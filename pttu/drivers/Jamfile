@@ -1,0 +1,4 @@
+SubDir TOP board pttu drivers ;
+
+Module board_common : pttu-uart0.c ;
+
