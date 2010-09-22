@@ -1,0 +1,5 @@
+SubDir TOP projects test_periodic_sleep ;
+
+Module test_periodic_sleep : main.c : swtimer ;
+
+UseModule test_periodic_sleep ;

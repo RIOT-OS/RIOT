@@ -1,0 +1,12 @@
+# ******************************************************************************
+# Copyright 2010, Freie Universitaet Berlin (FUB). All rights reserved.
+# ******************************************************************************
+# $Id$
+
+BOARD = eZ430-Chronos ;
+CPU = msp430 ;
+MCU = cc430x6137 ;
+
+FLASHER ?= mspdebug ;
+FLASHFLAGS ?= rf2500 ;
+

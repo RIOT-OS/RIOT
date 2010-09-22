@@ -1,0 +1,9 @@
+############################
+
+BOARD = olimex_lpc2148 ;
+CPU = lpc214x ;
+
+GDB = arm-elf-gdb ;
+GDBFLAGS = -x board/olimex_lpc2148/tools/lpc2148_flash.gdb ;
+
+include $(TOP)/Jamrules.arm_common ;

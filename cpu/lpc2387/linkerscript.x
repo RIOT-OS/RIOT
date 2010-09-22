@@ -1,0 +1,194 @@
+/******************************************************************************
+Copyright 2008-2009, Freie Universitaet Berlin (FUB). All rights reserved.
+
+These sources were developed at the Freie Universitaet Berlin, Computer Systems
+and Telematics group (http://cst.mi.fu-berlin.de).
+-------------------------------------------------------------------------------
+This file is part of FeuerWare.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+FeuerWare is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see http://www.gnu.org/licenses/ .
+--------------------------------------------------------------------------------
+For further information and questions please use the web site
+	http://scatterweb.mi.fu-berlin.de
+and the mailinglist (subscription via web site)
+	scatterweb@lists.spline.inf.fu-berlin.de
+*******************************************************************************/
+
+/* specify the LPC2387 memory areas (see LPC2387 datasheet page 15)  */
+MEMORY 
+{
+	flash     			: ORIGIN = 0,          LENGTH = 512K	/* FLASH ROM                            	*/
+	ram_battery			: ORIGIN = 0xE0084000, LENGTH = 2K		/* Battery RAM								*/
+	ram   				: ORIGIN = 0x40000000, LENGTH = 64K		/* LOCAL ON-CHIP STATIC RAM					*/
+	ram_usb				: ORIGIN = 0x7FD00000, LENGTH = 16K		/* USB RAM 									*/
+	ram_ethernet		: ORIGIN = 0x7FE00000, LENGTH = 16K		/* ethernet RAM 							*/
+}
+
+__stack_und_size = 4;			/* stack for "undefined instruction" interrupts				*/
+__stack_abt_size = 4;			/* stack for "abort" interrupts								*/
+__stack_fiq_size = 64;			/* stack for "FIQ" interrupts								*/
+__stack_irq_size = 400;			/* stack for "IRQ" normal interrupts						*/
+__stack_svc_size = 400;			/* stack for "SVC" supervisor mode							*/
+__stack_usr_size = 4096;		/* stack for user operation (kernel init)				    */
+__stack_size = __stack_und_size + __stack_abt_size + __stack_fiq_size + __stack_irq_size + __stack_svc_size + __stack_usr_size;
+
+/* now define the output sections  */
+SECTIONS 
+{
+	.text :								/* collect all sections that should go into FLASH after startup  */ 
+	{
+		*(.vectors)						/* Exception Vectors and branch table >= 64 bytes */
+		. = ALIGN(64);
+	    *(.init)
+	    *(.init0)  						/* Start here after reset.  */
+	    *(.init1)
+	    *(.init2) 						/* Copy data loop  */
+	    *(.init3)
+	    *(.init4)  						/* Clear bss  */
+	    *(.init5)
+	    *(.init6)  						/* C++ constructors.  */
+	    *(.init7)
+	    *(.init8)
+	    *(.init9) 						/* Call main().  */
+		
+		*(.text)						/* all .text sections (code)  */
+		*(.text.*)
+		*(.gnu.linkonce.t.*)
+
+		. = ALIGN(4);
+		__commands_start = .;
+		*(.commands)					/* command table */
+		__commands_end = .;
+		. = ALIGN(4);
+		__cfgspec_start = .;
+		*(.cfgspec)						/* configuration spec table */
+		__cfgspec_end = .;		
+		. = ALIGN(4);
+		
+		*(.rodata .rodata.*)			/* all .rodata sections (constants, strings, etc.)  */
+		*(.gnu.linkonce.r.*)
+		*(.glue_7)						/* all .glue_7 sections  (no idea what these are) */
+		*(.glue_7t)						/* all .glue_7t sections (no idea what these are) */
+		
+		*(.fini9)
+		*(.fini8)
+		*(.fini7)
+		*(.fini6)						/* C++ destructors.  */
+		*(.fini5)
+		*(.fini4)
+		*(.fini3)
+		*(.fini2)
+		*(.fini1)
+		*(.fini0)						/* Infinite loop after program termination.  */
+		*(.fini)
+		
+		*(.gcc_except_table)
+		
+	} >flash							/* put all the above into FLASH */	
+	. = ALIGN(4);
+	_etext = . ;						/* define a global symbol _etext just after the last code byte */
+
+	/**************************************************************************
+	 * RAM
+	 **************************************************************************/
+
+	/*
+	 * collect all uninitialized sections that go into RAM
+	 */	
+	.noinit (NOLOAD) :
+	{
+		__noinit_start = .;
+		PROVIDE(__fiq_handler = .);
+		*(.fiq)
+		*(.noinit)
+	}  > ram
+	. = ALIGN(4);
+	__noinit_end = .;
+
+	/*
+	 * collect all zero initialized sections that go into RAM
+	 */
+	.bss (NOLOAD) :
+	{
+		. = ALIGN(4);					/* ensure data is aligned so relocation can use 4-byte operations */
+		__bss_start = .;				/* define a global symbol marking the start of the .bss section */
+		*(.bss)							/* all .bss sections  */
+		*(COMMON)
+	} > ram								/* put all the above in RAM (it will be cleared in the startup code */
+	. = ALIGN(4);						/* ensure data is aligned so relocation can use 4-byte operations */
+	__bss_end = . ;						/* define a global symbol marking the end of the .bss section */
+	
+	/*
+	 * collect all initialized .data sections that go into RAM
+	 * initial values get placed at the end of .text in flash
+	 */
+	.data : AT (_etext)
+	{
+		. = ALIGN(4);					/* ensure data is aligned so relocation can use 4-byte operations */
+		_data = .;						/* create a global symbol marking the start of the .data section  */
+		*(.data)						/* all .data sections  */
+		*(.gnu.linkonce.d*)
+	} >ram								/* put all the above into RAM (but load the LMA copy into FLASH) */
+	. = ALIGN(4);						/* ensure data is aligned so relocation can use 4-byte operations */
+	_edata = .;							/* define a global symbol marking the end of the .data section  */	
+	_end = .;							/* define a global symbol marking the end of application RAM */
+
+	__heap1_size = ORIGIN(ram) + LENGTH(ram) - . - __stack_size;
+	.heap1 (NOLOAD) :
+	{
+		PROVIDE(__heap1_start = .);
+		. = . + __heap1_size;
+		PROVIDE(__heap1_max = .);	
+	} > ram	
+	
+	/*
+	 * Stacks
+	 */
+	.stack (NOLOAD) :
+	{
+		PROVIDE(__stack_start = .);
+	
+		. = . + __stack_usr_size;
+		__stack_usr_start = .;
+		. = . + __stack_und_size;
+		__stack_und_start = .;
+		. = . + __stack_fiq_size;
+		__stack_fiq_start = .;
+		. = . + __stack_irq_size;
+		__stack_irq_start = .;
+		. = . + __stack_abt_size;
+		__stack_abt_start = .;
+		. = . + __stack_svc_size;
+		__stack_svc_start = .;
+		
+		PROVIDE(__stack_end = .);
+	} > ram
+	
+	__heap2_size = LENGTH(ram_ethernet);
+	.heap2 (NOLOAD) :
+	{
+		PROVIDE(__heap2_start = . );
+		. = . + __heap2_size;
+		PROVIDE(__heap2_max = .);		/* _heap shall always be < _heap_max */
+	} > ram_ethernet
+
+	.usbdata (NOLOAD) :					/* USB RAM section, may be used otherwise if USB is disabled */
+	{
+		*(.usbdata)
+	} > ram_usb
+	
+	.batteryram (NOLOAD) :				/* battery ram stay on during powerdown but needs to be handled specially */
+	{
+		*(.batteryram)
+	} > ram_battery	
+}

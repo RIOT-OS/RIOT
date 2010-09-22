@@ -1,0 +1,6 @@
+SubDir TOP projects hello-world ;
+# LOCATE_TARGET = $(SEARCH_SOURCE)/bin ;
+
+Library hello-world : main.c ;
+
+LinkLibraries $(BOARD).elf : hello-world ;

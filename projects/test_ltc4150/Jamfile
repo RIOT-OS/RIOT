@@ -1,0 +1,5 @@
+SubDir TOP projects test_ltc4150 ;
+
+Module test_ltc4150 : main.c : ltc4150 swtimer auto_init ;
+
+UseModule test_ltc4150 ;

@@ -1,0 +1,18 @@
+#!/usr/bin/expect
+
+set timeout 5
+
+spawn board/msba2/tools/bin/pseudoterm $env(PORT) 
+
+exec jam reset 
+
+expect { 
+    "Hello world!" {} 
+    timeout { 
+        puts "\nTest not successful!\n"
+        exit 1 
+    }
+}
+
+puts "\nTest successful!\n"
+

@@ -1,0 +1,9 @@
+SubDir TOP projects cc110x ;
+# LOCATE_TARGET = $(SEARCH_SOURCE)/bin ;
+
+Library cc110x : main.c ;
+
+UseModule cc110x ;
+UseModule gpioint ;
+
+LinkLibraries $(BOARD).elf : cc110x ;

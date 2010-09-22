@@ -1,0 +1,174 @@
+/******************************************************************************
+Copyright 2009, Freie Universitaet Berlin (FUB). All rights reserved.
+
+These sources were developed at the Freie Universitaet Berlin, Computer Systems
+and Telematics group (http://cst.mi.fu-berlin.de).
+-------------------------------------------------------------------------------
+This file is part of FeuerWare.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+FeuerWare is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see http://www.gnu.org/licenses/ .
+--------------------------------------------------------------------------------
+For further information and questions please use the web site
+	http://scatterweb.mi.fu-berlin.de
+and the mailinglist (subscription via web site)
+	scatterweb@lists.spline.inf.fu-berlin.de
+*******************************************************************************/
+
+/**
+ * @ingroup		lpc2387
+ * @addtogroup	dev_gpioint
+ * @{
+ */
+
+/**
+ * @file
+ * @brief		LPC2387 GPIO Interrupt Multiplexer implementation
+ *
+ * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author		Michael Baar <michael.baar@fu-berlin.de>
+ * @version     $Revision: 1508 $
+ *
+ * @note    	$Id: lpc2387-gpioint.c 1508 2009-10-26 15:10:02Z baar $
+ * @see			dev_gpioint
+ */
+
+#include <stdio.h>
+#include "lpc2387.h"
+#include "gpioint.h"
+#include "cpu.h"
+#include <irq.h>
+
+struct irq_callback {
+	fp_irqcb	callback;
+};
+
+static struct irq_callback gpioint0[32];
+static struct irq_callback gpioint2[32];
+
+
+void gpioint_init(void) {
+    extern void GPIO_IRQHandler(void);
+
+   /* GPIO Init */
+    INTWAKE |= GPIO0WAKE | GPIO2WAKE;                       // allow GPIO to wake up from power down
+    install_irq(GPIO_INT, &GPIO_IRQHandler, IRQP_GPIO);     // install irq handler
+}
+
+/*---------------------------------------------------------------------------*/
+bool
+gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
+{
+	struct irq_callback*	cbdata;
+	unsigned long bit;
+	volatile unsigned long* en_f;
+	volatile unsigned long* en_r;
+	volatile unsigned long* en_clr;
+
+	/* lookup registers */
+	bit = number_of_highest_bit(bitmask);						// get irq mapping table index
+
+	switch( port ) {
+		case 0:													// PORT0
+			cbdata = gpioint0;
+			en_f = &IO0_INT_EN_F;
+			en_r = &IO0_INT_EN_R;
+			en_clr = &IO0_INT_CLR;
+			break;
+
+		case 2:													// PORT2
+			cbdata = gpioint2;
+			en_f = &IO2_INT_EN_F;
+			en_r = &IO2_INT_EN_R;
+			en_clr = &IO2_INT_CLR;
+			break;
+
+		default:												// unsupported
+			return false;										// fail
+	}
+
+	/* reconfigure irq */
+	unsigned long cpsr = disableIRQ();
+	*en_clr |= bitmask; 										// clear interrupt
+
+	if( (flags & GPIOINT_FALLING_EDGE) != 0 ) {
+		*en_f |= bitmask; 										// enable falling edge
+	} else {
+		*en_f &= ~bitmask; 										// disable falling edge
+	}
+
+	if( (flags & GPIOINT_RISING_EDGE) != 0 ) {
+		*en_r |= bitmask; 										// enable rising edge
+	} else {
+		*en_r &= ~bitmask; 										// disable rising edge
+	}
+
+	if( ((flags & (GPIOINT_FALLING_EDGE | GPIOINT_RISING_EDGE)) != 0) ) {
+		cbdata[bit].callback = callback;
+
+	} else {
+		cbdata[bit].callback = NULL;							// remove from interrupt mapping table
+	}
+	restoreIRQ(cpsr);
+
+	return true;												// success
+}
+/*---------------------------------------------------------------------------*/
+static void test_irq(int port, unsigned long f_mask, unsigned long r_mask, struct irq_callback* pcb)
+{
+	/* Test each bit of rising and falling masks, if set trigger interrupt
+	 * on corresponding device */
+	do {
+		if( (pcb->callback != NULL)  ) {
+			if ((r_mask & 1) | (f_mask & 1)) {
+				pcb->callback();			// pass to handler
+			}
+		}
+
+		f_mask >>= 1UL;
+		r_mask >>= 1UL;
+		pcb++;
+	} while( (f_mask != 0) || (r_mask != 0) );
+}
+/*---------------------------------------------------------------------------*/
+void GPIO_IRQHandler(void) __attribute__((interrupt("IRQ")));
+/**
+ * @brief	GPIO Interrupt handler function
+ * @internal
+ *
+ * Invoked whenever an activated gpio interrupt is triggered by a rising
+ * or falling edge.
+ */
+void GPIO_IRQHandler(void) {
+	if( IO_INT_STAT & BIT0 ) {										// interrupt(s) on PORT0 pending
+		unsigned long int_stat_f = IO0_INT_STAT_F;					// save content
+		unsigned long int_stat_r = IO0_INT_STAT_R;					// save content
+
+		IO0_INT_CLR = int_stat_f;									// clear flags of fallen pins
+		IO0_INT_CLR = int_stat_r;									// clear flags of risen pins
+
+		test_irq(0, int_stat_f, int_stat_r, gpioint0);
+	}
+
+	if( IO_INT_STAT & BIT2 ) {										// interrupt(s) on PORT2 pending
+		unsigned long int_stat_f = IO2_INT_STAT_F;					// save content
+		unsigned long int_stat_r = IO2_INT_STAT_R;					// save content
+
+		IO2_INT_CLR = int_stat_f;									// clear flags of fallen pins
+		IO2_INT_CLR = int_stat_r;									// clear flags of risen pins
+
+		test_irq(2, int_stat_f, int_stat_r, gpioint2);
+	}
+	VICVectAddr = 0;												// Acknowledge Interrupt
+}
+/*---------------------------------------------------------------------------*/
+/** @} */

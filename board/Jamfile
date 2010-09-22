@@ -1,0 +1,3 @@
+SubDir TOP board ;
+
+SubInclude TOP board $(BOARD) ;

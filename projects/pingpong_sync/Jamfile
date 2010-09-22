@@ -1,0 +1,6 @@
+SubDir TOP projects pingpong_sync ;
+# LOCATE_TARGET = $(SEARCH_SOURCE)/bin ;
+
+Library pingpong_sync : main.c ;
+
+LinkLibraries $(BOARD).elf : pingpong_sync ;

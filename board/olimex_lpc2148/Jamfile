@@ -1,0 +1,10 @@
+SubDir TOP board olimex_lpc2148 ;
+
+CPU = lpc214x ;
+
+HDRS += $(TOP)/board/olimex_lpc2148/include ;
+
+Module board : board_init.c debug_uart.c rs232.c ;
+UseModule board ;
+
+SubInclude TOP cpu lpc214x ;
