@@ -1,0 +1,30 @@
+#!/usr/bin/expect
+
+set timeout 5
+
+spawn board/msba2/tools/bin/pseudoterm $env(PORT)
+
+expect { 
+    ">$" {} 
+    timeout { exit 1 }
+}
+
+send "start_test\n" 
+expect {
+    "\[TEST_START\]" {}
+    timeout { exit 1 }
+}
+
+expect { 
+    ">$" {} 
+    timeout { exit 1 }
+}
+
+send "end_test\n" 
+
+expect {
+    "\[TEST_END\]" {}
+    timeout { exit 1 }
+}
+
+puts "\nTest successful!\n"
