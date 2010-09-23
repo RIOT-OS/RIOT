@@ -90,11 +90,6 @@ static void swtimer_update_values() {
             swtime_t offset = swtimer_next_alarm_absolute - now;
             hwtimer_ticks_left = HWTIMER_TICKS(offset);
             
-            if ( offset > swtimer_next_alarm_absolute ) {
-                DEBUG("swtimer_update_values: underflow corrected.\n");
-                hwtimer_ticks_left = 0;
-            } else {
-            }
             DEBUG("swtimer_update_values abs: %lu offset: %lu hwtimer_ticks_left: %lu, now=%lu, hwtimer_now=%lu\n", swtimer_next_alarm_absolute, offset, hwtimer_ticks_left, swtimer_now(), hwtimer_now());
 }
 
