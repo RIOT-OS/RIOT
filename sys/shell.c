@@ -37,11 +37,8 @@ and the mailinglist (subscription via web site)
  *              name of a handler, the handler will be called with the whole
  *              command line as parameter.
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Kaspar Schleiser <kaspar@schleiser.de>
- * @version     2.0 $Revision$
- *
- * @note		$Id$
  */
 
 #include <sys/unistd.h>
@@ -111,6 +108,4 @@ void shell_register_cmd(shell_t *shell, char* name, void (*handler)(char* args))
    hashtable_insert(shell->h, name, handler);
 }
 
-/**
- * @}
- */
+/** @} */
