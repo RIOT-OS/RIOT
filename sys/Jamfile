@@ -28,6 +28,9 @@
 SubDir TOP sys ;
 
 Module swtimer : swtimer.c : hwtimer ;
+Module shell : shell.c sync_read.c : hashtable hash_string ringbuffer ;
+
 Module auto_init : auto_init.c ;
 
 SubInclude TOP sys net ;
+SubInclude TOP sys lib ;
