@@ -172,3 +172,7 @@ void hwtimer_arch_unset(short timer) {
 unsigned long hwtimer_arch_now(void) {
     return T0TC;
 }
+
+void hwtimer_arch_setcounter(unsigned int val) {
+    T0TC = val;
+}
