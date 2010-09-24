@@ -19,6 +19,7 @@
 #include "queue.h"
 #include "tcb.h"
 #include <stddef.h>
+#include <irq.h>
 
 #include "flags.h"
 
@@ -91,6 +92,8 @@ int msg_send_int(msg* m, unsigned int target_pid) {
     if (target->status ==  STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send_int: direct msg copy.\n");
 
+        m->sender_pid = target_pid;
+
         /* copy msg to target */
         msg* target_message = (msg*)target->wait_data;
         *target_message = *m;
@@ -118,11 +121,12 @@ int msg_send_receive(msg *m, msg *reply, unsigned int target_pid) {
 }
 
 int msg_reply(msg *m, msg *reply) {
-    dINT();
+    int state = disableIRQ();
+
     tcb *target = (tcb*)fk_threads[m->sender_pid];
     if (target->status != STATUS_REPLY_BLOCKED) {
         DEBUG("%s: msg_reply(): target \"%s\" not waiting for reply.", fk_thread->name, target->name);
-        eINT();
+        restoreIRQ(state);
         return -1;
     }
     
@@ -131,11 +135,25 @@ int msg_reply(msg *m, msg *reply) {
     msg* target_message = (msg*)target->wait_data;
     *target_message = *m;
     sched_set_status(target,  STATUS_PENDING);
-    eINT();
+    restoreIRQ(state);
     fk_yield();
 
     return 1;
 }
+
+int msg_reply_int(msg *m, msg *reply) {
+    tcb *target = (tcb*)fk_threads[m->sender_pid];
+    if (target->status != STATUS_REPLY_BLOCKED) {
+        DEBUG("%s: msg_reply_int(): target \"%s\" not waiting for reply.", fk_thread->name, target->name);
+        return -1;
+    }
+    msg* target_message = (msg*)target->wait_data;
+    *target_message = *m;
+    sched_set_status(target,  STATUS_PENDING);
+    fk_context_switch_request = 1;
+    return 1;
+}
+
 
 int msg_receive(msg* m) {
     dINT();
