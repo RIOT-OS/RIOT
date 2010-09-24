@@ -66,7 +66,7 @@ const char *idle_name = "idle";
 void kernel_init(void)
 {
     dINT();
-    printf("kernel_init(): This is Fire_Kernel 0.0!\n");
+    printf("kernel_init(): This is µkleos!\n");
     
     scheduler_init();
 
