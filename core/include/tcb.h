@@ -20,7 +20,6 @@
 #include "queue.h"
 #include "clist.h"
 
-
 /* uneven means has to be on runqueue */
 #define STATUS_NOT_FOUND 0
 #define STATUS_ON_RUNQUEUE 1
