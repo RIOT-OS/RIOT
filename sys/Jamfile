@@ -28,7 +28,8 @@
 SubDir TOP sys ;
 
 Module swtimer : swtimer.c : hwtimer ;
-Module shell : shell.c sync_read.c : hashtable hash_string ringbuffer ;
+Module posix_io : posix_io.c ;
+Module shell : shell.c : hashtable hash_string ;
 
 Module auto_init : auto_init.c ;
 

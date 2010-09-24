@@ -60,41 +60,45 @@ static void handle_input_line(shell_t *shell, char* line) {
         if (handler) {
             handler(line);
         } else {
-            printf("shell: command not found.\n");
+            printf("shell: command \"%s\" not found.\n", command);
         }
     }
     
     free(line);
 }
 
+int readline(shell_t *shell, char* buf, int size) {
+    char *line_buf_ptr = buf;
+    int c;
+
+    while (1) {
+        if ( (line_buf_ptr - buf) >= size-1) {
+            return -1;
+        }
+
+        c = shell->readchar();
+
+        write(STDOUT_FILENO, &c, 1);
+
+        if (c == 13) continue;
+
+        if (c == 10) {
+            *line_buf_ptr = '\0';
+            return 0;
+        } else {
+            *line_buf_ptr++ = c;
+        }
+    }
+}
+
 void shell_run(shell_t *shell) {
     char line_buf[255];
-    char *line_buf_ptr = line_buf;
-    int c;
 
     while(1) {
         write(STDOUT_FILENO, ">", 1);
-
-        while (1) {
-            if ( (line_buf_ptr - line_buf) >= (sizeof(line_buf)-1)) {
-                printf("\nshell: input too long.\n");
-                line_buf_ptr = line_buf;
-            }
-
-            c = shell->readchar();
-            
-            write(STDOUT_FILENO, &c, 1);
-
-            if (c == 13) continue;
-
-            if (c == 10) {
-                *line_buf_ptr = '\0';
-                handle_input_line(shell, strdup(line_buf));
-                line_buf_ptr = line_buf;
-                break;
-            } else {
-                *line_buf_ptr++ = c;
-            }
+        int res = readline(shell, line_buf, sizeof(line_buf));
+        if (! res ) {
+            handle_input_line(shell, strdup(line_buf));
         }
     }
 }
