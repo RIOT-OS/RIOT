@@ -61,6 +61,7 @@ Doc doc ;											# build the documentation
 Flash flash : $(TARGET:S=.hex) ;
 Reset reset ;
 Terminal term ;
+Test test : all ;
 
 Debug debug : $(TARGET) ;
 ListModules listmodules ;
