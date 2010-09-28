@@ -30,7 +30,7 @@ SubDir TOP sys ;
 Module swtimer : swtimer.c : hwtimer ;
 Module posix_io : posix_io.c ;
 Module shell : shell.c : hashtable hash_string ;
-Module ps : ps ;
+Module ps : ps.c ;
 
 Module auto_init : auto_init.c ;
 
