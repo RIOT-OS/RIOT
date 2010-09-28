@@ -175,6 +175,13 @@ actions Reset
     $(RESET) > /dev/null 2>&1 
 }
 
+# run a terminal
+#
+actions Terminal
+{
+    $(TERMINAL) $(TERMOPTS) $(PORT)
+}
+
 #
 # Run debug server
 rule Debug

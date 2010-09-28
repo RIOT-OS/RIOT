@@ -60,6 +60,7 @@ LOCATE on $(TARGET:S=.hex) = bin ;
 Doc doc ;											# build the documentation
 Flash flash : $(TARGET:S=.hex) ;
 Reset reset ;
+Terminal term ;
 
 Debug debug : $(TARGET) ;
 ListModules listmodules ;
