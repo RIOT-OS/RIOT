@@ -26,7 +26,6 @@
 # $Id$
 
 SubDir TOP ;
-
 #
 # Target directory: bin directory located in BUILD_ROOT
 #
