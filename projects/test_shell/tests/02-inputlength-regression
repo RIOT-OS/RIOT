@@ -2,7 +2,7 @@
 
 set timeout 1
 
-spawn board/msba2/tools/bin/pseudoterm $env(PORT) 
+spawn pseudoterm $env(PORT) 
 
 sleep 1
 
