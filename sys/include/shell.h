@@ -57,4 +57,7 @@ void shell_register_cmd(shell_t *shell, char* name, void (*handler)(char* args))
  */
 void shell_run(shell_t *shell);
 
+
+void shell_auto_init(shell_t *shell);
+
 #endif /* __SIMPLE_SHELL_H */

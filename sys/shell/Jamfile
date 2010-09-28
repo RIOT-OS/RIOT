@@ -25,13 +25,9 @@
 # ******************************************************************************
 # $Id$
 
-SubDir TOP sys ;
+SubDir TOP sys shell ;
 
-Module swtimer : swtimer.c : hwtimer ;
-Module posix_io : posix_io.c ;
+Module shell : shell.c : hashtable hash_string ;
+Module ps : ps.c ;
+Module shell_auto_init : shell_auto_init.c : shell ;
 
-Module auto_init : auto_init.c ;
-
-SubInclude TOP sys net ;
-SubInclude TOP sys lib ;
-SubInclude TOP sys shell ;

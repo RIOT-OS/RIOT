@@ -37,6 +37,7 @@ int main(void) {
 
     shell_t shell;
     shell_init(&shell, shell_readc);
+    shell_auto_init(&shell);
     
     shell_register_cmd(&shell, "start_test", print_teststart);
     shell_register_cmd(&shell, "end_test", print_testend);
