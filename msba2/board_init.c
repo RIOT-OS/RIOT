@@ -25,7 +25,7 @@ and the mailinglist (subscription via web site)
 *******************************************************************************/
 
 /**
- * @ingroup pttu
+ * @ingroup msba2
  * @{
  */
 
