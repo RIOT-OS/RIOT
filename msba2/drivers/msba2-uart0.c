@@ -36,9 +36,7 @@ and the mailinglist (subscription via web site)
 #include "lpc23xx.h"
 #include "VIC.h"
 
-#include <msg.h>
-#include <ringbuffer.h>
-#include "uart0.h"
+#include <board_uart0.h>
 
 /**
  * @file
@@ -66,9 +64,6 @@ static volatile unsigned int running = 0;
 static volatile unsigned int fifo = 0;
 
 static volatile toprint* actual = NULL;
-
-int uart0_handler_pid = 0;
-extern ringbuffer uart0_ringbuffer;
 
 static inline void enqueue(void) {
     queue_items++;
@@ -109,12 +104,6 @@ int uart_active(void){
     return (running || fifo);
 }
 
-static void notify_handler() {
-    msg m;
-    m.type = 0;
-    msg_send_int(&m, uart0_handler_pid);
-}
-
 void stdio_flush(void)
 {
     U0IER &= ~BIT1;                             // disable THRE interrupt
@@ -140,15 +129,16 @@ void UART0_IRQHandler(void)
 
         case UIIR_CTI_INT:                // Character Timeout Indicator
         case UIIR_RDA_INT:                // Receive Data Available
+#ifdef MODULE_UART0
             if (uart0_handler_pid) {
                 do {
                     int c = U0RBR;
-                    rb_add_element(&uart0_ringbuffer, c);
+                    uart0_handle_incoming(c);
                 } while (U0LSR & ULSR_RDR);
-
-                notify_handler();
-                break;
+                uart0_notify_thread();
             }
+#endif
+            break;
         default:
             U0LSR;
             U0RBR;
