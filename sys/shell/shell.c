@@ -77,8 +77,7 @@ int readline(shell_t *shell, char* buf, int size) {
         }
 
         c = shell->readchar();
-
-        write(STDOUT_FILENO, &c, 1);
+        shell->put_char(c);
 
         if (c == 13) continue;
 
@@ -95,7 +94,7 @@ void shell_run(shell_t *shell) {
     char line_buf[255];
 
     while(1) {
-        write(STDOUT_FILENO, ">", 1);
+        shell->put_char('>');
         int res = readline(shell, line_buf, sizeof(line_buf));
         if (! res ) {
             handle_input_line(shell, strdup(line_buf));
@@ -103,9 +102,10 @@ void shell_run(shell_t *shell) {
     }
 }
 
-void shell_init(shell_t *shell, int(*readchar)(void)) {
+void shell_init(shell_t *shell, int(*readchar)(void), void(*put_char)(int)) {
     shell->h = create_hashtable(16, (unsigned int (*)(void*)) hash_string, (int (*) (void*,void*)) cmp_string);
     shell->readchar = readchar;
+    shell->put_char = put_char;
 }
 
 void shell_register_cmd(shell_t *shell, char* name, void (*handler)(char* args)) {

@@ -6,9 +6,9 @@
 #include <string.h>
 #include <malloc.h>
 
-#include <uart0.h>
 #include <posix_io.h>
 #include <shell.h>
+#include <board_uart0.h>
 
 void print_teststart(char* str) {
     printf("[TEST_START]\n");
@@ -27,16 +27,20 @@ int shell_readc() {
     return c;
 }
 
+void shell_putchar(int c) {
+    putchar(c);
+}
+
 int main(void) {
     //printf("Moin. build on %s %s SVN-Revision: %s\n", kernel_builddate, kernel_buildtime, kernel_svnrevision);
     printf("test_shell.\n");
 
-    uart0_init();
+    board_uart0_init();
 
     posix_open(uart0_handler_pid, 0);
 
     shell_t shell;
-    shell_init(&shell, shell_readc);
+    shell_init(&shell, shell_readc, shell_putchar);
     shell_auto_init(&shell);
     
     shell_register_cmd(&shell, "start_test", print_teststart);

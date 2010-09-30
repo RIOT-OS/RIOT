@@ -32,6 +32,8 @@ Module posix_io : posix_io.c ;
 
 Module auto_init : auto_init.c ;
 
+Module chardev_thread : chardev_thread.c : ringbuffer ;
+
 SubInclude TOP sys net ;
 SubInclude TOP sys lib ;
 SubInclude TOP sys shell ;

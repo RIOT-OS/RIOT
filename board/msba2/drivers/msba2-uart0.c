@@ -110,11 +110,9 @@ int uart_active(void){
 }
 
 static void notify_handler() {
-    if (uart0_handler_pid) {
-        msg m;
-        m.type = 0;
-        msg_send_int(&m, uart0_handler_pid);
-    }
+    msg m;
+    m.type = 0;
+    msg_send_int(&m, uart0_handler_pid);
 }
 
 void stdio_flush(void)
@@ -142,14 +140,15 @@ void UART0_IRQHandler(void)
 
         case UIIR_CTI_INT:                // Character Timeout Indicator
         case UIIR_RDA_INT:                // Receive Data Available
-            do {
-                int c = U0RBR;
-                rb_add_element(&uart0_ringbuffer, c);
-            } while (U0LSR & ULSR_RDR);
+            if (uart0_handler_pid) {
+                do {
+                    int c = U0RBR;
+                    rb_add_element(&uart0_ringbuffer, c);
+                } while (U0LSR & ULSR_RDR);
 
-            notify_handler();
-            break;
-
+                notify_handler();
+                break;
+            }
         default:
             U0LSR;
             U0RBR;
