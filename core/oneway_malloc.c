@@ -35,6 +35,13 @@ void *_malloc(size_t size) {
     }
 }
 
+void *_realloc(void *ptr, size_t size) {
+    void* newptr = _malloc(size);
+    memcpy(newptr, ptr, size);
+    free(ptr);
+    return newptr;
+}
+
 void _free(void* ptr) {
     DEBUG("_free(): block at 0x%X lost.\n", (unsigned int)ptr);
 }
