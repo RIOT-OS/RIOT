@@ -32,10 +32,15 @@ and the mailinglist (subscription via web site)
  * @ingroup feuerware
  */
 
-#include "hashtable.h"
+//#include "hashtable.h"
+
+typedef struct shell_commant_t {
+    char* name;
+    void (*handler)(char*);
+} shell_command_t;
 
 typedef struct shell_t {
-    struct hashtable *h;
+    const shell_command_t *command_list;
     int (*readchar)(void); 
     void (*put_char)(int); 
 } shell_t;
@@ -51,7 +56,7 @@ void shell_init(shell_t *shell, int(*read_char)(void), void (*put_char)(int));
  * @param name Name of the command to register.
  * @param handler Function pointer to handler that takes the complete command line as parameter.
  */
-void shell_register_cmd(shell_t *shell, char* name, void (*handler)(char* args));
+//void shell_register_cmd(shell_t *shell, char* name, void (*handler)(char* args));
 
 /**
  * @brief Endless loop that waits for command and executes handler.

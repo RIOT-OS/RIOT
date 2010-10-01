@@ -6,6 +6,6 @@
 
 SubDir TOP projects test_shell ;
 
-Module test_shell : test_shell.c : shell posix_io shell_auto_init ps uart0 ;
+Module test_shell : test_shell.c : shell posix_io ps uart0 ;
 
 UseModule test_shell ;

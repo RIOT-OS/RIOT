@@ -18,9 +18,6 @@ void print_testend(char* str) {
     printf("[TEST_END]\n");
 }
 
-//extern int uart0_init();
-//extern int uart0_handler_pid;
-
 int shell_readc() {
     char c = 0;
     posix_read(uart0_handler_pid, &c, 1);
@@ -30,6 +27,12 @@ int shell_readc() {
 void shell_putchar(int c) {
     putchar(c);
 }
+
+const shell_command_t shell_commands[] = {
+    {"start_test", print_teststart},
+    {"end_test", print_testend},
+    {NULL, NULL}
+};
 
 int main(void) {
     //printf("Moin. build on %s %s SVN-Revision: %s\n", kernel_builddate, kernel_buildtime, kernel_svnrevision);
@@ -41,10 +44,8 @@ int main(void) {
 
     shell_t shell;
     shell_init(&shell, shell_readc, shell_putchar);
-    shell_auto_init(&shell);
-    
-    shell_register_cmd(&shell, "start_test", print_teststart);
-    shell_register_cmd(&shell, "end_test", print_testend);
+
+    shell.command_list = shell_commands;
     
     shell_run(&shell);
 

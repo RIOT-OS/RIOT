@@ -27,7 +27,8 @@
 
 SubDir TOP sys shell ;
 
-Module shell : shell.c : hashtable hash_string ;
+Module shell : shell.c ;
+Module shell_commands : shell_commands.c : shell ;
+
 Module ps : ps.c ;
-Module shell_auto_init : shell_auto_init.c : shell ;
 
