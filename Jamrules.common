@@ -116,6 +116,9 @@ actions piecemeal together existing Clean
 {
 	# remove all jam targets
 	$(RM) $(>)
+	# empty bin directory (removing target of other projects)
+    rmdir --ignore-fail-on-non-empty bin/$(BOARD)/$(PROJECT)
+    rmdir --ignore-fail-on-non-empty bin/$(BOARD) 
 }
 
 #
