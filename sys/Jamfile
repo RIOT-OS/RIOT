@@ -29,11 +29,8 @@ SubDir TOP sys ;
 
 Module swtimer : swtimer.c : hwtimer ;
 Module posix_io : posix_io.c ;
-<<<<<<< HEAD
 Module shell : shell.c : hashtable hash_string ;
 Module ps : ps.c ;
-=======
->>>>>>> 355988f8cfa6d2d86fbdb7993fa6823943ca23c6
 
 Module auto_init : auto_init.c ;
 
