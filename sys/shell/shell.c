@@ -46,8 +46,20 @@ and the mailinglist (subscription via web site)
 #include <stdio.h>
 #include <malloc.h>
 #include <stdlib.h>
-#include <hash_string.h>
 #include <shell.h>
+
+static void(*find_handler(const shell_command_t *command_list, char *command))(char*) {
+    const shell_command_t *entry = command_list;
+
+    while(entry->name != NULL) {
+        if ( strcmp(entry->name, command) == 0) {
+            return entry->handler;
+        } else {
+            command_list++;
+        }
+    }
+    return NULL;
+}
 
 static void handle_input_line(shell_t *shell, char* line) {
     char* saveptr;
@@ -56,7 +68,7 @@ static void handle_input_line(shell_t *shell, char* line) {
     void (*handler)(char*) = NULL;
     
     if (command) {
-        handler = hashtable_search(shell->h, command);
+        handler = find_handler(shell->command_list, command);
         if (handler) {
             handler(line);
         } else {
@@ -77,8 +89,7 @@ int readline(shell_t *shell, char* buf, int size) {
         }
 
         c = shell->readchar();
-
-        write(STDOUT_FILENO, &c, 1);
+        shell->put_char(c);
 
         if (c == 13) continue;
 
@@ -95,7 +106,7 @@ void shell_run(shell_t *shell) {
     char line_buf[255];
 
     while(1) {
-        write(STDOUT_FILENO, ">", 1);
+        shell->put_char('>');
         int res = readline(shell, line_buf, sizeof(line_buf));
         if (! res ) {
             handle_input_line(shell, strdup(line_buf));
@@ -103,13 +114,9 @@ void shell_run(shell_t *shell) {
     }
 }
 
-void shell_init(shell_t *shell, int(*readchar)(void)) {
-    shell->h = create_hashtable(16, (unsigned int (*)(void*)) hash_string, (int (*) (void*,void*)) cmp_string);
+void shell_init(shell_t *shell, int(*readchar)(void), void(*put_char)(int)) {
     shell->readchar = readchar;
-}
-
-void shell_register_cmd(shell_t *shell, char* name, void (*handler)(char* args)) {
-   hashtable_insert(shell->h, name, handler);
+    shell->put_char = put_char;
 }
 
 /** @} */

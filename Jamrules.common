@@ -172,10 +172,28 @@ actions Flash
     $(FLASHER) $(FLASHFLAGS) $(>)
 }
 
+#
+# Run all tests for active project
+rule Test
+{
+    Depends $(<) : $(>) ;
+}
+actions Test
+{
+    for tst in projects/$(PROJECT)/tests/*; do $tst; done
+}
+
 # Reset connected sensor node
 actions Reset
 {
     $(RESET) > /dev/null 2>&1 
+}
+
+# run a terminal
+#
+actions Terminal
+{
+    $(TERMINAL) $(TERMOPTS) $(PORT)
 }
 
 #

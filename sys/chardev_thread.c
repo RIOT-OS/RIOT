@@ -1,36 +1,22 @@
 #include <thread.h>
 #include <kernel.h>
 #include <msg.h>
-#include <board.h>
 #include <ringbuffer.h>
 
 #include <stdio.h>
 #include <errno.h>
 #include <irq.h>
 #include <posix_io.h>
-#include "uart0.h"
 
 //#define ENABLE_DEBUG
 #include <debug.h>
-
-static char buffer[UART0_BUFSIZE];
-ringbuffer uart0_ringbuffer;
-
-static void uart0_loop();
-
-void uart0_init() {
-    ringbuffer_init(&uart0_ringbuffer, buffer, UART0_BUFSIZE);
-    int pid = thread_create(KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN-1, CREATE_STACKTEST, uart0_loop, "uart0");
-    uart0_handler_pid = pid;
-    puts("uart0_init() [OK]");
-}
 
 static int min(int a, int b) {
     if (b>a) return a;
     else return b;
 }
 
-static void uart0_loop() {
+void chardev_loop(ringbuffer *rb) {
     msg m;
 
     int pid = thread_getpid();
@@ -80,11 +66,11 @@ static void uart0_loop() {
             }
         }
 
-        if (uart0_ringbuffer.avail && (r != NULL)) {
+        if (rb->avail && (r != NULL)) {
             int state = disableIRQ();
-            int nbytes = min(r->nbytes, uart0_ringbuffer.avail);
+            int nbytes = min(r->nbytes, rb->avail);
             DEBUG("uart0_thread: sending %i bytes to pid %i\n", nbytes, reader_pid);
-            rb_get_elements(&uart0_ringbuffer, r->buffer, nbytes);
+            rb_get_elements(rb, r->buffer, nbytes);
             r->nbytes = nbytes;
 
             m.sender_pid = reader_pid;

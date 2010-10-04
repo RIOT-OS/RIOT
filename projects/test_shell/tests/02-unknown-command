@@ -1,8 +1,8 @@
 #!/usr/bin/expect
 
-set timeout 1
+set timeout 2
 
-spawn board/msba2/tools/bin/pseudoterm $env(PORT) 
+spawn pseudoterm $env(PORT) 
 
 sleep 1
 
@@ -13,7 +13,7 @@ expect {
 
 send "some_definately_unknown_command\n"
 expect { 
-    "shell: command not found." {} 
+    "shell: command "some_definately_unknown_command" not found." {} 
     timeout { exit 1 }
 }
 

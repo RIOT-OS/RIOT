@@ -13,6 +13,8 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+#include <kernel.h>
+
 
 /**
  * @brief Creates a new thread.

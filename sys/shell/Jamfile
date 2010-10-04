@@ -25,21 +25,10 @@
 # ******************************************************************************
 # $Id$
 
-SubDir TOP sys ;
+SubDir TOP sys shell ;
 
-Module swtimer : swtimer.c : hwtimer ;
-Module posix_io : posix_io.c ;
-<<<<<<< HEAD
-Module shell : shell.c : hashtable hash_string ;
+Module shell : shell.c ;
+Module shell_commands : shell_commands.c : shell ;
+
 Module ps : ps.c ;
-=======
->>>>>>> 355988f8cfa6d2d86fbdb7993fa6823943ca23c6
 
-Module auto_init : auto_init.c ;
-
-Module chardev_thread : chardev_thread.c : ringbuffer ;
-Module uart0 : uart0.c : ringbuffer chardev_thread ;
-
-SubInclude TOP sys net ;
-SubInclude TOP sys lib ;
-SubInclude TOP sys shell ;
