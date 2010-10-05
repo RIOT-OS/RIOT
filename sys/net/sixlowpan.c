@@ -1,6 +1,7 @@
 #include <stdio.h>
+#include "drivers/cc110x/cc1100.h"
 
-static output(void){
+static void output(void){
 	
 	// TODO
 	// 1. get dest addr from function param
