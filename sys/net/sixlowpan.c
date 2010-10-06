@@ -35,3 +35,7 @@ static eui64 get_eui64_from_mac(void){
 
     return ident;
 }
+
+static void set_6lowpan_address(uint64_t prefix){
+        
+}

@@ -13,4 +13,9 @@ typedef struct eui64{
     uint16_t pattern;
     uint8_t ext_ident_1;
     uint16_t ext_ident_2;
-} eui64;  
+} eui64;
+
+typedef struct ipv6_addr{
+    uint16_t prefix[4];
+    eui64 interface_id;
+} ipv6_addr;  
