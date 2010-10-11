@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "board.h"
-#include "kernel_intern.h"
+#include <board.h>
+#include <kernel_intern.h>
 
 extern void board_init();
 
@@ -10,7 +10,7 @@ __attribute__ ((constructor)) static void startup() {
 
     board_init();
 
-    puts("FireKernel MSP430 hardware initialization complete.\n");
+    puts("ukleos MSP430 hardware initialization complete.\n");
 
     kernel_init();
 }
