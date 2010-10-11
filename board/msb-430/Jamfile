@@ -25,9 +25,7 @@
 # ******************************************************************************
 # $Id$
 
-SubDir TOP board msb-430h ;
-
-Module board_cc1100 : driver_cc1100.c ;
+SubDir TOP board msb-430 ;
 
 SubInclude TOP board msb-430-common ;
 SubInclude TOP cpu $(CPU) ;
