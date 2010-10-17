@@ -1,6 +1,11 @@
 /* 6LoWPAN IP header file */
 
+#ifndef SIXLOWIP_H
+#define SIXLOWIP_H
+
 #include <stdint.h>
+
+#define MSBA2_SENSOR_NODE 1
 
 /* set maximum transmission unit */
 #ifdef MSBA2_SENSOR_NODE
@@ -23,14 +28,19 @@
 #define LL_HEADER_LENGTH            0x0    
 #endif
 
+#define SIXLOWPAN_IPV6_LL_ADDR_LEN  8            
+
+/* size of global buffer */
 #define BUFFER_SIZE (LL_HEADER_LENGTH + MTU)
 
-uint8_t ipv6_ext_hdr_len = 0;
+extern uint8_t ipv6_ext_hdr_len;
 
 #define LLHDR_IPV6HDR_LENGTH (LL_HEADER_LENGTH + IPV6_HEADER_LENGTH + ipv6_ext_hdr_len)
-
+#define LLHDR_ICMPV6HDR_LENGTH (LL_HEADER_LENGTH + IPV6_HEADER_LENGTH + ipv6_ext_hdr_len + ICMP_HEADER_LENGTH)
+#define IPV6HDR_ICMPV6HDR_LENGTH (IPV6_HEADER_LENGTH + ipv6_ext_hdr_len + ICMP_HEADER_LENGTH)
 /* global buffer*/
-uint8_t[BUFFER_SIZE] buffer;
+
+uint8_t buffer[BUFFER_SIZE];
 
 
 /* ipv6 extension header length */
@@ -56,3 +66,11 @@ struct ipv6_hdr{
     ipv6_addr srcaddr;
     ipv6_addr destaddr;
 };
+
+typedef struct link_layer_addr{
+    uint8_t uint8[8];  
+} link_layer_addr;
+
+#define HTONS(a) (uint16_t)((((uint16_t) (a)) << 8) | (((uint16_t) (a)) >> 8))
+
+#endif
