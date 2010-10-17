@@ -1,11 +1,28 @@
 /* 6LoWPAN MAC header file */
 
-#define MSBA2_OUI	0x005BA2	// 24bit OUI 
-#define MSBA2_R8BIT	0xA2		// random 8bit
+#ifndef SIXLOWMAC_H
+#define SIXLOWMAC_H
 
-typedef struct mac_addr{
-    uint16_t oui_1;
-    uint8_t oui_2;
-    uint8_t ext_ident_1;        // MSBA2_R8BIT
-    uint16_t ext_ident_2;       // radio address
-} mac_addr;
+#include "sixlowip.h"
+#include <stdio.h>
+#include <stdint.h>
+
+#define MSBA2_OUI	0x005BA2	// 24bit OUI 
+#define R8BIT	    0xA2		// random 8bit
+
+#ifdef MSBA2_SENSOR_NODE
+#define OUI         0x005BA2
+#else
+#define OUI         0x0
+#endif
+
+void create_link_local_prefix(ipv6_addr *ipaddr);
+
+void create_all_routers_mcast_addr(ipv6_addr *ipaddr);
+
+void set_eui64(ipv6_addr *ipaddr);
+
+void get_link_layer_addr_from_ipaddr(ipv6_addr *ipaddr, link_layer_addr *lla);
+
+void boot_6ln(void);
+#endif
