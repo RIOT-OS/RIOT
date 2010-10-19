@@ -79,10 +79,10 @@ void set_llao(uint8_t *llao, uint8_t type){
         // 16-bit short address
         llao[ND_OPT_LENGTH] = 1;
     // get link layer address
-    link_layer_addr mac;
-    get_link_layer_addr_from_ipaddr(&IP_BUFFER->srcaddr,&mac);    
+    link_layer_addr *mac = get_eui(&IP_BUFFER->srcaddr);
+    //get_link_layer_addr_from_ipaddr(&IP_BUFFER->srcaddr,&mac);    
 
-    memcpy(&llao[ND_OPT_DATA], &mac, SIXLOWPAN_IPV6_LL_ADDR_LEN);
+    memcpy(&llao[ND_OPT_DATA], mac, SIXLOWPAN_IPV6_LL_ADDR_LEN);
     // padding (all zeros) - 48bit 
     memset(&llao[ND_OPT_DATA + SIXLOWPAN_IPV6_LL_ADDR_LEN], 0, 
             SLLAO_OPT_LENGTH - SIXLOWPAN_IPV6_LL_ADDR_LEN - 2); 
