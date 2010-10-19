@@ -1,5 +1,3 @@
-/* 6LoWPAN/IPv6 Neighbor Discovery implementation*/
-
 #include "sixlowip.h"
 #include "sixlownd.h"
 #include "sixlowmac.h"
@@ -9,6 +7,7 @@
 #define PRINT6ADDR(addr) PRINTF("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x\n", ((uint8_t *)addr)[0], ((uint8_t *)addr)[1], ((uint8_t *)addr)[2], ((uint8_t *)addr)[3], ((uint8_t *)addr)[4], ((uint8_t *)addr)[5], ((uint8_t *)addr)[6], ((uint8_t *)addr)[7], ((uint8_t *)addr)[8], ((uint8_t *)addr)[9], ((uint8_t *)addr)[10], ((uint8_t *)addr)[11], ((uint8_t *)addr)[12], ((uint8_t *)addr)[13], ((uint8_t *)addr)[14], ((uint8_t *)addr)[15])
 
 static uint8_t option_field_length;
+uint8_t ipv6_ext_hdr_len = 0;
 
 #define IP_BUFFER ((struct ipv6_hdr*)&buffer[LL_HEADER_LENGTH])  
 #define ICMP_BUFFER ((struct icmpv6_hdr*)&buffer[LLHDR_IPV6HDR_LENGTH])
@@ -19,7 +18,7 @@ uint8_t rs_count;
 
 /* send router solicitation message - RFC4861 section 4.1 */
 void send_rs(void){
-      uint8_t ipv6_ext_hdr_len = 0;
+      //uint8_t ipv6_ext_hdr_len = 0;
     if(rs_count < MAX_RTR_SOLICITATIONS){
         ICMP_BUFFER->type = ICMP_ROUTER_SOLICITATION;
         ICMP_BUFFER->code = 0;
@@ -47,9 +46,10 @@ void send_rs(void){
 
 void recv_rs(void){
     option_field_length = RS_LENGTH;
+    uint8_t *llao;
     /* get link layer address option from buf */
     if(OPT_FIELD_BUFFER->type == SLLAO_OPT_LENGTH){
-        uint8_t *llao = OPT_FIELD_BUFFER;
+        llao = OPT_FIELD_BUFFER;
     }
 
     if(llao != NULL){
@@ -59,8 +59,14 @@ void recv_rs(void){
     send_ra();        
 }
 
-void send_ra(void){
-    
+void send_ra(ipv6_addr *addr){
+    IP_BUFFER->version_trafficclass = IPV6_VERSION;
+    IP_BUFFER->trafficclass_flowlabel = 0;
+    IP_BUFFER->flowlabel = 0;
+    IP_BUFFER->nextheader = ICMP_NEXTHEADER;
+    IP_BUFFER->hoplimit = NEIGHBOR_DISCOVERY_HOPLIMIT;
+
+    create_all_nodes_mcast_addr(&IP_BUFFER->destaddr);
 }
 
 /* link-layer address option - RFC4861 section 4.6.1/ RFC4944 8. */

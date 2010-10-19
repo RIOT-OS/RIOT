@@ -38,3 +38,4 @@ Module uart0 : uart0.c : ringbuffer chardev_thread ;
 SubInclude TOP sys net ;
 SubInclude TOP sys lib ;
 SubInclude TOP sys shell ;
+SubInclude TOP sys net sixlowpan ;

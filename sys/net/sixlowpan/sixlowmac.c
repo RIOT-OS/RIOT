@@ -14,14 +14,16 @@
 
 #include <stdio.h>
 
-void boot_6ln(void){
-//    uint8_t ipv6_ext_hdr_len = 0;
+void bootstrapping(void){
+#ifdef SIXLOWPAN_NODE
     /* create link-local address based on eui-64 */
+    RADIO.set_address(5);
     create_link_local_prefix(&IP_BUFFER->srcaddr);
     set_eui64(&IP_BUFFER->srcaddr);
     PRINT6ADDR(&IP_BUFFER->srcaddr);
     /* send router solicitation */
     send_rs();
+#endif  
 }
 
 
@@ -34,7 +36,7 @@ void create_link_local_prefix(ipv6_addr *ipaddr){
 
 /* cc1100 - eui-64 init fuction */
 void set_eui64(ipv6_addr *ipaddr){
-    uint16_t radio_driver_addr = cc1100_get_address();
+    uint16_t radio_driver_addr = RADIO.get_address();
 
     ipaddr->uint8[8] = ((uint8_t) (OUI >> 16)) | 0x2 ;
     ipaddr->uint8[9] = (uint8_t) (OUI >> 8);
@@ -56,6 +58,18 @@ void create_all_routers_mcast_addr(ipv6_addr *ipaddr){
     ipaddr->uint16[6] = 0;
     ipaddr->uint16[7] = HTONS(0x0002);
 }
+
+void create_all_nodes_mcast_addr(ipv6_addr *ipaddr){
+    ipaddr->uint16[0] = HTONS(0xff02);
+    ipaddr->uint16[1] = 0;
+    ipaddr->uint16[2] = 0;
+    ipaddr->uint16[3] = 0;
+    ipaddr->uint16[4] = 0;
+    ipaddr->uint16[5] = 0;
+    ipaddr->uint16[6] = 0;
+    ipaddr->uint16[7] = HTONS(0x0001);
+}
+
 
 void get_link_layer_addr_from_ipaddr(ipv6_addr *ipaddr, link_layer_addr *lla){
     lla->uint8[0] = ipaddr->uint8[8];
