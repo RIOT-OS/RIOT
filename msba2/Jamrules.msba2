@@ -29,5 +29,5 @@ CPU = lpc2387 ;
 
 HDRS += [ FPath $(TOP) board $(BOARD) drivers include ] ;
 
-FLASHER ?= $(POSIXSHELL) $(TOP)/board/msba2/tools/flashutil.sh ;
-FLASHFLAGS ?= --basedir $(TOP)/board/msba2/tools --id "MSB-A2" --ports "$(PORT)" ;
+FLASHER ?= $(POSIXSHELL) lpc2k_pgm ;
+FLASHFLAGS ?= "$(PORT)" ;
