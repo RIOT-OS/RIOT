@@ -55,7 +55,7 @@ static void(*find_handler(const shell_command_t *command_list, char *command))(c
         if ( strcmp(entry->name, command) == 0) {
             return entry->handler;
         } else {
-            command_list++;
+            entry++;
         }
     }
     return NULL;
@@ -69,14 +69,13 @@ static void handle_input_line(shell_t *shell, char* line) {
     
     if (command) {
         handler = find_handler(shell->command_list, command);
-        if (handler) {
+        if (handler != NULL) {
             handler(line);
         } else {
-            printf("shell: command \"%s\" not found.\n", command);
+            puts("shell: command not found.");
         }
     }
     
-    free(line);
 }
 
 int readline(shell_t *shell, char* buf, int size) {
@@ -109,7 +108,9 @@ void shell_run(shell_t *shell) {
         shell->put_char('>');
         int res = readline(shell, line_buf, sizeof(line_buf));
         if (! res ) {
-            handle_input_line(shell, strdup(line_buf));
+            char* line_copy = strdup(line_buf);
+            handle_input_line(shell, line_copy);
+            free(line_copy);
         }
     }
 }
