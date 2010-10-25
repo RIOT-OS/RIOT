@@ -15,9 +15,9 @@
 #ifndef _FLAGS_H
 #define _FLAGS_H
 
-#define CREATE_WOUT_YIELD 4
 #define CREATE_SLEEPING 1
-#define EXPECTS_REPLY 2
+#define AUTO_FREE 2
+#define CREATE_WOUT_YIELD 4
 #define CREATE_STACKTEST 8
 
 /**
