@@ -1,20 +1,24 @@
+BODY {
+	margin:0;
+	padding:0;
+}
 BODY,H1,H2,H3,H4,H5,H6,P,CENTER,TD,TH,UL,DL,DIV {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 BODY,TD {
-       font-size: 90%;
 }
-h1 { /* titel */
+h1 { 
 	text-align: left;
-    font-size: 140%;
-	background-color: #aabbbd; /*#f4f4f4; */
+	font-size: 140%;
+/*
 	padding: 0.3em 0.3 0em 0.3em;
 	height: 80px;
 	margin-top: 0;
-}
+	border:1px solid blue;
+*/
+} 
 h1,
 h1 a, h1 a:visited {
-	color: #0e393f;
 	text-decoration: none;
 }
 h2 { /* section */
@@ -52,7 +56,7 @@ DIV.nav {
 	border: 1px solid #84b0c7;
 	text-align: center;
 	margin: 2px;
-	padding: 2px;
+	/*padding: 2px;*/
 	line-height: 140%;
 }
 DIV.navtab {
@@ -135,8 +139,6 @@ DIV.groupText { margin-left: 16px; font-style: italic; font-size: 90% }
 BODY {
 	background: white;
 	color: black;
-	margin-right: 20px;
-	margin-left: 20px;
 }
 table.styled {
 	border: 1px solid #d1d1d1;
