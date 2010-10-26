@@ -28,11 +28,11 @@
 
 #undef wakeup
 
-#if WORDSIZE == 32
-typedef uint64_t swtime_t;
-#else
+//#if WORDSIZE == 32
+//typedef uint64_t swtime_t;
+//#else
 typedef uint32_t swtime_t;
-#endif
+//#endif
 
 /**
  * A swtimer.
