@@ -41,6 +41,7 @@ volatile int lpm_prevent_sleep = 0;
 extern void main(void);
 extern void fk_switch_context_exit(void);
 
+
 void fk_idle(void) {
     while(1) {
         if (lpm_prevent_sleep) {
@@ -57,6 +58,12 @@ void fk_idle(void) {
 const char *main_name = "main";
 const char *idle_name = "idle";
 
+static tcb main_tcb;
+static char main_stack[KERNEL_CONF_STACKSIZE_MAIN];
+
+static tcb idle_tcb;
+static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
+
 #ifdef MODULE_AUTO_INIT
 #define MAIN_FUNC auto_init
 #else
@@ -70,11 +77,11 @@ void kernel_init(void)
     
     scheduler_init();
 
-    if (thread_create(KERNEL_CONF_STACKSIZE_IDLE, PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, fk_idle, idle_name) < 0) {
+    if (thread_create(&main_tcb, main_stack, sizeof(main_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, fk_idle, idle_name) < 0) {
         printf("kernel_init(): error creating idle task.\n");
     }
 
-    if (thread_create(KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN, CREATE_WOUT_YIELD | CREATE_STACKTEST, MAIN_FUNC, main_name) < 0) {
+    if (thread_create(&idle_tcb, idle_stack, sizeof(idle_stack), PRIORITY_MAIN, CREATE_WOUT_YIELD | CREATE_STACKTEST, MAIN_FUNC, main_name) < 0) {
         printf("kernel_init(): error creating main task.\n");
     }
 

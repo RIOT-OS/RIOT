@@ -1,6 +1,4 @@
 SubDir TOP projects pingpong ;
-# LOCATE_TARGET = $(SEARCH_SOURCE)/bin ;
 
-Library pingpong : main.c ;
-
-LinkLibraries $(BOARD).elf : pingpong ;
+Module pingpong : main.c ;
+UseModule pingpong ;

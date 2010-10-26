@@ -94,10 +94,14 @@ static const pm_table_t handler_table;
 static const char *cc1100_event_handler_name = "cc1100_event_handler";
 static mutex_t cc1100_mutex;
 volatile int cc1100_mutex_pid;
-static uint16_t cc1100_event_handler_pid;
-static void cc1100_event_handler_function(void);
 static swtimer_t cc1100_watch_dog;
 static uint64_t cc1100_watch_dog_period = 0;
+
+static uint16_t cc1100_event_handler_pid;
+static void cc1100_event_handler_function(void);
+
+static tcb event_handler_tcb;
+static char event_handler_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 /*---------------------------------------------------------------------------*/
 // 				Sequence number buffer management data structures
@@ -188,7 +192,7 @@ void cc1100_phy_init()
 	mutex_init(&cc1100_mutex);
 
 	// Allocate event numbers and start cc1100 event process
-	cc1100_event_handler_pid = thread_create(2500, PRIORITY_CC1100, CREATE_STACKTEST,
+	cc1100_event_handler_pid = thread_create(&event_handler_tcb, event_handler_stack, sizeof(event_handler_stack), PRIORITY_CC1100, CREATE_STACKTEST,
 			cc1100_event_handler_function, cc1100_event_handler_name);
 
 	// Active watchdog for the first time

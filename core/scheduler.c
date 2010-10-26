@@ -149,12 +149,17 @@ extern void fk_switch_context_exit(void);
 void fk_task_exit(void) {
     DEBUG("fk_task_exit(): ending task %s...\n", fk_thread->name);
 
+    tcb* thread = (tcb*)fk_thread;
     dINT();
     fk_threads[fk_thread->pid] = NULL;
     num_tasks--;
-    sched_set_status((tcb*)fk_thread,  STATUS_STOPPED);
+    sched_set_status(thread,  STATUS_STOPPED);
 
-    free(((tcb*)fk_thread)->stack_start);
+//     if ( thread->flags & AUTO_FREE ) {
+//         free(thread)->stack_start);
+//         free(thread);
+//     }
+
     fk_thread = NULL;
     fk_switch_context_exit();
 }

@@ -74,7 +74,7 @@ int fk_measure_stack_free(char* stack) {
     return space;
 }
 
-int thread_create(int stacksize, char priority, int flags, void (*function) (void), const char* name)
+int thread_create(tcb *cb, char *stack, int stacksize, char priority, int flags, void (*function) (void), const char* name)
 {
     /* stacksize must be a multitude of 4 for alignment and stacktest */
 //  assert( ((stacksize & 0x03) == 0) && (stacksize > 0) );
@@ -84,20 +84,6 @@ int thread_create(int stacksize, char priority, int flags, void (*function) (voi
 
     if (priority >= SCHED_PRIO_LEVELS) {
         return -EINVAL;
-    }
-
-    tcb *pd = (tcb*)malloc(sizeof(tcb));
-    if ( pd == NULL) {
-        DEBUG("thread_create(): out of memory\n");
-        return -ENOMEM;
-    }
-
-    char *stack = (char*)malloc(stacksize);
-    if (stack==NULL)
-    {
-        DEBUG("thread_create(): out of memory\n");
-        free (pd);
-        return -ENOMEM;
     }
 
     if (flags & CREATE_STACKTEST) {
@@ -120,8 +106,8 @@ int thread_create(int stacksize, char priority, int flags, void (*function) (voi
     int pid = 0;
     while (pid < MAXTHREADS) {
         if (fk_threads[pid] == NULL) {
-            fk_threads[pid] = pd;
-            pd->pid = pid;
+            fk_threads[pid] = cb;
+            cb->pid = pid;
             break;
         }
         pid++;
@@ -130,42 +116,39 @@ int thread_create(int stacksize, char priority, int flags, void (*function) (voi
     if (pid == MAXTHREADS) {
         DEBUG("thread_create(): too many threads!\n");
 
-        free (pd);
-        free (stack);
-
         if (! inISR()) {
             eINT();
         }
         return -EOVERFLOW;
     }
 
-    pd->sp = fk_stack_init(function,stack+stacksize);
-    pd->stack_start = stack;
-    pd->stack_size = stacksize;
+    cb->sp = fk_stack_init(function,stack+stacksize);
+    cb->stack_start = stack;
+    cb->stack_size = stacksize;
 
-    pd->priority = priority;
-    pd->status = 0;
+    cb->priority = priority;
+    cb->status = 0;
 
-    pd->name = name;
+    cb->name = name;
 
-    pd->wait_data = NULL;
+    cb->wait_data = NULL;
 
-    pd->msg_queue.data = 0;
-    pd->msg_queue.priority = 0;
-    pd->msg_queue.next = NULL;
+    cb->msg_queue.data = 0;
+    cb->msg_queue.priority = 0;
+    cb->msg_queue.next = NULL;
 
-    pd->rq_entry.data = (unsigned int) pd;
-    pd->rq_entry.next = NULL;
-    pd->rq_entry.prev = NULL;
+    cb->rq_entry.data = (unsigned int) cb;
+    cb->rq_entry.next = NULL;
+    cb->rq_entry.prev = NULL;
 
     num_tasks++;
 
-    DEBUG("Created thread %s. PID: %u. Priority: %u.\n", name, pd->pid, priority);
+    DEBUG("Created thread %s. PID: %u. Priority: %u.\n", name, cb->pid, priority);
 
     if (flags & CREATE_SLEEPING) {
-        sched_set_status(pd, STATUS_SLEEPING);
+        sched_set_status(cb, STATUS_SLEEPING);
     } else {
-        sched_set_status(pd, STATUS_PENDING);
+        sched_set_status(cb, STATUS_PENDING);
         if (!(flags & CREATE_WOUT_YIELD)) {
             if (! inISR()) {
                 eINT();

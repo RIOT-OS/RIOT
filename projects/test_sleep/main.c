@@ -18,6 +18,8 @@ void second_thread(void) {
     }
 }
 
+tcb second_thread_tcb;
+char second_thread_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
 
 int main(void)
 {
@@ -25,7 +27,7 @@ int main(void)
 
     printf("Hello world!\n");
 
-    int pid = thread_create(KERNEL_CONF_STACKSIZE_DEFAULT, PRIORITY_MAIN-1, CREATE_STACKTEST | CREATE_SLEEPING | CREATE_WOUT_YIELD, second_thread, "sleeper");
+    int pid = thread_create(&second_thread_tcb, second_thread_stack, sizeof(second_thread_stack), PRIORITY_MAIN-1, CREATE_STACKTEST | CREATE_SLEEPING | CREATE_WOUT_YIELD, second_thread, "sleeper");
 
     if (pid < 0) {
         puts("Error creating second_thread! Stopping test.");
