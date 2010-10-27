@@ -54,7 +54,7 @@ extern uint8_t ipv6_ext_hdr_len;
 /* global buffer*/
 
 uint8_t buffer[BUFFER_SIZE];
-
+extern uint16_t packet_length;
 
 /* ipv6 extension header length */
 

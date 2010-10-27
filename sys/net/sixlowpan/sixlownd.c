@@ -8,6 +8,7 @@
 
 static uint8_t option_field_length;
 uint8_t ipv6_ext_hdr_len = 0;
+uint16_t packet_length;
 
 #define IP_BUFFER ((struct ipv6_hdr*)&buffer[LL_HEADER_LENGTH])  
 #define ICMP_BUFFER ((struct icmpv6_hdr*)&buffer[LLHDR_IPV6HDR_LENGTH])
@@ -20,6 +21,8 @@ uint8_t rs_count;
 void send_rs(void){
       //uint8_t ipv6_ext_hdr_len = 0;
     if(rs_count < MAX_RTR_SOLICITATIONS){
+        packet_length = 0;
+
         ICMP_BUFFER->type = ICMP_ROUTER_SOLICITATION;
         ICMP_BUFFER->code = 0;
 
