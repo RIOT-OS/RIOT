@@ -133,7 +133,7 @@ int msg_reply(msg *m, msg *reply) {
     DEBUG("%s: msg_reply(): direct msg copy.\n", fk_thread->name);
     /* copy msg to target */
     msg* target_message = (msg*)target->wait_data;
-    *target_message = *m;
+    *target_message = *reply;
     sched_set_status(target,  STATUS_PENDING);
     restoreIRQ(state);
     fk_yield();
