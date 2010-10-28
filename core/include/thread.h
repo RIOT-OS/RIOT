@@ -63,9 +63,9 @@ int thread_getpid();
  * @brief Measures the stack usage of a stack.
  * Only works if the thread was created with the flag CREATE_STACKTEST.
  *
- * @param stack The stack you want to measure. try fk_thread->stack_start.
+ * @param stack The stack you want to measure. try active_thread->stack_start.
  */
-int fk_measure_stack_free(char* stack);
+int thread_measure_stack_usage(char* stack);
 
 /* @} */
 #endif /* __THREAD_H */

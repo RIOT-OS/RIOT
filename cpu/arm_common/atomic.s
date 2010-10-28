@@ -4,7 +4,7 @@
   .code 32
   .align 4  /* 0 */
 
-/*  .extern  fk_schedule*/
+/*  .extern  sched_run*/
 
 /* Public functions declared in this file */
   .global  atomic_set_return

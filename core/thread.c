@@ -25,37 +25,37 @@
 #include "kernel_intern.h"
 #include "bitarithm.h"
 #include "hwtimer.h"
-#include "scheduler.h"
+#include "sched.h"
 
 inline int thread_getpid() {
-    return fk_thread->pid;
+    return active_thread->pid;
 }
 
 unsigned int thread_getstatus(int pid) {
-    if (fk_threads[pid]==NULL)
+    if (sched_threads[pid]==NULL)
         return STATUS_NOT_FOUND;
-    return fk_threads[pid]->status;
+    return sched_threads[pid]->status;
 }
 
 void thread_sleep() {
     if ( inISR()) return;
     dINT();
-    sched_set_status((tcb*)fk_thread, STATUS_SLEEPING);
-    fk_yield();
+    sched_set_status((tcb*)active_thread, STATUS_SLEEPING);
+    thread_yield();
 }
 
 int thread_wakeup(int pid) {
     int isr = inISR();
     if (! isr) dINT();
 
-    int result = fk_threads[pid]->status;
+    int result = sched_threads[pid]->status;
     if (result == STATUS_SLEEPING) {
-        sched_set_status((tcb*)fk_threads[pid], STATUS_RUNNING);
+        sched_set_status((tcb*)sched_threads[pid], STATUS_RUNNING);
         if (!isr) {
             eINT();
-            fk_yield();
+            thread_yield();
         } else {
-            fk_context_switch_request = 1;
+            sched_context_switch_request = 1;
         }
         return 0;
     } else {
@@ -64,7 +64,7 @@ int thread_wakeup(int pid) {
     }
 }
 
-int fk_measure_stack_free(char* stack) {
+int thread_measure_stack_usage(char* stack) {
     unsigned int* stackp = (unsigned int*)stack;
     /* assumption that the comparison fails before or after end of stack */
     while( *stackp == (unsigned int)stackp )
@@ -119,8 +119,8 @@ int thread_create(int stacksize, char priority, int flags, void (*function) (voi
 
     int pid = 0;
     while (pid < MAXTHREADS) {
-        if (fk_threads[pid] == NULL) {
-            fk_threads[pid] = pd;
+        if (sched_threads[pid] == NULL) {
+            sched_threads[pid] = pd;
             pd->pid = pid;
             break;
         }
@@ -139,7 +139,7 @@ int thread_create(int stacksize, char priority, int flags, void (*function) (voi
         return -EOVERFLOW;
     }
 
-    pd->sp = fk_stack_init(function,stack+stacksize);
+    pd->sp = thread_stack_init(function,stack+stacksize);
     pd->stack_start = stack;
     pd->stack_size = stacksize;
 
@@ -169,14 +169,14 @@ int thread_create(int stacksize, char priority, int flags, void (*function) (voi
         if (!(flags & CREATE_WOUT_YIELD)) {
             if (! inISR()) {
                 eINT();
-                fk_yield();
+                thread_yield();
             } else {
-                fk_context_switch_request = 1;
+                sched_context_switch_request = 1;
             }
         }
     }
 
-    if (!inISR() && fk_thread!=NULL) {
+    if (!inISR() && active_thread!=NULL) {
         eINT();
     }
 

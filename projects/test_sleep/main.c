@@ -38,7 +38,7 @@ int main(void)
         if (i % 100 == 0) { 
             printf("Waking up sleeper.\n");
             thread_wakeup(pid);
-            fk_yield();
+            thread_yield();
         }
     }
 }

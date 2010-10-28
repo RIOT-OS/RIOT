@@ -37,7 +37,7 @@ and the mailinglist (subscription via web site)
  * @{
  */
 
-#include <scheduler.h>
+#include <sched.h>
 #include <stdio.h>
 #include <signal.h>
 #include <cpu-conf.h>
@@ -66,11 +66,11 @@ inline void __save_context_isr() {
     __asm__("push r5");
     __asm__("push r4");
 
-    __asm__("mov.w r1,%0" : "=r" (fk_thread->sp));
+    __asm__("mov.w r1,%0" : "=r" (active_thread->sp));
 }
 
 inline void __restore_context_isr() {
-    __asm__("mov.w %0,r1" : : "m" (fk_thread->sp));
+    __asm__("mov.w %0,r1" : : "m" (active_thread->sp));
 
     __asm__("pop r4");
     __asm__("pop r5");
@@ -94,7 +94,7 @@ inline void __enter_isr() {
 
 inline void __exit_isr() {
     __inISR = 0;
-    if (fk_context_switch_request) fk_schedule();
+    if (sched_context_switch_request) sched_run();
     __restore_context_isr();
     __asm__("reti");
 }
@@ -121,7 +121,7 @@ inline void dINT() {
 
 #define lpm_set(...)
 
-void fk_yield();
+void thread_yield();
 
 
 int inISR();

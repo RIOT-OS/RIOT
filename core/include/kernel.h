@@ -25,7 +25,7 @@
 #include "tcb.h"
 #include "cpu.h"
 #include "flags.h"
-#include "scheduler.h"
+#include "sched.h"
 #include "cpu-conf.h"
 
 /* ------------------------------------------------------------------------- */

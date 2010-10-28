@@ -21,18 +21,18 @@
 #define SCHED_PRIO_LEVELS 16
 #endif
 
-void scheduler_init();
-void fk_schedule();
+void sched_init();
+void sched_run();
 
 void sched_set_status(tcb *process, unsigned int status);
 
-volatile unsigned int fk_context_switch_request;
+volatile unsigned int sched_context_switch_request;
 
-volatile tcb *fk_threads[MAXTHREADS];
-volatile tcb *fk_thread;
+volatile tcb *sched_threads[MAXTHREADS];
+volatile tcb *active_thread;
 
 extern volatile int num_tasks;
-volatile int fk_pid;
+volatile int thread_pid;
 
 //#define SCHEDSTATISTICS
 #if SCHEDSTATISTICS
