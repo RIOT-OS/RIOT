@@ -228,7 +228,7 @@ void _exit(int n)
 /*---------------------------------------------------------------------------*/
 int _getpid(void)
 {
-	return fk_thread->pid;
+	return active_thread->pid;
 }
 /*---------------------------------------------------------------------------*/
 int _kill_r(struct _reent *r, int pid, int sig)

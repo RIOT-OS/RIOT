@@ -28,25 +28,25 @@ and the mailinglist (subscription via web site)
 #include <board.h>
 #include "kernel.h"
 #include "kernel_intern.h"
-#include "scheduler.h"
+#include "sched.h"
 
 volatile int __inISR = 0;
 
 char __isr_stack[MSP430_ISR_STACK_SIZE];
 
-void fk_yield() {
+void thread_yield() {
     __save_context();
     
     dINT();
-    /* have fk_thread point to the next thread */
-    fk_schedule();
+    /* have active_thread point to the next thread */
+    sched_run();
     eINT();
 
     __restore_context();
 }
 
 // static void __resume_context () {
-//     __asm__("mov.w %0,r1" : : "m" (fk_thread->sp));
+//     __asm__("mov.w %0,r1" : : "m" (active_thread->sp));
 // 
 //     __asm__("pop r15");
 //     __asm__("pop r14");
@@ -81,15 +81,15 @@ void fk_yield() {
 //     __asm__("push r14");
 //     __asm__("push r15");
 // 
-//     __asm__("mov.w r1,%0" : "=r" (fk_thread->sp));
+//     __asm__("mov.w r1,%0" : "=r" (active_thread->sp));
 // }
 // 
 // 
 // __return_from_isr
 
-void fk_switch_context_exit(){
-    fk_thread = fk_threads[0];
-    fk_schedule();
+void cpu_switch_context_exit(){
+    active_thread = sched_threads[0];
+    sched_run();
 
     __restore_context();
 }
@@ -97,12 +97,12 @@ void fk_switch_context_exit(){
 //----------------------------------------------------------------------------
 // Processor specific routine - here for MSP
 //----------------------------------------------------------------------------
-char *fk_stack_init(void *task_func, void *stack_start)
+char *thread_stack_init(void *task_func, void *stack_start)
 {
     unsigned short * stk;
     stk = (unsigned short *) stack_start;
 
-    *stk = (unsigned short) fk_task_exit;
+    *stk = (unsigned short) sched_task_exit;
     --stk;
 
     *stk = (unsigned short) task_func;

@@ -22,15 +22,14 @@
 
   /* External references */
 
-  .extern  fk_thread
-  .extern  fk_context_switch_request
-  .extern  fk_schedule
+  .extern  active_thread
+  .extern  sched_context_switch_request
+  .extern  sched_run
   .extern  DEBUG_Routine
 
 /* Public functions declared in this file */
-  .global  fk_cpu_irq_isr
-  .global  fk_switch_context_exit
-  .global  fk_switch_context
+  .global  arm_irq_handler
+  .global  cpu_switch_context_exit
   .global  task_return
   .global  ctx_switch
   .global  dINT
@@ -80,32 +79,32 @@ ctx_switch2:
     /* store return address and spsr on user mode stack */
     stmfd   lr!, {r0, r1}
 
-    /* save user mode stack pointer in *fk_thread */
-    ldr     r1, =fk_thread   /* r1 = &fk_thread */
-    ldr     r1, [r1]                /* r1 = *r1 = fk_thread */
+    /* save user mode stack pointer in *active_thread */
+    ldr     r1, =active_thread   /* r1 = &active_thread */
+    ldr     r1, [r1]                /* r1 = *r1 = active_thread */
 
     str     lr, [r1]                /* store stack pointer in tasks tcb*/    
     /* now the calling task has all its registers saved on its stack and it's SP is saved in its tcb */
    
 
-    /* call scheduler so fk_thread points to the next task */
-    bl      fk_schedule
-    b       fk_task_return
+    /* call scheduler so active_thread points to the next task */
+    bl      sched_run
+    b       task_return
     /* never coming back */
 
-fk_switch_context_exit:
+cpu_switch_context_exit:
     mov r0, #NOINT|SVCMODE
     msr cpsr, r0
     
-    /* call scheduler so fk_thread points to the next task */
-    bl      fk_schedule
+    /* call scheduler so active_thread points to the next task */
+    bl      sched_run
 
-    /* continue in fk_task_return: */
+    /* continue in task_return: */
 
-fk_task_return:
+task_return:
     /* load tcb->stackpointer in r0 */
-    ldr     r0, =fk_thread   /* r0 = &fk_thread */
-    ldr     r0, [r0]                /* r0 = *r0 = fk_thread */
+    ldr     r0, =active_thread   /* r0 = &active_thread */
+    ldr     r0, [r0]                /* r0 = *r0 = active_thread */
     ldr     r0, [r0]
     
     /* restore saved spsr and return address from tasks stack */
@@ -121,7 +120,7 @@ fk_task_return:
 /*----------------------------------------------------------------------------
 *
 *----------------------------------------------------------------------------*/
-fk_cpu_irq_isr:
+arm_irq_handler:
     sub 	lr, lr, #4
 
     /* save interrupted tasks PC onto stack */
@@ -153,7 +152,7 @@ fk_cpu_irq_isr:
     MSR SPSR, R0    
 
     /* check if context switch was requested by irq */
-    ldr r0, =fk_context_switch_request
+    ldr r0, =sched_context_switch_request
     ldr r0, [r0]
 
     cmp r0, #0x00

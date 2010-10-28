@@ -11,7 +11,7 @@
 extern void dINT();
 extern void eINT();
 
-void fk_yield();
+void thread_yield();
 uint32_t get_system_speed(void);
 void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t* prescale);
 

@@ -210,9 +210,9 @@ void cc1100_phy_init()
 
 void cc1100_phy_mutex_lock(void)
 {
-	if (fk_thread->pid != cc1100_mutex_pid) {
+	if (active_thread->pid != cc1100_mutex_pid) {
 		mutex_lock(&cc1100_mutex);
-		cc1100_mutex_pid = fk_thread->pid;
+		cc1100_mutex_pid = active_thread->pid;
 	}
 }
 

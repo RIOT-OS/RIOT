@@ -15,7 +15,7 @@
 
 #include <stdint.h>
 #include <malloc.h>
-#include "scheduler.h"
+#include "sched.h"
 #include "kernel.h"
 #include "kernel_intern.h"
 #include "clist.h"
@@ -33,11 +33,11 @@ static uint32_t runqueue_bitcache = 0;
     schedstat pidlist[MAXTHREADS];
 #endif
 
-void scheduler_init() {
+void sched_init() {
     printf("Scheduler...");
     int i;
     for (i=0; i<MAXTHREADS; i++) {
-        fk_threads[i] = NULL;
+        sched_threads[i] = NULL;
 #if SCHEDSTATISTICS
         pidlist[i].laststart = 0;
         pidlist[i].runtime = 0;
@@ -45,8 +45,8 @@ void scheduler_init() {
 #endif
     }
 
-    fk_thread = NULL;
-    fk_pid = -1;
+    active_thread = NULL;
+    thread_pid = -1;
     for (i = 0; i < SCHED_PRIO_LEVELS; i++) {
         runqueues[i] = NULL;
     }
@@ -54,19 +54,19 @@ void scheduler_init() {
     printf("[OK]\n");
 }
 
-void fk_schedule() {
-    fk_context_switch_request = 0;
+void sched_run() {
+    sched_context_switch_request = 0;
 
-    tcb *my_fk_thread = (tcb*)fk_thread;
+    tcb *my_active_thread = (tcb*)active_thread;
 
-    if (my_fk_thread) {
-        if( my_fk_thread->status ==  STATUS_RUNNING) {
-            my_fk_thread->status =  STATUS_PENDING;
+    if (my_active_thread) {
+        if( my_active_thread->status ==  STATUS_RUNNING) {
+            my_active_thread->status =  STATUS_PENDING;
         }
 
 #ifdef SCHED_TEST_STACK
-        if (*((unsigned int*)my_fk_thread->stack_start) != (unsigned int) my_fk_thread->stack_start) {
-            printf("scheduler(): stack overflow detected, task=%s pid=%u\n", my_fk_thread->name, my_fk_thread->pid);
+        if (*((unsigned int*)my_active_thread->stack_start) != (unsigned int) my_active_thread->stack_start) {
+            printf("scheduler(): stack overflow detected, task=%s pid=%u\n", my_active_thread->name, my_active_thread->pid);
         }
 #endif
 
@@ -75,12 +75,12 @@ void fk_schedule() {
 #if SCHEDSTATISTICS
     extern unsigned long hwtimer_now(void);
     unsigned int time = hwtimer_now();
-    if (my_fk_thread && (pidlist[my_fk_thread->pid].laststart)) {
-        pidlist[my_fk_thread->pid].runtime += time - pidlist[my_fk_thread->pid].laststart;
+    if (my_active_thread && (pidlist[my_active_thread->pid].laststart)) {
+        pidlist[my_active_thread->pid].runtime += time - pidlist[my_active_thread->pid].laststart;
     }
 #endif
 
-    DEBUG("\nscheduler: previous task: %s\n", ( my_fk_thread == NULL) ? "none" : my_fk_thread->name );
+    DEBUG("\nscheduler: previous task: %s\n", ( my_active_thread == NULL) ? "none" : my_active_thread->name );
 
     if (num_tasks == 0) {
         DEBUG("scheduler: no tasks left.\n");
@@ -88,8 +88,8 @@ void fk_schedule() {
         DEBUG("scheduler: new task created.\n");
     }
 
-    my_fk_thread = NULL;
-    while(! my_fk_thread) {
+    my_active_thread = NULL;
+    while(! my_active_thread) {
 
         //        for (int i = 0; i < SCHED_PRIO_LEVELS; i++) { /* TODO: introduce bitfield cache */
         //            if (runqueues[i]) {
@@ -97,29 +97,29 @@ void fk_schedule() {
         clist_node_t next = *(runqueues[nextrq]);
         DEBUG("scheduler: first in queue: %s\n", ((tcb*)next.data)->name);
         clist_advance(&(runqueues[nextrq]));
-        my_fk_thread = (tcb*)next.data;
-        fk_pid = (volatile int) my_fk_thread->pid;
+        my_active_thread = (tcb*)next.data;
+        thread_pid = (volatile int) my_active_thread->pid;
 #if SCHEDSTATISTICS
-        pidlist[my_fk_thread->pid].laststart = time;
-        pidlist[my_fk_thread->pid].schedules ++;
+        pidlist[my_active_thread->pid].laststart = time;
+        pidlist[my_active_thread->pid].schedules ++;
 #endif
         //                break;
         //            }
         //        }
     }
 
-    DEBUG("scheduler: next task: %s\n", my_fk_thread->name);
+    DEBUG("scheduler: next task: %s\n", my_active_thread->name);
 
-    if (my_fk_thread != fk_thread) {
-        if (fk_thread != NULL) { //TODO: necessary?
-            if (fk_thread->status ==  STATUS_RUNNING) {
-                fk_thread->status =  STATUS_PENDING ;
+    if (my_active_thread != active_thread) {
+        if (active_thread != NULL) { //TODO: necessary?
+            if (active_thread->status ==  STATUS_RUNNING) {
+                active_thread->status =  STATUS_PENDING ;
             }
         }
-        sched_set_status((tcb*)my_fk_thread,  STATUS_RUNNING);
+        sched_set_status((tcb*)my_active_thread,  STATUS_RUNNING);
     }
 
-    fk_thread = (volatile tcb*) my_fk_thread;
+    active_thread = (volatile tcb*) my_active_thread;
 
     DEBUG("scheduler: done.\n");
 }
@@ -144,23 +144,20 @@ void sched_set_status(tcb *process, unsigned int status) {
     process->status = status;
 }
 
-extern void fk_switch_context_exit(void);
+extern void cpu_switch_context_exit(void);
 
-void fk_task_exit(void) {
-    DEBUG("fk_task_exit(): ending task %s...\n", fk_thread->name);
+void sched_task_exit(void) {
+    DEBUG("sched_task_exit(): ending task %s...\n", active_thread->name);
 
-    tcb* thread = (tcb*)fk_thread;
+    tcb* thread = (tcb*)active_thread;
     dINT();
-    fk_threads[fk_thread->pid] = NULL;
+    sched_threads[active_thread->pid] = NULL;
     num_tasks--;
-    sched_set_status(thread,  STATUS_STOPPED);
+    
+    sched_set_status((tcb*)active_thread,  STATUS_STOPPED);
 
-//     if ( thread->flags & AUTO_FREE ) {
-//         free(thread)->stack_start);
-//         free(thread);
-//     }
-
-    fk_thread = NULL;
-    fk_switch_context_exit();
+    free(((tcb*)active_thread)->stack_start);
+    active_thread = NULL;
+    cpu_switch_context_exit();
 }
 

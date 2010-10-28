@@ -20,7 +20,7 @@
 #include "tcb.h"
 #include "kernel.h"
 #include "kernel_intern.h"
-#include "scheduler.h"
+#include "sched.h"
 #include "flags.h"
 #include "cpu.h"
 #include "lpm.h"
@@ -34,15 +34,14 @@
 #define ENABLE_DEBUG
 #include "debug.h"
 
-volatile tcb *fk_threads[MAXTHREADS];
-volatile tcb *fk_thread;
+volatile tcb *sched_threads[MAXTHREADS];
+volatile tcb *active_thread;
 volatile int lpm_prevent_sleep = 0;
 
 extern void main(void);
-extern void fk_switch_context_exit(void);
+extern void cpu_switch_context_exit(void);
 
-
-void fk_idle(void) {
+static void idle_thread(void) {
     while(1) {
         if (lpm_prevent_sleep) {
             lpm_set(LPM_IDLE);
@@ -75,9 +74,9 @@ void kernel_init(void)
     dINT();
     printf("kernel_init(): This is ukleos!\n");
     
-    scheduler_init();
+    sched_init();
 
-    if (thread_create(&main_tcb, main_stack, sizeof(main_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, fk_idle, idle_name) < 0) {
+    if (thread_create(&main_tcb, main_stack, sizeof(main_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_stack, idle_name) < 0) {
         printf("kernel_init(): error creating idle task.\n");
     }
 
@@ -87,6 +86,6 @@ void kernel_init(void)
 
     printf("kernel_init(): jumping into first task...\n");
    
-    fk_switch_context_exit();
+    cpu_switch_context_exit();
 }
 

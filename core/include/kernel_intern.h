@@ -18,10 +18,10 @@
 
 void kernel_init(void);
 void board_init_drivers();
-char *fk_stack_init(void  *task_func, void *stack_start);
-void fk_task_exit(void);
-void fk_print_stack ();
-int fk_measure_stack_free(char* stack);
+char *thread_stack_init(void  *task_func, void *stack_start);
+void sched_task_exit(void);
+void thread_print_stack ();
+int thread_measure_stack_usage(char* stack);
 
 /** @} */
 #endif /* KERNEL_INTERN_H_ */

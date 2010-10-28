@@ -11,7 +11,7 @@
 #include <thread.h>
 #include <hwtimer.h>
 #include <swtimer.h>
-#include <scheduler.h>
+#include <sched.h>
 #include <cpu.h>
 #include <irq.h>
 

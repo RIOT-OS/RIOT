@@ -22,10 +22,10 @@
 
 #include <stdio.h>
 #include "arm_cpu.h"
-#include "scheduler.h"
+#include "sched.h"
 #include "kernel_intern.h"
 
-void fk_yield() {
+void thread_yield() {
     asm("svc 0\n");
 }
 
@@ -33,7 +33,7 @@ void fk_yield() {
 // Processor specific routine - here for ARM7
 // sizeof(void*) = sizeof(int)
 //----------------------------------------------------------------------------
-char * fk_stack_init(void * task_func, void * stack_start)
+char * thread_stack_init(void * task_func, void * stack_start)
 {
    unsigned int * stk;
    stk = (unsigned int *) stack_start;
@@ -42,7 +42,7 @@ char * fk_stack_init(void * task_func, void * stack_start)
     *stk = 0x77777777;
     stk--;
 
-    *stk = (unsigned int)fk_task_exit;       // LR
+    *stk = (unsigned int)sched_task_exit;       // LR
 
    stk--;
    *stk = (unsigned int) stack_start - 4;   // SP
@@ -60,12 +60,12 @@ char * fk_stack_init(void * task_func, void * stack_start)
    return (char*)stk;
 }
 
-void fk_print_stack () {
+void thread_print_stack () {
     register void * stack = 0;
     asm( "mov %0, sp" : "=r" (stack));
 
     register unsigned int * s = (unsigned int*) stack;
-    printf("task: %X SP: %X\n", (unsigned int)fk_thread, (unsigned int)stack);
+    printf("task: %X SP: %X\n", (unsigned int)active_thread, (unsigned int)stack);
     register int i = 0;
     s += 5;
     while (*s != 0x77777777) {

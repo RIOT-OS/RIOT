@@ -14,7 +14,7 @@
  */
 
 #include "kernel.h"
-#include "scheduler.h"
+#include "sched.h"
 #include "msg.h"
 #include "queue.h"
 #include "tcb.h"
@@ -33,9 +33,9 @@ int msg_send(msg* m, unsigned int target_pid, bool block) {
 
     int result = 1;
 
-    tcb *target = (tcb*)fk_threads[target_pid];
+    tcb *target = (tcb*)sched_threads[target_pid];
 
-    m->sender_pid = fk_pid;
+    m->sender_pid = thread_pid;
     if (m->sender_pid == target_pid) return -1;
 
     dINT();
@@ -47,33 +47,33 @@ int msg_send(msg* m, unsigned int target_pid, bool block) {
 
     if (target->status !=  STATUS_RECEIVE_BLOCKED) {
         if (! block ) {
-            DEBUG("%s: receiver not waiting. block=%u\n", fk_thread->name, block);
+            DEBUG("%s: receiver not waiting. block=%u\n", active_thread->name, block);
             eINT();
             return 0;
         }
 
-        DEBUG("%s: send_blocked.\n", fk_thread->name);
+        DEBUG("%s: send_blocked.\n", active_thread->name);
         queue_node_t n;
-        n.priority = fk_thread->priority;
-        n.data = (unsigned int) fk_thread;
-        DEBUG("%s: Adding node to msg_queue:\n", fk_thread->name);
+        n.priority = active_thread->priority;
+        n.data = (unsigned int) active_thread;
+        DEBUG("%s: Adding node to msg_queue:\n", active_thread->name);
 
         queue_priority_add(&(target->msg_queue), &n);
 
-        fk_thread->wait_data = (void*) m;
+        active_thread->wait_data = (void*) m;
 
         int newstatus;
-        if (fk_thread->status == STATUS_REPLY_BLOCKED) {
+        if (active_thread->status == STATUS_REPLY_BLOCKED) {
             newstatus = STATUS_REPLY_BLOCKED;
         } else {
             newstatus = STATUS_SEND_BLOCKED;
         }
 
-        sched_set_status((tcb*)fk_thread,  newstatus);
+        sched_set_status((tcb*)active_thread,  newstatus);
         
-        DEBUG("%s: back from send block.\n", fk_thread->name);
+        DEBUG("%s: back from send block.\n", active_thread->name);
     } else {
-        DEBUG("%s: direct msg copy.\n", fk_thread->name);
+        DEBUG("%s: direct msg copy.\n", active_thread->name);
         /* copy msg to target */
         msg* target_message = (msg*)target->wait_data;
         *target_message = *m;
@@ -81,13 +81,13 @@ int msg_send(msg* m, unsigned int target_pid, bool block) {
     }
 
     eINT();
-    fk_yield();
+    thread_yield();
 
     return result;
 }
 
 int msg_send_int(msg* m, unsigned int target_pid) {
-    tcb *target = (tcb*)fk_threads[target_pid];
+    tcb *target = (tcb*)sched_threads[target_pid];
 
     if (target->status ==  STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send_int: direct msg copy.\n");
@@ -99,7 +99,7 @@ int msg_send_int(msg* m, unsigned int target_pid) {
         *target_message = *m;
         sched_set_status(target,  STATUS_PENDING);
 
-        fk_context_switch_request = 1;
+        sched_context_switch_request = 1;
         return 1;
     } else {
         DEBUG("msg_send_int: receiver not waiting.\n");
@@ -110,7 +110,7 @@ int msg_send_int(msg* m, unsigned int target_pid) {
 
 int msg_send_receive(msg *m, msg *reply, unsigned int target_pid) {
     dINT();
-    tcb *me = (tcb*) fk_threads[fk_pid];
+    tcb *me = (tcb*) sched_threads[thread_pid];
     sched_set_status(me,  STATUS_REPLY_BLOCKED);
     me->wait_data = (void*) reply;
     msg_send(m, target_pid, true);
@@ -123,59 +123,59 @@ int msg_send_receive(msg *m, msg *reply, unsigned int target_pid) {
 int msg_reply(msg *m, msg *reply) {
     int state = disableIRQ();
 
-    tcb *target = (tcb*)fk_threads[m->sender_pid];
+    tcb *target = (tcb*)sched_threads[m->sender_pid];
     if (target->status != STATUS_REPLY_BLOCKED) {
-        DEBUG("%s: msg_reply(): target \"%s\" not waiting for reply.", fk_thread->name, target->name);
+        DEBUG("%s: msg_reply(): target \"%s\" not waiting for reply.", active_thread->name, target->name);
         restoreIRQ(state);
         return -1;
     }
     
-    DEBUG("%s: msg_reply(): direct msg copy.\n", fk_thread->name);
+    DEBUG("%s: msg_reply(): direct msg copy.\n", active_thread->name);
     /* copy msg to target */
     msg* target_message = (msg*)target->wait_data;
     *target_message = *reply;
     sched_set_status(target,  STATUS_PENDING);
     restoreIRQ(state);
-    fk_yield();
+    thread_yield();
 
     return 1;
 }
 
 int msg_reply_int(msg *m, msg *reply) {
-    tcb *target = (tcb*)fk_threads[m->sender_pid];
+    tcb *target = (tcb*)sched_threads[m->sender_pid];
     if (target->status != STATUS_REPLY_BLOCKED) {
-        DEBUG("%s: msg_reply_int(): target \"%s\" not waiting for reply.", fk_thread->name, target->name);
+        DEBUG("%s: msg_reply_int(): target \"%s\" not waiting for reply.", active_thread->name, target->name);
         return -1;
     }
     msg* target_message = (msg*)target->wait_data;
     *target_message = *m;
     sched_set_status(target,  STATUS_PENDING);
-    fk_context_switch_request = 1;
+    sched_context_switch_request = 1;
     return 1;
 }
 
 
 int msg_receive(msg* m) {
     dINT();
-    DEBUG("%s: msg_receive.\n", fk_thread->name);
+    DEBUG("%s: msg_receive.\n", active_thread->name);
 
-    tcb *me = (tcb*) fk_threads[fk_pid];
+    tcb *me = (tcb*) sched_threads[thread_pid];
 
     me->wait_data = (void*) m;
 
     queue_node_t *n = queue_remove_head(&(me->msg_queue));
 
     if (n == NULL) {
-        DEBUG("%s: msg_receive blocked\n", fk_thread->name);
+        DEBUG("%s: msg_receive blocked\n", active_thread->name);
         sched_set_status(me,  STATUS_RECEIVE_BLOCKED);
 
         eINT();
-        fk_yield();
+        thread_yield();
 
         /* sender copied message */
         return 1;
     } else {
-        DEBUG("%s: msg_receive direct copy.\n", fk_thread->name);
+        DEBUG("%s: msg_receive direct copy.\n", active_thread->name);
         tcb *sender = (tcb*)n->data;
 
         /* copy msg */
