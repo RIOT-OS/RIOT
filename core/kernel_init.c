@@ -76,7 +76,7 @@ void kernel_init(void)
     
     sched_init();
 
-    if (thread_create(&main_tcb, main_stack, sizeof(main_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_stack, idle_name) < 0) {
+    if (thread_create(&main_tcb, main_stack, sizeof(main_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, idle_name) < 0) {
         printf("kernel_init(): error creating idle task.\n");
     }
 

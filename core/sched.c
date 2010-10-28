@@ -149,14 +149,12 @@ extern void cpu_switch_context_exit(void);
 void sched_task_exit(void) {
     DEBUG("sched_task_exit(): ending task %s...\n", active_thread->name);
 
-    tcb* thread = (tcb*)active_thread;
     dINT();
     sched_threads[active_thread->pid] = NULL;
     num_tasks--;
     
     sched_set_status((tcb*)active_thread,  STATUS_STOPPED);
 
-    free(((tcb*)active_thread)->stack_start);
     active_thread = NULL;
     cpu_switch_context_exit();
 }

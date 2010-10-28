@@ -107,7 +107,7 @@ int thread_create(tcb *cb, char *stack, int stacksize, char priority, int flags,
     while (pid < MAXTHREADS) {
         if (sched_threads[pid] == NULL) {
             sched_threads[pid] = cb;
-            pd->pid = pid;
+            cb->pid = pid;
             break;
         }
         pid++;
