@@ -50,6 +50,11 @@ and the mailinglist (subscription via web site)
 #define SHT11_MEASURE_HUMI	(0x05) 	//000  0010	   1
 #define SHT11_RESET			(0x1E) 	//000  1111	   0
 
+/* time to wait after toggling the data line */
+#define SHT11_DATA_WAIT     (HWTIMER_TICKS(5))
+/* time to wait after toggling the clock line */
+#define SHT11_CLK_WAIT      (HWTIMER_TICKS(1))
+
 /* set measurement timeout to 1 second */
 #define SHT11_MEASURE_TIMEOUT   (1000)
 

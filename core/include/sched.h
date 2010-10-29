@@ -15,7 +15,7 @@
 
 #define MAXTHREADS 32
 
-#ifdef ARCH_32_BIT
+#if ARCH_32_BIT
 #define SCHED_PRIO_LEVELS 32
 #else
 #define SCHED_PRIO_LEVELS 16

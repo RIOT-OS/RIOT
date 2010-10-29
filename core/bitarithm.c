@@ -15,8 +15,6 @@
 
 #include <stdio.h>
 
-#define ARCH_32_BIT     (__INT_MAX__ == 2147483647)
-
 unsigned
 number_of_highest_bit(unsigned v)
 {

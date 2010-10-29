@@ -53,7 +53,6 @@ CCFLAGS += -DBOARD=BOARD_$(BOARD:U) ;
 # core source directories
 HDRS += $(TOP) ;
 HDRS += [ FPath $(TOP) core include ] ;
-HDRS += [ FPath $(TOP) hal include ] ;
 HDRS += [ FPath $(TOP) sys include ] [ FPath $(TOP) sys config ] [ FPath $(TOP) sys drivers include ] [ FPath $(TOP) sys drivers cc110x ] [ FPath $(TOP) sys drivers nanopan5375 ] ;
 HDRS += [ FPath $(TOP) sys net ] ;
 HDRS += [ FPath $(TOP) sys lib ] [ FPath $(TOP) sys lib fat include ] ;
