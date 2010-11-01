@@ -1,0 +1,5 @@
+SubDir TOP projects test_mutex_trylock_fail ;
+
+Module test_mutex_trylock_fail : main.c ;
+
+UseModule test_mutex_trylock_fail ;
