@@ -45,7 +45,6 @@ and the mailinglist (subscription via web site)
 #include "lpc2387.h"
 #include "lpc2387-rtc.h"
 #include "lpm.h"
-#include "clock.h"
 
 #define PREINT_RTC	0x000001C8  /* Prescaler value, integer portion, PCLK = 15Mhz */
 #define PREFRAC_RTC	0x000061C0  /* Prescaler value, fraction portion, PCLK = 15Mhz */
@@ -58,7 +57,6 @@ and the mailinglist (subscription via web site)
 #define PRINTF(fmt, args...)
 #endif
 
-extern void _clock_alarm(void);
 
 /**
  * @brief	epoch time in hour granularity
@@ -155,7 +153,6 @@ void RTC_IRQHandler (void)
 		RTC_AMR = 0xff;						// disable alarm irq
 		PRINTF("alarm");
 		lpm_end_awake();
-		_clock_alarm();
 	}
 
 	VICVectAddr = 0;						// Acknowledge Interrupt
