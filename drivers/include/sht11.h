@@ -50,17 +50,12 @@ and the mailinglist (subscription via web site)
 #define SHT11_MEASURE_HUMI	(0x05) 	//000  0010	   1
 #define SHT11_RESET			(0x1E) 	//000  1111	   0
 
-<<<<<<< HEAD
 /* time to wait after toggling the data line */
 #define SHT11_DATA_WAIT     (HWTIMER_TICKS(5))
 /* time to wait after toggling the clock line */
 #define SHT11_CLK_WAIT      (HWTIMER_TICKS(1))
 
 /* set measurement timeout to 1 second */
-=======
-/**
- * set measurement timeout to 1 second */
->>>>>>> fb40690... * removed old reference to clock module from rtc
 #define SHT11_MEASURE_TIMEOUT   (1000)
 
 /**
