@@ -16,18 +16,14 @@
  */
 
 #include <stdio.h>
-#include "hwtimer.h"
-#include "hwtimer_cpu.h"
-#include "hwtimer_arch.h"
+#include <hwtimer.h>
+#include <hwtimer_cpu.h>
+#include <hwtimer_arch.h>
 
 #include <bitarithm.h>
 
-#define USE_NONBLOCKING_WAIT 1
-#if USE_NONBLOCKING_WAIT
-//#include <stdlib.h>
-#include "kernel.h"
-#include "mutex.h"
-#endif
+#include <kernel.h>
+#include <mutex.h>
 
 /*---------------------------------------------------------------------------*/
 
