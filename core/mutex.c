@@ -107,6 +107,7 @@ void mutex_wake_waiters(struct mutex_t *mutex, int flags) {
     /* queue is empty */
     if (!next) {
         mutex->val = 0;
+        if ( ! (flags & MUTEX_INISR)) eINT();
         return;
     }
 
