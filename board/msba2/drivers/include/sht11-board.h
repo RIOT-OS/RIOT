@@ -54,10 +54,5 @@ and the mailinglist (subscription via web site)
 #define SHT11_DATA_OUT	(FIO1DIR |= BIT26)						// serial I/O as output
 #define SHT11_INIT		FIO1DIR |= BIT25; PINSEL3 &= ~(BIT14|BIT15 | BIT16|BIT17);
 
-/* time to wait after toggling the data line */
-#define SHT11_DATA_WAIT     (50)
-/* time to wait after toggling the clock line */
-#define SHT11_CLK_WAIT      (10)
-
 /** @} */
 #endif /* SHT11BOARD_H_ */
