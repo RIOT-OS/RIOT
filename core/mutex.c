@@ -35,6 +35,7 @@ int mutex_init(struct mutex_t* mutex) {
 }
 
 int mutex_trylock(struct mutex_t* mutex) {
+    DEBUG("%s: trylocking to get mutex. val: %u\n", active_thread->name, mutex->val);
     return (atomic_set_return(&mutex->val, thread_pid ) == 0);
 }
 
@@ -43,7 +44,7 @@ int prio() {
 }
 
 int mutex_lock(struct mutex_t* mutex) {
-   DEBUG("%s: trying to get mutex. val: %u\n", active_thread->name, mutex->val);
+    DEBUG("%s: trying to get mutex. val: %u\n", active_thread->name, mutex->val);
 
     if (atomic_set_return(&mutex->val,thread_pid) != 0) {
         // mutex was locked.
@@ -106,6 +107,7 @@ void mutex_wake_waiters(struct mutex_t *mutex, int flags) {
 
     /* queue is empty */
     if (!next) {
+        DEBUG("%s: no waiters?\n", active_thread->name);
         mutex->val = 0;
         if ( ! (flags & MUTEX_INISR)) eINT();
         return;
