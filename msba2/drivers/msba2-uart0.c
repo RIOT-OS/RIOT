@@ -149,7 +149,7 @@ void UART0_IRQHandler(void)
 
 static inline int uart0_puts(char *astring,int length)
 {
-    while (queue_items == (QUEUESIZE-1)) {} ;
+/*    while (queue_items == (QUEUESIZE-1)) {} ;
     U0IER = 0;
     queue[queue_tail] = malloc(length+sizeof(unsigned int));
     queue[queue_tail]->len = length;
@@ -158,14 +158,14 @@ static inline int uart0_puts(char *astring,int length)
     if (!running)
         push_queue();
     U0IER |= BIT0 | BIT1;       // enable RX irq
-
-    /* alternative without queue:
+*/
+    /* alternative without queue:*/
     int i;
     for (i=0;i<length;i++) {
             while (!(U0LSR & BIT5));
             U0THR = astring[i];
     }
-    */
+/*    */
 
     return length;
 }
