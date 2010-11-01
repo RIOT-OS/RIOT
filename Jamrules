@@ -31,7 +31,7 @@
 include $(TOP)$(SLASH)Jamrules.common ;
 
 #
-# Setup FeuerWare build system configuration (default values for common options)
+# Setup ukleos build system configuration (default values for common options)
 #
 PROJECT = $(PROJECT:E=hello-world) ;
 BOARD = $(BOARD:E=msba2) ;
