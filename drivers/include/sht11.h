@@ -50,22 +50,26 @@ and the mailinglist (subscription via web site)
 #define SHT11_MEASURE_HUMI	(0x05) 	//000  0010	   1
 #define SHT11_RESET			(0x1E) 	//000  1111	   0
 
+<<<<<<< HEAD
 /* time to wait after toggling the data line */
 #define SHT11_DATA_WAIT     (HWTIMER_TICKS(5))
 /* time to wait after toggling the clock line */
 #define SHT11_CLK_WAIT      (HWTIMER_TICKS(1))
 
 /* set measurement timeout to 1 second */
+=======
+/**
+ * set measurement timeout to 1 second */
+>>>>>>> fb40690... * removed old reference to clock module from rtc
 #define SHT11_MEASURE_TIMEOUT   (1000)
 
-/** sht11 measureable data */
+/**
+ * @brief   sht11 measureable data 
+ */
 typedef struct {
-    /* temperature value */
-	float	temperature;
-    /* linear relative humidity */
-	float	relhum;
-    /* temperature compensated relative humidity */
-	float	relhum_temp;
+	float	temperature;    /**< temperature value */
+	float	relhum;         /**< linear relative humidity */
+	float	relhum_temp;    /**< temperature compensated relative humidity */
 } sht11_val_t;
 
 /**
@@ -84,9 +88,14 @@ void sht11_init(void);
 /**
  * @brief	Read sensor
  *
+ * @param value The struct to be filled with measured values
+ * @param mode  Specifies type of data to be read
+ *
+ * @return  1 on success, 0 otherwise
+ *
  * Example:
- * \code struct sht11_val sht11;
- * sht11_Read_Sensor(&sht11, HUMIDITY|TEMPERATURE);
+ * \code sht11_val sht11;
+ * sht11_read_sensor(&sht11, HUMIDITY|TEMPERATURE);
  * printf("%-6.2f °C %5.2f %% %5.2f %%\n", sht11.temperature, sht11.relhum, sht11.relhum_temp); \endcode
  */
 uint8_t sht11_read_sensor(sht11_val_t *value, sht11_mode_t mode);
