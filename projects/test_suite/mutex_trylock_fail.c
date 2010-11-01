@@ -14,15 +14,15 @@ void second_thread(void) {
 }
 
 tcb second_tcb;
-char second_stack[8192];
+char second_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
-int main(void)
+void mutex_trylock_fail(char* cmdline)
 {
     puts("main: locking mutex...");
     mutex_lock(&mutex);
 
     puts("main: creating thread...");
-    int pid = thread_create(&second_tcb, second_stack, 8192, PRIORITY_MAIN-1, CREATE_STACKTEST, second_thread, "nr2");
+    int pid = thread_create(&second_tcb, second_stack, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN-1, CREATE_STACKTEST, second_thread, "nr2");
     
     puts("main: thread created. Unlocking mutex...");
     mutex_unlock(&mutex, true);
