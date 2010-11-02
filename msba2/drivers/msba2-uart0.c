@@ -199,7 +199,8 @@ bl_uart_init(void)
 
     /* irq */
     install_irq(UART0_INT, UART0_IRQHandler, 6);
-    U0IER |= BIT0 | BIT1;       // enable RX+TX irq
+//    U0IER |= BIT0 | BIT1;       // enable RX+TX irq
+    U0IER |= BIT0;       // enable only RX irq
     return 1;
 }
 
