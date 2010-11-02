@@ -9,7 +9,7 @@ static void second_thread(void) {
     while(1) {
         integer++;
         printf("sleeper: running. integer=%i, i=%i.\n", integer, i);
-        if (integer % 10 == 0) { 
+        if (integer % 2 == 0) { 
             printf("Going to sleep.\n");
             thread_sleep();
             printf("Woke up!\n");
@@ -29,10 +29,10 @@ void test_thread_sleep(char* line)
         while(1);
     }
 
-    while(1) {
+    while(i < 10) {
         i++;
         printf("   main: running. integer=%i, i=%i.\n", integer, i);
-        if (i % 10 == 0) { 
+        if (i % 2 == 0) { 
             printf("Waking up sleeper.\n");
             thread_wakeup(pid);
         }
