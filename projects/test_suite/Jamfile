@@ -6,7 +6,7 @@
 
 SubDir TOP projects test_suite ;
 
-Module test_suite : test_suite.c mutex_trylock_fail.c
-                  : shell posix_io ps uart0 ;
+Module test_suite : test_suite.c mutex_trylock_fail.c thread_sleep.c
+                  : shell posix_io ps uart0 hwtimer ;
 
 UseModule test_suite ;
