@@ -45,11 +45,16 @@ void thread_sleep() {
 }
 
 int thread_wakeup(int pid) {
+    DEBUG("thread_wakeup: Trying to wakeup PID %i...\n", pid);
     int isr = inISR();
-    if (! isr) dINT();
+    if (! isr) {
+        DEBUG("thread_wakeup: Not in interrupt.\n");
+        dINT();
+    }
 
     int result = sched_threads[pid]->status;
     if (result == STATUS_SLEEPING) {
+        DEBUG("thread_wakeup: Thread is sleeping.\n");
         sched_set_status((tcb*)sched_threads[pid], STATUS_RUNNING);
         if (!isr) {
             eINT();
@@ -59,6 +64,7 @@ int thread_wakeup(int pid) {
         }
         return 0;
     } else {
+        DEBUG("thread_wakeup: Thread is not sleeping!\n");
         if (!isr) eINT();
         return STATUS_NOT_FOUND;
     }
