@@ -48,10 +48,8 @@ int main(void) {
     posix_open(uart0_handler_pid, 0);
 
     shell_t shell;
-    shell_init(&shell, shell_readc, shell_putchar);
+    shell_init(&shell, shell_commands, shell_readc, shell_putchar);
 
-    shell.command_list = shell_commands;
-    
     shell_run(&shell);
 
     return 0;

@@ -115,7 +115,8 @@ void shell_run(shell_t *shell) {
     }
 }
 
-void shell_init(shell_t *shell, int(*readchar)(void), void(*put_char)(int)) {
+void shell_init(shell_t *shell, const shell_command_t *shell_commands, int(*readchar)(void), void(*put_char)(int)) {
+    shell->command_list = shell_commands;
     shell->readchar = readchar;
     shell->put_char = put_char;
 }

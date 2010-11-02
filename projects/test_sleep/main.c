@@ -2,6 +2,7 @@
 #include <thread.h>
 #include <kernel.h>
 #include <hwtimer.h>
+#include <ps.h>
 
 int integer = 0;
 int i = 0;
@@ -11,7 +12,7 @@ void second_thread(void) {
     while(1) {
         integer++;
         printf("sleeper: running. integer=%i, i=%i.\n", integer, i);
-        if (integer % 100 == 0) { 
+        if (integer % 1 == 0) { 
             printf("Going to sleep.\n");
             thread_sleep();
         }
@@ -19,13 +20,11 @@ void second_thread(void) {
 }
 
 tcb second_thread_tcb;
-char second_thread_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
+char second_thread_stack[KERNEL_CONF_STACKSIZE_DEFAULT*2];
 
 int main(void)
 {
     hwtimer_init();
-
-    printf("Hello world!\n");
 
     int pid = thread_create(&second_thread_tcb, second_thread_stack, sizeof(second_thread_stack), PRIORITY_MAIN-1, CREATE_STACKTEST | CREATE_SLEEPING | CREATE_WOUT_YIELD, second_thread, "sleeper");
 
@@ -37,9 +36,11 @@ int main(void)
     while(1) {
         i++;
         printf("   main: running. integer=%i, i=%i.\n", integer, i);
-        if (i % 100 == 0) { 
+        if (i % 1 == 0) { 
+            thread_print_all();
             printf("Waking up sleeper.\n");
             thread_wakeup(pid);
+            thread_print_all();
             thread_yield();
         }
     }
