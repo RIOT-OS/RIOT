@@ -148,7 +148,7 @@ int msg_reply_int(msg *m, msg *reply) {
         return -1;
     }
     msg* target_message = (msg*)target->wait_data;
-    *target_message = *m;
+    *target_message = *reply;
     sched_set_status(target,  STATUS_PENDING);
     fk_context_switch_request = 1;
     return 1;
