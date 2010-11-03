@@ -55,7 +55,7 @@ static void(*find_handler(const shell_command_t *command_list, char *command))(c
         if ( strcmp(entry->name, command) == 0) {
             return entry->handler;
         } else {
-            command_list++;
+            entry++;
         }
     }
     return NULL;
