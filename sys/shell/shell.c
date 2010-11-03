@@ -63,7 +63,8 @@ static void(*find_handler(const shell_command_t *command_list, char *command))(c
 
 static void handle_input_line(shell_t *shell, char* line) {
     char* saveptr;
-    char* command = strtok_r(line, " ", &saveptr);
+    char* linedup = strdup(line);
+    char* command = strtok_r(linedup, " ", &saveptr);
 
     void (*handler)(char*) = NULL;
     
@@ -75,7 +76,8 @@ static void handle_input_line(shell_t *shell, char* line) {
             puts("shell: command not found.");
         }
     }
-    
+
+    free(linedup);
 }
 
 int readline(shell_t *shell, char* buf, int size) {
