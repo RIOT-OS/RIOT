@@ -29,9 +29,9 @@ void shell_putchar(int c) {
 }
 
 const shell_command_t shell_commands[] = {
-    {"start_test", print_teststart},
-    {"end_test", print_testend},
-    {NULL, NULL}
+    {"start_test", "", print_teststart},
+    {"end_test", "", print_testend},
+    {NULL, NULL, NULL}
 };
 
 int main(void) {

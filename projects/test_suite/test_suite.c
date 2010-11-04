@@ -32,11 +32,11 @@ void mutex_trylock_fail(char* cmdline);
 void test_thread_sleep(char* line);
 
 const shell_command_t shell_commands[] = {
-    {"start_test", print_teststart},
-    {"end_test", print_testend},
-    {"mutex_trylock_fail", mutex_trylock_fail},
-    {"thread_sleep", test_thread_sleep},
-    {NULL, NULL}
+    {"start_test", "", print_teststart},
+    {"end_test", "", print_testend},
+    {"mutex_trylock_fail", "", mutex_trylock_fail},
+    {"thread_sleep", "", test_thread_sleep},
+    {NULL, NULL, NULL}
 };
 
 int main(void) {
