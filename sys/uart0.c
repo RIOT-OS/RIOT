@@ -13,7 +13,6 @@ int uart0_handler_pid;
 
 static char buffer[UART0_BUFSIZE];
 
-static tcb uart0_thread_tcb;
 static char uart0_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 static void uart0_loop() {
@@ -22,7 +21,7 @@ static void uart0_loop() {
 
 void board_uart0_init() {
     ringbuffer_init(&uart0_ringbuffer, buffer, UART0_BUFSIZE);
-    int pid = thread_create(&uart0_thread_tcb, uart0_thread_stack, sizeof(uart0_thread_stack), PRIORITY_MAIN-1, CREATE_STACKTEST, uart0_loop, "uart0");
+    int pid = thread_create(uart0_thread_stack, sizeof(uart0_thread_stack), PRIORITY_MAIN-1, CREATE_STACKTEST, uart0_loop, "uart0");
     uart0_handler_pid = pid;
     puts("uart0_init() [OK]");
 }

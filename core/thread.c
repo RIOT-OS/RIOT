@@ -80,13 +80,12 @@ int thread_measure_stack_usage(char* stack) {
     return space;
 }
 
-int thread_create(tcb *cb, char *stack, int stacksize, char priority, int flags, void (*function) (void), const char* name)
+int thread_create(char *stack, int stacksize, char priority, int flags, void (*function) (void), const char* name)
 {
-    /* stacksize must be a multitude of 4 for alignment and stacktest */
-//  assert( ((stacksize & 0x03) == 0) && (stacksize > 0) );
-
-    // TODO: shall we autoalign the stack?
-    // stacksize += 4-(~(stacksize & 0x0003));
+    /* allocate our thread control block at the top of our stackspace */
+    int total_stacksize = stacksize;
+    stacksize -= sizeof(tcb);
+    tcb *cb = (tcb*) (stack + stacksize);
 
     if (priority >= SCHED_PRIO_LEVELS) {
         return -EINVAL;
@@ -130,7 +129,7 @@ int thread_create(tcb *cb, char *stack, int stacksize, char priority, int flags,
 
     cb->sp = thread_stack_init(function,stack+stacksize);
     cb->stack_start = stack;
-    cb->stack_size = stacksize;
+    cb->stack_size = total_stacksize;
 
     cb->priority = priority;
     cb->status = 0;

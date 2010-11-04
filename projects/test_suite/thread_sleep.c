@@ -18,11 +18,10 @@ static void second_thread(void) {
 }
 
 static char second_thread_stack[KERNEL_CONF_STACKSIZE_DEFAULT*2];
-static tcb second_thread_tcb;
 
 void test_thread_sleep(char* line)
 {
-    int pid = thread_create(&second_thread_tcb, second_thread_stack, sizeof(second_thread_stack), PRIORITY_MAIN-1, CREATE_STACKTEST | CREATE_SLEEPING | CREATE_WOUT_YIELD, second_thread, "sleeper");
+    int pid = thread_create(second_thread_stack, sizeof(second_thread_stack), PRIORITY_MAIN-1, CREATE_STACKTEST | CREATE_SLEEPING | CREATE_WOUT_YIELD, second_thread, "sleeper");
 
     if (pid < 0) {
         puts("Error creating second_thread! Stopping test.");
