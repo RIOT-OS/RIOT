@@ -34,7 +34,7 @@
 
 typedef struct tcb {
     char* sp;
-    unsigned int status;
+    uint8_t status;
 
     uint16_t pid;
     uint16_t priority;

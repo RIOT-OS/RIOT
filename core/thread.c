@@ -62,7 +62,7 @@ int thread_wakeup(int pid) {
         } else {
             sched_context_switch_request = 1;
         }
-        return 0;
+        return 1;
     } else {
         DEBUG("thread_wakeup: Thread is not sleeping!\n");
         if (!isr) eINT();

@@ -30,7 +30,7 @@
 #define __HWTIMER_H
 
 #include <stdint.h>
-#include "hwtimer_cpu.h"
+#include <hwtimer_cpu.h>
 
 /**
  * @def    HWTIMER_SPEED
