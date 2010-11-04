@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <board_uart0.h>
 #include <auto_init.h>
 
 #define ENABLE_DEBUG
@@ -15,6 +16,10 @@ void auto_init(void) {
 #ifdef MODULE_SWTIMER
     DEBUG("Auto init swtimer module.\n");
     swtimer_init();
+#endif
+#ifdef MODULE_UART0
+    DEBUG("Auto init uart0 module.\n");
+    board_uart0_init();
 #endif
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");
