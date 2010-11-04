@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <board_uart0.h>
+#include <lpc2387-rtc.h>
 #include <auto_init.h>
 
 #define ENABLE_DEBUG
@@ -20,6 +21,11 @@ void auto_init(void) {
 #ifdef MODULE_UART0
     DEBUG("Auto init uart0 module.\n");
     board_uart0_init();
+#endif
+#ifdef MODULE_RTC
+    DEBUG("Auto init rtc module.\n");
+    rtc_init();
+    rtc_enable();
 #endif
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");

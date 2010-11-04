@@ -21,7 +21,6 @@ void shell_putchar(int c) {
 }
 
 int main(void) {
-    board_uart0_init();
     posix_open(uart0_handler_pid, 0);
     
     puts("Welcome to ukleos!");

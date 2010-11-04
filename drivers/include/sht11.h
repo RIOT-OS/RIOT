@@ -40,6 +40,7 @@ and the mailinglist (subscription via web site)
  *
  * @note		$Id: sht11.h 667 2009-02-19 15:06:38Z baar $
  */
+#include <stdint.h>
 
 #define SHT11_NO_ACK		(0)
 #define SHT11_ACK			(1)

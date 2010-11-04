@@ -122,7 +122,7 @@ void shell_run(shell_t *shell) {
     char line_buf[255];
 
     while(1) {
-        shell->put_char('>');
+        shell->put_char('> ');
         int res = readline(shell, line_buf, sizeof(line_buf));
         if (! res ) {
             char* line_copy = strdup(line_buf);

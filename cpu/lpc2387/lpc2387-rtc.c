@@ -68,7 +68,7 @@ static volatile time_t epoch;
  * @brief	Sets the current time in broken down format directly from to RTC
  * @param[in]	localt		Pointer to structure with time to set
  */
-static void
+void
 rtc_set_localtime(struct tm* localt)
 {
 	if( localt == NULL )
@@ -93,14 +93,14 @@ void rtc_set(time_t time) {
 }
 /*---------------------------------------------------------------------------*/
 /// set clock to start of unix epoch
-void _rtc_reset(void)
+void rtc_reset(void)
 {
     rtc_set(0);
 	epoch = 0;
 }
 /*---------------------------------------------------------------------------*/
 void
-_rtc_set_alarm(struct tm* localt, enum rtc_alarm_mask mask)
+rtc_set_alarm(struct tm* localt, enum rtc_alarm_mask mask)
 {
 	if( localt != NULL ) {
 		RTC_ALSEC = localt->tm_sec;
@@ -120,7 +120,7 @@ _rtc_set_alarm(struct tm* localt, enum rtc_alarm_mask mask)
 }
 /*---------------------------------------------------------------------------*/
 enum rtc_alarm_mask
-_rtc_get_alarm(struct tm* localt)
+rtc_get_alarm(struct tm* localt)
 {
 	if( localt != NULL ) {
 		localt->tm_sec = RTC_ALSEC;
@@ -169,7 +169,7 @@ void rtc_enable(void)
 	epoch = now - (now % 3600);
 }
 /*---------------------------------------------------------------------------*/
-void _rtc_init(void)
+void rtc_init(void)
 {
 	PCONP |= BIT9;
 	RTC_AMR = 0xff;							// disable alarm irq
@@ -183,7 +183,7 @@ void _rtc_init(void)
 	/* initialize clock with valid unix compatible values
 	 * If RTC_YEAR contains an value larger unix time_t we must reset. */
 	if( RTC_YEAR > 2037 ) {
-		_rtc_reset();
+		rtc_reset();
 	}
 
 	PRINTF("%2lu.%2lu.%4lu  %2lu:%2lu:%2lu epoch %lu",
@@ -242,7 +242,7 @@ rtc_get_localtime(struct tm* localt)
 	}
 }
 /*---------------------------------------------------------------------------*/
-void _gettimeofday_r(struct _reent *r, struct timeval *ptimeval, struct timezone *ptimezone)
+void gettimeofday_r(struct _reent *r, struct timeval *ptimeval, struct timezone *ptimezone)
 {
 	r->_errno = 0;
 	if( ptimeval != NULL ) {
