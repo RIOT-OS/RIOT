@@ -21,11 +21,10 @@ void shell_putchar(int c) {
 }
 
 int main(void) {
-    puts("Welcome to ukleos!");
-
     board_uart0_init();
-
     posix_open(uart0_handler_pid, 0);
+    
+    puts("Welcome to ukleos!");
 
     shell_t shell;
     shell_init(&shell, _shell_command_list, shell_readc, shell_putchar);
