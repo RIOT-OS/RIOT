@@ -36,6 +36,7 @@ and the mailinglist (subscription via web site)
 
 typedef struct shell_command_t {
     char* name;
+    char* desc;
     void (*handler)(char*);
 } shell_command_t;
 

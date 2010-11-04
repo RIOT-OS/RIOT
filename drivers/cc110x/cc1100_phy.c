@@ -60,6 +60,8 @@ and the mailinglist (subscription via web site)
 #include "msg.h"
 #include "debug.h"
 
+#define PRIORITY_CC1100         PRIORITY_MIN-9
+
 #define MSG_POLL 12346
 
 #define FLAGS_IDENTIFICATION			 (0x01)	///< Bit mask for reading the identification out of the flags field
