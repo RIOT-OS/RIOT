@@ -61,6 +61,17 @@ static void(*find_handler(const shell_command_t *command_list, char *command))(c
     return NULL;
 }
 
+static void print_help(const shell_command_t *command_list) {
+    const shell_command_t *entry = command_list;
+
+    printf("%-20s %s\n", "Command", "Description");
+
+    while(entry->name != NULL) {
+        printf("%-20s %s\n", entry->name, entry->desc);
+        entry++;
+    }
+}
+
 static void handle_input_line(shell_t *shell, char* line) {
     char* saveptr;
     char* linedup = strdup(line);
@@ -73,7 +84,11 @@ static void handle_input_line(shell_t *shell, char* line) {
         if (handler != NULL) {
             handler(line);
         } else {
-            puts("shell: command not found.");
+            if ( strcmp("help", command) == 0) {
+                print_help(shell->command_list);
+            } else {
+                puts("shell: command not found.");
+            }
         }
     }
 
