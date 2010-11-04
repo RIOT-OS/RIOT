@@ -20,7 +20,6 @@
  * @brief Creates a new thread.
  * This version will allocate it's stack itself using malloc.
  * 
- * @param   cb Address of preallocated tcb structure
  * @param   stack Lowest address of preallocated stack space
  * @param   stacksize
  * @param   flags Options: 
