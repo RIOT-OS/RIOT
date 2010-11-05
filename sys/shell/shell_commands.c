@@ -6,8 +6,7 @@ extern void _ps_handler(char* unused);
 #endif
 
 #ifdef MODULE_RTC
-extern void _gettime_handler(char* unused);
-extern void _settime_handler(char* now);
+extern void _date_handler(char* now);
 #endif
 
 #ifdef MODULE_SHT11
@@ -21,8 +20,7 @@ const shell_command_t _shell_command_list[] = {
     {"ps", "Prints information about running threads.", _ps_handler},
 #endif
 #ifdef MODULE_RTC
-    {"gettime", "Prints current date and time.", _gettime_handler},
-    {"settime", "Sets current time.", _settime_handler},
+    {"date", "Geets or gets current date and time.", _date_handler},
 #endif
 #ifdef MODULE_SHT11
     {"gettemp", "Prints measured temperature.", _get_temperature_handler},

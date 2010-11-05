@@ -70,7 +70,7 @@
 #define PRIORITY_MIN            SCHED_PRIO_LEVELS-1
 
 #define PRIORITY_IDLE           PRIORITY_MIN
-#define PRIORITY_MAIN           PRIORITY_MIN-1
+#define PRIORITY_MAIN           (PRIORITY_MIN - (SCHED_PRIO_LEVELS/2))
 
 /**
  * @brief   Check whether called from interrupt service routine

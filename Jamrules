@@ -33,7 +33,7 @@ include $(TOP)$(SLASH)Jamrules.common ;
 #
 # Setup ukleos build system configuration (default values for common options)
 #
-PROJECT = $(PROJECT:E=hello-world) ;
+PROJECT = $(PROJECT:E=default) ;
 BOARD = $(BOARD:E=msba2) ;
 SUFFIX ?= "" ; # must be at least "" !!!     
 TARGET = "$(BOARD)-$(PROJECT)$(SUFFIX)$(SUFEXE)" ;      # main target binary

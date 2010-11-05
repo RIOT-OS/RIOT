@@ -2,8 +2,9 @@
 #include <stdint.h>
 #include <lpc2387-rtc.h>
 #include <sys/time.h>
+#include <string.h>
 
-void _gettime_handler(char *unused) {
+void _gettime_handler(void) {
     struct tm now;
     rtc_get_localtime(&now);
 
@@ -15,7 +16,7 @@ void _settime_handler(char* c) {
     int res;
     uint16_t month, epoch_year;
 
-    res = sscanf(c, "settime %hu-%hu-%i %i:%i:%i",
+    res = sscanf(c, "date %hu-%hu-%i %i:%i:%i",
             &epoch_year,
             &month,
             &(now.tm_mday),
@@ -24,11 +25,11 @@ void _settime_handler(char* c) {
             &(now.tm_sec));
     
     if (res < 6) {
-        printf("Usage: settime YYYY-MM-DD hh:mm:ss\n");
+        printf("Usage: date YYYY-MM-DD hh:mm:ss\n");
         return;
     }
     else {
-        printf("OK %s", asctime(&now));
+        puts("OK");
     }
     
     now.tm_year = epoch_year - 1900;
@@ -37,4 +38,11 @@ void _settime_handler(char* c) {
     rtc_set(t);
 }
 
-
+void _date_handler(char* c) {
+	if (strlen(c) == 4) {
+		_gettime_handler();	
+	}
+	else {
+		_settime_handler(c);
+	}
+}

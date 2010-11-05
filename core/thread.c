@@ -14,7 +14,6 @@
  */
 
 #include <errno.h>
-#include <malloc.h>
 #include <stdio.h>
 
 #include "thread.h"

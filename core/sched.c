@@ -14,15 +14,14 @@
  */
 
 #include <stdint.h>
-#include <malloc.h>
-#include "sched.h"
-#include "kernel.h"
-#include "kernel_intern.h"
-#include "clist.h"
+#include <sched.h>
+#include <kernel.h>
+#include <kernel_intern.h>
+#include <clist.h>
 #include <bitarithm.h>
 
 //#define ENABLE_DEBUG
-#include "debug.h"
+#include <debug.h>
 
 volatile int num_tasks = 0;
 

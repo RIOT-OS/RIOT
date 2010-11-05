@@ -44,7 +44,6 @@ and the mailinglist (subscription via web site)
 #include <sys/unistd.h>
 #include <string.h>
 #include <stdio.h>
-#include <malloc.h>
 #include <stdlib.h>
 #include <shell.h>
 #include <shell_commands.h>

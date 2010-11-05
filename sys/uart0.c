@@ -6,14 +6,15 @@
 
 #include <board_uart0.h>
 
-#define UART0_BUFSIZE 32
+#define UART0_BUFSIZE 		(32)
+#define UART0_STACKSIZE 	(MINIMUM_STACK_SIZE + 256)
 
 ringbuffer uart0_ringbuffer;
 int uart0_handler_pid;
 
 static char buffer[UART0_BUFSIZE];
 
-static char uart0_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
+static char uart0_thread_stack[UART0_STACKSIZE];
 
 static void uart0_loop() {
     chardev_loop(&uart0_ringbuffer);
