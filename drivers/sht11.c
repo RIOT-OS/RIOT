@@ -48,6 +48,8 @@ and the mailinglist (subscription via web site)
 //#define ENABLE_DEBUG   (1)
 #include <debug.h>
 
+float sht11_temperature_offset;
+
 /**
  * @brief   Perform measurement
  * 
@@ -260,6 +262,7 @@ static uint8_t measure(uint8_t *p_value, uint8_t *p_checksum, uint8_t mode)
 }
 /*---------------------------------------------------------------------------*/
 void sht11_init(void) {
+	sht11_temperature_offset = 0;
 	mutex_init(&sht11_mutex);
 	SHT11_INIT;
     hwtimer_wait(11 * HWTIMER_TICKS(1000));
@@ -334,7 +337,7 @@ uint8_t sht11_read_sensor(sht11_val_t *value, sht11_mode_t mode) {
 	}
 
 	if (mode & TEMPERATURE) {
-		value->temperature = D1 + (D2 * ((float) temp_int));
+		value->temperature = D1 + (D2 * ((float) temp_int)) + sht11_temperature_offset;
 	}
 	if (mode & HUMIDITY) {
 		value->relhum = C1 + (C2 * ((float) humi_int)) + (C3 * ((float) humi_int) * ((float) humi_int));
