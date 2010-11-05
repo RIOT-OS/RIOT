@@ -62,7 +62,7 @@ double ltc4150_get_current_mA() {
     return 1000000000/(ltc4150_get_last_int_duration_us()*(_GFH * _R_SENSE));
 }
 
-double ltc4150_get_total_mA() {
+double ltc4150_get_total_mAh() {
     return coulomb_to_mA(int_to_coulomb(int_count));
 }
 

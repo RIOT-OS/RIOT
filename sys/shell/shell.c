@@ -51,15 +51,16 @@ and the mailinglist (subscription via web site)
 
 static void(*find_handler(const shell_command_t *command_list, char *command))(char*) {
     const shell_command_t* entry = command_list;
-
-    while (entry->name != NULL) {
-        if ( strcmp(entry->name, command) == 0) {
-            return entry->handler;
-        } else {
-            entry++;
-        }
-    }
-    
+	if (entry) {
+			while (entry->name != NULL) {
+				if ( strcmp(entry->name, command) == 0) {
+					return entry->handler;
+				} else {
+					entry++;
+				}
+			}
+	}
+			
 #ifdef MODULE_SHELL_COMMANDS
     entry = _shell_command_list;
     while (entry->name != NULL) {
@@ -79,10 +80,12 @@ static void print_help(const shell_command_t *command_list) {
     printf("%-20s %s\n", "Command", "Description");
     puts("---------------------------------------");
 
-    while (entry->name != NULL) {
-        printf("%-20s %s\n", entry->name, entry->desc);
-        entry++;
-    }
+	if (entry) {
+			while (entry->name != NULL) {
+				printf("%-20s %s\n", entry->name, entry->desc);
+				entry++;
+			}
+	}
     
 #ifdef MODULE_SHELL_COMMANDS
     entry = _shell_command_list;

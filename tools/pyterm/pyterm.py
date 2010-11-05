@@ -10,18 +10,14 @@ class MyCmd(cmd.Cmd):
 		self.stdout.write(line + "\n")
 
 	def do_help(self, line):
-		self.stdout.write(line + "\n")
+		self.stdout.write("help\n")
 
 	def complete_date(self, text, line, begidx, endidx):
 		date = datetime.now().strftime("%Y-%M-%d %H:%m:%S")
-		return ["date %s\n" % date]
+		return ["%s\n" % date]
 
 	def do_exit(self, line):
 		sys.exit(0)
-
-def sender(ser):
-	time.sleep(5)
-	ser.write("ps\n")
 
 def reader(ser):
 	while (1):
@@ -45,9 +41,6 @@ if __name__ == "__main__":
 	receiver_thread = threading.Thread(target=reader, args=(ser,))
 	receiver_thread.setDaemon(1)
 	receiver_thread.start()
-
-	sender_thread = threading.Thread(target=sender, args=(ser,))
-	sender_thread.start()	
 
 	myshell = MyCmd(stdout=ser)
 	myshell.prompt = ""

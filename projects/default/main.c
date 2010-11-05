@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include <posix_io.h>
+#include <ltc4150.h>
 #include <shell.h>
 #include <shell_commands.h>
 #include <board_uart0.h>
@@ -22,11 +23,12 @@ void shell_putchar(int c) {
 
 int main(void) {
     posix_open(uart0_handler_pid, 0);
+	ltc4150_start();
     
     puts("Welcome to ukleos!");
 
     shell_t shell;
-    shell_init(&shell, _shell_command_list, shell_readc, shell_putchar);
+    shell_init(&shell, NULL, shell_readc, shell_putchar);
 
     shell_run(&shell);
 
