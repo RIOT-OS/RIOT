@@ -7,7 +7,8 @@ from datetime import datetime
 class MyCmd(cmd.Cmd):
 
 	def default(self, line):
-		self.stdout.write(line + "\n")
+		for tok in line.split(';'):
+			self.stdout.write(tok.strip() + "\n")
 
 	def do_help(self, line):
 		self.stdout.write("help\n")

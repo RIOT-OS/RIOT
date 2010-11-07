@@ -9,8 +9,8 @@
 #ifndef __LPC2387_H
 #define __LPC2387_H
 
-#include "lpc23xx.h"
-#include "bitarithm.h"
+#include <lpc23xx.h>
+#include <bitarithm.h>
 
 #define F_CCO					288000000
 #define CL_CPU_DIV				4									///< CPU clock divider

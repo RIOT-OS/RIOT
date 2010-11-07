@@ -55,22 +55,14 @@ static enum lpm_mode lpm;
 extern void init_clks1(void);
 extern void init_clks2(void);
 
-#define DEBUG 0
-#if DEBUG
-#include <stdio.h>
-#define PRINTF(...) printf(__VA_ARGS__)
-#else
-#define PRINTF(...)
-#endif
+#define ENABLE_DEBUG 1
+#include <debug.h>
 
-
-void
-lpm_init(void)
-{
+void lpm_init(void) {
 	lpm = LPM_ON;
 }
 
-#define LPM_DEBUG 0
+#define LPM_DEBUG 1
 
 void lpm_begin_awake(void) {
 	if (lpm >= LPM_SLEEP ) {									// wake up from deep sleep
@@ -118,8 +110,8 @@ enum lpm_mode lpm_set(enum lpm_mode target) {
 
 	lpm = target;
 
-	#if DEBUG
-		PRINTF("# LPM power down %u -> %u", lpm, target);
+	#if iENABLE_DEBUG
+		DEBUG("# LPM power down %u -> %u", lpm, target);
 	#endif
 
 	PCON |= target_flags;										// set target power mode

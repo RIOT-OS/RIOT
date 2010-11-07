@@ -13,6 +13,7 @@ extern void _date_handler(char* now);
 extern void _get_temperature_handler(char* unused);
 extern void _get_humidity_handler(char* unused);
 extern void _get_weather_handler(char* unused);
+extern void _set_offset_handler(char* offset);
 #endif
 
 #ifdef MODULE_LTC4150
@@ -31,6 +32,7 @@ const shell_command_t _shell_command_list[] = {
     {"temp", "Prints measured temperature.", _get_temperature_handler},
     {"hum", "Prints measured humidity.", _get_humidity_handler},
     {"weather", "Prints measured humidity and temperature.", _get_weather_handler},
+	{"offset", "Set temperature offset.", _set_offset_handler},
 #endif
 #ifdef MODULE_LTC4150
 	{"cur", "Prints current and average power consumption.", _get_current_handler},

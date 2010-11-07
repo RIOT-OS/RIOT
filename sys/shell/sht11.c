@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <sht11.h>
+#include <string.h>
+
+extern float sht11_temperature_offset;
 
 void _get_humidity_handler(char* unused) {
     uint8_t success;
@@ -39,3 +42,12 @@ void _get_weather_handler(char* unused) {
     }
 }
 
+void _set_offset_handler(char* offset) {
+	if (strlen(offset) == 6) {
+		puts("Usage: offset <OFFSET>");
+	}
+	else {
+		sscanf(offset, "offset %f",	&sht11_temperature_offset);
+		printf("Temperature offset set to %f\n", sht11_temperature_offset);
+	}
+}

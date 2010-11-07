@@ -17,22 +17,22 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <errno.h>
-#include "tcb.h"
-#include "kernel.h"
-#include "kernel_intern.h"
-#include "sched.h"
-#include "flags.h"
-#include "cpu.h"
-#include "lpm.h"
-#include "thread.h"
-#include "hwtimer.h"
+#include <tcb.h>
+#include <kernel.h>
+#include <kernel_intern.h>
+#include <sched.h>
+#include <flags.h>
+#include <cpu.h>
+#include <lpm.h>
+#include <thread.h>
+#include <hwtimer.h>
 
 #ifdef MODULE_AUTO_INIT
 #include <auto_init.h>
 #endif
 
 #define ENABLE_DEBUG
-#include "debug.h"
+#include <debug.h>
 
 volatile tcb *sched_threads[MAXTHREADS];
 volatile tcb *active_thread;
