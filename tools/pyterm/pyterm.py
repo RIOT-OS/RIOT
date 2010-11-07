@@ -13,8 +13,8 @@ class MyCmd(cmd.Cmd):
 	def do_help(self, line):
 		self.stdout.write("help\n")
 
-	def complete_date(self, text, line, begidx, endidx):
-		date = datetime.now().strftime("%Y-%M-%d %H:%m:%S")
+	def complete_date(self, text, line, begidx, endidm):
+		date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		return ["%s\n" % date]
 
 	def do_exit(self, line):
