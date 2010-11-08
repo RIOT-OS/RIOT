@@ -15,7 +15,13 @@ class MyCmd(cmd.Cmd):
 
 	def complete_date(self, text, line, begidx, endidm):
 		date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-		return ["%s\n" % date]
+		return ["%s" % date]
+
+	def do_reset(self, line):
+		ser.setDTR(1)
+		ser.setRTS(1)
+		ser.setDTR(0)
+		ser.setRTS(0)
 
 	def do_exit(self, line):
 		sys.exit(0)
