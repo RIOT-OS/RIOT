@@ -35,6 +35,7 @@ and the mailinglist (subscription via web site)
 #include <stdio.h>
 #include "lpc23xx.h"
 #include "VIC.h"
+#include <kernel.h>
 
 #include <board_uart0.h>
 
@@ -78,12 +79,14 @@ static inline void dequeue(void) {
 
 static void  push_queue(void) {
     running = 1;
+	lpm_prevent_sleep |= LPM_PREVENT_SLEEP_UART;
 start:
     if (!actual) {
         if (queue_items) {
             dequeue();
         } else {
             running = 0;
+            lpm_prevent_sleep &= ~LPM_PREVENT_SLEEP_UART;
             if (!fifo)
                 while(!(U0LSR & BIT6)){};
             return;
