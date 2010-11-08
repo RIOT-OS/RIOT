@@ -49,14 +49,8 @@ and the mailinglist (subscription via web site)
 #define PREINT_RTC	0x000001C8  /* Prescaler value, integer portion, PCLK = 15Mhz */
 #define PREFRAC_RTC	0x000061C0  /* Prescaler value, fraction portion, PCLK = 15Mhz */
 
-#define DEBUG 0
-#if DEBUG
-#include <stdio.h>
-#define PRINTF(fmt, args...)		printf("rtc: " fmt "\n", ##args)
-#else
-#define PRINTF(fmt, args...)
-#endif
-
+#define ENABLE_DEBUG 0
+#include <debug.h>
 
 /**
  * @brief	epoch time in hour granularity
@@ -112,7 +106,7 @@ rtc_set_alarm(struct tm* localt, enum rtc_alarm_mask mask)
 		RTC_ALMON = localt->tm_mon + 1;
 		RTC_ALYEAR = localt->tm_year;
 		RTC_AMR = ~mask;											// set wich alarm fields to check
-		PRINTF("alarm set %2lu.%2lu.%4lu  %2lu:%2lu:%2lu",
+		DEBUG("alarm set %2lu.%2lu.%4lu  %2lu:%2lu:%2lu\n",
 				RTC_ALDOM, RTC_ALMON, RTC_ALYEAR, RTC_ALHOUR, RTC_ALMIN, RTC_ALSEC);
 	} else {
 		RTC_AMR = 0xff;
@@ -151,7 +145,7 @@ void RTC_IRQHandler (void)
 	} else if( RTC_ILR & ILR_RTCALF ) {
 		RTC_ILR |= ILR_RTCALF;
 		RTC_AMR = 0xff;						// disable alarm irq
-		PRINTF("alarm");
+		DEBUG("Ring\n");
 		lpm_end_awake();
 	}
 
@@ -186,7 +180,7 @@ void rtc_init(void)
 		rtc_reset();
 	}
 
-	PRINTF("%2lu.%2lu.%4lu  %2lu:%2lu:%2lu epoch %lu",
+	DEBUG("%2lu.%2lu.%4lu  %2lu:%2lu:%2lu epoch %lu\n",
 			RTC_DOM, RTC_MONTH, RTC_YEAR, RTC_HOUR, RTC_MIN, RTC_SEC,
 			epoch);
 }

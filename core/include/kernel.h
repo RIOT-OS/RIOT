@@ -80,6 +80,7 @@
  */
 int inISR(void);
 
+#define LPM_PREVENT_SLEEP_UART    BIT2
 #define LPM_PREVENT_SLEEP_HWTIMER    BIT1
 
 extern volatile int lpm_prevent_sleep;
