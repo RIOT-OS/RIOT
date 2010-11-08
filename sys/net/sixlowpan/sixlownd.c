@@ -12,18 +12,23 @@ uint16_t packet_length;
 
 #define IP_BUFFER ((struct ipv6_hdr*)&buffer[LL_HEADER_LENGTH])  
 #define ICMP_BUFFER ((struct icmpv6_hdr*)&buffer[LLHDR_IPV6HDR_LENGTH])
+/* fields after icmp header*/
+#define RA_BUFFER ((struct router_advertisement*)&buffer[LLHDR_ICMPV6HDR_LENGTH])
 #define IPH_LLH_BUFFER &buffer[LL_HEADER_LENGTH + IPV6_HEADER_LENGTH]
-#define OPT_FIELD_BUFFER ((struct option_hdr*)&buffer[LLHDR_IPV6HDR_LENGTH + option_field_length])
+#define OPT_ST_FIELD_BUFFER ((struct option_src_trgt_lla*)&buffer[LLHDR_IPV6HDR_LENGTH + option_field_length])
+#define OPT_MTU_BUFFER ((struct option_mtu*)&buffer[LLHDR_IPV6HDR_LENGTH + option_field_length])
 
 uint8_t rs_count;
+
+option_prefix_info *prefix; /** prefix list pointer */
 
 /* send router solicitation message - RFC4861 section 4.1 */
 void send_rs(void){
       //uint8_t ipv6_ext_hdr_len = 0;
-    if(rs_count < MAX_RTR_SOLICITATIONS){
+    if(rs_count < MAX_RTR_SOL){
         packet_length = 0;
 
-        ICMP_BUFFER->type = ICMP_ROUTER_SOLICITATION;
+        ICMP_BUFFER->type = ICMP_RTR_SOL;
         ICMP_BUFFER->code = 0;
 
         IP_BUFFER->version_trafficclass = IPV6_VERSION;
@@ -35,24 +40,24 @@ void send_rs(void){
         create_all_routers_mcast_addr(&IP_BUFFER->destaddr);
         PRINT6ADDR(&IP_BUFFER->destaddr);
         /* set payload length */
-        IP_BUFFER->length = ICMP_HEADER_LENGTH + RS_LENGTH + SLLAO_OPT_LENGTH; 
-        set_llao(&buffer[LLHDR_ICMPV6HDR_LENGTH + RS_LENGTH], SLLAO_OPT_LENGTH);
+        IP_BUFFER->length = ICMP_HEADER_LENGTH + RTR_SOL_LENGTH + SLLAO_OPT_LENGTH; 
+        set_llao(&buffer[LLHDR_ICMPV6HDR_LENGTH + RTR_SOL_LENGTH], SLLAO_OPT_LENGTH);
         ICMP_BUFFER->checksum = 0;
         ICMP_BUFFER->checksum = ~chksum_calc(ICMP_NEXTHEADER);
         printf("%x\n",ICMP_BUFFER->checksum);
 
         rs_count++;
         // sleep 4 sec
-        swtimer_usleep(ROUTER_SOLICITATION_INTERVAL * 1000000);
+        swtimer_usleep(RTR_SOL_INTERVAL * 1000000);
     } 
 }
 
 void recv_rs(void){
-    option_field_length = RS_LENGTH;
+    option_field_length = RTR_SOL_LENGTH;
     uint8_t *llao;
     /* get link layer address option from buf */
-    if(OPT_FIELD_BUFFER->type == SLLAO_OPT_LENGTH){
-        llao = OPT_FIELD_BUFFER;
+    if(OPT_ST_FIELD_BUFFER->type == SLLAO_OPT_LENGTH){
+        llao = OPT_ST_FIELD_BUFFER;
     }
 
     if(llao != NULL){
@@ -68,8 +73,44 @@ void send_ra(ipv6_addr *addr){
     IP_BUFFER->flowlabel = 0;
     IP_BUFFER->nextheader = ICMP_NEXTHEADER;
     IP_BUFFER->hoplimit = NEIGHBOR_DISCOVERY_HOPLIMIT;
-
+    // not solicited
     create_all_nodes_mcast_addr(&IP_BUFFER->destaddr);
+    
+    ICMP_BUFFER->type = ICMP_RTR_ADV;
+    ICMP_BUFFER->code = 0;
+    
+    // set current ttl 
+    RA_BUFFER->hoplimit = MULTIHOP_HOPLIMIT;
+    // set M and O flag, last 6 bits are zero
+    RA_BUFFER->autoconfig_flags = (ND_M_FLAG << 7) | (ND_O_FLAG << 6);
+    RA_BUFFER->router_lifetime = MAX_RTR_ADV_INTERVAL * MAX_RTR_ADV;
+    RA_BUFFER->reachable_time = 0;
+    RA_BUFFER->retrans_timer = 0;
+
+    set_llao((uint8_t *)OPT_ST_FIELD_BUFFER,SLLAO_OPT_LENGTH);
+
+    /* set MTU options */
+    OPT_MTU_BUFFER->type = MTU_OPTION_TYPE;
+    OPT_MTU_BUFFER->length = MTU_OPTION_LENGTH;
+    OPT_MTU_BUFFER->reserved = 0;
+    // 1500 octets mtu
+    OPT_MTU_BUFFER->mtu = HTONL(1500);
+
+    /* set packet length */
+    packet_length = IPV6_HEADER_LENGTH + ICMP_HEADER_LENGTH + 
+                    RTR_ADV_LENGTH + SLLAO_OPT_LEN + MTU_OPTION_HDR_LENGTH;
+    /* set payload length field */
+
+    /* set prefix option */
+    for(){
+    
+    }
+
+    IP_BUFFER->length = packet_length - IPV6_HEADER_LENGTH;
+
+    /* calculate checksum */
+    ICMP_BUFFER->checksum = 0;
+    ICMP_BUFFER->checksum = ~chksum_calc(ICMP_NEXTHEADER);
 }
 
 /* link-layer address option - RFC4861 section 4.6.1/ RFC4944 8. */

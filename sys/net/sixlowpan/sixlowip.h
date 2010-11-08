@@ -45,6 +45,7 @@
 #define RADIO_CONF                  radio_cc1100
 #define RADIO                       RADIO_CONF
 
+#define MUTLIHOP_HOPLIMIT           64
 
 extern uint8_t ipv6_ext_hdr_len;
 
@@ -52,8 +53,8 @@ extern uint8_t ipv6_ext_hdr_len;
 #define LLHDR_ICMPV6HDR_LENGTH (LL_HEADER_LENGTH + IPV6_HEADER_LENGTH + ipv6_ext_hdr_len + ICMP_HEADER_LENGTH)
 #define IPV6HDR_ICMPV6HDR_LENGTH (IPV6_HEADER_LENGTH + ipv6_ext_hdr_len + ICMP_HEADER_LENGTH)
 /* global buffer*/
-
 uint8_t buffer[BUFFER_SIZE];
+/* packet length*/
 extern uint16_t packet_length;
 
 /* ipv6 extension header length */
@@ -85,6 +86,10 @@ typedef struct link_layer_addr{
 } link_layer_addr;
 
 #define HTONS(a) (uint16_t)((((uint16_t) (a)) << 8) | (((uint16_t) (a)) >> 8))
+#define HTONL(a) ((((uint32_t) (a) & 0xff000000) >> 24) | \
+                  (((uint32_t) (a) & 0x00ff0000) >> 8)  | \
+                  (((uint32_t) (a) & 0x0000ff00) << 8)  | \
+                  (((uint32_t) (a) & 0x000000ff) << 24)) 
 
 void create_link_local_prefix(ipv6_addr *ipaddr);
 
