@@ -84,7 +84,18 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     /* allocate our thread control block at the top of our stackspace */
     int total_stacksize = stacksize;
     stacksize -= sizeof(tcb);
-    tcb *cb = (tcb*) (stack + stacksize);
+
+    /* align tcb address on 32bit boundary */
+    unsigned int tcb_address = (unsigned int) stack + stacksize;
+    if ( tcb_address & 1 ) {
+        tcb_address--;
+        stacksize--;
+    }
+    if ( tcb_address & 2 ) {
+        tcb_address-=2;
+        stacksize-=2;
+    }
+    tcb *cb = (tcb*) tcb_address;
 
     if (priority >= SCHED_PRIO_LEVELS) {
         return -EINVAL;
