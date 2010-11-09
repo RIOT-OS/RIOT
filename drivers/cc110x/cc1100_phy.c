@@ -60,7 +60,7 @@ and the mailinglist (subscription via web site)
 #include "msg.h"
 #include "debug.h"
 
-#define PRIORITY_CC1100         PRIORITY_MIN-9
+#define PRIORITY_CC1100         PRIORITY_MAIN-1
 
 #define MSG_POLL 12346
 
@@ -97,7 +97,7 @@ static const char *cc1100_event_handler_name = "cc1100_event_handler";
 static mutex_t cc1100_mutex;
 volatile int cc1100_mutex_pid;
 static swtimer_t cc1100_watch_dog;
-static uint64_t cc1100_watch_dog_period = 0;
+static swtime_t cc1100_watch_dog_period = 0;
 
 static uint16_t cc1100_event_handler_pid;
 static void cc1100_event_handler_function(void);
