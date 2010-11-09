@@ -16,13 +16,13 @@ void _settime_handler(char* c) {
     int res;
     uint16_t month, epoch_year;
 
-    res = sscanf(c, "date %hu-%hu-%i %i:%i:%i",
+    res = sscanf(c, "date %hu-%hu-%u %u:%u:%u",
             &epoch_year,
             &month,
-            &(now.tm_mday),
-            &(now.tm_hour),
-            &(now.tm_min),
-            &(now.tm_sec));
+            (unsigned int*) &(now.tm_mday),
+            (unsigned int*) &(now.tm_hour),
+            (unsigned int*) &(now.tm_min),
+            (unsigned int*) &(now.tm_sec));
     
     if (res < 6) {
         printf("Usage: date YYYY-MM-DD hh:mm:ss\n");

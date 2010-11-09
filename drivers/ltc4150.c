@@ -70,6 +70,10 @@ double ltc4150_get_avg_mA() {
     return (int_to_coulomb(int_count)*1000000000)/HWTIMER_TICKS_TO_US(last_int_time - start_time);
 }
 
+int ltc4150_get_interval() {
+    return HWTIMER_TICKS_TO_US(last_int_time - start_time);
+}
+
 unsigned long ltc4150_get_intcount() {
     return int_count;
 }
