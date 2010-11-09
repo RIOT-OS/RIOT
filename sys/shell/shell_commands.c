@@ -21,6 +21,11 @@ extern void _get_current_handler(char* unused);
 extern void _reset_current_handler(char* unused);
 #endif
 
+#ifdef MODULE_CC110X
+extern void _cc1100_get_address_handler(char *unused);
+extern void _cc1100_set_address_handler(char *ptr);
+#endif
+
 const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_PS
     {"ps", "Prints information about running threads.", _ps_handler},
@@ -37,6 +42,10 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_LTC4150
 	{"cur", "Prints current and average power consumption.", _get_current_handler},
 	{"rstcur", "Resets coulomb counter.", _reset_current_handler},
+#endif
+#ifdef MODULE_CC110X
+    {"cc1100_get_address", "", _cc1100_get_address_handler},
+    {"cc1100_set_address", "", _cc1100_set_address_handler},
 #endif
     {NULL, NULL, NULL}
 };
