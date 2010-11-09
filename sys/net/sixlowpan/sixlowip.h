@@ -14,24 +14,15 @@
 #define MTU                         0x0
 #endif                         
 
-#define IPV6_VERSION                0x60
-#define ICMP_NEXTHEADER             0x3A
-#define NEIGHBOR_DISCOVERY_HOPLIMIT 0xFF
-
-#define ICMP_HEADER_LENGTH          0x4
-#define IPV6_HEADER_LENGTH          0x28            
-
-/* link layer protocol control information length*/
-#ifdef MSBA2_SENSOR_NODE
-#define LL_HEADER_LENGTH            0x4
-#else
-#define LL_HEADER_LENGTH            0x0    
-#endif
+/* IPv6 field values */ 
+#define IPV6_VER                    0x60
+#define ICMPV6_NXT_HDR              0x3A
+#define ND_HOPLIMIT                 0xFF
 
 #define SIXLOWPAN_IPV6_LL_ADDR_LEN  8            
 
 /* size of global buffer */
-#define BUFFER_SIZE (LL_HEADER_LENGTH + MTU)
+#define BUFFER_SIZE (LL_HDR_LEN + MTU)
 
 #define MSBA2_OUI                   0x005BA2    // 24bit OUI 
 #define R8BIT                       0xA2        // random 8bit
@@ -45,13 +36,22 @@
 #define RADIO_CONF                  radio_cc1100
 #define RADIO                       RADIO_CONF
 
-#define MUTLIHOP_HOPLIMIT           64
+#define MULTIHOP_HOPLIMIT           64
 
 extern uint8_t ipv6_ext_hdr_len;
 
-#define LLHDR_IPV6HDR_LENGTH (LL_HEADER_LENGTH + IPV6_HEADER_LENGTH + ipv6_ext_hdr_len)
-#define LLHDR_ICMPV6HDR_LENGTH (LL_HEADER_LENGTH + IPV6_HEADER_LENGTH + ipv6_ext_hdr_len + ICMP_HEADER_LENGTH)
-#define IPV6HDR_ICMPV6HDR_LENGTH (IPV6_HEADER_LENGTH + ipv6_ext_hdr_len + ICMP_HEADER_LENGTH)
+/* base header lengths */
+#ifdef MSBA2_SENSOR_NODE
+    #define LL_HDR_LEN              0x4
+#else
+    #define LL_HDR_LEN              0x0    
+#endif /* MSBA2_SENSOR_NODE */
+#define ICMPV6_HDR_LEN              0x4
+#define IPV6_HDR_LEN                0x28 
+#define LLHDR_IPV6HDR_LEN (LL_HDR_LEN + IPV6_HDR_LEN + ipv6_ext_hdr_len)
+#define LLHDR_ICMPV6HDR_LEN (LL_HDR_LEN + IPV6_HDR_LEN + ipv6_ext_hdr_len + ICMPV6_HDR_LEN)
+#define IPV6HDR_ICMPV6HDR_LEN (IPV6_HDR_LEN + ipv6_ext_hdr_len + ICMPV6_HDR_LEN)
+
 /* global buffer*/
 uint8_t buffer[BUFFER_SIZE];
 /* packet length*/
@@ -91,14 +91,12 @@ typedef struct link_layer_addr{
                   (((uint32_t) (a) & 0x0000ff00) << 8)  | \
                   (((uint32_t) (a) & 0x000000ff) << 24)) 
 
+/* function prototypes */
 void create_link_local_prefix(ipv6_addr *ipaddr);
-
 void create_all_routers_mcast_addr(ipv6_addr *ipaddr);
-
 void set_eui64(ipv6_addr *ipaddr);
-
 link_layer_addr* get_eui(ipv6_addr *ipaddr);
-
 void bootstrapping(void);
+void print6addr(ipv6_addr *ipaddr);
 
 #endif /* SIXLOWIP_H*/

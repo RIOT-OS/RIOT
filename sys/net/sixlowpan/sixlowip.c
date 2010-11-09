@@ -4,21 +4,17 @@
 #include "drivers/cc110x/cc1100.h"
 #include "radio/radio.h"
 
-#define IP_BUFFER ((struct ipv6_hdr*)&buffer[LL_HEADER_LENGTH])
-
-#define PRINTF(...) printf(__VA_ARGS__) 
-#define PRINT6ADDR(addr) PRINTF("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x\n", ((uint8_t *)addr)[0], ((uint8_t *)addr)[1], ((uint8_t *)addr)[2], ((uint8_t *)addr)[3], ((uint8_t *)addr)[4], ((uint8_t *)addr)[5], ((uint8_t *)addr)[6], ((uint8_t *)addr)[7], ((uint8_t *)addr)[8], ((uint8_t *)addr)[9], ((uint8_t *)addr)[10], ((uint8_t *)addr)[11], ((uint8_t *)addr)[12], ((uint8_t *)addr)[13], ((uint8_t *)addr)[14], ((uint8_t *)addr)[15])
-
+#define ipv6_buf ((struct ipv6_hdr*)&buffer[LL_HDR_LEN])
 
 void bootstrapping(void){
 #ifdef SIXLOWPAN_NODE
     /* create link-local address based on eui-64 */
     RADIO.set_address(5);
-    create_link_local_prefix(&IP_BUFFER->srcaddr);
-    set_eui64(&IP_BUFFER->srcaddr);
-    PRINT6ADDR(&IP_BUFFER->srcaddr);
+    create_link_local_prefix(&ipv6_buf->srcaddr);
+    set_eui64(&ipv6_buf->srcaddr);
+    print6addr(&ipv6_buf->srcaddr);
     /* send router solicitation */
-    send_rs();
+    send_rtr_sol();
 #endif
 }
 
@@ -66,4 +62,14 @@ void create_link_local_prefix(ipv6_addr *ipaddr){
     ipaddr->uint16[1] = 0;
     ipaddr->uint16[2] = 0;
     ipaddr->uint16[3] = 0;
+}
+
+void print6addr(ipv6_addr *ipaddr){
+    printf("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x\n",
+        ((uint8_t *)ipaddr)[0], ((uint8_t *)ipaddr)[1], ((uint8_t *)ipaddr)[2],
+        ((uint8_t *)ipaddr)[3], ((uint8_t *)ipaddr)[4], ((uint8_t *)ipaddr)[5], 
+        ((uint8_t *)ipaddr)[6], ((uint8_t *)ipaddr)[7], ((uint8_t *)ipaddr)[8],
+        ((uint8_t *)ipaddr)[9], ((uint8_t *)ipaddr)[10], ((uint8_t *)ipaddr)[11], 
+        ((uint8_t *)ipaddr)[12], ((uint8_t *)ipaddr)[13], ((uint8_t *)ipaddr)[14], 
+        ((uint8_t *)ipaddr)[15]);      
 }
