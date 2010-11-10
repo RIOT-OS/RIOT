@@ -38,15 +38,16 @@ and the mailinglist (subscription via web site)
  */
 
 #include <stdio.h>
-//#include <stdlib.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include "cc1100.h"
-#include "cc1100_phy.h"
-#include "cc1100-csmaca-mac.h"
-#include "protocol-multiplex.h"
+#include <cc1100.h>
+#include <cc1100_phy.h>
+#include <cc1100-csmaca-mac.h>
+#include <protocol-multiplex.h>
 
-#include "hwtimer.h"
+#include <hwtimer.h>
+#include <swtimer.h>
 
 /*---------------------------------------------------------------------------*/
 
