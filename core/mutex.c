@@ -68,7 +68,7 @@ void mutex_wait(struct mutex_t *mutex) {
     n.data = (unsigned int) active_thread;
     n.next = NULL;
 
-    DEBUG("%s: Adding node to mutex queue: prio: %u data: %u\n", active_thread->name, n.priority, n.data);
+    DEBUG("%s: Adding node to mutex queue: prio: %u\n", active_thread->name, n.priority);
 
     queue_priority_add(&(mutex->queue), &n);
 
@@ -90,7 +90,7 @@ void mutex_unlock(struct mutex_t* mutex, int yield) {
             DEBUG("%s: waking up waiter %s.\n", process->name);
             sched_set_status(process, STATUS_PENDING);
 
-            sched_switch_if_higher(active_thread->priority, process->priority, inISR());
+            sched_switch(active_thread->priority, process->priority, inISR());
         } else {
             mutex->val = 0;
         }
