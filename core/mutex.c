@@ -40,10 +40,6 @@ int mutex_trylock(struct mutex_t* mutex) {
     return atomic_set_return(&mutex->val, 1 ) == 0;
 }
 
-static int prio() {
-    return active_thread->priority;
-}
-
 int mutex_lock(struct mutex_t* mutex) {
     DEBUG("%s: trying to get mutex. val: %u\n", active_thread->name, mutex->val);
 
