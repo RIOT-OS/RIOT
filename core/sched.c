@@ -143,6 +143,16 @@ void sched_set_status(tcb *process, unsigned int status) {
     process->status = status;
 }
 
+void sched_switch_if_higher(uint16_t current_prio, uint16_t other_prio, int in_isr) {
+    if (current_prio < other_prio) {
+        if (in_isr) {
+            sched_context_switch_request = 1;
+        } else {
+            thread_yield();
+        }
+    }
+}
+
 extern void cpu_switch_context_exit(void);
 
 void sched_task_exit(void) {
