@@ -56,7 +56,7 @@ void queue_priority_add(queue_node_t* root, queue_node_t* new_obj) {
     queue_node_t* node = root;
 
     while (node->next != NULL) {
-        if (node->next->priority < new_obj->priority) {
+        if (node->next->priority > new_obj->priority) {
             new_obj->next = node->next;
             node->next = new_obj;
             return;
