@@ -81,7 +81,7 @@ enum rtc_alarm_mask {
  * @internal
  * During reboots only alarms are reset.
  */
-void _rtc_init(void);
+void rtc_init(void);
 
 void _rtc_reset(void);
 

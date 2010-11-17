@@ -169,7 +169,7 @@ void rtc_enable(void)
 	epoch = now - (now % 3600);
 }
 /*---------------------------------------------------------------------------*/
-void _rtc_init(void)
+void rtc_init(void)
 {
 	PCONP |= BIT9;
 	RTC_AMR = 0xff;							// disable alarm irq
