@@ -22,8 +22,8 @@ class SerCmd(cmd.Cmd):
 			sys.stderr.write("No port specified!\n")
 			sys.exit(-1)
 		self.ser = serial.Serial(port=self.port, baudrate=115200, dsrdtr=0, rtscts=0)
-		self.ser.setDTR(0)
-		self.ser.setRTS(0)
+		#self.ser.setDTR(0)
+		#self.ser.setRTS(0)
 
 		# start serial->console thread
 		receiver_thread = threading.Thread(target=reader, args=(self.ser,))
@@ -100,7 +100,8 @@ class SerCmd(cmd.Cmd):
 					self.aliases[opt] = self.config.get(sec, opt)
 			else:
 				for opt in self.config.options(sec):
-					self.__dict__[opt] = self.config.get(sec, opt)
+					if not self.__dict__.has_key(opt):
+						self.__dict__[opt] = self.config.get(sec, opt)
 
 
 def reader(ser):
