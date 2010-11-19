@@ -5,6 +5,7 @@
 #include <cc1100-internal.h>
 #include <cc1100_spi.h>
 
+#include <transceiver.h>
 #include <hwtimer.h>
 
 #define RX_BUF_SIZE (10)
@@ -15,17 +16,24 @@ extern uint8_t pa_table_index;          ///< Current PATABLE Index
 
 /* global variables */
 
-static rx_buffer_t rx_buffer[RX_BUF_SIZE];		///< RX buffer
+rx_buffer_t cc1100_rx_buffer[RX_BUF_SIZE];		    ///< RX buffer
+cc1100_statistic_t cc1100_statistic;
 
-volatile cc1100_flags rflags;		///< Radio control flags
+volatile cc1100_flags rflags;		                ///< Radio control flags
 volatile uint8_t radio_state = RADIO_UNKNOWN;		///< Radio state
 
-static volatile uint8_t rx_buffer_tail;			///< RX queue tail
+volatile uint8_t cc1100_rx_buffer_next;			    ///< Next packet in RX queue
 
-static uint8_t radio_address;		///< Radio address
-static uint8_t radio_channel;		///< Radio channel
+static uint8_t radio_address;		                ///< Radio address
+static uint8_t radio_channel;		                ///< Radio channel
 
-cc1100_statistic_t cc1100_statistic;
+/**
+ * @brief	Last sequence number this node has seen
+ *
+ * @note	(phySrc + flags.identification) - for speedup in ISR.
+ */
+static volatile uint16_t last_seq_num = 0;
+
 
 /* internal function prototypes */
 static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length);
@@ -34,16 +42,11 @@ static void reset(void);
 static void power_up_reset(void);
 static void write_register(uint8_t r, uint8_t value);
 
-static void setup_rx_mode(void);
-static void switch_to_rx(void);
-static void wakeup_from_rx(void);
-static void switch_to_pwd(void);
-
 /*---------------------------------------------------------------------------*/
 // 								Radio Driver API
 /*---------------------------------------------------------------------------*/
 void cc1100_init(void) {
-	rx_buffer_tail = 0;
+	cc1100_rx_buffer_next = 0;
 
     /* Initialize SPI */
 	cc1100_spi_init();
@@ -91,7 +94,71 @@ void cc1100_gdo2_irq(void) {
 void cc1100_rx_handler(void) {
     uint8_t res = 0;
 
-	res = receive_packet((uint8_t*)&(rx_buffer[rx_buffer_tail].packet), sizeof(cc1100_packet_t));
+	// Possible packet received, RX -> IDLE (0.1 us)
+	rflags.CAA      = 0;
+	rflags.MAN_WOR  = 0;
+	cc1100_statistic.packets_in++;
+
+	res = receive_packet((uint8_t*)&(rx_buffer[cc1100_rx_buffer_next].packet), sizeof(cc1100_packet_t));
+	if (res)
+	{
+        // If we are sending a burst, don't accept packets.
+		// Only ACKs are processed (for stopping the burst).
+		// Same if state machine is in TX lock.
+		if (radio_state == RADIO_SEND_BURST || rflags.TX)
+		{
+			cc1100_statistic.packets_in_while_tx++;
+			return;
+		}
+        rx_buffer[cc1100_rx_buffer_next].info.rssi = rflags.RSSI;
+        rx_buffer[cc1100_rx_buffer_next].info.lqi = rflags.LQI;
+
+		// Valid packet. After a wake-up, the radio should be in IDLE.
+		// So put CC1100 to RX for WOR_TIMEOUT (have to manually put
+		// the radio back to sleep/WOR).
+		cc1100_spi_write_reg(CC1100_MCSM0, 0x08);	// Turn off FS-Autocal
+		cc1100_spi_write_reg(CC1100_MCSM2, 0x07);	// Configure RX_TIME (until end of packet)
+        cc1100_spi_strobe(CC1100_SRX);
+        hwtimer_wait(IDLE_TO_RX_TIME);
+        radio_state = RADIO_RX;
+        
+        if (++cc1100_rx_buffer_next == RX_BUF_SIZE) {
+            cc1100_rx_buffer_next = 0;
+        }
+        msg m;
+        m.type = RCV_PKT;
+        m.content = NULL;
+        msg_send_int(m, transceiver_pid);
+        return;
+    }
+	else
+	{
+		// No ACK received so TOF is unpredictable
+		rflags.TOF = 0;
+
+		// CRC false or RX buffer full -> clear RX FIFO in both cases
+		last_seq_num = 0;					// Reset for correct burst detection
+		cc1100_spi_strobe(CC1100_SIDLE);	// Switch to IDLE (should already be)...
+		cc1100_spi_strobe(CC1100_SFRX);		// ...for flushing the RX FIFO
+
+		// If packet interrupted this nodes send call,
+		// don't change anything after this point.
+		if (radio_state == RADIO_AIR_FREE_WAITING)
+		{
+			cc1100_spi_strobe(CC1100_SRX);
+			hwtimer_wait(IDLE_TO_RX_TIME);
+			return;
+		}
+		// If currently sending, exit here (don't go to RX/WOR)
+		if (radio_state == RADIO_SEND_BURST)
+		{
+			cc1100_statistic.packets_in_while_tx++;
+			return;
+		}
+
+		// No valid packet, so go back to RX/WOR as soon as possible
+		cc1100_switch_to_rx();
+	}
 }
 
 uint8_t cc1100_set_address(radio_address_t address) {
@@ -106,6 +173,29 @@ uint8_t cc1100_set_address(radio_address_t address) {
 
 	radio_address = id;
 	return 0;
+}
+
+void cc1100_setup_rx_mode(void) {
+	// Stay in RX mode until end of packet
+	cc1100_spi_write_reg(CC1100_MCSM2, 0x07);
+	cc1100_switch_to_rx();
+}
+
+void cc1100_switch_to_rx(void) {
+	radio_state = RADIO_RX;
+	cc1100_spi_strobe(CC1100_SRX);
+}
+
+void cc1100_wakeup_from_rx(void) {
+	if (radio_state != RADIO_RX) return;
+	cc1100_spi_strobe(CC1100_SIDLE);
+	radio_state = RADIO_IDLE;
+}
+
+void switch_to_pwd(void) {
+    cc1100_wakeup_from_rx();
+	cc1100_spi_strobe(CC1100_SPWD);
+	radio_state = RADIO_PWD;
 }
 /*---------------------------------------------------------------------------*/
 /*               Internal functions                                          */
@@ -175,7 +265,7 @@ static uint8_t receive_packet(uint8_t *rxBuffer, uint8_t length) {
 /*---------------------------------------------------------------------------*/
 
 static void reset(void) {
-	wakeup_from_rx();
+	cc1100_wakeup_from_rx();
 	cc1100_spi_select();
 	cc1100_spi_strobe(CC1100_SRES);
 	hwtimer_wait(RTIMER_TICKS(10));
@@ -195,13 +285,13 @@ static void write_register(uint8_t r, uint8_t value) {
 	uint8_t old_state = radio_state;
 
 	/* Wake up from WOR/RX (if in WOR/RX, else no effect) */
-	wakeup_from_rx();
+	cc1100_wakeup_from_rx();
 	cc1100_spi_write_reg(r, value);
 
 	// Have to put radio back to WOR/RX if old radio state
 	// was WOR/RX, otherwise no action is necessary
 	if ((old_state == RADIO_WOR) || (old_state == RADIO_RX)) {
-		switch_to_rx();
+		cc1100_switch_to_rx();
 	}
 }
     
@@ -219,11 +309,11 @@ static int rd_set_mode(int mode) {
 	switch (mode) {
 		case RADIO_MODE_ON:
 			cc1100_init_interrupts();			// Enable interrupts
-			setup_rx_mode();				// Set chip to desired mode
+			cc1100_setup_rx_mode();				// Set chip to desired mode
 			break;
 		case RADIO_MODE_OFF:
 			cc1100_disable_interrupts();		// Disable interrupts
-			switch_to_pwd();					// Set chip to power down mode
+			cc1100_switch_to_pwd();					// Set chip to power down mode
 			break;
 		case RADIO_MODE_GET:
 			// do nothing, just return current mode
@@ -236,25 +326,4 @@ static int rd_set_mode(int mode) {
 	return result;
 }
 
-static void setup_rx_mode(void) {
-	// Stay in RX mode until end of packet
-	cc1100_spi_write_reg(CC1100_MCSM2, 0x07);
-	switch_to_rx();
-}
 
-static void switch_to_rx(void) {
-	radio_state = RADIO_RX;
-	cc1100_spi_strobe(CC1100_SRX);
-}
-
-static void wakeup_from_rx(void) {
-	if (radio_state != RADIO_RX) return;
-	cc1100_spi_strobe(CC1100_SIDLE);
-	radio_state = RADIO_IDLE;
-}
-
-static void switch_to_pwd(void) {
-    wakeup_from_rx();
-	cc1100_spi_strobe(CC1100_SPWD);
-	radio_state = RADIO_PWD;
-}

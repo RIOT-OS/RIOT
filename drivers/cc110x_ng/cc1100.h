@@ -1,3 +1,6 @@
+#ifndef CC1100_H
+#define CC1100_H
+
 #include <radio/radio.h>
 #include <radio/types.h>
 #include <stdint.h>
@@ -30,6 +33,9 @@
 #define RADIO_PWD				(7)
 
 /** @} */
+
+extern rx_buffer_t cc1100_rx_buffer[]; 
+
 extern volatile cc1100_flags rflags;	///< Radio flags
 extern char cc1100_conf[];
 
@@ -65,8 +71,8 @@ typedef struct __attribute__ ((packed)) {
 } cc1100_packet_t;
 
 typedef struct {
-	cc1100_packet_t packet;
-	packet_info_t info;
+    radio_info_t info;
+    cc1100_packet_t;
 } rx_buffer_t;
 
 enum radio_mode {
@@ -75,8 +81,16 @@ enum radio_mode {
 	RADIO_MODE_ON	= 1			///< turn radio on
 };
 
+extern volatile uint8_t cc1100_rx_buffer_next;
+
 void cc1100_init(void);
 
 void cc1100_rx_handler(void);
 
+void cc1100_setup_rx_mode(void);
+void cc1100_switch_to_rx(void);
+void cc1100_wakeup_from_rx(void);
+void cc1100_switch_to_pwd(void);
+
 void cc1100_disable_interrupts(void);
+#endif
