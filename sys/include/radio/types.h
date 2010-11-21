@@ -74,15 +74,11 @@ typedef struct __attribute__ ((packed)) packet_info_t
 } packet_info_t;
 
 
-typedef struct __attribute__ ((packed)) {
-	uint8_t rssi;				///< Radio layer: RSSI
-	uint8_t lqi;				///< Radio layer: LQI
-} radio_info_t;
-
 /**
  * @brief General link layer packet format
  */
 typedef struct __attribute__ ((packed)) {
+    uint8_t processing;     ///< internal processing state
     uint16_t src;           ///< Radio source address
     uint16_t dst;           ///< Radio destination address
     uint8_t rssi;           ///< Radio Signal Strength Indication

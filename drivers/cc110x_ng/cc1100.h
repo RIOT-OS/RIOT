@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <cc1100-config.h>
 
-#define MAX_DATA_LENGTH (58)
+#define CC1100_MAX_DATA_LENGTH (58)
 
 #define	CC1100_BROADCAST_ADDRESS (0x00)	///< CC1100 broadcast address
 
@@ -34,7 +34,6 @@
 
 /** @} */
 
-extern rx_buffer_t cc1100_rx_buffer[]; 
 
 extern volatile cc1100_flags rflags;	///< Radio flags
 extern char cc1100_conf[];
@@ -67,12 +66,13 @@ typedef struct __attribute__ ((packed)) {
 	uint8_t address;				///< Destination address
 	uint8_t phy_src;				///< Source address (physical source)
 	uint8_t flags;					///< Flags
-	uint8_t data[MAX_DATA_LENGTH];	///< Data (high layer protocol)
+	uint8_t data[CC1100_MAX_DATA_LENGTH];	///< Data (high layer protocol)
 } cc1100_packet_t;
 
 typedef struct {
-    radio_info_t info;
-    cc1100_packet_t;
+    uint8_t rssi;
+    uint8_t lqi;
+    cc1100_packet_t packet;
 } rx_buffer_t;
 
 enum radio_mode {
@@ -80,6 +80,8 @@ enum radio_mode {
 	RADIO_MODE_OFF	= 0,		///< turn radio off
 	RADIO_MODE_ON	= 1			///< turn radio on
 };
+
+extern rx_buffer_t cc1100_rx_buffer[]; 
 
 extern volatile uint8_t cc1100_rx_buffer_next;
 

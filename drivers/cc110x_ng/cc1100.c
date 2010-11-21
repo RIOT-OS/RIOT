@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include <cc1100.h>
 #include <cc1100-arch.h>
 #include <cc1100-config.h>
@@ -7,6 +9,7 @@
 
 #include <transceiver.h>
 #include <hwtimer.h>
+#include <msg.h>
 
 #define RX_BUF_SIZE (10)
 
@@ -26,13 +29,6 @@ volatile uint8_t cc1100_rx_buffer_next;			    ///< Next packet in RX queue
 
 static uint8_t radio_address;		                ///< Radio address
 static uint8_t radio_channel;		                ///< Radio channel
-
-/**
- * @brief	Last sequence number this node has seen
- *
- * @note	(phySrc + flags.identification) - for speedup in ISR.
- */
-static volatile uint16_t last_seq_num = 0;
 
 
 /* internal function prototypes */
@@ -99,7 +95,7 @@ void cc1100_rx_handler(void) {
 	rflags.MAN_WOR  = 0;
 	cc1100_statistic.packets_in++;
 
-	res = receive_packet((uint8_t*)&(rx_buffer[cc1100_rx_buffer_next].packet), sizeof(cc1100_packet_t));
+	res = receive_packet((uint8_t*)&(cc1100_rx_buffer[cc1100_rx_buffer_next].packet), sizeof(cc1100_packet_t));
 	if (res)
 	{
         // If we are sending a burst, don't accept packets.
@@ -110,8 +106,8 @@ void cc1100_rx_handler(void) {
 			cc1100_statistic.packets_in_while_tx++;
 			return;
 		}
-        rx_buffer[cc1100_rx_buffer_next].info.rssi = rflags.RSSI;
-        rx_buffer[cc1100_rx_buffer_next].info.lqi = rflags.LQI;
+        cc1100_rx_buffer[cc1100_rx_buffer_next].rssi = rflags.RSSI;
+        cc1100_rx_buffer[cc1100_rx_buffer_next].lqi = rflags.LQI;
 
 		// Valid packet. After a wake-up, the radio should be in IDLE.
 		// So put CC1100 to RX for WOR_TIMEOUT (have to manually put
@@ -126,9 +122,9 @@ void cc1100_rx_handler(void) {
             cc1100_rx_buffer_next = 0;
         }
         msg m;
-        m.type = RCV_PKT;
-        m.content = NULL;
-        msg_send_int(m, transceiver_pid);
+        m.type = (uint16_t) RCV_PKT;
+        m.content.ptr = NULL;
+        msg_send_int(&m, transceiver_pid);
         return;
     }
 	else
@@ -137,7 +133,6 @@ void cc1100_rx_handler(void) {
 		rflags.TOF = 0;
 
 		// CRC false or RX buffer full -> clear RX FIFO in both cases
-		last_seq_num = 0;					// Reset for correct burst detection
 		cc1100_spi_strobe(CC1100_SIDLE);	// Switch to IDLE (should already be)...
 		cc1100_spi_strobe(CC1100_SFRX);		// ...for flushing the RX FIFO
 
