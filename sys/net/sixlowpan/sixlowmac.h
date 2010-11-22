@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include "sixlowip.h"
 
-uint16_t get_radio_address(link_layer_addr *lla);
+uint16_t get_radio_address(ieee_802154_long_t *lla);
 
 void send(void);
 
