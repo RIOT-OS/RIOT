@@ -44,7 +44,7 @@ and the mailinglist (subscription via web site)
 
 #include <stdio.h>
 
-#include <cc1100.h>
+#include <cc1100_ng.h>
 #include <cc1100-arch.h>
 #include <cc1100-internal.h>
 #include <cc1100_spi.h>

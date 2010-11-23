@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include <cc1100.h>
+#include <cc1100_ng.h>
 #include <cc1100-arch.h>
 #include <cc1100-config.h>
 #include <cc1100-defaultSettings.h>
@@ -25,11 +25,12 @@ cc1100_statistic_t cc1100_statistic;
 volatile cc1100_flags rflags;		                ///< Radio control flags
 volatile uint8_t radio_state = RADIO_UNKNOWN;		///< Radio state
 
-volatile uint8_t cc1100_rx_buffer_next;			    ///< Next packet in RX queue
+static volatile uint8_t rx_buffer_next;	    ///< Next packet in RX queue
 
 static uint8_t radio_address;		                ///< Radio address
 static uint8_t radio_channel;		                ///< Radio channel
 
+static int transceiver_pid;                         ///< the transceiver thread pid
 
 /* internal function prototypes */
 static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length);
@@ -41,8 +42,10 @@ static void write_register(uint8_t r, uint8_t value);
 /*---------------------------------------------------------------------------*/
 // 								Radio Driver API
 /*---------------------------------------------------------------------------*/
-void cc1100_init(void) {
-	cc1100_rx_buffer_next = 0;
+void cc1100_init(int tpid) {
+    transceiver_pid = tpid;
+
+	rx_buffer_next = 0;
 
     /* Initialize SPI */
 	cc1100_spi_init();
@@ -95,7 +98,7 @@ void cc1100_rx_handler(void) {
 	rflags.MAN_WOR  = 0;
 	cc1100_statistic.packets_in++;
 
-	res = receive_packet((uint8_t*)&(cc1100_rx_buffer[cc1100_rx_buffer_next].packet), sizeof(cc1100_packet_t));
+	res = receive_packet((uint8_t*)&(cc1100_rx_buffer[rx_buffer_next].packet), sizeof(cc1100_packet_t));
 	if (res)
 	{
         // If we are sending a burst, don't accept packets.
@@ -106,8 +109,8 @@ void cc1100_rx_handler(void) {
 			cc1100_statistic.packets_in_while_tx++;
 			return;
 		}
-        cc1100_rx_buffer[cc1100_rx_buffer_next].rssi = rflags.RSSI;
-        cc1100_rx_buffer[cc1100_rx_buffer_next].lqi = rflags.LQI;
+        cc1100_rx_buffer[rx_buffer_next].rssi = rflags.RSSI;
+        cc1100_rx_buffer[rx_buffer_next].lqi = rflags.LQI;
 
 		// Valid packet. After a wake-up, the radio should be in IDLE.
 		// So put CC1100 to RX for WOR_TIMEOUT (have to manually put
@@ -118,13 +121,15 @@ void cc1100_rx_handler(void) {
         hwtimer_wait(IDLE_TO_RX_TIME);
         radio_state = RADIO_RX;
         
-        if (++cc1100_rx_buffer_next == RX_BUF_SIZE) {
-            cc1100_rx_buffer_next = 0;
+        if (++rx_buffer_next == RX_BUF_SIZE) {
+            rx_buffer_next = 0;
         }
-        msg m;
-        m.type = (uint16_t) RCV_PKT;
-        m.content.ptr = NULL;
-        msg_send_int(&m, transceiver_pid);
+        if (transceiver_pid) {
+            msg m;  
+            m.type = (uint16_t) RCV_PKT;
+            m.content.value = TRANSCEIVER_CC1100;
+            msg_send_int(&m, transceiver_pid);
+        }
         return;
     }
 	else
@@ -154,6 +159,10 @@ void cc1100_rx_handler(void) {
 		// No valid packet, so go back to RX/WOR as soon as possible
 		cc1100_switch_to_rx();
 	}
+}
+
+uint8_t cc1100_get_buffer_pos(void) {
+    return (rx_buffer_next-1);
 }
 
 uint8_t cc1100_set_address(radio_address_t address) {

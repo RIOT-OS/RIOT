@@ -83,11 +83,11 @@ enum radio_mode {
 
 extern rx_buffer_t cc1100_rx_buffer[]; 
 
-extern volatile uint8_t cc1100_rx_buffer_next;
-
-void cc1100_init(void);
+void cc1100_init(int transceiver_pid);
 
 void cc1100_rx_handler(void);
+
+uint8_t cc1100_get_buffer_pos(void);
 
 void cc1100_setup_rx_mode(void);
 void cc1100_switch_to_rx(void);

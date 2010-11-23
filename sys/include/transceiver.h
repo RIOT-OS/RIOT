@@ -1,6 +1,8 @@
 #ifndef TRANSCEIVER_H
 #define TRANSCEIVER_H 
 
+#include <radio/types.h>
+
 /* Packets to buffer */
 #define TRANSCEIVER_BUFFER_SIZE      (10)
 /* Stack size for transceiver thread */
@@ -13,20 +15,27 @@
  * @brief Message types for transceiver interface
  */
 enum transceiver_msg_type_t {
+    /* Packet types for driver <-> transceiver communication */
     RCV_PKT,        ///< packet was received
+
+    /* Packet types for transceiver <-> upper layer communication */
+    PKT_PENDING,    ///< packet pending in transceiver buffer
     SND_PKT,        ///< request for sending a packet
     SND_ACK,        ///< request for sending an acknowledgement
-    SWITCH_RX,      ///< switch receiver to RX sate
-    POWERDOWN,      ///< power down receiver
+    SWITCH_RX,      ///< switch transceiver to RX sate
+    POWERDOWN,      ///< power down transceiver
+
+    /* Error messages */
+    ENOBUFFER,
 };
 
 /**
  * @brief All supported transceivers
  */
 typedef enum {
-    NONE,       ///< Invalid
-    CC1100,     ///< CC110X transceivers
-    CC1020      ///< CC1020 transceivers
+    TRANSCEIVER_NONE,       ///< Invalid
+    TRANSCEIVER_CC1100,     ///< CC110X transceivers
+    TRANSCEIVER_CC1020      ///< CC1020 transceivers
 } transceiver_type_t;
 
 /**
@@ -42,7 +51,6 @@ typedef struct {
     radio_packet_t *packet;
 } send_packet_t;
 
-extern int transceiver_pid;
 extern void *transceiver_rx_buffer;
 
 /**
@@ -55,7 +63,7 @@ void transceiver_init(transceiver_type_t transceivers);
 /**
  * @brief Runs the transceiver thread
  */
-void transceiver_start(void);
+int transceiver_start(void);
 
 /**
  * @brief register a thread for events from certain transceivers
