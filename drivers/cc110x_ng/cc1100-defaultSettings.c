@@ -121,8 +121,8 @@ char cc1100_conf[] = {
   0x00  // padding to 4 bytes
 };
 
-static uint8_t pa_table_index = PATABLE;	///< Current PATABLE Index
-static uint8_t pa_table[] = {				///< PATABLE with available output powers
+uint8_t pa_table_index = PATABLE;	///< Current PATABLE Index
+uint8_t pa_table[] = {				///< PATABLE with available output powers
 				   0x00,					///< -52 dBm
 				   0x03,					///< -30 dBm
 				   0x0D,					///< -20 dBm

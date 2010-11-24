@@ -16,7 +16,8 @@
  */
 enum transceiver_msg_type_t {
     /* Packet types for driver <-> transceiver communication */
-    RCV_PKT,        ///< packet was received
+    RCV_PKT_CC1020,        ///< packet was received by CC1020 transceiver
+    RCV_PKT_CC1100,        ///< packet was received by CC1100 transceiver
 
     /* Packet types for transceiver <-> upper layer communication */
     PKT_PENDING,    ///< packet pending in transceiver buffer
