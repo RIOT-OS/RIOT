@@ -120,6 +120,7 @@ static void receive_packet(uint16_t type, uint8_t pos) {
     rx_buffer_pos = pos;
     msg m;
    
+    DEBUG("Packet received\n");
     switch (type) {
         case RCV_PKT_CC1020:
             t = TRANSCEIVER_CC1020;
@@ -162,6 +163,7 @@ static void receive_packet(uint16_t type, uint8_t pos) {
     while (reg[i].transceivers != TRANSCEIVER_NONE) {
         if (reg[i].transceivers & t) {
             m.content.value = transceiver_buffer_pos;
+            DEBUG("Notify thread %i\n", reg[i].pid);
             msg_send(&m, reg[i].pid, false);
         }
         i++;
@@ -169,6 +171,7 @@ static void receive_packet(uint16_t type, uint8_t pos) {
 }
 
 static void receive_cc1100_packet(radio_packet_t *trans_p) {
+    DEBUG("Handling CC1100 packet\n");
     /* disable interrupts while copying packet */
     dINT();
     cc1100_packet_t p = cc1100_rx_buffer[rx_buffer_pos].packet;
@@ -181,6 +184,7 @@ static void receive_cc1100_packet(radio_packet_t *trans_p) {
     memcpy((void*) &(data_buffer[transceiver_buffer_pos]), p.data, CC1100_MAX_DATA_LENGTH);
     eINT();
 
+    DEBUG("Packet was from %hu to %hu, size: %u\n", trans_p->src, trans_p->dst, trans_p->length);
     trans_p->data = (uint8_t*) &(data_buffer[transceiver_buffer_pos * CC1100_MAX_DATA_LENGTH]);
 }
  

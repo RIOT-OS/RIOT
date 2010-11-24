@@ -95,4 +95,5 @@ void cc1100_wakeup_from_rx(void);
 void cc1100_switch_to_pwd(void);
 
 void cc1100_disable_interrupts(void);
+uint8_t cc1100_set_channel(uint8_t channr);
 #endif

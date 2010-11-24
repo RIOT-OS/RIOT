@@ -77,7 +77,7 @@ void cc1100_init(int tpid) {
 	rflags.WOR_RST      = 0;
 
 	/* Set default channel number */
-	radio_channel = CC1100_DEFAULT_CHANNR;
+	cc1100_set_channel(CC1100_DEFAULT_CHANNR);
     DEBUG("CC1100 initialized and set to channel %i\n", radio_channel);
 
 	// Switch to desired mode (WOR or RX)
@@ -213,6 +213,15 @@ void switch_to_pwd(void) {
     cc1100_wakeup_from_rx();
 	cc1100_spi_strobe(CC1100_SPWD);
 	radio_state = RADIO_PWD;
+}
+    
+uint8_t cc1100_set_channel(uint8_t channr) {
+	if (channr > MAX_CHANNR) {
+        return 0;
+    }
+	write_register(CC1100_CHANNR, channr*10);
+	radio_channel = channr;
+	return 1;
 }
 /*---------------------------------------------------------------------------*/
 /*               Internal functions                                          */
