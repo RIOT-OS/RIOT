@@ -203,14 +203,15 @@ void cc1100_switch_to_rx(void) {
 }
 
 void cc1100_wakeup_from_rx(void) {
-	if (radio_state != RADIO_RX) return;
+	if (radio_state != RADIO_RX) {
+        return;
+    }
     DEBUG("CC1100 going to idle\n");
 	cc1100_spi_strobe(CC1100_SIDLE);
 	radio_state = RADIO_IDLE;
 }
 
-char* cc1100_get_marc_state(void)
-{
+char* cc1100_get_marc_state(void) {
 	uint8_t state;
 
 	// Save old radio state
@@ -289,12 +290,17 @@ void switch_to_pwd(void) {
 }
     
 uint8_t cc1100_set_channel(uint8_t channr) {
-	if (channr > MAX_CHANNR) {
+	uint8_t state = cc1100_spi_read_status(CC1100_MARCSTATE) & MARC_STATE;
+	if (state != 1) && ((channr > MAX_CHANNR)) {
         return 0;
     }
 	write_register(CC1100_CHANNR, channr*10);
 	radio_channel = channr;
-	return 1;
+	return radio_channel;
+}
+
+uint8_t cc1100_get_channel(void) {
+    return radio_channel;
 }
 /*---------------------------------------------------------------------------*/
 /*               Internal functions                                          */
@@ -304,8 +310,6 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length) {
 	uint8_t status[2];
 	uint8_t packetLength = 0;
 
-	printf("Current radio state:          %s\r\n", cc1100_state_to_text(radio_state));
-	printf("Current MARC state:           %s\r\n", cc1100_get_marc_state());
 	/* Any bytes available in RX FIFO? */
 	if ((cc1100_spi_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO)) {
         LED_GREEN_TOGGLE;

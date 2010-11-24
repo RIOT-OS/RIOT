@@ -11,25 +11,42 @@
 #define SHELL_STACK_SIZE    (4096)
 #define RADIO_STACK_SIZE    (4096)
 
+int transceiver_pid;
 int radio_pid;
 char shell_stack_buffer[SHELL_STACK_SIZE];
 char radio_stack_buffer[RADIO_STACK_SIZE];
 
-void trans_run(char *unused);
+void trans_chan(char *chan);
 void trans_register(char *unused);
+
+msg mesg;
+transceiver_command_t tcmd;
 
 shell_t shell;
 const shell_command_t sc[] = {
-    {"trun", "Run the transceiver thread", trans_run},
+    {"tchan", "Set the channel for cc1100", trans_chan},
     {"treg", "Register application for CC1100", trans_register},
     {NULL, NULL, NULL}};
 
-void trans_run(char *unused) {
-    puts("NOP");
+void trans_chan(char *chan) {
+    unsigned int c;
+
+    tcmd.transceivers = TRANSCEIVER_CC1100;
+    tcmd.data = &c;
+    mesg.content.ptr = (char*) &tcmd;
+    if (sscanf(chan, "tchan %u", &c)) {
+        printf("Trying to set channel %u\n", c);
+        mesg.type = SET_CHANNEL;
+    }
+    else {
+        mesg.type = GET_CHANNEL;
+    }
+    msg_send_receive(&mesg, &mesg, transceiver_pid);
+    printf("Got channel: %hu\n", c);
 }
 
 void trans_register(char *unused) {
-    transceiver_register(TRANSCEIVER_CC1100, active_thread->pid);
+    transceiver_register(TRANSCEIVER_CC1100, radio_pid);
 }
 
 void shell_runner(void) {
@@ -49,9 +66,11 @@ void radio(void) {
 
 int main(void) {
    thread_create(shell_stack_buffer, SHELL_STACK_SIZE, PRIORITY_MAIN-1, CREATE_STACKTEST, shell_runner, "shell");
-   thread_create(radio_stack_buffer, RADIO_STACK_SIZE, PRIORITY_MAIN-2, CREATE_STACKTEST, radio, "radio");
+    radio_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE, PRIORITY_MAIN-2, CREATE_STACKTEST, radio, "radio");
    transceiver_init(TRANSCEIVER_CC1100);
-   transceiver_start();
+   transceiver_pid = transceiver_start();
+   extern void cc1100_set_channel(uint8_t c);
+   cc1100_set_channel(6);
    
    while (1) {
 //       LED_GREEN_TOGGLE;

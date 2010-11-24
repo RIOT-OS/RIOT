@@ -25,6 +25,8 @@ enum transceiver_msg_type_t {
     SND_ACK,        ///< request for sending an acknowledgement
     SWITCH_RX,      ///< switch transceiver to RX sate
     POWERDOWN,      ///< power down transceiver
+    GET_CHANNEL,    ///< Get current channel
+    SET_CHANNEL,    ///< Set a new channel
 
     /* Error messages */
     ENOBUFFER,
@@ -49,8 +51,8 @@ typedef struct {
 
 typedef struct {
     transceiver_type_t transceivers;
-    radio_packet_t *packet;
-} send_packet_t;
+    void *data;
+} transceiver_command_t;;
 
 extern void *transceiver_rx_buffer;
 

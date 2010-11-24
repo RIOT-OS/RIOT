@@ -40,7 +40,9 @@ char transceiver_stack[TRANSCEIVER_STACK_SIZE];
 static void run(void);
 static void receive_packet(uint16_t type, uint8_t pos);
 static void receive_cc1100_packet(radio_packet_t *trans_p);
-static uint8_t send_packet(transceiver_type_t t, radio_packet_t *pkt);
+static uint8_t send_packet(transceiver_type_t t, void *pkt);
+static uint8_t get_channel(transceiver_type_t t);
+static uint8_t set_channel(transceiver_type_t t, void *channel);
 
 void transceiver_init(transceiver_type_t t) {
     uint8_t i;
@@ -90,11 +92,9 @@ uint8_t transceiver_register(transceiver_type_t t, int pid) {
 /*------------------------------------------------------------------------------------*/
 void run(void) {
     msg m;
-    send_packet_t *spkt;
+    transceiver_command_t *cmd;
 
     while (1) {
-        DEBUG("Waiting for messages\n");
-        /* TODO: check here if message was lost, while handling the last */
         msg_receive(&m);
         DEBUG("Transceiver: Message received\n");
         switch (m.type) {
@@ -103,8 +103,18 @@ void run(void) {
                 receive_packet(m.type, m.content.value);
                 break;
             case SND_PKT:
-                spkt = (send_packet_t*) m.content.ptr;
-                send_packet(spkt->transceivers, spkt->packet);
+                cmd = (transceiver_command_t*) m.content.ptr;
+                send_packet(cmd->transceivers, cmd->data);
+                break;
+            case GET_CHANNEL:
+                cmd = (transceiver_command_t*) m.content.ptr;
+                *((uint8_t*) cmd->data) = get_channel(cmd->transceivers);
+                msg_reply(&m, &m);
+                break;
+            case SET_CHANNEL:
+                cmd = (transceiver_command_t*) m.content.ptr;
+                *((uint8_t*) cmd->data) = set_channel(cmd->transceivers, cmd->data);
+                msg_reply(&m, &m);
                 break;
             default:
                 DEBUG("Unknown message received\n");
@@ -151,6 +161,7 @@ static void receive_packet(uint16_t type, uint8_t pos) {
 
         if (type == RCV_PKT_CC1100) {
             receive_cc1100_packet(&trans_p); 
+            m.content.value = transceiver_buffer_pos;
         }
         else {
             puts("Invalid transceiver type");
@@ -189,7 +200,26 @@ static void receive_cc1100_packet(radio_packet_t *trans_p) {
 }
  
 
-static uint8_t send_packet(transceiver_type_t t, radio_packet_t *pkt) {
+static uint8_t send_packet(transceiver_type_t t, void *pkt) {
     uint8_t res = 0;
     return res;
+}
+
+static uint8_t set_channel(transceiver_type_t t, void *channel) {
+    uint8_t c = *((uint8_t*) channel);
+    switch (t) {
+        case TRANSCEIVER_CC1100:
+            return cc1100_set_channel(c);
+        default:
+            return -1;
+    }
+}
+
+static uint8_t get_channel(transceiver_type_t t) {
+    switch (t) {
+        case TRANSCEIVER_CC1100:
+            return cc1100_get_channel();
+        default:
+            return -1;
+    }
 }
