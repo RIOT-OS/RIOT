@@ -209,6 +209,79 @@ void cc1100_wakeup_from_rx(void) {
 	radio_state = RADIO_IDLE;
 }
 
+char* cc1100_get_marc_state(void)
+{
+	uint8_t state;
+
+	// Save old radio state
+	uint8_t old_state = radio_state;
+
+	// Read content of status register
+	state = cc1100_spi_read_status(CC1100_MARCSTATE) & MARC_STATE;
+
+	// Make sure in IDLE state.
+	// Only goes to IDLE if state was RX/WOR
+	cc1100_wakeup_from_rx();
+
+	// Have to put radio back to WOR/RX if old radio state
+	// was WOR/RX, otherwise no action is necessary
+	if (old_state == RADIO_WOR || old_state == RADIO_RX) {
+		cc1100_switch_to_rx();
+	}
+
+	switch (state)
+	{
+		// Note: it is not possible to read back the SLEEP or XOFF state numbers
+		// because setting CSn low will make the chip enter the IDLE mode from the
+		// SLEEP (0) or XOFF (2) states.
+		case 1: return "IDLE";
+		case 3: case 4: case 5: return "MANCAL";
+		case 6: case 7: return "FS_WAKEUP";
+		case 8: case 12: return "CALIBRATE";
+		case 9: case 10: case 11: return "SETTLING";
+		case 13: case 14: case 15: return "RX";
+		case 16: return "TXRX_SETTLING";
+		case 17: return "RXFIFO_OVERFLOW";
+		case 18: return "FSTXON";
+		case 19: case 20: return "TX";
+		case 21: return "RXTX_SETTLING";
+		case 22: return "TXFIFO_UNDERFLOW";
+		default: return "UNKNOWN";
+	}
+}
+
+char* cc1100_state_to_text(uint8_t state) {
+	switch (state)
+	{
+		case RADIO_UNKNOWN:
+			return "Unknown";
+		case RADIO_AIR_FREE_WAITING:
+			return "CS";
+		case RADIO_WOR:
+			return "WOR";
+		case RADIO_IDLE:
+			return "IDLE";
+		case RADIO_SEND_BURST:
+			return "TX BURST";
+		case RADIO_RX:
+			return "RX";
+		case RADIO_SEND_ACK:
+			return "TX ACK";
+		case RADIO_PWD:
+			return "PWD";
+		default:
+			return "unknown";
+	}
+}
+
+
+void cc1100_print_config(void) {
+	char buf[8];
+	printf("Current radio state:          %s\r\n", cc1100_state_to_text(radio_state));
+	printf("Current MARC state:           %s\r\n", cc1100_get_marc_state());
+	printf("Current channel number:       %u\r\n", radio_channel);
+}
+
 void switch_to_pwd(void) {
     cc1100_wakeup_from_rx();
 	cc1100_spi_strobe(CC1100_SPWD);
@@ -231,6 +304,8 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length) {
 	uint8_t status[2];
 	uint8_t packetLength = 0;
 
+	printf("Current radio state:          %s\r\n", cc1100_state_to_text(radio_state));
+	printf("Current MARC state:           %s\r\n", cc1100_get_marc_state());
 	/* Any bytes available in RX FIFO? */
 	if ((cc1100_spi_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO)) {
         LED_GREEN_TOGGLE;

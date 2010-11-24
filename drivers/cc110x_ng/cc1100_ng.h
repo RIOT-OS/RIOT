@@ -96,4 +96,6 @@ void cc1100_switch_to_pwd(void);
 
 void cc1100_disable_interrupts(void);
 uint8_t cc1100_set_channel(uint8_t channr);
+
+void cc1100_print_config(void);
 #endif
