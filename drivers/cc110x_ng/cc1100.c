@@ -11,6 +11,10 @@
 #include <hwtimer.h>
 #include <msg.h>
 
+//#define ENABLE_DEBUG    (1)
+#include <debug.h>
+#include <board.h>
+
 #define RX_BUF_SIZE (10)
 
 /* some externals */
@@ -35,6 +39,7 @@ static int transceiver_pid;                         ///< the transceiver thread 
 /* internal function prototypes */
 static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length);
 static uint8_t receive_packet(uint8_t *rxBuffer, uint8_t length);
+static int rd_set_mode(int mode);
 static void reset(void);
 static void power_up_reset(void);
 static void write_register(uint8_t r, uint8_t value);
@@ -44,6 +49,7 @@ static void write_register(uint8_t r, uint8_t value);
 /*---------------------------------------------------------------------------*/
 void cc1100_init(int tpid) {
     transceiver_pid = tpid;
+    DEBUG("Transceiver PID: %i\n", transceiver_pid);
 
 	rx_buffer_next = 0;
 
@@ -72,6 +78,10 @@ void cc1100_init(int tpid) {
 
 	/* Set default channel number */
 	radio_channel = CC1100_DEFAULT_CHANNR;
+    DEBUG("CC1100 initialized and set to channel %i\n", radio_channel);
+
+	// Switch to desired mode (WOR or RX)
+	rd_set_mode(RADIO_MODE_ON);
 }
 
 void cc1100_disable_interrupts(void) {
@@ -99,8 +109,7 @@ void cc1100_rx_handler(void) {
 	cc1100_statistic.packets_in++;
 
 	res = receive_packet((uint8_t*)&(cc1100_rx_buffer[rx_buffer_next].packet), sizeof(cc1100_packet_t));
-	if (res)
-	{
+	if (res) {
         // If we are sending a burst, don't accept packets.
 		// Only ACKs are processed (for stopping the burst).
 		// Same if state machine is in TX lock.
@@ -121,14 +130,17 @@ void cc1100_rx_handler(void) {
         hwtimer_wait(IDLE_TO_RX_TIME);
         radio_state = RADIO_RX;
         
-        if (++rx_buffer_next == RX_BUF_SIZE) {
-            rx_buffer_next = 0;
-        }
+        /* notify transceiver thread if any */
         if (transceiver_pid) {
             msg m;  
-            m.type = (uint16_t) RCV_PKT;
-            m.content.value = TRANSCEIVER_CC1100;
+            m.type = (uint16_t) RCV_PKT_CC1100;
+            m.content.value = rx_buffer_next;
             msg_send_int(&m, transceiver_pid);
+        }
+
+        /* shift to next buffer element */
+        if (++rx_buffer_next == RX_BUF_SIZE) {
+            rx_buffer_next = 0;
         }
         return;
     }
@@ -192,6 +204,7 @@ void cc1100_switch_to_rx(void) {
 
 void cc1100_wakeup_from_rx(void) {
 	if (radio_state != RADIO_RX) return;
+    DEBUG("CC1100 going to idle\n");
 	cc1100_spi_strobe(CC1100_SIDLE);
 	radio_state = RADIO_IDLE;
 }
@@ -210,8 +223,8 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length) {
 	uint8_t packetLength = 0;
 
 	/* Any bytes available in RX FIFO? */
-	if ((cc1100_spi_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO))
-	{
+	if ((cc1100_spi_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO)) {
+        LED_GREEN_TOGGLE;
 		// Read length byte (first byte in RX FIFO)
         packetLength = cc1100_spi_read_reg(CC1100_RXFIFO);
 		// Read data from RX FIFO and store in rxBuffer
@@ -248,6 +261,7 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length) {
 	}
     /* no bytes in RX FIFO */
 	else {
+        LED_RED_TOGGLE;
 		// RX FIFO get automatically flushed if return value is false
 		return 0;
 	}
@@ -312,6 +326,7 @@ static int rd_set_mode(int mode) {
 
 	switch (mode) {
 		case RADIO_MODE_ON:
+            DEBUG("Enabling rx mode\n");
 			cc1100_init_interrupts();			// Enable interrupts
 			cc1100_setup_rx_mode();				// Set chip to desired mode
 			break;
