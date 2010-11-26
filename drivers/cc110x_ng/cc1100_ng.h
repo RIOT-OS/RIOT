@@ -10,6 +10,8 @@
 
 #define CC1100_MAX_DATA_LENGTH (58)
 
+#define CC1100_HEADER_LENGTH   (3)             ///< Header covers SRC, DST and FLAGS
+
 #define	CC1100_BROADCAST_ADDRESS (0x00)	///< CC1100 broadcast address
 
 #define MAX_UID					 (0xFF) ///< Maximum UID of a node is 255

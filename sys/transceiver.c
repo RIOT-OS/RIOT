@@ -228,7 +228,7 @@ static void receive_cc1100_packet(radio_packet_t *trans_p) {
     trans_p->dst = p.address;
     trans_p->rssi = cc1100_rx_buffer[rx_buffer_pos].rssi;
     trans_p->lqi = cc1100_rx_buffer[rx_buffer_pos].lqi;
-    trans_p->length = p.length;
+    trans_p->length = p.length - CC1100_HEADER_LENGTH;
     memcpy((void*) &(data_buffer[transceiver_buffer_pos]), p.data, CC1100_MAX_DATA_LENGTH);
     eINT();
 
@@ -253,7 +253,7 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt) {
     switch (t) {
         case TRANSCEIVER_CC1100:
             /* TODO: prepare and send packet here */
-            cc1100_pkt.length = p.length;
+            cc1100_pkt.length = p.length + CC1100_HEADER_LENGTH;
             cc1100_pkt.address = p.dst;
             cc1100_pkt.flags = 0;
             memcpy(cc1100_pkt.data, p.data, p.length);

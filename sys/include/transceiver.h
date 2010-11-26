@@ -6,7 +6,7 @@
 /* Packets to buffer */
 #define TRANSCEIVER_BUFFER_SIZE      (10)
 /* Stack size for transceiver thread */
-#define TRANSCEIVER_STACK_SIZE      (4096)
+#define TRANSCEIVER_STACK_SIZE      (2048)
 
 /* The maximum of threads to register */
 #define TRANSCEIVER_MAX_REGISTERED  (10)
@@ -31,7 +31,7 @@ enum transceiver_msg_type_t {
     SET_ADDRESS,    ///< Set the radio address
 
     /* Error messages */
-    ENOBUFFER,
+    ENOBUFFER,      ///< No buffer left
 };
 
 /**
