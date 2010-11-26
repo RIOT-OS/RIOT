@@ -137,19 +137,5 @@ uint8_t pa_table[] = {				///< PATABLE with available output powers
 				   0xC3  					///< +10 dBm
 }; // If PATABLE is changed in size, adjust MAX_OUTPUT_POWER definition in CC1100 interface!
 
-static int8_t pa_table_dBm[] = {			///< Values of the PATABLE in dBm
-				   -52,
-				   -30,
-				   -20,
-				   -15,
-				   -10,
-				    -5,
-				    -1,
-				     0,
-				     5,
-				     7,
-				     9,
-				    10
-};
 
 /** @} */

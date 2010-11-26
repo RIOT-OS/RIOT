@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <cc1100-config.h>
 
+#define RX_BUF_SIZE (10)
+
 #define CC1100_MAX_DATA_LENGTH (58)
 
 #define	CC1100_BROADCAST_ADDRESS (0x00)	///< CC1100 broadcast address
@@ -19,6 +21,9 @@
 #define MIN_OUTPUT_POWER			(0)	///< Minimum output power value
 #define MAX_OUTPUT_POWER		   (11)	///< Maximum output power value
 
+#define PACKET_LENGTH				(0x3E)		///< Packet length = 62 Bytes.
+#define CC1100_SYNC_WORD_TX_TIME   (90000)		// loop count (max. timeout ~ 15 ms) to wait for
+												// sync word to be transmitted (GDO2 from low to high)
 /**
  * @name	Defines used as state values for state machine
  * @{
@@ -83,9 +88,18 @@ enum radio_mode {
 
 extern rx_buffer_t cc1100_rx_buffer[]; 
 
+extern volatile uint8_t rx_buffer_next;	    ///< Next packet in RX queue
+
+extern volatile uint8_t radio_state;		///< Radio state
+extern cc1100_statistic_t cc1100_statistic;
+
+int transceiver_pid;                         ///< the transceiver thread pid
+
 void cc1100_init(int transceiver_pid);
 
 void cc1100_rx_handler(void);
+
+uint8_t cc1100_send(cc1100_packet_t *pkt);
 
 uint8_t cc1100_get_buffer_pos(void);
 
@@ -95,4 +109,11 @@ void cc1100_wakeup_from_rx(void);
 void cc1100_switch_to_pwd(void);
 
 void cc1100_disable_interrupts(void);
+int16_t cc1100_set_channel(uint8_t channr);
+int16_t cc1100_get_channel(void);
+
+radio_address_t cc1100_set_address(radio_address_t addr);
+radio_address_t cc1100_get_address(void);
+
+void cc1100_print_config(void);
 #endif

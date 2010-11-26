@@ -29,5 +29,5 @@ SubDir TOP drivers cc110x_ng ;
 
 HDRS += $(TOP)/drivers/cc110x_ng ; 
 
-Module cc110x_ng : cc1100.c cc1100-defaultSettings.c cc1100_spi.c : board_cc1100 swtimer gpioint ;
+Module cc110x_ng : cc1100.c cc1100-rx.c cc1100-tx.c cc1100-defaultSettings.c cc1100_spi.c : board_cc1100 swtimer gpioint ;
 
