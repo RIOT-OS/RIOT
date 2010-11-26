@@ -1,8 +1,4 @@
-typedef struct cib {
-    unsigned int read_count;
-    unsigned int write_count;
-    unsigned int complement;
-} cib_t;
+#include <cib.h>
 
 void cib_init(cib_t *cib, unsigned int size) {
     cib->read_count = 0;
