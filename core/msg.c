@@ -56,7 +56,7 @@ int msg_send(msg* m, unsigned int target_pid, bool block) {
 
     dINT();
     if (target->status !=  STATUS_RECEIVE_BLOCKED) {
-        if (queue_msg(target, m)) {
+        if (target->msg_array && queue_msg(target, m)) {
             eINT();
             return 1;
         }
@@ -174,7 +174,11 @@ int msg_receive(msg* m) {
 
     tcb *me = (tcb*) sched_threads[thread_pid];
 
-    int n = cib_get(&(me->msg_queue));
+    int n = -1;
+    if (me->msg_array) {
+        n = cib_get(&(me->msg_queue));
+    }
+
     if (n >= 0) {
         DEBUG("%s: msg_receive(): We've got a queued message.\n", active_thread->name);
         *m = me->msg_array[n];
