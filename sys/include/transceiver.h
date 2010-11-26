@@ -27,6 +27,8 @@ enum transceiver_msg_type_t {
     POWERDOWN,      ///< power down transceiver
     GET_CHANNEL,    ///< Get current channel
     SET_CHANNEL,    ///< Set a new channel
+    GET_ADDRESS,    ///< Get the radio address
+    SET_ADDRESS,    ///< Set the radio address
 
     /* Error messages */
     ENOBUFFER,
