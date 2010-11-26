@@ -177,7 +177,7 @@ rule Test
 }
 actions Test
 {
-    for tst in projects/$(PROJECT)/tests/*; do $tst; done
+    export PORT=$(PORT); for tst in projects/$(PROJECT)/tests/*; do $tst; done
 }
 
 # Reset connected sensor node

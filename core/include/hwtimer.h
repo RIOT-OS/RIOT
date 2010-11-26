@@ -124,6 +124,7 @@ void hwtimer_t0_enable_interrupt(void);
 void hwtimer_t0_set(unsigned long value, short timer);
 void hwtimer_t0_unset(short timer);
 unsigned long hwtimer_t0_now(void);
+unsigned long hwtimer_now(void);
 
 /** @} */
 #endif /* __HWTIMER_H */
