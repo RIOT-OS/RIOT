@@ -189,12 +189,11 @@ static void receive_packet(uint16_t type, uint8_t pos) {
     }
     /* copy packet and handle it */
     else {
-        radio_packet_t trans_p = transceiver_buffer[transceiver_buffer_pos];
+        radio_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
         m.type = PKT_PENDING;
 
         if (type == RCV_PKT_CC1100) {
-            receive_cc1100_packet(&trans_p); 
-            m.content.value = transceiver_buffer_pos;
+            receive_cc1100_packet(trans_p); 
         }
         else {
             puts("Invalid transceiver type");
@@ -206,7 +205,7 @@ static void receive_packet(uint16_t type, uint8_t pos) {
      * this is done non-blocking, so packets can get lost */
     while (reg[i].transceivers != TRANSCEIVER_NONE) {
         if (reg[i].transceivers & t) {
-            m.content.value = transceiver_buffer_pos;
+            m.content.ptr = (char*) &(transceiver_buffer[transceiver_buffer_pos]);
             DEBUG("Notify thread %i\n", reg[i].pid);
             msg_send(&m, reg[i].pid, false);
         }
