@@ -19,6 +19,8 @@
 #include <stdint.h>
 #include <queue.h>
 #include <clist.h>
+#include <cib.h>
+#include <msg.h>
 
 /* uneven means has to be on runqueue */
 #define STATUS_NOT_FOUND 		(0x0000)
@@ -40,10 +42,13 @@ typedef struct tcb {
     uint16_t pid;
     uint16_t priority;
 
-    void* wait_data;
-    queue_node_t msg_queue;
-
     clist_node_t rq_entry;
+
+    void* wait_data;
+    queue_node_t msg_waiters;
+
+    cib_t msg_queue;
+    msg* msg_array;
 
     const char* name;
     char* stack_start;
