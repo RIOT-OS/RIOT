@@ -11,6 +11,10 @@
 /* The maximum of threads to register */
 #define TRANSCEIVER_MAX_REGISTERED  (10)
 
+/* The size of the message queue between driver and transceiver (must be power
+ * of two */
+#define TRANSCEIVER_MSG_BUFFER_SIZE     (64)
+
 /**
  * @brief Message types for transceiver interface
  */
