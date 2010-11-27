@@ -29,6 +29,7 @@ enum transceiver_msg_type_t {
     SET_CHANNEL,    ///< Set a new channel
     GET_ADDRESS,    ///< Get the radio address
     SET_ADDRESS,    ///< Set the radio address
+    SET_MONITOR,    ///< Set transceiver to monitor mode (disable address checking)
 
     /* Error messages */
     ENOBUFFER,      ///< No buffer left

@@ -51,6 +51,7 @@ static int16_t get_channel(transceiver_type_t t);
 static int16_t set_channel(transceiver_type_t t, void *channel);
 static int16_t get_address(transceiver_type_t t);
 static int16_t set_address(transceiver_type_t t, void *address);
+static void set_monitor(transceiver_type_t t, void *mode);
 
 /*------------------------------------------------------------------------------------*/
 /* Transceiver init */
@@ -141,6 +142,9 @@ void run(void) {
             case SET_ADDRESS:
                 *((int16_t*) cmd->data) = set_address(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
+                break;
+            case SET_MONITOR:
+                set_monitor(cmd->transceivers, cmd->data);
                 break;
             default:
                 DEBUG("Unknown message received\n");
@@ -333,5 +337,21 @@ static int16_t set_address(transceiver_type_t t, void *address) {
             return cc1100_set_address(addr);
         default:
             return -1;
+    }
+}
+
+/*
+ * @brief Set the transceiver device into monitor mode (disabling address check)
+ *
+ * @param t         The transceiver device
+ * @param mode      1 for enabling monitor mode, 0 for enabling address check
+ */
+static void set_monitor(transceiver_type_t t, void *mode) {
+    switch (t) {
+        case TRANSCEIVER_CC1100:
+            cc1100_set_monitor(*((uint8_t*) mode));
+            break;
+        default:
+            break;
     }
 }

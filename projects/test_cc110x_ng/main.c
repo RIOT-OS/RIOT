@@ -13,82 +13,24 @@
 
 #define SHELL_STACK_SIZE    (2048)
 #define RADIO_STACK_SIZE    (2048)
-#define TEXT_SIZE           CC1100_MAX_DATA_LENGTH
 
 int transceiver_pid;
 char shell_stack_buffer[SHELL_STACK_SIZE];
 char radio_stack_buffer[RADIO_STACK_SIZE];
-char text_msg[TEXT_SIZE];
 
-void trans_chan(char *chan);
-void trans_addr(char *addr);
-void trans_send(char *mesg);
-
-msg mesg;
-transceiver_command_t tcmd;
+void mon_handler(char *mode);
 
 shell_t shell;
 const shell_command_t sc[] = {
-    {"tchan", "Set the channel for cc1100", trans_chan},
-    {"taddr", "Set the address for cc1100", trans_addr},
-    {"tsnd", "Sends a CC1100 packet", trans_send},
+    {"mon", "", mon_handler},
     {NULL, NULL, NULL}};
 
-void trans_chan(char *chan) {
-    int16_t c;
+void mon_handler(char *mode) {
+    unsigned int m;
 
-    tcmd.transceivers = TRANSCEIVER_CC1100;
-    tcmd.data = &c;
-    mesg.content.ptr = (char*) &tcmd;
-    if (sscanf(chan, "tchan %hi", &c) > 0) {
-        printf("Trying to set channel %i\n", c);
-        mesg.type = SET_CHANNEL;
-    }
-    else {
-        mesg.type = GET_CHANNEL;
-    }
-    msg_send_receive(&mesg, &mesg, transceiver_pid);
-    printf("Got channel: %i\n", c);
-}
-
-void trans_addr(char *addr) {
-    int16_t a;
-
-    tcmd.transceivers = TRANSCEIVER_CC1100;
-    tcmd.data = &a;
-    mesg.content.ptr = (char*) &tcmd;
-    if (sscanf(addr, "taddr %hi", &a) > 0) {
-        printf("Trying to set address %i\n", a);
-        mesg.type = SET_ADDRESS;
-    }
-    else {
-        mesg.type = GET_ADDRESS;
-    }
-    msg_send_receive(&mesg, &mesg, transceiver_pid);
-    printf("Got address: %i\n", a);
-}
-
-void trans_send(char *text) {
-    radio_packet_t p;
-    uint32_t response;
-    tcmd.transceivers = TRANSCEIVER_CC1100;
-    tcmd.data = &p;
-    uint16_t addr;
-
-    if (sscanf(text, "tsnd %hu %s", &(addr), text_msg) == 2) {
-        p.data = (uint8_t*) text_msg;
-        p.length = strlen(text_msg);
-        p.dst = addr;
-        mesg.type = SND_PKT;
-        mesg.content.ptr = (char*) &tcmd;
-        printf("Sending packet of length %u to %hu: %s\n", p.length, p.dst, (char*) p.data);
-        msg_send_receive(&mesg, &mesg, transceiver_pid);
-        response = mesg.content.value;
-        printf("Packet send: %lu\n", response);
-    }
-    else {
-        puts("Usage:\ttsnd <ADDR> <MSG>");
-    }
+    sscanf(mode, "mon %u", &m);
+    printf("Setting monitor mode: %u\n", m);
+    cc1100_set_monitor(m);
 }
 
 void shell_runner(void) {

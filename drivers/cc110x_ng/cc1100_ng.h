@@ -116,6 +116,7 @@ int16_t cc1100_get_channel(void);
 
 radio_address_t cc1100_set_address(radio_address_t addr);
 radio_address_t cc1100_get_address(void);
+void cc1100_set_monitor(uint8_t mode);
 
 void cc1100_print_config(void);
 #endif

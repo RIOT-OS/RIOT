@@ -26,6 +26,14 @@ extern void _cc1100_get_address_handler(char *unused);
 extern void _cc1100_set_address_handler(char *ptr);
 #endif
 
+#ifdef MODULE_TRANSCEIVER
+#ifdef MODULE_CC110X_NG
+extern void _cc1100_ng_get_set_address_handler(char *addr);
+extern void _cc1100_ng_get_set_channel_handler(char *chan);
+extern void _cc1100_ng_send_handler(char *pkt);
+#endif
+#endif
+
 const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_PS
     {"ps", "Prints information about running threads.", _ps_handler},
@@ -46,6 +54,13 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_CC110X
     {"cc1100_get_address", "", _cc1100_get_address_handler},
     {"cc1100_set_address", "", _cc1100_set_address_handler},
+#endif
+#ifdef MODULE_TRANSCEIVER
+#ifdef MODULE_CC110X_NG
+    {"addr", "Gets or sets the address for the CC1100 transceiver", _cc1100_ng_get_set_address_handler},
+    {"chan", "Gets or sets the channel for the CC1100 transceiver", _cc1100_ng_get_set_channel_handler},
+    {"txtsnd", "Sends a text message to a given node via the CC1100 transceiver", _cc1100_ng_send_handler},
+#endif
 #endif
     {NULL, NULL, NULL}
 };
