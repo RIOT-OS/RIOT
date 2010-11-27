@@ -14,24 +14,12 @@
 #define SHELL_STACK_SIZE    (2048)
 #define RADIO_STACK_SIZE    (2048)
 
-int transceiver_pid;
 char shell_stack_buffer[SHELL_STACK_SIZE];
 char radio_stack_buffer[RADIO_STACK_SIZE];
 
-void mon_handler(char *mode);
-
 shell_t shell;
 const shell_command_t sc[] = {
-    {"mon", "", mon_handler},
     {NULL, NULL, NULL}};
-
-void mon_handler(char *mode) {
-    unsigned int m;
-
-    sscanf(mode, "mon %u", &m);
-    printf("Setting monitor mode: %u\n", m);
-    cc1100_set_monitor(m);
-}
 
 void shell_runner(void) {
     shell_init(&shell, sc, uart0_readc, uart0_putc);
@@ -67,7 +55,7 @@ int main(void) {
     thread_create(shell_stack_buffer, SHELL_STACK_SIZE, PRIORITY_MAIN-1, CREATE_STACKTEST, shell_runner, "shell");
     radio_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE, PRIORITY_MAIN-2, CREATE_STACKTEST, radio, "radio");
     transceiver_init(TRANSCEIVER_CC1100);
-    transceiver_pid = transceiver_start();
+    transceiver_start();
     transceiver_register(TRANSCEIVER_CC1100, radio_pid);
    
    while (1) {

@@ -57,7 +57,8 @@ typedef struct {
     void *data;
 } transceiver_command_t;;
 
-extern void *transceiver_rx_buffer;
+/* The transceiver thread's pid */
+extern int transceiver_pid;
 
 /**
  * @brief Initializes the transceiver module for certain transceiver types 

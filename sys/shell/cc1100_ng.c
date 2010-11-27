@@ -63,6 +63,24 @@ void _cc1100_ng_send_handler(char *pkt) {
         printf("[cc1100] Packet sent: %lu\n", response);
     }
     else {
-        puts("Usage:\ttsnd <ADDR> <MSG>");
+        puts("Usage:\ttxtsnd <ADDR> <MSG>");
     }
 }
+
+void _cc1100_ng_monitor_handler(char *mode) {
+    unsigned int m;
+
+    tcmd.transceivers = TRANSCEIVER_CC1100;
+    tcmd.data = &m;
+    mesg.content.ptr = (char*) &tcmd;
+    if (sscanf(mode, "monitor %u", &m) == 1) {
+        printf("Setting monitor mode: %u\n", m);
+        mesg.type = SET_MONITOR;
+        msg_send(&mesg, transceiver_pid, 1);
+    }
+    else {
+        puts("Usage:\nmonitor <MODE>");
+    }
+}
+
+

@@ -31,6 +31,7 @@ extern void _cc1100_set_address_handler(char *ptr);
 extern void _cc1100_ng_get_set_address_handler(char *addr);
 extern void _cc1100_ng_get_set_channel_handler(char *chan);
 extern void _cc1100_ng_send_handler(char *pkt);
+extern void _cc1100_ng_monitor_handler(char *mode);
 #endif
 #endif
 
@@ -60,6 +61,7 @@ const shell_command_t _shell_command_list[] = {
     {"addr", "Gets or sets the address for the CC1100 transceiver", _cc1100_ng_get_set_address_handler},
     {"chan", "Gets or sets the channel for the CC1100 transceiver", _cc1100_ng_get_set_channel_handler},
     {"txtsnd", "Sends a text message to a given node via the CC1100 transceiver", _cc1100_ng_send_handler},
+    {"monitor", "Enables or disables address checking for the CC1100 transceiver", _cc1100_ng_monitor_handler},
 #endif
 #endif
     {NULL, NULL, NULL}

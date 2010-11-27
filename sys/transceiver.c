@@ -35,6 +35,8 @@ uint8_t data_buffer[TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE];
 
 uint32_t response; ///< response bytes for messages to upper layer threads
 
+int transceiver_pid; ///< the transceiver thread's pid
+
 static volatile uint8_t rx_buffer_pos = 0;
 static volatile uint8_t transceiver_buffer_pos = 0;
 
@@ -71,15 +73,15 @@ void transceiver_init(transceiver_type_t t) {
 
 /* Start the transceiver thread */
 int transceiver_start(void) {
-    int pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN-3, CREATE_STACKTEST, run, "Transceiver");
-    if (pid < 0) {
+    transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN-3, CREATE_STACKTEST, run, "Transceiver");
+    if (transceiver_pid < 0) {
         puts("Error creating transceiver thread");
     }
     else if (transceivers & TRANSCEIVER_CC1100) {
         DEBUG("Transceiver started for CC1100\n");
-        cc1100_init(pid);
+        cc1100_init(transceiver_pid);
     }
-    return pid;
+    return transceiver_pid;
 }
 
 /* Register an upper layer thread */
