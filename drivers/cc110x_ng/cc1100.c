@@ -110,6 +110,15 @@ radio_address_t cc1100_set_address(radio_address_t address) {
 	return radio_address;
 }
 
+void cc1100_set_monitor(uint8_t mode) {
+    if (mode) {
+        write_register(CC1100_PKTCTRL1, (0x04));
+    }
+    else {
+        write_register(CC1100_PKTCTRL1, (0x06));
+    }
+}
+
 void cc1100_setup_rx_mode(void) {
 	// Stay in RX mode until end of packet
 	cc1100_spi_write_reg(CC1100_MCSM2, 0x07);

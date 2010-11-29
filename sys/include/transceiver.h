@@ -6,10 +6,14 @@
 /* Packets to buffer */
 #define TRANSCEIVER_BUFFER_SIZE      (10)
 /* Stack size for transceiver thread */
-#define TRANSCEIVER_STACK_SIZE      (4096)
+#define TRANSCEIVER_STACK_SIZE      (2048)
 
 /* The maximum of threads to register */
 #define TRANSCEIVER_MAX_REGISTERED  (10)
+
+/* The size of the message queue between driver and transceiver (must be power
+ * of two */
+#define TRANSCEIVER_MSG_BUFFER_SIZE     (64)
 
 /**
  * @brief Message types for transceiver interface
@@ -29,9 +33,10 @@ enum transceiver_msg_type_t {
     SET_CHANNEL,    ///< Set a new channel
     GET_ADDRESS,    ///< Get the radio address
     SET_ADDRESS,    ///< Set the radio address
+    SET_MONITOR,    ///< Set transceiver to monitor mode (disable address checking)
 
     /* Error messages */
-    ENOBUFFER,
+    ENOBUFFER,      ///< No buffer left
 };
 
 /**
@@ -56,7 +61,8 @@ typedef struct {
     void *data;
 } transceiver_command_t;;
 
-extern void *transceiver_rx_buffer;
+/* The transceiver thread's pid */
+extern int transceiver_pid;
 
 /**
  * @brief Initializes the transceiver module for certain transceiver types 

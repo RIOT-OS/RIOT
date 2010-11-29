@@ -33,7 +33,12 @@ registered_t reg[TRANSCEIVER_MAX_REGISTERED];
 radio_packet_t transceiver_buffer[TRANSCEIVER_BUFFER_SIZE];
 uint8_t data_buffer[TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE];
 
+/* message buffer */
+msg msg_buffer[TRANSCEIVER_MSG_BUFFER_SIZE];
+
 uint32_t response; ///< response bytes for messages to upper layer threads
+
+int transceiver_pid; ///< the transceiver thread's pid
 
 static volatile uint8_t rx_buffer_pos = 0;
 static volatile uint8_t transceiver_buffer_pos = 0;
@@ -51,6 +56,7 @@ static int16_t get_channel(transceiver_type_t t);
 static int16_t set_channel(transceiver_type_t t, void *channel);
 static int16_t get_address(transceiver_type_t t);
 static int16_t set_address(transceiver_type_t t, void *address);
+static void set_monitor(transceiver_type_t t, void *mode);
 
 /*------------------------------------------------------------------------------------*/
 /* Transceiver init */
@@ -70,15 +76,15 @@ void transceiver_init(transceiver_type_t t) {
 
 /* Start the transceiver thread */
 int transceiver_start(void) {
-    int pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN-3, CREATE_STACKTEST, run, "Transceiver");
-    if (pid < 0) {
+    transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN-3, CREATE_STACKTEST, run, "Transceiver");
+    if (transceiver_pid < 0) {
         puts("Error creating transceiver thread");
     }
     else if (transceivers & TRANSCEIVER_CC1100) {
         DEBUG("Transceiver started for CC1100\n");
-        cc1100_init(pid);
+        cc1100_init(transceiver_pid);
     }
-    return pid;
+    return transceiver_pid;
 }
 
 /* Register an upper layer thread */
@@ -111,6 +117,7 @@ void run(void) {
     msg m;
     transceiver_command_t *cmd;
 
+    msg_init_queue(msg_buffer, TRANSCEIVER_MSG_BUFFER_SIZE);
     while (1) {
         msg_receive(&m);
         /* only makes sense for messages for upper layers */
@@ -141,6 +148,9 @@ void run(void) {
             case SET_ADDRESS:
                 *((int16_t*) cmd->data) = set_address(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
+                break;
+            case SET_MONITOR:
+                set_monitor(cmd->transceivers, cmd->data);
                 break;
             default:
                 DEBUG("Unknown message received\n");
@@ -177,24 +187,24 @@ static void receive_packet(uint16_t type, uint8_t pos) {
     }
 
     /* search first free position in transceiver buffer */
-    while ((transceiver_buffer[transceiver_buffer_pos].processing) && (transceiver_buffer_pos < TRANSCEIVER_BUFFER_SIZE))
-    {
-        transceiver_buffer_pos++;
+    for (i = 0; (i < TRANSCEIVER_BUFFER_SIZE) && (transceiver_buffer[transceiver_buffer_pos].processing); i++) {
+        if (++transceiver_buffer_pos == TRANSCEIVER_BUFFER_SIZE) {
+            transceiver_buffer_pos = 0;
+        }
     }
     /* no buffer left */
-    if (transceiver_buffer_pos >= TRANSCEIVER_BUFFER_SIZE) {
+    if (i >= TRANSCEIVER_BUFFER_SIZE) {
         /* inform upper layers of lost packet */
         m.type = ENOBUFFER;
         m.content.value = t;
     }
     /* copy packet and handle it */
     else {
-        radio_packet_t trans_p = transceiver_buffer[transceiver_buffer_pos];
+        radio_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
         m.type = PKT_PENDING;
 
         if (type == RCV_PKT_CC1100) {
-            receive_cc1100_packet(&trans_p); 
-            m.content.value = transceiver_buffer_pos;
+            receive_cc1100_packet(trans_p); 
         }
         else {
             puts("Invalid transceiver type");
@@ -204,11 +214,14 @@ static void receive_packet(uint16_t type, uint8_t pos) {
 
     /* finally notify waiting upper layers
      * this is done non-blocking, so packets can get lost */
+    i = 0;
     while (reg[i].transceivers != TRANSCEIVER_NONE) {
         if (reg[i].transceivers & t) {
-            m.content.value = transceiver_buffer_pos;
+            m.content.ptr = (char*) &(transceiver_buffer[transceiver_buffer_pos]);
             DEBUG("Notify thread %i\n", reg[i].pid);
-            msg_send(&m, reg[i].pid, false);
+            if (msg_send(&m, reg[i].pid, false)) {
+                transceiver_buffer[transceiver_buffer_pos].processing++;
+            }
         }
         i++;
     }
@@ -229,11 +242,11 @@ static void receive_cc1100_packet(radio_packet_t *trans_p) {
     trans_p->dst = p.address;
     trans_p->rssi = cc1100_rx_buffer[rx_buffer_pos].rssi;
     trans_p->lqi = cc1100_rx_buffer[rx_buffer_pos].lqi;
-    trans_p->length = p.length;
-    memcpy((void*) &(data_buffer[transceiver_buffer_pos]), p.data, CC1100_MAX_DATA_LENGTH);
+    trans_p->length = p.length - CC1100_HEADER_LENGTH;
+    memcpy((void*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p.data, CC1100_MAX_DATA_LENGTH);
     eINT();
 
-    DEBUG("Packet was from %hu to %hu, size: %u\n", trans_p->src, trans_p->dst, trans_p->length);
+    DEBUG("Packet %p was from %hu to %hu, size: %u\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
     trans_p->data = (uint8_t*) &(data_buffer[transceiver_buffer_pos * CC1100_MAX_DATA_LENGTH]);
 }
  
@@ -253,8 +266,7 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt) {
 
     switch (t) {
         case TRANSCEIVER_CC1100:
-            /* TODO: prepare and send packet here */
-            cc1100_pkt.length = p.length;
+            cc1100_pkt.length = p.length + CC1100_HEADER_LENGTH;
             cc1100_pkt.address = p.dst;
             cc1100_pkt.flags = 0;
             memcpy(cc1100_pkt.data, p.data, p.length);
@@ -334,5 +346,21 @@ static int16_t set_address(transceiver_type_t t, void *address) {
             return cc1100_set_address(addr);
         default:
             return -1;
+    }
+}
+
+/*
+ * @brief Set the transceiver device into monitor mode (disabling address check)
+ *
+ * @param t         The transceiver device
+ * @param mode      1 for enabling monitor mode, 0 for enabling address check
+ */
+static void set_monitor(transceiver_type_t t, void *mode) {
+    switch (t) {
+        case TRANSCEIVER_CC1100:
+            cc1100_set_monitor(*((uint8_t*) mode));
+            break;
+        default:
+            break;
     }
 }

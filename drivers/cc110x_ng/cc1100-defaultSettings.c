@@ -86,7 +86,7 @@ char cc1100_conf[] = {
   0xAD, // SYNC0
   0x3D, // PKTLEN 		(maximum value of packet length byte = 61)
   0x06, // PKTCTRL1
-  0x45, // PKTCTRL0 	(variable packet length)
+  0x45, // PKTCTRL0 	(variable packet length) 
   0xFF, // ADDR
   CC1100_DEFAULT_CHANNR*10, // CHANNR
   0x0B, // FSCTRL1

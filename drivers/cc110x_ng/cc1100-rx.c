@@ -40,7 +40,7 @@ void cc1100_rx_handler(void) {
 		// Valid packet. After a wake-up, the radio should be in IDLE.
 		// So put CC1100 to RX for WOR_TIMEOUT (have to manually put
 		// the radio back to sleep/WOR).
-		cc1100_spi_write_reg(CC1100_MCSM0, 0x08);	// Turn off FS-Autocal
+		//cc1100_spi_write_reg(CC1100_MCSM0, 0x08);	// Turn off FS-Autocal
 		cc1100_spi_write_reg(CC1100_MCSM2, 0x07);	// Configure RX_TIME (until end of packet)
         cc1100_spi_strobe(CC1100_SRX);
         hwtimer_wait(IDLE_TO_RX_TIME);

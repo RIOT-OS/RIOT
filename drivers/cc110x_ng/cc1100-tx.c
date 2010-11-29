@@ -11,7 +11,6 @@
 #include <board.h>
 
 uint8_t cc1100_send(cc1100_packet_t *packet) {
-    puts("Going to send\n");
 	volatile uint32_t abort_count;
     uint8_t size;
     /* TODO: burst sending */
