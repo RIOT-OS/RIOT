@@ -36,6 +36,12 @@ int init() {
     return result;
 }
 
+struct termios old_term_setting;
+
+void close_tty() {
+	tcsetattr(tty_fd, TCSANOW, &old_term_setting);
+}
+
 void sig_handler(int signal) {
     if (signal == SIGUSR1) {
         if (stopped) {
@@ -43,6 +49,7 @@ void sig_handler(int signal) {
             printf("\nSignal received, opening port.\r\n");
             if (init() < 0) {
                 printf("Cannot open port.\r\n");
+                close_tty();
                 exit(1);
             }
         }
@@ -53,22 +60,32 @@ void sig_handler(int signal) {
             pthread_cancel(serial_reader);
             close_serial_port();
         }
+    } else if (signal == SIGINT) {
+        printf("SIGINT received, exiting...\n");
+        pthread_cancel(serial_reader);
+        close_serial_port();
+        close_tty();
+        exit(0);
     }
 }
 
 int open_tty(void)
 {
 	int r, fd;
-	struct termios term_setting;
+    struct termios term_setting;
 
 	fd = open("/dev/tty", O_RDWR);
 	if (fd < 0) return -1;
 	r = tcgetattr(fd, &term_setting);
 	if (r != 0) return -2;
+
+    old_term_setting = term_setting;
+
 	term_setting.c_oflag |= ( ONLRET );
-	term_setting.c_iflag |= (IGNBRK | IGNPAR);
-	term_setting.c_iflag &= ~(ISTRIP | BRKINT);
-	term_setting.c_lflag &= ~(ICANON | ISIG | ECHO);
+	term_setting.c_iflag |= (/*IGNBRK |*/ BRKINT | IGNPAR);
+	term_setting.c_iflag &= ~(ISTRIP);
+	term_setting.c_lflag &= ~(ICANON |/* ISIG |*/ ECHO);
+	term_setting.c_lflag |= ( ISIG );
 	term_setting.c_cflag |= CREAD;
 	term_setting.c_cc[VMIN] = 1;
 	term_setting.c_cc[VTIME] = 1;
@@ -80,17 +97,19 @@ int open_tty(void)
 void install_sighandler() {
     struct sigaction action;
     sigemptyset (&action.sa_mask);
+    sigaddset( &action.sa_mask, SIGINT );
     sigaddset( &action.sa_mask, SIGUSR1 );
     sigaddset( &action.sa_mask, SIGUSR2 );
     action.sa_flags = 0;
     action.sa_handler = sig_handler;
+    sigaction(SIGINT, &action, NULL);
     sigaction(SIGUSR1, &action, NULL);
     sigaction(SIGUSR2, &action, NULL);
 }
 
 int main(int argc, char** argv) {
     if (argc == 2) {
-    port_name = argv[1];
+        port_name = argv[1];
     }
 
     printf("Using %s as serial device.\n", port_name);
@@ -120,6 +139,7 @@ int main(int argc, char** argv) {
                     write_serial_port(ttybuf, i);
                 }
                 close_serial_port();
+                close_tty();
                 system("tset -c");
                 return 0;
             }
@@ -128,6 +148,7 @@ int main(int argc, char** argv) {
         write_serial_port(ttybuf,n);
     }
 
+    close_tty();
     close_serial_port();
     return 0;
 }
