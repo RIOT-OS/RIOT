@@ -23,6 +23,8 @@
 #define GPIO_INT 17
 #define IRQP_GPIO 4
 
+#define _XTAL       (72000)
+
 /**
  * @name	Timer Symbols
  * @{
