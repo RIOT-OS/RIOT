@@ -9,30 +9,30 @@ uint8_t opt_hdr_len = 0;
 uint8_t ipv6_ext_hdr_len = 0;
 uint16_t packet_length;
 
-struct rtr_adv_t* get_rtr_adv_buf(uint8_t ext_len){
+static struct rtr_adv_t* get_rtr_adv_buf(uint8_t ext_len){
     return ((struct rtr_adv_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
 }
 
-struct nbr_sol_t* get_nbr_sol_buf(uint8_t ext_len){
+static struct nbr_sol_t* get_nbr_sol_buf(uint8_t ext_len){
     return ((struct nbr_sol_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
 }
 
-struct opt_stllao_t* get_opt_stllao_buf(uint8_t ext_len, uint8_t opt_len){
+static struct opt_stllao_t* get_opt_stllao_buf(uint8_t ext_len, uint8_t opt_len){
     return ((struct opt_stllao_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + 
                                            ext_len + opt_len]));
 }
 
-struct opt_mtu_t* get_opt_mtu_buf(uint8_t ext_len, uint8_t opt_len){
+static struct opt_mtu_t* get_opt_mtu_buf(uint8_t ext_len, uint8_t opt_len){
     return ((struct opt_mtu_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + 
                                         ext_len + opt_len]));
 }
 
-struct opt_pi_t* get_opt_pi_buf(uint8_t ext_len, uint8_t opt_len){
+static struct opt_pi_t* get_opt_pi_buf(uint8_t ext_len, uint8_t opt_len){
     return ((struct opt_pi_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + 
                                        ext_len + opt_len]));
 }
 
-struct opt_aro_t* get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len){
+static struct opt_aro_t* get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len){
     return ((struct opt_aro_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + 
                                         ext_len + opt_len]));
 }
@@ -79,8 +79,8 @@ void send_rtr_sol(void){
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
         set_llao((uint8_t*)opt_stllao_buf, OPT_SLLAO_TYPE);
         icmp_buf->checksum = 0;
-
-        icmp_buf->checksum = ~chksum_calc(ICMPV6_NXT_HDR);
+        
+        icmp_buf->checksum = ~icmpv6_csum(ICMPV6_NXT_HDR);
         printf("%x\n",icmp_buf->checksum);
 
         rtr_sol_count++;
@@ -169,8 +169,8 @@ void send_rtr_adv(ipv6_addr_t *addr){
 
     /* calculate checksum */
     icmp_buf->checksum = 0;
-    icmp_buf->checksum = ~chksum_calc(ICMPV6_NXT_HDR);
-    printf("%x\n",icmp_buf->checksum);
+    icmp_buf->checksum = ~icmpv6_csum(ICMPV6_NXT_HDR);
+    //printf("%x\n",icmp_buf->checksum);
 }
 
 void send_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ){
@@ -280,33 +280,48 @@ void set_llao(uint8_t *llao, uint8_t type){
             OPT_STLLAO_LEN - SIXLOWPAN_IPV6_LL_ADDR_LEN - 2); 
 }
 
-/* pseudo-header checksum calculation - RFC4443 Section 2.3*/
-uint16_t chksum_calc(uint8_t type){
-    uint16_t length = ipv6_buf->length;
-    uint16_t sum = length + type;
+
+uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len){
+    int count;
+    uint16_t carry; 
    
-    /* address field chksum */ 
-    uint8_t *addrptr = (uint8_t*)&ipv6_buf->srcaddr;
-    uint16_t addr_fields_length = (2 * sizeof(ipv6_addr_t));
-    while(addr_fields_length > 1){
-        sum += (addrptr[0] << 8) + addrptr[1];
-        addrptr += 2;
-        addr_fields_length -= 2;
-    }    
-    if(addr_fields_length > 1){
-        sum += (addrptr[0] << 8) + 0;
+    count = len >> 1;
+    if(count){
+        if(count){
+            carry = 0;
+            do {
+                uint16_t t = (*buf << 8) + *(buf+1);
+                count--;
+                buf += 2;
+                sum += carry;
+                sum += t;
+                carry = (t > sum);
+            } while(count);
+            sum += carry;
+        }
+    }
+    if(len & 1){
+        uint16_t u = (*buf << 8);
+        sum += (*buf << 8);
+        if(sum < u){
+            sum++;
+        }
     }
 
-    /* header chksum */
-    uint8_t *bufptr = (uint8_t*) get_icmpv6_buf(0);
-    while(length > 1){
-        sum += (bufptr[0] << 8) + bufptr[1];
-        bufptr += 2;
-        length -= 2;
-    } 
-    if(length){
-        sum += (bufptr[0] << 8) + 0;
-    }
-
-    return sum; 
+    return sum;
 }
+
+
+uint16_t icmpv6_csum(uint8_t proto){
+    ipv6_buf = get_ipv6_buf();
+    uint16_t sum;
+    uint16_t len = ipv6_buf->length;
+    hehe.ha = 6; 
+    sum = len + proto;
+    sum = csum(sum, (uint8_t *)&ipv6_buf->srcaddr, 2 * sizeof(ipv6_addr_t));
+    sum = csum(sum,(uint8_t*)get_icmpv6_buf(0),len);
+    //sum = csum(0,(uint8_t*)&hehe,sizeof(struct hallo));
+    return (sum == 0) ? 0xffff : HTONS(sum);
+}
+
+

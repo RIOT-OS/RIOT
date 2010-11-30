@@ -25,10 +25,10 @@
 #define MULTIHOP_HOPLIMIT           64
 
 /* globals */
-uint8_t buffer[BUFFER_SIZE];
 extern uint8_t ipv6_ext_hdr_len;
 extern uint8_t opt_hdr_len;
 extern uint16_t packet_length;
+//extern const radio_t;
 /* base header lengths */
 #define LL_HDR_LEN                  0x4
 #define ICMPV6_HDR_LEN              0x4
@@ -37,20 +37,25 @@ extern uint16_t packet_length;
 #define LLHDR_ICMPV6HDR_LEN         (LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)
 #define IPV6HDR_ICMPV6HDR_LEN       (IPV6_HDR_LEN + ipv6_ext_hdr_len + ICMPV6_HDR_LEN)
 
+/* buffer */
+uint8_t buffer[BUFFER_SIZE];
+
+
 /* ipv6 extension header length */
 
-typedef union ipv6_addr_t{
+typedef union __attribute__ ((packed)) ipv6_addr_t{
     uint8_t uint8[16];
     uint16_t uint16[8];
+    uint32_t uint32[4];
 } ipv6_addr_t;
 
-struct icmpv6_hdr_t{
+struct __attribute__ ((packed)) icmpv6_hdr_t{
     uint8_t type;
     uint8_t code;
     uint16_t checksum;
 };
 
-struct ipv6_hdr_t{
+struct __attribute__ ((packed)) ipv6_hdr_t{
     uint8_t version_trafficclass;
     uint8_t trafficclass_flowlabel;
     uint16_t flowlabel;
@@ -62,15 +67,16 @@ struct ipv6_hdr_t{
 };
 
 /* link layer addressing */
-typedef struct ieee_802154_long_t {
+typedef struct __attribute__ ((packed)) ieee_802154_long_t {
     uint8_t uint8[8];  
 } ieee_802154_long_t;
 
-typedef struct ieee_802154_short_t {
+typedef struct __attribute__ ((packed)) ieee_802154_short_t {
     uint8_t uint8[2];
 } ieee_802154_short_t;
 
-#define HTONS(a) (uint16_t)((((uint16_t) (a)) << 8) | (((uint16_t) (a)) >> 8))
+//#define HTONS(a) (uint16_t)((((uint16_t) (a)) << 8) | (((uint16_t) (a)) >> 8))
+#define HTONS(a) ((((uint16_t) (a) >> 8) & 0xff) | ((((uint16_t) (a)) & 0xff) << 8))  
 #define HTONL(a) ((((uint32_t) (a) & 0xff000000) >> 24) | \
                   (((uint32_t) (a) & 0x00ff0000) >> 8)  | \
                   (((uint32_t) (a) & 0x0000ff00) << 8)  | \

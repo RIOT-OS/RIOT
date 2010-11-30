@@ -25,8 +25,8 @@ void bootstrapping(void){
     set_eui64(&ipv6_buf->srcaddr);
     print6addr(&ipv6_buf->srcaddr);
     /* send router solicitation */
-//    send_rtr_sol();
-    send_rtr_adv(&ipv6_buf->destaddr);
+    send_rtr_sol();
+    //send_rtr_adv(&ipv6_buf->destaddr);
 #endif
 }
 

@@ -2,8 +2,8 @@
 
 #include "sixlowmac.h"
 #include "sixlownd.h"
-#include "drivers/cc110x/cc1100.h"
 #include "radio/radio.h"
+#include "drivers/cc110x/cc1100.h"
 
 #define ipv6_buf ((struct ipv6_hdr_t*)&buffer[LL_HDR_LEN])
 

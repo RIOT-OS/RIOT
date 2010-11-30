@@ -38,19 +38,19 @@
 #define OPT_ARO_HDR_LEN                 16
 #define OPT_ARO_LTIME                   300 // geeigneten wert finden
 
-typedef struct opt_stllao_t {
+typedef struct __attribute__ ((packed)) opt_stllao_t {
   uint8_t type;
   uint8_t length;
 } opt_stllao_t;
 
-typedef struct opt_mtu_t {
+typedef struct __attribute__ ((packed)) opt_mtu_t {
     uint8_t type;
     uint8_t length;
     uint16_t reserved;
     uint32_t mtu;
 } opt_mtu_t;
 
-typedef struct opt_pi_t {
+typedef struct __attribute__ ((packed)) opt_pi_t {
     uint8_t type;
     uint8_t length;
     uint8_t prefix_length;
@@ -61,7 +61,7 @@ typedef struct opt_pi_t {
     ipv6_addr_t addr; 
 } opt_pi_t;
 
-typedef struct opt_aro_t {
+typedef struct __attribute__ ((packed)) opt_aro_t {
     uint8_t type;
     uint8_t length;
     uint8_t status;
@@ -71,7 +71,7 @@ typedef struct opt_aro_t {
     ieee_802154_long_t eui64;
 } opt_aro_t;
 
-typedef struct pfx_elem_t {
+typedef struct __attribute__ ((packed)) pfx_elem_t {
     uint8_t inuse;  
     uint8_t adv;
     ipv6_addr_t addr;
@@ -81,7 +81,7 @@ typedef struct pfx_elem_t {
     uint32_t pref_ltime;
 } pfx_elem_t;
 
-struct rtr_adv_t {
+struct __attribute__ ((packed)) rtr_adv_t {
     uint8_t hoplimit;
     uint8_t autoconfig_flags;
     uint16_t router_lifetime;
@@ -89,25 +89,20 @@ struct rtr_adv_t {
     uint32_t retrans_timer;
 };
 
-struct nbr_sol_t {
+struct __attribute__ ((packed)) nbr_sol_t {
     uint32_t reserved;
     ipv6_addr_t tgtaddr;  
 };
 
-/* function prototypes */
-struct rtr_adv_t* get_rtr_adv_buf(uint8_t ext_len);
-struct nbr_sol_t* get_nbr_sol_buf(uint8_t ext_len);
-struct opt_stllao_t* get_opt_stllao_buf(uint8_t ext_len, uint8_t opt_len);
-struct opt_mtu_t* get_opt_mtu_buf(uint8_t ext_len, uint8_t opt_len);
-struct opt_pi_t* get_opt_pi_buf(uint8_t ext_len, uint8_t opt_len);
-struct opt_aro_t* get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len);
 
 void send_rtr_sol(void);
 void recv_rtr_sol(void);
 void send_rtr_adv(ipv6_addr_t *addr);
-uint16_t chksum_calc(uint8_t type); 
 uint8_t pfx_chk_list(ipv6_addr_t *addr, uint8_t size);
 uint8_t pfx_cmp(ipv6_addr_t *addr1, ipv6_addr_t *addr2);
 void pfx_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
              uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
 void set_llao(uint8_t *llao, uint8_t type);
+
+uint16_t icmpv6_csum(uint8_t proto);
+uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len);
