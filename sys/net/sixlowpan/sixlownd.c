@@ -316,11 +316,10 @@ uint16_t icmpv6_csum(uint8_t proto){
     ipv6_buf = get_ipv6_buf();
     uint16_t sum;
     uint16_t len = ipv6_buf->length;
-    hehe.ha = 6; 
     sum = len + proto;
     sum = csum(sum, (uint8_t *)&ipv6_buf->srcaddr, 2 * sizeof(ipv6_addr_t));
     sum = csum(sum,(uint8_t*)get_icmpv6_buf(0),len);
-    //sum = csum(0,(uint8_t*)&hehe,sizeof(struct hallo));
+    
     return (sum == 0) ? 0xffff : HTONS(sum);
 }
 
