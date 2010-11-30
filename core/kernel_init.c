@@ -17,17 +17,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <errno.h>
-<<<<<<< HEAD
-#include "tcb.h"
-#include "kernel.h"
-#include "kernel_intern.h"
-#include "sched.h"
-#include "flags.h"
-#include "cpu.h"
-#include "lpm.h"
-#include "thread.h"
-#include "hwtimer.h"
-=======
 #include <tcb.h>
 #include <kernel.h>
 #include <kernel_intern.h>
@@ -37,7 +26,6 @@
 #include <lpm.h>
 #include <thread.h>
 #include <hwtimer.h>
->>>>>>> master
 
 #ifdef MODULE_AUTO_INIT
 #include <auto_init.h>
@@ -85,11 +73,7 @@ void kernel_init(void)
     
     sched_init();
 
-<<<<<<< HEAD
-    if (thread_create(KERNEL_CONF_STACKSIZE_IDLE, PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, idle_name) < 0) {
-=======
     if (thread_create(idle_stack, sizeof(idle_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, idle_name) < 0) {
->>>>>>> master
         printf("kernel_init(): error creating idle task.\n");
     }
 

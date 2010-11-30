@@ -43,16 +43,7 @@ int msg_send(msg* m, unsigned int target_pid, bool block) {
         return msg_send_int(m, target_pid);
     }
 
-<<<<<<< HEAD
-    int result = 1;
-
     tcb *target = (tcb*)sched_threads[target_pid];
-
-    m->sender_pid = thread_pid;
-    if (m->sender_pid == target_pid) return -1;
-=======
-    tcb *target = (tcb*)sched_threads[target_pid];
->>>>>>> master
 
     m->sender_pid = thread_pid;
     if (m->sender_pid == target_pid) {
@@ -80,11 +71,7 @@ int msg_send(msg* m, unsigned int target_pid, bool block) {
         queue_node_t n;
         n.priority = active_thread->priority;
         n.data = (unsigned int) active_thread;
-<<<<<<< HEAD
-        DEBUG("%s: Adding node to msg_queue:\n", active_thread->name);
-=======
         DEBUG("%s: Adding node to msg_waiters:\n", active_thread->name);
->>>>>>> master
 
         queue_priority_add(&(target->msg_waiters), &n);
 
@@ -199,14 +186,6 @@ int msg_receive(msg* m) {
         me->wait_data = (void*) m;
     }
 
-<<<<<<< HEAD
-    if (n == NULL) {
-        DEBUG("%s: msg_receive blocked\n", active_thread->name);
-        sched_set_status(me,  STATUS_RECEIVE_BLOCKED);
-
-        eINT();
-        thread_yield();
-=======
     queue_node_t *node = queue_remove_head(&(me->msg_waiters));
 
     if (node == NULL) {
@@ -214,7 +193,6 @@ int msg_receive(msg* m) {
         if (n < 0) {
             DEBUG("%s: msg_receive(): No msg in queue. Going blocked.\n", active_thread->name);
             sched_set_status(me,  STATUS_RECEIVE_BLOCKED);
->>>>>>> master
 
             eINT();
             thread_yield();
@@ -223,10 +201,6 @@ int msg_receive(msg* m) {
         }
         return 1;
     } else {
-<<<<<<< HEAD
-        DEBUG("%s: msg_receive direct copy.\n", active_thread->name);
-        tcb *sender = (tcb*)n->data;
-=======
         DEBUG("%s: msg_receive(): Wakeing up waiting thread.\n", active_thread->name);
         tcb *sender = (tcb*)node->data;
 
@@ -236,7 +210,6 @@ int msg_receive(msg* m) {
              */
             m = &(me->msg_array[cib_put(&(me->msg_queue))]);
         }
->>>>>>> master
 
         /* copy msg */
         msg* sender_msg = (msg*)sender->wait_data;

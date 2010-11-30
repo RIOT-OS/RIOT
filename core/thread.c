@@ -53,10 +53,7 @@ int thread_wakeup(int pid) {
 
     int result = sched_threads[pid]->status;
     if (result == STATUS_SLEEPING) {
-<<<<<<< HEAD
-=======
         DEBUG("thread_wakeup: Thread is sleeping.\n");
->>>>>>> master
         sched_set_status((tcb*)sched_threads[pid], STATUS_RUNNING);
         if (!isr) {
             eINT();
@@ -124,13 +121,8 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     int pid = 0;
     while (pid < MAXTHREADS) {
         if (sched_threads[pid] == NULL) {
-<<<<<<< HEAD
-            sched_threads[pid] = pd;
-            pd->pid = pid;
-=======
             sched_threads[pid] = cb;
             cb->pid = pid;
->>>>>>> master
             break;
         }
         pid++;
@@ -145,18 +137,12 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
         return -EOVERFLOW;
     }
 
-<<<<<<< HEAD
-    pd->sp = thread_stack_init(function,stack+stacksize);
-    pd->stack_start = stack;
-    pd->stack_size = stacksize;
-=======
     cb->sp = thread_stack_init(function,stack+stacksize);
     cb->stack_start = stack;
     cb->stack_size = total_stacksize;
 
     cb->priority = priority;
     cb->status = 0;
->>>>>>> master
 
     cb->rq_entry.data = (unsigned int) cb;
     cb->rq_entry.next = NULL;
