@@ -35,6 +35,7 @@ and the mailinglist (subscription via web site)
 #include <stdio.h>
 #include "lpc23xx.h"
 #include "VIC.h"
+#include <kernel.h>
 
 #include <board_uart0.h>
 
@@ -78,12 +79,14 @@ static inline void dequeue(void) {
 
 static void  push_queue(void) {
     running = 1;
+	lpm_prevent_sleep |= LPM_PREVENT_SLEEP_UART;
 start:
     if (!actual) {
         if (queue_items) {
             dequeue();
         } else {
             running = 0;
+            lpm_prevent_sleep &= ~LPM_PREVENT_SLEEP_UART;
             if (!fifo)
                 while(!(U0LSR & BIT6)){};
             return;
@@ -149,7 +152,7 @@ void UART0_IRQHandler(void)
 
 static inline int uart0_puts(char *astring,int length)
 {
-    while (queue_items == (QUEUESIZE-1)) {} ;
+/*    while (queue_items == (QUEUESIZE-1)) {} ;
     U0IER = 0;
     queue[queue_tail] = malloc(length+sizeof(unsigned int));
     queue[queue_tail]->len = length;
@@ -158,14 +161,14 @@ static inline int uart0_puts(char *astring,int length)
     if (!running)
         push_queue();
     U0IER |= BIT0 | BIT1;       // enable RX irq
-
-    /* alternative without queue:
+*/
+    /* alternative without queue:*/
     int i;
     for (i=0;i<length;i++) {
             while (!(U0LSR & BIT5));
             U0THR = astring[i];
     }
-    */
+/*    */
 
     return length;
 }
@@ -199,7 +202,8 @@ bl_uart_init(void)
 
     /* irq */
     install_irq(UART0_INT, UART0_IRQHandler, 6);
-    U0IER |= BIT0 | BIT1;       // enable RX+TX irq
+//    U0IER |= BIT0 | BIT1;       // enable RX+TX irq
+    U0IER |= BIT0;       // enable only RX irq
     return 1;
 }
 

@@ -78,8 +78,6 @@ int main(int argc, char **argv)
     char* port_name = argv[1];
 	char* file_name = argv[2];
 
-    sleep(1);
-	
     if (open_serial_port(port_name) < 0) {
         return(1);
     }

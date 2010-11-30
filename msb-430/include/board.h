@@ -24,17 +24,23 @@ and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
-#ifndef SHT11BOARD_H_
-#define SHT11BOARD_H_
+#ifndef _MSB_BOARD_H
+#define _MSB_BOARD_H
 
 /**
- * @ingroup		lpc2387
- * @{
- */
+ * @defgroup	msb_430h		ScatterWeb MSB-430H
+ * @ingroup		msp430
+ *
+<h2>Compontents</h2>
+\li MSP430
+\li CC1100
+
+* @{
+*/
 
 /**
  * @file
- * @brief		LPC2387 SHT11 Device Driver
+ * @brief		MSB-430H Board
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @version     $Revision$
@@ -42,17 +48,23 @@ and the mailinglist (subscription via web site)
  * @note		$Id$
  */
 
-#include <lpc23xx.h>
-#include <board.h>
+//MSB430 core
+#define MSP430_INITIAL_CPU_SPEED    7372800uL
+#define MSP430_HAS_DCOR             1
+#define MSP430_HAS_EXTERNAL_CRYSTAL 0
 
-#define SHT11_SCK_LOW	FIO1CLR = BIT25;	// serial clock line low
-#define SHT11_SCK_HIGH	FIO1SET = BIT25;    // serial clock line high
-#define SHT11_DATA		((FIO1PIN & BIT26) != 0)				// read serial I/O
-#define SHT11_DATA_LOW	(FIO1CLR = BIT26); 	// serial I/O line low
-#define SHT11_DATA_HIGH	(FIO1SET = BIT26);  // serial I/O line high
-#define SHT11_DATA_IN	(FIO1DIR &= ~BIT26)						// serial I/O as input
-#define SHT11_DATA_OUT	(FIO1DIR |= BIT26)						// serial I/O as output
-#define SHT11_INIT		FIO1DIR |= BIT25; PINSEL3 &= ~(BIT14|BIT15 | BIT16|BIT17);
+/* LEDs ports MSB430 */
+#define LEDS_PxDIR P5DIR
+#define LEDS_PxOUT P5OUT
+#define LEDS_CONF_RED		0x80
+#define LEDS_CONF_GREEN		0x00
+#define LEDS_CONF_YELLOW	0x00
+
+#define LED_RED_ON      LEDS_PxOUT &=~LEDS_CONF_RED
+#define LED_RED_OFF     LEDS_PxOUT |= LEDS_CONF_RED
+#define LED_RED_TOGGLE     LEDS_PxOUT ^= LEDS_CONF_RED
+
+#include <msp430x16x.h>
 
 /** @} */
-#endif /* SHT11BOARD_H_ */
+#endif // _MSB_BOARD_H

@@ -25,10 +25,13 @@
 # ******************************************************************************
 # $Id$
 
-SubDir TOP board msb-430h ;
+CPU = msp430 ;
+MCU = msp430x1612 ;
 
-Module board_cc1100 : driver_cc1100.c ;
+FLASH_PORT ?= /dev/ttyUSB0 ;
+FLASHER ?= mspdebug ;
+FLASHFLAGS ?= -d $(FLASH_PORT) -j uif ;
 
-SubInclude TOP board msb-430-common ;
-SubInclude TOP cpu $(CPU) ;
+RESET ?= $(FLASHER) $(FLASHFLAGS) reset ;
 
+HDRS += [ FPath $(TOP) board msb-430-common drivers include ] ;
