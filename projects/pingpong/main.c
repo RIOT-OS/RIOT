@@ -15,13 +15,15 @@ void second_thread(void) {
     }
 }
 
+char second_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
+
 int main(void)
 {
     printf("Hello world!\n");
 
     msg m;
 
-    int pid = thread_create(KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN-1, CREATE_WOUT_YIELD | CREATE_STACKTEST, second_thread, "pong");
+    int pid = thread_create(second_thread_stack, sizeof(second_thread_stack), PRIORITY_MAIN-1, CREATE_WOUT_YIELD | CREATE_STACKTEST, second_thread, "pong");
     
     m.content.value = 1;
 

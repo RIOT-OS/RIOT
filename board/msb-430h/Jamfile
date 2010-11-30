@@ -27,9 +27,8 @@
 
 SubDir TOP board msb-430h ;
 
-Module board : board_init.c debug_uart.c ;
-UseModule board ;
-
 Module board_cc1100 : driver_cc1100.c ;
 
+SubInclude TOP board msb-430-common ;
 SubInclude TOP cpu $(CPU) ;
+

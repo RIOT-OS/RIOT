@@ -51,7 +51,6 @@ and the mailinglist (subscription via web site)
 #include <time.h>
 #include <sys/time.h>
 #include "lpc2387.h"
-#include "clock.h"
 
 /* ------------------------------------------------------------------------- */
 /**
@@ -82,15 +81,21 @@ enum rtc_alarm_mask {
  * @internal
  * During reboots only alarms are reset.
  */
-void _rtc_init(void);
+void rtc_init(void);
 
-void _rtc_reset(void);
+void rtc_reset(void);
 
 /**
  * @brief	Returns the time of compilation in seconds
  * @internal
  */
 time_t rtc_get_compile_time(void) __attribute__((noinline));
+
+/**
+ * @brief	Sets the current time in broken down format directly from to RTC
+ * @param[in]	localt		Pointer to structure with time to set
+ */
+void rtc_set_localtime(struct tm* localt);
 
 /**
  * @brief	Returns the current clock time
@@ -132,7 +137,7 @@ void rtc_get_localtime(struct tm* localt);
  *
  * @see ::rtc_alarm_mask
  */
-void _rtc_set_alarm(struct tm* localt, enum rtc_alarm_mask mask);
+void rtc_set_alarm(struct tm* localt, enum rtc_alarm_mask mask);
 
 /**
  * @brief	Gets the current alarm setting

@@ -73,6 +73,21 @@ typedef struct __attribute__ ((packed)) packet_info_t
 	bool promiscuous;			///< Radio layer: whether network interface is in promiscuous mode
 } packet_info_t;
 
+
+/**
+ * @brief General link layer packet format
+ */
+typedef struct __attribute__ ((packed)) {
+    uint8_t processing;     ///< internal processing state
+    uint16_t src;           ///< Radio source address
+    uint16_t dst;           ///< Radio destination address
+    uint8_t rssi;           ///< Radio Signal Strength Indication
+    uint8_t lqi;            ///< Link Quality Indicator
+    uint8_t length;         ///< Length of payload
+    uint8_t *data;          ///< Payload
+} radio_packet_t;
+
+
 /**
  * Packet handler (receive function) of all layers.
  * @param [in/out]	payload			Pointer to packet payload data

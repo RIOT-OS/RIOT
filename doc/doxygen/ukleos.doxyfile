@@ -85,7 +85,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = ../../core ../../cpu ../../board ../../sys ../manual
+INPUT                  = ../../core ../../cpu ../../board ../../sys ../manual ../../drivers
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.doc *.c *.h 
 RECURSIVE              = YES
@@ -125,7 +125,7 @@ HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = .html
 HTML_HEADER            = src/ukleos-header.html 
 HTML_FOOTER            = src/ukleos-footer.html
-HTML_STYLESHEET        = src/ukleos.css 
+HTML_STYLESHEET        = 
 HTML_ALIGN_MEMBERS     = YES
 HTML_DYNAMIC_SECTIONS  = YES
 GENERATE_DOCSET        = NO

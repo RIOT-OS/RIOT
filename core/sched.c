@@ -14,15 +14,22 @@
  */
 
 #include <stdint.h>
+<<<<<<< HEAD:core/sched.c
 #include <malloc.h>
 #include "sched.h"
 #include "kernel.h"
 #include "kernel_intern.h"
 #include "clist.h"
+=======
+#include <sched.h>
+#include <kernel.h>
+#include <kernel_intern.h>
+#include <clist.h>
+>>>>>>> master:core/sched.c
 #include <bitarithm.h>
 
 //#define ENABLE_DEBUG
-#include "debug.h"
+#include <debug.h>
 
 volatile int num_tasks = 0;
 
@@ -144,6 +151,20 @@ void sched_set_status(tcb *process, unsigned int status) {
     process->status = status;
 }
 
+<<<<<<< HEAD:core/sched.c
+=======
+void sched_switch(uint16_t current_prio, uint16_t other_prio, int in_isr) {
+    DEBUG("%s: %i %i %i\n", active_thread->name, (int)current_prio, (int)other_prio, in_isr);
+    if (current_prio <= other_prio) {
+        if (in_isr) {
+            sched_context_switch_request = 1;
+        } else {
+            thread_yield();
+        }
+    }
+}
+
+>>>>>>> master:core/sched.c
 extern void cpu_switch_context_exit(void);
 
 void sched_task_exit(void) {
@@ -152,9 +173,15 @@ void sched_task_exit(void) {
     dINT();
     sched_threads[active_thread->pid] = NULL;
     num_tasks--;
+<<<<<<< HEAD:core/sched.c
     sched_set_status((tcb*)active_thread,  STATUS_STOPPED);
 
     free(((tcb*)active_thread)->stack_start);
+=======
+    
+    sched_set_status((tcb*)active_thread,  STATUS_STOPPED);
+
+>>>>>>> master:core/sched.c
     active_thread = NULL;
     cpu_switch_context_exit();
 }

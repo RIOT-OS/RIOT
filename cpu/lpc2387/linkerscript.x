@@ -28,6 +28,7 @@ and the mailinglist (subscription via web site)
 MEMORY 
 {
 	flash     			: ORIGIN = 0,          LENGTH = 512K	/* FLASH ROM                            	*/
+    infomem             : ORIGIN = 0x0007D000, LENGTH = 4K      /* Last sector in FLASH ROM for config data */
 	ram_battery			: ORIGIN = 0xE0084000, LENGTH = 2K		/* Battery RAM								*/
 	ram   				: ORIGIN = 0x40000000, LENGTH = 64K		/* LOCAL ON-CHIP STATIC RAM					*/
 	ram_usb				: ORIGIN = 0x7FD00000, LENGTH = 16K		/* USB RAM 									*/
@@ -97,6 +98,13 @@ SECTIONS
 	} >flash							/* put all the above into FLASH */	
 	. = ALIGN(4);
 	_etext = . ;						/* define a global symbol _etext just after the last code byte */
+
+    .config : 
+    {
+        *(.configmem) 
+        . = ALIGN(256);
+    } >infomem
+    . = ALIGN(4);
 
 	/**************************************************************************
 	 * RAM

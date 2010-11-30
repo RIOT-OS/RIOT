@@ -105,7 +105,13 @@ int msg_send_receive(msg *m, msg *reply, unsigned int target_pid);
  */
 int msg_reply(msg *m, msg *reply);
 
-uint16_t msg_alloc_event(void);
+/**
+ * @brief Initialize the current thread's message queue.
+ *
+ * @param array Pointer to preallocated array of msg objects
+ * @param num Number of msg objects in array. MUST BE POWER OF TWO!
+ */
+int msg_init_queue(msg* array, int num);
 
 /** @} */
 #endif /* __MSG_H */

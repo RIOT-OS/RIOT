@@ -37,7 +37,6 @@ and the mailinglist (subscription via web site)
  * @note		$Id: sht11.c 2396 2010-07-06 15:12:35Z ziegert $
  */
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
 
@@ -45,6 +44,11 @@ and the mailinglist (subscription via web site)
 #include <mutex.h>
 #include <sht11.h>
 #include <sht11-board.h>
+
+//#define ENABLE_DEBUG   (1)
+#include <debug.h>
+
+float sht11_temperature_offset;
 
 /**
  * @brief   Perform measurement
@@ -147,6 +151,7 @@ static uint8_t read_byte (uint8_t ack)
 		value = value << 1;
 		SHT11_SCK_HIGH;
         hwtimer_wait(SHT11_CLK_WAIT);
+
 		if (SHT11_DATA) {
             /* increase data by one when DATA is high */
             value++;
@@ -230,10 +235,10 @@ static uint8_t measure(uint8_t *p_value, uint8_t *p_checksum, uint8_t mode)
 	uint8_t ack = 1;
 	uint16_t i;
 
-	transmission_start();
+    transmission_start();
 	error = write_byte(mode);
 
-    hwtimer_wait(HWTIMER_MSEC);
+    hwtimer_wait(HWTIMER_TICKS(1000));
 
     /* wait untile sensor has finished measurement or timeout */
     for (i = 0; (i < SHT11_MEASURE_TIMEOUT) && (!error); i++) {
@@ -242,7 +247,7 @@ static uint8_t measure(uint8_t *p_value, uint8_t *p_checksum, uint8_t mode)
 		if (!ack) {
 			break;
         }
-        hwtimer_wait(HWTIMER_MSEC);
+        hwtimer_wait(HWTIMER_TICKS(1000));
 	}
 	error += ack;
 
@@ -257,9 +262,10 @@ static uint8_t measure(uint8_t *p_value, uint8_t *p_checksum, uint8_t mode)
 }
 /*---------------------------------------------------------------------------*/
 void sht11_init(void) {
+	sht11_temperature_offset = 0;
 	mutex_init(&sht11_mutex);
 	SHT11_INIT;
-    hwtimer_wait(11 * HWTIMER_MSEC);
+    hwtimer_wait(11 * HWTIMER_TICKS(1000));
 }
 /*---------------------------------------------------------------------------*/
 uint8_t sht11_read_status(uint8_t *p_value, uint8_t *p_checksum) {
@@ -303,7 +309,9 @@ uint8_t sht11_read_sensor(sht11_val_t *value, sht11_mode_t mode) {
 	const float T2 = +0.00008;
 
     /* check for valid buffer */
-	assert(value != NULL);
+	if (value == NULL) {
+        return 0;
+    }
 
 	value->temperature = 0;
 	value->relhum = 0;
@@ -329,7 +337,7 @@ uint8_t sht11_read_sensor(sht11_val_t *value, sht11_mode_t mode) {
 	}
 
 	if (mode & TEMPERATURE) {
-		value->temperature = D1 + (D2 * ((float) temp_int));
+		value->temperature = D1 + (D2 * ((float) temp_int)) + sht11_temperature_offset;
 	}
 	if (mode & HUMIDITY) {
 		value->relhum = C1 + (C2 * ((float) humi_int)) + (C3 * ((float) humi_int) * ((float) humi_int));

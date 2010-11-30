@@ -16,18 +16,14 @@
  */
 
 #include <stdio.h>
-#include "hwtimer.h"
-#include "hwtimer_cpu.h"
-#include "hwtimer_arch.h"
+#include <hwtimer.h>
+#include <hwtimer_cpu.h>
+#include <hwtimer_arch.h>
 
 #include <bitarithm.h>
 
-#define USE_NONBLOCKING_WAIT 1
-#if USE_NONBLOCKING_WAIT
-//#include <stdlib.h>
-#include "kernel.h"
-#include "mutex.h"
-#endif
+#include <kernel.h>
+#include <thread.h>
 
 /*---------------------------------------------------------------------------*/
 
@@ -37,8 +33,14 @@ typedef struct hwtimer_t {
     uint8_t checksum;
 } hwtimer_t;
 
+typedef struct hwtimer_wait_t {
+    unsigned int pid; /**< pid of waiting thread */
+    uint8_t state; /**<state of waiting thread */
+} hwtimer_wait_t;
+
 #define HWTIMER_QUEUESIZE   ARCH_MAXTIMERS
 #define Q_FULL              HWTIMER_QUEUESIZE + 1
+#define HWTIMER_WAIT_BACKOFF    (10)
 
 static hwtimer_t timer[HWTIMER_QUEUESIZE];
 static int queue[HWTIMER_QUEUESIZE];
@@ -52,8 +54,8 @@ static volatile long available_timers = 0;
 /*---------------------------------------------------------------------------*/
 
 static int enqueue(int item) {
-    // Test if timer is already cleared:
-    // (hack to prevent race-condition with proccing timer (ISR) and manual hwtimer_remove)
+    /* Test if timer is already cleared:
+     * (hack to prevent race-condition with proccing timer (ISR) and manual hwtimer_remove) */
     if (available_timers & (1 << item)) {
         return 1;
     }
@@ -62,7 +64,8 @@ static int enqueue(int item) {
     queue_tail = (queue_tail + 1) % HWTIMER_QUEUESIZE;
     queue_items++;
     if (queue_items == HWTIMER_QUEUESIZE) {
-        lpm_prevent_sleep &= ~LPM_PREVENT_SLEEP_HWTIMER; // Allow power down
+        /* Allow power down */
+        lpm_prevent_sleep &= ~LPM_PREVENT_SLEEP_HWTIMER; 
     }
     return 1;
 }
@@ -71,10 +74,12 @@ static int dequeue(void) {
     register int ret;
     if (!queue_items)
         return Q_FULL;
-    lpm_prevent_sleep |= LPM_PREVENT_SLEEP_HWTIMER;  // No power down while a timer is active
+    /* No power down while a timer is active */
+    lpm_prevent_sleep |= LPM_PREVENT_SLEEP_HWTIMER;  
     queue_items--;
     ret = queue[queue_head];
-    queue[queue_head] = 0xff; // Mark as empty
+    /* Mark as empty */
+    queue[queue_head] = 0xff;
     available_timers &= ~(1 << ret);
     queue_head = (queue_head + 1) % HWTIMER_QUEUESIZE;
     return ret;
@@ -85,8 +90,11 @@ static void multiplexer(int source) {
     timer[source].callback(timer[source].data);
 }
 
-static void hwtimer_releasemutex(void* mutex) {
-    mutex_unlock((mutex_t*)mutex, true);
+static void hwtimer_wakeup(void* hwt) {
+    ((hwtimer_wait_t*)hwt)->state = 0;
+    while (!(thread_wakeup((*((hwtimer_wait_t*)hwt)).pid))) {
+        hwtimer_set(HWTIMER_WAIT_BACKOFF, hwtimer_wakeup, (void*) &hwt);
+    }
 }
 
 void hwtimer_spin(unsigned long ticks)
@@ -113,7 +121,8 @@ void hwtimer_init_comp(uint32_t fcpu) {
     available_timers = 0;
     hwtimer_arch_init(multiplexer, fcpu);
     for (i = 0; i < HWTIMER_QUEUESIZE; i++) {
-        queue[i] = 0xff; // init queue as empty
+        /* init queue as empty */
+        queue[i] = 0xff;
     }
     for (i = 0; i < HWTIMER_QUEUESIZE; i++) {
         enqueue(i);
@@ -123,7 +132,7 @@ void hwtimer_init_comp(uint32_t fcpu) {
 /*---------------------------------------------------------------------------*/
 
 int hwtimer_active(void) {
-    return queue_items != HWTIMER_QUEUESIZE;
+    return (queue_items != HWTIMER_QUEUESIZE);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -137,34 +146,37 @@ unsigned long hwtimer_now(void)
 
 void hwtimer_wait(unsigned long ticks)
 {
-    mutex_t mutex;
-    if (ticks <= 4 || inISR()) {
+    if (ticks <= 6 || inISR()) {
         hwtimer_spin(ticks);
         return;
     }
-    mutex_init(&mutex);
-    mutex_lock(&mutex);
-    // -2 is to adjust the real value
-    int res = hwtimer_set(ticks-2, hwtimer_releasemutex, &mutex);
+    hwtimer_wait_t hwt;
+    hwt.pid = active_thread->pid;
+    hwt.state = 1;
+    /* -2 is to adjust the real value */
+    int res = hwtimer_set(ticks-2, hwtimer_wakeup, (void*) &hwt);
     if (res == -1) {
-        mutex_unlock(&mutex, true);
         hwtimer_spin(ticks);
         return;
     }
-    mutex_lock(&mutex);
+    while (hwt.state) {
+        thread_sleep();
+    }
 }
 
 /*---------------------------------------------------------------------------*/
 
 static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr, bool absolute)
 {
-    if (! inISR() ) dINT();
-//  hwtimer_arch_disable_interrupt();
+    if (!inISR()) {
+        dINT();
+    }
     int x = dequeue();
     if (x == Q_FULL) {
+        if (! inISR()) {
+            eINT();
+        }
         printf("[KT] no timers left\n");
-//      hwtimer_arch_enable_interrupt();
-        if (! inISR()) eINT();
         return -1;
     }
     
@@ -172,13 +184,16 @@ static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr
     timer[x].data = ptr;
     timer[x].checksum = ++timer_id;
 
-    if (absolute) 
+    if (absolute) {
         hwtimer_arch_set_absolute(offset, x);
-    else
+    }
+    else {
         hwtimer_arch_set(offset, x);
+    }
 
-    //hwtimer_arch_enable_interrupt();
-    if (! inISR()) eINT();
+    if (!inISR()) {
+        eINT();
+    }
     return (timer[x].checksum << 8) + x;
 }
 

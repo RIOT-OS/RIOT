@@ -28,11 +28,7 @@
 
 #undef wakeup
 
-#if WORDSIZE == 32
-typedef uint64_t swtime_t;
-#else
 typedef uint32_t swtime_t;
-#endif
 
 /**
  * A swtimer.
@@ -64,14 +60,23 @@ typedef struct swtimer_t {
     } action;
 } swtimer_t;
 
+/**
+ * @brief   Current system time
+ * @return  Time in ticks since system boot
+ */
 swtime_t swtimer_now();
 
+/**
+ * @brief   Initializes swtimer
+ * @return  always 0
+ */
 int swtimer_init();
 
 /**
  * @brief   set swtimer interval and activate 
  * @param[in]   t           pointer to preinitialised swtimer_t
  * @param[in]   interval    swtimer interval
+ * @return  always 0
  */
 int swtimer_set(swtimer_t *t, swtime_t interval);
 

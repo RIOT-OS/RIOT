@@ -44,39 +44,79 @@ and the mailinglist (subscription via web site)
 #include <sys/unistd.h>
 #include <string.h>
 #include <stdio.h>
-#include <malloc.h>
 #include <stdlib.h>
 #include <shell.h>
+#include <shell_commands.h>
+#include <stdint.h>
 
 static void(*find_handler(const shell_command_t *command_list, char *command))(char*) {
-    const shell_command_t *entry = command_list;
-
-    while(entry->name != NULL) {
+    const shell_command_t* entry = command_list;
+	if (entry) {
+			while (entry->name != NULL) {
+				if ( strcmp(entry->name, command) == 0) {
+					return entry->handler;
+				} else {
+					entry++;
+				}
+			}
+	}
+			
+#ifdef MODULE_SHELL_COMMANDS
+    entry = _shell_command_list;
+    while (entry->name != NULL) {
         if ( strcmp(entry->name, command) == 0) {
             return entry->handler;
         } else {
-            command_list++;
+            entry++;
         }
     }
+#endif
     return NULL;
+}
+
+static void print_help(const shell_command_t *command_list) {
+    const shell_command_t *entry = command_list;
+
+    printf("%-20s %s\n", "Command", "Description");
+    puts("---------------------------------------");
+
+	if (entry) {
+			while (entry->name != NULL) {
+				printf("%-20s %s\n", entry->name, entry->desc);
+				entry++;
+			}
+	}
+    
+#ifdef MODULE_SHELL_COMMANDS
+    entry = _shell_command_list;
+    while (entry->name != NULL) {
+        printf("%-20s %s\n", entry->name, entry->desc);
+        entry++;
+    }
+#endif
 }
 
 static void handle_input_line(shell_t *shell, char* line) {
     char* saveptr;
-    char* command = strtok_r(line, " ", &saveptr);
+    char* linedup = strdup(line);
+    char* command = strtok_r(linedup, " ", &saveptr);
 
     void (*handler)(char*) = NULL;
     
     if (command) {
         handler = find_handler(shell->command_list, command);
-        if (handler) {
+        if (handler != NULL) {
             handler(line);
         } else {
-            printf("shell: command \"%s\" not found.\n", command);
+            if ( strcmp("help", command) == 0) {
+                print_help(shell->command_list);
+            } else {
+                puts("shell: command not found.");
+            }
         }
     }
-    
-    free(line);
+
+    free(linedup);
 }
 
 int readline(shell_t *shell, char* buf, int size) {
@@ -109,12 +149,15 @@ void shell_run(shell_t *shell) {
         shell->put_char('>');
         int res = readline(shell, line_buf, sizeof(line_buf));
         if (! res ) {
-            handle_input_line(shell, strdup(line_buf));
+            char* line_copy = strdup(line_buf);
+            handle_input_line(shell, line_copy);
+            free(line_copy);
         }
     }
 }
 
-void shell_init(shell_t *shell, int(*readchar)(void), void(*put_char)(int)) {
+void shell_init(shell_t *shell, const shell_command_t *shell_commands, int(*readchar)(void), void(*put_char)(int)) {
+    shell->command_list = shell_commands;
     shell->readchar = readchar;
     shell->put_char = put_char;
 }

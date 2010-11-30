@@ -29,9 +29,9 @@ void shell_putchar(int c) {
 }
 
 const shell_command_t shell_commands[] = {
-    {"start_test", print_teststart},
-    {"end_test", print_testend},
-    {NULL, NULL}
+    {"start_test", "", print_teststart},
+    {"end_test", "", print_testend},
+    {NULL, NULL, NULL}
 };
 
 int main(void) {
@@ -43,10 +43,8 @@ int main(void) {
     posix_open(uart0_handler_pid, 0);
 
     shell_t shell;
-    shell_init(&shell, shell_readc, shell_putchar);
+    shell_init(&shell, shell_commands, shell_readc, shell_putchar);
 
-    shell.command_list = shell_commands;
-    
     shell_run(&shell);
 
     return 0;

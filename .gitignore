@@ -1,0 +1,5 @@
+*.o
+doc/doxygen/html
+doc/doxygen/latex
+doc/doxygen/man
+*bin

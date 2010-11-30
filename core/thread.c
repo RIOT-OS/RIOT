@@ -14,7 +14,6 @@
  */
 
 #include <errno.h>
-#include <malloc.h>
 #include <stdio.h>
 
 #include "thread.h"
@@ -45,11 +44,19 @@ void thread_sleep() {
 }
 
 int thread_wakeup(int pid) {
+    DEBUG("thread_wakeup: Trying to wakeup PID %i...\n", pid);
     int isr = inISR();
-    if (! isr) dINT();
+    if (! isr) {
+        DEBUG("thread_wakeup: Not in interrupt.\n");
+        dINT();
+    }
 
     int result = sched_threads[pid]->status;
     if (result == STATUS_SLEEPING) {
+<<<<<<< HEAD
+=======
+        DEBUG("thread_wakeup: Thread is sleeping.\n");
+>>>>>>> master
         sched_set_status((tcb*)sched_threads[pid], STATUS_RUNNING);
         if (!isr) {
             eINT();
@@ -57,8 +64,9 @@ int thread_wakeup(int pid) {
         } else {
             sched_context_switch_request = 1;
         }
-        return 0;
+        return 1;
     } else {
+        DEBUG("thread_wakeup: Thread is not sleeping!\n");
         if (!isr) eINT();
         return STATUS_NOT_FOUND;
     }
@@ -74,30 +82,26 @@ int thread_measure_stack_usage(char* stack) {
     return space;
 }
 
-int thread_create(int stacksize, char priority, int flags, void (*function) (void), const char* name)
+int thread_create(char *stack, int stacksize, char priority, int flags, void (*function) (void), const char* name)
 {
-    /* stacksize must be a multitude of 4 for alignment and stacktest */
-//  assert( ((stacksize & 0x03) == 0) && (stacksize > 0) );
+    /* allocate our thread control block at the top of our stackspace */
+    int total_stacksize = stacksize;
+    stacksize -= sizeof(tcb);
 
-    // TODO: shall we autoalign the stack?
-    // stacksize += 4-(~(stacksize & 0x0003));
+    /* align tcb address on 32bit boundary */
+    unsigned int tcb_address = (unsigned int) stack + stacksize;
+    if ( tcb_address & 1 ) {
+        tcb_address--;
+        stacksize--;
+    }
+    if ( tcb_address & 2 ) {
+        tcb_address-=2;
+        stacksize-=2;
+    }
+    tcb *cb = (tcb*) tcb_address;
 
     if (priority >= SCHED_PRIO_LEVELS) {
         return -EINVAL;
-    }
-
-    tcb *pd = (tcb*)malloc(sizeof(tcb));
-    if ( pd == NULL) {
-        DEBUG("thread_create(): out of memory\n");
-        return -ENOMEM;
-    }
-
-    char *stack = (char*)malloc(stacksize);
-    if (stack==NULL)
-    {
-        DEBUG("thread_create(): out of memory\n");
-        free (pd);
-        return -ENOMEM;
     }
 
     if (flags & CREATE_STACKTEST) {
@@ -120,8 +124,13 @@ int thread_create(int stacksize, char priority, int flags, void (*function) (voi
     int pid = 0;
     while (pid < MAXTHREADS) {
         if (sched_threads[pid] == NULL) {
+<<<<<<< HEAD
             sched_threads[pid] = pd;
             pd->pid = pid;
+=======
+            sched_threads[pid] = cb;
+            cb->pid = pid;
+>>>>>>> master
             break;
         }
         pid++;
@@ -130,42 +139,48 @@ int thread_create(int stacksize, char priority, int flags, void (*function) (voi
     if (pid == MAXTHREADS) {
         DEBUG("thread_create(): too many threads!\n");
 
-        free (pd);
-        free (stack);
-
         if (! inISR()) {
             eINT();
         }
         return -EOVERFLOW;
     }
 
+<<<<<<< HEAD
     pd->sp = thread_stack_init(function,stack+stacksize);
     pd->stack_start = stack;
     pd->stack_size = stacksize;
+=======
+    cb->sp = thread_stack_init(function,stack+stacksize);
+    cb->stack_start = stack;
+    cb->stack_size = total_stacksize;
 
-    pd->priority = priority;
-    pd->status = 0;
+    cb->priority = priority;
+    cb->status = 0;
+>>>>>>> master
 
-    pd->name = name;
+    cb->rq_entry.data = (unsigned int) cb;
+    cb->rq_entry.next = NULL;
+    cb->rq_entry.prev = NULL;
 
-    pd->wait_data = NULL;
+    cb->name = name;
 
-    pd->msg_queue.data = 0;
-    pd->msg_queue.priority = 0;
-    pd->msg_queue.next = NULL;
+    cb->wait_data = NULL;
 
-    pd->rq_entry.data = (unsigned int) pd;
-    pd->rq_entry.next = NULL;
-    pd->rq_entry.prev = NULL;
+    cb->msg_waiters.data = 0;
+    cb->msg_waiters.priority = 0;
+    cb->msg_waiters.next = NULL;
+
+    cib_init(&(cb->msg_queue),0);
+    cb->msg_array = NULL;
 
     num_tasks++;
 
-    DEBUG("Created thread %s. PID: %u. Priority: %u.\n", name, pd->pid, priority);
+    DEBUG("Created thread %s. PID: %u. Priority: %u.\n", name, cb->pid, priority);
 
     if (flags & CREATE_SLEEPING) {
-        sched_set_status(pd, STATUS_SLEEPING);
+        sched_set_status(cb, STATUS_SLEEPING);
     } else {
-        sched_set_status(pd, STATUS_PENDING);
+        sched_set_status(cb, STATUS_PENDING);
         if (!(flags & CREATE_WOUT_YIELD)) {
             if (! inISR()) {
                 eINT();

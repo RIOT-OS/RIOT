@@ -177,7 +177,7 @@ rule Test
 }
 actions Test
 {
-    for tst in projects/$(PROJECT)/tests/*; do $tst; done
+    export PORT=$(PORT); for tst in projects/$(PROJECT)/tests/*; do $tst; done
 }
 
 # Reset connected sensor node
@@ -356,5 +356,4 @@ actions ShowFlags {
     echo $(CCFLAGS) $(CCDEFS) -D$(MODULE_DEFINES) | tr ' ' '\n  ' | sort
     echo "" | $(CC) -E -dD -
 }
-
 

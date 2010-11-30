@@ -1,0 +1,70 @@
+#!/usr/bin/expect
+
+set timeout 5
+
+spawn pseudoterm $env(PORT)
+
+expect { 
+    ">$" {} 
+    timeout { exit 1 }
+}
+
+send "start_test\n" 
+expect {
+    "\[TEST_START\]" {}
+    timeout { exit 1 }
+}
+
+expect { 
+    ">$" {} 
+    timeout { exit 1 }
+}
+
+send "thread_sleep\n" 
+expect {
+"   main: running. integer=0, i=1." {}
+"   main: running. integer=0, i=2." {}
+"Waking up sleeper." {}
+"sleeper: running. integer=1, i=2." {}
+"sleeper: running. integer=2, i=2." {}
+"Going to sleep." {}
+"   main: running. integer=2, i=3." {}
+"   main: running. integer=2, i=4." {}
+"Waking up sleeper." {}
+"Woke up!" {}
+"sleeper: running. integer=3, i=4." {}
+"sleeper: running. integer=4, i=4." {}
+"Going to sleep." {}
+"   main: running. integer=4, i=5." {}
+"   main: running. integer=4, i=6." {}
+"Waking up sleeper." {}
+"Woke up!" {}
+"sleeper: running. integer=5, i=6." {}
+"sleeper: running. integer=6, i=6." {}
+"Going to sleep." {}
+"   main: running. integer=6, i=7." {}
+"   main: running. integer=6, i=8." {}
+"Waking up sleeper." {}
+"Woke up!" {}
+"sleeper: running. integer=7, i=8." {}
+"sleeper: running. integer=8, i=8." {}
+"Going to sleep." {}
+"   main: running. integer=8, i=9." {}
+"   main: running. integer=8, i=10." {}
+"Waking up sleeper." {}
+"Woke up!" {}
+"sleeper: running. integer=9, i=10." {}
+"sleeper: running. integer=10, i=10." {}
+"Going to sleep." {}
+    ">$" {} 
+    timeout { exit 1 }
+}
+
+send "end_test\n" 
+
+expect {
+    "\[TEST_END\]" {}
+    timeout { exit 1 }
+}
+
+puts "\nTest successful!\n"

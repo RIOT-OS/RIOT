@@ -67,8 +67,8 @@ Debug debug : $(TARGET) ;
 ListModules listmodules ;
 ShowFlags showflags : $(TARGET) ;
 
-SubInclude TOP projects $(PROJECT) ;
 SubInclude TOP sys ;
 SubInclude TOP core ;
 SubInclude TOP drivers ;
 SubInclude TOP board ;
+SubInclude TOP projects $(PROJECT) ;

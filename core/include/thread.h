@@ -14,12 +14,15 @@
  */
 
 #include <kernel.h>
+#include <tcb.h>
 
+/** Minimum stack size */
+#define MINIMUM_STACK_SIZE	(sizeof(tcb))
 
 /**
  * @brief Creates a new thread.
- * This version will allocate it's stack itself using malloc.
- *
+ * 
+ * @param   stack Lowest address of preallocated stack space
  * @param   stacksize
  * @param   flags Options: 
  * YIELD: force context switch.
@@ -32,7 +35,7 @@
  *
  * @return  returns <0 on error, pid of newly created task else.
 */
-int thread_create(int stacksize, char priority, int flags, void (*function) (void), const char* name);
+int thread_create(char *stack, int stacksize, char priority, int flags, void (*function) (void), const char* name);
 
 /**
  * @brief   returns the status of a process.

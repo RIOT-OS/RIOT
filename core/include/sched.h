@@ -15,7 +15,7 @@
 
 #define MAXTHREADS 32
 
-#ifdef ARCH_32_BIT
+#if ARCH_32_BIT
 #define SCHED_PRIO_LEVELS 32
 #else
 #define SCHED_PRIO_LEVELS 16
@@ -25,6 +25,7 @@ void sched_init();
 void sched_run();
 
 void sched_set_status(tcb *process, unsigned int status);
+void sched_switch(uint16_t current_prio, uint16_t other_prio, int in_isr);
 
 volatile unsigned int sched_context_switch_request;
 

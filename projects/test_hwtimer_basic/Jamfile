@@ -1,0 +1,5 @@
+SubDir TOP projects test_hwtimer ;
+
+Module test_hwtimer : main.c : hwtimer ;
+
+UseModule test_hwtimer ;
