@@ -1,6 +1,8 @@
 #include <shell.h>
 #include <stdlib.h>
 
+extern void _id_handler(char* id);
+
 #ifdef MODULE_PS
 extern void _ps_handler(char* unused);
 #endif
@@ -36,11 +38,12 @@ extern void _cc1100_ng_monitor_handler(char *mode);
 #endif
 
 const shell_command_t _shell_command_list[] = {
+    {"id", "Gets or sets the node's id.", _id_handler},
 #ifdef MODULE_PS
     {"ps", "Prints information about running threads.", _ps_handler},
 #endif
 #ifdef MODULE_RTC
-    {"date", "Geets or gets current date and time.", _date_handler},
+    {"date", "Gets or sets current date and time.", _date_handler},
 #endif
 #ifdef MODULE_SHT11
     {"temp", "Prints measured temperature.", _get_temperature_handler},

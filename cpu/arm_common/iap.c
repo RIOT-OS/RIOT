@@ -5,11 +5,15 @@
  * 
  */
 
-#include <iap.h>
+#include <irq.h>
+#include <flashrom.h>
 #include <lpc2387.h>
 
 #define ENABLE_DEBUG
 #include <debug.h>
+
+/* pointer to reserved flash rom section for configuration data */
+__attribute ((aligned(256))) char configmem[256] __attribute__ ((section (".configmem")));
 
 static unsigned int iap_command[5];			// contains parameters for IAP command
 static unsigned int iap_result[2];			// contains results
@@ -27,15 +31,19 @@ static uint32_t iap(uint32_t code, uint32_t p1, uint32_t p2, uint32_t p3, uint32
 /******************************************************************************
  * P U B L I C   F U N C T I O N S
  *****************************************************************************/
-uint8_t	iap_write(uint32_t dst, char *src, uint32_t size) {
+uint8_t	flashrom_write(uint32_t dst, char *src, uint32_t size) {
 	char err;
-	uint32_t buffer_vic;
+	unsigned intstate;
 	uint8_t sec;
 	
-	buffer_vic  = VICIntEnable;		// save interrupt enable
-	VICIntEnClr = 0xFFFFFFFF;		// clear vic
+	//buffer_vic  = VICIntEnable;		// save interrupt enable
+	//VICIntEnClr = 0xFFFFFFFF;		// clear vic
 	
-	sec = iap_get_sector(dst);
+	sec = flashrom_get_sector(dst);
+    if (sec == INVALID_ADDRESS) {
+        DEBUG("Invalid address\n");
+        return 0;
+    }
 
     /* check sector */
 	if(blank_check_sector(sec, sec) == SECTOR_NOT_BLANK) {
@@ -43,35 +51,39 @@ uint8_t	iap_write(uint32_t dst, char *src, uint32_t size) {
 	}
 
     /* prepare sector */
-	err = prepare_sectors(iap_get_sector(dst), iap_get_sector(dst));
+	err = prepare_sectors(sec, sec);
     if (err) {
-		DEBUG("\n-- ERROR: PREPARE_SECTOR_FOR_WRITE_OPERATION: %u", err);
+		DEBUG("\n-- ERROR: PREPARE_SECTOR_FOR_WRITE_OPERATION: %u\n", err);
         /* set interrupts back and return */
-        VICIntEnable = buffer_vic;	
+//        VICIntEnable = buffer_vic;	
 		return 0;
 	}
     /* write flash */
 	else {
-		err = copy_ram_to_flash(dst, (uint32_t) src, size);
+        intstate = disableIRQ();
+		err = copy_ram_to_flash(dst, (uint32_t) src, 256);
+        restoreIRQ(intstate);
 		if(err) {
 			DEBUG("ERROR: COPY_RAM_TO_FLASH: %u\n", err);
             /* set interrupts back and return */
-            VICIntEnable = buffer_vic;	
+            restoreIRQ(intstate);
+//            VICIntEnable = buffer_vic;	
 			return 0;
 		}
         /* check result */
 		else {
-			err = compare(dst, (uint32_t) src, size);
+			err = compare(dst, (uint32_t) src, 256);
             if (err) {
 				DEBUG("ERROR: COMPARE: %i (at position %u)\n", err, iap_result[1]);
                 /* set interrupts back and return */
-	            VICIntEnable = buffer_vic;
+//	            VICIntEnable = buffer_vic;
 				return 0;
 			}
 			else
 			{
 				DEBUG("Data successfully written!\n");
                 /* set interrupts back and return */
+//	            VICIntEnable = buffer_vic;
 				return 1;			
 			}
 		}
@@ -79,24 +91,35 @@ uint8_t	iap_write(uint32_t dst, char *src, uint32_t size) {
 }
 
 
-uint8_t iap_erase(uint32_t addr) {
+uint8_t flashrom_erase(uint32_t addr) {
+    uint8_t sec = flashrom_get_sector(addr);
+    unsigned intstate;
+    
+    if (sec == INVALID_ADDRESS) {
+        DEBUG("Invalid address\n");
+        return 0;
+    }
+
     /* check sector */
-	if (!blank_check_sector(iap_get_sector(addr), iap_get_sector(addr))) {
+	if (!blank_check_sector(sec, sec)) {
 		DEBUG("Sector already blank!\n");
 		return 1;
 	}
 	/* prepare sector */
-    if (prepare_sectors(iap_get_sector(addr), iap_get_sector(addr))) {
+    if (prepare_sectors(sec, sec)) {
 		DEBUG("-- ERROR: PREPARE_SECTOR_FOR_WRITE_OPERATION --\n");
 		return 0;
 	}
+    intstate = disableIRQ();
     /* erase sector */
-	if (erase_sectors(iap_get_sector(addr), iap_get_sector(addr))) {
+	if (erase_sectors(sec, sec)) {
 		DEBUG("-- ERROR: ERASE SECTOR --\n");
+        restoreIRQ(intstate);
 		return 0;
 	}
+    restoreIRQ(intstate);
     /* check again */
-	if (blank_check_sector(iap_get_sector(addr), iap_get_sector(addr))) {
+	if (blank_check_sector(sec, sec)) {
 		DEBUG("-- ERROR: BLANK_CHECK_SECTOR\n");
 		return 0;
 	}
