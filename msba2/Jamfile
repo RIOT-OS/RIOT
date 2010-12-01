@@ -27,7 +27,7 @@
 
 SubDir TOP board msba2 ;
 
-Module board : board_init.c ;
+Module board : board_init.c config.c ;
 UseModule board ;
 UseModule board_common ;
 
