@@ -27,6 +27,7 @@
 
 SubDir TOP sys ;
 
+Module timex : timex.c ;
 Module swtimer : swtimer.c : hwtimer ;
 Module posix_io : posix_io.c ;
 
