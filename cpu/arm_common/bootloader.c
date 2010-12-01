@@ -165,6 +165,7 @@ void bootloader(void) {
     extern void bl_init_ports(void);
     extern void bl_init_clks(void);
     extern void bl_blink(void);
+    extern void bl_config_init(void);
 
     /* board specific setup of clocks */
     bl_init_clks();
@@ -176,6 +177,9 @@ void bootloader(void) {
     bl_blink();
     /* board specific setup of UART */
     bl_uart_init();
+
+    /* initialize board configuration */
+    bl_config_init();
 
     printf("Board initialized.\n");
 }

@@ -26,6 +26,8 @@
 #define COMPARE_ERROR                               (10)
 #define BUSY                                        (11)
 
+#define INVALID_ADDRESS     (0xFF)
+
 /* IAP start location on flash */
 #define IAP_LOCATION    (0x7FFFFFF1)
 
@@ -42,7 +44,7 @@
  *
  * @return          1 on success, 0 otherwise
  */
-uint8_t          	iap_erase(uint32_t addr);
+uint8_t          	flashrom_erase(uint32_t addr);
 
 /* @brief Write buffer from ram to flash
  *
@@ -52,7 +54,7 @@ uint8_t          	iap_erase(uint32_t addr);
  *
  * @return          1 on success, 0 otherwise
  */
-uint8_t 			iap_write(uint32_t dst, char *src, uint32_t size);
+uint8_t 			flashrom_write(uint32_t dst, char *src, uint32_t size);
 
 /*
  * @brief:  Converts 'addr' to sector number
@@ -62,6 +64,6 @@ uint8_t 			iap_write(uint32_t dst, char *src, uint32_t size);
  * 
  * @return  Sector number. 0xFF on error
  */
-uint8_t iap_get_sector(uint32_t addr);
+uint8_t flashrom_get_sector(uint32_t addr);
 
 #endif /*IAP_H_*/

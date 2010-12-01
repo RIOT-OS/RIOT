@@ -94,6 +94,8 @@ void radio(void) {
             printf("\tLength:\t%u\n", p->length);
             printf("\tSrc:\t%u\n", p->src);
             printf("\tDst:\t%u\n", p->dst);
+            printf("\tLQI:\t%u\n", p->lqi);
+            printf("\tRSSI:\t%u\n", p->rssi);
 
             for (i = 0; i < p->length; i++) {
                 printf("%02X ", p->data[i]);

@@ -6,6 +6,7 @@
 #include <cc1100_spi.h>
 
 #include <hwtimer.h>
+#include <config.h>
 
 //#define ENABLE_DEBUG    (1)
 #include <debug.h>
@@ -20,9 +21,6 @@ cc1100_statistic_t cc1100_statistic;
 
 volatile cc1100_flags rflags;		                ///< Radio control flags
 volatile uint8_t radio_state = RADIO_UNKNOWN;		///< Radio state
-
-static uint8_t radio_address;		                ///< Radio address
-static uint8_t radio_channel;		                ///< Radio channel
 
 int transceiver_pid;                         ///< the transceiver thread pid
 
@@ -65,8 +63,8 @@ void cc1100_init(int tpid) {
 	rflags.WOR_RST      = 0;
 
 	/* Set default channel number */
-	cc1100_set_channel(CC1100_DEFAULT_CHANNR);
-    DEBUG("CC1100 initialized and set to channel %i\n", radio_channel);
+	cc1100_set_channel(sysconfig.radio_channel);
+    DEBUG("CC1100 initialized and set to channel %i\n", sysconfig.radio_channel);
 
 	// Switch to desired mode (WOR or RX)
 	rd_set_mode(RADIO_MODE_ON);
@@ -93,7 +91,7 @@ uint8_t cc1100_get_buffer_pos(void) {
 }
 
 radio_address_t cc1100_get_address() {
-    return radio_address;
+    return sysconfig.radio_address;
 }
 
 radio_address_t cc1100_set_address(radio_address_t address) {
@@ -106,8 +104,9 @@ radio_address_t cc1100_set_address(radio_address_t address) {
 		write_register(CC1100_ADDR, id);
 	}
 
-	radio_address = id;
-	return radio_address;
+	sysconfig.radio_address = id;
+    config_save();
+	return sysconfig.radio_address;
 }
 
 void cc1100_set_monitor(uint8_t mode) {
@@ -207,7 +206,7 @@ char* cc1100_state_to_text(uint8_t state) {
 void cc1100_print_config(void) {
 	printf("Current radio state:          %s\r\n", cc1100_state_to_text(radio_state));
 	printf("Current MARC state:           %s\r\n", cc1100_get_marc_state());
-	printf("Current channel number:       %u\r\n", radio_channel);
+	printf("Current channel number:       %u\r\n", sysconfig.radio_channel);
 }
 
 void switch_to_pwd(void) {
@@ -223,12 +222,13 @@ int16_t cc1100_set_channel(uint8_t channr) {
         return 0;
     }
 	write_register(CC1100_CHANNR, channr*10);
-	radio_channel = channr;
-	return radio_channel;
+	sysconfig.radio_channel = channr;
+    config_save();
+	return sysconfig.radio_channel;
 }
 
 int16_t cc1100_get_channel(void) {
-    return radio_channel;
+    return sysconfig.radio_channel;
 }
 
 
