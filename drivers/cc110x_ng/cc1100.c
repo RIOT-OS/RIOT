@@ -202,14 +202,14 @@ char* cc1100_state_to_text(uint8_t state) {
 	}
 }
 
-
 void cc1100_print_config(void) {
 	printf("Current radio state:          %s\r\n", cc1100_state_to_text(radio_state));
 	printf("Current MARC state:           %s\r\n", cc1100_get_marc_state());
 	printf("Current channel number:       %u\r\n", sysconfig.radio_channel);
 }
 
-void switch_to_pwd(void) {
+void cc1100_switch_to_pwd(void) {
+    DEBUG("[cc110x_ng] switching to powerdown\n");
     cc1100_wakeup_from_rx();
 	cc1100_spi_strobe(CC1100_SPWD);
 	radio_state = RADIO_PWD;

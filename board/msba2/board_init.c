@@ -167,7 +167,6 @@ void bl_config_init(void) {
     extern char configmem[];
    if (*((uint16_t*) configmem) ==  CONFIG_KEY) {
        memcpy(&sysconfig, (configmem + sizeof(CONFIG_KEY)), sizeof(sysconfig));
-       LED_GREEN_TOGGLE;
    }
    else {
        config_save();

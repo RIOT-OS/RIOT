@@ -1,6 +1,8 @@
 #ifndef CC1100_CONFIG_H
 #define CC1100_CONFIG_H
 
+#include <timex.h>
+
 /** CC1100 register configuration */
 typedef struct {
 	uint8_t IOCFG2;
@@ -56,6 +58,7 @@ typedef struct {
 typedef struct
 {
 	uint32_t TOF;				///< Time of flight of the last packet and last ACK
+    timex_t  TOA;               ///< Time of packet arriveal
 	uint32_t TCP;				///< Time to compute packet
 	unsigned RPS		: 16;	///< Raw packets sent to transmit last packet
 	unsigned RTC		: 8;	///< Retransmission count of last send packet
@@ -82,10 +85,8 @@ typedef struct cc1100_statistic {
 	uint32_t	packets_in_dups;
 	uint32_t	packets_in_up;
 	uint32_t	packets_out;
-	uint32_t	packets_out_acked;
 	uint32_t	packets_out_broadcast;
 	uint32_t	raw_packets_out;
-	uint32_t	raw_packets_out_acked;
 	uint32_t	acks_send;
 	uint32_t	rx_buffer_max;
 	uint32_t	watch_dog_resets;

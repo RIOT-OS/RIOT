@@ -82,5 +82,3 @@ void _cc1100_ng_monitor_handler(char *mode) {
         puts("Usage:\nmonitor <MODE>");
     }
 }
-
-
