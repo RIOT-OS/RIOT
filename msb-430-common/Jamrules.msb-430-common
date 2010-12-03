@@ -34,4 +34,5 @@ FLASHFLAGS ?= -d $(FLASH_PORT) -j uif ;
 
 RESET ?= $(FLASHER) $(FLASHFLAGS) reset ;
 
+HDRS += [ FPath $(TOP) board msb-430-common include ] ;
 HDRS += [ FPath $(TOP) board msb-430-common drivers include ] ;
