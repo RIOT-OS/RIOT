@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
+
+#ifdef MODULE_RTC
 #include <lpc2387-rtc.h>
 #include <sys/time.h>
-#include <string.h>
 
 void _gettime_handler(void) {
     struct tm now;
@@ -46,3 +48,5 @@ void _date_handler(char* c) {
 		_settime_handler(c);
 	}
 }
+
+#endif

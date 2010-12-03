@@ -3,6 +3,8 @@
 #include <sht11.h>
 #include <string.h>
 
+#ifdef MODULE_SHT11
+
 extern float sht11_temperature_offset;
 
 void _get_humidity_handler(char* unused) {
@@ -51,3 +53,5 @@ void _set_offset_handler(char* offset) {
 		printf("Temperature offset set to %f\n", sht11_temperature_offset);
 	}
 }
+
+#endif

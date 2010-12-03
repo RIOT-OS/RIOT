@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <transceiver.h>
 #include <cc1100_ng.h>
@@ -16,7 +17,8 @@ void _cc1100_ng_get_set_address_handler(char *addr) {
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &a;
     mesg.content.ptr = (char*) &tcmd;
-    if (sscanf(addr, "addr %hi", &a) > 0) {
+    a = atoi(addr+5);
+    if (strlen(addr) > 5) {
         printf("[cc1100] Trying to set address %i\n", a);
         mesg.type = SET_ADDRESS;
     }
@@ -33,7 +35,8 @@ void _cc1100_ng_get_set_channel_handler(char *chan) {
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &c;
     mesg.content.ptr = (char*) &tcmd;
-    if (sscanf(chan, "chan %hi", &c) > 0) {
+    c = atoi(chan+5);
+    if (strlen(chan) > 5) {
         printf("[cc1100] Trying to set channel %i\n", c);
         mesg.type = SET_CHANNEL;
     }
@@ -51,7 +54,10 @@ void _cc1100_ng_send_handler(char *pkt) {
     tcmd.data = &p;
     uint16_t addr;
 
-    if (sscanf(pkt, "txtsnd %hu %s", &(addr), text_msg) == 2) {
+    addr = atoi(pkt+7);
+    memcpy(text_msg, "Text", 5);
+    /*    if (sscanf(pkt, "txtsnd %hu %s", &(addr), text_msg) == 2) {*/
+    if (1 == 1) {
         p.data = (uint8_t*) text_msg;
         p.length = strlen(text_msg);
         p.dst = addr;
@@ -73,7 +79,8 @@ void _cc1100_ng_monitor_handler(char *mode) {
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &m;
     mesg.content.ptr = (char*) &tcmd;
-    if (sscanf(mode, "monitor %u", &m) == 1) {
+    m = atoi(mode+8);
+    if (strlen(mode) > 8) {
         printf("Setting monitor mode: %u\n", m);
         mesg.type = SET_MONITOR;
         msg_send(&mesg, transceiver_pid, 1);

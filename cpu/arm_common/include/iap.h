@@ -38,25 +38,6 @@
 #define PLLSTAT_PLOCK	(0x0400)	//</ PLL Lock Status
 
 /*
- * @brief Erase sector
- *
- * @param addr      Address within a flash sector to erase
- *
- * @return          1 on success, 0 otherwise
- */
-uint8_t          	flashrom_erase(uint32_t addr);
-
-/* @brief Write buffer from ram to flash
- *
- * @param dst       Address within a flash sector to write, must be a 256 byte boundary
- * @param src       Address within ram, must be a word boundary
- * @param size      Bytes to write
- *
- * @return          1 on success, 0 otherwise
- */
-uint8_t 			flashrom_write(uint32_t dst, char *src, uint32_t size);
-
-/*
  * @brief:  Converts 'addr' to sector number
  * @note:   Sector table (Users Manual P. 610)
  * 
@@ -64,6 +45,6 @@ uint8_t 			flashrom_write(uint32_t dst, char *src, uint32_t size);
  * 
  * @return  Sector number. 0xFF on error
  */
-uint8_t flashrom_get_sector(uint32_t addr);
+uint8_t iap_get_sector(uint32_t addr);
 
 #endif /*IAP_H_*/

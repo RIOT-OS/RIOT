@@ -12,13 +12,15 @@
 #include <transceiver.h>
 #include <cc1100_ng.h>
 
-#define RADIO_STACK_SIZE    (1024)
+#define SHELL_STACK_SIZE    (512)
+#define RADIO_STACK_SIZE    (512)
 
 #define SND_BUFFER_SIZE     (3)
 #define RCV_BUFFER_SIZE     (4)
 
 #define SENDING_DELAY       (5 * 1000)
 
+char shell_stack_buffer[SHELL_STACK_SIZE];
 char radio_stack_buffer[RADIO_STACK_SIZE];
 
 uint8_t snd_buffer[SND_BUFFER_SIZE][CC1100_MAX_DATA_LENGTH];
@@ -31,6 +33,20 @@ static radio_packet_t p;
 
 void sender(char *count);
 void print_buffer(char *unused);
+
+shell_t shell;
+const shell_command_t sc[] = {
+    {"snd", "", sender},
+    {"buffer", "", print_buffer},
+    {NULL, NULL, NULL}
+};
+
+void shell_runner(void) {
+    shell_init(&shell, sc, uart0_readc, uart0_putc);
+    posix_open(uart0_handler_pid, 0);
+    shell_run(&shell);
+}
+
 
 void sender(char *count) {
     unsigned int c = 3;
@@ -104,11 +120,17 @@ int main(void) {
     for (i = 0; i < SND_BUFFER_SIZE; i++) { 
         memset(snd_buffer[i], i, CC1100_MAX_DATA_LENGTH);
     }
+    thread_create(shell_stack_buffer, SHELL_STACK_SIZE, PRIORITY_MAIN-2, CREATE_STACKTEST, shell_runner, "shell");
     radio_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE, PRIORITY_MAIN-2, CREATE_STACKTEST, radio, "radio");
     transceiver_init(TRANSCEIVER_CC1100);
     transceiver_start();
     transceiver_register(TRANSCEIVER_CC1100, radio_pid);
     sender(NULL);
+
+    printf("Config:\n");
+    printf("\tid: %u\n", sysconfig.id);
+    printf("\taddr: %u\n", sysconfig.radio_address);
+    printf("\tchannel: %u\n", sysconfig.radio_channel);
    
    while (1) {
        extern void thread_print_all(void);

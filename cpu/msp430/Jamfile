@@ -27,7 +27,7 @@
 
 SubDir TOP cpu msp430 ;
 
-Module cpu : msp430-main.c cpu.c atomic.c irq.c ;
+Module cpu : msp430-main.c cpu.c atomic.c irq.c flashrom.c ;
 Module hwtimer_cpu : hwtimer_cpu.c ;
 
 UseModule cpu ;

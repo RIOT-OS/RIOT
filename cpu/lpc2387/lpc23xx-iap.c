@@ -1,7 +1,8 @@
 #include <stdint.h>
 #include <flashrom.h>
+#include <iap.h>
 
-uint8_t flashrom_get_sector(uint32_t addr) {
+uint8_t iap_get_sector(uint32_t addr) {
 	if ((addr >=0x00000000) && (addr <= 0x00000FFF)) {
         return 0; 	
     }
