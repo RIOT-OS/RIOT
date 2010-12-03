@@ -37,6 +37,9 @@ and the mailinglist (subscription via web site)
 
 #define KERNEL_CONF_STACKSIZE_IDLE 64
 #define MSP430_ISR_STACK_SIZE 256
+
+#define RX_BUF_SIZE (4)
+#define TRANSCEIVER_BUFFER_SIZE (4)
 /** @} */
 
 #endif /* CPUCONF_H_ */

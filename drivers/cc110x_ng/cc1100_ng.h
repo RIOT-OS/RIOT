@@ -6,8 +6,6 @@
 #include <stdint.h>
 #include <cc1100-config.h>
 
-#define RX_BUF_SIZE (10)
-
 #define CC1100_MAX_DATA_LENGTH (58)
 
 #define CC1100_HEADER_LENGTH   (3)             ///< Header covers SRC, DST and FLAGS

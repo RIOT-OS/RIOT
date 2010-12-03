@@ -68,12 +68,12 @@ int main(void)
     cc1100_set_address(2);
 
    
-    while(1) {
+//    while(1) {
         puts(".");
         int result = cc1100_send_csmaca(1, 4, 2, i, sizeof(i));
         printf("%i\n", result);
         hwtimer_wait(1000 * 1000);
-    }
+//    }
 #else
     cc1100_set_address(1);
     while(1) {

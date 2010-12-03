@@ -20,6 +20,10 @@
 #endif
 
 //#define ENABLE_DEBUG (1)
+#ifdef ENABLE_DEBUG
+#undef TRANSCEIVER_BUFFER_SIZE
+#define TRANSCEIVER_BUFFER_SIZE (2048)
+#endif
 #include <debug.h>
 
 /*------------------------------------------------------------------------------------*/

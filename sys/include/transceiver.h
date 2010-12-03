@@ -3,17 +3,15 @@
 
 #include <radio/types.h>
 
-/* Packets to buffer */
-#define TRANSCEIVER_BUFFER_SIZE      (10)
 /* Stack size for transceiver thread */
-#define TRANSCEIVER_STACK_SIZE      (2048)
+#define TRANSCEIVER_STACK_SIZE      (512)
 
 /* The maximum of threads to register */
-#define TRANSCEIVER_MAX_REGISTERED  (10)
+#define TRANSCEIVER_MAX_REGISTERED  (4)
 
 /* The size of the message queue between driver and transceiver (must be power
  * of two */
-#define TRANSCEIVER_MSG_BUFFER_SIZE     (64)
+#define TRANSCEIVER_MSG_BUFFER_SIZE     (32)
 
 /**
  * @brief Message types for transceiver interface

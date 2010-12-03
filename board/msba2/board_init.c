@@ -51,12 +51,6 @@ and the mailinglist (subscription via web site)
 #define PCRTC         BIT9
 #define CL_CPU_DIV    4
 
-config_t sysconfig  = {
-    0,      ///< default ID
-    0,      ///< default radio address
-    0,      ///< default radio channel
-};
-
 /*---------------------------------------------------------------------------*/
 /**
  * @brief   Enabling MAM and setting number of clocks used for Flash memory fetch

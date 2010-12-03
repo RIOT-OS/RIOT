@@ -84,5 +84,8 @@ and the mailinglist (subscription via web site)
 #define CC_CONF_WARN_UNUSED_RESULT		__attribute__((warn_unused_result))
 /** @} */
 
+#define TRANSCEIVER_BUFFER_SIZE (10)
+#define RX_BUF_SIZE  (10)
+
 /** @} */
 #endif /* CPUCONF_H_ */

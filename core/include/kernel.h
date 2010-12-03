@@ -22,6 +22,7 @@
  */
 
 #include <stdbool.h>
+#include <config.h>
 #include "tcb.h"
 #include "cpu.h"
 #include "flags.h"
@@ -84,6 +85,8 @@ int inISR(void);
 #define LPM_PREVENT_SLEEP_HWTIMER    BIT1
 
 extern volatile int lpm_prevent_sleep;
+
+extern config_t sysconfig;
 
 /** @} */
 #endif /* KERNEL_H_ */

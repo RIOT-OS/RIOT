@@ -8,6 +8,7 @@
 #include <msg.h>
 #include <transceiver.h>
 
+#include <cpu-conf.h>
 #include <board.h>
 
 static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length);
@@ -96,7 +97,8 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length) {
 
 	/* Any bytes available in RX FIFO? */
 	if ((cc1100_spi_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO)) {
-        LED_GREEN_TOGGLE;
+        //LED_GREEN_TOGGLE;
+        LED_RED_TOGGLE;
 		// Read length byte (first byte in RX FIFO)
         packetLength = cc1100_spi_read_reg(CC1100_RXFIFO);
 		// Read data from RX FIFO and store in rxBuffer

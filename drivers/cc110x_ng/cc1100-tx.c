@@ -60,7 +60,7 @@ uint8_t cc1100_send(cc1100_packet_t *packet) {
     restoreIRQ(cpsr);
 	// Wait for GDO2 to be cleared -> end of packet
     while (cc1100_get_gdo2() != 0);
-    LED_GREEN_TOGGLE;
+    //LED_GREEN_TOGGLE;
 
     // Experimental - TOF Measurement
     cc1100_after_send();
