@@ -1,7 +1,0 @@
-SubDir TOP board msba2 drivers ;
-
-Module board_cc1100 : msba2-cc1100.c : gpioint cc110x_spi ;
-Module board_hal : msba2-hal.c ; 
-Module board_ltc4150 : msba2-ltc4150.c : gpioint ;
-Module board_common : msba2-uart0.c : ringbuffer ;
-Module board_uart : msba2-uart0_thread.c : chardev_thread ringbuffer ;

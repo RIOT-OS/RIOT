@@ -25,10 +25,6 @@
 # ******************************************************************************
 # $Id$
 
-SubDir TOP board $(BOARD) ;
+Module msba2_common : board_init.c ;
 
-Module board : board_init.c : board_common board_uart ;
-UseModule board ;
-
-SubInclude TOP board msba2-common ;
-SubInclude TOP cpu $(CPU) ;
+include [ FPath $(TOP) cpu arm_common Jamfile.arm_common ] ;

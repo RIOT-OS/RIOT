@@ -25,12 +25,9 @@
 # ******************************************************************************
 # $Id: Jamrules.msba2 881 2009-03-20 12:24:58Z kaspar $
 
-CPU = lpc2387 ;
+include board/msba2-common/Jamrules.msba2 ;
 
 HDRS += [ FPath $(TOP) board $(BOARD) drivers include ] ;
-
-FLASHER = $(POSIXSHELL) $(TOP)/board/msba2/tools/flashutil.sh ;
-FLASHFLAGS = --basedir $(TOP)/board/msba2/tools --id PTTU --ports "$(PORT)" --openocd $(TOP)/board/pttu/tools/openocd-pttu.sh --openocd-if $(OPENOCD_IF) ;
 
 GDB = arm-elf-gdb ;
 GDBFLAGS = -x board/pttu/tools/pttu_debug.gdb ;

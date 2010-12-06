@@ -1,0 +1,6 @@
+SubDir TOP board msba2-common ;
+
+Module board_common : board_common_init.c ;
+
+SubInclude TOP board msba2-common drivers ;
+
