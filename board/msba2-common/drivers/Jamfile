@@ -1,0 +1,5 @@
+SubDir TOP board msba2-common drivers ;
+
+Module board_cc1100 : msba2-cc1100.c ;
+Module board_ltc4150 : msba2-ltc4150.c : gpioint ;
+Module board_uart : msba2-uart0.c : chardev_thread ringbuffer ;

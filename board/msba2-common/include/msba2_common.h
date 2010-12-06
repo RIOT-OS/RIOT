@@ -24,45 +24,28 @@ and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
-#ifndef BOARDCONF_H_
-#define BOARDCONF_H_
+#ifndef __BOARD_H
+#define __BOARD_H
 
 /**
- * @ingroup		conf
- * @ingroup		msba2
- *
+ * @ingroup		msb_a2
  * @{
  */
 
 /**
  * @file
- * @brief		MSB-A2 board configuration
+ * @brief		MSB-A2 Common Board Definitions
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
- * @author		baar
+ * @author		Kaspar Schleiser <kaspar@schleiser.de>
  * @version     $Revision$
  *
  * @note		$Id$
  */
 
-#define FEUERWARE_CONF_BOARD_NAME				"FU Berlin MSB-A2"
+#include <lpc2387.h>
 
-#ifdef MODULE_CC110X
-#define FEUERWARE_CONF_NUM_RADIOS				1
-#else
-#define FEUERWARE_CONF_NUM_RADIOS				0
-#endif
-
-// if FAT is enabled this board supports files
-#define FEUERWARE_CONF_CORE_SUPPORTS_FILES		defined(MODULE_FAT)
-
-#ifdef MODULE_FAT
-#define CFG_CONF_MEM_SIZE						0x7FFFFFFF
-#define SYSLOG_CONF_NUM_INTERFACES				2
-#else
-#define SYSLOG_CONF_NUM_INTERFACES				1
-#endif
-
+#define VICIntEnClear VICIntEnClr
 
 /** @} */
-#endif /* BOARDCONF_H_ */
+#endif // __BOARD_H

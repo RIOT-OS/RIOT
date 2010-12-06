@@ -25,7 +25,10 @@
 # ******************************************************************************
 # $Id$
 
-#LinkLibraries $(BOARD).elf : sys-drivers.a net_mm.a sys-lib.a fat-lib.a 
-#								cpu_drivers.a board_drivers.a cc110x.a hal.a hal_drivers.a lpc2387_hal.a ;
+CPU = lpc2387 ;
 
-include [ FPath $(TOP) cpu arm_common Jamfile.arm_common ] ;
+HDRS += [ FPath $(TOP) board msba2-common include ] ;
+HDRS += [ FPath $(TOP) board msba2-common drivers include ] ;
+
+FLASHER ?= $(POSIXSHELL) lpc2k_pgm ;
+FLASHFLAGS ?= "$(PORT)" ;
