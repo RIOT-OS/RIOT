@@ -30,7 +30,5 @@ SubDir TOP board $(BOARD) ;
 Module board : board_init.c : board_common board_uart ;
 UseModule board ;
 
-Module config : config.c ;
-
 SubInclude TOP board $(BOARD)-common ;
 SubInclude TOP cpu $(CPU) ;
