@@ -25,8 +25,6 @@
 #include <cpu.h>
 #include <lpm.h>
 #include <thread.h>
-#include <hwtimer.h>
-#include <config.h>
 
 #ifdef MODULE_AUTO_INIT
 #include <auto_init.h>
@@ -41,12 +39,6 @@ volatile int lpm_prevent_sleep = 0;
 
 extern void main(void);
 extern void cpu_switch_context_exit(void);
-
-config_t sysconfig  = {
-    0,      ///< default ID
-    0,      ///< default radio address
-    0,      ///< default radio channel
-};
 
 static void idle_thread(void) {
     while(1) {
