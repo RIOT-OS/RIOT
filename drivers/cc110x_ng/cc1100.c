@@ -4,6 +4,7 @@
 #include <cc1100-defaultSettings.h>
 #include <cc1100-internal.h>
 #include <cc1100_spi.h>
+#include <cc1100-reg.h>
 
 #include <hwtimer.h>
 #include <config.h>
@@ -39,20 +40,22 @@ void cc1100_init(int tpid) {
 
 	rx_buffer_next = 0;
 
+#ifdef MODULE_CC110X_SPI
     /* Initialize SPI */
 	cc1100_spi_init();
+#endif
 
 	/* Load driver & reset */
 	power_up_reset();
 
     /* Write configuration to configuration registers */
-    cc1100_spi_writeburst_reg(0x00, cc1100_conf, CC1100_CONF_SIZE);
+    cc1100_writeburst_reg(0x00, cc1100_conf, CC1100_CONF_SIZE);
 
 	/* Write PATABLE (power settings) */
-	cc1100_spi_write_reg(CC1100_PATABLE, pa_table[pa_table_index]);
+	cc1100_write_reg(CC1100_PATABLE, pa_table[pa_table_index]);
 
 	/* Initialize Radio Flags */
-	rflags.RSSI         = 0x00;
+	rflags._RSSI         = 0x00;
 	rflags.LL_ACK       = 0;
 	rflags.CAA          = 0;
 	rflags.CRC          = 0;
@@ -120,13 +123,13 @@ void cc1100_set_monitor(uint8_t mode) {
 
 void cc1100_setup_rx_mode(void) {
 	// Stay in RX mode until end of packet
-	cc1100_spi_write_reg(CC1100_MCSM2, 0x07);
+	cc1100_write_reg(CC1100_MCSM2, 0x07);
 	cc1100_switch_to_rx();
 }
 
 void cc1100_switch_to_rx(void) {
 	radio_state = RADIO_RX;
-	cc1100_spi_strobe(CC1100_SRX);
+	cc1100_strobe(CC1100_SRX);
 }
 
 void cc1100_wakeup_from_rx(void) {
@@ -134,7 +137,7 @@ void cc1100_wakeup_from_rx(void) {
         return;
     }
     DEBUG("CC1100 going to idle\n");
-	cc1100_spi_strobe(CC1100_SIDLE);
+	cc1100_strobe(CC1100_SIDLE);
 	radio_state = RADIO_IDLE;
 }
 
@@ -145,7 +148,7 @@ char* cc1100_get_marc_state(void) {
 	uint8_t old_state = radio_state;
 
 	// Read content of status register
-	state = cc1100_spi_read_status(CC1100_MARCSTATE) & MARC_STATE;
+	state = cc1100_read_status(CC1100_MARCSTATE) & MARC_STATE;
 
 	// Make sure in IDLE state.
 	// Only goes to IDLE if state was RX/WOR
@@ -211,13 +214,13 @@ void cc1100_print_config(void) {
 void cc1100_switch_to_pwd(void) {
     DEBUG("[cc110x_ng] switching to powerdown\n");
     cc1100_wakeup_from_rx();
-	cc1100_spi_strobe(CC1100_SPWD);
+	cc1100_strobe(CC1100_SPWD);
 	radio_state = RADIO_PWD;
 }
     
 /*---------------------------------------------------------------------------*/
 int16_t cc1100_set_channel(uint8_t channr) {
-	uint8_t state = cc1100_spi_read_status(CC1100_MARCSTATE) & MARC_STATE;
+	uint8_t state = cc1100_read_status(CC1100_MARCSTATE) & MARC_STATE;
 	if ((state != 1) && (channr > MAX_CHANNR)) {
         return 0;
     }
@@ -238,15 +241,19 @@ int16_t cc1100_get_channel(void) {
 
 static void reset(void) {
 	cc1100_wakeup_from_rx();
+#ifdef MODULE_CC110x_SPI
 	cc1100_spi_select();
-	cc1100_spi_strobe(CC1100_SRES);
+#endif
+	cc1100_strobe(CC1100_SRES);
 	hwtimer_wait(RTIMER_TICKS(10));
 }
 
 static void power_up_reset(void) {
+#ifdef MODULE_CC110x_SPI
 	cc1100_spi_unselect();
 	cc1100_spi_cs();
 	cc1100_spi_unselect();
+#endif
 	hwtimer_wait(RESET_WAIT_TIME);
 	reset();
 	radio_state = RADIO_IDLE;
@@ -258,7 +265,7 @@ static void write_register(uint8_t r, uint8_t value) {
 
 	/* Wake up from WOR/RX (if in WOR/RX, else no effect) */
 	cc1100_wakeup_from_rx();
-	cc1100_spi_write_reg(r, value);
+	cc1100_write_reg(r, value);
 
 	// Have to put radio back to WOR/RX if old radio state
 	// was WOR/RX, otherwise no action is necessary

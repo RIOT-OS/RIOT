@@ -5,6 +5,7 @@
 #include <cc1100-internal.h>
 #include <cc1100-arch.h>
 #include <cc1100_spi.h>
+#include <cc1100-reg.h>
 
 #include <irq.h>
 
@@ -38,15 +39,15 @@ uint8_t cc1100_send(cc1100_packet_t *packet) {
 	cc1100_before_send();
 
 	// But CC1100 in IDLE mode to flush the FIFO
-    cc1100_spi_strobe(CC1100_SIDLE);
+    cc1100_strobe(CC1100_SIDLE);
     // Flush TX FIFO to be sure it is empty
-    cc1100_spi_strobe(CC1100_SFTX);
+    cc1100_strobe(CC1100_SFTX);
 	// Write packet into TX FIFO
-    cc1100_spi_writeburst_reg(CC1100_TXFIFO, (char*) packet, size);
+    cc1100_writeburst_reg(CC1100_TXFIFO, (char*) packet, size);
   	// Switch to TX mode
     abort_count = 0;
     unsigned int cpsr = disableIRQ();
-    cc1100_spi_strobe(CC1100_STX);
+    cc1100_strobe(CC1100_STX);
     // Wait for GDO2 to be set -> sync word transmitted
     while (cc1100_get_gdo2() == 0) {
     	abort_count++;

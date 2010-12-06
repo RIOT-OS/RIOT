@@ -2,48 +2,49 @@
 #define CC1100_CONFIG_H
 
 #include <timex.h>
+#include <stdint.h>
 
 /** CC1100 register configuration */
 typedef struct {
-	uint8_t IOCFG2;
-	uint8_t IOCFG1;
-	uint8_t IOCFG0;
-	uint8_t FIFOTHR;
-	uint8_t SYNC1;
-	uint8_t SYNC0;
-	uint8_t PKTLEN;
-	uint8_t PKTCTRL1;
-	uint8_t PKTCTRL0;
-	uint8_t ADDR;
-	uint8_t CHANNR;
-	uint8_t FSCTRL1;
-	uint8_t FSCTRL0;
-	uint8_t FREQ2;
-	uint8_t FREQ1;
-	uint8_t FREQ0;
-	uint8_t MDMCFG4;
-	uint8_t MDMCFG3;
-	uint8_t MDMCFG2;
-	uint8_t MDMCFG1;
-	uint8_t MDMCFG0;
-	uint8_t DEVIATN;
-	uint8_t MCSM2;
-	uint8_t MCSM1;
-	uint8_t MCSM0;
-	uint8_t FOCCFG;
-	uint8_t BSCFG;
-	uint8_t AGCCTRL2;
-	uint8_t AGCCTRL1;
-	uint8_t AGCCTRL0;
-	uint8_t WOREVT1;
-	uint8_t WOREVT0;
-	uint8_t WORCTRL;
-	uint8_t FREND1;
-	uint8_t FREND0;
-	uint8_t FSCAL3;
-	uint8_t FSCAL2;
-	uint8_t FSCAL1;
-	uint8_t FSCAL0;
+	uint8_t _IOCFG2;
+	uint8_t _IOCFG1;
+	uint8_t _IOCFG0;
+	uint8_t _FIFOTHR;
+	uint8_t _SYNC1;
+	uint8_t _SYNC0;
+	uint8_t _PKTLEN;
+	uint8_t _PKTCTRL1;
+	uint8_t _PKTCTRL0;
+	uint8_t _ADDR;
+	uint8_t _CHANNR;
+	uint8_t _FSCTRL1;
+	uint8_t _FSCTRL0;
+	uint8_t _FREQ2;
+	uint8_t _FREQ1;
+	uint8_t _FREQ0;
+	uint8_t _MDMCFG4;
+	uint8_t _MDMCFG3;
+	uint8_t _MDMCFG2;
+	uint8_t _MDMCFG1;
+	uint8_t _MDMCFG0;
+	uint8_t _DEVIATN;
+	uint8_t _MCSM2;
+	uint8_t _MCSM1;
+	uint8_t _MCSM0;
+	uint8_t _FOCCFG;
+	uint8_t _BSCFG;
+	uint8_t _AGCCTRL2;
+	uint8_t _AGCCTRL1;
+	uint8_t _AGCCTRL0;
+	uint8_t _WOREVT1;
+	uint8_t _WOREVT0;
+	uint8_t _WORCTRL;
+	uint8_t _FREND1;
+	uint8_t _FREND0;
+	uint8_t _FSCAL3;
+	uint8_t _FSCAL2;
+	uint8_t _FSCAL1;
+	uint8_t _FSCAL0;
 } cc1100_reg_t;
 
 /** CC1100 radio configuration */
@@ -62,9 +63,9 @@ typedef struct
 	uint32_t TCP;				///< Time to compute packet
 	unsigned RPS		: 16;	///< Raw packets sent to transmit last packet
 	unsigned RTC		: 8;	///< Retransmission count of last send packet
-	unsigned RSSI	 	: 8;	///< The RSSI value of last received packet
+	unsigned _RSSI	 	: 8;	///< The RSSI value of last received packet
 	unsigned RSSI_SEND 	: 8; 	///< The RSSI value of the last send unicast packet of this node
-	unsigned LQI		: 8;	///< The LQI value of the last received packet
+	unsigned _LQI		: 8;	///< The LQI value of the last received packet
 	unsigned LL_ACK  	: 1;	///< Is set if Link-Level ACK is received, otherwise 0 (reset on new burst)
 	unsigned CAA     	: 1;	///< The status of the air (1 = air free, 0 = air not free)
 	unsigned CRC     	: 1;	///< The CRC status of last received packet (1 = OK, 0 = not OK)

@@ -48,6 +48,7 @@ and the mailinglist (subscription via web site)
 #include <cc1100-arch.h>
 #include <cc1100-internal.h>
 #include <cc1100_spi.h>
+#include <cc1100-reg.h>
 
 #include <irq.h>
 
@@ -57,7 +58,7 @@ and the mailinglist (subscription via web site)
 
 #define NOBYTE 0xFF
 
-uint8_t cc1100_spi_writeburst_reg(uint8_t addr, char *src, uint8_t count) {
+uint8_t cc1100_writeburst_reg(uint8_t addr, char *src, uint8_t count) {
 	int i = 0;
 	unsigned int cpsr = disableIRQ();
 	cc1100_spi_select();
@@ -71,7 +72,7 @@ uint8_t cc1100_spi_writeburst_reg(uint8_t addr, char *src, uint8_t count) {
 	return count;
 }
 
-void cc1100_spi_readburst_reg(uint8_t addr, char *buffer, uint8_t count) {
+void cc1100_readburst_reg(uint8_t addr, char *buffer, uint8_t count) {
 	int i = 0;
 	unsigned int cpsr = disableIRQ();
 	cc1100_spi_select();
@@ -84,7 +85,7 @@ void cc1100_spi_readburst_reg(uint8_t addr, char *buffer, uint8_t count) {
 	restoreIRQ(cpsr);
 }
 
-void cc1100_spi_write_reg(uint8_t addr, uint8_t value) {
+void cc1100_write_reg(uint8_t addr, uint8_t value) {
 	unsigned int cpsr = disableIRQ();
 	cc1100_spi_select();
 	cc1100_txrx(addr);
@@ -93,7 +94,7 @@ void cc1100_spi_write_reg(uint8_t addr, uint8_t value) {
 	restoreIRQ(cpsr);
 }
 
-uint8_t cc1100_spi_read_reg(uint8_t addr) {
+uint8_t cc1100_read_reg(uint8_t addr) {
 	uint8_t result;
 	unsigned int cpsr = disableIRQ();
 	cc1100_spi_select();
@@ -104,7 +105,7 @@ uint8_t cc1100_spi_read_reg(uint8_t addr) {
 	return result;
 }
 
-uint8_t cc1100_spi_read_status(uint8_t addr) {
+uint8_t cc1100_read_status(uint8_t addr) {
 	uint8_t result;
 	unsigned int cpsr = disableIRQ();
 	cc1100_spi_select();
@@ -115,7 +116,7 @@ uint8_t cc1100_spi_read_status(uint8_t addr) {
 	return result;
 }
 
-uint8_t cc1100_spi_strobe(uint8_t c) {
+uint8_t cc1100_strobe(uint8_t c) {
 	uint8_t result;
 	unsigned int cpsr = disableIRQ();
 	cc1100_spi_select();
