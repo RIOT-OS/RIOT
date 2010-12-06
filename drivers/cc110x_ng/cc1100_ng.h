@@ -109,10 +109,12 @@ void cc1100_wakeup_from_rx(void);
 void cc1100_switch_to_pwd(void);
 
 void cc1100_disable_interrupts(void);
+int16_t cc1100_set_config_channel(uint8_t channr);
 int16_t cc1100_set_channel(uint8_t channr);
 int16_t cc1100_get_channel(void);
 
 radio_address_t cc1100_set_address(radio_address_t addr);
+radio_address_t cc1100_set_config_address(radio_address_t addr);
 radio_address_t cc1100_get_address(void);
 void cc1100_set_monitor(uint8_t mode);
 

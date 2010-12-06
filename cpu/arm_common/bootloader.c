@@ -178,9 +178,6 @@ void bootloader(void) {
     /* board specific setup of UART */
     bl_uart_init();
 
-    /* initialize board configuration */
-    bl_config_init();
-
     printf("Board initialized.\n");
 }
 

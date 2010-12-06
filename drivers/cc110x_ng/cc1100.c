@@ -108,8 +108,13 @@ radio_address_t cc1100_set_address(radio_address_t address) {
 	}
 
 	sysconfig.radio_address = id;
-    config_save();
 	return sysconfig.radio_address;
+}
+
+radio_address_t cc1100_set_config_address(radio_address_t address) {
+    radio_address_t a = cc1100_set_address(address);
+    config_save();
+    return a;
 }
 
 void cc1100_set_monitor(uint8_t mode) {
@@ -222,12 +227,17 @@ void cc1100_switch_to_pwd(void) {
 int16_t cc1100_set_channel(uint8_t channr) {
 	uint8_t state = cc1100_read_status(CC1100_MARCSTATE) & MARC_STATE;
 	if ((state != 1) && (channr > MAX_CHANNR)) {
-        return 0;
+        return -1;
     }
 	write_register(CC1100_CHANNR, channr*10);
 	sysconfig.radio_channel = channr;
-    config_save();
 	return sysconfig.radio_channel;
+}
+
+int16_t cc1100_set_config_channel(uint8_t channr) {
+    int16_t c = cc1100_set_channel(channr);
+    config_save();
+    return c;
 }
 
 int16_t cc1100_get_channel(void) {
