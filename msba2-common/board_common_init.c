@@ -51,12 +51,6 @@ and the mailinglist (subscription via web site)
 #define PCRTC         BIT9
 #define CL_CPU_DIV    4
 
-config_t sysconfig  = {
-    0,      ///< default ID
-    0,      ///< default radio address
-    0,      ///< default radio channel
-};
-
 /*---------------------------------------------------------------------------*/
 /**
  * @brief   Enabling MAM and setting number of clocks used for Flash memory fetch
@@ -129,32 +123,3 @@ void bl_init_clks(void)
     init_mam();
 }
 
-void loop_delay(void) {
-    volatile uint16_t i, j;
-    for (i = 1; i < 30; i++) {
-        for (j = 1; j != 0; j++) {
-            asm volatile (" nop ");
-        }
-    }
-}
-
-/*void bl_blink(void) {
-    LED_RED_ON;
-    LED_GREEN_ON;
-    
-    loop_delay();
-
-    LED_RED_OFF;
-    LED_GREEN_OFF;
-}*/
-
-// void bl_config_init(void) {
-//     extern char configmem[];
-//    if (*((uint16_t*) configmem) ==  CONFIG_KEY) {
-//        memcpy(&sysconfig, (configmem + sizeof(CONFIG_KEY)), sizeof(sysconfig));
-//        LED_GREEN_TOGGLE;
-//    }
-//    else {
-//        config_save();
-//    }
-// }
