@@ -17,6 +17,8 @@
 
 #include <stdio.h>
 #include <sys/unistd.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define ENABLE_DEBUG
 #include <debug.h>

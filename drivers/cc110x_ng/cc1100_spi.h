@@ -53,12 +53,5 @@ void cc1100_spi_cs(void);
 void cc1100_spi_select(void);
 void cc1100_spi_unselect(void);
 
-uint8_t cc1100_spi_writeburst_reg(uint8_t addr, char *buffer, uint8_t count);
-void cc1100_spi_readburst_reg(uint8_t addr, char *buffer, uint8_t count);
-void cc1100_spi_write_reg(uint8_t addr, uint8_t value);
-uint8_t cc1100_spi_read_reg(uint8_t addr);
-uint8_t cc1100_spi_read_status(uint8_t addr);
-uint8_t cc1100_spi_strobe(uint8_t c);
-
 /** @} */
 #endif /* CC1100_SPI_H_ */

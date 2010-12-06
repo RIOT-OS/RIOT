@@ -6,8 +6,6 @@
 #include <stdint.h>
 #include <cc1100-config.h>
 
-#define RX_BUF_SIZE (10)
-
 #define CC1100_MAX_DATA_LENGTH (58)
 
 #define CC1100_HEADER_LENGTH   (3)             ///< Header covers SRC, DST and FLAGS
@@ -111,12 +109,28 @@ void cc1100_wakeup_from_rx(void);
 void cc1100_switch_to_pwd(void);
 
 void cc1100_disable_interrupts(void);
+int16_t cc1100_set_config_channel(uint8_t channr);
 int16_t cc1100_set_channel(uint8_t channr);
 int16_t cc1100_get_channel(void);
 
 radio_address_t cc1100_set_address(radio_address_t addr);
+radio_address_t cc1100_set_config_address(radio_address_t addr);
 radio_address_t cc1100_get_address(void);
 void cc1100_set_monitor(uint8_t mode);
 
 void cc1100_print_config(void);
+
+/**
+ * @brief	GDO0 interrupt handler.
+ */
+void cc1100_gdo0_irq(void);
+
+/**
+ * @brief	GDO2 interrupt handler.
+ *
+ * @note	Wakes up MCU on packet reception.
+ */
+void cc1100_gdo2_irq(void);
+
+
 #endif

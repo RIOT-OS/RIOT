@@ -3,11 +3,13 @@
 #include <cc1100-config.h>
 #include <cc1100-defaultSettings.h>
 #include <cc1100_spi.h>
+#include <cc1100-reg.h>
 
 #include <hwtimer.h>
 #include <msg.h>
 #include <transceiver.h>
 
+#include <cpu-conf.h>
 #include <board.h>
 
 static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length);
@@ -34,15 +36,15 @@ void cc1100_rx_handler(void) {
 			cc1100_statistic.packets_in_while_tx++;
 			return;
 		}
-        cc1100_rx_buffer[rx_buffer_next].rssi = rflags.RSSI;
-        cc1100_rx_buffer[rx_buffer_next].lqi = rflags.LQI;
+        cc1100_rx_buffer[rx_buffer_next].rssi = rflags._RSSI;
+        cc1100_rx_buffer[rx_buffer_next].lqi = rflags._LQI;
 
 		// Valid packet. After a wake-up, the radio should be in IDLE.
 		// So put CC1100 to RX for WOR_TIMEOUT (have to manually put
 		// the radio back to sleep/WOR).
 		//cc1100_spi_write_reg(CC1100_MCSM0, 0x08);	// Turn off FS-Autocal
-		cc1100_spi_write_reg(CC1100_MCSM2, 0x07);	// Configure RX_TIME (until end of packet)
-        cc1100_spi_strobe(CC1100_SRX);
+		cc1100_write_reg(CC1100_MCSM2, 0x07);	// Configure RX_TIME (until end of packet)
+        cc1100_strobe(CC1100_SRX);
         hwtimer_wait(IDLE_TO_RX_TIME);
         radio_state = RADIO_RX;
         
@@ -66,14 +68,14 @@ void cc1100_rx_handler(void) {
 		rflags.TOF = 0;
 
 		// CRC false or RX buffer full -> clear RX FIFO in both cases
-		cc1100_spi_strobe(CC1100_SIDLE);	// Switch to IDLE (should already be)...
-		cc1100_spi_strobe(CC1100_SFRX);		// ...for flushing the RX FIFO
+		cc1100_strobe(CC1100_SIDLE);	// Switch to IDLE (should already be)...
+		cc1100_strobe(CC1100_SFRX);		// ...for flushing the RX FIFO
 
 		// If packet interrupted this nodes send call,
 		// don't change anything after this point.
 		if (radio_state == RADIO_AIR_FREE_WAITING)
 		{
-			cc1100_spi_strobe(CC1100_SRX);
+			cc1100_strobe(CC1100_SRX);
 			hwtimer_wait(IDLE_TO_RX_TIME);
 			return;
 		}
@@ -95,10 +97,11 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length) {
 	uint8_t packetLength = 0;
 
 	/* Any bytes available in RX FIFO? */
-	if ((cc1100_spi_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO)) {
-        LED_GREEN_TOGGLE;
+	if ((cc1100_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO)) {
+        //LED_GREEN_TOGGLE;
+        //LED_RED_TOGGLE;
 		// Read length byte (first byte in RX FIFO)
-        packetLength = cc1100_spi_read_reg(CC1100_RXFIFO);
+        packetLength = cc1100_read_reg(CC1100_RXFIFO);
 		// Read data from RX FIFO and store in rxBuffer
         if (packetLength <= length)
 		{
@@ -106,13 +109,13 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length) {
 			rxBuffer[0] = packetLength;
 
 			// Read the rest of the packet
-			cc1100_spi_readburst_reg(CC1100_RXFIFO, (char*)rxBuffer+1, packetLength);
+			cc1100_readburst_reg(CC1100_RXFIFO, (char*)rxBuffer+1, packetLength);
 
             // Read the 2 appended status bytes (status[0] = RSSI, status[1] = LQI)
-			cc1100_spi_readburst_reg(CC1100_RXFIFO, (char*)status, 2);
+			cc1100_readburst_reg(CC1100_RXFIFO, (char*)status, 2);
 
 			// Store RSSI value of packet
-			rflags.RSSI = status[I_RSSI];
+			rflags._RSSI = status[I_RSSI];
 
 			// MSB of LQI is the CRC_OK bit
 			rflags.CRC = (status[I_LQI] & CRC_OK) >> 7;
@@ -121,7 +124,7 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length) {
             }
 
 			// Bit 0-6 of LQI indicates the link quality (LQI)
-			rflags.LQI = status[I_LQI] & LQI_EST;
+			rflags._LQI = status[I_LQI] & LQI_EST;
 
 			return rflags.CRC;
         }
@@ -133,14 +136,14 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length) {
 	}
     /* no bytes in RX FIFO */
 	else {
-        LED_RED_TOGGLE;
+        //LED_RED_TOGGLE;
 		// RX FIFO get automatically flushed if return value is false
 		return 0;
 	}
 }
 
 static uint8_t receive_packet(uint8_t *rxBuffer, uint8_t length) {
-	uint8_t pkt_len_cfg = cc1100_spi_read_reg(CC1100_PKTCTRL0) & PKT_LENGTH_CONFIG;
+	uint8_t pkt_len_cfg = cc1100_read_reg(CC1100_PKTCTRL0) & PKT_LENGTH_CONFIG;
 	if (pkt_len_cfg == VARIABLE_PKTLEN)
 	{
 		return receive_packet_variable(rxBuffer, length);

@@ -7,9 +7,10 @@
 
 #include <irq.h>
 #include <flashrom.h>
+#include <iap.h>
 #include <lpc2387.h>
 
-#define ENABLE_DEBUG
+//#define ENABLE_DEBUG
 #include <debug.h>
 
 /* pointer to reserved flash rom section for configuration data */
@@ -31,7 +32,7 @@ static uint32_t iap(uint32_t code, uint32_t p1, uint32_t p2, uint32_t p3, uint32
 /******************************************************************************
  * P U B L I C   F U N C T I O N S
  *****************************************************************************/
-uint8_t	flashrom_write(uint32_t dst, char *src, uint32_t size) {
+uint8_t	flashrom_write(uint8_t *dst, char *src, size_t size) {
 	char err;
 	unsigned intstate;
 	uint8_t sec;
@@ -39,7 +40,7 @@ uint8_t	flashrom_write(uint32_t dst, char *src, uint32_t size) {
 	//buffer_vic  = VICIntEnable;		// save interrupt enable
 	//VICIntEnClr = 0xFFFFFFFF;		// clear vic
 	
-	sec = flashrom_get_sector(dst);
+	sec = iap_get_sector((uint32_t) dst);
     if (sec == INVALID_ADDRESS) {
         DEBUG("Invalid address\n");
         return 0;
@@ -61,7 +62,7 @@ uint8_t	flashrom_write(uint32_t dst, char *src, uint32_t size) {
     /* write flash */
 	else {
         intstate = disableIRQ();
-		err = copy_ram_to_flash(dst, (uint32_t) src, 256);
+		err = copy_ram_to_flash((uint32_t) dst, (uint32_t) src, 256);
         restoreIRQ(intstate);
 		if(err) {
 			DEBUG("ERROR: COPY_RAM_TO_FLASH: %u\n", err);
@@ -72,7 +73,7 @@ uint8_t	flashrom_write(uint32_t dst, char *src, uint32_t size) {
 		}
         /* check result */
 		else {
-			err = compare(dst, (uint32_t) src, 256);
+			err = compare((uint32_t) dst, (uint32_t) src, 256);
             if (err) {
 				DEBUG("ERROR: COMPARE: %i (at position %u)\n", err, iap_result[1]);
                 /* set interrupts back and return */
@@ -91,8 +92,8 @@ uint8_t	flashrom_write(uint32_t dst, char *src, uint32_t size) {
 }
 
 
-uint8_t flashrom_erase(uint32_t addr) {
-    uint8_t sec = flashrom_get_sector(addr);
+uint8_t flashrom_erase(uint8_t *addr) {
+    uint8_t sec = iap_get_sector((uint32_t) addr);
     unsigned intstate;
     
     if (sec == INVALID_ADDRESS) {

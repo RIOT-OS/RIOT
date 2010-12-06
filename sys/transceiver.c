@@ -19,7 +19,11 @@
 #endif
 #endif
 
-#define ENABLE_DEBUG (1)
+//#define ENABLE_DEBUG (1)
+#ifdef ENABLE_DEBUG
+#undef TRANSCEIVER_BUFFER_SIZE
+#define TRANSCEIVER_BUFFER_SIZE (2048)
+#endif
 #include <debug.h>
 
 /*------------------------------------------------------------------------------------*/
@@ -57,6 +61,8 @@ static int16_t set_channel(transceiver_type_t t, void *channel);
 static int16_t get_address(transceiver_type_t t);
 static int16_t set_address(transceiver_type_t t, void *address);
 static void set_monitor(transceiver_type_t t, void *mode);
+static void powerdown(transceiver_type_t t);
+static void switch_to_rx(transceiver_type_t t);
 
 /*------------------------------------------------------------------------------------*/
 /* Transceiver init */
@@ -122,6 +128,7 @@ void run(void) {
         msg_receive(&m);
         /* only makes sense for messages for upper layers */
         cmd = (transceiver_command_t*) m.content.ptr;
+
         DEBUG("Transceiver: Message received\n");
         switch (m.type) {
             case RCV_PKT_CC1020:
@@ -151,6 +158,12 @@ void run(void) {
                 break;
             case SET_MONITOR:
                 set_monitor(cmd->transceivers, cmd->data);
+                break;
+            case POWERDOWN:
+                powerdown(cmd->transceivers);
+                break;
+            case SWITCH_RX:
+                switch_to_rx(cmd->transceivers);
                 break;
             default:
                 DEBUG("Unknown message received\n");
@@ -219,7 +232,7 @@ static void receive_packet(uint16_t type, uint8_t pos) {
         if (reg[i].transceivers & t) {
             m.content.ptr = (char*) &(transceiver_buffer[transceiver_buffer_pos]);
             DEBUG("Notify thread %i\n", reg[i].pid);
-            if (msg_send(&m, reg[i].pid, false)) {
+            if (msg_send(&m, reg[i].pid, false) && (m.type != ENOBUFFER)) {
                 transceiver_buffer[transceiver_buffer_pos].processing++;
             }
         }
@@ -359,6 +372,27 @@ static void set_monitor(transceiver_type_t t, void *mode) {
     switch (t) {
         case TRANSCEIVER_CC1100:
             cc1100_set_monitor(*((uint8_t*) mode));
+            break;
+        default:
+            break;
+    }
+}
+/*------------------------------------------------------------------------------------*/
+static void powerdown(transceiver_type_t t) {
+    switch (t) {
+        case TRANSCEIVER_CC1100:
+            cc1100_switch_to_pwd();
+            break;
+        default:
+            break;
+    }
+}
+
+/*------------------------------------------------------------------------------------*/
+static void switch_to_rx(transceiver_type_t t) {
+    switch (t) {
+        case TRANSCEIVER_CC1100:
+            cc1100_switch_to_rx();
             break;
         default:
             break;

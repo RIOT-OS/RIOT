@@ -44,18 +44,9 @@ and the mailinglist (subscription via web site)
 #include <lpc23xx.h>
 #include <VIC.h>
 #include <cpu.h>
-#include <config.h>
-#include <string.h>
-#include <flashrom.h>
 
 #define PCRTC         BIT9
 #define CL_CPU_DIV    4
-
-config_t sysconfig  = {
-    0,      ///< default ID
-    0,      ///< default radio address
-    0,      ///< default radio channel
-};
 
 /*---------------------------------------------------------------------------*/
 /**
@@ -161,15 +152,4 @@ void bl_blink(void) {
 
     LED_RED_OFF;
     LED_GREEN_OFF;
-}
-
-void bl_config_init(void) {
-    extern char configmem[];
-   if (*((uint16_t*) configmem) ==  CONFIG_KEY) {
-       memcpy(&sysconfig, (configmem + sizeof(CONFIG_KEY)), sizeof(sysconfig));
-       LED_GREEN_TOGGLE;
-   }
-   else {
-       config_save();
-   }
 }

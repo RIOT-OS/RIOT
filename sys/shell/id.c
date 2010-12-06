@@ -1,17 +1,22 @@
 #include <stdio.h>
+#include <string.h>
 #include <config.h>
+#include <stdlib.h>
 
 void _id_handler(char *id) {
-    uint16_t newid;
+    long newid;
 
-    if (sscanf(id, "id %hu", &newid) == 1) {
-        printf("Setting new id %u\n", newid);
+    newid = atoi(id+3);
+    if (strlen(id) < 3) {
+        printf("Current id: %u\n", sysconfig.id);
+    }
+    else {
+        printf("Setting new id %lu\n", newid);
         sysconfig.id = newid;
+#ifdef MODULE_CONFIG
         if (!config_save()) {
             puts("ERROR setting new id");
         }
-    }
-    else {
-        printf("Current id: %u\n", sysconfig.id);
+#endif
     }
 }
