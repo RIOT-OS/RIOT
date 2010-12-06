@@ -117,4 +117,18 @@ radio_address_t cc1100_get_address(void);
 void cc1100_set_monitor(uint8_t mode);
 
 void cc1100_print_config(void);
+
+/**
+ * @brief	GDO0 interrupt handler.
+ */
+void cc1100_gdo0_irq(void);
+
+/**
+ * @brief	GDO2 interrupt handler.
+ *
+ * @note	Wakes up MCU on packet reception.
+ */
+void cc1100_gdo2_irq(void);
+
+
 #endif

@@ -6,6 +6,6 @@
 
 SubDir TOP projects default ;
 
-Module default_project : main.c : shell posix_io uart0 shell_commands ps rtc sht11 ltc4150 cc110x auto_init ;
+Module default_project : main.c : shell posix_io uart0 shell_commands ps rtc sht11 ltc4150 cc110x_ng transceiver gpioint auto_init ;
 
 UseModule default_project ;

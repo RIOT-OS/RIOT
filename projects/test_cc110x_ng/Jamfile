@@ -1,5 +1,5 @@
 SubDir TOP projects test_cc110x_ng ;
 
-Module test_cc110x_ng : main.c : cc110x_ng shell shell_commands transceiver ps rtc posix_io uart0 auto_init gpioint cc110x_spi ;
+Module test_cc110x_ng : main.c : cc110x_ng shell shell_commands transceiver ps rtc posix_io uart0 auto_init swtimer ;
 
 UseModule test_cc110x_ng ;
