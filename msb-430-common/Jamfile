@@ -27,7 +27,8 @@
 
 SubDir TOP board msb-430-common ;
 
-Module board : board_init.c debug_uart.c config.c ;
+Module board : board_init.c debug_uart.c ;
+Module config : config.c ;
 UseModule board ;
 
 SubInclude TOP cpu $(CPU) ;
