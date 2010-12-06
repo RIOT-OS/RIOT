@@ -169,16 +169,17 @@ void bootloader(void) {
 
     /* board specific setup of clocks */
     bl_init_clks();
+
     /* initialize bss and data */
     bl_init_data();
+
     /* board specific setup of i/o pins */
     bl_init_ports();
-    /* short blinking of both of the LEDs on startup */
-    bl_blink();
-    /* board specific setup of UART */
+
+    /* UART setup */
     bl_uart_init();
 
-    printf("Board initialized.\n");
+    puts("Board initialized.");
 }
 
 /** @} */
