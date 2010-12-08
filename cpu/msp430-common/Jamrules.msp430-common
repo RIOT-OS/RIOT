@@ -5,7 +5,7 @@
 echo "Building for board $(BOARD)." ;
 echo "Building for MCU $(MCU)." ;
 
-HDRS += $(TOP)/cpu/$(CPU)/include $(TOP)/board/$(BOARD)/drivers $(TOP)/board/$(BOARD)/include $(TOP)/include $(TOP)/core/include ;
+HDRS += $(TOP)/cpu/msp430-common/include $(TOP)/cpu/$(CPU)/include $(TOP)/board/$(BOARD)/drivers $(TOP)/board/$(BOARD)/include $(TOP)/include $(TOP)/core/include ;
 
 TOOLCHAIN = msp430- ;
 CC = msp430-gcc ;

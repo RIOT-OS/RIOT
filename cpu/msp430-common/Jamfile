@@ -25,9 +25,14 @@
 # ******************************************************************************
 # $Id$
 
-SubDir TOP board msb-430h ;
+SubDir TOP cpu msp430-common ;
 
-Module board_cc1100 : driver_cc1100.c ;
+Module cpu : msp430-main.c cpu.c atomic.c irq.c flashrom.c ;
+Module hwtimer_msp430 : hwtimer_cpu.c ;
 
-SubInclude TOP board msb-430-common ;
-SubInclude TOP cpu $(CPU) ;
+UseModule cpu ;
+UseModule oneway_malloc ;
+
+Object startup.o : startup.c ;
+DEPENDS $(TARGET) : startup.o ;
+
