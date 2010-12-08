@@ -1,4 +1,4 @@
-SubDir TOP board eZ430-Chronos ;
+SubDir TOP board chronos ;
 
 HDRS += $(TOP)/board/$(CPU)/include ;
 
