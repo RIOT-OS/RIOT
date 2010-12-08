@@ -15,17 +15,15 @@ void timerA_init()
 	TA0CTL = TASSEL_1 + TACLR;   	  		 // Clear the timer counter, set ACLK
 	TA0CTL &= ~TAIE;						 // Clear the IFG
     
-/*    volatile unsigned int *ccr = &TA0CCR0;
+    volatile unsigned int *ccr = &TA0CCR0;
     volatile unsigned int *ctl = &TA0CCTL0;
 
     for (int i = 0; i < ARCH_MAXTIMERS; i++) {
-        *ccr = 0;
-        *ctl &= ~(CCIFG);
-        *ctl &= ~(CCIE);
+        *(ccr+i) = 0;
+        *(ctl+i) &= ~(CCIFG);
+        *(ctl+i) &= ~(CCIE);
     }
-    */
 
-    TA0CCR0 = 0;
     TA0CTL |= MC_2;
 }
 
@@ -43,12 +41,12 @@ interrupt(TIMER0_A1_VECTOR) __attribute__ ((naked)) timer0_a1_5_isr(void) {
     short taiv = TA0IV;
     short timer;
 
-    switch(taiv) {
-        case TAIFG:
+    if (!(taiv & TAIFG)) {
+//        case TAIFG:
             timer = (taiv/2);
             TA0_unset(timer);
             int_handler(timer);
-            break;
+  /*          break;
     
 		// Timer0_A3	Configurable periodic IRQ (used by button_repeat and buzzer)			
 		case 0x06:	// Disable IE 
@@ -66,7 +64,7 @@ interrupt(TIMER0_A1_VECTOR) __attribute__ ((naked)) timer0_a1_5_isr(void) {
 					TA0CCTL4 &= ~CCIE;
 					// Reset IRQ flag  
 					TA0CCTL4 &= ~CCIFG;  
-					break;
+					break;*/
 	}
 	
     __exit_isr();
