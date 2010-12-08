@@ -36,10 +36,10 @@ and the mailinglist (subscription via web site)
 #ifdef __MSP430_HAS_TA3__
 #define ARCH_MAXTIMERS 3
 #endif
-/*#ifdef __MSP430_HAS_TA5__
+#ifdef __MSP430_HAS_T0A5__
 #define ARCH_MAXTIMERS 5
 #endif
-*/
+
 
 #ifndef ARCH_MAXTIMERS
 #warning "ARCH_MAXTIMERS UNSET!"

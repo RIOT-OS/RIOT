@@ -33,29 +33,9 @@ and the mailinglist (subscription via web site)
 
 #include "debug.h"
 
-static uint32_t ticks = 0;
 
-static void (*int_handler)(int);
-
-static void timerA_init()
-{
-  	ticks = 0;								 // Set tick counter value to 0
-	TA0CTL = TASSEL_1 + TACLR;   	  		 // Clear the timer counter, set SMCLK
-	TA0CTL &= ~TAIFG;						 // Clear the IFG
-	TA0CTL &= ~TAIE;						 // Clear the IFG
-
-    volatile unsigned int *ccr = &TA0CCR0;
-    volatile unsigned int *ctl = &TA0CCTL0;
-
-    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
-        *ccr = 0;
-        *ctl &= ~(CCIFG);
-        *ctl &= ~(CCIE);
-    }
-	
-    TA0CTL |= MC_2;
-}
-
+void (*int_handler)(int);
+extern void timerA_init(void);
 
 static void TA0_disable_interrupt(short timer) {
     volatile unsigned int *ptr = &TA0CCTL0 + (timer);
@@ -80,7 +60,7 @@ static void TA0_set(unsigned long value, short timer) {
     TA0_enable_interrupt(timer);
 }
 
-static void TA0_unset(short timer) {
+void TA0_unset(short timer) {
     volatile unsigned int *ptr = &TA0CCR0 + (timer);
     TA0_disable_interrupt(timer);
     *ptr = 0;
@@ -118,34 +98,4 @@ void hwtimer_arch_set_absolute(unsigned long value, short timer) {
 
 void hwtimer_arch_unset(short timer) {
     TA0_unset(timer);
-}
-
-interrupt(TIMERA0_VECTOR) __attribute__ ((naked)) timer_isr_ccr0(void)
-{
-    __enter_isr();
-
-    TA0_unset(0);
-    int_handler(0);
-   
-    __exit_isr();
-}
-
-interrupt(TIMERA1_VECTOR) __attribute__ ((naked)) timer_isr(void)
-{
-    __enter_isr();
-    
-    short taiv = TA0IV;
-
-    if (taiv & TAIFG) {
-        puts("msp430/hwtimer_cpu TAIFG set!");
-    //    TA0CTL &= ~TAIFG;
-    //    ticks += 0xFFFF;
-    } else {
-
-        short timer = (taiv/2);
-        TA0_unset(timer);
-        int_handler(timer);
-    }
-    
-    __exit_isr();
 }

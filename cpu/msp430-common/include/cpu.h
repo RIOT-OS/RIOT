@@ -44,6 +44,7 @@ and the mailinglist (subscription via web site)
 
 #define WORDSIZE 16
 
+/* not used(?) */
 #define F_CPU 10000000
 
 extern volatile int __inISR;

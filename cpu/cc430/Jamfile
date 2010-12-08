@@ -1,5 +1,5 @@
 # ******************************************************************************
-# Copyright 2009, Freie Universitaet Berlin (FUB). All rights reserved.
+# Copyright 2010, Freie Universitaet Berlin (FUB). All rights reserved.
 # 
 # These sources were developed at the Freie Universitaet Berlin, Computer
 # Systems and Telematics group (http://cst.mi.fu-berlin.de).
@@ -25,14 +25,8 @@
 # ******************************************************************************
 # $Id$
 
-SubDir TOP cpu msp430 ;
+SubDir TOP cpu cc430 ;
 
-Module cpu : msp430-main.c cpu.c atomic.c irq.c flashrom.c ;
-Module hwtimer_cpu : hwtimer_cpu.c ;
+Module hwtimer_cpu : hwtimer_cc430.c : hwtimer_msp430 ;
 
-UseModule cpu ;
-UseModule oneway_malloc ;
-
-Object startup.o : startup.c ;
-DEPENDS $(TARGET) : startup.o ;
-
+SubInclude TOP cpu msp430-common ; 
