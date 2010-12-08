@@ -31,4 +31,3 @@ Module board_cc1100 : driver_cc1100.c ;
 
 SubInclude TOP board msb-430-common ;
 SubInclude TOP cpu $(CPU) ;
-
