@@ -337,8 +337,8 @@ void clear_blink_mem(void);
 void set_blink_rate(uint8_t bits);
 
 // Character / symbol draw functions
-void display_char(uint8_t segment, uint8_t chr, uint8_t mode);
-void display_chars(uint8_t segments, uint8_t * str, uint8_t mode);
+void display_char(uint8_t segment, char chr, uint8_t mode);
+void display_chars(uint8_t segments, char* str, uint8_t mode);
 void display_symbol(uint8_t symbol, uint8_t mode);
 
 // Time display function
