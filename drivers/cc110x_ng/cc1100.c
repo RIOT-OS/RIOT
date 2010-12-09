@@ -23,6 +23,9 @@ cc1100_statistic_t cc1100_statistic;
 volatile cc1100_flags rflags;		                ///< Radio control flags
 volatile uint8_t radio_state = RADIO_UNKNOWN;		///< Radio state
 
+static radio_address_t radio_address;                     ///< Radio address
+static uint8_t radio_channel;                             ///< Radio channel
+
 int transceiver_pid;                         ///< the transceiver thread pid
 
 /* internal function prototypes */
@@ -66,8 +69,12 @@ void cc1100_init(int tpid) {
 	rflags.WOR_RST      = 0;
 
 	/* Set default channel number */
-	cc1100_set_channel(sysconfig.radio_channel);
-    DEBUG("CC1100 initialized and set to channel %i\n", sysconfig.radio_channel);
+#ifdef MODULE_CONFIG
+	cc1100_set_config_channel(sysconfig.radio_channel);
+#else
+    cc1100_set_channel(CC1100_DEFAULT_CHANNR);
+#endif
+    DEBUG("CC1100 initialized and set to channel %i\n", radio_channel);
 
 	// Switch to desired mode (WOR or RX)
 	rd_set_mode(RADIO_MODE_ON);
@@ -94,7 +101,7 @@ uint8_t cc1100_get_buffer_pos(void) {
 }
 
 radio_address_t cc1100_get_address() {
-    return sysconfig.radio_address;
+    return radio_address;
 }
 
 radio_address_t cc1100_set_address(radio_address_t address) {
@@ -107,15 +114,20 @@ radio_address_t cc1100_set_address(radio_address_t address) {
 		write_register(CC1100_ADDR, id);
 	}
 
-	sysconfig.radio_address = id;
-	return sysconfig.radio_address;
+	radio_address = id;
+	return radio_address;
 }
 
+#ifdef MODULE_CONFIG
 radio_address_t cc1100_set_config_address(radio_address_t address) {
     radio_address_t a = cc1100_set_address(address);
+    if (a) {
+        sysconfig.radio_address = a;
+    }
     config_save();
     return a;
 }
+#endif
 
 void cc1100_set_monitor(uint8_t mode) {
     if (mode) {
@@ -213,7 +225,7 @@ char* cc1100_state_to_text(uint8_t state) {
 void cc1100_print_config(void) {
 	printf("Current radio state:          %s\r\n", cc1100_state_to_text(radio_state));
 	printf("Current MARC state:           %s\r\n", cc1100_get_marc_state());
-	printf("Current channel number:       %u\r\n", sysconfig.radio_channel);
+	printf("Current channel number:       %u\r\n", radio_channel);
 }
 
 void cc1100_switch_to_pwd(void) {
@@ -230,18 +242,23 @@ int16_t cc1100_set_channel(uint8_t channr) {
         return -1;
     }
 	write_register(CC1100_CHANNR, channr*10);
-	sysconfig.radio_channel = channr;
-	return sysconfig.radio_channel;
+	radio_channel = channr;
+	return radio_channel;
 }
 
+#ifdef MODULE_CONFIG
 int16_t cc1100_set_config_channel(uint8_t channr) {
     int16_t c = cc1100_set_channel(channr);
+    if (c) {
+        sysconfig.radio_channel = c;
+    }
     config_save();
     return c;
 }
+#endif
 
 int16_t cc1100_get_channel(void) {
-    return sysconfig.radio_channel;
+    return radio_channel;
 }
 
 

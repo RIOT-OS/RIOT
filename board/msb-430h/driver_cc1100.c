@@ -23,7 +23,7 @@ Boston, MA 02111-1307, USA.  */
 #include <cpu.h>
 #include <irq.h>
 
-#include <cc1100.h>
+#include <cc1100_ng.h>
 #include <arch_cc1100.h>
 
 #define CC1100_GDO0         (P2IN & 0x02)   // read serial I/O (GDO0)
@@ -340,4 +340,3 @@ puts("cc1100_isr()");
 //	if (system_state.POWERDOWN != 0) END_LPM3;
 	__exit_isr();
 }
-
