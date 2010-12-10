@@ -1,9 +1,34 @@
+/** \addtogroup system
+ * @{ */
+
+/**
+ * \defgroup vtimer Virtual (Software) Timer library
+ *
+ * The vtimer library provides functions for setting, resetting and restarting
+ * software timers, and for checking if a vtimer has expired.
+ *
+ * (As of now, not resetting, restarting, removing and checking are not implemented)
+ *
+ * @{
+ */
+
+/**
+ * \file
+ * Timer library header file.
+ */
 #ifndef __VTIMER_H
 #define __VTIMER_H 
 
 #include <queue.h>
 #include <timex.h>
 
+/**
+ * A vtimer object.
+ *
+ * This structure is used for declaring a vtimer. This should not be used by programmers, use the vtimer_set_*-functions instead.
+ *
+ * \hideinitializer
+ */
 typedef struct vtimer_t {
     queue_node_t queue_entry;
     timex_t absolute;
@@ -11,9 +36,18 @@ typedef struct vtimer_t {
     void* arg;
 } vtimer_t;
 
-int vtimer_init();
-
+/**
+ * @brief   Current system time
+ * @return  Time as timex_t since system boot
+ */
 timex_t vtimer_now();
+
+/**
+ * @brief   Initializes the vtimer subsystem. To be called once at system initialization. Will be initialized by auto_init.
+ *
+ * @return  always 0
+ */
+int vtimer_init();
 
 /**
  * @brief   will cause the calling thread to be suspended from excecution until the number of microseconds has elapsed
@@ -28,6 +62,7 @@ int vtimer_usleep(uint32_t us);
  * @return      0 on success, < 0 on error
  */
 int vtimer_sleep(timex_t time);
+
 /**
  * @brief   set a vtimer with msg event handler
  * @param[in]   t           pointer to preinitialised vtimer_t
