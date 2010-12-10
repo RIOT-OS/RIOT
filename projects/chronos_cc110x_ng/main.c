@@ -11,17 +11,16 @@
 #include <transceiver.h>
 #include <cc1100_ng.h>
 
-#define RADIO_STACK_SIZE    (1024)
+#define RADIO_STACK_SIZE    (512)
 #define SEND_SIZE   CC1100_MAX_DATA_LENGTH
 
-#define SND_BUFFER_SIZE     (3)
 #define RCV_BUFFER_SIZE     (4)
 
 #define SENDING_DELAY       (5 * 1000)
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
 
-uint8_t snd_buffer[SND_BUFFER_SIZE][SEND_SIZE];
+uint8_t snd_buffer[SEND_SIZE];
 
 msg msg_q[RCV_BUFFER_SIZE];
 
@@ -29,28 +28,20 @@ static msg mesg;
 static transceiver_command_t tcmd;
 static radio_packet_t p;
 
-void sender(char *count);
+void send(radio_address_t dst, uint8_t len, uint8_t *data);
 
-void sender(char *count) {
-    unsigned int c = 3;
-    unsigned int i;
-
+void send(radio_address_t dst, uint8_t len, uint8_t *data) {
     mesg.type = SND_PKT;
     mesg.content.ptr = (char*) &tcmd;
 
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &p;
 
-    p.length = CC1100_MAX_DATA_LENGTH;
-    p.dst = 0;
+    p.length = len;
+    p.dst = dst;
 
-    for (i = 0; i < c; i++) {
-        display_chars(LCD_SEG_L1_3_0, ".....", SEG_OFF);
-        display_chars(LCD_SEG_L1_3_0, (char*) itoa(i, 1, 0), SEG_ON);
-        p.data = snd_buffer[i % SND_BUFFER_SIZE];
-        msg_send(&mesg, transceiver_pid, 1);
-        hwtimer_wait(SENDING_DELAY);
-    }
+    p.data = data;
+    msg_send(&mesg, transceiver_pid, 1);
 }
 
 
@@ -64,7 +55,9 @@ void radio(void) {
         msg_receive(&m);
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t*) m.content.ptr;
-            display_chars(LCD_SEG_L2_5_0, (char*) itoa(p->length, 2, 0), SEG_ON);
+            display_chars(LCD_SEG_L2_5_0, "CC1100", SEG_OFF);
+            display_chars(LCD_SEG_L2_5_0, (char*) p->data, SEG_ON);
+            send(p->src, p->length, p->data);
             p->processing--;
         }
         else if (m.type == ENOBUFFER) {
@@ -76,11 +69,8 @@ void radio(void) {
 
 int main(void) {
     int radio_pid;
-    uint8_t addr = 43;
-    uint8_t i;
-    for (i = 0; i < SND_BUFFER_SIZE; i++) { 
-        memset(snd_buffer[i], i, SEND_SIZE);
-    }
+    radio_address_t addr = 43;
+    memset(snd_buffer, 43, SEND_SIZE);
     radio_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE, PRIORITY_MAIN-2, CREATE_STACKTEST, radio, "radio");
     transceiver_init(TRANSCEIVER_CC1100);
     transceiver_start();
@@ -96,8 +86,11 @@ int main(void) {
     tcmd.data = &addr;
     msg_send(&mesg, transceiver_pid, 1);
 
-    sender(NULL);
+    send(0, SEND_SIZE, snd_buffer);
 
    while (1) {
+       hwtimer_wait(SENDING_DELAY);
+        display_chars(LCD_SEG_L1_3_0, ".....", SEG_OFF);
+        display_chars(LCD_SEG_L1_3_0, (char*) itoa(TA0R, 6, 0), SEG_ON);
    }
 }

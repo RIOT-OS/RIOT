@@ -99,9 +99,16 @@ void cc1100_write_reg(uint8_t addr, uint8_t value) {
 }
 
 uint8_t cc1100_read_status(uint8_t addr) {
-    char status;
-    cc1100_readburst_reg(addr, &status, 1);
-    return status;
+    unsigned char x;
+    uint16_t int_state;
+
+    int_state = disableIRQ();
+
+    RF1AINSTR1B = (addr | RF_STATREGRD); 
+    x = RF1ADOUT1B;
+
+    restoreIRQ(int_state);
+    return x;
 }
 
 // *************************************************************************************************

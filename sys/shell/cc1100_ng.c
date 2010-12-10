@@ -50,27 +50,33 @@ void _cc1100_ng_get_set_channel_handler(char *chan) {
 void _cc1100_ng_send_handler(char *pkt) {
     radio_packet_t p;
     uint32_t response;
+    uint16_t addr;
+    char *tok;
+
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &p;
-    uint16_t addr;
 
-    addr = atoi(pkt+7);
-    memcpy(text_msg, "Text", 5);
+    tok = strtok(pkt+7, " ");
+    if (tok) {
+        addr = atoi(tok);
+        tok = strtok(NULL, " ");
+        if (tok) {
+            memset(text_msg, 0, TEXT_SIZE);
+            memcpy(text_msg, tok, strlen(tok));
     /*    if (sscanf(pkt, "txtsnd %hu %s", &(addr), text_msg) == 2) {*/
-    if (1 == 1) {
-        p.data = (uint8_t*) text_msg;
-        p.length = strlen(text_msg);
-        p.dst = addr;
-        mesg.type = SND_PKT;
-        mesg.content.ptr = (char*) &tcmd;
-        printf("[cc1100] Sending packet of length %u to %hu: %s\n", p.length, p.dst, (char*) p.data);
-        msg_send_receive(&mesg, &mesg, transceiver_pid);
-        response = mesg.content.value;
-        printf("[cc1100] Packet sent: %lu\n", response);
+            p.data = (uint8_t*) text_msg;
+            p.length = strlen(text_msg) + 1;
+            p.dst = addr;
+            mesg.type = SND_PKT;
+            mesg.content.ptr = (char*) &tcmd;
+            printf("[cc1100] Sending packet of length %u to %hu: %s\n", p.length, p.dst, (char*) p.data);
+            msg_send_receive(&mesg, &mesg, transceiver_pid);
+            response = mesg.content.value;
+            printf("[cc1100] Packet sent: %lu\n", response);
+            return;
+        }
     }
-    else {
-        puts("Usage:\ttxtsnd <ADDR> <MSG>");
-    }
+    puts("Usage:\ttxtsnd <ADDR> <MSG>");
 }
 
 void _cc1100_ng_monitor_handler(char *mode) {

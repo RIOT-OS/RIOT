@@ -38,6 +38,7 @@ void cc1100_rx_handler(void) {
 		}
         cc1100_rx_buffer[rx_buffer_next].rssi = rflags._RSSI;
         cc1100_rx_buffer[rx_buffer_next].lqi = rflags._LQI;
+		cc1100_strobe(CC1100_SFRX);		// ...for flushing the RX FIFO
 
 		// Valid packet. After a wake-up, the radio should be in IDLE.
 		// So put CC1100 to RX for WOR_TIMEOUT (have to manually put
@@ -109,6 +110,7 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length) {
 			rxBuffer[0] = packetLength;
 
 			// Read the rest of the packet
+            // TODO: Offset + 2 here for cc430
 			cc1100_readburst_reg(CC1100_RXFIFO, (char*)rxBuffer+1, packetLength);
 
             // Read the 2 appended status bytes (status[0] = RSSI, status[1] = LQI)

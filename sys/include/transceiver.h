@@ -4,7 +4,11 @@
 #include <radio/types.h>
 
 /* Stack size for transceiver thread */
+#ifdef ENABLE_DEBUG
+#define TRANSCEIVER_STACK_SIZE      (2048)
+#else
 #define TRANSCEIVER_STACK_SIZE      (512)
+#endif
 
 /* The maximum of threads to register */
 #define TRANSCEIVER_MAX_REGISTERED  (4)

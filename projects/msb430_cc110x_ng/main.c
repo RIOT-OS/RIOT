@@ -41,6 +41,22 @@ const shell_command_t sc[] = {
     {NULL, NULL, NULL}
 };
 
+void send(radio_address_t dst, uint8_t len, uint8_t *data);
+
+void send(radio_address_t dst, uint8_t len, uint8_t *data) {
+    mesg.type = SND_PKT;
+    mesg.content.ptr = (char*) &tcmd;
+
+    tcmd.transceivers = TRANSCEIVER_CC1100;
+    tcmd.data = &p;
+
+    p.length = len;
+    p.dst = dst;
+
+    p.data = data;
+    msg_send(&mesg, transceiver_pid, 1);
+}
+
 void shell_runner(void) {
     shell_init(&shell, sc, uart0_readc, uart0_putc);
     posix_open(uart0_handler_pid, 0);
@@ -102,6 +118,7 @@ void radio(void) {
             for (i = 0; i < p->length; i++) {
                 printf("%02X ", p->data[i]);
             }
+            send(p->src, p->length, p->data);
             p->processing--;
             printf("\n");
         }
