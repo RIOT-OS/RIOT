@@ -20,6 +20,7 @@
 
 void vtimer_callback(void *ptr);
 void vtimer_tick(void *ptr);
+static int vtimer_set(vtimer_t *timer);
 static int set_longterm(vtimer_t *timer);
 static int set_shortterm(vtimer_t *timer);
 
@@ -128,10 +129,10 @@ void normalize_to_tick(timex_t *time) {
     DEBUG("     Result: %lu %lu\n", time->seconds, time->nanoseconds);
 }
 
-int vtimer_set(vtimer_t *timer, timex_t *offset) {
-    DEBUG("vtimer_set(): New timer. Offset: %lu %lu\n", offset->seconds, offset->nanoseconds);
+static int vtimer_set(vtimer_t *timer) {
+    DEBUG("vtimer_set(): New timer. Offset: %lu %lu\n", timer->absolute.seconds, timer->absolute.nanoseconds);
 
-    timer->absolute = timex_add(vtimer_now(), *offset);
+    timer->absolute = timex_add(vtimer_now(), timer->absolute);
     normalize_to_tick(&(timer->absolute));
 
     DEBUG("vtimer_set(): Absolute: %lu %lu\n", timer->absolute.seconds, timer->absolute.nanoseconds);
@@ -192,13 +193,30 @@ int vtimer_init() {
     return 0;
 }
 
+int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid) {
+    t->action = (void*) thread_wakeup;
+    t->arg = (void*) pid;
+    t->absolute = interval;
+    vtimer_set(t);
+    return 0;
+}
+
 int vtimer_usleep(uint32_t usecs) {
-    vtimer_t t;
     timex_t offset = timex_set(0, usecs);
-    t.action = (void*) thread_wakeup;
-    t.arg = (void*) thread_getpid();
-    vtimer_set(&t, &offset);
+    return vtimer_sleep(offset);
+}
+
+int vtimer_sleep(timex_t time) {
+    vtimer_t t;
+    vtimer_set_wakeup(&t, time, thread_getpid());
     thread_sleep();
     return 0;
+}
+
+int vtimer_set_cb(vtimer_t *t, timex_t interval, void (*f_ptr)(void *), void *ptr) {
+    t->action = f_ptr;
+    t->arg = ptr;
+    t->absolute = interval;
+    return vtimer_set(t);
 }
 
