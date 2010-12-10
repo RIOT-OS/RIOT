@@ -31,7 +31,8 @@ and the mailinglist (subscription via web site)
 #include <hwtimer.h>
 #include <hwtimer_arch.h>
 
-#include "debug.h"
+// #define ENABLE_DEBUG (1)
+#include <debug.h>
 
 
 void (*int_handler)(int);
@@ -55,7 +56,7 @@ static void TA0_set_nostart(unsigned long value, short timer) {
 }
 
 static void TA0_set(unsigned long value, short timer) {
-//    printf("Setting timer %u to %lu\n", timer, value);
+    DEBUG("Setting timer %u to %lu\n", timer, value);
     TA0_set_nostart(value, timer);
     TA0_enable_interrupt(timer);
 }

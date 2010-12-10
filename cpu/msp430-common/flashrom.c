@@ -1,5 +1,6 @@
 #include <stddef.h>
-#include <msp430x16x.h>
+#include <stdint.h>
+#include  <msp430x16x.h>
 #include <msp430/flash.h>
 #include <irq.h>
 

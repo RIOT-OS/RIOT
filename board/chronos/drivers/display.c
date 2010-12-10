@@ -43,18 +43,15 @@
 #include <string.h>
 
 // driver
-#include "cc430x613x.h"
-#include "display.h"
+#include <cc430x613x.h>
+#include <display.h>
 
 
 // *************************************************************************************************
 // Prototypes section
-void write_lcd_mem(uint8_t * lcdmem, uint8_t bits, uint8_t bitmask, uint8_t state);
+void write_lcd_mem(uint8_t *lcdmem, uint8_t bits, uint8_t bitmask, uint8_t state);
 void clear_line(uint8_t line);
 void display_symbol(uint8_t symbol, uint8_t mode);
-void display_char(uint8_t segment, uint8_t chr, uint8_t mode);
-void display_chars(uint8_t segments, uint8_t * str, uint8_t mode);
-
 
 // *************************************************************************************************
 // Defines section
@@ -285,12 +282,12 @@ uint8_t * itoa(uint32_t n, uint8_t digits, uint8_t blanks)
 // *************************************************************************************************
 void display_value1(uint8_t segments, uint32_t value, uint8_t digits, uint8_t blanks, uint8_t disp_mode)
 {
-	uint8_t * str;
+	uint8_t* str;
 
 	str = itoa(value, digits, blanks);
 
 	// Display string in blink mode
-	display_chars(segments, str, disp_mode);
+	display_chars(segments, (char*) str, disp_mode);
 }
 
 
@@ -332,7 +329,7 @@ void display_symbol(uint8_t symbol, uint8_t mode)
 //				uint8_t mode		SEG_ON, SEG_OFF, SEG_BLINK
 // @return      none
 // *************************************************************************************************
-void display_char(uint8_t segment, uint8_t chr, uint8_t mode)
+void display_char(uint8_t segment, char chr, uint8_t mode)
 {
 	uint8_t * lcdmem;			// Pointer to LCD memory
 	uint8_t bitmask;			// Bitmask for character
@@ -393,8 +390,7 @@ void display_char(uint8_t segment, uint8_t chr, uint8_t mode)
 //				uint8_t mode		SEG_ON, SEG_OFF, SEG_BLINK
 // @return      none
 // *************************************************************************************************
-void display_chars(uint8_t segments, uint8_t * str, uint8_t mode)
-{
+void display_chars(uint8_t segments, char *str, uint8_t mode) {
 	uint8_t i;
 	uint8_t length = 0;			// Write length
 	uint8_t char_start = 0;			// Starting point for consecutive write
