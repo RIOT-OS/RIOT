@@ -17,6 +17,7 @@
 
 #ifndef __SWTIMER_H__
 #define __SWTIMER_H__
+#warning Swtimers are deprecated. use virtual timers (vtimer) instead.
 
 #include <stdint.h>
 
