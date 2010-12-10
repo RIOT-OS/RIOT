@@ -128,8 +128,7 @@ void cc1100_spi_init(void)
 	}
 }
 
-uint8_t
-cc1100_txrx(uint8_t c) {
+uint8_t cc1100_txrx(uint8_t c) {
 	uint8_t result;
 	SSP0DR = c;
 #ifdef DEBUG
