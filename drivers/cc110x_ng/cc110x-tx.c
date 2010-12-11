@@ -1,17 +1,17 @@
 #include <stdio.h>
 
-#include <cc1100_ng.h>
-#include <cc1100-defaultSettings.h>
-#include <cc1100-internal.h>
-#include <cc1100-arch.h>
-#include <cc1100_spi.h>
-#include <cc1100-reg.h>
+#include <cc110x_ng.h>
+#include <cc110x-defaultSettings.h>
+#include <cc110x-internal.h>
+#include <cc110x-arch.h>
+#include <cc110x_spi.h>
+#include <cc110x-reg.h>
 
 #include <irq.h>
 
 #include <board.h>
 
-uint8_t cc1100_send(cc1100_packet_t *packet) {
+uint8_t cc110x_send(cc110x_packet_t *packet) {
 	volatile uint32_t abort_count;
     uint8_t size;
     /* TODO: burst sending */
@@ -33,23 +33,23 @@ uint8_t cc1100_send(cc1100_packet_t *packet) {
         return 0;
     }
 
-    packet->phy_src = cc1100_get_address();
+    packet->phy_src = cc110x_get_address();
 
 	// Disables RX interrupt etc.
-	cc1100_before_send();
+	cc110x_before_send();
 
 	// But CC1100 in IDLE mode to flush the FIFO
-    cc1100_strobe(CC1100_SIDLE);
+    cc110x_strobe(CC1100_SIDLE);
     // Flush TX FIFO to be sure it is empty
-    cc1100_strobe(CC1100_SFTX);
+    cc110x_strobe(CC1100_SFTX);
 	// Write packet into TX FIFO
-    cc1100_writeburst_reg(CC1100_TXFIFO, (char*) packet, size);
+    cc110x_writeburst_reg(CC1100_TXFIFO, (char*) packet, size);
   	// Switch to TX mode
     abort_count = 0;
     unsigned int cpsr = disableIRQ();
-    cc1100_strobe(CC1100_STX);
+    cc110x_strobe(CC1100_STX);
     // Wait for GDO2 to be set -> sync word transmitted
-    while (cc1100_get_gdo2() == 0) {
+    while (cc110x_get_gdo2() == 0) {
     	abort_count++;
     	if (abort_count > CC1100_SYNC_WORD_TX_TIME) {
     		// Abort waiting. CC1100 maybe in wrong mode
@@ -60,18 +60,18 @@ uint8_t cc1100_send(cc1100_packet_t *packet) {
     }
     restoreIRQ(cpsr);
 	// Wait for GDO2 to be cleared -> end of packet
-    while (cc1100_get_gdo2() != 0);
+    while (cc110x_get_gdo2() != 0);
     //LED_GREEN_TOGGLE;
 
     // Experimental - TOF Measurement
-    cc1100_after_send();
-    cc1100_statistic.raw_packets_out++;
+    cc110x_after_send();
+    cc110x_statistic.raw_packets_out++;
 
 	// Store number of transmission retries
 	rflags.TX = 0;
 
 	// Go to mode after TX (CONST_RX -> RX, WOR -> WOR)
-	cc1100_switch_to_rx();
+	cc110x_switch_to_rx();
 
 	return true;
 }

@@ -41,7 +41,7 @@ and the mailinglist (subscription via web site)
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 2139 $
  *
- * @note		$Id: cc1100-defaultSettings.h 2139 2010-05-26 08:04:04Z hillebra $
+ * @note		$Id: cc110x-defaultSettings.h 2139 2010-05-26 08:04:04Z hillebra $
  */
 
 #include <stdint.h>

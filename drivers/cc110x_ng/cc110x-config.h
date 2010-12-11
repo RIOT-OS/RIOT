@@ -45,13 +45,13 @@ typedef struct {
 	uint8_t _FSCAL2;
 	uint8_t _FSCAL1;
 	uint8_t _FSCAL0;
-} cc1100_reg_t;
+} cc110x_reg_t;
 
 /** CC1100 radio configuration */
 typedef struct {
-	cc1100_reg_t reg_cfg;	 	///< CC1100 register configuration
+	cc110x_reg_t reg_cfg;	 	///< CC1100 register configuration
 	uint8_t pa_power;			///< Output power setting
-} cc1100_cfg_t;
+} cc110x_cfg_t;
 
 /**
  * @brief	Radio Control Flags
@@ -74,12 +74,12 @@ typedef struct
 	unsigned KT_RES_ERR : 1;	///< A hwtimer resource error has occurred (no free timers available)
 	unsigned TX         : 1;	///< State machine TX lock, only ACKs will be received
 	unsigned WOR_RST 	: 1;	///< Reset CC1100 real time clock (WOR) on next WOR strobe
-} cc1100_flags;
+} cc110x_flags;
 
 /**
  * @brief	Statistic interface for debugging
  */
-typedef struct cc1100_statistic {
+typedef struct cc110x_statistic {
 	uint32_t	packets_in;
 	uint32_t	packets_in_crc_fail;
 	uint32_t	packets_in_while_tx;
@@ -91,6 +91,6 @@ typedef struct cc1100_statistic {
 	uint32_t	acks_send;
 	uint32_t	rx_buffer_max;
 	uint32_t	watch_dog_resets;
-} cc1100_statistic_t;
+} cc110x_statistic_t;
 
 #endif

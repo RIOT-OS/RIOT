@@ -23,28 +23,35 @@ For further information and questions please use the web site
 and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
+/**
+ * @ingroup		dev_cc110x
+ * @{
+ */
 
 /**
  * @file
- * @ingroup		LPC2387
- * @brief		CC1100 LPC2387 dependend functions
+ * @internal
+ * @brief		TI Chipcon CC1100 SPI driver
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 1775 $
  *
- * @note    	$Id: arch_cc1100.h 1775 2010-01-26 09:37:03Z hillebra $
+ * @note		$Id: cc110x_spi.h 1775 2010-01-26 09:37:03Z hillebra $
  */
 
-#include <stdint.h>
+#ifndef CC1100_SPI_H_
+#define CC1100_SPI_H_
 
-uint8_t cc1100_txrx(uint8_t c);
+int cc110x_get_gdo0(void);
+int cc110x_get_gdo1(void);
+int cc110x_get_gdo2(void);
 
-void cc1100_gdo0_enable(void);
-void cc1100_gdo0_disable(void);
-void cc1100_gdo2_enable(void);
-void cc1100_gdo2_disable(void);
-void cc1100_init_interrupts(void);
+void cc110x_spi_init(void);
+void cc110x_spi_cs(void);
+void cc110x_spi_select(void);
+void cc110x_spi_unselect(void);
 
-void cc1100_before_send(void);
-void cc1100_after_send(void);
+/** @} */
+#endif /* CC1100_SPI_H_ */

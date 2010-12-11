@@ -27,7 +27,7 @@
 
 SubDir TOP board msb-430h ;
 
-Module board_cc1100 : driver_cc1100.c : cc110x_spi ;
+Module board_cc110x : driver_cc110x.c : cc110x_spi ;
 
 SubInclude TOP board msb-430-common ;
 SubInclude TOP cpu $(CPU) ;

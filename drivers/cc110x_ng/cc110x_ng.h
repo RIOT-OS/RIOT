@@ -4,7 +4,7 @@
 #include <radio/radio.h>
 #include <radio/types.h>
 #include <stdint.h>
-#include <cc1100-config.h>
+#include <cc110x-config.h>
 
 #define CC1100_MAX_DATA_LENGTH (58)
 
@@ -39,9 +39,8 @@
 
 /** @} */
 
-
-extern volatile cc1100_flags rflags;	///< Radio flags
-extern char cc1100_conf[];
+extern volatile cc110x_flags rflags;	///< Radio flags
+extern char cc110x_conf[];
 
 /**
  * @brief	CC1100 layer 0 protocol
@@ -72,12 +71,12 @@ typedef struct __attribute__ ((packed)) {
 	uint8_t phy_src;				///< Source address (physical source)
 	uint8_t flags;					///< Flags
 	uint8_t data[CC1100_MAX_DATA_LENGTH];	///< Data (high layer protocol)
-} cc1100_packet_t;
+} cc110x_packet_t;
 
 typedef struct {
     uint8_t rssi;
     uint8_t lqi;
-    cc1100_packet_t packet;
+    cc110x_packet_t packet;
 } rx_buffer_t;
 
 enum radio_mode {
@@ -86,51 +85,51 @@ enum radio_mode {
 	RADIO_MODE_ON	= 1			///< turn radio on
 };
 
-extern rx_buffer_t cc1100_rx_buffer[]; 
+extern rx_buffer_t cc110x_rx_buffer[]; 
 
 extern volatile uint8_t rx_buffer_next;	    ///< Next packet in RX queue
 
 extern volatile uint8_t radio_state;		///< Radio state
-extern cc1100_statistic_t cc1100_statistic;
+extern cc110x_statistic_t cc110x_statistic;
 
 int transceiver_pid;                         ///< the transceiver thread pid
 
-void cc1100_init(int transceiver_pid);
+void cc110x_init(int transceiver_pid);
 
-void cc1100_rx_handler(void);
+void cc110x_rx_handler(void);
 
-uint8_t cc1100_send(cc1100_packet_t *pkt);
+uint8_t cc110x_send(cc110x_packet_t *pkt);
 
-uint8_t cc1100_get_buffer_pos(void);
+uint8_t cc110x_get_buffer_pos(void);
 
-void cc1100_setup_rx_mode(void);
-void cc1100_switch_to_rx(void);
-void cc1100_wakeup_from_rx(void);
-void cc1100_switch_to_pwd(void);
+void cc110x_setup_rx_mode(void);
+void cc110x_switch_to_rx(void);
+void cc110x_wakeup_from_rx(void);
+void cc110x_switch_to_pwd(void);
 
-void cc1100_disable_interrupts(void);
-int16_t cc1100_set_config_channel(uint8_t channr);
-int16_t cc1100_set_channel(uint8_t channr);
-int16_t cc1100_get_channel(void);
+void cc110x_disable_interrupts(void);
+int16_t cc110x_set_config_channel(uint8_t channr);
+int16_t cc110x_set_channel(uint8_t channr);
+int16_t cc110x_get_channel(void);
 
-radio_address_t cc1100_set_address(radio_address_t addr);
-radio_address_t cc1100_set_config_address(radio_address_t addr);
-radio_address_t cc1100_get_address(void);
-void cc1100_set_monitor(uint8_t mode);
+radio_address_t cc110x_set_address(radio_address_t addr);
+radio_address_t cc110x_set_config_address(radio_address_t addr);
+radio_address_t cc110x_get_address(void);
+void cc110x_set_monitor(uint8_t mode);
 
-void cc1100_print_config(void);
+void cc110x_print_config(void);
 
 /**
  * @brief	GDO0 interrupt handler.
  */
-void cc1100_gdo0_irq(void);
+void cc110x_gdo0_irq(void);
 
 /**
  * @brief	GDO2 interrupt handler.
  *
  * @note	Wakes up MCU on packet reception.
  */
-void cc1100_gdo2_irq(void);
+void cc110x_gdo2_irq(void);
 
 
 #endif

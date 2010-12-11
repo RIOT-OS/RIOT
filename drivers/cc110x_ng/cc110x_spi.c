@@ -39,16 +39,16 @@ and the mailinglist (subscription via web site)
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 1775 $
  *
- * @note		$Id: cc1100_spi.c 1775 2010-01-26 09:37:03Z hillebra $
+ * @note		$Id: cc110x_spi.c 1775 2010-01-26 09:37:03Z hillebra $
  */
 
 #include <stdio.h>
 
-#include <cc1100_ng.h>
-#include <cc1100-arch.h>
-#include <cc1100-internal.h>
-#include <cc1100_spi.h>
-#include <cc1100-reg.h>
+#include <cc110x_ng.h>
+#include <cc110x-arch.h>
+#include <cc110x-internal.h>
+#include <cc110x_spi.h>
+#include <cc110x-reg.h>
 
 #include <irq.h>
 
@@ -58,70 +58,74 @@ and the mailinglist (subscription via web site)
 
 #define NOBYTE 0xFF
 
-uint8_t cc1100_writeburst_reg(uint8_t addr, char *src, uint8_t count) {
+uint8_t cc110x_writeburst_reg(uint8_t addr, char *src, uint8_t count) {
 	int i = 0;
 	unsigned int cpsr = disableIRQ();
-	cc1100_spi_select();
-	cc1100_txrx(addr | CC1100_WRITE_BURST);
+	cc110x_spi_select();
+	cc110x_txrx(addr | CC1100_WRITE_BURST);
 	while (i < count) {
-		cc1100_txrx(src[i]);
+		cc110x_txrx(src[i]);
 		i++;
 	}
-	cc1100_spi_unselect();
+	cc110x_spi_unselect();
 	restoreIRQ(cpsr);
 	return count;
 }
 
-void cc1100_readburst_reg(uint8_t addr, char *buffer, uint8_t count) {
+void cc110x_readburst_reg(uint8_t addr, char *buffer, uint8_t count) {
 	int i = 0;
 	unsigned int cpsr = disableIRQ();
-	cc1100_spi_select();
-	cc1100_txrx(addr | CC1100_READ_BURST);
+	cc110x_spi_select();
+	cc110x_txrx(addr | CC1100_READ_BURST);
 	while (i < count) {
-		buffer[i] = cc1100_txrx(NOBYTE);
+		buffer[i] = cc110x_txrx(NOBYTE);
 		i++;
 	}
-	cc1100_spi_unselect();
+	cc110x_spi_unselect();
 	restoreIRQ(cpsr);
 }
 
-void cc1100_write_reg(uint8_t addr, uint8_t value) {
+void cc110x_read_fifo(char *buffer, uint8_t count) {
+    cc110x_readburst_reg(CC1100_RXFIFO, buffer,count);
+}
+
+void cc110x_write_reg(uint8_t addr, uint8_t value) {
 	unsigned int cpsr = disableIRQ();
-	cc1100_spi_select();
-	cc1100_txrx(addr);
-	cc1100_txrx(value);
-	cc1100_spi_unselect();
+	cc110x_spi_select();
+	cc110x_txrx(addr);
+	cc110x_txrx(value);
+	cc110x_spi_unselect();
 	restoreIRQ(cpsr);
 }
 
-uint8_t cc1100_read_reg(uint8_t addr) {
+uint8_t cc110x_read_reg(uint8_t addr) {
 	uint8_t result;
 	unsigned int cpsr = disableIRQ();
-	cc1100_spi_select();
-	cc1100_txrx(addr | CC1100_READ_SINGLE);
-	result = cc1100_txrx(NOBYTE);
-	cc1100_spi_unselect();
+	cc110x_spi_select();
+	cc110x_txrx(addr | CC1100_READ_SINGLE);
+	result = cc110x_txrx(NOBYTE);
+	cc110x_spi_unselect();
 	restoreIRQ(cpsr);
 	return result;
 }
 
-uint8_t cc1100_read_status(uint8_t addr) {
+uint8_t cc110x_read_status(uint8_t addr) {
 	uint8_t result;
 	unsigned int cpsr = disableIRQ();
-	cc1100_spi_select();
-	cc1100_txrx(addr | CC1100_READ_BURST);
-	result = cc1100_txrx(NOBYTE);
-	cc1100_spi_unselect();
+	cc110x_spi_select();
+	cc110x_txrx(addr | CC1100_READ_BURST);
+	result = cc110x_txrx(NOBYTE);
+	cc110x_spi_unselect();
 	restoreIRQ(cpsr);
 	return result;
 }
 
-uint8_t cc1100_strobe(uint8_t c) {
+uint8_t cc110x_strobe(uint8_t c) {
 	uint8_t result;
 	unsigned int cpsr = disableIRQ();
-	cc1100_spi_select();
-	result = cc1100_txrx(c);
-	cc1100_spi_unselect();
+	cc110x_spi_select();
+	result = cc110x_txrx(c);
+	cc110x_spi_unselect();
 	restoreIRQ(cpsr);
 	return result;
 }

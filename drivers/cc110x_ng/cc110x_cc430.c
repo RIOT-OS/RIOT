@@ -1,6 +1,6 @@
 #include <irq.h>
-#include <cc1100-defaultSettings.h>
-#include <cc1100-reg.h>
+#include <cc110x-defaultSettings.h>
+#include <cc110x-reg.h>
 #include <stdint.h>
 #include <board.h>
 #include <hwtimer.h>
@@ -11,7 +11,7 @@
 // @param       none
 // @return      none
 // *************************************************************************************************
-uint8_t cc1100_strobe(uint8_t c) {
+uint8_t cc110x_strobe(uint8_t c) {
   uint8_t statusByte = 0;
   uint16_t int_state, gdo_state;
   
@@ -29,8 +29,8 @@ uint8_t cc1100_strobe(uint8_t c) {
 	  if ((c > RF_SRES) && (c < RF_SNOP))
 	  {
 	  	
-	  	gdo_state = cc1100_read_reg(IOCFG2); // buffer IOCFG2 state
-	  	cc1100_write_reg(IOCFG2, 0x29); // c-ready to GDO2
+	  	gdo_state = cc110x_read_reg(IOCFG2); // buffer IOCFG2 state
+	  	cc110x_write_reg(IOCFG2, 0x29); // c-ready to GDO2
 	  	
 	  	RF1AINSTRB = c;
 	  	if ((RF1AIN & 0x04) == 0x04 ) 			// chip at sleep mode
@@ -42,7 +42,7 @@ uint8_t cc1100_strobe(uint8_t c) {
 		 		hwtimer_wait(RTIMER_TICKS(9800));	// Delay for ~810usec at 12MHz CPU clock
 	  		}
 	  	}
-		cc1100_write_reg(IOCFG2, gdo_state); // restore IOCFG2 setting
+		cc110x_write_reg(IOCFG2, gdo_state); // restore IOCFG2 setting
 	  }
 	  else		// chip active mode
 	  {	
@@ -57,12 +57,12 @@ uint8_t cc1100_strobe(uint8_t c) {
 
 
 // *************************************************************************************************
-// @fn          cc1100_read_reg
+// @fn          cc110x_read_reg
 // @brief       Read byte from register.
 // @param       none
 // @return      none
 // *************************************************************************************************
-uint8_t cc1100_read_reg(uint8_t addr) {
+uint8_t cc110x_read_reg(uint8_t addr) {
   unsigned char x;
   uint16_t int_state;
 
@@ -77,12 +77,12 @@ uint8_t cc1100_read_reg(uint8_t addr) {
 
 
 // *************************************************************************************************
-// @fn          cc1100_write_reg
+// @fn          cc110x_write_reg
 // @brief       Write byte to register.
 // @param       none
 // @return      none
 // *************************************************************************************************
-void cc1100_write_reg(uint8_t addr, uint8_t value) { 
+void cc110x_write_reg(uint8_t addr, uint8_t value) { 
 	volatile unsigned int i;
 	uint16_t int_state;
 
@@ -98,7 +98,7 @@ void cc1100_write_reg(uint8_t addr, uint8_t value) {
     restoreIRQ(int_state);
 }
 
-uint8_t cc1100_read_status(uint8_t addr) {
+uint8_t cc110x_read_status(uint8_t addr) {
     unsigned char x;
     uint16_t int_state;
 
@@ -112,12 +112,12 @@ uint8_t cc1100_read_status(uint8_t addr) {
 }
 
 // *************************************************************************************************
-// @fn          cc1100_readburst_reg
+// @fn          cc110x_readburst_reg
 // @brief       Read sequence of bytes from register.
 // @param       none
 // @return      none
 // *************************************************************************************************
-void cc1100_readburst_reg(uint8_t addr, char *buffer, uint8_t count) {
+void cc110x_readburst_reg(uint8_t addr, char *buffer, uint8_t count) {
   unsigned int i;
   uint16_t int_state;
 
@@ -137,14 +137,32 @@ void cc1100_readburst_reg(uint8_t addr, char *buffer, uint8_t count) {
     restoreIRQ(int_state);
 }  
     
+void cc110x_read_fifo(char *buffer, uint8_t count) {
+  unsigned int i;
+  uint16_t int_state;
 
+    int_state = disableIRQ();
+  
+  while (!(RF1AIFCTL1 & RFINSTRIFG));       // Wait for the Radio to be ready for next instruction
+  RF1AINSTR1B = (RF_RXFIFORD);          // Send address + Instruction
+
+  for (i = 0; i < (count-1); i++)
+  {
+    while (!(RFDOUTIFG&RF1AIFCTL1));        // Wait for the Radio Core to update the RF1ADOUTB reg
+    buffer[i] = RF1ADOUT1B;                 // Read DOUT from Radio Core + clears RFDOUTIFG
+                                            // Also initiates auo-read for next DOUT byte
+  }
+  buffer[count-1] = RF1ADOUT0B;             // Store the last DOUT from Radio Core
+
+    restoreIRQ(int_state);
+}
 // *************************************************************************************************
-// @fn          cc1100_writeburst_reg
+// @fn          cc110x_writeburst_reg
 // @brief       Write sequence of bytes to register.
 // @param       none
 // @return      none
 // *************************************************************************************************
-uint8_t cc1100_writeburst_reg(uint8_t addr, char *buffer, uint8_t count) {  
+uint8_t cc110x_writeburst_reg(uint8_t addr, char *buffer, uint8_t count) {  
   // Write Burst works wordwise not bytewise - bug known already
   unsigned char i;                             
   uint16_t int_state;

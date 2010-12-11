@@ -6,10 +6,10 @@
 #include <thread.h>
 #include <board.h>
 #include <hwtimer.h>
-#include <swtimer.h>
+#include <vtimer.h>
 #include <msg.h>
 #include <transceiver.h>
-#include <cc1100_ng.h>
+#include <cc110x_ng.h>
 
 #define RADIO_STACK_SIZE    (512)
 #define SEND_SIZE   CC1100_MAX_DATA_LENGTH
@@ -39,6 +39,8 @@ void send(radio_address_t dst, uint8_t len, uint8_t *data) {
 
     p.length = len;
     p.dst = dst;
+    display_chars(LCD_SEG_L2_5_0, "CC1100", SEG_OFF);
+    display_chars(LCD_SEG_L2_5_0, (char*) itoa(p.dst, 6, 0), SEG_ON);
 
     p.data = data;
     msg_send(&mesg, transceiver_pid, 1);
@@ -58,6 +60,9 @@ void radio(void) {
             display_chars(LCD_SEG_L2_5_0, "CC1100", SEG_OFF);
             display_chars(LCD_SEG_L2_5_0, (char*) p->data, SEG_ON);
             send(p->src, p->length, p->data);
+            hwtimer_wait(50000);
+            send(p->src, sizeof(p->length), &(p->length));
+
             p->processing--;
         }
         else if (m.type == ENOBUFFER) {
@@ -86,7 +91,7 @@ int main(void) {
     tcmd.data = &addr;
     msg_send(&mesg, transceiver_pid, 1);
 
-    send(0, SEND_SIZE, snd_buffer);
+    send(12, SEND_SIZE, snd_buffer);
 
    while (1) {
        hwtimer_wait(SENDING_DELAY);

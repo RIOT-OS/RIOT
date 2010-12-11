@@ -29,6 +29,6 @@ SubDir TOP drivers cc110x_ng ;
 
 HDRS += $(TOP)/drivers/cc110x_ng ; 
 
-Module cc110x_ng : cc1100.c cc1100-rx.c cc1100-tx.c cc1100-defaultSettings.c : hwtimer board_cc1100 ;
-Module cc110x_spi : cc1100_spi.c ;
-Module cc110x_cc430 : cc1100_cc430.c ;
+Module cc110x_ng : cc110x.c cc110x-rx.c cc110x-tx.c cc110x-defaultSettings.c : hwtimer board_cc110x ;
+Module cc110x_spi : cc110x_spi.c ;
+Module cc110x_cc430 : cc110x_cc430.c ;

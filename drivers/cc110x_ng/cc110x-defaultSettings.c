@@ -38,10 +38,10 @@ and the mailinglist (subscription via web site)
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 2058 $
  *
- * @note		$Id: cc1100-defaultSettings.c 2058 2010-03-31 08:59:31Z hillebra $
+ * @note		$Id: cc110x-defaultSettings.c 2058 2010-03-31 08:59:31Z hillebra $
  */
 
-#include <cc1100-defaultSettings.h>
+#include <cc110x-defaultSettings.h>
 
 /**
  * Usable, non overlapping channels and corresponding frequencies
@@ -77,7 +77,7 @@ and the mailinglist (subscription via web site)
  */
 
 // 400 kbps, MSK, X-tal: 26 MHz (Chip Revision F)
-char cc1100_conf[] = {
+char cc110x_conf[] = {
   0x06, // IOCFG2
   0x2E, // IOCFG1
   0x0E, // IOCFG0

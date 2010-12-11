@@ -42,7 +42,7 @@ and the mailinglist (subscription via web site)
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 1231 $
  *
- * @note		$Id: cc1100-internal.h 1231 2009-08-20 08:31:32Z baar $
+ * @note		$Id: cc110x-internal.h 1231 2009-08-20 08:31:32Z baar $
  */
 
 #define FIXED_PKTLEN		(0x00)		///< Fixed length packets, length configured in PKTLEN register.

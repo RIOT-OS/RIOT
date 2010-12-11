@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <transceiver.h>
-#include <cc1100_ng.h>
+#include <cc110x_ng.h>
 #include <msg.h>
 
 #define TEXT_SIZE           CC1100_MAX_DATA_LENGTH
@@ -11,7 +11,7 @@ char text_msg[TEXT_SIZE];
 msg mesg;
 transceiver_command_t tcmd;
 
-void _cc1100_ng_get_set_address_handler(char *addr) {
+void _cc110x_ng_get_set_address_handler(char *addr) {
     int16_t a;
 
     tcmd.transceivers = TRANSCEIVER_CC1100;
@@ -19,17 +19,17 @@ void _cc1100_ng_get_set_address_handler(char *addr) {
     mesg.content.ptr = (char*) &tcmd;
     a = atoi(addr+5);
     if (strlen(addr) > 5) {
-        printf("[cc1100] Trying to set address %i\n", a);
+        printf("[cc110x] Trying to set address %i\n", a);
         mesg.type = SET_ADDRESS;
     }
     else {
         mesg.type = GET_ADDRESS;
     }
     msg_send_receive(&mesg, &mesg, transceiver_pid);
-    printf("[cc1100] Got address: %i\n", a);
+    printf("[cc110x] Got address: %i\n", a);
 }
 
-void _cc1100_ng_get_set_channel_handler(char *chan) {
+void _cc110x_ng_get_set_channel_handler(char *chan) {
     int16_t c;
 
     tcmd.transceivers = TRANSCEIVER_CC1100;
@@ -37,17 +37,17 @@ void _cc1100_ng_get_set_channel_handler(char *chan) {
     mesg.content.ptr = (char*) &tcmd;
     c = atoi(chan+5);
     if (strlen(chan) > 5) {
-        printf("[cc1100] Trying to set channel %i\n", c);
+        printf("[cc110x] Trying to set channel %i\n", c);
         mesg.type = SET_CHANNEL;
     }
     else {
         mesg.type = GET_CHANNEL;
     }
     msg_send_receive(&mesg, &mesg, transceiver_pid);
-    printf("[cc1100] Got channel: %i\n", c);
+    printf("[cc110x] Got channel: %i\n", c);
 }
 
-void _cc1100_ng_send_handler(char *pkt) {
+void _cc110x_ng_send_handler(char *pkt) {
     radio_packet_t p;
     uint32_t response;
     uint16_t addr;
@@ -69,17 +69,17 @@ void _cc1100_ng_send_handler(char *pkt) {
             p.dst = addr;
             mesg.type = SND_PKT;
             mesg.content.ptr = (char*) &tcmd;
-            printf("[cc1100] Sending packet of length %u to %hu: %s\n", p.length, p.dst, (char*) p.data);
+            printf("[cc110x] Sending packet of length %u to %hu: %s\n", p.length, p.dst, (char*) p.data);
             msg_send_receive(&mesg, &mesg, transceiver_pid);
             response = mesg.content.value;
-            printf("[cc1100] Packet sent: %lu\n", response);
+            printf("[cc110x] Packet sent: %lu\n", response);
             return;
         }
     }
     puts("Usage:\ttxtsnd <ADDR> <MSG>");
 }
 
-void _cc1100_ng_monitor_handler(char *mode) {
+void _cc110x_ng_monitor_handler(char *mode) {
     unsigned int m;
 
     tcmd.transceivers = TRANSCEIVER_CC1100;

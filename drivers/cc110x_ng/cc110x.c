@@ -1,10 +1,10 @@
-#include <cc1100_ng.h>
-#include <cc1100-arch.h>
-#include <cc1100-config.h>
-#include <cc1100-defaultSettings.h>
-#include <cc1100-internal.h>
-#include <cc1100_spi.h>
-#include <cc1100-reg.h>
+#include <cc110x_ng.h>
+#include <cc110x-arch.h>
+#include <cc110x-config.h>
+#include <cc110x-defaultSettings.h>
+#include <cc110x-internal.h>
+#include <cc110x_spi.h>
+#include <cc110x-reg.h>
 
 #include <hwtimer.h>
 #include <config.h>
@@ -18,9 +18,9 @@ extern uint8_t pa_table_index;          ///< Current PATABLE Index
 
 /* global variables */
 
-cc1100_statistic_t cc1100_statistic;
+cc110x_statistic_t cc110x_statistic;
 
-volatile cc1100_flags rflags;		                ///< Radio control flags
+volatile cc110x_flags rflags;		                ///< Radio control flags
 volatile uint8_t radio_state = RADIO_UNKNOWN;		///< Radio state
 
 static radio_address_t radio_address;                     ///< Radio address
@@ -37,7 +37,7 @@ static void write_register(uint8_t r, uint8_t value);
 /*---------------------------------------------------------------------------*/
 // 								Radio Driver API
 /*---------------------------------------------------------------------------*/
-void cc1100_init(int tpid) {
+void cc110x_init(int tpid) {
     transceiver_pid = tpid;
     DEBUG("Transceiver PID: %i\n", transceiver_pid);
 
@@ -45,17 +45,17 @@ void cc1100_init(int tpid) {
 
 #ifdef MODULE_CC110X_SPI
     /* Initialize SPI */
-	cc1100_spi_init();
+	cc110x_spi_init();
 #endif
 
 	/* Load driver & reset */
 	power_up_reset();
 
     /* Write configuration to configuration registers */
-    cc1100_writeburst_reg(0x00, cc1100_conf, CC1100_CONF_SIZE);
+    cc110x_writeburst_reg(0x00, cc110x_conf, CC1100_CONF_SIZE);
 
 	/* Write PATABLE (power settings) */
-	cc1100_write_reg(CC1100_PATABLE, pa_table[pa_table_index]);
+	cc110x_write_reg(CC1100_PATABLE, pa_table[pa_table_index]);
 
 	/* Initialize Radio Flags */
 	rflags._RSSI         = 0x00;
@@ -70,9 +70,9 @@ void cc1100_init(int tpid) {
 
 	/* Set default channel number */
 #ifdef MODULE_CONFIG
-	cc1100_set_config_channel(sysconfig.radio_channel);
+	cc110x_set_config_channel(sysconfig.radio_channel);
 #else
-    cc1100_set_channel(CC1100_DEFAULT_CHANNR);
+    cc110x_set_channel(CC1100_DEFAULT_CHANNR);
 #endif
     DEBUG("CC1100 initialized and set to channel %i\n", radio_channel);
 
@@ -80,31 +80,31 @@ void cc1100_init(int tpid) {
 	rd_set_mode(RADIO_MODE_ON);
 }
 
-void cc1100_disable_interrupts(void) {
-	cc1100_gdo2_disable();
-	cc1100_gdo0_disable();
+void cc110x_disable_interrupts(void) {
+	cc110x_gdo2_disable();
+	cc110x_gdo0_disable();
 }
 
-void cc1100_gdo0_irq(void) {
+void cc110x_gdo0_irq(void) {
 	// Air was not free -> Clear CCA flag
 	rflags.CAA = false;
 	// Disable carrier sense detection (GDO0 interrupt)
-	cc1100_gdo0_disable();
+	cc110x_gdo0_disable();
 }
 
-void cc1100_gdo2_irq(void) {
-	cc1100_rx_handler();
+void cc110x_gdo2_irq(void) {
+	cc110x_rx_handler();
 }
 
-uint8_t cc1100_get_buffer_pos(void) {
+uint8_t cc110x_get_buffer_pos(void) {
     return (rx_buffer_next-1);
 }
 
-radio_address_t cc1100_get_address() {
+radio_address_t cc110x_get_address() {
     return radio_address;
 }
 
-radio_address_t cc1100_set_address(radio_address_t address) {
+radio_address_t cc110x_set_address(radio_address_t address) {
 	if ((address < MIN_UID) || (address > MAX_UID)) {
 		return 0;
 	}
@@ -119,8 +119,8 @@ radio_address_t cc1100_set_address(radio_address_t address) {
 }
 
 #ifdef MODULE_CONFIG
-radio_address_t cc1100_set_config_address(radio_address_t address) {
-    radio_address_t a = cc1100_set_address(address);
+radio_address_t cc110x_set_config_address(radio_address_t address) {
+    radio_address_t a = cc110x_set_address(address);
     if (a) {
         sysconfig.radio_address = a;
     }
@@ -129,7 +129,7 @@ radio_address_t cc1100_set_config_address(radio_address_t address) {
 }
 #endif
 
-void cc1100_set_monitor(uint8_t mode) {
+void cc110x_set_monitor(uint8_t mode) {
     if (mode) {
         write_register(CC1100_PKTCTRL1, (0x04));
     }
@@ -138,43 +138,43 @@ void cc1100_set_monitor(uint8_t mode) {
     }
 }
 
-void cc1100_setup_rx_mode(void) {
+void cc110x_setup_rx_mode(void) {
 	// Stay in RX mode until end of packet
-	cc1100_write_reg(CC1100_MCSM2, 0x07);
-	cc1100_switch_to_rx();
+	cc110x_write_reg(CC1100_MCSM2, 0x07);
+	cc110x_switch_to_rx();
 }
 
-void cc1100_switch_to_rx(void) {
+void cc110x_switch_to_rx(void) {
 	radio_state = RADIO_RX;
-	cc1100_strobe(CC1100_SRX);
+	cc110x_strobe(CC1100_SRX);
 }
 
-void cc1100_wakeup_from_rx(void) {
+void cc110x_wakeup_from_rx(void) {
 	if (radio_state != RADIO_RX) {
         return;
     }
     DEBUG("CC1100 going to idle\n");
-	cc1100_strobe(CC1100_SIDLE);
+	cc110x_strobe(CC1100_SIDLE);
 	radio_state = RADIO_IDLE;
 }
 
-char* cc1100_get_marc_state(void) {
+char* cc110x_get_marc_state(void) {
 	uint8_t state;
 
 	// Save old radio state
 	uint8_t old_state = radio_state;
 
 	// Read content of status register
-	state = cc1100_read_status(CC1100_MARCSTATE) & MARC_STATE;
+	state = cc110x_read_status(CC1100_MARCSTATE) & MARC_STATE;
 
 	// Make sure in IDLE state.
 	// Only goes to IDLE if state was RX/WOR
-	cc1100_wakeup_from_rx();
+	cc110x_wakeup_from_rx();
 
 	// Have to put radio back to WOR/RX if old radio state
 	// was WOR/RX, otherwise no action is necessary
 	if (old_state == RADIO_WOR || old_state == RADIO_RX) {
-		cc1100_switch_to_rx();
+		cc110x_switch_to_rx();
 	}
 
 	switch (state)
@@ -198,7 +198,7 @@ char* cc1100_get_marc_state(void) {
 	}
 }
 
-char* cc1100_state_to_text(uint8_t state) {
+char* cc110x_state_to_text(uint8_t state) {
 	switch (state)
 	{
 		case RADIO_UNKNOWN:
@@ -222,22 +222,22 @@ char* cc1100_state_to_text(uint8_t state) {
 	}
 }
 
-void cc1100_print_config(void) {
-	printf("Current radio state:          %s\r\n", cc1100_state_to_text(radio_state));
-	printf("Current MARC state:           %s\r\n", cc1100_get_marc_state());
+void cc110x_print_config(void) {
+	printf("Current radio state:          %s\r\n", cc110x_state_to_text(radio_state));
+	printf("Current MARC state:           %s\r\n", cc110x_get_marc_state());
 	printf("Current channel number:       %u\r\n", radio_channel);
 }
 
-void cc1100_switch_to_pwd(void) {
+void cc110x_switch_to_pwd(void) {
     DEBUG("[cc110x_ng] switching to powerdown\n");
-    cc1100_wakeup_from_rx();
-	cc1100_strobe(CC1100_SPWD);
+    cc110x_wakeup_from_rx();
+	cc110x_strobe(CC1100_SPWD);
 	radio_state = RADIO_PWD;
 }
     
 /*---------------------------------------------------------------------------*/
-int16_t cc1100_set_channel(uint8_t channr) {
-	uint8_t state = cc1100_read_status(CC1100_MARCSTATE) & MARC_STATE;
+int16_t cc110x_set_channel(uint8_t channr) {
+	uint8_t state = cc110x_read_status(CC1100_MARCSTATE) & MARC_STATE;
 	if ((state != 1) && (channr > MAX_CHANNR)) {
         return -1;
     }
@@ -247,8 +247,8 @@ int16_t cc1100_set_channel(uint8_t channr) {
 }
 
 #ifdef MODULE_CONFIG
-int16_t cc1100_set_config_channel(uint8_t channr) {
-    int16_t c = cc1100_set_channel(channr);
+int16_t cc110x_set_config_channel(uint8_t channr) {
+    int16_t c = cc110x_set_channel(channr);
     if (c) {
         sysconfig.radio_channel = c;
     }
@@ -257,7 +257,7 @@ int16_t cc1100_set_config_channel(uint8_t channr) {
 }
 #endif
 
-int16_t cc1100_get_channel(void) {
+int16_t cc110x_get_channel(void) {
     return radio_channel;
 }
 
@@ -267,19 +267,19 @@ int16_t cc1100_get_channel(void) {
 /*---------------------------------------------------------------------------*/
 
 static void reset(void) {
-	cc1100_wakeup_from_rx();
+	cc110x_wakeup_from_rx();
 #ifdef MODULE_CC110x_SPI
-	cc1100_spi_select();
+	cc110x_spi_select();
 #endif
-	cc1100_strobe(CC1100_SRES);
+	cc110x_strobe(CC1100_SRES);
 	hwtimer_wait(RTIMER_TICKS(100));
 }
 
 static void power_up_reset(void) {
 #ifdef MODULE_CC110x_SPI
-	cc1100_spi_unselect();
-	cc1100_spi_cs();
-	cc1100_spi_unselect();
+	cc110x_spi_unselect();
+	cc110x_spi_cs();
+	cc110x_spi_unselect();
 #endif
 	hwtimer_wait(RESET_WAIT_TIME);
 	reset();
@@ -291,13 +291,13 @@ static void write_register(uint8_t r, uint8_t value) {
 	uint8_t old_state = radio_state;
 
 	/* Wake up from WOR/RX (if in WOR/RX, else no effect) */
-	cc1100_wakeup_from_rx();
-	cc1100_write_reg(r, value);
+	cc110x_wakeup_from_rx();
+	cc110x_write_reg(r, value);
 
 	// Have to put radio back to WOR/RX if old radio state
 	// was WOR/RX, otherwise no action is necessary
 	if ((old_state == RADIO_WOR) || (old_state == RADIO_RX)) {
-		cc1100_switch_to_rx();
+		cc110x_switch_to_rx();
 	}
 }
     
@@ -315,12 +315,12 @@ static int rd_set_mode(int mode) {
 	switch (mode) {
 		case RADIO_MODE_ON:
             DEBUG("Enabling rx mode\n");
-			cc1100_init_interrupts();			// Enable interrupts
-			cc1100_setup_rx_mode();				// Set chip to desired mode
+			cc110x_init_interrupts();			// Enable interrupts
+			cc110x_setup_rx_mode();				// Set chip to desired mode
 			break;
 		case RADIO_MODE_OFF:
-			cc1100_disable_interrupts();		// Disable interrupts
-			cc1100_switch_to_pwd();					// Set chip to power down mode
+			cc110x_disable_interrupts();		// Disable interrupts
+			cc110x_switch_to_pwd();					// Set chip to power down mode
 			break;
 		case RADIO_MODE_GET:
 			// do nothing, just return current mode
