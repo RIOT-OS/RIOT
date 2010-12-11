@@ -27,7 +27,7 @@
 
 SubDir TOP drivers cc110x_ng ;
 
-HDRS += $(TOP)/drivers/cc110x_ng ; 
+HDRS += $(TOP)/drivers/cc110x_ng/include ; 
 
 Module cc110x_ng : cc110x.c cc110x-rx.c cc110x-tx.c cc110x-defaultSettings.c : hwtimer board_cc110x ;
 Module cc110x_spi : cc110x_spi.c ;
