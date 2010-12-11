@@ -1,4 +1,4 @@
 SubDir TOP board chronos drivers ;
 
 Module board_display : display.c display1.c ;
-Module board_cc1100 : cc430-cc1100.c : cc110x_cc430 ;
+Module board_cc110x : cc430-cc110x.c : cc110x_cc430 ;
