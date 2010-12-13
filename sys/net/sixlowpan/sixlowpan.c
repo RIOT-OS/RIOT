@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include "sixlowmac.h"
-#include "sixlowip.h"
+#include "sixlowpan.h"
+#include "transceiver.h"
 
-#include "radio/radio.h"
-
-
-void sixlowpan_init(radio_t *rd){
-    radio_driver = rd;                 
+void sixlowpan_init(transceiver_type_t trans){
+    sixlowmac_init(trans);                     
 }

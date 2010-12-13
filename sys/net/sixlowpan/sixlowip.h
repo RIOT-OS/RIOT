@@ -67,12 +67,14 @@ struct __attribute__ ((packed)) ipv6_hdr_t{
 };
 
 /* link layer addressing */
-typedef struct __attribute__ ((packed)) ieee_802154_long_t {
-    uint8_t uint8[8];  
+typedef union __attribute__ ((packed)) ieee_802154_long_t {
+    uint8_t uint8[8];
+    uint16_t uint16[4]; 
 } ieee_802154_long_t;
 
-typedef struct __attribute__ ((packed)) ieee_802154_short_t {
+typedef union __attribute__ ((packed)) ieee_802154_short_t {
     uint8_t uint8[2];
+    uint16_t uint16[1];
 } ieee_802154_short_t;
 
 //#define HTONS(a) (uint16_t)((((uint16_t) (a)) << 8) | (((uint16_t) (a)) >> 8))

@@ -8,7 +8,10 @@
 #include "sixlowip.h"
 #include "radio/radio.h"
 
-//extern const radio_t *radio_driver;
+#define RADIO_STACK_SIZE            2048
+#define RADIO_RCV_BUF_SIZE          64
+#define RADIO_SND_BUF_SIZE          100
+#define RADIO_SENDING_DELAY         1000
 
 uint16_t get_radio_address(ieee_802154_long_t *lla);
 
