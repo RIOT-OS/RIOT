@@ -1,4 +1,7 @@
 SubDir TOP board chronos drivers ;
 
+HDRS += $(TOP)/board/$(CPU)/drivers/include ;
+
 Module board_display : display.c display1.c ;
 Module board_cc110x : cc430-cc110x.c : cc110x_cc430 ;
+Module board_buzzer : buzzer.c : hwtimer ;
