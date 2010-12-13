@@ -12,8 +12,8 @@ void _id_handler(char *id) {
     }
     else {
         printf("Setting new id %lu\n", newid);
-        sysconfig.id = newid;
 #ifdef MODULE_CONFIG
+        sysconfig.id = newid;
         if (!config_save()) {
             puts("ERROR setting new id");
         }

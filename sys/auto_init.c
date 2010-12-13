@@ -1,9 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <board_uart0.h>
-#ifdef MODULE_RTC
-#include <lpc2387-rtc.h>
-#endif
+#include <rtc.h>
 #include <auto_init.h>
 
 #define ENABLE_DEBUG
