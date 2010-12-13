@@ -3,8 +3,8 @@
 # ******************************************************************************
 # $Id$
 
-BOARD = eZ430-Chronos ;
-CPU = msp430 ;
+BOARD = chronos ;
+CPU = cc430 ;
 MCU = cc430x6137 ;
 
 FLASHER ?= mspdebug ;

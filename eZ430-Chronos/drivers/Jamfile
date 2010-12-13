@@ -1,5 +1,0 @@
-SubDir TOP board eZ430-Chronos drivers ;
-
-UseModule board_common ;
-
-Module board_common : display.c display1.c ;

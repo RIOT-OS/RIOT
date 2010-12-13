@@ -23,8 +23,8 @@ Boston, MA 02111-1307, USA.  */
 #include <cpu.h>
 #include <irq.h>
 
-#include <cc1100.h>
-#include <arch_cc1100.h>
+#include <cc110x_ng.h>
+#include <cc110x-arch.h>
 
 #define CC1100_GDO0         (P2IN & 0x02)   // read serial I/O (GDO0)
 #define CC1100_GDO1         (P3IN & 0x04)   // read serial I/O (GDO1)
@@ -39,61 +39,61 @@ Boston, MA 02111-1307, USA.  */
 volatile int abort_count;
 volatile int retry_count = 0;
 
-void cc1100_gdo0_enable(void)
+void cc110x_gdo0_enable(void)
 {
 	P2IFG &= ~0x02;     /* Clear IFG for GDO0 */
 	P2IE |= 0x02;       /* Enable interrupt for GDO0 */ 
 }
 
-void cc1100_gdo0_disable(void)
+void cc110x_gdo0_disable(void)
 {
 	P2IE &= ~0x02;      /* Disable interrupt for GDO0 */
 	P2IFG &= ~0x02;     /* Clear IFG for GDO0 */
 }
 
-void cc1100_gdo2_enable(void)
+void cc110x_gdo2_enable(void)
 {
 	P2IFG &= ~0x01;     /* Clear IFG for GDO2 */
 	P2IE |= 0x01;       /* Enable interrupt for GDO2 */ 
 }
 
-void cc1100_gdo2_disable(void)
+void cc110x_gdo2_disable(void)
 {
 	P2IE &= ~0x01;      /* Disable interrupt for GDO2 */
 	P2IFG &= ~0x01;     /* Clear IFG for GDO2 */
 }
 
-void cc1100_before_send(void)
+void cc110x_before_send(void)
 {
 	// Disable GDO2 interrupt before sending packet
-	cc1100_gdo2_disable();
+	cc110x_gdo2_disable();
 }
 
-void cc1100_after_send(void)
+void cc110x_after_send(void)
 {
 	// Enable GDO2 interrupt after sending packet
-	cc1100_gdo2_enable();
+	cc110x_gdo2_enable();
 }
 
 
-int cc1100_get_gdo0(void) {
+int cc110x_get_gdo0(void) {
         return  CC1100_GDO0;
 }
 
-int cc1100_get_gdo1(void) {
+int cc110x_get_gdo1(void) {
         return  CC1100_GDO1;
 }
 
-int cc1100_get_gdo2(void) {
+int cc110x_get_gdo2(void) {
         return  CC1100_GDO2;
 }
 
-void cc1100_spi_cs(void)
+void cc110x_spi_cs(void)
 {
     CC1100_CS_LOW;
 }
 
-uint8_t cc1100_txrx(uint8_t data)
+uint8_t cc110x_txrx(uint8_t data)
 {
 	/* Ensure TX Buf is empty */
 	long c = 0;
@@ -103,20 +103,20 @@ uint8_t cc1100_txrx(uint8_t data)
 	while(!(IFG1 & UTXIFG0))
 	{
 		if (c++ == 1000000) 
-			puts("cc1100_txrx alarm()");	
+			puts("cc110x_txrx alarm()");	
 	}
 	/* Wait for Byte received */
 	c = 0;
 	while(!(IFG1 & URXIFG0))
 	{
 		if (c++ == 1000000) 
-			puts("cc1100_txrx alarm()");	
+			puts("cc110x_txrx alarm()");	
 	}
 	return RXBUF0;
 }
 
 
-void cc1100_spi_select(void)
+void cc110x_spi_select(void)
 {
 	// Switch to GDO mode
 	P3SEL &= ~0x04;
@@ -147,11 +147,11 @@ void cc1100_spi_select(void)
 	P3SEL |= 0x04;
 }
 
-void cc1100_spi_unselect(void) {
+void cc110x_spi_unselect(void) {
     CC1100_CS_HIGH;
 }
 
-void cc1100_init_interrupts(void)
+void cc110x_init_interrupts(void)
 {
 	unsigned int state = disableIRQ(); /* Disable all interrupts */
 	P2SEL = 0x00;       /* must be <> 1 to use interrupts */
@@ -163,7 +163,7 @@ void cc1100_init_interrupts(void)
 	restoreIRQ(state);  /* Enable all interrupts */
 }
 
-void cc1100_spi_init(uint8_t clockrate)
+void cc110x_spi_init(uint8_t clockrate)
 {
     // Switch off async UART
     while(!(UTCTL0 & TXEPT));   // Wait for empty UxTXBUF register
@@ -197,8 +197,8 @@ void cc1100_spi_init(uint8_t clockrate)
 // #include <msp430x16x.h> 
 // #include <signal.h>
 // #include "type.h"
-// #include "cc1100_defines.h"
-// #include "driver_cc1100.h"
+// #include "cc110x_defines.h"
+// #include "driver_cc110x.h"
 // #include "driver_system.h"
 // #include "spi0.h"
 // 
@@ -213,17 +213,17 @@ void cc1100_spi_init(uint8_t clockrate)
 // //  void spiInitTrx(void)
 // //
 // //  DESCRIPTION:
-// //		This function puts the cc1100 into spi mode. You have to call this bevore every spi transaction.
+// //		This function puts the cc110x into spi mode. You have to call this bevore every spi transaction.
 // //  
 // //-------------------------------------------------------------------------------------------------------
 // 
 // 
-// void drivercc1100_spiwriteburstreg(uint8_t addr, unsigned char *buffer, uint8_t count)
+// void drivercc110x_spiwriteburstreg(uint8_t addr, unsigned char *buffer, uint8_t count)
 // {
 // 	uint8_t i;
 // 	long c;
-// 	drivercc1100_spiinittrx();
-// 	drivercc1100_trxspi(addr | CC1100_WRITE_BURST);
+// 	drivercc110x_spiinittrx();
+// 	drivercc110x_trxspi(addr | CC1100_WRITE_BURST);
 // 	for (i = 0; i < count; i++)
 // 	{
 // 		c = 0;
@@ -247,11 +247,11 @@ void cc1100_spi_init(uint8_t clockrate)
 // 	CC1100_CS_HIGH;
 // }
 // 
-// void drivercc1100_spireadburstreg(uint8_t addr, char *buffer, uint8_t count)
+// void drivercc110x_spireadburstreg(uint8_t addr, char *buffer, uint8_t count)
 // {
 // 	uint8_t i;
-// 	drivercc1100_spiinittrx();
-// 	drivercc1100_trxspi(addr | CC1100_READ_BURST);
+// 	drivercc110x_spiinittrx();
+// 	drivercc110x_trxspi(addr | CC1100_READ_BURST);
 // 	for (i = 0; i < count; i++)
 // 	{
 // 		long c = 0;
@@ -275,21 +275,21 @@ void cc1100_spi_init(uint8_t clockrate)
 // 	CC1100_CS_HIGH;
 // }
 // 
-// void drivercc1100_load(callback_t cs_cb,callback_t paket_cb)
+// void drivercc110x_load(callback_t cs_cb,callback_t paket_cb)
 // {
 // 	_paket_cb = paket_cb;
 // 	_cs_cb = cs_cb;
 // 	spi0_init(0);	
 // }
 // 
-// void drivercc1100_aftersend(void)
+// void drivercc110x_aftersend(void)
 // {
 //     CLEAR(P2IFG, 0x01);	
 // 	SET(P2IE, 0x01); /* Enable interrupts on port 2 pin 0 */
 // 	CLEAR(P4OUT, 0x08); /* Turn off Sending Led*/
 // }
 // 
-// void drivercc1100_initinterrupts(void)
+// void drivercc110x_initinterrupts(void)
 // {
 // 	_DINT(); /* Disable all interrupts */
 // 	P2SEL = 0x00; /* must be <> 1 to use interrupts */
@@ -301,7 +301,7 @@ void cc1100_spi_init(uint8_t clockrate)
 // 	_EINT(); /* Enable all interrupts */
 // }
 // 
-// void drivercc1100_beforesend(void)
+// void drivercc110x_beforesend(void)
 // {
 // 	/* Turn on Led while sending paket for debug reasons */
 // 	SET(P4OUT, 0x08);
@@ -319,25 +319,24 @@ void cc1100_spi_init(uint8_t clockrate)
 /*
  * CC1100 receive interrupt
  */
-interrupt (PORT2_VECTOR) __attribute__ ((naked)) cc1100_isr(void){
+interrupt (PORT2_VECTOR) __attribute__ ((naked)) cc110x_isr(void){
     __enter_isr();
-puts("cc1100_isr()");
+puts("cc110x_isr()");
 //	if (system_state.POWERDOWN) SPI_INIT; /* Initialize SPI after wakeup */
  	/* Check IFG */
 	if ((P2IFG & 0x01) != 0) {
 		P2IFG &= ~0x01;
-		cc1100_gdo2_irq();
+		cc110x_gdo2_irq();
 	}
 	else if ((P2IFG & 0x02) != 0) {
-        cc1100_gdo0_irq();
+        cc110x_gdo0_irq();
 		P2IE &= ~0x02;	            // Disable interrupt for GDO0
    		P2IFG &= ~0x02;	            // Clear IFG for GDO0
 	} else {
-        puts("cc1100_isr(): unexpected IFG!");
+        puts("cc110x_isr(): unexpected IFG!");
 		/* Should not occur - only Port 2 Pin 0 interrupts are enabled */
 //		CLEAR(P2IFG, 0xFF);	/* Clear all flags */
 	}
 //	if (system_state.POWERDOWN != 0) END_LPM3;
 	__exit_isr();
 }
-
