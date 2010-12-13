@@ -1,0 +1,5 @@
+SubDir TOP projects chronos_default ;
+
+Module chronos_default : main.c : transceiver cc110x_ng rtc board_buzzer board_display auto_init gpioint ;
+
+UseModule chronos_default ;

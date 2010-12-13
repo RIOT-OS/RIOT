@@ -29,5 +29,6 @@ SubDir TOP cpu cc430 ;
 
 Module hwtimer_cpu : hwtimer_cc430.c : hwtimer_msp430 ;
 Module rtc : cc430-rtc.c ;
+Module gpioint : cc430-gpioint.c ;
 
 SubInclude TOP cpu msp430-common ; 
