@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <board_uart0.h>
-#include <lpc2387-rtc.h>
+#include <rtc.h>
 #include <auto_init.h>
 
 #define ENABLE_DEBUG

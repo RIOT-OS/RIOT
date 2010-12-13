@@ -10,7 +10,7 @@
 #include <swtimer.h>
 #include <msg.h>
 #include <transceiver.h>
-#include <cc1100_ng.h>
+#include <cc110x_ng.h>
 
 #define SHELL_STACK_SIZE    (2048)
 #define RADIO_STACK_SIZE    (2048)
@@ -18,7 +18,7 @@
 #define SND_BUFFER_SIZE     (100)
 #define RCV_BUFFER_SIZE     (64)
 
-#define SENDING_DELAY       (1000)
+#define SENDING_DELAY       (5 * 1000)
 
 char shell_stack_buffer[SHELL_STACK_SIZE];
 char radio_stack_buffer[RADIO_STACK_SIZE];
@@ -31,12 +31,20 @@ static msg mesg;
 static transceiver_command_t tcmd;
 static radio_packet_t p;
 
+static uint32_t sending_delay = SENDING_DELAY;
+
 void sender(char *count);
 void print_buffer(char *unused);
+void switch2rx(char *unused);
+void powerdown(char *unused);
+void set_delay(char *delay);
 
 shell_t shell;
 const shell_command_t sc[] = {
+    {"on", "", switch2rx},
+    {"off", "", powerdown},
     {"snd", "", sender},
+    {"delay", "", set_delay},
     {"buffer", "", print_buffer},
     {NULL, NULL, NULL}};
 
@@ -63,7 +71,7 @@ void sender(char *count) {
         puts(".");
         p.data = snd_buffer[i % SND_BUFFER_SIZE];
         msg_send(&mesg, transceiver_pid, 1);
-        swtimer_usleep(SENDING_DELAY);
+        swtimer_usleep(sending_delay);
     }
 }
 
@@ -73,9 +81,42 @@ void print_buffer(char *unused) {
     for (i = 0; i < TRANSCEIVER_BUFFER_SIZE; i++) {
         printf("[%u] %u # %u # %u\n", i, transceiver_buffer[i].processing, transceiver_buffer[i].length, transceiver_buffer[i].data[i]);
     }
-    extern rx_buffer_t cc1100_rx_buffer[];
+    extern rx_buffer_t cc110x_rx_buffer[];
     for (i = 0; i < TRANSCEIVER_BUFFER_SIZE; i++) {
-        printf("[%u] %u # %u \n", i, cc1100_rx_buffer[i].packet.length, cc1100_rx_buffer[i].packet.data[i]);
+        printf("[%u] %u # %u \n", i, cc110x_rx_buffer[i].packet.length, cc110x_rx_buffer[i].packet.data[i]);
+    }
+}
+
+void switch2rx(char *unused) {
+    mesg.type = SWITCH_RX;
+    mesg.content.ptr = (char*) &tcmd;
+
+    tcmd.transceivers = TRANSCEIVER_CC1100;
+    puts("Turning transceiver on");
+    if (msg_send(&mesg, transceiver_pid, 1)) {
+        puts("\tsuccess");
+    }
+}
+
+void powerdown(char *unused) {
+    mesg.type = POWERDOWN;
+    mesg.content.ptr = (char*) &tcmd;
+
+    tcmd.transceivers = TRANSCEIVER_CC1100;
+    puts("Turning transceiver off");
+    if (msg_send(&mesg, transceiver_pid, 1)) {
+        puts("\tsuccess");
+    }
+}
+
+void set_delay(char *delay) {
+    uint32_t d;
+
+    if (sscanf(delay, "delay %lu", &d) == 1) {
+        sending_delay = d;
+    }
+    else {
+        puts("Usage:\tdelay <µs>");
     }
 }
 
@@ -94,6 +135,8 @@ void radio(void) {
             printf("\tLength:\t%u\n", p->length);
             printf("\tSrc:\t%u\n", p->src);
             printf("\tDst:\t%u\n", p->dst);
+            printf("\tLQI:\t%u\n", p->lqi);
+            printf("\tRSSI:\t%u\n", p->rssi);
 
             for (i = 0; i < p->length; i++) {
                 printf("%02X ", p->data[i]);

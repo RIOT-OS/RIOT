@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
-#include <lpc2387-rtc.h>
-#include <sys/time.h>
 #include <string.h>
+
+#ifdef MODULE_RTC
+#include <rtc.h>
 
 void _gettime_handler(void) {
     struct tm now;
@@ -34,8 +35,7 @@ void _settime_handler(char* c) {
     
     now.tm_year = epoch_year - 1900;
     now.tm_mon = month - 1;
-    time_t t = mktime(&now);
-    rtc_set(t);
+    rtc_set_localtime(&now);
 }
 
 void _date_handler(char* c) {
@@ -46,3 +46,5 @@ void _date_handler(char* c) {
 		_settime_handler(c);
 	}
 }
+
+#endif

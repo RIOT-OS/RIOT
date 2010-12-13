@@ -33,94 +33,18 @@ and the mailinglist (subscription via web site)
  * @file
  * @brief 		PTTU board initialization
  *
- * @author      Freie Universit�t Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @author		Heiko Will
- * @author		Kaspar Schleise
- * @author		Michael Baar <baar@inf.fu-berlin.de>
+ * @author		Kaspar Schleiser
  *
- * @note		$Id: cmdengine-out.c 971 2009-04-07 13:41:36Z baar $
  */
-#include "lpc23xx.h"
-#include "VIC.h"
-#include "cpu.h"
+#include <board.h>
+#include <VIC.h>
+#include <cpu.h>
 
 #define PCRTC         BIT9
 #define CL_CPU_DIV    4
 
-/*---------------------------------------------------------------------------*/
-/**
- * @brief	Enabling MAM and setting number of clocks used for Flash memory fetch
- * @internal
- */
-void
-init_mam(void)
-{
-	MAMCR  = 0x0000;
-	MAMTIM = 0x0003;
-	MAMCR  = 0x0002;
-}
-/*---------------------------------------------------------------------------*/
-static inline void
-pllfeed(void)
-{
-	PLLFEED = 0xAA;
-	PLLFEED = 0x55;
-}
-/*---------------------------------------------------------------------------*/
-void init_clks1(void)
-{
-	// Disconnect PLL
-	PLLCON &= ~0x0002;
-	pllfeed();
-
-	// Disable PLL
-	PLLCON &= ~0x0001;
-	pllfeed();
-
-	SCS |= 0x20;						// Enable main OSC
-	while( !(SCS & 0x40) );				// Wait until main OSC is usable
-
-	/* select main OSC, 16MHz, as the PLL clock source */
-	CLKSRCSEL = 0x0001;
-
-	// Setting Multiplier and Divider values
-  	PLLCFG = 0x0008;					// M=9 N=1 Fcco = 288 MHz
-  	pllfeed();
-
-	// Enabling the PLL */
-	PLLCON = 0x0001;
-	pllfeed();
-
-	/* Set clock divider to 4 (value+1) */
-	CCLKCFG = CL_CPU_DIV - 1;			// Fcpu = 72 MHz
-
-#if USE_USB
-	USBCLKCFG = USBCLKDivValue;		/* usbclk = 288 MHz/6 = 48 MHz */
-#endif
-}
-
-void init_clks2(void){
-	// Wait for the PLL to lock to set frequency
-	while(!(PLLSTAT & BIT26));
-
-	// Connect the PLL as the clock source
-	PLLCON = 0x0003;
-	pllfeed();
-
-	/* Check connect bit status */
-	while (!(PLLSTAT & BIT25));
-}
-
-void bl_init_clks(void)
-{
-    PCONP = PCRTC;          // switch off everything except RTC
-    init_clks1();
-    init_clks2();
-    init_mam();
-}
-
-
-// Michael, Do not change anything here! even not the redundant parts!
 void bl_init_ports(void)
 {
 	SCS |= BIT0;											// Set IO Ports to fast switching mode

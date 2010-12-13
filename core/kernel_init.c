@@ -25,7 +25,6 @@
 #include <cpu.h>
 #include <lpm.h>
 #include <thread.h>
-#include <hwtimer.h>
 
 #ifdef MODULE_AUTO_INIT
 #include <auto_init.h>

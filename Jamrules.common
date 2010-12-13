@@ -125,7 +125,7 @@ actions Cleanall
 {
 	echo "> Cleaning binaries"
 	$(RM) bin$(SLASH)*
-	make -C $(TOP)$(SLASH)doc clean
+#	make -C $(TOP)$(SLASH)doc clean
 }
 
 #

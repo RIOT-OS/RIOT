@@ -25,13 +25,14 @@
 # ******************************************************************************
 # $Id$
 
-CPU = msp430 ;
+CPU = msp430x16x ;
 MCU = msp430x1612 ;
 
-FLASH_PORT ?= /dev/ttyUSB0 ;
+FLASH_PORT ?= "$(PORT)" ;
 FLASHER ?= mspdebug ;
 FLASHFLAGS ?= -d $(FLASH_PORT) -j uif ;
 
 RESET ?= $(FLASHER) $(FLASHFLAGS) reset ;
 
+HDRS += [ FPath $(TOP) board msb-430-common include ] ;
 HDRS += [ FPath $(TOP) board msb-430-common drivers include ] ;

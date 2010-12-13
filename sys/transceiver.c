@@ -12,14 +12,14 @@
 
 /* supported transceivers */
 #ifdef MODULE_CC110X_NG
-#include <cc1100_ng.h>
+#include <cc110x_ng.h>
 #if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
     #undef PAYLOAD_SIZE
     #define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
 #endif
 #endif
 
-#define ENABLE_DEBUG (1)
+//#define ENABLE_DEBUG (1)
 #include <debug.h>
 
 /*------------------------------------------------------------------------------------*/
@@ -50,13 +50,15 @@ char transceiver_stack[TRANSCEIVER_STACK_SIZE];
 /* function prototypes */
 static void run(void);
 static void receive_packet(uint16_t type, uint8_t pos);
-static void receive_cc1100_packet(radio_packet_t *trans_p);
+static void receive_cc110x_packet(radio_packet_t *trans_p);
 static uint8_t send_packet(transceiver_type_t t, void *pkt);
 static int16_t get_channel(transceiver_type_t t);
 static int16_t set_channel(transceiver_type_t t, void *channel);
 static int16_t get_address(transceiver_type_t t);
 static int16_t set_address(transceiver_type_t t, void *address);
 static void set_monitor(transceiver_type_t t, void *mode);
+static void powerdown(transceiver_type_t t);
+static void switch_to_rx(transceiver_type_t t);
 
 /*------------------------------------------------------------------------------------*/
 /* Transceiver init */
@@ -82,7 +84,7 @@ int transceiver_start(void) {
     }
     else if (transceivers & TRANSCEIVER_CC1100) {
         DEBUG("Transceiver started for CC1100\n");
-        cc1100_init(transceiver_pid);
+        cc110x_init(transceiver_pid);
     }
     return transceiver_pid;
 }
@@ -122,6 +124,7 @@ void run(void) {
         msg_receive(&m);
         /* only makes sense for messages for upper layers */
         cmd = (transceiver_command_t*) m.content.ptr;
+
         DEBUG("Transceiver: Message received\n");
         switch (m.type) {
             case RCV_PKT_CC1020:
@@ -151,6 +154,12 @@ void run(void) {
                 break;
             case SET_MONITOR:
                 set_monitor(cmd->transceivers, cmd->data);
+                break;
+            case POWERDOWN:
+                powerdown(cmd->transceivers);
+                break;
+            case SWITCH_RX:
+                switch_to_rx(cmd->transceivers);
                 break;
             default:
                 DEBUG("Unknown message received\n");
@@ -204,7 +213,7 @@ static void receive_packet(uint16_t type, uint8_t pos) {
         m.type = PKT_PENDING;
 
         if (type == RCV_PKT_CC1100) {
-            receive_cc1100_packet(trans_p); 
+            receive_cc110x_packet(trans_p); 
         }
         else {
             puts("Invalid transceiver type");
@@ -219,7 +228,7 @@ static void receive_packet(uint16_t type, uint8_t pos) {
         if (reg[i].transceivers & t) {
             m.content.ptr = (char*) &(transceiver_buffer[transceiver_buffer_pos]);
             DEBUG("Notify thread %i\n", reg[i].pid);
-            if (msg_send(&m, reg[i].pid, false)) {
+            if (msg_send(&m, reg[i].pid, false) && (m.type != ENOBUFFER)) {
                 transceiver_buffer[transceiver_buffer_pos].processing++;
             }
         }
@@ -232,16 +241,16 @@ static void receive_packet(uint16_t type, uint8_t pos) {
  *
  * @param trans_p   The current entry in the transceiver buffer
  */
-static void receive_cc1100_packet(radio_packet_t *trans_p) {
+static void receive_cc110x_packet(radio_packet_t *trans_p) {
     DEBUG("Handling CC1100 packet\n");
     /* disable interrupts while copying packet */
     dINT();
-    cc1100_packet_t p = cc1100_rx_buffer[rx_buffer_pos].packet;
+    cc110x_packet_t p = cc110x_rx_buffer[rx_buffer_pos].packet;
     
     trans_p->src = p.phy_src;
     trans_p->dst = p.address;
-    trans_p->rssi = cc1100_rx_buffer[rx_buffer_pos].rssi;
-    trans_p->lqi = cc1100_rx_buffer[rx_buffer_pos].lqi;
+    trans_p->rssi = cc110x_rx_buffer[rx_buffer_pos].rssi;
+    trans_p->lqi = cc110x_rx_buffer[rx_buffer_pos].lqi;
     trans_p->length = p.length - CC1100_HEADER_LENGTH;
     memcpy((void*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p.data, CC1100_MAX_DATA_LENGTH);
     eINT();
@@ -262,16 +271,16 @@ static void receive_cc1100_packet(radio_packet_t *trans_p) {
 static uint8_t send_packet(transceiver_type_t t, void *pkt) {
     uint8_t res = 0;
     radio_packet_t p = *((radio_packet_t*) pkt);
-    cc1100_packet_t cc1100_pkt;
+    cc110x_packet_t cc110x_pkt;
 
     switch (t) {
         case TRANSCEIVER_CC1100:
-            cc1100_pkt.length = p.length + CC1100_HEADER_LENGTH;
-            cc1100_pkt.address = p.dst;
-            cc1100_pkt.flags = 0;
-            memcpy(cc1100_pkt.data, p.data, p.length);
+            cc110x_pkt.length = p.length + CC1100_HEADER_LENGTH;
+            cc110x_pkt.address = p.dst;
+            cc110x_pkt.flags = 0;
+            memcpy(cc110x_pkt.data, p.data, p.length);
 
-            res = cc1100_send(&cc1100_pkt);
+            res = cc110x_send(&cc110x_pkt);
             break;
         default:
             puts("Unknown transceiver");
@@ -293,7 +302,7 @@ static int16_t set_channel(transceiver_type_t t, void *channel) {
     uint8_t c = *((uint8_t*) channel);
     switch (t) {
         case TRANSCEIVER_CC1100:
-            return cc1100_set_channel(c);
+            return cc110x_set_channel(c);
         default:
             return -1;
     }
@@ -309,7 +318,7 @@ static int16_t set_channel(transceiver_type_t t, void *channel) {
 static int16_t get_channel(transceiver_type_t t) {
     switch (t) {
         case TRANSCEIVER_CC1100:
-            return cc1100_get_channel();
+            return cc110x_get_channel();
         default:
             return -1;
     }
@@ -325,7 +334,7 @@ static int16_t get_channel(transceiver_type_t t) {
 static int16_t get_address(transceiver_type_t t) {
     switch (t) {
         case TRANSCEIVER_CC1100:
-            return cc1100_get_address();
+            return cc110x_get_address();
         default:
             return -1;
     }
@@ -343,7 +352,7 @@ static int16_t set_address(transceiver_type_t t, void *address) {
     radio_address_t addr = *((radio_address_t*) address);
     switch (t) {
         case TRANSCEIVER_CC1100:
-            return cc1100_set_address(addr);
+            return cc110x_set_address(addr);
         default:
             return -1;
     }
@@ -358,7 +367,28 @@ static int16_t set_address(transceiver_type_t t, void *address) {
 static void set_monitor(transceiver_type_t t, void *mode) {
     switch (t) {
         case TRANSCEIVER_CC1100:
-            cc1100_set_monitor(*((uint8_t*) mode));
+            cc110x_set_monitor(*((uint8_t*) mode));
+            break;
+        default:
+            break;
+    }
+}
+/*------------------------------------------------------------------------------------*/
+static void powerdown(transceiver_type_t t) {
+    switch (t) {
+        case TRANSCEIVER_CC1100:
+            cc110x_switch_to_pwd();
+            break;
+        default:
+            break;
+    }
+}
+
+/*------------------------------------------------------------------------------------*/
+static void switch_to_rx(transceiver_type_t t) {
+    switch (t) {
+        case TRANSCEIVER_CC1100:
+            cc110x_switch_to_rx();
             break;
         default:
             break;

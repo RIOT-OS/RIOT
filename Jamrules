@@ -73,4 +73,4 @@ HDRS += [ FPath $(TOP) projects $(PROJECT) ] ;
 # drivers
 HDRS += [ FPath $(TOP) drivers include ] ;
 HDRS += [ FPath $(TOP) drivers cc110x ] ;
-HDRS += [ FPath $(TOP) drivers cc110x_ng ] ;
+HDRS += [ FPath $(TOP) drivers cc110x_ng include ] ;

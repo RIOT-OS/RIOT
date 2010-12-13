@@ -24,8 +24,8 @@ and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
-#ifndef __RTC_H
-#define __RTC_H
+#ifndef LPC2387_RTC_H
+#define LPC2387_RTC_H
 
 /**
  * @defgroup	lpc2387_rtc		LPC2387 Real-Time-Clock
@@ -48,9 +48,10 @@ and the mailinglist (subscription via web site)
  * @note    	$Id: lpc2387-rtc.h 1998 2010-03-16 13:05:41Z baar $
  */
 
+#include <rtc.h>
 #include <time.h>
 #include <sys/time.h>
-#include "lpc2387.h"
+#include <lpc2387.h>
 
 /* ------------------------------------------------------------------------- */
 /**
@@ -76,13 +77,6 @@ enum rtc_alarm_mask {
 	RTC_AMR_YEAR=	AMRYEAR, 	///< Alarm mask for Year
 };
 
-/**
- * @brief	Initializes the RTC
- * @internal
- * During reboots only alarms are reset.
- */
-void rtc_init(void);
-
 void rtc_reset(void);
 
 /**
@@ -90,12 +84,6 @@ void rtc_reset(void);
  * @internal
  */
 time_t rtc_get_compile_time(void) __attribute__((noinline));
-
-/**
- * @brief	Sets the current time in broken down format directly from to RTC
- * @param[in]	localt		Pointer to structure with time to set
- */
-void rtc_set_localtime(struct tm* localt);
 
 /**
  * @brief	Returns the current clock time
@@ -110,22 +98,6 @@ time_t rtc_time(struct timeval* time);
  * @note	Any set alarm is shifted
  */
 void rtc_set(time_t time);
-
-/**
- * @brief	Enables the RTC
- */
-void rtc_enable(void);
-
-/**
- * @brief	Disables the RTC
- */
-void rtc_disable(void);
-
-/**
- * @brief	Returns the current time in broken down format directly from the RTC
- * @param[out]	localt		Pointer to structure to receive time
- */
-void rtc_get_localtime(struct tm* localt);
 
 /**
  * @brief	Sets the alarm

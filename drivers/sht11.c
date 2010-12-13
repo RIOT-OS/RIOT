@@ -44,6 +44,7 @@ and the mailinglist (subscription via web site)
 #include <mutex.h>
 #include <sht11.h>
 #include <sht11-board.h>
+#include <bitarithm.h>
 
 //#define ENABLE_DEBUG   (1)
 #include <debug.h>

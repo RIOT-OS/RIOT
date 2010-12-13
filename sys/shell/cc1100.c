@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <cc1100-interface.h>
 
+#ifdef MODULE_CC110X
+
 void _cc1100_get_address_handler(char *str) {
     radio_address_t addr = cc1100_get_address();
     printf("cc1100 address: %i\n", addr);
@@ -22,3 +24,4 @@ void _cc1100_set_address_handler(char *str) {
     }
 }
 
+#endif

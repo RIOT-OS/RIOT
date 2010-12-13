@@ -20,81 +20,33 @@
 #include <hwtimer_cpu.h>
 #include <hwtimer_arch.h>
 
-#include <bitarithm.h>
-
 #include <kernel.h>
 #include <thread.h>
+#include <lifo.h>
 
 /*---------------------------------------------------------------------------*/
 
 typedef struct hwtimer_t {
     void (*callback)(void*);
     void* data;
-    uint8_t checksum;
 } hwtimer_t;
 
-typedef struct hwtimer_wait_t {
-    unsigned int pid; /**< pid of waiting thread */
-    uint8_t state; /**<state of waiting thread */
-} hwtimer_wait_t;
-
-#define HWTIMER_QUEUESIZE   ARCH_MAXTIMERS
-#define Q_FULL              HWTIMER_QUEUESIZE + 1
-#define HWTIMER_WAIT_BACKOFF    (10)
-
-static hwtimer_t timer[HWTIMER_QUEUESIZE];
-static int queue[HWTIMER_QUEUESIZE];
-static short queue_head = 0;
-static short queue_tail = 0;
-static short queue_items = 0;
-
-static uint8_t timer_id = 0;
-static volatile long available_timers = 0;
+static hwtimer_t timer[ARCH_MAXTIMERS];
+static int lifo[ARCH_MAXTIMERS+1];
 
 /*---------------------------------------------------------------------------*/
 
-static int enqueue(int item) {
-    /* Test if timer is already cleared:
-     * (hack to prevent race-condition with proccing timer (ISR) and manual hwtimer_remove) */
-    if (available_timers & (1 << item)) {
-        return 1;
-    }
-    queue[queue_tail] = item;
-    available_timers |= (1 << item);
-    queue_tail = (queue_tail + 1) % HWTIMER_QUEUESIZE;
-    queue_items++;
-    if (queue_items == HWTIMER_QUEUESIZE) {
-        /* Allow power down */
-        lpm_prevent_sleep &= ~LPM_PREVENT_SLEEP_HWTIMER; 
-    }
-    return 1;
-}
-
-static int dequeue(void) {
-    register int ret;
-    if (!queue_items)
-        return Q_FULL;
-    /* No power down while a timer is active */
-    lpm_prevent_sleep |= LPM_PREVENT_SLEEP_HWTIMER;  
-    queue_items--;
-    ret = queue[queue_head];
-    /* Mark as empty */
-    queue[queue_head] = 0xff;
-    available_timers &= ~(1 << ret);
-    queue_head = (queue_head + 1) % HWTIMER_QUEUESIZE;
-    return ret;
-}
-
 static void multiplexer(int source) {
-    enqueue(source);
+//    printf("\nhwt: trigger %i.\n", source);
+    lifo_insert(lifo, source);
+    lpm_prevent_sleep--;
+
     timer[source].callback(timer[source].data);
 }
 
-static void hwtimer_wakeup(void* hwt) {
-    ((hwtimer_wait_t*)hwt)->state = 0;
-    while (!(thread_wakeup((*((hwtimer_wait_t*)hwt)).pid))) {
-        hwtimer_set(HWTIMER_WAIT_BACKOFF, hwtimer_wakeup, (void*) &hwt);
-    }
+static void hwtimer_wakeup(void* ptr) {
+    int pid = (int)ptr;
+    thread_wakeup(pid);
 }
 
 void hwtimer_spin(unsigned long ticks)
@@ -113,26 +65,18 @@ void hwtimer_init(void) {
 /*---------------------------------------------------------------------------*/
 
 void hwtimer_init_comp(uint32_t fcpu) {
-    int i;
-    queue_head = 0;
-    queue_tail = 0;
-    queue_items = 0;
-    timer_id = 0;
-    available_timers = 0;
     hwtimer_arch_init(multiplexer, fcpu);
-    for (i = 0; i < HWTIMER_QUEUESIZE; i++) {
-        /* init queue as empty */
-        queue[i] = 0xff;
-    }
-    for (i = 0; i < HWTIMER_QUEUESIZE; i++) {
-        enqueue(i);
+    
+    lifo_init(lifo, ARCH_MAXTIMERS);
+    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
+        lifo_insert(lifo, i);
     }
 }
 
 /*---------------------------------------------------------------------------*/
 
 int hwtimer_active(void) {
-    return (queue_items != HWTIMER_QUEUESIZE);
+    return (! lifo_empty(lifo));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -150,51 +94,53 @@ void hwtimer_wait(unsigned long ticks)
         hwtimer_spin(ticks);
         return;
     }
-    hwtimer_wait_t hwt;
-    hwt.pid = active_thread->pid;
-    hwt.state = 1;
+    
     /* -2 is to adjust the real value */
-    int res = hwtimer_set(ticks-2, hwtimer_wakeup, (void*) &hwt);
+    int res = hwtimer_set(ticks-2, hwtimer_wakeup, (void*) (unsigned int)(active_thread->pid));
     if (res == -1) {
         hwtimer_spin(ticks);
         return;
     }
-    while (hwt.state) {
-        thread_sleep();
-    }
+
+    thread_sleep();
 }
 
 /*---------------------------------------------------------------------------*/
 
+#include <board.h>
 static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr, bool absolute)
 {
     if (!inISR()) {
         dINT();
     }
-    int x = dequeue();
-    if (x == Q_FULL) {
+
+    int n = lifo_get(lifo);
+    if (n == -1) {
         if (! inISR()) {
             eINT();
         }
-        printf("[KT] no timers left\n");
+        puts("No hwtimer left.");
         return -1;
     }
     
-    timer[x].callback = callback;
-    timer[x].data = ptr;
-    timer[x].checksum = ++timer_id;
+    timer[n].callback = callback;
+    timer[n].data = ptr;
 
     if (absolute) {
-        hwtimer_arch_set_absolute(offset, x);
+//        printf("hwt: setting %i to %u\n", n, offset);
+        hwtimer_arch_set_absolute(offset, n);
     }
     else {
-        hwtimer_arch_set(offset, x);
+//        printf("hwt: setting %i to offset %u\n", n, offset);
+        hwtimer_arch_set(offset, n);
     }
+
+    lpm_prevent_sleep++;
 
     if (!inISR()) {
         eINT();
     }
-    return (timer[x].checksum << 8) + x;
+    return n;
 }
 
 int hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr) {
@@ -208,31 +154,18 @@ int hwtimer_set_absolute(unsigned long offset, void (*callback)(void*), void *pt
 
 /*---------------------------------------------------------------------------*/
 
-int hwtimer_remove(int x)
+int hwtimer_remove(int n)
 {
-    int t = x & 0xff;
-    uint8_t checksum = (uint8_t) (x >> 8);
-    if (t < 0 || t >= HWTIMER_QUEUESIZE || timer[t].callback == NULL || timer[t].checksum != checksum) {
-        return -1;
-    }
+//    printf("hwt: remove %i.\n", n);
     hwtimer_arch_disable_interrupt();
-    hwtimer_arch_unset(t);
-    enqueue(t);
-    timer[t].callback = NULL;
+    hwtimer_arch_unset(n);
+
+    lifo_insert(lifo, n);
+    timer[n].callback = NULL;
+
+    lpm_prevent_sleep--;
+    
     hwtimer_arch_enable_interrupt();
     return 1;
 }
 
-/*---------------------------------------------------------------------------*/
-
-void hwtimer_debug(int timer)
-{
-    printf("queue size: %i\n", queue_items);
-    printf("available timers: %lu\n", available_timers);
-    int t = timer & 0xff;
-    if (available_timers & (1 << t)) {
-        printf("timer %i is: not set\n", timer);
-    } else {
-        printf("timer %i is: set\n", timer);
-    }
-}

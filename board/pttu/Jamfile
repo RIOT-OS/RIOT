@@ -23,13 +23,12 @@
 # and the mailinglist (subscription via web site)
 # 	scatterweb@lists.spline.inf.fu-berlin.de
 # ******************************************************************************
-# $Id: Jamfile 922 2009-03-26 12:52:27Z baar $
+# $Id$
 
-SubDir TOP board pttu ;
+SubDir TOP board $(BOARD) ;
 
-Module board : board_init.c ;
+Module board : board_init.c : board_common board_uart ;
 UseModule board ;
-UseModule board_common ;
 
-SubInclude TOP board $(BOARD) drivers ;
+SubInclude TOP board msba2-common ;
 SubInclude TOP cpu $(CPU) ;

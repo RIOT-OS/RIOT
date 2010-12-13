@@ -25,11 +25,10 @@
 # ******************************************************************************
 # $Id$
 
-SubDir TOP board msba2 ;
+SubDir TOP board $(BOARD) ;
 
-Module board : board_init.c ;
+Module board : board_init.c : board_common board_uart ;
 UseModule board ;
-UseModule board_common ;
 
-SubInclude TOP board $(BOARD) drivers ;
+SubInclude TOP board $(BOARD)-common ;
 SubInclude TOP cpu $(CPU) ;

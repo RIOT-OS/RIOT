@@ -26,6 +26,8 @@
 #define COMPARE_ERROR                               (10)
 #define BUSY                                        (11)
 
+#define INVALID_ADDRESS     (0xFF)
+
 /* IAP start location on flash */
 #define IAP_LOCATION    (0x7FFFFFF1)
 
@@ -34,25 +36,6 @@
 #define PLLCON_PLLD		(0x00)		///< PLL Disable
 #define PLLCON_PLLC		(0x03)		///< PLL Connect
 #define PLLSTAT_PLOCK	(0x0400)	//</ PLL Lock Status
-
-/*
- * @brief Erase sector
- *
- * @param addr      Address within a flash sector to erase
- *
- * @return          1 on success, 0 otherwise
- */
-uint8_t          	iap_erase(uint32_t addr);
-
-/* @brief Write buffer from ram to flash
- *
- * @param dst       Address within a flash sector to write, must be a 256 byte boundary
- * @param src       Address within ram, must be a word boundary
- * @param size      Bytes to write
- *
- * @return          1 on success, 0 otherwise
- */
-uint8_t 			iap_write(uint32_t dst, char *src, uint32_t size);
 
 /*
  * @brief:  Converts 'addr' to sector number

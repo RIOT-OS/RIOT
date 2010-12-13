@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include <flashrom.h>
+#include <iap.h>
 
 uint8_t iap_get_sector(uint32_t addr) {
 	if ((addr >=0x00000000) && (addr <= 0x00000FFF)) {
@@ -88,5 +90,5 @@ uint8_t iap_get_sector(uint32_t addr) {
     }
     
     /* no valid address within flash */
-	return 0xFF;	
+	return INVALID_ADDRESS;
 }

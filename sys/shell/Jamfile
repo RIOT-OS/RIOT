@@ -28,7 +28,7 @@
 SubDir TOP sys shell ;
 
 Module shell : shell.c ;
-Module shell_commands : shell_commands.c rtc.c sht11.c ltc4150.c cc1100.c cc1100_ng.c : shell ;
+Module shell_commands : shell_commands.c id.c rtc.c sht11.c ltc4150.c cc1100.c cc110x_ng.c : shell ;
 
 Module ps : ps.c ;
 
