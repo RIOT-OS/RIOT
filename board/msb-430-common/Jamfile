@@ -27,7 +27,7 @@
 
 SubDir TOP board msb-430-common ;
 
-Module board : board_init.c debug_uart.c ;
+Module board : board_init.c uart1.c ;
 Module board_config : board_config.c ;
 UseModule board ;
 
