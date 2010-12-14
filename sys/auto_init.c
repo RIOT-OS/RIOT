@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <board_uart0.h>
 #include <rtc.h>
+#include <display.h>
+#include <display_putchar.h>
 #include <auto_init.h>
 
 #define ENABLE_DEBUG
@@ -10,6 +12,14 @@
 extern void main(void);
 
 void auto_init(void) {
+#ifdef MODULE_BOARD_DISPLAY
+    lcd_init();
+    DEBUG("DISP OK");
+#endif
+#ifdef MODULE_DISPLAY_PUTCHAR
+    init_display_putchar();
+    DEBUG("DISP OK");
+#endif
 #ifdef MODULE_HWTIMER
     DEBUG("Auto init hwtimer module.\n");
     hwtimer_init();
