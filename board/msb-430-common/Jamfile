@@ -28,7 +28,7 @@
 SubDir TOP board msb-430-common ;
 
 Module board : board_init.c debug_uart.c ;
-Module board_config : board_config.c ;
+Module board_config : board_config.c : flashrom ;
 UseModule board ;
 
 SubInclude TOP cpu $(CPU) ;
