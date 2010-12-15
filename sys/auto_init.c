@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <board_uart0.h>
 #include <rtc.h>
-#include <display.h>
-#include <display_putchar.h>
 #include <auto_init.h>
 
 #define ENABLE_DEBUG
@@ -13,10 +11,12 @@ extern void main(void);
 
 void auto_init(void) {
 #ifdef MODULE_BOARD_DISPLAY
+    extern void lcd_init();
     lcd_init();
     DEBUG("DISP OK");
 #endif
 #ifdef MODULE_DISPLAY_PUTCHAR
+    extern void init_display_putchar();
     init_display_putchar();
     DEBUG("DISP OK");
 #endif
