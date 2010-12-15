@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include <display.h>
 
 #include <thread.h>
 #include <board.h>
 #include <hwtimer.h>
-#include <vtimer.h>
 #include <msg.h>
 #include <transceiver.h>
 #include <cc110x_ng.h>
@@ -56,12 +56,12 @@ void radio(void) {
     while (1) {
         msg_receive(&m);
         if (m.type == PKT_PENDING) {
+
             p = (radio_packet_t*) m.content.ptr;
             display_chars(LCD_SEG_L2_5_0, "CC1100", SEG_OFF);
             display_chars(LCD_SEG_L2_5_0, (char*) p->data, SEG_ON);
             send(p->src, p->length, p->data);
-            hwtimer_wait(50000);
-            send(p->src, sizeof(p->length), &(p->length));
+            
 
             p->processing--;
         }
@@ -74,6 +74,7 @@ void radio(void) {
 
 int main(void) {
     int radio_pid;
+
     radio_address_t addr = 43;
     memset(snd_buffer, 43, SEND_SIZE);
     radio_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE, PRIORITY_MAIN-2, CREATE_STACKTEST, radio, "radio");
@@ -91,11 +92,10 @@ int main(void) {
     tcmd.data = &addr;
     msg_send(&mesg, transceiver_pid, 1);
 
-    send(12, SEND_SIZE, snd_buffer);
+    send(0, SEND_SIZE, snd_buffer);
 
    while (1) {
-       hwtimer_wait(SENDING_DELAY);
-        display_chars(LCD_SEG_L1_3_0, ".....", SEG_OFF);
-        display_chars(LCD_SEG_L1_3_0, (char*) itoa(TA0R, 6, 0), SEG_ON);
+        hwtimer_wait(SENDING_DELAY);
+        display_chars(LCD_SEG_L1_3_0, itoa(hwtimer_now(), 4, 0), SEG_ON);
    }
 }

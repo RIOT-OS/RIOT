@@ -27,6 +27,7 @@ and the mailinglist (subscription via web site)
 #include <stdlib.h>
 #include <signal.h>
 #include <gpioint.h>
+#include <bitarithm.h>
 #include <cpu.h>
 #include <irq.h>
 #include <hwtimer.h>
@@ -48,13 +49,18 @@ and the mailinglist (subscription via web site)
 /** interrupt callbacks */
 fp_irqcb cb[INT_PORTS][BITMASK_SIZE];
 
-static int8_t calc_log2(uint8_t power);
+/** debounce interrupt flags */
+uint8_t debounce_flags[INT_PORTS];
+
+/** debounce interrupt times */
+uint16_t debounce_time[INT_PORTS][BITMASK_SIZE];
 
 void gpioint_init(void) {
     uint8_t i, j;
     for (i = 0; i < INT_PORTS; i++) {
         for (j = 0; j < BITMASK_SIZE; j++) {
             cb[i][j] = NULL;
+            debounce_time[i][j] = 0;
         }
     }
 }
@@ -64,12 +70,18 @@ bool gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback) {
 
     if ((port >= PORTINT_MIN) && (port <= PORTINT_MAX)) {
        /* set the callback function */
-        base = calc_log2(bitmask);
+        base = number_of_highest_bit(bitmask);
         if (base >= 0) {
-            cb[port - PORTINT_MIN][calc_log2(bitmask)] = callback;
+            cb[port - PORTINT_MIN][base] = callback;
         }
         else {
             return false;
+        }
+        if (flags & GPIOINT_DEBOUNCE) {
+            debounce_flags[port - PORTINT_MIN] |= bitmask;
+        }
+        else {
+            debounce_flags[port - PORTINT_MIN] &= ~bitmask;
         }
      }
 
@@ -85,15 +97,16 @@ bool gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback) {
             P1IFG &= ~bitmask;
 
             /* trigger on rising... */
-            if (flags == GPIOINT_RISING_EDGE) {
+            if (flags & GPIOINT_RISING_EDGE) {
                 P1IES &= bitmask;
             }
             /* ...or falling edge */
-            else if (flags == GPIOINT_FALLING_EDGE) {
+            if (flags & GPIOINT_FALLING_EDGE) {
                 P1IES |= bitmask;
             }
-            /* or disable interrupt */
-            else {
+            
+            /*  disable interrupt */
+            if (flags == GPIOINT_DISABLE) {
                P1IE &= ~bitmask; 
             }
             /* enable interrupt */
@@ -130,18 +143,8 @@ bool gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback) {
     return 1;
 }
 
-static int8_t calc_log2(uint8_t power) {
-    int8_t i;
-    for (i = 7; i >= 0; i--) {
-        if ((power >> i) & 1) {
-            return i;
-        }
-    }
-    return -1;
-}
-
 interrupt (PORT1_VECTOR) __attribute__ ((naked)) port1_isr(void) {
-    uint8_t int_enable, istate;
+    uint8_t int_enable, istate, ifg_num;
     uint16_t p1iv;
     __enter_isr();
 
@@ -153,50 +156,20 @@ interrupt (PORT1_VECTOR) __attribute__ ((naked)) port1_isr(void) {
     int_enable = P1IE;
     restoreIRQ(istate);
     P1IE = 0x00; 
-    hwtimer_wait(DEBOUNCE_TIMEOUT);
 
-    switch (p1iv) {
-        case P1IV_P1IFG0:
-            if ((P1IN & P1IV_P1IFG0) & P1IV_P1IFG0) {
-                cb[0][0]();
-            }
-            break;
-        case P1IV_P1IFG1:
-            if ((P1IN & P1IV_P1IFG1) & P1IV_P1IFG1) {
-                cb[0][1]();
-            }
-            break;
-        case P1IV_P1IFG2:
-            if ((P1IN & P1IV_P1IFG2) & P1IV_P1IFG2) {
-                cb[0][2]();
-            }
-            break;
-        case P1IV_P1IFG3:
-            if ((P1IN & P1IV_P1IFG3) & P1IV_P1IFG3) {
-                cb[0][3]();
-            }
-            break;
-        case P1IV_P1IFG4:
-            if ((P1IN & P1IV_P1IFG4) & P1IV_P1IFG4) {
-                cb[0][4]();
-            }
-            break;
-        case P1IV_P1IFG5:
-            if ((P1IN & P1IV_P1IFG5) & P1IV_P1IFG5) {
-                cb[0][5]();
-            }
-            break;
-        case P1IV_P1IFG6:
-            if ((P1IN & P1IV_P1IFG6) & P1IV_P1IFG6) {
-                cb[0][6]();
-            }
-            break;
-        case P1IV_P1IFG7:
-            if ((P1IN & P1IV_P1IFG7) & P1IV_P1IFG7) {
-                cb[0][7]();
-            }
-            break;
+    /* check interrupt source */
+    if (debounce_flags[0] & P1IFG) {
+        ifg_num = (p1iv >> 1) - 1;
+        /* check if bouncing */
+        if ((hwtimer_now() - debounce_time[0][ifg_num]) > DEBOUNCE_TIMEOUT) {
+            debounce_time[0][ifg_num] = hwtimer_now();
+            cb[0][ifg_num]();
+        }
+        else {
+            /* TODO: check for long duration irq */
+        }
     }
+    
 	P1IFG = 0x00; 	
     istate = disableIRQ();
     P1IE  = int_enable; 	
@@ -205,7 +178,7 @@ interrupt (PORT1_VECTOR) __attribute__ ((naked)) port1_isr(void) {
 }
 
 interrupt (PORT2_VECTOR) __attribute__ ((naked)) port2_isr(void) {
-    uint8_t int_enable, istate;
+    uint8_t int_enable, istate, ifg_num;
     uint16_t p2iv;
     __enter_isr();
 
@@ -217,50 +190,20 @@ interrupt (PORT2_VECTOR) __attribute__ ((naked)) port2_isr(void) {
     int_enable = P2IE;
     restoreIRQ(istate);
     P2IE = 0x00; 
-    hwtimer_wait(DEBOUNCE_TIMEOUT);
 
-    switch (p2iv) {
-        case P2IV_P2IFG0:
-            if ((P2IN & P2IV_P2IFG0) & P2IV_P2IFG0) {
-                cb[1][0]();
-            }
-            break;
-        case P2IV_P2IFG1:
-            if ((P2IN & P2IV_P2IFG1) & P2IV_P2IFG1) {
-                cb[1][1]();
-            }
-            break;
-        case P2IV_P2IFG2:
-            if ((P2IN & P2IV_P2IFG2) & P2IV_P2IFG2) {
-                cb[1][2]();
-            }
-            break;
-        case P2IV_P2IFG3:
-            if ((P2IN & P2IV_P2IFG3) & P2IV_P2IFG3) {
-                cb[1][3]();
-            }
-            break;
-        case P2IV_P2IFG4:
-            if ((P2IN & P2IV_P2IFG4) & P2IV_P2IFG4) {
-                cb[1][4]();
-            }
-            break;
-        case P2IV_P2IFG5:
-            if ((P2IN & P2IV_P2IFG5) & P2IV_P2IFG5) {
-                cb[1][5]();
-            }
-            break;
-        case P2IV_P2IFG6:
-            if ((P2IN & P2IV_P2IFG6) & P2IV_P2IFG6) {
-                cb[1][6]();
-            }
-            break;
-        case P2IV_P2IFG7:
-            if ((P2IN & P2IV_P2IFG7) & P2IV_P2IFG7) {
-                cb[1][7]();
-            }
-            break;
+    /* check interrupt source */
+    if (debounce_flags[1] & P1IFG) {
+        ifg_num = (p2iv >> 1) - 1;
+        /* check if bouncing */
+        if ((hwtimer_now() - debounce_time[1][ifg_num]) > DEBOUNCE_TIMEOUT) {
+            debounce_time[1][ifg_num] = hwtimer_now();
+            cb[1][ifg_num]();
+        }
+        else {
+            /* TODO: check for long duration irq */
+        }
     }
+
 	P2IFG = 0x00; 	
     istate = disableIRQ();
     P2IE  = int_enable; 	

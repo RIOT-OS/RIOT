@@ -46,8 +46,6 @@ void send(radio_address_t dst, uint8_t len, uint8_t *data) {
 
     p.length = len;
     p.dst = dst;
-    display_chars(LCD_SEG_L2_5_0, "CC1100", SEG_OFF);
-    display_chars(LCD_SEG_L2_5_0, (char*) itoa(p.dst, 6, 0), SEG_ON);
 
     p.data = data;
     msg_send(&mesg, transceiver_pid, 1);
@@ -64,10 +62,7 @@ void radio(void) {
         if (m.type == PKT_PENDING) {
 
             p = (radio_packet_t*) m.content.ptr;
-            display_chars(LCD_SEG_L2_5_0, "CC1100", SEG_OFF);
-            display_chars(LCD_SEG_L2_5_0, (char*) p->data, SEG_ON);
             send(p->src, p->length, p->data);
-            
 
             p->processing--;
         }
@@ -92,7 +87,8 @@ int main(void) {
     int radio_pid;
     struct tm now;
 
-    now.tm_min = 5;
+    now.tm_hour = 3;
+    now.tm_min = 59;
     now.tm_sec = 42;
 
     rtc_set_localtime(&now);
@@ -101,7 +97,7 @@ int main(void) {
 
     rtc_set_alarm(&now, RTC_ALARM_MIN);
 
-    gpioint_set(2, BUTTON_STAR_PIN, GPIOINT_RISING_EDGE, change_mode);
+    gpioint_set(2, BUTTON_STAR_PIN, (GPIOINT_RISING_EDGE | GPIOINT_DEBOUNCE), change_mode);
 
     radio_address_t addr = 43;
     memset(snd_buffer, 43, SEND_SIZE);
@@ -110,12 +106,10 @@ int main(void) {
     transceiver_start();
     transceiver_register(TRANSCEIVER_CC1100, radio_pid);
 
-    lcd_init();
-    clear_display_all();
     mesg.type = SET_ADDRESS;
     mesg.content.ptr = (char*) &tcmd;
 
-    display_chars(LCD_SEG_L2_5_0, "CC1100", SEG_ON);
+    printf("CC430");
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &addr;
     msg_send(&mesg, transceiver_pid, 1);
@@ -128,10 +122,10 @@ int main(void) {
 
         switch (mode) {
             case 0:
-                display_chars(LCD_SEG_L1_3_0, (char*) itoa(now.tm_sec, 4, 0), SEG_ON);
+                printf("\n%02u:%02u", now.tm_hour, now.tm_min);
                 break;
             case 1:
-                display_chars(LCD_SEG_L1_3_0, (char*) itoa(now.tm_min, 4, 0), SEG_ON);
+                printf("\n%02u", now.tm_sec);
                 break;
         }
    }
