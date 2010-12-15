@@ -5,3 +5,5 @@ HDRS += $(TOP)/board/$(CPU)/drivers/include ;
 Module board_display : display.c display1.c ;
 Module board_cc110x : cc430-cc110x.c : cc110x_cc430 ;
 Module board_buzzer : buzzer.c : hwtimer ;
+
+Module display_putchar : display_putchar.c : board_display ;
