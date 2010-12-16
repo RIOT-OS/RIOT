@@ -44,7 +44,7 @@ and the mailinglist (subscription via web site)
 #define BITMASK_SIZE    (8)
 
 /** debouncing port interrupts */
-#define DEBOUNCE_TIMEOUT   (150)
+#define DEBOUNCE_TIMEOUT   (250)
 
 /** interrupt callbacks */
 fp_irqcb cb[INT_PORTS][BITMASK_SIZE];
@@ -146,33 +146,41 @@ bool gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback) {
 }
 
 interrupt (PORT1_VECTOR) __attribute__ ((naked)) port1_isr(void) {
-    uint8_t int_enable, ifg_num;
+    uint8_t int_enable, ifg_num, p1ifg;
     uint16_t p1iv;
+    uint16_t diff;
     __enter_isr();
 
     /* Debounce
      * Disable PORT1 IRQ 
      */
+    p1ifg = P1IFG;
     p1iv = P1IV;
     int_enable = P1IE;
     P1IE = 0x00; 
 
     ifg_num = (p1iv >> 1) - 1;
     /* check interrupt source */
-    if (debounce_flags[0] & P1IFG) {
+    if (debounce_flags[0] & p1ifg) {
         /* check if bouncing */
-        if ((hwtimer_now() - debounce_time[0][ifg_num]) > DEBOUNCE_TIMEOUT) {
+        diff = hwtimer_now() - debounce_time[0][ifg_num];
+        if (diff > DEBOUNCE_TIMEOUT) {
             debounce_time[0][ifg_num] = hwtimer_now();
-            cb[0][ifg_num]();
+            if (cb[0][ifg_num] != NULL) {
+                cb[0][ifg_num]();
+            }
         }
         else {
             /* TODO: check for long duration irq */
+            asm volatile (" nop ");
         }
     }
     else {
-        cb[0][ifg_num]();
+        if (cb[0][ifg_num] != NULL) {
+            cb[0][ifg_num]();
+        }
     }
-    
+
 	P1IFG = 0x00; 	
     P1IE  = int_enable; 	
     __exit_isr();
@@ -211,7 +219,9 @@ interrupt (PORT2_VECTOR) __attribute__ ((naked)) port2_isr(void) {
         }
     }
     else {
-        cb[1][ifg_num]();
+        if (cb[1][ifg_num] != NULL) {
+            cb[1][ifg_num]();
+        }
     }
 
 	P2IFG = 0x00; 	
