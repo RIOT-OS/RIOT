@@ -44,7 +44,7 @@ and the mailinglist (subscription via web site)
 #define BITMASK_SIZE    (8)
 
 /** debouncing port interrupts */
-#define DEBOUNCE_TIMEOUT   (50)
+#define DEBOUNCE_TIMEOUT   (150)
 
 /** interrupt callbacks */
 fp_irqcb cb[INT_PORTS][BITMASK_SIZE];
@@ -54,6 +54,8 @@ uint8_t debounce_flags[INT_PORTS];
 
 /** debounce interrupt times */
 uint16_t debounce_time[INT_PORTS][BITMASK_SIZE];
+
+uint16_t c1 = 0, c2 = 0;
 
 void gpioint_init(void) {
     uint8_t i, j;
@@ -144,7 +146,7 @@ bool gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback) {
 }
 
 interrupt (PORT1_VECTOR) __attribute__ ((naked)) port1_isr(void) {
-    uint8_t int_enable, istate, ifg_num;
+    uint8_t int_enable, ifg_num;
     uint16_t p1iv;
     __enter_isr();
 
@@ -152,14 +154,12 @@ interrupt (PORT1_VECTOR) __attribute__ ((naked)) port1_isr(void) {
      * Disable PORT1 IRQ 
      */
     p1iv = P1IV;
-    istate = disableIRQ();
     int_enable = P1IE;
-    restoreIRQ(istate);
     P1IE = 0x00; 
 
+    ifg_num = (p1iv >> 1) - 1;
     /* check interrupt source */
     if (debounce_flags[0] & P1IFG) {
-        ifg_num = (p1iv >> 1) - 1;
         /* check if bouncing */
         if ((hwtimer_now() - debounce_time[0][ifg_num]) > DEBOUNCE_TIMEOUT) {
             debounce_time[0][ifg_num] = hwtimer_now();
@@ -169,45 +169,53 @@ interrupt (PORT1_VECTOR) __attribute__ ((naked)) port1_isr(void) {
             /* TODO: check for long duration irq */
         }
     }
+    else {
+        cb[0][ifg_num]();
+    }
     
 	P1IFG = 0x00; 	
-    istate = disableIRQ();
     P1IE  = int_enable; 	
-    restoreIRQ(istate);
     __exit_isr();
 }
 
 interrupt (PORT2_VECTOR) __attribute__ ((naked)) port2_isr(void) {
-    uint8_t int_enable, istate, ifg_num;
+    uint8_t int_enable, ifg_num, p2ifg;
     uint16_t p2iv;
+    uint16_t diff;
     __enter_isr();
 
     /* Debounce
      * Disable PORT2 IRQ 
      */
+    p2ifg = P2IFG;
     p2iv = P2IV;
-    istate = disableIRQ();
     int_enable = P2IE;
-    restoreIRQ(istate);
     P2IE = 0x00; 
 
+    ifg_num = (p2iv >> 1) - 1;
     /* check interrupt source */
-    if (debounce_flags[1] & P1IFG) {
-        ifg_num = (p2iv >> 1) - 1;
+    if (debounce_flags[1] & p2ifg) {
         /* check if bouncing */
-        if ((hwtimer_now() - debounce_time[1][ifg_num]) > DEBOUNCE_TIMEOUT) {
+        diff = hwtimer_now() - debounce_time[1][ifg_num];
+        if (diff > DEBOUNCE_TIMEOUT) {
             debounce_time[1][ifg_num] = hwtimer_now();
-            cb[1][ifg_num]();
+            c1++;
+            if (cb[1][ifg_num] != NULL) {
+                cb[1][ifg_num]();
+            }
         }
         else {
+            c2++;
             /* TODO: check for long duration irq */
+            asm volatile (" nop ");
         }
+    }
+    else {
+        cb[1][ifg_num]();
     }
 
 	P2IFG = 0x00; 	
-    istate = disableIRQ();
     P2IE  = int_enable; 	
-    restoreIRQ(istate);
     __exit_isr();
 }
 
