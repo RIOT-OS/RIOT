@@ -27,6 +27,8 @@ and the mailinglist (subscription via web site)
 #ifndef RTC_H
 #define RTC_H
 
+#define RTC_SECOND 10001U
+
 #include <time.h>
 
 /**
@@ -55,5 +57,7 @@ void rtc_set_localtime(struct tm* localt);
  * @param[out]	localt		Pointer to structure to receive time
  */
 void rtc_get_localtime(struct tm* localt);
+
+extern int rtc_second_pid;
 
 #endif
