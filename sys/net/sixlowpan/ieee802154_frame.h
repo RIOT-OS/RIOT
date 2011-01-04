@@ -38,7 +38,7 @@ typedef struct __attribute__ ((packed)) {
     uint16_t src_pan_id;
     uint8_t src_addr[8];
     uint8_t *payload;
-    uint8_t *payload_len;
+    uint8_t payload_len;
 } ieee802154_frame_t;
 
 uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf);
@@ -48,5 +48,6 @@ uint8_t check_802154_hdr_len(uint8_t len);
 uint8_t * get_802154_hdr_ptr(void);
 uint8_t * get_802154_payload_ptr(void);
 void clear_802154_pkt(void);
+void print_802154_fcf_frame(ieee802154_frame_t *frame);
 
 #endif /* IEEE802154_FRAME */

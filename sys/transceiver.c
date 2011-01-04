@@ -8,8 +8,6 @@
 #include <transceiver.h>
 #include <radio/types.h>
 
-#define PAYLOAD_SIZE  (0)
-
 /* supported transceivers */
 #ifdef MODULE_CC110X_NG
 #include <cc110x_ng.h>
@@ -124,7 +122,6 @@ void run(void) {
         msg_receive(&m);
         /* only makes sense for messages for upper layers */
         cmd = (transceiver_command_t*) m.content.ptr;
-
         DEBUG("Transceiver: Message received\n");
         switch (m.type) {
             case RCV_PKT_CC1020:
@@ -279,7 +276,6 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt) {
             cc110x_pkt.address = p.dst;
             cc110x_pkt.flags = 0;
             memcpy(cc110x_pkt.data, p.data, p.length);
-
             res = cc110x_send(&cc110x_pkt);
             break;
         default:

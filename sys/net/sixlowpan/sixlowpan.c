@@ -4,5 +4,6 @@
 #include "transceiver.h"
 
 void sixlowpan_init(transceiver_type_t trans){
-    sixlowmac_init(trans);                     
+    sixlowmac_init(trans);
+//    send_ieee802154_frame();
 }
