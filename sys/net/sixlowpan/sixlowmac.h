@@ -17,7 +17,8 @@
 uint8_t get_radio_address(void);
 
 void send_ieee802154_frame(uint8_t *addr, uint8_t *payload, uint8_t length);
-void init_802154_long_addr(uint8_t *addr);
+void init_802154_long_addr(ieee_802154_long_t *laddr);
+void init_802154_short_addr(ieee_802154_short_t *saddr);
 void sixlowmac_init(transceiver_type_t type);
 void send(void);
 

@@ -24,11 +24,13 @@
 
 #define MULTIHOP_HOPLIMIT           64
 
-/* globals */
+#define IP_PKT_RECV_BUF_SIZE        64
+
+/* extern variables */
 extern uint8_t ipv6_ext_hdr_len;
 extern uint8_t opt_hdr_len;
 extern uint16_t packet_length;
-//extern const radio_t;
+
 /* base header lengths */
 #define LL_HDR_LEN                  0x4
 #define ICMPV6_HDR_LEN              0x4
@@ -77,6 +79,14 @@ typedef union __attribute__ ((packed)) ieee_802154_short_t {
     uint16_t uint16[1];
 } ieee_802154_short_t;
 
+typedef struct __attribute__ ((packed)) iface_t {
+    ieee_802154_short_t saddr;
+    ieee_802154_long_t laddr;
+    ipv6_addr_t ipaddr;
+} iface_t;
+
+extern iface_t iface;
+
 //#define HTONS(a) (uint16_t)((((uint16_t) (a)) << 8) | (((uint16_t) (a)) >> 8))
 #define HTONS(a) ((((uint16_t) (a) >> 8) & 0xff) | ((((uint16_t) (a)) & 0xff) << 8))  
 #define HTONL(a) ((((uint32_t) (a) & 0xff000000) >> 24) | \
@@ -95,5 +105,6 @@ void set_eui64(ipv6_addr_t *ipaddr);
 ieee_802154_long_t* get_eui(ipv6_addr_t *ipaddr);
 void bootstrapping(uint8_t *addr);
 void print6addr(ipv6_addr_t *ipaddr);
+void ip_process(void);
 
 #endif /* SIXLOWIP_H*/

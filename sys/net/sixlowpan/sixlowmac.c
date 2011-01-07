@@ -48,17 +48,15 @@ void set_radio_channel(uint8_t channel){
 
 void init_802154_short_addr(ieee_802154_short_t *saddr){
     saddr->uint8[0] = 0;
-    saddr->uint8[1] = get_radio_address(); 
+    saddr->uint8[1] = get_radio_address();
 }
 
-void init_802154_long_addr(uint8_t *addr){
-    ieee_802154_long_t *laddr = (ieee_802154_long_t*)addr;
-
+void init_802154_long_addr(ieee_802154_long_t *laddr){
     // 16bit Pan-ID:16-zero-bits:16-bit-short-addr = 48bit
     laddr->uint16[0] = IEEE_802154_PAN_ID;
     
     /* RFC 4944 Section 6 / RFC 2464 Section 4 */
-    laddr->uint8[0] |= 0x02;
+    laddr->uint8[0] ^= 0x02;
     laddr->uint8[2] = 0;
     laddr->uint8[3] = 0xFF;
     laddr->uint8[4] = 0xFE;
@@ -80,11 +78,6 @@ void recv_ieee802154_frame(void){
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t*) m.content.ptr;
 
-/*            for (int i = 0; i < p->length; i++) {
-                printf("%02X ", p->data[i]);
-            }
-            printf("\n");
-*/            
             hdrlen = read_802154_frame(p->data, &frame, p->length);
             length = p->length - hdrlen;
             
@@ -169,6 +162,7 @@ void send_ieee802154_frame(uint8_t *addr, uint8_t *payload, uint8_t length){
     p.dst = *addr;
     // TODO: geeignete ring-bufferung nötig
     p.data = buf;
+
     //p.data = snd_buffer[i % RADIO_SND_BUF_SIZE];
     msg_send(&mesg, transceiver_pid, 1);
     //swtimer_usleep(RADIO_SENDING_DELAY);

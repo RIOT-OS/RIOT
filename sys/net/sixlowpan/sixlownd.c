@@ -8,6 +8,7 @@ uint8_t rtr_sol_count = 0;
 uint8_t opt_hdr_len = 0;
 uint8_t ipv6_ext_hdr_len = 0;
 uint16_t packet_length;
+iface_t iface;
 
 static struct rtr_adv_t* get_rtr_adv_buf(uint8_t ext_len){
     return ((struct rtr_adv_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
@@ -70,22 +71,19 @@ void init_rtr_sol(void){
         ipv6_buf->hoplimit = ND_HOPLIMIT;
 
         create_all_routers_mcast_addr(&ipv6_buf->destaddr);
-        
-//        print6addr(&ipv6_buf->destaddr);
-        
+        get_src_ipaddr(&ipv6_buf->srcaddr); 
         opt_hdr_len = RTR_SOL_LEN;
         ipv6_buf->length = ICMPV6_HDR_LEN + RTR_SOL_LEN + OPT_STLLAO_LEN; 
         
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
-        set_llao((uint8_t*)opt_stllao_buf, OPT_SLLAO_TYPE);
+        set_llao((uint8_t*)opt_stllao_buf, OPT_SLLAO_TYPE, 2);
 
-        packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + RTR_SOL_LEN + OPT_STLLAO_LEN;
+        packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len + 
+                        RTR_SOL_LEN + OPT_STLLAO_LEN;
 
         icmp_buf->checksum = 0;
         
         icmp_buf->checksum = ~icmpv6_csum(ICMPV6_NXT_HDR);
-//        printf("%x\n",icmp_buf->checksum);
-
         rtr_sol_count++;
         // sleep 4 sec
         //swtimer_usleep(RTR_SOL_INTERVAL * 1000000);
@@ -134,7 +132,7 @@ void init_rtr_adv(ipv6_addr_t *addr){
     
     /* set link layer address option */
     opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
-    set_llao((uint8_t *)opt_stllao_buf,OPT_STLLAO_LEN);
+    set_llao((uint8_t *)opt_stllao_buf,OPT_STLLAO_LEN, 2);
     opt_hdr_len += OPT_STLLAO_LEN;
 
     /* set MTU options */
@@ -207,7 +205,7 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ){
     
     /* set sllao option */
     opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
-    set_llao((uint8_t*)opt_stllao_buf, OPT_SLLAO_TYPE);
+    set_llao((uint8_t*)opt_stllao_buf, OPT_SLLAO_TYPE, 1);
     opt_hdr_len += OPT_STLLAO_LEN;
     
     /* set aro option */
@@ -264,23 +262,33 @@ uint8_t pfx_cmp(ipv6_addr_t *addr1, ipv6_addr_t *addr2){
 }
 
 /* link-layer address option - RFC4861 section 4.6.1/ RFC4944 8. */
-void set_llao(uint8_t *llao, uint8_t type){
+void set_llao(uint8_t *llao, uint8_t type, uint8_t length){
     llao[0] = type;
-    if(OPT_STLLAO_LEN == 16){
-        // 802.15.4 long address
-        llao[1] = 2;
-    } else{
-        // 16-bit short address
-        llao[1] = 1;
-    }
+    llao[1] = length;
+    
     // get link layer address
-    ieee_802154_long_t *mac = get_eui(&ipv6_buf->srcaddr);
+    switch(length) {
+        case(1):{
+            memcpy(&llao[2], &(iface.saddr), 2);
+            memset(&llao[4], 0, 4);
+            break;
+        }
+        case(2):{
+            memcpy(&llao[2], &(iface.laddr), 8);              
+            memset(&llao[10], 0, 6);
+        }
+        default:{
+            printf("ERROR: llao not set\n");
+            break;
+        }
+    }
+    //ieee_802154_long_t *mac = get_eui(&ipv6_buf->srcaddr);
     //get_ieee_802154_long_t_from_ipaddr(&ipv6_buf->srcaddr,&mac);    
 
-    memcpy(&llao[2], mac, SIXLOWPAN_IPV6_LL_ADDR_LEN);
+    //memcpy(&llao[2], mac, SIXLOWPAN_IPV6_LL_ADDR_LEN);
     // padding (all zeros) - 48bit 
-    memset(&llao[2 + SIXLOWPAN_IPV6_LL_ADDR_LEN], 0, 
-            OPT_STLLAO_LEN - SIXLOWPAN_IPV6_LL_ADDR_LEN - 2); 
+    //memset(&llao[2 + SIXLOWPAN_IPV6_LL_ADDR_LEN], 0, 
+    //        OPT_STLLAO_LEN - SIXLOWPAN_IPV6_LL_ADDR_LEN - 2); 
 }
 
 

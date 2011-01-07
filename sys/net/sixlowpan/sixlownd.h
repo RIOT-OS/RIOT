@@ -102,7 +102,7 @@ uint8_t pfx_chk_list(ipv6_addr_t *addr, uint8_t size);
 uint8_t pfx_cmp(ipv6_addr_t *addr1, ipv6_addr_t *addr2);
 void pfx_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
              uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
-void set_llao(uint8_t *llao, uint8_t type);
+void set_llao(uint8_t *llao, uint8_t type, uint8_t length);
 
 uint16_t icmpv6_csum(uint8_t proto);
 uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len);

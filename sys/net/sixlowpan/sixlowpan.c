@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "thread.h"
+#include "msg.h"
 #include "sixlowmac.h"
 #include "sixlowpan.h"
 #include "transceiver.h"
@@ -19,6 +21,13 @@ uint8_t frag_size;
 uint8_t *reas_buf;
 uint8_t byte_offset;
 uint8_t first_frag = 0;
+
+static struct ipv6_hdr_t *ipv6_buf;
+unsigned int ip_process_pid;
+
+iface_t iface;
+
+char ip_process_buf[IP_PROCESS_STACKSIZE];
 
 /* deliver packet to mac*/
 void output(uint8_t *addr, uint8_t *data){
@@ -90,6 +99,7 @@ void output(uint8_t *addr, uint8_t *data){
 
 void input(uint8_t *data, uint8_t length){
     /* check if packet is fragmented */
+    msg m;
     uint8_t hdr_length = 0;
     uint8_t datagram_offset = 0;    
     uint16_t datagram_size = 0;
@@ -145,18 +155,32 @@ void input(uint8_t *data, uint8_t length){
             }     
             memcpy(reas_buf + byte_offset, data + hdr_length, byte_offset);
             if((byte_offset + frag_size) == datagram_size){
+                m.content.ptr = (char*)reas_buf;
+                msg_send(&m,ip_process_pid, 1);
                 free(reas_buf);
-                printf("INFO: packet reassembled\n");
             }
-
             break;
         }
-        default:
+        default:{
+            m.content.ptr = (char*)data;
+            msg_send(&m,ip_process_pid, 1);
             break;
+        }
     }
 }
 
 void sixlowpan_init(transceiver_type_t trans){
+    /* init mac-layer and radio transceiver */
     sixlowmac_init(trans);
+    /* init interface addresses */
+    memset(&iface,0,sizeof(iface_t));
+    init_802154_short_addr(&(iface.saddr));
+    init_802154_long_addr(&(iface.laddr));
+    create_link_local_prefix(&(iface.ipaddr));
+    memcpy(&(iface.ipaddr.uint8[8]), &iface.laddr, 8);
+    
+    ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE, 
+                                       PRIORITY_MAIN-1, CREATE_STACKTEST,
+                                       ip_process, "ip_process");
 //    send_ieee802154_frame();
 }
