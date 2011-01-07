@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 /* set maximum transmission unit */
-#define MTU                         0x3A
+#define MTU                         1280
 /* IPv6 field values */ 
 #define IPV6_VER                    0x60
 #define ICMPV6_NXT_HDR              0x3A
@@ -93,7 +93,7 @@ void create_all_routers_mcast_addr(ipv6_addr_t *ipaddr);
 void create_all_nodes_mcast_addr(ipv6_addr_t *ipaddr);
 void set_eui64(ipv6_addr_t *ipaddr);
 ieee_802154_long_t* get_eui(ipv6_addr_t *ipaddr);
-void bootstrapping(void);
+void bootstrapping(uint8_t *addr);
 void print6addr(ipv6_addr_t *ipaddr);
 
 #endif /* SIXLOWIP_H*/

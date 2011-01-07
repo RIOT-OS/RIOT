@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-uint8_t rtr_sol_count;
+uint8_t rtr_sol_count = 0;
 uint8_t opt_hdr_len = 0;
 uint8_t ipv6_ext_hdr_len = 0;
 uint16_t packet_length;
@@ -56,7 +56,7 @@ static struct opt_aro_t *opt_aro_buf;
 
 
 /* send router solicitation message - RFC4861 section 4.1 */
-void send_rtr_sol(void){
+void init_rtr_sol(void){
     ipv6_buf = get_ipv6_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len); 
     if(rtr_sol_count < RTR_SOL_MAX){
@@ -71,21 +71,24 @@ void send_rtr_sol(void){
 
         create_all_routers_mcast_addr(&ipv6_buf->destaddr);
         
-        print6addr(&ipv6_buf->destaddr);
+//        print6addr(&ipv6_buf->destaddr);
         
         opt_hdr_len = RTR_SOL_LEN;
         ipv6_buf->length = ICMPV6_HDR_LEN + RTR_SOL_LEN + OPT_STLLAO_LEN; 
         
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
         set_llao((uint8_t*)opt_stllao_buf, OPT_SLLAO_TYPE);
+
+        packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + RTR_SOL_LEN + OPT_STLLAO_LEN;
+
         icmp_buf->checksum = 0;
         
         icmp_buf->checksum = ~icmpv6_csum(ICMPV6_NXT_HDR);
-        printf("%x\n",icmp_buf->checksum);
+//        printf("%x\n",icmp_buf->checksum);
 
         rtr_sol_count++;
         // sleep 4 sec
-        swtimer_usleep(RTR_SOL_INTERVAL * 1000000);
+        //swtimer_usleep(RTR_SOL_INTERVAL * 1000000);
     } 
 }
 
@@ -103,7 +106,7 @@ void recv_rtr_sol(void){
     //send_rtr_adv();        
 }
 
-void send_rtr_adv(ipv6_addr_t *addr){
+void init_rtr_adv(ipv6_addr_t *addr){
     ipv6_buf = get_ipv6_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);    
 
@@ -173,7 +176,7 @@ void send_rtr_adv(ipv6_addr_t *addr){
     //printf("%x\n",icmp_buf->checksum);
 }
 
-void send_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ){
+void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ){
     ipv6_ext_hdr_len = 0; 
     ipv6_buf = get_ipv6_buf();
     ipv6_buf->version_trafficclass = IPV6_VER;

@@ -1,6 +1,6 @@
 #include "ieee802154_frame.h"
 
-uint8_t mac_buf[IEEE_802154_HDR_LEN + IEEE_802154_PAYLOAD_LEN];
+//uint8_t mac_buf[IEEE_802154_HDR_LEN + IEEE_802154_PAYLOAD_LEN];
 
 uint8_t ieee802154_hdr_ptr;
 uint8_t ieee802154_payload_ptr;
@@ -84,7 +84,6 @@ uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf){
   */
 uint8_t get_802154_hdr_len(ieee802154_frame_t *frame){
     uint8_t len = 0;
-    uint8_t comp;
 
     if(frame->fcf.dest_addr_m == 0x02){
         len += 2;
@@ -131,7 +130,7 @@ uint8_t read_802154_frame(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len){
     frame->fcf.frame_ver = (buf[index] >> 2) & 0x03;
     frame->fcf.src_addr_m = buf[index] & 0x03;
 
-    print_802154_fcf_frame(frame);
+    //print_802154_fcf_frame(frame);
 
     index++;
 
@@ -222,32 +221,4 @@ void print_802154_fcf_frame(ieee802154_frame_t *frame){
            frame->fcf.dest_addr_m,
            frame->fcf.frame_ver,
            frame->fcf.src_addr_m); 
-}
-
-uint8_t get_802154_pkt_len(void){
-    return ((IEEE_802154_HDR_LEN - ieee802154_hdr_ptr) + 
-            ieee802154_payload_len);
-}
-
-uint8_t check_802154_hdr_len(uint8_t len){
-    if((ieee802154_hdr_ptr >= len) && 
-        ((get_802154_pkt_len() + len) <= IEEE_802154_PAYLOAD_LEN)){
-        ieee802154_hdr_ptr -= len;
-        return 1;
-    }
-    return 0;  
-}
-
-uint8_t * get_802154_hdr_ptr(void){
-    return &mac_buf[ieee802154_hdr_ptr];
-}
-
-uint8_t * get_802154_payload_ptr(void){
-    return &mac_buf[ieee802154_payload_ptr + IEEE_802154_HDR_LEN];
-}
-
-void clear_802154_pkt(void){
-    ieee802154_payload_ptr = 0;
-    ieee802154_payload_len = 0;
-    ieee802154_hdr_ptr = IEEE_802154_HDR_LEN;
 }

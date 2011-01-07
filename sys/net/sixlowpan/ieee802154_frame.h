@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 /* maximum 802.15.4 header length */
-#define IEEE_802154_HDR_LEN             37
+#define IEEE_802154_MAX_HDR_LEN         23
 /* mininmum */ 
 #define IEEE_802154_PAYLOAD_LEN         21
 
@@ -44,10 +44,7 @@ typedef struct __attribute__ ((packed)) {
 uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf);
 uint8_t get_802154_hdr_len(ieee802154_frame_t *frame);
 uint8_t get_802154_pkt_len(void);
-uint8_t check_802154_hdr_len(uint8_t len);
-uint8_t * get_802154_hdr_ptr(void);
-uint8_t * get_802154_payload_ptr(void);
-void clear_802154_pkt(void);
+uint8_t read_802154_frame(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len);
 void print_802154_fcf_frame(ieee802154_frame_t *frame);
 
 #endif /* IEEE802154_FRAME */

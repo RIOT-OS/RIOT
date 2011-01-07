@@ -1,9 +1,11 @@
 /* 6LoWPAN MAC - layer 2 implementations */
 
 #include <stdlib.h>
+#include <string.h>
 #include "sixlowmac.h"
 #include "sixlowip.h"
 #include "sixlownd.h"
+#include "sixlowpan.h"
 #include "thread.h"
 #include "msg.h"
 #include "radio/radio.h"
@@ -15,9 +17,9 @@ msg msg_q[RADIO_RCV_BUF_SIZE];
 uint8_t snd_buffer[RADIO_SND_BUF_SIZE][PAYLOAD_SIZE];
 
 uint8_t buf[PAYLOAD_SIZE];
-
+uint16_t packet_length;
 static uint8_t macdsn;
-static uint8_t macbsn;
+//static uint8_t macbsn;
 
 static radio_packet_t p;
 static msg mesg;
@@ -49,7 +51,9 @@ void init_802154_short_addr(ieee_802154_short_t *saddr){
     saddr->uint8[1] = get_radio_address(); 
 }
 
-void init_802154_long_addr(ieee_802154_long_t *laddr){
+void init_802154_long_addr(uint8_t *addr){
+    ieee_802154_long_t *laddr = (ieee_802154_long_t*)addr;
+
     // 16bit Pan-ID:16-zero-bits:16-bit-short-addr = 48bit
     laddr->uint16[0] = IEEE_802154_PAN_ID;
     
@@ -66,27 +70,29 @@ void init_802154_long_addr(ieee_802154_long_t *laddr){
 void recv_ieee802154_frame(void){
     msg m;
     radio_packet_t *p;
-    uint8_t i, hdrlen;
+    uint8_t hdrlen, length;
     ieee802154_frame_t frame;
    
     msg_init_queue(msg_q, RADIO_RCV_BUF_SIZE);
-
+    
     while (1) {
         msg_receive(&m);
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t*) m.content.ptr;
 
-            for (i = 0; i < p->length; i++) {
+/*            for (int i = 0; i < p->length; i++) {
                 printf("%02X ", p->data[i]);
             }
-
-            //clear_802154_pkt();
-            hdrlen = read_802154_frame(p->data, &frame, p->length);
-            printf("hdrlen: %hu\n", hdrlen);
-            printf("payload: %02x\n", frame.payload[0]);
-    
-            p->processing--;
             printf("\n");
+*/            
+            hdrlen = read_802154_frame(p->data, &frame, p->length);
+            length = p->length - hdrlen;
+            
+            /* deliver packet to network(6lowpan)-layer */
+            input(frame.payload, length);
+ 
+            p->processing--;
+ //           printf("\n");
         }
         else if (m.type == ENOBUFFER) {
             puts("Transceiver buffer full");
@@ -97,15 +103,16 @@ void recv_ieee802154_frame(void){
     }
 }
 
-void set_ieee802154_fcf_values(ieee802154_frame_t *frame){
+void set_ieee802154_fcf_values(ieee802154_frame_t *frame, uint8_t dest_mode,
+                               uint8_t src_mode){
     frame->fcf.frame_type = IEEE_802154_DATA_FRAME;
     frame->fcf.sec_enb = 0;
     frame->fcf.frame_pend = 0;
     frame->fcf.ack_req = 0;
     frame->fcf.panid_comp = 0;
     frame->fcf.frame_ver = 0;
-    frame->fcf.src_addr_m = IEEE_802154_SHORT_ADDR_M;
-    frame->fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
+    frame->fcf.src_addr_m = src_mode;
+    frame->fcf.dest_addr_m = dest_mode;
 }
 
 void set_ieee802154_frame_values(ieee802154_frame_t *frame){
@@ -113,10 +120,10 @@ void set_ieee802154_frame_values(ieee802154_frame_t *frame){
     frame->dest_pan_id = IEEE_802154_PAN_ID;
     frame->src_pan_id = IEEE_802154_PAN_ID;
     frame->seq_nr = macdsn;
+    macdsn++;
 }
 
-void send_ieee802154_frame(uint16_t addr, uint8_t *buf){
-    unsigned int c, i;
+void send_ieee802154_frame(uint8_t *addr, uint8_t *payload, uint8_t length){
     
     set_radio_channel(13);
     
@@ -129,7 +136,8 @@ void send_ieee802154_frame(uint16_t addr, uint8_t *buf){
     ieee802154_frame_t frame; 
 
     memset(&frame, 0, sizeof(frame));
-    set_ieee802154_fcf_values(&frame);
+    set_ieee802154_fcf_values(&frame, IEEE_802154_SHORT_ADDR_M, 
+                              IEEE_802154_SHORT_ADDR_M);
     set_ieee802154_frame_values(&frame); 
     
     /* ONLY FOR TESTING */
@@ -137,32 +145,36 @@ void send_ieee802154_frame(uint16_t addr, uint8_t *buf){
     frame.dest_addr[1] = 4;
     frame.src_addr[0] = 0;
     frame.src_addr[1] = 5;
- 
-    uint8_t test = 30;
-    frame.payload = &test;
-    frame.payload_len = 1;
-    uint8_t hdrlen = get_802154_hdr_len(&frame);
-    //uint8_t buf[hdrlen + frame.payload_len];
-    printf("hdrlen: %02x\n",hdrlen); 
-    //if(check_802154_hdr_len(hdrlen)){
-    memset(&buf,0,PAYLOAD_SIZE);
-    uint8_t index = init_802154_frame(&frame,&buf);
-    memcpy(&buf[hdrlen],frame.payload,frame.payload_len);
-        //p.length = get_802154_pkt_len(); 
-        //p.data = get_802154_hdr_ptr(); 
-    //}
 
-    p.length = PAYLOAD_SIZE;
-    p.dst = addr;
+    
+
+    /* check if destination address is NULL => broadcast */
+    if(addr[0] == 0 && addr[1] == 0){
+        frame.dest_addr[0] = 0xff;
+        frame.dest_addr[1] = 0xff;
+    } 
+
+    //uint8_t test = 30;
+    frame.payload = payload;
+    frame.payload_len = length;
+    //printf("length: %x\n",frame.payload_len);
+    uint8_t hdrlen = get_802154_hdr_len(&frame);
+ 
+    //printf("hdrlen: %02x\n",hdrlen); 
+    
+    memset(&buf,0,PAYLOAD_SIZE);
+    init_802154_frame(&frame,(uint8_t*)&buf);
+    memcpy(&buf[hdrlen],frame.payload,frame.payload_len);
+    p.length = hdrlen + frame.payload_len;
+    p.dst = *addr;
     // TODO: geeignete ring-bufferung nötig
     p.data = buf;
-
     //p.data = snd_buffer[i % RADIO_SND_BUF_SIZE];
     msg_send(&mesg, transceiver_pid, 1);
     //swtimer_usleep(RADIO_SENDING_DELAY);
 }
 
-uint8_t sixlowmac_init(transceiver_type_t type){
+void sixlowmac_init(transceiver_type_t type){
     int recv_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE, 
                         PRIORITY_MAIN-1, CREATE_STACKTEST, recv_ieee802154_frame , "radio");
     transceiver_type = type;

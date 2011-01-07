@@ -1,5 +1,8 @@
 //#include "sixlowpan.h"
 #include "sixlowip.h"
+#include "sixlowmac.h"
+#include "sixlownd.h"
+#include "sixlowpan.h"
 #include <stdio.h>
 #include "drivers/cc110x/cc1100.h"
 #include "radio/radio.h"
@@ -16,20 +19,23 @@ struct icmpv6_hdr_t* get_icmpv6_buf(uint8_t ext_len){
 }
 
 
-void bootstrapping(void){
+void bootstrapping(uint8_t *addr){
 #ifdef SIXLOWPAN_NODE
     /* create link-local address based on eui-64 */
     ipv6_buf = get_ipv6_buf();
-    RADIO.set_address(5);
+    //RADIO.set_address(5);
     create_link_local_prefix(&ipv6_buf->srcaddr);
-    set_eui64(&ipv6_buf->srcaddr);
-    print6addr(&ipv6_buf->srcaddr);
+    init_802154_long_addr((uint8_t*)&(ipv6_buf->srcaddr.uint8[8]));  
+    //set_eui64(&ipv6_buf->srcaddr);
+//    print6addr(&ipv6_buf->srcaddr);
     /* send router solicitation */
-    send_rtr_sol();
+    init_rtr_sol();
+
+    output(addr,(uint8_t*)ipv6_buf);
     //send_rtr_adv(&ipv6_buf->destaddr);
 #endif
 }
-
+/*
 void set_eui64(ipv6_addr_t *ipaddr){
     uint16_t radio_driver_addr = RADIO.get_address();
 
@@ -42,7 +48,7 @@ void set_eui64(ipv6_addr_t *ipaddr){
     ipaddr->uint8[14] = (uint8_t) (radio_driver_addr >> 8);
     ipaddr->uint8[15] = (uint8_t) radio_driver_addr;
 }
-
+*/
 ieee_802154_long_t* get_eui(ipv6_addr_t *ipaddr){
     return ((ieee_802154_long_t *) &(ipaddr->uint8[8]));
 }

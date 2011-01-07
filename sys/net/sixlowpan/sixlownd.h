@@ -95,9 +95,9 @@ struct __attribute__ ((packed)) nbr_sol_t {
 };
 
 
-void send_rtr_sol(void);
+void init_rtr_sol(void);
 void recv_rtr_sol(void);
-void send_rtr_adv(ipv6_addr_t *addr);
+void init_rtr_adv(ipv6_addr_t *addr);
 uint8_t pfx_chk_list(ipv6_addr_t *addr, uint8_t size);
 uint8_t pfx_cmp(ipv6_addr_t *addr1, ipv6_addr_t *addr2);
 void pfx_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
