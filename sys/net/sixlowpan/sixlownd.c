@@ -3,12 +3,47 @@
 #include "sixlowmac.h"
 #include <stdio.h>
 #include <string.h>
+#include <debug.h>
+#include <vtimer.h>
 
-uint8_t rtr_sol_count = 0;
+/* extern variables */
 uint8_t opt_hdr_len = 0;
 uint8_t ipv6_ext_hdr_len = 0;
 uint16_t packet_length;
+
+/* counter */
+uint8_t nbr_count = 0;
+uint8_t def_rtr_count = 0;
+uint8_t rtr_sol_count = 0;
+uint8_t prefix_count = 0;
+
+/* global interface*/
 iface_t iface;
+
+/* datastructures */
+nbr_cache_t nbr_cache[NBR_CACHE_SIZE];
+def_rtr_lst_t def_rtr_lst[DEF_RTR_LST_SIZE]; 
+plist_t plist[OPT_PI_LIST_LEN];
+
+/* pointer */
+static uint8_t *llao;
+addr_list_t *addr_list_ptr;
+
+static struct ipv6_hdr_t *ipv6_buf;
+static struct icmpv6_hdr_t *icmp_buf;
+static struct rtr_adv_t *rtr_adv_buf;
+static struct nbr_sol_t *nbr_sol_buf;
+static struct opt_buf_t *opt_buf;
+static struct opt_stllao_t *opt_stllao_buf;
+static struct opt_mtu_t *opt_mtu_buf;
+static struct opt_pi_t *opt_pi_buf;
+static struct opt_aro_t *opt_aro_buf;
+
+nbr_cache_t *nbr_entry;
+def_rtr_lst_t *def_rtr_entry;
+
+/* elements */
+ipv6_addr_t tmpaddr;
 
 static struct rtr_adv_t* get_rtr_adv_buf(uint8_t ext_len){
     return ((struct rtr_adv_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
@@ -16,6 +51,11 @@ static struct rtr_adv_t* get_rtr_adv_buf(uint8_t ext_len){
 
 static struct nbr_sol_t* get_nbr_sol_buf(uint8_t ext_len){
     return ((struct nbr_sol_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+}
+
+static struct opt_buf_t* get_opt_buf(uint8_t ext_len, uint8_t opt_len){
+    return ((struct opt_buf_t*)&(buffer[LLHDR_ICMPV6HDR_LEN +
+                                        ext_len + opt_len]));
 }
 
 static struct opt_stllao_t* get_opt_stllao_buf(uint8_t ext_len, uint8_t opt_len){
@@ -38,29 +78,11 @@ static struct opt_aro_t* get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len){
                                         ext_len + opt_len]));
 }
 
-/* data stuctures  */
-// TODO: prefix list size initialwert herausfinden
-pfx_elem_t plist[OPT_PI_LIST_LEN];
-
-/* pointer */
-static pfx_elem_t *pelem;
-static uint8_t *llao;
-
-static struct ipv6_hdr_t *ipv6_buf;
-static struct icmpv6_hdr_t *icmp_buf;
-static struct rtr_adv_t *rtr_adv_buf;
-static struct nbr_sol_t *nbr_sol_buf;
-static struct opt_stllao_t *opt_stllao_buf;
-static struct opt_mtu_t *opt_mtu_buf;
-static struct opt_pi_t *opt_pi_buf;
-static struct opt_aro_t *opt_aro_buf;
-
-
 /* send router solicitation message - RFC4861 section 4.1 */
-void init_rtr_sol(void){
+void init_rtr_sol(uint8_t sllao){
     ipv6_buf = get_ipv6_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len); 
-    if(rtr_sol_count < RTR_SOL_MAX){
+    //if(rtr_sol_count < RTR_SOL_MAX){
         packet_length = 0;
         icmp_buf->type = ICMP_RTR_SOL;
         icmp_buf->code = 0;
@@ -71,40 +93,69 @@ void init_rtr_sol(void){
         ipv6_buf->hoplimit = ND_HOPLIMIT;
 
         create_all_routers_mcast_addr(&ipv6_buf->destaddr);
-        get_src_ipaddr(&ipv6_buf->srcaddr); 
+        iface_find_src_ipaddr(&ipv6_buf->srcaddr, ADDR_STATE_PREFERRED,
+                              ADDR_TYPE_MULTICAST);
+
         opt_hdr_len = RTR_SOL_LEN;
         ipv6_buf->length = ICMPV6_HDR_LEN + RTR_SOL_LEN + OPT_STLLAO_LEN; 
         
-        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
-        set_llao((uint8_t*)opt_stllao_buf, OPT_SLLAO_TYPE, 2);
-
-        packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len + 
-                        RTR_SOL_LEN + OPT_STLLAO_LEN;
-
+        if(sllao == OPT_SLLAO){
+            opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
+            set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 2);
+            packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
+                            RTR_SOL_LEN + OPT_STLLAO_LEN;
+        } else {
+            packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len + 
+                            RTR_SOL_LEN;
+        }
         icmp_buf->checksum = 0;
         
         icmp_buf->checksum = ~icmpv6_csum(ICMPV6_NXT_HDR);
-        rtr_sol_count++;
+      //  rtr_sol_count++;
         // sleep 4 sec
         //swtimer_usleep(RTR_SOL_INTERVAL * 1000000);
-    } 
+    //} 
 }
 
 void recv_rtr_sol(void){
     opt_hdr_len = RTR_SOL_LEN;
-    /* get link layer address option from buf */
-    if(opt_stllao_buf->type == OPT_STLLAO_LEN){
+    ipv6_buf = get_ipv6_buf();
+
+    /* check if source option is set*/
+    if(opt_stllao_buf->type == OPT_SLLAO_TYPE){
+        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
         llao = (uint8_t*)opt_stllao_buf;
+        opt_hdr_len += (opt_stllao_buf->length) << 3;
     }
 
     if(llao != NULL){
-        // TODO: Neighbor lookup        
+        nbr_entry = nbr_cache_search(&ipv6_buf->srcaddr);
+        if(nbr_entry != NULL){
+            /* found neighbor in cache, update values and check long addr */
+            if(memcmp(&llao[2],&nbr_entry->laddr,8) == 0){
+                nbr_entry->isrouter = 0;
+            } else {
+                /* new long addr found, update */
+                memcpy(&nbr_entry->laddr,&llao[2],8);
+                nbr_entry->state = NBR_STATUS_STALE;
+                nbr_entry->isrouter = 0;
+            }
+        } else {
+            /* nothing found, add neigbor into cache*/
+            nbr_cache_add(&ipv6_buf->srcaddr,(ieee_802154_long_t*)&llao[2], 
+                          0, NBR_STATUS_STALE);
+        }
     }
 
-    //send_rtr_adv();        
+    /* init solicited router advertisment*/
+//    init_rtr_adv(&ipv6_buf->srcaddr, 0, 0, 0, 0, 0);
+    /* send solicited router advertisment */
+//    uint8_t addr = 0;
+//    output(&addr,(uint8_t*)ipv6_buf);         
 }
 
-void init_rtr_adv(ipv6_addr_t *addr){
+void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi, 
+                  uint8_t sixco, uint8_t abro){
     ipv6_buf = get_ipv6_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);    
 
@@ -113,8 +164,13 @@ void init_rtr_adv(ipv6_addr_t *addr){
     ipv6_buf->flowlabel = 0;
     ipv6_buf->nextheader = ICMPV6_NXT_HDR;
     ipv6_buf->hoplimit = ND_HOPLIMIT;
-    /* not solicited */
-    create_all_nodes_mcast_addr(&ipv6_buf->destaddr);
+
+    if(addr == NULL){
+        /* not solicited */
+        create_all_nodes_mcast_addr(&ipv6_buf->destaddr);
+    } else {
+        memcpy(&ipv6_buf->destaddr, addr, 16);
+    }
     
     icmp_buf->type = ICMP_RTR_ADV;
     icmp_buf->code = 0;
@@ -125,45 +181,50 @@ void init_rtr_adv(ipv6_addr_t *addr){
     rtr_adv_buf->hoplimit = MULTIHOP_HOPLIMIT;
     /* set M and O flag, last 6 bits are zero */
     rtr_adv_buf->autoconfig_flags = (RTR_ADV_M_FLAG << 7) | (RTR_ADV_O_FLAG << 6);
-    rtr_adv_buf->router_lifetime = RTR_ADV_MAX_INTERVAL * RTR_ADV_MAX;
+    rtr_adv_buf->router_lifetime = HTONS(RTR_ADV_MAX_INTERVAL * RTR_ADV_MAX);
     rtr_adv_buf->reachable_time = 0;
     rtr_adv_buf->retrans_timer = 0;
     opt_hdr_len = RTR_ADV_LEN;
     
-    /* set link layer address option */
-    opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
-    set_llao((uint8_t *)opt_stllao_buf,OPT_STLLAO_LEN, 2);
-    opt_hdr_len += OPT_STLLAO_LEN;
+    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + RTR_ADV_LEN;
 
-    /* set MTU options */
-    opt_mtu_buf = get_opt_mtu_buf(ipv6_ext_hdr_len, opt_hdr_len);
-    opt_mtu_buf->type = OPT_MTU_TYPE;
-    opt_mtu_buf->length = OPT_MTU_LEN;
-    opt_mtu_buf->reserved = 0;
-    /* 1500 octets mtu */
-    opt_mtu_buf->mtu = HTONL(1500);
-    opt_hdr_len += OPT_MTU_HDR_LEN;
-
-    /* set packet length */
-    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + 
-                    RTR_ADV_LEN + OPT_STLLAO_LEN + OPT_MTU_HDR_LEN;
+    if(sllao == OPT_SLLAO){
+        /* set link layer address option */
+        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
+        set_llao(opt_stllao_buf,OPT_STLLAO_LEN, 2);
+        opt_hdr_len += OPT_STLLAO_LEN;
+        packet_length += OPT_STLLAO_LEN;
+    }
+    
+    if(mtu == OPT_MTU){
+        /* set MTU options */
+        opt_mtu_buf = get_opt_mtu_buf(ipv6_ext_hdr_len, opt_hdr_len);
+        opt_mtu_buf->type = OPT_MTU_TYPE;
+        opt_mtu_buf->length = OPT_MTU_LEN;
+        opt_mtu_buf->reserved = 0;
+        opt_mtu_buf->mtu = HTONL(1500);
+        opt_hdr_len += OPT_MTU_HDR_LEN;
+        packet_length += OPT_MTU_HDR_LEN;
+    }
     /* set payload length field */
 
-    /* set prefix option */
-    opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, opt_hdr_len);
-    for(int i=0;i<OPT_PI_LIST_LEN; i++){
-          if(plist[i].inuse && plist[i].adv){
-                opt_pi_buf->addr = plist[i].addr;
+    if(pi == OPT_PI){
+        /* set prefix option */
+        for(int i=0;i<OPT_PI_LIST_LEN; i++){
+            if(plist[i].inuse && plist[i].adv){
+                opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, opt_hdr_len);
+                memcpy(&(opt_pi_buf->addr.uint8[0]), &(plist[i].addr.uint8[0]), 16);
                 opt_pi_buf->type = OPT_PI_TYPE;
                 opt_pi_buf->length = OPT_PI_LEN;
                 opt_pi_buf->prefix_length = plist[i].length;
                 opt_pi_buf->l_a_reserved1 = plist[i].l_a_reserved1;
-                opt_pi_buf->val_ltime = HTONL(pelem->val_ltime);
-                opt_pi_buf->pref_ltime = HTONL(pelem->val_ltime);
+                opt_pi_buf->val_ltime = HTONL(plist[i].val_ltime);
+                opt_pi_buf->pref_ltime = HTONL(plist[i].val_ltime);
                 opt_pi_buf->reserved2 = 0;
                 packet_length += OPT_PI_HDR_LEN;
                 opt_hdr_len += OPT_PI_HDR_LEN;
           }
+        }
     }
 
     ipv6_buf->length = packet_length - IPV6_HDR_LEN;
@@ -174,8 +235,110 @@ void init_rtr_adv(ipv6_addr_t *addr){
     //printf("%x\n",icmp_buf->checksum);
 }
 
-void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ){
-    ipv6_ext_hdr_len = 0; 
+void recv_rtr_adv(void){
+    ipv6_buf = get_ipv6_buf();
+    opt_hdr_len = RTR_ADV_LEN;
+    rtr_adv_buf = get_rtr_adv_buf(ipv6_ext_hdr_len);
+
+    /* update interface reachable time and retrans timer */
+    if(rtr_adv_buf->reachable_time != 0){
+        iface.adv_reachable_time = HTONL(rtr_adv_buf->reachable_time); 
+    }
+    
+    if(rtr_adv_buf->retrans_timer != 0){
+        iface.adv_retrans_timer = HTONL(rtr_adv_buf->retrans_timer);
+    }
+
+    def_rtr_entry = def_rtr_lst_search(&ipv6_buf->srcaddr);
+
+    if(rtr_adv_buf->router_lifetime != 0){
+        if(def_rtr_entry != NULL){
+            def_rtr_entry->inval_timer.absolute.seconds = 
+                                    HTONL(rtr_adv_buf->router_lifetime);
+            vtimer_set(&(def_rtr_entry->inval_timer));
+        } else {
+            def_rtr_lst_add(&(ipv6_buf->srcaddr), HTONL(rtr_adv_buf->router_lifetime));
+        }
+    } else {
+        /* remove router from default router list */
+        if(def_rtr_entry != NULL){
+            def_rtr_lst_rem(def_rtr_entry);
+        } 
+    }
+
+    /* read options */
+    while(packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len){
+        opt_buf = get_opt_buf(ipv6_ext_hdr_len, opt_hdr_len);
+        timex_t tmp;    
+
+        switch(opt_buf->type){
+            case(OPT_SLLAO_TYPE):{
+                break;
+            }
+            case(OPT_MTU_TYPE):{
+                break;
+            }
+            /* rfc 4862 section 5.5.3 */
+            case(OPT_PI_TYPE):{
+                opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, opt_hdr_len);
+                /* crazy condition, read 5.5.3a-b-c for further information */
+                if((!(opt_pi_buf->l_a_reserved1 & OPT_PI_FLAG_A)) || 
+                   (prefix_link_local_check(&opt_pi_buf->addr)) || 
+                   (opt_pi_buf->pref_ltime > opt_pi_buf->val_ltime)){
+                    break;
+                } else{
+                    addr_list_ptr = iface_addr_list_prefix_equals(&opt_pi_buf->addr);
+                    if(addr_list_ptr == NULL){
+                        /* 5.5.3d */
+                        if(opt_pi_buf->val_ltime != 0){
+                            setup_addr_with_prefix(&tmpaddr, &opt_pi_buf->addr);
+                            /* add into address list */
+                            iface_addr_list_add(&tmpaddr,ADDR_STATE_TENTATIVE, 
+                                                opt_pi_buf->val_ltime, 
+                                                opt_pi_buf->pref_ltime,
+                                                ADDR_CONFIGURED_AUTO);
+                        }    
+                    } else {
+                        /* 5.5.3e */
+                        set_remaining_time(&(addr_list_ptr->pref_ltime), opt_pi_buf->pref_ltime);
+                        //addr_list_ptr->pref_ltime.absolute.seconds = opt_pi_buf->pref_ltime;
+                        //vtimer_set(&addr_list_ptr->pref_ltime);
+    
+                        /* 7200 = 2hours in seconds */
+                        if(HTONL(opt_pi_buf->val_ltime) > 7200 || 
+                           HTONL(opt_pi_buf->val_ltime) > 
+                           //addr_list_ptr->val_ltime.absolute.seconds){
+                           get_remaining_time(&(addr_list_ptr->val_ltime))){
+                            set_remaining_time(&(addr_list_ptr->val_ltime),HTONL(opt_pi_buf->val_ltime));
+                            addr_list_ptr->val_ltime.absolute.seconds = HTONL(opt_pi_buf->val_ltime);
+                            vtimer_set(&addr_list_ptr->val_ltime);
+                        } else {
+                            /* reset valid lifetime to 2 hours */
+                            //set_remaining_time(addr_list_ptr->val_ltime, 7200);
+                            //addr_list_ptr->val_ltime.absolute.seconds = 7200;
+                            tmp.seconds = 7200;
+                            vtimer_set_wakeup(&(addr_list_ptr->val_ltime), tmp, NULL);
+                        }
+                    }               
+                }
+                break;
+            }
+            case(OPT_6CO_TYPE):{
+                break;
+            }
+            case(OPT_ABRO_TYPE):{
+                break; 
+            }
+            default:
+                break;
+        }
+        /* multiplied with 8 because options length is in units of 8 bytes */
+        opt_hdr_len += (opt_buf->length * 8);    
+    }
+}
+
+void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
+                  uint8_t sllao, uint8_t aro){
     ipv6_buf = get_ipv6_buf();
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
@@ -184,88 +347,60 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ){
     ipv6_buf->hoplimit = ND_HOPLIMIT;
 
     if(src == NULL){
-        // TODO: src auswaehlen
+        
     } else{
-        ipv6_buf->srcaddr = *src;
+        memcpy(&(ipv6_buf->srcaddr), src, 16);
     } 
     if(dest == NULL){
-        // TODO: solicited knoten erstellen
+        create_solicited_node_mcast_addr(targ, &(ipv6_buf->destaddr));
     } else{
-        ipv6_buf->destaddr = *dest;
+        memcpy(&(ipv6_buf->destaddr.uint8[0]), &(dest->uint8[0]), 16);
     }
-    
+
+    ipv6_ext_hdr_len = 0; 
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
     icmp_buf->type = ICMP_NBR_SOL;
     icmp_buf->code = 0;
     
     nbr_sol_buf = get_nbr_sol_buf(ipv6_ext_hdr_len);    
-    nbr_sol_buf->reserved = 0;
-    nbr_sol_buf->tgtaddr = *targ;
+    nbr_sol_buf->reserved = 0;   
+    memcpy(&(nbr_sol_buf->tgtaddr), targ, 16);
     opt_hdr_len = NBR_SOL_LEN;
     
-    /* set sllao option */
-    opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
-    set_llao((uint8_t*)opt_stllao_buf, OPT_SLLAO_TYPE, 1);
-    opt_hdr_len += OPT_STLLAO_LEN;
+    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + NBR_SOL_LEN;
+
+    if(sllao == OPT_SLLAO){
+        /* set sllao option */
+        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
+        set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 1);
+        opt_hdr_len += OPT_STLLAO_LEN;
+        
+        packet_length += OPT_STLLAO_LEN;
+    }
     
-    /* set aro option */
-    opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len, opt_hdr_len);
-    opt_aro_buf->type = OPT_ARO_TYPE;
-    opt_aro_buf->length = OPT_ARO_LEN;
-    opt_aro_buf->status = 0;
-    opt_aro_buf->reserved1 = 0;
-    opt_aro_buf->reserved2 = 0;
-    opt_aro_buf->eui64 = *get_eui(src);
-    opt_hdr_len += OPT_ARO_HDR_LEN; 
+    if(aro == OPT_ARO){
+        /* set aro option */
+        opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len, opt_hdr_len);
+        opt_aro_buf->type = OPT_ARO_TYPE;
+        opt_aro_buf->length = OPT_ARO_LEN;
+        opt_aro_buf->status = 0;
+        opt_aro_buf->reserved1 = 0;
+        opt_aro_buf->reserved2 = 0;
+        memcpy(&(opt_aro_buf->eui64), get_eui(src),8);
+        opt_hdr_len += OPT_ARO_HDR_LEN; 
     
-    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + NBR_SOL_LEN + 
-                    OPT_STLLAO_LEN + OPT_ARO_HDR_LEN;
+        packet_length += OPT_ARO_HDR_LEN;
+    }
+
     ipv6_buf->length = packet_length - IPV6_HDR_LEN;
 }
 
-void pfx_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime, 
-             uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1){
-    if(pfx_chk_list(addr,size) == 1){
-        pelem->inuse = 1;
-        pelem->length = size;
-        pelem->adv = adv_opt;
-        pelem->l_a_reserved1 = l_a_reserved1;
-        pelem->val_ltime = val_ltime;
-        pelem->pref_ltime = pref_ltime;
-        pelem->addr = *addr; 
-    }   
-}
-
-uint8_t pfx_chk_list(ipv6_addr_t *addr, uint8_t size){
-    pelem = NULL;
-    for(int i=0 ; i < size ; i++){
-        if(plist[i].inuse){
-            if(pfx_cmp(&plist[i].addr, addr)){
-                *pelem = plist[i];
-                return 0;
-            }
-        } else {
-            *pelem = plist[i];
-        }
-    }
-    if(pelem){
-        return 1;
-    } 
-    return 2;
-}
-
-uint8_t pfx_cmp(ipv6_addr_t *addr1, ipv6_addr_t *addr2){
-    if(memcmp(addr1, addr2, 8) == 0){
-        return 1;
-    }
-    return 0;
-}
-
 /* link-layer address option - RFC4861 section 4.6.1/ RFC4944 8. */
-void set_llao(uint8_t *llao, uint8_t type, uint8_t length){
-    llao[0] = type;
-    llao[1] = length;
+void set_llao(opt_stllao_t *sllao, uint8_t type, uint8_t length){
+    sllao->type = type;
+    sllao->length = length;
     
+    uint8_t *llao = (uint8_t*)sllao;
     // get link layer address
     switch(length) {
         case(1):{
@@ -276,21 +411,17 @@ void set_llao(uint8_t *llao, uint8_t type, uint8_t length){
         case(2):{
             memcpy(&llao[2], &(iface.laddr), 8);              
             memset(&llao[10], 0, 6);
+            break;
         }
         default:{
             printf("ERROR: llao not set\n");
             break;
         }
     }
-    //ieee_802154_long_t *mac = get_eui(&ipv6_buf->srcaddr);
-    //get_ieee_802154_long_t_from_ipaddr(&ipv6_buf->srcaddr,&mac);    
-
-    //memcpy(&llao[2], mac, SIXLOWPAN_IPV6_LL_ADDR_LEN);
-    // padding (all zeros) - 48bit 
-    //memset(&llao[2 + SIXLOWPAN_IPV6_LL_ADDR_LEN], 0, 
-    //        OPT_STLLAO_LEN - SIXLOWPAN_IPV6_LL_ADDR_LEN - 2); 
 }
 
+//------------------------------------------------------------------------------
+// checksum calculation
 
 uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len){
     int count;
@@ -322,16 +453,111 @@ uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len){
     return sum;
 }
 
-
 uint16_t icmpv6_csum(uint8_t proto){
     ipv6_buf = get_ipv6_buf();
     uint16_t sum;
     uint16_t len = ipv6_buf->length;
     sum = len + proto;
+
     sum = csum(sum, (uint8_t *)&ipv6_buf->srcaddr, 2 * sizeof(ipv6_addr_t));
     sum = csum(sum,(uint8_t*)get_icmpv6_buf(0),len);
     
     return (sum == 0) ? 0xffff : HTONS(sum);
 }
 
+//------------------------------------------------------------------------------
+// neighbor cache functions
+
+nbr_cache_t * nbr_cache_search(ipv6_addr_t *ipaddr){
+    int i;
+    for(i = 0; i < NBR_CACHE_SIZE; i++){
+        if(memcmp(&(nbr_cache[i].addr.uint8[0]), &(ipaddr->uint8[0]), 16) == 0){
+            return &nbr_cache[i];
+        } 
+    }
+    return NULL;
+}
+
+void nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr, 
+                   uint8_t isrouter, uint8_t state){
+    if(nbr_count == NBR_CACHE_SIZE){
+        printf("ERROR: neighbor cache full\n");
+    } else {
+        memcpy(&(nbr_cache[nbr_count].addr), ipaddr, 16);
+        memcpy(&(nbr_cache[nbr_count].laddr), laddr, 8);
+        nbr_cache[nbr_count].isrouter = isrouter;
+        nbr_cache[nbr_count].state = state;
+
+        nbr_count++;
+    }
+}
+
+//------------------------------------------------------------------------------
+// default router list functions
+
+def_rtr_lst_t * def_rtr_lst_search(ipv6_addr_t *ipaddr){
+    int i;
+    for(i = 0; i < DEF_RTR_LST_SIZE; i++){
+        if(memcmp(&def_rtr_lst[i].addr.uint8[0], 
+           &(ipaddr->uint8[0]), 16) == 0){
+            return &def_rtr_lst[i];
+        }
+    }
+    return NULL;
+}
+
+void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime){
+    if(def_rtr_count == DEF_RTR_LST_SIZE){
+        DEBUG("ERROR: default router list full\n");
+    } else {
+        memcpy(&(def_rtr_lst[def_rtr_count].addr), ipaddr, 16);
+        def_rtr_lst[def_rtr_count].inval_timer.absolute.seconds = rtr_ltime;
+        vtimer_set(&(def_rtr_lst[def_rtr_count].inval_timer));
+        
+        def_rtr_count++;
+    }
+}
+
+void def_rtr_lst_rem(def_rtr_lst_t *entry){
+    int i;
+    for(i = 0; i < DEF_RTR_LST_SIZE; i++){
+        if(&def_rtr_lst[i] == entry){
+            /* search the to deleted item, then memmove the last item to its
+             * position, and decrement array count */
+            memmove(entry, &def_rtr_lst[def_rtr_count], sizeof(def_rtr_lst_t));
+            memset(&def_rtr_lst[def_rtr_count], 0, sizeof(def_rtr_lst_t));
+            def_rtr_count--;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+// prefix list functions
+
+void plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
+             uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1){
+    if(prefix_count == OPT_PI_LIST_LEN){
+        printf("ERROR: prefix list full\n");
+    } else {
+        plist[prefix_count].inuse = 1;
+        plist[prefix_count].length = size;
+        plist[prefix_count].adv = adv_opt;
+        plist[prefix_count].l_a_reserved1 = l_a_reserved1;
+        plist[prefix_count].val_ltime = val_ltime;
+        plist[prefix_count].pref_ltime = pref_ltime;
+        memcpy(&(plist[prefix_count].addr.uint8[0]), &(addr->uint8[0]), 16);
+
+        prefix_count++;
+    }
+}
+
+uint8_t plist_search(ipv6_addr_t *addr){
+    int i;
+    for(i = 0; i < OPT_PI_LIST_LEN; i++){
+        if(memcmp(&(plist[i].addr.uint8[0]), &addr->uint8[0], 16) == 0){
+            return &plist[i];
+        }
+    }
+    return NULL;
+}
 

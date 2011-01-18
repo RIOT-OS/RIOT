@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "vtimer.h"
 
 /* router solicitation */
 #define RTR_SOL_LEN                     4
@@ -28,6 +29,9 @@
 #define OPT_PI_TYPE                     3
 #define OPT_PI_LEN                      4
 #define OPT_PI_HDR_LEN                  32
+#define OPT_PI_FLAG_A                   0x40
+#define OPT_PI_FLAG_L                   0x80
+#define OPT_PI_VLIFETIME_INFINITE       0xffffffff
 /* mtu option rfc4861 4.6.4 */
 #define OPT_MTU_TYPE                    5
 #define OPT_MTU_LEN                     1
@@ -37,10 +41,41 @@
 #define OPT_ARO_LEN                     2
 #define OPT_ARO_HDR_LEN                 16
 #define OPT_ARO_LTIME                   300 // geeigneten wert finden
+/* 6lowpan context option */
+#define OPT_6CO_TYPE                    32
+/* authoritative border router option */
+#define OPT_ABRO_TYPE                   33
+/* neighbor cache size */
+#define NBR_CACHE_SIZE                  8
+/* neighbor status values */
+#define NBR_STATUS_INCOMPLETE           0
+#define NBR_STATUS_REACHABLE            1
+#define NBR_STATUS_STALE                2
+#define NBR_STATUS_DELAY                3
+#define NBR_STATUS_PROBE                4
+/* default router list size */
+#define DEF_RTR_LST_SIZE                    3 // geeigneten wert finden
+
+enum option_types_t {
+    OPT_SLLAO = 1,
+    OPT_TLLAO,
+    OPT_PI,
+    OPT_MTU,
+    OPT_ARO,
+    OPT_6CO,
+    OPT_ABRO,
+    OPT_DAR,
+    OPT_DAC, 
+};
+
+typedef struct __attribute__ ((packed)) opt_buf_t {
+    uint8_t type;
+    uint8_t length;    
+} opt_buf_t;
 
 typedef struct __attribute__ ((packed)) opt_stllao_t {
-  uint8_t type;
-  uint8_t length;
+    uint8_t type;
+    uint8_t length;
 } opt_stllao_t;
 
 typedef struct __attribute__ ((packed)) opt_mtu_t {
@@ -71,7 +106,7 @@ typedef struct __attribute__ ((packed)) opt_aro_t {
     ieee_802154_long_t eui64;
 } opt_aro_t;
 
-typedef struct __attribute__ ((packed)) pfx_elem_t {
+typedef struct __attribute__ ((packed)) plist_t {
     uint8_t inuse;  
     uint8_t adv;
     ipv6_addr_t addr;
@@ -79,7 +114,8 @@ typedef struct __attribute__ ((packed)) pfx_elem_t {
     uint8_t l_a_reserved1;
     uint32_t val_ltime;
     uint32_t pref_ltime;
-} pfx_elem_t;
+    uint8_t infinite;
+} plist_t;
 
 struct __attribute__ ((packed)) rtr_adv_t {
     uint8_t hoplimit;
@@ -95,14 +131,38 @@ struct __attribute__ ((packed)) nbr_sol_t {
 };
 
 
-void init_rtr_sol(void);
-void recv_rtr_sol(void);
-void init_rtr_adv(ipv6_addr_t *addr);
-uint8_t pfx_chk_list(ipv6_addr_t *addr, uint8_t size);
-uint8_t pfx_cmp(ipv6_addr_t *addr1, ipv6_addr_t *addr2);
-void pfx_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
-             uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
-void set_llao(uint8_t *llao, uint8_t type, uint8_t length);
+/* neighbor cache - rfc4861 5.1. */
+typedef struct __attribute__ ((packed)) nbr_cache_t {
+    uint8_t state;
+    uint8_t isrouter;
+    ipv6_addr_t addr;
+    ieee_802154_long_t laddr;
+} nbr_cache_t;
 
+/* default router list - rfc4861 5.1. */
+typedef struct __attribute__ ((packed)) def_rtr_lst_t {
+    ipv6_addr_t addr;
+    vtimer_t inval_timer;
+} def_rtr_lst_t;
+
+void init_rtr_sol(uint8_t sllao);
+void recv_rtr_sol(void);
+void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi, 
+                  uint8_t sixco, uint8_t abro);
+uint8_t plist_search(ipv6_addr_t *addr);
+uint8_t plist_cmp(ipv6_addr_t *addr1, ipv6_addr_t *addr2);
+void plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
+             uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
+void set_llao(opt_stllao_t *sllao, uint8_t type, uint8_t length);
+nbr_cache_t * nbr_cache_search(ipv6_addr_t *ipaddr);
+void nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr,
+                   uint8_t isrouter, uint8_t state);
 uint16_t icmpv6_csum(uint8_t proto);
 uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len);
+def_rtr_lst_t * def_rtr_lst_search(ipv6_addr_t *ipaddr);
+void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime);
+void def_rtr_lst_rem(def_rtr_lst_t *entry);
+void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
+                  uint8_t slloa, uint8_t aro);
+void plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
+             uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);

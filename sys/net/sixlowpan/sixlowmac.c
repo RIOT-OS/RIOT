@@ -10,6 +10,7 @@
 #include "msg.h"
 #include "radio/radio.h"
 #include "transceiver.h"
+#include "vtimer.h"
 #include "ieee802154_frame.h"
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
@@ -46,6 +47,13 @@ void set_radio_channel(uint8_t channel){
     msg_send_receive(&mesg,&mesg,transceiver_pid);
 }
 
+void switch_to_rx(void){
+    mesg.type = SWITCH_RX;
+    mesg.content.ptr = (char*) &tcmd;
+    tcmd.transceivers = TRANSCEIVER_CC1100;
+    msg_send(&mesg, transceiver_pid, 1);
+}
+
 void init_802154_short_addr(ieee_802154_short_t *saddr){
     saddr->uint8[0] = 0;
     saddr->uint8[1] = get_radio_address();
@@ -72,7 +80,7 @@ void recv_ieee802154_frame(void){
     ieee802154_frame_t frame;
    
     msg_init_queue(msg_q, RADIO_RCV_BUF_SIZE);
-    
+   
     while (1) {
         msg_receive(&m);
         if (m.type == PKT_PENDING) {
@@ -80,12 +88,11 @@ void recv_ieee802154_frame(void){
 
             hdrlen = read_802154_frame(p->data, &frame, p->length);
             length = p->length - hdrlen;
-            
+           
             /* deliver packet to network(6lowpan)-layer */
             input(frame.payload, length);
- 
+
             p->processing--;
- //           printf("\n");
         }
         else if (m.type == ENOBUFFER) {
             puts("Transceiver buffer full");
@@ -117,9 +124,6 @@ void set_ieee802154_frame_values(ieee802154_frame_t *frame){
 }
 
 void send_ieee802154_frame(uint8_t *addr, uint8_t *payload, uint8_t length){
-    
-    set_radio_channel(13);
-    
     mesg.type = SND_PKT;
     mesg.content.ptr = (char*) &tcmd;
 
@@ -138,8 +142,6 @@ void send_ieee802154_frame(uint8_t *addr, uint8_t *payload, uint8_t length){
     frame.dest_addr[1] = 4;
     frame.src_addr[0] = 0;
     frame.src_addr[1] = 5;
-
-    
 
     /* check if destination address is NULL => broadcast */
     if(addr[0] == 0 && addr[1] == 0){
@@ -162,15 +164,14 @@ void send_ieee802154_frame(uint8_t *addr, uint8_t *payload, uint8_t length){
     p.dst = *addr;
     // TODO: geeignete ring-bufferung nötig
     p.data = buf;
-
     //p.data = snd_buffer[i % RADIO_SND_BUF_SIZE];
     msg_send(&mesg, transceiver_pid, 1);
-    //swtimer_usleep(RADIO_SENDING_DELAY);
+    //switch_to_rx();
 }
 
 void sixlowmac_init(transceiver_type_t type){
     int recv_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE, 
-                        PRIORITY_MAIN-1, CREATE_STACKTEST, recv_ieee802154_frame , "radio");
+                        PRIORITY_MAIN-2, CREATE_STACKTEST, recv_ieee802154_frame , "radio");
     transceiver_type = type;
     transceiver_init(transceiver_type);
     transceiver_start();
