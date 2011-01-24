@@ -23,8 +23,7 @@ struct icmpv6_hdr_t* get_icmpv6_buf(uint8_t ext_len){
 }
 
 
-void bootstrapping(uint8_t *addr){
-#ifdef SIXLOWPAN_NODE
+void lib6lowpan_bootstrapping(uint8_t *addr){
     /* create link-local address based on eui-64 */
     //ipv6_buf = get_ipv6_buf();
     //RADIO.set_address(5);
@@ -39,13 +38,15 @@ void bootstrapping(uint8_t *addr){
 
     //init_rtr_adv(&ipv6_buf->srcaddr, 0, 0, OPT_PI, 0, 0);
 
-    ipv6_buf = get_ipv6_buf();
-    output(addr,(uint8_t*)ipv6_buf);
+//    ieee_802154_long_t laddr;
+//    laddr.uint8[7] = *addr;
+
+//    ipv6_buf = get_ipv6_buf();
+//    output(&laddr,(uint8_t*)ipv6_buf);
     //send_rtr_adv(&ipv6_buf->destaddr);
-#endif
 }
 
-void ip_process(void){
+void ipv6_process(void){
     msg m;
     msg_init_queue(msg_queue, IP_PKT_RECV_BUF_SIZE);
     while(1){
@@ -55,7 +56,7 @@ void ip_process(void){
         ipv6_buf = (struct ipv6_hdr_t*) m.content.ptr;
         
         printf("INFO: packet received, source: ");
-        print6addr(&ipv6_buf->srcaddr);
+        ipv6_print_addr(&ipv6_buf->srcaddr);
         /* identifiy packet */
         nextheader = &ipv6_buf->nextheader;
         
@@ -72,11 +73,6 @@ void ip_process(void){
                         /* processing router solicitation */
                         recv_rtr_sol();    
                         /* init solicited router advertisment*/
-                        init_rtr_adv(&ipv6_buf->srcaddr, 0, 0, OPT_PI, 0, 0);
-                        /* send solicited router advertisment */
-                        uint8_t addr = 0;
-                        output(&addr,(uint8_t*)ipv6_buf);
-
                         break;
                     }
                     case(ICMP_RTR_ADV):{
@@ -84,11 +80,11 @@ void ip_process(void){
                         /* processing router advertisment */
                         recv_rtr_adv();
                         /* init neighbor solicitation */
-                        //init_nbr_sol();
                         break;
                     }
                     case(ICMP_NBR_SOL):{
                         printf("INFO: packet type: icmp neighbor solicitation\n");
+                        recv_nbr_sol();
                     }
                     default:
                         break;
@@ -101,25 +97,24 @@ void ip_process(void){
     }   
 }
 
-void iface_addr_list_add(ipv6_addr_t *addr, uint8_t state, uint32_t val_ltime,
+void ipv6_iface_add_addr(ipv6_addr_t *addr, uint8_t state, uint32_t val_ltime,
                          uint32_t pref_ltime, uint8_t type){
     if(iface_addr_list_count < IFACE_ADDR_LIST_LEN){
         memcpy(&(iface.addr_list[iface_addr_list_count].addr.uint8[0]), 
                &(addr->uint8[0]), 16);
         iface.addr_list[iface_addr_list_count].state = state;
-        iface.addr_list[iface_addr_list_count].val_ltime.absolute.seconds = val_ltime;
-        timex_t vtime, ptime;
+        timex_t vtime;
         vtime.seconds = val_ltime;
-        ptime.seconds = pref_ltime;
-        vtimer_set_wakeup(&(iface.addr_list[iface_addr_list_count].val_ltime),vtime,NULL);
-        //iface.addr_list[iface_addr_list_count].pref_ltime.absolute.seconds = pref_ltime;
-        vtimer_set_wakeup(&(iface.addr_list[iface_addr_list_count].pref_ltime), ptime, NULL);
+        timex_t prlt;
+        prlt.seconds = pref_ltime;
+        vtimer_set_sec(&(iface.addr_list[iface_addr_list_count].val_ltime), vtime);
+        vtimer_set_sec(&(iface.addr_list[iface_addr_list_count].pref_ltime), prlt);
         iface.addr_list[iface_addr_list_count].type = type;
         iface_addr_list_count++;
     }
 }
 
-addr_list_t * iface_addr_list_search(ipv6_addr_t *addr){
+addr_list_t * ipv6_iface_addr_match(ipv6_addr_t *addr){
     int i;
     for(i = 0; i < IFACE_ADDR_LIST_LEN; i++){
         if(memcmp(&(iface.addr_list[i].addr.uint8[0]),
@@ -127,9 +122,10 @@ addr_list_t * iface_addr_list_search(ipv6_addr_t *addr){
             return &(iface.addr_list[i]);
         }
     }
+    return NULL;
 }
 
-addr_list_t * iface_addr_list_prefix_equals(ipv6_addr_t *addr){
+addr_list_t * ipv6_iface_addr_prefix_eq(ipv6_addr_t *addr){
     int i;
     for(i = 0; i < IFACE_ADDR_LIST_LEN; i++){
         if(memcmp(&(iface.addr_list[i].addr.uint8[0]),
@@ -140,7 +136,13 @@ addr_list_t * iface_addr_list_prefix_equals(ipv6_addr_t *addr){
     return NULL;
 }
 
-void setup_addr_with_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix){
+void ipv6_iface_print_addrs(void){
+    for(int i = 0; i < iface_addr_list_count; i++){
+        ipv6_print_addr(&(iface.addr_list[i].addr));
+    } 
+}
+
+void ipv6_init_addr_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix){
     inout->uint16[0] = prefix->uint16[0];
     inout->uint16[1] = prefix->uint16[1];
     inout->uint16[2] = prefix->uint16[2];
@@ -149,22 +151,18 @@ void setup_addr_with_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix){
     memcpy(&(inout->uint8[8]),&(iface.laddr.uint8[0]), 8); 
 }
 
-ieee_802154_long_t* get_eui(ipv6_addr_t *ipaddr){
-    return ((ieee_802154_long_t *) &(ipaddr->uint8[8]));
-}
-
-void create_prefix(ipv6_addr_t *inout, uint16_t prefix){
-    inout->uint16[0] = prefix;
-    inout->uint16[1] = 0;
-    inout->uint16[2] = 0;
-    inout->uint16[3] = 0;
+void ipv6_set_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix){
+    inout->uint16[0] = prefix->uint16[0];
+    inout->uint16[1] = prefix->uint16[1];
+    inout->uint16[2] = prefix->uint16[2];
+    inout->uint16[3] = prefix->uint16[3];
     inout->uint16[4] = 0;
     inout->uint16[5] = 0;
     inout->uint16[6] = 0;
     inout->uint16[7] = 0;
 }
 
-void create_all_routers_mcast_addr(ipv6_addr_t *ipaddr){
+void ipv6_set_all_rtrs_mcast_addr(ipv6_addr_t *ipaddr){
     ipaddr->uint16[0] = HTONS(0xff02);
     ipaddr->uint16[1] = 0;
     ipaddr->uint16[2] = 0;
@@ -175,7 +173,7 @@ void create_all_routers_mcast_addr(ipv6_addr_t *ipaddr){
     ipaddr->uint16[7] = HTONS(0x0002);
 }
 
-void create_all_nodes_mcast_addr(ipv6_addr_t *ipaddr){
+void ipv6_set_all_nds_mcast_addr(ipv6_addr_t *ipaddr){
     ipaddr->uint16[0] = HTONS(0xff02);
     ipaddr->uint16[1] = 0;
     ipaddr->uint16[2] = 0;
@@ -186,75 +184,119 @@ void create_all_nodes_mcast_addr(ipv6_addr_t *ipaddr){
     ipaddr->uint16[7] = HTONS(0x0001);
 }
 
-void iface_find_src_ipaddr(ipv6_addr_t *ipaddr, uint8_t state, 
-                           uint8_t dest_addr_type){
-    int i;
-    int found = 0;
+void ipv6_get_saddr(ipv6_addr_t *src, ipv6_addr_t *dst){
+    /* try to find best match if dest is not mcast or link local */
+    int8_t itmp = -1;
+    uint8_t tmp = 0; 
+    uint8_t bmatch = 0;    
 
-    switch(dest_addr_type) {
-        case(ADDR_TYPE_MULTICAST):{
-            printf("a\n");
-            for(i = 0; i < IFACE_ADDR_LIST_LEN; i++){
-                if(prefix_link_local_check(&(iface.addr_list[i].addr))){
-                    printf("b\n");
-                    if(iface.addr_list[i].state == state){
-                        printf("c\n");
-                        memcpy(&(ipaddr->uint8[0]),
-                               &(iface.addr_list[i].addr.uint8[0]),16);
-                        found = 1;
+    if(!(ipv6_prefix_ll_match(dst)) && !(ipv6_prefix_mcast_match(dst))){
+        for(int i = 0; i < IFACE_ADDR_LIST_LEN; i++){
+            if(iface.addr_list[i].state == ADDR_STATE_PREFERRED){
+                if(!(ipv6_prefix_ll_match(&(iface.addr_list[i].addr)))){
+                    tmp = ipv6_get_addr_match(dst, &(iface.addr_list[i].addr));
+                    if(tmp >= bmatch){
+                        bmatch = tmp;
+                        itmp = i;
                     }
                 }
             }
-            break;
         }
-        case(ADDR_TYPE_LINK_LOCAL):{
-            for(i = 0; i < IFACE_ADDR_LIST_LEN; i++){
-                if(prefix_link_local_check(&(iface.addr_list[i].addr))){
-                    if(iface.addr_list[i].state == state){
-                        memcpy(&(ipaddr->uint8[0]),
-                               &(iface.addr_list[i].addr.uint8[0]),16);
-                        found = 1;
-                    }
-                }
-            }
-            break;
+    } else {
+        for(int j=0; j < IFACE_ADDR_LIST_LEN; j++){
+            if((iface.addr_list[j].state == ADDR_STATE_PREFERRED) &&
+                ipv6_prefix_ll_match(&(iface.addr_list[j].addr))){
+                itmp = j;    
+            } 
         }
-        case(ADDR_TYPE_GLOBAL):{
-            for(i = 0; i < IFACE_ADDR_LIST_LEN; i++){
-                if(!(prefix_link_local_check(&(iface.addr_list[i].addr)))){
-                    if(iface.addr_list[i].state == state){
-                        memcpy(&(ipaddr->uint8[0]),
-                               &(iface.addr_list[i].addr.uint8[0]),16);
-                        found = 1;
-                    }
-                }
-            }
-            break;            
-        }
-        default:
-            break;
     }
-    
-    if(found == 0){
-        memset(ipaddr, 0, 16);
+
+    if(itmp == -1){
+        memset(src, 0, 16);
+    } else {
+        memcpy(src, &(iface.addr_list[itmp].addr), 16);
     }
 }
 
-void create_link_local_prefix(ipv6_addr_t *ipaddr){
+uint8_t ipv6_get_addr_match(ipv6_addr_t *src, ipv6_addr_t *dst){
+    uint8_t val, xor;
+    for(int i = 0; i < 16; i++){
+        /* if bytes are equal add 8 */
+        if(src->uint8[i] == dst->uint8[i]){
+            val += 8; 
+        } else {
+            xor = src->uint8[i] ^ dst->uint8[i];
+            /* while bits from byte equal add 1 */
+            for(int j = 0; j < 8; j++){
+                if((xor & 0x80) == 0){
+                    val++;
+                    xor = xor << 1;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+    return val;
+}
+
+void ipv6_set_ll_prefix(ipv6_addr_t *ipaddr){
     ipaddr->uint16[0] = HTONS(0xfe80);
     ipaddr->uint16[1] = 0;
     ipaddr->uint16[2] = 0;
     ipaddr->uint16[3] = 0;
 }
 
-uint8_t prefix_link_local_check(ipv6_addr_t *addr){
+void ipv6_init_address(ipv6_addr_t *addr, uint16_t addr0, uint16_t addr1,
+                       uint16_t addr2, uint16_t addr3, uint16_t addr4,
+                       uint16_t addr5, uint16_t addr6, uint16_t addr7){
+    addr->uint16[0] = HTONS(addr0);
+    addr->uint16[1] = HTONS(addr1);
+    addr->uint16[2] = HTONS(addr2);
+    addr->uint16[3] = HTONS(addr3);
+    addr->uint16[4] = HTONS(addr4);
+    addr->uint16[5] = HTONS(addr5);
+    addr->uint16[6] = HTONS(addr6);
+    addr->uint16[7] = HTONS(addr7);
+}
+
+uint8_t ipv6_prefix_ll_match(ipv6_addr_t *addr){
     if(addr->uint8[0] == 0xfe && addr->uint8[1] == 0x80){
         return 1;
     }
     return 0;
 }
 
-void create_solicited_node_mcast_addr(ipv6_addr_t *addr_in, ipv6_addr_t *addr_out){
+uint8_t ipv6_prefix_mcast_match(ipv6_addr_t *addr){
+    if(addr->uint8[0] == 0xff && addr->uint8[1] == 0x02){
+        return 1;
+    }
+    return 0;    
+}
+
+uint8_t ipv6_addr_unspec_match(ipv6_addr_t *addr){
+    if((addr->uint16[0] == 0) && (addr->uint16[1] == 0) && 
+       (addr->uint16[2] == 0) && (addr->uint16[3] == 0) &&
+       (addr->uint16[4] == 0) && (addr->uint16[5] == 0) &&
+       (addr->uint16[6] == 0) && (addr->uint16[7] == 0)){
+        return 1;
+    }
+    return 0;
+}
+
+uint8_t ipv6_addr_sol_node_mcast_match(ipv6_addr_t *addr){
+    /* note: cool if-condition*/
+    if((addr->uint8[0] == 0xFF) && (addr->uint8[1] == 0x02) &&
+       (addr->uint16[1] == 0x00) && (addr->uint16[2] == 0x00) &&
+       (addr->uint16[3] == 0x00) && (addr->uint16[4] == 0x00) &&
+       (addr->uint8[10] == 0x00) && (addr->uint8[11] == 0x01) &&
+       (addr->uint8[12] == 0xFF)){
+        return 1;
+    }
+    return 0;
+}
+
+void ipv6_set_sol_node_mcast_addr(ipv6_addr_t *addr_in, ipv6_addr_t *addr_out){
     /* copy only the last 24-bit of the ip-address that is beeing resolved */
     addr_out->uint16[0] = HTONS(0xff02);
     addr_out->uint16[1] = 0;
@@ -267,7 +309,7 @@ void create_solicited_node_mcast_addr(ipv6_addr_t *addr_in, ipv6_addr_t *addr_ou
     addr_out->uint16[7] = addr_in->uint16[7];
 }
 
-void print6addr(ipv6_addr_t *ipaddr){
+void ipv6_print_addr(ipv6_addr_t *ipaddr){
     printf("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x\n",
         ((uint8_t *)ipaddr)[0], ((uint8_t *)ipaddr)[1], ((uint8_t *)ipaddr)[2],
         ((uint8_t *)ipaddr)[3], ((uint8_t *)ipaddr)[4], ((uint8_t *)ipaddr)[5], 

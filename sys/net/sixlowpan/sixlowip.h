@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <vtimer.h>
+#include <mutex.h>
 
 /* set maximum transmission unit */
 #define MTU                         1280
@@ -30,6 +31,7 @@ extern uint8_t opt_hdr_len;
 extern uint16_t packet_length;
 extern uint8_t packet_dispatch;
 extern uint8_t iface_addr_list_count;
+//extern mutex_t buf_mutex;
 
 /* base header lengths */
 #define LL_HDR_LEN                  0x4
@@ -133,22 +135,29 @@ extern iface_t iface;
 struct icmpv6_hdr_t* get_icmpv6_buf(uint8_t ext_len);
 struct ipv6_hdr_t* get_ipv6_buf(void);
 
-void create_link_local_prefix(ipv6_addr_t *ipaddr);
-void create_all_routers_mcast_addr(ipv6_addr_t *ipaddr);
-void create_all_nodes_mcast_addr(ipv6_addr_t *ipaddr);
-void set_eui64(ipv6_addr_t *ipaddr);
-ieee_802154_long_t* get_eui(ipv6_addr_t *ipaddr);
-void bootstrapping(uint8_t *addr);
-void print6addr(ipv6_addr_t *ipaddr);
-void ip_process(void);
-void iface_find_src_ipaddr(ipv6_addr_t *ipaddr, uint8_t state, 
-                           uint8_t dest_addr_type);
-uint8_t prefix_link_local_check(ipv6_addr_t *addr);
-void iface_addr_list_add(ipv6_addr_t* addr, uint8_t state, uint32_t val_ltime, 
+void ipv6_set_ll_prefix(ipv6_addr_t *ipaddr);
+void ipv6_set_all_rtrs_mcast_addr(ipv6_addr_t *ipaddr);
+void ipv6_set_all_nds_mcast_addr(ipv6_addr_t *ipaddr);
+void ipv6_set_sol_node_mcast_addr(ipv6_addr_t *addr_in, ipv6_addr_t *addr_out);
+void lib6lowpan_bootstrapping(uint8_t *addr);
+void ipv6_print_addr(ipv6_addr_t *ipaddr);
+void ipv6_process(void);
+void ipv6_get_saddr(ipv6_addr_t *src, ipv6_addr_t *dst);
+uint8_t ipv6_get_addr_match(ipv6_addr_t *src, ipv6_addr_t *dst);
+uint8_t ipv6_prefix_mcast_match(ipv6_addr_t *addr);
+uint8_t ipv6_prefix_ll_match(ipv6_addr_t *addr);
+void ipv6_iface_add_addr(ipv6_addr_t* addr, uint8_t state, uint32_t val_ltime, 
                          uint32_t pref_ltime, uint8_t type);
-addr_list_t * iface_addr_list_prefix_equals(ipv6_addr_t *addr);
-void setup_addr_with_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix);
+addr_list_t * ipv6_iface_addr_prefix_eq(ipv6_addr_t *addr);
+addr_list_t * ipv6_iface_addr_match(ipv6_addr_t *addr);
+void ipv6_iface_print_addrs(void);
+void ipv6_init_addr_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix);
+void ipv6_init_address(ipv6_addr_t *addr, uint16_t addr0, uint16_t addr1,
+                       uint16_t addr2, uint16_t addr3, uint16_t addr4,
+                       uint16_t addr5, uint16_t addr6, uint16_t addr7);
 uint32_t get_remaining_time(vtimer_t *t);
 void set_remaining_time(vtimer_t *t, uint32_t time);
-void create_prefix(ipv6_addr_t *inout, uint16_t prefix);
+void ipv6_set_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix);
+uint8_t ipv6_addr_unspec_match(ipv6_addr_t *addr);
+uint8_t ipv6_addr_sol_node_mcast_match(ipv6_addr_t *addr);
 #endif /* SIXLOWIP_H*/

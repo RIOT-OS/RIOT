@@ -15,6 +15,9 @@
 #define NBR_SOL_LEN                     20
 /* neighbour advertisement */
 #define NBR_ADV_LEN                     20
+#define NBR_ADV_FLAG_R                  0x80
+#define NBR_ADV_FLAG_S                  0x40
+#define NBR_ADV_FLAG_O                  0x20
 /* icmp message types rfc4861 4.*/
 #define ICMP_RTR_ADV                    134
 #define ICMP_RTR_SOL                    133
@@ -47,6 +50,10 @@
 #define OPT_ABRO_TYPE                   33
 /* neighbor cache size */
 #define NBR_CACHE_SIZE                  8
+#define NBR_CACHE_TYPE_GC               1
+#define NBR_CACHE_TYPE_REG              2
+#define NBR_CACHE_TYPE_TEN              3
+#define NBR_CACHE_LTIME_TEN             20 
 /* neighbor status values */
 #define NBR_STATUS_INCOMPLETE           0
 #define NBR_STATUS_REACHABLE            1
@@ -55,6 +62,8 @@
 #define NBR_STATUS_PROBE                4
 /* default router list size */
 #define DEF_RTR_LST_SIZE                    3 // geeigneten wert finden
+
+extern unsigned int nd_nbr_cache_rem_pid;
 
 enum option_types_t {
     OPT_SLLAO = 1,
@@ -130,13 +139,22 @@ struct __attribute__ ((packed)) nbr_sol_t {
     ipv6_addr_t tgtaddr;  
 };
 
+struct __attribute__ ((packed)) nbr_adv_t {
+    uint8_t rso;
+    uint8_t reserved[3];
+    ipv6_addr_t tgtaddr;  
+};
+
 
 /* neighbor cache - rfc4861 5.1. */
 typedef struct __attribute__ ((packed)) nbr_cache_t {
+    uint8_t type;
     uint8_t state;
     uint8_t isrouter;
     ipv6_addr_t addr;
     ieee_802154_long_t laddr;
+    ieee_802154_short_t saddr;
+    vtimer_t ltime;
 } nbr_cache_t;
 
 /* default router list - rfc4861 5.1. */
@@ -156,7 +174,10 @@ void plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
 void set_llao(opt_stllao_t *sllao, uint8_t type, uint8_t length);
 nbr_cache_t * nbr_cache_search(ipv6_addr_t *ipaddr);
 void nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr,
-                   uint8_t isrouter, uint8_t state);
+                   uint8_t isrouter, uint8_t state, uint8_t type,
+                   uint16_t ltime, ieee_802154_short_t *saddr);
+void nbr_cache_auto_rem(void);
+void nbr_cache_rem(ipv6_addr_t *addr);
 uint16_t icmpv6_csum(uint8_t proto);
 uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len);
 def_rtr_lst_t * def_rtr_lst_search(ipv6_addr_t *ipaddr);
@@ -166,3 +187,4 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
                   uint8_t slloa, uint8_t aro);
 void plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
              uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
+void recv_nbr_sol(void);
