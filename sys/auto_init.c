@@ -53,5 +53,9 @@ void auto_init(void) {
     DEBUG("Auto init ltc4150 module.\n");
     ltc4150_init();
 #endif
+#ifdef MODULE_PROFILING
+    extern void profiling_init(void);
+    profiling_init();
+#endif
     main();
 }

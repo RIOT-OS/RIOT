@@ -40,8 +40,13 @@ LINK = $(CC) ;
 
 OPTIM = -Os ;
 #OPTIM = -O0 -g ;
+
 CCFLAGS += -std=gnu99 -Wall -mcpu=arm7tdmi-s -mfloat-abi=soft -mfpu=vfp ;
 LINKFLAGS = -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T [ FPath $(TOP) cpu $(CPU) linkerscript.x ] ;
+
+if $(PROFILING) = 1 {
+    CCFLAGS += -g -finstrument-functions ;
+}
 
 AS = $(TOOLCHAIN)as ;
 ASFLAGS += -mcpu=arm7tdmi-s --defsym $(CPU)=1 -mfloat-abi=soft -mfpu=vfp ;

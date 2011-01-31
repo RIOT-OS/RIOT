@@ -123,7 +123,7 @@ gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
 	return true;												// success
 }
 /*---------------------------------------------------------------------------*/
-static void test_irq(int port, unsigned long f_mask, unsigned long r_mask, struct irq_callback* pcb)
+static void __attribute__ ((__no_instrument_function__)) test_irq(int port, unsigned long f_mask, unsigned long r_mask, struct irq_callback* pcb)
 {
 	/* Test each bit of rising and falling masks, if set trigger interrupt
 	 * on corresponding device */
@@ -148,7 +148,7 @@ void GPIO_IRQHandler(void) __attribute__((interrupt("IRQ")));
  * Invoked whenever an activated gpio interrupt is triggered by a rising
  * or falling edge.
  */
-void GPIO_IRQHandler(void) {
+void __attribute__ ((__no_instrument_function__)) GPIO_IRQHandler(void) {
 	if( IO_INT_STAT & BIT0 ) {										// interrupt(s) on PORT0 pending
 		unsigned long int_stat_f = IO0_INT_STAT_F;					// save content
 		unsigned long int_stat_r = IO0_INT_STAT_R;					// save content

@@ -29,7 +29,7 @@ SubDir TOP drivers ;
 
 Module sht11 : sht11.c : hwtimer ;
 
-Module ltc4150 : ltc4150.c : board_ltc4150 ;
+Module ltc4150 : ltc4150.c : board_ltc4150 hwtimer ;
 
 SubInclude TOP drivers cc110x ;
 SubInclude TOP drivers cc110x_ng ;
