@@ -178,7 +178,6 @@ static void receive_packet(uint16_t type, uint8_t pos) {
     transceiver_type_t t;
     rx_buffer_pos = pos;
     msg m;
-   
     DEBUG("Packet received\n");
     switch (type) {
         case RCV_PKT_CC1020:
