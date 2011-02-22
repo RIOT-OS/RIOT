@@ -3,3 +3,7 @@ SubDir TOP sys net sixlowpan ;
 # HDRS += $(TOP)/sys/net/sixlowpan/ ;
 
 Module 6lowpan : sixlowpan.c sixlowip.c sixlowmac.c sixlownd.c ieee802154_frame.c ;
+
+UseModule vtimer ;
+UseModule transceiver ;
+UseModule auto_init ;

@@ -11,15 +11,12 @@
 #define MTU                         1280
 /* IPv6 field values */ 
 #define IPV6_VER                    0x60
-#define ICMPV6_NXT_HDR              0x3A
+#define PROTO_NUM_ICMPV6            58
+#define PROTO_NUM_NONE              59
 #define ND_HOPLIMIT                 0xFF
 #define SIXLOWPAN_IPV6_LL_ADDR_LEN  8            
 /* size of global buffer */
 #define BUFFER_SIZE (LL_HDR_LEN + MTU)
-/* board specific configurations*/
-#define MSBA2_OUI                   0x005BA2    // 24bit OUI 
-#define R8BIT                       0xA2        // random 8bit
-#define OUI                         0x005BA2
 
 #define MULTIHOP_HOPLIMIT           64
 
@@ -32,6 +29,8 @@ extern uint16_t packet_length;
 extern uint8_t packet_dispatch;
 extern uint8_t iface_addr_list_count;
 //extern mutex_t buf_mutex;
+
+extern double start;
 
 /* base header lengths */
 #define LL_HDR_LEN                  0x4
@@ -134,12 +133,14 @@ extern iface_t iface;
 /* function prototypes */
 struct icmpv6_hdr_t* get_icmpv6_buf(uint8_t ext_len);
 struct ipv6_hdr_t* get_ipv6_buf(void);
+uint8_t * get_payload_buf(uint8_t ext_len);
 
 void ipv6_set_ll_prefix(ipv6_addr_t *ipaddr);
 void ipv6_set_all_rtrs_mcast_addr(ipv6_addr_t *ipaddr);
 void ipv6_set_all_nds_mcast_addr(ipv6_addr_t *ipaddr);
 void ipv6_set_sol_node_mcast_addr(ipv6_addr_t *addr_in, ipv6_addr_t *addr_out);
-void lib6lowpan_bootstrapping(uint8_t *addr);
+void sixlowpan_bootstrapping(void);
+void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len);
 void ipv6_print_addr(ipv6_addr_t *ipaddr);
 void ipv6_process(void);
 void ipv6_get_saddr(ipv6_addr_t *src, ipv6_addr_t *dst);

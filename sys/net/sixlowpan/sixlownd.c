@@ -93,7 +93,7 @@ void init_rtr_sol(uint8_t sllao){
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = ICMPV6_NXT_HDR;
+    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
     ipv6_buf->hoplimit = ND_HOPLIMIT;
 
     ipv6_set_all_rtrs_mcast_addr(&ipv6_buf->destaddr);
@@ -116,7 +116,7 @@ void init_rtr_sol(uint8_t sllao){
     }
     
     icmp_buf->checksum = 0;
-    icmp_buf->checksum = ~icmpv6_csum(ICMPV6_NXT_HDR);
+    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
 
     printf("INFO: send router solicitation to: ");
     ipv6_print_addr(&ipv6_buf->destaddr);
@@ -169,7 +169,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = ICMPV6_NXT_HDR;
+    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
     ipv6_buf->hoplimit = ND_HOPLIMIT;
 
     if(addr == NULL){
@@ -240,7 +240,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
 
     /* calculate checksum */
     icmp_buf->checksum = 0;
-    icmp_buf->checksum = ~icmpv6_csum(ICMPV6_NXT_HDR);
+    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
     //printf("%x\n",icmp_buf->checksum);
 }
 
@@ -384,7 +384,7 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = ICMPV6_NXT_HDR;
+    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
     ipv6_buf->hoplimit = ND_HOPLIMIT;
 
     if(dest == NULL){
@@ -439,7 +439,7 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
     ipv6_buf->length = packet_length - IPV6_HDR_LEN;
 
     icmp_buf->checksum = 0;
-    icmp_buf->checksum = ~icmpv6_csum(ICMPV6_NXT_HDR);
+    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
 }
 
 void recv_nbr_sol(void){
@@ -606,7 +606,7 @@ void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = ICMPV6_NXT_HDR;
+    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
     ipv6_buf->hoplimit = ND_HOPLIMIT;
     
     ipv6_ext_hdr_len = 0;
@@ -651,7 +651,7 @@ void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
     ipv6_buf->length = packet_length - IPV6_HDR_LEN;
     
     icmp_buf->checksum = 0;
-    icmp_buf->checksum = ~icmpv6_csum(ICMPV6_NXT_HDR);
+    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
 }
 
 void recv_nbr_adv(void){

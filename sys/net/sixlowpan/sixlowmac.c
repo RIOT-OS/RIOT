@@ -6,6 +6,7 @@
 #include "sixlowip.h"
 #include "sixlownd.h"
 #include "sixlowpan.h"
+#include <ltc4150.h>
 #include "thread.h"
 #include "msg.h"
 #include "radio/radio.h"
@@ -93,10 +94,12 @@ void recv_ieee802154_frame(void){
     ieee802154_frame_t frame;
    
     msg_init_queue(msg_q, RADIO_RCV_BUF_SIZE);
-   
+    
+
     while (1) {
         msg_receive(&m);
         if (m.type == PKT_PENDING) {
+
             p = (radio_packet_t*) m.content.ptr;
             hdrlen = read_802154_frame(p->data, &frame, p->length);
             length = p->length - hdrlen;
@@ -168,7 +171,8 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
     //    frame.dest_addr[1] = 0xff;
     //} 
 
-    memcpy(&daddr, &addr->uint8[6], 2);
+    daddr = HTONS(addr->uint16[3]);
+    //memcpy(&daddr, &addr->uint8[6], 2);
     //printf("blub: %02x\n", addr->uint8[6]);
     //uint8_t test = 30;
     frame.payload = payload;
@@ -186,12 +190,12 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
         p.dst = 0;
     }
 
-    //printf("dest: %02x\n", p.dst);
-
     // TODO: geeignete ring-bufferung nötig
     p.data = buf;
     //p.data = snd_buffer[i % RADIO_SND_BUF_SIZE];
     msg_send(&mesg, transceiver_pid, 1);
+
+    hwtimer_wait(5000);
     //switch_to_rx();
 }
 

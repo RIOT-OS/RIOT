@@ -22,48 +22,61 @@ struct icmpv6_hdr_t* get_icmpv6_buf(uint8_t ext_len){
     return ((struct icmpv6_hdr_t*)&(buffer[LLHDR_IPV6HDR_LEN + ext_len]));
 }
 
+uint8_t * get_payload_buf(uint8_t ext_len){
+    return &(buffer[LLHDR_IPV6HDR_LEN + ext_len]);
+}
 
-void lib6lowpan_bootstrapping(uint8_t *addr){
-    /* create link-local address based on eui-64 */
-    //ipv6_buf = get_ipv6_buf();
-    //RADIO.set_address(5);
-    //create_link_local_prefix(&ipv6_buf->srcaddr);
-    //init_802154_long_addr((uint8_t*)&(ipv6_buf->srcaddr.uint8[8]));  
-    //set_eui64(&ipv6_buf->srcaddr);
-//    print6addr(&ipv6_buf->srcaddr);
-    /* send router solicitation */
+void sixlowpan_bootstrapping(void){
     
     init_rtr_sol(OPT_SLLAO);
-    //init_rtr_adv(NULL, 0, 0, 0, 0, 0);
+}
 
-    //init_rtr_adv(&ipv6_buf->srcaddr, 0, 0, OPT_PI, 0, 0);
+void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len){
+    ipv6_buf = get_ipv6_buf();
+    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
+    packet_length = 0;
 
-//    ieee_802154_long_t laddr;
-//    laddr.uint8[7] = *addr;
+    icmp_buf->type = ICMP_RTR_SOL;
+    icmp_buf->code = 0;
+    ipv6_buf->version_trafficclass = IPV6_VER;
+    ipv6_buf->trafficclass_flowlabel = 0;
+    ipv6_buf->flowlabel = 0;
+    ipv6_buf->nextheader = PROTO_NUM_NONE;
+    ipv6_buf->hoplimit = MULTIHOP_HOPLIMIT;
+    ipv6_buf->length = p_len;    
 
-//    ipv6_buf = get_ipv6_buf();
-//    output(&laddr,(uint8_t*)ipv6_buf);
-    //send_rtr_adv(&ipv6_buf->destaddr);
+    memcpy(&(ipv6_buf->destaddr), addr, 16);
+    ipv6_get_saddr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
+
+    uint8_t *p_ptr = get_payload_buf(ipv6_ext_hdr_len); 
+    //*p_ptr = payload;
+
+    memcpy(p_ptr,payload,p_len);
+
+    packet_length = IPV6_HDR_LEN + p_len;
+
+    output((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf); 
 }
 
 void ipv6_process(void){
     msg m;
     msg_init_queue(msg_queue, IP_PKT_RECV_BUF_SIZE);
+
     while(1){
         msg_receive(&m);
 
         ipv6_buf = get_ipv6_buf();
         ipv6_buf = (struct ipv6_hdr_t*) m.content.ptr;
         
-        printf("INFO: packet received, source: ");
-        ipv6_print_addr(&ipv6_buf->srcaddr);
+        //printf("INFO: packet received, source: ");
+        //ipv6_print_addr(&ipv6_buf->srcaddr);
         /* identifiy packet */
         nextheader = &ipv6_buf->nextheader;
         
         switch(*nextheader) {
-            case(ICMPV6_NXT_HDR):{
+            case(PROTO_NUM_ICMPV6):{
                 /* checksum test*/
-                if(icmpv6_csum(ICMPV6_NXT_HDR) != 0xffff){
+                if(icmpv6_csum(PROTO_NUM_ICMPV6) != 0xffff){
                     printf("ERROR: wrong checksum\n");
                 }
                 icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
@@ -90,6 +103,10 @@ void ipv6_process(void){
                         break;
                 }            
                 break;
+            }
+            case(PROTO_NUM_NONE):{
+                //printf("Packet with no Header following the IPv6 Header received\n");
+                uint8_t *ptr = get_payload_buf(ipv6_ext_hdr_len);
             }
             default:
                 break;

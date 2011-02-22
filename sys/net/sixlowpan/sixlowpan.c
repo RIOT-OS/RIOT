@@ -68,8 +68,8 @@ void output(ieee_802154_long_t *addr, uint8_t *data){
     packet_size = (uint8_t)packet_length;
     /* check if packet needs to be fragmented */
     if(packet_size + header_size > PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN){
-        printf("      packet is to large, fragmentation started. size:"
-               " %hu byte\n", packet_length);
+//        printf("      packet is to large, fragmentation started. size:"
+//               " %hu byte\n", packet_length);
 
         uint8_t fragbuf[packet_size + header_size];
         uint8_t remaining;
@@ -190,19 +190,19 @@ void input(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
             }     
             memcpy(reas_buf + byte_offset, data + hdr_length, byte_offset);
             if((byte_offset + frag_size) == datagram_size){
-                //m.content.ptr = (char*)reas_buf;
-                printf("reas: %02x\n ", reas_buf[0]);
-                switch(reas_buf[0]) {
-                    case(LOWPAN_IPV6_DISPATCH):{
-                        ipv6_buf = get_ipv6_buf();
-                        memcpy(ipv6_buf, reas_buf + 1, datagram_size - 1);
-                        m.content.ptr = (char*) ipv6_buf;
-                        packet_length = datagram_size - 1;
-                        msg_send(&m,ip_process_pid, 1);
-                        break;
-                    }
-                    default:
-                        printf("ERROR: packet with unknown dispatch received\n");
+                if(reas_buf[0] == LOWPAN_IPV6_DISPATCH) {
+                    ipv6_buf = get_ipv6_buf();
+                    memcpy(ipv6_buf, reas_buf + 1, datagram_size - 1);
+                    m.content.ptr = (char*) ipv6_buf;
+                    packet_length = datagram_size - 1;
+                    msg_send(&m,ip_process_pid, 1);
+                } else if((reas_buf[0] & 0xe0) == LOWPAN_IPHC_DISPATCH) {
+                    lowpan_iphc_decoding(reas_buf, datagram_size, s_laddr, d_laddr);
+                    ipv6_buf = get_ipv6_buf();
+                    m.content.ptr = (char*) ipv6_buf;
+                    msg_send(&m,ip_process_pid, 1);
+                } else {        
+                    printf("ERROR: packet with unknown dispatch received\n");
                 }
             }
             break;
@@ -216,9 +216,10 @@ void input(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
                 msg_send(&m,ip_process_pid, 1);
                 break;
             } else if((data[0] & 0xe0) == LOWPAN_IPHC_DISPATCH){
-                printf("length: %hu\n", length);
                 lowpan_iphc_decoding(data, length, s_laddr, d_laddr);
-                printf("packet length: %hu\n", packet_length);
+                ipv6_buf = get_ipv6_buf();
+                m.content.ptr = (char*) ipv6_buf;
+                msg_send(&m,ip_process_pid, 1);
                 break;
             } else {
                 printf("ERROR: packet with unknown dispatch received\n");
@@ -493,6 +494,10 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest){
 
     comp_buf[0] = lowpan_iphc[0];
     comp_buf[1] = lowpan_iphc[1];
+
+    uint8_t *ptr = get_payload_buf(ipv6_ext_hdr_len);
+
+    memcpy(&ipv6_hdr_fields[hdr_pos],ptr,ipv6_buf->length);
 
     comp_len = 2 + hdr_pos + payload_length;
 }
@@ -812,6 +817,10 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
         } 
     }
 
+    uint8_t *ptr = get_payload_buf(ipv6_ext_hdr_len);
+
+    memcpy(ptr, &ipv6_hdr_fields[hdr_pos], length - hdr_pos);
+
     /* ipv6 length */
     ipv6_buf->length = length - hdr_pos;
     
@@ -860,6 +869,8 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr){
     memcpy(&(loaddr.uint8[8]), &(iface.laddr.uint8[0]), 8);
     ipv6_iface_add_addr(&loaddr, ADDR_STATE_PREFERRED, 0, 0, 
                         ADDR_CONFIGURED_AUTO);
+
+    //ipv6_print_addr(&loaddr);
 
     ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE, 
                                        PRIORITY_MAIN-1, CREATE_STACKTEST,
