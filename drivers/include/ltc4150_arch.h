@@ -46,6 +46,7 @@ and the mailinglist (subscription via web site)
 
 #define _GFH (double)32.631375
 #define _R_SENSE (double)0.330
+#define SUPPLY_VOLTAGE  (5)
 
 void ltc4150_disable_int(void);
 void ltc4150_enable_int(void);

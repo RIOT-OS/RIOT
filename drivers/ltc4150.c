@@ -54,6 +54,10 @@ static double __attribute__((__no_instrument_function__)) coulomb_to_mA(double c
     return (coulomb * 1000) / 3600;
 }
 
+static double mAh_to_Joule(double mAh) {
+    return (SUPPLY_VOLTAGE * mAh * 3600);
+}
+
 uint32_t ltc4150_get_last_int_duration_us() {
     return HWTIMER_TICKS_TO_US(last_int_duration);
 }
@@ -64,6 +68,10 @@ double ltc4150_get_current_mA() {
 
 double __attribute__((__no_instrument_function__)) ltc4150_get_total_mAh() {
     return coulomb_to_mA(int_to_coulomb(int_count));
+}
+
+double ltc4150_get_total_Joule(void) {
+    return mAh_to_Joule(ltc4150_get_total_mAh());
 }
 
 double ltc4150_get_avg_mA() {
