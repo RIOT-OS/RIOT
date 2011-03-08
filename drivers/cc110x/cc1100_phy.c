@@ -119,10 +119,10 @@ typedef struct
 	uint64_t m_ticks;			///< 64-bit timestamp
 	uint8_t source;				///< Source address
 	uint8_t identification;		///< Identification (1-bit)
-} seq_buffer_entry;
+} seq_buffer_entry_t;
 
 /// Sequence number buffer for this layer
-static seq_buffer_entry seq_buffer[MAX_SEQ_BUFFER_SIZE];
+static seq_buffer_entry_t seq_buffer[MAX_SEQ_BUFFER_SIZE];
 
 /// Next position to enter a new value into ::seqBuffer
 static uint8_t seq_buffer_pos = 0;
@@ -186,7 +186,7 @@ void cc1100_phy_init()
 	pm_init_table((pm_table_t*)&handler_table, MAX_PACKET_HANDLERS, handlers);
 
 	// Clear sequence number buffer
-	memset(seq_buffer, 0, sizeof(seq_buffer_entry) * MAX_SEQ_BUFFER_SIZE);
+	memset(seq_buffer, 0, sizeof(seq_buffer_entry_t) * MAX_SEQ_BUFFER_SIZE);
 
 	// Initialize mutex
 	cc1100_mutex_pid = -1;

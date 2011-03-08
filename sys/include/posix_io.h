@@ -6,7 +6,7 @@
 #define READ 2
 #define WRITE 3
 
-struct posix_iop {
+struct posix_iop_t {
     int nbytes;
     char *buffer;
 };

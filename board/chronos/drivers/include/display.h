@@ -67,9 +67,9 @@ typedef union {
     uint16_t update_acceleration		: 1; 	// 1 = Acceleration data was updated
   } flag;
   uint16_t all_flags;            // Shortcut to all display flags (for reset)
-} s_display_flags;
+} s_display_flags_t;
 
-extern volatile s_display_flags display;
+extern volatile s_display_flags_t display;
 
 // Constants defined in library
 extern const uint8_t lcd_font[];
