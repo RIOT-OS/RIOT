@@ -235,7 +235,7 @@ static void swtimer_action(swtimer_t *swtimer) {
             }
         case SWTIMER_MSG: 
             {
-                msg m;
+                msg_t m;
                 m.content.value = swtimer->action.msg.value;
                 int result = msg_send_int(&m, swtimer->action.msg.target_pid);
                 if (result < 0) {

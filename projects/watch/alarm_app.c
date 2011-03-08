@@ -13,7 +13,7 @@
 static char alarm_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
 
 static void alarm_thread(void) {
-    msg m;
+    msg_t m;
 
     struct tm time;
 

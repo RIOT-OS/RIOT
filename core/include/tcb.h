@@ -48,7 +48,7 @@ typedef struct tcb {
     queue_node_t msg_waiters;
 
     cib_t msg_queue;
-    msg* msg_array;
+    msg_t* msg_array;
 
     const char* name;
     char* stack_start;

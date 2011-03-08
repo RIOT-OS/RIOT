@@ -8,7 +8,7 @@
 #define TEXT_SIZE           CC1100_MAX_DATA_LENGTH
 
 char text_msg[TEXT_SIZE];
-msg mesg;
+msg_t mesg;
 transceiver_command_t tcmd;
 
 void _cc110x_ng_get_set_address_handler(char *addr) {

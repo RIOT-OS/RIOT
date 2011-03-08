@@ -33,7 +33,7 @@ void uart0_handle_incoming(int c) {
 }
 
 void uart0_notify_thread(void) {
-    msg m;
+    msg_t m;
     m.type = 0;
     msg_send_int(&m, uart0_handler_pid);
 }

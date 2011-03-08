@@ -27,9 +27,9 @@ char radio_stack_buffer[RADIO_STACK_SIZE];
 
 uint8_t snd_buffer[SEND_SIZE];
 
-msg msg_q[RCV_BUFFER_SIZE];
+msg_t msg_q[RCV_BUFFER_SIZE];
 
-static msg mesg;
+static msg_t mesg;
 static transceiver_command_t tcmd;
 static radio_packet_t p;
 
@@ -52,7 +52,7 @@ void send(radio_address_t dst, uint8_t len, uint8_t *data) {
 }
 
 void radio(void) {
-    msg m;
+    msg_t m;
     radio_packet_t *p;
 
     msg_init_queue(msg_q, RCV_BUFFER_SIZE);

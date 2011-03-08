@@ -15,7 +15,7 @@ void time_print(struct tm *time) {
 static char clock_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
 
 static void clock_thread(void) {
-    msg m;
+    msg_t m;
    
     int active = 0;
     rtc_second_pid = thread_getpid();

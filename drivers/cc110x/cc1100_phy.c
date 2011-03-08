@@ -624,7 +624,7 @@ int cc1100_set_packet_handler(protocol_t protocol, packet_handler_t handler)
 
 static void cc1100_event_handler_function(void)
 {
-    msg m;
+    msg_t m;
     while (1)
     {
     	if (cc1100_watch_dog_period != 0) {
@@ -685,7 +685,7 @@ static void cc1100_event_handler_function(void)
 
 void cc1100_phy_rx_handler(void)
 {
-	msg m;
+	msg_t m;
 	m.type = MSG_POLL;
 	bool dup = false;
 	bool res = false;
