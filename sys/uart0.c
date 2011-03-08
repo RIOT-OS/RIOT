@@ -10,7 +10,7 @@
 #define UART0_BUFSIZE 		(32)
 #define UART0_STACKSIZE 	(MINIMUM_STACK_SIZE + 256)
 
-ringbuffer uart0_ringbuffer;
+ringbuffer_t uart0_ringbuffer;
 int uart0_handler_pid;
 
 static char buffer[UART0_BUFSIZE];

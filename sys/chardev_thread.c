@@ -16,7 +16,7 @@ static int min(int a, int b) {
     else return b;
 }
 
-void chardev_loop(ringbuffer *rb) {
+void chardev_loop(ringbuffer_t *rb) {
     msg_t m;
 
     int pid = thread_getpid();
