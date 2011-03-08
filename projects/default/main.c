@@ -34,7 +34,6 @@ int main(void) {
     shell_init(&shell, NULL, shell_readc, shell_putchar);
 
     shell_run(&shell);
-
     return 0;
 }
 

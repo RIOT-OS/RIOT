@@ -9,6 +9,7 @@ void ltc4150_stop();
 
 double ltc4150_get_current_mA();
 double ltc4150_get_total_mAh();
+double ltc4150_get_total_Joule(void);
 double ltc4150_get_avg_mA();
 int ltc4150_get_interval();
 long ltc4150_get_intcount(void);
