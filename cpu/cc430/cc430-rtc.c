@@ -42,7 +42,9 @@ void rtc_init(void) {
     RTCCTL1 |= RTCMODE_H;
 
     /* enable ready interrupt (every second) */
+#ifndef ENABLE_DEBUG
     RTCCTL0 |= RTCRDYIE;
+#endif
 }
 
 /*---------------------------------------------------------------------------*/

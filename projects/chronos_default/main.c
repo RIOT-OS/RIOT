@@ -15,7 +15,18 @@
 #include <msg.h>
 #include <transceiver.h>
 #include <cc110x_ng.h>
+#include <battery.h>
 
+#include <vti_ps.h>
+#include "altitude.h"
+
+#define BUTTON_EVENT_STAR       (0x01)
+#define BUTTON_EVENT_NUM        (0x02)
+#define BUTTON_EVENT_UP         (0x04)
+#define BUTTON_EVENT_DOWN       (0x08)
+#define BUTTON_EVENT_BACKLIGHT  (0x10)
+
+#define BUTTON_HANDLER_STACK_SIZE    (256)
 #define RADIO_STACK_SIZE    (512)
 #define SEND_SIZE   CC1100_MAX_DATA_LENGTH
 
@@ -24,6 +35,7 @@
 #define SENDING_DELAY       (5 * 1000)
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
+char button_handler_stack_buffer[BUTTON_HANDLER_STACK_SIZE];
 
 uint8_t snd_buffer[SEND_SIZE];
 
@@ -33,6 +45,8 @@ static msg mesg;
 static transceiver_command_t tcmd;
 static radio_packet_t p;
 
+static int button_handler_pid;
+static uint8_t button_event = 0;
 static uint8_t mode = 0;
 
 void send(radio_address_t dst, uint8_t len, uint8_t *data);
@@ -73,19 +87,29 @@ void radio(void) {
     }
 }
 
+void button_handler(void) {
+    while (1) {
+        if (button_event & BUTTON_EVENT_STAR) {
+            buzzer_beep(15, 5000);
+            mode++;
+            button_event &= ~BUTTON_EVENT_STAR;
+        }
+        thread_sleep();
+    }
+}
+
 void change_mode(void) {
-    buzzer_beep(15, 5000);
-    if (mode) {
-        mode = 0;
-    }
-    else {
-        mode = 1;
-    }
+    button_event |= BUTTON_EVENT_STAR;
+    thread_wakeup(button_handler_pid);
 }
 
 int main(void) {
     int radio_pid;
+    uint32_t voltage;
     struct tm now;
+
+    ps_init();
+    reset_altitude_measurement();
 
     now.tm_hour = 3;
     now.tm_min = 59;
@@ -97,10 +121,12 @@ int main(void) {
 
     rtc_set_alarm(&now, RTC_ALARM_MIN);
 
+    button_handler_pid = thread_create(button_handler_stack_buffer, BUTTON_HANDLER_STACK_SIZE, PRIORITY_MAIN+1, CREATE_STACKTEST, button_handler, "button_handler");
     gpioint_set(2, BUTTON_STAR_PIN, (GPIOINT_RISING_EDGE | GPIOINT_DEBOUNCE), change_mode);
 
     radio_address_t addr = 43;
     memset(snd_buffer, 43, SEND_SIZE);
+    /*
     radio_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE, PRIORITY_MAIN-2, CREATE_STACKTEST, radio, "radio");
     transceiver_init(TRANSCEIVER_CC1100);
     transceiver_start();
@@ -115,17 +141,26 @@ int main(void) {
     msg_send(&mesg, transceiver_pid, 1);
 
     send(12, SEND_SIZE, snd_buffer);
-
+*/
    while (1) {
         hwtimer_wait(SENDING_DELAY);
         rtc_get_localtime(&now);
-
+        
+        voltage = battery_get_voltage();
         switch (mode) {
             case 0:
-                printf("\n%02u:%02u", now.tm_hour, now.tm_min);
+                printf("\n%lu", voltage);
                 break;
             case 1:
-                printf("\n%02u", now.tm_sec);
+                printf("\n%02u:%02u", now.tm_hour, now.tm_min);
+                break;
+            case 2:
+                start_altitude_measurement();
+                printf("\n%u", sAlt.altitude);
+                stop_altitude_measurement();
+                break;
+            default:
+                mode = 0;
                 break;
         }
    }
