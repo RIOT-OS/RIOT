@@ -1,6 +1,6 @@
 #ifndef BATTERY_H
 #define BATTERY_H 
 
-uint16_t battery_get_voltate(void);
+uint32_t battery_get_voltage(void);
 
 #endif /* BATTERY_H */

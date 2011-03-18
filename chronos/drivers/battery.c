@@ -2,8 +2,8 @@
 #include <cc430x613x.h>
 #include <cc430-adc.h>
 
-uint16_t battery_get_voltate(void) {
-    uint16_t voltage;
+uint32_t battery_get_voltage(void) {
+    uint32_t voltage;
     voltage = adc12_single_conversion(REFVSEL_1, ADC12SHT0_10, ADC12INCH_11);
 
     /* Ideally we have A11=0->AVCC=0V ... A11=4095(2^12-1)->AVCC=4V
