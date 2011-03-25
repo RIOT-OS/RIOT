@@ -189,7 +189,7 @@ interrupt(RTC_VECTOR) __attribute__ ((naked)) rtc_isr(void) {
             RTCYEARH = (time_to_set.tm_year + 1900) >> 0x08;
         }
         if (rtc_second_pid) {
-            msg m;
+            msg_t m;
             m.type = RTC_SECOND;
             msg_send_int(&m, rtc_second_pid);
         }

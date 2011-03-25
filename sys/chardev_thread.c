@@ -16,13 +16,13 @@ static int min(int a, int b) {
     else return b;
 }
 
-void chardev_loop(ringbuffer *rb) {
-    msg m;
+void chardev_loop(ringbuffer_t *rb) {
+    msg_t m;
 
     int pid = thread_getpid();
 
     int reader_pid = -1;
-    struct posix_iop *r = NULL;
+    struct posix_iop_t *r = NULL;
 
     puts("UART0 thread started.");
 
@@ -46,7 +46,7 @@ void chardev_loop(ringbuffer *rb) {
                         m.content.value = -EINVAL;
                         msg_reply(&m, &m);
                     } else {
-                        r = (struct posix_iop *)m.content.ptr;
+                        r = (struct posix_iop_t *)m.content.ptr;
                     }
                     break;
                 case CLOSE:

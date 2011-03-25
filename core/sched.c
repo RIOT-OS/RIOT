@@ -56,7 +56,7 @@ void sched_init() {
 void sched_run() {
     sched_context_switch_request = 0;
 
-    tcb *my_active_thread = (tcb*)active_thread;
+    tcb_t *my_active_thread = (tcb_t*)active_thread;
 
     if (my_active_thread) {
         if( my_active_thread->status ==  STATUS_RUNNING) {
@@ -94,9 +94,9 @@ void sched_run() {
         //            if (runqueues[i]) {
         int nextrq = number_of_lowest_bit(runqueue_bitcache);
         clist_node_t next = *(runqueues[nextrq]);
-        DEBUG("scheduler: first in queue: %s\n", ((tcb*)next.data)->name);
+        DEBUG("scheduler: first in queue: %s\n", ((tcb_t*)next.data)->name);
         clist_advance(&(runqueues[nextrq]));
-        my_active_thread = (tcb*)next.data;
+        my_active_thread = (tcb_t*)next.data;
         thread_pid = (volatile int) my_active_thread->pid;
 #if SCHEDSTATISTICS
         pidlist[my_active_thread->pid].laststart = time;
@@ -115,16 +115,16 @@ void sched_run() {
                 active_thread->status =  STATUS_PENDING ;
             }
         }
-        sched_set_status((tcb*)my_active_thread,  STATUS_RUNNING);
+        sched_set_status((tcb_t*)my_active_thread,  STATUS_RUNNING);
     }
 
-    active_thread = (volatile tcb*) my_active_thread;
+    active_thread = (volatile tcb_t*) my_active_thread;
 
     DEBUG("scheduler: done.\n");
 }
 
 
-void sched_set_status(tcb *process, unsigned int status) {
+void sched_set_status(tcb_t *process, unsigned int status) {
     if (status &  STATUS_ON_RUNQUEUE) {
         if (! (process->status &  STATUS_ON_RUNQUEUE)) {
             DEBUG("adding process %s to runqueue %u.\n", process->name, process->priority);
@@ -163,7 +163,7 @@ void sched_task_exit(void) {
     sched_threads[active_thread->pid] = NULL;
     num_tasks--;
     
-    sched_set_status((tcb*)active_thread,  STATUS_STOPPED);
+    sched_set_status((tcb_t*)active_thread,  STATUS_STOPPED);
 
     active_thread = NULL;
     cpu_switch_context_exit();

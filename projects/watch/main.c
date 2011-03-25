@@ -21,7 +21,7 @@ int apps[NUM_APPS];
 
 int button_thread = 0;
 void button_star(void) {
-    msg m;
+    msg_t m;
 
     if (button_thread) {
         m.type = MSG_BUTTON_STAR;
@@ -40,7 +40,7 @@ int main(void)
 
     int active_app = 0;
     
-    msg m;
+    msg_t m;
 
     //buzzer_beep(15, 5000);
     

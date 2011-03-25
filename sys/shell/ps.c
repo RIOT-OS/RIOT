@@ -27,7 +27,7 @@ void thread_print_all(void)
 
     printf("\tpid | %-21s| %-9sQ | pri | stack ( used) location   | runtime | switches \n", "name", "state");
     for( i = 0; i < MAXTHREADS; i++ ) {
-        tcb* p = (tcb*)sched_threads[i];
+        tcb_t* p = (tcb_t*)sched_threads[i];
 
         if( p != NULL ) {
             int state = p->status;                                          // copy state

@@ -3,6 +3,6 @@
 
 #include <ringbuffer.h>
 
-void chardev_loop(ringbuffer *rb);
+void chardev_loop(ringbuffer_t *rb);
 
 #endif /* __CHARDEV_THREAD_H */

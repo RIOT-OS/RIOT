@@ -4,7 +4,7 @@
 
 
 static int _posix_fileop(int pid, int op, int flags) {
-    msg m;
+    msg_t m;
     m.type = op;
     m.content.value = flags;
     msg_send_receive(&m, &m, pid);
@@ -12,11 +12,11 @@ static int _posix_fileop(int pid, int op, int flags) {
 }
 
 static int _posix_fileop_data(int pid, int op, char* buffer, int nbytes) {
-    struct posix_iop r;
+    struct posix_iop_t r;
     r.nbytes = nbytes;
     r.buffer = buffer;
 
-    msg m;
+    msg_t m;
     m.type = op;
     m.content.ptr = (char*) &r;
 

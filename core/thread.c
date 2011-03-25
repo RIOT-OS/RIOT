@@ -39,7 +39,7 @@ unsigned int thread_getstatus(int pid) {
 void thread_sleep() {
     if ( inISR()) return;
     dINT();
-    sched_set_status((tcb*)active_thread, STATUS_SLEEPING);
+    sched_set_status((tcb_t*)active_thread, STATUS_SLEEPING);
     thread_yield();
 }
 
@@ -54,7 +54,7 @@ int thread_wakeup(int pid) {
     int result = sched_threads[pid]->status;
     if (result == STATUS_SLEEPING) {
         DEBUG("thread_wakeup: Thread is sleeping.\n");
-        sched_set_status((tcb*)sched_threads[pid], STATUS_RUNNING);
+        sched_set_status((tcb_t*)sched_threads[pid], STATUS_RUNNING);
         if (!isr) {
             eINT();
             thread_yield();
@@ -83,7 +83,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
 {
     /* allocate our thread control block at the top of our stackspace */
     int total_stacksize = stacksize;
-    stacksize -= sizeof(tcb);
+    stacksize -= sizeof(tcb_t);
 
     /* align tcb address on 32bit boundary */
     unsigned int tcb_address = (unsigned int) stack + stacksize;
@@ -95,7 +95,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
         tcb_address-=2;
         stacksize-=2;
     }
-    tcb *cb = (tcb*) tcb_address;
+    tcb_t *cb = (tcb_t*) tcb_address;
 
     if (priority >= SCHED_PRIO_LEVELS) {
         return -EINVAL;
