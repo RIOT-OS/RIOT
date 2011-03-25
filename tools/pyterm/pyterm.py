@@ -22,8 +22,8 @@ class SerCmd(cmd.Cmd):
 			sys.stderr.write("No port specified!\n")
 			sys.exit(-1)
 		self.ser = serial.Serial(port=self.port, baudrate=115200, dsrdtr=0, rtscts=0)
-		#self.ser.setDTR(0)
-		#self.ser.setRTS(0)
+		self.ser.setDTR(0)
+		self.ser.setRTS(0)
 
 		# start serial->console thread
 		receiver_thread = threading.Thread(target=reader, args=(self.ser,))
