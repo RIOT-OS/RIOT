@@ -1,0 +1,5 @@
+SubDir TOP projects weather ;
+
+Module weather : main.c : sht11 ltc4150 swtimer auto_init ;
+
+UseModule weather ;
