@@ -38,7 +38,7 @@ and the mailinglist (subscription via web site)
  */
 
 #include <stdio.h>
-//#include <stdlib.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "cc1100.h"
@@ -47,6 +47,7 @@ and the mailinglist (subscription via web site)
 #include "protocol-multiplex.h"
 
 #include "hwtimer.h"
+#include <swtimer.h>
 
 /*---------------------------------------------------------------------------*/
 
@@ -106,9 +107,9 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
 		collisions_per_sec = 0;
 		collision_state = COLLISION_STATE_MEASURE;
 	} else if (collision_state == COLLISION_STATE_MEASURE) {
-		uint64_t timespan = swtimer_now() - collision_measurement_start;
-		if (timespan > 1000000) {
-			collisions_per_sec = (collision_count * 1000000) / (double) timespan;
+			uint64_t timespan = swtimer_now() - collision_measurement_start;
+			if (timespan > 1000000) {
+				collisions_per_sec = (collision_count * 1000000) / (double) timespan;
 			if (collisions_per_sec > 0.5 && collisions_per_sec <= 2.2) {
 				collision_measurement_start = swtimer_now();
 				collision_state = COLLISION_STATE_KEEP;
@@ -120,8 +121,8 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
 			}
 		}
 	} else if (collision_state == COLLISION_STATE_KEEP) {
-		uint64_t timespan = swtimer_now() - collision_measurement_start;
-		if (timespan > 5000000) {
+        uint64_t timespan = swtimer_now() - collision_measurement_start;
+        if (timespan > 5000000) {
 			collision_state = COLLISION_STATE_INITIAL;
 		}
 	}
