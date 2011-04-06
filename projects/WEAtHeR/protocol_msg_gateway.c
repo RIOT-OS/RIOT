@@ -8,6 +8,7 @@
 
 #include <board.h>
 #include "protocol_msg_gateway.h"
+#include "weather_protocol.h"
 
 #define NUM_PROTOCOL_HANDLER_PIDS 8
 
@@ -16,7 +17,7 @@ static uint16_t protocol_handler_pid;
 static int packet_buffer_next = 0;
 packet_t packet_buffer[PACKET_BUFFER_SIZE];
 
-static void protocol_msg_gateway(void* payload, int msg_size, protocol_t protocol, packet_info_t* packet_info) {
+static void protocol_msg_gateway(void* payload, int msg_size, packet_info_t* packet_info) {
     msg_t m;
 
     if (protocol_handler_pid <= 0) {
@@ -43,7 +44,7 @@ static void protocol_msg_gateway(void* payload, int msg_size, protocol_t protoco
 
 void init_protocol_msg_gateway() {
     puts("Init protocol msg gateway");
-    cc1100_set_packet_monitor(protocol_msg_gateway);
+    cc1100_set_packet_handler(WEATHER_PROTOCOL_NR, protocol_msg_gateway);
 }
 
 int set_protocol_handler_thread(int pid) {

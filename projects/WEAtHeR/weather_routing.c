@@ -5,6 +5,8 @@
 #include "weather_protocol.h"
 #include "weather_routing.h"
 
+uint8_t gossip_probability;
+
 static source_timestamp_t sources[MAX_SOURCES];
 
 static uint8_t update_sources(uint8_t id, time_t timestamp) {
@@ -48,7 +50,7 @@ void route_packet(void* msg, int msg_size) {
         }
    }
 
-   if ((100.0 * rand()/(double) RAND_MAX) <= FLOODING_PROB) {
+   if ((100.0 * rand()/(double) RAND_MAX) <= gossip_probability) {
        printf("Broadcasting packet...");
        /* if broadcasting weather data, append current hop */
        if (wdp != NULL) {
