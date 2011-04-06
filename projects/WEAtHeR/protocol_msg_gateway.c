@@ -19,9 +19,6 @@ packet_t packet_buffer[PACKET_BUFFER_SIZE];
 static void protocol_msg_gateway(void* payload, int msg_size, protocol_t protocol, packet_info_t* packet_info) {
     msg_t m;
 
-//    if ((((int16_t) packet_info->phy_src) > (((int16_t) cc1100_get_address()) + 10)) || (((int16_t) packet_info->phy_src) < (((int16_t) cc1100_get_address()) - 10))) {
-  //      return;
-   // }
     if (protocol_handler_pid <= 0) {
         puts("protocol_handler(): received packet without protocol handler. msg dropped.");
         return;
@@ -45,6 +42,7 @@ static void protocol_msg_gateway(void* payload, int msg_size, protocol_t protoco
 }
 
 void init_protocol_msg_gateway() {
+    puts("Init protocol msg gateway");
     cc1100_set_packet_monitor(protocol_msg_gateway);
 }
 

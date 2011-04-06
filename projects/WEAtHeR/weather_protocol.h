@@ -5,6 +5,7 @@
 #include <radio/radio.h>
 
 #define WEATHER_PROTOCOL_NR 6
+#define MAX_HOP_LIST    (11)
 
 typedef enum {
     WEATHER_HELLO,
@@ -16,7 +17,6 @@ typedef struct {
     uint16_t seq_nr;
     uint8_t src;
     uint8_t type;
-    uint8_t resevered;
 } weather_packet_header_t; 
 
 typedef struct __attribute__ ((packed)) {
@@ -29,13 +29,15 @@ typedef struct {
     char mesg[40];
 } weather_chat_pkt_t;
 
-typedef struct {
+typedef struct __attribute__ ((packed)) {
     weather_packet_header_t header;
     time_t timestamp;
     double temperature;
     double relhum;
     double relhum_temp;
     double energy;
+    uint8_t hop_counter;
+    uint8_t hops[MAX_HOP_LIST];
 } weather_data_pkt_t;
 
 #endif
