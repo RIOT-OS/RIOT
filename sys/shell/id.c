@@ -8,7 +8,9 @@ void _id_handler(char *id) {
 
     newid = atoi(id+3);
     if (strlen(id) < 3) {
+#ifdef MODULE_CONFIG
         printf("Current id: %u\n", sysconfig.id);
+#endif
     }
     else {
         printf("Setting new id %lu\n", newid);
