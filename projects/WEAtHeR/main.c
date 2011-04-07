@@ -64,6 +64,7 @@ static void weather_send(char* unused);
 static void weather_sink(char* unused);
 static void set_interval(char* interval);
 static void set_probability(char* prob);
+static void print_cc1100_info(char* unused);
 
 /* shell commands */
 shell_t shell;
@@ -72,6 +73,7 @@ const shell_command_t sc[] = {
     {"sink", "Enables node as data sink.", weather_sink},
     {"int", "Set the sending interval in seconds", set_interval},
     {"prob", "Set the gossiping probability", set_probability},
+    {"cc1100", "Show state, statistics and config of cc1100", print_cc1100_info},
     {NULL, NULL, NULL}};
 
 static void shell_runner(void) {
@@ -126,6 +128,14 @@ static void set_probability(char* prob) {
     else {
         printf("[WEAtHeR] Current probability is %hu\n ", gossip_probability);
     }
+}
+
+static void print_cc1100_info(char* unused) {
+            puts("==================================================");
+            cc1100_print_statistic();
+            puts("--------------------------------------------------");
+            cc1100_print_config();
+            puts("==================================================");
 }
 
 /* packet handling */
@@ -219,6 +229,7 @@ static void protocol_handler_thread(void) {
         packet = packet_buffer[pos];
         
         handle_packet(packet.payload, packet.msg_size, &(packet.packet_info));
+        DEBUG("Packet handler done\n");
     }
 }
 
@@ -273,8 +284,11 @@ int main(void) {
 
         if (data_src) {
             wdp.header.src = cc1100_get_address();
+            DEBUG("Src filled\n");
             wdp.timestamp = rtc_time(NULL);
+            DEBUG("Timestamp filled\n");
             wdp.energy = ltc4150_get_total_mAh();
+            DEBUG("Energy filled\n");
 
             if (!success) {
                 printf("error;error;error\n");
@@ -284,6 +298,7 @@ int main(void) {
                 wdp.relhum = sht11_val.relhum;
                 wdp.relhum_temp = sht11_val.relhum_temp;
                 wdp.hops[0] = cc1100_get_address();
+                DEBUG("Ready for sending\n");
                 /* send packet with one entry in hop list */
                 sending_state = cc1100_send_csmaca(0, WEATHER_PROTOCOL_NR, 0, (char*)&wdp, (EMPTY_WDP_SIZE + 1));
                 if (sending_state > 0) {

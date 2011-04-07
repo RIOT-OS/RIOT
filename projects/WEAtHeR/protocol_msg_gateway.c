@@ -20,6 +20,11 @@ packet_t packet_buffer[PACKET_BUFFER_SIZE];
 static void protocol_msg_gateway(void* payload, int msg_size, packet_info_t* packet_info) {
     msg_t m;
 
+    if (!cc1100_get_address()) {
+        puts("No address configured, not processing incoming packet");
+        return;
+    }
+
     if (protocol_handler_pid <= 0) {
         puts("protocol_handler(): received packet without protocol handler. msg dropped.");
         return;
