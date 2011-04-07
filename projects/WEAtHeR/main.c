@@ -1,51 +1,71 @@
-#include <stdio.h>
-#include <sht11.h>
-#include <board.h>
-#include <hwtimer.h>
-#include <ltc4150.h>
-#include <board_uart0.h>
-#include <posix_io.h>
-#include <msg.h>
-#include <thread.h>
-#include <board.h>
-#include <shell.h>
-#include <cc1100.h>
-#include <rtc.h>
-#include <lpc2387-rtc.h>
+/* stdlib includes */
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
+/* core includes */
+#include <msg.h>
+#include <thread.h>
+#include <hwtimer.h>
+
+#define ENABLE_DEBUG
+#include <debug.h>
+
+/* sensors and actors */
+#include <board.h>
+#include <sht11.h>
+#include <ltc4150.h>
+
+/* shell */
+#include <shell.h>
+#include <board_uart0.h>
+#include <posix_io.h>
+
+/* transceiver */
+#include <cc1100.h>
+
+/* real time clock */
+#include <rtc.h>
+#include <lpc2387-rtc.h>
+
+/* application header */
 #include "weather_routing.h"
 #include "weather_protocol.h"
 #include "protocol_msg_gateway.h"
 
+/* some local defines */
 #define SECOND  (1000 * 1000)
-#define MINUTE  (60 * SECOND)
-
-#define DEFAULT_INTERVAL    (60 * SECOND)
+#define MINUTE  (1 * SECOND)
 
 /* size of weather data packet without hop list */
 #define EMPTY_WDP_SIZE  (sizeof(weather_data_pkt_t) - MAX_HOP_LIST)
 
+/* default values */
+#define DEFAULT_INTERVAL    (5 * SECOND)
+
+/* stack space for threads */
 #define SHELL_STACK_SIZE    (4048)
 #define PH_STACK_SIZE    (4048)
-
-/* per default not acting as data sink */
-static uint8_t data_sink = 0;
-static uint8_t data_src = 0;
-
-static uint32_t sending_interval = DEFAULT_INTERVAL;
-extern uint8_t gossip_probability;
 
 char shell_stack_buffer[SHELL_STACK_SIZE];
 char ph_stack_buffer[PH_STACK_SIZE];
 
-void weather_send(char* unused);
-void weather_sink(char* unused);
+/* per default acting only as relay */
+static uint8_t data_sink = 0;
+static uint8_t data_src = 0;
+
+static uint32_t sending_interval = DEFAULT_INTERVAL;
+
+extern uint8_t gossip_probability;
+
+/* function prototypes */
+static void weather_send(char* unused);
+static void weather_sink(char* unused);
 static void set_interval(char* interval);
 static void set_probability(char* prob);
 
+/* shell commands */
 shell_t shell;
 const shell_command_t sc[] = {
     {"sender", "Enables node as data source.", weather_send},
@@ -54,13 +74,13 @@ const shell_command_t sc[] = {
     {"prob", "Set the gossiping probability", set_probability},
     {NULL, NULL, NULL}};
 
-void shell_runner(void) {
+static void shell_runner(void) {
     shell_init(&shell, sc, uart0_readc, uart0_putc);
     posix_open(uart0_handler_pid, 0);
     shell_run(&shell);
 }
 
-void weather_send(char* unused) {
+static void weather_send(char* unused) {
     if (data_src) {
         data_src = 0;
         puts("Disabling data source mode.");
@@ -71,7 +91,7 @@ void weather_send(char* unused) {
     }
 }
 
-void weather_sink(char* unused) {
+static void weather_sink(char* unused) {
     if (data_sink) {
         data_sink = 0;
         puts("Disabling data sink mode.");
@@ -108,6 +128,7 @@ static void set_probability(char* prob) {
     }
 }
 
+/* packet handling */
 static void handle_packet(void* msg, int msg_size, packet_info_t* packet_info) {
     weather_packet_header_t *header = (weather_packet_header_t*) msg;
 
@@ -115,8 +136,7 @@ static void handle_packet(void* msg, int msg_size, packet_info_t* packet_info) {
     if (header->src == cc1100_get_address()) {
         return;
     }
-    /*
-    printf("\n\t Pkt received from phy: %u (%u bytes)\n"
+    DEBUG("\n\t Pkt received from phy: %u (%u bytes)\n"
             "\t -> SEQ: %u | TYPE: %u | SRC: %hu \n\n", 
             packet_info->phy_src,
             msg_size,
@@ -124,13 +144,11 @@ static void handle_packet(void* msg, int msg_size, packet_info_t* packet_info) {
             header->type,
             header->src
           );
-          */
-    /* while not acting as sink route the packet */
+    /* while not acting as sink and packet contains data, route the packet */
     if (!data_sink) {
         if (header->type == WEATHER_DATA) {
-            //weather_data_pkt_t* wdp = (weather_data_pkt_t*) msg;
-            /* <node_id_source>;<node_id_sink>;<timestamp_source>;<timestamp_sink>;<temperature>;<humidity_relative>;<humitidy_absolut>;<energy_counter> */
-       /*     printf("$0;%hu;%hu;%04lX;%04X;%.2f;%.2f;%.2f;%.2f\n",
+            weather_data_pkt_t* wdp = (weather_data_pkt_t*) msg;
+            DEBUG("$0;%hu;%hu;%04lX;%04X;%.2f;%.2f;%.2f;%.2f\n",
                     header->src,
                     0,
                     wdp->timestamp,
@@ -139,8 +157,7 @@ static void handle_packet(void* msg, int msg_size, packet_info_t* packet_info) {
                     wdp->relhum,
                     wdp->relhum_temp,
                     wdp->energy);
-                    */
-            puts("Not for me, routing, baby!");
+            DEBUG("Not for me, routing, baby!\n");
             route_packet(msg, msg_size);
         }
 
@@ -165,8 +182,8 @@ static void handle_packet(void* msg, int msg_size, packet_info_t* packet_info) {
             }
         case WEATHER_DATA: {
                 weather_data_pkt_t* wdp = (weather_data_pkt_t*) msg;
-                time_t local_time = rtc_time(NULL);
                 uint8_t i;
+                time_t local_time = rtc_time(NULL);
                 /* <node_id_source>;<node_id_sink>;<timestamp_source>;<timestamp_sink>;<temperature>;<humidity_relative>;<humitidy_absolut>;<energy_counter> */
                 printf("$1;%hu;%u;%04lX;%04lX;%.2f;%.2f;%.2f;%.2f;",
                         header->src,
@@ -209,38 +226,56 @@ int main(void) {
     weather_data_pkt_t wdp;
     sht11_val_t sht11_val;
 
+    /* initialize variables */
     uint8_t success = 0;
+    int sending_state = 0;
     gossip_probability = FLOODING_PROB;
 
+    /* fill some fields of the packet */
     wdp.header.seq_nr = 0;
     wdp.header.type = WEATHER_DATA;
     wdp.hop_counter = 1;
 
+    /* set initial channel */
     cc1100_set_channel(10);
+
+    /* boot screen */
     puts("");
     puts("WEAtHeR: Wireless Energy-Aware mulTi-Hop sEnsor Reading.");
-    /* <node_id_source>;<node_id_sink>;<timestamp_source>;<timestamp_sink>;<temperature>;<humidity_relative>;<humitidy_absolut>;<energy_counter> */
-    puts("Printing \"node id of data source;node id of sink;timestamp of measurement;timestamp at data sink;temperature in °C;relative humidity;temperature compensated relative humidity;energy value\".");
     puts("");
-    printf("Sending interval: %lu\n", sending_interval);
-    
+    printf("Sending interval: %lu\n", sending_interval / SECOND);
+   
+    /* start shell */
     thread_create(shell_stack_buffer, SHELL_STACK_SIZE, PRIORITY_MAIN-1, CREATE_STACKTEST, shell_runner, "shell");
 
+    /* initialize message gateway */
     init_protocol_msg_gateway();
     /* create thread for radio packet handling */
     int pid = thread_create(ph_stack_buffer, PH_STACK_SIZE, PRIORITY_MAIN-2, CREATE_STACKTEST, protocol_handler_thread, "protocol_handler");
     set_protocol_handler_thread(pid);
 
+    /* start coulomb counter and RTC */
     ltc4150_start();
     rtc_enable();
 
+    /* loop forever */
     while (1) {
+        DEBUG("Measurement in progress...\n");
+#ifndef ENABLE_DEBUG
         success = sht11_read_sensor(&sht11_val, HUMIDITY|TEMPERATURE);
+#else
+        success = 1;
+        sht11_val.temperature = 1;
+        sht11_val.relhum = 2;
+        sht11_val.relhum_temp = 3;
+#endif
+        DEBUG("...done.\n");
+
         if (data_src) {
             wdp.header.src = cc1100_get_address();
             wdp.timestamp = rtc_time(NULL);
             wdp.energy = ltc4150_get_total_mAh();
-            success = sht11_read_sensor(&sht11_val, HUMIDITY|TEMPERATURE);
+
             if (!success) {
                 printf("error;error;error\n");
             }
@@ -250,12 +285,13 @@ int main(void) {
                 wdp.relhum_temp = sht11_val.relhum_temp;
                 wdp.hops[0] = cc1100_get_address();
                 /* send packet with one entry in hop list */
-                if (cc1100_send_csmaca(0, WEATHER_PROTOCOL_NR, 0, (char*)&wdp, (EMPTY_WDP_SIZE + 1)) > 0) {
-                    printf("Sending %lu bytes.\n", (EMPTY_WDP_SIZE + 1));
+                sending_state = cc1100_send_csmaca(0, WEATHER_PROTOCOL_NR, 0, (char*)&wdp, (EMPTY_WDP_SIZE + 1));
+                if (sending_state > 0) {
+                    DEBUG("Sending %lu bytes.\n", (EMPTY_WDP_SIZE + 1));
                     wdp.header.seq_nr++;
                 }
                 else {
-                    puts("Error on sending packet!");
+                    printf("Error on sending packet with code %i!\n", sending_state);
                 }
             }
             LED_GREEN_TOGGLE;
@@ -268,6 +304,14 @@ int main(void) {
                 printf("error;error;error\n");
         }
         else {
+#ifdef ENABLE_DEBUG
+            puts("==================================================");
+            cc1100_print_statistic();
+            puts("--------------------------------------------------");
+            cc1100_print_config();
+            puts("==================================================");
+#endif
+
             printf("$0;%hu;%hu;%04lX;%04X;%.2f;%.2f;%.2f;%.2f\n",
                     cc1100_get_address(),
                     0,
