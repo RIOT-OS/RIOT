@@ -1,0 +1,5 @@
+SubDir TOP projects WEAtHeR_stable ;
+
+Module WEAtHeR_stable : main.c weather_routing.c protocol_msg_gateway.c weather_cc1100.c weather_rtc.c : ltc4150 cc110x sht11 gpioint shell shell_commands posix_io uart0 auto_init rtc ;
+
+UseModule WEAtHeR_stable ;
