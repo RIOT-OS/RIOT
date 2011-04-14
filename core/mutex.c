@@ -103,6 +103,13 @@ void mutex_wake_waiters(struct mutex_t *mutex, int flags) {
     DEBUG("%s: waking up waiters.\n", fk_thread->name);
 
     queue_node_t *next = queue_remove_head(&(mutex->queue));
+
+    /* queue is empty */
+    if (!next) {
+        mutex->val = 0;
+        return;
+    }
+
     tcb* process = (tcb*)next->data;
 
     sched_set_status(process, STATUS_PENDING);
