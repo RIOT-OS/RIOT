@@ -34,6 +34,7 @@ typedef struct vtimer_t {
     timex_t absolute;
     void(*action)(void*);
     void* arg;
+    uint8_t action_type;
 } vtimer_t;
 
 /**
@@ -48,6 +49,10 @@ timex_t vtimer_now();
  * @return  always 0
  */
 int vtimer_init();
+
+int vtimer_set(vtimer_t *timer);
+timex_t vtimer_remaining(vtimer_t *t);
+int vtimer_set_sec(vtimer_t *t, timex_t interval);
 
 /**
  * @brief   will cause the calling thread to be suspended from excecution until the number of microseconds has elapsed

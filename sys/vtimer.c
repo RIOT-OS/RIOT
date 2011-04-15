@@ -12,6 +12,8 @@
 //#define ENABLE_DEBUG
 #include <debug.h>
 
+
+#define VTIMER_ACT_TYPE_STIMER      1
 #define VTIMER_THRESHOLD 20U
 #define VTIMER_BACKOFF 10U
 
@@ -20,7 +22,7 @@
 
 void vtimer_callback(void *ptr);
 void vtimer_tick(void *ptr);
-static int vtimer_set(vtimer_t *timer);
+//static int vtimer_set(vtimer_t *timer);
 static int set_longterm(vtimer_t *timer);
 static int set_shortterm(vtimer_t *timer);
 
@@ -35,6 +37,8 @@ static int hwtimer_id = -1;
 static uint32_t hwtimer_next_absolute;
 
 static uint32_t seconds = 0;
+static timex_t remaining;
+static vtimer_t *vtimer;
 
 static int set_longterm(vtimer_t *timer) {
     timer->queue_entry.priority = timer->absolute.seconds;
@@ -61,8 +65,11 @@ static int update_shortterm() {
         next = now + VTIMER_BACKOFF;
     }
 
-    hwtimer_id = hwtimer_set_absolute(next, vtimer_callback, NULL);
-
+    vtimer = (vtimer_t*) queue_remove_head(&shortterm_queue_root);
+    if(vtimer->action_type != VTIMER_ACT_TYPE_STIMER){
+        hwtimer_id = hwtimer_set_absolute(next, vtimer_callback, NULL);
+    }
+ 
     DEBUG("update_shortterm: Set hwtimer to %lu (now=%lu)\n", hwtimer_next_absolute + longterm_tick_start, hwtimer_now());
     return 0;
 }
@@ -129,7 +136,7 @@ void normalize_to_tick(timex_t *time) {
     DEBUG("     Result: %lu %lu\n", time->seconds, time->nanoseconds);
 }
 
-static int vtimer_set(vtimer_t *timer) {
+int vtimer_set(vtimer_t *timer) {
     DEBUG("vtimer_set(): New timer. Offset: %lu %lu\n", timer->absolute.seconds, timer->absolute.nanoseconds);
 
     timer->absolute = timex_add(vtimer_now(), timer->absolute);
@@ -146,22 +153,25 @@ static int vtimer_set(vtimer_t *timer) {
     }
 
     int state = disableIRQ();
-    if (timer->absolute.seconds != seconds ) {
-        /* we're long-term */
-        DEBUG("vtimer_set(): setting long_term\n");
-        result = set_longterm(timer);
-    } else {
-        DEBUG("vtimer_set(): setting short_term\n");
-        if (set_shortterm(timer)) {
+    if(timer->action_type != VTIMER_ACT_TYPE_STIMER){
+        if (timer->absolute.seconds != seconds){
+            /* we're long-term */
+            DEBUG("vtimer_set(): setting long_term\n");
+            result = set_longterm(timer);
+        } else {
+            DEBUG("vtimer_set(): setting short_term\n");
+            if (set_shortterm(timer)) {
 
-            /* delay update of next shortterm timer if we 
-             * are called from within vtimer_callback.
-             */
-            if (!in_callback) {
-                result = update_shortterm();
-            }
-        }
-    }
+                /* delay update of next shortterm timer if we 
+                * are called from within vtimer_callback. */
+             
+                if (!in_callback) {
+                    result = update_shortterm();
+                }
+           }
+       }
+   }
+
 
     restoreIRQ(state);
 
@@ -220,3 +230,18 @@ int vtimer_set_cb(vtimer_t *t, timex_t interval, void (*f_ptr)(void *), void *pt
     return vtimer_set(t);
 }
 
+int vtimer_set_sec(vtimer_t *t, timex_t interval){
+    t->absolute = interval;
+    t->action_type = VTIMER_ACT_TYPE_STIMER;
+    vtimer_set(t);
+    return 0;
+}
+
+timex_t vtimer_remaining(vtimer_t *t){
+    timex_t now = vtimer_now();
+    if(now.nanoseconds > t->absolute.nanoseconds){
+        remaining.nanoseconds = 0;
+    } else {    
+        remaining.nanoseconds = t->absolute.nanoseconds - now.nanoseconds;
+    }
+}
