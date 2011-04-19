@@ -256,7 +256,7 @@ int main(void) {
     puts("");
     printf("Sending interval: %lu\n", sending_interval / SECOND);
    
-    /* start shell thread */
+    /* start shell */
     thread_create(shell_stack_buffer, SHELL_STACK_SIZE, PRIORITY_MAIN-1, CREATE_STACKTEST, shell_runner, "shell");
 
     /* initialize message gateway */
