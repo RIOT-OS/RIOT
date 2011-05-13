@@ -9,6 +9,7 @@
 #include <thread.h>
 #include <hwtimer.h>
 #include <cib.h>
+#include <scheduler.h>
 
 //#define ENABLE_DEBUG
 #include <debug.h>
@@ -43,7 +44,7 @@
 #define EMPTY_WDP_SIZE  (sizeof(weather_data_pkt_t) - MAX_HOP_LIST) 
 
 /* default values */
-#define DEFAULT_INTERVAL    (5 * SECOND)
+#define DEFAULT_INTERVAL    (30 * SECOND)
 
 /* stack space for threads */
 #define SHELL_STACK_SIZE    (4048)
@@ -196,7 +197,7 @@ static void handle_packet(void* msg, int msg_size, packet_info_t* packet_info) {
     if (!data_sink) {
         if (header->type == WEATHER_DATA) {
             weather_data_pkt_t* wdp = (weather_data_pkt_t*) msg;
-            DEBUG("$0;%hu;%hu;%lu;%u;%.2f;%.2f;%.2f;%.2f\n",
+            DEBUG("$0;%hu;%hu;%lu;%u;%.2f;%.2f;%.2f;%.2f;%.2f\n",
                     header->src,
                     0,
                     wdp->timestamp,
@@ -204,7 +205,9 @@ static void handle_packet(void* msg, int msg_size, packet_info_t* packet_info) {
                     wdp->temperature,
                     wdp->relhum,
                     wdp->relhum_temp,
-                    wdp->energy);
+                    wdp->energy,
+                    pidlist[0].energy,
+                    pidlist[1].energy);
             DEBUG("Not for me, routing, baby!\n");
             route_packet(msg, msg_size);
         }
@@ -385,7 +388,8 @@ int main(void) {
             puts("==================================================");
 #endif
 
-             printf("$0;%hu;%hu;%lu;%u;%.2f;%.2f;%.2f;%.2f\n",
+          //thread_print_all();
+             printf("$0;%hu;%hu;%lu;%u;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f\n",
                     cc1100_get_address(),
                     0,
                     wdp.timestamp,
@@ -393,7 +397,9 @@ int main(void) {
                     sht11_val.temperature,
                     sht11_val.relhum,
                     sht11_val.relhum_temp,
-                    ltc4150_get_total_mAh());
+                    ltc4150_get_total_mAh(),
+                    pidlist[0].energy,
+                    pidlist[1].energy);
         }
         hwtimer_wait(sending_interval);
     }
