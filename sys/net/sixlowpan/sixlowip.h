@@ -28,7 +28,7 @@ extern uint8_t opt_hdr_len;
 extern uint16_t packet_length;
 extern uint8_t packet_dispatch;
 extern uint8_t iface_addr_list_count;
-//extern mutex_t buf_mutex;
+extern mutex_t buf_mutex;
 
 extern double start;
 

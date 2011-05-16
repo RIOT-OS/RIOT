@@ -24,6 +24,8 @@ uint16_t packet_length;
 static uint8_t macdsn;
 //static uint8_t macbsn;
 
+mutex_t buf_mutex;
+
 static radio_packet_t p;
 static msg mesg;
 int transceiver_type;
@@ -94,7 +96,6 @@ void recv_ieee802154_frame(void){
     ieee802154_frame_t frame;
    
     msg_init_queue(msg_q, RADIO_RCV_BUF_SIZE);
-    
 
     while (1) {
         msg_receive(&m);
@@ -105,7 +106,7 @@ void recv_ieee802154_frame(void){
             length = p->length - hdrlen;
            
             /* deliver packet to network(6lowpan)-layer */
-            input(frame.payload, length, (ieee_802154_long_t*)&frame.src_addr,
+            lowpan_read(frame.payload, length, (ieee_802154_long_t*)&frame.src_addr,
                   (ieee_802154_long_t*)&frame.dest_addr);
 
             p->processing--;
@@ -146,7 +147,6 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
     mesg.type = SND_PKT;
     mesg.content.ptr = (char*) &tcmd;
 
-
     tcmd.transceivers = transceiver_type;
     tcmd.data = &p;
     
@@ -157,32 +157,21 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
                               IEEE_802154_LONG_ADDR_M);
     set_ieee802154_frame_values(&frame); 
     
-    /* ONLY FOR TESTING */
     memcpy(&(frame.dest_addr[0]), &(addr->uint8[0]), 8);
-    //frame.dest_addr[0] = *addr & 0xff;
-    //frame.dest_addr[1] = (*addr >> 8) & 0xff;
     memcpy(&(frame.src_addr[0]), &(iface.laddr.uint8[0]), 8);
-    //frame.src_addr[0] = 0;
-    //frame.src_addr[1] = r_src_addr;
-
-    /* check if destination address is NULL => broadcast */
-    //if(addr[0] == 0 && addr[1] == 0){
-    //    frame.dest_addr[0] = 0xff;
-    //    frame.dest_addr[1] = 0xff;
-    //} 
 
     daddr = HTONS(addr->uint16[3]);
-    //memcpy(&daddr, &addr->uint8[6], 2);
-    //printf("blub: %02x\n", addr->uint8[6]);
-    //uint8_t test = 30;
     frame.payload = payload;
     frame.payload_len = length;
-    //printf("length: %x\n",frame.payload_len);
     uint8_t hdrlen = get_802154_hdr_len(&frame);
  
     memset(&buf,0,PAYLOAD_SIZE);
     init_802154_frame(&frame,(uint8_t*)&buf);
     memcpy(&buf[hdrlen],frame.payload,frame.payload_len);
+    
+    /* mutex unlock */
+    mutex_unlock(&buf_mutex, 0);
+ 
     p.length = hdrlen + frame.payload_len;
     if(mcast == 0){
         p.dst = daddr;
@@ -190,13 +179,10 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
         p.dst = 0;
     }
 
-    // TODO: geeignete ring-bufferung nötig
     p.data = buf;
-    //p.data = snd_buffer[i % RADIO_SND_BUF_SIZE];
     msg_send(&mesg, transceiver_pid, 1);
 
     hwtimer_wait(5000);
-    //switch_to_rx();
 }
 
 void sixlowmac_init(transceiver_type_t type){

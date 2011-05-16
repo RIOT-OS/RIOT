@@ -18,7 +18,6 @@
 #define LOWPAN_IPHC_DAM         0x03
 #define LOWPAN_IPHC_M           0x08
 #define LOWPAN_IPHC_NH          0x04
-
 #define LOWPAN_IPV6_DISPATCH    0x41
 #define LOWPAN_CONTEXT_MAX      16
 
@@ -30,8 +29,8 @@ typedef struct lowpan_context_t {
 } lowpan_context_t;
 
 void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr);
-void output(ieee_802154_long_t *addr, uint8_t *data);
-void input(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
+void lowpan_init(ieee_802154_long_t *addr, uint8_t *data);
+void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
            ieee_802154_long_t *d_laddr);
 void lowpan_iphc_encoding(ieee_802154_long_t *dest);
 void lowpan_iphc_decoding(uint8_t *data, uint8_t length,

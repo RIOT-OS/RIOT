@@ -165,6 +165,7 @@ typedef struct __attribute__ ((packed)) def_rtr_lst_t {
 
 void init_rtr_sol(uint8_t sllao);
 void recv_rtr_sol(void);
+void recv_rtr_adv(void);
 void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi, 
                   uint8_t sixco, uint8_t abro);
 uint8_t plist_search(ipv6_addr_t *addr);
@@ -185,6 +186,8 @@ void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime);
 void def_rtr_lst_rem(def_rtr_lst_t *entry);
 void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
                   uint8_t slloa, uint8_t aro);
+void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt, 
+                  uint8_t rso, uint8_t sllao, uint8_t aro, uint8_t aro_state);
 void plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
              uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
 void recv_nbr_sol(void);

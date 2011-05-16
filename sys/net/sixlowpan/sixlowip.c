@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <vtimer.h>
+#include <mutex.h>
 #include "msg.h"
 #include "sixlowip.h"
 #include "sixlowmac.h"
@@ -13,6 +14,8 @@ struct icmpv6_hdr_t* icmp_buf;
 uint8_t ipv6_ext_hdr_len;
 uint8_t *nextheader;
 iface_t iface;
+
+//mutex_t buf_mutex;
 
 struct ipv6_hdr_t* get_ipv6_buf(void){
     return ((struct ipv6_hdr_t*)&(buffer[LL_HDR_LEN]));
@@ -55,7 +58,7 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len){
 
     packet_length = IPV6_HDR_LEN + p_len;
 
-    output((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf); 
+    lowpan_init((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf); 
 }
 
 void ipv6_process(void){
@@ -67,9 +70,7 @@ void ipv6_process(void){
 
         ipv6_buf = get_ipv6_buf();
         ipv6_buf = (struct ipv6_hdr_t*) m.content.ptr;
-        
-        //printf("INFO: packet received, source: ");
-        //ipv6_print_addr(&ipv6_buf->srcaddr);
+
         /* identifiy packet */
         nextheader = &ipv6_buf->nextheader;
         
@@ -98,6 +99,10 @@ void ipv6_process(void){
                     case(ICMP_NBR_SOL):{
                         printf("INFO: packet type: icmp neighbor solicitation\n");
                         recv_nbr_sol();
+                        break;
+                    }
+                    case(ICMP_NBR_ADV):{
+                        printf("INFO: packet type: icmp neighbor advertisment\n");
                     }
                     default:
                         break;
@@ -107,6 +112,7 @@ void ipv6_process(void){
             case(PROTO_NUM_NONE):{
                 //printf("Packet with no Header following the IPv6 Header received\n");
                 uint8_t *ptr = get_payload_buf(ipv6_ext_hdr_len);
+                printf("hello\n");
             }
             default:
                 break;

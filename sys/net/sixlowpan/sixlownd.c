@@ -1,10 +1,13 @@
 #include "sixlowip.h"
 #include "sixlownd.h"
 #include "sixlowmac.h"
+#include "sixlowpan.h"
 #include <stdio.h>
 #include <string.h>
 #include <debug.h>
 #include <vtimer.h>
+
+#define ENABLE_DEBUG
 
 /* extern variables */
 uint8_t opt_hdr_len = 0;
@@ -87,7 +90,9 @@ static struct opt_aro_t* get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len){
 void init_rtr_sol(uint8_t sllao){
     ipv6_buf = get_ipv6_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len); 
+    
     packet_length = 0;
+    
     icmp_buf->type = ICMP_RTR_SOL;
     icmp_buf->code = 0;
     ipv6_buf->version_trafficclass = IPV6_VER;
@@ -118,9 +123,11 @@ void init_rtr_sol(uint8_t sllao){
     icmp_buf->checksum = 0;
     icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
 
+#ifdef ENABLE_DEBUG
     printf("INFO: send router solicitation to: ");
     ipv6_print_addr(&ipv6_buf->destaddr);
-    output((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf);
+#endif
+    lowpan_init((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf);
 }
 
 void recv_rtr_sol(void){
@@ -155,9 +162,11 @@ void recv_rtr_sol(void){
 
     /* send solicited router advertisment */
     init_rtr_adv(&ipv6_buf->srcaddr, 0, 0, OPT_PI, 0, 0);
+#ifdef ENABLE_DEBUG
     printf("INFO: send router advertisment to: ");
     ipv6_print_addr(&ipv6_buf->destaddr);
-    output((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf);
+#endif
+    lowpan_init((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf);
 
 }
 
@@ -241,7 +250,6 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
     /* calculate checksum */
     icmp_buf->checksum = 0;
     icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
-    //printf("%x\n",icmp_buf->checksum);
 }
 
 void recv_rtr_adv(void){
@@ -280,7 +288,6 @@ void recv_rtr_adv(void){
     /* read options */
     while(packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len){
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, opt_hdr_len);
-        timex_t tmp;    
 
         switch(opt_buf->type){
             case(OPT_SLLAO_TYPE):{
@@ -372,9 +379,11 @@ void recv_rtr_adv(void){
             init_nbr_sol(NULL, &(ipv6_buf->srcaddr), &(ipv6_buf->srcaddr),
                          OPT_SLLAO,OPT_ARO);
         }
+#ifdef ENABLE_DEBUG
         printf("INFO: send neighbor solicitation to: ");
         ipv6_print_addr(&(ipv6_buf->destaddr));
-        output((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]), (uint8_t*)ipv6_buf);
+#endif
+        lowpan_init((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]), (uint8_t*)ipv6_buf);
     }
 }
 
@@ -405,7 +414,7 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
     
     packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + NBR_SOL_LEN;
 
-    if(ipv6_iface_addr_match(&targ) == NULL){
+    if(ipv6_iface_addr_match(targ) == NULL){
         if(src == NULL){
             ipv6_get_saddr(&(ipv6_buf->srcaddr),&(ipv6_buf->destaddr));
         } else{
@@ -506,7 +515,8 @@ void recv_nbr_sol(void){
                                 nbr_cache_add(&ipv6_buf->srcaddr,
                                               NULL ,0, NBR_STATUS_STALE, 
                                               NBR_CACHE_TYPE_TEN,
-                                              NBR_CACHE_LTIME_TEN, &llao[2]);
+                                              NBR_CACHE_LTIME_TEN, 
+                                              (ieee_802154_short_t*)&llao[2]);
 
                                 break;
                             }
@@ -594,9 +604,11 @@ void recv_nbr_sol(void){
         uint8_t flags = (NBR_ADV_FLAG_O | NBR_ADV_FLAG_S);
         init_nbr_adv(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr), 
                      &(alist_targ->addr), flags, 0, OPT_ARO, aro_state);
+#ifdef ENABLE_DEBUG
         printf("INFO: send neighbor advertisment to: ");
         ipv6_print_addr(&ipv6_buf->destaddr);
-        output((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf);
+#endif
+        lowpan_init((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf);
     }
 }
 
@@ -916,14 +928,3 @@ void plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
         prefix_count++;
     }
 }
-
-uint8_t plist_search(ipv6_addr_t *addr){
-    int i;
-    for(i = 0; i < OPT_PI_LIST_LEN; i++){
-        if(memcmp(&(plist[i].addr.uint8[0]), &addr->uint8[0], 16) == 0){
-            return &plist[i];
-        }
-    }
-    return NULL;
-}
-
