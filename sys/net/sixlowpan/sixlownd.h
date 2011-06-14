@@ -46,8 +46,15 @@
 #define OPT_ARO_LTIME                   300 // geeigneten wert finden
 /* 6lowpan context option */
 #define OPT_6CO_TYPE                    32
+#define OPT_6CO_MIN_LEN                 2
+#define OPT_6CO_MAX_LEN                 3
+#define OPT_6CO_MIN_HDR_LEN             16
+#define OPT_6CO_MAX_HDR_LEN             24
+#define OPT_6CO_LTIME                   5   // geeigneten Wert finden
 /* authoritative border router option */
 #define OPT_ABRO_TYPE                   33
+#define OPT_ABRO_LEN                    3
+#define OPT_ABRO_HDR_LEN                24
 /* neighbor cache size */
 #define NBR_CACHE_SIZE                  8
 #define NBR_CACHE_TYPE_GC               1
@@ -114,6 +121,24 @@ typedef struct __attribute__ ((packed)) opt_aro_t {
     uint16_t reg_ltime;
     ieee_802154_long_t eui64;
 } opt_aro_t;
+
+typedef struct __attribute__ ((packed)) opt_6co_buf_t {
+    uint8_t type;
+    uint8_t length;
+    uint8_t c_length;
+    uint8_t c_flacs;
+    uint16_t reserved2;
+    uint16_t val_ltime;
+} opt_6co_buf_t;
+
+typedef struct __attribute__ ((packed)) opt_abro_t {
+    uint8_t type;
+    uint8_t length;
+    uint16_t version;
+    uint32_t reserved;
+    uint16_t reg_ltime;
+    ipv6_addr_t addr;
+} opt_abro_t;
 
 typedef struct __attribute__ ((packed)) plist_t {
     uint8_t inuse;  
