@@ -51,6 +51,8 @@
 #define OPT_6CO_MIN_HDR_LEN             16
 #define OPT_6CO_MAX_HDR_LEN             24
 #define OPT_6CO_LTIME                   5   // geeigneten Wert finden
+#define OPT_6CO_FLAG_C                  0x10
+#define OPT_6CO_FLAG_CID                0x0F
 /* authoritative border router option */
 #define OPT_ABRO_TYPE                   33
 #define OPT_ABRO_LEN                    3
@@ -126,7 +128,7 @@ typedef struct __attribute__ ((packed)) opt_6co_buf_t {
     uint8_t type;
     uint8_t length;
     uint8_t c_length;
-    uint8_t c_flacs;
+    uint8_t c_flags;
     uint16_t reserved2;
     uint16_t val_ltime;
 } opt_6co_buf_t;
