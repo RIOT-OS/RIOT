@@ -894,6 +894,10 @@ uint8_t lowpan_context_update(uint8_t num, uint8_t *prefix,
     return 0;
 }
 
+lowpan_context_t *lowpan_context_get() {
+    return contexts;
+}
+
 lowpan_context_t * lowpan_context_lookup(ipv6_addr_t *addr){
     int i;
     for(i = 0; i < LOWPAN_CONTEXT_MAX; i++){

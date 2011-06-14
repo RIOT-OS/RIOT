@@ -44,6 +44,7 @@ uint8_t lowpan_context_len();
 uint8_t lowpan_context_update(uint8_t num, uint8_t *prefix, 
                         uint8_t length, uint8_t comp,
                         uint16_t lifetime);
+lowpan_context_t * lowpan_context_get();
 lowpan_context_t * lowpan_context_lookup(ipv6_addr_t *addr);
 lowpan_context_t * lowpan_context_num_lookup(uint8_t num);
 void lowpan_ipv6_set_dispatch(uint8_t *data);
