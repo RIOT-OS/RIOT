@@ -22,10 +22,14 @@
 #define LOWPAN_CONTEXT_MAX      16
 
 #include "transceiver.h"
+#include <vtimer.h>
 
 typedef struct lowpan_context_t {
     uint8_t num;
     uint8_t prefix[8];
+    uint8_t length;
+    uint8_t comp;
+    vtimer_t lifetime;
 } lowpan_context_t;
 
 void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr);
@@ -36,6 +40,10 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest);
 void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                           ieee_802154_long_t *s_laddr,
                           ieee_802154_long_t *d_laddr);
+uint8_t lowpan_context_len();
+uint8_t lowpan_context_update(uint8_t num, uint8_t *prefix, 
+                        uint8_t length, uint8_t comp,
+                        uint16_t lifetime);
 lowpan_context_t * lowpan_context_lookup(ipv6_addr_t *addr);
 lowpan_context_t * lowpan_context_num_lookup(uint8_t num);
 void lowpan_ipv6_set_dispatch(uint8_t *data);

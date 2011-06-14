@@ -43,6 +43,7 @@ mutex_t buf_mutex;
 char ip_process_buf[IP_PROCESS_STACKSIZE];
 char nc_buf[NC_STACKSIZE];
 lowpan_context_t contexts[LOWPAN_CONTEXT_MAX];
+uint8_t context_len = 0;
 
 /* deliver packet to mac*/
 void lowpan_init(ieee_802154_long_t *addr, uint8_t *data){
@@ -834,11 +835,70 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
     packet_length = IPV6_HDR_LEN + ipv6_buf->length; 
 }
 
+uint8_t lowpan_context_len(){
+    return context_len;
+}
+
+void lowpan_context_remove(uint8_t num) {
+    int i;
+    int found = 0;
+    for(i = 0; i < LOWPAN_CONTEXT_MAX; i++){
+        if(contexts[i].num == num){
+            context_len--;
+//            vtimer_remove(&(contexts[i].lifetime));   Not implemented yet?
+        }
+    }
+    
+    for(i; i < LOWPAN_CONTEXT_MAX; i++) {
+        contexts[i] = contexts[i+1];
+    }
+}
+
+void lowpan_context_remove_cb(void* ptr) {
+    uint8_t num = (uint8_t)ptr;
+    lowpan_context_remove(num);
+}
+
+uint8_t lowpan_context_update(uint8_t num, uint8_t *prefix, 
+                        uint8_t length, uint8_t comp,
+                        uint16_t lifetime){
+    lowpan_context_t *context;
+    
+    timex_t lt;
+    
+    lt.nanoseconds = lifetime * 60 * 1000000;
+    
+    if (lifetime == 0){
+        lowpan_context_remove(num);
+        return 0;
+    }
+    
+    if (context_len == LOWPAN_CONTEXT_MAX)
+        return 2;
+    
+    context = lowpan_context_num_lookup(num);
+    
+    if (context == NULL) {
+        context = &(contexts[context_len++]);
+    }
+    
+    context->num = num;
+    strncpy((char*)context->prefix,(char*)prefix,8);
+    context->length = length;
+    context->comp = comp;
+    vtimer_set_cb(&(context->lifetime), 
+                  lt, 
+                  lowpan_context_remove_cb, 
+                  (void*)num);
+    
+    return 0;
+}
+
 lowpan_context_t * lowpan_context_lookup(ipv6_addr_t *addr){
     int i;
     for(i = 0; i < LOWPAN_CONTEXT_MAX; i++){
-        if(memcmp(&(addr->uint8[0]),&(contexts[i].prefix[0]),8) == 0){
-            return &contexts[i];  
+        if(memcmp(&(addr->uint8[0]),&(contexts[i].prefix[0]),contexts[i].length) == 0){
+            return &contexts[i];
         }
     }
     return NULL; 
