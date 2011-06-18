@@ -864,7 +864,7 @@ void lowpan_context_remove_cb(void* ptr) {
     lowpan_context_remove(num);
 }
 
-uint8_t lowpan_context_update(uint8_t num, uint8_t *prefix, 
+lowpan_context_t *lowpan_context_update(uint8_t num, const ipv6_addr_t *prefix, 
                         uint8_t length, uint8_t comp,
                         uint16_t lifetime){
     lowpan_context_t *context;
@@ -875,11 +875,11 @@ uint8_t lowpan_context_update(uint8_t num, uint8_t *prefix,
     
     if (lifetime == 0){
         lowpan_context_remove(num);
-        return 0;
+        return NULL;
     }
     
     if (context_len == LOWPAN_CONTEXT_MAX)
-        return 2;
+        return NULL;
     
     context = lowpan_context_num_lookup(num);
     
@@ -898,7 +898,7 @@ uint8_t lowpan_context_update(uint8_t num, uint8_t *prefix,
                   lowpan_context_remove_cb, 
                   (void*)(&num));
     
-    return 0;
+    return context;
 }
 
 lowpan_context_t *lowpan_context_get() {
