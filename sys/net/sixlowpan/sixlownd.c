@@ -45,6 +45,8 @@ static struct opt_buf_t *opt_buf;
 static struct opt_stllao_t *opt_stllao_buf;
 static struct opt_mtu_t *opt_mtu_buf;
 static struct opt_abro_t *opt_abro_buf;
+static struct opt_6co_hdr_t *opt_6co_hdr_buf;
+static uint8_t *opt_6co_prefix_buf;
 static struct opt_pi_t *opt_pi_buf;
 static struct opt_aro_t *opt_aro_buf;
 
@@ -87,6 +89,16 @@ static struct opt_mtu_t* get_opt_mtu_buf(uint8_t ext_len, uint8_t opt_len){
 static struct opt_abro_t* get_opt_abro_buf(uint8_t ext_len, uint8_t opt_len){
     return ((struct opt_abro_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + 
                                         ext_len + opt_len]));
+}
+
+static struct opt_6co_hdr_t* get_opt_6co_hdr_buf(uint8_t ext_len, uint8_t opt_len){
+    return ((struct opt_6co_hdr_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + 
+                                       ext_len + opt_len]));
+}
+
+static uint8_t* get_opt_6co_prefix_buf(uint8_t ext_len, uint8_t opt_len){
+    return ((uint8_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + 
+                                       ext_len + opt_len]));
 }
 
 static struct opt_pi_t* get_opt_pi_buf(uint8_t ext_len, uint8_t opt_len){
@@ -187,6 +199,24 @@ void recv_rtr_sol(void){
 
 }
 
+uint8_t set_opt_6co_flags(uint8_t compression_flag, uint8_t cid) {
+    uint8_t flags;
+    if (compression_flag)
+        flags = OPT_6CO_FLAG_C;
+    else
+        flags = 0;
+    
+    flags |= cid ^ OPT_6CO_FLAG_CID;
+    
+    return flags;
+}
+
+void get_opt_6co_flags(uint8_t *compression_flag, uint8_t *cid, uint8_t flags) {
+    compression_flag[0] = flags ^ OPT_6CO_FLAG_CID;
+    compression_flag[0] = compression_flag[0] != 0;
+    cid[0] = flags ^ OPT_6CO_FLAG_CID;
+}
+
 void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi, 
                   uint8_t sixco, uint8_t abro){
     abr_cache_t *msg_abr = NULL;
@@ -254,6 +284,57 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
             opt_abro_buf->version = msg_abr->version;
             opt_abro_buf->reserved = 0;
             opt_abro_buf->addr = msg_abr->abr_addr;
+        }
+    }
+    
+    if(sixco == OPT_6CO){
+        /* set 6lowpan context option */
+        lowpan_context_t *contexts = NULL;
+        int contexts_len = 0;
+        
+        if (msg_abr == NULL) {
+            contexts = lowpan_context_get();
+            contexts_len = lowpan_context_len();
+        } else {
+            contexts_len = msg_abr->contexts_num;
+            contexts = (lowpan_context_t*)calloc(contexts_len, sizeof(lowpan_context_t));
+            for (int i = 0; i < contexts_len; i++) {
+                contexts[i] = *(msg_abr->contexts[i]);
+            }
+        }
+        for(int i = 0; i < contexts_len; i++){
+            opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_ext_hdr_len, opt_hdr_len);
+            opt_6co_hdr_buf->type = OPT_6CO_TYPE;
+            if (contexts[i].length > 64) {
+                opt_6co_hdr_buf->length = OPT_6CO_MAX_LEN;
+            } else {
+                opt_6co_hdr_buf->length = OPT_6CO_MIN_LEN;
+            }
+            opt_6co_hdr_buf->c_length = HTONL(contexts[i].length);
+            opt_6co_hdr_buf->c_flags = HTONL(set_opt_6co_flags(contexts[i].comp,contexts[i].num));
+            opt_6co_hdr_buf->reserved = 0;
+            opt_6co_hdr_buf->val_ltime = HTONL((vtimer_remaining(&(contexts[i].lifetime)).nanoseconds / 1000000) / 60);
+            opt_hdr_len += OPT_6CO_HDR_LEN;
+            packet_length += OPT_6CO_HDR_LEN;
+            // attach prefixes
+            opt_6co_prefix_buf = get_opt_6co_prefix_buf(ipv6_ext_hdr_len, opt_hdr_len);
+            
+            uint8_t target_size;
+            if (opt_6co_hdr_buf->c_length > 64) {
+                target_size = 16;
+            } else {
+                target_size = 8;
+            }
+            
+            memset((void*)opt_6co_prefix_buf,0,target_size);
+            memcpy((void*)opt_6co_prefix_buf, (void*)&(contexts[i].prefix.uint8[0]), opt_6co_hdr_buf->c_length / 8);
+            
+            opt_hdr_len += target_size;
+            packet_length += target_size;
+        }
+        
+        if (msg_abr != NULL && contexts != NULL) {
+            free(contexts);
         }
     }
 
@@ -409,6 +490,25 @@ void recv_rtr_adv(void){
                 break;
             }
             case(OPT_6CO_TYPE):{
+                opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_ext_hdr_len, opt_hdr_len);
+                
+                uint8_t context_len = opt_6co_hdr_buf->c_length;
+                uint8_t comp;
+                uint8_t num;
+                get_opt_6co_flags(&comp,&num, opt_6co_hdr_buf->c_flags);
+                uint8_t lifetime = opt_6co_hdr_buf->val_ltime;
+                lowpan_context_t *context;
+                
+                ipv6_addr_t prefix;
+                memset(&prefix, 0, 16);
+                
+                opt_6co_prefix_buf = get_opt_6co_prefix_buf(ipv6_ext_hdr_len, opt_hdr_len + OPT_6CO_HDR_LEN);
+                
+                memcpy(&prefix, opt_6co_prefix_buf, context_len);
+                
+                context = lowpan_context_update(num, &prefix, context_len, comp, lifetime);
+                found_contexts[found_con_len] = context;
+                found_con_len = (found_con_len + 1)%LOWPAN_CONTEXT_MAX;	// better solution here, i.e. some kind of stack
                 break;
             }
             case(OPT_ABRO_TYPE):{

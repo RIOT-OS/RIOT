@@ -50,8 +50,7 @@
 #define OPT_6CO_TYPE                    32
 #define OPT_6CO_MIN_LEN                 2
 #define OPT_6CO_MAX_LEN                 3
-#define OPT_6CO_MIN_HDR_LEN             16
-#define OPT_6CO_MAX_HDR_LEN             24
+#define OPT_6CO_HDR_LEN                 8
 #define OPT_6CO_LTIME                   5   // geeigneten Wert finden
 #define OPT_6CO_FLAG_C                  0x10
 #define OPT_6CO_FLAG_CID                0x0F
@@ -128,14 +127,14 @@ typedef struct __attribute__ ((packed)) opt_aro_t {
     ieee_802154_long_t eui64;
 } opt_aro_t;
 
-typedef struct __attribute__ ((packed)) opt_6co_buf_t {
+typedef struct __attribute__ ((packed)) opt_6co_hdr_t {
     uint8_t type;
     uint8_t length;
     uint8_t c_length;
     uint8_t c_flags;
     uint16_t reserved;
     uint16_t val_ltime;
-} opt_6co_buf_t;
+} opt_6co_hdr_t;
 
 typedef struct __attribute__ ((packed)) opt_abro_t {
     uint8_t type;
