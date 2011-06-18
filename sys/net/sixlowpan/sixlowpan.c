@@ -247,7 +247,7 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest){
     uint16_t payload_length = ipv6_buf->length;
     uint8_t lowpan_iphc[2];
     uint8_t *ipv6_hdr_fields = &comp_buf[2];
-    lowpan_context_t *con;
+    lowpan_context_t *con = NULL;
     uint16_t hdr_pos = 0;
     uint8_t tc;
 
@@ -523,7 +523,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
 
     uint8_t ll_prefix[2] = {0xfe, 0x80};
     uint8_t m_prefix[2] = {0xff, 0x02};
-    lowpan_context_t *con;
+    lowpan_context_t *con = NULL;
     
     ipv6_buf = get_ipv6_buf();
 
