@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include "vtimer.h"
+#include "sixlowpan.h"
+#include "sixlowip.h"
 
 /* router solicitation */
 #define RTR_SOL_LEN                     4
@@ -57,6 +59,8 @@
 #define OPT_ABRO_TYPE                   33
 #define OPT_ABRO_LEN                    3
 #define OPT_ABRO_HDR_LEN                24
+/* authoritive border router cache size */
+#define ABR_CACHE_SIZE                  2
 /* neighbor cache size */
 #define NBR_CACHE_SIZE                  8
 #define NBR_CACHE_TYPE_GC               1
@@ -129,7 +133,7 @@ typedef struct __attribute__ ((packed)) opt_6co_buf_t {
     uint8_t length;
     uint8_t c_length;
     uint8_t c_flags;
-    uint16_t reserved2;
+    uint16_t reserved;
     uint16_t val_ltime;
 } opt_6co_buf_t;
 
@@ -138,7 +142,6 @@ typedef struct __attribute__ ((packed)) opt_abro_t {
     uint8_t length;
     uint16_t version;
     uint32_t reserved;
-    uint16_t reg_ltime;
     ipv6_addr_t addr;
 } opt_abro_t;
 
@@ -172,6 +175,15 @@ struct __attribute__ ((packed)) nbr_adv_t {
     ipv6_addr_t tgtaddr;  
 };
 
+/* authoritive border router cache - draft-draft-ietf-6lowpan-nd-17 */
+typedef struct __attribute__((packed)) abr_cache_t {
+    uint16_t version;
+    ipv6_addr_t abr_addr;
+    lowpan_context_t *contexts[LOWPAN_CONTEXT_MAX];
+    uint8_t contexts_num;
+    plist_t *prefixes[OPT_PI_LIST_LEN];
+    uint8_t prefixes_num;
+} abr_cache_t;
 
 /* neighbor cache - rfc4861 5.1. */
 typedef struct __attribute__ ((packed)) nbr_cache_t {
@@ -200,6 +212,10 @@ uint8_t plist_cmp(ipv6_addr_t *addr1, ipv6_addr_t *addr2);
 void plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
              uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
 void set_llao(opt_stllao_t *sllao, uint8_t type, uint8_t length);
+abr_cache_t *abr_update_cache(
+                    uint16_t version, ipv6_addr_t abr_addr,
+                    lowpan_context_t **contexts, uint8_t contexts_num,
+                    plist_t **prefixes, uint8_t prefixes_num);
 nbr_cache_t * nbr_cache_search(ipv6_addr_t *ipaddr);
 void nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr,
                    uint8_t isrouter, uint8_t state, uint8_t type,

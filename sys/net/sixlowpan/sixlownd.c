@@ -2,7 +2,9 @@
 #include "sixlownd.h"
 #include "sixlowmac.h"
 #include "sixlowpan.h"
+#include "serialnumber.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <debug.h>
 #include <vtimer.h>
@@ -15,6 +17,7 @@ uint8_t ipv6_ext_hdr_len = 0;
 uint16_t packet_length;
 
 /* counter */
+uint8_t abr_count = 0;
 uint8_t nbr_count = 0;
 uint8_t def_rtr_count = 0;
 uint8_t rtr_sol_count = 0;
@@ -24,6 +27,7 @@ uint8_t prefix_count = 0;
 iface_t iface;
 
 /* datastructures */
+abr_cache_t abr_cache[ABR_CACHE_SIZE];
 nbr_cache_t nbr_cache[NBR_CACHE_SIZE];
 def_rtr_lst_t def_rtr_lst[DEF_RTR_LST_SIZE]; 
 plist_t plist[OPT_PI_LIST_LEN];
@@ -40,6 +44,7 @@ static struct nbr_adv_t *nbr_adv_buf;
 static struct opt_buf_t *opt_buf;
 static struct opt_stllao_t *opt_stllao_buf;
 static struct opt_mtu_t *opt_mtu_buf;
+static struct opt_abro_t *opt_abro_buf;
 static struct opt_pi_t *opt_pi_buf;
 static struct opt_aro_t *opt_aro_buf;
 
@@ -48,6 +53,9 @@ def_rtr_lst_t *def_rtr_entry;
 
 /* elements */
 //ipv6_addr_t tmpaddr;
+
+static abr_cache_t* abr_get_most_current();
+static abr_cache_t* abr_get_oldest();
 
 static struct rtr_adv_t* get_rtr_adv_buf(uint8_t ext_len){
     return ((struct rtr_adv_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
@@ -73,6 +81,11 @@ static struct opt_stllao_t* get_opt_stllao_buf(uint8_t ext_len, uint8_t opt_len)
 
 static struct opt_mtu_t* get_opt_mtu_buf(uint8_t ext_len, uint8_t opt_len){
     return ((struct opt_mtu_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + 
+                                        ext_len + opt_len]));
+}
+
+static struct opt_abro_t* get_opt_abro_buf(uint8_t ext_len, uint8_t opt_len){
+    return ((struct opt_abro_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + 
                                         ext_len + opt_len]));
 }
 
@@ -161,7 +174,11 @@ void recv_rtr_sol(void){
     }
 
     /* send solicited router advertisment */
-    init_rtr_adv(&ipv6_buf->srcaddr, 0, 0, OPT_PI, 0, 0);
+    if (abr_count > 0) {
+        init_rtr_adv(&ipv6_buf->srcaddr, 0, 0, OPT_PI, OPT_6CO, OPT_ABRO);
+    } else {
+        init_rtr_adv(&ipv6_buf->srcaddr, 0, 0, OPT_PI, 0, 0);
+    }
 #ifdef ENABLE_DEBUG
     printf("INFO: send router advertisment to: ");
     ipv6_print_addr(&ipv6_buf->destaddr);
@@ -172,6 +189,7 @@ void recv_rtr_sol(void){
 
 void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi, 
                   uint8_t sixco, uint8_t abro){
+    abr_cache_t *msg_abr = NULL;
     ipv6_buf = get_ipv6_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);    
 
@@ -225,23 +243,54 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
         packet_length += OPT_MTU_HDR_LEN;
     }
     /* set payload length field */
+    
+    if(abro == OPT_ABRO){
+        /* set authoritive border router option */
+        if (abr_count > 0) {
+            msg_abr = abr_get_most_current();
+            opt_abro_buf = get_opt_abro_buf(ipv6_ext_hdr_len, opt_hdr_len);
+            opt_abro_buf->type = OPT_ABRO_TYPE;
+            opt_abro_buf->length = OPT_ABRO_LEN;
+            opt_abro_buf->version = msg_abr->version;
+            opt_abro_buf->reserved = 0;
+            opt_abro_buf->addr = msg_abr->abr_addr;
+        }
+    }
 
     if(pi == OPT_PI){
+        plist_t *prefixes = NULL;
+        int plist_len = 0;
+        
+        if (msg_abr == NULL) {
+            prefixes = plist;
+            plist_len = OPT_PI_LIST_LEN;
+        } else {
+            plist_len = msg_abr->prefixes_num;
+            prefixes = (plist_t*)calloc(plist_len, sizeof(plist_t));
+            for (int i = 0; i < plist_len; i++) {
+                prefixes[i] = *(msg_abr->prefixes[i]);
+            }
+        }
+        
         /* set prefix option */
-        for(int i=0;i<OPT_PI_LIST_LEN; i++){
-            if(plist[i].inuse && plist[i].adv){
+        for(int i=0;i<plist_len; i++){
+            if(prefixes[i].inuse && prefixes[i].adv){
                 opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, opt_hdr_len);
-                memcpy(&(opt_pi_buf->addr.uint8[0]), &(plist[i].addr.uint8[0]), 16);
+                memcpy(&(opt_pi_buf->addr.uint8[0]), &(prefixes[i].addr.uint8[0]), 16);
                 opt_pi_buf->type = OPT_PI_TYPE;
                 opt_pi_buf->length = OPT_PI_LEN;
-                opt_pi_buf->prefix_length = plist[i].length;
-                opt_pi_buf->l_a_reserved1 = plist[i].l_a_reserved1;
-                opt_pi_buf->val_ltime = HTONL(plist[i].val_ltime);
-                opt_pi_buf->pref_ltime = HTONL(plist[i].pref_ltime);
+                opt_pi_buf->prefix_length = prefixes[i].length;
+                opt_pi_buf->l_a_reserved1 = prefixes[i].l_a_reserved1;
+                opt_pi_buf->val_ltime = HTONL(prefixes[i].val_ltime);
+                opt_pi_buf->pref_ltime = HTONL(prefixes[i].pref_ltime);
                 opt_pi_buf->reserved2 = 0;
                 packet_length += OPT_PI_HDR_LEN;
                 opt_hdr_len += OPT_PI_HDR_LEN;
-          }
+            }
+        }
+        
+        if (msg_abr != NULL && prefixes != NULL) {
+            free(prefixes);
         }
     }
 
@@ -259,6 +308,14 @@ void recv_rtr_adv(void){
     ipv6_addr_t newaddr;   
  
     int8_t trigger_ns = -1;
+    int8_t abro_found = 0;
+    int16_t abro_version;
+    ipv6_addr_t abro_addr;
+    
+    lowpan_context_t *found_contexts[LOWPAN_CONTEXT_MAX];
+    uint8_t found_con_len = 0;
+    plist_t *found_prefixes[OPT_PI_LIST_LEN];
+    uint8_t found_pref_len = 0;
 
     /* update interface reachable time and retrans timer */
     if(rtr_adv_buf->reachable_time != 0){
@@ -348,12 +405,17 @@ void recv_rtr_adv(void){
                         }
                     }
                 }
+                // TODO: save found prefixes
                 break;
             }
             case(OPT_6CO_TYPE):{
                 break;
             }
             case(OPT_ABRO_TYPE):{
+                opt_abro_buf = get_opt_abro_buf(ipv6_ext_hdr_len, opt_hdr_len);
+                abro_found = 1;
+                abro_version = opt_abro_buf->version;
+                memcpy(&(abro_addr), &(opt_abro_buf->addr), sizeof(ipv6_addr_t));
                 break; 
             }
             default:
@@ -361,6 +423,10 @@ void recv_rtr_adv(void){
         }
         /* multiplied with 8 because options length is in units of 8 bytes */
         opt_hdr_len += (opt_buf->length * 8);    
+    }
+    
+    if (abro_found) {
+        abr_update_cache(abro_version,abro_addr,found_contexts,found_con_len,found_prefixes,found_pref_len);
     }
 
     if(trigger_ns >= 0){
@@ -867,6 +933,63 @@ void nbr_cache_rem(ipv6_addr_t *addr){
             nbr_count--;     
         }
     }
+}
+
+//------------------------------------------------------------------------------
+// authoritive border router list functions
+/** 
+ * @brief Finds the most current (by version number) authoritive border
+ *        router information.
+ * @pre  assumes that abro versions are centrally managed
+ * @return The most current authoritive border router information, NULL
+ *         if no such information is given.
+ */
+static abr_cache_t *abr_get_most_current(){
+    abr_cache_t *abr = NULL;
+    int i;
+    int version = abr_cache[0].version;
+    for(i = 0; i < abr_count; i++){
+        if (serial_comp16(version,abr_cache[i].version) == GREATER) {
+            abr = &(abr_cache[i]);
+            version = abr_cache[i].version;
+        }
+    }
+    
+    return abr;
+}
+
+static abr_cache_t *abr_get_oldest(){
+    abr_cache_t *abr = NULL;
+    int i;
+    int version = abr_cache[0].version;
+    for(i = 0; i < abr_count; i++){
+        if (serial_comp16(version,abr_cache[i].version) == LESS) {
+            abr = &(abr_cache[i]);
+            version = abr_cache[i].version;
+        }
+    }
+    
+    return abr;
+}
+
+abr_cache_t *abr_update_cache(
+                    uint16_t version, ipv6_addr_t abr_addr,
+                    lowpan_context_t **contexts, uint8_t contexts_num,
+                    plist_t **prefixes, uint8_t prefixes_num){
+    abr_cache_t *abr = NULL;
+    if (abr_count == ABR_CACHE_SIZE) {
+        abr = abr_get_oldest();
+    } else {
+        abr = &(abr_cache[abr_count++]);
+    }
+    abr->version = version;
+    abr->abr_addr = abr_addr;
+    memcpy(abr->contexts, contexts, contexts_num * sizeof (lowpan_context_t*));
+    abr->contexts_num = contexts_num;
+    memcpy(abr->prefixes, prefixes, prefixes_num * sizeof (lowpan_context_t*));
+    abr->prefixes_num = prefixes_num;
+    
+    return abr;
 }
 
 //------------------------------------------------------------------------------
