@@ -629,24 +629,27 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
         switch(((lowpan_iphc[1] & LOWPAN_IPHC_SAM) >> 4) & 0x03){
             case(0x01):{
                 /* 64-bits */
-                memcpy(&(ipv6_buf->srcaddr.uint8[0]), con->prefix, 8);
                 memcpy(&(ipv6_buf->srcaddr.uint8[8]), &ipv6_hdr_fields[hdr_pos], 8);
+                /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context information are always used. */
+                memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
                 hdr_pos += 8;
                 break;
             }
             case(0x02):{
                 /* 16-bits */
-                memcpy(&(ipv6_buf->srcaddr.uint8[0]), con->prefix, 8);
                 memset(&(ipv6_buf->srcaddr.uint8[8]), 0, 6);
                 memcpy(&(ipv6_buf->srcaddr.uint8[14]), &ipv6_hdr_fields[hdr_pos], 2);
+                /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context information are always used. */
+                memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
                 hdr_pos += 2;
                 break;
             }
             case(0x03):{
                 /* 0-bits */
-                memcpy(&(ipv6_buf->srcaddr.uint8[0]), con->prefix, 8);
                 memset(&(ipv6_buf->srcaddr.uint8[8]), 0, 8);
                 memcpy(&(ipv6_buf->srcaddr.uint8[8]), &s_laddr->uint8[0], 8); 
+                /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context information are always used. */
+                memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
                 break;
             }
             default:{
@@ -771,22 +774,25 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
             
             switch((lowpan_iphc[1] & LOWPAN_IPHC_DAM) & 0x03){
                 case(0x01):{
-                    memcpy(&(ipv6_buf->destaddr.uint8[0]), &con->prefix, 8);
                     memcpy(&(ipv6_buf->destaddr.uint8[8]), &ipv6_hdr_fields[hdr_pos], 8);
+                    /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context information are always used. */
+                    memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
                     hdr_pos += 8;
                     break;
                 }
                 case(0x02):{
-                    memcpy(&(ipv6_buf->destaddr.uint8[0]), &con->prefix, 8);
                     memset(&(ipv6_buf->destaddr.uint8[8]), 0, 6);
                     memcpy(&(ipv6_buf->destaddr.uint8[14]), &ipv6_hdr_fields[hdr_pos], 2);
+                    /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context information are always used. */
+                    memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
                     hdr_pos += 2;
                     break;
                 }
                 case(0x03):{
-                    memcpy(&(ipv6_buf->destaddr.uint8[0]), &con->prefix, 8);
                     memset(&(ipv6_buf->destaddr.uint8[0]), 0, 8);
                     memcpy(&(ipv6_buf->destaddr.uint8[8]), &d_laddr->uint8[0], 8);
+                    /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context information are always used. */
+                    memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
                     break;
                 }
                 default:
@@ -840,8 +846,7 @@ uint8_t lowpan_context_len(){
 }
 
 void lowpan_context_remove(uint8_t num) {
-    int i;
-    int found = 0;
+    int i,j;
     for(i = 0; i < LOWPAN_CONTEXT_MAX; i++){
         if(contexts[i].num == num){
             context_len--;
@@ -849,13 +854,13 @@ void lowpan_context_remove(uint8_t num) {
         }
     }
     
-    for(i; i < LOWPAN_CONTEXT_MAX; i++) {
-        contexts[i] = contexts[i+1];
+    for(j = 0; j < LOWPAN_CONTEXT_MAX; j++) {
+        contexts[j] = contexts[j+1];
     }
 }
 
 void lowpan_context_remove_cb(void* ptr) {
-    uint8_t num = (uint8_t)ptr;
+    uint8_t num = *((uint8_t*)ptr);
     lowpan_context_remove(num);
 }
 
@@ -883,13 +888,15 @@ uint8_t lowpan_context_update(uint8_t num, uint8_t *prefix,
     }
     
     context->num = num;
-    strncpy((char*)context->prefix,(char*)prefix,8);
+    memset((void*)(&context->prefix),0,16);
+    // length in bits
+    memcpy((void*)(&context->prefix),(void*)prefix,length/8);
     context->length = length;
     context->comp = comp;
     vtimer_set_cb(&(context->lifetime), 
                   lt, 
                   lowpan_context_remove_cb, 
-                  (void*)num);
+                  (void*)(&num));
     
     return 0;
 }
@@ -901,7 +908,7 @@ lowpan_context_t *lowpan_context_get() {
 lowpan_context_t * lowpan_context_lookup(ipv6_addr_t *addr){
     int i;
     for(i = 0; i < LOWPAN_CONTEXT_MAX; i++){
-        if(memcmp(&(addr->uint8[0]),&(contexts[i].prefix[0]),contexts[i].length) == 0){
+        if(memcmp((void*)addr,&(contexts[i].prefix),contexts[i].length) == 0){
             return &contexts[i];
         }
     }
