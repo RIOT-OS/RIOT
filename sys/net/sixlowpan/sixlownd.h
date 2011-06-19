@@ -1,3 +1,8 @@
+/* 6LoWPAN ND header file */
+
+#ifndef SIXLOWND_H
+#define SIXLOWND_H
+
 #include <stdint.h>
 #include "vtimer.h"
 #include "sixlowpan.h"
@@ -233,3 +238,4 @@ void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
 void plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
              uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
 void recv_nbr_sol(void);
+#endif /* SIXLOWND_H*/
