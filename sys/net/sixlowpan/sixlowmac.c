@@ -32,28 +32,32 @@ int transceiver_type;
 static transceiver_command_t tcmd;
 
 uint8_t get_radio_address(void){
-    uint16_t addr;
+    int16_t address;
 
     tcmd.transceivers = transceiver_type;
-    tcmd.data = &addr;
+    tcmd.data = &address;
     mesg.content.ptr = (char*)&tcmd;
     mesg.type = GET_ADDRESS;
     msg_send_receive(&mesg,&mesg,transceiver_pid);
     
-    return (uint8_t)addr;
+    return (uint8_t)address;
 }
 
 void set_radio_address(uint8_t addr){
+    int16_t address = (int16_t)addr;
+    
     tcmd.transceivers = transceiver_type;
-    tcmd.data = &addr;
+    tcmd.data = &address;
     mesg.content.ptr = (char*)&tcmd;
     mesg.type = SET_ADDRESS;
     msg_send_receive(&mesg, &mesg, transceiver_pid);
 }
 
 void set_radio_channel(uint8_t channel){
+    int16_t chan = (int16_t)channel;
+    
     tcmd.transceivers = transceiver_type;
-    tcmd.data = &channel;
+    tcmd.data = &chan;
     mesg.content.ptr = (char*)&tcmd;
     mesg.type = SET_CHANNEL;
     msg_send_receive(&mesg,&mesg,transceiver_pid);
