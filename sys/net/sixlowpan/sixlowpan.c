@@ -907,8 +907,8 @@ lowpan_context_t *lowpan_context_get() {
 
 lowpan_context_t * lowpan_context_lookup(ipv6_addr_t *addr){
     int i;
-    for(i = 0; i < LOWPAN_CONTEXT_MAX; i++){
-        if(memcmp((void*)addr,&(contexts[i].prefix),contexts[i].length) == 0){
+    for(i = 0; i < lowpan_context_len(); i++){
+        if(contexts[i].length > 0 && memcmp((void*)addr,&(contexts[i].prefix),contexts[i].length) == 0){
             return &contexts[i];
         }
     }
@@ -917,7 +917,7 @@ lowpan_context_t * lowpan_context_lookup(ipv6_addr_t *addr){
 
 lowpan_context_t * lowpan_context_num_lookup(uint8_t num){
     int i;
-    for(i = 0; i < LOWPAN_CONTEXT_MAX; i++){
+    for(i = 0; i < lowpan_context_len(); i++){
         if(contexts[i].num == num){
             return &contexts[i];
         }
@@ -947,7 +947,6 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr){
     memcpy(&(loaddr.uint8[8]), &(iface.laddr.uint8[0]), 8);
     ipv6_iface_add_addr(&loaddr, ADDR_STATE_PREFERRED, 0, 0, 
                         ADDR_CONFIGURED_AUTO);
-
     ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE, 
                                        PRIORITY_MAIN-1, CREATE_STACKTEST,
                                        ipv6_process, "ip_process");
