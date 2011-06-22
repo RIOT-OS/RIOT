@@ -12,7 +12,6 @@
 #include "transceiver.h"
 #include "ieee802154_frame.h"
 
-uint8_t iface_addr_list_count = 0;
 uint16_t packet_length;
 uint8_t packet_dispatch;
 uint16_t tag;

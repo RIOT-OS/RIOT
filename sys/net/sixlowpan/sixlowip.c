@@ -14,6 +14,7 @@ struct icmpv6_hdr_t* icmp_buf;
 uint8_t ipv6_ext_hdr_len;
 uint8_t *nextheader;
 iface_t iface;
+uint8_t iface_addr_list_count = 0;
 
 //mutex_t buf_mutex;
 
@@ -139,7 +140,7 @@ void ipv6_iface_add_addr(ipv6_addr_t *addr, uint8_t state, uint32_t val_ltime,
 
 addr_list_t * ipv6_iface_addr_match(ipv6_addr_t *addr){
     int i;
-    for(i = 0; i < IFACE_ADDR_LIST_LEN; i++){
+    for(i = 0; i < iface_addr_list_count; i++){
         if(memcmp(&(iface.addr_list[i].addr.uint8[0]),
                   &(addr->uint8[0]),16) == 0){
             return &(iface.addr_list[i]);
@@ -150,7 +151,7 @@ addr_list_t * ipv6_iface_addr_match(ipv6_addr_t *addr){
 
 addr_list_t * ipv6_iface_addr_prefix_eq(ipv6_addr_t *addr){
     int i;
-    for(i = 0; i < IFACE_ADDR_LIST_LEN; i++){
+    for(i = 0; i < iface_addr_list_count; i++){
         if(memcmp(&(iface.addr_list[i].addr.uint8[0]),
                   &(addr->uint8[0]), 8) == 0){
             return &(iface.addr_list[i]);
