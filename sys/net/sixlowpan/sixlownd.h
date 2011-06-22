@@ -51,6 +51,9 @@
 #define OPT_ARO_LEN                     2
 #define OPT_ARO_HDR_LEN                 16
 #define OPT_ARO_LTIME                   300 // geeigneten wert finden
+#define OPT_ARO_STATE_SUCCESS           0
+#define OPT_ARO_STATE_DUP_ADDR          1
+#define OPT_ARO_STATE_NBR_CACHE_FULL    2
 /* 6lowpan context option */
 #define OPT_6CO_TYPE                    32
 #define OPT_6CO_MIN_LEN                 2
@@ -221,7 +224,7 @@ abr_cache_t *abr_update_cache(
                     lowpan_context_t **contexts, uint8_t contexts_num,
                     plist_t **prefixes, uint8_t prefixes_num);
 nbr_cache_t * nbr_cache_search(ipv6_addr_t *ipaddr);
-void nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr,
+uint8_t nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr,
                    uint8_t isrouter, uint8_t state, uint8_t type,
                    uint16_t ltime, ieee_802154_short_t *saddr);
 void nbr_cache_auto_rem(void);

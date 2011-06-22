@@ -390,7 +390,7 @@ void recv_rtr_adv(void){
  
     int8_t trigger_ns = -1;
     int8_t abro_found = 0;
-    int16_t abro_version;
+    int16_t abro_version = 0;    // later replaced, just to supress warnings
     ipv6_addr_t abro_addr;
     
     lowpan_context_t *found_contexts[LOWPAN_CONTEXT_MAX];
@@ -624,7 +624,7 @@ void recv_nbr_sol(void){
         
     uint8_t send_na = 0;
     uint8_t sllao_set = 0;
-    uint8_t aro_state;
+    uint8_t aro_state = OPT_ARO_STATE_SUCCESS;
     
     /* check whick options are set, we need that because an aro
      * option condition is that a sllao option is set. thus that we don't 
@@ -714,11 +714,10 @@ void recv_nbr_sol(void){
                         nbr_entry = nbr_cache_search(&(ipv6_buf->srcaddr));
                         if(nbr_entry == NULL){
                             /* create neighbor cache */
-                            nbr_cache_add(&ipv6_buf->srcaddr,
-                                          &(opt_aro_buf->eui64),0,
-                                          NBR_STATUS_STALE, NBR_CACHE_TYPE_TEN,
-                                          opt_aro_buf->reg_ltime, NULL);
-                            aro_state = 0;
+                            aro_state = nbr_cache_add(&ipv6_buf->srcaddr,
+                                                      &(opt_aro_buf->eui64),0,
+                                                      NBR_STATUS_STALE, NBR_CACHE_TYPE_TEN,
+                                                      opt_aro_buf->reg_ltime, NULL);
                         } else {
                             if(memcmp(&(nbr_entry->addr.uint16[4]), 
                                &(opt_aro_buf->eui64.uint16[0]),8) == 0){
@@ -733,10 +732,11 @@ void recv_nbr_sol(void){
                                     nbr_entry->isrouter = 0;
                                     memcpy(&(nbr_entry->addr.uint8[0]),
                                            &(ipv6_buf->srcaddr.uint8[0]),16);
-                                }   
+                                }
+                                aro_state = OPT_ARO_STATE_SUCCESS;
                             } else {
                                 // duplicate found
-                                aro_state = 1;
+                                aro_state = OPT_ARO_STATE_DUP_ADDR;
                             }
                         } 
                     }
@@ -989,25 +989,28 @@ nbr_cache_t * nbr_cache_search(ipv6_addr_t *ipaddr){
     return NULL;
 }
 
-void nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr, 
+uint8_t nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr, 
                    uint8_t isrouter, uint8_t state, uint8_t type,
                    uint16_t ltime, ieee_802154_short_t *saddr){
     if(nbr_count == NBR_CACHE_SIZE){
         printf("ERROR: neighbor cache full\n");
-    } else {
-        memcpy(&(nbr_cache[nbr_count].addr), ipaddr, 16);
-        memcpy(&(nbr_cache[nbr_count].laddr), laddr, 8);
-        nbr_cache[nbr_count].isrouter = isrouter;
-        nbr_cache[nbr_count].state = state;
-        nbr_cache[nbr_count].type = type;
-        
-        timex_t t;
-        t.seconds = ltime;        
-        //vtimer_set_wakeup(&(nbr_cache[nbr_count].ltime), t, 
-        //                  nd_nbr_cache_rem_pid);        
-
-        nbr_count++;
+        return OPT_ARO_STATE_NBR_CACHE_FULL;
     }
+    
+    memcpy(&(nbr_cache[nbr_count].addr), ipaddr, 16);
+    memcpy(&(nbr_cache[nbr_count].laddr), laddr, 8);
+    nbr_cache[nbr_count].isrouter = isrouter;
+    nbr_cache[nbr_count].state = state;
+    nbr_cache[nbr_count].type = type;
+    
+    timex_t t;
+    t.seconds = ltime;        
+    //vtimer_set_wakeup(&(nbr_cache[nbr_count].ltime), t, 
+    //                  nd_nbr_cache_rem_pid);        
+
+    nbr_count++;
+    
+    return OPT_ARO_STATE_SUCCESS;
 }
 
 void nbr_cache_auto_rem(void){

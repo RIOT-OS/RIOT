@@ -112,7 +112,7 @@ void ipv6_process(void){
             }
             case(PROTO_NUM_NONE):{
                 //printf("Packet with no Header following the IPv6 Header received\n");
-                uint8_t *ptr = get_payload_buf(ipv6_ext_hdr_len);
+                //uint8_t *ptr = get_payload_buf(ipv6_ext_hdr_len);
                 printf("hello\n");
             }
             default:
@@ -243,7 +243,7 @@ void ipv6_get_saddr(ipv6_addr_t *src, ipv6_addr_t *dst){
 }
 
 uint8_t ipv6_get_addr_match(ipv6_addr_t *src, ipv6_addr_t *dst){
-    uint8_t val, xor;
+    uint8_t val = 0, xor;
     for(int i = 0; i < 16; i++){
         /* if bytes are equal add 8 */
         if(src->uint8[i] == dst->uint8[i]){

@@ -7,6 +7,7 @@
 #include "sixlownd.h"
 #include "sixlowpan.h"
 #include <ltc4150.h>
+#include <hwtimer.h>
 #include "thread.h"
 #include "msg.h"
 #include "radio/radio.h"
@@ -192,6 +193,7 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
 void sixlowmac_init(transceiver_type_t type){
     int recv_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE, 
                         PRIORITY_MAIN-2, CREATE_STACKTEST, recv_ieee802154_frame , "radio");
+    hwtimer_init();
     transceiver_type = type;
     transceiver_init(transceiver_type);
     transceiver_start();
