@@ -383,3 +383,22 @@ uint32_t get_remaining_time(vtimer_t *t){
 void set_remaining_time(vtimer_t *t, uint32_t time){
     t->absolute.nanoseconds = time * 1000000;
 }
+
+void ipv6_init_iface_as_router(void) {
+    ipv6_addr_t addr;
+    
+    ipv6_set_all_rtrs_mcast_addr(&addr);
+    ipv6_iface_add_addr(&addr,ADDR_STATE_PREFERRED,0,0,ADDR_TYPE_MULTICAST);
+}
+
+
+uint8_t ipv6_is_router(void) {
+    ipv6_addr_t addr;
+    
+    ipv6_set_all_rtrs_mcast_addr(&addr);
+    if (ipv6_iface_addr_match(&addr) != NULL) {
+        return 1;
+    }
+    
+    return 0;
+}
