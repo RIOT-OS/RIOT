@@ -123,7 +123,7 @@ void init_edge_router_info(ipv6_addr_t *abr_addr) {
             );
     
     ipv6_iface_add_addr(abr_addr,ADDR_STATE_PREFERRED,0,0,ADDR_TYPE_UNICAST);
-    ipv6_set_prefix(abr_addr, &prefix);
+    ipv6_set_prefix(&prefix, abr_addr);
     prefix_info = plist_add(&prefix, 64, OPT_PI_VLIFETIME_INFINITE,0,1,OPT_PI_FLAG_A);
     abr_info_add_prefix(prefix_info);
     
