@@ -126,7 +126,7 @@ void ipv6_iface_add_addr(ipv6_addr_t *addr, uint8_t state, uint32_t val_ltime,
     {
         ipv6_addr_t unspec;
         memset(&unspec,0,sizeof (ipv6_addr_t));
-        if(ipv6_get_addr_match(addr,unspec) == 128){
+        if(ipv6_get_addr_match(addr,&unspec) == 128){
             printf("ERROR: unspecified address (::) can't be assigned to interface.\n");
             return;
         }
