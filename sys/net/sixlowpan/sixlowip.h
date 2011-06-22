@@ -40,7 +40,7 @@ extern double start;
 #define LLHDR_ICMPV6HDR_LEN         (LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)
 #define IPV6HDR_ICMPV6HDR_LEN       (IPV6_HDR_LEN + ipv6_ext_hdr_len + ICMPV6_HDR_LEN)
 
-#define IFACE_ADDR_LIST_LEN         5 // maybe to much
+#define IFACE_ADDR_LIST_LEN         10 // maybe to much
 /* rfc 4862 section 2. address states */
 #define ADDR_STATE_TENTATIVE        0
 #define ADDR_STATE_PREFERRED        1
