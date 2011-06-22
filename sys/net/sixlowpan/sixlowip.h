@@ -141,7 +141,7 @@ uint8_t ipv6_is_router(void);
 void ipv6_set_ll_prefix(ipv6_addr_t *ipaddr);
 void ipv6_set_all_rtrs_mcast_addr(ipv6_addr_t *ipaddr);
 void ipv6_set_all_nds_mcast_addr(ipv6_addr_t *ipaddr);
-void ipv6_set_lpback_addr(ipv6_addr_t *ipaddr);
+void ipv6_set_loaddr(ipv6_addr_t *ipaddr);
 void ipv6_set_sol_node_mcast_addr(ipv6_addr_t *addr_in, ipv6_addr_t *addr_out);
 void sixlowpan_bootstrapping(void);
 void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len);

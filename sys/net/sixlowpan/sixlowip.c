@@ -221,7 +221,7 @@ void ipv6_set_all_nds_mcast_addr(ipv6_addr_t *ipaddr){
     ipaddr->uint16[7] = HTONS(0x0001);
 }
 
-void ipv6_set_lpback_addr(ipv6_addr_t *ipaddr){
+void ipv6_set_loaddr(ipv6_addr_t *ipaddr){
     ipaddr->uint16[0] = 0;
     ipaddr->uint16[1] = 0;
     ipaddr->uint16[2] = 0;

@@ -35,7 +35,7 @@ unsigned int ip_process_pid;
 unsigned int nd_nbr_cache_rem_pid = 0;
 
 iface_t iface;
-ipv6_addr_t loaddr;
+ipv6_addr_t lladdr;
 ieee_802154_long_t laddr;
 mutex_t buf_mutex;
 
@@ -930,6 +930,7 @@ lowpan_context_t * lowpan_context_num_lookup(uint8_t num){
 }
 
 void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr){
+    ipv6_addr_t tmp;
     /* init mac-layer and radio transceiver */
     vtimer_init();
     sixlowmac_init(trans);
@@ -942,10 +943,19 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr){
     mutex_init(&buf_mutex);
 
     /* init link-local address */
-    ipv6_set_ll_prefix(&loaddr);
+    ipv6_set_ll_prefix(&lladdr);
     
-    memcpy(&(loaddr.uint8[8]), &(iface.laddr.uint8[0]), 8);
-    ipv6_iface_add_addr(&loaddr, ADDR_STATE_PREFERRED, 0, 0, 
+    memcpy(&(lladdr.uint8[8]), &(iface.laddr.uint8[0]), 8);
+    ipv6_iface_add_addr(&lladdr, ADDR_STATE_PREFERRED, 0, 0, 
+                       ADDR_TYPE_LINK_LOCAL);
+    ipv6_set_loaddr(&tmp);
+    ipv6_iface_add_addr(&tmp, ADDR_STATE_PREFERRED, 0, 0, 
+                        ADDR_TYPE_LOOPBACK);
+    ipv6_set_all_nds_mcast_addr(&tmp);
+    ipv6_iface_add_addr(&tmp, ADDR_STATE_PREFERRED, 0, 0, 
+                        ADDR_TYPE_LOOPBACK);
+                        
+    ipv6_iface_add_addr(&lladdr, ADDR_STATE_PREFERRED, 0, 0, 
                         ADDR_CONFIGURED_AUTO);
     ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE, 
                                        PRIORITY_MAIN-1, CREATE_STACKTEST,
