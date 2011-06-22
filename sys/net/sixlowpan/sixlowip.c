@@ -65,7 +65,7 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len){
 void ipv6_process(void){
     msg m;
     msg_init_queue(msg_queue, IP_PKT_RECV_BUF_SIZE);
-
+    
     while(1){
         msg_receive(&m);
 
@@ -199,6 +199,17 @@ void ipv6_set_all_rtrs_mcast_addr(ipv6_addr_t *ipaddr){
 
 void ipv6_set_all_nds_mcast_addr(ipv6_addr_t *ipaddr){
     ipaddr->uint16[0] = HTONS(0xff02);
+    ipaddr->uint16[1] = 0;
+    ipaddr->uint16[2] = 0;
+    ipaddr->uint16[3] = 0;
+    ipaddr->uint16[4] = 0;
+    ipaddr->uint16[5] = 0;
+    ipaddr->uint16[6] = 0;
+    ipaddr->uint16[7] = HTONS(0x0001);
+}
+
+void ipv6_set_lpback_addr(ipv6_addr_t *ipaddr){
+    ipaddr->uint16[0] = 0;
     ipaddr->uint16[1] = 0;
     ipaddr->uint16[2] = 0;
     ipaddr->uint16[3] = 0;

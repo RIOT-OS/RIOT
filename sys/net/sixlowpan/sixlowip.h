@@ -56,8 +56,9 @@ extern double start;
 #define ADDR_TYPE_MULTICAST         2
 #define ADDR_TYPE_ANYCAST           3
 #define ADDR_TYPE_SOL_NODE_MCAST    4
-#define ADDR_TYPE_LINK_LOCAL        5
-#define ADDR_TYPE_GLOBAL            6
+#define ADDR_TYPE_LOOPBACK          5
+#define ADDR_TYPE_LINK_LOCAL        6
+#define ADDR_TYPE_GLOBAL            7
 /* dispatch types */
 #define DISPATCH_TYPE_IPV6          0x41
 #define DISPATCH_TYPE_LOWPAN_HC1    0x42
@@ -138,6 +139,7 @@ uint8_t * get_payload_buf(uint8_t ext_len);
 void ipv6_set_ll_prefix(ipv6_addr_t *ipaddr);
 void ipv6_set_all_rtrs_mcast_addr(ipv6_addr_t *ipaddr);
 void ipv6_set_all_nds_mcast_addr(ipv6_addr_t *ipaddr);
+void ipv6_set_lpback_addr(ipv6_addr_t *ipaddr);
 void ipv6_set_sol_node_mcast_addr(ipv6_addr_t *addr_in, ipv6_addr_t *addr_out);
 void sixlowpan_bootstrapping(void);
 void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len);
