@@ -123,6 +123,14 @@ void ipv6_process(void){
 
 void ipv6_iface_add_addr(ipv6_addr_t *addr, uint8_t state, uint32_t val_ltime,
                          uint32_t pref_ltime, uint8_t type){
+    {
+        ipv6_addr_t unspec;
+        memset(&unspec,0,sizeof (ipv6_addr_t));
+        if(ipv6_get_addr_match(addr,unspec) == 128){
+            printf("ERROR: unspecified address (::) can't be assigned to interface.\n");
+            return;
+        }
+    }
     if(iface_addr_list_count < IFACE_ADDR_LIST_LEN){
         memcpy(&(iface.addr_list[iface_addr_list_count].addr.uint8[0]), 
                &(addr->uint8[0]), 16);
@@ -135,6 +143,15 @@ void ipv6_iface_add_addr(ipv6_addr_t *addr, uint8_t state, uint32_t val_ltime,
         vtimer_set_sec(&(iface.addr_list[iface_addr_list_count].pref_ltime), prlt);
         iface.addr_list[iface_addr_list_count].type = type;
         iface_addr_list_count++;
+        // Register to Solicited-Node multicast address according to RFC 4291
+        if (type == ADDR_TYPE_ANYCAST || type == ADDR_TYPE_LINK_LOCAL ||
+            type == ADDR_TYPE_GLOBAL || type == ADDR_TYPE_UNICAST) {
+            ipv6_addr_t sol_node_mcast_addr;
+            ipv6_set_sol_node_mcast_addr(addr, &sol_node_mcast_addr);
+            if (ipv6_iface_addr_match(&sol_node_mcast_addr) == NULL) {
+                ipv6_iface_add_addr(&sol_node_mcast_addr, state, val_ltime, pref_ltime, ADDR_TYPE_SOL_NODE_MCAST);
+            }
+        }
     }
 }
 
