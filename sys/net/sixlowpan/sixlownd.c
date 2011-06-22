@@ -1138,10 +1138,11 @@ void def_rtr_lst_rem(def_rtr_lst_t *entry){
 //------------------------------------------------------------------------------
 // prefix list functions
 
-void plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
+plist_t *plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
              uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1){
     if(prefix_count == OPT_PI_LIST_LEN){
         printf("ERROR: prefix list full\n");
+        return NULL;
     } else {
         plist[prefix_count].inuse = 1;
         plist[prefix_count].length = size;
@@ -1151,6 +1152,6 @@ void plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
         plist[prefix_count].pref_ltime = HTONL(pref_ltime);
         memcpy(&(plist[prefix_count].addr.uint8[0]), &(addr->uint8[0]), 16);
 
-        prefix_count++;
+        return &(plist[prefix_count++]);
     }
 }
