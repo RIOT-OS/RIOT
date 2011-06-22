@@ -34,6 +34,7 @@ typedef struct lowpan_context_t {
 } lowpan_context_t;
 
 void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr);
+void sixlowpan_adhoc_init(transceiver_type_t trans, ipv6_addr_t *prefix, uint8_t r_addr);
 void lowpan_init(ieee_802154_long_t *addr, uint8_t *data);
 void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
            ieee_802154_long_t *d_laddr);

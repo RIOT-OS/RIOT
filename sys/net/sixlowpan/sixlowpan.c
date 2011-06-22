@@ -936,12 +936,8 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr){
     /* init global buffer mutex */
     mutex_init(&buf_mutex);
 
-    /* init link-local address and network prefix */
+    /* init link-local address */
     ipv6_set_ll_prefix(&loaddr);
-    ipv6_addr_t prefix, tmp;
-    ipv6_init_address(&tmp, 0xabcd,0,0,0,0,0,0,0);
-    ipv6_set_prefix(&prefix, &tmp);
-    plist_add(&prefix, 64, OPT_PI_VLIFETIME_INFINITE,0,1,OPT_PI_FLAG_A);
     
     memcpy(&(loaddr.uint8[8]), &(iface.laddr.uint8[0]), 8);
     ipv6_iface_add_addr(&loaddr, ADDR_STATE_PREFERRED, 0, 0, 
@@ -952,4 +948,12 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr){
     nd_nbr_cache_rem_pid = thread_create(nc_buf, NC_STACKSIZE,
                                          PRIORITY_MAIN-1, CREATE_STACKTEST,
                                          nbr_cache_auto_rem, "nbr_cache_rem"); 
+}
+
+void sixlowpan_adhoc_init(transceiver_type_t trans, ipv6_addr_t *prefix, uint8_t r_addr){
+    /* init network prefix */
+    ipv6_set_prefix(prefix, prefix);
+    plist_add(prefix, 64, OPT_PI_VLIFETIME_INFINITE,0,1,OPT_PI_FLAG_A);
+    ipv6_init_iface_as_router();
+    sixlowpan_init(trans, r_addr);
 }
