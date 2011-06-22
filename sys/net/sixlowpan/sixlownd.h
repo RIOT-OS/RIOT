@@ -62,6 +62,8 @@
 #define OPT_6CO_LTIME                   5   // geeigneten Wert finden
 #define OPT_6CO_FLAG_C                  0x10
 #define OPT_6CO_FLAG_CID                0x0F
+#define OPT_6CO_FLAG_C_VALUE_SET        1
+#define OPT_6CO_FLAG_C_VALUE_UNSET      0
 /* authoritative border router option */
 #define OPT_ABRO_TYPE                   33
 #define OPT_ABRO_LEN                    3
@@ -220,7 +222,7 @@ void plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
              uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
 void set_llao(opt_stllao_t *sllao, uint8_t type, uint8_t length);
 abr_cache_t *abr_update_cache(
-                    uint16_t version, ipv6_addr_t abr_addr,
+                    uint16_t version, ipv6_addr_t *abr_addr,
                     lowpan_context_t **contexts, uint8_t contexts_num,
                     plist_t **prefixes, uint8_t prefixes_num);
 nbr_cache_t * nbr_cache_search(ipv6_addr_t *ipaddr);

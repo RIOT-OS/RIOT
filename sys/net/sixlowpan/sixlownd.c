@@ -526,7 +526,7 @@ void recv_rtr_adv(void){
     }
     
     if (abro_found) {
-        abr_update_cache(abro_version,abro_addr,found_contexts,found_con_len,found_prefixes,found_pref_len);
+        abr_update_cache(abro_version,&abro_addr,found_contexts,found_con_len,found_prefixes,found_pref_len);
     }
 
     if(trigger_ns >= 0){
@@ -1076,7 +1076,7 @@ static abr_cache_t *abr_get_oldest(){
 }
 
 abr_cache_t *abr_update_cache(
-                    uint16_t version, ipv6_addr_t abr_addr,
+                    uint16_t version, ipv6_addr_t *abr_addr,
                     lowpan_context_t **contexts, uint8_t contexts_num,
                     plist_t **prefixes, uint8_t prefixes_num){
     abr_cache_t *abr = NULL;
@@ -1086,7 +1086,7 @@ abr_cache_t *abr_update_cache(
         abr = &(abr_cache[abr_count++]);
     }
     abr->version = version;
-    abr->abr_addr = abr_addr;
+    memcpy(&abr->abr_addr, abr_addr, sizeof (ipv6_addr_t));
     memcpy(abr->contexts, contexts, contexts_num * sizeof (lowpan_context_t*));
     abr->contexts_num = contexts_num;
     memcpy(abr->prefixes, prefixes, prefixes_num * sizeof (lowpan_context_t*));
