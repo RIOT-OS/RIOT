@@ -282,7 +282,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
             opt_abro_buf->length = OPT_ABRO_LEN;
             opt_abro_buf->version = msg_abr->version;
             opt_abro_buf->reserved = 0;
-            opt_abro_buf->addr = msg_abr->abr_addr;
+            memcpy(&(opt_abro_buf->addr), &(msg_abr->abr_addr), sizeof (ipv6_addr_t));
         }
     }
     
@@ -309,10 +309,10 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
             } else {
                 opt_6co_hdr_buf->length = OPT_6CO_MIN_LEN;
             }
-            opt_6co_hdr_buf->c_length = HTONL(contexts[i].length);
-            opt_6co_hdr_buf->c_flags = HTONL(set_opt_6co_flags(contexts[i].comp,contexts[i].num));
+            opt_6co_hdr_buf->c_length = contexts[i].length;
+            opt_6co_hdr_buf->c_flags = set_opt_6co_flags(contexts[i].comp,contexts[i].num);
             opt_6co_hdr_buf->reserved = 0;
-            opt_6co_hdr_buf->val_ltime = HTONL((vtimer_remaining(&(contexts[i].lifetime)).nanoseconds / 1000000) / 60);
+            opt_6co_hdr_buf->val_ltime = HTONS((vtimer_remaining(&(contexts[i].lifetime)).nanoseconds / 1000000) / 60);
             opt_hdr_len += OPT_6CO_HDR_LEN;
             packet_length += OPT_6CO_HDR_LEN;
             // attach prefixes
@@ -495,7 +495,7 @@ void recv_rtr_adv(void){
                 uint8_t comp;
                 uint8_t num;
                 get_opt_6co_flags(&comp,&num, opt_6co_hdr_buf->c_flags);
-                uint8_t lifetime = opt_6co_hdr_buf->val_ltime;
+                uint16_t lifetime = opt_6co_hdr_buf->val_ltime;
                 lowpan_context_t *context;
                 
                 ipv6_addr_t prefix;
@@ -798,12 +798,12 @@ void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
     nbr_adv_buf->rso = rso;
     
     memset(&(nbr_adv_buf->reserved[0]),0,3); 
-    memcpy(&(nbr_adv_buf->tgtaddr.uint8[0]), &(tgt->uint8[0]),16);    
+    memcpy(&(nbr_adv_buf->tgtaddr.uint8[0]), &(tgt->uint8[0]),16);
     
     packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + NBR_ADV_LEN;
-
+	
     if(sllao == OPT_SLLAO){
-               /* set sllao option */
+        /* set sllao option */
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
         set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 1);
         opt_hdr_len += OPT_STLLAO_LEN;
