@@ -206,15 +206,14 @@ uint8_t set_opt_6co_flags(uint8_t compression_flag, uint8_t cid) {
     else
         flags = 0;
     
-    flags |= cid ^ OPT_6CO_FLAG_CID;
-    
+    flags |= cid & OPT_6CO_FLAG_CID;
     return flags;
 }
 
 void get_opt_6co_flags(uint8_t *compression_flag, uint8_t *cid, uint8_t flags) {
-    compression_flag[0] = flags ^ OPT_6CO_FLAG_CID;
+    compression_flag[0] = flags & OPT_6CO_FLAG_CID;
     compression_flag[0] = compression_flag[0] != 0;
-    cid[0] = flags ^ OPT_6CO_FLAG_CID;
+    cid[0] = flags & OPT_6CO_FLAG_CID;
 }
 
 void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi, 
