@@ -8,6 +8,7 @@
 #include <string.h>
 #include <debug.h>
 #include <vtimer.h>
+#include <mutex.h>
 
 #define ENABLE_DEBUG
 
@@ -280,7 +281,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
             opt_abro_buf = get_opt_abro_buf(ipv6_ext_hdr_len, opt_hdr_len);
             opt_abro_buf->type = OPT_ABRO_TYPE;
             opt_abro_buf->length = OPT_ABRO_LEN;
-            opt_abro_buf->version = msg_abr->version;
+            opt_abro_buf->version = HTONS(msg_abr->version);
             opt_abro_buf->reserved = 0;
             memcpy(&(opt_abro_buf->addr), &(msg_abr->abr_addr), sizeof (ipv6_addr_t));
         }
@@ -290,7 +291,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
         /* set 6lowpan context option */
         lowpan_context_t *contexts = NULL;
         int contexts_len = 0;
-        
+        mutex_lock(&lowpan_context_mutex);
         if (msg_abr == NULL) {
             contexts = lowpan_context_get();
             contexts_len = lowpan_context_len();
@@ -312,7 +313,8 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
             opt_6co_hdr_buf->c_length = contexts[i].length;
             opt_6co_hdr_buf->c_flags = set_opt_6co_flags(contexts[i].comp,contexts[i].num);
             opt_6co_hdr_buf->reserved = 0;
-            opt_6co_hdr_buf->val_ltime = HTONS((vtimer_remaining(&(contexts[i].lifetime)).nanoseconds / 1000000) / 60);
+            opt_6co_hdr_buf->val_ltime = HTONS(contexts[i].lifetime);
+            
             opt_hdr_len += OPT_6CO_HDR_LEN;
             packet_length += OPT_6CO_HDR_LEN;
             // attach prefixes
@@ -335,6 +337,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
         if (msg_abr != NULL && contexts != NULL) {
             free(contexts);
         }
+        mutex_unlock(&lowpan_context_mutex, 0);
     }
 
     if(pi == OPT_PI){
@@ -422,6 +425,8 @@ void recv_rtr_adv(void){
             def_rtr_lst_rem(def_rtr_entry);
         } 
     }
+    
+    mutex_lock(&lowpan_context_mutex);
     /* read options */
     while(packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len){
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, opt_hdr_len);
@@ -489,13 +494,13 @@ void recv_rtr_adv(void){
                 break;
             }
             case(OPT_6CO_TYPE):{
-                opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_ext_hdr_len, opt_hdr_len);
-                
-                uint8_t context_len = opt_6co_hdr_buf->c_length;
                 uint8_t comp;
                 uint8_t num;
+                
+                opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_ext_hdr_len, opt_hdr_len);
+                
                 get_opt_6co_flags(&comp,&num, opt_6co_hdr_buf->c_flags);
-                uint16_t lifetime = opt_6co_hdr_buf->val_ltime;
+                
                 lowpan_context_t *context;
                 
                 ipv6_addr_t prefix;
@@ -503,9 +508,15 @@ void recv_rtr_adv(void){
                 
                 opt_6co_prefix_buf = get_opt_6co_prefix_buf(ipv6_ext_hdr_len, opt_hdr_len + OPT_6CO_HDR_LEN);
                 
-                memcpy(&prefix, opt_6co_prefix_buf, context_len);
+                memcpy(&prefix, opt_6co_prefix_buf, opt_6co_hdr_buf->c_length);
                 
-                context = lowpan_context_update(num, &prefix, context_len, comp, lifetime);
+                context = lowpan_context_update(
+                        num, 
+                        &prefix, 
+                        opt_6co_hdr_buf->c_length, 
+                        comp, 
+                        HTONS(opt_6co_hdr_buf->val_ltime)
+                    );
                 found_contexts[found_con_len] = context;
                 found_con_len = (found_con_len + 1)%LOWPAN_CONTEXT_MAX;	// better solution here, i.e. some kind of stack
                 break;
@@ -513,7 +524,7 @@ void recv_rtr_adv(void){
             case(OPT_ABRO_TYPE):{
                 opt_abro_buf = get_opt_abro_buf(ipv6_ext_hdr_len, opt_hdr_len);
                 abro_found = 1;
-                abro_version = opt_abro_buf->version;
+                abro_version = HTONS(opt_abro_buf->version);
                 memcpy(&(abro_addr), &(opt_abro_buf->addr), sizeof(ipv6_addr_t));
                 break; 
             }
@@ -527,7 +538,8 @@ void recv_rtr_adv(void){
     if (abro_found) {
         abr_update_cache(abro_version,&abro_addr,found_contexts,found_con_len,found_prefixes,found_pref_len);
     }
-
+    mutex_unlock(&lowpan_context_mutex,0);
+    
     if(trigger_ns >= 0){
         /* send ns - draft-ietf-6lowpan-nd-15#section-5.5.1 
          * 
@@ -1020,7 +1032,7 @@ void nbr_cache_auto_rem(void){
             memmove(&(nbr_cache[i]),&(nbr_cache[nbr_count]), 
                     sizeof(nbr_cache_t));
             memset(&(nbr_cache[nbr_count]), 0, sizeof(nbr_cache_t));
-            nbr_count--;        
+            nbr_count--;
         }
     }
 }
@@ -1092,6 +1104,25 @@ abr_cache_t *abr_update_cache(
     abr->prefixes_num = prefixes_num;
     
     return abr;
+}
+
+void abr_remove_context(uint8_t cid) {
+    int i, j, k;
+    int removed;
+    for (i = 0; i < abr_count; i++) {
+        for(j = 0; j < abr_cache[i].contexts_num; j++) {
+            do {
+                removed = 0;
+                if (abr_cache[i].contexts[j]->num == cid) {
+                    removed = 1;
+                    for(k = j; k < abr_cache[i].contexts_num-1; k++) {
+                        abr_cache[i].contexts[j] = abr_cache[i].contexts[j+1];
+                    }
+                    abr_cache[i].contexts_num--;
+                }
+            } while (removed);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

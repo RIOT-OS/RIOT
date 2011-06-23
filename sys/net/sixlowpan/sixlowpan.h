@@ -3,6 +3,7 @@
 
 #define IP_PROCESS_STACKSIZE    2048
 #define NC_STACKSIZE            512
+#define CON_STACKSIZE           512
 
 /* fragment size in bytes*/
 #define FRAG_PART_ONE_HDR_LEN   4
@@ -24,13 +25,16 @@
 #include "transceiver.h"
 #include "sixlowip.h"
 #include <vtimer.h>
+#include <mutex.h>
+
+extern mutex_t lowpan_context_mutex;
 
 typedef struct lowpan_context_t {
     uint8_t num;
     ipv6_addr_t prefix;
     uint8_t length;
     uint8_t comp;
-    vtimer_t lifetime;
+    uint16_t lifetime;
 } lowpan_context_t;
 
 void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr);

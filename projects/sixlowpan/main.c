@@ -134,7 +134,7 @@ void context(char *str){
     for(i = 0; i < LOWPAN_CONTEXT_MAX; i++){
         context = lowpan_context_num_lookup(i);
         if (context != NULL) {
-            printf("%2d\tLength: %3d\t",context->num,context->length);
+            printf("%2d\tLifetime: %5u\tLength: %3d\t",context->num,context->lifetime,context->length);
             ipv6_print_addr(&(context->prefix));
         }
     }

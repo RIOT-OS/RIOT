@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
+#include <mutex.h>
 #include "ieee802154_frame.h"
 #include "sixlowedge.h"
 #include "sixlowip.h"
@@ -48,8 +49,10 @@ uint8_t edge_initialize(transceiver_type_t trans,ipv6_addr_t *edge_router_addr) 
 lowpan_context_t *edge_define_context(uint8_t cid, ipv6_addr_t *prefix, uint8_t prefix_len, uint16_t lifetime) {
     lowpan_context_t *context;
     
+    mutex_lock(&lowpan_context_mutex);
     context = lowpan_context_update(cid, prefix, prefix_len, OPT_6CO_FLAG_C_VALUE_SET, lifetime);
     abr_info_add_context(context);
+    mutex_unlock(&lowpan_context_mutex,0);
     return context;
 }
 

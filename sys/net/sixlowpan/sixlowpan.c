@@ -2,7 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <vtimer.h>
-#include "thread.h"
+#include <timex.h>
+#include <debug.h>
+#include <thread.h>
 #include <mutex.h>
 #include "msg.h"
 #include "sixlowmac.h"
@@ -33,16 +35,21 @@ uint8_t first_frag = 0;
 
 unsigned int ip_process_pid;
 unsigned int nd_nbr_cache_rem_pid = 0;
+unsigned int contexts_rem_pid = 0;
 
 iface_t iface;
 ipv6_addr_t lladdr;
 ieee_802154_long_t laddr;
 mutex_t buf_mutex;
+mutex_t lowpan_context_mutex;
 
 char ip_process_buf[IP_PROCESS_STACKSIZE];
 char nc_buf[NC_STACKSIZE];
+char con_buf[CON_STACKSIZE];
 lowpan_context_t contexts[LOWPAN_CONTEXT_MAX];
 uint8_t context_len = 0;
+
+void lowpan_context_auto_remove(void);
 
 /* deliver packet to mac*/
 void lowpan_init(ieee_802154_long_t *addr, uint8_t *data){
@@ -322,6 +329,7 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest){
         }
     }
 
+    mutex_lock(&lowpan_context_mutex);
     /* CID: Context Identifier Extension: */
     if((lowpan_context_lookup(&ipv6_buf->srcaddr) != NULL ) || 
        (lowpan_context_lookup(&ipv6_buf->destaddr) != NULL)){
@@ -496,7 +504,8 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest){
             hdr_pos += 16;
         }
     }
-
+    mutex_unlock(&lowpan_context_mutex,0);
+    
     comp_buf[0] = lowpan_iphc[0];
     comp_buf[1] = lowpan_iphc[1];
 
@@ -517,9 +526,6 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
     uint8_t sci = 0;
     uint8_t dci = 0;
     
- 
-
-
     uint8_t ll_prefix[2] = {0xfe, 0x80};
     uint8_t m_prefix[2] = {0xff, 0x02};
     lowpan_context_t *con = NULL;
@@ -608,7 +614,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
         ipv6_buf->hoplimit = ipv6_hdr_fields[hdr_pos];
         hdr_pos++;
     }
-
+    
     /* CID: Context Identifier Extension: + SAC: Source Address Compression */
     if(lowpan_iphc[1] & LOWPAN_IPHC_SAC){
         /* 1: Source address compression uses stateful, context-based
@@ -616,6 +622,8 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
         if(cid){
             sci = ipv6_hdr_fields[3] >> 4;
         }
+        
+        mutex_lock(&lowpan_context_mutex);
         /* check context number */
         if(((lowpan_iphc[1] & LOWPAN_IPHC_SAM) >> 4) & 0x03){
             con = lowpan_context_num_lookup(sci); 
@@ -656,7 +664,8 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                 memset(&(ipv6_buf->srcaddr.uint8[0]), 0, 16);
                 break;
             }
-        } 
+        }
+        mutex_unlock(&lowpan_context_mutex,0);
     } else {
         switch(((lowpan_iphc[1] & LOWPAN_IPHC_SAM) >> 4) & 0x03){
             case(0x01):{
@@ -702,6 +711,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
             if(cid){
                 dci = ipv6_hdr_fields[3] & 0x0f;
             }
+            mutex_lock(&lowpan_context_mutex);
             if((lowpan_iphc[1] & LOWPAN_IPHC_DAM) & 0x03){
                 con = lowpan_context_num_lookup(dci);    
             }
@@ -709,7 +719,8 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                 printf("ERROR: context not found\n");
                 return;
             }
-            // TODO:  
+            // TODO:
+            mutex_unlock(&lowpan_context_mutex,0);
         } else {
             /* If M=1 and DAC=0: */
             switch(lowpan_iphc[1] & 0x03){
@@ -763,6 +774,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
             if(cid){
                 dci = ipv6_hdr_fields[3] & 0x0f;
             }
+            mutex_lock(&lowpan_context_mutex);
             if((lowpan_iphc[1] & LOWPAN_IPHC_DAM) & 0x03){
                 con = lowpan_context_num_lookup(dci);
             }
@@ -797,6 +809,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                 default:
                     break;
             }
+            mutex_unlock(&lowpan_context_mutex,0);
         } else {
             switch((lowpan_iphc[1] & LOWPAN_IPHC_DAM) & 0x03){
                 case(0x01):{
@@ -849,28 +862,21 @@ void lowpan_context_remove(uint8_t num) {
     for(i = 0; i < LOWPAN_CONTEXT_MAX; i++){
         if(contexts[i].num == num){
             context_len--;
-//            vtimer_remove(&(contexts[i].lifetime));   Not implemented yet?
+            break;
         }
     }
     
-    for(j = 0; j < LOWPAN_CONTEXT_MAX; j++) {
+    abr_remove_context(num);
+    
+    for(j = i; j < LOWPAN_CONTEXT_MAX; j++) {
         contexts[j] = contexts[j+1];
     }
 }
 
-void lowpan_context_remove_cb(void* ptr) {
-    uint8_t num = *((uint8_t*)ptr);
-    lowpan_context_remove(num);
-}
-
 lowpan_context_t *lowpan_context_update(uint8_t num, const ipv6_addr_t *prefix, 
                         uint8_t length, uint8_t comp,
-                        uint16_t lifetime){
+                        uint16_t lifetime) {
     lowpan_context_t *context;
-    
-    timex_t lt;
-    
-    lt.nanoseconds = lifetime * 60 * 1000000;
     
     if (lifetime == 0){
         lowpan_context_remove(num);
@@ -892,11 +898,7 @@ lowpan_context_t *lowpan_context_update(uint8_t num, const ipv6_addr_t *prefix,
     memcpy((void*)(&context->prefix),(void*)prefix,length/8);
     context->length = length;
     context->comp = comp;
-    vtimer_set_cb(&(context->lifetime), 
-                  lt, 
-                  lowpan_context_remove_cb, 
-                  (void*)(&num));
-    
+    context->lifetime = lifetime;
     return context;
 }
 
@@ -929,6 +931,27 @@ lowpan_context_t * lowpan_context_num_lookup(uint8_t num){
     return NULL;
 }
 
+void lowpan_context_auto_remove(void) {
+    timex_t minute = timex_set(60,0);
+    int i;
+    int8_t to_remove[LOWPAN_CONTEXT_MAX];
+    int8_t to_remove_size;
+    while(1){
+        vtimer_sleep(minute);
+        to_remove_size = 0;
+        mutex_lock(&lowpan_context_mutex);
+        for(i = 0; i < lowpan_context_len(); i++) {
+            if (--(contexts[i].lifetime) == 0) {
+                to_remove[to_remove_size++] = contexts[i].num;
+            }
+        }
+        for(i = 0; i < to_remove_size; i++) {
+            lowpan_context_remove(to_remove[i]);
+        }
+        mutex_unlock(&lowpan_context_mutex,0);
+    }
+}
+
 void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr){
     ipv6_addr_t tmp;
     /* init mac-layer and radio transceiver */
@@ -941,6 +964,9 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr){
     init_802154_long_addr(&(iface.laddr));
     /* init global buffer mutex */
     mutex_init(&buf_mutex);
+    
+    /* init lowpan context mutex */
+    mutex_init(&lowpan_context_mutex);
 
     /* init link-local address */
     ipv6_set_ll_prefix(&lladdr);
@@ -962,7 +988,10 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr){
                                        ipv6_process, "ip_process");
     nd_nbr_cache_rem_pid = thread_create(nc_buf, NC_STACKSIZE,
                                          PRIORITY_MAIN-1, CREATE_STACKTEST,
-                                         nbr_cache_auto_rem, "nbr_cache_rem"); 
+                                         nbr_cache_auto_rem, "nbr_cache_rem");
+    contexts_rem_pid = thread_create(con_buf, CON_STACKSIZE, 
+                                     PRIORITY_MAIN+1, CREATE_STACKTEST,
+                                     lowpan_context_auto_remove, "lowpan_context_rem");
 }
 
 void sixlowpan_adhoc_init(transceiver_type_t trans, ipv6_addr_t *prefix, uint8_t r_addr){
