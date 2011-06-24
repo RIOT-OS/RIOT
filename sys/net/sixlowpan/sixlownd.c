@@ -299,7 +299,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
             contexts_len = msg_abr->contexts_num;
             contexts = (lowpan_context_t*)calloc(contexts_len, sizeof(lowpan_context_t));
             for (int i = 0; i < contexts_len; i++) {
-                contexts[i] = *(msg_abr->contexts[i]);
+                contexts[i] = *(lowpan_context_num_lookup(msg_abr->contexts[i]));
             }
         }
         for(int i = 0; i < contexts_len; i++){
@@ -387,15 +387,15 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
 void recv_rtr_adv(void){
     ipv6_buf = get_ipv6_buf();
     opt_hdr_len = RTR_ADV_LEN;
-    rtr_adv_buf = get_rtr_adv_buf(ipv6_ext_hdr_len);   
-    ipv6_addr_t newaddr;   
- 
+    rtr_adv_buf = get_rtr_adv_buf(ipv6_ext_hdr_len);
+    ipv6_addr_t newaddr;
+    
     int8_t trigger_ns = -1;
     int8_t abro_found = 0;
     int16_t abro_version = 0;    // later replaced, just to supress warnings
     ipv6_addr_t abro_addr;
     
-    lowpan_context_t *found_contexts[LOWPAN_CONTEXT_MAX];
+    uint8_t found_contexts[LOWPAN_CONTEXT_MAX];
     uint8_t found_con_len = 0;
     plist_t *found_prefixes[OPT_PI_LIST_LEN];
     uint8_t found_pref_len = 0;
@@ -517,7 +517,7 @@ void recv_rtr_adv(void){
                         comp, 
                         HTONS(opt_6co_hdr_buf->val_ltime)
                     );
-                found_contexts[found_con_len] = context;
+                found_contexts[found_con_len] = num;
                 found_con_len = (found_con_len + 1)%LOWPAN_CONTEXT_MAX;	// better solution here, i.e. some kind of stack
                 break;
             }
@@ -1098,7 +1098,7 @@ abr_cache_t *abr_update_cache(
     }
     abr->version = version;
     memcpy(&abr->abr_addr, abr_addr, sizeof (ipv6_addr_t));
-    memcpy(abr->contexts, contexts, contexts_num * sizeof (lowpan_context_t*));
+    memcpy(abr->contexts, contexts, contexts_num * sizeof (uint8_t));
     abr->contexts_num = contexts_num;
     memcpy(abr->prefixes, prefixes, prefixes_num * sizeof (lowpan_context_t*));
     abr->prefixes_num = prefixes_num;
@@ -1113,7 +1113,7 @@ void abr_remove_context(uint8_t cid) {
         for(j = 0; j < abr_cache[i].contexts_num; j++) {
             do {
                 removed = 0;
-                if (abr_cache[i].contexts[j]->num == cid) {
+                if (abr_cache[i].contexts[j] == cid) {
                     removed = 1;
                     for(k = j; k < abr_cache[i].contexts_num-1; k++) {
                         abr_cache[i].contexts[j] = abr_cache[i].contexts[j+1];

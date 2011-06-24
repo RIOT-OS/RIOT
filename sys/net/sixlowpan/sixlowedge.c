@@ -77,8 +77,7 @@ uint8_t abr_info_add_context(lowpan_context_t *context) {
     uint16_t abro_version = get_next_abro_version();
     int i;
     for (i = 0; i < abr_info->contexts_num; i++) {
-        if (abr_info->contexts[i]->num == context->num) {
-            abr_info->contexts[i] = context;
+        if (abr_info->contexts[i] == context->num) {
             abr_info->version = abro_version;
             return SUCCESS;
         }
@@ -88,7 +87,7 @@ uint8_t abr_info_add_context(lowpan_context_t *context) {
         return SIXLOWERROR_ARRAYFULL;
     }
     
-    abr_info->contexts[abr_info->contexts_num++] = context;
+    abr_info->contexts[abr_info->contexts_num++] = context->num;
     abr_info->version = abro_version;
     return SUCCESS;
 }
@@ -131,7 +130,6 @@ void init_edge_router_info(ipv6_addr_t *abr_addr) {
     abr_info_add_prefix(prefix_info);
     
     context = edge_define_context(0, &prefix, 64, 5);  // has to be reset some time later
-    abr_info_add_context(context);
 }
 
 abr_cache_t *get_edge_router_info() {

@@ -188,7 +188,7 @@ struct __attribute__ ((packed)) nbr_adv_t {
 typedef struct __attribute__((packed)) abr_cache_t {
     uint16_t version;
     ipv6_addr_t abr_addr;
-    lowpan_context_t *contexts[LOWPAN_CONTEXT_MAX];
+    uint8_t contexts[LOWPAN_CONTEXT_MAX];
     uint8_t contexts_num;
     plist_t *prefixes[OPT_PI_LIST_LEN];
     uint8_t prefixes_num;
@@ -223,8 +223,8 @@ plist_t *plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
 void set_llao(opt_stllao_t *sllao, uint8_t type, uint8_t length);
 abr_cache_t *abr_update_cache(
                     uint16_t version, ipv6_addr_t *abr_addr,
-                    lowpan_context_t **contexts, uint8_t contexts_num,
-                    plist_t **prefixes, uint8_t prefixes_num);
+                    uint8_t *contexts, uint8_t contexts_num);
+void abr_remove_context(uint8_t context);
 nbr_cache_t * nbr_cache_search(ipv6_addr_t *ipaddr);
 uint8_t nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr,
                    uint8_t isrouter, uint8_t state, uint8_t type,
@@ -240,5 +240,6 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
                   uint8_t slloa, uint8_t aro);
 void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt, 
                   uint8_t rso, uint8_t sllao, uint8_t aro, uint8_t aro_state);
+void recv_nbr_adv(void);
 void recv_nbr_sol(void);
 #endif /* SIXLOWND_H*/
