@@ -27,13 +27,13 @@ void sched_run();
 void sched_set_status(tcb_t *process, unsigned int status);
 void sched_switch(uint16_t current_prio, uint16_t other_prio, int in_isr);
 
-volatile unsigned int sched_context_switch_request;
+extern volatile unsigned int sched_context_switch_request;
 
-volatile tcb_t *sched_threads[MAXTHREADS];
-volatile tcb_t *active_thread;
+extern volatile tcb_t *sched_threads[MAXTHREADS];
+extern volatile tcb_t *active_thread;
 
 extern volatile int num_tasks;
-volatile int thread_pid;
+extern volatile int thread_pid;
 
 //#define SCHEDSTATISTICS
 #if SCHEDSTATISTICS
