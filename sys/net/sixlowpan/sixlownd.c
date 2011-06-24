@@ -57,6 +57,11 @@ def_rtr_lst_t *def_rtr_entry;
 /* elements */
 //ipv6_addr_t tmpaddr;
 
+uint8_t recvd_contexts[LOWPAN_CONTEXT_MAX];
+uint8_t recvd_con_len = 0;
+plist_t *recvd_prefixes[OPT_PI_LIST_LEN];
+uint8_t recvd_pref_len = 0;
+
 static abr_cache_t* abr_get_most_current();
 static abr_cache_t* abr_get_oldest();
 
@@ -219,6 +224,8 @@ void get_opt_6co_flags(uint8_t *compression_flag, uint8_t *cid, uint8_t flags) {
 
 void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi, 
                   uint8_t sixco, uint8_t abro){
+    lowpan_context_t *contexts = NULL;
+    
     abr_cache_t *msg_abr = NULL;
     ipv6_buf = get_ipv6_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);    
@@ -289,7 +296,6 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
     
     if(sixco == OPT_6CO){
         /* set 6lowpan context option */
-        lowpan_context_t *contexts = NULL;
         int contexts_len = 0;
         mutex_lock(&lowpan_context_mutex);
         if (msg_abr == NULL) {
@@ -320,18 +326,18 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
             // attach prefixes
             opt_6co_prefix_buf = get_opt_6co_prefix_buf(ipv6_ext_hdr_len, opt_hdr_len);
             
-            uint8_t target_size;
             if (opt_6co_hdr_buf->c_length > 64) {
-                target_size = 16;
+                memset((void*)opt_6co_prefix_buf,0,16);
+                memcpy((void*)opt_6co_prefix_buf, (void*)&(contexts[i].prefix.uint8[0]), opt_6co_hdr_buf->c_length / 8);
+                opt_hdr_len += 16;
+                packet_length += 16;
             } else {
-                target_size = 8;
+                memset((void*)opt_6co_prefix_buf,0,8);
+                memcpy((void*)opt_6co_prefix_buf, (void*)&(contexts[i].prefix.uint8[0]), opt_6co_hdr_buf->c_length / 8);
+                opt_hdr_len += 8;
+                packet_length += 8;
             }
             
-            memset((void*)opt_6co_prefix_buf,0,target_size);
-            memcpy((void*)opt_6co_prefix_buf, (void*)&(contexts[i].prefix.uint8[0]), opt_6co_hdr_buf->c_length / 8);
-            
-            opt_hdr_len += target_size;
-            packet_length += target_size;
         }
         
         if (msg_abr != NULL && contexts != NULL) {
@@ -385,20 +391,16 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
 }
 
 void recv_rtr_adv(void){
-    ipv6_buf = get_ipv6_buf();
-    opt_hdr_len = RTR_ADV_LEN;
-    rtr_adv_buf = get_rtr_adv_buf(ipv6_ext_hdr_len);
-    ipv6_addr_t newaddr;
-    
     int8_t trigger_ns = -1;
     int8_t abro_found = 0;
     int16_t abro_version = 0;    // later replaced, just to supress warnings
     ipv6_addr_t abro_addr;
     
-    uint8_t found_contexts[LOWPAN_CONTEXT_MAX];
-    uint8_t found_con_len = 0;
-    plist_t *found_prefixes[OPT_PI_LIST_LEN];
-    uint8_t found_pref_len = 0;
+    ipv6_buf = get_ipv6_buf();
+    opt_hdr_len = RTR_ADV_LEN;
+    rtr_adv_buf = get_rtr_adv_buf(ipv6_ext_hdr_len);
+    ipv6_addr_t newaddr;
+    recvd_con_len = 0;
 
     /* update interface reachable time and retrans timer */
     if(rtr_adv_buf->reachable_time != 0){
@@ -517,8 +519,8 @@ void recv_rtr_adv(void){
                         comp, 
                         HTONS(opt_6co_hdr_buf->val_ltime)
                     );
-                found_contexts[found_con_len] = num;
-                found_con_len = (found_con_len + 1)%LOWPAN_CONTEXT_MAX;	// better solution here, i.e. some kind of stack
+                recvd_contexts[recvd_con_len] = num;
+                recvd_con_len = (recvd_con_len + 1)%LOWPAN_CONTEXT_MAX;	// better solution here, i.e. some kind of stack
                 break;
             }
             case(OPT_ABRO_TYPE):{
@@ -536,7 +538,7 @@ void recv_rtr_adv(void){
     }
     
     if (abro_found) {
-        abr_update_cache(abro_version,&abro_addr,found_contexts,found_con_len,found_prefixes,found_pref_len);
+        abr_update_cache(abro_version,&abro_addr,recvd_contexts,recvd_con_len,recvd_prefixes,recvd_pref_len);
     }
     mutex_unlock(&lowpan_context_mutex,0);
     
