@@ -66,7 +66,7 @@ extern double start;
 #define COMPRESSION_TYPE_NONE       
 
 /* buffer */
-uint8_t buffer[BUFFER_SIZE];
+extern uint8_t buffer[BUFFER_SIZE];
 
 
 /* ipv6 extension header length */

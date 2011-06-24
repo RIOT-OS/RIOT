@@ -8,6 +8,7 @@
 #include "sixlownd.h"
 #include "sixlowpan.h"
 
+uint8_t buffer[BUFFER_SIZE];
 msg msg_queue[IP_PKT_RECV_BUF_SIZE];
 struct ipv6_hdr_t* ipv6_buf;
 struct icmpv6_hdr_t* icmp_buf;
