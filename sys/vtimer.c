@@ -4,7 +4,7 @@
 #include <queue.h>
 #include <timex.h>
 #include <hwtimer.h>
-
+#include <msg.h>
 #include <thread.h>
 
 #include <vtimer.h>
@@ -51,7 +51,6 @@ static int update_shortterm() {
         }
     }
 
-
     hwtimer_next_absolute = shortterm_queue_root.next->priority;
 
     unsigned int next = hwtimer_next_absolute + longterm_tick_start;
@@ -60,9 +59,10 @@ static int update_shortterm() {
     if((next - VTIMER_THRESHOLD - now) > NANOSECONDS_PER_TICK ) {
         next = now + VTIMER_BACKOFF;
     }
-
+    
+    
     hwtimer_id = hwtimer_set_absolute(next, vtimer_callback, NULL);
-
+    printf("hw_id: %i\n", hwtimer_id);
     DEBUG("update_shortterm: Set hwtimer to %lu (now=%lu)\n", hwtimer_next_absolute + longterm_tick_start, hwtimer_now());
     return 0;
 }
@@ -104,8 +104,17 @@ void vtimer_callback(void *ptr) {
 
     DEBUG("vtimer_callback(): Shooting %lu.\n", timer->absolute.nanoseconds);
 
+    printf("timer pid: %i\n", timer->pid);
+
     /* shoot timer */
-    timer->action(timer->arg);
+    if(timer->pid != 0){
+        /* ugly*/
+        msg_t msg; 
+        msg.content.value = (unsigned int) timer->arg;
+        msg_send_int(&msg, timer->pid);
+    } else {
+        timer->action(timer->arg);
+    }    
 
     in_callback = false;
     update_shortterm();
@@ -220,3 +229,21 @@ int vtimer_set_cb(vtimer_t *t, timex_t interval, void (*f_ptr)(void *), void *pt
     return vtimer_set(t);
 }
 
+int vtimer_remove(vtimer_t *t){
+    queue_remove(&shortterm_queue_root, (queue_node_t*)t);
+    queue_remove(&longterm_queue_root, (queue_node_t*)t);
+  
+    update_shortterm();
+ 
+    if (! inISR() ) eINT();
+    return 0; 
+}
+
+int vtimer_set_msg(vtimer_t *t, timex_t interval, int pid, void *ptr){
+    t->action = (void* ) msg_send_int;
+    t->arg = (void*) ptr;
+    t->absolute = interval;
+    t->pid = pid; 
+    vtimer_set(t);
+    return 0;
+}

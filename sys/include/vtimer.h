@@ -22,6 +22,8 @@
 #include <queue.h>
 #include <timex.h>
 
+#define MSG_TIMER 12345
+
 /**
  * A vtimer object.
  *
@@ -34,6 +36,7 @@ typedef struct vtimer_t {
     timex_t absolute;
     void(*action)(void*);
     void* arg;
+    int pid;
 } vtimer_t;
 
 /**

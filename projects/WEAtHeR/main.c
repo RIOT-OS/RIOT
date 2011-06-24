@@ -34,9 +34,13 @@
 #include "weather_protocol.h"
 #include "protocol_msg_gateway.h"
 
-/* some local defines */
 #define SECOND  (1000 * 1000)
-#define MINUTE  (1 * SECOND)
+#define MINUTE  (60 * SECOND)
+
+#define SENDING_INTERVAL    (1 * SECOND)
+
+#define SHELL_STACK_SIZE    (2048)
+#define PH_STACK_SIZE    (2048)
 
 /* size of weather data packet without hop list */
 #define EMPTY_WDP_SIZE  (sizeof(weather_data_pkt_t) - MAX_HOP_LIST)

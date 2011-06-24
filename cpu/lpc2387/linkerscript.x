@@ -76,6 +76,16 @@ SECTIONS
 		__cfgspec_end = .;		
 		. = ALIGN(4);
 		
+		__ctors_start = .;
+        	PROVIDE (_os_ctor_start = .);
+        	*(.ctors);
+        	KEEP (*(.init_array))
+        	PROVIDE (_os_ctor_end = .);
+		__ctors_end = .;
+	        *(.dtors);
+	        LONG (0);
+
+
 		*(.rodata .rodata.*)			/* all .rodata sections (constants, strings, etc.)  */
 		*(.gnu.linkonce.r.*)
 		*(.glue_7)						/* all .glue_7 sections  (no idea what these are) */
@@ -110,6 +120,40 @@ SECTIONS
 	 * RAM
 	 **************************************************************************/
 
+
+	.ctors (NOLOAD) :
+
+	{
+
+	    . = ALIGN(4096);
+
+	    start_ctors = .;
+
+	    *(.init_array);
+
+	    *(.ctors);
+
+	    end_ctors = .;
+
+	}
+
+
+
+	.dtors (NOLOAD) :
+
+	{
+
+	    . = ALIGN(4096);
+
+	    start_dtors = .;
+
+	    *(.fini_array);
+
+	    *(.dtors);
+
+	    end_dtors = .;
+	}
+
 	/*
 	 * collect all uninitialized sections that go into RAM
 	 */	
@@ -131,6 +175,7 @@ SECTIONS
 		. = ALIGN(4);					/* ensure data is aligned so relocation can use 4-byte operations */
 		__bss_start = .;				/* define a global symbol marking the start of the .bss section */
 		*(.bss)							/* all .bss sections  */
+		*(.bss*)						/* all .bss sections  */
 		*(COMMON)
 	} > ram								/* put all the above in RAM (it will be cleared in the startup code */
 	. = ALIGN(4);						/* ensure data is aligned so relocation can use 4-byte operations */
