@@ -2,6 +2,7 @@
 #include "sixlownd.h"
 #include "sixlowmac.h"
 #include "sixlowpan.h"
+#include "sixlowerror.h"
 #include "serialnumber.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -347,39 +348,21 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
     }
 
     if(pi == OPT_PI){
-        plist_t *prefixes = NULL;
-        int plist_len = 0;
-        
-        if (msg_abr == NULL) {
-            prefixes = plist;
-            plist_len = OPT_PI_LIST_LEN;
-        } else {
-            plist_len = msg_abr->prefixes_num;
-            prefixes = (plist_t*)calloc(plist_len, sizeof(plist_t));
-            for (int i = 0; i < plist_len; i++) {
-                prefixes[i] = *(msg_abr->prefixes[i]);
-            }
-        }
-        
         /* set prefix option */
-        for(int i=0;i<plist_len; i++){
-            if(prefixes[i].inuse && prefixes[i].adv){
+        for(int i=0;i<OPT_PI_LIST_LEN; i++){
+            if(plist[i].inuse && plist[i].adv){
                 opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, opt_hdr_len);
-                memcpy(&(opt_pi_buf->addr.uint8[0]), &(prefixes[i].addr.uint8[0]), 16);
+                memcpy(&(opt_pi_buf->addr.uint8[0]), &(plist[i].addr.uint8[0]), 16);
                 opt_pi_buf->type = OPT_PI_TYPE;
                 opt_pi_buf->length = OPT_PI_LEN;
-                opt_pi_buf->prefix_length = prefixes[i].length;
-                opt_pi_buf->l_a_reserved1 = prefixes[i].l_a_reserved1;
-                opt_pi_buf->val_ltime = HTONL(prefixes[i].val_ltime);
-                opt_pi_buf->pref_ltime = HTONL(prefixes[i].pref_ltime);
+                opt_pi_buf->prefix_length = plist[i].length;
+                opt_pi_buf->l_a_reserved1 = plist[i].l_a_reserved1;
+                opt_pi_buf->val_ltime = HTONL(plist[i].val_ltime);
+                opt_pi_buf->pref_ltime = HTONL(plist[i].pref_ltime);
                 opt_pi_buf->reserved2 = 0;
                 packet_length += OPT_PI_HDR_LEN;
                 opt_hdr_len += OPT_PI_HDR_LEN;
             }
-        }
-        
-        if (msg_abr != NULL && prefixes != NULL) {
-            free(prefixes);
         }
     }
 
@@ -538,7 +521,7 @@ void recv_rtr_adv(void){
     }
     
     if (abro_found) {
-        abr_update_cache(abro_version,&abro_addr,recvd_contexts,recvd_con_len,recvd_prefixes,recvd_pref_len);
+        abr_update_cache(abro_version,&abro_addr,recvd_contexts,recvd_con_len);
     }
     mutex_unlock(&lowpan_context_mutex,0);
     
@@ -1090,8 +1073,7 @@ static abr_cache_t *abr_get_oldest(){
 
 abr_cache_t *abr_update_cache(
                     uint16_t version, ipv6_addr_t *abr_addr,
-                    lowpan_context_t **contexts, uint8_t contexts_num,
-                    plist_t **prefixes, uint8_t prefixes_num){
+                    uint8_t *contexts, uint8_t contexts_num){
     abr_cache_t *abr = NULL;
     if (abr_count == ABR_CACHE_SIZE) {
         abr = abr_get_oldest();
@@ -1102,8 +1084,6 @@ abr_cache_t *abr_update_cache(
     memcpy(&abr->abr_addr, abr_addr, sizeof (ipv6_addr_t));
     memcpy(abr->contexts, contexts, contexts_num * sizeof (uint8_t));
     abr->contexts_num = contexts_num;
-    memcpy(abr->prefixes, prefixes, prefixes_num * sizeof (lowpan_context_t*));
-    abr->prefixes_num = prefixes_num;
     
     return abr;
 }
@@ -1170,11 +1150,10 @@ void def_rtr_lst_rem(def_rtr_lst_t *entry){
 //------------------------------------------------------------------------------
 // prefix list functions
 
-plist_t *plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
+int8_t plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
              uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1){
     if(prefix_count == OPT_PI_LIST_LEN){
-        printf("ERROR: prefix list full\n");
-        return NULL;
+        return SIXLOWERROR_ARRAYFULL;
     } else {
         plist[prefix_count].inuse = 1;
         plist[prefix_count].length = size;
@@ -1184,6 +1163,6 @@ plist_t *plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
         plist[prefix_count].pref_ltime = HTONL(pref_ltime);
         memcpy(&(plist[prefix_count].addr.uint8[0]), &(addr->uint8[0]), 16);
 
-        return &(plist[prefix_count++]);
+        return SUCCESS;
     }
 }

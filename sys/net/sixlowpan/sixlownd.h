@@ -190,8 +190,6 @@ typedef struct __attribute__((packed)) abr_cache_t {
     ipv6_addr_t abr_addr;
     uint8_t contexts[LOWPAN_CONTEXT_MAX];
     uint8_t contexts_num;
-    plist_t *prefixes[OPT_PI_LIST_LEN];
-    uint8_t prefixes_num;
 } abr_cache_t;
 
 /* neighbor cache - rfc4861 5.1. */
@@ -218,7 +216,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
                   uint8_t sixco, uint8_t abro);
 uint8_t plist_search(ipv6_addr_t *addr);
 uint8_t plist_cmp(ipv6_addr_t *addr1, ipv6_addr_t *addr2);
-plist_t *plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
+int8_t plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
              uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
 void set_llao(opt_stllao_t *sllao, uint8_t type, uint8_t length);
 abr_cache_t *abr_update_cache(
