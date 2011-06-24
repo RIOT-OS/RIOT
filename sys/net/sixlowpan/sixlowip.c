@@ -64,14 +64,14 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len){
 }
 
 void ipv6_process(void){
-    msg m;
+    msg m[1];
     msg_init_queue(msg_queue, IP_PKT_RECV_BUF_SIZE);
     
     while(1){
-        msg_receive(&m);
-
+        msg_receive(m);
+        
         ipv6_buf = get_ipv6_buf();
-        ipv6_buf = (struct ipv6_hdr_t*) m.content.ptr;
+        //ipv6_buf = (struct ipv6_hdr_t*) m.content.ptr;
 
         /* identifiy packet */
         nextheader = &ipv6_buf->nextheader;
@@ -87,7 +87,7 @@ void ipv6_process(void){
                     case(ICMP_RTR_SOL):{
                         printf("INFO: packet type: icmp router solicitation\n");
                         /* processing router solicitation */
-                        recv_rtr_sol();    
+                        recv_rtr_sol();
                         /* init solicited router advertisment*/
                         break;
                     }
@@ -105,16 +105,17 @@ void ipv6_process(void){
                     }
                     case(ICMP_NBR_ADV):{
                         printf("INFO: packet type: icmp neighbor advertisment\n");
+                        recv_nbr_adv();
+                        break;
                     }
                     default:
                         break;
-                }            
+                }
                 break;
             }
             case(PROTO_NUM_NONE):{
-                //printf("Packet with no Header following the IPv6 Header received\n");
                 //uint8_t *ptr = get_payload_buf(ipv6_ext_hdr_len);
-                printf("hello\n");
+                printf("INFO: Packet with no Header following the IPv6 Header received.\n");
             }
             default:
                 break;
