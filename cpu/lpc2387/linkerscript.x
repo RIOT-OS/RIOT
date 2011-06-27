@@ -174,7 +174,6 @@ SECTIONS
 	{
 		. = ALIGN(4);					/* ensure data is aligned so relocation can use 4-byte operations */
 		__bss_start = .;				/* define a global symbol marking the start of the .bss section */
-		*(.bss)							/* all .bss sections  */
 		*(.bss*)						/* all .bss sections  */
 		*(COMMON)
 	} > ram								/* put all the above in RAM (it will be cleared in the startup code */
