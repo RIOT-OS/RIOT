@@ -22,7 +22,7 @@
  */
 
 #include <stdbool.h>
-#include <config.h>
+#include "config.h"
 #include "tcb.h"
 #include "cpu.h"
 #include "flags.h"
