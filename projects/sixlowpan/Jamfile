@@ -6,7 +6,7 @@
 
 SubDir TOP projects sixlowpan ;
 
-Module sixlowpan : main.c ;
+Module sixlowpan : main.c : ps shell_commands config ;
 
 UseModule sixlowpan ;
 UseModule shell ;
