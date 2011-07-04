@@ -140,13 +140,13 @@ void init_rtr_sol(uint8_t sllao){
     ipv6_get_saddr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
 
     opt_hdr_len = RTR_SOL_LEN;
-    ipv6_buf->length = ICMPV6_HDR_LEN + RTR_SOL_LEN + OPT_STLLAO_LEN; 
+    ipv6_buf->length = ICMPV6_HDR_LEN + RTR_SOL_LEN + OPT_STLLAO_MAX_LEN; 
         
     if(sllao == OPT_SLLAO){
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
         set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 2);
         packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
-                        RTR_SOL_LEN + OPT_STLLAO_LEN;
+                        RTR_SOL_LEN + OPT_STLLAO_MAX_LEN;
     } else {
         packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len + 
                             RTR_SOL_LEN;
@@ -265,9 +265,9 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
     if(sllao == OPT_SLLAO){
         /* set link layer address option */
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
-        set_llao(opt_stllao_buf,OPT_STLLAO_LEN, 2);
-        opt_hdr_len += OPT_STLLAO_LEN;
-        packet_length += OPT_STLLAO_LEN;
+        set_llao(opt_stllao_buf,OPT_SLLAO_TYPE, 2);
+        opt_hdr_len += OPT_STLLAO_MAX_LEN;
+        packet_length += OPT_STLLAO_MAX_LEN;
     }
     
     if(mtu == OPT_MTU){
@@ -587,9 +587,9 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
             /* set sllao option */
             opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
             set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 1);
-            opt_hdr_len += OPT_STLLAO_LEN;
+            opt_hdr_len += OPT_STLLAO_MIN_LEN;
 
-            packet_length += OPT_STLLAO_LEN;
+            packet_length += OPT_STLLAO_MIN_LEN;
         }
     }
 
@@ -803,9 +803,9 @@ void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
         /* set sllao option */
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
         set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 1);
-        opt_hdr_len += OPT_STLLAO_LEN;
+        opt_hdr_len += OPT_STLLAO_MIN_LEN;
 
-        packet_length += OPT_STLLAO_LEN;
+        packet_length += OPT_STLLAO_MIN_LEN;
     }
 
     if(aro == OPT_ARO){

@@ -31,7 +31,8 @@
 #define ICMP_NBR_ADV                    136
 #define ICMP_NBR_SOL                    135 
 /* stllao option rfc4861 4.6.1 */
-#define OPT_STLLAO_LEN                  16
+#define OPT_STLLAO_MIN_LEN              8
+#define OPT_STLLAO_MAX_LEN              16
 #define OPT_SLLAO_TYPE                  1
 #define OPT_TLLAO_TYPE                  2  
 /* prefix info option rfc 4.6.2 */     
