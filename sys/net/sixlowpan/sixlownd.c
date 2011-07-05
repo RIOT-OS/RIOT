@@ -813,10 +813,10 @@ void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
         opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len, opt_hdr_len);
         opt_aro_buf->type = OPT_ARO_TYPE;
         opt_aro_buf->length = OPT_ARO_LEN;
-        opt_aro_buf->status = 0;
+        opt_aro_buf->status = 0;    // TODO
         opt_aro_buf->reserved1 = 0;
         opt_aro_buf->reserved2 = 0;
-        memcpy(&(opt_aro_buf->eui64), mac_get_eui(src),8);
+        memcpy(&(opt_aro_buf->eui64), mac_get_eui(dst),8);
         opt_hdr_len += OPT_ARO_HDR_LEN;
 
         packet_length += OPT_ARO_HDR_LEN;
