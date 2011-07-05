@@ -66,6 +66,18 @@ uint8_t recvd_pref_len = 0;
 static abr_cache_t* abr_get_most_current();
 static abr_cache_t* abr_get_oldest();
 
+int min(int a, int b) {
+    if (a < b) {
+        return a;
+    } else {
+        return b;
+    }
+}
+
+static struct para_prob_t* get_para_prob_buf(uint8_t ext_len){
+    return ((struct para_prob_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+}
+
 static struct rtr_adv_t* get_rtr_adv_buf(uint8_t ext_len){
     return ((struct rtr_adv_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
 }
@@ -970,6 +982,42 @@ uint16_t icmpv6_csum(uint8_t proto){
     sum = csum(sum,(uint8_t*)get_icmpv6_buf(0),len);
     
     return (sum == 0) ? 0xffff : HTONS(sum);
+}
+
+
+void init_para_prob(ipv6_addr_t *src, ipv6_addr_t *dest, uint8_t code, uint32_t pointer, uint8_t *packet, uint8_t packet_len) {
+    struct para_prob_t *para_prob_buf;
+    
+    
+    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + PARA_PROB_LEN;
+    
+    memcpy(&(ipv6_buf[packet_length]),packet,min(MTU-packet_length,packet_len));
+    
+    ipv6_buf = get_ipv6_buf();
+    ipv6_buf->version_trafficclass = IPV6_VER;
+    ipv6_buf->trafficclass_flowlabel = 0;
+    ipv6_buf->flowlabel = 0;
+    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
+    ipv6_buf->hoplimit = ND_HOPLIMIT;
+    
+    ipv6_ext_hdr_len = 0;
+    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
+    icmp_buf->type = ICMP_PARA_PROB;
+    icmp_buf->code = code;
+    
+    memcpy(&(ipv6_buf->destaddr.uint8[0]), &(dest->uint8[0]), 16);
+    memcpy(&(ipv6_buf->srcaddr.uint8[0]), &(src->uint8[0]), 16);
+    
+    para_prob_buf = get_para_prob_buf(ipv6_ext_hdr_len);
+    
+    para_prob_buf->pointer = pointer;
+        
+    packet_length += min(MTU-packet_length,packet_len);
+    
+    ipv6_buf->length = packet_length - IPV6_HDR_LEN;
+    
+    icmp_buf->checksum = 0;
+    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
 }
 
 //------------------------------------------------------------------------------

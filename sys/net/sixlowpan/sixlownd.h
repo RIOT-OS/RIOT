@@ -8,6 +8,11 @@
 #include "sixlowpan.h"
 #include "sixlowip.h"
 
+/* parameter problem [rfc4443] */
+#define PARA_PROB_LEN                   8
+#define PARA_PROB_CODE_ERR              0   /* Erroneous header field encountered */
+#define PARA_PROB_NXT_HDR_UNREC         1   /* Unrecognized Next Header type encountered */
+#define PARA_PROB_IPV6_OPT_UNREC        2   /* Unrecognized IPv6 option encountered */
 /* router solicitation */
 #define RTR_SOL_LEN                     4
 #define RTR_SOL_INTERVAL                4
@@ -25,6 +30,8 @@
 #define NBR_ADV_FLAG_R                  0x80
 #define NBR_ADV_FLAG_S                  0x40
 #define NBR_ADV_FLAG_O                  0x20
+/* icmp message types rfc4443 */
+#define ICMP_PARA_PROB                  4 
 /* icmp message types rfc4861 4.*/
 #define ICMP_RTR_ADV                    134
 #define ICMP_RTR_SOL                    133
@@ -185,6 +192,10 @@ struct __attribute__ ((packed)) nbr_adv_t {
     ipv6_addr_t tgtaddr;  
 };
 
+struct __attribute__ ((packed)) para_prob_t {
+    uint8_t pointer;
+};
+
 /* authoritive border router cache - draft-draft-ietf-6lowpan-nd-17 */
 typedef struct __attribute__((packed)) abr_cache_t {
     uint16_t version;
@@ -235,6 +246,7 @@ uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len);
 def_rtr_lst_t * def_rtr_lst_search(ipv6_addr_t *ipaddr);
 void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime);
 void def_rtr_lst_rem(def_rtr_lst_t *entry);
+void init_para_prob(ipv6_addr_t *src, ipv6_addr_t *dest, uint8_t code, uint32_t pointer, uint8_t *packet, uint8_t packet_len);
 void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
                   uint8_t slloa, uint8_t aro);
 void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt, 
