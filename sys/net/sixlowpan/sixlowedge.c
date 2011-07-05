@@ -1,14 +1,35 @@
 #include <stdint.h>
+#include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <mutex.h>
+
+#include <posix_io.h>
+#include <board_uart0.h>
 #include "ieee802154_frame.h"
 #include "sixlowedge.h"
 #include "sixlowip.h"
+#include "sixlownd.h"
 #include "serialnumber.h"
 #include "sixlowerror.h"
 
+#define DC3         0x0D
+#define END         0xC0
+#define ESC         0xDB
+#define END_ESC     0xDC
+#define ESC_ESC     0xDD
+#define DC3_ESC     0xDE
+
 abr_cache_t *abr_info;
 uint16_t abro_version;
+uint8_t edge_out_buf[EDGE_BUFFER_SIZE];
+mutex_t edge_out_buf_mutex;
+
+uint8_t edge_in_buf[EDGE_BUFFER_SIZE];
+mutex_t edge_in_buf_mutex;
+
+edge_packet_t *uart_buf;
+edge_l3_header_t *l3_buf;
 
 uint16_t get_next_abro_version();
 void init_edge_router_info(ipv6_addr_t *abr_addr);
@@ -35,6 +56,11 @@ uint8_t edge_initialize(transceiver_type_t trans,ipv6_addr_t *edge_router_addr) 
     if (edge_router_addr->uint8[14] != 0) {
         return SIXLOWERROR_ADDRESS;
     }
+    
+    posix_open(uart0_handler_pid, 0);
+    
+    mutex_init(&edge_in_buf_mutex);
+    mutex_init(&edge_out_buf_mutex);
     
     sixlowpan_init(trans,edge_router_addr->uint8[15]);
     
@@ -111,6 +137,116 @@ void init_edge_router_info(ipv6_addr_t *abr_addr) {
     plist_add(&prefix, 64, OPT_PI_VLIFETIME_INFINITE,0,1,OPT_PI_FLAG_A);
     
     context = edge_define_context(0, &prefix, 64, 5);  // has to be reset some time later
+}
+
+int readpacket(uint8_t *packet_buf, int size) {
+    uint8_t *line_buf_ptr = packet_buf;
+    uint8_t byte = ~END;
+    uint8_t esc = 0;
+    
+    while (byte != END) {
+        byte = uart0_readc();
+        
+        if ( (line_buf_ptr - packet_buf) >= size-1) {
+            return -SIXLOWERROR_ARRAYFULL;
+        }
+
+        if (byte == DC3) continue;
+        
+        if (esc) {
+            switch (byte) {
+                case(END_ESC):{
+                    byte = END;
+                    break;
+                }
+                case(ESC_ESC):{
+                    byte = ESC;
+                    break;
+                }
+                case(DC3_ESC):{
+                    byte = DC3;
+                    break;
+                }
+                default:
+                    break;
+            }
+            
+            esc = 0;
+        }
+                
+        if (byte == ESC) {
+            esc = 1;
+            continue;
+        }
+        
+        *line_buf_ptr++ = byte;
+    }
+    
+    return (line_buf_ptr - packet_buf - 1);
+}
+
+void edge_process_uart(void) {
+    int status;
+    uint8_t packet_buf[EDGE_BUFFER_SIZE];
+    while(1) {
+        status = readpacket(packet_buf, EDGE_BUFFER_SIZE);
+        if (status < 0) {
+            switch (status) {
+                case (-SIXLOWERROR_ARRAYFULL):{
+                    printf("ERROR: (%s:%d) Array was full\n",__FILE__,__LINE__);
+                    break;
+                }
+                default:{
+                    printf("ERROR: unknown\n");
+                    break;
+                }
+            }
+            continue;
+        }
+        mutex_lock(&edge_in_buf_mutex);
+        memcpy(edge_in_buf,packet_buf,status);
+        uart_buf = (edge_packet_t*)edge_in_buf;
+        if (uart_buf->reserved == 0) {
+            switch (uart_buf->type) {
+                case (EDGE_PACKET_ACK_TYPE):{
+                    printf("INFO: ACK\n");
+                    //edge_ack_package(uart_buf->seq_num);
+                    break;
+                }
+                case (EDGE_PACKET_CONF_TYPE):{
+                    printf("INFO: CONF\n");
+                    // TODO
+                    break;
+                }
+                case (EDGE_PACKET_L3_TYPE):{
+                    l3_buf = (edge_l3_header_t*)uart_buf;
+                    printf("INFO: L3-Packet\n");
+                    // TODO
+                    //edge_send_ack(l3_buf->seq_num);
+                    
+                    switch (l3_buf->ethertype) {
+                        case(EDGE_ETHERTYPE_IPV6):{
+                            printf("INFO: IPv6-Packet\n");
+                            struct ipv6_hdr_t *ipv6_buf = (struct ipv6_hdr_t *)(edge_in_buf + sizeof (edge_l3_header_t));
+                            printf("Next-Header: %s\n",(ipv6_buf->nextheader == PROTO_NUM_ICMPV6) ? "ICMPv6" : "Not ICMPv6");
+                            //edge_send_ipv6_over_lowpan(ipv6_buf);
+                            break;
+                        }
+                        default:{
+                        printf("ERROR: Unknown Layer-3-Type %04x\n",l3_buf->ethertype);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                default:{
+                    printf("ERROR: Unknown Packet-Type %d\n",uart_buf->type);
+                    break;
+                }
+            }
+        }
+        mutex_unlock(&edge_in_buf_mutex,0);
+    }
 }
 
 abr_cache_t *get_edge_router_info() {
