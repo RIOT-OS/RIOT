@@ -165,4 +165,5 @@ void set_remaining_time(vtimer_t *t, uint32_t time);
 void ipv6_set_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix);
 uint8_t ipv6_addr_unspec_match(ipv6_addr_t *addr);
 uint8_t ipv6_addr_sol_node_mcast_match(ipv6_addr_t *addr);
+uint8_t ipv6_next_hdr_unrec(uint8_t next_hdr);
 #endif /* SIXLOWIP_H*/

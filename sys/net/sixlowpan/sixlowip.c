@@ -369,6 +369,12 @@ void ipv6_print_addr(ipv6_addr_t *ipaddr){
         ((uint8_t *)ipaddr)[15]);      
 }
 
+uint8_t ipv6_next_hdr_unknown(uint8_t next_hdr) {
+    return  next_hdr == PROTO_NUM_ICMPV6 ||
+            next_hdr == PROTO_NUM_NONE;
+}
+
+
 uint32_t get_remaining_time(vtimer_t *t){
     timex_t time;
     time = vtimer_remaining(t);
