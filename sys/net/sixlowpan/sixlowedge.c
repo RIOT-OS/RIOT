@@ -185,6 +185,43 @@ int readpacket(uint8_t *packet_buf, int size) {
     return (line_buf_ptr - packet_buf - 1);
 }
 
+int writepacket(uint8_t *packet_buf, size_t size) {
+    uint8_t *byte_ptr = packet_buf;
+    
+    while ((byte_ptr - packet_buf) < size) {
+        if ((byte_ptr - packet_buf) > EDGE_BUFFER_SIZE) {
+            return -1;
+        }
+        
+        switch (*byte_ptr) {
+            case(DC3):{
+                *byte_ptr = DC3_ESC;
+                goto write_esc;
+            }
+            case(END):{
+                *byte_ptr = END_ESC;
+                goto write_esc;
+            }
+            case(ESC):{
+                *byte_ptr = ESC_ESC;
+                goto write_esc;
+            }
+            default:{
+                goto write_byte;
+            }
+        }
+        write_esc:
+            uart0_putc(ESC);
+        write_byte:
+            uart0_putc(*byte_ptr);
+        byte_ptr++;
+    }
+    
+    uart0_putc(END);
+    
+    return (byte_ptr - packet_buf);
+}
+
 void edge_process_uart(void) {
     int status;
     uint8_t packet_buf[EDGE_BUFFER_SIZE];
@@ -246,6 +283,20 @@ void edge_process_uart(void) {
         }
         mutex_unlock(&edge_in_buf_mutex,0);
     }
+}
+
+void edge_send_ipv6_over_uart(struct ipv6_hdr_t *packet) {
+    edge_l3_header_t *serial_buf;
+    
+    mutex_lock(&edge_out_buf_mutex);
+    serial_buf = (edge_l3_header_t *)edge_out_buf;
+    serial_buf->reserved = 0;
+    serial_buf->type = EDGE_PACKET_L3_TYPE;
+    serial_buf->seq_num = 5; // TODO
+    serial_buf->ethertype = EDGE_ETHERTYPE_IPV6;
+    memcpy(edge_out_buf+sizeof (edge_l3_header_t), packet, IPV6_HDR_LEN + packet->length);
+    writepacket(edge_out_buf, sizeof (edge_l3_header_t) + IPV6_HDR_LEN + packet->length);
+    mutex_unlock(&edge_out_buf_mutex,0);
 }
 
 void edge_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag) {
