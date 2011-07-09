@@ -21,6 +21,7 @@
 #define MULTIHOP_HOPLIMIT           64
 
 #define IP_PKT_RECV_BUF_SIZE        64
+#define DEBUGLINE printf("%s:%d\n",__FILE__,__LINE__)
 
 /* extern variables */
 extern uint8_t ipv6_ext_hdr_len;
