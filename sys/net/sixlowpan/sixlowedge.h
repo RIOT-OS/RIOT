@@ -43,7 +43,7 @@ typedef struct __attribute__ ((packed)) edge_l3_header_t {
 uint8_t edge_initialize(transceiver_type_t trans,ipv6_addr_t *edge_router_addr);
 void edge_send_ipv6_over_uart(struct ipv6_hdr_t *packet);
 void edge_process_uart(void);
-void edge_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet);
+void edge_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag);
 void edge_process_lowpan(void);
 
 abr_cache_t *get_edge_router_info();

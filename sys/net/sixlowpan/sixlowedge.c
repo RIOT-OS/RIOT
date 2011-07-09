@@ -227,9 +227,8 @@ void edge_process_uart(void) {
                     switch (l3_buf->ethertype) {
                         case(EDGE_ETHERTYPE_IPV6):{
                             printf("INFO: IPv6-Packet\n");
-                            struct ipv6_hdr_t *ipv6_buf = (struct ipv6_hdr_t *)(edge_in_buf + sizeof (edge_l3_header_t));
-                            printf("Next-Header: %s\n",(ipv6_buf->nextheader == PROTO_NUM_ICMPV6) ? "ICMPv6" : "Not ICMPv6");
-                            //edge_send_ipv6_over_lowpan(ipv6_buf);
+                            struct ipv6_hdr_t *ipv6_packet = (struct ipv6_hdr_t *)(edge_in_buf + sizeof (edge_l3_header_t));
+                            edge_send_ipv6_over_lowpan(ipv6_packet,1,1);
                             break;
                         }
                         default:{
@@ -247,6 +246,60 @@ void edge_process_uart(void) {
         }
         mutex_unlock(&edge_in_buf_mutex,0);
     }
+}
+
+void edge_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag) {
+    //abr_cache_t *msg_abr = NULL;
+    uint16_t offset = IPV6_HDR_LEN+HTONS(packet->length);
+    
+    packet->flowlabel = HTONS(packet->flowlabel);
+    packet->length = HTONS(packet->length);
+    
+    memset(buffer, 0, BUFFER_SIZE);
+    memcpy(buffer+LL_HDR_LEN, packet, offset);
+    
+    /*
+    if (ipv6_buf->nextheader == PROTO_NUM_ICMPV6) {
+        icmp_buf = (icmpv6_hdr_t *)(ipv6_buf + IPV6_HDR_LEN);
+        if (icmp_buf->type == ICMP_RTR_ADV) {
+            if (abr_count > 0) {
+                opt_abro_t *opt_abro_buf = (opt_abro_t *)(ipv6_buf + offset);
+                msg_abr = abr_get_most_current();
+                opt_abro_buf->type = OPT_ABRO_TYPE;
+                opt_abro_buf->length = OPT_ABRO_LEN;
+                opt_abro_buf->version = HTONS(msg_abr->version);
+                opt_abro_buf->reserved = 0;
+                memcpy(&(opt_abro_buf->addr), &(msg_abr->abr_addr), sizeof (ipv6_addr_t));
+                ipv6->length += OPT_ABRO_HDR_LEN;
+                offset += OPT_ARO_HDR_LEN;
+            }
+            
+            if (sixco_flag) {
+                // TODO: 6CO
+            }
+        }
+        
+        if (icmp_buf->type == ICMP_NBR_ADV && aro_flag) {
+            if(aro == OPT_ARO){
+                /* set aro option *//*
+                opt_aro_t *opt_aro_buf = (opt_abro_t *)(ipv6_buf + offset);
+                opt_aro_buf->type = OPT_ARO_TYPE;
+                opt_aro_buf->length = OPT_ARO_LEN;
+                opt_aro_buf->status = 0;    // TODO
+                opt_aro_buf->reserved1 = 0;
+                opt_aro_buf->reserved2 = 0;
+                memcpy(&(opt_aro_buf->eui64), mac_get_eui(dst),8);
+                
+                ipv6->length += OPT_ARO_HDR_LEN;
+                offset += OPT_ARO_HDR_LEN;
+            }
+        }
+        
+        // edge router should not send neighbor and router solicitations in lowpan
+    }*/
+    
+    lowpan_init((ieee_802154_long_t*)&(packet->destaddr.uint16[4]), (uint8_t*)packet);
+    
 }
 
 abr_cache_t *get_edge_router_info() {
