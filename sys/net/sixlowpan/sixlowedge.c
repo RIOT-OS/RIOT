@@ -141,7 +141,7 @@ void init_edge_router_info(ipv6_addr_t *abr_addr) {
 
 int readpacket(uint8_t *packet_buf, int size) {
     uint8_t *line_buf_ptr = packet_buf;
-    uint8_t byte = ~END;
+    uint8_t byte = END+1;
     uint8_t esc = 0;
     
     while (byte != END) {
