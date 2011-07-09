@@ -12,9 +12,11 @@
 #define EDGE_HEADER_LENGTH      2
 
 /* packet types of uart-packets */
-#define EDGE_PACKET_ACK_TYPE    0
+#define EDGE_PACKET_RAW_TYPE    0
 
-#define EDGE_PACKET_CONF_TYPE   1
+#define EDGE_PACKET_ACK_TYPE    1
+
+#define EDGE_PACKET_CONF_TYPE   2
 
 #define EDGE_PACKET_L3_TYPE     3
 
