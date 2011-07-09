@@ -62,7 +62,7 @@ uint8_t edge_initialize(transceiver_type_t trans,ipv6_addr_t *edge_router_addr) 
     mutex_init(&edge_in_buf_mutex);
     mutex_init(&edge_out_buf_mutex);
     
-    sixlowpan_init(trans,edge_router_addr->uint8[15]);
+    sixlowpan_init(trans,edge_router_addr->uint8[15],1);
     
     init_edge_router_info(edge_router_addr);
     
@@ -351,6 +351,18 @@ void edge_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uin
     
     lowpan_init((ieee_802154_long_t*)&(packet->destaddr.uint16[4]), (uint8_t*)packet);
     
+}
+
+void edge_process_lowpan(void) {
+    msg m;
+    struct ipv6_hdr_t *ipv6_buf;
+    
+    while(1) {
+        msg_receive(&m);
+        ipv6_buf = (struct ipv6_hdr_t *)m.content.ptr;
+        // TODO: Bei ICMPv6-Paketen entsprechende LoWPAN-Optionen verarbeiten und entfernen
+        edge_send_ipv6_over_uart(ipv6_buf);
+    }
 }
 
 abr_cache_t *get_edge_router_info() {

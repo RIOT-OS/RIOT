@@ -9,6 +9,7 @@
 #include "msg.h"
 #include "sixlowmac.h"
 #include "sixlowpan.h"
+#include "sixlowedge.h"
 #include "sixlowip.h"
 #include "sixlownd.h"
 #include "transceiver.h"
@@ -952,7 +953,7 @@ void lowpan_context_auto_remove(void) {
     }
 }
 
-void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr){
+void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_edge){
     ipv6_addr_t tmp;
     /* init mac-layer and radio transceiver */
     vtimer_init();
@@ -983,9 +984,15 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr){
                         
     ipv6_iface_add_addr(&lladdr, ADDR_STATE_PREFERRED, 0, 0, 
                         ADDR_CONFIGURED_AUTO);
-    ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE, 
+    if (as_edge) {
+        ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE, 
+                                       PRIORITY_MAIN-1, CREATE_STACKTEST,
+                                       edge_process_lowpan, "edge_process_lowpan");
+    } else {
+        ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE, 
                                        PRIORITY_MAIN-1, CREATE_STACKTEST,
                                        ipv6_process, "ip_process");
+    }
     nd_nbr_cache_rem_pid = thread_create(nc_buf, NC_STACKSIZE,
                                          PRIORITY_MAIN-1, CREATE_STACKTEST,
                                          nbr_cache_auto_rem, "nbr_cache_rem");
@@ -999,5 +1006,5 @@ void sixlowpan_adhoc_init(transceiver_type_t trans, ipv6_addr_t *prefix, uint8_t
     ipv6_set_prefix(prefix, prefix);
     plist_add(prefix, 64, OPT_PI_VLIFETIME_INFINITE,0,1,OPT_PI_FLAG_A);
     ipv6_init_iface_as_router();
-    sixlowpan_init(trans, r_addr);
+    sixlowpan_init(trans, r_addr,0);
 }

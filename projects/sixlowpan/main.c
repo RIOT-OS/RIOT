@@ -48,7 +48,7 @@ void init(char *str){
                 printf("ERROR: radio_address not an 8 bit integer\n");
                 return;
             }
-            sixlowpan_init(TRANSCEIVER_CC1100,r_addr);
+            sixlowpan_init(TRANSCEIVER_CC1100,r_addr,0);
             break;
         case 'r':
             printf("INFO: Initialize as router on radio address %hu\n", r_addr);
@@ -56,7 +56,7 @@ void init(char *str){
                 printf("ERROR: radio_address not an 8 bit integer\n");
                 return;
             }
-            sixlowpan_init(TRANSCEIVER_CC1100, r_addr);
+            sixlowpan_init(TRANSCEIVER_CC1100, r_addr,0);
             ipv6_init_iface_as_router();
             break;
         case 'a':
