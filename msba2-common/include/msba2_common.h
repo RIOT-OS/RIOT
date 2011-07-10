@@ -24,8 +24,8 @@ and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
-#ifndef __BOARD_H
-#define __BOARD_H
+#ifndef __MSBA2_COMMON_H
+#define __MSBA2_COMMON_H
 
 /**
  * @ingroup		msb_a2
@@ -48,4 +48,4 @@ and the mailinglist (subscription via web site)
 #define VICIntEnClear VICIntEnClr
 
 /** @} */
-#endif // __BOARD_H
+#endif // __MSBA2_COMMON_H

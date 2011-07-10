@@ -57,7 +57,7 @@ void display_symbol(uint8_t symbol, uint8_t mode);
  * Global Variable section */
 
 /* Display flags */
-volatile s_display_flags display;
+volatile s_display_flags_t display;
 
 /* Global return string for itoa function */
 char itoa_str[8];

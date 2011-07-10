@@ -49,13 +49,13 @@ and the mailinglist (subscription via web site)
  * @note    $Id$
  */
 
-typedef struct toprint {
+typedef struct toprint_t {
     unsigned int len;
     char content[];
-}toprint;
+}toprint_t;
 
 #define QUEUESIZE 255
-static volatile toprint* queue[QUEUESIZE];
+static volatile toprint_t* queue[QUEUESIZE];
 static volatile unsigned char queue_head = 0;
 static volatile unsigned char queue_tail = 0;
 static volatile unsigned char queue_items = 0;
@@ -64,7 +64,7 @@ static volatile unsigned int actual_pos = 0;
 static volatile unsigned int running = 0;
 static volatile unsigned int fifo = 0;
 
-static volatile toprint* actual = NULL;
+static volatile toprint_t* actual = NULL;
 
 static inline void enqueue(void) {
     queue_items++;
