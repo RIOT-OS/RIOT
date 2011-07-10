@@ -14,7 +14,7 @@ void wakeup_thread(void){
 }
 
 void msg_thread(void){
-        msg m;
+        msg_t m;
         msg_receive(&m);
         printf("%s\n",(char*)m.content.ptr);
 }

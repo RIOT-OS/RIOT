@@ -2,7 +2,7 @@ SubDir TOP board chronos ;
 
 HDRS += $(TOP)/board/$(CPU)/include ;
 
-Module board : debug_uart.c board_init.c ;
+Module board : putchar.c board_init.c ;
 UseModule board ;
 
 SubInclude TOP board $(BOARD) drivers ;

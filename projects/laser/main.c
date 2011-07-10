@@ -7,6 +7,8 @@
 int main(void)
 {
     sht11_val_t sht11_val;
+    double mAh = 0;
+
     uint8_t success = 0;
     
     puts("");
@@ -18,11 +20,12 @@ int main(void)
 
     while (1) {
         success = sht11_read_sensor(&sht11_val, HUMIDITY|TEMPERATURE);
+        mAh = ltc4150_get_total_mAh();
         if (!success) {
             printf("error;error;error\n");
         }
         else {
-            printf("%.2f;%.2f;%.2f\n", sht11_val.temperature, sht11_val.relhum, sht11_val.relhum_temp);
+            printf("%.2f;%.2f;%.2f;%.2f\n", sht11_val.temperature, sht11_val.relhum, sht11_val.relhum_temp, mAh);
         }
         LED_RED_TOGGLE;
         swtimer_usleep(60 * 1000*1000);

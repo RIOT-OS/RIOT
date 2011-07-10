@@ -33,11 +33,18 @@ and the mailinglist (subscription via web site)
 
 //static volatile time_t epoch;
 static struct tm time_to_set;
+static int set_time = 0;
+int rtc_second_pid = 0;
 
 /*---------------------------------------------------------------------------*/
 void rtc_init(void) {
     /* Set to calendar mode */
     RTCCTL1 |= RTCMODE_H;
+
+    /* enable ready interrupt (every second) */
+#ifndef ENABLE_DEBUG
+    RTCCTL0 |= RTCRDYIE;
+#endif
 }
 
 /*---------------------------------------------------------------------------*/
@@ -59,7 +66,8 @@ void rtc_set_localtime(struct tm* localt) {
     /* copy time to be set */
     memcpy(&time_to_set, localt, sizeof(struct tm));
     /* set interrupt to set this time after the next transition */
-    RTCCTL0 |= RTCRDYIE;
+//    RTCCTL0 |= RTCRDYIE;
+    set_time = 1;
 }
 
 /*---------------------------------------------------------------------------
@@ -166,16 +174,25 @@ interrupt(RTC_VECTOR) __attribute__ ((naked)) rtc_isr(void) {
     /* RTC is save to write for up to one second now */
     if (RTCIV == RTC_RTCRDYIFG) {
         /* disable interrupt */
-        RTCCTL0 &= ~RTCRDYIE;
+        //RTCCTL0 &= ~RTCRDYIE;
+
+        if (set_time) {
+            set_time = 0;
         /* set previous set time and reset it */
-        RTCSEC = time_to_set.tm_sec;
-        RTCMIN = time_to_set.tm_min;
-        RTCHOUR = time_to_set.tm_hour;
-        RTCDAY = time_to_set.tm_mday;
-        RTCDOW = time_to_set.tm_wday;
-        RTCMON = time_to_set.tm_mon + 1;
-        RTCYEARL = (time_to_set.tm_year + 1900) & 0xFF;
-        RTCYEARH = (time_to_set.tm_year + 1900) >> 0x08;
+            RTCSEC = time_to_set.tm_sec;
+            RTCMIN = time_to_set.tm_min;
+            RTCHOUR = time_to_set.tm_hour;
+            RTCDAY = time_to_set.tm_mday;
+            RTCDOW = time_to_set.tm_wday;
+            RTCMON = time_to_set.tm_mon + 1;
+            RTCYEARL = (time_to_set.tm_year + 1900) & 0xFF;
+            RTCYEARH = (time_to_set.tm_year + 1900) >> 0x08;
+        }
+        if (rtc_second_pid) {
+            msg_t m;
+            m.type = RTC_SECOND;
+            msg_send_int(&m, rtc_second_pid);
+        }
     }
     /* RTC alarm */
     else if (RTCIV == RTC_RTCAIFG) {

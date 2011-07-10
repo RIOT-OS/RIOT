@@ -1,0 +1,3 @@
+echo "Doing stuff..."
+cd $FEUERWHERE_PATH
+jam -sPROJECT=wiselib

@@ -354,7 +354,7 @@ void edge_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uin
 }
 
 void edge_process_lowpan(void) {
-    msg m;
+    msg_t m;
     struct ipv6_hdr_t *ipv6_buf;
     
     while(1) {

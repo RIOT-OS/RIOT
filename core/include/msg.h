@@ -35,7 +35,7 @@ typedef struct msg {
         char     *ptr;          ///< pointer content field
         uint32_t value;         ///< value content field
     } content;
-} msg;
+} msg_t;
 
 
 /**
@@ -54,7 +54,7 @@ typedef struct msg {
  * @return 0 if receiver is not waiting and block == false
  * @return -1 on error (invalid PID)
  */
-int msg_send(msg* m, unsigned int target_pid, bool block);
+int msg_send(msg_t* m, unsigned int target_pid, bool block);
 
 
 /**
@@ -68,7 +68,7 @@ int msg_send(msg* m, unsigned int target_pid, bool block);
  * @return 1 if sending was successfull
  * @return 0 if receiver is not waiting and block == false
  */
-int msg_send_int(msg* m, unsigned int target_pid);
+int msg_send_int(msg_t* m, unsigned int target_pid);
 
 
 /**
@@ -79,7 +79,7 @@ int msg_send_int(msg* m, unsigned int target_pid);
  *
  * @return 1 Function always succeeds or blocks forever.
  */
-int msg_receive(msg* m);
+int msg_receive(msg_t* m);
 
 /**
  * @brief Send a message, block until reply received.
@@ -90,7 +90,7 @@ int msg_receive(msg* m);
  * @param target pid the pid of the target process
  * @return 1 if successful
  */
-int msg_send_receive(msg *m, msg *reply, unsigned int target_pid);
+int msg_send_receive(msg_t *m, msg_t *reply, unsigned int target_pid);
 
 /**
  * @brief Replies to a message.
@@ -103,7 +103,7 @@ int msg_send_receive(msg *m, msg *reply, unsigned int target_pid);
  * @return 1 if succcessful
  * qreturn 0 on error
  */
-int msg_reply(msg *m, msg *reply);
+int msg_reply(msg_t *m, msg_t *reply);
 
 /**
  * @brief Initialize the current thread's message queue.
@@ -111,7 +111,7 @@ int msg_reply(msg *m, msg *reply);
  * @param array Pointer to preallocated array of msg objects
  * @param num Number of msg objects in array. MUST BE POWER OF TWO!
  */
-int msg_init_queue(msg* array, int num);
+int msg_init_queue(msg_t* array, int num);
 
 /** @} */
 #endif /* __MSG_H */

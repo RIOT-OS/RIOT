@@ -16,7 +16,7 @@
 #include "ieee802154_frame.h"
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
-msg msg_q[RADIO_RCV_BUF_SIZE];
+msg_t msg_q[RADIO_RCV_BUF_SIZE];
 uint8_t snd_buffer[RADIO_SND_BUF_SIZE][PAYLOAD_SIZE];
 
 uint8_t r_src_addr;
@@ -28,7 +28,7 @@ static uint8_t macdsn;
 mutex_t buf_mutex;
 
 static radio_packet_t p;
-static msg mesg;
+static msg_t mesg;
 int transceiver_type;
 static transceiver_command_t tcmd;
 
@@ -95,7 +95,7 @@ void init_802154_long_addr(ieee_802154_long_t *laddr){
 }
 
 void recv_ieee802154_frame(void){
-    msg m;
+    msg_t m;
     radio_packet_t *p;
     uint8_t hdrlen, length;
     ieee802154_frame_t frame;

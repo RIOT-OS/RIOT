@@ -68,6 +68,7 @@ and the mailinglist (subscription via web site)
 #define GPIOINT_DISABLE			0x00
 #define GPIOINT_RISING_EDGE		0x01			///< interrupt is generated on rising edge
 #define GPIOINT_FALLING_EDGE	0x02			///< interrupt is generated on falling edge
+#define GPIOINT_DEBOUNCE        0x04            ///< debounce this interrupt
 
 /**
  * @brief	GPIO IRQ callback function type

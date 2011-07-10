@@ -27,6 +27,7 @@
 
 SubDir TOP cpu msp430x16x ;
 
+Module flashrom : flashrom.c ;
 Module hwtimer_cpu : hwtimer_msp430.c : hwtimer_msp430 ;
 
 SubInclude TOP cpu msp430-common ; 

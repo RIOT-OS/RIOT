@@ -25,9 +25,9 @@ char radio_stack_buffer[RADIO_STACK_SIZE];
 
 uint8_t snd_buffer[SND_BUFFER_SIZE][CC1100_MAX_DATA_LENGTH];
 
-msg msg_q[RCV_BUFFER_SIZE];
+msg_t msg_q[RCV_BUFFER_SIZE];
 
-static msg mesg;
+static msg_t mesg;
 static transceiver_command_t tcmd;
 static radio_packet_t p;
 
@@ -98,7 +98,7 @@ void print_buffer(char *unused) {
 }
 
 void radio(void) {
-    msg m;
+    msg_t m;
     radio_packet_t *p;
     uint8_t i;
 

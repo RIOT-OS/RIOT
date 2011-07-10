@@ -30,6 +30,11 @@ SubDir TOP cpu arm_common ;
 Module arm_common : common.s bootloader.c VIC.c atomic.s arm_cpu.c iap.c ;
 UseModule arm_common ;
 
+Module profiling : profiling.c ;
+if $(PROFILING) {
+    UseModule profiling ;
+}
+
 Module hwtimer_cpu : hwtimer_cpu.c ;
 
 Objects syscalls.c ;

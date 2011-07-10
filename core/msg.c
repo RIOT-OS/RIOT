@@ -27,7 +27,7 @@
 //#define ENABLE_DEBUG
 #include "debug.h"
 
-static int queue_msg(tcb *target, msg *m) {
+static int queue_msg(tcb_t *target, msg_t *m) {
         int n = cib_put(&(target->msg_queue));
 
         if (n != -1) {
@@ -38,12 +38,12 @@ static int queue_msg(tcb *target, msg *m) {
         return 0;
 }
 
-int msg_send(msg* m, unsigned int target_pid, bool block) {
+int msg_send(msg_t* m, unsigned int target_pid, bool block) {
     if (inISR()) {
         return msg_send_int(m, target_pid);
     }
 
-    tcb *target = (tcb*)sched_threads[target_pid];
+    tcb_t *target = (tcb_t*)sched_threads[target_pid];
 
     m->sender_pid = thread_pid;
     if (m->sender_pid == target_pid) {
@@ -84,13 +84,13 @@ int msg_send(msg* m, unsigned int target_pid, bool block) {
             newstatus = STATUS_SEND_BLOCKED;
         }
 
-        sched_set_status((tcb*)active_thread,  newstatus);
+        sched_set_status((tcb_t*)active_thread,  newstatus);
         
         DEBUG("%s: back from send block.\n", active_thread->name);
     } else {
         DEBUG("%s: direct msg copy.\n", active_thread->name);
         /* copy msg to target */
-        msg* target_message = (msg*)target->wait_data;
+        msg_t* target_message = (msg_t*)target->wait_data;
         *target_message = *m;
         sched_set_status(target,  STATUS_PENDING);
     }
@@ -101,8 +101,8 @@ int msg_send(msg* m, unsigned int target_pid, bool block) {
     return 1;
 }
 
-int msg_send_int(msg* m, unsigned int target_pid) {
-    tcb *target = (tcb*)sched_threads[target_pid];
+int msg_send_int(msg_t* m, unsigned int target_pid) {
+    tcb_t *target = (tcb_t*)sched_threads[target_pid];
 
     if (target->status ==  STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send_int: direct msg copy.\n");
@@ -110,7 +110,7 @@ int msg_send_int(msg* m, unsigned int target_pid) {
         m->sender_pid = target_pid;
 
         /* copy msg to target */
-        msg* target_message = (msg*)target->wait_data;
+        msg_t* target_message = (msg_t*)target->wait_data;
         *target_message = *m;
         sched_set_status(target,  STATUS_PENDING);
 
@@ -122,9 +122,9 @@ int msg_send_int(msg* m, unsigned int target_pid) {
     }
 }
 
-int msg_send_receive(msg *m, msg *reply, unsigned int target_pid) {
+int msg_send_receive(msg_t *m, msg_t *reply, unsigned int target_pid) {
     dINT();
-    tcb *me = (tcb*) sched_threads[thread_pid];
+    tcb_t *me = (tcb_t*) sched_threads[thread_pid];
     sched_set_status(me,  STATUS_REPLY_BLOCKED);
     me->wait_data = (void*) reply;
     msg_send(m, target_pid, true);
@@ -134,10 +134,10 @@ int msg_send_receive(msg *m, msg *reply, unsigned int target_pid) {
     return 1;
 }
 
-int msg_reply(msg *m, msg *reply) {
+int msg_reply(msg_t *m, msg_t *reply) {
     int state = disableIRQ();
 
-    tcb *target = (tcb*)sched_threads[m->sender_pid];
+    tcb_t *target = (tcb_t*)sched_threads[m->sender_pid];
     if (target->status != STATUS_REPLY_BLOCKED) {
         DEBUG("%s: msg_reply(): target \"%s\" not waiting for reply.", active_thread->name, target->name);
         restoreIRQ(state);
@@ -146,7 +146,7 @@ int msg_reply(msg *m, msg *reply) {
     
     DEBUG("%s: msg_reply(): direct msg copy.\n", active_thread->name);
     /* copy msg to target */
-    msg* target_message = (msg*)target->wait_data;
+    msg_t* target_message = (msg_t*)target->wait_data;
     *target_message = *reply;
     sched_set_status(target,  STATUS_PENDING);
     restoreIRQ(state);
@@ -155,24 +155,24 @@ int msg_reply(msg *m, msg *reply) {
     return 1;
 }
 
-int msg_reply_int(msg *m, msg *reply) {
-    tcb *target = (tcb*)sched_threads[m->sender_pid];
+int msg_reply_int(msg_t *m, msg_t *reply) {
+    tcb_t *target = (tcb_t*)sched_threads[m->sender_pid];
     if (target->status != STATUS_REPLY_BLOCKED) {
         DEBUG("%s: msg_reply_int(): target \"%s\" not waiting for reply.", active_thread->name, target->name);
         return -1;
     }
-    msg* target_message = (msg*)target->wait_data;
+    msg_t* target_message = (msg_t*)target->wait_data;
     *target_message = *reply;
     sched_set_status(target,  STATUS_PENDING);
     sched_context_switch_request = 1;
     return 1;
 }
 
-int msg_receive(msg* m) {
+int msg_receive(msg_t* m) {
     dINT();
     DEBUG("%s: msg_receive.\n", active_thread->name);
 
-    tcb *me = (tcb*) sched_threads[thread_pid];
+    tcb_t *me = (tcb_t*) sched_threads[thread_pid];
 
     int n = -1;
     if (me->msg_array) {
@@ -202,7 +202,7 @@ int msg_receive(msg* m) {
         return 1;
     } else {
         DEBUG("%s: msg_receive(): Wakeing up waiting thread.\n", active_thread->name);
-        tcb *sender = (tcb*)node->data;
+        tcb_t *sender = (tcb_t*)node->data;
 
         if (n >= 0) {
             /* we've already got a messgage from the queue.  as there is a
@@ -212,7 +212,7 @@ int msg_receive(msg* m) {
         }
 
         /* copy msg */
-        msg* sender_msg = (msg*)sender->wait_data;
+        msg_t* sender_msg = (msg_t*)sender->wait_data;
         *m = *sender_msg;
 
         /* remove sender from queue */
@@ -224,10 +224,10 @@ int msg_receive(msg* m) {
     }
 }
 
-int msg_init_queue(msg* array, int num) {
+int msg_init_queue(msg_t* array, int num) {
     /* make sure brainfuck condition is met */
     if (num && (num & (num - 1)) == 0) {
-        tcb *me = (tcb*)active_thread;
+        tcb_t *me = (tcb_t*)active_thread;
         me->msg_array = array;
         cib_init(&(me->msg_queue), num);
         return 0;

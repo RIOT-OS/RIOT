@@ -138,7 +138,7 @@ void lowpan_init(ieee_802154_long_t *addr, uint8_t *data){
 void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
            ieee_802154_long_t *d_laddr){
     /* check if packet is fragmented */
-    msg m;
+    msg_t m;
     uint8_t hdr_length = 0;
     uint8_t datagram_offset = 0;    
     uint16_t datagram_size = 0;

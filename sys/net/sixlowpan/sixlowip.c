@@ -9,7 +9,7 @@
 #include "sixlowpan.h"
 
 uint8_t buffer[BUFFER_SIZE];
-msg msg_queue[IP_PKT_RECV_BUF_SIZE];
+msg_t msg_queue[IP_PKT_RECV_BUF_SIZE];
 struct ipv6_hdr_t* ipv6_buf;
 struct icmpv6_hdr_t* icmp_buf;
 uint8_t ipv6_ext_hdr_len;
@@ -64,14 +64,14 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len){
 }
 
 void ipv6_process(void){
-    msg m[1];
+    msg_t m;
     msg_init_queue(msg_queue, IP_PKT_RECV_BUF_SIZE);
     
     while(1){
-        msg_receive(m);
+        msg_receive(&m);
         
-        ipv6_buf = get_ipv6_buf();
-        //ipv6_buf = (struct ipv6_hdr_t*) m.content.ptr;
+        //ipv6_buf = get_ipv6_buf();
+        ipv6_buf = (struct ipv6_hdr_t*) m.content.ptr;
 
         /* identifiy packet */
         nextheader = &ipv6_buf->nextheader;

@@ -32,7 +32,7 @@ radio_packet_t transceiver_buffer[TRANSCEIVER_BUFFER_SIZE];
 uint8_t data_buffer[TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE];
 
 /* message buffer */
-msg msg_buffer[TRANSCEIVER_MSG_BUFFER_SIZE];
+msg_t msg_buffer[TRANSCEIVER_MSG_BUFFER_SIZE];
 
 uint32_t response; ///< response bytes for messages to upper layer threads
 
@@ -114,7 +114,7 @@ uint8_t transceiver_register(transceiver_type_t t, int pid) {
  * loop
  */
 void run(void) {
-    msg m;
+    msg_t m;
     transceiver_command_t *cmd;
 
     msg_init_queue(msg_buffer, TRANSCEIVER_MSG_BUFFER_SIZE);
@@ -177,7 +177,8 @@ static void receive_packet(uint16_t type, uint8_t pos) {
     uint8_t i = 0;
     transceiver_type_t t;
     rx_buffer_pos = pos;
-    msg m;
+    msg_t m;
+   
     DEBUG("Packet received\n");
     switch (type) {
         case RCV_PKT_CC1020:
