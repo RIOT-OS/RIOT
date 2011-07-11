@@ -23,17 +23,35 @@
 abr_cache_t *abr_info;
 uint16_t abro_version;
 uint8_t edge_out_buf[EDGE_BUFFER_SIZE];
-mutex_t edge_out_buf_mutex;
-
 uint8_t edge_in_buf[EDGE_BUFFER_SIZE];
-mutex_t edge_in_buf_mutex;
 
-edge_packet_t *uart_buf;
-edge_l3_header_t *l3_buf;
-
+slwin_stat_t slwin_stat;
+sem_t connection_established;
 uint16_t get_next_abro_version();
 void init_edge_router_info(ipv6_addr_t *abr_addr);
 uint8_t abr_info_add_context(lowpan_context_t *context);
+void edge_process_uart(void);
+void edge_receive_from_uart(edge_packet_t *packet, int len);
+
+void slwin_init() {
+    int i;
+    slwin_stat.last_ack = 0xFF;
+    slwin_stat.last_frame = 0xFF;
+    
+    slwin_stat.send_win_not_full = sem_init(EDGE_SWS);
+    for(i = 0; i < EDGE_SWS; i++) {
+        slwin_stat.send_win[i].frame_len = 0;
+    }
+    memset(&slwin_stat.send_win,0, sizeof(struct send_slot) * EDGE_SWS);
+    
+    slwin_stat.next_exp = 0;
+    
+    for(i = 0; i < EDGE_RWS; i++) {
+        slwin_stat.recv_win[i].received = 0;
+        slwin_stat.recv_win[i].frame_len = 0;
+    }
+    memset(&slwin_stat.recv_win,0, sizeof(struct recv_slot) * EDGE_RWS);
+}
 
 uint16_t get_next_abro_version() {
     abro_version = serial_add16(abro_version, 1);
@@ -41,6 +59,9 @@ uint16_t get_next_abro_version() {
 }
 
 uint8_t edge_initialize(transceiver_type_t trans,ipv6_addr_t *edge_router_addr) {
+    posix_open(uart0_handler_pid, 0);
+    slwin_init();
+    
     /* only allow addresses generated accoding to 
      * RFC 4944 (Section 6) & RFC 2464 (Section 4) from short address 
      * -- for now
@@ -57,16 +78,12 @@ uint8_t edge_initialize(transceiver_type_t trans,ipv6_addr_t *edge_router_addr) 
         return SIXLOWERROR_ADDRESS;
     }
     
-    posix_open(uart0_handler_pid, 0);
-    
-    mutex_init(&edge_in_buf_mutex);
-    mutex_init(&edge_out_buf_mutex);
-    
     sixlowpan_init(trans,edge_router_addr->uint8[15],1);
     
     init_edge_router_info(edge_router_addr);
     
     ipv6_init_iface_as_router();
+    
     
     return SUCCESS;
 }
@@ -223,14 +240,15 @@ int writepacket(uint8_t *packet_buf, size_t size) {
 }
 
 void edge_process_uart(void) {
-    int status;
+    int bytes;
     uint8_t packet_buf[EDGE_BUFFER_SIZE];
+    edge_packet_t *uart_buf;
     while(1) {
-        status = readpacket(packet_buf, EDGE_BUFFER_SIZE);
-        if (status < 0) {
-            switch (status) {
+        bytes = readpacket(packet_buf, EDGE_BUFFER_SIZE);
+        if (bytes < 0) {
+            switch (bytes) {
                 case (-SIXLOWERROR_ARRAYFULL):{
-                    printf("ERROR: (%s:%d) Array was full\n",__FILE__,__LINE__);
+                    printf("ERROR: Array was full\n");
                     break;
                 }
                 default:{
@@ -240,63 +258,152 @@ void edge_process_uart(void) {
             }
             continue;
         }
-        mutex_lock(&edge_in_buf_mutex);
-        memcpy(edge_in_buf,packet_buf,status);
+        memcpy(edge_in_buf,packet_buf,bytes);
+        
         uart_buf = (edge_packet_t*)edge_in_buf;
         if (uart_buf->reserved == 0) {
-            switch (uart_buf->type) {
-                case (EDGE_PACKET_ACK_TYPE):{
-                    printf("INFO: ACK\n");
-                    //edge_ack_package(uart_buf->seq_num);
+            edge_receive_from_uart(uart_buf, bytes);
+        }
+    }
+}
+
+void timeout_callback (void *args) {
+    uint8_t *packet_seq_num = (uint8_t *)args;
+    struct send_slot *slot = &(slwin_stat.send_win[*packet_seq_num % EDGE_SWS]);
+    
+    if (*packet_seq_num == ((edge_packet_t *)(slot->frame))->seq_num) {
+        writepacket(slot->frame,slot->frame_len);
+        // restart timer
+    } else {
+        return;
+    }
+}
+
+int set_timeout(vtimer_t *timeout, long useconds, void *args) {
+    timex_t interval;
+    interval.seconds = useconds / 1000000;
+    interval.nanoseconds = (useconds % 1000000) * 1000;
+    
+    return vtimer_set_cb(timeout, interval, timeout_callback, args);
+}
+
+static int in_window(uint8_t seq_num, uint8_t min, uint8_t max) {
+    uint8_t pos = seq_num - min;
+    uint8_t maxpos = max - min + 1;
+    return pos < maxpos;
+}
+
+void edge_demultiplex(edge_packet_t *packet, int len) {
+    switch (packet->type) {
+        case (EDGE_PACKET_RAW_TYPE):{
+            fputs(((char *)packet) + sizeof (edge_packet_t), stdin);
+            break;
+        }
+        case (EDGE_PACKET_L3_TYPE):{
+            edge_l3_header_t *l3_header_buf = (edge_l3_header_t *)packet;
+            switch (l3_header_buf->ethertype) {
+                case (EDGE_ETHERTYPE_IPV6):{
+                    printf("INFO: IPv6-Packet received\n");
+                    struct ipv6_hdr_t *ipv6_buf = (struct ipv6_hdr_t *)(((unsigned char *)packet) + sizeof (edge_l3_header_t));
+                    edge_send_ipv6_over_lowpan(ipv6_buf, 1, 1);
                     break;
                 }
-                case (EDGE_PACKET_CONF_TYPE):{
-                    printf("INFO: CONF\n");
-                    // TODO
+                default:
+                    printf("INFO: Unknown ethertype %04x\n", l3_header_buf->ethertype);
+                    break;
+            }
+            break;
+        }
+        case (EDGE_PACKET_CONF_TYPE):{
+            edge_conf_header_t *conf_header_buf = (edge_conf_header_t *)packet;
+            switch (conf_header_buf->conftype) {
+                case (EDGE_CONF_SYNACK):{
+                    printf("INFO: SYNACK-Packet received\n");
+                    sem_signal(&connection_established);
                     break;
                 }
-                case (EDGE_PACKET_L3_TYPE):{
-                    l3_buf = (edge_l3_header_t*)uart_buf;
-                    printf("INFO: L3-Packet\n");
-                    // TODO
-                    //edge_send_ack(l3_buf->seq_num);
-                    
-                    switch (l3_buf->ethertype) {
-                        case(EDGE_ETHERTYPE_IPV6):{
-                            printf("INFO: IPv6-Packet\n");
-                            struct ipv6_hdr_t *ipv6_packet = (struct ipv6_hdr_t *)(edge_in_buf + sizeof (edge_l3_header_t));
-                            edge_send_ipv6_over_lowpan(ipv6_packet,1,1);
-                            break;
-                        }
-                        default:{
-                        printf("ERROR: Unknown Layer-3-Type %04x\n",l3_buf->ethertype);
-                            break;
-                        }
-                    }
+                default:
+                    printf("INFO: Unknown conftype %02x\n", conf_header_buf->conftype);
                     break;
-                }
-                default:{
-                    printf("ERROR: Unknown Packet-Type %d\n",uart_buf->type);
-                    break;
-                }
+            }
+            break;
+        }
+        default:
+            printf("INFO: Unknown edge packet type %02x\n", packet->type);
+            break;
+    }
+}
+
+void edge_send_ack(uint8_t seq_num) {
+    edge_packet_t *packet = (edge_packet_t *)edge_out_buf;
+    packet->reserved = 0;
+    packet->type = EDGE_PACKET_ACK_TYPE;
+    packet->seq_num = seq_num;
+    writepacket((uint8_t *)packet, sizeof (edge_packet_t));
+}
+
+void edge_receive_from_uart(edge_packet_t *packet, int len) {
+    if (packet->type == EDGE_PACKET_ACK_TYPE) {
+        if (in_window(packet->seq_num, slwin_stat.last_ack+1, slwin_stat.last_frame)) {
+            do {
+                struct send_slot *slot;
+                slot = &(slwin_stat.send_win[++slwin_stat.last_ack % EDGE_SWS]);
+                vtimer_remove(&slot->timeout);
+                memset(&slot->frame,0,EDGE_BUFFER_SIZE);
+                sem_signal(&slwin_stat.send_win_not_full);
+            } while (slwin_stat.last_ack != packet->seq_num);
+        }
+    } else {
+        struct recv_slot *slot;
+        
+        slot = &(slwin_stat.recv_win[packet->seq_num % EDGE_RWS]);
+        if (    !in_window(packet->seq_num, 
+                slwin_stat.next_exp, 
+                slwin_stat.next_exp + EDGE_RWS - 1)) {
+            return;
+        }
+        
+        memcpy(slot->frame, (uint8_t *)packet, len);
+        slot->received = 1;
+        
+        if (packet->seq_num == slwin_stat.next_exp) {
+            while (slot->received) {
+                edge_demultiplex((edge_packet_t *)slot->frame, slot->frame_len);
+                memset(&slot->frame,0,EDGE_BUFFER_SIZE);
+                slot->received = 0;
+                slot = &slwin_stat.recv_win[++(slwin_stat.next_exp) % EDGE_RWS];
             }
         }
-        mutex_unlock(&edge_in_buf_mutex,0);
+        
+        edge_send_ack(slwin_stat.next_exp - 1);
     }
+}
+
+void edge_send_over_uart(edge_packet_t *packet, int len) {
+    struct send_slot *slot;
+    uint8_t args[] = {packet->seq_num};
+    
+    sem_wait(&(slwin_stat.send_win_not_full));
+    packet->seq_num = ++slwin_stat.last_frame;
+    slot = &(slwin_stat.send_win[packet->seq_num % EDGE_SWS]);
+    memcpy(slot->frame, (uint8_t *)packet, len);
+    slot->frame_len = len;
+    if (set_timeout(&slot->timeout, EDGE_SL_TIMEOUT, (void *)args) != 0) {
+        printf("ERROR: Error invoking timeout timer\n");
+        return;
+    }
+    writepacket((uint8_t *)packet, len);
 }
 
 void edge_send_ipv6_over_uart(struct ipv6_hdr_t *packet) {
     edge_l3_header_t *serial_buf;
     
-    mutex_lock(&edge_out_buf_mutex);
     serial_buf = (edge_l3_header_t *)edge_out_buf;
     serial_buf->reserved = 0;
     serial_buf->type = EDGE_PACKET_L3_TYPE;
-    serial_buf->seq_num = 5; // TODO
     serial_buf->ethertype = EDGE_ETHERTYPE_IPV6;
     memcpy(edge_out_buf+sizeof (edge_l3_header_t), packet, IPV6_HDR_LEN + packet->length);
     writepacket(edge_out_buf, sizeof (edge_l3_header_t) + IPV6_HDR_LEN + packet->length);
-    mutex_unlock(&edge_out_buf_mutex,0);
 }
 
 void edge_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag) {
