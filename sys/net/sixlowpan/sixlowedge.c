@@ -338,7 +338,11 @@ void timeout_callback (void *args) {
     
     if (seq_num == ((edge_packet_t *)(slot->frame))->seq_num) {
         writepacket(slot->frame,slot->frame_len);
-        // restart timer
+        
+        if (set_timeout(&slot->timeout, EDGE_SL_TIMEOUT, args) != 0) {
+            printf("ERROR: Error invoking timeout timer\n");
+            return;
+        }
     } else {
         return;
     }
