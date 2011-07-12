@@ -55,6 +55,15 @@ typedef struct __attribute__ ((packed)) edge_conf_header_t {
     uint8_t conftype;
 } edge_conf_header_t;
 
+typedef struct __attribute__ ((packed)) edge_syn_packet_t {
+    uint8_t reserved;
+    uint8_t type;
+    uint8_t next_seq_num;
+    uint8_t conftype;
+    uint8_t next_exp;
+    ipv6_addr_t addr;
+} edge_syn_packet_t;
+
 typedef struct __attribute__ ((packed)) edge_addr_packet_t {
     uint8_t reserved;
     uint8_t type;

@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mutex.h>
+#include <thread.h>
+#include <msg.h>
 
 #include <posix_io.h>
 #include <board_uart0.h>
@@ -20,6 +22,11 @@
 #define ESC_ESC     0xDD
 #define DC3_ESC     0xDE
 
+#define READER_STACK_SIZE   512
+
+char reader_stack[READER_STACK_SIZE];
+uint16_t reader_pid;
+
 abr_cache_t *abr_info;
 uint16_t abro_version;
 uint8_t edge_out_buf[EDGE_BUFFER_SIZE];
@@ -27,25 +34,24 @@ uint8_t edge_in_buf[EDGE_BUFFER_SIZE];
 
 slwin_stat_t slwin_stat;
 sem_t connection_established;
+int16_t synack_seqnum = -1;
+int readpacket(uint8_t *packet_buf, int size);
 uint16_t get_next_abro_version();
 void init_edge_router_info(ipv6_addr_t *abr_addr);
 uint8_t abr_info_add_context(lowpan_context_t *context);
+
 void edge_process_uart(void);
 void edge_receive_from_uart(edge_packet_t *packet, int len);
 
 void slwin_init() {
     int i;
-    slwin_stat.last_ack = 0xFF;
-    slwin_stat.last_frame = 0xFF;
     
     slwin_stat.send_win_not_full = sem_init(EDGE_SWS);
     for(i = 0; i < EDGE_SWS; i++) {
         slwin_stat.send_win[i].frame_len = 0;
     }
     memset(&slwin_stat.send_win,0, sizeof(struct send_slot) * EDGE_SWS);
-    
-    slwin_stat.next_exp = 0;
-    
+        
     for(i = 0; i < EDGE_RWS; i++) {
         slwin_stat.recv_win[i].received = 0;
         slwin_stat.recv_win[i].frame_len = 0;
@@ -58,9 +64,52 @@ uint16_t get_next_abro_version() {
     return abro_version;
 }
 
+ipv6_addr_t init_threeway_handshake() {
+    edge_syn_packet_t *syn;
+    msg_t m;
+    m.content.ptr = NULL;
+    msg_send(&m,reader_pid,1);
+    while(1) {
+        msg_receive(&m);
+        printf("INFO: SYN received.\n");
+        
+        syn = (edge_syn_packet_t *)m.content.ptr;
+        edge_conf_header_t *synack = (edge_conf_header_t *)edge_out_buf;
+        ipv6_addr_t addr;
+        memcpy(&addr, &(syn->addr), sizeof (ipv6_addr_t));
+        
+        slwin_stat.next_exp = syn->next_seq_num;
+        slwin_stat.last_frame = syn->next_exp - 1;
+        slwin_stat.last_ack = slwin_stat.last_frame;
+        
+        synack->reserved = 0;
+        synack->type = EDGE_PACKET_CONF_TYPE;
+        synack->conftype = EDGE_CONF_SYNACK;
+        
+        printf("Send SYNACK.\n");
+        edge_send_over_uart((edge_packet_t *)synack,sizeof (edge_conf_header_t));
+        
+        synack_seqnum = synack->seq_num;
+        
+        return addr;
+    }
+}
+
 uint8_t edge_initialize(transceiver_type_t trans,ipv6_addr_t *edge_router_addr) {
-    posix_open(uart0_handler_pid, 0);
+    ipv6_addr_t addr;
+    
     slwin_init();
+    
+    reader_pid = thread_create(
+            reader_stack, READER_STACK_SIZE,
+            PRIORITY_MAIN-1, CREATE_STACKTEST,
+            edge_process_uart, "edge_process_uart");
+    
+    if (edge_router_addr == NULL) {
+        edge_router_addr = &addr;
+        
+        addr = init_threeway_handshake();
+    }
     
     /* only allow addresses generated accoding to 
      * RFC 4944 (Section 6) & RFC 2464 (Section 4) from short address 
@@ -209,7 +258,7 @@ int writepacket(uint8_t *packet_buf, size_t size) {
         if ((byte_ptr - packet_buf) > EDGE_BUFFER_SIZE) {
             return -1;
         }
-        
+        printf("%02x ",*byte_ptr);
         switch (*byte_ptr) {
             case(DC3):{
                 *byte_ptr = DC3_ESC;
@@ -234,17 +283,26 @@ int writepacket(uint8_t *packet_buf, size_t size) {
         byte_ptr++;
     }
     
+    printf("\n");
     uart0_putc(END);
     
     return (byte_ptr - packet_buf);
 }
 
 void edge_process_uart(void) {
+    int main_pid = 0;
     int bytes;
-    uint8_t packet_buf[EDGE_BUFFER_SIZE];
+    msg_t m;
     edge_packet_t *uart_buf;
+    
+    posix_open(uart0_handler_pid, 0);
+    
+    msg_receive(&m);
+    main_pid = m.sender_pid;
+    
     while(1) {
-        bytes = readpacket(packet_buf, EDGE_BUFFER_SIZE);
+        posix_open(uart0_handler_pid, 0);
+        bytes = readpacket(edge_in_buf, EDGE_BUFFER_SIZE);
         if (bytes < 0) {
             switch (bytes) {
                 case (-SIXLOWERROR_ARRAYFULL):{
@@ -258,20 +316,27 @@ void edge_process_uart(void) {
             }
             continue;
         }
-        memcpy(edge_in_buf,packet_buf,bytes);
         
         uart_buf = (edge_packet_t*)edge_in_buf;
         if (uart_buf->reserved == 0) {
+            if (uart_buf->type == EDGE_PACKET_CONF_TYPE) {
+                edge_conf_header_t *conf_packet = (edge_conf_header_t*)edge_in_buf;
+                if (conf_packet->conftype == EDGE_CONF_SYN) {
+                    m.content.ptr = (char *)conf_packet;
+                    msg_send(&m, main_pid, 1);
+                    continue;
+                }
+            }
             edge_receive_from_uart(uart_buf, bytes);
         }
     }
 }
 
 void timeout_callback (void *args) {
-    uint8_t *packet_seq_num = (uint8_t *)args;
-    struct send_slot *slot = &(slwin_stat.send_win[*packet_seq_num % EDGE_SWS]);
+    uint8_t seq_num = *((uint8_t *)args);
+    struct send_slot *slot = &(slwin_stat.send_win[seq_num % EDGE_SWS]);
     
-    if (*packet_seq_num == ((edge_packet_t *)(slot->frame))->seq_num) {
+    if (seq_num == ((edge_packet_t *)(slot->frame))->seq_num) {
         writepacket(slot->frame,slot->frame_len);
         // restart timer
     } else {
@@ -317,11 +382,6 @@ void edge_demultiplex(edge_packet_t *packet, int len) {
         case (EDGE_PACKET_CONF_TYPE):{
             edge_conf_header_t *conf_header_buf = (edge_conf_header_t *)packet;
             switch (conf_header_buf->conftype) {
-                case (EDGE_CONF_SYNACK):{
-                    printf("INFO: SYNACK-Packet received\n");
-                    sem_signal(&connection_established);
-                    break;
-                }
                 default:
                     printf("INFO: Unknown conftype %02x\n", conf_header_buf->conftype);
                     break;
@@ -344,7 +404,12 @@ void edge_send_ack(uint8_t seq_num) {
 
 void edge_receive_from_uart(edge_packet_t *packet, int len) {
     if (packet->type == EDGE_PACKET_ACK_TYPE) {
+        printf("INFO: ACK %d received\n", packet->seq_num);
         if (in_window(packet->seq_num, slwin_stat.last_ack+1, slwin_stat.last_frame)) {
+            if (synack_seqnum == packet->seq_num) {
+                synack_seqnum = -1;
+                sem_signal(&connection_established);
+            }
             do {
                 struct send_slot *slot;
                 slot = &(slwin_stat.send_win[++slwin_stat.last_ack % EDGE_SWS]);
