@@ -953,7 +953,7 @@ void lowpan_context_auto_remove(void) {
     }
 }
 
-void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_edge){
+void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border){
     ipv6_addr_t tmp;
     /* init mac-layer and radio transceiver */
     vtimer_init();
@@ -984,10 +984,10 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_edge){
                         
     ipv6_iface_add_addr(&lladdr, ADDR_STATE_PREFERRED, 0, 0, 
                         ADDR_CONFIGURED_AUTO);
-    if (as_edge) {
+    if (as_border) {
         ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE, 
                                        PRIORITY_MAIN-1, CREATE_STACKTEST,
-                                       edge_process_lowpan, "edge_process_lowpan");
+                                       border_process_lowpan, "border_process_lowpan");
     } else {
         ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE, 
                                        PRIORITY_MAIN-1, CREATE_STACKTEST,

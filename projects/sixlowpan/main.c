@@ -35,7 +35,7 @@ void init(char *str){
         printf("\th\tinitialize as host\n");
         printf("\tr\tinitialize as router\n");
         printf("\ta\tinitialize as ad-hoc router\n");
-        printf("\te\tinitialize as edge router\n\n");
+        printf("\tb\tinitialize as border router\n\n");
         printf("\tradio_address must be an 8 bit integer\n");
     }
     
@@ -67,15 +67,15 @@ void init(char *str){
             }
             sixlowpan_adhoc_init(TRANSCEIVER_CC1100, &std_addr, r_addr);
             break;
-        case 'e':
-            printf("INFO: Initialize as edge router on radio address %hu\n", r_addr);
+        case 'b':
+            printf("INFO: Initialize as border router on radio address %hu\n", r_addr);
             if (r_addr > 255) {
                 printf("ERROR: radio_address not an 8 bit integer\n");
                 return;
             }
-            res = edge_initialize(TRANSCEIVER_CC1100, &std_addr);
+            res = border_initialize(TRANSCEIVER_CC1100, &std_addr);
             switch (res) {
-                case (SUCCESS): printf("INFO: Edge router initialized.\n"); break;
+                case (SUCCESS): printf("INFO: Border router initialized.\n"); break;
                 case (SIXLOWERROR_ADDRESS): printf("ERROR: Illegal IP address: "); 
                         ipv6_print_addr(&std_addr); break;
                 default: printf("ERROR: Unknown error (%d).\n", res); break;

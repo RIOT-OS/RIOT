@@ -24,39 +24,39 @@
 
 #define READER_STACK_SIZE   512
 
-char reader_stack[READER_STACK_SIZE];
-uint16_t reader_pid;
+char serial_reader_stack[READER_STACK_SIZE];
+uint16_t serial_reader_pid;
 
 abr_cache_t *abr_info;
 uint16_t abro_version;
-uint8_t edge_out_buf[EDGE_BUFFER_SIZE];
-uint8_t edge_in_buf[EDGE_BUFFER_SIZE];
+uint8_t border_out_buf[BORDER_BUFFER_SIZE];
+uint8_t border_in_buf[BORDER_BUFFER_SIZE];
 
-slwin_stat_t slwin_stat;
+flowcontrol_stat_t slwin_stat;
 sem_t connection_established;
 int16_t synack_seqnum = -1;
 int readpacket(uint8_t *packet_buf, int size);
 uint16_t get_next_abro_version();
-void init_edge_router_info(ipv6_addr_t *abr_addr);
+void init_border_router_info(ipv6_addr_t *abr_addr);
 uint8_t abr_info_add_context(lowpan_context_t *context);
 
-void edge_process_uart(void);
-void edge_receive_from_uart(edge_packet_t *packet, int len);
+void serial_reader_f(void);
+void flowcontrol_deliver_from_uart(border_packet_t *packet, int len);
 
 void slwin_init() {
     int i;
     
-    slwin_stat.send_win_not_full = sem_init(EDGE_SWS);
-    for(i = 0; i < EDGE_SWS; i++) {
+    slwin_stat.send_win_not_full = sem_init(BORDER_SWS);
+    for(i = 0; i < BORDER_SWS; i++) {
         slwin_stat.send_win[i].frame_len = 0;
     }
-    memset(&slwin_stat.send_win,0, sizeof(struct send_slot) * EDGE_SWS);
+    memset(&slwin_stat.send_win,0, sizeof(struct send_slot) * BORDER_SWS);
         
-    for(i = 0; i < EDGE_RWS; i++) {
+    for(i = 0; i < BORDER_RWS; i++) {
         slwin_stat.recv_win[i].received = 0;
         slwin_stat.recv_win[i].frame_len = 0;
     }
-    memset(&slwin_stat.recv_win,0, sizeof(struct recv_slot) * EDGE_RWS);
+    memset(&slwin_stat.recv_win,0, sizeof(struct recv_slot) * BORDER_RWS);
 }
 
 uint16_t get_next_abro_version() {
@@ -65,16 +65,16 @@ uint16_t get_next_abro_version() {
 }
 
 ipv6_addr_t init_threeway_handshake() {
-    edge_syn_packet_t *syn;
+    border_syn_packet_t *syn;
     msg_t m;
     m.content.ptr = NULL;
-    msg_send(&m,reader_pid,1);
+    msg_send(&m,serial_reader_pid,1);
     while(1) {
         msg_receive(&m);
         printf("INFO: SYN received.\n");
         
-        syn = (edge_syn_packet_t *)m.content.ptr;
-        edge_conf_header_t *synack = (edge_conf_header_t *)edge_out_buf;
+        syn = (border_syn_packet_t *)m.content.ptr;
+        border_conf_header_t *synack = (border_conf_header_t *)border_out_buf;
         ipv6_addr_t addr;
         memcpy(&addr, &(syn->addr), sizeof (ipv6_addr_t));
         
@@ -83,11 +83,11 @@ ipv6_addr_t init_threeway_handshake() {
         slwin_stat.last_ack = slwin_stat.last_frame;
         
         synack->reserved = 0;
-        synack->type = EDGE_PACKET_CONF_TYPE;
-        synack->conftype = EDGE_CONF_SYNACK;
+        synack->type = BORDER_PACKET_CONF_TYPE;
+        synack->conftype = BORDER_CONF_SYNACK;
         
         printf("Send SYNACK.\n");
-        edge_send_over_uart((edge_packet_t *)synack,sizeof (edge_conf_header_t));
+        flowcontrol_send_over_uart((border_packet_t *)synack,sizeof (border_conf_header_t));
         
         synack_seqnum = synack->seq_num;
         
@@ -95,18 +95,18 @@ ipv6_addr_t init_threeway_handshake() {
     }
 }
 
-uint8_t edge_initialize(transceiver_type_t trans,ipv6_addr_t *edge_router_addr) {
+uint8_t border_initialize(transceiver_type_t trans,ipv6_addr_t *border_router_addr) {
     ipv6_addr_t addr;
     
     slwin_init();
     
-    reader_pid = thread_create(
-            reader_stack, READER_STACK_SIZE,
+    serial_reader_pid = thread_create(
+            serial_reader_stack, READER_STACK_SIZE,
             PRIORITY_MAIN-1, CREATE_STACKTEST,
-            edge_process_uart, "edge_process_uart");
+            serial_reader_f, "serial_reader");
     
-    if (edge_router_addr == NULL) {
-        edge_router_addr = &addr;
+    if (border_router_addr == NULL) {
+        border_router_addr = &addr;
         
         addr = init_threeway_handshake();
     }
@@ -115,21 +115,21 @@ uint8_t edge_initialize(transceiver_type_t trans,ipv6_addr_t *edge_router_addr) 
      * RFC 4944 (Section 6) & RFC 2464 (Section 4) from short address 
      * -- for now
      */
-    if (    edge_router_addr->uint16[4] != HTONS(IEEE_802154_PAN_ID ^ 0x0200) ||
-            edge_router_addr->uint16[5] != HTONS(0x00FF) ||
-            edge_router_addr->uint16[6] != HTONS(0xFE00)
+    if (    border_router_addr->uint16[4] != HTONS(IEEE_802154_PAN_ID ^ 0x0200) ||
+            border_router_addr->uint16[5] != HTONS(0x00FF) ||
+            border_router_addr->uint16[6] != HTONS(0xFE00)
         ) {
         return SIXLOWERROR_ADDRESS;
     }
     
     // radio-address is 8-bit so this must be tested extra
-    if (edge_router_addr->uint8[14] != 0) {
+    if (border_router_addr->uint8[14] != 0) {
         return SIXLOWERROR_ADDRESS;
     }
     
-    sixlowpan_init(trans,edge_router_addr->uint8[15],1);
+    sixlowpan_init(trans,border_router_addr->uint8[15],1);
     
-    init_edge_router_info(edge_router_addr);
+    init_border_router_info(border_router_addr);
     
     ipv6_init_iface_as_router();
     
@@ -137,7 +137,7 @@ uint8_t edge_initialize(transceiver_type_t trans,ipv6_addr_t *edge_router_addr) 
     return SUCCESS;
 }
 
-lowpan_context_t *edge_define_context(uint8_t cid, ipv6_addr_t *prefix, uint8_t prefix_len, uint16_t lifetime) {
+lowpan_context_t *border_define_context(uint8_t cid, ipv6_addr_t *prefix, uint8_t prefix_len, uint16_t lifetime) {
     lowpan_context_t *context;
     
     mutex_lock(&lowpan_context_mutex);
@@ -147,17 +147,17 @@ lowpan_context_t *edge_define_context(uint8_t cid, ipv6_addr_t *prefix, uint8_t 
     return context;
 }
 
-lowpan_context_t *edge_alloc_context(ipv6_addr_t *prefix, uint8_t prefix_len, uint16_t lifetime) {
+lowpan_context_t *border_alloc_context(ipv6_addr_t *prefix, uint8_t prefix_len, uint16_t lifetime) {
     lowpan_context_t *context = lowpan_context_lookup(prefix);
     
     if (context != NULL && context->length == prefix_len) {
-        context = edge_define_context(context->num, prefix, prefix_len, lifetime);
+        context = border_define_context(context->num, prefix, prefix_len, lifetime);
     }
     
     context = NULL;
     for (int i = 0; i < LOWPAN_CONTEXT_MAX; i++) {
         if (lowpan_context_num_lookup(i) != NULL) {
-            context = edge_define_context(i, prefix, prefix_len, lifetime);
+            context = border_define_context(i, prefix, prefix_len, lifetime);
         }
     }
     return context;
@@ -183,7 +183,7 @@ uint8_t abr_info_add_context(lowpan_context_t *context) {
     return SUCCESS;
 }
 
-void init_edge_router_info(ipv6_addr_t *abr_addr) {
+void init_border_router_info(ipv6_addr_t *abr_addr) {
     uint16_t abro_version = get_next_abro_version();
     ipv6_addr_t prefix;
     lowpan_context_t *context;
@@ -202,7 +202,7 @@ void init_edge_router_info(ipv6_addr_t *abr_addr) {
     ipv6_set_prefix(&prefix, abr_addr);
     plist_add(&prefix, 64, OPT_PI_VLIFETIME_INFINITE,0,1,OPT_PI_FLAG_A);
     
-    context = edge_define_context(0, &prefix, 64, 5);  // has to be reset some time later
+    context = border_define_context(0, &prefix, 64, 5);  // has to be reset some time later
 }
 
 int readpacket(uint8_t *packet_buf, int size) {
@@ -255,7 +255,7 @@ int writepacket(uint8_t *packet_buf, size_t size) {
     uint8_t *byte_ptr = packet_buf;
     
     while ((byte_ptr - packet_buf) < size) {
-        if ((byte_ptr - packet_buf) > EDGE_BUFFER_SIZE) {
+        if ((byte_ptr - packet_buf) > BORDER_BUFFER_SIZE) {
             return -1;
         }
         printf("%02x ",*byte_ptr);
@@ -289,11 +289,11 @@ int writepacket(uint8_t *packet_buf, size_t size) {
     return (byte_ptr - packet_buf);
 }
 
-void edge_process_uart(void) {
+void serial_reader_f(void) {
     int main_pid = 0;
     int bytes;
     msg_t m;
-    edge_packet_t *uart_buf;
+    border_packet_t *uart_buf;
     
     posix_open(uart0_handler_pid, 0);
     
@@ -302,7 +302,7 @@ void edge_process_uart(void) {
     
     while(1) {
         posix_open(uart0_handler_pid, 0);
-        bytes = readpacket(edge_in_buf, EDGE_BUFFER_SIZE);
+        bytes = readpacket(border_in_buf, BORDER_BUFFER_SIZE);
         if (bytes < 0) {
             switch (bytes) {
                 case (-SIXLOWERROR_ARRAYFULL):{
@@ -317,17 +317,17 @@ void edge_process_uart(void) {
             continue;
         }
         
-        uart_buf = (edge_packet_t*)edge_in_buf;
+        uart_buf = (border_packet_t*)border_in_buf;
         if (uart_buf->reserved == 0) {
-            if (uart_buf->type == EDGE_PACKET_CONF_TYPE) {
-                edge_conf_header_t *conf_packet = (edge_conf_header_t*)edge_in_buf;
-                if (conf_packet->conftype == EDGE_CONF_SYN) {
+            if (uart_buf->type == BORDER_PACKET_CONF_TYPE) {
+                border_conf_header_t *conf_packet = (border_conf_header_t*)border_in_buf;
+                if (conf_packet->conftype == BORDER_CONF_SYN) {
                     m.content.ptr = (char *)conf_packet;
                     msg_send(&m, main_pid, 1);
                     continue;
                 }
             }
-            edge_receive_from_uart(uart_buf, bytes);
+            flowcontrol_deliver_from_uart(uart_buf, bytes);
         }
     }
 }
@@ -336,12 +336,12 @@ int set_timeout(vtimer_t *timeout, long useconds, void *args);
 
 void timeout_callback (void *args) {
     uint8_t seq_num = *((uint8_t *)args);
-    struct send_slot *slot = &(slwin_stat.send_win[seq_num % EDGE_SWS]);
+    struct send_slot *slot = &(slwin_stat.send_win[seq_num % BORDER_SWS]);
     
-    if (seq_num == ((edge_packet_t *)(slot->frame))->seq_num) {
+    if (seq_num == ((border_packet_t *)(slot->frame))->seq_num) {
         writepacket(slot->frame,slot->frame_len);
         
-        if (set_timeout(&slot->timeout, EDGE_SL_TIMEOUT, args) != 0) {
+        if (set_timeout(&slot->timeout, BORDER_SL_TIMEOUT, args) != 0) {
             printf("ERROR: Error invoking timeout timer\n");
             return;
         }
@@ -364,19 +364,19 @@ static int in_window(uint8_t seq_num, uint8_t min, uint8_t max) {
     return pos < maxpos;
 }
 
-void edge_demultiplex(edge_packet_t *packet, int len) {
+void demultiplex(border_packet_t *packet, int len) {
     switch (packet->type) {
-        case (EDGE_PACKET_RAW_TYPE):{
-            fputs(((char *)packet) + sizeof (edge_packet_t), stdin);
+        case (BORDER_PACKET_RAW_TYPE):{
+            fputs(((char *)packet) + sizeof (border_packet_t), stdin);
             break;
         }
-        case (EDGE_PACKET_L3_TYPE):{
-            edge_l3_header_t *l3_header_buf = (edge_l3_header_t *)packet;
+        case (BORDER_PACKET_L3_TYPE):{
+            border_l3_header_t *l3_header_buf = (border_l3_header_t *)packet;
             switch (l3_header_buf->ethertype) {
-                case (EDGE_ETHERTYPE_IPV6):{
+                case (BORDER_ETHERTYPE_IPV6):{
                     printf("INFO: IPv6-Packet received\n");
-                    struct ipv6_hdr_t *ipv6_buf = (struct ipv6_hdr_t *)(((unsigned char *)packet) + sizeof (edge_l3_header_t));
-                    edge_send_ipv6_over_lowpan(ipv6_buf, 1, 1);
+                    struct ipv6_hdr_t *ipv6_buf = (struct ipv6_hdr_t *)(((unsigned char *)packet) + sizeof (border_l3_header_t));
+                    border_send_ipv6_over_lowpan(ipv6_buf, 1, 1);
                     break;
                 }
                 default:
@@ -385,8 +385,8 @@ void edge_demultiplex(edge_packet_t *packet, int len) {
             }
             break;
         }
-        case (EDGE_PACKET_CONF_TYPE):{
-            edge_conf_header_t *conf_header_buf = (edge_conf_header_t *)packet;
+        case (BORDER_PACKET_CONF_TYPE):{
+            border_conf_header_t *conf_header_buf = (border_conf_header_t *)packet;
             switch (conf_header_buf->conftype) {
                 default:
                     printf("INFO: Unknown conftype %02x\n", conf_header_buf->conftype);
@@ -395,21 +395,21 @@ void edge_demultiplex(edge_packet_t *packet, int len) {
             break;
         }
         default:
-            printf("INFO: Unknown edge packet type %02x\n", packet->type);
+            printf("INFO: Unknown border packet type %02x\n", packet->type);
             break;
     }
 }
 
-void edge_send_ack(uint8_t seq_num) {
-    edge_packet_t *packet = (edge_packet_t *)edge_out_buf;
+void border_send_ack(uint8_t seq_num) {
+    border_packet_t *packet = (border_packet_t *)border_out_buf;
     packet->reserved = 0;
-    packet->type = EDGE_PACKET_ACK_TYPE;
+    packet->type = BORDER_PACKET_ACK_TYPE;
     packet->seq_num = seq_num;
-    writepacket((uint8_t *)packet, sizeof (edge_packet_t));
+    writepacket((uint8_t *)packet, sizeof (border_packet_t));
 }
 
-void edge_receive_from_uart(edge_packet_t *packet, int len) {
-    if (packet->type == EDGE_PACKET_ACK_TYPE) {
+void flowcontrol_deliver_from_uart(border_packet_t *packet, int len) {
+    if (packet->type == BORDER_PACKET_ACK_TYPE) {
         printf("INFO: ACK %d received\n", packet->seq_num);
         if (in_window(packet->seq_num, slwin_stat.last_ack+1, slwin_stat.last_frame)) {
             if (synack_seqnum == packet->seq_num) {
@@ -418,19 +418,19 @@ void edge_receive_from_uart(edge_packet_t *packet, int len) {
             }
             do {
                 struct send_slot *slot;
-                slot = &(slwin_stat.send_win[++slwin_stat.last_ack % EDGE_SWS]);
+                slot = &(slwin_stat.send_win[++slwin_stat.last_ack % BORDER_SWS]);
                 vtimer_remove(&slot->timeout);
-                memset(&slot->frame,0,EDGE_BUFFER_SIZE);
+                memset(&slot->frame,0,BORDER_BUFFER_SIZE);
                 sem_signal(&slwin_stat.send_win_not_full);
             } while (slwin_stat.last_ack != packet->seq_num);
         }
     } else {
         struct recv_slot *slot;
         
-        slot = &(slwin_stat.recv_win[packet->seq_num % EDGE_RWS]);
+        slot = &(slwin_stat.recv_win[packet->seq_num % BORDER_RWS]);
         if (    !in_window(packet->seq_num, 
                 slwin_stat.next_exp, 
-                slwin_stat.next_exp + EDGE_RWS - 1)) {
+                slwin_stat.next_exp + BORDER_RWS - 1)) {
             return;
         }
         
@@ -439,45 +439,45 @@ void edge_receive_from_uart(edge_packet_t *packet, int len) {
         
         if (packet->seq_num == slwin_stat.next_exp) {
             while (slot->received) {
-                edge_demultiplex((edge_packet_t *)slot->frame, slot->frame_len);
-                memset(&slot->frame,0,EDGE_BUFFER_SIZE);
+                demultiplex((border_packet_t *)slot->frame, slot->frame_len);
+                memset(&slot->frame,0,BORDER_BUFFER_SIZE);
                 slot->received = 0;
-                slot = &slwin_stat.recv_win[++(slwin_stat.next_exp) % EDGE_RWS];
+                slot = &slwin_stat.recv_win[++(slwin_stat.next_exp) % BORDER_RWS];
             }
         }
         
-        edge_send_ack(slwin_stat.next_exp - 1);
+        border_send_ack(slwin_stat.next_exp - 1);
     }
 }
 
-void edge_send_over_uart(edge_packet_t *packet, int len) {
+void flowcontrol_send_over_uart(border_packet_t *packet, int len) {
     struct send_slot *slot;
     uint8_t args[] = {packet->seq_num};
     
     sem_wait(&(slwin_stat.send_win_not_full));
     packet->seq_num = ++slwin_stat.last_frame;
-    slot = &(slwin_stat.send_win[packet->seq_num % EDGE_SWS]);
+    slot = &(slwin_stat.send_win[packet->seq_num % BORDER_SWS]);
     memcpy(slot->frame, (uint8_t *)packet, len);
     slot->frame_len = len;
-    if (set_timeout(&slot->timeout, EDGE_SL_TIMEOUT, (void *)args) != 0) {
+    if (set_timeout(&slot->timeout, BORDER_SL_TIMEOUT, (void *)args) != 0) {
         printf("ERROR: Error invoking timeout timer\n");
         return;
     }
     writepacket((uint8_t *)packet, len);
 }
 
-void edge_send_ipv6_over_uart(struct ipv6_hdr_t *packet) {
-    edge_l3_header_t *serial_buf;
+void multiplex_send_ipv6_over_uart(struct ipv6_hdr_t *packet) {
+    border_l3_header_t *serial_buf;
     
-    serial_buf = (edge_l3_header_t *)edge_out_buf;
+    serial_buf = (border_l3_header_t *)border_out_buf;
     serial_buf->reserved = 0;
-    serial_buf->type = EDGE_PACKET_L3_TYPE;
-    serial_buf->ethertype = EDGE_ETHERTYPE_IPV6;
-    memcpy(edge_out_buf+sizeof (edge_l3_header_t), packet, IPV6_HDR_LEN + packet->length);
-    writepacket(edge_out_buf, sizeof (edge_l3_header_t) + IPV6_HDR_LEN + packet->length);
+    serial_buf->type = BORDER_PACKET_L3_TYPE;
+    serial_buf->ethertype = BORDER_ETHERTYPE_IPV6;
+    memcpy(border_out_buf+sizeof (border_l3_header_t), packet, IPV6_HDR_LEN + packet->length);
+    writepacket(border_out_buf, sizeof (border_l3_header_t) + IPV6_HDR_LEN + packet->length);
 }
 
-void edge_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag) {
+void border_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag) {
     //abr_cache_t *msg_abr = NULL;
     uint16_t offset = IPV6_HDR_LEN+HTONS(packet->length);
     
@@ -524,14 +524,14 @@ void edge_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uin
             }
         }
         
-        // edge router should not send neighbor and router solicitations in lowpan
+        // border router should not send neighbor and router solicitations in lowpan
     }*/
     
     lowpan_init((ieee_802154_long_t*)&(packet->destaddr.uint16[4]), (uint8_t*)packet);
     
 }
 
-void edge_process_lowpan(void) {
+void border_process_lowpan(void) {
     msg_t m;
     struct ipv6_hdr_t *ipv6_buf;
     
@@ -539,10 +539,10 @@ void edge_process_lowpan(void) {
         msg_receive(&m);
         ipv6_buf = (struct ipv6_hdr_t *)m.content.ptr;
         // TODO: Bei ICMPv6-Paketen entsprechende LoWPAN-Optionen verarbeiten und entfernen
-        edge_send_ipv6_over_uart(ipv6_buf);
+        multiplex_send_ipv6_over_uart(ipv6_buf);
     }
 }
 
-abr_cache_t *get_edge_router_info() {
+abr_cache_t *get_border_router_info() {
     return abr_info;
 }
