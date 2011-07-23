@@ -332,6 +332,8 @@ void edge_process_uart(void) {
     }
 }
 
+int set_timeout(vtimer_t *timeout, long useconds, void *args);
+
 void timeout_callback (void *args) {
     uint8_t seq_num = *((uint8_t *)args);
     struct send_slot *slot = &(slwin_stat.send_win[seq_num % EDGE_SWS]);
