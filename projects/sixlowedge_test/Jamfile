@@ -1,0 +1,10 @@
+SubDir TOP projects sixlowedge_test ;
+
+Module sixlowedge_test : main.c : 6lowpan auto_init uart0 posix_io ;
+
+UseModule sixlowedge_test ;
+UseModule cc110x_ng ;
+# UseModule transceiver ;
+UseModule 6lowpan ;
+UseModule vtimer ;
+UseModule auto_init ;
