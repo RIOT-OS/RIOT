@@ -374,13 +374,12 @@ void demultiplex(border_packet_t *packet, int len) {
             border_l3_header_t *l3_header_buf = (border_l3_header_t *)packet;
             switch (l3_header_buf->ethertype) {
                 case (BORDER_ETHERTYPE_IPV6):{
-                    printf("INFO: IPv6-Packet received\n");
                     struct ipv6_hdr_t *ipv6_buf = (struct ipv6_hdr_t *)(((unsigned char *)packet) + sizeof (border_l3_header_t));
                     border_send_ipv6_over_lowpan(ipv6_buf, 1, 1);
                     break;
                 }
                 default:
-                    printf("INFO: Unknown ethertype %04x\n", l3_header_buf->ethertype);
+                    printf("ERROR: Unknown ethertype %04x\n", l3_header_buf->ethertype);
                     break;
             }
             break;
@@ -388,17 +387,9 @@ void demultiplex(border_packet_t *packet, int len) {
         case (BORDER_PACKET_CONF_TYPE):{
             border_conf_header_t *conf_header_buf = (border_conf_header_t *)packet;
             switch (conf_header_buf->conftype) {
-                case (BORDER_CONF_SYNACK):{
-                    printf("INFO: SYNACK-Packet %d received, "
-                            "but nothing is implemented yet for this case.\n",
-                            conf_header_buf->seq_num);
-                    break;
-                }
                 case (BORDER_CONF_CONTEXT):{
                     border_context_packet_t *context = (border_context_packet_t *)packet;
                     ipv6_addr_t target_addr;
-                    printf("INFO: Context packet (%d) received\n",
-                            conf_header_buf->seq_num);
                     ipv6_set_all_nds_mcast_addr(&target_addr);
                     lowpan_context_update(
                             context->context.cid, 
@@ -411,20 +402,18 @@ void demultiplex(border_packet_t *packet, int len) {
                     break;
                 }
                 case (BORDER_CONF_IPADDR):{
-                    border_addr_packet_t *addr_packet = (border_addr_packet_t *)packet;
-                    
-                    printf("INFO: Address packet (%d) received.\n",
-                            conf_header_buf->seq_num);
+                    //border_addr_packet_t *addr_packet = (border_addr_packet_t *)packet;
                     // add address
+                    break;
                 }
                 default:
-                    printf("INFO: Unknown conftype %02x\n", conf_header_buf->conftype);
+                    printf("ERROR: Unknown conftype %02x\n", conf_header_buf->conftype);
                     break;
             }
             break;
         }
         default:
-            printf("INFO: Unknown border packet type %02x\n", packet->type);
+            printf("ERROR: Unknown border packet type %02x\n", packet->type);
             break;
     }
 }
