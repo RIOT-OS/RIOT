@@ -71,7 +71,6 @@ ipv6_addr_t init_threeway_handshake() {
     msg_send(&m,serial_reader_pid,1);
     while(1) {
         msg_receive(&m);
-        printf("INFO: SYN received.\n");
         
         syn = (border_syn_packet_t *)m.content.ptr;
         border_conf_header_t *synack = (border_conf_header_t *)border_out_buf;
@@ -86,7 +85,6 @@ ipv6_addr_t init_threeway_handshake() {
         synack->type = BORDER_PACKET_CONF_TYPE;
         synack->conftype = BORDER_CONF_SYNACK;
         
-        printf("Send SYNACK.\n");
         flowcontrol_send_over_uart((border_packet_t *)synack,sizeof (border_conf_header_t));
         
         synack_seqnum = synack->seq_num;
@@ -258,7 +256,6 @@ int writepacket(uint8_t *packet_buf, size_t size) {
         if ((byte_ptr - packet_buf) > BORDER_BUFFER_SIZE) {
             return -1;
         }
-        printf("%02x ",*byte_ptr);
         switch (*byte_ptr) {
             case(DC3):{
                 *byte_ptr = DC3_ESC;
@@ -283,7 +280,6 @@ int writepacket(uint8_t *packet_buf, size_t size) {
         byte_ptr++;
     }
     
-    printf("\n");
     uart0_putc(END);
     
     return (byte_ptr - packet_buf);
@@ -374,13 +370,12 @@ void demultiplex(border_packet_t *packet, int len) {
             border_l3_header_t *l3_header_buf = (border_l3_header_t *)packet;
             switch (l3_header_buf->ethertype) {
                 case (BORDER_ETHERTYPE_IPV6):{
-                    printf("INFO: IPv6-Packet received\n");
                     struct ipv6_hdr_t *ipv6_buf = (struct ipv6_hdr_t *)(((unsigned char *)packet) + sizeof (border_l3_header_t));
                     border_send_ipv6_over_lowpan(ipv6_buf, 1, 1);
                     break;
                 }
                 default:
-                    printf("INFO: Unknown ethertype %04x\n", l3_header_buf->ethertype);
+                    printf("ERROR: Unknown ethertype %02x\n", l3_header_buf->ethertype);
                     break;
             }
             break;
@@ -389,16 +384,11 @@ void demultiplex(border_packet_t *packet, int len) {
             border_conf_header_t *conf_header_buf = (border_conf_header_t *)packet;
             switch (conf_header_buf->conftype) {
                 case (BORDER_CONF_SYNACK):{
-                    printf("INFO: SYNACK-Packet %d received, "
-                            "but nothing is implemented yet for this case.\n",
-                            conf_header_buf->seq_num);
                     break;
                 }
                 case (BORDER_CONF_CONTEXT):{
                     border_context_packet_t *context = (border_context_packet_t *)packet;
                     ipv6_addr_t target_addr;
-                    printf("INFO: Context packet (%d) received\n",
-                            conf_header_buf->seq_num);
                     ipv6_set_all_nds_mcast_addr(&target_addr);
                     lowpan_context_update(
                             context->context.cid, 
@@ -413,18 +403,16 @@ void demultiplex(border_packet_t *packet, int len) {
                 case (BORDER_CONF_IPADDR):{
                     border_addr_packet_t *addr_packet = (border_addr_packet_t *)packet;
                     
-                    printf("INFO: Address packet (%d) received.\n",
-                            conf_header_buf->seq_num);
                     // add address
                 }
                 default:
-                    printf("INFO: Unknown conftype %02x\n", conf_header_buf->conftype);
+                    printf("ERROR: Unknown conftype %02x\n", conf_header_buf->conftype);
                     break;
             }
             break;
         }
         default:
-            printf("INFO: Unknown border packet type %02x\n", packet->type);
+            printf("ERROR: Unknown border packet type %02x\n", packet->type);
             break;
     }
 }
@@ -439,7 +427,6 @@ void border_send_ack(uint8_t seq_num) {
 
 void flowcontrol_deliver_from_uart(border_packet_t *packet, int len) {
     if (packet->type == BORDER_PACKET_ACK_TYPE) {
-        printf("INFO: ACK %d received\n", packet->seq_num);
         if (in_window(packet->seq_num, slwin_stat.last_ack+1, slwin_stat.last_frame)) {
             if (synack_seqnum == packet->seq_num) {
                 synack_seqnum = -1;
