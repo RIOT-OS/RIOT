@@ -78,8 +78,7 @@ typedef struct __attribute__ ((packed)) border_context_packet_t {
     uint8_t seq_num;
     uint8_t conftype;
     struct border_context_t {
-        uint16_t abro_version;
-        uint8_t num;
+        uint8_t cid;
         ipv6_addr_t prefix;
         uint8_t length;
         uint8_t comp;

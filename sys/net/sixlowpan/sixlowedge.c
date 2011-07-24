@@ -388,6 +388,35 @@ void demultiplex(border_packet_t *packet, int len) {
         case (BORDER_PACKET_CONF_TYPE):{
             border_conf_header_t *conf_header_buf = (border_conf_header_t *)packet;
             switch (conf_header_buf->conftype) {
+                case (BORDER_CONF_SYNACK):{
+                    printf("INFO: SYNACK-Packet %d received, "
+                            "but nothing is implemented yet for this case.\n",
+                            conf_header_buf->seq_num);
+                    break;
+                }
+                case (BORDER_CONF_CONTEXT):{
+                    border_context_packet_t *context = (border_context_packet_t *)packet;
+                    ipv6_addr_t target_addr;
+                    printf("INFO: Context packet (%d) received\n",
+                            conf_header_buf->seq_num);
+                    ipv6_set_all_nds_mcast_addr(&target_addr);
+                    lowpan_context_update(
+                            context->context.cid, 
+                            &context->context.prefix, 
+                            context->context.length, 
+                            context->context.comp,
+                            context->context.lifetime
+                        );
+                    // Send router advertisement
+                    break;
+                }
+                case (BORDER_CONF_IPADDR):{
+                    border_addr_packet_t *addr_packet = (border_addr_packet_t *)packet;
+                    
+                    printf("INFO: Address packet (%d) received.\n",
+                            conf_header_buf->seq_num);
+                    // add address
+                }
                 default:
                     printf("INFO: Unknown conftype %02x\n", conf_header_buf->conftype);
                     break;
