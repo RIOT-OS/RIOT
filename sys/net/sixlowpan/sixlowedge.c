@@ -503,7 +503,30 @@ void multiplex_send_ipv6_over_uart(struct ipv6_hdr_t *packet) {
     serial_buf->type = BORDER_PACKET_L3_TYPE;
     serial_buf->ethertype = BORDER_ETHERTYPE_IPV6;
     memcpy(border_out_buf+sizeof (border_l3_header_t), packet, IPV6_HDR_LEN + packet->length);
-    writepacket(border_out_buf, sizeof (border_l3_header_t) + IPV6_HDR_LEN + packet->length);
+    
+    flowcontrol_send_over_tty(
+            (border_packet_t *) serial_buf,
+            sizeof (border_l3_header_t)
+        );
+}
+
+void multiplex_send_addr_over_uart(ipv6_addr_t *addr) {
+    border_addr_packet_t *serial_buf;
+    
+    serial_buf = (border_addr_packet_t *)border_out_buf;
+    serial_buf->reserved = 0;
+    serial_buf->type = BORDER_PACKET_CONF_TYPE;
+    serial_buf->conftype = BORDER_CONF_IPADDR;
+    memcpy(
+            &serial_buf->addr,
+            addr, 
+            sizeof (ipv6_addr_t)
+        );
+    
+    flowcontrol_send_over_tty(
+            (border_packet_t *) serial_buf,
+            sizeof (border_addr_packet_t)
+        );
 }
 
 void border_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag) {

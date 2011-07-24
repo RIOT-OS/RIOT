@@ -110,6 +110,7 @@ typedef struct flowcontrol_stat_t {
 
 uint8_t border_initialize(transceiver_type_t trans,ipv6_addr_t *border_router_addr);
 void multiplex_send_ipv6_over_uart(struct ipv6_hdr_t *packet);
+void multiplex_send_addr_over_uart(ipv6_addr_t *addr);
 void flowcontrol_send_over_uart(border_packet_t *packet, int len);
 void border_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag);
 void border_process_lowpan(void);
@@ -119,8 +120,5 @@ void border_process_uart(void);
 void slwin_init();
 
 abr_cache_t *get_border_router_info();
-
-lowpan_context_t *border_define_context(uint8_t cid, ipv6_addr_t *prefix, uint8_t prefix_len, uint16_t lifetime);
-lowpan_context_t *border_alloc_context(ipv6_addr_t *prefix, uint8_t prefix_len, uint16_t lifetime);
 
 #endif /* SIXLOWBORDER_H*/
