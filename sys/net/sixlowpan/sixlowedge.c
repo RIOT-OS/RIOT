@@ -539,45 +539,13 @@ void border_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, u
     memset(buffer, 0, BUFFER_SIZE);
     memcpy(buffer+LL_HDR_LEN, packet, offset);
     
-    /*
-    if (ipv6_buf->nextheader == PROTO_NUM_ICMPV6) {
-        icmp_buf = (icmpv6_hdr_t *)(ipv6_buf + IPV6_HDR_LEN);
-        if (icmp_buf->type == ICMP_RTR_ADV) {
-            if (abr_count > 0) {
-                opt_abro_t *opt_abro_buf = (opt_abro_t *)(ipv6_buf + offset);
-                msg_abr = abr_get_most_current();
-                opt_abro_buf->type = OPT_ABRO_TYPE;
-                opt_abro_buf->length = OPT_ABRO_LEN;
-                opt_abro_buf->version = HTONS(msg_abr->version);
-                opt_abro_buf->reserved = 0;
-                memcpy(&(opt_abro_buf->addr), &(msg_abr->abr_addr), sizeof (ipv6_addr_t));
-                ipv6->length += OPT_ABRO_HDR_LEN;
-                offset += OPT_ARO_HDR_LEN;
-            }
-            
-            if (sixco_flag) {
-                // TODO: 6CO
-            }
+    if (packet->nextheader == PROTO_NUM_ICMPV6) {
+        struct icmpv6_hdr_t *icmp_buf = (struct icmpv6_hdr_t *)(packet + IPV6_HDR_LEN);
+        if (icmp_buf->type == ICMP_REDIRECT) {
+            return;
         }
-        
-        if (icmp_buf->type == ICMP_NBR_ADV && aro_flag) {
-            if(aro == OPT_ARO){
-                /* set aro option *//*
-                opt_aro_t *opt_aro_buf = (opt_abro_t *)(ipv6_buf + offset);
-                opt_aro_buf->type = OPT_ARO_TYPE;
-                opt_aro_buf->length = OPT_ARO_LEN;
-                opt_aro_buf->status = 0;    // TODO
-                opt_aro_buf->reserved1 = 0;
-                opt_aro_buf->reserved2 = 0;
-                memcpy(&(opt_aro_buf->eui64), mac_get_eui(dst),8);
-                
-                ipv6->length += OPT_ARO_HDR_LEN;
-                offset += OPT_ARO_HDR_LEN;
-            }
-        }
-        
-        // border router should not send neighbor and router solicitations in lowpan
-    }*/
+        // Here, other ICMPv6 message types for ND may follow.
+    }
     
     lowpan_init((ieee_802154_long_t*)&(packet->destaddr.uint16[4]), (uint8_t*)packet);
     

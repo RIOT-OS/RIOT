@@ -37,6 +37,7 @@
 #define ICMP_RTR_SOL                    133
 #define ICMP_NBR_ADV                    136
 #define ICMP_NBR_SOL                    135 
+#define ICMP_REDIRECT                   137	// will be filtered out by the border router
 /* stllao option rfc4861 4.6.1 */
 #define OPT_STLLAO_MIN_LEN              8
 #define OPT_STLLAO_MAX_LEN              16
