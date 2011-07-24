@@ -71,7 +71,6 @@ ipv6_addr_t init_threeway_handshake() {
     msg_send(&m,serial_reader_pid,1);
     while(1) {
         msg_receive(&m);
-        printf("INFO: SYN received.\n");
         
         syn = (border_syn_packet_t *)m.content.ptr;
         border_conf_header_t *synack = (border_conf_header_t *)border_out_buf;
@@ -86,7 +85,6 @@ ipv6_addr_t init_threeway_handshake() {
         synack->type = BORDER_PACKET_CONF_TYPE;
         synack->conftype = BORDER_CONF_SYNACK;
         
-        printf("Send SYNACK.\n");
         flowcontrol_send_over_uart((border_packet_t *)synack,sizeof (border_conf_header_t));
         
         synack_seqnum = synack->seq_num;
@@ -262,24 +260,24 @@ int writepacket(uint8_t *packet_buf, size_t size) {
         switch (*byte_ptr) {
             case(DC3):{
                 *byte_ptr = DC3_ESC;
-                goto write_esc;
+                uart0_putc(ESC);
+                break;
             }
             case(END):{
                 *byte_ptr = END_ESC;
-                goto write_esc;
+                uart0_putc(ESC);
+                break;
             }
             case(ESC):{
                 *byte_ptr = ESC_ESC;
-                goto write_esc;
+                uart0_putc(ESC);
+                break;
             }
             default:{
-                goto write_byte;
+                break;
             }
         }
-        write_esc:
-            uart0_putc(ESC);
-        write_byte:
-            uart0_putc(*byte_ptr);
+        uart0_putc(*byte_ptr);
         byte_ptr++;
     }
     
@@ -428,7 +426,6 @@ void border_send_ack(uint8_t seq_num) {
 
 void flowcontrol_deliver_from_uart(border_packet_t *packet, int len) {
     if (packet->type == BORDER_PACKET_ACK_TYPE) {
-        printf("INFO: ACK %d received\n", packet->seq_num);
         if (in_window(packet->seq_num, slwin_stat.last_ack+1, slwin_stat.last_frame)) {
             if (synack_seqnum == packet->seq_num) {
                 synack_seqnum = -1;
