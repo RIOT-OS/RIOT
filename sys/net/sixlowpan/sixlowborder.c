@@ -22,46 +22,6 @@
 char serial_reader_stack[READER_STACK_SIZE];
 uint16_t serial_reader_pid;
 
-void serial_reader_f(void);
-
-uint8_t border_initialize(transceiver_type_t trans,ipv6_addr_t *border_router_addr) {
-    ipv6_addr_t addr;
-    
-    serial_reader_pid = thread_create(
-            serial_reader_stack, READER_STACK_SIZE,
-            PRIORITY_MAIN-1, CREATE_STACKTEST,
-            serial_reader_f, "serial_reader");
-    
-    if (border_router_addr == NULL) {
-        border_router_addr = &addr;
-        
-        addr = flowcontrol_init();
-    }
-    
-    /* only allow addresses generated accoding to 
-     * RFC 4944 (Section 6) & RFC 2464 (Section 4) from short address 
-     * -- for now
-     */
-    if (    border_router_addr->uint16[4] != HTONS(IEEE_802154_PAN_ID ^ 0x0200) ||
-            border_router_addr->uint16[5] != HTONS(0x00FF) ||
-            border_router_addr->uint16[6] != HTONS(0xFE00)
-        ) {
-        return SIXLOWERROR_ADDRESS;
-    }
-    
-    // radio-address is 8-bit so this must be tested extra
-    if (border_router_addr->uint8[14] != 0) {
-        return SIXLOWERROR_ADDRESS;
-    }
-    
-    sixlowpan_init(trans,border_router_addr->uint8[15],1);
-    
-    ipv6_init_iface_as_router();
-    
-    
-    return SUCCESS;
-}
-
 uint16_t border_get_serial_reader() {
     return serial_reader_pid;
 }
@@ -107,6 +67,44 @@ void serial_reader_f(void) {
             flowcontrol_deliver_from_uart(uart_buf, bytes);
         }
     }
+}
+
+uint8_t border_initialize(transceiver_type_t trans,ipv6_addr_t *border_router_addr) {
+    ipv6_addr_t addr;
+    
+    serial_reader_pid = thread_create(
+            serial_reader_stack, READER_STACK_SIZE,
+            PRIORITY_MAIN-1, CREATE_STACKTEST,
+            serial_reader_f, "serial_reader");
+    
+    if (border_router_addr == NULL) {
+        border_router_addr = &addr;
+        
+        addr = flowcontrol_init();
+    }
+    
+    /* only allow addresses generated accoding to 
+     * RFC 4944 (Section 6) & RFC 2464 (Section 4) from short address 
+     * -- for now
+     */
+    if (    border_router_addr->uint16[4] != HTONS(IEEE_802154_PAN_ID ^ 0x0200) ||
+            border_router_addr->uint16[5] != HTONS(0x00FF) ||
+            border_router_addr->uint16[6] != HTONS(0xFE00)
+        ) {
+        return SIXLOWERROR_ADDRESS;
+    }
+    
+    // radio-address is 8-bit so this must be tested extra
+    if (border_router_addr->uint8[14] != 0) {
+        return SIXLOWERROR_ADDRESS;
+    }
+    
+    sixlowpan_init(trans,border_router_addr->uint8[15],1);
+    
+    ipv6_init_iface_as_router();
+    
+    
+    return SUCCESS;
 }
 
 void border_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag) {
