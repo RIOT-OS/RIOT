@@ -104,6 +104,9 @@ typedef struct flowcontrol_stat_t {
         size_t frame_len;
     } recv_win[BORDER_RWS];
 } flowcontrol_stat_t;
+uint16_t border_get_serial_reader();
+uint8_t *get_serial_out_buffer(int offset);
+uint8_t *get_serial_in_buffer(int offset);
 
 uint8_t border_initialize(transceiver_type_t trans,ipv6_addr_t *border_router_addr);
 void multiplex_send_ipv6_over_uart(struct ipv6_hdr_t *packet);

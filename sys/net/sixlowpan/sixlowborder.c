@@ -27,8 +27,8 @@
 char serial_reader_stack[READER_STACK_SIZE];
 uint16_t serial_reader_pid;
 
-uint8_t border_out_buf[BORDER_BUFFER_SIZE];
-uint8_t border_in_buf[BORDER_BUFFER_SIZE];
+uint8_t serial_out_buf[BORDER_BUFFER_SIZE];
+uint8_t serial_in_buf[BORDER_BUFFER_SIZE];
 
 flowcontrol_stat_t slwin_stat;
 sem_t connection_established;
@@ -63,7 +63,7 @@ ipv6_addr_t init_threeway_handshake() {
         msg_receive(&m);
         
         syn = (border_syn_packet_t *)m.content.ptr;
-        border_conf_header_t *synack = (border_conf_header_t *)border_out_buf;
+        border_conf_header_t *synack = (border_conf_header_t *)get_serial_out_buffer(0);
         ipv6_addr_t addr;
         memcpy(&addr, &(syn->addr), sizeof (ipv6_addr_t));
         
@@ -121,6 +121,26 @@ uint8_t border_initialize(transceiver_type_t trans,ipv6_addr_t *border_router_ad
     
     
     return SUCCESS;
+}
+
+uint16_t border_get_serial_reader() {
+    return serial_reader_pid;
+}
+
+uint8_t *get_serial_out_buffer(int offset) {
+    if (offset > BUFFER_SIZE) {
+        return NULL;
+    }
+    
+    return &(serial_out_buf[offset]);
+}
+
+uint8_t *get_serial_in_buffer(int offset) {
+    if (offset > BUFFER_SIZE) {
+        return NULL;
+    }
+    
+    return &(serial_in_buf[offset]);
 }
 
 int readpacket(uint8_t *packet_buf, int size) {
@@ -220,7 +240,7 @@ void serial_reader_f(void) {
     
     while(1) {
         posix_open(uart0_handler_pid, 0);
-        bytes = readpacket(border_in_buf, BORDER_BUFFER_SIZE);
+        bytes = readpacket(get_serial_in_buffer(0), BORDER_BUFFER_SIZE);
         if (bytes < 0) {
             switch (bytes) {
                 case (-SIXLOWERROR_ARRAYFULL):{
@@ -235,10 +255,10 @@ void serial_reader_f(void) {
             continue;
         }
         
-        uart_buf = (border_packet_t*)border_in_buf;
+        uart_buf = (border_packet_t*)get_serial_in_buffer(0);
         if (uart_buf->reserved == 0) {
             if (uart_buf->type == BORDER_PACKET_CONF_TYPE) {
-                border_conf_header_t *conf_packet = (border_conf_header_t*)border_in_buf;
+                border_conf_header_t *conf_packet = (border_conf_header_t*)uart_buf;
                 if (conf_packet->conftype == BORDER_CONF_SYN) {
                     m.content.ptr = (char *)conf_packet;
                     msg_send(&m, main_pid, 1);
@@ -340,7 +360,7 @@ void demultiplex(border_packet_t *packet, int len) {
 }
 
 void border_send_ack(uint8_t seq_num) {
-    border_packet_t *packet = (border_packet_t *)border_out_buf;
+    border_packet_t *packet = (border_packet_t *)get_serial_out_buffer(0);
     packet->reserved = 0;
     packet->type = BORDER_PACKET_ACK_TYPE;
     packet->seq_num = seq_num;
@@ -407,11 +427,11 @@ void flowcontrol_send_over_uart(border_packet_t *packet, int len) {
 void multiplex_send_ipv6_over_uart(struct ipv6_hdr_t *packet) {
     border_l3_header_t *serial_buf;
     
-    serial_buf = (border_l3_header_t *)border_out_buf;
+    serial_buf = (border_l3_header_t *)get_serial_out_buffer(0);
     serial_buf->reserved = 0;
     serial_buf->type = BORDER_PACKET_L3_TYPE;
     serial_buf->ethertype = BORDER_ETHERTYPE_IPV6;
-    memcpy(border_out_buf+sizeof (border_l3_header_t), packet, IPV6_HDR_LEN + packet->length);
+    memcpy(get_serial_in_buffer(0)+sizeof (border_l3_header_t), packet, IPV6_HDR_LEN + packet->length);
     
     flowcontrol_send_over_uart(
             (border_packet_t *) serial_buf,
@@ -422,7 +442,7 @@ void multiplex_send_ipv6_over_uart(struct ipv6_hdr_t *packet) {
 void multiplex_send_addr_over_uart(ipv6_addr_t *addr) {
     border_addr_packet_t *serial_buf;
     
-    serial_buf = (border_addr_packet_t *)border_out_buf;
+    serial_buf = (border_addr_packet_t *)get_serial_in_buffer(0);
     serial_buf->reserved = 0;
     serial_buf->type = BORDER_PACKET_CONF_TYPE;
     serial_buf->conftype = BORDER_CONF_IPADDR;
@@ -456,7 +476,6 @@ void border_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, u
     }
     
     lowpan_init((ieee_802154_long_t*)&(packet->destaddr.uint16[4]), (uint8_t*)packet);
-    
 }
 
 void border_process_lowpan(void) {
