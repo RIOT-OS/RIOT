@@ -19,7 +19,7 @@
 #include <rtc.h>
 #include "sys/net/sixlowpan/sixlowmac.h"
 #include "sys/net/sixlowpan/sixlowip.h"
-#include "sys/net/sixlowpan/sixlowedge.h"
+#include "sys/net/sixlowpan/sixlowborder.h"
 #include "sys/net/sixlowpan/sixlowpan.h"
 #include "sys/net/sixlowpan/sixlowerror.h"
 

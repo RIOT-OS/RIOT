@@ -9,7 +9,7 @@
 #include <posix_io.h>
 #include <board_uart0.h>
 #include "ieee802154_frame.h"
-#include "sixlowedge.h"
+#include "sixlowborder.h"
 #include "sixlowip.h"
 #include "sixlownd.h"
 #include "serialnumber.h"

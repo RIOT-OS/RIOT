@@ -9,7 +9,7 @@
 #include "msg.h"
 #include "sixlowmac.h"
 #include "sixlowpan.h"
-#include "sixlowedge.h"
+#include "sixlowborder.h"
 #include "sixlowip.h"
 #include "sixlownd.h"
 #include "transceiver.h"
