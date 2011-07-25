@@ -22,6 +22,25 @@
 char serial_reader_stack[READER_STACK_SIZE];
 uint16_t serial_reader_pid;
 
+uint8_t serial_out_buf[BORDER_BUFFER_SIZE];
+uint8_t serial_in_buf[BORDER_BUFFER_SIZE];
+
+uint8_t *get_serial_out_buffer(int offset) {
+    if (offset > BUFFER_SIZE) {
+        return NULL;
+    }
+    
+    return &(serial_out_buf[offset]);
+}
+
+uint8_t *get_serial_in_buffer(int offset) {
+    if (offset > BUFFER_SIZE) {
+        return NULL;
+    }
+    
+    return &(serial_in_buf[offset]);
+}
+
 uint16_t border_get_serial_reader() {
     return serial_reader_pid;
 }

@@ -62,9 +62,6 @@ typedef struct __attribute__ ((packed)) border_context_packet_t {
 
 #define BORDER_BUFFER_SIZE (sizeof (border_l3_header_t) + MTU)
 
-uint8_t *get_serial_out_buffer(int offset);
-uint8_t *get_serial_in_buffer(int offset);
-
 void demultiplex(border_packet_t *packet, int len);
 void multiplex_send_ipv6_over_uart(struct ipv6_hdr_t *packet);
 void multiplex_send_addr_over_uart(ipv6_addr_t *addr);

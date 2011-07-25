@@ -14,25 +14,6 @@
 #define ESC_ESC     0xDD
 #define DC3_ESC     0xDE
 
-uint8_t serial_out_buf[BORDER_BUFFER_SIZE];
-uint8_t serial_in_buf[BORDER_BUFFER_SIZE];
-
-uint8_t *get_serial_out_buffer(int offset) {
-    if (offset > BUFFER_SIZE) {
-        return NULL;
-    }
-    
-    return &(serial_out_buf[offset]);
-}
-
-uint8_t *get_serial_in_buffer(int offset) {
-    if (offset > BUFFER_SIZE) {
-        return NULL;
-    }
-    
-    return &(serial_in_buf[offset]);
-}
-
 void demultiplex(border_packet_t *packet, int len) {
     switch (packet->type) {
         case (BORDER_PACKET_RAW_TYPE):{
