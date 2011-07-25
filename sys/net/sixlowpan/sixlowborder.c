@@ -27,8 +27,6 @@
 char serial_reader_stack[READER_STACK_SIZE];
 uint16_t serial_reader_pid;
 
-abr_cache_t *abr_info;
-uint16_t abro_version;
 uint8_t border_out_buf[BORDER_BUFFER_SIZE];
 uint8_t border_in_buf[BORDER_BUFFER_SIZE];
 
@@ -36,9 +34,6 @@ flowcontrol_stat_t slwin_stat;
 sem_t connection_established;
 int16_t synack_seqnum = -1;
 int readpacket(uint8_t *packet_buf, int size);
-uint16_t get_next_abro_version();
-void init_border_router_info(ipv6_addr_t *abr_addr);
-uint8_t abr_info_add_context(lowpan_context_t *context);
 
 void serial_reader_f(void);
 void flowcontrol_deliver_from_uart(border_packet_t *packet, int len);
@@ -57,11 +52,6 @@ void slwin_init() {
         slwin_stat.recv_win[i].frame_len = 0;
     }
     memset(&slwin_stat.recv_win,0, sizeof(struct recv_slot) * BORDER_RWS);
-}
-
-uint16_t get_next_abro_version() {
-    abro_version = serial_add16(abro_version, 1);
-    return abro_version;
 }
 
 ipv6_addr_t init_threeway_handshake() {
@@ -127,80 +117,10 @@ uint8_t border_initialize(transceiver_type_t trans,ipv6_addr_t *border_router_ad
     
     sixlowpan_init(trans,border_router_addr->uint8[15],1);
     
-    init_border_router_info(border_router_addr);
-    
     ipv6_init_iface_as_router();
     
     
     return SUCCESS;
-}
-
-lowpan_context_t *border_define_context(uint8_t cid, ipv6_addr_t *prefix, uint8_t prefix_len, uint16_t lifetime) {
-    lowpan_context_t *context;
-    
-    mutex_lock(&lowpan_context_mutex);
-    context = lowpan_context_update(cid, prefix, prefix_len, OPT_6CO_FLAG_C_VALUE_SET, lifetime);
-    abr_info_add_context(context);
-    mutex_unlock(&lowpan_context_mutex,0);
-    return context;
-}
-
-lowpan_context_t *border_alloc_context(ipv6_addr_t *prefix, uint8_t prefix_len, uint16_t lifetime) {
-    lowpan_context_t *context = lowpan_context_lookup(prefix);
-    
-    if (context != NULL && context->length == prefix_len) {
-        context = border_define_context(context->num, prefix, prefix_len, lifetime);
-    }
-    
-    context = NULL;
-    for (int i = 0; i < LOWPAN_CONTEXT_MAX; i++) {
-        if (lowpan_context_num_lookup(i) != NULL) {
-            context = border_define_context(i, prefix, prefix_len, lifetime);
-        }
-    }
-    return context;
-}
-
-uint8_t abr_info_add_context(lowpan_context_t *context) {
-    if (context == NULL) return SIXLOWERROR_NULLPTR;
-    uint16_t abro_version = get_next_abro_version();
-    int i;
-    for (i = 0; i < abr_info->contexts_num; i++) {
-        if (abr_info->contexts[i] == context->num) {
-            abr_info->version = abro_version;
-            return SUCCESS;
-        }
-    }
-    
-    if (abr_info->contexts_num == LOWPAN_CONTEXT_MAX) {
-        return SIXLOWERROR_ARRAYFULL;
-    }
-    
-    abr_info->contexts[abr_info->contexts_num++] = context->num;
-    abr_info->version = abro_version;
-    return SUCCESS;
-}
-
-void init_border_router_info(ipv6_addr_t *abr_addr) {
-    uint16_t abro_version = get_next_abro_version();
-    ipv6_addr_t prefix;
-    lowpan_context_t *context;
-    
-    if (abr_info == NULL)
-        abr_info = abr_update_cache(abro_version,abr_addr,NULL,0);
-    else
-        abr_info = abr_update_cache(
-                abro_version,
-                abr_addr,
-                abr_info->contexts,
-                abr_info->contexts_num
-            );
-    
-    ipv6_iface_add_addr(abr_addr,ADDR_STATE_PREFERRED,0,0,ADDR_TYPE_UNICAST);
-    ipv6_set_prefix(&prefix, abr_addr);
-    plist_add(&prefix, 64, OPT_PI_VLIFETIME_INFINITE,0,1,OPT_PI_FLAG_A);
-    
-    context = border_define_context(0, &prefix, 64, 5);  // has to be reset some time later
 }
 
 int readpacket(uint8_t *packet_buf, int size) {
@@ -389,6 +309,7 @@ void demultiplex(border_packet_t *packet, int len) {
                     border_context_packet_t *context = (border_context_packet_t *)packet;
                     ipv6_addr_t target_addr;
                     ipv6_set_all_nds_mcast_addr(&target_addr);
+                    mutex_lock(&lowpan_context_mutex);
                     lowpan_context_update(
                             context->context.cid, 
                             &context->context.prefix, 
@@ -396,6 +317,8 @@ void demultiplex(border_packet_t *packet, int len) {
                             context->context.comp,
                             context->context.lifetime
                         );
+                    // abr stuff
+                    mutex_unlock(&lowpan_context_mutex,0);
                     // Send router advertisement
                     break;
                 }
@@ -516,7 +439,6 @@ void multiplex_send_addr_over_uart(ipv6_addr_t *addr) {
 }
 
 void border_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag) {
-    //abr_cache_t *msg_abr = NULL;
     uint16_t offset = IPV6_HDR_LEN+HTONS(packet->length);
     
     packet->flowlabel = HTONS(packet->flowlabel);
@@ -547,8 +469,4 @@ void border_process_lowpan(void) {
         // TODO: Bei ICMPv6-Paketen entsprechende LoWPAN-Optionen verarbeiten und entfernen
         multiplex_send_ipv6_over_uart(ipv6_buf);
     }
-}
-
-abr_cache_t *get_border_router_info() {
-    return abr_info;
 }

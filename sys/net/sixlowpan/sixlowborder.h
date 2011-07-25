@@ -32,9 +32,6 @@
 /* ethertypes for L3 packets */
 #define BORDER_ETHERTYPE_IPV6     0x86DD
 
-extern uint16_t abro_version;
-extern int tun_fd;
-
 typedef struct __attribute__ ((packed)) border_packet_t {
     uint8_t reserved;
     uint8_t type;
@@ -114,11 +111,5 @@ void multiplex_send_addr_over_uart(ipv6_addr_t *addr);
 void flowcontrol_send_over_uart(border_packet_t *packet, int len);
 void border_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag);
 void border_process_lowpan(void);
-// to be removed
-void border_process_uart(void);
-
-void slwin_init();
-
-abr_cache_t *get_border_router_info();
 
 #endif /* SIXLOWBORDER_H*/
