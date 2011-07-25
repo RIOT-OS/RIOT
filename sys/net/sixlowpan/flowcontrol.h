@@ -6,6 +6,7 @@
 
 #include "semaphore.h"
 #include "sixlowip.h"
+#include "sixlowborder.h"
 #include "bordermultiplex.h"
 
 /* packet types for flowcontrol */

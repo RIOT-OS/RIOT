@@ -6,6 +6,7 @@
 
 #include "semaphore.h"
 #include "bordermultiplex.h"
+#include "flowcontrol.h"
 
 flowcontrol_stat_t slwin_stat;
 sem_t connection_established;
