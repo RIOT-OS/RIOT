@@ -12,7 +12,6 @@ flowcontrol_stat_t slwin_stat;
 sem_t connection_established;
 int16_t synack_seqnum = -1;
 
-
 ipv6_addr_t init_threeway_handshake() {
     border_syn_packet_t *syn;
     msg_t m;

@@ -5,9 +5,9 @@
 
 #include <stdint.h>
 #include <mutex.h>
+#include <transceiver.h>
+
 #include "sixlowip.h"
-#include "sixlowpan.h"
-#include "sixlownd.h"
 #include "semaphore.h"
 
 uint16_t border_get_serial_reader();

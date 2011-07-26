@@ -4,8 +4,11 @@
 #include <board_uart0.h>
 
 #include "flowcontrol.h"
+#include "sixlowpan.h"
 #include "sixlowborder.h"
 #include "sixlowerror.h"
+
+#include "bordermultiplex.h"
 
 #define DC3         0x0D
 #define END         0xC0
