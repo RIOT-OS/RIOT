@@ -43,6 +43,7 @@ typedef struct __attribute__ ((packed)) border_addr_packet_t {
     uint8_t type;
     uint8_t seq_num;
     uint8_t conftype;
+    uint16_t version;
     ipv6_addr_t addr;
 } border_addr_packet_t;
 
@@ -52,6 +53,7 @@ typedef struct __attribute__ ((packed)) border_context_packet_t {
     uint8_t seq_num;
     uint8_t conftype;
     struct border_context_t {
+        uint16_t version;
         uint8_t cid;
         ipv6_addr_t prefix;
         uint8_t length;
