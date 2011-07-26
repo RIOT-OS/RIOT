@@ -58,8 +58,8 @@ def_rtr_lst_t *def_rtr_entry;
 /* elements */
 //ipv6_addr_t tmpaddr;
 
-uint8_t recvd_contexts[LOWPAN_CONTEXT_MAX];
-uint8_t recvd_con_len = 0;
+uint8_t recvd_cids[LOWPAN_CONTEXT_MAX];
+uint8_t recvd_cids_len = 0;
 plist_t *recvd_prefixes[OPT_PI_LIST_LEN];
 uint8_t recvd_pref_len = 0;
 
@@ -235,6 +235,8 @@ void get_opt_6co_flags(uint8_t *compression_flag, uint8_t *cid, uint8_t flags) {
     cid[0] = flags & OPT_6CO_FLAG_CID;
 }
 
+lowpan_context_t *abr_get_context(abr_cache_t *abr, uint8_t cid);
+
 void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi, 
                   uint8_t sixco, uint8_t abro){
     lowpan_context_t *contexts = NULL;
@@ -315,11 +317,18 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
             contexts = lowpan_context_get();
             contexts_len = lowpan_context_len();
         } else {
-            contexts_len = msg_abr->contexts_num;
-            contexts = (lowpan_context_t*)calloc(contexts_len, sizeof(lowpan_context_t));
-            for (int i = 0; i < contexts_len; i++) {
-                contexts[i] = *(lowpan_context_num_lookup(msg_abr->contexts[i]));
+            lowpan_context_t c_tmp[LOWPAN_CONTEXT_MAX];
+            
+            contexts_len = 0;
+            for (int i = 0; i < LOWPAN_CONTEXT_MAX; i++) {
+                lowpan_context_t *ctx = abr_get_context(msg_abr, i);
+                if (ctx != NULL) {
+                    memcpy(&(c_tmp[contexts_len++]), ctx, sizeof (lowpan_context_t));
+                }
             }
+            
+            contexts = (lowpan_context_t*)calloc(contexts_len, sizeof(lowpan_context_t));
+            memcpy(contexts,c_tmp,contexts_len);
         }
         for(int i = 0; i < contexts_len; i++){
             opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_ext_hdr_len, opt_hdr_len);
@@ -395,7 +404,7 @@ void recv_rtr_adv(void){
     opt_hdr_len = RTR_ADV_LEN;
     rtr_adv_buf = get_rtr_adv_buf(ipv6_ext_hdr_len);
     ipv6_addr_t newaddr;
-    recvd_con_len = 0;
+    recvd_cids_len = 0;
 
     /* update interface reachable time and retrans timer */
     if(rtr_adv_buf->reachable_time != 0){
@@ -514,8 +523,8 @@ void recv_rtr_adv(void){
                         comp, 
                         HTONS(opt_6co_hdr_buf->val_ltime)
                     );
-                recvd_contexts[recvd_con_len] = num;
-                recvd_con_len = (recvd_con_len + 1)%LOWPAN_CONTEXT_MAX;	// better solution here, i.e. some kind of stack
+                recvd_cids[recvd_cids_len] = num;
+                recvd_cids_len = (recvd_cids_len + 1)%LOWPAN_CONTEXT_MAX;
                 break;
             }
             case(OPT_ABRO_TYPE):{
@@ -533,7 +542,10 @@ void recv_rtr_adv(void){
     }
     
     if (abro_found) {
-        abr_update_cache(abro_version,&abro_addr,recvd_contexts,recvd_con_len);
+        int i;
+        for (i = 0; i < recvd_cids_len; i++) {
+            abr_add_context(abro_version,&abro_addr,recvd_cids[i]);
+        }
     }
     mutex_unlock(&lowpan_context_mutex,0);
     
@@ -1119,39 +1131,52 @@ static abr_cache_t *abr_get_oldest(){
     return abr;
 }
 
-abr_cache_t *abr_update_cache(
-                    uint16_t version, ipv6_addr_t *abr_addr,
-                    uint8_t *contexts, uint8_t contexts_num){
-    abr_cache_t *abr = NULL;
-    if (abr_count == ABR_CACHE_SIZE) {
-        abr = abr_get_oldest();
-    } else {
-        abr = &(abr_cache[abr_count++]);
+abr_cache_t *abr_get_version(uint16_t version, ipv6_addr_t *abr_addr) {
+    int i = 0;
+    
+    for (i = 0; i < ABR_CACHE_SIZE; i++){
+        if (abr_cache[i].version == version && 
+                memcmp( &(abr_cache[i].abr_addr.uint8[0]),
+                        &(abr_addr->uint8[0]),16
+                    ) == 0){
+            return &(abr_cache[i]);
+        }
     }
-    abr->version = version;
-    memcpy(&abr->abr_addr, abr_addr, sizeof (ipv6_addr_t));
-    memcpy(abr->contexts, contexts, contexts_num * sizeof (uint8_t));
-    abr->contexts_num = contexts_num;
+    
+    return NULL;
+}
+
+lowpan_context_t *abr_get_context(abr_cache_t *abr, uint8_t cid) {
+    if (abr->cids[cid] != cid) {
+        return NULL;
+    }
+    return lowpan_context_num_lookup(abr->cids[cid]);
+}
+
+abr_cache_t *abr_add_context(   uint16_t version, ipv6_addr_t *abr_addr,
+                                uint8_t cid){
+    abr_cache_t *abr = abr_get_version(version, abr_addr);
+    
+    if (abr == NULL) {
+        if (abr_count == ABR_CACHE_SIZE) {
+            abr = abr_get_oldest();
+        } else {
+            abr = &(abr_cache[abr_count++]);
+        }
+        abr->version = version;
+        memcpy(&(abr->abr_addr), abr_addr, sizeof (ipv6_addr_t));
+        memset(abr->cids, 0xFF, LOWPAN_CONTEXT_MAX);
+    }
+    
+    abr->cids[cid] = cid;
     
     return abr;
 }
 
 void abr_remove_context(uint8_t cid) {
-    int i, j, k;
-    int removed;
+    int i;
     for (i = 0; i < abr_count; i++) {
-        for(j = 0; j < abr_cache[i].contexts_num; j++) {
-            do {
-                removed = 0;
-                if (abr_cache[i].contexts[j] == cid) {
-                    removed = 1;
-                    for(k = j; k < abr_cache[i].contexts_num-1; k++) {
-                        abr_cache[i].contexts[j] = abr_cache[i].contexts[j+1];
-                    }
-                    abr_cache[i].contexts_num--;
-                }
-            } while (removed);
-        }
+        abr_cache[i].cids[cid] = 0xFF;
     }
 }
 

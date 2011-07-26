@@ -201,8 +201,7 @@ struct __attribute__ ((packed)) para_prob_t {
 typedef struct __attribute__((packed)) abr_cache_t {
     uint16_t version;
     ipv6_addr_t abr_addr;
-    uint8_t contexts[LOWPAN_CONTEXT_MAX];
-    uint8_t contexts_num;
+    uint8_t cids[LOWPAN_CONTEXT_MAX];
 } abr_cache_t;
 
 /* neighbor cache - rfc4861 5.1. */
@@ -232,10 +231,12 @@ uint8_t plist_cmp(ipv6_addr_t *addr1, ipv6_addr_t *addr2);
 int8_t plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
              uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
 void set_llao(opt_stllao_t *sllao, uint8_t type, uint8_t length);
-abr_cache_t *abr_update_cache(
-                    uint16_t version, ipv6_addr_t *abr_addr,
-                    uint8_t *contexts, uint8_t contexts_num);
-void abr_remove_context(uint8_t context);
+
+abr_cache_t *abr_get_version(uint16_t version, ipv6_addr_t *abr_addr);
+abr_cache_t *abr_add_context(   uint16_t version, ipv6_addr_t *abr_addr, 
+                                uint8_t cid);
+void abr_remove_context(uint8_t cid);
+
 nbr_cache_t * nbr_cache_search(ipv6_addr_t *ipaddr);
 uint8_t nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr,
                    uint8_t isrouter, uint8_t state, uint8_t type,
