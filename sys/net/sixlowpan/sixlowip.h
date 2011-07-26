@@ -137,6 +137,7 @@ struct icmpv6_hdr_t* get_icmpv6_buf(uint8_t ext_len);
 struct ipv6_hdr_t* get_ipv6_buf(void);
 uint8_t * get_payload_buf(uint8_t ext_len);
 
+int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr);
 void ipv6_init_iface_as_router(void);
 uint8_t ipv6_is_router(void);
 void ipv6_set_ll_prefix(ipv6_addr_t *ipaddr);

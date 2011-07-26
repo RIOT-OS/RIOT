@@ -63,6 +63,39 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len){
     lowpan_init((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf); 
 }
 
+int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr) {
+    switch(hdr->type) {
+        case(ICMP_RTR_SOL):{
+            printf("INFO: packet type: icmp router solicitation\n");
+            /* processing router solicitation */
+            recv_rtr_sol();
+            /* init solicited router advertisment*/
+            break;
+        }
+        case(ICMP_RTR_ADV):{
+            printf("INFO: packet type: icmp router advertisment\n");
+            /* processing router advertisment */
+            recv_rtr_adv();
+            /* init neighbor solicitation */
+            break;
+        }
+        case(ICMP_NBR_SOL):{
+            printf("INFO: packet type: icmp neighbor solicitation\n");
+            recv_nbr_sol();
+            break;
+        }
+        case(ICMP_NBR_ADV):{
+            printf("INFO: packet type: icmp neighbor advertisment\n");
+            recv_nbr_adv();
+            break;
+        }
+        default:
+            return -1;
+    }
+    
+    return 0;
+}
+
 void ipv6_process(void){
     msg_t m;
     msg_init_queue(msg_queue, IP_PKT_RECV_BUF_SIZE);
@@ -83,34 +116,7 @@ void ipv6_process(void){
                     printf("ERROR: wrong checksum\n");
                 }
                 icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
-                switch(icmp_buf->type) {
-                    case(ICMP_RTR_SOL):{
-                        printf("INFO: packet type: icmp router solicitation\n");
-                        /* processing router solicitation */
-                        recv_rtr_sol();
-                        /* init solicited router advertisment*/
-                        break;
-                    }
-                    case(ICMP_RTR_ADV):{
-                        printf("INFO: packet type: icmp router advertisment\n");
-                        /* processing router advertisment */
-                        recv_rtr_adv();
-                        /* init neighbor solicitation */
-                        break;
-                    }
-                    case(ICMP_NBR_SOL):{
-                        printf("INFO: packet type: icmp neighbor solicitation\n");
-                        recv_nbr_sol();
-                        break;
-                    }
-                    case(ICMP_NBR_ADV):{
-                        printf("INFO: packet type: icmp neighbor advertisment\n");
-                        recv_nbr_adv();
-                        break;
-                    }
-                    default:
-                        break;
-                }
+                icmpv6_demultiplex(icmp_buf);
                 break;
             }
             case(PROTO_NUM_NONE):{

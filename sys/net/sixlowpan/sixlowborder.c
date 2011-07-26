@@ -135,14 +135,6 @@ void border_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, u
     memset(buffer, 0, BUFFER_SIZE);
     memcpy(buffer+LL_HDR_LEN, packet, offset);
     
-    if (packet->nextheader == PROTO_NUM_ICMPV6) {
-        struct icmpv6_hdr_t *icmp_buf = (struct icmpv6_hdr_t *)(packet + IPV6_HDR_LEN);
-        if (icmp_buf->type == ICMP_REDIRECT) {
-            return;
-        }
-        // Here, other ICMPv6 message types for ND may follow.
-    }
-    
     lowpan_init((ieee_802154_long_t*)&(packet->destaddr.uint16[4]), (uint8_t*)packet);
 }
 
@@ -153,6 +145,18 @@ void border_process_lowpan(void) {
     while(1) {
         msg_receive(&m);
         ipv6_buf = (struct ipv6_hdr_t *)m.content.ptr;
+        
+        if (ipv6_buf->nextheader == PROTO_NUM_ICMPV6) {
+            struct icmpv6_hdr_t *icmp_buf = (struct icmpv6_hdr_t *)(((uint8_t *)ipv6_buf) + IPV6_HDR_LEN);
+            if (icmp_buf->type == ICMP_REDIRECT) {
+                continue;
+            }
+            if (icmpv6_demultiplex(icmp_buf) == 0) {
+                continue;
+            }
+            // Here, other ICMPv6 message types for ND may follow.
+        }
+        
         // TODO: Bei ICMPv6-Paketen entsprechende LoWPAN-Optionen verarbeiten und entfernen
         multiplex_send_ipv6_over_uart(ipv6_buf);
     }
