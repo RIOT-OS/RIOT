@@ -33,7 +33,7 @@ void demultiplex(border_packet_t *packet, int len) {
                     break;
                 }
                 default:
-                    printf("ERROR: Unknown ethertype %02x\n", l3_header_buf->ethertype);
+                    printf("ERROR: Unknown ethertype 0x%04x\n", l3_header_buf->ethertype);
                     break;
             }
             break;
