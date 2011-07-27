@@ -114,36 +114,39 @@ int readpacket(uint8_t *packet_buf, size_t size) {
     uint8_t byte = END+1;
     uint8_t esc = 0;
     
-    while (byte != END) {
+    while (1) {
         byte = uart0_readc();
+        
+        if (byte == END) {
+            break;
+        }
         
         if ( (line_buf_ptr - packet_buf) >= size-1) {
             return -SIXLOWERROR_ARRAYFULL;
         }
-
+        
         if (byte == DC3) continue;
         
         if (esc) {
+            esc = 0;
             switch (byte) {
                 case(END_ESC):{
-                    byte = END;
-                    break;
+                    *line_buf_ptr++ = END;
+                    continue;
                 }
                 case(ESC_ESC):{
-                    byte = ESC;
-                    break;
+                    *line_buf_ptr++ = ESC;
+                    continue;
                 }
                 case(DC3_ESC):{
-                    byte = DC3;
-                    break;
+                    *line_buf_ptr++ = DC3;
+                    continue;
                 }
                 default:
-                    break;
+                    continue;
             }
-            
-            esc = 0;
         }
-                
+        
         if (byte == ESC) {
             esc = 1;
             continue;
