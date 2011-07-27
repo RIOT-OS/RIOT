@@ -161,7 +161,7 @@ int writepacket(uint8_t *packet_buf, size_t size) {
         if ((byte_ptr - packet_buf) > BORDER_BUFFER_SIZE) {
             return -1;
         }
-        printf("%02x ",*byte_ptr);
+        
         switch (*byte_ptr) {
             case(DC3):{
                 *byte_ptr = DC3_ESC;
@@ -186,7 +186,6 @@ int writepacket(uint8_t *packet_buf, size_t size) {
         byte_ptr++;
     }
     
-    printf("\n");
     uart0_putc(END);
     
     return (byte_ptr - packet_buf);
