@@ -19,6 +19,8 @@
 
 #define READER_STACK_SIZE   512
 
+ipv6_addr_t abr_addr;
+
 char serial_reader_stack[READER_STACK_SIZE];
 uint16_t serial_reader_pid;
 
@@ -118,10 +120,11 @@ uint8_t border_initialize(transceiver_type_t trans,ipv6_addr_t *border_router_ad
         return SIXLOWERROR_ADDRESS;
     }
     
+    memcpy(&(abr_addr.uint8[0]),&(border_router_addr->uint8[0]),16);
+    
     sixlowpan_init(trans,border_router_addr->uint8[15],1);
     
     ipv6_init_iface_as_router();
-    
     
     return SUCCESS;
 }

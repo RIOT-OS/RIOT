@@ -5,6 +5,7 @@
 
 #include "flowcontrol.h"
 #include "sixlowpan.h"
+#include "sixlownd.h"
 #include "sixlowborder.h"
 #include "sixlowerror.h"
 
@@ -52,8 +53,8 @@ void demultiplex(border_packet_t *packet, int len) {
                             context->context.comp,
                             context->context.lifetime
                         );
-                    // abr stuff
                     mutex_unlock(&lowpan_context_mutex,0);
+                    abr_add_context(context->context.version, &abr_addr, context->context.cid);
                     // Send router advertisement
                     break;
                 }

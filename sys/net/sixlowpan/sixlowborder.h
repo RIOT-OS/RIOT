@@ -10,6 +10,8 @@
 #include "sixlowip.h"
 #include "semaphore.h"
 
+extern ipv6_addr_t abr_addr;
+
 uint16_t border_get_serial_reader();
 
 uint8_t *get_serial_out_buffer(int offset);
