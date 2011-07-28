@@ -44,7 +44,7 @@ ipv6_addr_t init_threeway_handshake() {
 ipv6_addr_t flowcontrol_init() {
     int i;
     
-    slwin_stat.send_win_not_full = sem_init(BORDER_SWS);
+    sem_init(&slwin_stat.send_win_not_full,BORDER_SWS);
     for(i = 0; i < BORDER_SWS; i++) {
         slwin_stat.send_win[i].frame_len = 0;
     }
