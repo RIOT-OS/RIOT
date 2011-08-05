@@ -11,12 +11,10 @@
 
 #include "bordermultiplex.h"
 
-#define DC3         0x0D
 #define END         0xC0
 #define ESC         0xDB
 #define END_ESC     0xDC
 #define ESC_ESC     0xDD
-#define DC3_ESC     0xDE
 
 void demultiplex(border_packet_t *packet, int len) {
     switch (packet->type) {
@@ -125,8 +123,6 @@ int readpacket(uint8_t *packet_buf, size_t size) {
             return -SIXLOWERROR_ARRAYFULL;
         }
         
-        if (byte == DC3) continue;
-        
         if (esc) {
             esc = 0;
             switch (byte) {
@@ -136,10 +132,6 @@ int readpacket(uint8_t *packet_buf, size_t size) {
                 }
                 case(ESC_ESC):{
                     *line_buf_ptr++ = ESC;
-                    continue;
-                }
-                case(DC3_ESC):{
-                    *line_buf_ptr++ = DC3;
                     continue;
                 }
                 default:
@@ -167,11 +159,6 @@ int writepacket(uint8_t *packet_buf, size_t size) {
         }
         
         switch (*byte_ptr) {
-            case(DC3):{
-                *byte_ptr = DC3_ESC;
-                uart0_putc(ESC);
-                break;
-            }
             case(END):{
                 *byte_ptr = END_ESC;
                 uart0_putc(ESC);
