@@ -1,12 +1,11 @@
-#include <semaphore.h>
 #include <mutex.h>
 
-sem_t sem_init(int8_t value) {
-    sem_t sem;
-    sem.value = value;
-    mutex_init(&sem.mutex);
-    sem.locked = 0;
-    return sem;
+#include "semaphore.h"
+
+void sem_init(sem_t *sem, int8_t value) {
+    sem->value = value;
+    mutex_init(&sem->mutex);
+    sem->locked = 0;
 }
 
 int sem_wait(sem_t *sem) {

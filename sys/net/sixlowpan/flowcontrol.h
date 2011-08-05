@@ -16,8 +16,8 @@
 #define BORDER_CONF_SYN           0
 #define BORDER_CONF_SYNACK        1
 
-#define BORDER_SWS                8
-#define BORDER_RWS                8
+#define BORDER_SWS                1
+#define BORDER_RWS                1
 #define BORDER_SL_TIMEOUT         500 // microseconds, maybe smaller
 
 typedef struct flowcontrol_stat_t {

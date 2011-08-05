@@ -10,7 +10,7 @@ typedef struct sem_t {
     mutex_t mutex;
 } sem_t;
 
-sem_t sem_init(int8_t value);
+void sem_init(sem_t *sem, int8_t value);
 int sem_wait(sem_t *sem);
 int sem_signal(sem_t *sem);
  
