@@ -41,7 +41,7 @@ typedef struct flowcontrol_stat_t {
 } flowcontrol_stat_t;
 
 typedef struct __attribute__ ((packed)) border_syn_packet_t {
-    uint8_t reserved;
+    uint8_t empty;
     uint8_t type;
     uint8_t next_seq_num;
     uint8_t conftype;

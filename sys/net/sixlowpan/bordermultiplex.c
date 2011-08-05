@@ -79,7 +79,7 @@ void multiplex_send_ipv6_over_uart(struct ipv6_hdr_t *packet) {
     border_l3_header_t *serial_buf;
     
     serial_buf = (border_l3_header_t *)get_serial_out_buffer(0);
-    serial_buf->reserved = 0;
+    serial_buf->empty = 0;
     serial_buf->type = BORDER_PACKET_L3_TYPE;
     serial_buf->ethertype = BORDER_ETHERTYPE_IPV6;
     memcpy(get_serial_in_buffer(0)+sizeof (border_l3_header_t), packet, IPV6_HDR_LEN + packet->length);
@@ -94,7 +94,7 @@ void multiplex_send_addr_over_uart(ipv6_addr_t *addr) {
     border_addr_packet_t *serial_buf;
     
     serial_buf = (border_addr_packet_t *)get_serial_in_buffer(0);
-    serial_buf->reserved = 0;
+    serial_buf->empty = 0;
     serial_buf->type = BORDER_PACKET_CONF_TYPE;
     serial_buf->conftype = BORDER_CONF_IPADDR;
     memcpy(

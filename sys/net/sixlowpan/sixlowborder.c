@@ -76,7 +76,7 @@ void serial_reader_f(void) {
         }
         
         uart_buf = (border_packet_t*)get_serial_in_buffer(0);
-        if (uart_buf->reserved == 0) {
+        if (uart_buf->empty == 0) {
             if (uart_buf->type == BORDER_PACKET_CONF_TYPE) {
                 border_conf_header_t *conf_packet = (border_conf_header_t*)uart_buf;
                 if (conf_packet->conftype == BORDER_CONF_SYN) {

@@ -19,27 +19,27 @@
 #define BORDER_ETHERTYPE_IPV6     0x86DD
 
 typedef struct __attribute__ ((packed)) border_packet_t {
-    uint8_t reserved;
+    uint8_t empty;
     uint8_t type;
     uint8_t seq_num;
 } border_packet_t;
 
 typedef struct __attribute__ ((packed)) border_l3_header_t {
-    uint8_t reserved;
+    uint8_t empty;
     uint8_t type;
     uint8_t seq_num;
     uint16_t ethertype;
 } border_l3_header_t;
 
 typedef struct __attribute__ ((packed)) border_conf_header_t {
-    uint8_t reserved;
+    uint8_t empty;
     uint8_t type;
     uint8_t seq_num;
     uint8_t conftype;
 } border_conf_header_t;
 
 typedef struct __attribute__ ((packed)) border_addr_packet_t {
-    uint8_t reserved;
+    uint8_t empty;
     uint8_t type;
     uint8_t seq_num;
     uint8_t conftype;
@@ -48,7 +48,7 @@ typedef struct __attribute__ ((packed)) border_addr_packet_t {
 } border_addr_packet_t;
 
 typedef struct __attribute__ ((packed)) border_context_packet_t {
-    uint8_t reserved;
+    uint8_t empty;
     uint8_t type;
     uint8_t seq_num;
     uint8_t conftype;

@@ -29,7 +29,7 @@ ipv6_addr_t init_threeway_handshake() {
         slwin_stat.last_frame = syn->next_exp - 1;
         slwin_stat.last_ack = slwin_stat.last_frame;
         
-        synack->reserved = 0;
+        synack->empty = 0;
         synack->type = BORDER_PACKET_CONF_TYPE;
         synack->conftype = BORDER_CONF_SYNACK;
         
@@ -109,7 +109,7 @@ void flowcontrol_send_over_uart(border_packet_t *packet, int len) {
 
 void send_ack(uint8_t seq_num) {
     border_packet_t *packet = (border_packet_t *)get_serial_out_buffer(0);
-    packet->reserved = 0;
+    packet->empty = 0;
     packet->type = BORDER_PACKET_ACK_TYPE;
     packet->seq_num = seq_num;
     writepacket((uint8_t *)packet, sizeof (border_packet_t));
