@@ -237,3 +237,5 @@ int _kill_r(struct _reent *r, int pid, int sig)
 	return -1;
 }
 /*---------------------------------------------------------------------------*/
+
+void _fini(void) {}
