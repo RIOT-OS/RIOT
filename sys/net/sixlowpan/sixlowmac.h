@@ -22,6 +22,6 @@ void init_802154_long_addr(ieee_802154_long_t *laddr);
 void init_802154_short_addr(ieee_802154_short_t *saddr);
 void sixlowmac_init(transceiver_type_t type);
 ieee_802154_long_t* mac_get_eui(ipv6_addr_t *ipaddr);
-void send(void);
+// void send(void);
 
 #endif /* SIXLOWMAC_H*/

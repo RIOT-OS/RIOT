@@ -44,3 +44,4 @@ SubInclude TOP sys net ;
 SubInclude TOP sys lib ;
 SubInclude TOP sys shell ;
 SubInclude TOP sys net sixlowpan ;
+SubInclude TOP sys net destiny ;

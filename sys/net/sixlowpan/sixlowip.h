@@ -84,7 +84,7 @@ struct __attribute__ ((packed)) icmpv6_hdr_t{
     uint16_t checksum;
 };
 
-struct __attribute__ ((packed)) ipv6_hdr_t{
+typedef struct __attribute__ ((packed)) ipv6_hdr_t{
     uint8_t version_trafficclass;
     uint8_t trafficclass_flowlabel;
     uint16_t flowlabel;
@@ -93,7 +93,7 @@ struct __attribute__ ((packed)) ipv6_hdr_t{
     uint8_t hoplimit;
     ipv6_addr_t srcaddr;
     ipv6_addr_t destaddr;
-};
+} ipv6_hdr_t;
 
 /* link layer addressing */
 typedef union __attribute__ ((packed)) ieee_802154_long_t {
@@ -146,7 +146,7 @@ void ipv6_set_all_nds_mcast_addr(ipv6_addr_t *ipaddr);
 void ipv6_set_loaddr(ipv6_addr_t *ipaddr);
 void ipv6_set_sol_node_mcast_addr(ipv6_addr_t *addr_in, ipv6_addr_t *addr_out);
 void sixlowpan_bootstrapping(void);
-void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len);
+void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t next_header);
 void ipv6_print_addr(ipv6_addr_t *ipaddr);
 void ipv6_process(void);
 void ipv6_get_saddr(ipv6_addr_t *src, ipv6_addr_t *dst);
@@ -168,4 +168,6 @@ void ipv6_set_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix);
 uint8_t ipv6_addr_unspec_match(ipv6_addr_t *addr);
 uint8_t ipv6_addr_sol_node_mcast_match(ipv6_addr_t *addr);
 uint8_t ipv6_next_hdr_unrec(uint8_t next_hdr);
+void set_tcp_packet_handler_pid(int pid, uint8_t *buffer);
+void set_udp_packet_handler_pid(int pid, uint8_t *buffer);
 #endif /* SIXLOWIP_H*/

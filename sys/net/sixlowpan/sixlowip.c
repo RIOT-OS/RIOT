@@ -7,6 +7,7 @@
 #include "sixlowmac.h"
 #include "sixlownd.h"
 #include "sixlowpan.h"
+#include "sys/net/destiny/in.h"
 
 uint8_t buffer[BUFFER_SIZE];
 msg_t msg_queue[IP_PKT_RECV_BUF_SIZE];
@@ -16,6 +17,10 @@ uint8_t ipv6_ext_hdr_len;
 uint8_t *nextheader;
 iface_t iface;
 uint8_t iface_addr_list_count = 0;
+int udp_packet_handler_pid = 0;
+int tcp_packet_handler_pid = 0;
+uint8_t *udp_packet_buffer;
+uint8_t *tcp_packet_buffer;
 
 //mutex_t buf_mutex;
 
@@ -36,17 +41,17 @@ void sixlowpan_bootstrapping(void){
     init_rtr_sol(OPT_SLLAO);
 }
 
-void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len){
+void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t next_header){
     ipv6_buf = get_ipv6_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
     packet_length = 0;
 
-    icmp_buf->type = ICMP_RTR_SOL;
-    icmp_buf->code = 0;
+//    icmp_buf->type = ICMP_RTR_SOL;
+//    icmp_buf->code = 0;
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = PROTO_NUM_NONE;
+    ipv6_buf->nextheader = next_header;
     ipv6_buf->hoplimit = MULTIHOP_HOPLIMIT;
     ipv6_buf->length = p_len;    
 
@@ -97,35 +102,68 @@ int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr) {
 }
 
 void ipv6_process(void){
-    msg_t m;
+	msg_t m_recv, m_send;
     msg_init_queue(msg_queue, IP_PKT_RECV_BUF_SIZE);
     
     while(1){
-        msg_receive(&m);
+        msg_receive(&m_recv);
         
         //ipv6_buf = get_ipv6_buf();
-        ipv6_buf = (struct ipv6_hdr_t*) m.content.ptr;
+        ipv6_buf = (struct ipv6_hdr_t*) m_recv.content.ptr;
 
         /* identifiy packet */
         nextheader = &ipv6_buf->nextheader;
         
         switch(*nextheader) {
-            case(PROTO_NUM_ICMPV6):{
-                /* checksum test*/
-                if(icmpv6_csum(PROTO_NUM_ICMPV6) != 0xffff){
-                    printf("ERROR: wrong checksum\n");
-                }
-                icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
-                icmpv6_demultiplex(icmp_buf);
-                break;
-            }
-            case(PROTO_NUM_NONE):{
-                //uint8_t *ptr = get_payload_buf(ipv6_ext_hdr_len);
-                printf("INFO: Packet with no Header following the IPv6 Header received.\n");
-            }
-            default:
-                break;
-        }
+			case(PROTO_NUM_ICMPV6):{
+				/* checksum test*/
+				if(icmpv6_csum(PROTO_NUM_ICMPV6) != 0xffff){
+					printf("ERROR: wrong checksum\n");
+				}
+				icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
+				icmpv6_demultiplex(icmp_buf);
+				break;
+			}
+			case(IPPROTO_TCP):{
+				// TODO: Notify TCP Handler
+				printf("INFO: TCP Packet received.\n");
+				char content[20];
+				memcpy(content, ((char*)ipv6_buf)+IPV6_HDR_LEN, ipv6_buf->length);
+				printf("Length: %i Content: %s\n", ipv6_buf->length, content);
+				if (tcp_packet_handler_pid != 0){
+
+				}
+				else{
+					printf("INFO: No TCP handler registered.\n");
+				}
+				break;
+			}
+			case(IPPROTO_UDP):{
+				// TODO: Notify UDP Handler
+				printf("INFO: UDP Packet received.\n");
+				if (udp_packet_handler_pid != 0)	{
+					printf("IPv6 packet length: %i\n", IPV6_HDR_LEN+ipv6_buf->length);
+					memcpy(udp_packet_buffer, (char*) ipv6_buf, IPV6_HDR_LEN+ipv6_buf->length);
+
+
+//            		m_send.content.ptr = (char*) get_ipv6_buf();
+
+					msg_send_receive(&m_send, &m_recv, udp_packet_handler_pid);
+				}
+				else{
+					printf("INFO: No UDP handler registered.\n");
+				}
+				break;
+			}
+			case(PROTO_NUM_NONE):{
+				// TODO: Notify all Transport Layer Protocols
+				//uint8_t *ptr = get_payload_buf(ipv6_ext_hdr_len);
+				printf("INFO: Packet with no Header following the IPv6 Header received.\n");
+				break;
+			}
+			default:
+				break;
+		}
     }   
 }
 
@@ -415,3 +453,15 @@ uint8_t ipv6_is_router(void) {
     
     return 0;
 }
+
+void set_tcp_packet_handler_pid(int pid, uint8_t *buffer)
+	{
+	tcp_packet_handler_pid = pid;
+	tcp_packet_buffer = buffer;
+	}
+
+void set_udp_packet_handler_pid(int pid, uint8_t *buffer)
+	{
+	udp_packet_handler_pid = pid;
+	udp_packet_buffer = buffer;
+	}

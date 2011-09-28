@@ -193,7 +193,7 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
                     return;
                 }
             }     
-            memcpy(reas_buf + byte_offset, data + hdr_length, byte_offset);
+            memcpy(reas_buf + byte_offset, data + hdr_length, frag_size);
             if((byte_offset + frag_size) == datagram_size){
                 if(reas_buf[0] == LOWPAN_IPV6_DISPATCH) {
                     /* mutex lock here */
