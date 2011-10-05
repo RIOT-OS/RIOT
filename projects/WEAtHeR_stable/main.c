@@ -36,6 +36,8 @@
 #include "weather_protocol.h"
 #include "protocol_msg_gateway.h"
 
+#define CC1100_RADIO_MODE CC1100_MODE_WOR
+
 /* some local defines */
 #define SECOND  (1000 * 1000)
 #define MINUTE  (1 * SECOND)
