@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 #include <malloc.h>
+#include "hwtimer.h"
 #include "scheduler.h"
 #include "kernel.h"
 #include "kernel_intern.h"
@@ -26,10 +27,16 @@
 
 volatile int num_tasks = 0;
 
+uint8_t last_pid = 0xFF;
+
 clist_node_t *runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;
 
+void sched_register_cb(void (*callback)(uint32_t, uint32_t));
+
+
 #if SCHEDSTATISTICS
+    static void (*sched_cb)(uint32_t timestamp, uint32_t value) = NULL;
     schedstat pidlist[MAXTHREADS];
 #endif
 
@@ -106,6 +113,12 @@ void fk_schedule() {
         //                break;
         //            }
         //        }
+#if SCHEDSTATISTICS
+        if ((sched_cb) && (my_fk_thread->pid != last_pid)) {
+            sched_cb(hwtimer_now(), my_fk_thread->pid);
+            last_pid = my_fk_thread->pid;
+        }
+#endif
     }
 
     DEBUG("scheduler: next task: %s\n", my_fk_thread->name);
@@ -124,6 +137,11 @@ void fk_schedule() {
     DEBUG("scheduler: done.\n");
 }
 
+#if SCHEDSTATISTICS
+void sched_register_cb(void (*callback)(uint32_t, uint32_t)) {
+    sched_cb = callback;    
+}
+#endif
 
 void sched_set_status(tcb *process, unsigned int status) {
     if (status &  STATUS_ON_RUNQUEUE) {
