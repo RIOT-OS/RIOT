@@ -244,7 +244,6 @@ uint8_t nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr,
 void nbr_cache_auto_rem(void);
 void nbr_cache_rem(ipv6_addr_t *addr);
 uint16_t icmpv6_csum(uint8_t proto);
-uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len);
 def_rtr_lst_t * def_rtr_lst_search(ipv6_addr_t *ipaddr);
 void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime);
 void def_rtr_lst_rem(def_rtr_lst_t *entry);

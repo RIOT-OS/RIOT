@@ -2,8 +2,9 @@ SubDir TOP sys net destiny ;
 
 # HDRS += $(TOP)/sys/net/destiny/ ;
 
-Module destiny : destiny.c udp.c socket.c ;
+Module destiny : destiny.c udp.c tcp.c socket.c ;
 
 UseModule vtimer ;
 UseModule auto_init ;
 UseModule 6lowpan ;
+UseModule net_help ;

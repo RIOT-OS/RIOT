@@ -126,11 +126,7 @@ typedef struct __attribute__ ((packed)) iface_t {
 extern iface_t iface;
 
 //#define HTONS(a) (uint16_t)((((uint16_t) (a)) << 8) | (((uint16_t) (a)) >> 8))
-#define HTONS(a) ((((uint16_t) (a) >> 8) & 0xff) | ((((uint16_t) (a)) & 0xff) << 8))  
-#define HTONL(a) ((((uint32_t) (a) & 0xff000000) >> 24) | \
-                  (((uint32_t) (a) & 0x00ff0000) >> 8)  | \
-                  (((uint32_t) (a) & 0x0000ff00) << 8)  | \
-                  (((uint32_t) (a) & 0x000000ff) << 24)) 
+
 
 /* function prototypes */
 struct icmpv6_hdr_t* get_icmpv6_buf(uint8_t ext_len);

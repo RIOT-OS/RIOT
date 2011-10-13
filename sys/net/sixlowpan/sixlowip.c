@@ -8,6 +8,7 @@
 #include "sixlownd.h"
 #include "sixlowpan.h"
 #include "sys/net/destiny/in.h"
+#include "sys/net/net_help/net_help.h"
 
 uint8_t buffer[BUFFER_SIZE];
 msg_t msg_queue[IP_PKT_RECV_BUF_SIZE];
@@ -124,43 +125,43 @@ void ipv6_process(void){
 				icmpv6_demultiplex(icmp_buf);
 				break;
 			}
-			case(IPPROTO_TCP):{
-				// TODO: Notify TCP Handler
+			case(IPPROTO_TCP):
+				{
 				printf("INFO: TCP Packet received.\n");
-				char content[20];
-				memcpy(content, ((char*)ipv6_buf)+IPV6_HDR_LEN, ipv6_buf->length);
-				printf("Length: %i Content: %s\n", ipv6_buf->length, content);
-				if (tcp_packet_handler_pid != 0){
 
-				}
-				else{
+				if (tcp_packet_handler_pid != 0)
+					{
+					memcpy(tcp_packet_buffer, (char*) ipv6_buf, IPV6_HDR_LEN+ipv6_buf->length);
+					msg_send_receive(&m_send, &m_recv, tcp_packet_handler_pid);
+					}
+				else
+					{
 					printf("INFO: No TCP handler registered.\n");
-				}
+					}
 				break;
-			}
-			case(IPPROTO_UDP):{
-				// TODO: Notify UDP Handler
+				}
+			case(IPPROTO_UDP):
+				{
 				printf("INFO: UDP Packet received.\n");
-				if (udp_packet_handler_pid != 0)	{
-					printf("IPv6 packet length: %i\n", IPV6_HDR_LEN+ipv6_buf->length);
+
+				if (udp_packet_handler_pid != 0)
+					{
 					memcpy(udp_packet_buffer, (char*) ipv6_buf, IPV6_HDR_LEN+ipv6_buf->length);
-
-
-//            		m_send.content.ptr = (char*) get_ipv6_buf();
-
+					printf("Copy 1!\n");
 					msg_send_receive(&m_send, &m_recv, udp_packet_handler_pid);
-				}
-				else{
+					printf("Copy 2!\n");
+					}
+				else
+					{
 					printf("INFO: No UDP handler registered.\n");
-				}
+					}
 				break;
-			}
-			case(PROTO_NUM_NONE):{
-				// TODO: Notify all Transport Layer Protocols
-				//uint8_t *ptr = get_payload_buf(ipv6_ext_hdr_len);
+				}
+			case(PROTO_NUM_NONE):
+				{
 				printf("INFO: Packet with no Header following the IPv6 Header received.\n");
 				break;
-			}
+				}
 			default:
 				break;
 		}
@@ -454,14 +455,14 @@ uint8_t ipv6_is_router(void) {
     return 0;
 }
 
-void set_tcp_packet_handler_pid(int pid, uint8_t *buffer)
+void set_tcp_packet_handler_pid(int pid, uint8_t *buf)
 	{
 	tcp_packet_handler_pid = pid;
-	tcp_packet_buffer = buffer;
+	tcp_packet_buffer = buf;
 	}
 
-void set_udp_packet_handler_pid(int pid, uint8_t *buffer)
+void set_udp_packet_handler_pid(int pid, uint8_t *buf)
 	{
 	udp_packet_handler_pid = pid;
-	udp_packet_buffer = buffer;
+	udp_packet_buffer = buf;
 	}

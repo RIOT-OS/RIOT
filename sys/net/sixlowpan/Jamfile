@@ -7,3 +7,4 @@ Module 6lowpan : sixlowpan.c sixlowip.c sixlowmac.c sixlownd.c sixlowborder.c ie
 UseModule vtimer ;
 UseModule transceiver ;
 UseModule auto_init ;
+UseModule net_help ;

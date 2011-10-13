@@ -4,6 +4,7 @@
 #include "sixlowpan.h"
 #include "sixlowerror.h"
 #include "serialnumber.h"
+#include "sys/net/net_help/net_help.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -949,39 +950,6 @@ void set_llao(opt_stllao_t *sllao, uint8_t type, uint8_t length){
             break;
         }
     }
-}
-
-//------------------------------------------------------------------------------
-// checksum calculation
-
-uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len){
-    int count;
-    uint16_t carry; 
-   
-    count = len >> 1;
-    if(count){
-        if(count){
-            carry = 0;
-            do {
-                uint16_t t = (*buf << 8) + *(buf+1);
-                count--;
-                buf += 2;
-                sum += carry;
-                sum += t;
-                carry = (t > sum);
-            } while(count);
-            sum += carry;
-        }
-    }
-    if(len & 1){
-        uint16_t u = (*buf << 8);
-        sum += (*buf << 8);
-        if(sum < u){
-            sum++;
-        }
-    }
-
-    return sum;
 }
 
 uint16_t icmpv6_csum(uint8_t proto){

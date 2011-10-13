@@ -14,6 +14,7 @@
 #include "transceiver.h"
 #include "vtimer.h"
 #include "ieee802154_frame.h"
+#include "sys/net/net_help/net_help.h"
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
 msg_t msg_q[RADIO_RCV_BUF_SIZE];

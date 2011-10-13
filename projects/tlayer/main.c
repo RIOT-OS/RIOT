@@ -19,14 +19,117 @@
 #include "sys/net/sixlowpan/sixlowpan.h"
 #include "sys/net/sixlowpan/sixlowerror.h"
 #include "sys/net/destiny/udp.h"
+#include "sys/net/destiny/tcp.h"
 #include "sys/net/destiny/socket.h"
 #include "sys/net/destiny/in.h"
 #include "sys/net/destiny/destiny.h"
+#include "sys/net/net_help/net_help.h"
 
+uint8_t udp_server_thread_pid;
+char udp_server_stack_buffer[UDP_STACK_SIZE];
 
+uint8_t tcp_server_thread_pid;
+char tcp_server_stack_buffer[TCP_STACK_SIZE];
 
-uint8_t server_thread_pid;
-char server_stack_buffer[2048];
+void init_tl (char *str)
+	{
+	init_transport_layer();
+	}
+
+void init_udp_server(void)
+	{
+	struct sockaddr_in6 sa;
+	char buffer_main[256];
+	ssize_t recsize;
+	uint32_t fromlen;
+	int sock = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+	memset(&sa, 0, sizeof sa);
+	sa.sin6_family = AF_INET;
+	sa.sin6_port = 7654;
+	fromlen = sizeof(sa);
+	if (-1 == bind(sock, &sa, sizeof(sa), udp_server_thread_pid))
+		{
+		printf("Error bind failed!\n");
+		close(sock);
+		}
+	for (;;)
+		{
+		print_socket(sock);
+		recsize = recvfrom(sock, (void *)buffer_main, 256, 0, &sa, &fromlen);
+		if (recsize < 0)
+			{
+			printf("ERROR: recsize < 0!\n");
+			}
+		printf("recsize: %i\n ", recsize);
+		printf("datagram: %.*s\n", (int)recsize, buffer_main);
+		}
+	}
+
+void init_tcp_server(void)
+	{
+	struct sockaddr_in6 stSockAddr;
+	int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
+
+	if(-1 == SocketFD)
+		{
+		perror("can not create socket");
+		exit(EXIT_FAILURE);
+		}
+
+	memset(&stSockAddr, 0, sizeof(stSockAddr));
+
+	stSockAddr.sin6_family = AF_INET6;
+	stSockAddr.sin6_port = HTONS(1100);
+
+	if(-1 == bind(SocketFD, &stSockAddr, sizeof(stSockAddr), tcp_server_thread_pid))
+		{
+		perror("error bind failed");
+		close(SocketFD);
+		exit(EXIT_FAILURE);
+		}
+
+	if(-1 == listen(SocketFD, 10))
+		{
+		perror("error listen failed");
+		close(SocketFD);
+	 	exit(EXIT_FAILURE);
+		}
+
+	for(;;)
+		{
+		int ConnectFD = accept(SocketFD, NULL, 0);
+
+		if(0 > ConnectFD)
+			{
+			perror("error accept failed");
+			close(SocketFD);
+			exit(EXIT_FAILURE);
+			}
+
+		// TODO: read and writes
+
+		shutdown(ConnectFD, 0);
+
+		close(ConnectFD);
+		}
+	}
+
+void init_udp_server_thread(char *str)
+	{
+	udp_server_thread_pid = thread_create(udp_server_stack_buffer, UDP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, init_udp_server, "init_udp_server");
+	printf("UDP SERVER THREAD PID: %i\n", udp_server_thread_pid);
+	}
+
+void init_tcp_server_thread(char *str)
+	{
+	tcp_server_thread_pid = thread_create(tcp_server_stack_buffer, TCP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, init_tcp_server, "init_tcp_server");
+	printf("TCP SERVER THREAD PID: %i\n", tcp_server_thread_pid);
+	}
+
+void init_tcp_client_thread(char *str)
+	{
+
+	}
 
 void init(char *str){
     char command;
@@ -90,6 +193,7 @@ void init(char *str){
             printf("ERROR: Unknown command '%c'\n", command);
             break;
     }
+
 }
 
 void bootstrapping(char *str){
@@ -137,8 +241,9 @@ void send_udp(char *str)
 	struct sockaddr_in6 sa;
 	ipv6_addr_t ipaddr;
 	int bytes_sent;
+	int address;
 	uint8_t text[20];
-	sscanf(str, "send_udp %s", text);
+	sscanf(str, "send_udp %s %i", text, &address);
 
 	sock = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 	if (-1 == sock)
@@ -149,7 +254,7 @@ void send_udp(char *str)
 
 	memset(&sa, 0, sizeof sa);
 
-	ipv6_init_address(&ipaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, 0x0005);
+	ipv6_init_address(&ipaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, (uint16_t)address);
 	ipv6_print_addr(&ipaddr);
 
 	sa.sin6_family = AF_INET;
@@ -196,47 +301,6 @@ void context(char *str){
     }
 }
 
-void init_tl (char *str)
-	{
-	init_transport_layer();
-	}
-
-void init_server(void)
-	{
-	int sock = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-	printf("Socket Number: %i\n", sock);
-	struct sockaddr_in6 sa;
-	char buffer[1024];
-	ssize_t recsize;
-	uint32_t fromlen;
-	memset(&sa, 0, sizeof sa);
-	sa.sin6_family = AF_INET;
-	sa.sin6_port = 7654;
-	fromlen = sizeof(sa);
-	if (-1 == bind(sock, &sa, sizeof(sa), server_thread_pid))
-		{
-		printf("Error bind failed!\n");
-		close(sock);
-		}
-	for (;;)
-		{
-		print_socket(sock);
-		recsize = recvfrom(sock, (void *)buffer, 1024, 0, &sa, &fromlen);
-		if (recsize < 0)
-			{
-			printf("ERROR: recsize < 0!\n");
-			}
-		printf("recsize: %i\n ", recsize);
-		printf("datagram: %.*s\n", (int)recsize, buffer);
-		}
-	}
-
-void init_server_thread(char *str)
-	{
-	server_thread_pid = thread_create(server_stack_buffer, 2048, PRIORITY_MAIN, CREATE_STACKTEST, init_server, "init_server");
-	printf("SERVER THREAD PID: %i\n", server_thread_pid);
-	}
-
 const shell_command_t shell_commands[] = {
     //{"send", "", send_packet},
     {"init", "", init},
@@ -246,19 +310,27 @@ const shell_command_t shell_commands[] = {
     {"ip", "", ip},
     {"context", "", context},
     {"init_tl", "", init_tl},
-    {"init_server_thread", "", init_server_thread},
+    {"init_udp_server_thread", "", init_udp_server_thread},
+    {"init_tcp_server_thread", "", init_tcp_server_thread},
+    {"init_tcp_client_thread", "", init_tcp_client_thread},
     {"send_udp", "", send_udp},
     {NULL, NULL, NULL}
 };
 
 int main(void) {
     printf("6LoWPAN Transport Layers\n");
-    vtimer_init();
     posix_open(uart0_handler_pid, 0);
+//    vtimer_init();
+//    border_initialize(TRANSCEIVER_CC1100, NULL);
+    init_tl(NULL);
+    init_udp_server_thread(NULL);
+//    printf("RAN TO THE END!\n");
+
+//    init("init a 2");
     shell_t shell;
     shell_init(&shell, shell_commands, uart0_readc, uart0_putc);
+
     shell_run(&shell);
+
     return 0;
 }
-
-

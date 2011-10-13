@@ -9,6 +9,8 @@
 #define SOCKET_H_
 
 #include <stdint.h>
+#include "tcp.h"
+#include "udp.h"
 #include "in.h"
 #include "sys/net/sixlowpan/sixlowip.h"
 
@@ -104,6 +106,7 @@
 #define	PF_MAX				AF_MAX
 
 #define MAX_SOCKETS			16
+#define MAX_QUEUED_SOCKETS	5
 
 typedef struct __attribute__ ((packed)) sockaddr_in6
 	{
@@ -115,15 +118,23 @@ typedef struct __attribute__ ((packed)) sockaddr_in6
 
 typedef struct __attribute__ ((packed)) socket_t
 	{
-	uint8_t				socket;
-	uint8_t				pid;
+	uint8_t				socket_id;
 	uint8_t				domain;
 	uint8_t				type;
 	uint8_t				protocol;
+	tcp_socket_status_t tcp_socket_status;
 	sockaddr_in6		sa;
 	} socket_t;
 
-socket_t sockets[MAX_SOCKETS];
+typedef struct __attribute__ ((packed)) socket_internal_t
+	{
+	uint8_t				pid;
+	//uint8_t 			socket_status;			/* TCP only */
+	socket_t			in_socket;
+	socket_t			queued_sockets[MAX_QUEUED_SOCKETS];
+	} socket_internal_t;
+
+socket_internal_t sockets[MAX_SOCKETS];
 
 int socket(int domain, int type, int protocol);
 int connect(int socket, struct sockaddr_in6 *addr, uint32_t addrlen);
@@ -135,8 +146,12 @@ int close(int s);
 int bind(int s, struct sockaddr_in6 *name, int namelen, uint8_t pid);
 int listen(int s, int backlog);
 int accept(int s, struct sockaddr_in6 *addr, uint32_t addrlen);
+int shutdown(int s , int how);
 void socket_init(void);
-int get_udp_process(uint16_t port);
+socket_internal_t *get_udp_socket(uint16_t port);
+socket_internal_t *get_tcp_socket(uint16_t port);
 void print_socket(uint8_t socket);
+bool exists_socket(uint8_t socket);
+socket_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *socket);
 
 #endif /* SOCKET_H_ */

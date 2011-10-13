@@ -12,7 +12,7 @@
 
 
 // TODO: Probably stack size too high
-#define UDP_STACK_SIZE 				256
+#define UDP_STACK_SIZE 				4096
 
 #include "sys/net/sixlowpan/sixlowip.h"
 
@@ -23,12 +23,11 @@ typedef struct __attribute__ ((packed)) udp_hdr_t{
     uint16_t checksum;
 } udp_hdr_t;
 
-uint8_t buffer[BUFFER_SIZE];
-char udp_stack_buffer[2048];
+uint8_t buffer_udp[BUFFER_SIZE];
+char udp_stack_buffer[UDP_STACK_SIZE];
 
-uint16_t checksum(uint16_t sum, uint8_t *buf, uint16_t len);
 uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header);
 void udp_packet_handler(void);
-void printArrayRange(uint8_t *udp_header, uint16_t len);
+void printArrayRange_udp(uint8_t *array, uint16_t len);
 
 #endif /* UDP_H_ */
