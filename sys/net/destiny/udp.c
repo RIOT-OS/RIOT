@@ -55,7 +55,7 @@ void udp_packet_handler(void)
 			{
 			m_send_udp.content.ptr = (char*)buffer;
 			m_send_udp.content.value = IPV6_HDR_LEN + UDP_HDR_LEN + udp_header->length;
-			udp_socket = get_udp_socket(udp_header->dst_port);
+			udp_socket = get_udp_socket(ipv6_header, udp_header);
 			if (udp_socket != NULL)
 				{
 				msg_send_receive(&m_send_udp, &m_recv_udp, udp_socket->pid);

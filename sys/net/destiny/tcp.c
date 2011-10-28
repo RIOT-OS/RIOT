@@ -26,7 +26,8 @@ void printArrayRange_tcp(uint8_t *udp_header, uint16_t len)
 	printf("-------------MEMORY-------------\n");
 	}
 
-uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header){
+uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
+	{
     uint16_t sum;
     uint16_t len = ipv6_header->length;
 
@@ -34,7 +35,7 @@ uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header){
 	sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
 	sum = csum(sum, (uint8_t*)tcp_header, len);
     return (sum == 0) ? 0xffff : HTONS(sum);
-}
+	}
 
 void tcp_packet_handler (void)
 	{
@@ -55,53 +56,86 @@ void tcp_packet_handler (void)
 		chksum = tcp_csum(ipv6_header, tcp_header);
 		printf("Checksum is %x!\n", chksum);
 
-		tcp_socket = get_tcp_socket(tcp_header->dst_port);
+		tcp_socket = get_tcp_socket(ipv6_header, tcp_header);
 
-		if ((chksum != 0xffff) && (tcp_socket != NULL))
+		if ((chksum == 0xffff) && (tcp_socket != NULL))
 			{
-			uint8_t tcp_flags = tcp_header->reserved_flags;
+			// Remove reserved bits from tcp flags field
+			uint8_t tcp_flags = tcp_header->reserved_flags & 0xC0;
+
 			//TODO: URG Flag and PSH flag are currently being ignored
-
-			if (IS_TCP_ACK(tcp_flags))
+			switch (tcp_flags)
 				{
-				// only ACK Bit set
-				}
-			else if (IS_TCP_RST(tcp_flags))
-				{
-				// only RST Bit set
-				}
-			else if (IS_TCP_SYN(tcp_flags))
-				{
-				// only SYN Bit set, request new queued socket
-
-				socket_t *new_socket = new_tcp_queued_socket(ipv6_header, tcp_header, tcp_socket);
-				if (new_socket != NULL)
+				case TCP_ACK:
 					{
-					// notify socket function accept(..) that a new connection request has arrived
-					m_send_tcp.content.ptr = (char*)buffer;
-					m_send_tcp.content.value = IPV6_HDR_LEN + ipv6_header->length;
-					msg_send(&m_send_tcp, tcp_socket->pid, 0);
+					// only ACK Bit set
+					// TODO: WRONG, check in queued sockets of dst socket!
+					if (tcp_socket->in_socket.local_tcp_status.state == SYN_RCVD)
+						{
+						m_send_tcp.content.ptr = (char*)buffer;
+						m_send_tcp.content.value = IPV6_HDR_LEN + ipv6_header->length;
+						msg_send_receive(&m_recv_tcp, &m_send_tcp, tcp_socket->pid);
+						}
+					break;
 					}
-				else
+				case TCP_RST:
 					{
-					printf("Dropped TCP Message because an error occured while requesting a new queued socket!\n");
+					// only RST Bit set
+					break;
 					}
-				}
-			else if (IS_TCP_SYN_ACK(tcp_flags))
-				{
-				// only SYN and ACK Bit set
-				}
-			else if (IS_TCP_FIN(tcp_flags))
-				{
-				// only FIN Bit set
-				}
-			else if (IS_TCP_FIN_ACK(tcp_flags))
-				{
-				// only FIN and ACK Bit set
-				}
-			else
-				{
-				// TODO: any other case
+				case TCP_SYN:
+					{
+					// only SYN Bit set, look for matching, listening socket and request new queued socket
+
+					if (tcp_socket->in_socket.local_tcp_status.state == LISTEN)
+						{
+						socket_t *new_socket = new_tcp_queued_socket(ipv6_header, tcp_header, tcp_socket);
+						if (new_socket != NULL)
+							{
+							// notify socket function accept(..) that a new connection request has arrived
+							// No need to wait for an answer because the server accept() function isnt reading from anything other than the queued sockets
+							msg_send(&m_send_tcp, tcp_socket->pid, 0);
+							}
+						else
+							{
+							printf("Dropped TCP SYN Message because an error occured while requesting a new queued socket!\n");
+							}
+						}
+					else
+						{
+						printf("Droppec TCP SYN Message because socket was not in state LISTEN!");
+						}
+					break;
+					}
+				case TCP_SYN_ACK:
+					{
+					// only SYN and ACK Bit set, complete three way handshake when socket in state SYN_SENT
+					if (tcp_socket->in_socket.local_tcp_status.state == SYN_SENT)
+						{
+						m_send_tcp.content.ptr = (char*)buffer;
+						m_send_tcp.content.value = IPV6_HDR_LEN + ipv6_header->length;
+						msg_send_receive(&m_recv_tcp, &m_send_tcp, tcp_socket->pid);
+						}
+					else
+						{
+						printf("Socket not in state SYN_SENT, dropping SYN-ACK-packet!");
+						}
+					break;
+					}
+				case TCP_FIN:
+					{
+					// only FIN Bit set
+					break;
+					}
+				case TCP_FIN_ACK:
+					{
+					// only FIN and ACK Bit set
+					break;
+					}
+				default:
+					{
+					// TODO: any other case
+					}
 				}
 			}
 		else

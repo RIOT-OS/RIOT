@@ -31,21 +31,55 @@ char udp_server_stack_buffer[UDP_STACK_SIZE];
 uint8_t tcp_server_thread_pid;
 char tcp_server_stack_buffer[TCP_STACK_SIZE];
 
+uint8_t tcp_client_thread_pid;
+char tcp_client_stack_buffer[TCP_STACK_SIZE];
+
 void init_tl (char *str)
 	{
 	init_transport_layer();
 	}
 
+void init_tcp_client(void)
+	{
+	struct sockaddr6 stSockAddr;
+	int SocketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	if (-1 == SocketFD)
+		{
+		printf("cannot create socket");
+		}
+
+	memset(&stSockAddr, 0, sizeof(stSockAddr));
+
+	stSockAddr.sin6_family = AF_INET;
+	// TODO: use HTONS and NTOHL, here as well as in socket, udp and tcp api
+	stSockAddr.sin6_port = HTONS(1100);
+
+	ipv6_init_address(&stSockAddr.sin6_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, 0x02);
+	ipv6_print_addr(&stSockAddr.sin6_addr);
+
+	if (-1 == connect(SocketFD, &stSockAddr, sizeof(stSockAddr)))
+		{
+		printf("connect failed");
+		close(SocketFD);
+		}
+
+	/* perform read write operations ... */
+
+
+	close(SocketFD);
+	}
+
 void init_udp_server(void)
 	{
-	struct sockaddr_in6 sa;
+	struct sockaddr6 sa;
 	char buffer_main[256];
 	ssize_t recsize;
 	uint32_t fromlen;
 	int sock = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 	memset(&sa, 0, sizeof sa);
 	sa.sin6_family = AF_INET;
-	sa.sin6_port = 7654;
+	sa.sin6_port = HTONS(7654);
 	fromlen = sizeof(sa);
 	if (-1 == bind(sock, &sa, sizeof(sa), udp_server_thread_pid))
 		{
@@ -67,7 +101,7 @@ void init_udp_server(void)
 
 void init_tcp_server(void)
 	{
-	struct sockaddr_in6 stSockAddr;
+	struct sockaddr6 stSockAddr;
 	int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
 	if(-1 == SocketFD)
@@ -97,7 +131,9 @@ void init_tcp_server(void)
 
 	for(;;)
 		{
-		int ConnectFD = accept(SocketFD, NULL, 0);
+		// Decide whether a new thread should be used to handle the new connection or the same (other queued
+		// connections would not be handled!)
+		int ConnectFD = accept(SocketFD, NULL, 0, tcp_server_thread_pid);
 
 		if(0 > ConnectFD)
 			{
@@ -128,7 +164,8 @@ void init_tcp_server_thread(char *str)
 
 void init_tcp_client_thread(char *str)
 	{
-
+	tcp_client_thread_pid = thread_create(tcp_client_stack_buffer, TCP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, init_tcp_client, "init tcp client");
+	printf("TCP CLIENT THREAD PID: %i\n", tcp_client_thread_pid);
 	}
 
 void init(char *str){
@@ -238,7 +275,7 @@ void send_packet(char *str){
 void send_udp(char *str)
 	{
 	int sock;
-	struct sockaddr_in6 sa;
+	struct sockaddr6 sa;
 	ipv6_addr_t ipaddr;
 	int bytes_sent;
 	int address;
@@ -259,7 +296,7 @@ void send_udp(char *str)
 
 	sa.sin6_family = AF_INET;
 	memcpy(&sa.sin6_addr, &ipaddr, 16);
-	sa.sin6_port = 7654;
+	sa.sin6_port = HTONS(7654);
 
 	bytes_sent = sendto(sock, (char*)text, strlen((char*)text)+1, 0, &sa, sizeof sa);
 	if (bytes_sent < 0)
