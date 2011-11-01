@@ -16,7 +16,7 @@
 
 #include "sys/net/sixlowpan/sixlowip.h"
 
-typedef struct __attribute__ ((packed)) udp_hdr_t{
+typedef struct __attribute__ ((packed)) udp_h_t{
     uint16_t src_port;
     uint16_t dst_port;
     uint16_t length;

@@ -62,7 +62,6 @@ void serial_reader_f(void) {
     while(1) {
         posix_open(uart0_handler_pid, 0);
         bytes = readpacket(get_serial_in_buffer(0), BORDER_BUFFER_SIZE);
-        printf("GOT PACKET FROM RS232!\n");
         if (bytes < 0) {
             switch (bytes) {
                 case (-SIXLOWERROR_ARRAYFULL):{

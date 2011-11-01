@@ -34,7 +34,7 @@ char tcp_server_stack_buffer[TCP_STACK_SIZE];
 uint8_t tcp_cht_pid;
 char tcp_cht_stack_buffer[TCP_STACK_SIZE];
 
-typedef struct tcp_message_t
+typedef struct tcp_msg_t
 	{
 	int		 	node_number;
 	char		tcp_string_msg[50];
@@ -49,42 +49,42 @@ void init_tl (char *str)
 void tcp_ch(void)
 	{
 	msg_t recv_msg;
-	struct sockaddr6 stSockAddr;
+	sockaddr6 stSockAddr;
 
-	msg_receive(&recv_msg);
-
-	int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
-
-	if (-1 == SocketFD)
+	while (1)
 		{
-		printf("cannot create socket");
-		}
+		msg_receive(&recv_msg);
 
-	memset(&stSockAddr, 0, sizeof(stSockAddr));
+		int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
-	stSockAddr.sin6_family = AF_INET6;
-	// TODO: use HTONS and NTOHL, here as well as in socket, udp and tcp api
-	stSockAddr.sin6_port = HTONS(1100);
-//	printf("SIN 6 PORT: %i %i\n", stSockAddr.sin6_port, NTOHS(stSockAddr.sin6_port));
-	printf("Sending %s to node %i!\n", current_message.tcp_string_msg, current_message.node_number);
-	ipv6_init_address(&stSockAddr.sin6_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, current_message.node_number);
-	ipv6_print_addr(&stSockAddr.sin6_addr);
+		if (-1 == SocketFD)
+			{
+			printf("cannot create socket");
+			}
 
-	if (-1 == connect(SocketFD, &stSockAddr, sizeof(stSockAddr), tcp_cht_pid))
-		{
-		printf("connect failed");
+		memset(&stSockAddr, 0, sizeof(stSockAddr));
+
+		stSockAddr.sin6_family = AF_INET6;
+		stSockAddr.sin6_port = HTONS(1100);
+		ipv6_init_address(&stSockAddr.sin6_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, current_message.node_number);
+		ipv6_print_addr(&stSockAddr.sin6_addr);
+
+		if (-1 == connect(SocketFD, &stSockAddr, sizeof(stSockAddr), tcp_cht_pid))
+			{
+			printf("connect failed");
+			close(SocketFD);
+			}
+
+		/* perform read write operations ... */
+
+
 		close(SocketFD);
 		}
-
-	/* perform read write operations ... */
-
-
-	close(SocketFD);
 	}
 
 void init_udp_server(void)
 	{
-	struct sockaddr6 sa;
+	sockaddr6 sa;
 	char buffer_main[256];
 	ssize_t recsize;
 	uint32_t fromlen;
@@ -113,7 +113,7 @@ void init_udp_server(void)
 
 void init_tcp_server(void)
 	{
-	struct sockaddr6 stSockAddr;
+	sockaddr6 stSockAddr;
 	int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
 	if(-1 == SocketFD)
@@ -272,8 +272,8 @@ void send_packet(char *str){
 	uint8_t text[20];
 	sscanf(str, "send %s", text);
 
-	struct ipv6_hdr_t *test_ipv6_header = ((struct ipv6_hdr_t*)(&send_buffer));
-	struct udp_hdr_t *test_udp_header = ((struct udp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
+	ipv6_hdr_t *test_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
+	udp_hdr_t *test_udp_header = ((udp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
 	uint8_t *payload = &send_buffer[IPV6_HDR_LEN+UDP_HDR_LEN];
 
 	ipv6_addr_t ipaddr;
@@ -305,7 +305,7 @@ void send_packet(char *str){
 void send_udp(char *str)
 	{
 	int sock;
-	struct sockaddr6 sa;
+	sockaddr6 sa;
 	ipv6_addr_t ipaddr;
 	int bytes_sent;
 	int address;

@@ -46,19 +46,16 @@ uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
     uint16_t len = ipv6_header->length;
 
 	sum = len + IPPROTO_TCP;
-	printf("1sum: %i len: %i \n", sum, len);
 	sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
-	printf("2sum: %i \n", sum);
 	sum = csum(sum, (uint8_t *)tcp_header, len);
-	printf("3sum: %i \n", sum);
     return (sum == 0) ? 0xffff : HTONS(sum);
 	}
 
 void tcp_packet_handler (void)
 	{
 	msg_t m_recv_ip, m_send_ip, m_recv_tcp, m_send_tcp;
-	struct ipv6_hdr_t *ipv6_header;
-	struct tcp_hdr_t *tcp_header;
+	ipv6_hdr_t *ipv6_header;
+	tcp_hdr_t *tcp_header;
 	uint8_t *payload;
 	socket_internal_t *tcp_socket = NULL;
 	uint16_t chksum;
@@ -66,17 +63,14 @@ void tcp_packet_handler (void)
 	while (1)
 		{
 		msg_receive(&m_recv_ip);
-		ipv6_header = ((struct ipv6_hdr_t*)&buffer_tcp);
-		tcp_header = ((struct tcp_hdr_t*)(&buffer_tcp[IPV6_HDR_LEN]));
+		ipv6_header = ((ipv6_hdr_t*)&buffer_tcp);
+		tcp_header = ((tcp_hdr_t*)(&buffer_tcp[IPV6_HDR_LEN]));
 		payload = &buffer_tcp[IPV6_HDR_LEN+TCP_HDR_LEN];
-		printf("IPv6 Length Field: %i\n", ipv6_header->length);
 		prinTCPHeader(tcp_header);
-		//printArrayRange_tcp((uint8_t *) tcp_header, TCP_HDR_LEN);
 		chksum = tcp_csum(ipv6_header, tcp_header);
 		printf("Checksum is %x!\n", chksum);
 
 		tcp_socket = get_tcp_socket(ipv6_header, tcp_header);
-		printf("TCP_SOCKET: %s\n",((tcp_socket == NULL)?"NULL":"FOUND"));
 
 		if ((chksum == 0xffff) && (tcp_socket != NULL))
 			{
@@ -111,11 +105,9 @@ void tcp_packet_handler (void)
 					printf("SYN Bit set!\n");
 					if (tcp_socket->in_socket.local_tcp_status.state == LISTEN)
 						{
-						printf("IN1\n");
 						socket_t *new_socket = new_tcp_queued_socket(ipv6_header, tcp_header, tcp_socket);
 						if (new_socket != NULL)
 							{
-							printf("IN2\n");
 							// notify socket function accept(..) that a new connection request has arrived
 							// No need to wait for an answer because the server accept() function isnt reading from anything other than the queued sockets
 							msg_send(&m_send_tcp, tcp_socket->pid, 0);
@@ -134,14 +126,11 @@ void tcp_packet_handler (void)
 				case TCP_SYN_ACK:
 					{
 					// only SYN and ACK Bit set, complete three way handshake when socket in state SYN_SENT
-					printf("--1--\n");
 					if (tcp_socket->in_socket.local_tcp_status.state == SYN_SENT)
 						{
-						printf("--2-- PID: %i\n",tcp_socket->pid);
 						m_send_tcp.content.ptr = (char*)buffer;
 						m_send_tcp.content.value = IPV6_HDR_LEN + ipv6_header->length;
 						msg_send_receive(&m_recv_tcp, &m_send_tcp, tcp_socket->pid);
-						printf("--3--\n");
 						}
 					else
 						{

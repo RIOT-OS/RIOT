@@ -58,7 +58,7 @@ enum tcp_states
 
 #include "sys/net/sixlowpan/sixlowip.h"
 
-typedef struct __attribute__ ((packed)) tcp_socket_status_t
+typedef struct __attribute__ ((packed)) tcp_so_sta_t
 	{
 	uint32_t	ack_nr;
 	uint32_t 	seq_nr;
@@ -67,7 +67,7 @@ typedef struct __attribute__ ((packed)) tcp_socket_status_t
 	uint8_t 	state;
 	} tcp_socket_status_t;
 
-typedef struct __attribute__ ((packed)) tcp_hdr_t
+typedef struct __attribute__ ((packed)) tcp_h_t
 	{
     uint16_t 	src_port;
     uint16_t 	dst_port;

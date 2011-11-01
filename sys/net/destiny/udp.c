@@ -35,8 +35,8 @@ uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
 void udp_packet_handler(void)
 	{
 	msg_t m_recv_ip, m_send_ip, m_recv_udp, m_send_udp;
-	struct ipv6_hdr_t *ipv6_header;
-	struct udp_hdr_t *udp_header;
+	ipv6_hdr_t *ipv6_header;
+	udp_hdr_t *udp_header;
 	uint8_t *payload;
 	socket_internal_t *udp_socket = NULL;
 	uint16_t chksum;
@@ -45,8 +45,8 @@ void udp_packet_handler(void)
 		{
 		msg_receive(&m_recv_ip);
 		printf("Inside UDP handler!\n");
-		ipv6_header = ((struct ipv6_hdr_t*)&buffer_udp);
-		udp_header = ((struct udp_hdr_t*)(&buffer_udp[IPV6_HDR_LEN]));
+		ipv6_header = ((ipv6_hdr_t*)&buffer_udp);
+		udp_header = ((udp_hdr_t*)(&buffer_udp[IPV6_HDR_LEN]));
 		payload = &buffer_udp[IPV6_HDR_LEN+UDP_HDR_LEN];
 
 		chksum = udp_csum(ipv6_header, udp_header);
