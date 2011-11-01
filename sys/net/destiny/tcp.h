@@ -37,12 +37,14 @@ enum tcp_states
 	UNKNOWN			= 11
 	};
 
-#define IS_TCP_ACK(a) 			(((a & 0xC0) & ~TCP_URG_PSH) | TCP_ACK)			// Test for ACK flag only, iognore URG und PSH flag
-#define IS_TCP_RST(a) 			(((a & 0xC0) & ~TCP_URG_PSH) | TCP_RST)
-#define IS_TCP_SYN(a) 			(((a & 0xC0) & ~TCP_URG_PSH) | TCP_SYN)
-#define IS_TCP_SYN_ACK(a) 		(((a & 0xC0) & ~TCP_URG_PSH) | TCP_SYN_ACK)
-#define IS_TCP_FIN(a) 			(((a & 0xC0) & ~TCP_URG_PSH) | TCP_FIN)
-#define IS_TCP_FIN_ACK(a) 		(((a & 0xC0) & ~TCP_URG_PSH) | TCP_FIN_ACK)
+#define REMOVE_RESERVED 		0xFC
+
+#define IS_TCP_ACK(a) 			(((a & REMOVE_RESERVED) & ~TCP_URG_PSH) | TCP_ACK)			// Test for ACK flag only, iognore URG und PSH flag
+#define IS_TCP_RST(a) 			(((a & REMOVE_RESERVED) & ~TCP_URG_PSH) | TCP_RST)
+#define IS_TCP_SYN(a) 			(((a & REMOVE_RESERVED) & ~TCP_URG_PSH) | TCP_SYN)
+#define IS_TCP_SYN_ACK(a) 		(((a & REMOVE_RESERVED) & ~TCP_URG_PSH) | TCP_SYN_ACK)
+#define IS_TCP_FIN(a) 			(((a & REMOVE_RESERVED) & ~TCP_URG_PSH) | TCP_FIN)
+#define IS_TCP_FIN_ACK(a) 		(((a & REMOVE_RESERVED) & ~TCP_URG_PSH) | TCP_FIN_ACK)
 
 #define SET_TCP_ACK(a)			a = ((a & 0x00) | TCP_ACK)
 #define SET_TCP_RST(a) 			a = ((a & 0x00) | TCP_RST)
@@ -84,5 +86,7 @@ char tcp_stack_buffer[TCP_STACK_SIZE];
 
 void tcp_packet_handler (void);
 uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
+void prinTCPHeader(tcp_hdr_t *tcp_header);
+void printArrayRange_tcp(uint8_t *udp_header, uint16_t len);
 
 #endif /* TCP_H_ */

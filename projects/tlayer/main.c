@@ -31,18 +31,29 @@ char udp_server_stack_buffer[UDP_STACK_SIZE];
 uint8_t tcp_server_thread_pid;
 char tcp_server_stack_buffer[TCP_STACK_SIZE];
 
-uint8_t tcp_client_thread_pid;
-char tcp_client_stack_buffer[TCP_STACK_SIZE];
+uint8_t tcp_cht_pid;
+char tcp_cht_stack_buffer[TCP_STACK_SIZE];
+
+typedef struct tcp_message_t
+	{
+	int		 	node_number;
+	char		tcp_string_msg[50];
+	}tcp_message_t;
+tcp_message_t current_message;
 
 void init_tl (char *str)
 	{
 	init_transport_layer();
 	}
 
-void init_tcp_client(void)
+void tcp_ch(void)
 	{
+	msg_t recv_msg;
 	struct sockaddr6 stSockAddr;
-	int SocketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	msg_receive(&recv_msg);
+
+	int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
 	if (-1 == SocketFD)
 		{
@@ -51,14 +62,15 @@ void init_tcp_client(void)
 
 	memset(&stSockAddr, 0, sizeof(stSockAddr));
 
-	stSockAddr.sin6_family = AF_INET;
+	stSockAddr.sin6_family = AF_INET6;
 	// TODO: use HTONS and NTOHL, here as well as in socket, udp and tcp api
 	stSockAddr.sin6_port = HTONS(1100);
-
-	ipv6_init_address(&stSockAddr.sin6_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, 0x02);
+//	printf("SIN 6 PORT: %i %i\n", stSockAddr.sin6_port, NTOHS(stSockAddr.sin6_port));
+	printf("Sending %s to node %i!\n", current_message.tcp_string_msg, current_message.node_number);
+	ipv6_init_address(&stSockAddr.sin6_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, current_message.node_number);
 	ipv6_print_addr(&stSockAddr.sin6_addr);
 
-	if (-1 == connect(SocketFD, &stSockAddr, sizeof(stSockAddr)))
+	if (-1 == connect(SocketFD, &stSockAddr, sizeof(stSockAddr), tcp_cht_pid))
 		{
 		printf("connect failed");
 		close(SocketFD);
@@ -114,6 +126,9 @@ void init_tcp_server(void)
 
 	stSockAddr.sin6_family = AF_INET6;
 	stSockAddr.sin6_port = HTONS(1100);
+	// TODO: HARDCODED! Use one of the IPv6 methods after initializing the node to get the correct ipv6 address!
+	ipv6_init_address(&stSockAddr.sin6_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, get_radio_address());
+	ipv6_print_addr(&stSockAddr.sin6_addr);
 
 	if(-1 == bind(SocketFD, &stSockAddr, sizeof(stSockAddr), tcp_server_thread_pid))
 		{
@@ -121,7 +136,7 @@ void init_tcp_server(void)
 		close(SocketFD);
 		exit(EXIT_FAILURE);
 		}
-
+	print_socket(SocketFD);
 	if(-1 == listen(SocketFD, 10))
 		{
 		perror("error listen failed");
@@ -133,8 +148,9 @@ void init_tcp_server(void)
 		{
 		// Decide whether a new thread should be used to handle the new connection or the same (other queued
 		// connections would not be handled!)
+		printf("1Waiting for connection!\n");
 		int ConnectFD = accept(SocketFD, NULL, 0, tcp_server_thread_pid);
-
+		printf("2Waiting for connection!\n");
 		if(0 > ConnectFD)
 			{
 			perror("error accept failed");
@@ -162,10 +178,24 @@ void init_tcp_server_thread(char *str)
 	printf("TCP SERVER THREAD PID: %i\n", tcp_server_thread_pid);
 	}
 
-void init_tcp_client_thread(char *str)
+// Init TCP connection handler thread
+void init_tcp_cht(char *str)
 	{
-	tcp_client_thread_pid = thread_create(tcp_client_stack_buffer, TCP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, init_tcp_client, "init tcp client");
-	printf("TCP CLIENT THREAD PID: %i\n", tcp_client_thread_pid);
+	tcp_cht_pid = thread_create(		tcp_cht_stack_buffer,
+											TCP_STACK_SIZE,
+											PRIORITY_MAIN,
+											CREATE_STACKTEST,
+											tcp_ch,
+											"init_connection_handler");
+	printf("TCP CONNECTION HANDLER THREAD PID: %i\n", tcp_cht_pid);
+	}
+
+void send_tcp(char *str)
+	{
+	msg_t send_msg;
+	sscanf(str, "send_tcp %s %i", current_message.tcp_string_msg, &current_message.node_number);
+
+	msg_send(&send_msg, tcp_cht_pid, 1);
 	}
 
 void init(char *str){
@@ -338,6 +368,11 @@ void context(char *str){
     }
 }
 
+void shows(char *str)
+	{
+	print_sockets();
+	}
+
 const shell_command_t shell_commands[] = {
     //{"send", "", send_packet},
     {"init", "", init},
@@ -345,11 +380,13 @@ const shell_command_t shell_commands[] = {
     {"set_chann", "", set_radio_chann},
     {"boot", "", bootstrapping},
     {"ip", "", ip},
+    {"shows", "", shows},
     {"context", "", context},
     {"init_tl", "", init_tl},
     {"init_udp_server_thread", "", init_udp_server_thread},
     {"init_tcp_server_thread", "", init_tcp_server_thread},
-    {"init_tcp_client_thread", "", init_tcp_client_thread},
+    {"init_tcp_cht", "", init_tcp_cht},
+    {"send_tcp", "", send_tcp},
     {"send_udp", "", send_udp},
     {NULL, NULL, NULL}
 };
@@ -360,7 +397,8 @@ int main(void) {
 //    vtimer_init();
 //    border_initialize(TRANSCEIVER_CC1100, NULL);
     init_tl(NULL);
-    init_udp_server_thread(NULL);
+//    init_udp_server_thread(NULL);
+//    init_tcp_server_thread(NULL);
 //    printf("RAN TO THE END!\n");
 
 //    init("init a 2");

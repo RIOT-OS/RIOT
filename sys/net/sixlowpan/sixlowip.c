@@ -131,6 +131,7 @@ void ipv6_process(void){
 
 				if (tcp_packet_handler_pid != 0)
 					{
+					printf("IPV6 Header Length: %i\n", ipv6_buf->length);
 					memcpy(tcp_packet_buffer, (char*) ipv6_buf, IPV6_HDR_LEN+ipv6_buf->length);
 					msg_send_receive(&m_send, &m_recv, tcp_packet_handler_pid);
 					}
@@ -147,9 +148,7 @@ void ipv6_process(void){
 				if (udp_packet_handler_pid != 0)
 					{
 					memcpy(udp_packet_buffer, (char*) ipv6_buf, IPV6_HDR_LEN+ipv6_buf->length);
-					printf("Copy 1!\n");
 					msg_send_receive(&m_send, &m_recv, udp_packet_handler_pid);
-					printf("Copy 2!\n");
 					}
 				else
 					{

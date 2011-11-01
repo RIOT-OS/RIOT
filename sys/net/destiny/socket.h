@@ -140,7 +140,8 @@ typedef struct __attribute__ ((packed)) socket_internal_t
 socket_internal_t sockets[MAX_SOCKETS];
 
 int socket(int domain, int type, int protocol);
-int connect(int socket, struct sockaddr6 *addr, uint32_t addrlen);
+int connect(int socket, struct sockaddr6 *addr, uint32_t addrlen, uint8_t tcp_client_thread);
+socket_t *getWaitingConnectionSocket(int socket);
 int32_t recvfrom( int s, void *buf, uint64_t len, int flags, struct sockaddr6 *from, uint32_t *fromlen );
 int32_t sendto( int s, void *msg, uint64_t len, int flags, struct sockaddr6 *to, uint32_t tolen);
 int32_t send(int s, void *msg, uint64_t len, int flags);
@@ -153,6 +154,7 @@ int shutdown(int s , int how);
 void socket_init(void);
 socket_internal_t *get_udp_socket(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header);
 socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
+void print_sockets(void);
 void print_socket(uint8_t socket);
 bool exists_socket(uint8_t socket);
 socket_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *socket);
