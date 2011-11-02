@@ -47,8 +47,6 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
     packet_length = 0;
 
-//    icmp_buf->type = ICMP_RTR_SOL;
-//    icmp_buf->code = 0;
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
@@ -60,7 +58,6 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t
     ipv6_get_saddr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
 
     uint8_t *p_ptr = get_payload_buf(ipv6_ext_hdr_len); 
-    //*p_ptr = payload;
 
     memcpy(p_ptr,payload,p_len);
 

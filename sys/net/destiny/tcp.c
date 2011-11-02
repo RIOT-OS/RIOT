@@ -14,7 +14,7 @@
 #include "socket.h"
 #include "sys/net/net_help/net_help.h"
 
-void prinTCPHeader(tcp_hdr_t *tcp_header)
+void printTCPHeader(tcp_hdr_t *tcp_header)
 	{
 	printf("\nBEGIN: TCP HEADER\n");
 	printf("ack_nr: %lu\n", tcp_header->ack_nr);
@@ -66,7 +66,7 @@ void tcp_packet_handler (void)
 		ipv6_header = ((ipv6_hdr_t*)&buffer_tcp);
 		tcp_header = ((tcp_hdr_t*)(&buffer_tcp[IPV6_HDR_LEN]));
 		payload = &buffer_tcp[IPV6_HDR_LEN+TCP_HDR_LEN];
-		prinTCPHeader(tcp_header);
+		printTCPHeader(tcp_header);
 		chksum = tcp_csum(ipv6_header, tcp_header);
 		printf("Checksum is %x!\n", chksum);
 
@@ -82,11 +82,9 @@ void tcp_packet_handler (void)
 				{
 				case TCP_ACK:
 					{
-					printf("ACK Bit set! State: %i\n", getWaitingConnectionSocket((tcp_socket->socket_id)+1)->local_tcp_status.state);
 					// only ACK Bit set
 					if (getWaitingConnectionSocket(tcp_socket->socket_id)->local_tcp_status.state == SYN_RCVD)
 						{
-						printf("Sending message to thread accepting connections!\n");
 						m_send_tcp.content.ptr = (char*)buffer;
 						m_send_tcp.content.value = IPV6_HDR_LEN + ipv6_header->length;
 						msg_send_receive(&m_recv_tcp, &m_send_tcp, tcp_socket->pid);

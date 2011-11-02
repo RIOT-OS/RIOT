@@ -61,10 +61,10 @@ enum tcp_states
 typedef struct __attribute__ ((packed)) tcp_so_sta_t
 	{
 	uint32_t	ack_nr;
-	uint32_t 	seq_nr;
-	uint16_t 	window;
 	uint8_t		mss;
+	uint32_t 	seq_nr;
 	uint8_t 	state;
+	uint16_t 	window;
 	} tcp_socket_status_t;
 
 typedef struct __attribute__ ((packed)) tcp_h_t
@@ -86,7 +86,7 @@ char tcp_stack_buffer[TCP_STACK_SIZE];
 
 void tcp_packet_handler (void);
 uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
-void prinTCPHeader(tcp_hdr_t *tcp_header);
+void printTCPHeader(tcp_hdr_t *tcp_header);
 void printArrayRange_tcp(uint8_t *udp_header, uint16_t len);
 
 #endif /* TCP_H_ */

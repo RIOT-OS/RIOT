@@ -49,7 +49,7 @@ void init_tl (char *str)
 void tcp_ch(void)
 	{
 	msg_t recv_msg;
-	sockaddr6 stSockAddr;
+	sockaddr6_t stSockAddr;
 
 	while (1)
 		{
@@ -84,7 +84,7 @@ void tcp_ch(void)
 
 void init_udp_server(void)
 	{
-	sockaddr6 sa;
+	sockaddr6_t sa;
 	char buffer_main[256];
 	ssize_t recsize;
 	uint32_t fromlen;
@@ -113,7 +113,7 @@ void init_udp_server(void)
 
 void init_tcp_server(void)
 	{
-	sockaddr6 stSockAddr;
+	sockaddr6_t stSockAddr;
 	int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
 	if(-1 == SocketFD)
@@ -148,9 +148,7 @@ void init_tcp_server(void)
 		{
 		// Decide whether a new thread should be used to handle the new connection or the same (other queued
 		// connections would not be handled!)
-		printf("1Waiting for connection!\n");
 		int ConnectFD = accept(SocketFD, NULL, 0, tcp_server_thread_pid);
-		printf("2Waiting for connection!\n");
 		if(0 > ConnectFD)
 			{
 			perror("error accept failed");
@@ -298,14 +296,13 @@ void send_packet(char *str){
 
     test_udp_header->checksum = ~udp_csum(test_ipv6_header, test_udp_header);
 
-    printf("Content of UDP Packet: src_port: %i, dst_port: %i, length: %i, checksum: %x\n", test_udp_header->src_port, test_udp_header->dst_port, test_udp_header->length, test_udp_header->checksum);
     sixlowpan_send(&ipaddr, (uint8_t*)(test_udp_header), test_udp_header->length, IPPROTO_UDP);
 }
 
 void send_udp(char *str)
 	{
 	int sock;
-	sockaddr6 sa;
+	sockaddr6_t sa;
 	ipv6_addr_t ipaddr;
 	int bytes_sent;
 	int address;
@@ -374,7 +371,6 @@ void shows(char *str)
 	}
 
 const shell_command_t shell_commands[] = {
-    //{"send", "", send_packet},
     {"init", "", init},
     {"addr", "", get_r_address},
     {"set_chann", "", set_radio_chann},
@@ -393,15 +389,9 @@ const shell_command_t shell_commands[] = {
 
 int main(void) {
     printf("6LoWPAN Transport Layers\n");
+    printf("RANDMAX: %i\n", RAND_MAX);
     posix_open(uart0_handler_pid, 0);
-//    vtimer_init();
-//    border_initialize(TRANSCEIVER_CC1100, NULL);
     init_tl(NULL);
-//    init_udp_server_thread(NULL);
-//    init_tcp_server_thread(NULL);
-//    printf("RAN TO THE END!\n");
-
-//    init("init a 2");
     shell_t shell;
     shell_init(&shell, shell_commands, uart0_readc, uart0_putc);
 

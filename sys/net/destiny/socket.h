@@ -105,10 +105,13 @@
 #define	PF_NETGRAPH			AF_NETGRAPH
 #define	PF_MAX				AF_MAX
 
-#define MAX_SOCKETS			16
+#define MAX_SOCKETS			8
 #define MAX_QUEUED_SOCKETS	5
 
 #define EPHEMERAL_PORTS 	49152
+
+#define STATIC_MSS			32
+#define STATIC_WINDOW		32
 
 typedef struct __attribute__ ((packed)) socka6
 	{
@@ -116,7 +119,7 @@ typedef struct __attribute__ ((packed)) socka6
     uint16_t       		sin6_port;      		/* transport layer port # */
     uint32_t        	sin6_flowinfo;  		/* IPv6 flow information */
     ipv6_addr_t 		sin6_addr;      		/* IPv6 address */
-	} sockaddr6;
+	} sockaddr6_t;
 
 typedef struct __attribute__ ((packed)) sock_t
 	{
@@ -125,8 +128,8 @@ typedef struct __attribute__ ((packed)) sock_t
 	uint8_t				protocol;
 	tcp_socket_status_t local_tcp_status;
 	tcp_socket_status_t foreign_tcp_status;
-	sockaddr6			local_address;
-	sockaddr6			foreign_address;
+	sockaddr6_t			local_address;
+	sockaddr6_t			foreign_address;
 	} socket_t;
 
 typedef struct __attribute__ ((packed)) socket_in_t
@@ -140,16 +143,16 @@ typedef struct __attribute__ ((packed)) socket_in_t
 socket_internal_t sockets[MAX_SOCKETS];
 
 int socket(int domain, int type, int protocol);
-int connect(int socket, sockaddr6 *addr, uint32_t addrlen, uint8_t tcp_client_thread);
+int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_thread);
 socket_t *getWaitingConnectionSocket(int socket);
-int32_t recvfrom( int s, void *buf, uint64_t len, int flags, sockaddr6 *from, uint32_t *fromlen );
-int32_t sendto( int s, void *msg, uint64_t len, int flags, sockaddr6 *to, uint32_t tolen);
+int32_t recvfrom( int s, void *buf, uint64_t len, int flags, sockaddr6_t *from, uint32_t *fromlen );
+int32_t sendto( int s, void *msg, uint64_t len, int flags, sockaddr6_t *to, uint32_t tolen);
 int32_t send(int s, void *msg, uint64_t len, int flags);
 int32_t recv(int s, void *buf, uint64_t len, int flags);
 int close(int s);
-int bind(int s, sockaddr6 *name, int namelen, uint8_t pid);
+int bind(int s, sockaddr6_t *name, int namelen, uint8_t pid);
 int listen(int s, int backlog);
-int accept(int s, sockaddr6 *addr, uint32_t addrlen, uint8_t pid);
+int accept(int s, sockaddr6_t *addr, uint32_t addrlen, uint8_t pid);
 int shutdown(int s , int how);
 void socket_init(void);
 socket_internal_t *get_udp_socket(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header);
