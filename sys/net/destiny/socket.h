@@ -113,6 +113,9 @@
 #define STATIC_MSS			32
 #define STATIC_WINDOW		32
 
+#define INC_PACKET			0
+#define OUT_PACKET			1
+
 typedef struct __attribute__ ((packed)) socka6
 	{
     uint8_t     		sin6_family;    		/* AF_INET6 */
@@ -161,5 +164,6 @@ void print_sockets(void);
 void print_socket(uint8_t socket);
 bool exists_socket(uint8_t socket);
 socket_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *socket);
+void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
 
 #endif /* SOCKET_H_ */

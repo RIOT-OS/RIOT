@@ -13,6 +13,38 @@
 #include "socket.h"
 #include "sys/net/net_help/net_help.h"
 
+void print_tcp_flags (tcp_hdr_t *tcp_header)
+	{
+	printf("FLAGS: ");
+	if ((tcp_header->reserved_flags & TCP_ACK) > 0)
+		{
+		printf("ACK ");
+		}
+	if ((tcp_header->reserved_flags & TCP_RST) > 0)
+		{
+		printf("RST ");
+		}
+	if ((tcp_header->reserved_flags & TCP_SYN) > 0)
+		{
+		printf("SYN ");
+		}
+	if ((tcp_header->reserved_flags & TCP_FIN) > 0)
+		{
+		printf("FIN ");
+		}
+	printf("\n\n");
+	}
+
+void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
+	{
+	printf("--- %s TCP packet: ---\n", (in_or_out == INC_PACKET ? "Incoming" : "Outgoing"));
+	ipv6_print_addr(&ipv6_header->srcaddr);
+	ipv6_print_addr(&ipv6_header->destaddr);
+	printf("Source Port: %i, Dest. Port: %i\n", tcp_header->src_port, tcp_header->dst_port);
+	printf("ACK: %li, SEQ: %li, Window: %i\n", tcp_header->ack_nr, tcp_header->seq_nr, tcp_header->window);
+	print_tcp_flags(tcp_header);
+	}
+
 void print_socket(uint8_t socket)
 	{
 	socket_internal_t *current_socket_internal = &sockets[socket - 1];
@@ -271,6 +303,26 @@ void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port, ui
 	tcp_hdr->window					= window;
 	}
 
+// Check for consistent ACK and SEQ number
+// TODO: Use error codes for different kinds of inconsistency when needed!
+int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header)
+	{
+	if (IS_TCP_ACK(tcp_header->reserved_flags))
+		{
+		if(tcp_header->ack_nr != (current_tcp_socket->local_tcp_status.seq_nr+1))
+			{
+			// TODO: possible loss of a packet (MAYBE!)
+			return -1;
+			}
+		}
+	if (tcp_header->seq_nr <= current_tcp_socket->foreign_tcp_status.seq_nr)
+		{
+		// TODO: possible repetition of a packet or wrong order of arriving
+		return -1;
+		}
+	return 1;
+	}
+
 int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_thread)
 	{
 	// Variables
@@ -310,8 +362,6 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 	// Fill TCP SYN packet
 	set_tcp_packet(current_tcp_packet, current_tcp_socket->local_address.sin6_port, current_tcp_socket->foreign_address.sin6_port,
 			current_tcp_socket->local_tcp_status.seq_nr, 0, 0, TCP_SYN, current_tcp_socket->local_tcp_status.window, 0, 0);
-	printf("PORT orig: %i, PORT socket: %i\n", addr->sin6_port, current_tcp_socket->foreign_address.sin6_port);
-	printTCPHeader(current_tcp_packet);
 	// Fill IPv6 Header
 	memcpy(&(temp_ipv6_header->destaddr), &current_tcp_socket->foreign_address.sin6_addr, 16);
 	memcpy(&(temp_ipv6_header->srcaddr), &current_tcp_socket->local_address.sin6_addr, 16);
@@ -326,7 +376,13 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 	msg_receive(&msg_from_server);
 
 	// Read packet content
-	tcp_hdr_t *tcp_header = ((tcp_hdr_t*)(msg_from_server.content.ptr+IPV6_HDR_LEN));
+	tcp_hdr_t *tcp_header = ((tcp_hdr_t*)(buffer_tcp+IPV6_HDR_LEN));
+
+	// Check for consistency
+	if (check_tcp_consistency(current_tcp_socket, tcp_header) == -1)
+		{
+		printf("TCP packets not consistent!\n");
+		}
 
 	// Got SYN ACK from Server
 	// Refresh foreign TCP socket information
@@ -584,8 +640,14 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 	ipv6_hdr_t *ipv6_header;
 	tcp_hdr_t *tcp_header;
 
-	ipv6_header = ((ipv6_hdr_t*)(msg_recv_client_ack.content.ptr));
-	tcp_header = ((tcp_hdr_t*)(msg_recv_client_ack.content.ptr));
+	ipv6_header = ((ipv6_hdr_t*)(buffer_tcp));
+	tcp_header = ((tcp_hdr_t*)(buffer_tcp+IPV6_HDR_LEN));
+
+	// Check for consistency
+	if (check_tcp_consistency(current_queued_socket, tcp_header) == -1)
+		{
+		printf("TCP packets not consistent!\n");
+		}
 
 	// Got ack, connection established, refresh local and foreign tcp socket status
 	set_tcp_status(&current_queued_socket->foreign_tcp_status, tcp_header->ack_nr, STATIC_MSS, tcp_header->seq_nr, ESTABLISHED, tcp_header->window);
