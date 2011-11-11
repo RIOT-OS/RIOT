@@ -111,6 +111,13 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, s
 
 	}
 
+void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket, uint8_t *payload)
+	{
+	char message[128];
+	memcpy(message, payload, ipv6_header->length-TCP_HDR_LEN);
+	printf("Packet-Content: %s\n", message);
+	}
+
 void tcp_packet_handler (void)
 	{
 	msg_t m_recv_ip, m_send_ip;
@@ -184,8 +191,8 @@ void tcp_packet_handler (void)
 					}
 				default:
 					{
-					// TODO: any other case
 					printf("DEFAULT!\n");
+					handle_tcp_no_flags_packet(ipv6_header, tcp_header, tcp_socket, payload);
 					}
 				}
 			}

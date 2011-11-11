@@ -48,38 +48,47 @@ void init_tl (char *str)
 
 void tcp_ch(void)
 	{
+	uint32_t state = 0;
 	msg_t recv_msg;
 	sockaddr6_t stSockAddr;
 
-	while (1)
+	msg_receive(&recv_msg);
+
+	int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
+
+	if (-1 == SocketFD)
 		{
-		msg_receive(&recv_msg);
+		printf("cannot create socket");
+		}
 
-		int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
+	memset(&stSockAddr, 0, sizeof(stSockAddr));
 
-		if (-1 == SocketFD)
-			{
-			printf("cannot create socket");
-			}
+	stSockAddr.sin6_family = AF_INET6;
+	stSockAddr.sin6_port = HTONS(1100);
+	ipv6_init_address(&stSockAddr.sin6_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, current_message.node_number);
+	ipv6_print_addr(&stSockAddr.sin6_addr);
 
-		memset(&stSockAddr, 0, sizeof(stSockAddr));
-
-		stSockAddr.sin6_family = AF_INET6;
-		stSockAddr.sin6_port = HTONS(1100);
-		ipv6_init_address(&stSockAddr.sin6_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, current_message.node_number);
-		ipv6_print_addr(&stSockAddr.sin6_addr);
-
-		if (-1 == connect(SocketFD, &stSockAddr, sizeof(stSockAddr), tcp_cht_pid))
-			{
-			printf("connect failed");
-			close(SocketFD);
-			}
-
-		/* perform read write operations ... */
-
-
+	if (-1 == connect(SocketFD, &stSockAddr, sizeof(stSockAddr), tcp_cht_pid))
+		{
+		printf("connect failed");
 		close(SocketFD);
 		}
+	msg_receive(&recv_msg);
+	state = recv_msg.content.value;
+	while (state == 1)
+		{
+		printf("Trying to send data!\n");
+		if (send(SocketFD, (void*) current_message.tcp_string_msg, strlen(current_message.tcp_string_msg)+1, 0) < 0)
+			{
+			printf("Could not send %s!\n", current_message.tcp_string_msg);
+			}
+
+		msg_receive(&recv_msg);
+		state = recv_msg.content.value;
+		}
+
+	close(SocketFD);
+
 	}
 
 void init_udp_server(void)
@@ -191,9 +200,27 @@ void init_tcp_cht(char *str)
 void send_tcp(char *str)
 	{
 	msg_t send_msg;
-	sscanf(str, "send_tcp %s %i", current_message.tcp_string_msg, &current_message.node_number);
+	sscanf(str, "send_tcp %s", current_message.tcp_string_msg);
 
-	msg_send(&send_msg, tcp_cht_pid, 1);
+	send_msg.content.value = 1;
+	msg_send(&send_msg, tcp_cht_pid, 0);
+	}
+
+void connect_tcp(char *str)
+	{
+	msg_t send_msg;
+	sscanf(str, "connect_tcp %i", &current_message.node_number);
+
+	send_msg.content.value = 1;
+	msg_send(&send_msg, tcp_cht_pid, 0);
+	}
+
+void disconnect_tcp(char *str)
+	{
+	msg_t send_msg;
+
+	send_msg.content.value = 0;
+	msg_send(&send_msg, tcp_cht_pid, 0);
 	}
 
 void init(char *str){
@@ -382,6 +409,7 @@ const shell_command_t shell_commands[] = {
     {"init_udp_server_thread", "", init_udp_server_thread},
     {"init_tcp_server_thread", "", init_tcp_server_thread},
     {"init_tcp_cht", "", init_tcp_cht},
+    {"connect_tcp", "", connect_tcp},
     {"send_tcp", "", send_tcp},
     {"send_udp", "", send_udp},
     {NULL, NULL, NULL}

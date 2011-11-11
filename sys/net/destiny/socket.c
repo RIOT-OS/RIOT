@@ -38,8 +38,11 @@ void print_tcp_flags (tcp_hdr_t *tcp_header)
 void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
 	{
 	printf("--- %s TCP packet: ---\n", (in_or_out == INC_PACKET ? "Incoming" : "Outgoing"));
+	printf("IPv6 Source:");
 	ipv6_print_addr(&ipv6_header->srcaddr);
+	printf("IPv6 Dest:");
 	ipv6_print_addr(&ipv6_header->destaddr);
+	printf("TCP Length: %i\n", ipv6_header->length-TCP_HDR_LEN);
 	printf("Source Port: %i, Dest. Port: %i\n", tcp_header->src_port, tcp_header->dst_port);
 	printf("ACK: %li, SEQ: %li, Window: %i\n", tcp_header->ack_nr, tcp_header->seq_nr, tcp_header->window);
 	print_tcp_flags(tcp_header);
@@ -326,6 +329,7 @@ int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header)
 int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_thread)
 	{
 	// Variables
+	socket_internal_t *current_int_tcp_socket;
 	socket_t *current_tcp_socket;
 	msg_t msg_from_server, msg_reply_fin;
 	uint8_t send_buffer[BUFFER_SIZE];
@@ -333,11 +337,13 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
 
 	// Check if socket exists
-	current_tcp_socket = &getSocket(socket)->in_socket;
-	if (current_tcp_socket == NULL)
+	current_int_tcp_socket = getSocket(socket);
+	if (current_int_tcp_socket == NULL)
 		{
 		return -1;
 		}
+
+	current_tcp_socket = &current_int_tcp_socket->in_socket;
 
 	// Set client thread process ID
 	getSocket(socket)->pid = tcp_client_thread;
@@ -402,9 +408,49 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 	return 0;
 	}
 
+void set_tcp_packet_auto(tcp_hdr_t *current_tcp_packet, socket_t *current_socket)
+	{
+	set_tcp_packet(current_tcp_packet, current_socket->local_address.sin6_port, current_socket->foreign_address.sin6_port, current_socket->local_tcp_status.seq_nr,
+			current_socket->local_tcp_status.ack_nr, 0, 0, current_socket->local_tcp_status.window, 0, 0);
+	}
+
 int32_t send(int s, void *msg, uint64_t len, int flags)
 	{
-	return -1;
+	// Variables
+	socket_internal_t *current_int_tcp_socket;
+	socket_t *current_tcp_socket;
+	uint8_t send_buffer[BUFFER_SIZE];
+	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
+	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
+
+	// Check if socket exists
+	current_int_tcp_socket = getSocket(s);
+	if (current_int_tcp_socket == NULL)
+		{
+		return -1;
+		}
+
+	current_tcp_socket = &current_int_tcp_socket->in_socket;
+
+	// Refresh local TCP socket information
+	current_tcp_socket->local_tcp_status.seq_nr = current_tcp_socket->local_tcp_status.seq_nr + len;
+
+	// IPv6 information
+	memcpy(&(temp_ipv6_header->destaddr), &current_tcp_socket->foreign_address.sin6_addr, 16);
+	memcpy(&(temp_ipv6_header->srcaddr), &current_tcp_socket->local_address.sin6_addr, 16);
+	temp_ipv6_header->length = TCP_HDR_LEN+len;
+
+	// Fill TCP packet header
+	set_tcp_packet_auto(current_tcp_packet, current_tcp_socket);
+
+	// Add packet data
+	memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, len);
+
+	// Checksum
+	current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
+
+	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN+len, IPPROTO_TCP);
+	return 1;
 	}
 
 int32_t recv(int s, void *buf, uint64_t len, int flags)
