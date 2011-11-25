@@ -12,6 +12,7 @@
 #include "tcp.h"
 #include "socket.h"
 #include "sys/net/net_help/net_help.h"
+#include "sys/net/net_help/msg_help.h"
 
 void print_tcp_flags (tcp_hdr_t *tcp_header)
 	{
@@ -48,36 +49,37 @@ void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_hea
 	print_tcp_flags(tcp_header);
 	}
 
-void print_socket(uint8_t socket)
+void print_socket(socket_t *current_socket)
 	{
-	socket_internal_t *current_socket_internal = &sockets[socket - 1];
-	socket_t *current_socket = &current_socket_internal->in_socket;
-	printf("ID: %i, PID: %i, Domain: %i, Type: %i, Protocol: %i State: %i\n",
-			current_socket_internal->socket_id,
-			current_socket_internal->pid,
+	printf("Domain: %i, Type: %i, Protocol: %i \n",
 			current_socket->domain,
 			current_socket->type,
-			current_socket->protocol,
-			current_socket->local_tcp_status.state);
-	printf("Local address: \tPort: %i, \tFamily: %i\n",
-			NTOHS(current_socket->local_address.sin6_port),
-			current_socket->local_address.sin6_family);
+			current_socket->protocol);
+//	printf("Local address: \tPort: %i, \tFamily: %i\n",
+//			NTOHS(current_socket->local_address.sin6_port),
+//			current_socket->local_address.sin6_family);
 	ipv6_print_addr(&current_socket->local_address.sin6_addr);
-	printf("\n");
-	printf("Foreign address: \tPort: %i, \tFamily: %i\n",
-			NTOHS(current_socket->foreign_address.sin6_port),
-			current_socket->foreign_address.sin6_family);
+//	printf("Foreign address: \tPort: %i, \tFamily: %i\n",
+//			NTOHS(current_socket->foreign_address.sin6_port),
+//			current_socket->foreign_address.sin6_family);
 	ipv6_print_addr(&current_socket->foreign_address.sin6_addr);
-	printf("\n");
-	printf("Local TCP status: ACK: %li, SEQ: %li, STATE: %i\n",
-			current_socket->local_tcp_status.ack_nr,
-			current_socket->local_tcp_status.seq_nr,
-			current_socket->local_tcp_status.state);
-	printf("\n");
-	printf("Foreign TCP status: ACK: %li, SEQ: %li, STATE: %i\n",
-				current_socket->foreign_tcp_status.ack_nr,
-				current_socket->foreign_tcp_status.seq_nr,
-				current_socket->foreign_tcp_status.state);
+//	printf("Local TCP status: ACK: %li, SEQ: %li, STATE: %i\n",
+//			current_socket->local_tcp_status.ack_nr,
+//			current_socket->local_tcp_status.seq_nr,
+//			current_socket->local_tcp_status.state);
+//	printf("Foreign TCP status: ACK: %li, SEQ: %li, STATE: %i\n",
+//				current_socket->foreign_tcp_status.ack_nr,
+//				current_socket->foreign_tcp_status.seq_nr,
+//				current_socket->foreign_tcp_status.state);
+	}
+
+void print_internal_socket(socket_internal_t *current_socket_internal)
+	{
+	socket_t *current_socket = &current_socket_internal->in_socket;
+	printf("\n--------------------------\n");
+	printf("ID: %i, PID: %i\n",	current_socket_internal->socket_id,	current_socket_internal->pid);
+	print_socket(current_socket);
+	printf("\n--------------------------\n");
 	}
 
 socket_internal_t *getSocket(uint8_t s)
@@ -100,8 +102,7 @@ void print_sockets(void)
 		{
 		if(getSocket(i) != NULL)
 			{
-			print_socket(i);
-			printf("\n----------------------------------------------------------------\n");
+			print_internal_socket(getSocket(i));
 			}
 		}
 	}
@@ -246,13 +247,13 @@ socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header
 			}
 		// TODO: Figure out a better strategy of using *.LOCAL_ADRESS than using the last Byte
 		else if ( isTCPSocket(i) &&
-				(current_socket->in_socket.local_tcp_status.state == LISTEN) &&
+				((current_socket->in_socket.local_tcp_status.state == LISTEN) || (current_socket->in_socket.local_tcp_status.state == SYN_RCVD)) &&
 				(current_socket->in_socket.local_address.sin6_addr.uint8[15] == ipv6_header->destaddr.uint8[15]) &&
 				(current_socket->in_socket.local_address.sin6_port == tcp_header->dst_port) &&
 				(current_socket->in_socket.foreign_address.sin6_addr.uint8[15] == 0x00) &&
 				(current_socket->in_socket.foreign_address.sin6_port == 0))
 			{
-			listening_socket = *(&current_socket);
+			listening_socket = current_socket;
 			}
 		i++;
 		}
@@ -307,23 +308,27 @@ void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port, ui
 	}
 
 // Check for consistent ACK and SEQ number
-// TODO: Use error codes for different kinds of inconsistency when needed!
 int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header)
 	{
 	if (IS_TCP_ACK(tcp_header->reserved_flags))
 		{
-		if(tcp_header->ack_nr != (current_tcp_socket->local_tcp_status.seq_nr+1))
+		if(tcp_header->ack_nr > (current_tcp_socket->local_tcp_status.seq_nr+1))
 			{
-			// TODO: possible loss of a packet (MAYBE!)
-			return -1;
+			// ACK of not yet sent byte, discard
+			return ACK_NO_TOO_BIG;
+			}
+		else if (tcp_header->ack_nr < (current_tcp_socket->local_tcp_status.seq_nr+1))
+			{
+			// ACK of previous segments, maybe dropped?
+			return ACK_NO_TOO_SMALL;
 			}
 		}
-	if (tcp_header->seq_nr <= current_tcp_socket->foreign_tcp_status.seq_nr)
+	if ((current_tcp_socket->foreign_tcp_status.seq_nr > 0) && (tcp_header->seq_nr <= current_tcp_socket->foreign_tcp_status.seq_nr))
 		{
-		// TODO: possible repetition of a packet or wrong order of arriving
-		return -1;
+		// segment repetition, maybe ACK got lost?
+		return SEQ_NO_SAME;
 		}
-	return 1;
+	return PACKET_OK;
 	}
 
 int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_thread)
@@ -392,7 +397,7 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 
 	// Got SYN ACK from Server
 	// Refresh foreign TCP socket information
-	set_tcp_status(&current_tcp_socket->foreign_tcp_status, tcp_header->ack_nr, STATIC_MSS, tcp_header->seq_nr, SYN_RCVD, tcp_header->window);
+	set_tcp_status(&current_tcp_socket->foreign_tcp_status, tcp_header->ack_nr, STATIC_MSS, tcp_header->seq_nr, ESTABLISHED, tcp_header->window);
 
 	// Refresh local TCP socket information
 	set_tcp_status(&current_tcp_socket->local_tcp_status, tcp_header->seq_nr + 1, STATIC_MSS, tcp_header->ack_nr, ESTABLISHED, STATIC_WINDOW);
@@ -417,20 +422,27 @@ void set_tcp_packet_auto(tcp_hdr_t *current_tcp_packet, socket_t *current_socket
 int32_t send(int s, void *msg, uint64_t len, int flags)
 	{
 	// Variables
+	int32_t sent_bytes = 0;
 	socket_internal_t *current_int_tcp_socket;
 	socket_t *current_tcp_socket;
 	uint8_t send_buffer[BUFFER_SIZE];
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
 
-	// Check if socket exists
-	current_int_tcp_socket = getSocket(s);
-	if (current_int_tcp_socket == NULL)
+	// Check if socket exists and is TCP socket
+	if (!isTCPSocket(s))
 		{
 		return -1;
 		}
 
+	current_int_tcp_socket = getSocket(s);
 	current_tcp_socket = &current_int_tcp_socket->in_socket;
+
+	// Check for ESTABLISHED STATE
+	if (current_tcp_socket->local_tcp_status.state != ESTABLISHED)
+		{
+		return -1;
+		}
 
 	// Refresh local TCP socket information
 	current_tcp_socket->local_tcp_status.seq_nr = current_tcp_socket->local_tcp_status.seq_nr + len;
@@ -444,17 +456,72 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 	set_tcp_packet_auto(current_tcp_packet, current_tcp_socket);
 
 	// Add packet data
-	memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, len);
+	if (len > current_tcp_socket->foreign_tcp_status.window)
+		{
+		memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, current_tcp_socket->foreign_tcp_status.window);
+		sent_bytes = current_tcp_socket->foreign_tcp_status.window;
+		}
+	else
+		{
+		memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, len);
+		sent_bytes = len;
+		}
+
 
 	// Checksum
 	current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
 
 	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN+len, IPPROTO_TCP);
-	return 1;
+	return sent_bytes;
+	}
+
+uint8_t read_from_socket(socket_internal_t *current_int_tcp_socket, void *buf, int len)
+	{
+	if (len > current_int_tcp_socket->tcp_input_buffer_end)
+		{
+		uint8_t read_bytes = current_int_tcp_socket->tcp_input_buffer_end;
+		memcpy(buf, current_int_tcp_socket->tcp_input_buffer, current_int_tcp_socket->tcp_input_buffer_end);
+		current_int_tcp_socket->tcp_input_buffer_end = 0;
+		return read_bytes;
+		}
+	else
+		{
+		memcpy(buf, current_int_tcp_socket->tcp_input_buffer, len);
+		memmove(current_int_tcp_socket->tcp_input_buffer, (current_int_tcp_socket->tcp_input_buffer+len), current_int_tcp_socket->tcp_input_buffer_end-len);
+		current_int_tcp_socket->tcp_input_buffer_end = current_int_tcp_socket->tcp_input_buffer_end-len;
+		return len;
+		}
 	}
 
 int32_t recv(int s, void *buf, uint64_t len, int flags)
 	{
+	// Variables
+	msg_t m_recv;
+	socket_internal_t *current_int_tcp_socket;
+	socket_t *current_tcp_socket;
+
+	// Check if socket exists
+	if (!isTCPSocket(s))
+		{
+		return -1;
+		}
+
+	current_int_tcp_socket = getSocket(s);
+	current_tcp_socket = &current_int_tcp_socket->in_socket;
+
+
+	if (current_int_tcp_socket->tcp_input_buffer_end > 0)
+		{
+		return read_from_socket(current_int_tcp_socket, buf, len);
+		}
+
+	net_msg_receive(&m_recv, FID_RECV);
+
+	if (current_int_tcp_socket->tcp_input_buffer_end > 0)
+		{
+		return read_from_socket(current_int_tcp_socket, buf, len);
+		}
+
 	return -1;
 	}
 
@@ -466,8 +533,7 @@ int32_t recvfrom(int s, void *buf, uint64_t len, int flags, sockaddr6_t *from, u
 		ipv6_hdr_t *ipv6_header;
 		udp_hdr_t *udp_header;
 		uint8_t *payload;
-		msg_receive(&m_recv);
-
+		net_msg_receive(&m_recv, FID_RECV_FROM);
 		ipv6_header = ((ipv6_hdr_t*)&buffer_udp);
 		udp_header = ((udp_hdr_t*)(&buffer_udp[IPV6_HDR_LEN]));
 		payload = &buffer_udp[IPV6_HDR_LEN+UDP_HDR_LEN];
@@ -479,7 +545,7 @@ int32_t recvfrom(int s, void *buf, uint64_t len, int flags, sockaddr6_t *from, u
 		from->sin6_flowinfo = 0;
 		from->sin6_port = udp_header->src_port;
 		memcpy(fromlen, (void*)(sizeof(sockaddr6_t)), sizeof(fromlen));
-		msg_reply(&m_recv, &m_send);
+		net_msg_reply(&m_recv, &m_send, FID_UDP_PH);
 		return udp_header->length;
 		}
 	else if (isTCPSocket(s))
@@ -646,7 +712,7 @@ socket_t *getWaitingConnectionSocket(int socket)
 	int i;
 	for (i = 0; i < MAX_QUEUED_SOCKETS; i++)
 		{
-		if (getSocket(socket)->queued_sockets[i].type != 0)
+		if (getSocket(socket)->queued_sockets[i].local_tcp_status.state == SYN_RCVD)
 			{
 			return &getSocket(socket)->queued_sockets[i];
 			}
@@ -664,6 +730,9 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *syn_ack_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
 
+	// Set status of internal socket to SYN_RCVD until connection with second socket is established!
+	server_socket->in_socket.local_tcp_status.state = SYN_RCVD;
+
 	// Fill SYN ACK TCP packet, still use queued socket for port number until connection is completely established!
 	// Otherwise the program doesnt return to this function and instead trys to call the new registered thread
 	// which isnt prepared to complete the threeway handshake process!
@@ -678,6 +747,7 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 
 	syn_ack_packet->checksum = ~tcp_csum(temp_ipv6_header, syn_ack_packet);
 
+	printf("BEFORE SENDING SYN ACK PACKET!\n");
 	sixlowpan_send(&current_queued_socket->foreign_address.sin6_addr, (uint8_t*)(syn_ack_packet), TCP_HDR_LEN, IPPROTO_TCP);
 
 	// wait for ACK from Client
@@ -690,7 +760,7 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 	tcp_header = ((tcp_hdr_t*)(buffer_tcp+IPV6_HDR_LEN));
 
 	// Check for consistency
-	if (check_tcp_consistency(current_queued_socket, tcp_header) == -1)
+	if (check_tcp_consistency(current_queued_socket, tcp_header) != PACKET_OK)
 		{
 		printf("TCP packets not consistent!\n");
 		}
@@ -699,6 +769,9 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 	set_tcp_status(&current_queued_socket->foreign_tcp_status, tcp_header->ack_nr, STATIC_MSS, tcp_header->seq_nr, ESTABLISHED, tcp_header->window);
 	set_tcp_status(&current_queued_socket->local_tcp_status, tcp_header->seq_nr+1, STATIC_MSS, tcp_header->ack_nr, ESTABLISHED, STATIC_WINDOW);
 
+	// Set status of internal socket back to LISTEN
+	server_socket->in_socket.local_tcp_status.state = LISTEN;
+
 	// send a reply to the TCP handler after processing every information from the TCP ACK packet
 	msg_reply(&msg_recv_client_ack, &msg_send_client_ack);
 
@@ -706,8 +779,9 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 	current_new_socket = getSocket(new_socket);
 
 	current_new_socket->pid = pid;
-	memcpy(&current_new_socket->in_socket, &current_queued_socket, sizeof(socket_t));
+	memcpy(&current_new_socket->in_socket, current_queued_socket, sizeof(socket_t));
 	close_socket(current_queued_socket);
+	print_sockets();
 	return new_socket;
 	}
 

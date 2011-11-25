@@ -37,14 +37,23 @@ enum tcp_states
 	UNKNOWN			= 11
 	};
 
+enum tcp_codes
+	{
+	SEQ_NO_SAME			= -3,
+	ACK_NO_TOO_SMALL 	= -2,
+	ACK_NO_TOO_BIG		= -1,
+	UNDEFINED			= 0,
+	PACKET_OK			= 1
+	};
+
 #define REMOVE_RESERVED 		0xFC
 
-#define IS_TCP_ACK(a) 			(((a & REMOVE_RESERVED) & ~TCP_URG_PSH) | TCP_ACK)			// Test for ACK flag only, iognore URG und PSH flag
-#define IS_TCP_RST(a) 			(((a & REMOVE_RESERVED) & ~TCP_URG_PSH) | TCP_RST)
-#define IS_TCP_SYN(a) 			(((a & REMOVE_RESERVED) & ~TCP_URG_PSH) | TCP_SYN)
-#define IS_TCP_SYN_ACK(a) 		(((a & REMOVE_RESERVED) & ~TCP_URG_PSH) | TCP_SYN_ACK)
-#define IS_TCP_FIN(a) 			(((a & REMOVE_RESERVED) & ~TCP_URG_PSH) | TCP_FIN)
-#define IS_TCP_FIN_ACK(a) 		(((a & REMOVE_RESERVED) & ~TCP_URG_PSH) | TCP_FIN_ACK)
+#define IS_TCP_ACK(a) 			((a & TCP_ACK) > 0)			// Test for ACK flag only, iognore URG und PSH flag
+#define IS_TCP_RST(a) 			((a & TCP_RST) > 0)
+#define IS_TCP_SYN(a) 			((a & TCP_SYN) > 0)
+#define IS_TCP_SYN_ACK(a) 		((a & TCP_SYN_ACK) > 0)
+#define IS_TCP_FIN(a) 			((a & TCP_FIN) > 0)
+#define IS_TCP_FIN_ACK(a) 		((a & TCP_FIN_ACK) > 0)
 
 #define SET_TCP_ACK(a)			a = ((a & 0x00) | TCP_ACK)
 #define SET_TCP_RST(a) 			a = ((a & 0x00) | TCP_RST)
@@ -54,7 +63,7 @@ enum tcp_states
 #define SET_TCP_FIN_ACK(a) 		a = ((a & 0x00) | TCP_FIN_ACK)
 
 // TODO: Probably stack size too high
-#define TCP_STACK_SIZE 			2048
+#define TCP_STACK_SIZE 			4096
 
 #include "sys/net/sixlowpan/sixlowip.h"
 

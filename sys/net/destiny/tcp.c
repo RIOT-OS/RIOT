@@ -13,6 +13,7 @@
 #include "in.h"
 #include "socket.h"
 #include "sys/net/net_help/net_help.h"
+#include "sys/net/net_help/msg_help.h"
 
 void printTCPHeader(tcp_hdr_t *tcp_header)
 	{
@@ -51,13 +52,40 @@ uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
     return (sum == 0) ? 0xffff : HTONS(sum);
 	}
 
+uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket, uint8_t *payload)
+	{
+	msg_t m_send_tcp;
+	uint8_t tcp_payload_len = ipv6_header->length-TCP_HDR_LEN;
+	uint8_t acknowledged_bytes = 0;
+	if (tcp_payload_len > tcp_socket->in_socket.local_tcp_status.window)
+		{
+		memcpy(tcp_socket->tcp_input_buffer, payload, tcp_socket->in_socket.local_tcp_status.window);
+		acknowledged_bytes = tcp_socket->in_socket.local_tcp_status.window;
+		tcp_socket->in_socket.local_tcp_status.window = 0;
+		tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end + tcp_socket->in_socket.local_tcp_status.window;
+		}
+	else
+		{
+		memcpy(tcp_socket->tcp_input_buffer, payload, tcp_payload_len);
+
+		tcp_socket->in_socket.local_tcp_status.window = tcp_socket->in_socket.local_tcp_status.window - tcp_payload_len;
+		acknowledged_bytes = tcp_payload_len;
+		tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end + tcp_payload_len;
+		}
+
+	net_msg_send(&m_send_tcp, tcp_socket->pid, 0, FID_RECV);
+	return acknowledged_bytes;
+	}
+
 void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
 	{
 	msg_t m_recv_tcp, m_send_tcp;
+
 	if (getWaitingConnectionSocket(tcp_socket->socket_id)->local_tcp_status.state == SYN_RCVD)
 		{
 		msg_send_receive(&m_send_tcp, &m_recv_tcp, tcp_socket->pid);
 		}
+	printf("GOT REGULAR ACK FOR DATA!\n");
 	}
 
 void handle_tcp_rst_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
@@ -84,7 +112,7 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 		}
 	else
 		{
-		printf("Droppec TCP SYN Message because socket was not in state LISTEN!");
+		printf("Dropped TCP SYN Message because socket was not in state LISTEN!");
 		}
 	}
 
@@ -113,9 +141,42 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, s
 
 void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket, uint8_t *payload)
 	{
-	char message[128];
-	memcpy(message, payload, ipv6_header->length-TCP_HDR_LEN);
-	printf("Packet-Content: %s\n", message);
+	uint8_t tcp_payload_len = ipv6_header->length-TCP_HDR_LEN, read_bytes = 0;
+	socket_t *current_tcp_socket = &tcp_socket->in_socket;
+	uint8_t send_buffer[BUFFER_SIZE];
+	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
+	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
+
+	if (tcp_payload_len > 0)
+		{
+		read_bytes = handle_payload(ipv6_header, tcp_header, tcp_socket, payload);
+		// Refresh TCP status values
+		set_tcp_status(&tcp_socket->in_socket.foreign_tcp_status,
+				tcp_header->ack_nr,
+				STATIC_MSS,
+				tcp_header->seq_nr,
+				ESTABLISHED,
+				tcp_header->window);
+		set_tcp_status(&tcp_socket->in_socket.local_tcp_status,
+				tcp_header->seq_nr - tcp_payload_len + read_bytes + 1,
+				STATIC_MSS,
+				tcp_socket->in_socket.local_tcp_status.seq_nr,
+				ESTABLISHED,
+				tcp_socket->in_socket.local_tcp_status.window);
+
+		// Fill IPv6 Header
+		memcpy(&(temp_ipv6_header->destaddr), &current_tcp_socket->foreign_address.sin6_addr, 16);
+		memcpy(&(temp_ipv6_header->srcaddr), &current_tcp_socket->local_address.sin6_addr, 16);
+		temp_ipv6_header->length = TCP_HDR_LEN;
+
+		// Fill TCP ACK packet
+		set_tcp_packet(current_tcp_packet, current_tcp_socket->local_address.sin6_port, current_tcp_socket->foreign_address.sin6_port,
+				current_tcp_socket->local_tcp_status.seq_nr, current_tcp_socket->local_tcp_status.ack_nr, 0, TCP_ACK, current_tcp_socket->local_tcp_status.window,
+				0, 0);
+
+		current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
+		sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN, IPPROTO_TCP);
+		}
 	}
 
 void tcp_packet_handler (void)
@@ -129,24 +190,21 @@ void tcp_packet_handler (void)
 
 	while (1)
 		{
-		msg_receive(&m_recv_ip);
+		net_msg_receive(&m_recv_ip, FID_TCP_PH);
 		ipv6_header = ((ipv6_hdr_t*)&buffer_tcp);
 		tcp_header = ((tcp_hdr_t*)(&buffer_tcp[IPV6_HDR_LEN]));
 		payload = &buffer_tcp[IPV6_HDR_LEN+TCP_HDR_LEN];
-		//printTCPHeader(tcp_header);
 		chksum = tcp_csum(ipv6_header, tcp_header);
 		printf("Checksum is %x!\n", chksum);
-
-		tcp_socket = get_tcp_socket(ipv6_header, tcp_header);
-
 		print_tcp_status(INC_PACKET, ipv6_header, tcp_header);
+		tcp_socket = get_tcp_socket(ipv6_header, tcp_header);
 
 		if ((chksum == 0xffff) && (tcp_socket != NULL))
 			{
 			// Remove reserved bits from tcp flags field
 			uint8_t tcp_flags = tcp_header->reserved_flags & REMOVE_RESERVED;
 
-			//TODO: URG Flag and PSH flag are currently being ignored
+			// TODO: URG Flag and PSH flag are currently being ignored
 			switch (tcp_flags)
 				{
 				case TCP_ACK:
@@ -200,9 +258,7 @@ void tcp_packet_handler (void)
 			{
 			printf("Wrong checksum (%x) or no corresponding socket found!\n", chksum);
 			}
-
-		tcp_socket = NULL;
-		msg_reply(&m_recv_ip, &m_send_ip);
+		net_msg_reply(&m_recv_ip, &m_send_ip, FID_SIXLOWIP_TCP);
 		}
 	}
 

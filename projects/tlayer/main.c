@@ -109,20 +109,21 @@ void init_udp_server(void)
 		}
 	for (;;)
 		{
-		print_socket(sock);
 		recsize = recvfrom(sock, (void *)buffer_main, 256, 0, &sa, &fromlen);
 		if (recsize < 0)
 			{
 			printf("ERROR: recsize < 0!\n");
 			}
 		printf("recsize: %i\n ", recsize);
-		printf("datagram: %.*s\n", (int)recsize, buffer_main);
+		printf("datagram: %s\n", buffer_main);
 		}
 	}
 
 void init_tcp_server(void)
 	{
 	sockaddr6_t stSockAddr;
+	uint8_t read_bytes;
+	char buff_msg[MAX_TCP_BUFFER];
 	int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
 	if(-1 == SocketFD)
@@ -145,7 +146,7 @@ void init_tcp_server(void)
 		close(SocketFD);
 		exit(EXIT_FAILURE);
 		}
-	print_socket(SocketFD);
+	print_internal_socket(getSocket(SocketFD));
 	if(-1 == listen(SocketFD, 10))
 		{
 		perror("error listen failed");
@@ -165,7 +166,11 @@ void init_tcp_server(void)
 			exit(EXIT_FAILURE);
 			}
 
-		// TODO: read and writes
+		while (1)
+			{
+			read_bytes = recv(ConnectFD, buff_msg, MAX_TCP_BUFFER, 0);
+			printf("--- Message: %s ---\n", buff_msg);
+			}
 
 		shutdown(ConnectFD, 0);
 

@@ -9,6 +9,7 @@
 #include "socket.h"
 #include "in.h"
 #include "sys/net/net_help/net_help.h"
+#include "sys/net/net_help/msg_help.h"
 
 void printArrayRange_udp(uint8_t *array, uint16_t len)
 	{
@@ -43,8 +44,7 @@ void udp_packet_handler(void)
 
 	while (1)
 		{
-		msg_receive(&m_recv_ip);
-		printf("Inside UDP handler!\n");
+		net_msg_receive(&m_recv_ip, FID_UDP_PH);
 		ipv6_header = ((ipv6_hdr_t*)&buffer_udp);
 		udp_header = ((udp_hdr_t*)(&buffer_udp[IPV6_HDR_LEN]));
 		payload = &buffer_udp[IPV6_HDR_LEN+UDP_HDR_LEN];
@@ -53,12 +53,10 @@ void udp_packet_handler(void)
 
 		if (chksum == 0xffff)
 			{
-			m_send_udp.content.ptr = (char*)buffer;
-			m_send_udp.content.value = IPV6_HDR_LEN + UDP_HDR_LEN + udp_header->length;
 			udp_socket = get_udp_socket(ipv6_header, udp_header);
 			if (udp_socket != NULL)
 				{
-				msg_send_receive(&m_send_udp, &m_recv_udp, udp_socket->pid);
+				net_msg_send_recv(&m_send_udp, &m_recv_udp, udp_socket->pid, FID_RECV_FROM, FID_UDP_PH);
 				}
 			else
 				{
@@ -69,9 +67,7 @@ void udp_packet_handler(void)
 			{
 			printf("Wrong checksum (%x)!\n", chksum);
 			}
-
-		udp_socket = NULL;
-		msg_reply(&m_recv_ip, &m_send_ip);
+		net_msg_reply(&m_recv_ip, &m_send_ip, FID_SIXLOWIP_UDP);
 		}
 	}
 
