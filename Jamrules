@@ -39,7 +39,7 @@ SUFFIX ?= "" ; # must be at least "" !!!
 TARGET = "$(BOARD)-$(PROJECT)$(SUFFIX)$(SUFEXE)" ;      # main target binary
 OPENOCD_IF ?= olimex-jtag-tiny-a ;
 
-TERMINAL ?= board/msba2/tools/bin/pseudoterm ;
+TERMINAL ?= tools/pyterm/pyterm.py ;
 
 if $(NT) || $(OS) = CYGWIN {
     PORT = $(PORT:E=1) ;
