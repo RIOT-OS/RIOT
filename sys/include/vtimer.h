@@ -36,7 +36,7 @@ typedef struct vtimer_t {
     timex_t absolute;
     void(*action)(void*);
     void* arg;
-    int pid;
+    unsigned int pid;
 } vtimer_t;
 
 /**
@@ -74,7 +74,7 @@ int vtimer_sleep(timex_t time);
  * @param[in]   ptr         message value
  * @return      0 on success, < 0 on error
  */
-int vtimer_set_msg(vtimer_t *t, timex_t interval, int pid, void *ptr);
+int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr);
 
 /**
  * @brief   set a vtimer with wakeup event

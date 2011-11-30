@@ -24,6 +24,8 @@ static int vtimer_set(vtimer_t *timer);
 static int set_longterm(vtimer_t *timer);
 static int set_shortterm(vtimer_t *timer);
 
+static void vtimer_print(vtimer_t* t);
+
 static queue_node_t longterm_queue_root;
 static queue_node_t shortterm_queue_root;
 
@@ -60,9 +62,7 @@ static int update_shortterm() {
         next = now + VTIMER_BACKOFF;
     }
     
-    
     hwtimer_id = hwtimer_set_absolute(next, vtimer_callback, NULL);
-    printf("hw_id: %i\n", hwtimer_id);
     DEBUG("update_shortterm: Set hwtimer to %lu (now=%lu)\n", hwtimer_next_absolute + longterm_tick_start, hwtimer_now());
     return 0;
 }
@@ -102,9 +102,10 @@ void vtimer_callback(void *ptr) {
 
     timer = (vtimer_t *)queue_remove_head(&shortterm_queue_root);
 
+#ifdef ENABLE_DEBUG
+    vtimer_print(timer);
+#endif
     DEBUG("vtimer_callback(): Shooting %lu.\n", timer->absolute.nanoseconds);
-
-    printf("timer pid: %i\n", timer->pid);
 
     /* shoot timer */
     if(timer->pid != 0){
@@ -206,6 +207,7 @@ int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid) {
     t->action = (void*) thread_wakeup;
     t->arg = (void*) pid;
     t->absolute = interval;
+    t->pid = 0;
     vtimer_set(t);
     return 0;
 }
@@ -226,6 +228,7 @@ int vtimer_set_cb(vtimer_t *t, timex_t interval, void (*f_ptr)(void *), void *pt
     t->action = f_ptr;
     t->arg = ptr;
     t->absolute = interval;
+    t->pid = 0;
     return vtimer_set(t);
 }
 
@@ -239,11 +242,22 @@ int vtimer_remove(vtimer_t *t){
     return 0; 
 }
 
-int vtimer_set_msg(vtimer_t *t, timex_t interval, int pid, void *ptr){
+int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr){
     t->action = (void* ) msg_send_int;
-    t->arg = (void*) ptr;
+    t->arg = ptr;
     t->absolute = interval;
     t->pid = pid; 
     vtimer_set(t);
     return 0;
+}
+
+static void vtimer_print(vtimer_t* t) {
+    printf("Seconds: %lu - Nanoseconds: %lu\n \
+            action: %p\n \
+            action: %p\n \
+            pid: %u\n",
+            t->absolute.seconds, t->absolute.nanoseconds,
+            t->action,
+            t->arg,
+            t->pid);
 }
