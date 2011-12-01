@@ -1,4 +1,12 @@
 /**
+ *  There are two ways to use the IPC Messaging system of µkleos. The default is synchronous
+ *  messaging. In this manner, messages are either dropped when the receiver is not waiting and the
+ *  message was sent non-blocking, or will be delivered immediately when the receiver calls
+ *  msg_receive(msg_t* m). To use asynchronous messaging any thread can create its own queue by
+ *  calling msg_init_queue(msg_t* array, int num). Messages sent to a thread with a non full message
+ *  queue are never dropped and the sending never blocks. Threads with a full message queue behaves
+ *  like in synchronous mode.
+ *
  * @defgroup    kernel_msg  Messaging / IPC
  * @ingroup     kernel
  * @{
@@ -48,7 +56,8 @@ typedef struct msg {
  *
  * @param  m Pointer to message structure
  * @param  target_pid PID of target thread
- * @param  block If true and receiver is not receive-blocked, function will block. If not, function returns.
+ * @param  block If true and receiver is not receive-blocked, function will block. If not, function
+ * returns.
  *
  * @return 1 if sending was successfull (message delivered directly or to a queue)
  * @return 0 if receiver is not waiting or has a full message queue and block == false
