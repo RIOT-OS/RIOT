@@ -85,15 +85,6 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr);
 int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid);
 
 /**
- * @brief   set a vtimer with callback function event handler 
- * @param[in]   t           pointer to preinitialised vtimer_t
- * @param[in]   interval    vtimer interval
- * @param[in]   f_ptr       pointer to callback function
- * @return      0 on success, < 0 on error
- */
-int vtimer_set_cb(vtimer_t *t, timex_t interval, void (*f_ptr)(void *), void *ptr);
-
-/**
  * @brief   remove a vtimer
  * @param[in]   t           pointer to preinitialised vtimer_t
  * @return      0 on success, < 0 on error

@@ -24,7 +24,9 @@ static int vtimer_set(vtimer_t *timer);
 static int set_longterm(vtimer_t *timer);
 static int set_shortterm(vtimer_t *timer);
 
+#ifdef ENABLE_DEBUG
 static void vtimer_print(vtimer_t* t);
+#endif
 
 static queue_node_t longterm_queue_root;
 static queue_node_t shortterm_queue_root;
@@ -225,14 +227,6 @@ int vtimer_sleep(timex_t time) {
     return 0;
 }
 
-int vtimer_set_cb(vtimer_t *t, timex_t interval, void (*f_ptr)(void *), void *ptr) {
-    t->action = f_ptr;
-    t->arg = ptr;
-    t->absolute = interval;
-    t->pid = 0;
-    return vtimer_set(t);
-}
-
 int vtimer_remove(vtimer_t *t){
     queue_remove(&shortterm_queue_root, (queue_node_t*)t);
     queue_remove(&longterm_queue_root, (queue_node_t*)t);
@@ -252,6 +246,7 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr){
     return 0;
 }
 
+#ifdef ENABLE_DEBUG
 static void vtimer_print(vtimer_t* t) {
     printf("Seconds: %lu - Microseconds: %lu\n \
             action: %p\n \
@@ -262,3 +257,4 @@ static void vtimer_print(vtimer_t* t) {
             t->arg,
             t->pid);
 }
+#endif
