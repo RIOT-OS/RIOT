@@ -50,8 +50,8 @@ typedef struct msg {
  * @param  target_pid PID of target thread
  * @param  block If true and receiver is not receive-blocked, function will block. If not, function returns.
  *
- * @return 1 if sending was successfull
- * @return 0 if receiver is not waiting and block == false
+ * @return 1 if sending was successfull (message delivered directly or to a queue)
+ * @return 0 if receiver is not waiting or has a full message queue and block == false
  * @return -1 on error (invalid PID)
  */
 int msg_send(msg_t* m, unsigned int target_pid, bool block);
