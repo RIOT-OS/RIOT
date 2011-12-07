@@ -111,9 +111,8 @@ void vtimer_callback(void *ptr) {
 
     /* shoot timer */
     if (timer->action == (void*) msg_send_int) {
-//    if(timer->pid != 0){
-        /* ugly*/
         msg_t msg; 
+        msg.type = MSG_TIMER;
         msg.content.value = (unsigned int) timer->arg;
         msg_send_int(&msg, timer->pid);
     } else {
