@@ -37,6 +37,15 @@ extern void _cc110x_ng_monitor_handler(char *mode);
 #endif
 #endif
 
+#ifdef MODULE_MCI
+extern void _get_sectorsize(char *unused);
+extern void _get_blocksize(char* unused);
+extern void _get_sectorcount(char* unused);
+extern void _read_sector(char* sector);
+extern void _read_bytes(char* bytes);
+extern void _write_bytes(char* bytes);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"id", "Gets or sets the node's id.", _id_handler},
 #ifdef MODULE_PS
@@ -66,6 +75,13 @@ const shell_command_t _shell_command_list[] = {
     {"txtsnd", "Sends a text message to a given node via the CC1100 transceiver", _cc110x_ng_send_handler},
     {"monitor", "Enables or disables address checking for the CC1100 transceiver", _cc110x_ng_monitor_handler},
 #endif
+#endif
+#ifdef MODULE_MCI
+    {DISK_READ_SECTOR_CMD, "Reads the specified sector of inserted memory card", _read_sector},
+    {DISK_READ_BYTES_CMD, "Reads the specified bytes from inserted memory card", _read_bytes},
+    {DISK_GET_SECTOR_SIZE, "Get the sector size of inserted memory card", _get_sectorsize},
+    {DISK_GET_SECTOR_COUNT, "Get the sector count of inserted memory card", _get_sectorcount},
+    {DISK_GET_BLOCK_SIZE, "Get the block size of inserted memory card", _get_blocksize},
 #endif
     {NULL, NULL, NULL}
 };

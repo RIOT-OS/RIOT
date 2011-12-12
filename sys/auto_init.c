@@ -1,7 +1,8 @@
 #include <stdint.h>
 #include <stdio.h>
-#include <board_uart0.h>
-#include <rtc.h>
+#include "board_uart0.h"
+#include "rtc.h"
+#include "diskio.h"
 #include <auto_init.h>
 
 #define ENABLE_DEBUG
@@ -52,6 +53,10 @@ void auto_init(void) {
 #ifdef MODULE_LTC4150
     DEBUG("Auto init ltc4150 module.\n");
     ltc4150_init();
+#endif
+#ifdef MODULE_MCI
+    DEBUG("Auto init mci module.\n");
+    MCI_initialize();
 #endif
 #ifdef MODULE_PROFILING
     extern void profiling_init(void);

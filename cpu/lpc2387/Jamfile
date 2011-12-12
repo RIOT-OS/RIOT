@@ -27,11 +27,13 @@
 
 SubDir TOP cpu lpc2387 ;
 
-Module cpu : cpu.c lpc2387-lpm.c lpc23xx-iap.c ;
+Module cpu : cpu.c lpc2387-lpm.c ;
 UseModule cpu ;
 
 Module rtc : lpc2387-rtc.c ;
 Module gpioint : lpc2387-gpioint.c ;
+Module adc : lpc2387-adc.c ;
+Module mci : lpc2387-mci.c asmfunc.s ;
 
 Objects startup.s ;
 
