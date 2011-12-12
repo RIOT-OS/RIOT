@@ -57,7 +57,7 @@ void _read_sector(char *sector) {
 
     if (strlen(sector) > strlen(DISK_READ_SECTOR_CMD) + 1) {
 
-        sectornr = (unsigned short) atol(sector + strlen(DISK_READ_SECTOR_CMD) + 1);
+        sectornr = atol(sector + strlen(DISK_READ_SECTOR_CMD) + 1);
         if ((MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) && (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK)) {
             unsigned char read_buf[ssize];
             if (sector_read(read_buf, sectornr, ssize, 0)) {
