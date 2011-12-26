@@ -22,8 +22,8 @@ iface_t iface;
 uint8_t iface_addr_list_count = 0;
 int udp_packet_handler_pid = 0;
 int tcp_packet_handler_pid = 0;
-uint8_t *udp_packet_buffer;
-uint8_t *tcp_packet_buffer;
+//uint8_t *udp_packet_buffer;
+//uint8_t *tcp_packet_buffer;
 
 //mutex_t buf_mutex;
 
@@ -135,7 +135,7 @@ void ipv6_process(void){
 
 				if (tcp_packet_handler_pid != 0)
 					{
-					memcpy(tcp_packet_buffer, (char*) ipv6_buf, IPV6_HDR_LEN+ipv6_buf->length);
+					m_send.content.ptr = (char*) ipv6_buf;
 					net_msg_send_recv(&m_send, &m_recv, tcp_packet_handler_pid, FID_TCP_PH, FID_SIXLOWIP_TCP);
 					}
 				else
@@ -150,7 +150,7 @@ void ipv6_process(void){
 
 				if (udp_packet_handler_pid != 0)
 					{
-					memcpy(udp_packet_buffer, (char*) ipv6_buf, IPV6_HDR_LEN+ipv6_buf->length);
+					m_send.content.ptr = (char*) ipv6_buf;
 					net_msg_send_recv(&m_send, &m_recv, udp_packet_handler_pid, FID_UDP_PH, FID_SIXLOWIP_UDP);
 					}
 				else
@@ -457,14 +457,12 @@ uint8_t ipv6_is_router(void) {
     return 0;
 }
 
-void set_tcp_packet_handler_pid(int pid, uint8_t *buf)
+void set_tcp_packet_handler_pid(int pid)
 	{
 	tcp_packet_handler_pid = pid;
-	tcp_packet_buffer = buf;
 	}
 
-void set_udp_packet_handler_pid(int pid, uint8_t *buf)
+void set_udp_packet_handler_pid(int pid)
 	{
 	udp_packet_handler_pid = pid;
-	udp_packet_buffer = buf;
 	}

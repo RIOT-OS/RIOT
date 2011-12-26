@@ -206,7 +206,7 @@ void send_tcp(char *str)
 	{
 	msg_t send_msg;
 	sscanf(str, "send_tcp %s", current_message.tcp_string_msg);
-
+	printf("1Send Content: %s\n", current_message.tcp_string_msg);
 	send_msg.content.value = 1;
 	msg_send(&send_msg, tcp_cht_pid, 0);
 	}
@@ -402,13 +402,19 @@ void shows(char *str)
 	print_sockets();
 	}
 
+void showReas(char *str)
+	{
+	printReasBuffers();
+	}
+
 const shell_command_t shell_commands[] = {
     {"init", "", init},
     {"addr", "", get_r_address},
     {"set_chann", "", set_radio_chann},
     {"boot", "", bootstrapping},
     {"ip", "", ip},
-    {"shows", "", shows},
+    {"shows", "Show Sockets", shows},
+    {"show_reas", "Show reassembly Buffers", showReas},
     {"context", "", context},
     {"init_tl", "", init_tl},
     {"init_udp_server_thread", "", init_udp_server_thread},
@@ -422,7 +428,6 @@ const shell_command_t shell_commands[] = {
 
 int main(void) {
     printf("6LoWPAN Transport Layers\n");
-    printf("RANDMAX: %i\n", RAND_MAX);
     posix_open(uart0_handler_pid, 0);
     init_tl(NULL);
     shell_t shell;

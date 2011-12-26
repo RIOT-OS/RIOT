@@ -90,7 +90,7 @@ typedef struct __attribute__ ((packed)) tcp_h_t
 	} tcp_hdr_t;
 
 
-uint8_t buffer_tcp[BUFFER_SIZE];
+// uint8_t buffer_tcp[BUFFER_SIZE];
 char tcp_stack_buffer[TCP_STACK_SIZE];
 
 void tcp_packet_handler (void);

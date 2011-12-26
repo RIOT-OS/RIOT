@@ -1,7 +1,7 @@
 #ifndef SIXLOWPAN_H
 #define SIXLOWPAN_H
 
-#define IP_PROCESS_STACKSIZE    2048
+#define IP_PROCESS_STACKSIZE    3072
 #define NC_STACKSIZE            512
 #define CON_STACKSIZE           512
 
@@ -26,6 +26,7 @@
 #include "sixlowip.h"
 #include <vtimer.h>
 #include <mutex.h>
+#include <time.h>
 
 extern mutex_t lowpan_context_mutex;
 
@@ -36,6 +37,26 @@ typedef struct lowpan_context_t {
     uint8_t comp;
     uint16_t lifetime;
 } lowpan_context_t;
+
+typedef struct lowpan_interval_list_t {
+	uint8_t							start;
+	uint8_t							end;
+	struct lowpan_interval_list_t 	*next;
+} lowpan_interval_list_t;
+
+typedef struct lowpan_reas_buf_t {
+	ieee_802154_long_t 				s_laddr;					// Source Address
+	ieee_802154_long_t 				d_laddr;					// Destination Address
+	uint16_t						ident_no;					// Identification Number
+	time_t							timestamp;					// Timestamp of last packet fragment
+	uint8_t							packet_size;				// Size of reassembled packet with possible IPHC header
+	uint8_t							current_packet_size;		// Additive size of currently already received fragments
+	uint8_t							*packet;					// Pointer to allocated memory for reassembled packet + 6LoWPAN Dispatch Byte
+	lowpan_interval_list_t			*interval_list_head;		// Pointer to list of intervals of received packet fragments (if any)
+	struct lowpan_reas_buf_t		*next;						// Pointer to next reassembly buffer (if any)
+} lowpan_reas_buf_t;
+
+extern lowpan_reas_buf_t *head;
 
 void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border);
 void sixlowpan_adhoc_init(transceiver_type_t trans, ipv6_addr_t *prefix, uint8_t r_addr);
@@ -55,4 +76,6 @@ lowpan_context_t * lowpan_context_get();
 lowpan_context_t * lowpan_context_lookup(ipv6_addr_t *addr);
 lowpan_context_t * lowpan_context_num_lookup(uint8_t num);
 void lowpan_ipv6_set_dispatch(uint8_t *data);
+void init_reas_bufs(lowpan_reas_buf_t *buf);
+void printReasBuffers(void);
 #endif

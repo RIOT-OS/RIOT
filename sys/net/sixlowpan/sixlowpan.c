@@ -6,6 +6,8 @@
 #include <debug.h>
 #include <thread.h>
 #include <mutex.h>
+#include <rtc.h>
+#include <lpc2387-rtc.h>
 #include "msg.h"
 #include "sixlowmac.h"
 #include "sixlowpan.h"
@@ -33,6 +35,7 @@ uint8_t reas_buf[512];
 uint8_t comp_buf[512];
 uint8_t byte_offset;
 uint8_t first_frag = 0;
+lowpan_reas_buf_t *head = NULL;
 
 unsigned int ip_process_pid;
 unsigned int nd_nbr_cache_rem_pid = 0;
@@ -135,6 +138,268 @@ void lowpan_init(ieee_802154_long_t *addr, uint8_t *data){
     tag++;
 }
 
+void printArrayRange(uint8_t *array, uint16_t len, char *str)
+	{
+	int i = 0;
+	printf("-------------%s-------------\n", str);
+	for (i = 0; i < len; i++)
+		{
+		printf("%#x ", *(array+i));
+		}
+	printf("\n--------------------------\n");
+	}
+
+void printLongLocalAddr(ieee_802154_long_t *saddr)
+	{
+	char text[9];
+	text[8] = '\0';
+	memcpy(text, saddr, 8);
+	printf("Short Local Address: %s\n", text);
+	}
+
+void printReasBuffers()
+	{
+	lowpan_reas_buf_t *temp_buffer;
+	lowpan_interval_list_t *temp_interval;
+	temp_buffer = head;
+
+	printf("\n\n--- Reassembly Buffers ---\n");
+
+	while (temp_buffer != NULL)
+		{
+		printLongLocalAddr(&temp_buffer->s_laddr);
+		printf("Ident.: %i, Packet Size: %i/%i, Timestamp: %li\n", temp_buffer->ident_no, temp_buffer->current_packet_size, temp_buffer->packet_size, temp_buffer->timestamp);
+		temp_interval = temp_buffer->interval_list_head;
+		while (temp_interval != NULL)
+			{
+			printf("\t%i - %i\n", temp_interval->start, temp_interval->end);
+			temp_interval = temp_interval->next;
+			}
+		temp_buffer = temp_buffer->next;
+		}
+	}
+
+uint8_t ll_get_addr_match(ieee_802154_long_t *src, ieee_802154_long_t *dst){
+    uint8_t val = 0, xor;
+    for(int i = 0; i < 8; i++){
+        /* if bytes are equal add 8 */
+        if(src->uint8[i] == dst->uint8[i]){
+            val += 8;
+        } else {
+            xor = src->uint8[i] ^ dst->uint8[i];
+            /* while bits from byte equal add 1 */
+            for(int j = 0; j < 8; j++){
+                if((xor & 0x80) == 0){
+                    val++;
+                    xor = xor << 1;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+    return val;
+}
+
+lowpan_reas_buf_t *get_packet_frag_buf(uint16_t datagram_size, uint16_t datagram_tag, ieee_802154_long_t *s_laddr, ieee_802154_long_t *d_laddr)
+	{
+	lowpan_reas_buf_t *current_buf = NULL, *new_buf = NULL, *temp_buf = NULL;
+	current_buf = head;
+	while (current_buf != NULL)
+		{
+		if (((ll_get_addr_match(&current_buf->s_laddr, s_laddr)) == 64) &&
+			((ll_get_addr_match(&current_buf->d_laddr, d_laddr)) == 64) &&
+			(current_buf->packet_size == datagram_size) &&
+			(current_buf->ident_no == datagram_tag))
+			{
+			/* Found buffer for current packet fragment */
+			current_buf->timestamp = rtc_time(NULL);
+			return current_buf;
+			}
+		temp_buf = current_buf;
+		current_buf = current_buf->next;
+		}
+
+	/* Allocate new memory for a new packet to be reassembled */
+	new_buf = malloc(sizeof(lowpan_reas_buf_t));
+
+	if (new_buf != NULL)
+		{
+		init_reas_bufs(new_buf);
+
+		new_buf->packet = malloc(datagram_size);
+		//printf("Malloc Packet Size: %i, Pointer: %p\n", );
+		if(new_buf->packet != NULL)
+			{
+			memcpy(&new_buf->s_laddr, s_laddr, SIXLOWPAN_IPV6_LL_ADDR_LEN);
+			memcpy(&new_buf->d_laddr, d_laddr, SIXLOWPAN_IPV6_LL_ADDR_LEN);
+			new_buf->ident_no = datagram_tag;
+			new_buf->packet_size = datagram_size;
+			new_buf->timestamp = rtc_time(NULL);
+
+			if ((current_buf == NULL) && (temp_buf == NULL))
+				{
+				head = new_buf;
+				}
+			else
+				{
+				temp_buf->next = new_buf;
+				}
+			return new_buf;
+			}
+		else
+			{
+			return NULL;
+			}
+		}
+	else
+		{
+		return NULL;
+		}
+	}
+
+uint8_t isInInterval(uint8_t start1, uint8_t end1, uint8_t start2, uint8_t end2)
+	{
+	/* 1: Interval 1 and 2 are the same or overlapping */
+	/* 0: Interval 1 and 2 are not overlapping or the same */
+
+	if 	(((start1 < start2) && (start2 <= end1)) ||
+		((start2 < start1) && (start1 <= end2)) ||
+		((start1 == start2) && (end1 == end2)))
+		{
+		return 1;
+		}
+	else
+		{
+		return 0;
+		}
+	}
+
+uint8_t handle_packet_frag_interval(lowpan_reas_buf_t *current_buf, uint8_t datagram_offset,  uint8_t frag_size)
+	{
+	/* 0: Error, discard fragment */
+	/* 1: Finished correctly */
+	lowpan_interval_list_t *temp_interval = NULL, *current_interval = NULL, *new_interval = NULL;
+	current_interval = current_buf->interval_list_head;
+	while (current_interval != NULL)
+		{
+		if (isInInterval(current_interval->start, current_interval->end, datagram_offset, datagram_offset+frag_size) == 1)
+			{
+			/* Interval is overlapping or the same as one of a previous fragment, discard fragment */
+			return 0;
+			}
+		temp_interval = current_interval;
+		current_interval = current_interval->next;
+		}
+	new_interval = malloc(sizeof(lowpan_interval_list_t));
+
+	if (new_interval != NULL)
+		{
+		new_interval->start = datagram_offset;
+		new_interval->end = datagram_offset+frag_size-1;
+		new_interval->next = NULL;
+		if ((current_interval == NULL) && (temp_interval == NULL))
+			{
+			current_buf->interval_list_head = new_interval;
+			}
+		else
+			{
+			temp_interval->next = new_interval;
+			}
+		return 1;
+		}
+
+	return 0;
+	}
+
+void collect_garbage(lowpan_reas_buf_t *current_buf)
+	{
+	lowpan_interval_list_t *temp_list, *current_list;
+	lowpan_reas_buf_t *temp_buf, *my_buf;
+
+	current_list = current_buf->interval_list_head;
+	temp_list = current_list;
+
+	while (current_list != NULL)
+		{
+		temp_list = current_list->next;
+		free(current_list);
+		current_list = temp_list;
+		}
+
+	temp_buf = head;
+	my_buf = temp_buf;
+
+	if (head == current_buf)
+		{
+		head = current_buf->next;
+		}
+	else
+		{
+		while (temp_buf != current_buf)
+			{
+			my_buf = temp_buf;
+			temp_buf = temp_buf->next;
+			}
+		my_buf->next = current_buf->next;
+		}
+
+	free(current_buf->packet);
+	free(current_buf);
+	}
+
+void handle_packet_fragment(uint8_t *data, uint8_t datagram_offset,  uint16_t datagram_size,
+		uint16_t datagram_tag, ieee_802154_long_t *s_laddr, ieee_802154_long_t *d_laddr,
+		uint8_t hdr_length, uint8_t frag_size)
+	{
+	lowpan_reas_buf_t *current_buf;
+	msg_t m;
+	/* Is there already a reassembly buffer for this packet fragment? */
+	current_buf = get_packet_frag_buf(datagram_size, datagram_tag, s_laddr, d_laddr);
+	if ((current_buf != NULL) && (handle_packet_frag_interval(current_buf, datagram_offset, frag_size) == 1))
+		{
+		/* Copy fragment bytes into corresponding packet space area */
+		memcpy(current_buf->packet+datagram_offset, data+hdr_length, frag_size);
+		current_buf->current_packet_size += frag_size;
+
+		if (current_buf->current_packet_size == datagram_size)
+			{
+			if(current_buf->packet[0] == LOWPAN_IPV6_DISPATCH)
+				{
+				ipv6_buf = get_ipv6_buf();
+				memcpy(ipv6_buf, current_buf->packet + 1, datagram_size - 1);
+				m.content.ptr = (char*) ipv6_buf;
+				packet_length = datagram_size - 1;
+				msg_send(&m,ip_process_pid, 1);
+				}
+			else if((current_buf->packet[0] & 0xe0) == LOWPAN_IPHC_DISPATCH)
+				{
+				lowpan_iphc_decoding(current_buf->packet, datagram_size, s_laddr, d_laddr);
+				ipv6_buf = get_ipv6_buf();
+				m.content.ptr = (char*) ipv6_buf;
+				msg_send(&m,ip_process_pid, 1);
+				}
+			else
+				{
+				printf("ERROR: packet with unknown dispatch received\n");
+				}
+			collect_garbage(current_buf);
+			}
+		}
+	else
+		{
+		/* No memory left or duplicate */
+		if (current_buf == NULL)
+			{
+			printf("ERROR: no memory left!\n");
+			}
+		else
+			{
+			printf("ERROR: duplicate fragment!\n");
+			}
+		}
+	}
+
 void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
            ieee_802154_long_t *d_laddr){
     /* check if packet is fragmented */
@@ -144,102 +409,68 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
     uint16_t datagram_size = 0;
     uint16_t datagram_tag = 0;
 
-    /* check first 5-bit*/
-    switch(data[0] & 0xf8) {
-        /* first fragment */
-        case(0xc0):{
-            first_frag = 1;
-            datagram_offset = 0;
-            /* get 11-bit from first 2 byte*/
-            datagram_size = (((uint16_t)(data[0] << 8)) | data[1]) & 0x07ff;
-            /* get 16-bit datagram tag */
-            datagram_tag = (((uint16_t)(data[2] << 8)) | data[3]);
-            /* discard fragment header */
-            hdr_length += 4;
-            /* set global variable frag_size to size of decompr. packet*/
-            frag_size = datagram_size;
-            /* check dispatch byte */
-            switch(data[hdr_length]) {
-                case(LOWPAN_IPV6_DISPATCH):{
-                    break;
-                }
-                default:
-                    break;
-            }                
-            memcpy(reas_buf, data + hdr_length, length - 4);
-            break;
-        }
-        /* subsequent fragment */
-        case(0xe0):{
-            if(first_frag == 0){
-                printf("ERROR: first fragment not received\n");
-                break;
-            }
+    /* Fragmented Packet */
+    if (((data[0] & 0xf8) == (0xc0)) || ((data[0] & 0xf8) == (0xe0)))
+		{
+    	/* get 11-bit from first 2 byte*/
+		datagram_size = (((uint16_t)(data[0] << 8)) | data[1]) & 0x07ff;
 
-            /* get 11-bit from first 2 byte*/
-            datagram_size = (((uint16_t)(data[0] << 8)) | data[1]) & 0x07ff;
-            /* get 16-bit datagram tag */
-            datagram_tag = (((uint16_t)(data[2] << 8)) | data[3]);
-            /* get 8-bit datagram offset */
-            datagram_offset = data[4];
-            /* discard framentation header */
-            hdr_length += 5;
-           
-            frag_size = length - hdr_length;
-            byte_offset = datagram_offset * 8;
-            if((frag_size % 8) != 0){
-                if((byte_offset + frag_size) != datagram_size){
-                    printf("ERROR: received invalid fragment\n");
-                    return;
-                }
-            }     
-            memcpy(reas_buf + byte_offset, data + hdr_length, frag_size);
-            if((byte_offset + frag_size) == datagram_size){
-                if(reas_buf[0] == LOWPAN_IPV6_DISPATCH) {
-                    /* mutex lock here */
-       //             mutex_lock(&buf_mutex);
-                    ipv6_buf = get_ipv6_buf();
-                    memcpy(ipv6_buf, reas_buf + 1, datagram_size - 1);
-                    m.content.ptr = (char*) ipv6_buf;
-                    packet_length = datagram_size - 1;
-                    msg_send(&m,ip_process_pid, 1);
-                } else if((reas_buf[0] & 0xe0) == LOWPAN_IPHC_DISPATCH) {
-                    /* mutex lock */
-     //               mutex_lock(&buf_mutex);
-                    lowpan_iphc_decoding(reas_buf, datagram_size, s_laddr, d_laddr);
-                    ipv6_buf = get_ipv6_buf();
-                    m.content.ptr = (char*) ipv6_buf;
-                    msg_send(&m,ip_process_pid, 1);
-                } else {        
-                    printf("ERROR: packet with unknown dispatch received\n");
-                }
-            }
-            break;
-        }
-        default:{
-            if(data[0] == LOWPAN_IPV6_DISPATCH){
-                /* mutex lock here */
-   //             mutex_lock(&buf_mutex);
-                ipv6_buf = get_ipv6_buf();
-                memcpy(ipv6_buf, data + 1, length - 1);
-                m.content.ptr = (char*) ipv6_buf;
-                packet_length = length - 1;
-                msg_send(&m,ip_process_pid, 1);
-                break;
-            } else if((data[0] & 0xe0) == LOWPAN_IPHC_DISPATCH){
-                /* mutex lock here */
- //               mutex_lock(&buf_mutex);
-                lowpan_iphc_decoding(data, length, s_laddr, d_laddr);
-                ipv6_buf = get_ipv6_buf();
-                m.content.ptr = (char*) ipv6_buf;
-                msg_send(&m,ip_process_pid, 1);
-                break;
-            } else {
-                printf("ERROR: packet with unknown dispatch received\n");
-                break;
-            }
-        }
-    }
+		/* get 16-bit datagram tag */
+		datagram_tag = (((uint16_t)(data[2] << 8)) | data[3]);
+
+		switch(data[0] & 0xf8)
+			{
+			/* First Fragment */
+			case(0xc0):
+				{
+				datagram_offset = 0;
+				hdr_length += 4;
+				break;
+				}
+			/* Subsequent Fragment */
+			case(0xe0):
+				{
+				datagram_offset = data[4];
+				hdr_length += 5;
+				break;
+				}
+			}
+		frag_size = length - hdr_length;
+    	byte_offset = datagram_offset * 8;
+
+    	if((frag_size % 8) != 0)
+			{
+			if((byte_offset + frag_size) != datagram_size)
+				{
+				printf("ERROR: received invalid fragment\n");
+				return;
+				}
+			}
+		handle_packet_fragment(data, byte_offset, datagram_size, datagram_tag, s_laddr, d_laddr, hdr_length, frag_size);
+		}
+    /* Regular Packet */
+    else
+		{
+    	if(data[0] == LOWPAN_IPV6_DISPATCH)
+			{
+			ipv6_buf = get_ipv6_buf();
+			memcpy(ipv6_buf, data + 1, length - 1);
+			m.content.ptr = (char*) ipv6_buf;
+			packet_length = length - 1;
+			msg_send(&m,ip_process_pid, 1);
+			}
+    	else if((data[0] & 0xe0) == LOWPAN_IPHC_DISPATCH)
+			{
+			lowpan_iphc_decoding(data, length, s_laddr, d_laddr);
+			ipv6_buf = get_ipv6_buf();
+			m.content.ptr = (char*) ipv6_buf;
+			msg_send(&m,ip_process_pid, 1);
+			}
+    	else
+			{
+			printf("ERROR: packet with unknown dispatch received\n");
+			}
+		}
 }
 
 void lowpan_ipv6_set_dispatch(uint8_t *data){
@@ -951,6 +1182,18 @@ void lowpan_context_auto_remove(void) {
         }
         mutex_unlock(&lowpan_context_mutex,0);
     }
+}
+
+void init_reas_bufs(lowpan_reas_buf_t *buf) {
+	memset(&buf->s_laddr, 0, SIXLOWPAN_IPV6_LL_ADDR_LEN);
+	memset(&buf->d_laddr, 0, SIXLOWPAN_IPV6_LL_ADDR_LEN);
+	buf->ident_no = 			0;
+	buf->timestamp =			0;
+	buf->packet_size =			0;
+	buf->current_packet_size = 	0;
+	buf->packet = 				NULL;
+	buf->interval_list_head	=	NULL;
+	buf->next = 				NULL;
 }
 
 void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border){

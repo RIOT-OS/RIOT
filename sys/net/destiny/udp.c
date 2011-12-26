@@ -6,21 +6,11 @@
 #include "udp.h"
 #include "msg.h"
 #include "sys/net/sixlowpan/sixlowip.h"
+#include "sys/net/sixlowpan/sixlowpan.h"
 #include "socket.h"
 #include "in.h"
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
-
-void printArrayRange_udp(uint8_t *array, uint16_t len)
-	{
-	int i = 0;
-	printf("-------------MEMORY-------------\n");
-	for (i = 0; i < len; i++)
-		{
-		printf("%#x ", *(array+i));
-		}
-	printf("-------------MEMORY-------------\n");
-	}
 
 uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
 	{
@@ -45,9 +35,9 @@ void udp_packet_handler(void)
 	while (1)
 		{
 		net_msg_receive(&m_recv_ip, FID_UDP_PH);
-		ipv6_header = ((ipv6_hdr_t*)&buffer_udp);
-		udp_header = ((udp_hdr_t*)(&buffer_udp[IPV6_HDR_LEN]));
-		payload = &buffer_udp[IPV6_HDR_LEN+UDP_HDR_LEN];
+		ipv6_header = ((ipv6_hdr_t*)m_recv_ip.content.ptr);
+		udp_header = ((udp_hdr_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
+		payload = (uint8_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN + UDP_HDR_LEN);
 
 		chksum = udp_csum(ipv6_header, udp_header);
 
@@ -56,6 +46,7 @@ void udp_packet_handler(void)
 			udp_socket = get_udp_socket(ipv6_header, udp_header);
 			if (udp_socket != NULL)
 				{
+				m_send_udp.content.ptr = (char*)ipv6_header;
 				net_msg_send_recv(&m_send_udp, &m_recv_udp, udp_socket->pid, FID_RECV_FROM, FID_UDP_PH);
 				}
 			else

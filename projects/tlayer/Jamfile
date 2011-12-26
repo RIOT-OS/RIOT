@@ -12,4 +12,4 @@ UseModule shell ;
 UseModule ps ;
 UseModule 6lowpan ;
 UseModule vtimer ;
-#UseModule net_help ;
+UseModule rtc ;

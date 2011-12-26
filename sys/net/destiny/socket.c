@@ -17,21 +17,43 @@
 void print_tcp_flags (tcp_hdr_t *tcp_header)
 	{
 	printf("FLAGS: ");
-	if ((tcp_header->reserved_flags & TCP_ACK) > 0)
+	switch(tcp_header->reserved_flags)
 		{
-		printf("ACK ");
-		}
-	if ((tcp_header->reserved_flags & TCP_RST) > 0)
-		{
-		printf("RST ");
-		}
-	if ((tcp_header->reserved_flags & TCP_SYN) > 0)
-		{
-		printf("SYN ");
-		}
-	if ((tcp_header->reserved_flags & TCP_FIN) > 0)
-		{
-		printf("FIN ");
+		case TCP_ACK:
+			{
+			printf("ACK ");
+			break;
+			}
+		case TCP_RST:
+			{
+			printf("RST ");
+			break;
+			}
+		case TCP_SYN:
+			{
+			printf("SYN ");
+			break;
+			}
+		case TCP_FIN:
+			{
+			printf("FIN ");
+			break;
+			}
+		case TCP_URG_PSH:
+			{
+			printf("URG PSH ");
+			break;
+			}
+		case TCP_SYN_ACK:
+			{
+			printf("SYN ACK ");
+			break;
+			}
+		case TCP_FIN_ACK:
+			{
+			printf("FIN ACK ");
+			break;
+			}
 		}
 	printf("\n\n");
 	}
@@ -384,10 +406,10 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN, IPPROTO_TCP);
 
 	// wait for SYN ACK
-	msg_receive(&msg_from_server);
+	net_msg_receive(&msg_from_server, FID_SOCKET_CONNECT);
 
 	// Read packet content
-	tcp_hdr_t *tcp_header = ((tcp_hdr_t*)(buffer_tcp+IPV6_HDR_LEN));
+	tcp_hdr_t *tcp_header = ((tcp_hdr_t*)(msg_from_server.content.ptr));
 
 	// Check for consistency
 	if (check_tcp_consistency(current_tcp_socket, tcp_header) == -1)
@@ -409,7 +431,7 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 	current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
 
 	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN, IPPROTO_TCP);
-	msg_reply(&msg_from_server, &msg_reply_fin);
+	net_msg_reply(&msg_from_server, &msg_reply_fin, FID_TCP_SYN_ACK);
 	return 0;
 	}
 
@@ -534,9 +556,9 @@ int32_t recvfrom(int s, void *buf, uint64_t len, int flags, sockaddr6_t *from, u
 		udp_hdr_t *udp_header;
 		uint8_t *payload;
 		net_msg_receive(&m_recv, FID_RECV_FROM);
-		ipv6_header = ((ipv6_hdr_t*)&buffer_udp);
-		udp_header = ((udp_hdr_t*)(&buffer_udp[IPV6_HDR_LEN]));
-		payload = &buffer_udp[IPV6_HDR_LEN+UDP_HDR_LEN];
+		ipv6_header = ((ipv6_hdr_t*)m_recv.content.ptr);
+		udp_header = ((udp_hdr_t*)(m_recv.content.ptr + IPV6_HDR_LEN));
+		payload = (uint8_t*)(m_recv.content.ptr + IPV6_HDR_LEN+UDP_HDR_LEN);
 
 		memset(buf, 0, len);
 		memcpy(buf, payload, udp_header->length);
@@ -726,7 +748,7 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 	int new_socket;
 	msg_t msg_recv_client_ack, msg_send_client_ack;
 	socket_internal_t *current_new_socket;
-	uint8_t send_buffer[BUFFER_SIZE];
+	uint8_t send_buffer[BUFFER_SIZE], consistency;
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *syn_ack_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
 
@@ -747,22 +769,22 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 
 	syn_ack_packet->checksum = ~tcp_csum(temp_ipv6_header, syn_ack_packet);
 
-	printf("BEFORE SENDING SYN ACK PACKET!\n");
 	sixlowpan_send(&current_queued_socket->foreign_address.sin6_addr, (uint8_t*)(syn_ack_packet), TCP_HDR_LEN, IPPROTO_TCP);
 
 	// wait for ACK from Client
-	msg_receive(&msg_recv_client_ack);
+	net_msg_receive(&msg_recv_client_ack, FID_SOCKET_HANDLE_NEW_TCP_CON);
 
-	ipv6_hdr_t *ipv6_header;
 	tcp_hdr_t *tcp_header;
 
-	ipv6_header = ((ipv6_hdr_t*)(buffer_tcp));
-	tcp_header = ((tcp_hdr_t*)(buffer_tcp+IPV6_HDR_LEN));
+	tcp_header = ((tcp_hdr_t*)(msg_recv_client_ack.content.ptr));
 
 	// Check for consistency
-	if (check_tcp_consistency(current_queued_socket, tcp_header) != PACKET_OK)
+	consistency = check_tcp_consistency(current_queued_socket, tcp_header);
+	if (consistency != PACKET_OK)
 		{
-		printf("TCP packets not consistent!\n");
+		printf("TCP packets not consistent, Error Code: %i!\n", consistency);
+		printf("TCP ACK NR: %li, Local TCP Status SEQ: %li, TCP SEQ NR: %li, FOREIGN TCP STATUS SEQ: %li\n", tcp_header->ack_nr, current_queued_socket->local_tcp_status.seq_nr+1,
+				tcp_header->seq_nr, current_queued_socket->foreign_tcp_status.seq_nr);
 		}
 
 	// Got ack, connection established, refresh local and foreign tcp socket status
@@ -773,7 +795,7 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 	server_socket->in_socket.local_tcp_status.state = LISTEN;
 
 	// send a reply to the TCP handler after processing every information from the TCP ACK packet
-	msg_reply(&msg_recv_client_ack, &msg_send_client_ack);
+	net_msg_reply(&msg_recv_client_ack, &msg_send_client_ack, FID_TCP_ACK);
 
 	new_socket = socket(current_queued_socket->domain, current_queued_socket->type, current_queued_socket->protocol);
 	current_new_socket = getSocket(new_socket);

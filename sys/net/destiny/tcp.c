@@ -67,13 +67,12 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_in
 	else
 		{
 		memcpy(tcp_socket->tcp_input_buffer, payload, tcp_payload_len);
-
 		tcp_socket->in_socket.local_tcp_status.window = tcp_socket->in_socket.local_tcp_status.window - tcp_payload_len;
 		acknowledged_bytes = tcp_payload_len;
 		tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end + tcp_payload_len;
 		}
 
-	net_msg_send(&m_send_tcp, tcp_socket->pid, 0, FID_RECV);
+	net_msg_send(&m_send_tcp, tcp_socket->pid, 1, FID_RECV);
 	return acknowledged_bytes;
 	}
 
@@ -83,7 +82,8 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 
 	if (getWaitingConnectionSocket(tcp_socket->socket_id)->local_tcp_status.state == SYN_RCVD)
 		{
-		msg_send_receive(&m_send_tcp, &m_recv_tcp, tcp_socket->pid);
+		m_send_tcp.content.ptr = (char*)tcp_header;
+		net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->pid, FID_SOCKET_HANDLE_NEW_TCP_CON, FID_TCP_ACK);
 		}
 	printf("GOT REGULAR ACK FOR DATA!\n");
 	}
@@ -121,7 +121,8 @@ void handle_tcp_syn_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, s
 	msg_t m_recv_tcp, m_send_tcp;
 	if (tcp_socket->in_socket.local_tcp_status.state == SYN_SENT)
 		{
-		msg_send_receive(&m_send_tcp, &m_recv_tcp, tcp_socket->pid);
+		m_send_tcp.content.ptr = (char*) tcp_header;
+		net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->pid, FID_SOCKET_CONNECT, FID_TCP_SYN_ACK);
 		}
 	else
 		{
@@ -191,9 +192,11 @@ void tcp_packet_handler (void)
 	while (1)
 		{
 		net_msg_receive(&m_recv_ip, FID_TCP_PH);
-		ipv6_header = ((ipv6_hdr_t*)&buffer_tcp);
-		tcp_header = ((tcp_hdr_t*)(&buffer_tcp[IPV6_HDR_LEN]));
-		payload = &buffer_tcp[IPV6_HDR_LEN+TCP_HDR_LEN];
+
+		ipv6_header = ((ipv6_hdr_t*)m_recv_ip.content.ptr);
+		tcp_header = ((tcp_hdr_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
+		payload = (uint8_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN + TCP_HDR_LEN);
+
 		chksum = tcp_csum(ipv6_header, tcp_header);
 		printf("Checksum is %x!\n", chksum);
 		print_tcp_status(INC_PACKET, ipv6_header, tcp_header);

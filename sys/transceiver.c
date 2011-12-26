@@ -62,6 +62,11 @@ static void switch_to_rx(transceiver_type_t t);
 /* Transceiver init */
 void transceiver_init(transceiver_type_t t) {
     uint8_t i;
+
+    /* Initializing transceiver buffer and data buffer */
+    memset(transceiver_buffer, 0, TRANSCEIVER_BUFFER_SIZE);
+    memset(data_buffer, 0, TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE);
+
     for (i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
         reg[i].transceivers = TRANSCEIVER_NONE;
         reg[i].pid          = 0;

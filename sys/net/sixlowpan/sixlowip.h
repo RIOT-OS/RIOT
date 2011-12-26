@@ -125,9 +125,6 @@ typedef struct __attribute__ ((packed)) iface_t {
 
 extern iface_t iface;
 
-//#define HTONS(a) (uint16_t)((((uint16_t) (a)) << 8) | (((uint16_t) (a)) >> 8))
-
-
 /* function prototypes */
 struct icmpv6_hdr_t* get_icmpv6_buf(uint8_t ext_len);
 struct ipv6_hdr_t* get_ipv6_buf(void);
@@ -164,6 +161,6 @@ void ipv6_set_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix);
 uint8_t ipv6_addr_unspec_match(ipv6_addr_t *addr);
 uint8_t ipv6_addr_sol_node_mcast_match(ipv6_addr_t *addr);
 uint8_t ipv6_next_hdr_unrec(uint8_t next_hdr);
-void set_tcp_packet_handler_pid(int pid, uint8_t *buffer);
-void set_udp_packet_handler_pid(int pid, uint8_t *buffer);
+void set_tcp_packet_handler_pid(int pid);
+void set_udp_packet_handler_pid(int pid);
 #endif /* SIXLOWIP_H*/

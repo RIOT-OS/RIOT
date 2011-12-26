@@ -9,7 +9,7 @@
 #include "radio/radio.h"
 #include <transceiver.h>
 
-#define RADIO_STACK_SIZE            2048
+#define RADIO_STACK_SIZE            3072
 #define RADIO_RCV_BUF_SIZE          64
 #define RADIO_SND_BUF_SIZE          100
 #define RADIO_SENDING_DELAY         1000
@@ -22,6 +22,5 @@ void init_802154_long_addr(ieee_802154_long_t *laddr);
 void init_802154_short_addr(ieee_802154_short_t *saddr);
 void sixlowmac_init(transceiver_type_t type);
 ieee_802154_long_t* mac_get_eui(ipv6_addr_t *ipaddr);
-// void send(void);
 
 #endif /* SIXLOWMAC_H*/
