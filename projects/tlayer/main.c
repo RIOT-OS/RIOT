@@ -206,7 +206,6 @@ void send_tcp(char *str)
 	{
 	msg_t send_msg;
 	sscanf(str, "send_tcp %s", current_message.tcp_string_msg);
-	printf("1Send Content: %s\n", current_message.tcp_string_msg);
 	send_msg.content.value = 1;
 	msg_send(&send_msg, tcp_cht_pid, 0);
 	}

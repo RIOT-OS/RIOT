@@ -22,6 +22,8 @@
 #define LOWPAN_IPV6_DISPATCH    0x41
 #define LOWPAN_CONTEXT_MAX      16
 
+#define LOWPAN_REAS_BUF_TIMEOUT	60
+
 #include "transceiver.h"
 #include "sixlowip.h"
 #include <vtimer.h>

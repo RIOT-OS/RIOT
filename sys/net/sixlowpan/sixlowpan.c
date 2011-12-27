@@ -312,7 +312,7 @@ uint8_t handle_packet_frag_interval(lowpan_reas_buf_t *current_buf, uint8_t data
 	return 0;
 	}
 
-void collect_garbage(lowpan_reas_buf_t *current_buf)
+lowpan_reas_buf_t *collect_garbage(lowpan_reas_buf_t *current_buf)
 	{
 	lowpan_interval_list_t *temp_list, *current_list;
 	lowpan_reas_buf_t *temp_buf, *my_buf;
@@ -333,6 +333,9 @@ void collect_garbage(lowpan_reas_buf_t *current_buf)
 	if (head == current_buf)
 		{
 		head = current_buf->next;
+		free(current_buf->packet);
+		free(current_buf);
+		return head;
 		}
 	else
 		{
@@ -342,10 +345,10 @@ void collect_garbage(lowpan_reas_buf_t *current_buf)
 			temp_buf = temp_buf->next;
 			}
 		my_buf->next = current_buf->next;
+		free(current_buf->packet);
+		free(current_buf);
+		return my_buf->next;
 		}
-
-	free(current_buf->packet);
-	free(current_buf);
 	}
 
 void handle_packet_fragment(uint8_t *data, uint8_t datagram_offset,  uint16_t datagram_size,
@@ -396,6 +399,28 @@ void handle_packet_fragment(uint8_t *data, uint8_t datagram_offset,  uint16_t da
 		else
 			{
 			printf("ERROR: duplicate fragment!\n");
+			}
+		}
+	}
+
+void check_timeout(void)
+	{
+	lowpan_reas_buf_t *temp_buf;
+	time_t cur_time;
+
+	cur_time = rtc_time(NULL);
+	temp_buf = head;
+
+	while (temp_buf != NULL)
+		{
+		if ((cur_time - temp_buf->timestamp) >= LOWPAN_REAS_BUF_TIMEOUT)
+			{
+			printf("TIMEOUT! cur_time: %li, temp_buf: %li\n", cur_time, temp_buf->timestamp);
+			temp_buf = collect_garbage(temp_buf);
+			}
+		else
+			{
+			temp_buf = temp_buf->next;
 			}
 		}
 	}
@@ -471,7 +496,8 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
 			printf("ERROR: packet with unknown dispatch received\n");
 			}
 		}
-}
+    check_timeout();
+	}
 
 void lowpan_ipv6_set_dispatch(uint8_t *data){
     memmove(data + 1, data, packet_length);
@@ -1201,6 +1227,10 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border){
     /* init mac-layer and radio transceiver */
     vtimer_init();
     sixlowmac_init(trans);
+
+    rtc_init();
+    rtc_enable();
+
     /* init interface addresses */
     memset(&iface,0,sizeof(iface_t));
     set_radio_address(r_addr); 
