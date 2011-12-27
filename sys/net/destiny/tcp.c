@@ -80,10 +80,11 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 	{
 	msg_t m_recv_tcp, m_send_tcp;
 
-	if (getWaitingConnectionSocket(tcp_socket->socket_id)->local_tcp_status.state == SYN_RCVD)
+	if (getWaitingConnectionSocket(tcp_socket->socket_id) != NULL)
 		{
 		m_send_tcp.content.ptr = (char*)tcp_header;
 		net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->pid, FID_SOCKET_HANDLE_NEW_TCP_CON, FID_TCP_ACK);
+		return;
 		}
 	printf("GOT REGULAR ACK FOR DATA!\n");
 	}

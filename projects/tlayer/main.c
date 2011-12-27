@@ -172,8 +172,6 @@ void init_tcp_server(void)
 			printf("--- Message: %s ---\n", buff_msg);
 			}
 
-		shutdown(ConnectFD, 0);
-
 		close(ConnectFD);
 		}
 	}
@@ -202,7 +200,7 @@ void init_tcp_cht(char *str)
 	printf("TCP CONNECTION HANDLER THREAD PID: %i\n", tcp_cht_pid);
 	}
 
-void send_tcp(char *str)
+void send_tcp_msg(char *str)
 	{
 	msg_t send_msg;
 	sscanf(str, "send_tcp %s", current_message.tcp_string_msg);
@@ -420,7 +418,7 @@ const shell_command_t shell_commands[] = {
     {"init_tcp_server_thread", "", init_tcp_server_thread},
     {"init_tcp_cht", "", init_tcp_cht},
     {"connect_tcp", "", connect_tcp},
-    {"send_tcp", "", send_tcp},
+    {"send_tcp", "", send_tcp_msg},
     {"send_udp", "", send_udp},
     {NULL, NULL, NULL}
 };

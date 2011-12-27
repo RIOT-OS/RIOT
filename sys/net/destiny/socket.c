@@ -353,6 +353,45 @@ int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header)
 	return PACKET_OK;
 	}
 
+int send_tcp(sockaddr6_t *addr, socket_t *current_tcp_socket, tcp_hdr_t *current_tcp_packet, ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length)
+	{
+	if (addr != NULL)
+		{
+		// Local address information
+		ipv6_addr_t src_addr;
+		ipv6_get_saddr(&src_addr, &addr->sin6_addr);
+		set_socket_address(&current_tcp_socket->local_address, PF_INET6, HTONS(get_free_source_port(IPPROTO_TCP)), 0, &src_addr);
+
+		// Foreign address information
+		set_socket_address(&current_tcp_socket->foreign_address, addr->sin6_family, addr->sin6_port, addr->sin6_flowinfo, &addr->sin6_addr);
+		}
+
+	// Fill TCP SYN packet
+//	if (IS_TCP_ACK(flags))
+//		{
+		set_tcp_packet(current_tcp_packet, current_tcp_socket->local_address.sin6_port, current_tcp_socket->foreign_address.sin6_port,
+							current_tcp_socket->local_tcp_status.seq_nr, current_tcp_socket->local_tcp_status.ack_nr, 0, flags, current_tcp_socket->local_tcp_status.window, 0, 0);
+//
+//		}
+//	else
+//		{
+//		set_tcp_packet(current_tcp_packet, current_tcp_socket->local_address.sin6_port, current_tcp_socket->foreign_address.sin6_port,
+//							current_tcp_socket->local_tcp_status.seq_nr, 0, 0, flags, current_tcp_socket->local_tcp_status.window, 0, 0);
+//		}
+
+	// Fill IPv6 Header
+	memcpy(&(temp_ipv6_header->destaddr), &current_tcp_socket->foreign_address.sin6_addr, 16);
+	memcpy(&(temp_ipv6_header->srcaddr), &current_tcp_socket->local_address.sin6_addr, 16);
+	temp_ipv6_header->length = TCP_HDR_LEN + payload_length;
+
+	current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
+
+	// send TCP SYN packet
+	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN+payload_length, IPPROTO_TCP);
+
+	return 1;
+	}
+
 int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_thread)
 	{
 	// Variables
@@ -384,26 +423,8 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 	// Fill foreign TCP socket information
 	set_tcp_status(&current_tcp_socket->foreign_tcp_status, 0, 0, 0, UNKNOWN, 0);
 
-	// Local address information
-	ipv6_addr_t src_addr;
-	ipv6_get_saddr(&src_addr, &addr->sin6_addr);
-	set_socket_address(&current_tcp_socket->local_address, PF_INET6, HTONS(get_free_source_port(IPPROTO_TCP)), 0, &src_addr);
-
-	// Foreign address information
-	set_socket_address(&current_tcp_socket->foreign_address, addr->sin6_family, addr->sin6_port, addr->sin6_flowinfo, &addr->sin6_addr);
-
-	// Fill TCP SYN packet
-	set_tcp_packet(current_tcp_packet, current_tcp_socket->local_address.sin6_port, current_tcp_socket->foreign_address.sin6_port,
-			current_tcp_socket->local_tcp_status.seq_nr, 0, 0, TCP_SYN, current_tcp_socket->local_tcp_status.window, 0, 0);
-	// Fill IPv6 Header
-	memcpy(&(temp_ipv6_header->destaddr), &current_tcp_socket->foreign_address.sin6_addr, 16);
-	memcpy(&(temp_ipv6_header->srcaddr), &current_tcp_socket->local_address.sin6_addr, 16);
-	temp_ipv6_header->length = TCP_HDR_LEN;
-
-	current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
-
-	// send TCP SYN packet
-	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN, IPPROTO_TCP);
+	// Send packet
+	send_tcp(addr, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_SYN, 0);
 
 	// wait for SYN ACK
 	net_msg_receive(&msg_from_server, FID_SOCKET_CONNECT);
@@ -424,21 +445,11 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 	// Refresh local TCP socket information
 	set_tcp_status(&current_tcp_socket->local_tcp_status, tcp_header->seq_nr + 1, STATIC_MSS, tcp_header->ack_nr, ESTABLISHED, STATIC_WINDOW);
 
-	// Fill TCP ACK packet, use same IPv6 header
-	set_tcp_packet(current_tcp_packet, current_tcp_socket->local_address.sin6_port, current_tcp_socket->foreign_address.sin6_port,
-			current_tcp_socket->local_tcp_status.seq_nr, current_tcp_socket->local_tcp_status.ack_nr, 0, TCP_ACK, current_tcp_socket->local_tcp_status.window,
-			0, 0);
-	current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
+	// Send packet
+	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
 
-	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN, IPPROTO_TCP);
 	net_msg_reply(&msg_from_server, &msg_reply_fin, FID_TCP_SYN_ACK);
 	return 0;
-	}
-
-void set_tcp_packet_auto(tcp_hdr_t *current_tcp_packet, socket_t *current_socket)
-	{
-	set_tcp_packet(current_tcp_packet, current_socket->local_address.sin6_port, current_socket->foreign_address.sin6_port, current_socket->local_tcp_status.seq_nr,
-			current_socket->local_tcp_status.ack_nr, 0, 0, current_socket->local_tcp_status.window, 0, 0);
 	}
 
 int32_t send(int s, void *msg, uint64_t len, int flags)
@@ -469,13 +480,13 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 	// Refresh local TCP socket information
 	current_tcp_socket->local_tcp_status.seq_nr = current_tcp_socket->local_tcp_status.seq_nr + len;
 
-	// IPv6 information
-	memcpy(&(temp_ipv6_header->destaddr), &current_tcp_socket->foreign_address.sin6_addr, 16);
-	memcpy(&(temp_ipv6_header->srcaddr), &current_tcp_socket->local_address.sin6_addr, 16);
-	temp_ipv6_header->length = TCP_HDR_LEN+len;
-
-	// Fill TCP packet header
-	set_tcp_packet_auto(current_tcp_packet, current_tcp_socket);
+//	// IPv6 information
+//	memcpy(&(temp_ipv6_header->destaddr), &current_tcp_socket->foreign_address.sin6_addr, 16);
+//	memcpy(&(temp_ipv6_header->srcaddr), &current_tcp_socket->local_address.sin6_addr, 16);
+//	temp_ipv6_header->length = TCP_HDR_LEN+len;
+//
+//	// Fill TCP packet header
+//	set_tcp_packet_auto(current_tcp_packet, current_tcp_socket);
 
 	// Add packet data
 	if (len > current_tcp_socket->foreign_tcp_status.window)
@@ -489,11 +500,12 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 		sent_bytes = len;
 		}
 
+	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, 0, sent_bytes);
 
-	// Checksum
-	current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
-
-	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN+len, IPPROTO_TCP);
+//	// Checksum
+//	current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
+//
+//	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN+len, IPPROTO_TCP);
 	return sent_bytes;
 	}
 
@@ -621,6 +633,7 @@ int close(int s)
 	if (current_socket != NULL)
 		{
 		// TODO: Kill connection, not just delete socket!
+
 		memset(current_socket, 0, sizeof(socket_internal_t));
 
 		return 1;
@@ -832,11 +845,6 @@ int accept(int s, sockaddr6_t *addr, uint32_t addrlen, uint8_t pid)
 		{
 		return -1;
 		}
-	}
-
-int shutdown(int s , int how)
-	{
-	return -1;
 	}
 
 socket_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *socket)

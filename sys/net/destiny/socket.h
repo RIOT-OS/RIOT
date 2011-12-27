@@ -160,7 +160,6 @@ int close(int s);
 int bind(int s, sockaddr6_t *name, int namelen, uint8_t pid);
 int listen(int s, int backlog);
 int accept(int s, sockaddr6_t *addr, uint32_t addrlen, uint8_t pid);
-int shutdown(int s , int how);
 void socket_init(void);
 socket_internal_t *get_udp_socket(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header);
 socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
@@ -176,4 +175,5 @@ void set_socket_address(sockaddr6_t *sockaddr, uint8_t sin6_family, uint16_t sin
 void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port, uint32_t seq_nr, uint32_t ack_nr,
 		uint8_t dataOffset_reserved, uint8_t reserved_flags, uint16_t window, uint16_t checksum, uint16_t urg_pointer);
 int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header);
+int send_tcp(sockaddr6_t *addr, socket_t *current_tcp_socket, tcp_hdr_t *current_tcp_packet, ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length);
 #endif /* SOCKET_H_ */
