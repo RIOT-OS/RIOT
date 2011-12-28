@@ -8,7 +8,7 @@
 //#define DEBUG(...) printf (__VA_ARGS__)
 #define DEBUG(...)
 
-void ringbuffer_init(ringbuffer *rb, char* buffer, unsigned int bufsize) {
+void ringbuffer_init(ringbuffer_t *rb, char* buffer, unsigned int bufsize) {
     rb->buf = buffer;
     rb->start = 0;
     rb->end = 0;
@@ -16,13 +16,13 @@ void ringbuffer_init(ringbuffer *rb, char* buffer, unsigned int bufsize) {
     rb->avail = 0;
 }
 
-void rb_add_elements(ringbuffer* rb, char *buf, int n) {
+void rb_add_elements(ringbuffer_t* rb, char *buf, int n) {
     for (int i = 0; i < n; i++) {
         rb_add_element(rb, buf[i]);
     }
 }
 
-void rb_add_element(ringbuffer* rb, char c) {
+void rb_add_element(ringbuffer_t* rb, char c) {
     if (rb->avail == rb->size) rb_get_element(rb);
 
     rb->buf[rb->end++] = c;
@@ -31,7 +31,7 @@ void rb_add_element(ringbuffer* rb, char c) {
     rb->avail++;
 }
 
-int rb_get_element(ringbuffer *rb) {
+int rb_get_element(ringbuffer_t *rb) {
     if (rb->avail == 0) return -1;
     
     rb->avail--;
@@ -42,7 +42,7 @@ int rb_get_element(ringbuffer *rb) {
     return c;
 }
 
-int rb_get_elements(ringbuffer *rb, char* buf, int n) {
+int rb_get_elements(ringbuffer_t *rb, char* buf, int n) {
     int count = 0;
     while (rb->avail && (count < n)) {
         buf[count++] = rb_get_element(rb);

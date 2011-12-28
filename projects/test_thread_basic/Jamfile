@@ -1,0 +1,5 @@
+SubDir TOP projects test_thread_exit ;
+
+Module test_thread_exit : main.c ;
+
+UseModule test_thread_exit ;

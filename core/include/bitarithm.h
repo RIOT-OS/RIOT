@@ -64,6 +64,8 @@
 #endif
 /** @} */
 
+#define ARCH_32_BIT   (__INT_MAX__ == 2147483647)
+
 /**
  * @brief	Returns the number of the highest '1' bit in a value
  * @param[in]	v	Input value

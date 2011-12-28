@@ -22,10 +22,11 @@
  */
 
 #include <stdbool.h>
+#include "config.h"
 #include "tcb.h"
 #include "cpu.h"
 #include "flags.h"
-#include "scheduler.h"
+#include "sched.h"
 #include "cpu-conf.h"
 
 /* ------------------------------------------------------------------------- */
@@ -70,15 +71,7 @@
 #define PRIORITY_MIN            SCHED_PRIO_LEVELS-1
 
 #define PRIORITY_IDLE           PRIORITY_MIN
-#define PRIORITY_MAIN           PRIORITY_MIN-1
-#define PRIORITY_CMD_THREADS    PRIORITY_MIN-2      ///< all cmd handler threads
-#define PRIORITY_CBD            PRIORITY_MIN-3
-#define PRIORITY_CMDD           PRIORITY_MIN-4      ///< cmdengine demon
-#define PRIORITY_PRINTTHREAD    PRIORITY_MIN-5      ///< mprint worker thread
-#define PRIORITY_HAL            PRIORITY_MIN-6
-#define PRIORITY_UTIMER         PRIORITY_MIN-7
-#define PRIORITY_MMREQ          PRIORITY_MIN-8
-#define PRIORITY_CC1100         PRIORITY_MIN-9
+#define PRIORITY_MAIN           (PRIORITY_MIN - (SCHED_PRIO_LEVELS/2))
 
 /**
  * @brief   Check whether called from interrupt service routine
@@ -88,9 +81,12 @@
  */
 int inISR(void);
 
+#define LPM_PREVENT_SLEEP_UART    BIT2
 #define LPM_PREVENT_SLEEP_HWTIMER    BIT1
 
 extern volatile int lpm_prevent_sleep;
+
+extern config_t sysconfig;
 
 /** @} */
 #endif /* KERNEL_H_ */

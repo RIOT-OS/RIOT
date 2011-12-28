@@ -61,13 +61,13 @@ cc1100_spi_writeburst_reg(uint8_t addr, char *src, uint8_t count)
 {
 	int i = 0;
 	unsigned int cpsr = disableIRQ();
-	cc1100_spi_select();
-	cc1100_txrx(addr | CC1100_WRITE_BURST);
+	cc110x_spi_select();
+	cc110x_txrx(addr | CC1100_WRITE_BURST);
 	while (i < count) {
-		cc1100_txrx(src[i]);
+		cc110x_txrx(src[i]);
 		i++;
 	}
-	cc1100_spi_unselect();
+	cc110x_spi_unselect();
 	restoreIRQ(cpsr);
 	return count;
 }
@@ -77,13 +77,13 @@ cc1100_spi_readburst_reg(uint8_t addr, char *buffer, uint8_t count)
 {
 	int i = 0;
 	unsigned int cpsr = disableIRQ();
-	cc1100_spi_select();
-	cc1100_txrx(addr | CC1100_READ_BURST);
+	cc110x_spi_select();
+	cc110x_txrx(addr | CC1100_READ_BURST);
 	while (i < count) {
-		buffer[i] = cc1100_txrx(NOBYTE);
+		buffer[i] = cc110x_txrx(NOBYTE);
 		i++;
 	}
-	cc1100_spi_unselect();
+	cc110x_spi_unselect();
 	restoreIRQ(cpsr);
 }
 
@@ -91,10 +91,10 @@ void
 cc1100_spi_write_reg(uint8_t addr, uint8_t value)
 {
 	unsigned int cpsr = disableIRQ();
-	cc1100_spi_select();
-	cc1100_txrx(addr);
-	cc1100_txrx(value);
-	cc1100_spi_unselect();
+	cc110x_spi_select();
+	cc110x_txrx(addr);
+	cc110x_txrx(value);
+	cc110x_spi_unselect();
 	restoreIRQ(cpsr);
 }
 
@@ -102,10 +102,10 @@ uint8_t cc1100_spi_read_reg(uint8_t addr)
 {
 	uint8_t result;
 	unsigned int cpsr = disableIRQ();
-	cc1100_spi_select();
-	cc1100_txrx(addr | CC1100_READ_SINGLE);
-	result = cc1100_txrx(NOBYTE);
-	cc1100_spi_unselect();
+	cc110x_spi_select();
+	cc110x_txrx(addr | CC1100_READ_SINGLE);
+	result = cc110x_txrx(NOBYTE);
+	cc110x_spi_unselect();
 	restoreIRQ(cpsr);
 	return result;
 }
@@ -114,10 +114,10 @@ uint8_t cc1100_spi_read_status(uint8_t addr)
 {
 	uint8_t result;
 	unsigned int cpsr = disableIRQ();
-	cc1100_spi_select();
-	cc1100_txrx(addr | CC1100_READ_BURST);
-	result = cc1100_txrx(NOBYTE);
-	cc1100_spi_unselect();
+	cc110x_spi_select();
+	cc110x_txrx(addr | CC1100_READ_BURST);
+	result = cc110x_txrx(NOBYTE);
+	cc110x_spi_unselect();
 	restoreIRQ(cpsr);
 	return result;
 }
@@ -126,9 +126,9 @@ uint8_t cc1100_spi_strobe(uint8_t c)
 {
 	uint8_t result;
 	unsigned int cpsr = disableIRQ();
-	cc1100_spi_select();
-	result = cc1100_txrx(c);
-	cc1100_spi_unselect();
+	cc110x_spi_select();
+	result = cc110x_txrx(c);
+	cc110x_spi_unselect();
 	restoreIRQ(cpsr);
 	return result;
 }

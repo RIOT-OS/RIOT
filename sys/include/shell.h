@@ -34,8 +34,9 @@ and the mailinglist (subscription via web site)
 
 //#include "hashtable.h"
 
-typedef struct shell_commant_t {
+typedef struct shell_command_t {
     char* name;
+    char* desc;
     void (*handler)(char*);
 } shell_command_t;
 
@@ -47,16 +48,12 @@ typedef struct shell_t {
 
 /**
  * @brief Initialize a shell object
+ * @param shell Pointer to preallocated shell object
+ * @param shell_commands Pointer to shell command structure. See test_shell project for example.
+ * @param read_char Pointer to input device read function. Should return exactly one byte or block.
+ * @param put_char Pointer to output funtion. currently unused, shell code will use printf.
  */
-void shell_init(shell_t *shell, int(*read_char)(void), void (*put_char)(int));
-
-/**
- * @brief Register a new command handler for a shell.
- * @param shell Shell object.
- * @param name Name of the command to register.
- * @param handler Function pointer to handler that takes the complete command line as parameter.
- */
-//void shell_register_cmd(shell_t *shell, char* name, void (*handler)(char* args));
+void shell_init(shell_t *shell, const shell_command_t *shell_commands, int(*read_char)(void), void (*put_char)(int));
 
 /**
  * @brief Endless loop that waits for command and executes handler.

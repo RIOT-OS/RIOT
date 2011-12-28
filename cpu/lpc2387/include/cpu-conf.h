@@ -68,7 +68,7 @@ and the mailinglist (subscription via web site)
  * @{
  */
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT	2500
+#define KERNEL_CONF_STACKSIZE_DEFAULT	4500
 #endif
 
 #define KERNEL_CONF_STACKSIZE_IDLE		500
@@ -83,6 +83,9 @@ and the mailinglist (subscription via web site)
 #define CC_CONF_NONNULL(...)			__attribute__((nonnull(__VA_ARGS__)))
 #define CC_CONF_WARN_UNUSED_RESULT		__attribute__((warn_unused_result))
 /** @} */
+
+#define TRANSCEIVER_BUFFER_SIZE (10)
+#define RX_BUF_SIZE  (10)
 
 /** @} */
 #endif /* CPUCONF_H_ */

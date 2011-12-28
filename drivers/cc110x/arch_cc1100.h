@@ -38,13 +38,13 @@ and the mailinglist (subscription via web site)
 
 #include <stdint.h>
 
-uint8_t cc1100_txrx(uint8_t c);
+uint8_t cc110x_txrx(uint8_t c);
 
-void cc1100_gdo0_enable(void);
-void cc1100_gdo0_disable(void);
-void cc1100_gdo2_enable(void);
-void cc1100_gdo2_disable(void);
-void cc1100_init_interrupts(void);
+void cc110x_gdo0_enable(void);
+void cc110x_gdo0_disable(void);
+void cc110x_gdo2_enable(void);
+void cc110x_gdo2_disable(void);
+void cc110x_init_interrupts(void);
 
-void cc1100_before_send(void);
-void cc1100_after_send(void);
+void cc110x_before_send(void);
+void cc110x_after_send(void);

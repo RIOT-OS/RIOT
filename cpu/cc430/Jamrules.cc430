@@ -1,0 +1,1 @@
+include [ FPath $(TOP) cpu msp430-common Jamrules.msp430-common ] ;

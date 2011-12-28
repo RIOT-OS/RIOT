@@ -1,0 +1,5 @@
+SubDir TOP projects WEAtHeR ;
+
+Module WEAtHeR : main.c weather_routing.c protocol_msg_gateway.c : ltc4150 cc110x gpioint vtimer shell shell_commands posix_io uart0 auto_init rtc ;
+
+UseModule WEAtHeR ;

@@ -58,7 +58,7 @@ int main(void)
     // radio stack
     cc1100_init();
     cc1100_set_packet_handler(4, protocol_handler);
-    cc1100_set_channel(10);
+    cc1100_set_channel(0);
 //    cc1100_set_output_power(5);
     printf("cc1100..[OK]\n");
     
@@ -68,11 +68,12 @@ int main(void)
     cc1100_set_address(2);
 
    
-    while(1) {
+//    while(1) {
         puts(".");
         int result = cc1100_send_csmaca(1, 4, 2, i, sizeof(i));
         printf("%i\n", result);
-    }
+        hwtimer_wait(1000 * 1000);
+//    }
 #else
     cc1100_set_address(1);
     while(1) {

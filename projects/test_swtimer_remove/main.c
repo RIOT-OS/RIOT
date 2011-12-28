@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <hwtimer.h>
 #include <swtimer.h>
-#include <scheduler.h>
+#include <sched.h>
 
 int main(void)
 {
@@ -13,7 +13,7 @@ int main(void)
     swtimer_t t;
 
     puts("Setting timer...\n");
-    swtimer_set_wakeup(&t, 10000000L, fk_thread->pid);
+    swtimer_set_wakeup(&t, 10000000L, active_thread->pid);
     puts("Small delay...\n");
     hwtimer_wait(200000);
     puts("Removing timer...\n");
@@ -22,9 +22,9 @@ int main(void)
 
     swtimer_t t2;
     puts("Setting timer...\n");
-    swtimer_set_wakeup(&t, 10000000L, fk_thread->pid);
+    swtimer_set_wakeup(&t, 10000000L, active_thread->pid);
     puts("Setting timer 2...\n");
-    swtimer_set_wakeup(&t2, 50000000L, fk_thread->pid);
+    swtimer_set_wakeup(&t2, 50000000L, active_thread->pid);
     puts("Small delay...\n");
     hwtimer_wait(200000);
     puts("Removing timer 1...\n");
@@ -34,9 +34,9 @@ int main(void)
     puts("Done.\n");
     
     puts("Setting timer...\n");
-    swtimer_set_wakeup(&t, 10000000L, fk_thread->pid);
+    swtimer_set_wakeup(&t, 10000000L, active_thread->pid);
     puts("Setting timer 2...\n");
-    swtimer_set_wakeup(&t2, 50000000L, fk_thread->pid);
+    swtimer_set_wakeup(&t2, 50000000L, active_thread->pid);
     puts("Small delay...\n");
     hwtimer_wait(200000);
     puts("Removing timer 2...\n");

@@ -19,7 +19,8 @@
 #include "queue.h"
 #include "tcb.h"
 #include "kernel.h"
-#include "scheduler.h"
+#include "sched.h"
+#include <irq.h>
 
 //#define ENABLE_DEBUG
 #include <debug.h>
@@ -35,92 +36,66 @@ int mutex_init(struct mutex_t* mutex) {
 }
 
 int mutex_trylock(struct mutex_t* mutex) {
-    return (atomic_set_return(&mutex->val, fk_pid ) == 0);
-}
-
-int prio() {
-    return fk_thread->priority;
+    DEBUG("%s: trylocking to get mutex. val: %u\n", active_thread->name, mutex->val);
+    return atomic_set_return(&mutex->val, 1 ) == 0;
 }
 
 int mutex_lock(struct mutex_t* mutex) {
-   DEBUG("%s: trying to get mutex. val: %u\n", fk_thread->name, mutex->val);
+    DEBUG("%s: trying to get mutex. val: %u\n", active_thread->name, mutex->val);
 
-    if (atomic_set_return(&mutex->val,fk_pid) != 0) {
+    if (atomic_set_return(&mutex->val,1) != 0) {
         // mutex was locked.
         mutex_wait(mutex);
     }
     return 1;
 }
 
-void mutex_unlock(struct mutex_t* mutex, int yield) {
-    DEBUG("%s: unlocking mutex. val: %u pid: %u\n", fk_thread->name, mutex->val, fk_pid);
-    int me_value;
-
-    if (inISR()) {
-        me_value = 0;
-        yield = MUTEX_INISR;
-    } else {
-        me_value = fk_pid;
-    }
-                
-    if (atomic_set_return(&mutex->val,0) != me_value ) {
-        // there were waiters.
-        mutex_wake_waiters(mutex, yield);
-    }
-}
-
 void mutex_wait(struct mutex_t *mutex) {
-    dINT();
-    DEBUG("%s: Mutex in use. %u\n", fk_thread->name, mutex->val);
+    int irqstate = disableIRQ();
+    DEBUG("%s: Mutex in use. %u\n", active_thread->name, mutex->val);
     if (mutex->val == 0) {
         // somebody released the mutex. return.
-        mutex->val = fk_pid;
-        DEBUG("%s: mutex_wait early out. %u\n", fk_thread->name, mutex->val);
-        eINT();
+        mutex->val = thread_pid;
+        DEBUG("%s: mutex_wait early out. %u\n", active_thread->name, mutex->val);
+        restoreIRQ(irqstate);
         return;
     }
 
-    sched_set_status((tcb*)fk_thread, STATUS_MUTEX_BLOCKED);
+    sched_set_status((tcb_t*)active_thread, STATUS_MUTEX_BLOCKED);
 
     queue_node_t n;
-    n.priority = (unsigned int) fk_thread->priority;
-    n.data = (unsigned int) fk_thread;
+    n.priority = (unsigned int) active_thread->priority;
+    n.data = (unsigned int) active_thread;
     n.next = NULL;
 
-    DEBUG("%s: Adding node to mutex queue: prio: %u data: %u\n", fk_thread->name, n.priority, n.data);
+    DEBUG("%s: Adding node to mutex queue: prio: %u\n", active_thread->name, n.priority);
 
     queue_priority_add(&(mutex->queue), &n);
 
-    eINT();
+    restoreIRQ(irqstate);
 
-    fk_yield();
+    thread_yield();
 
     /* we were woken up by scheduler. waker removed us from queue. we have the mutex now. */
 }
 
-void mutex_wake_waiters(struct mutex_t *mutex, int flags) {
-    if ( ! (flags & MUTEX_INISR)) dINT();
-    DEBUG("%s: waking up waiters.\n", fk_thread->name);
+void mutex_unlock(struct mutex_t* mutex, int yield) {
+    DEBUG("%s: unlocking mutex. val: %u pid: %u\n", active_thread->name, mutex->val, thread_pid);
+    int irqstate = disableIRQ();
+  
+    if (mutex->val != 0) {
+        if (mutex->queue.next) {
+            queue_node_t *next = queue_remove_head(&(mutex->queue));
+            tcb_t* process = (tcb_t*)next->data;
+            DEBUG("%s: waking up waiter %s.\n", process->name);
+            sched_set_status(process, STATUS_PENDING);
 
-    queue_node_t *next = queue_remove_head(&(mutex->queue));
-    tcb* process = (tcb*)next->data;
-
-    sched_set_status(process, STATUS_PENDING);
-
-    if ( mutex->queue.next != NULL) {
-        mutex->val = -1;
-    } else {
-        mutex->val = process->pid;
+            sched_switch(active_thread->priority, process->priority, inISR());
+        } else {
+            mutex->val = 0;
+        }
     }
 
-    DEBUG("%s: waiters woken up.\n", fk_thread->name);
-
-    /* If called from process, reenable interrupts, yield if requested */
-    if (! (flags & MUTEX_INISR)) {
-        eINT();
-        if (flags & MUTEX_YIELD) fk_yield();
-    } else {
-       fk_context_switch_request = 1; 
-    }
+    restoreIRQ(irqstate);
 }
 

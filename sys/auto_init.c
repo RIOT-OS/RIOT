@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stdio.h>
-#include <board_uart0.h>
+#include "board_uart0.h"
+#include "rtc.h"
+#include "diskio.h"
 #include <auto_init.h>
 #include <lpc2387-rtc.h>
 
@@ -10,6 +12,16 @@
 extern void main(void);
 
 void auto_init(void) {
+#ifdef MODULE_BOARD_DISPLAY
+    extern void lcd_init();
+    lcd_init();
+    DEBUG("DISP OK");
+#endif
+#ifdef MODULE_DISPLAY_PUTCHAR
+    extern void init_display_putchar();
+    init_display_putchar();
+    DEBUG("DISP OK");
+#endif
 #ifdef MODULE_HWTIMER
     DEBUG("Auto init hwtimer module.\n");
     hwtimer_init();
@@ -42,6 +54,14 @@ void auto_init(void) {
 #ifdef MODULE_LTC4150
     DEBUG("Auto init ltc4150 module.\n");
     ltc4150_init();
+#endif
+#ifdef MODULE_MCI
+    DEBUG("Auto init mci module.\n");
+    MCI_initialize();
+#endif
+#ifdef MODULE_PROFILING
+    extern void profiling_init(void);
+    profiling_init();
 #endif
     main();
 }

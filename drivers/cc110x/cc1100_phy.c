@@ -45,7 +45,7 @@ and the mailinglist (subscription via web site)
 #include <string.h>
 
 #include "hwtimer.h"
-#include "swtimer.h"
+#include <swtimer.h>
 
 #include "cc1100.h"
 #include "cc1100_spi.h"
@@ -59,6 +59,8 @@ and the mailinglist (subscription via web site)
 #include "mutex.h"
 #include "msg.h"
 #include "debug.h"
+
+#define PRIORITY_CC1100         PRIORITY_MAIN-1
 
 #define MSG_POLL 12346
 
@@ -94,10 +96,13 @@ static const pm_table_t handler_table;
 static const char *cc1100_event_handler_name = "cc1100_event_handler";
 static mutex_t cc1100_mutex;
 volatile int cc1100_mutex_pid;
+static swtimer_t cc1100_watch_dog;
+static swtime_t cc1100_watch_dog_period = 0;
+
 static uint16_t cc1100_event_handler_pid;
 static void cc1100_event_handler_function(void);
-static swtimer_t cc1100_watch_dog;
-static uint64_t cc1100_watch_dog_period = 0;
+
+static char event_handler_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 /*---------------------------------------------------------------------------*/
 // 				Sequence number buffer management data structures
@@ -114,10 +119,10 @@ typedef struct
 	uint64_t m_ticks;			///< 64-bit timestamp
 	uint8_t source;				///< Source address
 	uint8_t identification;		///< Identification (1-bit)
-} seq_buffer_entry;
+} seq_buffer_entry_t;
 
 /// Sequence number buffer for this layer
-static seq_buffer_entry seq_buffer[MAX_SEQ_BUFFER_SIZE];
+static seq_buffer_entry_t seq_buffer[MAX_SEQ_BUFFER_SIZE];
 
 /// Next position to enter a new value into ::seqBuffer
 static uint8_t seq_buffer_pos = 0;
@@ -181,14 +186,14 @@ void cc1100_phy_init()
 	pm_init_table((pm_table_t*)&handler_table, MAX_PACKET_HANDLERS, handlers);
 
 	// Clear sequence number buffer
-	memset(seq_buffer, 0, sizeof(seq_buffer_entry) * MAX_SEQ_BUFFER_SIZE);
+	memset(seq_buffer, 0, sizeof(seq_buffer_entry_t) * MAX_SEQ_BUFFER_SIZE);
 
 	// Initialize mutex
 	cc1100_mutex_pid = -1;
 	mutex_init(&cc1100_mutex);
 
 	// Allocate event numbers and start cc1100 event process
-	cc1100_event_handler_pid = thread_create(2500, PRIORITY_CC1100, CREATE_STACKTEST,
+	cc1100_event_handler_pid = thread_create(event_handler_stack, sizeof(event_handler_stack), PRIORITY_CC1100, CREATE_STACKTEST,
 			cc1100_event_handler_function, cc1100_event_handler_name);
 
 	// Active watchdog for the first time
@@ -206,9 +211,9 @@ void cc1100_phy_init()
 
 void cc1100_phy_mutex_lock(void)
 {
-	if (fk_thread->pid != cc1100_mutex_pid) {
+	if (active_thread->pid != cc1100_mutex_pid) {
 		mutex_lock(&cc1100_mutex);
-		cc1100_mutex_pid = fk_thread->pid;
+		cc1100_mutex_pid = active_thread->pid;
 	}
 }
 
@@ -377,7 +382,7 @@ static bool contains_seq_entry(uint8_t src, uint8_t id)
 		{
 			// Check if time stamp is OK
 			cmp = (radio_mode == CC1100_MODE_WOR) ? cc1100_wor_config.rx_interval : 16000; // constant RX ~16ms
-			if ((now - seq_buffer[i].m_ticks) <= cmp)
+            if ((now - seq_buffer[i].m_ticks) <= cmp)
 			{
 				return true;
 			}
@@ -407,7 +412,7 @@ static void add_seq_entry(uint8_t src, uint8_t id)
 	// Add new entry
 	seq_buffer[seq_buffer_pos].source = src;
 	seq_buffer[seq_buffer_pos].identification = id;
-	seq_buffer[seq_buffer_pos].m_ticks = swtimer_now();
+    seq_buffer[seq_buffer_pos].m_ticks = swtimer_now();
 
 	// Store 16 bit sequence number of layer 0 for speedup
 	last_seq_num = src;
@@ -619,7 +624,8 @@ int cc1100_set_packet_handler(protocol_t protocol, packet_handler_t handler)
 
 static void cc1100_event_handler_function(void)
 {
-    msg m;
+    msg_t m;
+
     while (1)
     {
     	if (cc1100_watch_dog_period != 0) {
@@ -680,7 +686,7 @@ static void cc1100_event_handler_function(void)
 
 void cc1100_phy_rx_handler(void)
 {
-	msg m;
+	msg_t m;
 	m.type = MSG_POLL;
 	bool dup = false;
 	bool res = false;

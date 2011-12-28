@@ -1,0 +1,14 @@
+# ******************************************************************************
+# Copyright 2010, Freie Universitaet Berlin (FUB). All rights reserved.
+# ******************************************************************************
+# $Id$
+
+BOARD = chronos ;
+CPU = cc430 ;
+MCU = cc430x6137 ;
+
+HDRS += [ FPath $(TOP) board chronos drivers include ] ;
+
+FLASHER ?= mspdebug ;
+FLASHFLAGS ?= rf2500 ;
+

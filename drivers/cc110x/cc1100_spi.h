@@ -44,14 +44,14 @@ and the mailinglist (subscription via web site)
 #ifndef CC1100_SPI_H_
 #define CC1100_SPI_H_
 
-int cc1100_get_gdo0(void);
-int cc1100_get_gdo1(void);
-int cc1100_get_gdo2(void);
+int cc110x_get_gdo0(void);
+int cc110x_get_gdo1(void);
+int cc110x_get_gdo2(void);
 
-void cc1100_spi_init(void);
-void cc1100_spi_cs(void);
-void cc1100_spi_select(void);
-void cc1100_spi_unselect(void);
+void cc110x_spi_init(void);
+void cc110x_spi_cs(void);
+void cc110x_spi_select(void);
+void cc110x_spi_unselect(void);
 
 uint8_t cc1100_spi_writeburst_reg(uint8_t addr, char *buffer, uint8_t count);
 void cc1100_spi_readburst_reg(uint8_t addr, char *buffer, uint8_t count);

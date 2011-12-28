@@ -1,0 +1,5 @@
+SubDir TOP projects laser ;
+
+Module laser : main.c : sht11 ltc4150 swtimer auto_init ;
+
+UseModule laser ;

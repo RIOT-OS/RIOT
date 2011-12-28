@@ -27,13 +27,18 @@
 
 SubDir TOP sys ;
 
+Module timex : timex.c ;
+Module vtimer : vtimer.c : hwtimer timex ;
 Module swtimer : swtimer.c : hwtimer ;
 Module posix_io : posix_io.c ;
+Module config : config.c : board_config ;
 
 Module auto_init : auto_init.c ;
 
 Module chardev_thread : chardev_thread.c : ringbuffer ;
 Module uart0 : uart0.c : ringbuffer chardev_thread ;
+
+Module transceiver : transceiver.c ;
 
 SubInclude TOP sys net ;
 SubInclude TOP sys lib ;

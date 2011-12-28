@@ -40,6 +40,7 @@ and the mailinglist (subscription via web site)
  *
  * @note		$Id: sht11.h 667 2009-02-19 15:06:38Z baar $
  */
+#include <stdint.h>
 
 #define SHT11_NO_ACK		(0)
 #define SHT11_ACK			(1)
@@ -50,8 +51,12 @@ and the mailinglist (subscription via web site)
 #define SHT11_MEASURE_HUMI	(0x05) 	//000  0010	   1
 #define SHT11_RESET			(0x1E) 	//000  1111	   0
 
-/**
- * set measurement timeout to 1 second */
+/* time to wait after toggling the data line */
+#define SHT11_DATA_WAIT     (HWTIMER_TICKS(1))
+/* time to wait after toggling the clock line */
+#define SHT11_CLK_WAIT      (HWTIMER_TICKS(1))
+
+/* set measurement timeout to 1 second */
 #define SHT11_MEASURE_TIMEOUT   (1000)
 
 /**

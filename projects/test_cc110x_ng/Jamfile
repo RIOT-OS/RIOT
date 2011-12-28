@@ -1,0 +1,5 @@
+SubDir TOP projects test_cc110x_ng ;
+
+Module test_cc110x_ng : main.c : cc110x_ng shell shell_commands transceiver ps rtc posix_io uart0 auto_init swtimer config ltc4150 ;
+
+UseModule test_cc110x_ng ;

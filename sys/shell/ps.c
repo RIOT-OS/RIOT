@@ -1,6 +1,6 @@
 #include <thread.h>
 #include <hwtimer.h>
-#include <scheduler.h>
+#include <sched.h>
 #include <stdio.h>
 
 /* list of states copied from tcb.h */
@@ -27,7 +27,7 @@ void thread_print_all(void)
 
     printf("\tpid | %-21s| %-9sQ | pri | stack ( used) location   | runtime | switches \n", "name", "state");
     for( i = 0; i < MAXTHREADS; i++ ) {
-        tcb* p = (tcb*)fk_threads[i];
+        tcb_t* p = (tcb_t*)sched_threads[i];
 
         if( p != NULL ) {
             int state = p->status;                                          // copy state
@@ -42,7 +42,7 @@ void thread_print_all(void)
             switches = pidlist[i].schedules;
 #endif
             overall_stacksz += stacksz;
-            stacksz -= fk_measure_stack_free(p->stack_start);
+            stacksz -= thread_measure_stack_usage(p->stack_start);
             printf("\t%3u | %-21s| %-8s %.1s | %3i | %5i (%5i) %p | %6.3f%% | %8i\n",
                     p->pid, p->name, sname, queued, p->priority, p->stack_size, stacksz, p->stack_start, runtime, switches);
         }

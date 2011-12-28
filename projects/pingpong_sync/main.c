@@ -5,7 +5,7 @@
 
 void second_thread(void) {
     printf("second_thread starting.\n");
-    msg m;
+    msg_t m;
     int i = 1;
     while(1) {
         msg_receive(&m);
@@ -15,13 +15,15 @@ void second_thread(void) {
     }
 }
 
+char second_thread_stack[8192];
+
 int main(void)
 {
     printf("Hello world!\n");
 
-    msg m;
+    msg_t m;
 
-    int pid = thread_create(8192, PRIORITY_MAIN-1, CREATE_WOUT_YIELD | CREATE_STACKTEST, second_thread, "pong");
+    int pid = thread_create(second_thread_stack, sizeof(second_thread_stack), PRIORITY_MAIN-1, CREATE_WOUT_YIELD | CREATE_STACKTEST, second_thread, "pong");
     
     m.content.value = 1;
 

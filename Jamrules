@@ -31,15 +31,15 @@
 include $(TOP)$(SLASH)Jamrules.common ;
 
 #
-# Setup FeuerWare build system configuration (default values for common options)
+# Setup ukleos build system configuration (default values for common options)
 #
-PROJECT = $(PROJECT:E=hello-world) ;
+PROJECT = $(PROJECT:E=default) ;
 BOARD = $(BOARD:E=msba2) ;
 SUFFIX ?= "" ; # must be at least "" !!!     
 TARGET = "$(BOARD)-$(PROJECT)$(SUFFIX)$(SUFEXE)" ;      # main target binary
 OPENOCD_IF ?= olimex-jtag-tiny-a ;
 
-TERMINAL ?= board/msba2/tools/bin/pseudoterm ;
+TERMINAL ?= tools/pyterm/pyterm.py ;
 
 if $(NT) || $(OS) = CYGWIN {
     PORT = $(PORT:E=1) ;
@@ -53,7 +53,6 @@ CCFLAGS += -DBOARD=BOARD_$(BOARD:U) ;
 # core source directories
 HDRS += $(TOP) ;
 HDRS += [ FPath $(TOP) core include ] ;
-HDRS += [ FPath $(TOP) hal include ] ;
 HDRS += [ FPath $(TOP) sys include ] [ FPath $(TOP) sys config ] [ FPath $(TOP) sys drivers include ] [ FPath $(TOP) sys drivers cc110x ] [ FPath $(TOP) sys drivers nanopan5375 ] ;
 HDRS += [ FPath $(TOP) sys net ] ;
 HDRS += [ FPath $(TOP) sys lib ] [ FPath $(TOP) sys lib fat include ] ;
@@ -74,3 +73,4 @@ HDRS += [ FPath $(TOP) projects $(PROJECT) ] ;
 # drivers
 HDRS += [ FPath $(TOP) drivers include ] ;
 HDRS += [ FPath $(TOP) drivers cc110x ] ;
+HDRS += [ FPath $(TOP) drivers cc110x_ng include ] ;

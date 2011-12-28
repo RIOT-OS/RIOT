@@ -49,14 +49,8 @@ and the mailinglist (subscription via web site)
 #define PREINT_RTC	0x000001C8  /* Prescaler value, integer portion, PCLK = 15Mhz */
 #define PREFRAC_RTC	0x000061C0  /* Prescaler value, fraction portion, PCLK = 15Mhz */
 
-#define DEBUG 0
-#if DEBUG
-#include <stdio.h>
-#define PRINTF(fmt, args...)		printf("rtc: " fmt "\n", ##args)
-#else
-#define PRINTF(fmt, args...)
-#endif
-
+#define ENABLE_DEBUG 0
+#include <debug.h>
 
 /**
  * @brief	epoch time in hour granularity
@@ -68,7 +62,7 @@ static volatile time_t epoch;
  * @brief	Sets the current time in broken down format directly from to RTC
  * @param[in]	localt		Pointer to structure with time to set
  */
-static void
+void
 rtc_set_localtime(struct tm* localt)
 {
 	if( localt == NULL )
@@ -93,14 +87,14 @@ void rtc_set(time_t time) {
 }
 /*---------------------------------------------------------------------------*/
 /// set clock to start of unix epoch
-void _rtc_reset(void)
+void rtc_reset(void)
 {
     rtc_set(0);
 	epoch = 0;
 }
 /*---------------------------------------------------------------------------*/
 void
-_rtc_set_alarm(struct tm* localt, enum rtc_alarm_mask mask)
+rtc_set_alarm(struct tm* localt, enum rtc_alarm_mask mask)
 {
 	if( localt != NULL ) {
 		RTC_ALSEC = localt->tm_sec;
@@ -112,7 +106,7 @@ _rtc_set_alarm(struct tm* localt, enum rtc_alarm_mask mask)
 		RTC_ALMON = localt->tm_mon + 1;
 		RTC_ALYEAR = localt->tm_year;
 		RTC_AMR = ~mask;											// set wich alarm fields to check
-		PRINTF("alarm set %2lu.%2lu.%4lu  %2lu:%2lu:%2lu",
+		DEBUG("alarm set %2lu.%2lu.%4lu  %2lu:%2lu:%2lu\n",
 				RTC_ALDOM, RTC_ALMON, RTC_ALYEAR, RTC_ALHOUR, RTC_ALMIN, RTC_ALSEC);
 	} else {
 		RTC_AMR = 0xff;
@@ -120,7 +114,7 @@ _rtc_set_alarm(struct tm* localt, enum rtc_alarm_mask mask)
 }
 /*---------------------------------------------------------------------------*/
 enum rtc_alarm_mask
-_rtc_get_alarm(struct tm* localt)
+rtc_get_alarm(struct tm* localt)
 {
 	if( localt != NULL ) {
 		localt->tm_sec = RTC_ALSEC;
@@ -151,7 +145,7 @@ void RTC_IRQHandler (void)
 	} else if( RTC_ILR & ILR_RTCALF ) {
 		RTC_ILR |= ILR_RTCALF;
 		RTC_AMR = 0xff;						// disable alarm irq
-		PRINTF("alarm");
+		DEBUG("Ring\n");
 		lpm_end_awake();
 	}
 
@@ -183,10 +177,10 @@ void rtc_init(void)
 	/* initialize clock with valid unix compatible values
 	 * If RTC_YEAR contains an value larger unix time_t we must reset. */
 	if( RTC_YEAR > 2037 ) {
-		_rtc_reset();
+		rtc_reset();
 	}
 
-	PRINTF("%2lu.%2lu.%4lu  %2lu:%2lu:%2lu epoch %lu",
+	DEBUG("%2lu.%2lu.%4lu  %2lu:%2lu:%2lu epoch %lu\n",
 			RTC_DOM, RTC_MONTH, RTC_YEAR, RTC_HOUR, RTC_MIN, RTC_SEC,
 			epoch);
 }
@@ -242,7 +236,7 @@ rtc_get_localtime(struct tm* localt)
 	}
 }
 /*---------------------------------------------------------------------------*/
-void _gettimeofday_r(struct _reent *r, struct timeval *ptimeval, struct timezone *ptimezone)
+void gettimeofday_r(struct _reent *r, struct timeval *ptimeval, struct timezone *ptimezone)
 {
 	r->_errno = 0;
 	if( ptimeval != NULL ) {

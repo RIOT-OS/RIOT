@@ -55,7 +55,7 @@ Undef_Addr:     .word   UNDEF_Routine		/* defined in main.c  */
 SWI_Addr:       .word   ctx_switch 			/* defined in main.c  */
 PAbt_Addr:      .word   UNDEF_Routine		/* defined in main.c  */
 DAbt_Addr:      .word   UNDEF_Routine		/* defined in main.c  */
-IRQ_Addr:       .word   fk_cpu_irq_isr  	/* defined in main.c  */
+IRQ_Addr:       .word   arm_irq_handler  	/* defined in main.c  */
 FIQ_Addr:       .word   FIQ_Routine			/* defined in main.c  */
                 .word   0					/* rounds the vectors and ISR addresses to 64 bytes total  */
 

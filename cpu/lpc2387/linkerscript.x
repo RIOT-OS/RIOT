@@ -28,6 +28,7 @@ and the mailinglist (subscription via web site)
 MEMORY 
 {
 	flash     			: ORIGIN = 0,          LENGTH = 512K	/* FLASH ROM                            	*/
+    infomem             : ORIGIN = 0x0007D000, LENGTH = 4K      /* Last sector in FLASH ROM for config data */
 	ram_battery			: ORIGIN = 0xE0084000, LENGTH = 2K		/* Battery RAM								*/
 	ram   				: ORIGIN = 0x40000000, LENGTH = 64K		/* LOCAL ON-CHIP STATIC RAM					*/
 	ram_usb				: ORIGIN = 0x7FD00000, LENGTH = 16K		/* USB RAM 									*/
@@ -75,6 +76,16 @@ SECTIONS
 		__cfgspec_end = .;		
 		. = ALIGN(4);
 		
+		__ctors_start = .;
+        	PROVIDE (_os_ctor_start = .);
+        	*(.ctors);
+        	KEEP (*(.init_array))
+        	PROVIDE (_os_ctor_end = .);
+		__ctors_end = .;
+	        *(.dtors);
+	        LONG (0);
+
+
 		*(.rodata .rodata.*)			/* all .rodata sections (constants, strings, etc.)  */
 		*(.gnu.linkonce.r.*)
 		*(.glue_7)						/* all .glue_7 sections  (no idea what these are) */
@@ -98,9 +109,35 @@ SECTIONS
 	. = ALIGN(4);
 	_etext = . ;						/* define a global symbol _etext just after the last code byte */
 
+    .config : 
+    {
+        *(.configmem) 
+        . = ALIGN(256);
+    } >infomem
+    . = ALIGN(4);
+
 	/**************************************************************************
 	 * RAM
 	 **************************************************************************/
+
+
+	.ctors (NOLOAD) :
+	{
+	    . = ALIGN(4096);
+	    start_ctors = .;
+	    *(.init_array);
+	    *(.ctors);
+	    end_ctors = .;
+	} >ram
+
+	.dtors (NOLOAD) :
+	{
+	    . = ALIGN(4096);
+	    start_dtors = .;
+	    *(.fini_array);
+	    *(.dtors);
+	    end_dtors = .;
+	} >ram
 
 	/*
 	 * collect all uninitialized sections that go into RAM
@@ -122,7 +159,7 @@ SECTIONS
 	{
 		. = ALIGN(4);					/* ensure data is aligned so relocation can use 4-byte operations */
 		__bss_start = .;				/* define a global symbol marking the start of the .bss section */
-		*(.bss)							/* all .bss sections  */
+		*(.bss*)						/* all .bss sections  */
 		*(COMMON)
 	} > ram								/* put all the above in RAM (it will be cleared in the startup code */
 	. = ALIGN(4);						/* ensure data is aligned so relocation can use 4-byte operations */

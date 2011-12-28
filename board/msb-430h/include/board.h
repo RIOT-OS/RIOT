@@ -60,8 +60,9 @@ and the mailinglist (subscription via web site)
 #define LEDS_CONF_GREEN		0x00
 #define LEDS_CONF_YELLOW	0x00
 
-#define RED_ON      LEDS_PxOUT &=~LEDS_CONF_RED
-#define RED_OFF     LEDS_PxOUT |= LEDS_CONF_RED
+#define LED_RED_ON      LEDS_PxOUT &=~LEDS_CONF_RED
+#define LED_RED_OFF     LEDS_PxOUT |= LEDS_CONF_RED
+#define LED_RED_TOGGLE     LEDS_PxOUT ^= LEDS_CONF_RED
 
 #include <msp430x16x.h>
 

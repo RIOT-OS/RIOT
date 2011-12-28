@@ -160,19 +160,19 @@ volatile int wor_hwtimer_id = -1;
 
 void cc1100_disable_interrupts(void)
 {
-	cc1100_gdo2_disable();
-	cc1100_gdo0_disable();
+	cc110x_gdo2_disable();
+	cc110x_gdo0_disable();
 }
 
-void cc1100_gdo0_irq(void)
+void cc110x_gdo0_irq(void)
 {
 	// Air was not free -> Clear CCA flag
 	rflags.CAA = false;
 	// Disable carrier sense detection (GDO0 interrupt)
-	cc1100_gdo0_disable();
+	cc110x_gdo0_disable();
 }
 
-void cc1100_gdo2_irq(void)
+void cc110x_gdo2_irq(void)
 {
 	cc1100_phy_rx_handler();
 }
@@ -251,9 +251,9 @@ bool cc1100_spi_receive_packet(uint8_t *rxBuffer, uint8_t length)
 void cc1100_set_idle(void) {
 	if (radio_state == RADIO_WOR) {
 		// Wake up the chip from WOR/sleep
-		cc1100_spi_select();
+		cc110x_spi_select();
 		hwtimer_wait(RTIMER_TICKS(122));
-		cc1100_spi_unselect();
+		cc110x_spi_unselect();
 		radio_state = RADIO_IDLE;
 		// XOSC startup + FS calibration (300 + 809 us  ~ 1.38 ms)
 		hwtimer_wait(FS_CAL_TIME);
@@ -292,9 +292,9 @@ static void wakeup_from_wor(void)
 		return;
 	}
 	// Wake up the chip from WOR/sleep
-	cc1100_spi_select();
+	cc110x_spi_select();
 	hwtimer_wait(RTIMER_TICKS(122));
-	cc1100_spi_unselect();
+	cc110x_spi_unselect();
 	radio_state = RADIO_IDLE;
 	// XOSC startup + FS calibration (300 + 809 us  ~ 1.38 ms)
 	hwtimer_wait(FS_CAL_TIME);
@@ -305,7 +305,7 @@ static void wakeup_from_wor(void)
  */
 void switch_to_wor2(void)
 {
-	if (cc1100_get_gdo2()) return;				// If incoming packet, then don't go to WOR now
+	if (cc110x_get_gdo2()) return;				// If incoming packet, then don't go to WOR now
 	cc1100_spi_strobe(CC1100_SIDLE);			// Put CC1100 to IDLE
 	radio_state = RADIO_IDLE;					// Radio state now IDLE
 	cc1100_spi_write_reg(CC1100_MCSM2,
@@ -336,7 +336,7 @@ static void hwtimer_switch_to_wor2_wrapper(void* ptr)
 static void switch_to_wor(void)
 {
 	// Any incoming packet?
-	if (cc1100_get_gdo2())
+	if (cc110x_get_gdo2())
 	{
 		// Then don't go to WOR now
 		return;
@@ -558,16 +558,16 @@ void cc1100_hwtimer_go_receive_wrapper(void *ptr)
 static void reset(void)
 {
 	cc1100_go_idle();
-	cc1100_spi_select();
+	cc110x_spi_select();
 	cc1100_spi_strobe(CC1100_SRES);
 	hwtimer_wait(RTIMER_TICKS(10));
 }
 
 static void power_up_reset(void)
 {
-	cc1100_spi_unselect();
-	cc1100_spi_cs();
-	cc1100_spi_unselect();
+	cc110x_spi_unselect();
+	cc110x_spi_cs();
+	cc110x_spi_unselect();
 	hwtimer_wait(RESET_WAIT_TIME);
 	reset();
 	radio_state = RADIO_IDLE;
@@ -587,7 +587,7 @@ void cc1100_send_raw(uint8_t *tx_buffer, uint8_t size)
 	if (size > PACKET_LENGTH) return;
 
 	// Disables RX interrupt etc.
-	cc1100_before_send();
+	cc110x_before_send();
 
 	// But CC1100 in IDLE mode to flush the FIFO
     cc1100_spi_strobe(CC1100_SIDLE);
@@ -600,7 +600,7 @@ void cc1100_send_raw(uint8_t *tx_buffer, uint8_t size)
     unsigned int cpsr = disableIRQ();
     cc1100_spi_strobe(CC1100_STX);
     // Wait for GDO2 to be set -> sync word transmitted
-    while (cc1100_get_gdo2() == 0) {
+    while (cc110x_get_gdo2() == 0) {
     	abort_count++;
     	if (abort_count > CC1100_SYNC_WORD_TX_TIME) {
     		// Abort waiting. CC1100 maybe in wrong mode
@@ -611,9 +611,9 @@ void cc1100_send_raw(uint8_t *tx_buffer, uint8_t size)
     }
     restoreIRQ(cpsr);
 	// Wait for GDO2 to be cleared -> end of packet
-    while (cc1100_get_gdo2() != 0);
+    while (cc110x_get_gdo2() != 0);
     // Experimental - TOF Measurement
-    cc1100_after_send();
+    cc110x_after_send();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -742,7 +742,7 @@ rssi_2_dbm(uint8_t rssi)
 void cc1100_init(void)
 {
     // Initialize SPI
-	cc1100_spi_init();
+	cc110x_spi_init();
 
     // Set default mode (with default (energy optimized) RX interval)
 	cc1100_set_mode0(CC1100_RADIO_MODE, T_RX_INTERVAL);
@@ -834,7 +834,7 @@ rd_set_mode(int mode)
 	switch (mode)
 	{
 		case RADIO_MODE_ON:
-			cc1100_init_interrupts();			// Enable interrupts
+			cc110x_init_interrupts();			// Enable interrupts
 			cc1100_setup_mode();				// Set chip to desired mode
 			break;
 		case RADIO_MODE_OFF:
@@ -877,19 +877,19 @@ void cc1100_cs_set_enabled(bool enabled)
 	if (enabled)
 	{
 		// Enable carrier sense detection (GDO0 interrupt)
-		cc1100_gdo0_enable();
+		cc110x_gdo0_enable();
 	}
 	else
 	{
 		// Disable carrier sense detection (GDO0 interrupt)
-		cc1100_gdo0_disable();
+		cc110x_gdo0_disable();
 	}
 }
 
 int cc1100_cs_read(void)
 {
 	/* GDO0 reflects CS (high: air not free, low: air free) */
-	return cc1100_get_gdo0();
+	return cc110x_get_gdo0();
 }
 
 int cc1100_cs_read_cca(void)

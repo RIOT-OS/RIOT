@@ -46,12 +46,16 @@ static unsigned int last_int_time;
 static unsigned int last_int_duration;
 static unsigned int start_time;
 
-static double int_to_coulomb(int ints) {
+static double __attribute__((__no_instrument_function__)) int_to_coulomb(int ints) {
     return ((double)ints) / (_GFH * _R_SENSE);
 }
 
-static double coulomb_to_mA(double coulomb){
+static double __attribute__((__no_instrument_function__)) coulomb_to_mA(double coulomb){
     return (coulomb * 1000) / 3600;
+}
+
+static double mAh_to_Joule(double mAh) {
+    return (SUPPLY_VOLTAGE * mAh * 3600);
 }
 
 uint32_t ltc4150_get_last_int_duration_us() {
@@ -62,15 +66,23 @@ double ltc4150_get_current_mA() {
     return 1000000000/(ltc4150_get_last_int_duration_us()*(_GFH * _R_SENSE));
 }
 
-double ltc4150_get_total_mA() {
+double __attribute__((__no_instrument_function__)) ltc4150_get_total_mAh() {
     return coulomb_to_mA(int_to_coulomb(int_count));
+}
+
+double ltc4150_get_total_Joule(void) {
+    return mAh_to_Joule(ltc4150_get_total_mAh());
 }
 
 double ltc4150_get_avg_mA() {
     return (int_to_coulomb(int_count)*1000000000)/HWTIMER_TICKS_TO_US(last_int_time - start_time);
 }
 
-unsigned long ltc4150_get_intcount() {
+int ltc4150_get_interval() {
+    return HWTIMER_TICKS_TO_US(last_int_time - start_time);
+}
+
+unsigned long __attribute__((__no_instrument_function__)) ltc4150_get_intcount() {
     return int_count;
 }
 
@@ -92,7 +104,7 @@ void ltc4150_stop() {
     ltc4150_disable_int();
 }
 
-void ltc4150_interrupt()
+void __attribute__((__no_instrument_function__)) ltc4150_interrupt()
 {
     uint32_t now = hwtimer_now();
     if (now >= last_int_time) {

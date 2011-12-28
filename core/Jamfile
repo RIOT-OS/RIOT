@@ -27,8 +27,8 @@
 
 SubDir TOP core ;
 
-Module core : kernel_init.c scheduler.c mutex.c msg.c queue.c 
-                clist.c thread.c bitarithm.c ;
+Module core : kernel_init.c sched.c mutex.c msg.c thread.c : core_lib ;
+Module core_lib : queue.c clist.c bitarithm.c cib.c lifo.c ;
 
 Module hwtimer : hwtimer.c : hwtimer_cpu ;
 
