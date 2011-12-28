@@ -79,6 +79,7 @@ void mutex_wait(struct mutex_t *mutex) {
     /* we were woken up by scheduler. waker removed us from queue. we have the mutex now. */
 }
 
+<<<<<<< HEAD
 void mutex_unlock(struct mutex_t* mutex, int yield) {
     DEBUG("%s: unlocking mutex. val: %u pid: %u\n", active_thread->name, mutex->val, thread_pid);
     int irqstate = disableIRQ();
@@ -94,6 +95,28 @@ void mutex_unlock(struct mutex_t* mutex, int yield) {
         } else {
             mutex->val = 0;
         }
+=======
+void mutex_wake_waiters(struct mutex_t *mutex, int flags) {
+    if ( ! (flags & MUTEX_INISR)) dINT();
+    DEBUG("%s: waking up waiters.\n", fk_thread->name);
+
+    queue_node_t *next = queue_remove_head(&(mutex->queue));
+
+    /* queue is empty */
+    if (!next) {
+        mutex->val = 0;
+        return;
+    }
+
+    tcb* process = (tcb*)next->data;
+
+    sched_set_status(process, STATUS_PENDING);
+
+    if ( mutex->queue.next != NULL) {
+        mutex->val = -1;
+    } else {
+        mutex->val = process->pid;
+>>>>>>> 2919cc18c84c53e1aedb6c7e3f39162635b5ab70
     }
 
     restoreIRQ(irqstate);

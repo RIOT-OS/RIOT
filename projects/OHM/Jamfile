@@ -1,0 +1,7 @@
+SubDir TOP projects OHM ;
+
+CCFLAGS += -DSCHEDSTATISTICS ;
+
+Module OHM : profiling.c main.c ohm_routing.c protocol_msg_gateway.c ohm_cc1100.c ohm_rtc.c ohm_ltc4150.c : cc110x sht11 gpioint shell shell_commands posix_io uart0 auto_init rtc ps board_ltc4150  ;
+
+UseModule OHM ;
