@@ -25,10 +25,8 @@
 # ******************************************************************************
 # $Id$
 
-SubDir TOP board $(BOARD) ;
+SubDir TOP board msb-430 ;
 
-Module board : board_init.c : board_common board_uart ;
-UseModule board ;
-
-SubInclude TOP board msba2-common ;
+SubInclude TOP board msb-430-common ;
 SubInclude TOP cpu $(CPU) ;
+

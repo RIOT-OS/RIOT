@@ -25,10 +25,10 @@
 # ******************************************************************************
 # $Id$
 
-SubDir TOP board $(BOARD) ;
+SubDir TOP board msb-430-common ;
 
-Module board : board_init.c : board_common board_uart ;
+Module board : board_init.c uart1.c ;
+Module board_config : board_config.c : flashrom ;
 UseModule board ;
 
-SubInclude TOP board msba2-common ;
 SubInclude TOP cpu $(CPU) ;

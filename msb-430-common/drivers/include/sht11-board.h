@@ -24,47 +24,38 @@ and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
-#ifndef _MSB_BOARD_H
-#define _MSB_BOARD_H
+#ifndef SHT11BOARD_H_
+#define SHT11BOARD_H_
 
 /**
- * @defgroup	msb_430h		ScatterWeb MSB-430H
- * @ingroup		msp430
- *
-<h2>Compontents</h2>
-\li MSP430
-\li CC1100
-
-* @{
-*/
+ * @ingroup	    msb_430h
+ * @{
+ */
 
 /**
  * @file
- * @brief		MSB-430H Board
+ * @brief		SHT11 Device Driver Configuration For MSB-430 Platform
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics, µkleos
  * @version     $Revision$
  *
  * @note		$Id$
  */
-
-//MSB430 core
-#define MSP430_INITIAL_CPU_SPEED    7372800uL
-#define MSP430_HAS_DCOR             1
-#define MSP430_HAS_EXTERNAL_CRYSTAL 1
-
-/* LEDs ports MSB430 */
-#define LEDS_PxDIR P5DIR
-#define LEDS_PxOUT P5OUT
-#define LEDS_CONF_RED		0x80
-#define LEDS_CONF_GREEN		0x00
-#define LEDS_CONF_YELLOW	0x00
-
-#define LED_RED_ON      LEDS_PxOUT &=~LEDS_CONF_RED
-#define LED_RED_OFF     LEDS_PxOUT |= LEDS_CONF_RED
-#define LED_RED_TOGGLE     LEDS_PxOUT ^= LEDS_CONF_RED
-
 #include <msp430x16x.h>
+#include <bitarithm.h>
+
+/* SCK  = P3B5
+ * DATA = P3B4
+ */
+
+#define SHT11_SCK_LOW	P3OUT &= ~(BIT5);     /**< serial clock line low */
+#define SHT11_SCK_HIGH	P3OUT |= BIT5;      /**< serial clock line high */
+#define SHT11_DATA		(P3IN & BIT5)      /**< read serial I/O */
+#define SHT11_DATA_LOW	P3OUT &= ~(BIT5); 	/**< serial I/O line low */
+#define SHT11_DATA_HIGH	P3OUT |= BIT5;      /**< serial I/O line high */
+#define SHT11_DATA_IN	P3DIR &= ~(BIT5);      /**< serial I/O as input */
+#define SHT11_DATA_OUT	P3DIR |= BIT5;      /**< serial I/O as output */
+#define SHT11_INIT		P3DIR |= BIT5;      /* FIO1DIR |= BIT25; PINSEL3 &= ~(BIT14|BIT15 | BIT16|BIT17); */
 
 /** @} */
-#endif // _MSB_BOARD_H
+#endif /* SHT11BOARD_H_ */

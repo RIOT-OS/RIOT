@@ -51,12 +51,12 @@ int counter = 0;
 
 void Timer0_IRQHandler (void)
 {
-    extern unsigned int fk_context_switch_request;
+    extern unsigned int sched_context_switch_request;
     counter++;
 	T0IR |= 0xff;											// reset timer1 interrupt flag
 	sl_printf("#");
 
-    fk_context_switch_request = 1;
+    sched_context_switch_request = 1;
 
 	VICVectAddr = 0;										// acknowledge interrupt (if using VIC IRQ)
 }

@@ -25,10 +25,14 @@
 # ******************************************************************************
 # $Id$
 
-SubDir TOP board $(BOARD) ;
+CPU = msp430x16x ;
+MCU = msp430x1612 ;
 
-Module board : board_init.c : board_common board_uart ;
-UseModule board ;
+FLASH_PORT ?= "$(PORT)" ;
+FLASHER ?= mspdebug ;
+FLASHFLAGS ?= -d $(FLASH_PORT) -j uif ;
 
-SubInclude TOP board msba2-common ;
-SubInclude TOP cpu $(CPU) ;
+RESET ?= $(FLASHER) $(FLASHFLAGS) reset ;
+
+HDRS += [ FPath $(TOP) board msb-430-common include ] ;
+HDRS += [ FPath $(TOP) board msb-430-common drivers include ] ;

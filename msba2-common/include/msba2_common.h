@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright 2009, Freie Universitaet Berlin (FUB). All rights reserved.
+Copyright 2008, Freie Universitaet Berlin (FUB). All rights reserved.
 
 These sources were developed at the Freie Universitaet Berlin, Computer Systems
 and Telematics group (http://cst.mi.fu-berlin.de).
@@ -24,47 +24,28 @@ and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
-#ifndef _MSB_BOARD_H
-#define _MSB_BOARD_H
+#ifndef __MSBA2_COMMON_H
+#define __MSBA2_COMMON_H
 
 /**
- * @defgroup	msb_430h		ScatterWeb MSB-430H
- * @ingroup		msp430
- *
-<h2>Compontents</h2>
-\li MSP430
-\li CC1100
-
-* @{
-*/
+ * @ingroup		msb_a2
+ * @{
+ */
 
 /**
  * @file
- * @brief		MSB-430H Board
+ * @brief		MSB-A2 Common Board Definitions
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author		Kaspar Schleiser <kaspar@schleiser.de>
  * @version     $Revision$
  *
  * @note		$Id$
  */
 
-//MSB430 core
-#define MSP430_INITIAL_CPU_SPEED    7372800uL
-#define MSP430_HAS_DCOR             1
-#define MSP430_HAS_EXTERNAL_CRYSTAL 1
+#include <lpc2387.h>
 
-/* LEDs ports MSB430 */
-#define LEDS_PxDIR P5DIR
-#define LEDS_PxOUT P5OUT
-#define LEDS_CONF_RED		0x80
-#define LEDS_CONF_GREEN		0x00
-#define LEDS_CONF_YELLOW	0x00
-
-#define LED_RED_ON      LEDS_PxOUT &=~LEDS_CONF_RED
-#define LED_RED_OFF     LEDS_PxOUT |= LEDS_CONF_RED
-#define LED_RED_TOGGLE     LEDS_PxOUT ^= LEDS_CONF_RED
-
-#include <msp430x16x.h>
+#define VICIntEnClear VICIntEnClr
 
 /** @} */
-#endif // _MSB_BOARD_H
+#endif // __MSBA2_COMMON_H

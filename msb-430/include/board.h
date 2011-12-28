@@ -51,7 +51,7 @@ and the mailinglist (subscription via web site)
 //MSB430 core
 #define MSP430_INITIAL_CPU_SPEED    7372800uL
 #define MSP430_HAS_DCOR             1
-#define MSP430_HAS_EXTERNAL_CRYSTAL 1
+#define MSP430_HAS_EXTERNAL_CRYSTAL 0
 
 /* LEDs ports MSB430 */
 #define LEDS_PxDIR P5DIR

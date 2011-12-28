@@ -25,10 +25,10 @@
 # ******************************************************************************
 # $Id$
 
-SubDir TOP board $(BOARD) ;
+CPU = lpc2387 ;
 
-Module board : board_init.c : board_common board_uart ;
-UseModule board ;
+HDRS += [ FPath $(TOP) board msba2-common include ] ;
+HDRS += [ FPath $(TOP) board msba2-common drivers include ] ;
 
-SubInclude TOP board msba2-common ;
-SubInclude TOP cpu $(CPU) ;
+FLASHER ?= $(POSIXSHELL) lpc2k_pgm ;
+FLASHFLAGS ?= "$(PORT)" ;

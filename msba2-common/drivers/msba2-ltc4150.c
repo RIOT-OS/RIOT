@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright 2009, Freie Universitaet Berlin (FUB). All rights reserved.
+Copyright 2008-2009, Freie Universitaet Berlin (FUB). All rights reserved.
 
 These sources were developed at the Freie Universitaet Berlin, Computer Systems
 and Telematics group (http://cst.mi.fu-berlin.de).
@@ -24,47 +24,42 @@ and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
-#ifndef _MSB_BOARD_H
-#define _MSB_BOARD_H
-
 /**
- * @defgroup	msb_430h		ScatterWeb MSB-430H
- * @ingroup		msp430
- *
-<h2>Compontents</h2>
-\li MSP430
-\li CC1100
-
-* @{
-*/
+ * @ingroup		msba2
+ * @ingroup		ltc4150
+ * @{
+ */
 
 /**
  * @file
- * @brief		MSB-430H Board
+ * @brief		LTC4150 MSB-A2 specific implemetation
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
- * @version     $Revision$
- *
- * @note		$Id$
+ * @author		Heiko Will
+ * @author		Michael Baar
+ * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
  */
 
-//MSB430 core
-#define MSP430_INITIAL_CPU_SPEED    7372800uL
-#define MSP430_HAS_DCOR             1
-#define MSP430_HAS_EXTERNAL_CRYSTAL 1
+#include <stdio.h>
+#include "lpc2387.h"
+#include "ltc4150_arch.h"
+#include "gpioint.h"
 
-/* LEDs ports MSB430 */
-#define LEDS_PxDIR P5DIR
-#define LEDS_PxOUT P5OUT
-#define LEDS_CONF_RED		0x80
-#define LEDS_CONF_GREEN		0x00
-#define LEDS_CONF_YELLOW	0x00
+void __attribute__((__no_instrument_function__)) ltc4150_disable_int(void) {
+	gpioint_set(0, BIT4, GPIOINT_DISABLE, NULL);
+}
 
-#define LED_RED_ON      LEDS_PxOUT &=~LEDS_CONF_RED
-#define LED_RED_OFF     LEDS_PxOUT |= LEDS_CONF_RED
-#define LED_RED_TOGGLE     LEDS_PxOUT ^= LEDS_CONF_RED
+void __attribute__((__no_instrument_function__)) ltc4150_enable_int(void) {
+	gpioint_set(0, BIT4, GPIOINT_FALLING_EDGE, &ltc4150_interrupt);
+}
 
-#include <msp430x16x.h>
+void __attribute__((__no_instrument_function__)) ltc4150_sync_blocking(void) {
+	while(!(FIO0PIN & BIT4)) {};
+}
+
+void __attribute__((__no_instrument_function__)) ltc4150_arch_init() {
+    FIO0DIR |= BIT5;
+	FIO0SET = BIT5;
+}
 
 /** @} */
-#endif // _MSB_BOARD_H
