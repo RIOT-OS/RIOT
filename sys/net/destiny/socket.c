@@ -493,6 +493,7 @@ uint8_t read_from_socket(socket_internal_t *current_int_tcp_socket, void *buf, i
 		uint8_t read_bytes = current_int_tcp_socket->tcp_input_buffer_end;
 		memcpy(buf, current_int_tcp_socket->tcp_input_buffer, current_int_tcp_socket->tcp_input_buffer_end);
 		current_int_tcp_socket->tcp_input_buffer_end = 0;
+		current_int_tcp_socket->in_socket.local_tcp_status.window += read_bytes;
 		return read_bytes;
 		}
 	else
@@ -500,6 +501,7 @@ uint8_t read_from_socket(socket_internal_t *current_int_tcp_socket, void *buf, i
 		memcpy(buf, current_int_tcp_socket->tcp_input_buffer, len);
 		memmove(current_int_tcp_socket->tcp_input_buffer, (current_int_tcp_socket->tcp_input_buffer+len), current_int_tcp_socket->tcp_input_buffer_end-len);
 		current_int_tcp_socket->tcp_input_buffer_end = current_int_tcp_socket->tcp_input_buffer_end-len;
+		current_int_tcp_socket->in_socket.local_tcp_status.window += len;
 		return len;
 		}
 	}
@@ -832,14 +834,11 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 int accept(int s, sockaddr6_t *addr, uint32_t addrlen, uint8_t pid)
 	{
 	socket_internal_t *server_socket = getSocket(s);
-	printf("INFO: IN ACCEPT\n");
 	if (isTCPSocket(s) && (server_socket->in_socket.local_tcp_status.state == LISTEN))
 		{
-		printf("INFO: IN ACCEPT, LISTEN\n");
 		socket_t *current_queued_socket = getWaitingConnectionSocket(s);
 		if (current_queued_socket != NULL)
 			{
-			printf("INFO: IN ACCEPT, LISTEN, GOT QUEUED SOCKET\n");
 			return handle_new_tcp_connection(current_queued_socket, server_socket, pid);
 			}
 		else
