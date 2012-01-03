@@ -89,6 +89,11 @@ void tcp_ch(void)
 
 	close(SocketFD);
 
+//	while (1)
+//		{
+//		thread_sleep();
+//		}
+
 	}
 
 void init_udp_server(void)
@@ -122,7 +127,7 @@ void init_udp_server(void)
 void init_tcp_server(void)
 	{
 	sockaddr6_t stSockAddr;
-	uint8_t read_bytes;
+	int read_bytes = -1;
 	char buff_msg[MAX_TCP_BUFFER];
 	int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
@@ -158,6 +163,8 @@ void init_tcp_server(void)
 		{
 		// Decide whether a new thread should be used to handle the new connection or the same (other queued
 		// connections would not be handled!)
+		read_bytes = -1;
+		printf("INFO: WAITING FOR INC CONNECTIONS!\n");
 		int ConnectFD = accept(SocketFD, NULL, 0, tcp_server_thread_pid);
 		if(0 > ConnectFD)
 			{
@@ -166,12 +173,12 @@ void init_tcp_server(void)
 			exit(EXIT_FAILURE);
 			}
 
-		while (1)
+		while (read_bytes != 0)
 			{
 			read_bytes = recv(ConnectFD, buff_msg, MAX_TCP_BUFFER, 0);
 			printf("--- Message: %s ---\n", buff_msg);
 			}
-
+		printf("INFO: CLOSING SOCKET!\n");
 		close(ConnectFD);
 		}
 	}
@@ -204,8 +211,17 @@ void send_tcp_msg(char *str)
 	{
 	msg_t send_msg;
 	sscanf(str, "send_tcp %s", current_message.tcp_string_msg);
-	send_msg.content.value = 1;
-	msg_send(&send_msg, tcp_cht_pid, 0);
+	printf("Message: %s, strcmp: %i\n", current_message.tcp_string_msg, strcmp(current_message.tcp_string_msg, "close"));
+	if (strcmp(current_message.tcp_string_msg, "close") == 0)
+		{
+		send_msg.content.value = 0;
+		msg_send(&send_msg, tcp_cht_pid, 0);
+		}
+	else
+		{
+		send_msg.content.value = 1;
+		msg_send(&send_msg, tcp_cht_pid, 0);
+		}
 	}
 
 void connect_tcp(char *str)

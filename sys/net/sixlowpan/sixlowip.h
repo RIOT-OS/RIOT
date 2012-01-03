@@ -8,7 +8,7 @@
 #include <mutex.h>
 
 /* set maximum transmission unit */
-#define MTU                         1280
+#define MTU                         256
 /* IPv6 field values */ 
 #define IPV6_VER                    0x60
 #define PROTO_NUM_ICMPV6            58

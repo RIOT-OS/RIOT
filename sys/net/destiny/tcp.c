@@ -72,7 +72,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_in
 		tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end + tcp_payload_len;
 		}
 
-	net_msg_send(&m_send_tcp, tcp_socket->pid, 1, FID_RECV);
+	net_msg_send(&m_send_tcp, tcp_socket->pid, 1, FID_SOCKET_RECV);
 	return acknowledged_bytes;
 	}
 
@@ -80,13 +80,25 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 	{
 	msg_t m_recv_tcp, m_send_tcp;
 
-	if (getWaitingConnectionSocket(tcp_socket->socket_id) != NULL)
+	if (tcp_socket->in_socket.local_tcp_status.state == LAST_ACK)
+		{
+		net_msg_send(&m_send_tcp, tcp_socket->pid, 0, FID_SOCKET_RECV);
+		memset(tcp_socket, 0, sizeof(socket_internal_t));
+		return;
+		}
+	// TODO: Find better way of handling queued sockets ACK packets
+	else if (getWaitingConnectionSocket(tcp_socket->socket_id) != NULL)
 		{
 		m_send_tcp.content.ptr = (char*)tcp_header;
 		net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->pid, FID_SOCKET_HANDLE_NEW_TCP_CON, FID_TCP_ACK);
 		return;
 		}
-	printf("GOT REGULAR ACK FOR DATA!\n");
+	else if (tcp_socket->in_socket.local_tcp_status.state == ESTABLISHED)
+		{
+		printf("Got regular ack for established connections payload.\n");
+		return;
+		}
+	printf("NO WAY OF HANDLING THIS ACK!\n");
 	}
 
 void handle_tcp_rst_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
@@ -133,12 +145,52 @@ void handle_tcp_syn_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, s
 
 void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
 	{
+	msg_t m_send;
+	socket_t *current_tcp_socket = &tcp_socket->in_socket;
+	uint8_t send_buffer[BUFFER_SIZE];
+	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
+	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
+	set_tcp_status(&current_tcp_socket->local_tcp_status,
+			tcp_header->seq_nr+1,
+			STATIC_MSS,
+			current_tcp_socket->local_tcp_status.seq_nr+1,
+			LAST_ACK,
+			current_tcp_socket->local_tcp_status.window);
+	set_tcp_status(&current_tcp_socket->foreign_tcp_status,
+			tcp_header->ack_nr,
+			STATIC_MSS,
+			tcp_header->seq_nr,
+			FIN_WAIT_1,
+			current_tcp_socket->foreign_tcp_status.window);
+	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
 
+	m_send.content.value = CLOSE_CONN;
+	net_msg_send(&m_send, tcp_socket->pid, 0, FID_SOCKET_RECV);
 	}
 
 void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
 	{
+	msg_t m_send;
+	socket_t *current_tcp_socket = &tcp_socket->in_socket;
+	uint8_t send_buffer[BUFFER_SIZE];
+	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
+	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
+	set_tcp_status(&current_tcp_socket->local_tcp_status,
+			tcp_header->seq_nr+1,
+			STATIC_MSS,
+			current_tcp_socket->local_tcp_status.seq_nr,
+			CLOSED,
+			current_tcp_socket->local_tcp_status.window);
+	set_tcp_status(&current_tcp_socket->foreign_tcp_status,
+			tcp_header->ack_nr,
+			STATIC_MSS,
+			tcp_header->seq_nr,
+			LAST_ACK,
+			current_tcp_socket->foreign_tcp_status.window);
+	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
+	memset(tcp_socket, 0, sizeof(socket_internal_t));
 
+	net_msg_send(&m_send, tcp_socket->pid, 0, FID_SOCKET_CLOSE);
 	}
 
 void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket, uint8_t *payload)

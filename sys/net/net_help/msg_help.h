@@ -14,13 +14,13 @@
 #define FID_TCP_PH						2
 #define FID_UDP_PH						3
 #define FID_H_PAYLOAD					4
-#define FID_RECV						5
-#define	FID_RECV_FROM					6
+#define FID_SOCKET_RECV					5
+#define	FID_SOCKET_RECV_FROM			6
 #define FID_TCP_SYN_ACK					7
 #define FID_SOCKET_CONNECT				8
 #define FID_SOCKET_HANDLE_NEW_TCP_CON	9
 #define FID_TCP_ACK						10
-
+#define FID_SOCKET_CLOSE				11
 
 int net_msg_receive(msg_t *m, uint16_t function_id);
 int net_msg_reply(msg_t *m, msg_t *reply, uint16_t function_id);

@@ -39,11 +39,12 @@ enum tcp_states
 
 enum tcp_codes
 	{
-	SEQ_NO_SAME			= -3,
-	ACK_NO_TOO_SMALL 	= -2,
-	ACK_NO_TOO_BIG		= -1,
 	UNDEFINED			= 0,
-	PACKET_OK			= 1
+	PACKET_OK			= 1,
+	CLOSE_CONN			= 2,
+	SEQ_NO_SAME			= 3,
+	ACK_NO_TOO_SMALL 	= 4,
+	ACK_NO_TOO_BIG		= 5
 	};
 
 #define REMOVE_RESERVED 		0xFC
