@@ -6,23 +6,17 @@ PREFIX=${HOME}/gnuarm
 # directory to download source files and store intermediates 
 GNUARM_BUILDDIR=${GNUARM_BUILDDIR:-"/tmp/gnuarm-${USER}"}
 
-#GCC_VER=4.5.1
-#GCC_MD5=dc8959e31b01a65ce10d269614815054
-GCC_VER=4.3.4
-GCC_MD5=575b3220bb8e7060939c429fc8608d22
+GCC_VER=4.6.2
+GCC_MD5=780f614ab18c7a9066dec6387d7490b2
 
 BINUTILS_VER=2.20.1
-BINUTILS_MD5=9cdfb9d6ec0578c166d3beae5e15c4e5
+BINUTILS_MD5=2b9dc8f2b7dbd5ec5992c6e29de0b764
 
-# 1.17.0 is a lot smaller (about 10k for arm7)
-#NEWLIB_VER=1.17.0
-#NEWLIB_MD5=9c345928b4f600a211ddc5a6072f8337
+NEWLIB_VER=1.20.0
+NEWLIB_MD5=e5488f545c46287d360e68a801d470e8
 
-NEWLIB_VER=1.18.0
-NEWLIB_MD5=3dae127d4aa659d72f8ea8c0ff2a7a20
-
-GDB_VER=7.2
-GDB_MD5=64260e6c56979ee750a01055f16091a5
+GDB_VER=7.3.1
+GDB_MD5=b89a5fac359c618dda97b88645ceab47
 
 #uncomment to support multi-threaded compile
 MAKE_THREADS=-j4
@@ -42,8 +36,8 @@ build_binutils() {
         touch .binutils_extracted
     fi 
 	rm -rf binutils-build && mkdir -p binutils-build && cd binutils-build &&
-	../binutils-${BINUTILS_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilibi --with-float=soft --with-fpu=vfp &&
-	make ${MAKE_THREADS} all CFLAGS=-Wformat=0 &&
+	../binutils-${BINUTILS_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilibi &&
+	make ${MAKE_THREADS} all CFLAGS=-Wno-error=unused-but-set-variable &&
 	make install &&
 	cd ${GNUARM_BUILDDIR}
 }
@@ -55,7 +49,7 @@ build_gcc() {
         touch .gcc_extracted
     fi 
     rm -rf gcc-build && mkdir -p gcc-build && cd gcc-build &&
-	../gcc-${GCC_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib --enable-languages="c" --with-newlib --enable-lto --disable-libssp --disable-hardfloat --with-float=soft --with-fpu=vfp --with-headers=${GNUARM_BUILDDIR}/newlib-${NEWLIB_VER}/newlib/libc/include && 
+	../gcc-${GCC_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib --enable-languages="c" --with-newlib --enable-lto --disable-libssp --with-headers=${GNUARM_BUILDDIR}/newlib-${NEWLIB_VER}/newlib/libc/include && 
 	
     make ${MAKE_THREADS} all &&
 	make install &&
@@ -80,7 +74,7 @@ build_newlib() {
     fi 
 	
     rm -rf newlib-build && mkdir -p newlib-build && cd newlib-build &&
-	../newlib-${NEWLIB_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib --disable-newlib-supplied-syscalls --enable-newlib-reent-small --enable-newlib-io-long-long --enable-newlib-io-float --with-float=soft --with-fpu=vfp &&
+	../newlib-${NEWLIB_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib --disable-newlib-supplied-syscalls --enable-newlib-reent-small --enable-newlib-io-long-long --enable-newlib-io-float &&
 	#--enable-newlib-supplied-syscalls &&
 	# options to try: --enable-newlib-reent-small
     make ${MAKE_THREADS} TARGET_CFLAGS=-DREENTRANT_SYSCALLS_PROVIDED all &&

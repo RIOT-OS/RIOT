@@ -27,7 +27,7 @@
 
 SubDir TOP cpu lpc2387 ;
 
-Module cpu : cpu.c lpc2387-lpm.c ;
+Module cpu : cpu.c lpc2387-lpm.c lpc23xx-iap.c ;
 UseModule cpu ;
 
 Module rtc : lpc2387-rtc.c ;
