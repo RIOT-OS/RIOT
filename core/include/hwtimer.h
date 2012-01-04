@@ -117,7 +117,6 @@ int hwtimer_active(void);
  * @brief    TODO
  * @internal
  */
-uint32_t hwtimer_now();
 void hwtimer_cpu_init(void (*handler)(int), uint32_t fcpu);
 void hwtimer_t0_disable_interrupt(void);
 void hwtimer_t0_enable_interrupt(void);
