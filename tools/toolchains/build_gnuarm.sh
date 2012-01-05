@@ -29,12 +29,20 @@ DOWNLOADER_OPTS="-nv -c"
 #
 FILES=.
 
+HOST_GCC_VER=`gcc --version | awk '{ if (NR == 1) { print $4 } }'`
+
 build_binutils() {
     echo "Building binutils..."
     if [ ! -e .binutils_extracted ] ; then 
         tar -xjf ${FILES}/binutils-${BINUTILS_VER}.tar.bz2
         touch .binutils_extracted
     fi 
+    if [[ $HOST_GCC_VER == 4.6* ]]
+    then
+        CFLAGS="-Wno-error=unused-but-set-variable"
+    else
+        CFLAGS="-Wnoerror=unused"
+    fi
 	rm -rf binutils-build && mkdir -p binutils-build && cd binutils-build &&
 	../binutils-${BINUTILS_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilibi &&
 	make ${MAKE_THREADS} all CFLAGS=-Wno-error=unused-but-set-variable &&
