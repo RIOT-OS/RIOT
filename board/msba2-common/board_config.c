@@ -5,12 +5,14 @@
 
 void config_load(void) {
     extern char configmem[];
-   if (*((uint16_t*) configmem) ==  CONFIG_KEY) {
-       memcpy(&sysconfig, (configmem + sizeof(CONFIG_KEY)), sizeof(sysconfig));
-   }
-   else {
-       config_save();
-   }
+    /* cast it here for strict-aliasing */
+    uint16_t* tmp = (uint16_t*) configmem;
+    if (*tmp ==  CONFIG_KEY) {
+        memcpy(&sysconfig, (configmem + sizeof(CONFIG_KEY)), sizeof(sysconfig));
+    }
+    else {
+        config_save();
+    }
 }
 
 uint8_t config_save(void) {
