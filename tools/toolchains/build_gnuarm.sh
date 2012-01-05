@@ -41,11 +41,11 @@ build_binutils() {
     then
         CFLAGS="-Wno-error=unused-but-set-variable"
     else
-        CFLAGS="-Wnoerror=unused"
+        CFLAGS="-Wno-error=unused"
     fi
 	rm -rf binutils-build && mkdir -p binutils-build && cd binutils-build &&
 	../binutils-${BINUTILS_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilibi &&
-	make ${MAKE_THREADS} all CFLAGS=-Wno-error=unused-but-set-variable &&
+    make ${MAKE_THREADS} all CFLAGS=${CFLAGS} &&
 	make install &&
 	cd ${GNUARM_BUILDDIR}
 }
