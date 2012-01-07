@@ -24,7 +24,7 @@ static void (*int_handler)(int);
 /// Timer 0-3 interrupt handler
 static void timer_irq(void) __attribute__((interrupt("IRQ")));
 
-inline unsigned long get_base_address(short timer) {
+inline static unsigned long get_base_address(short timer) {
     return (volatile unsigned long)(TMR0_BASE_ADDR + (timer / 8) * 0x6C000 + (timer/4 - (timer/8)*2) * 0x4000);
 }
 
