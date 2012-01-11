@@ -29,3 +29,4 @@ SubDir TOP sys net ;
 
 Module protocol_multiplex : protocol-multiplex.c ;
 
+# SubInclude TOP net ;

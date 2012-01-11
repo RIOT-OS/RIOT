@@ -29,6 +29,7 @@
 # OS specifics
 #
 if $(NT) {
+    SLASH = \\ ;
 	POSIXSHELL = sh ;
 	NULLDEV = NUL ;
 	CAT = type ;

@@ -21,7 +21,7 @@ timex_t timex_set(uint32_t seconds, uint32_t microseconds);
  *
  * @return -1 when a is smaller, 0 if equal, 1 if a is bigger
  */
-timex_t timex_sub(const timex_t a, const timex_t b);
+int timex_cmp(const timex_t a, const timex_t b);
 
 /**
  * @brief Corrects timex_t structure so that microseconds < 1000000

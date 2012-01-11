@@ -1,0 +1,7 @@
+SubDir TOP sys net net_help ;
+
+# HDRS += $(TOP)/sys/net/net_help/ ;
+
+Module net_help : net_help.c msg_help.c ;
+
+

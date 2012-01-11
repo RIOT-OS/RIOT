@@ -12,6 +12,7 @@
 //#define ENABLE_DEBUG
 #include <debug.h>
 
+
 #define VTIMER_THRESHOLD 20U
 #define VTIMER_BACKOFF 10U
 
@@ -65,6 +66,7 @@ static int update_shortterm() {
     }
     
     hwtimer_id = hwtimer_set_absolute(next, vtimer_callback, NULL);
+
     DEBUG("update_shortterm: Set hwtimer to %lu (now=%lu)\n", hwtimer_next_absolute + longterm_tick_start, hwtimer_now());
     return 0;
 }
@@ -158,22 +160,24 @@ static int vtimer_set(vtimer_t *timer) {
     }
 
     int state = disableIRQ();
-    if (timer->absolute.seconds != seconds ) {
+    if (timer->absolute.seconds != seconds){
         /* we're long-term */
         DEBUG("vtimer_set(): setting long_term\n");
         result = set_longterm(timer);
-    } else {
+    }
+    else {
         DEBUG("vtimer_set(): setting short_term\n");
         if (set_shortterm(timer)) {
 
             /* delay update of next shortterm timer if we 
-             * are called from within vtimer_callback.
-             */
+            * are called from within vtimer_callback. */
+         
             if (!in_callback) {
                 result = update_shortterm();
             }
         }
     }
+
 
     restoreIRQ(state);
 

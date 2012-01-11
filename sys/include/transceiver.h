@@ -10,6 +10,8 @@
 #define TRANSCEIVER_STACK_SIZE      (512)
 #endif
 
+#define PAYLOAD_SIZE  (58)
+
 /* The maximum of threads to register */
 #define TRANSCEIVER_MAX_REGISTERED  (4)
 
