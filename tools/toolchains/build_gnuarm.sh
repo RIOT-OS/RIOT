@@ -44,7 +44,7 @@ build_binutils() {
         CFLAGS="-Wno-error=unused"
     fi
 	rm -rf binutils-build && mkdir -p binutils-build && cd binutils-build &&
-	../binutils-${BINUTILS_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilibi &&
+	../binutils-${BINUTILS_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib &&
     make ${MAKE_THREADS} all CFLAGS=${CFLAGS} &&
 	make install &&
 	cd ${GNUARM_BUILDDIR}
