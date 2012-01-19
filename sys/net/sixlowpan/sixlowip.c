@@ -118,7 +118,7 @@ int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr) {
 }
 
 void turn_on_rpl_handler(){
-	rpl_handler_flag = 0;
+	rpl_handler_flag = 1;
 }
 
 void ipv6_process(void){
