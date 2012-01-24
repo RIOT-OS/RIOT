@@ -1,15 +1,5 @@
 SubDir TOP projects tlayer ;
 
-Module tlayer : main.c : ps shell_commands config ;
+Module tlayer : main.c : auto_init vtimer ps shell_commands config cc110x_ng destiny uart0 posix_io shell 6lowpan rtc rpl ;
 
-UseModule auto_init ;
 UseModule tlayer ;
-UseModule cc110x_ng ;
-UseModule destiny ;
-UseModule uart0 ;
-UseModule posix_io ;
-UseModule shell ;
-UseModule ps ;
-UseModule 6lowpan ;
-UseModule vtimer ;
-UseModule rtc ;
