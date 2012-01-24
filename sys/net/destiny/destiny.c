@@ -11,6 +11,8 @@
 #include "udp.h"
 #include "tcp.h"
 #include "socket.h"
+#include "tcp_timer.h"
+#include "destiny.h"
 
 void init_transport_layer(void)
 	{
@@ -25,4 +27,6 @@ void init_transport_layer(void)
 	// TCP
 	int tcp_thread_pid = thread_create(tcp_stack_buffer, TCP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, tcp_packet_handler, "tcp_packet_handler");
 	set_tcp_packet_handler_pid(tcp_thread_pid);
+	tcp_timer_pid = thread_create(tcp_timer_stack, TCP_TIMER_STACKSIZE, PRIORITY_MAIN+1, CREATE_STACKTEST, tcp_general_timer, "tcp_general_timer");
+
 	}

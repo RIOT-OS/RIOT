@@ -11,8 +11,12 @@
 #include "udp.h"
 #include "tcp.h"
 #include "socket.h"
+#include "vtimer.h"
+#include "tcp_timer.h"
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
+
+msg_t socket_msg_queue[IP_PKT_RECV_BUF_SIZE];
 
 void print_tcp_flags (tcp_hdr_t *tcp_header)
 	{
@@ -387,7 +391,7 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 	// Variables
 	socket_internal_t *current_int_tcp_socket;
 	socket_t *current_tcp_socket;
-	msg_t msg_from_server, msg_reply_fin;
+	msg_t msg_from_server;
 	uint8_t send_buffer[BUFFER_SIZE];
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
@@ -413,11 +417,26 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 	// Fill foreign TCP socket information
 	set_tcp_status(&current_tcp_socket->foreign_tcp_status, 0, 0, 0, UNKNOWN, 0);
 
-	// Send packet
-	send_tcp(addr, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_SYN, 0);
+	// Remember current time
+	current_tcp_socket->tcp_control.last_packet_time = vtimer_now();
 
-	// wait for SYN ACK
-	net_msg_receive(&msg_from_server, FID_SOCKET_CONNECT);
+	// memcpy(&current_tcp_socket->tcp_control.last_packet_time, &(vtimer_now()), sizeof(timex_t));
+	current_tcp_socket->tcp_control.no_of_retry = 0;
+
+	msg_from_server.type = TCP_RETRY;
+
+	while (msg_from_server.type == TCP_RETRY)
+		{
+		// Send packet
+		send_tcp(addr, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_SYN, 0);
+
+		// wait for SYN ACK or RETRY
+		msg_receive(&msg_from_server);
+		if (msg_from_server.type == TCP_TIMEOUT)
+			{
+			return -1;
+			}
+		}
 
 	// Read packet content
 	tcp_hdr_t *tcp_header = ((tcp_hdr_t*)(msg_from_server.content.ptr));
@@ -438,7 +457,7 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 	// Send packet
 	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
 
-	net_msg_reply(&msg_from_server, &msg_reply_fin, FID_TCP_SYN_ACK);
+	//msg_reply(&msg_from_server, &msg_reply_fin);
 	return 0;
 	}
 
@@ -467,8 +486,6 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 		return -1;
 		}
 
-	// Refresh local TCP socket information
-	current_tcp_socket->local_tcp_status.seq_nr = current_tcp_socket->local_tcp_status.seq_nr + len;
 
 	// Add packet data
 	if (len > current_tcp_socket->foreign_tcp_status.window)
@@ -512,7 +529,7 @@ int32_t recv(int s, void *buf, uint64_t len, int flags)
 	msg_t m_recv;
 	socket_internal_t *current_int_tcp_socket;
 	socket_t *current_tcp_socket;
-
+	msg_init_queue(socket_msg_queue, IP_PKT_RECV_BUF_SIZE);
 	// Check if socket exists
 	if (!isTCPSocket(s))
 		{
@@ -529,7 +546,7 @@ int32_t recv(int s, void *buf, uint64_t len, int flags)
 		return read_from_socket(current_int_tcp_socket, buf, len);
 		}
 
-	net_msg_receive(&m_recv, FID_SOCKET_RECV);
+	msg_receive(&m_recv);
 
 	if (current_int_tcp_socket->tcp_input_buffer_end > 0)
 		{
@@ -539,7 +556,7 @@ int32_t recv(int s, void *buf, uint64_t len, int flags)
 	if (m_recv.content.value == CLOSE_CONN)
 		{
 		// Sent FIN_ACK, wait for ACK
-		net_msg_receive(&m_recv, FID_SOCKET_RECV);
+		msg_receive(&m_recv);
 		// Received ACK, return with closed socket!
 		return 0;
 		}
@@ -555,7 +572,7 @@ int32_t recvfrom(int s, void *buf, uint64_t len, int flags, sockaddr6_t *from, u
 		ipv6_hdr_t *ipv6_header;
 		udp_hdr_t *udp_header;
 		uint8_t *payload;
-		net_msg_receive(&m_recv, FID_SOCKET_RECV_FROM);
+		msg_receive(&m_recv);
 		ipv6_header = ((ipv6_hdr_t*)m_recv.content.ptr);
 		udp_header = ((udp_hdr_t*)(m_recv.content.ptr + IPV6_HDR_LEN));
 		payload = (uint8_t*)(m_recv.content.ptr + IPV6_HDR_LEN+UDP_HDR_LEN);
@@ -567,7 +584,7 @@ int32_t recvfrom(int s, void *buf, uint64_t len, int flags, sockaddr6_t *from, u
 		from->sin6_flowinfo = 0;
 		from->sin6_port = udp_header->src_port;
 		memcpy(fromlen, (void*)(sizeof(sockaddr6_t)), sizeof(fromlen));
-		net_msg_reply(&m_recv, &m_send, FID_UDP_PH);
+		msg_reply(&m_recv, &m_send);
 		return udp_header->length;
 		}
 	else if (isTCPSocket(s))
@@ -638,7 +655,8 @@ int close(int s)
 		// Check for ESTABLISHED STATE
 		if (current_tcp_socket->local_tcp_status.state != ESTABLISHED)
 			{
-			return -1;
+			close_socket(current_tcp_socket);
+			return 1;
 			}
 
 		// Refresh local TCP socket information
@@ -646,7 +664,7 @@ int close(int s)
 		current_tcp_socket->local_tcp_status.state = FIN_WAIT_1;
 
 		send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN, 0);
-		net_msg_receive(&m_recv, FID_SOCKET_CLOSE);
+		msg_receive(&m_recv);
 		return 1;
 		}
 	else
@@ -793,10 +811,30 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 
 	syn_ack_packet->checksum = ~tcp_csum(temp_ipv6_header, syn_ack_packet);
 
-	sixlowpan_send(&current_queued_socket->foreign_address.sin6_addr, (uint8_t*)(syn_ack_packet), TCP_HDR_LEN, IPPROTO_TCP);
+	// Remember current time
+	server_socket->in_socket.tcp_control.last_packet_time = vtimer_now();
 
-	// wait for ACK from Client
-	net_msg_receive(&msg_recv_client_ack, FID_SOCKET_HANDLE_NEW_TCP_CON);
+	server_socket->in_socket.tcp_control.no_of_retry = 0;
+
+	// Set message type to Retry for while loop
+	msg_recv_client_ack.type = TCP_RETRY;
+
+	while (msg_recv_client_ack.type == TCP_RETRY)
+		{
+		// Send packet
+		sixlowpan_send(&current_queued_socket->foreign_address.sin6_addr, (uint8_t*)(syn_ack_packet), TCP_HDR_LEN, IPPROTO_TCP);
+
+		// wait for ACK from Client
+		msg_receive(&msg_recv_client_ack);
+		if (msg_recv_client_ack.type == TCP_TIMEOUT)
+			{
+			// Set status of internal socket back to LISTEN
+			server_socket->in_socket.local_tcp_status.state = LISTEN;
+
+			close_socket(current_queued_socket);
+			return -1;
+			}
+		}
 
 	tcp_hdr_t *tcp_header;
 
@@ -819,7 +857,7 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 	server_socket->in_socket.local_tcp_status.state = LISTEN;
 
 	// send a reply to the TCP handler after processing every information from the TCP ACK packet
-	net_msg_reply(&msg_recv_client_ack, &msg_send_client_ack, FID_TCP_ACK);
+	msg_reply(&msg_recv_client_ack, &msg_send_client_ack);
 
 	new_socket = socket(current_queued_socket->domain, current_queued_socket->type, current_queued_socket->protocol);
 	current_new_socket = getSocket(new_socket);

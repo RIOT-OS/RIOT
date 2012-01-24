@@ -69,7 +69,7 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t
 
 #ifdef MODULE_DESTINY
     if (next_header == IPPROTO_TCP) {
-    		print_tcp_status(OUT_PACKET, ipv6_buf, (tcp_hdr_t *)(payload));
+    		// print_tcp_status(OUT_PACKET, ipv6_buf, (tcp_hdr_t *)(payload));
 		}
 #endif
 
@@ -151,7 +151,7 @@ void ipv6_process(void){
 				if (tcp_packet_handler_pid != 0)
 					{
 					m_send.content.ptr = (char*) ipv6_buf;
-					net_msg_send_recv(&m_send, &m_recv, tcp_packet_handler_pid, FID_TCP_PH, FID_SIXLOWIP_TCP);
+					msg_send_receive(&m_send, &m_recv, tcp_packet_handler_pid);
 					}
 				else
 					{
@@ -166,7 +166,7 @@ void ipv6_process(void){
 				if (udp_packet_handler_pid != 0)
 					{
 					m_send.content.ptr = (char*) ipv6_buf;
-					net_msg_send_recv(&m_send, &m_recv, udp_packet_handler_pid, FID_UDP_PH, FID_SIXLOWIP_UDP);
+					msg_send_receive(&m_send, &m_recv, udp_packet_handler_pid);
 					}
 				else
 					{

@@ -1225,7 +1225,7 @@ void init_reas_bufs(lowpan_reas_buf_t *buf) {
 void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border){
     ipv6_addr_t tmp;
     /* init mac-layer and radio transceiver */
-    vtimer_init();
+    // vtimer_init();
     sixlowmac_init(trans);
 
     rtc_init();

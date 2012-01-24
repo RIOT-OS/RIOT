@@ -6,6 +6,7 @@
 #include <posix_io.h>
 #include <shell.h>
 #include <board_uart0.h>
+#include "hwtimer.h"
 #include <vtimer.h>
 #include <ltc4150.h>
 #include <thread.h>
@@ -23,7 +24,9 @@
 #include "sys/net/destiny/socket.h"
 #include "sys/net/destiny/in.h"
 #include "sys/net/destiny/destiny.h"
+#include "sys/net/destiny/tcp_timer.h"
 #include "sys/net/net_help/net_help.h"
+#include "sys/net/net_help/msg_help.h"
 
 uint8_t udp_server_thread_pid;
 char udp_server_stack_buffer[UDP_STACK_SIZE];
@@ -49,29 +52,25 @@ void init_tl (char *str)
 void tcp_ch(void)
 	{
 	uint32_t state = 0;
-	msg_t recv_msg;
+	msg_t recv_msg, send_msg;
 	sockaddr6_t stSockAddr;
-
 	msg_receive(&recv_msg);
-
 	int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
-
 	if (-1 == SocketFD)
 		{
 		printf("cannot create socket");
+		return;
 		}
-
 	memset(&stSockAddr, 0, sizeof(stSockAddr));
-
 	stSockAddr.sin6_family = AF_INET6;
 	stSockAddr.sin6_port = HTONS(1100);
 	ipv6_init_address(&stSockAddr.sin6_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, current_message.node_number);
 	ipv6_print_addr(&stSockAddr.sin6_addr);
-
 	if (-1 == connect(SocketFD, &stSockAddr, sizeof(stSockAddr), tcp_cht_pid))
 		{
-		printf("connect failed");
+		printf("Connect failed!\n");
 		close(SocketFD);
+		return;
 		}
 	msg_receive(&recv_msg);
 	state = recv_msg.content.value;
@@ -83,17 +82,13 @@ void tcp_ch(void)
 			printf("Could not send %s!\n", current_message.tcp_string_msg);
 			}
 
+		msg_reply(&recv_msg, &send_msg);
+
 		msg_receive(&recv_msg);
 		state = recv_msg.content.value;
 		}
-
+	msg_reply(&recv_msg, &send_msg);
 	close(SocketFD);
-
-//	while (1)
-//		{
-//		thread_sleep();
-//		}
-
 	}
 
 void init_udp_server(void)
@@ -203,24 +198,36 @@ void init_tcp_cht(char *str)
 											PRIORITY_MAIN,
 											CREATE_STACKTEST,
 											tcp_ch,
-											"init_connection_handler");
+											"init_conn_handler");
 	printf("TCP CONNECTION HANDLER THREAD PID: %i\n", tcp_cht_pid);
 	}
 
 void send_tcp_msg(char *str)
 	{
-	msg_t send_msg;
+	msg_t send_msg, recv_msg;
 	sscanf(str, "send_tcp %s", current_message.tcp_string_msg);
 	printf("Message: %s, strcmp: %i\n", current_message.tcp_string_msg, strcmp(current_message.tcp_string_msg, "close"));
 	if (strcmp(current_message.tcp_string_msg, "close") == 0)
 		{
 		send_msg.content.value = 0;
-		msg_send(&send_msg, tcp_cht_pid, 0);
 		}
 	else
 		{
 		send_msg.content.value = 1;
-		msg_send(&send_msg, tcp_cht_pid, 0);
+		}
+	msg_send_receive(&send_msg, &recv_msg, tcp_cht_pid);
+	}
+
+void send_tcp_bulk(char *str)
+	{
+	int i = 0, count;
+	char command[61];
+	char msg_string[50];
+	sscanf(str, "send_tcp_bulk %i %s", &count, msg_string);
+	for (i = 0; i < count; i++)
+		{
+		sprintf(command, "send_tcp %s%i", msg_string, i);
+		send_tcp_msg(command);
 		}
 	}
 
@@ -228,7 +235,6 @@ void connect_tcp(char *str)
 	{
 	msg_t send_msg;
 	sscanf(str, "connect_tcp %i", &current_message.node_number);
-
 	send_msg.content.value = 1;
 	msg_send(&send_msg, tcp_cht_pid, 0);
 	}
@@ -420,6 +426,24 @@ void showReas(char *str)
 	printReasBuffers();
 	}
 
+void kill_process(char *str)
+	{
+	msg_t send;
+	int mypid;
+	send.type = RETURNNOW;
+	sscanf(str, "kill_process %i", &mypid);
+	msg_send(&send, mypid, 0);
+	}
+
+void continue_process(char *str)
+	{
+	msg_t send;
+	int pid;
+	sscanf(str, "continue_process %i", &pid);
+	send.type = TCP_CONTINUE;
+	msg_send(&send, pid, 0);
+	}
+
 const shell_command_t shell_commands[] = {
     {"init", "", init},
     {"addr", "", get_r_address},
@@ -436,6 +460,9 @@ const shell_command_t shell_commands[] = {
     {"connect_tcp", "", connect_tcp},
     {"send_tcp", "", send_tcp_msg},
     {"send_udp", "", send_udp},
+    {"send_tcp_bulk", "send_tcp_bulk NO_OF_PACKETS PAYLOAD", send_tcp_bulk},
+    {"kill_process", "", kill_process},
+    {"continue_process", "", continue_process},
     {NULL, NULL, NULL}
 };
 

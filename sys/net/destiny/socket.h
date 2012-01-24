@@ -125,6 +125,12 @@ typedef struct __attribute__ ((packed)) socka6
     ipv6_addr_t 		sin6_addr;      		/* IPv6 address */
 	} sockaddr6_t;
 
+typedef struct __attribute__((packed)) tcp_control_block
+	{
+	timex_t				last_packet_time;
+	uint8_t				no_of_retry;
+	} tcp_cb;
+
 typedef struct __attribute__ ((packed)) sock_t
 	{
 	uint8_t				domain;
@@ -132,6 +138,7 @@ typedef struct __attribute__ ((packed)) sock_t
 	uint8_t				protocol;
 	tcp_socket_status_t local_tcp_status;
 	tcp_socket_status_t foreign_tcp_status;
+	tcp_cb				tcp_control;			// TODO: Migrate every TCP specific value to this struct: TCP Control Block
 	sockaddr6_t			local_address;
 	sockaddr6_t			foreign_address;
 	} socket_t;
@@ -176,4 +183,5 @@ void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port, ui
 		uint8_t dataOffset_reserved, uint8_t reserved_flags, uint16_t window, uint16_t checksum, uint16_t urg_pointer);
 int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header);
 int send_tcp(sockaddr6_t *addr, socket_t *current_tcp_socket, tcp_hdr_t *current_tcp_packet, ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length);
+bool isTCPSocket(uint8_t s);
 #endif /* SOCKET_H_ */

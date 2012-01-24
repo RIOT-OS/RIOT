@@ -34,7 +34,7 @@ void udp_packet_handler(void)
 
 	while (1)
 		{
-		net_msg_receive(&m_recv_ip, FID_UDP_PH);
+		msg_receive(&m_recv_ip);
 		ipv6_header = ((ipv6_hdr_t*)m_recv_ip.content.ptr);
 		udp_header = ((udp_hdr_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
 		payload = (uint8_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN + UDP_HDR_LEN);
@@ -47,7 +47,7 @@ void udp_packet_handler(void)
 			if (udp_socket != NULL)
 				{
 				m_send_udp.content.ptr = (char*)ipv6_header;
-				net_msg_send_recv(&m_send_udp, &m_recv_udp, udp_socket->pid, FID_SOCKET_RECV_FROM, FID_UDP_PH);
+				msg_send_receive(&m_send_udp, &m_recv_udp, udp_socket->pid);
 				}
 			else
 				{
@@ -58,7 +58,7 @@ void udp_packet_handler(void)
 			{
 			printf("Wrong checksum (%x)!\n", chksum);
 			}
-		net_msg_reply(&m_recv_ip, &m_send_ip, FID_SIXLOWIP_UDP);
+		msg_reply(&m_recv_ip, &m_send_ip);
 		}
 	}
 

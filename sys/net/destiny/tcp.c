@@ -8,7 +8,9 @@
 #include <stdio.h>
 #include <thread.h>
 #include <string.h>
+#include <stdlib.h>
 
+#include "vtimer.h"
 #include "tcp.h"
 #include "in.h"
 #include "socket.h"
@@ -72,7 +74,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_in
 		tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end + tcp_payload_len;
 		}
 
-	net_msg_send(&m_send_tcp, tcp_socket->pid, 1, FID_SOCKET_RECV);
+	msg_send(&m_send_tcp, tcp_socket->pid, 0);
 	return acknowledged_bytes;
 	}
 
@@ -82,7 +84,7 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 
 	if (tcp_socket->in_socket.local_tcp_status.state == LAST_ACK)
 		{
-		net_msg_send(&m_send_tcp, tcp_socket->pid, 0, FID_SOCKET_RECV);
+		msg_send(&m_send_tcp, tcp_socket->pid, 0);
 		memset(tcp_socket, 0, sizeof(socket_internal_t));
 		return;
 		}
@@ -90,7 +92,7 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 	else if (getWaitingConnectionSocket(tcp_socket->socket_id) != NULL)
 		{
 		m_send_tcp.content.ptr = (char*)tcp_header;
-		net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->pid, FID_SOCKET_HANDLE_NEW_TCP_CON, FID_TCP_ACK);
+		net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->pid, TCP_ACK);
 		return;
 		}
 	else if (tcp_socket->in_socket.local_tcp_status.state == ESTABLISHED)
@@ -131,11 +133,11 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 
 void handle_tcp_syn_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
 	{
-	msg_t m_recv_tcp, m_send_tcp;
+	msg_t m_send_tcp;
 	if (tcp_socket->in_socket.local_tcp_status.state == SYN_SENT)
 		{
 		m_send_tcp.content.ptr = (char*) tcp_header;
-		net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->pid, FID_SOCKET_CONNECT, FID_TCP_SYN_ACK);
+		net_msg_send(&m_send_tcp, tcp_socket->pid, 0, TCP_SYN_ACK);
 		}
 	else
 		{
@@ -165,7 +167,7 @@ void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
 
 	m_send.content.value = CLOSE_CONN;
-	net_msg_send(&m_send, tcp_socket->pid, 0, FID_SOCKET_RECV);
+	msg_send(&m_send, tcp_socket->pid, 0);
 	}
 
 void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
@@ -190,7 +192,7 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, s
 	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
 	memset(tcp_socket, 0, sizeof(socket_internal_t));
 
-	net_msg_send(&m_send, tcp_socket->pid, 0, FID_SOCKET_CLOSE);
+	msg_send(&m_send, tcp_socket->pid, 0);
 	}
 
 void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket, uint8_t *payload)
@@ -244,17 +246,17 @@ void tcp_packet_handler (void)
 
 	while (1)
 		{
-		net_msg_receive(&m_recv_ip, FID_TCP_PH);
+		msg_receive(&m_recv_ip);
 
 		ipv6_header = ((ipv6_hdr_t*)m_recv_ip.content.ptr);
 		tcp_header = ((tcp_hdr_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
 		payload = (uint8_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN + TCP_HDR_LEN);
 
 		chksum = tcp_csum(ipv6_header, tcp_header);
-		printf("Checksum is %x!\n", chksum);
-		print_tcp_status(INC_PACKET, ipv6_header, tcp_header);
+		// printf("Checksum is %x!\n", chksum);
+		// print_tcp_status(INC_PACKET, ipv6_header, tcp_header);
 		tcp_socket = get_tcp_socket(ipv6_header, tcp_header);
-
+		printf("Seconds: %li\n", vtimer_now().seconds);
 		if ((chksum == 0xffff) && (tcp_socket != NULL))
 			{
 			// Remove reserved bits from tcp flags field
@@ -314,7 +316,7 @@ void tcp_packet_handler (void)
 			{
 			printf("Wrong checksum (%x) or no corresponding socket found!\n", chksum);
 			}
-		net_msg_reply(&m_recv_ip, &m_send_ip, FID_SIXLOWIP_TCP);
+		msg_reply(&m_recv_ip, &m_send_ip);
 		}
 	}
 
