@@ -59,17 +59,17 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_in
 	msg_t m_send_tcp;
 	uint8_t tcp_payload_len = ipv6_header->length-TCP_HDR_LEN;
 	uint8_t acknowledged_bytes = 0;
-	if (tcp_payload_len > tcp_socket->in_socket.local_tcp_status.window)
+	if (tcp_payload_len > tcp_socket->socket_values.tcp_control.rcv_wnd)
 		{
-		memcpy(tcp_socket->tcp_input_buffer, payload, tcp_socket->in_socket.local_tcp_status.window);
-		acknowledged_bytes = tcp_socket->in_socket.local_tcp_status.window;
-		tcp_socket->in_socket.local_tcp_status.window = 0;
-		tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end + tcp_socket->in_socket.local_tcp_status.window;
+		memcpy(tcp_socket->tcp_input_buffer, payload, tcp_socket->socket_values.tcp_control.rcv_wnd);
+		acknowledged_bytes = tcp_socket->socket_values.tcp_control.rcv_wnd;
+		tcp_socket->socket_values.tcp_control.rcv_wnd = 0;
+		tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end + tcp_socket->socket_values.tcp_control.rcv_wnd;
 		}
 	else
 		{
 		memcpy(tcp_socket->tcp_input_buffer, payload, tcp_payload_len);
-		tcp_socket->in_socket.local_tcp_status.window = tcp_socket->in_socket.local_tcp_status.window - tcp_payload_len;
+		tcp_socket->socket_values.tcp_control.rcv_wnd = tcp_socket->socket_values.tcp_control.rcv_wnd - tcp_payload_len;
 		acknowledged_bytes = tcp_payload_len;
 		tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end + tcp_payload_len;
 		}
@@ -82,7 +82,7 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 	{
 	msg_t m_recv_tcp, m_send_tcp;
 
-	if (tcp_socket->in_socket.local_tcp_status.state == LAST_ACK)
+	if (tcp_socket->socket_values.tcp_control.state == LAST_ACK)
 		{
 		msg_send(&m_send_tcp, tcp_socket->pid, 0);
 		memset(tcp_socket, 0, sizeof(socket_internal_t));
@@ -95,9 +95,12 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 		net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->pid, TCP_ACK);
 		return;
 		}
-	else if (tcp_socket->in_socket.local_tcp_status.state == ESTABLISHED)
+	else if (tcp_socket->socket_values.tcp_control.state == ESTABLISHED)
 		{
 		printf("Got regular ack for established connections payload.\n");
+		tcp_socket->socket_values.tcp_control.send_una = tcp_header->ack_nr;
+		tcp_socket->socket_values.tcp_control.send_nxt = tcp_header->ack_nr;
+		tcp_socket->socket_values.tcp_control.send_wnd = tcp_header->window;
 		return;
 		}
 	printf("NO WAY OF HANDLING THIS ACK!\n");
@@ -111,7 +114,7 @@ void handle_tcp_rst_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
 	{
 	msg_t m_send_tcp;
-	if (tcp_socket->in_socket.local_tcp_status.state == LISTEN)
+	if (tcp_socket->socket_values.tcp_control.state == LISTEN)
 		{
 		socket_t *new_socket = new_tcp_queued_socket(ipv6_header, tcp_header, tcp_socket);
 		if (new_socket != NULL)
@@ -134,7 +137,7 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 void handle_tcp_syn_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
 	{
 	msg_t m_send_tcp;
-	if (tcp_socket->in_socket.local_tcp_status.state == SYN_SENT)
+	if (tcp_socket->socket_values.tcp_control.state == SYN_SENT)
 		{
 		m_send_tcp.content.ptr = (char*) tcp_header;
 		net_msg_send(&m_send_tcp, tcp_socket->pid, 0, TCP_SYN_ACK);
@@ -148,22 +151,16 @@ void handle_tcp_syn_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, s
 void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
 	{
 	msg_t m_send;
-	socket_t *current_tcp_socket = &tcp_socket->in_socket;
+	socket_t *current_tcp_socket = &tcp_socket->socket_values;
 	uint8_t send_buffer[BUFFER_SIZE];
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
-	set_tcp_status(&current_tcp_socket->local_tcp_status,
-			tcp_header->seq_nr+1,
-			STATIC_MSS,
-			current_tcp_socket->local_tcp_status.seq_nr+1,
-			LAST_ACK,
-			current_tcp_socket->local_tcp_status.window);
-	set_tcp_status(&current_tcp_socket->foreign_tcp_status,
-			tcp_header->ack_nr,
-			STATIC_MSS,
-			tcp_header->seq_nr,
-			FIN_WAIT_1,
-			current_tcp_socket->foreign_tcp_status.window);
+
+	current_tcp_socket->tcp_control.state = LAST_ACK;
+
+	set_tcp_cb(&current_tcp_socket->tcp_control, tcp_header->seq_nr+1, current_tcp_socket->tcp_control.send_wnd, tcp_header->ack_nr,
+			tcp_header->ack_nr, tcp_header->window);
+
 	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
 
 	m_send.content.value = CLOSE_CONN;
@@ -173,22 +170,16 @@ void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
 	{
 	msg_t m_send;
-	socket_t *current_tcp_socket = &tcp_socket->in_socket;
+	socket_t *current_tcp_socket = &tcp_socket->socket_values;
 	uint8_t send_buffer[BUFFER_SIZE];
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
-	set_tcp_status(&current_tcp_socket->local_tcp_status,
-			tcp_header->seq_nr+1,
-			STATIC_MSS,
-			current_tcp_socket->local_tcp_status.seq_nr,
-			CLOSED,
-			current_tcp_socket->local_tcp_status.window);
-	set_tcp_status(&current_tcp_socket->foreign_tcp_status,
-			tcp_header->ack_nr,
-			STATIC_MSS,
-			tcp_header->seq_nr,
-			LAST_ACK,
-			current_tcp_socket->foreign_tcp_status.window);
+
+	current_tcp_socket->tcp_control.state = CLOSED;
+
+	set_tcp_cb(&current_tcp_socket->tcp_control, tcp_header->seq_nr+1, current_tcp_socket->tcp_control.send_wnd, tcp_header->ack_nr,
+			tcp_header->ack_nr, tcp_header->window);
+
 	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
 	memset(tcp_socket, 0, sizeof(socket_internal_t));
 
@@ -198,7 +189,7 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, s
 void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket, uint8_t *payload)
 	{
 	uint8_t tcp_payload_len = ipv6_header->length-TCP_HDR_LEN, read_bytes = 0;
-	socket_t *current_tcp_socket = &tcp_socket->in_socket;
+	socket_t *current_tcp_socket = &tcp_socket->socket_values;
 	uint8_t send_buffer[BUFFER_SIZE];
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
@@ -207,18 +198,14 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, 
 		{
 		read_bytes = handle_payload(ipv6_header, tcp_header, tcp_socket, payload);
 		// Refresh TCP status values
-		set_tcp_status(&tcp_socket->in_socket.foreign_tcp_status,
-				tcp_header->ack_nr,
-				STATIC_MSS,
-				tcp_header->seq_nr,
-				ESTABLISHED,
-				tcp_header->window);
-		set_tcp_status(&tcp_socket->in_socket.local_tcp_status,
-				tcp_header->seq_nr - tcp_payload_len + read_bytes + 1,
-				STATIC_MSS,
-				tcp_socket->in_socket.local_tcp_status.seq_nr,
-				ESTABLISHED,
-				tcp_socket->in_socket.local_tcp_status.window);
+		current_tcp_socket->tcp_control.state = ESTABLISHED;
+
+		set_tcp_cb(&current_tcp_socket->tcp_control,
+				tcp_header->seq_nr + read_bytes + 1,
+				current_tcp_socket->tcp_control.rcv_wnd,
+				current_tcp_socket->tcp_control.send_nxt,
+				current_tcp_socket->tcp_control.send_una,
+				current_tcp_socket->tcp_control.send_wnd);
 
 		// Fill IPv6 Header
 		memcpy(&(temp_ipv6_header->destaddr), &current_tcp_socket->foreign_address.sin6_addr, 16);
@@ -227,7 +214,7 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, 
 
 		// Fill TCP ACK packet
 		set_tcp_packet(current_tcp_packet, current_tcp_socket->local_address.sin6_port, current_tcp_socket->foreign_address.sin6_port,
-				current_tcp_socket->local_tcp_status.seq_nr, current_tcp_socket->local_tcp_status.ack_nr, 0, TCP_ACK, current_tcp_socket->local_tcp_status.window,
+				current_tcp_socket->tcp_control.send_una, current_tcp_socket->tcp_control.rcv_nxt, 0, TCP_ACK, current_tcp_socket->tcp_control.rcv_wnd,
 				0, 0);
 
 		current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
@@ -253,10 +240,9 @@ void tcp_packet_handler (void)
 		payload = (uint8_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN + TCP_HDR_LEN);
 
 		chksum = tcp_csum(ipv6_header, tcp_header);
-		// printf("Checksum is %x!\n", chksum);
-		// print_tcp_status(INC_PACKET, ipv6_header, tcp_header);
+		print_tcp_status(INC_PACKET, ipv6_header, tcp_header);
 		tcp_socket = get_tcp_socket(ipv6_header, tcp_header);
-		printf("Seconds: %li\n", vtimer_now().seconds);
+
 		if ((chksum == 0xffff) && (tcp_socket != NULL))
 			{
 			// Remove reserved bits from tcp flags field

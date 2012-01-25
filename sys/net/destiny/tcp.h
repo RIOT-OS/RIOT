@@ -42,7 +42,7 @@ enum tcp_codes
 	UNDEFINED			= 0,
 	PACKET_OK			= 1,
 	CLOSE_CONN			= 2,
-	SEQ_NO_SAME			= 3,
+	SEQ_NO_TOO_SMALL			= 3,
 	ACK_NO_TOO_SMALL 	= 4,
 	ACK_NO_TOO_BIG		= 5
 	};
@@ -67,15 +67,15 @@ enum tcp_codes
 #define TCP_STACK_SIZE 			4096
 
 #include "sys/net/sixlowpan/sixlowip.h"
-
-typedef struct __attribute__ ((packed)) tcp_so_sta_t
-	{
-	uint32_t	ack_nr;
-	uint8_t		mss;
-	uint32_t 	seq_nr;
-	uint8_t 	state;
-	uint16_t 	window;
-	} tcp_socket_status_t;
+//
+//typedef struct __attribute__ ((packed)) tcp_so_sta_t
+//	{
+//	uint32_t	ack_nr;
+//	uint8_t		mss;
+//	uint32_t 	seq_nr;
+//	uint8_t 	state;
+//	uint16_t 	window;
+//	} tcp_socket_status_t;
 
 typedef struct __attribute__ ((packed)) tcp_h_t
 	{

@@ -127,8 +127,19 @@ typedef struct __attribute__ ((packed)) socka6
 
 typedef struct __attribute__((packed)) tcp_control_block
 	{
+	uint32_t			send_una;
+	uint32_t			send_nxt;
+	uint16_t			send_wnd;
+	uint32_t			send_iss;
+
+	uint32_t			rcv_nxt;
+	uint16_t			rcv_wnd;
+	uint32_t			rcv_irs;
+
 	timex_t				last_packet_time;
 	uint8_t				no_of_retry;
+
+	uint8_t 			state;
 	} tcp_cb;
 
 typedef struct __attribute__ ((packed)) sock_t
@@ -136,8 +147,8 @@ typedef struct __attribute__ ((packed)) sock_t
 	uint8_t				domain;
 	uint8_t				type;
 	uint8_t				protocol;
-	tcp_socket_status_t local_tcp_status;
-	tcp_socket_status_t foreign_tcp_status;
+//	tcp_socket_status_t local_tcp_status;
+//	tcp_socket_status_t foreign_tcp_status;
 	tcp_cb				tcp_control;			// TODO: Migrate every TCP specific value to this struct: TCP Control Block
 	sockaddr6_t			local_address;
 	sockaddr6_t			foreign_address;
@@ -150,7 +161,7 @@ typedef struct __attribute__ ((packed)) socket_in_t
 	// TODO: Maybe use ring buffer instead of copying array values each time
 	uint8_t				tcp_input_buffer_end;
 	uint8_t				tcp_input_buffer[MAX_TCP_BUFFER];
-	socket_t			in_socket;
+	socket_t			socket_values;
 	socket_t			queued_sockets[MAX_QUEUED_SOCKETS];
 	} socket_internal_t;
 
@@ -177,8 +188,8 @@ void print_socket(socket_t *current_socket);
 bool exists_socket(uint8_t socket);
 socket_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *socket);
 void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
-void set_tcp_status(tcp_socket_status_t *tcp_socket_status, uint32_t ack_nr, uint8_t mss, uint32_t seq_nr, uint8_t state, uint16_t window);
 void set_socket_address(sockaddr6_t *sockaddr, uint8_t sin6_family, uint16_t sin6_port, uint32_t sin6_flowinfo, ipv6_addr_t *sin6_addr);
+void set_tcp_cb(tcp_cb *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd, uint32_t send_nxt, uint32_t send_una, uint16_t send_wnd);
 void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port, uint32_t seq_nr, uint32_t ack_nr,
 		uint8_t dataOffset_reserved, uint8_t reserved_flags, uint16_t window, uint16_t checksum, uint16_t urg_pointer);
 int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header);

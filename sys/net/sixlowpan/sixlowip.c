@@ -69,7 +69,7 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t
 
 #ifdef MODULE_DESTINY
     if (next_header == IPPROTO_TCP) {
-    		// print_tcp_status(OUT_PACKET, ipv6_buf, (tcp_hdr_t *)(payload));
+    		 print_tcp_status(OUT_PACKET, ipv6_buf, (tcp_hdr_t *)(payload));
 		}
 #endif
 
