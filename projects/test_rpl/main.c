@@ -6,7 +6,7 @@
 #include "sys/net/sixlowpan/sixlowpan.h"
 #include "sys/net/sixlowpan/rpl/rpl.h"
 
-void main(void)
+int main(void)
 {
 	uint16_t root = 0x0001;
 	ipv6_addr_t std_addr;

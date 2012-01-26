@@ -10,11 +10,15 @@ rpl_of_t rpl_of0 = {
 	NULL
 };
 
-static void reset(rpl_dodag_t *dodag){
+rpl_of_t *rpl_get_of0(){
+	return &rpl_of0;
+}
+
+void reset(rpl_dodag_t *dodag){
 	//Nothing to do in OF0
 }
 
-static uint16_t calc_rank(rpl_parent_t * parent, uint16_t base_rank){
+uint16_t calc_rank(rpl_parent_t * parent, uint16_t base_rank){
 	if(base_rank == 0) {
 		if(parent == NULL) {
 			return INFINITE_RANK;
@@ -35,10 +39,10 @@ static uint16_t calc_rank(rpl_parent_t * parent, uint16_t base_rank){
 	return base_rank + add;
 }
 
-static rpl_parent_t * which_parent(rpl_parent_t *p1, rpl_parent_t *p2){
+rpl_parent_t * which_parent(rpl_parent_t *p1, rpl_parent_t *p2){
 	return p1;
 }
 
-static rpl_dodag_t * which_dodag(rpl_dodag_t *d1, rpl_dodag_t *d2){
+rpl_dodag_t * which_dodag(rpl_dodag_t *d1, rpl_dodag_t *d2){
 	return d1;
 }

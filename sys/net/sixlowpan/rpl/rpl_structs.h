@@ -1,5 +1,7 @@
 #include "sys/net/sixlowpan/sixlowip.h"
 
+#ifndef RPL_STRUCTS_H_INCLUDED
+#define RPL_STRUCTS_H_INCLUDED
 // Modes of Operation
 
 #define NO_DOWNWARD_ROUTES  0x00
@@ -66,6 +68,7 @@
 
 //others
 
+#define NUMBER_IMPLEMENTED_OFS 1
 #define RPL_MAX_DODAGS 3
 #define RPL_MAX_INSTANCES 1
 #define RPL_MAX_PARENTS 5
@@ -73,7 +76,11 @@
 #define RPL_DEFAULT_LIFETIME 0xff
 #define RPL_LIFETIME_UNIT 0xffff
 #define RPL_GROUNDED 1
+#define RPL_PRF_MASK 0x7
 #define RPL_MOP_SHIFT 3
+#define RPL_SHIFTED_MOP_MASK 0x7
+#define RPL_GROUNDED_SHIFT 7
+#define RPL_DEFAULT_OCP 0
 
 struct __attribute__((packed)) rpl_dio_t{
     uint8_t rpl_instanceid;
@@ -81,7 +88,7 @@ struct __attribute__((packed)) rpl_dio_t{
     uint16_t rank;
     uint8_t g_mop_prf;
     uint8_t dtsn;
-    uint8_t flags;
+    uint8_t flags; 
     uint8_t reserved;
     ipv6_addr_t dodagid;
 };
@@ -135,12 +142,13 @@ typedef struct rpl_parent_t {
     ipv6_addr_t addr;
     uint16_t rank;
     struct rpl_dodag_t *dodag;
+	uint8_t used;
 } rpl_parent_t;
 
 struct rpl_of_t;
 
 typedef struct rpl_instance_t {
-    struct rpl_dodag_t *current_dodoag;
+    //struct rpl_dodag_t *current_dodoag;
     uint8_t id;
     uint8_t used;
 	uint8_t joined;
@@ -153,13 +161,14 @@ typedef struct rpl_dodag_t {
     uint8_t used;
     uint8_t mop;
     uint8_t dtsn;
+	uint8_t prf;
     uint8_t dio_interval_doubling;
     uint8_t dio_min;
     uint8_t dio_redundancy;
     uint16_t maxrankincrease;
-    uint8_t minhoprankincrease;
+    uint16_t minhoprankincrease;
     uint8_t default_lifetime;
-	uint8_t lifetime_unit;
+	uint16_t lifetime_unit;
     uint8_t version;
     uint8_t grounded;
     uint16_t my_rank;
@@ -178,3 +187,4 @@ typedef struct rpl_of_t {
     void (*parent_state_callback)(rpl_parent_t *, int, int);
 } rpl_of_t;
 
+#endif

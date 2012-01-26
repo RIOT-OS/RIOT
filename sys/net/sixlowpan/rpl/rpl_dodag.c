@@ -13,6 +13,7 @@ rpl_instance_t *rpl_new_instance(uint8_t instanceid){
 	for(inst=&instances[0], end = inst+RPL_MAX_INSTANCES; inst < end;inst++){
 		if(inst->used == 0){
 			memset(inst, 0, sizeof(*inst));
+			inst->used = 1;
 			return inst;
 		}	
 	}
@@ -35,11 +36,11 @@ rpl_instance_t *rpl_get_my_instance(){
 	}
 	return NULL;
 }
-rpl_dodag_t * rpl_new_dodag(uint8_t instanceid){
+rpl_dodag_t * rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid){
 	rpl_instance_t * inst;
 	inst = rpl_get_instance(instanceid);
 	if(inst == NULL){
-		printf("No instance found for id %d. This should not happen\n", instanceid);
+		printf("Error - No instance found for id %d. This should not happen\n", instanceid);
 		return NULL;
 	}
 
@@ -52,6 +53,7 @@ rpl_dodag_t * rpl_new_dodag(uint8_t instanceid){
 			dodag->instance = inst;
 			dodag->my_rank = INFINITE_RANK;
 			dodag->used = 1;
+			dodag->dodag_id = *dodagid;
 			return dodag;
 		}
 	}
@@ -92,4 +94,21 @@ bool rpl_equal_dodag_id(ipv6_addr_t *id1, ipv6_addr_t *id2){
 		}
 	}
 	return true;
+}
+
+rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t rank){
+	rpl_parent_t *parent;
+	rpl_parent_t *end;
+
+	for(parent= &parents[0], end=parents+RPL_MAX_PARENTS; parent < end; parent++){
+		if(parent->used == 0){
+			memset(parent, 0, sizeof(*parent));
+			parent->used = 1;
+			parent->addr = *address;
+			parent->rank = rank;
+			parent->dodag = dodag;
+			return parent;
+		}
+	}
+	return NULL;
 }

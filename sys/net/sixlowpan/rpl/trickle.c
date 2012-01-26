@@ -1,20 +1,6 @@
 #include <stdio.h>
 #include "sys/net/sixlowpan/sixlowip.h"
 
-#define ICMP_RPL_CM	155
-
-
-int test(void)
-{
-    ipv6_addr_t std_addr;
-    struct icmpv6_hdr_t icmphdr;
-    icmphdr.type = ICMP_RPL_CM;
-
-    int pid = thread_create(KERNEL_CONF_STACKSIZE_MAIN, 0, CREATE_SLEEPING, trickle_increment_counter, "count");
-   hwtimer_init();
-    
-}
-
 //struct für trickle parameter??
 int reset_trickletimer(void){a
  I = Imin;

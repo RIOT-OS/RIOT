@@ -1,10 +1,5 @@
 SubDir TOP projects test_rpl ;
 
-Module test_rpl : main.c : 6lowpan auto_init uart0 posix_io ;
+Module test_rpl : main.c : auto_init vtimer 6lowpan uart0 posix_io cc110x_ng rpl ;
 
 UseModule test_rpl ;
-UseModule cc110x_ng ;
-UseModule rpl ;
-UseModule 6lowpan ;
-UseModule vtimer ;
-UseModule auto_init ; 

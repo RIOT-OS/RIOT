@@ -1,3 +1,3 @@
 SubDir TOP sys net sixlowpan rpl ;
 
-Module rpl : rpl.c of0.c rpl_dodag.c : 6lowpan vtimer transceiver auto_init net_help ;
+Module rpl : rpl.c of0.c rpl_dodag.c : vtimer ;

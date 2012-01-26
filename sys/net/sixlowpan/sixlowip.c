@@ -21,9 +21,9 @@ uint8_t ipv6_ext_hdr_len;
 uint8_t *nextheader;
 iface_t iface;
 uint8_t iface_addr_list_count = 0;
-uint8_t rpl_handler_flag = 0;
 int udp_packet_handler_pid = 0;
 int tcp_packet_handler_pid = 0;
+int rpl_process_pid = 0;
 //uint8_t *udp_packet_buffer;
 //uint8_t *tcp_packet_buffer;
 
@@ -104,10 +104,14 @@ int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr) {
         }
 		case(ICMP_RPL_CONTROL):{
 			printf("INFO: packet type: RPL message\n");
-			if(rpl_handler_flag)
-				rpl_icmp_handler(hdr->code);
-			else
-				printf("INFO: no RPL packt handling activated, packet will be dropped\n");
+			if(rpl_process_pid != 0){
+				msg_t m_send;
+				m_send.content.ptr = (char*) &hdr->code;
+				msg_send(&m_send, rpl_process_pid, 1);
+			}
+			else{
+				printf("INFO: no RPL handler registered\n");
+			}
 			break;
 		}
         default:
@@ -115,10 +119,6 @@ int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr) {
     }
     
     return 0;
-}
-
-void turn_on_rpl_handler(){
-	rpl_handler_flag = 1;
 }
 
 void ipv6_process(void){
@@ -474,4 +474,8 @@ void set_tcp_packet_handler_pid(int pid) {
 
 void set_udp_packet_handler_pid(int pid) {
 	udp_packet_handler_pid = pid;
+}
+
+void set_rpl_process_pid(int pid){
+	rpl_process_pid = pid;
 }

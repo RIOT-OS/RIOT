@@ -1,25 +1,26 @@
 #include <string.h>
 #include <vtimer.h>
+#include <thread.h>
+#include "msg.h"
 #include "rpl.h"
+#include "of0.h"
 
 #include "sys/net/sixlowpan/sixlowmac.h"
 #include "sys/net/sixlowpan/sixlowip.h"
 #include "sys/net/sixlowpan/sixlowpan.h"
 
-//global variables for own rpl status:
-bool root = false;
-ipv6_addr_t dodagid;
-uint8_t rpl_instance_id;
-
+char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 //counters
 uint8_t act_dodag_version = 240;
 uint8_t dao_sequence = 240;
 uint8_t path_sequence = 240;
 //other global variables
 
-//ipv6_addr_t parents[10];
-//rpl_instance_t instances[5];
+rpl_of_t *objective_functions[NUMBER_IMPLEMENTED_OFS];
+unsigned int rpl_process_pid;
 uint16_t packet_length;
+
+msg_t msg_queue[RPL_PKT_RECV_BUF_SIZE];
 
 //Unbenutzte buffer auskommentiert, damit keine warnings erscheinen
 static struct ipv6_hdr_t* ipv6_buf;
@@ -53,10 +54,23 @@ static struct rpl_opt_dodag_conf_t* get_rpl_opt_dodag_conf_buf(uint8_t rpl_msg_l
 	return ((struct rpl_opt_dodag_conf_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
+rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp){
+	for(uint8_t i; i < NUMBER_IMPLEMENTED_OFS; i++){
+		if(ocp == objective_functions[i]->ocp){
+			return objective_functions[i];
+		}
+	}
+	return NULL;
+}
+
 void rpl_init(){
+
 	//TODO: initialize trickle
-	turn_on_rpl_handler();
-	
+	rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
+									PRIORITY_MAIN-1, CREATE_STACKTEST,
+									rpl_process, "rpl_process");
+	objective_functions[0] = rpl_get_of0();
+	set_rpl_process_pid(rpl_process_pid);
 
 }
 
@@ -65,26 +79,31 @@ void rpl_init_root(){
 	rpl_dodag_t *dodag;
 
 	inst = rpl_new_instance(RPL_DEFAULT_INSTANCE);
+	if(inst == NULL){
+		printf("Error - No memory for another RPL instance\n");
+		return;
+	}
 	inst->id = RPL_DEFAULT_INSTANCE;
+	inst->joined = 1;
 
-	dodag = rpl_new_dodag(RPL_DEFAULT_INSTANCE);
+	ipv6_addr_t id;
+	ipv6_addr_t mcast;
+	ipv6_set_all_nds_mcast_addr(&mcast);
+	ipv6_get_saddr(&id, &mcast);
+
+	dodag = rpl_new_dodag(RPL_DEFAULT_INSTANCE, &id);
 	if(dodag != NULL) {
-		ipv6_addr_t id;
-		ipv6_addr_t mcast;
-		ipv6_set_all_nds_mcast_addr(&mcast);
-		ipv6_get_saddr(&id, &mcast);
-		
-		//TODO: dodag->of = 
-		dodag->dodag_id = id;
+		dodag->of = rpl_get_of_for_ocp(RPL_DEFAULT_OCP); 
 		dodag->instance = inst;
 		dodag->mop = RPL_DEFAULT_MOP;
 		dodag->dtsn = 1;
+		dodag->prf = 0;
 		dodag->dio_interval_doubling = DEFAULT_DIO_INTERVAL_DOUBLINGS;
 		dodag->dio_min = DEFAULT_DIO_INTERVAL_MIN;
 		dodag->dio_redundancy = DEFAULT_DIO_REDUNDANCY_CONSTANT;
 		dodag->maxrankincrease = 0;
-		dodag->minhoprankincrease = DEFAULT_MIN_HOP_RANK_INCREASE;
-		dodag->default_lifetime = RPL_DEFAULT_LIFETIME;
+		dodag->minhoprankincrease = (uint16_t)DEFAULT_MIN_HOP_RANK_INCREASE;
+		dodag->default_lifetime = (uint16_t)RPL_DEFAULT_LIFETIME;
 		dodag->lifetime_unit = RPL_LIFETIME_UNIT;
 		dodag->version = 0;
 		dodag->grounded = RPL_GROUNDED;
@@ -92,6 +111,10 @@ void rpl_init_root(){
 		dodag->joined = 1;
 		dodag->my_preferred_parent = NULL;
 	}	
+	else{
+		printf("Error - could not generate DODAG\n");
+		return;
+	}
 
 	send_DIO();
 
@@ -126,7 +149,7 @@ void send_DIO(){
 	rpl_dio_buf->rpl_instanceid = mydodag->instance->id;
 	rpl_dio_buf->version_number = mydodag->version;
 	rpl_dio_buf->rank = mydodag->my_rank;
-	rpl_dio_buf->g_mop_prf = mydodag->grounded | (mydodag->mop << RPL_MOP_SHIFT);
+	rpl_dio_buf->g_mop_prf = (mydodag->grounded << RPL_GROUNDED_SHIFT) | (mydodag->mop << RPL_MOP_SHIFT) | mydodag->prf;
 	rpl_dio_buf->dtsn = mydodag->dtsn;
 	rpl_dio_buf->flags = 0;
 	rpl_dio_buf->reserved = 0;
@@ -151,34 +174,41 @@ void send_DIO(){
 	rpl_opt_dodag_conf_buf->lifetime_unit = mydodag->lifetime_unit;
 	
 
-	opt_hdr_len += RPL_OPT_LEN + RPL_OPT_DODAG_CONF_LEN; 
+	opt_hdr_len += RPL_OPT_LEN + RPL_OPT_DODAG_CONF_LEN;
 	
 	
 	ipv6_buf->length = ICMPV6_HDR_LEN + DIO_BASE_LEN + opt_hdr_len;
-	//ipv6_buf->length = ICMPV6_HDR_LEN + DIO_BASE_LEN;// + RPL_OPT_LEN + RPL_OPT_DODAG_CONF_LEN; 
 	lowpan_init((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf);
-	printf("sent DIO\n");
 }
 
-void rpl_icmp_handler(uint8_t code){
-	//pakettypen unterscheiden
-	switch(code) {
-		case(ICMP_CODE_DIS):{
-			break;
+void rpl_process(void){
+
+	msg_t m_recv;
+	msg_init_queue(msg_queue, RPL_PKT_RECV_BUF_SIZE);
+
+	while(1){
+		msg_receive(&m_recv);
+		uint8_t *code;
+		code = ((uint8_t*)m_recv.content.ptr);
+		//pakettypen unterscheiden
+		switch(*code) {
+			case(ICMP_CODE_DIS):{
+				break;
+			}
+			case(ICMP_CODE_DIO):{
+				recv_rpl_dio();
+				break;
+			}
+			case(ICMP_CODE_DAO):{
+				recv_rpl_dao();
+				break;
+			}
+			 case(ICMP_CODE_DAO_ACK):{
+				break;
+			}
+			default:
+				break;
 		}
-		case(ICMP_CODE_DIO):{
-			recv_rpl_dio();
-			break;
-		}
-		case(ICMP_CODE_DAO):{
-			recv_rpl_dao();
-			break;
-		}
-		 case(ICMP_CODE_DAO_ACK):{
-			break;
-		}
-		default:
-			return;
 	}
 }
 
@@ -187,18 +217,39 @@ void recv_rpl_dio(void){
 	ipv6_buf = get_ipv6_buf();
 	
 	rpl_dio_buf = get_rpl_dio_buf();
-	
 	int len = DIO_BASE_LEN;
-	printf("Received DIO with DODAGID:\n");
-	ipv6_print_addr(&rpl_dio_buf->dodagid);
-	printf("Rank: %d \n", rpl_dio_buf->rank);
-	
-	//rpl_get_dodag();
-	
-	uint8_t mop = (rpl_dio_buf->g_mop_prf >> RPL_MOP_SHIFT ) | 0x7;
-	if(mop != RPL_DEFAULT_MOP){
-		//not supported yet
+
+	//printf("Rank: %d \n", rpl_dio_buf->rank);
+	printf("Try to find instance with id: %d \n", rpl_dio_buf->rpl_instanceid);
+	rpl_instance_t * dio_inst = rpl_get_instance(rpl_dio_buf->rpl_instanceid);
+	if(dio_inst == NULL){
+		dio_inst = rpl_new_instance(rpl_dio_buf->rpl_instanceid);
+		if(dio_inst == NULL){
+			return;
+		}
+		printf("Created new instance\n");
 	}
+	printf("Try to find dodag with id:\n");
+	ipv6_print_addr(&rpl_dio_buf->dodagid);
+	rpl_dodag_t * dio_dodag = rpl_get_dodag(&rpl_dio_buf->dodagid);
+	if(dio_dodag == NULL){
+		dio_dodag = rpl_new_dodag(dio_inst->id, &rpl_dio_buf->dodagid);
+		if(dio_dodag == NULL){
+			return;
+		}
+		printf("Created new dodag\n");
+		dio_dodag->dtsn = rpl_dio_buf->dtsn;
+		dio_dodag->mop = ((rpl_dio_buf->g_mop_prf >> RPL_MOP_SHIFT ) & RPL_SHIFTED_MOP_MASK);
+		dio_dodag->grounded = rpl_dio_buf->g_mop_prf >> RPL_GROUNDED_SHIFT;
+		dio_dodag->prf = (rpl_dio_buf->g_mop_prf & RPL_PRF_MASK);
+		dio_dodag->version = rpl_dio_buf->version_number;
+	}
+	else{
+		if(rpl_dio_buf->version_number > dio_dodag->version){
+			printf("New Version of dodag\n");
+		}
+	}
+	
 
 	while(len < (ipv6_buf->length - LLHDR_ICMPV6HDR_LEN) ){
 		rpl_opt_buf = get_rpl_opt_buf(len);
@@ -226,6 +277,7 @@ void recv_rpl_dio(void){
 				}
 				len += RPL_OPT_DODAG_CONF_LEN +2;
 				rpl_opt_dodag_conf_buf = get_rpl_opt_dodag_conf_buf(len);	
+				
 				break;
 			}
 			case(RPL_OPT_PREFIX_INFO):{
@@ -243,29 +295,11 @@ void recv_rpl_dio(void){
 
 	
 
+	if(dio_dodag->mop != RPL_DEFAULT_MOP){
+		printf("Error - required MOP not supported yet\n");
+		return;
+	}
 	//handle Packet...
-	
-	//bin ich schon in einem DODAG?
-
-	//kein DODAG:
-	//will ich dem DODAG beitreten?
-
-	//im DODAG:
-	//will ich das DODAG wechseln?
-	//brauche ich für die entscheidung mehr Infos, die im DIO nicht enthalten waren?
-		//DIS an entsprechenden Knoten senden!
-
-	//wechseln:
-		//war ich schon zuvor in dem DODAG?
-			//ja:
-			//Regeln beachten bei Wechsel
-
-			//nein:
-
-	//normal beitreten
-	//-> nur in Parents eintragen
-	
-		
 }
 
 void recv_rpl_dao(void){
@@ -306,8 +340,4 @@ void recv_rpl_dao(void){
 				break;
 		}
 	}
-	//für mich?
-		//ja: verarbeiten
-		//nein: weiterleiten
-
 }
