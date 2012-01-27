@@ -74,7 +74,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_in
 		tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end + tcp_payload_len;
 		}
 
-	msg_send(&m_send_tcp, tcp_socket->pid, 0);
+	msg_send(&m_send_tcp, tcp_socket->recv_pid, 0);
 	return acknowledged_bytes;
 	}
 
@@ -84,7 +84,7 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 
 	if (tcp_socket->socket_values.tcp_control.state == LAST_ACK)
 		{
-		msg_send(&m_send_tcp, tcp_socket->pid, 0);
+		msg_send(&m_send_tcp, tcp_socket->recv_pid, 0);
 		memset(tcp_socket, 0, sizeof(socket_internal_t));
 		return;
 		}
@@ -92,15 +92,14 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 	else if (getWaitingConnectionSocket(tcp_socket->socket_id) != NULL)
 		{
 		m_send_tcp.content.ptr = (char*)tcp_header;
-		net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->pid, TCP_ACK);
+		net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->recv_pid, TCP_ACK);
 		return;
 		}
 	else if (tcp_socket->socket_values.tcp_control.state == ESTABLISHED)
 		{
 		printf("Got regular ack for established connections payload.\n");
-		tcp_socket->socket_values.tcp_control.send_una = tcp_header->ack_nr;
-		tcp_socket->socket_values.tcp_control.send_nxt = tcp_header->ack_nr;
-		tcp_socket->socket_values.tcp_control.send_wnd = tcp_header->window;
+		m_send_tcp.content.ptr = (char*)tcp_header;
+		net_msg_send(&m_send_tcp, tcp_socket->send_pid, 0, TCP_ACK);
 		return;
 		}
 	printf("NO WAY OF HANDLING THIS ACK!\n");
@@ -121,7 +120,7 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 			{
 			// notify socket function accept(..) that a new connection request has arrived
 			// No need to wait for an answer because the server accept() function isnt reading from anything other than the queued sockets
-			msg_send(&m_send_tcp, tcp_socket->pid, 0);
+			msg_send(&m_send_tcp, tcp_socket->recv_pid, 0);
 			}
 		else
 			{
@@ -140,7 +139,7 @@ void handle_tcp_syn_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, s
 	if (tcp_socket->socket_values.tcp_control.state == SYN_SENT)
 		{
 		m_send_tcp.content.ptr = (char*) tcp_header;
-		net_msg_send(&m_send_tcp, tcp_socket->pid, 0, TCP_SYN_ACK);
+		net_msg_send(&m_send_tcp, tcp_socket->recv_pid, 0, TCP_SYN_ACK);
 		}
 	else
 		{
@@ -164,7 +163,7 @@ void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
 
 	m_send.content.value = CLOSE_CONN;
-	msg_send(&m_send, tcp_socket->pid, 0);
+	msg_send(&m_send, tcp_socket->recv_pid, 0);
 	}
 
 void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
@@ -183,7 +182,7 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, s
 	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
 	memset(tcp_socket, 0, sizeof(socket_internal_t));
 
-	msg_send(&m_send, tcp_socket->pid, 0);
+	msg_send(&m_send, tcp_socket->recv_pid, 0);
 	}
 
 void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket, uint8_t *payload)
@@ -214,7 +213,7 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, 
 
 		// Fill TCP ACK packet
 		set_tcp_packet(current_tcp_packet, current_tcp_socket->local_address.sin6_port, current_tcp_socket->foreign_address.sin6_port,
-				current_tcp_socket->tcp_control.send_una, current_tcp_socket->tcp_control.rcv_nxt, 0, TCP_ACK, current_tcp_socket->tcp_control.rcv_wnd,
+				current_tcp_socket->tcp_control.send_una-1, current_tcp_socket->tcp_control.rcv_nxt, 0, TCP_ACK, current_tcp_socket->tcp_control.rcv_wnd,
 				0, 0);
 
 		current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);

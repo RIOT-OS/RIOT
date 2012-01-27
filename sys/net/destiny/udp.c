@@ -47,7 +47,7 @@ void udp_packet_handler(void)
 			if (udp_socket != NULL)
 				{
 				m_send_udp.content.ptr = (char*)ipv6_header;
-				msg_send_receive(&m_send_udp, &m_recv_udp, udp_socket->pid);
+				msg_send_receive(&m_send_udp, &m_recv_udp, udp_socket->recv_pid);
 				}
 			else
 				{

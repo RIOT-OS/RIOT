@@ -103,7 +103,7 @@ void print_internal_socket(socket_internal_t *current_socket_internal)
 	{
 	socket_t *current_socket = &current_socket_internal->socket_values;
 	printf("\n--------------------------\n");
-	printf("ID: %i, PID: %i\n",	current_socket_internal->socket_id,	current_socket_internal->pid);
+	printf("ID: %i, RECV PID: %i SEND PID: %i\n",	current_socket_internal->socket_id,	current_socket_internal->recv_pid, current_socket_internal->send_pid);
 	print_socket(current_socket);
 	printf("\n--------------------------\n");
 	}
@@ -189,7 +189,7 @@ int bind_udp_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
 			}
 		}
 	memcpy(&getSocket(s)->socket_values.local_address, name, namelen);
-	getSocket(s)->pid = pid;
+	getSocket(s)->recv_pid = pid;
 	return 1;
 	}
 
@@ -208,7 +208,7 @@ int bind_tcp_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
 			}
 		}
 	memcpy(&getSocket(s)->socket_values.local_address, name, namelen);
-	getSocket(s)->pid = pid;
+	getSocket(s)->recv_pid = pid;
 	return 1;
 	}
 
@@ -385,7 +385,7 @@ void set_tcp_cb(tcp_cb *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd, uint32_
 	tcp_control->send_wnd = send_wnd;
 	}
 
-int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_thread)
+int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	{
 	// Variables
 	socket_internal_t *current_int_tcp_socket;
@@ -404,8 +404,10 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 
 	current_tcp_socket = &current_int_tcp_socket->socket_values;
 
-	// Set client thread process ID
-	getSocket(socket)->pid = tcp_client_thread;
+	current_int_tcp_socket->recv_pid = thread_getpid();
+
+//	// Set client thread process ID
+//	getSocket(socket)->pid = tcp_client_thread;
 
 	// TODO: random number should be generated like common BSD socket implementation with a periodic timer increasing it
 	// TODO: Add TCP MSS option field
@@ -465,6 +467,8 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_
 int32_t send(int s, void *msg, uint64_t len, int flags)
 	{
 	// Variables
+	uint8_t success = 0;
+	msg_t recv_msg;
 	int32_t sent_bytes = 0;
 	socket_internal_t *current_int_tcp_socket;
 	socket_t *current_tcp_socket;
@@ -487,22 +491,68 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 		return -1;
 		}
 
+	// Add thread PID
+	current_int_tcp_socket->send_pid = thread_getpid();
 
-	// Add packet data
-	if (len > current_tcp_socket->tcp_control.rcv_wnd)
-		{
-		memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, current_tcp_socket->tcp_control.rcv_wnd);
-		sent_bytes = current_tcp_socket->tcp_control.rcv_wnd;
-		}
-	else
-		{
-		memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, len);
-		sent_bytes = len;
-		}
+	current_tcp_socket->tcp_control.no_of_retry = 0;
 
-	current_tcp_socket->tcp_control.send_nxt += sent_bytes;
-	current_tcp_socket->tcp_control.send_wnd = current_tcp_socket->tcp_control.send_wnd - sent_bytes;
-	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, 0, sent_bytes);
+	while (!success)
+		{
+		// Add packet data
+		if (len > current_tcp_socket->tcp_control.send_wnd)
+			{
+			memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, current_tcp_socket->tcp_control.send_wnd);
+			sent_bytes = current_tcp_socket->tcp_control.send_wnd;
+			}
+		else
+			{
+			memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, len);
+			sent_bytes = len;
+			}
+
+		current_tcp_socket->tcp_control.send_nxt += sent_bytes;
+		current_tcp_socket->tcp_control.send_wnd -= sent_bytes;
+		send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, 0, sent_bytes);
+
+		// Remember current time
+		current_tcp_socket->tcp_control.last_packet_time = vtimer_now();
+
+		net_msg_receive(&recv_msg);
+		switch (recv_msg.type)
+			{
+			case TCP_ACK:
+				{
+				tcp_hdr_t *tcp_header = ((tcp_hdr_t*)(recv_msg.content.ptr));
+				printf("send nxt: %li, tcp_ack_nr: %li\n", current_tcp_socket->tcp_control.send_nxt, tcp_header->ack_nr);
+				if (current_tcp_socket->tcp_control.send_nxt == tcp_header->ack_nr-1)
+					{
+					current_tcp_socket->tcp_control.send_una = tcp_header->ack_nr;
+					current_tcp_socket->tcp_control.send_nxt = tcp_header->ack_nr;
+					current_tcp_socket->tcp_control.send_wnd = tcp_header->window;
+					// Got ACK for every sent byte
+					return sent_bytes;
+					}
+				else
+					{
+					// TODO: Handle retransmit of missing bytes
+					break;
+					}
+				}
+			case TCP_RETRY:
+				{
+				current_tcp_socket->tcp_control.send_nxt -= sent_bytes;
+				current_tcp_socket->tcp_control.send_wnd += sent_bytes;
+				break;
+				}
+			case TCP_TIMEOUT:
+				{
+				current_tcp_socket->tcp_control.send_nxt -= sent_bytes;
+				current_tcp_socket->tcp_control.send_wnd += sent_bytes;
+				return -1;
+				break;
+				}
+			}
+		}
 	return sent_bytes;
 	}
 
@@ -537,12 +587,14 @@ int32_t recv(int s, void *buf, uint64_t len, int flags)
 	if (!isTCPSocket(s))
 		{
 		printf("INFO: NO TCP SOCKET!\n");
-		return 0;
+		return -1;
 		}
 
 	current_int_tcp_socket = getSocket(s);
 	current_tcp_socket = &current_int_tcp_socket->socket_values;
 
+	// Setting Thread PID
+	current_int_tcp_socket->recv_pid = thread_getpid();
 
 	if (current_int_tcp_socket->tcp_input_buffer_end > 0)
 		{
@@ -561,7 +613,7 @@ int32_t recv(int s, void *buf, uint64_t len, int flags)
 		// Sent FIN_ACK, wait for ACK
 		msg_receive(&m_recv);
 		// Received ACK, return with closed socket!
-		return 0;
+		return -1;
 		}
 
 	return -1;
@@ -676,7 +728,7 @@ int close(int s)
 		}
 	}
 
-int bind(int s, sockaddr6_t *name, int namelen, uint8_t pid)
+int bind(int s, sockaddr6_t *name, int namelen)
 	{
 	if (exists_socket(s))
 		{
@@ -698,7 +750,7 @@ int bind(int s, sockaddr6_t *name, int namelen, uint8_t pid)
 						{
 						if ((current_socket->protocol == 0) || (current_socket->protocol == IPPROTO_TCP))
 							{
-							return bind_tcp_socket(s, name, namelen, pid);
+							return bind_tcp_socket(s, name, namelen, thread_getpid());
 							break;
 							}
 						else
@@ -713,7 +765,7 @@ int bind(int s, sockaddr6_t *name, int namelen, uint8_t pid)
 						{
 						if ((current_socket->protocol == 0) || (current_socket->protocol == IPPROTO_UDP))
 							{
-							return bind_udp_socket(s, name, namelen, pid);
+							return bind_udp_socket(s, name, namelen, thread_getpid());
 							break;
 							}
 						else
@@ -863,14 +915,14 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 	new_socket = socket(current_queued_socket->domain, current_queued_socket->type, current_queued_socket->protocol);
 	current_new_socket = getSocket(new_socket);
 
-	current_new_socket->pid = pid;
+	current_new_socket->recv_pid = pid;
 	memcpy(&current_new_socket->socket_values, current_queued_socket, sizeof(socket_t));
 	close_socket(current_queued_socket);
 	print_sockets();
 	return new_socket;
 	}
 
-int accept(int s, sockaddr6_t *addr, uint32_t addrlen, uint8_t pid)
+int accept(int s, sockaddr6_t *addr, uint32_t addrlen)
 	{
 	socket_internal_t *server_socket = getSocket(s);
 	if (isTCPSocket(s) && (server_socket->socket_values.tcp_control.state == LISTEN))
@@ -878,7 +930,7 @@ int accept(int s, sockaddr6_t *addr, uint32_t addrlen, uint8_t pid)
 		socket_t *current_queued_socket = getWaitingConnectionSocket(s);
 		if (current_queued_socket != NULL)
 			{
-			return handle_new_tcp_connection(current_queued_socket, server_socket, pid);
+			return handle_new_tcp_connection(current_queued_socket, server_socket, thread_getpid());
 			}
 		else
 			{
@@ -888,7 +940,7 @@ int accept(int s, sockaddr6_t *addr, uint32_t addrlen, uint8_t pid)
 
 			current_queued_socket = getWaitingConnectionSocket(s);
 
-			return handle_new_tcp_connection(current_queued_socket, server_socket, pid);
+			return handle_new_tcp_connection(current_queued_socket, server_socket, thread_getpid());
 			}
 		}
 	else

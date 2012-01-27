@@ -147,9 +147,7 @@ typedef struct __attribute__ ((packed)) sock_t
 	uint8_t				domain;
 	uint8_t				type;
 	uint8_t				protocol;
-//	tcp_socket_status_t local_tcp_status;
-//	tcp_socket_status_t foreign_tcp_status;
-	tcp_cb				tcp_control;			// TODO: Migrate every TCP specific value to this struct: TCP Control Block
+	tcp_cb				tcp_control;
 	sockaddr6_t			local_address;
 	sockaddr6_t			foreign_address;
 	} socket_t;
@@ -157,7 +155,8 @@ typedef struct __attribute__ ((packed)) sock_t
 typedef struct __attribute__ ((packed)) socket_in_t
 	{
 	uint8_t				socket_id;
-	uint8_t				pid;
+	uint8_t				recv_pid;
+	uint8_t				send_pid;
 	// TODO: Maybe use ring buffer instead of copying array values each time
 	uint8_t				tcp_input_buffer_end;
 	uint8_t				tcp_input_buffer[MAX_TCP_BUFFER];
@@ -168,16 +167,16 @@ typedef struct __attribute__ ((packed)) socket_in_t
 socket_internal_t sockets[MAX_SOCKETS];
 
 int socket(int domain, int type, int protocol);
-int connect(int socket, sockaddr6_t *addr, uint32_t addrlen, uint8_t tcp_client_thread);
+int connect(int socket, sockaddr6_t *addr, uint32_t addrlen);
 socket_t *getWaitingConnectionSocket(int socket);
 int32_t recvfrom( int s, void *buf, uint64_t len, int flags, sockaddr6_t *from, uint32_t *fromlen );
 int32_t sendto( int s, void *msg, uint64_t len, int flags, sockaddr6_t *to, uint32_t tolen);
 int32_t send(int s, void *msg, uint64_t len, int flags);
 int32_t recv(int s, void *buf, uint64_t len, int flags);
 int close(int s);
-int bind(int s, sockaddr6_t *name, int namelen, uint8_t pid);
+int bind(int s, sockaddr6_t *name, int namelen);
 int listen(int s, int backlog);
-int accept(int s, sockaddr6_t *addr, uint32_t addrlen, uint8_t pid);
+int accept(int s, sockaddr6_t *addr, uint32_t addrlen);
 void socket_init(void);
 socket_internal_t *get_udp_socket(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header);
 socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
