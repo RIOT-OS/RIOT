@@ -91,6 +91,7 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 	// TODO: Find better way of handling queued sockets ACK packets
 	else if (getWaitingConnectionSocket(tcp_socket->socket_id) != NULL)
 		{
+		printf("sending ACK to queued socket!\n");
 		m_send_tcp.content.ptr = (char*)tcp_header;
 		net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->recv_pid, TCP_ACK);
 		return;
@@ -114,7 +115,7 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 	msg_t m_send_tcp;
 	if (tcp_socket->socket_values.tcp_control.state == LISTEN)
 		{
-		socket_t *new_socket = new_tcp_queued_socket(ipv6_header, tcp_header, tcp_socket);
+		socket_internal_t *new_socket = new_tcp_queued_socket(ipv6_header, tcp_header);
 		if (new_socket != NULL)
 			{
 			// notify socket function accept(..) that a new connection request has arrived
@@ -230,7 +231,7 @@ void tcp_packet_handler (void)
 
 		chksum = tcp_csum(ipv6_header, tcp_header);
 		tcp_socket = get_tcp_socket(ipv6_header, tcp_header);
-		// print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
+//		print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
 
 		if ((chksum == 0xffff) && (tcp_socket != NULL))
 			{
@@ -282,7 +283,7 @@ void tcp_packet_handler (void)
 					}
 				default:
 					{
-					printf("DEFAULT!\n");
+//					printf("DEFAULT!\n");
 					handle_tcp_no_flags_packet(ipv6_header, tcp_header, tcp_socket, payload);
 					}
 				}

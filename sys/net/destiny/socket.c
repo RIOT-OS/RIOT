@@ -98,14 +98,8 @@ void print_socket(socket_t *current_socket)
 //			NTOHS(current_socket->foreign_address.sin6_port),
 //			current_socket->foreign_address.sin6_family);
 	ipv6_print_addr(&current_socket->foreign_address.sin6_addr);
-//	printf("Local TCP status: ACK: %li, SEQ: %li, STATE: %i\n",
-//			current_socket->local_tcp_status.ack_nr,
-//			current_socket->local_tcp_status.seq_nr,
-//			current_socket->local_tcp_status.state);
-//	printf("Foreign TCP status: ACK: %li, SEQ: %li, STATE: %i\n",
-//				current_socket->foreign_tcp_status.ack_nr,
-//				current_socket->foreign_tcp_status.seq_nr,
-//				current_socket->foreign_tcp_status.state);
+	printf("Local Port: %u, Foreign Port: %u\n", NTOHS(current_socket->local_address.sin6_port),
+			NTOHS(current_socket->foreign_address.sin6_port));
 	}
 
 void print_internal_socket(socket_internal_t *current_socket_internal)
@@ -154,7 +148,7 @@ bool exists_socket(uint8_t socket)
 		}
 	}
 
-void close_socket(socket_t *current_socket)
+void close_socket(socket_internal_t *current_socket)
 	{
 	memset(current_socket, 0, sizeof(current_socket));
 	}
@@ -259,6 +253,21 @@ socket_internal_t *get_udp_socket(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header
 	return NULL;
 	}
 
+bool is_four_touple (socket_internal_t *current_socket, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
+	{
+//	printf("Local Port: %i, TCP Dest Port: %i\n", current_socket->socket_values.local_address.sin6_port, tcp_header->dst_port);
+//	printf("Foreign Port: %i, TCP Src Port: %i\n", current_socket->socket_values.foreign_address.sin6_port, tcp_header->src_port);
+//	ipv6_print_addr(&current_socket->socket_values.local_address.sin6_addr);
+//	ipv6_print_addr(&ipv6_header->destaddr);
+//	ipv6_print_addr(&current_socket->socket_values.foreign_address.sin6_addr);
+//	ipv6_print_addr(&ipv6_header->srcaddr);
+//	printf("\n");
+	return ((ipv6_get_addr_match(&current_socket->socket_values.local_address.sin6_addr, &ipv6_header->destaddr) == 128) &&
+			(current_socket->socket_values.local_address.sin6_port == tcp_header->dst_port) &&
+			(ipv6_get_addr_match(&current_socket->socket_values.foreign_address.sin6_addr, &ipv6_header->srcaddr) == 128) &&
+			(current_socket->socket_values.foreign_address.sin6_port == tcp_header->src_port));
+	}
+
 socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
 	{
 	uint8_t i = 1;
@@ -271,11 +280,7 @@ socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header
 		{
 		current_socket = getSocket(i);
 		// Check for matching 4 touple
-		if( isTCPSocket(i) &&
-			(ipv6_get_addr_match(&current_socket->socket_values.local_address.sin6_addr, &ipv6_header->destaddr) == 128) &&
-			(current_socket->socket_values.local_address.sin6_port == tcp_header->dst_port) &&
-			(ipv6_get_addr_match(&current_socket->socket_values.foreign_address.sin6_addr, &ipv6_header->srcaddr) == 128) &&
-			(current_socket->socket_values.foreign_address.sin6_port == tcp_header->src_port))
+		if( isTCPSocket(i) && is_four_touple(current_socket, ipv6_header, tcp_header))
 			{
 			return current_socket;
 			}
@@ -415,9 +420,6 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	current_tcp_socket = &current_int_tcp_socket->socket_values;
 
 	current_int_tcp_socket->recv_pid = thread_getpid();
-
-//	// Set client thread process ID
-//	getSocket(socket)->pid = tcp_client_thread;
 
 	// TODO: random number should be generated like common BSD socket implementation with a periodic timer increasing it
 	// TODO: Add TCP MSS option field
@@ -702,7 +704,6 @@ int close(int s)
 		{
 		// Variables
 		msg_t m_recv;
-		socket_t *current_tcp_socket;
 		uint8_t send_buffer[BUFFER_SIZE];
 		ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 		tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
@@ -713,21 +714,20 @@ int close(int s)
 			return -1;
 			}
 
-		current_tcp_socket = &current_socket->socket_values;
-
 		// Check for ESTABLISHED STATE
-		if (current_tcp_socket->tcp_control.state != ESTABLISHED)
+		if (current_socket->socket_values.tcp_control.state != ESTABLISHED)
 			{
-			close_socket(current_tcp_socket);
+			close_socket(current_socket);
 			return 1;
 			}
 
 		// Refresh local TCP socket information
-		current_tcp_socket->tcp_control.send_una++;
-		current_tcp_socket->tcp_control.state = FIN_WAIT_1;
+		current_socket->socket_values.tcp_control.send_una++;
+		current_socket->socket_values.tcp_control.state = FIN_WAIT_1;
 
-		send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN, 0);
+		send_tcp(NULL, &current_socket->socket_values, current_tcp_packet, temp_ipv6_header, TCP_FIN, 0);
 		msg_receive(&m_recv);
+		close_socket(current_socket);
 		return 1;
 		}
 	else
@@ -825,7 +825,6 @@ int listen(int s, int backlog)
 		{
 		socket_internal_t *current_socket = getSocket(s);
 		current_socket->socket_values.tcp_control.state = LISTEN;
-		memset(current_socket->queued_sockets, 0, MAX_QUEUED_SOCKETS*sizeof(socket_t));
 		return 0;
 		}
 	else
@@ -834,50 +833,36 @@ int listen(int s, int backlog)
 		}
 	}
 
-socket_t *getWaitingConnectionSocket(int socket)
+socket_internal_t *getWaitingConnectionSocket(int socket)
 	{
 	int i;
-	for (i = 0; i < MAX_QUEUED_SOCKETS; i++)
+	socket_internal_t *current_socket, *listening_socket = getSocket(socket);
+	for (i = 0; i < MAX_SOCKETS; i++)
 		{
-		if (getSocket(socket)->queued_sockets[i].tcp_control.state == SYN_RCVD)
+		current_socket = getSocket(i);
+		if ((current_socket->socket_values.tcp_control.state == SYN_RCVD) &&
+				(current_socket->socket_values.local_address.sin6_port == listening_socket->socket_values.local_address.sin6_port))
 			{
-			return &getSocket(socket)->queued_sockets[i];
+			return current_socket;
 			}
 		}
 	return NULL;
 	}
 
-int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t *server_socket, uint8_t pid)
+int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket, socket_internal_t *server_socket, uint8_t pid)
 	{
-	// Got new connection request (SYN), get new socket number and establish connection (send SYN ACK)
-	int new_socket;
 	msg_t msg_recv_client_ack, msg_send_client_ack;
-	socket_internal_t *current_new_socket;
+	socket_t *current_queued_socket = &current_queued_int_socket->socket_values;
 	uint8_t send_buffer[BUFFER_SIZE];
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *syn_ack_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
 
-	// Set status of internal socket to SYN_RCVD until connection with second socket is established!
-	server_socket->socket_values.tcp_control.state = SYN_RCVD;
-
-	// Fill SYN ACK TCP packet, still use queued socket for port number until connection is completely established!
-	// Otherwise the program doesnt return to this function and instead trys to call the new registered thread
-	// which isnt prepared to complete the threeway handshake process!
-	set_tcp_packet(syn_ack_packet, server_socket->socket_values.local_address.sin6_port, current_queued_socket->foreign_address.sin6_port,
-			current_queued_socket->tcp_control.send_una, current_queued_socket->tcp_control.rcv_nxt, 0, TCP_SYN_ACK,
-			current_queued_socket->tcp_control.rcv_wnd, 0, 0);
-
-	// Specify IPV6 target address and choose outgoing interface source address
-	memcpy(&(temp_ipv6_header->destaddr), &current_queued_socket->foreign_address.sin6_addr, 16);
-	ipv6_get_saddr(&(temp_ipv6_header->srcaddr), &(temp_ipv6_header->destaddr));
-	temp_ipv6_header->length = TCP_HDR_LEN;
-
-	syn_ack_packet->checksum = ~tcp_csum(temp_ipv6_header, syn_ack_packet);
+	current_queued_int_socket->recv_pid = thread_getpid();
 
 	// Remember current time
-	server_socket->socket_values.tcp_control.last_packet_time = vtimer_now();
+	current_queued_int_socket->socket_values.tcp_control.last_packet_time = vtimer_now();
 
-	server_socket->socket_values.tcp_control.no_of_retry = 0;
+	current_queued_int_socket->socket_values.tcp_control.no_of_retry = 0;
 
 	// Set message type to Retry for while loop
 	msg_recv_client_ack.type = TCP_RETRY;
@@ -885,7 +870,7 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 	while (msg_recv_client_ack.type == TCP_RETRY)
 		{
 		// Send packet
-		sixlowpan_send(&current_queued_socket->foreign_address.sin6_addr, (uint8_t*)(syn_ack_packet), TCP_HDR_LEN, IPPROTO_TCP, current_queued_socket);
+		send_tcp(NULL, current_queued_socket, syn_ack_packet, temp_ipv6_header, TCP_SYN_ACK, 0);
 
 		// wait for ACK from Client
 		msg_receive(&msg_recv_client_ack);
@@ -894,7 +879,7 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 			// Set status of internal socket back to LISTEN
 			server_socket->socket_values.tcp_control.state = LISTEN;
 
-			close_socket(current_queued_socket);
+			close_socket(current_queued_int_socket);
 			return -1;
 			}
 		}
@@ -920,14 +905,9 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 	// send a reply to the TCP handler after processing every information from the TCP ACK packet
 	msg_reply(&msg_recv_client_ack, &msg_send_client_ack);
 
-	new_socket = socket(current_queued_socket->domain, current_queued_socket->type, current_queued_socket->protocol);
-	current_new_socket = getSocket(new_socket);
-
-	current_new_socket->recv_pid = pid;
-	memcpy(&current_new_socket->socket_values, current_queued_socket, sizeof(socket_t));
-	close_socket(current_queued_socket);
 	print_sockets();
-	return new_socket;
+
+	return current_queued_int_socket->socket_id;
 	}
 
 int accept(int s, sockaddr6_t *addr, uint32_t addrlen)
@@ -935,7 +915,7 @@ int accept(int s, sockaddr6_t *addr, uint32_t addrlen)
 	socket_internal_t *server_socket = getSocket(s);
 	if (isTCPSocket(s) && (server_socket->socket_values.tcp_control.state == LISTEN))
 		{
-		socket_t *current_queued_socket = getWaitingConnectionSocket(s);
+		socket_internal_t *current_queued_socket = getWaitingConnectionSocket(s);
 		if (current_queued_socket != NULL)
 			{
 			return handle_new_tcp_connection(current_queued_socket, server_socket, thread_getpid());
@@ -957,40 +937,26 @@ int accept(int s, sockaddr6_t *addr, uint32_t addrlen)
 		}
 	}
 
-socket_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *socket)
+socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
 	{
-	int i, free_slot = -1;
-	for (i = 0; i < MAX_QUEUED_SOCKETS; i++)
-		{
-		if (socket->queued_sockets[i].type == 0)
-			{
-			// Found a free slot, remember for usage later
-			free_slot = i;
-			}
-		else if (socket->queued_sockets[i].foreign_address.sin6_port == tcp_header->src_port)
-			{
-			// Already registered as waiting connection
-			return NULL;
-			}
-		}
+	int queued_socket_id;
 
-	socket_t *current_queued_socket = &socket->queued_sockets[free_slot];
-	current_queued_socket->domain = PF_INET6;
-	current_queued_socket->type = SOCK_STREAM;
-	current_queued_socket->protocol = IPPROTO_TCP;
+	queued_socket_id = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
+	socket_internal_t *current_queued_socket = getSocket(queued_socket_id);
 
 	// Foreign address
-	set_socket_address(&current_queued_socket->foreign_address, AF_INET6, tcp_header->src_port, ipv6_header->flowlabel, &ipv6_header->srcaddr);
+	set_socket_address(&current_queued_socket->socket_values.foreign_address, AF_INET6, tcp_header->src_port, ipv6_header->flowlabel, &ipv6_header->srcaddr);
 
 	// Local address
-	set_socket_address(&current_queued_socket->local_address, AF_INET6, tcp_header->dst_port, 0, &ipv6_header->destaddr);
+	set_socket_address(&current_queued_socket->socket_values.local_address, AF_INET6, tcp_header->dst_port, 0, &ipv6_header->destaddr);
 
 	// Foreign TCP information
-	current_queued_socket->tcp_control.rcv_irs 	= tcp_header->seq_nr;
-	current_queued_socket->tcp_control.send_iss 	= rand();
-	current_queued_socket->tcp_control.state 		= SYN_RCVD;
-	set_tcp_cb(&current_queued_socket->tcp_control, tcp_header->seq_nr+1, STATIC_WINDOW,
-			current_queued_socket->tcp_control.send_iss, current_queued_socket->tcp_control.send_iss, tcp_header->window);
+	current_queued_socket->socket_values.tcp_control.rcv_irs 		= tcp_header->seq_nr;
+	current_queued_socket->socket_values.tcp_control.send_iss 	= rand();
+	current_queued_socket->socket_values.tcp_control.state 		= SYN_RCVD;
+	set_tcp_cb(&current_queued_socket->socket_values.tcp_control, tcp_header->seq_nr+1, STATIC_WINDOW,
+			current_queued_socket->socket_values.tcp_control.send_iss,
+			current_queued_socket->socket_values.tcp_control.send_iss, tcp_header->window);
 
 	return current_queued_socket;
 	}

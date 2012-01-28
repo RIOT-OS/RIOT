@@ -149,21 +149,21 @@ void init_tcp_server(void)
 	 	exit(EXIT_FAILURE);
 		}
 
-		printf("INFO: WAITING FOR INC CONNECTIONS!\n");
-		int ConnectFD = accept(SocketFD, NULL, 0);
-		if(0 > ConnectFD)
-			{
-			perror("error accept failed");
-			close(SocketFD);
-			exit(EXIT_FAILURE);
-			}
-		tcp_socket_id = ConnectFD;
-		while (read_bytes != -1)
-			{
-			read_bytes = recv(ConnectFD, buff_msg, MAX_TCP_BUFFER, 0);
-			printf("--- Message: %s ---\n", buff_msg);
+	printf("INFO: WAITING FOR INC CONNECTIONS!\n");
+	int ConnectFD = accept(SocketFD, NULL, 0);
+	if(0 > ConnectFD)
+		{
+		perror("error accept failed");
+		close(SocketFD);
+		exit(EXIT_FAILURE);
+		}
+	tcp_socket_id = ConnectFD;
+	while (read_bytes != -1)
+		{
+		read_bytes = recv(ConnectFD, buff_msg, MAX_TCP_BUFFER, 0);
+		printf("--- Message: %s ---\n", buff_msg);
 
-			}
+		}
 	}
 
 void init_udp_server_thread(char *str)
@@ -208,7 +208,7 @@ void send_tcp_msg(char *str)
 	{
 	msg_t send_msg, recv_msg;
 	sscanf(str, "send_tcp %s", current_message.tcp_string_msg);
-	printf("Message: %s, strcmp: %i\n", current_message.tcp_string_msg, strcmp(current_message.tcp_string_msg, "close"));
+	printf("Message: %s\n", current_message.tcp_string_msg);
 	if (strcmp(current_message.tcp_string_msg, "close") == 0)
 		{
 		send_msg.content.value = 0;
