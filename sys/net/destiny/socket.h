@@ -117,6 +117,8 @@
 #define INC_PACKET			0
 #define OUT_PACKET			1
 
+#define SEND_MSG_BUF_SIZE	64
+
 typedef struct __attribute__ ((packed)) socka6
 	{
     uint8_t     		sin6_family;    		/* AF_INET6 */
@@ -186,7 +188,7 @@ void print_internal_socket(socket_internal_t *current_socket_internal);
 void print_socket(socket_t *current_socket);
 bool exists_socket(uint8_t socket);
 socket_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *socket);
-void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
+void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_t *tcp_socket);
 void set_socket_address(sockaddr6_t *sockaddr, uint8_t sin6_family, uint16_t sin6_port, uint32_t sin6_flowinfo, ipv6_addr_t *sin6_addr);
 void set_tcp_cb(tcp_cb *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd, uint32_t send_nxt, uint32_t send_una, uint16_t send_wnd);
 void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port, uint32_t seq_nr, uint32_t ack_nr,

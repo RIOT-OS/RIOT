@@ -97,7 +97,6 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 		}
 	else if (tcp_socket->socket_values.tcp_control.state == ESTABLISHED)
 		{
-		printf("Got regular ack for established connections payload.\n");
 		m_send_tcp.content.ptr = (char*)tcp_header;
 		net_msg_send(&m_send_tcp, tcp_socket->send_pid, 0, TCP_ACK);
 		return;
@@ -196,28 +195,19 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, 
 	if (tcp_payload_len > 0)
 		{
 		read_bytes = handle_payload(ipv6_header, tcp_header, tcp_socket, payload);
+
 		// Refresh TCP status values
 		current_tcp_socket->tcp_control.state = ESTABLISHED;
 
 		set_tcp_cb(&current_tcp_socket->tcp_control,
-				tcp_header->seq_nr + read_bytes + 1,
+				tcp_header->seq_nr + read_bytes,
 				current_tcp_socket->tcp_control.rcv_wnd,
 				current_tcp_socket->tcp_control.send_nxt,
 				current_tcp_socket->tcp_control.send_una,
 				current_tcp_socket->tcp_control.send_wnd);
 
-		// Fill IPv6 Header
-		memcpy(&(temp_ipv6_header->destaddr), &current_tcp_socket->foreign_address.sin6_addr, 16);
-		memcpy(&(temp_ipv6_header->srcaddr), &current_tcp_socket->local_address.sin6_addr, 16);
-		temp_ipv6_header->length = TCP_HDR_LEN;
-
-		// Fill TCP ACK packet
-		set_tcp_packet(current_tcp_packet, current_tcp_socket->local_address.sin6_port, current_tcp_socket->foreign_address.sin6_port,
-				current_tcp_socket->tcp_control.send_una-1, current_tcp_socket->tcp_control.rcv_nxt, 0, TCP_ACK, current_tcp_socket->tcp_control.rcv_wnd,
-				0, 0);
-
-		current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
-		sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN, IPPROTO_TCP);
+		// Send packet
+		send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
 		}
 	}
 
@@ -239,8 +229,8 @@ void tcp_packet_handler (void)
 		payload = (uint8_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN + TCP_HDR_LEN);
 
 		chksum = tcp_csum(ipv6_header, tcp_header);
-		print_tcp_status(INC_PACKET, ipv6_header, tcp_header);
 		tcp_socket = get_tcp_socket(ipv6_header, tcp_header);
+		// print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
 
 		if ((chksum == 0xffff) && (tcp_socket != NULL))
 			{
@@ -301,6 +291,7 @@ void tcp_packet_handler (void)
 			{
 			printf("Wrong checksum (%x) or no corresponding socket found!\n", chksum);
 			}
+
 		msg_reply(&m_recv_ip, &m_send_ip);
 		}
 	}

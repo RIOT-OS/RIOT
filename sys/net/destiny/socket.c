@@ -17,6 +17,7 @@
 #include "sys/net/net_help/msg_help.h"
 
 msg_t socket_msg_queue[IP_PKT_RECV_BUF_SIZE];
+msg_t send_msg_queue[SEND_MSG_BUF_SIZE];
 
 void print_tcp_flags (tcp_hdr_t *tcp_header)
 	{
@@ -59,10 +60,17 @@ void print_tcp_flags (tcp_hdr_t *tcp_header)
 			break;
 			}
 		}
-	printf("\n\n");
+	printf("\n");
 	}
 
-void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
+void print_tcp_cb(tcp_cb *cb)
+	{
+	printf("Send_ISS: %lu\nSend_UNA: %lu\nSend_NXT: %lu\nSend_WND: %u\n", cb->send_iss, cb->send_una, cb->send_nxt, cb->send_wnd);
+	printf("Rcv_IRS: %lu\nRcv_NXT: %lu\nRcv_WND: %u\n", cb->rcv_irs, cb->rcv_nxt, cb->rcv_wnd);
+	printf("Time difference: %lu, No_of_retrie: %u, State: %u\n\n", timex_sub(vtimer_now(), cb->last_packet_time).microseconds, cb->no_of_retry, cb->state);
+	}
+
+void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_t *tcp_socket)
 	{
 	printf("--- %s TCP packet: ---\n", (in_or_out == INC_PACKET ? "Incoming" : "Outgoing"));
 	printf("IPv6 Source:");
@@ -73,6 +81,7 @@ void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_hea
 	printf("Source Port: %i, Dest. Port: %i\n", tcp_header->src_port, tcp_header->dst_port);
 	printf("ACK: %li, SEQ: %li, Window: %i\n", tcp_header->ack_nr, tcp_header->seq_nr, tcp_header->window);
 	print_tcp_flags(tcp_header);
+	print_tcp_cb(&tcp_socket->tcp_control);
 	}
 
 void print_socket(socket_t *current_socket)
@@ -361,7 +370,8 @@ int send_tcp(sockaddr6_t *addr, socket_t *current_tcp_socket, tcp_hdr_t *current
 		}
 
 	set_tcp_packet(current_tcp_packet, current_tcp_socket->local_address.sin6_port, current_tcp_socket->foreign_address.sin6_port,
-						current_tcp_socket->tcp_control.send_una, current_tcp_socket->tcp_control.rcv_nxt, 0, flags, current_tcp_socket->tcp_control.rcv_wnd, 0, 0);
+						(flags == TCP_ACK ? current_tcp_socket->tcp_control.send_una-1 : current_tcp_socket->tcp_control.send_una),
+						current_tcp_socket->tcp_control.rcv_nxt, 0, flags, current_tcp_socket->tcp_control.rcv_wnd, 0, 0);
 
 	// Fill IPv6 Header
 	memcpy(&(temp_ipv6_header->destaddr), &current_tcp_socket->foreign_address.sin6_addr, 16);
@@ -371,7 +381,7 @@ int send_tcp(sockaddr6_t *addr, socket_t *current_tcp_socket, tcp_hdr_t *current
 	current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
 
 	// send TCP SYN packet
-	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN+payload_length, IPPROTO_TCP);
+	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN+payload_length, IPPROTO_TCP, current_tcp_socket);
 
 	return 1;
 	}
@@ -454,20 +464,17 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	current_tcp_socket->tcp_control.rcv_irs = tcp_header->seq_nr;
 	set_tcp_cb(&current_tcp_socket->tcp_control, tcp_header->seq_nr+1, current_tcp_socket->tcp_control.rcv_wnd,
 			current_tcp_socket->tcp_control.send_una, current_tcp_socket->tcp_control.send_una, tcp_header->window);
-
+	current_tcp_socket->tcp_control.send_una++;
+	current_tcp_socket->tcp_control.send_nxt++;
 
 	// Send packet
 	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
-
-	current_tcp_socket->tcp_control.send_una++;
-	current_tcp_socket->tcp_control.send_nxt++;
 	return 0;
 	}
 
 int32_t send(int s, void *msg, uint64_t len, int flags)
 	{
 	// Variables
-	uint8_t success = 0;
 	msg_t recv_msg;
 	int32_t sent_bytes = 0;
 	socket_internal_t *current_int_tcp_socket;
@@ -475,6 +482,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 	uint8_t send_buffer[BUFFER_SIZE];
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
+	msg_init_queue(send_msg_queue, SEND_MSG_BUF_SIZE);
 
 	// Check if socket exists and is TCP socket
 	if (!isTCPSocket(s))
@@ -496,7 +504,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 
 	current_tcp_socket->tcp_control.no_of_retry = 0;
 
-	while (!success)
+	while (1)
 		{
 		// Add packet data
 		if (len > current_tcp_socket->tcp_control.send_wnd)
@@ -510,7 +518,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 			sent_bytes = len;
 			}
 
-		current_tcp_socket->tcp_control.send_nxt += sent_bytes;
+		current_tcp_socket->tcp_control.send_nxt += sent_bytes - 1;
 		current_tcp_socket->tcp_control.send_wnd -= sent_bytes;
 		send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, 0, sent_bytes);
 
@@ -523,7 +531,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 			case TCP_ACK:
 				{
 				tcp_hdr_t *tcp_header = ((tcp_hdr_t*)(recv_msg.content.ptr));
-				printf("send nxt: %li, tcp_ack_nr: %li\n", current_tcp_socket->tcp_control.send_nxt, tcp_header->ack_nr);
+				// printf("send nxt: %li, tcp_ack_nr: %li\n", current_tcp_socket->tcp_control.send_nxt, tcp_header->ack_nr);
 				if (current_tcp_socket->tcp_control.send_nxt == tcp_header->ack_nr-1)
 					{
 					current_tcp_socket->tcp_control.send_una = tcp_header->ack_nr;
@@ -540,7 +548,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 				}
 			case TCP_RETRY:
 				{
-				current_tcp_socket->tcp_control.send_nxt -= sent_bytes;
+				current_tcp_socket->tcp_control.send_nxt -= sent_bytes - 1;
 				current_tcp_socket->tcp_control.send_wnd += sent_bytes;
 				break;
 				}
@@ -678,7 +686,7 @@ int32_t sendto(int s, void *msg, uint64_t len, int flags, sockaddr6_t *to, uint3
 
 		current_udp_packet->checksum = ~udp_csum(temp_ipv6_header, current_udp_packet);
 
-		sixlowpan_send(&to->sin6_addr, (uint8_t*)(current_udp_packet), current_udp_packet->length, IPPROTO_UDP);
+		sixlowpan_send(&to->sin6_addr, (uint8_t*)(current_udp_packet), current_udp_packet->length, IPPROTO_UDP, NULL);
 		return current_udp_packet->length;
 		}
 	else
@@ -877,7 +885,7 @@ int handle_new_tcp_connection(socket_t *current_queued_socket, socket_internal_t
 	while (msg_recv_client_ack.type == TCP_RETRY)
 		{
 		// Send packet
-		sixlowpan_send(&current_queued_socket->foreign_address.sin6_addr, (uint8_t*)(syn_ack_packet), TCP_HDR_LEN, IPPROTO_TCP);
+		sixlowpan_send(&current_queued_socket->foreign_address.sin6_addr, (uint8_t*)(syn_ack_packet), TCP_HDR_LEN, IPPROTO_TCP, current_queued_socket);
 
 		// wait for ACK from Client
 		msg_receive(&msg_recv_client_ack);

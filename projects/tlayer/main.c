@@ -355,7 +355,7 @@ void send_packet(char *str){
 
     test_udp_header->checksum = ~udp_csum(test_ipv6_header, test_udp_header);
 
-    sixlowpan_send(&ipaddr, (uint8_t*)(test_udp_header), test_udp_header->length, IPPROTO_UDP);
+    sixlowpan_send(&ipaddr, (uint8_t*)(test_udp_header), test_udp_header->length, IPPROTO_UDP, NULL);
 }
 
 void send_udp(char *str)
