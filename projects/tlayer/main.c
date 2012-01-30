@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
+#include <stdint.h>
 
 #include <posix_io.h>
 #include <shell.h>
@@ -28,7 +29,11 @@
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
 
+#define SEND_TCP_THREAD_SIZE		3072
+#define SHELL_EXTRA_STACK_SIZE		3072
+
 uint8_t udp_server_thread_pid;
+
 char udp_server_stack_buffer[UDP_STACK_SIZE];
 
 uint8_t tcp_server_thread_pid;
@@ -39,7 +44,10 @@ char tcp_cht_stack_buffer[TCP_STACK_SIZE];
 
 int tcp_socket_id = -1;
 uint8_t tcp_send_pid = -1;
-char tcp_send_stack_buffer[2048];
+
+char tcp_send_stack_buffer[SEND_TCP_THREAD_SIZE];
+// TODO: Add UDP_STACK_SIZE definition again!
+char shell_extra_stack[SHELL_EXTRA_STACK_SIZE];
 
 typedef struct tcp_msg_t
 	{
@@ -81,7 +89,10 @@ void tcp_ch(void)
 	while (read_bytes != -1)
 		{
 		read_bytes = recv(SocketFD, buff_msg, MAX_TCP_BUFFER, 0);
-		printf("--- Message: %s ---\n", buff_msg);
+		if (read_bytes > 0)
+			{
+			printf("--- Message: %s ---\n", buff_msg);
+			}
 
 		}
 	}
@@ -109,15 +120,15 @@ void init_udp_server(void)
 			{
 			printf("ERROR: recsize < 0!\n");
 			}
-		printf("recsize: %i\n ", recsize);
-		printf("datagram: %s\n", buffer_main);
+//		printf("recsize: %i\n ", recsize);
+//		printf("datagram: %s\n", buffer_main);
 		}
 	}
 
 void init_tcp_server(void)
 	{
 	sockaddr6_t stSockAddr;
-	int read_bytes = 0;
+	int read_bytes;
 	char buff_msg[MAX_TCP_BUFFER];
 	int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
@@ -137,32 +148,38 @@ void init_tcp_server(void)
 
 	if(-1 == bind(SocketFD, &stSockAddr, sizeof(stSockAddr)))
 		{
-		perror("error bind failed");
+		printf("error bind failed\n");
 		close(SocketFD);
-		exit(EXIT_FAILURE);
+		return;
 		}
 	print_internal_socket(getSocket(SocketFD));
 	if(-1 == listen(SocketFD, 10))
 		{
-		perror("error listen failed");
+		printf("error listen failed\n");
 		close(SocketFD);
-	 	exit(EXIT_FAILURE);
+	 	return;
 		}
-
-	printf("INFO: WAITING FOR INC CONNECTIONS!\n");
-	int ConnectFD = accept(SocketFD, NULL, 0);
-	if(0 > ConnectFD)
+	while (1)
 		{
-		perror("error accept failed");
-		close(SocketFD);
-		exit(EXIT_FAILURE);
-		}
-	tcp_socket_id = ConnectFD;
-	while (read_bytes != -1)
-		{
-		read_bytes = recv(ConnectFD, buff_msg, MAX_TCP_BUFFER, 0);
-		printf("--- Message: %s ---\n", buff_msg);
+		read_bytes = 0;
+		printf("INFO: WAITING FOR INC CONNECTIONS!\n");
+		int ConnectFD = accept(SocketFD, NULL, 0);
+		if(0 > ConnectFD)
+			{
+			printf("error accept failed\n");
+			close(SocketFD);
+			return;
+			}
+		tcp_socket_id = ConnectFD;
+		while (read_bytes != -1)
+			{
+			read_bytes = recv(ConnectFD, buff_msg, MAX_TCP_BUFFER, 0);
 
+			if (read_bytes > 0)
+				{
+				printf("--- Message: %s ---\n", buff_msg);
+				}
+			}
 		}
 	}
 
@@ -218,6 +235,7 @@ void send_tcp_msg(char *str)
 		send_msg.content.value = 1;
 		}
 	msg_send_receive(&send_msg, &recv_msg, tcp_send_pid);
+//	msg_send(&send_msg, tcp_send_pid, 0);
 	}
 
 void send_tcp_bulk(char *str)
@@ -231,6 +249,29 @@ void send_tcp_bulk(char *str)
 		sprintf(command, "send_tcp %s%i", msg_string, i);
 		send_tcp_msg(command);
 		}
+	}
+
+void send_tcp_bandwidth_test(char *str)
+	{
+	timex_t start, end, total;
+	uint32_t secs;
+
+	int i = 0, count;
+	char command[61];
+	char msg_string[] = "abcdefghijklmnopqrstuvwxyz0123456789!-=$%&/()";
+
+	sscanf(str, "tcp_bw %i", &count);
+	start = vtimer_now();
+	for (i = 0; i < count; i++)
+		{
+		sprintf(command, "send_tcp %s%i", msg_string, i);
+		send_tcp_msg(command);
+		}
+	end = vtimer_now();
+	total = timex_sub(end, start);
+	printf("Start: %lu, End: %lu, Total: %lu\n", start.microseconds, end.microseconds, total.microseconds);
+	secs = total.microseconds / 1000000;
+	printf("Time: %lu seconds, Bandwidth: %lu byte/second\n", secs, (count*48)/secs);
 	}
 
 void connect_tcp(char *str)
@@ -312,7 +353,7 @@ void init(char *str){
             break;
     }
     tcp_send_pid = thread_create(	tcp_send_stack_buffer,
-									2048,
+									SEND_TCP_THREAD_SIZE,
 									PRIORITY_MAIN,
 									CREATE_STACKTEST,
 									send_tcp_thread,
@@ -360,13 +401,15 @@ void send_packet(char *str){
 
 void send_udp(char *str)
 	{
+	timex_t start, end, total;
+	uint32_t secs;
 	int sock;
 	sockaddr6_t sa;
 	ipv6_addr_t ipaddr;
 	int bytes_sent;
-	int address;
-	uint8_t text[20];
-	sscanf(str, "send_udp %s %i", text, &address);
+	int address, count;
+	uint8_t text[] = "abcdefghijklmnopqrstuvwxyz0123456789!-=$%&/()";
+	sscanf(str, "send_udp %i %i", &count, &address);
 
 	sock = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 	if (-1 == sock)
@@ -383,13 +426,20 @@ void send_udp(char *str)
 	sa.sin6_family = AF_INET;
 	memcpy(&sa.sin6_addr, &ipaddr, 16);
 	sa.sin6_port = HTONS(7654);
-
-	bytes_sent = sendto(sock, (char*)text, strlen((char*)text)+1, 0, &sa, sizeof sa);
-	if (bytes_sent < 0)
+	start = vtimer_now();
+	for (int i = 0; i < count; i++)
 		{
-		printf("Error sending packet!\n");
+		bytes_sent = sendto(sock, (char*)text, strlen((char*)text)+1, 0, &sa, sizeof sa);
+		if (bytes_sent < 0)
+			{
+			printf("Error sending packet!\n");
+			}
 		}
-
+	end = vtimer_now();
+	total = timex_sub(end, start);
+	printf("Start: %lu, End: %lu, Total: %lu\n", start.microseconds, end.microseconds, total.microseconds);
+	secs = total.microseconds / 1000000;
+	printf("Time: %lu seconds, Bandwidth: %lu byte/second\n", secs, (count*48)/secs);
 	close(sock);
 	}
 
@@ -452,6 +502,17 @@ void continue_process(char *str)
 	msg_send(&send, pid, 0);
 	}
 
+void close_tcp_thread(void)
+	{
+	close(tcp_socket_id);
+	}
+
+void close_tcp (char *str)
+	{
+	thread_create(shell_extra_stack, SHELL_EXTRA_STACK_SIZE, PRIORITY_MAIN,
+			CREATE_STACKTEST, close_tcp_thread, "close_tcp_thread");
+	}
+
 const shell_command_t shell_commands[] = {
     {"init", "", init},
     {"addr", "", get_r_address},
@@ -461,7 +522,6 @@ const shell_command_t shell_commands[] = {
     {"shows", "Show Sockets", shows},
     {"show_reas", "Show reassembly Buffers", showReas},
     {"context", "", context},
-    {"init_tl", "", init_tl},
     {"init_udp_server_thread", "", init_udp_server_thread},
     {"init_tcp_server_thread", "", init_tcp_server_thread},
     {"init_tcp_cht", "", init_tcp_cht},
@@ -471,6 +531,8 @@ const shell_command_t shell_commands[] = {
     {"send_tcp_bulk", "send_tcp_bulk NO_OF_PACKETS PAYLOAD", send_tcp_bulk},
     {"kill_process", "", kill_process},
     {"continue_process", "", continue_process},
+    {"close_tcp", "", close_tcp},
+    {"tcp_bw", "tcp_bw NO_OF_PACKETS", send_tcp_bandwidth_test},
     {NULL, NULL, NULL}
 };
 
@@ -478,6 +540,7 @@ int main(void) {
     printf("6LoWPAN Transport Layers\n");
     posix_open(uart0_handler_pid, 0);
     init_tl(NULL);
+
     shell_t shell;
     shell_init(&shell, shell_commands, uart0_readc, uart0_putc);
 

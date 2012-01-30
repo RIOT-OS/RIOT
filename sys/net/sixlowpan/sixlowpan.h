@@ -65,7 +65,7 @@ void sixlowpan_adhoc_init(transceiver_type_t trans, ipv6_addr_t *prefix, uint8_t
 void lowpan_init(ieee_802154_long_t *addr, uint8_t *data);
 void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
            ieee_802154_long_t *d_laddr);
-void lowpan_iphc_encoding(ieee_802154_long_t *dest);
+void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra);
 void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                           ieee_802154_long_t *s_laddr,
                           ieee_802154_long_t *d_laddr);

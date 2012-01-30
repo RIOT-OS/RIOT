@@ -129,6 +129,7 @@ extern iface_t iface;
 struct icmpv6_hdr_t* get_icmpv6_buf(uint8_t ext_len);
 struct ipv6_hdr_t* get_ipv6_buf(void);
 uint8_t * get_payload_buf(uint8_t ext_len);
+uint8_t * get_payload_buf_send(uint8_t ext_len);
 
 int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr);
 void ipv6_init_iface_as_router(void);
@@ -139,7 +140,7 @@ void ipv6_set_all_nds_mcast_addr(ipv6_addr_t *ipaddr);
 void ipv6_set_loaddr(ipv6_addr_t *ipaddr);
 void ipv6_set_sol_node_mcast_addr(ipv6_addr_t *addr_in, ipv6_addr_t *addr_out);
 void sixlowpan_bootstrapping(void);
-void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t next_header);
+void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t next_header, void *tcp_socket);
 void ipv6_print_addr(ipv6_addr_t *ipaddr);
 void ipv6_process(void);
 void ipv6_get_saddr(ipv6_addr_t *src, ipv6_addr_t *dst);

@@ -113,8 +113,6 @@ void tcp_general_timer(void)
 	while (1)
 		{
 		check_sockets();
-//		cur_time = vtimer_now();
-//		printf("Time Seconds: %li uSeconds: %li\n", cur_time.seconds, cur_time.microseconds);
 		vtimer_set_wakeup(&tcp_vtimer, interval, tcp_timer_pid);
 		thread_sleep();
 		}

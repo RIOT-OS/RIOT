@@ -42,7 +42,7 @@ enum tcp_codes
 	UNDEFINED			= 0,
 	PACKET_OK			= 1,
 	CLOSE_CONN			= 2,
-	SEQ_NO_TOO_SMALL			= 3,
+	SEQ_NO_TOO_SMALL	= 3,
 	ACK_NO_TOO_SMALL 	= 4,
 	ACK_NO_TOO_BIG		= 5
 	};
@@ -64,7 +64,7 @@ enum tcp_codes
 #define SET_TCP_FIN_ACK(a) 		a = ((a & 0x00) | TCP_FIN_ACK)
 
 // TODO: Probably stack size too high
-#define TCP_STACK_SIZE 			4096
+#define TCP_STACK_SIZE 			3072
 
 #include "sys/net/sixlowpan/sixlowip.h"
 //

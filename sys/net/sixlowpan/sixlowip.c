@@ -13,6 +13,7 @@
 #include "sys/net/net_help/msg_help.h"
 #include "sys/net/sixlowpan/rpl/rpl.h"
 
+uint8_t ip_send_buffer[BUFFER_SIZE];
 uint8_t buffer[BUFFER_SIZE];
 msg_t msg_queue[IP_PKT_RECV_BUF_SIZE];
 struct ipv6_hdr_t* ipv6_buf;
@@ -24,10 +25,14 @@ uint8_t iface_addr_list_count = 0;
 int udp_packet_handler_pid = 0;
 int tcp_packet_handler_pid = 0;
 int rpl_process_pid = 0;
-//uint8_t *udp_packet_buffer;
-//uint8_t *tcp_packet_buffer;
 
-//mutex_t buf_mutex;
+struct ipv6_hdr_t* get_ipv6_buf_send(void){
+    return ((struct ipv6_hdr_t*)&(ip_send_buffer[LL_HDR_LEN]));
+}
+
+uint8_t * get_payload_buf_send(uint8_t ext_len){
+    return &(ip_send_buffer[LLHDR_IPV6HDR_LEN + ext_len]);
+}
 
 struct ipv6_hdr_t* get_ipv6_buf(void){
     return ((struct ipv6_hdr_t*)&(buffer[LL_HDR_LEN]));
@@ -46,8 +51,18 @@ void sixlowpan_bootstrapping(void){
     init_rtr_sol(OPT_SLLAO);
 }
 
-void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t next_header){
-    ipv6_buf = get_ipv6_buf();
+void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t next_header, void *tcp_socket){
+	uint8_t *p_ptr;
+	if (next_header == IPPROTO_TCP)
+		{
+		p_ptr = get_payload_buf_send(ipv6_ext_hdr_len);
+    	ipv6_buf = get_ipv6_buf_send();
+		}
+    else
+		{
+    	ipv6_buf = get_ipv6_buf();
+    	p_ptr = get_payload_buf(ipv6_ext_hdr_len);
+		}
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
     packet_length = 0;
 
@@ -61,15 +76,13 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t
     memcpy(&(ipv6_buf->destaddr), addr, 16);
     ipv6_get_saddr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
 
-    uint8_t *p_ptr = get_payload_buf(ipv6_ext_hdr_len); 
-
     memcpy(p_ptr,payload,p_len);
 
     packet_length = IPV6_HDR_LEN + p_len;
 
 #ifdef MODULE_DESTINY
     if (next_header == IPPROTO_TCP) {
-    		 print_tcp_status(OUT_PACKET, ipv6_buf, (tcp_hdr_t *)(payload));
+//    		 print_tcp_status(OUT_PACKET, ipv6_buf, (tcp_hdr_t *)(payload), (socket_t *)tcp_socket);
 		}
 #endif
 
@@ -122,14 +135,15 @@ int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr) {
 }
 
 void ipv6_process(void){
+	msg_t m_recv_lowpan;
 	msg_t m_recv, m_send;
     msg_init_queue(msg_queue, IP_PKT_RECV_BUF_SIZE);
     
     while(1){
-        msg_receive(&m_recv);
+        msg_receive(&m_recv_lowpan);
         
         //ipv6_buf = get_ipv6_buf();
-        ipv6_buf = (struct ipv6_hdr_t*) m_recv.content.ptr;
+        ipv6_buf = (struct ipv6_hdr_t*) m_recv_lowpan.content.ptr;
 
         /* identifiy packet */
         nextheader = &ipv6_buf->nextheader;
@@ -161,7 +175,7 @@ void ipv6_process(void){
 				}
 			case(IPPROTO_UDP):
 				{
-				printf("INFO: UDP Packet received.\n");
+//				printf("INFO: UDP Packet received.\n");
 
 				if (udp_packet_handler_pid != 0)
 					{

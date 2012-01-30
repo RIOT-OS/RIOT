@@ -16,6 +16,7 @@
 #include "sixlownd.h"
 #include "transceiver.h"
 #include "ieee802154_frame.h"
+#include "sys/net/destiny/in.h"
 
 uint16_t packet_length;
 uint8_t packet_dispatch;
@@ -57,10 +58,11 @@ void lowpan_context_auto_remove(void);
 
 /* deliver packet to mac*/
 void lowpan_init(ieee_802154_long_t *addr, uint8_t *data){
-    ipv6_buf = get_ipv6_buf();
     uint8_t mcast = 0;
 
-    memcpy(&laddr.uint8[0], &addr->uint8[0], 8);
+	ipv6_buf = (ipv6_hdr_t *) data;
+
+	memcpy(&laddr.uint8[0], &addr->uint8[0], 8);
 
     if(ipv6_prefix_mcast_match(&ipv6_buf->destaddr)){
         /* send broadcast */
@@ -68,7 +70,7 @@ void lowpan_init(ieee_802154_long_t *addr, uint8_t *data){
     } 
 
 //#ifdef LOWPAN_IPHC
-    lowpan_iphc_encoding(&laddr);
+    lowpan_iphc_encoding(&laddr, ipv6_buf);
     data = &comp_buf[0];
     packet_length = comp_len;
     
@@ -506,8 +508,9 @@ void lowpan_ipv6_set_dispatch(uint8_t *data){
 }
 
 /* draft-ietf-6lowpan-hc-13#section-3.1 */
-void lowpan_iphc_encoding(ieee_802154_long_t *dest){
-    ipv6_buf = get_ipv6_buf();
+void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra){
+	ipv6_buf = ipv6_buf_extra;
+
     uint16_t payload_length = ipv6_buf->length;
     uint8_t lowpan_iphc[2];
     uint8_t *ipv6_hdr_fields = &comp_buf[2];
@@ -767,7 +770,15 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest){
     comp_buf[0] = lowpan_iphc[0];
     comp_buf[1] = lowpan_iphc[1];
 
-    uint8_t *ptr = get_payload_buf(ipv6_ext_hdr_len);
+    uint8_t *ptr;
+    if (ipv6_buf->nextheader == IPPROTO_TCP)
+		{
+    	ptr = get_payload_buf_send(ipv6_ext_hdr_len);
+		}
+    else
+		{
+    	ptr = get_payload_buf(ipv6_ext_hdr_len);
+		}
 
     memcpy(&ipv6_hdr_fields[hdr_pos],ptr,ipv6_buf->length);
 

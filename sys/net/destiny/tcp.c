@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #include "vtimer.h"
+#include "tcp_timer.h"
 #include "tcp.h"
 #include "in.h"
 #include "socket.h"
@@ -61,19 +62,24 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_in
 	uint8_t acknowledged_bytes = 0;
 	if (tcp_payload_len > tcp_socket->socket_values.tcp_control.rcv_wnd)
 		{
+		mutex_lock(&tcp_socket->tcp_buffer_mutex);
 		memcpy(tcp_socket->tcp_input_buffer, payload, tcp_socket->socket_values.tcp_control.rcv_wnd);
 		acknowledged_bytes = tcp_socket->socket_values.tcp_control.rcv_wnd;
 		tcp_socket->socket_values.tcp_control.rcv_wnd = 0;
 		tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end + tcp_socket->socket_values.tcp_control.rcv_wnd;
+		mutex_unlock(&tcp_socket->tcp_buffer_mutex, 0);
 		}
 	else
 		{
+		mutex_lock(&tcp_socket->tcp_buffer_mutex);
 		memcpy(tcp_socket->tcp_input_buffer, payload, tcp_payload_len);
 		tcp_socket->socket_values.tcp_control.rcv_wnd = tcp_socket->socket_values.tcp_control.rcv_wnd - tcp_payload_len;
 		acknowledged_bytes = tcp_payload_len;
 		tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end + tcp_payload_len;
+		mutex_unlock(&tcp_socket->tcp_buffer_mutex, 0);
 		}
-
+//	 msg_receive(&m_recv_tcp);
+//	 printf("Sending MSG to Receiving Thread!\n");
 	msg_send(&m_send_tcp, tcp_socket->recv_pid, 0);
 	return acknowledged_bytes;
 	}
@@ -81,15 +87,23 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_in
 void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
 	{
 	msg_t m_recv_tcp, m_send_tcp;
+	uint8_t target_pid;
 
 	if (tcp_socket->socket_values.tcp_control.state == LAST_ACK)
 		{
+		target_pid = tcp_socket->recv_pid;
+		close_socket(tcp_socket);
+		msg_send(&m_send_tcp, target_pid, 0);
+		return;
+		}
+	else if (tcp_socket->socket_values.tcp_control.state == CLOSING)
+		{
 		msg_send(&m_send_tcp, tcp_socket->recv_pid, 0);
-		memset(tcp_socket, 0, sizeof(socket_internal_t));
+		msg_send(&m_send_tcp, tcp_socket->send_pid, 0);
 		return;
 		}
 	// TODO: Find better way of handling queued sockets ACK packets
-	else if (getWaitingConnectionSocket(tcp_socket->socket_id) != NULL)
+	else if (getWaitingConnectionSocket(tcp_socket->socket_id, ipv6_header, tcp_header) != NULL)
 		{
 		printf("sending ACK to queued socket!\n");
 		m_send_tcp.content.ptr = (char*)tcp_header;
@@ -120,7 +134,7 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 			{
 			// notify socket function accept(..) that a new connection request has arrived
 			// No need to wait for an answer because the server accept() function isnt reading from anything other than the queued sockets
-			msg_send(&m_send_tcp, tcp_socket->recv_pid, 0);
+			net_msg_send(&m_send_tcp, tcp_socket->recv_pid, 0, TCP_SYN);
 			}
 		else
 			{
@@ -155,15 +169,22 @@ void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
 
-	current_tcp_socket->tcp_control.state = LAST_ACK;
-
 	set_tcp_cb(&current_tcp_socket->tcp_control, tcp_header->seq_nr+1, current_tcp_socket->tcp_control.send_wnd, tcp_header->ack_nr,
-			tcp_header->ack_nr, tcp_header->window);
+					tcp_header->ack_nr, tcp_header->window);
 
-	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
+	if (current_tcp_socket->tcp_control.state == FIN_WAIT_1)
+		{
+		current_tcp_socket->tcp_control.state = CLOSING;
 
-	m_send.content.value = CLOSE_CONN;
-	msg_send(&m_send, tcp_socket->recv_pid, 0);
+		send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
+		}
+	else
+		{
+		current_tcp_socket->tcp_control.state = LAST_ACK;
+
+		send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
+		}
+	net_msg_send(&m_send, tcp_socket->recv_pid, 0, CLOSE_CONN);
 	}
 
 void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
@@ -180,8 +201,8 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, s
 			tcp_header->ack_nr, tcp_header->window);
 
 	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
-	memset(tcp_socket, 0, sizeof(socket_internal_t));
 
+	msg_send(&m_send, tcp_socket->send_pid, 0);
 	msg_send(&m_send, tcp_socket->recv_pid, 0);
 	}
 
@@ -200,13 +221,15 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, 
 		// Refresh TCP status values
 		current_tcp_socket->tcp_control.state = ESTABLISHED;
 
+//		printf("     INFOS: TCP Header Seq Nr: %lu, Read Bytes: %u, Both: %lu\n", tcp_header->seq_nr, read_bytes, tcp_header->seq_nr + read_bytes);
+
 		set_tcp_cb(&current_tcp_socket->tcp_control,
 				tcp_header->seq_nr + read_bytes,
 				current_tcp_socket->tcp_control.rcv_wnd,
 				current_tcp_socket->tcp_control.send_nxt,
 				current_tcp_socket->tcp_control.send_una,
 				current_tcp_socket->tcp_control.send_wnd);
-
+//		printf("     INFOS: %lu\n", current_tcp_socket->tcp_control.rcv_nxt);
 		// Send packet
 		send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
 		}
