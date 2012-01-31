@@ -172,6 +172,7 @@ typedef struct rpl_dodag_t {
     uint8_t version;
     uint8_t grounded;
     uint16_t my_rank;
+	uint16_t min_rank;
     uint8_t joined;
     rpl_parent_t *my_preferred_parent;
 	struct rpl_of_t *of;
