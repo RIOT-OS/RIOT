@@ -113,7 +113,7 @@ void tcp_general_timer(void)
 	while (1)
 		{
 		check_sockets();
-		vtimer_set_wakeup(&tcp_vtimer, interval, tcp_timer_pid);
+		vtimer_set_wakeup(&tcp_vtimer, interval, thread_getpid());
 		thread_sleep();
 		}
 	}

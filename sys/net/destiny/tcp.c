@@ -176,13 +176,13 @@ void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 		{
 		current_tcp_socket->tcp_control.state = CLOSING;
 
-		send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
+		send_tcp(current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
 		}
 	else
 		{
 		current_tcp_socket->tcp_control.state = LAST_ACK;
 
-		send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
+		send_tcp(current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
 		}
 	net_msg_send(&m_send, tcp_socket->recv_pid, 0, CLOSE_CONN);
 	}
@@ -200,7 +200,7 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, s
 	set_tcp_cb(&current_tcp_socket->tcp_control, tcp_header->seq_nr+1, current_tcp_socket->tcp_control.send_wnd, tcp_header->ack_nr,
 			tcp_header->ack_nr, tcp_header->window);
 
-	send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
+	send_tcp(current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
 
 	msg_send(&m_send, tcp_socket->send_pid, 0);
 	msg_send(&m_send, tcp_socket->recv_pid, 0);
@@ -231,7 +231,7 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, 
 				current_tcp_socket->tcp_control.send_wnd);
 //		printf("     INFOS: %lu\n", current_tcp_socket->tcp_control.rcv_nxt);
 		// Send packet
-		send_tcp(NULL, current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
+		send_tcp(current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
 		}
 	}
 

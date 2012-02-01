@@ -196,6 +196,6 @@ void set_tcp_cb(tcp_cb *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd, uint32_
 void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port, uint32_t seq_nr, uint32_t ack_nr,
 		uint8_t dataOffset_reserved, uint8_t reserved_flags, uint16_t window, uint16_t checksum, uint16_t urg_pointer);
 int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header);
-int send_tcp(sockaddr6_t *addr, socket_t *current_tcp_socket, tcp_hdr_t *current_tcp_packet, ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length);
+int send_tcp(socket_t *current_tcp_socket, tcp_hdr_t *current_tcp_packet, ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length);
 bool isTCPSocket(uint8_t s);
 #endif /* SOCKET_H_ */

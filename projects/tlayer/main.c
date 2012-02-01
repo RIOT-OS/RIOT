@@ -28,12 +28,12 @@
 #include "sys/net/destiny/tcp_timer.h"
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
+#include "sys/net/net_help/printf2.h"
 
 #define SEND_TCP_THREAD_SIZE		3072
-#define SHELL_EXTRA_STACK_SIZE		3072
+#define TCP_CLOSE_THREAD_STACK_SIZE		3072
 
 uint8_t udp_server_thread_pid;
-
 char udp_server_stack_buffer[UDP_STACK_SIZE];
 
 uint8_t tcp_server_thread_pid;
@@ -42,12 +42,13 @@ char tcp_server_stack_buffer[TCP_STACK_SIZE];
 uint8_t tcp_cht_pid;
 char tcp_cht_stack_buffer[TCP_STACK_SIZE];
 
+// Socket ID used for sending/receiving packets via different threads
 int tcp_socket_id = -1;
-uint8_t tcp_send_pid = -1;
 
+uint8_t tcp_send_pid = -1;
 char tcp_send_stack_buffer[SEND_TCP_THREAD_SIZE];
-// TODO: Add UDP_STACK_SIZE definition again!
-char shell_extra_stack[SHELL_EXTRA_STACK_SIZE];
+
+char tcp_close_thread_stack[TCP_CLOSE_THREAD_STACK_SIZE];
 
 typedef struct tcp_msg_t
 	{
@@ -75,10 +76,13 @@ void tcp_ch(void)
 		return;
 		}
 	memset(&stSockAddr, 0, sizeof(stSockAddr));
+
 	stSockAddr.sin6_family = AF_INET6;
 	stSockAddr.sin6_port = HTONS(1100);
+
 	ipv6_init_address(&stSockAddr.sin6_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, current_message.node_number);
 	ipv6_print_addr(&stSockAddr.sin6_addr);
+
 	if (-1 == connect(SocketFD, &stSockAddr, sizeof(stSockAddr)))
 		{
 		printf("Connect failed!\n");
@@ -91,7 +95,7 @@ void tcp_ch(void)
 		read_bytes = recv(SocketFD, buff_msg, MAX_TCP_BUFFER, 0);
 		if (read_bytes > 0)
 			{
-			printf("--- Message: %s ---\n", buff_msg);
+//			printf("--- Message: %s ---\n", buff_msg);
 			}
 
 		}
@@ -105,8 +109,10 @@ void init_udp_server(void)
 	uint32_t fromlen;
 	int sock = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 	memset(&sa, 0, sizeof sa);
+
 	sa.sin6_family = AF_INET;
 	sa.sin6_port = HTONS(7654);
+
 	fromlen = sizeof(sa);
 	if (-1 == bind(sock, &sa, sizeof(sa)))
 		{
@@ -120,8 +126,8 @@ void init_udp_server(void)
 			{
 			printf("ERROR: recsize < 0!\n");
 			}
-//		printf("recsize: %i\n ", recsize);
-//		printf("datagram: %s\n", buffer_main);
+		printf("recsize: %i\n ", recsize);
+		printf("datagram: %s\n", buffer_main);
 		}
 	}
 
@@ -142,6 +148,7 @@ void init_tcp_server(void)
 
 	stSockAddr.sin6_family = AF_INET6;
 	stSockAddr.sin6_port = HTONS(1100);
+
 	// TODO: HARDCODED! Use one of the IPv6 methods after initializing the node to get the correct ipv6 address!
 	ipv6_init_address(&stSockAddr.sin6_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, get_radio_address());
 	ipv6_print_addr(&stSockAddr.sin6_addr);
@@ -177,7 +184,7 @@ void init_tcp_server(void)
 
 			if (read_bytes > 0)
 				{
-				printf("--- Message: %s ---\n", buff_msg);
+//				printf("--- Message: %s ---\n", buff_msg);
 				}
 			}
 		}
@@ -225,7 +232,7 @@ void send_tcp_msg(char *str)
 	{
 	msg_t send_msg, recv_msg;
 	sscanf(str, "send_tcp %s", current_message.tcp_string_msg);
-	printf("Message: %s\n", current_message.tcp_string_msg);
+//	printf("Message: %s\n", current_message.tcp_string_msg);
 	if (strcmp(current_message.tcp_string_msg, "close") == 0)
 		{
 		send_msg.content.value = 0;
@@ -235,7 +242,6 @@ void send_tcp_msg(char *str)
 		send_msg.content.value = 1;
 		}
 	msg_send_receive(&send_msg, &recv_msg, tcp_send_pid);
-//	msg_send(&send_msg, tcp_send_pid, 0);
 	}
 
 void send_tcp_bulk(char *str)
@@ -269,6 +275,7 @@ void send_tcp_bandwidth_test(char *str)
 		}
 	end = vtimer_now();
 	total = timex_sub(end, start);
+	secs = total.microseconds / 1000000;
 	printf("Start: %lu, End: %lu, Total: %lu\n", start.microseconds, end.microseconds, total.microseconds);
 	secs = total.microseconds / 1000000;
 	printf("Time: %lu seconds, Bandwidth: %lu byte/second\n", secs, (count*48)/secs);
@@ -402,7 +409,7 @@ void send_packet(char *str){
 void send_udp(char *str)
 	{
 	timex_t start, end, total;
-	uint32_t secs;
+	float secs;
 	int sock;
 	sockaddr6_t sa;
 	ipv6_addr_t ipaddr;
@@ -439,7 +446,7 @@ void send_udp(char *str)
 	total = timex_sub(end, start);
 	printf("Start: %lu, End: %lu, Total: %lu\n", start.microseconds, end.microseconds, total.microseconds);
 	secs = total.microseconds / 1000000;
-	printf("Time: %lu seconds, Bandwidth: %lu byte/second\n", secs, (count*48)/secs);
+	printf("Time: %f seconds, Bandwidth: %f byte/second\n", secs, (count*48)/secs);
 	close(sock);
 	}
 
@@ -509,8 +516,8 @@ void close_tcp_thread(void)
 
 void close_tcp (char *str)
 	{
-	thread_create(shell_extra_stack, SHELL_EXTRA_STACK_SIZE, PRIORITY_MAIN,
-			CREATE_STACKTEST, close_tcp_thread, "close_tcp_thread");
+	thread_create(tcp_close_thread_stack, TCP_CLOSE_THREAD_STACK_SIZE, PRIORITY_MAIN,
+			CREATE_STACKTEST, close_tcp_thread, "tcp_close_thread");
 	}
 
 const shell_command_t shell_commands[] = {
@@ -539,6 +546,7 @@ const shell_command_t shell_commands[] = {
 int main(void) {
     printf("6LoWPAN Transport Layers\n");
     posix_open(uart0_handler_pid, 0);
+
     init_tl(NULL);
 
     shell_t shell;

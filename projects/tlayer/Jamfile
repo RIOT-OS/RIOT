@@ -1,5 +1,5 @@
 SubDir TOP projects tlayer ;
 
-Module tlayer : main.c : auto_init vtimer ps shell_commands config cc110x_ng destiny uart0 posix_io shell 6lowpan rtc rpl ;
+Module tlayer : main.c : auto_init vtimer ps shell_commands config cc110x_ng destiny uart0 posix_io shell 6lowpan rtc rpl net_help ;
 
 UseModule tlayer ;
