@@ -13,6 +13,7 @@
 #include "socket.h"
 #include "vtimer.h"
 #include "tcp_timer.h"
+#include "tcp_hc.h"
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
 
@@ -63,7 +64,7 @@ void print_tcp_flags (tcp_hdr_t *tcp_header)
 	printf("\n");
 	}
 
-void print_tcp_cb(tcp_cb *cb)
+void print_tcp_cb(tcp_cb_t *cb)
 	{
 	printf("Send_ISS: %lu\nSend_UNA: %lu\nSend_NXT: %lu\nSend_WND: %u\n", cb->send_iss, cb->send_una, cb->send_nxt, cb->send_wnd);
 	printf("Rcv_IRS: %lu\nRcv_NXT: %lu\nRcv_WND: %u\n", cb->rcv_irs, cb->rcv_nxt, cb->rcv_wnd);
@@ -375,13 +376,21 @@ int send_tcp(socket_t *current_tcp_socket, tcp_hdr_t *current_tcp_packet, ipv6_h
 
 	current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
 
+#ifdef TCP_HC
+	uint16_t compressed_size;
+	compressed_size = compress_tcp_packet(current_tcp_socket, (uint8_t *) current_tcp_packet, temp_ipv6_header, flags, payload_length);
+	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), compressed_size, IPPROTO_TCP, current_tcp_socket);
+
+	return 1;
+#else
 	// send TCP SYN packet
 	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN+payload_length, IPPROTO_TCP, current_tcp_socket);
 
 	return 1;
+#endif
 	}
 
-void set_tcp_cb(tcp_cb *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd, uint32_t send_nxt, uint32_t send_una, uint16_t send_wnd)
+void set_tcp_cb(tcp_cb_t *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd, uint32_t send_nxt, uint32_t send_una, uint16_t send_wnd)
 	{
 	tcp_control->rcv_nxt = rcv_nxt;
 	tcp_control->rcv_wnd = rcv_wnd;
@@ -428,6 +437,11 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	current_tcp_socket->tcp_control.send_iss 	= rand();
 	current_tcp_socket->tcp_control.state 		= SYN_SENT;
 
+#ifdef TCP_HC
+	// Choosing random number Context ID
+	current_tcp_socket->tcp_control.tcp_context.context_id = rand();
+#endif
+
 	set_tcp_cb(&current_tcp_socket->tcp_control, 0, STATIC_WINDOW, current_tcp_socket->tcp_control.send_iss, current_tcp_socket->tcp_control.send_iss, 0);
 
 	// Remember current time
@@ -460,7 +474,6 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 
 	// Got SYN ACK from Server
 	// Refresh foreign TCP socket information
-	current_tcp_socket->tcp_control.state = ESTABLISHED;
 	current_tcp_socket->tcp_control.rcv_irs = tcp_header->seq_nr;
 	set_tcp_cb(&current_tcp_socket->tcp_control, tcp_header->seq_nr+1, current_tcp_socket->tcp_control.rcv_wnd,
 			current_tcp_socket->tcp_control.send_una, current_tcp_socket->tcp_control.send_una, tcp_header->window);
@@ -469,6 +482,7 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 
 	// Send packet
 	send_tcp(current_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
+	current_tcp_socket->tcp_control.state = ESTABLISHED;
 	return 0;
 	}
 
@@ -593,7 +607,8 @@ uint8_t read_from_socket(socket_internal_t *current_int_tcp_socket, void *buf, i
 int recv(int s, void *buf, uint64_t len, int flags)
 	{
 	// Variables
-	msg_t m_recv;
+	uint8_t read_bytes;
+	msg_t m_recv, m_send;
 	socket_internal_t *current_int_tcp_socket;
 	socket_t *current_tcp_socket;
 	msg_init_queue(socket_msg_queue, IP_PKT_RECV_BUF_SIZE);
@@ -619,7 +634,9 @@ int recv(int s, void *buf, uint64_t len, int flags)
 
 	if ((exists_socket(s)) && (current_int_tcp_socket->tcp_input_buffer_end > 0))
 		{
-		return read_from_socket(current_int_tcp_socket, buf, len);
+		read_bytes = read_from_socket(current_int_tcp_socket, buf, len);
+		net_msg_reply(&m_recv, &m_send, UNDEFINED);
+		return read_bytes;
 		}
 
 	// Received FIN

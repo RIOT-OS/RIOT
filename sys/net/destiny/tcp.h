@@ -49,12 +49,12 @@ enum tcp_codes
 
 #define REMOVE_RESERVED 		0xFC
 
-#define IS_TCP_ACK(a) 			((a & TCP_ACK) > 0)			// Test for ACK flag only, iognore URG und PSH flag
-#define IS_TCP_RST(a) 			((a & TCP_RST) > 0)
-#define IS_TCP_SYN(a) 			((a & TCP_SYN) > 0)
-#define IS_TCP_SYN_ACK(a) 		((a & TCP_SYN_ACK) > 0)
-#define IS_TCP_FIN(a) 			((a & TCP_FIN) > 0)
-#define IS_TCP_FIN_ACK(a) 		((a & TCP_FIN_ACK) > 0)
+#define IS_TCP_ACK(a) 			((a & TCP_ACK) 		> 0)	// Test for ACK flag only, ignore URG und PSH flag
+#define IS_TCP_RST(a) 			((a & TCP_RST) 		> 0)
+#define IS_TCP_SYN(a) 			((a & TCP_SYN) 		> 0)
+#define IS_TCP_SYN_ACK(a) 		((a & TCP_SYN_ACK) 	> 0)
+#define IS_TCP_FIN(a) 			((a & TCP_FIN) 		> 0)
+#define IS_TCP_FIN_ACK(a) 		((a & TCP_FIN_ACK) 	> 0)
 
 #define SET_TCP_ACK(a)			a = ((a & 0x00) | TCP_ACK)
 #define SET_TCP_RST(a) 			a = ((a & 0x00) | TCP_RST)
@@ -67,15 +67,6 @@ enum tcp_codes
 #define TCP_STACK_SIZE 			3072
 
 #include "sys/net/sixlowpan/sixlowip.h"
-//
-//typedef struct __attribute__ ((packed)) tcp_so_sta_t
-//	{
-//	uint32_t	ack_nr;
-//	uint8_t		mss;
-//	uint32_t 	seq_nr;
-//	uint8_t 	state;
-//	uint16_t 	window;
-//	} tcp_socket_status_t;
 
 typedef struct __attribute__ ((packed)) tcp_h_t
 	{

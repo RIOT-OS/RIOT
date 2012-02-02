@@ -12,6 +12,7 @@
 
 #include "vtimer.h"
 #include "tcp_timer.h"
+#include "tcp_hc.h"
 #include "tcp.h"
 #include "in.h"
 #include "socket.h"
@@ -57,7 +58,7 @@ uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
 
 uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket, uint8_t *payload)
 	{
-	msg_t m_send_tcp;
+	msg_t m_send_tcp, m_recv_tcp;
 	uint8_t tcp_payload_len = ipv6_header->length-TCP_HDR_LEN;
 	uint8_t acknowledged_bytes = 0;
 	if (tcp_payload_len > tcp_socket->socket_values.tcp_control.rcv_wnd)
@@ -80,7 +81,11 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_in
 		}
 //	 msg_receive(&m_recv_tcp);
 //	 printf("Sending MSG to Receiving Thread!\n");
-	msg_send(&m_send_tcp, tcp_socket->recv_pid, 0);
+	if (thread_getstatus(tcp_socket->recv_pid) == STATUS_RECEIVE_BLOCKED)
+		{
+		net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->recv_pid, UNDEFINED);
+		}
+
 	return acknowledged_bytes;
 	}
 
@@ -254,10 +259,13 @@ void tcp_packet_handler (void)
 
 		chksum = tcp_csum(ipv6_header, tcp_header);
 		tcp_socket = get_tcp_socket(ipv6_header, tcp_header);
-//		print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
+		print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
 
 		if ((chksum == 0xffff) && (tcp_socket != NULL))
 			{
+#ifdef TCP_HC
+			update_tcp_hc_context(true, &tcp_socket->socket_values.tcp_control.tcp_context, tcp_header);
+#endif
 			// Remove reserved bits from tcp flags field
 			uint8_t tcp_flags = tcp_header->reserved_flags & REMOVE_RESERVED;
 

@@ -28,7 +28,6 @@
 #include "sys/net/destiny/tcp_timer.h"
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
-#include "sys/net/net_help/printf2.h"
 
 #define SEND_TCP_THREAD_SIZE		3072
 #define TCP_CLOSE_THREAD_STACK_SIZE		3072
