@@ -1,6 +1,13 @@
+#include <vtimer.h>
+#include <thread.h>
+
+#define TRICKLE_TIMER_STACKSIZE 1024 
+#define TRICKLE_INTERVAL_STACKSIZE 3024
+
 void reset_trickletimer(void);
-void init_trickle(int Imin, int Imax, int k);
-void increment_trickle_counter(void);
-void trickle_timer_over_callback(void);
-void trickke_intervall_over_callback(void);
+void init_trickle(void);
+void start_trickle(uint8_t DIOINtMin, uint8_t DIOIntDoubl, uint8_t DIORedundancyConstatnt);
+void trickle_increment_counter(void);
+void trickle_timer_over(void);
+void trickle_interval_over(void);
 

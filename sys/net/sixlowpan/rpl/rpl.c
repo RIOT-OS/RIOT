@@ -4,6 +4,7 @@
 #include "msg.h"
 #include "rpl.h"
 #include "of0.h"
+#include "trickle.h"
 
 #include "sys/net/sixlowpan/sixlowmac.h"
 #include "sys/net/sixlowpan/sixlowip.h"
@@ -64,7 +65,7 @@ rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp){
 
 void rpl_init(){
 
-	//TODO: initialize trickle
+	init_trickle();
 	rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
 									PRIORITY_MAIN-1, CREATE_STACKTEST,
 									rpl_process, "rpl_process");
@@ -115,8 +116,7 @@ void rpl_init_root(){
 		return;
 	}
 
-	//TODO: instead start trickle timer that sends DIOs...
-	send_DIO(&mcast);
+	start_trickle(dodag->dio_min, dodag->dio_interval_doubling, dodag->dio_redundancy);
 
 }
 

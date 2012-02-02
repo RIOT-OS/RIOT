@@ -162,5 +162,11 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
 }
 
 void rpl_global_repair(rpl_dodag_t *dodag){
-
+	rpl_dodag_t * my_dodag = rpl_get_my_dodag();
+	if(my_dodag == NULL){
+		printf("Error - no global repair possible, if not part of a DODAG\n");
+		return;
+	}
+	my_dodag->version = dodag->version;
+	my_dodag->dtsn = dodag->dtsn;
 }
