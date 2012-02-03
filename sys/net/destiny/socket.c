@@ -79,7 +79,7 @@ void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_hea
 	printf("IPv6 Dest:");
 	ipv6_print_addr(&ipv6_header->destaddr);
 	printf("TCP Length: %i\n", ipv6_header->length-TCP_HDR_LEN);
-	printf("Source Port: %i, Dest. Port: %i\n", tcp_header->src_port, tcp_header->dst_port);
+	printf("Source Port: %i, Dest. Port: %i\n", NTOHS(tcp_header->src_port), NTOHS(tcp_header->dst_port));
 	printf("ACK: %li, SEQ: %li, Window: %i\n", tcp_header->ack_nr, tcp_header->seq_nr, tcp_header->window);
 	print_tcp_flags(tcp_header);
 	print_tcp_cb(&tcp_socket->tcp_control);
@@ -281,6 +281,9 @@ socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header
 	while (i < MAX_SOCKETS+1)
 		{
 		current_socket = getSocket(i);
+		printf("State: %i, Local port: %i, tcp-header-port: %i\n", current_socket->socket_values.tcp_control.state,
+				current_socket->socket_values.local_address.sin6_port,
+				tcp_header->dst_port);
 		// Check for matching 4 touple, ESTABLISHED connection
 		if( isTCPSocket(i) && is_four_touple(current_socket, ipv6_header, tcp_header))
 			{
@@ -378,6 +381,7 @@ int send_tcp(socket_t *current_tcp_socket, tcp_hdr_t *current_tcp_packet, ipv6_h
 
 #ifdef TCP_HC
 	uint16_t compressed_size;
+
 	compressed_size = compress_tcp_packet(current_tcp_socket, (uint8_t *) current_tcp_packet, temp_ipv6_header, flags, payload_length);
 	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), compressed_size, IPPROTO_TCP, current_tcp_socket);
 

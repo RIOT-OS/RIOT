@@ -18,6 +18,7 @@
 #include "socket.h"
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
+#include "sys/net/sixlowpan/sixlowpan.h"
 
 void printTCPHeader(tcp_hdr_t *tcp_header)
 	{
@@ -257,8 +258,14 @@ void tcp_packet_handler (void)
 		tcp_header = ((tcp_hdr_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
 		payload = (uint8_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN + TCP_HDR_LEN);
 
-		chksum = tcp_csum(ipv6_header, tcp_header);
+
+#ifdef TCP_HC
+		printArrayRange((uint8_t *)tcp_header, ipv6_header->length, "Incoming: TCP_HC_FULL_HEADER");
+		tcp_socket = decompress_tcp_packet(ipv6_header);
+#else
 		tcp_socket = get_tcp_socket(ipv6_header, tcp_header);
+#endif
+		chksum = tcp_csum(ipv6_header, tcp_header);
 		print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
 
 		if ((chksum == 0xffff) && (tcp_socket != NULL))
