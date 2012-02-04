@@ -8,15 +8,19 @@
 #include <thread.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <vtimer.h>
 #include "udp.h"
 #include "tcp.h"
 #include "socket.h"
 #include "tcp_timer.h"
 #include "destiny.h"
 
+#define TCP_HC
+
 void init_transport_layer(void)
 	{
-	printf("Initiating Transport Layer packages.\n");
+	printf("Initializing transport layer packages.\n");
 	// SOCKETS
 	memset(sockets, 0, MAX_SOCKETS*sizeof(socket_internal_t));
 
@@ -25,6 +29,10 @@ void init_transport_layer(void)
 	set_udp_packet_handler_pid(udp_thread_pid);
 
 	// TCP
+	srand(vtimer_now().microseconds);
+	global_context_counter = rand();
+	global_sequence_counter = rand();
+
 	int tcp_thread_pid = thread_create(tcp_stack_buffer, TCP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, tcp_packet_handler, "tcp_packet_handler");
 	set_tcp_packet_handler_pid(tcp_thread_pid);
 

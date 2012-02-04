@@ -402,7 +402,7 @@ void send_packet(char *str){
 
     test_udp_header->checksum = ~udp_csum(test_ipv6_header, test_udp_header);
 
-    sixlowpan_send(&ipaddr, (uint8_t*)(test_udp_header), test_udp_header->length, IPPROTO_UDP, NULL);
+    sixlowpan_send(&ipaddr, (uint8_t*)(test_udp_header), test_udp_header->length, IPPROTO_UDP);
 }
 
 void send_udp(char *str)
@@ -519,6 +519,20 @@ void close_tcp (char *str)
 			CREATE_STACKTEST, close_tcp_thread, "tcp_close_thread");
 	}
 
+void boot_server(char *str)
+	{
+	bootstrapping(NULL);
+	vtimer_usleep(1000*1000*2);
+	init_tcp_server_thread(NULL);
+	}
+
+void boot_client(char *str)
+	{
+	init_tcp_cht(NULL);
+	vtimer_usleep(1000*1000*2);
+	connect_tcp("connect_tcp 2");
+	}
+
 const shell_command_t shell_commands[] = {
     {"init", "", init},
     {"addr", "", get_r_address},
@@ -539,6 +553,8 @@ const shell_command_t shell_commands[] = {
     {"continue_process", "", continue_process},
     {"close_tcp", "", close_tcp},
     {"tcp_bw", "tcp_bw NO_OF_PACKETS", send_tcp_bandwidth_test},
+    {"boots", "", boot_server},
+    {"bootc", "", boot_client},
     {NULL, NULL, NULL}
 };
 

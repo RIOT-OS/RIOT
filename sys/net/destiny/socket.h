@@ -177,7 +177,6 @@ typedef struct __attribute__ ((packed)) socket_in_t
 	uint8_t				socket_id;
 	uint8_t				recv_pid;
 	uint8_t				send_pid;
-	// TODO: Maybe use ring buffer instead of copying array values each time
 	uint8_t				tcp_input_buffer_end;
 	uint8_t				tcp_input_buffer[MAX_TCP_BUFFER];
 	mutex_t				tcp_buffer_mutex;
@@ -205,6 +204,7 @@ socket_internal_t *getSocket(uint8_t s);
 void print_sockets(void);
 void print_internal_socket(socket_internal_t *current_socket_internal);
 void print_socket(socket_t *current_socket);
+void printf_tcp_context(tcp_hc_context_t *current_tcp_context);
 bool exists_socket(uint8_t socket);
 socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
 void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_t *tcp_socket);
@@ -213,6 +213,6 @@ void set_tcp_cb(tcp_cb_t *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd, uint3
 void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port, uint32_t seq_nr, uint32_t ack_nr,
 		uint8_t dataOffset_reserved, uint8_t reserved_flags, uint16_t window, uint16_t checksum, uint16_t urg_pointer);
 int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header);
-int send_tcp(socket_t *current_tcp_socket, tcp_hdr_t *current_tcp_packet, ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length);
+int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet, ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length);
 bool isTCPSocket(uint8_t s);
 #endif /* SOCKET_H_ */

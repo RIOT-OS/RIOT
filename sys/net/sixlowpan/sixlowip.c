@@ -51,7 +51,7 @@ void sixlowpan_bootstrapping(void){
     init_rtr_sol(OPT_SLLAO);
 }
 
-void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t next_header, void *tcp_socket){
+void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t next_header){
 	uint8_t *p_ptr;
 	if (next_header == IPPROTO_TCP)
 		{
@@ -79,12 +79,6 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t
     memcpy(p_ptr,payload,p_len);
 
     packet_length = IPV6_HDR_LEN + p_len;
-
-#ifdef MODULE_DESTINY
-    if (next_header == IPPROTO_TCP) {
-    		 print_tcp_status(OUT_PACKET, ipv6_buf, (tcp_hdr_t *)(payload), (socket_t *)tcp_socket);
-		}
-#endif
 
     lowpan_init((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf);
 }

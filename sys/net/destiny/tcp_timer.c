@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "tcp_timer.h"
 #include "vtimer.h"
 #include "thread.h"
@@ -105,6 +106,17 @@ void check_sockets(void)
 		}
 	}
 
+void inc_global_variables(void)
+	{
+	mutex_lock(&global_sequence_clunter_mutex);
+	global_sequence_counter += rand();
+	mutex_unlock(&global_sequence_clunter_mutex, 0);
+
+	mutex_lock(&global_context_counter_mutex);
+	global_context_counter += rand();
+	mutex_unlock(&global_context_counter_mutex, 0);
+	}
+
 void tcp_general_timer(void)
 	{
 	vtimer_t tcp_vtimer;
@@ -112,6 +124,7 @@ void tcp_general_timer(void)
 
 	while (1)
 		{
+		inc_global_variables();
 		check_sockets();
 		vtimer_set_wakeup(&tcp_vtimer, interval, thread_getpid());
 		thread_sleep();

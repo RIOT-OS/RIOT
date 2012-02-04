@@ -8,6 +8,8 @@
 #ifndef TCP_H_
 #define TCP_H_
 
+#define TCP_HC
+
 #define TCP_HDR_LEN 			20
 
 enum tcp_flags
@@ -84,6 +86,14 @@ typedef struct __attribute__ ((packed)) tcp_h_t
 
 // uint8_t buffer_tcp[BUFFER_SIZE];
 char tcp_stack_buffer[TCP_STACK_SIZE];
+
+#ifdef TCP_HC
+mutex_t				global_context_counter_mutex;
+uint8_t				global_context_counter;
+#endif
+
+mutex_t				global_sequence_clunter_mutex;
+uint32_t			global_sequence_counter;
 
 void tcp_packet_handler (void);
 uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
