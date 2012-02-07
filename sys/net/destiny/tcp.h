@@ -8,7 +8,7 @@
 #ifndef TCP_H_
 #define TCP_H_
 
-#define TCP_HC
+//#define TCP_HC
 
 #define TCP_HDR_LEN 			20
 

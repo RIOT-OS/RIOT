@@ -523,7 +523,6 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 
 int32_t send(int s, void *msg, uint64_t len, int flags)
 	{
-	printf("In Send(): %s\n", (char*) msg);
 	// Variables
 	msg_t recv_msg;
 	int32_t sent_bytes = 0;
@@ -631,7 +630,6 @@ uint8_t read_from_socket(socket_internal_t *current_int_tcp_socket, void *buf, i
 	{
 	if (len >= current_int_tcp_socket->tcp_input_buffer_end)
 		{
-		printArrayRange(current_int_tcp_socket->tcp_input_buffer, current_int_tcp_socket->tcp_input_buffer_end, "Incoming_SOCKET");
 		mutex_lock(&current_int_tcp_socket->tcp_buffer_mutex);
 		uint8_t read_bytes = current_int_tcp_socket->tcp_input_buffer_end;
 		memcpy(buf, current_int_tcp_socket->tcp_input_buffer, current_int_tcp_socket->tcp_input_buffer_end);

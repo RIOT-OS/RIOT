@@ -73,8 +73,6 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_in
 		}
 	else
 		{
-		printf("Payload Length: %i\n", tcp_payload_len);
-
 		mutex_lock(&tcp_socket->tcp_buffer_mutex);
 		memcpy(tcp_socket->tcp_input_buffer, payload, tcp_payload_len);
 		tcp_socket->socket_values.tcp_control.rcv_wnd = tcp_socket->socket_values.tcp_control.rcv_wnd - tcp_payload_len;

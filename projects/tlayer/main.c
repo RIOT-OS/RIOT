@@ -184,7 +184,7 @@ void init_tcp_server(void)
 
 			if (read_bytes > 0)
 				{
-				printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
+//				printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
 				}
 			}
 		}
@@ -232,7 +232,7 @@ void send_tcp_msg(char *str)
 	{
 	msg_t send_msg, recv_msg;
 	sscanf(str, "send_tcp %s", current_message.tcp_string_msg);
-	printf("Message: %s\n", current_message.tcp_string_msg);
+//	printf("Message: %s\n", current_message.tcp_string_msg);
 	if (strcmp(current_message.tcp_string_msg, "close") == 0)
 		{
 		send_msg.content.value = 0;
