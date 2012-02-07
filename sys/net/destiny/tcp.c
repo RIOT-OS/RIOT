@@ -226,6 +226,9 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, 
 
 	if (tcp_payload_len > 0)
 		{
+#ifdef TCP_HC
+	current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
+#endif
 		if (check_tcp_consistency(current_tcp_socket, tcp_header) == PACKET_OK)
 			{
 			read_bytes = handle_payload(ipv6_header, tcp_header, tcp_socket, payload);
@@ -342,8 +345,8 @@ void tcp_packet_handler (void)
 		else
 			{
 			printf("Wrong checksum (%x) or no corresponding socket found!\n", chksum);
-//			printArrayRange(((uint8_t *)ipv6_header), IPV6_HDR_LEN+ipv6_header->length, "Incoming");
-//			print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
+			printArrayRange(((uint8_t *)ipv6_header), IPV6_HDR_LEN+ipv6_header->length, "Incoming");
+			print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
 			}
 
 		msg_reply(&m_recv_ip, &m_send_ip);

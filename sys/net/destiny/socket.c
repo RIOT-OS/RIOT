@@ -17,8 +17,8 @@
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
 
-msg_t socket_msg_queue[IP_PKT_RECV_BUF_SIZE];
-msg_t send_msg_queue[SEND_MSG_BUF_SIZE];
+//msg_t socket_msg_queue[IP_PKT_RECV_BUF_SIZE];
+//msg_t send_msg_queue[SEND_MSG_BUF_SIZE];
 
 void printf_tcp_context(tcp_hc_context_t *current_tcp_context)
 	{
@@ -391,6 +391,11 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet, i
 	uint16_t compressed_size;
 
 	compressed_size = compress_tcp_packet(current_socket, (uint8_t *) current_tcp_packet, temp_ipv6_header, flags, payload_length);
+	if (compressed_size == 0)
+		{
+		// Error in compressing tcp packet header
+		return -1;
+		}
 	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), compressed_size, IPPROTO_TCP);
 
 	return 1;
@@ -531,7 +536,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 	uint8_t send_buffer[BUFFER_SIZE];
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
-	msg_init_queue(send_msg_queue, SEND_MSG_BUF_SIZE);
+//	msg_init_queue(send_msg_queue, SEND_MSG_BUF_SIZE);
 
 	// Check if socket exists and is TCP socket
 	if (!isTCPSocket(s))
@@ -553,6 +558,13 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 
 	current_tcp_socket->tcp_control.no_of_retry = 0;
 
+#ifdef TCP_HC
+	current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
+	// Remember TCP Context for possible TCP_RETRY
+	tcp_hc_context_t saved_tcp_context;
+	memcpy(&saved_tcp_context, &current_tcp_socket->tcp_control.tcp_context, sizeof(tcp_hc_context_t)-1);
+#endif
+
 	while (1)
 		{
 		// Add packet data
@@ -570,13 +582,17 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 		current_tcp_socket->tcp_control.send_nxt += sent_bytes;
 		current_tcp_socket->tcp_control.send_wnd -= sent_bytes;
 
+		if (send_tcp(current_int_tcp_socket, current_tcp_packet, temp_ipv6_header, 0, sent_bytes) != 1)
+			{
+			// Error while sending tcp data
+			current_tcp_socket->tcp_control.send_nxt -= sent_bytes;
+			current_tcp_socket->tcp_control.send_wnd += sent_bytes;
 #ifdef TCP_HC
-		// Remember TCP Context for possible TCP_RETRY
-		tcp_hc_context_t saved_tcp_context;
-		memcpy(&saved_tcp_context, &current_tcp_socket->tcp_control.tcp_context, sizeof(tcp_hc_context_t));
+			memcpy(&current_tcp_socket->tcp_control.tcp_context, &saved_tcp_context, sizeof(tcp_hc_context_t));
+			current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
 #endif
-
-		send_tcp(current_int_tcp_socket, current_tcp_packet, temp_ipv6_header, 0, sent_bytes);
+			return -1;
+			}
 
 		// Remember current time
 		current_tcp_socket->tcp_control.last_packet_time = vtimer_now();
@@ -593,6 +609,9 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 					current_tcp_socket->tcp_control.send_nxt = tcp_header->ack_nr;
 					current_tcp_socket->tcp_control.send_wnd = tcp_header->window;
 					// Got ACK for every sent byte
+#ifdef TCP_HC
+					current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
+#endif
 					return sent_bytes;
 					}
 				else
@@ -617,6 +636,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 				current_tcp_socket->tcp_control.send_wnd += sent_bytes;
 #ifdef TCP_HC
 				memcpy(&current_tcp_socket->tcp_control.tcp_context, &saved_tcp_context, sizeof(tcp_hc_context_t));
+				current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
 #endif
 				return -1;
 				break;
@@ -656,8 +676,7 @@ int recv(int s, void *buf, uint64_t len, int flags)
 	uint8_t read_bytes;
 	msg_t m_recv, m_send;
 	socket_internal_t *current_int_tcp_socket;
-	socket_t *current_tcp_socket;
-	msg_init_queue(socket_msg_queue, IP_PKT_RECV_BUF_SIZE);
+//	msg_init_queue(socket_msg_queue, IP_PKT_RECV_BUF_SIZE);
 	// Check if socket exists
 	if (!isTCPSocket(s))
 		{
@@ -666,7 +685,6 @@ int recv(int s, void *buf, uint64_t len, int flags)
 		}
 
 	current_int_tcp_socket = getSocket(s);
-	current_tcp_socket = &current_int_tcp_socket->socket_values;
 
 	// Setting Thread PID
 	current_int_tcp_socket->recv_pid = thread_getpid();
