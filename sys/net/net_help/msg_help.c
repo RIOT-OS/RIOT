@@ -8,6 +8,17 @@
 #include <thread.h>
 #include <stdio.h>
 #include "msg_help.h"
+#include "sys/net/destiny/tcp_timer.h"
+
+void block_continue_thread(void)
+	{
+//	msg_t recv_m;
+//	recv_m.type = TCP_NOT_DEFINED;
+//	while (recv_m.type != TCP_CONTINUE)
+//		{
+//		net_msg_receive(&recv_m);
+//		}
+	}
 
 int net_msg_receive(msg_t *m)
 	{

@@ -52,7 +52,7 @@ char tcp_close_thread_stack[TCP_CLOSE_THREAD_STACK_SIZE];
 typedef struct tcp_msg_t
 	{
 	int		 	node_number;
-	char		tcp_string_msg[50];
+	char		tcp_string_msg[80];
 	}tcp_message_t;
 tcp_message_t current_message;
 
@@ -135,6 +135,7 @@ void init_tcp_server(void)
 	sockaddr6_t stSockAddr;
 	int read_bytes;
 	char buff_msg[MAX_TCP_BUFFER];
+	memset(buff_msg, 0, MAX_TCP_BUFFER);
 	int SocketFD = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
 	if(-1 == SocketFD)
@@ -183,7 +184,7 @@ void init_tcp_server(void)
 
 			if (read_bytes > 0)
 				{
-				printf("--- Message: %s ---\n", buff_msg);
+				printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
 				}
 			}
 		}
@@ -231,7 +232,7 @@ void send_tcp_msg(char *str)
 	{
 	msg_t send_msg, recv_msg;
 	sscanf(str, "send_tcp %s", current_message.tcp_string_msg);
-//	printf("Message: %s\n", current_message.tcp_string_msg);
+	printf("Message: %s\n", current_message.tcp_string_msg);
 	if (strcmp(current_message.tcp_string_msg, "close") == 0)
 		{
 		send_msg.content.value = 0;
@@ -251,7 +252,7 @@ void send_tcp_bulk(char *str)
 	sscanf(str, "send_tcp_bulk %i %s", &count, msg_string);
 	for (i = 0; i < count; i++)
 		{
-		sprintf(command, "send_tcp %s%i", msg_string, i);
+		sprintf(command, "send_tcp %s%.5i", msg_string, i);
 		send_tcp_msg(command);
 		}
 	}
@@ -262,14 +263,14 @@ void send_tcp_bandwidth_test(char *str)
 	uint32_t secs;
 
 	int i = 0, count;
-	char command[61];
-	char msg_string[] = "abcdefghijklmnopqrstuvwxyz0123456789!-=$%&/()";
+	char command[80];
+	char msg_string[] = "abcdefghijklmnopqrstuvwxyz0123456789!-=/%$";
 
 	sscanf(str, "tcp_bw %i", &count);
 	start = vtimer_now();
 	for (i = 0; i < count; i++)
 		{
-		sprintf(command, "send_tcp %s%i", msg_string, i);
+		sprintf(command, "send_tcp %s%.5i", msg_string, i);
 		send_tcp_msg(command);
 		}
 	end = vtimer_now();

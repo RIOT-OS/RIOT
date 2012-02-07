@@ -11,6 +11,17 @@
 
 #include "net_help.h"
 
+void printArrayRange(uint8_t *array, uint16_t len, char *str)
+	{
+	int i = 0;
+	printf("-------------%s-------------\n", str);
+	for (i = 0; i < len; i++)
+		{
+		printf("%#x ", *(array+i));
+		}
+	printf("\n--------------------------\n");
+	}
+
 uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len)
 	{
     int count;

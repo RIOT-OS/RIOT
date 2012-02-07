@@ -138,6 +138,7 @@ typedef struct __attribute__((packed)) tcp_hc_con
 	uint32_t		seq_snd; // Last sent packet values
 	uint32_t		ack_snd;
 	uint16_t		wnd_snd;
+	uint8_t			hc_type;
 	} tcp_hc_context_t;
 
 typedef struct __attribute__((packed)) tcp_control_block
@@ -172,15 +173,15 @@ typedef struct __attribute__ ((packed)) sock_t
 	sockaddr6_t			foreign_address;
 	} socket_t;
 
-typedef struct __attribute__ ((packed)) socket_in_t
+typedef struct socket_in_t
 	{
 	uint8_t				socket_id;
 	uint8_t				recv_pid;
 	uint8_t				send_pid;
 	uint8_t				tcp_input_buffer_end;
-	uint8_t				tcp_input_buffer[MAX_TCP_BUFFER];
 	mutex_t				tcp_buffer_mutex;
 	socket_t			socket_values;
+	uint8_t				tcp_input_buffer[MAX_TCP_BUFFER];
 	} socket_internal_t;
 
 socket_internal_t sockets[MAX_SOCKETS];
@@ -213,6 +214,7 @@ void set_tcp_cb(tcp_cb_t *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd, uint3
 void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port, uint32_t seq_nr, uint32_t ack_nr,
 		uint8_t dataOffset_reserved, uint8_t reserved_flags, uint16_t window, uint16_t checksum, uint16_t urg_pointer);
 int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header);
+void switch_tcp_packet_byte_order(tcp_hdr_t *current_tcp_packet);
 int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet, ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length);
 bool isTCPSocket(uint8_t s);
 #endif /* SOCKET_H_ */

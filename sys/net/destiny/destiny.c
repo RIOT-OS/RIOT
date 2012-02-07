@@ -16,8 +16,6 @@
 #include "tcp_timer.h"
 #include "destiny.h"
 
-#define TCP_HC
-
 void init_transport_layer(void)
 	{
 	printf("Initializing transport layer packages.\n");
@@ -30,7 +28,9 @@ void init_transport_layer(void)
 
 	// TCP
 	srand(vtimer_now().microseconds);
+#ifdef TCP_HC
 	global_context_counter = rand();
+#endif
 	global_sequence_counter = rand();
 
 	int tcp_thread_pid = thread_create(tcp_stack_buffer, TCP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, tcp_packet_handler, "tcp_packet_handler");

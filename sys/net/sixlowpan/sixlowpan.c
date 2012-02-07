@@ -17,6 +17,7 @@
 #include "transceiver.h"
 #include "ieee802154_frame.h"
 #include "sys/net/destiny/in.h"
+#include "sys/net/net_help/net_help.h"
 
 uint16_t packet_length;
 uint8_t packet_dispatch;
@@ -139,17 +140,6 @@ void lowpan_init(ieee_802154_long_t *addr, uint8_t *data){
 
     tag++;
 }
-
-void printArrayRange(uint8_t *array, uint16_t len, char *str)
-	{
-	int i = 0;
-	printf("-------------%s-------------\n", str);
-	for (i = 0; i < len; i++)
-		{
-		printf("%#x ", *(array+i));
-		}
-	printf("\n--------------------------\n");
-	}
 
 void printLongLocalAddr(ieee_802154_long_t *saddr)
 	{
@@ -417,7 +407,7 @@ void check_timeout(void)
 		{
 		if ((cur_time - temp_buf->timestamp) >= LOWPAN_REAS_BUF_TIMEOUT)
 			{
-			printf("TIMEOUT! cur_time: %li, temp_buf: %li\n", cur_time, temp_buf->timestamp);
+//			printf("TIMEOUT! cur_time: %li, temp_buf: %li\n", cur_time, temp_buf->timestamp);
 			temp_buf = collect_garbage(temp_buf);
 			}
 		else
