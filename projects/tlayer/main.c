@@ -94,7 +94,7 @@ void tcp_ch(void)
 		read_bytes = recv(SocketFD, buff_msg, MAX_TCP_BUFFER, 0);
 		if (read_bytes > 0)
 			{
-//			printf("--- Message: %s ---\n", buff_msg);
+			printf("--- Message: %s ---\n", buff_msg);
 			}
 
 		}
@@ -184,7 +184,7 @@ void init_tcp_server(void)
 
 			if (read_bytes > 0)
 				{
-//				printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
+				printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
 				}
 			}
 		}
