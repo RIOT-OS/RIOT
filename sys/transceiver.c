@@ -58,6 +58,10 @@ static void set_monitor(transceiver_type_t t, void *mode);
 static void powerdown(transceiver_type_t t);
 static void switch_to_rx(transceiver_type_t t);
 
+#ifdef DBG_IGNORE
+static void ignore_add(transceiver_type_t t, void *address);
+#endif
+
 /*------------------------------------------------------------------------------------*/
 /* Transceiver init */
 void transceiver_init(transceiver_type_t t) {
@@ -163,6 +167,11 @@ void run(void) {
             case SWITCH_RX:
                 switch_to_rx(cmd->transceivers);
                 break;
+#ifdef DBG_IGNORE
+            case DBG_IGN:
+                ignore_add(cmd->transceivers, cmd->data);
+                break;
+#endif
             default:
                 DEBUG("Unknown message received\n");
                 break;
@@ -395,3 +404,15 @@ static void switch_to_rx(transceiver_type_t t) {
             break;
     }
 }
+
+#ifdef DBG_IGNORE
+static void ignore_add(transceiver_type_t t, void *address) {
+    switch (t) {
+        case TRANSCEIVER_CC1100:
+            cc110x_add_ignored(*((uint8_t*) address));
+            break;
+        default:
+            break;
+    }
+}
+#endif

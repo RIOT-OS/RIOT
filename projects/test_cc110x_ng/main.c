@@ -38,6 +38,9 @@ void print_buffer(char *unused);
 void switch2rx(char *unused);
 void powerdown(char *unused);
 void set_delay(char *delay);
+#ifdef DBG_IGNORE
+void ignore(char *addr);
+#endif
 
 shell_t shell;
 const shell_command_t sc[] = {
@@ -46,6 +49,9 @@ const shell_command_t sc[] = {
     {"snd", "", sender},
     {"delay", "", set_delay},
     {"buffer", "", print_buffer},
+#ifdef DBG_IGNORE
+    {"ign", "ignore node", ignore},
+#endif
     {NULL, NULL, NULL}};
 
 void shell_runner(void) {
@@ -119,6 +125,23 @@ void set_delay(char *delay) {
         puts("Usage:\tdelay <µs>");
     }
 }
+
+#ifdef DBG_IGNORE
+void ignore(char *addr) {
+    uint16_t a;
+    mesg.type = DBG_IGN;
+    mesg.content.ptr = (char*) &tcmd;
+
+    tcmd.transceivers = TRANSCEIVER_CC1100;
+    tcmd.data = &a;
+    if (sscanf(addr, "ign %hu", &a) == 1) {
+        msg_send(&mesg, transceiver_pid, 1);
+    }
+    else {
+        puts("Usage:\tign <addr>");
+    }
+}
+#endif
 
 void radio(void) {
     msg_t m;

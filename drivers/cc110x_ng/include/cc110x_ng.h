@@ -131,5 +131,23 @@ void cc110x_gdo0_irq(void);
  */
 void cc110x_gdo2_irq(void);
 
+#ifdef DBG_IGNORE
+/**
+ * @brief   Initialize ignore function
+ */
+void cc110x_init_ignore(void);
+
+/**
+ * @brief       Adds a address to the ignore list
+ *
+ * @param addr  The physical address to be ignored
+ *
+ * @return      0 if list is full, 1 otherwise
+ *
+ */
+uint8_t cc110x_add_ignored(uint8_t addr);
+#endif
+
+
 
 #endif

@@ -23,11 +23,11 @@
  * @brief Message types for transceiver interface
  */
 enum transceiver_msg_type_t {
-    /* Packet types for driver <-> transceiver communication */
+    /* Message types for driver <-> transceiver communication */
     RCV_PKT_CC1020,        ///< packet was received by CC1020 transceiver
     RCV_PKT_CC1100,        ///< packet was received by CC1100 transceiver
 
-    /* Packet types for transceiver <-> upper layer communication */
+    /* Message types for transceiver <-> upper layer communication */
     PKT_PENDING,    ///< packet pending in transceiver buffer
     SND_PKT,        ///< request for sending a packet
     SND_ACK,        ///< request for sending an acknowledgement
@@ -38,6 +38,9 @@ enum transceiver_msg_type_t {
     GET_ADDRESS,    ///< Get the radio address
     SET_ADDRESS,    ///< Set the radio address
     SET_MONITOR,    ///< Set transceiver to monitor mode (disable address checking)
+
+    /* debug message types */
+    DBG_IGN,        ///< add a physical address to the ignore list
 
     /* Error messages */
     ENOBUFFER,      ///< No buffer left

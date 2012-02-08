@@ -78,6 +78,10 @@ void cc110x_init(int tpid) {
 
 	// Switch to desired mode (WOR or RX)
 	rd_set_mode(RADIO_MODE_ON);
+
+#ifdef DBG_IGNORE
+    cc110x_init_ignore();
+#endif
 }
 
 void cc110x_disable_interrupts(void) {

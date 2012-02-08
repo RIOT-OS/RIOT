@@ -12,6 +12,14 @@
 #include <cpu-conf.h>
 #include <board.h>
 
+#ifdef DBG_IGNORE
+#include <stdio.h>
+#define IGN_MAX     (10)
+
+uint8_t ignored_addr[IGN_MAX];
+static uint8_t is_ignored(uint8_t addr);
+#endif
+
 static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length);
 static uint8_t receive_packet(uint8_t *rxBuffer, uint8_t length);
 
@@ -36,6 +44,11 @@ void cc110x_rx_handler(void) {
 			cc110x_statistic.packets_in_while_tx++;
 			return;
 		}
+#ifdef DBG_IGNORE
+        if (is_ignored(cc110x_rx_buffer[rx_buffer_next].packet.address)) {
+            return;
+        }
+#endif
         cc110x_rx_buffer[rx_buffer_next].rssi = rflags._RSSI;
         cc110x_rx_buffer[rx_buffer_next].lqi = rflags._LQI;
 		cc110x_strobe(CC1100_SFRX);		// ...for flushing the RX FIFO
@@ -155,4 +168,37 @@ static uint8_t receive_packet(uint8_t *rxBuffer, uint8_t length) {
 	return 0;
 }
 
+#ifdef DBG_IGNORE
+void cc110x_init_ignore(void) {
+    uint8_t i;
 
+    for (i = 0; i < IGN_MAX; i++) {
+        ignored_addr[i] = 0;
+    }
+}
+
+uint8_t cc110x_add_ignored(uint8_t addr) {
+   uint8_t i = 0;
+
+   while ((i < IGN_MAX) && ignored_addr[i++]) {
+       printf("i: %hu\n", i);
+   }
+   printf("Adding %hu to ignore list at position %hu\n", addr, i);
+   if (i >= IGN_MAX) {
+       return 0;
+   }
+   ignored_addr[i-1] = addr;
+   return 1;
+}
+
+static uint8_t is_ignored(uint8_t addr) {
+    uint8_t i;
+
+    for (i = 0; i < IGN_MAX; i++) {
+        if (ignored_addr[i] == addr) {
+            return 1;
+        }
+    }
+    return 0;
+}
+#endif
