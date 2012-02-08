@@ -59,6 +59,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 	tcp_hdr_t full_tcp_header;
 	uint16_t packet_size = 0;
 
+	// Connection establisment phase, use FULL_HEADER TCP
 	if (tcp_cb->state != ESTABLISHED)
 		{
 		// draft-aayadi-6lowpan-tcphc-01: 5.1 Full header TCP segment. Establishing Connection
@@ -70,16 +71,22 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 		memset(current_tcp_packet, 0x01, 1);
 
 		// Adding Context ID
-		memcpy(current_tcp_packet + 1, &tcp_context->context_id, 2);
+		uint16_t current_context = HTONS(tcp_context->context_id);
+		memcpy(current_tcp_packet + 1, &current_context, 2);
 
 		// Return correct header length (+3)
 		packet_size = TCP_HDR_LEN + 3 + payload_length;
 
 		// Update the tcp context fields
 		update_tcp_hc_context(false, current_socket, (tcp_hdr_t *)(current_tcp_packet+3));
+
+		// Convert TCP packet to network byte order
+		switch_tcp_packet_byte_order((tcp_hdr_t *)(current_tcp_packet+3));
+
 		return packet_size;
 		}
-	else
+	// Check for header compression type: COMPRESSED_HEADER
+	else if (tcp_context->hc_type == COMPRESSED_HEADER)
 		{
 		// draft-aayadi-6lowpan-tcphc-01: 5.1 Compressed header TCP segment.
 
@@ -100,8 +107,8 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 
 		// 5.2.  LOWPAN_TCPHC Format
 
-		// First 3 bits of TCP_HC_Header are not exactly specified. In this implementation they are always (1|1|0)
-		// CID is always 16 bits in this implementation (1)
+		// First 3 bits of TCP_HC_Header are not exactly specified. In this implementation they are (1|1|0)
+		// for compressed headers and the CID is always 16 bits (1)
 		// (1|1|0|1) = D
 		tcp_hc_header |= 0xD000;
 
@@ -130,7 +137,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 			tcp_hc_header |= 0x0800;
 
 			// Copy first 16 less significant bits of sequence number into buffer
-			*((uint16_t *)current_tcp_packet) = (uint16_t)(full_tcp_header.seq_nr & 0x0000FFFF);
+			*((uint16_t *)current_tcp_packet) = HTONS((uint16_t)(full_tcp_header.seq_nr & 0x0000FFFF));
 			current_tcp_packet += 2;
 			packet_size += 2;
 			}
@@ -141,7 +148,8 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 			tcp_hc_header |= 0x0C00;
 
 			// Copy all bits of sequence number into buffer
-			memcpy(current_tcp_packet, &full_tcp_header.seq_nr, 4);
+			uint32_t cur_seq_no = HTONL(full_tcp_header.seq_nr);
+			memcpy(current_tcp_packet, &cur_seq_no, 4);
 			current_tcp_packet += 4;
 			packet_size += 4;
 			}
@@ -149,6 +157,13 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 		/*----------------------------------*/
 		/*|	Acknowledgment number handling |*/
 		/*----------------------------------*/
+		if ((IS_TCP_ACK(full_tcp_header.reserved_flags) &&
+				(tcp_cb->tcp_context.ack_snd == full_tcp_header.ack_nr)))
+			{
+//			printf("TCP Context Ack Send: %lu, Current TCP Packet Ack: %lu\n", tcp_cb->tcp_context.ack_snd, ((tcp_hdr_t*)current_tcp_packet)->ack_nr);
+			tcp_context->ack_snd = tcp_context->seq_rcv;
+//			printf("TCP Context Ack Send: %lu, TCP Context Seq Recv: %lu\n", tcp_cb->tcp_context.ack_snd, tcp_context->seq_rcv);
+			}
 		if (full_tcp_header.ack_nr == tcp_context->ack_snd)
 			{
 			// Nothing to do, Ack = (0|0)
@@ -171,7 +186,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 			tcp_hc_header |= 0x0200;
 
 			// Copy first 16 less significant bits of acknowledgment number into buffer
-			*((uint16_t *)current_tcp_packet) = (uint16_t)(full_tcp_header.ack_nr & 0x0000FFFF);
+			*((uint16_t *)current_tcp_packet) = HTONS((uint16_t)(full_tcp_header.ack_nr & 0x0000FFFF));
 			current_tcp_packet += 2;
 			packet_size += 2;
 			}
@@ -182,7 +197,8 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 			tcp_hc_header |= 0x0300;
 
 			// Copy all bits of acknowledgment number into buffer
-			memcpy(current_tcp_packet, &full_tcp_header.ack_nr, 4);
+			uint32_t cur_ack_nr = HTONL(full_tcp_header.ack_nr);
+			memcpy(current_tcp_packet, &cur_ack_nr, 4);
 			current_tcp_packet += 4;
 			packet_size += 4;
 			}
@@ -223,7 +239,8 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 			tcp_hc_header |= 0x00C0;
 
 			// Copy all bits of window size into buffer
-			memcpy(current_tcp_packet, &full_tcp_header.window, 2);
+			uint16_t cur_window = HTONS(full_tcp_header.window);
+			memcpy(current_tcp_packet, &cur_window, 2);
 			current_tcp_packet += 2;
 			packet_size += 2;
 			}
@@ -236,15 +253,18 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 			}
 
 		// Copy checksum into buffer
-		memcpy(current_tcp_packet, &full_tcp_header.checksum, 2);
+		uint16_t cur_chk_sum = HTONS(full_tcp_header.checksum);
+		memcpy(current_tcp_packet, &cur_chk_sum, 2);
 		current_tcp_packet += 2;
 		packet_size += 2;
 
 		// Copy TCP_HC Bytes into buffer
-		memcpy(tcp_packet_begin, &tcp_hc_header, 2);
+		uint16_t cur_tcp_hc_header = HTONS(tcp_hc_header);
+		memcpy(tcp_packet_begin, &cur_tcp_hc_header, 2);
 
 		// Copy TCP_HC Context ID into buffer
-		memcpy(tcp_packet_begin+2, &tcp_context->context_id, 2);
+		uint16_t cur_context_id = HTONS(tcp_context->context_id);
+		memcpy(tcp_packet_begin+2, &cur_context_id, 2);
 
 		// Move payload to end of tcp header
 		memmove(current_tcp_packet, tcp_packet_begin+TCP_HDR_LEN, payload_length);
@@ -252,10 +272,106 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 		// Adding TCP payload length to TCP_HC header length
 		packet_size += payload_length;
 
-		print_tcp_status(OUT_PACKET, temp_ipv6_header, &full_tcp_header, current_tcp_socket);
 		update_tcp_hc_context(false, current_socket, &full_tcp_header);
+//		print_tcp_status(OUT_PACKET, temp_ipv6_header, &full_tcp_header, current_tcp_socket);
 		return packet_size;
 		}
+	// Check for header compression type: MOSTLY_COMPRESSED_HEADER
+	else if (tcp_context->hc_type == MOSTLY_COMPRESSED_HEADER)
+		{
+		// draft-aayadi-6lowpan-tcphc-01: 5.1 Compressed header TCP segment.
+
+		// Temporary variable for TCP_HC_Header Bytes
+		uint16_t tcp_hc_header = 0x0000;
+
+		// Save TCP_Header to refresh TCP Context values after compressing the packet
+		memcpy(&full_tcp_header, current_tcp_packet, TCP_HDR_LEN);
+
+		// Temporary variable for storing TCP header beginning
+		uint8_t *tcp_packet_begin = current_tcp_packet;
+
+		// Position for first TCP header value, TCP_HC_Header and Context ID
+		current_tcp_packet += 4;
+
+		// Packet size value
+		packet_size += 4;
+
+		// 5.2.  LOWPAN_TCPHC Format
+
+		// First 3 bits of TCP_HC_Header are not exactly specified. In this implementation they are (1|0|0)
+		// for mostly compressed headers and the CID is always 16 bits (1)
+		// (1|0|0|1) = 9
+		tcp_hc_header |= 0x9000;
+
+		/*----------------------------------*/
+		/*|		Sequence number handling   |*/
+		/*----------------------------------*/
+		// Sending uncompressed sequence number
+		// Seq = (1|1)
+		tcp_hc_header |= 0x0C00;
+
+		// Copy all bits of sequence number into buffer
+		uint32_t cur_seq_no = HTONL(full_tcp_header.seq_nr);
+		memcpy(current_tcp_packet, &cur_seq_no, 4);
+		current_tcp_packet += 4;
+		packet_size += 4;
+
+		/*----------------------------------*/
+		/*|	Acknowledgment number handling |*/
+		/*----------------------------------*/
+		// Ack = (1|1)
+		tcp_hc_header |= 0x0300;
+
+		// Copy all bits of acknowledgment number into buffer
+		uint32_t cur_ack_nr = HTONL(full_tcp_header.ack_nr);
+		memcpy(current_tcp_packet, &cur_ack_nr, 4);
+		current_tcp_packet += 4;
+		packet_size += 4;
+
+		/*----------------------------------*/
+		/*|			Window handling 	   |*/
+		/*----------------------------------*/
+		// Wnd = (1|1)
+		tcp_hc_header |= 0x00C0;
+
+		// Copy all bits of window size into buffer
+		uint16_t cur_window = HTONS(full_tcp_header.window);
+		memcpy(current_tcp_packet, &cur_window, 2);
+		current_tcp_packet += 2;
+		packet_size += 2;
+
+		// FIN flag
+		if (IS_TCP_FIN(full_tcp_header.reserved_flags))
+			{
+			// F = (1)
+			tcp_hc_header |= 0x0008;
+			}
+
+		// Copy checksum into buffer
+		uint16_t cur_chk_sum = HTONS(full_tcp_header.checksum);
+		memcpy(current_tcp_packet, &cur_chk_sum, 2);
+		current_tcp_packet += 2;
+		packet_size += 2;
+
+		// Copy TCP_HC Bytes into buffer
+		uint16_t cur_tcp_hc_header = HTONS(tcp_hc_header);
+		memcpy(tcp_packet_begin, &cur_tcp_hc_header, 2);
+
+		// Copy TCP_HC Context ID into buffer
+		uint16_t cur_context_id = HTONS(tcp_context->context_id);
+		memcpy(tcp_packet_begin+2, &cur_context_id, 2);
+
+		// Move payload to end of tcp header
+		memmove(current_tcp_packet, tcp_packet_begin+TCP_HDR_LEN, payload_length);
+
+		// Adding TCP payload length to TCP_HC header length
+		packet_size += payload_length;
+
+		update_tcp_hc_context(false, current_socket, &full_tcp_header);
+//		print_tcp_status(OUT_PACKET, temp_ipv6_header, &full_tcp_header, current_tcp_socket);
+		return packet_size;
+		}
+	return 0;
 	}
 
 socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
@@ -268,12 +384,14 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
 	// Full header TCP segment
 	if (*(((uint8_t *)temp_ipv6_header)+IPV6_HDR_LEN) == 0x01)
 		{
+		switch_tcp_packet_byte_order(((tcp_hdr_t *)(((uint8_t*)temp_ipv6_header)+IPV6_HDR_LEN+3)));
 		current_socket = get_tcp_socket(temp_ipv6_header, ((tcp_hdr_t *)(((uint8_t*)temp_ipv6_header)+IPV6_HDR_LEN+3)));
 		if (current_socket != NULL)
 			{
 			if (current_socket->socket_values.tcp_control.state == LISTEN)
 				{
 				memcpy(&current_socket->socket_values.tcp_control.tcp_context.context_id, ((uint8_t *)temp_ipv6_header)+IPV6_HDR_LEN+1, 2);
+				current_socket->socket_values.tcp_control.tcp_context.context_id = NTOHS(current_socket->socket_values.tcp_control.tcp_context.context_id);
 				}
 			memmove(((uint8_t *)temp_ipv6_header)+IPV6_HDR_LEN, (((uint8_t*)temp_ipv6_header)+IPV6_HDR_LEN+3), temp_ipv6_header->length-3);
 			temp_ipv6_header->length -= 3;
@@ -296,9 +414,21 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
 		// Current context ID
 		uint16_t current_context;
 		memcpy(&current_context, (packet_buffer+2), 2);
+		current_context = NTOHS(current_context);
 
-		// Copy TCP_HC header into local variable
+		// Copy TCP_HC header into local variable (1,0,0,1|SEQ,SEQ,0)(1,0,0,1|0,0,0,0)
 		memcpy(&tcp_hc_header, packet_buffer, 2);
+		tcp_hc_header = NTOHS(tcp_hc_header);
+
+		uint8_t header_type = UNDEFINED;
+		if (BITSET(tcp_hc_header, 15) && !BITSET(tcp_hc_header, 14) && !BITSET(tcp_hc_header, 13))
+			{
+			header_type = MOSTLY_COMPRESSED_HEADER;
+			}
+		else if (BITSET(tcp_hc_header, 15) && BITSET(tcp_hc_header, 14) && !BITSET(tcp_hc_header, 13))
+			{
+			header_type = COMPRESSED_HEADER;
+			}
 
 		// Setting pointer to first tcp_hc field
 		packet_buffer += 4;
@@ -337,7 +467,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
 		else if (BITSET(tcp_hc_header, 11) && !BITSET(tcp_hc_header, 10))
 			{
 			// Seq = (1|0), copy 2 bytes of tcp_hc packet and 2 bytes from previous packet
-			full_tcp_header.seq_nr |= *((uint16_t *)packet_buffer);
+			full_tcp_header.seq_nr |= NTOHS(*((uint16_t *)packet_buffer));
 			full_tcp_header.seq_nr |= ((current_tcp_context->seq_rcv)&0xFFFF0000);
 			packet_buffer += 2;
 			packet_size += 2;
@@ -347,6 +477,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
 			{
 			// Seq = (1|1), copy 4 bytes of tcp_hc packet
 			memcpy(&full_tcp_header.seq_nr, packet_buffer, 4);
+			full_tcp_header.seq_nr = NTOHL(full_tcp_header.seq_nr);
 			packet_buffer += 4;
 			packet_size += 4;
 			}
@@ -373,7 +504,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
 		else if (BITSET(tcp_hc_header, 9) && !BITSET(tcp_hc_header, 8))
 			{
 			// Ack = (1|0), copy 2 bytes of tcp_hc packet and 2 bytes from previous packet
-			full_tcp_header.ack_nr |= *((uint16_t *)packet_buffer);
+			full_tcp_header.ack_nr |= NTOHS(*((uint16_t *)packet_buffer));
 			full_tcp_header.ack_nr |= ((current_tcp_context->ack_rcv)&0xFFFF0000);
 			packet_buffer += 2;
 			packet_size += 2;
@@ -384,9 +515,13 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
 			{
 			// Ack = (1|1), copy 4 bytes of tcp_hc packet
 			memcpy(&full_tcp_header.ack_nr, packet_buffer, 4);
+			full_tcp_header.ack_nr = NTOHL(full_tcp_header.ack_nr);
 			packet_buffer += 4;
 			packet_size += 4;
-			SET_TCP_ACK(full_tcp_header.reserved_flags);
+			if (header_type == COMPRESSED_HEADER)
+				{
+				SET_TCP_ACK(full_tcp_header.reserved_flags);
+				}
 			}
 
 		/*----------------------------------*/
@@ -420,6 +555,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
 			{
 			// Wnd = (1|1), copy 2 bytes of tcp_hc packet
 			memcpy(&full_tcp_header.window, packet_buffer, 2);
+			full_tcp_header.window = NTOHS(full_tcp_header.window);
 			packet_buffer += 2;
 			packet_size += 2;
 			}
@@ -440,6 +576,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
 
 		// Copy checksum into into tcp header
 		memcpy(&full_tcp_header.checksum, packet_buffer, 2);
+		full_tcp_header.checksum = NTOHS(full_tcp_header.checksum);
 		packet_buffer += 2;
 		packet_size += 2;
 

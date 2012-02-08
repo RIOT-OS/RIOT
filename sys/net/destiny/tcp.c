@@ -116,8 +116,11 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 		}
 	else if (tcp_socket->socket_values.tcp_control.state == ESTABLISHED)
 		{
-		m_send_tcp.content.ptr = (char*)tcp_header;
-		net_msg_send(&m_send_tcp, tcp_socket->send_pid, 0, TCP_ACK);
+		if (check_tcp_consistency(&tcp_socket->socket_values, tcp_header) == PACKET_OK)
+			{
+			m_send_tcp.content.ptr = (char*)tcp_header;
+			net_msg_send(&m_send_tcp, tcp_socket->send_pid, 0, TCP_ACK);
+			}
 		return;
 		}
 	printf("NO WAY OF HANDLING THIS ACK!\n");
@@ -136,7 +139,9 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 		socket_internal_t *new_socket = new_tcp_queued_socket(ipv6_header, tcp_header);
 		if (new_socket != NULL)
 			{
+#ifdef TCP_HC
 			update_tcp_hc_context(true, new_socket, tcp_header);
+#endif
 			// notify socket function accept(..) that a new connection request has arrived
 			// No need to wait for an answer because the server accept() function isnt reading from anything other than the queued sockets
 			net_msg_send(&m_send_tcp, tcp_socket->recv_pid, 0, TCP_SYN);
@@ -221,19 +226,32 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, 
 
 	if (tcp_payload_len > 0)
 		{
-		read_bytes = handle_payload(ipv6_header, tcp_header, tcp_socket, payload);
+#ifdef TCP_HC
+	current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
+#endif
+		if (check_tcp_consistency(current_tcp_socket, tcp_header) == PACKET_OK)
+			{
+			read_bytes = handle_payload(ipv6_header, tcp_header, tcp_socket, payload);
 
-		// Refresh TCP status values
-		current_tcp_socket->tcp_control.state = ESTABLISHED;
+			// Refresh TCP status values
+			current_tcp_socket->tcp_control.state = ESTABLISHED;
 
-		set_tcp_cb(&current_tcp_socket->tcp_control,
-				tcp_header->seq_nr + read_bytes,
-				current_tcp_socket->tcp_control.rcv_wnd,
-				current_tcp_socket->tcp_control.send_nxt,
-				current_tcp_socket->tcp_control.send_una,
-				current_tcp_socket->tcp_control.send_wnd);
-		// Send packet
-		send_tcp(tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
+			set_tcp_cb(&current_tcp_socket->tcp_control,
+					tcp_header->seq_nr + read_bytes,
+					current_tcp_socket->tcp_control.rcv_wnd,
+					current_tcp_socket->tcp_control.send_nxt,
+					current_tcp_socket->tcp_control.send_una,
+					current_tcp_socket->tcp_control.send_wnd);
+			// Send packet
+			block_continue_thread();
+			send_tcp(tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
+			}
+		// ACK packet probably got lost
+		else
+			{
+			block_continue_thread();
+			send_tcp(tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
+			}
 		}
 	}
 
@@ -254,19 +272,22 @@ void tcp_packet_handler (void)
 		tcp_header = ((tcp_hdr_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
 		payload = (uint8_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN + TCP_HDR_LEN);
 
-
+//		printArrayRange(((uint8_t *)tcp_header), ipv6_header->length, "Incoming_TCP");
 #ifdef TCP_HC
 		tcp_socket = decompress_tcp_packet(ipv6_header);
 #else
+		switch_tcp_packet_byte_order(tcp_header);
 		tcp_socket = get_tcp_socket(ipv6_header, tcp_header);
 #endif
 		chksum = tcp_csum(ipv6_header, tcp_header);
-		print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
+
+
 
 		if ((chksum == 0xffff) && (tcp_socket != NULL))
 			{
 #ifdef TCP_HC
 			update_tcp_hc_context(true, tcp_socket, tcp_header);
+//			print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
 #endif
 			// Remove reserved bits from tcp flags field
 			uint8_t tcp_flags = tcp_header->reserved_flags & REMOVE_RESERVED;
@@ -324,6 +345,8 @@ void tcp_packet_handler (void)
 		else
 			{
 			printf("Wrong checksum (%x) or no corresponding socket found!\n", chksum);
+			printArrayRange(((uint8_t *)ipv6_header), IPV6_HDR_LEN+ipv6_header->length, "Incoming");
+			print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
 			}
 
 		msg_reply(&m_recv_ip, &m_send_ip);

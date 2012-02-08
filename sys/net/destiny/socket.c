@@ -17,8 +17,8 @@
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
 
-msg_t socket_msg_queue[IP_PKT_RECV_BUF_SIZE];
-msg_t send_msg_queue[SEND_MSG_BUF_SIZE];
+//msg_t socket_msg_queue[IP_PKT_RECV_BUF_SIZE];
+//msg_t send_msg_queue[SEND_MSG_BUF_SIZE];
 
 void printf_tcp_context(tcp_hc_context_t *current_tcp_context)
 	{
@@ -91,7 +91,10 @@ void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_hea
 	printf("ACK: %lx, SEQ: %lx, Window: %x\n", tcp_header->ack_nr, tcp_header->seq_nr, tcp_header->window);
 	printf("ACK: %lu, SEQ: %lu, Window: %u\n", tcp_header->ack_nr, tcp_header->seq_nr, tcp_header->window);
 	print_tcp_flags(tcp_header);
-//	print_tcp_cb(&tcp_socket->tcp_control);
+	print_tcp_cb(&tcp_socket->tcp_control);
+#ifdef TCP_HC
+	printf_tcp_context(&tcp_socket->tcp_control.tcp_context);
+#endif
 	}
 
 void print_socket(socket_t *current_socket)
@@ -345,18 +348,27 @@ int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header)
 			// ACK of not yet sent byte, discard
 			return ACK_NO_TOO_BIG;
 			}
-		else if (tcp_header->ack_nr < (current_tcp_socket->tcp_control.send_una))
+		else if (tcp_header->ack_nr <= (current_tcp_socket->tcp_control.send_una))
 			{
 			// ACK of previous segments, maybe dropped?
 			return ACK_NO_TOO_SMALL;
 			}
 		}
-	if ((current_tcp_socket->tcp_control.rcv_nxt > 0) && (tcp_header->seq_nr <= current_tcp_socket->tcp_control.rcv_nxt))
+	else if ((current_tcp_socket->tcp_control.rcv_nxt > 0) && (tcp_header->seq_nr < current_tcp_socket->tcp_control.rcv_nxt))
 		{
 		// segment repetition, maybe ACK got lost?
 		return SEQ_NO_TOO_SMALL;
 		}
 	return PACKET_OK;
+	}
+
+void switch_tcp_packet_byte_order(tcp_hdr_t *current_tcp_packet)
+	{
+	current_tcp_packet->seq_nr = HTONL(current_tcp_packet->seq_nr);
+	current_tcp_packet->ack_nr = HTONL(current_tcp_packet->ack_nr);
+	current_tcp_packet->window = HTONS(current_tcp_packet->window);
+	current_tcp_packet->checksum = HTONS(current_tcp_packet->checksum);
+	current_tcp_packet->urg_pointer = HTONS(current_tcp_packet->urg_pointer);
 	}
 
 int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet, ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length)
@@ -373,17 +385,23 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet, i
 
 	current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
 
+
+
 #ifdef TCP_HC
 	uint16_t compressed_size;
 
 	compressed_size = compress_tcp_packet(current_socket, (uint8_t *) current_tcp_packet, temp_ipv6_header, flags, payload_length);
+	if (compressed_size == 0)
+		{
+		// Error in compressing tcp packet header
+		return -1;
+		}
 	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), compressed_size, IPPROTO_TCP);
 
 	return 1;
 #else
-	// send TCP SYN packet
-	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN+payload_length, IPPROTO_TCP, current_tcp_socket);
-
+	switch_tcp_packet_byte_order(current_tcp_packet);
+	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN+payload_length, IPPROTO_TCP);
 	return 1;
 #endif
 	}
@@ -441,6 +459,11 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	mutex_lock(&global_context_counter_mutex);
 	current_tcp_socket->tcp_control.tcp_context.context_id = global_context_counter;
 	mutex_unlock(&global_context_counter_mutex, 0);
+
+	// Remember TCP Context for possible TCP_RETRY
+	tcp_hc_context_t saved_tcp_context;
+	memcpy(&saved_tcp_context, &current_tcp_socket->tcp_control.tcp_context, sizeof(tcp_hc_context_t));
+
 	printf("Context ID in Connect(): %u\n", current_tcp_socket->tcp_control.tcp_context.context_id);
 #endif
 
@@ -461,8 +484,19 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 		msg_receive(&msg_from_server);
 		if (msg_from_server.type == TCP_TIMEOUT)
 			{
+#ifdef TCP_HC
+			// We did not send anything successful so restore last context
+			memcpy(&current_tcp_socket->tcp_control.tcp_context, &saved_tcp_context, sizeof(tcp_hc_context_t));
+#endif
 			return -1;
 			}
+#ifdef TCP_HC
+		else if (msg_from_server.type == TCP_RETRY)
+			{
+			// We retry sending a packet so set everything to last values again
+			memcpy(&current_tcp_socket->tcp_control.tcp_context, &saved_tcp_context, sizeof(tcp_hc_context_t));
+			}
+#endif
 		}
 
 	// Read packet content
@@ -496,13 +530,12 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 	{
 	// Variables
 	msg_t recv_msg;
-	int32_t sent_bytes = 0;
+	int32_t sent_bytes = 0, total_sent_bytes = 0;
 	socket_internal_t *current_int_tcp_socket;
 	socket_t *current_tcp_socket;
 	uint8_t send_buffer[BUFFER_SIZE];
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
-	msg_init_queue(send_msg_queue, SEND_MSG_BUF_SIZE);
 
 	// Check if socket exists and is TCP socket
 	if (!isTCPSocket(s))
@@ -521,62 +554,106 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 
 	// Add thread PID
 	current_int_tcp_socket->send_pid = thread_getpid();
-
-	current_tcp_socket->tcp_control.no_of_retry = 0;
-
 	while (1)
 		{
-		// Add packet data
-		if (len > current_tcp_socket->tcp_control.send_wnd)
-			{
-			memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, current_tcp_socket->tcp_control.send_wnd);
-			sent_bytes = current_tcp_socket->tcp_control.send_wnd;
-			}
-		else
-			{
-			memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, len);
-			sent_bytes = len;
-			}
+		current_tcp_socket->tcp_control.no_of_retry = 0;
 
-		current_tcp_socket->tcp_control.send_nxt += sent_bytes;
-		current_tcp_socket->tcp_control.send_wnd -= sent_bytes;
-		send_tcp(current_int_tcp_socket, current_tcp_packet, temp_ipv6_header, 0, sent_bytes);
+#ifdef TCP_HC
+		current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
+		// Remember TCP Context for possible TCP_RETRY
+		tcp_hc_context_t saved_tcp_context;
+		memcpy(&saved_tcp_context, &current_tcp_socket->tcp_control.tcp_context, sizeof(tcp_hc_context_t)-1);
+#endif
 
-		// Remember current time
-		current_tcp_socket->tcp_control.last_packet_time = vtimer_now();
-
-		net_msg_receive(&recv_msg);
-		switch (recv_msg.type)
+		while (1)
 			{
-			case TCP_ACK:
+			// Add packet data
+			if ((len-total_sent_bytes) > current_tcp_socket->tcp_control.send_wnd)
 				{
-				tcp_hdr_t *tcp_header = ((tcp_hdr_t*)(recv_msg.content.ptr));
-				if (current_tcp_socket->tcp_control.send_nxt == tcp_header->ack_nr)
+				memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, current_tcp_socket->tcp_control.send_wnd);
+				sent_bytes = current_tcp_socket->tcp_control.send_wnd;
+				total_sent_bytes += sent_bytes;
+				}
+			else
+				{
+				memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg+total_sent_bytes, len-total_sent_bytes);
+				sent_bytes = len-total_sent_bytes;
+				total_sent_bytes = len;
+				}
+
+			current_tcp_socket->tcp_control.send_nxt += sent_bytes;
+			current_tcp_socket->tcp_control.send_wnd -= sent_bytes;
+
+			if (send_tcp(current_int_tcp_socket, current_tcp_packet, temp_ipv6_header, 0, sent_bytes) != 1)
+				{
+				// Error while sending tcp data
+				current_tcp_socket->tcp_control.send_nxt -= sent_bytes;
+				current_tcp_socket->tcp_control.send_wnd += sent_bytes;
+#ifdef TCP_HC
+				memcpy(&current_tcp_socket->tcp_control.tcp_context, &saved_tcp_context, sizeof(tcp_hc_context_t));
+				current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
+#endif
+				return -1;
+				}
+
+			// Remember current time
+			current_tcp_socket->tcp_control.last_packet_time = vtimer_now();
+
+			net_msg_receive(&recv_msg);
+			switch (recv_msg.type)
+				{
+				case TCP_ACK:
 					{
-					current_tcp_socket->tcp_control.send_una = tcp_header->ack_nr;
-					current_tcp_socket->tcp_control.send_nxt = tcp_header->ack_nr;
-					current_tcp_socket->tcp_control.send_wnd = tcp_header->window;
-					// Got ACK for every sent byte
-					return sent_bytes;
+					tcp_hdr_t *tcp_header = ((tcp_hdr_t*)(recv_msg.content.ptr));
+					if ((current_tcp_socket->tcp_control.send_nxt == tcp_header->ack_nr) && (total_sent_bytes == len))
+						{
+						current_tcp_socket->tcp_control.send_una = tcp_header->ack_nr;
+						current_tcp_socket->tcp_control.send_nxt = tcp_header->ack_nr;
+						current_tcp_socket->tcp_control.send_wnd = tcp_header->window;
+						// Got ACK for every sent byte
+#ifdef TCP_HC
+						current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
+#endif
+						return sent_bytes;
+						}
+					else if ((current_tcp_socket->tcp_control.send_nxt == tcp_header->ack_nr) && (total_sent_bytes != len))
+						{
+						current_tcp_socket->tcp_control.send_una = tcp_header->ack_nr;
+						current_tcp_socket->tcp_control.send_nxt = tcp_header->ack_nr;
+						current_tcp_socket->tcp_control.send_wnd = tcp_header->window;
+						// Got ACK for every sent byte
+#ifdef TCP_HC
+						current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
+#endif
+						break;
+						}
+					else
+						{
+						// TODO: If window size > MSS, ACK was valid only for a few segments, handle retransmit of missing segments
+						break;
+						}
 					}
-				else
+				case TCP_RETRY:
 					{
-					// TODO: Handle retransmit of missing bytes
+					current_tcp_socket->tcp_control.send_nxt -= sent_bytes;
+					current_tcp_socket->tcp_control.send_wnd += sent_bytes;
+#ifdef TCP_HC
+					memcpy(&current_tcp_socket->tcp_control.tcp_context, &saved_tcp_context, sizeof(tcp_hc_context_t));
+					current_tcp_socket->tcp_control.tcp_context.hc_type = MOSTLY_COMPRESSED_HEADER;
+#endif
 					break;
 					}
-				}
-			case TCP_RETRY:
-				{
-				current_tcp_socket->tcp_control.send_nxt -= sent_bytes;
-				current_tcp_socket->tcp_control.send_wnd += sent_bytes;
-				break;
-				}
-			case TCP_TIMEOUT:
-				{
-				current_tcp_socket->tcp_control.send_nxt -= sent_bytes;
-				current_tcp_socket->tcp_control.send_wnd += sent_bytes;
-				return -1;
-				break;
+				case TCP_TIMEOUT:
+					{
+					current_tcp_socket->tcp_control.send_nxt -= sent_bytes;
+					current_tcp_socket->tcp_control.send_wnd += sent_bytes;
+#ifdef TCP_HC
+					memcpy(&current_tcp_socket->tcp_control.tcp_context, &saved_tcp_context, sizeof(tcp_hc_context_t));
+					current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
+#endif
+					return -1;
+					break;
+					}
 				}
 			}
 		}
@@ -585,7 +662,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 
 uint8_t read_from_socket(socket_internal_t *current_int_tcp_socket, void *buf, int len)
 	{
-	if (len > current_int_tcp_socket->tcp_input_buffer_end)
+	if (len >= current_int_tcp_socket->tcp_input_buffer_end)
 		{
 		mutex_lock(&current_int_tcp_socket->tcp_buffer_mutex);
 		uint8_t read_bytes = current_int_tcp_socket->tcp_input_buffer_end;
@@ -613,8 +690,7 @@ int recv(int s, void *buf, uint64_t len, int flags)
 	uint8_t read_bytes;
 	msg_t m_recv, m_send;
 	socket_internal_t *current_int_tcp_socket;
-	socket_t *current_tcp_socket;
-	msg_init_queue(socket_msg_queue, IP_PKT_RECV_BUF_SIZE);
+//	msg_init_queue(socket_msg_queue, IP_PKT_RECV_BUF_SIZE);
 	// Check if socket exists
 	if (!isTCPSocket(s))
 		{
@@ -623,18 +699,15 @@ int recv(int s, void *buf, uint64_t len, int flags)
 		}
 
 	current_int_tcp_socket = getSocket(s);
-	current_tcp_socket = &current_int_tcp_socket->socket_values;
 
 	// Setting Thread PID
 	current_int_tcp_socket->recv_pid = thread_getpid();
-
 	if (current_int_tcp_socket->tcp_input_buffer_end > 0)
 		{
 		return read_from_socket(current_int_tcp_socket, buf, len);
 		}
 
 	msg_receive(&m_recv);
-
 	if ((exists_socket(s)) && (current_int_tcp_socket->tcp_input_buffer_end > 0))
 		{
 		read_bytes = read_from_socket(current_int_tcp_socket, buf, len);
@@ -896,10 +969,10 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket, sock
 	tcp_hdr_t *syn_ack_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
 
 	current_queued_int_socket->recv_pid = thread_getpid();
-
+#ifdef TCP_HC
 	memcpy(&current_queued_int_socket->socket_values.tcp_control.tcp_context.context_id,
 			&server_socket->socket_values.tcp_control.tcp_context.context_id, sizeof(server_socket->socket_values.tcp_control.tcp_context.context_id));
-
+#endif
 	// Remember current time
 	current_queued_int_socket->socket_values.tcp_control.last_packet_time = vtimer_now();
 
@@ -939,8 +1012,10 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket, sock
 	set_tcp_cb(&current_queued_socket->tcp_control, tcp_header->seq_nr+1, current_queued_socket->tcp_control.rcv_wnd, tcp_header->ack_nr,
 			tcp_header->ack_nr, tcp_header->window);
 
+#ifdef TCP_HC
 	// Copy TCP context information into new socket
 	memset(&server_socket->socket_values.tcp_control.tcp_context, 0, sizeof(tcp_hc_context_t));
+#endif
 
 	// Update connection status information
 	current_queued_socket->tcp_control.state = ESTABLISHED;
