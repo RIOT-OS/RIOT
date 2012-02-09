@@ -44,11 +44,7 @@ void cc110x_rx_handler(void) {
 			cc110x_statistic.packets_in_while_tx++;
 			return;
 		}
-#ifdef DBG_IGNORE
-        if (is_ignored(cc110x_rx_buffer[rx_buffer_next].packet.address)) {
-            return;
-        }
-#endif
+
         cc110x_rx_buffer[rx_buffer_next].rssi = rflags._RSSI;
         cc110x_rx_buffer[rx_buffer_next].lqi = rflags._LQI;
 		cc110x_strobe(CC1100_SFRX);		// ...for flushing the RX FIFO
@@ -62,6 +58,12 @@ void cc110x_rx_handler(void) {
         hwtimer_wait(IDLE_TO_RX_TIME);
         radio_state = RADIO_RX;
         
+#ifdef DBG_IGNORE
+        if (is_ignored(cc110x_rx_buffer[rx_buffer_next].packet.phy_src)) {
+            return;
+        }
+#endif
+
         /* notify transceiver thread if any */
         if (transceiver_pid) {
             msg_t m;  

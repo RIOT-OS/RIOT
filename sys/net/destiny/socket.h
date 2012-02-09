@@ -121,7 +121,7 @@
 
 #define SEND_MSG_BUF_SIZE	64
 
-typedef struct __attribute__ ((packed)) socka6
+typedef struct socka6
 	{
     uint8_t     		sin6_family;    		/* AF_INET6 */
     uint16_t       		sin6_port;      		/* transport layer port # */
@@ -129,7 +129,7 @@ typedef struct __attribute__ ((packed)) socka6
     ipv6_addr_t 		sin6_addr;      		/* IPv6 address */
 	} sockaddr6_t;
 
-typedef struct __attribute__((packed)) tcp_hc_con
+typedef struct tcp_hc_con
 	{
 	uint16_t 		context_id;
 	uint32_t 		seq_rcv; // Last received packet values
@@ -141,7 +141,7 @@ typedef struct __attribute__((packed)) tcp_hc_con
 	uint8_t			hc_type;
 	} tcp_hc_context_t;
 
-typedef struct __attribute__((packed)) tcp_control_block
+typedef struct tcp_control_block
 	{
 	uint32_t			send_una;
 	uint32_t			send_nxt;
@@ -163,7 +163,7 @@ typedef struct __attribute__((packed)) tcp_control_block
 
 	} tcp_cb_t;
 
-typedef struct __attribute__ ((packed)) sock_t
+typedef struct sock_t
 	{
 	uint8_t				domain;
 	uint8_t				type;

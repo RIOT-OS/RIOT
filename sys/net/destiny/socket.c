@@ -157,12 +157,17 @@ bool exists_socket(uint8_t socket)
 
 void close_socket(socket_internal_t *current_socket)
 	{
-	printf("Closing Socket %i with size %i!\n", current_socket->socket_id, sizeof(socket_internal_t));
+//	printf("Closing Socket %i with size %i!\n", current_socket->socket_id, sizeof(socket_internal_t));
 	memset(current_socket, 0, sizeof(socket_internal_t));
 	}
 
 bool isUDPSocket(uint8_t s)
 	{
+//	printf("Socket_exists: %s, domain: %u, type: %u, protocol: %u\n", exists_socket(s)?"true":"false",
+//			getSocket(s)->socket_values.domain, getSocket(s)->socket_values.type, getSocket(s)->socket_values.protocol);
+//	printf("Domain_match: %s, type_macht: %s, protocol_match: %s\n", (getSocket(s)->socket_values.domain == PF_INET6)?"true":"false",
+//			(getSocket(s)->socket_values.type == SOCK_DGRAM)?"true":"false",
+//			(getSocket(s)->socket_values.protocol == IPPROTO_UDP)?"true":"false");
 	if (	(exists_socket(s)) &&
 			(getSocket(s)->socket_values.domain == PF_INET6) &&
 			(getSocket(s)->socket_values.type == SOCK_DGRAM) &&
@@ -798,36 +803,44 @@ int close(int s)
 	socket_internal_t *current_socket = getSocket(s);
 	if (current_socket != NULL)
 		{
-		// Variables
-		msg_t m_recv;
-		uint8_t send_buffer[BUFFER_SIZE];
-		ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
-		tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
-
-		// Check if socket exists and is TCP socket
-		if (!isTCPSocket(s))
+		if (isTCPSocket(s))
 			{
-			return -1;
-			}
+			// Variables
+			msg_t m_recv;
+			uint8_t send_buffer[BUFFER_SIZE];
+			ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
+			tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
 
-		// Check for ESTABLISHED STATE
-		if (current_socket->socket_values.tcp_control.state != ESTABLISHED)
+			// Check if socket exists and is TCP socket
+			if (!isTCPSocket(s))
+				{
+				return -1;
+				}
+
+			// Check for ESTABLISHED STATE
+			if (current_socket->socket_values.tcp_control.state != ESTABLISHED)
+				{
+				close_socket(current_socket);
+				return 1;
+				}
+
+			current_socket->send_pid = thread_getpid();
+
+			// Refresh local TCP socket information
+			current_socket->socket_values.tcp_control.send_una++;
+			current_socket->socket_values.tcp_control.state = FIN_WAIT_1;
+
+			send_tcp(current_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN, 0);
+			msg_receive(&m_recv);
+			close_socket(current_socket);
+			return 1;
+			}
+		else if(isUDPSocket(s))
 			{
 			close_socket(current_socket);
 			return 1;
 			}
-
-		current_socket->send_pid = thread_getpid();
-
-		// Refresh local TCP socket information
-		current_socket->socket_values.tcp_control.send_una++;
-		current_socket->socket_values.tcp_control.state = FIN_WAIT_1;
-
-		send_tcp(current_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN, 0);
-		msg_receive(&m_recv);
-		close_socket(current_socket);
-		printf("Returning from Close()!\n");
-		return 1;
+		return -1;
 		}
 	else
 		{

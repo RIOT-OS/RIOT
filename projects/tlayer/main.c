@@ -49,6 +49,9 @@ char tcp_send_stack_buffer[SEND_TCP_THREAD_SIZE];
 
 char tcp_close_thread_stack[TCP_CLOSE_THREAD_STACK_SIZE];
 
+static msg_t mesg;
+static transceiver_command_t tcmd;
+
 typedef struct tcp_msg_t
 	{
 	int		 	node_number;
@@ -534,6 +537,23 @@ void boot_client(char *str)
 	connect_tcp("connect_tcp 2");
 	}
 
+#ifdef DBG_IGNORE
+void ignore(char *addr) {
+    uint16_t a;
+    mesg.type = DBG_IGN;
+    mesg.content.ptr = (char*) &tcmd;
+
+    tcmd.transceivers = TRANSCEIVER_CC1100;
+    tcmd.data = &a;
+    if (sscanf(addr, "ign %hu", &a) == 1) {
+        msg_send(&mesg, transceiver_pid, 1);
+    }
+    else {
+        puts("Usage:\tign <addr>");
+    }
+}
+#endif
+
 const shell_command_t shell_commands[] = {
     {"init", "", init},
     {"addr", "", get_r_address},
@@ -556,6 +576,9 @@ const shell_command_t shell_commands[] = {
     {"tcp_bw", "tcp_bw NO_OF_PACKETS", send_tcp_bandwidth_test},
     {"boots", "", boot_server},
     {"bootc", "", boot_client},
+#ifdef DBG_IGNORE
+    {"ign", "ignore node", ignore},
+#endif
     {NULL, NULL, NULL}
 };
 
