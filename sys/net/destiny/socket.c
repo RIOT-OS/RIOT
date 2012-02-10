@@ -369,28 +369,54 @@ int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header)
 
 void switch_tcp_packet_byte_order(tcp_hdr_t *current_tcp_packet)
 	{
+	if (current_tcp_packet->dataOffset_reserved*4 > TCP_HDR_LEN)
+		{
+		if (*(((uint8_t*)current_tcp_packet)+TCP_HDR_LEN) == TCP_MSS_OPTION)
+			{
+			uint8_t *packet_pointer = (uint8_t *)current_tcp_packet;
+			packet_pointer += (TCP_HDR_LEN+2);
+			uint8_t mss1 = *packet_pointer;
+			uint8_t mss2 = *(packet_pointer+1);
+			*packet_pointer = mss2;
+			*(packet_pointer+1) = mss1;
+			}
+		if (*(((uint8_t*)current_tcp_packet)+TCP_HDR_LEN) == TCP_TS_OPTION)
+			{
+			// TODO: Timestamp option nit implemented
+			}
+		}
+
 	current_tcp_packet->seq_nr = HTONL(current_tcp_packet->seq_nr);
 	current_tcp_packet->ack_nr = HTONL(current_tcp_packet->ack_nr);
 	current_tcp_packet->window = HTONS(current_tcp_packet->window);
-	current_tcp_packet->checksum = HTONS(current_tcp_packet->checksum);
 	current_tcp_packet->urg_pointer = HTONS(current_tcp_packet->urg_pointer);
 	}
 
 int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet, ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length)
 	{
 	socket_t *current_tcp_socket = &current_socket->socket_values;
+	uint8_t header_length = TCP_HDR_LEN/4;
+	if (IS_TCP_SYN(current_tcp_packet->reserved_flags) || IS_TCP_SYN_ACK(current_tcp_packet->reserved_flags))
+		{
+		tcp_mss_option_t current_mss_option;
+		header_length += sizeof(tcp_mss_option_t)/4;
+
+		current_mss_option.kind 	= TCP_MSS_OPTION;
+		current_mss_option.len 		= sizeof(tcp_mss_option_t);
+		current_mss_option.mss		= STATIC_MSS;
+		memcpy(((uint8_t*)current_tcp_packet)+TCP_HDR_LEN, &current_mss_option, sizeof(tcp_mss_option_t));
+		}
+
 	set_tcp_packet(current_tcp_packet, current_tcp_socket->local_address.sin6_port, current_tcp_socket->foreign_address.sin6_port,
 						(flags == TCP_ACK ? current_tcp_socket->tcp_control.send_una-1 : current_tcp_socket->tcp_control.send_una),
-						current_tcp_socket->tcp_control.rcv_nxt, 0, flags, current_tcp_socket->tcp_control.rcv_wnd, 0, 0);
+						current_tcp_socket->tcp_control.rcv_nxt, header_length, flags, current_tcp_socket->tcp_control.rcv_wnd, 0, 0);
 
 	// Fill IPv6 Header
 	memcpy(&(temp_ipv6_header->destaddr), &current_tcp_socket->foreign_address.sin6_addr, 16);
 	memcpy(&(temp_ipv6_header->srcaddr), &current_tcp_socket->local_address.sin6_addr, 16);
-	temp_ipv6_header->length = TCP_HDR_LEN + payload_length;
+	temp_ipv6_header->length = header_length*4 + payload_length;
 
 	current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
-
-
 
 #ifdef TCP_HC
 	uint16_t compressed_size;
@@ -405,8 +431,9 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet, i
 
 	return 1;
 #else
+	print_tcp_status(OUT_PACKET, temp_ipv6_header, current_tcp_packet, current_tcp_socket);
 	switch_tcp_packet_byte_order(current_tcp_packet);
-	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), TCP_HDR_LEN+payload_length, IPPROTO_TCP);
+	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), header_length*4+payload_length, IPPROTO_TCP);
 	return 1;
 #endif
 	}
@@ -449,7 +476,6 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	// Foreign address information
 	set_socket_address(&current_tcp_socket->foreign_address, addr->sin6_family, addr->sin6_port, addr->sin6_flowinfo, &addr->sin6_addr);
 
-	// TODO: Add TCP MSS option field
 	// Fill lcoal TCP socket information
 	srand(addr->sin6_port);
 
@@ -515,6 +541,14 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 
 	// Got SYN ACK from Server
 	// Refresh foreign TCP socket information
+	if ((tcp_header->dataOffset_reserved*4 > TCP_HDR_LEN) && (*(((uint8_t*)tcp_header)+TCP_HDR_LEN) == TCP_MSS_OPTION))
+		{
+		current_tcp_socket->tcp_control.mss = *((uint16_t*)(((uint8_t*)tcp_header)+TCP_HDR_LEN+2));
+		}
+	else
+		{
+		current_tcp_socket->tcp_control.mss = STATIC_MSS;
+		}
 	current_tcp_socket->tcp_control.rcv_irs = tcp_header->seq_nr;
 	set_tcp_cb(&current_tcp_socket->tcp_control, tcp_header->seq_nr+1, current_tcp_socket->tcp_control.rcv_wnd,
 			current_tcp_socket->tcp_control.send_una, current_tcp_socket->tcp_control.send_una, tcp_header->window);
@@ -539,6 +573,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 	socket_internal_t *current_int_tcp_socket;
 	socket_t *current_tcp_socket;
 	uint8_t send_buffer[BUFFER_SIZE];
+	memset(send_buffer, 0, BUFFER_SIZE);
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
 
@@ -573,17 +608,37 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 		while (1)
 			{
 			// Add packet data
-			if ((len-total_sent_bytes) > current_tcp_socket->tcp_control.send_wnd)
+			if (current_tcp_socket->tcp_control.send_wnd > current_tcp_socket->tcp_control.mss)
 				{
-				memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, current_tcp_socket->tcp_control.send_wnd);
-				sent_bytes = current_tcp_socket->tcp_control.send_wnd;
-				total_sent_bytes += sent_bytes;
+				// Window size > Maximum Segment Size
+				if ((len-total_sent_bytes) > current_tcp_socket->tcp_control.mss)
+					{
+					memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, current_tcp_socket->tcp_control.mss);
+					sent_bytes = current_tcp_socket->tcp_control.mss;
+					total_sent_bytes += sent_bytes;
+					}
+				else
+					{
+					memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg+total_sent_bytes, len-total_sent_bytes);
+					sent_bytes = len-total_sent_bytes;
+					total_sent_bytes = len;
+					}
 				}
 			else
 				{
-				memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg+total_sent_bytes, len-total_sent_bytes);
-				sent_bytes = len-total_sent_bytes;
-				total_sent_bytes = len;
+				// Window size <= Maximum Segment Size
+				if ((len-total_sent_bytes) > current_tcp_socket->tcp_control.send_wnd)
+					{
+					memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg, current_tcp_socket->tcp_control.send_wnd);
+					sent_bytes = current_tcp_socket->tcp_control.send_wnd;
+					total_sent_bytes += sent_bytes;
+					}
+				else
+					{
+					memcpy(&send_buffer[IPV6_HDR_LEN+TCP_HDR_LEN], msg+total_sent_bytes, len-total_sent_bytes);
+					sent_bytes = len-total_sent_bytes;
+					total_sent_bytes = len;
+					}
 				}
 
 			current_tcp_socket->tcp_control.send_nxt += sent_bytes;
@@ -1091,7 +1146,15 @@ socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp
 	set_socket_address(&current_queued_socket->socket_values.local_address, AF_INET6, tcp_header->dst_port, 0, &ipv6_header->destaddr);
 
 	// Foreign TCP information
-	current_queued_socket->socket_values.tcp_control.rcv_irs 		= tcp_header->seq_nr;
+	if ((tcp_header->dataOffset_reserved*4 > TCP_HDR_LEN) && (*(((uint8_t*)tcp_header)+TCP_HDR_LEN) == TCP_MSS_OPTION))
+		{
+		current_queued_socket->socket_values.tcp_control.mss = *((uint16_t*)(((uint8_t*)tcp_header)+TCP_HDR_LEN+2));
+		}
+	else
+		{
+		current_queued_socket->socket_values.tcp_control.mss = STATIC_MSS;
+		}
+	current_queued_socket->socket_values.tcp_control.rcv_irs 	= tcp_header->seq_nr;
 	mutex_lock(&global_sequence_clunter_mutex);
 	current_queued_socket->socket_values.tcp_control.send_iss 	= global_sequence_counter;
 	mutex_unlock(&global_sequence_clunter_mutex, 0);

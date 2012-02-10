@@ -64,8 +64,8 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 		{
 		// draft-aayadi-6lowpan-tcphc-01: 5.1 Full header TCP segment. Establishing Connection
 
-		// Move tcp packet 2 bytes to add padding and Context ID
-		memmove(current_tcp_packet+3, current_tcp_packet, TCP_HDR_LEN+payload_length);
+		// Move tcp packet 3 bytes to add padding and Context ID
+		memmove(current_tcp_packet+3, current_tcp_packet, ((((tcp_hdr_t *)current_tcp_packet)->dataOffset_reserved)*4)+payload_length);
 
 		// 1 padding byte with value 0x01 to introduce full header TCP_HC segment
 		memset(current_tcp_packet, 0x01, 1);
@@ -75,10 +75,12 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 		memcpy(current_tcp_packet + 1, &current_context, 2);
 
 		// Return correct header length (+3)
-		packet_size = TCP_HDR_LEN + 3 + payload_length;
+		packet_size = ((((tcp_hdr_t *)(current_tcp_packet+3))->dataOffset_reserved)*4) + 3 + payload_length;
 
 		// Update the tcp context fields
 		update_tcp_hc_context(false, current_socket, (tcp_hdr_t *)(current_tcp_packet+3));
+
+//		print_tcp_status(OUT_PACKET, temp_ipv6_header, (tcp_hdr_t *)(current_tcp_packet+3), current_tcp_socket);
 
 		// Convert TCP packet to network byte order
 		switch_tcp_packet_byte_order((tcp_hdr_t *)(current_tcp_packet+3));
@@ -583,6 +585,9 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
 		// Copy dest. and src. port into tcp header
 		memcpy(&full_tcp_header.dst_port, &current_socket->socket_values.local_address.sin6_port, 2);
 		memcpy(&full_tcp_header.src_port, &current_socket->socket_values.foreign_address.sin6_port, 2);
+
+		// Ordinary TCP header length
+		full_tcp_header.dataOffset_reserved = TCP_HDR_LEN/4;
 
 		// Move payload to end of tcp header
 		memmove(((uint8_t*)temp_ipv6_header)+IPV6_HDR_LEN+TCP_HDR_LEN, packet_buffer, temp_ipv6_header->length-packet_size);

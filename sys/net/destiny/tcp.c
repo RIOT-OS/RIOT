@@ -51,9 +51,14 @@ uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
     uint16_t sum;
     uint16_t len = ipv6_header->length;
 
-	sum = len + IPPROTO_TCP;
+//    printArrayRange(((uint8_t *)ipv6_header), IPV6_HDR_LEN + tcp_header->dataOffset_reserved, "Incoming_TCP");
+
+    sum = len + IPPROTO_TCP;
+//    printf("sum1: %u\n", sum);
 	sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
+//	printf("sum2: %u\n", sum);
 	sum = csum(sum, (uint8_t *)tcp_header, len);
+//	printf("sum3: %u\n", sum);
     return (sum == 0) ? 0xffff : HTONS(sum);
 	}
 
@@ -128,7 +133,7 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 
 void handle_tcp_rst_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
 	{
-
+	// TODO: Reset connection
 	}
 
 void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_internal_t *tcp_socket)
@@ -270,9 +275,6 @@ void tcp_packet_handler (void)
 
 		ipv6_header = ((ipv6_hdr_t*)m_recv_ip.content.ptr);
 		tcp_header = ((tcp_hdr_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
-		payload = (uint8_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN + TCP_HDR_LEN);
-
-//		printArrayRange(((uint8_t *)tcp_header), ipv6_header->length, "Incoming_TCP");
 #ifdef TCP_HC
 		tcp_socket = decompress_tcp_packet(ipv6_header);
 #else
@@ -281,18 +283,17 @@ void tcp_packet_handler (void)
 #endif
 		chksum = tcp_csum(ipv6_header, tcp_header);
 
-
+		payload = (uint8_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN + tcp_header->dataOffset_reserved*4);
 
 		if ((chksum == 0xffff) && (tcp_socket != NULL))
 			{
 #ifdef TCP_HC
 			update_tcp_hc_context(true, tcp_socket, tcp_header);
-//			print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
 #endif
-			// Remove reserved bits from tcp flags field
+//			print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
+            // Remove reserved bits from tcp flags field
 			uint8_t tcp_flags = tcp_header->reserved_flags & REMOVE_RESERVED;
 
-			// TODO: URG Flag and PSH flag are currently being ignored
 			switch (tcp_flags)
 				{
 				case TCP_ACK:

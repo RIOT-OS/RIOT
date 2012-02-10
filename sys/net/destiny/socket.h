@@ -112,7 +112,7 @@
 
 #define EPHEMERAL_PORTS 	49152
 
-#define STATIC_MSS			16
+#define STATIC_MSS			48
 #define STATIC_WINDOW		1 * STATIC_MSS
 #define MAX_TCP_BUFFER		1 * STATIC_WINDOW
 
@@ -154,6 +154,7 @@ typedef struct tcp_control_block
 
 	timex_t				last_packet_time;
 	uint8_t				no_of_retry;
+	uint16_t			mss;
 
 	uint8_t 			state;
 

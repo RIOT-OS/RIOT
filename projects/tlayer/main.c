@@ -20,6 +20,7 @@
 #include "sys/net/sixlowpan/sixlowborder.h"
 #include "sys/net/sixlowpan/sixlowpan.h"
 #include "sys/net/sixlowpan/sixlowerror.h"
+#include "sys/net/sixlowpan/sixlownd.h"
 #include "sys/net/destiny/udp.h"
 #include "sys/net/destiny/tcp.h"
 #include "sys/net/destiny/socket.h"
@@ -537,6 +538,11 @@ void boot_client(char *str)
 	connect_tcp("connect_tcp 2");
 	}
 
+void show_nbr_cache(char *str)
+	{
+	print_nbr_cache();
+	}
+
 #ifdef DBG_IGNORE
 void ignore(char *addr) {
     uint16_t a;
@@ -576,6 +582,7 @@ const shell_command_t shell_commands[] = {
     {"tcp_bw", "tcp_bw NO_OF_PACKETS", send_tcp_bandwidth_test},
     {"boots", "", boot_server},
     {"bootc", "", boot_client},
+    {"print_nbr_cache", "", show_nbr_cache},
 #ifdef DBG_IGNORE
     {"ign", "ignore node", ignore},
 #endif

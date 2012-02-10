@@ -12,6 +12,12 @@
 
 #define TCP_HDR_LEN 			20
 
+#define TCP_EOO_OPTION			0x00		// End of option list
+#define TCP_NOP_OPTION			0x01		// No operation
+#define TCP_MSS_OPTION			0x02		// Maximum segment size
+#define TCP_WSF_OPTION			0x03		// Window scale factor
+#define TCP_TS_OPTION			0x08		// Timestamp
+
 enum tcp_flags
 	{
 	TCP_ACK			= 0x08,
@@ -69,6 +75,13 @@ enum tcp_codes
 #define TCP_STACK_SIZE 			3072
 
 #include "sys/net/sixlowpan/sixlowip.h"
+
+typedef struct __attribute__ ((packed)) tcp_mms_o_t
+	{
+    uint8_t		kind;
+    uint8_t		len;
+    uint16_t	mss;
+	} tcp_mss_option_t;
 
 typedef struct __attribute__ ((packed)) tcp_h_t
 	{
