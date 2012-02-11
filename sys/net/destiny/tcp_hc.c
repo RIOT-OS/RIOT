@@ -80,7 +80,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 		// Update the tcp context fields
 		update_tcp_hc_context(false, current_socket, (tcp_hdr_t *)(current_tcp_packet+3));
 
-//		print_tcp_status(OUT_PACKET, temp_ipv6_header, (tcp_hdr_t *)(current_tcp_packet+3), current_tcp_socket);
+		print_tcp_status(OUT_PACKET, temp_ipv6_header, (tcp_hdr_t *)(current_tcp_packet+3), current_tcp_socket);
 
 		// Convert TCP packet to network byte order
 		switch_tcp_packet_byte_order((tcp_hdr_t *)(current_tcp_packet+3));
@@ -275,7 +275,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 		packet_size += payload_length;
 
 		update_tcp_hc_context(false, current_socket, &full_tcp_header);
-//		print_tcp_status(OUT_PACKET, temp_ipv6_header, &full_tcp_header, current_tcp_socket);
+		print_tcp_status(OUT_PACKET, temp_ipv6_header, &full_tcp_header, current_tcp_socket);
 		return packet_size;
 		}
 	// Check for header compression type: MOSTLY_COMPRESSED_HEADER
@@ -369,8 +369,10 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 		// Adding TCP payload length to TCP_HC header length
 		packet_size += payload_length;
 
+		printf("TCP Payload length: %u\n", payload_length);
+
 		update_tcp_hc_context(false, current_socket, &full_tcp_header);
-//		print_tcp_status(OUT_PACKET, temp_ipv6_header, &full_tcp_header, current_tcp_socket);
+		print_tcp_status(OUT_PACKET, temp_ipv6_header, &full_tcp_header, current_tcp_socket);
 		return packet_size;
 		}
 	return 0;

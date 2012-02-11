@@ -228,6 +228,7 @@ void send_tcp_thread (void)
 			{
 			printf("Could not send %s!\n", current_message.tcp_string_msg);
 			}
+		printf("Finished sending!\n");
 		msg_reply(&recv_msg, &send_msg);
 		}
 	}
@@ -540,7 +541,7 @@ void boot_client(char *str)
 
 void show_nbr_cache(char *str)
 	{
-	print_nbr_cache();
+//	print_nbr_cache();
 	}
 
 #ifdef DBG_IGNORE

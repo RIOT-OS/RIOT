@@ -594,6 +594,9 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 
 	// Add thread PID
 	current_int_tcp_socket->send_pid = thread_getpid();
+
+	recv_msg.type = UNDEFINED;
+
 	while (1)
 		{
 		current_tcp_socket->tcp_control.no_of_retry = 0;
@@ -605,9 +608,10 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 		memcpy(&saved_tcp_context, &current_tcp_socket->tcp_control.tcp_context, sizeof(tcp_hc_context_t)-1);
 #endif
 
-		while (1)
+		while (recv_msg.type != TCP_ACK)
 			{
 			// Add packet data
+			printf("Send Window: %u, MSS: %u\n", current_tcp_socket->tcp_control.send_wnd, current_tcp_socket->tcp_control.mss);
 			if (current_tcp_socket->tcp_control.send_wnd > current_tcp_socket->tcp_control.mss)
 				{
 				// Window size > Maximum Segment Size
@@ -644,6 +648,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 			current_tcp_socket->tcp_control.send_nxt += sent_bytes;
 			current_tcp_socket->tcp_control.send_wnd -= sent_bytes;
 
+			printf("Sent bytes: %li\n", sent_bytes);
 			if (send_tcp(current_int_tcp_socket, current_tcp_packet, temp_ipv6_header, 0, sent_bytes) != 1)
 				{
 				// Error while sending tcp data
@@ -653,17 +658,20 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 				memcpy(&current_tcp_socket->tcp_control.tcp_context, &saved_tcp_context, sizeof(tcp_hc_context_t));
 				current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
 #endif
+				printf("Error while sending, returning to application thread!\n");
 				return -1;
 				}
 
 			// Remember current time
 			current_tcp_socket->tcp_control.last_packet_time = vtimer_now();
 
+			printf("Waiting for Message in send()!\n");
 			net_msg_receive(&recv_msg);
 			switch (recv_msg.type)
 				{
 				case TCP_ACK:
 					{
+					printf("Got ACK in send()!\n");
 					tcp_hdr_t *tcp_header = ((tcp_hdr_t*)(recv_msg.content.ptr));
 					if ((current_tcp_socket->tcp_control.send_nxt == tcp_header->ack_nr) && (total_sent_bytes == len))
 						{
@@ -671,6 +679,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 						current_tcp_socket->tcp_control.send_nxt = tcp_header->ack_nr;
 						current_tcp_socket->tcp_control.send_wnd = tcp_header->window;
 						// Got ACK for every sent byte
+						printf("Everything sent, returning!\n");
 #ifdef TCP_HC
 						current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
 #endif
@@ -687,16 +696,18 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 #endif
 						break;
 						}
-					else
-						{
-						// TODO: If window size > MSS, ACK was valid only for a few segments, handle retransmit of missing segments
-						break;
-						}
+//					else
+//						{
+//						// TODO: If window size > MSS, ACK was valid only for a few segments, handle retransmit of missing segments
+//						break;
+//						}
+					break;
 					}
 				case TCP_RETRY:
 					{
 					current_tcp_socket->tcp_control.send_nxt -= sent_bytes;
 					current_tcp_socket->tcp_control.send_wnd += sent_bytes;
+					total_sent_bytes -= sent_bytes;
 #ifdef TCP_HC
 					memcpy(&current_tcp_socket->tcp_control.tcp_context, &saved_tcp_context, sizeof(tcp_hc_context_t));
 					current_tcp_socket->tcp_control.tcp_context.hc_type = MOSTLY_COMPRESSED_HEADER;
