@@ -48,7 +48,8 @@ void handle_established(socket_internal_t *current_socket)
 	msg_t send;
 	uint32_t current_timeout = TCP_ACK_TIMEOUT;
 	uint8_t i;
-	if (current_socket->socket_values.tcp_control.send_nxt > current_socket->socket_values.tcp_control.send_una)
+	if ((current_socket->socket_values.tcp_control.send_nxt > current_socket->socket_values.tcp_control.send_una) &&
+			(thread_getstatus(current_socket->send_pid) == STATUS_RECEIVE_BLOCKED))
 		{
 		for(i = 0; i < current_socket->socket_values.tcp_control.no_of_retry; i++)
 			{
@@ -64,7 +65,10 @@ void handle_established(socket_internal_t *current_socket)
 			{
 			current_socket->socket_values.tcp_control.no_of_retry++;
 			net_msg_send(&send, current_socket->send_pid, 0, TCP_RETRY);
-			printf("GOT NO ACK YET, %i. RETRY!\n", current_socket->socket_values.tcp_control.no_of_retry);
+			printf("GOT NO ACK YET, %i. RETRY! Now: %lu  Before: %lu, Diff: %lu, Cur Timeout: %lu\n", current_socket->socket_values.tcp_control.no_of_retry,
+					vtimer_now().microseconds, current_socket->socket_values.tcp_control.last_packet_time.microseconds,
+					vtimer_now().microseconds - current_socket->socket_values.tcp_control.last_packet_time.microseconds,
+					current_timeout);
 			}
 		}
 	}

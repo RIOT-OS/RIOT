@@ -8,7 +8,7 @@
 #ifndef TCP_H_
 #define TCP_H_
 
-#define TCP_HC
+//#define TCP_HC
 
 #define TCP_HDR_LEN 			20
 
@@ -57,12 +57,12 @@ enum tcp_codes
 
 #define REMOVE_RESERVED 		0xFC
 
-#define IS_TCP_ACK(a) 			((a & TCP_ACK) 		> 0)	// Test for ACK flag only, ignore URG und PSH flag
-#define IS_TCP_RST(a) 			((a & TCP_RST) 		> 0)
-#define IS_TCP_SYN(a) 			((a & TCP_SYN) 		> 0)
-#define IS_TCP_SYN_ACK(a) 		((a & TCP_SYN_ACK) 	> 0)
-#define IS_TCP_FIN(a) 			((a & TCP_FIN) 		> 0)
-#define IS_TCP_FIN_ACK(a) 		((a & TCP_FIN_ACK) 	> 0)
+#define IS_TCP_ACK(a) 			((a & TCP_ACK) 		== TCP_ACK)	// Test for ACK flag only, ignore URG und PSH flag
+#define IS_TCP_RST(a) 			((a & TCP_RST) 		== TCP_RST)
+#define IS_TCP_SYN(a) 			((a & TCP_SYN) 		== TCP_SYN)
+#define IS_TCP_SYN_ACK(a) 		((a & TCP_SYN_ACK)	== TCP_SYN_ACK)
+#define IS_TCP_FIN(a) 			((a & TCP_FIN) 		== TCP_FIN)
+#define IS_TCP_FIN_ACK(a) 		((a & TCP_FIN_ACK) 	== TCP_FIN_ACK)
 
 #define SET_TCP_ACK(a)			a = ((a & 0x00) | TCP_ACK)
 #define SET_TCP_RST(a) 			a = ((a & 0x00) | TCP_RST)

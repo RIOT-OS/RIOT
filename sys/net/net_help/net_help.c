@@ -19,7 +19,7 @@ void printArrayRange(uint8_t *array, uint16_t len, char *str)
 		{
 		printf("%#x ", *(array+i));
 		}
-	printf("\n--------------------------\n");
+	printf("\n-----------%u-------------\n", len);
 	}
 
 uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len)

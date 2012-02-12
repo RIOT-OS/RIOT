@@ -228,7 +228,7 @@ void send_tcp_thread (void)
 			{
 			printf("Could not send %s!\n", current_message.tcp_string_msg);
 			}
-		printf("Finished sending!\n");
+//		printf("Finished sending!\n");
 		msg_reply(&recv_msg, &send_msg);
 		}
 	}

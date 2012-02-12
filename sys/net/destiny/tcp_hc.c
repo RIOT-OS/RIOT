@@ -58,7 +58,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 	tcp_cb_t *tcp_cb = &current_tcp_socket->tcp_control;
 	tcp_hdr_t full_tcp_header;
 	uint16_t packet_size = 0;
-
+//	printArrayRange(((uint8_t *)temp_ipv6_header), IPV6_HDR_LEN+temp_ipv6_header->length, "Outgoing");
 	// Connection establisment phase, use FULL_HEADER TCP
 	if (tcp_cb->state != ESTABLISHED)
 		{
@@ -80,10 +80,11 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 		// Update the tcp context fields
 		update_tcp_hc_context(false, current_socket, (tcp_hdr_t *)(current_tcp_packet+3));
 
-		print_tcp_status(OUT_PACKET, temp_ipv6_header, (tcp_hdr_t *)(current_tcp_packet+3), current_tcp_socket);
+//		print_tcp_status(OUT_PACKET, temp_ipv6_header, (tcp_hdr_t *)(current_tcp_packet+3), current_tcp_socket);
 
 		// Convert TCP packet to network byte order
 		switch_tcp_packet_byte_order((tcp_hdr_t *)(current_tcp_packet+3));
+//		printArrayRange(((uint8_t *)temp_ipv6_header), IPV6_HDR_LEN+temp_ipv6_header->length, "Outgoing1");
 
 		return packet_size;
 		}
@@ -275,7 +276,10 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 		packet_size += payload_length;
 
 		update_tcp_hc_context(false, current_socket, &full_tcp_header);
-		print_tcp_status(OUT_PACKET, temp_ipv6_header, &full_tcp_header, current_tcp_socket);
+//		print_tcp_status(OUT_PACKET, temp_ipv6_header, &full_tcp_header, current_tcp_socket);
+
+//		printf("packet Size2: %u\n", packet_size);
+
 		return packet_size;
 		}
 	// Check for header compression type: MOSTLY_COMPRESSED_HEADER
@@ -369,10 +373,11 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 		// Adding TCP payload length to TCP_HC header length
 		packet_size += payload_length;
 
-		printf("TCP Payload length: %u\n", payload_length);
+//		printf("packet Size2: %u\n", packet_size);
 
 		update_tcp_hc_context(false, current_socket, &full_tcp_header);
-		print_tcp_status(OUT_PACKET, temp_ipv6_header, &full_tcp_header, current_tcp_socket);
+//		print_tcp_status(OUT_PACKET, temp_ipv6_header, &full_tcp_header, current_tcp_socket);
+//		printArrayRange(((uint8_t *)temp_ipv6_header), IPV6_HDR_LEN+temp_ipv6_header->length, "Outgoing3");
 		return packet_size;
 		}
 	return 0;
@@ -384,7 +389,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
 	uint16_t tcp_hc_header;
 	socket_internal_t *current_socket = NULL;
 	uint16_t packet_size = 0;
-
+//	printArrayRange(((uint8_t *)temp_ipv6_header), IPV6_HDR_LEN+temp_ipv6_header->length, "Incoming");
 	// Full header TCP segment
 	if (*(((uint8_t *)temp_ipv6_header)+IPV6_HDR_LEN) == 0x01)
 		{
@@ -599,7 +604,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
 
 		// Set IPV6 header length
 		temp_ipv6_header->length = temp_ipv6_header->length - packet_size + TCP_HDR_LEN;
-
+//		printArrayRange(((uint8_t *)temp_ipv6_header), IPV6_HDR_LEN+temp_ipv6_header->length, "Incoming");
 		return current_socket;
 		}
 	}
