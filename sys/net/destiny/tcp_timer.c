@@ -17,28 +17,31 @@
 void handle_synchro_timeout(socket_internal_t *current_socket)
 	{
 	msg_t send;
-	if ((current_socket->socket_values.tcp_control.no_of_retry == 0) &&
-			(timex_sub(vtimer_now(), current_socket->socket_values.tcp_control.last_packet_time).microseconds >
-			TCP_SYN_INITIAL_TIMEOUT))
+	if (thread_getstatus(current_socket->recv_pid) == STATUS_RECEIVE_BLOCKED)
 		{
-		current_socket->socket_values.tcp_control.no_of_retry++;
-		net_msg_send(&send, current_socket->recv_pid, 0, TCP_RETRY);
-		printf("FIRST RETRY!\n");
-		}
-	else if ((current_socket->socket_values.tcp_control.no_of_retry > 0) &&
-			(timex_sub(vtimer_now(), current_socket->socket_values.tcp_control.last_packet_time).microseconds >
-			(current_socket->socket_values.tcp_control.no_of_retry * TCP_SYN_TIMEOUT + TCP_SYN_INITIAL_TIMEOUT)))
-		{
-		current_socket->socket_values.tcp_control.no_of_retry++;
-		if (current_socket->socket_values.tcp_control.no_of_retry > TCP_MAX_SYN_RETRIES)
+		if ((current_socket->socket_values.tcp_control.no_of_retries == 0) &&
+				(timex_sub(vtimer_now(), current_socket->socket_values.tcp_control.last_packet_time).microseconds >
+				TCP_SYN_INITIAL_TIMEOUT))
 			{
-			net_msg_send(&send, current_socket->recv_pid, 0, TCP_TIMEOUT);
-			printf("TCP SYN TIMEOUT!!\n");
-			}
-		else
-			{
+			current_socket->socket_values.tcp_control.no_of_retries++;
 			net_msg_send(&send, current_socket->recv_pid, 0, TCP_RETRY);
-			printf("NEXT RETRY!\n");
+			printf("FIRST RETRY!\n");
+			}
+		else if ((current_socket->socket_values.tcp_control.no_of_retries > 0) &&
+				(timex_sub(vtimer_now(), current_socket->socket_values.tcp_control.last_packet_time).microseconds >
+				(current_socket->socket_values.tcp_control.no_of_retries * TCP_SYN_TIMEOUT + TCP_SYN_INITIAL_TIMEOUT)))
+			{
+			current_socket->socket_values.tcp_control.no_of_retries++;
+			if (current_socket->socket_values.tcp_control.no_of_retries > TCP_MAX_SYN_RETRIES)
+				{
+				net_msg_send(&send, current_socket->recv_pid, 0, TCP_TIMEOUT);
+				printf("TCP SYN TIMEOUT!!\n");
+				}
+			else
+				{
+				net_msg_send(&send, current_socket->recv_pid, 0, TCP_RETRY);
+				printf("NEXT RETRY!\n");
+				}
 			}
 		}
 	}
@@ -51,7 +54,7 @@ void handle_established(socket_internal_t *current_socket)
 	if ((current_socket->socket_values.tcp_control.send_nxt > current_socket->socket_values.tcp_control.send_una) &&
 			(thread_getstatus(current_socket->send_pid) == STATUS_RECEIVE_BLOCKED))
 		{
-		for(i = 0; i < current_socket->socket_values.tcp_control.no_of_retry; i++)
+		for(i = 0; i < current_socket->socket_values.tcp_control.no_of_retries; i++)
 			{
 			current_timeout *= 2;
 			}
@@ -63,9 +66,9 @@ void handle_established(socket_internal_t *current_socket)
 		else if (timex_sub(vtimer_now(), current_socket->socket_values.tcp_control.last_packet_time).microseconds >
 					current_timeout)
 			{
-			current_socket->socket_values.tcp_control.no_of_retry++;
+			current_socket->socket_values.tcp_control.no_of_retries++;
 			net_msg_send(&send, current_socket->send_pid, 0, TCP_RETRY);
-			printf("GOT NO ACK YET, %i. RETRY! Now: %lu  Before: %lu, Diff: %lu, Cur Timeout: %lu\n", current_socket->socket_values.tcp_control.no_of_retry,
+			printf("GOT NO ACK YET, %i. RETRY! Now: %lu  Before: %lu, Diff: %lu, Cur Timeout: %lu\n", current_socket->socket_values.tcp_control.no_of_retries,
 					vtimer_now().microseconds, current_socket->socket_values.tcp_control.last_packet_time.microseconds,
 					vtimer_now().microseconds - current_socket->socket_values.tcp_control.last_packet_time.microseconds,
 					current_timeout);

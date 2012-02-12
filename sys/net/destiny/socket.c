@@ -75,7 +75,7 @@ void print_tcp_cb(tcp_cb_t *cb)
 	{
 	printf("Send_ISS: %lu\nSend_UNA: %lu\nSend_NXT: %lu\nSend_WND: %u\n", cb->send_iss, cb->send_una, cb->send_nxt, cb->send_wnd);
 	printf("Rcv_IRS: %lu\nRcv_NXT: %lu\nRcv_WND: %u\n", cb->rcv_irs, cb->rcv_nxt, cb->rcv_wnd);
-	printf("Time difference: %lu, No_of_retries: %u, State: %u\n\n", timex_sub(vtimer_now(), cb->last_packet_time).microseconds, cb->no_of_retry, cb->state);
+	printf("Time difference: %lu, No_of_retries: %u, State: %u\n\n", timex_sub(vtimer_now(), cb->last_packet_time).microseconds, cb->no_of_retries, cb->state);
 	}
 
 void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_t *tcp_socket)
@@ -504,7 +504,7 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 
 	// Remember current time
 	current_tcp_socket->tcp_control.last_packet_time = vtimer_now();
-	current_tcp_socket->tcp_control.no_of_retry = 0;
+	current_tcp_socket->tcp_control.no_of_retries = 0;
 
 	msg_from_server.type = TCP_RETRY;
 
@@ -557,8 +557,37 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	current_tcp_socket->tcp_control.send_una++;
 	current_tcp_socket->tcp_control.send_nxt++;
 
-	// Send packet
-	send_tcp(current_int_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
+	msg_from_server.type = UNDEFINED;
+
+	// Remember current time
+	current_tcp_socket->tcp_control.last_packet_time = vtimer_now();
+	current_tcp_socket->tcp_control.no_of_retries = 0;
+
+#ifdef TCP_HC
+	// Remember TCP Context for possible TCP_RETRY
+	tcp_hc_context_t saved_tcp_context;
+	memcpy(&saved_tcp_context, &current_tcp_socket->tcp_control.tcp_context, sizeof(tcp_hc_context_t));
+#endif
+
+	while (msg_from_server.type != TCP_RETRY)
+		{
+		// Send packet
+		send_tcp(current_int_tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
+
+		msg_receive(&msg_from_server);
+#ifdef TCP_HC
+		if (msg_from_server.type == TCP_SYN_ACK)
+			{
+			// TCP_SYN_ACK from server arrived again, copy old context and send TCP_ACK again
+			memcpy(&current_tcp_socket->tcp_control.tcp_context, &saved_tcp_context, sizeof(tcp_hc_context_t));
+			}
+		else if (msg_from_server.type == TCP_RETRY)
+			{
+			// We waited for RTT, no TCP_SYN_ACK received, so we assume the TCP_ACK packet arrived safely
+			}
+#endif
+		}
+
 	current_tcp_socket->tcp_control.state = ESTABLISHED;
 
 	current_int_tcp_socket->recv_pid = 255;
@@ -601,7 +630,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 
 	while (1)
 		{
-		current_tcp_socket->tcp_control.no_of_retry = 0;
+		current_tcp_socket->tcp_control.no_of_retries = 0;
 
 #ifdef TCP_HC
 		current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
@@ -1057,7 +1086,7 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket, sock
 	// Remember current time
 	current_queued_int_socket->socket_values.tcp_control.last_packet_time = vtimer_now();
 
-	current_queued_int_socket->socket_values.tcp_control.no_of_retry = 0;
+	current_queued_int_socket->socket_values.tcp_control.no_of_retries = 0;
 
 	// Set message type to Retry for while loop
 	msg_recv_client_ack.type = TCP_RETRY;

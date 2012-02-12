@@ -153,7 +153,7 @@ typedef struct tcp_control_block
 	uint32_t			rcv_irs;
 
 	timex_t				last_packet_time;
-	uint8_t				no_of_retry;
+	uint8_t				no_of_retries;
 	uint16_t			mss;
 
 	uint8_t 			state;
