@@ -14,7 +14,7 @@
 #define TCP_SYN_TIMEOUT				24*SECONDS
 #define TCP_MAX_SYN_RETRIES			3
 #define TCP_ACK_TIMEOUT				3*SECONDS 	// still static, should be calculated via RTT
-#define TCP_ACK_MAX_TIMEOUT			90*SECONDS
+#define TCP_ACK_MAX_TIMEOUT			30*SECONDS 	// TODO: Set back to 90 Seconds
 
 #define TCP_NOT_DEFINED				0
 #define TCP_RETRY					1

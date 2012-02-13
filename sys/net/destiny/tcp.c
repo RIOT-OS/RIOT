@@ -51,14 +51,9 @@ uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
     uint16_t sum;
     uint16_t len = ipv6_header->length;
 
-//    printArrayRange(((uint8_t *)ipv6_header), IPV6_HDR_LEN + tcp_header->dataOffset_reserved, "Incoming_TCP");
-
     sum = len + IPPROTO_TCP;
-//    printf("sum1: %u\n", sum);
 	sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
-//	printf("sum2: %u\n", sum);
 	sum = csum(sum, (uint8_t *)tcp_header, len);
-//	printf("sum3: %u\n", sum);
     return (sum == 0) ? 0xffff : HTONS(sum);
 	}
 
@@ -123,7 +118,6 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 		{
 		if (check_tcp_consistency(&tcp_socket->socket_values, tcp_header) == PACKET_OK)
 			{
-//			printf("Packet consistency OK!\n");
 			m_send_tcp.content.ptr = (char*)tcp_header;
 			net_msg_send(&m_send_tcp, tcp_socket->send_pid, 0, TCP_ACK);
 			return;
@@ -188,6 +182,10 @@ void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 	set_tcp_cb(&current_tcp_socket->tcp_control, tcp_header->seq_nr+1, current_tcp_socket->tcp_control.send_wnd, tcp_header->ack_nr,
 					tcp_header->ack_nr, tcp_header->window);
 
+#ifdef TCP_HC
+	current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
+#endif
+
 	if (current_tcp_socket->tcp_control.state == FIN_WAIT_1)
 		{
 		current_tcp_socket->tcp_control.state = CLOSING;
@@ -215,6 +213,10 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, s
 
 	set_tcp_cb(&current_tcp_socket->tcp_control, tcp_header->seq_nr+1, current_tcp_socket->tcp_control.send_wnd, tcp_header->ack_nr,
 			tcp_header->ack_nr, tcp_header->window);
+
+#ifdef TCP_HC
+	current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
+#endif
 
 	send_tcp(tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
 
@@ -259,7 +261,7 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, 
 			{
 			block_continue_thread();
 #ifdef TCP_HC
-	current_tcp_socket->tcp_control.tcp_context.hc_type = MOSTLY_COMPRESSED_HEADER;
+	current_tcp_socket->tcp_control.tcp_context.hc_type = FULL_HEADER;
 #endif
 			send_tcp(tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
 			}
@@ -281,7 +283,6 @@ void tcp_packet_handler (void)
 
 		ipv6_header = ((ipv6_hdr_t*)m_recv_ip.content.ptr);
 		tcp_header = ((tcp_hdr_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
-//		printArrayRange(((uint8_t *)ipv6_header), IPV6_HDR_LEN+ipv6_header->length, "Incoming");
 #ifdef TCP_HC
 		tcp_socket = decompress_tcp_packet(ipv6_header);
 #else
@@ -291,9 +292,6 @@ void tcp_packet_handler (void)
 		chksum = tcp_csum(ipv6_header, tcp_header);
 
 		payload = (uint8_t*)(m_recv_ip.content.ptr + IPV6_HDR_LEN + tcp_header->dataOffset_reserved*4);
-
-
-//		print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
 
 		if ((chksum == 0xffff) && (tcp_socket != NULL))
 			{
@@ -355,7 +353,7 @@ void tcp_packet_handler (void)
 		else
 			{
 			printf("Wrong checksum (%x) or no corresponding socket found!\n", chksum);
-//			printArrayRange(((uint8_t *)ipv6_header), IPV6_HDR_LEN+ipv6_header->length, "Incoming");
+			printArrayRange(((uint8_t *)ipv6_header), IPV6_HDR_LEN+ipv6_header->length, "Incoming");
 			print_tcp_status(INC_PACKET, ipv6_header, tcp_header, &tcp_socket->socket_values);
 			}
 

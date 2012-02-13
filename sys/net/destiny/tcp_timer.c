@@ -13,6 +13,7 @@
 #include "destiny.h"
 #include "socket.h"
 #include "net_help/msg_help.h"
+#include "sys/net/sixlowpan/sixlowpan.h"
 
 void handle_synchro_timeout(socket_internal_t *current_socket)
 	{
@@ -66,6 +67,7 @@ void handle_established(socket_internal_t *current_socket)
 		else if (timex_sub(vtimer_now(), current_socket->socket_values.tcp_control.last_packet_time).microseconds >
 					current_timeout)
 			{
+			printReasBuffers();
 			current_socket->socket_values.tcp_control.no_of_retries++;
 			net_msg_send(&send, current_socket->send_pid, 0, TCP_RETRY);
 			printf("GOT NO ACK YET, %i. RETRY! Now: %lu  Before: %lu, Diff: %lu, Cur Timeout: %lu\n", current_socket->socket_values.tcp_control.no_of_retries,

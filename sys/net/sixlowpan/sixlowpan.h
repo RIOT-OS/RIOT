@@ -1,9 +1,10 @@
 #ifndef SIXLOWPAN_H
 #define SIXLOWPAN_H
 
-#define IP_PROCESS_STACKSIZE    3072
-#define NC_STACKSIZE            512
-#define CON_STACKSIZE           512
+#define IP_PROCESS_STACKSIZE    		3072
+#define NC_STACKSIZE            		512
+#define CON_STACKSIZE           		512
+#define LOWPAN_TRANSFER_BUF_STACKSIZE	512
 
 /* fragment size in bytes*/
 #define FRAG_PART_ONE_HDR_LEN   4
@@ -50,9 +51,10 @@ typedef struct lowpan_reas_buf_t {
 	ieee_802154_long_t 				s_laddr;					// Source Address
 	ieee_802154_long_t 				d_laddr;					// Destination Address
 	uint16_t						ident_no;					// Identification Number
-	time_t							timestamp;					// Timestamp of last packet fragment
-	uint8_t							packet_size;				// Size of reassembled packet with possible IPHC header
-	uint8_t							current_packet_size;		// Additive size of currently already received fragments
+	long							timestamp;					// Timestamp of last packet fragment
+	uint16_t						packet_size;				// Size of reassembled packet with possible IPHC header
+	uint16_t						current_packet_size;		// Additive size of currently already received fragments
+	mutex_t							mu;							// Used to synchronize transfer thread with reassembly thread
 	uint8_t							*packet;					// Pointer to allocated memory for reassembled packet + 6LoWPAN Dispatch Byte
 	lowpan_interval_list_t			*interval_list_head;		// Pointer to list of intervals of received packet fragments (if any)
 	struct lowpan_reas_buf_t		*next;						// Pointer to next reassembly buffer (if any)
@@ -77,6 +79,8 @@ lowpan_context_t * lowpan_context_update(
 lowpan_context_t * lowpan_context_get();
 lowpan_context_t * lowpan_context_lookup(ipv6_addr_t *addr);
 lowpan_context_t * lowpan_context_num_lookup(uint8_t num);
+lowpan_reas_buf_t *collect_garbage(lowpan_reas_buf_t *current_buf);
+void check_timeout(void);
 void lowpan_ipv6_set_dispatch(uint8_t *data);
 void init_reas_bufs(lowpan_reas_buf_t *buf);
 void printReasBuffers(void);

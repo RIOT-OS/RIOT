@@ -80,6 +80,8 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t
 
     packet_length = IPV6_HDR_LEN + p_len;
 
+//    printArrayRange(payload, p_len, "Outgoing");
+
     lowpan_init((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf);
 }
 
@@ -129,9 +131,8 @@ int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr) {
 }
 
 void ipv6_process(void){
-	msg_t m_recv_lowpan;
+	msg_t m_recv_lowpan, m_send_lowpan;
 	msg_t m_recv, m_send;
-    msg_init_queue(msg_queue, IP_PKT_RECV_BUF_SIZE);
     
     while(1){
         msg_receive(&m_recv_lowpan);
@@ -190,6 +191,7 @@ void ipv6_process(void){
 			default:
 				break;
 		}
+        msg_reply(&m_recv_lowpan, &m_send_lowpan);
     }   
 }
 

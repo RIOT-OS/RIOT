@@ -17,9 +17,6 @@
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
 
-//msg_t socket_msg_queue[IP_PKT_RECV_BUF_SIZE];
-//msg_t send_msg_queue[SEND_MSG_BUF_SIZE];
-
 void printf_tcp_context(tcp_hc_context_t *current_tcp_context)
 	{
 	printf("Context: %u\n", current_tcp_context->context_id);
@@ -157,17 +154,11 @@ bool exists_socket(uint8_t socket)
 
 void close_socket(socket_internal_t *current_socket)
 	{
-//	printf("Closing Socket %i with size %i!\n", current_socket->socket_id, sizeof(socket_internal_t));
 	memset(current_socket, 0, sizeof(socket_internal_t));
 	}
 
 bool isUDPSocket(uint8_t s)
 	{
-//	printf("Socket_exists: %s, domain: %u, type: %u, protocol: %u\n", exists_socket(s)?"true":"false",
-//			getSocket(s)->socket_values.domain, getSocket(s)->socket_values.type, getSocket(s)->socket_values.protocol);
-//	printf("Domain_match: %s, type_macht: %s, protocol_match: %s\n", (getSocket(s)->socket_values.domain == PF_INET6)?"true":"false",
-//			(getSocket(s)->socket_values.type == SOCK_DGRAM)?"true":"false",
-//			(getSocket(s)->socket_values.protocol == IPPROTO_UDP)?"true":"false");
 	if (	(exists_socket(s)) &&
 			(getSocket(s)->socket_values.domain == PF_INET6) &&
 			(getSocket(s)->socket_values.type == SOCK_DGRAM) &&
@@ -398,7 +389,6 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet, i
 	uint8_t header_length = TCP_HDR_LEN/4;
 	if (IS_TCP_SYN(flags) || IS_TCP_SYN_ACK(flags))
 		{
-		printf("Sending with MSS Option! flags: %u\n", flags);
 		tcp_mss_option_t current_mss_option;
 		header_length += sizeof(tcp_mss_option_t)/4;
 
@@ -423,17 +413,18 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet, i
 	uint16_t compressed_size;
 
 	compressed_size = compress_tcp_packet(current_socket, (uint8_t *) current_tcp_packet, temp_ipv6_header, flags, payload_length);
-//	printArrayRange(((uint8_t *)temp_ipv6_header), IPV6_HDR_LEN+compressed_size, "Outgoing2");
+
 	if (compressed_size == 0)
 		{
 		// Error in compressing tcp packet header
 		return -1;
 		}
+
 	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), compressed_size, IPPROTO_TCP);
 
 	return 1;
 #else
-	print_tcp_status(OUT_PACKET, temp_ipv6_header, current_tcp_packet, current_tcp_socket);
+//	print_tcp_status(OUT_PACKET, temp_ipv6_header, current_tcp_packet, current_tcp_socket);
 	switch_tcp_packet_byte_order(current_tcp_packet);
 	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), header_length*4+payload_length, IPPROTO_TCP);
 	return 1;
@@ -493,11 +484,11 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	current_tcp_socket->tcp_control.tcp_context.context_id = global_context_counter;
 	mutex_unlock(&global_context_counter_mutex, 0);
 
+	current_tcp_socket->tcp_control.tcp_context.hc_type = FULL_HEADER;
+
 	// Remember TCP Context for possible TCP_RETRY
 	tcp_hc_context_t saved_tcp_context;
 	memcpy(&saved_tcp_context, &current_tcp_socket->tcp_control.tcp_context, sizeof(tcp_hc_context_t));
-
-	printf("Context ID in Connect(): %u\n", current_tcp_socket->tcp_control.tcp_context.context_id);
 #endif
 
 	set_tcp_cb(&current_tcp_socket->tcp_control, 0, STATIC_WINDOW, current_tcp_socket->tcp_control.send_iss, current_tcp_socket->tcp_control.send_iss, 0);
@@ -564,8 +555,8 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	current_tcp_socket->tcp_control.no_of_retries = 0;
 
 #ifdef TCP_HC
+	current_tcp_socket->tcp_control.tcp_context.hc_type = FULL_HEADER;
 	// Remember TCP Context for possible TCP_RETRY
-	tcp_hc_context_t saved_tcp_context;
 	memcpy(&saved_tcp_context, &current_tcp_socket->tcp_control.tcp_context, sizeof(tcp_hc_context_t));
 #endif
 
@@ -642,7 +633,6 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 		while (recv_msg.type != TCP_ACK)
 			{
 			// Add packet data
-//			printf("Send Window: %u, MSS: %u\n", current_tcp_socket->tcp_control.send_wnd, current_tcp_socket->tcp_control.mss);
 			if (current_tcp_socket->tcp_control.send_wnd > current_tcp_socket->tcp_control.mss)
 				{
 				// Window size > Maximum Segment Size
@@ -679,7 +669,6 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 			current_tcp_socket->tcp_control.send_nxt += sent_bytes;
 			current_tcp_socket->tcp_control.send_wnd -= sent_bytes;
 
-//			printf("Sent bytes: %li\n", sent_bytes);
 			if (send_tcp(current_int_tcp_socket, current_tcp_packet, temp_ipv6_header, 0, sent_bytes) != 1)
 				{
 				// Error while sending tcp data
@@ -696,13 +685,11 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 			// Remember current time
 			current_tcp_socket->tcp_control.last_packet_time = vtimer_now();
 
-//			printf("Waiting for Message in send()!\n");
 			net_msg_receive(&recv_msg);
 			switch (recv_msg.type)
 				{
 				case TCP_ACK:
 					{
-//					printf("Got ACK in send()!\n");
 					tcp_hdr_t *tcp_header = ((tcp_hdr_t*)(recv_msg.content.ptr));
 					if ((current_tcp_socket->tcp_control.send_nxt == tcp_header->ack_nr) && (total_sent_bytes == len))
 						{
@@ -710,7 +697,6 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 						current_tcp_socket->tcp_control.send_nxt = tcp_header->ack_nr;
 						current_tcp_socket->tcp_control.send_wnd = tcp_header->window;
 						// Got ACK for every sent byte
-//						printf("Everything sent, returning!\n");
 #ifdef TCP_HC
 						current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
 #endif
@@ -792,7 +778,6 @@ int recv(int s, void *buf, uint64_t len, int flags)
 	uint8_t read_bytes;
 	msg_t m_recv, m_send;
 	socket_internal_t *current_int_tcp_socket;
-//	msg_init_queue(socket_msg_queue, IP_PKT_RECV_BUF_SIZE);
 	// Check if socket exists
 	if (!isTCPSocket(s))
 		{
@@ -926,6 +911,9 @@ int close(int s)
 			// Refresh local TCP socket information
 			current_socket->socket_values.tcp_control.send_una++;
 			current_socket->socket_values.tcp_control.state = FIN_WAIT_1;
+#ifdef TCP_HC
+			current_socket->socket_values.tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
+#endif
 
 			send_tcp(current_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN, 0);
 			msg_receive(&m_recv);
@@ -1080,6 +1068,7 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket, sock
 
 	current_queued_int_socket->recv_pid = thread_getpid();
 #ifdef TCP_HC
+	current_queued_int_socket->socket_values.tcp_control.tcp_context.hc_type = FULL_HEADER;
 	memcpy(&current_queued_int_socket->socket_values.tcp_control.tcp_context.context_id,
 			&server_socket->socket_values.tcp_control.tcp_context.context_id, sizeof(server_socket->socket_values.tcp_control.tcp_context.context_id));
 #endif
@@ -1136,7 +1125,11 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket, sock
 	// send a reply to the TCP handler after processing every information from the TCP ACK packet
 	msg_reply(&msg_recv_client_ack, &msg_send_client_ack);
 
+	// Reset PID to an unlikely value
 	current_queued_int_socket->recv_pid = 255;
+
+	// Waiting for Clients ACK waiting period to time out
+	vtimer_usleep(TCP_SYN_INITIAL_TIMEOUT/2);
 
 	print_sockets();
 

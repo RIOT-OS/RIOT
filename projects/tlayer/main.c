@@ -188,7 +188,7 @@ void init_tcp_server(void)
 
 			if (read_bytes > 0)
 				{
-				printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
+//				printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
 				}
 			}
 		}
@@ -414,7 +414,7 @@ void send_packet(char *str){
 void send_udp(char *str)
 	{
 	timex_t start, end, total;
-	float secs;
+	long secs;
 	int sock;
 	sockaddr6_t sa;
 	ipv6_addr_t ipaddr;
@@ -449,9 +449,10 @@ void send_udp(char *str)
 		}
 	end = vtimer_now();
 	total = timex_sub(end, start);
+	secs = total.microseconds / 1000000;
 	printf("Start: %lu, End: %lu, Total: %lu\n", start.microseconds, end.microseconds, total.microseconds);
 	secs = total.microseconds / 1000000;
-	printf("Time: %f seconds, Bandwidth: %f byte/second\n", secs, (count*48)/secs);
+	printf("Time: %lu seconds, Bandwidth: %lu byte/second\n", secs, (count*48)/secs);
 	close(sock);
 	}
 
