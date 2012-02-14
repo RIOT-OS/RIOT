@@ -53,7 +53,7 @@ typedef struct shell_t {
  * @param read_char Pointer to input device read function. Should return exactly one byte or block.
  * @param put_char Pointer to output funtion. currently unused, shell code will use printf.
  */
-void shell_init(shell_t *shell, const shell_command_t *shell_commands, int(*read_char)(void), void (*put_char)(int));
+void shell_init(shell_t *shell,  /*@null@*/ const shell_command_t *shell_commands, int(*read_char)(void), void (*put_char)(int));
 
 /**
  * @brief Endless loop that waits for command and executes handler.

@@ -12,25 +12,25 @@
 #include <board_uart0.h>
 #include <transceiver.h>
 
-int shell_readc() {
+static int shell_readc() {
     char c = 0;
-    posix_read(uart0_handler_pid, &c, 1);
+    (void) posix_read(uart0_handler_pid, &c, 1);
     return c;
 }
 
-void shell_putchar(int c) {
-    putchar(c);
+static void shell_putchar(int c) {
+    (void) putchar(c);
 }
 
 int main(void) {
-    posix_open(uart0_handler_pid, 0);
+    shell_t shell;
+    (void) posix_open(uart0_handler_pid, 0);
 	ltc4150_start();
     transceiver_init(TRANSCEIVER_CC1100);
-    transceiver_start();
+    (void) transceiver_start();
     
-    puts("Welcome to ukleos!");
+    (void) puts("Welcome to ukleos!");
 
-    shell_t shell;
     shell_init(&shell, NULL, shell_readc, shell_putchar);
 
     shell_run(&shell);

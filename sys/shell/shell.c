@@ -119,12 +119,12 @@ static void handle_input_line(shell_t *shell, char* line) {
     free(linedup);
 }
 
-int readline(shell_t *shell, char* buf, int size) {
+static int readline(shell_t *shell, char* buf, size_t size) {
     char *line_buf_ptr = buf;
     int c;
 
     while (1) {
-        if ( (line_buf_ptr - buf) >= size-1) {
+        if ( (line_buf_ptr - buf) >= ((int) size)-1) {
             return -1;
         }
 
@@ -140,14 +140,15 @@ int readline(shell_t *shell, char* buf, int size) {
             *line_buf_ptr++ = c;
         }
     }
+    return 1;
 }
 
 void shell_run(shell_t *shell) {
     char line_buf[255];
 
     while(1) {
-        shell->put_char('>');
         int res = readline(shell, line_buf, sizeof(line_buf));
+        shell->put_char('>');
         if (! res ) {
             char* line_copy = strdup(line_buf);
             handle_input_line(shell, line_copy);
