@@ -5,8 +5,11 @@
  *      Author: Oliver
  */
 
+#include <thread.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+#include <math.h>
 #include "tcp_timer.h"
 #include "vtimer.h"
 #include "thread.h"
@@ -47,10 +50,30 @@ void handle_synchro_timeout(socket_internal_t *current_socket)
 		}
 	}
 
+char *double2string (double d, int stellen) {
+  int num_int_digits = 0;
+  char* returnstr = NULL;
+
+  if ((int) d != 0)
+    num_int_digits = (int) log10 (abs((int) d)) + 1;
+  else
+    num_int_digits = 1;
+
+  returnstr = malloc (num_int_digits + 1 + stellen + 1);
+
+  sprintf (returnstr, "%.*f", stellen, d);
+
+  return returnstr;
+}
+
 void handle_established(socket_internal_t *current_socket)
 	{
 	msg_t send;
 	double current_timeout = current_socket->socket_values.tcp_control.rto;
+	if (current_timeout < SECOND)
+		{
+		current_timeout = SECOND;
+		}
 	uint8_t i;
 	if ((current_socket->socket_values.tcp_control.send_nxt > current_socket->socket_values.tcp_control.send_una) &&
 			(thread_getstatus(current_socket->send_pid) == STATUS_RECEIVE_BLOCKED))

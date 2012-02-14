@@ -58,6 +58,7 @@ char con_buf[CON_STACKSIZE];
 char lowpan_transfer_buf[LOWPAN_TRANSFER_BUF_STACKSIZE];
 lowpan_context_t contexts[LOWPAN_CONTEXT_MAX];
 uint8_t context_len = 0;
+uint8_t route_head = 0;
 
 void lowpan_context_auto_remove(void);
 
@@ -78,6 +79,18 @@ void lowpan_init(ieee_802154_long_t *addr, uint8_t *data){
     data = &comp_buf[0];
     packet_length = comp_len;
     
+    if (route_head == 1)
+		{
+		if (laddr.uint8[7] < get_radio_address())
+			{
+			laddr.uint8[7] = get_radio_address() - 1;
+			}
+		else
+			{
+			laddr.uint8[7] = get_radio_address() + 1;
+			}
+		}
+
     /* check if packet needs to be fragmented */
     if(packet_length + header_size > PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN){
         uint8_t fragbuf[packet_length + header_size];

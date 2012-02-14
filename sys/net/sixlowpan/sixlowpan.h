@@ -32,6 +32,7 @@
 #include <time.h>
 
 extern mutex_t lowpan_context_mutex;
+extern uint8_t route_head;
 
 typedef struct lowpan_context_t {
     uint8_t num;

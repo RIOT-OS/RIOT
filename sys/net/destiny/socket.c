@@ -18,6 +18,8 @@
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
 
+socket_internal_t sockets[MAX_SOCKETS];
+
 void printf_tcp_context(tcp_hc_context_t *current_tcp_context)
 	{
 	printf("Context: %u\n", current_tcp_context->context_id);
@@ -614,6 +616,11 @@ void calculate_rto(tcp_cb_t *tcp_control, timex_t current_time)
 		{
 		rto = SECOND;
 		}
+
+//	if (((rto > (SECOND-1)) && (rto < (SECOND+1))))
+//		{
+//		printf("RTO is correct!\n");
+//		}
 	tcp_control->srtt = srtt;
 	tcp_control->rttvar = rttvar;
 	tcp_control->rto = rto;

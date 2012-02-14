@@ -14,6 +14,8 @@
 #define RADIO_SND_BUF_SIZE          100
 #define RADIO_SENDING_DELAY         1000
 
+extern uint8_t static_route;
+
 uint8_t get_radio_address(void);
 void set_radio_address(uint8_t addr);
 void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload, 

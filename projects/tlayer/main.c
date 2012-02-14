@@ -269,6 +269,7 @@ void send_tcp_bandwidth_test(char *str)
 
 	int i = 0, count;
 	char command[80];
+//	char msg_string[] = "abcdefghijklmnopqrstuvwxyz0123456789!-";
 	char msg_string[] = "abcdefghijklmnopqrstuvwxyz0123456789!-=/%$";
 
 	sscanf(str, "tcp_bw %i", &count);
@@ -561,6 +562,50 @@ void ignore(char *addr) {
 }
 #endif
 
+/* HACK: Simple mesh routing on MAC layer:
+ *
+ * This routing method is used to forward layer 3 fragments over N hops in 2 directions.
+ *
+ * Example: A <--> B <--> C <--> D (N = 4)
+ *
+ * To achieve the network topology described in the example above one has to
+ * declare the nodes A and D as "head nodes" and the nodes B and C as "routing nodes".
+ * For every static route with N hops there are always N-2 nodes which are
+ * routing nodes and 2 head nodes (start and end).
+ *
+ * A "head node" is a node receiving or sending packets of higher layers (i.e. layer 3 or higher)
+ * and does not route any fragments on the MAC layer.
+ * A "routing node" is a node forwarding fragments from local addresses < its own address to
+ * nodes (head or routing) with local address > its own address (own_address+1).
+ * It also forwards fragments from local addresses > its own address to nodes with
+ * local address < its own address (own_address-1).
+ *
+ * The variables which need to be set are static_route in sys/net/sixlowpan/sixlowmac.c for
+ * routing nodes and route_head in sys/net/sixlowpan/sixlowpan.c for head nodes. */
+void static_routing (char *str)
+	{
+	if (static_route == 0)
+		{
+		static_route = 1;
+		}
+	else
+		{
+		static_route = 0;
+		}
+	}
+
+void static_head (char *str)
+	{
+	if (route_head == 0)
+		{
+		route_head = 1;
+		}
+	else
+		{
+		route_head = 0;
+		}
+	}
+
 const shell_command_t shell_commands[] = {
     {"init", "", init},
     {"addr", "", get_r_address},
@@ -584,6 +629,8 @@ const shell_command_t shell_commands[] = {
     {"boots", "", boot_server},
     {"bootc", "", boot_client},
     {"print_nbr_cache", "", show_nbr_cache},
+    {"static_routing", "", static_routing},
+    {"static_head", "", static_head},
 #ifdef DBG_IGNORE
     {"ign", "ignore node", ignore},
 #endif

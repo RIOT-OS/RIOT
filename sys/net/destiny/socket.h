@@ -189,7 +189,7 @@ typedef struct socket_in_t
 	uint8_t				tcp_input_buffer[MAX_TCP_BUFFER];
 	} socket_internal_t;
 
-socket_internal_t sockets[MAX_SOCKETS];
+extern socket_internal_t sockets[MAX_SOCKETS];
 
 int socket(int domain, int type, int protocol);
 int connect(int socket, sockaddr6_t *addr, uint32_t addrlen);
