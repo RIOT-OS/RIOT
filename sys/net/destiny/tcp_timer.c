@@ -50,7 +50,7 @@ void handle_synchro_timeout(socket_internal_t *current_socket)
 void handle_established(socket_internal_t *current_socket)
 	{
 	msg_t send;
-	uint32_t current_timeout = TCP_ACK_TIMEOUT;
+	uint32_t current_timeout = (uint32_t)(current_socket->socket_values.tcp_control.rto);
 	uint8_t i;
 	if ((current_socket->socket_values.tcp_control.send_nxt > current_socket->socket_values.tcp_control.send_una) &&
 			(thread_getstatus(current_socket->send_pid) == STATUS_RECEIVE_BLOCKED))
@@ -130,7 +130,7 @@ void inc_global_variables(void)
 void tcp_general_timer(void)
 	{
 	vtimer_t tcp_vtimer;
-	timex_t interval = timex_set(0, 500*1000);
+	timex_t interval = timex_set(0, TCP_TIMER_RESOLUTION);
 
 	while (1)
 		{

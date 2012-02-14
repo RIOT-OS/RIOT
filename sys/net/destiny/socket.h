@@ -158,6 +158,10 @@ typedef struct tcp_control_block
 
 	uint8_t 			state;
 
+	double				srtt;
+	double				rttvar;
+	double				rto;
+
 #ifdef TCP_HC
 	tcp_hc_context_t	tcp_context;
 #endif

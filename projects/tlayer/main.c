@@ -265,7 +265,7 @@ void send_tcp_bulk(char *str)
 void send_tcp_bandwidth_test(char *str)
 	{
 	timex_t start, end, total;
-	uint32_t secs;
+	double secs;
 
 	int i = 0, count;
 	char command[80];
@@ -280,10 +280,9 @@ void send_tcp_bandwidth_test(char *str)
 		}
 	end = vtimer_now();
 	total = timex_sub(end, start);
-	secs = total.microseconds / 1000000;
+	secs = total.microseconds / 1000000.0f;
 	printf("Start: %lu, End: %lu, Total: %lu\n", start.microseconds, end.microseconds, total.microseconds);
-	secs = total.microseconds / 1000000;
-	printf("Time: %lu seconds, Bandwidth: %lu byte/second\n", secs, (count*48)/secs);
+	printf("Time: %f seconds, Bandwidth: %f byte/second\n", secs, (count*48)/secs);
 	}
 
 void connect_tcp(char *str)

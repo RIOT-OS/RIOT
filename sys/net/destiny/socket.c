@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 #include "udp.h"
 #include "tcp.h"
 #include "socket.h"
@@ -216,6 +217,7 @@ int bind_tcp_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
 		}
 	memcpy(&getSocket(s)->socket_values.local_address, name, namelen);
 	getSocket(s)->recv_pid = pid;
+	getSocket(s)->socket_values.tcp_control.rto = TCP_INITIAL_ACK_TIMEOUT;
 	return 1;
 	}
 
@@ -587,6 +589,36 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	return 0;
 	}
 
+void calculate_rto(tcp_cb_t *tcp_control, timex_t current_time)
+	{
+	double rtt = timex_sub(current_time, tcp_control->last_packet_time).microseconds;
+	double srtt = tcp_control->srtt;
+	double rttvar = tcp_control->rttvar;
+	double rto = tcp_control->rto;
+
+	if ((srtt == 0) && (rttvar == 0) && (rto == TCP_INITIAL_ACK_TIMEOUT))
+		{
+		// First calculation
+		srtt = rtt;
+		rttvar = 0.5*rtt;
+		rto = rtt + 4*rttvar;
+		}
+	else
+		{
+		// every other calculation
+		srtt = (1-TCP_ALPHA)*srtt+TCP_ALPHA*rtt;
+		rttvar = (1-TCP_BETA)*rttvar+TCP_BETA*abs(srtt-rtt);
+		rto = srtt + (((4*rttvar) < TCP_TIMER_RESOLUTION) ? (TCP_TIMER_RESOLUTION) : (4*rttvar));
+		}
+	if (rto < SECOND)
+		{
+		rto = SECOND;
+		}
+	tcp_control->srtt = srtt;
+	tcp_control->rttvar = rttvar;
+	tcp_control->rto = rto;
+	}
+
 int32_t send(int s, void *msg, uint64_t len, int flags)
 	{
 	// Variables
@@ -690,6 +722,10 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 				{
 				case TCP_ACK:
 					{
+					if (current_tcp_socket->tcp_control.no_of_retries == 0)
+						{
+						calculate_rto(&current_tcp_socket->tcp_control, vtimer_now());
+						}
 					tcp_hdr_t *tcp_header = ((tcp_hdr_t*)(recv_msg.content.ptr));
 					if ((current_tcp_socket->tcp_control.send_nxt == tcp_header->ack_nr) && (total_sent_bytes == len))
 						{
