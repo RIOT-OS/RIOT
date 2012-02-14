@@ -2,7 +2,7 @@
 #include "of0.h"
 
 rpl_of_t rpl_of0 = {
-	0,
+	0x0,
 	calc_rank,
 	which_parent,
 	which_dodag,

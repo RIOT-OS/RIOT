@@ -1,8 +1,8 @@
 #include <vtimer.h>
 #include <thread.h>
 
-#define TRICKLE_TIMER_STACKSIZE 1024 
-#define TRICKLE_INTERVAL_STACKSIZE 3024
+#define TRICKLE_TIMER_STACKSIZE 3072 
+#define TRICKLE_INTERVAL_STACKSIZE 3072
 
 void reset_trickletimer(void);
 void init_trickle(void);
