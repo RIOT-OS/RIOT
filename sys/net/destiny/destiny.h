@@ -8,7 +8,7 @@
 #ifndef DESTINY_H_
 #define DESTINY_H_
 
-//#define TCP_HC
+#define TCP_HC
 
 void init_transport_layer(void);
 

@@ -50,7 +50,7 @@ void handle_synchro_timeout(socket_internal_t *current_socket)
 void handle_established(socket_internal_t *current_socket)
 	{
 	msg_t send;
-	uint32_t current_timeout = (uint32_t)(current_socket->socket_values.tcp_control.rto);
+	double current_timeout = current_socket->socket_values.tcp_control.rto;
 	uint8_t i;
 	if ((current_socket->socket_values.tcp_control.send_nxt > current_socket->socket_values.tcp_control.send_una) &&
 			(thread_getstatus(current_socket->send_pid) == STATUS_RECEIVE_BLOCKED))
@@ -70,7 +70,7 @@ void handle_established(socket_internal_t *current_socket)
 			printReasBuffers();
 			current_socket->socket_values.tcp_control.no_of_retries++;
 			net_msg_send(&send, current_socket->send_pid, 0, TCP_RETRY);
-			printf("GOT NO ACK YET, %i. RETRY! Now: %lu  Before: %lu, Diff: %lu, Cur Timeout: %lu\n", current_socket->socket_values.tcp_control.no_of_retries,
+			printf("GOT NO ACK YET, %i. RETRY! Now: %lu  Before: %lu, Diff: %lu, Cur Timeout: %f\n", current_socket->socket_values.tcp_control.no_of_retries,
 					vtimer_now().microseconds, current_socket->socket_values.tcp_control.last_packet_time.microseconds,
 					vtimer_now().microseconds - current_socket->socket_values.tcp_control.last_packet_time.microseconds,
 					current_timeout);
