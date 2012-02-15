@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "rpl_dodag.h"
+#include "trickle.h"
 
 rpl_instance_t instances[RPL_MAX_INSTANCES];
 rpl_dodag_t dodags[RPL_MAX_DODAGS];
@@ -14,6 +15,7 @@ rpl_instance_t *rpl_new_instance(uint8_t instanceid){
 		if(inst->used == 0){
 			memset(inst, 0, sizeof(*inst));
 			inst->used = 1;
+			inst->id = instanceid;
 			return inst;
 		}	
 	}
@@ -54,7 +56,7 @@ rpl_dodag_t * rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid){
 			dodag->instance = inst;
 			dodag->my_rank = INFINITE_RANK;
 			dodag->used = 1;
-			dodag->dodag_id = *dodagid;
+			memcpy(&dodag->dodag_id,dodagid,sizeof(*dodagid));
 			return dodag;
 		}
 	}
@@ -126,6 +128,14 @@ rpl_parent_t *rpl_find_parent(ipv6_addr_t *address){
 	return NULL;
 }
 
+void rpl_delete_parent(ipv6_addr_t * address){
+	for(int i=0;i<RPL_MAX_PARENTS;i++){
+		if( parents[i].used && (rpl_equal_id(address, &parents[i].addr)) ){
+			memset(&parents[i], 0, sizeof(parents[i]));	
+		}
+	}
+}
+
 void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_rank){
 	rpl_dodag_t *my_dodag;
 	rpl_parent_t *preferred_parent;
@@ -138,6 +148,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
 		rpl_del_dodag(my_dodag);
 		return;	
 	}
+	my_dodag->instance->joined = 1;
 	my_dodag->of = dodag->of;
 	my_dodag->mop = dodag->mop;
 	my_dodag->dtsn = dodag->dtsn;
@@ -156,7 +167,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
 	my_dodag->my_rank = dodag->of->calc_rank(preferred_parent, dodag->my_rank);
 	my_dodag->min_rank = my_dodag->my_rank;
 	
-	//TODO: reset trickle timer
+	start_trickle(my_dodag->dio_min, my_dodag->dio_interval_doubling, my_dodag->dio_redundancy);
 	//TODO: start sending DAOs
 
 }
@@ -169,4 +180,12 @@ void rpl_global_repair(rpl_dodag_t *dodag){
 	}
 	my_dodag->version = dodag->version;
 	my_dodag->dtsn = dodag->dtsn;
+}
+
+ipv6_addr_t *rpl_get_my_preferred_parent(){
+	rpl_dodag_t * my_dodag = rpl_get_my_dodag();
+	if(my_dodag == NULL){
+		return NULL;
+	}
+	return &my_dodag->my_preferred_parent->addr;
 }

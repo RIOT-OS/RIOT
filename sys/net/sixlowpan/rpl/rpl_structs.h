@@ -72,6 +72,7 @@
 #define RPL_MAX_DODAGS 3
 #define RPL_MAX_INSTANCES 1
 #define RPL_MAX_PARENTS 5
+#define RPL_MAX_ROUTING_ENTRIES 20
 #define RPL_ROOT_RANK 1
 #define RPL_DEFAULT_LIFETIME 0xff
 #define RPL_LIFETIME_UNIT 0xffff
@@ -187,5 +188,12 @@ typedef struct rpl_of_t {
     void (*reset)(struct rpl_dodag_t *);
     void (*parent_state_callback)(rpl_parent_t *, int, int);
 } rpl_of_t;
+
+typedef struct rpl_routing_entry_t {
+	uint8_t used;
+	ipv6_addr_t address;
+	ipv6_addr_t next_hop;
+	
+} rpl_routing_entry_t;
 
 #endif
