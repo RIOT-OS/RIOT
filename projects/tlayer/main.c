@@ -30,8 +30,10 @@
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
 
-#define SEND_TCP_THREAD_SIZE		3072
-#define TCP_CLOSE_THREAD_STACK_SIZE		3072
+#define SEND_TCP_THREAD_SIZE				1536
+#define TCP_CLOSE_THREAD_STACK_SIZE			1536
+#define RECV_FROM_TCP_THREAD_STACK_SIZE1	512
+#define RECV_FROM_TCP_THREAD_STACK_SIZE2	512
 
 uint8_t udp_server_thread_pid;
 char udp_server_stack_buffer[UDP_STACK_SIZE];
@@ -50,8 +52,15 @@ char tcp_send_stack_buffer[SEND_TCP_THREAD_SIZE];
 
 char tcp_close_thread_stack[TCP_CLOSE_THREAD_STACK_SIZE];
 
+char recv_from_tcp_thread_stack1[RECV_FROM_TCP_THREAD_STACK_SIZE1];
+char recv_from_tcp_thread_stack2[RECV_FROM_TCP_THREAD_STACK_SIZE2];
+
 static msg_t mesg;
 static transceiver_command_t tcmd;
+
+static uint8_t running_recv_threads = 0;
+static uint8_t recv_socket_id1 = 0;
+static uint8_t recv_socket_id2 = 0;
 
 typedef struct tcp_msg_t
 	{
@@ -59,6 +68,9 @@ typedef struct tcp_msg_t
 	char		tcp_string_msg[80];
 	}tcp_message_t;
 tcp_message_t current_message;
+
+void recv_from_tcp_thread1 (void);
+void recv_from_tcp_thread2 (void);
 
 void init_tl (char *str)
 	{
@@ -153,7 +165,6 @@ void init_tcp_server(void)
 	stSockAddr.sin6_family = AF_INET6;
 	stSockAddr.sin6_port = HTONS(1100);
 
-	// TODO: HARDCODED! Use one of the IPv6 methods after initializing the node to get the correct ipv6 address!
 	ipv6_init_address(&stSockAddr.sin6_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, get_radio_address());
 	ipv6_print_addr(&stSockAddr.sin6_addr);
 
@@ -181,15 +192,22 @@ void init_tcp_server(void)
 			close(SocketFD);
 			return;
 			}
-		tcp_socket_id = ConnectFD;
-		while (read_bytes != -1)
+		else
 			{
-			read_bytes = recv(ConnectFD, buff_msg, MAX_TCP_BUFFER, 0);
-
-			if (read_bytes > 0)
+			printf("Connection established on socket %u.\n", ConnectFD);
+			if (running_recv_threads == 0)
 				{
-//				printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
+				recv_socket_id1 = ConnectFD;
+				thread_create(recv_from_tcp_thread_stack1, RECV_FROM_TCP_THREAD_STACK_SIZE1, PRIORITY_MAIN,
+									    				CREATE_STACKTEST, recv_from_tcp_thread1, "recv_from_tcp_thread1");
 				}
+			else if (running_recv_threads == 1)
+				{
+				recv_socket_id2 = ConnectFD;
+				thread_create(recv_from_tcp_thread_stack2, RECV_FROM_TCP_THREAD_STACK_SIZE2, PRIORITY_MAIN,
+														CREATE_STACKTEST, recv_from_tcp_thread2, "recv_from_tcp_thread2");
+				}
+			running_recv_threads++;
 			}
 		}
 	}
@@ -302,6 +320,40 @@ void disconnect_tcp(char *str)
 	msg_send(&send_msg, tcp_cht_pid, 0);
 	}
 
+void recv_from_tcp_thread2 (void)
+	{
+	int read_bytes = 0;
+	char buff_msg[MAX_TCP_BUFFER];
+	memset(buff_msg, 0, MAX_TCP_BUFFER);
+
+	while (read_bytes != -1)
+		{
+		read_bytes = recv(recv_socket_id2, buff_msg, MAX_TCP_BUFFER, 0);
+
+		if (read_bytes > 0)
+			{
+			printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
+			}
+		}
+	}
+
+void recv_from_tcp_thread1 (void)
+	{
+	int read_bytes = 0;
+	char buff_msg[MAX_TCP_BUFFER];
+	memset(buff_msg, 0, MAX_TCP_BUFFER);
+
+	while (read_bytes != -1)
+		{
+		read_bytes = recv(recv_socket_id1, buff_msg, MAX_TCP_BUFFER, 0);
+
+		if (read_bytes > 0)
+			{
+			printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
+			}
+		}
+	}
+
 void init(char *str){
     char command;
     uint16_t r_addr;
@@ -370,45 +422,10 @@ void init(char *str){
 									CREATE_STACKTEST,
 									send_tcp_thread,
 									"send_tcp_thread");
-
 }
 
 void bootstrapping(char *str){
     sixlowpan_bootstrapping();
-}
-
-void send_packet(char *str){
-	uint8_t send_buffer[UDP_STACK_SIZE];
-	uint8_t text[20];
-	sscanf(str, "send %s", text);
-
-	ipv6_hdr_t *test_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
-	udp_hdr_t *test_udp_header = ((udp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
-	uint8_t *payload = &send_buffer[IPV6_HDR_LEN+UDP_HDR_LEN];
-
-	ipv6_addr_t ipaddr;
-	ipv6_init_address(&ipaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, 0x0005);
-	ipv6_print_addr(&ipaddr);
-
-	memcpy(&(test_ipv6_header->destaddr), &ipaddr, 16);
-	ipv6_get_saddr(&(test_ipv6_header->srcaddr), &(test_ipv6_header->destaddr));
-	test_ipv6_header->version_trafficclass = IPV6_VER;
-	test_ipv6_header->trafficclass_flowlabel = 0;
-	test_ipv6_header->flowlabel = 0;
-	test_ipv6_header->nextheader = IPPROTO_UDP;
-	test_ipv6_header->hoplimit = MULTIHOP_HOPLIMIT;
-	test_ipv6_header->length = sizeof(test_udp_header);
-
-    test_udp_header->src_port = 9821;
-    test_udp_header->dst_port = 7654;
-    test_udp_header->checksum = 0;
-
-    memcpy(payload, text, strlen((char*)text)+1);
-    test_udp_header->length = 8 + strlen((char*)text)+1;
-
-    test_udp_header->checksum = ~udp_csum(test_ipv6_header, test_udp_header);
-
-    sixlowpan_send(&ipaddr, (uint8_t*)(test_udp_header), test_udp_header->length, IPPROTO_UDP);
 }
 
 void send_udp(char *str)
@@ -606,6 +623,22 @@ void static_head (char *str)
 		}
 	}
 
+
+
+void recv_from_tcp (char *str)
+	{
+	uint16_t a;
+	msg_t send;
+	if (sscanf(str, "recv_from %hu", &a) == 1)
+		{
+		msg_send(&send, transceiver_pid, 1);
+		}
+	else
+		{
+		puts("Usage:\trecv_from <socket_number>");
+		}
+	}
+
 const shell_command_t shell_commands[] = {
     {"init", "", init},
     {"addr", "", get_r_address},
@@ -625,6 +658,7 @@ const shell_command_t shell_commands[] = {
     {"kill_process", "", kill_process},
     {"continue_process", "", continue_process},
     {"close_tcp", "", close_tcp},
+    {"recv_from", "recv_from SOCKET_ID", recv_from_tcp},
     {"tcp_bw", "tcp_bw NO_OF_PACKETS", send_tcp_bandwidth_test},
     {"boots", "", boot_server},
     {"bootc", "", boot_client},
