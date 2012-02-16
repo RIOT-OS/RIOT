@@ -145,7 +145,7 @@ void cc110x_init_ignore(void);
  * @return      0 if list is full, 1 otherwise
  *
  */
-uint8_t cc110x_add_ignored(uint8_t addr);
+uint8_t cc110x_add_ignored(radio_address_t addr);
 #endif
 
 
