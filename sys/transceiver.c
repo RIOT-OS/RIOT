@@ -128,6 +128,7 @@ void run(void) {
 
     msg_init_queue(msg_buffer, TRANSCEIVER_MSG_BUFFER_SIZE);
     while (1) {
+        DEBUG("Waiting for next message\n");
         msg_receive(&m);
         /* only makes sense for messages for upper layers */
         cmd = (transceiver_command_t*) m.content.ptr;
@@ -169,6 +170,7 @@ void run(void) {
                 break;
 #ifdef DBG_IGNORE
             case DBG_IGN:
+                printf("Transceiver PID: %i (%p), rx_buffer_next: %u\n", transceiver_pid, &transceiver_pid, rx_buffer_next);
                 ignore_add(cmd->transceivers, cmd->data);
                 break;
 #endif
@@ -407,9 +409,10 @@ static void switch_to_rx(transceiver_type_t t) {
 
 #ifdef DBG_IGNORE
 static void ignore_add(transceiver_type_t t, void *address) {
+    radio_address_t addr = *((radio_address_t*) address);
     switch (t) {
         case TRANSCEIVER_CC1100:
-            cc110x_add_ignored(*((uint8_t*) address));
+            cc110x_add_ignored(addr);
             break;
         default:
             break;
