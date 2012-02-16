@@ -55,8 +55,10 @@ char tcp_close_thread_stack[TCP_CLOSE_THREAD_STACK_SIZE];
 char recv_from_tcp_thread_stack1[RECV_FROM_TCP_THREAD_STACK_SIZE1];
 char recv_from_tcp_thread_stack2[RECV_FROM_TCP_THREAD_STACK_SIZE2];
 
+#ifdef DBG_IGNORE
 static msg_t mesg;
 static transceiver_command_t tcmd;
+#endif
 
 static uint8_t running_recv_threads = 0;
 static uint8_t recv_socket_id1 = 0;
@@ -291,6 +293,8 @@ void send_tcp_bandwidth_test(char *str)
 	char msg_string[] = "abcdefghijklmnopqrstuvwxyz0123456789!-=/%$";
 
 	sscanf(str, "tcp_bw %i", &count);
+	ltc4150_start();
+	printf("Start power: %f\n", ltc4150_get_total_mAh());
 	start = vtimer_now();
 	for (i = 0; i < count; i++)
 		{
@@ -300,6 +304,7 @@ void send_tcp_bandwidth_test(char *str)
 	end = vtimer_now();
 	total = timex_sub(end, start);
 	secs = total.microseconds / 1000000.0f;
+	printf("Used power: %f\n", ltc4150_get_total_mAh());
 	printf("Start: %lu, End: %lu, Total: %lu\n", start.microseconds, end.microseconds, total.microseconds);
 	printf("Time: %f seconds, Bandwidth: %f byte/second\n", secs, (count*48)/secs);
 	}
@@ -455,6 +460,8 @@ void send_udp(char *str)
 	sa.sin6_family = AF_INET;
 	memcpy(&sa.sin6_addr, &ipaddr, 16);
 	sa.sin6_port = HTONS(7654);
+	ltc4150_start();
+	printf("Start power: %f\n", ltc4150_get_total_mAh());
 	start = vtimer_now();
 	for (int i = 0; i < count; i++)
 		{
@@ -467,6 +474,7 @@ void send_udp(char *str)
 	end = vtimer_now();
 	total = timex_sub(end, start);
 	secs = total.microseconds / 1000000;
+	printf("Used power: %f\n", ltc4150_get_total_mAh());
 	printf("Start: %lu, End: %lu, Total: %lu\n", start.microseconds, end.microseconds, total.microseconds);
 	secs = total.microseconds / 1000000;
 	printf("Time: %lu seconds, Bandwidth: %lu byte/second\n", secs, (count*48)/secs);
@@ -623,22 +631,6 @@ void static_head (char *str)
 		}
 	}
 
-
-
-void recv_from_tcp (char *str)
-	{
-	uint16_t a;
-	msg_t send;
-	if (sscanf(str, "recv_from %hu", &a) == 1)
-		{
-		msg_send(&send, transceiver_pid, 1);
-		}
-	else
-		{
-		puts("Usage:\trecv_from <socket_number>");
-		}
-	}
-
 const shell_command_t shell_commands[] = {
     {"init", "", init},
     {"addr", "", get_r_address},
@@ -658,7 +650,6 @@ const shell_command_t shell_commands[] = {
     {"kill_process", "", kill_process},
     {"continue_process", "", continue_process},
     {"close_tcp", "", close_tcp},
-    {"recv_from", "recv_from SOCKET_ID", recv_from_tcp},
     {"tcp_bw", "tcp_bw NO_OF_PACKETS", send_tcp_bandwidth_test},
     {"boots", "", boot_server},
     {"bootc", "", boot_client},
