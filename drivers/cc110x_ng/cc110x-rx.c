@@ -14,10 +14,11 @@
 
 #ifdef DBG_IGNORE
 #include <stdio.h>
+#include <string.h>
 #define IGN_MAX     (10)
 
-uint8_t ignored_addr[IGN_MAX];
-static uint8_t is_ignored(uint8_t addr);
+radio_address_t ignored_addr[IGN_MAX];
+static uint8_t is_ignored(radio_address_t addr);
 #endif
 
 static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length);
@@ -60,6 +61,7 @@ void cc110x_rx_handler(void) {
         
 #ifdef DBG_IGNORE
         if (is_ignored(cc110x_rx_buffer[rx_buffer_next].packet.phy_src)) {
+            LED_RED_TOGGLE;
             return;
         }
 #endif
@@ -114,8 +116,6 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length) {
 
 	/* Any bytes available in RX FIFO? */
 	if ((cc110x_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO)) {
-        //LED_GREEN_TOGGLE;
-        //LED_RED_TOGGLE;
 		// Read length byte (first byte in RX FIFO)
         cc110x_read_fifo((char*) &packetLength, 1);
 		// Read data from RX FIFO and store in rxBuffer
@@ -153,7 +153,6 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length) {
 	}
     /* no bytes in RX FIFO */
 	else {
-        //LED_RED_TOGGLE;
 		// RX FIFO get automatically flushed if return value is false
 		return 0;
 	}
@@ -172,28 +171,23 @@ static uint8_t receive_packet(uint8_t *rxBuffer, uint8_t length) {
 
 #ifdef DBG_IGNORE
 void cc110x_init_ignore(void) {
-    uint8_t i;
-
-    for (i = 0; i < IGN_MAX; i++) {
-        ignored_addr[i] = 0;
-    }
+    memset(ignored_addr, 0, IGN_MAX*sizeof(radio_address_t));
 }
 
-uint8_t cc110x_add_ignored(uint8_t addr) {
+uint8_t cc110x_add_ignored(radio_address_t addr) {
    uint8_t i = 0;
 
    while ((i < IGN_MAX) && ignored_addr[i++]) {
        printf("i: %hu\n", i);
    }
-   printf("Adding %hu to ignore list at position %hu\n", addr, i);
-   if (i >= IGN_MAX) {
+   if (i > IGN_MAX) {
        return 0;
    }
    ignored_addr[i-1] = addr;
    return 1;
 }
 
-static uint8_t is_ignored(uint8_t addr) {
+static uint8_t is_ignored(radio_address_t addr) {
     uint8_t i;
 
     for (i = 0; i < IGN_MAX; i++) {

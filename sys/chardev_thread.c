@@ -29,14 +29,16 @@ void chardev_loop(ringbuffer_t *rb) {
     while (1) {
         msg_receive(&m);
 
-        if (m.sender_pid == pid) {
-        } else {
+        if (m.sender_pid != pid) {
+            DEBUG("Receiving message from another thread");
             switch (m.type) {
                 case OPEN:
                     if (reader_pid == -1) {
                         reader_pid = m.sender_pid;
-                        m.content.value = 0; // no error
-                    } else {
+                        /* no error */
+                        m.content.value = 0;
+                    }
+                    else {
                         m.content.value = -EBUSY;
                     }
                     msg_reply(&m,&m);
@@ -44,8 +46,10 @@ void chardev_loop(ringbuffer_t *rb) {
                 case READ:
                     if (m.sender_pid != reader_pid) {
                         m.content.value = -EINVAL;
+                        r = NULL;
                         msg_reply(&m, &m);
-                    } else {
+                    }
+                    else {
                         r = (struct posix_iop_t *)m.content.ptr;
                     }
                     break;
@@ -55,7 +59,8 @@ void chardev_loop(ringbuffer_t *rb) {
                         reader_pid = -1;
                         r = NULL;
                         m.content.value = 0;
-                    } else {
+                    }
+                    else {
                         m.content.value = -EINVAL;
                     }
                     msg_reply(&m,&m);
@@ -69,7 +74,7 @@ void chardev_loop(ringbuffer_t *rb) {
         if (rb->avail && (r != NULL)) {
             int state = disableIRQ();
             int nbytes = min(r->nbytes, rb->avail);
-            DEBUG("uart0_thread: sending %i bytes to pid %i\n", nbytes, reader_pid);
+            DEBUG("uart0_thread [%i]: sending %i bytes received from %i to pid %i\n", pid, nbytes, m.sender_pid, reader_pid);
             rb_get_elements(rb, r->buffer, nbytes);
             r->nbytes = nbytes;
 
@@ -78,7 +83,6 @@ void chardev_loop(ringbuffer_t *rb) {
             m.content.ptr = (char*)r;
 
             msg_reply(&m, &m);
-           // DEBUG("uart0_thread: sending res=%i\n", res);
 
             r = NULL;
             restoreIRQ(state);
