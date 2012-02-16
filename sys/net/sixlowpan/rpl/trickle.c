@@ -6,8 +6,10 @@
 
 char timer_over_buf[TRICKLE_TIMER_STACKSIZE];
 char interval_over_buf[TRICKLE_INTERVAL_STACKSIZE];
+char dao_delay_over_buf[DAO_DELAY_STACKSIZE];
 int timer_over_pid;
 int interval_over_pid;
+int dao_delay_over_pid;
 
 uint8_t k;
 uint32_t Imin;
@@ -17,8 +19,10 @@ uint32_t t;
 uint16_t c;
 vtimer_t trickle_t_timer;
 vtimer_t trickle_I_timer;
+vtimer_t dao_timer;
 timex_t t_time;
 timex_t I_time;
+timex_t dao_time;
 
 //struct für trickle parameter??
 void reset_trickletimer(void){
@@ -41,6 +45,9 @@ void init_trickle(void){
 	interval_over_pid = thread_create(interval_over_buf, TRICKLE_INTERVAL_STACKSIZE,
 									  PRIORITY_MAIN-1, CREATE_SLEEPING,
 									  trickle_interval_over, "trickle_interval_over");
+	dao_delay_over_pid = thread_create(dao_delay_over_buf, DAO_DELAY_STACKSIZE,
+									  PRIORITY_MAIN-1, CREATE_SLEEPING,
+									  dao_delay_over, "dao_delay_over");
 	
 }
 
@@ -95,4 +102,16 @@ void trickle_interval_over(void){
 		thread_sleep();
 	}
 
+}
+
+void delay_dao(void){
+	dao_time = timex_set(DEFAULT_DAO_DELAY,0);
+	vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
+}
+
+void dao_delay_over(void){
+	while(1){
+		send_DAO();
+		thread_sleep();
+	}
 }

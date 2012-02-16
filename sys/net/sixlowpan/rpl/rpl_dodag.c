@@ -129,11 +129,20 @@ rpl_parent_t *rpl_find_parent(ipv6_addr_t *address){
 }
 
 void rpl_delete_parent(ipv6_addr_t * address){
+	rpl_dodag_t * my_dodag = rpl_get_my_dodag();
+	//TODO:check if this was the preferred parent, find new parent, if it was last parent leave dodag
+	if(rpl_equal_id(&my_dodag->my_preferred_parent->addr,address)){
+		//set_new_preferred_parent
+	}
 	for(int i=0;i<RPL_MAX_PARENTS;i++){
 		if( parents[i].used && (rpl_equal_id(address, &parents[i].addr)) ){
 			memset(&parents[i], 0, sizeof(parents[i]));	
 		}
 	}
+}
+
+void rpl_delete_parents_for_dodag(ipv6_addr_t * dodag_id){
+
 }
 
 void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_rank){
@@ -168,8 +177,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
 	my_dodag->min_rank = my_dodag->my_rank;
 	
 	start_trickle(my_dodag->dio_min, my_dodag->dio_interval_doubling, my_dodag->dio_redundancy);
-	//TODO: start sending DAOs
-
+	delay_dao();
 }
 
 void rpl_global_repair(rpl_dodag_t *dodag){
