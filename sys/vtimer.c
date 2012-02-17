@@ -210,12 +210,13 @@ int vtimer_init() {
 }
 
 int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid) {
+    int ret;
     t->action = (void*) thread_wakeup;
     t->arg = (void*) pid;
     t->absolute = interval;
     t->pid = 0;
-    vtimer_set(t);
-    return 0;
+    ret = vtimer_set(t);
+    return ret;
 }
 
 int vtimer_usleep(uint32_t usecs) {
@@ -224,10 +225,11 @@ int vtimer_usleep(uint32_t usecs) {
 }
 
 int vtimer_sleep(timex_t time) {
+    int ret;
     vtimer_t t;
-    vtimer_set_wakeup(&t, time, thread_getpid());
+    ret = vtimer_set_wakeup(&t, time, thread_getpid());
     thread_sleep();
-    return 0;
+    return ret;
 }
 
 int vtimer_remove(vtimer_t *t){
