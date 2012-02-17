@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <transceiver.h>
 
 #include <shell.h>
 #include <board_uart0.h>
@@ -9,7 +10,6 @@
 #include <hwtimer.h>
 #include <swtimer.h>
 #include <msg.h>
-#include <transceiver.h>
 #include <cc110x_ng.h>
 
 #define SHELL_STACK_SIZE    (2048)
@@ -30,6 +30,7 @@ msg_t msg_q[RCV_BUFFER_SIZE];
 static msg_t mesg;
 static transceiver_command_t tcmd;
 static radio_packet_t p;
+static uint16_t a;
 
 static uint32_t sending_delay = SENDING_DELAY;
 
@@ -135,6 +136,9 @@ void ignore(char *addr) {
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &a;
     if (sscanf(addr, "ign %hu", &a) == 1) {
+        printf("msg_q: %hu/%hu/%lu Transceiver PID: %i (%p), rx_buffer_next: %u\n", 
+                msg_q[63].sender_pid, msg_q[63].type, msg_q[63].content.value, transceiver_pid, &transceiver_pid, rx_buffer_next);
+        printf("sending to transceiver (%u): %u\n", transceiver_pid, (*(uint8_t*)tcmd.data));
         msg_send(&mesg, transceiver_pid, 1);
     }
     else {
