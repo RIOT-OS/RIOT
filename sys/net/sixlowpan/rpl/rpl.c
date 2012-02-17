@@ -12,12 +12,8 @@
 #include "sys/net/sixlowpan/sixlowerror.h"
 
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
-//counters
-uint8_t act_dodag_version = 240;
-uint8_t dao_sequence = 240;
-uint8_t path_sequence = 240;
-//other global variables
-
+//global variables
+char i_am_root = 0;
 rpl_of_t *objective_functions[NUMBER_IMPLEMENTED_OFS];
 rpl_routing_entry_t routing_table[RPL_MAX_ROUTING_ENTRIES];
 unsigned int rpl_process_pid;
@@ -34,6 +30,8 @@ static struct rpl_dao_t *rpl_dao_buf;
 //static struct rpl_dao_ack_t * rpl_dao_ack_buf;
 static struct rpl_opt_t *rpl_opt_buf;
 static struct rpl_opt_dodag_conf_t * rpl_opt_dodag_conf_buf;
+static struct rpl_opt_solicited_t * rpl_opt_solicited_buf;
+static struct rpl_opt_target_t * rpl_opt_target_buf;
 
 
 static struct rpl_dio_t* get_rpl_dio_buf(){
@@ -55,6 +53,14 @@ static struct rpl_opt_t* get_rpl_opt_buf(uint8_t rpl_msg_len){
 
 static struct rpl_opt_dodag_conf_t* get_rpl_opt_dodag_conf_buf(uint8_t rpl_msg_len){
 	return ((struct rpl_opt_dodag_conf_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + rpl_msg_len]));
+}
+
+static struct rpl_opt_solicited_t* get_rpl_opt_solicited_buf(uint8_t rpl_msg_len){
+	return ((struct rpl_opt_solicited_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + rpl_msg_len]));
+}
+
+static struct rpl_opt_target_t* get_rpl_opt_target_buf(uint8_t rpl_msg_len){
+	return ((struct rpl_opt_target_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
 rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp){
@@ -118,7 +124,7 @@ void rpl_init_root(){
 		dodag->minhoprankincrease = (uint16_t)DEFAULT_MIN_HOP_RANK_INCREASE;
 		dodag->default_lifetime = (uint16_t)RPL_DEFAULT_LIFETIME;
 		dodag->lifetime_unit = RPL_LIFETIME_UNIT;
-		dodag->version = 0;
+		dodag->version = RPL_COUNTER_INIT;
 		dodag->grounded = RPL_GROUNDED;
 		dodag->my_rank = RPL_ROOT_RANK;
 		dodag->joined = 1;
@@ -128,7 +134,7 @@ void rpl_init_root(){
 		printf("Error - could not generate DODAG\n");
 		return;
 	}
-
+	i_am_root = 1;
 	start_trickle(dodag->dio_min, dodag->dio_interval_doubling, dodag->dio_redundancy);
 
 }
@@ -213,9 +219,23 @@ void send_DAO(){
 	//rpl_dao_buf->k_d_flags = 0x00;
 	//TODO:dao_sequence handling
 	rpl_dao_buf->dao_sequence = 0x00;
+	uint16_t opt_len = 0;
+	rpl_opt_target_buf = get_rpl_opt_target_buf(DAO_BASE_LEN);
+	//Alle Ziele aus der Routing Tabelle als Target eintragen
+	//TODO: Ausnahme default_route zu Parent
+	for(uint8_t i=0; i<RPL_MAX_ROUTING_ENTRIES;i++){
+		if(routing_table[i].used){
+			rpl_opt_target_buf->type=RPL_OPT_TARGET;
+			rpl_opt_target_buf->length=RPL_OPT_TARGET_LEN;
+			rpl_opt_target_buf->flags=0x00;
+			rpl_opt_target_buf->prefix_length=16;
+			memcpy(&rpl_opt_target_buf->target,&routing_table[i].address,sizeof(ipv6_addr_t));
+			opt_len += RPL_OPT_TARGET_LEN +2;
+			rpl_opt_target_buf = get_rpl_opt_target_buf(DAO_BASE_LEN + opt_len);
+		}
+	}
 	
-	
-	uint16_t plen = ICMPV6_HDR_LEN + DAO_BASE_LEN;
+	uint16_t plen = ICMPV6_HDR_LEN + DAO_BASE_LEN + opt_len;
 	rpl_send(&my_dodag->my_preferred_parent->addr,(uint8_t*)icmp_buf, plen, PROTO_NUM_ICMPV6, NULL);
 }
 
@@ -317,6 +337,7 @@ void recv_rpl_dio(void){
 				has_dodag_conf_opt = 1;
 				if(rpl_opt_buf->length != RPL_OPT_DODAG_CONF_LEN){
 					//error malformed
+					return;
 				}
 				rpl_opt_dodag_conf_buf = get_rpl_opt_dodag_conf_buf(len);
 				dio_dodag.dio_interval_doubling = rpl_opt_dodag_conf_buf->DIOIntDoubl; 
@@ -333,6 +354,7 @@ void recv_rpl_dio(void){
 			case(RPL_OPT_PREFIX_INFO):{
 				if(rpl_opt_buf->length != RPL_OPT_PREFIX_INFO_LEN){
 					//error malformed
+					return;
 				}
 				len += RPL_OPT_PREFIX_INFO_LEN +2;
 				break;
@@ -378,7 +400,7 @@ void recv_rpl_dio(void){
 		if( dio_dodag.version > my_dodag->version){
 			printf("New Version of dodag\n");
 			if(my_dodag->my_rank == ROOT_RANK){
-				my_dodag->version = dio_dodag.version +1;
+				my_dodag->version = RPL_COUNTER_INCREMENT(dio_dodag.version);
 				reset_trickletimer();
 			}
 			else{
@@ -418,7 +440,54 @@ void recv_rpl_dio(void){
 }
 
 void recv_rpl_dis(void){
-	
+	rpl_dodag_t *my_dodag = rpl_get_my_dodag();
+	if(my_dodag == NULL){
+		return;
+	}
+	ipv6_buf = get_ipv6_buf();
+	rpl_dis_buf = get_rpl_dis_buf();
+	int len = DIS_BASE_LEN;
+	while(len < (ipv6_buf->length - ICMPV6_HDR_LEN) ){
+		rpl_opt_buf = get_rpl_opt_buf(len);
+		switch(rpl_opt_buf->type){
+			case(RPL_OPT_PAD1):{
+				len += 1;
+				break;
+			}
+			case(RPL_OPT_PADN):{
+				len += rpl_opt_buf->length +2;
+				break;
+			}
+			case(RPL_OPT_SOLICITED_INFO):{
+				len+= RPL_OPT_SOLICITED_INFO_LEN+2;
+				//extract + check 
+				if(rpl_opt_buf->length != RPL_OPT_SOLICITED_INFO_LEN){
+					//error malformed
+					return;
+				}
+				rpl_opt_solicited_buf = get_rpl_opt_solicited_buf(len);
+				if(rpl_opt_solicited_buf->VID_Flags & RPL_DIS_I_MASK){
+					if(my_dodag->instance->id != rpl_opt_solicited_buf->rplinstanceid){
+						return;
+					}
+				}
+				if(rpl_opt_solicited_buf->VID_Flags & RPL_DIS_D_MASK){
+					if(!rpl_equal_id(&my_dodag->dodag_id, &rpl_opt_solicited_buf->dodagid)){
+						return;
+					}
+				}
+				if(rpl_opt_solicited_buf->VID_Flags & RPL_DIS_V_MASK){
+					if(my_dodag->version != rpl_opt_solicited_buf->version){
+						return;
+					}
+				}
+				break;
+			}
+			default:
+				break;
+		}
+	}
+	send_DIO(&ipv6_buf->srcaddr);
 
 }
 
@@ -427,7 +496,7 @@ void recv_rpl_dao(void){
 	
 	rpl_dao_buf = get_rpl_dao_buf();
 	int len = DAO_BASE_LEN;
-	while(len < (ipv6_buf->length - LLHDR_ICMPV6HDR_LEN) ){
+	while(len < (ipv6_buf->length - ICMPV6_HDR_LEN) ){
 		rpl_opt_buf = get_rpl_opt_buf(len);
 		switch(rpl_opt_buf->type){
 
@@ -503,9 +572,15 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
 		//find right next hop before sending
 		ipv6_addr_t *next_hop = rpl_get_next_hop(&ipv6_buf->destaddr);
 		if(next_hop == NULL){
-			//oops... entweder bin ich root und weiß nicht wohin mit dem paket, oder es ist kein 
-			//preferred parent eingetragen, was nicht passieren sollte.
-			printf("[Error] destination unknown\n");
+			if(i_am_root){
+				//oops... entweder bin ich root und weiß nicht wohin mit dem paket, oder es ist kein 
+				//preferred parent eingetragen, was nicht passieren sollte.
+				printf("[Error] destination unknown\n");
+				return;
+			}
+			else{
+				next_hop = rpl_get_my_preferred_parent();
+			}
 		}
 	    lowpan_init((ieee_802154_long_t*)&(next_hop->uint16[4]),(uint8_t*)ipv6_buf);
 	}
@@ -518,10 +593,11 @@ ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t * addr){
 			return &routing_table[i].next_hop;
 		}
 	}
-	return rpl_get_my_preferred_parent();
+	return NULL;
 }
 
 void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop){
+	//TODO: if no free entry, delete worst parent
 	for(uint8_t i=0; i<RPL_MAX_ROUTING_ENTRIES; i++){
 		if(!routing_table[i].used){
 			routing_table[i].address = *addr;
