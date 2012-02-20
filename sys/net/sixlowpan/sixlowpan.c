@@ -40,6 +40,8 @@ uint8_t comp_buf[512];
 uint8_t byte_offset;
 uint8_t first_frag = 0;
 lowpan_reas_buf_t *head = NULL;
+lowpan_reas_buf_t *packet_fifo = NULL;
+mutex_t fifo_mutex;
 
 unsigned int ip_process_pid;
 unsigned int nd_nbr_cache_rem_pid = 0;
@@ -58,7 +60,8 @@ char con_buf[CON_STACKSIZE];
 char lowpan_transfer_buf[LOWPAN_TRANSFER_BUF_STACKSIZE];
 lowpan_context_t contexts[LOWPAN_CONTEXT_MAX];
 uint8_t context_len = 0;
-uint8_t route_head = 0;
+uint8_t static_route = 0;
+uint16_t local_address = 0;
 
 void lowpan_context_auto_remove(void);
 
@@ -79,15 +82,15 @@ void lowpan_init(ieee_802154_long_t *addr, uint8_t *data){
     data = &comp_buf[0];
     packet_length = comp_len;
     
-    if (route_head == 1)
+    if (static_route == 1)
 		{
-		if (laddr.uint8[7] < get_radio_address())
+		if (laddr.uint8[7] < local_address)
 			{
-			laddr.uint8[7] = get_radio_address() - 1;
+			laddr.uint8[7] = local_address - 1;
 			}
 		else
 			{
-			laddr.uint8[7] = get_radio_address() + 1;
+			laddr.uint8[7] = local_address + 1;
 			}
 		}
 
@@ -160,7 +163,7 @@ void printLongLocalAddr(ieee_802154_long_t *saddr)
 	        ((uint8_t *)saddr)[6], ((uint8_t *)saddr)[7]);
 	}
 
-void printReasBuffers()
+void printReasBuffers(void)
 	{
 	lowpan_reas_buf_t *temp_buffer;
 	lowpan_interval_list_t *temp_interval;
@@ -182,62 +185,75 @@ void printReasBuffers()
 		}
 	}
 
+void printFIFOBuffers(void)
+	{
+	lowpan_reas_buf_t *temp_buffer;
+	lowpan_interval_list_t *temp_interval;
+	temp_buffer = packet_fifo;
+
+	printf("\n\n--- Reassembly Buffers ---\n");
+
+	while (temp_buffer != NULL)
+		{
+		printLongLocalAddr(&temp_buffer->s_laddr);
+		printf("Ident.: %i, Packet Size: %i/%i, Timestamp: %li\n", temp_buffer->ident_no, temp_buffer->current_packet_size, temp_buffer->packet_size, temp_buffer->timestamp);
+		temp_interval = temp_buffer->interval_list_head;
+		while (temp_interval != NULL)
+			{
+			printf("\t%i - %i\n", temp_interval->start, temp_interval->end);
+			temp_interval = temp_interval->next;
+			}
+		temp_buffer = temp_buffer->next;
+		}
+	}
+
 void lowpan_transfer(void)
 	{
 	msg_t m_recv, m_send;
 	ipv6_hdr_t *ipv6_buf;
-	lowpan_reas_buf_t *current_buf, *temp_buf;
+	lowpan_reas_buf_t *current_buf;
 	long temp_time;
 	uint8_t gotosleep;
 
 	while (1)
 		{
-		temp_buf = NULL;
 		temp_time = LONG_MAX;
 		gotosleep = 1;
 
-		current_buf = head;
-
-		while(current_buf != NULL)
+		mutex_lock(&fifo_mutex);
+		current_buf = packet_fifo;
+		if (current_buf != NULL)
 			{
-			if ((current_buf->current_packet_size == current_buf->packet_size) &&
-					(current_buf->timestamp < temp_time))
-				{
-				temp_time = current_buf->timestamp;
-				temp_buf = current_buf;
-				}
-			current_buf = current_buf->next;
-			}
-
-		if (temp_buf != NULL)
-			{
-			if((temp_buf->packet)[0] == LOWPAN_IPV6_DISPATCH)
+			mutex_unlock(&fifo_mutex, 0);
+			if((current_buf->packet)[0] == LOWPAN_IPV6_DISPATCH)
 				{
 				ipv6_buf = get_ipv6_buf();
-				memcpy(ipv6_buf, (temp_buf->packet)+1, temp_buf->packet_size - 1);
+				memcpy(ipv6_buf, (current_buf->packet)+1, current_buf->packet_size - 1);
 				m_send.content.ptr = (char*) ipv6_buf;
-				packet_length = temp_buf->packet_size - 1;
+				packet_length = current_buf->packet_size - 1;
 				msg_send_receive(&m_send, &m_recv, ip_process_pid);
 				}
-			else if(((temp_buf->packet)[0] & 0xe0) == LOWPAN_IPHC_DISPATCH)
+			else if(((current_buf->packet)[0] & 0xe0) == LOWPAN_IPHC_DISPATCH)
 				{
-				lowpan_iphc_decoding(temp_buf->packet, temp_buf->packet_size, &temp_buf->s_laddr, &temp_buf->d_laddr);
+				lowpan_iphc_decoding(current_buf->packet, current_buf->packet_size, &current_buf->s_laddr, &current_buf->d_laddr);
+
 				ipv6_buf = get_ipv6_buf();
 				m_send.content.ptr = (char*) ipv6_buf;
 				msg_send_receive(&m_send, &m_recv, ip_process_pid);
 				}
 			else
 				{
-				printf("ERROR: packet with unknown dispatch received\n");
+//				printf("ERROR: packet with unknown dispatch received\n");
 				}
-			collect_garbage(temp_buf);
+			collect_garbage_fifo(current_buf);
 			gotosleep = 0;
 			}
-		check_timeout();
+
 
 		if (gotosleep == 1)
 			{
-			vtimer_usleep(1000);
+			mutex_unlock(&fifo_mutex, 0);
+			thread_sleep();
 			}
 		}
 	}
@@ -284,7 +300,7 @@ lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size, uint16_t datagram_t
 
 			new_buf->ident_no = datagram_tag;
 			new_buf->packet_size = datagram_size;
-			new_buf->timestamp = rtc_time(NULL);
+			new_buf->timestamp = vtimer_now().microseconds;
 
 			if ((current_buf == NULL) && (temp_buf == NULL))
 				{
@@ -292,9 +308,7 @@ lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size, uint16_t datagram_t
 				}
 			else
 				{
-				mutex_lock(&temp_buf->mu);
 				temp_buf->next = new_buf;
-				mutex_unlock(&temp_buf->mu, 0);
 				}
 			return new_buf;
 			}
@@ -322,9 +336,7 @@ lowpan_reas_buf_t *get_packet_frag_buf(uint16_t datagram_size, uint16_t datagram
 			current_buf->interval_list_head != NULL)
 			{
 			/* Found buffer for current packet fragment */
-			mutex_lock(&current_buf->mu);
-			current_buf->timestamp = rtc_time(NULL);
-			mutex_unlock(&current_buf->mu, 0);
+			current_buf->timestamp = vtimer_now().microseconds;
 			return current_buf;
 			}
 		temp_buf = current_buf;
@@ -388,6 +400,51 @@ uint8_t handle_packet_frag_interval(lowpan_reas_buf_t *current_buf, uint8_t data
 	return 0;
 	}
 
+lowpan_reas_buf_t *collect_garbage_fifo(lowpan_reas_buf_t *current_buf)
+	{
+	lowpan_interval_list_t *temp_list, *current_list;
+	lowpan_reas_buf_t *temp_buf, *my_buf, *return_buf;
+
+	mutex_lock(&fifo_mutex);
+
+	temp_buf = packet_fifo;
+	my_buf = temp_buf;
+
+	if (packet_fifo == current_buf)
+		{
+		packet_fifo = current_buf->next;
+		return_buf = packet_fifo;
+		}
+	else
+		{
+		while (temp_buf != current_buf)
+			{
+			my_buf = temp_buf;
+			temp_buf = temp_buf->next;
+			}
+
+		my_buf->next = current_buf->next;
+
+		return_buf = my_buf->next;
+		}
+	mutex_unlock(&fifo_mutex, 0);
+
+	current_list = current_buf->interval_list_head;
+	temp_list = current_list;
+
+	while (current_list != NULL)
+		{
+		temp_list = current_list->next;
+		free(current_list);
+		current_list = temp_list;
+		}
+
+	free(current_buf->packet);
+	free(current_buf);
+
+	return return_buf;
+	}
+
 lowpan_reas_buf_t *collect_garbage(lowpan_reas_buf_t *current_buf)
 	{
 	lowpan_interval_list_t *temp_list, *current_list;
@@ -408,9 +465,9 @@ lowpan_reas_buf_t *collect_garbage(lowpan_reas_buf_t *current_buf)
 			my_buf = temp_buf;
 			temp_buf = temp_buf->next;
 			}
-		mutex_lock(&my_buf->mu);
+
 		my_buf->next = current_buf->next;
-		mutex_unlock(&my_buf->mu, 0);
+
 		return_buf = my_buf->next;
 		}
 
@@ -425,10 +482,7 @@ lowpan_reas_buf_t *collect_garbage(lowpan_reas_buf_t *current_buf)
 		}
 
 	free(current_buf->packet);
-
-	mutex_lock(&current_buf->mu);
 	free(current_buf);
-	mutex_unlock(&current_buf->mu, 0);
 
 	return return_buf;
 	}
@@ -444,13 +498,14 @@ void handle_packet_fragment(uint8_t *data, uint8_t datagram_offset,  uint16_t da
 		{
 		/* Copy fragment bytes into corresponding packet space area */
 		memcpy(current_buf->packet+datagram_offset, data+hdr_length, frag_size);
-
-		mutex_lock(&current_buf->mu);
 		current_buf->current_packet_size += frag_size;
-		mutex_unlock(&current_buf->mu, 0);
-		if (thread_getstatus(transceiver_pid) == STATUS_SLEEPING)
+		if (current_buf->current_packet_size == current_buf->packet_size)
 			{
-			thread_wakeup(transfer_pid);
+			add_fifo_packet(current_buf);
+			if (thread_getstatus(transfer_pid) == STATUS_SLEEPING)
+				{
+				thread_wakeup(transfer_pid);
+				}
 			}
 		}
 	else
@@ -469,24 +524,75 @@ void handle_packet_fragment(uint8_t *data, uint8_t datagram_offset,  uint16_t da
 
 void check_timeout(void)
 	{
-	lowpan_reas_buf_t *temp_buf;
-	time_t cur_time;
+	lowpan_reas_buf_t *temp_buf, *smallest_time = NULL;
+	long cur_time;
+	int count = 0;
 
-	cur_time = rtc_time(NULL);
+	cur_time = vtimer_now().microseconds;
 	temp_buf = head;
 
 	while (temp_buf != NULL)
 		{
 		if ((cur_time - temp_buf->timestamp) >= LOWPAN_REAS_BUF_TIMEOUT)
 			{
-//			printf("TIMEOUT! cur_time: %li, temp_buf: %li\n", cur_time, temp_buf->timestamp);
+			printf("TIMEOUT! cur_time: %li, temp_buf: %li\n", cur_time, temp_buf->timestamp);
 			temp_buf = collect_garbage(temp_buf);
 			}
 		else
 			{
+			if (smallest_time == NULL)
+				{
+				smallest_time = temp_buf;
+				}
+			else if (temp_buf->timestamp < smallest_time->timestamp)
+				{
+				smallest_time = temp_buf;
+				}
 			temp_buf = temp_buf->next;
+			count++;
 			}
 		}
+	if ((count > 10) && (smallest_time != NULL))
+		{
+		collect_garbage(smallest_time);
+		}
+	}
+
+void add_fifo_packet(lowpan_reas_buf_t *current_packet)
+	{
+	lowpan_reas_buf_t *temp_buf, *my_buf;
+
+	if (head == current_packet)
+		{
+		head = current_packet->next;
+		}
+	else
+		{
+		temp_buf = head;
+		while (temp_buf != current_packet)
+			{
+			my_buf = temp_buf;
+			temp_buf = temp_buf->next;
+			}
+		my_buf->next = current_packet->next;
+		}
+	mutex_lock(&fifo_mutex);
+	if (packet_fifo == NULL)
+		{
+		packet_fifo = current_packet;
+		}
+	else
+		{
+		temp_buf = packet_fifo;
+		while (temp_buf != NULL)
+			{
+			my_buf = temp_buf;
+			temp_buf = temp_buf->next;
+			}
+		my_buf->next = current_packet;
+		}
+	mutex_unlock(&fifo_mutex, 0);
+	current_packet->next = NULL;
 	}
 
 void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
@@ -496,6 +602,8 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
     uint8_t datagram_offset = 0;    
     uint16_t datagram_size = 0;
     uint16_t datagram_tag = 0;
+
+    check_timeout();
 
     /* Fragmented Packet */
     if (((data[0] & 0xf8) == (0xc0)) || ((data[0] & 0xf8) == (0xe0)))
@@ -542,10 +650,9 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
     	lowpan_reas_buf_t *current_buf = get_packet_frag_buf(length, 0, s_laddr, d_laddr);
     	/* Copy packet bytes into corresponding packet space area */
 		memcpy(current_buf->packet, data, length);
-		mutex_lock(&current_buf->mu);
 		current_buf->current_packet_size += length;
-		mutex_unlock(&current_buf->mu, 0);
-		if (thread_getstatus(transceiver_pid) == STATUS_SLEEPING)
+		add_fifo_packet(current_buf);
+		if (thread_getstatus(transfer_pid) == STATUS_SLEEPING)
 			{
 			thread_wakeup(transfer_pid);
 			}
@@ -1283,7 +1390,6 @@ void init_reas_bufs(lowpan_reas_buf_t *buf) {
 	buf->packet = 				NULL;
 	buf->interval_list_head	=	NULL;
 	buf->next = 				NULL;
-	mutex_init(&buf->mu);
 }
 
 void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border){
@@ -1304,6 +1410,11 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border){
     
     /* init lowpan context mutex */
     mutex_init(&lowpan_context_mutex);
+
+    /* init packet_fifo mutex */
+    mutex_init(&fifo_mutex);
+
+    local_address = r_addr;
 
     /* init link-local address */
     ipv6_set_ll_prefix(&lladdr);

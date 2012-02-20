@@ -377,7 +377,7 @@ void switch_tcp_packet_byte_order(tcp_hdr_t *current_tcp_packet)
 			}
 		if (*(((uint8_t*)current_tcp_packet)+TCP_HDR_LEN) == TCP_TS_OPTION)
 			{
-			// TODO: Timestamp option nit implemented
+			// TODO: Timestamp option not implemented
 			}
 		}
 

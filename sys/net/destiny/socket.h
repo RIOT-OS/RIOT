@@ -14,8 +14,6 @@
 #include "in.h"
 #include "sys/net/sixlowpan/sixlowip.h"
 
-#define TCP_HC
-
 /*
  * Types
  */

@@ -8,8 +8,6 @@
 #ifndef TCP_H_
 #define TCP_H_
 
-#define TCP_HC
-
 #define TCP_HDR_LEN 			20
 
 #define TCP_EOO_OPTION			0x00		// End of option list
@@ -72,7 +70,7 @@ enum tcp_codes
 #define SET_TCP_FIN_ACK(a) 		a = ((a & 0x00) | TCP_FIN_ACK)
 
 // TODO: Probably stack size too high
-#define TCP_STACK_SIZE 			3072
+#define TCP_STACK_SIZE 			2048
 
 #include "sys/net/sixlowpan/sixlowip.h"
 
