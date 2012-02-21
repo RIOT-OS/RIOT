@@ -13,6 +13,7 @@
 #include "tcp.h"
 #include "socket.h"
 #include "vtimer.h"
+#include "hwtimer.h"
 #include "tcp_timer.h"
 #include "tcp_hc.h"
 #include "sys/net/net_help/net_help.h"
@@ -423,9 +424,7 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet, i
 		// Error in compressing tcp packet header
 		return -1;
 		}
-
 	sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr, (uint8_t*)(current_tcp_packet), compressed_size, IPPROTO_TCP);
-
 	return 1;
 #else
 //	print_tcp_status(OUT_PACKET, temp_ipv6_header, current_tcp_packet, current_tcp_socket);
@@ -591,9 +590,9 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	return 0;
 	}
 
-void calculate_rto(tcp_cb_t *tcp_control, timex_t current_time)
+void calculate_rto(tcp_cb_t *tcp_control, long current_time)
 	{
-	double rtt = timex_sub(current_time, tcp_control->last_packet_time).microseconds;
+	double rtt = current_time - tcp_control->last_packet_time.microseconds;
 	double srtt = tcp_control->srtt;
 	double rttvar = tcp_control->rttvar;
 	double rto = tcp_control->rto;
@@ -616,17 +615,12 @@ void calculate_rto(tcp_cb_t *tcp_control, timex_t current_time)
 		{
 		rto = SECOND;
 		}
-
-//	if (((rto > (SECOND-1)) && (rto < (SECOND+1))))
-//		{
-//		printf("RTO is correct!\n");
-//		}
 	tcp_control->srtt = srtt;
 	tcp_control->rttvar = rttvar;
 	tcp_control->rto = rto;
 	}
 
-int32_t send(int s, void *msg, uint64_t len, int flags)
+int32_t send(int s, void *msg, uint32_t len, int flags)
 	{
 	// Variables
 	msg_t recv_msg;
@@ -637,6 +631,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 	memset(send_buffer, 0, BUFFER_SIZE);
 	ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
 	tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
+
 
 	// Check if socket exists and is TCP socket
 	if (!isTCPSocket(s))
@@ -722,8 +717,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 				}
 
 			// Remember current time
-			current_tcp_socket->tcp_control.last_packet_time = vtimer_now();
-
+			current_tcp_socket->tcp_control.last_packet_time.microseconds = hwtimer_now();
 			net_msg_receive(&recv_msg);
 			switch (recv_msg.type)
 				{
@@ -731,7 +725,7 @@ int32_t send(int s, void *msg, uint64_t len, int flags)
 					{
 					if (current_tcp_socket->tcp_control.no_of_retries == 0)
 						{
-						calculate_rto(&current_tcp_socket->tcp_control, vtimer_now());
+						calculate_rto(&current_tcp_socket->tcp_control, hwtimer_now());
 						}
 					tcp_hdr_t *tcp_header = ((tcp_hdr_t*)(recv_msg.content.ptr));
 					if ((current_tcp_socket->tcp_control.send_nxt == tcp_header->ack_nr) && (total_sent_bytes == len))
@@ -815,7 +809,7 @@ uint8_t read_from_socket(socket_internal_t *current_int_tcp_socket, void *buf, i
 		}
 	}
 
-int recv(int s, void *buf, uint64_t len, int flags)
+int recv(int s, void *buf, uint32_t len, int flags)
 	{
 	// Variables
 	uint8_t read_bytes;
@@ -836,7 +830,6 @@ int recv(int s, void *buf, uint64_t len, int flags)
 		{
 		return read_from_socket(current_int_tcp_socket, buf, len);
 		}
-
 	msg_receive(&m_recv);
 	if ((exists_socket(s)) && (current_int_tcp_socket->tcp_input_buffer_end > 0))
 		{
@@ -857,7 +850,7 @@ int recv(int s, void *buf, uint64_t len, int flags)
 	return -1;
 	}
 
-int32_t recvfrom(int s, void *buf, uint64_t len, int flags, sockaddr6_t *from, uint32_t *fromlen)
+int32_t recvfrom(int s, void *buf, uint32_t len, int flags, sockaddr6_t *from, uint32_t *fromlen)
 	{
 	if (isUDPSocket(s))
 		{
@@ -865,20 +858,24 @@ int32_t recvfrom(int s, void *buf, uint64_t len, int flags, sockaddr6_t *from, u
 		ipv6_hdr_t *ipv6_header;
 		udp_hdr_t *udp_header;
 		uint8_t *payload;
+		getSocket(s)->recv_pid = thread_getpid();
+
 		msg_receive(&m_recv);
+
 		ipv6_header = ((ipv6_hdr_t*)m_recv.content.ptr);
 		udp_header = ((udp_hdr_t*)(m_recv.content.ptr + IPV6_HDR_LEN));
 		payload = (uint8_t*)(m_recv.content.ptr + IPV6_HDR_LEN+UDP_HDR_LEN);
 
 		memset(buf, 0, len);
-		memcpy(buf, payload, udp_header->length);
+		memcpy(buf, payload, udp_header->length-UDP_HDR_LEN);
 		memcpy(&from->sin6_addr, &ipv6_header->srcaddr, 16);
 		from->sin6_family = AF_INET6;
 		from->sin6_flowinfo = 0;
 		from->sin6_port = udp_header->src_port;
-		memcpy(fromlen, (void*)(sizeof(sockaddr6_t)), sizeof(fromlen));
+		*fromlen = sizeof(sockaddr6_t);
+
 		msg_reply(&m_recv, &m_send);
-		return udp_header->length;
+		return udp_header->length-UDP_HDR_LEN;
 		}
 	else if (isTCPSocket(s))
 		{
@@ -891,7 +888,7 @@ int32_t recvfrom(int s, void *buf, uint64_t len, int flags, sockaddr6_t *from, u
 		}
 	}
 
-int32_t sendto(int s, void *msg, uint64_t len, int flags, sockaddr6_t *to, uint32_t tolen)
+int32_t sendto(int s, void *msg, uint32_t len, int flags, sockaddr6_t *to, uint32_t tolen)
 	{
 	if (isUDPSocket(s) && (getSocket(s)->socket_values.foreign_address.sin6_port == 0))
 		{

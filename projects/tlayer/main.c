@@ -125,7 +125,7 @@ void init_udp_server(void)
 	ssize_t recsize;
 	uint32_t fromlen;
 	int sock = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-	memset(&sa, 0, sizeof sa);
+	memset(&sa, 0, sizeof(sa));
 
 	sa.sin6_family = AF_INET;
 	sa.sin6_port = HTONS(7654);
@@ -146,6 +146,7 @@ void init_udp_server(void)
 		printf("recsize: %i\n ", recsize);
 		printf("datagram: %s\n", buffer_main);
 		}
+	close(sock);
 	}
 
 void init_tcp_server(void)
