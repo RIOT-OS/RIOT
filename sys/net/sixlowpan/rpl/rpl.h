@@ -24,3 +24,4 @@ ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t * addr);
 void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop);
 void rpl_del_routing_entry(ipv6_addr_t *addr);
 void rpl_clear_routing_table();
+rpl_routing_entry_t *rpl_get_routing_table(void);

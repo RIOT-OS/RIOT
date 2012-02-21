@@ -15,3 +15,6 @@ void rpl_leave_dodag(rpl_dodag_t * dodag);
 bool rpl_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2);
 void rpl_global_repair(rpl_dodag_t *dodag);
 ipv6_addr_t *rpl_get_my_preferred_parent();
+void rpl_delete_parent(rpl_parent_t *parent);
+void rpl_delete_worst_parent(void);
+void rpl_delete_all_parents(void);
