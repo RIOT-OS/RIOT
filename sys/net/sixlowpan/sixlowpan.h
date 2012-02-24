@@ -4,7 +4,7 @@
 #define IP_PROCESS_STACKSIZE    		3072
 #define NC_STACKSIZE            		512
 #define CON_STACKSIZE           		512
-#define LOWPAN_TRANSFER_BUF_STACKSIZE	512
+#define LOWPAN_TRANSFER_BUF_STACKSIZE	1024
 
 /* fragment size in bytes*/
 #define FRAG_PART_ONE_HDR_LEN   4
@@ -23,7 +23,7 @@
 #define LOWPAN_IPV6_DISPATCH    0x41
 #define LOWPAN_CONTEXT_MAX      16
 
-#define LOWPAN_REAS_BUF_TIMEOUT	60
+#define LOWPAN_REAS_BUF_TIMEOUT	3 * 1000 * 1000 // TODO: Set back to 3 * 1000 * 1000
 
 #include "transceiver.h"
 #include "sixlowip.h"
@@ -32,6 +32,8 @@
 #include <time.h>
 
 extern mutex_t lowpan_context_mutex;
+extern uint8_t static_route;
+extern uint16_t local_address;
 
 typedef struct lowpan_context_t {
     uint8_t num;
@@ -54,7 +56,6 @@ typedef struct lowpan_reas_buf_t {
 	long							timestamp;					// Timestamp of last packet fragment
 	uint16_t						packet_size;				// Size of reassembled packet with possible IPHC header
 	uint16_t						current_packet_size;		// Additive size of currently already received fragments
-	mutex_t							mu;							// Used to synchronize transfer thread with reassembly thread
 	uint8_t							*packet;					// Pointer to allocated memory for reassembled packet + 6LoWPAN Dispatch Byte
 	lowpan_interval_list_t			*interval_list_head;		// Pointer to list of intervals of received packet fragments (if any)
 	struct lowpan_reas_buf_t		*next;						// Pointer to next reassembly buffer (if any)
@@ -72,6 +73,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                           ieee_802154_long_t *s_laddr,
                           ieee_802154_long_t *d_laddr);
 uint8_t lowpan_context_len();
+void add_fifo_packet(lowpan_reas_buf_t *current_packet);
 lowpan_context_t * lowpan_context_update(
                         uint8_t num, const ipv6_addr_t *prefix, 
                         uint8_t length, uint8_t comp,
@@ -79,9 +81,11 @@ lowpan_context_t * lowpan_context_update(
 lowpan_context_t * lowpan_context_get();
 lowpan_context_t * lowpan_context_lookup(ipv6_addr_t *addr);
 lowpan_context_t * lowpan_context_num_lookup(uint8_t num);
+lowpan_reas_buf_t *collect_garbage_fifo(lowpan_reas_buf_t *current_buf);
 lowpan_reas_buf_t *collect_garbage(lowpan_reas_buf_t *current_buf);
 void check_timeout(void);
 void lowpan_ipv6_set_dispatch(uint8_t *data);
 void init_reas_bufs(lowpan_reas_buf_t *buf);
 void printReasBuffers(void);
+void printFIFOBuffers(void);
 #endif

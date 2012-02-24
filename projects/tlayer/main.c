@@ -30,8 +30,10 @@
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
 
-#define SEND_TCP_THREAD_SIZE		3072
-#define TCP_CLOSE_THREAD_STACK_SIZE		3072
+#define SEND_TCP_THREAD_SIZE				1536
+#define TCP_CLOSE_THREAD_STACK_SIZE			1536
+#define RECV_FROM_TCP_THREAD_STACK_SIZE1	512
+#define RECV_FROM_TCP_THREAD_STACK_SIZE2	512
 
 uint8_t udp_server_thread_pid;
 char udp_server_stack_buffer[UDP_STACK_SIZE];
@@ -50,8 +52,17 @@ char tcp_send_stack_buffer[SEND_TCP_THREAD_SIZE];
 
 char tcp_close_thread_stack[TCP_CLOSE_THREAD_STACK_SIZE];
 
+char recv_from_tcp_thread_stack1[RECV_FROM_TCP_THREAD_STACK_SIZE1];
+char recv_from_tcp_thread_stack2[RECV_FROM_TCP_THREAD_STACK_SIZE2];
+
+#ifdef DBG_IGNORE
 static msg_t mesg;
 static transceiver_command_t tcmd;
+#endif
+
+static uint8_t running_recv_threads = 0;
+static uint8_t recv_socket_id1 = 0;
+static uint8_t recv_socket_id2 = 0;
 
 typedef struct tcp_msg_t
 	{
@@ -59,6 +70,9 @@ typedef struct tcp_msg_t
 	char		tcp_string_msg[80];
 	}tcp_message_t;
 tcp_message_t current_message;
+
+void recv_from_tcp_thread1 (void);
+void recv_from_tcp_thread2 (void);
 
 void init_tl (char *str)
 	{
@@ -111,7 +125,7 @@ void init_udp_server(void)
 	ssize_t recsize;
 	uint32_t fromlen;
 	int sock = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-	memset(&sa, 0, sizeof sa);
+	memset(&sa, 0, sizeof(sa));
 
 	sa.sin6_family = AF_INET;
 	sa.sin6_port = HTONS(7654);
@@ -132,6 +146,7 @@ void init_udp_server(void)
 		printf("recsize: %i\n ", recsize);
 		printf("datagram: %s\n", buffer_main);
 		}
+	close(sock);
 	}
 
 void init_tcp_server(void)
@@ -153,7 +168,6 @@ void init_tcp_server(void)
 	stSockAddr.sin6_family = AF_INET6;
 	stSockAddr.sin6_port = HTONS(1100);
 
-	// TODO: HARDCODED! Use one of the IPv6 methods after initializing the node to get the correct ipv6 address!
 	ipv6_init_address(&stSockAddr.sin6_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, get_radio_address());
 	ipv6_print_addr(&stSockAddr.sin6_addr);
 
@@ -181,15 +195,22 @@ void init_tcp_server(void)
 			close(SocketFD);
 			return;
 			}
-		tcp_socket_id = ConnectFD;
-		while (read_bytes != -1)
+		else
 			{
-			read_bytes = recv(ConnectFD, buff_msg, MAX_TCP_BUFFER, 0);
-
-			if (read_bytes > 0)
+			printf("Connection established on socket %u.\n", ConnectFD);
+			if (running_recv_threads == 0)
 				{
-//				printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
+				recv_socket_id1 = ConnectFD;
+				thread_create(recv_from_tcp_thread_stack1, RECV_FROM_TCP_THREAD_STACK_SIZE1, PRIORITY_MAIN,
+									    				CREATE_STACKTEST, recv_from_tcp_thread1, "recv_from_tcp_thread1");
 				}
+			else if (running_recv_threads == 1)
+				{
+				recv_socket_id2 = ConnectFD;
+				thread_create(recv_from_tcp_thread_stack2, RECV_FROM_TCP_THREAD_STACK_SIZE2, PRIORITY_MAIN,
+														CREATE_STACKTEST, recv_from_tcp_thread2, "recv_from_tcp_thread2");
+				}
+			running_recv_threads++;
 			}
 		}
 	}
@@ -269,9 +290,12 @@ void send_tcp_bandwidth_test(char *str)
 
 	int i = 0, count;
 	char command[80];
+//	char msg_string[] = "abcdefghijklmnopqrstuvwxyz0123456789!-";
 	char msg_string[] = "abcdefghijklmnopqrstuvwxyz0123456789!-=/%$";
 
 	sscanf(str, "tcp_bw %i", &count);
+	ltc4150_start();
+	printf("Start power: %f\n", ltc4150_get_total_mAh());
 	start = vtimer_now();
 	for (i = 0; i < count; i++)
 		{
@@ -281,6 +305,7 @@ void send_tcp_bandwidth_test(char *str)
 	end = vtimer_now();
 	total = timex_sub(end, start);
 	secs = total.microseconds / 1000000.0f;
+	printf("Used power: %f\n", ltc4150_get_total_Joule());
 	printf("Start: %lu, End: %lu, Total: %lu\n", start.microseconds, end.microseconds, total.microseconds);
 	printf("Time: %f seconds, Bandwidth: %f byte/second\n", secs, (count*48)/secs);
 	}
@@ -299,6 +324,40 @@ void disconnect_tcp(char *str)
 
 	send_msg.content.value = 0;
 	msg_send(&send_msg, tcp_cht_pid, 0);
+	}
+
+void recv_from_tcp_thread2 (void)
+	{
+	int read_bytes = 0;
+	char buff_msg[MAX_TCP_BUFFER];
+	memset(buff_msg, 0, MAX_TCP_BUFFER);
+
+	while (read_bytes != -1)
+		{
+		read_bytes = recv(recv_socket_id2, buff_msg, MAX_TCP_BUFFER, 0);
+
+		if (read_bytes > 0)
+			{
+//			printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
+			}
+		}
+	}
+
+void recv_from_tcp_thread1 (void)
+	{
+	int read_bytes = 0;
+	char buff_msg[MAX_TCP_BUFFER];
+	memset(buff_msg, 0, MAX_TCP_BUFFER);
+
+	while (read_bytes != -1)
+		{
+		read_bytes = recv(recv_socket_id1, buff_msg, MAX_TCP_BUFFER, 0);
+
+		if (read_bytes > 0)
+			{
+//			printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
+			}
+		}
 	}
 
 void init(char *str){
@@ -369,45 +428,10 @@ void init(char *str){
 									CREATE_STACKTEST,
 									send_tcp_thread,
 									"send_tcp_thread");
-
 }
 
 void bootstrapping(char *str){
     sixlowpan_bootstrapping();
-}
-
-void send_packet(char *str){
-	uint8_t send_buffer[UDP_STACK_SIZE];
-	uint8_t text[20];
-	sscanf(str, "send %s", text);
-
-	ipv6_hdr_t *test_ipv6_header = ((ipv6_hdr_t*)(&send_buffer));
-	udp_hdr_t *test_udp_header = ((udp_hdr_t*)(&send_buffer[IPV6_HDR_LEN]));
-	uint8_t *payload = &send_buffer[IPV6_HDR_LEN+UDP_HDR_LEN];
-
-	ipv6_addr_t ipaddr;
-	ipv6_init_address(&ipaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, 0x0005);
-	ipv6_print_addr(&ipaddr);
-
-	memcpy(&(test_ipv6_header->destaddr), &ipaddr, 16);
-	ipv6_get_saddr(&(test_ipv6_header->srcaddr), &(test_ipv6_header->destaddr));
-	test_ipv6_header->version_trafficclass = IPV6_VER;
-	test_ipv6_header->trafficclass_flowlabel = 0;
-	test_ipv6_header->flowlabel = 0;
-	test_ipv6_header->nextheader = IPPROTO_UDP;
-	test_ipv6_header->hoplimit = MULTIHOP_HOPLIMIT;
-	test_ipv6_header->length = sizeof(test_udp_header);
-
-    test_udp_header->src_port = 9821;
-    test_udp_header->dst_port = 7654;
-    test_udp_header->checksum = 0;
-
-    memcpy(payload, text, strlen((char*)text)+1);
-    test_udp_header->length = 8 + strlen((char*)text)+1;
-
-    test_udp_header->checksum = ~udp_csum(test_ipv6_header, test_udp_header);
-
-    sixlowpan_send(&ipaddr, (uint8_t*)(test_udp_header), test_udp_header->length, IPPROTO_UDP);
 }
 
 void send_udp(char *str)
@@ -419,8 +443,8 @@ void send_udp(char *str)
 	ipv6_addr_t ipaddr;
 	int bytes_sent;
 	int address, count;
-	uint8_t text[] = "abcdefghijklmnopqrstuvwxyz0123456789!-=$%&/()";
-	sscanf(str, "send_udp %i %i", &count, &address);
+	char text[] = "abcdefghijklmnopqrstuvwxyz0123456789!-=$%&/()";
+	sscanf(str, "send_udp %i %i %s", &count, &address, text);
 
 	sock = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 	if (-1 == sock)
@@ -437,6 +461,8 @@ void send_udp(char *str)
 	sa.sin6_family = AF_INET;
 	memcpy(&sa.sin6_addr, &ipaddr, 16);
 	sa.sin6_port = HTONS(7654);
+	ltc4150_start();
+	printf("Start power: %f\n", ltc4150_get_total_Joule());
 	start = vtimer_now();
 	for (int i = 0; i < count; i++)
 		{
@@ -445,10 +471,12 @@ void send_udp(char *str)
 			{
 			printf("Error sending packet!\n");
 			}
+//		hwtimer_wait(20*1000);
 		}
 	end = vtimer_now();
 	total = timex_sub(end, start);
 	secs = total.microseconds / 1000000;
+	printf("Used power: %f\n", ltc4150_get_total_Joule());
 	printf("Start: %lu, End: %lu, Total: %lu\n", start.microseconds, end.microseconds, total.microseconds);
 	secs = total.microseconds / 1000000;
 	printf("Time: %lu seconds, Bandwidth: %lu byte/second\n", secs, (count*48)/secs);
@@ -561,6 +589,58 @@ void ignore(char *addr) {
 }
 #endif
 
+/* HACK: Simple routing on IP layer:
+ *
+ * This routing method is used to forward IP packets over N hops in 2 directions.
+ *
+ * Example: A <--> B <--> C <--> D (N = 4)
+ *
+ * To achieve the network topology described in the example above one has to
+ * declare the nodes A to D as "static_routes" and assign them radio addresses in ascending or descending order
+ * without gaps (ie 2-3-4-5 is OK, 2-3-5-6 is NOT OK).
+ *
+ * The variable which needs to be set in every node is static_route in sys/net/sixlowpan/sixlowpan.c. */
+
+void static_routing (char *str)
+	{
+	if (static_route == 0)
+		{
+		static_route = 1;
+		printf("Static Routing: TRUE\n");
+		}
+	else
+		{
+		static_route = 0;
+		printf("Static Routing: FALSE\n");
+		}
+	}
+
+void print_fragment_counter (char *str)
+	{
+	printf("Fragment Counter: %u\n", fragmentcounter);
+	}
+
+void pfifo_buf (char *str)
+	{
+	printFIFOBuffers();
+	}
+
+void sleep_now(char *str)
+	{
+	int time;
+	sscanf(str, "sleep %i", &time);
+	vtimer_usleep(time*1000*1000);
+	}
+
+void get_rtt (char *str)
+	{
+	int socket;
+	sscanf(str, "get_rtt %i", &socket);
+	printf("SRTT: %f, RTO: %f, RTTVAR: %f\n", getSocket(socket)->socket_values.tcp_control.srtt,
+			getSocket(socket)->socket_values.tcp_control.rto,
+			getSocket(socket)->socket_values.tcp_control.rttvar);
+	}
+
 const shell_command_t shell_commands[] = {
     {"init", "", init},
     {"addr", "", get_r_address},
@@ -584,6 +664,12 @@ const shell_command_t shell_commands[] = {
     {"boots", "", boot_server},
     {"bootc", "", boot_client},
     {"print_nbr_cache", "", show_nbr_cache},
+    {"static_routing", "", static_routing},
+//    {"static_head", "", static_head},
+    {"pfrag", "", print_fragment_counter},
+    {"show_fifo", "", pfifo_buf},
+    {"sleep", "", sleep_now},
+    {"get_rtt", "", get_rtt},
 #ifdef DBG_IGNORE
     {"ign", "ignore node", ignore},
 #endif

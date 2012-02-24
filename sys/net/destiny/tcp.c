@@ -106,7 +106,6 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 		msg_send(&m_send_tcp, tcp_socket->send_pid, 0);
 		return;
 		}
-	// TODO: Find better way of handling queued sockets ACK packets
 	else if (getWaitingConnectionSocket(tcp_socket->socket_id, ipv6_header, tcp_header) != NULL)
 		{
 		printf("sending ACK to queued socket!\n");

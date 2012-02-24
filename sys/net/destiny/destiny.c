@@ -18,7 +18,7 @@
 
 void init_transport_layer(void)
 	{
-	printf("Initializing transport layer packages.\n");
+	printf("Initializing transport layer packages. Size of socket_type: %u\n", sizeof(socket_internal_t));
 	// SOCKETS
 	memset(sockets, 0, MAX_SOCKETS*sizeof(socket_internal_t));
 
@@ -29,6 +29,7 @@ void init_transport_layer(void)
 	// TCP
 	srand(vtimer_now().microseconds);
 #ifdef TCP_HC
+	printf("TCP_HC enabled!\n");
 	global_context_counter = rand();
 #endif
 	global_sequence_counter = rand();

@@ -26,6 +26,8 @@
 #define RPL_OPT_LEN                 2
 #define RPL_OPT_DODAG_CONF_LEN      14
 #define RPL_OPT_PREFIX_INFO_LEN		30
+#define RPL_OPT_SOLICITED_INFO_LEN	19
+#define RPL_OPT_TARGET_LEN			18
 
 //message options
 #define RPL_OPT_PAD1                 0
@@ -64,7 +66,9 @@
 #define DEFAULT_DIO_INTERVAL_DOUBLINGS 20
 #define DEFAULT_DIO_REDUNDANCY_CONSTANT 10
 #define DEFAULT_MIN_HOP_RANK_INCREASE 256
+//DAO_DELAY is in seconds
 #define DEFAULT_DAO_DELAY 1
+#define RPL_DODAG_ID_LEN 16
 
 //others
 
@@ -72,6 +76,7 @@
 #define RPL_MAX_DODAGS 3
 #define RPL_MAX_INSTANCES 1
 #define RPL_MAX_PARENTS 5
+#define RPL_MAX_ROUTING_ENTRIES 20
 #define RPL_ROOT_RANK 1
 #define RPL_DEFAULT_LIFETIME 0xff
 #define RPL_LIFETIME_UNIT 0xffff
@@ -79,6 +84,9 @@
 #define RPL_PRF_MASK 0x7
 #define RPL_MOP_SHIFT 3
 #define RPL_SHIFTED_MOP_MASK 0x7
+#define RPL_DIS_V_MASK 0x80
+#define RPL_DIS_I_MASK 0x40
+#define RPL_DIS_D_MASK 0x20
 #define RPL_GROUNDED_SHIFT 7
 #define RPL_DEFAULT_OCP 0
 
@@ -136,6 +144,24 @@ typedef struct __attribute__((packed)) rpl_opt_dodag_conf_t {
     uint16_t lifetime_unit;
 } rpl_opt_dodag_conf_t;
 
+typedef struct __attribute__((packed)) rpl_opt_solicited_t {
+	uint8_t type;
+	uint8_t length;
+	uint8_t rplinstanceid;
+	uint8_t VID_Flags;
+	ipv6_addr_t dodagid;
+	uint8_t version;
+} rpl_opt_solicited_t;
+
+//ipv6_addr_t target may be replaced by a target prefix of variable length
+typedef struct __attribute__((packed)) rpl_opt_target_t {
+	uint8_t type;
+	uint8_t length;
+	uint8_t flags;
+	uint8_t prefix_length;
+	ipv6_addr_t target;
+} rpl_opt_target_t;
+
 struct rpl_dodag_t;
 
 typedef struct rpl_parent_t {
@@ -172,6 +198,7 @@ typedef struct rpl_dodag_t {
     uint8_t version;
     uint8_t grounded;
     uint16_t my_rank;
+	uint8_t dao_seq;
 	uint16_t min_rank;
     uint8_t joined;
     rpl_parent_t *my_preferred_parent;
@@ -187,5 +214,12 @@ typedef struct rpl_of_t {
     void (*reset)(struct rpl_dodag_t *);
     void (*parent_state_callback)(rpl_parent_t *, int, int);
 } rpl_of_t;
+
+typedef struct rpl_routing_entry_t {
+	uint8_t used;
+	ipv6_addr_t address;
+	ipv6_addr_t next_hop;
+	
+} rpl_routing_entry_t;
 
 #endif

@@ -80,8 +80,6 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t
 
     packet_length = IPV6_HDR_LEN + p_len;
 
-//    printArrayRange(payload, p_len, "Outgoing");
-
     lowpan_init((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)ipv6_buf);
 }
 
@@ -133,63 +131,68 @@ int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr) {
 void ipv6_process(void){
 	msg_t m_recv_lowpan, m_send_lowpan;
 	msg_t m_recv, m_send;
+	ipv6_addr_t myaddr;
+	ipv6_init_address(&myaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, get_radio_address());
     
     while(1){
         msg_receive(&m_recv_lowpan);
-        
-        //ipv6_buf = get_ipv6_buf();
+
         ipv6_buf = (struct ipv6_hdr_t*) m_recv_lowpan.content.ptr;
 
         /* identifiy packet */
         nextheader = &ipv6_buf->nextheader;
-        
-        switch(*nextheader) {
-			case(PROTO_NUM_ICMPV6):{
-				/* checksum test*/
-				if(icmpv6_csum(PROTO_NUM_ICMPV6) != 0xffff){
-					printf("ERROR: wrong checksum\n");
-				}
-				icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
-				icmpv6_demultiplex(icmp_buf);
-				break;
+
+        if ((ipv6_get_addr_match(&myaddr, &ipv6_buf->destaddr) >= 112) && (ipv6_buf->destaddr.uint8[15] != myaddr.uint8[15]))
+			{
+        	memcpy(get_ipv6_buf_send(), get_ipv6_buf(), IPV6_HDR_LEN+ipv6_buf->length);
+        	lowpan_init((ieee_802154_long_t*)&(ipv6_buf->destaddr.uint16[4]),(uint8_t*)get_ipv6_buf_send());
 			}
-			case(IPPROTO_TCP):
-				{
-				// printf("INFO: TCP Packet received.\n");
-
-				if (tcp_packet_handler_pid != 0)
-					{
-					m_send.content.ptr = (char*) ipv6_buf;
-					msg_send_receive(&m_send, &m_recv, tcp_packet_handler_pid);
+        else
+			{
+			switch(*nextheader) {
+				case(PROTO_NUM_ICMPV6):{
+					/* checksum test*/
+					if(icmpv6_csum(PROTO_NUM_ICMPV6) != 0xffff){
+						printf("ERROR: wrong checksum\n");
 					}
-				else
-					{
-					printf("INFO: No TCP handler registered.\n");
-					}
-				break;
+					icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
+					icmpv6_demultiplex(icmp_buf);
+					break;
 				}
-			case(IPPROTO_UDP):
-				{
-//				printf("INFO: UDP Packet received.\n");
-
-				if (udp_packet_handler_pid != 0)
+				case(IPPROTO_TCP):
 					{
-					m_send.content.ptr = (char*) ipv6_buf;
-					msg_send_receive(&m_send, &m_recv, udp_packet_handler_pid);
+					if (tcp_packet_handler_pid != 0)
+						{
+						m_send.content.ptr = (char*) ipv6_buf;
+						msg_send_receive(&m_send, &m_recv, tcp_packet_handler_pid);
+						}
+					else
+						{
+						printf("INFO: No TCP handler registered.\n");
+						}
+					break;
 					}
-				else
+				case(IPPROTO_UDP):
 					{
-					printf("INFO: No UDP handler registered.\n");
+					if (udp_packet_handler_pid != 0)
+						{
+						m_send.content.ptr = (char*) ipv6_buf;
+						msg_send_receive(&m_send, &m_recv, udp_packet_handler_pid);
+						}
+					else
+						{
+						printf("INFO: No UDP handler registered.\n");
+						}
+					break;
 					}
-				break;
-				}
-			case(PROTO_NUM_NONE):
-				{
-				printf("INFO: Packet with no Header following the IPv6 Header received.\n");
-				break;
-				}
-			default:
-				break;
+				case(PROTO_NUM_NONE):
+					{
+					printf("INFO: Packet with no Header following the IPv6 Header received.\n");
+					break;
+					}
+				default:
+					break;
+			}
 		}
         msg_reply(&m_recv_lowpan, &m_send_lowpan);
     }   

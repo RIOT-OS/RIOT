@@ -136,7 +136,8 @@ static int readline(shell_t *shell, char* buf, size_t size) {
         if (c == 10) {
             *line_buf_ptr = '\0';
             return 0;
-        } else {
+        }
+        else {
             *line_buf_ptr++ = c;
         }
     }

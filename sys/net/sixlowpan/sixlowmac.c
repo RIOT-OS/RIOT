@@ -32,6 +32,7 @@ static radio_packet_t p;
 static msg_t mesg;
 int transceiver_type;
 static transceiver_command_t tcmd;
+uint16_t fragmentcounter = 0;
 
 uint8_t get_radio_address(void){
     int16_t address;
@@ -110,10 +111,11 @@ void recv_ieee802154_frame(void){
             p = (radio_packet_t*) m.content.ptr;
             hdrlen = read_802154_frame(p->data, &frame, p->length);
             length = p->length - hdrlen;
-           
+
             /* deliver packet to network(6lowpan)-layer */
-            lowpan_read(frame.payload, length, (ieee_802154_long_t*)&frame.src_addr,
-                  (ieee_802154_long_t*)&frame.dest_addr);
+			fragmentcounter++;
+			lowpan_read(frame.payload, length, (ieee_802154_long_t*)&frame.src_addr,
+				  (ieee_802154_long_t*)&frame.dest_addr);
 
             p->processing--;
         }
@@ -149,7 +151,7 @@ void set_ieee802154_frame_values(ieee802154_frame_t *frame){
 void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload, 
                            uint8_t length, uint8_t mcast){
     uint16_t daddr;
-    r_src_addr = get_radio_address(); 
+    r_src_addr = local_address;
     mesg.type = SND_PKT;
     mesg.content.ptr = (char*) &tcmd;
 
