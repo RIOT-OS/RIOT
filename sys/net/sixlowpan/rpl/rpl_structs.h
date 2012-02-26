@@ -28,6 +28,7 @@
 #define RPL_OPT_PREFIX_INFO_LEN		30
 #define RPL_OPT_SOLICITED_INFO_LEN	19
 #define RPL_OPT_TARGET_LEN			18
+#define RPL_OPT_TRANSIT_LEN			4
 
 //message options
 #define RPL_OPT_PAD1                 0
@@ -79,7 +80,7 @@
 #define RPL_MAX_ROUTING_ENTRIES 20
 #define RPL_ROOT_RANK 1
 #define RPL_DEFAULT_LIFETIME 0xff
-#define RPL_LIFETIME_UNIT 0xffff
+#define RPL_LIFETIME_UNIT 0x0001
 #define RPL_GROUNDED 1
 #define RPL_PRF_MASK 0x7
 #define RPL_MOP_SHIFT 3
@@ -162,11 +163,21 @@ typedef struct __attribute__((packed)) rpl_opt_target_t {
 	ipv6_addr_t target;
 } rpl_opt_target_t;
 
+typedef struct __attribute__((packed)) rpl_opt_transit_t {
+	uint8_t type;
+	uint8_t length;
+	uint8_t e_flags;
+	uint8_t path_control;
+	uint8_t path_sequence;
+	uint8_t path_lifetime;
+} rpl_opt_transit_t;
+
 struct rpl_dodag_t;
 
 typedef struct rpl_parent_t {
     ipv6_addr_t addr;
     uint16_t rank;
+	uint8_t dtsn;
     struct rpl_dodag_t *dodag;
 	uint8_t used;
 } rpl_parent_t;
@@ -219,6 +230,7 @@ typedef struct rpl_routing_entry_t {
 	uint8_t used;
 	ipv6_addr_t address;
 	ipv6_addr_t next_hop;
+	uint8_t lifetime;
 	
 } rpl_routing_entry_t;
 

@@ -11,6 +11,7 @@
 #include "sys/net/sixlowpan/sixlowpan.h"
 #include "sys/net/sixlowpan/sixlowerror.h"
 #include "sys/net/sixlowpan/rpl/rpl.h"
+#include "sys/net/sixlowpan/rpl/rpl_dodag.h"
 
 void init(char *str){
     char command;
@@ -74,9 +75,26 @@ void table(char *str){
 	}
 }
 
+void dodag(char *str){
+	printf("---------------------------\n");
+	rpl_dodag_t * mydodag = rpl_get_my_dodag();
+	if(mydodag == NULL){
+		printf("Not part of a dodag\n");
+	printf("---------------------------\n");
+		return;
+	}
+	printf("Part of Dodag:\n");
+	ipv6_print_addr(&mydodag->dodag_id);
+	printf("my rank: %d\n", mydodag->my_rank);
+	printf("my preferred parent:\n");
+	ipv6_print_addr(&mydodag->my_preferred_parent->addr);
+	printf("---------------------------\n");
+}
+
 const shell_command_t shell_commands[] = {
     {"init", "", init},
     {"table", "", table},
+    {"dodag", "", dodag},
 	{NULL, NULL, NULL}
 };
 

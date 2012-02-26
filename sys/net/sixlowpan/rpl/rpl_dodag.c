@@ -3,6 +3,7 @@
 
 #include "rpl_dodag.h"
 #include "trickle.h"
+#include "rpl.h"
 
 rpl_instance_t instances[RPL_MAX_INSTANCES];
 rpl_dodag_t dodags[RPL_MAX_DODAGS];
@@ -87,9 +88,7 @@ void rpl_del_dodag(rpl_dodag_t *dodag){
 void rpl_leave_dodag(rpl_dodag_t * dodag){
 	dodag->joined = 0;
 	dodag->my_preferred_parent = NULL;
-	//parents aus Liste löschen
 	rpl_delete_all_parents();
-	//TODO: Poison mit INFINITE_RANK
 }
 
 bool rpl_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2){
@@ -113,6 +112,8 @@ rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t 
 			parent->addr = *address;
 			parent->rank = rank;
 			parent->dodag = dodag;
+			//dtsn is set at the end of recv_dio function
+			parent->dtsn = 0;
 			return parent;
 		}
 	}
@@ -134,28 +135,10 @@ rpl_parent_t *rpl_find_parent(ipv6_addr_t *address){
 
 void rpl_delete_parent(rpl_parent_t * parent){
 	rpl_dodag_t * my_dodag = rpl_get_my_dodag();
-	//check if this was the preferred parent, find new parent, if it was last parent leave dodag
-	char new_preferred_parent = 0;
 	if( (my_dodag != NULL) && rpl_equal_id(&my_dodag->my_preferred_parent->addr, &parent->addr) ){
-		new_preferred_parent = 1;
-		memset(parent,0,sizeof(*parent));
+		my_dodag->my_preferred_parent = NULL;
 	}
-	uint8_t best = 0xFF;
-	uint16_t min_rank = 0xFFFF;
-	if(new_preferred_parent){
-		for(int i=0;i<RPL_MAX_PARENTS;i++){
-			if(parents[i].rank < min_rank){
-				best = i;
-				min_rank = parents[i].rank;
-			}
-		}
-		if(best == 0xFF){
-			//we have no more parents for this dodag -> leave dodag;
-			//TODO: Erst nach Ablauf eines Timers verlassen, siehe RPL draft 8.2.2.1 DODAG Version
-			rpl_leave_dodag(my_dodag);
-		}
-		my_dodag->my_preferred_parent = &parents[best];
-	}
+	memset(parent,0,sizeof(*parent));
 }
 
 void rpl_delete_worst_parent(void){
@@ -176,8 +159,63 @@ void rpl_delete_worst_parent(void){
 }
 
 void rpl_delete_all_parents(void){
+	rpl_dodag_t * my_dodag = rpl_get_my_dodag();
+	my_dodag->my_preferred_parent = NULL;
 	for(int i=0;i<RPL_MAX_PARENTS;i++){
 		memset(&parents[i],0,sizeof(parents[i]));
+	}
+}
+
+rpl_parent_t * rpl_find_preferred_parent(void){
+	rpl_parent_t * best = NULL;
+	rpl_dodag_t * my_dodag = rpl_get_my_dodag();
+
+	for(uint8_t i=0;i<RPL_MAX_PARENTS;i++){
+		if(parents[i].used){
+			if(parents[i].rank == INFINITE_RANK){
+				continue;
+			}
+			else if(best == NULL){
+				best = &parents[i];
+			} else{
+				best = my_dodag->of->which_parent(best, &parents[i]);
+			}
+		}
+	}
+
+
+	if(best == NULL){
+		return NULL;
+	}
+	
+	if(!rpl_equal_id(&my_dodag->my_preferred_parent->addr, &best->addr)){
+		if(my_dodag->mop != NO_DOWNWARD_ROUTES){
+			//send DAO with ZERO_LIFETIME to old parent
+			send_DAO(&my_dodag->my_preferred_parent->addr, 0);
+		}
+		my_dodag->my_preferred_parent = best;
+		if(my_dodag->mop != NO_DOWNWARD_ROUTES){
+			delay_dao();
+		}
+		reset_trickletimer();
+	}
+	
+	return best;
+}
+
+void rpl_parent_update(rpl_parent_t * parent){
+	rpl_dodag_t * my_dodag = rpl_get_my_dodag();
+	uint16_t old_rank = my_dodag->my_rank; 
+	
+	if(rpl_find_preferred_parent() == NULL){
+		rpl_local_repair();
+	}
+	
+	if(rpl_calc_rank(old_rank, my_dodag->minhoprankincrease) != rpl_calc_rank(my_dodag->my_rank, my_dodag->minhoprankincrease)){
+		if(my_dodag->my_rank < my_dodag->min_rank){
+			my_dodag->min_rank = my_dodag->my_rank;
+		}
+		reset_trickletimer();
 	}
 }
 
@@ -217,15 +255,42 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
 	delay_dao();
 }
 
-void rpl_global_repair(rpl_dodag_t *dodag){
+void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t * p_addr, uint16_t rank){
 	rpl_dodag_t * my_dodag = rpl_get_my_dodag();
 	if(my_dodag == NULL){
-		printf("Error - no global repair possible, if not part of a DODAG\n");
+		printf("[Error] - no global repair possible, if not part of a DODAG\n");
 		return;
 	}
-	//TODO: nachschauen - soll das wirklich so überschrieben werden? 
+	rpl_delete_all_parents();
 	my_dodag->version = dodag->version;
-	my_dodag->dtsn = dodag->dtsn;
+	my_dodag->dtsn++;
+	my_dodag->my_preferred_parent = rpl_new_parent(my_dodag, p_addr, rank);
+	if(my_dodag->my_preferred_parent == NULL){
+		printf("[Error] no more parent after global repair\n");
+		my_dodag->my_rank = INFINITE_RANK;
+	}else{
+		//Calc new Rank
+		my_dodag->my_rank = my_dodag->of->calc_rank(my_dodag->my_preferred_parent, my_dodag->my_rank);
+		my_dodag->min_rank = my_dodag->my_rank;
+		reset_trickletimer();
+		delay_dao();
+	}
+	printf("Migrated to DODAG Version %d. My new Rank: %d\n", my_dodag->version, my_dodag->my_rank);
+
+	
+}
+
+void rpl_local_repair(void){
+	rpl_dodag_t * my_dodag = rpl_get_my_dodag();
+	if(my_dodag == NULL){
+		printf("[Error] - no local repair possible, if not part of a DODAG\n");
+		return;
+	}
+	my_dodag->my_rank = INFINITE_RANK;
+	my_dodag->dtsn++;
+	rpl_delete_all_parents();
+	reset_trickletimer();
+
 }
 
 ipv6_addr_t *rpl_get_my_preferred_parent(){
@@ -234,4 +299,8 @@ ipv6_addr_t *rpl_get_my_preferred_parent(){
 		return NULL;
 	}
 	return &my_dodag->my_preferred_parent->addr;
+}
+
+uint16_t rpl_calc_rank(uint16_t abs_rank, uint16_t minhoprankincrease){
+	return abs_rank / minhoprankincrease;
 }
