@@ -108,7 +108,7 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socke
 		}
 	else if (getWaitingConnectionSocket(tcp_socket->socket_id, ipv6_header, tcp_header) != NULL)
 		{
-		printf("sending ACK to queued socket!\n");
+//		printf("sending ACK to queued socket!\n");
 		m_send_tcp.content.ptr = (char*)tcp_header;
 		net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->recv_pid, TCP_ACK);
 		return;
@@ -249,7 +249,7 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, 
 					current_tcp_socket->tcp_control.send_wnd);
 
 			// Send packet
-			block_continue_thread();
+//			block_continue_thread();
 #ifdef TCP_HC
 	current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
 #endif
@@ -258,7 +258,7 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, 
 		// ACK packet probably got lost
 		else
 			{
-			block_continue_thread();
+//			block_continue_thread();
 #ifdef TCP_HC
 	current_tcp_socket->tcp_control.tcp_context.hc_type = FULL_HEADER;
 #endif

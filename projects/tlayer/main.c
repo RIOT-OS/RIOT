@@ -30,19 +30,21 @@
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
 
-#define SEND_TCP_THREAD_SIZE				1536
-#define TCP_CLOSE_THREAD_STACK_SIZE			1536
+#define SEND_TCP_THREAD_SIZE				1024
+#define TCP_CLOSE_THREAD_STACK_SIZE			1024
 #define RECV_FROM_TCP_THREAD_STACK_SIZE1	512
 #define RECV_FROM_TCP_THREAD_STACK_SIZE2	512
+#define UDP_APP_STACK_SIZE					3072
+#define TCP_APP_STACK_SIZE					3072
 
 uint8_t udp_server_thread_pid;
-char udp_server_stack_buffer[UDP_STACK_SIZE];
+char udp_server_stack_buffer[UDP_APP_STACK_SIZE];
 
 uint8_t tcp_server_thread_pid;
-char tcp_server_stack_buffer[TCP_STACK_SIZE];
+char tcp_server_stack_buffer[TCP_APP_STACK_SIZE];
 
 uint8_t tcp_cht_pid;
-char tcp_cht_stack_buffer[TCP_STACK_SIZE];
+char tcp_cht_stack_buffer[TCP_APP_STACK_SIZE];
 
 // Socket ID used for sending/receiving packets via different threads
 int tcp_socket_id = -1;
@@ -217,13 +219,13 @@ void init_tcp_server(void)
 
 void init_udp_server_thread(char *str)
 	{
-	udp_server_thread_pid = thread_create(udp_server_stack_buffer, UDP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, init_udp_server, "init_udp_server");
+	udp_server_thread_pid = thread_create(udp_server_stack_buffer, UDP_APP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, init_udp_server, "init_udp_server");
 	printf("UDP SERVER THREAD PID: %i\n", udp_server_thread_pid);
 	}
 
 void init_tcp_server_thread(char *str)
 	{
-	tcp_server_thread_pid = thread_create(tcp_server_stack_buffer, TCP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, init_tcp_server, "init_tcp_server");
+	tcp_server_thread_pid = thread_create(tcp_server_stack_buffer, TCP_APP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, init_tcp_server, "init_tcp_server");
 	printf("TCP SERVER THREAD PID: %i\n", tcp_server_thread_pid);
 	}
 
@@ -231,7 +233,7 @@ void init_tcp_server_thread(char *str)
 void init_tcp_cht(char *str)
 	{
 	tcp_cht_pid = thread_create(		tcp_cht_stack_buffer,
-											TCP_STACK_SIZE,
+											TCP_APP_STACK_SIZE,
 											PRIORITY_MAIN,
 											CREATE_STACKTEST,
 											tcp_ch,
@@ -245,6 +247,10 @@ void send_tcp_thread (void)
 	while (1)
 		{
 		msg_receive(&recv_msg);
+		if (tcp_socket_id == -1)
+			{
+			tcp_socket_id = recv_socket_id1;
+			}
 		if (send(tcp_socket_id, (void*) current_message.tcp_string_msg, strlen(current_message.tcp_string_msg)+1, 0) < 0)
 			{
 			printf("Could not send %s!\n", current_message.tcp_string_msg);

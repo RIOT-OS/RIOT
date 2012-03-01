@@ -602,7 +602,7 @@ void calculate_rto(tcp_cb_t *tcp_control, long current_time)
 		// First calculation
 		srtt = rtt;
 		rttvar = 0.5*rtt;
-		rto = rtt + 4*rttvar;
+		rto = rtt + (((4*rttvar) < TCP_TIMER_RESOLUTION) ? (TCP_TIMER_RESOLUTION) : (4*rttvar));
 		}
 	else
 		{

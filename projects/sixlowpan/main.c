@@ -103,7 +103,7 @@ void send_packet(char *str){
     for(int j=0;j<100;j++){
         test[0] = j;
         for(int i=0;i<1000;i++){
-            sixlowpan_send(&ipaddr, test, 2, 0, NULL);
+            sixlowpan_send(&ipaddr, test, 2, 0);
         }
         //lib6lowpan_bootstrapping(&addr8);
     }
