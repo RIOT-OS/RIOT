@@ -29,7 +29,7 @@ void handle_synchro_timeout(socket_internal_t *current_socket)
 			{
 			current_socket->socket_values.tcp_control.no_of_retries++;
 			net_msg_send(&send, current_socket->recv_pid, 0, TCP_RETRY);
-			printf("FIRST RETRY!\n");
+//			printf("FIRST RETRY!\n");
 			}
 		else if ((current_socket->socket_values.tcp_control.no_of_retries > 0) &&
 				(timex_sub(vtimer_now(), current_socket->socket_values.tcp_control.last_packet_time).microseconds >
@@ -39,32 +39,16 @@ void handle_synchro_timeout(socket_internal_t *current_socket)
 			if (current_socket->socket_values.tcp_control.no_of_retries > TCP_MAX_SYN_RETRIES)
 				{
 				net_msg_send(&send, current_socket->recv_pid, 0, TCP_TIMEOUT);
-				printf("TCP SYN TIMEOUT!!\n");
+//				printf("TCP SYN TIMEOUT!!\n");
 				}
 			else
 				{
 				net_msg_send(&send, current_socket->recv_pid, 0, TCP_RETRY);
-				printf("NEXT RETRY!\n");
+//				printf("NEXT RETRY!\n");
 				}
 			}
 		}
 	}
-
-char *double2string (double d, int stellen) {
-  int num_int_digits = 0;
-  char* returnstr = NULL;
-
-  if ((int) d != 0)
-    num_int_digits = (int) log10 (abs((int) d)) + 1;
-  else
-    num_int_digits = 1;
-
-  returnstr = malloc (num_int_digits + 1 + stellen + 1);
-
-  sprintf (returnstr, "%.*f", stellen, d);
-
-  return returnstr;
-}
 
 void handle_established(socket_internal_t *current_socket)
 	{
@@ -85,18 +69,18 @@ void handle_established(socket_internal_t *current_socket)
 		if (current_timeout > TCP_ACK_MAX_TIMEOUT)
 			{
 			net_msg_send(&send, current_socket->send_pid, 0, TCP_TIMEOUT);
-			printf("GOT NO ACK: TIMEOUT!\n");
+//			printf("GOT NO ACK: TIMEOUT!\n");
 			}
 		else if (timex_sub(vtimer_now(), current_socket->socket_values.tcp_control.last_packet_time).microseconds >
 					current_timeout)
 			{
-			printReasBuffers();
+//			printReasBuffers();
 			current_socket->socket_values.tcp_control.no_of_retries++;
 			net_msg_send(&send, current_socket->send_pid, 0, TCP_RETRY);
-			printf("GOT NO ACK YET, %i. RETRY! Now: %lu  Before: %lu, Diff: %lu, Cur Timeout: %f\n", current_socket->socket_values.tcp_control.no_of_retries,
-					vtimer_now().microseconds, current_socket->socket_values.tcp_control.last_packet_time.microseconds,
-					vtimer_now().microseconds - current_socket->socket_values.tcp_control.last_packet_time.microseconds,
-					current_timeout);
+//			printf("GOT NO ACK YET, %i. RETRY! Now: %lu  Before: %lu, Diff: %lu, Cur Timeout: %f\n", current_socket->socket_values.tcp_control.no_of_retries,
+//					vtimer_now().microseconds, current_socket->socket_values.tcp_control.last_packet_time.microseconds,
+//					vtimer_now().microseconds - current_socket->socket_values.tcp_control.last_packet_time.microseconds,
+//					current_timeout);
 			}
 		}
 	}

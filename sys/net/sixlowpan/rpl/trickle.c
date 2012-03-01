@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -7,9 +8,11 @@
 char timer_over_buf[TRICKLE_TIMER_STACKSIZE];
 char interval_over_buf[TRICKLE_INTERVAL_STACKSIZE];
 char dao_delay_over_buf[DAO_DELAY_STACKSIZE];
+char routing_table_buf[RT_STACKSIZE];
 int timer_over_pid;
 int interval_over_pid;
 int dao_delay_over_pid;
+int rt_timer_over_pid;
 
 uint8_t k;
 uint32_t Imin;
@@ -20,9 +23,11 @@ uint16_t c;
 vtimer_t trickle_t_timer;
 vtimer_t trickle_I_timer;
 vtimer_t dao_timer;
+vtimer_t rt_timer;
 timex_t t_time;
 timex_t I_time;
 timex_t dao_time;
+timex_t rt_time;
 
 //struct für trickle parameter??
 void reset_trickletimer(void){
@@ -32,6 +37,8 @@ void reset_trickletimer(void){
 	t = (I/2) + ( rand() % ( I - (I/2) + 1 ) );
 	t_time = timex_set(0,t*1000);
 	I_time = timex_set(0,I*1000);
+	vtimer_remove(&trickle_t_timer);
+	vtimer_remove(&trickle_I_timer);
 	vtimer_set_wakeup(&trickle_t_timer, t_time, timer_over_pid);
 	vtimer_set_wakeup(&trickle_I_timer, I_time, interval_over_pid);
 
@@ -48,6 +55,9 @@ void init_trickle(void){
 	dao_delay_over_pid = thread_create(dao_delay_over_buf, DAO_DELAY_STACKSIZE,
 									  PRIORITY_MAIN-1, CREATE_SLEEPING,
 									  dao_delay_over, "dao_delay_over");
+	rt_timer_over_pid = thread_create(routing_table_buf, RT_STACKSIZE,
+									  PRIORITY_MAIN-1, CREATE_SLEEPING,
+									  rt_timer_over, "rt_timer_over");
 	
 }
 
@@ -62,6 +72,8 @@ void start_trickle(uint8_t DIOIntMin, uint8_t DIOIntDoubl, uint8_t DIORedundancy
 	t = (I/2) + ( rand() % ( I - (I/2) + 1 ) );
 	t_time = timex_set(0,t*1000);
 	I_time = timex_set(0,I*1000);
+	vtimer_remove(&trickle_t_timer);
+	vtimer_remove(&trickle_I_timer);
 	vtimer_set_wakeup(&trickle_t_timer, t_time, timer_over_pid);
 	vtimer_set_wakeup(&trickle_I_timer, I_time, interval_over_pid);
 
@@ -97,6 +109,8 @@ void trickle_interval_over(void){
 		//start timer
 		t_time = timex_set(0,t*1000);
 		I_time = timex_set(0,I*1000);
+		vtimer_remove(&trickle_t_timer);
+		vtimer_remove(&trickle_I_timer);
 		vtimer_set_wakeup(&trickle_t_timer, t_time, timer_over_pid);
 		vtimer_set_wakeup(&trickle_I_timer, I_time, interval_over_pid);
 		thread_sleep();
@@ -106,12 +120,33 @@ void trickle_interval_over(void){
 
 void delay_dao(void){
 	dao_time = timex_set(DEFAULT_DAO_DELAY,0);
+	vtimer_remove(&dao_timer);
 	vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
 }
 
 void dao_delay_over(void){
 	while(1){
-		send_DAO();
+		send_DAO(NULL, false);
+		thread_sleep();
+	}
+}
+
+void rt_timer_over(void){
+	while(1){
+		rpl_routing_entry_t * rt = rpl_get_routing_table();
+		for(uint8_t i=0; i<RPL_MAX_ROUTING_ENTRIES;i++){
+			if(rt[i].used){
+				if(rt[i].lifetime <= 1){
+					memset(&rt[i], 0,sizeof(rt[i]));
+				}
+				else{
+					rt[i].lifetime--;
+				}
+			}
+		}
+		//Wake up every second
+		rt_time = timex_set(1,0);
+		vtimer_set_wakeup(&rt_timer, rt_time, rt_timer_over_pid);
 		thread_sleep();
 	}
 }

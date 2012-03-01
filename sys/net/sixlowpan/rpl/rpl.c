@@ -9,6 +9,7 @@
 #include "sys/net/sixlowpan/sixlowmac.h"
 #include "sys/net/sixlowpan/sixlowip.h"
 #include "sys/net/sixlowpan/sixlowpan.h"
+#include "sys/net/sixlowpan/sixlownd.h"
 #include "sys/net/sixlowpan/sixlowerror.h"
 
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
@@ -32,6 +33,7 @@ static struct rpl_opt_t *rpl_opt_buf;
 static struct rpl_opt_dodag_conf_t * rpl_opt_dodag_conf_buf;
 static struct rpl_opt_solicited_t * rpl_opt_solicited_buf;
 static struct rpl_opt_target_t * rpl_opt_target_buf;
+static struct rpl_opt_transit_t * rpl_opt_transit_buf;
 
 
 static struct rpl_dio_t* get_rpl_dio_buf(){
@@ -63,6 +65,11 @@ static struct rpl_opt_target_t* get_rpl_opt_target_buf(uint8_t rpl_msg_len){
 	return ((struct rpl_opt_target_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
+static struct rpl_opt_transit_t* get_rpl_opt_transit_buf(uint8_t rpl_msg_len){
+	return ((struct rpl_opt_transit_t*)&(buffer[LLHDR_ICMPV6HDR_LEN + rpl_msg_len]));
+}
+
+//Diese Funktion findet eine implementierte OF anhand des Objective Code Point 
 rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp){
 	for(uint16_t i=0; i < NUMBER_IMPLEMENTED_OFS; i++){
 		if(ocp == objective_functions[i]->ocp){
@@ -152,6 +159,7 @@ void send_DIO(ipv6_addr_t* destination){
 
 	icmp_buf->type = ICMP_RPL_CONTROL;
 	icmp_buf->code = ICMP_CODE_DIO; 
+	icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
 
 	rpl_dio_buf = get_rpl_dio_buf();
 	memset(rpl_dio_buf, 0, sizeof(*rpl_dio_buf));
@@ -163,8 +171,8 @@ void send_DIO(ipv6_addr_t* destination){
 	rpl_dio_buf->flags = 0;
 	rpl_dio_buf->reserved = 0;
 	rpl_dio_buf->dodagid = mydodag->dodag_id;
-	printf("Send DIO with DODAGID: \n");
-	ipv6_print_addr(&rpl_dio_buf->dodagid);
+	//printf("Send DIO with DODAGID: \n");
+	//ipv6_print_addr(&rpl_dio_buf->dodagid);
 
 	int opt_hdr_len = 0; 
 	//DODAG Configuration Option!
@@ -195,48 +203,84 @@ void send_DIS(ipv6_addr_t *destination){
 	icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
 
 	icmp_buf->type = ICMP_RPL_CONTROL;
-	icmp_buf->code = ICMP_CODE_DIO; 
+	icmp_buf->code = ICMP_CODE_DIO;
+	icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
+	
 	rpl_dis_buf = get_rpl_dis_buf();
 
 	uint16_t plen = ICMPV6_HDR_LEN + DIS_BASE_LEN;
 	rpl_send(destination,(uint8_t*)icmp_buf, plen, PROTO_NUM_ICMPV6, NULL); 
 }
 
-void send_DAO(){
+
+void send_DAO(ipv6_addr_t *destination, uint8_t lifetime){
+	if(i_am_root){
+		return;
+	}
+	rpl_dodag_t * my_dodag;
+	my_dodag = rpl_get_my_dodag();
+	
+	if(destination == NULL){
+		destination = &my_dodag->my_preferred_parent->addr;
+	}
+	printf("Sending DAO to\n");
+	ipv6_print_addr(destination);
+
 	icmp_buf  = get_icmpv6_buf(ipv6_ext_hdr_len);
 
 	icmp_buf->type = ICMP_RPL_CONTROL;
 	icmp_buf->code = ICMP_CODE_DAO; 
+	icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
 
-	rpl_dodag_t * my_dodag;
-	my_dodag = rpl_get_my_dodag();
 	if(my_dodag == NULL){
 		return;
 	}
 	rpl_dao_buf = get_rpl_dao_buf();
 	memset(rpl_dao_buf,0,sizeof(*rpl_dao_buf));
 	rpl_dao_buf->rpl_instanceid = my_dodag->instance->id;
-	//rpl_dao_buf->k_d_flags = 0x00;
-	//TODO:dao_sequence handling
-	rpl_dao_buf->dao_sequence = 0x00;
+	rpl_dao_buf->k_d_flags = 0x00;
+	rpl_dao_buf->dao_sequence = my_dodag->dao_seq;
 	uint16_t opt_len = 0;
 	rpl_opt_target_buf = get_rpl_opt_target_buf(DAO_BASE_LEN);
 	//Alle Ziele aus der Routing Tabelle als Target eintragen
-	//TODO: Ausnahme default_route zu Parent
 	for(uint8_t i=0; i<RPL_MAX_ROUTING_ENTRIES;i++){
 		if(routing_table[i].used){
 			rpl_opt_target_buf->type=RPL_OPT_TARGET;
 			rpl_opt_target_buf->length=RPL_OPT_TARGET_LEN;
 			rpl_opt_target_buf->flags=0x00;
-			rpl_opt_target_buf->prefix_length=16;
+			rpl_opt_target_buf->prefix_length= RPL_DODAG_ID_LEN;
 			memcpy(&rpl_opt_target_buf->target,&routing_table[i].address,sizeof(ipv6_addr_t));
 			opt_len += RPL_OPT_TARGET_LEN +2;
+			rpl_opt_transit_buf = get_rpl_opt_transit_buf(DAO_BASE_LEN + opt_len);
+			rpl_opt_transit_buf->type=RPL_OPT_TRANSIT;
+			rpl_opt_transit_buf->length=RPL_OPT_TRANSIT_LEN;
+			rpl_opt_transit_buf->e_flags=0x00;
+			rpl_opt_transit_buf->path_control=0x00;//not used
+			rpl_opt_transit_buf->path_sequence=0x00;//not used
+			rpl_opt_transit_buf->path_lifetime=lifetime;
+			opt_len += RPL_OPT_TRANSIT_LEN +2;
 			rpl_opt_target_buf = get_rpl_opt_target_buf(DAO_BASE_LEN + opt_len);
 		}
 	}
+	//Add own address
+	rpl_opt_target_buf->type=RPL_OPT_TARGET;
+	rpl_opt_target_buf->length=RPL_OPT_TARGET_LEN;
+	rpl_opt_target_buf->flags=0x00;
+	rpl_opt_target_buf->prefix_length= RPL_DODAG_ID_LEN;
+	memcpy(&rpl_opt_target_buf->target,&my_address,sizeof(ipv6_addr_t));
+	opt_len += RPL_OPT_TARGET_LEN +2;
+
+	rpl_opt_transit_buf = get_rpl_opt_transit_buf(DAO_BASE_LEN + opt_len);
+	rpl_opt_transit_buf->type=RPL_OPT_TRANSIT;
+	rpl_opt_transit_buf->length=RPL_OPT_TRANSIT_LEN;
+	rpl_opt_transit_buf->e_flags=0x00;
+	rpl_opt_transit_buf->path_control=0x00;
+	rpl_opt_transit_buf->path_sequence=0x00;
+	rpl_opt_transit_buf->path_lifetime=lifetime;
+	opt_len += RPL_OPT_TRANSIT_LEN +2;
 	
 	uint16_t plen = ICMPV6_HDR_LEN + DAO_BASE_LEN + opt_len;
-	rpl_send(&my_dodag->my_preferred_parent->addr,(uint8_t*)icmp_buf, plen, PROTO_NUM_ICMPV6, NULL);
+	rpl_send(destination,(uint8_t*)icmp_buf, plen, PROTO_NUM_ICMPV6, NULL);
 }
 
 void rpl_process(void){
@@ -397,18 +441,22 @@ void recv_rpl_dio(void){
 
 	if(rpl_equal_id(&my_dodag->dodag_id, &dio_dodag.dodag_id)){
 		//Mein DODAG
-		if( dio_dodag.version > my_dodag->version){
-			printf("New Version of dodag\n");
+		if(RPL_COUNTER_GREATER_THAN(dio_dodag.version,my_dodag->version) ){
 			if(my_dodag->my_rank == ROOT_RANK){
+				//Jemand hat ein DIO mit einer höheren Version als der richtigen gesendet
+				//Wir erhöhen diese Version noch einmal, und machen sie zur neuen
+				printf("[Warning] Inconsistent Dodag Version\n");
 				my_dodag->version = RPL_COUNTER_INCREMENT(dio_dodag.version);
 				reset_trickletimer();
 			}
 			else{
-				rpl_global_repair(&dio_dodag);
+				printf("[Info] New Version of dodag %d\n", dio_dodag.version);
+				rpl_global_repair(&dio_dodag, &ipv6_buf->srcaddr, rpl_dio_buf->rank);
 			}
 			return;
 		}
-		else if( dio_dodag.version < my_dodag->version){
+		else if( RPL_COUNTER_GREATER_THAN(my_dodag->version, dio_dodag.version) ){
+			//ein Knoten hat noch eine kleinere Versionsnummer -> mehr DIOs senden
 			reset_trickletimer();
 			return;
 		}		
@@ -417,17 +465,25 @@ void recv_rpl_dio(void){
 	//Version stimmt, DODAG stimmt
 	if(rpl_dio_buf->rank == INFINITE_RANK) {
 		reset_trickletimer();
-		if(my_dodag->my_rank == ROOT_RANK){
-			trickle_increment_counter();
-			return;
-		}
 	}
+	//Wenn wir root sind, ist nichts weiter zu tun
+	if(my_dodag->my_rank == ROOT_RANK){
+		if(rpl_dio_buf->rank != INFINITE_RANK){
+			trickle_increment_counter();
+		}
+		return;
+	}
+
+	//
+	// Parent Handling
+	//
+
 	//Ist Knoten bereits Parent?
 	rpl_parent_t *parent;
 	parent = rpl_find_parent(&ipv6_buf->srcaddr);
 	if(parent == NULL){
-		//neuen Elternknoten hinzufuegen
-		parent = rpl_new_parent(&dio_dodag, &ipv6_buf->srcaddr, rpl_dio_buf->rank);
+		//neuen möglichen Elternknoten hinzufuegen
+		parent = rpl_new_parent(my_dodag, &ipv6_buf->srcaddr, rpl_dio_buf->rank);
 		if(parent == NULL){
 			return;
 		}
@@ -436,6 +492,14 @@ void recv_rpl_dio(void){
 		//DIO ok
 		trickle_increment_counter();
 	}
+	
+	//update parent rank
+	parent->rank = rpl_dio_buf->rank;
+	rpl_parent_update(parent);
+	if(rpl_equal_id(&parent->addr, &my_dodag->my_preferred_parent->addr) && (parent->dtsn != rpl_dio_buf->dtsn)){
+		delay_dao();
+	}
+	parent->dtsn = rpl_dio_buf->dtsn;
 	
 }
 
@@ -492,10 +556,16 @@ void recv_rpl_dis(void){
 }
 
 void recv_rpl_dao(void){
+	printf("Receiving DAO\n");
+	rpl_dodag_t *my_dodag = rpl_get_my_dodag();
+	if(my_dodag == NULL){
+		printf("[Error] got DAO without beeing part of a Dodag\n");
+		return;
+	}
 	ipv6_buf = get_ipv6_buf();
-	
 	rpl_dao_buf = get_rpl_dao_buf();
 	int len = DAO_BASE_LEN;
+	uint8_t increment_seq = 0;
 	while(len < (ipv6_buf->length - ICMPV6_HDR_LEN) ){
 		rpl_opt_buf = get_rpl_opt_buf(len);
 		switch(rpl_opt_buf->type){
@@ -513,7 +583,21 @@ void recv_rpl_dao(void){
 				break;
 			}
 			case(RPL_OPT_TARGET):{
+				rpl_opt_target_buf = get_rpl_opt_target_buf(len);
+				if(rpl_opt_target_buf->prefix_length != RPL_DODAG_ID_LEN){
+					printf("prefixes are not supported yet");
+					break;
+				}
+				increment_seq = 1;
 				len += rpl_opt_buf->length +2;
+				rpl_opt_transit_buf = get_rpl_opt_transit_buf(len);
+				if(rpl_opt_transit_buf->type != RPL_OPT_TRANSIT){
+					printf("[Error] - no Transit Inforamtion to Target Option\n");
+					break;
+				}
+				len += rpl_opt_transit_buf->length +2;
+				//Die eigentliche Lebenszeit einer Route errechnet sich aus  (Lifetime aus DAO) * (Lifetime Unit) Sekunden
+				rpl_add_routing_entry(&rpl_opt_target_buf->target, &ipv6_buf->srcaddr, rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit);
 				break;
 			}
 			case(RPL_OPT_TRANSIT):{
@@ -529,10 +613,14 @@ void recv_rpl_dao(void){
 				break;
 		}
 	}
+	if(increment_seq){
+		RPL_COUNTER_INCREMENT(my_dodag->dao_seq);
+		delay_dao();
+	}
 }
 
 void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_t next_header, void *tcp_socket){
-    uint8_t *p_ptr;
+	uint8_t *p_ptr;
     /*if (next_header == IPPROTO_TCP)
         {
         p_ptr = get_payload_buf_send(ipv6_ext_hdr_len);
@@ -573,13 +661,17 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
 		ipv6_addr_t *next_hop = rpl_get_next_hop(&ipv6_buf->destaddr);
 		if(next_hop == NULL){
 			if(i_am_root){
-				//oops... entweder bin ich root und weiß nicht wohin mit dem paket, oder es ist kein 
-				//preferred parent eingetragen, was nicht passieren sollte.
+				//oops... ich bin root und weiß nicht wohin mit dem paketn 
 				printf("[Error] destination unknown\n");
 				return;
 			}
 			else{
 				next_hop = rpl_get_my_preferred_parent();
+				if(next_hop == NULL){
+					//kein preferred parent eingetragen, was nicht passieren sollte.
+					printf("[Error] no preferred parent\n");
+					return;
+				}
 			}
 		}
 	    lowpan_init((ieee_802154_long_t*)&(next_hop->uint16[4]),(uint8_t*)ipv6_buf);
@@ -596,12 +688,13 @@ ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t * addr){
 	return NULL;
 }
 
-void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop){
-	//TODO: if no free entry, delete worst parent
+void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint8_t lifetime){
 	for(uint8_t i=0; i<RPL_MAX_ROUTING_ENTRIES; i++){
 		if(!routing_table[i].used){
 			routing_table[i].address = *addr;
 			routing_table[i].next_hop = *next_hop;
+			routing_table[i].used = 1;
+			break;
 		}
 	} 
 }
@@ -620,4 +713,8 @@ void rpl_clear_routing_table(){
 		routing_table[i].used = 0;
 	}
 
+}
+
+rpl_routing_entry_t *rpl_get_routing_table(void){
+	return routing_table;
 }

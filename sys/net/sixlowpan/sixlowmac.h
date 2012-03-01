@@ -14,7 +14,7 @@
 #define RADIO_SND_BUF_SIZE          100
 #define RADIO_SENDING_DELAY         1000
 
-extern uint8_t static_route;
+extern uint16_t fragmentcounter;
 
 uint8_t get_radio_address(void);
 void set_radio_address(uint8_t addr);

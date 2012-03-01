@@ -29,6 +29,7 @@ void init_transport_layer(void)
 	// TCP
 	srand(vtimer_now().microseconds);
 #ifdef TCP_HC
+	printf("TCP_HC enabled!\n");
 	global_context_counter = rand();
 #endif
 	global_sequence_counter = rand();

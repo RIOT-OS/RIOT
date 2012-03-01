@@ -30,19 +30,21 @@
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
 
-#define SEND_TCP_THREAD_SIZE				1536
-#define TCP_CLOSE_THREAD_STACK_SIZE			1536
+#define SEND_TCP_THREAD_SIZE				1024
+#define TCP_CLOSE_THREAD_STACK_SIZE			1024
 #define RECV_FROM_TCP_THREAD_STACK_SIZE1	512
 #define RECV_FROM_TCP_THREAD_STACK_SIZE2	512
+#define UDP_APP_STACK_SIZE					3072
+#define TCP_APP_STACK_SIZE					3072
 
 uint8_t udp_server_thread_pid;
-char udp_server_stack_buffer[UDP_STACK_SIZE];
+char udp_server_stack_buffer[UDP_APP_STACK_SIZE];
 
 uint8_t tcp_server_thread_pid;
-char tcp_server_stack_buffer[TCP_STACK_SIZE];
+char tcp_server_stack_buffer[TCP_APP_STACK_SIZE];
 
 uint8_t tcp_cht_pid;
-char tcp_cht_stack_buffer[TCP_STACK_SIZE];
+char tcp_cht_stack_buffer[TCP_APP_STACK_SIZE];
 
 // Socket ID used for sending/receiving packets via different threads
 int tcp_socket_id = -1;
@@ -125,7 +127,7 @@ void init_udp_server(void)
 	ssize_t recsize;
 	uint32_t fromlen;
 	int sock = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-	memset(&sa, 0, sizeof sa);
+	memset(&sa, 0, sizeof(sa));
 
 	sa.sin6_family = AF_INET;
 	sa.sin6_port = HTONS(7654);
@@ -146,6 +148,7 @@ void init_udp_server(void)
 		printf("recsize: %i\n ", recsize);
 		printf("datagram: %s\n", buffer_main);
 		}
+	close(sock);
 	}
 
 void init_tcp_server(void)
@@ -216,13 +219,13 @@ void init_tcp_server(void)
 
 void init_udp_server_thread(char *str)
 	{
-	udp_server_thread_pid = thread_create(udp_server_stack_buffer, UDP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, init_udp_server, "init_udp_server");
+	udp_server_thread_pid = thread_create(udp_server_stack_buffer, UDP_APP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, init_udp_server, "init_udp_server");
 	printf("UDP SERVER THREAD PID: %i\n", udp_server_thread_pid);
 	}
 
 void init_tcp_server_thread(char *str)
 	{
-	tcp_server_thread_pid = thread_create(tcp_server_stack_buffer, TCP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, init_tcp_server, "init_tcp_server");
+	tcp_server_thread_pid = thread_create(tcp_server_stack_buffer, TCP_APP_STACK_SIZE, PRIORITY_MAIN, CREATE_STACKTEST, init_tcp_server, "init_tcp_server");
 	printf("TCP SERVER THREAD PID: %i\n", tcp_server_thread_pid);
 	}
 
@@ -230,7 +233,7 @@ void init_tcp_server_thread(char *str)
 void init_tcp_cht(char *str)
 	{
 	tcp_cht_pid = thread_create(		tcp_cht_stack_buffer,
-											TCP_STACK_SIZE,
+											TCP_APP_STACK_SIZE,
 											PRIORITY_MAIN,
 											CREATE_STACKTEST,
 											tcp_ch,
@@ -244,6 +247,10 @@ void send_tcp_thread (void)
 	while (1)
 		{
 		msg_receive(&recv_msg);
+		if (tcp_socket_id == -1)
+			{
+			tcp_socket_id = recv_socket_id1;
+			}
 		if (send(tcp_socket_id, (void*) current_message.tcp_string_msg, strlen(current_message.tcp_string_msg)+1, 0) < 0)
 			{
 			printf("Could not send %s!\n", current_message.tcp_string_msg);
@@ -304,7 +311,7 @@ void send_tcp_bandwidth_test(char *str)
 	end = vtimer_now();
 	total = timex_sub(end, start);
 	secs = total.microseconds / 1000000.0f;
-	printf("Used power: %f\n", ltc4150_get_total_mAh());
+	printf("Used power: %f\n", ltc4150_get_total_Joule());
 	printf("Start: %lu, End: %lu, Total: %lu\n", start.microseconds, end.microseconds, total.microseconds);
 	printf("Time: %f seconds, Bandwidth: %f byte/second\n", secs, (count*48)/secs);
 	}
@@ -337,7 +344,7 @@ void recv_from_tcp_thread2 (void)
 
 		if (read_bytes > 0)
 			{
-			printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
+//			printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
 			}
 		}
 	}
@@ -354,7 +361,7 @@ void recv_from_tcp_thread1 (void)
 
 		if (read_bytes > 0)
 			{
-			printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
+//			printf("--- Read bytes: %i, Strlen(): %i, Message: %s ---\n", read_bytes, strlen(buff_msg), buff_msg);
 			}
 		}
 	}
@@ -442,8 +449,8 @@ void send_udp(char *str)
 	ipv6_addr_t ipaddr;
 	int bytes_sent;
 	int address, count;
-	uint8_t text[] = "abcdefghijklmnopqrstuvwxyz0123456789!-=$%&/()";
-	sscanf(str, "send_udp %i %i", &count, &address);
+	char text[] = "abcdefghijklmnopqrstuvwxyz0123456789!-=$%&/()";
+	sscanf(str, "send_udp %i %i %s", &count, &address, text);
 
 	sock = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 	if (-1 == sock)
@@ -461,7 +468,7 @@ void send_udp(char *str)
 	memcpy(&sa.sin6_addr, &ipaddr, 16);
 	sa.sin6_port = HTONS(7654);
 	ltc4150_start();
-	printf("Start power: %f\n", ltc4150_get_total_mAh());
+	printf("Start power: %f\n", ltc4150_get_total_Joule());
 	start = vtimer_now();
 	for (int i = 0; i < count; i++)
 		{
@@ -470,11 +477,12 @@ void send_udp(char *str)
 			{
 			printf("Error sending packet!\n");
 			}
+//		hwtimer_wait(20*1000);
 		}
 	end = vtimer_now();
 	total = timex_sub(end, start);
 	secs = total.microseconds / 1000000;
-	printf("Used power: %f\n", ltc4150_get_total_mAh());
+	printf("Used power: %f\n", ltc4150_get_total_Joule());
 	printf("Start: %lu, End: %lu, Total: %lu\n", start.microseconds, end.microseconds, total.microseconds);
 	secs = total.microseconds / 1000000;
 	printf("Time: %lu seconds, Bandwidth: %lu byte/second\n", secs, (count*48)/secs);
@@ -587,48 +595,56 @@ void ignore(char *addr) {
 }
 #endif
 
-/* HACK: Simple mesh routing on MAC layer:
+/* HACK: Simple routing on IP layer:
  *
- * This routing method is used to forward layer 3 fragments over N hops in 2 directions.
+ * This routing method is used to forward IP packets over N hops in 2 directions.
  *
  * Example: A <--> B <--> C <--> D (N = 4)
  *
  * To achieve the network topology described in the example above one has to
- * declare the nodes A and D as "head nodes" and the nodes B and C as "routing nodes".
- * For every static route with N hops there are always N-2 nodes which are
- * routing nodes and 2 head nodes (start and end).
+ * declare the nodes A to D as "static_routes" and assign them radio addresses in ascending or descending order
+ * without gaps (ie 2-3-4-5 is OK, 2-3-5-6 is NOT OK).
  *
- * A "head node" is a node receiving or sending packets of higher layers (i.e. layer 3 or higher)
- * and does not route any fragments on the MAC layer.
- * A "routing node" is a node forwarding fragments from local addresses < its own address to
- * nodes (head or routing) with local address > its own address (own_address+1).
- * It also forwards fragments from local addresses > its own address to nodes with
- * local address < its own address (own_address-1).
- *
- * The variables which need to be set are static_route in sys/net/sixlowpan/sixlowmac.c for
- * routing nodes and route_head in sys/net/sixlowpan/sixlowpan.c for head nodes. */
+ * The variable which needs to be set in every node is static_route in sys/net/sixlowpan/sixlowpan.c. */
+
 void static_routing (char *str)
 	{
 	if (static_route == 0)
 		{
 		static_route = 1;
+		printf("Static Routing: TRUE\n");
 		}
 	else
 		{
 		static_route = 0;
+		printf("Static Routing: FALSE\n");
 		}
 	}
 
-void static_head (char *str)
+void print_fragment_counter (char *str)
 	{
-	if (route_head == 0)
-		{
-		route_head = 1;
-		}
-	else
-		{
-		route_head = 0;
-		}
+	printf("Fragment Counter: %u\n", fragmentcounter);
+	}
+
+void pfifo_buf (char *str)
+	{
+	printFIFOBuffers();
+	}
+
+void sleep_now(char *str)
+	{
+	int time;
+	sscanf(str, "sleep %i", &time);
+	vtimer_usleep(time*1000*1000);
+	}
+
+void get_rtt (char *str)
+	{
+	int socket;
+	sscanf(str, "get_rtt %i", &socket);
+	printf("SRTT: %f, RTO: %f, RTTVAR: %f\n", getSocket(socket)->socket_values.tcp_control.srtt,
+			getSocket(socket)->socket_values.tcp_control.rto,
+			getSocket(socket)->socket_values.tcp_control.rttvar);
 	}
 
 const shell_command_t shell_commands[] = {
@@ -655,7 +671,11 @@ const shell_command_t shell_commands[] = {
     {"bootc", "", boot_client},
     {"print_nbr_cache", "", show_nbr_cache},
     {"static_routing", "", static_routing},
-    {"static_head", "", static_head},
+//    {"static_head", "", static_head},
+    {"pfrag", "", print_fragment_counter},
+    {"show_fifo", "", pfifo_buf},
+    {"sleep", "", sleep_now},
+    {"get_rtt", "", get_rtt},
 #ifdef DBG_IGNORE
     {"ign", "ignore node", ignore},
 #endif
