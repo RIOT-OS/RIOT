@@ -24,8 +24,14 @@ extern void _reset_current_handler(char* unused);
 #endif
 
 #ifdef MODULE_CC110X
+#ifdef MODULE_TRANSCEIVER
+extern void _cc1100_get_set_address_handler(char *addr);
+extern void _cc1100_get_set_channel_handler(char *chan);
+extern void _cc1100_send_handler(char *pkt);
+#else
 extern void _cc110x_get_set_address_handler(char *addr);
 extern void _cc110x_get_set_channel_handler(char *addr);
+#endif
 #endif
 
 #ifdef MODULE_TRANSCEIVER
@@ -65,8 +71,14 @@ const shell_command_t _shell_command_list[] = {
 	{"rstcur", "Resets coulomb counter.", _reset_current_handler},
 #endif
 #ifdef MODULE_CC110X
+#ifdef MODULE_TRANSCEIVER
+    {"addr", "Gets or sets the address for the CC1100 transceiver", _cc1100_get_set_address_handler},
+    {"chan", "Gets or sets the channel for the CC1100 transceiver", _cc1100_get_set_channel_handler},
+    {"txtsnd", "Sends a text message to a given node via the CC1100 transceiver", _cc1100_send_handler},
+#else
     {"addr", "Gets or sets the address for the CC1100 transceiver", _cc110x_get_set_address_handler},
     {"chan", "Gets or sets the channel for the CC1100 transceiver", _cc110x_get_set_channel_handler},
+#endif
 #endif
 #ifdef MODULE_TRANSCEIVER
 #ifdef MODULE_CC110X_NG

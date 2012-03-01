@@ -568,7 +568,7 @@ int cc1100_send(radio_address_t addr, protocol_t protocol, int priority, char *p
 
 	memset(tx_buffer.data, 0, MAX_DATA_LENGTH);			// Clean data
 
-	tx_buffer.length = 3 + MAX_DATA_LENGTH;				// 3 bytes (A&PS&F) + data length
+	tx_buffer.length = 3 + payload_len;				// 3 bytes (A&PS&F) + data length
 	tx_buffer.address = address;						// Copy destination address
 	tx_buffer.flags = 0x00;								// Set clean state
 	tx_buffer.flags = W_FLAGS_PROTOCOL(protocol);		// Copy protocol identifier
@@ -659,7 +659,7 @@ static void cc1100_event_handler_function(void)
     	{
     		rx_buffer_t* packet = &rx_buffer[rx_buffer_head];
 			protocol_t p =  R_FLAGS_PROTOCOL(packet->packet.flags);
-			if (packet_monitor != NULL) packet_monitor((void*)&packet->packet.data, MAX_DATA_LENGTH, p, &packet->info);
+			if (packet_monitor != NULL) packet_monitor((void*)&packet->packet.data, packet->packet.length, p, &packet->info);
 			pm_invoke(&handler_table, p, (void*)&packet->packet.data, MAX_DATA_LENGTH, &packet->info);
 			dINT();
 			rx_buffer_size--;
@@ -711,6 +711,8 @@ void cc1100_phy_rx_handler(void)
 		// Get packet pointer and store additional data in packet info structure
 		cc1100_packet_layer0_t* p = &(rx_buffer[rx_buffer_tail].packet);
 		rx_buffer[rx_buffer_tail].info.phy_src = p->phy_src;
+		rx_buffer[rx_buffer_tail].info.source = p->phy_src;
+		rx_buffer[rx_buffer_tail].info.destination = p->address;
 		rx_buffer[rx_buffer_tail].info.rssi = rflags.RSSI;
 		rx_buffer[rx_buffer_tail].info.lqi = rflags.LQI;
 		rx_buffer[rx_buffer_tail].info.promiscuous = false;
