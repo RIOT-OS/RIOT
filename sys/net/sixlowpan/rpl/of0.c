@@ -39,8 +39,12 @@ uint16_t calc_rank(rpl_parent_t * parent, uint16_t base_rank){
 	return base_rank + add;
 }
 
+//We simply return the Parent with lower rank
 rpl_parent_t * which_parent(rpl_parent_t *p1, rpl_parent_t *p2){
-	return p1;
+	if(p1->rank < p2->rank){
+		return p1;
+	}
+	return p2;
 }
 
 rpl_dodag_t * which_dodag(rpl_dodag_t *d1, rpl_dodag_t *d2){

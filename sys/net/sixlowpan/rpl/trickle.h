@@ -3,7 +3,11 @@
 
 #define TRICKLE_TIMER_STACKSIZE 3072 
 #define TRICKLE_INTERVAL_STACKSIZE 3072
-#define DAO_DELAY_STACKSIZE 2048
+//#define DAO_DELAY_STACKSIZE 2048
+//#define DAO_DELAY_STACKSIZE 3072
+#define DAO_DELAY_STACKSIZE 4096
+//#define RT_STACKSIZE 2048
+#define RT_STACKSIZE 3072
 
 void reset_trickletimer(void);
 void init_trickle(void);
@@ -13,3 +17,4 @@ void trickle_timer_over(void);
 void trickle_interval_over(void);
 void delay_dao(void);
 void dao_delay_over(void);
+void rt_timer_over(void);

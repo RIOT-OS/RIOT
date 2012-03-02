@@ -51,7 +51,7 @@ void udp_packet_handler(void)
 				}
 			else
 				{
-				printf("Dropped UDP Message because no process ID was found for delivery!\n");
+				printf("Dropped UDP Message because no thread ID was found for delivery!\n");
 				}
 			}
 		else

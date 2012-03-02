@@ -4,7 +4,7 @@
 #define IP_PROCESS_STACKSIZE    		3072
 #define NC_STACKSIZE            		512
 #define CON_STACKSIZE           		512
-#define LOWPAN_TRANSFER_BUF_STACKSIZE	1024
+#define LOWPAN_TRANSFER_BUF_STACKSIZE	512
 
 /* fragment size in bytes*/
 #define FRAG_PART_ONE_HDR_LEN   4

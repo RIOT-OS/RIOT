@@ -10,9 +10,7 @@
 
 #define UDP_HDR_LEN 				8
 
-
-// TODO: Probably stack size too high
-#define UDP_STACK_SIZE 				2048
+#define UDP_STACK_SIZE 				512
 
 #include "sys/net/sixlowpan/sixlowip.h"
 
