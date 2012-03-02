@@ -150,6 +150,7 @@ void set_ieee802154_frame_values(ieee802154_frame_t *frame){
 
 void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload, 
                            uint8_t length, uint8_t mcast){
+	puts("send_ieee802154_frame gets called");
     uint16_t daddr;
     r_src_addr = local_address;
     mesg.type = SND_PKT;

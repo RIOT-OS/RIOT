@@ -165,6 +165,7 @@ void run(void) {
                 receive_packet(m.type, m.content.value);
                 break;
             case SND_PKT:
+				puts("Transceiver start sending...");
                 response = send_packet(cmd->transceivers, cmd->data);
                 m.content.value = response;
                 msg_reply(&m, &m);
