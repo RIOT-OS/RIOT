@@ -142,12 +142,16 @@ void rpl_init_root(){
 		return;
 	}
 	i_am_root = 1;
-	start_trickle(dodag->dio_min, dodag->dio_interval_doubling, dodag->dio_redundancy);
+	//start_trickle(dodag->dio_min, dodag->dio_interval_doubling, dodag->dio_redundancy);
+	ipv6_addr_t mcast;
+	ipv6_set_all_nds_mcast_addr(&mcast);
+	send_DIO(&mcast);
 
 }
 
 
 void send_DIO(ipv6_addr_t* destination){
+	puts("\nSEND DIO");
 	rpl_dodag_t * mydodag;
 	icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
 
@@ -620,6 +624,7 @@ void recv_rpl_dao(void){
 }
 
 void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_t next_header, void *tcp_socket){
+	printf("rpl_send gets called, packet length %d\n", p_len);
 	uint8_t *p_ptr;
     /*if (next_header == IPPROTO_TCP)
         {
