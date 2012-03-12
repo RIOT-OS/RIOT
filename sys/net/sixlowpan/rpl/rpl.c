@@ -80,6 +80,7 @@ rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp){
 }
 
 uint8_t rpl_init(transceiver_type_t trans, ipv6_addr_t *rpl_address){
+	vtimer_init();
 	if(rpl_address == NULL){
 		return SIXLOWERROR_ADDRESS;
 	}
@@ -142,10 +143,11 @@ void rpl_init_root(){
 		return;
 	}
 	i_am_root = 1;
-	//start_trickle(dodag->dio_min, dodag->dio_interval_doubling, dodag->dio_redundancy);
-	ipv6_addr_t mcast;
-	ipv6_set_all_nds_mcast_addr(&mcast);
-	send_DIO(&mcast);
+	start_trickle(dodag->dio_min, dodag->dio_interval_doubling, dodag->dio_redundancy);
+	//ipv6_addr_t mcast;
+	//ipv6_set_all_nds_mcast_addr(&mcast);
+	//send_DIO(&mcast);
+	puts("ROOT INIT FINISHED");
 
 }
 

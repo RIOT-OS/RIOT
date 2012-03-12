@@ -5,6 +5,7 @@
 
 #include <posix_io.h>
 #include <shell.h>
+#include <shell_commands.h>
 #include <board_uart0.h>
 
 #include "sys/net/sixlowpan/sixlowip.h"
