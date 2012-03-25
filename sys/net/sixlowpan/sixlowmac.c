@@ -20,7 +20,7 @@ char radio_stack_buffer[RADIO_STACK_SIZE];
 msg_t msg_q[RADIO_RCV_BUF_SIZE];
 uint8_t snd_buffer[RADIO_SND_BUF_SIZE][PAYLOAD_SIZE];
 
-uint8_t r_src_addr;
+static uint8_t r_src_addr;
 uint8_t buf[PAYLOAD_SIZE];
 uint16_t packet_length;
 static uint8_t macdsn;
@@ -150,7 +150,6 @@ void set_ieee802154_frame_values(ieee802154_frame_t *frame){
 
 void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload, 
                            uint8_t length, uint8_t mcast){
-	puts("send_ieee802154_frame gets called");
     uint16_t daddr;
     r_src_addr = local_address;
     mesg.type = SND_PKT;

@@ -75,10 +75,8 @@ void start_trickle(uint8_t DIOIntMin, uint8_t DIOIntDoubl, uint8_t DIORedundancy
 	//Eigentlich laut Spezifikation erste Bestimmung von I wie auskommentiert:
 	//I = Imin + ( rand() % ( (Imin << Imax) - Imin + 1 ) );
 	I = Imin + ( rand() % ( (4*Imin) - Imin + 1 ) );
-	printf("STARTING TRICKLE WITH I = %u\n", I);
 
 	t = (I/2) + ( rand() % ( I - (I/2) + 1 ) );
-	printf("STARTING TRICKLE WITH t = %u\n", t);
 	t_time = timex_set(0,t*1000);
 	timex_normalize(&t_time);
 	I_time = timex_set(0,I*1000);
@@ -101,12 +99,10 @@ void trickle_timer_over(void)
 	ipv6_set_all_nds_mcast_addr(&mcast);
 	while(1){
 		thread_sleep();
-		puts("TRICKLE TIMER OVER");
 		//Laut RPL Spezifikation soll k=0 wie k= Unendlich behandelt werden, also immer gesendet werden
 		if( (c < k) || (k == 0)){
 			send_DIO(&mcast);
 		}
-		puts("TRICKLE TIMER OVER 2");
 	}
 }
 
@@ -120,7 +116,6 @@ void trickle_interval_over(void){
 		}
 		c=0;
 		t = (I/2) + ( rand() % ( I - (I/2) + 1 ) );
-		printf("TRICKLE new TIMER %u\n",t);
 		//start timer
 		t_time = timex_set(0,t*1000);
 		timex_normalize(&t_time);

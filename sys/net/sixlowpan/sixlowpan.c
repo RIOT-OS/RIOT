@@ -78,7 +78,7 @@ void lowpan_init(ieee_802154_long_t *addr, uint8_t *data){
         mcast = 1;
     } 
 
-    lowpan_iphc_encoding(&laddr, ipv6_buf);
+    lowpan_iphc_encoding(&laddr, ipv6_buf, data);
     data = &comp_buf[0];
     packet_length = comp_len;
     
@@ -667,7 +667,7 @@ void lowpan_ipv6_set_dispatch(uint8_t *data){
 }
 
 /* draft-ietf-6lowpan-hc-13#section-3.1 */
-void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra){
+void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra, uint8_t * ptr){
 	ipv6_buf = ipv6_buf_extra;
 
     uint16_t payload_length = ipv6_buf->length;
@@ -929,7 +929,7 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra){
     comp_buf[0] = lowpan_iphc[0];
     comp_buf[1] = lowpan_iphc[1];
 
-    uint8_t *ptr;
+    /*uint8_t *ptr;
     if (ipv6_buf->nextheader == IPPROTO_TCP)
 		{
     	ptr = get_payload_buf_send(ipv6_ext_hdr_len);
@@ -938,8 +938,8 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra){
 		{
     	ptr = get_payload_buf(ipv6_ext_hdr_len);
 		}
-
-    memcpy(&ipv6_hdr_fields[hdr_pos],ptr,ipv6_buf->length);
+	*/
+    memcpy(&ipv6_hdr_fields[hdr_pos],&ptr[IPV6_HDR_LEN],ipv6_buf->length);
 
     comp_len = 2 + hdr_pos + payload_length;
 }
