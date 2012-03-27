@@ -191,7 +191,7 @@ rpl_parent_t * rpl_find_preferred_parent(void){
 	if(!rpl_equal_id(&my_dodag->my_preferred_parent->addr, &best->addr)){
 		if(my_dodag->mop != NO_DOWNWARD_ROUTES){
 			//send DAO with ZERO_LIFETIME to old parent
-			send_DAO(&my_dodag->my_preferred_parent->addr, 0);
+			send_DAO(&my_dodag->my_preferred_parent->addr, 0, false);
 		}
 		my_dodag->my_preferred_parent = best;
 		if(my_dodag->mop != NO_DOWNWARD_ROUTES){

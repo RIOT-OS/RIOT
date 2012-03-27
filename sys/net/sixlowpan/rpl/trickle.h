@@ -17,4 +17,5 @@ void trickle_timer_over(void);
 void trickle_interval_over(void);
 void delay_dao(void);
 void dao_delay_over(void);
+void dao_ack_received(void);
 void rt_timer_over(void);

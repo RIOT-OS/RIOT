@@ -17,7 +17,6 @@
 void init(char *str){
     char command;
     uint16_t r_addr;
-    ipv6_addr_t std_addr;
 
     int res = sscanf(str, "init %c %hu", &command, &r_addr);
 
@@ -28,30 +27,27 @@ void init(char *str){
         printf("\taddress must be an 8 bit integer\n");
     }
 
-	ipv6_init_address(&std_addr, 0xABCD,0,0,0,0x1234,0xFFFF,0xFEDC,r_addr);
 	uint8_t state;
     switch (command) {
         case 'r':
-            printf("INFO: Initialize as root on address \n");
-			ipv6_print_addr(&std_addr);
+            printf("INFO: Initialize as root on address %d\n", r_addr);
             if (r_addr > 255) {
                 printf("ERROR: address not an 8 bit integer\n");
                 return;
             }
-			state = rpl_init(TRANSCEIVER_CC1100, &std_addr);
+			state = rpl_init(TRANSCEIVER_CC1100, r_addr);
 			if(state != SUCCESS){
 				printf("Error initializing RPL\n");
 			}
 			rpl_init_root();
             break;
         case 'n':
-            printf("INFO: Initialize as node on address \n");
-			ipv6_print_addr(&std_addr);
+            printf("INFO: Initialize as node on address %d\n", r_addr);
             if (r_addr > 255) {
                 printf("ERROR: address not an 8 bit integer\n");
                 return;
             }
-            state = rpl_init(TRANSCEIVER_CC1100, &std_addr);
+            state = rpl_init(TRANSCEIVER_CC1100, r_addr);
             if(state != SUCCESS){
                 printf("Error initializing RPL\n");
             }

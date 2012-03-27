@@ -86,38 +86,38 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t
 int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr) {
     switch(hdr->type) {
         case(ICMP_RTR_SOL):{
-            printf("INFO: packet type: icmp router solicitation\n");
+            puts("INFO: packet type: icmp router solicitation");
             /* processing router solicitation */
             recv_rtr_sol();
             /* init solicited router advertisment*/
             break;
         }
         case(ICMP_RTR_ADV):{
-            printf("INFO: packet type: icmp router advertisment\n");
+            puts("INFO: packet type: icmp router advertisment");
             /* processing router advertisment */
             recv_rtr_adv();
             /* init neighbor solicitation */
             break;
         }
         case(ICMP_NBR_SOL):{
-            printf("INFO: packet type: icmp neighbor solicitation\n");
+            puts("INFO: packet type: icmp neighbor solicitation");
             recv_nbr_sol();
             break;
         }
         case(ICMP_NBR_ADV):{
-            printf("INFO: packet type: icmp neighbor advertisment\n");
+            puts("INFO: packet type: icmp neighbor advertisment");
             recv_nbr_adv();
             break;
         }
 		case(ICMP_RPL_CONTROL):{
-			printf("INFO: packet type: RPL message\n");
+			puts("INFO: packet type: RPL message");
 			if(rpl_process_pid != 0){
 				msg_t m_send;
 				m_send.content.ptr = (char*) &hdr->code;
 				msg_send(&m_send, rpl_process_pid, 1);
 			}
 			else{
-				printf("INFO: no RPL handler registered\n");
+				puts("INFO: no RPL handler registered");
 			}
 			break;
 		}
