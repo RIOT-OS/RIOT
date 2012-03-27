@@ -395,7 +395,6 @@ void rpl_process(void){
 
 	while(1){
 		msg_receive(&m_recv);
-		puts("Got a RPL Package");
 		uint8_t *code;
 		code = ((uint8_t*)m_recv.content.ptr);
 		//pakettypen unterscheiden
@@ -533,7 +532,7 @@ void recv_rpl_dio(void){
 			}
 			default:
 				printf("[Error] Unsupported DIO option\n");
-				break;
+				return;
 		}
 	}
 
@@ -677,7 +676,7 @@ void recv_rpl_dis(void){
 				break;
 			}
 			default:
-				break;
+				return;
 		}
 	}
 	send_DIO(&ipv6_buf->srcaddr);
@@ -739,7 +738,7 @@ void recv_rpl_dao(void){
 			}
 
 			default:
-				break;
+				return;
 		}
 	}
 	send_DAO_ACK(&ipv6_buf->srcaddr);
