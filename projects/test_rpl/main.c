@@ -88,10 +88,17 @@ void dodag(char *str){
 	printf("---------------------------\n");
 }
 
+extern void cc1100_print_config(void);
+
+void cc1100_cfg(char* unused) {
+    cc1100_print_config();
+}
+
 const shell_command_t shell_commands[] = {
     {"init", "", init},
     {"table", "", table},
     {"dodag", "", dodag},
+    {"cc1100", "", cc1100_cfg},
 	{NULL, NULL, NULL}
 };
 

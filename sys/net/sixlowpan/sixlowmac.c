@@ -151,6 +151,8 @@ void set_ieee802154_frame_values(ieee802154_frame_t *frame){
 void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload, 
                            uint8_t length, uint8_t mcast){
     uint16_t daddr;
+    /* TODO: check if dedicated response struct is necessary */
+    msg_t transceiver_rsp;
     r_src_addr = local_address;
     mesg.type = SND_PKT;
     mesg.content.ptr = (char*) &tcmd;
@@ -188,7 +190,8 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
     }
 
     p.data = buf;
-    msg_send(&mesg, transceiver_pid, 1);
+    msg_send_receive(&mesg, &transceiver_rsp, transceiver_pid);
+    printf("%s, %u: %lu\n", __FILE__, __LINE__, transceiver_rsp.content.value);
 
     hwtimer_wait(5000);
 }

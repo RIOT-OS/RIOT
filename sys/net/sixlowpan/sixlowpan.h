@@ -23,7 +23,7 @@
 #define LOWPAN_IPV6_DISPATCH    0x41
 #define LOWPAN_CONTEXT_MAX      16
 
-#define LOWPAN_REAS_BUF_TIMEOUT	3 * 1000 * 1000 // TODO: Set back to 3 * 1000 * 1000
+#define LOWPAN_REAS_BUF_TIMEOUT	15 * 1000 * 1000 // TODO: Set back to 3 * 1000 * 1000
 
 #include "transceiver.h"
 #include "sixlowip.h"

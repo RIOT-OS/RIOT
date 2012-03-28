@@ -358,8 +358,9 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt) {
             res = cc110x_send(&cc110x_pkt);
 #else
             memcpy(cc1100_pkt, p.data, p.length);
+            puts("physical send");
             if ((snd_ret = cc1100_send_csmaca(p.dst, 4, 0, (char*) cc1100_pkt, p.length)) < 0) {
-                printf("snd_ret (%u) = %i\n", p.length, snd_ret);
+                //printf("snd_ret (%u) = %i\n", p.length, snd_ret);
                 res = 0;
             }
             else {
