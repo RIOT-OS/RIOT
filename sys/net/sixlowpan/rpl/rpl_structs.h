@@ -70,6 +70,7 @@
 #define DEFAULT_MIN_HOP_RANK_INCREASE 256
 //DAO_DELAY is in seconds
 #define DEFAULT_DAO_DELAY 3
+#define DEFAULT_WAIT_FOR_DAO_ACK 10
 #define RPL_DODAG_ID_LEN 16
 
 //others

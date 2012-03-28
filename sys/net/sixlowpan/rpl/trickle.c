@@ -14,6 +14,9 @@ int interval_over_pid;
 int dao_delay_over_pid;
 int rt_timer_over_pid;
 
+bool ack_received;
+uint8_t dao_counter;
+
 uint8_t k;
 uint32_t Imin;
 uint8_t Imax;
@@ -48,9 +51,7 @@ void reset_trickletimer(void){
 
 void init_trickle(void){
 	//Create threads
-//	timer_over_pid = thread_create(timer_over_buf, TRICKLE_TIMER_STACKSIZE,
-//								   PRIORITY_MAIN-1,CREATE_SLEEPING,
-//								   trickle_timer_over, "trickle_timer_over");
+	ack_received = true;
 	timer_over_pid = thread_create(timer_over_buf, TRICKLE_TIMER_STACKSIZE,
 								   PRIORITY_MAIN-1,CREATE_STACKTEST,
 								   trickle_timer_over, "trickle_timer_over");
@@ -74,7 +75,7 @@ void start_trickle(uint8_t DIOIntMin, uint8_t DIOIntDoubl, uint8_t DIORedundancy
 	Imax = DIOIntDoubl;
 	//Eigentlich laut Spezifikation erste Bestimmung von I wie auskommentiert:
 	//I = Imin + ( rand() % ( (Imin << Imax) - Imin + 1 ) );
-	I = Imin + ( rand() % ( (4*Imin) - Imin + 1 ) );
+	I = Imin + ( rand() % ( (4*Imin) - Imin + 1 ) ) ;
 
 	t = (I/2) + ( rand() % ( I - (I/2) + 1 ) );
 	t_time = timex_set(0,t*1000);
@@ -135,6 +136,8 @@ void trickle_interval_over(void){
 
 void delay_dao(void){
 	dao_time = timex_set(DEFAULT_DAO_DELAY,0);
+	ack_received = false;
+	dao_counter = 0;
 	vtimer_remove(&dao_timer);
 	vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
 }
@@ -142,8 +145,18 @@ void delay_dao(void){
 void dao_delay_over(void){
 	while(1){
 		thread_sleep();
-		send_DAO(NULL, false);
+		//10 DAOs will do... TODO: define
+		if((ack_received == false) && (dao_counter < 10)){
+			dao_counter++;
+			send_DAO(NULL, 0, true);
+			dao_time = timex_set(DEFAULT_WAIT_FOR_DAO_ACK,0);
+			vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
+		}
 	}
+}
+
+void dao_ack_received(){
+	ack_received = true;
 }
 
 void rt_timer_over(void){
