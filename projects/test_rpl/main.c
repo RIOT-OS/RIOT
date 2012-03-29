@@ -14,7 +14,29 @@
 #include "sys/net/sixlowpan/rpl/rpl.h"
 #include "sys/net/sixlowpan/rpl/rpl_dodag.h"
 
+#define TR_WD_STACKSIZE     (256)
+
+char tr_wd_stack[TR_WD_STACKSIZE];
+
+void wakeup_thread(void) {
+    while (1) {
+        if (thread_getstatus(transceiver_pid) == STATUS_SLEEPING) {
+            vtimer_usleep(100 * 1000);
+            if (thread_getstatus(transceiver_pid) == STATUS_SLEEPING) {
+                puts("WAKEUP!");
+                thread_wakeup(transceiver_pid);
+            }
+        }
+        vtimer_usleep(1000 * 1000);
+
+    }
+}
+
 void init(char *str){
+    transceiver_command_t tcmd;
+    msg_t m;
+    uint8_t chan = 10;
+
     char command;
     uint16_t r_addr;
 
@@ -54,9 +76,21 @@ void init(char *str){
             break;
         default:
             printf("ERROR: Unknown command '%c'\n", command);
-            break;
+            return;
     }
-}
+
+    /* set channel to 10 */
+    tcmd.transceivers = TRANSCEIVER_CC1100;
+    tcmd.data = &chan;
+    m.type = SET_CHANNEL;
+    m.content.ptr = (void*) &tcmd;
+
+    msg_send_receive(&m, &m, transceiver_pid);
+
+    /* start transceiver watchdog */
+    thread_create(tr_wd_stack, TR_WD_STACKSIZE, PRIORITY_MAIN-3, CREATE_STACKTEST, wakeup_thread, "TX/RX WD");
+
+ }
 
 void table(char *str){
 	rpl_routing_entry_t * rtable;
@@ -89,9 +123,17 @@ void dodag(char *str){
 }
 
 extern void cc1100_print_config(void);
+extern void cc1100_print_statistic(void);
 
 void cc1100_cfg(char* unused) {
     cc1100_print_config();
+    puts("=============================================");
+    cc1100_print_statistic();
+}
+
+
+void wakeup(char* unused) {
+    thread_wakeup(10);
 }
 
 const shell_command_t shell_commands[] = {
@@ -99,12 +141,13 @@ const shell_command_t shell_commands[] = {
     {"table", "", table},
     {"dodag", "", dodag},
     {"cc1100", "", cc1100_cfg},
+    {"wakeup", "", wakeup},
 	{NULL, NULL, NULL}
 };
 
 int main(void) {
     printf("RPL Test Application\n");
-    vtimer_init();
+    
 
     posix_open(uart0_handler_pid, 0);
 

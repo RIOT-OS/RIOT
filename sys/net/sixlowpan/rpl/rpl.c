@@ -142,7 +142,6 @@ rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp){
 }
 
 uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address){
-	vtimer_init();
 	mutex_init(&rpl_send_mutex);
 	mutex_init(&rpl_recv_mutex);
 	if(rpl_address == 0){
