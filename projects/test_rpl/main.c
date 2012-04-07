@@ -21,9 +21,9 @@ char tr_wd_stack[TR_WD_STACKSIZE];
 void wakeup_thread(void) {
     while (1) {
         if (thread_getstatus(transceiver_pid) == STATUS_SLEEPING) {
-            vtimer_usleep(100 * 1000);
+            vtimer_usleep(500 * 1000);
             if (thread_getstatus(transceiver_pid) == STATUS_SLEEPING) {
-                puts("WAKEUP!");
+                //puts("WAKEUP!");
                 thread_wakeup(transceiver_pid);
             }
         }
@@ -91,6 +91,40 @@ void init(char *str){
     thread_create(tr_wd_stack, TR_WD_STACKSIZE, PRIORITY_MAIN-3, CREATE_STACKTEST, wakeup_thread, "TX/RX WD");
 
  }
+void loop(char *str){
+	rpl_routing_entry_t * rtable;
+	while(1){
+		rtable = rpl_get_routing_table();
+		rpl_dodag_t * mydodag = rpl_get_my_dodag();
+		if(mydodag == NULL){
+        	vtimer_usleep(20 * 1000 * 1000);
+			continue;
+		}
+		printf("---------------------------\n");
+		printf("OUTPUT\n");
+		printf("my rank: %d\n", mydodag->my_rank);
+		printf("my preferred parent:\n");
+		ipv6_print_addr(&mydodag->my_preferred_parent->addr);
+		printf("parent lifetime: %d\n",mydodag->my_preferred_parent->lifetime);
+		printf("---------------------------$\n");
+		for(int i=0;i<RPL_MAX_ROUTING_ENTRIES;i++){
+			if(rtable[i].used){
+				ipv6_print_addr(&rtable[i].address);
+				puts("next hop");
+				ipv6_print_addr(&rtable[i].next_hop);
+				printf("entry %d lifetime %d\n",i,rtable[i].lifetime);
+				if(!rpl_equal_id(&rtable[i].address, &rtable[i].next_hop)){
+					puts("multi-hop");
+				}
+				printf("---------------------------$\n");
+			}
+		}
+		printf("########################\n");
+        vtimer_usleep(20 * 1000 * 1000);
+	}
+
+
+}
 
 void table(char *str){
 	rpl_routing_entry_t * rtable;
@@ -101,9 +135,14 @@ void table(char *str){
 	for(int i=0;i<RPL_MAX_ROUTING_ENTRIES;i++){
 		if(rtable[i].used){
 			ipv6_print_addr(&rtable[i].address);
+			printf("entry %d lifetime %d\n",i,rtable[i].lifetime);
+			if(!rpl_equal_id(&rtable[i].address, &rtable[i].next_hop)){
+				puts("multi-hop");
+			}
 			printf("--------------\n");
 		}
 	}
+	printf("$\n");
 }
 
 void dodag(char *str){
@@ -111,7 +150,7 @@ void dodag(char *str){
 	rpl_dodag_t * mydodag = rpl_get_my_dodag();
 	if(mydodag == NULL){
 		printf("Not part of a dodag\n");
-	printf("---------------------------\n");
+	printf("---------------------------$\n");
 		return;
 	}
 	printf("Part of Dodag:\n");
@@ -119,7 +158,7 @@ void dodag(char *str){
 	printf("my rank: %d\n", mydodag->my_rank);
 	printf("my preferred parent:\n");
 	ipv6_print_addr(&mydodag->my_preferred_parent->addr);
-	printf("---------------------------\n");
+	printf("---------------------------$\n");
 }
 
 extern void cc1100_print_config(void);
@@ -142,6 +181,7 @@ const shell_command_t shell_commands[] = {
     {"dodag", "", dodag},
     {"cc1100", "", cc1100_cfg},
     {"wakeup", "", wakeup},
+    {"loop", "", loop},
 	{NULL, NULL, NULL}
 };
 

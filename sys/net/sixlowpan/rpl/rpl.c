@@ -36,7 +36,7 @@ static struct rpl_dis_t *rpl_send_dis_buf;
 static struct rpl_dao_t *rpl_send_dao_buf;
 static struct rpl_dao_ack_t * rpl_send_dao_ack_buf;
 static struct rpl_opt_dodag_conf_t * rpl_send_opt_dodag_conf_buf;
-static struct rpl_opt_solicited_t * rpl_send_opt_solicited_buf;
+//static struct rpl_opt_solicited_t * rpl_send_opt_solicited_buf;
 static struct rpl_opt_target_t * rpl_send_opt_target_buf;
 static struct rpl_opt_transit_t * rpl_send_opt_transit_buf;
 
@@ -164,6 +164,26 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address){
 	ipv6_set_ll_prefix(&ll_address);
     ipv6_get_saddr(&my_address, &ll_address);
 	set_rpl_process_pid(rpl_process_pid);
+
+	//some fake routing entries...
+	/*if(rpl_address != 1){
+		ll_address.uint8[15]=1;
+		rpl_add_routing_entry(&ll_address, &ll_address, 9000);
+		ll_address.uint8[15]=2;
+		rpl_add_routing_entry(&ll_address, &ll_address, 8000);
+		ll_address.uint8[15]=3;
+		rpl_add_routing_entry(&ll_address, &ll_address, 7000);
+		ll_address.uint8[15]=4;
+		rpl_add_routing_entry(&ll_address, &ll_address, 6000);
+		ll_address.uint8[15]=5;
+		rpl_add_routing_entry(&ll_address, &ll_address, 5000);
+		ll_address.uint8[15]=6;
+		rpl_add_routing_entry(&ll_address, &ll_address, 4000);
+		ll_address.uint8[15]=7;
+		rpl_add_routing_entry(&ll_address, &ll_address, 4000);
+		ll_address.uint8[15]=8;
+		rpl_add_routing_entry(&ll_address, &ll_address, 4000);
+	}	*/
 	return SUCCESS;
 
 }
@@ -212,7 +232,7 @@ void rpl_init_root(){
 
 
 void send_DIO(ipv6_addr_t* destination){
-	puts("\nSEND DIO");
+	//puts("\nSEND DIO");
 	mutex_lock(&rpl_send_mutex);
 	rpl_dodag_t * mydodag;
 	icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
@@ -267,7 +287,7 @@ void send_DIO(ipv6_addr_t* destination){
 }
 
 void send_DIS(ipv6_addr_t *destination){
-	puts("Send DIS");
+	//puts("Send DIS");
 
 	mutex_lock(&rpl_send_mutex);
 	icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
@@ -284,7 +304,7 @@ void send_DIS(ipv6_addr_t *destination){
 }
 
 
-void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime){
+void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index){
 	if(i_am_root){
 		return;
 	}
@@ -298,7 +318,7 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime)
 	if(default_lifetime){
 		lifetime=my_dodag->default_lifetime;
 	}
-	puts("sending DAO");
+	//puts("sending DAO");
 
 	icmp_send_buf  = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
 
@@ -318,7 +338,9 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime)
 	uint16_t opt_len = 0;
 	rpl_send_opt_target_buf = get_rpl_send_opt_target_buf(DAO_BASE_LEN);
 	//Alle Ziele aus der Routing Tabelle als Target eintragen
-	for(uint8_t i=0; i<RPL_MAX_ROUTING_ENTRIES;i++){
+	uint8_t entries = 0;
+	uint8_t continue_index = 0;
+	for(uint8_t i=start_index; i<RPL_MAX_ROUTING_ENTRIES;i++){
 		if(routing_table[i].used){
 			rpl_send_opt_target_buf->type=RPL_OPT_TARGET;
 			rpl_send_opt_target_buf->length=RPL_OPT_TARGET_LEN;
@@ -335,6 +357,13 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime)
 			rpl_send_opt_transit_buf->path_lifetime=lifetime;
 			opt_len += RPL_OPT_TRANSIT_LEN +2;
 			rpl_send_opt_target_buf = get_rpl_send_opt_target_buf(DAO_BASE_LEN + opt_len);
+			entries++;
+		}
+		if(entries >= 5){
+			//split DAO, so packages dont get too big.
+			//The value 5 is based on experience
+			continue_index = i+1;
+			break;
 		}
 	}
 	//Add own address
@@ -357,10 +386,13 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime)
 	uint16_t plen = ICMPV6_HDR_LEN + DAO_BASE_LEN + opt_len;
 	rpl_send(destination,(uint8_t*)icmp_send_buf, plen, PROTO_NUM_ICMPV6, NULL);
 	mutex_unlock(&rpl_send_mutex, 0);
+	if(continue_index > 1){
+		send_DAO(destination, lifetime, default_lifetime, continue_index);
+	}
 }
 
 void send_DAO_ACK(ipv6_addr_t *destination){
-	puts("Send DAO_ACK to");
+	//puts("Send DAO_ACK to");
 	ipv6_print_addr(destination);
 	rpl_dodag_t * my_dodag;
 	my_dodag = rpl_get_my_dodag();
@@ -557,7 +589,8 @@ void recv_rpl_dio(void){
 			return;
 		}
 		if(rpl_dio_buf->rank != INFINITE_RANK){
-			printf("Will join DODAG\n");
+			puts("Will join DODAG\n");
+			ipv6_print_addr(&dio_dodag.dodag_id);
 			rpl_join_dodag(&dio_dodag, &ipv6_buf->srcaddr, rpl_dio_buf->rank);
 		}
 		else{
@@ -723,7 +756,7 @@ void recv_rpl_dao(void){
 				len += rpl_opt_transit_buf->length +2;
 				//Die eigentliche Lebenszeit einer Route errechnet sich aus  (Lifetime aus DAO) * (Lifetime Unit) Sekunden
 				rpl_add_routing_entry(&rpl_opt_target_buf->target, &ipv6_buf->srcaddr, rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit);
-				puts("Updated route \n");
+				//puts("Updated route \n");
 				increment_seq = 1;
 				break;
 			}
@@ -759,7 +792,7 @@ void recv_rpl_dao_ack(void){
 	if(rpl_dao_ack_buf->status != 0){
 		return;
 	}
-	puts("Received DAO ACK");
+	//puts("Received DAO ACK");
 	dao_ack_received();
 
 }
@@ -804,8 +837,8 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
 			else{
 				next_hop = rpl_get_my_preferred_parent();
 				if(next_hop == NULL){
-					//kein preferred parent eingetragen, was nicht passieren sollte.
-					printf("[Error] no preferred parent\n");
+					//kein preferred parent eingetragen
+					puts("[Error] no preferred parent, dropping package");
 					return;
 				}
 			}
@@ -824,7 +857,7 @@ ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t * addr){
 	return NULL;
 }
 
-void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint8_t lifetime){
+void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t lifetime){
 	rpl_routing_entry_t * entry = rpl_find_routing_entry(addr);
 	if(entry != NULL){
 		entry->lifetime = lifetime;

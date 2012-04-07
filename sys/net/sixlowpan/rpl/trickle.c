@@ -75,7 +75,7 @@ void start_trickle(uint8_t DIOIntMin, uint8_t DIOIntDoubl, uint8_t DIORedundancy
 	Imax = DIOIntDoubl;
 	//Eigentlich laut Spezifikation erste Bestimmung von I wie auskommentiert:
 	//I = Imin + ( rand() % ( (Imin << Imax) - Imin + 1 ) );
-	I = Imin + ( rand() % ( (4*Imin) - Imin + 1 ) ) ;
+	I = Imin + ( rand() %  (4*Imin)  ) ;
 
 	t = (I/2) + ( rand() % ( I - (I/2) + 1 ) );
 	t_time = timex_set(0,t*1000);
@@ -111,7 +111,14 @@ void trickle_interval_over(void){
 	while(1){
 		thread_sleep();
 		I = I*2;
-		printf("TRICKLE new Interval %u\n",I);
+		printf("TRICKLE new Interval %lu\n",I);
+		if( I == 0 ){
+			puts("[WARNING] Interval was 0");
+			if( Imax == 0){
+				puts("[WARNING] Imax == 0");
+			}
+			I = (Imin << Imax);
+		}
 		if(I > (Imin << Imax)){
 			I=(Imin << Imax);
 		}
@@ -136,8 +143,17 @@ void trickle_interval_over(void){
 
 void delay_dao(void){
 	dao_time = timex_set(DEFAULT_DAO_DELAY,0);
-	ack_received = false;
 	dao_counter = 0;
+	ack_received = false;
+	vtimer_remove(&dao_timer);
+	vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
+}
+
+//This function is used for regular update of the routes. The Timer can be overwritten, as the normal delay_dao function gets called
+void long_delay_dao(void){
+	dao_time = timex_set(REGULAR_DAO_INTERVAL,0);
+	dao_counter = 0;
+	ack_received = false;
 	vtimer_remove(&dao_timer);
 	vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
 }
@@ -145,31 +161,47 @@ void delay_dao(void){
 void dao_delay_over(void){
 	while(1){
 		thread_sleep();
-		//10 DAOs will do... TODO: define
-		if((ack_received == false) && (dao_counter < 10)){
+		if((ack_received == false) && (dao_counter < DAO_SEND_RETRIES)){
 			dao_counter++;
-			send_DAO(NULL, 0, true);
+			send_DAO(NULL, 0, true, 0);
 			dao_time = timex_set(DEFAULT_WAIT_FOR_DAO_ACK,0);
 			vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
+		}
+		else if(ack_received == false){
+			long_delay_dao();
 		}
 	}
 }
 
 void dao_ack_received(){
 	ack_received = true;
+	long_delay_dao();
 }
 
 void rt_timer_over(void){
 	rpl_routing_entry_t * rt;
 	while(1){
-		rt = rpl_get_routing_table();
-		for(uint8_t i=0; i<RPL_MAX_ROUTING_ENTRIES;i++){
-			if(rt[i].used){
-				if(rt[i].lifetime <= 1){
-					memset(&rt[i], 0,sizeof(rt[i]));
+		rpl_dodag_t * my_dodag = rpl_get_my_dodag();
+		if(my_dodag != NULL){
+			rt = rpl_get_routing_table();
+			for(uint8_t i=0; i<RPL_MAX_ROUTING_ENTRIES;i++){
+				if(rt[i].used){
+					if(rt[i].lifetime <= 1){
+						memset(&rt[i], 0,sizeof(rt[i]));
+					}
+					else{
+						rt[i].lifetime--;
+					}
+				}
+			}
+			//Parent is NULL for root too
+            if(my_dodag->my_preferred_parent != NULL){
+				if(my_dodag->my_preferred_parent->lifetime <= 1){
+					puts("parent lifetime timeout");
+					rpl_parent_update(NULL);
 				}
 				else{
-					rt[i].lifetime--;
+					my_dodag->my_preferred_parent->lifetime--;
 				}
 			}
 		}

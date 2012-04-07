@@ -172,10 +172,12 @@ rpl_parent_t * rpl_find_preferred_parent(void){
 
 	for(uint8_t i=0;i<RPL_MAX_PARENTS;i++){
 		if(parents[i].used){
-			if(parents[i].rank == INFINITE_RANK){
+			if((parents[i].rank == INFINITE_RANK) || (parents[i].lifetime <= 1)){
+				puts("bad parent");
 				continue;
 			}
 			else if(best == NULL){
+				puts("parent");
 				best = &parents[i];
 			} else{
 				best = my_dodag->of->which_parent(best, &parents[i]);
@@ -191,7 +193,7 @@ rpl_parent_t * rpl_find_preferred_parent(void){
 	if(!rpl_equal_id(&my_dodag->my_preferred_parent->addr, &best->addr)){
 		if(my_dodag->mop != NO_DOWNWARD_ROUTES){
 			//send DAO with ZERO_LIFETIME to old parent
-			send_DAO(&my_dodag->my_preferred_parent->addr, 0, false);
+			send_DAO(&my_dodag->my_preferred_parent->addr, 0, false, 0);
 		}
 		my_dodag->my_preferred_parent = best;
 		if(my_dodag->mop != NO_DOWNWARD_ROUTES){
@@ -207,6 +209,11 @@ void rpl_parent_update(rpl_parent_t * parent){
 	rpl_dodag_t * my_dodag = rpl_get_my_dodag();
 	uint16_t old_rank = my_dodag->my_rank; 
 	
+	//update Parent lifetime
+	if(parent != NULL){
+		parent->lifetime = my_dodag->default_lifetime * my_dodag->lifetime_unit;	
+	}
+
 	if(rpl_find_preferred_parent() == NULL){
 		rpl_local_repair();
 	}
@@ -256,6 +263,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
 }
 
 void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t * p_addr, uint16_t rank){
+	puts("[INFO] Global repair started");
 	rpl_dodag_t * my_dodag = rpl_get_my_dodag();
 	if(my_dodag == NULL){
 		printf("[Error] - no global repair possible, if not part of a DODAG\n");
@@ -281,6 +289,7 @@ void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t * p_addr, uint16_t rank){
 }
 
 void rpl_local_repair(void){
+	puts("[INFO] Local Repair started");
 	rpl_dodag_t * my_dodag = rpl_get_my_dodag();
 	if(my_dodag == NULL){
 		printf("[Error] - no local repair possible, if not part of a DODAG\n");
