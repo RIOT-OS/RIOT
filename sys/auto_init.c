@@ -4,6 +4,7 @@
 #include "rtc.h"
 #include "diskio.h"
 #include <auto_init.h>
+#include "vtimer.h"
 
 #define ENABLE_DEBUG
 #include <debug.h>
@@ -24,6 +25,10 @@ void auto_init(void) {
 #ifdef MODULE_HWTIMER
     DEBUG("Auto init hwtimer module.\n");
     hwtimer_init();
+#endif
+#ifdef MODULE_VTIMER
+    DEBUG("Auto init vtimer module.\n");
+    vtimer_init();
 #endif
 #ifdef MODULE_SWTIMER
     DEBUG("Auto init swtimer module.\n");
