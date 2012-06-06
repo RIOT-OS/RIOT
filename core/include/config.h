@@ -22,6 +22,18 @@ typedef struct {
 
 extern config_t sysconfig;
 
+/**
+ * @brief:  Write configuration back to flashrom
+ *
+ * @return 1 on success, 0 otherwise 
+ */
 uint8_t config_save(void);
+
+/** 
+ * @brief: Read configuration from flashrom and stores it to sysconfig
+ *
+ * @note: If no configuration is present within flashrom a new configuration will be created
+ */
+void config_load(void);
 
 #endif /* CONFIG_H */
