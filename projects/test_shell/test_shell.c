@@ -10,6 +10,7 @@
 #include <shell.h>
 #include <board_uart0.h>
 
+
 void print_teststart(char* str) {
     printf("[TEST_START]\n");
 }

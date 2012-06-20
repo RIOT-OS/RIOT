@@ -107,6 +107,7 @@ void ltc4150_stop() {
 void __attribute__((__no_instrument_function__)) ltc4150_interrupt()
 {
     uint32_t now = hwtimer_now();
+    printf("last_int_duration %lu\n",last_int_duration);	//todo remove printf row
     if (now >= last_int_time) {
         last_int_duration = now - last_int_time;
     } else {

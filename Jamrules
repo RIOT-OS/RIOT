@@ -48,6 +48,7 @@ if $(NT) || $(OS) = CYGWIN {
 }
 
 CCFLAGS += -DBOARD=BOARD_$(BOARD:U) ;
+#CCFLAGS += -finstrument-functions -finstrument-functions-exclude-file-list=trace ;
 
 #
 # core source directories

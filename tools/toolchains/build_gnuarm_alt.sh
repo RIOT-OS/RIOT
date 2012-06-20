@@ -37,12 +37,15 @@ build_binutils() {
         tar -xjf ${FILES}/binutils-${BINUTILS_VER}.tar.bz2
         touch .binutils_extracted
     fi 
-        CFLAGS="-Wno-error=unused-but-set-variable -Wno-error=unused-but-set-parameter"
-        echo "echoing cflags..."
-	echo $CFLAGS
+    if [[ $HOST_GCC_VER == 4.6* ]]
+    then
+        CFLAGS="-Wno-error=unused-but-set-variable"
+    else
+        CFLAGS="-Wno-error=unused"
+    fi
 	rm -rf binutils-build && mkdir -p binutils-build && cd binutils-build &&
 	../binutils-${BINUTILS_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib &&
-    make ${MAKE_THREADS} all CFLAGS="${CFLAGS}" &&
+    make ${MAKE_THREADS} all CFLAGS=${CFLAGS} &&
 	make install &&
 	cd ${GNUARM_BUILDDIR}
 }
@@ -106,7 +109,7 @@ build_gdb() {
 	rm -rf gdb-build && mkdir -p gdb-build && cd gdb-build &&
 	../gdb-${GDB_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib &&
 
-    make ${MAKE_THREADS} all CFLAGS="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0" &&
+    make ${MAKE_THREADS} all CFLAGS=-D_FORTIFY_SOURCE=0 &&
 	make install &&
 	
     cd ${GNUARM_BUILDDIR}

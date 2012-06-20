@@ -1,0 +1,5 @@
+SubDir TOP projects ukleos ;
+
+Module ukleos : main.c ;
+
+UseModule ukleos ;

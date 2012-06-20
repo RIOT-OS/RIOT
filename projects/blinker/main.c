@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <math.h>
+//#include <stdio.h>
+//#include <math.h>
 #include <board.h>
 #include "hwtimer.h"
 
@@ -9,13 +9,14 @@ void wait(void)
 	for(i = 0; i < 32000; i++);                      /* repeat 32000 times (nop)  */
 }
 
+
 int main(void)
 {
 	for(;;)
 	{ /* infinite loop */
-		RED_ON; 
+		LED_RED_ON;
 		wait();              /* call delay function       */
-		RED_OFF;
+		LED_RED_OFF;
 		wait();
 	}
 }
