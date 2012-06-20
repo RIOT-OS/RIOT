@@ -1,3 +1,3 @@
-obj/ihex.d obj/ihex.o: src/ihex.c src/ihex.h
+obj/ihex.d: src/ihex.c src/ihex.h
 
 src/ihex.h:
