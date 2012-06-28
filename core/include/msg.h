@@ -94,6 +94,7 @@ int msg_receive(msg_t* m);
  * @brief Send a message, block until reply received.
  *
  * This function sends a message to target_pid and then blocks until target has sent a reply.
+ * @note CAUTION! Use this function only when receiver is already waiting. If not use simple msg_send()
  * @param m pointer to preallocated msg
  * @param reply pointer to preallocated msg. Reply will be written here.
  * @param target pid the pid of the target process
