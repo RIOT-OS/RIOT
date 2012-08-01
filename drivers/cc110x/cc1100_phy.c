@@ -469,7 +469,7 @@ static bool send_burst(cc1100_packet_layer0_t *packet, uint8_t retries, uint8_t 
 
 		cc1100_statistic.raw_packets_out++;
 
-		// Delay until predefined "send" interval has passed
+        // Delay until predefined "send" interval has passed
 		timer_tick_t now = hwtimer_now();
 		if (t > now)
 		{

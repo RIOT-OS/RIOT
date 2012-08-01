@@ -305,7 +305,7 @@ static void wakeup_from_wor(void)
  */
 void switch_to_wor2(void)
 {
-	if (cc110x_get_gdo2()) return;				// If incoming packet, then don't go to WOR now
+//	if (cc110x_get_gdo2()) return;				// If incoming packet, then don't go to WOR now
 	cc1100_spi_strobe(CC1100_SIDLE);			// Put CC1100 to IDLE
 	radio_state = RADIO_IDLE;					// Radio state now IDLE
 	cc1100_spi_write_reg(CC1100_MCSM2,
@@ -865,7 +865,7 @@ void cc1100_cs_init(void)
 	}
 	cc1100_spi_write_reg(CC1100_MCSM0, 0x08);	// Turn off FS-Autocal
 	cc1100_spi_strobe(CC1100_SCAL);				// Calibrate manually (721 us)
-	hwtimer_wait(MANUAL_FS_CAL_TIME);			// Wait for calibration to finish before packet burst can start
+    hwtimer_wait(MANUAL_FS_CAL_TIME);			// Wait for calibration to finish before packet burst can start
 	radio_state = RADIO_AIR_FREE_WAITING;		// Set status "waiting for air free"
 	cc1100_spi_write_reg(CC1100_MCSM2, 0x07);	// Configure RX_TIME = Until end of packet (no timeout)
 	cc1100_spi_strobe(CC1100_SRX);				// Switch to RX (88.4 us) (Carrier Sense)
