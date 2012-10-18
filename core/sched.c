@@ -31,6 +31,7 @@ volatile tcb_t *sched_threads[MAXTHREADS];
 volatile tcb_t *active_thread;
 
 volatile int thread_pid;
+volatile int last_pid = -1;
 
 clist_node_t *runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;
@@ -112,6 +113,9 @@ void sched_run() {
         //                break;
         //            }
         //        }
+        if (my_active_thread->pid != last_pid) {
+            last_pid = my_active_thread->pid;
+        }
     }
 
     DEBUG("scheduler: next task: %s\n", my_active_thread->name);

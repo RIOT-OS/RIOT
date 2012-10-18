@@ -30,6 +30,11 @@ inline int thread_getpid() {
     return active_thread->pid;
 }
 
+int thread_getlastpid() {
+    extern int last_pid;
+    return last_pid;
+}
+
 unsigned int thread_getstatus(int pid) {
     if (sched_threads[pid]==NULL)
         return STATUS_NOT_FOUND;
