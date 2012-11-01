@@ -45,6 +45,7 @@ void thread_sleep() {
     if ( inISR()) return;
     dINT();
     sched_set_status((tcb_t*)active_thread, STATUS_SLEEPING);
+    eINT();
     thread_yield();
 }
 

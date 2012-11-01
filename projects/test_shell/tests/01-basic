@@ -4,8 +4,11 @@ set timeout 5
 
 spawn pseudoterm $env(PORT)
 
+sleep 1
+send "\n" 
+send "\n" 
 expect { 
-    ">$" {} 
+    ">" {} 
     timeout { exit 1 }
 }
 
@@ -16,12 +19,11 @@ expect {
 }
 
 expect { 
-    ">$" {} 
+    ">" {} 
     timeout { exit 1 }
 }
 
 send "end_test\n" 
-
 expect {
     "\[TEST_END\]" {}
     timeout { exit 1 }

@@ -113,8 +113,8 @@ void sched_run() {
         //                break;
         //            }
         //        }
-        if (my_active_thread->pid != last_pid) {
-            last_pid = my_active_thread->pid;
+        if (active_thread->pid != last_pid) {
+            last_pid = active_thread->pid;
         }
     }
 

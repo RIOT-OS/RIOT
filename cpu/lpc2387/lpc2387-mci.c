@@ -572,7 +572,6 @@ DSTATUS MCI_initialize (void) {
 
 	if (!send_cmd(CMD9, (unsigned long)CardRCA << 16, 2, resp))		/* Get CSD and save it */
 	{
-	    //printf("MCI CMD9 fail\n");
 	    goto di_fail;
 	}
 	for (n = 0; n < 4; n++) bswap_cp(&CardInfo[n * 4], &resp[n]);

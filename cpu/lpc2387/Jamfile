@@ -33,7 +33,7 @@ UseModule cpu ;
 Module rtc : lpc2387-rtc.c ;
 Module gpioint : lpc2387-gpioint.c ;
 Module adc : lpc2387-adc.c ;
-Module mci : lpc2387-mci.c asmfunc.s ;
+Module mci : lpc2387-mci.c asmfunc.s : hwtimer ;
 
 Objects startup.s ;
 

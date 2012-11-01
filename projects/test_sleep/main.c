@@ -39,10 +39,7 @@ int main(void)
             thread_print_all();
             printf("Waking up sleeper.\n");
             thread_wakeup(pid);
-<<<<<<< HEAD
-=======
             thread_print_all();
->>>>>>> master
             thread_yield();
         }
     }
