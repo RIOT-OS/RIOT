@@ -57,8 +57,6 @@ if $(NT) {
 	# use english language output for gcc
 	actions Cc
 	{
-		#echo $(PWD)
-		#echo TEST $(CCFLAGS)
 		LANG=C $(CC) -c -o $(<) $(CCFLAGS) -D$(MODULE_DEFINES) $(CCDEFS) $(CCHDRS) $(>)
 	}
 	
