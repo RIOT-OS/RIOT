@@ -63,12 +63,19 @@
 #define INFINITE_RANK 0xFFFF
 #define RPL_DEFAULT_INSTANCE 0
 #define DEFAULT_PATH_CONTROL_SIZE 0
-#define DEFAULT_DIO_INTERVAL_MIN 3
-#define DEFAULT_DIO_INTERVAL_DOUBLINGS 20
+#define DEFAULT_DIO_INTERVAL_MIN 11
+//standard value:
+//#define DEFAULT_DIO_INTERVAL_MIN 3
+#define DEFAULT_DIO_INTERVAL_DOUBLINGS 7
+//standard value:
+//#define DEFAULT_DIO_INTERVAL_DOUBLINGS 20
 #define DEFAULT_DIO_REDUNDANCY_CONSTANT 10
 #define DEFAULT_MIN_HOP_RANK_INCREASE 256
 //DAO_DELAY is in seconds
-#define DEFAULT_DAO_DELAY 1
+#define DEFAULT_DAO_DELAY 3
+#define REGULAR_DAO_INTERVAL 300
+#define DAO_SEND_RETRIES 4
+#define DEFAULT_WAIT_FOR_DAO_ACK 15
 #define RPL_DODAG_ID_LEN 16
 
 //others
@@ -77,10 +84,10 @@
 #define RPL_MAX_DODAGS 3
 #define RPL_MAX_INSTANCES 1
 #define RPL_MAX_PARENTS 5
-#define RPL_MAX_ROUTING_ENTRIES 20
+#define RPL_MAX_ROUTING_ENTRIES 128
 #define RPL_ROOT_RANK 1
 #define RPL_DEFAULT_LIFETIME 0xff
-#define RPL_LIFETIME_UNIT 0x0001
+#define RPL_LIFETIME_UNIT 2
 #define RPL_GROUNDED 1
 #define RPL_PRF_MASK 0x7
 #define RPL_MOP_SHIFT 3
@@ -179,6 +186,7 @@ typedef struct rpl_parent_t {
     uint16_t rank;
 	uint8_t dtsn;
     struct rpl_dodag_t *dodag;
+	uint16_t lifetime;
 	uint8_t used;
 } rpl_parent_t;
 
@@ -230,7 +238,7 @@ typedef struct rpl_routing_entry_t {
 	uint8_t used;
 	ipv6_addr_t address;
 	ipv6_addr_t next_hop;
-	uint8_t lifetime;
+	uint16_t lifetime;
 	
 } rpl_routing_entry_t;
 

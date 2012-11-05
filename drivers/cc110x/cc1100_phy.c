@@ -45,7 +45,7 @@ and the mailinglist (subscription via web site)
 #include <string.h>
 
 #include "hwtimer.h"
-#include <swtimer.h>
+#include <vtimer.h>
 
 #include "cc1100.h"
 #include "cc1100_spi.h"
@@ -96,8 +96,8 @@ static const pm_table_t handler_table;
 static const char *cc1100_event_handler_name = "cc1100_event_handler";
 static mutex_t cc1100_mutex;
 volatile int cc1100_mutex_pid;
-static swtimer_t cc1100_watch_dog;
-static swtime_t cc1100_watch_dog_period = 0;
+static vtimer_t cc1100_watch_dog;
+static timex_t cc1100_watch_dog_period;
 
 static uint16_t cc1100_event_handler_pid;
 static void cc1100_event_handler_function(void);
@@ -198,9 +198,10 @@ void cc1100_phy_init()
 
 	// Active watchdog for the first time
 	if (radio_mode == CC1100_MODE_CONSTANT_RX) {
-		cc1100_watch_dog_period = CC1100_WATCHDOG_PERIOD;
-		if (cc1100_watch_dog_period != 0) {
-            swtimer_set_msg(&cc1100_watch_dog, 5000000L, cc1100_event_handler_pid, NULL);
+		cc1100_watch_dog_period.microseconds = CC1100_WATCHDOG_PERIOD;
+		if (cc1100_watch_dog_period.microseconds != 0) {
+			timex_t temp = timex_set(0, 5000000L);
+            vtimer_set_msg(&cc1100_watch_dog, temp, cc1100_event_handler_pid, NULL);
 		}
 	}
 }
@@ -374,7 +375,8 @@ static bool contains_seq_entry(uint8_t src, uint8_t id)
 {
 	int i;
 	uint32_t cmp;
-	uint64_t now = swtimer_now();
+	timex_t now_timex = vtimer_now();
+	uint64_t now = now_timex.microseconds;
 
 	for (i = 0; i < MAX_SEQ_BUFFER_SIZE; i++)
 	{
@@ -412,7 +414,8 @@ static void add_seq_entry(uint8_t src, uint8_t id)
 	// Add new entry
 	seq_buffer[seq_buffer_pos].source = src;
 	seq_buffer[seq_buffer_pos].identification = id;
-    seq_buffer[seq_buffer_pos].m_ticks = swtimer_now();
+	timex_t now = vtimer_now();
+    seq_buffer[seq_buffer_pos].m_ticks = now.microseconds;
 
 	// Store 16 bit sequence number of layer 0 for speedup
 	last_seq_num = src;
@@ -466,7 +469,7 @@ static bool send_burst(cc1100_packet_layer0_t *packet, uint8_t retries, uint8_t 
 
 		cc1100_statistic.raw_packets_out++;
 
-		// Delay until predefined "send" interval has passed
+        // Delay until predefined "send" interval has passed
 		timer_tick_t now = hwtimer_now();
 		if (t > now)
 		{
@@ -568,7 +571,9 @@ int cc1100_send(radio_address_t addr, protocol_t protocol, int priority, char *p
 
 	memset(tx_buffer.data, 0, MAX_DATA_LENGTH);			// Clean data
 
-	tx_buffer.length = 3 + MAX_DATA_LENGTH;				// 3 bytes (A&PS&F) + data length
+	/* TODO: when packets are shoreter than max packet size, WOR interval is too long.
+     *       This must be solved in some way. */
+    tx_buffer.length = 3 + payload_len;				// 3 bytes (A&PS&F) + data length
 	tx_buffer.address = address;						// Copy destination address
 	tx_buffer.flags = 0x00;								// Set clean state
 	tx_buffer.flags = W_FLAGS_PROTOCOL(protocol);		// Copy protocol identifier
@@ -628,8 +633,8 @@ static void cc1100_event_handler_function(void)
 
     while (1)
     {
-    	if (cc1100_watch_dog_period != 0) {
-    		swtimer_remove(&cc1100_watch_dog);
+    	if (cc1100_watch_dog_period.microseconds != 0) {
+    		vtimer_remove(&cc1100_watch_dog);
     	}
     	// Test if any resource error has occurred
     	if (rflags.KT_RES_ERR)
@@ -659,7 +664,7 @@ static void cc1100_event_handler_function(void)
     	{
     		rx_buffer_t* packet = &rx_buffer[rx_buffer_head];
 			protocol_t p =  R_FLAGS_PROTOCOL(packet->packet.flags);
-			if (packet_monitor != NULL) packet_monitor((void*)&packet->packet.data, MAX_DATA_LENGTH, p, &packet->info);
+			if (packet_monitor != NULL) packet_monitor((void*)&packet->packet.data, packet->packet.length, p, &packet->info);
 			pm_invoke(&handler_table, p, (void*)&packet->packet.data, MAX_DATA_LENGTH, &packet->info);
 			dINT();
 			rx_buffer_size--;
@@ -670,8 +675,9 @@ static void cc1100_event_handler_function(void)
     	dINT();
     	if (rx_buffer_size == 0)
     	{
-    		if (cc1100_watch_dog_period != 0) {
-                swtimer_set_msg(&cc1100_watch_dog, cc1100_watch_dog_period * 1000000L, 
+    		if (cc1100_watch_dog_period.microseconds != 0) {
+				timex_t temp = timex_set(0, cc1100_watch_dog_period.microseconds * 1000000L);
+                vtimer_set_msg(&cc1100_watch_dog, temp, 
                         cc1100_event_handler_pid, NULL);
     		}
     		msg_receive(&m);
@@ -711,6 +717,8 @@ void cc1100_phy_rx_handler(void)
 		// Get packet pointer and store additional data in packet info structure
 		cc1100_packet_layer0_t* p = &(rx_buffer[rx_buffer_tail].packet);
 		rx_buffer[rx_buffer_tail].info.phy_src = p->phy_src;
+		rx_buffer[rx_buffer_tail].info.source = p->phy_src;
+		rx_buffer[rx_buffer_tail].info.destination = p->address;
 		rx_buffer[rx_buffer_tail].info.rssi = rflags.RSSI;
 		rx_buffer[rx_buffer_tail].info.lqi = rflags.LQI;
 		rx_buffer[rx_buffer_tail].info.promiscuous = false;
