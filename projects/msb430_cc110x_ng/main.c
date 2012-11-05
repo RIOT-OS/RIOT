@@ -10,7 +10,7 @@
 #include <swtimer.h>
 #include <msg.h>
 #include <transceiver.h>
-#include <cc1100_ng.h>
+#include <cc110x_ng.h>
 
 #define SHELL_STACK_SIZE    (512)
 #define RADIO_STACK_SIZE    (512)
@@ -81,7 +81,7 @@ void sender(char *count) {
         puts(".");
         p.data = snd_buffer[i % SND_BUFFER_SIZE];
         msg_send(&mesg, transceiver_pid, 1);
-        swtimer_usleep(SENDING_DELAY);
+        hwtimer_wait(50000);
     }
 }
 
@@ -91,9 +91,9 @@ void print_buffer(char *unused) {
     for (i = 0; i < TRANSCEIVER_BUFFER_SIZE; i++) {
         printf("[%u] %u # %u # %u\n", i, transceiver_buffer[i].processing, transceiver_buffer[i].length, transceiver_buffer[i].data[i]);
     }
-    extern rx_buffer_t cc1100_rx_buffer[];
+    extern rx_buffer_t cc110x_rx_buffer[];
     for (i = 0; i < TRANSCEIVER_BUFFER_SIZE; i++) {
-        printf("[%u] %u # %u \n", i, cc1100_rx_buffer[i].packet.length, cc1100_rx_buffer[i].packet.data[i]);
+        printf("[%u] %u # %u \n", i, cc110x_rx_buffer[i].packet.length, cc110x_rx_buffer[i].packet.data[i]);
     }
 }
 
@@ -153,6 +153,6 @@ int main(void) {
        extern void thread_print_all(void);
        thread_print_all();
        print_buffer(NULL);
-       swtimer_usleep(10000000);
+       hwtimer_wait(50000);
    }
 }
