@@ -180,7 +180,6 @@ interrupt (PORT1_VECTOR) __attribute__ ((naked)) port1_isr(void) {
             cb[0][ifg_num]();
         }
     }
-
 	P1IFG = 0x00; 	
     P1IE  = int_enable; 	
     __exit_isr();
@@ -222,6 +221,9 @@ interrupt (PORT2_VECTOR) __attribute__ ((naked)) port2_isr(void) {
         if (cb[1][ifg_num] != NULL) {
             cb[1][ifg_num]();
         }
+    }
+    else {
+        cb[1][ifg_num]();
     }
 
 	P2IFG = 0x00; 	
