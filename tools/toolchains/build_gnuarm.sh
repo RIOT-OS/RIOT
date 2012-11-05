@@ -37,7 +37,7 @@ build_binutils() {
         tar -xjf ${FILES}/binutils-${BINUTILS_VER}.tar.bz2
         touch .binutils_extracted
     fi 
-    if [[ $HOST_GCC_VER == 4.6* ]]
+    if [[ $HOST_GCC_VER == 4.6* || $HOST_GCC_VER == 4.7* ]]
     then
         CFLAGS="-Wno-error=unused-but-set-variable"
     else

@@ -1,5 +1,3 @@
-//#include <stdio.h>
-//#include <math.h>
 #include <board.h>
 #include "hwtimer.h"
 
