@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <sht11.h>
 #include <string.h>
 
@@ -16,7 +17,7 @@ void _get_humidity_handler(char* unused) {
     }
     else {
         printf("Relative humidity: %5.2f%% / Temperature compensated humidity; %5.2f%%\n",
-                sht11_val.relhum, sht11_val.relhum_temp);
+                (double) sht11_val.relhum, (double) sht11_val.relhum_temp);
     }
 }
 void _get_temperature_handler(char* unused) {
@@ -27,7 +28,7 @@ void _get_temperature_handler(char* unused) {
         printf("Error reading SHT11\n");
     }
     else {
-        printf("Temperature: %-6.2f°C\n", sht11_val.temperature);
+        printf("Temperature: %-6.2f°C\n", (double) sht11_val.temperature);
     }
 }
 void _get_weather_handler(char* unused) {
@@ -39,8 +40,8 @@ void _get_weather_handler(char* unused) {
     }
     else {
         printf("Relative humidity: %5.2f%% / Temperature compensated humidity; %5.2f%% ",
-                sht11_val.relhum, sht11_val.relhum_temp);
-        printf("Temperature: %-6.2f°C\n", sht11_val.temperature);
+                (double) sht11_val.relhum, (double) sht11_val.relhum_temp);
+        printf("Temperature: %-6.2f°C\n", (double) sht11_val.temperature);
     }
 }
 
@@ -49,8 +50,8 @@ void _set_offset_handler(char* offset) {
 		puts("Usage: offset <OFFSET>");
 	}
 	else {
-		sscanf(offset, "offset %f",	&sht11_temperature_offset);
-		printf("Temperature offset set to %f\n", sht11_temperature_offset);
+        sht11_temperature_offset = atoi(offset+7);
+		printf("Temperature offset set to %f\n", (double) sht11_temperature_offset);
 	}
 }
 
