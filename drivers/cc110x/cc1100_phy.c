@@ -571,7 +571,7 @@ int cc1100_send(radio_address_t addr, protocol_t protocol, int priority, char *p
 
 	memset(tx_buffer.data, 0, MAX_DATA_LENGTH);			// Clean data
 
-	/* TODO: when packets are shoreter than max packet size, WOR interval is too long.
+	/* TODO: If packets are shorter than max packet size, WOR interval is too long.
      *       This must be solved in some way. */
     tx_buffer.length = 3 + payload_len;				// 3 bytes (A&PS&F) + data length
 	tx_buffer.address = address;						// Copy destination address
