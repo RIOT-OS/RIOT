@@ -51,7 +51,7 @@ and the mailinglist (subscription via web site)
 #include <rtc.h>
 #include <time.h>
 #include <sys/time.h>
-#include <lpc2387.h>
+#include "lpc2387.h"
 
 /* ------------------------------------------------------------------------- */
 /**

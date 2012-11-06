@@ -4,8 +4,8 @@
 #include <msg.h>
 #include <kernel.h>
 
-#include "drivers/cc110x/cc1100.h"
-#include "radio/radio.h"
+#include <cc1100.h>
+#include <radio/radio.h>
 
 #include "gpioint.h"
 #include "hwtimer.h"

@@ -49,7 +49,6 @@ extern void _get_blocksize(char* unused);
 extern void _get_sectorcount(char* unused);
 extern void _read_sector(char* sector);
 extern void _read_bytes(char* bytes);
-extern void _write_bytes(char* bytes);
 #endif
 
 const shell_command_t _shell_command_list[] = {
