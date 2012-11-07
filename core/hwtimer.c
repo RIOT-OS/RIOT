@@ -107,7 +107,7 @@ void hwtimer_wait(unsigned long ticks)
 
 /*---------------------------------------------------------------------------*/
 
-#include <board.h>
+
 static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr, bool absolute)
 {
     if (!inISR()) {

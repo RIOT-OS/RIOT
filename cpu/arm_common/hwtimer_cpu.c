@@ -11,7 +11,6 @@
  */
 
 #include "cpu.h"
-#include "board.h"
 #include "bitarithm.h"
 #include "hwtimer_cpu.h"
 #include "hwtimer_arch.h"
@@ -133,6 +132,7 @@ void hwtimer_arch_set(unsigned long offset, short timer) {
     volatile unsigned long base = get_base_address(timer);
     // Calculate match register address of corresponding timer
     timer %= 4;
+    unsigned long cpsr = disableIRQ();
     volatile unsigned long* addr = VULP(base + TXMR0 + 4 * timer);
     // Calculate match register value
     unsigned long value = *VULP(base + TXTC) + offset;
@@ -140,6 +140,7 @@ void hwtimer_arch_set(unsigned long offset, short timer) {
     *VULP(base+TXIR) = 0x01 << timer;               // reset interrupt register value for corresponding match register
     *VULP(base+TXMCR) &= ~(7 << (3 * timer));       // Clear all bits
     *VULP(base+TXMCR) |= (MR0I << (3 * timer));     // enable interrupt for match register
+    restoreIRQ(cpsr);
 }
 
 void hwtimer_arch_set_absolute(unsigned long value, short timer) {
