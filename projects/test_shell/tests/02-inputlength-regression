@@ -79,4 +79,5 @@ expect {
     timeout { exit 1 }
 }
 
+sleep 1
 puts "\nTest successful!\n"
