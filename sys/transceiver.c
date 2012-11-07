@@ -340,7 +340,9 @@ void receive_cc1100_packet(radio_packet_t *trans_p) {
  */
 static uint8_t send_packet(transceiver_type_t t, void *pkt) {
     uint8_t res = 0;
+#ifdef MODULE_CC110x
     int snd_ret;
+#endif
     radio_packet_t p = *((radio_packet_t*) pkt);
     
 #ifdef MODULE_CC110X_NG
@@ -358,7 +360,7 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt) {
 #else
             memcpy(cc1100_pkt, p.data, p.length);
             if ((snd_ret = cc1100_send_csmaca(p.dst, 4, 0, (char*) cc1100_pkt, p.length)) < 0) {
-                //printf("snd_ret (%u) = %i\n", p.length, snd_ret);
+                DEBUG("snd_ret (%u) = %i\n", p.length, snd_ret);
                 res = 0;
             }
             else {

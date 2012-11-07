@@ -6,6 +6,15 @@
 
 SubDir TOP projects default ;
 
-Module default_project : main.c : shell posix_io uart0 shell_commands ps rtc sht11 ltc4150 cc110x_ng transceiver gpioint auto_init config mci ;
+switch $(BOARD) {
+    case "msb-430h" : 
+        Module default_project : main.c : shell posix_io uart0 shell_commands ps sht11 cc110x_ng transceiver auto_init ;
+    case "msba2" :
+        Module default_project : main.c : shell posix_io uart0 shell_commands ps rtc sht11 ltc4150 cc110x_ng transceiver gpioint auto_init config mci ;
+    case "msb-430" :
+        Module default_project : main.c : shell posix_io uart0 shell_commands ps sht11 auto_init ;
+    case "*" :
+        exit "Board not supported for this project" ;
+}
 
 UseModule default_project ;

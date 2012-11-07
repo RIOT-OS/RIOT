@@ -25,9 +25,13 @@ static void shell_putchar(int c) {
 int main(void) {
     shell_t shell;
     (void) posix_open(uart0_handler_pid, 0);
-	ltc4150_start();
+#ifdef MODULE_LTC4150
+    ltc4150_start();
+#endif
+#ifdef MODULE_TRANSCEIVER
     transceiver_init(TRANSCEIVER_CC1100);
     (void) transceiver_start();
+#endif
     
     (void) puts("Welcome to ukleos!");
 
