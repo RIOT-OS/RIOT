@@ -31,9 +31,9 @@ and the mailinglist (subscription via web site)
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @author		Michael Baar <michael.baar@fu-berlin.de>
- * @version     $Revision: 3914 $
+ * @version     $Revision$
  *
- * @note		$Id: syscalls.c 3914 2012-02-14 09:31:06Z hwill $
+ * @note		$Id$
  */
 
 #include <errno.h>
@@ -45,16 +45,15 @@ and the mailinglist (subscription via web site)
 #include <stdint.h>
 // core
 #include "kernel.h"
-// sys
-#include "lpm.h"
-#include "tracelog.h"
-#include "hal-syscalls.h"
+#include "irq.h"
+#include "io.h"
 
 /* When using the HAL standard in and out are handled by HAL
    devices. */
 #if FEUERWARE_CONF_ENABLE_HAL
 #include "hal.h"
 #include "interface-chardevice.h"
+#include "hal-syscalls.h"
 #endif
 
 #define DEBUG_SYSCALLS			0
@@ -88,8 +87,7 @@ static caddr_t heap[NUM_HEAPS] = {(caddr_t)&__heap1_start,(caddr_t)&__heap3_star
 static const caddr_t heap_max[NUM_HEAPS] = {(caddr_t)&__heap1_max,(caddr_t)&__heap3_max,(caddr_t)&__heap2_max};
 // start position in heap
 static const caddr_t heap_start[NUM_HEAPS] = {(caddr_t)&__heap1_start,(caddr_t)&__heap3_start,(caddr_t)&__heap2_start};
-// current heap in use
-volatile static uint8_t iUsedHeap = 0;
+
 
 /** @} */
 
@@ -127,7 +125,7 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
     uint32_t cpsr = disableIRQ();
 
     /* check all heaps for a chunk of the requested size */
-	for( ; iUsedHeap < NUM_HEAPS; iUsedHeap++ ) {
+	for(volatile uint8_t iUsedHeap = 0; iUsedHeap < NUM_HEAPS; iUsedHeap++ ) {
 		caddr_t new_heap = heap[iUsedHeap] + incr;
 
 		#ifdef MODULE_TRACELOG
@@ -151,7 +149,7 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
 	#endif
 
 	r->_errno = ENOMEM;
-	return NULL;
+    return NULL;
 }
 /*---------------------------------------------------------------------------*/
 int _isatty_r(struct _reent *r, int fd)
@@ -249,6 +247,9 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 			#ifdef MODULE_FAT
 				result = ff_write_r(r, fd, data, count);
 			#endif
+			PRINTF("write [%i] data @%p count %i\n", fd, data, count);
+
+			PRINTF("write [%i] returned %i errno %i\n", fd, result, r->_errno);
 			break;
 	}
 
@@ -262,27 +263,36 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 #ifdef MODULE_FAT
 	result = ff_read_r(r, fd, buffer, count);
 #endif
-	return result;
+    PRINTF("read [%i] buffer @%p count %i\n", fd, buffer, count);
+	PRINTF("read [%i] returned %i\n", fd, result);
+	
+    return result;
 }
 /*---------------------------------------------------------------------------*/
 int _close_r(struct _reent *r, int fd)
 {
-	int ret = -1;
+	int result = -1;
 	r->_errno = EBADF;
 	#ifdef MODULE_FAT
 		ret = ff_close_r(r, fd);
 	#endif
-	return ret;
+    PRINTF("close [%i]\n", fd);
+	PRINTF("close returned %i errno %i\n", result, errno);
+	
+    return result;
 }
 /*---------------------------------------------------------------------------*/
 int _unlink_r(struct _reent *r, char* path)
 {
-	int ret = -1;
+	int result = -1;
 	r->_errno = ENODEV;
 #ifdef MODULE_FAT
-	ret = ff_unlink_r(r, path);
+	result = ff_unlink_r(r, path);
 #endif
-	return ret;
+    PRINTF("unlink '%s'\n", path);
+	PRINTF("unlink returned %i errno %i\n", result, errno);
+	
+    return result;
 }
 /*---------------------------------------------------------------------------*/
 void _exit(int n)

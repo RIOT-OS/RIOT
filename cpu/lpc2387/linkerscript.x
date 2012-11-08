@@ -27,11 +27,11 @@ and the mailinglist (subscription via web site)
 /* specify the LPC2387 memory areas (see LPC2387 datasheet page 15)  */
 MEMORY 
 {
-	flash     			: ORIGIN = 0,          LENGTH = 512K	/* FLASH ROM                            	*/
+	flash     			: ORIGIN = 0,          LENGTH = 504K	/* FLASH ROM 512kByte without ISP bootloader*/
     infomem             : ORIGIN = 0x0007D000, LENGTH = 4K      /* Last sector in FLASH ROM for config data */
 	ram_battery			: ORIGIN = 0xE0084000, LENGTH = 2K		/* Battery RAM								*/
 	ram   				: ORIGIN = 0x40000000, LENGTH = 64K		/* LOCAL ON-CHIP STATIC RAM					*/
-	ram_usb				: ORIGIN = 0x7FD00000, LENGTH = 16K		/* USB RAM 									*/
+	ram_usb				: ORIGIN = 0x7FD00000, LENGTH = 16K		/* USB RAM 	!!! first 1024 bytes are occupied from GPDMA for MCI */
 	ram_ethernet		: ORIGIN = 0x7FE00000, LENGTH = 16K		/* ethernet RAM 							*/
 }
 
@@ -177,7 +177,27 @@ SECTIONS
 		*(.gnu.linkonce.d*)
 	} >ram								/* put all the above into RAM (but load the LMA copy into FLASH) */
 	. = ALIGN(4);						/* ensure data is aligned so relocation can use 4-byte operations */
-	_edata = .;							/* define a global symbol marking the end of the .data section  */	
+	_edata = .;							/* define a global symbol marking the end of the .data section  */
+	
+	
+	/*
+	 * Exception frames (newer linker versions generate these but they use of 
+	 * most of the RAM.
+	 */
+    /DISCARD/ :							/* discard exception frames */
+    {
+        *(.eh_*)
+    }
+
+	/* to enable exception frames */
+	/*
+	.eh_frame :					
+	{
+		 KEEP (*(.eh_frame))
+	} > ram
+	. = ALIGN(4);
+	*/
+	
 	_end = .;							/* define a global symbol marking the end of application RAM */
 
 	__heap1_size = ORIGIN(ram) + LENGTH(ram) - . - __stack_size;
@@ -219,12 +239,23 @@ SECTIONS
 		PROVIDE(__heap2_max = .);		/* _heap shall always be < _heap_max */
 	} > ram_ethernet
 
+	. = ORIGIN(ram_usb);
 	.usbdata (NOLOAD) :					/* USB RAM section, may be used otherwise if USB is disabled */
 	{
 		*(.usbdata)
 	} > ram_usb
 	
-	.batteryram (NOLOAD) :				/* battery ram stay on during powerdown but needs to be handled specially */
+	.heap3 ALIGN(0x1000) (NOLOAD) :
+	{
+		__heap3_size = ORIGIN(ram_usb) + LENGTH(ram_usb) - ABSOLUTE(.);
+		PROVIDE(__heap3_start = . );
+		. += __heap3_size;
+		PROVIDE(__heap3_max = .);
+	} > ram_usb
+	__heap_size = SIZEOF(.heap3);
+	
+	
+	.batteryram (NOLOAD) :				/* battery ram stays on during powerdown but needs to be handled specially */
 	{
 		*(.batteryram)
 	} > ram_battery	
