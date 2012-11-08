@@ -6,8 +6,8 @@ PREFIX=${HOME}/gnuarm
 # directory to download source files and store intermediates 
 GNUARM_BUILDDIR=${GNUARM_BUILDDIR:-"/tmp/gnuarm-${USER}"}
 
-GCC_VER=4.6.2
-GCC_MD5=780f614ab18c7a9066dec6387d7490b2
+GCC_VER=4.7.2
+GCC_MD5=cc308a0891e778cfda7a151ab8a6e762
 
 BINUTILS_VER=2.20.1
 BINUTILS_MD5=2b9dc8f2b7dbd5ec5992c6e29de0b764
@@ -53,11 +53,11 @@ build_binutils() {
 build_gcc() {
     echo "Building gcc..."
     if [ ! -e .gcc_extracted ] ; then 
-	    tar -xjf ${FILES}/gcc-core-${GCC_VER}.tar.bz2 &&
+	    tar -xjf ${FILES}/gcc-${GCC_VER}.tar.bz2 &&
         touch .gcc_extracted
     fi 
     rm -rf gcc-build && mkdir -p gcc-build && cd gcc-build &&
-	../gcc-${GCC_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib --enable-languages="c" --with-newlib --enable-lto --disable-libssp --with-headers=${GNUARM_BUILDDIR}/newlib-${NEWLIB_VER}/newlib/libc/include && 
+	../gcc-${GCC_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib --enable-languages="c,c++" --with-newlib --enable-lto --disable-libssp --with-headers=${GNUARM_BUILDDIR}/newlib-${NEWLIB_VER}/newlib/libc/include --enable-obsolete && 
 	
     make ${MAKE_THREADS} all &&
 	make install &&
@@ -125,7 +125,7 @@ export PATH=$PATH:${PREFIX}/bin
 
 download() {
     download_file http://ftp.gnu.org/gnu/binutils binutils-${BINUTILS_VER}.tar.bz2 ${BINUTILS_MD5} &&
-    download_file ftp://ftp.fu-berlin.de/unix/languages/gcc/releases/gcc-${GCC_VER} gcc-core-${GCC_VER}.tar.bz2 ${GCC_MD5} &&
+    download_file ftp://ftp.fu-berlin.de/unix/languages/gcc/releases/gcc-${GCC_VER} gcc-${GCC_VER}.tar.bz2 ${GCC_MD5} &&
     download_file ftp://sources.redhat.com/pub/newlib newlib-${NEWLIB_VER}.tar.gz ${NEWLIB_MD5} &&
     download_file http://ftp.gnu.org/gnu/gdb gdb-${GDB_VER}.tar.bz2 ${GDB_MD5}
 }
