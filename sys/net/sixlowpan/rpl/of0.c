@@ -47,6 +47,7 @@ rpl_parent_t * which_parent(rpl_parent_t *p1, rpl_parent_t *p2){
 	return p2;
 }
 
+//Not used yet, as the implementation only makes use of one dodag for now.
 rpl_dodag_t * which_dodag(rpl_dodag_t *d1, rpl_dodag_t *d2){
 	return d1;
 }

@@ -199,26 +199,3 @@ int main(void) {
     return 0;
 }
 
-
-
-int old_main(void)
-{
-	timex_t mytime = timex_set(10,0);
-    while(1){
-		
-		rpl_routing_entry_t * rtable;
-		rtable = rpl_get_routing_table();
-		printf("---------------------------\n");
-		printf("OUTPUT\n");
-		printf("---------------------------\n");
-		for(int i=0;i<RPL_MAX_ROUTING_ENTRIES;i++){
-			if(rtable[i].used){
-				ipv6_print_addr(&rtable[i].address);
-				printf("--------------\n");
-			}
-		}
-		
-		vtimer_sleep(mytime);	
-	};
-}
-
