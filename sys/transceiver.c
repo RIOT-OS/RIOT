@@ -340,7 +340,7 @@ void receive_cc1100_packet(radio_packet_t *trans_p) {
  */
 static uint8_t send_packet(transceiver_type_t t, void *pkt) {
     uint8_t res = 0;
-#ifdef MODULE_CC110x
+#ifdef MODULE_CC110X
     int snd_ret;
 #endif
     radio_packet_t p = *((radio_packet_t*) pkt);
