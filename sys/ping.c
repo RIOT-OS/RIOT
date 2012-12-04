@@ -6,7 +6,6 @@
 #include "drivers/cc110x/cc1100.h"
 #include "lpc2387.h"
 
-#include "ktimer.h"
 #include "swtimer.h"
 #include "gpioint.h"
 #include <ping.h>
