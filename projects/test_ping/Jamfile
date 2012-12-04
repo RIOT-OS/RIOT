@@ -1,0 +1,5 @@
+SubDir TOP projects test_ping ;
+
+Module test_ping : main.c ;
+
+UseModule test_ping ;
