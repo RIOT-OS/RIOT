@@ -42,7 +42,7 @@ void help(char* unused) {
     printf("\tping [address] (time)\n");
     printf("\tstop\n");
     printf("\n");
-    printf("[] = mandatory, () = optional");
+    printf("[] = mandatory, () = optional\n");
 }
 
 /**
