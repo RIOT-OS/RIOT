@@ -57,6 +57,4 @@ int main(void) {
 	shell_run(&shell);
 
 	return 0;
-	while (1)
-		;
 }
