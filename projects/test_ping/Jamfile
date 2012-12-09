@@ -1,5 +1,5 @@
 SubDir TOP projects test_ping ;
 
-Module test_ping : main.c : shell shell_commands ps uart0 posix_io auto_init vtimer cc110x ;
+Module test_ping : main.c : shell shell_commands ps uart0 posix_io auto_init vtimer 6lowpan cc110x transceiver ;
 
 UseModule test_ping ;
