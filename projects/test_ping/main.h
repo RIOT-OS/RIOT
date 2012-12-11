@@ -34,9 +34,9 @@ void init(char * arg);
  * Sends out pings from this node to another node in a continuous manner, until
  * the stop command is used.
  */
-//void ping(char * arg);
+void ping(char * arg);
 
-//uint16_t get_radio_address(void);
+uint16_t get_radio_address(void);
 
 void set_radio_address(uint8_t addr);
 
