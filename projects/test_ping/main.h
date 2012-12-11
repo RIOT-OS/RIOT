@@ -2,10 +2,14 @@
 
 #define PING_TEST_H
 
+#include <stdint.h>
+
 #define MIN_ADDR 1
 #define MIN_CHAN MIN_ADDR
 #define MAX_CHAN 14
 #define MAX_ADDR 255
+#define SND_BUFFER_SIZE     (100)
+#define RCV_BUFFER_SIZE     (64)
 
 /**
  * @brief Shows a helping text.
@@ -30,7 +34,15 @@ void init(char * arg);
  * Sends out pings from this node to another node in a continuous manner, until
  * the stop command is used.
  */
-void ping();
+//void ping(char * arg);
+
+//uint16_t get_radio_address(void);
+
+void set_radio_address(uint8_t addr);
+
+void set_radio_channel(uint8_t chan);
+
+void switch_to_rx(void);
 
 /**
  * Stops any current pinging-action by this node and prints a summary of how
@@ -41,5 +53,7 @@ void ping();
  * @param arg
  */
 void stop(char * arg);
+
+void radio(void);
 
 #endif /* PING_TEST_H */
