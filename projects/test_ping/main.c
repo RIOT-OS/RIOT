@@ -15,8 +15,9 @@
 //net stuff
 #include <transceiver.h>
 #include <cc1100.h>
+#include <pingpong.h>
 
-#define SHELL_STACK (2048)
+#define SHELL_STACK (4500)
 #define RADIO_STACK (2048)
 
 #define SND_BUFFER_SIZE     (100)
@@ -32,8 +33,8 @@ msg_t msg_q[RCV_BUFFER_SIZE];
 transceiver_command_t tcmd;
 msg_t mesg;
 
+static bool isinit = false;
 static int radio_pid;
-static radio_packet_t p;
 
 // Shell commands for this application
 const shell_command_t shell_commands[] =
@@ -43,12 +44,9 @@ const shell_command_t shell_commands[] =
                         init },
                 { "ping", "Makes this node a pinging node", ping },
                 { "stop", "Stops the current node's pings and prints a summary",
-                        stop },
+                        stop_pings },
                 { NULL, NULL, NULL }
         };
-
-// pid of ongoing ping thread, 0 if not set
-int pid_pingthread = 0;
 
 // see header for documentation
 void init(char* arg) {
@@ -82,11 +80,7 @@ void init(char* arg) {
             set_radio_channel((uint8_t) chan);
 
             printf("radio address is %d\n", get_radio_address());
-            puts("turning on..");
-
-            switch_to_rx();
-
-            puts("done");
+            isinit = true;
         } else {
             printf("ERROR: The address for the node has to be in %d to %d.\n",
                     MIN_ADDR, MAX_ADDR);
@@ -150,29 +144,24 @@ void help(char* cmdname) {
     }
 }
 
-// see header for docs
+// see header for documentation
 void ping(char* arg) {
     uint16_t addr;
+
+    if (!isinit) {
+        // don't try to send without proper init
+        puts("[ERROR] Cannot send while radio is not initialized!");
+        return;
+    }
 
     int res = sscanf(arg, "ping %hu", &addr);
 
     if (res > 0) {
         if (addr < MAX_ADDR) {
             printf("Ready to send to address %d\n", addr);
-            //todo do something that makes sense actually
-            mesg.type = SND_PKT;
-            mesg.content.ptr = (char*) &tcmd;
 
-            tcmd.transceivers = TRANSCEIVER_CC1100;
-            tcmd.data = &p;
+            pingpong(addr, 5);
 
-            p.length = 4;
-            p.dst = addr;
-
-            puts("sending..");
-            p.data = "ping";
-            msg_send(&mesg, transceiver_pid, 1);
-            puts("sent");
         } else {
             printf("ERROR: Please give an address which is in range %d to %d.",
                     MIN_ADDR, MAX_ADDR);
@@ -183,6 +172,7 @@ void ping(char* arg) {
     }
 }
 
+// see header for documentation
 void set_radio_address(uint8_t address) {
     uint16_t addr = (uint16_t) address;
 
@@ -193,6 +183,7 @@ void set_radio_address(uint8_t address) {
     msg_send_receive(&mesg, &mesg, transceiver_pid);
 }
 
+// see header for documentation
 uint16_t get_radio_address(void) {
     uint16_t result;
 
@@ -204,6 +195,7 @@ uint16_t get_radio_address(void) {
     return result;
 }
 
+// see header for documentation
 void set_radio_channel(uint8_t channel) {
     uint16_t chan = (uint16_t) channel;
 
@@ -214,48 +206,42 @@ void set_radio_channel(uint8_t channel) {
     msg_send_receive(&mesg, &mesg, transceiver_pid);
 }
 
-void switch_to_rx(void) {
-    mesg.type = SWITCH_RX;
-    mesg.content.ptr = (char*) &tcmd;
-    tcmd.transceivers = TRANSCEIVER_CC1100;
-    msg_send(&mesg, transceiver_pid, 1);
+// see header for documentation
+void stop_pings(char* unused) {
+    stop();
 }
 
-void powerdown(char *unused) {
-    mesg.type = POWERDOWN;
-    mesg.content.ptr = (char*) &tcmd;
-
-    tcmd.transceivers = TRANSCEIVER_CC1100;
-    msg_send(&mesg, transceiver_pid, 1);
-}
-
-void stop(char* unused) {
-    //TODO implement
-    if (pid_pingthread) {
-    }
-}
-
+// see header for documentation
 void radio(void) {
     msg_t m;
     radio_packet_t *p;
-    uint8_t i;
-
+    ping_packet_t *ping_pkt;
     msg_init_queue(msg_q, RCV_BUFFER_SIZE);
 
     while (1) {
         msg_receive(&m);
+
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t*) m.content.ptr;
+            ping_pkt = (ping_packet_t*) p->data;
+
             printf("Packet waiting, process %p...\n", p);
             printf("\tLength:\t%u\n", p->length);
             printf("\tSrc:\t%u\n", p->src);
             printf("\tDst:\t%u\n", p->dst);
             printf("\tLQI:\t%u\n", p->lqi);
             printf("\tRSSI:\t%u\n", p->rssi);
+            printf("Type: %d, ", ping_pkt->type);
+            printf("Seq#: %d\n", ping_pkt->seq_nr);
 
-            for (i = 0; i < p->length; i++) {
-                printf("%02X ", p->data[i]);
+            if (ping_pkt->type == PING) {
+                ping_incoming((uint8_t) p->src);
+            } else if (ping_pkt->type == PING_ACK) {
+                ack_incoming();
+            } else if (ping_pkt->type == PING_BCST) {
+                broadcast_incoming();
             }
+
             p->processing--;
             printf("\n");
         }
@@ -291,7 +277,7 @@ int main(void) {
 
     while (true) {
         //sleep a sec
-        vtimer_usleep(1000 * 1000);
+        vtimer_usleep(1 * SECOND);
     }
 
     return 0;
