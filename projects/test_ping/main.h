@@ -18,6 +18,13 @@
 #define MAX_CHAN MAX_CHANNR
 
 /**
+ * Maximum and minimum duration times
+ * TODO change min duration to 0 once stopping works as intended
+ */
+#define MIN_DURATION 1
+#define MAX_DURATION UINT16_MAX
+
+/**
  * Receive- and send-buffer size
  */
 #define SND_BUFFER_SIZE     (100)
@@ -39,6 +46,17 @@ void help(char * commandname);
  * @param arg
  */
 void init(char * arg);
+
+/**
+ * @brief broadcasts for a specified duration
+ *
+ * Broadcasts a pingmessage from this node in a continuous manner until the
+ * duration (in seconds) is over or the stop command is used.
+ * If the duration is set to 0, it broadcasts endlessly until the stop command
+ * is used.
+ * @param arg
+ */
+void broadcast(char* arg);
 
 /**
  * @brief Pings another node.
@@ -73,7 +91,7 @@ void set_radio_address(uint8_t addr);
 void set_radio_channel(uint8_t chan);
 
 /**
- * @brief Stops this node from pinging.
+ * @brief Stops this node from sending broadcasts or pings.
  *
  * Stops any current pinging-action by this node and prints a summary of how
  * many pings got returned.
@@ -82,7 +100,7 @@ void set_radio_channel(uint8_t chan);
  *
  * @param arg unused
  */
-void stop_pings(char * arg);
+void stop(char * arg);
 
 /**
  * @brief The thread for the processing of received radio-packets.

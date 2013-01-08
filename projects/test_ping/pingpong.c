@@ -30,11 +30,12 @@ msg_t mesg;
 // see header for documentation
 void stop_after_time() {
     vtimer_usleep(time * SECOND);
-    stop();
+    stop_now();
 }
 
 // see header for documentation
-void stop() {
+void stop_now() {
+    puts("stopping now");
     cont_ping = false;
 }
 
@@ -75,8 +76,10 @@ void wait_pong() {
 
 // see header for documentation
 void broadcast_without_ack(uint16_t duration) {
+    cont_ping = true;
     time = duration;
 
+    puts("Setting up broadcast");
     if (time) {
         //A time has been given after which pings should not be sent anymore
         thread_create(stack_stop, XS_STACK, PRIORITY_MAIN - 2, 0,
@@ -84,9 +87,11 @@ void broadcast_without_ack(uint16_t duration) {
     }
 
     while (cont_ping) {
+    puts("Setting up packet");
+        //TODO replace swtimer with vtimer
         start = swtimer_now();
         send_broadcast();
-        vtimer_usleep(500 * 1000);
+        vtimer_usleep(1 * SECOND);
     }
 }
 
@@ -167,6 +172,7 @@ void send_ack(uint8_t addr) {
 
 // see header for documentation
 void send_broadcast() {
+    puts("Preparing broadcast ping");
     mesg.type = SND_PKT;
     mesg.content.ptr = (char*) &tcmd;
 

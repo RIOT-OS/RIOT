@@ -96,12 +96,12 @@ void send_broadcast();
 void calc_rtt(void);
 
 /**
- * @brief The internal method to stop this node from pinging a target.
+ * @brief The internal method to stop this node from pinging or broadcasting.
  *
  * This method should be used for example if a ping was given without a
  * duration, so without manually stopping the node it would send endlessly.
  */
-void stop(void);
+void stop_now(void);
 
 /**
  * @brief The internal thread that stops this node from pinging a target after a

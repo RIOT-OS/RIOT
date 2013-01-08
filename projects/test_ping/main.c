@@ -42,9 +42,10 @@ const shell_command_t shell_commands[] =
                 { "init",
                         "Initializes this node with an address and a channel.",
                         init },
+                { "broadcast", "Puts this node into broadcast mode", broadcast },
                 { "ping", "Makes this node a pinging node", ping },
                 { "stop", "Stops the current node's pings and prints a summary",
-                        stop_pings },
+                        stop },
                 { NULL, NULL, NULL }
         };
 
@@ -145,6 +146,37 @@ void help(char* cmdname) {
 }
 
 // see header for documentation
+void broadcast(char* arg) {
+    uint16_t duration;
+
+    if (!isinit) {
+        // don't try to send without proper init
+        puts("[ERROR] Cannot broadcast while radio is not initialized!");
+        return;
+    }
+
+    int res = sscanf(arg, "broadcast %hu", &duration);
+
+    if (res > 0) {
+        if (duration < MAX_ADDR) {
+            printf("Ready to broadcast for a duration of %d seconds\n",
+                    duration);
+
+            broadcast_without_ack(duration);
+
+        } else {
+            printf("ERROR: Please give a duration which is in range %d to %d.",
+                    MIN_DURATION, MAX_DURATION);
+        }
+    } else {
+        puts("ERROR: Please give a duration for which you wish to broadcast.");
+        puts(
+                "For more information on how to use broadcast, type 'help broadcast'.");
+    }
+
+}
+
+// see header for documentation
 void ping(char* arg) {
     uint16_t addr;
 
@@ -207,8 +239,11 @@ void set_radio_channel(uint8_t channel) {
 }
 
 // see header for documentation
-void stop_pings(char* unused) {
-    stop();
+void stop(char* unused) {
+    //TODO doesn't work, since broadcasting runs in the same thread, either del
+    //or make the whole thing threaded
+    puts("calling stop_now");
+    stop_now();
 }
 
 // see header for documentation
