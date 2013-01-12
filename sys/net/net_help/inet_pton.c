@@ -13,10 +13,14 @@
  * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
  * SOFTWARE.
  */
+
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
  
- #include <string.h>
+#include "sys/net/destiny/socket.h"
  
- #include "inet_pton.h"
+#include "inet_pton.h"
 
 /* int
  * inet_pton4(src, dst)

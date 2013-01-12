@@ -6,7 +6,7 @@
 #endif
 
 #ifndef INT16SZ
-#define INT16SZ sizeof(apr_int16_t)
+#define INT16SZ sizeof(int16_t)
 #endif
 
 #if !defined(EAFNOSUPPORT) && defined(WSAEAFNOSUPPORT)
