@@ -30,6 +30,7 @@ void broadcast_without_ack(uint16_t duration) {
 
     while(counter < seconds){
         puts("Setting up packet");
+        counter = counter + 1;
         send_broadcast();
         vtimer_usleep(1 * SECOND);
     }
