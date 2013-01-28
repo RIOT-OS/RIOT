@@ -43,9 +43,6 @@ const shell_command_t shell_commands[] =
                         "Initializes this node with an address and a channel.",
                         init },
                 { "broadcast", "Puts this node into broadcast mode", broadcast },
-                { "ping", "Makes this node a pinging node", ping },
-                { "stop", "Stops the current node's pings and prints a summary",
-                        stop },
                 { NULL, NULL, NULL }
         };
 
@@ -105,8 +102,6 @@ void help(char* cmdname) {
         puts("These are the usable commands:");
         puts("\thelp (commandname)");
         puts("\tinit [address] (channel)");
-        puts("\tping [address] (time)");
-        puts("\tstop");
         puts("");
         puts("[] = mandatory, () = optional");
     } else if (!strcasecmp("init", command)) {
@@ -119,29 +114,10 @@ void help(char* cmdname) {
         puts(" +---(channel): The radio-channel that this node should use");
         puts("                This argument is optional.");
         puts("                Uses a default channel if not given.");
-    } else if (!strcasecmp("ping", command)) {
-        puts(
-                "ping: Sends ping-messages to another node and records statistics on the number");
-        puts(
-                " +    of sent messages/received messages as well as the RTT of those pings.");
-        puts(" +");
-        puts(
-                " +---[address]: The radio-address that this node should send its pings to)");
-        puts(" +              This argument is mandatory.");
-        puts(" +");
-        puts(
-                " +---(time)   : The duration (in seconds) that these ping messages should ");
-        puts("                be sent over");
-        puts("                This argument is optional.");
-        puts("                Sends infinite pings when no time is given.");
-    } else if (!strcasecmp("stop", command)) {
-        puts("stop: Stops any ongoing pings this node sends out.");
-        puts(
-                "      If this node is currently not sending any pings, this command does nothing.");
     } else {
         puts("The command given was not recognized. You gave:");
         puts(command);
-        puts("Recognized commands are 'init','ping' and 'stop'");
+        puts("Recognized command is 'init'");
     }
 }
 
@@ -174,34 +150,6 @@ void broadcast(char* arg) {
                 "For more information on how to use broadcast, type 'help broadcast'.");
     }
 
-}
-
-// see header for documentation
-void ping(char* arg) {
-    uint16_t addr;
-
-    if (!isinit) {
-        // don't try to send without proper init
-        puts("[ERROR] Cannot send while radio is not initialized!");
-        return;
-    }
-
-    int res = sscanf(arg, "ping %hu", &addr);
-
-    if (res > 0) {
-        if (addr < MAX_ADDR) {
-            printf("Ready to send to address %d\n", addr);
-
-            pingpong(addr, 5);
-
-        } else {
-            printf("ERROR: Please give an address which is in range %d to %d.",
-                    MIN_ADDR, MAX_ADDR);
-        }
-    } else {
-        puts("ERROR: Please give an address which you wish to ping.");
-        puts("For more information on how to use ping, type 'help ping'.");
-    }
 }
 
 // see header for documentation
@@ -239,14 +187,6 @@ void set_radio_channel(uint8_t channel) {
 }
 
 // see header for documentation
-void stop(char* unused) {
-    //TODO doesn't work, since broadcasting runs in the same thread, either del
-    //or make the whole thing threaded
-    puts("calling stop_now");
-    stop_now();
-}
-
-// see header for documentation
 void radio(void) {
     msg_t m;
     radio_packet_t *p;
@@ -269,11 +209,7 @@ void radio(void) {
             printf("Type: %d, ", ping_pkt->type);
             printf("Seq#: %d\n", ping_pkt->seq_nr);
 
-            if (ping_pkt->type == PING) {
-                ping_incoming((uint8_t) p->src);
-            } else if (ping_pkt->type == PING_ACK) {
-                ack_incoming();
-            } else if (ping_pkt->type == PING_BCST) {
+            if (ping_pkt->type == PING_BCST) {
                 broadcast_incoming();
             }
 

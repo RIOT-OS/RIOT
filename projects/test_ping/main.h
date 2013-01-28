@@ -59,14 +59,6 @@ void init(char * arg);
 void broadcast(char* arg);
 
 /**
- * @brief Pings another node.
- *
- * Sends out pings from this node to another node in a continuous manner, until
- * the stop command is used.
- */
-void ping(char * arg);
-
-/**
  * @brief Returns the radio address of this device.
  *
  * @return The radio-address of the device. Undefined if radio-address has not
@@ -89,18 +81,6 @@ void set_radio_address(uint8_t addr);
  * @param chan The channel number to set.
  */
 void set_radio_channel(uint8_t chan);
-
-/**
- * @brief Stops this node from sending broadcasts or pings.
- *
- * Stops any current pinging-action by this node and prints a summary of how
- * many pings got returned.
- * If the node was not pinging at the time of the method-call, this method does
- * nothing.
- *
- * @param arg unused
- */
-void stop(char * arg);
 
 /**
  * @brief The thread for the processing of received radio-packets.
