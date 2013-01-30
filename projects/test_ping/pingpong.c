@@ -34,6 +34,7 @@ void broadcast_without_ack(uint16_t duration) {
         send_broadcast();
         vtimer_usleep(1 * SECOND);
     }
+    puts("stopping now");
 }
 
 // see header for documentation
