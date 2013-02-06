@@ -1,0 +1,3 @@
+[submodule "board"]
+	path = board
+	url = git@github.com:RIOT-OS/boards.git
