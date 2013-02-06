@@ -8,7 +8,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "lpc2387.h"
-#include "benchmark.h"
 
 void  benchmark_init(void)
 {

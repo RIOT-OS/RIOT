@@ -1,5 +1,5 @@
 SRC = $(wildcard *.c)
-BINDIR = bin/
+BINDIR = $(RIOTBOARD)/$(BOARD)/bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 
 DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -7,11 +7,12 @@ DEP = $(SRC:%.c=$(BINDIR)%.d)
 INCLUDES += -I$(RIOTBOARD)/msba2-common/include/
 INCLUDES += -I$(RIOTBASE)/cpu/arm_common/include/
 INCLUDES += -I$(RIOTBASE)/cpu/lpc2387/include/
+INCLUDES += -I$(RIOTBASE)/drivers/include/
 
-all: $(BINDIR)msba2_base.a 
-	$(MAKE) -C ../msba2-common
+all: $(BINDIR)msba2_common_base.a 
+	$(MAKE) -C drivers
 
-$(BINDIR)msba2_base.a: $(OBJ)
+$(BINDIR)msba2_common_base.a: $(OBJ)
 	$(AR) rcs $(BINDIR)msba2_base.a $(OBJ)
 
 # pull in dependency info for *existing* .o files
@@ -25,6 +26,6 @@ $(BINDIR)%.o: %.c
 
 # remove compilation products
 clean:
-	$(MAKE) -C ../msba2-common clean
-	rm -f $(BINDIR)msba2_base.a $(OBJ) $(DEP)
+	make -C drivers clean
+	rm -f $(OBJ) $(DEP)
 
