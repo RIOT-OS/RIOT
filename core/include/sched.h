@@ -21,8 +21,8 @@
 #define SCHED_PRIO_LEVELS 16
 #endif
 
-void sched_init();
-void sched_run();
+void sched_init(void);
+void sched_run(void);
 
 void sched_set_status(tcb_t *process, unsigned int status);
 void sched_switch(uint16_t current_prio, uint16_t other_prio, int in_isr);

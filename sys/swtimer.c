@@ -30,13 +30,13 @@
 /* workaround for buggy mspgcc signal.h */
 #undef wakeup
 
-static void swtimer_update_alarm();
+static void swtimer_update_alarm(void);
 static void swtimer_action(swtimer_t *swtimer);
 static void swtimer_trigger(void* ptr);
 static void swtimer_tick(void *ptr);
 static int swtimer_activate(swtimer_t *t);
 static void swtimer_priolist_insert(swtimer_t *t);
-static void swtimer_update_values();
+static void swtimer_update_values(void);
 
 static swtimer_t *swtimer_list = NULL;
 static volatile swtime_t system_time = 0;
@@ -46,7 +46,7 @@ static volatile int hwtimer_id = -1;
 
 extern unsigned long hwtimer_now(void);
 
-int swtimer_init() {
+int swtimer_init(void) {
     hwtimer_set_absolute(HWTIMER_MAXTICKS, swtimer_tick, NULL);
     return 0;
 }
@@ -84,7 +84,7 @@ static int swtimer_activate(swtimer_t *t) {
     return 0;
 }
 
-static void swtimer_update_values() {
+static void swtimer_update_values(void) {
             swtimer_next_alarm_absolute = swtimer_list->start + swtimer_list->interval;
             swtime_t now = swtimer_now();
             swtime_t offset = swtimer_next_alarm_absolute - now;
@@ -125,7 +125,7 @@ int swtimer_remove(swtimer_t *t) {
     return 0;
 }
 
-swtime_t swtimer_now() {
+swtime_t swtimer_now(void) {
     swtime_t now = system_time;
     now += HWTIMER_TICKS_TO_US(hwtimer_now());
     return now;
@@ -254,7 +254,7 @@ static void swtimer_trigger(void* ptr) {
 }
 
 
-static void swtimer_update_alarm() {
+static void swtimer_update_alarm(void) {
     DEBUG("swtimer_check_elapsed: Checking for elapsed timer...\n");
     
     while (swtimer_list) {

@@ -1,0 +1,26 @@
+export MAKEBASE =$(RIOTBASE)
+export BINDIR =$(RIOTBASE)/bin/
+#UNDEF =  $(BINDIR)startup.o $(BINDIR)builddate.o
+UNDEF =  $(BINDIR)startup.o
+
+### Minimal setup
+ifeq ($(CPU),lpc2387)
+  USEMODULE += arm_common
+  UNDEF += $(BINDIR)syscalls.o
+endif
+ifeq ($(CPU),lpc214x)
+  USEMODULE += arm_common
+  UNDEF += $(BINDIR)syscalls.o
+endif
+ifeq ($(CPU),cc430)
+USEMODULE += cpu core lib sys
+else
+#USEMODULE += cpu_drivers cpu core lib sys
+USEMODULE += cpu core sys
+endif
+ED = $(USEMODULE:%=-D MODULE_%)
+EXTDEFINES = $(shell echo $(ED)|tr 'a-z' 'A-Z')
+export BASELIBS=$(USEMODULE:%= $(BINDIR)%.a)
+CFLAGS += $(EXTDEFINES)
+
+export USEMODULE

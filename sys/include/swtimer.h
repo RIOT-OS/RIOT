@@ -65,13 +65,13 @@ typedef struct swtimer_t {
  * @brief   Current system time
  * @return  Time in ticks since system boot
  */
-swtime_t swtimer_now();
+swtime_t swtimer_now(void);
 
 /**
  * @brief   Initializes swtimer
  * @return  always 0
  */
-int swtimer_init();
+int swtimer_init(void);
 
 /**
  * @brief   set swtimer interval and activate 

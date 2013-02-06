@@ -47,7 +47,7 @@ static int set_longterm(vtimer_t *timer) {
     return 0;
 }
 
-static int update_shortterm() {
+static int update_shortterm(void) {
     if (hwtimer_id != -1) {
         if (hwtimer_next_absolute != shortterm_queue_root.next->priority) {
             hwtimer_remove(hwtimer_id);

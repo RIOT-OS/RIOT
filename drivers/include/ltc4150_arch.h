@@ -52,7 +52,7 @@ void ltc4150_disable_int(void);
 void ltc4150_enable_int(void);
 void ltc4150_sync_blocking(void); 
 void ltc4150_arch_init(void);
-void ltc4150_interrupt();
+void ltc4150_interrupt(void);
 
 /** @} */
 #endif /* __LTC4150_ARCH_H */

@@ -43,7 +43,6 @@ and the mailinglist (subscription via web site)
 
 #include <stdio.h>
 #include <stdint.h>
-#include "board.h"
 #include "lpc23xx.h"
 #include "lpc2387.h"
 #include "lpm.h"

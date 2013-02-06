@@ -43,14 +43,14 @@ typedef struct vtimer_t {
  * @brief   Current system time
  * @return  Time as timex_t since system boot
  */
-timex_t vtimer_now();
+timex_t vtimer_now(void);
 
 /**
  * @brief   Initializes the vtimer subsystem. To be called once at system initialization. Will be initialized by auto_init.
  *
  * @return  always 0
  */
-int vtimer_init();
+int vtimer_init(void);
 
 /**
  * @brief   will cause the calling thread to be suspended from excecution until the number of microseconds has elapsed

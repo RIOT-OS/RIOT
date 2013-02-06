@@ -3,7 +3,7 @@
 #include <thread.h>
 #include <msg.h>
 
-#include "drivers/cc110x/cc1100.h"
+#include "cc110x/cc1100.h"
 #include "lpc2387.h"
 
 #include "swtimer.h"
@@ -53,11 +53,11 @@ void ping(radio_address_t addr, uint8_t channr){
 			protocol_id,2,pipa->payload,sizeof(pipa->payload));
 		if(trans_ok < 0)
 			print_failed();
-		ktimer_wait(500000);
+		hwtimer_wait(500000);
 	}
 }
 
-void calc_rtt(){
+void calc_rtt(void){
 	uint64_t end = swtimer_now();
 	
 	rtt = ((float)end - (float)start)/1000;	

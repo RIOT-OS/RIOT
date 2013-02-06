@@ -40,7 +40,7 @@ int mutex_trylock(struct mutex_t* mutex) {
     return (atomic_set_return(&mutex->val, thread_pid ) == 0);
 }
 
-int prio() {
+int prio(void) {
     return active_thread->priority;
 }
 

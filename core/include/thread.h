@@ -46,7 +46,7 @@ unsigned int thread_getstatus(int pid);
 /**
  * @brief   Puts the current thread into sleep mode. Has to be woken up externally.
  */
-void thread_sleep();
+void thread_sleep(void);
 
 /**
  * @brief   Wakes up a sleeping thread.
@@ -60,13 +60,13 @@ int thread_wakeup(int pid);
  * @brief   Returns the process ID of the currently running thread.
  * @return  Obviously you are not a golfer.
  */
-int thread_getpid();
+int thread_getpid(void);
 
 /**
  * @brief   Returns the process ID of the thread running before the current one.
  * @return  Obviously you are not a golfer.
  */
-int thread_getlastpid();
+int thread_getlastpid(void);
 
 /**
  * @brief Measures the stack usage of a stack.

@@ -23,12 +23,12 @@
 #define ENABLE_DEBUG
 #include <debug.h>
 
-extern void *sbrk(int incr);
+//extern void *sbrk(int incr);
 
 void *_malloc(size_t size) {
     void* ptr = sbrk(size);
     
-    DEBUG("_malloc(): allocating block of size %u at 0x%X.\n", size, (unsigned int)ptr);
+    DEBUG("_malloc(): allocating block of size %u at 0x%X.\n", (unsigned int) size, (unsigned int)ptr);
     
     if (ptr != (void*)-1) {
         return ptr;
