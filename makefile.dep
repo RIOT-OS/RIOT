@@ -1,0 +1,27 @@
+ifneq (,$(findstring vtimer,$(USEMODULE)))
+	ifeq (,$(findstring hwtimer,$(USEMODULE)))
+		USEMODULE += hwtimer
+	endif
+	ifeq (,$(findstring timex,$(USEMODULE)))
+		USEMODULE += timex
+	endif
+endif
+
+ifneq (,$(findstring uart0,$(USEMODULE)))
+	ifeq (,$(findstring lib,$(USEMODULE)))
+		USEMODULE += lib	
+	endif
+endif
+
+ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
+  ifneq (,$(findstring msba2,$(BOARD)))
+  	USEMODULE += cc110x_spi
+	ifeq (,$(findstring gpioint,$(USEMODULE)))
+		USEMODULE += gpioint
+	endif
+	ifeq (,$(findstring hwtimer,$(USEMODULE)))
+		USEMODULE += hwtimer
+	endif
+  endif
+endif
+

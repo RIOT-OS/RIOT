@@ -18,8 +18,7 @@ const char *state_names[] = {
 /**
  * @brief Prints a list of running threads including stack usage to stdout.
  */
-void thread_print_all(void)
-{
+void thread_print_all(void) {
     extern unsigned long hwtimer_now(void);
     const char queued_name[] = {'_', 'Q'};
     int i;
@@ -49,8 +48,3 @@ void thread_print_all(void)
     }
     printf("\t%5s %-21s|%13s%6s %5i\n", "|", "SUM", "|", "|", overall_stacksz);
 }
-
-void _ps_handler(char* unnused) {
-    thread_print_all();
-}
-

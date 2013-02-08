@@ -20,7 +20,11 @@ USEMODULE += cpu core sys
 endif
 ED = $(USEMODULE:%=-D MODULE_%)
 EXTDEFINES = $(shell echo $(ED)|tr 'a-z' 'A-Z')
-export BASELIBS=$(USEMODULE:%= $(BINDIR)%.a)
+BL=$(USEMODULE:%= $(BINDIR)%.a)
+# exclude hwtimer, because it is part of the kernel but the define is needed for auto_init
+export BASELIBS = $(shell echo $(BL)|sed 's/[^ ]*hwtimer.a//')
 CFLAGS += $(EXTDEFINES)
+
+include $(RIOTBASE)/makefile.dep
 
 export USEMODULE

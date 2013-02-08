@@ -1,5 +1,16 @@
-INCLUDES = -I../../include -I../../net -I../include -I../../lib -I../../../.. -I../../../cpu/ -I../../../core/include -I../../ -Iinclude/
+INCLUDES = -I$(RIOTBASE)/sys/include -I../../net -I../include -I../../lib -I../../../.. -I../../../cpu/ -I$(RIOTBASE)/core/include -I../../ -Iinclude/
 MODULE =cc110x_ng
-include $(MAKEBASE)/makefile.base
 
+DIRS =
+ifneq (,$(findstring msba2,$(BOARD)))
+	DIRS += spi 
+endif
+
+all: $(BINDIR)$(MODULE).a
+	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
+
+include $(RIOTBASE)/makefile.base
+
+clean::
+	@for i in $(DIRS) ; do $(MAKE) -C $$i clean ; done ;
 

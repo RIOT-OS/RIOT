@@ -9,7 +9,7 @@
 
 #### Mandatory vars!
 
-# this has to be the absolute path of the feuerware-base dir
+# this has to be the absolute path of the RIOT-base dir
 export RIOTBASE =$(CURDIR)/../RIOT
 export RIOTBOARD =$(CURDIR)/../RIOT/board
 
@@ -26,9 +26,17 @@ export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
+FLASH = lpc2k_pgm
+TERM = pyterm.py
 LINKFLAGS = -gdwarf-2 -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T$(RIOTBASE)/cpu/$(CPU)/linkerscript.x
 
-## Modules to include. No autodependencies!
+PROJBINDIR = bin
+
+ifeq ($(strip $(PORT)),)
+	PORT = /dev/ttyUSB0
+endif
+
+## Modules to include. 
 
 #USEMODULE += nanopan5375_proprietary
 #USEMODULE += sys
@@ -57,9 +65,6 @@ LINKFLAGS = -gdwarf-2 -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T$(RIOTBASE)
 #USEMODULE += net_kernel
 #USEMODULE += net_mm
 
-# mandatory include! 
-include $(RIOTBASE)/makefile.modules 
-
 #### Project Config 
 
 # name of your project
@@ -68,6 +73,9 @@ PROJECT = hello-world
 # for easy switching of boards
 export BOARD = msba2
 
+# mandatory include! 
+include $(RIOTBASE)/makefile.modules 
+
 # if you want to publish the board into the sources as an uppercase #define
 BB = $(shell echo $(BOARD)|tr 'a-z' 'A-Z')
 CFLAGS += -DBOARD_$(BB)
@@ -75,31 +83,37 @@ export CFLAGS
 
 # your binaries to link
 BASELIBS += $(RIOTBOARD)/$(BOARD)/bin/$(BOARD)_base.a
-BASELIBS += bin/project.a
+BASELIBS += $(PROJBINDIR)/project.a
 
-INCLUDES = -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/cpu/$(CPU)/include -I$(RIOTBASE)/cpu/arm_common/include -I$(RIOTBASE)/sys/lib
+INCLUDES = -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/cpu/$(CPU)/include -I$(RIOTBASE)/cpu/arm_common/include -I$(RIOTBASE)/sys/lib -I$(RIOTBASE)/sys/include/ -I$(RIOTBASE)/drivers/include/
 
 export INCLUDES
 
-## make script for your project. Build feuerware-base here!
-all: bin/$(PROJECT).a
+## make script for your project. Build RIOT-base here!
+all: $(PROJBINDIR)/$(PROJECT).a
+	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(CPU)."
 	$(MAKE) -C $(RIOTBOARD)
 	$(MAKE) -C $(RIOTBASE)
-	$(LINK) $(LINKFLAGS) $(UNDEF) -o bin/$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=bin/$(PROJECT).map
-	$(SIZE) bin/$(PROJECT).elf
-	$(OBJCOPY) -O ihex bin/$(PROJECT).elf bin/$(PROJECT).hex
+	$(LINK) $(LINKFLAGS) $(UNDEF) -o $(PROJBINDIR)/$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(PROJBINDIR)/$(PROJECT).map
+	$(SIZE) $(PROJBINDIR)/$(PROJECT).elf
+	$(OBJCOPY) -O ihex $(PROJBINDIR)/$(PROJECT).elf $(PROJBINDIR)/$(PROJECT).hex
 
 ## your make rules
 ## Only basic example - modify it for larger projects!!
 
-bin/$(PROJECT).a: bin/$(PROJECT).o
-	$(AR) -rc bin/project.a bin/$(PROJECT).o 
+$(PROJBINDIR)/$(PROJECT).a: $(PROJBINDIR)/$(PROJECT).o
+	$(AR) -rc $(PROJBINDIR)/project.a $(PROJBINDIR)/$(PROJECT).o 
 	
-bin/$(PROJECT).o: main.c 
-	$(CC) $(CFLAGS) $(BOARDINCLUDE) $(INCLUDES) -c main.c -o bin/$(PROJECT).o
+$(PROJBINDIR)/$(PROJECT).o: main.c 
+	$(CC) $(CFLAGS) $(BOARDINCLUDE) $(INCLUDES) -c main.c -o $(PROJBINDIR)/$(PROJECT).o
 
 clean:
 	$(MAKE) -C $(RIOTBOARD) clean
 	$(MAKE) -C $(RIOTBASE) clean
-	rm -f bin/*
-	
+	rm -f $(PROJBINDIR)/*
+
+flash: all
+	$(FLASH) $(PORT) $(PROJBINDIR)/$(PROJECT).hex
+
+term:
+	$(TERM) $(PORT)
