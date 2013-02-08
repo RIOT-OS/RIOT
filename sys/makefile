@@ -23,6 +23,9 @@ endif
 ifneq (,$(findstring mprint,$(USEMODULE)))
     DIRS += mprint
 endif
+ifneq (,$(findstring ping,$(USEMODULE)))
+    DIRS += ping
+endif
 ifneq (,$(findstring ps,$(USEMODULE)))
     DIRS += ps
 endif
@@ -46,6 +49,9 @@ ifneq (,$(findstring shell,$(USEMODULE)))
 endif
 ifneq (,$(findstring shell_commands,$(USEMODULE)))
     DIRS += shell/commands
+endif
+ifneq (,$(findstring swtimer,$(USEMODULE)))
+    DIRS += swtimer
 endif
 ifneq (,$(findstring timex,$(USEMODULE)))
     DIRS += timex

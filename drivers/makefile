@@ -18,9 +18,6 @@ endif
 ifneq (,$(findstring gps_ublox,$(USEMODULE)))
     DIRS += gps_ublox
 endif
-ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
-    DIRS += cc110x_ng
-endif
 
 all:
 	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
