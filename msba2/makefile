@@ -28,5 +28,8 @@ $(BINDIR)%.o: %.c
 clean:
 	$(MAKE) -C ../msba2-common clean
 	rm -f $(BINDIR)msba2_base.a $(OBJ) $(DEP)
-	rmdir $(BINDIR)
+	@if [ -d $(BINDIR) ] ; \
+	then rmdir $(BINDIR) ; \
+	fi 
+
 
