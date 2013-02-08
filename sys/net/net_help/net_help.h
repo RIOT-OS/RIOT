@@ -8,6 +8,7 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 #include <string.h>
+#include <stdint.h>
 
 #define BITSET(var,pos) ((var) & (1<<(pos)))
 #define HTONS(a) ((((uint16_t) (a) >> 8) & 0xff) | ((((uint16_t) (a)) & 0xff) << 8))
