@@ -6,4 +6,5 @@ all:
 clean:
 	@for i in $(DIRS) ; do $(MAKE) -C $$i clean ; done ;
 
-	
+doc:
+	make -BC doc/doxygen	

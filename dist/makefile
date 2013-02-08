@@ -117,3 +117,6 @@ flash: all
 
 term:
 	$(TERM) $(PORT)
+
+doc:
+	make -BC $(RIOTBASE) doc
