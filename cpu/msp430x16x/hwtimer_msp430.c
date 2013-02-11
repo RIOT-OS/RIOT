@@ -1,5 +1,5 @@
 #include <signal.h>
-#include <board.h>
+#include <msp430x16x.h>
 #include <hwtimer.h>
 #include <hwtimer_arch.h>
 #include <cpu.h>
@@ -9,7 +9,7 @@ static uint32_t ticks = 0;
 extern void (*int_handler)(int);
 extern void TA0_unset(short timer);
 
-void timerA_init()
+void timerA_init(void)
 {
   	ticks = 0;								 // Set tick counter value to 0
 	TA0CTL = TASSEL_1 + TACLR;   	  		 // Clear the timer counter, set ACLK

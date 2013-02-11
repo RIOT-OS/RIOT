@@ -27,7 +27,6 @@ and the mailinglist (subscription via web site)
 #include <stdint.h>
 
 #include <cpu.h>
-#include <board.h>
 #include <hwtimer.h>
 #include <hwtimer_arch.h>
 

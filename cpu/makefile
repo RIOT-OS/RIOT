@@ -10,6 +10,10 @@ ifeq ($(CPU),cc430)
  DIRS = msp430 cc430
 endif
 
+ifeq ($(CPU),msp430x16x)
+ DIRS = msp430-common msp430x16x
+endif
+
 .PHONY: cpus
 .PHONY: $(DIRS)
 

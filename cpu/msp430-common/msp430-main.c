@@ -35,7 +35,7 @@
 #include <sys/unistd.h>
 
 #include "cpu.h"
-#include "board.h"
+#include <msp430x16x.h>
 #include "msp430.h"
 
 
@@ -168,5 +168,5 @@ splx_(int sr)
 }
 /*---------------------------------------------------------------------------*/
 
-extern void board_init();
+extern void board_init(void);
 

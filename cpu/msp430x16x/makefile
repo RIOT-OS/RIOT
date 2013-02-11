@@ -1,6 +1,6 @@
 MODULE =cpu
 
-INCLUDES = -Iinclude -I$(RIOTBASE)/core/include/ -I$(RIOTBOARD)/$(BOARD)/include
+INCLUDES = -I../include -I$(RIOTBASE)/core/include
 DIRS =
 
 all: $(BINDIR)$(MODULE).a

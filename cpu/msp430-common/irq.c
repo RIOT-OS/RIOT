@@ -1,5 +1,5 @@
 #include <irq.h>
-#include <board.h>
+#include <msp430x16x.h>
 #include <cpu.h>
 
 unsigned int disableIRQ() {

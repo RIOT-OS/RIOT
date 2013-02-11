@@ -24,8 +24,8 @@ and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
+#include <msp430x16x.h>
 #include "cpu.h"
-#include <board.h>
 #include "kernel.h"
 #include "kernel_intern.h"
 #include "sched.h"
@@ -87,7 +87,7 @@ void thread_yield() {
 // 
 // __return_from_isr
 
-void cpu_switch_context_exit(){
+void cpu_switch_context_exit(void){
     active_thread = sched_threads[0];
     sched_run();
 

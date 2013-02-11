@@ -18,7 +18,7 @@ else
 #USEMODULE += cpu_drivers cpu core lib sys
 USEMODULE += cpu core sys
 endif
-ED = $(USEMODULE:%=-D MODULE_%)
+ED = $(USEMODULE:%=-DMODULE_%)
 EXTDEFINES = $(shell echo $(ED)|tr 'a-z' 'A-Z')
 BL=$(USEMODULE:%= $(BINDIR)%.a)
 # exclude hwtimer, because it is part of the kernel but the define is needed for auto_init

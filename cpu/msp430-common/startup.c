@@ -1,10 +1,9 @@
 #include <stdio.h>
-#include <board.h>
 #include <kernel_intern.h>
 
-extern void board_init();
+extern void board_init(void);
 
-__attribute__ ((constructor)) static void startup() {
+__attribute__ ((constructor)) static void startup(void) {
     /* use putchar so the linker links it in: */
     putchar('\n');
 

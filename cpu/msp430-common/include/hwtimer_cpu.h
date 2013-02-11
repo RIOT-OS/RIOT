@@ -27,8 +27,8 @@ and the mailinglist (subscription via web site)
 #ifndef __HWTIMER_CPU_H
 #define __HWTIMER_CPU_H
 
+#include <msp430x16x.h>
 #include <stdint.h>
-#include <board.h>
 
 #ifdef __MSP430_HAS_TA2__
 #define ARCH_MAXTIMERS 2

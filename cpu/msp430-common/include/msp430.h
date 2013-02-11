@@ -49,7 +49,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
 #include "board.h"
 
 #ifndef MSP430_INITIAL_CPU_SPEED
@@ -88,7 +87,7 @@ void msp430_set_cpu_speed(uint32_t speed);
 void msp430_cpu_init(void);	/* Rename to cpu_init() later! */
 #define cpu_init() msp430_cpu_init()
 
-void msp430_init_dco();
+void msp430_init_dco(void);
 
 void   *sbrk(int);
 

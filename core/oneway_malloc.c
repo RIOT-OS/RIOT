@@ -23,7 +23,7 @@
 #define ENABLE_DEBUG
 #include <debug.h>
 
-//extern void *sbrk(int incr);
+extern void *sbrk(int incr);
 
 void *_malloc(size_t size) {
     void* ptr = sbrk(size);
