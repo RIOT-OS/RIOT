@@ -17,6 +17,12 @@
 #include <cc1100.h>
 #include <pingpong.h>
 
+//debug stuff
+//#define ENABLE_DEBUG
+#ifdef ENABLE_DEBUG
+#include <ps.h>
+#endif
+
 #define SHELL_STACK (4500)
 #define RADIO_STACK (2048)
 
@@ -247,6 +253,11 @@ int main(void) {
             CREATE_STACKTEST, shell_runner, "shell");
 
     while (true) {
+#ifdef ENABLE_DEBUG
+        thread_print_all();
+        vtimer_print_short_queue();
+        vtimer_print_long_queue();
+#endif
         //sleep a sec
         vtimer_usleep(1 * SECOND);
     }

@@ -11,6 +11,12 @@
 //net stuff
 #include <transceiver.h>
 
+//debug stuff
+//#define ENABLE_DEBUG
+#ifdef ENABLE_DEBUG
+#include <ps.h>
+#endif
+
 static uint16_t sequence = 0;
 
 radio_packet_t p;
@@ -32,6 +38,11 @@ void broadcast_without_ack(uint16_t duration) {
         puts("Setting up packet");
         counter = counter + 1;
         send_broadcast();
+#ifdef ENABLE_DEBUG
+        thread_print_all();
+        vtimer_print_short_queue();
+        vtimer_print_long_queue();
+#endif
         vtimer_usleep(1 * SECOND);
     }
     puts("stopping now");
