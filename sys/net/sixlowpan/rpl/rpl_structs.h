@@ -98,6 +98,7 @@
 #define RPL_GROUNDED_SHIFT 7
 #define RPL_DEFAULT_OCP 0
 
+//DIO Base Object (RFC 6550 Fig. 14)
 struct __attribute__((packed)) rpl_dio_t{
     uint8_t rpl_instanceid;
     uint8_t version_number;
@@ -114,6 +115,7 @@ struct __attribute__((packed)) rpl_dis_t{
     uint8_t reserved;
 };
 
+//DAO Base Object (RFC 6550 Fig. 16)
 struct __attribute__((packed)) rpl_dao_t{
     uint8_t rpl_instanceid;
     uint8_t k_d_flags;
@@ -121,6 +123,7 @@ struct __attribute__((packed)) rpl_dao_t{
     uint8_t dao_sequence;
 };
 
+//DAO ACK Base Object (RFC 6550 Fig. 17.)
 struct __attribute__((packed)) rpl_dao_ack_t{
     uint8_t rpl_instanceid;
     uint8_t d_reserved;
@@ -128,15 +131,19 @@ struct __attribute__((packed)) rpl_dao_ack_t{
     uint8_t status;
 };
 
+//DODAG ID Struckt
 //may be present in dao or dao_ack packets
 struct __attribute__((packed)) dodag_id_t{
     ipv6_addr_t dodagid;
 };
+
+//RPL-Option Generic Format (RFC 6550 Fig. 19)
 typedef struct __attribute__((packed)) rpl_opt_t {
     uint8_t type;
     uint8_t length;
 } rpl_opt_t;
 
+//DODAG Configuration-Option (RFC 6550 Fig. 24)
 typedef struct __attribute__((packed)) rpl_opt_dodag_conf_t {
     uint8_t type;
     uint8_t length;
@@ -152,6 +159,7 @@ typedef struct __attribute__((packed)) rpl_opt_dodag_conf_t {
     uint16_t lifetime_unit;
 } rpl_opt_dodag_conf_t;
 
+//RPL Solicited Information Option (RFC 6550 Fig. 28)
 typedef struct __attribute__((packed)) rpl_opt_solicited_t {
 	uint8_t type;
 	uint8_t length;
@@ -161,6 +169,7 @@ typedef struct __attribute__((packed)) rpl_opt_solicited_t {
 	uint8_t version;
 } rpl_opt_solicited_t;
 
+//RPL Target-Option (RFC 6550 Fig. 25)
 //ipv6_addr_t target may be replaced by a target prefix of variable length
 typedef struct __attribute__((packed)) rpl_opt_target_t {
 	uint8_t type;
@@ -170,6 +179,7 @@ typedef struct __attribute__((packed)) rpl_opt_target_t {
 	ipv6_addr_t target;
 } rpl_opt_target_t;
 
+//RPL Transit-Option (RFC 6550 Fig. 26)
 typedef struct __attribute__((packed)) rpl_opt_transit_t {
 	uint8_t type;
 	uint8_t length;
