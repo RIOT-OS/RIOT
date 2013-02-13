@@ -156,7 +156,7 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address){
 	
 	//INSERT NEW OBJECTIVE FUNCTIONS HERE
 	objective_functions[0] = rpl_get_of0();
-	//objective_functions[1] = rpl_get_of_ETX()
+	objective_functions[1] = rpl_get_of_mrhof();
 
 	sixlowpan_init(trans,rpl_address,0);
 	//Wir benötigen einen Link Local prefix, um unsere entsprechende Addresse im Netz abzufragen
@@ -165,25 +165,6 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address){
     ipv6_get_saddr(&my_address, &ll_address);
 	set_rpl_process_pid(rpl_process_pid);
 
-	//some fake routing entries...
-	/*if(rpl_address != 1){
-		ll_address.uint8[15]=1;
-		rpl_add_routing_entry(&ll_address, &ll_address, 9000);
-		ll_address.uint8[15]=2;
-		rpl_add_routing_entry(&ll_address, &ll_address, 8000);
-		ll_address.uint8[15]=3;
-		rpl_add_routing_entry(&ll_address, &ll_address, 7000);
-		ll_address.uint8[15]=4;
-		rpl_add_routing_entry(&ll_address, &ll_address, 6000);
-		ll_address.uint8[15]=5;
-		rpl_add_routing_entry(&ll_address, &ll_address, 5000);
-		ll_address.uint8[15]=6;
-		rpl_add_routing_entry(&ll_address, &ll_address, 4000);
-		ll_address.uint8[15]=7;
-		rpl_add_routing_entry(&ll_address, &ll_address, 4000);
-		ll_address.uint8[15]=8;
-		rpl_add_routing_entry(&ll_address, &ll_address, 4000);
-	}	*/
 	return SUCCESS;
 
 }
@@ -797,6 +778,7 @@ void recv_rpl_dao_ack(void){
 
 }
 
+//xxx tcp_socket unused?
 void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_t next_header, void *tcp_socket){
 	uint8_t *p_ptr;
     ipv6_send_buf = get_rpl_send_ipv6_buf();
