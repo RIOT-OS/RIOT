@@ -1,18 +1,18 @@
 /* Copyright (C) 2004 Christopher Clark <firstname.lastname@cl.cam.ac.uk> */
 
-#include "hashtable.h"
-#include "hashtable_private.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include "hashtable.h"
+#include "hashtable_private.h"
 
 /*
 Credit for primes table: Aaron Krowne
  http://br.endernet.org/~akrowne/
  http://planetmath.org/encyclopedia/GoodHashTablePrimes.html
 */
-static const unsigned int primes[] = {
+static const uint32_t primes[] = {
 53, 97, 193, 389,
 769, 1543, 3079, 6151,
 12289, 24593, 49157, 98317,
@@ -26,7 +26,7 @@ const float max_load_factor = 0.65;
 
 /*****************************************************************************/
 struct hashtable *
-create_hashtable(unsigned int minsize,
+create_hashtable(uint32_t minsize,
                  unsigned int (*hashf) (void*),
                  int (*eqf) (void*,void*))
 {

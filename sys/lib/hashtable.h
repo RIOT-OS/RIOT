@@ -72,7 +72,7 @@ struct hashtable;
  */
 
 struct hashtable *
-create_hashtable(unsigned int minsize,
+create_hashtable(uint32_t minsize,
                  unsigned int (*hashfunction) (void*),
                  int (*key_eq_fn) (void*,void*));
 

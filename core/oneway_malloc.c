@@ -16,7 +16,6 @@
  */
 
 #include <stdio.h>
-#include <sys/unistd.h>
 #include <string.h>
 #include <stdlib.h>
 

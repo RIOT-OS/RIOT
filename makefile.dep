@@ -23,5 +23,11 @@ ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
 		USEMODULE += hwtimer
 	endif
   endif
+  ifneq (,$(findstring msb-430h,$(BOARD)))
+  	USEMODULE += cc110x_spi
+	ifeq (,$(findstring hwtimer,$(USEMODULE)))
+		USEMODULE += hwtimer
+	endif
+  endif
 endif
 

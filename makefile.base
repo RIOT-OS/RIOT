@@ -25,6 +25,11 @@ ifeq ($(BOARD),msba2)
  INCLUDES += -I$(RIOTBOARD)/msba2-common/include/
  INCLUDES += -I$(RIOTBOARD)/msba2-common/drivers/include/
 endif
+ifeq ($(BOARD),msb-430h)
+ INCLUDES += -I$(RIOTBOARD)/msb-430h/include/
+ INCLUDES += -I$(RIOTBOARD)/msb-430-common/include/
+ INCLUDES += -I$(RIOTBOARD)/msb-430-common/drivers/include/
+endif
 
 $(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ)
 	$(AR) -rc $(BINDIR)$(MODULE).a $(OBJ) $(ASMOBJ)
