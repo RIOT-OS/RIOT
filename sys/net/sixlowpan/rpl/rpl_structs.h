@@ -59,7 +59,6 @@
 // RPL Constants and Variables
 
 #define BASE_RANK 0
-#define ROOT_RANK 1
 #define INFINITE_RANK 0xFFFF
 #define RPL_DEFAULT_INSTANCE 0
 #define DEFAULT_PATH_CONTROL_SIZE 0
@@ -71,6 +70,7 @@
 //#define DEFAULT_DIO_INTERVAL_DOUBLINGS 20
 #define DEFAULT_DIO_REDUNDANCY_CONSTANT 10
 #define DEFAULT_MIN_HOP_RANK_INCREASE 256
+#define ROOT_RANK DEFAULT_MIN_HOP_RANK_INCREASE
 //DAO_DELAY is in seconds
 #define DEFAULT_DAO_DELAY 3
 #define REGULAR_DAO_INTERVAL 300
@@ -80,9 +80,10 @@
 
 //others
 
-#define NUMBER_IMPLEMENTED_OFS 1
+#define NUMBER_IMPLEMENTED_OFS 2
 #define RPL_MAX_DODAGS 3
 #define RPL_MAX_INSTANCES 1
+#define RPL_MAX_CANDIDATE_NEIGHBORS 15
 #define RPL_MAX_PARENTS 5
 #define RPL_MAX_ROUTING_ENTRIES 128
 #define RPL_ROOT_RANK 1
@@ -191,6 +192,12 @@ typedef struct __attribute__((packed)) rpl_opt_transit_t {
 
 struct rpl_dodag_t;
 
+typedef struct rpl_candidate_neighbor_t {
+    ipv6_addr_t addr;
+    struct rpl_dodag_t *dodag;
+    uint8_t used;
+} rpl_candidate_neighbor_t;
+
 typedef struct rpl_parent_t {
     ipv6_addr_t addr;
     uint16_t rank;
@@ -199,8 +206,6 @@ typedef struct rpl_parent_t {
 	uint16_t lifetime;
 	uint8_t used;
 } rpl_parent_t;
-
-struct rpl_of_t;
 
 typedef struct rpl_instance_t {
     //struct rpl_dodag_t *current_dodoag;
@@ -232,16 +237,17 @@ typedef struct rpl_dodag_t {
     uint8_t joined;
     rpl_parent_t *my_preferred_parent;
 	struct rpl_of_t *of;
-
 } rpl_dodag_t;
 
 typedef struct rpl_of_t {
     uint16_t ocp;
-    uint16_t (*calc_rank)(rpl_parent_t *, uint16_t);
+    uint16_t (*calc_rank)();
     rpl_parent_t *(*which_parent)(rpl_parent_t *, rpl_parent_t *);
     rpl_dodag_t *(*which_dodag)(rpl_dodag_t *, rpl_dodag_t *);
     void (*reset)(struct rpl_dodag_t *);
     void (*parent_state_callback)(rpl_parent_t *, int, int);
+    void (*init) (void); //OF specific init function
+    void (*process_dio) (); //DIO processing callback (acc. to OF0 spec, chpt 5)
 } rpl_of_t;
 
 typedef struct rpl_routing_entry_t {

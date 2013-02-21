@@ -7,6 +7,7 @@
 
 rpl_instance_t instances[RPL_MAX_INSTANCES];
 rpl_dodag_t dodags[RPL_MAX_DODAGS];
+rpl_candidate_neighbor_t candidates[RPL_MAX_CANDIDATE_NEIGHBORS];
 rpl_parent_t parents[RPL_MAX_PARENTS];
 
 rpl_instance_t *rpl_new_instance(uint8_t instanceid){
@@ -254,10 +255,17 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
 	my_dodag->grounded = dodag->grounded;
 	my_dodag->joined = 1;
 	my_dodag->my_preferred_parent = preferred_parent;
-	my_dodag->my_rank = dodag->of->calc_rank(preferred_parent, dodag->my_rank);
+	my_dodag->my_rank = dodag->of->calc_rank();
 	my_dodag->dao_seq = RPL_COUNTER_INIT;
 	my_dodag->min_rank = my_dodag->my_rank;
 	
+
+    //OF specific initialisation, the rootnode does this at the beginning
+    //when constructing a dodag
+	if(my_dodag->of->init != NULL){
+	    my_dodag->of->init();
+	}
+
 	start_trickle(my_dodag->dio_min, my_dodag->dio_interval_doubling, my_dodag->dio_redundancy);
 	delay_dao();
 }
@@ -278,7 +286,7 @@ void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t * p_addr, uint16_t rank){
 		my_dodag->my_rank = INFINITE_RANK;
 	}else{
 		//Calc new Rank
-		my_dodag->my_rank = my_dodag->of->calc_rank(my_dodag->my_preferred_parent, my_dodag->my_rank);
+		my_dodag->my_rank = my_dodag->of->calc_rank();
 		my_dodag->min_rank = my_dodag->my_rank;
 		reset_trickletimer();
 		delay_dao();
