@@ -1,6 +1,7 @@
 SRC = $(wildcard *.c)
 BINDIR = bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
+export ARCH = msb-430h_base.a
 
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
@@ -9,11 +10,11 @@ INCLUDES += -I$(RIOTBASE)/cpu/msp430-common/include/
 INCLUDES += -I$(RIOTBASE)/cpu/msp430x16x/include/
 INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include/ -I$(RIOTBASE)/sys/include
 
-all: $(BINDIR)msb-430_base.a 
+all: $(BINDIR)$(ARCH)
 	$(MAKE) -C ../msb-430-common
 
-$(BINDIR)msb-430_base.a: $(OBJ)
-	$(AR) rcs $(BINDIR)msb-430_base.a $(OBJ)
+$(BINDIR)$(ARCH): $(OBJ)
+	$(AR) rcs $(BINDIR)$(ARCH) $(OBJ)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)

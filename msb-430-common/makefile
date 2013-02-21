@@ -7,12 +7,13 @@ DEP = $(SRC:%.c=$(BINDIR)%.d)
 INCLUDES += -I$(RIOTBOARD)/msb-430-common/include/
 INCLUDES += -I$(RIOTBASE)/cpu/msp430-common/include/
 INCLUDES += -I$(RIOTBASE)/cpu/mspx16x/include/
+INCLUDES += -I$(RIOTBASE)/drivers/include/
 
-all: $(BINDIR)msb-430_common_base.a 
+all: $(BINDIR)$(ARCH) 
 	$(MAKE) -C drivers
 
-$(BINDIR)msb-430_common_base.a: $(OBJ)
-	$(AR) rcs $(BINDIR)msb-430_base.a $(OBJ)
+$(BINDIR)$(ARCH): $(OBJ)
+	$(AR) rcs $(BINDIR)$(ARCH) $(OBJ)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
@@ -27,4 +28,4 @@ $(BINDIR)%.o: %.c
 clean:
 	$(MAKE) -C drivers clean
 	rm -f $(OBJ) $(DEP)
-
+	rm -f $(BINDIR)$(ARCH)
