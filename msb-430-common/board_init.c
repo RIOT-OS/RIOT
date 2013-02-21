@@ -3,7 +3,6 @@
 #include "kernel_intern.h"
 #include "msp430.h"
 #include "debug.h"
-#include "msb430-uart1.h"
 
 volatile static uint32_t __msp430_cpu_speed = MSP430_INITIAL_CPU_SPEED;
 

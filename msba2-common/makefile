@@ -13,7 +13,7 @@ all: $(BINDIR)msba2_common_base.a
 	$(MAKE) -C drivers
 
 $(BINDIR)msba2_common_base.a: $(OBJ)
-	$(AR) rcs $(BINDIR)msba2_base.a $(OBJ)
+	$(AR) rcs $(BINDIR)$(ARCH) $(OBJ)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)

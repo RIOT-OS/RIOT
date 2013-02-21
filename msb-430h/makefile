@@ -29,7 +29,7 @@ $(BINDIR)%.o: %.c
 # remove compilation products
 clean:
 	$(MAKE) -C ../msb-430-common clean
-	rm -f $(BINDIR)msb-430_base.a $(OBJ) $(DEP)
+	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
 	@if [ -d $(BINDIR) ] ; \
 	then rmdir $(BINDIR) ; \
 	fi 
