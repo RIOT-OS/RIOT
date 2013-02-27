@@ -4,7 +4,8 @@
 PREFIX=${HOME}/gnuarm
 
 # directory to download source files and store intermediates 
-GNUARM_BUILDDIR=${GNUARM_BUILDDIR:-"/tmp/gnuarm-${USER}"}
+TMP_DIR=/var/tmp
+GNUARM_BUILDDIR=${GNUARM_BUILDDIR:-"${TMP_DIR}/gnuarm-${USER}"}
 
 GCC_VER=4.7.2
 GCC_MD5=cc308a0891e778cfda7a151ab8a6e762
@@ -29,7 +30,10 @@ DOWNLOADER_OPTS="-nv -c"
 #
 FILES=.
 
-HOST_GCC_VER=`gcc --version | awk '{ if (NR == 1) { print $4 } }'`
+HOST_GCC_VER=`gcc --version | awk '/gcc/{print $NF}'`
+
+SPACE_NEEDED=2641052
+FREETMP=`df ${TMP_DIR} | awk '{ if (NR == 2) print $4}'`
 
 build_binutils() {
     echo "Building binutils..."
@@ -138,8 +142,18 @@ download_file() {
     echo "${3}  ${2}" | md5sum -c -
 }
 
+check_space() {
+    echo "Checkign disk space in ${TMP_DIR}"
+    if [ $FREETMP -lt $SPACE_NEEDED ]
+    then
+        echo "Not enough available space in ${TMP_DIR}. Minimum ${SPACE_NEEDED} free bytes required."
+        exit 1
+    fi
+}
+
 build_all() {
     echo "Starting in ${GNUARM_BUILDDIR}. Installing to ${PREFIX}."
+    check_space &&
     download &&
 	build_binutils && 
     extract_newlib &&

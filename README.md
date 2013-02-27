@@ -2,7 +2,7 @@ RIOT OS
 =======
 RIOT - The revolutionary IoT OS!
 
-RIOT OS is an operating system for Internet of Things (IoT) devices. It is basesed on a microkernel and designed for
+RIOT OS is an operating system for Internet of Things (IoT) devices. It is based on a microkernel and designed for
 * energy efficiency
 * hardware independent development
 * a high degree of modularity

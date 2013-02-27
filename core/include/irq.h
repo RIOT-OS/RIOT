@@ -14,17 +14,17 @@
  * @file
  * @brief       IRQ driver interface
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
- * @author      Michael Baar <michael.baar@fu-berlin.de>
- * @version     $Revision: 1410 $
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  *
- * @note        $Id$
  */
 
 #include <stdbool.h>
 
 /**
  * @brief   This function sets the IRQ disable bit in the status register
+ *
+ * @note    This function should be used in favour of dINT().
+ *
  * @return  previous value of status register
  */
 unsigned disableIRQ(void);
@@ -33,7 +33,6 @@ unsigned disableIRQ(void);
  * @brief   This function clears the IRQ disable bit in the status register
  * @return  previous value of status register
  *
- * @example irq-driver-example.c
  * @see     restoreIRQ
  */
 unsigned enableIRQ(void);
@@ -42,9 +41,9 @@ unsigned enableIRQ(void);
  * @brief   This function restores the IRQ disable bit in the status register
  *          to the value contained within passed state
  * @param   state   state to restore
- * @return  previous state
  *
- * @example irq-driver-example.c
+ * @note    This function should be used in favour of eINT().
+ *
  * @see     disableIRQ
  */
 void restoreIRQ(unsigned state);
