@@ -1,5 +1,0 @@
-SubDir TOP projects test_rpl ;
-
-Module test_rpl : main.c : shell shell_commands ps posix_io uart0 auto_init vtimer 6lowpan uart0 posix_io cc110x rpl ;
-
-UseModule test_rpl ;

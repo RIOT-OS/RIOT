@@ -1,5 +1,0 @@
-SubDir TOP projects watch ;
-
-Module watch : main.c clock_app.c alarm_app.c : uart0 posix_io rtc display_putchar gpioint hwtimer board_buzzer auto_init ;
-
-UseModule watch ;

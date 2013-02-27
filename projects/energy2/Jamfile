@@ -1,5 +1,0 @@
-SubDir TOP projects energy2 ;
-
-Module energy2 : main.c testThread.c testSHT11.c led.c testShell.c testLTC4150.c : auto_init hwtimer swtimer sht11 shell posix_io ps uart0 ltc4150 ;
-
-UseModule energy2 ;

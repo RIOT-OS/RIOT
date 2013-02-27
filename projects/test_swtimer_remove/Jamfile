@@ -1,5 +1,0 @@
-SubDir TOP projects test_swtimer_remove ;
-
-Module test_swtimer_remove : main.c : swtimer ;
-
-UseModule test_swtimer_remove ;

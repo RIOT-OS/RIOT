@@ -1,5 +1,0 @@
-SubDir TOP projects long_term ;
-
-Module long_term : main.c : swtimer ;
-
-UseModule long_term ;

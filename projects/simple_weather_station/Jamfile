@@ -1,5 +1,0 @@
-SubDir TOP projects simple_weather_station ;
-
-Module simple_weather_station : main.c : swtimer sht11 ;
-
-UseModule simple_weather_station ;

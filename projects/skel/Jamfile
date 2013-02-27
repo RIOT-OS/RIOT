@@ -1,5 +1,0 @@
-SubDir TOP projects skel ;
-
-Module skel : main.c ;
-
-UseModule skel ;

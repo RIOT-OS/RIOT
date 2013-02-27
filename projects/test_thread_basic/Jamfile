@@ -1,5 +1,0 @@
-SubDir TOP projects test_thread_basic ;
-
-Module test_thread_basic : main.c ;
-
-UseModule test_thread_basic ;

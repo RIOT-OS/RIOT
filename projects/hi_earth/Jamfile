@@ -1,5 +1,0 @@
-SubDir TOP projects hi_earth ;
-
-Module hi_earth : main.c : auto_init display_putchar ;
-
-UseModule hi_earth ;

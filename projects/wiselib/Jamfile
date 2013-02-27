@@ -1,5 +1,0 @@
-SubDir TOP projects wiselib ;
-
-Module wiselib : main.c : shell posix_io vtimer timex shell_commands ps rtc sht11 ltc4150 cc110x gpioint config mci ps transceiver swtimer ;
-
-UseModule wiselib ;

@@ -1,5 +1,0 @@
-SubDir TOP projects chronos_cc110x_ng ;
-
-Module chronos_cc110x_ng : main.c : cc110x_ng transceiver auto_init board_display ;
-
-UseModule chronos_cc110x_ng ;

@@ -1,5 +1,0 @@
-SubDir TOP projects energy_profile_functions ;
-
-Module energy_profile_functions : main.c led.c : auto_init swtimer ;
-
-UseModule energy_profile_functions ;

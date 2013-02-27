@@ -1,5 +1,0 @@
-SubDir TOP projects msb430_cc110x_ng ;
-
-Module msb430_cc110x_ng : main.c : cc110x_ng transceiver swtimer shell shell_commands ps posix_io uart0 auto_init config ;
-
-UseModule msb430_cc110x_ng ;

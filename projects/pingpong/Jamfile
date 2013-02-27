@@ -1,4 +1,0 @@
-SubDir TOP projects pingpong ;
-
-Module pingpong : main.c ;
-UseModule pingpong ;

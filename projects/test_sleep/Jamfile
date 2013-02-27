@@ -1,5 +1,0 @@
-SubDir TOP projects test_sleep ;
-
-Module test_sleep : main.c : hwtimer ps ;
-
-UseModule test_sleep ;

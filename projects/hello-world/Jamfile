@@ -1,5 +1,0 @@
-SubDir TOP projects hello-world ;
-
-Module hello_world : main.c ;
-
-UseModule hello_world ;

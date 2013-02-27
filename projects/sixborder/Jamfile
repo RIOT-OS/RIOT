@@ -1,5 +1,0 @@
-SubDir TOP projects sixborder ;
-
-Module sixborder : main.c : auto_init uart0 posix_io cc110x_ng 6lowpan vtimer rtc destiny ;
-
-UseModule sixborder ;

@@ -1,5 +1,0 @@
-SubDir TOP projects test_float ;
-
-Module test_float : main.c ;
-
-UseModule test_float ;

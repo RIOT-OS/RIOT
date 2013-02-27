@@ -1,5 +1,0 @@
-SubDir TOP projects expect_swtimer ;
-
-Module expect_swtimer : main.c : swtimer ;
-
-UseModule expect_swtimer ;
