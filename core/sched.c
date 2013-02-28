@@ -84,6 +84,7 @@ void sched_run() {
     }
 
 #if SCHEDSTATISTICS
+    /* TODO: setup dependency from SCHEDSTATISTICS to MODULE_HWTIMER */
     extern unsigned long hwtimer_now(void);
     unsigned int time = hwtimer_now();
     if (my_active_thread && (pidlist[my_active_thread->pid].laststart)) {
@@ -101,9 +102,6 @@ void sched_run() {
 
     my_active_thread = NULL;
     while(! my_active_thread) {
-
-        //        for (int i = 0; i < SCHED_PRIO_LEVELS; i++) { /* TODO: introduce bitfield cache */
-        //            if (runqueues[i]) {
         int nextrq = number_of_lowest_bit(runqueue_bitcache);
         clist_node_t next = *(runqueues[nextrq]);
         DEBUG("scheduler: first in queue: %s\n", ((tcb_t*)next.data)->name);
@@ -114,12 +112,11 @@ void sched_run() {
         pidlist[my_active_thread->pid].laststart = time;
         pidlist[my_active_thread->pid].schedules ++;
 #endif
-        //                break;
-        //            }
-        //        }
-        if (active_thread->pid != last_pid) {
+#ifdef MODULE_NSS
+        if (active_thread && active_thread->pid != last_pid) {
             last_pid = active_thread->pid;
         }
+#endif
     }
 
     DEBUG("scheduler: next task: %s\n", my_active_thread->name);
