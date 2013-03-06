@@ -1,3 +1,18 @@
+/**
+ * Native CPU entry code
+ *
+ * Copyright (C) 2013 Ludwig Ortmann
+ *
+ * This file subject to the terms and conditions of the GNU General Public
+ * License. See the file LICENSE in the top level directory for more details.
+ *
+ * @ingroup arch
+ * @{
+ * @file
+ * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @}
+ */
+
 #include <stdio.h>
 #include <kernel_intern.h>
 
