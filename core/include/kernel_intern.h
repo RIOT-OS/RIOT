@@ -18,7 +18,7 @@
 
 void kernel_init(void);
 void board_init_drivers(void);
-char *thread_stack_init(void  *task_func, void *stack_start);
+char *thread_stack_init(void  *task_func, void *stack_start, int stack_size);
 void sched_task_exit(void);
 void thread_print_stack (void);
 int thread_measure_stack_usage(char* stack);

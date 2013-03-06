@@ -14,6 +14,10 @@ ifeq ($(CPU),msp430x16x)
  DIRS = msp430-common msp430x16x
 endif
 
+ifeq ($(CPU),native)
+ DIRS = native
+endif
+
 .PHONY: cpus
 .PHONY: $(DIRS)
 
@@ -28,6 +32,5 @@ clean:
 	@$(MAKE) -C cc430 clean
 	@$(MAKE) -C msp430-common clean
 	@$(MAKE) -C msp430x16x clean
-
-
+	@$(MAKE) -C native clean
 

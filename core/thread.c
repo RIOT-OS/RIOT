@@ -143,7 +143,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
         return -EOVERFLOW;
     }
 
-    cb->sp = thread_stack_init(function,stack+stacksize);
+    cb->sp = thread_stack_init(function,stack,stacksize);
     cb->stack_start = stack;
     cb->stack_size = total_stacksize;
 
