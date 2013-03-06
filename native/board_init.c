@@ -13,7 +13,11 @@
  * @}
  */
 
+#include "board.h"
+
 void board_init()
 {
+    LED_GREEN_OFF();
+    LED_RED_ON();
     puts("RIOT native board initialized.");
 }
