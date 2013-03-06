@@ -4,6 +4,7 @@ OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
 INCLUDES += -I$(RIOTBASE)/cpu/native/include/
+INCLUDES += -I$(RIOTBOARD)/native/include/
 
 all: $(BINDIR)native_base.a 
 
