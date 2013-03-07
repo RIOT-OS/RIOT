@@ -14,8 +14,8 @@
  */
 
 #include <atomic.h>
-#include <cpu.h>
-#include "debug.h"
+#include <irq.h>
+#include <debug.h>
 
 unsigned int atomic_set_return(unsigned int* val, unsigned int set)
 {

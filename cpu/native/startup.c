@@ -15,8 +15,11 @@
 
 #include <stdio.h>
 #include <kernel_intern.h>
+#include <cpu.h>
 
 extern void board_init(void);
+extern void native_cpu_init(void);
+extern void native_interrupt_init(void);
 
 __attribute__ ((constructor)) static void startup(void)
 {

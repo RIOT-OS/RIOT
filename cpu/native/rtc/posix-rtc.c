@@ -14,6 +14,7 @@
  */
 
 #include <time.h>
+#include <err.h>
 
 #include "debug.h"
 
