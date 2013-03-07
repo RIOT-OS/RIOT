@@ -4,7 +4,7 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = µkleos 
+PROJECT_NAME           = RIOT 
 PROJECT_NUMBER         = 
 OUTPUT_DIRECTORY       = 
 CREATE_SUBDIRS         = NO
@@ -123,8 +123,8 @@ IGNORE_PREFIX          =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = .html
-HTML_HEADER            = src/ukleos-header.html 
-HTML_FOOTER            = src/ukleos-footer.html
+HTML_HEADER            = src/riot-header.html 
+HTML_FOOTER            = src/riot-footer.html
 HTML_STYLESHEET        = 
 HTML_ALIGN_MEMBERS     = YES
 HTML_DYNAMIC_SECTIONS  = YES

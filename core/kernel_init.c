@@ -68,7 +68,7 @@ static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
 void kernel_init(void)
 {
     dINT();
-    printf("kernel_init(): This is ukleos!\n");
+    printf("kernel_init(): This is RIOT!\n");
     
     sched_init();
 
