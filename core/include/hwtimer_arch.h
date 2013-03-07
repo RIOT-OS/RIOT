@@ -41,8 +41,7 @@ void hwtimer_arch_disable_interrupt(void);
 void hwtimer_arch_set(unsigned long offset, short timer);
 
 /**
- * Set a kernel timer to raise an interrupt after ::offset kernel timer ticks
- * from now.
+ * Set a kernel timer to raise an interrupt at specified system time.
  */
 void hwtimer_arch_set_absolute(unsigned long value, short timer);
 
