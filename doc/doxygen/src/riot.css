@@ -7,9 +7,8 @@ BODY,TD {
 h1 { /* titel */
 	text-align: left;
     font-size: 140%;
-	background-color: #aabbbd; /*#f4f4f4; */
-	padding: 0.3em 0.3 0em 0.3em;
-	height: 80px;
+	background-color: #d4d4d4;
+	padding: 0.3em 0.3 0.3em 0.3em;
 	margin-top: 0;
 }
 h1,
@@ -26,6 +25,9 @@ td h2 { /* member table captions */
 }
 h3 { /* subsection */
     font-size: 100%;
+}
+div.title {
+    font-size: 200%;
 }
 div.agtlogo {
 	float: left;
