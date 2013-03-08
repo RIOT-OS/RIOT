@@ -29,7 +29,7 @@ and the mailinglist (subscription via web site)
  * @ingroup		syslog
  * @brief		System Logging Service output implementation
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @version     $Revision: 3854 $
  *
  * @note		$Id: syslog-out.c 3854 2011-12-06 15:27:01Z hwill $

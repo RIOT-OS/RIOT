@@ -50,7 +50,7 @@ and the mailinglist (subscription via web site)
  * @file
  * @brief		GPIO IRQ Multiplexer interface
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Michael Baar <michael.baar@fu-berlin.de>
  * @version     $Revision: 1508 $
  *

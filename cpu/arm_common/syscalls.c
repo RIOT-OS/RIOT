@@ -29,7 +29,7 @@ and the mailinglist (subscription via web site)
  * @ingroup		lpc2387
  * @brief		LPC2387 NewLib system calls implementation
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Michael Baar <michael.baar@fu-berlin.de>
  * @version     $Revision$
  *

@@ -33,7 +33,7 @@ and the mailinglist (subscription via web site)
  * @file
  * @brief		Tracelog implementation
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Michael Baar <baar@inf.fu-berlin.de>
  *
  * @note		$Id: tracelog.c 3854 2011-12-06 15:27:01Z hwill $

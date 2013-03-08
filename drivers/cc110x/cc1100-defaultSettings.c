@@ -33,7 +33,7 @@ and the mailinglist (subscription via web site)
  * @file
  * @brief		TI Chipcon CC110x default settings
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 2058 $

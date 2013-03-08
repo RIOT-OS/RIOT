@@ -33,7 +33,7 @@ and the mailinglist (subscription via web site)
  * @file
  * @brief		System Logging Service implementation
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Michael Baar <baar@inf.fu-berlin.de>
  * @version     $Revision: 3854 $
  *

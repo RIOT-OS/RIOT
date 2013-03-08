@@ -29,7 +29,7 @@ and the mailinglist (subscription via web site)
  * @ingroup		lpc2387_adc
  * @brief		LPC2387 ADC
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @version     $Revision: 3250 $
  *

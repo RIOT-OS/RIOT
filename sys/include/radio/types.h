@@ -31,7 +31,7 @@ and the mailinglist (subscription via web site)
  * @file
  * @brief		Common network stack types (of all layers).
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @version     $Revision: 2061 $
  *

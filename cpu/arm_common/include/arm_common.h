@@ -37,7 +37,7 @@ and the mailinglist (subscription via web site)
  * @file
  * @brief		ARM CPU common declarations
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @version     $Revision$
  *
  * @note		$Id$

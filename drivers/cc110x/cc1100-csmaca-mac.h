@@ -29,7 +29,7 @@ and the mailinglist (subscription via web site)
  * @ingroup		dev_cc110x
  * @brief		ScatterWeb MSB-A2 mac-layer
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 1999 $

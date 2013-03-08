@@ -11,7 +11,7 @@
  * @file
  * @brief       Power Management Interface
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @version     $Revision$
  *
  * This interface needs to be implemented for each platform.

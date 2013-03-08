@@ -34,7 +34,7 @@ and the mailinglist (subscription via web site)
  * @internal
  * @brief       ARM bootloader
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Michael Baar <michael.baar@fu-berlin.de>
  * @version     $Revision$

@@ -34,7 +34,7 @@ and the mailinglist (subscription via web site)
  * @brief		LPC2387 Low-Power management
  * @ingroup		lpc2387
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author 		Heiko Will
  * @version     $Revision$
  *

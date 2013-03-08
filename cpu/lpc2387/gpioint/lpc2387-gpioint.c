@@ -34,7 +34,7 @@ and the mailinglist (subscription via web site)
  * @file
  * @brief		LPC2387 GPIO Interrupt Multiplexer implementation
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Michael Baar <michael.baar@fu-berlin.de>
  * @version     $Revision: 1508 $
  *

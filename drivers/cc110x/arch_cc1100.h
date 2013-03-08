@@ -29,7 +29,7 @@ and the mailinglist (subscription via web site)
  * @ingroup		LPC2387
  * @brief		CC1100 LPC2387 dependend functions
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 1775 $
  *

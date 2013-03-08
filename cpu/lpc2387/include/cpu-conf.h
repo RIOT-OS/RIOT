@@ -38,7 +38,7 @@ and the mailinglist (subscription via web site)
  * @file
  * @brief		LPC2387 CPUconfiguration
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		baar
  * @version     $Revision$
  *

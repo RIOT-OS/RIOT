@@ -29,7 +29,7 @@ and the mailinglist (subscription via web site)
  * @ingroup		lpc2387_rtc
  * @brief		LPC2387 Real-Time-Clock
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Michael Baar <michael.baar@fu-berlin.de>
  * @version     $Revision: 2005 $
  *
