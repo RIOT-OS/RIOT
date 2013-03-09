@@ -1,8 +1,6 @@
-#SRC = cc1100.c cc110x_ng.c disk.c id.c ltc4150.c ps.c rtc.c shell.c shell_commands.c sht11.c
 SRC = shell_commands.c sc_id.c
 INCLUDES = -I../../../core/include -I../../include -I../../../drivers/include/
 
-#cc1100.c  cc110x_ng.c  disk.c  id.c  Jamfile  ltc4150.c  makefile  makefile.commands  ps.c  rtc.c  shell.c  shell_commands.c  sht11.c
 ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
 	INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include/
 	SRC += sc_cc110x_ng.c

@@ -24,7 +24,7 @@ endif
 all:
 	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
 
-include $(RIOTBASE)/makefile.base
+include $(RIOTBASE)/Makefile.base
 
 # remove compilation products
 clean::

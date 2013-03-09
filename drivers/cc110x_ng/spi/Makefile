@@ -2,5 +2,5 @@ INCLUDES = -I$(RIOTBASE)/sys/include -I../../net -I../include -I../../lib -I../.
 
 MODULE =cc110x_spi
 
-include $(MAKEBASE)/makefile.base
+include $(MAKEBASE)/Makefile.base
 

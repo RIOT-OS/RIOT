@@ -1,5 +1,5 @@
 INCLUDES = -I../include -I$(RIOTBASE)/core/include
 MODULE =config
 
-include $(RIOTBASE)/makefile.base
+include $(RIOTBASE)/Makefile.base
 

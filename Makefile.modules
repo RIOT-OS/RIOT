@@ -25,6 +25,6 @@ BL=$(USEMODULE:%= $(BINDIR)%.a)
 export BASELIBS = $(shell echo $(BL)|sed 's/[^ ]*hwtimer.a//')
 CFLAGS += $(EXTDEFINES)
 
-include $(RIOTBASE)/makefile.dep
+include $(RIOTBASE)/Makefile.dep
 
 export USEMODULE

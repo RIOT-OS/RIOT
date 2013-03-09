@@ -2,5 +2,5 @@ INCLUDES = -I.. -I../../include -I../../drivers/include -I../../../core/include 
 
 MODULE =net_mm
 
-include $(MAKEBASE)/makefile.base	
+include $(MAKEBASE)/Makefile.base	
 

@@ -1,8 +1,8 @@
-  ASMSRC = $(wildcard *.s)
-  ASMOBJ = $(ASMSRC:%.s=$(BINDIR)%.o)
-  SRC = $(wildcard *.c)
-  OBJ = $(SRC:%.c=$(BINDIR)%.o)
-  DEP = $(SRC:%.c=$(BINDIR)%.d)
+ASMSRC = $(wildcard *.s)
+ASMOBJ = $(ASMSRC:%.s=$(BINDIR)%.o)
+SRC = $(wildcard *.c)
+OBJ = $(SRC:%.c=$(BINDIR)%.o)
+DEP = $(SRC:%.c=$(BINDIR)%.d)
 
 ifeq ($(CPU),lpc2387)
  INCLUDES += -I$(MAKEBASE)/cpu/arm_common/include/
@@ -24,6 +24,11 @@ ifeq ($(BOARD),msba2)
  INCLUDES += -I$(RIOTBOARD)/msba2/include/
  INCLUDES += -I$(RIOTBOARD)/msba2-common/include/
  INCLUDES += -I$(RIOTBOARD)/msba2-common/drivers/include/
+endif
+ifeq ($(BOARD),msb-430)
+ INCLUDES += -I$(RIOTBOARD)/msb-430/include/
+ INCLUDES += -I$(RIOTBOARD)/msb-430-common/include/
+ INCLUDES += -I$(RIOTBOARD)/msb-430-common/drivers/include/
 endif
 ifeq ($(BOARD),msb-430h)
  INCLUDES += -I$(RIOTBOARD)/msb-430h/include/

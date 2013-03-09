@@ -2,5 +2,5 @@ INCLUDES = -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include -I../../net -
 
 MODULE =mci
 
-include $(MAKEBASE)/makefile.base
+include $(MAKEBASE)/Makefile.base
 

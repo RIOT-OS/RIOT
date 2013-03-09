@@ -6,7 +6,7 @@ HTMLDIR=${TOOLROOT}/tools/testsuite/html
 
 test -f ~/.buildbot && . ~/.buildbot
 
-OUTFILE=${HTMLFILE:-${HOME}/firekernel.html}
+OUTFILE=${HTMLFILE:-${HOME}/riot.html}
 LOGDIR=${BUILDLOGS:-${HOME}/buildlogs}
 
 {

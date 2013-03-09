@@ -2,6 +2,6 @@ INCLUDES = -I../include -I../drivers/include -I../lib -I../../cpu/$(CPU)/include
 
 MODULE =uart0
 
-include $(MAKEBASE)/makefile.base
+include $(MAKEBASE)/Makefile.base
 
 
