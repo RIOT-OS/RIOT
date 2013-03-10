@@ -1,5 +1,5 @@
 /**
- * The µkleos scheduler implementation
+ * The RIOT scheduler implementation
  *
  * Copyright (C) 2010 Freie Universität Berlin
  *

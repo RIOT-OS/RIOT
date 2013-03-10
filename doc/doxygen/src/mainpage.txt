@@ -1,0 +1,40 @@
+/*! \mainpage RIOT Documentation
+ *
+ * RIOT is an operating system for the Internet of Things based on a microkernel architecture. 
+ *
+ * \section first_sec First steps
+ *
+ * \subsection getting_sec Getting RIOT
+ *
+ * You can obtain the latest RIOT code from our [Github](https://github.com/) account. There are three repositories:
+ *   - [RIOT](https://github.com/RIOT-OS/RIOT)\n
+ *     This contains the kernel, support for different CPUs, device drivers, and system libraries.\n
+ *     It also provides you with additional tools like a terminal program and scripts to setup a toolchain.\n
+ *     This is the only repository you need to develop applications with RIOT.
+ *   - [boards](https://github.com/RIOT-OS/boards)
+ *     This repository contains configuration files and hardware initialization code for various supported hardware platforms.\n
+ *     You need this code only if you want to use RIOT on one of these boards:
+ *     -# [MSB-A2](http://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/Z_Finished_Projects/ScatterWeb/modules/mod_MSB-A2.html)
+ *     -# PTTU
+ *     -# [MSB-430(H)](http://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/Z_Finished_Projects/ScatterWeb/modules/mod_MSB-430H.html)
+ *     -# [EZ430-Chronos](http://processors.wiki.ti.com/index.php/EZ430-Chronos)\n
+ *     You will also need this code to run RIOT as a program on your development system.
+ *   - [projects](https://github.com/RIOT-OS/projects)\n
+ *     Contains some exemplary applications.\n
+ *
+ * \subsection compile_sec Compiling RIOT
+ *
+ * Depending on the hardware you want to use, you need to first install a corresponding toolchain. Instructions for the installation of the toolchain for an ARM7 based plaform in Ubuntu or Debian can be found at our [Wiki](https://github.com/RIOT-OS/boards/wiki/For-MSB-A2).\n
+ * Once you have set up the toolchain, you can create your own project. Apart from the C file(s) containing your source code you need a Makefile. A template Makefile is available in the `dist` folder of the [RIOT repository](https://github.com/RIOT-OS/RIOT).\n
+ * Within your project's Makefile, you can define the target hardware as well as the modules you want to use.\n
+ * Unless specified otherwise, make will create an elf-file as well as an Intel hex file in the `bin` folder of your project directory.
+ *
+ * \subsection native_sec Native RIOT - Run RIOT on your PC!
+ *
+ * As a special platform, you will find a CPU and board called `native` in the repository. This target allows you to run RIOT as a process on POSIX compliant operating systgems. Just set CPU and BOARD to `native` in your project's Makefile, call `make`, and execute the resulting elf-file.
+ *
+ * \section info_sec Community
+ *
+ * Whether you are looking for help with writing an application for RIOT, want to learn more about it, or just stay in the loop you are invited to join the RIOT-users mailing list. For developers who want to participate and contribute to the kernel development or integrate new MCU and platform support the [RIOT-devel mailing list](http://lists.riot-os.org/mailman/listinfo/devel) is the right place.
+ *  
+ */
