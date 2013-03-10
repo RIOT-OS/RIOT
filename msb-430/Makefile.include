@@ -1,0 +1,1 @@
+include $(RIOTBOARD)/msb-430-common/Makefile.include
