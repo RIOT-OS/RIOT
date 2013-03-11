@@ -31,7 +31,7 @@
  *
  * \subsection native_sec Native RIOT - Run RIOT on your PC!
  *
- * As a special platform, you will find a CPU and board called `native` in the repository. This target allows you to run RIOT as a process on POSIX compliant operating systgems. Just set CPU and BOARD to `native` in your project's Makefile, call `make`, and execute the resulting elf-file.
+ * As a special platform, you will find a CPU and board called `native` in the repository. This target allows you to run RIOT as a process on Linux on most supported hardware platforms. Just set CPU and BOARD to `native` in your project's Makefile, call `make`, and execute the resulting elf-file.
  *
  * \section info_sec Community
  *
