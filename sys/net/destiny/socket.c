@@ -888,7 +888,7 @@ int32_t recvfrom(int s, void *buf, uint32_t len, int flags, sockaddr6_t *from, u
 		}
 	}
 
-int32_t sendto(int s, void *msg, uint32_t len, int flags, sockaddr6_t *to, uint32_t tolen)
+int32_t sendto(int s, const void *msg, uint32_t len, int flags, sockaddr6_t *to, uint32_t tolen)
 	{
 	if (isUDPSocket(s) && (getSocket(s)->socket_values.foreign_address.sin6_port == 0))
 		{
@@ -1176,7 +1176,7 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket, sock
 	return current_queued_int_socket->socket_id;
 	}
 
-int accept(int s, sockaddr6_t *addr, uint32_t addrlen)
+int accept(int s, sockaddr6_t *addr, uint32_t *addrlen)
 	{
 	socket_internal_t *server_socket = getSocket(s);
 	if (isTCPSocket(s) && (server_socket->socket_values.tcp_control.state == LISTEN))

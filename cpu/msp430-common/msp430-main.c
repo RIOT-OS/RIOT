@@ -32,7 +32,6 @@
  *
  * Modified by Kaspar Schleiser
  */
-#include <sys/unistd.h>
 
 #include "cpu.h"
 #include <msp430x16x.h>

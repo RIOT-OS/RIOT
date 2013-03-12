@@ -9,7 +9,7 @@ __attribute__ ((constructor)) static void startup(void) {
 
     board_init();
 
-    puts("ukleos MSP430 hardware initialization complete.\n");
+    puts("RIOT MSP430 hardware initialization complete.\n");
 
     kernel_init();
 }

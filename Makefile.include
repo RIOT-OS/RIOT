@@ -1,0 +1,45 @@
+# if you want to publish the board into the sources as an uppercase #define
+BB = $(shell echo $(BOARD)|tr 'a-z' 'A-Z')
+CFLAGS += -DBOARD=$(BB)
+export CFLAGS
+
+# mandatory include! 
+include $(RIOTBASE)/Makefile.modules 
+include $(RIOTBOARD)/$(BOARD)/Makefile.include
+
+# your binaries to link
+BASELIBS += $(RIOTBOARD)/$(BOARD)/bin/$(BOARD)_base.a
+BASELIBS += $(PROJBINDIR)/project.a
+
+PROJBINDIR =$(CURDIR)/bin
+
+## make script for your project. Build RIOT-base here!
+all: $(PROJBINDIR)/$(PROJECT).a
+	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(CPU)."
+	$(MAKE) -C $(RIOTBOARD)
+	$(MAKE) -C $(RIOTBASE)
+	$(LINK) $(LINKFLAGS) $(UNDEF) -o $(PROJBINDIR)/$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(PROJBINDIR)/$(PROJECT).map
+	$(SIZE) $(PROJBINDIR)/$(PROJECT).elf
+	$(OBJCOPY) -O ihex $(PROJBINDIR)/$(PROJECT).elf $(PROJBINDIR)/$(PROJECT).hex
+
+## your make rules
+## Only basic example - modify it for larger projects!!
+$(PROJBINDIR)/$(PROJECT).a: $(PROJBINDIR)/$(PROJECT).o
+	$(AR) -rc $(PROJBINDIR)/project.a $(PROJBINDIR)/$(PROJECT).o 
+	
+$(PROJBINDIR)/$(PROJECT).o: main.c 
+	$(CC) $(CFLAGS) $(BOARDINCLUDE) $(INCLUDES) -c main.c -o $(PROJBINDIR)/$(PROJECT).o
+
+clean:
+	$(MAKE) -C $(RIOTBOARD) clean
+	$(MAKE) -C $(RIOTBASE) clean
+	rm -f $(PROJBINDIR)/*
+
+flash: all
+	$(FLASH) $(PORT) $(PROJBINDIR)/$(PROJECT).hex
+
+term:
+	$(TERM) $(PORT)
+
+doc:
+	make -BC $(RIOTBASE) doc

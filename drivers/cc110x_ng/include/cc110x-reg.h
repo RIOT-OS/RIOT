@@ -3,7 +3,7 @@
  * @ingroup dev_cc110x_ng
  * @brief   Access to CC110X registers
  *
- * @author  Freie Uniersität Berlin, Computer Systems & Telematics, µkleos
+ * @author  Freie Uniersität Berlin, Computer Systems & Telematics, RIOT
  * @author  Oliver Hahm <oliver.hahm@fu-berlin.de
  * version  $Revision$
  *

@@ -4,7 +4,7 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = µkleos 
+PROJECT_NAME           = RIOT 
 PROJECT_NUMBER         = 
 OUTPUT_DIRECTORY       = 
 CREATE_SUBDIRS         = NO
@@ -85,9 +85,9 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = ../../core ../../cpu ../../board ../../sys ../manual ../../drivers
+INPUT                  = ../../core ../../cpu ../../board ../../sys src/ ../../drivers
 INPUT_ENCODING         = UTF-8
-FILE_PATTERNS          = *.doc *.c *.h 
+FILE_PATTERNS          = *.txt *.c *.h 
 RECURSIVE              = YES
 EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO
@@ -123,9 +123,9 @@ IGNORE_PREFIX          =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = .html
-HTML_HEADER            = src/ukleos-header.html 
-HTML_FOOTER            = src/ukleos-footer.html
-HTML_STYLESHEET        = 
+HTML_HEADER            = src/riot-header.html 
+HTML_FOOTER            = src/riot-footer.html
+HTML_STYLESHEET        = src/riot.css
 HTML_ALIGN_MEMBERS     = YES
 HTML_DYNAMIC_SECTIONS  = YES
 GENERATE_DOCSET        = NO
@@ -148,7 +148,7 @@ QHP_SECT_FILTER_ATTRS  =
 QHG_LOCATION           = 
 DISABLE_INDEX          = NO
 ENUM_VALUES_PER_LINE   = 4
-GENERATE_TREEVIEW      = NO 
+GENERATE_TREEVIEW      = YES 
 TREEVIEW_WIDTH         = 250
 FORMULA_FONTSIZE       = 10
 #---------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /**
- *  There are two ways to use the IPC Messaging system of µkleos. The default is synchronous
+ *  There are two ways to use the IPC Messaging system of RIOT. The default is synchronous
  *  messaging. In this manner, messages are either dropped when the receiver is not waiting and the
  *  message was sent non-blocking, or will be delivered immediately when the receiver calls
  *  msg_receive(msg_t* m). To use asynchronous messaging any thread can create its own queue by
@@ -14,7 +14,7 @@
 
 /**
  * @file
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 

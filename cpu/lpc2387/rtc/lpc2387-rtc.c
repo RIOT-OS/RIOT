@@ -4,14 +4,14 @@ Copyright 2008-2010, Freie Universitaet Berlin (FUB). All rights reserved.
 These sources were developed at the Freie Universitaet Berlin, Computer Systems
 and Telematics group (http://cst.mi.fu-berlin.de).
 -------------------------------------------------------------------------------
-This file is part of FeuerWare.
+This file is part of RIOT.
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
 Foundation, either version 3 of the License, or (at your option) any later
 version.
 
-FeuerWare is distributed in the hope that it will be useful, but WITHOUT
+RIOT is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
@@ -29,7 +29,7 @@ and the mailinglist (subscription via web site)
  * @ingroup		lpc2387_rtc
  * @brief		LPC2387 Real-Time-Clock
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Michael Baar <michael.baar@fu-berlin.de>
  * @version     $Revision: 2005 $
  *
