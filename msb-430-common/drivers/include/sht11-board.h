@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright 2009, Freie Universitaet Berlin (FUB). All rights reserved.
+Copyright 2013, Freie Universitaet Berlin (FUB). All rights reserved.
 
 These sources were developed at the Freie Universitaet Berlin, Computer Systems
 and Telematics group (http://cst.mi.fu-berlin.de).
@@ -36,10 +36,8 @@ and the mailinglist (subscription via web site)
  * @file
  * @brief		SHT11 Device Driver Configuration For MSB-430 Platform
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, µkleos
- * @version     $Revision$
+ * @author      Freie Universität Berlin, Computer Systems & Telematics, RIOT
  *
- * @note		$Id$
  */
 #include <msp430x16x.h>
 #include <bitarithm.h>
