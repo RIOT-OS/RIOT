@@ -3,5 +3,3 @@ INCLUDES = -Iinclude -I../$(CPU)/include -I../../sys/lib -I../../drivers/include
 
 include $(RIOTBASE)/Makefile.base
 
-
-

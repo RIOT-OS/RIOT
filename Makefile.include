@@ -4,8 +4,8 @@ CFLAGS += -DBOARD=$(BB)
 export CFLAGS
 
 # mandatory include! 
-include $(RIOTBASE)/Makefile.modules 
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
+include $(RIOTBASE)/Makefile.modules 
 
 # your binaries to link
 BASELIBS += $(RIOTBOARD)/$(BOARD)/bin/$(BOARD)_base.a
@@ -36,7 +36,7 @@ clean:
 	rm -f $(PROJBINDIR)/*
 
 flash: all
-	$(FLASH) $(PORT) $(PROJBINDIR)/$(PROJECT).hex
+	$(FLASHER) $(PORT) $(PROJBINDIR)/$(PROJECT).hex
 
 term:
 	$(TERM) $(PORT)
