@@ -1,12 +1,15 @@
 /**
  * Native CPU lpm.h implementation
  *
+ * Uses system calls to emulate CPU power modes.
+ *
  * Copyright (C) 2013 Ludwig Ortmann
  *
  * This file subject to the terms and conditions of the GNU General Public
  * License. See the file LICENSE in the top level directory for more details.
  *
- * @ingroup arch
+ * @ingroup lpm
+ * @ingroup native_cpu
  * @{
  * @file
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
@@ -28,6 +31,11 @@ void lpm_init(void)
     return;
 }
 
+/**
+ * LPM_IDLE uses sleep() to wait for interrupts
+ * LPM_OFF exits process
+ * other modes not supported at the moment
+ */
 enum lpm_mode lpm_set(enum lpm_mode target)
 {
     enum lpm_mode last_lpm;
@@ -90,6 +98,7 @@ void lpm_end_awake(void)
     native_lpm = LPM_ON;
     return;
 }
+
 enum lpm_mode lpm_get(void)
 {
     return native_lpm;

@@ -27,7 +27,7 @@ and the mailinglist (subscription via web site)
 
 /**
  * @defgroup	sht11	Sensirion SHT11 Driver
- * @ingroup		dev
+ * @ingroup		drivers
  * @{
  */
 

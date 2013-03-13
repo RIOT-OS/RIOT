@@ -1,15 +1,19 @@
 /**
  * Native CPU hwtimer_arch.h implementation
  *
+ * Uses POSIX real-time extension timers to mimic hardware timers.
+ * XXX: see hwtimer_isr_timer()
+ *
  * Copyright (C) 2013 Ludwig Ortmann
  *
  * This file subject to the terms and conditions of the GNU General Public
  * License. See the file LICENSE in the top level directory for more details.
  *
- * @ingroup arch
+ * @ingroup hwtimer
+ * @ingroup native_cpu
  * @{
- * @file
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @file
  * @}
  */
 
@@ -33,18 +37,29 @@ static int native_hwtimer_irq[ARCH_MAXTIMERS];
 static timer_t native_hwtimer_timer[ARCH_MAXTIMERS];
 static void (*int_handler)(int);
 
+/**
+ * sets timespec to given ticks
+ */
 void ticks2ts(unsigned long ticks, struct timespec *tp)
 {
    tp->tv_sec = ticks / HWTIMER_SPEED;
    tp->tv_nsec = (ticks % HWTIMER_SPEED)*1000 ;
 }
 
+/**
+ * returns ticks for give timespec
+ */
 unsigned long ts2ticks(struct timespec *tp)
 {
     /* TODO: check for overflow */
     return((tp->tv_sec * HWTIMER_SPEED) + (tp->tv_nsec/1000));
 }
 
+/**
+ * native timer signal handler,
+ * 
+ * XXX: Calls callback for all timers whenever any timer finishes.
+ */
 void hwtimer_isr_timer()
 {
     DEBUG("hwtimer_isr_timer()\n");
@@ -95,10 +110,6 @@ void hwtimer_arch_unset(short timer)
     return;
 }
 
-/**
- * Set a kernel timer to raise an interrupt after ::offset kernel timer ticks
- * from now.
- */
 void hwtimer_arch_set(unsigned long offset, short timer)
 {
     struct itimerspec its;

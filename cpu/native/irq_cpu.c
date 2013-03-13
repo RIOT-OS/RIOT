@@ -1,16 +1,19 @@
 /**
  * Native CPU irq.h implementation
  *
+ * uses POSIX real-time extension signals to create interrupts
+ * TODO: needs to be rewritten for better portability
+ * 
  * Copyright (C) 2013 Ludwig Ortmann
  *
  * This file subject to the terms and conditions of the GNU General Public
  * License. See the file LICENSE in the top level directory for more details.
  *
- * @ingroup arch
+ * @ingroup native_cpu
+ * @ingroup irq
  * @{
  * @file
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
- * @}
  */
 #include <signal.h>
 #include <err.h>
@@ -34,6 +37,9 @@ struct int_handler_t {
 };
 static struct int_handler_t native_irq_handlers[255];
 
+/**
+ * block signals
+ */
 unsigned disableIRQ(void)
 {
     unsigned int prev_state;
@@ -60,6 +66,9 @@ unsigned disableIRQ(void)
     return prev_state;
 }
 
+/**
+ * unblock signals
+ */
 unsigned enableIRQ(void)
 {
     unsigned int prev_state;
@@ -181,8 +190,10 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
 }
 
 /**
+ * register signal/interrupt handler for signal sig
+ *
  * TODO: check sa_flags for appropriateness
- * TODO: use appropriate data structure (hashmap?) for signal
+ * TODO: use appropriate data structure for signal
  *       handlers.
  */
 int register_interrupt(int sig, void *handler)
@@ -212,6 +223,8 @@ int register_interrupt(int sig, void *handler)
 }
 
 /**
+ * empty signal mask
+ *
  * TODO: see register_interrupt
  * TODO: ignore signal
  */
@@ -239,6 +252,9 @@ int unregister_interrupt(int sig)
 
 
 /**
+ * register internal signal handler,
+ * initalize local variables
+ *
  * TODO: see register_interrupt
  */
 void native_interrupt_init(void)
@@ -269,3 +285,4 @@ void native_interrupt_init(void)
 
     puts("RIOT native interrupts/signals initialized.");
 }
+/** @} */

@@ -6,8 +6,8 @@
  * This file subject to the terms and conditions of the GNU General Public
  * License. See the file LICENSE in the top level directory for more details.
  *
- * @ingroup arch
  * @{
+ * @ingroup native_hwtimer
  * @file
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  * @}
