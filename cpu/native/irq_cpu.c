@@ -245,7 +245,7 @@ int unregister_interrupt(int sig)
     sa.sa_flags = SA_RESTART | SA_SIGINFO;
 
     if (sigaction(sig, &sa, NULL)) {
-        err(1, "register_interrupt: sigaction");
+        err(1, "unregister_interrupt: sigaction");
     }
     return 0;
 }
