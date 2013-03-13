@@ -30,8 +30,6 @@
 
 #include "debug.h"
 
-#define HWTIMER_MINTICKS (1000)
-
 static unsigned long native_hwtimer_now;
 static int native_hwtimer_irq[ARCH_MAXTIMERS];
 static timer_t native_hwtimer_timer[ARCH_MAXTIMERS];
