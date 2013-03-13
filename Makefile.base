@@ -20,6 +20,9 @@ ifeq ($(CPU),cc430)
  INCLUDES += -I$(MAKEBASE)/cpu/msp430-common/include/
  INCLUDES += -I$(MAKEBASE)/cpu/cc430/include/
 endif
+ifeq ($(CPU),native)
+ INCLUDES += -I$(MAKEBASE)/cpu/native/include/
+endif
 ifeq ($(BOARD),msba2)
  INCLUDES += -I$(RIOTBOARD)/msba2/include/
  INCLUDES += -I$(RIOTBOARD)/msba2-common/include/
