@@ -1,3 +1,0 @@
-BOARD = msb-430h ;
-
-include $(TOP)/board/msb-430-common/Jamrules.msb-430-common ; 
