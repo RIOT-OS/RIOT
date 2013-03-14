@@ -1,12 +1,14 @@
 /**
  * Native Board LED implementation
  *
+ * Only prints function calls at the moment.
+ *
  * Copyright (C) 2013 Ludwig Ortmann
  *
  * This file subject to the terms and conditions of the GNU General Public
  * License. See the file LICENSE in the top level directory for more details.
  *
- * @ingroup native
+ * @ingroup native_board
  * @{
  * @file
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
