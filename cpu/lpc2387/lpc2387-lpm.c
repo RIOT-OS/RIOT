@@ -26,6 +26,7 @@ and the mailinglist (subscription via web site)
 
 /**
  * @ingroup lpc2387
+ * @ingroup lpm
  * @{
  */
 

@@ -1,16 +1,18 @@
 /**
  * Native CPU kernel_intern.h and sched.h implementation
  *
+ * in-process preemptive context switching utilizes POSIX ucontexts.
+ * (ucontext provides for architecture independent stack handling)
+ *
  * Copyright (C) 2013 Ludwig Ortmann
  *
  * This file subject to the terms and conditions of the GNU General Public
  * License. See the file LICENSE in the top level directory for more details.
  *
- * @ingroup arch
+ * @ingroup native_cpu
  * @{
  * @file
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
- * @}
  */
 #include <stdio.h>
 #include <ucontext.h>
@@ -109,3 +111,4 @@ void native_cpu_init()
     makecontext(&native_context, sched_task_exit, 0);
     puts("RIOT native cpu initialized.");
 }
+/** @} */

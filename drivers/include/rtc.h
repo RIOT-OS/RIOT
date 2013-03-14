@@ -24,6 +24,12 @@ and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
+/**
+ * @defgroup rtc Realtime Clock
+ * @ingroup drivers
+ * @{
+ */
+
 #ifndef RTC_H
 #define RTC_H
 
@@ -61,3 +67,4 @@ void rtc_get_localtime(struct tm* localt);
 extern int rtc_second_pid;
 
 #endif
+/** @} */

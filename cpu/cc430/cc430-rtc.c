@@ -24,6 +24,10 @@ and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
+/**
+ * @ingroup rtc
+ */
+
 #include <string.h>
 #include <signal.h>
 #include <irq.h>
