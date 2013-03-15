@@ -1,11 +1,16 @@
 #include <string.h>
-#include <math.h>
+#include <stdio.h>
 #include "of_mrhof.h"
 
-static char is_initialised = 0;
+// Function Prototypes
+static uint16_t calc_rank(rpl_parent_t *, uint16_t);
+static rpl_parent_t *which_parent(rpl_parent_t *, rpl_parent_t *);
+static rpl_dodag_t *which_dodag(rpl_dodag_t *, rpl_dodag_t *);
+static void reset(rpl_dodag_t *);
+static uint16_t calc_path_cost(rpl_parent_t * parent);
 
 uint16_t cur_min_path_cost = MAX_PATH_COST;
-static mrhof_candidate_info_t candidate_info[RPL_MAX_CANDIDATE_NEIGHBORS];
+rpl_parent_t * cur_preferred_parent = NULL;
 
 rpl_of_t rpl_of_mrhof = {
         0x1,
@@ -13,170 +18,137 @@ rpl_of_t rpl_of_mrhof = {
         which_parent,
         which_dodag,
         reset,
-        init,
         NULL
-};
+        };
 
-rpl_of_t *rpl_get_of_mrhof() {
+rpl_of_t * rpl_get_of_mrhof(void) {
     return &rpl_of_mrhof;
 }
 
-void init() {
-    //TODO implement OF-specific init of timers/functions/structs/whatever
-    if (!is_initialised) {
-        //blabla init this node
-    }
-    is_initialised = 1;
-}
-
 void reset(rpl_dodag_t *dodag) {
-    //todo implement if necessary
 }
 
-void calc_path_cost() {
+static uint16_t calc_path_cost(rpl_parent_t * parent) {
     /*
-     * Calculates the path cost through all candidate neighbours and sets
-     * cur_min_path_cost to the lowest value?
+     * Calculates the path cost through the parent, for now, only for ETX
      */
-
-    if(i_am_root){
-        //Since for now we only support ETX, the pastcost that computes to
-        //a rank of minhoprankincrease IS minhoprankincrease
-        cur_min_path_cost = rpl_get_my_dodag()->minhoprankincrease;
-        return;
+    if (parent == NULL ) {
+        // Shouldn't ever happen since this function is supposed to be always
+        // run with a parent. If it does happen, we can assume a root called it.
+        printf("[WARNING] calc_path_cost called without parent!");
+        return DEFAULT_MIN_HOP_RANK_INCREASE;
     }
 
-    /*
-     * This is the boolean describing if I need to do a parent selection.
-     * This happens always when the past cost for a candidate neighbor OR a
-     * parent changes.
-     */
-    char do_parent_selection = 0;
-    uint16_t path_cost = 0;
-    for (uint8_t i = 0; i < RPL_MAX_CANDIDATE_NEIGHBORS; i++) {
-        if(candidates[i].used){
-            if(candidate_info[i].cur_etx != 0){
-                /* The RFC specifies this computation a bit ambiguously, this is
-                 * what I understood:
-                 *
-                 * (ETX_for_link_to_neighbor * 128) + Rank_of_that_neighbor
-                 *
-                 * This means I get the rank of that neighbor (which is the etx
-                 * of the whole path from him to the root node) plus my ETX to
-                 * that neighbor*128, which would be the 'rank' of the single link
-                 * from me to that neighbor
-                 *
-                 */
-                path_cost = candidate_info[i].cur_etx*ETX_RANK_MULTIPLIER + (candidates[i].dodag->my_rank);
-                if(candidate_info[i].cur_path_cost == path_cost){
-                    //nothing changed
-                    continue;
-                }
-                do_parent_selection = 1;
-                candidate_info[i].cur_path_cost = path_cost;
-            }else{
-                //if it is 0, the value has not been computed yet, so we can't
-                //compute a path cost
-                if(candidate_info[i].cur_path_cost == MAX_PATH_COST){
-                    //nothing changed
-                    continue;
-                }
-                do_parent_selection = 1;
-                candidate_info[i].cur_path_cost = MAX_PATH_COST;
-            }
+    double etx_value = etx_get_metric(parent->addr);
+    if (etx_value != 0) {
+        /*
+         * (ETX_for_link_to_neighbor * 128) + Rank_of_that_neighbor
+         *
+         * This means I get the rank of that neighbor (which is the etx
+         * of the whole path from him to the root node) plus my ETX to
+         * that neighbor*128, which would be the 'rank' of the single link
+         * from me to that neighbor
+         *
+         */
+        if (etx_value * ETX_RANK_MULTIPLIER > MAX_LINK_METRIC) {
+            // Disallow links with an estimated ETX of 4 or higher
+            return MAX_PATH_COST;
         }
-    }
-    if(do_parent_selection){
-        parent_selection();
-    }
 
+        if (etx_value * ETX_RANK_MULTIPLIER + parent->rank
+                < parent->rank) {
+            //Overflow
+            return MAX_PATH_COST;
+        }
+        //TODO runden
+        return etx_value * ETX_RANK_MULTIPLIER
+                + parent->rank;
+    } else {
+        // IMPLEMENT HANDLING OF OTHER METRICS HERE
+        // if it is 0, it hasn't been computed, thus we cannot compute a path
+        // cost
+        return MAX_PATH_COST;
+    }
 }
 
-uint16_t calc_rank() {
+static uint16_t calc_rank(rpl_parent_t * parent, uint16_t base_rank) {
     /*
-     * Return the rank for this node (calculated from path cost).
-     * There will be 3 values calculated, the highest of those 3 values will be
-     * used as the noderank.
+     * Return the rank for this node.
      *
      * For now, there is no metric-selection or specification, so the rank com-
      * putation will always be assumed to be done for the ETX metric.
+     * Baserank is pretty much only used to find out if a node is a root or not.
      */
-    uint16_t result = INFINITE_RANK;
+    if (parent == NULL ) {
+        if (base_rank == 0) {
+            //No parent, no rank, a root node would have a rank != 0
+            return INFINITE_RANK;
+        }
 
-    //Holds the 3 computed values for the nodes rank from which the max value
-    //will be the nodes actual rank
-    uint16_t rankarray[3] = {0,0,0};
+        /*
+         * No parent, base_rank != 0 means this is a root node or a node which
+         * is recalculating.
+         * Since a recalculating node must have a parent in this implementation
+         * (see rpl.c, function global_repair), we can assume this node is root.
+         */
+        return DEFAULT_MIN_HOP_RANK_INCREASE;
+    } else {
+        /*
+         * We have a parent and are a non-root node, calculate the path cost for
+         * the parent and choose the maximum of that value and the advertised
+         * rank of the parent + minhoprankincrease for our rank.
+         */
+        uint16_t calculated_pcost = calc_path_cost(parent);
 
-    //TODO finish this
-    //rankarray[0] = (rpl_find_preferred_parent()->rank > ;
-
-    if (i_am_root) {
-        result = rpl_get_my_dodag()->minhoprankincrease;
-        return result;
-    }
-
-    //Check which parent has the highest advertised rank
-    for (uint8_t i = 0; i < RPL_MAX_PARENTS; i++) {
-        if (parents[i].used) {
-            if (parents[i].rank == INFINITE_RANK){
-                // parent not useful, should be deleted //TODO check if deletion
-                // should be triggered from here
-                continue;
+        if (calculated_pcost < MAX_PATH_COST) {
+            if ((parent->rank + parent->dodag->minhoprankincrease)
+                    > calculated_pcost) {
+                return parent->rank + parent->dodag->minhoprankincrease;
+            } else {
+                return calculated_pcost;
             }
-            else if (parents[i].rank > rankarray[2]) {
-                //store it away
-                rankarray[2] = parents[i].rank;
-            }
+        } else {
+            //Path costs are greater than allowed
+            return INFINITE_RANK;
         }
     }
-
-    //Compute 2nd rankvalue and store it in 2nd place in the array
-    if(rpl_get_my_dodag()->minhoprankincrease * (1 + (rankarray[2]/rpl_get_my_dodag()->minhoprankincrease)) < rankarray[2]){
-        //overflow
-        rankarray[1] = INFINITE_RANK;
-    }else{
-        rankarray[1] = rpl_get_my_dodag()->minhoprankincrease * (1 + (rankarray[2]/rpl_get_my_dodag()->minhoprankincrease));
-    }
-
-    //Compute the 3rd rankvalue and store it in the 3rd place
-    if(rankarray[2] - rpl_get_my_dodag()->maxrankincrease )
-
-
-    return result;
 }
 
-void parent_selection(){
+static rpl_parent_t * which_parent(rpl_parent_t * p1, rpl_parent_t * p2) {
     /*
-     * Select a candidate neighbor as preferred parent.
+     * Return the parent with the lowest path cost.
+     * Before returning any of the two given parents, make sure that a switch is
+     * desirable.
      *
-     * Note:
-     *      If we allow floating roots, a node may have no parents
      */
+    uint16_t path_p1    = calc_path_cost(p1);
+    uint16_t path_p2    = calc_path_cost(p2);
 
-    /*
-     * Might be faster to set the node directly?
-     */
-    uint8_t cur_min_path_neighbor_index = 0;
-    uint16_t min_path_cost = MAX_PATH_COST;
-
-    for (uint8_t i = 0; i < RPL_MAX_CANDIDATE_NEIGHBORS; i++) {
-        /*
-         * Go through all Candidate Neighbors, compare their path cost with cur-
-         * rent minimum path cost and change cur_min_path_neighbor_index
-         * to the index of the current neighbor if his path is 'shorter'
-         */
-        if(candidates[i].used && (candidate_info[i].cur_path_cost < MAX_LINK_METRIC)){
-            if(candidate_info[i].cur_path_cost < min_path_cost){
-                cur_min_path_neighbor_index = i;
+    if(cur_preferred_parent != NULL){
+        //test if the parent from which we got this path is still active
+        if(cur_preferred_parent->used != 0){
+            // Test, if the current best path is better than both parents given
+            if(cur_min_path_cost < path_p1 + PARENT_SWITCH_THRESHOLD
+                && cur_min_path_cost < path_p2 + PARENT_SWITCH_THRESHOLD){
+                return cur_preferred_parent;
             }
         }
     }
 
-    //TODO finish this.
-    //rpl_find_preferred_parent()
+    if (path_p1 < path_p2) {
+        /*
+         * Return the current best parent, and set it as current best parent
+         */
+        cur_min_path_cost = path_p1;
+        cur_preferred_parent = p1;
+        return p1;
+    }
+    cur_min_path_cost = path_p2;
+    cur_preferred_parent = p2;
+    return p2;
 }
 
 //Not used yet, as the implementation only makes use of one dodag for now.
-rpl_dodag_t * which_dodag(rpl_dodag_t *d1, rpl_dodag_t *d2) {
+static rpl_dodag_t * which_dodag(rpl_dodag_t *d1, rpl_dodag_t *d2) {
     return d1;
 }

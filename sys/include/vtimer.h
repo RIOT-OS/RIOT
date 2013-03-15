@@ -91,4 +91,14 @@ int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid);
  */
 int vtimer_remove(vtimer_t *t);
 
+/**
+ * @brief Prints the vtimer shortterm queue (use for debug purposes)
+ */
+void vtimer_print_short_queue();
+
+/**
+ * @brief Prints the vtimer longterm queue (use for debug purposes)
+ */
+void vtimer_print_long_queue();
+
 #endif /* __VTIMER_H */

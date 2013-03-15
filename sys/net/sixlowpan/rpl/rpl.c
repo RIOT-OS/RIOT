@@ -4,7 +4,9 @@
 #include <mutex.h>
 #include "msg.h"
 #include "rpl.h"
+#include "etx_beaconing.h"
 #include "of0.h"
+#include "of_mrhof.h"
 #include "trickle.h"
 
 #include "sys/net/sixlowpan/sixlowmac.h"
@@ -165,6 +167,12 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address){
     ipv6_get_saddr(&my_address, &ll_address);
 	set_rpl_process_pid(rpl_process_pid);
 
+	//Initialize ETX-calculation if needed
+	if(RPL_DEFAULT_OCP == 1){
+        puts("INIT ETX BEACONING");
+        etx_init_beaconing(&my_address);
+	}
+
 	return SUCCESS;
 
 }
@@ -197,15 +205,10 @@ void rpl_init_root(){
 		dodag->lifetime_unit = RPL_LIFETIME_UNIT;
 		dodag->version = RPL_COUNTER_INIT;
 		dodag->grounded = RPL_GROUNDED;
+		dodag->node_status = (uint8_t) ROOT_NODE;
 		dodag->my_rank = ROOT_RANK; //TODO change this, according to spec.
 		dodag->joined = 1;
 		dodag->my_preferred_parent = NULL;
-
-		//OF-specific initialisation, if needed.
-		//For non-root nodes, this happens when a DIO with a OF is received
-		if(dodag->of->init != NULL){
-		    dodag->of->init();
-		}
 	}	
 	else{
 		printf("Error - could not generate DODAG\n");
@@ -515,7 +518,6 @@ void recv_rpl_dio(void){
 				break;
 			}
 			case(RPL_OPT_DAG_METRIC_CONTAINER):{
-			    //TODO implement handling of Metric container
 				len += rpl_opt_buf->length +2;
 				break;
 			}
@@ -625,10 +627,6 @@ void recv_rpl_dio(void){
 	//
 	// Parent Handling
 	//
-
-	//TODO parent selection should not be run from RPL core but from the object-
-	//ive function, the parents set here should be instead the candidate neigh-
-	//bor set
 	//
 	//Ist Knoten bereits Parent?
 	rpl_parent_t *parent;

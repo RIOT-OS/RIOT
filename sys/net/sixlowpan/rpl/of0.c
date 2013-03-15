@@ -1,14 +1,18 @@
 #include <string.h>
 #include "of0.h"
 
+//Function Prototypes
+static uint16_t calc_rank(rpl_parent_t *, uint16_t);
+static rpl_parent_t *which_parent(rpl_parent_t *, rpl_parent_t *);
+static rpl_dodag_t *which_dodag(rpl_dodag_t *, rpl_dodag_t *);
+static void reset(rpl_dodag_t *);
+
 rpl_of_t rpl_of0 = {
 	0x0,
 	calc_rank,
 	which_parent,
 	which_dodag,
 	reset,
-	NULL,
-	NULL,
 	NULL
 };
 
@@ -20,19 +24,12 @@ void reset(rpl_dodag_t *dodag){
 	//Nothing to do in OF0
 }
 
-uint16_t calc_rank(){
-	rpl_parent_t *  parent  = rpl_find_preferred_parent();
-	uint16_t        my_rank = rpl_get_my_dodag()->my_rank;
-
-	if(i_am_root){
-	    return rpl_get_my_dodag()->minhoprankincrease;
-	}
-
-    if(my_rank == 0) {
+uint16_t calc_rank(rpl_parent_t * parent, uint16_t base_rank){
+	if(base_rank == 0) {
 		if(parent == NULL) {
 			return INFINITE_RANK;
 		}
-		my_rank = parent->rank;
+		base_rank = parent->rank;
 	}
 
 	uint16_t add;
@@ -42,10 +39,10 @@ uint16_t calc_rank(){
 	else{
 		add = DEFAULT_MIN_HOP_RANK_INCREASE;
 	}
-	if( my_rank + add < my_rank ){
+	if( base_rank + add < base_rank ){
 		return INFINITE_RANK;
 	}
-	return my_rank + add;
+	return base_rank + add;
 }
 
 //We simply return the Parent with lower rank

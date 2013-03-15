@@ -117,9 +117,13 @@ void vtimer_callback(void *ptr) {
         msg.type = MSG_TIMER;
         msg.content.value = (unsigned int) timer->arg;
         msg_send_int(&msg, timer->pid);
-    } else {
+    }
+    else if (timer->action == (void*) thread_wakeup){
         timer->action(timer->arg);
-    }    
+    }else {
+        puts("Timer was poisoned");//TODO delete this debug message
+        DEBUG("Timer was poisoned.");
+    }
 
     in_callback = false;
     update_shortterm();
@@ -249,6 +253,14 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr){
     t->pid = pid; 
     vtimer_set(t);
     return 0;
+}
+
+void vtimer_print_short_queue(){
+    queue_print(&shortterm_queue_root);
+}
+
+void vtimer_print_long_queue(){
+    queue_print(&longterm_queue_root);
 }
 
 #ifdef ENABLE_DEBUG

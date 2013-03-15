@@ -52,6 +52,14 @@
 #define RPL_COUNTER_GREATER_THAN_LOCAL(A,B) (((A<B) && (RPL_COUNTER_LOWER_REGION + 1 - B + A < RPL_COUNTER_SEQ_WINDOW)) || ((A > B) && (A-B < RPL_COUNTER_SEQ_WINDOW)))
 #define RPL_COUNTER_GREATER_THAN(A,B)   ((A>RPL_COUNTER_LOWER_REGION) ? ((B > RPL_COUNTER_LOWER_REGION ) ? RPL_COUNTER_GREATER_THAN_LOCAL(A,B) : 0): (( B>RPL_COUNTER_LOWER_REGION ) ? 1: RPL_COUNTER_GREATER_THAN_LOCAL(A,B)))
 
+// Node Status
+#define NORMAL_NODE  0
+#define ROOT_NODE    1
+#define LEAF_NODE    2
+
+// Link Metric Type
+#define METRIC_ETX 1
+
 // Default values
 
 #define RPL_DEFAULT_MOP STORING_MODE_NO_MC
@@ -97,7 +105,7 @@
 #define RPL_DIS_I_MASK 0x40
 #define RPL_DIS_D_MASK 0x20
 #define RPL_GROUNDED_SHIFT 7
-#define RPL_DEFAULT_OCP 0
+#define RPL_DEFAULT_OCP 1
 
 //DIO Base Object (RFC 6550 Fig. 14)
 struct __attribute__((packed)) rpl_dio_t{
@@ -193,19 +201,24 @@ typedef struct __attribute__((packed)) rpl_opt_transit_t {
 struct rpl_dodag_t;
 
 typedef struct rpl_candidate_neighbor_t {
-    ipv6_addr_t addr;
-    struct rpl_dodag_t *dodag;
-    uint8_t used;
+    ipv6_addr_t addr;           //The address of this node
+    uint8_t     packets_rx;     //The packets this node has received FROM ME
+    double      cur_etx;        //The currently calculated ETX-value
+    uint8_t     used;           //The indicator if this node is active or not
 } rpl_candidate_neighbor_t;
 
 typedef struct rpl_parent_t {
-    ipv6_addr_t addr;
-    uint16_t rank;
-	uint8_t dtsn;
+    ipv6_addr_t         addr;
+    uint16_t            rank;
+	uint8_t             dtsn;
     struct rpl_dodag_t *dodag;
-	uint16_t lifetime;
-	uint8_t used;
+	uint16_t            lifetime;
+	double              link_metric;
+	uint8_t             link_metric_type;
+	uint8_t             used;
 } rpl_parent_t;
+
+struct rpl_of_t;
 
 typedef struct rpl_instance_t {
     //struct rpl_dodag_t *current_dodoag;
@@ -215,6 +228,7 @@ typedef struct rpl_instance_t {
 
 } rpl_instance_t;
 
+//Node-internal representation of a DODAG, with nodespecific information
 typedef struct rpl_dodag_t {
     rpl_instance_t *instance;
     ipv6_addr_t dodag_id;
@@ -232,6 +246,7 @@ typedef struct rpl_dodag_t {
     uint8_t version;
     uint8_t grounded;
     uint16_t my_rank;
+    uint8_t node_status;
 	uint8_t dao_seq;
 	uint16_t min_rank;
     uint8_t joined;
@@ -241,7 +256,7 @@ typedef struct rpl_dodag_t {
 
 typedef struct rpl_of_t {
     uint16_t ocp;
-    uint16_t (*calc_rank)();
+    uint16_t (*calc_rank)(rpl_parent_t * parent, uint16_t base_rank);
     rpl_parent_t *(*which_parent)(rpl_parent_t *, rpl_parent_t *);
     rpl_dodag_t *(*which_dodag)(rpl_dodag_t *, rpl_dodag_t *);
     void (*reset)(struct rpl_dodag_t *);

@@ -66,7 +66,10 @@ and the mailinglist (subscription via web site)
 // Define default radio mode to constant RX if no
 // project specific setting is available.
 #ifndef CC1100_RADIO_MODE
-	#define CC1100_RADIO_MODE CC1100_MODE_CONSTANT_RX
+    /* TODO define this to be CC1100_MODE_CONSTANT_RX again and
+     * put the CC1100_MODE_WOR definition into the RPL specific project
+     */
+	#define CC1100_RADIO_MODE CC1100_MODE_WOR
 #endif
 
 /// CC1100 radio interface

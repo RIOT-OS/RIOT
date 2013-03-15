@@ -32,8 +32,6 @@
 char stack_shell[SHELL_STACK];
 char stack_radio[RADIO_STACK];
 
-uint8_t snd_buffer[SND_BUFFER_SIZE][CC1100_MAX_DATA_LENGTH];
-
 msg_t msg_q[RCV_BUFFER_SIZE];
 
 transceiver_command_t tcmd;

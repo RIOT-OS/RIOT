@@ -1,3 +1,4 @@
+#include "main.h"
 #include <stdio.h>
 #include <string.h>
 #include <vtimer.h>
@@ -143,6 +144,7 @@ void table(char *str){
 		}
 	}
 	printf("$\n");
+	thread_print_all();
 }
 
 void dodag(char *str){
@@ -175,6 +177,20 @@ void wakeup(char* unused) {
     thread_wakeup(10);
 }
 
+void send_msg(char* message) {
+    rpl_dodag_t * my_dodag = rpl_get_my_dodag();
+    ipv6_addr_t rootid   = my_dodag->dodag_id;
+    ipv6_addr_t* next_hop = rpl_get_next_hop(&rootid);
+    //TODO implement
+    //if(my_dodag->node_status == ROOT_NODE){
+        //don't send when root
+    //   puts("[ERROR] I'm root, please send from another node.");
+    //    return;
+    //}
+
+    //rpl_send(&next_hop,message,length,next_header,NULL);
+}
+
 const shell_command_t shell_commands[] = {
     {"init", "", init},
     {"table", "", table},
@@ -182,6 +198,7 @@ const shell_command_t shell_commands[] = {
     {"cc1100", "", cc1100_cfg},
     {"wakeup", "", wakeup},
     {"loop", "", loop},
+    {"send", "", send_msg},
 	{NULL, NULL, NULL}
 };
 

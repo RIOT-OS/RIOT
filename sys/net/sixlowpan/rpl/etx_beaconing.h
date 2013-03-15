@@ -1,4 +1,5 @@
 /*
+ * Header for the ETX-beaconing module
  * etx_beaconing.h
  *
  *  Created on: Feb 26, 2013
@@ -8,24 +9,51 @@
 #ifndef ETX_BEACONING_H_
 #define ETX_BEACONING_H_
 
-#include "rpl_structs.h"
+#include "sys/net/sixlowpan/sixlowip.h"
 
-#define ETX_BEACON_STACKSIZE 2048
+#define ETX_BEACON_STACKSIZE    1024
+#define ETX_RADIO_STACKSIZE     1024
+#define ETX_UPDT_STACKSIZE      256
+#define ETX_INTERVAL            1000000 //1 Second in us is the default value
+#define ETX_ROUNDS              10      //10 is the default value
 
-//[option|length|ipaddr.|packetcount] with up to 10 ipaddr|packetcount pairs
-// 1 Byte 1 Byte  2 Byte  1 Byte
+//[option|length|ipaddr.|packetcount] with up to 15 ipaddr|packetcount pairs
+// 1 Byte 1 Byte  1 Byte  1 Byte
 #define ETX_BUF_SIZE   (32)
 
-#define ETX_RCV_BUFFER_SIZE     (64)
+#define ETX_RCV_BUFFER_SIZE     (128)
 
 //ETX beaconing type (!ATTENTION! this is non-standard)
 #define ETX_BEACON                  0x20
 
 //prototypes
-void init_etx_beaconing(void);
+void etx_init_beaconing(ipv6_addr_t * address);
 void etx_beacon(void);
+double etx_get_metric(ipv6_addr_t * address);
+void etx_update(void);
 void etx_radio(void);
 
+/*
+ * The ETX beaconing packet consists of:
+ *
+ *      0                   1                   2
+ *      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+- - - - - - - -
+ *     |  Option Type  | Option Length | Data
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+- - - - - - - -
+ * Option type:     Set to 0x20
+ *
+ * Option Length:   The length of the Data sent with this packet
+ *
+ * Option Data:     2-Octet Pairs of 8 bit for addresses and a positive integer
+ *                  denoting the amount of packets received from that IP address
+ *
+ * We only need 1 octet for the ip address since RPL for now only allows for
+ * 255 different addresses.
+ *
+ * If the length of this packet says 0, it has received no other beaconing
+ * packets itself so far.
+ */
 typedef struct __attribute__((packed)) {
     uint8_t code;
     uint8_t length;
