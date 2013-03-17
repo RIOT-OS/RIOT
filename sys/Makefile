@@ -68,6 +68,22 @@ endif
 ifneq (,$(findstring vtimer,$(USEMODULE)))
     DIRS += vtimer
 endif
+ifneq (,$(findstring destiny,$(USEMODULE)))
+    DIRS += net/destiny
+endif
+ifneq (,$(findstring net_mm,$(USEMODULE)))
+    DIRS += net/mm
+endif
+ifneq (,$(findstring net_help,$(USEMODULE)))
+    DIRS += net/net_help
+endif
+ifneq (,$(findstring protocol-multiplex,$(USEMODULE)))
+    DIRS += net/protocol-multiplex
+endif
+ifneq (,$(findstring sixlowpan,$(USEMODULE)))
+    DIRS += net/sixlowpan
+    DIRS += net/sixlowpan/rpl
+endif
 
 all: $(BINDIR)$(MODULE).a 
 	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
