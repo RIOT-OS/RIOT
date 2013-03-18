@@ -144,17 +144,25 @@ static int readline(shell_t *shell, char* buf, size_t size) {
     return 1;
 }
 
+static inline void print_prompt(shell_t *shell)
+{
+    shell->put_char('>');
+    shell->put_char(' ');
+    return;
+}
+
 void shell_run(shell_t *shell) {
     char line_buf[255];
 
+    print_prompt(shell);
     while(1) {
         int res = readline(shell, line_buf, sizeof(line_buf));
-        shell->put_char('>');
         if (! res ) {
             char* line_copy = strdup(line_buf);
             handle_input_line(shell, line_copy);
             free(line_copy);
         }
+        print_prompt(shell);
     }
 }
 
