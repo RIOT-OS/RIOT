@@ -13,7 +13,7 @@ void hard_reset_to_bootloader(void)
     getchar();
     */
     printf("Reset CPU (into bootloader)\r\n");
-	set_rts(0);		// RTS (ttl level) connects to P0.14
+	set_rts(1);		// RTS (ttl level) connects to P0.14
     /* the next two lines should be commented for the prepared node */
 	set_dtr(1);		// DTR (ttl level) connects to RST
 	send_break_signal();	// or break detect circuit to RST
@@ -24,14 +24,14 @@ void hard_reset_to_bootloader(void)
     */
 	set_dtr(0);		// allow the CPU to run:
 	set_baud(baud_rate);
-	set_rts(0);		// set RTS again (as it has been reset by set_baudrate) 
+	set_rts(1);		// set RTS again (as it has been reset by set_baudrate) 
 	usleep(40000);
 }
 
 void hard_reset_to_user_code(void)
 {
 	printf("Reset CPU (into user code)\r\n");
-	set_rts(1);		// RTS (ttl level) connects to P0.14
+	set_rts(0);		// RTS (ttl level) connects to P0.14
 	set_dtr(1);		// DTR (ttl level) connects to RST
 	send_break_signal();	// or break detect circuit to RST
 	usleep(75000);

@@ -59,6 +59,7 @@ void init(char *str){
 
 void table(char *str){
     thread_print_all();
+    show_candidates();
 }
 
 const shell_command_t shell_commands[] = {

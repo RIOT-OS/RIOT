@@ -75,6 +75,8 @@ static etx_probe_t * get_etx_rec_buf(void) {
 
 //TODO delete
 void etx_beacon2(void);
+void etx_radio2(void);
+
 void show_candidates(void) {
     //TODO delete
     /*
@@ -104,77 +106,32 @@ void show_candidates(void) {
 
 void etx_init_beaconing(ipv6_addr_t * address) {
     own_address = address;
-    show_candidates();
-//set code
+    //set code
     printf("ETX BEACON INIT");
     etx_send_buf[0] = ETX_BEACON;
 
     thread_print_all();
-   // etx_beacon_pid = thread_create(etx_beacon_buf, ETX_BEACON_STACKSIZE,
-   //         PRIORITY_MAIN - 1, CREATE_STACKTEST,
-   //         etx_beacon2, "etx_beacon");
+    etx_beacon_pid = thread_create(etx_beacon_buf, ETX_BEACON_STACKSIZE,
+            PRIORITY_MAIN - 1, CREATE_STACKTEST,
+            etx_beacon, "etx_beacon");
 
     etx_radio_pid = thread_create(etx_radio_buf, ETX_RADIO_STACKSIZE,
             PRIORITY_MAIN - 1, CREATE_STACKTEST,
             etx_radio, "etx_radio");
 
-    printf("etx radio pid is %d", etx_radio_pid);
     /*
      * Maybe this should not be in a seperate thread resource-wise, but the
      * motive was to delay beacon-sending as little as possible, as this would
      * derail beaconing from the intended ETX_INTERVAL.
      */
 
-    //TODO delete
-    show_candidates();
-
     etx_update_pid = thread_create(etx_update_buf, ETX_UPDT_STACKSIZE,
             PRIORITY_MAIN - 1, CREATE_STACKTEST,
             etx_update, "etx_update");
 
-    //TODO delete
-    show_candidates();
-
-    //TODO delete
-    thread_wakeup(etx_update_pid);
-
 //register at transceiver
     transceiver_register(TRANSCEIVER_CC1100, etx_radio_pid);
     printf("...[DONE]\n");
-}
-
-void etx_beacon2(void) {
-//TODO delete or delete beacon, whatever do use 1 method and del the other
-    etx_probe_t *etx_p = get_etx_send_buf();
-
-    ieee_802154_long_t empty_addr = { 0 };
-
-    uint8_t jittercorrection = 10;
-    uint8_t jitter = (uint8_t) (rand() % 21);
-    uint8_t p_length = 0;
-
-    while (true) {
-        if (rounds == ETX_ROUNDS) {
-            //calculate the ETX values and update the parents
-            thread_wakeup(etx_update_pid);
-            rounds = 1;
-        } else {
-            rounds++;
-        }
-
-        vtimer_usleep(80 * MS + jittercorrection * MS + jitter * MS);
-        /// TODO once vtimer works as intended, replace the hwtimer here with
-        /// the vtimer. Right now vtimer bugs, so we have hwtimer here.
-        //hwtimer_wait(HWTIMER_TICKS(80*MS + jittercorrection*MS + jitter*MS));
-
-        jittercorrection = 20 - jitter;
-
-        //the jitter is a value between 0 and 20
-        jitter = (uint8_t) (rand() % 21);
-        printf("jitter: %d", jitter);
-        puts("beacon2 run through complete");
-        show_candidates();
-    }
 }
 
 void etx_beacon(void) {
@@ -217,17 +174,16 @@ void etx_beacon(void) {
         send_ieee802154_frame(&empty_addr, &etx_send_buf[0],
                 get_etx_send_buf()->length + 2, 1);
         puts("sent beacon!");
-        //hwtimer buggt noch mehr als der vtimer...
-        vtimer_usleep(80 * MS + jittercorrection * MS + jitter * MS);
+        //vtimer_usleep(80 * MS + jittercorrection * MS + jitter * MS);
         /// TODO once vtimer works as intended, replace the hwtimer here with
         /// the vtimer. Right now vtimer bugs, so we have hwtimer here.
-        //hwtimer_wait(HWTIMER_TICKS(80*MS + jittercorrection*MS + jitter*MS));
+        /// hangs after 38 runthroughs (roughly 1 minute, a bit more)
+        hwtimer_wait(HWTIMER_TICKS(80*MS + jittercorrection*MS + jitter*MS));
 
         jittercorrection = 20 - jitter;
 
         //the jitter is a value between 0 and 20
         jitter = (uint8_t) (rand() % 21);
-        printf("jitter: %d", jitter);
     }
 }
 
@@ -261,7 +217,7 @@ void etx_handle_beacon(ipv6_addr_t * candidate_address) {
 
     etx_probe_t * probe = get_etx_rec_buf();
 
-//Todo delete once everything works well
+    //Todo delete once everything works well
     printf("ETX beacon package received with following values:\n"
             "\tPackage Option:%x\n"
             "\t   Data Length:%u\n"
@@ -297,11 +253,11 @@ void etx_radio(void) {
 
     msg_init_queue(msg_que, ETX_RCV_BUFFER_SIZE);
 
-//    ipv6_addr_t ll_address;
-//    ipv6_addr_t candidate_addr;
+    ipv6_addr_t ll_address;
+    ipv6_addr_t candidate_addr;
 
-//    ipv6_set_ll_prefix(&ll_address);
-//    ipv6_get_saddr(&candidate_addr, &ll_address);
+    ipv6_set_ll_prefix(&ll_address);
+    ipv6_get_saddr(&candidate_addr, &ll_address);
 
     while (1) {
         puts("radio");        //TODO del
@@ -319,10 +275,9 @@ void etx_radio(void) {
                 //create IPv6 address from radio packet
                 //we can do the cast here since rpl nodes can only have addr
                 //up to 8 bits
-                //              candidate_addr.uint8[15] = (uint8_t) p->src;
+                candidate_addr.uint8[15] = (uint8_t) p->src;
                 //handle the beacon
-                //              etx_handle_beacon(&candidate_addr);
-                etx_handle_beacon(0);
+                etx_handle_beacon(&candidate_addr);
             }
 
             p->processing--;
@@ -347,7 +302,7 @@ void etx_update(void) {
      *
      */
     rpl_candidate_neighbor_t * candidate;
-    rpl_candidate_neighbor_t *end;
+    rpl_candidate_neighbor_t * end;
 
     while (true) {
         //good night
