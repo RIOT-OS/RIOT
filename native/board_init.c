@@ -6,7 +6,7 @@
  * This file subject to the terms and conditions of the GNU General Public
  * License. See the file LICENSE in the top level directory for more details.
  *
- * @ingroup native
+ * @ingroup native_board
  * @{
  * @file
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
@@ -15,6 +15,10 @@
 
 #include "board.h"
 
+/**
+ * Nothing to initialize at the moment.
+ * Turns the red LED on and the green LED off.
+ */
 void board_init()
 {
     LED_GREEN_OFF();
