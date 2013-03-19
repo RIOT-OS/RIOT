@@ -125,6 +125,7 @@ typedef struct socka6
     uint16_t       		sin6_port;      		/* transport layer port # */
     uint32_t        	sin6_flowinfo;  		/* IPv6 flow information */
     ipv6_addr_t 		sin6_addr;      		/* IPv6 address */
+    uint32_t 			sin6_scope_id;			/* Scope ID (unused) */
 	} sockaddr6_t;
 
 typedef struct tcp_hc_con
