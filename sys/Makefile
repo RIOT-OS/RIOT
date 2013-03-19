@@ -84,6 +84,9 @@ ifneq (,$(findstring sixlowpan,$(USEMODULE)))
     DIRS += net/sixlowpan
     DIRS += net/sixlowpan/rpl
 endif
+ifneq (,$(findstring cunit,$(USEMODULE)))
+    DIRS += cunit
+endif
 
 all: $(BINDIR)$(MODULE).a 
 	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
