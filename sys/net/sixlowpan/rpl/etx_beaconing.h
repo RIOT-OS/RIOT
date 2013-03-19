@@ -11,11 +11,12 @@
 
 #include "sys/net/sixlowpan/sixlowip.h"
 
-#define ETX_BEACON_STACKSIZE    1024
-#define ETX_RADIO_STACKSIZE     1024
-#define ETX_UPDT_STACKSIZE      256
+#define ETX_BEACON_STACKSIZE    4500 //TODO debug stacksize, set for production
+#define ETX_RADIO_STACKSIZE     4500 //TODO debug stacksize, set for production
+#define ETX_UPDT_STACKSIZE      4500 //TODO debug stacksize, set for production
 #define ETX_INTERVAL            1000000 //1 Second in us is the default value
 #define ETX_ROUNDS              10      //10 is the default value
+
 
 //[option|length|ipaddr.|packetcount] with up to 15 ipaddr|packetcount pairs
 // 1 Byte 1 Byte  1 Byte  1 Byte
@@ -23,8 +24,17 @@
 
 #define ETX_RCV_BUFFER_SIZE     (128)
 
-//ETX beaconing type (!ATTENTION! this is non-standard)
-#define ETX_BEACON                  0x20
+//Constants for packets
+
+//ETX beaconing type (XXX ATTENTION! this is non-standard)
+#define ETX_BEACON          0x20//Non-standard way of saying this is an etx-pkt.
+
+#define ETX_PKT_HDR_LEN     2   //Option type + Length (1 Byte each)
+#define ETX_TUPLE_SIZE      2   //1 Byte for Addr, 1 Byte for packets rec.
+#define ETX_PKT_REC_OFFSET  1   //Offset in a tuple of (addr,pkt_rec)
+#define ETX_IPV6_LAST_BYTE  15  //The last byte for an ipv6 address
+#define ETX_JITTER_MOD      21  //The modulo value for jitter computation
+#define ETX_DEF_JIT_CORRECT (ETX_JITTER_MOD - 1) / 2  //Default Jitter correction value (normally ETX_JITTER_MOD -1 / 2)
 
 //prototypes
 void etx_init_beaconing(ipv6_addr_t * address);

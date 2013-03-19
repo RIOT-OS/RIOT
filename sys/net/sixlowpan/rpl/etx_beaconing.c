@@ -73,9 +73,6 @@ static etx_probe_t * get_etx_rec_buf(void) {
     return ((etx_probe_t *) &(etx_rec_buf[0]));
 }
 
-//TODO delete
-void etx_beacon2(void);
-void etx_radio2(void);
 
 void show_candidates(void) {
     //TODO delete
@@ -84,7 +81,7 @@ void show_candidates(void) {
      printf("Candidates Addr:%d\n"
      "\t cur_etx:%f\n"
      "\t packets_rx:%d\n"
-     "\t used:%d\n", candidates[i].addr.uint8[15],
+     "\t used:%d\n", candidates[i].addr.uint8[ETX_IPV6_LAST_BYTE],
      candidates[i].cur_etx, candidates[i].packets_rx,
      candidates[i].used);
      }
@@ -98,7 +95,7 @@ void show_candidates(void) {
         printf("Candidates Addr:%d\n"
                 "\t cur_etx:%f\n"
                 "\t packets_rx:%d\n"
-                "\t used:%d\n", candidate->addr.uint8[15],
+                "\t used:%d\n", candidate->addr.uint8[ETX_IPV6_LAST_BYTE],
                 candidate->cur_etx, candidate->packets_rx,
                 candidate->used);
     }
@@ -143,8 +140,8 @@ void etx_beacon(void) {
      * and modifies the time to wait accordingly.
      */
     etx_probe_t *etx_p = get_etx_send_buf();
-    uint8_t jittercorrection = 10;
-    uint8_t jitter = (uint8_t) (rand() % 21);
+    uint8_t jittercorrection = ETX_DEF_JIT_CORRECT;
+    uint8_t jitter = (uint8_t) (rand() % ETX_JITTER_MOD);
 
     uint8_t p_length = 0;
 
@@ -164,15 +161,15 @@ void etx_beacon(void) {
         p_length = 0;
         for (uint8_t i = 0; i < RPL_MAX_CANDIDATE_NEIGHBORS; i++) {
             if (candidates[i].used != 0) {
-                etx_p->data[i * 2] = candidates[i].addr.uint8[15];
-                etx_p->data[i * 2 + 1] = candidates[i].packets_rx;
-                p_length = p_length + 2;
+                etx_p->data[i * ETX_TUPLE_SIZE] = candidates[i].addr.uint8[ETX_IPV6_LAST_BYTE];
+                etx_p->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET] = candidates[i].packets_rx;
+                p_length = p_length + ETX_PKT_HDR_LEN;
             }
         }
         etx_p->length = p_length;
 
         send_ieee802154_frame(&empty_addr, &etx_send_buf[0],
-                get_etx_send_buf()->length + 2, 1);
+                get_etx_send_buf()->length + ETX_PKT_HDR_LEN, 1);
         puts("sent beacon!");
         //vtimer_usleep(80 * MS + jittercorrection * MS + jitter * MS);
         /// TODO once vtimer works as intended, replace the hwtimer here with
@@ -183,7 +180,7 @@ void etx_beacon(void) {
         jittercorrection = 20 - jitter;
 
         //the jitter is a value between 0 and 20
-        jitter = (uint8_t) (rand() % 21);
+        jitter = (uint8_t) (rand() % ETX_JITTER_MOD);
     }
 }
 
@@ -222,23 +219,23 @@ void etx_handle_beacon(ipv6_addr_t * candidate_address) {
             "\tPackage Option:%x\n"
             "\t   Data Length:%u\n"
             "\tSource Address:%d\n\n", probe->code, probe->length,
-            candidate_address->uint8[15]);
+            candidate_address->uint8[ETX_IPV6_LAST_BYTE]);
 
     rpl_candidate_neighbor_t* candidate = NULL;
 
-    for (uint8_t i = 0; i < probe->length / 2; i++) {
+    for (uint8_t i = 0; i < probe->length / ETX_TUPLE_SIZE; i++) {
         //todo delete once everything works well
         printf("\tIPv6 short  Addr:%u\n"
-                "\tPackets f. Addr:%u\n\n", probe->data[i * 2],
-                probe->data[i * 2 + 1]);
+                "\tPackets f. Addr:%u\n\n", probe->data[i * ETX_TUPLE_SIZE],
+                probe->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET]);
 
         // If i find my address in this probe, update the packet_rx value for
         // this candidate, if he is in my candidate list.
-        if (probe->data[i * 2] == own_address->uint8[15]) {
+        if (probe->data[i * ETX_TUPLE_SIZE] == own_address->uint8[ETX_IPV6_LAST_BYTE]) {
             //candidate = etx_find_candidate(candidate_address);
-            candidate = NULL;
+            candidate = NULL;//TODO delete
             if (candidate != NULL ) {
-                candidate->packets_rx = probe->data[i * 2 + 1];
+                candidate->packets_rx = probe->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET];
             }
         }
     }
@@ -275,7 +272,7 @@ void etx_radio(void) {
                 //create IPv6 address from radio packet
                 //we can do the cast here since rpl nodes can only have addr
                 //up to 8 bits
-                candidate_addr.uint8[15] = (uint8_t) p->src;
+                candidate_addr.uint8[ETX_IPV6_LAST_BYTE] = (uint8_t) p->src;
                 //handle the beacon
                 etx_handle_beacon(&candidate_addr);
             }
@@ -316,7 +313,7 @@ void etx_update(void) {
 
             if (candidate->used != 0) {
                 //update its ETX-metric and packet count TODO mutex this
-                candidate->cur_etx = candidate->packets_rx / (double) 10;
+                candidate->cur_etx = candidate->packets_rx / (double) ETX_ROUNDS;
                 candidate->packets_rx = 0;
                 printf(
                         "Updated ETX Metric to %f for candidate used was on %d",
