@@ -75,17 +75,6 @@ static etx_probe_t * get_etx_rec_buf(void) {
 
 
 void show_candidates(void) {
-    //TODO delete
-    /*
-     for (int i = 0; i < RPL_MAX_CANDIDATE_NEIGHBORS; i++) {
-     printf("Candidates Addr:%d\n"
-     "\t cur_etx:%f\n"
-     "\t packets_rx:%d\n"
-     "\t used:%d\n", candidates[i].addr.uint8[ETX_IPV6_LAST_BYTE],
-     candidates[i].cur_etx, candidates[i].packets_rx,
-     candidates[i].used);
-     }
-     */
     rpl_candidate_neighbor_t * candidate;
     rpl_candidate_neighbor_t *end;
 
@@ -104,7 +93,7 @@ void show_candidates(void) {
 void etx_init_beaconing(ipv6_addr_t * address) {
     own_address = address;
     //set code
-    printf("ETX BEACON INIT");
+    puts("ETX BEACON INIT");
     etx_send_buf[0] = ETX_BEACON;
 
     thread_print_all();
@@ -126,9 +115,9 @@ void etx_init_beaconing(ipv6_addr_t * address) {
             PRIORITY_MAIN - 1, CREATE_STACKTEST,
             etx_update, "etx_update");
 
-//register at transceiver
+    //register at transceiver
     transceiver_register(TRANSCEIVER_CC1100, etx_radio_pid);
-    printf("...[DONE]\n");
+    puts("...[DONE]");
 }
 
 void etx_beacon(void) {
@@ -174,7 +163,6 @@ void etx_beacon(void) {
         //vtimer_usleep(80 * MS + jittercorrection * MS + jitter * MS);
         /// TODO once vtimer works as intended, replace the hwtimer here with
         /// the vtimer. Right now vtimer bugs, so we have hwtimer here.
-        /// hangs after 38 runthroughs (roughly 1 minute, a bit more)
         hwtimer_wait(HWTIMER_TICKS(80*MS + jittercorrection*MS + jitter*MS));
 
         jittercorrection = 20 - jitter;
@@ -207,7 +195,6 @@ double etx_get_metric(ipv6_addr_t * address) {
 }
 
 void etx_handle_beacon(ipv6_addr_t * candidate_address) {
-    puts("handle_beacon");        //TODO del
     /*
      * Handle the ETX probe that has been received and update all infos.
      */
@@ -257,9 +244,7 @@ void etx_radio(void) {
     ipv6_get_saddr(&candidate_addr, &ll_address);
 
     while (1) {
-        puts("radio");        //TODO del
         msg_receive(&m);
-        puts("msg received");
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t*) m.content.ptr;
 
