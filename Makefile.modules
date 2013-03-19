@@ -7,6 +7,7 @@ UNDEF =  $(BINDIR)startup.o
 ifeq ($(CPU),lpc2387)
   USEMODULE += arm_common
   UNDEF += $(BINDIR)syscalls.o
+  export INCLUDES += -I$(RIOTBASE)/cpu/arm_common/include
 endif
 ifeq ($(CPU),lpc214x)
   USEMODULE += arm_common

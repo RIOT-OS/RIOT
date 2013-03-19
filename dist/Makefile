@@ -20,12 +20,14 @@ export RIOTBOARD =$(CURDIR)/../../boards
 ## Modules to include. 
 
 #USEMODULE += shell
+#USEMODULE += uart0
+#USEMODULE += posix
 #USEMODULE += vtimer
 #USEMODULE += sht11
 #USEMODULE += ltc4150
 #USEMODULE += cc110x
 #USEMODULE += fat
 
-export INCLUDES = -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/cpu/$(CPU)/include -I$(RIOTBASE)/cpu/arm_common/include -I$(RIOTBASE)/sys/lib -I$(RIOTBASE)/sys/include/ -I$(RIOTBASE)/drivers/include/
+export INCLUDES = -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/cpu/$(CPU)/include -I$(RIOTBASE)/sys/lib -I$(RIOTBASE)/sys/include/ -I$(RIOTBASE)/drivers/include/
 
 include $(RIOTBASE)/Makefile.include
