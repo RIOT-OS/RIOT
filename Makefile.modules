@@ -13,6 +13,9 @@ ifeq ($(CPU),lpc214x)
   USEMODULE += arm_common
   UNDEF += $(BINDIR)syscalls.o
 endif
+ifeq ($(CPU),native)
+  export INCLUDES += -I$(RIOTBASE)/cpu/native/include
+endif
 ifeq ($(CPU),cc430)
 USEMODULE += cpu core lib sys
 else

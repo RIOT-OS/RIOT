@@ -18,7 +18,7 @@ all: $(PROJBINDIR)/$(PROJECT).a
 	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(CPU)."
 	$(MAKE) -C $(RIOTBOARD)
 	$(MAKE) -C $(RIOTBASE)
-	$(LINK) $(LINKFLAGS) $(UNDEF) -o $(PROJBINDIR)/$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(PROJBINDIR)/$(PROJECT).map
+	$(LINK) $(UNDEF) -o $(PROJBINDIR)/$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(PROJBINDIR)/$(PROJECT).map $(LINKFLAGS) 
 	$(SIZE) $(PROJBINDIR)/$(PROJECT).elf
 	$(OBJCOPY) -O ihex $(PROJBINDIR)/$(PROJECT).elf $(PROJBINDIR)/$(PROJECT).hex
 
