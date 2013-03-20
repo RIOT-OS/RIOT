@@ -36,7 +36,7 @@ void thread_yield() {
 char * thread_stack_init(void * task_func, void * stack_start, int stack_size)
 {
    unsigned int * stk;
-   stk = (unsigned int *) stack_start + stack_size;
+   stk = (unsigned int *) (stack_start + stack_size);
     stk--;
 
     *stk = 0x77777777;
@@ -45,7 +45,7 @@ char * thread_stack_init(void * task_func, void * stack_start, int stack_size)
     *stk = (unsigned int)sched_task_exit;       // LR
 
    stk--;
-   *stk = (unsigned int) stack_start - 4;   // SP
+   *stk = (unsigned int) (stack_start + stack_size) - 4;   // SP
 
    for (int i = 12; i>= 0 ; i--) {          // build base stack
        stk--;
