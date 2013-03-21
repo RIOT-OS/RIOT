@@ -21,7 +21,7 @@
 #define KERNEL_CONF_STACKSIZE_DEFAULT   8192
 #endif
 
-#define KERNEL_CONF_STACKSIZE_IDLE      2048
+#define KERNEL_CONF_STACKSIZE_IDLE      4096
 #define NATIVE_ISR_STACKSIZE            8192
 
 #define _SIG_UNDEF          SIGRTMIN + 0
@@ -29,5 +29,9 @@
 #define _SIG_LTC4150        SIGRTMIN + 20
 
 /* TODO: check for overflow (SIGRTMAX) */
+
+/* for cc110x_ng */
+#define RX_BUF_SIZE (10)
+#define TRANSCEIVER_BUFFER_SIZE (3)
 
 #endif /* CPUCONF_H_ */
