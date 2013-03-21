@@ -51,11 +51,13 @@ unsigned disableIRQ(void)
         err(1, "disableIRQ(): sigfillset");
     }
     if (native_interrupts_enabled == 1) {
+        DEBUG("sigprocmask(..native_sig_set)\n");
         if (sigprocmask(SIG_SETMASK, &mask, &native_sig_set) == -1) {
             err(1, "disableIRQ(): sigprocmask");
         }
     }
     else {
+        DEBUG("sigprocmask()\n");
         if (sigprocmask(SIG_SETMASK, &mask, NULL) == -1) {
             err(1, "disableIRQ(): sigprocmask()");
         }
@@ -120,14 +122,21 @@ void eINT(void)
  */
 void native_irq_handler()
 {
+    if (last_sig == -1) {
+        errx(1, "XXX: internal error");
+    }
     if (native_irq_handlers[last_sig].func != NULL) {
         DEBUG("calling interrupt handler for %i\n", last_sig);
         native_irq_handlers[last_sig].func();
+    }
+    else if (last_sig == SIGUSR1) {
+        DEBUG("ignoring SIGUSR1\n");
     }
     else {
         printf("XXX: no handler for signal %i\n", last_sig);
         errx(1, "XXX: this should not have happened!\n");
     }
+    last_sig = -1;
     native_in_irs = 0;
     cpu_switch_context_exit();
 }

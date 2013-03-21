@@ -67,6 +67,9 @@ void hwtimer_isr_timer()
             DEBUG("hwtimer_isr_timer(): calling hwtimer.int_handler(%i)\n", i);
             int_handler(i);
         }
+        if (timer_getoverrun(native_hwtimer_timer[i]) > 0 ) {
+            errx(1, "XXX: unhandled hwtimer situation");
+        }
     }
 }
 
@@ -165,10 +168,11 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
         native_hwtimer_irq[i] = 0;
         //sev.sigev_signo =  _SIG_TIMER + i;;
         sev.sigev_signo =  SIGALRM;
-        sev.sigev_value.sival_ptr = &native_hwtimer_timer[i];
+        //sev.sigev_value.sival_ptr = &native_hwtimer_timer[i];
         if (timer_create(CLOCK_REALTIME, &sev, &native_hwtimer_timer[i]) == -1) {
             err(1, "timer_create");
         }
     }
+    hwtimer_arch_enable_interrupt();
     return;
 }
