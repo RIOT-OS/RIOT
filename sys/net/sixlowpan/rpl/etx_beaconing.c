@@ -165,12 +165,12 @@ void etx_beacon(void) {
         send_ieee802154_frame(&empty_addr, &etx_send_buf[0],
                 get_etx_send_buf()->length + ETX_PKT_HDR_LEN, 1);
         puts("sent beacon!");
-        //vtimer_usleep(ETX_INTERVAL - ETX_MAX_JITTER + jittercorrection*MS + jitter*MS);
+        //vtimer_usleep(((ETX_INTERVAL - ETX_MAX_JITTER)*MS) + jittercorrection*MS + jitter*MS);
         /// TODO once vtimer works as intended, replace the hwtimer here with
         /// the vtimer. Right now vtimer bugs, so we have hwtimer here.
-        hwtimer_wait(HWTIMER_TICKS(ETX_INTERVAL - ETX_MAX_JITTER + jittercorrection*MS + jitter*MS));
+        hwtimer_wait(HWTIMER_TICKS(((ETX_INTERVAL - ETX_MAX_JITTER)*MS) + jittercorrection*MS + jitter*MS));
 
-        jittercorrection = (ETX_MAX_JITTER/MS) - jitter;
+        jittercorrection = (ETX_MAX_JITTER) - jitter;
 
         //the jitter is a value between 0 and ETX_MAX_JITTER
         jitter = (uint8_t) (rand() % ETX_JITTER_MOD);

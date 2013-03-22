@@ -30,15 +30,22 @@
 //ETX Interval parameters
 #define MS  1000
 
-#define ETX_INTERVAL        (1000 * MS)             //Given in us, the default is 1 second
+/*
+ * ETX_INTERVAL
+ *
+ * Given in ms, the default is 1 second.
+ * Should be divisible through 2 (For ETX_DEF_JIT_CORRECT)
+ * and 5 (For ETX_MAX_JITTER) unless those values are adjusted too.
+ */
+#define ETX_INTERVAL        (1000)
 #define ETX_ROUNDS          (10)                    //10 is the default value
 #define ETX_PKT_HDR_LEN     (2)                     //Option type + Length (1 Byte each)
 #define ETX_TUPLE_SIZE      (2)                     //1 Byte for Addr, 1 Byte for packets rec.
-#define ETX_PKT_REC_OFFSET  (1)                     //Offset in a tuple of (addr,pkt_rec)
+#define ETX_PKT_REC_OFFSET  (ETX_TUPLE_SIZE - 1)    //Offset in a tuple of (addr,pkt_rec), will always be the last byte
 #define ETX_IPV6_LAST_BYTE  (15)                    //The last byte for an ipv6 address
-#define ETX_MAX_JITTER      (ETX_INTERVAL/5)        //The default value is 20% of ETX_INTERVAL
-#define ETX_JITTER_MOD      (ETX_MAX_JITTER/MS + 1) //The modulo value for jitter computation
-#define ETX_DEF_JIT_CORRECT (ETX_MAX_JITTER/MS / 2) //Default Jitter correction value (normally ETX_MAX_JITTER / 2)
+#define ETX_MAX_JITTER      (ETX_INTERVAL / 5)      //The default value is 20% of ETX_INTERVAL
+#define ETX_JITTER_MOD      (ETX_MAX_JITTER + 1)    //The modulo value for jitter computation
+#define ETX_DEF_JIT_CORRECT (ETX_MAX_JITTER / 2)    //Default Jitter correction value (normally ETX_MAX_JITTER / 2)
 
 //prototypes
 void etx_init_beaconing(ipv6_addr_t * address);
