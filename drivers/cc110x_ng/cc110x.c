@@ -61,7 +61,7 @@ void cc110x_init(int tpid) {
 	rflags._RSSI         = 0x00;
 	rflags.LL_ACK       = 0;
 	rflags.CAA          = 0;
-	rflags.CRC          = 0;
+	rflags.CRC_STATE    = 0;
 	rflags.SEQ          = 0;
 	rflags.MAN_WOR      = 0;
 	rflags.KT_RES_ERR   = 0;

@@ -125,13 +125,13 @@ typedef struct cc1100_flags
 	uint32_t TOF;				///< Time of flight of the last packet and last ACK
 	uint32_t TCP;				///< Time to compute packet
 	unsigned RPS		: 16;	///< Raw packets sent to transmit last packet
-	unsigned RTC		: 8;	///< Retransmission count of last send packet
+	unsigned RETC		: 8;	///< Retransmission count of last send packet
 	unsigned RSSI	 	: 8;	///< The RSSI value of last received packet
 	unsigned RSSI_SEND 	: 8; 	///< The RSSI value of the last send unicast packet of this node
 	unsigned LQI		: 8;	///< The LQI value of the last received packet
 	unsigned LL_ACK  	: 1;	///< Is set if Link-Level ACK is received, otherwise 0 (reset on new burst)
 	unsigned CAA     	: 1;	///< The status of the air (1 = air free, 0 = air not free)
-	unsigned CRC     	: 1;	///< The CRC status of last received packet (1 = OK, 0 = not OK)
+	unsigned CRC_STATE 	: 1;	///< The CRC status of last received packet (1 = OK, 0 = not OK)
 	unsigned SEQ	 	: 1;	///< Sequence number (toggles between 0 and 1)
 	unsigned MAN_WOR 	: 1; 	///< Manual WOR set (for randomized WOR times => no synch)
 	unsigned KT_RES_ERR : 1;	///< A hwtimer resource error has occurred (no free timers available)
