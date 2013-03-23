@@ -1,5 +1,4 @@
-
-INCLUDES = -Iinclude -I$(RIOTBASE)/drivers/ -I$(RIOTBASE)/drivers/include -Ilib -I../.. -I../cpu/$(CPU)/include -I../cpu/ -Ilib/cmdengine -Inet -I../hal/include -I../core/include -Iconfig
+INCLUDES = -Iinclude -I$(RIOTBASE)/drivers/ -I$(RIOTBASE)/drivers/include -Ilib -I$(RIOTCPU)/$(CPU)/include -Inet -I../core/include
 
 MODULE =sys
 ifneq (,$(findstring auto_init,$(USEMODULE)))

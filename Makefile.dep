@@ -14,24 +14,10 @@ ifneq (,$(findstring uart0,$(USEMODULE)))
 endif
 
 ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
-  ifeq (,$(findstring transceiver,$(USEMODULE)))
-	USEMODULE += transceiver
-  endif
-
-  ifneq (,$(findstring msba2,$(BOARD)))
-  	USEMODULE += cc110x_spi
-	ifeq (,$(findstring gpioint,$(USEMODULE)))
-		USEMODULE += gpioint
+	ifeq (,$(findstring transceiver,$(USEMODULE)))
+		USEMODULE += transceiver
 	endif
 	ifeq (,$(findstring hwtimer,$(USEMODULE)))
 		USEMODULE += hwtimer
 	endif
-  endif
-  ifneq (,$(findstring msb-430h,$(BOARD)))
-  	USEMODULE += cc110x_spi
-	ifeq (,$(findstring hwtimer,$(USEMODULE)))
-		USEMODULE += hwtimer
-	endif
-  endif
 endif
-

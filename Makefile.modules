@@ -1,6 +1,5 @@
 export MAKEBASE =$(RIOTBASE)
 export BINDIR =$(RIOTBASE)/bin/
-#UNDEF =  $(BINDIR)startup.o $(BINDIR)builddate.o
 UNDEF =  $(BINDIR)startup.o
 
 ### Minimal setup
@@ -16,12 +15,13 @@ endif
 ifeq ($(CPU),native)
   export INCLUDES += -I$(RIOTBASE)/cpu/native/include
 endif
-ifeq ($(CPU),cc430)
-USEMODULE += cpu core lib sys
-else
+ifeq ($(CPU),stm32f407vgt6)
+	USEMODULE += stm32f4xxstdperi
+	UNDEF += $(BINDIR)syscalls.o
+endif
+
 #USEMODULE += cpu_drivers cpu core lib sys
 USEMODULE += cpu core sys
-endif
 ED = $(USEMODULE:%=-DMODULE_%)
 EXTDEFINES = $(shell echo $(ED)|tr 'a-z' 'A-Z')
 BL=$(USEMODULE:%= $(BINDIR)%.a)

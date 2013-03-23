@@ -4,43 +4,8 @@ SRC = $(wildcard *.c)
 OBJ = $(SRC:%.c=$(BINDIR)%.o)
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
-ifeq ($(CPU),lpc2387)
- INCLUDES += -I$(MAKEBASE)/cpu/arm_common/include/
- INCLUDES += -I$(MAKEBASE)/cpu/lpc2387/include
-endif
-ifeq ($(CPU),lpc214x)
- INCLUDES += -I$(MAKEBASE)/cpu/arm_common/include/
- INCLUDES += -I$(MAKEBASE)/cpu/lpc214x/include
-endif
-ifeq ($(CPU),msp430x16x)
- INCLUDES += -I$(MAKEBASE)/cpu/msp430-common/include/
- INCLUDES += -I$(MAKEBASE)/cpu/msp430x16x/include/
-endif
-ifeq ($(CPU),cc430)
- INCLUDES += -I$(MAKEBASE)/cpu/msp430-common/include/
- INCLUDES += -I$(MAKEBASE)/cpu/cc430/include/
-endif
-ifeq ($(CPU),native)
- INCLUDES += -I$(MAKEBASE)/cpu/native/include/
-endif
-ifeq ($(BOARD),msba2)
- INCLUDES += -I$(RIOTBOARD)/msba2/include/
- INCLUDES += -I$(RIOTBOARD)/msba2-common/include/
- INCLUDES += -I$(RIOTBOARD)/msba2-common/drivers/include/
-endif
-ifeq ($(BOARD),msb-430)
- INCLUDES += -I$(RIOTBOARD)/msb-430/include/
- INCLUDES += -I$(RIOTBOARD)/msb-430-common/include/
- INCLUDES += -I$(RIOTBOARD)/msb-430-common/drivers/include/
-endif
-ifeq ($(BOARD),msb-430h)
- INCLUDES += -I$(RIOTBOARD)/msb-430h/include/
- INCLUDES += -I$(RIOTBOARD)/msb-430-common/include/
- INCLUDES += -I$(RIOTBOARD)/msb-430-common/drivers/include/
-endif
-ifeq ($(BOARD),native)
- INCLUDES += -I$(RIOTBOARD)/native/include/
-endif
+include $(RIOTCPU)/Makefile.base
+include $(RIOTBOARD)/Makefile.base
 
 $(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ)
 	$(AR) -rc $(BINDIR)$(MODULE).a $(OBJ) $(ASMOBJ)
@@ -55,7 +20,7 @@ $(BINDIR)%.o: %.c
 	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 
 $(BINDIR)%.o: %.s
-	$(AS) $(ASFLAGS) $*.s -o $(BINDIR)$*.o
+	@$(AS) $(ASFLAGS) $*.s -o $(BINDIR)$*.o
 
 # remove compilation products
 clean::

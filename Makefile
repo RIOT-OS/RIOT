@@ -1,4 +1,4 @@
-DIRS = cpu core drivers sys 
+DIRS = $(RIOTCPU) core drivers sys 
 
 all:
 	mkdir -p $(BINDIR)
