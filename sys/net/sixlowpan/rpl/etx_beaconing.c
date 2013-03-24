@@ -20,17 +20,24 @@
 #include "rpl_structs.h"
 #include "rpl_dodag.h"
 
+//For debugging purposes
+#include <debug.h>
+//#define ENABLE_DEBUG
+
+char etx_radio_buf[ETX_RADIO_STACKSIZE] = { 0 };
+char etx_update_buf[ETX_UPDT_STACKSIZE] = { 0 };
+
 int etx_beacon_pid = 0;
 int etx_radio_pid = 0;
 int etx_update_pid = 0;
 
 //Buffer
-char etx_beacon_buf[ETX_BEACON_STACKSIZE] = { 0 };
-char etx_radio_buf[ETX_RADIO_STACKSIZE] = { 0 };
-char etx_update_buf[ETX_UPDT_STACKSIZE] = { 0 };
-
 uint8_t etx_send_buf[ETX_BUF_SIZE] = { 0 };
 uint8_t etx_rec_buf[ETX_BUF_SIZE] = { 0 };
+char etx_beacon_buf[ETX_BEACON_STACKSIZE] = { 0 };
+
+//Message queue for radio
+msg_t msg_que[ETX_RCV_QUEUE_SIZE] = { 0 };
 
 /*
  * The counter for the current 'round'. An ETX beacon is sent every ETX_INTERVAL
@@ -38,9 +45,6 @@ uint8_t etx_rec_buf[ETX_BUF_SIZE] = { 0 };
  * probes vs the expected probes from a neighbor every ETX_ROUND intervals.
  */
 static uint8_t rounds = 0;
-
-//Message queue for radio
-msg_t msg_que[ETX_RCV_QUEUE_SIZE] = { 0 };
 
 /*
  * This could (and should) be done differently, once the RPL implementation
@@ -78,7 +82,7 @@ void show_candidates(void) {
     for (candidate = &candidates[0], end = candidates
             + RPL_MAX_CANDIDATE_NEIGHBORS; candidate < end;
             candidate++) {
-        printf("Candidates Addr:%d\n"
+        DEBUG("Candidates Addr:%d\n"
                 "\t cur_etx:%f\n"
                 "\t packets_rx:%d\n"
                 "\t used:%d\n", candidate->addr.uint8[ETX_IPV6_LAST_BYTE],
@@ -156,7 +160,7 @@ void etx_beacon(void) {
                 etx_p->data[i * ETX_TUPLE_SIZE] =
                         candidates[i].addr.uint8[ETX_IPV6_LAST_BYTE];
                 etx_p->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET] =
-                        candidates[i].packets_rx;
+                        candidates[i].packets_tx;
                 p_length = p_length + ETX_PKT_HDR_LEN;
             }
         }
@@ -168,7 +172,8 @@ void etx_beacon(void) {
         //vtimer_usleep(((ETX_INTERVAL - ETX_MAX_JITTER)*MS) + jittercorrection*MS + jitter*MS);
         /// TODO once vtimer works as intended, replace the hwtimer here with
         /// the vtimer. Right now vtimer bugs, so we have hwtimer here.
-        hwtimer_wait(HWTIMER_TICKS(((ETX_INTERVAL - ETX_MAX_JITTER)*MS) + jittercorrection*MS + jitter*MS));
+        hwtimer_wait(
+                HWTIMER_TICKS(((ETX_INTERVAL - ETX_MAX_JITTER)*MS) + jittercorrection*MS + jitter*MS));
 
         jittercorrection = (ETX_MAX_JITTER) - jitter;
 
@@ -199,9 +204,10 @@ double etx_get_metric(ipv6_addr_t * address) {
     return 0;
 }
 
-uint8_t etx_add_candidate(ipv6_addr_t * address, uint8_t * pkt_rcvd) {
+rpl_candidate_neighbor_t * etx_add_candidate(ipv6_addr_t * address) {
+    puts("add candidate");
     /*
-     * Pre-Condition:   Add etx_add_candidate should only be called when the
+     * Pre-Condition:   etx_add_candidate should only be called when the
      *                  candidate is not yet in the list.
      *                  Otherwise the candidate will be added a second time,
      *                  leading to unknown behavior.
@@ -218,11 +224,11 @@ uint8_t etx_add_candidate(ipv6_addr_t * address, uint8_t * pkt_rcvd) {
      *              This shouldn't really happen though, since we have enough
      *              place in the array.
      *
-     * Returns if the candidate was added (1) or not (0).
+     * Returns the pointer to the candidate if it was added, or a NULL-pointer
+     * otherwise.
      */
     rpl_candidate_neighbor_t * candidate;
     rpl_candidate_neighbor_t * end;
-    uint8_t added = 0;
 
     for (candidate = &candidates[0], end = candidates
             + RPL_MAX_CANDIDATE_NEIGHBORS; candidate < end;
@@ -232,16 +238,15 @@ uint8_t etx_add_candidate(ipv6_addr_t * address, uint8_t * pkt_rcvd) {
             continue;
         } else {
             //We still have a free place add the new candidate
-            candidate->addr = * address;
+            candidate->addr = *address;
             candidate->cur_etx = 0;
-            candidate->packets_rx = *pkt_rcvd;
+            candidate->packets_tx = 0;
+            candidate->packets_rx = 0;
             candidate->used = 1;
-
-            added = 1;
-            break;
+            return candidate;
         }
     }
-    return added;
+    return NULL ;
 }
 
 void etx_handle_beacon(ipv6_addr_t * candidate_address) {
@@ -252,42 +257,40 @@ void etx_handle_beacon(ipv6_addr_t * candidate_address) {
 
     etx_probe_t * probe = get_etx_rec_buf();
 
-    //Todo delete once everything works well
-    printf("ETX beacon package received with following values:\n"
+    DEBUG("ETX beacon package received with following values:\n"
             "\tPackage Option:%x\n"
             "\t   Data Length:%u\n"
             "\tSource Address:%d\n\n", probe->code, probe->length,
             candidate_address->uint8[ETX_IPV6_LAST_BYTE]);
 
-    rpl_candidate_neighbor_t* candidate = NULL;
-
-    for (uint8_t i = 0; i < probe->length / ETX_TUPLE_SIZE; i++) {
-        //todo delete once everything works well
-        printf("\tIPv6 short  Addr:%u\n"
-                "\tPackets f. Addr:%u\n\n", probe->data[i * ETX_TUPLE_SIZE],
-                probe->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET]);
-
-        // If i find my address in this probe, update the packet_rx value for
-        // this candidate, if he is in my candidate list.
-        if (probe->data[i * ETX_TUPLE_SIZE]
-                == own_address->uint8[ETX_IPV6_LAST_BYTE]) {
-            candidate = etx_find_candidate(candidate_address);
-            if (candidate != NULL ) {
-                candidate->packets_rx = probe->data[i * ETX_TUPLE_SIZE
-                        + ETX_PKT_REC_OFFSET];
-            } else {
-                //Candidate was not found in my list, maybe I should add it
-                uint8_t addresult = 0;
-                addresult = etx_add_candidate(candidate_address,
-                        &(probe->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET]));
-
-                if(addresult == 1){
-                    puts("[WARNING] Candidate could not get added");
-                }
-            }
+    rpl_candidate_neighbor_t* candidate = etx_find_candidate(candidate_address);
+    if (candidate == NULL ) {
+        //Candidate was not found in my list, I should add it
+        candidate = etx_add_candidate(candidate_address);
+        if (candidate == NULL ) {
+            puts("[ERROR] Candidate could not get added");
+            puts("Increase the constant RPL_MAX_CANDIDATE_NEIGHBORS");
+            return;
         }
     }
 
+    //I have received 1 more packet from this candidate
+    candidate->packets_tx = candidate->packets_tx + 1;
+
+    // If i find my address in this probe, update the packet_rx value for
+    // this candidate.
+    for (uint8_t i = 0; i < probe->length / ETX_TUPLE_SIZE; i++) {
+        DEBUG("\tIPv6 short  Addr:%u\n"
+                "\tPackets f. Addr:%u\n\n", probe->data[i * ETX_TUPLE_SIZE],
+                probe->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET]);
+
+        if (probe->data[i * ETX_TUPLE_SIZE]
+                == own_address->uint8[ETX_IPV6_LAST_BYTE]) {
+
+            candidate->packets_rx = probe->data[i * ETX_TUPLE_SIZE
+                    + ETX_PKT_REC_OFFSET];
+        }
+    }
 }
 
 void etx_radio(void) {
@@ -364,7 +367,7 @@ void etx_update(void) {
                 candidate->cur_etx =
                         candidate->packets_rx / (double) ETX_ROUNDS;
                 candidate->packets_rx = 0;
-                printf(
+                DEBUG(
                         "Updated ETX Metric to %f for candidate used was on %d",
                         candidate->cur_etx, candidate->used);
             }
