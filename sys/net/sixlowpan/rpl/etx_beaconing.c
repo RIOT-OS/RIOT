@@ -40,7 +40,7 @@ uint8_t etx_rec_buf[ETX_BUF_SIZE] = { 0 };
 static uint8_t rounds = 0;
 
 //Message queue for radio
-msg_t msg_que[ETX_RCV_BUFFER_SIZE] = { 0 };
+msg_t msg_que[ETX_RCV_QUEUE_SIZE] = { 0 };
 
 /*
  * This could (and should) be done differently, once the RPL implementation
@@ -232,7 +232,7 @@ uint8_t etx_add_candidate(ipv6_addr_t * address, uint8_t * pkt_rcvd) {
             continue;
         } else {
             //We still have a free place add the new candidate
-            candidate->addr = address;
+            candidate->addr = * address;
             candidate->cur_etx = 0;
             candidate->packets_rx = *pkt_rcvd;
             candidate->used = 1;
@@ -279,7 +279,7 @@ void etx_handle_beacon(ipv6_addr_t * candidate_address) {
                 //Candidate was not found in my list, maybe I should add it
                 uint8_t addresult = 0;
                 addresult = etx_add_candidate(candidate_address,
-                        probe->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET]);
+                        &(probe->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET]));
 
                 if(addresult == 1){
                     puts("[WARNING] Candidate could not get added");
@@ -296,7 +296,7 @@ void etx_radio(void) {
 
     ieee802154_frame_t frame;
 
-    msg_init_queue(msg_que, ETX_RCV_BUFFER_SIZE);
+    msg_init_queue(msg_que, ETX_RCV_QUEUE_SIZE);
 
     ipv6_addr_t ll_address;
     ipv6_addr_t candidate_addr;

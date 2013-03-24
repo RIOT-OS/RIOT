@@ -11,16 +11,16 @@
 
 #include "sys/net/sixlowpan/sixlowip.h"
 
-#define ETX_BEACON_STACKSIZE    4500 //TODO debug stacksize, set for production
-#define ETX_RADIO_STACKSIZE     4500 //TODO debug stacksize, set for production
-#define ETX_UPDT_STACKSIZE      4500 //TODO debug stacksize, set for production
+#define ETX_BEACON_STACKSIZE    2000 //TODO debug stacksize, set for production
+#define ETX_RADIO_STACKSIZE     2000 //TODO debug stacksize, set for production
+#define ETX_UPDT_STACKSIZE      800 //TODO debug stacksize, set for production
 
 
 //[option|length|ipaddr.|packetcount] with up to 15 ipaddr|packetcount pairs
 // 1 Byte 1 Byte  1 Byte  1 Byte
 #define ETX_BUF_SIZE   (32)
 
-#define ETX_RCV_BUFFER_SIZE     (128)
+#define ETX_RCV_QUEUE_SIZE     (128)
 
 //Constants for packets
 
