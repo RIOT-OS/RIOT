@@ -59,12 +59,16 @@ void init(char *str){
 
 void table(char *str){
     thread_print_all();
+}
+
+void candidates(char *str){
     show_candidates();
 }
 
 const shell_command_t shell_commands[] = {
     {"init", "", init},
     {"table", "", table},
+    {"cand", "", candidates},
     {NULL, NULL, NULL}
 };
 
