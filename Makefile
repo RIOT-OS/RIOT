@@ -6,8 +6,8 @@ all:
 	
 clean:
 	@for i in $(DIRS) ; do $(MAKE) -C $$i clean ; done ;
-	@if [ -d $(BINDIR) ] ; \
-	then rmdir --ignore-fail-on-non-empty $(BINDIR) ; \
+	-@if [ -d $(BINDIR) ] ; \
+	then rmdir $(BINDIR) ; \
 	fi 
 
 doc:
