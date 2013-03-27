@@ -171,8 +171,6 @@ void sched_switch(uint16_t current_prio, uint16_t other_prio, int in_isr) {
     }
 }
 
-extern void cpu_switch_context_exit(void);
-
 void sched_task_exit(void) {
     DEBUG("sched_task_exit(): ending task %s...\n", active_thread->name);
 

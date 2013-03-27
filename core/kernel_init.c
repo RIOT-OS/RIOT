@@ -38,7 +38,6 @@ volatile tcb_t *active_thread;
 volatile int lpm_prevent_sleep = 0;
 
 extern void main(void);
-extern void cpu_switch_context_exit(void);
 
 static void idle_thread(void) {
     while(1) {
