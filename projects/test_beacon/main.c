@@ -62,7 +62,9 @@ void table(char *str){
 }
 
 void candidates(char *str){
+    puts("++++++++++++candidates++++++++");
     show_candidates();
+    puts("++++++++++++end++++++++");
 }
 
 const shell_command_t shell_commands[] = {

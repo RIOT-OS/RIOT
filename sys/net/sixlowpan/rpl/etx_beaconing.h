@@ -12,9 +12,9 @@
 #include "sys/net/sixlowpan/sixlowip.h"
 
 //4908 is available stack size
-#define ETX_BEACON_STACKSIZE    2000 //TODO debug stacksize, set for production
-#define ETX_RADIO_STACKSIZE     2000 //TODO debug stacksize, set for production
-#define ETX_UPDT_STACKSIZE       908 //TODO debug stacksize, set for production
+#define ETX_BEACON_STACKSIZE    4500 //TODO debug stacksize, set for production
+#define ETX_RADIO_STACKSIZE     4500 //TODO debug stacksize, set for production
+#define ETX_CLOCK_STACKSIZE     4500 //TODO debug stacksize, set for production
 
 
 //[option|length|ipaddr.|packetcount] with up to 15 ipaddr|packetcount pairs
@@ -25,8 +25,6 @@
 
 //Constants for packets
 
-//ETX beaconing type (XXX ATTENTION! this is non-standard)
-#define ETX_BEACON          0x20//Non-standard way of saying this is an etx-pkt.
 
 //ETX Interval parameters
 #define MS  1000
@@ -39,21 +37,14 @@
  * and 5 (For ETX_MAX_JITTER) unless those values are adjusted too.
  */
 #define ETX_INTERVAL        (1000)
-#define ETX_ROUNDS          (10)                    //10 is the default value
-#define ETX_PKT_HDR_LEN     (2)                     //Option type + Length (1 Byte each)
+#define ETX_WINDOW          (10)                    //10 is the default value
 #define ETX_TUPLE_SIZE      (2)                     //1 Byte for Addr, 1 Byte for packets rec.
 #define ETX_PKT_REC_OFFSET  (ETX_TUPLE_SIZE - 1)    //Offset in a tuple of (addr,pkt_rec), will always be the last byte
 #define ETX_IPV6_LAST_BYTE  (15)                    //The last byte for an ipv6 address
 #define ETX_MAX_JITTER      (ETX_INTERVAL / 5)      //The default value is 20% of ETX_INTERVAL
 #define ETX_JITTER_MOD      (ETX_MAX_JITTER + 1)    //The modulo value for jitter computation
 #define ETX_DEF_JIT_CORRECT (ETX_MAX_JITTER / 2)    //Default Jitter correction value (normally ETX_MAX_JITTER / 2)
-
-//prototypes
-void etx_init_beaconing(ipv6_addr_t * address);
-void etx_beacon(void);
-double etx_get_metric(ipv6_addr_t * address);
-void etx_update(void);
-void etx_radio(void);
+#define ETX_CLOCK_ADJUST    (52500)                 //Adjustment for clockthread computations to stay close/near ETX_INTERVAL
 
 /*
  * The ETX beaconing packet consists of:
@@ -76,11 +67,33 @@ void etx_radio(void);
  * If the length of this packet says 0, it has received no other beaconing
  * packets itself so far.
  */
-typedef struct __attribute__((packed)) {
+typedef struct __attribute__((packed)) etx_probe_t{
     uint8_t code;
     uint8_t length;
     uint8_t* data;
 } etx_probe_t;
 
+typedef struct etx_neighbor_t {
+    ipv6_addr_t addr;           //The address of this node
+    uint8_t     tx_cur_round;   //The indicator for receiving a packet from this candidate this round
+    uint8_t     packets_tx[10]; //The packets this node has transmitted TO ME
+    uint8_t     packets_rx;     //The packets this node has received FROM ME
+    double      cur_etx;        //The currently calculated ETX-value
+    uint8_t     used;           //The indicator if this node is active or not
+} etx_neighbor_t;
+
+//prototypes
+void etx_init_beaconing(ipv6_addr_t * address);
+void etx_beacon(void);
+void etx_clock(void);
+double etx_get_metric(ipv6_addr_t * address);
+void etx_update(etx_neighbor_t * neighbor);
+void etx_radio(void);
+
+#define ETX_PKT_OPT         (0)     //Position of Option-Type-Byte
+#define ETX_PKT_OPTVAL      (0x20)  //Non-standard way of saying this is an ETX-Packet.
+#define ETX_PKT_LEN         (1)     //Position of Length-Byte
+#define ETX_PKT_HDR_LEN     (2)     //Option type + Length (1 Byte each)
+#define ETX_PKT_DATA        (2)     //Begin of Data Bytes
 
 #endif /* ETX_BEACONING_H_ */

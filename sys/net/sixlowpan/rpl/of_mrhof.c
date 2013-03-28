@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "of_mrhof.h"
 
+#include "etx_beaconing.h"
+
 // Function Prototypes
 static uint16_t calc_rank(rpl_parent_t *, uint16_t);
 static rpl_parent_t *which_parent(rpl_parent_t *, rpl_parent_t *);
@@ -39,7 +41,7 @@ static uint16_t calc_path_cost(rpl_parent_t * parent) {
         return DEFAULT_MIN_HOP_RANK_INCREASE;
     }
 
-    double etx_value = etx_get_metric(parent->addr);
+    double etx_value = etx_get_metric(&(parent->addr));
     if (etx_value != 0) {
         /*
          * (ETX_for_link_to_neighbor * 128) + Rank_of_that_neighbor

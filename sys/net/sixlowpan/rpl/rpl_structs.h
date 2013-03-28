@@ -204,14 +204,6 @@ typedef struct __attribute__((packed)) rpl_opt_transit_t {
 
 struct rpl_dodag_t;
 
-typedef struct rpl_candidate_neighbor_t {
-    ipv6_addr_t addr;           //The address of this node
-    uint8_t     packets_tx;     //The packets this node has transmitted TO ME
-    uint8_t     packets_rx;     //The packets this node has received FROM ME
-    double      cur_etx;        //The currently calculated ETX-value
-    uint8_t     used;           //The indicator if this node is active or not
-} rpl_candidate_neighbor_t;
-
 typedef struct rpl_parent_t {
     ipv6_addr_t         addr;
     uint16_t            rank;
