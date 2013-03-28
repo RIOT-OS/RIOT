@@ -453,7 +453,7 @@ static uint8_t etx_count_packet_tx(etx_neighbor_t * candidate) {
      *  Counts the number of packets that were received for this candidate
      *  in the last ETX_WINDOW intervals.
      */
-    puts("counting packets");
+    DEBUG("counting packets");
     uint8_t pkt_count = 0;
     DEBUG("[");
     for (uint8_t i = 0; i < ETX_WINDOW; i++) {

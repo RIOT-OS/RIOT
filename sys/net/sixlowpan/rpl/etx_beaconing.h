@@ -12,7 +12,7 @@
 #include "sys/net/sixlowpan/sixlowip.h"
 
 //For debugging purposes
-#define ENABLE_DEBUG
+//#define ENABLE_DEBUG
 #include <debug.h>
 
 #ifdef ENABLE_DEBUG
