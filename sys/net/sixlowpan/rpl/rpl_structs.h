@@ -91,11 +91,6 @@
 #define NUMBER_IMPLEMENTED_OFS 2
 #define RPL_MAX_DODAGS 3
 #define RPL_MAX_INSTANCES 1
-/*
- * Default 40, should be enough to get all messages for neighbors.
- * In my tests, the maximum count of neighbors was around 30-something
- */
-#define RPL_MAX_CANDIDATE_NEIGHBORS 15//TODO change
 #define RPL_MAX_PARENTS 5
 #define RPL_MAX_ROUTING_ENTRIES 128
 #define RPL_ROOT_RANK 1

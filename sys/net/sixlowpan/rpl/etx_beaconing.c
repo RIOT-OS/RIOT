@@ -17,15 +17,11 @@
 
 #include "sys/net/sixlowpan/sixlowmac.h"
 #include "sys/net/sixlowpan/ieee802154_frame.h"
-#include "rpl_dodag.h"
-
-//For debugging purposes
-#define ENABLE_DEBUG
-#include <debug.h>
 
 //prototytpes
 static uint8_t etx_count_packet_tx(etx_neighbor_t * candidate);
 static void etx_set_packets_received(void);
+static bool etx_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2);
 
 //Buffer
 char etx_beacon_buf[ETX_BEACON_STACKSIZE] = { 0 };
@@ -67,7 +63,7 @@ static char reached_window = 0;
  * possible neighbor we hear from is a parent.
  * Right now, we need to keep track of the ETX values of other nodes without
  * needing them to be in our parent array, so we have another array here in
- * which we put all necessary info for up to RPL_MAX_CANDIDATE_NEIGHBORS
+ * which we put all necessary info for up to ETX_MAX_CANDIDATE_NEIHGBORS
  * candidates.
  *
  * xxx If you get a -Wmissing-braces warning here:
@@ -76,7 +72,7 @@ static char reached_window = 0;
  * See: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
  */
 //Candidate array
-static etx_neighbor_t candidates[RPL_MAX_CANDIDATE_NEIGHBORS] = { 0 };
+static etx_neighbor_t candidates[ETX_MAX_CANDIDATE_NEIGHBORS] = { 0 };
 
 /*
  * Each time we send a beacon packet we need to reset some values for the
@@ -95,10 +91,10 @@ msg_t mesg;
 //RPL-address
 static ipv6_addr_t * own_address;
 
-static etx_probe_t * get_etx_send_buf(void) {
+static etx_probe_t * etx_get_send_buf(void) {
     return ((etx_probe_t *) &(etx_send_buf[0]));
 }
-static etx_probe_t * get_etx_rec_buf(void) {
+static etx_probe_t * etx_get_rec_buf(void) {
     return ((etx_probe_t *) &(etx_rec_buf[0]));
 }
 
@@ -107,7 +103,7 @@ void show_candidates(void) {
     etx_neighbor_t *end;
 
     for (candidate = &candidates[0], end = candidates
-            + RPL_MAX_CANDIDATE_NEIGHBORS; candidate < end;
+            + ETX_MAX_CANDIDATE_NEIGHBORS; candidate < end;
             candidate++) {
         if (candidate->used == 0) {
             break;
@@ -153,7 +149,7 @@ void etx_beacon(void) {
      * ETX_INTERVAL between the wakeups. It takes the old jittervalue in account
      * and modifies the time to wait accordingly.
      */
-    uint8_t * etx_data = &etx_send_buf[ETX_PKT_DATA];
+    etx_probe_t * packet = etx_get_send_buf();
     uint8_t p_length = 0;
 
     /*
@@ -165,22 +161,22 @@ void etx_beacon(void) {
     ieee_802154_long_t empty_addr = { 0 };
 
     //Build first etx packet
-    for (uint8_t i = 0; i < RPL_MAX_CANDIDATE_NEIGHBORS; i++) {
+    for (uint8_t i = 0; i < ETX_MAX_CANDIDATE_NEIGHBORS; i++) {
         if (candidates[i].used != 0) {
-            etx_data[i * ETX_TUPLE_SIZE] =
+            packet->data[i * ETX_TUPLE_SIZE] =
                     candidates[i].addr.uint8[ETX_IPV6_LAST_BYTE];
-            etx_data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET] =
+            packet->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET] =
                     etx_count_packet_tx(&candidates[i]);
             p_length = p_length + ETX_TUPLE_SIZE;
         }
     }
-    etx_send_buf[ETX_PKT_LEN] = p_length;
+    packet->length = p_length;
 
     while (true) {
         thread_sleep();
         //mutex_lock(&etx_mutex);
         send_ieee802154_frame(&empty_addr, &etx_send_buf[0],
-                etx_send_buf[ETX_PKT_LEN] + ETX_PKT_HDR_LEN, 1);
+                ETX_DATA_MAXLEN+ETX_PKT_HDR_LEN, 1);
         DEBUG("sent beacon!\n");
         etx_set_packets_received();
         cur_round++;
@@ -194,16 +190,16 @@ void etx_beacon(void) {
         //mutex_unlock(&etx_mutex,0);
         //Build etx packet
         p_length = 0;
-        for (uint8_t i = 0; i < RPL_MAX_CANDIDATE_NEIGHBORS; i++) {
+        for (uint8_t i = 0; i < ETX_MAX_CANDIDATE_NEIGHBORS; i++) {
             if (candidates[i].used != 0) {
-                etx_data[i * ETX_TUPLE_SIZE] =
+                packet->data[i * ETX_TUPLE_SIZE] =
                         candidates[i].addr.uint8[ETX_IPV6_LAST_BYTE];
-                etx_data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET] =
+                packet->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET] =
                         etx_count_packet_tx(&candidates[i]);
                 p_length = p_length + ETX_PKT_HDR_LEN;
             }
         }
-        etx_send_buf[ETX_PKT_LEN] = p_length;
+        packet->length = p_length;
     }
 }
 
@@ -212,9 +208,9 @@ etx_neighbor_t * etx_find_candidate(ipv6_addr_t * address) {
      * find the candidate with address address and returns it, or returns NULL
      * if no candidate having this address was found.
      */
-    for (uint8_t i = 0; i < RPL_MAX_CANDIDATE_NEIGHBORS; i++) {
+    for (uint8_t i = 0; i < ETX_MAX_CANDIDATE_NEIGHBORS; i++) {
         if (candidates[i].used
-                && (rpl_equal_id(&candidates[i].addr, address))) {
+                && (etx_equal_id(&candidates[i].addr, address))) {
             return &candidates[i];
         }
     }
@@ -295,7 +291,7 @@ etx_neighbor_t * etx_add_candidate(ipv6_addr_t * address) {
     etx_neighbor_t * end;
 
     for (candidate = &candidates[0], end = candidates
-            + RPL_MAX_CANDIDATE_NEIGHBORS; candidate < end;
+            + ETX_MAX_CANDIDATE_NEIGHBORS; candidate < end;
             candidate++) {
         if (candidate->used) {
             //skip
@@ -332,7 +328,7 @@ void etx_handle_beacon(ipv6_addr_t * candidate_address) {
         candidate = etx_add_candidate(candidate_address);
         if (candidate == NULL ) {
             puts("[ERROR] Candidate could not get added");
-            puts("Increase the constant RPL_MAX_CANDIDATE_NEIGHBORS");
+            puts("Increase the constant ETX_MAX_CANDIDATE_NEIHGBORS");
             return;
         }
     }
@@ -343,18 +339,17 @@ void etx_handle_beacon(ipv6_addr_t * candidate_address) {
 
     // If i find my address in this probe, update the packet_rx value for
     // this candidate.
-    uint8_t datalength = etx_rec_buf[ETX_PKT_LEN];
-    uint8_t * rec_data = &etx_rec_buf[ETX_PKT_DATA];
+    etx_probe_t * rec_pkt = etx_get_rec_buf();
 
-    for (uint8_t i = 0; i < datalength / ETX_TUPLE_SIZE; i++) {
+    for (uint8_t i = 0; i < rec_pkt->length / ETX_TUPLE_SIZE; i++) {
         DEBUG("\tIPv6 short Addr:%u\n"
-        "\tPackets f. Addr:%u\n\n", rec_data[i * ETX_TUPLE_SIZE],
-                rec_data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET]);
+        "\tPackets f. Addr:%u\n\n", rec_pkt->data[i * ETX_TUPLE_SIZE],
+            rec_pkt->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET]);
 
-        if (rec_data[i * ETX_TUPLE_SIZE]
+        if (rec_pkt->data[i * ETX_TUPLE_SIZE]
                 == own_address->uint8[ETX_IPV6_LAST_BYTE]) {
 
-            candidate->packets_rx = rec_data[i * ETX_TUPLE_SIZE
+            candidate->packets_rx = rec_pkt->data[i * ETX_TUPLE_SIZE
                     + ETX_PKT_REC_OFFSET];
         }
     }
@@ -482,7 +477,6 @@ static uint8_t etx_count_packet_tx(etx_neighbor_t * candidate) {
                 }
 #endif
             } else {
-                DEBUG("Received packet in ROUND%d!\n", i);
                 //Add 1 and set field
                 pkt_count = pkt_count + 1;
                 candidate->packets_tx[i] = 1;
@@ -503,7 +497,7 @@ static void etx_set_packets_received(void) {
     /*
      * Set for all candidates if they received a packet this round or not
      */
-    for (uint8_t i = 0; i < RPL_MAX_CANDIDATE_NEIGHBORS; i++) {
+    for (uint8_t i = 0; i < ETX_MAX_CANDIDATE_NEIGHBORS; i++) {
         if (candidates[i].used) {
             if (candidates[i].tx_cur_round != 0) {
                 candidates[i].packets_tx[cur_round] = 1;
@@ -511,4 +505,14 @@ static void etx_set_packets_received(void) {
             }
         }
     }
+}
+
+bool etx_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2){
+    for(uint8_t i=0;i<4;i++){
+        if(id1->uint32[i] != id2->uint32[i]){
+            return false;
+        }
+    }
+    return true;
+
 }

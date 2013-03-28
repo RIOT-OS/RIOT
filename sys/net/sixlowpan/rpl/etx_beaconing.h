@@ -11,11 +11,19 @@
 
 #include "sys/net/sixlowpan/sixlowip.h"
 
-//4908 is available stack size
-#define ETX_BEACON_STACKSIZE    4500 //TODO debug stacksize, set for production
-#define ETX_RADIO_STACKSIZE     4500 //TODO debug stacksize, set for production
-#define ETX_CLOCK_STACKSIZE     4500 //TODO debug stacksize, set for production
+//For debugging purposes
+#define ENABLE_DEBUG
+#include <debug.h>
 
+#ifdef ENABLE_DEBUG
+    #define ETX_BEACON_STACKSIZE    4500
+    #define ETX_RADIO_STACKSIZE     4500
+    #define ETX_CLOCK_STACKSIZE      500
+#else
+    #define ETX_BEACON_STACKSIZE    2500 //TODO optimize, maybe 2000 is enough
+    #define ETX_RADIO_STACKSIZE     2500 //TODO optimize, maybe 2000 is enough
+    #define ETX_CLOCK_STACKSIZE      500 //TODO optimize, maybe  250 is enough
+#endif
 
 //[option|length|ipaddr.|packetcount] with up to 15 ipaddr|packetcount pairs
 // 1 Byte 1 Byte  1 Byte  1 Byte
@@ -23,9 +31,15 @@
 
 #define ETX_RCV_QUEUE_SIZE     (128)
 
-//Constants for packets
-
-
+/*
+ * Default 40, should be enough to get all messages for neighbors.
+ * In my tests, the maximum count of neighbors was around 30-something
+ */
+#ifdef ENABLE_DEBUG
+    #define ETX_MAX_CANDIDATE_NEIGHBORS 15 //Stacksizes are huge in debug mode, so memory is rare
+#else
+    #define ETX_MAX_CANDIDATE_NEIGHBORS 40
+#endif
 //ETX Interval parameters
 #define MS  1000
 
@@ -66,11 +80,15 @@
  *
  * If the length of this packet says 0, it has received no other beaconing
  * packets itself so far.
+ *
+ * The packet is always 32bytes long, but may contain varying amounts of
+ * information.
+ * The information processed shall not exceed the value set in Option Length.
  */
 typedef struct __attribute__((packed)) etx_probe_t{
     uint8_t code;
     uint8_t length;
-    uint8_t* data;
+    uint8_t data[30];
 } etx_probe_t;
 
 typedef struct etx_neighbor_t {
@@ -93,6 +111,7 @@ void etx_radio(void);
 #define ETX_PKT_OPT         (0)     //Position of Option-Type-Byte
 #define ETX_PKT_OPTVAL      (0x20)  //Non-standard way of saying this is an ETX-Packet.
 #define ETX_PKT_LEN         (1)     //Position of Length-Byte
+#define ETX_DATA_MAXLEN     (30)    //max length of the data
 #define ETX_PKT_HDR_LEN     (2)     //Option type + Length (1 Byte each)
 #define ETX_PKT_DATA        (2)     //Begin of Data Bytes
 
