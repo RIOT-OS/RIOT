@@ -51,19 +51,17 @@ void reset_trickletimer(void){
 }
 
 void init_trickle(void){
-    puts("trickle init!");
-    //malloc thread stacks
-    timer_over_buf      =  malloc(TRICKLE_TIMER_STACKSIZE*sizeof(char));
+    timer_over_buf      =  calloc(TRICKLE_TIMER_STACKSIZE,sizeof(char));
     if(timer_over_buf == NULL){
         puts("[ERROR] Could not allocate enough memory for timer_over_buf!");
         return;
     }
-    interval_over_buf   =  malloc(TRICKLE_INTERVAL_STACKSIZE*sizeof(char));
+    interval_over_buf   =  calloc(TRICKLE_INTERVAL_STACKSIZE,sizeof(char));
     if(interval_over_buf == NULL){
         puts("[ERROR] Could not allocate enough memory for interval_over_buf!");
         return;
     }
-    dao_delay_over_buf  =  malloc(DAO_DELAY_STACKSIZE*sizeof(char));
+    dao_delay_over_buf  =  calloc(DAO_DELAY_STACKSIZE,sizeof(char));
     if(dao_delay_over_buf == NULL){
         puts("[ERROR] Could not allocate enough memory for interval_over_buf!");
         return;

@@ -81,7 +81,7 @@ static etx_neighbor_t candidates[ETX_MAX_CANDIDATE_NEIGHBORS] = { 0 };
  * In this time, no packet may be handled, otherwise it could assume values
  * from the last round to count for this round.
  */
-//mutex_t etx_mutex;
+mutex_t etx_mutex;
 //Transceiver command for sending ETX probes
 transceiver_command_t tcmd;
 
@@ -120,7 +120,7 @@ void show_candidates(void) {
 }
 
 void etx_init_beaconing(ipv6_addr_t * address) {
-    //mutex_init(&etx_mutex);
+    mutex_init(&etx_mutex);
     own_address = address;
     //set code
     puts("ETX BEACON INIT");
@@ -160,21 +160,21 @@ void etx_beacon(void) {
      */
     ieee_802154_long_t empty_addr = { 0 };
 
-    //Build first etx packet
-    for (uint8_t i = 0; i < ETX_MAX_CANDIDATE_NEIGHBORS; i++) {
-        if (candidates[i].used != 0) {
-            packet->data[i * ETX_TUPLE_SIZE] =
-                    candidates[i].addr.uint8[ETX_IPV6_LAST_BYTE];
-            packet->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET] =
-                    etx_count_packet_tx(&candidates[i]);
-            p_length = p_length + ETX_TUPLE_SIZE;
-        }
-    }
-    packet->length = p_length;
-
     while (true) {
         thread_sleep();
-        //mutex_lock(&etx_mutex);
+        mutex_lock(&etx_mutex);
+        //Build etx packet
+        p_length = 0;
+        for (uint8_t i = 0; i < ETX_BEST_CANDIDATES; i++) {
+            if (candidates[i].used != 0) {
+                packet->data[i * ETX_TUPLE_SIZE] =
+                        candidates[i].addr.uint8[ETX_IPV6_LAST_BYTE];
+                packet->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET] =
+                        etx_count_packet_tx(&candidates[i]);
+                p_length = p_length + ETX_PKT_HDR_LEN;
+            }
+        }
+        packet->length = p_length;
         send_ieee802154_frame(&empty_addr, &etx_send_buf[0],
                 ETX_DATA_MAXLEN+ETX_PKT_HDR_LEN, 1);
         DEBUG("sent beacon!\n");
@@ -187,19 +187,7 @@ void etx_beacon(void) {
             }
             cur_round = 0;
         }
-        //mutex_unlock(&etx_mutex,0);
-        //Build etx packet
-        p_length = 0;
-        for (uint8_t i = 0; i < ETX_MAX_CANDIDATE_NEIGHBORS; i++) {
-            if (candidates[i].used != 0) {
-                packet->data[i * ETX_TUPLE_SIZE] =
-                        candidates[i].addr.uint8[ETX_IPV6_LAST_BYTE];
-                packet->data[i * ETX_TUPLE_SIZE + ETX_PKT_REC_OFFSET] =
-                        etx_count_packet_tx(&candidates[i]);
-                p_length = p_length + ETX_PKT_HDR_LEN;
-            }
-        }
-        packet->length = p_length;
+        mutex_unlock(&etx_mutex,0);
     }
 }
 
@@ -388,9 +376,9 @@ void etx_radio(void) {
                 //up to 8 bits
                 candidate_addr.uint8[ETX_IPV6_LAST_BYTE] = (uint8_t) p->src;
                 //handle the beacon
-                //mutex_lock(&etx_mutex);
+                mutex_lock(&etx_mutex);
                 etx_handle_beacon(&candidate_addr);
-                //mutex_unlock(&etx_mutex,0);
+                mutex_unlock(&etx_mutex,1);
             }
 
             p->processing--;
@@ -459,7 +447,7 @@ static uint8_t etx_count_packet_tx(etx_neighbor_t * candidate) {
     for (uint8_t i = 0; i < ETX_WINDOW; i++) {
         if (i != cur_round) {
             pkt_count = pkt_count + candidate->packets_tx[i];
-#ifdef ENABLE_DEBUG //so ugly delete TODO
+#ifdef ENABLE_DEBUG
             DEBUG("%d",candidate->packets_tx[i]);
             if (i < ETX_WINDOW - 1) {
                 DEBUG(",");
@@ -471,7 +459,7 @@ static uint8_t etx_count_packet_tx(etx_neighbor_t * candidate) {
                 //Didn't receive a packet, zero the field and don't add
                 candidate->packets_tx[i] = 0;
 #ifdef ENABLE_DEBUG
-                DEBUG("%d",candidate->packets_tx[i]);
+                DEBUG("%d!",candidate->packets_tx[i]);
                 if (i < ETX_WINDOW - 1) {
                     DEBUG(",");
                 }
@@ -481,7 +469,7 @@ static uint8_t etx_count_packet_tx(etx_neighbor_t * candidate) {
                 pkt_count = pkt_count + 1;
                 candidate->packets_tx[i] = 1;
 #ifdef ENABLE_DEBUG
-                DEBUG("%d",candidate->packets_tx[i]);
+                DEBUG("%d!",candidate->packets_tx[i]);
                 if (i < ETX_WINDOW - 1) {
                     DEBUG(",");
                 }

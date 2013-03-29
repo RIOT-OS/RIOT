@@ -12,7 +12,7 @@
 #include "sys/net/sixlowpan/sixlowip.h"
 
 //For debugging purposes
-//#define ENABLE_DEBUG
+#define ENABLE_DEBUG
 #include <debug.h>
 
 #ifdef ENABLE_DEBUG
@@ -52,6 +52,7 @@
  */
 #define ETX_INTERVAL        (1000)
 #define ETX_WINDOW          (10)                    //10 is the default value
+#define ETX_BEST_CANDIDATES (15)                    //Sent only 15 candidates in a beaconing packet
 #define ETX_TUPLE_SIZE      (2)                     //1 Byte for Addr, 1 Byte for packets rec.
 #define ETX_PKT_REC_OFFSET  (ETX_TUPLE_SIZE - 1)    //Offset in a tuple of (addr,pkt_rec), will always be the last byte
 #define ETX_IPV6_LAST_BYTE  (15)                    //The last byte for an ipv6 address
@@ -94,7 +95,7 @@ typedef struct __attribute__((packed)) etx_probe_t{
 typedef struct etx_neighbor_t {
     ipv6_addr_t addr;           //The address of this node
     uint8_t     tx_cur_round;   //The indicator for receiving a packet from this candidate this round
-    uint8_t     packets_tx[10]; //The packets this node has transmitted TO ME
+    uint8_t     packets_tx[ETX_WINDOW]; //The packets this node has transmitted TO ME
     uint8_t     packets_rx;     //The packets this node has received FROM ME
     double      cur_etx;        //The currently calculated ETX-value
     uint8_t     used;           //The indicator if this node is active or not

@@ -31,17 +31,19 @@ void reset(rpl_dodag_t *dodag) {
 }
 
 static uint16_t calc_path_cost(rpl_parent_t * parent) {
+    puts("calc_pathcost");
     /*
      * Calculates the path cost through the parent, for now, only for ETX
      */
     if (parent == NULL ) {
         // Shouldn't ever happen since this function is supposed to be always
         // run with a parent. If it does happen, we can assume a root called it.
-        printf("[WARNING] calc_path_cost called without parent!");
+        puts("[WARNING] calc_path_cost called without parent!");
         return DEFAULT_MIN_HOP_RANK_INCREASE;
     }
 
     double etx_value = etx_get_metric(&(parent->addr));
+    printf("Metric for parent returned: %f", etx_value);
     if (etx_value != 0) {
         /*
          * (ETX_for_link_to_neighbor * 128) + Rank_of_that_neighbor
@@ -74,6 +76,7 @@ static uint16_t calc_path_cost(rpl_parent_t * parent) {
 }
 
 static uint16_t calc_rank(rpl_parent_t * parent, uint16_t base_rank) {
+    puts("calc_rank");
     /*
      * Return the rank for this node.
      *
@@ -117,6 +120,7 @@ static uint16_t calc_rank(rpl_parent_t * parent, uint16_t base_rank) {
 }
 
 static rpl_parent_t * which_parent(rpl_parent_t * p1, rpl_parent_t * p2) {
+    puts("which_parent");
     /*
      * Return the parent with the lowest path cost.
      * Before returning any of the two given parents, make sure that a switch is

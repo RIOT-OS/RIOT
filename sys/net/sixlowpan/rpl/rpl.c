@@ -158,7 +158,10 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address){
 	
 	//INSERT NEW OBJECTIVE FUNCTIONS HERE
 	objective_functions[0] = rpl_get_of0();
+	puts("OF0 added.");//todo del
 	objective_functions[1] = rpl_get_of_mrhof();
+	puts("OF_MRHOF added.");//todo del
+
 
 	sixlowpan_init(trans,rpl_address,0);
 	//Wir benötigen einen Link Local prefix, um unsere entsprechende Addresse im Netz abzufragen
@@ -206,7 +209,7 @@ void rpl_init_root(){
 		dodag->version = RPL_COUNTER_INIT;
 		dodag->grounded = RPL_GROUNDED;
 		dodag->node_status = (uint8_t) ROOT_NODE;
-		dodag->my_rank = ROOT_RANK; //TODO change this, according to spec.
+		dodag->my_rank = ROOT_RANK;
 		dodag->joined = 1;
 		dodag->my_preferred_parent = NULL;
 	}	
@@ -222,7 +225,7 @@ void rpl_init_root(){
 
 
 void send_DIO(ipv6_addr_t* destination){
-	//puts("\nSEND DIO");
+	puts("=================SEND DIO=================");//TODO comment out
 	mutex_lock(&rpl_send_mutex);
 	rpl_dodag_t * mydodag;
 	icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
@@ -277,7 +280,7 @@ void send_DIO(ipv6_addr_t* destination){
 }
 
 void send_DIS(ipv6_addr_t *destination){
-	//puts("Send DIS");
+	puts("=================Send DIS=================");
 
 	mutex_lock(&rpl_send_mutex);
 	icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
@@ -298,6 +301,7 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
 	if(i_am_root){
 		return;
 	}
+	puts("=================Send DAO=================");//todo del
 	mutex_lock(&rpl_send_mutex);
 	rpl_dodag_t * my_dodag;
 	my_dodag = rpl_get_my_dodag();
@@ -382,7 +386,7 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
 }
 
 void send_DAO_ACK(ipv6_addr_t *destination){
-	//puts("Send DAO_ACK to");
+	puts("=================Send DAO_ACK to=================");
 	ipv6_print_addr(destination);
 	rpl_dodag_t * my_dodag;
 	my_dodag = rpl_get_my_dodag();
@@ -410,7 +414,7 @@ void send_DAO_ACK(ipv6_addr_t *destination){
 }
 
 void rpl_process(void){
-
+    puts("rpl process here!");//todo del
 	msg_t m_recv;
 	msg_init_queue(msg_queue, RPL_PKT_RECV_BUF_SIZE);
 
@@ -425,24 +429,28 @@ void rpl_process(void){
 		memcpy(&rpl_buffer,ipv6_buf,ipv6_buf->length+IPV6_HDR_LEN);
 		switch(*code) {
 			case(ICMP_CODE_DIS):{
+                puts("=================processing DIS!=================");//todo del
 				recv_rpl_dis();
 				mutex_unlock(&rpl_recv_mutex, 0);
 				//mutex_unlock(&rpl_send_mutex, 0);
 				break;
 			}
 			case(ICMP_CODE_DIO):{
+                puts("=================processing DIO!=================");//todo del
 				recv_rpl_dio();
 				mutex_unlock(&rpl_recv_mutex, 0);
 				//mutex_unlock(&rpl_send_mutex, 0);
 				break;
 			}
 			case(ICMP_CODE_DAO):{
+                puts("=================processing DAO!=================");//todo del
 				recv_rpl_dao();
 				mutex_unlock(&rpl_recv_mutex, 0);
 				//mutex_unlock(&rpl_send_mutex, 0);
 				break;
 			}
 			 case(ICMP_CODE_DAO_ACK):{
+                puts("=================processing DAOACK!=================");//todo del
 				recv_rpl_dao_ack();
 				mutex_unlock(&rpl_recv_mutex, 0);
 				//mutex_unlock(&rpl_send_mutex, 0);
@@ -451,7 +459,7 @@ void rpl_process(void){
 			default:
 				mutex_unlock(&rpl_recv_mutex, 0);
 				//mutex_unlock(&rpl_send_mutex, 0);
-				puts("default unlock");
+				puts("=================default unlock=================");
 				break;
 		}
 	}
