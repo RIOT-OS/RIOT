@@ -69,6 +69,6 @@ void cc430_cpu_init(void) {
  
 }
 
-void board_init() {
+void board_init(void) {
     cc430_cpu_init();
 }
