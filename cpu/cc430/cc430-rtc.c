@@ -29,10 +29,10 @@ and the mailinglist (subscription via web site)
  */
 
 #include <string.h>
-#include <signal.h>
+#include <legacymsp430.h>
 #include <irq.h>
 #include <cpu.h>
-#include <cc430x613x.h>
+#include <cc430f6137.h>
 #include <cc430-rtc.h>
 
 //static volatile time_t epoch;

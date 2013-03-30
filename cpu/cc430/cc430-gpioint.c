@@ -25,13 +25,13 @@ and the mailinglist (subscription via web site)
 *******************************************************************************/
 
 #include <stdlib.h>
-#include <signal.h>
+#include <legacymsp430.h>
 #include <gpioint.h>
 #include <bitarithm.h>
 #include <cpu.h>
 #include <irq.h>
 #include <hwtimer.h>
-#include <cc430x613x.h>
+#include <cc430f6137.h>
 
 /** min and max portnumber to generate interrupts */
 #define PORTINT_MIN     (1)
@@ -222,9 +222,10 @@ interrupt (PORT2_VECTOR) __attribute__ ((naked)) port2_isr(void) {
             cb[1][ifg_num]();
         }
     }
-    else {
-        cb[1][ifg_num]();
-    }
+    
+    //else {
+    //    cb[1][ifg_num]();
+    //}
 
 	P2IFG = 0x00; 	
     P2IE  = int_enable; 	
