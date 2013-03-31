@@ -1,12 +1,13 @@
 /* iap driver
  *
  * based on iap driver for LPC2148 Controller made by Andreas Weschenfelder, 2008
- *
+ * 
  */
 
 #include <irq.h>
 #include <flashrom.h>
 #include <iap.h>
+/* TODO: replace by a lpc generic header */
 #include <lpc2387.h>
 
 #define ENABLE_DEBUG    (0)
