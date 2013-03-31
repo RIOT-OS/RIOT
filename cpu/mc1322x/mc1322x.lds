@@ -1,4 +1,3 @@
-/* vim: set syntax=rpcgen : */
 /* Script for -z combreloc: combine and sort reloc sections */
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm",
 	      "elf32-littlearm")
