@@ -2,6 +2,9 @@ ifeq ($(strip $(RIOTCPU)),)
 	export RIOTCPU =$(RIOTBASE)/cpu
 endif
 	
+ifeq ($(strip $(MCU)),)
+	MCU = $(CPU)
+endif
 
 # if you want to publish the board into the sources as an uppercase #define
 BB = $(shell echo $(BOARD)|tr 'a-z' 'A-Z')
