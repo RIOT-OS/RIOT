@@ -4,12 +4,12 @@ OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
-INCLUDES = -Iinclude -I../../feuerware-base/sys/lib -I../../feuerware-base/sys/drivers/include
-INCLUDES += -I../../feuerware-base/sys/drivers/cc110x_ng/include
-INCLUDES += -I../../feuerware-base/core/include
-INCLUDES += -I../../feuerware-base/cpu/msp430/include/
-INCLUDES += -I../../feuerware-base/cpu/cc430/include/
-INCLUDES += -I/usr/msp430/include/
+INCLUDES += -Iinclude -I$(RIOTBASE)/sys/lib -I$(RIOTBASE)/sys/drivers/include
+INCLUDES += -I$(RIOTBASE)/sys/drivers/cc110x_ng/include
+INCLUDES += -I$(RIOTBASE)/core/include
+INCLUDES += -I$(RIOTBASE)/cpu/msp430-common/include/
+INCLUDES += -I$(RIOTBASE)/cpu/cc430/include/
+#INCLUDES += -I/usr/msp430/include/
 
 all: $(BINDIR)chronos_base.a 
 	$(MAKE) -C drivers

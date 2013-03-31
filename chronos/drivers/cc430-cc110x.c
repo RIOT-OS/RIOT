@@ -6,7 +6,7 @@
 #include <cc110x-arch.h>
 
 //#include <cc430_.h>
-#include <cc430x613x.h>
+#include <cc430f6137.h>
 //#include <msp430/rf1a.h>
 
 #define CC1100_GDO0     (RF1AIN & BIT0) 

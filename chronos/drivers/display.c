@@ -43,7 +43,7 @@
 #include <string.h>
 
 /* driver */
-#include <cc430x613x.h>
+#include <cc430f6137.h>
 #include <display.h>
 
 

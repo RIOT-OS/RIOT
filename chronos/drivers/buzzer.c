@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <buzzer.h>
 #include <hwtimer.h>
-#include <cc430x613x.h>
+#include <cc430f6137.h>
 
 void buzzer_beep(uint8_t pitch, uint16_t duration) {
     // Reset TA1R, set up mode, TA1 runs from 32768Hz ACLK 

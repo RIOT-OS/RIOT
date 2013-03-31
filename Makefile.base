@@ -13,6 +13,10 @@ ifeq ($(BOARD),msb-430h)
  INCLUDES += -I$(RIOTBOARD)/msb-430-common/include/
  INCLUDES += -I$(RIOTBOARD)/msb-430-common/drivers/include/
 endif
+ifeq ($(BOARD),chronos)
+ INCLUDES += -I$(RIOTBOARD)/chronos/include/
+ INCLUDES += -I$(RIOTBOARD)/chronos/drivers/include/
+endif
 ifeq ($(BOARD),native)
  INCLUDES += -I$(RIOTBOARD)/native/include/
 endif
