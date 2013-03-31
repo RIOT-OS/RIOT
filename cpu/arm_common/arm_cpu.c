@@ -86,6 +86,8 @@ void thread_print_stack(void)
     printf("STACK (%u)= %X \n",i,*s);
 }
 
+/* LPC specific */
+#ifdef WDTC
 __attribute__((naked,noreturn)) void arm_reset(void)
 {
     dINT();
@@ -95,3 +97,4 @@ __attribute__((naked,noreturn)) void arm_reset(void)
     WDFEED= 0x55;
     while(1);
 }
+#endif
