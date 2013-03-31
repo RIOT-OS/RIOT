@@ -1,27 +1,17 @@
-/******************************************************************************
-Copyright 2008, Freie Universitaet Berlin (FUB). All rights reserved.
-
-These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
--------------------------------------------------------------------------------
-This file is part of RIOT.
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-RIOT is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see http://www.gnu.org/licenses/ .
-*******************************************************************************/
+/*
+ * syscalls.c - arm system calls
+ * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ * This source code is licensed under the GNU General Public License,
+ * Version 3.  See the file LICENSE for more details.
+ *
+ * This file is part of RIOT.
+ *
+ */
 
 /**
  * @file
- * @ingroup     lpc2387
+ * @ingroup     arm_common
  * @brief       LPC2387 NewLib system calls implementation
  *
  * @author      Michael Baar <michael.baar@fu-berlin.de>
@@ -35,6 +25,8 @@ this program.  If not, see http://www.gnu.org/licenses/ .
 #include <sys/stat.h>
 #include <sys/unistd.h>
 #include <stdint.h>
+
+#include "arm_cpu.h"
 // core
 #include "kernel.h"
 #include "irq.h"
@@ -109,13 +101,6 @@ void __assert(const char *file, int line, const char *failedexpr)
 /*-----------------------------------------------------------------------------------*/
 caddr_t _sbrk_r(struct _reent *r, size_t incr)
 {
-    if(incr < 0)
-    {
-        puts("[syscalls] Negative Values for _sbrk_r are not supported");
-        r->_errno = ENOMEM;
-        return NULL;
-    }
-
     uint32_t cpsr = disableIRQ();
 
     /* check all heaps for a chunk of the requested size */
