@@ -23,8 +23,11 @@ For further information and questions please use the web site
 and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
-
-#include <msp430x16x.h>
+#ifdef CC430
+	#include <cc430f6137.h>
+#else
+	#include <msp430x16x.h>
+#endif
 #include "cpu.h"
 #include "kernel.h"
 #include "kernel_intern.h"

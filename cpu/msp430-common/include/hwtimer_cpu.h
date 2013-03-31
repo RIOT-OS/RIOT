@@ -27,7 +27,11 @@ and the mailinglist (subscription via web site)
 #ifndef __HWTIMER_CPU_H
 #define __HWTIMER_CPU_H
 
-#include <msp430x16x.h>
+#ifdef CC430
+	#include <cc430f6137.h>
+#else
+	#include <msp430x16x.h>
+#endif
 #include <stdint.h>
 
 #ifdef __MSP430_HAS_TA2__

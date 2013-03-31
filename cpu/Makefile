@@ -7,7 +7,7 @@ ifeq ($(CPU),lpc214x)
 endif
 
 ifeq ($(CPU),cc430)
- DIRS = msp430 cc430
+ DIRS = msp430-common cc430
 endif
 
 ifeq ($(CPU),msp430x16x)
