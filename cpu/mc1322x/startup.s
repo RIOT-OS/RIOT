@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010, Mariano Alvira <mar@devl.org> and other contributors
- * to the MC1322x project (http://mc1322x.devl.org) and Contiki.
+ * to the MC1322x project (http:/*mc1322x.devl.org) and Contiki.
  *
  * All rights reserved.
  *
@@ -58,38 +58,38 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 	
-// Stack Sizes
+/* Stack Sizes */
         .set  UND_STACK_SIZE, 0x00000004
         .set  ABT_STACK_SIZE, 0x00000004
         .set  FIQ_STACK_SIZE, 0x00000004
         .set  IRQ_STACK_SIZE, 0X00000080
         .set  SVC_STACK_SIZE, 0x00000004
 
-// Standard definitions of Mode bits and Interrupt (I & F) flags in PSRs
-        .set  MODE_USR, 0x10            // User Mode
-        .set  MODE_FIQ, 0x11            // FIQ Mode
-        .set  MODE_IRQ, 0x12            // IRQ Mode
-        .set  MODE_SVC, 0x13            // Supervisor Mode
-        .set  MODE_ABT, 0x17            // Abort Mode
-        .set  MODE_UND, 0x1B            // Undefined Mode
-        .set  MODE_SYS, 0x1F            // System Mode
+/* Standard definitions of Mode bits and Interrupt (I & F) flags in PSRs */
+        .set  MODE_USR, 0x10            /* User Mode */
+        .set  MODE_FIQ, 0x11            /* FIQ Mode */
+        .set  MODE_IRQ, 0x12            /* IRQ Mode */
+        .set  MODE_SVC, 0x13            /* Supervisor Mode */
+        .set  MODE_ABT, 0x17            /* Abort Mode */
+        .set  MODE_UND, 0x1B            /* Undefined Mode */
+        .set  MODE_SYS, 0x1F            /* System Mode */
 
-        .equ  I_BIT, 0x80               // when I bit is set, IRQ is disabled
-        .equ  F_BIT, 0x40               // when F bit is set, FIQ is disabled
+        .equ  I_BIT, 0x80               /* when I bit is set, IRQ is disabled */
+        .equ  F_BIT, 0x40               /* when F bit is set, FIQ is disabled */
 
        .section .start
 	
        .set _rom_data_init, 0x108d0
        .global _start
-_start:
-        b     _begin                    // reset - _start
-        ldr   pc,_undf                  // undefined 
-        ldr   pc,_swi                   // SWI 
-        ldr   pc,_pabt                  // program abort 
-        ldr   pc,_dabt                  // data abort 
-        nop                             // reserved
-        ldr   pc,_irq                   // IRQ 
-        ldr   pc,_fiq                   // FIQ 
+_startup:
+        b     _begin                    /* reset - _start */
+        ldr   pc,_undf                  /* undefined  */
+        ldr   pc,_swi                   /* SWI  */
+        ldr   pc,_pabt                  /* program abort  */
+        ldr   pc,_dabt                  /* data abort  */
+        nop                             /* reserved */
+        ldr   pc,_irq                   /* IRQ  */
+        ldr   pc,_fiq                   /* FIQ  */
 
  /* these vectors are used for rom patching */	
 .org 0x20
@@ -163,20 +163,20 @@ clbss_l:
 
         b main
 
-_undf:  .word __undf                    // undefined
-_swi:   .word __swi                     // SWI
-_pabt:  .word __pabt                    // program abort
-_dabt:  .word __dabt                    // data abort
-_irq:   .word irq                       // IRQ
-_fiq:   .word __fiq                     // FIQ
+_undf:  .word __undf                    /* undefined */
+_swi:   .word __swi                     /* SWI */
+_pabt:  .word __pabt                    /* program abort */
+_dabt:  .word __dabt                    /* data abort */
+_irq:   .word irq                       /* IRQ */
+_fiq:   .word __fiq                     /* FIQ */
 	
-__undf: b     .                         // undefined
-__swi:  b     .                         // SWI
-__pabt: b     .                         // program abort
-__dabt: b     .                         // data abort
+__undf: b     .                         /* undefined */
+__swi:  b     .                         /* SWI */
+__pabt: b     .                         /* program abort */
+__dabt: b     .                         /* data abort */
 /* IRQ handler set in isr.c */
-//__irq:  b     .                         // IRQ
-__fiq:  b     .                         // FIQ
+/*__irq:  b     .                         // IRQ */
+__fiq:  b     .                         /* FIQ */
 
 /*
  * These are defined in the board-specific linker script.

@@ -10,6 +10,7 @@
 #define CPU_H 
 
 #include <stdint.h>
+#include "mc1322x.h"
 
 extern uintptr_t __stack_start;		///< end of user stack memory space
 
