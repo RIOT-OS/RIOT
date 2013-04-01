@@ -1,7 +1,10 @@
 /*
  * hwtimer_cpu.c - architecture dependent hardware timer functionality
  * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr>
+<<<<<<< HEAD
  * Copyright (C) 2013 Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+=======
+>>>>>>> * added header and preliminary hwtimer code for mc1322x
  *
  * This source code is licensed under the GNU General Public License,
  * Version 3.  See the file LICENSE for more details.
