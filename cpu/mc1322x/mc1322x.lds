@@ -2,7 +2,7 @@
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm",
 	      "elf32-littlearm")
 OUTPUT_ARCH(arm)
-ENTRY(_start)
+ENTRY(_startup)
 
 MEMORY
   {
@@ -24,7 +24,7 @@ HEAP_SIZE = 4096;
   PROVIDE (__executable_start = 0x00400000); . = 0x00400000;
   .text           :
   {
-    *(.start)
+    *(.startup)
     *(.irq)		
     *(.text .stub .text.* .gnu.linkonce.t.*)
     /* .gnu.warning sections are handled specially by elf32.em.  */
