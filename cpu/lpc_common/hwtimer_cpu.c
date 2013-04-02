@@ -18,10 +18,10 @@
 
 #define VULP(x) ((volatile unsigned long*) (x))
 
-/// High level interrupt handler
+/* High level interrupt handler */
 static void (*int_handler)(int);
 
-/// Timer 0-3 interrupt handler
+/* Timer 0-3 interrupt handler */
 static void timer_irq(void) __attribute__((interrupt("IRQ")));
 
 inline static unsigned long get_base_address(short timer) {
