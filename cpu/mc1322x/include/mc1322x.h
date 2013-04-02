@@ -11,6 +11,198 @@
 #ifndef MC1322X_H
 #define MC1322X_H 
 
+#include <stdint.h>
+
+/*-----------------------------------------------------------------*/
+/* System Management */
+#define SW_RST_VAL       (0x87651234)
+
+#define CRM_BASE         (0x80003000)
+
+/* Structure-based CRM access */
+struct CRM_struct {
+	union {
+		uint32_t SYS_CNTL;
+		struct CRM_SYS_CNTL {
+			uint32_t PWR_SOURCE:2;
+			uint32_t PADS_1P8V_SEL:1;
+			uint32_t :1;
+			uint32_t JTAG_SECU_OFF:1;
+			uint32_t XTAL32_EXISTS:1;
+			uint32_t :2;
+			uint32_t XTAL_CLKDIV:6;
+			uint32_t :18;
+		} SYS_CNTLbits;
+	};
+	union {
+		uint32_t WU_CNTL;
+		struct CRM_WU_CNTL {
+			uint32_t TIMER_WU_EN:1;
+			uint32_t RTC_WU_EN:1;
+			uint32_t HOST_WAKE:1;
+			uint32_t AUTO_ADC:1;
+			uint32_t EXT_WU_EN:4;
+			uint32_t EXT_WU_EDGE:4;
+			uint32_t EXT_WU_POL:4;
+			uint32_t TIMER_WU_IEN:1;
+			uint32_t RTC_WU_IEN:1;
+			uint32_t :2;
+			uint32_t EXT_WU_IEN:4;
+			uint32_t :4;
+			uint32_t EXT_OUT_POL:4;
+		} WU_CNTLbits;
+	};
+	union {
+		uint32_t SLEEP_CNTL;
+		struct CRM_SLEEP_CNTL {
+			uint32_t HIB:1;
+			uint32_t DOZE:1;
+			uint32_t :2;
+			uint32_t RAM_RET:2;
+			uint32_t MCU_RET:1;
+			uint32_t DIG_PAD_EN:1;
+			uint32_t :24;
+		} SLEEP_CNTLbits;
+	};
+	union {
+		uint32_t BS_CNTL;
+		struct CRM_BS_CNTL {
+			uint32_t BS_EN:1;
+			uint32_t WAIT4IRQ:1;
+			uint32_t BS_MAN_EN:1;
+			uint32_t :2;
+			uint32_t ARM_OFF_TIME:6;
+			uint32_t :18;
+		} BS_CNTLbits;
+	};
+	union {
+		uint32_t COP_CNTL;
+		struct CRM_COP_CNTL {
+			uint32_t COP_EN:1;
+			uint32_t COP_OUT:1;
+			uint32_t COP_WP:1;
+			uint32_t :5;
+			uint32_t COP_TIMEOUT:7;
+			uint32_t :1;
+			uint32_t COP_COUNT:7;
+			uint32_t :9;
+		} COP_CNTLbits;
+	};
+	uint32_t COP_SERVICE;
+	union {
+		uint32_t STATUS;
+		struct CRM_STATUS {
+			uint32_t SLEEP_SYNC:1;
+			uint32_t HIB_WU_EVT:1;
+			uint32_t DOZE_WU_EVT:1;
+			uint32_t RTC_WU_EVT:1;
+			uint32_t EXT_WU_EVT:4;
+			uint32_t :1;
+			uint32_t CAL_DONE:1;
+			uint32_t COP_EVT:1;
+			uint32_t :6;
+			uint32_t VREG_BUCK_RDY:1;
+			uint32_t VREG_1P8V_RDY:1;
+			uint32_t VREG_1P5V_RDY:1;
+			uint32_t :12;
+		} STATUSbits;
+	};
+	union {
+		uint32_t MOD_STATUS;
+		struct CRM_MOD_STATUS {
+			uint32_t ARM_EN:1;
+			uint32_t MACA_EN:1;
+			uint32_t ASM_EN:1;
+			uint32_t SPI_EN:1;
+			uint32_t GPIO_EN:1;
+			uint32_t UART1_EN:1;
+			uint32_t UART2_EN:1;
+			uint32_t TMR_EN:1;
+			uint32_t RIF_EN:1;
+			uint32_t I2C_EN:1;
+			uint32_t SSI_EN:1;
+			uint32_t SPIF_EN:1;
+			uint32_t ADC_EN:1;
+			uint32_t :1;
+			uint32_t JTA_EN:1;
+			uint32_t NEX_EN:1;
+			uint32_t :1;
+			uint32_t AIM_EN:1;
+			uint32_t :14;
+		} MOD_STATUSbits;
+	};
+	uint32_t WU_COUNT;
+	uint32_t WU_TIMEOUT;
+	uint32_t RTC_COUNT;
+	uint32_t RTC_TIMEOUT;
+	uint32_t reserved1;
+	union {
+		uint32_t CAL_CNTL;
+		struct CRM_CAL_CNTL {
+			uint32_t CAL_TIMEOUT:16;
+			uint32_t CAL_EN:1;
+			uint32_t CAL_IEN:1;
+			uint32_t :14;
+		} CAL_CNTLbits;
+	};
+	uint32_t CAL_COUNT;
+	union {
+		uint32_t RINGOSC_CNTL;
+		struct CRM_RINGOSC_CNTL {
+			uint32_t ROSC_EN:1;
+			uint32_t :3;
+			uint32_t ROSC_FTUNE:5;
+			uint32_t ROSC_CTUNE:4;
+			uint32_t :19;
+		} RINGOSC_CNTLbits;
+	};
+	union {
+		uint32_t XTAL_CNTL;
+		struct CRM_XTAL_CNTL {
+			uint32_t :8;
+			uint32_t XTAL_IBIAS_SEL:4;
+			uint32_t :4;
+			uint32_t XTAL_FTUNE:5;
+			uint32_t XTAL_CTUNE:5;
+			uint32_t :6;
+		} XTAL_CNTLbits;
+	};
+	union {
+		uint32_t XTAL32_CNTL;
+		struct CRM_XTAL32_CNTL {
+			uint32_t XTAL32_EN:1;
+			uint32_t :3;
+			uint32_t XTAL32_GAIN:2;
+			uint32_t :26;
+		} XTAL32_CNTLbits;
+	};
+	union {
+		uint32_t VREG_CNTL;
+		struct CRM_VREG_CNTL {
+			uint32_t BUCK_EN:1;
+			uint32_t BUCK_SYNC_REC_EN:1;
+			uint32_t BUCK_BYPASS_EN:1;
+			uint32_t VREG_1P5V_EN:2;
+			uint32_t VREG_1P5V_SEL:2;
+			uint32_t VREG_1P8V_EN:1;
+			uint32_t BUCK_CLKDIV:4;
+			uint32_t :20;
+		} VREG_CNTLbits;
+	};
+	uint32_t reserved2;
+	uint32_t SW_RST;
+	uint32_t reserved3;
+	uint32_t reserved4;
+	uint32_t reserved5;
+	uint32_t reserved6;
+};
+
+static volatile struct CRM_struct * const CRM = (void*) (CRM_BASE);
+
+
+/*-----------------------------------------------------------------*/
+/* TIMERS */
+
 #define F_CPU   (24000000)				///< CPU target speed in Hz
 
 /* Timer registers are all 16-bit wide with 16-bit access only */
@@ -20,16 +212,6 @@
 #define TMR1_BASE       (TMR_BASE + TMR_OFFSET*1)
 #define TMR2_BASE       (TMR_BASE + TMR_OFFSET*2)
 #define TMR3_BASE       (TMR_BASE + TMR_OFFSET*3)
-
-/* Structure-based register definitions */
-/* Example use:
-	TMR2->CTRL = 0x1234;
-	TMR2->CTRLbits = (struct TMR_CTRL) {
-		.DIR = 1,
-		.OUTPUT_MODE = 2,
-	};
-	TMR2->CTRLbits.PRIMARY_CNT_SOURCE = 3;
-*/
 
 struct TMR_struct {
 	uint16_t COMP1;
@@ -120,91 +302,85 @@ static volatile struct TMR_struct * const TMR3 = (void *) (TMR3_BASE);
 /* Get timer number from the timer pointer. */
 #define TMR_NUM(x) (((uint32_t)(x) - TMR_BASE) / TMR_OFFSET)
 
-/* Used to compute which enable bit to set for a particular timer, e.g.
-     TMR0.ENBL |= TMR_ENABLE_BIT(TMR2);
-   Helpful when you're using macros to define timers
-*/
-#define TMR_ENABLE_BIT(x) (1 << TMR_NUM(x))
+/*-----------------------------------------------------------------*/
+/* UART */
+#define UART1_BASE      (0x80005000)
+#define UART2_BASE      (0x8000B000)
 
-#define TMR0_PIN GPIO_08
-#define TMR1_PIN GPIO_09
-#define TMR2_PIN GPIO_10
-#define TMR3_PIN GPIO_11
+struct UART_struct {
+	union {
+		uint32_t CON;
+		struct UART_CON {
+           		uint32_t :16;
+			uint32_t TST:1;
+			uint32_t MRXR:1;
+			uint32_t MTXR:1;
+			uint32_t FCE:1;
+			uint32_t FCP:1;
+			uint32_t XTIM:1;
+			uint32_t :2;
+			uint32_t TXOENB:1;
+			uint32_t CONTX:1;
+			uint32_t SB:1;
+			uint32_t ST2:1;
+			uint32_t EP:1;
+			uint32_t PEN:1;
+			uint32_t RXE:1;
+			uint32_t TXE:1;
+		} CONbits;
+	};
+	union {
+		uint32_t STAT;
+		struct UART_STAT {
+           		uint32_t :24;
+			uint32_t TXRDY:1;
+			uint32_t RXRDY:1;
+			uint32_t RUE:1;
+			uint32_t ROE:1;
+			uint32_t TOE:1;
+			uint32_t FE:1;
+			uint32_t PE:1;
+			uint32_t SE:1;
+		} USTATbits;
+	};
+	union {
+		uint32_t DATA;
+		struct UART_DATA {
+           		uint32_t :24;
+			uint32_t DATA:8;
+		} DATAbits;
+	};
+	union {
+		uint32_t RXCON;
+		struct UART_URXCON {
+                        uint32_t :26;
+                        uint32_t LVL:6;
+		} RXCONbits;
+	};
+	union {
+		uint32_t TXCON;
+		struct UART_TXCON {
+                        uint32_t :26;
+			uint32_t LVL:6;
+		} TXCONbits;
+	};
+	union {
+		uint32_t CTS;
+		struct UART_CTS {
+           		uint32_t :27;
+			uint32_t LVL:5;
+		} CTSbits;
+	};
+	union {
+		uint32_t BR;
+		struct UART_BR {
+           		uint32_t INC:16;
+			uint32_t MOD:16;
+		} BRbits;
+	};
+};
 
-#define TMR_REGOFF_COMP1    (0x0)
-#define TMR_REGOFF_COMP2    (0x2)
-#define TMR_REGOFF_CAPT     (0x4)
-#define TMR_REGOFF_LOAD     (0x6)
-#define TMR_REGOFF_HOLD     (0x8)
-#define TMR_REGOFF_CNTR     (0xa)
-#define TMR_REGOFF_CTRL     (0xc)
-#define TMR_REGOFF_SCTRL    (0xe)
-#define TMR_REGOFF_CMPLD1   (0x10)
-#define TMR_REGOFF_CMPLD2   (0x12)
-#define TMR_REGOFF_CSCTRL   (0x14)
-#define TMR_REGOFF_ENBL     (0x1e)
+static volatile struct UART_struct * const UART1 = (void *) (UART1_BASE);
+static volatile struct UART_struct * const UART2 = (void *) (UART2_BASE);
 
-/* one enable register to rule them all */
-#define TMR_ENBL     (*(volatile uint16_t *) (TMR0_BASE + TMR_REGOFF_ENBL))
-
-/* Timer 0 registers */
-#define TMR0_COMP1   (*(volatile uint16_t *) (TMR0_BASE + TMR_REGOFF_COMP1))
-#define TMR0_COMP_UP TMR0_COMP1
-#define TMR0_COMP2   (*(volatile uint16_t *) (TMR0_BASE + TMR_REGOFF_COMP2))
-#define TMR0_COMP_DOWN TMR0_COMP2
-#define TMR0_CAPT    (*(volatile uint16_t *) (TMR0_BASE + TMR_REGOFF_CAPT))
-#define TMR0_LOAD    (*(volatile uint16_t *) (TMR0_BASE + TMR_REGOFF_LOAD))
-#define TMR0_HOLD    (*(volatile uint16_t *) (TMR0_BASE + TMR_REGOFF_HOLD))
-#define TMR0_CNTR    (*(volatile uint16_t *) (TMR0_BASE + TMR_REGOFF_CNTR))
-#define TMR0_CTRL    (*(volatile uint16_t *) (TMR0_BASE + TMR_REGOFF_CTRL))
-#define TMR0_SCTRL   (*(volatile uint16_t *) (TMR0_BASE + TMR_REGOFF_SCTRL))
-#define TMR0_CMPLD1  (*(volatile uint16_t *) (TMR0_BASE + TMR_REGOFF_CMPLD1))
-#define TMR0_CMPLD2  (*(volatile uint16_t *) (TMR0_BASE + TMR_REGOFF_CMPLD2))
-#define TMR0_CSCTRL  (*(volatile uint16_t *) (TMR0_BASE + TMR_REGOFF_CSCTRL))
-
-/* Timer 1 registers */
-#define TMR1_COMP1   (*(volatile uint16_t *) (TMR1_BASE + TMR_REGOFF_COMP1))
-#define TMR1_COMP_UP TMR1_COMP1
-#define TMR1_COMP2   (*(volatile uint16_t *) (TMR1_BASE + TMR_REGOFF_COMP2))
-#define TMR1_COMP_DOWN TMR1_COMP2
-#define TMR1_CAPT    (*(volatile uint16_t *) (TMR1_BASE + TMR_REGOFF_CAPT))
-#define TMR1_LOAD    (*(volatile uint16_t *) (TMR1_BASE + TMR_REGOFF_LOAD))
-#define TMR1_HOLD    (*(volatile uint16_t *) (TMR1_BASE + TMR_REGOFF_HOLD))
-#define TMR1_CNTR    (*(volatile uint16_t *) (TMR1_BASE + TMR_REGOFF_CNTR))
-#define TMR1_CTRL    (*(volatile uint16_t *) (TMR1_BASE + TMR_REGOFF_CTRL))
-#define TMR1_SCTRL   (*(volatile uint16_t *) (TMR1_BASE + TMR_REGOFF_SCTRL))
-#define TMR1_CMPLD1  (*(volatile uint16_t *) (TMR1_BASE + TMR_REGOFF_CMPLD1))
-#define TMR1_CMPLD2  (*(volatile uint16_t *) (TMR1_BASE + TMR_REGOFF_CMPLD2))
-#define TMR1_CSCTRL  (*(volatile uint16_t *) (TMR1_BASE + TMR_REGOFF_CSCTRL))
-
-/* Timer 2 registers */
-#define TMR2_COMP1   (*(volatile uint16_t *) (TMR2_BASE + TMR_REGOFF_COMP1))
-#define TMR2_COMP_UP TMR2_COMP1
-#define TMR2_COMP2   (*(volatile uint16_t *) (TMR2_BASE + TMR_REGOFF_COMP2))
-#define TMR2_COMP_DOWN TMR2_COMP2
-#define TMR2_CAPT    (*(volatile uint16_t *) (TMR2_BASE + TMR_REGOFF_CAPT))
-#define TMR2_LOAD    (*(volatile uint16_t *) (TMR2_BASE + TMR_REGOFF_LOAD))
-#define TMR2_HOLD    (*(volatile uint16_t *) (TMR2_BASE + TMR_REGOFF_HOLD))
-#define TMR2_CNTR    (*(volatile uint16_t *) (TMR2_BASE + TMR_REGOFF_CNTR))
-#define TMR2_CTRL    (*(volatile uint16_t *) (TMR2_BASE + TMR_REGOFF_CTRL))
-#define TMR2_SCTRL   (*(volatile uint16_t *) (TMR2_BASE + TMR_REGOFF_SCTRL))
-#define TMR2_CMPLD1  (*(volatile uint16_t *) (TMR2_BASE + TMR_REGOFF_CMPLD1))
-#define TMR2_CMPLD2  (*(volatile uint16_t *) (TMR2_BASE + TMR_REGOFF_CMPLD2))
-#define TMR2_CSCTRL  (*(volatile uint16_t *) (TMR2_BASE + TMR_REGOFF_CSCTRL))
-
-/* Timer 3 registers */
-#define TMR3_COMP1   (*(volatile uint16_t *) (TMR3_BASE + TMR_REGOFF_COMP1))
-#define TMR3_COMP_UP TMR3_COMP1
-#define TMR3_COMP2   (*(volatile uint16_t *) (TMR3_BASE + TMR_REGOFF_COMP2))
-#define TMR3_COMP_DOWN TMR3_COMP2
-#define TMR3_CAPT    (*(volatile uint16_t *) (TMR3_BASE + TMR_REGOFF_CAPT))
-#define TMR3_LOAD    (*(volatile uint16_t *) (TMR3_BASE + TMR_REGOFF_LOAD))
-#define TMR3_HOLD    (*(volatile uint16_t *) (TMR3_BASE + TMR_REGOFF_HOLD))
-#define TMR3_CNTR    (*(volatile uint16_t *) (TMR3_BASE + TMR_REGOFF_CNTR))
-#define TMR3_CTRL    (*(volatile uint16_t *) (TMR3_BASE + TMR_REGOFF_CTRL))
-#define TMR3_SCTRL   (*(volatile uint16_t *) (TMR3_BASE + TMR_REGOFF_SCTRL))
-#define TMR3_CMPLD1  (*(volatile uint16_t *) (TMR3_BASE + TMR_REGOFF_CMPLD1))
-#define TMR3_CMPLD2  (*(volatile uint16_t *) (TMR3_BASE + TMR_REGOFF_CMPLD2))
-#define TMR3_CSCTRL  (*(volatile uint16_t *) (TMR3_BASE + TMR_REGOFF_CSCTRL))
-#define TMR(num, reg)  CAT2(TMR,num,_##reg)
 #endif /* MC1322X_H */

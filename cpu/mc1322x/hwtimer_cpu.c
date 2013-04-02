@@ -21,24 +21,31 @@
 #define CO_INIT    0      /* other counters cannot force a re-initialization of this counter */
 #define OUT_MODE   0      /* OFLAG is asserted while counter is active */
 
+/* High level interrupt handler */
+static void (*int_handler)(int);
+
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu) {
+    int_handler = handler;
     /* Reset the timer */
-    TMR_ENBL = 0;
+    TMR0->ENBL = 0;
     /* Clear status */
-    TMR0_SCTRL = 0;
+    TMR0->SCTRL = 0;
     /* disable interrupt */
-    TMR0_CSCTRL =0x0000;
+    TMR0->CSCTRL =0x0000;
     /* Reload/initialize to zero */
-    TMR0_LOAD = 0;
+    TMR0->LOAD = 0;
 
     /* disable comparison */
-    TMR0_COMP_UP = 0;
-    TMR0_CMPLD1 = 0;
+    TMR0->COMP1 = 0;
+    TMR0->CMPLD1 = 0;
     
     /* set counter to zero */
-    TMR0_CNTR = 0;
+    TMR0->CNTR = 0;
 
-    TMR0_CTRL = (COUNT_MODE<<13) | (PRIME_SRC<<9) | (SEC_SRC<<7) | (ONCE<<6) | (LEN<<5) | (DIR<<4) | (CO_INIT<<3) | (OUT_MODE);
-    TMR_ENBL = 0xf;                   /* enable all the timers --- why not? */
+    /* TODO: do scaling voodoo */
+    (void) fcpu;
+    /* TODO: use struct */
+    TMR0->CTRL = (COUNT_MODE<<13) | (PRIME_SRC<<9) | (SEC_SRC<<7) | (ONCE<<6) | (LEN<<5) | (DIR<<4) | (CO_INIT<<3) | (OUT_MODE);
+    TMR0->ENBL = 0xf;                   /* enable all the timers --- why not? */
 
 }
