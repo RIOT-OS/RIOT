@@ -58,38 +58,36 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 	
-/* Stack Sizes */
-        .set  UND_STACK_SIZE, 0x00000004
-        .set  ABT_STACK_SIZE, 0x00000004
-        .set  FIQ_STACK_SIZE, 0x00000004
-        .set  IRQ_STACK_SIZE, 0X00000080
-        .set  SVC_STACK_SIZE, 0x00000004
+/* Standard definitions of Mode bits and Interrupt (I & F) flags in PSRs (program status registers) */
+.set  MODE_USR, 0x10            		/* Normal User Mode 										*/
+.set  MODE_FIQ, 0x11            		/* FIQ Processing Fast Interrupts Mode 						*/
+.set  MODE_IRQ, 0x12            		/* IRQ Processing Standard Interrupts Mode 					*/
+.set  MODE_SVC, 0x13            		/* Supervisor Processing Software Interrupts Mode 			*/
+.set  MODE_ABT, 0x17            		/* Abort Processing memory Faults Mode 						*/
+.set  MODE_UND, 0x1B            		/* Undefined Processing Undefined Instructions Mode 		*/
+.set  MODE_SYS, 0x1F            		/* System Running Priviledged Operating System Tasks  Mode	*/
 
-/* Standard definitions of Mode bits and Interrupt (I & F) flags in PSRs */
-        .set  MODE_USR, 0x10            /* User Mode */
-        .set  MODE_FIQ, 0x11            /* FIQ Mode */
-        .set  MODE_IRQ, 0x12            /* IRQ Mode */
-        .set  MODE_SVC, 0x13            /* Supervisor Mode */
-        .set  MODE_ABT, 0x17            /* Abort Mode */
-        .set  MODE_UND, 0x1B            /* Undefined Mode */
-        .set  MODE_SYS, 0x1F            /* System Mode */
+.set  I_BIT, 0x80               		/* when I bit is set, IRQ is disabled (program status registers) */
+.set  F_BIT, 0x40               		/* when F bit is set, FIQ is disabled (program status registers) */
 
-        .equ  I_BIT, 0x80               /* when I bit is set, IRQ is disabled */
-        .equ  F_BIT, 0x40               /* when F bit is set, FIQ is disabled */
 
-       .section .start
+        .section .startup
 	
        .set _rom_data_init, 0x108d0
-       .global _start
+       .global _startup
+       .func _startup
+
 _startup:
         b     _begin                    /* reset - _start */
-        ldr   pc,_undf                  /* undefined  */
-        ldr   pc,_swi                   /* SWI  */
-        ldr   pc,_pabt                  /* program abort  */
-        ldr   pc,_dabt                  /* data abort  */
-        nop                             /* reserved */
-        ldr   pc,_irq                   /* IRQ  */
-        ldr   pc,_fiq                   /* FIQ  */
+        ldr     PC, Undef_Addr		/* Undefined Instruction */
+        ldr     PC, SWI_Addr		/* Software Interrupt */
+        ldr     PC, PAbt_Addr		/* Prefetch Abort */
+        ldr     PC, DAbt_Addr		/* Data Abort */
+        nop							/* Reserved Vector (holds Philips ISP checksum) */
+        /* see page 71 of "Insiders Guide to the Philips ARM7-Based Microcontrollers" by Trevor Martin  */
+        /*                ldr     PC, [PC,#-0x0120]  	/* Interrupt Request Interrupt (load from VIC) */
+        ldr     PC, IRQ_Addr    	/* Interrupt Request Interrupt (load from VIC) */
+        ldr		r0, =__fiq_handler	/* Fast Interrupt Request Interrupt */
 
  /* these vectors are used for rom patching */	
 .org 0x20
@@ -163,19 +161,14 @@ clbss_l:
 
         b main
 
-_undf:  .word __undf                    /* undefined */
-_swi:   .word __swi                     /* SWI */
-_pabt:  .word __pabt                    /* program abort */
-_dabt:  .word __dabt                    /* data abort */
-_irq:   .word irq                       /* IRQ */
-_fiq:   .word __fiq                     /* FIQ */
-	
-__undf: b     .                         /* undefined */
-__swi:  b     .                         /* SWI */
-__pabt: b     .                         /* program abort */
-__dabt: b     .                         /* data abort */
-/* IRQ handler set in isr.c */
-/*__irq:  b     .                         // IRQ */
+/* Exception vector handlers branching table */
+Undef_Addr:     .word   UNDEF_Routine		/* defined in main.c  */
+SWI_Addr:       .word   ctx_switch			/* defined in main.c  */
+PAbt_Addr:      .word   PABT_Routine		/* defined in main.c  */
+DAbt_Addr:      .word   DABT_Routine		/* defined in main.c  */
+IRQ_Addr:       .word   arm_irq_handler      /* defined in main.c  */
+__fiq_handler:           .word   __fiq                /* FIQ */
+
 __fiq:  b     .                         /* FIQ */
 
 /*
