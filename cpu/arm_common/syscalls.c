@@ -79,7 +79,6 @@ void __assert(const char *file, int line, const char *failedexpr)
 {
     __assert_func(file, line, "?", failedexpr);
 }
-
 /*---------------------------------------------------------------------------*/
 int _isatty_r(struct _reent *r, int fd)
 {
