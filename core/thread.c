@@ -136,10 +136,16 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
 
     if (flags & CREATE_STACKTEST) {
         /* assign each int of the stack the value of it's address */
+<<<<<<< HEAD
         unsigned int *stackmax = (unsigned int *)((char *)stack + stacksize);
         unsigned int *stackp = (unsigned int *)stack;
 
         while (stackp < stackmax) {
+=======
+        unsigned int *stackmax = (unsigned int*) (void*) (stack + stacksize);
+        unsigned int *stackp = (unsigned int*)(void*)stack;
+        while(stackp < stackmax) {
+>>>>>>> * clean up stuff (fix gcc warnings and added clean target for doc)
             *stackp = (unsigned int)stackp;
             stackp++;
         }
