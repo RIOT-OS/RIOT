@@ -76,7 +76,7 @@ void chardev_loop(ringbuffer_t *rb)
                         msg_reply(&m, &m);
                     }
                     else {
-                        r = (struct posix_iop_t *)m.content.ptr;
+                        r = (struct posix_iop_t *)(void*)m.content.ptr;
                     }
 
                     break;
