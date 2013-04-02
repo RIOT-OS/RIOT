@@ -75,10 +75,10 @@ int thread_wakeup(int pid) {
     }
 }
 
-int thread_measure_stack_usage(char* stack) {
-    unsigned int* stackp = (unsigned int*)stack;
+int thread_measure_stack_usage(char *stack) {
+    unsigned int *stackp = (unsigned int*) (void*) stack;
     /* assumption that the comparison fails before or after end of stack */
-    while( *stackp == (unsigned int)stackp )
+    while (*stackp == (unsigned int)stackp)
         stackp++;
 
     int space = (unsigned int)stackp - (unsigned int)stack;
@@ -109,8 +109,8 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
 
     if (flags & CREATE_STACKTEST) {
         /* assign each int of the stack the value of it's address */
-        unsigned int *stackmax = (unsigned int*) ((char*)stack + stacksize);
-        unsigned int* stackp = (unsigned int*)stack;
+        unsigned int *stackmax = (unsigned int*) (void*) (stack + stacksize);
+        unsigned int *stackp = (unsigned int*)(void*)stack;
         while(stackp < stackmax) {
             *stackp = (unsigned int)stackp;
             stackp++;
