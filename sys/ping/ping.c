@@ -6,14 +6,15 @@
 #include "cc110x/cc1100.h"
 #include "lpc2387.h"
 
-#include "swtimer.h"
+#include "vtimer.h"
+#include "timex.h"
 #include "gpioint.h"
 #include <ping.h>
 
 ping_payload *pipa;
 protocol_t protocol_id = 0;
 radio_address_t r_address = 0;
-uint64_t start = 0;
+timex_t start = 0;
 float rtt = 0;
 
 void ping_handler(void *payload, int payload_size, 
@@ -48,7 +49,7 @@ void ping(radio_address_t addr, uint8_t channr){
 	cc1100_set_channel(channr);
 	cc1100_set_address(r_address);
 	while(1){
-		start = swtimer_now();
+		start = vtimer_now();
 		int trans_ok = cc1100_send_csmaca(addr,
 			protocol_id,2,pipa->payload,sizeof(pipa->payload));
 		if(trans_ok < 0)
@@ -58,9 +59,10 @@ void ping(radio_address_t addr, uint8_t channr){
 }
 
 void calc_rtt(void){
-	uint64_t end = swtimer_now();
+	timex_t end = vtimer_now();
+	timex_t result = vtimer_sub(end, start);
 	
-	rtt = ((float)end - (float)start)/1000;	
+	rtt = result.seconds+(float)result.microseconds/100000;	
 }
 
 void print_success(void){
