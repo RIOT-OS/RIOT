@@ -24,9 +24,7 @@
 #define KERNEL_CONF_STACKSIZE_IDLE      4096
 #define NATIVE_ISR_STACKSIZE            8192
 
-#define _SIG_UNDEF          SIGRTMIN + 0
-#define _SIG_TIMER          SIGRTMIN + 10 // check hwtimer_cpu.h for compliance
-#define _SIG_LTC4150        SIGRTMIN + 20
+#define _SIG_LTC4150        SIGRTMIN + 0
 
 /* TODO: check for overflow (SIGRTMAX) */
 
