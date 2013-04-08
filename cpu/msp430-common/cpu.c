@@ -23,8 +23,11 @@ For further information and questions please use the web site
 and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
-
-#include <msp430x16x.h>
+#ifdef CC430
+	#include <cc430f6137.h>
+#else
+	#include <msp430x16x.h>
+#endif
 #include "cpu.h"
 #include "kernel.h"
 #include "kernel_intern.h"
@@ -100,7 +103,7 @@ void cpu_switch_context_exit(void){
 char *thread_stack_init(void *task_func, void *stack_start, int stack_size)
 {
     unsigned short * stk;
-    stk = (unsigned short *) stack_start + stack_size;
+    stk = (unsigned short *) (stack_start + stack_size);
 
     *stk = (unsigned short) sched_task_exit;
     --stk;

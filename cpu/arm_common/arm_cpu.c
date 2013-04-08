@@ -25,59 +25,68 @@
 #include "sched.h"
 #include "kernel_intern.h"
 
-void thread_yield() {
+#define STACK_MARKER    (0x77777777)
+#define REGISTER_CNT    (12)
+
+void thread_yield(void)
+{
     asm("svc 0\n");
 }
 
-//----------------------------------------------------------------------------
-// Processor specific routine - here for ARM7
-// sizeof(void*) = sizeof(int)
-//----------------------------------------------------------------------------
-char * thread_stack_init(void * task_func, void * stack_start, int stack_size)
+/*----------------------------------------------------------------------------
+ * Processor specific routine - here for ARM7
+ * sizeof(void*) = sizeof(int)
+ *--------------------------------------------------------------------------*/
+char *thread_stack_init(void *task_func, void *stack_start, int stack_size)
 {
-   unsigned int * stk;
-   stk = (unsigned int *) stack_start + stack_size;
+    unsigned int *stk;
+    stk = (unsigned int *) (stack_start + stack_size);
     stk--;
 
-    *stk = 0x77777777;
+    *stk = STACK_MARKER;
+
+    /* set the return address (LR) */
     stk--;
+    *stk = (unsigned int) sched_task_exit;
 
-    *stk = (unsigned int)sched_task_exit;       // LR
+    /* set the stack pointer (SP) */
+    stk--;
+    *stk = (unsigned int) (stack_start + stack_size) - 4;
 
-   stk--;
-   *stk = (unsigned int) stack_start - 4;   // SP
+    /* build base stack */
+    for (int i = REGISTER_CNT; i>= 0 ; i--) {
+        stk--;
+        *stk = i;
+    }
 
-   for (int i = 12; i>= 0 ; i--) {          // build base stack
-       stk--;
-       *stk = i;
-   }
+    /* set the entry point */
+    stk--;
+    *stk = ((unsigned int) task_func);
+    /* set the saved program status register */
+    stk--;
+    *stk = (unsigned int) NEW_TASK_CPSR;
 
-   stk--;
-   *stk = ((unsigned int) task_func);       // Entry Point
-   stk--;
-   *stk = (unsigned int) NEW_TASK_CPSR;     // spsr
-
-   return (char*)stk;
+    return (char*) stk;
 }
 
-void thread_print_stack () {
-    register void * stack = 0;
+void thread_print_stack(void)
+{
+    register void *stack = 0;
     asm( "mov %0, sp" : "=r" (stack));
 
-    register unsigned int * s = (unsigned int*) stack;
-    printf("task: %X SP: %X\n", (unsigned int)active_thread, (unsigned int)stack);
+    register unsigned int *s = (unsigned int*) stack;
+    printf("task: %X SP: %X\n", (unsigned int) active_thread, (unsigned int) stack);
     register int i = 0;
     s += 5;
-    while (*s != 0x77777777) {
-        printf("STACK (%u) addr=%X = %X \n",i,(unsigned int) s, (unsigned int)*s);
+    while (*s != STACK_MARKER) {
+        printf("STACK (%u) addr=%X = %X \n", i, (unsigned int) s, (unsigned int) *s);
         s++;
         i++;
     }
     printf("STACK (%u)= %X \n",i,*s);
 }
 
-__attribute__((naked,noreturn)) void
-arm_reset(void)
+__attribute__((naked,noreturn)) void arm_reset(void)
 {
     dINT();
     WDTC = 0x00FFF;

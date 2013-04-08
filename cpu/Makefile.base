@@ -1,0 +1,20 @@
+ifeq ($(CPU),lpc2387)
+ INCLUDES += -I$(MAKEBASE)/cpu/arm_common/include/
+ INCLUDES += -I$(MAKEBASE)/cpu/lpc2387/include
+endif
+ifeq ($(CPU),lpc214x)
+ INCLUDES += -I$(MAKEBASE)/cpu/arm_common/include/
+ INCLUDES += -I$(MAKEBASE)/cpu/lpc214x/include
+endif
+ifeq ($(CPU),msp430x16x)
+ INCLUDES += -I$(MAKEBASE)/cpu/msp430-common/include/
+ INCLUDES += -I$(MAKEBASE)/cpu/msp430x16x/include/
+endif
+ifeq ($(CPU),cc430)
+ INCLUDES += -I$(MAKEBASE)/cpu/msp430-common/include/
+ INCLUDES += -I$(MAKEBASE)/cpu/cc430/include/
+endif
+ifeq ($(CPU),native)
+ INCLUDES += -I$(MAKEBASE)/cpu/native/include/
+endif
+

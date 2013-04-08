@@ -1,3 +1,11 @@
+ifeq ($(strip $(RIOTCPU)),)
+	export RIOTCPU =$(RIOTBASE)/cpu
+endif
+	
+ifeq ($(strip $(MCU)),)
+	MCU = $(CPU)
+endif
+
 # if you want to publish the board into the sources as an uppercase #define
 BB = $(shell echo $(BOARD)|tr 'a-z' 'A-Z')
 CFLAGS += -DBOARD=$(BB)
@@ -15,12 +23,12 @@ PROJBINDIR =$(CURDIR)/bin
 
 ## make script for your project. Build RIOT-base here!
 all: $(PROJBINDIR)/$(PROJECT).a
-	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(CPU)."
+	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
 	$(MAKE) -C $(RIOTBOARD)
 	$(MAKE) -C $(RIOTBASE)
-	$(LINK) $(UNDEF) -o $(PROJBINDIR)/$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(PROJBINDIR)/$(PROJECT).map $(LINKFLAGS) 
-	$(SIZE) $(PROJBINDIR)/$(PROJECT).elf
-	$(OBJCOPY) -O ihex $(PROJBINDIR)/$(PROJECT).elf $(PROJBINDIR)/$(PROJECT).hex
+	@$(LINK) $(UNDEF) -o $(PROJBINDIR)/$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(PROJBINDIR)/$(PROJECT).map $(LINKFLAGS) 
+	@$(SIZE) $(PROJBINDIR)/$(PROJECT).elf
+	@$(OBJCOPY) -O ihex $(PROJBINDIR)/$(PROJECT).elf $(PROJBINDIR)/$(PROJECT).hex
 
 ## your make rules
 ## Only basic example - modify it for larger projects!!

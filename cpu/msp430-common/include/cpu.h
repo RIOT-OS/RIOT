@@ -39,7 +39,7 @@ and the mailinglist (subscription via web site)
 
 #include <sched.h>
 #include <stdio.h>
-#include <signal.h>
+#include <legacymsp430.h>
 #include <cpu-conf.h>
 
 #define WORDSIZE 16

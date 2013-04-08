@@ -1,4 +1,4 @@
-DIRS = cpu core drivers sys 
+DIRS = $(RIOTCPU) core drivers sys 
 
 all:
 	mkdir -p $(BINDIR)
@@ -6,8 +6,8 @@ all:
 	
 clean:
 	@for i in $(DIRS) ; do $(MAKE) -C $$i clean ; done ;
-	@if [ -d $(BINDIR) ] ; \
-	then rmdir --ignore-fail-on-non-empty $(BINDIR) ; \
+	-@if [ -d $(BINDIR) ] ; \
+	then rmdir $(BINDIR) ; \
 	fi 
 
 doc:

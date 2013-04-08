@@ -211,13 +211,13 @@ static bool spi_receive_packet_variable(uint8_t *rxBuffer, uint8_t length)
 			rflags.RSSI = status[I_RSSI];
 
 			// MSB of LQI is the CRC_OK bit
-			rflags.CRC = (status[I_LQI] & CRC_OK) >> 7;
-			if (!rflags.CRC) cc1100_statistic.packets_in_crc_fail++;
+			rflags.CRC_STATE = (status[I_LQI] & CRC_OK) >> 7;
+			if (!rflags.CRC_STATE) cc1100_statistic.packets_in_crc_fail++;
 
 			// Bit 0-6 of LQI indicates the link quality (LQI)
 			rflags.LQI = status[I_LQI] & LQI_EST;
 
-			return rflags.CRC;
+			return rflags.CRC_STATE;
         }
 		else
 		{
@@ -761,7 +761,7 @@ void cc1100_init(void)
 	rflags.RSSI = 0x00;
 	rflags.LL_ACK = false;
 	rflags.CAA = false;
-	rflags.CRC = false;
+	rflags.CRC_STATE = false;
 	rflags.SEQ = false;
 	rflags.MAN_WOR = false;
 	rflags.KT_RES_ERR = false;

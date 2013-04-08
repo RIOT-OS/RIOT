@@ -135,15 +135,15 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length) {
 			rflags._RSSI = status[I_RSSI];
 
 			// MSB of LQI is the CRC_OK bit
-			rflags.CRC = (status[I_LQI] & CRC_OK) >> 7;
-			if (!rflags.CRC) {
+			rflags.CRC_STATE = (status[I_LQI] & CRC_OK) >> 7;
+			if (!rflags.CRC_STATE) {
                 cc110x_statistic.packets_in_crc_fail++;
             }
 
 			// Bit 0-6 of LQI indicates the link quality (LQI)
 			rflags._LQI = status[I_LQI] & LQI_EST;
 
-			return rflags.CRC;
+			return rflags.CRC_STATE;
         }
         /* too many bytes in FIFO */
 		else {

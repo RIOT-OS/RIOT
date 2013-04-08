@@ -500,7 +500,7 @@ static bool send_burst(cc1100_packet_layer0_t *packet, uint8_t retries, uint8_t 
 	}
 
 	// Store number of transmission retries
-	rflags.RTC = rtc;
+	rflags.RETC = rtc;
 	rflags.RPS = rtc * cc1100_burst_count + i;
 	if (i > cc1100_burst_count) rflags.RPS--;
 	rflags.TX = false;
