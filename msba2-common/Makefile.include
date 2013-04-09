@@ -19,5 +19,5 @@ ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
 export HEXFILE = bin/$(PROJECT).hex
-
+export FFLAGS = $(PORT) $(PROJBINDIR)/$(PROJECT).hex
 include $(RIOTBOARD)/msba2-common/Makefile.dep
