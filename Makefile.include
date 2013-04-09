@@ -46,7 +46,7 @@ clean:
 	rm -f $(PROJBINDIR)/*
 
 flash: all
-	$(FLASHER) $(PORT) $(PROJBINDIR)/$(PROJECT).hex
+	$(FLASHER) $(FFLAGS)
 
 term:
 	$(TERM) $(PORT)
