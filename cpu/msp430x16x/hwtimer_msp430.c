@@ -1,4 +1,3 @@
-#include <signal.h>
 #include <msp430x16x.h>
 #include <hwtimer.h>
 #include <hwtimer_arch.h>
