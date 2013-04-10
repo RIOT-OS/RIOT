@@ -20,7 +20,4 @@ ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
 	ifeq (,$(findstring hwtimer,$(USEMODULE)))
 		USEMODULE += hwtimer
 	endif
-	ifneq (,$(findstring native,$(BOARD)))
-		USEMODULE += cc110x_spi
-	endif
 endif
