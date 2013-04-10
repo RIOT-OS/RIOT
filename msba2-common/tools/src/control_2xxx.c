@@ -31,7 +31,7 @@ void hard_reset_to_bootloader(void)
 void hard_reset_to_user_code(void)
 {
 	printf("Reset CPU (into user code)\r\n");
-	et_rts(0);		// RTS (ttl level) connects to P0.14
+	set_rts(0);		// RTS (ttl level) connects to P0.14
 	set_dtr(1);		// DTR (ttl level) connects to RST
 	send_break_signal();	// or break detect circuit to RST
 	usleep(75000);
