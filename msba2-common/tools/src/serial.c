@@ -60,6 +60,7 @@ char* baud_rate = "115200";
 int open_serial_port(const char *port_name)
 {
 	int r;
+        struct termios term_setting;
 
 	if (port_fd >= 0) {
 		close(port_fd);
@@ -69,6 +70,14 @@ int open_serial_port(const char *port_name)
 		report_open_error(port_name, errno);
 		return -1;
 	}
+
+        bzero(&term_setting, sizeof(term_setting));
+        term_setting.c_cflag = (CS8 | CREAD);
+	term_setting.c_cc[VMIN] = 1;
+	term_setting.c_cc[VTIME] = 1;
+	r = tcsetattr(port_fd, TCSANOW, &term_setting);
+	if (r != 0) return -1;
+
 	r = set_baud(baud_rate);
 	if (r == 0) {
 		printf("Port \"%s\" opened at %s baud\r\n",
@@ -272,9 +281,15 @@ int set_baud(const char *baud_name)
 	if (baud == B0) return -2;
 	r = tcgetattr(port_fd, &port_setting);
 	if (r != 0) return -3;
-	//port_setting.c_iflag = IGNBRK | IGNPAR | IXANY | IXON;
+#ifdef __APPLE__
+	cfsetspeed(&port_setting,baud);
+	port_setting.c_iflag = IGNBRK | IGNPAR;
+	port_setting.c_cflag =  CS8 | CREAD | HUPCL | CLOCAL;
+#else
 	port_setting.c_iflag = IGNBRK | IGNPAR;
 	port_setting.c_cflag = baud | CS8 | CREAD | HUPCL | CLOCAL;
+#endif
+
 	port_setting.c_oflag = 0;
 	port_setting.c_lflag = 0;
 	r = tcsetattr(port_fd, TCSAFLUSH, &port_setting);
