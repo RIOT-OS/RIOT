@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>Start the RIOT</title>
+        <link href="riot.css" media="all" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+	<h1>Start the RIOT &dash; Getting started with RIOT</h1>
+
+	<div id="toc">
+	<ol start="0">
+	    <li><a href="#requirements" title="Required tools and libraries">Requirements</a></li>
+		<li><a href="#getcode" title="How to obtain RIOT">Get the source code</a></li>
+		<li><a href="#toolchains" title="How to install and configure the toolchains">Setup the toolchain</a></li>
+		<li><a href="#flasher" title="How to install a flasher">Setup a flashing tool</a></li>
+		<li><a href="#hello" title="Build and run the famous hello world program">Hello World!</a></li>
+		<li><a href="#firstapp" title="First Application">Write your first applicatoin</a></li>
+	</ol>
+	</div>
+
+	<h2 id="requirements">Requirements</h2>
+<ul>
+<li>Git (<a href="http://git-scm.com/" title="A distributed version control
+system" target="_blank">http://git-scm.com/</a>)</li>
+<li>Python (for the terminal script) (<a href="http://www.python.org/" title="Python Programming Language" target="_blank">http://www.python.org/</a>)</li>
+<li>A toolchain (see <a href="#toolchains" title="How to install and configure
+the toolchains">Setup the toolchain</a>)</li>
+</ul>
+	<p class="todo">TODO: Collect the requirements.</p>
+	<h2 id="getcode">Get the source code</h2>
+You can obtain RIOT either by cloning the git repositories or download the latest tarballs.
+
+<h3>Using the git repository</h3>
+
+In order to obtain RIOT from the official <a
+href="https://github.com/RIOT-OS/" title="RIOT at GitHub" target="_blank">GitHub</a>
+repositories, please perform the following commands:
+
+<h4>The kernel</h4>
+<pre>
+git clone git://github.com/RIOT-OS/RIOT.git
+</pre>
+
+<h4>The platform configurations</h4>
+<pre>
+git clone git://github.com/RIOT-OS/boards.git
+</pre>
+or
+<pre>
+git clone git://github.com/RIOT-OS/thirdparty_boards.git
+git clone git://github.com/RIOT-OS/thirdparty_cpu.git
+</pre>
+
+<h4><em>Optional (recommended):</em> Examplary projects</h4>
+<pre>
+git clone git://github.com/RIOT-OS/projects.git
+</pre>
+
+<h3>Download the tarballs</h3>
+<p class="todo">TODO: Build tarballs!</p>
+
+	<h2 id="toolchains">Setup the toolchain</h2>
+You can either build RIOT for one of the supported hardware platforms (check
+our <a href="http://riot-os.org/new/#usage" title="RIOT usage"
+target="_blank">website</a>) or try the native port. As a special platform,
+you will find a CPU and board called <i>native</i> in the repository. This
+target allows you to run RIOT as a process on Linux on most supported hardware
+platforms. Just set <tt>CPU</tt> and <tt>BOARD</tt> to native in your
+project's Makefile, call <tt>make</tt>, and execute the resulting elf-file.
+<h3>For ARM</h3>
+Download and install <a href="https://launchpad.net/gcc-arm-embedded/+download"
+title="GCC ARM Embedded" target="_blank">GNU Tools for ARM Embedded Processors</a> according
+to the information provided on the website.
+<p class="todo">TODO: Check if this is working with all supported ARM
+architectures</p>
+<h3>For MSP430</h3>
+Download and install <a href="http://sourceforge.net/projects/mspgcc/"
+title="MSPGCC" target="_blank">GCC toolchain for MSP430</a> according
+to the information provided on the website.
+<h3>For the native port</h3>
+In order to build RIOT for the native port, you just need the <a
+href="http://gcc.gnu.org/" title="GCC, the GNU Compiler Collection" target="_blank">GNU
+Compiler Collection</a>.
+
+    <h2 id="flasher">Setup a flashing tool</a></h2>
+	<h3>For MSB-A2</h3>
+	<ul>
+	<li>Enter the <i>boards</i> directory and change to <i>msba2-common/tools</i>.</li>
+	<li>Call <tt>make</tt>.</li>
+	<li>Either run <tt>make install</tt> (you will need probably superuser
+rights to do this, i.e. you could run <tt>sudo make install</tt>) or add
+<i>boards/msba2-common/tools/bin/</i> to your <a
+href="http://en.wikipedia.org/wiki/PATH_(variable)" title="Wikipedia article
+about the PATH variable" target="_blank">PATH variable</a>.</li>
+<li>Install the driver for the FTDI chip from
+<a href="http://www.ftdichip.com/Drivers/VCP.htm" title="Virtual COM Port
+Drivers" target="_blank">FTDI homepage</a>.</li>
+	</ul>
+	<h3>For MSB-430H</h3>
+<p class="todo">TODO</p>
+	<h3>For redbee-econotag</h3>
+<p class="todo">TODO</p>
+	<h3>For STM32F4DISCOVERY</h3>
+<p class="todo">TODO</p>
+
+	<h2 id="hello"><em>Optional:</em> Hello World!</h2>
+	If you have obtained a copy of the projects repository, you can build the
+famous <em>Hello World</em> application for RIOT.
+<ul>
+<li>Enter the <i>projects</i> directory and change to <tt>hello-world</tt>.</li>
+<li>Edit the <tt>Makefile</tt> to set the variables <tt>RIOTBASE</tt> and
+<tt>RIOTBOARD</tt> according to where your copies of the RIOT repositories are located.</li>
+<li>Dependent on your target platform set the <tt>BOARD</tt> environment
+variable and call <tt>make</tt>, e.g. <tt>BOARD=msb-430h make</tt>.</li>
+<li>Now you program the resulting hex file on your target platform by calling
+<tt>make flash</tt>.</li>
+<li>Finally see the output of the application by running <tt>make term</tt>.</li>
+</ul>
+
+	<h2 id="firstapp">Write your first application</h2>
+<p>To write your own RIOT application, you just need a <tt>Makefile</tt> and C file(s)
+containing your source code. A template Makefile is available in the dist
+folder of the RIOT repository.</p>
+<p>One of the C files has to provide a main function according to this
+prototype:
+<pre>
+void main(void);
+</pre>
+</p>
+<p>Within your project's Makefile, you can define the modules you want to use.</p>
+<p>Unless specified otherwise, make will create an
+elf-file as well as an Intel hex file in the bin folder of your project
+directory.
+    </body>
+</html>
