@@ -107,6 +107,15 @@ SECTIONS
 		
 	} >flash							/* put all the above into FLASH */	
 	. = ALIGN(4);
+
+    /* .ARM.exidx is sorted, so has to go in its own output section.  */
+    __exidx_start = .;
+    .ARM.exidx :
+    {
+        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+    } >flash
+    __exidx_end = .;
+
 	_etext = . ;						/* define a global symbol _etext just after the last code byte */
 
     .config : 
@@ -175,7 +184,26 @@ SECTIONS
 		_data = .;						/* create a global symbol marking the start of the .data section  */
 		*(.data)						/* all .data sections  */
 		*(.gnu.linkonce.d*)
-	} >ram								/* put all the above into RAM (but load the LMA copy into FLASH) */
+        . = ALIGN(4);
+        /* preinit data */
+        PROVIDE_HIDDEN (__preinit_array_start = .);
+        KEEP(*(.preinit_array))
+            PROVIDE_HIDDEN (__preinit_array_end = .);
+
+        . = ALIGN(4);
+        /* init data */
+        PROVIDE_HIDDEN (__init_array_start = .);
+        KEEP(*(SORT(.init_array.*)))
+            KEEP(*(.init_array))
+            PROVIDE_HIDDEN (__init_array_end = .);
+
+        . = ALIGN(4);
+        /* finit data */
+        PROVIDE_HIDDEN (__fini_array_start = .);
+        KEEP(*(SORT(.fini_array.*)))
+            KEEP(*(.fini_array))
+            PROVIDE_HIDDEN (__fini_array_end = .);
+    } >ram								/* put all the above into RAM (but load the LMA copy into FLASH) */
 	. = ALIGN(4);						/* ensure data is aligned so relocation can use 4-byte operations */
 	_edata = .;							/* define a global symbol marking the end of the .data section  */
 	
