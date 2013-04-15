@@ -46,5 +46,6 @@ int unregister_interrupt(int sig);
 /* this should be defined elsewhere */
 void thread_yield(void);
 
+extern volatile ucontext_t *interrupted_contexts[MAXTHREADS];
 /** @} */
 #endif //_CPU_H

@@ -17,16 +17,10 @@
 #include <signal.h>
 
 /* TODO: choose more sensibly? */
-#ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   8192
-#endif
-
-#define KERNEL_CONF_STACKSIZE_IDLE      4096
-#define NATIVE_ISR_STACKSIZE            8192
-
-#define _SIG_LTC4150        SIGRTMIN + 0
-
-/* TODO: check for overflow (SIGRTMAX) */
+#define KERNEL_CONF_STACKSIZE_DEFAULT   (16384)
+#define KERNEL_CONF_STACKSIZE_IDLE      (4096)
+#define NATIVE_ISR_STACKSIZE            (16384)
+#define TRANSCEIVER_STACK_SIZE          (16384)
 
 /* for cc110x_ng */
 #define RX_BUF_SIZE (10)

@@ -75,28 +75,53 @@ char *thread_stack_init(void *task_func, void *stack_start, int stacksize)
 
 void cpu_switch_context_exit(void)
 {
+    ucontext_t *ctx;
+
     DEBUG("XXX: cpu_switch_context_exit()\n");
     //active_thread = sched_threads[0];
     sched_run();
 
     DEBUG("XXX: cpu_switch_context_exit(): calling setcontext(%s)\n\n", active_thread->name);
-    if (setcontext((ucontext_t*)(active_thread->sp)) == -1) {
+    if (interrupted_contexts[thread_getpid()] == NULL) {
+        ctx = (ucontext_t*)(active_thread->sp);
+    }
+    else {
+        ctx = interrupted_contexts[thread_getpid()];
+        interrupted_contexts[thread_getpid()] = NULL;
+    }
+    if (setcontext(ctx) == -1) {
         err(1, "cpu_switch_context_exit(): setcontext():");
     }
 }
 
 void thread_yield()
 {
-    ucontext_t *oc;
+    /**
+     * XXX: check whether it is advisable to switch context for sched_run()
+     */
+    ucontext_t *oc, *nc;
 
     DEBUG("thread_yield()\n");
 
-    oc = (ucontext_t*)(active_thread->sp);
+    if (interrupted_contexts[thread_getpid()] == NULL) {
+        oc = (ucontext_t*)(active_thread->sp);
+    }
+    else {
+        oc = interrupted_contexts[thread_getpid()];
+        interrupted_contexts[thread_getpid()] = NULL;
+    }
+
     sched_run();
 
-    DEBUG("thread_yield(): calling swapcontext(%s)\n\n", active_thread->name);
-    if (swapcontext(oc, (ucontext_t*)(active_thread->sp)) == -1) {
-        err(1, "thread_yield(): swapcontext()");
+    nc = (ucontext_t*)(active_thread->sp);
+    if (nc != oc) {
+        DEBUG("thread_yield(): calling swapcontext(%s)\n\n", active_thread->name);
+        if (swapcontext(oc, nc) == -1) {
+            err(1, "thread_yield(): swapcontext()");
+        }
+    }
+    else {
+        DEBUG("thread_yield(): old = new, returning to context (%s)\n\n", active_thread->name);
     }
 }
 

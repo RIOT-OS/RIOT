@@ -37,6 +37,74 @@ struct int_handler_t {
 };
 static struct int_handler_t native_irq_handlers[255];
 
+volatile ucontext_t *interrupted_contexts[MAXTHREADS];
+
+void print_thread_sigmask(ucontext_t *cp)
+{
+    sigset_t *p = &cp->uc_sigmask;
+    if (sigemptyset(p) == -1) {
+        err(1, "print_thread_sigmask: sigemptyset");
+    }
+
+    for (int i = 1; i<(SIGRTMAX); i++) {
+        if (native_irq_handlers[i].func != NULL) {
+            printf("%s: %s\n",
+                    strsignal(i),
+                    (sigismember(&native_sig_set, i) ? "blocked": "unblocked")
+                  );
+        }
+        if (sigismember(p, i)) {
+            printf("%s: pending\n", strsignal(i));
+        }
+    }
+}
+
+void print_sigmasks(void)
+{
+    ucontext_t *p;
+    //tcb_t *cb = NULL;
+
+    for (int i=0; i<MAXTHREADS; i++) {
+        if (sched_threads[i] != NULL) {
+            printf("%s:\n", sched_threads[i]->name);
+            //print_thread_sigmask(sched_threads[i]->sp);
+            p = sched_threads[i]->stack_start;
+            print_thread_sigmask(p);
+            puts("");
+        }
+    }
+}
+
+void native_print_signals()
+{
+    sigset_t p, q;
+    puts("native signals:\n");
+    if (sigemptyset(&p) == -1) {
+        err(1, "native_print_signals: sigemptyset");
+    }
+    if (sigpending(&p) == -1) {
+        err(1, "native_print_signals: sigpending");
+    }
+    if (sigprocmask(SIG_SETMASK, NULL, &q) == -1) {
+        err(1, "native_print_signals(): sigprocmask");
+    }
+
+    for (int i = 1; i<(SIGRTMAX); i++) {
+        if (native_irq_handlers[i].func != NULL || i == SIGUSR1) {
+            printf("%s: %s\n",
+                    strsignal(i),
+                    (sigismember(&native_sig_set, i) ? "blocked": "unblocked")
+                  );
+        }
+        if (sigismember(&p, i)) {
+            printf("%s: pending\n", strsignal(i));
+        }
+        if (sigismember(&q, i)) {
+            printf("%s: currently blocked\n", strsignal(i));
+        }
+    }
+}
+
 /**
  * block signals
  */
@@ -82,6 +150,9 @@ unsigned enableIRQ(void)
     }
     prev_state = native_interrupts_enabled;
     native_interrupts_enabled = 1;
+
+    //print_sigmasks();
+    //native_print_signals();
 
     return prev_state;
 }
@@ -188,6 +259,15 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
 
     makecontext(&native_context, native_irq_handler, 0);
 
+#ifdef NATIVEUSESWAPCONTEXT
+    /**
+     * XXX:
+     * This seems to be the cause of undefined behavior. Try saving
+     * the context passed to this function and using setcontext to
+     * leave the handler.
+     * Also it is probably wise to makecontext the isr context
+     * elsewehere.
+     * */
     if ((swapcontext((ucontext_t*)active_thread->sp, &native_context)) == -1) {
         err(1, "swapcontext failed");
     }
@@ -196,6 +276,15 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     }
     native_in_irs = 0;
     enableIRQ();
+#else
+    interrupted_contexts[thread_getpid()] = context;
+    /**
+     * signal masks are broken
+     */
+    //active_thread->sp = context;
+    setcontext(&native_context);
+    DEBUG("\n\n\tnever reached\n\n\n");
+#endif
 }
 
 /**
@@ -210,13 +299,14 @@ int register_interrupt(int sig, void *handler)
     struct sigaction sa;
     DEBUG("XXX: register_interrupt()\n");
 
-    if (sigaddset(&native_sig_set, sig)) {
-        err(1, "register_interrupt: sigaddset");
+    if (sigdelset(&native_sig_set, sig)) {
+        err(1, "register_interrupt: sigdelset");
     }
 
     native_irq_handlers[sig].func = handler;
 
     sa.sa_sigaction = (void*) native_isr_entry;
+    /* sa.sa_handler = (void*) native_isr_entry; */
 
     if (sigemptyset(&sa.sa_mask) == -1) {
         err(1, "register_interrupt: sigemptyset");
@@ -242,12 +332,13 @@ int unregister_interrupt(int sig)
     struct sigaction sa;
     DEBUG("XXX: unregister_interrupt()\n");
 
-    if (sigdelset(&native_sig_set, sig) == -1) {
-        err(1, "unregister_interrupt: sigdelset");
+    if (sigaddset(&native_sig_set, sig) == -1) {
+        err(1, "unregister_interrupt: sigaddset");
     }
     native_irq_handlers[sig].func = NULL;
 
-    sa.sa_sigaction = SIG_IGN;
+    /* sa.sa_sigaction = SIG_IGN; */
+    sa.sa_handler = SIG_IGN;
     if (sigemptyset(&sa.sa_mask) == -1) {
         err(1, "unregister_interrupt: sigemptyset");
     }
@@ -271,6 +362,8 @@ void native_interrupt_init(void)
     struct sigaction sa;
     DEBUG("XXX: native_interrupt_init()\n");
 
+    native_interrupts_enabled = 1;
+
     for (int i = 0; i<255; i++) {
         native_irq_handlers[i].func = NULL;
     }
@@ -281,15 +374,36 @@ void native_interrupt_init(void)
     }
     sa.sa_flags = SA_RESTART | SA_SIGINFO;
 
+    /*
     if (sigemptyset(&native_sig_set) == -1) {
         err(1, "native_interrupt_init: sigemptyset");
     }
-    if (sigaddset(&native_sig_set, SIGUSR1) == -1) {
-        err(1, "native_interrupt_init: sigaddset");
+    */
+    if (sigprocmask(SIG_SETMASK, NULL, &native_sig_set) == -1) {
+        err(1, "native_interrupt_init(): sigprocmask");
+    }
+
+    if (sigdelset(&native_sig_set, SIGUSR1) == -1) {
+        err(1, "native_interrupt_init: sigdelset");
     }
 
     if (sigaction(SIGUSR1, &sa, NULL)) {
         err(1, "native_interrupt_init: sigaction");
+    }
+
+    if (sigdelset(&native_sig_set, SIGALRM) == -1) {
+        err(1, "native_interrupt_init: sigdelset");
+    }
+
+    if (sigaction(SIGALRM, &sa, NULL)) {
+        err(1, "native_interrupt_init: sigaction");
+    }
+    if (sigprocmask(SIG_SETMASK, &native_sig_set, NULL) == -1) {
+        err(1, "native_interrupt_init(): sigprocmask");
+    }
+
+    for (int i = 0; i<MAXTHREADS; i++) {
+        interrupted_contexts[i] = NULL;
     }
 
     puts("RIOT native interrupts/signals initialized.");
