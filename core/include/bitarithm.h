@@ -77,7 +77,8 @@ unsigned number_of_highest_bit(unsigned v);
 
 /**
  * @brief	Returns the number of the lowest '1' bit in a value
- * @param[in]	v	Input value
+ * @param[in]	v	Input value - must be unequal to '0', otherwise the
+ *                  function will produce an infinite loop
  * @return			Bit Number
  *
  * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
