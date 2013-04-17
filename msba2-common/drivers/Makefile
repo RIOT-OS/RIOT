@@ -6,7 +6,7 @@ DEP = $(SRC:%.c=$(BINDIR)%.d)
 INCLUDES += -I$(RIOTBASE)/sys/include/ -I$(RIOTBASE)/drivers/cc110x_ng/include/
 
 $(BINDIR)msba2_common_drivers.a: $(OBJ)
-	$(AR) rcs $(BINDIR)msba2_base.a $(OBJ)
+	$(AR) rcs $(BINDIR)${ARCH} $(OBJ)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
