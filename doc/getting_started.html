@@ -2,10 +2,11 @@
 <html>
     <head>
         <title>Start the RIOT</title>
-        <link href="riot.css" media="all" rel="stylesheet" type="text/css" />
+        <link href="riot.css" media="all" rel="stylesheet" type="text/css" >
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     </head>
     <body>
-	<h1>Start the RIOT &dash; Getting started with RIOT</h1>
+	<h1>Start the RIOT - Getting started with RIOT</h1>
 
 	<div id="toc">
 	<ol start="0">
@@ -26,21 +27,16 @@ system" target="_blank">http://git-scm.com/</a>)</li>
 <li>A toolchain (see <a href="#toolchains" title="How to install and configure
 the toolchains">Setup the toolchain</a>)</li>
 </ul>
-	<p class="todo">TODO: Collect the requirements.</p>
-	<h2 id="getcode">Get the source code</h2>
-You can obtain RIOT either by cloning the git repositories or download the latest tarballs.
+<p>You may not to install additional packages for particular toolchains or flashing tools. For the MSB-A2 check the requirements in the <a href="https://github.com/RIOT-OS/boards/wiki/For-MSB-A2" title="MSB-A2 Toolchain Installation" target="_blank">Github Wiki</a>.</p>
+<h2 id="getcode">Get the source code</h2>
+<p>You can obtain RIOT either by cloning the git repositories or download the latest tarballs.</p>
 
 <h3>Using the git repository</h3>
-
-In order to obtain RIOT from the official <a
-href="https://github.com/RIOT-OS/" title="RIOT at GitHub" target="_blank">GitHub</a>
-repositories, please perform the following commands:
-
+<p>In order to obtain RIOT from the official <a href="https://github.com/RIOT-OS/" title="RIOT at GitHub" target="_blank">GitHub</a> repositories, please perform the following commands:</p>
 <h4>The kernel</h4>
 <pre>
 git clone git://github.com/RIOT-OS/RIOT.git
 </pre>
-
 <h4>The platform configurations</h4>
 <pre>
 git clone git://github.com/RIOT-OS/boards.git
@@ -60,29 +56,40 @@ git clone git://github.com/RIOT-OS/projects.git
 <p class="todo">TODO: Build tarballs!</p>
 
 	<h2 id="toolchains">Setup the toolchain</h2>
-You can either build RIOT for one of the supported hardware platforms (check
+    <p>You can either build RIOT for one of the supported hardware platforms (check
 our <a href="http://riot-os.org/new/#usage" title="RIOT usage"
 target="_blank">website</a>) or try the native port. As a special platform,
 you will find a CPU and board called <i>native</i> in the repository. This
 target allows you to run RIOT as a process on Linux on most supported hardware
 platforms. Just set <tt>CPU</tt> and <tt>BOARD</tt> to native in your
-project's Makefile, call <tt>make</tt>, and execute the resulting elf-file.
+project's Makefile, call <tt>make</tt>, and execute the resulting elf-file.</p>
 <h3>For ARM</h3>
-Download and install <a href="https://launchpad.net/gcc-arm-embedded/+download"
-title="GCC ARM Embedded" target="_blank">GNU Tools for ARM Embedded Processors</a> according
-to the information provided on the website.
-<p class="todo">TODO: Check if this is working with all supported ARM
-architectures</p>
+<p>The recommended toolchain for RIOT on ARM is an older version (2008q3) of CodeBench (formerly CodeSourcery) from <a href="http://www.mentor.com/" title="Company Web Page">Mentor Graphics</a>. It can be obtained <a class="download" href="http://www.codesourcery.com/sgpp/lite/arm/portal/release642" title="CodeSourcery 2008q3">here</a>.</p>
+<h4>Linux</h4>
+<p>Direct links for Linux are </p>
+<p class="download"><a href="http://www.codesourcery.com/sgpp/lite/arm/portal/package3688/public/arm-none-eabi/arm-2008q3-66-arm-none-eabi.bin" title="Installer for Linux version">http://www.codesourcery.com/.../arm-2008q3-66-arm-none-eabi.bin</a> (with installer)</p>
+<p> or</p>
+<p class="download"><a href="http://www.codesourcery.com/sgpp/lite/arm/portal/package3686/public/arm-none-eabi/arm-2008q3-66-arm-none-eabi-i686-pc-linux-gnu.tar.bz2" title="Binary archive for Linux">http://www.codesourcery.com/.../arm-2008q3-66-arm-none-eabi-i686-pc-linux-gnu.tar.bz2</a>.</p>
+<p><em>Please note</em> that you will have to add the directory with executables (<tt>arm-none-eabi-gcc</tt>, <tt>arm-none-eabi-as</tt> etc.) to your <a href="http://en.wikipedia.org/wiki/PATH_(variable)" title="Wikipedia article about the PATH variable" target="_blank">PATH variable</a> in both cases.
+On a typical shell like bash or zsh this can be done using export, e.g.</p>
+<pre>
+export PATH=${PATH}:/path/to/arm-none-eabi-gcc
+</pre>
+<h4>Windows</h4>
+<p>The direct link for the Windows version is</p>
+<p class="download"><a href="http://www.codesourcery.com/sgpp/lite/arm/portal/package3689/public/arm-none-eabi/arm-2008q3-66-arm-none-eabi.exe" title="Installer for Windows version">http://www.codesourcery.com/.../arm-2008q3-66-arm-none-eabi.exe</a>.</p>
+<h4>Mac OS X</h4>
+<p>There is a tutorial to install the CodeSourcery toolchain on Mac OS X: <a href="https://gist.github.com/errordeveloper/1854389" title="CodeSourcery ARM (2008q3) bare-metal toolchain on OS X">https://gist.github.com/errordeveloper/1854389</a>.</p>
+<h4>Build the toolchain from sources</h4>
+<p>There is also the possibility to build the toolchain from the sources, allowing for newer versions of GCC, binutils, and Newlib. A script to build a toolchain for the MSB-A2 is available in the RIOT git repository at <br>
+<code>dist/tools/toolchains/build_gnuarm.sh</code>.</p>
 <h3>For MSP430</h3>
-Download and install <a href="http://sourceforge.net/projects/mspgcc/"
-title="MSPGCC" target="_blank">GCC toolchain for MSP430</a> according
-to the information provided on the website.
+<p>Download and install <a class="download" href="http://sourceforge.net/projects/mspgcc/"title="MSPGCC" target="_blank">GCC toolchain for MSP430</a> according to the information provided on the website.</p>
 <h3>For the native port</h3>
-In order to build RIOT for the native port, you just need the <a
-href="http://gcc.gnu.org/" title="GCC, the GNU Compiler Collection" target="_blank">GNU
-Compiler Collection</a>.
+<p>In order to build RIOT for the native port, you just need the <a class="download" href="http://gcc.gnu.org/" title="GCC, the GNU Compiler Collection" target="_blank">GNU
+Compiler Collection</a>.</p>
 
-    <h2 id="flasher">Setup a flashing tool</a></h2>
+    <h2 id="flasher">Setup a flashing tool</h2>
 	<h3>For MSB-A2</h3>
 	<ul>
 	<li>Enter the <i>boards</i> directory and change to <i>msba2-common/tools</i>.</li>
@@ -96,10 +103,10 @@ about the PATH variable" target="_blank">PATH variable</a>.</li>
 <a href="http://www.ftdichip.com/Drivers/VCP.htm" title="Virtual COM Port
 Drivers" target="_blank">FTDI homepage</a>.</li>
 	</ul>
-	<h3>For MSB-430H</h3>
-<p class="todo">TODO</p>
-	<h3>For redbee-econotag</h3>
-<p class="todo">TODO</p>
+    <h3>For MSB-430H</h3>
+    <p>Download and install <a class="download" href="http://mspdebug.sourceforge.net/download.html" title="Debugging and programming tool for MSP430 MCUs" target="_blank">MSPDebug</a> according to the information provided on the website. You can also use MSPDebug for debugging.</p>
+    <h3>For redbee-econotag</h3>
+    <p>Folow the instructions for <a href="http://mc1322x.devl.org/libmc1322x.html" title="LIBMC1322X"target="_blank">Getting Started with MC1322x</a>.
 	<h3>For STM32F4DISCOVERY</h3>
 <p class="todo">TODO</p>
 
@@ -122,11 +129,10 @@ variable and call <tt>make</tt>, e.g. <tt>BOARD=msb-430h make</tt>.</li>
 containing your source code. A template Makefile is available in the dist
 folder of the RIOT repository.</p>
 <p>One of the C files has to provide a main function according to this
-prototype:
+prototype:</p>
 <pre>
-void main(void);
+int main(void);
 </pre>
-</p>
 <p>Within your project's Makefile, you can define the modules you want to use.</p>
 <p>Unless specified otherwise, make will create an
 elf-file as well as an Intel hex file in the bin folder of your project
