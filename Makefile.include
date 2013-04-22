@@ -1,3 +1,4 @@
+# set undefined variables
 ifeq ($(strip $(RIOTCPU)),)
 	export RIOTCPU =$(RIOTBASE)/cpu
 endif
@@ -11,8 +12,9 @@ BB = $(shell echo $(BOARD)|tr 'a-z' 'A-Z')
 CFLAGS += -DBOARD=$(BB)
 export CFLAGS
 
-# mandatory include! 
+# mandatory includes!
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
+include $(RIOTCPU)/Makefile.include
 include $(RIOTBASE)/Makefile.modules 
 
 # your binaries to link
