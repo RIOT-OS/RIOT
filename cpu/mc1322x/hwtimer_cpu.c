@@ -90,7 +90,19 @@ void hwtimer_arch_set(unsigned long offset, short timer) {
 
 /*---------------------------------------------------------------------------*/
 void hwtimer_arch_set_absolute(unsigned long value, short timer) {
+    /* get corresponding struct for the given ::timer parameter */
+    TMR_struct* tmr = (void *) TMR_BASE + (timer + TMR_OFFSET);
     
+    /* disable IRQs and save the status register */
+    unsigned long cpsr = disableIRQ();
+    
+    tmr->COMP1 = value;                         /* load the value into the compare register */
+    tmr->CSCTRLbits.TCF1 = 0;                   /* reset compare flag */
+    tmr->CSCTRLbits.TCF1EN = 1;                 /* enable intterupts when TCF1 is set \ */
+    tmr->SCTRLbits.TCFIE = 1;                   /* enable interrupts when TCF is one  - do we need both?*/ 
+    
+    /* restor status register */
+    restoreIRQ(cpsr);
 }
 
 /*---------------------------------------------------------------------------*/
