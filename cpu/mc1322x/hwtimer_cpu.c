@@ -45,6 +45,8 @@ void timer_x_init(TMR_struct* TMRx) {
     TMRx->CTRLbits.OUTPUT_MODE = 0x00;          /* OFLAG is asserted while counter is active */
     
     TMRx->ENBL = 0xf;                           /* enable all the timers --- why not? */
+    
+    /* TODO: install ISR */
 };
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu) {
@@ -61,12 +63,16 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu) {
 
 /*---------------------------------------------------------------------------*/
 void hwtimer_arch_enable_interrupt(void) {
-    
+    /* this enables timer interrupts in general by using the ITC.
+     * Timer specific interrupt control is given by the TMRx structs. */
+    enable_irq(TRM);
 }
 
 /*---------------------------------------------------------------------------*/
 void hwtimer_arch_disable_interrupt(void) {
-    
+    /* this disables timer interrupts in general by using the ITC.
+     * Timer specific interrupt control is given by the TMRx structs. */
+    disable_irq(TRM);
 }
 
 /*---------------------------------------------------------------------------*/
