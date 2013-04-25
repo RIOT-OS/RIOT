@@ -83,11 +83,12 @@ _startup:
         ldr     PC, SWI_Addr		/* Software Interrupt */
         ldr     PC, PAbt_Addr		/* Prefetch Abort */
         ldr     PC, DAbt_Addr		/* Data Abort */
-        nop							/* Reserved Vector (holds Philips ISP checksum) */
+        nop				/* Reserved Vector (holds Philips ISP checksum) */
+        
         /* see page 71 of "Insiders Guide to the Philips ARM7-Based Microcontrollers" by Trevor Martin  */
-        /*                ldr     PC, [PC,#-0x0120]  	/* Interrupt Request Interrupt (load from VIC) */
+        /* ldr     PC, [PC,#-0x0120]  	/* Interrupt Request Interrupt (load from VIC) */
         ldr     PC, IRQ_Addr    	/* Interrupt Request Interrupt (load from VIC) */
-        ldr		r0, =__fiq_handler	/* Fast Interrupt Request Interrupt */
+        ldr     r0, =__fiq_handler	/* Fast Interrupt Request Interrupt */
 
  /* these vectors are used for rom patching */	
 .org 0x20
@@ -163,11 +164,11 @@ clbss_l:
 
 /* Exception vector handlers branching table */
 Undef_Addr:     .word   UNDEF_Routine		/* defined in main.c  */
-SWI_Addr:       .word   ctx_switch			/* defined in main.c  */
+SWI_Addr:       .word   ctx_switch		/* defined in main.c  */
 PAbt_Addr:      .word   PABT_Routine		/* defined in main.c  */
 DAbt_Addr:      .word   DABT_Routine		/* defined in main.c  */
-IRQ_Addr:       .word   arm_irq_handler      /* defined in main.c  */
-__fiq_handler:           .word   __fiq                /* FIQ */
+IRQ_Addr:       .word   arm_irq_handler         /* defined in main.c  */
+__fiq_handler:  .word   __fiq                   /* FIQ */
 
 __fiq:  b     .                         /* FIQ */
 
