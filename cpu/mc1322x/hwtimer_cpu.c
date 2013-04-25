@@ -14,8 +14,6 @@
 #include "hwtimer_arch.h"
 #include "irq.h"
 
-#define VULP(x) ((volatile unsigned long*) (x))
-
 /* High level interrupt handler */
 static void (*int_handler)(int);
 
@@ -98,7 +96,7 @@ void hwtimer_arch_set_absolute(unsigned long value, short timer) {
     
     tmr->COMP1 = value;                         /* load the value into the compare register */
     tmr->CSCTRLbits.TCF1 = 0;                   /* reset compare flag */
-    tmr->CSCTRLbits.TCF1EN = 1;                 /* enable intterupts when TCF1 is set \ */
+    tmr->CSCTRLbits.TCF1EN = 1;                 /* enable interrupts when TCF1 is set \ */
     tmr->SCTRLbits.TCFIE = 1;                   /* enable interrupts when TCF is one  - do we need both?*/ 
     
     /* restor status register */
@@ -107,10 +105,15 @@ void hwtimer_arch_set_absolute(unsigned long value, short timer) {
 
 /*---------------------------------------------------------------------------*/
 void hwtimer_arch_unset(short timer) {
+    /* get corresponding struct for the given ::timer parameter */
+    TMR_struct* tmr = (void *) TMR_BASE + (timer + TMR_OFFSET);
     
+    tmr->CSCTRLbits.TCF1 = 0;                   /* reset compare flag */
+    tmr->CSCTRLbits.TCF1EN = 0;                 /* disable interrupts for TCF1 */
+    tmr->SCTRLbits.TCFIE = 0;                   /* disable interrupts for TCF */
 }
 
 /*---------------------------------------------------------------------------*/
 unsigned long hwtimer_arch_now(void) {
-    
+    return TMR0->CNTR;
 }
