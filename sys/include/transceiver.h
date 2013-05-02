@@ -10,8 +10,11 @@
 #define TRANSCEIVER_STACK_SIZE      (512)
 #endif
 
+#ifdef MODULE_CC2420
+#define PAYLOAD_SIZE  (118)
+#else
 #define PAYLOAD_SIZE  (58)
-
+#endif
 /* The maximum of threads to register */
 #define TRANSCEIVER_MAX_REGISTERED  (4)
 
@@ -26,6 +29,7 @@ enum transceiver_msg_type_t {
     /* Message types for driver <-> transceiver communication */
     RCV_PKT_CC1020,        ///< packet was received by CC1020 transceiver
     RCV_PKT_CC1100,        ///< packet was received by CC1100 transceiver
+    RCV_PKT_CC2420,        ///< packet was received by CC2420 transceiver
 
     /* Message types for transceiver <-> upper layer communication */
     PKT_PENDING,    ///< packet pending in transceiver buffer
@@ -38,6 +42,8 @@ enum transceiver_msg_type_t {
     GET_ADDRESS,    ///< Get the radio address
     SET_ADDRESS,    ///< Set the radio address
     SET_MONITOR,    ///< Set transceiver to monitor mode (disable address checking)
+    GET_PAN,        ///< Get current pan
+    SET_PAN,        ///< Set a new pan
 
     /* debug message types */
     DBG_IGN,        ///< add a physical address to the ignore list
@@ -52,7 +58,8 @@ enum transceiver_msg_type_t {
 typedef enum {
     TRANSCEIVER_NONE,       ///< Invalid
     TRANSCEIVER_CC1100,     ///< CC110X transceivers
-    TRANSCEIVER_CC1020      ///< CC1020 transceivers
+    TRANSCEIVER_CC1020,      ///< CC1020 transceivers
+    TRANSCEIVER_CC2420      ///< CC2420 transceivers
 } transceiver_type_t;
 
 /**
