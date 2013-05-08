@@ -162,6 +162,10 @@ void uart_init ( volatile struct UART_struct* uart, uint32_t baudrate ) {
 
 int fw_puts(char *astring,int length)
 {
+    return uart0_puts ( astring, length );
+}
+
+static inline uint32_t uart0_puts ( uint8_t *astring, uint32_t length ) {
     int i = 0;
     for (; i<length; i++) {
         uart1_putc( astring[i] );
