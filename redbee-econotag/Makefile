@@ -4,6 +4,12 @@ OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 export ARCH = redbee-econotag_base.a
 
+INCLUDES += -I$(RIOTBOARD)/redbee-econotag/drivers/include
+INCLUDES += -I$(RIOTBASE)/cpu/arm_common/include
+INCLUDES += -I$(RIOTBASE)/cpu/mc1322x/include
+
+.PHONY: $(BINDIR)/$(ARCH)
+
 all: $(BINDIR)$(ARCH)
 	$(MAKE) -C drivers
 

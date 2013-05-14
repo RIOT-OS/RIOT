@@ -11,6 +11,9 @@
 #ifndef GPIO_H
 #define GPIO_H
 
+// TODO: why do we need to include this for macro expansion?
+#include "stdint.h"
+
 /* Structure-based GPIO access
    Example usage:
 
@@ -92,7 +95,6 @@
 #define EVTO GPIO_62
 #define MCKO GPIO_50
 #define EVTI GPIO_63
-
 
 
 #define _V(x,n,i) uint32_t x##_##i : n;

@@ -104,7 +104,7 @@ void uart_flow_ctl(volatile struct UART_struct * uart, uint8_t on);
  */
 #define UART1_TX_BUFFERSIZE 1024
 extern volatile uint32_t  u1_tx_head, u1_tx_tail;
-void uart1_putc(char c);
+void uart1_putc(uint8_t c);
 
 /* The mc1322x has a 32 byte hardware FIFO for received characters.
  * If a larger rx buffersize is specified the FIFO will be extended into RAM.
@@ -125,7 +125,7 @@ uint8_t uart1_getc(void);
 
 #define UART2_TX_BUFFERSIZE 1024
 extern volatile uint32_t  u2_tx_head, u2_tx_tail;
-void uart2_putc(char c);
+void uart2_putc(uint8_t c);
 
 #define UART2_RX_BUFFERSIZE 128
 #if UART2_RX_BUFFERSIZE > 32

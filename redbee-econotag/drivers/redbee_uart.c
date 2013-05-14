@@ -16,6 +16,8 @@
 #define MOD_ 9999
 #define CLK_ 24000000
 #define DIV_ 16 /* uart->CON.XTIM = 0 is 16x oversample (datasheet is incorrect) */
+#define BAUTRATE_UART1 115200 
+#define BAUTRATE_UART2 115200
 
 void uart_set_baudrate ( volatile struct UART_struct* uart, uint32_t baudrate ) {
     uint64_t inc = 0;
@@ -86,6 +88,7 @@ void uart_flow_ctl ( volatile struct UART_struct* uart, uint8_t on ) {
     }
 }
 
+// TODO: clean from u*_(rx|tx)_(head|tail)
 void uart_init ( volatile struct UART_struct* uart, uint32_t baudrate ) {
     /* enable the uart so we can set the gpio mode */
     /* has to be enabled before setting the function with GPIO->FUNC_SEL */
@@ -108,8 +111,8 @@ void uart_init ( volatile struct UART_struct* uart, uint32_t baudrate ) {
         UART1->CONbits.RXE = 1;                         /*< enable receive */
 #if UART1_RX_BUFFERSIZE > 32
         UART1->RXCONbits.LVL = 30;                      /*< interrupt when fifo is nearly full */
-        u1_rx_head = 0;
-        u1_rx_tail = 0;
+        //u1_rx_head = 0;
+        //u1_rx_tail = 0;
 #elif UART1_RX_BUFFERSIZE < 32
         UART1->CONbits.FCE = 1;                         /*< enable flowcontrol */
         UART1->CONbits.MRXR = 1;                        /*< disable Rx interrupt */
@@ -120,10 +123,11 @@ void uart_init ( volatile struct UART_struct* uart, uint32_t baudrate ) {
         UART1->CONbits.MRXR = 1;                        /*< disable rx interrupt */
 #endif
         
-        u1_tx_head = 0;
-        u1_tx_tail = 0;
+        //u1_tx_head = 0;
+        //u1_tx_tail = 0;
         
-        enable_irq(UART1);
+        //enable_irq(UART1);
+        ITC->INTENABLEbits.UART1 = 1;
     }
     else {
         /* UART2 */
@@ -139,8 +143,8 @@ void uart_init ( volatile struct UART_struct* uart, uint32_t baudrate ) {
         UART2->CONbits.RXE = 1;                         /*< enable receive */
 #if UART2_RX_BUFFERSIZE > 32
         UART2->RXCONbits.LVL = 30;                      /*< interrupt when fifo is nearly full */
-        u2_rx_head = 0;
-        u2_rx_tail = 0;
+        //u2_rx_head = 0;
+        //u2_rx_tail = 0;
 #elif UART2_RX_BUFFERSIZE < 32
         UART2->CONbits.FCE = 1;                         /*< enable flowcontrol */
         UART2->CONbits.MRXR = 1;                        /*< disable Rx interrupt */
@@ -151,25 +155,50 @@ void uart_init ( volatile struct UART_struct* uart, uint32_t baudrate ) {
         UART2->CONbits.MRXR = 1;                        /*< disable rx interrupt */
 #endif
         
-        u2_tx_head = 0;
-        u2_tx_tail = 0;
+       // u2_tx_head = 0;
+        //u2_tx_tail = 0;
         
-        enable_irq(UART2);
+        //enable_irq(UART2);
+        ITC->INTENABLEbits.UART2 = 1;
     }
     
     uart_set_baudrate( uart, baudrate );
 }
 
-int fw_puts(char *astring,int length)
-{
-    return uart0_puts ( astring, length );
-}
-
 static inline uint32_t uart0_puts ( uint8_t *astring, uint32_t length ) {
-    int i = 0;
+    uint32_t i = 0;
     for (; i<length; i++) {
         uart1_putc( astring[i] );
     }
     
     return i;
+}
+
+void stdio_flush(void)
+{
+    ITC->INTENABLEbits.UART1 = 0;
+    ITC->INTENABLEbits.UART2 = 0;
+    
+    ITC->INTENABLEbits.UART1 = 1;
+    ITC->INTENABLEbits.UART2 = 1;
+    /** taken from msba2-uart0.c
+    U0IER &= ~BIT1;                             // disable THRE interrupt
+    while(running) {
+        while(!(U0LSR & (BIT5|BIT6))){};        // transmit fifo
+        fifo=0;
+        push_queue();                           // dequeue to fifo
+    }
+    U0IER |= BIT1;                              // enable THRE interrupt
+    */
+}
+
+
+int fw_puts(char *astring,int length)
+{
+    return uart0_puts ( (uint8_t*) astring, (uint32_t) length );
+}
+
+int bl_uart_init(void) {
+    uart_init( UART1, BAUTRATE_UART1 );
+    uart_init( UART2, BAUTRATE_UART2 );
 }
