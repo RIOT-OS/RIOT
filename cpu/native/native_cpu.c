@@ -26,7 +26,7 @@
 #include "debug.h"
 
 extern volatile tcb_t *active_thread;
-static ucontext_t native_context;
+static ucontext_t end_context;
 static char __isr_stack[SIGSTKSZ];
 
 /**
@@ -63,7 +63,7 @@ char *thread_stack_init(void *task_func, void *stack_start, int stacksize)
     p->uc_stack.ss_sp = stk;
     p->uc_stack.ss_size = stacksize;
     p->uc_stack.ss_flags = 0;
-    p->uc_link = &native_context;
+    p->uc_link = &end_context;
     if (sigemptyset(&(p->uc_sigmask)) == -1) {
         err(1, "thread_stack_init(): sigemptyset()");
     }
@@ -82,13 +82,8 @@ void cpu_switch_context_exit(void)
     sched_run();
 
     DEBUG("XXX: cpu_switch_context_exit(): calling setcontext(%s)\n\n", active_thread->name);
-    if (interrupted_contexts[thread_getpid()] == NULL) {
-        ctx = (ucontext_t*)(active_thread->sp);
-    }
-    else {
-        ctx = interrupted_contexts[thread_getpid()];
-        interrupted_contexts[thread_getpid()] = NULL;
-    }
+    ctx = (ucontext_t*)(active_thread->sp);
+    eINT(); // XXX: workaround for bug (?) in sched_task_exit
     if (setcontext(ctx) == -1) {
         err(1, "cpu_switch_context_exit(): setcontext():");
     }
@@ -103,13 +98,7 @@ void thread_yield()
 
     DEBUG("thread_yield()\n");
 
-    if (interrupted_contexts[thread_getpid()] == NULL) {
-        oc = (ucontext_t*)(active_thread->sp);
-    }
-    else {
-        oc = interrupted_contexts[thread_getpid()];
-        interrupted_contexts[thread_getpid()] = NULL;
-    }
+    oc = (ucontext_t*)(active_thread->sp);
 
     sched_run();
 
@@ -127,13 +116,14 @@ void thread_yield()
 
 void native_cpu_init()
 {
-    if (getcontext(&native_context) == -1) {
-        err(1, "native_context(): getcontext()");
+    if (getcontext(&end_context) == -1) {
+        err(1, "end_context(): getcontext()");
     }
-    native_context.uc_stack.ss_sp = __isr_stack;
-    native_context.uc_stack.ss_size = SIGSTKSZ;
-    native_context.uc_stack.ss_flags = 0;
-    makecontext(&native_context, sched_task_exit, 0);
+    end_context.uc_stack.ss_sp = __isr_stack;
+    end_context.uc_stack.ss_size = SIGSTKSZ;
+    end_context.uc_stack.ss_flags = 0;
+    makecontext(&end_context, sched_task_exit, 0);
+
     puts("RIOT native cpu initialized.");
 }
 /** @} */

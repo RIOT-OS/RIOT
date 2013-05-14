@@ -34,6 +34,8 @@
 
 #include "debug.h"
 
+#define HWTIMERMINOFFSET 1000
+
 static unsigned long native_hwtimer_now;
 
 static int native_hwtimer_irq[ARCH_MAXTIMERS];
@@ -172,6 +174,10 @@ void hwtimer_arch_unset(short timer)
 void hwtimer_arch_set(unsigned long offset, short timer)
 {
     DEBUG("hwtimer_arch_set(%li, %i)\n", offset, timer);
+    if (offset < HWTIMERMINOFFSET) {
+        offset = HWTIMERMINOFFSET;
+        DEBUG("hwtimer_arch_set: offset < MIN, set to: %i\n", offset);
+    }
     native_hwtimer_irq[timer] = 1;
     native_hwtimer_isset[timer] = 1;
 

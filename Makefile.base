@@ -1,5 +1,8 @@
 ASMSRC = $(wildcard *.s)
+ASSMSRC = $(wildcard *.S)
 ASMOBJ = $(ASMSRC:%.s=$(BINDIR)%.o)
+ASMOBJ += $(ASSMSRC:%.S=$(BINDIR)%.o)
+
 SRC = $(wildcard *.c)
 OBJ = $(SRC:%.c=$(BINDIR)%.o)
 DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -7,8 +10,8 @@ DEP = $(SRC:%.c=$(BINDIR)%.d)
 include $(RIOTCPU)/Makefile.base
 include $(RIOTBOARD)/Makefile.base
 
-$(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ)
-	$(AR) -rc $(BINDIR)$(MODULE).a $(OBJ) $(ASMOBJ)
+$(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ) $(ASSMOBJ)
+	$(AR) -rc $(BINDIR)$(MODULE).a $(OBJ) $(ASMOBJ) $(ASSMOBJ)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
@@ -22,7 +25,10 @@ $(BINDIR)%.o: %.c
 $(BINDIR)%.o: %.s
 	@$(AS) $(ASFLAGS) $*.s -o $(BINDIR)$*.o
 
+$(BINDIR)%.o: %.S
+	@gcc -c -m32 $*.S -o $(BINDIR)$*.o
+
 # remove compilation products
 clean::
-	rm -f $(BINDIR)$(MODULE).a $(OBJ) $(DEP) $(ASMOBJ)
+	rm -f $(BINDIR)$(MODULE).a $(OBJ) $(DEP) $(ASMOBJ) $(ASSMOBJ)
 	
