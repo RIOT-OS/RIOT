@@ -21,7 +21,7 @@
 #define KERNEL_CONF_STACKSIZE_IDLE      (16384)
 #define NATIVE_ISR_STACKSIZE            (16384)
 #define TRANSCEIVER_STACK_SIZE          (16384)
-#define MINIMUM_STACK_SIZE              (1024)
+#define MINIMUM_STACK_SIZE              (16384)
 
 /* for cc110x_ng */
 #define RX_BUF_SIZE (10)
