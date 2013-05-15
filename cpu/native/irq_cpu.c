@@ -48,6 +48,8 @@ struct int_handler_t {
 static struct int_handler_t native_irq_handlers[255];
 char sigalt_stk[SIGSTKSZ];
 
+#define SIGMAX (255) // XXX: do this properly if possible
+
 void print_thread_sigmask(ucontext_t *cp)
 {
     sigset_t *p = &cp->uc_sigmask;
@@ -55,7 +57,7 @@ void print_thread_sigmask(ucontext_t *cp)
         err(1, "print_thread_sigmask: sigemptyset");
     }
 
-    for (int i = 1; i<(SIGRTMAX); i++) {
+    for (int i = 1; i<(SIGMAX); i++) {
         if (native_irq_handlers[i].func != NULL) {
             printf("%s: %s\n",
                     strsignal(i),
@@ -98,7 +100,7 @@ void native_print_signals()
         err(1, "native_print_signals(): sigprocmask");
     }
 
-    for (int i = 1; i<(SIGRTMAX); i++) {
+    for (int i = 1; i<(SIGMAX); i++) {
         if (native_irq_handlers[i].func != NULL || i == SIGUSR1) {
             printf("%s: %s\n",
                     strsignal(i),
@@ -291,8 +293,13 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     if (_native_in_syscall == 0) {
         _native_in_isr = 1;
         DEBUG("\n\n\t\treturn to _native_sig_leave_tramp\n\n");
+#ifdef __MACH__
+        _native_saved_eip =  ((ucontext_t*)context)->uc_mcontext->__ss.__eip;
+        ((ucontext_t*)context)->uc_mcontext->__ss.__eip = (unsigned int)&_native_sig_leave_tramp;
+#else
         _native_saved_eip = ((ucontext_t*)context)->uc_mcontext.gregs[REG_EIP];
         ((ucontext_t*)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
+#endif
         // TODO: change sigmask?
     }
     else {

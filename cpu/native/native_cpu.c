@@ -15,7 +15,13 @@
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  */
 #include <stdio.h>
+#ifdef __MACH__
+#define _XOPEN_SOURCE
+#endif
 #include <ucontext.h>
+#ifdef __MACH__
+#undef _XOPEN_SOURCE
+#endif
 #include <err.h>
 
 #include "kernel_intern.h"

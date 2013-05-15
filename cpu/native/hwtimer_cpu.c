@@ -20,6 +20,11 @@
  * @}
  */
 
+#ifdef __MACH__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
+
 #include <time.h>
 #include <sys/time.h>
 #include <signal.h>
@@ -204,9 +209,20 @@ unsigned long hwtimer_arch_now(void)
 
     DEBUG("hwtimer_arch_now()\n");
 
+#ifdef __MACH__ 
+    clock_serv_t cclock;
+    mach_timespec_t mts;
+    host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
+    clock_get_time(cclock, &mts);
+    mach_port_deallocate(mach_task_self(), cclock);
+    t.tv_sec = mts.tv_sec;
+    t.tv_nsec = mts.tv_nsec;
+#else
     if (clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
         err(1, "hwtimer_arch_now: clock_gettime");
     }
+#endif
+
     native_hwtimer_now = ts2ticks(&t);
 
     DEBUG("hwtimer_arch_now(): it is now %lis %lins\n", t.tv_sec, t.tv_nsec);

@@ -19,7 +19,13 @@
 #ifndef _CPU_H
 #define _CPU_H
 
+#ifdef __MACH__
+#define _XOPEN_SOURCE
+#endif
 #include <ucontext.h>
+#ifdef __MACH__
+#undef _XOPEN_SOURCE
+#endif
 
 #include "kernel_intern.h"
 #include "sched.h"
