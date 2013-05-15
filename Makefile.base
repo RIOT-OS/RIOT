@@ -26,7 +26,7 @@ $(BINDIR)%.o: %.s
 	@$(AS) $(ASFLAGS) $*.s -o $(BINDIR)$*.o
 
 $(BINDIR)%.o: %.S
-	@gcc -c -m32 $*.S -o $(BINDIR)$*.o
+	@gcc -c $(CFLAGS) $*.S -o $(BINDIR)$*.o
 
 # remove compilation products
 clean::
