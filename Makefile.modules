@@ -19,6 +19,9 @@ ifeq ($(CPU),stm32f407vgt6)
 	USEMODULE += stm32f4xxstdperi
 	UNDEF += $(BINDIR)syscalls.o
 endif
+ifeq ($(CPU),msp430x16x)
+  USEMODULE += msp430_common
+endif
 
 #USEMODULE += cpu_drivers cpu core lib sys
 USEMODULE += cpu core sys
