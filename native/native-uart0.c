@@ -1,3 +1,8 @@
+/*
+ * TODO: 
+ * make stdin/stdout customizable.
+ */
+
 #include <err.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -41,4 +46,9 @@ void _native_init_uart0()
     FD_ZERO(&_native_uart_rfds);
     FD_SET(0, &_native_uart_rfds);
     puts("RIOT native uart0 initialized.");
+}
+
+int putchar(int c) {
+    write(1, &c, 1);
+    return 0;
 }
