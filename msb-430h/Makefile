@@ -5,9 +5,9 @@ export ARCH = msb-430h_base.a
 
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
-INCLUDES += -I$(RIOTBOARD)/msb-430-common/include/
-INCLUDES += -I$(RIOTBASE)/cpu/msp430-common/include/
-INCLUDES += -I$(RIOTBASE)/cpu/msp430x16x/include/
+INCLUDES += -I${RIOTBASE}/core/include/
+INCLUDES += -Iinclude/ -I$(RIOTBOARD)/msb-430-common/include/
+INCLUDES += -I$(RIOTBASE)/cpu/msp430-common/include/ -I$(RIOTBASE)/cpu/msp430x16x/include/
 INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include/ -I$(RIOTBASE)/sys/include
 
 all: $(BINDIR)$(ARCH)

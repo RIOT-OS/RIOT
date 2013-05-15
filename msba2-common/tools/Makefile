@@ -1,5 +1,6 @@
 CFLAGS = -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)"
 CC = gcc
+prefix=/usr/local
 
 all: lpc2k_pgm pseudoterm
 
@@ -31,15 +32,20 @@ cksum_test: cksum_test.c uuencode.o cksum_test.o
 	$(CC) $(CFLAGS) -o $(TARGETDIR)/cksum_test obj/cksum_test.o obj/uuencode.o
 
 boot_2xxx.c boot_2xxx.h: boot_2xxx.armasm mkbootc
-	arm-elf-as -o boot_2xxx.armobj boot_2xxx.armasm
-	arm-elf-objdump -d boot_2xxx.armobj | ./mkbootc boot_2xxx
+	arm-none-eabi-as -o boot_2xxx.armobj boot_2xxx.armasm
+	arm-none-eabi-objdump -d boot_2xxx.armobj | ./mkbootc boot_2xxx
 
 boot_23xx.c boot_23xx.h: src/boot_23xx.armasm mkbootc
-	arm-elf-as -o obj/boot_23xx.armobj src/boot_23xx.armasm
-	arm-elf-objdump -d obj/boot_23xx.armobj | ./mkbootc boot_23xx
+	arm-none-eabi-as -o obj/boot_23xx.armobj src/boot_23xx.armasm
+	arm-none-eabi-objdump -d obj/boot_23xx.armobj | ./mkbootc boot_23xx
 
 clean:
 	rm -f bin/lpc2k_pgm cksum_test obj/*.o core core.* obj/*.armobj bin/pseudoterm
+
+install:
+	install -m 0755 bin/lpc2k_pgm $(prefix)/bin
+
+.PHONY: install
 
 obj/gui.o: src/gui.c
 	$(CC) $(CFLAGS) `gtk-config --cflags` -c src/gui.c -o obj/gui.o

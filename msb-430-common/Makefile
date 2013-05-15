@@ -3,7 +3,7 @@ BINDIR = $(RIOTBOARD)/$(BOARD)/bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
-INCLUDES += -I$(RIOTBOARD)/msb-430-common/include/
+INCLUDES += -I$(RIOTBOARD)/msb-430-common/include/ -I${RIOTBOARD}/${BOARD}/include/
 INCLUDES += -I$(RIOTBASE)/cpu/msp430-common/include/
 INCLUDES += -I$(RIOTBASE)/cpu/mspx16x/include/
 INCLUDES += -I$(RIOTBASE)/drivers/include/
