@@ -17,7 +17,7 @@ include $(RIOTBASE)/Makefile.modules
 
 # your binaries to link
 BASELIBS += $(RIOTBOARD)/$(BOARD)/bin/$(BOARD)_base.a
-BASELIBS += $(PROJBINDIR)/project.a
+BASELIBS += $(PROJBINDIR)/${PROJECT}.a
 
 PROJBINDIR =$(CURDIR)/bin
 
@@ -32,11 +32,24 @@ all: $(PROJBINDIR)/$(PROJECT).a
 
 ## your make rules
 ## Only basic example - modify it for larger projects!!
-$(PROJBINDIR)/$(PROJECT).a: $(PROJBINDIR)/$(PROJECT).o
-	$(AR) -rc $(PROJBINDIR)/project.a $(PROJBINDIR)/$(PROJECT).o 
-	
-$(PROJBINDIR)/$(PROJECT).o: main.c 
-	$(CC) $(CFLAGS) $(BOARDINCLUDE) $(INCLUDES) -c main.c -o $(PROJBINDIR)/$(PROJECT).o
+#$(PROJBINDIR)/$(PROJECT).a: $(PROJBINDIR)/$(PROJECT).o
+#	$(AR) -rc $(PROJBINDIR)/project.a $(PROJBINDIR)/$(PROJECT).o 
+
+# string array of all names of c files in dir
+SRC = $(wildcard *.c)
+
+# string array of all names replaced .c with .o 
+OBJ = $(SRC:%.c=${PROJBINDIR}/%.o)
+
+${PROJBINDIR}/$(PROJECT).a:  $(OBJ)
+	$(AR) -rc bin/$(PROJECT).a $(OBJ)
+
+# pull in dependency info for *existing* .o files
+-include $(OBJ:.o=.d)
+
+${PROJBINDIR}/%.o: %.c
+	@echo; echo "Compiling.... $*.c"; echo
+	$(CC) $(CFLAGS) $(BOARDINCLUDE) $(INCLUDES) -c $*.c -o bin/$*.o
 
 clean:
 	$(MAKE) -C $(RIOTBOARD) clean
@@ -44,7 +57,7 @@ clean:
 	rm -f $(PROJBINDIR)/*
 
 flash: all
-	$(FLASHER) $(PORT) $(PROJBINDIR)/$(PROJECT).hex
+	$(FLASHER) $(FFLAGS)
 
 term:
 	$(TERM) $(PORT)

@@ -7,7 +7,7 @@
  * interrupt context and must use the shortest possible execution time (e.g.
  * set a flag and trigger a worker thread).
  *
- * <b>hwtimer must not be used within applications</b>, use \ref swtimer
+ * <b>hwtimer must not be used within applications</b>, use \ref vtimer
  * instead.
  *
  * @defgroup hwtimer    Hardware timer

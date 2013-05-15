@@ -24,6 +24,7 @@ this program.  If not, see http://www.gnu.org/licenses/ .
  * @ingroup     lpc2387
  * @brief       LPC2387 NewLib system calls implementation
  *
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Michael Baar <michael.baar@fu-berlin.de>
  *
  */

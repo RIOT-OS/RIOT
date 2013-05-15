@@ -11,7 +11,9 @@
 export PROJECT =foobar
 
 # for easy switching of boards
-export BOARD = msb-430
+ifeq ($(strip $(BOARD)),)
+	export BOARD = msba2
+endif
 
 # this has to be the absolute path of the RIOT-base dir
 export RIOTBASE =$(CURDIR)/../../RIOT
