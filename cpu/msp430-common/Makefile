@@ -1,4 +1,4 @@
-MODULE =cpu
+MODULE =msp430_common
 
 INCLUDES += -Iinclude -I$(RIOTBASE)/core/include/ -I$(RIOTBOARD)/$(BOARD)/include
 DIRS =
