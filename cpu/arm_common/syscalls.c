@@ -80,7 +80,8 @@ static caddr_t heap[NUM_HEAPS] = {(caddr_t)&__heap1_start,(caddr_t)&__heap3_star
 static const caddr_t heap_max[NUM_HEAPS] = {(caddr_t)&__heap1_max,(caddr_t)&__heap3_max,(caddr_t)&__heap2_max};
 // start position in heap
 static const caddr_t heap_start[NUM_HEAPS] = {(caddr_t)&__heap1_start,(caddr_t)&__heap3_start,(caddr_t)&__heap2_start};
-
+// current heap in use
+volatile static uint8_t iUsedHeap = 0;
 
 /** @} */
 
@@ -120,7 +121,7 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
     uint32_t cpsr = disableIRQ();
 
     /* check all heaps for a chunk of the requested size */
-    for (volatile uint8_t iUsedHeap = 0; iUsedHeap < NUM_HEAPS; iUsedHeap++ ) {
+    for (; iUsedHeap < NUM_HEAPS; iUsedHeap++ ) {
         caddr_t new_heap = heap[iUsedHeap] + incr;
 
         #ifdef MODULE_TRACELOG
