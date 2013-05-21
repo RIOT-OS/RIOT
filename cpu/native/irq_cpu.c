@@ -48,8 +48,6 @@ struct int_handler_t {
 static struct int_handler_t native_irq_handlers[255];
 char sigalt_stk[SIGSTKSZ];
 
-#define SIGMAX (255) // XXX: do this properly if possible
-
 void print_thread_sigmask(ucontext_t *cp)
 {
     sigset_t *p = &cp->uc_sigmask;
@@ -57,7 +55,7 @@ void print_thread_sigmask(ucontext_t *cp)
         err(1, "print_thread_sigmask: sigemptyset");
     }
 
-    for (int i = 1; i<(SIGMAX); i++) {
+    for (int i = 1; i<(NSIG); i++) {
         if (native_irq_handlers[i].func != NULL) {
             printf("%s: %s\n",
                     strsignal(i),
@@ -100,9 +98,9 @@ void native_print_signals()
         err(1, "native_print_signals(): sigprocmask");
     }
 
-    for (int i = 1; i<(SIGMAX); i++) {
+    for (int i = 1; i<(NSIG); i++) {
         if (native_irq_handlers[i].func != NULL || i == SIGUSR1) {
-            printf("%s: %s\n",
+            printf("%s: %s in active thread\n",
                     strsignal(i),
                     (sigismember(&native_sig_set, i) ? "blocked": "unblocked")
                   );
@@ -111,7 +109,7 @@ void native_print_signals()
             printf("%s: pending\n", strsignal(i));
         }
         if (sigismember(&q, i)) {
-            printf("%s: currently blocked\n", strsignal(i));
+            printf("%s: blocked in this context\n", strsignal(i));
         }
     }
 }
