@@ -9,7 +9,7 @@
 #define TCP_HC_H_
 
 #include "tcp.h"
-#include "sys/net/sixlowpan/sixlowip.h"
+#include "../sixlowpan/sixlowip.h"
 #include "socket.h"
 
 #ifdef TCP_HC

@@ -16,9 +16,9 @@
 #include "tcp.h"
 #include "in.h"
 #include "socket.h"
-#include "sys/net/net_help/net_help.h"
-#include "sys/net/net_help/msg_help.h"
-#include "sys/net/sixlowpan/sixlowpan.h"
+#include "../net_help/net_help.h"
+#include "../net_help/msg_help.h"
+#include "../sixlowpan/sixlowpan.h"
 
 void printTCPHeader(tcp_hdr_t *tcp_header)
 	{
