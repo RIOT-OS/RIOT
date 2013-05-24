@@ -7,7 +7,7 @@ all:
 clean:
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
 	-@if [ -d $(BINDIR) ] ; \
-	then rmdir $(BINDIR) ; \
+	then rm -rf $(BINDIR) ; \
 	fi 
 
 doc:
