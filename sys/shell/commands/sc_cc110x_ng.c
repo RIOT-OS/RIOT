@@ -69,7 +69,7 @@ void _cc110x_ng_send_handler(char *pkt) {
             p.dst = addr;
             mesg.type = SND_PKT;
             mesg.content.ptr = (char*) &tcmd;
-            printf("[cc110x] Sending packet of length %u to %hu: %s\n", p.length, p.dst, (char*) p.data);
+            printf("[cc110x] Sending packet of length %u to %u: %s\n", p.length, p.dst, (char*) p.data);
             msg_send_receive(&mesg, &mesg, transceiver_pid);
             response = mesg.content.value;
             printf("[cc110x] Packet sent: %lu\n", response);

@@ -36,6 +36,8 @@ and the mailinglist (subscription via web site)
 
 void (*int_handler)(int);
 extern void timerA_init(void);
+uint16_t overflow_interrupt[ARCH_MAXTIMERS+1];
+uint16_t timer_round;
 
 static void TA0_disable_interrupt(short timer) {
     volatile unsigned int *ptr = &TA0CCTL0 + (timer);
@@ -67,12 +69,13 @@ void TA0_unset(short timer) {
 }
 
 unsigned long hwtimer_arch_now() {
-	return TA0R;
+	return ((uint32_t)timer_round << 16)+TA0R;
 }
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu) {
     timerA_init();
     int_handler = handler;
+    TA0_enable_interrupt(0);
 }
 
 void hwtimer_arch_enable_interrupt(void) {
@@ -88,12 +91,14 @@ void hwtimer_arch_disable_interrupt(void) {
 }
 
 void hwtimer_arch_set(unsigned long offset, short timer) {
-    unsigned int value = hwtimer_arch_now() + offset;
+    unsigned long value = hwtimer_arch_now() + offset;
     hwtimer_arch_set_absolute(value, timer);
 }
 
 void hwtimer_arch_set_absolute(unsigned long value, short timer) {
-    TA0_set(value,timer);
+	uint16_t small_value = value % 0xFFFF;
+	overflow_interrupt[timer] = (uint16_t)(value >> 16);
+    TA0_set(small_value,timer);
 }
 
 void hwtimer_arch_unset(short timer) {
