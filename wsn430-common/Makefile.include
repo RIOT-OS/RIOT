@@ -1,0 +1,23 @@
+## the cpu to build for
+export CPU = msp430x16x
+export MCU = msp430f1611
+
+# toolchain config
+export PREFIX = @msp430-
+export CC = @$(PREFIX)gcc
+export AR = @$(PREFIX)ar
+export CFLAGS += -std=gnu99 -Wstrict-prototypes -gdwarf-2 -Os -Wall -mmcu=$(MCU)
+export ASFLAGS += -mmcu=$(MCU) --defsym $(MCU)=1 --gdwarf-2
+export AS = $(PREFIX)as
+export LINK = $(PREFIX)gcc
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+export LINKFLAGS = -mmcu=$(MCU) -lgcc $(RIOTBASE)/bin/startup.o
+export FLASHER = mspdebug
+ifeq ($(strip $(PORT)),)
+    export PORT = /dev/ttyUSB0
+endif
+export HEXFILE = bin/$(PROJECT).hex
+export FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
+
+export INCLUDES += -I $(RIOTCPU)/msp430-common/include/
