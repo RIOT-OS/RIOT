@@ -1,5 +1,5 @@
 /**
-  * board.h - wsn430-v1_3b Board.
+  * board.h - wsn430-v1_4 Board.
   * Copyright (C) 2013 Milan Babel <babel@inf.fu-berlin.de>
   *
   * This source code is licensed under the GNU Lesser General Public License,
@@ -10,19 +10,19 @@
 #define _WSN_BOARD_H
 
 /**
- * @defgroup	wsn430-v1_3b		Senslab WSN430 v1.3b
+ * @defgroup	wsn430-v1_4		Senslab WSN430 v1.4
  * @ingroup		wsn430
  *
 <h2>Compontents</h2>
 \li MSP430
-\li CC1100
+\li CC2420
 
 * @{
 */
 
 /**
  * @file
- * @brief		wsn430-v1_3b Board
+ * @brief		wsn430-v1_4 Board
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @author      Milan Babel <babel@inf.fu-berlin.de>

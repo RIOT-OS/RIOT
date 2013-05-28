@@ -1,9 +1,10 @@
   /*
    * driver_cc110x.c - Implementation of the board dependent cc1100 functions.
+   * Copyright (C) 2005, 2006, 2007, 2008 by Thomas Hillebrandt and Heiko Will
    * Copyright (C) 2013 Milan Babel <babel@inf.fu-berlin.de>
    *
-   * This source code is licensed under the GNU General Public License,
-   * Version 3.  See the file LICENSE for more details.
+   * This source code is licensed under the GNU Lesser General Public License,
+   * Version 2.  See the file LICENSE for more details.
    */
 
 #include <stdio.h>

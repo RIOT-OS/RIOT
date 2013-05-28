@@ -2,8 +2,8 @@
    * board_init.c - Implementation of functions to init board.
    * Copyright (C) 2013 Milan Babel <babel@inf.fu-berlin.de>
    *
-   * This source code is licensed under the GNU General Public License,
-   * Version 3.  See the file LICENSE for more details.
+   * This source code is licensed under the GNU Lesser General Public License,
+   * Version 2.  See the file LICENSE for more details.
    */
 
 #include "cpu.h"
@@ -49,7 +49,7 @@ static void msb_ports_init(void)
     // Port 1: GDO, Flash, BSL TX
     P1SEL = 0x02;    // Port1 Select: 00000010 = 0x02
     P1OUT = 0x00;    // Port1 Output: 00000000 = 0x00
-    P1DIR = 0xE7;    // Port1 Direction: 11100111 = 0xE7
+    P1DIR = 0x87;    // Port1 Direction: 10000111 = 0x87
 
     // Port 2: GPIO, BSL RX, 1wire
     P2SEL = 0x04;    // Port2 Select: 00000100 = 0x04
