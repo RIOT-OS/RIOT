@@ -1,3 +1,10 @@
+/**
+  * board-config.c.
+  *
+  * This source code is licensed under the GNU Lesser General Public License,
+  * Version 2.  See the file LICENSE for more details.
+  */
+
 #include <stdint.h>
 #include <string.h>
 #include <board-conf.h>

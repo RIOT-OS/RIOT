@@ -17,6 +17,10 @@ ifeq ($(BOARD),wsn430-v1_3b)
  INCLUDES += -I$(RIOTBOARD)/wsn430-v1_3b/include/
  INCLUDES += -I$(RIOTBOARD)/wsn430-common/include/
 endif
+ifeq ($(BOARD),wsn430-v1_4)
+ INCLUDES += -I$(RIOTBOARD)/wsn430-v1_4/include/
+ INCLUDES += -I$(RIOTBOARD)/wsn430-common/include/
+endif
 ifeq ($(BOARD),chronos)
  INCLUDES += -I$(RIOTBOARD)/chronos/include/
  INCLUDES += -I$(RIOTBOARD)/chronos/drivers/include/
