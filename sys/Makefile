@@ -77,8 +77,12 @@ ifneq (,$(findstring protocol-multiplex,$(USEMODULE)))
     DIRS += net/protocol-multiplex
 endif
 ifneq (,$(findstring sixlowpan,$(USEMODULE)))
+    DIRS += net/ieee802154
     DIRS += net/sixlowpan
     DIRS += net/sixlowpan/rpl
+endif
+ifneq (,$(findstring ieee802154,$(USEMODULE)))
+    DIRS += net/ieee802154
 endif
 
 all: $(BINDIR)$(MODULE).a 
