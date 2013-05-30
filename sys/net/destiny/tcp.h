@@ -71,7 +71,7 @@ enum tcp_codes
 
 #define TCP_STACK_SIZE 			1024
 
-#include "sys/net/sixlowpan/sixlowip.h"
+#include "../sixlowpan/sixlowip.h"
 
 typedef struct __attribute__ ((packed)) tcp_mms_o_t
 	{

@@ -5,12 +5,12 @@
 
 #include "udp.h"
 #include "msg.h"
-#include "sys/net/sixlowpan/sixlowip.h"
-#include "sys/net/sixlowpan/sixlowpan.h"
+#include "../sixlowpan/sixlowip.h"
+#include "../sixlowpan/sixlowpan.h"
 #include "socket.h"
 #include "in.h"
-#include "sys/net/net_help/net_help.h"
-#include "sys/net/net_help/msg_help.h"
+#include "../net_help/net_help.h"
+#include "../net_help/msg_help.h"
 
 uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
 	{

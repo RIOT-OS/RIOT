@@ -12,8 +12,8 @@
 #include "tcp_hc.h"
 #include "socket.h"
 #include "tcp.h"
-#include "sys/net/sixlowpan/sixlowip.h"
-#include "sys/net/net_help/net_help.h"
+#include "../sixlowpan/sixlowip.h"
+#include "../net_help/net_help.h"
 
 #ifdef TCP_HC
 

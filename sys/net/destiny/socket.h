@@ -12,7 +12,7 @@
 #include "tcp.h"
 #include "udp.h"
 #include "in.h"
-#include "sys/net/sixlowpan/sixlowip.h"
+#include "../sixlowpan/sixlowip.h"
 
 /*
  * Types

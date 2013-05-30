@@ -16,8 +16,8 @@
 #include "hwtimer.h"
 #include "tcp_timer.h"
 #include "tcp_hc.h"
-#include "sys/net/net_help/net_help.h"
-#include "sys/net/net_help/msg_help.h"
+#include "../net_help/net_help.h"
+#include "../net_help/msg_help.h"
 
 socket_internal_t sockets[MAX_SOCKETS];
 
