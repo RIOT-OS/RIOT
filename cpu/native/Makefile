@@ -5,6 +5,9 @@ DIRS =
 ifneq (,$(findstring rtc,$(USEMODULE)))
 	DIRS += rtc
 endif
+ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
+	DIRS += cc110x_ng
+endif
 
 all: $(BINDIR)$(MODULE).a
 	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;

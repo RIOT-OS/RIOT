@@ -1,7 +1,12 @@
 #include <stdio.h>
 #include <stdint.h>
-#include <malloc.h>
 #include <string.h>
+
+#ifdef __MACH__
+#include <stdlib.h>
+#else
+#include "malloc.h"
+#endif
 
 #include "ringbuffer.h"
 
