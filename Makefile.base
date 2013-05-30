@@ -10,8 +10,8 @@ DEP = $(SRC:%.c=$(BINDIR)%.d)
 include $(RIOTCPU)/Makefile.base
 include $(RIOTBOARD)/Makefile.base
 
-$(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ) $(ASSMOBJ)
-	$(AR) -rc $(BINDIR)$(MODULE).a $(OBJ) $(ASMOBJ) $(ASSMOBJ)
+$(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ)
+	$(AR) -rc $(BINDIR)$(MODULE).a $(OBJ) $(ASMOBJ)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
@@ -30,5 +30,5 @@ $(BINDIR)%.o: %.S
 
 # remove compilation products
 clean::
-	rm -f $(BINDIR)$(MODULE).a $(OBJ) $(DEP) $(ASMOBJ) $(ASSMOBJ)
+	rm -f $(BINDIR)$(MODULE).a $(OBJ) $(DEP) $(ASMOBJ)
 	
