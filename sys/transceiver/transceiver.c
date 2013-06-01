@@ -115,7 +115,11 @@ void transceiver_init(transceiver_type_t t) {
         reg[i].pid          = 0;
     }
     if (t & TRANSCEIVER_CC1100) {
-        transceivers |= t;
+
+    	//transceivers |= t;
+    	// the above probably results in transceivers = TRANSCEIVER_CC1100 | TRANSCEIVER_CC1020;
+    	// which is 3 and not defined
+    	transceivers = t;
     }
     else {
         puts("Invalid transceiver type");
@@ -151,7 +155,8 @@ uint8_t transceiver_register(transceiver_type_t t, int pid) {
        return ENOMEM;
    }
    else {
-       reg[i].transceivers |= t;
+       //reg[i].transceivers |= t; //it probably results 3 (undefined)
+	   reg[i].transceivers = t;
        reg[i].pid         = pid;
        DEBUG("Thread %i registered for %i\n", reg[i].pid, reg[i].transceivers);
        return 1;
