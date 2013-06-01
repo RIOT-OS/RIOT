@@ -45,7 +45,7 @@ void thread_print_stack(void)
     return;
 }
 
-char *thread_stack_init(void *task_func, void *stack_start, int stacksize)
+char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksize)
 {
     unsigned int *stk;
     ucontext_t *p;
