@@ -1,11 +1,10 @@
 /**
  * platform-independent kernel initialization
  *
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2010 Freie Universität Berlin
  *
- * This file subject to the terms and conditions of the GNU Lesser General
- * Public License. See the file LICENSE in the top level directory for more
- * details.
+ * This file subject to the terms and conditions of the GNU General Public
+ * License. See the file LICENSE in the top level directory for more details.
  *
  * @ingroup kernel
  * @{
@@ -20,7 +19,7 @@
 #include <errno.h>
 #include <tcb.h>
 #include <kernel.h>
-#include <kernel_internal.h>
+#include <kernel_intern.h>
 #include <sched.h>
 #include <flags.h>
 #include <cpu.h>
@@ -31,6 +30,7 @@
 #include <auto_init.h>
 #endif
 
+#define ENABLE_DEBUG
 #include <debug.h>
 
 volatile tcb_t *sched_threads[MAXTHREADS];
@@ -39,16 +39,15 @@ volatile int lpm_prevent_sleep = 0;
 
 extern int main(void);
 
-static void idle_thread(void)
-{
-    while (1) {
+static void idle_thread(void) {
+    while(1) {
         if (lpm_prevent_sleep) {
             lpm_set(LPM_IDLE);
         }
         else {
             lpm_set(LPM_IDLE);
-            /* lpm_set(LPM_SLEEP); */
-            /* lpm_set(LPM_POWERDOWN); */
+//            lpm_set(LPM_SLEEP);          
+//            lpm_set(LPM_POWERDOWN);
         }
     }
 }
@@ -69,7 +68,7 @@ void kernel_init(void)
 {
     dINT();
     printf("kernel_init(): This is RIOT!\n");
-
+    
     sched_init();
 
     if (thread_create(idle_stack, sizeof(idle_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, idle_name) < 0) {
@@ -81,7 +80,7 @@ void kernel_init(void)
     }
 
     printf("kernel_init(): jumping into first task...\n");
-
+   
     cpu_switch_context_exit();
 }
 
