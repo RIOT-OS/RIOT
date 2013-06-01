@@ -39,7 +39,6 @@ extern volatile tcb_t *active_thread;
 
 unsigned int _native_saved_eip;
 ucontext_t *_native_cur_ctx, *_native_isr_ctx;
-int _native_in_isr;
 
 static int pipefd[2];
 
