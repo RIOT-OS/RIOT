@@ -323,7 +323,7 @@ int register_interrupt(int sig, void (*handler)(void))
 
     native_irq_handlers[sig].func = handler;
 
-    sa.sa_sigaction = (void*) native_isr_entry;
+    sa.sa_sigaction = native_isr_entry;
     /* sa.sa_handler = (void*) native_isr_entry; */
 
     if (sigemptyset(&sa.sa_mask) == -1) {
@@ -387,7 +387,7 @@ void native_interrupt_init(void)
         native_irq_handlers[i].func = NULL;
     }
 
-    sa.sa_sigaction = (void*) native_isr_entry;
+    sa.sa_sigaction = native_isr_entry;
     if (sigemptyset(&sa.sa_mask) == -1) {
         err(1, "native_interrupt_init: sigemptyset");
     }
