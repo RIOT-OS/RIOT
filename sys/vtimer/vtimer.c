@@ -262,7 +262,7 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr){
     // if the msg_send_int prototype ( int(*)(msg_t*, unsigned int) )
     // is not used reading or accessing t->action
     typedef void (*action_ri)(void*);
-    action_ri new_action = reinterpret_cast<action_ri>(thread_wakeup);
+    action_ri new_action = reinterpret_cast<action_ri>(msg_send_int);
     t->action = new_action;
 #endif
     t->arg = ptr;
