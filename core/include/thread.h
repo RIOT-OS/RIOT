@@ -16,6 +16,11 @@
 #include <kernel.h>
 #include <tcb.h>
 
+#ifdef __cplusplus
+#include "sched.h"
+#endif
+
+
 /** Minimum stack size */
 #ifndef MINIMUM_STACK_SIZE
 #define MINIMUM_STACK_SIZE	(sizeof(tcb_t))
@@ -62,8 +67,13 @@ int thread_wakeup(int pid);
  * @brief   Returns the process ID of the currently running thread.
  * @return  Obviously you are not a golfer.
  */
+#ifndef __cplusplus
 int thread_getpid(void);
-
+#else
+inline int thread_getpid(void) {
+    return active_thread->pid;
+}
+#endif
 /**
  * @brief   Returns the process ID of the thread running before the current one.
  * @return  Obviously you are not a golfer.
