@@ -42,7 +42,7 @@ static radio_address_t radio_address;                     ///< Radio address
 static uint8_t radio_channel;                             ///< Radio channel
 
 // already defined in included file cc110x_ng.h
-//int transceiver_pid;                         ///< the transceiver thread pid
+int transceiver_pid;                         ///< the transceiver thread pid
 
 /* internal function prototypes */
 static int rd_set_mode(int mode);
