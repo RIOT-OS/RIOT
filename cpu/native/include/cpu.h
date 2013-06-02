@@ -63,7 +63,11 @@ int unregister_interrupt(int sig);
 /* this should be defined elsewhere */
 void thread_yield(void);
 
+#ifndef __cplusplus
 extern void _native_sig_leave_tramp(void);
+#else
+extern "C" void _native_sig_leave_tramp(void);
+#endif
 extern ucontext_t *_native_cur_ctx, *_native_isr_ctx;
 extern unsigned int _native_saved_eip;
 extern int _native_in_isr;
