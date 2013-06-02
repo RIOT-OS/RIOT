@@ -81,8 +81,6 @@ void ltc4150_sync_blocking(void)
  */
 void ltc4150_arch_init(void)
 {
-    struct sigevent sev;
-
     ltc4150_disable_int();
 
     puts("Native LTC4150 initialized.");
