@@ -29,6 +29,15 @@ ifeq ($(shell uname -s),Darwin)
 endif
 endif
 
+# backward compatability with glibc <= 2.17 for native
+ifeq ($(CPU),native)
+ifeq ($(shell uname -s),Linux)
+ifeq ($(shell ldd --version |  awk '/^ldd/{if ($$NF < 2.17) {print "yes"} else {print "no"} }'),yes)
+	LINKFLAGS += -lrt
+endif
+endif
+endif
+
 ## make script for your project. Build RIOT-base here!
 all: $(PROJBINDIR)/$(PROJECT).a
 	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
