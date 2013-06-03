@@ -12,7 +12,7 @@
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  * @}
  */
-
+#include <stdio.h>
 #include "board.h"
 
 /**
