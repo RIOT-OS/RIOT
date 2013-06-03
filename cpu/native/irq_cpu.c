@@ -294,6 +294,9 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
 #ifdef __MACH__
         _native_saved_eip =  ((ucontext_t*)context)->uc_mcontext->__ss.__eip;
         ((ucontext_t*)context)->uc_mcontext->__ss.__eip = (unsigned int)&_native_sig_leave_tramp;
+#elif BSD
+        _native_saved_eip = ((struct sigcontext*)context)->sc_eip;
+        ((struct sigcontext*)context)->sc_eip = (unsigned int)&_native_sig_leave_tramp;
 #else
         _native_saved_eip = ((ucontext_t*)context)->uc_mcontext.gregs[REG_EIP];
         ((ucontext_t*)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
