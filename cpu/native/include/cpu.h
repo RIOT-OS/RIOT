@@ -19,12 +19,22 @@
 #ifndef _CPU_H
 #define _CPU_H
 
-#ifdef __MACH__
+#include <sys/param.h>
+
+/* enable signal handler register access on different platforms
+ * check here for more:
+ * http://sourceforge.net/p/predef/wiki/OperatingSystems/
+ */
+#ifdef BSD // BSD = (FreeBSD, Darwin, ...)
 #define _XOPEN_SOURCE
+#elif defined(__linux__)
+#define __USE_GNU
 #endif
 #include <ucontext.h>
-#ifdef __MACH__
+#ifdef BSD
 #undef _XOPEN_SOURCE
+#elif defined(__linux__)
+#undef __USE_GNU
 #endif
 
 #include "kernel_intern.h"

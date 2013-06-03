@@ -16,9 +16,8 @@
 #include <string.h>
 #include <unistd.h>
 
-// __USE_GNU for gregs[REG_EIP] access
+// __USE_GNU for gregs[REG_EIP] access under Linux
 #define __USE_GNU
-#include <ucontext.h>
 #include <signal.h>
 #undef __USE_GNU
 
