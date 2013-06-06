@@ -26,11 +26,25 @@
 
 #include "cpu.h"
 #include "cpu-conf.h"
+#include "hwtimer.h"
 
 #define native_ltc4150_startup_delay 10
 
-static timer_t native_ltc4150_timer;
-static struct itimerspec native_ltc4150_timer_time;
+static int _int_enabled;
+
+/**
+ * native ltc4150 hwtimer - interrupt handler proxy
+ */
+static void _int_handler()
+{
+    DEBUG("ltc4150 _int_handler()\n");
+    ltc4150_interrupt();
+    if (_int_enabled == 1) {
+        if (hwtimer_set(100000, _int_handler, NULL) == -1) {
+            errx(1, "_int_handler: hwtimer_set");
+        };
+    }
+}
 
 /**
  * unregister signal handler
@@ -38,7 +52,7 @@ static struct itimerspec native_ltc4150_timer_time;
 void ltc4150_disable_int(void)
 {
     DEBUG("ltc4150_disable_int()\n");
-    unregister_interrupt(_SIG_LTC4150);
+    _int_enabled = 0;
 }
 
 /**
@@ -47,7 +61,10 @@ void ltc4150_disable_int(void)
 void ltc4150_enable_int(void)
 {
     DEBUG("ltc4150_enable_int()\n");
-    register_interrupt(_SIG_LTC4150, ltc4150_interrupt);
+    _int_enabled = 1;
+    if (hwtimer_set(100000, _int_handler, NULL) == -1) {
+        errx(1, "ltc4150_enable_int: hwtimer_set");
+    };
 }
 
 /**
@@ -64,28 +81,7 @@ void ltc4150_sync_blocking(void)
  */
 void ltc4150_arch_init(void)
 {
-    struct sigevent sev;
-
     ltc4150_disable_int();
-
-    /* create timer */
-    sev.sigev_notify = SIGEV_SIGNAL;
-    sev.sigev_signo = _SIG_LTC4150;
-    sev.sigev_value.sival_ptr = &native_ltc4150_timer;
-
-    if (timer_create(CLOCK_MONOTONIC, &sev, &native_ltc4150_timer) == -1) {
-        err(1, "ltc4150_arch_init(): timer_create");
-    }
-
-    /* set timer */
-    native_ltc4150_timer_time.it_value.tv_sec = 0;
-    native_ltc4150_timer_time.it_value.tv_nsec = 100000000;
-    native_ltc4150_timer_time.it_interval.tv_sec = 0;
-    native_ltc4150_timer_time.it_interval.tv_nsec = 100000000;
-
-    if (timer_settime(native_ltc4150_timer, 0, &native_ltc4150_timer_time, NULL) == -1) {
-        err(1, "ltc4150_arch_init: timer_settime");
-    }
 
     puts("Native LTC4150 initialized.");
 }
