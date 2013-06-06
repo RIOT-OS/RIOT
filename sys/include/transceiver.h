@@ -4,10 +4,12 @@
 #include <radio/types.h>
 
 /* Stack size for transceiver thread */
+#ifndef TRANSCEIVER_STACK_SIZE
 #ifdef ENABLE_DEBUG
 #define TRANSCEIVER_STACK_SIZE      (2048)
 #else
 #define TRANSCEIVER_STACK_SIZE      (512)
+#endif
 #endif
 
 #ifdef MODULE_CC2420

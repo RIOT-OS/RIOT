@@ -1,5 +1,8 @@
 ASMSRC = $(wildcard *.s)
+ASSMSRC = $(wildcard *.S)
 ASMOBJ = $(ASMSRC:%.s=$(BINDIR)%.o)
+ASMOBJ += $(ASSMSRC:%.S=$(BINDIR)%.o)
+
 SRC = $(wildcard *.c)
 OBJ = $(SRC:%.c=$(BINDIR)%.o)
 DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -21,6 +24,9 @@ $(BINDIR)%.o: %.c
 
 $(BINDIR)%.o: %.s
 	@$(AS) $(ASFLAGS) $*.s -o $(BINDIR)$*.o
+
+$(BINDIR)%.o: %.S
+	@gcc -c $(CFLAGS) $*.S -o $(BINDIR)$*.o
 
 # remove compilation products
 clean::
