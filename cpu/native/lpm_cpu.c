@@ -18,9 +18,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#ifdef MODULE_UART0
+#include <sys/select.h>
+#include <errno.h>
+#endif
 
 #include "lpm.h"
 #include "debug.h"
+#include "cpu.h"
+#ifdef MODULE_UART0
+#include "board.h"
+#endif
 
 static enum lpm_mode native_lpm;
 
@@ -29,6 +37,32 @@ void lpm_init(void)
     DEBUG("lpm_init()\n");
     native_lpm = LPM_ON;
     return;
+}
+
+void _native_lpm_sleep()
+{
+#ifdef MODULE_UART0
+    int retval;
+    retval = select(1, &_native_uart_rfds, NULL, NULL, NULL);
+    DEBUG("_native_lpm_sleep: retval: %i\n", retval);
+    if (retval != -1) {
+        DEBUG("\n\n\t\treturn from syscall, calling _native_handle_uart0_input\n\n");
+        makecontext(_native_isr_ctx, _native_handle_uart0_input, 0);
+        swapcontext(_native_cur_ctx, _native_isr_ctx);
+    }
+    else if (errno != EINTR) {
+        err(1, "lpm_set(): select()");
+    }
+#else
+    pause();
+#endif 
+
+    if (_native_sigpend > 0) {
+        DEBUG("\n\n\t\treturn from syscall, calling native_irq_handler\n\n");
+        _native_in_syscall = 0;
+        _native_in_isr = 1;
+        swapcontext(_native_cur_ctx, _native_isr_ctx);
+    }
 }
 
 /**
@@ -40,7 +74,7 @@ enum lpm_mode lpm_set(enum lpm_mode target)
 {
     enum lpm_mode last_lpm;
 
-    DEBUG("lpm_set(%i)\n", target);
+    //DEBUG("lpm_set(%i)\n", target);
 
     last_lpm = native_lpm;
     native_lpm = target;
@@ -51,8 +85,11 @@ enum lpm_mode lpm_set(enum lpm_mode target)
             break;
 
         case LPM_IDLE:
-            DEBUG("lpm_set(): pause()\n");
-            pause();
+            //DEBUG("lpm_set(): pause()\n");
+
+            _native_in_syscall = 1;
+            //pause();
+            _native_lpm_sleep();
             break;
 
         /* XXX: unfinished modes: */

@@ -8,6 +8,9 @@ endif
 ifneq (,$(findstring msba2,$(BOARD)))
 	DIRS += spi 
 endif
+ifneq (,$(findstring native,$(BOARD)))
+	DIRS += spi 
+endif
 
 all: $(BINDIR)$(MODULE).a
 	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;

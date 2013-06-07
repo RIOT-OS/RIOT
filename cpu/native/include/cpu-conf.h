@@ -17,17 +17,22 @@
 #include <signal.h>
 
 /* TODO: choose more sensibly? */
-#ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   8192
+#ifdef __MACH__
+#define KERNEL_CONF_STACKSIZE_DEFAULT   (163840)
+#define KERNEL_CONF_STACKSIZE_IDLE      (163840)
+#define NATIVE_ISR_STACKSIZE            (163840)
+#define TRANSCEIVER_STACK_SIZE          (163840)
+#define MINIMUM_STACK_SIZE              (163840)
+#else
+#define KERNEL_CONF_STACKSIZE_DEFAULT   (16384)
+#define KERNEL_CONF_STACKSIZE_IDLE      (16384)
+#define NATIVE_ISR_STACKSIZE            (16384)
+#define TRANSCEIVER_STACK_SIZE          (16384)
+#define MINIMUM_STACK_SIZE              (16384)
 #endif
 
-#define KERNEL_CONF_STACKSIZE_IDLE      2048
-#define NATIVE_ISR_STACKSIZE            8192
-
-#define _SIG_UNDEF          SIGRTMIN + 0
-#define _SIG_TIMER          SIGRTMIN + 10 // check hwtimer_cpu.h for compliance
-#define _SIG_LTC4150        SIGRTMIN + 20
-
-/* TODO: check for overflow (SIGRTMAX) */
+/* for cc110x_ng */
+#define RX_BUF_SIZE (10)
+#define TRANSCEIVER_BUFFER_SIZE (3)
 
 #endif /* CPUCONF_H_ */

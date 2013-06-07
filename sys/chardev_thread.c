@@ -30,7 +30,7 @@ void chardev_loop(ringbuffer_t *rb) {
         msg_receive(&m);
 
         if (m.sender_pid != pid) {
-            DEBUG("Receiving message from another thread");
+            DEBUG("Receiving message from another thread\n");
             switch (m.type) {
                 case OPEN:
                     if (reader_pid == -1) {

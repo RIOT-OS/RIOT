@@ -17,7 +17,9 @@
 #include <tcb.h>
 
 /** Minimum stack size */
+#ifndef MINIMUM_STACK_SIZE
 #define MINIMUM_STACK_SIZE	(sizeof(tcb_t))
+#endif
 
 /**
  * @brief Creates a new thread.
