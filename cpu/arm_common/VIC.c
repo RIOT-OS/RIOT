@@ -61,6 +61,13 @@ unsigned restoreIRQ(unsigned oldCPSR)
   return _cpsr;
 }
 
+unsigned IRQenabled(void) {
+    unsigned _cpsr;
+
+    _cpsr = __get_cpsr();
+    return (_cpsr & IRQ_MASK);
+}
+
 unsigned enableIRQ(void)
 {
   unsigned _cpsr;
