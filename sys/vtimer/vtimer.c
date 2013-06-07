@@ -184,6 +184,7 @@ static int vtimer_set(vtimer_t *timer) {
     return result;
 }
 
+/* TODO: Do NOT return a struct! */
 timex_t vtimer_now() {
     timex_t t = timex_set(seconds, hwtimer_now()-longterm_tick_start);
     return t;
