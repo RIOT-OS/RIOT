@@ -43,6 +43,16 @@ extern void _cc110x_ng_monitor_handler(char *mode);
 #endif
 #endif
 
+#ifdef MODULE_TRANSCEIVER
+#ifdef MODULE_CC2420
+extern void _cc2420_get_set_address_handler(char *addr);
+extern void _cc2420_get_set_channel_handler(char *chan);
+extern void _cc2420_get_set_pan_handler(char *pan);
+extern void _cc2420_send_handler(char *pkt);
+extern void _cc2420_monitor_handler(char *mode);
+#endif
+#endif
+
 #ifdef MODULE_MCI
 extern void _get_sectorsize(char *unused);
 extern void _get_blocksize(char* unused);
@@ -85,6 +95,15 @@ const shell_command_t _shell_command_list[] = {
     {"chan", "Gets or sets the channel for the CC1100 transceiver", _cc110x_ng_get_set_channel_handler},
     {"txtsnd", "Sends a text message to a given node via the CC1100 transceiver", _cc110x_ng_send_handler},
     {"monitor", "Enables or disables address checking for the CC1100 transceiver", _cc110x_ng_monitor_handler},
+#endif
+#endif
+#ifdef MODULE_TRANSCEIVER
+#ifdef MODULE_CC2420
+    {"addr", "Gets or sets the address for the CC2420 transceiver", _cc2420_get_set_address_handler},
+    {"chan", "Gets or sets the channel for the CC2420 transceiver", _cc2420_get_set_channel_handler},
+    {"pan", "Gets or sets the pan id for the CC2420 transceiver", _cc2420_get_set_pan_handler},
+    {"txtsnd", "Sends a text message to a given node via the C2420 transceiver", _cc2420_send_handler},
+    {"monitor", "Enables or disables address checking for the CC2420 transceiver", _cc2420_monitor_handler},
 #endif
 #endif
 #ifdef MODULE_MCI
