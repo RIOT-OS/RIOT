@@ -9,7 +9,7 @@
 #define ENABLE_DEBUG
 #include <debug.h>
 
-extern void main(void);
+extern int main(void);
 
 void auto_init(void) {
 #ifdef MODULE_BOARD_DISPLAY
