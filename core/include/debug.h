@@ -16,6 +16,9 @@
  * @}
  */
 
+#ifndef DEBUG_H_
+#define DEBUG_H_
+
 #include <stdio.h>
 
 #ifdef ENABLE_DEBUG
@@ -23,3 +26,5 @@
 #else
 #define DEBUG(...)
 #endif
+
+#endif /* DEGUG_H_ */
