@@ -4,6 +4,9 @@ DIRS=
 ifneq (,$(findstring powermon,$(USEMODULE)))
     DIRS += powermon
 endif
+ifneq (,$(findstring cc2420,$(USEMODULE)))
+    DIRS += cc2420
+endif
 ifneq (,$(findstring sht11,$(USEMODULE)))
     DIRS += sht11
 endif

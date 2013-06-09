@@ -8,6 +8,9 @@ endif
 ifneq (,$(findstring msba2,$(BOARD)))
 	DIRS += spi 
 endif
+ifneq (,$(findstring wsn430-v1_3b,$(BOARD)))
+	DIRS += spi 
+endif
 ifneq (,$(findstring native,$(BOARD)))
 	DIRS += spi 
 endif

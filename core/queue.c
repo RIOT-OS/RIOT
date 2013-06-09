@@ -89,12 +89,12 @@ void queue_print(queue_node_t* node) {
     printf("queue:\n");
     while (node->next != NULL) {
         node = node->next;
-        printf("Data: %u Priority: %u\n", node->data, node->priority);
+        printf("Data: %u Priority: %lu\n", node->data, node->priority);
     }
 }
 
 void queue_print_node(queue_node_t *node) {
-    printf("Data: %u Priority: %u Next: %u\n", (unsigned int)node->data, node->priority, (unsigned int)node->next);
+    printf("Data: %u Priority: %lu Next: %u\n", (unsigned int)node->data, node->priority, (unsigned int)node->next);
 }
 
 /*

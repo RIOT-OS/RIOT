@@ -51,6 +51,6 @@ and the mailinglist (subscription via web site)
 #endif
 
 #define HWTIMER_SPEED 32768
-#define HWTIMER_MAXTICKS (0xFFFF)
+#define HWTIMER_MAXTICKS (0xFFFFFFFF)
 
 #endif // __HWTIMER_CPU_H
