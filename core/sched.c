@@ -96,7 +96,10 @@ void sched_run() {
 
     if (num_tasks == 0) {
         DEBUG("scheduler: no tasks left.\n");
-        while(! num_tasks);
+        while(! num_tasks) {
+          /* loop until a new task arrives */
+          ;
+        }
         DEBUG("scheduler: new task created.\n");
     }
 
