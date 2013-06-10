@@ -212,14 +212,12 @@ void lowpan_transfer(void)
 	msg_t m_recv, m_send;
 	ipv6_hdr_t *ipv6_buf;
 	lowpan_reas_buf_t *current_buf;
-	long temp_time;
 	uint8_t gotosleep;
 
 	while (1)
 		{
-		temp_time = LONG_MAX;
-		gotosleep = 1;
 
+		gotosleep = 1;
 		mutex_lock(&fifo_mutex);
 		current_buf = packet_fifo;
 		if (current_buf != NULL)

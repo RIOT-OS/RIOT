@@ -72,13 +72,13 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra, 
 void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                           ieee_802154_long_t *s_laddr,
                           ieee_802154_long_t *d_laddr);
-uint8_t lowpan_context_len();
+uint8_t lowpan_context_len(void);
 void add_fifo_packet(lowpan_reas_buf_t *current_packet);
 lowpan_context_t * lowpan_context_update(
                         uint8_t num, const ipv6_addr_t *prefix, 
                         uint8_t length, uint8_t comp,
                         uint16_t lifetime);
-lowpan_context_t * lowpan_context_get();
+lowpan_context_t * lowpan_context_get(void);
 lowpan_context_t * lowpan_context_lookup(ipv6_addr_t *addr);
 lowpan_context_t * lowpan_context_num_lookup(uint8_t num);
 lowpan_reas_buf_t *collect_garbage_fifo(lowpan_reas_buf_t *current_buf);

@@ -10,7 +10,7 @@ rpl_of_t rpl_of0 = {
 	NULL
 };
 
-rpl_of_t *rpl_get_of0(){
+rpl_of_t *rpl_get_of0(void){
 	return &rpl_of0;
 }
 
