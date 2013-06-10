@@ -293,7 +293,7 @@ void send_DIS(ipv6_addr_t *destination){
 	icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
 
 	icmp_send_buf->type = ICMP_RPL_CONTROL;
-	icmp_send_buf->code = ICMP_CODE_DIO;
+	icmp_send_buf->code = ICMP_CODE_DIS;
 	icmp_send_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
 	
 	rpl_send_dis_buf = get_rpl_send_dis_buf();
