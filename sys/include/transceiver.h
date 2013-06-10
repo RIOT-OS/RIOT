@@ -12,8 +12,11 @@
 #endif
 #endif
 
+#ifdef MODULE_CC2420
+#define PAYLOAD_SIZE  (118)
+#else
 #define PAYLOAD_SIZE  (58)
-
+#endif
 /* The maximum of threads to register */
 #define TRANSCEIVER_MAX_REGISTERED  (4)
 
@@ -22,12 +25,26 @@
 #define TRANSCEIVER_MSG_BUFFER_SIZE     (32)
 
 /**
+ * @brief All supported transceivers
+ */
+#define TRANSCEIVER_NONE    (0x0)       ///< Invalid
+#define TRANSCEIVER_CC1100  (0x01)      ///< CC110X transceivers
+#define TRANSCEIVER_CC1020  (0x02)      ///< CC1020 transceivers
+#define TRANSCEIVER_CC2420  (0x04)      ///< CC2420 transceivers
+
+/**
+ * @brief Data type for transceiver specification
+ */
+typedef uint16_t transceiver_type_t;
+
+/**
  * @brief Message types for transceiver interface
  */
 enum transceiver_msg_type_t {
     /* Message types for driver <-> transceiver communication */
     RCV_PKT_CC1020,        ///< packet was received by CC1020 transceiver
     RCV_PKT_CC1100,        ///< packet was received by CC1100 transceiver
+    RCV_PKT_CC2420,        ///< packet was received by CC2420 transceiver
 
     /* Message types for transceiver <-> upper layer communication */
     PKT_PENDING,    ///< packet pending in transceiver buffer
@@ -40,6 +57,8 @@ enum transceiver_msg_type_t {
     GET_ADDRESS,    ///< Get the radio address
     SET_ADDRESS,    ///< Set the radio address
     SET_MONITOR,    ///< Set transceiver to monitor mode (disable address checking)
+    GET_PAN,        ///< Get current pan
+    SET_PAN,        ///< Set a new pan
 
     /* debug message types */
     DBG_IGN,        ///< add a physical address to the ignore list
@@ -47,15 +66,6 @@ enum transceiver_msg_type_t {
     /* Error messages */
     ENOBUFFER,      ///< No buffer left
 };
-
-/**
- * @brief All supported transceivers
- */
-typedef enum {
-    TRANSCEIVER_NONE,       ///< Invalid
-    TRANSCEIVER_CC1100,     ///< CC110X transceivers
-    TRANSCEIVER_CC1020      ///< CC1020 transceivers
-} transceiver_type_t;
 
 /**
  * @brief Manage registered threads per transceiver
