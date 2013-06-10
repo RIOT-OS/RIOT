@@ -65,18 +65,18 @@ static struct icmpv6_hdr_t * get_rpl_send_icmpv6_buf(uint8_t ext_len){
 	//return ((struct icmpv6_hdr_t*)&(rpl_send_buffer[LLHDR_IPV6HDR_LEN + ext_len]));
 	return ((struct icmpv6_hdr_t*)&(rpl_send_buffer[IPV6_HDR_LEN + ext_len]));
 }
-static struct rpl_dio_t* get_rpl_send_dio_buf(){
+static struct rpl_dio_t* get_rpl_send_dio_buf(void){
 	//return ((struct rpl_dio_t*)&(rpl_send_buffer[LLHDR_ICMPV6HDR_LEN]));
 	return ((struct rpl_dio_t*)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
-static struct rpl_dao_t* get_rpl_send_dao_buf(){
+static struct rpl_dao_t* get_rpl_send_dao_buf(void){
 	//return ((struct rpl_dao_t*)&(rpl_send_buffer[LLHDR_ICMPV6HDR_LEN]));
 	return ((struct rpl_dao_t*)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
-static struct rpl_dao_ack_t* get_rpl_send_dao_ack_buf(){
+static struct rpl_dao_ack_t* get_rpl_send_dao_ack_buf(void){
 	return ((struct rpl_dao_ack_t*)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
-static struct rpl_dis_t* get_rpl_send_dis_buf(){
+static struct rpl_dis_t* get_rpl_send_dis_buf(void){
 	//return ((struct rpl_dis_t*)&(rpl_send_buffer[LLHDR_ICMPV6HDR_LEN]));
 	return ((struct rpl_dis_t*)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
@@ -98,17 +98,17 @@ static struct rpl_opt_transit_t* get_rpl_send_opt_transit_buf(uint8_t rpl_msg_le
 static struct ipv6_hdr_t * get_rpl_ipv6_buf(void){
 	return ((struct ipv6_hdr_t*)&(rpl_buffer[0]));
 }
-static struct rpl_dio_t* get_rpl_dio_buf(){
+static struct rpl_dio_t* get_rpl_dio_buf(void){
 	return ((struct rpl_dio_t*)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
 
-static struct rpl_dao_t* get_rpl_dao_buf(){
+static struct rpl_dao_t* get_rpl_dao_buf(void){
 	return ((struct rpl_dao_t*)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
-static struct rpl_dao_ack_t* get_rpl_dao_ack_buf(){
+static struct rpl_dao_ack_t* get_rpl_dao_ack_buf(void){
 	return ((struct rpl_dao_ack_t*)&(buffer[LLHDR_ICMPV6HDR_LEN]));
 }
-static struct rpl_dis_t* get_rpl_dis_buf(){
+static struct rpl_dis_t* get_rpl_dis_buf(void){
 	return ((struct rpl_dis_t*)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
 static struct rpl_opt_t* get_rpl_opt_buf(uint8_t rpl_msg_len){
@@ -188,7 +188,7 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address){
 
 }
 
-void rpl_init_root(){
+void rpl_init_root(void){
 	rpl_instance_t *inst;
 	rpl_dodag_t *dodag;
 
@@ -892,7 +892,7 @@ rpl_routing_entry_t *rpl_find_routing_entry(ipv6_addr_t *addr){
 	return NULL;
 }
 
-void rpl_clear_routing_table(){
+void rpl_clear_routing_table(void){
 	for(uint8_t i=0; i<RPL_MAX_ROUTING_ENTRIES; i++){
 		memset(&routing_table[i], 0, sizeof(routing_table[i]));
 	}
