@@ -40,7 +40,6 @@ and the mailinglist (subscription via web site)
  *
  * @note        $Id$
  */
-#include <board.h>
 #include <lpc23xx.h>
 #include <VIC.h>
 #include <cpu.h>
