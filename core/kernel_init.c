@@ -61,7 +61,7 @@ static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
 #ifdef MODULE_AUTO_INIT
 #define MAIN_FUNC auto_init
 #else
-#define MAIN_FUNC main
+#define MAIN_FUNC ((void (*) (void))  main)
 #endif
 
 void kernel_init(void)
