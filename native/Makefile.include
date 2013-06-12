@@ -5,7 +5,7 @@ export CPU = native
 export PREFIX = 
 #export CC = @$(PREFIX)gcc
 export AR = @$(PREFIX)ar
-export CFLAGS = -std=gnu99 -Wall -m32
+export CFLAGS += -std=gnu99 -Wall -m32
 export ASFLAGS =
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
@@ -14,7 +14,7 @@ export OBJCOPY = $(PREFIX)objcopy
 FLASHER = lpc2k_pgm
 TERM = pyterm.py
 
-LINKFLAGS = -m32
+LINKFLAGS = -m32 -gc
 
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0

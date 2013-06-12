@@ -2,14 +2,16 @@ SRC = $(wildcard *.c)
 BINDIR = bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 DEP = $(SRC:%.c=$(BINDIR)%.d)
+export ARCH = native_base.a
 
 INCLUDES += -I$(RIOTBASE)/cpu/native/include/
 INCLUDES += -I$(RIOTBOARD)/native/include/
 
-all: $(BINDIR)native_base.a 
+all: $(BINDIR)$(ARCH)
+	$(MAKE) -C drivers
 
-$(BINDIR)native_base.a: $(OBJ)
-	$(AR) rcs $(BINDIR)native_base.a $(OBJ)
+$(BINDIR)$(ARCH): $(OBJ)
+	$(AR) rcs $(BINDIR)$(ARCH) $(OBJ)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
@@ -23,6 +25,7 @@ $(BINDIR)%.o: %.c
 
 # remove compilation products
 clean:
-	rm -f $(BINDIR)native_base.a $(OBJ) $(DEP)
+	${MAKE} -C drivers clean
+	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
 	-rmdir -p $(BINDIR)
 
