@@ -38,8 +38,8 @@ $(BINDIR)$(MODULE).a: $(OBJ)
 
 # compile and generate dependency info
 $(BINDIR)%.o: %.c
-	$(CC) $(CFLAGS) $(PROJECTINCLUDE) $(BOARDINCLUDE) $(INCLUDES) -c $*.c -o $(BINDIR)$*.o
-	$(CC) $(CFLAGS) $(PROJECTINCLUDE) $(BOARDINCLUDE) $(INCLUDES) -MM $*.c > $(BINDIR)$*.d
+	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$*.o
+	$(CC) $(CFLAGS) $(INCLUDES) -MM $*.c > $(BINDIR)$*.d
 	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 
 # remove compilation products
