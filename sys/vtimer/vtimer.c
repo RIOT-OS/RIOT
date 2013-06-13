@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include <irq.h>
 #include <queue.h>
 #include <timex.h>
@@ -146,7 +147,9 @@ void normalize_to_tick(timex_t *time) {
 static int vtimer_set(vtimer_t *timer) {
     DEBUG("vtimer_set(): New timer. Offset: %lu %lu\n", timer->absolute.seconds, timer->absolute.microseconds);
 
-    timer->absolute = timex_add(vtimer_now(), timer->absolute);
+    timex_t now;
+    vtimer_now(&now);
+    timer->absolute = timex_add(now, timer->absolute);
     normalize_to_tick(&(timer->absolute));
 
     DEBUG("vtimer_set(): Absolute: %lu %lu\n", timer->absolute.seconds, timer->absolute.microseconds);
@@ -184,10 +187,9 @@ static int vtimer_set(vtimer_t *timer) {
     return result;
 }
 
-/* TODO: Do NOT return a struct! */
-timex_t vtimer_now() {
+void vtimer_now(timex_t* out) {
     timex_t t = timex_set(seconds, hwtimer_now()-longterm_tick_start);
-    return t;
+    memcpy(out, &t, sizeof(timex_t));
 }
 
 int vtimer_init() {

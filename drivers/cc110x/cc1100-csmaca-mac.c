@@ -102,22 +102,26 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
 
 	// Calculate collisions per second
 	if (collision_state == COLLISION_STATE_INITIAL) {
-		timex_t now = vtimer_now();
+		timex_t now;
+		vtimer_now(&now);
 		collision_measurement_start =  now.microseconds;
 		collision_count = 0;
 		collisions_per_sec = 0;
 		collision_state = COLLISION_STATE_MEASURE;
 	} else if (collision_state == COLLISION_STATE_MEASURE) {
-			timex_t now = vtimer_now();
+			timex_t now;
+			vtimer_now(&now);
 			uint64_t timespan = now.microseconds - collision_measurement_start;
 			if (timespan > 1000000) {
 				collisions_per_sec = (collision_count * 1000000) / (double) timespan;
 			if (collisions_per_sec > 0.5 && collisions_per_sec <= 2.2) {
-				timex_t now = vtimer_now();
+				timex_t now;
+				vtimer_now(&now);
 				collision_measurement_start = now.microseconds;
 				collision_state = COLLISION_STATE_KEEP;
 			} else if (collisions_per_sec > 2.2) {
-				timex_t now = vtimer_now();
+				timex_t now;
+				vtimer_now(now);
 				collision_measurement_start = now.microseconds;
 				collision_state = COLLISION_STATE_KEEP;
 			} else {
@@ -125,7 +129,8 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
 			}
 		}
 	} else if (collision_state == COLLISION_STATE_KEEP) {
-		timex_t now = vtimer_now();
+		timex_t now;
+		vtimer_now(&now);
         uint64_t timespan = now.microseconds - collision_measurement_start;
         if (timespan > 5000000) {
 			collision_state = COLLISION_STATE_INITIAL;

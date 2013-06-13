@@ -74,9 +74,11 @@ void print_tcp_flags (tcp_hdr_t *tcp_header)
 
 void print_tcp_cb(tcp_cb_t *cb)
 	{
+	timex_t now;
+	vtimer_now(&now);
 	printf("Send_ISS: %lu\nSend_UNA: %lu\nSend_NXT: %lu\nSend_WND: %u\n", cb->send_iss, cb->send_una, cb->send_nxt, cb->send_wnd);
 	printf("Rcv_IRS: %lu\nRcv_NXT: %lu\nRcv_WND: %u\n", cb->rcv_irs, cb->rcv_nxt, cb->rcv_wnd);
-	printf("Time difference: %lu, No_of_retries: %u, State: %u\n\n", timex_sub(vtimer_now(), cb->last_packet_time).microseconds, cb->no_of_retries, cb->state);
+	printf("Time difference: %lu, No_of_retries: %u, State: %u\n\n", timex_sub(now, cb->last_packet_time).microseconds, cb->no_of_retries, cb->state);
 	}
 
 void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_t *tcp_socket)
@@ -497,7 +499,9 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	set_tcp_cb(&current_tcp_socket->tcp_control, 0, STATIC_WINDOW, current_tcp_socket->tcp_control.send_iss, current_tcp_socket->tcp_control.send_iss, 0);
 
 	// Remember current time
-	current_tcp_socket->tcp_control.last_packet_time = vtimer_now();
+	timex_t now;
+	vtimer_now(&now);
+	current_tcp_socket->tcp_control.last_packet_time = now;
 	current_tcp_socket->tcp_control.no_of_retries = 0;
 
 	msg_from_server.type = TCP_RETRY;
@@ -554,7 +558,9 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	msg_from_server.type = UNDEFINED;
 
 	// Remember current time
-	current_tcp_socket->tcp_control.last_packet_time = vtimer_now();
+	timex_t now;
+	vtimer_now(&now)
+	current_tcp_socket->tcp_control.last_packet_time = now;
 	current_tcp_socket->tcp_control.no_of_retries = 0;
 
 #ifdef TCP_HC
@@ -1113,7 +1119,9 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket, sock
 			&server_socket->socket_values.tcp_control.tcp_context.context_id, sizeof(server_socket->socket_values.tcp_control.tcp_context.context_id));
 #endif
 	// Remember current time
-	current_queued_int_socket->socket_values.tcp_control.last_packet_time = vtimer_now();
+	timex_t now;
+	vtimer_now(&now);
+	current_queued_int_socket->socket_values.tcp_control.last_packet_time = now;
 
 	current_queued_int_socket->socket_values.tcp_control.no_of_retries = 0;
 
