@@ -9,8 +9,6 @@
 #ifndef __QUEUE_H
 #define __QUEUE_H
 
-#include "queue.h"
-
 typedef struct queue_node_t {
     struct queue_node_t *next;
     unsigned int data;
