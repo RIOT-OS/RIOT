@@ -22,6 +22,7 @@
 #include <sys/select.h>
 #include <errno.h>
 #endif
+#include <err.h>
 
 #include "lpm.h"
 #include "debug.h"
@@ -46,21 +47,15 @@ void _native_lpm_sleep()
     retval = select(1, &_native_uart_rfds, NULL, NULL, NULL);
     DEBUG("_native_lpm_sleep: retval: %i\n", retval);
     if (retval != -1) {
-        /* uart ready, swap to ISR context and handle input */
-        makecontext(_native_isr_ctx, _native_handle_uart0_input, 0);
-        swapcontext((ucontext_t*)(active_thread->sp), _native_isr_ctx);
+        /* uart ready, handle input */
+        /* TODO: switch to ISR context */
+        _native_handle_uart0_input();
     }
-    else if ((retval == -1) && (errno == EINTR)) {
-        /* TODO: reevaluate and merge with above branch
-         *       IF any thread except the idle thread uses lpm_set this could make sense... */
-        /* select interrupted by signal swap to ISR context and handle input */
-        DEBUG("\n\n\t\treturn from interrupted syscall, swapping context and calling _native_handle_uart0_input\n\n");
-        makecontext(_native_isr_ctx, _native_handle_uart0_input, 0);
-        swapcontext(_native_cur_ctx, _native_isr_ctx);
-    }
-    else {
+    else if (errno != EINTR) {
+        /* select failed for reason other than signal */
         err(1, "lpm_set(): select()");
     }
+    /* otherwise select was interrupted because of a signal, continue below */
 #else
     pause();
 #endif 
