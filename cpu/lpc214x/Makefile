@@ -19,8 +19,8 @@ endif
 
 # compile and generate dependency info
 ../bin/%.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o ../bin/$*.o
-	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > ../bin/$*.d
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPUINCLUDE) -c $*.c -o ../bin/$*.o
+	$(CC) $(CFLAGS) $(INCLUDES) $(CPUINCLUDE) -MM $*.c > ../bin/$*.d
 	@printf "../bin/"|cat - ../bin/$*.d > /tmp/fw_out && mv /tmp/fw_out ../bin/$*.d
 
 # remove compilation products
