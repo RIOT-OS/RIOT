@@ -121,7 +121,7 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
 				collision_state = COLLISION_STATE_KEEP;
 			} else if (collisions_per_sec > 2.2) {
 				timex_t now;
-				vtimer_now(now);
+				vtimer_now(&now);
 				collision_measurement_start = now.microseconds;
 				collision_state = COLLISION_STATE_KEEP;
 			} else {
