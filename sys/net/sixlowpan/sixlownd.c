@@ -1154,7 +1154,8 @@ void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime){
     } else {
         memcpy(&(def_rtr_lst[def_rtr_count].addr), ipaddr, 16);
         timex_t rltime = {rtr_ltime, 0};
-        timex_t now = vtimer_now();
+        timex_t now;
+        vtimer_now(&now);
         
         def_rtr_lst[def_rtr_count].inval_time = timex_add(now, rltime);
         

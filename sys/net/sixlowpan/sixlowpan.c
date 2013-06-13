@@ -298,7 +298,10 @@ lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size, uint16_t datagram_t
 
 			new_buf->ident_no = datagram_tag;
 			new_buf->packet_size = datagram_size;
-			new_buf->timestamp = vtimer_now().microseconds;
+
+			timex_t now;
+			vtimer_now(&now)
+			new_buf->timestamp = now.microseconds;
 
 			if ((current_buf == NULL) && (temp_buf == NULL))
 				{
@@ -334,7 +337,9 @@ lowpan_reas_buf_t *get_packet_frag_buf(uint16_t datagram_size, uint16_t datagram
 			current_buf->interval_list_head != NULL)
 			{
 			/* Found buffer for current packet fragment */
-			current_buf->timestamp = vtimer_now().microseconds;
+			timex_t now;
+			vtimer_now(&now);
+			current_buf->timestamp = now.microseconds;
 			return current_buf;
 			}
 		temp_buf = current_buf;
@@ -526,7 +531,9 @@ void check_timeout(void)
 	long cur_time;
 	int count = 0;
 
-	cur_time = vtimer_now().microseconds;
+	timex_t now;
+	vtimer_now(&now)
+	cur_time = now.microseconds;
 	temp_buf = head;
 
 	while (temp_buf != NULL)

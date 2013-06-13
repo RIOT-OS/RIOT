@@ -375,7 +375,8 @@ static bool contains_seq_entry(uint8_t src, uint8_t id)
 {
 	int i;
 	uint32_t cmp;
-	timex_t now_timex = vtimer_now();
+	timex_t now_timex;
+	vtimer_now(&now_timex);
 	uint64_t now = now_timex.microseconds;
 
 	for (i = 0; i < MAX_SEQ_BUFFER_SIZE; i++)
@@ -414,7 +415,8 @@ static void add_seq_entry(uint8_t src, uint8_t id)
 	// Add new entry
 	seq_buffer[seq_buffer_pos].source = src;
 	seq_buffer[seq_buffer_pos].identification = id;
-	timex_t now = vtimer_now();
+	timex_t now;
+	vtimer_now(&now);
     seq_buffer[seq_buffer_pos].m_ticks = now.microseconds;
 
 	// Store 16 bit sequence number of layer 0 for speedup

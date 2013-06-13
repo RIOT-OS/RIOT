@@ -27,7 +27,9 @@ void init_transport_layer(void)
 	set_udp_packet_handler_pid(udp_thread_pid);
 
 	// TCP
-	srand(vtimer_now().microseconds);
+	timex_t now;
+	vtimer_now(&now);
+	srand(now.microseconds);
 #ifdef TCP_HC
 	printf("TCP_HC enabled!\n");
 	global_context_counter = rand();
