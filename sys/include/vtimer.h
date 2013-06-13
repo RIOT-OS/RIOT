@@ -43,7 +43,7 @@ typedef struct vtimer_t {
  * @brief   Current system time
  * @return  Time as timex_t since system boot
  */
-timex_t vtimer_now(void);
+void vtimer_now(timex_t* out);
 
 /**
  * @brief   Initializes the vtimer subsystem. To be called once at system initialization. Will be initialized by auto_init.

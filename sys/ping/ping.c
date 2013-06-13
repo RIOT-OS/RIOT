@@ -49,7 +49,7 @@ void ping(radio_address_t addr, uint8_t channr){
 	cc1100_set_channel(channr);
 	cc1100_set_address(r_address);
 	while(1){
-		start = vtimer_now();
+		vtimer_now(&start);
 		int trans_ok = cc1100_send_csmaca(addr,
 			protocol_id,2,pipa->payload,sizeof(pipa->payload));
 		if(trans_ok < 0)
@@ -59,7 +59,8 @@ void ping(radio_address_t addr, uint8_t channr){
 }
 
 void calc_rtt(void){
-	timex_t end = vtimer_now();
+	timex_t end;
+	vtimer_now(&end);
 	timex_t result = vtimer_sub(end, start);
 	
 	rtt = result.seconds+(float)result.microseconds/100000;	
