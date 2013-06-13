@@ -45,7 +45,7 @@ and the mailinglist (subscription via web site)
 #define MMR_TYPE_RREP		 	 (2)
 #define MMR_TYPE_RERR		 	 (3)
 
-	#define ADDRESS_LIST_SIZE		(21)
+#define ADDRESS_LIST_SIZE		(21)
 
 #define RERR_NODE_UNREACHABLE	 (1)
 
