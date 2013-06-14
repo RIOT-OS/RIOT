@@ -2,14 +2,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <vtimer.h>
-#include <timex.h>
-#include <debug.h>
-#include <thread.h>
-#include <mutex.h>
-#include <hwtimer.h>
-#include <rtc.h>
-#include <lpc2387-rtc.h>
+
+#include "vtimer.h"
+#include "timex.h"
+#include "debug.h"
+#include "thread.h"
+#include "mutex.h"
+#include "hwtimer.h"
+#include "rtc.h"
 #include "msg.h"
 #include "sixlowmac.h"
 #include "sixlowpan.h"

@@ -19,8 +19,8 @@
 #ifndef __VTIMER_H
 #define __VTIMER_H 
 
-#include <queue.h>
-#include <timex.h>
+#include "queue.h"
+#include "timex.h"
 
 #define MSG_TIMER 12345
 
