@@ -9,7 +9,7 @@
 #define RPL_PROCESS_STACKSIZE 4096
 
 uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address);
-void rpl_init_root();
+void rpl_init_root(void);
 rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp);
 
 void send_DIO(ipv6_addr_t *destination);
@@ -26,5 +26,5 @@ ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t * addr);
 void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t lifetime);
 void rpl_del_routing_entry(ipv6_addr_t *addr);
 rpl_routing_entry_t * rpl_find_routing_entry(ipv6_addr_t *addr);
-void rpl_clear_routing_table();
+void rpl_clear_routing_table(void);
 rpl_routing_entry_t *rpl_get_routing_table(void);

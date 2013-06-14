@@ -37,7 +37,7 @@ volatile tcb_t *sched_threads[MAXTHREADS];
 volatile tcb_t *active_thread;
 volatile int lpm_prevent_sleep = 0;
 
-extern void main(void);
+extern int main(void);
 
 static void idle_thread(void) {
     while(1) {
@@ -61,7 +61,7 @@ static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
 #ifdef MODULE_AUTO_INIT
 #define MAIN_FUNC auto_init
 #else
-#define MAIN_FUNC main
+#define MAIN_FUNC ((void (*) (void))  main)
 #endif
 
 void kernel_init(void)

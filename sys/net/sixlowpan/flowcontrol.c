@@ -20,7 +20,7 @@ flowcontrol_stat_t slwin_stat;
 sem_t connection_established;
 int16_t synack_seqnum = -1;
 
-ipv6_addr_t init_threeway_handshake() {
+ipv6_addr_t init_threeway_handshake(void) {
     border_syn_packet_t *syn;
     msg_t m;
     m.content.ptr = NULL;
@@ -48,7 +48,7 @@ ipv6_addr_t init_threeway_handshake() {
     return addr;
 }
 
-ipv6_addr_t flowcontrol_init() {
+ipv6_addr_t flowcontrol_init(void) {
     int i;
     
     sem_init(&slwin_stat.send_win_not_full,BORDER_SWS);

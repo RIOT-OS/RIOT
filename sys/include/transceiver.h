@@ -25,6 +25,19 @@
 #define TRANSCEIVER_MSG_BUFFER_SIZE     (32)
 
 /**
+ * @brief All supported transceivers
+ */
+#define TRANSCEIVER_NONE    (0x0)       ///< Invalid
+#define TRANSCEIVER_CC1100  (0x01)      ///< CC110X transceivers
+#define TRANSCEIVER_CC1020  (0x02)      ///< CC1020 transceivers
+#define TRANSCEIVER_CC2420  (0x04)      ///< CC2420 transceivers
+
+/**
+ * @brief Data type for transceiver specification
+ */
+typedef uint16_t transceiver_type_t;
+
+/**
  * @brief Message types for transceiver interface
  */
 enum transceiver_msg_type_t {
@@ -53,16 +66,6 @@ enum transceiver_msg_type_t {
     /* Error messages */
     ENOBUFFER,      ///< No buffer left
 };
-
-/**
- * @brief All supported transceivers
- */
-typedef enum {
-    TRANSCEIVER_NONE,       ///< Invalid
-    TRANSCEIVER_CC1100,     ///< CC110X transceivers
-    TRANSCEIVER_CC1020,      ///< CC1020 transceivers
-    TRANSCEIVER_CC2420      ///< CC2420 transceivers
-} transceiver_type_t;
 
 /**
  * @brief Manage registered threads per transceiver

@@ -51,7 +51,7 @@ typedef struct __attribute__ ((packed)) border_syn_packet_t {
     ipv6_addr_t addr;
 } border_syn_packet_t;
 
-ipv6_addr_t flowcontrol_init();
+ipv6_addr_t flowcontrol_init(void);
 void flowcontrol_send_over_uart(border_packet_t *packet, int len);
 void flowcontrol_deliver_from_uart(border_packet_t *packet, int len);
 

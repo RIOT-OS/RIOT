@@ -64,8 +64,8 @@ uint8_t recvd_cids_len = 0;
 plist_t *recvd_prefixes[OPT_PI_LIST_LEN];
 uint8_t recvd_pref_len = 0;
 
-static abr_cache_t* abr_get_most_current();
-static abr_cache_t* abr_get_oldest();
+static abr_cache_t* abr_get_most_current(void);
+static abr_cache_t* abr_get_oldest(void);
 
 int min(int a, int b) {
     if (a < b) {
@@ -1057,7 +1057,7 @@ void nbr_cache_rem(ipv6_addr_t *addr){
  * @return The most current authoritive border router information, NULL
  *         if no such information is given.
  */
-static abr_cache_t *abr_get_most_current(){
+static abr_cache_t *abr_get_most_current(void){
     abr_cache_t *abr = NULL;
     int i;
     int version = abr_cache[0].version;
@@ -1071,7 +1071,7 @@ static abr_cache_t *abr_get_most_current(){
     return abr;
 }
 
-static abr_cache_t *abr_get_oldest(){
+static abr_cache_t *abr_get_oldest(void){
     abr_cache_t *abr = NULL;
     int i;
     int version = abr_cache[0].version;
@@ -1154,7 +1154,8 @@ void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime){
     } else {
         memcpy(&(def_rtr_lst[def_rtr_count].addr), ipaddr, 16);
         timex_t rltime = {rtr_ltime, 0};
-        timex_t now = vtimer_now();
+        timex_t now;
+        vtimer_now(&now);
         
         def_rtr_lst[def_rtr_count].inval_time = timex_add(now, rltime);
         

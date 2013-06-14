@@ -211,7 +211,8 @@ void ipv6_iface_add_addr(ipv6_addr_t *addr, uint8_t state, uint32_t val_ltime, u
         iface.addr_list[iface_addr_list_count].state = state;
         timex_t valtime = {val_ltime, 0};
         timex_t preftime = {pref_ltime, 0};
-        timex_t now = vtimer_now();
+        timex_t now;
+        vtimer_now(&now);
         iface.addr_list[iface_addr_list_count].val_ltime = timex_add(now, valtime);
         iface.addr_list[iface_addr_list_count].pref_ltime = timex_add(now, preftime);
         iface.addr_list[iface_addr_list_count].type = type;
@@ -451,7 +452,8 @@ uint8_t ipv6_next_hdr_unknown(uint8_t next_hdr) {
 
 
 uint32_t get_remaining_time(timex_t *t){
-    timex_t now = vtimer_now();
+    timex_t now;
+    vtimer_now(&now);
     
     return (timex_sub(*t, now).seconds);
 }
@@ -459,7 +461,9 @@ uint32_t get_remaining_time(timex_t *t){
 void set_remaining_time(timex_t *t, uint32_t time){
     timex_t tmp = {time, 0};
 
-    *t = timex_add(vtimer_now(), tmp);
+    timex_t now;
+    vtimer_now(&now)
+    *t = timex_add(now, tmp);
 }
 
 void ipv6_init_iface_as_router(void) {

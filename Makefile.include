@@ -70,7 +70,7 @@ ${PROJBINDIR}/$(PROJECT).a:  $(OBJ)
 
 ${PROJBINDIR}/%.o: %.c
 	@echo; echo "Compiling.... $*.c"; echo
-	$(CC) $(CFLAGS) $(BOARDINCLUDE) $(INCLUDES) -c $*.c -o bin/$*.o
+	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o bin/$*.o
 
 clean:
 	$(MAKE) -C $(RIOTBOARD) clean
