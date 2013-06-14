@@ -153,7 +153,7 @@ static int vtimer_set(vtimer_t *timer) {
     normalize_to_tick(&(timer->absolute));
 
     DEBUG("vtimer_set(): Absolute: %lu %lu\n", timer->absolute.seconds, timer->absolute.microseconds);
-    DEBUG("vtimer_set(): NOW: %lu %lu\n", vtimer_now().seconds, vtimer_now().microseconds);
+    DEBUG("vtimer_set(): NOW: %lu %lu\n", now.seconds, now.microseconds);
 
     int result = 0;
 
