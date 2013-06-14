@@ -462,7 +462,7 @@ void set_remaining_time(timex_t *t, uint32_t time){
     timex_t tmp = {time, 0};
 
     timex_t now;
-    vtimer_now(&now)
+    vtimer_now(&now);
     *t = timex_add(now, tmp);
 }
 

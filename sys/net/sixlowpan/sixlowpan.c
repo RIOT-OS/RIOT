@@ -300,7 +300,7 @@ lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size, uint16_t datagram_t
 			new_buf->packet_size = datagram_size;
 
 			timex_t now;
-			vtimer_now(&now)
+			vtimer_now(&now);
 			new_buf->timestamp = now.microseconds;
 
 			if ((current_buf == NULL) && (temp_buf == NULL))
@@ -532,7 +532,7 @@ void check_timeout(void)
 	int count = 0;
 
 	timex_t now;
-	vtimer_now(&now)
+	vtimer_now(&now);
 	cur_time = now.microseconds;
 	temp_buf = head;
 
