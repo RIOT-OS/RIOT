@@ -1,4 +1,6 @@
-#include <timex.h>
+#include <stdio.h>
+
+#include "timex.h"
 
 timex_t timex_add(const timex_t a, const timex_t b) {
     timex_t result;
@@ -47,3 +49,6 @@ int timex_cmp(const timex_t a, const timex_t b) {
     return 1;
 }
 
+void timex_print(const timex_t t) {
+    printf("Seconds: %u - Microseconds: %u\n", t.seconds, t.microseconds);
+}

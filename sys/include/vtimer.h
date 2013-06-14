@@ -91,4 +91,9 @@ int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid);
  */
 int vtimer_remove(vtimer_t *t);
 
+/**
+ * @brief Prints a vtimer_t
+ */
+void vtimer_print(vtimer_t* t);
+
 #endif /* __VTIMER_H */
