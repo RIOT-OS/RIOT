@@ -191,7 +191,7 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
 
     p.data = buf;
     msg_send_receive(&mesg, &transceiver_rsp, transceiver_pid);
-    printf("%s, %u: %lu\n", __FILE__, __LINE__, transceiver_rsp.content.value);
+    printf("%s, %u: %u\n", __FILE__, __LINE__, transceiver_rsp.content.value);
 
     hwtimer_wait(5000);
 }
