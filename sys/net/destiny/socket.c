@@ -558,8 +558,7 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	msg_from_server.type = UNDEFINED;
 
 	// Remember current time
-	timex_t now;
-	vtimer_now(&now)
+	vtimer_now(&now);
 	current_tcp_socket->tcp_control.last_packet_time = now;
 	current_tcp_socket->tcp_control.no_of_retries = 0;
 
