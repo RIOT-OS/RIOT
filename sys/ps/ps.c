@@ -1,3 +1,21 @@
+/**
+ * Print thread information. 
+ *
+ * Copyright (C) 2013, INRIA.
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup ps
+ * @{
+ * @file    ps.c
+ * @brief   UNIX like ps command 
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @}
+ */
+
+#include <thread.h>
 #include <thread.h>
 #include <hwtimer.h>
 #include <sched.h>

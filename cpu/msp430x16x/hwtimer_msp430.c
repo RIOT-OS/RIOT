@@ -22,7 +22,7 @@ void timerA_init(void)
         *ctl &= ~(CCIFG);
         *ctl &= ~(CCIE);
     }
-    TA0CTL |= MC_2;
+    ITA0CTL |= MC_2;
 }
 
 interrupt(TIMERA0_VECTOR) __attribute__ ((naked)) timer_isr_ccr0(void) {

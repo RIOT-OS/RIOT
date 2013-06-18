@@ -3,10 +3,11 @@
  *
  * Needed on platforms without malloc in libc, e.g. msb430
  *
- * Copyright (C) 2010 Freie Universität Berlin
+ * Copyright (C) 2013 Freie Universität Berlin
  *
- * This file subject to the terms and conditions of the GNU General Public
- * License. See the file LICENSE in the top level directory for more details.
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
  *
  * @ingroup kernel
  * @{

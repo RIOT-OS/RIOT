@@ -1,3 +1,20 @@
+/**
+ * Character device messaging loop.  
+ *
+ * Copyright (C) 2013, INRIA.
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup chardev
+ * @{
+ * @file    chardev_thread.c
+ * @brief   Runs an infinite loop in a separate thread to handle access to character devices such as uart.
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @}
+ */
+
 #include <thread.h>
 #include <kernel.h>
 #include <msg.h>

@@ -1,3 +1,21 @@
+/**
+ * Generic transceiver module as an interface to NIC driver. 
+ *
+ * Copyright (C) 2013  INRIA.
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup transceiver
+ * @{
+ * @file    transceiver.c
+ * @brief   Providing a generic interface to the driver implementation for any supported network device.
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
+ * @}
+ */
+
+#include <stdint.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>

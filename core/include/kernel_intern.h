@@ -1,7 +1,8 @@
 /**
  * @ingroup	kernel
  * @{
- * @file
+ * @file        kernel_intern.h
+ * @brief       prototypes for kernel intern functions
  * @author      INRIA
  * @author		Oliver Hahm <oliver.hahm@inria.fr>
  */
