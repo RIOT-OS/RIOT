@@ -1,5 +1,5 @@
 INCLUDES = -I../include 
-MODULE =timex
+MODULE = timex
 
 include $(RIOTBASE)/Makefile.base
 

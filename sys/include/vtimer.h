@@ -19,8 +19,8 @@
 #ifndef __VTIMER_H
 #define __VTIMER_H 
 
-#include <queue.h>
-#include <timex.h>
+#include "queue.h"
+#include "timex.h"
 
 #define MSG_TIMER 12345
 
@@ -90,5 +90,10 @@ int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid);
  * @return      0 on success, < 0 on error
  */
 int vtimer_remove(vtimer_t *t);
+
+/**
+ * @brief Prints a vtimer_t
+ */
+void vtimer_print(vtimer_t* t);
 
 #endif /* __VTIMER_H */

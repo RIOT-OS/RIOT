@@ -111,7 +111,7 @@ void trickle_interval_over(void){
 	while(1){
 		thread_sleep();
 		I = I*2;
-		printf("TRICKLE new Interval %lu\n",I);
+		printf("TRICKLE new Interval %u\n",I);
 		if( I == 0 ){
 			puts("[WARNING] Interval was 0");
 			if( Imax == 0){

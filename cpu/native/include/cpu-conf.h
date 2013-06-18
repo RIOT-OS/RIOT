@@ -28,7 +28,12 @@
 #define KERNEL_CONF_STACKSIZE_DEFAULT   (16384)
 #define KERNEL_CONF_STACKSIZE_IDLE      (16384)
 #define NATIVE_ISR_STACKSIZE            (16384)
+// undefine the TRANSCEIVER_STACK_SIZE (2048 or 512) defined in trnsceiver.h
+#ifdef TRANSCEIVER_STACK_SIZE
+#undef TRANSCEIVER_STACK_SIZE
+#endif
 #define TRANSCEIVER_STACK_SIZE          (16384)
+
 #define MINIMUM_STACK_SIZE              (16384)
 #endif
 

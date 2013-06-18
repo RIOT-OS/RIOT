@@ -78,7 +78,7 @@ void print_sigmasks(void)
         if (sched_threads[i] != NULL) {
             printf("%s:\n", sched_threads[i]->name);
             //print_thread_sigmask(sched_threads[i]->sp);
-            p = sched_threads[i]->stack_start;
+            p = (ucontext_t*)(sched_threads[i]->stack_start);
             print_thread_sigmask(p);
             puts("");
         }

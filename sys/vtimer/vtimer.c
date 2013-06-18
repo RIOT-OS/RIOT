@@ -254,9 +254,8 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr){
     return 0;
 }
 
-#ifdef ENABLE_DEBUG
-static void vtimer_print(vtimer_t* t) {
-    printf("Seconds: %lu - Microseconds: %lu\n \
+void vtimer_print(vtimer_t* t) {
+    printf("Seconds: %u - Microseconds: %u\n \
             action: %p\n \
             action: %p\n \
             pid: %u\n",
@@ -265,4 +264,3 @@ static void vtimer_print(vtimer_t* t) {
             t->arg,
             t->pid);
 }
-#endif
