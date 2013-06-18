@@ -2,14 +2,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <vtimer.h>
-#include <timex.h>
-#include <debug.h>
-#include <thread.h>
-#include <mutex.h>
-#include <hwtimer.h>
-#include <rtc.h>
-#include <lpc2387-rtc.h>
+
+#include "vtimer.h"
+#include "timex.h"
+#include "debug.h"
+#include "thread.h"
+#include "mutex.h"
+#include "hwtimer.h"
+#include "rtc.h"
 #include "msg.h"
 #include "sixlowmac.h"
 #include "sixlowpan.h"
@@ -300,7 +300,7 @@ lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size, uint16_t datagram_t
 			new_buf->packet_size = datagram_size;
 
 			timex_t now;
-			vtimer_now(&now)
+			vtimer_now(&now);
 			new_buf->timestamp = now.microseconds;
 
 			if ((current_buf == NULL) && (temp_buf == NULL))
@@ -532,7 +532,7 @@ void check_timeout(void)
 	int count = 0;
 
 	timex_t now;
-	vtimer_now(&now)
+	vtimer_now(&now);
 	cur_time = now.microseconds;
 	temp_buf = head;
 

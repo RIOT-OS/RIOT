@@ -41,7 +41,7 @@ and the mailinglist (subscription via web site)
  * @note		$Id: cc110x-defaultSettings.c 2058 2010-03-31 08:59:31Z hillebra $
  */
 
-#include <cc110x-defaultSettings.h>
+#include "cc110x-defaultSettings.h"
 
 /**
  * Usable, non overlapping channels and corresponding frequencies

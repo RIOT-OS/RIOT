@@ -28,4 +28,9 @@ int timex_cmp(const timex_t a, const timex_t b);
  */
 void timex_normalize(timex_t *time);
 
+/**
+ * @brief Prints a timex_t
+ */
+void timex_print(const timex_t t);
+
 #endif /* __TIMEX_H */

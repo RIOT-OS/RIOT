@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include <math.h>
 #include "udp.h"
 #include "tcp.h"
@@ -24,8 +25,8 @@ socket_internal_t sockets[MAX_SOCKETS];
 void printf_tcp_context(tcp_hc_context_t *current_tcp_context)
 	{
 	printf("Context: %u\n", current_tcp_context->context_id);
-	printf("Rcv Seq: %lu Rcv Ack: %lu, Rcv Wnd: %u\n", current_tcp_context->seq_rcv, current_tcp_context->ack_rcv, current_tcp_context->wnd_rcv);
-	printf("Snd Seq: %lu Snd Ack: %lu, Snd Wnd: %u\n", current_tcp_context->seq_snd, current_tcp_context->ack_snd, current_tcp_context->wnd_snd);
+	printf("Rcv Seq: %" PRIu32 " Rcv Ack: %" PRIu32 ", Rcv Wnd: %u\n", current_tcp_context->seq_rcv, current_tcp_context->ack_rcv, current_tcp_context->wnd_rcv);
+	printf("Snd Seq: %" PRIu32 " Snd Ack: %" PRIu32 ", Snd Wnd: %u\n", current_tcp_context->seq_snd, current_tcp_context->ack_snd, current_tcp_context->wnd_snd);
 	}
 
 void print_tcp_flags (tcp_hdr_t *tcp_header)
@@ -76,9 +77,9 @@ void print_tcp_cb(tcp_cb_t *cb)
 	{
 	timex_t now;
 	vtimer_now(&now);
-	printf("Send_ISS: %lu\nSend_UNA: %lu\nSend_NXT: %lu\nSend_WND: %u\n", cb->send_iss, cb->send_una, cb->send_nxt, cb->send_wnd);
-	printf("Rcv_IRS: %lu\nRcv_NXT: %lu\nRcv_WND: %u\n", cb->rcv_irs, cb->rcv_nxt, cb->rcv_wnd);
-	printf("Time difference: %lu, No_of_retries: %u, State: %u\n\n", timex_sub(now, cb->last_packet_time).microseconds, cb->no_of_retries, cb->state);
+	printf("Send_ISS: %" PRIu32 "\nSend_UNA: %" PRIu32 "\nSend_NXT: %" PRIu32 "\nSend_WND: %u\n", cb->send_iss, cb->send_una, cb->send_nxt, cb->send_wnd);
+	printf("Rcv_IRS: %" PRIu32 "\nRcv_NXT: %" PRIu32 "\nRcv_WND: %u\n", cb->rcv_irs, cb->rcv_nxt, cb->rcv_wnd);
+	printf("Time difference: %" PRIu32 ", No_of_retries: %u, State: %u\n\n", timex_sub(now, cb->last_packet_time).microseconds, cb->no_of_retries, cb->state);
 	}
 
 void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_t *tcp_socket)
@@ -91,8 +92,8 @@ void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_hea
 	printf("TCP Length: %x\n", ipv6_header->length-TCP_HDR_LEN);
 	printf("Source Port: %x, Dest. Port: %x\n", NTOHS(tcp_header->src_port), NTOHS(tcp_header->dst_port));
 	printf("Source Port: %u, Dest. Port: %u\n", NTOHS(tcp_header->src_port), NTOHS(tcp_header->dst_port));
-	printf("ACK: %lx, SEQ: %lx, Window: %x\n", tcp_header->ack_nr, tcp_header->seq_nr, tcp_header->window);
-	printf("ACK: %lu, SEQ: %lu, Window: %u\n", tcp_header->ack_nr, tcp_header->seq_nr, tcp_header->window);
+	printf("ACK: %" PRIu32 ", SEQ: %" PRIu32 ", Window: %x\n", tcp_header->ack_nr, tcp_header->seq_nr, tcp_header->window);
+	printf("ACK: %" PRIu32 ", SEQ: %" PRIu32 ", Window: %u\n", tcp_header->ack_nr, tcp_header->seq_nr, tcp_header->window);
 	print_tcp_flags(tcp_header);
 	print_tcp_cb(&tcp_socket->tcp_control);
 #ifdef TCP_HC
@@ -558,8 +559,7 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 	msg_from_server.type = UNDEFINED;
 
 	// Remember current time
-	timex_t now;
-	vtimer_now(&now)
+	vtimer_now(&now);
 	current_tcp_socket->tcp_control.last_packet_time = now;
 	current_tcp_socket->tcp_control.no_of_retries = 0;
 

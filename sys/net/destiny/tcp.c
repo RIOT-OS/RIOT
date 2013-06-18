@@ -9,6 +9,7 @@
 #include <thread.h>
 #include <string.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "vtimer.h"
 #include "tcp_timer.h"
@@ -23,12 +24,12 @@
 void printTCPHeader(tcp_hdr_t *tcp_header)
 	{
 	printf("\nBEGIN: TCP HEADER\n");
-	printf("ack_nr: %lu\n", tcp_header->ack_nr);
+	printf("ack_nr: %" PRIu32 "\n", tcp_header->ack_nr);
 	printf("checksum: %i\n", tcp_header->checksum);
 	printf("dataOffset_reserved: %i\n", tcp_header->dataOffset_reserved);
 	printf("dst_port: %i\n", tcp_header->dst_port);
 	printf("reserved_flags: %i\n", tcp_header->reserved_flags);
-	printf("seq_nr: %lu\n", tcp_header->seq_nr);
+	printf("seq_nr: %" PRIu32 "\n", tcp_header->seq_nr);
 	printf("src_port: %i\n", tcp_header->src_port);
 	printf("urg_pointer: %i\n", tcp_header->urg_pointer);
 	printf("window: %i\n", tcp_header->window);
