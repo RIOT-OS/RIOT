@@ -4,6 +4,7 @@
 #include <transceiver.h>
 #include <cc110x_ng.h>
 #include <msg.h>
+#include <inttypes.h>
 
 #define TEXT_SIZE           CC1100_MAX_DATA_LENGTH
 
@@ -72,7 +73,7 @@ void _cc110x_ng_send_handler(char *pkt) {
             printf("[cc110x] Sending packet of length %u to %hu: %s\n", p.length, p.dst, (char*) p.data);
             msg_send_receive(&mesg, &mesg, transceiver_pid);
             response = mesg.content.value;
-            printf("[cc110x] Packet sent: %lu\n", response);
+            printf("[cc110x] Packet sent: %" PRIu32 "\n", response);
             return;
         }
     }
