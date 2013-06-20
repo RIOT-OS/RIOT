@@ -1,5 +1,5 @@
 #ifndef __CIB_H
-#define __CIB_H 
+#define __CIB_H
 
 typedef struct cib_t {
     unsigned int read_count;

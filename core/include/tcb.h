@@ -36,7 +36,7 @@
 #define STATUS_TIMER_WAITING	(0x0200)
 
 typedef struct tcb_t {
-    char* sp;
+    char *sp;
     uint16_t status;
 
     uint16_t pid;
@@ -44,14 +44,14 @@ typedef struct tcb_t {
 
     clist_node_t rq_entry;
 
-    void* wait_data;
+    void *wait_data;
     queue_node_t msg_waiters;
 
     cib_t msg_queue;
-    msg_t* msg_array;
+    msg_t *msg_array;
 
-    const char* name;
-    char* stack_start;
+    const char *name;
+    char *stack_start;
     int stack_size;
 } tcb_t;
 

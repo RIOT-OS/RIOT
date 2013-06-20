@@ -27,7 +27,7 @@ void board_init(void);
  * @param[in] stack_start   Start address of the stack
  * @param[in] stack_size    Stack size
  *
- * @return stack pointer 
+ * @return stack pointer
  */
 char *thread_stack_init(void  *task_func, void *stack_start, int stack_size);
 
@@ -39,7 +39,7 @@ void sched_task_exit(void);
 /**
  * @brief   Prints human readable, ps-like thread information for debugging purposes
  */
-void thread_print_stack (void);
+void thread_print_stack(void);
 
 /**
  * @brief   Calculates stack usage if thread was created using CREATE_STACKTEST
@@ -48,7 +48,7 @@ void thread_print_stack (void);
  *
  * @return  The current usage (overwritten addresses) of the thread's stack
  */
-int thread_measure_stack_usage(char* stack);
+int thread_measure_stack_usage(char *stack);
 
 /** @} */
 #endif /* KERNEL_INTERN_H_ */

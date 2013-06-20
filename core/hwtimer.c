@@ -29,23 +29,24 @@
 
 typedef struct hwtimer_t {
     void (*callback)(void*);
-    void* data;
+    void *data;
 } hwtimer_t;
 
 static hwtimer_t timer[ARCH_MAXTIMERS];
-static int lifo[ARCH_MAXTIMERS+1];
+static int lifo[ARCH_MAXTIMERS + 1];
 
 /*---------------------------------------------------------------------------*/
 
-static void multiplexer(int source) {
-//    printf("\nhwt: trigger %i.\n", source);
+static void multiplexer(int source)
+{
     lifo_insert(lifo, source);
     lpm_prevent_sleep--;
 
     timer[source].callback(timer[source].data);
 }
 
-static void hwtimer_wakeup(void* ptr) {
+static void hwtimer_wakeup(void *ptr)
+{
     int pid = (int)ptr;
     thread_wakeup(pid);
 }
@@ -53,30 +54,36 @@ static void hwtimer_wakeup(void* ptr) {
 void hwtimer_spin(unsigned long ticks)
 {
     unsigned long co = hwtimer_arch_now() + ticks;
-    while (hwtimer_arch_now() > co);
-    while (hwtimer_arch_now() < co);
+
+    while(hwtimer_arch_now() > co);
+
+    while(hwtimer_arch_now() < co);
 }
 
 /*---------------------------------------------------------------------------*/
 
-void hwtimer_init(void) {
+void hwtimer_init(void)
+{
     hwtimer_init_comp(F_CPU);
 }
 
 /*---------------------------------------------------------------------------*/
 
-void hwtimer_init_comp(uint32_t fcpu) {
+void hwtimer_init_comp(uint32_t fcpu)
+{
     hwtimer_arch_init(multiplexer, fcpu);
-    
+
     lifo_init(lifo, ARCH_MAXTIMERS);
-    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
+
+    for(int i = 0; i < ARCH_MAXTIMERS; i++) {
         lifo_insert(lifo, i);
     }
 }
 
 /*---------------------------------------------------------------------------*/
 
-int hwtimer_active(void) {
+int hwtimer_active(void)
+{
     return (! lifo_empty(lifo));
 }
 
@@ -91,14 +98,15 @@ unsigned long hwtimer_now(void)
 
 void hwtimer_wait(unsigned long ticks)
 {
-    if (ticks <= 6 || inISR()) {
+    if(ticks <= 6 || inISR()) {
         hwtimer_spin(ticks);
         return;
     }
-    
+
     /* -2 is to adjust the real value */
-    int res = hwtimer_set(ticks-2, hwtimer_wakeup, (void*) (unsigned int)(active_thread->pid));
-    if (res == -1) {
+    int res = hwtimer_set(ticks - 2, hwtimer_wakeup, (void*)(unsigned int)(active_thread->pid));
+
+    if(res == -1) {
         hwtimer_spin(ticks);
         return;
     }
@@ -111,44 +119,47 @@ void hwtimer_wait(unsigned long ticks)
 
 static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr, bool absolute)
 {
-    if (!inISR()) {
+    if(!inISR()) {
         dINT();
     }
 
     int n = lifo_get(lifo);
-    if (n == -1) {
-        if (! inISR()) {
+
+    if(n == -1) {
+        if(! inISR()) {
             eINT();
         }
+
         puts("No hwtimer left.");
         return -1;
     }
-    
+
     timer[n].callback = callback;
     timer[n].data = ptr;
 
-    if (absolute) {
-//        printf("hwt: setting %i to %u\n", n, offset);
+    if(absolute) {
         hwtimer_arch_set_absolute(offset, n);
     }
     else {
-//        printf("hwt: setting %i to offset %u\n", n, offset);
         hwtimer_arch_set(offset, n);
     }
 
     lpm_prevent_sleep++;
 
-    if (!inISR()) {
+    if(!inISR()) {
         eINT();
     }
+
     return n;
 }
 
-int hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr) {
+int hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr)
+{
     return _hwtimer_set(offset, callback, ptr, false);
 }
 
-int hwtimer_set_absolute(unsigned long offset, void (*callback)(void*), void *ptr) {
+int hwtimer_set_absolute(unsigned long offset, void (*callback)(void*), void *ptr)
+{
     return _hwtimer_set(offset, callback, ptr, true);
 }
 
@@ -157,7 +168,6 @@ int hwtimer_set_absolute(unsigned long offset, void (*callback)(void*), void *pt
 
 int hwtimer_remove(int n)
 {
-//    printf("hwt: remove %i.\n", n);
     hwtimer_arch_disable_interrupt();
     hwtimer_arch_unset(n);
 
@@ -165,7 +175,7 @@ int hwtimer_remove(int n)
     timer[n].callback = NULL;
 
     lpm_prevent_sleep--;
-    
+
     hwtimer_arch_enable_interrupt();
     return 1;
 }

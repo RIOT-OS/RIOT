@@ -50,7 +50,7 @@ typedef struct msg {
  * @brief Send a message.
  *
  * This function sends a message to another thread.
- * The msg structure has to be allocated (e.g. on the stack) 
+ * The msg structure has to be allocated (e.g. on the stack)
  * before calling the function and can be freed afterwards.
  * If called from an interrupt, this function will never block.
  *
@@ -63,7 +63,7 @@ typedef struct msg {
  * @return 0 if receiver is not waiting or has a full message queue and block == false
  * @return -1 on error (invalid PID)
  */
-int msg_send(msg_t* m, unsigned int target_pid, bool block);
+int msg_send(msg_t *m, unsigned int target_pid, bool block);
 
 
 /**
@@ -77,7 +77,7 @@ int msg_send(msg_t* m, unsigned int target_pid, bool block);
  * @return 1 if sending was successfull
  * @return 0 if receiver is not waiting and block == false
  */
-int msg_send_int(msg_t* m, unsigned int target_pid);
+int msg_send_int(msg_t *m, unsigned int target_pid);
 
 
 /**
@@ -88,7 +88,7 @@ int msg_send_int(msg_t* m, unsigned int target_pid);
  *
  * @return 1 Function always succeeds or blocks forever.
  */
-int msg_receive(msg_t* m);
+int msg_receive(msg_t *m);
 
 /**
  * @brief Send a message, block until reply received.
@@ -121,7 +121,7 @@ int msg_reply(msg_t *m, msg_t *reply);
  * @param array Pointer to preallocated array of msg objects
  * @param num Number of msg objects in array. MUST BE POWER OF TWO!
  */
-int msg_init_queue(msg_t* array, int num);
+int msg_init_queue(msg_t *array, int num);
 
 /** @} */
 #endif /* __MSG_H */

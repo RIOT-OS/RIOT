@@ -26,7 +26,8 @@
 //#define ENABLE_DEBUG
 #include <debug.h>
 
-int mutex_init(struct mutex_t* mutex) {
+int mutex_init(struct mutex_t *mutex)
+{
     mutex->val = 0;
 
     mutex->queue.priority = 0;
@@ -36,37 +37,43 @@ int mutex_init(struct mutex_t* mutex) {
     return 1;
 }
 
-int mutex_trylock(struct mutex_t* mutex) {
+int mutex_trylock(struct mutex_t *mutex)
+{
     DEBUG("%s: trylocking to get mutex. val: %u\n", active_thread->name, mutex->val);
-    return (atomic_set_return(&mutex->val, thread_pid ) == 0);
+    return (atomic_set_return(&mutex->val, thread_pid) == 0);
 }
 
-int prio(void) {
+int prio(void)
+{
     return active_thread->priority;
 }
 
-int mutex_lock(struct mutex_t* mutex) {
+int mutex_lock(struct mutex_t *mutex)
+{
     DEBUG("%s: trying to get mutex. val: %u\n", active_thread->name, mutex->val);
 
-    if (atomic_set_return(&mutex->val,1) != 0) {
-        // mutex was locked.
+    if(atomic_set_return(&mutex->val, 1) != 0) {
+        /* mutex was locked. */
         mutex_wait(mutex);
     }
+
     return 1;
 }
 
-void mutex_wait(struct mutex_t *mutex) {
+void mutex_wait(struct mutex_t *mutex)
+{
     int irqstate = disableIRQ();
     DEBUG("%s: Mutex in use. %u\n", active_thread->name, mutex->val);
-    if (mutex->val == 0) {
-        // somebody released the mutex. return.
+
+    if(mutex->val == 0) {
+        /* somebody released the mutex. return. */
         mutex->val = thread_pid;
         DEBUG("%s: mutex_wait early out. %u\n", active_thread->name, mutex->val);
         restoreIRQ(irqstate);
         return;
     }
 
-    sched_set_status((tcb_t*)active_thread, STATUS_MUTEX_BLOCKED);
+    sched_set_status((tcb_t*) active_thread, STATUS_MUTEX_BLOCKED);
 
     queue_node_t n;
     n.priority = (unsigned int) active_thread->priority;
@@ -84,19 +91,21 @@ void mutex_wait(struct mutex_t *mutex) {
     /* we were woken up by scheduler. waker removed us from queue. we have the mutex now. */
 }
 
-void mutex_unlock(struct mutex_t* mutex, int yield) {
+void mutex_unlock(struct mutex_t *mutex, int yield)
+{
     DEBUG("%s: unlocking mutex. val: %u pid: %u\n", active_thread->name, mutex->val, thread_pid);
     int irqstate = disableIRQ();
-  
-    if (mutex->val != 0) {
-        if (mutex->queue.next) {
+
+    if(mutex->val != 0) {
+        if(mutex->queue.next) {
             queue_node_t *next = queue_remove_head(&(mutex->queue));
-            tcb_t* process = (tcb_t*)next->data;
+            tcb_t *process = (tcb_t*) next->data;
             DEBUG("%s: waking up waiter %s.\n", process->name);
             sched_set_status(process, STATUS_PENDING);
 
             sched_switch(active_thread->priority, process->priority, inISR());
-        } else {
+        }
+        else {
             mutex->val = 0;
         }
     }

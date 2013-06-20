@@ -1,5 +1,5 @@
 /**
- * Debug-Header. 
+ * Debug-Header.
  *
  * #define ENABLE_DEBUG, include this and then use DEBUG as printf you can toggle.
  *

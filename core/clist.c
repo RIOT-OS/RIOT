@@ -19,16 +19,19 @@
 #include <stdio.h>
 
 /* inserts new_node after node */
-void clist_add(clist_node_t** node, clist_node_t* new_node) {
-    if (*node != NULL) {
+void clist_add(clist_node_t **node, clist_node_t *new_node)
+{
+    if(*node != NULL) {
         new_node->next = (*node);
         new_node->prev = (*node)->prev;
         (*node)->prev->next = new_node;
         (*node)->prev = new_node;
-        if ((*node)->prev == *node) {
+
+        if((*node)->prev == *node) {
             (*node)->prev = new_node;
         }
-    } else {
+    }
+    else {
         *node = new_node;
         new_node->next = new_node;
         new_node->prev = new_node;
@@ -36,23 +39,32 @@ void clist_add(clist_node_t** node, clist_node_t* new_node) {
 }
 
 /* removes node. */
-void clist_remove(clist_node_t** list, clist_node_t *node) {
-    if (node->next != node) {
+void clist_remove(clist_node_t **list, clist_node_t *node)
+{
+    if(node->next != node) {
         node->prev->next = node->next;
         node->next->prev = node->prev;
-        if (node == *list) *list = node->next;
-    } else {
+
+        if(node == *list) {
+            *list = node->next;
+        }
+    }
+    else {
         *list = NULL;
     }
 }
 
-void clist_print(clist_node_t* clist) {
+void clist_print(clist_node_t *clist)
+{
     clist_node_t *start = clist;
 
-    while (clist != NULL ) {
+    while(clist != NULL) {
         printf("list entry: %u prev=%u next=%u\n", clist->data, clist->prev->data, clist->next->data);
         clist = clist->next;
-        if (clist == start) break;
+
+        if(clist == start) {
+            break;
+        }
     }
 }
 
@@ -89,12 +101,12 @@ int main (int argc, char* argv[]) {
 
     clist_print(clist);
     printf("\n");
-    
+
     printf("removing a...\n");
 
     clist_remove(&clist, &a);
     clist_print(clist);
-    
+
     printf("removing c...\n");
 
     clist_remove(&clist, &c);

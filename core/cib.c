@@ -1,30 +1,34 @@
 #include <cib.h>
 
-void cib_init(cib_t *cib, unsigned int size) {
+void cib_init(cib_t *cib, unsigned int size)
+{
     cib->read_count = 0;
     cib->write_count = 0;
-    cib->complement = 0-size;
+    cib->complement = 0 - size;
 }
 
-int cib_avail (cib_t *cib) {
-    return (int) (cib->write_count - cib->read_count);
+int cib_avail(cib_t *cib)
+{
+    return (int)(cib->write_count - cib->read_count);
 }
 
-int cib_get(cib_t *cib) {
-    int avail = cib_avail (cib);
+int cib_get(cib_t *cib)
+{
+    int avail = cib_avail(cib);
 
-    if (avail > 0) {
-        return (int) (cib->read_count++ & ~cib->complement);
-    } 
+    if(avail > 0) {
+        return (int)(cib->read_count++ & ~cib->complement);
+    }
 
     return -1;
 }
 
-int cib_put(cib_t *cib) {
-    int avail = cib_avail (cib);
+int cib_put(cib_t *cib)
+{
+    int avail = cib_avail(cib);
 
-    if ((int)(avail + cib->complement) < 0 ) {
-        return (int) (cib->write_count++ & ~(cib->complement));
+    if((int)(avail + cib->complement) < 0) {
+        return (int)(cib->write_count++ & ~(cib->complement));
     }
 
     return -1;

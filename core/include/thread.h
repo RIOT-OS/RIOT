@@ -23,10 +23,10 @@
 
 /**
  * @brief Creates a new thread.
- * 
+ *
  * @param   stack Lowest address of preallocated stack space
  * @param   stacksize
- * @param   flags Options: 
+ * @param   flags Options:
  * YIELD: force context switch.
  * CREATE_SLEEPING: set new thread to sleeping state, thread must be woken up manually.
  * CREATE_STACKTEST: initialize stack with values needed for stack overflow testing.
@@ -37,7 +37,7 @@
  *
  * @return  returns <0 on error, pid of newly created task else.
 */
-int thread_create(char *stack, int stacksize, char priority, int flags, void (*function) (void), const char* name);
+int thread_create(char *stack, int stacksize, char priority, int flags, void (*function) (void), const char *name);
 
 /**
  * @brief   returns the status of a process.
@@ -76,7 +76,7 @@ int thread_getlastpid(void);
  *
  * @param stack The stack you want to measure. try active_thread->stack_start.
  */
-int thread_measure_stack_usage(char* stack);
+int thread_measure_stack_usage(char *stack);
 
 /* @} */
 #endif /* __THREAD_H */

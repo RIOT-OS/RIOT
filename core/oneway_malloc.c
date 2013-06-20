@@ -25,26 +25,30 @@
 
 extern void *sbrk(int incr);
 
-void *_malloc(size_t size) {
-    void* ptr = sbrk(size);
-    
+void *_malloc(size_t size)
+{
+    void *ptr = sbrk(size);
+
     DEBUG("_malloc(): allocating block of size %u at 0x%X.\n", (unsigned int) size, (unsigned int)ptr);
-    
-    if (ptr != (void*)-1) {
+
+    if(ptr != (void*) - 1) {
         return ptr;
-    } else {
+    }
+    else {
         return NULL;
     }
 }
 
-void *_realloc(void *ptr, size_t size) {
-    void* newptr = _malloc(size);
+void *_realloc(void *ptr, size_t size)
+{
+    void *newptr = _malloc(size);
     memcpy(newptr, ptr, size);
     free(ptr);
     return newptr;
 }
 
-void _free(void* ptr) {
+void _free(void *ptr)
+{
     DEBUG("_free(): block at 0x%X lost.\n", (unsigned int)ptr);
 }
 

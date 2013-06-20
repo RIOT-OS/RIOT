@@ -39,13 +39,13 @@ extern volatile int thread_pid;
 //#define SCHEDSTATISTICS
 #if SCHEDSTATISTICS
 
-    typedef struct schedstat {
-        unsigned int laststart;
-        unsigned int schedules;
-        unsigned int runtime;
-    }schedstat;
+typedef struct {
+    unsigned int laststart;
+    unsigned int schedules;
+    unsigned int runtime;
+} schedstat;
 
-    extern schedstat pidlist[MAXTHREADS];
+extern schedstat pidlist[MAXTHREADS];
 #endif
 
 /** @} */

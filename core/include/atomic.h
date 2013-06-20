@@ -21,7 +21,7 @@
  * @brief sets "val" to "set", returns old "val", atomically
  */
 
-extern unsigned int atomic_set_return(unsigned int* val, unsigned int set); 
+extern unsigned int atomic_set_return(unsigned int *val, unsigned int set);
 
 /**
  * @}
