@@ -33,3 +33,5 @@ CFLAGS += $(EXTDEFINES)
 include $(RIOTBASE)/Makefile.dep
 
 export USEMODULE
+
+export INCLUDES += -I$(RIOTBASE)/core/include
