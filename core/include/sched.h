@@ -1,7 +1,7 @@
 /**
  * @ingroup kernel
  * @{
- * @file
+ * @file        sched.h
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
