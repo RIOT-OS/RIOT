@@ -1,13 +1,13 @@
 /**
  * @file    testing.h
  * @brief   Test suite for the 6LoWPAN Border Router.
- * 
+ *
  *          The tests are managed in the following way:
- *          Packets (ICMPv6 Echo Request) are send onto the sensor node 
- *          via the serial interface. The user can then decide what she 
- *          wants to measure by calling testing_start() to start the 
+ *          Packets (ICMPv6 Echo Request) are send onto the sensor node
+ *          via the serial interface. The user can then decide what she
+ *          wants to measure by calling testing_start() to start the
  *          measuring and testing_stop() to end it.
- * 
+ *
  * @author  Freie Universität Berlin, Computer Systems & Telemetics
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  */
@@ -52,9 +52,9 @@ void testing_stop(uint8_t seq_num);
  *                                  is. Lines of the formats
  *                                  <tt>"# count=%ld (-c)\n"</tt> and
  *                                  <tt>"# interval=%0.2f (-i)\n"</tt>
- *                                  will be replaced with <tt>\%ld</tt> 
- *                                  set to <em>runs_per_test</em> and 
- *                                  <tt>\%0.2f</tt> set to 
+ *                                  will be replaced with <tt>\%ld</tt>
+ *                                  set to <em>runs_per_test</em> and
+ *                                  <tt>\%0.2f</tt> set to
  *                                  <em>interval</em>.
  * @param[in]   runs_per_test       How many packets shall be send in
  *                                  this test.
@@ -62,7 +62,7 @@ void testing_stop(uint8_t seq_num);
  *                                  the sending of each packet.
  */
 void start_test(const char *ping_addr,
-        const char* results_dir_name, const char *skeleton_file, 
-        int runs_per_test, float interval);
+                const char *results_dir_name, const char *skeleton_file,
+                int runs_per_test, float interval);
 
 #endif /* TESTING_H*/

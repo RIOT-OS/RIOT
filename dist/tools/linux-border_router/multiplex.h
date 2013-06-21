@@ -2,7 +2,7 @@
  * @file    multiplex.h
  * @author  Freie Universität Berlin, Computer Systems & Telemetics
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
- * @brief   Public declarations for the multiplexing jobs via the 
+ * @brief   Public declarations for the multiplexing jobs via the
  *          serial interface for the 6LoWPAN Border Router driver.
  */
 #ifndef MULTIPLEX_H
@@ -30,11 +30,11 @@
 /**
  * @brief   Describes packets for transmission via serial interface.
  */
-typedef struct __attribute__ ((packed)) border_packet_t {
+typedef struct __attribute__((packed)) border_packet_t {
     /**
      * @brief Reserved byte.
-     * 
-     * Must be always 0 to distinguish packets from MSB-A2 
+     *
+     * Must be always 0 to distinguish packets from MSB-A2
      * stdout/stdin/stderr.
      */
     uint8_t empty;
@@ -47,7 +47,7 @@ typedef struct __attribute__ ((packed)) border_packet_t {
  *          serial interface.
  * @extends border_packet_t
  */
-typedef struct __attribute__ ((packed)) border_l3_header_t {
+typedef struct __attribute__((packed)) border_l3_header_t {
     uint8_t empty;
     uint8_t type;
     uint8_t seq_num;
@@ -59,7 +59,7 @@ typedef struct __attribute__ ((packed)) border_l3_header_t {
  *          serial interface.
  * @extends border_packet_t
  */
-typedef struct __attribute__ ((packed)) border_conf_header_t {
+typedef struct __attribute__((packed)) border_conf_header_t {
     uint8_t empty;
     uint8_t type;
     uint8_t seq_num;
@@ -69,11 +69,11 @@ typedef struct __attribute__ ((packed)) border_conf_header_t {
 /**
  * @brief   Describes an address configuration packet.
  * @extends border_conf_header_t
- * 
+ *
  * This packet type enables the driver to add new IPv6 addresses to
  * the border router.
  */
- typedef struct __attribute__ ((packed)) border_addr_packet_t {
+typedef struct __attribute__((packed)) border_addr_packet_t {
     uint8_t empty;
     uint8_t type;
     uint8_t seq_num;
@@ -82,18 +82,18 @@ typedef struct __attribute__ ((packed)) border_conf_header_t {
      * @brief   Version for this IP address (send with the ABRO for PIs,
      *          s. draft-ietf-6lowpan-nd-17).
      */
-    uint16_t version;       
+    uint16_t version;
     struct in6_addr addr;   ///< New IPv6-Address to be added to this border router.
 } border_addr_packet_t;
 
 /**
  * @brief   Describes a context configuration packet.
  * @extends border_conf_header_t
- * 
+ *
  * This packet type enables the driver to manipulate Context Informations
  * in the LoWPAN.
  */
-typedef struct __attribute__ ((packed)) border_context_packet_t {
+typedef struct __attribute__((packed)) border_context_packet_t {
     uint8_t empty;
     uint8_t type;
     uint8_t seq_num;
@@ -103,8 +103,8 @@ typedef struct __attribute__ ((packed)) border_context_packet_t {
 
 /**
  * @brief   Size of all packet buffers in this driver.
- * 
- * @ref border_l3_header_t was since packets of this type may be the 
+ *
+ * @ref border_l3_header_t was since packets of this type may be the
  * longest (with payload).
  */
 #define BUFFER_SIZE sizeof (border_l3_header_t) + MTU
@@ -122,7 +122,7 @@ int init_multiplex(const char *tty_dev);
  *          data, that shall be send via the serial interface.
  * @param[in]   offset  The offset from the start of the buffer.
  * @return  Pointer to a cell in the buffer for the output
- *          data. The size of the buffer is then 
+ *          data. The size of the buffer is then
  *          \ref BUFFER_SIZE - <em>offset</em>.
  */
 uint8_t *get_serial_out_buffer(int offset);
@@ -132,7 +132,7 @@ uint8_t *get_serial_out_buffer(int offset);
  *          data, that was received via the serial interface.
  * @param[in]   offset  The offset from the start of the buffer.
  * @return  Pointer to a cell in the buffer for the input
- *          data. The size of the buffer is then 
+ *          data. The size of the buffer is then
  *          \ref BUFFER_SIZE - <em>offset</em>.
  */
 uint8_t *get_serial_in_buffer(int offset);
@@ -141,7 +141,7 @@ uint8_t *get_serial_in_buffer(int offset);
  * @brief   Demultiplexes a packet, that was received via the serial
  *          interface.
  * @param[in]   packet  Packet, that should be demultiplexed.
- * @param[in]   len     Length of the packet, that should be 
+ * @param[in]   len     Length of the packet, that should be
  *                      demultiplexed.
  */
 void demultiplex(const border_packet_t *packet, int len);
@@ -150,29 +150,29 @@ void demultiplex(const border_packet_t *packet, int len);
  * @brief   Sends an IPv6 datagram via the serial interface.
  * @param[in]   packet  The IPv6 datagram that is to be send via the
  *                      serial interface and starts with an IPv6 header.
- * 
- * The function uses the payload length field of the IPv6 Header to 
- * determine the length of the overall packet. The payload bytes 
+ *
+ * The function uses the payload length field of the IPv6 Header to
+ * determine the length of the overall packet. The payload bytes
  * <em>must</em> follow the header in memory.
  */
 void multiplex_send_ipv6_over_tty(const struct ip6_hdr *packet);
 
 /**
  * @brief   Sends context information via the serial interface.
- * @param[in]   context The context information that is to be send via 
+ * @param[in]   context The context information that is to be send via
  *                      the serial interface.
  */
 void multiplex_send_context_over_tty(const border_context_t *context);
 
 /**
  * @brief   Sends new IPv6 address via the serial interface.
- * @param[in]   addr    The new address that is to be send via 
+ * @param[in]   addr    The new address that is to be send via
  *                      the serial interface.
  */
 void multiplex_send_addr_over_tty(struct in6_addr *addr);
 
 /**
- * @brief   Reads a packet up to a length of <em>size</em> bytes from 
+ * @brief   Reads a packet up to a length of <em>size</em> bytes from
  *          the serial interface and saves it to <em>packet_buf</em>.
  * @param[out]  packet_buf  The buffer the read packet should be written
  *                          into.
@@ -182,9 +182,9 @@ void multiplex_send_addr_over_tty(struct in6_addr *addr);
 int readpacket(uint8_t *packet_buf, size_t size);
 
 /**
- * @brief   Writes a packet up to a length of <em>size</em> bytes from 
+ * @brief   Writes a packet up to a length of <em>size</em> bytes from
  *          <em>packet_buf</em> to the serial interface.
- * @param[in]   packet_buf  The buffer from which the packet should be 
+ * @param[in]   packet_buf  The buffer from which the packet should be
  *                          written.
  * @param[in]   size        The maximum number of bytes to be written.
  * @return  The number of bytes written.

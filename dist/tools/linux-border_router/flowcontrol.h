@@ -2,7 +2,7 @@
  * @file    flowcontrol.h
  * @author  Freie Universität Berlin, Computer Systems & Telemetics
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
- * @brief   Public declarations for the flow control jobs via the 
+ * @brief   Public declarations for the flow control jobs via the
  *          serial interface for the 6LoWPAN Border Router driver.
  */
 
@@ -30,7 +30,7 @@
 
 /**
  * @brief   State of the sliding window algorithm, used for flow control
- * @see     "Computernetze -- Eine systemorientierte Einführung", 
+ * @see     "Computernetze -- Eine systemorientierte Einführung",
  *          L.L. Peterson, B.S. Davie, dpunkt-lehrbuch, 2008
  */
 typedef struct flowcontrol_stat_t {
@@ -49,7 +49,7 @@ typedef struct flowcontrol_stat_t {
         uint8_t frame[BUFFER_SIZE];     ///< This slot's frame.
         size_t frame_len;               ///< The length of this slot's frame.
     } send_win[BORDER_SWS];             ///< The sending window.
-    
+
     /* Receiver state */
     uint8_t next_exp;                   ///< The next expected sequence number to be received.
     /**
@@ -67,15 +67,15 @@ typedef struct flowcontrol_stat_t {
  *          the serial line.
  * @extends border_conf_header_t
  */
-typedef struct __attribute__ ((packed)) border_syn_packet_t {
+typedef struct __attribute__((packed)) border_syn_packet_t {
     uint8_t empty;
     uint8_t type;
     /**
      * @brief Next sequence number
-     * 
-     * Communicates the next local sequence number to be send to the 
+     *
+     * Communicates the next local sequence number to be send to the
      * MSB-A2 (for flow control).
-     * 
+     *
      * This replaces @ref border_conf_header_t::seq_num of normal
      * configuration packets.
      */
@@ -83,8 +83,8 @@ typedef struct __attribute__ ((packed)) border_syn_packet_t {
     uint8_t conftype;
     /**
      * @brief Next expected sequence number
-     * 
-     * Communicates to the MSB-A2 which sequence number the driver 
+     *
+     * Communicates to the MSB-A2 which sequence number the driver
      * expects next.
      */
     uint8_t next_exp;
@@ -112,7 +112,7 @@ void signal_connection_established(void);
 /**
  * @brief   Sends a packet via the serial interface.
  * @param[in,out]   packet  The packet that is to be send via the
- *                          serial interface. The function sets the 
+ *                          serial interface. The function sets the
  *                          sequence number of the packet for flow
  *                          control.
  * @param[in]       len     Length of the packet.
