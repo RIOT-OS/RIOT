@@ -40,9 +40,9 @@
 /*
  * @brief:  Converts 'addr' to sector number
  * @note:   Sector table (Users Manual P. 610)
- * 
+ *
  * @param addr	    Flash address
- * 
+ *
  * @return  Sector number. 0xFF on error
  */
 uint8_t iap_get_sector(uint32_t addr);

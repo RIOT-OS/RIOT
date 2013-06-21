@@ -74,23 +74,23 @@ extern uintptr_t __heap3_start;     ///< start of heap memory space
 extern uintptr_t __heap3_max;       ///< maximum for end of heap memory space
 
 
-/// current position in heap
-static caddr_t heap[NUM_HEAPS] = {(caddr_t)&__heap1_start,(caddr_t)&__heap3_start,(caddr_t)&__heap2_start}; // add heap3 before heap2 cause Heap3 address is lower then addr of heap2
-/// maximum position in heap
-static const caddr_t heap_max[NUM_HEAPS] = {(caddr_t)&__heap1_max,(caddr_t)&__heap3_max,(caddr_t)&__heap2_max};
-// start position in heap
-static const caddr_t heap_start[NUM_HEAPS] = {(caddr_t)&__heap1_start,(caddr_t)&__heap3_start,(caddr_t)&__heap2_start};
-// current heap in use
+/* current position in heap */
+static caddr_t heap[NUM_HEAPS] = {(caddr_t) &__heap1_start, (caddr_t) &__heap3_start, (caddr_t) &__heap2_start}; // add heap3 before heap2 cause Heap3 address is lower then addr of heap2
+/* maximum position in heap */
+static const caddr_t heap_max[NUM_HEAPS] = {(caddr_t) &__heap1_max, (caddr_t) &__heap3_max, (caddr_t) &__heap2_max};
+/* start position in heap */
+static const caddr_t heap_start[NUM_HEAPS] = {(caddr_t) &__heap1_start, (caddr_t) &__heap3_start, (caddr_t) &__heap2_start};
+/* current heap in use */
 volatile static uint8_t iUsedHeap = 0;
 
 /** @} */
 
 /*-----------------------------------------------------------------------------------*/
-void heap_stats(void) 
+void heap_stats(void)
 {
     for(int i = 0; i < NUM_HEAPS; i++)
         printf("# heap %i: %p -- %p -> %p (%li of %li free)\n", i, heap_start[i], heap[i], heap_max[i],
-            (uint32_t)heap_max[i] - (uint32_t)heap[i], (uint32_t)heap_max[i] - (uint32_t)heap_start[i]);
+               (uint32_t)heap_max[i] - (uint32_t)heap[i], (uint32_t)heap_max[i] - (uint32_t)heap_start[i]);
 }
 
 /*-----------------------------------------------------------------------------------*/
@@ -100,7 +100,7 @@ void __assert_func(const char *file, int line, const char *func, const char *fai
     trace_number(TRACELOG_EV_ASSERTION, line);
     syslog(SL_EMERGENCY, "assert", "%s() in %s:%u\n", func, file, line);
 #endif
-    printf("#! assertion %s failed\n\t%s() in %s:%u\n", failedexpr, func, file, line );
+    printf("#! assertion %s failed\n\t%s() in %s:%u\n", failedexpr, func, file, line);
     _exit(3);
 }
 /*-----------------------------------------------------------------------------------*/
@@ -111,8 +111,7 @@ void __assert(const char *file, int line, const char *failedexpr)
 /*-----------------------------------------------------------------------------------*/
 caddr_t _sbrk_r(struct _reent *r, size_t incr)
 {
-    if(incr < 0)
-    {
+    if(incr < 0) {
         puts("[syscalls] Negative Values for _sbrk_r are not supported");
         r->_errno = ENOMEM;
         return NULL;
@@ -121,17 +120,18 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
     uint32_t cpsr = disableIRQ();
 
     /* check all heaps for a chunk of the requested size */
-    for (; iUsedHeap < NUM_HEAPS; iUsedHeap++ ) {
+    for(; iUsedHeap < NUM_HEAPS; iUsedHeap++) {
         caddr_t new_heap = heap[iUsedHeap] + incr;
 
-        #ifdef MODULE_TRACELOG
+#ifdef MODULE_TRACELOG
         trace_pointer(TRACELOG_EV_MEMORY, heap[iUsedHeap]);
-        #endif
-        if( new_heap <= heap_max[iUsedHeap] ) {
+#endif
+
+        if(new_heap <= heap_max[iUsedHeap]) {
             caddr_t prev_heap = heap[iUsedHeap];
-            #ifdef MODULE_TRACELOG
+#ifdef MODULE_TRACELOG
             trace_pointer(TRACELOG_EV_MEMORY, new_heap);
-            #endif
+#endif
             heap[iUsedHeap] = new_heap;
 
             r->_errno = 0;
@@ -139,10 +139,11 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
             return prev_heap;
         }
     }
+
     restoreIRQ(cpsr);
-    #ifdef MODULE_TRACELOG
+#ifdef MODULE_TRACELOG
     trace_string(TRACELOG_EV_MEMORY, "heap!");                                  // heap full
-    #endif
+#endif
 
     r->_errno = ENOMEM;
     return NULL;
@@ -151,10 +152,13 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
 int _isatty_r(struct _reent *r, int fd)
 {
     r->_errno = 0;
-    if( fd == STDOUT_FILENO || fd == STDERR_FILENO )
+
+    if(fd == STDOUT_FILENO || fd == STDERR_FILENO) {
         return 1;
-    else
+    }
+    else {
         return 0;
+    }
 }
 /*---------------------------------------------------------------------------*/
 _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int whence)
@@ -178,7 +182,7 @@ int _open_r(struct _reent *r, const char *name, int mode)
 
     r->_errno = ENODEV; // no such device
 #ifdef MODULE_FAT
-    ret = ff_open_r(r,name,mode);
+    ret = ff_open_r(r, name, mode);
 #endif
 
     PRINTF("open [%i] errno %i\n", ret, r->_errno);
@@ -191,33 +195,36 @@ int _stat_r(struct _reent *r, char *name, struct stat *st)
     PRINTF("_stat_r '%s' \n", name);
     r->_errno = ENODEV; // no such device
 #ifdef MODULE_FAT
-    ret = ff_stat_r(r,name,st);
+    ret = ff_stat_r(r, name, st);
 #endif
     PRINTF("_stat_r [%i] errno %i\n", ret, r->_errno);
     return ret;
 }
 /*---------------------------------------------------------------------------*/
-int _fstat_r(struct _reent *r, int fd, struct stat * st)
+int _fstat_r(struct _reent *r, int fd, struct stat *st)
 {
     int ret = -1;
 
     r->_errno = 0;
     memset(st, 0, sizeof(*st));
-    if( fd == STDOUT_FILENO || fd == STDERR_FILENO ) {
+
+    if(fd == STDOUT_FILENO || fd == STDERR_FILENO) {
         st->st_mode = S_IFCHR;
         ret = 0;
-    } else {
+    }
+    else {
 
 #ifdef MODULE_FAT
         PRINTF("_fstat_r '%i' \n", fd);
 
-        ret = ff_fstat_r(r,fd,st);
+        ret = ff_fstat_r(r, fd, st);
         PRINTF("_fstat_r [%i] errno %i\n", ret, r->_errno);
 
 #else
         r->_errno = ENODEV;
 #endif
     }
+
     return ret;
 }
 /*---------------------------------------------------------------------------*/
@@ -229,20 +236,23 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
     switch(fd) {
         case STDOUT_FILENO:
         case STDERR_FILENO:
-            #if FEUERWARE_CONF_ENABLE_HAL
-                if( stdio != NULL )
-                    result = chardevice_write(stdio, (char*)data, count);
-                else if( hal_state == HAL_NOT_INITIALIZED )
-                    result = fw_puts((char*)data, count);
-            #else
-                result = fw_puts((char*)data, count);
-            #endif
+#if FEUERWARE_CONF_ENABLE_HAL
+            if(stdio != NULL) {
+                result = chardevice_write(stdio, (char *)data, count);
+            }
+            else if(hal_state == HAL_NOT_INITIALIZED) {
+                result = fw_puts((char *)data, count);
+            }
+
+#else
+            result = fw_puts((char *)data, count);
+#endif
             break;
 
         default:
-            #ifdef MODULE_FAT
-                result = ff_write_r(r, fd, data, count);
-            #endif
+#ifdef MODULE_FAT
+            result = ff_write_r(r, fd, data, count);
+#endif
             PRINTF("write [%i] data @%p count %i\n", fd, data, count);
 
             PRINTF("write [%i] returned %i errno %i\n", fd, result, r->_errno);
@@ -261,7 +271,7 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 #endif
     PRINTF("read [%i] buffer @%p count %i\n", fd, buffer, count);
     PRINTF("read [%i] returned %i\n", fd, result);
-    
+
     return result;
 }
 /*---------------------------------------------------------------------------*/
@@ -269,16 +279,16 @@ int _close_r(struct _reent *r, int fd)
 {
     int result = -1;
     r->_errno = EBADF;
-    #ifdef MODULE_FAT
-        ret = ff_close_r(r, fd);
-    #endif
+#ifdef MODULE_FAT
+    ret = ff_close_r(r, fd);
+#endif
     PRINTF("close [%i]\n", fd);
     PRINTF("close returned %i errno %i\n", result, errno);
-    
+
     return result;
 }
 /*---------------------------------------------------------------------------*/
-int _unlink_r(struct _reent *r, char* path)
+int _unlink_r(struct _reent *r, char *path)
 {
     int result = -1;
     r->_errno = ENODEV;
@@ -287,7 +297,7 @@ int _unlink_r(struct _reent *r, char* path)
 #endif
     PRINTF("unlink '%s'\n", path);
     PRINTF("unlink returned %i errno %i\n", result, errno);
-    
+
     return result;
 }
 /*---------------------------------------------------------------------------*/
@@ -300,6 +310,7 @@ void _exit(int n)
 
     stdio_flush();
     arm_reset();
+
     while(1);
 }
 /*---------------------------------------------------------------------------*/
@@ -315,5 +326,5 @@ int _kill_r(struct _reent *r, int pid, int sig)
     return -1;
 }
 /*---------------------------------------------------------------------------*/
-void _init(void){}
-void _fini(void){}
+void _init(void) {}
+void _fini(void) {}

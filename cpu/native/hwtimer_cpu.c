@@ -56,8 +56,8 @@ static void (*int_handler)(int);
  */
 void ticks2tv(unsigned long ticks, struct timeval *tp)
 {
-   tp->tv_sec = ticks / HWTIMER_SPEED;
-   tp->tv_usec = (ticks % HWTIMER_SPEED) ;
+    tp->tv_sec = ticks / HWTIMER_SPEED;
+    tp->tv_usec = (ticks % HWTIMER_SPEED) ;
 }
 
 /**
@@ -75,7 +75,7 @@ unsigned long tv2ticks(struct timeval *tp)
 unsigned long ts2ticks(struct timespec *tp)
 {
     /* TODO: check for overflow */
-    return((tp->tv_sec * HWTIMER_SPEED) + (tp->tv_nsec/1000));
+    return((tp->tv_sec * HWTIMER_SPEED) + (tp->tv_nsec / 1000));
 }
 
 /**
@@ -84,34 +84,35 @@ unsigned long ts2ticks(struct timespec *tp)
 void schedule_timer(void)
 {
     int l = next_timer;
-    for (
-            int i = ((next_timer +1) % ARCH_MAXTIMERS);
-            i != next_timer;
-            i = ((i+1) % ARCH_MAXTIMERS)
-        )
-    {
 
-        if ( native_hwtimer_isset[l] != 1 ) {
+    for(
+        int i = ((next_timer + 1) % ARCH_MAXTIMERS);
+        i != next_timer;
+        i = ((i + 1) % ARCH_MAXTIMERS)
+    ) {
+
+        if(native_hwtimer_isset[l] != 1) {
             /* make sure we dont compare to garbage in the following
              * if condition */
             l = i;
         }
 
-        if (
-                ( native_hwtimer_isset[i] == 1 ) &&
-                ( tv2ticks(&(native_hwtimer[i].it_value)) < tv2ticks(&(native_hwtimer[l].it_value)) )
-           )
-        {
+        if(
+            (native_hwtimer_isset[i] == 1) &&
+            (tv2ticks(&(native_hwtimer[i].it_value)) < tv2ticks(&(native_hwtimer[l].it_value)))
+        ) {
             /* set l to the lowest active time */
             l = i;
         }
 
     }
+
     next_timer = l;
+
     /* l could still point to some unused (garbage) timer if no timers
      * are set at all */
-    if (native_hwtimer_isset[next_timer] == 1) {
-        if (setitimer(ITIMER_REAL, &native_hwtimer[next_timer], NULL) == -1) {
+    if(native_hwtimer_isset[next_timer] == 1) {
+        if(setitimer(ITIMER_REAL, &native_hwtimer[next_timer], NULL) == -1) {
             err(1, "schedule_timer");
         }
         else {
@@ -126,7 +127,7 @@ void schedule_timer(void)
 
 /**
  * native timer signal handler
- * 
+ *
  * set new system timer, call timer interrupt handler
  */
 void hwtimer_isr_timer()
@@ -139,7 +140,7 @@ void hwtimer_isr_timer()
     native_hwtimer_isset[next_timer] = 0;
     schedule_timer();
 
-    if (native_hwtimer_irq[i] == 1) {
+    if(native_hwtimer_irq[i] == 1) {
         DEBUG("hwtimer_isr_timer(): calling hwtimer.int_handler(%i)\n", i);
         int_handler(i);
     }
@@ -151,18 +152,22 @@ void hwtimer_isr_timer()
 void hwtimer_arch_enable_interrupt(void)
 {
     DEBUG("hwtimer_arch_enable_interrupt()\n");
-    if (register_interrupt(SIGALRM, hwtimer_isr_timer) != 0) {
+
+    if(register_interrupt(SIGALRM, hwtimer_isr_timer) != 0) {
         DEBUG("darn!\n\n");
     }
+
     return;
 }
 
 void hwtimer_arch_disable_interrupt(void)
 {
     DEBUG("hwtimer_arch_disable_interrupt()\n");
-    if (unregister_interrupt(SIGALRM) != 0) {
+
+    if(unregister_interrupt(SIGALRM) != 0) {
         DEBUG("darn!\n\n");
     }
+
     return;
 }
 
@@ -180,17 +185,19 @@ void hwtimer_arch_unset(short timer)
 void hwtimer_arch_set(unsigned long offset, short timer)
 {
     DEBUG("hwtimer_arch_set(%li, %i)\n", offset, timer);
-    if (offset < HWTIMERMINOFFSET) {
+
+    if(offset < HWTIMERMINOFFSET) {
         offset = HWTIMERMINOFFSET;
         DEBUG("hwtimer_arch_set: offset < MIN, set to: %i\n", offset);
     }
+
     native_hwtimer_irq[timer] = 1;
     native_hwtimer_isset[timer] = 1;
 
     ticks2tv(offset, &(native_hwtimer[timer].it_value));
     DEBUG("hwtimer_arch_set(): that is %lis %lius from now\n",
-            native_hwtimer[timer].it_value.tv_sec,
-            native_hwtimer[timer].it_value.tv_usec);
+          native_hwtimer[timer].it_value.tv_sec,
+          native_hwtimer[timer].it_value.tv_usec);
 
     schedule_timer();
 
@@ -210,7 +217,7 @@ unsigned long hwtimer_arch_now(void)
 
     DEBUG("hwtimer_arch_now()\n");
 
-#ifdef __MACH__ 
+#ifdef __MACH__
     clock_serv_t cclock;
     mach_timespec_t mts;
     host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
@@ -219,9 +226,11 @@ unsigned long hwtimer_arch_now(void)
     t.tv_sec = mts.tv_sec;
     t.tv_nsec = mts.tv_nsec;
 #else
-    if (clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
+
+    if(clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
         err(1, "hwtimer_arch_now: clock_gettime");
     }
+
 #endif
 
     native_hwtimer_now = ts2ticks(&t);
@@ -238,7 +247,7 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
     hwtimer_arch_disable_interrupt();
     int_handler = handler;
 
-    for (int i = 0; i<ARCH_MAXTIMERS; i++) {
+    for(int i = 0; i < ARCH_MAXTIMERS; i++) {
         native_hwtimer_irq[i] = 0;
         native_hwtimer_isset[i] = 0;
         native_hwtimer[i].it_interval.tv_sec = 0;

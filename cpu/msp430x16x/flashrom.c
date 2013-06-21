@@ -10,38 +10,44 @@ static void finish(uint8_t istate);
 static inline void busy_wait(void);
 
 /*---------------------------------------------------------------------------*/
-uint8_t flashrom_erase(uint8_t *addr) {
+uint8_t flashrom_erase(uint8_t *addr)
+{
     uint8_t istate = prepare();
 
     FCTL3 = FWKEY;               /* Lock = 0 */
     busy_wait();
-    FCTL1 = FWKEY | ERASE; 
+    FCTL1 = FWKEY | ERASE;
     *addr  = 0;                    /* erase Flash segment */
     busy_wait();
     FCTL1 = FWKEY;               /* ERASE = 0 */
-    FCTL3 = FWKEY | LOCK;  
+    FCTL3 = FWKEY | LOCK;
     finish(istate);
     return 1;
 }
 
-void flashrom_write(uint8_t *dst, uint8_t *src, size_t size)  {
+void flashrom_write(uint8_t *dst, uint8_t *src, size_t size)
+{
     unsigned int i;
     FCTL3 = FWKEY;              /* Lock = 0 */
     busy_wait();
-    for (i = size; i > 0; i--) {
+
+    for(i = size; i > 0; i--) {
         FCTL1 = FWKEY | WRT;
         *dst = *src;                /* program Flash word */
-        while (!(FCTL3 & WAIT)) {
+
+        while(!(FCTL3 & WAIT)) {
             nop();
         }
     }
+
     busy_wait();
     FCTL1 = FWKEY;              /* WRT = 0 */
     FCTL3 = FWKEY | LOCK;              /* Lock = 1 */
 }
 
 /*---------------------------------------------------------------------------*/
-static uint8_t prepare(void) {
+static uint8_t prepare(void)
+{
     uint8_t istate;
 
     /* Disable all interrupts. */
@@ -51,7 +57,7 @@ static uint8_t prepare(void) {
 
     /* DCO(SMCLK) is 2,4576MHz, /6 = 409600 Hz
      select SMCLK for flash timing, divider 4+1 */
-    FCTL2 = FWKEY | FSSEL_3 | FN2 | FN0;              
+    FCTL2 = FWKEY | FSSEL_3 | FN2 | FN0;
 
     /* disable all interrupts to protect CPU
      during programming from system crash */
@@ -60,19 +66,21 @@ static uint8_t prepare(void) {
     /* disable all NMI-Interrupt sources */
     ie1 = IE1;
     ie2 = IE2;
-    IE1 = 0x00;                  
+    IE1 = 0x00;
     IE2 = 0x00;
     return istate;
 }
 /*---------------------------------------------------------------------------*/
-void finish(uint8_t istate) {
-  /* Enable interrupts. */
-  IE1 = ie1;
-  IE2 = ie2;
-  restoreIRQ(istate);
+void finish(uint8_t istate)
+{
+    /* Enable interrupts. */
+    IE1 = ie1;
+    IE2 = ie2;
+    restoreIRQ(istate);
 }
 
-static inline void busy_wait(void) {
+static inline void busy_wait(void)
+{
     /* Wait for BUSY = 0, not needed unless run from RAM */
     while(FCTL3 & 0x0001) {
         nop();

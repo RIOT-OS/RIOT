@@ -14,9 +14,9 @@ License. See the file LICENSE in the top level directory for more details.
 #define __HWTIMER_CPU_H
 
 #ifdef CC430
-	#include <cc430f6137.h>
+#include <cc430f6137.h>
 #else
-	#include <msp430x16x.h>
+#include <msp430x16x.h>
 #endif
 #include <stdint.h>
 

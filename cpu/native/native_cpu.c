@@ -55,15 +55,15 @@ char *thread_stack_init(void *task_func, void *stack_start, int stacksize)
     stk = stack_start;
 
 #ifdef NATIVESPONTOP
-    p = (ucontext_t*)stk;
-    stk += sizeof(ucontext_t)/sizeof(void*);
+    p = (ucontext_t *)stk;
+    stk += sizeof(ucontext_t) / sizeof(void *);
     stacksize -= sizeof(ucontext_t);
 #else
-    p = (ucontext_t*)(stk + ((stacksize-sizeof(ucontext_t))/sizeof(void*)));
+    p = (ucontext_t *)(stk + ((stacksize - sizeof(ucontext_t)) / sizeof(void *)));
     stacksize -= sizeof(ucontext_t);
 #endif
 
-    if (getcontext(p) == -1) {
+    if(getcontext(p) == -1) {
         err(1, "thread_stack_init(): getcontext()");
     }
 
@@ -71,7 +71,8 @@ char *thread_stack_init(void *task_func, void *stack_start, int stacksize)
     p->uc_stack.ss_size = stacksize;
     p->uc_stack.ss_flags = 0;
     p->uc_link = &end_context;
-    if (sigemptyset(&(p->uc_sigmask)) == -1) {
+
+    if(sigemptyset(&(p->uc_sigmask)) == -1) {
         err(1, "thread_stack_init(): sigemptyset()");
     }
 
@@ -89,9 +90,10 @@ void cpu_switch_context_exit(void)
     sched_run();
 
     DEBUG("XXX: cpu_switch_context_exit(): calling setcontext(%s)\n\n", active_thread->name);
-    ctx = (ucontext_t*)(active_thread->sp);
+    ctx = (ucontext_t *)(active_thread->sp);
     eINT(); // XXX: workaround for bug (?) in sched_task_exit
-    if (setcontext(ctx) == -1) {
+
+    if(setcontext(ctx) == -1) {
         err(1, "cpu_switch_context_exit(): setcontext():");
     }
 }
@@ -105,14 +107,16 @@ void thread_yield()
 
     DEBUG("thread_yield()\n");
 
-    oc = (ucontext_t*)(active_thread->sp);
+    oc = (ucontext_t *)(active_thread->sp);
 
     sched_run();
 
-    nc = (ucontext_t*)(active_thread->sp);
-    if (nc != oc) {
+    nc = (ucontext_t *)(active_thread->sp);
+
+    if(nc != oc) {
         DEBUG("thread_yield(): calling swapcontext(%s)\n\n", active_thread->name);
-        if (swapcontext(oc, nc) == -1) {
+
+        if(swapcontext(oc, nc) == -1) {
             err(1, "thread_yield(): swapcontext()");
         }
     }
@@ -123,9 +127,10 @@ void thread_yield()
 
 void native_cpu_init()
 {
-    if (getcontext(&end_context) == -1) {
+    if(getcontext(&end_context) == -1) {
         err(1, "end_context(): getcontext()");
     }
+
     end_context.uc_stack.ss_sp = __isr_stack;
     end_context.uc_stack.ss_size = SIGSTKSZ;
     end_context.uc_stack.ss_flags = 0;

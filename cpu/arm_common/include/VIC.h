@@ -90,7 +90,7 @@ Boston, MA 02111-1307, USA.  */
 #include <stdbool.h>
 #include "cpu.h"
 
-bool cpu_install_irq( int IntNumber, void *HandlerAddr, int Priority );
+bool cpu_install_irq(int IntNumber, void *HandlerAddr, int Priority);
 
 /** @} */
 #endif /*ARMVIC_H_*/

@@ -3,7 +3,8 @@
 
 extern void board_init(void);
 
-__attribute__ ((constructor)) static void startup(void) {
+__attribute__((constructor)) static void startup(void)
+{
     /* use putchar so the linker links it in: */
     putchar('\n');
 

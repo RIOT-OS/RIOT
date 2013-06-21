@@ -22,7 +22,7 @@ extern void board_init(void);
 extern void native_cpu_init(void);
 extern void native_interrupt_init(void);
 
-__attribute__ ((constructor)) static void startup(void)
+__attribute__((constructor)) static void startup(void)
 {
     native_cpu_init();
     native_interrupt_init();

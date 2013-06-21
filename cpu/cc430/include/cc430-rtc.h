@@ -33,10 +33,10 @@ License. See the file LICENSE in the top level directory for more details.
  * @see		::rtc_set_alarm
  */
 typedef enum {
-	RTC_ALARM_DISABLED = 0x00,		///< Alarm disables
-	RTC_ALARM_MIN	   = 0x01,    	///< Alarm mask for Minutes
-	RTC_ALARM_HOUR     = 0x02, 	    ///< Alarm mask for Hours
-	RTC_ALARM_DOW	   = 0x04, 	    ///< Alarm mask for Day of Week
+    RTC_ALARM_DISABLED = 0x00,		///< Alarm disables
+    RTC_ALARM_MIN	   = 0x01,    	///< Alarm mask for Minutes
+    RTC_ALARM_HOUR     = 0x02, 	    ///< Alarm mask for Hours
+    RTC_ALARM_DOW	   = 0x04, 	    ///< Alarm mask for Day of Week
     RTC_ALARM_DOM      = 0x08       ///< Alarm mask for Day of Month
 } rtc_alarm_mask_t;
 
@@ -50,7 +50,7 @@ typedef enum {
  *
  * @see ::rtc_alarm_mask
  */
-void rtc_set_alarm(struct tm* localti, rtc_alarm_mask_t mask);
+void rtc_set_alarm(struct tm *localti, rtc_alarm_mask_t mask);
 
 /**
  * @brief   Resets any set alarm

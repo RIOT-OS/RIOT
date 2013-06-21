@@ -35,95 +35,101 @@ License. See the file LICENSE in the top level directory for more details.
 #include <irq.h>
 
 struct irq_callback_t {
-	fp_irqcb	callback;
+    fp_irqcb	callback;
 };
 
 static struct irq_callback_t gpioint0[32];
 static struct irq_callback_t gpioint2[32];
 
 
-void gpioint_init(void) {
+void gpioint_init(void)
+{
     extern void GPIO_IRQHandler(void);
 
-   /* GPIO Init */
-    INTWAKE |= GPIO0WAKE | GPIO2WAKE;                       // allow GPIO to wake up from power down
-    install_irq(GPIO_INT, &GPIO_IRQHandler, IRQP_GPIO);     // install irq handler
+    /* GPIO Init */
+    INTWAKE |= GPIO0WAKE | GPIO2WAKE;                       /* allow GPIO to wake up from power down */
+    install_irq(GPIO_INT, &GPIO_IRQHandler, IRQP_GPIO);     /* install irq handler */
 }
 
 /*---------------------------------------------------------------------------*/
 bool
 gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
 {
-	struct irq_callback_t*	cbdata;
-	unsigned long bit;
-	volatile unsigned long* en_f;
-	volatile unsigned long* en_r;
-	volatile unsigned long* en_clr;
+    struct irq_callback_t	*cbdata;
+    unsigned long bit;
+    volatile unsigned long *en_f;
+    volatile unsigned long *en_r;
+    volatile unsigned long *en_clr;
 
-	/* lookup registers */
-	bit = number_of_highest_bit(bitmask);						// get irq mapping table index
+    /* lookup registers */
+    bit = number_of_highest_bit(bitmask);						/* get irq mapping table index */
 
-	switch( port ) {
-		case 0:													// PORT0
-			cbdata = gpioint0;
-			en_f = &IO0_INT_EN_F;
-			en_r = &IO0_INT_EN_R;
-			en_clr = &IO0_INT_CLR;
-			break;
+    switch(port) {
+        case 0:													/* PORT0 */
+            cbdata = gpioint0;
+            en_f = &IO0_INT_EN_F;
+            en_r = &IO0_INT_EN_R;
+            en_clr = &IO0_INT_CLR;
+            break;
 
-		case 2:													// PORT2
-			cbdata = gpioint2;
-			en_f = &IO2_INT_EN_F;
-			en_r = &IO2_INT_EN_R;
-			en_clr = &IO2_INT_CLR;
-			break;
+        case 2:													/* PORT2 */
+            cbdata = gpioint2;
+            en_f = &IO2_INT_EN_F;
+            en_r = &IO2_INT_EN_R;
+            en_clr = &IO2_INT_CLR;
+            break;
 
-		default:												// unsupported
-			return false;										// fail
-	}
+        default:												/* unsupported */
+            return false;										/* fail */
+    }
 
-	/* reconfigure irq */
-	unsigned long cpsr = disableIRQ();
-	*en_clr |= bitmask; 										// clear interrupt
+    /* reconfigure irq */
+    unsigned long cpsr = disableIRQ();
+    *en_clr |= bitmask; 										/* clear interrupt */
 
-	if( (flags & GPIOINT_FALLING_EDGE) != 0 ) {
-		*en_f |= bitmask; 										// enable falling edge
-	} else {
-		*en_f &= ~bitmask; 										// disable falling edge
-	}
+    if((flags & GPIOINT_FALLING_EDGE) != 0) {
+        *en_f |= bitmask; 										/* enable falling edge */
+    }
+    else {
+        *en_f &= ~bitmask; 										/* disable falling edge */
+    }
 
-	if( (flags & GPIOINT_RISING_EDGE) != 0 ) {
-		*en_r |= bitmask; 										// enable rising edge
-	} else {
-		*en_r &= ~bitmask; 										// disable rising edge
-	}
+    if((flags & GPIOINT_RISING_EDGE) != 0) {
+        *en_r |= bitmask; 										/* enable rising edge */
+    }
+    else {
+        *en_r &= ~bitmask; 										/* disable rising edge */
+    }
 
-	if( ((flags & (GPIOINT_FALLING_EDGE | GPIOINT_RISING_EDGE)) != 0) ) {
-		cbdata[bit].callback = callback;
+    if(((flags & (GPIOINT_FALLING_EDGE | GPIOINT_RISING_EDGE)) != 0)) {
+        cbdata[bit].callback = callback;
 
-	} else {
-		cbdata[bit].callback = NULL;							// remove from interrupt mapping table
-	}
-	restoreIRQ(cpsr);
+    }
+    else {
+        cbdata[bit].callback = NULL;							/* remove from interrupt mapping table */
+    }
 
-	return true;												// success
+    restoreIRQ(cpsr);
+
+    return true;												/* success */
 }
 /*---------------------------------------------------------------------------*/
-static void __attribute__ ((__no_instrument_function__)) test_irq(int port, unsigned long f_mask, unsigned long r_mask, struct irq_callback_t* pcb)
+static void __attribute__((__no_instrument_function__)) test_irq(int port, unsigned long f_mask, unsigned long r_mask, struct irq_callback_t *pcb)
 {
-	/* Test each bit of rising and falling masks, if set trigger interrupt
-	 * on corresponding device */
-	do {
-		if( (pcb->callback != NULL)  ) {
-			if ((r_mask & 1) | (f_mask & 1)) {
-				pcb->callback();			// pass to handler
-			}
-		}
+    /* Test each bit of rising and falling masks, if set trigger interrupt
+     * on corresponding device */
+    do {
+        if((pcb->callback != NULL)) {
+            if((r_mask & 1) | (f_mask & 1)) {
+                pcb->callback();			/* pass to handler */
+            }
+        }
 
-		f_mask >>= 1UL;
-		r_mask >>= 1UL;
-		pcb++;
-	} while( (f_mask != 0) || (r_mask != 0) );
+        f_mask >>= 1UL;
+        r_mask >>= 1UL;
+        pcb++;
+    }
+    while((f_mask != 0) || (r_mask != 0));
 }
 /*---------------------------------------------------------------------------*/
 void GPIO_IRQHandler(void) __attribute__((interrupt("IRQ")));
@@ -134,27 +140,29 @@ void GPIO_IRQHandler(void) __attribute__((interrupt("IRQ")));
  * Invoked whenever an activated gpio interrupt is triggered by a rising
  * or falling edge.
  */
-void __attribute__ ((__no_instrument_function__)) GPIO_IRQHandler(void) {
-	if( IO_INT_STAT & BIT0 ) {										// interrupt(s) on PORT0 pending
-		unsigned long int_stat_f = IO0_INT_STAT_F;					// save content
-		unsigned long int_stat_r = IO0_INT_STAT_R;					// save content
+void __attribute__((__no_instrument_function__)) GPIO_IRQHandler(void)
+{
+    if(IO_INT_STAT & BIT0) {										/* interrupt(s) on PORT0 pending */
+        unsigned long int_stat_f = IO0_INT_STAT_F;					/* save content */
+        unsigned long int_stat_r = IO0_INT_STAT_R;					/* save content */
 
-		IO0_INT_CLR = int_stat_f;									// clear flags of fallen pins
-		IO0_INT_CLR = int_stat_r;									// clear flags of risen pins
+        IO0_INT_CLR = int_stat_f;									/* clear flags of fallen pins */
+        IO0_INT_CLR = int_stat_r;									/* clear flags of risen pins */
 
-		test_irq(0, int_stat_f, int_stat_r, gpioint0);
-	}
+        test_irq(0, int_stat_f, int_stat_r, gpioint0);
+    }
 
-	if( IO_INT_STAT & BIT2 ) {										// interrupt(s) on PORT2 pending
-		unsigned long int_stat_f = IO2_INT_STAT_F;					// save content
-		unsigned long int_stat_r = IO2_INT_STAT_R;					// save content
+    if(IO_INT_STAT & BIT2) {										/* interrupt(s) on PORT2 pending */
+        unsigned long int_stat_f = IO2_INT_STAT_F;					/* save content */
+        unsigned long int_stat_r = IO2_INT_STAT_R;					/* save content */
 
-		IO2_INT_CLR = int_stat_f;									// clear flags of fallen pins
-		IO2_INT_CLR = int_stat_r;									// clear flags of risen pins
+        IO2_INT_CLR = int_stat_f;									/* clear flags of fallen pins */
+        IO2_INT_CLR = int_stat_r;									/* clear flags of risen pins */
 
-		test_irq(2, int_stat_f, int_stat_r, gpioint2);
-	}
-	VICVectAddr = 0;												// Acknowledge Interrupt
+        test_irq(2, int_stat_f, int_stat_r, gpioint2);
+    }
+
+    VICVectAddr = 0;												/* Acknowledge Interrupt */
 }
 /*---------------------------------------------------------------------------*/
 /** @} */

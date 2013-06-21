@@ -1,15 +1,14 @@
 #ifndef MSPGCC_TIME_H
 #define MSPGCC_TIME_H
 
-struct tm
-{
-  int tm_sec;                   // Seconds after the minute [0, 59]
-  int tm_min;                   // Minutes after the hour [0, 59]
-  int tm_hour;                  // Hours since midnight [0, 23]
-  int tm_mday;                  // Day of the month [1, 31]
-  int tm_mon;                   // Months since January [0, 11]
-  int tm_year;                  // Years since 1900
-  int tm_wday;                  // Days since Sunday [0, 6]
+struct tm {
+    int tm_sec;                   /* Seconds after the minute [0, 59] */
+    int tm_min;                   /* Minutes after the hour [0, 59] */
+    int tm_hour;                  /* Hours since midnight [0, 23] */
+    int tm_mday;                  /* Day of the month [1, 31] */
+    int tm_mon;                   /* Months since January [0, 11] */
+    int tm_year;                  /* Years since 1900 */
+    int tm_wday;                  /* Days since Sunday [0, 6] */
 };
 
 #endif

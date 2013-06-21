@@ -424,5 +424,5 @@ details.
 //inline void TurOffPeripheral(int p);
 //inline void TurOnPeripheral(int p);
 
-#endif  
+#endif
 

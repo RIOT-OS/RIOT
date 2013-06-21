@@ -18,7 +18,7 @@
 #include <irq.h>
 #include <debug.h>
 
-unsigned int atomic_set_return(unsigned int* val, unsigned int set)
+unsigned int atomic_set_return(unsigned int *val, unsigned int set)
 {
     unsigned int old_val;
     unsigned int old_state;

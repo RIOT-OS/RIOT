@@ -27,7 +27,8 @@ static uint8_t native_cc110x_ssp0dr;
 uint8_t cc110x_txrx(uint8_t c)
 {
     native_cc110x_ssp0dr = c;
-    switch (c) {
+
+    switch(c) {
         case CC1100_READ_BURST:
         case CC1100_WRITE_BURST:
         case CC1100_READ_SINGLE:
@@ -35,6 +36,7 @@ uint8_t cc110x_txrx(uint8_t c)
         default:
             warnx("cc110x_txrx (%i): not implemented", c);
     }
+
     DEBUG("cc110x_txrx\n");
     return native_cc110x_ssp0dr;
 }
