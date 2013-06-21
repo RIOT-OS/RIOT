@@ -1,3 +1,19 @@
+/**
+ * Data structures and variables for the cc110x driver interface
+ *
+ * Copyright (C) 2009 Freie Universität Berlin
+ * Copyright (C) 2013 INRIA 
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup dev_cc110x_ng
+ * @{
+ * @file
+ * @author Oliver Hahm <oliver.hahm@inria.fr>
+ * @}
+ */
 #ifndef CC1100_H
 #define CC1100_H
 
@@ -65,13 +81,15 @@ Notes:
 \li Identification is increased is used to scan duplicates. It must be increased
 	for each new packet and kept for packet retransmissions.
  */
-typedef struct __attribute__ ((packed)) {
-	uint8_t length;					///< Length of the packet (without length byte)
-	uint8_t address;				///< Destination address
-	uint8_t phy_src;				///< Source address (physical source)
-	uint8_t flags;					///< Flags
-	uint8_t data[CC1100_MAX_DATA_LENGTH];	///< Data (high layer protocol)
-} cc110x_packet_t;
+typedef struct __attribute__((packed))
+{
+    uint8_t length;					///< Length of the packet (without length byte)
+    uint8_t address;				///< Destination address
+    uint8_t phy_src;				///< Source address (physical source)
+    uint8_t flags;					///< Flags
+    uint8_t data[CC1100_MAX_DATA_LENGTH];	///< Data (high layer protocol)
+}
+cc110x_packet_t;
 
 typedef struct {
     uint8_t rssi;
@@ -80,12 +98,12 @@ typedef struct {
 } rx_buffer_t;
 
 enum radio_mode {
-	RADIO_MODE_GET	= -1,		///< leave mode unchanged
-	RADIO_MODE_OFF	= 0,		///< turn radio off
-	RADIO_MODE_ON	= 1			///< turn radio on
+    RADIO_MODE_GET	= -1,		///< leave mode unchanged
+    RADIO_MODE_OFF	= 0,		///< turn radio off
+    RADIO_MODE_ON	= 1			///< turn radio on
 };
 
-extern rx_buffer_t cc110x_rx_buffer[]; 
+extern rx_buffer_t cc110x_rx_buffer[];
 
 extern volatile uint8_t rx_buffer_next;	    ///< Next packet in RX queue
 

@@ -44,7 +44,7 @@ and the mailinglist (subscription via web site)
 
 #define SHT11_NO_ACK		(0)
 #define SHT11_ACK			(1)
-							 		//adr command  r/w
+//adr command  r/w
 #define SHT11_STATUS_REG_W	(0x06) 	//000  0011    0
 #define SHT11_STATUS_REG_R	(0x07) 	//000  0011    1
 #define SHT11_MEASURE_TEMP	(0x03) 	//000  0001	   1
@@ -60,20 +60,20 @@ and the mailinglist (subscription via web site)
 #define SHT11_MEASURE_TIMEOUT   (1000)
 
 /**
- * @brief   sht11 measureable data 
+ * @brief   sht11 measureable data
  */
 typedef struct {
-	float	temperature;    /**< temperature value */
-	float	relhum;         /**< linear relative humidity */
-	float	relhum_temp;    /**< temperature compensated relative humidity */
+    float	temperature;    /**< temperature value */
+    float	relhum;         /**< linear relative humidity */
+    float	relhum_temp;    /**< temperature compensated relative humidity */
 } sht11_val_t;
 
 /**
  * @brief	SHT11 modes that can be measured
  */
 typedef enum {
-	TEMPERATURE = 1,
-	HUMIDITY = 2
+    TEMPERATURE = 1,
+    HUMIDITY = 2
 } sht11_mode_t;
 
 /**
@@ -98,7 +98,7 @@ uint8_t sht11_read_sensor(sht11_val_t *value, sht11_mode_t mode);
 
 /**
  * @brief   Write status register
- * 
+ *
  * @param   p_value The value to write
  *
  * @return  1 on success, 0 otherwise

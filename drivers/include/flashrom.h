@@ -1,5 +1,5 @@
 #ifndef FLASHROM_H
-#define FLASHROM_H 
+#define FLASHROM_H
 
 #include <stdint.h>
 #include <stddef.h>

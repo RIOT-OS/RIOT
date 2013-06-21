@@ -1,28 +1,19 @@
-/******************************************************************************
-Copyright 2008, Freie Universitaet Berlin (FUB). All rights reserved.
-
-These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
--------------------------------------------------------------------------------
-This file is part of RIOT.
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-RIOT is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see http://www.gnu.org/licenses/ .
---------------------------------------------------------------------------------
-For further information and questions please use the web site
-	http://scatterweb.mi.fu-berlin.de
-and the mailinglist (subscription via web site)
-	scatterweb@lists.spline.inf.fu-berlin.de
-*******************************************************************************/
+/**
+ * Driver internal constants for 110x chip configuration
+ *
+ * Copyright (C) 2008 Freie Universität Berlin
+ * Copyright (C) 2013 INRIA 
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup dev_cc110x_ng
+ * @{
+ * @file
+ * @author Oliver Hahm <oliver.hahm@inria.fr>
+ * @}
+ */
 
 #ifndef CC1100_INTERNAL_H
 #define CC1100_INTERNAL_H

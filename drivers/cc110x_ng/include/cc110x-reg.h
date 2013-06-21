@@ -3,9 +3,8 @@
  * @ingroup dev_cc110x_ng
  * @brief   Access to CC110X registers
  *
- * @author  Freie Uniersität Berlin, Computer Systems & Telematics, RIOT
- * @author  Oliver Hahm <oliver.hahm@fu-berlin.de
- * version  $Revision$
+ * @author  INRIA 
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  *
  */
 
@@ -39,7 +38,7 @@ void cc110x_readburst_reg(uint8_t addr, char *buffer, uint8_t count);
  *
  * @param buffer    Buffer to store read data
  * @param count     Size of data to be read
- *  
+ *
  * @note:   Calls cc110x_readburst_reg if not dedicated fifo read command
  *          available
  */

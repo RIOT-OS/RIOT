@@ -66,162 +66,195 @@ volatile static int cs_hwtimer_id = -1;
 volatile static int cs_timeout_flag = 0;
 
 /*---------------------------------------------------------------------------*/
-static void cs_timeout_cb(void* ptr)
+static void cs_timeout_cb(void *ptr)
 {
-	cs_timeout_flag = 1;
+    cs_timeout_flag = 1;
 }
 
 /*---------------------------------------------------------------------------*/
 int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priority, char *payload, int payload_len)
 {
-	uint16_t min_window_size;
-	uint16_t max_window_size;
-	uint16_t difs;
-	uint16_t slottime;
+    uint16_t min_window_size;
+    uint16_t max_window_size;
+    uint16_t difs;
+    uint16_t slottime;
 
-	switch (priority)
-	{
-		case PRIORITY_ALARM:
-			min_window_size = PRIO_ALARM_MIN_WINDOW_SIZE;
-			max_window_size = PRIO_ALARM_MAX_WINDOW_SIZE;
-			difs = PRIO_ALARM_DIFS;
-			slottime = PRIO_ALARM_SLOTTIME;
-			break;
-		case PRIORITY_WARNING:
-			min_window_size = PRIO_WARN_MIN_WINDOW_SIZE;
-			max_window_size = PRIO_WARN_MAX_WINDOW_SIZE;
-			difs = PRIO_WARN_DIFS;
-			slottime = PRIO_WARN_SLOTTIME;
-			break;
-		default:
-			min_window_size = PRIO_DATA_MIN_WINDOW_SIZE;
-			max_window_size = PRIO_DATA_MAX_WINDOW_SIZE;
-			difs = PRIO_DATA_DIFS;
-			slottime = PRIO_DATA_SLOTTIME;
-	}
+    switch(priority) {
+        case PRIORITY_ALARM:
+            min_window_size = PRIO_ALARM_MIN_WINDOW_SIZE;
+            max_window_size = PRIO_ALARM_MAX_WINDOW_SIZE;
+            difs = PRIO_ALARM_DIFS;
+            slottime = PRIO_ALARM_SLOTTIME;
+            break;
 
-	// Calculate collisions per second
-	if (collision_state == COLLISION_STATE_INITIAL) {
-		timex_t now;
-		vtimer_now(&now);
-		collision_measurement_start =  now.microseconds;
-		collision_count = 0;
-		collisions_per_sec = 0;
-		collision_state = COLLISION_STATE_MEASURE;
-	} else if (collision_state == COLLISION_STATE_MEASURE) {
-			timex_t now;
-			vtimer_now(&now);
-			uint64_t timespan = now.microseconds - collision_measurement_start;
-			if (timespan > 1000000) {
-				collisions_per_sec = (collision_count * 1000000) / (double) timespan;
-			if (collisions_per_sec > 0.5 && collisions_per_sec <= 2.2) {
-				timex_t now;
-				vtimer_now(&now);
-				collision_measurement_start = now.microseconds;
-				collision_state = COLLISION_STATE_KEEP;
-			} else if (collisions_per_sec > 2.2) {
-				timex_t now;
-				vtimer_now(&now);
-				collision_measurement_start = now.microseconds;
-				collision_state = COLLISION_STATE_KEEP;
-			} else {
-				collision_state = COLLISION_STATE_INITIAL;
-			}
-		}
-	} else if (collision_state == COLLISION_STATE_KEEP) {
-		timex_t now;
-		vtimer_now(&now);
+        case PRIORITY_WARNING:
+            min_window_size = PRIO_WARN_MIN_WINDOW_SIZE;
+            max_window_size = PRIO_WARN_MAX_WINDOW_SIZE;
+            difs = PRIO_WARN_DIFS;
+            slottime = PRIO_WARN_SLOTTIME;
+            break;
+
+        default:
+            min_window_size = PRIO_DATA_MIN_WINDOW_SIZE;
+            max_window_size = PRIO_DATA_MAX_WINDOW_SIZE;
+            difs = PRIO_DATA_DIFS;
+            slottime = PRIO_DATA_SLOTTIME;
+    }
+
+    /* Calculate collisions per second */
+    if(collision_state == COLLISION_STATE_INITIAL) {
+        timex_t now;
+        vtimer_now(&now);
+        collision_measurement_start =  now.microseconds;
+        collision_count = 0;
+        collisions_per_sec = 0;
+        collision_state = COLLISION_STATE_MEASURE;
+    }
+    else if(collision_state == COLLISION_STATE_MEASURE) {
+        timex_t now;
+        vtimer_now(&now);
         uint64_t timespan = now.microseconds - collision_measurement_start;
-        if (timespan > 5000000) {
-			collision_state = COLLISION_STATE_INITIAL;
-		}
-	}
 
-	// Adjust initial window size according to collision rate
-	if (collisions_per_sec > 0.5 && collisions_per_sec <= 2.2) {
-		min_window_size *= 2;
-	} else if (collisions_per_sec > 2.2) {
-		min_window_size *= 4;
-	}
+        if(timespan > 1000000) {
+            collisions_per_sec = (collision_count * 1000000) / (double) timespan;
 
-	uint16_t windowSize = min_window_size;		// Start with window size of PRIO_XXX_MIN_WINDOW_SIZE
-	uint16_t backoff = 0;						// Backoff between 1 and windowSize
-	uint32_t total;								// Holds the total wait time before send try
-	uint32_t cs_timeout;						// Current carrier sense timeout value
+            if(collisions_per_sec > 0.5 && collisions_per_sec <= 2.2) {
+                timex_t now;
+                vtimer_now(&now);
+                collision_measurement_start = now.microseconds;
+                collision_state = COLLISION_STATE_KEEP;
+            }
+            else if(collisions_per_sec > 2.2) {
+                timex_t now;
+                vtimer_now(&now);
+                collision_measurement_start = now.microseconds;
+                collision_state = COLLISION_STATE_KEEP;
+            }
+            else {
+                collision_state = COLLISION_STATE_INITIAL;
+            }
+        }
+    }
+    else if(collision_state == COLLISION_STATE_KEEP) {
+        timex_t now;
+        vtimer_now(&now);
+        uint64_t timespan = now.microseconds - collision_measurement_start;
 
-	if (protocol == 0)
-	{
-		return RADIO_INVALID_PARAM;				// Not allowed, protocol id must be greater zero
-	}
+        if(timespan > 5000000) {
+            collision_state = COLLISION_STATE_INITIAL;
+        }
+    }
 
-	cc1100_phy_mutex_lock();					// Lock radio for exclusive access
+    /* Adjust initial window size according to collision rate */
+    if(collisions_per_sec > 0.5 && collisions_per_sec <= 2.2) {
+        min_window_size *= 2;
+    }
+    else if(collisions_per_sec > 2.2) {
+        min_window_size *= 4;
+    }
 
-	// Get carrier sense timeout based on overall error rate till now
-	send_csmaca_calls++;
-	int fail_percentage = (send_csmaca_calls_cs_timeout * 100) / send_csmaca_calls;
-	if (fail_percentage == 0) fail_percentage = 1;
-	cs_timeout = CARRIER_SENSE_TIMEOUT / fail_percentage;
-	if (cs_timeout < CARRIER_SENSE_TIMEOUT_MIN) cs_timeout = CARRIER_SENSE_TIMEOUT_MIN;
+    uint16_t windowSize = min_window_size;		/* Start with window size of PRIO_XXX_MIN_WINDOW_SIZE */
+    uint16_t backoff = 0;						/* Backoff between 1 and windowSize */
+    uint32_t total;								/* Holds the total wait time before send try */
+    uint32_t cs_timeout;						/* Current carrier sense timeout value */
 
-	cc1100_cs_init();							// Initialize carrier sensing
+    if(protocol == 0) {
+        return RADIO_INVALID_PARAM;				/* Not allowed, protocol id must be greater zero */
+    }
 
-	window:
-		if (backoff != 0) goto cycle;			// If backoff was 0
-		windowSize *= 2;						// ...double the current window size
-		if (windowSize > max_window_size)
-		{
-			windowSize = max_window_size;		// This is the maximum size allowed
-		}
-		backoff = rand() % windowSize;			// ...and choose new backoff
-		if (backoff < 0) backoff *= -1;
-		backoff += (uint16_t) 1;
-	cycle:
-		cs_timeout_flag = 0;					// Carrier sense timeout flag
-		cs_hwtimer_id = hwtimer_set(cs_timeout,	// Set hwtimer to set CS timeout flag
-				cs_timeout_cb, NULL);
-		while (cc1100_cs_read())				// Wait until air is free
-		{
-			if (cs_timeout_flag)
-			{
-				send_csmaca_calls_cs_timeout++;
+    cc1100_phy_mutex_lock();					/* Lock radio for exclusive access */
+
+    /* Get carrier sense timeout based on overall error rate till now */
+    send_csmaca_calls++;
+    int fail_percentage = (send_csmaca_calls_cs_timeout * 100) / send_csmaca_calls;
+
+    if(fail_percentage == 0) {
+        fail_percentage = 1;
+    }
+
+    cs_timeout = CARRIER_SENSE_TIMEOUT / fail_percentage;
+
+    if(cs_timeout < CARRIER_SENSE_TIMEOUT_MIN) {
+        cs_timeout = CARRIER_SENSE_TIMEOUT_MIN;
+    }
+
+    cc1100_cs_init();							/* Initialize carrier sensing */
+
+window:
+
+    if(backoff != 0) {
+        goto cycle;    /* If backoff was 0 */
+    }
+
+    windowSize *= 2;						/* ...double the current window size */
+
+    if(windowSize > max_window_size) {
+        windowSize = max_window_size;		/* This is the maximum size allowed */
+    }
+
+    backoff = rand() % windowSize;			/* ...and choose new backoff */
+
+    if(backoff < 0) {
+        backoff *= -1;
+    }
+
+    backoff += (uint16_t) 1;
+cycle:
+    cs_timeout_flag = 0;					/* Carrier sense timeout flag */
+    cs_hwtimer_id = hwtimer_set(cs_timeout,	/* Set hwtimer to set CS timeout flag */
+                                cs_timeout_cb, NULL);
+
+    while(cc1100_cs_read()) {			/* Wait until air is free */
+        if(cs_timeout_flag) {
+            send_csmaca_calls_cs_timeout++;
 #ifndef CSMACA_MAC_AGGRESSIVE_MODE
-				cc1100_phy_mutex_unlock();
-				cc1100_go_after_tx();			// Go from RX to default mode
-				return RADIO_CS_TIMEOUT;		// Return immediately
+            cc1100_phy_mutex_unlock();
+            cc1100_go_after_tx();			/* Go from RX to default mode */
+            return RADIO_CS_TIMEOUT;		/* Return immediately */
 #endif
 #ifdef CSMACA_MAC_AGGRESSIVE_MODE
-				goto send;						// Send anyway
+            goto send;						/* Send anyway */
 #endif
-			}
-		}
-		hwtimer_remove(cs_hwtimer_id);			// Remove hwtimer
-		cc1100_cs_write_cca(1);					// Air is free now
-		cc1100_cs_set_enabled(true);
-		if (cc1100_cs_read()) goto window;		// GDO0 triggers on rising edge, so
-												// test once after interrupt is enabled
-		if (backoff > 0) backoff--;				// Decrement backoff counter
-		total = slottime;						// Calculate total wait time
-		total *= (uint32_t)backoff;				// Slot vector set
-		total += difs;							// ...and standard DIFS wait time
-		cs_timeout_flag = 0;					// Carrier sense timeout flag
-		cs_hwtimer_id = hwtimer_set(total,		// Set hwtimer to set CS timeout flag
-				cs_timeout_cb, NULL);
-		while (!cs_timeout_flag
-				|| !cc1100_cs_read_cca())		// Wait until timeout is finished
-		{
-			if (cc1100_cs_read_cca() == 0)		// Is the air still free?
-			{
-				hwtimer_remove(cs_hwtimer_id);
-				goto window;					// No. Go back to new wait period.
-			}
-		}
-		cc1100_cs_set_enabled(false);
+        }
+    }
+
+    hwtimer_remove(cs_hwtimer_id);			/* Remove hwtimer */
+    cc1100_cs_write_cca(1);					/* Air is free now */
+    cc1100_cs_set_enabled(true);
+
+    if(cc1100_cs_read()) {
+        goto window;    /* GDO0 triggers on rising edge, so */
+    }
+
+    /* test once after interrupt is enabled */
+    if(backoff > 0) {
+        backoff--;    /* Decrement backoff counter */
+    }
+
+    total = slottime;						/* Calculate total wait time */
+    total *= (uint32_t)backoff;				/* Slot vector set */
+    total += difs;							/* ...and standard DIFS wait time */
+    cs_timeout_flag = 0;					/* Carrier sense timeout flag */
+    cs_hwtimer_id = hwtimer_set(total,		/* Set hwtimer to set CS timeout flag */
+                                cs_timeout_cb, NULL);
+
+    while(!cs_timeout_flag
+          || !cc1100_cs_read_cca()) {	/* Wait until timeout is finished */
+        if(cc1100_cs_read_cca() == 0) {	/* Is the air still free? */
+            hwtimer_remove(cs_hwtimer_id);
+            goto window;					/* No. Go back to new wait period. */
+        }
+    }
+
+    cc1100_cs_set_enabled(false);
 #ifdef CSMACA_MAC_AGGRESSIVE_MODE
-	send:
+send:
 #endif
-		int res = cc1100_send(address, protocol, priority, payload, payload_len);
-		if (res < 0) {
-			collision_count++;
-		}
-		return res;
+    int res = cc1100_send(address, protocol, priority, payload, payload_len);
+
+    if(res < 0) {
+        collision_count++;
+    }
+
+    return res;
 }

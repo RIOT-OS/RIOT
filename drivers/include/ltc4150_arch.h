@@ -25,7 +25,7 @@ and the mailinglist (subscription via web site)
 *******************************************************************************/
 
 #ifndef __LTC4150_ARCH_H
-#define __LTC4150_ARCH_H 
+#define __LTC4150_ARCH_H
 
 /**
  * @defgroup    ltc4150 LTC4150 Coulomb Counter
@@ -53,7 +53,7 @@ void ltc4150_disable_int(void);
 /** board specific ltc4150 interrupt enable */
 void ltc4150_enable_int(void);
 /** board specific synchronization of ltc4150 */
-void ltc4150_sync_blocking(void); 
+void ltc4150_sync_blocking(void);
 /** board specific ltc4150 initialization */
 void ltc4150_arch_init(void);
 

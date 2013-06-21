@@ -75,23 +75,21 @@ Notes:
 \li Identification is increased is used to scan duplicates. It must be increased
 	for each new packet and kept for packet retransmissions.
  */
-typedef struct __attribute__ ((packed)) cc1100_packet_layer0_t
-{
-	uint8_t length;					///< Length of the packet (without length byte)
-	uint8_t address;				///< Destination address
-	uint8_t phy_src;				///< Source address (physical source)
-	uint8_t flags;					///< Flags
-	uint8_t data[MAX_DATA_LENGTH];	///< Data (high layer protocol)
+typedef struct __attribute__((packed)) cc1100_packet_layer0_t {
+    uint8_t length;					///< Length of the packet (without length byte)
+    uint8_t address;				///< Destination address
+    uint8_t phy_src;				///< Source address (physical source)
+    uint8_t flags;					///< Flags
+    uint8_t data[MAX_DATA_LENGTH];	///< Data (high layer protocol)
 } cc1100_packet_layer0_t;
 
-typedef struct cc1100_wor_config_t
-{
-	uint16_t rx_interval;	///< RX polling interval in milliseconds
-	float	 rx_time_ms;	///< WOR_RX_TIME in milliseconds
-	uint8_t  rx_time_reg;	///< WOR_RX_TIME (CC1100 "MCSM2.RX_TIME" register value)
-	uint8_t  wor_evt_0;		///< CC1100 WOREVT0 register value
-	uint8_t  wor_evt_1;		///< CC1100 WOREVT1 register value
-	uint8_t  wor_ctrl;		///< CC1100 WORCTRL register value
+typedef struct cc1100_wor_config_t {
+    uint16_t rx_interval;	///< RX polling interval in milliseconds
+    float	 rx_time_ms;	///< WOR_RX_TIME in milliseconds
+    uint8_t  rx_time_reg;	///< WOR_RX_TIME (CC1100 "MCSM2.RX_TIME" register value)
+    uint8_t  wor_evt_0;		///< CC1100 WOREVT0 register value
+    uint8_t  wor_evt_1;		///< CC1100 WOREVT1 register value
+    uint8_t  wor_ctrl;		///< CC1100 WORCTRL register value
 } cc1100_wor_config_t;
 
 /*---------------------------------------------------------------------------*/

@@ -20,8 +20,8 @@
 #endif
 
 /* These functions are defined in asmfunc.S */
-void Copy_al2un (unsigned char *dst, const unsigned long *src, int count);	/* Copy aligned to unaligned. */
-void Copy_un2al (unsigned long *dst, const unsigned char *src, int count);	/* Copy unaligned to aligned. */
+void Copy_al2un(unsigned char *dst, const unsigned long *src, int count);	/* Copy aligned to unaligned. */
+void Copy_un2al(unsigned long *dst, const unsigned char *src, int count);	/* Copy unaligned to aligned. */
 
 
 /* Status of Disk Functions */
@@ -29,22 +29,22 @@ typedef unsigned char	DSTATUS;
 
 /* Results of Disk Functions */
 typedef enum {
-	RES_OK = 0,		/* 0: Successful */
-	RES_ERROR,		/* 1: R/W Error */
-	RES_WRPRT,		/* 2: Write Protected */
-	RES_NOTRDY,		/* 3: Not Ready */
-	RES_PARERR		/* 4: Invalid Parameter */
+    RES_OK = 0,		/* 0: Successful */
+    RES_ERROR,		/* 1: R/W Error */
+    RES_WRPRT,		/* 2: Write Protected */
+    RES_NOTRDY,		/* 3: Not Ready */
+    RES_PARERR		/* 4: Invalid Parameter */
 } DRESULT;
 
 
 /*---------------------------------------*/
 /* Prototypes for disk control functions */
 
-DSTATUS disk_initialize (unsigned char);
-DSTATUS disk_status (unsigned char);
-DRESULT disk_read (unsigned char, unsigned char*, unsigned long, unsigned char);
-DRESULT disk_write (unsigned char, const unsigned char*, unsigned long, unsigned char);
-DRESULT disk_ioctl (unsigned char, unsigned char, void*);
+DSTATUS disk_initialize(unsigned char);
+DSTATUS disk_status(unsigned char);
+DRESULT disk_read(unsigned char, unsigned char *, unsigned long, unsigned char);
+DRESULT disk_write(unsigned char, const unsigned char *, unsigned long, unsigned char);
+DRESULT disk_ioctl(unsigned char, unsigned char, void *);
 
 
 
@@ -90,18 +90,18 @@ DRESULT disk_ioctl (unsigned char, unsigned char, void*);
 /* Prototypes for each physical disk functions */
 
 
-DSTATUS NAND_initialize (void);
-DSTATUS NAND_status (void);
-DRESULT NAND_read (unsigned char*, unsigned long, unsigned char);
-DRESULT NAND_write (const unsigned char*, unsigned long, unsigned char);
-DRESULT NAND_ioctl (unsigned char, void*);
+DSTATUS NAND_initialize(void);
+DSTATUS NAND_status(void);
+DRESULT NAND_read(unsigned char *, unsigned long, unsigned char);
+DRESULT NAND_write(const unsigned char *, unsigned long, unsigned char);
+DRESULT NAND_ioctl(unsigned char, void *);
 
-DSTATUS MCI_initialize (void);
-DSTATUS MCI_status (void);
-DRESULT MCI_read (unsigned char*, unsigned long, unsigned char);
-DRESULT MCI_write (const unsigned char*, unsigned long, unsigned char);
-DRESULT MCI_ioctl (unsigned char, void*);
-void MCI_timerproc (void);
+DSTATUS MCI_initialize(void);
+DSTATUS MCI_status(void);
+DRESULT MCI_read(unsigned char *, unsigned long, unsigned char);
+DRESULT MCI_write(const unsigned char *, unsigned long, unsigned char);
+DRESULT MCI_ioctl(unsigned char, void *);
+void MCI_timerproc(void);
 
 
 #endif

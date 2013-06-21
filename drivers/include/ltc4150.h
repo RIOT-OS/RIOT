@@ -1,5 +1,5 @@
 #ifndef __LTC4150_H
-#define __LTC4150_H 
+#define __LTC4150_H
 
 #include <ltc4150_arch.h>
 

@@ -56,13 +56,13 @@ void rtc_disable(void);
  * @brief	Sets the current time in broken down format directly from to RTC
  * @param[in]	localt		Pointer to structure with time to set
  */
-void rtc_set_localtime(struct tm* localt);
+void rtc_set_localtime(struct tm *localt);
 
 /**
  * @brief	Returns the current time in broken down format directly from the RTC
  * @param[out]	localt		Pointer to structure to receive time
  */
-void rtc_get_localtime(struct tm* localt);
+void rtc_get_localtime(struct tm *localt);
 
 extern int rtc_second_pid;
 
