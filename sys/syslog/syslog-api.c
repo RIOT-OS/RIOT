@@ -32,81 +32,78 @@ and the mailinglist (subscription via web site)
 #define VSYSLOG(level, strModule, strFmt, argp)		vsyslog(level, strModule, strFmt, argp)
 
 void
-syslog(
-		const uint8_t level,
-		const char (*const strModule),
-		const char* strFmt, ...
-) {
-	va_list argp;
+syslog(const uint8_t level, const char(*const strModule), const char *strFmt, ...)
+{
+    va_list argp;
 
-	va_start(argp, strFmt);
-	VSYSLOG(level, strModule, strFmt, argp);
-	va_end(argp);
+    va_start(argp, strFmt);
+    VSYSLOG(level, strModule, strFmt, argp);
+    va_end(argp);
 }
 /*-----------------------------------------------------------------------------------*/
 #if (SYSLOG_CONF_LEVEL & SL_EMERGENCY) == SL_EMERGENCY
-void syslog_emergency(const char (*const mod), const char* strFmt, ...)
+void syslog_emergency(const char(*const mod), const char *strFmt, ...)
 {
-	va_list argp;
+    va_list argp;
 
-	va_start(argp, strFmt);
-	VSYSLOG(SL_EMERGENCY, mod, strFmt, argp);
-	va_end(argp);
+    va_start(argp, strFmt);
+    VSYSLOG(SL_EMERGENCY, mod, strFmt, argp);
+    va_end(argp);
 }
 #endif
 /*-----------------------------------------------------------------------------------*/
 #if (SYSLOG_CONF_LEVEL & SL_CRITICAL) == SL_CRITICAL
-void syslog_critical(const char (*const mod), const char* strFmt, ...)
+void syslog_critical(const char(*const mod), const char *strFmt, ...)
 {
-	va_list argp;
+    va_list argp;
 
-	va_start(argp, strFmt);
-	VSYSLOG(SL_CRITICAL, mod, strFmt, argp);
-	va_end(argp);
+    va_start(argp, strFmt);
+    VSYSLOG(SL_CRITICAL, mod, strFmt, argp);
+    va_end(argp);
 }
 #endif
 /*-----------------------------------------------------------------------------------*/
 #if (SYSLOG_CONF_LEVEL & SL_WARN) == SL_WARN
-void syslog_warn(const char (*const mod), const char* strFmt, ...)
+void syslog_warn(const char(*const mod), const char *strFmt, ...)
 {
-	va_list argp;
+    va_list argp;
 
-	va_start(argp, strFmt);
-	VSYSLOG(SL_WARN, mod, strFmt, argp);
-	va_end(argp);
+    va_start(argp, strFmt);
+    VSYSLOG(SL_WARN, mod, strFmt, argp);
+    va_end(argp);
 }
 #endif
 /*-----------------------------------------------------------------------------------*/
 #if (SYSLOG_CONF_LEVEL & SL_NOTICE) == SL_NOTICE
-void syslog_notice(const char (*const mod), const char* strFmt, ...)
+void syslog_notice(const char(*const mod), const char *strFmt, ...)
 {
-	va_list argp;
+    va_list argp;
 
-	va_start(argp, strFmt);
-	VSYSLOG(SL_NOTICE, mod, strFmt, argp);
-	va_end(argp);
+    va_start(argp, strFmt);
+    VSYSLOG(SL_NOTICE, mod, strFmt, argp);
+    va_end(argp);
 }
 #endif
 /*-----------------------------------------------------------------------------------*/
 #if (SYSLOG_CONF_LEVEL & SL_INFO) == SL_INFO
-void syslog_info(const char (*const mod), const char* strFmt, ...)
+void syslog_info(const char(*const mod), const char *strFmt, ...)
 {
-	va_list argp;
+    va_list argp;
 
-	va_start(argp, strFmt);
-	VSYSLOG(SL_INFO, mod, strFmt, argp);
-	va_end(argp);
+    va_start(argp, strFmt);
+    VSYSLOG(SL_INFO, mod, strFmt, argp);
+    va_end(argp);
 }
 #endif
 /*-----------------------------------------------------------------------------------*/
 #if SYSLOG_ISLEVEL(SL_DEBUG)
-void syslog_debug(const char (*const mod), const char* strFmt, ...)
+void syslog_debug(const char(*const mod), const char *strFmt, ...)
 {
-	va_list argp;
+    va_list argp;
 
-	va_start(argp, strFmt);
-	VSYSLOG(SL_DEBUG, mod, strFmt, argp);
-	va_end(argp);
+    va_start(argp, strFmt);
+    VSYSLOG(SL_DEBUG, mod, strFmt, argp);
+    va_end(argp);
 }
 #endif
 

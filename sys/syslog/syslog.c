@@ -52,7 +52,7 @@ and the mailinglist (subscription via web site)
 #include "sysmon.h"
 #include "tracelog.h"
 
-static const char* syslog_level_stringtable =	"emergency\0"
+static const char *syslog_level_stringtable =	"emergency\0"
 												"critical\0"
 												"warn\0"
 												"notice\0"
@@ -64,109 +64,108 @@ __attribute__((section(".noinit")))
 static volatile unsigned int syslog_msgnum;
 
 static unsigned short syslog_flagtolevel(const uint8_t level);
-static int find_interface_index_for_name(const char* name);
+static int find_interface_index_for_name(const char *name);
 
 extern struct syslog_interface syslog_interfaces[];
 
 /*-----------------------------------------------------------------------------------*/
-void
-syslog_init(void)
+void syslog_init(void)
 {
-	if( sysmon_initial_boot() )
-		syslog_msgnum = 0;
+    if(sysmon_initial_boot()) {
+        syslog_msgnum = 0;
+    }
 }
 /*-----------------------------------------------------------------------------------*/
-static bool
-testlevel(uint8_t filter_level, const uint8_t level) {
-	return ((filter_level & level) != 0);
-}
-/*-----------------------------------------------------------------------------------*/
-void
-vsyslog(
-		const uint8_t level,
-		const char (*const strModule),
-		const char* strFmt,
-		va_list argp
-) {
-	int i;
-	struct syslog_interface*	slif;				// syslog interface
-	struct syslog_args args;						// output function arguments
-	char   message[SYSLOG_CONF_BUFSIZE];			// message buffer
-	int    msglen = 0;
-
-	args.message = NULL;
-
-	//printf("0 %p %p\n", &syslog_interfaces[0], syslog_interfaces[0].chain);
-	//printf("1 %p %p\n", &syslog_interfaces[1], syslog_interfaces[1].chain);
-
-	// check each syslog interface
-	for( i = 0; i < SYSLOG_CONF_NUM_INTERFACES; i++) {
-		slif = &syslog_interfaces[i];
-		/* run interface filter */
-		//printf("testing %i, %s\n", i, slif->name);
-		if( slif->name != NULL && testlevel(cfg_feuerware.level[i], level) ) {
-			/* filter matched, produce output */
-			//printf("printing to %s\n", slif->name);
-			if( args.message == NULL ) {
-				// initialize structure one time, when actually needed
-				args.msgnum = syslog_msgnum++;
-				args.level = syslog_flagtolevel(level);
-				args.module = strModule;
-				args.message = message;
-				msglen = vsnprintf(message, SYSLOG_CONF_BUFSIZE-1, strFmt, argp);
-			}
-			//printf("msg %i: %s\n", msglen, message);
-			args.interface = (const struct syslog_interface*)slif;
-
-			// invoke first link of ouput chain
-			//printf("invoke on %s: %p %p\n", slif->name, slif, slif->chain);
-			if( slif->chain->fpout != NULL ) {
-				slif->chain->fpout(&args, slif->chain->next);
-			}
-		}
-	}
-}
-/*-----------------------------------------------------------------------------------*/
-void syslog_printlevel(char* buffer, size_t bufsize, uint8_t level)
+static bool testlevel(uint8_t filter_level, const uint8_t level)
 {
-	uint8_t l = level;
-	int intlevel;
-	int bufpos;
-	int len = 0;
-
-	bufpos = snprintf(buffer, bufsize, "%#.2x=", level);
-	bufsize -= bufpos;
-	for( intlevel = 0; intlevel < SYSLOG_LEVELS_COUNT; intlevel++ ) {
-		if( l & 0x0001 ) {
-			const char* string = string_table_get(syslog_level_stringtable, intlevel);
-			if( string ) {
-				if( bufsize < 0 ) bufsize = 0;
-				len = snprintf( &buffer[bufpos], bufsize, "%s%s", ((len > 0) ? "|" : ""), (char*)string );
-				bufsize -= len;
-				bufpos += len;
-			}
-		}
-		l >>= 1;
-	}
+    return ((filter_level & level) != 0);
 }
 /*-----------------------------------------------------------------------------------*/
-uint8_t syslog_set_level(const char* name, uint8_t level)
+void vsyslog(const uint8_t level, const char(*const strModule),
+             const char *strFmt, va_list argp)
 {
-	uint8_t result;
-	int index = find_interface_index_for_name(name);
-	if( index < 0 )
-		return 0;
+    int i;
+    struct syslog_interface	*slif;				// syslog interface
+    struct syslog_args args;						// output function arguments
+    char   message[SYSLOG_CONF_BUFSIZE];			// message buffer
+    int    msglen = 0;
 
-	result = cfg_feuerware.level[index];
-	cfg_feuerware.level[index] = level;
-	cfg_feuerware_spec.state->modified = 1;
+    args.message = NULL;
 
-	return result;
+    /* check each syslog interface */
+    for(i = 0; i < SYSLOG_CONF_NUM_INTERFACES; i++) {
+        slif = &syslog_interfaces[i];
+
+        /* run interface filter */
+        if(slif->name != NULL && testlevel(cfg_feuerware.level[i], level)) {
+            /* filter matched, produce output */
+            if(args.message == NULL) {
+                /* initialize structure one time, when actually needed */
+                args.msgnum = syslog_msgnum++;
+                args.level = syslog_flagtolevel(level);
+                args.module = strModule;
+                args.message = message;
+                msglen = vsnprintf(message, SYSLOG_CONF_BUFSIZE - 1, strFmt, argp);
+            }
+
+            args.interface = (const struct syslog_interface *)slif;
+
+            /* invoke first link of ouput chain */
+            if(slif->chain->fpout != NULL) {
+                slif->chain->fpout(&args, slif->chain->next);
+            }
+        }
+    }
 }
 /*-----------------------------------------------------------------------------------*/
-const char*
-syslog_leveltostring(unsigned int level) {
-	return string_table_get(syslog_level_stringtable, level);
+void syslog_printlevel(char *buffer, size_t bufsize, uint8_t level)
+{
+    uint8_t l = level;
+    int intlevel;
+    int bufpos;
+    int len = 0;
+
+    bufpos = snprintf(buffer, bufsize, "%#.2x=", level);
+    bufsize -= bufpos;
+
+    for(intlevel = 0; intlevel < SYSLOG_LEVELS_COUNT; intlevel++) {
+        if(l & 0x0001) {
+            const char *string = string_table_get(syslog_level_stringtable, intlevel);
+
+            if(string) {
+                if(bufsize < 0) {
+                    bufsize = 0;
+                }
+
+                len = snprintf(&buffer[bufpos], bufsize, "%s%s", ((len > 0) ? "|" : ""), (char *)string);
+                bufsize -= len;
+                bufpos += len;
+            }
+        }
+
+        l >>= 1;
+    }
+}
+/*-----------------------------------------------------------------------------------*/
+uint8_t syslog_set_level(const char *name, uint8_t level)
+{
+    uint8_t result;
+    int index = find_interface_index_for_name(name);
+
+    if(index < 0) {
+        return 0;
+    }
+
+    result = cfg_feuerware.level[index];
+    cfg_feuerware.level[index] = level;
+    cfg_feuerware_spec.state->modified = 1;
+
+    return result;
+}
+/*-----------------------------------------------------------------------------------*/
+const char *syslog_leveltostring(unsigned int level)
+{
+    return string_table_get(syslog_level_stringtable, level);
 }
 /*-----------------------------------------------------------------------------------*/
 
@@ -189,76 +188,82 @@ syslog_leveltostring(unsigned int level) {
 ASCCMD(syslog, 0, "[interface] [byte val]: syslog-level property");
 CMD_FUNCTION(syslog, cmdargs)
 {
-	int i;
+    int i;
 
-	if( cmdargs->arg_size > 0 ) {
-		unsigned int argc;
-		const char* arg;
-		const char* name = NULL;
-		unsigned int value;
+    if(cmdargs->arg_size > 0) {
+        unsigned int argc;
+        const char *arg;
+        const char *name = NULL;
+        unsigned int value;
 
-		argc = cmd_split_arguments(cmdargs->args);
-		arg = cmdargs->args;
+        argc = cmd_split_arguments(cmdargs->args);
+        arg = cmdargs->args;
 
-		if( *arg >= 'A' ) {
-			// first argument is a string
-			name = arg;
-			// move to next argument
-			arg = cmd_get_next_argument(arg);
-		}
-		if( *arg == '\0' )
-			return CMD_ERROR;
-		value = strtoul(arg, NULL, 0);
-		syslog_set_level(name, value);
-	}
+        if(*arg >= 'A') {
+            // first argument is a string
+            name = arg;
+            // move to next argument
+            arg = cmd_get_next_argument(arg);
+        }
 
-	for( i = 0; i < SYSLOG_CONF_NUM_INTERFACES; i++ ) {
-		if( syslog_interfaces[i].name != NULL ) {
-			char buf[SYSLOG_PRINTLEVEL_MAXLEN];
-			syslog_printlevel(buf, sizeof(buf), cfg_feuerware.level[i]);
-			cmdargs->fresponse(cmdargs,
-					CMD_RESPONSE_MULTILINE,
-					"%s:%s",
-					syslog_interfaces[i].name,
-					buf
-			);
-		}
-	}
-	return CMD_SUCCESS;
+        if(*arg == '\0') {
+            return CMD_ERROR;
+        }
+
+        value = strtoul(arg, NULL, 0);
+        syslog_set_level(name, value);
+    }
+
+    for(i = 0; i < SYSLOG_CONF_NUM_INTERFACES; i++) {
+        if(syslog_interfaces[i].name != NULL) {
+            char buf[SYSLOG_PRINTLEVEL_MAXLEN];
+            syslog_printlevel(buf, sizeof(buf), cfg_feuerware.level[i]);
+            cmdargs->fresponse(cmdargs,
+                               CMD_RESPONSE_MULTILINE,
+                               "%s:%s",
+                               syslog_interfaces[i].name,
+                               buf
+                              );
+        }
+    }
+
+    return CMD_SUCCESS;
 }
 #endif
 /*-----------------------------------------------------------------------------------*/
 /**
  * @brief	Convert bit flag to bit number
  */
-static unsigned short
-syslog_flagtolevel(const uint8_t level)
+static unsigned short syslog_flagtolevel(const uint8_t level)
 {
-	uint8_t l = level;
-	unsigned short intlevel;
+    uint8_t l = level;
+    unsigned short intlevel;
 
-	for( intlevel = 0; intlevel < SYSLOG_LEVELS_COUNT; intlevel++ ) {
-		if( (l & 1) == 1 )
-			break;
-		l >>= 1;
-	}
+    for(intlevel = 0; intlevel < SYSLOG_LEVELS_COUNT; intlevel++) {
+        if((l & 1) == 1) {
+            break;
+        }
 
-	return intlevel;
+        l >>= 1;
+    }
+
+    return intlevel;
 }
 /*-----------------------------------------------------------------------------------*/
 /**
  * @brief	Find an interface for a given name
  */
-static int
-find_interface_index_for_name(const char* name)
+static int find_interface_index_for_name(const char *name)
 {
-	int i;
+    int i;
 
-	for( i = 0; i < SYSLOG_CONF_NUM_INTERFACES; i++ ) {
-		if( strcmp(syslog_interfaces[i].name, name) == 0 )
-			return i;
-	}
-	return -1;
+    for(i = 0; i < SYSLOG_CONF_NUM_INTERFACES; i++) {
+        if(strcmp(syslog_interfaces[i].name, name) == 0) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 /** @} */

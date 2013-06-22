@@ -57,123 +57,132 @@ and the mailinglist (subscription via web site)
 #endif
 
 /*-----------------------------------------------------------------------------------*/
-void
-syslog_format_ascii(struct syslog_args*	args, struct syslog_chainlink* chainlink)
+void syslog_format_ascii(struct syslog_args	*args, struct syslog_chainlink *chainlink)
 {
-	char buffer[SYSLOG_CONF_BUFSIZE + 25];
-	int msglen = 0;
+    char buffer[SYSLOG_CONF_BUFSIZE + 25];
+    int msglen = 0;
 
-	if( args->message[0] != '\t' ) {
-		const char* strlevel = syslog_leveltostring(args->level);
-		msglen = snprintf(buffer, SYSLOG_CONF_BUFSIZE + 23,
-						"#[%u.%u:%u=%s] %s:",
-						NETWORK_ADDR_NET(NET_LOCAL_ADDRESS), NETWORK_ADDR_HOST(NET_LOCAL_ADDRESS),
-						args->level, strlevel, args->module
-		);
-	}
+    if(args->message[0] != '\t') {
+        const char *strlevel = syslog_leveltostring(args->level);
+        msglen = snprintf(buffer, SYSLOG_CONF_BUFSIZE + 23,
+                          "#[%u.%u:%u=%s] %s:",
+                          NETWORK_ADDR_NET(NET_LOCAL_ADDRESS), NETWORK_ADDR_HOST(NET_LOCAL_ADDRESS),
+                          args->level, strlevel, args->module
+                         );
+    }
 
-	msglen += snprintf(buffer + msglen, SYSLOG_CONF_BUFSIZE + 23 - msglen, "%s", args->message);
-	buffer[msglen++] = '\n';
-	buffer[msglen] = '\0';
+    msglen += snprintf(buffer + msglen, SYSLOG_CONF_BUFSIZE + 23 - msglen, "%s", args->message);
+    buffer[msglen++] = '\n';
+    buffer[msglen] = '\0';
 
-	args->message = buffer;
-	if( chainlink != NULL && chainlink->fpout != NULL )
-		chainlink->fpout(args, chainlink->next);
+    args->message = buffer;
+
+    if(chainlink != NULL && chainlink->fpout != NULL) {
+        chainlink->fpout(args, chainlink->next);
+    }
 }
 /*-----------------------------------------------------------------------------------*/
-void
-syslog_format_xml(struct syslog_args* args, struct syslog_chainlink* chainlink)
+void syslog_format_xml(struct syslog_args *args, struct syslog_chainlink *chainlink)
 {
-	const size_t bufsize = SYSLOG_CONF_BUFSIZE + 80;
-	char buffer[bufsize];
-	char tbuf[20];
-	int msglen = 0;
+    const size_t bufsize = SYSLOG_CONF_BUFSIZE + 80;
+    char buffer[bufsize];
+    char tbuf[20];
+    int msglen = 0;
 
-	#if FEUERWARE_CONF_CORE_SUPPORTS_TIME
-		time_get_string(tbuf, sizeof(tbuf));
-	#else
-		sprintf(tbuf, "%lu", clock_time(NULL));
-	#endif
+#if FEUERWARE_CONF_CORE_SUPPORTS_TIME
+    time_get_string(tbuf, sizeof(tbuf));
+#else
+    sprintf(tbuf, "%lu", clock_time(NULL));
+#endif
 
-	msglen = snprintf(buffer, bufsize,
-				"<log lvl=%u src=\"%u.%u\" id=%u ts=\"%s\" mod=\"%s\">%s</log>\n",
-				args->level, NETWORK_ADDR_NET(NET_LOCAL_ADDRESS), NETWORK_ADDR_HOST(NET_LOCAL_ADDRESS),
-				args->msgnum, tbuf, args->module, args->message
-	);
+    msglen = snprintf(buffer, bufsize,
+                      "<log lvl=%u src=\"%u.%u\" id=%u ts=\"%s\" mod=\"%s\">%s</log>\n",
+                      args->level, NETWORK_ADDR_NET(NET_LOCAL_ADDRESS), NETWORK_ADDR_HOST(NET_LOCAL_ADDRESS),
+                      args->msgnum, tbuf, args->module, args->message
+                     );
 
-	args->message = buffer;
-	if( chainlink != NULL && chainlink->fpout != NULL )
-		chainlink->fpout(args, chainlink->next);
+    args->message = buffer;
+
+    if(chainlink != NULL && chainlink->fpout != NULL) {
+        chainlink->fpout(args, chainlink->next);
+    }
 }
 /*-----------------------------------------------------------------------------------*/
-void
-syslog_copy_stdout(struct syslog_args*	args, struct syslog_chainlink* chainlink)
+void syslog_copy_stdout(struct syslog_args	*args, struct syslog_chainlink *chainlink)
 {
-	if( args->message[0] != '\t' ) {
-		const char* strlevel = syslog_leveltostring(args->level);
-		printf("#[%u.%u:%u=%s] %s:",
-				NETWORK_ADDR_NET(NET_LOCAL_ADDRESS), NETWORK_ADDR_HOST(NET_LOCAL_ADDRESS),
-				args->level, strlevel, args->module
-		);
-	}
-	printf("%s\n", args->message);
+    if(args->message[0] != '\t') {
+        const char *strlevel = syslog_leveltostring(args->level);
+        printf("#[%u.%u:%u=%s] %s:",
+               NETWORK_ADDR_NET(NET_LOCAL_ADDRESS), NETWORK_ADDR_HOST(NET_LOCAL_ADDRESS),
+               args->level, strlevel, args->module
+              );
+    }
 
-	if( chainlink != NULL && chainlink->fpout != NULL )
-		chainlink->fpout(args, chainlink->next);
+    printf("%s\n", args->message);
+
+    if(chainlink != NULL && chainlink->fpout != NULL) {
+        chainlink->fpout(args, chainlink->next);
+    }
 }
 /*-----------------------------------------------------------------------------------*/
-void
-syslog_out_stdout(struct syslog_args*	args, struct syslog_chainlink* chainlink)
+void syslog_out_stdout(struct syslog_args	*args, struct syslog_chainlink *chainlink)
 {
-	printf(args->message);
+    printf(args->message);
 
-	if( chainlink != NULL && chainlink->fpout != NULL )
-		chainlink->fpout(args, chainlink->next);
+    if(chainlink != NULL && chainlink->fpout != NULL) {
+        chainlink->fpout(args, chainlink->next);
+    }
 }
 /*-----------------------------------------------------------------------------------*/
 #ifdef MODULE_FAT
 static int syslog_file = -1;
 
-static int fat_open_logfile(const char* path);
-static int fat_open_logfile(const char* path)
+static int fat_open_logfile(const char *path);
+static int fat_open_logfile(const char *path)
 {
-	char t[20];
-	int file;
+    char t[20];
+    int file;
 
-	file = open(path, O_WRONLY | O_APPEND | O_CREAT);
+    file = open(path, O_WRONLY | O_APPEND | O_CREAT);
 
-	time_get_string(t, sizeof(t));
+    time_get_string(t, sizeof(t));
 
-	if( file >= 0 ) {
-		syslog_notice("sys", "%s log %s opened", t, path);
-	} else {
-		syslog_warn("sys", "%s log %s failed", t, path);
-	}
-	return file;
+    if(file >= 0) {
+        syslog_notice("sys", "%s log %s opened", t, path);
+    }
+    else {
+        syslog_warn("sys", "%s log %s failed", t, path);
+    }
+
+    return file;
 }
 
-void syslog_out_file(struct syslog_args* args, struct syslog_chainlink* chainlink)
+void syslog_out_file(struct syslog_args *args, struct syslog_chainlink *chainlink)
 {
-	if( syslog_file >= 0 ) {
-		size_t length = (size_t)strlen(args->message);
-		int ret = write(syslog_file, args->message, length);
-		if( ret == 1 ) {
+    if(syslog_file >= 0) {
+        size_t length = (size_t)strlen(args->message);
+        int ret = write(syslog_file, args->message, length);
+
+        if(ret == 1) {
 #ifdef MODULE_TRACELOG
-			trace_string(TRACELOG_EV_MEMORY, "fat");
+            trace_string(TRACELOG_EV_MEMORY, "fat");
 #endif
-		}
-	}
+        }
+    }
 
-	if( chainlink != NULL && chainlink->fpout != NULL )
-		chainlink->fpout(args, chainlink->next);
+    if(chainlink != NULL && chainlink->fpout != NULL) {
+        chainlink->fpout(args, chainlink->next);
+    }
 }
 
-bool syslog_open_file(void) {
-	syslog_file = fat_open_logfile("SYSLOG.LOG");
-	return (syslog_file >= 0);
+bool syslog_open_file(void)
+{
+    syslog_file = fat_open_logfile("SYSLOG.LOG");
+    return (syslog_file >= 0);
 }
-void syslog_close_file(void) {
-	close(syslog_file);
-	syslog_file = -1;
+void syslog_close_file(void)
+{
+    close(syslog_file);
+    syslog_file = -1;
 }
 #endif

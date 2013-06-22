@@ -1,26 +1,43 @@
+/**
+ * Provides prototypes for available shell commands
+ *
+ * Copyright (C) 2013  INRIA.
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup shell_commands
+ * @{
+ * @file    shell_commands.c
+ * @brief   sets up the system shell command struct
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
+ * @}
+ */
+
 #include <shell_commands.h>
 #include <stdlib.h>
 
-extern void _id_handler(char* id);
+extern void _id_handler(char *id);
 
 #ifdef MODULE_PS
-extern void _ps_handler(char* unused);
+extern void _ps_handler(char *unused);
 #endif
 
 #ifdef MODULE_RTC
-extern void _date_handler(char* now);
+extern void _date_handler(char *now);
 #endif
 
 #ifdef MODULE_SHT11
-extern void _get_temperature_handler(char* unused);
-extern void _get_humidity_handler(char* unused);
-extern void _get_weather_handler(char* unused);
-extern void _set_offset_handler(char* offset);
+extern void _get_temperature_handler(char *unused);
+extern void _get_humidity_handler(char *unused);
+extern void _get_weather_handler(char *unused);
+extern void _set_offset_handler(char *offset);
 #endif
 
 #ifdef MODULE_LTC4150
-extern void _get_current_handler(char* unused);
-extern void _reset_current_handler(char* unused);
+extern void _get_current_handler(char *unused);
+extern void _reset_current_handler(char *unused);
 #endif
 
 #ifdef MODULE_CC110X
@@ -45,10 +62,10 @@ extern void _cc110x_ng_monitor_handler(char *mode);
 
 #ifdef MODULE_MCI
 extern void _get_sectorsize(char *unused);
-extern void _get_blocksize(char* unused);
-extern void _get_sectorcount(char* unused);
-extern void _read_sector(char* sector);
-extern void _read_bytes(char* bytes);
+extern void _get_blocksize(char *unused);
+extern void _get_sectorcount(char *unused);
+extern void _read_sector(char *sector);
+extern void _read_bytes(char *bytes);
 #endif
 
 const shell_command_t _shell_command_list[] = {
@@ -63,11 +80,11 @@ const shell_command_t _shell_command_list[] = {
     {"temp", "Prints measured temperature.", _get_temperature_handler},
     {"hum", "Prints measured humidity.", _get_humidity_handler},
     {"weather", "Prints measured humidity and temperature.", _get_weather_handler},
-	{"offset", "Set temperature offset.", _set_offset_handler},
+    {"offset", "Set temperature offset.", _set_offset_handler},
 #endif
 #ifdef MODULE_LTC4150
-	{"cur", "Prints current and average power consumption.", _get_current_handler},
-	{"rstcur", "Resets coulomb counter.", _reset_current_handler},
+    {"cur", "Prints current and average power consumption.", _get_current_handler},
+    {"rstcur", "Resets coulomb counter.", _reset_current_handler},
 #endif
 #ifdef MODULE_CC110X
 #ifdef MODULE_TRANSCEIVER

@@ -25,7 +25,7 @@ and the mailinglist (subscription via web site)
 *******************************************************************************/
 
 #ifndef __SHELL_H
-#define __SHELL_H 
+#define __SHELL_H
 
 /**
  * @defgroup shell Simple Shell Interpreter
@@ -35,15 +35,15 @@ and the mailinglist (subscription via web site)
 //#include "hashtable.h"
 
 typedef struct shell_command_t {
-    char* name;
-    char* desc;
-    void (*handler)(char*);
+    char *name;
+    char *desc;
+    void (*handler)(char *);
 } shell_command_t;
 
 typedef struct shell_t {
     const shell_command_t *command_list;
-    int (*readchar)(void); 
-    void (*put_char)(int); 
+    int (*readchar)(void);
+    void (*put_char)(int);
 } shell_t;
 
 /**

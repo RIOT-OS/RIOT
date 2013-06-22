@@ -1,5 +1,5 @@
 /**
- * Auto initialization for used modules 
+ * Auto initialization for used modules
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -27,7 +27,8 @@
 
 extern int main(void);
 
-void auto_init(void) {
+void auto_init(void)
+{
 #ifdef MODULE_BOARD_DISPLAY
     extern void lcd_init();
     lcd_init();

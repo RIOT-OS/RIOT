@@ -1,5 +1,5 @@
 #ifndef __CHARDEV_THREAD_H
-#define __CHARDEV_THREAD_H 
+#define __CHARDEV_THREAD_H
 
 #include <ringbuffer.h>
 

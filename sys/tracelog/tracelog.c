@@ -52,72 +52,76 @@ and the mailinglist (subscription via web site)
 #include "syslog.h"
 
 #if TRACELOG_CONF_NUM_ENTRIES > 0
-	__attribute__((section(".noinit")))
-	struct tracelog tracelog;
+__attribute__((section(".noinit")))
+struct tracelog tracelog;
 
-	/// tells if tracelog can accept input
-	static bool tracelog_initialized = 0;
+/// tells if tracelog can accept input
+static bool tracelog_initialized = 0;
 #endif
 
 #if defined(SYSLOG_CONF_LEVEL) && ((SYSLOG_CONF_LEVEL & SL_DEBUG) == SL_DEBUG)
 static const char symon_event_names[] =
-	"\0"
-	"start\0"
-	"exit\0"
-	"assert\0"
-	"event\0"
-	"timer\0"
-	"irqdis\0"
-	"irqen\0"
-	"irq\0"
-	"switch\0"
-	"\0"
-	"memory\0"
-	"memaccess\0"
-	"opfault\0"
-	"panic\0"
-	"userdef\0"
-	"\3";
+    "\0"
+    "start\0"
+    "exit\0"
+    "assert\0"
+    "event\0"
+    "timer\0"
+    "irqdis\0"
+    "irqen\0"
+    "irq\0"
+    "switch\0"
+    "\0"
+    "memory\0"
+    "memaccess\0"
+    "opfault\0"
+    "panic\0"
+    "userdef\0"
+    "\3";
 #endif
 
 /*-----------------------------------------------------------------------------------*/
 #if TRACELOG_CONF_NUM_ENTRIES > 0
-static void tracelog_snprint(char* buf, int bufsz, int i)
+static void tracelog_snprint(char *buf, int bufsz, int i)
 {
-	struct tracelog_entry* trace = &tracelog.traces[i];
-	int length = 0;
-	bufsz -= 1;																	// save one for zero
+    struct tracelog_entry *trace = &tracelog.traces[i];
+    int length = 0;
+    bufsz -= 1;																	// save one for zero
 
-	#if (SYSLOG_CONF_LEVEL & SL_DEBUG) == SL_DEBUG
-		/* when running in debug level, event names are available and can be printed */
-		char* name = (char*)string_table_get(symon_event_names, trace->event);
-		length = snprintf(buf, bufsz, "%#.2x (%s): ", trace->event, name);
-	#else
-		length = snprintf(buf, bufsz, "%#.2x: ", trace->event);
-	#endif
-	bufsz -= length;
-	buf += length;
+#if (SYSLOG_CONF_LEVEL & SL_DEBUG) == SL_DEBUG
+    /* when running in debug level, event names are available and can be printed */
+    char *name = (char *)string_table_get(symon_event_names, trace->event);
+    length = snprintf(buf, bufsz, "%#.2x (%s): ", trace->event, name);
+#else
+    length = snprintf(buf, bufsz, "%#.2x: ", trace->event);
+#endif
+    bufsz -= length;
+    buf += length;
 
-	switch( trace->type ) {
-		case TRACE_NUMBER: {
-			tracelog_number_t uldata;
-			memcpy(&uldata, trace->data, sizeof(tracelog_number_t));
-			length += snprintf(buf, bufsz, "%#10lx (%lu)", uldata, uldata);
-			break;
-		}
-		case TRACE_POINTER: {
-			void* uldata;
-			memcpy(&uldata, trace->data, sizeof(void*));
-			length += snprintf(buf, bufsz, "%p", uldata);
-			break;
-		}
-		case TRACE_STRING:
-			length += snprintf(buf, bufsz, "%.*s", TRACELOG_CONF_ENTRY_SIZE, trace->data);
-			break;
-		default:
-			break;
-	}
-	buf[length] = '\0';
+    switch(trace->type) {
+        case TRACE_NUMBER: {
+            tracelog_number_t uldata;
+            memcpy(&uldata, trace->data, sizeof(tracelog_number_t));
+            length += snprintf(buf, bufsz, "%#10lx (%lu)", uldata, uldata);
+            break;
+        }
+
+        case TRACE_POINTER: {
+            void *uldata;
+            memcpy(&uldata, trace->data, sizeof(void *));
+            length += snprintf(buf, bufsz, "%p", uldata);
+            break;
+        }
+
+        case TRACE_STRING:
+            length += snprintf(buf, bufsz, "%.*s", TRACELOG_CONF_ENTRY_SIZE, trace->data);
+            break;
+
+        default:
+            break;
+    }
+
+    buf[length] = '\0';
 }
 #endif
 /*-----------------------------------------------------------------------------------*/
@@ -127,50 +131,56 @@ static void tracelog_snprint(char* buf, int bufsz, int i)
  */
 static void
 trace(
-	enum tracelog_event	event,
-	const enum tracelog_type t,
-	const void (* const data),
-	const int size
-) {
+    enum tracelog_event	event,
+    const enum tracelog_type t,
+    const void (* const data),
+    const int size
+)
+{
 #if TRACELOG_CONF_NUM_ENTRIES > 0
-	int length = size;
+    int length = size;
 
-	if( tracelog_initialized == false )
-		return;
+    if(tracelog_initialized == false) {
+        return;
+    }
 
-	struct tracelog_entry* trace = &tracelog.traces[tracelog.tail];				// get current tail element
-	/* increase tail */
-	if( (tracelog.tail + 1) < TRACELOG_CONF_NUM_ENTRIES )
-		tracelog.tail++;
-	else
-		tracelog.tail = 0;
+    struct tracelog_entry *trace = &tracelog.traces[tracelog.tail];				// get current tail element
 
-	/* fill meta data */
-	trace->event = event & 0x7F;
-	trace->type = t;
+    /* increase tail */
+    if((tracelog.tail + 1) < TRACELOG_CONF_NUM_ENTRIES) {
+        tracelog.tail++;
+    }
+    else {
+        tracelog.tail = 0;
+    }
 
-	/* calculate size */
-	if( length == 0 ) {
-		if( t == TRACE_STRING ) {
-			length = strlen((char*)data);
-		}
-	}
-	length = (TRACELOG_CONF_ENTRY_SIZE < length) ? TRACELOG_CONF_ENTRY_SIZE : length;
+    /* fill meta data */
+    trace->event = event & 0x7F;
+    trace->type = t;
 
-	memcpy( trace->data, data, length );										// copy description
+    /* calculate size */
+    if(length == 0) {
+        if(t == TRACE_STRING) {
+            length = strlen((char *)data);
+        }
+    }
+
+    length = (TRACELOG_CONF_ENTRY_SIZE < length) ? TRACELOG_CONF_ENTRY_SIZE : length;
+
+    memcpy(trace->data, data, length);										// copy description
 #endif
 }
 /*-----------------------------------------------------------------------------------*/
 void trace_reset(void)
 {
 #if TRACELOG_CONF_NUM_ENTRIES > 0
-	#if SYSLOG_ISLEVEL(SL_DEBUG)
-		char buffer[12];
-		sysmon_write_reset_info(buffer, 12, sysmon.reset_code);
-		trace_string(TRACELOG_EV_START, buffer);
-	#else
-		trace_number(TRACELOG_EV_START, sysmon.reset_code);
-	#endif
+#if SYSLOG_ISLEVEL(SL_DEBUG)
+    char buffer[12];
+    sysmon_write_reset_info(buffer, 12, sysmon.reset_code);
+    trace_string(TRACELOG_EV_START, buffer);
+#else
+    trace_number(TRACELOG_EV_START, sysmon.reset_code);
+#endif
 #endif
 }
 /*-----------------------------------------------------------------------------------*/
@@ -178,42 +188,50 @@ void
 tracelog_init(void)
 {
 #if TRACELOG_CONF_NUM_ENTRIES > 0
-	if( tracelog_initialized != 0 )
-		return;
 
-	if( sysmon_initial_boot() ) {
-		memset( &tracelog, 0, sizeof(struct tracelog) );						// clear tracelog buffer on initial boot only
-	}
+    if(tracelog_initialized != 0) {
+        return;
+    }
 
-	tracelog_initialized = true;												// accept traces
+    if(sysmon_initial_boot()) {
+        memset(&tracelog, 0, sizeof(struct tracelog));						// clear tracelog buffer on initial boot only
+    }
 
-	trace_reset();																// trace reason for last reset
+    tracelog_initialized = true;												// accept traces
+
+    trace_reset();																// trace reason for last reset
 #endif
 }
 void
 tracelog_dump(void)
 {
-	printf("[trace] {\n");
+    printf("[trace] {\n");
 #if TRACELOG_CONF_NUM_ENTRIES > 0
-	char buf[30 + TRACELOG_CONF_ENTRY_SIZE];
-	int i = tracelog.tail;														// tracelog tail holds next index
-	do {
-		i--;
-		if( i < 0 )
-			i = TRACELOG_CONF_NUM_ENTRIES - 1;
-		tracelog_snprint(buf, sizeof(buf), i);
-		printf("\t %.2i: %s\n", i, buf);
-	} while( i != tracelog.tail );
+    char buf[30 + TRACELOG_CONF_ENTRY_SIZE];
+    int i = tracelog.tail;														// tracelog tail holds next index
+
+    do {
+        i--;
+
+        if(i < 0) {
+            i = TRACELOG_CONF_NUM_ENTRIES - 1;
+        }
+
+        tracelog_snprint(buf, sizeof(buf), i);
+        printf("\t %.2i: %s\n", i, buf);
+    }
+    while(i != tracelog.tail);
+
 #endif
 
-	printf("}\n");
+    printf("}\n");
 }
 /*-----------------------------------------------------------------------------------*/
 void
 trace_event(enum tracelog_event event)
 {
 #if TRACELOG_CONF_NUM_ENTRIES > 0
-	trace(event, TRACE_NULL, NULL, 0);
+    trace(event, TRACE_NULL, NULL, 0);
 #endif
 }
 /*-----------------------------------------------------------------------------------*/
@@ -221,23 +239,23 @@ void
 trace_number(enum tracelog_event event, tracelog_number_t number)
 {
 #if TRACELOG_CONF_NUM_ENTRIES > 0
-	trace(event, TRACE_NUMBER, &number, sizeof(tracelog_number_t));
+    trace(event, TRACE_NUMBER, &number, sizeof(tracelog_number_t));
 #endif
 }
 /*-----------------------------------------------------------------------------------*/
 void
-trace_pointer(enum tracelog_event event, void* pointer)
+trace_pointer(enum tracelog_event event, void *pointer)
 {
 #if TRACELOG_CONF_NUM_ENTRIES > 0
-	trace(event, TRACE_POINTER, &pointer, sizeof(void*));
+    trace(event, TRACE_POINTER, &pointer, sizeof(void *));
 #endif
 }
 /*-----------------------------------------------------------------------------------*/
 void
-trace_string(enum tracelog_event event, char* string)
+trace_string(enum tracelog_event event, char *string)
 {
 #if TRACELOG_CONF_NUM_ENTRIES > 0
-	trace(event, TRACE_STRING, string, strlen(string));
+    trace(event, TRACE_STRING, string, strlen(string));
 #endif
 }
 /*-----------------------------------------------------------------------------------*/
@@ -254,20 +272,23 @@ ASCCMD(trace, CMDFLAG_SERIAL, "[event] [text]: print tracelog / trace event [num
 CMD_FUNCTION(trace, cmdargs)
 {
 #if TRACELOG_CONF_NUM_ENTRIES > 0
-	if( cmdargs->arg_size > 0 ) {
-		enum tracelog_event event;
-		char* c = (char*)cmdargs->args;
-		event = (enum tracelog_event)strtoul(c, &c, 0);						// read event number
-		if( event > 0 ) {
-			c++;															// skip expected whitespace
-			trace_string(event, c);											// generate event with argument as text
-			return true;
-		}
-	}
-#endif
-	tracelog_dump();
 
-	return CMD_SUCCESS;
+    if(cmdargs->arg_size > 0) {
+        enum tracelog_event event;
+        char *c = (char *)cmdargs->args;
+        event = (enum tracelog_event)strtoul(c, &c, 0);						// read event number
+
+        if(event > 0) {
+            c++;															// skip expected whitespace
+            trace_string(event, c);											// generate event with argument as text
+            return true;
+        }
+    }
+
+#endif
+    tracelog_dump();
+
+    return CMD_SUCCESS;
 }
 #endif
 /*-----------------------------------------------------------------------------------*/

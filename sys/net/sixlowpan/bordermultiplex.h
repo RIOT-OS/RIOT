@@ -1,3 +1,21 @@
+/**
+ * 6lowpan border router multiplexer 
+ *
+ * Copyright (C) 2013  INRIA.
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup sixlowpan
+ * @{
+ * @file    bordermultiplex.h 
+ * @brief   data structs for border router multiplexing
+ * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
+ * @}
+ */
+
 #ifndef BORDERMULTIPLEX_H
 #define BORDERMULTIPLEX_H
 
@@ -18,27 +36,27 @@
 /* ethertypes for L3 packets */
 #define BORDER_ETHERTYPE_IPV6     0x86DD
 
-typedef struct __attribute__ ((packed)) border_packet_t {
+typedef struct __attribute__((packed)) {
     uint8_t empty;
     uint8_t type;
     uint8_t seq_num;
 } border_packet_t;
 
-typedef struct __attribute__ ((packed)) border_l3_header_t {
+typedef struct __attribute__((packed)) {
     uint8_t empty;
     uint8_t type;
     uint8_t seq_num;
     uint16_t ethertype;
 } border_l3_header_t;
 
-typedef struct __attribute__ ((packed)) border_conf_header_t {
+typedef struct __attribute__((packed)) {
     uint8_t empty;
     uint8_t type;
     uint8_t seq_num;
     uint8_t conftype;
 } border_conf_header_t;
 
-typedef struct __attribute__ ((packed)) border_addr_packet_t {
+typedef struct __attribute__((packed)) {
     uint8_t empty;
     uint8_t type;
     uint8_t seq_num;
@@ -47,7 +65,7 @@ typedef struct __attribute__ ((packed)) border_addr_packet_t {
     ipv6_addr_t addr;
 } border_addr_packet_t;
 
-typedef struct __attribute__ ((packed)) border_context_packet_t {
+typedef struct __attribute__((packed)) {
     uint8_t empty;
     uint8_t type;
     uint8_t seq_num;

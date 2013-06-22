@@ -1,3 +1,21 @@
+/**
+ * 6lowpan border router flow control 
+ *
+ * Copyright (C) 2013  INRIA.
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup sixlowpan
+ * @{
+ * @file    flowcontrol.h
+ * @brief   data structs for border router flowcontrol
+ * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
+ * @}
+ */
+
 #ifndef FLOWCONTROL_H
 #define FLOWCONTROL_H
 
@@ -22,17 +40,17 @@
 
 #define SENDING_SLOT_STACK_SIZE     (256)
 
-typedef struct flowcontrol_stat_t {
+typedef struct {
     /* Sender state */
     uint8_t last_ack;
     uint8_t last_frame;
     sem_t send_win_not_full;
     struct send_slot {
-        vtimer_t timeout; 
+        vtimer_t timeout;
         uint8_t frame[BORDER_BUFFER_SIZE];
         size_t frame_len;
     } send_win[BORDER_SWS];
-    
+
     /* Receiver state */
     uint8_t next_exp;
     struct recv_slot {
@@ -42,7 +60,7 @@ typedef struct flowcontrol_stat_t {
     } recv_win[BORDER_RWS];
 } flowcontrol_stat_t;
 
-typedef struct __attribute__ ((packed)) border_syn_packet_t {
+typedef struct __attribute__((packed)) {
     uint8_t empty;
     uint8_t type;
     uint8_t next_seq_num;

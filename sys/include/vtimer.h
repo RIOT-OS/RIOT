@@ -17,7 +17,7 @@
  * Timer library header file.
  */
 #ifndef __VTIMER_H
-#define __VTIMER_H 
+#define __VTIMER_H
 
 #include "queue.h"
 #include "timex.h"
@@ -34,8 +34,8 @@
 typedef struct vtimer_t {
     queue_node_t queue_entry;
     timex_t absolute;
-    void(*action)(void*);
-    void* arg;
+    void(*action)(void *);
+    void *arg;
     unsigned int pid;
 } vtimer_t;
 
@@ -43,7 +43,7 @@ typedef struct vtimer_t {
  * @brief   Current system time
  * @return  Time as timex_t since system boot
  */
-void vtimer_now(timex_t* out);
+void vtimer_now(timex_t *out);
 
 /**
  * @brief   Initializes the vtimer subsystem. To be called once at system initialization. Will be initialized by auto_init.
@@ -54,7 +54,7 @@ int vtimer_init(void);
 
 /**
  * @brief   will cause the calling thread to be suspended from excecution until the number of microseconds has elapsed
- * @param[in]   us          number of microseconds 
+ * @param[in]   us          number of microseconds
  * @return      0 on success, < 0 on error
  */
 int vtimer_usleep(uint32_t us);
@@ -94,6 +94,6 @@ int vtimer_remove(vtimer_t *t);
 /**
  * @brief Prints a vtimer_t
  */
-void vtimer_print(vtimer_t* t);
+void vtimer_print(vtimer_t *t);
 
 #endif /* __VTIMER_H */

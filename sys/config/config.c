@@ -1,5 +1,5 @@
 /**
- * System wide configuration struct. 
+ * System wide configuration struct.
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -10,7 +10,7 @@
  * @ingroup config
  * @{
  * @file    config_c
- * @brief   Provides system configuration struct with default values. 
+ * @brief   Provides system configuration struct with default values.
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */

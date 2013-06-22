@@ -60,13 +60,12 @@ and the mailinglist (subscription via web site)
  * |             Source            |          Address[1..n]        |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
-typedef struct __attribute__ ((packed)) mmr_rreq_message_t
-{
-	uint8_t type;	///< Must be first byte in struct for type detection
-	uint8_t length;
-	uint16_t destination;
-	uint16_t source;
-	uint16_t address[ADDRESS_LIST_SIZE];
+typedef struct __attribute__((packed)) {
+    uint8_t type;	///< Must be first byte in struct for type detection
+    uint8_t length;
+    uint16_t destination;
+    uint16_t source;
+    uint16_t address[ADDRESS_LIST_SIZE];
 } mmr_rreq_message_t;
 
 /**
@@ -80,13 +79,12 @@ typedef struct __attribute__ ((packed)) mmr_rreq_message_t
  * |             Source            |          Address[1..n]        |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
-typedef struct __attribute__ ((packed)) mmr_rrep_message_t
-{
-	uint8_t type;	///< Must be first byte in struct for type detection
-	uint8_t length;
-	uint16_t destination;
-	uint16_t source;
-	uint16_t address[ADDRESS_LIST_SIZE];
+typedef struct __attribute__((packed)) {
+    uint8_t type;	///< Must be first byte in struct for type detection
+    uint8_t length;
+    uint16_t destination;
+    uint16_t source;
+    uint16_t address[ADDRESS_LIST_SIZE];
 } mmr_rrep_message_t;
 
 /**
@@ -111,11 +109,10 @@ typedef struct __attribute__ ((packed)) mmr_rrep_message_t
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-typedef struct __attribute__ ((packed)) mmr_rerr_message_t
-{
-	uint8_t type;	///< Must be first byte in struct for type detection
-	uint8_t error_type;
-	uint16_t type_specific_info;
+typedef struct __attribute__((packed)) {
+    uint8_t type;	///< Must be first byte in struct for type detection
+    uint8_t error_type;
+    uint16_t type_specific_info;
 } mmr_rerr_message_t;
 
 /**
@@ -131,7 +128,7 @@ void mmr_init(void);
  * @param	message incoming packet
  * @param	packet_info Additional packet information
  */
-void mmr_peek(net_message_t* message, packet_info_t* packet_info);
+void mmr_peek(net_message_t *message, packet_info_t *packet_info);
 
 /**
  * Called by the network layer to request transmission of a packet that
@@ -145,7 +142,7 @@ void mmr_peek(net_message_t* message, packet_info_t* packet_info);
  * @return 	true if packet was successfully stored for transmission; false otherwise
  *          (e.g. message queue full).
  */
-bool mmr_send(net_message_t* message);
+bool mmr_send(net_message_t *message);
 
 /**
  * Called by the network layer which forwards notifications of dropped packets
@@ -155,7 +152,7 @@ bool mmr_send(net_message_t* message);
  * @param	next_hop next hop network address of dropped packet (can be undefined)
  * @param	error Error type which informs about reason
  */
-void mmr_packet_dropped(net_message_t* message, uint16_t next_hop, int error);
+void mmr_packet_dropped(net_message_t *message, uint16_t next_hop, int error);
 
 /**
  * @brief	Receive a message from network layer.
@@ -164,7 +161,7 @@ void mmr_packet_dropped(net_message_t* message, uint16_t next_hop, int error);
  * @param	msg_size Size of received message
  * @param	packet_info Additional packet information
  */
-void mmr_receive(void* msg, int msg_size, packet_info_t* packet_info);
+void mmr_receive(void *msg, int msg_size, packet_info_t *packet_info);
 
 /**
  * @brief	Print routing layer statistics.

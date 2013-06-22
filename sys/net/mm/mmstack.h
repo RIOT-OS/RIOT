@@ -59,7 +59,7 @@ void mms_init(void);
  * @param 	rp Routing protocol type identifier.
  * @param	ri Pointer to route interface.
  */
-void mms_initp(protocol_t rp, route_interface_t* ri);
+void mms_initp(protocol_t rp, route_interface_t *ri);
 
 /**
  * @brief	Add network interface.
@@ -70,7 +70,7 @@ void mms_initp(protocol_t rp, route_interface_t* ri);
  *
  * @return	Interface identifier or -1 if an error occurs.
  */
-int mms_add_interface(const char* name, uint16_t addr, const radio_t* radio);
+int mms_add_interface(const char *name, uint16_t addr, const radio_t *radio);
 
 /**
  * @brief	Get the address of the network interface with given id.
@@ -129,12 +129,14 @@ int mms_connect(int socket, uint16_t dest_addr);
 /**
  * @see	::trans_send(int,void*,int,protocol_t,uint8_t)
  */
-int mms_sock_send(int socket, void* buffer, int length, protocol_t protocol, uint8_t priority);
+int mms_sock_send(int socket, void *buffer, int length, protocol_t protocol,
+                  uint8_t priority);
 
 /**
  * @see	::trans_sendto(int,void*,int,protocol_t,uint8_t,uint16_t)
  */
-int mms_sock_sendto(int socket, void* buffer, int length, protocol_t protocol, uint8_t priority, uint16_t dest_addr);
+int mms_sock_sendto(int socket, void *buffer, int length, protocol_t protocol,
+                    uint8_t priority, uint16_t dest_addr);
 
 /**
  * @brief	Convenience function to send a message via UDPL socket.
@@ -148,7 +150,8 @@ int mms_sock_sendto(int socket, void* buffer, int length, protocol_t protocol, u
  * @return	Upon successful completion, mms_send() returns a value greater zero.
  * 			Otherwise, a negative value is returned to indicate the error.
  */
-int mms_send(void* msg, int msg_len, uint16_t dst, protocol_t protocol, uint8_t priority);
+int mms_send(void *msg, int msg_len, uint16_t dst, protocol_t protocol,
+             uint8_t priority);
 
 /**
  * @see	::trans_poll(int)
@@ -170,7 +173,7 @@ int mms_close(int socket, int how);
  * @param	msg_size Size of incoming packet.
  * @param	packet_info Additional packet information.
  */
-void mms_receive(void* msg, int msg_size, packet_info_t* packet_info);
+void mms_receive(void *msg, int msg_size, packet_info_t *packet_info);
 
 /**
  * @brief	Flush kernel route table.
@@ -188,7 +191,7 @@ void mms_flush_routes(bool flush_static);
  *
  * @param format String that contains the text to be written to stdout.
  */
-void mms_net_printf(const char * format);
+void mms_net_printf(const char *format);
 
 /**
  * @brief	Print kernel route table.

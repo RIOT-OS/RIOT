@@ -1,28 +1,13 @@
-/******************************************************************************
-Copyright 2009, Freie Universitaet Berlin (FUB). All rights reserved.
-
-These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
--------------------------------------------------------------------------------
-This file is part of RIOT.
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-RIOT is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see http://www.gnu.org/licenses/ .
---------------------------------------------------------------------------------
-For further information and questions please use the web site
-	http://scatterweb.mi.fu-berlin.de
-and the mailinglist (subscription via web site)
-	scatterweb@lists.spline.inf.fu-berlin.de
-*******************************************************************************/
+/**
+ * Shell interpreter 
+ *
+ * Copyright (C) 2009, Freie Universitaet Berlin (FUB).
+ * Copyright (C) 2013, INRIA.
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
 
 /**
  * @ingroup	shell
@@ -49,68 +34,81 @@ and the mailinglist (subscription via web site)
 #include <stdint.h>
 #include <stdlib.h>
 
-static void(*find_handler(const shell_command_t *command_list, char *command))(char*) {
-    const shell_command_t* entry = command_list;
-	if (entry) {
-			while (entry->name != NULL) {
-				if ( strcmp(entry->name, command) == 0) {
-					return entry->handler;
-				} else {
-					entry++;
-				}
-			}
-	}
-			
+static void(*find_handler(const shell_command_t *command_list, char *command))(char *)
+{
+    const shell_command_t *entry = command_list;
+
+    if(entry) {
+        while(entry->name != NULL) {
+            if(strcmp(entry->name, command) == 0) {
+                return entry->handler;
+            }
+            else {
+                entry++;
+            }
+        }
+    }
+
 #ifdef MODULE_SHELL_COMMANDS
     entry = _shell_command_list;
-    while (entry->name != NULL) {
-        if ( strcmp(entry->name, command) == 0) {
+
+    while(entry->name != NULL) {
+        if(strcmp(entry->name, command) == 0) {
             return entry->handler;
-        } else {
+        }
+        else {
             entry++;
         }
     }
+
 #endif
     return NULL;
 }
 
-static void print_help(const shell_command_t *command_list) {
+static void print_help(const shell_command_t *command_list)
+{
     const shell_command_t *entry = command_list;
 
     printf("%-20s %s\n", "Command", "Description");
     puts("---------------------------------------");
 
-	if (entry) {
-			while (entry->name != NULL) {
-				printf("%-20s %s\n", entry->name, entry->desc);
-				entry++;
-			}
-	}
-    
+    if(entry) {
+        while(entry->name != NULL) {
+            printf("%-20s %s\n", entry->name, entry->desc);
+            entry++;
+        }
+    }
+
 #ifdef MODULE_SHELL_COMMANDS
     entry = _shell_command_list;
-    while (entry->name != NULL) {
+
+    while(entry->name != NULL) {
         printf("%-20s %s\n", entry->name, entry->desc);
         entry++;
     }
+
 #endif
 }
 
-static void handle_input_line(shell_t *shell, char* line) {
-    char* saveptr;
-    char* linedup = strdup(line);
-    char* command = strtok_r(linedup, " ", &saveptr);
+static void handle_input_line(shell_t *shell, char *line)
+{
+    char *saveptr;
+    char *linedup = strdup(line);
+    char *command = strtok_r(linedup, " ", &saveptr);
 
-    void (*handler)(char*) = NULL;
-    
-    if (command) {
+    void (*handler)(char *) = NULL;
+
+    if(command) {
         handler = find_handler(shell->command_list, command);
-        if (handler != NULL) {
+
+        if(handler != NULL) {
             handler(line);
-        } else {
-            if ( strcmp("help", command) == 0) {
+        }
+        else {
+            if(strcmp("help", command) == 0) {
                 print_help(shell->command_list);
-            } else {
+            }
+            else {
                 puts("shell: command not found.");
             }
         }
@@ -119,21 +117,24 @@ static void handle_input_line(shell_t *shell, char* line) {
     free(linedup);
 }
 
-static int readline(shell_t *shell, char* buf, size_t size) {
+static int readline(shell_t *shell, char *buf, size_t size)
+{
     char *line_buf_ptr = buf;
     int c;
 
-    while (1) {
-        if ( (line_buf_ptr - buf) >= ((int) size)-1) {
+    while(1) {
+        if((line_buf_ptr - buf) >= ((int) size) - 1) {
             return -1;
         }
 
         c = shell->readchar();
         shell->put_char(c);
 
-        if (c == 13) continue;
+        if(c == 13) {
+            continue;
+        }
 
-        if (c == 10) {
+        if(c == 10) {
             *line_buf_ptr = '\0';
             return 0;
         }
@@ -141,6 +142,7 @@ static int readline(shell_t *shell, char* buf, size_t size) {
             *line_buf_ptr++ = c;
         }
     }
+
     return 1;
 }
 
@@ -151,22 +153,27 @@ static inline void print_prompt(shell_t *shell)
     return;
 }
 
-void shell_run(shell_t *shell) {
+void shell_run(shell_t *shell)
+{
     char line_buf[255];
 
     print_prompt(shell);
+
     while(1) {
         int res = readline(shell, line_buf, sizeof(line_buf));
-        if (! res ) {
-            char* line_copy = strdup(line_buf);
+
+        if(! res) {
+            char *line_copy = strdup(line_buf);
             handle_input_line(shell, line_copy);
             free(line_copy);
         }
+
         print_prompt(shell);
     }
 }
 
-void shell_init(shell_t *shell, const shell_command_t *shell_commands, int(*readchar)(void), void(*put_char)(int)) {
+void shell_init(shell_t *shell, const shell_command_t *shell_commands, int(*readchar)(void), void(*put_char)(int))
+{
     shell->command_list = shell_commands;
     shell->readchar = readchar;
     shell->put_char = put_char;

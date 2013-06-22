@@ -1,5 +1,5 @@
 #ifndef __TIMEX_H
-#define __TIMEX_H 
+#define __TIMEX_H
 
 #include <stdint.h>
 
@@ -9,7 +9,7 @@ typedef struct timex_t {
 } timex_t;
 
 /* a+b */
-timex_t timex_add(const timex_t a, const timex_t b); 
+timex_t timex_add(const timex_t a, const timex_t b);
 
 /* a-b*/
 timex_t timex_sub(const timex_t a, const timex_t b);

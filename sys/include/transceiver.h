@@ -1,5 +1,5 @@
 #ifndef TRANSCEIVER_H
-#define TRANSCEIVER_H 
+#define TRANSCEIVER_H
 
 #include <radio/types.h>
 
@@ -84,7 +84,7 @@ typedef struct {
 extern int transceiver_pid;
 
 /**
- * @brief Initializes the transceiver module for certain transceiver types 
+ * @brief Initializes the transceiver module for certain transceiver types
  *
  * @param transceivers  Specifies all transceivers to init
  **/
