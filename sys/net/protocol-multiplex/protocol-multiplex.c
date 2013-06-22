@@ -49,97 +49,103 @@ and the mailinglist (subscription via web site)
 
 //#define DEBUG
 #ifdef DEBUG
-	#include <stdio.h>
-	#define PRINTF(fmt,args...) printf("pm: " fmt "\n", ##args)
+#include <stdio.h>
+#define PRINTF(fmt,args...) printf("pm: " fmt "\n", ##args)
 #else
-	#define PRINTF(...)
+#define PRINTF(...)
 #endif
 
 /*---------------------------------------------------------------------------*/
-void
-pm_init_table(pm_table_t* table, uint8_t size, handler_entry_t* handler)
+void pm_init_table(pm_table_t *table, uint8_t size, handler_entry_t *handler)
 {
-	table->size = size;
-	table->handler = handler;
-	memset(handler, 0, sizeof(handler_entry_t) * size);
+    table->size = size;
+    table->handler = handler;
+    memset(handler, 0, sizeof(handler_entry_t) * size);
 }
 /*---------------------------------------------------------------------------*/
-int
-pm_find_handler_index(const pm_table_t* table, protocol_t protocol, unsigned int start)
+int pm_find_handler_index(const pm_table_t *table, protocol_t protocol,
+                          unsigned int start)
 {
-	int i;
-	handler_entry_t* e = &table->handler[start];
-	for(i = start; i < table->size; i++, e++)
-	{
-		if (e->protocol == protocol)
-			return i;
-	}
-	return -1;
-}
-/*---------------------------------------------------------------------------*/
-int
-pm_set_handler(const pm_table_t* table, protocol_t protocol, packet_handler_t handler)
-{
-	// Reject illegal values
-	if (protocol == 0 || handler == NULL) {
-		PRINTF("proto %u rejected", protocol);
-		return -1;
-	}
-	// Check if there is already a handler for given protocol
-	int index = pm_find_handler_index(table, protocol, 0);
-	if (index >= 0)
-	{
-		// Two handlers for same protocol not allowed because only
-		// one gets called. This hasn't to be the last one who
-		// registered!
-		PRINTF("proto %u handler found, reset", protocol);
-		table->handler[index].protocol = 0;
-		table->handler[index].handler = NULL;
+    int i;
+    handler_entry_t *e = &table->handler[start];
 
-	}
-	// Find free position for handler (protocol value is 0)
-	index = pm_find_handler_index(table, 0, 0);
-	// Store handler if free index found
-	if (index >= 0)
-	{
-		PRINTF("proto %u, set", protocol);
-		table->handler[index].protocol = protocol;
-		table->handler[index].handler = handler;
-	}
-	// Return result (-1 on error or no free index)
-	return index;
+    for(i = start; i < table->size; i++, e++) {
+        if(e->protocol == protocol) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 /*---------------------------------------------------------------------------*/
-void
-pm_remove_handler(const pm_table_t* table, protocol_t protocol, packet_handler_t handler)
+int pm_set_handler(const pm_table_t *table, protocol_t protocol,
+                   packet_handler_t handler)
 {
-	int i;
-	for (i = 0; i < table->size; i++)
-	{
-		if (table->handler[i].protocol == protocol && table->handler[i].handler == handler)
-		{
-			PRINTF("proto %u handler found, reset", protocol);
-			table->handler[i].protocol = 0;
-			table->handler[i].handler = NULL;
-		}
-	}
+    /* Reject illegal values */
+    if(protocol == 0 || handler == NULL) {
+        PRINTF("proto %u rejected", protocol);
+        return -1;
+    }
+
+    /* Check if there is already a handler for given protocol */
+    int index = pm_find_handler_index(table, protocol, 0);
+
+    if(index >= 0) {
+        /* Two handlers for same protocol not allowed because only
+         * one gets called. This hasn't to be the last one who
+         * registered! */
+        PRINTF("proto %u handler found, reset", protocol);
+        table->handler[index].protocol = 0;
+        table->handler[index].handler = NULL;
+    }
+
+    /* Find free position for handler (protocol value is 0) */
+    index = pm_find_handler_index(table, 0, 0);
+
+    /* Store handler if free index found */
+    if(index >= 0) {
+        PRINTF("proto %u, set", protocol);
+        table->handler[index].protocol = protocol;
+        table->handler[index].handler = handler;
+    }
+
+    /* Return result (-1 on error or no free index) */
+    return index;
 }
 /*---------------------------------------------------------------------------*/
-int
-pm_invoke(const pm_table_t* table, protocol_t protocol, void* payload, int payload_size, packet_info_t* packet_info)
+void pm_remove_handler(const pm_table_t *table, protocol_t protocol, 
+                       packet_handler_t handler)
 {
-	int index = 0;
+    int i;
 
-	// Reject illegal values
-	if (protocol == 0) return -1;
+    for(i = 0; i < table->size; i++) {
+        if(table->handler[i].protocol == protocol && table->handler[i].handler == handler) {
+            PRINTF("proto %u handler found, reset", protocol);
+            table->handler[i].protocol = 0;
+            table->handler[i].handler = NULL;
+        }
+    }
+}
+/*---------------------------------------------------------------------------*/
+int pm_invoke(const pm_table_t *table, protocol_t protocol, void *payload,
+              int payload_size, packet_info_t *packet_info)
+{
+    int index = 0;
 
-	if ( (index = pm_find_handler_index(table, protocol, index)) != -1 ) {
-		PRINTF("proto %u, invoke", protocol);
-		table->handler[index].handler(payload, payload_size, packet_info);
-	} else {
-		PRINTF("proto %u invoke failed (no handler)", protocol);
-	}
-	return index;
+    /* Reject illegal values */
+    if(protocol == 0) {
+        return -1;
+    }
+
+    if((index = pm_find_handler_index(table, protocol, index)) != -1) {
+        PRINTF("proto %u, invoke", protocol);
+        table->handler[index].handler(payload, payload_size, packet_info);
+    }
+    else {
+        PRINTF("proto %u invoke failed (no handler)", protocol);
+    }
+
+    return index;
 }
 /*---------------------------------------------------------------------------*/
 /** @} */

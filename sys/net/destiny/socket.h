@@ -1,9 +1,20 @@
-/*
- * socket.h
+/**
+ * Destiny socket API
  *
- *  Created on: 16.09.2011
- *      Author: Oliver
+ * Copyright (C) 2013  INRIA.
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup destiny 
+ * @{
+ * @file    socket.h
+ * @brief   header for BSD socket API
+ * @author  Oliver Gesch <oliver.gesch@googlemail.com>
+ * @}
  */
+
 
 #ifndef SOCKET_H_
 #define SOCKET_H_
@@ -119,82 +130,81 @@
 
 #define SEND_MSG_BUF_SIZE	64
 
-typedef struct socka6
-	{
+typedef struct socka6 {
     uint8_t     		sin6_family;    		/* AF_INET6 */
     uint16_t       		sin6_port;      		/* transport layer port # */
     uint32_t        	sin6_flowinfo;  		/* IPv6 flow information */
     ipv6_addr_t 		sin6_addr;      		/* IPv6 address */
-	} sockaddr6_t;
+} sockaddr6_t;
 
-typedef struct tcp_hc_con
-	{
-	uint16_t 		context_id;
-	uint32_t 		seq_rcv; // Last received packet values
-	uint32_t 		ack_rcv;
-	uint16_t		wnd_rcv;
-	uint32_t		seq_snd; // Last sent packet values
-	uint32_t		ack_snd;
-	uint16_t		wnd_snd;
-	uint8_t			hc_type;
-	} tcp_hc_context_t;
+typedef struct tcp_hc_con {
+    uint16_t 		context_id;
+    uint32_t 		seq_rcv; // Last received packet values
+    uint32_t 		ack_rcv;
+    uint16_t		wnd_rcv;
+    uint32_t		seq_snd; // Last sent packet values
+    uint32_t		ack_snd;
+    uint16_t		wnd_snd;
+    uint8_t			hc_type;
+} tcp_hc_context_t;
 
-typedef struct tcp_control_block
-	{
-	uint32_t			send_una;
-	uint32_t			send_nxt;
-	uint16_t			send_wnd;
-	uint32_t			send_iss;
+typedef struct tcp_control_block {
+    uint32_t			send_una;
+    uint32_t			send_nxt;
+    uint16_t			send_wnd;
+    uint32_t			send_iss;
 
-	uint32_t			rcv_nxt;
-	uint16_t			rcv_wnd;
-	uint32_t			rcv_irs;
+    uint32_t			rcv_nxt;
+    uint16_t			rcv_wnd;
+    uint32_t			rcv_irs;
 
-	timex_t				last_packet_time;
-	uint8_t				no_of_retries;
-	uint16_t			mss;
+    timex_t				last_packet_time;
+    uint8_t				no_of_retries;
+    uint16_t			mss;
 
-	uint8_t 			state;
+    uint8_t 			state;
 
-	double				srtt;
-	double				rttvar;
-	double				rto;
+    double				srtt;
+    double				rttvar;
+    double				rto;
 
 #ifdef TCP_HC
-	tcp_hc_context_t	tcp_context;
+    tcp_hc_context_t	tcp_context;
 #endif
 
-	} tcp_cb_t;
+} tcp_cb_t;
 
-typedef struct sock_t
-	{
-	uint8_t				domain;
-	uint8_t				type;
-	uint8_t				protocol;
-	tcp_cb_t			tcp_control;
-	sockaddr6_t			local_address;
-	sockaddr6_t			foreign_address;
-	} socket_t;
+typedef struct sock_t {
+    uint8_t				domain;
+    uint8_t				type;
+    uint8_t				protocol;
+    tcp_cb_t			tcp_control;
+    sockaddr6_t			local_address;
+    sockaddr6_t			foreign_address;
+} socket_t;
 
-typedef struct socket_in_t
-	{
-	uint8_t				socket_id;
-	uint8_t				recv_pid;
-	uint8_t				send_pid;
-	uint8_t				tcp_input_buffer_end;
-	mutex_t				tcp_buffer_mutex;
-	socket_t			socket_values;
-	uint8_t				tcp_input_buffer[MAX_TCP_BUFFER];
-	} socket_internal_t;
+typedef struct socket_in_t {
+    uint8_t				socket_id;
+    uint8_t				recv_pid;
+    uint8_t				send_pid;
+    uint8_t				tcp_input_buffer_end;
+    mutex_t				tcp_buffer_mutex;
+    socket_t			socket_values;
+    uint8_t				tcp_input_buffer[MAX_TCP_BUFFER];
+} socket_internal_t;
 
 extern socket_internal_t sockets[MAX_SOCKETS];
 
 int socket(int domain, int type, int protocol);
 int connect(int socket, sockaddr6_t *addr, uint32_t addrlen);
-socket_internal_t *getWaitingConnectionSocket(int socket, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
+socket_internal_t *getWaitingConnectionSocket(int socket,
+                                              ipv6_hdr_t *ipv6_header,
+                                              tcp_hdr_t *tcp_header);
 void close_socket(socket_internal_t *current_socket);
-int32_t recvfrom( int s, void *buf, uint32_t len, int flags, sockaddr6_t *from, uint32_t *fromlen );
-int32_t sendto( int s, const void *msg, uint32_t len, int flags, sockaddr6_t *to, uint32_t tolen);
+int32_t recvfrom(int s, void *buf, uint32_t len, int flags, sockaddr6_t *from,
+                 uint32_t *fromlen);
+int32_t sendto(int s, const void *msg, uint32_t len, int flags,
+               sockaddr6_t *to, uint32_t tolen);
 int32_t send(int s, void *msg, uint32_t len, int flags);
 int recv(int s, void *buf, uint32_t len, int flags);
 int close(int s);
@@ -210,14 +220,23 @@ void print_internal_socket(socket_internal_t *current_socket_internal);
 void print_socket(socket_t *current_socket);
 void printf_tcp_context(tcp_hc_context_t *current_tcp_context);
 bool exists_socket(uint8_t socket);
-socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
-void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header, socket_t *tcp_socket);
-void set_socket_address(sockaddr6_t *sockaddr, uint8_t sin6_family, uint16_t sin6_port, uint32_t sin6_flowinfo, ipv6_addr_t *sin6_addr);
-void set_tcp_cb(tcp_cb_t *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd, uint32_t send_nxt, uint32_t send_una, uint16_t send_wnd);
-void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port, uint32_t seq_nr, uint32_t ack_nr,
-		uint8_t dataOffset_reserved, uint8_t reserved_flags, uint16_t window, uint16_t checksum, uint16_t urg_pointer);
+socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
+                                         tcp_hdr_t *tcp_header);
+void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
+                      tcp_hdr_t *tcp_header, socket_t *tcp_socket);
+void set_socket_address(sockaddr6_t *sockaddr, uint8_t sin6_family,
+                        uint16_t sin6_port, uint32_t sin6_flowinfo,
+                        ipv6_addr_t *sin6_addr);
+void set_tcp_cb(tcp_cb_t *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd,
+                uint32_t send_nxt, uint32_t send_una, uint16_t send_wnd);
+void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port,
+                    uint32_t seq_nr, uint32_t ack_nr,
+                    uint8_t dataOffset_reserved, uint8_t reserved_flags,
+                    uint16_t window, uint16_t checksum, uint16_t urg_pointer);
 int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header);
 void switch_tcp_packet_byte_order(tcp_hdr_t *current_tcp_packet);
-int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet, ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length);
+int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
+             ipv6_hdr_t *temp_ipv6_header, uint8_t flags,
+             uint8_t payload_length);
 bool isTCPSocket(uint8_t s);
 #endif /* SOCKET_H_ */

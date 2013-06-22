@@ -18,6 +18,6 @@
  * sizeof(int) < 4.  sizeof(int) > 4 is fine; all the world's not a VAX.
  */
 
-const char *inet_ntop  (int af, const void *src, char *dst, size_t size);
+const char *inet_ntop(int af, const void *src, char *dst, size_t size);
 
 #endif /* INET_NTOP_H_ */

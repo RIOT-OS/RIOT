@@ -17,9 +17,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
- 
+
 #include "sys/net/destiny/socket.h"
- 
+
 #include "inet_pton.h"
 
 /* int
@@ -32,8 +32,7 @@
  * author:
  *	Paul Vixie, 1996.
  */
-static int
-inet_pton4(const char *src, unsigned char *dst)
+static int inet_pton4(const char *src, unsigned char *dst)
 {
     static const char digits[] = "0123456789";
     int saw_digit, octets, ch;
@@ -42,30 +41,43 @@ inet_pton4(const char *src, unsigned char *dst)
     saw_digit = 0;
     octets = 0;
     *(tp = tmp) = 0;
-    while ((ch = *src++) != '\0') {
-	const char *pch;
 
-	if ((pch = strchr(digits, ch)) != NULL) {
-	    unsigned int new = *tp * 10 + (unsigned int)(pch - digits);
+    while((ch = *src++) != '\0') {
+        const char *pch;
 
-	    if (new > 255)
-		return (0);
-	    *tp = new;
-	    if (! saw_digit) {
-		if (++octets > 4)
-		    return (0);
-		saw_digit = 1;
-	    }
-	} else if (ch == '.' && saw_digit) {
-	    if (octets == 4)
-		return (0);
-	    *++tp = 0;
-	    saw_digit = 0;
-	} else
-		return (0);
+        if((pch = strchr(digits, ch)) != NULL) {
+            unsigned int new = *tp * 10 + (unsigned int)(pch - digits);
+
+            if(new > 255) {
+                return (0);
+            }
+
+            *tp = new;
+
+            if(! saw_digit) {
+                if(++octets > 4) {
+                    return (0);
+                }
+
+                saw_digit = 1;
+            }
+        }
+        else if(ch == '.' && saw_digit) {
+            if(octets == 4) {
+                return (0);
+            }
+
+            *++tp = 0;
+            saw_digit = 0;
+        }
+        else {
+            return (0);
+        }
     }
-    if (octets < 4)
-	return (0);
+
+    if(octets < 4) {
+        return (0);
+    }
 
     memcpy(dst, tmp, INADDRSZ);
     return (1);
@@ -84,87 +96,112 @@ inet_pton4(const char *src, unsigned char *dst)
  * author:
  *	Paul Vixie, 1996.
  */
-static int
-inet_pton6(const char *src, unsigned char *dst)
+static int inet_pton6(const char *src, unsigned char *dst)
 {
-	static const char xdigits_l[] = "0123456789abcdef",
-			  xdigits_u[] = "0123456789ABCDEF";
-	unsigned char tmp[IN6ADDRSZ], *tp, *endp, *colonp;
-	const char *xdigits, *curtok;
-	int ch, saw_xdigit;
-	unsigned int val;
+    static const char xdigits_l[] = "0123456789abcdef",
+                                    xdigits_u[] = "0123456789ABCDEF";
+    unsigned char tmp[IN6ADDRSZ], *tp, *endp, *colonp;
+    const char *xdigits, *curtok;
+    int ch, saw_xdigit;
+    unsigned int val;
 
-	memset((tp = tmp), '\0', IN6ADDRSZ);
-	endp = tp + IN6ADDRSZ;
-	colonp = NULL;
-	/* Leading :: requires some special handling. */
-	if (*src == ':')
-		if (*++src != ':')
-			return (0);
-	curtok = src;
-	saw_xdigit = 0;
-	val = 0;
-	while ((ch = *src++) != '\0') {
-		const char *pch;
+    memset((tp = tmp), '\0', IN6ADDRSZ);
+    endp = tp + IN6ADDRSZ;
+    colonp = NULL;
 
-		if ((pch = strchr((xdigits = xdigits_l), ch)) == NULL)
-			pch = strchr((xdigits = xdigits_u), ch);
-		if (pch != NULL) {
-			val <<= 4;
-			val |= (pch - xdigits);
-			if (val > 0xffff)
-				return (0);
-			saw_xdigit = 1;
-			continue;
-		}
-		if (ch == ':') {
-			curtok = src;
-			if (!saw_xdigit) {
-				if (colonp)
-					return (0);
-				colonp = tp;
-				continue;
-			}
-			if (tp + INT16SZ > endp)
-				return (0);
-			*tp++ = (unsigned char) (val >> 8) & 0xff;
-			*tp++ = (unsigned char) val & 0xff;
-			saw_xdigit = 0;
-			val = 0;
-			continue;
-		}
-		if (ch == '.' && ((tp + INADDRSZ) <= endp) &&
-		    inet_pton4(curtok, tp) > 0) {
-			tp += INADDRSZ;
-			saw_xdigit = 0;
-			break;	/* '\0' was seen by inet_pton4(). */
-		}
-		return (0);
-	}
-	if (saw_xdigit) {
-		if (tp + INT16SZ > endp)
-			return (0);
-		*tp++ = (unsigned char) (val >> 8) & 0xff;
-		*tp++ = (unsigned char) val & 0xff;
-	}
-	if (colonp != NULL) {
-		/*
-		 * Since some memmove()'s erroneously fail to handle
-		 * overlapping regions, we'll do the shift by hand.
-		 */
-		const ssize_t n = tp - colonp;
-		ssize_t i;
+    /* Leading :: requires some special handling. */
+    if(*src == ':')
+        if(*++src != ':') {
+            return (0);
+        }
 
-		for (i = 1; i <= n; i++) {
-			endp[- i] = colonp[n - i];
-			colonp[n - i] = 0;
-		}
-		tp = endp;
-	}
-	if (tp != endp)
-		return (0);
-	memcpy(dst, tmp, IN6ADDRSZ);
-	return (1);
+    curtok = src;
+    saw_xdigit = 0;
+    val = 0;
+
+    while((ch = *src++) != '\0') {
+        const char *pch;
+
+        if((pch = strchr((xdigits = xdigits_l), ch)) == NULL) {
+            pch = strchr((xdigits = xdigits_u), ch);
+        }
+
+        if(pch != NULL) {
+            val <<= 4;
+            val |= (pch - xdigits);
+
+            if(val > 0xffff) {
+                return (0);
+            }
+
+            saw_xdigit = 1;
+            continue;
+        }
+
+        if(ch == ':') {
+            curtok = src;
+
+            if(!saw_xdigit) {
+                if(colonp) {
+                    return (0);
+                }
+
+                colonp = tp;
+                continue;
+            }
+
+            if(tp + INT16SZ > endp) {
+                return (0);
+            }
+
+            *tp++ = (unsigned char)(val >> 8) & 0xff;
+            *tp++ = (unsigned char) val & 0xff;
+            saw_xdigit = 0;
+            val = 0;
+            continue;
+        }
+
+        if(ch == '.' && ((tp + INADDRSZ) <= endp) &&
+           inet_pton4(curtok, tp) > 0) {
+            tp += INADDRSZ;
+            saw_xdigit = 0;
+            break;	/* '\0' was seen by inet_pton4(). */
+        }
+
+        return (0);
+    }
+
+    if(saw_xdigit) {
+        if(tp + INT16SZ > endp) {
+            return (0);
+        }
+
+        *tp++ = (unsigned char)(val >> 8) & 0xff;
+        *tp++ = (unsigned char) val & 0xff;
+    }
+
+    if(colonp != NULL) {
+        /*
+         * Since some memmove()'s erroneously fail to handle
+         * overlapping regions, we'll do the shift by hand.
+         */
+        const ssize_t n = tp - colonp;
+        ssize_t i;
+
+        for(i = 1; i <= n; i++) {
+            endp[- i] = colonp[n - i];
+            colonp[n - i] = 0;
+        }
+
+        tp = endp;
+    }
+
+    if(tp != endp) {
+        return (0);
+    }
+
+    memcpy(dst, tmp, IN6ADDRSZ);
+    return (1);
 }
 
 /* int
@@ -178,16 +215,18 @@ inet_pton6(const char *src, unsigned char *dst)
  * author:
  *	Paul Vixie, 1996.
  */
-int
-inet_pton(int af, const char *src, void *dst)
+int inet_pton(int af, const char *src, void *dst)
 {
-	switch (af) {
-	case AF_INET:
-		return (inet_pton4(src, dst));
-	case AF_INET6:
-		return (inet_pton6(src, dst));
-	default:
-		return (-1);
-	}
-	/* NOTREACHED */
+    switch(af) {
+        case AF_INET:
+            return (inet_pton4(src, dst));
+
+        case AF_INET6:
+            return (inet_pton6(src, dst));
+
+        default:
+            return (-1);
+    }
+
+    /* NOTREACHED */
 }

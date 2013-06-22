@@ -49,20 +49,20 @@ and the mailinglist (subscription via web site)
 #include "radio/types.h"
 
 typedef struct {
-	packet_handler_t	handler;
-	protocol_t			protocol;
+    packet_handler_t	handler;
+    protocol_t			protocol;
 } handler_entry_t;
 
 typedef struct {
-	uint8_t				size;
-	handler_entry_t*	handler;
+    uint8_t				size;
+    handler_entry_t	*handler;
 } pm_table_t;
 
-void pm_init_table(pm_table_t* table, uint8_t size, handler_entry_t* handler);
-int pm_find_handler_index(const pm_table_t* table, protocol_t protocol, unsigned int start);
-int pm_set_handler(const pm_table_t* table, protocol_t protocol, packet_handler_t handler);
-void pm_remove_handler(const pm_table_t* table, protocol_t protocol, packet_handler_t handler);
-int pm_invoke(const pm_table_t* table, protocol_t protocol, void* payload, int payload_size, packet_info_t* packet_info);
+void pm_init_table(pm_table_t *table, uint8_t size, handler_entry_t *handler);
+int pm_find_handler_index(const pm_table_t *table, protocol_t protocol, unsigned int start);
+int pm_set_handler(const pm_table_t *table, protocol_t protocol, packet_handler_t handler);
+void pm_remove_handler(const pm_table_t *table, protocol_t protocol, packet_handler_t handler);
+int pm_invoke(const pm_table_t *table, protocol_t protocol, void *payload, int payload_size, packet_info_t *packet_info);
 
 /** @} */
 

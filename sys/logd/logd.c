@@ -1,31 +1,15 @@
-/******************************************************************************
-Copyright 2009-2010, Freie Universitaet Berlin (FUB). All rights reserved.
-
-These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
--------------------------------------------------------------------------------
-This file is part of RIOT.
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-RIOT is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see http://www.gnu.org/licenses/ .
---------------------------------------------------------------------------------
-For further information and questions please use the web site
-	http://scatterweb.mi.fu-berlin.de
-and the mailinglist (subscription via web site)
-	scatterweb@lists.spline.inf.fu-berlin.de
-*******************************************************************************/
+/**
+ * Logging daemon 
+ *
+ * Copyright (C) 2009-2013 Freie Universitaet Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
 
 /**
- * @file
+ * @file        logd.c
  * @brief		Simple logging demon implementation
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
@@ -39,26 +23,25 @@ and the mailinglist (subscription via web site)
 #include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
-// core
+/* core */
 #include "msg.h"
 #include "flags.h"
 #include "mutex.h"
 #include "thread.h"
 #include "kernel.h"
-// system
+/* system */
 #include "logd.h"
 #include "list.h"
 
-typedef struct log_queue_t
-{
-	list_node_t listnode;
-	char* str;
-	int str_len;
+typedef struct {
+    list_node_t listnode;
+    char *str;
+    int str_len;
 } log_queue_t;
 
 static volatile int log_pid = -1;
 static int logd_stack_size = LOGD_STACK_SIZE_NORMAL;
-static FILE* fh = NULL;
+static FILE *fh = NULL;
 static int log_count = 0;
 static mutex_t log_mutex;
 static list_t log_msg_queue;
@@ -69,125 +52,156 @@ static volatile bool echo_on = false;
 
 static void close_file_handle(void)
 {
-	if (fh != NULL) {
-		fclose(fh);
-		fh = NULL;
-	}
+    if(fh != NULL) {
+        fclose(fh);
+        fh = NULL;
+    }
 }
 
-static void write_to_file(char* str, int str_len)
+static void write_to_file(char *str, int str_len)
 {
-	if (fh != NULL && str_len > 0) {
-		if (fwrite(str, sizeof(char), str_len, fh) != str_len) {
-			if (echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
-				printf("LOGD [WARN]: file write failed, closing file\n");
-			}
-			close_file_handle();
-			return;
-		}
-		if (fflush(fh) == EOF) {
-			if (echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
-				printf("LOGD [WARN]: file write failed, closing file\n");
-			}
-			close_file_handle();
-			return;
-		}
-	} else {
-		fh = fopen("/LOGD.LOG", "w");
-		if (!fh) {
-			if (echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
-				printf("LOGD [WARN]: file reopen failed, damn!\n");
-			}
-		} else {
-			write_to_file(str, str_len);
-		}
-	}
+    if(fh != NULL && str_len > 0) {
+        if(fwrite(str, sizeof(char), str_len, fh) != str_len) {
+            if(echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
+                printf("LOGD [WARN]: file write failed, closing file\n");
+            }
+
+            close_file_handle();
+            return;
+        }
+
+        if(fflush(fh) == EOF) {
+            if(echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
+                printf("LOGD [WARN]: file write failed, closing file\n");
+            }
+
+            close_file_handle();
+            return;
+        }
+    }
+    else {
+        fh = fopen("/LOGD.LOG", "w");
+
+        if(!fh) {
+            if(echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
+                printf("LOGD [WARN]: file reopen failed, damn!\n");
+            }
+        }
+        else {
+            write_to_file(str, str_len);
+        }
+    }
 }
 
 static void logd_process(void)
 {
-	msg m;
-	log_queue_t* node;
-	do
-	{
-		if (!exit_flag) msg_receive(&m);
-		mutex_lock(&log_mutex);
-		while ((node = (log_queue_t*) list_remove_head(&log_msg_queue)) != NULL) {
-			write_to_file(node->str, node->str_len);
-			if (echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
-				printf("%s", node->str);
-			}
-			log_count++;
-			free(node->str);
-			free(node);
-		}
-		mutex_unlock(&log_mutex, 0);
-	} while (m.type != MSG_EXIT && !exit_flag);
-	/* Logging thread is terminating, close log file */
-	close_file_handle();
+    msg m;
+    log_queue_t *node;
+
+    do {
+        if(!exit_flag) {
+            msg_receive(&m);
+        }
+
+        mutex_lock(&log_mutex);
+
+        while((node = (log_queue_t *) list_remove_head(&log_msg_queue)) != NULL) {
+            write_to_file(node->str, node->str_len);
+
+            if(echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
+                printf("%s", node->str);
+            }
+
+            log_count++;
+            free(node->str);
+            free(node);
+        }
+
+        mutex_unlock(&log_mutex, 0);
+    }
+    while(m.type != MSG_EXIT && !exit_flag);
+
+    /* Logging thread is terminating, close log file */
+    close_file_handle();
 }
 
 /*---------------------------------------------------------------------------*/
 
-static void logd_init0(void) {
-	fh = fopen("/LOGD.LOG", "w");
-	if (!fh) return;
-	log_pid = thread_create(logd_stack_size, PRIORITY_LOGD, CREATE_STACKTEST, logd_process, "logd");
+static void logd_init0(void)
+{
+    fh = fopen("/LOGD.LOG", "w");
+
+    if(!fh) {
+        return;
+    }
+
+    log_pid = thread_create(logd_stack_size, PRIORITY_LOGD, CREATE_STACKTEST, logd_process, "logd");
 }
 
 void logd_init(int stack_size)
 {
-	logd_stack_size = stack_size;
-	mutex_init(&log_mutex);
-	list_init(&log_msg_queue);
-	logd_init0();
+    logd_stack_size = stack_size;
+    mutex_init(&log_mutex);
+    list_init(&log_msg_queue);
+    logd_init0();
 }
 
 void logd_set_console_enabled(bool enabled)
 {
-	echo_on = enabled;
+    echo_on = enabled;
 }
 
-bool logd_log(char* str, int str_len)
+bool logd_log(char *str, int str_len)
 {
-	msg m;
-	// Test if logd process was created
-	if (log_pid == -1) {
-		// no logd created, because fopen() on log file failed. So try again
-		logd_init0();
-		if (log_pid == -1) {
-			// Still errors opening log file, exit now
-			return false;
-		}
-	}
-	log_queue_t* lq = malloc(sizeof(*lq));
-	if (lq == NULL) return false;
-	lq->str = malloc(sizeof(char) * str_len + 1); // 1 byte for string termination char
-	if (lq->str == NULL) {
-		free(lq);
-		return false;
-	}
-	strncpy(lq->str, str, str_len);
-	lq->str_len = str_len;
-	lq->str[str_len] = '\0';	// add string termination char at end of buffer
-	mutex_lock(&log_mutex);
-	list_append(&log_msg_queue, (list_node_t*) lq);
-	mutex_unlock(&log_mutex, 0);
-	m.type = MSG_POLL;
-	m.content.ptr = NULL;
-	msg_send(&m, log_pid, false);
-	return true;
+    msg m;
+
+    /* Test if logd process was created */
+    if(log_pid == -1) {
+        /* no logd created, because fopen() on log file failed. So try again */
+        logd_init0();
+
+        if(log_pid == -1) {
+            /* Still errors opening log file, exit now */
+            return false;
+        }
+    }
+
+    log_queue_t *lq = malloc(sizeof(*lq));
+
+    if(lq == NULL) {
+        return false;
+    }
+
+    lq->str = malloc(sizeof(char) * str_len + 1); /* 1 byte for string termination char */
+
+    if(lq->str == NULL) {
+        free(lq);
+        return false;
+    }
+
+    strncpy(lq->str, str, str_len);
+    lq->str_len = str_len;
+    lq->str[str_len] = '\0';	/* add string termination char at end of buffer */
+    mutex_lock(&log_mutex);
+    list_append(&log_msg_queue, (list_node_t *) lq);
+    mutex_unlock(&log_mutex, 0);
+    m.type = MSG_POLL;
+    m.content.ptr = NULL;
+    msg_send(&m, log_pid, false);
+    return true;
 }
 
 void logd_exit(void)
 {
-	msg m;
-	// Test if logd process was created
-	if (log_pid == -1) {
-		return;
-	}
-	exit_flag = true;
-	m.type = MSG_EXIT;
-	m.content.ptr = NULL;
-	msg_send(&m, log_pid, false);
+    msg m;
+
+    /* Test if logd process was created */
+    if(log_pid == -1) {
+        return;
+    }
+
+    exit_flag = true;
+    m.type = MSG_EXIT;
+    m.content.ptr = NULL;
+    msg_send(&m, log_pid, false);
 }

@@ -33,34 +33,38 @@
  * author:
  *	Paul Vixie, 1996.
  */
-static const char *
-inet_ntop4(const unsigned char *src, char *dst, size_t size)
+static const char *inet_ntop4(const unsigned char *src, char *dst, size_t size)
 {
-	const size_t MIN_SIZE = 16; /* space for 255.255.255.255\0 */
-	int n = 0;
-	char *next = dst;
+    const size_t MIN_SIZE = 16; /* space for 255.255.255.255\0 */
+    int n = 0;
+    char *next = dst;
 
-	if (size < MIN_SIZE) {
-	    return NULL;
-	}
-	do {
-	    unsigned char u = *src++;
-	    if (u > 99) {
-		*next++ = '0' + u/100;
-		u %= 100;
-		*next++ = '0' + u/10;
-		u %= 10;
-	    }
-	    else if (u > 9) {
-		*next++ = '0' + u/10;
-		u %= 10;
-	    }
-	    *next++ = '0' + u;
-	    *next++ = '.';
-	    n++;
-	} while (n < 4);
-	*--next = 0;
-	return dst;
+    if(size < MIN_SIZE) {
+        return NULL;
+    }
+
+    do {
+        unsigned char u = *src++;
+
+        if(u > 99) {
+            *next++ = '0' + u / 100;
+            u %= 100;
+            *next++ = '0' + u / 10;
+            u %= 10;
+        }
+        else if(u > 9) {
+            *next++ = '0' + u / 10;
+            u %= 10;
+        }
+
+        *next++ = '0' + u;
+        *next++ = '.';
+        n++;
+    }
+    while(n < 4);
+
+    *--next = 0;
+    return dst;
 }
 
 /* const char *
@@ -69,8 +73,7 @@ inet_ntop4(const unsigned char *src, char *dst, size_t size)
  * author:
  *	Paul Vixie, 1996.
  */
-static const char *
-inet_ntop6(const unsigned char *src, char *dst, size_t size)
+static const char *inet_ntop6(const unsigned char *src, char *dst, size_t size)
 {
     /*
      * Note that int32_t and int16_t need only be "at least" large enough
@@ -80,7 +83,9 @@ inet_ntop6(const unsigned char *src, char *dst, size_t size)
      * to use pointer overlays.  All the world's not a VAX.
      */
     char tmp[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"], *tp;
-    struct { int base, len; } best = {-1, 0}, cur = {-1, 0};
+    struct {
+        int base, len;
+    } best = { -1, 0}, cur = { -1, 0};
     unsigned int words[IN6ADDRSZ / INT16SZ];
     int i;
     const unsigned char *next_src, *src_end;
@@ -95,38 +100,43 @@ inet_ntop6(const unsigned char *src, char *dst, size_t size)
     src_end = src + IN6ADDRSZ;
     next_dest = words;
     i = 0;
+
     do {
-        unsigned int next_word = (unsigned int)*next_src++;
+        unsigned int next_word = (unsigned int) *next_src++;
         next_word <<= 8;
-        next_word |= (unsigned int)*next_src++;
+        next_word |= (unsigned int) *next_src++;
         *next_dest++ = next_word;
 
-        if (next_word == 0) {
-            if (cur.base == -1) {
+        if(next_word == 0) {
+            if(cur.base == -1) {
                 cur.base = i;
                 cur.len = 1;
             }
             else {
                 cur.len++;
             }
-        } else {
-            if (cur.base != -1) {
-                if (best.base == -1 || cur.len > best.len) {
+        }
+        else {
+            if(cur.base != -1) {
+                if(best.base == -1 || cur.len > best.len) {
                     best = cur;
                 }
+
                 cur.base = -1;
             }
         }
 
         i++;
-    } while (next_src < src_end);
+    }
+    while(next_src < src_end);
 
-    if (cur.base != -1) {
-        if (best.base == -1 || cur.len > best.len) {
+    if(cur.base != -1) {
+        if(best.base == -1 || cur.len > best.len) {
             best = cur;
         }
     }
-    if (best.base != -1 && best.len < 2) {
+
+    if(best.base != -1 && best.len < 2) {
         best.base = -1;
     }
 
@@ -134,41 +144,49 @@ inet_ntop6(const unsigned char *src, char *dst, size_t size)
      * Format the result.
      */
     tp = tmp;
-    for (i = 0; i < (IN6ADDRSZ / INT16SZ);) {
+
+    for(i = 0; i < (IN6ADDRSZ / INT16SZ);) {
         /* Are we inside the best run of 0x00's? */
-        if (i == best.base) {
+        if(i == best.base) {
             *tp++ = ':';
             i += best.len;
             continue;
         }
+
         /* Are we following an initial run of 0x00s or any real hex? */
-        if (i != 0) {
+        if(i != 0) {
             *tp++ = ':';
         }
+
         /* Is this address an encapsulated IPv4? */
-        if (i == 6 && best.base == 0 &&
-            (best.len == 6 || (best.len == 5 && words[5] == 0xffff))) {
-            if (!inet_ntop4(src+12, tp, sizeof tmp - (tp - tmp))) {
+        if(i == 6 && best.base == 0 &&
+           (best.len == 6 || (best.len == 5 && words[5] == 0xffff))) {
+            if(!inet_ntop4(src + 12, tp, sizeof tmp - (tp - tmp))) {
                 return (NULL);
             }
+
             tp += strlen(tp);
             break;
         }
+
         tp += snprintf(tp, sizeof tmp - (tp - tmp), "%x", words[i]);
         i++;
     }
+
     /* Was it a trailing run of 0x00's? */
-    if (best.base != -1 && (best.base + best.len) == (IN6ADDRSZ / INT16SZ)) {
+    if(best.base != -1 && (best.base + best.len) == (IN6ADDRSZ / INT16SZ)) {
         *tp++ = ':';
     }
+
     *tp++ = '\0';
 
     /*
      * Check for overflow, copy, and we're done.
      */
-    if ((size_t)(tp - tmp) > size) {
+    if((size_t)(tp - tmp) > size) {
         return (NULL);
     }
+
     strcpy(dst, tmp);
     return (dst);
 }
@@ -181,16 +199,18 @@ inet_ntop6(const unsigned char *src, char *dst, size_t size)
  * author:
  *	Paul Vixie, 1996.
  */
-const char *
-inet_ntop(int af, const void *src, char *dst, size_t size)
+const char *inet_ntop(int af, const void *src, char *dst, size_t size)
 {
-	switch (af) {
-	case AF_INET:
-		return (inet_ntop4(src, dst, size));
-	case AF_INET6:
-		return (inet_ntop6(src, dst, size));
-	default:
-		return (NULL);
-	}
-	/* NOTREACHED */
+    switch(af) {
+        case AF_INET:
+            return (inet_ntop4(src, dst, size));
+
+        case AF_INET6:
+            return (inet_ntop6(src, dst, size));
+
+        default:
+            return (NULL);
+    }
+
+    /* NOTREACHED */
 }
