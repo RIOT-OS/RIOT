@@ -30,7 +30,6 @@
 #include "thread.h"
 #include "mutex.h"
 #include "hwtimer.h"
-#include "rtc.h"
 #include "msg.h"
 #include "sixlowmac.h"
 #include "sixlowpan.h"
@@ -51,7 +50,7 @@ uint8_t max_frag_initial = 0;
 uint8_t position;
 uint8_t max_frag;
 
-struct ipv6_hdr_t *ipv6_buf;
+ipv6_hdr_t *ipv6_buf;
 
 /* length of compressed packet */
 uint16_t comp_len;
@@ -257,8 +256,8 @@ void lowpan_transfer(void)
             else if(((current_buf->packet)[0] & 0xe0) == LOWPAN_IPHC_DISPATCH) {
                 lowpan_iphc_decoding(current_buf->packet,
                                      current_buf->packet_size,
-                                     current_buf->s_laddr,
-                                     current_buf->d_laddr);
+                                     &(current_buf->s_laddr),
+                                     &(current_buf->d_laddr));
 
                 ipv6_buf = get_ipv6_buf();
                 m_send.content.ptr = (char *) ipv6_buf;
@@ -1520,9 +1519,6 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border)
     ipv6_addr_t tmp;
     /* init mac-layer and radio transceiver */
     sixlowmac_init(trans);
-
-    rtc_init();
-    rtc_enable();
 
     /* init interface addresses */
     memset(&iface, 0, sizeof(iface_t));
