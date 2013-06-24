@@ -41,20 +41,20 @@ void ringbuffer_init(ringbuffer_t *rb, char *buffer, unsigned int bufsize)
 
 void rb_add_elements(ringbuffer_t *rb, char *buf, int n)
 {
-    for(int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         rb_add_element(rb, buf[i]);
     }
 }
 
 void rb_add_element(ringbuffer_t *rb, char c)
 {
-    if(rb->avail == rb->size) {
+    if (rb->avail == rb->size) {
         rb_get_element(rb);
     }
 
     rb->buf[rb->end++] = c;
 
-    if(rb->end >= rb->size) {
+    if (rb->end >= rb->size) {
         rb->end = 0;
     }
 
@@ -63,7 +63,7 @@ void rb_add_element(ringbuffer_t *rb, char c)
 
 int rb_get_element(ringbuffer_t *rb)
 {
-    if(rb->avail == 0) {
+    if (rb->avail == 0) {
         return -1;
     }
 
@@ -71,7 +71,7 @@ int rb_get_element(ringbuffer_t *rb)
 
     int c = (char)rb->buf[rb->start++];
 
-    if(rb->start >= rb->size) {
+    if (rb->start >= rb->size) {
         rb->start = 0;
     }
 
@@ -82,7 +82,7 @@ int rb_get_elements(ringbuffer_t *rb, char *buf, int n)
 {
     int count = 0;
 
-    while(rb->avail && (count < n)) {
+    while (rb->avail && (count < n)) {
         buf[count++] = rb_get_element(rb);
     }
 

@@ -32,7 +32,7 @@ static int queue_msg(tcb_t *target, msg_t *m)
 {
     int n = cib_put(&(target->msg_queue));
 
-    if(n != -1) {
+    if (n != -1) {
         target->msg_array[n] = *m;
         return 1;
     }
@@ -42,7 +42,7 @@ static int queue_msg(tcb_t *target, msg_t *m)
 
 int msg_send(msg_t *m, unsigned int target_pid, bool block)
 {
-    if(inISR()) {
+    if (inISR()) {
         return msg_send_int(m, target_pid);
     }
 
@@ -50,23 +50,23 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
 
     m->sender_pid = thread_pid;
 
-    if(m->sender_pid == target_pid) {
+    if (m->sender_pid == target_pid) {
         return -1;
     }
 
-    if(target == NULL) {
+    if (target == NULL) {
         return -1;
     }
 
     dINT();
 
-    if(target->status !=  STATUS_RECEIVE_BLOCKED) {
-        if(target->msg_array && queue_msg(target, m)) {
+    if (target->status !=  STATUS_RECEIVE_BLOCKED) {
+        if (target->msg_array && queue_msg(target, m)) {
             eINT();
             return 1;
         }
 
-        if(!block) {
+        if (!block) {
             DEBUG("%s: receiver not waiting. block=%u\n", active_thread->name, block);
             eINT();
             return 0;
@@ -84,7 +84,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
 
         int newstatus;
 
-        if(active_thread->status == STATUS_REPLY_BLOCKED) {
+        if (active_thread->status == STATUS_REPLY_BLOCKED) {
             newstatus = STATUS_REPLY_BLOCKED;
         }
         else {
@@ -113,7 +113,7 @@ int msg_send_int(msg_t *m, unsigned int target_pid)
 {
     tcb_t *target = (tcb_t *) sched_threads[target_pid];
 
-    if(target->status ==  STATUS_RECEIVE_BLOCKED) {
+    if (target->status ==  STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send_int: direct msg copy from %i to %i.\n", thread_getpid(), target_pid);
 
         m->sender_pid = target_pid;
@@ -151,7 +151,7 @@ int msg_reply(msg_t *m, msg_t *reply)
 
     tcb_t *target = (tcb_t*) sched_threads[m->sender_pid];
 
-    if(target->status != STATUS_REPLY_BLOCKED) {
+    if (target->status != STATUS_REPLY_BLOCKED) {
         DEBUG("%s: msg_reply(): target \"%s\" not waiting for reply.", active_thread->name, target->name);
         restoreIRQ(state);
         return -1;
@@ -172,7 +172,7 @@ int msg_reply_int(msg_t *m, msg_t *reply)
 {
     tcb_t *target = (tcb_t*) sched_threads[m->sender_pid];
 
-    if(target->status != STATUS_REPLY_BLOCKED) {
+    if (target->status != STATUS_REPLY_BLOCKED) {
         DEBUG("%s: msg_reply_int(): target \"%s\" not waiting for reply.", active_thread->name, target->name);
         return -1;
     }
@@ -193,11 +193,11 @@ int msg_receive(msg_t *m)
 
     int n = -1;
 
-    if(me->msg_array) {
+    if (me->msg_array) {
         n = cib_get(&(me->msg_queue));
     }
 
-    if(n >= 0) {
+    if (n >= 0) {
         DEBUG("%s: msg_receive(): We've got a queued message.\n", active_thread->name);
         *m = me->msg_array[n];
     }
@@ -207,10 +207,10 @@ int msg_receive(msg_t *m)
 
     queue_node_t *node = queue_remove_head(&(me->msg_waiters));
 
-    if(node == NULL) {
+    if (node == NULL) {
         DEBUG("%s: msg_receive(): No thread in waiting list.\n", active_thread->name);
 
-        if(n < 0) {
+        if (n < 0) {
             DEBUG("%s: msg_receive(): No msg in queue. Going blocked.\n", active_thread->name);
             sched_set_status(me,  STATUS_RECEIVE_BLOCKED);
 
@@ -226,7 +226,7 @@ int msg_receive(msg_t *m)
         DEBUG("%s: msg_receive(): Wakeing up waiting thread.\n", active_thread->name);
         tcb_t *sender = (tcb_t*) node->data;
 
-        if(n >= 0) {
+        if (n >= 0) {
             /* we've already got a messgage from the queue.  as there is a
              * waiter, take it's message into the just freed queue space.
              */
@@ -249,7 +249,7 @@ int msg_receive(msg_t *m)
 int msg_init_queue(msg_t *array, int num)
 {
     /* make sure brainfuck condition is met */
-    if(num && (num & (num - 1)) == 0) {
+    if (num && (num & (num - 1)) == 0) {
         tcb_t *me = (tcb_t*) active_thread;
         me->msg_array = array;
         cib_init(&(me->msg_queue), num);

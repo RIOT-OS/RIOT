@@ -53,8 +53,8 @@ static int set_longterm(vtimer_t *timer)
 
 static int update_shortterm(void)
 {
-    if(hwtimer_id != -1) {
-        if(hwtimer_next_absolute != shortterm_queue_root.next->priority) {
+    if (hwtimer_id != -1) {
+        if (hwtimer_next_absolute != shortterm_queue_root.next->priority) {
             hwtimer_remove(hwtimer_id);
         }
         else {
@@ -67,7 +67,7 @@ static int update_shortterm(void)
     unsigned int next = hwtimer_next_absolute + longterm_tick_start;
     unsigned int now = hwtimer_now();
 
-    if((next - VTIMER_THRESHOLD - now) > MICROSECONDS_PER_TICK) {
+    if ((next - VTIMER_THRESHOLD - now) > MICROSECONDS_PER_TICK) {
         next = now + VTIMER_BACKOFF;
     }
 
@@ -86,10 +86,10 @@ void vtimer_tick(void *ptr)
     longterm_tick_timer.absolute.microseconds = longterm_tick_timer.absolute.microseconds + MICROSECONDS_PER_TICK;
     set_shortterm(&longterm_tick_timer);
 
-    while(longterm_queue_root.next) {
+    while (longterm_queue_root.next) {
         vtimer_t *timer = (vtimer_t *) longterm_queue_root.next;
 
-        if(timer->absolute.seconds == seconds) {
+        if (timer->absolute.seconds == seconds) {
             timer = (vtimer_t *) queue_remove_head(&longterm_queue_root);
             set_shortterm(timer);
         }
@@ -123,7 +123,7 @@ void vtimer_callback(void *ptr)
     DEBUG("vtimer_callback(): Shooting %lu.\n", timer->absolute.microseconds);
 
     /* shoot timer */
-    if(timer->action == (void *) msg_send_int) {
+    if (timer->action == (void *) msg_send_int) {
         msg_t msg;
         msg.type = MSG_TIMER;
         msg.content.value = (unsigned int) timer->arg;
@@ -145,12 +145,12 @@ void normalize_to_tick(timex_t *time)
     uint32_t usecs_tmp = time->microseconds + (seconds_tmp * 1000000);
     DEBUG("Normalizin2: %lu %lu\n", time->seconds, usecs_tmp);
 
-    if(usecs_tmp < time->microseconds) {
+    if (usecs_tmp < time->microseconds) {
         usecs_tmp -= MICROSECONDS_PER_TICK;
         time->seconds += SECONDS_PER_TICK;
     }
 
-    if(usecs_tmp > MICROSECONDS_PER_TICK) {
+    if (usecs_tmp > MICROSECONDS_PER_TICK) {
         usecs_tmp -= MICROSECONDS_PER_TICK;
         time->seconds += SECONDS_PER_TICK;
     }
@@ -172,15 +172,15 @@ static int vtimer_set(vtimer_t *timer)
 
     int result = 0;
 
-    if(timer->absolute.seconds == 0) {
-        if(timer->absolute.microseconds > 10) {
+    if (timer->absolute.seconds == 0) {
+        if (timer->absolute.microseconds > 10) {
             timer->absolute.microseconds -= 10;
         }
     }
 
     int state = disableIRQ();
 
-    if(timer->absolute.seconds != seconds) {
+    if (timer->absolute.seconds != seconds) {
         /* we're long-term */
         DEBUG("vtimer_set(): setting long_term\n");
         result = set_longterm(timer);
@@ -188,12 +188,12 @@ static int vtimer_set(vtimer_t *timer)
     else {
         DEBUG("vtimer_set(): setting short_term\n");
 
-        if(set_shortterm(timer)) {
+        if (set_shortterm(timer)) {
 
             /* delay update of next shortterm timer if we
             * are called from within vtimer_callback. */
 
-            if(!in_callback) {
+            if (!in_callback) {
                 result = update_shortterm();
             }
         }
@@ -265,7 +265,7 @@ int vtimer_remove(vtimer_t *t)
 
     update_shortterm();
 
-    if(! inISR()) {
+    if (!inISR()) {
         eINT();
     }
 

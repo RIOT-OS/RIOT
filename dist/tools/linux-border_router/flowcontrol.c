@@ -19,10 +19,10 @@ void *resend_thread_f(void *args)
     uint8_t seq_num = *((uint8_t *)args);
     struct send_slot *slot = &(slwin_stat.send_win[seq_num % BORDER_SWS]);
 
-    while(1) {
+    while (1) {
         usleep(BORDER_SL_TIMEOUT);
 
-        if(seq_num == ((border_packet_t *)(slot->frame))->seq_num) {
+        if (seq_num == ((border_packet_t *)(slot->frame))->seq_num) {
             writepacket(slot->frame, slot->frame_len);
         }
         else {
@@ -45,7 +45,7 @@ void init_threeway_handshake(const struct in6_addr *addr)
         writepacket((uint8_t *)syn, sizeof(border_syn_packet_t));
         usleep(BORDER_SL_TIMEOUT);
     }
-    while(!connection_established);
+    while (!connection_established);
 }
 
 void signal_connection_established(void)
@@ -62,7 +62,7 @@ void flowcontrol_init(const struct in6_addr *addr)
 
     sem_init(&slwin_stat.send_win_not_full, 0, BORDER_SWS);
 
-    for(i = 0; i < BORDER_SWS; i++) {
+    for (i = 0; i < BORDER_SWS; i++) {
         slwin_stat.send_win[i].frame_len = 0;
     }
 
@@ -70,7 +70,7 @@ void flowcontrol_init(const struct in6_addr *addr)
 
     slwin_stat.next_exp = 0;
 
-    for(i = 0; i < BORDER_RWS; i++) {
+    for (i = 0; i < BORDER_RWS; i++) {
         slwin_stat.recv_win[i].received = 0;
         slwin_stat.recv_win[i].frame_len = 0;
     }
@@ -120,8 +120,8 @@ void flowcontrol_send_over_tty(border_packet_t *packet, int len)
 
 void flowcontrol_deliver_from_tty(const border_packet_t *packet, int len)
 {
-    if(packet->type == BORDER_PACKET_ACK_TYPE) {
-        if(in_window(packet->seq_num, slwin_stat.last_ack + 1, slwin_stat.last_frame)) {
+    if (packet->type == BORDER_PACKET_ACK_TYPE) {
+        if (in_window(packet->seq_num, slwin_stat.last_ack + 1, slwin_stat.last_frame)) {
             do {
                 struct send_slot *slot;
                 slot = &(slwin_stat.send_win[++slwin_stat.last_ack % BORDER_SWS]);
@@ -133,7 +133,7 @@ void flowcontrol_deliver_from_tty(const border_packet_t *packet, int len)
                 slot->frame_len = 0;
                 sem_post(&slwin_stat.send_win_not_full);
             }
-            while(slwin_stat.last_ack != packet->seq_num);
+            while (slwin_stat.last_ack != packet->seq_num);
         }
     }
     else {
@@ -141,7 +141,7 @@ void flowcontrol_deliver_from_tty(const border_packet_t *packet, int len)
 
         slot = &slwin_stat.recv_win[packet->seq_num % BORDER_RWS];
 
-        if(!in_window(packet->seq_num,
+        if (!in_window(packet->seq_num,
                       slwin_stat.next_exp,
                       slwin_stat.next_exp + BORDER_RWS - 1)) {
             return;
@@ -150,8 +150,8 @@ void flowcontrol_deliver_from_tty(const border_packet_t *packet, int len)
         memcpy(slot->frame, (uint8_t *)packet, len);
         slot->received = 1;
 
-        if(packet->seq_num == slwin_stat.next_exp) {
-            while(slot->received) {
+        if (packet->seq_num == slwin_stat.next_exp) {
+            while (slot->received) {
                 demultiplex((border_packet_t *)slot->frame, slot->frame_len);
                 memset(&slot->frame, 0, BUFFER_SIZE);
                 slot->received = 0;

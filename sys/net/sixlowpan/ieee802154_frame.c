@@ -44,7 +44,7 @@ uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf)
     index++;
 
     /* Destination PAN Identifier - 802.15.4 - 2006 - 7.2.1.3 */
-    if(frame->fcf.dest_addr_m == 0x02 || frame->fcf.dest_addr_m == 0x03) {
+    if (frame->fcf.dest_addr_m == 0x02 || frame->fcf.dest_addr_m == 0x03) {
         buf[index] = ((frame->dest_pan_id >> 8) & 0xff);
         buf[index + 1] = (frame->dest_pan_id & 0xff);
     }
@@ -52,12 +52,12 @@ uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf)
     index += 2;
 
     /* Destination Address - 802.15.4 - 2006 - 7.2.1.4 */
-    if(frame->fcf.dest_addr_m == 0x02) {
+    if (frame->fcf.dest_addr_m == 0x02) {
         buf[index]     = frame->dest_addr[0];
         buf[index + 1] = frame->dest_addr[1];
         index += 2;
     }
-    else if(frame->fcf.dest_addr_m == 0x03) {
+    else if (frame->fcf.dest_addr_m == 0x03) {
         buf[index]     = frame->dest_addr[0];
         buf[index + 1] = frame->dest_addr[1];
         buf[index + 2] = frame->dest_addr[2];
@@ -70,8 +70,8 @@ uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf)
     }
 
     /* Source PAN Identifier - 802.15.4 - 2006 - 7.2.1.5 */
-    if(!(frame->fcf.panid_comp & 0x01)) {
-        if(frame->fcf.src_addr_m == 0x02 || frame->fcf.src_addr_m == 0x03) {
+    if (!(frame->fcf.panid_comp & 0x01)) {
+        if (frame->fcf.src_addr_m == 0x02 || frame->fcf.src_addr_m == 0x03) {
             buf[index]     = ((frame->src_pan_id >> 8) & 0xff);
             buf[index + 1] = (frame->src_pan_id & 0xff);
             index += 2;
@@ -79,12 +79,12 @@ uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf)
     }
 
     /* Source Address field - 802.15.4 - 2006 - 7.2.1.6 */
-    if(frame->fcf.src_addr_m == 0x02) {
+    if (frame->fcf.src_addr_m == 0x02) {
         buf[index]     = frame->src_addr[0];
         buf[index + 1] = frame->src_addr[1];
         index += 2;
     }
-    else if(frame->fcf.src_addr_m == 0x03) {
+    else if (frame->fcf.src_addr_m == 0x03) {
         buf[index]     = frame->src_addr[0];
         buf[index + 1] = frame->src_addr[1];
         buf[index + 2] = frame->src_addr[2];
@@ -108,30 +108,30 @@ uint8_t get_802154_hdr_len(ieee802154_frame_t *frame)
 {
     uint8_t len = 0;
 
-    if(frame->fcf.dest_addr_m == 0x02) {
+    if (frame->fcf.dest_addr_m == 0x02) {
         len += 2;
     }
-    else if(frame->fcf.dest_addr_m == 0x03) {
+    else if (frame->fcf.dest_addr_m == 0x03) {
         len += 8;
     }
 
-    if(frame->fcf.src_addr_m == 0x02) {
+    if (frame->fcf.src_addr_m == 0x02) {
         len += 2;
     }
-    else if(frame->fcf.src_addr_m == 0x03) {
+    else if (frame->fcf.src_addr_m == 0x03) {
         len += 8;
     }
 
-    if((frame->fcf.dest_addr_m == 0x02) || (frame->fcf.dest_addr_m == 0x03)) {
+    if ((frame->fcf.dest_addr_m == 0x02) || (frame->fcf.dest_addr_m == 0x03)) {
         len += 2;
     }
 
-    if((frame->fcf.src_addr_m == 0x02) || (frame->fcf.src_addr_m == 0x03)) {
+    if ((frame->fcf.src_addr_m == 0x02) || (frame->fcf.src_addr_m == 0x03)) {
         len += 2;
     }
 
     /* if src pan id == dest pan id set compression bit */
-    if(frame->src_pan_id == frame->dest_pan_id) {
+    if (frame->src_pan_id == frame->dest_pan_id) {
         frame->fcf.panid_comp = 1;
         len -= 2;
     }
@@ -170,19 +170,19 @@ uint8_t read_802154_frame(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len)
     index += 2;
 
     switch(frame->fcf.dest_addr_m) {
-        case(0): {
+        case (0): {
             printf("fcf.dest_addr_m: pan identifier/address fields empty\n");
             break;
         }
 
-        case(2): {
+        case (2): {
             frame->dest_addr[0] = buf[index];
             frame->dest_addr[1] = buf[index + 1];
             index += 2;
             break;
         }
 
-        case(3): {
+        case (3): {
             frame->dest_addr[0] = buf[index];
             frame->dest_addr[1] = buf[index + 1];
             frame->dest_addr[2] = buf[index + 2];
@@ -196,25 +196,25 @@ uint8_t read_802154_frame(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len)
         }
     }
 
-    if(!(frame->fcf.panid_comp == 1)) {
+    if (!(frame->fcf.panid_comp == 1)) {
         frame->src_pan_id = (((uint16_t)buf[index]) << 8) | buf[index + 1];
         index += 2;
     }
 
     switch(frame->fcf.src_addr_m) {
-        case(0): {
+        case (0): {
             printf("fcf.src_addr_m: pan identifier/address fields empty\n");
             break;
         }
 
-        case(2): {
+        case (2): {
             frame->src_addr[0] = buf[index];
             frame->src_addr[1] = buf[index + 1];
             index += 2;
             break;
         }
 
-        case(3): {
+        case (3): {
             frame->src_addr[0] = buf[index];
             frame->src_addr[1] = buf[index + 1];
             frame->src_addr[2] = buf[index + 2];

@@ -73,13 +73,13 @@ ipv6_addr_t flowcontrol_init(void)
 
     sem_init(&slwin_stat.send_win_not_full, BORDER_SWS);
 
-    for(i = 0; i < BORDER_SWS; i++) {
+    for (i = 0; i < BORDER_SWS; i++) {
         slwin_stat.send_win[i].frame_len = 0;
     }
 
     memset(&slwin_stat.send_win, 0, sizeof(struct send_slot) * BORDER_SWS);
 
-    for(i = 0; i < BORDER_RWS; i++) {
+    for (i = 0; i < BORDER_RWS; i++) {
         slwin_stat.recv_win[i].received = 0;
         slwin_stat.recv_win[i].frame_len = 0;
     }
@@ -96,16 +96,16 @@ static void sending_slot(void)
     struct send_slot *slot;
     border_packet_t *tmp;
 
-    while(1) {
+    while (1) {
         msg_receive(&m);
         seq_num = *((uint8_t *)m.content.ptr);
         slot = &(slwin_stat.send_win[seq_num % BORDER_SWS]);
         tmp = (border_packet_t *)slot->frame;
 
-        if(seq_num == tmp->seq_num) {
+        if (seq_num == tmp->seq_num) {
             writepacket(slot->frame, slot->frame_len);
 
-            if(set_timeout(&slot->timeout, BORDER_SL_TIMEOUT, (void *)m.content.ptr) != 0) {
+            if (set_timeout(&slot->timeout, BORDER_SL_TIMEOUT, (void *)m.content.ptr) != 0) {
                 printf("ERROR: Error invoking timeout timer\n");
             }
         }
@@ -139,7 +139,7 @@ void flowcontrol_send_over_uart(border_packet_t *packet, int len)
     memcpy(slot->frame, (uint8_t *)packet, len);
     slot->frame_len = len;
 
-    if(set_timeout(&slot->timeout, BORDER_SL_TIMEOUT, (void *)args) != 0) {
+    if (set_timeout(&slot->timeout, BORDER_SL_TIMEOUT, (void *)args) != 0) {
         printf("ERROR: Error invoking timeout timer\n");
         return;
     }
@@ -158,9 +158,9 @@ void send_ack(uint8_t seq_num)
 
 void flowcontrol_deliver_from_uart(border_packet_t *packet, int len)
 {
-    if(packet->type == BORDER_PACKET_ACK_TYPE) {
-        if(in_window(packet->seq_num, slwin_stat.last_ack + 1, slwin_stat.last_frame)) {
-            if(synack_seqnum == packet->seq_num) {
+    if (packet->type == BORDER_PACKET_ACK_TYPE) {
+        if (in_window(packet->seq_num, slwin_stat.last_ack + 1, slwin_stat.last_frame)) {
+            if (synack_seqnum == packet->seq_num) {
                 synack_seqnum = -1;
                 sem_signal(&connection_established);
             }
@@ -172,7 +172,7 @@ void flowcontrol_deliver_from_uart(border_packet_t *packet, int len)
                 memset(&slot->frame, 0, BORDER_BUFFER_SIZE);
                 sem_signal(&slwin_stat.send_win_not_full);
             }
-            while(slwin_stat.last_ack != packet->seq_num);
+            while (slwin_stat.last_ack != packet->seq_num);
         }
     }
     else {
@@ -180,7 +180,7 @@ void flowcontrol_deliver_from_uart(border_packet_t *packet, int len)
 
         slot = &(slwin_stat.recv_win[packet->seq_num % BORDER_RWS]);
 
-        if(!in_window(packet->seq_num,
+        if (!in_window(packet->seq_num,
                       slwin_stat.next_exp,
                       slwin_stat.next_exp + BORDER_RWS - 1)) {
             return;
@@ -189,8 +189,8 @@ void flowcontrol_deliver_from_uart(border_packet_t *packet, int len)
         memcpy(slot->frame, (uint8_t *)packet, len);
         slot->received = 1;
 
-        if(packet->seq_num == slwin_stat.next_exp) {
-            while(slot->received) {
+        if (packet->seq_num == slwin_stat.next_exp) {
+            while (slot->received) {
                 demultiplex((border_packet_t *)slot->frame, slot->frame_len);
                 memset(&slot->frame, 0, BORDER_BUFFER_SIZE);
                 slot->received = 0;

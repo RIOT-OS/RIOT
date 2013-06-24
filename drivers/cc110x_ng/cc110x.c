@@ -132,13 +132,13 @@ radio_address_t cc110x_get_address()
 
 radio_address_t cc110x_set_address(radio_address_t address)
 {
-    if((address < MIN_UID) || (address > MAX_UID)) {
+    if ((address < MIN_UID) || (address > MAX_UID)) {
         return 0;
     }
 
     uint8_t id = (uint8_t) address;
 
-    if(radio_state != RADIO_UNKNOWN) {
+    if (radio_state != RADIO_UNKNOWN) {
         write_register(CC1100_ADDR, id);
     }
 
@@ -151,7 +151,7 @@ radio_address_t cc110x_set_config_address(radio_address_t address)
 {
     radio_address_t a = cc110x_set_address(address);
 
-    if(a) {
+    if (a) {
         sysconfig.radio_address = a;
     }
 
@@ -162,7 +162,7 @@ radio_address_t cc110x_set_config_address(radio_address_t address)
 
 void cc110x_set_monitor(uint8_t mode)
 {
-    if(mode) {
+    if (mode) {
         write_register(CC1100_PKTCTRL1, (0x04));
     }
     else {
@@ -185,7 +185,7 @@ void cc110x_switch_to_rx(void)
 
 void cc110x_wakeup_from_rx(void)
 {
-    if(radio_state != RADIO_RX) {
+    if (radio_state != RADIO_RX) {
         return;
     }
 
@@ -210,7 +210,7 @@ char *cc110x_get_marc_state(void)
 
     /* Have to put radio back to WOR/RX if old radio state 
      * was WOR/RX, otherwise no action is necessary */
-    if(old_state == RADIO_WOR || old_state == RADIO_RX) {
+    if (old_state == RADIO_WOR || old_state == RADIO_RX) {
         cc110x_switch_to_rx();
     }
 
@@ -320,7 +320,7 @@ int16_t cc110x_set_channel(uint8_t channr)
 {
     uint8_t state = cc110x_read_status(CC1100_MARCSTATE) & MARC_STATE;
 
-    if((state != 1) && (channr > MAX_CHANNR)) {
+    if ((state != 1) && (channr > MAX_CHANNR)) {
         return -1;
     }
 
@@ -334,7 +334,7 @@ int16_t cc110x_set_config_channel(uint8_t channr)
 {
     int16_t c = cc110x_set_channel(channr);
 
-    if(c) {
+    if (c) {
         sysconfig.radio_channel = c;
     }
 
@@ -386,7 +386,7 @@ static void write_register(uint8_t r, uint8_t value)
 
     /* Have to put radio back to WOR/RX if old radio state
      * was WOR/RX, otherwise no action is necessary */
-    if((old_state == RADIO_WOR) || (old_state == RADIO_RX)) {
+    if ((old_state == RADIO_WOR) || (old_state == RADIO_RX)) {
         cc110x_switch_to_rx();
     }
 }
@@ -396,7 +396,7 @@ static int rd_set_mode(int mode)
     int result;
 
     /* Get current radio mode */
-    if((radio_state == RADIO_UNKNOWN) || (radio_state == RADIO_PWD)) {
+    if ((radio_state == RADIO_UNKNOWN) || (radio_state == RADIO_PWD)) {
         result = RADIO_MODE_OFF;
     }
     else {

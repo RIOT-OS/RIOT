@@ -16,7 +16,7 @@ int cib_get(cib_t *cib)
 {
     int avail = cib_avail(cib);
 
-    if(avail > 0) {
+    if (avail > 0) {
         return (int)(cib->read_count++ & ~cib->complement);
     }
 
@@ -27,7 +27,7 @@ int cib_put(cib_t *cib)
 {
     int avail = cib_avail(cib);
 
-    if((int)(avail + cib->complement) < 0) {
+    if ((int)(avail + cib->complement) < 0) {
         return (int)(cib->write_count++ & ~(cib->complement));
     }
 

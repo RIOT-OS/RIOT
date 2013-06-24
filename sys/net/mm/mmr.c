@@ -144,18 +144,18 @@ static void rt_extract_routes(uint16_t local_addr, uint8_t length, uint16_t *lis
     uint16_t net_id = NETWORK_ADDR_BC(list[0]); 		/* BC address of source of RREQ */
     route_table_entry_t *rte = rt_lookup_route(net_id);	/* Should exist (preconfigured) */
 
-    if(rte == NULL) {
+    if (rte == NULL) {
         DEBUG("exit [%u]: rt_extract_routes\n", fk_thread->pid);
         return;											/* else exit here */
     }
 
     int i = 0;
 
-    while(i < length && list[i] != local_addr) {
+    while (i < length && list[i] != local_addr) {
         i++;
     }
 
-    if(i == length) {
+    if (i == length) {
         DEBUG("exit [%u]: rt_extract_routes\n", fk_thread->pid);
         return;
     }
@@ -164,24 +164,24 @@ static void rt_extract_routes(uint16_t local_addr, uint8_t length, uint16_t *lis
     int leftNeighbour = -1;
     int rightNeighbour = -1;
 
-    if(pos > 0) {
+    if (pos > 0) {
         leftNeighbour = list[pos - 1];
     }
 
-    if(pos + 1 != length) {
+    if (pos + 1 != length) {
         rightNeighbour = list[pos + 1];
     }
 
     i = 0;
 
-    while(i < length) {
+    while (i < length) {
         uint16_t next = list[i];
 
-        if(local_addr != next) {
+        if (local_addr != next) {
             int distance = pos - i;
             int router = leftNeighbour;
 
-            if(distance < 0) {
+            if (distance < 0) {
                 router = rightNeighbour;
                 distance *= -1;
             }
@@ -217,8 +217,8 @@ static message_queue_entry_t *mq_add(net_message_t *msg)
     /* Find the first active RREQ to this destination */
     int i;
 
-    for(i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
-        if(message_queue[i].timestamp != 0 &&
+    for (i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
+        if (message_queue[i].timestamp != 0 &&
            message_queue[i].message.destination == msg->destination &&
            message_queue[i].retry_count != RREQ_NONE) {
             DEBUG("%s FOUND Duplicated Request to %u.%u in route req queue\n",
@@ -234,19 +234,19 @@ static message_queue_entry_t *mq_add(net_message_t *msg)
      * even if the new message will get dropped later on because of
      * limited queue space. Route to this destination gets queried
      * again for sure so make new RREQ as soon as possible... */
-    if(pFirstFoundDup != NULL) {
+    if (pFirstFoundDup != NULL) {
         pFirstFoundDup->retry_count = 0;
         pFirstFoundDup->timestamp = 1;
         mmr_stats.rreq_duplicated++;
     }
 
     /* Find free position to insert new message */
-    for(i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
-        if(message_queue[i].timestamp == 0) {
+    for (i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
+        if (message_queue[i].timestamp == 0) {
             /* Free position found, add entry */
             message_queue[i].message = *msg;
 
-            if(pFirstFoundDup != NULL) {
+            if (pFirstFoundDup != NULL) {
                 /* There is already a RREQ for this destination, so don't
                  * generate a new one */
                 message_queue[i].retry_count = RREQ_NONE;
@@ -278,8 +278,8 @@ static int mq_msgs_for_destination(uint16_t dst)
     DEBUG("call [%u]: mq_msgs_for_destination\n", fk_thread->pid);
     int i, dst_count = 0;
 
-    for(i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
-        if(message_queue[i].timestamp != 0 &&
+    for (i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
+        if (message_queue[i].timestamp != 0 &&
            message_queue[i].message.destination == dst) {
             dst_count++;
         }
@@ -299,8 +299,8 @@ static void mq_remove_msgs_for_destination(uint16_t dst)
     DEBUG("call [%u]: mq_remove_msgs_for_destination\n", fk_thread->pid);
     int i;
 
-    for(i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
-        if(message_queue[i].timestamp != 0 &&
+    for (i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
+        if (message_queue[i].timestamp != 0 &&
            message_queue[i].message.destination == dst) {
             message_queue[i].timestamp = 0;
         }
@@ -326,15 +326,15 @@ static void mq_dequeue_and_send(uint16_t dst)
     /* Prioritize packets for given destination, route entry should exist */
     route_table_entry_t *rte = rt_lookup_route(dst);
 
-    if(rte != NULL) {
-        for(i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
-            if(message_queue[i].timestamp != 0 &&
+    if (rte != NULL) {
+        for (i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
+            if (message_queue[i].timestamp != 0 &&
                     message_queue[i].message.destination == dst) {
                 bool res = net_enqueue_for_transmission(&message_queue[i].message,
                                                         rte->interface_id,
                                                         rte->gateway, true);
 
-                if(res) {
+                if (res) {
                     message_queue[i].timestamp = 0;
                 }
             }
@@ -342,17 +342,17 @@ static void mq_dequeue_and_send(uint16_t dst)
     }
 
     /* Now all other packets */
-    for(i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
-        if(message_queue[i].timestamp != 0 &&
+    for (i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
+        if (message_queue[i].timestamp != 0 &&
            message_queue[i].message.destination != dst) {
             route_table_entry_t *rte = rt_lookup_route(message_queue[i].message.destination);
 
-            if(rte != NULL) {
+            if (rte != NULL) {
                 bool res = net_enqueue_for_transmission(&message_queue[i].message,
                                                         rte->interface_id,
                                                         rte->gateway, true);
 
-                if(res) {
+                if (res) {
                     message_queue[i].timestamp = 0;
                 }
             }
@@ -390,9 +390,9 @@ void mmr_init(void)
  */
 static bool is_route_error(net_message_t *msg)
 {
-    if(msg->protocol == LAYER_2_PROTOCOL_MMR) {
+    if (msg->protocol == LAYER_2_PROTOCOL_MMR) {
         /* First byte in {RREQ, RREP, RERR} is always type */
-        if(msg->payload[0] == MMR_TYPE_RERR) {
+        if (msg->payload[0] == MMR_TYPE_RERR) {
             return true;
         }
     }
@@ -430,7 +430,7 @@ static void generate_route_reply_message(mmr_rreq_message_t *rreq_msg)
     /* interface id and next hop (should be created by RREQ) */
     route_table_entry_t *rte = rt_lookup_route(net_msg.destination);
 
-    if(rte != NULL) {
+    if (rte != NULL) {
         /* Send message to next hop */
         mmr_stats.rrep_originated++;
         net_enqueue_for_transmission(&net_msg, rte->interface_id, rte->gateway, true);
@@ -486,7 +486,7 @@ static void receive_route_request_message(mmr_rreq_message_t *msg,
     uint16_t my_addr = net_get_address_in_subnet(msg->source);
 #if (MMR_INFO_LEVEL >= LEVEL_WARN)
 
-    if(my_addr == 0) {
+    if (my_addr == 0) {
         puts("MMR [WARN]: received RREQ with unknown network part of source address");
         puts("MMR [WARN]: => can't find own net address in sub net!");
     }
@@ -494,7 +494,7 @@ static void receive_route_request_message(mmr_rreq_message_t *msg,
 #endif
 
     /* If address list of RREQ message has enough space */
-    if(msg->length < ADDRESS_LIST_SIZE) {
+    if (msg->length < ADDRESS_LIST_SIZE) {
         /* append our node id to list */
         msg->address[msg->length++] = my_addr;
         /* add routes with overhearing */
@@ -509,7 +509,7 @@ static void receive_route_request_message(mmr_rreq_message_t *msg,
     }
 
     /* If RREQ message was send to us, then send RREP message */
-    if(msg->destination == my_addr) {
+    if (msg->destination == my_addr) {
         /* Don't forward RREQ packet any further => set TTL to zero */
         *packet_info->ttl_ptr = 0;
         generate_route_reply_message(msg);
@@ -572,7 +572,7 @@ static int compute_rreq_timeout(int ttl, uint16_t dst)
 {
     int t_hop = net_get_interface_transmission_duration(dst);
 
-    if(t_hop == -1) {
+    if (t_hop == -1) {
         t_hop = RREQ_TIMEOUT_PER_TTL * ttl;
     }
     else {
@@ -595,7 +595,7 @@ static void rreq_broadcast(message_queue_entry_t *mq_entry)
 {
     DEBUG("call [%u]: rreq_broadcast\n", fk_thread->pid);
 
-    if(mq_entry->retry_count == RREQ_NONE) {
+    if (mq_entry->retry_count == RREQ_NONE) {
         DEBUG("call [%u]: rreq duplicated do not send\n", fk_thread->pid);
         return;
     }
@@ -624,7 +624,7 @@ static void rreq_broadcast(message_queue_entry_t *mq_entry)
     /* Find the broadcast route table entry */
     route_table_entry_t *rte = rt_lookup_route(net_msg.destination);
 
-    if(rte != NULL) {
+    if (rte != NULL) {
         /* Next hop address is broadcast address of lower layer */
         net_enqueue_for_transmission(&net_msg, rte->interface_id,
                                      rte->gateway, true);
@@ -643,21 +643,21 @@ static void post_next_rreq_timeout(void)
     int i, j = -1;
     uint32_t now, next = 0xffffffff;
 
-    for(i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
-        if((message_queue[i].timestamp != 0) && (message_queue[i].retry_count !=
+    for (i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
+        if ((message_queue[i].timestamp != 0) && (message_queue[i].retry_count !=
                                               RREQ_NONE)) {
             int ttl = message_queue[i].retry_count == 1 ? TTL_START : TTL_THRESHOLD;
             int to = compute_rreq_timeout(ttl,
                                           message_queue[i].message.destination);
 
-            if(message_queue[i].timestamp + to < next) {
+            if (message_queue[i].timestamp + to < next) {
                 next = message_queue[i].timestamp + to;
                 j = i;
             }
         }
     }
 
-    if(j == -1) {
+    if (j == -1) {
         DEBUG("exit [%u]: post_next_rreq_timeout\n", fk_thread->pid);
         return;
     }
@@ -668,14 +668,14 @@ static void post_next_rreq_timeout(void)
     /* If current time greater than RREQ timeout value */
     now = rtc_now();
 
-    if(now >= next) {
+    if (now >= next) {
         /* Schedule RREQ-Timeout immediately */
         msg m;
         m.type = MSG_TIMER;
         m.content.ptr = (char *)&message_queue[j];
         rreq_to_active = true;
 
-        if(msg_send(&m, rreq_timeout_process_pid, false) != 1) {
+        if (msg_send(&m, rreq_timeout_process_pid, false) != 1) {
             /* Message could not be send (receiver not waiting), schedule
              * timer with minimum delay */
 #if (MMR_INFO_LEVEL >= LEVEL_WARN)
@@ -706,7 +706,7 @@ static void rreq_timeout(message_queue_entry_t *mqe)
     DEBUG("call [%u]: rreq_timeout\n", fk_thread->pid);
 
     /* Test if valid entry passed */
-    if(mqe->timestamp == 0) {
+    if (mqe->timestamp == 0) {
 #if (MMR_INFO_LEVEL >= LEVEL_WARN)
         puts("MMR [WARN]: invalid message queue entry for RREQ-Timeout");
 #endif
@@ -718,11 +718,11 @@ static void rreq_timeout(message_queue_entry_t *mqe)
 
     /* If found and no messages in queue for destination: return (queued
      * packets are send on reception of RREP); If found but messages in queue:
-     * trigger send immediately here! */
-    if(rte != NULL) {
+     * trigger send immediately here!*/
+    if (rte != NULL) {
         int msg_count = mq_msgs_for_destination(mqe->message.destination);
 
-        if(msg_count > 0) {
+        if (msg_count > 0) {
             mq_dequeue_and_send(mqe->message.destination);
             DEBUG("exit [%u]: rreq_timeout\n", fk_thread->pid);
             return;
@@ -739,7 +739,7 @@ static void rreq_timeout(message_queue_entry_t *mqe)
 
     /* Otherwise send new RREQ if below threshold (means also retry count !=
      * RREQ_NONE) */
-    if(mqe->retry_count < RREQ_THRESHOLD) {
+    if (mqe->retry_count < RREQ_THRESHOLD) {
         /* Broadcast new RREQ message (with incremented TTL) */
         rreq_broadcast(mqe);
     }
@@ -762,12 +762,12 @@ static void rreq_timeout_process(void)
     do {
         msg_receive(&m);
 
-        if(m.type == MSG_TIMER && rreq_to_active) {
+        if (m.type == MSG_TIMER && rreq_to_active) {
             rreq_to_active = false;
             rreq_timeout((message_queue_entry_t *)m.content.ptr);
         }
     }
-    while(m.type != MSG_EXIT);
+    while (m.type != MSG_EXIT);
 }
 
 void mmr_peek(net_message_t *message, packet_info_t *packet_info)
@@ -775,16 +775,16 @@ void mmr_peek(net_message_t *message, packet_info_t *packet_info)
     DEBUG("call [%u]: mmr_peek\n", fk_thread->pid);
 
     /* Only look at micro mesh routing messages */
-    if(message->protocol == LAYER_2_PROTOCOL_MMR) {
+    if (message->protocol == LAYER_2_PROTOCOL_MMR) {
         uint8_t type = message->payload[0];
         uint16_t my_addr = net_get_address_in_subnet(message->source);
 
-        if(type == MMR_TYPE_RREP) {
+        if (type == MMR_TYPE_RREP) {
             /* Add routes to route table */
             mmr_rrep_message_t *rrep_msg = (mmr_rrep_message_t *)message->payload;
 #if (MMR_INFO_LEVEL >= LEVEL_WARN)
 
-            if(my_addr == 0) {
+            if (my_addr == 0) {
                 puts("MMR [WARN]: received RREP with unknown network part of source address");
                 puts("MMR [WARN]: => can't find own net address in sub net!");
             }
@@ -792,10 +792,10 @@ void mmr_peek(net_message_t *message, packet_info_t *packet_info)
 #endif
             rt_extract_routes(my_addr, rrep_msg->length, rrep_msg->address);
         }
-        else if(type == MMR_TYPE_RERR) {
+        else if (type == MMR_TYPE_RERR) {
 #if (MMR_INFO_LEVEL >= LEVEL_WARN)
 
-            if(my_addr == 0) {
+            if (my_addr == 0) {
                 puts("MMR [WARN]: received RERR with unknown network part of source address");
                 puts("MMR [WARN]: => can't find own net address in sub net!");
             }
@@ -804,11 +804,11 @@ void mmr_peek(net_message_t *message, packet_info_t *packet_info)
 
             /* If not destination of RERR, then remove route to unavailable
              * node in RERR packet */
-            if(message->destination != my_addr) {
+            if (message->destination != my_addr) {
                 mmr_rerr_message_t *rerr_msg =
                     (mmr_rerr_message_t *)message->payload;
 
-                if(rerr_msg->error_type == RERR_NODE_UNREACHABLE) {
+                if (rerr_msg->error_type == RERR_NODE_UNREACHABLE) {
                     rt_remove_route(rerr_msg->type_specific_info);
                 }
             }
@@ -823,7 +823,7 @@ bool mmr_send(net_message_t *message)
     DEBUG("call [%u]: mmr_send\n", fk_thread->pid);
     bool enqueue = true;
 
-    if(message->destination == net_get_address_in_subnet(message->destination)) {
+    if (message->destination == net_get_address_in_subnet(message->destination)) {
 #if (MMR_INFO_LEVEL >= LEVEL_WARN)
         puts("MMR [WARN]: message is already at destination, why is routing called?");
 #endif
@@ -831,7 +831,7 @@ bool mmr_send(net_message_t *message)
         return false;
     }
 
-    if(NETWORK_ADDR_NET(message->destination) == 0) {
+    if (NETWORK_ADDR_NET(message->destination) == 0) {
 #if (MMR_INFO_LEVEL >= LEVEL_WARN)
         puts("MMR [WARN]: NET part of address cannot be 0!");
 #endif
@@ -839,7 +839,7 @@ bool mmr_send(net_message_t *message)
         return false;
     }
 
-    if(NETWORK_ADDR_HOST(message->destination) == 0) {
+    if (NETWORK_ADDR_HOST(message->destination) == 0) {
 #if (MMR_INFO_LEVEL >= LEVEL_INFO)
         puts("MMR [INFO]: broadcast destination, why is routing called? A route entry should exist!");
 #endif
@@ -850,13 +850,13 @@ bool mmr_send(net_message_t *message)
     route_table_entry_t *rte = rt_lookup_route(message->destination);
 
     /* If next hop address found in routing table, forward message */
-    if(rte != NULL) {
+    if (rte != NULL) {
         DEBUG("exit [%u]: mmr_send\n", fk_thread->pid);
         return net_enqueue_for_transmission(message, rte->interface_id, rte->gateway, true);
     }
     /* Otherwise, save message in queue; broadcast RREQ message */
     else {
-        if(!enqueue) {
+        if (!enqueue) {
             /* Don't enqueue broadcast destinations */
             DEBUG("exit [%u]: mmr_send\n", fk_thread->pid);
             return false;
@@ -864,7 +864,7 @@ bool mmr_send(net_message_t *message)
 
         message_queue_entry_t *mqe = mq_add(message);
 
-        if(mqe != NULL) {
+        if (mqe != NULL) {
             rreq_broadcast(mqe);
             post_next_rreq_timeout();
             mmr_stats.rreq_originated++;
@@ -881,19 +881,19 @@ void mmr_packet_dropped(net_message_t *message, uint16_t next_hop, int error)
 {
     DEBUG("call [%u]: mmr_packet_dropped\n", fk_thread->pid);
 
-    if(error == ROUTE_ERROR_BROKEN_ROUTE) {
+    if (error == ROUTE_ERROR_BROKEN_ROUTE) {
         /* Local failure detected - remove all routes through broken link */
         rt_remove_gateway_routes(next_hop);
         mmr_stats.messages_broken_link_on_forward++;
     }
-    else if(error == ROUTE_ERROR_MISSING_ROUTE) {
+    else if (error == ROUTE_ERROR_MISSING_ROUTE) {
         mmr_stats.messages_no_route_avail_on_forward++;
     }
 
     /* If source != net_addr, send RERR to source of message */
-    if(message->source != net_get_address_in_subnet(message->source)) {
+    if (message->source != net_get_address_in_subnet(message->source)) {
         /* Do not generate RERR if it is already a RERR message */
-        if(is_route_error(message)) {
+        if (is_route_error(message)) {
             DEBUG("exit [%u]: mmr_packet_dropped\n", fk_thread->pid);
             return;
         }
@@ -901,7 +901,7 @@ void mmr_packet_dropped(net_message_t *message, uint16_t next_hop, int error)
         /* Find next hop to source */
         route_table_entry_t *rte = rt_lookup_route(message->source);
 
-        if(rte != NULL) {
+        if (rte != NULL) {
             generate_route_error_message(message->source, rte->gateway,
                                          rte->interface_id,
                                          RERR_NODE_UNREACHABLE,
@@ -926,15 +926,15 @@ void mmr_receive(void *msg, int msg_size, packet_info_t *packet_info)
     uint8_t *p = (uint8_t *) msg;
     uint8_t type = p[0];
 
-    if(type == MMR_TYPE_RREQ) {
+    if (type == MMR_TYPE_RREQ) {
         receive_route_request_message((mmr_rreq_message_t *)msg, packet_info);
         mmr_stats.rreq_received++;
     }
-    else if(type == MMR_TYPE_RREP) {
+    else if (type == MMR_TYPE_RREP) {
         receive_route_reply_message((mmr_rrep_message_t *)msg, packet_info);
         mmr_stats.rrep_received++;
     }
-    else if(type == MMR_TYPE_RERR) {
+    else if (type == MMR_TYPE_RERR) {
         receive_route_error_message((mmr_rerr_message_t *)msg, packet_info);
         mmr_stats.rerr_received++;
     }

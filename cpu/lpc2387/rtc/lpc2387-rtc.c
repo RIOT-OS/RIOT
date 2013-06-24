@@ -51,7 +51,7 @@ static volatile time_t epoch;
 void
 rtc_set_localtime(struct tm *localt)
 {
-    if(localt == NULL) {
+    if (localt == NULL) {
         return;
     }
 
@@ -84,7 +84,7 @@ void rtc_reset(void)
 void
 rtc_set_alarm(struct tm *localt, enum rtc_alarm_mask mask)
 {
-    if(localt != NULL) {
+    if (localt != NULL) {
         RTC_ALSEC = localt->tm_sec;
         RTC_ALMIN = localt->tm_min;
         RTC_ALHOUR = localt->tm_hour;
@@ -105,7 +105,7 @@ rtc_set_alarm(struct tm *localt, enum rtc_alarm_mask mask)
 enum rtc_alarm_mask
 rtc_get_alarm(struct tm *localt)
 {
-    if(localt != NULL) {
+    if (localt != NULL) {
         localt->tm_sec = RTC_ALSEC;
         localt->tm_min = RTC_ALMIN;
         localt->tm_hour = RTC_ALHOUR;
@@ -125,17 +125,17 @@ void RTC_IRQHandler(void)
 {
     lpm_begin_awake();
 
-    if(RTC_ILR & ILR_RTSSF) {
+    if (RTC_ILR & ILR_RTSSF) {
         /* sub second interrupt (does not need flag-clearing) */
 
     }
-    else if(RTC_ILR & ILR_RTCCIF) {
+    else if (RTC_ILR & ILR_RTCCIF) {
         /* counter increase interrupt */
         RTC_ILR |= ILR_RTCCIF;
         epoch += 60 * 60;					/* add 1 hour */
 
     }
-    else if(RTC_ILR & ILR_RTCALF) {
+    else if (RTC_ILR & ILR_RTCALF) {
         RTC_ILR |= ILR_RTCALF;
         RTC_AMR = 0xff;						/* disable alarm irq */
         DEBUG("Ring\n");
@@ -169,7 +169,7 @@ void rtc_init(void)
 
     /* initialize clock with valid unix compatible values
      * If RTC_YEAR contains an value larger unix time_t we must reset. */
-    if(RTC_YEAR > 2037) {
+    if (RTC_YEAR > 2037) {
         rtc_reset();
     }
 
@@ -188,7 +188,7 @@ time_t rtc_time(struct timeval *time)
     sec  = RTC_SEC;
     min = RTC_MIN;
 
-    while(usec != (RTC_CTC >> 1)) {
+    while (usec != (RTC_CTC >> 1)) {
         usec = (RTC_CTC >> 1);
         sec  = RTC_SEC;
         min = RTC_MIN;
@@ -197,7 +197,7 @@ time_t rtc_time(struct timeval *time)
     sec += min * 60;							/* add number of minutes */
     sec += epoch;								/* add precalculated epoch in hour granularity */
 
-    if(time != NULL) {
+    if (time != NULL) {
         usec = usec * 15625;
         usec >>= 9;
         time->tv_sec = sec;
@@ -217,7 +217,7 @@ void rtc_disable(void)
 void
 rtc_get_localtime(struct tm *localt)
 {
-    if(localt != NULL) {
+    if (localt != NULL) {
         localt->tm_sec = RTC_SEC;
         localt->tm_min = RTC_MIN;
         localt->tm_hour = RTC_HOUR;
@@ -234,7 +234,7 @@ void gettimeofday_r(struct _reent *r, struct timeval *ptimeval, struct timezone 
 {
     r->_errno = 0;
 
-    if(ptimeval != NULL) {
+    if (ptimeval != NULL) {
         rtc_time(ptimeval);
     }
 }

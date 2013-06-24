@@ -23,8 +23,8 @@
 
 void queue_remove(queue_node_t *root, queue_node_t *node)
 {
-    while(root->next != NULL) {
-        if(root->next == node) {
+    while (root->next != NULL) {
+        if (root->next == node) {
             root->next = node->next;
             node->next = NULL;
             return;
@@ -38,7 +38,7 @@ queue_node_t *queue_remove_head(queue_node_t *root)
 {
     queue_node_t *head = root->next;
 
-    if(head != NULL) {
+    if (head != NULL) {
         root->next = head->next;
     }
 
@@ -47,7 +47,7 @@ queue_node_t *queue_remove_head(queue_node_t *root)
 
 void queue_add_tail(queue_node_t *node, queue_node_t *new_obj)
 {
-    while(node->next != NULL) {
+    while (node->next != NULL) {
         node = node->next;
     }
 
@@ -65,8 +65,8 @@ void queue_priority_add(queue_node_t *root, queue_node_t *new_obj)
 {
     queue_node_t *node = root;
 
-    while(node->next != NULL) {
-        if(node->next->priority > new_obj->priority) {
+    while (node->next != NULL) {
+        if (node->next->priority > new_obj->priority) {
             new_obj->next = node->next;
             node->next = new_obj;
             return;
@@ -83,8 +83,8 @@ void queue_priority_add_generic(queue_node_t *root, queue_node_t *new_obj, int (
 {
     queue_node_t *node = root;
 
-    while(node->next != NULL) {
-        if(cmp(node->next, new_obj) < 0) {
+    while (node->next != NULL) {
+        if (cmp(node->next, new_obj) < 0) {
             new_obj->next = node->next;
             node->next = new_obj;
             return;
@@ -102,7 +102,7 @@ void queue_print(queue_node_t *node)
 {
     printf("queue:\n");
 
-    while(node->next != NULL) {
+    while (node->next != NULL) {
         node = node->next;
         printf("Data: %u Priority: %u\n", node->data, node->priority);
     }

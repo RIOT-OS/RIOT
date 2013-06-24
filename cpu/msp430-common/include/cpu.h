@@ -86,7 +86,7 @@ inline void __exit_isr(void)
 {
     __inISR = 0;
 
-    if(sched_context_switch_request) {
+    if (sched_context_switch_request) {
         sched_run();
     }
 

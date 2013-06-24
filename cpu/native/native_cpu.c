@@ -63,7 +63,7 @@ char *thread_stack_init(void *task_func, void *stack_start, int stacksize)
     stacksize -= sizeof(ucontext_t);
 #endif
 
-    if(getcontext(p) == -1) {
+    if (getcontext(p) == -1) {
         err(1, "thread_stack_init(): getcontext()");
     }
 
@@ -72,7 +72,7 @@ char *thread_stack_init(void *task_func, void *stack_start, int stacksize)
     p->uc_stack.ss_flags = 0;
     p->uc_link = &end_context;
 
-    if(sigemptyset(&(p->uc_sigmask)) == -1) {
+    if (sigemptyset(&(p->uc_sigmask)) == -1) {
         err(1, "thread_stack_init(): sigemptyset()");
     }
 
@@ -93,7 +93,7 @@ void cpu_switch_context_exit(void)
     ctx = (ucontext_t *)(active_thread->sp);
     eINT(); // XXX: workaround for bug (?) in sched_task_exit
 
-    if(setcontext(ctx) == -1) {
+    if (setcontext(ctx) == -1) {
         err(1, "cpu_switch_context_exit(): setcontext():");
     }
 }
@@ -113,10 +113,10 @@ void thread_yield()
 
     nc = (ucontext_t *)(active_thread->sp);
 
-    if(nc != oc) {
+    if (nc != oc) {
         DEBUG("thread_yield(): calling swapcontext(%s)\n\n", active_thread->name);
 
-        if(swapcontext(oc, nc) == -1) {
+        if (swapcontext(oc, nc) == -1) {
             err(1, "thread_yield(): swapcontext()");
         }
     }
@@ -127,7 +127,7 @@ void thread_yield()
 
 void native_cpu_init()
 {
-    if(getcontext(&end_context) == -1) {
+    if (getcontext(&end_context) == -1) {
         err(1, "end_context(): getcontext()");
     }
 

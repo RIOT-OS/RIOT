@@ -55,7 +55,7 @@ char *thread_stack_init(void *task_func, void *stack_start, int stack_size)
     *stk = (unsigned int)(stack_start + stack_size) - 4;
 
     /* build base stack */
-    for(int i = REGISTER_CNT; i >= 0 ; i--) {
+    for (int i = REGISTER_CNT; i >= 0 ; i--) {
         stk--;
         *stk = i;
     }
@@ -80,7 +80,7 @@ void thread_print_stack(void)
     register int i = 0;
     s += 5;
 
-    while(*s != STACK_MARKER) {
+    while (*s != STACK_MARKER) {
         printf("STACK (%u) addr=%X = %X \n", i, (unsigned int) s, (unsigned int) *s);
         s++;
         i++;
@@ -97,5 +97,5 @@ __attribute__((naked, noreturn)) void arm_reset(void)
     WDFEED = 0xAA;
     WDFEED = 0x55;
 
-    while(1);
+    while (1);
 }

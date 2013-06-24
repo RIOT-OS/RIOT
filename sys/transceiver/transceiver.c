@@ -116,12 +116,12 @@ void transceiver_init(transceiver_type_t t)
     memset(transceiver_buffer, 0, TRANSCEIVER_BUFFER_SIZE);
     memset(data_buffer, 0, TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE);
 
-    for(i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
+    for (i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
         reg[i].transceivers = TRANSCEIVER_NONE;
         reg[i].pid          = 0;
     }
 
-    if(t & TRANSCEIVER_CC1100) {
+    if (t & TRANSCEIVER_CC1100) {
         transceivers |= t;
     }
     else {
@@ -134,10 +134,10 @@ int transceiver_start(void)
 {
     transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN - 3, CREATE_STACKTEST, run, "Transceiver");
 
-    if(transceiver_pid < 0) {
+    if (transceiver_pid < 0) {
         puts("Error creating transceiver thread");
     }
-    else if(transceivers & TRANSCEIVER_CC1100) {
+    else if (transceivers & TRANSCEIVER_CC1100) {
         DEBUG("Transceiver started for CC1100\n");
 #ifdef MODULE_CC110X_NG
         cc110x_init(transceiver_pid);
@@ -155,11 +155,11 @@ uint8_t transceiver_register(transceiver_type_t t, int pid)
 {
     uint8_t i;
 
-    for(i = 0; ((reg[i].pid != pid) &&
+    for (i = 0; ((reg[i].pid != pid) &&
                 (i < TRANSCEIVER_MAX_REGISTERED) &&
                 (reg[i].transceivers != TRANSCEIVER_NONE)); i++);
 
-    if(i >= TRANSCEIVER_MAX_REGISTERED) {
+    if (i >= TRANSCEIVER_MAX_REGISTERED) {
         return ENOMEM;
     }
     else {
@@ -185,7 +185,7 @@ void run(void)
 
     msg_init_queue(msg_buffer, TRANSCEIVER_MSG_BUFFER_SIZE);
 
-    while(1) {
+    while (1) {
         DEBUG("Waiting for next message\n");
         msg_receive(&m);
         /* only makes sense for messages for upper layers */
@@ -292,14 +292,14 @@ static void receive_packet(uint16_t type, uint8_t pos)
     }
 
     /* search first free position in transceiver buffer */
-    for(i = 0; (i < TRANSCEIVER_BUFFER_SIZE) && (transceiver_buffer[transceiver_buffer_pos].processing); i++) {
-        if(++transceiver_buffer_pos == TRANSCEIVER_BUFFER_SIZE) {
+    for (i = 0; (i < TRANSCEIVER_BUFFER_SIZE) && (transceiver_buffer[transceiver_buffer_pos].processing); i++) {
+        if (++transceiver_buffer_pos == TRANSCEIVER_BUFFER_SIZE) {
             transceiver_buffer_pos = 0;
         }
     }
 
     /* no buffer left */
-    if(i >= TRANSCEIVER_BUFFER_SIZE) {
+    if (i >= TRANSCEIVER_BUFFER_SIZE) {
         /* inform upper layers of lost packet */
         m.type = ENOBUFFER;
         m.content.value = t;
@@ -309,7 +309,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
         radio_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
         m.type = PKT_PENDING;
 
-        if(type == RCV_PKT_CC1100) {
+        if (type == RCV_PKT_CC1100) {
 #ifdef MODULE_CC110X_NG
             receive_cc110x_packet(trans_p);
 #else
@@ -326,12 +326,12 @@ static void receive_packet(uint16_t type, uint8_t pos)
      * this is done non-blocking, so packets can get lost */
     i = 0;
 
-    while(reg[i].transceivers != TRANSCEIVER_NONE) {
-        if(reg[i].transceivers & t) {
+    while (reg[i].transceivers != TRANSCEIVER_NONE) {
+        if (reg[i].transceivers & t) {
             m.content.ptr = (char *) & (transceiver_buffer[transceiver_buffer_pos]);
             DEBUG("Notify thread %i\n", reg[i].pid);
 
-            if(msg_send(&m, reg[i].pid, false) && (m.type != ENOBUFFER)) {
+            if (msg_send(&m, reg[i].pid, false) && (m.type != ENOBUFFER)) {
                 transceiver_buffer[transceiver_buffer_pos].processing++;
             }
         }
@@ -415,7 +415,7 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
 #else
             memcpy(cc1100_pkt, p.data, p.length);
 
-            if((snd_ret = cc1100_send_csmaca(p.dst, 4, 0, (char *) cc1100_pkt, p.length)) < 0) {
+            if ((snd_ret = cc1100_send_csmaca(p.dst, 4, 0, (char *) cc1100_pkt, p.length)) < 0) {
                 DEBUG("snd_ret (%u) = %i\n", p.length, snd_ret);
                 res = 0;
             }

@@ -102,7 +102,7 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
     }
 
     /* Calculate collisions per second */
-    if(collision_state == COLLISION_STATE_INITIAL) {
+    if (collision_state == COLLISION_STATE_INITIAL) {
         timex_t now;
         vtimer_now(&now);
         collision_measurement_start =  now.microseconds;
@@ -110,21 +110,21 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
         collisions_per_sec = 0;
         collision_state = COLLISION_STATE_MEASURE;
     }
-    else if(collision_state == COLLISION_STATE_MEASURE) {
+    else if (collision_state == COLLISION_STATE_MEASURE) {
         timex_t now;
         vtimer_now(&now);
         uint64_t timespan = now.microseconds - collision_measurement_start;
 
-        if(timespan > 1000000) {
+        if (timespan > 1000000) {
             collisions_per_sec = (collision_count * 1000000) / (double) timespan;
 
-            if(collisions_per_sec > 0.5 && collisions_per_sec <= 2.2) {
+            if (collisions_per_sec > 0.5 && collisions_per_sec <= 2.2) {
                 timex_t now;
                 vtimer_now(&now);
                 collision_measurement_start = now.microseconds;
                 collision_state = COLLISION_STATE_KEEP;
             }
-            else if(collisions_per_sec > 2.2) {
+            else if (collisions_per_sec > 2.2) {
                 timex_t now;
                 vtimer_now(&now);
                 collision_measurement_start = now.microseconds;
@@ -135,21 +135,21 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
             }
         }
     }
-    else if(collision_state == COLLISION_STATE_KEEP) {
+    else if (collision_state == COLLISION_STATE_KEEP) {
         timex_t now;
         vtimer_now(&now);
         uint64_t timespan = now.microseconds - collision_measurement_start;
 
-        if(timespan > 5000000) {
+        if (timespan > 5000000) {
             collision_state = COLLISION_STATE_INITIAL;
         }
     }
 
     /* Adjust initial window size according to collision rate */
-    if(collisions_per_sec > 0.5 && collisions_per_sec <= 2.2) {
+    if (collisions_per_sec > 0.5 && collisions_per_sec <= 2.2) {
         min_window_size *= 2;
     }
-    else if(collisions_per_sec > 2.2) {
+    else if (collisions_per_sec > 2.2) {
         min_window_size *= 4;
     }
 
@@ -158,7 +158,7 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
     uint32_t total;								/* Holds the total wait time before send try */
     uint32_t cs_timeout;						/* Current carrier sense timeout value */
 
-    if(protocol == 0) {
+    if (protocol == 0) {
         return RADIO_INVALID_PARAM;				/* Not allowed, protocol id must be greater zero */
     }
 
@@ -168,13 +168,13 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
     send_csmaca_calls++;
     int fail_percentage = (send_csmaca_calls_cs_timeout * 100) / send_csmaca_calls;
 
-    if(fail_percentage == 0) {
+    if (fail_percentage == 0) {
         fail_percentage = 1;
     }
 
     cs_timeout = CARRIER_SENSE_TIMEOUT / fail_percentage;
 
-    if(cs_timeout < CARRIER_SENSE_TIMEOUT_MIN) {
+    if (cs_timeout < CARRIER_SENSE_TIMEOUT_MIN) {
         cs_timeout = CARRIER_SENSE_TIMEOUT_MIN;
     }
 
@@ -182,19 +182,19 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
 
 window:
 
-    if(backoff != 0) {
+    if (backoff != 0) {
         goto cycle;    /* If backoff was 0 */
     }
 
     windowSize *= 2;						/* ...double the current window size */
 
-    if(windowSize > max_window_size) {
+    if (windowSize > max_window_size) {
         windowSize = max_window_size;		/* This is the maximum size allowed */
     }
 
     backoff = rand() % windowSize;			/* ...and choose new backoff */
 
-    if(backoff < 0) {
+    if (backoff < 0) {
         backoff *= -1;
     }
 
@@ -204,8 +204,8 @@ cycle:
     cs_hwtimer_id = hwtimer_set(cs_timeout,	/* Set hwtimer to set CS timeout flag */
                                 cs_timeout_cb, NULL);
 
-    while(cc1100_cs_read()) {			/* Wait until air is free */
-        if(cs_timeout_flag) {
+    while (cc1100_cs_read()) {			/* Wait until air is free */
+        if (cs_timeout_flag) {
             send_csmaca_calls_cs_timeout++;
 #ifndef CSMACA_MAC_AGGRESSIVE_MODE
             cc1100_phy_mutex_unlock();
@@ -222,12 +222,12 @@ cycle:
     cc1100_cs_write_cca(1);					/* Air is free now */
     cc1100_cs_set_enabled(true);
 
-    if(cc1100_cs_read()) {
+    if (cc1100_cs_read()) {
         goto window;    /* GDO0 triggers on rising edge, so */
     }
 
     /* test once after interrupt is enabled */
-    if(backoff > 0) {
+    if (backoff > 0) {
         backoff--;    /* Decrement backoff counter */
     }
 
@@ -238,9 +238,9 @@ cycle:
     cs_hwtimer_id = hwtimer_set(total,		/* Set hwtimer to set CS timeout flag */
                                 cs_timeout_cb, NULL);
 
-    while(!cs_timeout_flag
+    while (!cs_timeout_flag
           || !cc1100_cs_read_cca()) {	/* Wait until timeout is finished */
-        if(cc1100_cs_read_cca() == 0) {	/* Is the air still free? */
+        if (cc1100_cs_read_cca() == 0) {	/* Is the air still free? */
             hwtimer_remove(cs_hwtimer_id);
             goto window;					/* No. Go back to new wait period. */
         }
@@ -252,7 +252,7 @@ send:
 #endif
     int res = cc1100_send(address, protocol, priority, payload, payload_len);
 
-    if(res < 0) {
+    if (res < 0) {
         collision_count++;
     }
 

@@ -31,7 +31,7 @@ number_of_highest_bit(unsigned v)
                                             r |= (v >> 1);
 #else
     r = 0;
-    while(v >>= 1) { // unroll for more speed...
+    while (v >>= 1) { // unroll for more speed...
         r++;
     }
 
@@ -45,7 +45,7 @@ number_of_lowest_bit(register unsigned v)
 {
     register unsigned r = 0;
 
-    while((v & 0x01) == 0) {
+    while ((v & 0x01) == 0) {
         v >>= 1;
         r++;
     };
@@ -58,7 +58,7 @@ number_of_bits_set(unsigned v)
 {
     unsigned c; // c accumulates the total bits set in v
 
-    for(c = 0; v; c++) {
+    for (c = 0; v; c++) {
         v &= v - 1; // clear the least significant bit set
     }
 

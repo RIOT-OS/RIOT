@@ -48,7 +48,7 @@ uint8_t serial_in_buf[BORDER_BUFFER_SIZE];
 
 uint8_t *get_serial_out_buffer(int offset)
 {
-    if(offset > BUFFER_SIZE) {
+    if (offset > BUFFER_SIZE) {
         return NULL;
     }
 
@@ -57,7 +57,7 @@ uint8_t *get_serial_out_buffer(int offset)
 
 uint8_t *get_serial_in_buffer(int offset)
 {
-    if(offset > BUFFER_SIZE) {
+    if (offset > BUFFER_SIZE) {
         return NULL;
     }
 
@@ -81,13 +81,13 @@ void serial_reader_f(void)
     msg_receive(&m);
     main_pid = m.sender_pid;
 
-    while(1) {
+    while (1) {
         posix_open(uart0_handler_pid, 0);
         bytes = readpacket(get_serial_in_buffer(0), BORDER_BUFFER_SIZE);
 
-        if(bytes < 0) {
+        if (bytes < 0) {
             switch(bytes) {
-                case(-SIXLOWERROR_ARRAYFULL): {
+                case (-SIXLOWERROR_ARRAYFULL): {
                     printf("ERROR: Array was full\n");
                     break;
                 }
@@ -103,11 +103,11 @@ void serial_reader_f(void)
 
         uart_buf = (border_packet_t *)get_serial_in_buffer(0);
 
-        if(uart_buf->empty == 0) {
-            if(uart_buf->type == BORDER_PACKET_CONF_TYPE) {
+        if (uart_buf->empty == 0) {
+            if (uart_buf->type == BORDER_PACKET_CONF_TYPE) {
                 border_conf_header_t *conf_packet = (border_conf_header_t *)uart_buf;
 
-                if(conf_packet->conftype == BORDER_CONF_SYN) {
+                if (conf_packet->conftype == BORDER_CONF_SYN) {
                     m.content.ptr = (char *)conf_packet;
                     msg_send(&m, main_pid, 1);
                     continue;
@@ -128,7 +128,7 @@ uint8_t border_initialize(transceiver_type_t trans, ipv6_addr_t *border_router_a
                             PRIORITY_MAIN - 1, CREATE_STACKTEST,
                             serial_reader_f, "serial_reader");
 
-    if(border_router_addr == NULL) {
+    if (border_router_addr == NULL) {
         border_router_addr = &addr;
 
         addr = flowcontrol_init();
@@ -138,7 +138,7 @@ uint8_t border_initialize(transceiver_type_t trans, ipv6_addr_t *border_router_a
      * RFC 4944 (Section 6) & RFC 2464 (Section 4) from short address
      * -- for now
      */
-    if(border_router_addr->uint16[4] != HTONS(IEEE_802154_PAN_ID ^ 0x0200) ||
+    if (border_router_addr->uint16[4] != HTONS(IEEE_802154_PAN_ID ^ 0x0200) ||
        border_router_addr->uint16[5] != HTONS(0x00FF) ||
        border_router_addr->uint16[6] != HTONS(0xFE00)
       ) {
@@ -146,7 +146,7 @@ uint8_t border_initialize(transceiver_type_t trans, ipv6_addr_t *border_router_a
     }
 
     /* radio-address is 8-bit so this must be tested extra */
-    if(border_router_addr->uint8[14] != 0) {
+    if (border_router_addr->uint8[14] != 0) {
         return SIXLOWERROR_ADDRESS;
     }
 
@@ -177,18 +177,18 @@ void border_process_lowpan(void)
     msg_t m;
     ipv6_hdr_t *ipv6_buf;
 
-    while(1) {
+    while (1) {
         msg_receive(&m);
         ipv6_buf = (ipv6_hdr_t *)m.content.ptr;
 
-        if(ipv6_buf->nextheader == PROTO_NUM_ICMPV6) {
+        if (ipv6_buf->nextheader == PROTO_NUM_ICMPV6) {
             struct icmpv6_hdr_t *icmp_buf = (struct icmpv6_hdr_t *)(((uint8_t *)ipv6_buf) + IPV6_HDR_LEN);
 
-            if(icmp_buf->type == ICMP_REDIRECT) {
+            if (icmp_buf->type == ICMP_REDIRECT) {
                 continue;
             }
 
-            if(icmpv6_demultiplex(icmp_buf) == 0) {
+            if (icmpv6_demultiplex(icmp_buf) == 0) {
                 continue;
             }
 

@@ -85,7 +85,7 @@ static uint8_t pa_table[] = {				///< PATABLE with available output powers
 				   0xCC,					///< + 7 dBm
 				   0xC6, 					///< + 9 dBm
 				   0xC3  					///< +10 dBm
-}; /* If PATABLE is changed in size, adjust MAX_OUTPUT_POWER definition in CC1100 interface! */
+}; /* If PATABLE is changed in size, adjust MAX_OUTPUT_POWER definition in CC1100 interface!*/
 
 static int8_t pa_table_dBm[] = {			///< Values of the PATABLE in dBm
 				   -52,
@@ -176,12 +176,12 @@ static bool spi_receive_packet_variable(uint8_t *rxBuffer, uint8_t length)
     uint8_t packetLength = 0;
 
     /* Any bytes available in RX FIFO? */
-    if((cc1100_spi_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO)) {
+    if ((cc1100_spi_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO)) {
         /* Read length byte (first byte in RX FIFO) */
         packetLength = cc1100_spi_read_reg(CC1100_RXFIFO);
 
         /* Read data from RX FIFO and store in rxBuffer */
-        if(packetLength <= length) {
+        if (packetLength <= length) {
             /* Put length byte at first position in RX Buffer */
             rxBuffer[0] = packetLength;
 
@@ -197,7 +197,7 @@ static bool spi_receive_packet_variable(uint8_t *rxBuffer, uint8_t length)
             /* MSB of LQI is the CRC_OK bit */
             rflags.CRC_STATE = (status[I_LQI] & CRC_OK) >> 7;
 
-            if(!rflags.CRC_STATE) {
+            if (!rflags.CRC_STATE) {
                 cc1100_statistic.packets_in_crc_fail++;
             }
 
@@ -221,7 +221,7 @@ bool cc1100_spi_receive_packet(uint8_t *rxBuffer, uint8_t length)
 {
     uint8_t pkt_len_cfg = cc1100_spi_read_reg(CC1100_PKTCTRL0) & PKT_LENGTH_CONFIG;
 
-    if(pkt_len_cfg == VARIABLE_PKTLEN) {
+    if (pkt_len_cfg == VARIABLE_PKTLEN) {
         return spi_receive_packet_variable(rxBuffer, length);
     }
 
@@ -236,7 +236,7 @@ bool cc1100_spi_receive_packet(uint8_t *rxBuffer, uint8_t length)
 
 void cc1100_set_idle(void)
 {
-    if(radio_state == RADIO_WOR) {
+    if (radio_state == RADIO_WOR) {
         /* Wake up the chip from WOR/sleep */
         cc110x_spi_select();
         hwtimer_wait(RTIMER_TICKS(122));
@@ -253,7 +253,7 @@ void cc1100_set_idle(void)
 
 static void wakeup_from_rx(void)
 {
-    if(radio_state != RADIO_RX) {
+    if (radio_state != RADIO_RX) {
         return;
     }
 
@@ -279,7 +279,7 @@ static void setup_rx_mode(void)
  */
 static void wakeup_from_wor(void)
 {
-    if(radio_state != RADIO_WOR) {
+    if (radio_state != RADIO_WOR) {
         return;
     }
 
@@ -304,7 +304,7 @@ void switch_to_wor2(void)
                          cc1100_wor_config.rx_time_reg);		/* Configure RX_TIME (for use in WOR) */
     cc1100_spi_write_reg(CC1100_MCSM0, 0x18);	/* Turn on FS-Autocal */
 
-    if(rflags.WOR_RST) {
+    if (rflags.WOR_RST) {
         cc1100_spi_strobe(CC1100_SWORRST);		/* Resets the real time clock */
         rflags.WOR_RST = false;
     }
@@ -320,7 +320,7 @@ static void hwtimer_switch_to_wor2_wrapper(void *ptr)
 {
     wor_hwtimer_id = -1;							/* kernel timer handler function called, clear timer id */
 
-    if(rflags.TX) {
+    if (rflags.TX) {
         return;    /* Stability: don't allow WOR timers at this point */
     }
 
@@ -334,13 +334,13 @@ static void hwtimer_switch_to_wor2_wrapper(void *ptr)
 static void switch_to_wor(void)
 {
     /* Any incoming packet? */
-    if(cc110x_get_gdo2()) {
+    if (cc110x_get_gdo2()) {
         /* Then don't go to WOR now */
         return;
     }
 
     /* Step 1: Set chip for random interval (1..RX_INTERVAL) to power down mode */
-    if(!rflags.MAN_WOR) {
+    if (!rflags.MAN_WOR) {
         rflags.MAN_WOR = true;
         radio_state = RADIO_WOR;
         /* Go to power down mode */
@@ -351,7 +351,7 @@ static void switch_to_wor(void)
         int r = (rand() / (double)(RAND_MAX + 1.0)) * (cc1100_wor_config.rx_interval * 100.0) + 20;
         wor_hwtimer_id = hwtimer_set(r, cc1100_hwtimer_go_receive_wrapper, NULL);
 
-        if(wor_hwtimer_id == -1) {
+        if (wor_hwtimer_id == -1) {
             rflags.KT_RES_ERR = true;
             /* No hwtimer available, go immediately to WOR mode. */
             /* Else never receiving packets again... */
@@ -370,7 +370,7 @@ static void switch_to_wor(void)
         wor_hwtimer_id = hwtimer_set((cc1100_wor_config.rx_time_ms * 100 + 150),
                                      hwtimer_switch_to_wor2_wrapper, NULL); /* add 1,5 ms secure time */
 
-        if(wor_hwtimer_id == -1) {
+        if (wor_hwtimer_id == -1) {
             rflags.KT_RES_ERR = true;
         }
     }
@@ -428,7 +428,7 @@ static bool cc1100_set_mode0(uint8_t mode, uint16_t opt_mode_data)
             result = cc1100_phy_calc_wor_settings(opt_mode_data);
 
             /* If settings can be applied, set new mode and burst count */
-            if(result != -1) {
+            if (result != -1) {
                 radio_mode = mode;
                 cc1100_go_idle = wakeup_from_wor;
                 cc1100_go_receive = switch_to_wor;
@@ -469,7 +469,7 @@ bool cc1100_set_mode(uint8_t mode, uint16_t opt_mode_data)
     bool result = cc1100_set_mode0(mode, opt_mode_data);
 
     /* If mode change was successful (mode is valid) */
-    if(result) {
+    if (result) {
         /* Setup new mode configuration */
         cc1100_setup_mode();
         /* Reset statistics */
@@ -535,11 +535,11 @@ void cc1100_hwtimer_go_receive_wrapper(void *ptr)
     wor_hwtimer_id = -1;
 
     /* Stability: don't allow WOR timers at this point */
-    if(rflags.TX) {
+    if (rflags.TX) {
         return;
     }
 
-    if(radio_state == RADIO_PWD) {
+    if (radio_state == RADIO_PWD) {
         /* Go to RX state, listen for packets as long as WOR_TIMEOUT_2 */
         cc1100_spi_strobe(CC1100_SRX);
         hwtimer_wait(IDLE_TO_RX_TIME);
@@ -547,7 +547,7 @@ void cc1100_hwtimer_go_receive_wrapper(void *ptr)
         /* Set hwtimer to put CC1100 back to WOR after WOR_TIMEOUT_2 */
         wor_hwtimer_id = hwtimer_set(WOR_TIMEOUT_2, cc1100_hwtimer_go_receive_wrapper, NULL);
 
-        if(wor_hwtimer_id == -1) {
+        if (wor_hwtimer_id == -1) {
             rflags.KT_RES_ERR = true;
             /* No hwtimer available, go immediately to WOR mode. */
             /* Else never receiving packets again... */
@@ -594,7 +594,7 @@ void cc1100_send_raw(uint8_t *tx_buffer, uint8_t size)
     /* or equal to PACKET_LENGTH (62 bytes). So the receiver */
     /* can put the whole packet in its RX-FIFO (with appended */
     /* packet status bytes). */
-    if(size > PACKET_LENGTH) {
+    if (size > PACKET_LENGTH) {
         return;
     }
 
@@ -613,10 +613,10 @@ void cc1100_send_raw(uint8_t *tx_buffer, uint8_t size)
     cc1100_spi_strobe(CC1100_STX);
 
     /* Wait for GDO2 to be set -> sync word transmitted */
-    while(cc110x_get_gdo2() == 0) {
+    while (cc110x_get_gdo2() == 0) {
         abort_count++;
 
-        if(abort_count > CC1100_SYNC_WORD_TX_TIME) {
+        if (abort_count > CC1100_SYNC_WORD_TX_TIME) {
             /* Abort waiting. CC1100 maybe in wrong mode */
             /* e.g. sending preambles for always */
             puts("[CC1100 TX] fatal error\n");
@@ -627,7 +627,7 @@ void cc1100_send_raw(uint8_t *tx_buffer, uint8_t size)
     restoreIRQ(cpsr);
 
     /* Wait for GDO2 to be cleared -> end of packet */
-    while(cc110x_get_gdo2() != 0);
+    while (cc110x_get_gdo2() != 0);
 
     /* Experimental - TOF Measurement */
     cc110x_after_send();
@@ -650,7 +650,7 @@ read_register(uint8_t r)
 
     /* Have to put radio back to WOR/RX if old radio state */
     /* was WOR/RX, otherwise no action is necessary */
-    if(old_state == RADIO_WOR || old_state == RADIO_RX) {
+    if (old_state == RADIO_WOR || old_state == RADIO_RX) {
         cc1100_go_receive();
     }
 
@@ -669,7 +669,7 @@ write_register(uint8_t r, uint8_t value)
 
     /* Have to put radio back to WOR/RX if old radio state */
     /* was WOR/RX, otherwise no action is necessary */
-    if(old_state == RADIO_WOR || old_state == RADIO_RX) {
+    if (old_state == RADIO_WOR || old_state == RADIO_RX) {
         cc1100_go_receive();
     }
 }
@@ -688,7 +688,7 @@ uint8_t cc1100_get_channel(void)
 bool
 cc1100_set_channel(uint8_t channr)
 {
-    if(channr > MAX_CHANNR) {
+    if (channr > MAX_CHANNR) {
         return false;
     }
 
@@ -700,7 +700,7 @@ cc1100_set_channel(uint8_t channr)
 bool
 cc1100_set_output_power(uint8_t pa_idx)
 {
-    if(pa_idx >= sizeof(pa_table)) {
+    if (pa_idx >= sizeof(pa_table)) {
         return false;
     }
 
@@ -725,7 +725,7 @@ char *cc1100_get_marc_state(void)
 
     /* Have to put radio back to WOR/RX if old radio state */
     /* was WOR/RX, otherwise no action is necessary */
-    if(old_state == RADIO_WOR || old_state == RADIO_RX) {
+    if (old_state == RADIO_WOR || old_state == RADIO_RX) {
         cc1100_go_receive();
     }
 
@@ -840,7 +840,7 @@ void cc1100_init(void)
 
 int cc1100_get_avg_transmission_duration(void)
 {
-    if(radio_mode == CC1100_MODE_WOR) {
+    if (radio_mode == CC1100_MODE_WOR) {
         /* Transmission duration ~ RX interval */
         /* Double value because of MAC delay. */
         return 2 * cc1100_wor_config.rx_interval;
@@ -859,13 +859,13 @@ radio_address_t cc1100_get_address(void)
 
 bool cc1100_set_address(radio_address_t address)
 {
-    if(address < MIN_UID || address > MAX_UID) {
+    if (address < MIN_UID || address > MAX_UID) {
         return false;
     }
 
     uint8_t id = (uint8_t) address;
 
-    if(radio_state != RADIO_UNKNOWN) {
+    if (radio_state != RADIO_UNKNOWN) {
         write_register(CC1100_ADDR, id);
     }
 
@@ -879,7 +879,7 @@ rd_set_mode(int mode)
     int result;
 
     /* Get current radio mode */
-    if(radio_state == RADIO_UNKNOWN || radio_state == RADIO_PWD) {
+    if (radio_state == RADIO_UNKNOWN || radio_state == RADIO_PWD) {
         result = RADIO_MODE_OFF;
     }
     else {
@@ -917,7 +917,7 @@ void cc1100_cs_init(void)
 {
     cc1100_go_idle();							/* Wake CC1100 up from Wake-On-Radio mode */
 
-    if(radio_state == RADIO_RX) {			/* If radio in RX mode */
+    if (radio_state == RADIO_RX) {			/* If radio in RX mode */
         cc1100_spi_strobe(CC1100_SIDLE);		/* Go back to IDLE for calibration */
     }
 
@@ -932,7 +932,7 @@ void cc1100_cs_init(void)
 
 void cc1100_cs_set_enabled(bool enabled)
 {
-    if(enabled) {
+    if (enabled) {
         /* Enable carrier sense detection (GDO0 interrupt) */
         cc110x_gdo0_enable();
     }

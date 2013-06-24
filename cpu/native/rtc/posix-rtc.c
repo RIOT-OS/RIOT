@@ -55,10 +55,10 @@ void rtc_get_localtime(struct tm *localt)
 {
     time_t t;
 
-    if(native_rtc_enabled == 1) {
+    if (native_rtc_enabled == 1) {
         t = time(NULL);
 
-        if(localtime_r(&t, localt) == NULL) {
+        if (localtime_r(&t, localt) == NULL) {
             err(1, "rtc_get_localtime: localtime_r");
         }
     }

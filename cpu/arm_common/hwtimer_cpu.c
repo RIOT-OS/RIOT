@@ -35,37 +35,37 @@ static void timer_irq(void)
 {
     short timer = 0;
 
-    if(T0IR) {
+    if (T0IR) {
         timer = 0;
     }
-    else if(T1IR) {
+    else if (T1IR) {
         timer = 4;
     }
-    else if(T2IR) {
+    else if (T2IR) {
         timer = 8;
     }
 
     volatile unsigned long base = get_base_address(timer);
 
-    if(*VULP(base + TXIR) & BIT0) {
+    if (*VULP(base + TXIR) & BIT0) {
         *VULP(base + TXMCR) &= ~BIT0;
         *VULP(base + TXIR) = BIT0;
         int_handler(timer);
     }
 
-    if(*VULP(base + TXIR) & BIT1) {
+    if (*VULP(base + TXIR) & BIT1) {
         *VULP(base + TXMCR) &= ~BIT3;
         *VULP(base + TXIR) = BIT1;
         int_handler(timer + 1);
     }
 
-    if(*VULP(base + TXIR) & BIT2) {
+    if (*VULP(base + TXIR) & BIT2) {
         *VULP(base + TXMCR) &= ~BIT6;
         *VULP(base + TXIR) = BIT2;
         int_handler(timer + 2);
     }
 
-    if(*VULP(base + TXIR) & BIT3) {
+    if (*VULP(base + TXIR) & BIT3) {
         *VULP(base + TXMCR) &= ~BIT9;
         *VULP(base + TXIR) = BIT3;
         int_handler(timer + 3);

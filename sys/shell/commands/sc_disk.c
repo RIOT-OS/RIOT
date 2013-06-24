@@ -26,13 +26,13 @@ static inline uint8_t sector_read(unsigned char *read_buf, unsigned long sector,
 {
     unsigned long i;
 
-    if(MCI_read(read_buf, sector, 1) == RES_OK) {
+    if (MCI_read(read_buf, sector, 1) == RES_OK) {
         printf("[disk] Read sector %lu (%lu):\n", sector, offset);
 
-        for(i = offset + 1; i <= offset + length; i++) {
+        for (i = offset + 1; i <= offset + length; i++) {
             printf(" %u", read_buf[i - 1]);
 
-            if(!(i % 16)) {
+            if (!(i % 16)) {
                 puts("");
             }
         }
@@ -48,7 +48,7 @@ void _get_sectorsize(char *unused)
 {
     unsigned short ssize;
 
-    if(MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK) {
+    if (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK) {
         printf("[disk] sector size is %u\n", ssize);
     }
     else {
@@ -60,7 +60,7 @@ void _get_blocksize(char *unused)
 {
     unsigned long bsize;
 
-    if(MCI_ioctl(GET_BLOCK_SIZE, &bsize) == RES_OK) {
+    if (MCI_ioctl(GET_BLOCK_SIZE, &bsize) == RES_OK) {
         printf("[disk] block size is %lu\n", bsize);
     }
     else {
@@ -72,7 +72,7 @@ void _get_sectorcount(char *unused)
 {
     unsigned long scount;
 
-    if(MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) {
+    if (MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) {
         printf("[disk] sector count is %lu\n", scount);
     }
     else {
@@ -85,14 +85,14 @@ void _read_sector(char *sector)
     unsigned long sectornr, scount;
     unsigned short ssize;
 
-    if(strlen(sector) > strlen(DISK_READ_SECTOR_CMD) + 1) {
+    if (strlen(sector) > strlen(DISK_READ_SECTOR_CMD) + 1) {
 
         sectornr = atol(sector + strlen(DISK_READ_SECTOR_CMD) + 1);
 
-        if((MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) && (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK)) {
+        if ((MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) && (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK)) {
             unsigned char read_buf[ssize];
 
-            if(sector_read(read_buf, sectornr, ssize, 0)) {
+            if (sector_read(read_buf, sectornr, ssize, 0)) {
                 return;
             }
         }
@@ -114,16 +114,16 @@ void _read_bytes(char *bytes)
     /* tokenize user input */
     tok = strtok(bytes + strlen(DISK_READ_BYTES_CMD) + 1, " ");
 
-    if(tok) {
+    if (tok) {
         offset = atol(tok);
         tok = strtok(NULL, " ");
 
-        if(tok) {
+        if (tok) {
             length = atoi(tok);
 
-            if(length) {
+            if (length) {
                 /* get card info */
-                if((MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) && (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK)) {
+                if ((MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) && (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK)) {
                     /* calculate sector and offset position */
                     sector = (offset / ssize) + 1;
                     offset = (offset % ssize);
@@ -131,13 +131,13 @@ void _read_bytes(char *bytes)
                     unsigned char read_buf[((length / ssize) + 1) * 512];
 
                     /* read from several sectors */
-                    if(length > (ssize - offset)) {
+                    if (length > (ssize - offset)) {
                         /* buffer offset */
                         unsigned long j = 0;
                         /* chunk from current sector */
                         unsigned short tmp = ssize - offset;
 
-                        while(length) {
+                        while (length) {
                             sector_read(read_buf + j, sector++, tmp, offset);
                             /* decrease length  and recalculate chunk */
                             length -= tmp;
@@ -148,7 +148,7 @@ void _read_bytes(char *bytes)
                     } /* length > (ssize - offset) */
                     /* read only one sector */
                     else {
-                        if(sector_read(read_buf, sector, length, offset)) {
+                        if (sector_read(read_buf, sector, length, offset)) {
                             return;
                         }
                     } /* length < (ssize - offset) */

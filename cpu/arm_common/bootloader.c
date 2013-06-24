@@ -49,35 +49,35 @@ and the mailinglist (subscription via web site)
 #include <thread.h>
 
 void FIQ_Routine(void)   __attribute__((interrupt("FIQ")));
-//void SWI_Routine (void)   __attribute__ ((interrupt("SWI")));
+//void SWI_Routine (void)   __attribute__((interrupt("SWI")));
 void UNDEF_Routine(void) __attribute__((interrupt("UNDEF")));
 
 void IRQ_Routine(void)
 {
     printf("Kernel Panic,\nEarly IRQ call\n");
 
-    while(1) {};
+    while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 void FIQ_Routine(void)
 {
     printf("Kernel Panic,\nEarly FIQ call\n");
 
-    while(1) {};
+    while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 void SWI_Routine(void)
 {
     printf("Kernel Panic,\nEarly SWI call\n");
 
-    while(1) {};
+    while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 void DEBUG_Routine(void)
 {
     printf("DEBUG hit.");
 
-    while(1) {};
+    while (1) {};
 }
 /*-----------------------------------------------------------------------------------*/
 volatile int arm_abortflag = 0;
@@ -95,7 +95,7 @@ void abtorigin(const char *vector, u_long *lnk_ptr1)
     __asm__ __volatile__("mov %0, sp" : "=r"(sp));              // copy sp
     __asm__ __volatile__("msr cpsr_c, %0" :: "r"(cpsr));        // switch back to abt mode
 
-    printf("#! %s abort at %p (0x%08lX) originating from %p (0x%08lX) in mode 0x%X\n",
+    printf("#!%s abort at %p (0x%08lX) originating from %p (0x%08lX) in mode 0x%X\n",
            vector, (void *)lnk_ptr1, *(lnk_ptr1), (void *)lnk_ptr2, *(lnk_ptr2), spsr
           );
     stdio_flush();
@@ -108,7 +108,7 @@ void UNDEF_Routine(void)
     register u_long    *lnk_ptr;
     __asm__ __volatile__("sub %0, lr, #8" : "=r"(lnk_ptr));     // get aborting instruction
 
-    if(arm_abortflag == 0) {
+    if (arm_abortflag == 0) {
         arm_abortflag = 1;                                          // remember state (if printing should fail again)
         abtorigin("undef", lnk_ptr);
     }
@@ -121,7 +121,7 @@ void PABT_Routine(void)
     register u_long    *lnk_ptr;
     __asm__ __volatile__("sub %0, lr, #8" : "=r"(lnk_ptr));     // get aborting instruction
 
-    if(arm_abortflag == 0) {
+    if (arm_abortflag == 0) {
         arm_abortflag = 1;                                          // remember state (if printing should fail again)
         abtorigin("pabt", lnk_ptr);
     }
@@ -134,7 +134,7 @@ void DABT_Routine(void)
     register u_long    *lnk_ptr;
     __asm__ __volatile__("sub %0, lr, #8" : "=r"(lnk_ptr));     // get aborting instruction
 
-    if(arm_abortflag == 0) {
+    if (arm_abortflag == 0) {
         arm_abortflag = 1;                                          // remember state (if printing should fail again)
         abtorigin("data", lnk_ptr);
     }
@@ -161,7 +161,7 @@ bl_init_data(void)
     p2 = &_data;
     p3 = &_edata;
 
-    while(p2 < p3) {
+    while (p2 < p3) {
         *p2++ = *p1++;
     }
 
@@ -170,7 +170,7 @@ bl_init_data(void)
     p1 = &__bss_start;
     p2 = &__bss_end;
 
-    while(p1 < p2) {
+    while (p1 < p2) {
         *p1++ = 0;
     }
 }

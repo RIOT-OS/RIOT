@@ -140,14 +140,14 @@ trace(
 #if TRACELOG_CONF_NUM_ENTRIES > 0
     int length = size;
 
-    if(tracelog_initialized == false) {
+    if (tracelog_initialized == false) {
         return;
     }
 
     struct tracelog_entry *trace = &tracelog.traces[tracelog.tail];				// get current tail element
 
     /* increase tail */
-    if((tracelog.tail + 1) < TRACELOG_CONF_NUM_ENTRIES) {
+    if ((tracelog.tail + 1) < TRACELOG_CONF_NUM_ENTRIES) {
         tracelog.tail++;
     }
     else {
@@ -159,8 +159,8 @@ trace(
     trace->type = t;
 
     /* calculate size */
-    if(length == 0) {
-        if(t == TRACE_STRING) {
+    if (length == 0) {
+        if (t == TRACE_STRING) {
             length = strlen((char *)data);
         }
     }
@@ -189,11 +189,11 @@ tracelog_init(void)
 {
 #if TRACELOG_CONF_NUM_ENTRIES > 0
 
-    if(tracelog_initialized != 0) {
+    if (tracelog_initialized != 0) {
         return;
     }
 
-    if(sysmon_initial_boot()) {
+    if (sysmon_initial_boot()) {
         memset(&tracelog, 0, sizeof(struct tracelog));						// clear tracelog buffer on initial boot only
     }
 
@@ -213,14 +213,14 @@ tracelog_dump(void)
     do {
         i--;
 
-        if(i < 0) {
+        if (i < 0) {
             i = TRACELOG_CONF_NUM_ENTRIES - 1;
         }
 
         tracelog_snprint(buf, sizeof(buf), i);
         printf("\t %.2i: %s\n", i, buf);
     }
-    while(i != tracelog.tail);
+    while (i != tracelog.tail);
 
 #endif
 
@@ -273,12 +273,12 @@ CMD_FUNCTION(trace, cmdargs)
 {
 #if TRACELOG_CONF_NUM_ENTRIES > 0
 
-    if(cmdargs->arg_size > 0) {
+    if (cmdargs->arg_size > 0) {
         enum tracelog_event event;
         char *c = (char *)cmdargs->args;
         event = (enum tracelog_event)strtoul(c, &c, 0);						// read event number
 
-        if(event > 0) {
+        if (event > 0) {
             c++;															// skip expected whitespace
             trace_string(event, c);											// generate event with argument as text
             return true;

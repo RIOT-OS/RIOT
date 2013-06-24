@@ -110,16 +110,16 @@ void Isr_MCI(void)
 
     xs = XferStat;
 
-    if(ms & 0x400) {			/* A block transfer completed (DataBlockEnd) */
-        if(xs & 1) {				/* In card read operation */
-            if(ms & 0x100) {			/* When last block is received (DataEnd), */
+    if (ms & 0x400) {			/* A block transfer completed (DataBlockEnd) */
+        if (xs & 1) {				/* In card read operation */
+            if (ms & 0x100) {			/* When last block is received (DataEnd), */
                 GPDMA_SOFT_BREQ = 0x10;    /* Pop off remaining data in the MCIFIFO */
             }
 
             n = (XferWp + 1) % N_BUF;	/* Next write buffer */
             XferWp = n;
 
-            if(n == XferRp) {
+            if (n == XferRp) {
                 xs |= 4;    /* Check block overrun */
             }
         }
@@ -127,7 +127,7 @@ void Isr_MCI(void)
             n = (XferRp + 1) % N_BUF;	/* Next read buffer */
             XferRp = n;
 
-            if(n == XferWp) {
+            if (n == XferWp) {
                 xs |= 4;    /* Check block underrun */
             }
         }
@@ -143,12 +143,12 @@ void Isr_MCI(void)
 
 void Isr_GPDMA(void)
 {
-    if(GPDMA_INT_TCSTAT & BIT0) {
+    if (GPDMA_INT_TCSTAT & BIT0) {
         GPDMA_INT_TCCLR = 0x01;				/* Clear GPDMA interrupt flag */
 
-        if(XferStat & 2) {
+        if (XferStat & 2) {
             /* In write operation */
-            if(--XferWc == N_BUF) { /* Terminate LLI */
+            if (--XferWc == N_BUF) { /* Terminate LLI */
                 LinkList[XferRp % N_BUF][2] = 0;
             }
         }
@@ -180,7 +180,7 @@ static void ready_reception(unsigned int blks, unsigned int bs)
     dma_ctrl = 0x88492000 | (bs / 4);	/* 1_000_1_0_00_010_010_010_010_************ */
 
     /* Create link list */
-    for(n = 0; n < N_BUF; n++) {
+    for (n = 0; n < N_BUF; n++) {
         LinkList[n][0] = (unsigned long)&MCI_FIFO;
         LinkList[n][1] = (unsigned long)DmaBuff[n];
         LinkList[n][2] = (unsigned long)LinkList[(n + 1) % N_BUF];
@@ -207,7 +207,7 @@ static void ready_reception(unsigned int blks, unsigned int bs)
     MCI_CLEAR = 0x72A;						/* Clear status flags */
     MCI_MASK0 = 0x72A;						/* DataBlockEnd StartBitErr DataEnd RxOverrun DataTimeOut DataCrcFail */
 
-    for(n = 0; bs > 1; bs >>= 1, n += 0x10);
+    for (n = 0; bs > 1; bs >>= 1, n += 0x10);
 
     MCI_DATA_CTRL  = n | 0xB;				/* Start to receive data blocks */
 }
@@ -234,7 +234,7 @@ static void start_transmission(unsigned char blks)
     dma_ctrl = 0x84492080;				/* 1_000_0_1_00_010_010_010_010_000010000000 */
 
     /* Create link list */
-    for(n = 0; n < N_BUF; n++) {
+    for (n = 0; n < N_BUF; n++) {
         LinkList[n][0] = (unsigned long)DmaBuff[n];
         LinkList[n][1] = (unsigned long)&MCI_FIFO;
         LinkList[n][2] = (n == blks - 1) ? 0 : (unsigned long)LinkList[(n + 1) % N_BUF];
@@ -382,8 +382,8 @@ static int send_cmd(unsigned int idx, unsigned long arg, unsigned int rt, unsign
 {
     unsigned int s, mc;
 
-    if(idx & 0x80) {				/* Send a CMD55 prior to the specified command if it is ACMD class */
-        if(!send_cmd(CMD55, (unsigned long)CardRCA << 16, 1, buff)	/* When CMD55 is faild, */
+    if (idx & 0x80) {				/* Send a CMD55 prior to the specified command if it is ACMD class */
+        if (!send_cmd(CMD55, (unsigned long)CardRCA << 16, 1, buff)	/* When CMD55 is faild, */
            || !(buff[0] & 0x00000020)) {
             return 0;    /* exit with error */
         }
@@ -395,20 +395,20 @@ static int send_cmd(unsigned int idx, unsigned long arg, unsigned int rt, unsign
         MCI_COMMAND = 0;			/* Cancel to transmit command */
         MCI_CLEAR = 0x0C5;			/* Clear status flags */
 
-        for(s = 0; s < 10; s++) {
+        for (s = 0; s < 10; s++) {
             MCI_STATUS;    /* Skip lock out time of command reg. */
         }
     }
-    while(MCI_STATUS & 0x00800);
+    while (MCI_STATUS & 0x00800);
 
     MCI_ARGUMENT = arg;				/* Set the argument into argument register */
     mc = 0x400 | idx;				/* Enable bit + index */
 
-    if(rt == 1) {
+    if (rt == 1) {
         mc |= 0x040;    /* Set Response bit to reveice short resp */
     }
 
-    if(rt > 1) {
+    if (rt > 1) {
         mc |= 0x0C0;    /* Set Response and LongResp bit to receive long resp */
     }
 
@@ -417,35 +417,35 @@ static int send_cmd(unsigned int idx, unsigned long arg, unsigned int rt, unsign
     //Timer[1] = 100;
     uint32_t timerstart = hwtimer_now();
 
-    for(;;) {						/* Wait for end of the cmd/resp transaction */
+    for (;;) {						/* Wait for end of the cmd/resp transaction */
 
         //if (!Timer[1]) return 0;
-        if(hwtimer_now() - timerstart > 10000) {
+        if (hwtimer_now() - timerstart > 10000) {
             return 0;
         }
 
         s = MCI_STATUS;				/* Get the transaction status */
 
-        if(rt == 0) {
-            if(s & 0x080) {
+        if (rt == 0) {
+            if (s & 0x080) {
                 return 1;    /* CmdSent */
             }
         }
         else {
-            if(s & 0x040) {
+            if (s & 0x040) {
                 break;    /* CmdRespEnd */
             }
 
-            if(s & 0x001) {
+            if (s & 0x001) {
                 /* CmdCrcFail */
-                if(idx == 1 || idx == 12 || idx == 41) { /* Ignore CRC error on CMD1/12/41 */
+                if (idx == 1 || idx == 12 || idx == 41) { /* Ignore CRC error on CMD1/12/41 */
                     break;
                 }
 
                 return 0;
             }
 
-            if(s & 0x004) {
+            if (s & 0x004) {
                 return 0;    /* CmdTimeOut */
             }
         }
@@ -453,7 +453,7 @@ static int send_cmd(unsigned int idx, unsigned long arg, unsigned int rt, unsign
 
     buff[0] = MCI_RESP0;			/* Read the response words */
 
-    if(rt == 2) {
+    if (rt == 2) {
         buff[1] = MCI_RESP1;
         buff[2] = MCI_RESP2;
         buff[3] = MCI_RESP3;
@@ -480,8 +480,8 @@ static int wait_ready(unsigned short tmr)
     uint32_t stoppoll = hwtimer_now() + tmr * 100;
     bool bBreak = false;
 
-    while(hwtimer_now() < stoppoll/*Timer[0]*/) {
-        if(send_cmd(CMD13, (unsigned long) CardRCA << 16, 1, &rc) && ((rc & 0x01E00) == 0x00800)) {
+    while (hwtimer_now() < stoppoll/*Timer[0]*/) {
+        if (send_cmd(CMD13, (unsigned long) CardRCA << 16, 1, &rc) && ((rc & 0x01E00) == 0x00800)) {
             bBreak = true;
             break;
         }
@@ -529,7 +529,7 @@ DSTATUS MCI_initialize(void)
     unsigned long resp[4];
     unsigned char ty;
 
-    if(Stat & STA_NODISK) {
+    if (Stat & STA_NODISK) {
         return Stat;    /* No card in the socket */
     }
 
@@ -551,23 +551,23 @@ DSTATUS MCI_initialize(void)
     uint32_t start = hwtimer_now();
 
     /* SDC Ver2 */
-    if(send_cmd(CMD8, 0x1AA, 1, resp) && (resp[0] & 0xFFF) == 0x1AA) {
+    if (send_cmd(CMD8, 0x1AA, 1, resp) && (resp[0] & 0xFFF) == 0x1AA) {
         /* The card can work at vdd range of 2.7-3.6V */
         DEBUG("SDC Ver. 2\n");
 
         do {									/* Wait while card is busy state (use ACMD41 with HCS bit) */
             /* This loop will take a time. Insert wai_tsk(1) here for multitask envilonment. */
-            if(hwtimer_now() > start + 1000000/*!Timer[0]*/) {
+            if (hwtimer_now() > start + 1000000/*!Timer[0]*/) {
                 DEBUG("%s, %d: Timeout #1\n", __FILE__, __LINE__);
                 goto di_fail;
             }
         }
-        while(!send_cmd(ACMD41, 0x40FF8000, 1, resp) || !(resp[0] & 0x80000000));
+        while (!send_cmd(ACMD41, 0x40FF8000, 1, resp) || !(resp[0] & 0x80000000));
 
         ty = (resp[0] & 0x40000000) ? CT_SD2 | CT_BLOCK : CT_SD2;	/* Check CCS bit in the OCR */
     }
     else {									/* SDC Ver1 or MMC */
-        if(send_cmd(ACMD41, 0x00FF8000, 1, resp)) {
+        if (send_cmd(ACMD41, 0x00FF8000, 1, resp)) {
             DEBUG("SDC Ver. 1\n");
             ty = CT_SD1;
             cmd = ACMD41;			/* ACMD41 is accepted -> SDC Ver1 */
@@ -582,13 +582,13 @@ DSTATUS MCI_initialize(void)
             DEBUG("%s, %d: %lX\n", __FILE__, __LINE__, resp[0]);
 
             /* This loop will take a time. Insert wai_tsk(1) here for multitask envilonment. */
-            if(hwtimer_now() > start + 1000000/*!Timer[0]*/) {
+            if (hwtimer_now() > start + 1000000/*!Timer[0]*/) {
                 DEBUG("now: %lu, started at: %lu\n", hwtimer_now(), start);
                 DEBUG("%s, %d: Timeout #2\n", __FILE__, __LINE__);
                 goto di_fail;
             }
         }
-        while(!send_cmd(cmd, 0x00FF8000, 1, resp) || !(resp[0] & 0x80000000));
+        while (!send_cmd(cmd, 0x00FF8000, 1, resp) || !(resp[0] & 0x80000000));
     }
 
     CardType = ty;							/* Save card type */
@@ -596,19 +596,19 @@ DSTATUS MCI_initialize(void)
 
     /*---- Card is 'ready' state ----*/
 
-    if(!send_cmd(CMD2, 0, 2, resp)) {
+    if (!send_cmd(CMD2, 0, 2, resp)) {
         DEBUG("%s, %d: Failed entering ident state", __FILE__, __LINE__);
         goto di_fail;	/* Enter ident state */
     }
 
-    for(n = 0; n < 4; n++) {
+    for (n = 0; n < 4; n++) {
         bswap_cp(&CardInfo[n * 4 + 16], &resp[n]);    /* Save CID */
     }
 
     /*---- Card is 'ident' state ----*/
 
-    if(ty & CT_SDC) {						/* SDC: Get generated RCA and save it */
-        if(!send_cmd(CMD3, 0, 1, resp)) {
+    if (ty & CT_SDC) {						/* SDC: Get generated RCA and save it */
+        if (!send_cmd(CMD3, 0, 1, resp)) {
             DEBUG("%s, %d: Failed generating RCA\n", __FILE__, __LINE__);
             goto di_fail;
         }
@@ -616,7 +616,7 @@ DSTATUS MCI_initialize(void)
         CardRCA = (unsigned short)(resp[0] >> 16);
     }
     else {								/* MMC: Assign RCA to the card */
-        if(!send_cmd(CMD3, 1 << 16, 1, resp)) {
+        if (!send_cmd(CMD3, 1 << 16, 1, resp)) {
             goto di_fail;
         }
 
@@ -625,23 +625,23 @@ DSTATUS MCI_initialize(void)
 
     /*---- Card is 'stby' state ----*/
 
-    if(!send_cmd(CMD9, (unsigned long)CardRCA << 16, 2, resp)) {	/* Get CSD and save it */
+    if (!send_cmd(CMD9, (unsigned long)CardRCA << 16, 2, resp)) {	/* Get CSD and save it */
         goto di_fail;
     }
 
-    for(n = 0; n < 4; n++) {
+    for (n = 0; n < 4; n++) {
         bswap_cp(&CardInfo[n * 4], &resp[n]);
     }
 
-    if(!send_cmd(CMD7, (unsigned long)CardRCA << 16, 1, resp)) {	/* Select card */
+    if (!send_cmd(CMD7, (unsigned long)CardRCA << 16, 1, resp)) {	/* Select card */
         //printf("MCI CMD7 fail\n");
         goto di_fail;
     }
 
     /*---- Card is 'tran' state ----*/
 
-    if(!(ty & CT_BLOCK)) {		/* Set data block length to 512 (for byte addressing cards) */
-        if(!send_cmd(CMD16, 512, 1, resp) || (resp[0] & 0xFDF90000)) {
+    if (!(ty & CT_BLOCK)) {		/* Set data block length to 512 (for byte addressing cards) */
+        if (!send_cmd(CMD16, 512, 1, resp) || (resp[0] & 0xFDF90000)) {
             //printf("MCI CMD16 fail\n");
             goto di_fail;
         }
@@ -649,8 +649,8 @@ DSTATUS MCI_initialize(void)
 
 #if USE_4BIT
 
-    if(ty & CT_SDC) {		/* Set wide bus mode (for SDCs) */
-        if(!send_cmd(ACMD6, 2, 1, resp)	/* Set bus mode of SDC */
+    if (ty & CT_SDC) {		/* Set wide bus mode (for SDCs) */
+        if (!send_cmd(ACMD6, 2, 1, resp)	/* Set bus mode of SDC */
            || (resp[0] & 0xFDF90000)) {
             //printf("MCI ACMD6 fail\n");
             goto di_fail;
@@ -703,19 +703,19 @@ DRESULT MCI_read(unsigned char *buff, unsigned long sector, unsigned char count)
     unsigned char rp;
 
 
-    if(count < 1 || count > 127) {
+    if (count < 1 || count > 127) {
         return RES_PARERR;    /* Check parameter */
     }
 
-    if(Stat & STA_NOINIT) {
+    if (Stat & STA_NOINIT) {
         return RES_NOTRDY;    /* Check drive status */
     }
 
-    if(!(CardType & CT_BLOCK)) {
+    if (!(CardType & CT_BLOCK)) {
         sector *= 512;    /* Convert LBA to byte address if needed */
     }
 
-    if(!wait_ready(500)) {
+    if (!wait_ready(500)) {
         return RES_ERROR;    /* Make sure that card is tran state */
     }
 
@@ -723,17 +723,17 @@ DRESULT MCI_read(unsigned char *buff, unsigned long sector, unsigned char count)
 
     cmd = (count > 1) ? CMD18 : CMD17;		/* Transfer type: Single block or Multiple block */
 
-    if(send_cmd(cmd, sector, 1, &resp)		/* Start to read */
+    if (send_cmd(cmd, sector, 1, &resp)		/* Start to read */
        && !(resp & 0xC0580000)) {
         rp = 0;
 
         do {
-            while((rp == XferWp) && !(XferStat & 0xC)) {
+            while ((rp == XferWp) && !(XferStat & 0xC)) {
                 /* Wait for block arrival */
                 /* This loop will take a time. Replace it with sync process for multitask envilonment. */
             }
 
-            if(XferStat & 0xC) {
+            if (XferStat & 0xC) {
                 break; /* Abort if any error has occured */
             }
 
@@ -741,15 +741,15 @@ DRESULT MCI_read(unsigned char *buff, unsigned long sector, unsigned char count)
 
             XferRp = rp = (rp + 1) % N_BUF; /* Next DMA buffer */
 
-            if(XferStat & 0xC) {
+            if (XferStat & 0xC) {
                 break; /* Abort if overrun has occured */
             }
 
             buff += 512; /* Next user buffer address */
         }
-        while(--count);
+        while (--count);
 
-        if(cmd == CMD18) { /* Terminate to read (MB) */
+        if (cmd == CMD18) { /* Terminate to read (MB) */
             send_cmd(CMD12, 0, 1, &resp);
         }
     }
@@ -777,33 +777,33 @@ DRESULT MCI_write(const unsigned char *buff, unsigned long sector, unsigned char
     unsigned int cmd;
     unsigned char wp, xc;
 
-    if(count < 1 || count > 127) {
+    if (count < 1 || count > 127) {
         return RES_PARERR;    /* Check parameter */
     }
 
-    if(Stat & STA_NOINIT) {
+    if (Stat & STA_NOINIT) {
         return RES_NOTRDY;    /* Check drive status */
     }
 
-    if(Stat & STA_PROTECT) {
+    if (Stat & STA_PROTECT) {
         return RES_WRPRT;    /* Check write protection */
     }
 
-    if(!(CardType & CT_BLOCK)) {
+    if (!(CardType & CT_BLOCK)) {
         sector *= 512;    /* Convert LBA to byte address if needed */
     }
 
-    if(!wait_ready(500)) {
+    if (!wait_ready(500)) {
         return RES_ERROR;    /* Make sure that card is tran state */
     }
 
-    if(count == 1) {	/* Single block write */
+    if (count == 1) {	/* Single block write */
         cmd = CMD24;
     }
     else {			/* Multiple block write */
         cmd = (CardType & CT_SDC) ? ACMD23 : CMD23;
 
-        if(!send_cmd(cmd, count, 1, &rc)		/* Preset number of blocks to write */
+        if (!send_cmd(cmd, count, 1, &rc)		/* Preset number of blocks to write */
            || (rc & 0xC0580000)) {
             return RES_ERROR;
         }
@@ -811,7 +811,7 @@ DRESULT MCI_write(const unsigned char *buff, unsigned long sector, unsigned char
         cmd = CMD25;
     }
 
-    if(!send_cmd(cmd, sector, 1, &rc)			/* Send a write command */
+    if (!send_cmd(cmd, sector, 1, &rc)			/* Send a write command */
        || (rc & 0xC0580000)) {
         return RES_ERROR;
     }
@@ -825,24 +825,24 @@ DRESULT MCI_write(const unsigned char *buff, unsigned long sector, unsigned char
         count--;
         buff += 512; 			 			/* Next user buffer address */
     }
-    while(count && wp < N_BUF);
+    while (count && wp < N_BUF);
 
     XferWp = wp = wp % N_BUF;
     start_transmission(xc);						/* Start transmission */
 
-    while(count) {
-        while((wp == XferRp) && !(XferStat & 0xC)) {	/* Wait for block FIFO not full */
+    while (count) {
+        while ((wp == XferRp) && !(XferStat & 0xC)) {	/* Wait for block FIFO not full */
             /* This loop will take a time. Replace it with sync process for multitask envilonment. */
         }
 
-        if(XferStat & 0xC) {
+        if (XferStat & 0xC) {
             break;    /* Abort if block underrun or any MCI error has occured */
         }
 
         Copy_un2al(DmaBuff[wp], (unsigned char *)(unsigned int)buff, 512);	/* Push a block */
         XferWp = wp = (wp + 1) % N_BUF;				/* Next DMA buffer */
 
-        if(XferStat & 0xC) {
+        if (XferStat & 0xC) {
             break;    /* Abort if block underrun has occured */
         }
 
@@ -850,15 +850,15 @@ DRESULT MCI_write(const unsigned char *buff, unsigned long sector, unsigned char
         buff += 512;						/* Next user buffer address */
     }
 
-    while(!(XferStat & 0xC));					/* Wait for all blocks sent (block underrun) */
+    while (!(XferStat & 0xC));					/* Wait for all blocks sent (block underrun) */
 
-    if(XferStat & 0x8) {
+    if (XferStat & 0x8) {
         count = 1;    /* Abort if any MCI error has occured */
     }
 
     stop_transfer();							/* Close data path */
 
-    if(cmd == CMD25 && (CardType & CT_SDC)) {	/* Terminate to write (SDC w/MB) */
+    if (cmd == CMD25 && (CardType & CT_SDC)) {	/* Terminate to write (SDC w/MB) */
         send_cmd(CMD12, 0, 1, &rc);
     }
 
@@ -883,7 +883,7 @@ DRESULT MCI_ioctl(
     unsigned long resp[4], d, *dp, st, ed;
 
 
-    if(Stat & STA_NOINIT) {
+    if (Stat & STA_NOINIT) {
         return RES_NOTRDY;
     }
 
@@ -891,14 +891,14 @@ DRESULT MCI_ioctl(
 
     switch(ctrl) {
         case CTRL_SYNC :	/* Make sure that all data has been written on the media */
-            if(wait_ready(500)) {	/* Wait for card enters tarn state */
+            if (wait_ready(500)) {	/* Wait for card enters tarn state */
                 res = RES_OK;
             }
 
             break;
 
         case GET_SECTOR_COUNT :	/* Get number of sectors on the disk (unsigned long) */
-            if((CardInfo[0] >> 6) == 1) {	/* SDC CSD v2.0 */
+            if ((CardInfo[0] >> 6) == 1) {	/* SDC CSD v2.0 */
                 d = ((unsigned short)CardInfo[8] << 8) + CardInfo[9] + 1;
                 *(unsigned long *)buff = d << 10;
             }
@@ -917,11 +917,11 @@ DRESULT MCI_ioctl(
             break;
 
         case GET_BLOCK_SIZE :	/* Get erase block size in unit of sectors (unsigned long) */
-            if(CardType & CT_SD2) {	/* SDC ver 2.00 */
+            if (CardType & CT_SD2) {	/* SDC ver 2.00 */
                 *(unsigned long *)buff = 16UL << (CardInfo[10] >> 4);
             }
             else {					/* SDC ver 1.XX or MMC */
-                if(CardType & CT_SD1) {	/* SDC v1 */
+                if (CardType & CT_SD1) {	/* SDC v1 */
                     *(unsigned long *)buff = (((CardInfo[10] & 63) << 1) + ((unsigned short)(CardInfo[11] & 128) >> 7) + 1) << ((CardInfo[13] >> 6) - 1);
                 }
                 else {				/* MMC */
@@ -933,7 +933,7 @@ DRESULT MCI_ioctl(
             break;
 
         case CTRL_ERASE_SECTOR :	/* Erase a block of sectors */
-            if(!(CardType & CT_SDC) || (!(CardInfo[0] >> 6) && !(CardInfo[10] & 0x40))) {
+            if (!(CardType & CT_SDC) || (!(CardInfo[0] >> 6) && !(CardInfo[10] & 0x40))) {
                 break;    /* Check if sector erase can be applied to the card */
             }
 
@@ -941,12 +941,12 @@ DRESULT MCI_ioctl(
             st = dp[0];
             ed = dp[1];
 
-            if(!(CardType & CT_BLOCK)) {
+            if (!(CardType & CT_BLOCK)) {
                 st *= 512;
                 ed *= 512;
             }
 
-            if(send_cmd(CMD32, st, 1, resp) && send_cmd(CMD33, ed, 1, resp) && send_cmd(CMD38, 0, 1, resp) && wait_ready(30000)) {
+            if (send_cmd(CMD32, st, 1, resp) && send_cmd(CMD33, ed, 1, resp) && send_cmd(CMD38, 0, 1, resp) && wait_ready(30000)) {
                 res = RES_OK;
             }
 
@@ -991,15 +991,15 @@ DRESULT MCI_ioctl(
             break;
 
         case MMC_GET_SDSTAT :	/* Receive SD status as a data block (64 bytes) */
-            if(CardType & CT_SDC) {	/* SDC */
-                if(wait_ready(500)) {
+            if (CardType & CT_SDC) {	/* SDC */
+                if (wait_ready(500)) {
                     ready_reception(1, 64);				/* Ready to receive data blocks */
 
-                    if(send_cmd(ACMD13, 0, 1, resp)	/* Start to read */
+                    if (send_cmd(ACMD13, 0, 1, resp)	/* Start to read */
                        && !(resp[0] & 0xC0580000)) {
-                        while((XferWp == 0) && !(XferStat & 0xC));
+                        while ((XferWp == 0) && !(XferStat & 0xC));
 
-                        if(!(XferStat & 0xC)) {
+                        if (!(XferStat & 0xC)) {
                             Copy_al2un(buff, DmaBuff[0], 64);
                             res = RES_OK;
                         }

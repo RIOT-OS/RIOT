@@ -31,7 +31,7 @@ void _get_humidity_handler(char *unused)
     sht11_val_t sht11_val;
     success = sht11_read_sensor(&sht11_val, HUMIDITY | TEMPERATURE);
 
-    if(!success) {
+    if (!success) {
         printf("Error reading SHT11\n");
     }
     else {
@@ -45,7 +45,7 @@ void _get_temperature_handler(char *unused)
     sht11_val_t sht11_val;
     success = sht11_read_sensor(&sht11_val, TEMPERATURE);
 
-    if(!success) {
+    if (!success) {
         printf("Error reading SHT11\n");
     }
     else {
@@ -58,7 +58,7 @@ void _get_weather_handler(char *unused)
     sht11_val_t sht11_val;
     success = sht11_read_sensor(&sht11_val, HUMIDITY | TEMPERATURE);
 
-    if(!success) {
+    if (!success) {
         printf("Error reading SHT11\n");
     }
     else {
@@ -70,7 +70,7 @@ void _get_weather_handler(char *unused)
 
 void _set_offset_handler(char *offset)
 {
-    if(strlen(offset) == 6) {
+    if (strlen(offset) == 6) {
         puts("Usage: offset <OFFSET>");
     }
     else {

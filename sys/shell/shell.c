@@ -38,9 +38,9 @@ static void(*find_handler(const shell_command_t *command_list, char *command))(c
 {
     const shell_command_t *entry = command_list;
 
-    if(entry) {
-        while(entry->name != NULL) {
-            if(strcmp(entry->name, command) == 0) {
+    if (entry) {
+        while (entry->name != NULL) {
+            if (strcmp(entry->name, command) == 0) {
                 return entry->handler;
             }
             else {
@@ -52,8 +52,8 @@ static void(*find_handler(const shell_command_t *command_list, char *command))(c
 #ifdef MODULE_SHELL_COMMANDS
     entry = _shell_command_list;
 
-    while(entry->name != NULL) {
-        if(strcmp(entry->name, command) == 0) {
+    while (entry->name != NULL) {
+        if (strcmp(entry->name, command) == 0) {
             return entry->handler;
         }
         else {
@@ -72,8 +72,8 @@ static void print_help(const shell_command_t *command_list)
     printf("%-20s %s\n", "Command", "Description");
     puts("---------------------------------------");
 
-    if(entry) {
-        while(entry->name != NULL) {
+    if (entry) {
+        while (entry->name != NULL) {
             printf("%-20s %s\n", entry->name, entry->desc);
             entry++;
         }
@@ -82,7 +82,7 @@ static void print_help(const shell_command_t *command_list)
 #ifdef MODULE_SHELL_COMMANDS
     entry = _shell_command_list;
 
-    while(entry->name != NULL) {
+    while (entry->name != NULL) {
         printf("%-20s %s\n", entry->name, entry->desc);
         entry++;
     }
@@ -98,14 +98,14 @@ static void handle_input_line(shell_t *shell, char *line)
 
     void (*handler)(char *) = NULL;
 
-    if(command) {
+    if (command) {
         handler = find_handler(shell->command_list, command);
 
-        if(handler != NULL) {
+        if (handler != NULL) {
             handler(line);
         }
         else {
-            if(strcmp("help", command) == 0) {
+            if (strcmp("help", command) == 0) {
                 print_help(shell->command_list);
             }
             else {
@@ -122,19 +122,19 @@ static int readline(shell_t *shell, char *buf, size_t size)
     char *line_buf_ptr = buf;
     int c;
 
-    while(1) {
-        if((line_buf_ptr - buf) >= ((int) size) - 1) {
+    while (1) {
+        if ((line_buf_ptr - buf) >= ((int) size) - 1) {
             return -1;
         }
 
         c = shell->readchar();
         shell->put_char(c);
 
-        if(c == 13) {
+        if (c == 13) {
             continue;
         }
 
-        if(c == 10) {
+        if (c == 10) {
             *line_buf_ptr = '\0';
             return 0;
         }
@@ -159,10 +159,10 @@ void shell_run(shell_t *shell)
 
     print_prompt(shell);
 
-    while(1) {
+    while (1) {
         int res = readline(shell, line_buf, sizeof(line_buf));
 
-        if(! res) {
+        if (!res) {
             char *line_copy = strdup(line_buf);
             handle_input_line(shell, line_copy);
             free(line_copy);

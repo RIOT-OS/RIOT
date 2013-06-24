@@ -20,7 +20,7 @@ struct hashtable;
  *
  *      (initialise k and v to suitable values)
  *
- *      if (! hashtable_insert(h,k,v) )
+ *      if (!hashtable_insert(h,k,v) )
  *      {     exit(-1);               }
  *
  *      if (NULL == (found = hashtable_search(h,k) ))

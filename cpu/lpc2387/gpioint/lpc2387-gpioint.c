@@ -87,21 +87,21 @@ gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
     unsigned long cpsr = disableIRQ();
     *en_clr |= bitmask; 										/* clear interrupt */
 
-    if((flags & GPIOINT_FALLING_EDGE) != 0) {
+    if ((flags & GPIOINT_FALLING_EDGE) != 0) {
         *en_f |= bitmask; 										/* enable falling edge */
     }
     else {
         *en_f &= ~bitmask; 										/* disable falling edge */
     }
 
-    if((flags & GPIOINT_RISING_EDGE) != 0) {
+    if ((flags & GPIOINT_RISING_EDGE) != 0) {
         *en_r |= bitmask; 										/* enable rising edge */
     }
     else {
         *en_r &= ~bitmask; 										/* disable rising edge */
     }
 
-    if(((flags & (GPIOINT_FALLING_EDGE | GPIOINT_RISING_EDGE)) != 0)) {
+    if (((flags & (GPIOINT_FALLING_EDGE | GPIOINT_RISING_EDGE)) != 0)) {
         cbdata[bit].callback = callback;
 
     }
@@ -119,8 +119,8 @@ static void __attribute__((__no_instrument_function__)) test_irq(int port, unsig
     /* Test each bit of rising and falling masks, if set trigger interrupt
      * on corresponding device */
     do {
-        if((pcb->callback != NULL)) {
-            if((r_mask & 1) | (f_mask & 1)) {
+        if ((pcb->callback != NULL)) {
+            if ((r_mask & 1) | (f_mask & 1)) {
                 pcb->callback();			/* pass to handler */
             }
         }
@@ -129,7 +129,7 @@ static void __attribute__((__no_instrument_function__)) test_irq(int port, unsig
         r_mask >>= 1UL;
         pcb++;
     }
-    while((f_mask != 0) || (r_mask != 0));
+    while ((f_mask != 0) || (r_mask != 0));
 }
 /*---------------------------------------------------------------------------*/
 void GPIO_IRQHandler(void) __attribute__((interrupt("IRQ")));
@@ -142,7 +142,7 @@ void GPIO_IRQHandler(void) __attribute__((interrupt("IRQ")));
  */
 void __attribute__((__no_instrument_function__)) GPIO_IRQHandler(void)
 {
-    if(IO_INT_STAT & BIT0) {										/* interrupt(s) on PORT0 pending */
+    if (IO_INT_STAT & BIT0) {										/* interrupt(s) on PORT0 pending */
         unsigned long int_stat_f = IO0_INT_STAT_F;					/* save content */
         unsigned long int_stat_r = IO0_INT_STAT_R;					/* save content */
 
@@ -152,7 +152,7 @@ void __attribute__((__no_instrument_function__)) GPIO_IRQHandler(void)
         test_irq(0, int_stat_f, int_stat_r, gpioint0);
     }
 
-    if(IO_INT_STAT & BIT2) {										/* interrupt(s) on PORT2 pending */
+    if (IO_INT_STAT & BIT2) {										/* interrupt(s) on PORT2 pending */
         unsigned long int_stat_f = IO2_INT_STAT_F;					/* save content */
         unsigned long int_stat_r = IO2_INT_STAT_R;					/* save content */
 

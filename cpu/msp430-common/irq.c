@@ -12,7 +12,7 @@ unsigned int disableIRQ()
     __asm__("mov.w r2,%0" : "=r"(state));
     state &= GIE;
 
-    if(state) {
+    if (state) {
         dINT();
     }
 
@@ -25,7 +25,7 @@ unsigned int enableIRQ()
     __asm__("mov.w r2,%0" : "=r"(state));
     state &= GIE;
 
-    if(!state) {
+    if (!state) {
         eINT();
     }
 
@@ -34,7 +34,7 @@ unsigned int enableIRQ()
 
 void restoreIRQ(unsigned int state)
 {
-    if(state) {
+    if (state) {
         eINT();
     }
 }

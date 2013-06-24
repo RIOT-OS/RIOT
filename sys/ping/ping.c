@@ -35,7 +35,7 @@ void pong(uint16_t src)
     int trans_ok = cc1100_send_csmaca(src, protocol_id, 2, pipa->payload,
                                       sizeof(pipa->payload));
 
-    if(trans_ok < 0) {
+    if (trans_ok < 0) {
         print_failed();
     }
 }
@@ -56,12 +56,12 @@ void ping(radio_address_t addr, uint8_t channr)
     cc1100_set_channel(channr);
     cc1100_set_address(r_address);
 
-    while(1) {
+    while (1) {
         vtimer_now(&start);
         int trans_ok = cc1100_send_csmaca(addr,
                                           protocol_id, 2, pipa->payload, sizeof(pipa->payload));
 
-        if(trans_ok < 0) {
+        if (trans_ok < 0) {
             print_failed();
         }
 

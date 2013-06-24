@@ -10,7 +10,7 @@
 
 int main(int argc, char **argv)
 {
-    if(argc < 4) {
+    if (argc < 4) {
         fprintf(stderr, "Usage: %s r_addr if_name tty_dev\n", argv[0]);
         return -1;
     }
@@ -22,12 +22,12 @@ int main(int argc, char **argv)
     char tty_dev[DEV_LEN];
     strncpy(tty_dev, argv[3], DEV_LEN);
 
-    if(border_initialize(if_name, addr, tty_dev) == 0) {
+    if (border_initialize(if_name, addr, tty_dev) == 0) {
 #ifdef BORDER_TESTING
         char ping_addr[IPV6_ADDR_LEN];
         float interval;
 
-        if(argc < 9) {
+        if (argc < 9) {
             fprintf(stderr, "Usage: %s r_addr if_name tty_dev ping_id result_dir skeleton_file ping_count interval\n", argv[0]);
             return -1;
         }
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
         start_test(ping_addr, argv[5], argv[6], atoi(argv[7]), interval);
 #else
 
-        while(1);
+        while (1);
 
 #endif
     }

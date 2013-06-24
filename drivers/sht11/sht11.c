@@ -116,8 +116,8 @@ static uint8_t write_byte(uint8_t value)
     SHT11_DATA_OUT;
 
     /* send value bit by bit to sht11 */
-    for(i = 0; i < 8; i++) {
-        if(value & BIT7) {
+    for (i = 0; i < 8; i++) {
+        if (value & BIT7) {
             SHT11_DATA_HIGH;
             hwtimer_wait(SHT11_DATA_WAIT);
         }
@@ -152,12 +152,12 @@ static uint8_t read_byte(uint8_t ack)
     hwtimer_wait(SHT11_DATA_WAIT);
 
     /* read value bit by bit */
-    for(i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++) {
         value = value << 1;
         SHT11_SCK_HIGH;
         hwtimer_wait(SHT11_CLK_WAIT);
 
-        if(SHT11_DATA) {
+        if (SHT11_DATA) {
             /* increase data by one when DATA is high */
             value++;
         }
@@ -169,7 +169,7 @@ static uint8_t read_byte(uint8_t ack)
     /* send ack if necessary */
     SHT11_DATA_OUT;
 
-    if(ack) {
+    if (ack) {
         SHT11_DATA_LOW;
         hwtimer_wait(SHT11_DATA_WAIT);
     }
@@ -233,7 +233,7 @@ static void connection_reset(void)
     SHT11_SCK_LOW;
     hwtimer_wait(SHT11_CLK_WAIT);
 
-    for(i = 0; i < 9; i++) {
+    for (i = 0; i < 9; i++) {
         clk_signal();
     }
 
@@ -252,10 +252,10 @@ static uint8_t measure(uint8_t *p_value, uint8_t *p_checksum, uint8_t mode)
     hwtimer_wait(HWTIMER_TICKS(1000));
 
     /* wait untile sensor has finished measurement or timeout */
-    for(i = 0; (i < SHT11_MEASURE_TIMEOUT) && (!error); i++) {
+    for (i = 0; (i < SHT11_MEASURE_TIMEOUT) && (!error); i++) {
         ack = SHT11_DATA;
 
-        if(!ack) {
+        if (!ack) {
             break;
         }
 
@@ -326,7 +326,7 @@ uint8_t sht11_read_sensor(sht11_val_t *value, sht11_mode_t mode)
     const float T2 = +0.00008;
 
     /* check for valid buffer */
-    if(value == NULL) {
+    if (value == NULL) {
         return 0;
     }
 
@@ -338,30 +338,30 @@ uint8_t sht11_read_sensor(sht11_val_t *value, sht11_mode_t mode)
     connection_reset();
 
     /* measure humidity */
-    if(mode & HUMIDITY) {
+    if (mode & HUMIDITY) {
         error += (!measure((uint8_t *) &humi_int, &checksum, SHT11_MEASURE_HUMI));
     }
 
     /* measure temperature */
-    if(mode & TEMPERATURE) {
+    if (mode & TEMPERATURE) {
         error += (!measure((uint8_t *) &temp_int, &checksum, SHT11_MEASURE_TEMP));
     }
 
     /* break on error */
-    if(error != 0) {
+    if (error != 0) {
         connection_reset();
         mutex_unlock(&sht11_mutex, 0);
         return 0;
     }
 
-    if(mode & TEMPERATURE) {
+    if (mode & TEMPERATURE) {
         value->temperature = D1 + (D2 * ((float) temp_int)) + sht11_temperature_offset;
     }
 
-    if(mode & HUMIDITY) {
+    if (mode & HUMIDITY) {
         value->relhum = C1 + (C2 * ((float) humi_int)) + (C3 * ((float) humi_int) * ((float) humi_int));
 
-        if(mode & TEMPERATURE) {
+        if (mode & TEMPERATURE) {
             value->relhum_temp = (value->temperature - 25) * (T1 + (T2 * (float) humi_int)) + value->relhum;
         }
     }

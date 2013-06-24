@@ -19,7 +19,7 @@ uint8_t serial_in_buf[BUFFER_SIZE];
 
 uint8_t *get_serial_out_buffer(int offset)
 {
-    if(offset > BUFFER_SIZE) {
+    if (offset > BUFFER_SIZE) {
         return NULL;
     }
 
@@ -28,7 +28,7 @@ uint8_t *get_serial_out_buffer(int offset)
 
 uint8_t *get_serial_in_buffer(int offset)
 {
-    if(offset > BUFFER_SIZE) {
+    if (offset > BUFFER_SIZE) {
         return NULL;
     }
 
@@ -56,33 +56,33 @@ int readpacket(uint8_t *packet_buf, size_t size)
     uint8_t esc = 0;
     uint8_t translate = 1;
 
-    while((line_buf_ptr - packet_buf) < size - 1) {
+    while ((line_buf_ptr - packet_buf) < size - 1) {
         byte = serial_read_byte();
 
-        if(translate && byte == END) {
+        if (translate && byte == END) {
             break;
         }
 
-        if(line_buf_ptr == packet_buf && byte != 0) {
+        if (line_buf_ptr == packet_buf && byte != 0) {
             translate = 0;
         }
 
-        if(line_buf_ptr > packet_buf && !translate && byte == '\n') {
+        if (line_buf_ptr > packet_buf && !translate && byte == '\n') {
             *line_buf_ptr++ = '\0';
             return line_buf_ptr - packet_buf;
         }
 
-        if(translate) {
-            if(esc) {
+        if (translate) {
+            if (esc) {
                 esc = 0;
 
                 switch(byte) {
-                    case(END_ESC): {
+                    case (END_ESC): {
                         *line_buf_ptr++ = END;
                         continue;
                     }
 
-                    case(ESC_ESC): {
+                    case (ESC_ESC): {
                         *line_buf_ptr++ = ESC;
                         continue;
                     }
@@ -92,7 +92,7 @@ int readpacket(uint8_t *packet_buf, size_t size)
                 }
             }
 
-            if(byte == ESC) {
+            if (byte == ESC) {
                 esc = 1;
                 continue;
             }
@@ -112,20 +112,20 @@ int writepacket(uint8_t *packet_buf, size_t size)
     uint8_t *byte_ptr = packet_buf;
     uint8_t *tmp_ptr = packet_tmp;
 
-    if(2 * size + 1 > BUFFER_SIZE) {
+    if (2 * size + 1 > BUFFER_SIZE) {
         return -1;
     }
 
-    while((byte_ptr - packet_buf) < size) {
+    while ((byte_ptr - packet_buf) < size) {
         switch(*byte_ptr) {
-            case(END): {
+            case (END): {
                 *byte_ptr = END_ESC;
                 *tmp_ptr = ESC;
                 tmp_ptr++;
                 break;
             }
 
-            case(ESC): {
+            case (ESC): {
                 *byte_ptr = ESC_ESC;
                 *tmp_ptr = ESC;
                 tmp_ptr++;
@@ -151,18 +151,18 @@ int writepacket(uint8_t *packet_buf, size_t size)
 void demultiplex(const border_packet_t *packet, int len)
 {
     switch(packet->type) {
-        case(BORDER_PACKET_RAW_TYPE): {
+        case (BORDER_PACKET_RAW_TYPE): {
             printf("\033[00;33m[via serial interface] %s\033[00m\n",
                    ((unsigned char *)packet) + sizeof(border_packet_t)
                   );
             break;
         }
 
-        case(BORDER_PACKET_L3_TYPE): {
+        case (BORDER_PACKET_L3_TYPE): {
             border_l3_header_t *l3_header_buf = (border_l3_header_t *)packet;
 
             switch(l3_header_buf->ethertype) {
-                case(ETHERTYPE_IPV6): {
+                case (ETHERTYPE_IPV6): {
                     printf("INFO: IPv6-Packet %d received\n", l3_header_buf->seq_num);
                     struct ip6_hdr *ip6_buf = (struct ip6_hdr *)(((unsigned char *)packet) + sizeof(border_l3_header_t));
                     border_send_ipv6_over_tun(get_tun_fd(), ip6_buf);
@@ -177,24 +177,24 @@ void demultiplex(const border_packet_t *packet, int len)
             break;
         }
 
-        case(BORDER_PACKET_CONF_TYPE): {
+        case (BORDER_PACKET_CONF_TYPE): {
             border_conf_header_t *conf_header_buf = (border_conf_header_t *)packet;
 
             switch(conf_header_buf->conftype) {
-                case(BORDER_CONF_SYNACK): {
+                case (BORDER_CONF_SYNACK): {
                     printf("INFO: SYNACK-Packet %d received\n", conf_header_buf->seq_num);
                     signal_connection_established();
                     break;
                 }
 
-                case(BORDER_CONF_CONTEXT): {
+                case (BORDER_CONF_CONTEXT): {
                     printf("INFO: Context packet (%d) received, "
                            "but nothing is implemented yet for this case.\n",
                            conf_header_buf->seq_num);
                     break;
                 }
 
-                case(BORDER_CONF_IPADDR): {
+                case (BORDER_CONF_IPADDR): {
                     char str_addr[IPV6_ADDR_LEN];
                     border_addr_packet_t *addr_packet = (border_addr_packet_t *)packet;
 

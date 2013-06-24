@@ -39,20 +39,20 @@ uint8_t	flashrom_write(uint8_t *dst, char *src, size_t size)
 
     sec = iap_get_sector((uint32_t) dst);
 
-    if(sec == INVALID_ADDRESS) {
+    if (sec == INVALID_ADDRESS) {
         DEBUG("Invalid address\n");
         return 0;
     }
 
     /* check sector */
-    if(blank_check_sector(sec, sec) == SECTOR_NOT_BLANK) {
+    if (blank_check_sector(sec, sec) == SECTOR_NOT_BLANK) {
         DEBUG("Warning: Sector %i not blank\n", sec);
     }
 
     /* prepare sector */
     err = prepare_sectors(sec, sec);
 
-    if(err) {
+    if (err) {
         DEBUG("\n-- ERROR: PREPARE_SECTOR_FOR_WRITE_OPERATION: %u\n", err);
         return 0;
     }
@@ -62,7 +62,7 @@ uint8_t	flashrom_write(uint8_t *dst, char *src, size_t size)
         err = copy_ram_to_flash((uint32_t) dst, (uint32_t) src, 256);
         restoreIRQ(intstate);
 
-        if(err) {
+        if (err) {
             DEBUG("ERROR: COPY_RAM_TO_FLASH: %u\n", err);
             /* set interrupts back and return */
             restoreIRQ(intstate);
@@ -72,7 +72,7 @@ uint8_t	flashrom_write(uint8_t *dst, char *src, size_t size)
         else {
             err = compare((uint32_t) dst, (uint32_t) src, 256);
 
-            if(err) {
+            if (err) {
                 DEBUG("ERROR: COMPARE: %i (at position %u)\n", err, iap_result[1]);
                 return 0;
             }
@@ -90,19 +90,19 @@ uint8_t flashrom_erase(uint8_t *addr)
     uint8_t sec = iap_get_sector((uint32_t) addr);
     unsigned intstate;
 
-    if(sec == INVALID_ADDRESS) {
+    if (sec == INVALID_ADDRESS) {
         DEBUG("Invalid address\n");
         return 0;
     }
 
     /* check sector */
-    if(!blank_check_sector(sec, sec)) {
+    if (!blank_check_sector(sec, sec)) {
         DEBUG("Sector already blank!\n");
         return 1;
     }
 
     /* prepare sector */
-    if(prepare_sectors(sec, sec)) {
+    if (prepare_sectors(sec, sec)) {
         DEBUG("-- ERROR: PREPARE_SECTOR_FOR_WRITE_OPERATION --\n");
         return 0;
     }
@@ -110,7 +110,7 @@ uint8_t flashrom_erase(uint8_t *addr)
     intstate = disableIRQ();
 
     /* erase sector */
-    if(erase_sectors(sec, sec)) {
+    if (erase_sectors(sec, sec)) {
         DEBUG("-- ERROR: ERASE SECTOR --\n");
         restoreIRQ(intstate);
         return 0;
@@ -119,7 +119,7 @@ uint8_t flashrom_erase(uint8_t *addr)
     restoreIRQ(intstate);
 
     /* check again */
-    if(blank_check_sector(sec, sec)) {
+    if (blank_check_sector(sec, sec)) {
         DEBUG("-- ERROR: BLANK_CHECK_SECTOR\n");
         return 0;
     }

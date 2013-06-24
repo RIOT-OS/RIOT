@@ -35,13 +35,13 @@ create_hashtable(uint32_t minsize,
     unsigned int pindex, size = primes[0];
 
     /* Check requested hashtable isn't too large */
-    if(minsize > (1u << 30)) {
+    if (minsize > (1u << 30)) {
         return NULL;
     }
 
     /* Enforce size as prime */
-    for(pindex = 0; pindex < prime_table_length; pindex++) {
-        if(primes[pindex] > minsize) {
+    for (pindex = 0; pindex < prime_table_length; pindex++) {
+        if (primes[pindex] > minsize) {
             size = primes[pindex];
             break;
         }
@@ -49,13 +49,13 @@ create_hashtable(uint32_t minsize,
 
     h = (struct hashtable *)malloc(sizeof(struct hashtable));
 
-    if(NULL == h) {
+    if (NULL == h) {
         return NULL;    /*oom*/
     }
 
     h->table = (struct entry **)malloc(sizeof(struct entry *) * size);
 
-    if(NULL == h->table) {
+    if (NULL == h->table) {
         free(h);    /*oom*/
         return NULL;
     }
@@ -95,7 +95,7 @@ hashtable_expand(struct hashtable *h)
     unsigned int newsize, i, index;
 
     /* Check we're not hitting max capacity */
-    if(h->primeindex == (prime_table_length - 1)) {
+    if (h->primeindex == (prime_table_length - 1)) {
         return 0;
     }
 
@@ -103,13 +103,13 @@ hashtable_expand(struct hashtable *h)
 
     newtable = (struct entry **)malloc(sizeof(struct entry *) * newsize);
 
-    if(NULL != newtable) {
+    if (NULL != newtable) {
         memset(newtable, 0, newsize * sizeof(struct entry *));
 
         /* This algorithm is not 'stable'. ie. it reverses the list
          * when it transfers entries between the tables */
-        for(i = 0; i < h->tablelength; i++) {
-            while(NULL != (e = h->table[i])) {
+        for (i = 0; i < h->tablelength; i++) {
+            while (NULL != (e = h->table[i])) {
                 h->table[i] = e->next;
                 index = indexFor(newsize, e->h);
                 e->next = newtable[index];
@@ -125,7 +125,7 @@ hashtable_expand(struct hashtable *h)
         newtable = (struct entry **)
                    realloc(h->table, newsize * sizeof(struct entry *));
 
-        if(NULL == newtable) {
+        if (NULL == newtable) {
             (h->primeindex)--;
             return 0;
         }
@@ -133,11 +133,11 @@ hashtable_expand(struct hashtable *h)
         h->table = newtable;
         memset(newtable[h->tablelength], 0, newsize - h->tablelength);
 
-        for(i = 0; i < h->tablelength; i++) {
-            for(pE = &(newtable[i]), e = *pE; e != NULL; e = *pE) {
+        for (i = 0; i < h->tablelength; i++) {
+            for (pE = &(newtable[i]), e = *pE; e != NULL; e = *pE) {
                 index = indexFor(newsize, e->h);
 
-                if(index == i) {
+                if (index == i) {
                     pE = &(e->next);
                 }
                 else {
@@ -169,7 +169,7 @@ hashtable_insert(struct hashtable *h, void *k, void *v)
     unsigned int index;
     struct entry *e;
 
-    if(++(h->entrycount) > h->loadlimit) {
+    if (++(h->entrycount) > h->loadlimit) {
         /* Ignore the return value. If expand fails, we should
          * still try cramming just this value into the existing table
          * -- we may not have memory for a larger table, but one more
@@ -179,7 +179,7 @@ hashtable_insert(struct hashtable *h, void *k, void *v)
 
     e = (struct entry *)malloc(sizeof(struct entry));
 
-    if(NULL == e) {
+    if (NULL == e) {
         --(h->entrycount);    /*oom*/
         return 0;
     }
@@ -203,9 +203,9 @@ hashtable_search(struct hashtable *h, void *k)
     index = indexFor(h->tablelength, hashvalue);
     e = h->table[index];
 
-    while(NULL != e) {
+    while (NULL != e) {
         /* Check hash value to short circuit heavier comparison */
-        if((hashvalue == e->h) && (h->eqfn(k, e->k))) {
+        if ((hashvalue == e->h) && (h->eqfn(k, e->k))) {
             return e->v;
         }
 
@@ -232,9 +232,9 @@ hashtable_remove(struct hashtable *h, void *k)
     pE = &(h->table[index]);
     e = *pE;
 
-    while(NULL != e) {
+    while (NULL != e) {
         /* Check hash value to short circuit heavier comparison */
-        if((hashvalue == e->h) && (h->eqfn(k, e->k))) {
+        if ((hashvalue == e->h) && (h->eqfn(k, e->k))) {
             *pE = e->next;
             h->entrycount--;
             v = e->v;
@@ -259,11 +259,11 @@ hashtable_destroy(struct hashtable *h, int free_values)
     struct entry *e, *f;
     struct entry **table = h->table;
 
-    if(free_values) {
-        for(i = 0; i < h->tablelength; i++) {
+    if (free_values) {
+        for (i = 0; i < h->tablelength; i++) {
             e = table[i];
 
-            while(NULL != e) {
+            while (NULL != e) {
                 f = e;
                 e = e->next;
                 freekey(f->k);
@@ -273,10 +273,10 @@ hashtable_destroy(struct hashtable *h, int free_values)
         }
     }
     else {
-        for(i = 0; i < h->tablelength; i++) {
+        for (i = 0; i < h->tablelength; i++) {
             e = table[i];
 
-            while(NULL != e) {
+            while (NULL != e) {
                 f = e;
                 e = e->next;
                 freekey(f->k);

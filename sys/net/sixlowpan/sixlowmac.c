@@ -132,10 +132,10 @@ void recv_ieee802154_frame(void)
 
     msg_init_queue(msg_q, RADIO_RCV_BUF_SIZE);
 
-    while(1) {
+    while (1) {
         msg_receive(&m);
 
-        if(m.type == PKT_PENDING) {
+        if (m.type == PKT_PENDING) {
 
             p = (radio_packet_t *) m.content.ptr;
             hdrlen = read_802154_frame(p->data, &frame, p->length);
@@ -148,7 +148,7 @@ void recv_ieee802154_frame(void)
 
             p->processing--;
         }
-        else if(m.type == ENOBUFFER) {
+        else if (m.type == ENOBUFFER) {
             puts("Transceiver buffer full");
         }
         else {
@@ -216,7 +216,7 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
 
     p.length = hdrlen + frame.payload_len;
 
-    if(mcast == 0) {
+    if (mcast == 0) {
         p.dst = daddr;
     }
     else {

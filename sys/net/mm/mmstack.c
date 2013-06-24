@@ -188,45 +188,45 @@ static route_interface_t r_iface = {
 ASCCMD(route, CMDFLAG_SERIAL, "[-adfFg] print kernel route table");
 CMD_FUNCTION(route, cmdargs)
 {
-    if(cmdargs->arg_size > 0) {
+    if (cmdargs->arg_size > 0) {
         char *msg = (char *)cmdargs->args;
 
-        while(*msg == ' ') {
+        while (*msg == ' ') {
             msg++;
         }
 
-        if(*msg == '-' && *(msg + 1) == 'f') {
+        if (*msg == '-' && *(msg + 1) == 'f') {
             mms_flush_routes(false);
             printf("Kernel route table flushed (non-static)!\n");
             return CMD_SUCCESS;
         }
-        else if(*msg == '-' && *(msg + 1) == 'F') {
+        else if (*msg == '-' && *(msg + 1) == 'F') {
             mms_flush_routes(true);
             printf("Kernel route table flushed (static)!\n");
             return CMD_SUCCESS;
         }
-        else if(*msg == '-' && *(msg + 1) == 'd') {
+        else if (*msg == '-' && *(msg + 1) == 'd') {
             msg++;
             msg++;
 
-            while(*msg == ' ') {
+            while (*msg == ' ') {
                 msg++;
             }
 
             uint16_t address = net_strtoaddr(msg, &msg);
 
-            if(rt_remove_static_route(address)) {
+            if (rt_remove_static_route(address)) {
                 printf("Static route deleted successfully!\n");
                 return CMD_SUCCESS;
             }
 
             return CMD_ERROR;
         }
-        else if(*msg == '-' && *(msg + 1) == 'g') {
+        else if (*msg == '-' && *(msg + 1) == 'g') {
             msg++;
             msg++;
 
-            while(*msg == ' ') {
+            while (*msg == ' ') {
                 msg++;
             }
 
@@ -235,11 +235,11 @@ CMD_FUNCTION(route, cmdargs)
             printf("%u static route(s) deleted!\n", c);
             return CMD_SUCCESS;
         }
-        else if(*msg == '-' && *(msg + 1) == 'a') {
+        else if (*msg == '-' && *(msg + 1) == 'a') {
             msg++;
             msg++;
 
-            while(*msg == ' ') {
+            while (*msg == ' ') {
                 msg++;
             }
 
@@ -248,8 +248,8 @@ CMD_FUNCTION(route, cmdargs)
             int metric = (int)strtoul(msg, &msg, 0);
             int iface = (int)strtoul(msg, &msg, 0);
 
-            if(address != 0 && gateway != 0) {
-                if(rt_add_static_route(address, gateway, metric, iface)) {
+            if (address != 0 && gateway != 0) {
+                if (rt_add_static_route(address, gateway, metric, iface)) {
                     printf("Static route added successfully!\n");
                     return CMD_SUCCESS;
                 }
@@ -281,42 +281,42 @@ CMD_FUNCTION(route, cmdargs)
 ASCCMD(ifconfig, CMDFLAG_SERIAL, "[IFACE]: print interface configuration");
 CMD_FUNCTION(ifconfig, cmdargs)
 {
-    if(cmdargs->arg_size > 0) {
+    if (cmdargs->arg_size > 0) {
         char *msg;
         int iface = (int)strtoul(cmdargs->args, &msg, 0);
 
-        if(cmdargs->arg_size > 1) {
-            while(*msg == ' ') {
+        if (cmdargs->arg_size > 1) {
+            while (*msg == ' ') {
                 msg++;
             }
 
-            if(*msg == '-' && (*(msg + 1) == 'P' || *(msg + 1) == 'p')) {
+            if (*msg == '-' && (*(msg + 1) == 'P' || *(msg + 1) == 'p')) {
                 msg++;
                 msg++;
                 uint8_t power = (uint8_t)strtoul(msg, &msg, 0);
 
-                if(*msg != '\0') {
+                if (*msg != '\0') {
                     return CMD_ERROR;
                 }
 
-                if(mms_set_output_power(iface, power)) {
+                if (mms_set_output_power(iface, power)) {
                     printf("Output power set!\n");
                     return CMD_SUCCESS;
                 }
 
                 return CMD_ERROR;
             }
-            else if(*msg == '-' && (*(msg + 1) == 'A' || *(msg + 1) == 'a')) {
+            else if (*msg == '-' && (*(msg + 1) == 'A' || *(msg + 1) == 'a')) {
                 msg++;
                 msg++;
 
-                while(*msg == ' ') {
+                while (*msg == ' ') {
                     msg++;
                 }
 
                 uint16_t address = net_strtoaddr(msg, &msg);
 
-                if(mms_set_interface_address(iface, address)) {
+                if (mms_set_interface_address(iface, address)) {
                     printf("Interface address set!\n");
                     return CMD_SUCCESS;
                 }
@@ -344,7 +344,7 @@ CMD_FUNCTION(ifconfig, cmdargs)
 ASCCMD(ping, CMDFLAG_SERIAL, "ping [-bchpstw] destination");
 CMD_FUNCTION(ping, cmdargs)
 {
-    if(cmdargs->arg_size > 0) {
+    if (cmdargs->arg_size > 0) {
         int i;
         msg m;
         uint8_t count = MMS_PING_PACKETS;
@@ -358,26 +358,26 @@ CMD_FUNCTION(ping, cmdargs)
         const char *msg = cmdargs->args;
     read_ping_cmd:
 
-        while(*msg == ' ') {
+        while (*msg == ' ') {
             msg++;
         }
 
-        if(*msg == '-' && (*(msg + 1) == 'B' || *(msg + 1) == 'b')) {
+        if (*msg == '-' && (*(msg + 1) == 'B' || *(msg + 1) == 'b')) {
             bc = true;
             msg++;
             msg++;
             goto read_ping_cmd;
         }
-        else if(*msg == '-' && (*(msg + 1) == 'C' || *(msg + 1) == 'c')) {
+        else if (*msg == '-' && (*(msg + 1) == 'C' || *(msg + 1) == 'c')) {
             msg++;
             msg++;
             unsigned long tc = strtoul(msg, (char **)&msg, 0);
 
-            if(tc == 0) {
+            if (tc == 0) {
                 return CMD_ERROR;
             }
 
-            if(tc > 255) {
+            if (tc > 255) {
                 puts("Not more than 255 ping messages allowed!");
                 return CMD_ERROR;
             }
@@ -385,7 +385,7 @@ CMD_FUNCTION(ping, cmdargs)
             count = (uint8_t) tc;
             goto read_ping_cmd;
         }
-        else if(*msg == '-' && (*(msg + 1) == 'H' || *(msg + 1) == 'h')) {
+        else if (*msg == '-' && (*(msg + 1) == 'H' || *(msg + 1) == 'h')) {
             printf("Usage: ping [-bchpstw] destination\n\n");
             printf("        -b, do a broadcast ping\n");
             printf("        -c <COUNT>, set number of ping messages\n");
@@ -399,19 +399,19 @@ CMD_FUNCTION(ping, cmdargs)
             printf("        -w <WAIT>, time to wait for a response, in seconds (default: 3)\n\n");
             return CMD_SUCCESS;
         }
-        else if(*msg == '-' && (*(msg + 1) == 'p' || *(msg + 1) == 'P')) {
+        else if (*msg == '-' && (*(msg + 1) == 'p' || *(msg + 1) == 'P')) {
             msg++;
             msg++;
             unsigned long tp = strtoul(msg, (char **)&msg, 0);
 
-            if(tp == 0) {
+            if (tp == 0) {
                 return CMD_ERROR;
             }
 
-            if(tp == 1) {
+            if (tp == 1) {
                 prio = 0;
             }
-            else if(tp == 2) {
+            else if (tp == 2) {
                 prio = 1;
             }
             else {
@@ -420,30 +420,30 @@ CMD_FUNCTION(ping, cmdargs)
 
             goto read_ping_cmd;
         }
-        else if(*msg == '-' && (*(msg + 1) == 's' || *(msg + 1) == 'S')) {
+        else if (*msg == '-' && (*(msg + 1) == 's' || *(msg + 1) == 'S')) {
             ping_silent_mode = true;
             msg++;
             msg++;
             goto read_ping_cmd;
         }
-        else if(*msg == '-' && (*(msg + 1) == 't' || *(msg + 1) == 'T')) {
+        else if (*msg == '-' && (*(msg + 1) == 't' || *(msg + 1) == 'T')) {
             msg++;
             msg++;
             unsigned long to = strtoul(msg, (char **)&msg, 0);
 
-            if(to == 0 || to > 255) {
+            if (to == 0 || to > 255) {
                 return CMD_ERROR;
             }
 
             ttl = to;
             goto read_ping_cmd;
         }
-        else if(*msg == '-' && (*(msg + 1) == 'w' || *(msg + 1) == 'W')) {
+        else if (*msg == '-' && (*(msg + 1) == 'w' || *(msg + 1) == 'W')) {
             msg++;
             msg++;
             unsigned long to = strtoul(msg, (char **)&msg, 0);
 
-            if(to == 0) {
+            if (to == 0) {
                 return CMD_ERROR;
             }
 
@@ -453,20 +453,20 @@ CMD_FUNCTION(ping, cmdargs)
 
         uint16_t address = net_strtoaddr((char *)msg, (char **)&msg);
 
-        if(address == 0) {
+        if (address == 0) {
             return CMD_ERROR;
         }
 
         int iface_addr = net_get_address_in_subnet(address);
 
         /* No ping to unsupported network or own address */
-        if(iface_addr == 0 || iface_addr == address) {
+        if (iface_addr == 0 || iface_addr == address) {
             return CMD_ERROR;
         }
 
         /* If broadcast destination address, limit TTL to one hop */
-        if(address == NETWORK_ADDR_BC(address)) {
-            if(!bc) {
+        if (address == NETWORK_ADDR_BC(address)) {
+            if (!bc) {
                 puts("Do you want to ping broadcast? Then -b");
                 return CMD_ERROR;
             }
@@ -478,7 +478,7 @@ CMD_FUNCTION(ping, cmdargs)
         /* Try to malloc duplicate detection buffer */
         dups = (bool *) malloc(count * sizeof(bool));
 
-        if(dups == NULL) {
+        if (dups == NULL) {
             puts("Not enough system memory to fulfill your request!");
             return CMD_ERROR;
         }
@@ -494,7 +494,7 @@ CMD_FUNCTION(ping, cmdargs)
         mms_ping_pid = fk_thread->pid;
         long ts_start = (uint32_t)clock_get_systemtime();
 
-        for(i = 1; i <= count; i++) {
+        for (i = 1; i <= count; i++) {
             /* No duplicate for this sequence number possible */
             dups[i - 1] = false;
             /* Send ping echo request to destination */
@@ -510,7 +510,7 @@ CMD_FUNCTION(ping, cmdargs)
         ts_start = (uint32_t)clock_get_systemtime() - ts_start;
         printf("--- %s ping statistics ---\n", adrbuf);
 
-        if(mms_ping_dups == 0) {
+        if (mms_ping_dups == 0) {
             printf("%u packets transmitted, %u received, %u%% packet loss, time %lu ms\n", count,
                    mms_ping_packets, ((count - mms_ping_packets) * 100) / count, ts_start);
         }
@@ -519,11 +519,11 @@ CMD_FUNCTION(ping, cmdargs)
                    mms_ping_packets, mms_ping_dups, ((count - mms_ping_packets) * 100) / count, ts_start);
         }
 
-        if(mms_ping_packets > 0) {
+        if (mms_ping_packets > 0) {
             printf("rtt min/avg/max = %.2f/%.2f/%.2f ms\n", rtt_min, rtt_avg / (mms_ping_packets + mms_ping_dups), rtt_max);
         }
 
-        if(!ping_bc_mode && mms_ping_packets == count) {
+        if (!ping_bc_mode && mms_ping_packets == count) {
             /* Calculate approximate throughput */
             printf("--- %s throughput statistics ---\n", adrbuf);
             float bw = (count * (8 + 4 + 62 + 2) * 1000) / (float)ts_start; /* for CC1100 */
@@ -550,15 +550,15 @@ CMD_FUNCTION(ping, cmdargs)
 ASCCMD(ssh, CMDFLAG_SERIAL, "Usage: ssh [-q] destination");
 CMD_FUNCTION(ssh, cmdargs)
 {
-    if(cmdargs->arg_size > 0) {
+    if (cmdargs->arg_size > 0) {
         bool quit = false;
         const char *msg = cmdargs->args;
 
-        while(*msg == ' ') {
+        while (*msg == ' ') {
             msg++;
         }
 
-        if(*msg == '-' && (*(msg + 1) == 'Q' || *(msg + 1) == 'q')) {
+        if (*msg == '-' && (*(msg + 1) == 'Q' || *(msg + 1) == 'q')) {
             quit = true;
             msg++;
             msg++;
@@ -566,23 +566,23 @@ CMD_FUNCTION(ssh, cmdargs)
 
         uint16_t address = net_strtoaddr((char *)msg, (char **)&msg);
 
-        if(address == 0) {
+        if (address == 0) {
             return CMD_ERROR;
         }
 
         int iface_addr = net_get_address_in_subnet(address);
 
         /* No ssh to unsupported network or own address */
-        if(iface_addr == 0 || iface_addr == address) {
+        if (iface_addr == 0 || iface_addr == address) {
             return CMD_ERROR;
         }
 
         /* If broadcast destination address, also exit here */
-        if(address == NETWORK_ADDR_BC(address)) {
+        if (address == NETWORK_ADDR_BC(address)) {
             return CMD_ERROR;
         }
 
-        if(!quit) {
+        if (!quit) {
             mms_ssh_connect(address);
         }
         else {
@@ -605,19 +605,19 @@ static void mms_ping_handler(void *message, int message_size,
 {
     mms_ping_message_t *ping = (mms_ping_message_t *)message;
 
-    if(ping->type == MMS_PING_ECHO_REQUEST) {
+    if (ping->type == MMS_PING_ECHO_REQUEST) {
         ping->type = MMS_PING_ECHO_REPLY;
         net_send((void *)ping, sizeof(mms_ping_message_t), packet_info->source,
                  LAYER_2_PROTOCOL_PING, packet_info->tos, 10);
     }
-    else if(ping->type == MMS_PING_ECHO_REPLY) {
-        if(ping->identifier == mms_ping_last_proc_id) {
+    else if (ping->type == MMS_PING_ECHO_REPLY) {
+        if (ping->identifier == mms_ping_last_proc_id) {
             msg m;
             bool wasDup = false;
             char *msgDup;
             char buf[10];
 
-            if(dups[ping->seq_num - 1]) {
+            if (dups[ping->seq_num - 1]) {
                 wasDup = true;
                 mms_ping_dups++;
                 msgDup = "(DUP!)";
@@ -628,30 +628,30 @@ static void mms_ping_handler(void *message, int message_size,
                 msgDup = "";
             }
 
-            if(!ping_bc_mode && !wasDup) {
+            if (!ping_bc_mode && !wasDup) {
                 utimer_remove(&mms_ping_utimer); /* Stop timeout timer */
             }
 
             float ms = ((uint32_t)clock_get_systemtime() - ping->timestamp);
 
-            if(ms < rtt_min) {
+            if (ms < rtt_min) {
                 rtt_min = ms;
             }
 
-            if(ms > rtt_max) {
+            if (ms > rtt_max) {
                 rtt_max = ms;
             }
 
             rtt_avg += ms;
 
-            if(!ping_silent_mode) {
+            if (!ping_silent_mode) {
                 net_addrtostr(packet_info->source, buf, sizeof(buf));
                 printf("%lu bytes from %s: seq=%u ttl=%u time=%.2f ms %s\n",
                        sizeof(mms_ping_message_t), buf,
                        ping->seq_num, *packet_info->ttl_ptr, ms, msgDup);
             }
 
-            if(!ping_bc_mode && !wasDup) {
+            if (!ping_bc_mode && !wasDup) {
                 msg_send(&m, mms_ping_pid, false);
             }
         }
@@ -704,15 +704,15 @@ static void mms_ssh_handler(void *message, int message_size,
     char adrbuf[10];
     mms_ssh_message_t *ssh = (mms_ssh_message_t *)message;
 
-    if(ssh->type == MMS_SSH_CON_REQUEST) {
-        if(ssh_socket > -1) {
+    if (ssh->type == MMS_SSH_CON_REQUEST) {
+        if (ssh_socket > -1) {
             mms_ssh_reply_connect(packet_info->source, -1, false);
             return;
         }
 
         ssh_socket = trans_socket(SOCK_TCPL);
 
-        if(ssh_socket < 0) {
+        if (ssh_socket < 0) {
             mms_ssh_reply_connect(packet_info->source, -1, false);
             return;
         }
@@ -720,27 +720,27 @@ static void mms_ssh_handler(void *message, int message_size,
         trans_connect(ssh_socket, packet_info->source);
         mms_ssh_reply_connect(packet_info->source, ssh_socket, true);
     }
-    else if(ssh->type == MMS_SSH_CON_ACCEPT) {
+    else if (ssh->type == MMS_SSH_CON_ACCEPT) {
         net_addrtostr(packet_info->source, adrbuf, sizeof(adrbuf));
         printf("SSH connection accepted by %s\n", adrbuf);
     }
-    else if(ssh->type == MMS_SSH_CON_REJECT) {
+    else if (ssh->type == MMS_SSH_CON_REJECT) {
         net_addrtostr(packet_info->source, adrbuf, sizeof(adrbuf));
         printf("SSH connection rejected by %s\n", adrbuf);
     }
-    else if(ssh->type == MMS_SSH_CON_CLOSE) {
-        if(ssh_socket > -1) {
+    else if (ssh->type == MMS_SSH_CON_CLOSE) {
+        if (ssh_socket > -1) {
             uint16_t peer;
             trans_getpeername(ssh_socket, &peer);
 
-            if(peer == packet_info->source) {
-                if(trans_close(ssh_socket, CLOSE_IMMEDIATE) == 1) {
+            if (peer == packet_info->source) {
+                if (trans_close(ssh_socket, CLOSE_IMMEDIATE) == 1) {
                     ssh_socket = -1;
                 }
             }
         }
     }
-    else if(ssh->type == MMS_SSH_DATA) {
+    else if (ssh->type == MMS_SSH_DATA) {
         mms_ssh_data_message_t *ssh_data = (mms_ssh_data_message_t *)message;
         printf((char *)ssh_data->data);
         fflush(stderr);
@@ -749,18 +749,18 @@ static void mms_ssh_handler(void *message, int message_size,
 
 void mms_net_printf(const char *format)
 {
-    if(ssh_socket > -1) {
+    if (ssh_socket > -1) {
         mms_ssh_data_message_t ssh_data;
         ssh_data.type = MMS_SSH_DATA;
         int i = 0;
         int len = strlen(format);
 
-        while(i < len) {
+        while (i < len) {
             int chunk = len - i > (MMS_SSH_DATA_MAX - 1) ? (MMS_SSH_DATA_MAX - 1) : len - i;
             memset(ssh_data.data, 0, sizeof(ssh_data.data));
             memcpy(ssh_data.data, format + i, chunk);
 
-            if(trans_send(ssh_socket, (void *)&ssh_data, sizeof(mms_ssh_data_message_t),
+            if (trans_send(ssh_socket, (void *)&ssh_data, sizeof(mms_ssh_data_message_t),
                           LAYER_3_PROTOCOL_SSH, PRIORITY_DATA) < 0) {
                 break;
             }

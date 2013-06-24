@@ -64,7 +64,7 @@ cc1100_spi_writeburst_reg(uint8_t addr, char *src, uint8_t count)
     cc110x_spi_select();
     cc110x_txrx(addr | CC1100_WRITE_BURST);
 
-    while(i < count) {
+    while (i < count) {
         cc110x_txrx(src[i]);
         i++;
     }
@@ -82,7 +82,7 @@ cc1100_spi_readburst_reg(uint8_t addr, char *buffer, uint8_t count)
     cc110x_spi_select();
     cc110x_txrx(addr | CC1100_READ_BURST);
 
-    while(i < count) {
+    while (i < count) {
         buffer[i] = cc110x_txrx(NOBYTE);
         i++;
     }

@@ -21,7 +21,7 @@
 
 int serial_add8(uint8_t s, uint8_t n)
 {
-    if(n > 127) {
+    if (n > 127) {
         return -1;
     }
 
@@ -31,7 +31,7 @@ int serial_add8(uint8_t s, uint8_t n)
 
 int serial_add16(uint16_t s, uint16_t n)
 {
-    if(n > 32767) {
+    if (n > 32767) {
         return -1;
     }
 
@@ -41,7 +41,7 @@ int serial_add16(uint16_t s, uint16_t n)
 
 int serial_add32(uint32_t s, uint32_t n)
 {
-    if(n > 2147483647) {
+    if (n > 2147483647) {
         return -1;
     }
 
@@ -51,15 +51,15 @@ int serial_add32(uint32_t s, uint32_t n)
 
 serial_comp_res_t serial_comp8(uint8_t s1, uint8_t s2)
 {
-    if(s1 == s2) {
+    if (s1 == s2) {
         return EQUAL;
     }
 
-    if((s1 < s2 && s1 - s2 < 128) || (s1 > s2 && s1 - s2 > 128)) {
+    if ((s1 < s2 && s1 - s2 < 128) || (s1 > s2 && s1 - s2 > 128)) {
         return LESS;
     }
 
-    if((s1 < s2 && s1 - s2 > 128) || (s1 > s2 && s1 - s2 < 128)) {
+    if ((s1 < s2 && s1 - s2 > 128) || (s1 > s2 && s1 - s2 < 128)) {
         return GREATER;
     }
 
@@ -68,15 +68,15 @@ serial_comp_res_t serial_comp8(uint8_t s1, uint8_t s2)
 
 serial_comp_res_t serial_comp16(uint16_t s1, uint16_t s2)
 {
-    if(s1 == s2) {
+    if (s1 == s2) {
         return EQUAL;
     }
 
-    if((s1 < s2 && s1 - s2 < 32768) || (s1 > s2 && s1 - s2 > 32768)) {
+    if ((s1 < s2 && s1 - s2 < 32768) || (s1 > s2 && s1 - s2 > 32768)) {
         return LESS;
     }
 
-    if((s1 < s2 && s1 - s2 > 32768) || (s1 > s2 && s1 - s2 < 32768)) {
+    if ((s1 < s2 && s1 - s2 > 32768) || (s1 > s2 && s1 - s2 < 32768)) {
         return GREATER;
     }
 
@@ -85,15 +85,15 @@ serial_comp_res_t serial_comp16(uint16_t s1, uint16_t s2)
 
 serial_comp_res_t serial_comp32(uint32_t s1, uint32_t s2)
 {
-    if(s1 == s2) {
+    if (s1 == s2) {
         return EQUAL;
     }
 
-    if((s1 < s2 && s1 - s2 < 2147483648) || (s1 > s2 && s1 - s2 > 2147483648)) {
+    if ((s1 < s2 && s1 - s2 < 2147483648) || (s1 > s2 && s1 - s2 > 2147483648)) {
         return LESS;
     }
 
-    if((s1 < s2 && s1 - s2 > 2147483648) || (s1 > s2 && s1 - s2 < 2147483648)) {
+    if ((s1 < s2 && s1 - s2 > 2147483648) || (s1 > s2 && s1 - s2 < 2147483648)) {
         return GREATER;
     }
 

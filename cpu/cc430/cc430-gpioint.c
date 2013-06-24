@@ -55,8 +55,8 @@ void gpioint_init(void)
 {
     uint8_t i, j;
 
-    for(i = 0; i < INT_PORTS; i++) {
-        for(j = 0; j < BITMASK_SIZE; j++) {
+    for (i = 0; i < INT_PORTS; i++) {
+        for (j = 0; j < BITMASK_SIZE; j++) {
             cb[i][j] = NULL;
             debounce_time[i][j] = 0;
         }
@@ -67,18 +67,18 @@ bool gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
 {
     int8_t base;
 
-    if((port >= PORTINT_MIN) && (port <= PORTINT_MAX)) {
+    if ((port >= PORTINT_MIN) && (port <= PORTINT_MAX)) {
         /* set the callback function */
         base = number_of_highest_bit(bitmask);
 
-        if(base >= 0) {
+        if (base >= 0) {
             cb[port - PORTINT_MIN][base] = callback;
         }
         else {
             return false;
         }
 
-        if(flags & GPIOINT_DEBOUNCE) {
+        if (flags & GPIOINT_DEBOUNCE) {
             debounce_flags[port - PORTINT_MIN] |= bitmask;
         }
         else {
@@ -98,17 +98,17 @@ bool gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
             P1IFG &= ~bitmask;
 
             /* trigger on rising... */
-            if(flags & GPIOINT_RISING_EDGE) {
+            if (flags & GPIOINT_RISING_EDGE) {
                 P1IES &= bitmask;
             }
 
             /* ...or falling edge */
-            if(flags & GPIOINT_FALLING_EDGE) {
+            if (flags & GPIOINT_FALLING_EDGE) {
                 P1IES |= bitmask;
             }
 
             /*  disable interrupt */
-            if(flags == GPIOINT_DISABLE) {
+            if (flags == GPIOINT_DISABLE) {
                 P1IE &= ~bitmask;
             }
 
@@ -127,11 +127,11 @@ bool gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
             P2IFG &= ~bitmask;
 
             /* trigger on rising... */
-            if(flags == GPIOINT_RISING_EDGE) {
+            if (flags == GPIOINT_RISING_EDGE) {
                 P2IES &= bitmask;
             }
             /* ...or falling edge */
-            else if(flags == GPIOINT_FALLING_EDGE) {
+            else if (flags == GPIOINT_FALLING_EDGE) {
                 P2IES |= bitmask;
             }
             /* or disable interrupt */
@@ -168,14 +168,14 @@ interrupt(PORT1_VECTOR) __attribute__((naked)) port1_isr(void)
     ifg_num = (p1iv >> 1) - 1;
 
     /* check interrupt source */
-    if(debounce_flags[0] & p1ifg) {
+    if (debounce_flags[0] & p1ifg) {
         /* check if bouncing */
         diff = hwtimer_now() - debounce_time[0][ifg_num];
 
-        if(diff > DEBOUNCE_TIMEOUT) {
+        if (diff > DEBOUNCE_TIMEOUT) {
             debounce_time[0][ifg_num] = hwtimer_now();
 
-            if(cb[0][ifg_num] != NULL) {
+            if (cb[0][ifg_num] != NULL) {
                 cb[0][ifg_num]();
             }
         }
@@ -185,7 +185,7 @@ interrupt(PORT1_VECTOR) __attribute__((naked)) port1_isr(void)
         }
     }
     else {
-        if(cb[0][ifg_num] != NULL) {
+        if (cb[0][ifg_num] != NULL) {
             cb[0][ifg_num]();
         }
     }
@@ -213,15 +213,15 @@ interrupt(PORT2_VECTOR) __attribute__((naked)) port2_isr(void)
     ifg_num = (p2iv >> 1) - 1;
 
     /* check interrupt source */
-    if(debounce_flags[1] & p2ifg) {
+    if (debounce_flags[1] & p2ifg) {
         /* check if bouncing */
         diff = hwtimer_now() - debounce_time[1][ifg_num];
 
-        if(diff > DEBOUNCE_TIMEOUT) {
+        if (diff > DEBOUNCE_TIMEOUT) {
             debounce_time[1][ifg_num] = hwtimer_now();
             c1++;
 
-            if(cb[1][ifg_num] != NULL) {
+            if (cb[1][ifg_num] != NULL) {
                 cb[1][ifg_num]();
             }
         }
@@ -232,7 +232,7 @@ interrupt(PORT2_VECTOR) __attribute__((naked)) port2_isr(void)
         }
     }
     else {
-        if(cb[1][ifg_num] != NULL) {
+        if (cb[1][ifg_num] != NULL) {
             cb[1][ifg_num]();
         }
     }

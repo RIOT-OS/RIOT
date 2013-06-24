@@ -52,7 +52,7 @@ int mutex_lock(struct mutex_t *mutex)
 {
     DEBUG("%s: trying to get mutex. val: %u\n", active_thread->name, mutex->val);
 
-    if(atomic_set_return(&mutex->val, 1) != 0) {
+    if (atomic_set_return(&mutex->val, 1) != 0) {
         /* mutex was locked. */
         mutex_wait(mutex);
     }
@@ -65,7 +65,7 @@ void mutex_wait(struct mutex_t *mutex)
     int irqstate = disableIRQ();
     DEBUG("%s: Mutex in use. %u\n", active_thread->name, mutex->val);
 
-    if(mutex->val == 0) {
+    if (mutex->val == 0) {
         /* somebody released the mutex. return. */
         mutex->val = thread_pid;
         DEBUG("%s: mutex_wait early out. %u\n", active_thread->name, mutex->val);
@@ -96,8 +96,8 @@ void mutex_unlock(struct mutex_t *mutex, int yield)
     DEBUG("%s: unlocking mutex. val: %u pid: %u\n", active_thread->name, mutex->val, thread_pid);
     int irqstate = disableIRQ();
 
-    if(mutex->val != 0) {
-        if(mutex->queue.next) {
+    if (mutex->val != 0) {
+        if (mutex->queue.next) {
             queue_node_t *next = queue_remove_head(&(mutex->queue));
             tcb_t *process = (tcb_t*) next->data;
             DEBUG("%s: waking up waiter %s.\n", process->name);

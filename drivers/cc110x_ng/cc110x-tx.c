@@ -47,7 +47,7 @@ uint8_t cc110x_send(cc110x_packet_t *packet)
      * or equal to PACKET_LENGTH (62 bytes). So the receiver
      * can put the whole packet in its RX-FIFO (with appended
      * packet status bytes).*/
-    if(size > PACKET_LENGTH) {
+    if (size > PACKET_LENGTH) {
         return 0;
     }
 
@@ -68,10 +68,10 @@ uint8_t cc110x_send(cc110x_packet_t *packet)
     cc110x_strobe(CC1100_STX);
 
     /* Wait for GDO2 to be set -> sync word transmitted */
-    while(cc110x_get_gdo2() == 0) {
+    while (cc110x_get_gdo2() == 0) {
         abort_count++;
 
-        if(abort_count > CC1100_SYNC_WORD_TX_TIME) {
+        if (abort_count > CC1100_SYNC_WORD_TX_TIME) {
             /* Abort waiting. CC1100 maybe in wrong mode */
             /* e.g. sending preambles for always */
             puts("[CC1100 TX] fatal error\n");
@@ -82,7 +82,7 @@ uint8_t cc110x_send(cc110x_packet_t *packet)
     restoreIRQ(cpsr);
 
     /* Wait for GDO2 to be cleared -> end of packet */
-    while(cc110x_get_gdo2() != 0);
+    while (cc110x_get_gdo2() != 0);
 
 
     /* Experimental - TOF Measurement */

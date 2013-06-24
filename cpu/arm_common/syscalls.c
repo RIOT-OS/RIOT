@@ -88,7 +88,7 @@ volatile static uint8_t iUsedHeap = 0;
 /*-----------------------------------------------------------------------------------*/
 void heap_stats(void)
 {
-    for(int i = 0; i < NUM_HEAPS; i++)
+    for (int i = 0; i < NUM_HEAPS; i++)
         printf("# heap %i: %p -- %p -> %p (%li of %li free)\n", i, heap_start[i], heap[i], heap_max[i],
                (uint32_t)heap_max[i] - (uint32_t)heap[i], (uint32_t)heap_max[i] - (uint32_t)heap_start[i]);
 }
@@ -100,7 +100,7 @@ void __assert_func(const char *file, int line, const char *func, const char *fai
     trace_number(TRACELOG_EV_ASSERTION, line);
     syslog(SL_EMERGENCY, "assert", "%s() in %s:%u\n", func, file, line);
 #endif
-    printf("#! assertion %s failed\n\t%s() in %s:%u\n", failedexpr, func, file, line);
+    printf("#!assertion %s failed\n\t%s() in %s:%u\n", failedexpr, func, file, line);
     _exit(3);
 }
 /*-----------------------------------------------------------------------------------*/
@@ -111,7 +111,7 @@ void __assert(const char *file, int line, const char *failedexpr)
 /*-----------------------------------------------------------------------------------*/
 caddr_t _sbrk_r(struct _reent *r, size_t incr)
 {
-    if(incr < 0) {
+    if (incr < 0) {
         puts("[syscalls] Negative Values for _sbrk_r are not supported");
         r->_errno = ENOMEM;
         return NULL;
@@ -120,14 +120,14 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
     uint32_t cpsr = disableIRQ();
 
     /* check all heaps for a chunk of the requested size */
-    for(; iUsedHeap < NUM_HEAPS; iUsedHeap++) {
+    for (; iUsedHeap < NUM_HEAPS; iUsedHeap++) {
         caddr_t new_heap = heap[iUsedHeap] + incr;
 
 #ifdef MODULE_TRACELOG
         trace_pointer(TRACELOG_EV_MEMORY, heap[iUsedHeap]);
 #endif
 
-        if(new_heap <= heap_max[iUsedHeap]) {
+        if (new_heap <= heap_max[iUsedHeap]) {
             caddr_t prev_heap = heap[iUsedHeap];
 #ifdef MODULE_TRACELOG
             trace_pointer(TRACELOG_EV_MEMORY, new_heap);
@@ -153,7 +153,7 @@ int _isatty_r(struct _reent *r, int fd)
 {
     r->_errno = 0;
 
-    if(fd == STDOUT_FILENO || fd == STDERR_FILENO) {
+    if (fd == STDOUT_FILENO || fd == STDERR_FILENO) {
         return 1;
     }
     else {
@@ -208,7 +208,7 @@ int _fstat_r(struct _reent *r, int fd, struct stat *st)
     r->_errno = 0;
     memset(st, 0, sizeof(*st));
 
-    if(fd == STDOUT_FILENO || fd == STDERR_FILENO) {
+    if (fd == STDOUT_FILENO || fd == STDERR_FILENO) {
         st->st_mode = S_IFCHR;
         ret = 0;
     }
@@ -237,10 +237,10 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
         case STDOUT_FILENO:
         case STDERR_FILENO:
 #if FEUERWARE_CONF_ENABLE_HAL
-            if(stdio != NULL) {
+            if (stdio != NULL) {
                 result = chardevice_write(stdio, (char *)data, count);
             }
-            else if(hal_state == HAL_NOT_INITIALIZED) {
+            else if (hal_state == HAL_NOT_INITIALIZED) {
                 result = fw_puts((char *)data, count);
             }
 
@@ -306,12 +306,12 @@ void _exit(int n)
 #ifdef MODULE_TRACELOG
     trace_number(TRACELOG_EV_EXIT, n);
 #endif
-    printf("#! exit %i: resetting\n", n);
+    printf("#!exit %i: resetting\n", n);
 
     stdio_flush();
     arm_reset();
 
-    while(1);
+    while (1);
 }
 /*---------------------------------------------------------------------------*/
 int _getpid(void)

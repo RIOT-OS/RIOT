@@ -80,7 +80,7 @@ typedef struct __attribute__((packed)) {
     } context;
 } border_context_packet_t;
 
-#define BORDER_BUFFER_SIZE (sizeof (border_l3_header_t) + MTU)
+#define BORDER_BUFFER_SIZE (sizeof(border_l3_header_t) + MTU)
 
 void demultiplex(border_packet_t *packet, int len);
 void multiplex_send_ipv6_over_uart(ipv6_hdr_t *packet);

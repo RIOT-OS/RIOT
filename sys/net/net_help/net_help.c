@@ -16,7 +16,7 @@ void printArrayRange(uint8_t *array, uint16_t len, char *str)
     int i = 0;
     printf("-------------%s-------------\n", str);
 
-    for(i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         printf("%#x ", *(array + i));
     }
 
@@ -30,8 +30,8 @@ uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len)
 
     count = len >> 1;
 
-    if(count) {
-        if(count) {
+    if (count) {
+        if (count) {
             carry = 0;
 
             do {
@@ -42,17 +42,17 @@ uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len)
                 sum += t;
                 carry = (t > sum);
             }
-            while(count);
+            while (count);
 
             sum += carry;
         }
     }
 
-    if(len & 1) {
+    if (len & 1) {
         uint16_t u = (*buf << 8);
         sum += (*buf << 8);
 
-        if(sum < u) {
+        if (sum < u) {
             sum++;
         }
     }

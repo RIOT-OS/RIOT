@@ -88,7 +88,7 @@ static abr_cache_t *abr_get_oldest(void);
 
 int min(int a, int b)
 {
-    if(a < b) {
+    if (a < b) {
         return a;
     }
     else {
@@ -188,7 +188,7 @@ void init_rtr_sol(uint8_t sllao)
     opt_hdr_len = RTR_SOL_LEN;
     ipv6_buf->length = ICMPV6_HDR_LEN + RTR_SOL_LEN + OPT_STLLAO_MAX_LEN;
 
-    if(sllao == OPT_SLLAO) {
+    if (sllao == OPT_SLLAO) {
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
         set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 2);
         packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
@@ -216,18 +216,18 @@ void recv_rtr_sol(void)
     ipv6_buf = get_ipv6_buf();
 
     /* check if source option is set*/
-    if(opt_stllao_buf->type == OPT_SLLAO_TYPE) {
+    if (opt_stllao_buf->type == OPT_SLLAO_TYPE) {
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
         llao = (uint8_t *)opt_stllao_buf;
         opt_hdr_len += (opt_stllao_buf->length) << 3;
     }
 
-    if(llao != NULL) {
+    if (llao != NULL) {
         nbr_entry = nbr_cache_search(&ipv6_buf->srcaddr);
 
-        if(nbr_entry != NULL) {
+        if (nbr_entry != NULL) {
             /* found neighbor in cache, update values and check long addr */
-            if(memcmp(&llao[2], &nbr_entry->laddr, 8) == 0) {
+            if (memcmp(&llao[2], &nbr_entry->laddr, 8) == 0) {
                 nbr_entry->isrouter = 0;
             }
             else {
@@ -246,7 +246,7 @@ void recv_rtr_sol(void)
     }
 
     /* send solicited router advertisment */
-    if(abr_count > 0) {
+    if (abr_count > 0) {
         init_rtr_adv(&ipv6_buf->srcaddr, 0, 0, OPT_PI, OPT_6CO, OPT_ABRO);
     }
     else {
@@ -266,7 +266,7 @@ uint8_t set_opt_6co_flags(uint8_t compression_flag, uint8_t cid)
 {
     uint8_t flags;
 
-    if(compression_flag) {
+    if (compression_flag) {
         flags = OPT_6CO_FLAG_C;
     }
     else {
@@ -301,7 +301,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
     ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
     ipv6_buf->hoplimit = ND_HOPLIMIT;
 
-    if(addr == NULL) {
+    if (addr == NULL) {
         /* not solicited */
         ipv6_set_all_nds_mcast_addr(&ipv6_buf->destaddr);
     }
@@ -327,7 +327,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
 
     packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + RTR_ADV_LEN;
 
-    if(sllao == OPT_SLLAO) {
+    if (sllao == OPT_SLLAO) {
         /* set link layer address option */
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
         set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 2);
@@ -335,7 +335,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
         packet_length += OPT_STLLAO_MAX_LEN;
     }
 
-    if(mtu == OPT_MTU) {
+    if (mtu == OPT_MTU) {
         /* set MTU options */
         opt_mtu_buf = get_opt_mtu_buf(ipv6_ext_hdr_len, opt_hdr_len);
         opt_mtu_buf->type = OPT_MTU_TYPE;
@@ -348,9 +348,9 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
 
     /* set payload length field */
 
-    if(abro == OPT_ABRO) {
+    if (abro == OPT_ABRO) {
         /* set authoritive border router option */
-        if(abr_count > 0) {
+        if (abr_count > 0) {
             msg_abr = abr_get_most_current();
             opt_abro_buf = get_opt_abro_buf(ipv6_ext_hdr_len, opt_hdr_len);
             opt_abro_buf->type = OPT_ABRO_TYPE;
@@ -361,12 +361,12 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
         }
     }
 
-    if(sixco == OPT_6CO) {
+    if (sixco == OPT_6CO) {
         /* set 6lowpan context option */
         int contexts_len = 0;
         mutex_lock(&lowpan_context_mutex);
 
-        if(msg_abr == NULL) {
+        if (msg_abr == NULL) {
             contexts = lowpan_context_get();
             contexts_len = lowpan_context_len();
         }
@@ -375,10 +375,10 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
 
             contexts_len = 0;
 
-            for(int i = 0; i < LOWPAN_CONTEXT_MAX; i++) {
+            for (int i = 0; i < LOWPAN_CONTEXT_MAX; i++) {
                 lowpan_context_t *ctx = abr_get_context(msg_abr, i);
 
-                if(ctx != NULL) {
+                if (ctx != NULL) {
                     memcpy(&(c_tmp[contexts_len++]), ctx, sizeof(lowpan_context_t));
                 }
             }
@@ -387,11 +387,11 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
             memcpy(contexts, c_tmp, contexts_len);
         }
 
-        for(int i = 0; i < contexts_len; i++) {
+        for (int i = 0; i < contexts_len; i++) {
             opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_ext_hdr_len, opt_hdr_len);
             opt_6co_hdr_buf->type = OPT_6CO_TYPE;
 
-            if(contexts[i].length > 64) {
+            if (contexts[i].length > 64) {
                 opt_6co_hdr_buf->length = OPT_6CO_MAX_LEN;
             }
             else {
@@ -408,7 +408,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
             /* attach prefixes */
             opt_6co_prefix_buf = get_opt_6co_prefix_buf(ipv6_ext_hdr_len, opt_hdr_len);
 
-            if(opt_6co_hdr_buf->c_length > 64) {
+            if (opt_6co_hdr_buf->c_length > 64) {
                 memset((void *)opt_6co_prefix_buf, 0, 16);
                 memcpy((void *)opt_6co_prefix_buf, (void *) & (contexts[i].prefix.uint8[0]), opt_6co_hdr_buf->c_length / 8);
                 opt_hdr_len += 16;
@@ -423,17 +423,17 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
 
         }
 
-        if(msg_abr != NULL && contexts != NULL) {
+        if (msg_abr != NULL && contexts != NULL) {
             free(contexts);
         }
 
         mutex_unlock(&lowpan_context_mutex, 0);
     }
 
-    if(pi == OPT_PI) {
+    if (pi == OPT_PI) {
         /* set prefix option */
-        for(int i = 0; i < OPT_PI_LIST_LEN; i++) {
-            if(plist[i].inuse && plist[i].adv) {
+        for (int i = 0; i < OPT_PI_LIST_LEN; i++) {
+            if (plist[i].inuse && plist[i].adv) {
                 opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, opt_hdr_len);
                 memcpy(&(opt_pi_buf->addr.uint8[0]), &(plist[i].addr.uint8[0]), 16);
                 opt_pi_buf->type = OPT_PI_TYPE;
@@ -470,18 +470,18 @@ void recv_rtr_adv(void)
     recvd_cids_len = 0;
 
     /* update interface reachable time and retrans timer */
-    if(rtr_adv_buf->reachable_time != 0) {
+    if (rtr_adv_buf->reachable_time != 0) {
         iface.adv_reachable_time = HTONL(rtr_adv_buf->reachable_time);
     }
 
-    if(rtr_adv_buf->retrans_timer != 0) {
+    if (rtr_adv_buf->retrans_timer != 0) {
         iface.adv_retrans_timer = HTONL(rtr_adv_buf->retrans_timer);
     }
 
     def_rtr_entry = def_rtr_lst_search(&ipv6_buf->srcaddr);
 
-    if(rtr_adv_buf->router_lifetime != 0) {
-        if(def_rtr_entry != NULL) {
+    if (rtr_adv_buf->router_lifetime != 0) {
+        if (def_rtr_entry != NULL) {
             set_remaining_time(&(def_rtr_entry->inval_time), HTONL(rtr_adv_buf->router_lifetime));
         }
         else {
@@ -491,7 +491,7 @@ void recv_rtr_adv(void)
     }
     else {
         /* remove router from default router list */
-        if(def_rtr_entry != NULL) {
+        if (def_rtr_entry != NULL) {
             def_rtr_lst_rem(def_rtr_entry);
         }
     }
@@ -499,40 +499,40 @@ void recv_rtr_adv(void)
     mutex_lock(&lowpan_context_mutex);
 
     /* read options */
-    while(packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len) {
+    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len) {
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, opt_hdr_len);
 
         switch(opt_buf->type) {
-            case(OPT_SLLAO_TYPE): {
+            case (OPT_SLLAO_TYPE): {
                 break;
             }
 
-            case(OPT_MTU_TYPE): {
+            case (OPT_MTU_TYPE): {
                 break;
             }
 
             /* rfc 4862 section 5.5.3 */
-            case(OPT_PI_TYPE): {
+            case (OPT_PI_TYPE): {
                 opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, opt_hdr_len);
 
                 /* crazy condition, read 5.5.3a-b-c for further information */
-                if(ipv6_prefix_ll_match(&opt_pi_buf->addr) ||
+                if (ipv6_prefix_ll_match(&opt_pi_buf->addr) ||
                    (HTONL(opt_pi_buf->pref_ltime) >
                     HTONL(opt_pi_buf->val_ltime))) {
                     break;
                 }
                 else {
                     /* check if on-link flag is set */
-                    if(opt_pi_buf->l_a_reserved1 & OPT_PI_FLAG_L) {
+                    if (opt_pi_buf->l_a_reserved1 & OPT_PI_FLAG_L) {
                         /* TODO: do on-link pi handling */
                     }
 
-                    if(opt_pi_buf->l_a_reserved1 & OPT_PI_FLAG_A) {
+                    if (opt_pi_buf->l_a_reserved1 & OPT_PI_FLAG_A) {
                         addr_list_ptr = ipv6_iface_addr_prefix_eq(&opt_pi_buf->addr);
 
-                        if(addr_list_ptr == NULL) {
+                        if (addr_list_ptr == NULL) {
                             /* 5.5.3d */
-                            if(opt_pi_buf->val_ltime != 0) {
+                            if (opt_pi_buf->val_ltime != 0) {
                                 /* iid will also be added here */
                                 ipv6_init_addr_prefix(&newaddr, &opt_pi_buf->addr);
                                 /* add into address list
@@ -553,7 +553,7 @@ void recv_rtr_adv(void)
                             set_remaining_time(&(addr_list_ptr->pref_ltime), opt_pi_buf->pref_ltime);
 
                             /* 7200 = 2hours in seconds */
-                            if(HTONL(opt_pi_buf->val_ltime) > 7200 ||
+                            if (HTONL(opt_pi_buf->val_ltime) > 7200 ||
                                HTONL(opt_pi_buf->val_ltime) >
                                get_remaining_time(&(addr_list_ptr->val_ltime))) {
                                 set_remaining_time(&(addr_list_ptr->val_ltime), HTONL(opt_pi_buf->val_ltime));
@@ -570,7 +570,7 @@ void recv_rtr_adv(void)
                 break;
             }
 
-            case(OPT_6CO_TYPE): {
+            case (OPT_6CO_TYPE): {
                 uint8_t comp;
                 uint8_t num;
 
@@ -597,7 +597,7 @@ void recv_rtr_adv(void)
                 break;
             }
 
-            case(OPT_ABRO_TYPE): {
+            case (OPT_ABRO_TYPE): {
                 opt_abro_buf = get_opt_abro_buf(ipv6_ext_hdr_len, opt_hdr_len);
                 abro_found = 1;
                 abro_version = HTONS(opt_abro_buf->version);
@@ -613,17 +613,17 @@ void recv_rtr_adv(void)
         opt_hdr_len += (opt_buf->length * 8);
     }
 
-    if(abro_found) {
+    if (abro_found) {
         int i;
 
-        for(i = 0; i < recvd_cids_len; i++) {
+        for (i = 0; i < recvd_cids_len; i++) {
             abr_add_context(abro_version, &abro_addr, recvd_cids[i]);
         }
     }
 
     mutex_unlock(&lowpan_context_mutex, 0);
 
-    if(trigger_ns >= 0) {
+    if (trigger_ns >= 0) {
         /* send ns - draft-ietf-6lowpan-nd-15#section-5.5.1
          *
          * section-10.2.4
@@ -651,7 +651,7 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
     ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
     ipv6_buf->hoplimit = ND_HOPLIMIT;
 
-    if(dest == NULL) {
+    if (dest == NULL) {
         ipv6_set_sol_node_mcast_addr(targ, &(ipv6_buf->destaddr));
     }
     else {
@@ -670,15 +670,15 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
 
     packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + NBR_SOL_LEN;
 
-    if(ipv6_iface_addr_match(targ) == NULL) {
-        if(src == NULL) {
+    if (ipv6_iface_addr_match(targ) == NULL) {
+        if (src == NULL) {
             ipv6_get_saddr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
         }
         else {
             memcpy(&(ipv6_buf->srcaddr), src, 16);
         }
 
-        if(sllao == OPT_SLLAO) {
+        if (sllao == OPT_SLLAO) {
             /* set sllao option */
             opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
             set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 1);
@@ -688,7 +688,7 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
         }
     }
 
-    if(aro == OPT_ARO) {
+    if (aro == OPT_ARO) {
         /* set aro option */
         opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len, opt_hdr_len);
         opt_aro_buf->type = OPT_ARO_TYPE;
@@ -722,10 +722,10 @@ void recv_nbr_sol(void)
      * option condition is that a sllao option is set. thus that we don't
      * know which option comes first we need to this here */
 
-    while(packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len) {
+    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len) {
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, opt_hdr_len);
 
-        if(opt_buf->type == OPT_SLLAO_TYPE) {
+        if (opt_buf->type == OPT_SLLAO_TYPE) {
             sllao_set = 1;
         }
 
@@ -734,23 +734,23 @@ void recv_nbr_sol(void)
 
     opt_hdr_len = NBR_SOL_LEN;
 
-    while(packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len) {
+    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len) {
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, opt_hdr_len);
 
         switch(opt_buf->type) {
-            case(OPT_SLLAO_TYPE): {
+            case (OPT_SLLAO_TYPE): {
                 opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len,
                                                     opt_hdr_len);
                 llao = (uint8_t *)opt_stllao_buf;
 
-                if(llao != NULL &&
+                if (llao != NULL &&
                    !(ipv6_addr_unspec_match(&ipv6_buf->srcaddr))) {
                     nbr_entry = nbr_cache_search(&(ipv6_buf->srcaddr));
 
-                    if(nbr_entry != NULL) {
+                    if (nbr_entry != NULL) {
                         switch(opt_stllao_buf->length) {
-                            case(1): {
-                                if(memcmp(&llao[2], &(nbr_entry->saddr), 2) == 0) {
+                            case (1): {
+                                if (memcmp(&llao[2], &(nbr_entry->saddr), 2) == 0) {
                                     nbr_entry->isrouter = 0;
                                 }
                                 else {
@@ -762,8 +762,8 @@ void recv_nbr_sol(void)
                                 break;
                             }
 
-                            case(2): {
-                                if(memcmp(&llao[2], &(nbr_entry->laddr), 8) == 0) {
+                            case (2): {
+                                if (memcmp(&llao[2], &(nbr_entry->laddr), 8) == 0) {
                                     nbr_entry->isrouter = 0;
                                 }
                                 else {
@@ -781,7 +781,7 @@ void recv_nbr_sol(void)
                     }
                     else {
                         switch(opt_stllao_buf->length) {
-                            case(1): {
+                            case (1): {
                                 nbr_cache_add(&ipv6_buf->srcaddr,
                                               NULL , 0, NBR_STATUS_STALE,
                                               NBR_CACHE_TYPE_TEN,
@@ -791,7 +791,7 @@ void recv_nbr_sol(void)
                                 break;
                             }
 
-                            case(2): {
+                            case (2): {
                                 nbr_cache_add(&ipv6_buf->srcaddr,
                                               (ieee_802154_long_t *)&llao[2], 0,
                                               NBR_STATUS_STALE,
@@ -809,20 +809,20 @@ void recv_nbr_sol(void)
                 break;
             }
 
-            case(OPT_ARO_TYPE): {
+            case (OPT_ARO_TYPE): {
                 /* check if sllao option is set, and if address src address
                  * isn't unspecified - draft-ietf-6lowpan-nd-15#section-6.5 */
-                if(!(ipv6_addr_unspec_match(&ipv6_buf->srcaddr)) &&
+                if (!(ipv6_addr_unspec_match(&ipv6_buf->srcaddr)) &&
                    sllao_set == 1) {
                     opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len,
                                                   opt_hdr_len);
 
-                    if((opt_aro_buf->length == 2) &&
+                    if ((opt_aro_buf->length == 2) &&
                        (opt_aro_buf->status == 0)) {
                         /* check neighbor cache for duplicates */
                         nbr_entry = nbr_cache_search(&(ipv6_buf->srcaddr));
 
-                        if(nbr_entry == NULL) {
+                        if (nbr_entry == NULL) {
                             /* create neighbor cache */
                             aro_state = nbr_cache_add(&ipv6_buf->srcaddr,
                                                       &(opt_aro_buf->eui64), 0,
@@ -830,10 +830,10 @@ void recv_nbr_sol(void)
                                                       opt_aro_buf->reg_ltime, NULL);
                         }
                         else {
-                            if(memcmp(&(nbr_entry->addr.uint16[4]),
+                            if (memcmp(&(nbr_entry->addr.uint16[4]),
                                       &(opt_aro_buf->eui64.uint16[0]), 8) == 0) {
                                 /* update neighbor cache entry */
-                                if(opt_aro_buf->reg_ltime == 0) {
+                                if (opt_aro_buf->reg_ltime == 0) {
                                     /* delete neighbor cache entry */
                                     nbr_cache_rem(&nbr_entry->addr);
                                 }
@@ -870,10 +870,10 @@ void recv_nbr_sol(void)
     nbr_sol_buf = get_nbr_sol_buf(ipv6_ext_hdr_len);
     alist_targ = ipv6_iface_addr_match(&(nbr_sol_buf->tgtaddr));
 
-    if(alist_targ != NULL) {
+    if (alist_targ != NULL) {
         alist_dest = ipv6_iface_addr_match(&(ipv6_buf->destaddr));
 
-        if((memcmp(&(alist_targ->addr), &(alist_dest->addr), 16) == 0) ||
+        if ((memcmp(&(alist_targ->addr), &(alist_dest->addr), 16) == 0) ||
            ipv6_addr_sol_node_mcast_match(&ipv6_buf->destaddr)) {
             memcpy(&(ipv6_buf->destaddr.uint8[0]),
                    &(ipv6_buf->srcaddr.uint8[0]), 16);
@@ -883,7 +883,7 @@ void recv_nbr_sol(void)
         }
     }
 
-    if(send_na) {
+    if (send_na) {
         /* solicited na */
         uint8_t flags = (NBR_ADV_FLAG_O | NBR_ADV_FLAG_S);
         init_nbr_adv(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr),
@@ -922,7 +922,7 @@ void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
 
     packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + NBR_ADV_LEN;
 
-    if(sllao == OPT_SLLAO) {
+    if (sllao == OPT_SLLAO) {
         /* set sllao option */
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
         set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 1);
@@ -931,7 +931,7 @@ void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
         packet_length += OPT_STLLAO_MIN_LEN;
     }
 
-    if(aro == OPT_ARO) {
+    if (aro == OPT_ARO) {
         /* set aro option */
         opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len, opt_hdr_len);
         opt_aro_buf->type = OPT_ARO_TYPE;
@@ -960,17 +960,17 @@ void recv_nbr_adv(void)
     nbr_adv_buf = get_nbr_adv_buf(ipv6_ext_hdr_len);
 
     /* check if options are present */
-    while(packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len) {
+    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len) {
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, opt_hdr_len);
 
         switch(opt_buf->type) {
-            case(OPT_TLLAO_TYPE): {
+            case (OPT_TLLAO_TYPE): {
                 llao = (uint8_t *)get_opt_stllao_buf(ipv6_ext_hdr_len,
                                                      opt_hdr_len);
                 break;
             }
 
-            case(OPT_ARO_TYPE): {
+            case (OPT_ARO_TYPE): {
                 break;
             }
         }
@@ -981,24 +981,24 @@ void recv_nbr_adv(void)
     addr_list_t *addr;
     addr = ipv6_iface_addr_match(&nbr_adv_buf->tgtaddr);
 
-    if(addr == NULL) {
+    if (addr == NULL) {
         nbr_entry = nbr_cache_search(&nbr_adv_buf->tgtaddr);
 
-        if(nbr_entry != NULL) {
-            if(llao != 0) {
+        if (nbr_entry != NULL) {
+            if (llao != 0) {
                 /* TODO: untersheiden zwischen short und long stllao option */
                 new_ll = memcmp(&llao[2], &(nbr_entry->laddr), 8);
             }
 
-            if(nbr_entry->state == NBR_STATUS_INCOMPLETE) {
-                if(llao == NULL) {
+            if (nbr_entry->state == NBR_STATUS_INCOMPLETE) {
+                if (llao == NULL) {
                     return;
                 }
 
                 /* TODO: untersheiden zwischen short und long stllao option */
                 memcpy(&nbr_entry->laddr, &llao[2], 8);
 
-                if(nbr_adv_buf->rso & NBR_ADV_FLAG_S) {
+                if (nbr_adv_buf->rso & NBR_ADV_FLAG_S) {
                     nbr_entry->state = NBR_STATUS_REACHABLE;
                     /* TODO: set rechability */
                 }
@@ -1009,27 +1009,27 @@ void recv_nbr_adv(void)
                 nbr_entry->isrouter = nbr_adv_buf->rso & NBR_ADV_FLAG_R;
             }
             else {
-                if(new_ll && !(nbr_adv_buf->rso & NBR_ADV_FLAG_O)) {
-                    if(nbr_entry->state == NBR_STATUS_REACHABLE) {
+                if (new_ll && !(nbr_adv_buf->rso & NBR_ADV_FLAG_O)) {
+                    if (nbr_entry->state == NBR_STATUS_REACHABLE) {
                         nbr_entry->state = NBR_STATUS_STALE;
                     }
 
                     return;
                 }
                 else {
-                    if((nbr_adv_buf->rso & NBR_ADV_FLAG_O) ||
+                    if ((nbr_adv_buf->rso & NBR_ADV_FLAG_O) ||
                        (!(nbr_adv_buf->rso & NBR_ADV_FLAG_O) && llao != 0 &&
                         !new_ll)) {
-                        if(llao != 0) {
+                        if (llao != 0) {
                             memcpy(&nbr_entry->laddr, &llao[2], 8);
                         }
 
-                        if(nbr_adv_buf->rso & NBR_ADV_FLAG_S) {
+                        if (nbr_adv_buf->rso & NBR_ADV_FLAG_S) {
                             nbr_entry->state = NBR_STATUS_REACHABLE;
                             /* TODO: set rechablility */
                         }
                         else {
-                            if(llao != 0 && new_ll) {
+                            if (llao != 0 && new_ll) {
                                 nbr_entry->state = NBR_STATUS_STALE;
                             }
                         }
@@ -1050,13 +1050,13 @@ void set_llao(opt_stllao_t *sllao, uint8_t type, uint8_t length)
 
     /* get link layer address */
     switch(length) {
-        case(1): {
+        case (1): {
             memcpy(&llao[2], &(iface.saddr), 2);
             memset(&llao[4], 0, 4);
             break;
         }
 
-        case(2): {
+        case (2): {
             memcpy(&llao[2], &(iface.laddr), 8);
             memset(&llao[10], 0, 6);
             break;
@@ -1126,8 +1126,8 @@ nbr_cache_t *nbr_cache_search(ipv6_addr_t *ipaddr)
 {
     int i;
 
-    for(i = 0; i < NBR_CACHE_SIZE; i++) {
-        if(memcmp(&(nbr_cache[i].addr.uint8[0]), &(ipaddr->uint8[0]), 16) == 0) {
+    for (i = 0; i < NBR_CACHE_SIZE; i++) {
+        if (memcmp(&(nbr_cache[i].addr.uint8[0]), &(ipaddr->uint8[0]), 16) == 0) {
             return &nbr_cache[i];
         }
     }
@@ -1139,7 +1139,7 @@ uint8_t nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr,
                       uint8_t isrouter, uint8_t state, uint8_t type,
                       uint16_t ltime, ieee_802154_short_t *saddr)
 {
-    if(nbr_count == NBR_CACHE_SIZE) {
+    if (nbr_count == NBR_CACHE_SIZE) {
         printf("ERROR: neighbor cache full\n");
         return OPT_ARO_STATE_NBR_CACHE_FULL;
     }
@@ -1162,8 +1162,8 @@ void nbr_cache_auto_rem(void)
 {
     int i;
 
-    for(i = 0; i < NBR_CACHE_SIZE; i++) {
-        if(get_remaining_time(&(nbr_cache[i].ltime)) == 0 &&
+    for (i = 0; i < NBR_CACHE_SIZE; i++) {
+        if (get_remaining_time(&(nbr_cache[i].ltime)) == 0 &&
            nbr_cache[i].type == NBR_CACHE_TYPE_TEN) {
             memmove(&(nbr_cache[i]), &(nbr_cache[nbr_count]),
                     sizeof(nbr_cache_t));
@@ -1177,8 +1177,8 @@ void nbr_cache_rem(ipv6_addr_t *addr)
 {
     int i;
 
-    for(i = 0; i < NBR_CACHE_SIZE; i++) {
-        if(memcmp(&(nbr_cache[i].addr.uint8[0]), &(addr->uint8[0]), 16) == 0) {
+    for (i = 0; i < NBR_CACHE_SIZE; i++) {
+        if (memcmp(&(nbr_cache[i].addr.uint8[0]), &(addr->uint8[0]), 16) == 0) {
             memmove(&(nbr_cache[i]), &(nbr_cache[nbr_count]),
                     sizeof(nbr_cache_t));
             memset(&(nbr_cache[nbr_count]), 0, sizeof(nbr_cache_t));
@@ -1202,8 +1202,8 @@ static abr_cache_t *abr_get_most_current(void)
     int i;
     int version = abr_cache[0].version;
 
-    for(i = 0; i < abr_count; i++) {
-        if(serial_comp16(version, abr_cache[i].version) == GREATER) {
+    for (i = 0; i < abr_count; i++) {
+        if (serial_comp16(version, abr_cache[i].version) == GREATER) {
             abr = &(abr_cache[i]);
             version = abr_cache[i].version;
         }
@@ -1218,8 +1218,8 @@ static abr_cache_t *abr_get_oldest(void)
     int i;
     int version = abr_cache[0].version;
 
-    for(i = 0; i < abr_count; i++) {
-        if(serial_comp16(version, abr_cache[i].version) == LESS) {
+    for (i = 0; i < abr_count; i++) {
+        if (serial_comp16(version, abr_cache[i].version) == LESS) {
             abr = &(abr_cache[i]);
             version = abr_cache[i].version;
         }
@@ -1232,8 +1232,8 @@ abr_cache_t *abr_get_version(uint16_t version, ipv6_addr_t *abr_addr)
 {
     int i = 0;
 
-    for(i = 0; i < ABR_CACHE_SIZE; i++) {
-        if(abr_cache[i].version == version &&
+    for (i = 0; i < ABR_CACHE_SIZE; i++) {
+        if (abr_cache[i].version == version &&
            memcmp(&(abr_cache[i].abr_addr.uint8[0]),
                   &(abr_addr->uint8[0]), 16
                  ) == 0) {
@@ -1246,7 +1246,7 @@ abr_cache_t *abr_get_version(uint16_t version, ipv6_addr_t *abr_addr)
 
 lowpan_context_t *abr_get_context(abr_cache_t *abr, uint8_t cid)
 {
-    if(abr->cids[cid] != cid) {
+    if (abr->cids[cid] != cid) {
         return NULL;
     }
 
@@ -1258,8 +1258,8 @@ abr_cache_t *abr_add_context(uint16_t version, ipv6_addr_t *abr_addr,
 {
     abr_cache_t *abr = abr_get_version(version, abr_addr);
 
-    if(abr == NULL) {
-        if(abr_count == ABR_CACHE_SIZE) {
+    if (abr == NULL) {
+        if (abr_count == ABR_CACHE_SIZE) {
             abr = abr_get_oldest();
         }
         else {
@@ -1280,7 +1280,7 @@ void abr_remove_context(uint8_t cid)
 {
     int i;
 
-    for(i = 0; i < abr_count; i++) {
+    for (i = 0; i < abr_count; i++) {
         abr_cache[i].cids[cid] = 0xFF;
     }
 }
@@ -1292,8 +1292,8 @@ def_rtr_lst_t *def_rtr_lst_search(ipv6_addr_t *ipaddr)
 {
     int i;
 
-    for(i = 0; i < DEF_RTR_LST_SIZE; i++) {
-        if(memcmp(&def_rtr_lst[i].addr.uint8[0],
+    for (i = 0; i < DEF_RTR_LST_SIZE; i++) {
+        if (memcmp(&def_rtr_lst[i].addr.uint8[0],
                   &(ipaddr->uint8[0]), 16) == 0) {
             return &def_rtr_lst[i];
         }
@@ -1304,7 +1304,7 @@ def_rtr_lst_t *def_rtr_lst_search(ipv6_addr_t *ipaddr)
 
 void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime)
 {
-    if(def_rtr_count == DEF_RTR_LST_SIZE) {
+    if (def_rtr_count == DEF_RTR_LST_SIZE) {
         DEBUG("ERROR: default router list full\n");
     }
     else {
@@ -1323,8 +1323,8 @@ void def_rtr_lst_rem(def_rtr_lst_t *entry)
 {
     int i;
 
-    for(i = 0; i < DEF_RTR_LST_SIZE; i++) {
-        if(&def_rtr_lst[i] == entry) {
+    for (i = 0; i < DEF_RTR_LST_SIZE; i++) {
+        if (&def_rtr_lst[i] == entry) {
             /* search the to deleted item, then memmove the last item to its
              * position, and decrement array count */
             memmove(entry, &def_rtr_lst[def_rtr_count], sizeof(def_rtr_lst_t));
@@ -1340,7 +1340,7 @@ void def_rtr_lst_rem(def_rtr_lst_t *entry)
 int8_t plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
                  uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1)
 {
-    if(prefix_count == OPT_PI_LIST_LEN) {
+    if (prefix_count == OPT_PI_LIST_LEN) {
         return SIXLOWERROR_ARRAYFULL;
     }
     else {

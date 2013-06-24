@@ -52,7 +52,7 @@ static volatile bool echo_on = false;
 
 static void close_file_handle(void)
 {
-    if(fh != NULL) {
+    if (fh != NULL) {
         fclose(fh);
         fh = NULL;
     }
@@ -60,9 +60,9 @@ static void close_file_handle(void)
 
 static void write_to_file(char *str, int str_len)
 {
-    if(fh != NULL && str_len > 0) {
-        if(fwrite(str, sizeof(char), str_len, fh) != str_len) {
-            if(echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
+    if (fh != NULL && str_len > 0) {
+        if (fwrite(str, sizeof(char), str_len, fh) != str_len) {
+            if (echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
                 printf("LOGD [WARN]: file write failed, closing file\n");
             }
 
@@ -70,8 +70,8 @@ static void write_to_file(char *str, int str_len)
             return;
         }
 
-        if(fflush(fh) == EOF) {
-            if(echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
+        if (fflush(fh) == EOF) {
+            if (echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
                 printf("LOGD [WARN]: file write failed, closing file\n");
             }
 
@@ -82,8 +82,8 @@ static void write_to_file(char *str, int str_len)
     else {
         fh = fopen("/LOGD.LOG", "w");
 
-        if(!fh) {
-            if(echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
+        if (!fh) {
+            if (echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
                 printf("LOGD [WARN]: file reopen failed, damn!\n");
             }
         }
@@ -99,16 +99,16 @@ static void logd_process(void)
     log_queue_t *node;
 
     do {
-        if(!exit_flag) {
+        if (!exit_flag) {
             msg_receive(&m);
         }
 
         mutex_lock(&log_mutex);
 
-        while((node = (log_queue_t *) list_remove_head(&log_msg_queue)) != NULL) {
+        while ((node = (log_queue_t *) list_remove_head(&log_msg_queue)) != NULL) {
             write_to_file(node->str, node->str_len);
 
-            if(echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
+            if (echo_on && logd_stack_size >= LOGD_STACK_SIZE_CONSOLE) {
                 printf("%s", node->str);
             }
 
@@ -119,7 +119,7 @@ static void logd_process(void)
 
         mutex_unlock(&log_mutex, 0);
     }
-    while(m.type != MSG_EXIT && !exit_flag);
+    while (m.type != MSG_EXIT && !exit_flag);
 
     /* Logging thread is terminating, close log file */
     close_file_handle();
@@ -131,7 +131,7 @@ static void logd_init0(void)
 {
     fh = fopen("/LOGD.LOG", "w");
 
-    if(!fh) {
+    if (!fh) {
         return;
     }
 
@@ -156,11 +156,11 @@ bool logd_log(char *str, int str_len)
     msg m;
 
     /* Test if logd process was created */
-    if(log_pid == -1) {
+    if (log_pid == -1) {
         /* no logd created, because fopen() on log file failed. So try again */
         logd_init0();
 
-        if(log_pid == -1) {
+        if (log_pid == -1) {
             /* Still errors opening log file, exit now */
             return false;
         }
@@ -168,13 +168,13 @@ bool logd_log(char *str, int str_len)
 
     log_queue_t *lq = malloc(sizeof(*lq));
 
-    if(lq == NULL) {
+    if (lq == NULL) {
         return false;
     }
 
     lq->str = malloc(sizeof(char) * str_len + 1); /* 1 byte for string termination char */
 
-    if(lq->str == NULL) {
+    if (lq->str == NULL) {
         free(lq);
         return false;
     }
@@ -196,7 +196,7 @@ void logd_exit(void)
     msg m;
 
     /* Test if logd process was created */
-    if(log_pid == -1) {
+    if (log_pid == -1) {
         return;
     }
 

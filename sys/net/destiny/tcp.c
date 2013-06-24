@@ -52,7 +52,7 @@ void printArrayRange_tcp(uint8_t *udp_header, uint16_t len)
     int i = 0;
     printf("-------------MEMORY-------------\n");
 
-    for(i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         printf("%#x ", *(udp_header + i));
     }
 
@@ -77,7 +77,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
     uint8_t tcp_payload_len = ipv6_header->length - TCP_HDR_LEN;
     uint8_t acknowledged_bytes = 0;
 
-    if(tcp_payload_len > tcp_socket->socket_values.tcp_control.rcv_wnd) {
+    if (tcp_payload_len > tcp_socket->socket_values.tcp_control.rcv_wnd) {
         mutex_lock(&tcp_socket->tcp_buffer_mutex);
         memcpy(tcp_socket->tcp_input_buffer, payload,
                tcp_socket->socket_values.tcp_control.rcv_wnd);
@@ -98,7 +98,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
         mutex_unlock(&tcp_socket->tcp_buffer_mutex, 0);
     }
 
-    if(thread_getstatus(tcp_socket->recv_pid) == STATUS_RECEIVE_BLOCKED) {
+    if (thread_getstatus(tcp_socket->recv_pid) == STATUS_RECEIVE_BLOCKED) {
         net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->recv_pid, UNDEFINED);
     }
 
@@ -111,25 +111,25 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
     msg_t m_recv_tcp, m_send_tcp;
     uint8_t target_pid;
 
-    if(tcp_socket->socket_values.tcp_control.state == LAST_ACK) {
+    if (tcp_socket->socket_values.tcp_control.state == LAST_ACK) {
         target_pid = tcp_socket->recv_pid;
         close_socket(tcp_socket);
         msg_send(&m_send_tcp, target_pid, 0);
         return;
     }
-    else if(tcp_socket->socket_values.tcp_control.state == CLOSING) {
+    else if (tcp_socket->socket_values.tcp_control.state == CLOSING) {
         msg_send(&m_send_tcp, tcp_socket->recv_pid, 0);
         msg_send(&m_send_tcp, tcp_socket->send_pid, 0);
         return;
     }
-    else if(getWaitingConnectionSocket(tcp_socket->socket_id, ipv6_header,
+    else if (getWaitingConnectionSocket(tcp_socket->socket_id, ipv6_header,
                                        tcp_header) != NULL) {
         m_send_tcp.content.ptr = (char *)tcp_header;
         net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->recv_pid, TCP_ACK);
         return;
     }
-    else if(tcp_socket->socket_values.tcp_control.state == ESTABLISHED) {
-        if(check_tcp_consistency(&tcp_socket->socket_values, tcp_header) == PACKET_OK) {
+    else if (tcp_socket->socket_values.tcp_control.state == ESTABLISHED) {
+        if (check_tcp_consistency(&tcp_socket->socket_values, tcp_header) == PACKET_OK) {
             m_send_tcp.content.ptr = (char *)tcp_header;
             net_msg_send(&m_send_tcp, tcp_socket->send_pid, 0, TCP_ACK);
             return;
@@ -150,11 +150,11 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 {
     msg_t m_send_tcp;
 
-    if(tcp_socket->socket_values.tcp_control.state == LISTEN) {
+    if (tcp_socket->socket_values.tcp_control.state == LISTEN) {
         socket_internal_t *new_socket = new_tcp_queued_socket(ipv6_header,
                                                               tcp_header);
 
-        if(new_socket != NULL) {
+        if (new_socket != NULL) {
 #ifdef TCP_HC
             update_tcp_hc_context(true, new_socket, tcp_header);
 #endif
@@ -179,7 +179,7 @@ void handle_tcp_syn_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 {
     msg_t m_send_tcp;
 
-    if(tcp_socket->socket_values.tcp_control.state == SYN_SENT) {
+    if (tcp_socket->socket_values.tcp_control.state == SYN_SENT) {
         m_send_tcp.content.ptr = (char *) tcp_header;
         net_msg_send(&m_send_tcp, tcp_socket->recv_pid, 0, TCP_SYN_ACK);
     }
@@ -205,7 +205,7 @@ void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
     current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
 #endif
 
-    if(current_tcp_socket->tcp_control.state == FIN_WAIT_1) {
+    if (current_tcp_socket->tcp_control.state == FIN_WAIT_1) {
         current_tcp_socket->tcp_control.state = CLOSING;
 
         send_tcp(tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
@@ -253,9 +253,9 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
-    if(tcp_payload_len > 0) {
+    if (tcp_payload_len > 0) {
 
-        if(check_tcp_consistency(current_tcp_socket, tcp_header) == PACKET_OK) {
+        if (check_tcp_consistency(current_tcp_socket, tcp_header) == PACKET_OK) {
             read_bytes = handle_payload(ipv6_header, tcp_header, tcp_socket, payload);
 
             /* Refresh TCP status values */
@@ -295,7 +295,7 @@ void tcp_packet_handler(void)
     socket_internal_t *tcp_socket = NULL;
     uint16_t chksum;
 
-    while(1) {
+    while (1) {
         msg_receive(&m_recv_ip);
 
         ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
@@ -311,7 +311,7 @@ void tcp_packet_handler(void)
         payload = (uint8_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN +
                 tcp_header->dataOffset_reserved * 4);
 
-        if((chksum == 0xffff) && (tcp_socket != NULL)) {
+        if ((chksum == 0xffff) && (tcp_socket != NULL)) {
 #ifdef TCP_HC
             update_tcp_hc_context(true, tcp_socket, tcp_header);
 #endif

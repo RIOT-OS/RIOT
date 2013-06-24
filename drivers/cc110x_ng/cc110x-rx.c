@@ -55,11 +55,11 @@ void cc110x_rx_handler(void)
 
     res = receive_packet((uint8_t *)&(cc110x_rx_buffer[rx_buffer_next].packet), sizeof(cc110x_packet_t));
 
-    if(res) {
+    if (res) {
         /* If we are sending a burst, don't accept packets.
          * Only ACKs are processed (for stopping the burst).
          * Same if state machine is in TX lock. */
-        if(radio_state == RADIO_SEND_BURST || rflags.TX) {
+        if (radio_state == RADIO_SEND_BURST || rflags.TX) {
             cc110x_statistic.packets_in_while_tx++;
             return;
         }
@@ -79,7 +79,7 @@ void cc110x_rx_handler(void)
 
 #ifdef DBG_IGNORE
 
-        if(is_ignored(cc110x_rx_buffer[rx_buffer_next].packet.phy_src)) {
+        if (is_ignored(cc110x_rx_buffer[rx_buffer_next].packet.phy_src)) {
             LED_RED_TOGGLE;
             return;
         }
@@ -87,7 +87,7 @@ void cc110x_rx_handler(void)
 #endif
 
         /* notify transceiver thread if any */
-        if(transceiver_pid) {
+        if (transceiver_pid) {
             msg_t m;
             m.type = (uint16_t) RCV_PKT_CC1100;
             m.content.value = rx_buffer_next;
@@ -95,7 +95,7 @@ void cc110x_rx_handler(void)
         }
 
         /* shift to next buffer element */
-        if(++rx_buffer_next == RX_BUF_SIZE) {
+        if (++rx_buffer_next == RX_BUF_SIZE) {
             rx_buffer_next = 0;
         }
 
@@ -111,14 +111,14 @@ void cc110x_rx_handler(void)
 
         /* If packet interrupted this nodes send call,
          * don't change anything after this point. */
-        if(radio_state == RADIO_AIR_FREE_WAITING) {
+        if (radio_state == RADIO_AIR_FREE_WAITING) {
             cc110x_strobe(CC1100_SRX);
             hwtimer_wait(IDLE_TO_RX_TIME);
             return;
         }
 
         /* If currently sending, exit here (don't go to RX/WOR) */
-        if(radio_state == RADIO_SEND_BURST) {
+        if (radio_state == RADIO_SEND_BURST) {
             cc110x_statistic.packets_in_while_tx++;
             return;
         }
@@ -135,12 +135,12 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length)
     uint8_t packetLength = 0;
 
     /* Any bytes available in RX FIFO? */
-    if((cc110x_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO)) {
+    if ((cc110x_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO)) {
         /* Read length byte (first byte in RX FIFO) */
         cc110x_read_fifo((char *) &packetLength, 1);
 
         /* Read data from RX FIFO and store in rxBuffer */
-        if(packetLength <= length) {
+        if (packetLength <= length) {
             /* Put length byte at first position in RX Buffer */
             rxBuffer[0] = packetLength;
 
@@ -157,7 +157,7 @@ static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length)
             /* MSB of LQI is the CRC_OK bit */
             rflags.CRC_STATE = (status[I_LQI] & CRC_OK) >> 7;
 
-            if(!rflags.CRC_STATE) {
+            if (!rflags.CRC_STATE) {
                 cc110x_statistic.packets_in_crc_fail++;
             }
 
@@ -183,7 +183,7 @@ static uint8_t receive_packet(uint8_t *rxBuffer, uint8_t length)
 {
     uint8_t pkt_len_cfg = cc110x_read_reg(CC1100_PKTCTRL0) & PKT_LENGTH_CONFIG;
 
-    if(pkt_len_cfg == VARIABLE_PKTLEN) {
+    if (pkt_len_cfg == VARIABLE_PKTLEN) {
         return receive_packet_variable(rxBuffer, length);
     }
 
@@ -202,11 +202,11 @@ uint8_t cc110x_add_ignored(radio_address_t addr)
 {
     uint8_t i = 0;
 
-    while((i < IGN_MAX) && ignored_addr[i++]) {
+    while ((i < IGN_MAX) && ignored_addr[i++]) {
         printf("i: %hu\n", i);
     }
 
-    if(i > IGN_MAX) {
+    if (i > IGN_MAX) {
         return 0;
     }
 
@@ -218,8 +218,8 @@ static uint8_t is_ignored(radio_address_t addr)
 {
     uint8_t i;
 
-    for(i = 0; i < IGN_MAX; i++) {
-        if(ignored_addr[i] == addr) {
+    for (i = 0; i < IGN_MAX; i++) {
+        if (ignored_addr[i] == addr) {
             return 1;
         }
     }

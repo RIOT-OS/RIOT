@@ -40,7 +40,7 @@ void _cc1100_get_set_address_handler(char *addr)
     mesg.content.ptr = (char *) &tcmd;
     a = atoi(addr + 5);
 
-    if(strlen(addr) > 5) {
+    if (strlen(addr) > 5) {
         printf("[cc110x] Trying to set address %i\n", a);
         mesg.type = SET_ADDRESS;
     }
@@ -61,7 +61,7 @@ void _cc1100_get_set_channel_handler(char *chan)
     mesg.content.ptr = (char *) &tcmd;
     c = atoi(chan + 5);
 
-    if(strlen(chan) > 5) {
+    if (strlen(chan) > 5) {
         printf("[cc110x] Trying to set channel %i\n", c);
         mesg.type = SET_CHANNEL;
     }
@@ -85,11 +85,11 @@ void _cc1100_send_handler(char *pkt)
 
     tok = strtok(pkt + 7, " ");
 
-    if(tok) {
+    if (tok) {
         addr = atoi(tok);
         tok = strtok(NULL, " ");
 
-        if(tok) {
+        if (tok) {
             memset(text_msg, 0, TEXT_SIZE);
             memcpy(text_msg, tok, strlen(tok));
             /*    if (sscanf(pkt, "txtsnd %hu %s", &(addr), text_msg) == 2) {*/
@@ -116,11 +116,11 @@ void _cc110x_get_set_address_handler(char *addr)
 
     a = atoi(addr + 5);
 
-    if(strlen(addr) > 5) {
+    if (strlen(addr) > 5) {
         printf("[cc110x] Setting address %i ... ", a);
         cc1100_set_address((radio_address_t)a);
 
-        if(cc1100_get_address() == (radio_address_t)a) {
+        if (cc1100_get_address() == (radio_address_t)a) {
             puts("[OK]");
         }
         else {
@@ -138,11 +138,11 @@ void _cc110x_get_set_channel_handler(char *addr)
 
     a = atoi(addr + 5);
 
-    if(strlen(addr) > 5) {
+    if (strlen(addr) > 5) {
         printf("[cc110x] Setting channel %i...", a);
         cc1100_set_channel(a);
 
-        if(cc1100_get_channel() == a) {
+        if (cc1100_get_channel() == a) {
             puts("OK");
         }
         else {

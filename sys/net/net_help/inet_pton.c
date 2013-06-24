@@ -42,28 +42,28 @@ static int inet_pton4(const char *src, unsigned char *dst)
     octets = 0;
     *(tp = tmp) = 0;
 
-    while((ch = *src++) != '\0') {
+    while ((ch = *src++) != '\0') {
         const char *pch;
 
-        if((pch = strchr(digits, ch)) != NULL) {
+        if ((pch = strchr(digits, ch)) != NULL) {
             unsigned int new = *tp * 10 + (unsigned int)(pch - digits);
 
-            if(new > 255) {
+            if (new > 255) {
                 return (0);
             }
 
             *tp = new;
 
-            if(! saw_digit) {
-                if(++octets > 4) {
+            if (!saw_digit) {
+                if (++octets > 4) {
                     return (0);
                 }
 
                 saw_digit = 1;
             }
         }
-        else if(ch == '.' && saw_digit) {
-            if(octets == 4) {
+        else if (ch == '.' && saw_digit) {
+            if (octets == 4) {
                 return (0);
             }
 
@@ -75,7 +75,7 @@ static int inet_pton4(const char *src, unsigned char *dst)
         }
     }
 
-    if(octets < 4) {
+    if (octets < 4) {
         return (0);
     }
 
@@ -110,8 +110,8 @@ static int inet_pton6(const char *src, unsigned char *dst)
     colonp = NULL;
 
     /* Leading :: requires some special handling. */
-    if(*src == ':')
-        if(*++src != ':') {
+    if (*src == ':')
+        if (*++src != ':') {
             return (0);
         }
 
@@ -119,18 +119,18 @@ static int inet_pton6(const char *src, unsigned char *dst)
     saw_xdigit = 0;
     val = 0;
 
-    while((ch = *src++) != '\0') {
+    while ((ch = *src++) != '\0') {
         const char *pch;
 
-        if((pch = strchr((xdigits = xdigits_l), ch)) == NULL) {
+        if ((pch = strchr((xdigits = xdigits_l), ch)) == NULL) {
             pch = strchr((xdigits = xdigits_u), ch);
         }
 
-        if(pch != NULL) {
+        if (pch != NULL) {
             val <<= 4;
             val |= (pch - xdigits);
 
-            if(val > 0xffff) {
+            if (val > 0xffff) {
                 return (0);
             }
 
@@ -138,11 +138,11 @@ static int inet_pton6(const char *src, unsigned char *dst)
             continue;
         }
 
-        if(ch == ':') {
+        if (ch == ':') {
             curtok = src;
 
-            if(!saw_xdigit) {
-                if(colonp) {
+            if (!saw_xdigit) {
+                if (colonp) {
                     return (0);
                 }
 
@@ -150,7 +150,7 @@ static int inet_pton6(const char *src, unsigned char *dst)
                 continue;
             }
 
-            if(tp + INT16SZ > endp) {
+            if (tp + INT16SZ > endp) {
                 return (0);
             }
 
@@ -161,7 +161,7 @@ static int inet_pton6(const char *src, unsigned char *dst)
             continue;
         }
 
-        if(ch == '.' && ((tp + INADDRSZ) <= endp) &&
+        if (ch == '.' && ((tp + INADDRSZ) <= endp) &&
            inet_pton4(curtok, tp) > 0) {
             tp += INADDRSZ;
             saw_xdigit = 0;
@@ -171,8 +171,8 @@ static int inet_pton6(const char *src, unsigned char *dst)
         return (0);
     }
 
-    if(saw_xdigit) {
-        if(tp + INT16SZ > endp) {
+    if (saw_xdigit) {
+        if (tp + INT16SZ > endp) {
             return (0);
         }
 
@@ -180,7 +180,7 @@ static int inet_pton6(const char *src, unsigned char *dst)
         *tp++ = (unsigned char) val & 0xff;
     }
 
-    if(colonp != NULL) {
+    if (colonp != NULL) {
         /*
          * Since some memmove()'s erroneously fail to handle
          * overlapping regions, we'll do the shift by hand.
@@ -188,7 +188,7 @@ static int inet_pton6(const char *src, unsigned char *dst)
         const ssize_t n = tp - colonp;
         ssize_t i;
 
-        for(i = 1; i <= n; i++) {
+        for (i = 1; i <= n; i++) {
             endp[- i] = colonp[n - i];
             colonp[n - i] = 0;
         }
@@ -196,7 +196,7 @@ static int inet_pton6(const char *src, unsigned char *dst)
         tp = endp;
     }
 
-    if(tp != endp) {
+    if (tp != endp) {
         return (0);
     }
 

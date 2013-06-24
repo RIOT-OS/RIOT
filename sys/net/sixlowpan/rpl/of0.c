@@ -39,8 +39,8 @@ void reset(rpl_dodag_t *dodag)
 
 uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
 {
-    if(base_rank == 0) {
-        if(parent == NULL) {
+    if (base_rank == 0) {
+        if (parent == NULL) {
             return INFINITE_RANK;
         }
 
@@ -49,14 +49,14 @@ uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
 
     uint16_t add;
 
-    if(parent != NULL) {
+    if (parent != NULL) {
         add = parent->dodag->minhoprankincrease;
     }
     else {
         add = DEFAULT_MIN_HOP_RANK_INCREASE;
     }
 
-    if(base_rank + add < base_rank) {
+    if (base_rank + add < base_rank) {
         return INFINITE_RANK;
     }
 
@@ -66,7 +66,7 @@ uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
 /* We simply return the Parent with lower rank */
 rpl_parent_t *which_parent(rpl_parent_t *p1, rpl_parent_t *p2)
 {
-    if(p1->rank < p2->rank) {
+    if (p1->rank < p2->rank) {
         return p1;
     }
 

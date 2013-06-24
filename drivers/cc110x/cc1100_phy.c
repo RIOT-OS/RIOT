@@ -174,7 +174,7 @@ void cc1100_phy_init()
     rx_buffer_size = 0;
 
     /* Initialize RX-Buffer (clear content) */
-    for(i = 0; i < RX_BUFF_SIZE; i++) {
+    for (i = 0; i < RX_BUFF_SIZE; i++) {
         rx_buffer->packet.length = 0;
     }
 
@@ -194,10 +194,10 @@ void cc1100_phy_init()
                                cc1100_event_handler_function, cc1100_event_handler_name);
 
     /* Active watchdog for the first time */
-    if(radio_mode == CC1100_MODE_CONSTANT_RX) {
+    if (radio_mode == CC1100_MODE_CONSTANT_RX) {
         cc1100_watch_dog_period.microseconds = CC1100_WATCHDOG_PERIOD;
 
-        if(cc1100_watch_dog_period.microseconds != 0) {
+        if (cc1100_watch_dog_period.microseconds != 0) {
             timex_t temp = timex_set(0, 5000000L);
             vtimer_set_msg(&cc1100_watch_dog, temp, cc1100_event_handler_pid, NULL);
         }
@@ -210,7 +210,7 @@ void cc1100_phy_init()
 
 void cc1100_phy_mutex_lock(void)
 {
-    if(active_thread->pid != cc1100_mutex_pid) {
+    if (active_thread->pid != cc1100_mutex_pid) {
         mutex_lock(&cc1100_mutex);
         cc1100_mutex_pid = active_thread->pid;
     }
@@ -274,7 +274,7 @@ void cc1100_print_config(void)
     printf("Retransmissions (broadcast):  %u - always\r\n", cc1100_retransmission_count_bc);
     printf("Output power setting:         %s\r\n", cc1100_get_output_power(buf));
 
-    if(radio_mode == CC1100_MODE_WOR) {
+    if (radio_mode == CC1100_MODE_WOR) {
         printf("RX polling interval:      %u ms\r\n", cc1100_wor_config.rx_interval);
         printf("WOR receive time:         0x%.2X (%f ms)\r\n", cc1100_wor_config.rx_time_reg,
                cc1100_wor_config.rx_time_ms);
@@ -312,7 +312,7 @@ int cc1100_phy_calc_wor_settings(uint16_t millis)
     uint16_t event0_min = (uint16_t)(t_packet_interval * 8) + 1 + 10;
 
     /* Check if given value is in allowed range */
-    if(millis < event0_min || millis > EVENT0_MAX) {
+    if (millis < event0_min || millis > EVENT0_MAX) {
         return -1;
     }
 
@@ -323,7 +323,7 @@ int cc1100_phy_calc_wor_settings(uint16_t millis)
     /* Calculate new value for EVENT0 */
     double tmp = (millis * 26) / (double) 750;
 
-    if(wor_res == 1) {
+    if (wor_res == 1) {
         tmp /= 32;
     }
 
@@ -334,22 +334,22 @@ int cc1100_phy_calc_wor_settings(uint16_t millis)
     int i;
     double rx_timeouts[DUTY_CYCLE_SIZE];
 
-    for(i = 0; i < DUTY_CYCLE_SIZE; i++) {
+    for (i = 0; i < DUTY_CYCLE_SIZE; i++) {
         rx_timeouts[i] = (millis * duty_cycle[wor_res][i]) / 100;
     }
 
     /* Calculate index for optimal rx_timeout (MCSM2.RX_TIME) (if possible) */
     int idx = -1;
 
-    for(i = DUTY_CYCLE_SIZE - 1; i >= 0; i--) {
-        if(rx_timeouts[i] > t_packet_interval) {
+    for (i = DUTY_CYCLE_SIZE - 1; i >= 0; i--) {
+        if (rx_timeouts[i] > t_packet_interval) {
             idx = i;
             break;
         }
     }
 
     /* If no index found, exit here (configuration with given value is not possible) */
-    if(idx == -1) {
+    if (idx == -1) {
         return -1;
     }
 
@@ -381,12 +381,12 @@ static bool contains_seq_entry(uint8_t src, uint8_t id)
     vtimer_now(&now_timex);
     uint64_t now = now_timex.microseconds;
 
-    for(i = 0; i < MAX_SEQ_BUFFER_SIZE; i++) {
-        if((seq_buffer[i].source == src) && (seq_buffer[i].identification == id)) {
+    for (i = 0; i < MAX_SEQ_BUFFER_SIZE; i++) {
+        if ((seq_buffer[i].source == src) && (seq_buffer[i].identification == id)) {
             /* Check if time stamp is OK */
             cmp = (radio_mode == CC1100_MODE_WOR) ? cc1100_wor_config.rx_interval : 16000; /* constant RX ~16ms */
 
-            if((now - seq_buffer[i].m_ticks) <= cmp) {
+            if ((now - seq_buffer[i].m_ticks) <= cmp) {
                 return true;
             }
             else {
@@ -405,8 +405,8 @@ static void add_seq_entry(uint8_t src, uint8_t id)
      * lost (especially important in constant RX mode). */
     int i;
 
-    for(i = 0; i < MAX_SEQ_BUFFER_SIZE; i++) {
-        if(seq_buffer[i].source == src) {
+    for (i = 0; i < MAX_SEQ_BUFFER_SIZE; i++) {
+        if (seq_buffer[i].source == src) {
             seq_buffer[i].source = 0; /* Reset */
         }
     }
@@ -425,7 +425,7 @@ static void add_seq_entry(uint8_t src, uint8_t id)
 
     seq_buffer_pos++;
 
-    if(seq_buffer_pos == MAX_SEQ_BUFFER_SIZE) {
+    if (seq_buffer_pos == MAX_SEQ_BUFFER_SIZE) {
         seq_buffer_pos = 0;
     }
 }
@@ -442,7 +442,7 @@ static void send_link_level_ack(uint8_t dest)
     radio_state = RADIO_SEND_ACK;				/* Set state to "Sending ACK" */
     cc1100_spi_write_reg(CC1100_MCSM0, 0x08);	/* Turn off FS-Autocal */
     cc1100_spi_write_reg(CC1100_MCSM1, 0x00);	/* TX_OFFMODE = IDLE */
-    ack.length = 3;								/* possible packet in txBuffer! */
+    ack.length = 3;								/* possible packet in txBuffer!*/
     ack.address = dest;
     ack.phy_src = rflags.RSSI;
     ack.flags = (LAYER_1_PROTOCOL_LL_ACK << 1);
@@ -460,7 +460,7 @@ static bool send_burst(cc1100_packet_layer0_t *packet, uint8_t retries, uint8_t 
     radio_state = RADIO_SEND_BURST;
     rflags.LL_ACK = false;
 
-    for(i = 1; i <= cc1100_burst_count; i++) {
+    for (i = 1; i <= cc1100_burst_count; i++) {
         /*
          * Number of bytes to send is:
          * length of phy payload (packet->length)
@@ -475,7 +475,7 @@ static bool send_burst(cc1100_packet_layer0_t *packet, uint8_t retries, uint8_t 
         /* Delay until predefined "send" interval has passed */
         timer_tick_t now = hwtimer_now();
 
-        if(t > now) {
+        if (t > now) {
             hwtimer_wait(t - now);
         }
 
@@ -486,7 +486,7 @@ static bool send_burst(cc1100_packet_layer0_t *packet, uint8_t retries, uint8_t 
          * have the broadcast address at startup and would stop the burst
          * by sending an ACK).
          */
-        if(rflags.LL_ACK && packet->address != CC1100_BROADCAST_ADDRESS) {
+        if (rflags.LL_ACK && packet->address != CC1100_BROADCAST_ADDRESS) {
             cc1100_statistic.raw_packets_out_acked += i;
             break;
         }
@@ -496,7 +496,7 @@ static bool send_burst(cc1100_packet_layer0_t *packet, uint8_t retries, uint8_t 
      * Note: Event broadcast packets can be sent repeatedly if in
      *       constant RX mode. In WOR mode it is not necessary, so
      *       set retry count to zero.*/
-    if(!rflags.LL_ACK && retries > 0) {
+    if (!rflags.LL_ACK && retries > 0) {
         return send_burst(packet, retries - 1, rtc + 1);
     }
 
@@ -504,7 +504,7 @@ static bool send_burst(cc1100_packet_layer0_t *packet, uint8_t retries, uint8_t 
     rflags.RETC = rtc;
     rflags.RPS = rtc * cc1100_burst_count + i;
 
-    if(i > cc1100_burst_count) {
+    if (i > cc1100_burst_count) {
         rflags.RPS--;
     }
 
@@ -516,7 +516,7 @@ static bool send_burst(cc1100_packet_layer0_t *packet, uint8_t retries, uint8_t 
     /* Burst from any other node is definitely over */
     last_seq_num = 0;
 
-    if(packet->address != CC1100_BROADCAST_ADDRESS && !rflags.LL_ACK) {
+    if (packet->address != CC1100_BROADCAST_ADDRESS && !rflags.LL_ACK) {
         return false;
     }
 
@@ -543,24 +543,24 @@ int cc1100_send(radio_address_t addr, protocol_t protocol, int priority, char *p
     address = addr;
 
     /* Loopback not supported */
-    if(address == cc1100_get_address()) {
+    if (address == cc1100_get_address()) {
         return_code = RADIO_ADDR_OUT_OF_RANGE;
         goto mode_before_final;
     }
 
     /* Check address */
-    if(address > MAX_UID) {
+    if (address > MAX_UID) {
         return_code = RADIO_ADDR_OUT_OF_RANGE;
         goto mode_before_final;
     }
 
     /* Packet too long */
-    if(payload_len > MAX_DATA_LENGTH) {
+    if (payload_len > MAX_DATA_LENGTH) {
         return_code = RADIO_PAYLOAD_TOO_LONG;
         goto mode_before_final;
     }
 
-    if(radio_state == RADIO_PWD) {
+    if (radio_state == RADIO_PWD) {
         return_code = RADIO_WRONG_MODE;
         goto mode_before_final;
     }
@@ -591,10 +591,10 @@ int cc1100_send(radio_address_t addr, protocol_t protocol, int priority, char *p
     return_code = result ? payload_len : RADIO_OP_FAILED;
 
     /* Collect statistics */
-    if(address != CC1100_BROADCAST_ADDRESS) {
+    if (address != CC1100_BROADCAST_ADDRESS) {
         cc1100_statistic.packets_out++;
 
-        if(result) {
+        if (result) {
             cc1100_statistic.packets_out_acked++;
         }
     }
@@ -627,7 +627,7 @@ bool cc1100_set_packet_monitor(packet_monitor_t monitor)
 
 int cc1100_set_packet_handler(protocol_t protocol, packet_handler_t handler)
 {
-    if(protocol > 7) {
+    if (protocol > 7) {
         return -1;    /* Only 3-bit value allowed */
     }
 
@@ -638,27 +638,27 @@ static void cc1100_event_handler_function(void)
 {
     msg_t m;
 
-    while(1) {
-        if(cc1100_watch_dog_period.microseconds != 0) {
+    while (1) {
+        if (cc1100_watch_dog_period.microseconds != 0) {
             vtimer_remove(&cc1100_watch_dog);
         }
 
         /* Test if any resource error has occurred */
-        if(rflags.KT_RES_ERR) {
+        if (rflags.KT_RES_ERR) {
             rflags.KT_RES_ERR = false;
             /* possibly do something, e.g. log error condition */
         }
 
-        if(m.type == MSG_TIMER) {
+        if (m.type == MSG_TIMER) {
             uint8_t state;
 
-            if(radio_mode == CC1100_MODE_CONSTANT_RX) {
+            if (radio_mode == CC1100_MODE_CONSTANT_RX) {
                 state = cc1100_spi_read_status(CC1100_MARCSTATE) & MARC_STATE;
 
-                if((state < 13 || state > 15) && radio_state == RADIO_RX && !rflags.TX) {
+                if ((state < 13 || state > 15) && radio_state == RADIO_RX && !rflags.TX) {
                     cc1100_statistic.watch_dog_resets++;
 
-                    if(state != 1) {
+                    if (state != 1) {
                         cc1100_spi_strobe(CC1100_SIDLE);
                     }
 
@@ -672,11 +672,11 @@ static void cc1100_event_handler_function(void)
             }
         }
 
-        while(rx_buffer_size > 0) {
+        while (rx_buffer_size > 0) {
             rx_buffer_t *packet = &rx_buffer[rx_buffer_head];
             protocol_t p =  R_FLAGS_PROTOCOL(packet->packet.flags);
 
-            if(packet_monitor != NULL) {
+            if (packet_monitor != NULL) {
                 packet_monitor((void *)&packet->packet.data, packet->packet.length, p, &packet->info);
             }
 
@@ -685,7 +685,7 @@ static void cc1100_event_handler_function(void)
             rx_buffer_size--;
             rx_buffer_head++;
 
-            if(rx_buffer_head == RX_BUFF_SIZE) {
+            if (rx_buffer_head == RX_BUFF_SIZE) {
                 rx_buffer_head = 0;
             }
 
@@ -694,8 +694,8 @@ static void cc1100_event_handler_function(void)
 
         dINT();
 
-        if(rx_buffer_size == 0) {
-            if(cc1100_watch_dog_period.microseconds != 0) {
+        if (rx_buffer_size == 0) {
+            if (cc1100_watch_dog_period.microseconds != 0) {
                 timex_t temp = timex_set(0, cc1100_watch_dog_period.microseconds * 1000000L);
                 vtimer_set_msg(&cc1100_watch_dog, temp,
                                cc1100_event_handler_pid, NULL);
@@ -725,7 +725,7 @@ void cc1100_phy_rx_handler(void)
     cc1100_statistic.packets_in++;
 
     /* If WOR timer set, delete it now (new one will be set at end of ISR) */
-    if(wor_hwtimer_id != -1) {
+    if (wor_hwtimer_id != -1) {
         hwtimer_remove(wor_hwtimer_id);
         wor_hwtimer_id = -1;
     }
@@ -733,7 +733,7 @@ void cc1100_phy_rx_handler(void)
     /* Transfer packet into temporary buffer position */
     res = cc1100_spi_receive_packet((uint8_t *) & (rx_buffer[rx_buffer_tail].packet), sizeof(cc1100_packet_layer0_t));
 
-    if(res) {
+    if (res) {
         /* Get packet pointer and store additional data in packet info structure */
         cc1100_packet_layer0_t *p = &(rx_buffer[rx_buffer_tail].packet);
         rx_buffer[rx_buffer_tail].info.phy_src = p->phy_src;
@@ -749,9 +749,9 @@ void cc1100_phy_rx_handler(void)
 
         /* If received packet was an ACK (here we must be in
          * TX lock state, otherwise we don't expect an ACK) */
-        if(protocol == LAYER_1_PROTOCOL_LL_ACK && rflags.TX) {
+        if (protocol == LAYER_1_PROTOCOL_LL_ACK && rflags.TX) {
             /* And packet was for us */
-            if(p->address == cc1100_get_address()) {
+            if (p->address == cc1100_get_address()) {
                 /* Stop the burst */
                 rflags.LL_ACK = true;
                 rflags.RSSI_SEND = p->phy_src;
@@ -768,14 +768,14 @@ void cc1100_phy_rx_handler(void)
         /* If we are sending a burst, don't accept packets.
          * Only ACKs are processed (for stopping the burst).
          * Same if state machine is in TX lock. */
-        if(radio_state == RADIO_SEND_BURST || rflags.TX) {
+        if (radio_state == RADIO_SEND_BURST || rflags.TX) {
             cc1100_statistic.packets_in_while_tx++;
             return;
         }
 
         /* If buffer is currently full -> don't check sequence numbers, send
          * ACK and restore state (keep always one position free for temporary packets) */
-        if(rx_buffer_size >= RX_BUFF_SIZE - 1) {
+        if (rx_buffer_size >= RX_BUFF_SIZE - 1) {
             goto send_ack;
         }
 
@@ -788,9 +788,9 @@ void cc1100_phy_rx_handler(void)
         dup = true;
 
         /* If new and last sequence number are the same, then discard packet */
-        if(last_seq_num != new_seq_num) {
+        if (last_seq_num != new_seq_num) {
             /* Do a more precise check (takes more time) with larger buffer */
-            if(!contains_seq_entry(p->phy_src, identification)) {
+            if (!contains_seq_entry(p->phy_src, identification)) {
                 /* Sequence number is new, no duplicate packet */
                 dup = false;
 
@@ -800,13 +800,13 @@ void cc1100_phy_rx_handler(void)
                 /* Make temporary packet in RX buffer to a "real" packet which is processed */
                 rx_buffer_size++;
 
-                if(rx_buffer_size > cc1100_statistic.rx_buffer_max) {
+                if (rx_buffer_size > cc1100_statistic.rx_buffer_max) {
                     cc1100_statistic.rx_buffer_max = rx_buffer_size;
                 }
 
                 rx_buffer_tail++;
 
-                if(rx_buffer_tail == RX_BUFF_SIZE) {
+                if (rx_buffer_tail == RX_BUFF_SIZE) {
                     rx_buffer_tail = 0;
                 }
 
@@ -822,8 +822,8 @@ void cc1100_phy_rx_handler(void)
     send_ack:
 
         /* If packet was send directly to us, send an ACK packet back to sender.
-         * But only not if the packet itself was a LL-ACK! */
-        if(p->address == cc1100_get_address() && protocol != LAYER_1_PROTOCOL_LL_ACK) {
+         * But only not if the packet itself was a LL-ACK!*/
+        if (p->address == cc1100_get_address() && protocol != LAYER_1_PROTOCOL_LL_ACK) {
             send_link_level_ack(p->phy_src);
 
             /* After LL-ACK burst is over, reset number */
@@ -831,13 +831,13 @@ void cc1100_phy_rx_handler(void)
         }
 
         /* If duplicate packet detected, clear rxBuffer position */
-        if(dup) {
+        if (dup) {
             cc1100_statistic.packets_in_dups++;
         }
 
         /* If packet interrupted this nodes send call,
          * don't change anything after this point. */
-        if(radio_state == RADIO_AIR_FREE_WAITING) {
+        if (radio_state == RADIO_AIR_FREE_WAITING) {
             cc1100_spi_strobe(CC1100_SRX);
             hwtimer_wait(IDLE_TO_RX_TIME);
             return;
@@ -849,7 +849,7 @@ void cc1100_phy_rx_handler(void)
         cc1100_spi_write_reg(CC1100_MCSM0, 0x08);	 * Turn off FS-Autocal
         cc1100_spi_write_reg(CC1100_MCSM2, 0x07);	/* Configure RX_TIME (until end of packet) */
 
-        if(radio_mode == CC1100_MODE_CONSTANT_RX) {
+        if (radio_mode == CC1100_MODE_CONSTANT_RX) {
             cc1100_spi_strobe(CC1100_SRX);
             hwtimer_wait(IDLE_TO_RX_TIME);
             radio_state = RADIO_RX;
@@ -864,7 +864,7 @@ void cc1100_phy_rx_handler(void)
         /* Set hwtimer to put CC1100 back to RX after WOR_TIMEOUT_1 */
         wor_hwtimer_id = hwtimer_set(WOR_TIMEOUT_1, cc1100_hwtimer_go_receive_wrapper, NULL);
 
-        if(wor_hwtimer_id == -1) {
+        if (wor_hwtimer_id == -1) {
             /* Signal hwtimer resource error, radio stays in RX,
              * so no big problem, only energy is wasted. */
             rflags.KT_RES_ERR = true;
@@ -881,14 +881,14 @@ void cc1100_phy_rx_handler(void)
 
         /* If packet interrupted this nodes send call,
          * don't change anything after this point. */
-        if(radio_state == RADIO_AIR_FREE_WAITING) {
+        if (radio_state == RADIO_AIR_FREE_WAITING) {
             cc1100_spi_strobe(CC1100_SRX);
             hwtimer_wait(IDLE_TO_RX_TIME);
             return;
         }
 
         /* If currently sending, exit here (don't go to RX/WOR) */
-        if(radio_state == RADIO_SEND_BURST) {
+        if (radio_state == RADIO_SEND_BURST) {
             cc1100_statistic.packets_in_while_tx++;
             return;
         }

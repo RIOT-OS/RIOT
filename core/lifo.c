@@ -7,7 +7,7 @@ int lifo_empty(int *array)
 
 void lifo_init(int *array, int n)
 {
-    for(int i = 0; i <= n; i++) {
+    for (int i = 0; i <= n; i++) {
         array[i] = -1;
     }
 }
@@ -23,7 +23,7 @@ int lifo_get(int *array)
 {
     int head = array[0];
 
-    if(head != -1) {
+    if (head != -1) {
         array[0] = array[head + 1];
     }
 

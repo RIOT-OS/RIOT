@@ -272,7 +272,7 @@ bool cc1100_spi_receive_packet(uint8_t *rxBuffer, uint8_t length);
  * buffer must match the CC1100 packet format (so address interpretation
  * succeeds).
  * <p>
- * This function is not mode safe! The radio must be woke up before
+ * This function is not mode safe!The radio must be woke up before
  * sending and has to be put back manually to receive mode.
  *
  * @param	tx_buffer Data source buffer.

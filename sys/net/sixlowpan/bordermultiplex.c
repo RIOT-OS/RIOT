@@ -37,16 +37,16 @@
 void demultiplex(border_packet_t *packet, int len)
 {
     switch(packet->type) {
-        case(BORDER_PACKET_RAW_TYPE): {
+        case (BORDER_PACKET_RAW_TYPE): {
             fputs(((char *)packet) + sizeof(border_packet_t), stdin);
             break;
         }
 
-        case(BORDER_PACKET_L3_TYPE): {
+        case (BORDER_PACKET_L3_TYPE): {
             border_l3_header_t *l3_header_buf = (border_l3_header_t *)packet;
 
             switch(l3_header_buf->ethertype) {
-                case(BORDER_ETHERTYPE_IPV6): {
+                case (BORDER_ETHERTYPE_IPV6): {
                     ipv6_hdr_t *ipv6_buf = (ipv6_hdr_t *)(((unsigned char *)packet) + sizeof(border_l3_header_t));
                     border_send_ipv6_over_lowpan(ipv6_buf, 1, 1);
                     break;
@@ -60,11 +60,11 @@ void demultiplex(border_packet_t *packet, int len)
             break;
         }
 
-        case(BORDER_PACKET_CONF_TYPE): {
+        case (BORDER_PACKET_CONF_TYPE): {
             border_conf_header_t *conf_header_buf = (border_conf_header_t *)packet;
 
             switch(conf_header_buf->conftype) {
-                case(BORDER_CONF_CONTEXT): {
+                case (BORDER_CONF_CONTEXT): {
                     border_context_packet_t *context = (border_context_packet_t *)packet;
                     ipv6_addr_t target_addr;
                     ipv6_set_all_nds_mcast_addr(&target_addr);
@@ -82,7 +82,7 @@ void demultiplex(border_packet_t *packet, int len)
                     break;
                 }
 
-                case(BORDER_CONF_IPADDR): {
+                case (BORDER_CONF_IPADDR): {
                     //border_addr_packet_t *addr_packet = (border_addr_packet_t *)packet;
                     /* add address */
                     break;
@@ -134,27 +134,27 @@ int readpacket(uint8_t *packet_buf, size_t size)
     uint8_t byte = END + 1;
     uint8_t esc = 0;
 
-    while(1) {
+    while (1) {
         byte = uart0_readc();
 
-        if(byte == END) {
+        if (byte == END) {
             break;
         }
 
-        if((line_buf_ptr - packet_buf) >= size - 1) {
+        if ((line_buf_ptr - packet_buf) >= size - 1) {
             return -SIXLOWERROR_ARRAYFULL;
         }
 
-        if(esc) {
+        if (esc) {
             esc = 0;
 
             switch(byte) {
-                case(END_ESC): {
+                case (END_ESC): {
                     *line_buf_ptr++ = END;
                     continue;
                 }
 
-                case(ESC_ESC): {
+                case (ESC_ESC): {
                     *line_buf_ptr++ = ESC;
                     continue;
                 }
@@ -164,7 +164,7 @@ int readpacket(uint8_t *packet_buf, size_t size)
             }
         }
 
-        if(byte == ESC) {
+        if (byte == ESC) {
             esc = 1;
             continue;
         }
@@ -179,19 +179,19 @@ int writepacket(uint8_t *packet_buf, size_t size)
 {
     uint8_t *byte_ptr = packet_buf;
 
-    while((byte_ptr - packet_buf) < size) {
-        if((byte_ptr - packet_buf) > BORDER_BUFFER_SIZE) {
+    while ((byte_ptr - packet_buf) < size) {
+        if ((byte_ptr - packet_buf) > BORDER_BUFFER_SIZE) {
             return -1;
         }
 
         switch(*byte_ptr) {
-            case(END): {
+            case (END): {
                 *byte_ptr = END_ESC;
                 uart0_putc(ESC);
                 break;
             }
 
-            case(ESC): {
+            case (ESC): {
                 *byte_ptr = ESC_ESC;
                 uart0_putc(ESC);
                 break;

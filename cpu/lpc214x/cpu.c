@@ -25,7 +25,7 @@ bool cpu_install_irq(int IntNumber, void *HandlerAddr, int Priority)
 
     VICIntEnClear = 1 << IntNumber;	/* Disable Interrupt */
 
-    if(IntNumber >= VIC_SIZE) {
+    if (IntNumber >= VIC_SIZE) {
         return (false);
     }
     else {

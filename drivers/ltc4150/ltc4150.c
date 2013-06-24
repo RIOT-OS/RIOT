@@ -121,7 +121,7 @@ void __attribute__((__no_instrument_function__)) ltc4150_interrupt(void)
 {
     uint32_t now = hwtimer_now();
 
-    if(now >= last_int_time) {
+    if (now >= last_int_time) {
         last_int_duration = now - last_int_time;
     }
     else {

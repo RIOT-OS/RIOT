@@ -9,7 +9,7 @@ timex_t timex_add(const timex_t a, const timex_t b)
     result.seconds = a.seconds + b.seconds;
     result.microseconds = a.microseconds + b.microseconds;
 
-    if(result.microseconds < a.microseconds) {
+    if (result.microseconds < a.microseconds) {
         result.seconds++;
     }
 
@@ -47,16 +47,16 @@ timex_t timex_sub(const timex_t a, const timex_t b)
 
 int timex_cmp(const timex_t a, const timex_t b)
 {
-    if(a.seconds < b.seconds) {
+    if (a.seconds < b.seconds) {
         return -1;
     }
 
-    if(a.seconds == b.seconds) {
-        if(a.microseconds < b.microseconds) {
+    if (a.seconds == b.seconds) {
+        if (a.microseconds < b.microseconds) {
             return -1;
         }
 
-        if(a.microseconds == b.microseconds) {
+        if (a.microseconds == b.microseconds) {
             return 0;
         }
     }

@@ -70,14 +70,14 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
 
 void hwtimer_arch_enable_interrupt(void)
 {
-    for(int i = 0; i < ARCH_MAXTIMERS; i++) {
+    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
         TA0_enable_interrupt(i);
     }
 }
 
 void hwtimer_arch_disable_interrupt(void)
 {
-    for(int i = 0; i < ARCH_MAXTIMERS; i++) {
+    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
         TA0_disable_interrupt(i);
     }
 }

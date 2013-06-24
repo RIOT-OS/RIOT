@@ -31,11 +31,11 @@ int sem_wait(sem_t *sem)
 {
     int res;
 
-    if(--(sem->value) <= 0 && !sem->locked) {
+    if (--(sem->value) <= 0 && !sem->locked) {
         sem->locked = !(sem->locked);
         res = mutex_lock(&(sem->mutex));
 
-        if(res < 0) {
+        if (res < 0) {
             return res;
         }
     }
@@ -45,7 +45,7 @@ int sem_wait(sem_t *sem)
 
 int sem_signal(sem_t *sem)
 {
-    if(++(sem->value) > 0 && sem->locked) {
+    if (++(sem->value) > 0 && sem->locked) {
         sem->locked = !(sem->locked);
         mutex_unlock(&(sem->mutex), 0);
     }

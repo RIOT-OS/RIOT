@@ -33,10 +33,10 @@ socket_internal_t *get_tcp_socket_by_context(ipv6_hdr_t *current_ipv6_header,
 {
     socket_internal_t *temp_socket;
 
-    for(int i = 1; i < MAX_SOCKETS + 1; i++) {
+    for (int i = 1; i < MAX_SOCKETS + 1; i++) {
         temp_socket = getSocket(i);
 
-        if((temp_socket != NULL) &&
+        if ((temp_socket != NULL) &&
            (ipv6_get_addr_match(&temp_socket->socket_values.foreign_address.sin6_addr,
                                 &current_ipv6_header->srcaddr) == 128) &&
            (ipv6_get_addr_match(&temp_socket->socket_values.local_address.sin6_addr,
@@ -56,7 +56,7 @@ void update_tcp_hc_context(bool incoming, socket_internal_t *current_socket,
     tcp_hc_context_t *current_context =
         &current_socket->socket_values.tcp_control.tcp_context;
 
-    if(incoming) {
+    if (incoming) {
         current_context->ack_rcv = current_tcp_packet->ack_nr;
         current_context->seq_rcv = current_tcp_packet->seq_nr;
         current_context->wnd_rcv = current_tcp_packet->window;
@@ -81,7 +81,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
     uint16_t packet_size = 0;
 
     /* Connection establisment phase, use FULL_HEADER TCP */
-    if(tcp_context->hc_type == FULL_HEADER) {
+    if (tcp_context->hc_type == FULL_HEADER) {
         /* draft-aayadi-6lowpan-tcphc-01: 5.1 Full header TCP segment.
          * Establishing Connection */
 
@@ -111,7 +111,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         return packet_size;
     }
     /* Check for header compression type: COMPRESSED_HEADER */
-    else if(tcp_context->hc_type == COMPRESSED_HEADER) {
+    else if (tcp_context->hc_type == COMPRESSED_HEADER) {
         /* draft-aayadi-6lowpan-tcphc-01: 5.1 Compressed header TCP segment. */
 
         /* Temporary variable for TCP_HC_Header Bytes */
@@ -141,12 +141,12 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         /*----------------------------------*/
         /*|		Sequence number handling   |*/
         /*----------------------------------*/
-        if(full_tcp_header.seq_nr == tcp_context->seq_snd) {
+        if (full_tcp_header.seq_nr == tcp_context->seq_snd) {
             /* Nothing to do, Seq = (0|0) */
         }
         /* If the 24 most significant bits haven't changed from previous
          * packet, don't transmit them */
-        else if((full_tcp_header.seq_nr & 0xFFFFFF00) == (tcp_context->seq_snd &
+        else if ((full_tcp_header.seq_nr & 0xFFFFFF00) == (tcp_context->seq_snd &
                                                           0xFFFFFF00)) {
             /* Seq = (0|1) */
             tcp_hc_header |= 0x0400;
@@ -159,7 +159,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         }
         /* If the 16 most significant bits haven't changed from previous packet,
          * don't transmit them */
-        else if((full_tcp_header.seq_nr & 0xFFFF0000) == (tcp_context->seq_snd & 0xFFFF0000)) {
+        else if ((full_tcp_header.seq_nr & 0xFFFF0000) == (tcp_context->seq_snd & 0xFFFF0000)) {
             /* Seq = (1|0) */
             tcp_hc_header |= 0x0800;
 
@@ -184,17 +184,17 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         /*----------------------------------*/
         /*|	Acknowledgment number handling |*/
         /*----------------------------------*/
-        if((IS_TCP_ACK(full_tcp_header.reserved_flags) &&
+        if ((IS_TCP_ACK(full_tcp_header.reserved_flags) &&
             (tcp_cb->tcp_context.ack_snd == full_tcp_header.ack_nr))) {
             tcp_context->ack_snd = tcp_context->seq_rcv;
         }
 
-        if(full_tcp_header.ack_nr == tcp_context->ack_snd) {
+        if (full_tcp_header.ack_nr == tcp_context->ack_snd) {
             /* Nothing to do, Ack = (0|0) */
         }
         /* If the 24 most significant bits haven't changed from previous packet,
          * don't transmit them */
-        else if((full_tcp_header.ack_nr & 0xFFFFFF00) == (tcp_context->ack_snd &
+        else if ((full_tcp_header.ack_nr & 0xFFFFFF00) == (tcp_context->ack_snd &
                                                           0xFFFFFF00)) {
             /* Ack = (0|1) */
             tcp_hc_header |= 0x0100;
@@ -207,7 +207,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         }
         /* If the 16 most significant bits haven't changed from previous packet,
          * don't transmit them */
-        else if((full_tcp_header.ack_nr & 0xFFFF0000) == (tcp_context->ack_snd &
+        else if ((full_tcp_header.ack_nr & 0xFFFF0000) == (tcp_context->ack_snd &
                                                           0xFFFF0000)) {
             /* Ack = (1|0) */
             tcp_hc_header |= 0x0200;
@@ -234,12 +234,12 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         /*----------------------------------*/
         /*|			Window handling 	   |*/
         /*----------------------------------*/
-        if(full_tcp_header.window == tcp_context->wnd_snd) {
+        if (full_tcp_header.window == tcp_context->wnd_snd) {
             /* Nothing to do, Wnd = (0|0) */
         }
         /* If the 8 most significant bits haven't changed from previous packet,
          * don't transmit them */
-        else if((full_tcp_header.window & 0xFF00) == (tcp_context->wnd_snd & 0xFF00)) {
+        else if ((full_tcp_header.window & 0xFF00) == (tcp_context->wnd_snd & 0xFF00)) {
             /* Wnd = (0|1) */
             tcp_hc_header |= 0x0040;
 
@@ -250,7 +250,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         }
         /* If the 8 less significant bits haven't changed from previous packet,
          * don't transmit them */
-        else if((full_tcp_header.window & 0x00FF) == (tcp_context->wnd_snd &
+        else if ((full_tcp_header.window & 0x00FF) == (tcp_context->wnd_snd &
                                                       0x00FF)) {
             /* Wnd = (1|0) */
             tcp_hc_header |= 0x0080;
@@ -273,7 +273,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         }
 
         /* FIN flag */
-        if(IS_TCP_FIN(full_tcp_header.reserved_flags)) {
+        if (IS_TCP_FIN(full_tcp_header.reserved_flags)) {
             /* F = (1) */
             tcp_hc_header |= 0x0008;
         }
@@ -304,7 +304,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         return packet_size;
     }
     /* Check for header compression type: MOSTLY_COMPRESSED_HEADER */
-    else if(tcp_context->hc_type == MOSTLY_COMPRESSED_HEADER) {
+    else if (tcp_context->hc_type == MOSTLY_COMPRESSED_HEADER) {
         /* draft-aayadi-6lowpan-tcphc-01: 5.1 Compressed header TCP segment. */
 
         /* Temporary variable for TCP_HC_Header Bytes */
@@ -369,7 +369,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         packet_size += 2;
 
         /* FIN flag */
-        if(IS_TCP_FIN(full_tcp_header.reserved_flags)) {
+        if (IS_TCP_FIN(full_tcp_header.reserved_flags)) {
             /* F = (1) */
             tcp_hc_header |= 0x0008;
         }
@@ -410,15 +410,15 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
     uint16_t packet_size = 0;
 
     /* Full header TCP segment */
-    if(*(((uint8_t *)temp_ipv6_header) + IPV6_HDR_LEN) == 0x01) {
+    if (*(((uint8_t *)temp_ipv6_header) + IPV6_HDR_LEN) == 0x01) {
         switch_tcp_packet_byte_order(((tcp_hdr_t *)(((uint8_t *)temp_ipv6_header) +
                                      IPV6_HDR_LEN + 3)));
         current_socket = get_tcp_socket(temp_ipv6_header,
                                         ((tcp_hdr_t *)(((uint8_t *)temp_ipv6_header) +
                                          IPV6_HDR_LEN + 3)));
 
-        if(current_socket != NULL) {
-            if(current_socket->socket_values.tcp_control.state == LISTEN) {
+        if (current_socket != NULL) {
+            if (current_socket->socket_values.tcp_control.state == LISTEN) {
                 memcpy(&current_socket->socket_values.tcp_control.tcp_context.context_id,
                        ((uint8_t *)temp_ipv6_header) + IPV6_HDR_LEN + 1, 2);
                 current_socket->socket_values.tcp_control.tcp_context.context_id =
@@ -455,11 +455,11 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
 
         uint8_t header_type = UNDEFINED;
 
-        if(BITSET(tcp_hc_header, 15) && !BITSET(tcp_hc_header, 14) &&
+        if (BITSET(tcp_hc_header, 15) && !BITSET(tcp_hc_header, 14) &&
            !BITSET(tcp_hc_header, 13)) {
             header_type = MOSTLY_COMPRESSED_HEADER;
         }
-        else if(BITSET(tcp_hc_header, 15) && BITSET(tcp_hc_header, 14) &&
+        else if (BITSET(tcp_hc_header, 15) && BITSET(tcp_hc_header, 14) &&
                 !BITSET(tcp_hc_header, 13)) {
             header_type = COMPRESSED_HEADER;
         }
@@ -472,7 +472,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
         socket_internal_t *current_socket =
             get_tcp_socket_by_context(temp_ipv6_header, current_context);
 
-        if(current_socket == NULL) {
+        if (current_socket == NULL) {
             printf("Current Socket == NULL!\n");
             return NULL;
         }
@@ -484,12 +484,12 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
         /*----------------------------------*/
         /*|		Sequence number handling   |*/
         /*----------------------------------*/
-        if(!BITSET(tcp_hc_header, 11) && !BITSET(tcp_hc_header, 10)) {
+        if (!BITSET(tcp_hc_header, 11) && !BITSET(tcp_hc_header, 10)) {
             /* Seq = (0|0), sequence number didn't change, copy old value */
             memcpy(&full_tcp_header.seq_nr, &current_tcp_context->seq_rcv, 4);
         }
         /* The 24 most significant bits haven't changed from previous packet */
-        else if(!BITSET(tcp_hc_header, 11) && BITSET(tcp_hc_header, 10)) {
+        else if (!BITSET(tcp_hc_header, 11) && BITSET(tcp_hc_header, 10)) {
             /* Seq = (0|1), copy 1 byte of tcp_hc packet and 3 bytes from
              * previous packet */
             full_tcp_header.seq_nr |= *packet_buffer;
@@ -499,7 +499,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
             packet_size += 1;
         }
         /* If the 16 most significant bits haven't changed from previous packet */
-        else if(BITSET(tcp_hc_header, 11) && !BITSET(tcp_hc_header, 10)) {
+        else if (BITSET(tcp_hc_header, 11) && !BITSET(tcp_hc_header, 10)) {
             /* Seq = (1|0), copy 2 bytes of tcp_hc packet and 2 bytes from
              * previous packet */
             full_tcp_header.seq_nr |= NTOHS(*((uint16_t *)packet_buffer));
@@ -519,12 +519,12 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
         /*----------------------------------*/
         /*|	Acknowledgment number handling |*/
         /*----------------------------------*/
-        if(!BITSET(tcp_hc_header, 9) && !BITSET(tcp_hc_header, 8)) {
+        if (!BITSET(tcp_hc_header, 9) && !BITSET(tcp_hc_header, 8)) {
             /* Ack = (0|0), acknowledgment number didn't change, copy old value */
             memcpy(&full_tcp_header.ack_nr, &current_tcp_context->ack_rcv, 4);
         }
         /* The 24 most significant bits haven't changed from previous packet */
-        else if(!BITSET(tcp_hc_header, 9) && BITSET(tcp_hc_header, 8)) {
+        else if (!BITSET(tcp_hc_header, 9) && BITSET(tcp_hc_header, 8)) {
             /* Ack = (0|1), copy 1 byte of tcp_hc packet and 3 bytes from
              * previous packet */
             full_tcp_header.ack_nr |= *packet_buffer;
@@ -534,7 +534,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
             SET_TCP_ACK(full_tcp_header.reserved_flags);
         }
         /* If the 16 most significant bits haven't changed from previous packet */
-        else if(BITSET(tcp_hc_header, 9) && !BITSET(tcp_hc_header, 8)) {
+        else if (BITSET(tcp_hc_header, 9) && !BITSET(tcp_hc_header, 8)) {
             /* Ack = (1|0), copy 2 bytes of tcp_hc packet and 2 bytes from
              * previous packet */
             full_tcp_header.ack_nr |= NTOHS(*((uint16_t *)packet_buffer));
@@ -551,7 +551,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
             packet_buffer += 4;
             packet_size += 4;
 
-            if(header_type == COMPRESSED_HEADER) {
+            if (header_type == COMPRESSED_HEADER) {
                 SET_TCP_ACK(full_tcp_header.reserved_flags);
             }
         }
@@ -559,12 +559,12 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
         /*----------------------------------*/
         /*|			Window handling 	   |*/
         /*----------------------------------*/
-        if(!BITSET(tcp_hc_header, 7) && !BITSET(tcp_hc_header, 6)) {
+        if (!BITSET(tcp_hc_header, 7) && !BITSET(tcp_hc_header, 6)) {
             /* Wnd = (0|0), copy old value */
             memcpy(&full_tcp_header.window, &current_tcp_context->wnd_rcv, 2);
         }
         /* The 8 most significant bits haven't changed from previous packet */
-        else if(!BITSET(tcp_hc_header, 7) && BITSET(tcp_hc_header, 6)) {
+        else if (!BITSET(tcp_hc_header, 7) && BITSET(tcp_hc_header, 6)) {
             /* Wnd = (0|1), copy 1 byte of tcp_hc packet and 1 byte from
              * previous packet */
             full_tcp_header.window |= *packet_buffer;
@@ -573,7 +573,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
             packet_size += 1;
         }
         /* If the 8 less significant bits haven't changed from previous packet */
-        else if(BITSET(tcp_hc_header, 7) && !BITSET(tcp_hc_header, 6)) {
+        else if (BITSET(tcp_hc_header, 7) && !BITSET(tcp_hc_header, 6)) {
             /* Wnd = (1|0), copy 1 byte of tcp_hc packet and 1 byte from previous packet */
             full_tcp_header.window |= ((*((uint16_t *)packet_buffer)) & 0xFF00);
             full_tcp_header.window |= ((current_tcp_context->wnd_rcv) & 0x00FF);
@@ -590,9 +590,9 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
         }
 
         /* FIN flag */
-        if(BITSET(tcp_hc_header, 3)) {
+        if (BITSET(tcp_hc_header, 3)) {
             /* F = (1) */
-            if(IS_TCP_ACK(full_tcp_header.reserved_flags)) {
+            if (IS_TCP_ACK(full_tcp_header.reserved_flags)) {
                 SET_TCP_FIN_ACK(full_tcp_header.reserved_flags);
             }
             else {

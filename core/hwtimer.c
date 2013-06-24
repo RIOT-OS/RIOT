@@ -55,9 +55,9 @@ void hwtimer_spin(unsigned long ticks)
 {
     unsigned long co = hwtimer_arch_now() + ticks;
 
-    while(hwtimer_arch_now() > co);
+    while (hwtimer_arch_now() > co);
 
-    while(hwtimer_arch_now() < co);
+    while (hwtimer_arch_now() < co);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -75,7 +75,7 @@ void hwtimer_init_comp(uint32_t fcpu)
 
     lifo_init(lifo, ARCH_MAXTIMERS);
 
-    for(int i = 0; i < ARCH_MAXTIMERS; i++) {
+    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
         lifo_insert(lifo, i);
     }
 }
@@ -84,7 +84,7 @@ void hwtimer_init_comp(uint32_t fcpu)
 
 int hwtimer_active(void)
 {
-    return (! lifo_empty(lifo));
+    return (!lifo_empty(lifo));
 }
 
 /*---------------------------------------------------------------------------*/
@@ -98,7 +98,7 @@ unsigned long hwtimer_now(void)
 
 void hwtimer_wait(unsigned long ticks)
 {
-    if(ticks <= 6 || inISR()) {
+    if (ticks <= 6 || inISR()) {
         hwtimer_spin(ticks);
         return;
     }
@@ -106,7 +106,7 @@ void hwtimer_wait(unsigned long ticks)
     /* -2 is to adjust the real value */
     int res = hwtimer_set(ticks - 2, hwtimer_wakeup, (void*)(unsigned int)(active_thread->pid));
 
-    if(res == -1) {
+    if (res == -1) {
         hwtimer_spin(ticks);
         return;
     }
@@ -119,14 +119,14 @@ void hwtimer_wait(unsigned long ticks)
 
 static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr, bool absolute)
 {
-    if(!inISR()) {
+    if (!inISR()) {
         dINT();
     }
 
     int n = lifo_get(lifo);
 
-    if(n == -1) {
-        if(! inISR()) {
+    if (n == -1) {
+        if (!inISR()) {
             eINT();
         }
 
@@ -137,7 +137,7 @@ static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr
     timer[n].callback = callback;
     timer[n].data = ptr;
 
-    if(absolute) {
+    if (absolute) {
         hwtimer_arch_set_absolute(offset, n);
     }
     else {
@@ -146,7 +146,7 @@ static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr
 
     lpm_prevent_sleep++;
 
-    if(!inISR()) {
+    if (!inISR()) {
         eINT();
     }
 

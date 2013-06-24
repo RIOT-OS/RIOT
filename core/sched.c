@@ -50,7 +50,7 @@ void sched_init()
     printf("Scheduler...");
     int i;
 
-    for(i = 0; i < MAXTHREADS; i++) {
+    for (i = 0; i < MAXTHREADS; i++) {
         sched_threads[i] = NULL;
 #if SCHEDSTATISTICS
         pidlist[i].laststart = 0;
@@ -62,7 +62,7 @@ void sched_init()
     active_thread = NULL;
     thread_pid = -1;
 
-    for(i = 0; i < SCHED_PRIO_LEVELS; i++) {
+    for (i = 0; i < SCHED_PRIO_LEVELS; i++) {
         runqueues[i] = NULL;
     }
 
@@ -75,14 +75,14 @@ void sched_run()
 
     tcb_t *my_active_thread = (tcb_t *)active_thread;
 
-    if(my_active_thread) {
-        if(my_active_thread->status == STATUS_RUNNING) {
+    if (my_active_thread) {
+        if (my_active_thread->status == STATUS_RUNNING) {
             my_active_thread->status = STATUS_PENDING;
         }
 
 #ifdef SCHED_TEST_STACK
 
-        if(*((unsigned int *)my_active_thread->stack_start) != (unsigned int) my_active_thread->stack_start) {
+        if (*((unsigned int *)my_active_thread->stack_start) != (unsigned int) my_active_thread->stack_start) {
             printf("scheduler(): stack overflow detected, task=%s pid=%u\n", my_active_thread->name, my_active_thread->pid);
         }
 
@@ -95,7 +95,7 @@ void sched_run()
     extern unsigned long hwtimer_now(void);
     unsigned int time = hwtimer_now();
 
-    if(my_active_thread && (pidlist[my_active_thread->pid].laststart)) {
+    if (my_active_thread && (pidlist[my_active_thread->pid].laststart)) {
         pidlist[my_active_thread->pid].runtime += time - pidlist[my_active_thread->pid].laststart;
     }
 
@@ -103,10 +103,10 @@ void sched_run()
 
     DEBUG("\nscheduler: previous task: %s\n", (my_active_thread == NULL) ? "none" : my_active_thread->name);
 
-    if(num_tasks == 0) {
+    if (num_tasks == 0) {
         DEBUG("scheduler: no tasks left.\n");
 
-        while(! num_tasks) {
+        while (!num_tasks) {
             /* loop until a new task arrives */
             ;
         }
@@ -116,7 +116,7 @@ void sched_run()
 
     my_active_thread = NULL;
 
-    while(! my_active_thread) {
+    while (!my_active_thread) {
         int nextrq = number_of_lowest_bit(runqueue_bitcache);
         clist_node_t next = *(runqueues[nextrq]);
         DEBUG("scheduler: first in queue: %s\n", ((tcb_t *)next.data)->name);
@@ -129,7 +129,7 @@ void sched_run()
 #endif
 #ifdef MODULE_NSS
 
-        if(active_thread && active_thread->pid != last_pid) {
+        if (active_thread && active_thread->pid != last_pid) {
             last_pid = active_thread->pid;
         }
 
@@ -138,9 +138,9 @@ void sched_run()
 
     DEBUG("scheduler: next task: %s\n", my_active_thread->name);
 
-    if(my_active_thread != active_thread) {
-        if(active_thread != NULL) {  /* TODO: necessary? */
-            if(active_thread->status ==  STATUS_RUNNING) {
+    if (my_active_thread != active_thread) {
+        if (active_thread != NULL) {  /* TODO: necessary? */
+            if (active_thread->status ==  STATUS_RUNNING) {
                 active_thread->status =  STATUS_PENDING ;
             }
         }
@@ -162,19 +162,19 @@ void sched_register_cb(void (*callback)(uint32_t, uint32_t))
 
 void sched_set_status(tcb_t *process, unsigned int status)
 {
-    if(status &  STATUS_ON_RUNQUEUE) {
-        if(!(process->status &  STATUS_ON_RUNQUEUE)) {
+    if (status &  STATUS_ON_RUNQUEUE) {
+        if (!(process->status &  STATUS_ON_RUNQUEUE)) {
             DEBUG("adding process %s to runqueue %u.\n", process->name, process->priority);
             clist_add(&runqueues[process->priority], &(process->rq_entry));
             runqueue_bitcache |= 1 << process->priority;
         }
     }
     else {
-        if(process->status & STATUS_ON_RUNQUEUE) {
+        if (process->status & STATUS_ON_RUNQUEUE) {
             DEBUG("removing process %s from runqueue %u.\n", process->name, process->priority);
             clist_remove(&runqueues[process->priority], &(process->rq_entry));
 
-            if(! runqueues[process->priority]) {
+            if (!runqueues[process->priority]) {
                 runqueue_bitcache &= ~(1 << process->priority);
             }
         }
@@ -187,8 +187,8 @@ void sched_switch(uint16_t current_prio, uint16_t other_prio, int in_isr)
 {
     DEBUG("%s: %i %i %i\n", active_thread->name, (int)current_prio, (int)other_prio, in_isr);
 
-    if(current_prio <= other_prio) {
-        if(in_isr) {
+    if (current_prio <= other_prio) {
+        if (in_isr) {
             sched_context_switch_request = 1;
         }
         else {

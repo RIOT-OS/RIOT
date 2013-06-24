@@ -21,7 +21,7 @@ void timerA_init(void)
     volatile unsigned int *ccr = &TA0CCR0;
     volatile unsigned int *ctl = &TA0CCTL0;
 
-    for(int i = 0; i < ARCH_MAXTIMERS; i++) {
+    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
         *(ccr + i) = 0;
         *(ctl + i) &= ~(CCIFG);
         *(ctl + i) &= ~(CCIE);
@@ -46,7 +46,7 @@ interrupt(TIMER0_A1_VECTOR) __attribute__((naked)) timer0_a1_5_isr(void)
     short taiv = TA0IV;
     short timer;
 
-    if(taiv & TAIFG) {
+    if (taiv & TAIFG) {
         DEBUG("Overflow\n");
     }
     else {

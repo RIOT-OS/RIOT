@@ -53,14 +53,14 @@ void lpm_init(void)
 
 void lpm_begin_awake(void)
 {
-    if(lpm >= LPM_SLEEP) {									// wake up from deep sleep
+    if (lpm >= LPM_SLEEP) {									// wake up from deep sleep
         init_clks1();
     }
 }
 
 void lpm_end_awake(void)
 {
-    if(lpm >= LPM_SLEEP) {									// wake up from deep sleep
+    if (lpm >= LPM_SLEEP) {									// wake up from deep sleep
         init_clks2();
     }
 
@@ -73,7 +73,7 @@ void lpm_awake(void)
     unsigned long usec = RTC_CTC;
 #endif
 
-    if(lpm >= LPM_SLEEP) {									// wake up from deep sleep
+    if (lpm >= LPM_SLEEP) {									// wake up from deep sleep
         /* benchmark */
         init_clks1();
         init_clks2();
@@ -93,13 +93,13 @@ enum lpm_mode lpm_set(enum lpm_mode target)
     enum lpm_mode last_lpm = lpm;
 
     /* calculate target mcu power mode */
-    if(target == LPM_IDLE) {
+    if (target == LPM_IDLE) {
         target_flags = PM_IDLE;
     }
-    else if(target == LPM_SLEEP) {
+    else if (target == LPM_SLEEP) {
         target_flags = PM_SLEEP;
     }
-    else if(target == LPM_POWERDOWN) {
+    else if (target == LPM_POWERDOWN) {
         target_flags = PM_POWERDOWN;
     }
     else {

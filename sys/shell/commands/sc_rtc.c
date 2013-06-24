@@ -44,7 +44,7 @@ void _settime_handler(char *c)
                  (unsigned int *) & (now.tm_min),
                  (unsigned int *) & (now.tm_sec));
 
-    if(res < 6) {
+    if (res < 6) {
         printf("Usage: date YYYY-MM-DD hh:mm:ss\n");
         return;
     }
@@ -59,7 +59,7 @@ void _settime_handler(char *c)
 
 void _date_handler(char *c)
 {
-    if(strlen(c) == 4) {
+    if (strlen(c) == 4) {
         _gettime_handler();
     }
     else {

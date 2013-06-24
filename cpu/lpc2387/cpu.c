@@ -24,15 +24,15 @@ void lpc2387_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uin
     uint32_t pclkdiv;
     *prescale = source / target;
 
-    if((*prescale % 16) == 0) {
+    if ((*prescale % 16) == 0) {
         *pclksel = 3;
         pclkdiv = 8;
     }
-    else if((*prescale % 8) == 0) {
+    else if ((*prescale % 8) == 0) {
         *pclksel = 0;
         pclkdiv = 4;
     }
-    else if((*prescale % 4) == 0) {
+    else if ((*prescale % 4) == 0) {
         *pclksel = 2;
         pclkdiv = 2;
     }
@@ -43,7 +43,7 @@ void lpc2387_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uin
 
     *prescale /= pclkdiv;
 
-    if(*prescale % 2) {
+    if (*prescale % 2) {
         (*prescale)++;
     }
 }
@@ -77,7 +77,7 @@ bool install_irq(int IntNumber, void *HandlerAddr, int Priority)
 
     VICIntEnClr = 1 << IntNumber;	/* Disable Interrupt */
 
-    if(IntNumber >= VIC_SIZE) {
+    if (IntNumber >= VIC_SIZE) {
         return (false);
     }
     else {

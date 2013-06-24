@@ -107,7 +107,7 @@ uint16_t adc_read(uint8_t channel)
     uint32_t regVal, adc_data;
 
     /* channel number is 0 through 7 */
-    if(channel >= ADC_NUM) {
+    if (channel >= ADC_NUM) {
         channel = 0;		/* reset channel number to 0 */
     }
 
@@ -122,19 +122,19 @@ uint16_t adc_read(uint8_t channel)
     t2 = hwtimer_now();
 #endif
 
-    while(1) {
+    while (1) {
         /* read result of A/D conversion */
         regVal = *(volatile unsigned long *)(AD0_BASE_ADDR + ADC_OFFSET + ADC_INDEX * channel);
 
         /* wait until end of A/D convert */
-        if(regVal & ADC_DONE) {
+        if (regVal & ADC_DONE) {
             break;
         }
     }
 
     AD0CR &= 0xF8FFFFFF;			/* stop ADC now */
 
-    if(regVal & ADC_OVERRUN) {	/* save data when it's not overrun, otherwise, return zero */
+    if (regVal & ADC_OVERRUN) {	/* save data when it's not overrun, otherwise, return zero */
         return 0;
     }
 

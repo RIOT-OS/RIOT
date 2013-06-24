@@ -26,7 +26,7 @@ void _id_handler(char *id)
 
     newid = atoi(id + 3);
 
-    if(strlen(id) < 3) {
+    if (strlen(id) < 3) {
 #ifdef MODULE_CONFIG
         printf("Current id: %u\n", sysconfig.id);
 #endif
@@ -36,7 +36,7 @@ void _id_handler(char *id)
 #ifdef MODULE_CONFIG
         sysconfig.id = newid;
 
-        if(!config_save()) {
+        if (!config_save()) {
             puts("ERROR setting new id");
         }
 

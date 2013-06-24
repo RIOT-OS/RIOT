@@ -84,7 +84,7 @@ extern volatile uint32_t cpu_speed;
 
 void msp430_set_cpu_speed(uint32_t speed);
 
-void msp430_cpu_init(void);	/* Rename to cpu_init() later! */
+void msp430_cpu_init(void);	/* Rename to cpu_init() later!*/
 #define cpu_init() msp430_cpu_init()
 
 void msp430_init_dco(void);

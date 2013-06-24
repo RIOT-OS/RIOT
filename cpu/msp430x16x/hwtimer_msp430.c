@@ -17,7 +17,7 @@ void timerA_init(void)
     volatile unsigned int *ccr = &TA0CCR0;
     volatile unsigned int *ctl = &TA0CCTL0;
 
-    for(int i = 0; i < ARCH_MAXTIMERS; i++) {
+    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
         *ccr = 0;
         *ctl &= ~(CCIFG);
         *ctl &= ~(CCIE);
@@ -42,7 +42,7 @@ interrupt(TIMERA1_VECTOR) __attribute__((naked)) timer_isr(void)
 
     short taiv = TA0IV;
 
-    if(taiv & TAIFG) {
+    if (taiv & TAIFG) {
         // puts("msp430/hwtimer_cpu TAIFG set!");
         //    TA0CTL &= ~TAIFG;
         //    ticks += 0xFFFF;

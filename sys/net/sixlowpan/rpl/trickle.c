@@ -121,11 +121,11 @@ void trickle_timer_over(void)
     ipv6_addr_t mcast;
     ipv6_set_all_nds_mcast_addr(&mcast);
 
-    while(1) {
+    while (1) {
         thread_sleep();
 
         /* Laut RPL Spezifikation soll k=0 wie k= Unendlich behandelt werden, also immer gesendet werden */
-        if((c < k) || (k == 0)) {
+        if ((c < k) || (k == 0)) {
             send_DIO(&mcast);
         }
     }
@@ -133,22 +133,22 @@ void trickle_timer_over(void)
 
 void trickle_interval_over(void)
 {
-    while(1) {
+    while (1) {
         thread_sleep();
         I = I * 2;
         printf("TRICKLE new Interval %"PRIu32"\n", I);
 
-        if(I == 0) {
+        if (I == 0) {
             puts("[WARNING] Interval was 0");
 
-            if(Imax == 0) {
+            if (Imax == 0) {
                 puts("[WARNING] Imax == 0");
             }
 
             I = (Imin << Imax);
         }
 
-        if(I > (Imin << Imax)) {
+        if (I > (Imin << Imax)) {
             I = (Imin << Imax);
         }
 
@@ -160,11 +160,11 @@ void trickle_interval_over(void)
         I_time = timex_set(0, I * 1000);
         timex_normalize(&I_time);
 
-        if(vtimer_set_wakeup(&trickle_t_timer, t_time, timer_over_pid) != 0) {
+        if (vtimer_set_wakeup(&trickle_t_timer, t_time, timer_over_pid) != 0) {
             puts("[ERROR] setting Wakeup");
         }
 
-        if(vtimer_set_wakeup(&trickle_I_timer, I_time, interval_over_pid) != 0) {
+        if (vtimer_set_wakeup(&trickle_I_timer, I_time, interval_over_pid) != 0) {
             puts("[ERROR] setting Wakeup");
         }
     }
@@ -192,16 +192,16 @@ void long_delay_dao(void)
 
 void dao_delay_over(void)
 {
-    while(1) {
+    while (1) {
         thread_sleep();
 
-        if((ack_received == false) && (dao_counter < DAO_SEND_RETRIES)) {
+        if ((ack_received == false) && (dao_counter < DAO_SEND_RETRIES)) {
             dao_counter++;
             send_DAO(NULL, 0, true, 0);
             dao_time = timex_set(DEFAULT_WAIT_FOR_DAO_ACK, 0);
             vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
         }
-        else if(ack_received == false) {
+        else if (ack_received == false) {
             long_delay_dao();
         }
     }
@@ -217,15 +217,15 @@ void rt_timer_over(void)
 {
     rpl_routing_entry_t *rt;
 
-    while(1) {
+    while (1) {
         rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 
-        if(my_dodag != NULL) {
+        if (my_dodag != NULL) {
             rt = rpl_get_routing_table();
 
-            for(uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-                if(rt[i].used) {
-                    if(rt[i].lifetime <= 1) {
+            for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
+                if (rt[i].used) {
+                    if (rt[i].lifetime <= 1) {
                         memset(&rt[i], 0, sizeof(rt[i]));
                     }
                     else {
@@ -235,8 +235,8 @@ void rt_timer_over(void)
             }
 
             /* Parent is NULL for root too */
-            if(my_dodag->my_preferred_parent != NULL) {
-                if(my_dodag->my_preferred_parent->lifetime <= 1) {
+            if (my_dodag->my_preferred_parent != NULL) {
+                if (my_dodag->my_preferred_parent->lifetime <= 1) {
                     puts("parent lifetime timeout");
                     rpl_parent_update(NULL);
                 }

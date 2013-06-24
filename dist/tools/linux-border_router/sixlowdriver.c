@@ -58,11 +58,11 @@ void *serial_reader_f(void *arg)
     unsigned char buf[BUFFER_SIZE];
     border_packet_t *packet_buf;
 
-    while(1) {
+    while (1) {
         int n = readpacket(buf, BUFFER_SIZE);
 
-        if(n > 0) {
-            if(buf[0] == 0) {
+        if (n > 0) {
+            if (buf[0] == 0) {
                 packet_buf = (border_packet_t *)buf;
                 flowcontrol_deliver_from_tty(packet_buf, n);
                 continue;
@@ -95,10 +95,10 @@ void *tun_reader_f(void *args)
     unsigned char data[BUFFER_SIZE];
     size_t bytes;
 
-    while(1) {
+    while (1) {
         bytes = read(tun_fd, (void *)data, BUFFER_SIZE);
 
-        if(bytes > 0) {
+        if (bytes > 0) {
             bytes = tun_to_serial_packet(tun_in_buf, (uint8_t *)data, bytes);
             flowcontrol_send_over_tty((border_packet_t *)tun_in_buf, bytes);
         }
@@ -121,14 +121,14 @@ void border_send_ipv6_over_tun(int fd, const struct ip6_hdr *packet)
 
 int tun_set_owner(int fd, const uid_t *uid, const gid_t *gid)
 {
-    if(uid != NULL) {
-        if(*uid != -1 && ioctl(fd, TUNSETOWNER, *uid)) {
+    if (uid != NULL) {
+        if (*uid != -1 && ioctl(fd, TUNSETOWNER, *uid)) {
             return -1;
         }
     }
 
-    if(gid != NULL) {
-        if(*gid != -1 && ioctl(fd, TUNSETGROUP, *gid)) {
+    if (gid != NULL) {
+        if (*gid != -1 && ioctl(fd, TUNSETGROUP, *gid)) {
             return -1;
         }
     }
@@ -143,7 +143,7 @@ int tun_add_addr(const char *ip_addr)
     printf("INFO: ip addr add %s dev %s\n", ip_addr, tun_if_name);
     sprintf(command, "ip addr add %s dev %s", ip_addr, tun_if_name);
 
-    if(system(command) != 0) {
+    if (system(command) != 0) {
         return -1;
     }
 
@@ -165,7 +165,7 @@ int open_tun(char *if_name, int flags)
      */
 
     /* open the clone device */
-    if((fd = open(TUNDEV, O_RDWR)) < 0) {
+    if ((fd = open(TUNDEV, O_RDWR)) < 0) {
         return fd;
     }
 
@@ -174,7 +174,7 @@ int open_tun(char *if_name, int flags)
 
     ifr.ifr_flags = flags;   /* IFF_TUN or IFF_TAP, plus maybe IFF_NO_PI */
 
-    if(*if_name) {
+    if (*if_name) {
         /* if a device name was specified, put it in the structure; otherwise,
          * the kernel will try to allocate the "next" device of the
          * specified type */
@@ -182,7 +182,7 @@ int open_tun(char *if_name, int flags)
     }
 
     /* try to create the device */
-    if((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
+    if ((err = ioctl(fd, TUNSETIFF, (void *) &ifr)) < 0) {
         close(fd);
         return err;
     }
@@ -207,13 +207,13 @@ int border_update_context(uint8_t cid, const struct in6_addr *prefix,
                           uint8_t len, uint8_t comp,
                           uint16_t lifetime)
 {
-    if(cid >= MAXIMUM_CONTEXTS) {
+    if (cid >= MAXIMUM_CONTEXTS) {
         return -1;
     }
 
     len = (len <= 128) ? len : 128;
 
-    if(context_empty(cid)) {
+    if (context_empty(cid)) {
         context_cache[cid].version = get_abro_version();
     }
     else {
@@ -233,11 +233,11 @@ int border_update_context(uint8_t cid, const struct in6_addr *prefix,
 
 int border_renew_existing_context(uint8_t cid)
 {
-    if(cid >= MAXIMUM_CONTEXTS) {
+    if (cid >= MAXIMUM_CONTEXTS) {
         return -1;
     }
 
-    if(context_empty(cid)) {
+    if (context_empty(cid)) {
         return -1;
     }
 
@@ -248,11 +248,11 @@ int border_renew_existing_context(uint8_t cid)
 
 void border_remove_context(uint8_t cid)
 {
-    if(cid >= MAXIMUM_CONTEXTS) {
+    if (cid >= MAXIMUM_CONTEXTS) {
         return;
     }
 
-    if(context_empty(cid)) {
+    if (context_empty(cid)) {
         return;
     }
 
@@ -268,7 +268,7 @@ int border_add_addr(const char *ip_addr)
 {
     struct in6_addr parsed_addr;
 
-    if(inet_pton(AF_INET6, ip_addr, &parsed_addr) != 1) {
+    if (inet_pton(AF_INET6, ip_addr, &parsed_addr) != 1) {
         return -1;
     }
 
@@ -289,11 +289,11 @@ int border_initialize(char *if_name, const char *ip_addr, const char *tty_dev)
 
     strtok(ip_addr_cpy, "/");
 
-    if((res = inet_pton(AF_INET6, ip_addr_cpy, &parsed_addr)) != 1) {
+    if ((res = inet_pton(AF_INET6, ip_addr_cpy, &parsed_addr)) != 1) {
         return res;
     }
 
-    if((res = init_multiplex(tty_dev)) != 0) {
+    if ((res = init_multiplex(tty_dev)) != 0) {
         return res;
     }
 
@@ -304,16 +304,16 @@ int border_initialize(char *if_name, const char *ip_addr, const char *tty_dev)
 
     strncpy(tun_if_name, if_name, IF_NAME_LEN);
 
-    if((res = system(command)) != 0) {
+    if ((res = system(command)) != 0) {
         return res;
     }
 
-    if((res = tun_add_addr(ip_addr)) != 0) {
+    if ((res = tun_add_addr(ip_addr)) != 0) {
         return res;
     }
 
     // initialize context cache as empty.
-    for(i = 0; i < MAXIMUM_CONTEXTS; i++) {
+    for (i = 0; i < MAXIMUM_CONTEXTS; i++) {
         context_cache[i].cid = 0xFF;
     }
 

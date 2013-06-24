@@ -61,20 +61,20 @@ int open_serial_port(const char *port_name)
 {
     int r;
 
-    if(port_fd >= 0) {
+    if (port_fd >= 0) {
         close(port_fd);
     }
 
     port_fd = open(port_name, O_RDWR);
 
-    if(port_fd < 0) {
+    if (port_fd < 0) {
         report_open_error(port_name, errno);
         return -1;
     }
 
     r = set_baud(baud_rate);
 
-    if(r == 0) {
+    if (r == 0) {
         printf("Port \"%s\" opened at %s baud\r\n",
                port_name, baud_rate);
     }
@@ -89,7 +89,7 @@ int open_serial_port(const char *port_name)
         /* attempt to set low latency mode, but don't worry if we can't */
         r = ioctl(port_fd, TIOCGSERIAL, &kernel_serial_settings);
 
-        if(r < 0) {
+        if (r < 0) {
             return 0;
         }
 
@@ -118,20 +118,20 @@ static void report_open_error(const char *filename, int err)
     printf("\r\n");
     printf("Unable to open \"%s\"\r\n", filename);
 
-    if(err == EACCES) {
+    if (err == EACCES) {
         printf("You don't have permission to access %s\r\n", filename);
     }
 
     r = stat(filename, &info);
 
-    if(r < 0) {
-        if(errno == ENOENT) {
+    if (r < 0) {
+        if (errno == ENOENT) {
             printf("file %s does not exist\r\n", filename);
         }
-        else if(errno == ELOOP) {
+        else if (errno == ELOOP) {
             printf("too many symbolic links\r\n");
         }
-        else if(errno == EACCES) {
+        else if (errno == EACCES) {
             printf("permission denied to get file status\r\n");
         }
         else {
@@ -146,7 +146,7 @@ static void report_open_error(const char *filename, int err)
 
     p = getpwuid(my_uid);
 
-    if(p) {
+    if (p) {
         snprintf(my_uname, sizeof(my_uname),
                  "\"%s\" (gid=%d)", p->pw_name, (int)my_uid);
     }
@@ -157,7 +157,7 @@ static void report_open_error(const char *filename, int err)
 
     p = getpwuid(info.st_uid);
 
-    if(p) {
+    if (p) {
         snprintf(file_uname, sizeof(file_uname),
                  "\"%s\" (uid=%d)", p->pw_name, (int)info.st_uid);
     }
@@ -168,7 +168,7 @@ static void report_open_error(const char *filename, int err)
 
     g = getgrgid(my_gid);
 
-    if(g) {
+    if (g) {
         snprintf(my_gname, sizeof(my_gname),
                  "\"%s\" (gid=%d)", g->gr_name, (int)my_gid);
     }
@@ -179,7 +179,7 @@ static void report_open_error(const char *filename, int err)
 
     g = getgrgid(info.st_gid);
 
-    if(g) {
+    if (g) {
         snprintf(file_gname, sizeof(file_gname),
                  "\"%s\" (uid=%d)", g->gr_name, (int)info.st_gid);
     }
@@ -193,7 +193,7 @@ static void report_open_error(const char *filename, int err)
 
     perm = info.st_mode;
 
-    if((perm & S_IROTH) && (perm & S_IWOTH)) {
+    if ((perm & S_IROTH) && (perm & S_IWOTH)) {
         printf("%s has read/write permission for everybody\r\n",
                filename);
     }
@@ -201,19 +201,19 @@ static void report_open_error(const char *filename, int err)
         printf("%s is not read/write for everybody, so\r\n", filename);
         printf("  you must match either user or group permission\r\n");
 
-        if((perm & S_IRUSR) && (perm & S_IWUSR)) {
+        if ((perm & S_IRUSR) && (perm & S_IWUSR)) {
             printf("%s has read/write permission for user %s\r\n",
                    filename, file_uname);
             perm_ok = 1;
         }
 
-        if((perm & S_IRGRP) && (perm & S_IWGRP)) {
+        if ((perm & S_IRGRP) && (perm & S_IWGRP)) {
             printf("%s has read/write permission for group %s\r\n",
                    filename, file_gname);
             perm_ok = 1;
         }
 
-        if(perm_ok == 0) {
+        if (perm_ok == 0) {
             printf("%s does not read/write permission for user or group!\r\n",
                    filename);
         }
@@ -269,7 +269,7 @@ void send_break_signal(void)
 
 void close_serial_port(void)
 {
-    if(port_fd >= 0) {
+    if (port_fd >= 0) {
         close(port_fd);
         port_fd = -1;
     }
@@ -278,43 +278,43 @@ void close_serial_port(void)
 
 tcflag_t baud_name_to_flags(const char *baud_name)
 {
-    if(strcmp(baud_name, "230400") == 0) {
+    if (strcmp(baud_name, "230400") == 0) {
         return B230400;
     }
 
-    if(strcmp(baud_name, "115200") == 0) {
+    if (strcmp(baud_name, "115200") == 0) {
         return B115200;
     }
 
-    if(strcmp(baud_name, "57600") == 0) {
+    if (strcmp(baud_name, "57600") == 0) {
         return B57600;
     }
 
-    if(strcmp(baud_name, "38400") == 0) {
+    if (strcmp(baud_name, "38400") == 0) {
         return B38400;
     }
 
-    if(strcmp(baud_name, "19200") == 0) {
+    if (strcmp(baud_name, "19200") == 0) {
         return B19200;
     }
 
-    if(strcmp(baud_name, "9600") == 0) {
+    if (strcmp(baud_name, "9600") == 0) {
         return B9600;
     }
 
-    if(strcmp(baud_name, "4800") == 0) {
+    if (strcmp(baud_name, "4800") == 0) {
         return B4800;
     }
 
-    if(strcmp(baud_name, "2400") == 0) {
+    if (strcmp(baud_name, "2400") == 0) {
         return B2400;
     }
 
-    if(strcmp(baud_name, "1200") == 0) {
+    if (strcmp(baud_name, "1200") == 0) {
         return B1200;
     }
 
-    if(strcmp(baud_name, "300") == 0) {
+    if (strcmp(baud_name, "300") == 0) {
         return B300;
     }
 
@@ -328,19 +328,19 @@ int set_baud(const char *baud_name)
     tcflag_t baud;
     int r;
 
-    if(port_fd < 0) {
+    if (port_fd < 0) {
         return -1;
     }
 
     baud = baud_name_to_flags(baud_name);
 
-    if(baud == B0) {
+    if (baud == B0) {
         return -2;
     }
 
     r = tcgetattr(port_fd, &port_setting);
 
-    if(r != 0) {
+    if (r != 0) {
         return -3;
     }
 
@@ -350,7 +350,7 @@ int set_baud(const char *baud_name)
     port_setting.c_lflag = 0;
     r = tcsetattr(port_fd, TCSAFLUSH, &port_setting);
 
-    if(r != 0) {
+    if (r != 0) {
         return -4;
     }
 
@@ -375,12 +375,12 @@ void set_rts(int val)
 
     result = ioctl(port_fd, TIOCMGET, &flags);
 
-    if(result == -1) {
+    if (result == -1) {
         printf("Error %i while reading port io flags\n", errno);
         return;
     }
 
-    if(val) {
+    if (val) {
         flags |= TIOCM_RTS;
     }
     else {
@@ -389,7 +389,7 @@ void set_rts(int val)
 
     result = ioctl(port_fd, TIOCMSET, &flags);
 
-    if(result == -1) {
+    if (result == -1) {
         printf("Error %i while setting port io flags\n", errno);
     }
 }
@@ -407,12 +407,12 @@ void set_dtr(int val)
 
     result = ioctl(port_fd, TIOCMGET, &flags);
 
-    if(result == -1) {
+    if (result == -1) {
         printf("Error %i while reading port io flags\n", errno);
         return;
     }
 
-    if(val) {
+    if (val) {
         flags |= TIOCM_DTR;
     }
     else {
@@ -421,7 +421,7 @@ void set_dtr(int val)
 
     result = ioctl(port_fd, TIOCMSET, &flags);
 
-    if(result == -1) {
+    if (result == -1) {
         printf("Error %i while setting port io flags\n", errno);
     }
 }

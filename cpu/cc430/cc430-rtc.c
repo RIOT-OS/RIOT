@@ -57,7 +57,7 @@ void rtc_disable(void)
 /*---------------------------------------------------------------------------*/
 void rtc_set_localtime(struct tm *localt)
 {
-    if(localt == NULL) {
+    if (localt == NULL) {
         return;
     }
 
@@ -91,14 +91,14 @@ void rtc_get_localtime(struct tm *localt)
     uint8_t i;
     uint16_t tmpyear;
 
-    if(localt == NULL) {
+    if (localt == NULL) {
         return;
     }
 
-    while(!success) {
-        for(i = 0; i < 8; i++) {
+    while (!success) {
+        for (i = 0; i < 8; i++) {
             /* try again when RTC is in transition */
-            if(!(RTCCTL1 & RTCRDY_H)) {
+            if (!(RTCCTL1 & RTCRDY_H)) {
                 break;
             }
 
@@ -144,22 +144,22 @@ void rtc_get_localtime(struct tm *localt)
 /*---------------------------------------------------------------------------*/
 void rtc_set_alarm(struct tm *localt, rtc_alarm_mask_t mask)
 {
-    if(mask & RTC_ALARM_MIN) {
+    if (mask & RTC_ALARM_MIN) {
         RTCAMIN = localt->tm_min;
         RTCAMIN |= BIT7;
     }
 
-    if(mask & RTC_ALARM_HOUR) {
+    if (mask & RTC_ALARM_HOUR) {
         RTCAHOUR = localt->tm_hour;
         RTCAHOUR |= BIT7;
     }
 
-    if(mask & RTC_ALARM_DOW) {
+    if (mask & RTC_ALARM_DOW) {
         RTCADOW = localt->tm_wday;
         RTCADOW |= BIT7;
     }
 
-    if(mask & RTC_ALARM_DOM) {
+    if (mask & RTC_ALARM_DOM) {
         RTCADAY = localt->tm_mday;
         RTCADAY |= BIT7;
     }
@@ -185,11 +185,11 @@ interrupt(RTC_VECTOR) __attribute__((naked)) rtc_isr(void)
     __enter_isr();
 
     /* RTC is save to write for up to one second now */
-    if(RTCIV == RTC_RTCRDYIFG) {
+    if (RTCIV == RTC_RTCRDYIFG) {
         /* disable interrupt */
         //RTCCTL0 &= ~RTCRDYIE;
 
-        if(set_time) {
+        if (set_time) {
             set_time = 0;
             /* set previous set time and reset it */
             RTCSEC = time_to_set.tm_sec;
@@ -202,14 +202,14 @@ interrupt(RTC_VECTOR) __attribute__((naked)) rtc_isr(void)
             RTCYEARH = (time_to_set.tm_year + 1900) >> 0x08;
         }
 
-        if(rtc_second_pid) {
+        if (rtc_second_pid) {
             msg_t m;
             m.type = RTC_SECOND;
             msg_send_int(&m, rtc_second_pid);
         }
     }
     /* RTC alarm */
-    else if(RTCIV == RTC_RTCAIFG) {
+    else if (RTCIV == RTC_RTCAIFG) {
     }
 
     __exit_isr();

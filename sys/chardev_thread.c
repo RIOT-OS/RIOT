@@ -30,7 +30,7 @@
 
 static int min(int a, int b)
 {
-    if(b > a) {
+    if (b > a) {
         return a;
     }
     else {
@@ -49,15 +49,15 @@ void chardev_loop(ringbuffer_t *rb)
 
     puts("UART0 thread started.");
 
-    while(1) {
+    while (1) {
         msg_receive(&m);
 
-        if(m.sender_pid != pid) {
+        if (m.sender_pid != pid) {
             DEBUG("Receiving message from another thread\n");
 
             switch(m.type) {
                 case OPEN:
-                    if(reader_pid == -1) {
+                    if (reader_pid == -1) {
                         reader_pid = m.sender_pid;
                         /* no error */
                         m.content.value = 0;
@@ -70,7 +70,7 @@ void chardev_loop(ringbuffer_t *rb)
                     break;
 
                 case READ:
-                    if(m.sender_pid != reader_pid) {
+                    if (m.sender_pid != reader_pid) {
                         m.content.value = -EINVAL;
                         r = NULL;
                         msg_reply(&m, &m);
@@ -82,7 +82,7 @@ void chardev_loop(ringbuffer_t *rb)
                     break;
 
                 case CLOSE:
-                    if(m.sender_pid == reader_pid) {
+                    if (m.sender_pid == reader_pid) {
                         DEBUG("uart0_thread: closing file from %i\n", reader_pid);
                         reader_pid = -1;
                         r = NULL;
@@ -101,7 +101,7 @@ void chardev_loop(ringbuffer_t *rb)
             }
         }
 
-        if(rb->avail && (r != NULL)) {
+        if (rb->avail && (r != NULL)) {
             int state = disableIRQ();
             int nbytes = min(r->nbytes, rb->avail);
             DEBUG("uart0_thread [%i]: sending %i bytes received from %i to pid %i\n", pid, nbytes, m.sender_pid, reader_pid);

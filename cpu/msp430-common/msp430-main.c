@@ -113,7 +113,7 @@ msp430_cpu_init(void)
     //  lpm_init();
     eint();
 
-    if((uintptr_t)cur_break & 1) { /* Workaround for msp430-ld bug! */
+    if ((uintptr_t)cur_break & 1) { /* Workaround for msp430-ld bug!*/
         cur_break++;
     }
 }
@@ -136,7 +136,7 @@ void *sbrk(int incr)
     asmv("mov r1, %0" : "=r"(stack_pointer));
     stack_pointer -= STACK_EXTRA;
 
-    if(incr > (stack_pointer - cur_break)) {
+    if (incr > (stack_pointer - cur_break)) {
         return (void *) - 1;    /* ENOMEM */
     }
 

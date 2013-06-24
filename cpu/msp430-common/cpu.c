@@ -63,7 +63,7 @@ char *thread_stack_init(void *task_func, void *stack_start, int stack_size)
     --stk;
 
     /* Space for registers. */
-    for(unsigned int i = 15; i > 4; i--) {
+    for (unsigned int i = 15; i > 4; i--) {
         *stk = i;
         --stk;
     }

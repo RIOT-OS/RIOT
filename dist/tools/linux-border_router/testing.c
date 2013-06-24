@@ -22,14 +22,14 @@ void init_file(const char *skeleton_file_name,
 
     skeleton_file = fopen(skeleton_file_name, "r");
 
-    while(fgets(line, 1024, skeleton_file) != NULL) {
-        if(strncmp(line, "# sending window size=%d\n", 1024) == 0) {
+    while (fgets(line, 1024, skeleton_file) != NULL) {
+        if (strncmp(line, "# sending window size=%d\n", 1024) == 0) {
             fprintf(stats_file, line, BORDER_SWS);
         }
-        else if(strncmp(line, "# count=%ld (-c)\n", 1024) == 0) {
+        else if (strncmp(line, "# count=%ld (-c)\n", 1024) == 0) {
             fprintf(stats_file, line, runs_per_test);
         }
-        else if(strncmp(line, "# interval=%f (-i)\n", 1024) == 0) {
+        else if (strncmp(line, "# interval=%f (-i)\n", 1024) == 0) {
             fprintf(stats_file, line, interval);
         }
         else {
@@ -42,7 +42,7 @@ int testing_init(const char *stats_file_name,
                  const char *skeleton_file_name,
                  int runs_per_test, float interval)
 {
-    if(stats_file != NULL) {
+    if (stats_file != NULL) {
         return -1;
     }
 
@@ -51,7 +51,7 @@ int testing_init(const char *stats_file_name,
 
     stats_file = fopen(stats_file_name, "w");
 
-    if(stats_file == NULL) {
+    if (stats_file == NULL) {
         return -1;
     }
 
@@ -63,7 +63,7 @@ int testing_destroy()
 {
     int res, i;
 
-    for(i = 0; i < run_counter; i++) {
+    for (i = 0; i < run_counter; i++) {
         fprintf(stats_file, "%7d\t%3d\t%7ld\n",
                 i, stats[i].seq_num, stats[i].time_diff
                );
@@ -82,7 +82,7 @@ int testing_destroy()
 
 void testing_start(uint8_t seq_num)
 {
-    if(stats_file == NULL) {
+    if (stats_file == NULL) {
         return;
     }
 
@@ -91,7 +91,7 @@ void testing_start(uint8_t seq_num)
 
 void testing_stop(uint8_t seq_num)
 {
-    if(stats_file == NULL) {
+    if (stats_file == NULL) {
         return;
     }
 
@@ -123,7 +123,7 @@ void generate_filename(
     today = time(NULL);
     tmp = localtime(&today);
 
-    if(tmp == NULL) {
+    if (tmp == NULL) {
         perror("localtime");
         return;
     }
@@ -141,9 +141,9 @@ void generate_filename(
                 count++
                );
     }
-    while((test = fopen(filename, "r")) != NULL);
+    while ((test = fopen(filename, "r")) != NULL);
 
-    if(test != NULL) {
+    if (test != NULL) {
         fclose(test);
     }
 }

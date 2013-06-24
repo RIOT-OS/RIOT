@@ -31,11 +31,11 @@ void flashrom_write(uint8_t *dst, uint8_t *src, size_t size)
     FCTL3 = FWKEY;              /* Lock = 0 */
     busy_wait();
 
-    for(i = size; i > 0; i--) {
+    for (i = size; i > 0; i--) {
         FCTL1 = FWKEY | WRT;
         *dst = *src;                /* program Flash word */
 
-        while(!(FCTL3 & WAIT)) {
+        while (!(FCTL3 & WAIT)) {
             nop();
         }
     }
@@ -82,7 +82,7 @@ void finish(uint8_t istate)
 static inline void busy_wait(void)
 {
     /* Wait for BUSY = 0, not needed unless run from RAM */
-    while(FCTL3 & 0x0001) {
+    while (FCTL3 & 0x0001) {
         nop();
     }
 }

@@ -85,19 +85,19 @@ void schedule_timer(void)
 {
     int l = next_timer;
 
-    for(
+    for (
         int i = ((next_timer + 1) % ARCH_MAXTIMERS);
         i != next_timer;
         i = ((i + 1) % ARCH_MAXTIMERS)
     ) {
 
-        if(native_hwtimer_isset[l] != 1) {
+        if (native_hwtimer_isset[l] != 1) {
             /* make sure we dont compare to garbage in the following
              * if condition */
             l = i;
         }
 
-        if(
+        if (
             (native_hwtimer_isset[i] == 1) &&
             (tv2ticks(&(native_hwtimer[i].it_value)) < tv2ticks(&(native_hwtimer[l].it_value)))
         ) {
@@ -111,8 +111,8 @@ void schedule_timer(void)
 
     /* l could still point to some unused (garbage) timer if no timers
      * are set at all */
-    if(native_hwtimer_isset[next_timer] == 1) {
-        if(setitimer(ITIMER_REAL, &native_hwtimer[next_timer], NULL) == -1) {
+    if (native_hwtimer_isset[next_timer] == 1) {
+        if (setitimer(ITIMER_REAL, &native_hwtimer[next_timer], NULL) == -1) {
             err(1, "schedule_timer");
         }
         else {
@@ -140,7 +140,7 @@ void hwtimer_isr_timer()
     native_hwtimer_isset[next_timer] = 0;
     schedule_timer();
 
-    if(native_hwtimer_irq[i] == 1) {
+    if (native_hwtimer_irq[i] == 1) {
         DEBUG("hwtimer_isr_timer(): calling hwtimer.int_handler(%i)\n", i);
         int_handler(i);
     }
@@ -153,7 +153,7 @@ void hwtimer_arch_enable_interrupt(void)
 {
     DEBUG("hwtimer_arch_enable_interrupt()\n");
 
-    if(register_interrupt(SIGALRM, hwtimer_isr_timer) != 0) {
+    if (register_interrupt(SIGALRM, hwtimer_isr_timer) != 0) {
         DEBUG("darn!\n\n");
     }
 
@@ -164,7 +164,7 @@ void hwtimer_arch_disable_interrupt(void)
 {
     DEBUG("hwtimer_arch_disable_interrupt()\n");
 
-    if(unregister_interrupt(SIGALRM) != 0) {
+    if (unregister_interrupt(SIGALRM) != 0) {
         DEBUG("darn!\n\n");
     }
 
@@ -186,7 +186,7 @@ void hwtimer_arch_set(unsigned long offset, short timer)
 {
     DEBUG("hwtimer_arch_set(%li, %i)\n", offset, timer);
 
-    if(offset < HWTIMERMINOFFSET) {
+    if (offset < HWTIMERMINOFFSET) {
         offset = HWTIMERMINOFFSET;
         DEBUG("hwtimer_arch_set: offset < MIN, set to: %i\n", offset);
     }
@@ -227,7 +227,7 @@ unsigned long hwtimer_arch_now(void)
     t.tv_nsec = mts.tv_nsec;
 #else
 
-    if(clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
+    if (clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
         err(1, "hwtimer_arch_now: clock_gettime");
     }
 
@@ -247,7 +247,7 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
     hwtimer_arch_disable_interrupt();
     int_handler = handler;
 
-    for(int i = 0; i < ARCH_MAXTIMERS; i++) {
+    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
         native_hwtimer_irq[i] = 0;
         native_hwtimer_isset[i] = 0;
         native_hwtimer[i].it_interval.tv_sec = 0;

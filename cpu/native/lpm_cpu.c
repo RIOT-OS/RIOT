@@ -48,12 +48,12 @@ void _native_lpm_sleep()
     retval = select(1, &_native_uart_rfds, NULL, NULL, NULL);
     DEBUG("_native_lpm_sleep: retval: %i\n", retval);
 
-    if(retval != -1) {
+    if (retval != -1) {
         /* uart ready, handle input */
         /* TODO: switch to ISR context */
         _native_handle_uart0_input();
     }
-    else if(errno != EINTR) {
+    else if (errno != EINTR) {
         /* select failed for reason other than signal */
         err(1, "lpm_set(): select()");
     }
@@ -63,7 +63,7 @@ void _native_lpm_sleep()
     pause();
 #endif
 
-    if(_native_sigpend > 0) {
+    if (_native_sigpend > 0) {
         DEBUG("\n\n\t\treturn from syscall, calling native_irq_handler\n\n");
         _native_in_syscall = 0;
         _native_in_isr = 1;
