@@ -46,33 +46,33 @@ uint8_t rpl_send_buffer[BUFFER_SIZE];
 
 msg_t msg_queue[RPL_PKT_RECV_BUF_SIZE];
 /* SEND BUFFERS */
-static struct ipv6_hdr_t *ipv6_send_buf;
+static ipv6_hdr_t *ipv6_send_buf;
 static struct icmpv6_hdr_t *icmp_send_buf;
 static struct rpl_dio_t *rpl_send_dio_buf;
 static struct rpl_dis_t *rpl_send_dis_buf;
 static struct rpl_dao_t *rpl_send_dao_buf;
 static struct rpl_dao_ack_t *rpl_send_dao_ack_buf;
-static struct rpl_opt_dodag_conf_t *rpl_send_opt_dodag_conf_buf;
+static rpl_opt_dodag_conf_t *rpl_send_opt_dodag_conf_buf;
 /* static struct rpl_opt_solicited_t * rpl_send_opt_solicited_buf; */
-static struct rpl_opt_target_t *rpl_send_opt_target_buf;
-static struct rpl_opt_transit_t *rpl_send_opt_transit_buf;
+static rpl_opt_target_t *rpl_send_opt_target_buf;
+static rpl_opt_transit_t *rpl_send_opt_transit_buf;
 
 /* RECEIVE BUFFERS */
-static struct ipv6_hdr_t *ipv6_buf;
+static ipv6_hdr_t *ipv6_buf;
 static struct rpl_dio_t *rpl_dio_buf;
 static struct rpl_dis_t *rpl_dis_buf;
 static struct rpl_dao_t *rpl_dao_buf;
 static struct rpl_dao_ack_t *rpl_dao_ack_buf;
-static struct rpl_opt_t *rpl_opt_buf;
-static struct rpl_opt_dodag_conf_t *rpl_opt_dodag_conf_buf;
-static struct rpl_opt_solicited_t *rpl_opt_solicited_buf;
-static struct rpl_opt_target_t *rpl_opt_target_buf;
-static struct rpl_opt_transit_t *rpl_opt_transit_buf;
+static rpl_opt_t *rpl_opt_buf;
+static rpl_opt_dodag_conf_t *rpl_opt_dodag_conf_buf;
+static rpl_opt_solicited_t *rpl_opt_solicited_buf;
+static rpl_opt_target_t *rpl_opt_target_buf;
+static rpl_opt_transit_t *rpl_opt_transit_buf;
 
 /*  SEND BUFFERS */
-static struct ipv6_hdr_t *get_rpl_send_ipv6_buf(void)
+static ipv6_hdr_t *get_rpl_send_ipv6_buf(void)
 {
-    return ((struct ipv6_hdr_t *)&(rpl_send_buffer[0]));
+    return ((ipv6_hdr_t *)&(rpl_send_buffer[0]));
 }
 
 static uint8_t *get_rpl_send_payload_buf(uint8_t ext_len)
@@ -105,25 +105,25 @@ static struct rpl_dis_t *get_rpl_send_dis_buf(void)
     return ((struct rpl_dis_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
 
-static struct rpl_opt_dodag_conf_t *get_rpl_send_opt_dodag_conf_buf(uint8_t rpl_msg_len)
+static rpl_opt_dodag_conf_t *get_rpl_send_opt_dodag_conf_buf(uint8_t rpl_msg_len)
 {
-    return ((struct rpl_opt_dodag_conf_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_dodag_conf_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
-static struct rpl_opt_target_t *get_rpl_send_opt_target_buf(uint8_t rpl_msg_len)
+static rpl_opt_target_t *get_rpl_send_opt_target_buf(uint8_t rpl_msg_len)
 {
-    return ((struct rpl_opt_target_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_target_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
-static struct rpl_opt_transit_t *get_rpl_send_opt_transit_buf(uint8_t rpl_msg_len)
+static rpl_opt_transit_t *get_rpl_send_opt_transit_buf(uint8_t rpl_msg_len)
 {
-    return ((struct rpl_opt_transit_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_transit_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
 /* RECEIVE BUFFERS */
-static struct ipv6_hdr_t *get_rpl_ipv6_buf(void)
+static ipv6_hdr_t *get_rpl_ipv6_buf(void)
 {
-    return ((struct ipv6_hdr_t *)&(rpl_buffer[0]));
+    return ((ipv6_hdr_t *)&(rpl_buffer[0]));
 }
 
 static struct rpl_dio_t *get_rpl_dio_buf(void)
@@ -146,29 +146,29 @@ static struct rpl_dis_t *get_rpl_dis_buf(void)
     return ((struct rpl_dis_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
 
-static struct rpl_opt_t *get_rpl_opt_buf(uint8_t rpl_msg_len)
+static rpl_opt_t *get_rpl_opt_buf(uint8_t rpl_msg_len)
 {
-    return ((struct rpl_opt_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
-static struct rpl_opt_dodag_conf_t *get_rpl_opt_dodag_conf_buf(uint8_t rpl_msg_len)
+static rpl_opt_dodag_conf_t *get_rpl_opt_dodag_conf_buf(uint8_t rpl_msg_len)
 {
-    return ((struct rpl_opt_dodag_conf_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_dodag_conf_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
-static struct rpl_opt_solicited_t *get_rpl_opt_solicited_buf(uint8_t rpl_msg_len)
+static rpl_opt_solicited_t *get_rpl_opt_solicited_buf(uint8_t rpl_msg_len)
 {
-    return ((struct rpl_opt_solicited_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_solicited_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
-static struct rpl_opt_target_t *get_rpl_opt_target_buf(uint8_t rpl_msg_len)
+static rpl_opt_target_t *get_rpl_opt_target_buf(uint8_t rpl_msg_len)
 {
-    return ((struct rpl_opt_target_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_target_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
-static struct rpl_opt_transit_t *get_rpl_opt_transit_buf(uint8_t rpl_msg_len)
+static rpl_opt_transit_t *get_rpl_opt_transit_buf(uint8_t rpl_msg_len)
 {
-    return ((struct rpl_opt_transit_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_transit_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
 /* Diese Funktion findet eine implementierte OF anhand des Objective Code Point */
@@ -232,7 +232,7 @@ void rpl_init_root(void)
     dodag = rpl_new_dodag(RPL_DEFAULT_INSTANCE, &my_address);
 
     if(dodag != NULL) {
-        dodag->of = rpl_get_of_for_ocp(RPL_DEFAULT_OCP);
+        dodag->of = (struct rpl_of_t*) rpl_get_of_for_ocp(RPL_DEFAULT_OCP);
         dodag->instance = inst;
         dodag->mop = RPL_DEFAULT_MOP;
         dodag->dtsn = 1;
@@ -599,7 +599,7 @@ void recv_rpl_dio(void)
                 dio_dodag.minhoprankincrease = rpl_opt_dodag_conf_buf->MinHopRankIncrease;
                 dio_dodag.default_lifetime = rpl_opt_dodag_conf_buf->default_lifetime;
                 dio_dodag.lifetime_unit = rpl_opt_dodag_conf_buf->lifetime_unit;
-                dio_dodag.of = rpl_get_of_for_ocp(rpl_opt_dodag_conf_buf->ocp);
+                dio_dodag.of = (struct rpl_of_t*) rpl_get_of_for_ocp(rpl_opt_dodag_conf_buf->ocp);
                 len += RPL_OPT_DODAG_CONF_LEN + 2;
                 break;
             }

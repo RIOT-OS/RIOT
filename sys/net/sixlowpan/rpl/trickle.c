@@ -20,8 +20,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "inttypes.h"
 #include "trickle.h"
-#include "sys/net/sixlowpan/rpl/rpl.h"
+#include "sixlowpan/rpl/rpl.h"
 
 char timer_over_buf[TRICKLE_TIMER_STACKSIZE];
 char interval_over_buf[TRICKLE_INTERVAL_STACKSIZE];
@@ -135,7 +136,7 @@ void trickle_interval_over(void)
     while(1) {
         thread_sleep();
         I = I * 2;
-        printf("TRICKLE new Interval %u\n", I);
+        printf("TRICKLE new Interval %"PRIu32"\n", I);
 
         if(I == 0) {
             puts("[WARNING] Interval was 0");
