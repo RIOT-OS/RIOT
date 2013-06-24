@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
+
 #include <irq.h>
 #include <queue.h>
 #include <timex.h>
@@ -282,7 +284,7 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr)
 
 void vtimer_print(vtimer_t *t)
 {
-    printf("Seconds: %u - Microseconds: %u\n \
+    printf("Seconds: %"PRIu32" - Microseconds: %"PRIu32"\n \
             action: %p\n \
             action: %p\n \
             pid: %u\n",
