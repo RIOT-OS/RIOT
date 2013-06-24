@@ -80,7 +80,6 @@ char con_buf[CON_STACKSIZE];
 char lowpan_transfer_buf[LOWPAN_TRANSFER_BUF_STACKSIZE];
 lowpan_context_t contexts[LOWPAN_CONTEXT_MAX];
 uint8_t context_len = 0;
-uint8_t static_route = 0;
 uint16_t local_address = 0;
 
 void lowpan_context_auto_remove(void);
@@ -102,15 +101,6 @@ void lowpan_init(ieee_802154_long_t *addr, uint8_t *data)
     lowpan_iphc_encoding(&laddr, ipv6_buf, data);
     data = &comp_buf[0];
     packet_length = comp_len;
-
-    if(static_route == 1) {
-        if(laddr.uint8[7] < local_address) {
-            laddr.uint8[7] = local_address - 1;
-        }
-        else {
-            laddr.uint8[7] = local_address + 1;
-        }
-    }
 
     /* check if packet needs to be fragmented */
     if(packet_length + header_size > PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN) {

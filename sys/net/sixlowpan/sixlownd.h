@@ -26,90 +26,90 @@
 #include "sixlowip.h"
 
 /* parameter problem [rfc4443] */
-#define PARA_PROB_LEN                   8
-#define PARA_PROB_CODE_ERR              0   /* Erroneous header field encountered */
-#define PARA_PROB_NXT_HDR_UNREC         1   /* Unrecognized Next Header type encountered */
-#define PARA_PROB_IPV6_OPT_UNREC        2   /* Unrecognized IPv6 option encountered */
+#define PARA_PROB_LEN                  	(8)
+#define PARA_PROB_CODE_ERR             	(0)   /* Erroneous header field encountered */
+#define PARA_PROB_NXT_HDR_UNREC        	(1)   /* Unrecognized Next Header type encountered */
+#define PARA_PROB_IPV6_OPT_UNREC       	(2)   /* Unrecognized IPv6 option encountered */
 /* router solicitation */
-#define RTR_SOL_LEN                     4
-#define RTR_SOL_INTERVAL                4
-#define RTR_SOL_MAX                     3
+#define RTR_SOL_LEN                    	(4)
+#define RTR_SOL_INTERVAL               	(4)
+#define RTR_SOL_MAX                    	(3)
 /* router advertisment */
-#define RTR_ADV_M_FLAG                  0
-#define RTR_ADV_O_FLAG                  0
-#define RTR_ADV_MAX                     3
-#define RTR_ADV_MAX_INTERVAL            600
-#define RTR_ADV_LEN                     12
+#define RTR_ADV_M_FLAG                 	(0)
+#define RTR_ADV_O_FLAG                 	(0)
+#define RTR_ADV_MAX                    	(3)
+#define RTR_ADV_MAX_INTERVAL           	(600)
+#define RTR_ADV_LEN                    	(12)
 /* neighbour solicitation */
-#define NBR_SOL_LEN                     20
+#define NBR_SOL_LEN                    	(20)
 /* neighbour advertisement */
-#define NBR_ADV_LEN                     20
-#define NBR_ADV_FLAG_R                  0x80
-#define NBR_ADV_FLAG_S                  0x40
-#define NBR_ADV_FLAG_O                  0x20
+#define NBR_ADV_LEN                    	(20)
+#define NBR_ADV_FLAG_R                 	(0x80)
+#define NBR_ADV_FLAG_S                 	(0x40)
+#define NBR_ADV_FLAG_O                 	(0x20)
 /* icmp message types rfc4443 */
-#define ICMP_PARA_PROB                  4
+#define ICMP_PARA_PROB                 	(4)
 /* icmp message types rfc4861 4.*/
-#define ICMP_RTR_ADV                    134
-#define ICMP_RTR_SOL                    133
-#define ICMP_NBR_ADV                    136
-#define ICMP_NBR_SOL                    135
-#define ICMP_REDIRECT                   137	/* will be filtered out by the border router */
+#define ICMP_RTR_ADV                   	(134)
+#define ICMP_RTR_SOL                   	(133)
+#define ICMP_NBR_ADV                   	(136)
+#define ICMP_NBR_SOL                   	(135)
+#define ICMP_REDIRECT                  	(137)	/* will be filtered out by the border router */
 /* stllao option rfc4861 4.6.1 */
-#define OPT_STLLAO_MIN_LEN              8
-#define OPT_STLLAO_MAX_LEN              16
-#define OPT_SLLAO_TYPE                  1
-#define OPT_TLLAO_TYPE                  2
+#define OPT_STLLAO_MIN_LEN             	(8)
+#define OPT_STLLAO_MAX_LEN             	(16)
+#define OPT_SLLAO_TYPE                 	(1)
+#define OPT_TLLAO_TYPE                 	(2)
 /* prefix info option rfc 4.6.2 */
-#define OPT_PI_LIST_LEN                 5 //TODO: initalwert suchen        
-#define OPT_PI_TYPE                     3
-#define OPT_PI_LEN                      4
-#define OPT_PI_HDR_LEN                  32
-#define OPT_PI_FLAG_A                   0x40
-#define OPT_PI_FLAG_L                   0x80
-#define OPT_PI_VLIFETIME_INFINITE       0xffffffff
+#define OPT_PI_LIST_LEN                	(5) //TODO: initalwert suchen        
+#define OPT_PI_TYPE                    	(3)
+#define OPT_PI_LEN                     	(4)
+#define OPT_PI_HDR_LEN                 	(32)
+#define OPT_PI_FLAG_A                  	(0x40)
+#define OPT_PI_FLAG_L                  	(0x80)
+#define OPT_PI_VLIFETIME_INFINITE      	(0xffffffff)
 /* mtu option rfc4861 4.6.4 */
-#define OPT_MTU_TYPE                    5
-#define OPT_MTU_LEN                     1
-#define OPT_MTU_HDR_LEN                 8
+#define OPT_MTU_TYPE                   	(5)
+#define OPT_MTU_LEN                    	(1)
+#define OPT_MTU_HDR_LEN                	(8)
 /* aro - address registration option draft-ietf-6lowpan-nd-14 4.2 */
-#define OPT_ARO_TYPE                    31 /* TBD1  */
-#define OPT_ARO_LEN                     2
-#define OPT_ARO_HDR_LEN                 16
-#define OPT_ARO_LTIME                   300 /* geeigneten wert finden */
-#define OPT_ARO_STATE_SUCCESS           0
-#define OPT_ARO_STATE_DUP_ADDR          1
-#define OPT_ARO_STATE_NBR_CACHE_FULL    2
+#define OPT_ARO_TYPE                   	(31) /* TBD1  */
+#define OPT_ARO_LEN                    	(2)
+#define OPT_ARO_HDR_LEN                	(16)
+#define OPT_ARO_LTIME                  	(300) /* geeigneten wert finden */
+#define OPT_ARO_STATE_SUCCESS          	(0)
+#define OPT_ARO_STATE_DUP_ADDR         	(1)
+#define OPT_ARO_STATE_NBR_CACHE_FULL   	(2)
 /* 6lowpan context option */
-#define OPT_6CO_TYPE                    32
-#define OPT_6CO_MIN_LEN                 2
-#define OPT_6CO_MAX_LEN                 3
-#define OPT_6CO_HDR_LEN                 8
-#define OPT_6CO_LTIME                   5   /* geeigneten Wert finden */
-#define OPT_6CO_FLAG_C                  0x10
-#define OPT_6CO_FLAG_CID                0x0F
-#define OPT_6CO_FLAG_C_VALUE_SET        1
-#define OPT_6CO_FLAG_C_VALUE_UNSET      0
+#define OPT_6CO_TYPE                   	(32)
+#define OPT_6CO_MIN_LEN                	(2)
+#define OPT_6CO_MAX_LEN                	(3)
+#define OPT_6CO_HDR_LEN                	(8)
+#define OPT_6CO_LTIME                  	(5)   /* geeigneten Wert finden */
+#define OPT_6CO_FLAG_C                 	(0x10)
+#define OPT_6CO_FLAG_CID               	(0x0F)
+#define OPT_6CO_FLAG_C_VALUE_SET       	(1)
+#define OPT_6CO_FLAG_C_VALUE_UNSET     	(0)
 /* authoritative border router option */
-#define OPT_ABRO_TYPE                   33
-#define OPT_ABRO_LEN                    3
-#define OPT_ABRO_HDR_LEN                24
+#define OPT_ABRO_TYPE                  	(33)
+#define OPT_ABRO_LEN                   	(3)
+#define OPT_ABRO_HDR_LEN               	(24)
 /* authoritive border router cache size */
-#define ABR_CACHE_SIZE                  2
+#define ABR_CACHE_SIZE                 	(2)
 /* neighbor cache size */
-#define NBR_CACHE_SIZE                  8
-#define NBR_CACHE_TYPE_GC               1
-#define NBR_CACHE_TYPE_REG              2
-#define NBR_CACHE_TYPE_TEN              3
-#define NBR_CACHE_LTIME_TEN             20
+#define NBR_CACHE_SIZE                 	(8)
+#define NBR_CACHE_TYPE_GC              	(1)
+#define NBR_CACHE_TYPE_REG             	(2)
+#define NBR_CACHE_TYPE_TEN             	(3)
+#define NBR_CACHE_LTIME_TEN            	(20)
 /* neighbor status values */
-#define NBR_STATUS_INCOMPLETE           0
-#define NBR_STATUS_REACHABLE            1
-#define NBR_STATUS_STALE                2
-#define NBR_STATUS_DELAY                3
-#define NBR_STATUS_PROBE                4
+#define NBR_STATUS_INCOMPLETE          	(0)
+#define NBR_STATUS_REACHABLE           	(1)
+#define NBR_STATUS_STALE               	(2)
+#define NBR_STATUS_DELAY               	(3)
+#define NBR_STATUS_PROBE               	(4)
 /* default router list size */
-#define DEF_RTR_LST_SIZE                    3 /* geeigneten wert finden */
+#define DEF_RTR_LST_SIZE                   	(3) /* geeigneten wert finden */
 
 extern unsigned int nd_nbr_cache_rem_pid;
 

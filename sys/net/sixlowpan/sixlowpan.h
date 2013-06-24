@@ -21,38 +21,36 @@
 #ifndef SIXLOWPAN_H
 #define SIXLOWPAN_H
 
-#define IP_PROCESS_STACKSIZE            3072
-#define NC_STACKSIZE                    512
-#define CON_STACKSIZE                   512
-#define LOWPAN_TRANSFER_BUF_STACKSIZE   512
+#define IP_PROCESS_STACKSIZE           	(3072)
+#define NC_STACKSIZE                   	(512)
+#define CON_STACKSIZE                  	(512)
+#define LOWPAN_TRANSFER_BUF_STACKSIZE  	(512)
 
 /* fragment size in bytes*/
-#define FRAG_PART_ONE_HDR_LEN   4
-#define FRAG_PART_N_HDR_LEN     5
+#define FRAG_PART_ONE_HDR_LEN  	(4)
+#define FRAG_PART_N_HDR_LEN    	(5)
 
-#define LOWPAN_IPHC_DISPATCH    0x60
-#define LOWPAN_IPHC_FL_C        0x10
-#define LOWPAN_IPHC_TC_C        0x08
-#define LOWPAN_IPHC_CID         0x80
-#define LOWPAN_IPHC_SAC         0x40
-#define LOWPAN_IPHC_SAM         0x30
-#define LOWPAN_IPHC_DAC         0x04
-#define LOWPAN_IPHC_DAM         0x03
-#define LOWPAN_IPHC_M           0x08
-#define LOWPAN_IPHC_NH          0x04
-#define LOWPAN_IPV6_DISPATCH    0x41
-#define LOWPAN_CONTEXT_MAX      16
+#define LOWPAN_IPHC_DISPATCH   	(0x60)
+#define LOWPAN_IPHC_FL_C       	(0x10)
+#define LOWPAN_IPHC_TC_C       	(0x08)
+#define LOWPAN_IPHC_CID        	(0x80)
+#define LOWPAN_IPHC_SAC        	(0x40)
+#define LOWPAN_IPHC_SAM        	(0x30)
+#define LOWPAN_IPHC_DAC        	(0x04)
+#define LOWPAN_IPHC_DAM        	(0x03)
+#define LOWPAN_IPHC_M          	(0x08)
+#define LOWPAN_IPHC_NH         	(0x04)
+#define LOWPAN_IPV6_DISPATCH   	(0x41)
+#define LOWPAN_CONTEXT_MAX     	(16)
 
-#define LOWPAN_REAS_BUF_TIMEOUT 15 * 1000 * 1000 /* TODO: Set back to 3 * 1000 * 1000 */
+#define LOWPAN_REAS_BUF_TIMEOUT (15 * 1000 * 1000) /* TODO: Set back to 3 * 1000 *	(1000) */
 
 #include "transceiver.h"
 #include "sixlowip.h"
-#include <vtimer.h>
-#include <mutex.h>
-#include <time.h>
+#include "vtimer.h"
+#include "mutex.h"
 
 extern mutex_t lowpan_context_mutex;
-extern uint8_t static_route;
 extern uint16_t local_address;
 
 typedef struct {
@@ -92,7 +90,22 @@ typedef struct lowpan_reas_buf_t {
 
 extern lowpan_reas_buf_t *head;
 
+/**
+ * @brief   Initializes 6lowpan
+ *
+ * @param[in] trans     transceiver to use with 6lowpan
+ * @param[in] r_addr    phy layer address
+ * @param[in] as_border 1 if node shoud act as border router, 0 otherwise
+ */
 void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border);
+
+/**
+ * @brief Initializes a 6lowpan router with address prefix
+ *
+ * @param[in] trans     transceiver to use with 6lowpan
+ * @param[in] prefix    the address prefix to advertise
+ * @param[in] r_addr    phy layer address
+ */
 void sixlowpan_adhoc_init(transceiver_type_t trans, ipv6_addr_t *prefix, 
                           uint8_t r_addr);
 void lowpan_init(ieee_802154_long_t *addr, uint8_t *data);
