@@ -36,7 +36,7 @@
 uint8_t ip_send_buffer[BUFFER_SIZE];
 uint8_t buffer[BUFFER_SIZE];
 msg_t msg_queue[IP_PKT_RECV_BUF_SIZE];
-struct ipv6_hdr_t *ipv6_buf;
+ipv6_hdr_t *ipv6_buf;
 struct icmpv6_hdr_t *icmp_buf;
 uint8_t ipv6_ext_hdr_len;
 uint8_t *nextheader;
@@ -46,9 +46,9 @@ int udp_packet_handler_pid = 0;
 int tcp_packet_handler_pid = 0;
 int rpl_process_pid = 0;
 
-struct ipv6_hdr_t *get_ipv6_buf_send(void)
+ipv6_hdr_t *get_ipv6_buf_send(void)
 {
-    return ((struct ipv6_hdr_t *) & (ip_send_buffer[LL_HDR_LEN]));
+    return ((ipv6_hdr_t *) & (ip_send_buffer[LL_HDR_LEN]));
 }
 
 uint8_t *get_payload_buf_send(uint8_t ext_len)
@@ -56,9 +56,9 @@ uint8_t *get_payload_buf_send(uint8_t ext_len)
     return &(ip_send_buffer[LLHDR_IPV6HDR_LEN + ext_len]);
 }
 
-struct ipv6_hdr_t *get_ipv6_buf(void)
+ipv6_hdr_t *get_ipv6_buf(void)
 {
-    return ((struct ipv6_hdr_t *) & (buffer[LL_HDR_LEN]));
+    return ((ipv6_hdr_t *)&(buffer[LL_HDR_LEN]));
 }
 
 struct icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len)
@@ -176,7 +176,7 @@ void ipv6_process(void)
     while(1) {
         msg_receive(&m_recv_lowpan);
 
-        ipv6_buf = (struct ipv6_hdr_t *) m_recv_lowpan.content.ptr;
+        ipv6_buf = (ipv6_hdr_t *)m_recv_lowpan.content.ptr;
 
         /* identifiy packet */
         nextheader = &ipv6_buf->nextheader;

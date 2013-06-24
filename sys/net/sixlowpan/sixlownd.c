@@ -58,19 +58,19 @@ plist_t plist[OPT_PI_LIST_LEN];
 static uint8_t *llao;
 addr_list_t *addr_list_ptr;
 
-static struct ipv6_hdr_t *ipv6_buf;
+static ipv6_hdr_t *ipv6_buf;
 static struct icmpv6_hdr_t *icmp_buf;
 static struct rtr_adv_t *rtr_adv_buf;
 static struct nbr_sol_t *nbr_sol_buf;
 static struct nbr_adv_t *nbr_adv_buf;
-static struct opt_buf_t *opt_buf;
-static struct opt_stllao_t *opt_stllao_buf;
-static struct opt_mtu_t *opt_mtu_buf;
-static struct opt_abro_t *opt_abro_buf;
-static struct opt_6co_hdr_t *opt_6co_hdr_buf;
+static opt_buf_t *opt_buf;
+static opt_stllao_t *opt_stllao_buf;
+static opt_mtu_t *opt_mtu_buf;
+static opt_abro_t *opt_abro_buf;
+static opt_6co_hdr_t *opt_6co_hdr_buf;
 static uint8_t *opt_6co_prefix_buf;
-static struct opt_pi_t *opt_pi_buf;
-static struct opt_aro_t *opt_aro_buf;
+static opt_pi_t *opt_pi_buf;
+static opt_aro_t *opt_aro_buf;
 
 nbr_cache_t *nbr_entry;
 def_rtr_lst_t *def_rtr_entry;
@@ -98,51 +98,51 @@ int min(int a, int b)
 
 static struct para_prob_t *get_para_prob_buf(uint8_t ext_len)
 {
-    return ((struct para_prob_t *) & (buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+    return ((struct para_prob_t *)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
 }
 
 static struct rtr_adv_t *get_rtr_adv_buf(uint8_t ext_len)
 {
-    return ((struct rtr_adv_t *) & (buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+    return ((struct rtr_adv_t *)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
 }
 
 static struct nbr_sol_t *get_nbr_sol_buf(uint8_t ext_len)
 {
-    return ((struct nbr_sol_t *) & (buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+    return ((struct nbr_sol_t *)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
 }
 
 static struct nbr_adv_t *get_nbr_adv_buf(uint8_t ext_len)
 {
-    return ((struct nbr_adv_t *) & (buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+    return ((struct nbr_adv_t *)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
 }
 
-static struct opt_buf_t *get_opt_buf(uint8_t ext_len, uint8_t opt_len)
+static opt_buf_t *get_opt_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((struct opt_buf_t *) & (buffer[LLHDR_ICMPV6HDR_LEN +
+    return ((opt_buf_t *)&(buffer[LLHDR_ICMPV6HDR_LEN +
                                            ext_len + opt_len]));
 }
 
-static struct opt_stllao_t *get_opt_stllao_buf(uint8_t ext_len, uint8_t opt_len)
+static opt_stllao_t *get_opt_stllao_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((struct opt_stllao_t *)&(buffer[LLHDR_ICMPV6HDR_LEN +
+    return ((opt_stllao_t *)&(buffer[LLHDR_ICMPV6HDR_LEN +
                                        ext_len + opt_len]));
 }
 
-static struct opt_mtu_t *get_opt_mtu_buf(uint8_t ext_len, uint8_t opt_len)
+static opt_mtu_t *get_opt_mtu_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((struct opt_mtu_t *) & (buffer[LLHDR_ICMPV6HDR_LEN +
+    return ((opt_mtu_t *)&(buffer[LLHDR_ICMPV6HDR_LEN +
                                            ext_len + opt_len]));
 }
 
-static struct opt_abro_t *get_opt_abro_buf(uint8_t ext_len, uint8_t opt_len)
+static opt_abro_t *get_opt_abro_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((struct opt_abro_t *)&(buffer[LLHDR_ICMPV6HDR_LEN +
+    return ((opt_abro_t *)&(buffer[LLHDR_ICMPV6HDR_LEN +
                                             ext_len + opt_len]));
 }
 
-static struct opt_6co_hdr_t *get_opt_6co_hdr_buf(uint8_t ext_len, uint8_t opt_len)
+static opt_6co_hdr_t *get_opt_6co_hdr_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((struct opt_6co_hdr_t *)&(buffer[LLHDR_ICMPV6HDR_LEN +
+    return ((opt_6co_hdr_t *)&(buffer[LLHDR_ICMPV6HDR_LEN +
                                        ext_len + opt_len]));
 }
 
@@ -151,15 +151,15 @@ static uint8_t *get_opt_6co_prefix_buf(uint8_t ext_len, uint8_t opt_len)
     return ((uint8_t *)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]));
 }
 
-static struct opt_pi_t *get_opt_pi_buf(uint8_t ext_len, uint8_t opt_len)
+static opt_pi_t *get_opt_pi_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((struct opt_pi_t *)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len +
+    return ((opt_pi_t *)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len +
                                  opt_len]));
 }
 
-static struct opt_aro_t *get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len)
+static opt_aro_t *get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((struct opt_aro_t *)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len +
+    return ((opt_aro_t *)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len +
                                   opt_len]));
 }
 

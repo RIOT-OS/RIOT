@@ -293,7 +293,7 @@ socket_internal_t *get_udp_socket(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header
 bool is_four_touple(socket_internal_t *current_socket, ipv6_hdr_t *ipv6_header,
                     tcp_hdr_t *tcp_header)
 {
-    return ((ipv6_get_addr_match(&current_socket->socket_values.local_address.sin6_addr
+    return ((ipv6_get_addr_match(&current_socket->socket_values.local_address.sin6_addr,
                                  &ipv6_header->destaddr) == 128) &&
             (current_socket->socket_values.local_address.sin6_port == tcp_header->dst_port) &&
             (ipv6_get_addr_match(&current_socket->socket_values.foreign_address.sin6_addr,
@@ -528,9 +528,9 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 
     current_tcp_socket->tcp_control.rcv_irs	= 0;
     mutex_lock(&global_sequence_clunter_mutex);
-    current_tcp_socket->tcp_control.send_is	= global_sequence_counter;
+    current_tcp_socket->tcp_control.send_iss = global_sequence_counter;
     mutex_unlock(&global_sequence_clunter_mutex, 0);
-    current_tcp_socket->tcp_control.state 		= SYN_SENT;
+    current_tcp_socket->tcp_control.state = SYN_SENT;
 
 #ifdef TCP_HC
     /* Choosing random number Context ID */

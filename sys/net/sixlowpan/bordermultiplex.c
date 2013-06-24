@@ -47,7 +47,7 @@ void demultiplex(border_packet_t *packet, int len)
 
             switch(l3_header_buf->ethertype) {
                 case(BORDER_ETHERTYPE_IPV6): {
-                    struct ipv6_hdr_t *ipv6_buf = (struct ipv6_hdr_t *)(((unsigned char *)packet) + sizeof(border_l3_header_t));
+                    ipv6_hdr_t *ipv6_buf = (ipv6_hdr_t *)(((unsigned char *)packet) + sizeof(border_l3_header_t));
                     border_send_ipv6_over_lowpan(ipv6_buf, 1, 1);
                     break;
                 }
@@ -102,7 +102,7 @@ void demultiplex(border_packet_t *packet, int len)
     }
 }
 
-void multiplex_send_ipv6_over_uart(struct ipv6_hdr_t *packet)
+void multiplex_send_ipv6_over_uart(ipv6_hdr_t *packet)
 {
     border_l3_header_t *serial_buf;
 

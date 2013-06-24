@@ -55,7 +55,7 @@ extern mutex_t lowpan_context_mutex;
 extern uint8_t static_route;
 extern uint16_t local_address;
 
-typedef struct lowpan_context_t {
+typedef struct {
     uint8_t num;
     ipv6_addr_t prefix;
     uint8_t length;

@@ -21,6 +21,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
+
 #include "sixlowmac.h"
 #include "sixlowip.h"
 #include "sixlownd.h"
@@ -33,7 +35,7 @@
 #include "transceiver.h"
 #include "vtimer.h"
 #include "ieee802154_frame.h"
-#include "sys/net/net_help/net_help.h"
+#include "net_help/net_help.h"
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
 msg_t msg_q[RADIO_RCV_BUF_SIZE];
@@ -223,7 +225,7 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
 
     p.data = buf;
     msg_send_receive(&mesg, &transceiver_rsp, transceiver_pid);
-    printf("%s, %u: %u\n", __FILE__, __LINE__, transceiver_rsp.content.value);
+    printf("%s, %u: %"PRIu32"\n", __FILE__, __LINE__, transceiver_rsp.content.value);
 
     hwtimer_wait(5000);
 }

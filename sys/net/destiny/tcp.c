@@ -165,8 +165,8 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
             net_msg_send(&m_send_tcp, tcp_socket->recv_pid, 0, TCP_SYN);
         }
         else {
-            printf("Dropped TCP SYN Message because an error occured while
-                    requesting a new queued socket!\n");
+            printf("Dropped TCP SYN Message because an error occured while "\
+                   "requesting a new queued socket!\n");
         }
     }
     else {

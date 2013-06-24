@@ -83,7 +83,7 @@ typedef struct __attribute__((packed)) {
 #define BORDER_BUFFER_SIZE (sizeof (border_l3_header_t) + MTU)
 
 void demultiplex(border_packet_t *packet, int len);
-void multiplex_send_ipv6_over_uart(struct ipv6_hdr_t *packet);
+void multiplex_send_ipv6_over_uart(ipv6_hdr_t *packet);
 void multiplex_send_addr_over_uart(ipv6_addr_t *addr);
 
 int readpacket(uint8_t *packet_buf, size_t size);

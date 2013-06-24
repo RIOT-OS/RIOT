@@ -159,7 +159,7 @@ uint8_t border_initialize(transceiver_type_t trans, ipv6_addr_t *border_router_a
     return SUCCESS;
 }
 
-void border_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag)
+void border_send_ipv6_over_lowpan(ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag)
 {
     uint16_t offset = IPV6_HDR_LEN + HTONS(packet->length);
 
@@ -175,11 +175,11 @@ void border_send_ipv6_over_lowpan(struct ipv6_hdr_t *packet, uint8_t aro_flag, u
 void border_process_lowpan(void)
 {
     msg_t m;
-    struct ipv6_hdr_t *ipv6_buf;
+    ipv6_hdr_t *ipv6_buf;
 
     while(1) {
         msg_receive(&m);
-        ipv6_buf = (struct ipv6_hdr_t *)m.content.ptr;
+        ipv6_buf = (ipv6_hdr_t *)m.content.ptr;
 
         if(ipv6_buf->nextheader == PROTO_NUM_ICMPV6) {
             struct icmpv6_hdr_t *icmp_buf = (struct icmpv6_hdr_t *)(((uint8_t *)ipv6_buf) + IPV6_HDR_LEN);

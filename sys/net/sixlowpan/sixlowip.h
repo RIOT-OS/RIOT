@@ -147,7 +147,7 @@ extern iface_t iface;
 
 /* function prototypes */
 struct icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len);
-struct ipv6_hdr_t *get_ipv6_buf(void);
+ipv6_hdr_t *get_ipv6_buf(void);
 uint8_t *get_payload_buf(uint8_t ext_len);
 uint8_t *get_payload_buf_send(uint8_t ext_len);
 
