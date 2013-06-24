@@ -62,7 +62,7 @@ msg_t msg_buffer[TRANSCEIVER_MSG_BUFFER_SIZE];
 
 uint32_t response; ///< response bytes for messages to upper layer threads
 
-int transceiver_pid; ///< the transceiver thread's pid
+int transceiver_pid = -1; ///< the transceiver thread's pid
 
 static volatile uint8_t rx_buffer_pos = 0;
 static volatile uint8_t transceiver_buffer_pos = 0;
@@ -106,6 +106,11 @@ static void ignore_add(transceiver_type_t t, void *address);
 void transceiver_init(transceiver_type_t t)
 {
     uint8_t i;
+
+    if (transceiver_pid >= 0) {
+        /* do not re-initialize an already running transceiver */
+        return;
+    }
 
     /* Initializing transceiver buffer and data buffer */
     memset(transceiver_buffer, 0, TRANSCEIVER_BUFFER_SIZE);
