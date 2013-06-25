@@ -9,7 +9,7 @@ INCLUDES += -I${RIOTBASE}/core/include/
 INCLUDES += -Iinclude/ -I$(RIOTBOARD)/wsn430-common/include/
 INCLUDES += -I$(RIOTBASE)/cpu/msp430-common/include/ -I$(RIOTBASE)/cpu/msp430x16x/include/
 INCLUDES += -I$(RIOTBASE)/drivers/cc2420/include/ -I$(RIOTBASE)/sys/include
-#INCLUDES += -I/usr/msp430/include/
+INCLUDES += -I$(RIOTBASE)/sys/net/
 
 all: $(BINDIR)$(ARCH)
 	$(MAKE) -C ../wsn430-common
@@ -33,4 +33,4 @@ clean:
 	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
 	@if [ -d $(BINDIR) ] ; \
 	then rmdir $(BINDIR) ; \
-	fi 
+	fi
