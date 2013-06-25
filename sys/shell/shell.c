@@ -130,7 +130,6 @@ static int readline(shell_t *shell, char *buf, size_t size)
         }
 
         c = shell->readchar();
-        shell->put_char(c);
 
         if (c == 13) {
             continue;
