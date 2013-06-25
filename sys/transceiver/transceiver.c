@@ -43,6 +43,14 @@
 #endif
 #endif
 
+#ifdef MODULE_CC2420
+#include <cc2420.h>
+#if (CC2420_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+    #undef PAYLOAD_SIZE
+    #define PAYLOAD_SIZE (CC2420_MAX_DATA_LENGTH)
+#endif
+#endif
+
 //#define ENABLE_DEBUG (1)
 #include <debug.h>
 
@@ -87,12 +95,17 @@ static void receive_cc110x_packet(radio_packet_t *trans_p);
 #elif MODULE_CC110X
 void cc1100_packet_monitor(void *payload, int payload_size, protocol_t protocol, packet_info_t *packet_info);
 void receive_cc1100_packet(radio_packet_t *trans_p);
+#elif MODULE_CC2420
+static void receive_cc2420_packet(radio_packet_t *trans_p);
 #endif
 static uint8_t send_packet(transceiver_type_t t, void *pkt);
 static int16_t get_channel(transceiver_type_t t);
 static int16_t set_channel(transceiver_type_t t, void *channel);
 static int16_t get_address(transceiver_type_t t);
 static int16_t set_address(transceiver_type_t t, void *address);
+static uint16_t get_pan(transceiver_type_t t);
+static uint16_t set_pan(transceiver_type_t t, void *pan);
+
 static void set_monitor(transceiver_type_t t, void *mode);
 static void powerdown(transceiver_type_t t);
 static void switch_to_rx(transceiver_type_t t);
@@ -120,8 +133,7 @@ void transceiver_init(transceiver_type_t t)
         reg[i].transceivers = TRANSCEIVER_NONE;
         reg[i].pid          = 0;
     }
-
-    if (t & TRANSCEIVER_CC1100) {
+    if (t & (TRANSCEIVER_CC1100 || TRANSCEIVER_CC2420)) {
         transceivers |= t;
     }
     else {
@@ -137,16 +149,23 @@ int transceiver_start(void)
     if (transceiver_pid < 0) {
         puts("Error creating transceiver thread");
     }
+#ifdef MODULE_CC110X_NG
     else if (transceivers & TRANSCEIVER_CC1100) {
         DEBUG("Transceiver started for CC1100\n");
-#ifdef MODULE_CC110X_NG
         cc110x_init(transceiver_pid);
-#else
+    }
+#elif MODULE_CC110X
+    else if (transceivers & TRANSCEIVER_CC1100) {
+        DEBUG("Transceiver started for CC1100\n");
         cc1100_init();
         cc1100_set_packet_monitor(cc1100_packet_monitor);
-#endif
     }
-
+#elif MODULE_CC2420
+    else if(transceivers & TRANSCEIVER_CC2420) {
+        DEBUG("Transceiver started for CC2420\n");
+        cc2420_init(transceiver_pid);
+    }
+#endif
     return transceiver_pid;
 }
 
@@ -197,7 +216,9 @@ void run(void)
             case RCV_PKT_CC1100:
                 receive_packet(m.type, m.content.value);
                 break;
-
+            case RCV_PKT_CC2420:
+                receive_packet(m.type, m.content.value);
+                break;
             case SND_PKT:
                 response = send_packet(cmd->transceivers, cmd->data);
                 m.content.value = response;
@@ -234,6 +255,14 @@ void run(void)
 
             case SWITCH_RX:
                 switch_to_rx(cmd->transceivers);
+                break;
+            case GET_PAN:
+                *((int16_t*) cmd->data) = get_pan(cmd->transceivers);
+                msg_reply(&m, &m);
+                break;
+            case SET_PAN:
+                *((int16_t*) cmd->data) = set_pan(cmd->transceivers, cmd->data);
+                msg_reply(&m, &m);
                 break;
 #ifdef DBG_IGNORE
 
@@ -285,7 +314,9 @@ static void receive_packet(uint16_t type, uint8_t pos)
         case RCV_PKT_CC1100:
             t = TRANSCEIVER_CC1100;
             break;
-
+        case RCV_PKT_CC2420:
+            t = TRANSCEIVER_CC2420;
+            break;
         default:
             t = TRANSCEIVER_NONE;
             break;
@@ -311,9 +342,14 @@ static void receive_packet(uint16_t type, uint8_t pos)
 
         if (type == RCV_PKT_CC1100) {
 #ifdef MODULE_CC110X_NG
-            receive_cc110x_packet(trans_p);
-#else
+            receive_cc110x_packet(trans_p); 
+#elif MODULE_CC110X
             receive_cc1100_packet(trans_p);
+#endif
+        }
+        else if (type == RCV_PKT_CC2420) {
+#ifdef MODULE_CC2420
+            receive_cc2420_packet(trans_p);
 #endif
         }
         else {
@@ -383,6 +419,25 @@ void receive_cc1100_packet(radio_packet_t *trans_p)
 #endif
 
 
+#ifdef MODULE_CC2420
+void receive_cc2420_packet(radio_packet_t *trans_p) {
+    DEBUG("Handling CC2420 packet\n");
+    dINT();
+    cc2420_packet_t p = cc2420_rx_buffer[rx_buffer_pos];
+    trans_p->src = (uint16_t)((p.frame.src_addr[1] << 8) | p.frame.src_addr[0]);
+    trans_p->dst = (uint16_t)((p.frame.dest_addr[1] << 8)| p.frame.dest_addr[0]);
+    trans_p->rssi = p.rssi;
+    trans_p->lqi = p.lqi;
+    trans_p->length = p.frame.payload_len;
+    memcpy((void*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p.frame.payload, CC2420_MAX_DATA_LENGTH);
+    eINT();
+
+    DEBUG("Packet %p was from %u to %u, size: %u\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
+    trans_p->data = (uint8_t*) &(data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH]);
+    DEBUG("Content: %s\n", trans_p->data);
+}
+#endif
+
 /*------------------------------------------------------------------------------------*/
 /*
  * @brief Sends a radio packet to the receiver
@@ -404,7 +459,11 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
     cc110x_packet_t cc110x_pkt;
 #endif
 
-    switch(t) {
+#ifdef MODULE_CC2420
+    cc2420_packet_t cc2420_pkt;
+#endif
+
+    switch (t) {
         case TRANSCEIVER_CC1100:
 #ifdef MODULE_CC110X_NG
             cc110x_pkt.length = p.length + CC1100_HEADER_LENGTH;
@@ -412,7 +471,7 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
             cc110x_pkt.flags = 0;
             memcpy(cc110x_pkt.data, p.data, p.length);
             res = cc110x_send(&cc110x_pkt);
-#else
+#elif MODULE_CC110X
             memcpy(cc1100_pkt, p.data, p.length);
 
             if ((snd_ret = cc1100_send_csmaca(p.dst, 4, 0, (char *) cc1100_pkt, p.length)) < 0) {
@@ -425,7 +484,22 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
 
 #endif
             break;
-
+#ifdef MODULE_CC2420
+        case TRANSCEIVER_CC2420:
+            cc2420_pkt.frame.payload_len = p.length;
+            cc2420_pkt.frame.dest_addr[1] = (uint8_t)(p.dst >> 8);
+            cc2420_pkt.frame.dest_addr[0] = (uint8_t)(p.dst & 0xFF);
+            cc2420_pkt.frame.dest_pan_id = cc2420_get_pan();
+            cc2420_pkt.frame.fcf.dest_addr_m = 2;
+            cc2420_pkt.frame.fcf.src_addr_m = 2;
+            cc2420_pkt.frame.fcf.ack_req = 0;
+            cc2420_pkt.frame.fcf.sec_enb = 0;
+            cc2420_pkt.frame.fcf.frame_type = 1;
+            cc2420_pkt.frame.fcf.frame_pend = 0;
+            cc2420_pkt.frame.payload = p.data;
+            res = cc2420_send(&cc2420_pkt);
+            break;
+#endif
         default:
             puts("Unknown transceiver");
             break;
@@ -451,10 +525,13 @@ static int16_t set_channel(transceiver_type_t t, void *channel)
         case TRANSCEIVER_CC1100:
 #ifdef MODULE_CC110X_NG
             return cc110x_set_channel(c);
-#else
+#elif MODULE_CC110X
             return cc1100_set_channel(c);
 #endif
-
+        case TRANSCEIVER_CC2420:
+#ifdef MODULE_CC2420
+            return cc2420_set_channel(c);
+#endif
         default:
             return -1;
     }
@@ -473,10 +550,54 @@ static int16_t get_channel(transceiver_type_t t)
         case TRANSCEIVER_CC1100:
 #ifdef MODULE_CC110X_NG
             return cc110x_get_channel();
-#else
+#elif MODULE_CC110X
             return cc1100_get_channel();
 #endif
+        case TRANSCEIVER_CC2420:
+#ifdef MODULE_CC2420
+            return cc2420_get_channel();
+#endif
+        default:
+            return -1;
+    }
+}
 
+/*------------------------------------------------------------------------------------*/
+/*
+ * @brief Sets the pan for the CC2420 transceiver device
+ *
+ * @param t         The transceiver device
+ * @param channel   The channel to be set
+ *
+ * @return The pan AFTER calling the set command, -1 on error
+ */
+static uint16_t set_pan(transceiver_type_t t, void *pan) {
+    uint16_t c = *((uint16_t*) pan);
+    switch (t) {
+        case TRANSCEIVER_CC2420:
+#ifdef MODULE_CC2420
+            return cc2420_set_pan(c);
+#endif
+        default:
+            /* get rid of compiler warning about unused variable */
+            (void) c;
+            return -1;
+    }
+}
+
+/*
+ * @brief Get the pan for the cc2420 transceiver device
+ *
+ * @param t     The transceiver device
+ *
+ * @return The current pan of the transceiver, -1 on error
+ */
+static uint16_t get_pan(transceiver_type_t t) {
+    switch (t) {
+        case TRANSCEIVER_CC2420:
+#ifdef MODULE_CC2420
+            return cc2420_get_pan();
+#endif
         default:
             return -1;
     }
@@ -495,10 +616,13 @@ static int16_t get_address(transceiver_type_t t)
         case TRANSCEIVER_CC1100:
 #ifdef MODULE_CC110X_NG
             return cc110x_get_address();
-#else
+#elif MODULE_CC110X
             return cc1100_get_address();
 #endif
-
+        case TRANSCEIVER_CC2420:
+#ifdef MODULE_CC2420
+            return cc2420_get_address();
+#endif
         default:
             return -1;
     }
@@ -520,10 +644,13 @@ static int16_t set_address(transceiver_type_t t, void *address)
         case TRANSCEIVER_CC1100:
 #ifdef MODULE_CC110X_NG
             return cc110x_set_address(addr);
-#else
+#elif MODULE_CC110X
             return cc1100_set_address(addr);
 #endif
-
+        case TRANSCEIVER_CC2420:
+#ifdef MODULE_CC2420
+            return cc2420_set_address(addr);
+#endif
         default:
             return -1;
     }
@@ -543,7 +670,11 @@ static void set_monitor(transceiver_type_t t, void *mode)
             cc110x_set_monitor(*((uint8_t *)mode));
 #endif
             break;
-
+        case TRANSCEIVER_CC2420:
+#ifdef MODULE_CC2420
+            cc2420_set_monitor(*((uint8_t*) mode));
+#endif
+            break;
         default:
             break;
     }
@@ -572,7 +703,11 @@ static void switch_to_rx(transceiver_type_t t)
             cc110x_switch_to_rx();
 #endif
             break;
-
+        case TRANSCEIVER_CC2420:
+#ifdef MODULE_CC2420
+            cc2420_switch_to_rx();
+#endif
+            break;
         default:
             break;
     }

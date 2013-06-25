@@ -35,7 +35,7 @@ create_hashtable(uint32_t minsize,
     unsigned int pindex, size = primes[0];
 
     /* Check requested hashtable isn't too large */
-    if (minsize > (1u << 30)) {
+    if (minsize > (1UL << 30)) {
         return NULL;
     }
 
@@ -76,7 +76,7 @@ hash(struct hashtable *h, void *k)
 {
     /* Aim to protect against poor hash functions by adding logic here
      * - logic taken from java 1.4 hashtable source */
-    unsigned int i = h->hashfn(k);
+    uint32_t i = h->hashfn(k);
     i += ~(i << 9);
     i ^= ((i >> 14) | (i << 18));  /* >>> */
     i += (i << 4);

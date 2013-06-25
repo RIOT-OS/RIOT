@@ -3,13 +3,16 @@ MODULE =cc110x_ng
 
 DIRS =
 ifneq (,$(findstring msb-430h,$(BOARD)))
-	DIRS += spi 
+	DIRS += spi
 endif
 ifneq (,$(findstring msba2,$(BOARD)))
-	DIRS += spi 
+	DIRS += spi
+endif
+ifneq (,$(findstring wsn430-v1_3b,$(BOARD)))
+	DIRS += spi
 endif
 ifneq (,$(findstring native,$(BOARD)))
-	DIRS += spi 
+	DIRS += spi
 endif
 
 all: $(BINDIR)$(MODULE).a

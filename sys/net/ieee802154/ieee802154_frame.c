@@ -27,16 +27,17 @@ uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf)
 {
     /* Frame Control Field - 802.15.4 - 2006 - 7.2.1.1  */
     uint8_t index = 0;
+    
+    buf[index] = ((frame->fcf.dest_addr_m << 2) |
+                 (frame->fcf.frame_ver << 4) |
+                 (frame->fcf.src_addr_m << 6));
 
-    buf[index] = ((frame->fcf.frame_type << 5) |
-                  (frame->fcf.sec_enb << 4) |
-                  (frame->fcf.frame_pend << 3) |
-                  (frame->fcf.ack_req << 2) |
-                  (frame->fcf.panid_comp << 1));
     index++;
-    buf[index] = ((frame->fcf.dest_addr_m << 4) |
-                  (frame->fcf.frame_ver << 2) |
-                  (frame->fcf.src_addr_m));
+    buf[index] = ((frame->fcf.frame_type) |
+                 (frame->fcf.sec_enb << 3) |
+                 (frame->fcf.frame_pend << 4) |
+                 (frame->fcf.ack_req << 5) |
+                 (frame->fcf.panid_comp << 6));
     index++;
 
     /* Sequence Number - 802.15.4 - 2006 - 7.2.1.2 */
@@ -145,17 +146,17 @@ uint8_t read_802154_frame(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len)
     uint8_t index = 0;
     uint8_t hdrlen;
 
-    frame->fcf.frame_type = (buf[index] >> 5) & 0x07;
-    frame->fcf.sec_enb = (buf[index] >> 4) & 0x01;
-    frame->fcf.frame_pend = (buf[index] >> 3) & 0x01;
-    frame->fcf.ack_req = (buf[index] >> 2) & 0x01;
-    frame->fcf.panid_comp = (buf[index] >> 1) & 0x01;
+    frame->fcf.dest_addr_m = (buf[index] >> 2) & 0x03;
+    frame->fcf.frame_ver = (buf[index] >> 4) & 0x03;
+    frame->fcf.src_addr_m = (buf[index] >> 6) & 0x03;
 
     index++;
 
-    frame->fcf.dest_addr_m = (buf[index] >> 4) & 0x03;
-    frame->fcf.frame_ver = (buf[index] >> 2) & 0x03;
-    frame->fcf.src_addr_m = buf[index] & 0x03;
+    frame->fcf.frame_type = (buf[index]) & 0x07;
+    frame->fcf.sec_enb = (buf[index] >> 3) & 0x01;
+    frame->fcf.frame_pend = (buf[index] >> 4) & 0x01;
+    frame->fcf.ack_req = (buf[index] >> 5) & 0x01;
+    frame->fcf.panid_comp = (buf[index] >> 6) & 0x01;
 
     //print_802154_fcf_frame(frame);
 

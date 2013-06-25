@@ -34,7 +34,7 @@
 #include "radio/radio.h"
 #include "transceiver.h"
 #include "vtimer.h"
-#include "ieee802154_frame.h"
+#include "ieee802154/ieee802154_frame.h"
 #include "net_help/net_help.h"
 
 char radio_stack_buffer[RADIO_STACK_SIZE];

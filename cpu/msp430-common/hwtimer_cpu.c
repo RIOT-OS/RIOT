@@ -22,6 +22,8 @@ License. See the file LICENSE in the top level directory for more details.
 
 void (*int_handler)(int);
 extern void timerA_init(void);
+uint16_t overflow_interrupt[ARCH_MAXTIMERS+1];
+uint16_t timer_round;
 
 static void TA0_disable_interrupt(short timer)
 {
@@ -66,6 +68,7 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
 {
     timerA_init();
     int_handler = handler;
+    TA0_enable_interrupt(0);
 }
 
 void hwtimer_arch_enable_interrupt(void)
@@ -90,7 +93,9 @@ void hwtimer_arch_set(unsigned long offset, short timer)
 
 void hwtimer_arch_set_absolute(unsigned long value, short timer)
 {
-    TA0_set(value, timer);
+    uint16_t small_value = value % 0xFFFF;
+    overflow_interrupt[timer] = (uint16_t)(value >> 16);
+    TA0_set(small_value,timer);
 }
 
 void hwtimer_arch_unset(short timer)

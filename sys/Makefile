@@ -7,9 +7,6 @@ endif
 ifneq (,$(findstring config,$(USEMODULE)))
     DIRS += config
 endif
-ifneq (,$(findstring net,$(USEMODULE)))
-    DIRS += net
-endif
 ifneq (,$(findstring lib,$(USEMODULE)))
     DIRS += lib
 endif
@@ -80,6 +77,9 @@ ifneq (,$(findstring sixlowpan,$(USEMODULE)))
     DIRS += net/sixlowpan
     DIRS += net/sixlowpan/rpl
 endif
+ifneq (,$(findstring ieee802154,$(USEMODULE)))
+    DIRS += net/ieee802154
+endif
 
 all: $(BINDIR)$(MODULE).a 
 	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
@@ -89,6 +89,4 @@ include $(RIOTBASE)/Makefile.base
 # remove compilation products
 clean::
 	@for i in $(DIRS) ; do $(MAKE) -C $$i clean ; done ;
-
-
 

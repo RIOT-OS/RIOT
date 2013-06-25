@@ -37,6 +37,6 @@ License. See the file LICENSE in the top level directory for more details.
 #endif
 
 #define HWTIMER_SPEED 32768
-#define HWTIMER_MAXTICKS (0xFFFF)
+#define HWTIMER_MAXTICKS (0xFFFFFFFF)
 
 #endif // __HWTIMER_CPU_H

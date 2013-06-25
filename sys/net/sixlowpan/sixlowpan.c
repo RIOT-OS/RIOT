@@ -37,7 +37,7 @@
 #include "sixlowip.h"
 #include "sixlownd.h"
 #include "transceiver.h"
-#include "ieee802154_frame.h"
+#include "ieee802154/ieee802154_frame.h"
 #include "sys/net/destiny/in.h"
 #include "sys/net/net_help/net_help.h"
 

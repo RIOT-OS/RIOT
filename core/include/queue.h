@@ -9,10 +9,13 @@
 #ifndef __QUEUE_H
 #define __QUEUE_H
 
+#include <stdlib.h>
+#include <stdint.h>
+
 typedef struct queue_node_t {
     struct queue_node_t *next;
     unsigned int data;
-    unsigned int priority;
+    uint32_t priority;
 } queue_node_t;
 
 queue_node_t *queue_remove_head(queue_node_t *root);

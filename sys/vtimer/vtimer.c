@@ -16,11 +16,11 @@
 #include <debug.h>
 
 
-#define VTIMER_THRESHOLD 20U
-#define VTIMER_BACKOFF 10U
+#define VTIMER_THRESHOLD 20UL
+#define VTIMER_BACKOFF 10UL
 
 #define SECONDS_PER_TICK (4096U)
-#define MICROSECONDS_PER_TICK (4096U * 1000000)
+#define MICROSECONDS_PER_TICK (4096UL * 1000000)
 
 void vtimer_callback(void *ptr);
 void vtimer_tick(void *ptr);
@@ -64,16 +64,16 @@ static int update_shortterm(void)
 
     hwtimer_next_absolute = shortterm_queue_root.next->priority;
 
-    unsigned int next = hwtimer_next_absolute + longterm_tick_start;
-    unsigned int now = hwtimer_now();
+    uint32_t next = hwtimer_next_absolute + longterm_tick_start;
+    uint32_t now = HWTIMER_TICKS_TO_US(hwtimer_now());
 
-    if ((next - VTIMER_THRESHOLD - now) > MICROSECONDS_PER_TICK) {
-        next = now + VTIMER_BACKOFF;
+    if((next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now) > MICROSECONDS_PER_TICK ) {
+        next = now +  HWTIMER_TICKS_TO_US(VTIMER_BACKOFF);
     }
+    
+    hwtimer_id = hwtimer_set_absolute(HWTIMER_TICKS(next), vtimer_callback, NULL);
 
-    hwtimer_id = hwtimer_set_absolute(next, vtimer_callback, NULL);
-
-    DEBUG("update_shortterm: Set hwtimer to %lu (now=%lu)\n", hwtimer_next_absolute + longterm_tick_start, hwtimer_now());
+    DEBUG("update_shortterm: Set hwtimer to %lu (now=%lu)\n", next, HWTIMER_TICKS_TO_US(hwtimer_now()));
     return 0;
 }
 
@@ -169,6 +169,7 @@ static int vtimer_set(vtimer_t *timer)
     normalize_to_tick(&(timer->absolute));
 
     DEBUG("vtimer_set(): Absolute: %lu %lu\n", timer->absolute.seconds, timer->absolute.microseconds);
+    DEBUG("vtimer_set(): NOW: %lu %lu\n", now.seconds, now.microseconds);
 
     int result = 0;
 
@@ -216,6 +217,8 @@ int vtimer_init()
     DEBUG("vtimer_init().\n");
     int state = disableIRQ();
     seconds = 0;
+
+    longterm_tick_start = 0;
 
     longterm_tick_timer.action = vtimer_tick;
     longterm_tick_timer.arg = NULL;
