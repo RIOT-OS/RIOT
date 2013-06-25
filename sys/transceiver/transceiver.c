@@ -133,7 +133,7 @@ void transceiver_init(transceiver_type_t t)
         reg[i].transceivers = TRANSCEIVER_NONE;
         reg[i].pid          = 0;
     }
-    if (t & (TRANSCEIVER_CC1100 || TRANSCEIVER_CC2420)) {
+    if (t & (TRANSCEIVER_CC1100 | TRANSCEIVER_CC2420)) {
         transceivers |= t;
     }
     else {
