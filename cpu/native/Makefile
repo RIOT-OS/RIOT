@@ -1,6 +1,6 @@
 MODULE = cpu
 
-INCLUDES = -I../include -I$(RIOTBASE)/core/include
+INCLUDES = -I../include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/cc110x_ng/include
 DIRS =
 ifneq (,$(findstring rtc,$(USEMODULE)))
 	DIRS += rtc

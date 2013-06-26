@@ -1,44 +1,36 @@
 #include <stdio.h>
 #include <err.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 
-#include <debug.h>
+#include <arpa/inet.h>
 
-#include <cc110x-arch.h>
-#include <cc110x_ng.h>
-#include <cc110x_spi.h>
-#include <cc110x-internal.h> /* CC1100_READ_BURST etc. */
+#include "debug.h"
 
-static int native_cc110x_enabled;
+#include "tap.h"
+#include "cc1100sim.h"
+#include "cpu.h"
 
-static int native_cc110x_gd0;
-static int native_cc110x_gd1;
-static int native_cc110x_gd2;
+#include "cc110x-arch.h"
+#include "cc110x_ng.h"
+#include "cc110x_spi.h"
+#include "cc110x-internal.h" /* CC1100 constants */
 
-static int native_cc110x_gd0_enabled;
-static int native_cc110x_gd2_enabled;
 
-static uint8_t native_cc110x_ssp0dr;
+static int _native_cc110x_enabled;
 
 /* arch */
 
 /**
  * writes to SSP0 data register and reads from it once it is ready
+ * TODO: move content to simulator
  */
 uint8_t cc110x_txrx(uint8_t c)
 {
-    native_cc110x_ssp0dr = c;
-
-    switch(c) {
-        case CC1100_READ_BURST:
-        case CC1100_WRITE_BURST:
-        case CC1100_READ_SINGLE:
-        case CC1100_NOBYTE:
-        default:
-            warnx("cc110x_txrx (%i): not implemented", c);
-    }
-
     DEBUG("cc110x_txrx\n");
-    return native_cc110x_ssp0dr;
+    return do_txrx(c);
 }
 
 /**
@@ -47,19 +39,18 @@ uint8_t cc110x_txrx(uint8_t c)
 void cc110x_gdo0_enable(void)
 {
     /* this would be for rising/high edge if this was proper hardware */
-    native_cc110x_gd0_enabled = 1;
     DEBUG("cc110x_gdo0_enable\n");
+    native_cc110x_gd0_enabled = 1;
     return;
 }
-
 
 /**
  * enables GDO0 interrupt
  */
 void cc110x_gdo0_disable(void)
 {
-    native_cc110x_gd0_enabled = 0;
     DEBUG("cc110x_gdo0_disable\n");
+    native_cc110x_gd0_enabled = 0;
     return;
 }
 
@@ -69,8 +60,8 @@ void cc110x_gdo0_disable(void)
 void cc110x_gdo2_enable(void)
 {
     /* this would be for falling/low edge if this was proper hardware */
-    native_cc110x_gd2_enabled = 1;
     DEBUG("cc110x_gdo2_enable\n");
+    native_cc110x_gd2_enabled = 1;
     return;
 }
 
@@ -79,8 +70,8 @@ void cc110x_gdo2_enable(void)
  */
 void cc110x_gdo2_disable(void)
 {
-    native_cc110x_gd2_enabled = 0;
     DEBUG("cc110x_gdo2_disable\n");
+    native_cc110x_gd2_enabled = 0;
     return;
 }
 
@@ -90,22 +81,23 @@ void cc110x_gdo2_disable(void)
 void cc110x_init_interrupts(void)
 {
     /* this would be for low edge in both cases if this was proper hardware */
+    DEBUG("cc110x_init_interrupts\n");
     cc110x_gdo2_enable();
     cc110x_gdo0_enable();
-    DEBUG("cc110x_init_interrupts\n");
     return;
 }
 
+/* Disables RX interrupt etc. */
 void cc110x_before_send(void)
 {
-    cc110x_gdo2_disable();
     DEBUG("cc110x_before_send\n");
+    cc110x_gdo2_disable();
     return;
 }
 void cc110x_after_send(void)
 {
-    cc110x_gdo2_enable();
     DEBUG("cc110x_after_send\n");
+    cc110x_gdo2_enable();
     return;
 }
 
@@ -124,13 +116,13 @@ int cc110x_get_gdo1(void)
 int cc110x_get_gdo2(void)
 {
     DEBUG("cc110x_get_gdo2\n");
-    return native_cc110x_gd2;
+    return native_cc110x_gd2--;
 }
 
 void cc110x_spi_init(void)
 {
-    native_cc110x_enabled = 1; /* power on */
     DEBUG("cc110x_spi_init\n");
+    _native_cc110x_enabled = 1; /* power on */
     return;
 }
 
@@ -141,12 +133,14 @@ void cc110x_spi_cs(void)
 }
 void cc110x_spi_select(void)
 {
-    DEBUG("cc110x_spi_select\n");
+    DEBUG("___cc110x_spi_select\n");
+    _native_cc110x_state = STATE_SEL;
     return;
 }
 void cc110x_spi_unselect(void)
 {
     DEBUG("cc110x_spi_unselect\n");
+    _native_cc110x_state = STATE_NULL;
     return;
 }
 

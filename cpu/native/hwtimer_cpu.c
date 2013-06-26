@@ -40,7 +40,7 @@
 
 #include "debug.h"
 
-#define HWTIMERMINOFFSET 1000
+#define HWTIMERMINOFFSET 100000
 
 static unsigned long native_hwtimer_now;
 
@@ -217,6 +217,7 @@ unsigned long hwtimer_arch_now(void)
 
     DEBUG("hwtimer_arch_now()\n");
 
+    _native_in_syscall = 1;
 #ifdef __MACH__
     clock_serv_t cclock;
     mach_timespec_t mts;
@@ -232,6 +233,7 @@ unsigned long hwtimer_arch_now(void)
     }
 
 #endif
+    _native_in_syscall = 0;
 
     native_hwtimer_now = ts2ticks(&t);
 

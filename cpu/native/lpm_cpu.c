@@ -44,8 +44,15 @@ void lpm_init(void)
 void _native_lpm_sleep()
 {
 #ifdef MODULE_UART0
-    int retval;
-    retval = select(1, &_native_uart_rfds, NULL, NULL, NULL);
+    int retval, nfds;
+
+    /* set fds */
+    nfds = 0;
+    FD_ZERO(&_native_rfds);
+    nfds = _native_set_uart_fds();
+    nfds++;
+
+    retval = select(nfds, &_native_rfds, NULL, NULL, NULL);
     DEBUG("_native_lpm_sleep: retval: %i\n", retval);
 
     if (retval != -1) {

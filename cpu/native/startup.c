@@ -15,17 +15,33 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <err.h>
+
 #include <kernel_internal.h>
 #include <cpu.h>
+
+#include "tap.h"
 
 extern void board_init(void);
 extern void native_cpu_init(void);
 extern void native_interrupt_init(void);
 
-__attribute__((constructor)) static void startup(void)
+__attribute__((constructor)) static void startup(int argc, char **argv)
 {
+
+#ifdef MODULE_CC110X_NG
+    if (argc < 2) {
+        printf("usage: %s <tap interface>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+#endif
+
     native_cpu_init();
     native_interrupt_init();
+#ifdef MODULE_CC110X_NG
+    tap_init(argv[1]);
+#endif
 
     board_init();
 
