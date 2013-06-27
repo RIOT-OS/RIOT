@@ -109,7 +109,9 @@ static void handle_input_line(shell_t *shell, char *line)
                 print_help(shell->command_list);
             }
             else {
-                puts("shell: command not found.");
+                char buf[100];
+                snprintf(buf, 100, "shell: command `%s` not found.", command);
+                puts(buf);
             }
         }
     }
@@ -128,7 +130,6 @@ static int readline(shell_t *shell, char *buf, size_t size)
         }
 
         c = shell->readchar();
-        shell->put_char(c);
 
         if (c == 13) {
             continue;
