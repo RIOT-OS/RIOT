@@ -21,7 +21,9 @@
 #include <mutex.h>
 #include "msg.h"
 #include "rpl.h"
+#include "etx_beaconing.h"
 #include "of0.h"
+#include "of_mrhof.h"
 #include "trickle.h"
 
 #include "sys/net/sixlowpan/sixlowmac.h"
@@ -210,8 +212,13 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address)
     ipv6_get_saddr(&my_address, &ll_address);
     set_rpl_process_pid(rpl_process_pid);
 
-    return SUCCESS;
+    /* Initialize ETX-calculation if needed */
+    if(RPL_DEFAULT_OCP == 1){
+        puts("INIT ETX BEACONING");
+        etx_init_beaconing(&my_address);
+    }
 
+    return SUCCESS;
 }
 
 void rpl_init_root(void)
@@ -246,6 +253,7 @@ void rpl_init_root(void)
         dodag->lifetime_unit = RPL_LIFETIME_UNIT;
         dodag->version = RPL_COUNTER_INIT;
         dodag->grounded = RPL_GROUNDED;
+        dodag->node_status = (uint8_t) ROOT_NODE;
         dodag->my_rank = RPL_ROOT_RANK;
         dodag->joined = 1;
         dodag->my_preferred_parent = NULL;
@@ -453,8 +461,6 @@ void send_DAO_ACK(ipv6_addr_t *destination)
     uint16_t plen = ICMPV6_HDR_LEN + DIS_BASE_LEN;
     rpl_send(destination, (uint8_t *)icmp_send_buf, plen, PROTO_NUM_ICMPV6, NULL);
     mutex_unlock(&rpl_send_mutex, 0);
-
-
 }
 
 void rpl_process(void)
@@ -498,7 +504,6 @@ void rpl_process(void)
 
             default:
                 mutex_unlock(&rpl_recv_mutex, 0);
-                puts("default unlock");
                 break;
         }
     }
@@ -847,7 +852,6 @@ void recv_rpl_dao(void)
                 len += rpl_opt_transit_buf->length + 2;
                 /* Die eigentliche Lebenszeit einer Route errechnet sich aus  (Lifetime aus DAO) * (Lifetime Unit) Sekunden */
                 rpl_add_routing_entry(&rpl_opt_target_buf->target, &ipv6_buf->srcaddr, rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit);
-                /* puts("Updated route \n"); */
                 increment_seq = 1;
                 break;
             }
@@ -898,6 +902,7 @@ void recv_rpl_dao_ack(void)
 
 }
 
+/* TODO: tcp_socket unused? */
 void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_t next_header, void *tcp_socket)
 {
     uint8_t *p_ptr;

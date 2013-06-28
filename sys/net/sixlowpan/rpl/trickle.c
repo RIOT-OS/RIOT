@@ -24,9 +24,10 @@
 #include "trickle.h"
 #include "sixlowpan/rpl/rpl.h"
 
-char timer_over_buf[TRICKLE_TIMER_STACKSIZE];
-char interval_over_buf[TRICKLE_INTERVAL_STACKSIZE];
-char dao_delay_over_buf[DAO_DELAY_STACKSIZE];
+//TODO in pointer umwandeln, speicher mit malloc holen
+char * timer_over_buf;
+char * interval_over_buf;
+char * dao_delay_over_buf;
 char routing_table_buf[RT_STACKSIZE];
 int timer_over_pid;
 int interval_over_pid;
@@ -70,6 +71,22 @@ void reset_trickletimer(void)
 
 void init_trickle(void)
 {
+    timer_over_buf      =  calloc(TRICKLE_TIMER_STACKSIZE,sizeof(char));
+    if(timer_over_buf == NULL){
+        puts("[ERROR] Could not allocate enough memory for timer_over_buf!");
+        return;
+    }
+    interval_over_buf   =  calloc(TRICKLE_INTERVAL_STACKSIZE,sizeof(char));
+    if(interval_over_buf == NULL){
+        puts("[ERROR] Could not allocate enough memory for interval_over_buf!");
+        return;
+    }
+    dao_delay_over_buf  =  calloc(DAO_DELAY_STACKSIZE,sizeof(char));
+    if(dao_delay_over_buf == NULL){
+        puts("[ERROR] Could not allocate enough memory for interval_over_buf!");
+        return;
+    }
+
     /* Create threads */
     ack_received = true;
     timer_over_pid = thread_create(timer_over_buf, TRICKLE_TIMER_STACKSIZE,
@@ -85,7 +102,6 @@ void init_trickle(void)
     rt_timer_over_pid = thread_create(routing_table_buf, RT_STACKSIZE,
                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                       rt_timer_over, "rt_timer_over");
-
 }
 
 void start_trickle(uint8_t DIOIntMin, uint8_t DIOIntDoubl,

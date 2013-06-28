@@ -96,4 +96,14 @@ int vtimer_remove(vtimer_t *t);
  */
 void vtimer_print(vtimer_t *t);
 
+/**
+ * @brief Prints the vtimer shortterm queue (use for debug purposes)
+ */
+void vtimer_print_short_queue();
+
+/**
+ * @brief Prints the vtimer longterm queue (use for debug purposes)
+ */
+void vtimer_print_long_queue();
+
 #endif /* __VTIMER_H */

@@ -129,8 +129,11 @@ void vtimer_callback(void *ptr)
         msg.content.value = (unsigned int) timer->arg;
         msg_send_int(&msg, timer->pid);
     }
-    else {
+    else if (timer->action == (void*) thread_wakeup){
         timer->action(timer->arg);
+    }
+    else {
+        DEBUG("Timer was poisoned.");
     }
 
     in_callback = false;
@@ -285,7 +288,15 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr)
     return 0;
 }
 
-void vtimer_print(vtimer_t *t)
+void vtimer_print_short_queue(){
+    queue_print(&shortterm_queue_root);
+}
+
+void vtimer_print_long_queue(){
+    queue_print(&longterm_queue_root);
+}
+
+static void vtimer_print(vtimer_t *t)
 {
     printf("Seconds: %"PRIu32" - Microseconds: %"PRIu32"\n \
             action: %p\n \

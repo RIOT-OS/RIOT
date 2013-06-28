@@ -317,6 +317,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     my_dodag->grounded = dodag->grounded;
     my_dodag->joined = 1;
     my_dodag->my_preferred_parent = preferred_parent;
+    my_dodag->node_status = (uint8_t) NORMAL_NODE;
     my_dodag->my_rank = dodag->of->calc_rank(preferred_parent, dodag->my_rank);
     my_dodag->dao_seq = RPL_COUNTER_INIT;
     my_dodag->min_rank = my_dodag->my_rank;

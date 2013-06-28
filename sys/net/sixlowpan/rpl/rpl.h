@@ -23,6 +23,8 @@
 #include "sys/net/sixlowpan/sixlowip.h"
 #include "rpl_dodag.h"
 
+#define CC1100_RADIO_MODE CC1100_MODE_WOR
+
 #define RPL_PKT_RECV_BUF_SIZE 20
 #define RPL_PROCESS_STACKSIZE 4096
 

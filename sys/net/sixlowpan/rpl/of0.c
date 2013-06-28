@@ -18,6 +18,12 @@
 #include <string.h>
 #include "of0.h"
 
+//Function Prototypes
+static uint16_t calc_rank(rpl_parent_t *, uint16_t);
+static rpl_parent_t *which_parent(rpl_parent_t *, rpl_parent_t *);
+static rpl_dodag_t *which_dodag(rpl_dodag_t *, rpl_dodag_t *);
+static void reset(rpl_dodag_t *);
+
 rpl_of_t rpl_of0 = {
     0x0,
     calc_rank,
@@ -73,6 +79,7 @@ rpl_parent_t *which_parent(rpl_parent_t *p1, rpl_parent_t *p2)
     return p2;
 }
 
+/* Not used yet, as the implementation only makes use of one dodag for now. */
 rpl_dodag_t *which_dodag(rpl_dodag_t *d1, rpl_dodag_t *d2)
 {
     return d1;
