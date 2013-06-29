@@ -26,5 +26,8 @@ void queue_priority_add(queue_node_t *root, queue_node_t *new_obj);
 void queue_priority_add_generic(queue_node_t *root, queue_node_t *new_obj, int(*cmp)(queue_node_t *, queue_node_t *)) ;
 void queue_remove(queue_node_t *root, queue_node_t *node);
 
+void queue_print(queue_node_t *node);
+void queue_print_node(queue_node_t *node);
+
 /** @} */
 #endif // __QUEUE_H
