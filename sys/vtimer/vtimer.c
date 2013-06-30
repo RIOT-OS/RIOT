@@ -9,6 +9,7 @@
 #include <hwtimer.h>
 #include <msg.h>
 #include <thread.h>
+#include <queue.h>
 
 #include <vtimer.h>
 
@@ -296,7 +297,7 @@ void vtimer_print_long_queue(){
     queue_print(&longterm_queue_root);
 }
 
-static void vtimer_print(vtimer_t *t)
+void vtimer_print(vtimer_t *t)
 {
     printf("Seconds: %"PRIu32" - Microseconds: %"PRIu32"\n \
             action: %p\n \

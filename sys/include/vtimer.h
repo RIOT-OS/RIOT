@@ -99,11 +99,11 @@ void vtimer_print(vtimer_t *t);
 /**
  * @brief Prints the vtimer shortterm queue (use for debug purposes)
  */
-void vtimer_print_short_queue();
+void vtimer_print_short_queue(void);
 
 /**
  * @brief Prints the vtimer longterm queue (use for debug purposes)
  */
-void vtimer_print_long_queue();
+void vtimer_print_long_queue(void);
 
 #endif /* __VTIMER_H */
