@@ -45,6 +45,16 @@
 
 #define LOWPAN_REAS_BUF_TIMEOUT (15 * 1000 * 1000) /* TODO: Set back to 3 * 1000 *	(1000) */
 
+/* icmp message types rfc4443 */
+#define ICMP_PARA_PROB                 	(4)
+/* icmp message types rfc4861 4.*/
+#define ICMP_RTR_ADV                   	(134)
+#define ICMP_RTR_SOL                   	(133)
+#define ICMP_NBR_ADV                   	(136)
+#define ICMP_NBR_SOL                   	(135)
+#define ICMP_REDIRECT                  	(137)	/* will be filtered out by the border router */
+#define ICMP_RPL_CONTROL                (155)
+
 #include "transceiver.h"
 #include "sixlowip.h"
 #include "vtimer.h"

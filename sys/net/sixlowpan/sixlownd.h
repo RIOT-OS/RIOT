@@ -47,14 +47,6 @@
 #define NBR_ADV_FLAG_R                 	(0x80)
 #define NBR_ADV_FLAG_S                 	(0x40)
 #define NBR_ADV_FLAG_O                 	(0x20)
-/* icmp message types rfc4443 */
-#define ICMP_PARA_PROB                 	(4)
-/* icmp message types rfc4861 4.*/
-#define ICMP_RTR_ADV                   	(134)
-#define ICMP_RTR_SOL                   	(133)
-#define ICMP_NBR_ADV                   	(136)
-#define ICMP_NBR_SOL                   	(135)
-#define ICMP_REDIRECT                  	(137)	/* will be filtered out by the border router */
 /* stllao option rfc4861 4.6.1 */
 #define OPT_STLLAO_MIN_LEN             	(8)
 #define OPT_STLLAO_MAX_LEN             	(16)

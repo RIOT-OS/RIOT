@@ -28,7 +28,6 @@
 #define STORING_MODE_MC     0x03
 
 /* ICMP type */
-#define ICMP_RPL_CONTROL            155
 #define RPL_SEQUENCE_WINDOW         16
 #define ICMP_CODE_DIS               0x00
 #define ICMP_CODE_DIO               0x01

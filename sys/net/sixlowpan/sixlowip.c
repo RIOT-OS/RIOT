@@ -31,7 +31,6 @@
 #include "sys/net/destiny/socket.h"
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
-#include "sys/net/sixlowpan/rpl/rpl.h"
 
 uint8_t ip_send_buffer[BUFFER_SIZE];
 uint8_t buffer[BUFFER_SIZE];
