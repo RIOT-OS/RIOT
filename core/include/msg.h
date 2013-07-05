@@ -91,6 +91,16 @@ int msg_send_int(msg_t *m, unsigned int target_pid);
 int msg_receive(msg_t *m);
 
 /**
+ * @brief Try to receive a message.
+ *
+ * This function does not block if no message can be received.
+ * @param m pointer to preallocated msg
+ *
+ * @return 1 if a message was received, -1 otherwise.
+ */
+int msg_try_receive(msg_t *m);
+
+/**
  * @brief Send a message, block until reply received.
  *
  * This function sends a message to target_pid and then blocks until target has sent a reply.

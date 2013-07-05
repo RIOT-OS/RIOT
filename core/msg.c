@@ -184,7 +184,17 @@ int msg_reply_int(msg_t *m, msg_t *reply)
     return 1;
 }
 
+int msg_try_receive(msg_t *m)
+{
+    return _msg_receive(m, false);
+}
+
 int msg_receive(msg_t *m)
+{
+    return _msg_receive(m, true);
+}
+
+int _msg_receive(msg_t *m, block)
 {
     dINT();
     DEBUG("%s: msg_receive.\n", active_thread->name);
@@ -195,6 +205,11 @@ int msg_receive(msg_t *m)
 
     if (me->msg_array) {
         n = cib_get(&(me->msg_queue));
+    }
+
+    /* no message, fail */
+    if ((!block) && (n == -1)) {
+        return -1;
     }
 
     if (n >= 0) {
