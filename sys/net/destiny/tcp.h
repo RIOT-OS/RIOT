@@ -98,10 +98,6 @@ typedef struct __attribute__((packed)) tcp_h_t {
     uint16_t	urg_pointer;
 } tcp_hdr_t;
 
-
-// uint8_t buffer_tcp[BUFFER_SIZE];
-char tcp_stack_buffer[TCP_STACK_SIZE];
-
 #ifdef TCP_HC
 mutex_t				global_context_counter_mutex;
 uint8_t				global_context_counter;

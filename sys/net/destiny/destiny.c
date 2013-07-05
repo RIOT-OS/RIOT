@@ -26,6 +26,9 @@
 #include "tcp_timer.h"
 #include "destiny.h"
 
+char tcp_stack_buffer[TCP_STACK_SIZE];
+char udp_stack_buffer[UDP_STACK_SIZE];
+
 void init_transport_layer(void)
 {
     printf("Initializing transport layer packages. Size of socket_type: %u\n",
