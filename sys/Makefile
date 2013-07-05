@@ -75,6 +75,8 @@ ifneq (,$(findstring protocol-multiplex,$(USEMODULE)))
 endif
 ifneq (,$(findstring sixlowpan,$(USEMODULE)))
     DIRS += net/sixlowpan
+endif
+ifneq (,$(findstring rpl,$(USEMODULE)))
     DIRS += net/sixlowpan/rpl
 endif
 ifneq (,$(findstring ieee802154,$(USEMODULE)))
