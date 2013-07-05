@@ -28,6 +28,9 @@
 //#define ENABLE_DEBUG
 #include "debug.h"
 
+static int _msg_receive(msg_t *m, int block);
+
+
 static int queue_msg(tcb_t *target, msg_t *m)
 {
     int n = cib_put(&(target->msg_queue));
@@ -194,7 +197,7 @@ int msg_receive(msg_t *m)
     return _msg_receive(m, true);
 }
 
-int _msg_receive(msg_t *m, block)
+static int _msg_receive(msg_t *m, block)
 {
     dINT();
     DEBUG("%s: msg_receive.\n", active_thread->name);
