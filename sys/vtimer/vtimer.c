@@ -29,7 +29,7 @@ static int set_longterm(vtimer_t *timer);
 static int set_shortterm(vtimer_t *timer);
 
 #ifdef ENABLE_DEBUG
-static void vtimer_print(vtimer_t *t);
+void vtimer_print(vtimer_t *t);
 #endif
 
 static queue_node_t longterm_queue_root;
