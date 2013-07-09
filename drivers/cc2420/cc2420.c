@@ -12,7 +12,6 @@
 #include <cc2420_arch.h>
 #include <hwtimer.h>
 
-//#define ENABLE_DEBUG
 #include <debug.h>
 
 static uint16_t radio_channel;

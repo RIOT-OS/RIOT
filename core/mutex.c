@@ -23,7 +23,6 @@
 #include "sched.h"
 #include <irq.h>
 
-//#define ENABLE_DEBUG
 #include <debug.h>
 
 int mutex_init(struct mutex_t *mutex)

@@ -9,7 +9,6 @@
 #include <iap.h>
 #include <lpc2387.h>
 
-//#define ENABLE_DEBUG
 #include <debug.h>
 
 /* pointer to reserved flash rom section for configuration data */

@@ -19,7 +19,6 @@
 
 #include "queue.h"
 
-//#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void queue_remove(queue_node_t *root, queue_node_t *node)

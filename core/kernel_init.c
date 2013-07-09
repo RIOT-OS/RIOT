@@ -31,7 +31,6 @@
 #include <auto_init.h>
 #endif
 
-#define ENABLE_DEBUG
 #include <debug.h>
 
 volatile tcb_t *sched_threads[MAXTHREADS];

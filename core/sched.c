@@ -21,7 +21,6 @@
 #include <clist.h>
 #include <bitarithm.h>
 
-//#define ENABLE_DEBUG
 #include <debug.h>
 
 volatile int num_tasks = 0;
