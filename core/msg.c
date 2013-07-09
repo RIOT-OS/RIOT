@@ -189,15 +189,15 @@ int msg_reply_int(msg_t *m, msg_t *reply)
 
 int msg_try_receive(msg_t *m)
 {
-    return _msg_receive(m, false);
+    return _msg_receive(m, 0);
 }
 
 int msg_receive(msg_t *m)
 {
-    return _msg_receive(m, true);
+    return _msg_receive(m, 1);
 }
 
-static int _msg_receive(msg_t *m, block)
+static int _msg_receive(msg_t *m, int block)
 {
     dINT();
     DEBUG("%s: msg_receive.\n", active_thread->name);
