@@ -50,6 +50,14 @@
     #define PAYLOAD_SIZE (CC2420_MAX_DATA_LENGTH)
 #endif
 #endif
+    
+#ifdef MODULE_AT86RF231
+#include <at86rf231.h>
+#if (AT86RF231_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+    #undef PAYLOAD_SIZE
+    #define PAYLOAD_SIZE (AT86RF231_MAX_DATA_LENGTH)
+#endif
+#endif
 
 #ifdef MODULE_MC1322X
 #include <mc1322x.h>
@@ -103,6 +111,8 @@ void cc1100_packet_monitor(void *payload, int payload_size, protocol_t protocol,
 void receive_cc1100_packet(radio_packet_t *trans_p);
 #elif MODULE_CC2420
 static void receive_cc2420_packet(radio_packet_t *trans_p);
+#elif MODULE_AT86RF231
+void receive_at86rf231_packet(radio_packet_t *trans_p);
 #endif
 static uint8_t send_packet(transceiver_type_t t, void *pkt);
 static int16_t get_channel(transceiver_type_t t);
@@ -139,7 +149,7 @@ void transceiver_init(transceiver_type_t t)
         reg[i].transceivers = TRANSCEIVER_NONE;
         reg[i].pid          = 0;
     }
-    if (t & (TRANSCEIVER_CC1100 | TRANSCEIVER_CC2420)) {
+    if (t & (TRANSCEIVER_CC1100 | TRANSCEIVER_CC2420 | TRANSCEIVER_AT86RF231)) {
         transceivers |= t;
     }
     else if (t & TRANSCEIVER_MC1322X) {
@@ -173,6 +183,11 @@ int transceiver_start(void)
     else if(transceivers & TRANSCEIVER_CC2420) {
         DEBUG("Transceiver started for CC2420\n");
         cc2420_init(transceiver_pid);
+    }
+#elif MODULE_AT86RF231
+    else if(transceivers & TRANSCEIVER_AT86RF231) {
+        DEBUG("Transceiver started for AT86RF231\n");
+        at86rf231_init(transceiver_pid);
     }
 #endif
 #ifdef MODULE_MC1322X
@@ -232,6 +247,9 @@ void run(void)
                 receive_packet(m.type, m.content.value);
                 break;
             case RCV_PKT_CC2420:
+                receive_packet(m.type, m.content.value);
+                break;
+            case RCV_PKT_AT86RF231:
                 receive_packet(m.type, m.content.value);
                 break;
             case SND_PKT:
@@ -335,6 +353,9 @@ static void receive_packet(uint16_t type, uint8_t pos)
         case RCV_PKT_MC1322X:
             t = TRANSCEIVER_MC1322X;
             break;
+        case RCV_PKT_AT86RF231:
+            t = TRANSCEIVER_AT86RF231;
+            break;
         default:
             t = TRANSCEIVER_NONE;
             break;
@@ -373,6 +394,11 @@ static void receive_packet(uint16_t type, uint8_t pos)
         else if (type == RCV_PKT_CC2420) {
 #ifdef MODULE_CC2420
             receive_cc2420_packet(trans_p);
+#endif
+        }
+        else if (type == RCV_PKT_AT86RF231) {
+#ifdef MODULE_AT86RF231
+            receive_at86rf231_packet(trans_p);
 #endif
         }
         else {
@@ -476,7 +502,25 @@ void receive_mc1322x_packet(radio_packet_t *trans_p) {
 }
 #endif
 
- 
+#ifdef MODULE_AT86RF231
+void receive_at86rf231_packet(radio_packet_t *trans_p) {
+    DEBUG("Handling AT86RF231 packet\n");
+    dINT();
+    at86rf231_packet_t p = at86rf231_rx_buffer[rx_buffer_pos];
+    trans_p->src = (uint16_t)((p.frame.src_addr[1] << 8) | p.frame.src_addr[0]);
+    trans_p->dst = (uint16_t)((p.frame.dest_addr[1] << 8)| p.frame.dest_addr[0]);
+    trans_p->rssi = p.rssi;
+    trans_p->lqi = p.lqi;
+    trans_p->length = p.frame.payload_len;
+    memcpy((void*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p.frame.payload, AT86RF231_MAX_DATA_LENGTH);
+    eINT();
+
+    DEBUG("Packet %p was from %u to %u, size: %u\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
+    trans_p->data = (uint8_t*) &(data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH]);
+    DEBUG("Content: %s\n", trans_p->data);
+}
+#endif
+
 /*------------------------------------------------------------------------------------*/
 /*
  * @brief Sends a radio packet to the receiver
@@ -503,6 +547,10 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
 
 #ifdef MODULE_CC2420
     cc2420_packet_t cc2420_pkt;
+#endif
+
+#ifdef MODULE_AT86RF231
+    at86rf231_packet_t at86rf231_pkt;
 #endif
 
     switch (t) {
@@ -549,6 +597,23 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
             memcpy(maca_pkt->data, p.data, p.length);
             maca_set_tx_packet( maca_pkt );
             res = 1;
+            break;
+#endif
+#ifdef MODULE_AT86RF231
+        case TRANSCEIVER_AT86RF231:
+            at86rf231_pkt.frame.payload_len = p.length;
+            at86rf231_pkt.frame.dest_addr[1] = (uint8_t)(p.dst >> 8);
+            at86rf231_pkt.frame.dest_addr[0] = (uint8_t)(p.dst & 0xFF);
+            at86rf231_pkt.frame.dest_pan_id = at86rf231_get_pan();
+            at86rf231_pkt.frame.fcf.dest_addr_m = 2;
+            at86rf231_pkt.frame.fcf.src_addr_m = 2;
+            at86rf231_pkt.frame.fcf.ack_req = 0;
+            at86rf231_pkt.frame.fcf.sec_enb = 0;
+            at86rf231_pkt.frame.fcf.frame_type = 1;
+            at86rf231_pkt.frame.fcf.frame_pend = 0;
+            at86rf231_pkt.frame.payload = p.data;
+            res = at86rf231_send(&at86rf231_pkt);
+            break;
 #endif
         default:
             puts("Unknown transceiver");
@@ -586,6 +651,9 @@ static int16_t set_channel(transceiver_type_t t, void *channel)
 #ifdef MODULE_MC1322X
             maca_set_channel(c);
             return c; ///< TODO: should be changed! implement get channel
+        case TRANSCEIVER_AT86RF231:
+#ifdef MODULE_AT86RF231
+            return at86rf231_set_channel(c);
 #endif
         default:
             return -1;
@@ -614,6 +682,10 @@ static int16_t get_channel(transceiver_type_t t)
 #endif
         case TRANSCEIVER_MC1322X:
             ///< TODO:implement return maca_get_channel(); 
+        case TRANSCEIVER_AT86RF231:
+#ifdef MODULE_AT86RF231
+            return at86rf231_get_channel();
+#endif
         default:
             return -1;
     }
@@ -635,6 +707,10 @@ static uint16_t set_pan(transceiver_type_t t, void *pan) {
 #ifdef MODULE_CC2420
             return cc2420_set_pan(c);
 #endif
+        case TRANSCEIVER_AT86RF231:
+#ifdef MODULE_AT86RF231
+            return at86rf231_set_pan(c);
+#endif
         default:
             /* get rid of compiler warning about unused variable */
             (void) c;
@@ -654,6 +730,10 @@ static uint16_t get_pan(transceiver_type_t t) {
         case TRANSCEIVER_CC2420:
 #ifdef MODULE_CC2420
             return cc2420_get_pan();
+#endif
+        case TRANSCEIVER_AT86RF231:
+#ifdef MODULE_AT86RF231
+            return at86rf231_get_pan();
 #endif
         default:
             return -1;
@@ -683,6 +763,10 @@ static int16_t get_address(transceiver_type_t t)
 #ifdef MODULE_MC1322X
         case TRANSCEIVER_MC1322X:
             return maca_get_address();
+#endif
+        case TRANSCEIVER_AT86RF231:
+#ifdef MODULE_AT86RF231
+            return at86rf231_get_address();
 #endif
         default:
             return -1;
@@ -716,6 +800,10 @@ static int16_t set_address(transceiver_type_t t, void *address)
         case TRANSCEIVER_MC1322X:
             return maca_set_address(addr);
 #endif
+        case TRANSCEIVER_AT86RF231:
+#ifdef MODULE_AT86RF231
+            return at86rf231_set_address(addr);
+#endif
         default:
             return -1;
     }
@@ -738,6 +826,10 @@ static void set_monitor(transceiver_type_t t, void *mode)
         case TRANSCEIVER_CC2420:
 #ifdef MODULE_CC2420
             cc2420_set_monitor(*((uint8_t*) mode));
+#endif
+        case TRANSCEIVER_AT86RF231:
+#ifdef MODULE_AT86RF231
+            at86rf231_set_monitor(*((uint8_t*) mode));
 #endif
             break;
         default:
@@ -777,6 +869,12 @@ static void switch_to_rx(transceiver_type_t t)
             cc2420_switch_to_rx();
 #endif
             break;
+        case TRANSCEIVER_AT86RF231:
+#ifdef MODULE_AT86RF231
+            at86rf231_switch_to_rx();
+#endif
+            break;
+
         default:
             break;
     }
