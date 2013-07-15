@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import cmd, serial, sys, threading, readline, time, ConfigParser, logging, os
