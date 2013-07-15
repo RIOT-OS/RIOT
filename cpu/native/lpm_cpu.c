@@ -29,7 +29,7 @@
 #include "debug.h"
 #include "cpu.h"
 #ifdef MODULE_UART0
-#include "board.h"
+#include "board_internal.h"
 #endif
 
 static enum lpm_mode native_lpm;
