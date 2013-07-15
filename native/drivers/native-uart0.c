@@ -17,7 +17,7 @@ int _native_uart_out;
 
 fd_set _native_uart_rfds;
 
-static inline int uart0_puts(char *astring, int length)
+inline int uart0_puts(char *astring, int length)
 {
     return puts(astring);
 }
