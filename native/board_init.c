@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include "board.h"
 
+#include "board_internal.h"
+
 /**
  * Nothing to initialize at the moment.
  * Turns the red LED on and the green LED off.
