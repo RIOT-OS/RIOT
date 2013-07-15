@@ -21,9 +21,3 @@ void LED_GREEN_TOGGLE(void);
 void LED_RED_OFF(void);
 void LED_RED_ON(void);
 void LED_RED_TOGGLE(void);
-
-#ifdef MODULE_UART0
-#include <sys/select.h>
-extern fd_set _native_uart_rfds;
-extern void _native_handle_uart0_input(void);
-#endif
