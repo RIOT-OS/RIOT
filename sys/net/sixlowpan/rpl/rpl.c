@@ -889,7 +889,6 @@ void recv_rpl_dao_ack(void)
         return;
     }
 
-    /* puts("Received DAO ACK"); */
     dao_ack_received();
 
 }
