@@ -73,7 +73,7 @@ static int update_shortterm(void)
     
     hwtimer_id = hwtimer_set_absolute(HWTIMER_TICKS(next), vtimer_callback, NULL);
 
-    DEBUG("update_shortterm: Set hwtimer to %lu (now=%lu)\n", next, HWTIMER_TICKS_TO_US(hwtimer_now()));
+    DEBUG("update_shortterm: Set hwtimer to %" PRIu32 " (now=%lu)\n", next, HWTIMER_TICKS_TO_US(hwtimer_now()));
     return 0;
 }
 
@@ -103,7 +103,7 @@ void vtimer_tick(void *ptr)
 
 static int set_shortterm(vtimer_t *timer)
 {
-    DEBUG("set_shortterm(): Absolute: %lu %lu\n", timer->absolute.seconds, timer->absolute.microseconds);
+    DEBUG("set_shortterm(): Absolute: %" PRIu32 " %" PRIu32 "\n", timer->absolute.seconds, timer->absolute.microseconds);
     timer->queue_entry.priority = timer->absolute.microseconds;
     queue_priority_add(&shortterm_queue_root, (queue_node_t *)timer);
     return 1;
@@ -120,7 +120,7 @@ void vtimer_callback(void *ptr)
 #ifdef ENABLE_DEBUG
     vtimer_print(timer);
 #endif
-    DEBUG("vtimer_callback(): Shooting %lu.\n", timer->absolute.microseconds);
+    DEBUG("vtimer_callback(): Shooting %" PRIu32 ".\n", timer->absolute.microseconds);
 
     /* shoot timer */
     if (timer->action == (void *) msg_send_int) {
@@ -142,11 +142,11 @@ void vtimer_callback(void *ptr)
 
 void normalize_to_tick(timex_t *time)
 {
-    DEBUG("Normalizing: %lu %lu\n", time->seconds, time->microseconds);
+    DEBUG("Normalizing: %" PRIu32 " %" PRIu32 "\n", time->seconds, time->microseconds);
     uint32_t seconds_tmp = time->seconds % SECONDS_PER_TICK;
     time->seconds -= seconds_tmp;
     uint32_t usecs_tmp = time->microseconds + (seconds_tmp * 1000000);
-    DEBUG("Normalizin2: %lu %lu\n", time->seconds, usecs_tmp);
+    DEBUG("Normalizin2: %" PRIu32 " %" PRIu32 "\n", time->seconds, usecs_tmp);
 
     if (usecs_tmp < time->microseconds) {
         usecs_tmp -= MICROSECONDS_PER_TICK;
@@ -159,20 +159,20 @@ void normalize_to_tick(timex_t *time)
     }
 
     time->microseconds = usecs_tmp;
-    DEBUG("     Result: %lu %lu\n", time->seconds, time->microseconds);
+    DEBUG("     Result: %" PRIu32 " %" PRIu32 "\n", time->seconds, time->microseconds);
 }
 
 static int vtimer_set(vtimer_t *timer)
 {
-    DEBUG("vtimer_set(): New timer. Offset: %lu %lu\n", timer->absolute.seconds, timer->absolute.microseconds);
+    DEBUG("vtimer_set(): New timer. Offset: %" PRIu32 " %" PRIu32 "\n", timer->absolute.seconds, timer->absolute.microseconds);
 
     timex_t now;
     vtimer_now(&now);
     timer->absolute = timex_add(now, timer->absolute);
     normalize_to_tick(&(timer->absolute));
 
-    DEBUG("vtimer_set(): Absolute: %lu %lu\n", timer->absolute.seconds, timer->absolute.microseconds);
-    DEBUG("vtimer_set(): NOW: %lu %lu\n", now.seconds, now.microseconds);
+    DEBUG("vtimer_set(): Absolute: %" PRIu32 " %" PRIu32 "\n", timer->absolute.seconds, timer->absolute.microseconds);
+    DEBUG("vtimer_set(): NOW: %" PRIu32 " %" PRIu32 "\n", now.seconds, now.microseconds);
 
     int result = 0;
 
@@ -229,7 +229,7 @@ int vtimer_init()
     longterm_tick_timer.absolute.seconds = 0;
     longterm_tick_timer.absolute.microseconds = MICROSECONDS_PER_TICK;
 
-    DEBUG("vtimer_init(): Setting longterm tick to %lu\n", longterm_tick_timer.absolute.microseconds);
+    DEBUG("vtimer_init(): Setting longterm tick to %" PRIu32 "\n", longterm_tick_timer.absolute.microseconds);
 
     set_shortterm(&longterm_tick_timer);
     update_shortterm();
