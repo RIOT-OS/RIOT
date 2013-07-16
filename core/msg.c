@@ -25,6 +25,7 @@
 
 #include "flags.h"
 #include "debug.h"
+#include "thread.h"
 
 static int _msg_receive(msg_t *m, int block);
 
