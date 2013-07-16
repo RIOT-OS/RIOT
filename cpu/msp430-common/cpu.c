@@ -16,7 +16,7 @@ License. See the file LICENSE in the top level directory for more details.
 #endif
 #include "cpu.h"
 #include "kernel.h"
-#include "kernel_intern.h"
+#include "kernel_internal.h"
 #include "sched.h"
 
 volatile int __inISR = 0;

@@ -17,7 +17,7 @@
 #include <stdint.h>
 #include <sched.h>
 #include <kernel.h>
-#include <kernel_intern.h>
+#include <kernel_internal.h>
 #include <clist.h>
 #include <bitarithm.h>
 
