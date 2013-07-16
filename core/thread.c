@@ -21,7 +21,7 @@
 #include "kernel.h"
 
 #include "debug.h"
-#include "kernel_intern.h"
+#include "kernel_internal.h"
 #include "bitarithm.h"
 #include "hwtimer.h"
 #include "sched.h"

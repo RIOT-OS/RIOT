@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include "arm_cpu.h"
 #include "sched.h"
-#include "kernel_intern.h"
+#include "kernel_internal.h"
 
 #define STACK_MARKER    (0x77777777)
 #define REGISTER_CNT    (12)
