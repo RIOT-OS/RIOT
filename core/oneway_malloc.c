@@ -20,7 +20,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define ENABLE_DEBUG
 #include <debug.h>
 
 extern void *sbrk(int incr);

@@ -23,7 +23,6 @@
 #include "sched.h"
 #include <irq.h>
 
-//#define ENABLE_DEBUG
 #include <debug.h>
 
 int mutex_init(struct mutex_t *mutex)
@@ -100,7 +99,7 @@ void mutex_unlock(struct mutex_t *mutex, int yield)
         if (mutex->queue.next) {
             queue_node_t *next = queue_remove_head(&(mutex->queue));
             tcb_t *process = (tcb_t*) next->data;
-            DEBUG("%s: waking up waiter %s.\n", process->name);
+            DEBUG("%s: waking up waiter.\n", process->name);
             sched_set_status(process, STATUS_PENDING);
 
             sched_switch(active_thread->priority, process->priority, inISR());

@@ -188,7 +188,7 @@ void hwtimer_arch_set(unsigned long offset, short timer)
 
     if (offset < HWTIMERMINOFFSET) {
         offset = HWTIMERMINOFFSET;
-        DEBUG("hwtimer_arch_set: offset < MIN, set to: %i\n", offset);
+        DEBUG("hwtimer_arch_set: offset < MIN, set to: %lu\n", offset);
     }
 
     native_hwtimer_irq[timer] = 1;
