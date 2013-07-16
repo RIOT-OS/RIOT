@@ -85,3 +85,4 @@ term:
 
 doc:
 	make -BC $(RIOTBASE) doc
+
