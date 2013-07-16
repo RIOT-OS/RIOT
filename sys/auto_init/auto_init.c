@@ -22,7 +22,6 @@
 #include <auto_init.h>
 #include "vtimer.h"
 
-#define ENABLE_DEBUG
 #include <debug.h>
 
 extern int main(void);

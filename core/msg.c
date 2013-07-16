@@ -24,9 +24,8 @@
 #include <cib.h>
 
 #include "flags.h"
-
-//#define ENABLE_DEBUG
 #include "debug.h"
+#include "thread.h"
 
 static int _msg_receive(msg_t *m, int block);
 

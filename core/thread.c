@@ -20,7 +20,6 @@
 #include "thread.h"
 #include "kernel.h"
 
-//#define ENABLE_DEBUG
 #include "debug.h"
 #include "kernel_intern.h"
 #include "bitarithm.h"
