@@ -214,7 +214,7 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address)
 
     /* initialize ETX-calculation if needed */
     if(RPL_DEFAULT_OCP == 1){
-        puts("INIT ETX BEACONING");
+        DEBUG("INIT ETX BEACONING\n");
         etx_init_beaconing(&my_address);
     }
 
@@ -229,7 +229,7 @@ void rpl_init_root(void)
     inst = rpl_new_instance(RPL_DEFAULT_INSTANCE);
 
     if (inst == NULL) {
-        printf("Error - No memory for another RPL instance\n");
+        DEBUG("Error - No memory for another RPL instance\n");
         return;
     }
 
@@ -259,13 +259,13 @@ void rpl_init_root(void)
         dodag->my_preferred_parent = NULL;
     }
     else {
-        printf("Error - could not generate DODAG\n");
+        DEBUG("Error - could not generate DODAG\n");
         return;
     }
 
     i_am_root = 1;
     start_trickle(dodag->dio_min, dodag->dio_interval_doubling, dodag->dio_redundancy);
-    puts("ROOT INIT FINISHED");
+    DEBUG("ROOT INIT FINISHED\n");
 
 }
 
@@ -279,7 +279,7 @@ void send_DIO(ipv6_addr_t *destination)
     mydodag = rpl_get_my_dodag();
 
     if (mydodag == NULL) {
-        printf("Error, trying to send DIO without being part of a dodag. This should not happen\n");
+        DEBUG("Error - trying to send DIO without being part of a dodag.\n");
         mutex_unlock(&rpl_send_mutex, 0);
         return;
     }
@@ -533,13 +533,13 @@ void recv_rpl_dio(void)
         }
     }
     else if (my_inst->id != dio_inst->id) {
-        printf("Andere Instanz, wir haben %d es kam aber %d\n", my_inst->id, dio_inst->id);
          /* TODO: Add support support for several instances.  */
 
          /* At the moment, nodes can only join one instance, this is
          * the instance they join first.
          * Instances cannot be switched later on.  */
 
+        DEBUG("Ignoring instance - we are %d and got %d\n", my_inst->id, dio_inst->id);
         return;
     }
 
@@ -617,7 +617,7 @@ void recv_rpl_dio(void)
             }
 
             default:
-                printf("[Error] Unsupported DIO option\n");
+                DEBUG("[Error] Unsupported DIO option\n");
                 return;
         }
     }
@@ -627,33 +627,33 @@ void recv_rpl_dio(void)
 
     if (my_dodag == NULL) {
         if (!has_dodag_conf_opt) {
-            puts("send DIS");
+            DEBUG("send DIS\n");
             send_DIS(&ipv6_buf->srcaddr);
             return;
         }
 
         if (rpl_dio_buf->rank < ROOT_RANK) {
-            printf("DIO with Rank < ROOT_RANK\n");
+            DEBUG("DIO with Rank < ROOT_RANK\n");
             return;
         }
 
         if (dio_dodag.mop != RPL_DEFAULT_MOP) {
-            printf("Required MOP not supported\n");
+            DEBUG("Required MOP not supported\n");
             return;
         }
 
         if (dio_dodag.of == NULL) {
-            printf("Required objective function not supported\n");
+            DEBUG("Required objective function not supported\n");
             return;
         }
 
         if (rpl_dio_buf->rank != INFINITE_RANK) {
-            puts("Will join DODAG\n");
+            DEBUG("Will join DODAG\n");
             ipv6_print_addr(&dio_dodag.dodag_id);
             rpl_join_dodag(&dio_dodag, &ipv6_buf->srcaddr, rpl_dio_buf->rank);
         }
         else {
-            printf("Cannot access DODAG because of DIO with infinite rank\n");
+            DEBUG("Cannot access DODAG because of DIO with infinite rank\n");
             return;
         }
     }
@@ -662,12 +662,12 @@ void recv_rpl_dio(void)
         /* "our" DODAG */
         if (RPL_COUNTER_GREATER_THAN(dio_dodag.version, my_dodag->version)) {
             if (my_dodag->my_rank == ROOT_RANK) {
-                printf("[Warning] Inconsistent Dodag Version\n");
+                DEBUG("[Warning] Inconsistent Dodag Version\n");
                 my_dodag->version = RPL_COUNTER_INCREMENT(dio_dodag.version);
                 reset_trickletimer();
             }
             else {
-                printf("[Info] New Version of dodag %d\n", dio_dodag.version);
+                DEBUG("[Info] New Version of dodag %d\n", dio_dodag.version);
                 rpl_global_repair(&dio_dodag, &ipv6_buf->srcaddr, rpl_dio_buf->rank);
             }
 
@@ -796,7 +796,7 @@ void recv_rpl_dao(void)
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 
     if (my_dodag == NULL) {
-        printf("[Error] got DAO without beeing part of a Dodag\n");
+        DEBUG("[Error] got DAO although not a DODAG\n");
         return;
     }
 
@@ -829,7 +829,7 @@ void recv_rpl_dao(void)
                 rpl_opt_target_buf = get_rpl_opt_target_buf(len);
 
                 if (rpl_opt_target_buf->prefix_length != RPL_DODAG_ID_LEN) {
-                    printf("prefixes are not supported yet");
+                    DEBUG("prefixes are not supported yet");
                     break;
                 }
 
@@ -837,7 +837,7 @@ void recv_rpl_dao(void)
                 rpl_opt_transit_buf = get_rpl_opt_transit_buf(len);
 
                 if (rpl_opt_transit_buf->type != RPL_OPT_TRANSIT) {
-                    printf("[Error] - no Transit Inforamtion to Target Option, type = %d\n", rpl_opt_transit_buf->type);
+                    DEBUG("[Error] - no transit information for target option type = %d\n", rpl_opt_transit_buf->type);
                     break;
                 }
 
@@ -931,14 +931,14 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
 
         if (next_hop == NULL) {
             if (i_am_root) {
-                printf("[Error] destination unknown\n");
+                DEBUG("[Error] destination unknown\n");
                 return;
             }
             else {
                 next_hop = rpl_get_my_preferred_parent();
 
                 if (next_hop == NULL) {
-                    puts("[Error] no preferred parent, dropping package");
+                    DEBUG("[Error] no preferred parent, dropping package\n");
                     return;
                 }
             }
