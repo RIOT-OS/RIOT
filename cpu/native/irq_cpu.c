@@ -24,6 +24,7 @@
 
 #include "irq.h"
 #include "cpu.h"
+#include "unused.h"
 
 #include "debug.h"
 
@@ -292,7 +293,7 @@ void native_irq_handler()
 /**
  * save signal, return to _native_sig_leave_tramp if possible
  */
-void native_isr_entry(int sig, siginfo_t *info, void *context)
+void native_isr_entry(int sig, siginfo_t *UNUSED(info), void *context)
 {
     DEBUG("\n\n\t\tnative_isr_entry\n\n");
 
