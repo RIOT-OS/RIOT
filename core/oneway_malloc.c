@@ -20,6 +20,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "unused.h"
+
 #include <debug.h>
 
 extern void *sbrk(int incr);
@@ -46,7 +48,7 @@ void *_realloc(void *ptr, size_t size)
     return newptr;
 }
 
-void _free(void *ptr)
+void _free(void *UNUSED(ptr))
 {
     DEBUG("_free(): block at 0x%X lost.\n", (unsigned int)ptr);
 }

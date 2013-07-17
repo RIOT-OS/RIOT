@@ -15,15 +15,16 @@
  */
 
 #include <stdio.h>
+
 #include "mutex.h"
 #include "atomic.h"
 #include "queue.h"
 #include "tcb.h"
 #include "kernel.h"
 #include "sched.h"
-#include <irq.h>
-
-#include <debug.h>
+#include "irq.h"
+#include "unused.h"
+#include "debug.h"
 
 int mutex_init(struct mutex_t *mutex)
 {
@@ -90,7 +91,7 @@ void mutex_wait(struct mutex_t *mutex)
     /* we were woken up by scheduler. waker removed us from queue. we have the mutex now. */
 }
 
-void mutex_unlock(struct mutex_t *mutex, int yield)
+void mutex_unlock(struct mutex_t *mutex, int UNUSED(yield))
 {
     DEBUG("%s: unlocking mutex. val: %u pid: %u\n", active_thread->name, mutex->val, thread_pid);
     int irqstate = disableIRQ();

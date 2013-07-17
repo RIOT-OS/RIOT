@@ -38,6 +38,7 @@
 #include "cpu.h"
 #include "cpu-conf.h"
 
+#include "unused.h"
 #include "debug.h"
 
 #define HWTIMERMINOFFSET 1000
@@ -240,7 +241,7 @@ unsigned long hwtimer_arch_now(void)
     return native_hwtimer_now;
 }
 
-void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
+void hwtimer_arch_init(void (*handler)(int), uint32_t UNUSED(fcpu))
 {
     DEBUG("hwtimer_arch_init()\n");
 

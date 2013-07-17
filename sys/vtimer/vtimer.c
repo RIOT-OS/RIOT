@@ -10,10 +10,12 @@
 #include <msg.h>
 #include <thread.h>
 #include <queue.h>
+#include "unused.h"
 
 #include <vtimer.h>
 
 #include <debug.h>
+
 
 
 #define VTIMER_THRESHOLD 20UL
@@ -77,7 +79,7 @@ static int update_shortterm(void)
     return 0;
 }
 
-void vtimer_tick(void *ptr)
+void vtimer_tick(void *UNUSED(ptr))
 {
     DEBUG("vtimer_tick().");
     seconds += SECONDS_PER_TICK;
@@ -109,7 +111,7 @@ static int set_shortterm(vtimer_t *timer)
     return 1;
 }
 
-void vtimer_callback(void *ptr)
+void vtimer_callback(void *UNUSED(ptr))
 {
     vtimer_t *timer;
     in_callback = true;

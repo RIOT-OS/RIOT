@@ -20,6 +20,7 @@
 
 #include <time.h>
 #include <err.h>
+#include "unused.h"
 
 #include "debug.h"
 
@@ -45,7 +46,7 @@ void rtc_disable(void)
     native_rtc_enabled = 0;
 }
 
-void rtc_set_localtime(struct tm *localt)
+void rtc_set_localtime(struct tm *UNUSED(localt))
 {
     DEBUG("rtc_set_localtime()\n");
     printf("setting time not supported.");
