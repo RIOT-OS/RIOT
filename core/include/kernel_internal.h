@@ -1,14 +1,14 @@
 /**
  * @ingroup	kernel
  * @{
- * @file        kernel_intern.h
- * @brief       prototypes for kernel intern functions
+ * @file        kernel_internal.h
+ * @brief       prototypes for kernel internal functions
  * @author      INRIA
  * @author		Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef KERNEL_INTERN_H_
-#define KERNEL_INTERN_H_
+#ifndef KERNEL_INTERNAL_H_
+#define KERNEL_INTERNAL_H_
 
 /**
  * @brief   Initializes scheduler and creates main and idle task
@@ -51,4 +51,4 @@ void thread_print_stack(void);
 int thread_measure_stack_usage(char *stack);
 
 /** @} */
-#endif /* KERNEL_INTERN_H_ */
+#endif /* KERNEL_INTERNAL_H_ */

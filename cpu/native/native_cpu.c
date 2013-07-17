@@ -25,7 +25,7 @@
 #endif
 #include <err.h>
 
-#include "kernel_intern.h"
+#include "kernel_internal.h"
 #include "sched.h"
 
 #include "cpu.h"

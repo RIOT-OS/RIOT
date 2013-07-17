@@ -15,7 +15,7 @@
  */
 
 #include <stdio.h>
-#include <kernel_intern.h>
+#include <kernel_internal.h>
 #include <cpu.h>
 
 extern void board_init(void);

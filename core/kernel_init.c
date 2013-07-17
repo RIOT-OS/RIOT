@@ -20,7 +20,7 @@
 #include <errno.h>
 #include <tcb.h>
 #include <kernel.h>
-#include <kernel_intern.h>
+#include <kernel_internal.h>
 #include <sched.h>
 #include <flags.h>
 #include <cpu.h>

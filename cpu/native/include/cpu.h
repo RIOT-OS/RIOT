@@ -38,7 +38,7 @@
 #undef __USE_GNU
 #endif
 
-#include "kernel_intern.h"
+#include "kernel_internal.h"
 #include "sched.h"
 #include "debug.h"
 
