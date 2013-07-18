@@ -4,7 +4,7 @@
 #include "msp430.h"
 #include "debug.h"
 
-volatile static uint32_t __msp430_cpu_speed = MSP430_INITIAL_CPU_SPEED;
+static volatile uint32_t __msp430_cpu_speed = MSP430_INITIAL_CPU_SPEED;
 
 /*---------------------------------------------------------------------------*/
 static uint8_t calc_umctl(uint16_t br) {
