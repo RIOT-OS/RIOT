@@ -8,7 +8,7 @@
 
 #include "cpu.h"
 #include "board.h"
-#include "kernel_intern.h"
+#include "kernel_internal.h"
 #include "msp430.h"
 #include "debug.h"
 
