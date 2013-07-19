@@ -1,5 +1,5 @@
-SRC = shell_commands.c sc_id.c
-INCLUDES = -I../../../core/include -I../../include -I../../../drivers/include/
+SRC = shell_commands.c sc_id.c sc_heap.c
+INCLUDES = -I../../../core/include -I../../include -I../../../drivers/include/ 
 
 ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
 	INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include/

@@ -24,13 +24,14 @@ endif
 cpus: $(DIRS)
 
 $(DIRS): 
-	@$(MAKE) -C $@
+	@"$(MAKE)" -C $@
 
 clean:
-	@$(MAKE) -C lpc2387 clean
-	@$(MAKE) -C arm_common clean
-	@$(MAKE) -C cc430 clean
-	@$(MAKE) -C msp430-common clean
-	@$(MAKE) -C msp430x16x clean
-	@$(MAKE) -C native clean
+	@"$(MAKE)" -C lpc2387 clean
+	@"$(MAKE)" -C arm_common clean
+	@"$(MAKE)" -C cc430 clean
+	@"$(MAKE)" -C msp430-common clean
+	@"$(MAKE)" -C msp430x16x clean
+	@"$(MAKE)" -C native clean
+
 

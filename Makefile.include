@@ -41,8 +41,8 @@ endif
 ## make script for your project. Build RIOT-base here!
 all: $(PROJBINDIR)/$(PROJECT).a
 	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
-	$(MAKE) -C $(RIOTBOARD)
-	$(MAKE) -C $(RIOTBASE)
+	"$(MAKE)" -C $(RIOTBOARD)
+	"$(MAKE)" -C $(RIOTBASE)
 ifeq ($(BUILDOSXNATIVE),1)	
 	@$(LINK) $(UNDEF) -o $(PROJBINDIR)/$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
@@ -73,8 +73,8 @@ ${PROJBINDIR}/%.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o bin/$*.o
 
 clean:
-	$(MAKE) -C $(RIOTBOARD) clean
-	$(MAKE) -C $(RIOTBASE) clean
+	"$(MAKE)" -C $(RIOTBOARD) clean
+	"$(MAKE)" -C $(RIOTBASE) clean
 	rm -f $(PROJBINDIR)/*
 
 flash: all
@@ -85,3 +85,5 @@ term:
 
 doc:
 	make -BC $(RIOTBASE) doc
+
+
