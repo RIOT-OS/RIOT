@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * RPL data structs 
  *
@@ -17,6 +18,10 @@
 
 #include <string.h>
 #include "sys/net/sixlowpan/sixlowip.h"
+=======
+//#include "sys/net/sixlowpan/sixlowip.h"
+#include <sixlowpan.h>
+>>>>>>> fix RPL includes
 
 #ifndef RPL_STRUCTS_H_INCLUDED
 #define RPL_STRUCTS_H_INCLUDED
