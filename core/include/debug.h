@@ -17,8 +17,8 @@
  * @}
  */
 
-#ifndef DEBUG_H_
-#define DEBUG_H_
+#ifndef _DEBUG_H
+#define _DEBUG_H
 
 #include <stdio.h>
 
@@ -28,4 +28,4 @@
 #define DEBUG(...)
 #endif
 
-#endif /* DEGUG_H_ */
+#endif // _DEBUG_H

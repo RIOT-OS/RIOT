@@ -62,7 +62,7 @@ void ltc4150_arch_init(void);
  * shall be called on ltc4150 interrupt,
  * implemented in driver
  */
-void ltc4150_interrupt(void);
+void __attribute__((__no_instrument_function__)) ltc4150_interrupt(void);
 
 /** * @} */
 #endif /* __LTC4150_ARCH_H */

@@ -110,8 +110,6 @@ extern volatile uint8_t rx_buffer_next;	    ///< Next packet in RX queue
 extern volatile uint8_t radio_state;		///< Radio state
 extern cc110x_statistic_t cc110x_statistic;
 
-int transceiver_pid;                         ///< the transceiver thread pid
-
 void cc110x_init(int transceiver_pid);
 
 void cc110x_rx_handler(void);

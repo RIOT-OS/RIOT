@@ -32,6 +32,8 @@
 #include "board_internal.h"
 #endif
 
+#include <err.h>
+
 static enum lpm_mode native_lpm;
 
 void lpm_init(void)

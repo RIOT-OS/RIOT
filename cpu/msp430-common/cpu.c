@@ -46,7 +46,7 @@ void cpu_switch_context_exit(void)
 //----------------------------------------------------------------------------
 // Processor specific routine - here for MSP
 //----------------------------------------------------------------------------
-char *thread_stack_init(void *task_func, void *stack_start, int stack_size)
+char *thread_stack_init(void (*task_func)(void), void *stack_start, int stack_size)
 {
     unsigned short *stk;
     stk = (unsigned short *)(stack_start + stack_size);

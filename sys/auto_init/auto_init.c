@@ -22,12 +22,12 @@
 #include <auto_init.h>
 #include "vtimer.h"
 
+#define ENABLE_DEBUG
 #include <debug.h>
 
 extern int main(void);
 
-void auto_init(void)
-{
+void auto_init(void) {
 #ifdef MODULE_BOARD_DISPLAY
     extern void lcd_init();
     lcd_init();
