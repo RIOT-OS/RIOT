@@ -331,6 +331,8 @@ static void receive_packet(uint16_t type, uint8_t pos)
             break;
         case RCV_PKT_CC2420:
             t = TRANSCEIVER_CC2420;
+        case RCV_PKT_MC1322X:
+            t = TRANSCEIVER_MC1322X;
             break;
         case RCV_PKT_MC1322X:
             t = TRANSCEIVER_MC1322X;
