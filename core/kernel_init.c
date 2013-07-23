@@ -31,8 +31,6 @@
 #include <auto_init.h>
 #endif
 
-#include <debug.h>
-
 volatile tcb_t *sched_threads[MAXTHREADS];
 volatile tcb_t *active_thread;
 volatile int lpm_prevent_sleep = 0;

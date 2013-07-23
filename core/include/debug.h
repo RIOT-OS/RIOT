@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 
-#ifdef ENABLE_DEBUG
+#if ENABLE_DEBUG
 #define DEBUG(...) printf(__VA_ARGS__)
 #else
 #define DEBUG(...)

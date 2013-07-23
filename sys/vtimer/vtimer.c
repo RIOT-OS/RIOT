@@ -13,8 +13,8 @@
 
 #include <vtimer.h>
 
+#define ENABLE_DEBUG    (0)
 #include <debug.h>
-
 
 #define VTIMER_THRESHOLD 20UL
 #define VTIMER_BACKOFF 10UL
@@ -28,7 +28,7 @@ static int vtimer_set(vtimer_t *timer);
 static int set_longterm(vtimer_t *timer);
 static int set_shortterm(vtimer_t *timer);
 
-#ifdef ENABLE_DEBUG
+#if ENABLE_DEBUG
 void vtimer_print(vtimer_t *t);
 #endif
 
@@ -117,7 +117,7 @@ void vtimer_callback(void *ptr)
 
     timer = (vtimer_t *)queue_remove_head(&shortterm_queue_root);
 
-#ifdef ENABLE_DEBUG
+#if ENABLE_DEBUG
     vtimer_print(timer);
 #endif
     DEBUG("vtimer_callback(): Shooting %" PRIu32 ".\n", timer->absolute.microseconds);

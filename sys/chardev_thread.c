@@ -25,6 +25,7 @@
 #include <irq.h>
 #include <posix_io.h>
 
+#define ENABLE_DEBUG    (0)
 #include <debug.h>
 
 static int min(int a, int b)

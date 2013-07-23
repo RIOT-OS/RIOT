@@ -1,8 +1,3 @@
-//For debugging purposes
-#define ENABLE_DEBUG
-#include <debug.h>
-
-
 #include "rpl_structs.h"
 
 /*

@@ -25,6 +25,7 @@
 #include <hwtimer.h>
 #include <config.h>
 
+#define ENABLE_DEBUG    (0)
 #include <debug.h>
 
 /* some externals */

@@ -46,8 +46,6 @@ and the mailinglist (subscription via web site)
 #include <sht11-board.h>
 #include <bitarithm.h>
 
-#include <debug.h>
-
 float sht11_temperature_offset;
 
 /**

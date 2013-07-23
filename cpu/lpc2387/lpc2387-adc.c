@@ -27,8 +27,8 @@ License. See the file LICENSE in the top level directory for more details.
 #include "lpc23xx.h"
 #include "lpc2387-adc.h"
 
-#define ENABLE_DEBUG
-#ifdef ENABLE_DEBUG
+#define ENABLE_DEBUG    (0)
+#if ENABLE_DEBUG
 #include "hwtimer.h"
 #include "debug.h"
 #endif
@@ -101,7 +101,7 @@ void adc_init_2(void)
 /*---------------------------------------------------------------------------*/
 uint16_t adc_read(uint8_t channel)
 {
-#ifdef ENABLE_DEBUG
+#if ENABLE_DEBUG
     uint32_t t1, t2;
 #endif
     uint32_t regVal, adc_data;
@@ -113,12 +113,12 @@ uint16_t adc_read(uint8_t channel)
 
     /* switch channel, start A/D convert */
     AD0CR &= 0xFFFFFF00;
-#ifdef ENABLE_DEBUG
+#if ENABLE_DEBUG
     t1 = hwtimer_now();
 #endif
     AD0CR |= (1 << 24) | (1 << channel);
 
-#ifdef ENABLE_DEBUG
+#if ENABLE_DEBUG
     t2 = hwtimer_now();
 #endif
 

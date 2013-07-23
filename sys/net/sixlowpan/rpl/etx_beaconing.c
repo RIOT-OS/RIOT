@@ -447,33 +447,27 @@ static uint8_t etx_count_packet_tx(etx_neighbor_t * candidate) {
     for (uint8_t i = 0; i < ETX_WINDOW; i++) {
         if (i != cur_round) {
             pkt_count = pkt_count + candidate->packets_tx[i];
-#ifdef ENABLE_DEBUG
             DEBUG("%d",candidate->packets_tx[i]);
             if (i < ETX_WINDOW - 1) {
                 DEBUG(",");
             }
-#endif
         } else {
             //Check if I received something for the current round
             if (candidate->tx_cur_round == 0) {
                 //Didn't receive a packet, zero the field and don't add
                 candidate->packets_tx[i] = 0;
-#ifdef ENABLE_DEBUG
                 DEBUG("%d!",candidate->packets_tx[i]);
                 if (i < ETX_WINDOW - 1) {
                     DEBUG(",");
                 }
-#endif
             } else {
                 //Add 1 and set field
                 pkt_count = pkt_count + 1;
                 candidate->packets_tx[i] = 1;
-#ifdef ENABLE_DEBUG
                 DEBUG("%d!",candidate->packets_tx[i]);
                 if (i < ETX_WINDOW - 1) {
                     DEBUG(",");
                 }
-#endif
             }
         }
     }

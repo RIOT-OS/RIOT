@@ -19,8 +19,6 @@
 
 #include "queue.h"
 
-#include "debug.h"
-
 void queue_remove(queue_node_t *root, queue_node_t *node)
 {
     while (root->next != NULL) {

@@ -41,7 +41,7 @@ static enum lpm_mode lpm;
 extern void init_clks1(void);
 extern void init_clks2(void);
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG (0)
 #include <debug.h>
 
 void lpm_init(void)
@@ -49,7 +49,7 @@ void lpm_init(void)
     lpm = LPM_ON;
 }
 
-#define LPM_DEBUG 1
+#define LPM_DEBUG (1)
 
 void lpm_begin_awake(void)
 {
@@ -108,9 +108,7 @@ enum lpm_mode lpm_set(enum lpm_mode target)
 
     lpm = target;
 
-#if iENABLE_DEBUG
     DEBUG("# LPM power down %u -> %u", lpm, target);
-#endif
 
     PCON |= target_flags;										// set target power mode
     return last_lpm;

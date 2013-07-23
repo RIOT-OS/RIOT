@@ -35,11 +35,6 @@ void rtc_init(void)
 {
     /* Set to calendar mode */
     RTCCTL1 |= RTCMODE_H;
-
-    /* enable ready interrupt (every second) */
-#ifndef ENABLE_DEBUG
-    RTCCTL0 |= RTCRDYIE;
-#endif
 }
 
 /*---------------------------------------------------------------------------*/

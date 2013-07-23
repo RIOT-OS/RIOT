@@ -16,7 +16,7 @@ License. See the file LICENSE in the top level directory for more details.
 #include <hwtimer.h>
 #include <hwtimer_arch.h>
 
-// #define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include <debug.h>
 
 

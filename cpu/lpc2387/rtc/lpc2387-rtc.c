@@ -35,7 +35,7 @@ License. See the file LICENSE in the top level directory for more details.
 #define PREINT_RTC	0x000001C8  /* Prescaler value, integer portion, PCLK = 15Mhz */
 #define PREFRAC_RTC	0x000061C0  /* Prescaler value, fraction portion, PCLK = 15Mhz */
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG (0)
 #include <debug.h>
 
 /**
