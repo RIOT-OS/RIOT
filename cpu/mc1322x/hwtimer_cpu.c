@@ -17,7 +17,7 @@
 /* High level interrupt handler */
 static void (*int_handler)(int);
 
-void timer_x_init(TMR_struct* TMRx) {
+void timer_x_init(volatile struct TMR_struct* const TMRx) {
     /* Reset the timer */
     TMRx->ENBL = 0;
     /* Clear status */
@@ -47,7 +47,7 @@ void timer_x_init(TMR_struct* TMRx) {
     TMRx->ENBL = 0xf;                           /* enable all the timers --- why not? */
     
     /* TODO: install ISR */
-};
+}
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu) {
     int_handler = handler;
@@ -59,26 +59,28 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu) {
     timer_x_init(TMR1);
     timer_x_init(TMR2);
     timer_x_init(TMR3);
-};
+}
 
 /*---------------------------------------------------------------------------*/
 void hwtimer_arch_enable_interrupt(void) {
     /* this enables timer interrupts in general by using the ITC.
      * Timer specific interrupt control is given by the TMRx structs. */
-    enable_irq(TRM);
+    //enable_irq(INT_NUM_TMR);
+    ITC->INTENABLEbits.TMR = 1;
 }
 
 /*---------------------------------------------------------------------------*/
 void hwtimer_arch_disable_interrupt(void) {
     /* this disables timer interrupts in general by using the ITC.
      * Timer specific interrupt control is given by the TMRx structs. */
-    disable_irq(TRM);
+    //disable_irq(INT_NUM_TMR);
+    ITC->INTENABLEbits.TMR = 1;
 }
 
 /*---------------------------------------------------------------------------*/
 void hwtimer_arch_set(unsigned long offset, short timer) {
     /* get corresponding struct for the given ::timer parameter */
-    TMR_struct* tmr = (void *) TMR_BASE + (timer + TMR_OFFSET);
+    struct TMR_struct* tmr = (void *) TMR_BASE + (timer + TMR_OFFSET);
     
     /* disable IRQs and save the status register */
     unsigned long cpsr = disableIRQ();
@@ -95,7 +97,7 @@ void hwtimer_arch_set(unsigned long offset, short timer) {
 /*---------------------------------------------------------------------------*/
 void hwtimer_arch_set_absolute(unsigned long value, short timer) {
     /* get corresponding struct for the given ::timer parameter */
-    TMR_struct* tmr = (void *) TMR_BASE + (timer + TMR_OFFSET);
+    struct TMR_struct* tmr = (void *) TMR_BASE + (timer + TMR_OFFSET);
     
     /* disable IRQs and save the status register */
     unsigned long cpsr = disableIRQ();
@@ -112,7 +114,7 @@ void hwtimer_arch_set_absolute(unsigned long value, short timer) {
 /*---------------------------------------------------------------------------*/
 void hwtimer_arch_unset(short timer) {
     /* get corresponding struct for the given ::timer parameter */
-    TMR_struct* tmr = (void *) TMR_BASE + (timer + TMR_OFFSET);
+    struct TMR_struct* tmr = (void *) TMR_BASE + (timer + TMR_OFFSET);
     
     tmr->CSCTRLbits.TCF1 = 0;                   /* reset compare flag */
     tmr->CSCTRLbits.TCF1EN = 0;                 /* disable interrupts for TCF1 */
