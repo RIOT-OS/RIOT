@@ -28,9 +28,9 @@ License. See the file LICENSE in the top level directory for more details.
 #include "lpc2387-adc.h"
 
 #define ENABLE_DEBUG    (0)
+#include "debug.h"
 #if ENABLE_DEBUG
 #include "hwtimer.h"
-#include "debug.h"
 #endif
 
 /*---------------------------------------------------------------------------*/

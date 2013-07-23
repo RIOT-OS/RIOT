@@ -16,6 +16,7 @@
 
 #include <stddef.h>
 #include <inttypes.h>
+#include <stdio.h>
 
 #include "queue.h"
 

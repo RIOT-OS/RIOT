@@ -27,11 +27,11 @@
 #include "sixlowerror.h"
 #include "serialnumber.h"
 #include "sys/net/net_help/net_help.h"
-#include "io.h"
 #include "vtimer.h"
 #include "mutex.h"
 
 #define ENABLE_DEBUG    (0)
+#include "debug.h"
 
 /* extern variables */
 uint8_t opt_hdr_len = 0;
