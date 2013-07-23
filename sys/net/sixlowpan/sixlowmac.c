@@ -39,7 +39,6 @@
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
 msg_t msg_q[RADIO_RCV_BUF_SIZE];
-uint8_t snd_buffer[RADIO_SND_BUF_SIZE][PAYLOAD_SIZE];
 
 static uint8_t r_src_addr;
 uint8_t buf[PAYLOAD_SIZE];

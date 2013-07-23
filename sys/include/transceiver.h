@@ -6,7 +6,7 @@
 /* Stack size for transceiver thread */
 #ifndef TRANSCEIVER_STACK_SIZE
 #ifdef ENABLE_DEBUG
-#define TRANSCEIVER_STACK_SIZE      (2048)
+#define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_PRINTF)
 #else
 #define TRANSCEIVER_STACK_SIZE      (512)
 #endif

@@ -27,10 +27,9 @@
 #include "radio/radio.h"
 #include <transceiver.h>
 
-#define RADIO_STACK_SIZE            512
-#define RADIO_RCV_BUF_SIZE          64
-#define RADIO_SND_BUF_SIZE          100
-#define RADIO_SENDING_DELAY         1000
+#define RADIO_STACK_SIZE            (MINIMUM_STACK_SIZE + 256)
+#define RADIO_RCV_BUF_SIZE          (64)
+#define RADIO_SENDING_DELAY         (1000)
 
 extern uint16_t fragmentcounter;
 

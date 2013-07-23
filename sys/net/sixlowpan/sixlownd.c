@@ -17,6 +17,9 @@
  * @}
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "sixlowip.h"
 #include "sixlownd.h"
 #include "sixlowmac.h"
@@ -24,14 +27,9 @@
 #include "sixlowerror.h"
 #include "serialnumber.h"
 #include "sys/net/net_help/net_help.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <debug.h>
-#include <vtimer.h>
-#include <mutex.h>
-
-#define ENABLE_DEBUG
+#include "io.h"
+#include "vtimer.h"
+#include "mutex.h"
 
 /* extern variables */
 uint8_t opt_hdr_len = 0;
