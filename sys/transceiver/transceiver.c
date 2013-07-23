@@ -25,6 +25,12 @@
 #endif
 #endif
 
+//#ifdef MODULE_MC1322X
+#include <mc1322x.h>
+#include <maca.h>
+#include <maca_packet.h>
+//#endif
+
 //#define ENABLE_DEBUG (1)
 #include <debug.h>
 
@@ -99,6 +105,9 @@ void transceiver_init(transceiver_type_t t) {
     if (t & TRANSCEIVER_CC1100) {
         transceivers |= t;
     }
+    else if (t & TRANSCEIVER_MC1322X) {
+        transceivers |= t;
+    }
     else {
         puts("Invalid transceiver type");
     }
@@ -118,6 +127,9 @@ int transceiver_start(void) {
         cc1100_init();
         cc1100_set_packet_monitor(cc1100_packet_monitor);
 #endif
+    }
+    else if (transceivers & TRANSCEIVER_MC1322X) {
+        maca_init();
     }
     return transceiver_pid;
 }
@@ -162,6 +174,7 @@ void run(void) {
         switch (m.type) {
             case RCV_PKT_CC1020:
             case RCV_PKT_CC1100:
+            case RCV_PKT_MC1322X:
                 receive_packet(m.type, m.content.value);
                 break;
             case SND_PKT:
@@ -238,6 +251,9 @@ static void receive_packet(uint16_t type, uint8_t pos) {
         case RCV_PKT_CC1100:
             t = TRANSCEIVER_CC1100;
             break;
+        case RCV_PKT_MC1322X:
+            t = TRANSCEIVER_MC1322X;
+            break;
         default:
             t = TRANSCEIVER_NONE;
             break;
@@ -266,6 +282,8 @@ static void receive_packet(uint16_t type, uint8_t pos) {
 #else
             receive_cc1100_packet(trans_p);
 #endif
+        } else if (type == RCV_PKT_MC1322X) {
+            receive_mc1322x_packet(trans_p);
         }
         else {
             puts("Invalid transceiver type");
@@ -328,6 +346,21 @@ void receive_cc1100_packet(radio_packet_t *trans_p) {
 }
 #endif
 
+//#ifdef MODULE_MC1322X
+void receive_mc1322x_packet(radio_packet_t *trans_p) {
+    maca_packet_t* maca_pkt;
+    dINT();
+    maca_pkt = maca_get_rx_packet ();
+    trans_p->lqi = maca_pkt->lqi;
+    trans_p->length = maca_pkt->length;
+    memcpy((void*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), maca_pkt->data, MACA_MAX_PAYLOAD_SIZE);
+    maca_free_packet( maca_pkt );
+    eINT();
+    
+    trans_p->data = (uint8_t*) &(data_buffer[transceiver_buffer_pos * MACA_MAX_PAYLOAD_SIZE]);
+}
+//#endif
+
  
 /*------------------------------------------------------------------------------------*/
 /*
@@ -348,6 +381,9 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt) {
 #ifdef MODULE_CC110X_NG
     cc110x_packet_t cc110x_pkt;
 #endif
+//#ifdef MODULE_MC1322X
+    maca_packet_t* maca_pkt = maca_get_free_packet();
+//#endif
 
     switch (t) {
         case TRANSCEIVER_CC1100:
@@ -368,6 +404,11 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt) {
             }
 #endif
             break;
+        case TRANSCEIVER_MC1322X:
+            maca_pkt->length = p.length;
+            memcpy(maca_pkt->data, p.data, p.length);
+            maca_set_tx_packet( maca_pkt );
+            res = 1;
         default:
             puts("Unknown transceiver");
             break;
@@ -393,6 +434,9 @@ static int16_t set_channel(transceiver_type_t t, void *channel) {
 #else
             return cc1100_set_channel(c);
 #endif
+        case TRANSCEIVER_MC1322X:
+            maca_set_channel(c);
+            return c; ///< TODO: should be changed! implement get channel
         default:
             return -1;
     }
@@ -413,6 +457,8 @@ static int16_t get_channel(transceiver_type_t t) {
 #else
             return cc1100_get_channel();
 #endif
+        case TRANSCEIVER_MC1322X:
+            ///< TODO:implement return maca_get_channel(); 
         default:
             return -1;
     }
@@ -433,6 +479,8 @@ static int16_t get_address(transceiver_type_t t) {
 #else
             return cc1100_get_address();
 #endif
+        case TRANSCEIVER_MC1322X:
+            return maca_get_address();
         default:
             return -1;
     }
@@ -455,6 +503,8 @@ static int16_t set_address(transceiver_type_t t, void *address) {
 #else
             return cc1100_set_address(addr);
 #endif
+        case TRANSCEIVER_MC1322X:
+            return maca_set_address(addr);
         default:
             return -1;
     }
@@ -484,6 +534,9 @@ static void powerdown(transceiver_type_t t) {
 #ifdef MODULE_CC110X_NG
             cc110x_switch_to_pwd();
 #endif
+            break;
+        case TRANSCEIVER_MC1322X:
+            maca_off();
             break;
         default:
             break;

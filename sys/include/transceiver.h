@@ -26,6 +26,7 @@ enum transceiver_msg_type_t {
     /* Message types for driver <-> transceiver communication */
     RCV_PKT_CC1020,        ///< packet was received by CC1020 transceiver
     RCV_PKT_CC1100,        ///< packet was received by CC1100 transceiver
+    RCV_PKT_MC1322X,       ///< packet was received by mc1322x transceiver
 
     /* Message types for transceiver <-> upper layer communication */
     PKT_PENDING,    ///< packet pending in transceiver buffer
@@ -50,9 +51,10 @@ enum transceiver_msg_type_t {
  * @brief All supported transceivers
  */
 typedef enum {
-    TRANSCEIVER_NONE,       ///< Invalid
-    TRANSCEIVER_CC1100,     ///< CC110X transceivers
-    TRANSCEIVER_CC1020      ///< CC1020 transceivers
+    TRANSCEIVER_NONE = 0,       ///< Invalid
+    TRANSCEIVER_CC1100 = 1,     ///< CC110X transceivers
+    TRANSCEIVER_CC1020 = 2,     ///< CC1020 transceivers
+    TRANSCEIVER_MC1322X = 4     ///< cm1322x transceiver
 } transceiver_type_t;
 
 /**
