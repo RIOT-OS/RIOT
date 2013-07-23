@@ -45,6 +45,8 @@ enum transceiver_msg_type_t {
     RCV_PKT_CC1020,        ///< packet was received by CC1020 transceiver
     RCV_PKT_CC1100,        ///< packet was received by CC1100 transceiver
     RCV_PKT_CC2420,        ///< packet was received by CC2420 transceiver
+    RCV_PKT_MC1322X,       ///< packet was received by mc1322x transceiver
+
 
     /* Message types for transceiver <-> upper layer communication */
     PKT_PENDING,    ///< packet pending in transceiver buffer
