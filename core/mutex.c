@@ -15,15 +15,17 @@
  */
 
 #include <stdio.h>
+#include <inttypes.h>
+
 #include "mutex.h"
 #include "atomic.h"
 #include "queue.h"
 #include "tcb.h"
 #include "kernel.h"
 #include "sched.h"
-#include <irq.h>
+#include "irq.h"
 
-#include <debug.h>
+#include "debug.h"
 
 int mutex_init(struct mutex_t *mutex)
 {
@@ -79,7 +81,7 @@ void mutex_wait(struct mutex_t *mutex)
     n.data = (unsigned int) active_thread;
     n.next = NULL;
 
-    DEBUG("%s: Adding node to mutex queue: prio: %u\n", active_thread->name, n.priority);
+    DEBUG("%s: Adding node to mutex queue: prio: %"PRIu32"\n", active_thread->name, n.priority);
 
     queue_priority_add(&(mutex->queue), &n);
 
