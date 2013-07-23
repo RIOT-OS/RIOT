@@ -7,6 +7,7 @@ ifneq (,$(findstring rtc,$(USEMODULE)))
 endif
 ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
 	DIRS += cc110x_ng
+	INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include
 endif
 
 all: $(BINDIR)$(MODULE).a
