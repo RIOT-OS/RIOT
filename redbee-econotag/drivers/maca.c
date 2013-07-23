@@ -827,7 +827,7 @@ const uint32_t AIMVAL[19] = {
 #define ADDR_POW2 (ADDR_POW1 + 12)
 #define ADDR_POW3 (ADDR_POW1 + 64)
 
-void set_power ( uint8_t power ) {
+void maca_set_power ( uint8_t power ) {
     safe_irq_disable ( INT_NUM_MACA );
 
     * ( ( uint32_t * ) ( ADDR_POW1 ) ) = PSMVAL[power];
@@ -865,7 +865,7 @@ const uint32_t VCODivF[16] = {
 #define ADDR_CHAN3 (ADDR_CHAN1+16)
 #define ADDR_CHAN4 (ADDR_CHAN1+48)
 
-void set_channel ( uint8_t chan ) {
+void maca_set_channel ( uint8_t chan ) {
     volatile uint32_t tmp;
     safe_irq_disable ( INT_NUM_MACA );
 
@@ -893,6 +893,23 @@ void set_channel ( uint8_t chan ) {
     if ( ITC->NIPENDbits.MACA ) {
         ITC->INTFRCbits.MACA = 1;
     }
+}
+
+uint16_t maca_set_address ( uint16_t addr ) {
+    safe_irq_disable ( INT_NUM_MACA );
+    
+    MACA->MAC16ADDR = addr;
+    
+    irq_restore();
+    
+    if ( ITC->NIPENDbits.MACA ) {
+        ITC->INTFRCbits.MACA = 1;
+    }
+    return MACA->MAC16ADDR;
+}
+
+uint16_t maca_get_address ( void ) {
+    return MACA->MAC16ADDR;
 }
 
 #define MACA_ROM_END 0x0013ffff

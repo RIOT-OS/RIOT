@@ -29,6 +29,8 @@ void maca_check ( void );
 /* functions to configure MACA */
 void maca_set_power ( uint8_t power );
 void maca_set_channel ( uint8_t channel );
+uint16_t maca_set_address ( uint16_t addr );
+uint16_t maca_get_address ( void );
 
 /* get Link Quality Indicator */
 //extern uint8_t (*get_lqi) ( void );
