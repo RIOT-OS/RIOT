@@ -14,6 +14,7 @@
 #include "uart.h"
 
 void uart1_isr ( void ) {
+    uint8_t i = 0;
     if ( UART1->USTATbits.RXRDY == 1 ) {
 #ifdef MODULE_UART0
         if ( uart0_handler_pid ) {

@@ -201,4 +201,5 @@ int fw_puts(char *astring,int length)
 int bl_uart_init(void) {
     uart_init( UART1, BAUTRATE_UART1 );
     uart_init( UART2, BAUTRATE_UART2 );
+    return 0;
 }
