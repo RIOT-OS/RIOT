@@ -48,6 +48,8 @@ volatile maca_packet_t *maca_tx_head;
 
 static volatile maca_packet_t maca_dummy_ack;
 
+uint8_t (*get_lqi)(void) = (void *) 0x0000e04d;
+
 #define MACA_NO_POST 0
 #define MACA_TX_POST 1
 #define MACA_RX_POST 2
@@ -480,7 +482,7 @@ void _maca_decode_status ( void ) {
 }
 
 void maca_isr ( void ) {
-    maca_entry++;
+    //maca_entry++;
 
     if ( MACA->STATUSbits.OVR ) {
         printf ( "maca overrun\n" );
@@ -550,7 +552,7 @@ void maca_isr ( void ) {
     // action complete interrupt
     if ( MACA->IRQbits.ACPL ) {
         if ( maca_last_post == MACA_TX_POST ) {
-            maca_tx_head->status == MACA->STATUSbits.COMPLETE_CODE;
+            maca_tx_head->status = MACA->STATUSbits.COMPLETE_CODE;
 
             if ( maca_tx_callback != 0 ) {
                 maca_tx_callback ( maca_tx_head );
@@ -569,7 +571,7 @@ void maca_isr ( void ) {
 
     // this should never happen ...
     if ( MACA->IRQ != 0 ) {
-        printf ( "MACA->IRQ is %x", MACA->IRQ );
+        printf ( "MACA->IRQ is %x", (unsigned int) MACA->IRQ );
     }
 
     if ( maca_tx_head != 0 ) {
@@ -602,7 +604,7 @@ void _maca_init_phy ( void ) {
 }
 
 #define MTOC_BASE 0x80009a00 //Modem Tracking Oscillator Controller
-void _flyback_init ( void ) {
+void _maca_flyback_init ( void ) {
     uint32_t val8, tmp;
 
     val8 = * ( volatile uint32_t * ) ( MTOC_BASE+8 );
@@ -920,7 +922,7 @@ uint32_t _exec_init_entry ( volatile uint32_t *entries, uint8_t *value_buffer ) 
     if ( entries[0] <= MACA_ROM_END ) {
         if ( entries[0] == 0 ) {
             /* do delay */
-            printf ( "init_entry: delay 0x%08x\n", entries[1] );
+            printf ( "init_entry: delay 0x%08x\n", (unsigned int) entries[1] );
 
             for ( i=0; i < entries[1]; i++ ) {
                 continue;
@@ -930,13 +932,16 @@ uint32_t _exec_init_entry ( volatile uint32_t *entries, uint8_t *value_buffer ) 
         }
         else if ( entries[0] == 1 ) {
             /* do bit set/clear */
-            printf ( "init_entry: bit set/clear 0x%08x 0x%08x 0x%08x\n", entries[1], entries[2], entries[3] );
+            printf ( "init_entry: bit set/clear 0x%08x 0x%08x 0x%08x\n", (unsigned int) entries[1],
+                                                                        (unsigned int) entries[2],
+                                                                        (unsigned int) entries[3] );
             * ( uint32_t * ) ( entries[2] ) = ( * ( uint32_t * ) ( entries[2] ) & entries[1] ) | ( entries[3] & entries[1] );
             return 4;
         }
         else if ( entries[0] >= 16 && entries[0] < 0xfff1 ) {
             /* store bytes in value_buffer */
-            printf ( "init_entry: store in value_buffer 0x%02x position %d\n", entries[1], ( entries[0]>>4 ) - 1 );
+                printf ( "init_entry: store in value_buffer 0x%02x position %d\n", (unsigned int) entries[1], 
+                                                                                   (unsigned int) ( entries[0]>>4 ) - 1 );
             value_buffer[ ( entries[0]>>4 )-1] = entries[1];
             return 2;
         }
@@ -946,14 +951,15 @@ uint32_t _exec_init_entry ( volatile uint32_t *entries, uint8_t *value_buffer ) 
         }
         else {
             /* invalid */
-            printf ( "init_entry: invalid code 0x%08x\n", entries[0] );
+            printf ( "init_entry: invalid code 0x%08x\n", (unsigned int) entries[0] );
             return 0;
         }
     }
     else {
         /* address not in ROM */
         /* store value in address command */
-        printf ( "init_entry: address value pair - *0x%08x = 0x%08x\n", entries[0], entries[1] );
+        printf ( "init_entry: address value pair - *0x%08x = 0x%08x\n", (unsigned int) entries[0], 
+                                                                        (unsigned int) entries[1] );
 
         if ( entries[0] != CRM->VREG_CNTL ) {
             * ( uint32_t * ) ( entries[0] ) = entries[1];
@@ -985,7 +991,7 @@ uint32_t _maca_init_from_flash ( uint32_t addr ) {
     printf ( "nvm_read returned: 0x%02x\n", err );
 
     for ( j = 0; j < 4; j++ ) {
-        printf ( "0x%08x\n", buffer[j] );
+        printf ( "0x%08x\n", (unsigned int) buffer[j] );
     }
 
     if ( buffer[0] == MACA_FLASH_INIT_MAGIC ) {

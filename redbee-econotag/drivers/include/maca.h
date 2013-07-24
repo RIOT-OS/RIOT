@@ -33,8 +33,8 @@ uint16_t maca_set_address ( uint16_t addr );
 uint16_t maca_get_address ( void );
 
 /* get Link Quality Indicator */
-//extern uint8_t (*get_lqi) ( void );
-uint8_t (*get_lqi)(void) = (void *) 0x0000e04d;
+extern uint8_t (*get_lqi) ( void );
+
 
 /* interface to configure demodulator */
 #define MACA_DEMOD_DCD 1 /* -96dBm, 22.2mA */
