@@ -42,10 +42,7 @@ msg_t msg_q[RADIO_RCV_BUF_SIZE];
 
 static uint8_t r_src_addr;
 uint8_t buf[PAYLOAD_SIZE];
-uint16_t packet_length;
 static uint8_t macdsn;
-
-mutex_t buf_mutex;
 
 static radio_packet_t p;
 static msg_t mesg;

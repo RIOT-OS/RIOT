@@ -50,7 +50,7 @@ uint8_t max_frag_initial = 0;
 uint8_t position;
 uint8_t max_frag;
 
-ipv6_hdr_t *ipv6_buf;
+static ipv6_hdr_t *ipv6_buf;
 
 /* length of compressed packet */
 uint16_t comp_len;

@@ -1,27 +1,17 @@
-/******************************************************************************
-Copyright 2008, Freie Universitaet Berlin (FUB). All rights reserved.
-
-These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
--------------------------------------------------------------------------------
-This file is part of RIOT.
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-RIOT is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see http://www.gnu.org/licenses/ .
-*******************************************************************************/
+/*
+ * syscalls.c - arm system calls
+ * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ * This source code is licensed under the GNU General Public License,
+ * Version 3.  See the file LICENSE for more details.
+ *
+ * This file is part of RIOT.
+ *
+ */
 
 /**
  * @file
- * @ingroup     lpc2387
+ * @ingroup     arm_common
  * @brief       LPC2387 NewLib system calls implementation
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
@@ -36,6 +26,8 @@ this program.  If not, see http://www.gnu.org/licenses/ .
 #include <sys/stat.h>
 #include <sys/unistd.h>
 #include <stdint.h>
+
+#include "arm_cpu.h"
 // core
 #include "kernel.h"
 #include "irq.h"
@@ -64,7 +56,6 @@ this program.  If not, see http://www.gnu.org/licenses/ .
  * @name Heaps (defined in linker script)
  * @{
  */
-#define NUM_HEAPS   3//2
 
 extern uintptr_t __heap1_start;     ///< start of heap memory space
 extern uintptr_t __heap1_max;       ///< maximum for end of heap memory space
@@ -72,26 +63,6 @@ extern uintptr_t __heap2_start;     ///< start of heap memory space
 extern uintptr_t __heap2_max;       ///< maximum for end of heap memory space
 extern uintptr_t __heap3_start;     ///< start of heap memory space
 extern uintptr_t __heap3_max;       ///< maximum for end of heap memory space
-
-
-/* current position in heap */
-static caddr_t heap[NUM_HEAPS] = {(caddr_t) &__heap1_start, (caddr_t) &__heap3_start, (caddr_t) &__heap2_start}; // add heap3 before heap2 cause Heap3 address is lower then addr of heap2
-/* maximum position in heap */
-static const caddr_t heap_max[NUM_HEAPS] = {(caddr_t) &__heap1_max, (caddr_t) &__heap3_max, (caddr_t) &__heap2_max};
-/* start position in heap */
-static const caddr_t heap_start[NUM_HEAPS] = {(caddr_t) &__heap1_start, (caddr_t) &__heap3_start, (caddr_t) &__heap2_start};
-/* current heap in use */
-volatile static uint8_t iUsedHeap = 0;
-
-/** @} */
-
-/*-----------------------------------------------------------------------------------*/
-void heap_stats(void)
-{
-    for (int i = 0; i < NUM_HEAPS; i++)
-        printf("# heap %i: %p -- %p -> %p (%li of %li free)\n", i, heap_start[i], heap[i], heap_max[i],
-               (uint32_t)heap_max[i] - (uint32_t)heap[i], (uint32_t)heap_max[i] - (uint32_t)heap_start[i]);
-}
 
 /*-----------------------------------------------------------------------------------*/
 void __assert_func(const char *file, int line, const char *func, const char *failedexpr)
@@ -108,46 +79,7 @@ void __assert(const char *file, int line, const char *failedexpr)
 {
     __assert_func(file, line, "?", failedexpr);
 }
-/*-----------------------------------------------------------------------------------*/
-caddr_t _sbrk_r(struct _reent *r, size_t incr)
-{
-    if (incr < 0) {
-        puts("[syscalls] Negative Values for _sbrk_r are not supported");
-        r->_errno = ENOMEM;
-        return NULL;
-    }
 
-    uint32_t cpsr = disableIRQ();
-
-    /* check all heaps for a chunk of the requested size */
-    for (; iUsedHeap < NUM_HEAPS; iUsedHeap++) {
-        caddr_t new_heap = heap[iUsedHeap] + incr;
-
-#ifdef MODULE_TRACELOG
-        trace_pointer(TRACELOG_EV_MEMORY, heap[iUsedHeap]);
-#endif
-
-        if (new_heap <= heap_max[iUsedHeap]) {
-            caddr_t prev_heap = heap[iUsedHeap];
-#ifdef MODULE_TRACELOG
-            trace_pointer(TRACELOG_EV_MEMORY, new_heap);
-#endif
-            heap[iUsedHeap] = new_heap;
-
-            r->_errno = 0;
-            restoreIRQ(cpsr);
-            return prev_heap;
-        }
-    }
-
-    restoreIRQ(cpsr);
-#ifdef MODULE_TRACELOG
-    trace_string(TRACELOG_EV_MEMORY, "heap!");                                  // heap full
-#endif
-
-    r->_errno = ENOMEM;
-    return NULL;
-}
 /*---------------------------------------------------------------------------*/
 int _isatty_r(struct _reent *r, int fd)
 {
@@ -163,6 +95,10 @@ int _isatty_r(struct _reent *r, int fd)
 /*---------------------------------------------------------------------------*/
 _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int whence)
 {
+    /* to get rid of gcc warnings */
+    (void) fd;
+    (void) pos;
+    (void) whence;
     _off_t result = -1;
     PRINTF("lseek [%i] pos %li whence %i\n", fd, pos, whence);
 
@@ -177,6 +113,9 @@ _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int whence)
 /*---------------------------------------------------------------------------*/
 int _open_r(struct _reent *r, const char *name, int mode)
 {
+    /* to get rid of gcc warnings */
+    (void) name;
+    (void) mode;
     int ret = -1;
     PRINTF("open '%s' mode %#x\n", name, mode);
 
@@ -191,6 +130,9 @@ int _open_r(struct _reent *r, const char *name, int mode)
 /*---------------------------------------------------------------------------*/
 int _stat_r(struct _reent *r, char *name, struct stat *st)
 {
+    /* to get rid of gcc warnings */
+    (void) name;
+    (void) st;
     int ret = -1;
     PRINTF("_stat_r '%s' \n", name);
     r->_errno = ENODEV; // no such device
@@ -264,6 +206,10 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 /*---------------------------------------------------------------------------*/
 int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 {
+    /* to get rid of gcc warnings */
+    (void) fd;
+    (void) buffer;
+    (void) count;
     int result = -1;
     r->_errno = EBADF;
 #ifdef MODULE_FAT
@@ -277,6 +223,7 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 /*---------------------------------------------------------------------------*/
 int _close_r(struct _reent *r, int fd)
 {
+    (void) fd;
     int result = -1;
     r->_errno = EBADF;
 #ifdef MODULE_FAT
@@ -290,6 +237,9 @@ int _close_r(struct _reent *r, int fd)
 /*---------------------------------------------------------------------------*/
 int _unlink_r(struct _reent *r, char *path)
 {
+    /* get rid of gcc warnings */
+    (void) path;
+
     int result = -1;
     r->_errno = ENODEV;
 #ifdef MODULE_FAT
