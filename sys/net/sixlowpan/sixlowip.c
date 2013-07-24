@@ -112,6 +112,20 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len,
 int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr)
 {
     switch(hdr->type) {
+        case (ICMP_ECHO_REQ): {
+            puts("INFO: packet type: icmp echo request");
+            /* processing echo request */
+            recv_echo_req();
+            break;
+        }
+
+        case (ICMP_ECHO_REPL): {
+            puts("INFO: packet type: icmp echo reply");
+            /* processing echo reply */
+            recv_echo_repl();
+            break;
+        }
+
         case (ICMP_RTR_SOL): {
             puts("INFO: packet type: icmp router solicitation");
             /* processing router solicitation */
