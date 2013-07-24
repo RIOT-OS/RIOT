@@ -18,15 +18,10 @@
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
 msg_t msg_q[RADIO_RCV_BUF_SIZE];
-uint8_t snd_buffer[RADIO_SND_BUF_SIZE][PAYLOAD_SIZE];
 
 static uint8_t r_src_addr;
 uint8_t buf[PAYLOAD_SIZE];
-uint16_t packet_length;
 static uint8_t macdsn;
-//static uint8_t macbsn;
-
-mutex_t buf_mutex;
 
 static radio_packet_t p;
 static msg_t mesg;

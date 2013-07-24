@@ -8,8 +8,6 @@
 #include <thread.h>
 #include <mutex.h>
 #include <hwtimer.h>
-#include <rtc.h>
-//#include <lpc2387-rtc.h>
 #include "msg.h"
 #include "sixlowmac.h"
 #include "sixlowpan.h"
@@ -30,7 +28,7 @@ uint8_t max_frag_initial = 0;
 uint8_t position;
 uint8_t max_frag;
 
-struct ipv6_hdr_t *ipv6_buf;
+static struct ipv6_hdr_t *ipv6_buf;
 
 /* length of compressed packet */
 uint16_t comp_len;
@@ -1396,9 +1394,6 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border){
     ipv6_addr_t tmp;
     /* init mac-layer and radio transceiver */
     sixlowmac_init(trans);
-
-    rtc_init();
-    rtc_enable();
 
     /* init interface addresses */
     memset(&iface,0,sizeof(iface_t));

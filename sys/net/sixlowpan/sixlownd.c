@@ -17,7 +17,6 @@
 /* extern variables */
 uint8_t opt_hdr_len = 0;
 uint8_t ipv6_ext_hdr_len = 0;
-uint16_t packet_length;
 
 /* counter */
 uint8_t abr_count = 0;
@@ -25,9 +24,6 @@ uint8_t nbr_count = 0;
 uint8_t def_rtr_count = 0;
 uint8_t rtr_sol_count = 0;
 uint8_t prefix_count = 0;
-
-/* global interface*/
-iface_t iface;
 
 /* datastructures */
 abr_cache_t abr_cache[ABR_CACHE_SIZE];
