@@ -10,7 +10,7 @@
 #include <transceiver.h>
 
 #include <cpu-conf.h>
-#include <board.h>
+//#include <board.h>
 
 #ifdef DBG_IGNORE
 #include <stdio.h>

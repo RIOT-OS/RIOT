@@ -9,7 +9,7 @@
 
 #include <irq.h>
 
-#include <board.h>
+//#include <board.h>
 
 uint8_t cc110x_send(cc110x_packet_t *packet) {
 	volatile uint32_t abort_count;

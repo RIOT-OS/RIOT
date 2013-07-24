@@ -160,7 +160,8 @@ HEAP_SIZE = 4096;
   .got            : { *(.got.plt) *(.got) }
   .data           :
   {
-    __data_start = . ;
+    /* changed from __data_start = . ; */
+    _data = . ;
     *(.data .data.* .gnu.linkonce.d.*)
     SORT(CONSTRUCTORS)
   }
@@ -212,15 +213,16 @@ HEAP_SIZE = 4096;
       pad the .data section.  */
    . = ALIGN(. != 0 ? 32 / 8 : 1);
   }
-  _bss_end__ = . ; __bss_end__ = . ;
+  /* changed from _bss_end__ = . ; __bss_end__ = . ; */
+  __bss_end = . ; __bss_end__ = . ;
   . = ALIGN(32 / 8);
 
    .heap : {
-                __heap_start__ = . ; PROVIDE(__HEAP_START = .);
+                __heap_start__ = . ; PROVIDE(__heap_start = .);
                 *(.heap);
                 . += HEAP_SIZE;
                 . = ALIGN (4);
-                __heap_end__ = . ;  PROVIDE(__HEAP_END = .);
+                __heap_end__ = . ;  PROVIDE(__heap_end = .);
    }
 
 

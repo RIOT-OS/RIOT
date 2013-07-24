@@ -14,6 +14,7 @@ endif
 ifeq ($(CPU),mc1322x)
   export USEMODULE += arm_common
   export UNDEF += $(BINDIR)syscalls.o
+  export UNDEF += $(BINDIR)mc1322x_syscalls.o
   export INCLUDES += -I$(RIOTBASE)/cpu/arm_common/include
 endif
 ifeq ($(CPU),native)

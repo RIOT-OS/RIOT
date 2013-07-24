@@ -9,7 +9,7 @@
 #include <mutex.h>
 #include <hwtimer.h>
 #include <rtc.h>
-#include <lpc2387-rtc.h>
+//#include <lpc2387-rtc.h>
 #include "msg.h"
 #include "sixlowmac.h"
 #include "sixlowpan.h"
