@@ -26,6 +26,12 @@
 #include "../sixlowpan/sixlowip.h"
 
 /*
+ * POSIX compatibility
+ */
+typedef uint8_t sa_family_t;
+typedef uint32_t  socklen_t;
+
+/*
  * Types
  */
 #define	SOCK_STREAM			1					/* stream socket */
@@ -196,21 +202,21 @@ typedef struct socket_in_t {
 extern socket_internal_t sockets[MAX_SOCKETS];
 
 int socket(int domain, int type, int protocol);
-int connect(int socket, sockaddr6_t *addr, uint32_t addrlen);
+int connect(int socket, sockaddr6_t *addr, socklen_t addrlen);
 socket_internal_t *getWaitingConnectionSocket(int socket,
                                               ipv6_hdr_t *ipv6_header,
                                               tcp_hdr_t *tcp_header);
 void close_socket(socket_internal_t *current_socket);
 int32_t recvfrom(int s, void *buf, uint32_t len, int flags, sockaddr6_t *from,
-                 uint32_t *fromlen);
+                 socklen_t *fromlen);
 int32_t sendto(int s, const void *msg, uint32_t len, int flags,
-               sockaddr6_t *to, uint32_t tolen);
+               sockaddr6_t *to, socklen_t tolen);
 int32_t send(int s, void *msg, uint32_t len, int flags);
 int recv(int s, void *buf, uint32_t len, int flags);
 int close(int s);
 int bind(int s, sockaddr6_t *name, int namelen);
 int listen(int s, int backlog);
-int accept(int s, sockaddr6_t *addr, uint32_t *addrlen);
+int accept(int s, sockaddr6_t *addr, socklen_t *addrlen);
 void socket_init(void);
 socket_internal_t *get_udp_socket(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header);
 socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
@@ -224,7 +230,7 @@ socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
                                          tcp_hdr_t *tcp_header);
 void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
                       tcp_hdr_t *tcp_header, socket_t *tcp_socket);
-void set_socket_address(sockaddr6_t *sockaddr, uint8_t sin6_family,
+void set_socket_address(sockaddr6_t *sockaddr, sa_family_t sin6_family,
                         uint16_t sin6_port, uint32_t sin6_flowinfo,
                         ipv6_addr_t *sin6_addr);
 void set_tcp_cb(tcp_cb_t *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd,
