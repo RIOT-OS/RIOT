@@ -31,7 +31,7 @@
 #define TRANSCEIVER_CC1100  (0x01)      ///< CC110X transceivers
 #define TRANSCEIVER_CC1020  (0x02)      ///< CC1020 transceivers
 #define TRANSCEIVER_CC2420  (0x04)      ///< CC2420 transceivers
-#define TRANSCEIVER_CC2420  (0x08)      ///< MC1322X transceivers
+#define TRANSCEIVER_MC1322X (0x08)      ///< MC1322X transceivers
 
 /**
  * @brief Data type for transceiver specification

@@ -364,8 +364,11 @@ static void receive_packet(uint16_t type, uint8_t pos)
 #elif MODULE_CC110X
             receive_cc1100_packet(trans_p);
 #endif
-        } else if (type == RCV_PKT_MC1322X) {
+        } 
+        else if (type == RCV_PKT_MC1322X) {
+#ifdef MODULE_MC1322X
             receive_mc1322x_packet(trans_p);
+#endif
         }
         else if (type == RCV_PKT_CC2420) {
 #ifdef MODULE_CC2420
@@ -494,9 +497,9 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
 #ifdef MODULE_CC110X_NG
     cc110x_packet_t cc110x_pkt;
 #endif
-//#ifdef MODULE_MC1322X
+#ifdef MODULE_MC1322X
     maca_packet_t* maca_pkt = maca_get_free_packet();
-//#endif
+#endif
 
 #ifdef MODULE_CC2420
     cc2420_packet_t cc2420_pkt;
