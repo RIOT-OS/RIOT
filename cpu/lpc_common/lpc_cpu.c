@@ -9,9 +9,12 @@
  *
  */
 
+#include "cpu.h"
+#include "irq.h"
+
 __attribute__((naked,noreturn)) void arm_reset(void)
 {
-    dINT();
+    disableIRQ();
     WDTC = 0x00FFF;
     WDMOD = 0x03;
     WDFEED= 0xAA;

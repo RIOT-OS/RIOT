@@ -10,6 +10,10 @@
  */
 
 #include <errno.h>
+#include <stdint.h>
+#include <sys/unistd.h>
+#include <stdio.h>
+#include "irq.h"
 
 /**
  * @name Heaps (defined in linker script)
