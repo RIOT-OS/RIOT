@@ -97,6 +97,16 @@ static struct para_prob_t *get_para_prob_buf(uint8_t ext_len)
     return ((struct para_prob_t *)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
 }
 
+static struct echo_req_t *get_echo_req_buf(uint8_t ext_len)
+{
+    return ((struct echo_req_t *)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+}
+
+static struct echo_repl_t *get_echo_repl_buf(uint8_t ext_len)
+{
+    return ((struct echo_repl_t *)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+}
+
 static struct rtr_adv_t *get_rtr_adv_buf(uint8_t ext_len)
 {
     return ((struct rtr_adv_t *)&(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
@@ -159,6 +169,82 @@ static opt_aro_t *get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len)
                                   opt_len]));
 }
 
+void init_echo_req(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data, size_t data_len)
+{
+    ipv6_buf = get_ipv6_buf();
+    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
+    struct echo_req_t *echo_buf = get_echo_req_buf(ipv6_ext_hdr_len);
+    char *echo_data_buf = ((char *)echo_buf)+sizeof (struct echo_req_t);
+    
+    packet_length = 0;
+
+    icmp_buf->type = ICMP_ECHO_REQ;
+    icmp_buf->code = 0;
+    ipv6_buf->version_trafficclass = IPV6_VER;
+    ipv6_buf->trafficclass_flowlabel = 0;
+    ipv6_buf->flowlabel = 0;
+    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
+    ipv6_buf->hoplimit = 0xff;
+    
+    memcpy(&ipv6_buf->destaddr, destaddr, sizeof (ipv6_addr_t));
+    ipv6_get_saddr(&ipv6_buf->srcaddr, &ipv6_buf->destaddr);
+    echo_buf->id = id;
+    echo_buf->seq = seq;
+    
+    memcpy(echo_data_buf, data, data_len);
+    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
+                    ECHO_REQ_LEN + data_len;
+
+    icmp_buf->checksum = 0;
+    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
+    
+#ifdef ENABLE_DEBUG
+    printf("INFO: send echo request to: ");
+    ipv6_print_addr(&ipv6_buf->destaddr);
+#endif
+    lowpan_init((ieee_802154_long_t *)&(ipv6_buf->destaddr.uint16[4]),
+                (uint8_t *)ipv6_buf);
+}
+
+void init_echo_repl(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data, size_t data_len)
+{
+    ipv6_buf = get_ipv6_buf();
+    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
+    struct echo_repl_t *echo_buf = get_echo_repl_buf(ipv6_ext_hdr_len);
+    char *echo_data_buf = ((char *)echo_buf)+sizeof (struct echo_repl_t);
+    
+    packet_length = 0;
+
+    icmp_buf->type = ICMP_ECHO_REPL;
+    icmp_buf->code = 0;
+    ipv6_buf->version_trafficclass = IPV6_VER;
+    ipv6_buf->trafficclass_flowlabel = 0;
+    ipv6_buf->flowlabel = 0;
+    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
+    ipv6_buf->hoplimit = 0xff;
+    
+    memcpy(&ipv6_buf->destaddr, destaddr, sizeof (ipv6_addr_t));
+    ipv6_get_saddr(&ipv6_buf->srcaddr, &ipv6_buf->destaddr);
+    echo_buf->id = id;
+    echo_buf->seq = seq;
+    
+    memcpy(echo_data_buf, data, data_len);
+    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
+                    ECHO_REPL_LEN + data_len;
+    
+    ipv6_buf->length = packet_length-IPV6_HDR_LEN;
+
+    icmp_buf->checksum = 0;
+    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
+    
+#ifdef ENABLE_DEBUG
+    printf("INFO: send echo request to: ");
+    ipv6_print_addr(&ipv6_buf->destaddr);
+#endif
+    lowpan_init((ieee_802154_long_t *)&(ipv6_buf->destaddr.uint16[4]),
+                (uint8_t *)ipv6_buf);
+}
+
 /* send router solicitation message - RFC4861 section 4.1 */
 void init_rtr_sol(uint8_t sllao)
 {
@@ -204,6 +290,50 @@ void init_rtr_sol(uint8_t sllao)
 #endif
     lowpan_init((ieee_802154_long_t *)&(ipv6_buf->destaddr.uint16[4]),
                 (uint8_t *)ipv6_buf);
+}
+
+void recv_echo_req(void)
+{
+    ipv6_buf = get_ipv6_buf();
+    struct echo_req_t *echo_buf = get_echo_req_buf(ipv6_ext_hdr_len);
+    char *echo_data_buf = ((char *)echo_buf)+sizeof (struct echo_repl_t);
+    size_t data_len = ipv6_buf->length - (IPV6_HDR_LEN + ICMPV6_HDR_LEN +
+                      ipv6_ext_hdr_len + ECHO_REQ_LEN);
+#ifdef ENABLE_DEBUG
+    printf("INFO: received echo request from: ");
+    ipv6_print_addr(&ipv6_buf->srcaddr);
+    printf("\n");
+    printf("id = 0x%04x, seq = %d\n", echo_buf->id, echo_buf->seq);
+    for (int i = 0; i < data_len; i++) {
+        printf("%02x ", echo_data_buf[i]);
+        if ((i+1) % 16 || i == data_len-1) {
+            printf("\n");
+        }
+    }
+#endif
+    init_echo_repl(&ipv6_buf->srcaddr, echo_buf->id, echo_buf->seq,
+            echo_data_buf, data_len);
+}
+
+void recv_echo_repl(void)
+{
+    ipv6_buf = get_ipv6_buf();
+    struct echo_repl_t *echo_buf = get_echo_repl_buf(ipv6_ext_hdr_len);
+    char *echo_data_buf = ((char *)echo_buf)+sizeof (struct echo_repl_t);
+    size_t data_len = ipv6_buf->length - (IPV6_HDR_LEN + ICMPV6_HDR_LEN +
+                      ipv6_ext_hdr_len + ECHO_REPL_LEN);
+#ifdef ENABLE_DEBUG
+    printf("INFO: received echo reply from: ");
+    ipv6_print_addr(&ipv6_buf->srcaddr);
+    printf("\n");
+    printf("id = 0x%04x, seq = %d\n", echo_buf->id, echo_buf->seq);
+    for (int i = 0; i < data_len; i++) {
+        printf("%02x ", echo_data_buf[i]);
+        if ((i+1) % 16 || i == data_len-1) {
+            printf("\n");
+        }
+    }
+#endif
 }
 
 void recv_rtr_sol(void)
