@@ -102,6 +102,11 @@ typedef struct lowpan_reas_buf_t {
 
 extern lowpan_reas_buf_t *head;
 
+typedef enum {
+    LOWPAN_IPHC_DISABLE = 0,
+    LOWPAN_IPHC_ENABLE = 1
+} lowpan_iphc_status_t;
+
 /**
  * @brief   Initializes 6lowpan
  *
@@ -121,6 +126,7 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border);
 void sixlowpan_adhoc_init(transceiver_type_t trans, ipv6_addr_t *prefix,
                           uint8_t r_addr);
 void lowpan_init(ieee_802154_long_t *addr, uint8_t *data);
+void lowpan_set_iphc_status(lowpan_iphc_status_t status);
 void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
                  ieee_802154_long_t *d_laddr);
 void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra, uint8_t *ptr);

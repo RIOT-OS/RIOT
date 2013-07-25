@@ -50,6 +50,7 @@ uint8_t max_frame = 0;
 uint8_t max_frag_initial = 0;
 uint8_t position;
 uint8_t max_frag;
+lowpan_iphc_status_t iphc_status = LOWPAN_IPHC_ENABLE;
 
 static ipv6_hdr_t *ipv6_buf;
 
@@ -98,10 +99,14 @@ void lowpan_init(ieee_802154_long_t *addr, uint8_t *data)
         /* send broadcast */
         mcast = 1;
     }
-
-    lowpan_iphc_encoding(&laddr, ipv6_buf, data);
-    data = &comp_buf[0];
-    packet_length = comp_len;
+    
+    if (iphc_status == LOWPAN_IPHC_ENABLE) {
+        lowpan_iphc_encoding(&laddr, ipv6_buf, data);
+        data = &comp_buf[0];
+        packet_length = comp_len;
+    } else {
+        lowpan_ipv6_set_dispatch(data);
+    }
 
     /* check if packet needs to be fragmented */
     if (packet_length + header_size > PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN) {
@@ -163,6 +168,11 @@ void lowpan_init(ieee_802154_long_t *addr, uint8_t *data)
     }
 
     tag++;
+}
+
+void lowpan_set_iphc_status(lowpan_iphc_status_t status)
+{
+    iphc_status = status;
 }
 
 void printLongLocalAddr(ieee_802154_long_t *saddr)
