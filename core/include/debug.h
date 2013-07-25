@@ -17,15 +17,13 @@
  * @}
  */
 
-#ifndef DEBUG_H_
-#define DEBUG_H_
 
 #include <stdio.h>
 
 #if ENABLE_DEBUG
 #define DEBUG(...) printf(__VA_ARGS__)
+#undef ENABLE_DEBUG
 #else
 #define DEBUG(...)
 #endif
 
-#endif /* DEGUG_H_ */
