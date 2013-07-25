@@ -99,7 +99,6 @@ void __assert(const char *file, int line, const char *failedexpr)
 {
     __assert_func(file, line, "?", failedexpr);
 }
-<<<<<<< HEAD
 /*-----------------------------------------------------------------------------------*/
 caddr_t _sbrk_r(struct _reent *r, size_t incr)
 {
@@ -140,9 +139,6 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
     r->_errno = ENOMEM;
     return NULL;
 }
-=======
-
->>>>>>> * split up syscalls in arm and lpc specific code
 /*---------------------------------------------------------------------------*/
 int _isatty_r(struct _reent *r, int fd)
 {

@@ -145,6 +145,9 @@ void transceiver_init(transceiver_type_t t)
     else if (t & TRANSCEIVER_MC1322X) {
         transceivers |= t;
     }
+    else if (t & TRANSCEIVER_MC1322X) {
+        transceivers |= t;
+    }
     else {
         puts("Invalid transceiver type");
     }
@@ -175,6 +178,9 @@ int transceiver_start(void)
         cc2420_init(transceiver_pid);
     }
 #endif
+    else if (transceivers & TRANSCEIVER_MC1322X) {
+        maca_init();
+    }
     else if (transceivers & TRANSCEIVER_MC1322X) {
         maca_init();
     }
@@ -227,8 +233,6 @@ void run(void)
             case RCV_PKT_CC1020:
             case RCV_PKT_CC1100:
             case RCV_PKT_MC1322X:
-                receive_packet(m.type, m.content.value);
-                break;
             case RCV_PKT_CC2420:
                 receive_packet(m.type, m.content.value);
                 break;
@@ -329,6 +333,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
             break;
         case RCV_PKT_CC2420:
             t = TRANSCEIVER_CC2420;
+            break;
         case RCV_PKT_MC1322X:
             t = TRANSCEIVER_MC1322X;
             break;
