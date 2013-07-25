@@ -40,7 +40,6 @@
 
 #include "kernel_internal.h"
 #include "sched.h"
-#include "debug.h"
 
 #include "cpu-conf.h"
 
