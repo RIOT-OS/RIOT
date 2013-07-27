@@ -42,6 +42,9 @@
 #define MULTIHOP_HOPLIMIT           64
 
 #define IP_PKT_RECV_BUF_SIZE        64
+
+#define SIXLOWIP_MAX_REGISTERED     (4)
+
 #define DEBUGLINE printf("%s:%d\n",__FILE__,__LINE__)
 
 /* extern variables */
@@ -90,6 +93,7 @@ extern double start;
 /* buffer */
 extern uint8_t buffer[BUFFER_SIZE];
 
+extern int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
 /* ipv6 extension header length */
 

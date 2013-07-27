@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #include "vtimer.h"
 #include "mutex.h"
@@ -45,6 +46,9 @@ uint8_t iface_addr_list_count = 0;
 int udp_packet_handler_pid = 0;
 int tcp_packet_handler_pid = 0;
 int rpl_process_pid = 0;
+
+/* registered upper layer threads */
+int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
 ipv6_hdr_t *get_ipv6_buf_send(void)
 {
@@ -109,6 +113,23 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len,
 
     lowpan_init((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
                 (uint8_t *)ipv6_buf);
+}
+
+/* Register an upper layer thread */
+uint8_t sixlowip_register(int pid)
+{
+    uint8_t i;
+
+    for (i = 0; ((sixlowip_reg[i] != pid) && (i < SIXLOWIP_MAX_REGISTERED) && 
+                 (sixlowip_reg[i] != 0)); i++);
+
+    if (i >= SIXLOWIP_MAX_REGISTERED) {
+        return ENOMEM;
+    }
+    else {
+        sixlowip_reg[i] = pid;
+        return 1;
+    }
 }
 
 int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr)
@@ -183,6 +204,8 @@ void ipv6_process(void)
     msg_t m_recv_lowpan, m_send_lowpan;
     msg_t m_recv, m_send;
     ipv6_addr_t myaddr;
+    uint8_t i;
+
     ipv6_init_address(&myaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00,
                       get_radio_address());
 
@@ -202,6 +225,13 @@ void ipv6_process(void)
                         (uint8_t *)get_ipv6_buf_send());
         }
         else {
+            for (i = 0; i < SIXLOWIP_MAX_REGISTERED; i++) {
+                if (sixlowip_reg[i]) {
+                    msg_t m_send;
+                    m_send.content.ptr = (char *) &ipv6_buf;
+                    msg_send(&m_send, sixlowip_reg[i], 1);
+                }
+            }
             switch (*nextheader) {
                 case (PROTO_NUM_ICMPV6): {
                     /* checksum test*/

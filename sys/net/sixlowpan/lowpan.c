@@ -1518,6 +1518,8 @@ void init_reas_bufs(lowpan_reas_buf_t *buf)
 void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border)
 {
     ipv6_addr_t tmp;
+    short i;
+
     /* init mac-layer and radio transceiver */
     sixlowmac_init(trans);
 
@@ -1574,6 +1576,11 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border)
     transfer_pid = thread_create(lowpan_transfer_buf, LOWPAN_TRANSFER_BUF_STACKSIZE,
                                  PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                  lowpan_transfer, "lowpan_transfer");
+
+    for (i = 0; i < SIXLOWIP_MAX_REGISTERED; i++) {
+        sixlowip_reg[i] = 0;
+    }
+
 }
 
 void sixlowpan_adhoc_init(transceiver_type_t trans, ipv6_addr_t *prefix,
