@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <errno.h>
 
 #include "vtimer.h"
 #include "timex.h"
@@ -75,6 +76,9 @@ ipv6_addr_t lladdr;
 ieee_802154_long_t laddr;
 mutex_t buf_mutex;
 mutex_t lowpan_context_mutex;
+
+/* registered upper layer threads */
+int sixlowpan_reg[SIXLOWPAN_MAX_REGISTERED];
 
 char ip_process_buf[IP_PROCESS_STACKSIZE];
 char nc_buf[NC_STACKSIZE];
@@ -625,6 +629,23 @@ void add_fifo_packet(lowpan_reas_buf_t *current_packet)
     current_packet->next = NULL;
 }
 
+/* Register an upper layer thread */
+uint8_t sixlowpan_register(int pid)
+{
+    uint8_t i;
+
+    for (i = 0; ((sixlowpan_reg[i] != pid) && (i < SIXLOWPAN_MAX_REGISTERED) && 
+                 (sixlowpan_reg[i] != 0)); i++);
+
+    if (i >= SIXLOWPAN_MAX_REGISTERED) {
+        return ENOMEM;
+    }
+    else {
+        sixlowpan_reg[i] = pid;
+        return 1;
+    }
+}
+
 void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
                  ieee_802154_long_t *d_laddr)
 {
@@ -633,9 +654,20 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
     uint8_t datagram_offset = 0;
     uint16_t datagram_size = 0;
     uint16_t datagram_tag = 0;
+    short i;
+    lowpan_datagram_t current_datagram;
 
     check_timeout();
 
+    for (i = 0; i < SIXLOWPAN_MAX_REGISTERED; i++) {
+        if (sixlowpan_reg[i]) {
+            msg_t m_send;
+            current_datagram.length = length;
+            current_datagram.data = data;
+            m_send.content.ptr = (char *) &current_datagram;
+            msg_send(&m_send, sixlowpan_reg[i], 1);
+        }
+    }
     /* Fragmented Packet */
     if (((data[0] & 0xf8) == (0xc0)) || ((data[0] & 0xf8) == (0xe0))) {
         /* get 11-bit from first 2 byte*/

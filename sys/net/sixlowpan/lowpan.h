@@ -30,6 +30,8 @@
 #define FRAG_PART_ONE_HDR_LEN  	(4)
 #define FRAG_PART_N_HDR_LEN    	(5)
 
+#define SIXLOWPAN_MAX_REGISTERED     (4)
+
 #define LOWPAN_IPHC_DISPATCH   	(0x60)
 #define LOWPAN_IPHC_FL_C       	(0x10)
 #define LOWPAN_IPHC_TC_C       	(0x08)
@@ -99,6 +101,11 @@ typedef struct lowpan_reas_buf_t {
     /* Pointer to next reassembly buffer (if any) */
     struct lowpan_reas_buf_t *next;
 } lowpan_reas_buf_t;
+
+typedef struct {
+    uint8_t length;
+    uint8_t *data;
+} lowpan_datagram_t;
 
 extern lowpan_reas_buf_t *head;
 
