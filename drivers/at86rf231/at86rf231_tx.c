@@ -36,20 +36,20 @@ int16_t at86rf231_send(at86rf231_packet_t *packet)
   sequenz_nr += 1;
 
   // calculate size of the frame (payload + FCS) */
-  packet->length = get_802154_hdr_len(&packet->frame) + packet->frame.payload_len + 2;
+  packet->length = get_802154_hdr_len(&packet->frame) + packet->frame.payload_len + 1;
 
   if(packet->length > AT86RF231_MAX_PKT_LENGTH) {
       return -1;
   }
 
   // FCS is added in hardware
-  uint8_t pkt[packet->length-2];
+  uint8_t pkt[packet->length];
 
   /* generate pkt */
   at86rf231_gen_pkt(pkt, packet);
 
   // transmit packet
-  at86rf231_xmit(pkt, packet->length-2);
+  at86rf231_xmit(pkt, packet->length);
 }
 
 static void at86rf231_xmit(uint8_t *data, uint8_t length)
@@ -92,12 +92,13 @@ static void at86rf231_gen_pkt(uint8_t *buf, at86rf231_packet_t *packet)
     index = init_802154_frame(&packet->frame, &buf[1]);
 
     // add length for at86rf231
-    buf[0] = packet->length;
+    buf[0] = packet->length+1;
     index++;
+
     offset = index;
 
-    while(index < packet->length-2) {
-        buf[index] = packet->frame.payload[index-offset];
+    while(index < packet->length) {
+        buf[index] = packet->frame.payload[index-offset+1];
         index += 1;
     }
 
