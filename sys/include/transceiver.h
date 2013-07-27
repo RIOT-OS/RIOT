@@ -17,6 +17,11 @@
 #else
 #define PAYLOAD_SIZE  (58)
 #endif
+
+#ifdef MODULE_AT86RF231
+#define PAYLOAD_SIZE  (118)
+#endif
+
 /* The maximum of threads to register */
 #define TRANSCEIVER_MAX_REGISTERED  (4)
 
