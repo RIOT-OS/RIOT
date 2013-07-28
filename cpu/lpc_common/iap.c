@@ -7,6 +7,7 @@
 #include <irq.h>
 #include <flashrom.h>
 #include <iap.h>
+/* TODO: replace by a lpc generic header */
 #include <lpc2387.h>
 
 #define ENABLE_DEBUG    (0)

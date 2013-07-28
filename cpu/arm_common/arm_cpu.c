@@ -41,6 +41,7 @@ void thread_yield(void)
 char *thread_stack_init(void *task_func, void *stack_start, int stack_size)
 {
     unsigned int *stk;
+    int i;
     stk = (unsigned int *)(stack_start + stack_size);
     stk--;
 
@@ -55,7 +56,7 @@ char *thread_stack_init(void *task_func, void *stack_start, int stack_size)
     *stk = (unsigned int)(stack_start + stack_size) - 4;
 
     /* build base stack */
-    for (int i = REGISTER_CNT; i >= 0 ; i--) {
+    for (i = REGISTER_CNT; i >= 0 ; i--) {
         stk--;
         *stk = i;
     }
@@ -87,15 +88,4 @@ void thread_print_stack(void)
     }
 
     printf("STACK (%u)= %X \n", i, *s);
-}
-
-__attribute__((naked, noreturn)) void arm_reset(void)
-{
-    dINT();
-    WDTC   = 0x00FFF;
-    WDMOD  = 0x03;
-    WDFEED = 0xAA;
-    WDFEED = 0x55;
-
-    while (1);
 }

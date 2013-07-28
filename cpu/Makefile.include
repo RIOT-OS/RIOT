@@ -1,0 +1,22 @@
+### Minimal setup
+ifeq ($(CPU),lpc2387)
+  export USEMODULE += arm_common lpc_common
+  export UNDEF += $(BINDIR)syscalls.o $(BINDIR)lpc_syscalls.o
+  export INCLUDES += -I$(RIOTCPU)/arm_common/include
+  export INCLUDES += -I$(RIOTCPU)/lpc_common/include
+endif
+ifeq ($(CPU),lpc214x)
+  export USEMODULE += arm_common lpc_common
+  export UNDEF += $(BINDIR)syscalls.o $(BINDIR)lpc_syscalls.o
+  export INCLUDES += -I$(RIOTCPU)/arm_common/include
+  export INCLUDES += -I$(RIOTCPU)/lpc_common/include
+endif
+ifeq ($(CPU),mc1322x)
+  export USEMODULE += arm_common
+  export UNDEF += $(BINDIR)syscalls.o
+  export UNDEF += $(BINDIR)mc1322x_syscalls.o
+  export INCLUDES += -I$(RIOTBASE)/cpu/arm_common/include
+endif
+ifeq ($(CPU),native)
+  export INCLUDES += -I$(RIOTBASE)/cpu/native/include
+endif
