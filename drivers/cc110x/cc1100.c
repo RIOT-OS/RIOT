@@ -41,7 +41,7 @@
 #include "cc1100-defaultSettings.h"
 
 #include "hwtimer.h"
-#include "core/include/bitarithm.h"
+#include "bitarithm.h"
 
 /* TODO: cc1100 port timer */
 #ifdef FEUERWARE_CPU_LPC2387

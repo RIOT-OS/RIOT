@@ -44,7 +44,7 @@ and the mailinglist (subscription via web site)
 #include <cc1100.h>
 #include <cc1100_phy.h>
 #include <cc1100-csmaca-mac.h>
-#include <protocol-multiplex.h>
+#include "protocol-multiplex/protocol-multiplex.h"
 
 #include "hwtimer.h"
 #include <vtimer.h>

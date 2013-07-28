@@ -53,7 +53,7 @@ and the mailinglist (subscription via web site)
 #include "cc1100_phy.h"
 #include "cc1100-defaultSettings.h"
 
-#include "protocol-multiplex.h"
+#include "protocol-multiplex/protocol-multiplex.h"
 
 #include "kernel.h"
 #include "thread.h"
@@ -846,7 +846,7 @@ void cc1100_phy_rx_handler(void)
         /* Valid packet. After a wake-up, the radio should be in IDLE.
          * So put CC1100 to RX for WOR_TIMEOUT (have to manually put
          * the radio back to sleep/WOR).*/
-        cc1100_spi_write_reg(CC1100_MCSM0, 0x08);	 * Turn off FS-Autocal
+        cc1100_spi_write_reg(CC1100_MCSM0, 0x08);	/* Turn off FS-Autocal */
         cc1100_spi_write_reg(CC1100_MCSM2, 0x07);	/* Configure RX_TIME (until end of packet) */
 
         if (radio_mode == CC1100_MODE_CONSTANT_RX) {

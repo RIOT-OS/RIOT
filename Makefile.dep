@@ -13,6 +13,12 @@ ifneq (,$(findstring uart0,$(USEMODULE)))
 	endif
 endif
 
+ifneq (,$(findstring cc110x,$(USEMODULE)))
+	ifeq (,$(findstring protocol-multiplex,$(USEMODULE)))
+		USEMODULE += protocol-multiplex
+	endif
+endif
+
 ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
 	ifeq (,$(findstring transceiver,$(USEMODULE)))
 		USEMODULE += transceiver
