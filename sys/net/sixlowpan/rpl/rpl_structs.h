@@ -16,7 +16,7 @@
  */
 
 #include <string.h>
-#include "sys/net/sixlowpan/sixlowip.h"
+#include "sixlowpan/sixlowip.h"
 
 #ifndef RPL_STRUCTS_H_INCLUDED
 #define RPL_STRUCTS_H_INCLUDED

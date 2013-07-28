@@ -15,8 +15,8 @@
 #include <thread.h>
 #include <transceiver.h>
 
-#include "sys/net/sixlowpan/sixlowmac.h"
-#include "sys/net/sixlowpan/ieee802154_frame.h"
+#include "sixlowpan/sixlowmac.h"
+#include "ieee802154/ieee802154_frame.h"
 
 //prototytpes
 static uint8_t etx_count_packet_tx(etx_neighbor_t * candidate);
