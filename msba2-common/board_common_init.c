@@ -82,7 +82,8 @@ void init_clks1(void)
     pllfeed();
 
     SCS |= 0x20;                        // Enable main OSC
-    while( !(SCS & 0x40) );             // Wait until main OSC is usable
+
+    while (!(SCS & 0x40));              // Wait until main OSC is usable
 
     /* select main OSC, 16MHz, as the PLL clock source */
     CLKSRCSEL = 0x0001;
@@ -103,9 +104,10 @@ void init_clks1(void)
 #endif
 }
 
-void init_clks2(void){
+void init_clks2(void)
+{
     // Wait for the PLL to lock to set frequency
-    while(!(PLLSTAT & BIT26));
+    while (!(PLLSTAT & BIT26));
 
     // Connect the PLL as the clock source
     PLLCON = 0x0003;

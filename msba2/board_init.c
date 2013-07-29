@@ -1,19 +1,22 @@
 #include <board.h>
 #include <cpu.h>
 
-void loop_delay(void) {
+void loop_delay(void)
+{
     volatile uint16_t i, j;
+
     for (i = 1; i < 30; i++) {
         for (j = 1; j != 0; j++) {
-            asm volatile (" nop ");
+            asm volatile(" nop ");
         }
     }
 }
 
-void bl_blink(void) {
+void bl_blink(void)
+{
     LED_RED_ON;
     LED_GREEN_ON;
-    
+
     loop_delay();
 
     LED_RED_OFF;
@@ -33,7 +36,7 @@ void bl_init_ports(void)
     FIO3DIR |= LED_GREEN_PIN;
     LED_RED_OFF;
     LED_GREEN_OFF;
-    
+
     /* short blinking of both of the LEDs on startup */
     bl_blink();
 }

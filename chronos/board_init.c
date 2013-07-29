@@ -3,7 +3,8 @@
 #include <cpu.h>
 #include <irq.h>
 
-void cc430_cpu_init(void) {
+void cc430_cpu_init(void)
+{
     volatile uint16_t i;
     volatile unsigned char *ptr;
 
@@ -11,7 +12,7 @@ void cc430_cpu_init(void) {
     WDTCTL = WDTPW + WDTHOLD;
 
     // ---------------------------------------------------------------------
-    // Enable 32kHz ACLK    
+    // Enable 32kHz ACLK
     P5SEL |= 0x03;                            // Select XIN, XOUT on P5.0 and P5.1
     UCSCTL6 &= ~XT1OFF;                       // XT1 On, Highest drive strength
     UCSCTL6 |= XCAP_3;                        // Internal load cap
@@ -31,15 +32,15 @@ void cc430_cpu_init(void) {
     // changed is n x 32 x 32 x f_MCLK / f_FLL_reference. See UCS chapter in 5xx
     // UG for optimization.
     // 32 x 32 x 8 MHz / 32,768 Hz = 250000 = MCLK cycles for DCO to settle
-	for (i = 0xFF; i > 0; i--); // Time for flag to set
+    for (i = 0xFF; i > 0; i--); // Time for flag to set
 
-    // Loop until XT1 & DCO stabilizes, use do-while to insure that 
+    // Loop until XT1 & DCO stabilizes, use do-while to insure that
     // body is executed at least once
-    do
-    {
+    do {
         UCSCTL7 &= ~(XT2OFFG + XT1LFOFFG + XT1HFOFFG + DCOFFG);
         SFRIFG1 &= ~OFIFG;                      // Clear fault flags
-    } while ((SFRIFG1 & OFIFG));
+    }
+    while ((SFRIFG1 & OFIFG));
 
     // Disable all interrupts
     __disable_interrupt();
@@ -50,25 +51,26 @@ void cc430_cpu_init(void) {
 
     // P2.7 = TA0CCR1A or TA1CCR0A output (buzzer output)
     ptr  = &P2MAP0;
-    *(ptr+7) = PM_TA1CCR0A;
+    *(ptr + 7) = PM_TA1CCR0A;
     P2OUT &= ~BIT7;
     P2DIR |= BIT7;
 
     // P1.5 = SPI MISO input
     ptr  = &P1MAP0;
-    *(ptr+5) = PM_UCA0SOMI;
+    *(ptr + 5) = PM_UCA0SOMI;
     // P1.6 = SPI MOSI output
-    *(ptr+6) = PM_UCA0SIMO;
+    *(ptr + 6) = PM_UCA0SIMO;
     // P1.7 = SPI CLK output
-    *(ptr+7) = PM_UCA0CLK;
+    *(ptr + 7) = PM_UCA0CLK;
 
     // Disable write-access to port mapping registers:
     PMAPPWD = 0;
     // Re-enable all interrupts
     enableIRQ();
- 
+
 }
 
-void board_init(void) {
+void board_init(void)
+{
     cc430_cpu_init();
 }

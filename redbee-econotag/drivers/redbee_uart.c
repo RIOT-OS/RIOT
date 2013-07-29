@@ -16,26 +16,27 @@
 #define MOD_ 9999
 #define CLK_ 24000000
 #define DIV_ 16 /* uart->CON.XTIM = 0 is 16x oversample (datasheet is incorrect) */
-#define BAUTRATE_UART1 115200 
+#define BAUTRATE_UART1 115200
 #define BAUTRATE_UART2 115200
 
-void uart_set_baudrate ( volatile struct UART_struct* uart, uint32_t baudrate ) {
+void uart_set_baudrate(volatile struct UART_struct *uart, uint32_t baudrate)
+{
     uint64_t inc = 0;
-    
+
     /* calculate inc following equation 13-1 from datasheet */
     /* multiply by another 10 to get a fixed point*/
     inc = ((uint64_t) baudrate * DIV_ * MOD_ * 10 / CLK_) - 10;
     /* add 5 and div by 10 to get a rounding */
     inc = (inc + 5) / 10;
-    
+
     /* disable UARTx to set baudrate */
     uart->CONbits.TXE = 0;
     uart->CONbits.RXE = 0;
-    
+
     /* set baudrate */
     uart->BRbits.INC = inc;
     uart->BRbits.MOD = MOD_;
-    
+
     /* reenable UARTx again */
     /* uart->CON.XTIM = 0 is 16x oversample (datasheet is incorrect) */
     uart->CONbits.XTIM = 0;
@@ -43,7 +44,8 @@ void uart_set_baudrate ( volatile struct UART_struct* uart, uint32_t baudrate ) 
     uart->CONbits.RXE = 1;
 }
 
-void uart_flow_ctl ( volatile struct UART_struct* uart, uint8_t on ) {
+void uart_flow_ctl(volatile struct UART_struct *uart, uint8_t on)
+{
     if (on) {
         /* enable flow control */
         if (uart == UART1) {
@@ -63,12 +65,14 @@ void uart_flow_ctl ( volatile struct UART_struct* uart, uint8_t on ) {
             GPIO->FUNC_SEL.U2CTS = 1;
             GPIO->FUNC_SEL.U2RTS = 1;
         }
+
         /* enable flow control */
         uart->CONbits.FCE = 1;
     }
     else {
         /* disable flow control */
         uart->CONbits.FCE = 0;
+
         if (uart == UART1) {
             /* CTS and RTS directions */
             GPIO->PAD_DIR_RESET.U1CTS = 1;
@@ -89,24 +93,25 @@ void uart_flow_ctl ( volatile struct UART_struct* uart, uint8_t on ) {
 }
 
 // TODO: clean from u*_(rx|tx)_(head|tail)
-void uart_init ( volatile struct UART_struct* uart, uint32_t baudrate ) {
+void uart_init(volatile struct UART_struct *uart, uint32_t baudrate)
+{
     /* enable the uart so we can set the gpio mode */
     /* has to be enabled before setting the function with GPIO->FUNC_SEL */
     uart->CONbits.TXE = 1;
     uart->CONbits.RXE = 1;
-    
+
     /* interrupt when this or more bytes are free in the tx buffer */
     uart->TXCON = 16;
-    
+
     if (uart == UART1) {
         /* TX and RX direction */
         GPIO->PAD_DIR_SET.U1TX = 1;
         GPIO->PAD_DIR_RESET.U1RX = 1;
-        
+
         /* set function selection to UART */
         GPIO->FUNC_SEL.U1TX = 1;
         GPIO->FUNC_SEL.U1RX = 1;
-        
+
         UART1->CONbits.TXE = 1;                         /*< enable transmit */
         UART1->CONbits.RXE = 1;                         /*< enable receive */
 #if UART1_RX_BUFFERSIZE > 32
@@ -122,10 +127,10 @@ void uart_init ( volatile struct UART_struct* uart, uint32_t baudrate ) {
 #else
         UART1->CONbits.MRXR = 1;                        /*< disable rx interrupt */
 #endif
-        
+
         //u1_tx_head = 0;
         //u1_tx_tail = 0;
-        
+
         //enable_irq(UART1);
         ITC->INTENABLEbits.UART1 = 1;
     }
@@ -134,11 +139,11 @@ void uart_init ( volatile struct UART_struct* uart, uint32_t baudrate ) {
         /* TX and RX direction */
         GPIO->PAD_DIR_SET.U2TX = 1;
         GPIO->PAD_DIR_RESET.U2RX = 1;
-        
+
         /* set function selection to UART */
         GPIO->FUNC_SEL.U2TX = 1;
         GPIO->FUNC_SEL.U2RX = 1;
-        
+
         UART2->CONbits.TXE = 1;                         /*< enable transmit */
         UART2->CONbits.RXE = 1;                         /*< enable receive */
 #if UART2_RX_BUFFERSIZE > 32
@@ -154,23 +159,25 @@ void uart_init ( volatile struct UART_struct* uart, uint32_t baudrate ) {
 #else
         UART2->CONbits.MRXR = 1;                        /*< disable rx interrupt */
 #endif
-        
-       // u2_tx_head = 0;
+
+        // u2_tx_head = 0;
         //u2_tx_tail = 0;
-        
+
         //enable_irq(UART2);
         ITC->INTENABLEbits.UART2 = 1;
     }
-    
-    uart_set_baudrate( uart, baudrate );
+
+    uart_set_baudrate(uart, baudrate);
 }
 
-static inline uint32_t uart0_puts ( uint8_t *astring, uint32_t length ) {
+static inline uint32_t uart0_puts(uint8_t *astring, uint32_t length)
+{
     uint32_t i = 0;
-    for (; i<length; i++) {
-        uart1_putc( astring[i] );
+
+    for (; i < length; i++) {
+        uart1_putc(astring[i]);
     }
-    
+
     return i;
 }
 
@@ -178,7 +185,7 @@ void stdio_flush(void)
 {
     ITC->INTENABLEbits.UART1 = 0;
     ITC->INTENABLEbits.UART2 = 0;
-    
+
     ITC->INTENABLEbits.UART1 = 1;
     ITC->INTENABLEbits.UART2 = 1;
     /** taken from msba2-uart0.c
@@ -193,12 +200,13 @@ void stdio_flush(void)
 }
 
 
-int fw_puts(char *astring,int length)
+int fw_puts(char *astring, int length)
 {
-    return uart0_puts ( (uint8_t*) astring, (uint32_t) length );
+    return uart0_puts((uint8_t *) astring, (uint32_t) length);
 }
 
-int bl_uart_init(void) {
-    uart_init( UART1, BAUTRATE_UART1 );
-    uart_init( UART2, BAUTRATE_UART2 );
+int bl_uart_init(void)
+{
+    uart_init(UART1, BAUTRATE_UART1);
+    uart_init(UART2, BAUTRATE_UART2);
 }

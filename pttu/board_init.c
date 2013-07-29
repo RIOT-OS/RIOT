@@ -47,117 +47,117 @@ and the mailinglist (subscription via web site)
 
 void bl_init_ports(void)
 {
-	SCS |= BIT0;											// Set IO Ports to fast switching mode
+    SCS |= BIT0;											// Set IO Ports to fast switching mode
 
-	/* UART0 */
-	PINSEL0 |= BIT4 + BIT6;									// RxD0 and TxD0
-	PINSEL0 &= ~(BIT5 + BIT7);
+    /* UART0 */
+    PINSEL0 |= BIT4 + BIT6;									// RxD0 and TxD0
+    PINSEL0 &= ~(BIT5 + BIT7);
 
-	/*Turn Board on*/
-	PINMODE0 |= BIT1;
-	FIO0DIR |= BIT27;
-	FIO0CLR = BIT27;
+    /*Turn Board on*/
+    PINMODE0 |= BIT1;
+    FIO0DIR |= BIT27;
+    FIO0CLR = BIT27;
 
-	/* 5V*/
-	FIO1DIR |= BIT28; // Synch
-	FIO1SET = BIT28;  // No Powersave
+    /* 5V*/
+    FIO1DIR |= BIT28; // Synch
+    FIO1SET = BIT28;  // No Powersave
 
-	FIO1DIR |= BIT27; // 5V off
-	FIO1CLR = BIT27;
+    FIO1DIR |= BIT27; // 5V off
+    FIO1CLR = BIT27;
 
-	/* Disable Resistors on Buttons */
-	PINMODE4 |= BIT9 + BIT11;
+    /* Disable Resistors on Buttons */
+    PINMODE4 |= BIT9 + BIT11;
 
-	/* Disable Resistors on LED - and Ports to output*/
-	PINMODE7 |= BIT19 + BIT21;
-	PINMODE2 |= BIT1;
-	FIO1DIR |= BIT0;
-	FIO3DIR |= BIT25 + BIT26;
-	FIO1SET = BIT0;
-	FIO3SET = BIT25 + BIT26;
+    /* Disable Resistors on LED - and Ports to output*/
+    PINMODE7 |= BIT19 + BIT21;
+    PINMODE2 |= BIT1;
+    FIO1DIR |= BIT0;
+    FIO3DIR |= BIT25 + BIT26;
+    FIO1SET = BIT0;
+    FIO3SET = BIT25 + BIT26;
 
-	// Config and Disable PA
-	FIO1DIR |= BIT25 + BIT26 + BIT22;
-	FIO1SET = BIT26;
-	FIO1CLR = BIT25;
-	FIO1CLR = BIT22; // PA /Shutdown
-	FIO0DIR |= BIT26; // **  // Important: First put this Port as DA 2.0V and then turn on PA!!
-	FIO0SET = BIT26; // **
+    // Config and Disable PA
+    FIO1DIR |= BIT25 + BIT26 + BIT22;
+    FIO1SET = BIT26;
+    FIO1CLR = BIT25;
+    FIO1CLR = BIT22; // PA /Shutdown
+    FIO0DIR |= BIT26; // **  // Important: First put this Port as DA 2.0V and then turn on PA!!
+    FIO0SET = BIT26; // **
 
-	// Configure GPS
-	PINMODE3 |= BIT3 + BIT7; // No Pullup on 1.17 & 1.19
-	PINMODE9 |= BIT27 + BIT25; // No Pullup for Uart
-	FIO1DIR |= BIT17;
-	FIO1CLR = BIT17; // Turn off GPS
-	FIO1DIR |= BIT19;
-	FIO1CLR = BIT19; // Hold in Reset
-	PINSEL9 |= BIT24 + BIT25 + BIT26 + BIT27; //4.28 & 4.29 as Uart3
+    // Configure GPS
+    PINMODE3 |= BIT3 + BIT7; // No Pullup on 1.17 & 1.19
+    PINMODE9 |= BIT27 + BIT25; // No Pullup for Uart
+    FIO1DIR |= BIT17;
+    FIO1CLR = BIT17; // Turn off GPS
+    FIO1DIR |= BIT19;
+    FIO1CLR = BIT19; // Hold in Reset
+    PINSEL9 |= BIT24 + BIT25 + BIT26 + BIT27; //4.28 & 4.29 as Uart3
 
-	// Nanotron
-	FIO2DIR &= ~BIT8;	// nanotron uC IRQ as input
-	FIO1DIR |= BIT15;	// nanotron power on reset
-	FIO1DIR &= ~BIT14;	// nanotron uC RESET as input
-	FIO1DIR &= ~BIT10;	// nanotron uC Vcc as input
-	FIO1DIR |= BIT9;	// nanotron ENABLE as output
-	FIO1DIR &= ~BIT4;	// nanotron Rx/Tx as input
+    // Nanotron
+    FIO2DIR &= ~BIT8;	// nanotron uC IRQ as input
+    FIO1DIR |= BIT15;	// nanotron power on reset
+    FIO1DIR &= ~BIT14;	// nanotron uC RESET as input
+    FIO1DIR &= ~BIT10;	// nanotron uC Vcc as input
+    FIO1DIR |= BIT9;	// nanotron ENABLE as output
+    FIO1DIR &= ~BIT4;	// nanotron Rx/Tx as input
 
-	FIO1CLR = BIT15;
-	FIO1CLR = BIT9;		// Enable power
+    FIO1CLR = BIT15;
+    FIO1CLR = BIT9;		// Enable power
 
-	PINMODE1 |= BIT1;   // No Pullup for CS
-	FIO0DIR |= BIT16;   // CS as output
-	FIO0SET = BIT16;	// drive cs inactive
-	FIO0DIR |= BIT18 + BIT15;   // SPi Output
+    PINMODE1 |= BIT1;   // No Pullup for CS
+    FIO0DIR |= BIT16;   // CS as output
+    FIO0SET = BIT16;	// drive cs inactive
+    FIO0DIR |= BIT18 + BIT15;   // SPi Output
 
-	// RFID
-	FIO1DIR |= BIT1;    // RFID Power
-	FIO1CLR = BIT1;		//
+    // RFID
+    FIO1DIR |= BIT1;    // RFID Power
+    FIO1CLR = BIT1;		//
 
-	FIO0DIR |= BIT1;    // RFID Reset
-	FIO0SET = BIT1;     // Hold in Reset
+    FIO0DIR |= BIT1;    // RFID Reset
+    FIO0SET = BIT1;     // Hold in Reset
 
-	FIO0DIR &= ~BIT10;  // LED as INPUT
-	FIO0DIR &= ~BIT11;  // DATA as INPUT
-	PINMODE0 |= BIT19 + BIT21; // No Pullups
+    FIO0DIR &= ~BIT10;  // LED as INPUT
+    FIO0DIR &= ~BIT11;  // DATA as INPUT
+    PINMODE0 |= BIT19 + BIT21; // No Pullups
 
-	// LTC4150 ARM
-	FIO0DIR |= BIT5;
-	FIO0CLR = BIT5;
+    // LTC4150 ARM
+    FIO0DIR |= BIT5;
+    FIO0CLR = BIT5;
 
-	// LTC4150 System
-	FIO0DIR |= BIT24;
-	FIO0CLR = BIT24;
+    // LTC4150 System
+    FIO0DIR |= BIT24;
+    FIO0CLR = BIT24;
 
-	// Battery Voltage (AD)
-	PINMODE1 |= BIT19;
-	PINSEL1 &= ~BIT19;
-	PINSEL1 |= BIT18;
+    // Battery Voltage (AD)
+    PINMODE1 |= BIT19;
+    PINSEL1 &= ~BIT19;
+    PINSEL1 |= BIT18;
 
-	//cc1100
-	FIO0DIR |= BIT6 + BIT7 + BIT9;
-	FIO0SET = BIT6;
-	FIO0SET = BIT7 + BIT9;
+    //cc1100
+    FIO0DIR |= BIT6 + BIT7 + BIT9;
+    FIO0SET = BIT6;
+    FIO0SET = BIT7 + BIT9;
 
-	//SD
-	FIO2DIR |= BIT12 + BIT13 + BIT11;
-	FIO0DIR |= BIT20 + BIT22 + BIT21;
+    //SD
+    FIO2DIR |= BIT12 + BIT13 + BIT11;
+    FIO0DIR |= BIT20 + BIT22 + BIT21;
 
-	//Tetra
-	FIO2DIR |= BIT0 + BIT7;
+    //Tetra
+    FIO2DIR |= BIT0 + BIT7;
 
 
-	// No Pullups on any port
-	int nopullup = BIT1 + BIT3 + BIT5 + BIT7 + BIT9 + BIT11 + BIT13 + BIT15 + BIT17 + BIT19 + BIT21 + BIT23 + BIT25 + BIT27 + BIT29 + BIT31;
-	PINMODE0 = nopullup - BIT13 - BIT15 - BIT17 - BIT19;
-	PINMODE1 = BIT1 + BIT3 + BIT5 + BIT7 + BIT9 + BIT11 + BIT13 + BIT15 + BIT17 + BIT19 + BIT21;
-	PINMODE2 = nopullup;
-	PINMODE3 = nopullup;
-	PINMODE4 = nopullup;
-	PINMODE5 = nopullup;
-	PINMODE6 = nopullup;
-	PINMODE7 = nopullup;
-	PINMODE8 = nopullup;
-	PINMODE9 = nopullup;
+    // No Pullups on any port
+    int nopullup = BIT1 + BIT3 + BIT5 + BIT7 + BIT9 + BIT11 + BIT13 + BIT15 + BIT17 + BIT19 + BIT21 + BIT23 + BIT25 + BIT27 + BIT29 + BIT31;
+    PINMODE0 = nopullup - BIT13 - BIT15 - BIT17 - BIT19;
+    PINMODE1 = BIT1 + BIT3 + BIT5 + BIT7 + BIT9 + BIT11 + BIT13 + BIT15 + BIT17 + BIT19 + BIT21;
+    PINMODE2 = nopullup;
+    PINMODE3 = nopullup;
+    PINMODE4 = nopullup;
+    PINMODE5 = nopullup;
+    PINMODE6 = nopullup;
+    PINMODE7 = nopullup;
+    PINMODE8 = nopullup;
+    PINMODE9 = nopullup;
 }
 
 /** @} */

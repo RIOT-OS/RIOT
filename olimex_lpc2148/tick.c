@@ -23,7 +23,7 @@ Boston, MA 02111-1307, USA.  */
 #include "minimal_dbg_console.h"
 #include "VIC.h"
 
-void Timer0_IRQHandler (void) __attribute__((interrupt("IRQ")));
+void Timer0_IRQHandler(void) __attribute__((interrupt("IRQ")));
 
 extern void eINT();
 extern void dINT();
@@ -35,9 +35,9 @@ void driver_timer_load(void)
     T0PR  = 3000;               // Prescaler is set to relevant pclk , counter is incremented every T0PR tact.
     T0CCR = 0;                  // Capture is disabled.
     T0EMR = 0;                  // No external match output.
-    T0TC= 0;
-    T0MR0= 1000;
-    T0MCR|= BIT0 + BIT1;
+    T0TC = 0;
+    T0MR0 = 1000;
+    T0MCR |= BIT0 + BIT1;
     T0TCR = BIT0;               // Enable timer 0.
 
     dINT();                      // Disable all interrupts
@@ -49,15 +49,15 @@ void driver_timer_load(void)
 
 int counter = 0;
 
-void Timer0_IRQHandler (void)
+void Timer0_IRQHandler(void)
 {
     extern unsigned int sched_context_switch_request;
     counter++;
-	T0IR |= 0xff;											// reset timer1 interrupt flag
-	sl_printf("#");
+    T0IR |= 0xff;											// reset timer1 interrupt flag
+    sl_printf("#");
 
     sched_context_switch_request = 1;
 
-	VICVectAddr = 0;										// acknowledge interrupt (if using VIC IRQ)
+    VICVectAddr = 0;										// acknowledge interrupt (if using VIC IRQ)
 }
 

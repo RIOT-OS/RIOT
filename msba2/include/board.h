@@ -1,5 +1,5 @@
 #ifndef __BOARD_H
-#define __BOARD_H 
+#define __BOARD_H
 
 #include <msba2_common.h>
 #include <bitarithm.h>

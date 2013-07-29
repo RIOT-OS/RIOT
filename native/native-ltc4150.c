@@ -56,7 +56,8 @@ void ltc4150_enable_int(void)
 void ltc4150_sync_blocking(void)
 {
     DEBUG("ltc4150_sync_blocking()\n");
-    for(int i = native_ltc4150_startup_delay; i>0; i--);
+
+    for (int i = native_ltc4150_startup_delay; i > 0; i--);
 }
 
 /**

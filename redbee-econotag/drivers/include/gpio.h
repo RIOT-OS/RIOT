@@ -76,12 +76,12 @@
 #define TXON GPIO_44
 #define RXON GPIO_45
 #define ANT1 GPIO_42
-#define ANT2 GPIO_43 
+#define ANT2 GPIO_43
 #define VREF2H GPIO_38
 #define VREF2L GPIO_39
 #define VREF1H GPIO_40
 #define VREF1L GPIO_41
-#define MDO0 GPIO_51 
+#define MDO0 GPIO_51
 #define MDO1 GPIO_52
 #define MDO2 GPIO_53
 #define MDO3 GPIO_54
@@ -118,18 +118,18 @@ struct GPIO_struct {
                 struct { _REP(x, 2) };  \
                 struct GPIO_##x { _REP(GPIO, 2) } x; };
 
-        _IO(PAD_DIR);
-        _IO(DATA);
-        _IO(PAD_PU_EN);
-        _IO_2bit(FUNC_SEL);
-        _IO(DATA_SEL);
-        _IO(PAD_PU_SEL);
-        _IO(PAD_HYST_EN);
-        _IO(PAD_KEEP);
-        _IO(DATA_SET);
-        _IO(DATA_RESET);
-        _IO(PAD_DIR_SET);
-        _IO(PAD_DIR_RESET);
+    _IO(PAD_DIR);
+    _IO(DATA);
+    _IO(PAD_PU_EN);
+    _IO_2bit(FUNC_SEL);
+    _IO(DATA_SEL);
+    _IO(PAD_PU_SEL);
+    _IO(PAD_HYST_EN);
+    _IO(PAD_KEEP);
+    _IO(DATA_SET);
+    _IO(DATA_RESET);
+    _IO(PAD_DIR_SET);
+    _IO(PAD_DIR_RESET);
 };
 #undef _IO
 #undef _IO_2bit
@@ -137,7 +137,7 @@ struct GPIO_struct {
 /* Build an enum lookup to map GPIO_08 -> 8 */
 #undef _V
 #define _V(x,n,i) __NUM_GPIO_GPIO_##i,
-enum { _REP(0,0) };
+enum { _REP(0, 0) };
 
 /* Macros to set or reset a data pin in the fastest possible way */
 #define gpio_set(gpio_xx) __gpio_set(gpio_xx)
@@ -154,6 +154,6 @@ enum { _REP(0,0) };
 #undef _REP
 #undef _V
 
-static volatile struct GPIO_struct * const GPIO = (void *) (0x80000000);
+static volatile struct GPIO_struct *const GPIO = (void *)(0x80000000);
 
 #endif

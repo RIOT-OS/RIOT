@@ -1,4 +1,4 @@
-extern int download_begin(char* file);
+extern int download_begin(char *file);
 extern void soft_reboot_begin(void);
 extern void hard_reset_to_bootloader(void);
 extern void hard_reset_to_user_code(void);
