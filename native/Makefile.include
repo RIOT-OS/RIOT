@@ -14,7 +14,7 @@ export OBJCOPY = $(PREFIX)objcopy
 FLASHER = lpc2k_pgm
 TERM = pyterm.py
 
-LINKFLAGS = -m32 -gc
+LINKFLAGS += -m32 -gc
 
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
