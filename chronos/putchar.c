@@ -1,4 +1,5 @@
-static void _dummy(int c) {
+static void _dummy(int c)
+{
 }
 
 void (*_putchar)(int c) = _dummy;

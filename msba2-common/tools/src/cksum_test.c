@@ -20,7 +20,7 @@
 
 /* If this code fails to build, please provide at least the following
  * information when requesting (free) technical support.
- * 
+ *
  * 1: Complete copy of all messages during the build.
  * 2: Output of "gtk-config --version"
  * 3: Output of "gtk-config --libs"
@@ -38,36 +38,45 @@
 #include "uuencode.h"
 
 
-unsigned int sum=0;
+unsigned int sum = 0;
 
 
 
 void cksum(const char *str)
 {
-	int num, i;
-	unsigned char data[256];
+    int num, i;
+    unsigned char data[256];
 
-	if (str == NULL) return;
-	num = uudecode(str, data, sizeof(data));
-	for (i=0; i<num; i++) {
-		sum += data[i];
-	}
+    if (str == NULL) {
+        return;
+    }
+
+    num = uudecode(str, data, sizeof(data));
+
+    for (i = 0; i < num; i++) {
+        sum += data[i];
+    }
 
 }
 
 
 int main()
 {
-	char buf[4096];
+    char buf[4096];
 
-	while (!feof(stdin)) {
-		fgets(buf, sizeof(buf), stdin);
-		if (strcmp(buf, "\n") == 0) break;
-		cksum(buf);
-	}
-	printf("sum = %u\n", sum);
+    while (!feof(stdin)) {
+        fgets(buf, sizeof(buf), stdin);
 
-	return 0;
+        if (strcmp(buf, "\n") == 0) {
+            break;
+        }
+
+        cksum(buf);
+    }
+
+    printf("sum = %u\n", sum);
+
+    return 0;
 }
 
 

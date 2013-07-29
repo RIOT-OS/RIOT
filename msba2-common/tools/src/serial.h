@@ -1,7 +1,7 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
-extern char* baud_rate;
+extern char *baud_rate;
 
 int open_serial_port(const char *port_name);
 int write_serial_port(const void *buf, int num);

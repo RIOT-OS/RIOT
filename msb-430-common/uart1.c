@@ -9,7 +9,7 @@ int putchar(int c)
 {
     UART1_TX = c;
     UART1_WAIT_TXDONE();
-    
+
     if (c == 10) {
         UART1_TX = 13;
         UART1_WAIT_TXDONE();

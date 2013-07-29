@@ -6,6 +6,17 @@
  * Version 3.  See the file LICENSE for more details.
  */
 
-void board_init(void) {
+void board_init(void)
+{
     asm("nop");
+}
+
+void bl_init_clks(void)
+{
+    // dummy to compile
+}
+
+void bl_init_ports(void)
+{
+    // dummy to compile
 }

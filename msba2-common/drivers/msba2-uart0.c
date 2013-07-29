@@ -52,10 +52,10 @@ and the mailinglist (subscription via web site)
 typedef struct toprint_t {
     unsigned int len;
     char content[];
-}toprint_t;
+} toprint_t;
 
 #define QUEUESIZE 255
-static volatile toprint_t* queue[QUEUESIZE];
+static volatile toprint_t *queue[QUEUESIZE];
 static volatile unsigned char queue_head = 0;
 static volatile unsigned char queue_tail = 0;
 static volatile unsigned char queue_items = 0;
@@ -64,57 +64,71 @@ static volatile unsigned int actual_pos = 0;
 static volatile unsigned int running = 0;
 static volatile unsigned int fifo = 0;
 
-static volatile toprint_t* actual = NULL;
+static volatile toprint_t *actual = NULL;
 
-static inline void enqueue(void) {
+static inline void enqueue(void)
+{
     queue_items++;
     queue_tail++;
 }
 
-static inline void dequeue(void) {
+static inline void dequeue(void)
+{
     actual = (queue[queue_head]);
     queue_items--;
     queue_head++;
 }
 
-static void  push_queue(void) {
+static void  push_queue(void)
+{
     running = 1;
-	lpm_prevent_sleep |= LPM_PREVENT_SLEEP_UART;
+    lpm_prevent_sleep |= LPM_PREVENT_SLEEP_UART;
 start:
+
     if (!actual) {
         if (queue_items) {
             dequeue();
-        } else {
+        }
+        else {
             running = 0;
             lpm_prevent_sleep &= ~LPM_PREVENT_SLEEP_UART;
+
             if (!fifo)
-                while(!(U0LSR & BIT6)){};
+                while (!(U0LSR & BIT6)) {};
+
             return;
         }
     }
-    while ((actual_pos < actual->len)  && (fifo++ < 16)){
+
+    while ((actual_pos < actual->len)  && (fifo++ < 16)) {
         U0THR = actual->content[actual_pos++];
     }
+
     if (actual_pos == actual->len) {
-        free((void*)actual);
+        free((void *)actual);
         actual = NULL;
         actual_pos = 0;
         goto start;
     }
 }
 
-int uart_active(void){
+int uart_active(void)
+{
     return (running || fifo);
 }
 
 void stdio_flush(void)
 {
     U0IER &= ~BIT1;                             // disable THRE interrupt
-    while(running) {
-        while(!(U0LSR & (BIT5|BIT6))){};        // transmit fifo
-        fifo=0;
+
+    while (running) {
+        while (!(U0LSR & (BIT5 | BIT6))) {};    // transmit fifo
+
+        fifo = 0;
+
         push_queue();                           // dequeue to fifo
     }
+
     U0IER |= BIT1;                              // enable THRE interrupt
 }
 
@@ -124,9 +138,9 @@ void UART0_IRQHandler(void)
     int iir;
     iir = U0IIR;
 
-    switch(iir & UIIR_ID_MASK) {
+    switch (iir & UIIR_ID_MASK) {
         case UIIR_THRE_INT:               // Transmit Holding Register Empty
-            fifo=0;
+            fifo = 0;
             push_queue();
             break;
 
@@ -137,43 +151,51 @@ void UART0_IRQHandler(void)
                 do {
                     int c = U0RBR;
                     uart0_handle_incoming(c);
-                } while (U0LSR & ULSR_RDR);
+                }
+                while (U0LSR & ULSR_RDR);
+
                 uart0_notify_thread();
             }
+
 #endif
             break;
+
         default:
             U0LSR;
             U0RBR;
             break;
     } // switch
+
     VICVectAddr = 0;                    // Acknowledge Interrupt
 }
 
-static inline int uart0_puts(char *astring,int length)
+static inline int uart0_puts(char *astring, int length)
 {
-/*    while (queue_items == (QUEUESIZE-1)) {} ;
-    U0IER = 0;
-    queue[queue_tail] = malloc(length+sizeof(unsigned int));
-    queue[queue_tail]->len = length;
-    memcpy(&queue[queue_tail]->content,astring,length);
-    enqueue();
-    if (!running)
-        push_queue();
-    U0IER |= BIT0 | BIT1;       // enable RX irq
-*/
+    /*    while (queue_items == (QUEUESIZE-1)) {} ;
+        U0IER = 0;
+        queue[queue_tail] = malloc(length+sizeof(unsigned int));
+        queue[queue_tail]->len = length;
+        memcpy(&queue[queue_tail]->content,astring,length);
+        enqueue();
+        if (!running)
+            push_queue();
+        U0IER |= BIT0 | BIT1;       // enable RX irq
+    */
     /* alternative without queue:*/
     int i;
-    for (i=0;i<length;i++) {
-            while (!(U0LSR & BIT5));
-            U0THR = astring[i];
+
+    for (i = 0; i < length; i++) {
+        while (!(U0LSR & BIT5));
+
+        U0THR = astring[i];
     }
-/*    */
+
+    /*    */
 
     return length;
 }
 
-int fw_puts(char *astring,int length)
+int fw_puts(char *astring, int length)
 {
     return uart0_puts(astring, length);
 }

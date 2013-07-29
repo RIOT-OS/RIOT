@@ -45,21 +45,25 @@ and the mailinglist (subscription via web site)
 #include "ltc4150_arch.h"
 #include "gpioint.h"
 
-void __attribute__((__no_instrument_function__)) ltc4150_disable_int(void) {
-	gpioint_set(0, BIT4, GPIOINT_DISABLE, NULL);
+void __attribute__((__no_instrument_function__)) ltc4150_disable_int(void)
+{
+    gpioint_set(0, BIT4, GPIOINT_DISABLE, NULL);
 }
 
-void __attribute__((__no_instrument_function__)) ltc4150_enable_int(void) {
-	gpioint_set(0, BIT4, GPIOINT_FALLING_EDGE, &ltc4150_interrupt);
+void __attribute__((__no_instrument_function__)) ltc4150_enable_int(void)
+{
+    gpioint_set(0, BIT4, GPIOINT_FALLING_EDGE, &ltc4150_interrupt);
 }
 
-void __attribute__((__no_instrument_function__)) ltc4150_sync_blocking(void) {
-	while(!(FIO0PIN & BIT4)) {};
+void __attribute__((__no_instrument_function__)) ltc4150_sync_blocking(void)
+{
+    while (!(FIO0PIN & BIT4)) {};
 }
 
-void __attribute__((__no_instrument_function__)) ltc4150_arch_init() {
+void __attribute__((__no_instrument_function__)) ltc4150_arch_init()
+{
     FIO0DIR |= BIT5;
-	FIO0SET = BIT5;
+    FIO0SET = BIT5;
 }
 
 /** @} */

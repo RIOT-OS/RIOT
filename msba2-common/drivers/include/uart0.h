@@ -1,5 +1,5 @@
 #ifndef __UART0_H
-#define __UART0_H 
+#define __UART0_H
 
 #define UART0_BUFSIZE 32
 
