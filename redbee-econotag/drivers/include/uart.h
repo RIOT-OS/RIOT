@@ -97,6 +97,8 @@ void uart_set_baudrate(volatile struct UART_struct *uart, uint32_t baud);
 void uart_flow_ctl(volatile struct UART_struct *uart, uint8_t on);
 
 
+#define UART0_BUFSIZE (32)
+
 /* The mc1322x has a 32 byte hardware FIFO for transmitted characters.
  * Currently it is always filled from a larger RAM buffer. It would be
  * possible to eliminate that overhead by filling directly from a chain
