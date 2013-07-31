@@ -73,13 +73,14 @@ ${PROJBINDIR}/$(PROJECT).a:  $(OBJ)
 
 ${PROJBINDIR}/%.o: %.c
 	@echo; echo "Compiling.... $*.c"; echo
+	@test -d $(PROJBINDIR) || mkdir $(PROJBINDIR)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o bin/$*.o
 
 clean:
 	$(MAKE) -C $(RIOTBOARD) clean
 	$(MAKE) -C $(RIOTBASE) clean
 	@for i in $(EXTERNAL_MODULES) ; do $(MAKE) -C $$i clean ; done ;
-	rm -f $(PROJBINDIR)/*
+	rm -rf $(PROJBINDIR)
 
 flash: all
 	$(FLASHER) $(FFLAGS)
