@@ -73,7 +73,7 @@ ${PROJBINDIR}/$(PROJECT).a:  $(OBJ)
 
 ${PROJBINDIR}/%.o: %.c
 	@echo; echo "Compiling.... $*.c"; echo
-	@test -d $(PROJBINDIR) || mkdir $(PROJBINDIR)
+	@test -d $(PROJBINDIR) || mkdir -p $(PROJBINDIR)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o bin/$*.o
 
 clean:
