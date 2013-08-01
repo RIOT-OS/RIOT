@@ -70,7 +70,7 @@ endif
 ifneq (,$(findstring net_help,$(USEMODULE)))
     DIRS += net/net_help
 endif
-ifneq (,$(findstring protocol-multiplex,$(USEMODULE)))
+ifneq (,$(findstring protocol_multiplex,$(USEMODULE)))
     DIRS += net/protocol-multiplex
 endif
 ifneq (,$(findstring sixlowpan,$(USEMODULE)))

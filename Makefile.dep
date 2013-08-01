@@ -14,8 +14,8 @@ ifneq (,$(findstring uart0,$(USEMODULE)))
 endif
 
 ifneq (,$(findstring cc110x,$(USEMODULE)))
-	ifeq (,$(findstring protocol-multiplex,$(USEMODULE)))
-		USEMODULE += protocol-multiplex
+	ifeq (,$(findstring protocol_multiplex,$(USEMODULE)))
+		USEMODULE += protocol_multiplex
 	endif
 endif
 
