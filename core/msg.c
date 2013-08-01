@@ -10,7 +10,9 @@
  * @ingroup kernel_msg
  * @{
  * @file
+ * @author Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @author Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 
@@ -80,6 +82,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
         queue_node_t n;
         n.priority = active_thread->priority;
         n.data = (unsigned int) active_thread;
+        n.next = NULL;
         DEBUG("%s: Adding node to msg_waiters:\n", active_thread->name);
 
         queue_priority_add(&(target->msg_waiters), &n);
