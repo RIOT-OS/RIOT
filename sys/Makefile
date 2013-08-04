@@ -77,7 +77,7 @@ ifneq (,$(findstring sixlowpan,$(USEMODULE)))
     DIRS += net/sixlowpan
 endif
 ifneq (,$(findstring rpl,$(USEMODULE)))
-    DIRS += net/sixlowpan/rpl
+    DIRS += net/rpl
 endif
 ifneq (,$(findstring ieee802154,$(USEMODULE)))
     DIRS += net/ieee802154
