@@ -92,7 +92,7 @@ void mutex_wait(struct mutex_t *mutex)
     /* we were woken up by scheduler. waker removed us from queue. we have the mutex now. */
 }
 
-void mutex_unlock(struct mutex_t *mutex, int yield)
+void mutex_unlock(struct mutex_t *mutex)
 {
     DEBUG("%s: unlocking mutex. val: %u pid: %u\n", active_thread->name, mutex->val, thread_pid);
     int irqstate = disableIRQ();

@@ -219,7 +219,7 @@ void cc1100_phy_mutex_lock(void)
 void cc1100_phy_mutex_unlock(void)
 {
     cc1100_mutex_pid = -1;
-    mutex_unlock(&cc1100_mutex, 0);
+    mutex_unlock(&cc1100_mutex);
 }
 
 /*---------------------------------------------------------------------------*/

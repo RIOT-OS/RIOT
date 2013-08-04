@@ -79,6 +79,7 @@ static int update_shortterm(void)
 
 void vtimer_tick(void *ptr)
 {
+    (void) ptr;
     DEBUG("vtimer_tick().");
     seconds += SECONDS_PER_TICK;
 
@@ -111,6 +112,7 @@ static int set_shortterm(vtimer_t *timer)
 
 void vtimer_callback(void *ptr)
 {
+    (void) ptr;
     vtimer_t *timer;
     in_callback = true;
     hwtimer_id = -1;

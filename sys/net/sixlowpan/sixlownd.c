@@ -423,7 +423,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
             free(contexts);
         }
 
-        mutex_unlock(&lowpan_context_mutex, 0);
+        mutex_unlock(&lowpan_context_mutex);
     }
 
     if (pi == OPT_PI) {
@@ -617,7 +617,7 @@ void recv_rtr_adv(void)
         }
     }
 
-    mutex_unlock(&lowpan_context_mutex, 0);
+    mutex_unlock(&lowpan_context_mutex);
 
     if (trigger_ns >= 0) {
         /* send ns - draft-ietf-6lowpan-nd-15#section-5.5.1

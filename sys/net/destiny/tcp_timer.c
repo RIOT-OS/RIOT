@@ -134,11 +134,11 @@ void inc_global_variables(void)
 {
     mutex_lock(&global_sequence_clunter_mutex);
     global_sequence_counter += rand();
-    mutex_unlock(&global_sequence_clunter_mutex, 0);
+    mutex_unlock(&global_sequence_clunter_mutex);
 #ifdef TCP_HC
     mutex_lock(&global_context_counter_mutex);
     global_context_counter += rand();
-    mutex_unlock(&global_context_counter_mutex, 0);
+    mutex_unlock(&global_context_counter_mutex);
 #endif
 }
 

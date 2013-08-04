@@ -187,7 +187,7 @@ void etx_beacon(void) {
             }
             cur_round = 0;
         }
-        mutex_unlock(&etx_mutex,0);
+        mutex_unlock(&etx_mutex);
     }
 }
 
@@ -378,7 +378,7 @@ void etx_radio(void) {
                 //handle the beacon
                 mutex_lock(&etx_mutex);
                 etx_handle_beacon(&candidate_addr);
-                mutex_unlock(&etx_mutex,1);
+                mutex_unlock(&etx_mutex);
             }
 
             p->processing--;
