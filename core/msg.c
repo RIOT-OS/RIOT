@@ -142,11 +142,10 @@ int msg_send_receive(msg_t *m, msg_t *reply, unsigned int target_pid)
     tcb_t *me = (tcb_t*) sched_threads[thread_pid];
     sched_set_status(me,  STATUS_REPLY_BLOCKED);
     me->wait_data = (void*) reply;
-    msg_send(m, target_pid, true);
 
     /* msg_send blocks until reply received */
 
-    return 1;
+    return msg_send(m, target_pid, true);
 }
 
 int msg_reply(msg_t *m, msg_t *reply)
