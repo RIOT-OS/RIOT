@@ -76,7 +76,7 @@ void demultiplex(border_packet_t *packet, int len)
                         context->context.comp,
                         context->context.lifetime
                     );
-                    mutex_unlock(&lowpan_context_mutex, 0);
+                    mutex_unlock(&lowpan_context_mutex);
                     abr_add_context(context->context.version, &abr_addr, context->context.cid);
                     /* Send router advertisement */
                     break;

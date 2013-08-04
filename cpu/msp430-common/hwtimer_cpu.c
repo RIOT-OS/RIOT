@@ -66,6 +66,7 @@ unsigned long hwtimer_arch_now()
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
 {
+    (void) fcpu;
     timerA_init();
     int_handler = handler;
     TA0_enable_interrupt(0);

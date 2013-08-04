@@ -32,4 +32,4 @@
  */
 #define ETX_RANK_MULTIPLIER (0x80)
 
-rpl_of_t *rpl_get_of_mrhof();
+rpl_of_t *rpl_get_of_mrhof(void);

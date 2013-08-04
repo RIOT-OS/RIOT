@@ -234,7 +234,7 @@ void lowpan_transfer(void)
         current_buf = packet_fifo;
 
         if (current_buf != NULL) {
-            mutex_unlock(&fifo_mutex, 0);
+            mutex_unlock(&fifo_mutex);
 
             if ((current_buf->packet)[0] == LOWPAN_IPV6_DISPATCH) {
                 ipv6_buf = get_ipv6_buf();
@@ -263,7 +263,7 @@ void lowpan_transfer(void)
 
 
         if (gotosleep == 1) {
-            mutex_unlock(&fifo_mutex, 0);
+            mutex_unlock(&fifo_mutex);
             thread_sleep();
         }
     }
@@ -450,7 +450,7 @@ lowpan_reas_buf_t *collect_garbage_fifo(lowpan_reas_buf_t *current_buf)
         return_buf = my_buf->next;
     }
 
-    mutex_unlock(&fifo_mutex, 0);
+    mutex_unlock(&fifo_mutex);
 
     current_list = current_buf->interval_list_head;
     temp_list = current_list;
@@ -610,7 +610,7 @@ void add_fifo_packet(lowpan_reas_buf_t *current_packet)
         my_buf->next = current_packet;
     }
 
-    mutex_unlock(&fifo_mutex, 0);
+    mutex_unlock(&fifo_mutex);
     current_packet->next = NULL;
 }
 
@@ -973,7 +973,7 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
         }
     }
 
-    mutex_unlock(&lowpan_context_mutex, 0);
+    mutex_unlock(&lowpan_context_mutex);
 
     comp_buf[0] = lowpan_iphc[0];
     comp_buf[1] = lowpan_iphc[1];
@@ -1160,7 +1160,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
             }
         }
 
-        mutex_unlock(&lowpan_context_mutex, 0);
+        mutex_unlock(&lowpan_context_mutex);
     }
     else {
         switch(((lowpan_iphc[1] & LOWPAN_IPHC_SAM) >> 4) & 0x03) {
@@ -1223,7 +1223,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
             }
 
             // TODO:
-            mutex_unlock(&lowpan_context_mutex, 0);
+            mutex_unlock(&lowpan_context_mutex);
         }
         else {
             /* If M=1 and DAC=0: */
@@ -1326,7 +1326,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                     break;
             }
 
-            mutex_unlock(&lowpan_context_mutex, 0);
+            mutex_unlock(&lowpan_context_mutex);
         }
         else {
             switch((lowpan_iphc[1] & LOWPAN_IPHC_DAM) & 0x03) {
@@ -1487,7 +1487,7 @@ void lowpan_context_auto_remove(void)
             lowpan_context_remove(to_remove[i]);
         }
 
-        mutex_unlock(&lowpan_context_mutex, 0);
+        mutex_unlock(&lowpan_context_mutex);
     }
 }
 

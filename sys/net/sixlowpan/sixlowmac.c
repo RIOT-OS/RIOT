@@ -208,7 +208,7 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
     memcpy(&buf[hdrlen], frame.payload, frame.payload_len);
 
     /* mutex unlock */
-    mutex_unlock(&buf_mutex, 0);
+    mutex_unlock(&buf_mutex);
 
     p.length = hdrlen + frame.payload_len;
 

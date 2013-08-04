@@ -294,6 +294,7 @@ void native_irq_handler()
  */
 void native_isr_entry(int sig, siginfo_t *info, void *context)
 {
+    (void) info; /* unused at the moment */
     DEBUG("\n\n\t\tnative_isr_entry\n\n");
 
     if (native_interrupts_enabled == 0) {
