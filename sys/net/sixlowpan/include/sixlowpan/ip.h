@@ -1,5 +1,5 @@
 /**
- * 6LoWPAN constants, data structs, and prototypes for MAC layer
+ * 6LoWPAN constants, data structs, and prototypes for network layer
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -9,8 +9,8 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    sixlowpan/mac.h
- * @brief   6LoWPAN MAC layer header
+ * @file    sixlowpan/ip.h
+ * @brief   6LoWPAN network layer header
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Eric Engel <eric.engel@fu-berlin.de>
@@ -18,7 +18,7 @@
  * @}
  */
 
-#ifndef SIXLOWPAN_MAC_H
-#define SIXLOWPAN_MAC_H
+#ifndef SIXLOWPAN_IP_H
+#define SIXLOWPAN_IP_H
 
-#endif /* SIXLOWPAN_MAC_H */
+#endif /* SIXLOWPAN_IP_H */

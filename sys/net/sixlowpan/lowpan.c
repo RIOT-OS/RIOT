@@ -18,7 +18,7 @@
  * @}
  */
 
-#include "sixlowip.h"
+#include "ip.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -31,13 +31,13 @@
 #include "mutex.h"
 #include "hwtimer.h"
 #include "msg.h"
-#include "sixlowmac.h"
-#include "sixlowpan.h"
-#include "sixlowborder.h"
-#include "sixlowip.h"
-#include "sixlownd.h"
+#include "mac.h"
+#include "lowpan.h"
+#include "border.h"
+#include "ip.h"
+#include "icmp.h"
 #include "transceiver.h"
-#include "ieee802154/ieee802154_frame.h"
+#include "sys/net/ieee802154/ieee802154_frame.h"
 #include "sys/net/destiny/in.h"
 #include "sys/net/net_help/net_help.h"
 

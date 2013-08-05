@@ -17,13 +17,13 @@
  * @}
  */
 
-#ifndef SIXLOWND_H
-#define SIXLOWND_H
+#ifndef _SIXLOWPAN_ICMP_H
+#define _SIXLOWPAN_ICMP_H
 
 #include <stdint.h>
 #include "vtimer.h"
-#include "sixlowpan.h"
-#include "sixlowip.h"
+#include "lowpan.h"
+#include "ip.h"
 
 /* parameter problem [rfc4443] */
 #define PARA_PROB_LEN                  	(8)
@@ -282,4 +282,4 @@ void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
                   uint8_t rso, uint8_t sllao, uint8_t aro, uint8_t aro_state);
 void recv_nbr_adv(void);
 void recv_nbr_sol(void);
-#endif /* SIXLOWND_H*/
+#endif /* _SIXLOWPAN_ICMP_H*/

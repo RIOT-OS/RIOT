@@ -22,8 +22,8 @@
 
 #include "udp.h"
 #include "msg.h"
-#include "../sixlowpan/sixlowip.h"
-#include "../sixlowpan/sixlowpan.h"
+#include "ipv6.h"
+#include "sixlowpan.h"
 #include "socket.h"
 #include "in.h"
 #include "../net_help/net_help.h"

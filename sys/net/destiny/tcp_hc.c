@@ -23,7 +23,7 @@
 #include "tcp_hc.h"
 #include "socket.h"
 #include "tcp.h"
-#include "../sixlowpan/sixlowip.h"
+#include "ipv6.h"
 #include "../net_help/net_help.h"
 
 #ifdef TCP_HC

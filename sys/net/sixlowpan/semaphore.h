@@ -16,8 +16,8 @@
  * @}
  */
 
-#ifndef SEMAPHORE_H
-#define SEMAPHORE_H
+#ifndef _SIXLOWPAN_SEMAPHORE_H
+#define _SIXLOWPAN_SEMAPHORE_H
 
 #include <stdint.h>
 #include <mutex.h>
@@ -32,4 +32,4 @@ void sem_init(sem_t *sem, int8_t value);
 int sem_wait(sem_t *sem);
 int sem_signal(sem_t *sem);
 
-#endif /* SEMAPHORE_H*/
+#endif /* _SIXLOWPAN_SEMAPHORE_H*/

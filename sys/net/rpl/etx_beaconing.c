@@ -15,7 +15,7 @@
 #include <thread.h>
 #include <transceiver.h>
 
-#include "sixlowpan/sixlowmac.h"
+#include "sixlowpan.h"
 #include "ieee802154/ieee802154_frame.h"
 
 //prototytpes

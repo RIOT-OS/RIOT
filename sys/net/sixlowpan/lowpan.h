@@ -18,8 +18,8 @@
  * @}
  */
 
-#ifndef SIXLOWPAN_H
-#define SIXLOWPAN_H
+#ifndef _SIXLOWPAN_LOWPAN_H
+#define _SIXLOWPAN_LOWPAN_H
 
 #define IP_PROCESS_STACKSIZE           	(3072)
 #define NC_STACKSIZE                   	(512)
@@ -58,7 +58,7 @@
 #define ICMP_RPL_CONTROL                (155)
 
 #include "transceiver.h"
-#include "sixlowip.h"
+#include "ip.h"
 #include "vtimer.h"
 #include "mutex.h"
 
@@ -143,4 +143,4 @@ void lowpan_ipv6_set_dispatch(uint8_t *data);
 void init_reas_bufs(lowpan_reas_buf_t *buf);
 void printReasBuffers(void);
 void printFIFOBuffers(void);
-#endif
+#endif  /* _SIXLOWPAN_LOWPAN_H */

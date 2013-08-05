@@ -23,10 +23,10 @@
 #include <vtimer.h>
 #include <mutex.h>
 #include "msg.h"
-#include "sixlowip.h"
-#include "sixlowmac.h"
-#include "sixlownd.h"
-#include "sixlowpan.h"
+#include "ip.h"
+#include "mac.h"
+#include "icmp.h"
+#include "lowpan.h"
 #include "sys/net/destiny/in.h"
 #include "sys/net/destiny/socket.h"
 #include "sys/net/net_help/net_help.h"

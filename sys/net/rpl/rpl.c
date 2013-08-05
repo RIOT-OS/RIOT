@@ -26,11 +26,8 @@
 #include "of_mrhof.h"
 #include "trickle.h"
 
-#include "sys/net/sixlowpan/sixlowmac.h"
-#include "sys/net/sixlowpan/sixlowip.h"
-#include "sys/net/sixlowpan/sixlowpan.h"
-#include "sys/net/sixlowpan/sixlownd.h"
-#include "sys/net/sixlowpan/sixlowerror.h"
+#include "sixlowpan.h"
+#include "ipv6.h"
 
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 /* global variables */

@@ -20,8 +20,8 @@
 
 /* 6LoWPAN IP header file */
 
-#ifndef SIXLOWIP_H
-#define SIXLOWIP_H
+#ifndef _SIXLOWPAN_IP_H
+#define _SIXLOWPAN_IP_H
 
 #include <stdint.h>
 #include <timex.h>
@@ -185,4 +185,4 @@ uint8_t ipv6_next_hdr_unrec(uint8_t next_hdr);
 void set_tcp_packet_handler_pid(int pid);
 void set_udp_packet_handler_pid(int pid);
 void set_rpl_process_pid(int pid);
-#endif /* SIXLOWIP_H*/
+#endif /* _SIXLOWPAN_IP_H*/

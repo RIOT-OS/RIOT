@@ -9,7 +9,7 @@
 #ifndef ETX_BEACONING_H_
 #define ETX_BEACONING_H_
 
-#include "sys/net/sixlowpan/sixlowip.h"
+#include "ipv6.h"
 
 //For debugging purposes
 #define ENABLE_DEBUG (0)

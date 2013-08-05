@@ -18,14 +18,14 @@
 
 /* 6LoWPAN Border Router header file */
 
-#ifndef SIXLOWBORDER_H
-#define SIXLOWBORDER_H
+#ifndef _SIXLOWPAN_BORDER_H
+#define _SIXLOWPAN_BORDER_H
 
 #include <stdint.h>
 #include <mutex.h>
 #include <transceiver.h>
 
-#include "sixlowip.h"
+#include "ip.h"
 #include "semaphore.h"
 
 extern ipv6_addr_t abr_addr;
@@ -39,4 +39,4 @@ uint8_t border_initialize(transceiver_type_t trans, ipv6_addr_t *border_router_a
 void border_send_ipv6_over_lowpan(ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag);
 void border_process_lowpan(void);
 
-#endif /* SIXLOWBORDER_H*/
+#endif /* _SIXLOWPAN_BORDER_H*/

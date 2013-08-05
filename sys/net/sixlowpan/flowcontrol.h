@@ -16,15 +16,15 @@
  * @}
  */
 
-#ifndef FLOWCONTROL_H
-#define FLOWCONTROL_H
+#ifndef _SIXLOWPAN_FLOWCONTROL_H
+#define _SIXLOWPAN_FLOWCONTROL_H
 
 #include <stdint.h>
 #include <vtimer.h>
 
 #include "semaphore.h"
-#include "sixlowip.h"
-#include "sixlowborder.h"
+#include "ip.h"
+#include "border.h"
 #include "bordermultiplex.h"
 
 /* packet types for flowcontrol */
@@ -73,4 +73,4 @@ ipv6_addr_t flowcontrol_init(void);
 void flowcontrol_send_over_uart(border_packet_t *packet, int len);
 void flowcontrol_deliver_from_uart(border_packet_t *packet, int len);
 
-#endif /* FLOWCONTROL_H*/
+#endif /* _SIXLOWPAN_FLOWCONTROL_H*/

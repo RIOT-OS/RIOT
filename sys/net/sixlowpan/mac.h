@@ -18,12 +18,12 @@
  * @}
  */
 
-#ifndef SIXLOWMAC_H
-#define SIXLOWMAC_H
+#ifndef _SIXLOWPAN_MAC_H
+#define _SIXLOWPAN_MAC_H
 
 #include <stdio.h>
 #include <stdint.h>
-#include "sixlowip.h"
+#include "ip.h"
 #include "radio/radio.h"
 #include <transceiver.h>
 
@@ -42,4 +42,4 @@ void init_802154_short_addr(ieee_802154_short_t *saddr);
 void sixlowmac_init(transceiver_type_t type);
 ieee_802154_long_t *mac_get_eui(ipv6_addr_t *ipaddr);
 
-#endif /* SIXLOWMAC_H*/
+#endif /* _SIXLOWPAN_MAC_H*/

@@ -22,10 +22,10 @@
 #include <board_uart0.h>
 
 #include "flowcontrol.h"
-#include "sixlowpan.h"
-#include "sixlownd.h"
-#include "sixlowborder.h"
-#include "sixlowerror.h"
+#include "lowpan.h"
+#include "icmp.h"
+#include "border.h"
+#include "error.h"
 
 #include "bordermultiplex.h"
 

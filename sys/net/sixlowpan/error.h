@@ -1,5 +1,5 @@
-#ifndef SIXLOWERROR_H
-#define SIXLOWERROR_H
+#ifndef _SIXLOWPAN_ERROR_H
+#define _SIXLOWPAN_ERROR_H
 
 #define SUCCESS                 0
 #define SIXLOWERROR_ARRAYFULL   132 // array is full
@@ -13,4 +13,4 @@
 #define SIXLOWERROR_DCI         140 // destination context not found
 #define SIXLOWERROR_CSUM        141 // wrong checksum
 
-#endif /* SIXLOWERROR_H*/
+#endif /* _SIXLOWPAN_ERROR_H*/

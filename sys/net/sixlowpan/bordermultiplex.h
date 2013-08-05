@@ -16,13 +16,13 @@
  * @}
  */
 
-#ifndef BORDERMULTIPLEX_H
-#define BORDERMULTIPLEX_H
+#ifndef _SIXLOWPAN_BORDERMULTIPLEX_H
+#define _SIXLOWPAN_BORDERMULTIPLEX_H
 
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "sixlowip.h"
+#include "ip.h"
 
 /* packet types of uart-packets */
 #define BORDER_PACKET_RAW_TYPE    0
@@ -89,4 +89,4 @@ void multiplex_send_addr_over_uart(ipv6_addr_t *addr);
 int readpacket(uint8_t *packet_buf, size_t size);
 int writepacket(uint8_t *packet_buf, size_t size);
 
-#endif /* BORDERMULTIPLEX_H*/
+#endif /* _SIXLOWPAN_BORDERMULTIPLEX_H*/

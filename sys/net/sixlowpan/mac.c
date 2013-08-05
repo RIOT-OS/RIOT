@@ -24,10 +24,10 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "sixlowmac.h"
-#include "sixlowip.h"
-#include "sixlownd.h"
-#include "sixlowpan.h"
+#include "mac.h"
+#include "ip.h"
+#include "icmp.h"
+#include "lowpan.h"
 #include <ltc4150.h>
 #include <hwtimer.h>
 #include "thread.h"
@@ -35,8 +35,8 @@
 #include "radio/radio.h"
 #include "transceiver.h"
 #include "vtimer.h"
-#include "ieee802154/ieee802154_frame.h"
-#include "net_help/net_help.h"
+#include "sys/net/ieee802154/ieee802154_frame.h"
+#include "sys/net/net_help/net_help.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
