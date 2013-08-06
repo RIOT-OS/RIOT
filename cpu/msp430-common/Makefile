@@ -4,10 +4,10 @@ INCLUDES += -Iinclude -I$(RIOTBASE)/core/include/ -I$(RIOTBOARD)/$(BOARD)/includ
 DIRS =
 
 all: $(BINDIR)$(MODULE).a
-	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
 include $(RIOTBASE)/Makefile.base
 
 clean::
-	@for i in $(DIRS) ; do $(MAKE) -C $$i clean ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
 
