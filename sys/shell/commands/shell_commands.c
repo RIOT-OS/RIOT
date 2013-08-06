@@ -3,8 +3,10 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * The source code is licensed under the LGPLv2 license, 
- * see the file LICENSE for more details.
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
  *
  * @ingroup shell_commands
  * @{
@@ -17,8 +19,6 @@
 
 #include <shell_commands.h>
 #include <stdlib.h>
-
-
 
 extern void _id_handler(char* id);
 extern void _heap_handler(char* unused);
