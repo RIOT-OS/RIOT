@@ -15,6 +15,7 @@
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 
@@ -36,6 +37,9 @@
 #include "vtimer.h"
 #include "ieee802154/ieee802154_frame.h"
 #include "net_help/net_help.h"
+
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
 msg_t msg_q[RADIO_RCV_BUF_SIZE];
@@ -164,6 +168,7 @@ void set_ieee802154_fcf_values(ieee802154_frame_t *frame, uint8_t dest_mode,
     frame->fcf.frame_ver = 0;
     frame->fcf.src_addr_m = src_mode;
     frame->fcf.dest_addr_m = dest_mode;
+    print_802154_fcf_frame(frame);
 }
 
 void set_ieee802154_frame_values(ieee802154_frame_t *frame)
@@ -206,6 +211,7 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
     memset(&buf, 0, PAYLOAD_SIZE);
     init_802154_frame(&frame, (uint8_t *)&buf);
     memcpy(&buf[hdrlen], frame.payload, frame.payload_len);
+    DEBUG("IEEE802.15.4 frame - FCF: %02X %02X DPID: %02X SPID: %02X DSN: %02X\n", buf[0], buf[1], frame->dest_pan_id, frame->src_pan_id, frame->seq_nr);
 
     /* mutex unlock */
     mutex_unlock(&buf_mutex, 0);
