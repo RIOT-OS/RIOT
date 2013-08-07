@@ -15,4 +15,6 @@
 #define LED_RED_ON (FIO3CLR = LED_RED_PIN)
 #define LED_RED_TOGGLE (FIO3PIN ^= LED_RED_PIN)
 
+void init_clks1(void);
+
 #endif /* __BOARD_H */
