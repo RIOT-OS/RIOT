@@ -12,6 +12,7 @@ INCLUDES += -I$(RIOTBASE)/drivers/cc110x
 
 all: $(BINDIR)$(ARCH) 
 	"$(MAKE)" -C ../msba2-common
+	"$(MAKE)" -C drivers
 
 $(BINDIR)$(ARCH): $(OBJ)
 	$(AR) rcs $(BINDIR)$(ARCH) $(OBJ)
@@ -29,10 +30,11 @@ $(BINDIR)%.o: %.c
 # remove compilation products
 clean:
 	"$(MAKE)" -C ../msba2-common clean
+	"$(MAKE)" -C drivers clean
 	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
 	@if [ -d $(BINDIR) ] ; \
 	then rmdir $(BINDIR) ; \
 	fi 
-
+	
 
 

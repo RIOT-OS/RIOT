@@ -1,4 +1,4 @@
-SRC = $(wildcard *.c)
+SRC = $(wildcard *.c) 
 BINDIR = $(RIOTBOARD)/$(BOARD)/bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -7,11 +7,12 @@ INCLUDES += -I$(RIOTBOARD)/msba2-common/include/
 INCLUDES += -I$(RIOTBASE)/cpu/arm_common/include/
 INCLUDES += -I$(RIOTBASE)/cpu/lpc2387/include/
 INCLUDES += -I$(RIOTBASE)/drivers/include/
+INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
 
 .PHONY: $(BINDIR)msba2_common_base.a
 
 all: $(BINDIR)msba2_common_base.a 
-	$(MAKE) -C drivers
+	"$(MAKE)" -C drivers
 
 $(BINDIR)msba2_common_base.a: $(OBJ)
 	$(AR) rcs $(BINDIR)$(ARCH) $(OBJ)
@@ -27,6 +28,6 @@ $(BINDIR)%.o: %.c
 
 # remove compilation products
 clean:
-	${MAKE} -C drivers clean
+	"$(MAKE)" -C drivers clean
 	rm -f $(OBJ) $(DEP)
 
