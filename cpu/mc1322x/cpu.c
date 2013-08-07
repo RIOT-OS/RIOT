@@ -10,6 +10,7 @@
  */
 
 #include "mc1322x.h"
+#include "arm_cpu.h"
 
 __attribute__((naked,noreturn)) void arm_reset(void)
 {

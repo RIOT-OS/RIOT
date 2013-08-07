@@ -637,6 +637,8 @@ static uint16_t set_pan(transceiver_type_t t, void *pan) {
 #ifdef MODULE_CC2420
             return cc2420_set_pan(c);
 #endif
+        case TRANSCEIVER_MC1322X:
+            return maca_set_pan(c);
         default:
             /* get rid of compiler warning about unused variable */
             (void) c;
@@ -657,6 +659,8 @@ static uint16_t get_pan(transceiver_type_t t) {
 #ifdef MODULE_CC2420
             return cc2420_get_pan();
 #endif
+        case TRANSCEIVER_MC1322X:
+            return maca_get_pan();
         default:
             return -1;
     }
