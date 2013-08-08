@@ -36,7 +36,7 @@ extern volatile tcb_t *active_thread;
 static ucontext_t end_context;
 static char __isr_stack[SIGSTKSZ];
 
-#if (defined(MODULE_UART0) || defined(MODULE_CC110X_NG))
+#ifdef MODULE_UART0
 fd_set _native_rfds;
 #endif
 

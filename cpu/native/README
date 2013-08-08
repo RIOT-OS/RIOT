@@ -1,4 +1,4 @@
-If you compile RIOT for the native cpu and include the cc110x_ng
+If you compile RIOT for the native cpu and include the native_net
 module, you need to specify a network interface like this:
 ./bin/default-native.elf tap0
 

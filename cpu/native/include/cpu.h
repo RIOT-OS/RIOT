@@ -68,12 +68,9 @@ extern unsigned int _native_saved_eip;
 extern int _native_in_isr;
 extern int _native_in_syscall;
 extern int _native_sigpend;
-#if (defined(MODULE_UART0) || defined(MODULE_CC110X_NG))
+#ifdef MODULE_UART0
 #include <sys/select.h>
 extern fd_set _native_rfds;
-#endif
-#ifdef MODULE_CC110X_NG
-int _native_set_cc110xng_fds(void);
 #endif
 /** @} */
 #endif //_CPU_H

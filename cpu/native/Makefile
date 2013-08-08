@@ -1,13 +1,12 @@
 MODULE = cpu
 
-INCLUDES = -I../include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/cc110x_ng/include
+INCLUDES += -I../include -I$(RIOTBASE)/core/include
 DIRS =
 ifneq (,$(findstring rtc,$(USEMODULE)))
 	DIRS += rtc
 endif
-ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
-	DIRS += cc110x_ng
-	INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include
+ifneq (,$(findstring nativenet,$(USEMODULE)))
+	DIRS += net
 endif
 
 all: $(BINDIR)$(MODULE).a

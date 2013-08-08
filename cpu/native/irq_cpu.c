@@ -167,8 +167,8 @@ unsigned disableIRQ(void)
     if ((_native_sigpend > 0) && (_native_in_isr == 0)) {
         DEBUG("\n\n\t\treturn from syscall, calling native_irq_handler\n\n");
         _native_in_syscall = 0;
-        printf("disableIRQ: calling swapcontext()\n");
-        printf("disableIRQ: _native_cur_ctx == %p, _native_isr_ctx == %p\n", _native_cur_ctx, _native_isr_ctx);
+        DEBUG("disableIRQ: calling swapcontext()\n");
+        DEBUG("disableIRQ: _native_cur_ctx == %p, _native_isr_ctx == %p\n", _native_cur_ctx, _native_isr_ctx);
         makecontext(&native_isr_context, native_irq_handler, 0);
         swapcontext(_native_cur_ctx, _native_isr_ctx);
     }
@@ -207,8 +207,8 @@ unsigned enableIRQ(void)
     if ((_native_sigpend > 0) && (_native_in_isr == 0)) {
         DEBUG("\n\n\t\treturn from syscall, calling native_irq_handler\n\n");
         _native_in_syscall = 0;
-        printf("enableIRQ: calling swapcontext()\n");
-        printf("enableIRQ: _native_cur_ctx == %p, _native_isr_ctx == %p\n", _native_cur_ctx, _native_isr_ctx);
+        DEBUG("enableIRQ: calling swapcontext()\n");
+        DEBUG("enableIRQ: _native_cur_ctx == %p, _native_isr_ctx == %p\n", _native_cur_ctx, _native_isr_ctx);
         makecontext(&native_isr_context, native_irq_handler, 0);
         swapcontext(_native_cur_ctx, _native_isr_ctx);
     }
@@ -297,7 +297,7 @@ void native_irq_handler()
             DEBUG("ignoring SIGUSR1\n");
         }
         else {
-            printf("XXX: no handler for signal %i\n", sig);
+            DEBUG("XXX: no handler for signal %i\n", sig);
             errx(1, "XXX: this should not have happened!\n");
         }
     }

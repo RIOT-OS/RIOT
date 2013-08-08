@@ -88,7 +88,7 @@
 #define CC1100_WRITE_BURST	(0x40) ///< Offset for burst write.
 #define CC1100_READ_SINGLE	(0x80) ///< Offset for read single byte.
 #define CC1100_READ_BURST	(0xC0) ///< Offset for read burst.
-#define CC1100_NOBYTE		(0xFF) ///< No command (for reading).
+#define CC1100_NOBYTE		(0x00) ///< No command (for reading).
 /** @} */
 
 /**

@@ -30,7 +30,7 @@ extern void native_interrupt_init(void);
 __attribute__((constructor)) static void startup(int argc, char **argv)
 {
 
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_NATIVENET
     if (argc < 2) {
         printf("usage: %s <tap interface>\n", argv[0]);
         exit(EXIT_FAILURE);
@@ -39,7 +39,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 
     native_cpu_init();
     native_interrupt_init();
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_NATIVENET
     tap_init(argv[1]);
 #endif
 

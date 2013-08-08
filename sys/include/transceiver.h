@@ -54,6 +54,11 @@
 #define PAYLOAD_SIZE (MC1322X_MAX_DATA_LENGTH)
 #endif
 #endif
+#ifdef MODULE_NATIVENET
+#if (NATIVE_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+#define PAYLOAD_SIZE (NATIVE_MAX_DATA_LENGTH)
+#endif
+#endif
 /* The maximum of threads to register */
 #define TRANSCEIVER_MAX_REGISTERED  (4)
 
@@ -69,6 +74,7 @@
 #define TRANSCEIVER_CC1020  (0x02)      ///< CC1020 transceivers
 #define TRANSCEIVER_CC2420  (0x04)      ///< CC2420 transceivers
 #define TRANSCEIVER_MC1322X (0x08)      ///< MC1322X transceivers
+#define TRANSCEIVER_NATIVE  (0x10)      ///< NATIVE transceivers
 
 /**
  * @brief Data type for transceiver specification
@@ -84,6 +90,7 @@ enum transceiver_msg_type_t {
     RCV_PKT_CC1100,        ///< packet was received by CC1100 transceiver
     RCV_PKT_CC2420,        ///< packet was received by CC2420 transceiver
     RCV_PKT_MC1322X,       ///< packet was received by mc1322x transceiver
+    RCV_PKT_NATIVE,       ///< packet was received by native transceiver
 
     /* Message types for transceiver <-> upper layer communication */
     PKT_PENDING,    ///< packet pending in transceiver buffer

@@ -3,6 +3,8 @@
 
 #include <net/ethernet.h>
 
+#include "radio/types.h"
+
 /**
  * create and/or open tap device "name"
  *
@@ -11,9 +13,7 @@
  * otherwise a device named "name" is created
  */
 int tap_init(char *name);
-int send_buf(void);
-void _native_marshall_ethernet(uint8_t *framebuf, uint8_t *data, int data_len);
-void _native_cc1100_handle_input(unsigned char *buf, int size);
+int send_buf(radio_packet_t *packet);
 
 extern int _native_tap_fd;
 extern unsigned char _native_tap_mac[ETHER_ADDR_LEN];
