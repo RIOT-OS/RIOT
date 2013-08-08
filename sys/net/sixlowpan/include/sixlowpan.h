@@ -24,7 +24,6 @@
 #include "sixlowpan/lowpan.h"
 #include "sixlowpan/mac.h"
 
-#include "../error.h"       /* TODO: remove if not needed anymore */
 #include "../border.h"      /* TODO: remove if not needed anymore */
 #include "../lowpan.h"      /* TODO: remove if not needed anymore */
 #include "../mac.h"         /* TODO: remove if not needed anymore */

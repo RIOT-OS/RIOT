@@ -20,11 +20,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "sixlowpan/error.h"
+
 #include "ip.h"
 #include "icmp.h"
 #include "mac.h"
 #include "lowpan.h"
-#include "error.h"
 #include "serialnumber.h"
 #include "sys/net/net_help/net_help.h"
 #include "vtimer.h"

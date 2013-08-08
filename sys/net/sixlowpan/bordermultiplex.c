@@ -20,12 +20,12 @@
 #include <string.h>
 
 #include <board_uart0.h>
+#include "sixlowpan/error.h"
 
 #include "flowcontrol.h"
 #include "lowpan.h"
 #include "icmp.h"
 #include "border.h"
-#include "error.h"
 
 #include "bordermultiplex.h"
 
