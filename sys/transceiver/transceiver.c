@@ -508,6 +508,7 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
     switch (t) {
         case TRANSCEIVER_CC1100:
 #ifdef MODULE_CC110X_NG
+            DEBUG("Send packet to %" PRIu16 "\n", p.dst);
             cc110x_pkt.length = p.length + CC1100_HEADER_LENGTH;
             cc110x_pkt.address = p.dst;
             cc110x_pkt.flags = 0;
