@@ -24,32 +24,21 @@
 #include <thread.h>
 #include <msg.h>
 
-#include <transceiver.h>
 #include <radio/types.h>
+
+#include "transceiver.h"
 
 /* supported transceivers */
 #ifdef MODULE_CC110X
 #include <cc1100-interface.h>
-#if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
-#undef PAYLOAD_SIZE
-#define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
-#endif
 #endif
 
 #ifdef MODULE_CC110X_NG
 #include <cc110x_ng.h>
-#if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
-#undef PAYLOAD_SIZE
-#define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
-#endif
 #endif
 
 #ifdef MODULE_CC2420
 #include <cc2420.h>
-#if (CC2420_MAX_DATA_LENGTH > PAYLOAD_SIZE)
-    #undef PAYLOAD_SIZE
-    #define PAYLOAD_SIZE (CC2420_MAX_DATA_LENGTH)
-#endif
 #endif
 
 #ifdef MODULE_MC1322X
@@ -59,6 +48,10 @@
 #endif
 
 #define ENABLE_DEBUG (0)
+#if ENABLE_DEBUG
+    #undef TRANSCEIVER_STACK_SIZE
+    #define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_PRINTF)
+#endif
 #include <debug.h>
 
 /*------------------------------------------------------------------------------------*/
