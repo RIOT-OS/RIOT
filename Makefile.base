@@ -7,6 +7,8 @@ SRC = $(wildcard *.c)
 OBJ = $(SRC:%.c=$(BINDIR)%.o)
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
+.PHONY: clean
+
 include $(RIOTCPU)/Makefile.base
 include $(RIOTBOARD)/Makefile.base
 
