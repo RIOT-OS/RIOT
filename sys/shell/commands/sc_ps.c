@@ -17,8 +17,10 @@
 
 #include "ps.h"
 
-void _ps_handler(char *unnused)
+void _ps_handler(char *unused)
 {
+    (void) unused;
+
     thread_print_all();
 }
 
