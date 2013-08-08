@@ -25,14 +25,15 @@
 #include "msg.h"
 #include "posix_io.h"
 #include "board_uart0.h"
-#include "sixlowpan/error.h"
 
+#include "sixlowpan/error.h"
 #include "bordermultiplex.h"
 #include "flowcontrol.h"
 #include "border.h"
 #include "ip.h"
 #include "icmp.h"
 #include "serialnumber.h"
+
 #include "sys/net/ieee802154/ieee802154_frame.h"
 #include "sys/net/net_help/net_help.h"
 

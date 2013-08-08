@@ -28,6 +28,8 @@
 #include "timex.h"
 #include "mutex.h"
 
+#include "sixlowpan/types.h"
+
 /* set maximum transmission unit */
 #define MTU                         256
 /* IPv6 field values */
@@ -97,12 +99,6 @@ extern int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
 /* ipv6 extension header length */
 
-typedef union __attribute__((packed)) {
-    uint8_t uint8[16];
-    uint16_t uint16[8];
-    uint32_t uint32[4];
-} ipv6_addr_t;
-
 struct __attribute__((packed)) icmpv6_hdr_t {
     uint8_t type;
     uint8_t code;
@@ -119,17 +115,6 @@ typedef struct __attribute__((packed)) {
     ipv6_addr_t srcaddr;
     ipv6_addr_t destaddr;
 } ipv6_hdr_t;
-
-/* link layer addressing */
-typedef union __attribute__((packed)) {
-    uint8_t uint8[8];
-    uint16_t uint16[4];
-} ieee_802154_long_t;
-
-typedef union __attribute__((packed)) {
-    uint8_t uint8[2];
-    uint16_t uint16[1];
-} ieee_802154_short_t;
 
 typedef struct __attribute__((packed)) {
     uint8_t state;

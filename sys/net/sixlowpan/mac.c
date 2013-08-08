@@ -31,8 +31,8 @@
 #include "radio/radio.h"
 #include "transceiver.h"
 #include "vtimer.h"
+#include "sixlowpan/mac.h"
 
-#include "mac.h"
 #include "ip.h"
 #include "icmp.h"
 #include "lowpan.h"
@@ -41,6 +41,10 @@
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
+
+#define RADIO_STACK_SIZE            (MINIMUM_STACK_SIZE + 256)
+#define RADIO_RCV_BUF_SIZE          (64)
+#define RADIO_SENDING_DELAY         (1000)
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
 msg_t msg_q[RADIO_RCV_BUF_SIZE];
@@ -53,9 +57,8 @@ static radio_packet_t p;
 static msg_t mesg;
 int transceiver_type;
 static transceiver_command_t tcmd;
-uint16_t fragmentcounter = 0;
 
-uint8_t get_radio_address(void)
+uint8_t sixlowpan_mac_get_radio_address(void)
 {
     int16_t address;
 
@@ -68,7 +71,7 @@ uint8_t get_radio_address(void)
     return (uint8_t)address;
 }
 
-void set_radio_address(uint8_t addr)
+void sixlowpan_mac_set_radio_address(uint8_t addr)
 {
     int16_t address = (int16_t)addr;
 
@@ -98,18 +101,18 @@ void switch_to_rx(void)
     msg_send(&mesg, transceiver_pid, 1);
 }
 
-void init_802154_short_addr(ieee_802154_short_t *saddr)
+void sixlowpan_mac_init_802154_short_addr(ieee_802154_short_t *saddr)
 {
     saddr->uint8[0] = 0;
-    saddr->uint8[1] = get_radio_address();
+    saddr->uint8[1] = sixlowpan_mac_get_radio_address();
 }
 
-ieee_802154_long_t *mac_get_eui(ipv6_addr_t *ipaddr)
+ieee_802154_long_t *sixlowpan_mac_get_eui64(const ipv6_addr_t *ipaddr)
 {
     return ((ieee_802154_long_t *) & (ipaddr->uint8[8]));
 }
 
-void init_802154_long_addr(ieee_802154_long_t *laddr)
+void sixlowpan_mac_init_802154_long_addr(ieee_802154_long_t *laddr)
 {
     // 16bit Pan-ID:16-zero-bits:16-bit-short-addr = 48bit
     laddr->uint16[0] = IEEE_802154_PAN_ID;
@@ -121,7 +124,7 @@ void init_802154_long_addr(ieee_802154_long_t *laddr)
     laddr->uint8[4] = 0xFE;
     laddr->uint8[5] = 0;
     laddr->uint8[6] = 0;
-    laddr->uint8[7] = get_radio_address();
+    laddr->uint8[7] = sixlowpan_mac_get_radio_address();
 }
 
 void recv_ieee802154_frame(void)
@@ -143,7 +146,6 @@ void recv_ieee802154_frame(void)
             length = p->length - hdrlen;
 
             /* deliver packet to network(6lowpan)-layer */
-            fragmentcounter++;
             lowpan_read(frame.payload, length, (ieee_802154_long_t *)&frame.src_addr,
                         (ieee_802154_long_t *)&frame.dest_addr);
 
@@ -181,8 +183,9 @@ void set_ieee802154_frame_values(ieee802154_frame_t *frame)
     macdsn++;
 }
 
-void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
-                           uint8_t length, uint8_t mcast)
+void sixlowpan_mac_send_ieee802154_frame(const ieee_802154_long_t *addr,
+                                         const uint8_t *payload, 
+                                         uint8_t length, uint8_t mcast)
 {
     uint16_t daddr;
     /* TODO: check if dedicated response struct is necessary */
@@ -205,7 +208,7 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
     memcpy(&(frame.src_addr[0]), &(iface.laddr.uint8[0]), 8);
 
     daddr = HTONS(addr->uint16[3]);
-    frame.payload = payload;
+    frame.payload = (uint8_t *)payload; // payload won't be changed so cast is legal.
     frame.payload_len = length;
     uint8_t hdrlen = get_802154_hdr_len(&frame);
 
@@ -232,7 +235,7 @@ void send_ieee802154_frame(ieee_802154_long_t *addr, uint8_t *payload,
     hwtimer_wait(5000);
 }
 
-void sixlowmac_init(transceiver_type_t type)
+void sixlowpan_mac_init(transceiver_type_t type)
 {
     int recv_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE,
                                  PRIORITY_MAIN - 2, CREATE_STACKTEST, recv_ieee802154_frame , "radio");

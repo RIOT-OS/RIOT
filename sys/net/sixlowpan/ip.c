@@ -25,9 +25,9 @@
 #include "vtimer.h"
 #include "mutex.h"
 #include "msg.h"
+#include "sixlowpan/mac.h"
 
 #include "ip.h"
-#include "mac.h"
 #include "icmp.h"
 #include "lowpan.h"
 
@@ -207,7 +207,7 @@ void ipv6_process(void)
     uint8_t i;
 
     ipv6_init_address(&myaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00,
-                      get_radio_address());
+                      sixlowpan_mac_get_radio_address());
 
     while (1) {
         msg_receive(&m_recv_lowpan);

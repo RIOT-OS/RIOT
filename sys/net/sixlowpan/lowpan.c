@@ -32,8 +32,8 @@
 #include "hwtimer.h"
 #include "msg.h"
 #include "transceiver.h"
+#include "sixlowpan/mac.h"
 
-#include "mac.h"
 #include "lowpan.h"
 #include "border.h"
 #include "ip.h"
@@ -128,8 +128,10 @@ void lowpan_init(ieee_802154_long_t *addr, uint8_t *data)
         fragbuf[2] = (tag >> 8) & 0xff;
         fragbuf[3] = tag & 0xff;
 
-        send_ieee802154_frame(&laddr, (uint8_t *)&fragbuf,
-                              max_frag_initial + header_size + 4, mcast);
+        sixlowpan_mac_send_ieee802154_frame(&laddr,
+                                            (uint8_t *)&fragbuf,
+                                            max_frag_initial + header_size + 4,
+                                            mcast);
         /* subsequent fragments */
         position = max_frag_initial;
         max_frag = ((max_frame - 5) / 8) * 8;
@@ -146,8 +148,9 @@ void lowpan_init(ieee_802154_long_t *addr, uint8_t *data)
             fragbuf[3] = tag & 0xff;
             fragbuf[4] = position / 8;
 
-            send_ieee802154_frame(&laddr, (uint8_t *)&fragbuf, max_frag + 5,
-                                  mcast);
+            sixlowpan_mac_send_ieee802154_frame(&laddr,
+                                                (uint8_t *)&fragbuf,
+                                                max_frag + 5, mcast);
             data += max_frag;
             position += max_frag;
 
@@ -165,10 +168,13 @@ void lowpan_init(ieee_802154_long_t *addr, uint8_t *data)
         fragbuf[3] = tag & 0xff;
         fragbuf[4] = position / 8;
 
-        send_ieee802154_frame(&laddr, (uint8_t *)&fragbuf, remaining + 5, mcast);
+        sixlowpan_mac_send_ieee802154_frame(&laddr,
+                                            (uint8_t *)&fragbuf,
+                                            remaining + 5, mcast);
     }
     else {
-        send_ieee802154_frame(&laddr, data, packet_length, mcast);
+        sixlowpan_mac_send_ieee802154_frame(&laddr, data,
+                                            packet_length, mcast);
     }
 
     tag++;
@@ -1553,13 +1559,13 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border)
     short i;
 
     /* init mac-layer and radio transceiver */
-    sixlowmac_init(trans);
+    sixlowpan_mac_init(trans);
 
     /* init interface addresses */
     memset(&iface, 0, sizeof(iface_t));
-    set_radio_address(r_addr);
-    init_802154_short_addr(&(iface.saddr));
-    init_802154_long_addr(&(iface.laddr));
+    sixlowpan_mac_set_radio_address(r_addr);
+    sixlowpan_mac_init_802154_short_addr(&(iface.saddr));
+    sixlowpan_mac_init_802154_long_addr(&(iface.laddr));
     /* init global buffer mutex */
     mutex_init(&buf_mutex);
 

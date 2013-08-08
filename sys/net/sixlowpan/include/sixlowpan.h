@@ -49,7 +49,6 @@
 
 #include "../border.h"      /* TODO: remove if not needed anymore */
 #include "../lowpan.h"      /* TODO: remove if not needed anymore */
-#include "../mac.h"         /* TODO: remove if not needed anymore */
 
 /**
  * @}

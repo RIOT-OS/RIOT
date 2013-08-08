@@ -24,10 +24,10 @@
 #include "vtimer.h"
 #include "mutex.h"
 #include "sixlowpan/error.h"
+#include "sixlowpan/mac.h"
 
 #include "ip.h"
 #include "icmp.h"
-#include "mac.h"
 #include "lowpan.h"
 #include "serialnumber.h"
 #include "sys/net/net_help/net_help.h"
@@ -826,7 +826,7 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
         opt_aro_buf->status = 0;
         opt_aro_buf->reserved1 = 0;
         opt_aro_buf->reserved2 = 0;
-        memcpy(&(opt_aro_buf->eui64), mac_get_eui(src), 8);
+        memcpy(&(opt_aro_buf->eui64), sixlowpan_mac_get_eui64(src), 8);
         opt_hdr_len += OPT_ARO_HDR_LEN;
 
         packet_length += OPT_ARO_HDR_LEN;
@@ -1069,7 +1069,7 @@ void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
         opt_aro_buf->status = 0;    /* TODO */
         opt_aro_buf->reserved1 = 0;
         opt_aro_buf->reserved2 = 0;
-        memcpy(&(opt_aro_buf->eui64), mac_get_eui(dst), 8);
+        memcpy(&(opt_aro_buf->eui64), sixlowpan_mac_get_eui64(dst), 8);
         opt_hdr_len += OPT_ARO_HDR_LEN;
 
         packet_length += OPT_ARO_HDR_LEN;
