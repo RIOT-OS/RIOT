@@ -41,10 +41,10 @@ Its features comprise
 * TCP and UDP
 * 6LoWPAN
 * RPL
-
-Development procedures
+ 
+Development Procedures
 ======================
-1. Check if your code follows the Coding Conventions. If the code does not comply these style rules, your code will not be merged.
+1. Check if your code follows the https://github.com/RIOT-OS/RIOT/wiki/Coding-conventions. If the code does not comply these style rules, your code will not be merged.
 
 2. Create a new branch in your own fork for every new feature or fix. Then create the pull request from this branch, once you completed your task (feature or fix). Every commit in this branch will be added to the pull request.
 
@@ -52,7 +52,7 @@ Development procedures
 
 4. New features and fixes will always be submitted as pull requests. A pull request will be merged if the RIOT maintainers acknowledge the request. Before it will get merged, the pull request has to stay open long enough to discuss possible issues, but no longer than 30 days. The more extensive the changes in the pull request, the more time should be given for discussion.
 
-5. Comments on a pull request should be added to the request itself, and not to the commit.
+5. Comments on a pull request should be added to the request itself, and *not* to the commit.
 
 6. Only RIOT maintainers have commit rights to the main RIOT repository. However, even they have to create pull requests to submit their changes. A RIOT contributor cannot acknowledge his own pull request. All current RIOT maintainers are listed in the wiki.
 
@@ -60,10 +60,26 @@ Development procedures
 
 8. Describe the technical detail of the change(s) as specific as possible.
 
+Getting Started
+===============
+* You want to start the RIOT? Just follow our Getting started documentation: http://riot-os.org/doc/getting_started.html
+* The RIOT API itself can be built from the code using doxygen. The latest version is uploaded daily to http://riot-os.org/api.
+
+Mailing Lists
+=============
+* RIOT OS kernel developers list
+ * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+* RIOT OS users list
+ * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+* RIOT commits
+ * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+* Github notifications
+ * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+
 License
 =======
 * All sources and binaries that have been developed at Freie Universität Berlin are
-  licensed under the GNU General Public License version 3 as published by the
+  licensed under the GNU Lesser General Public License version 2 as published by the
   Free Software Foundation.
 * Some external sources, especially files developed by SICS are published under
   a separate license.
