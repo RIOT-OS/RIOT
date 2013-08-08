@@ -7,10 +7,10 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup rpl 
+ * @ingroup rpl
  * @{
  * @file    trickle.h
- * @brief   Trickle 
+ * @brief   Trickle
  * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @}
  */

@@ -24,8 +24,9 @@
 #define _SIXLOWPAN_IP_H
 
 #include <stdint.h>
-#include <timex.h>
-#include <mutex.h>
+
+#include "timex.h"
+#include "mutex.h"
 
 /* set maximum transmission unit */
 #define MTU                         256

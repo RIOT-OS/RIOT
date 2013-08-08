@@ -1,5 +1,5 @@
 /**
- * RPL implementation 
+ * RPL implementation
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,10 +7,10 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup rpl 
+ * @ingroup rpl
  * @{
- * @file    rpl.c 
- * @brief   basic RPL functions 
+ * @file    rpl.c
+ * @brief   basic RPL functions
  * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @}
  */
@@ -71,7 +71,7 @@ static rpl_opt_transit_t *rpl_opt_transit_buf;
 /*  SEND BUFFERS */
 static ipv6_hdr_t *get_rpl_send_ipv6_buf(void)
 {
-    return ((ipv6_hdr_t *)&(rpl_send_buffer[0]));
+    return ((ipv6_hdr_t *) & (rpl_send_buffer[0]));
 }
 
 static uint8_t *get_rpl_send_payload_buf(uint8_t ext_len)
@@ -79,95 +79,86 @@ static uint8_t *get_rpl_send_payload_buf(uint8_t ext_len)
     return &(rpl_send_buffer[IPV6_HDR_LEN + ext_len]);
 }
 
-static struct icmpv6_hdr_t *get_rpl_send_icmpv6_buf(uint8_t ext_len)
-{
-    return ((struct icmpv6_hdr_t *)&(rpl_send_buffer[IPV6_HDR_LEN + ext_len]));
+static struct icmpv6_hdr_t *get_rpl_send_icmpv6_buf(uint8_t ext_len) {
+    return ((struct icmpv6_hdr_t *) & (rpl_send_buffer[IPV6_HDR_LEN + ext_len]));
 }
 
-static struct rpl_dio_t *get_rpl_send_dio_buf(void)
-{
-    return ((struct rpl_dio_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+static struct rpl_dio_t *get_rpl_send_dio_buf(void) {
+    return ((struct rpl_dio_t *) & (rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
 
-static struct rpl_dao_t *get_rpl_send_dao_buf(void)
-{
-    return ((struct rpl_dao_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+static struct rpl_dao_t *get_rpl_send_dao_buf(void) {
+    return ((struct rpl_dao_t *) & (rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
 
-static struct rpl_dao_ack_t *get_rpl_send_dao_ack_buf(void)
-{
-    return ((struct rpl_dao_ack_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+static struct rpl_dao_ack_t *get_rpl_send_dao_ack_buf(void) {
+    return ((struct rpl_dao_ack_t *) & (rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
 
-static struct rpl_dis_t *get_rpl_send_dis_buf(void)
-{
-    return ((struct rpl_dis_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+static struct rpl_dis_t *get_rpl_send_dis_buf(void) {
+    return ((struct rpl_dis_t *) & (rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
 
 static rpl_opt_dodag_conf_t *get_rpl_send_opt_dodag_conf_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_dodag_conf_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_dodag_conf_t *) & (rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
 static rpl_opt_target_t *get_rpl_send_opt_target_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_target_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_target_t *) & (rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
 static rpl_opt_transit_t *get_rpl_send_opt_transit_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_transit_t *)&(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_transit_t *) & (rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
 /* RECEIVE BUFFERS */
 static ipv6_hdr_t *get_rpl_ipv6_buf(void)
 {
-    return ((ipv6_hdr_t *)&(rpl_buffer[0]));
+    return ((ipv6_hdr_t *) & (rpl_buffer[0]));
 }
 
-static struct rpl_dio_t *get_rpl_dio_buf(void)
-{
-    return ((struct rpl_dio_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+static struct rpl_dio_t *get_rpl_dio_buf(void) {
+    return ((struct rpl_dio_t *) & (rpl_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
 
-static struct rpl_dao_t *get_rpl_dao_buf(void)
-{
-    return ((struct rpl_dao_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+static struct rpl_dao_t *get_rpl_dao_buf(void) {
+    return ((struct rpl_dao_t *) & (rpl_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
 
-static struct rpl_dao_ack_t *get_rpl_dao_ack_buf(void)
-{
-    return ((struct rpl_dao_ack_t *)&(buffer[LLHDR_ICMPV6HDR_LEN]));
+static struct rpl_dao_ack_t *get_rpl_dao_ack_buf(void) {
+    return ((struct rpl_dao_ack_t *) & (buffer[LLHDR_ICMPV6HDR_LEN]));
 }
 
-static struct rpl_dis_t *get_rpl_dis_buf(void)
-{
-    return ((struct rpl_dis_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+static struct rpl_dis_t *get_rpl_dis_buf(void) {
+    return ((struct rpl_dis_t *) & (rpl_buffer[IPV6HDR_ICMPV6HDR_LEN]));
 }
 
 static rpl_opt_t *get_rpl_opt_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_t *) & (rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
 static rpl_opt_dodag_conf_t *get_rpl_opt_dodag_conf_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_dodag_conf_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_dodag_conf_t *) & (rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
 static rpl_opt_solicited_t *get_rpl_opt_solicited_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_solicited_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_solicited_t *) & (rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
 static rpl_opt_target_t *get_rpl_opt_target_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_target_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_target_t *) & (rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
 static rpl_opt_transit_t *get_rpl_opt_transit_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_transit_t *)&(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_transit_t *) & (rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
 }
 
 /* find implemented OF via objective code point */
@@ -210,7 +201,7 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address)
     set_rpl_process_pid(rpl_process_pid);
 
     /* initialize ETX-calculation if needed */
-    if(RPL_DEFAULT_OCP == 1){
+    if (RPL_DEFAULT_OCP == 1) {
         DEBUG("INIT ETX BEACONING\n");
         etx_init_beaconing(&my_address);
     }
@@ -236,7 +227,7 @@ void rpl_init_root(void)
     dodag = rpl_new_dodag(RPL_DEFAULT_INSTANCE, &my_address);
 
     if (dodag != NULL) {
-        dodag->of = (struct rpl_of_t*) rpl_get_of_for_ocp(RPL_DEFAULT_OCP);
+        dodag->of = (struct rpl_of_t *) rpl_get_of_for_ocp(RPL_DEFAULT_OCP);
         dodag->instance = inst;
         dodag->mop = RPL_DEFAULT_MOP;
         dodag->dtsn = 1;
@@ -474,7 +465,7 @@ void rpl_process(void)
         ipv6_buf = get_ipv6_buf();
         memcpy(&rpl_buffer, ipv6_buf, ipv6_buf->length + IPV6_HDR_LEN);
 
-        switch(*code) {
+        switch (*code) {
             case (ICMP_CODE_DIS): {
                 recv_rpl_dis();
                 mutex_unlock(&rpl_recv_mutex);
@@ -530,11 +521,11 @@ void recv_rpl_dio(void)
         }
     }
     else if (my_inst->id != dio_inst->id) {
-         /* TODO: Add support support for several instances.  */
+        /* TODO: Add support support for several instances.  */
 
-         /* At the moment, nodes can only join one instance, this is
-         * the instance they join first.
-         * Instances cannot be switched later on.  */
+        /* At the moment, nodes can only join one instance, this is
+        * the instance they join first.
+        * Instances cannot be switched later on.  */
 
         DEBUG("Ignoring instance - we are %d and got %d\n", my_inst->id, dio_inst->id);
         return;
@@ -553,14 +544,14 @@ void recv_rpl_dio(void)
 
     uint8_t has_dodag_conf_opt = 0;
 
-     /* Parse until all options are consumed.
-      * ipv6_buf->length contains the packet length minus ipv6 and
-      * icmpv6 header, so only ICMPV6_HDR_LEN remains to be
-      * subtracted.  */
+    /* Parse until all options are consumed.
+     * ipv6_buf->length contains the packet length minus ipv6 and
+     * icmpv6 header, so only ICMPV6_HDR_LEN remains to be
+     * subtracted.  */
     while (len < (ipv6_buf->length - ICMPV6_HDR_LEN)) {
         rpl_opt_buf = get_rpl_opt_buf(len);
 
-        switch(rpl_opt_buf->type) {
+        switch (rpl_opt_buf->type) {
 
             case (RPL_OPT_PAD1): {
                 len += 1;
@@ -598,7 +589,7 @@ void recv_rpl_dio(void)
                 dio_dodag.minhoprankincrease = rpl_opt_dodag_conf_buf->MinHopRankIncrease;
                 dio_dodag.default_lifetime = rpl_opt_dodag_conf_buf->default_lifetime;
                 dio_dodag.lifetime_unit = rpl_opt_dodag_conf_buf->lifetime_unit;
-                dio_dodag.of = (struct rpl_of_t*) rpl_get_of_for_ocp(rpl_opt_dodag_conf_buf->ocp);
+                dio_dodag.of = (struct rpl_of_t *) rpl_get_of_for_ocp(rpl_opt_dodag_conf_buf->ocp);
                 len += RPL_OPT_DODAG_CONF_LEN + 2;
                 break;
             }
@@ -682,7 +673,7 @@ void recv_rpl_dio(void)
         reset_trickletimer();
     }
 
-    /* We are root, all done!  */
+    /* We are root, all done! */
     if (my_dodag->my_rank == ROOT_RANK) {
         if (rpl_dio_buf->rank != INFINITE_RANK) {
             trickle_increment_counter();
@@ -736,7 +727,7 @@ void recv_rpl_dis(void)
     while (len < (ipv6_buf->length - ICMPV6_HDR_LEN)) {
         rpl_opt_buf = get_rpl_opt_buf(len);
 
-        switch(rpl_opt_buf->type) {
+        switch (rpl_opt_buf->type) {
             case (RPL_OPT_PAD1): {
                 len += 1;
                 break;
@@ -805,7 +796,7 @@ void recv_rpl_dao(void)
     while (len < (ipv6_buf->length - ICMPV6_HDR_LEN)) {
         rpl_opt_buf = get_rpl_opt_buf(len);
 
-        switch(rpl_opt_buf->type) {
+        switch (rpl_opt_buf->type) {
 
             case (RPL_OPT_PAD1): {
                 len += 1;
@@ -919,7 +910,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
     packet_length = IPV6_HDR_LEN + p_len;
 
     if (ipv6_prefix_mcast_match(&ipv6_send_buf->destaddr)) {
-        lowpan_init((ieee_802154_long_t *)&(ipv6_send_buf->destaddr.uint16[4]), (uint8_t *)ipv6_send_buf);
+        lowpan_init((ieee_802154_long_t *) & (ipv6_send_buf->destaddr.uint16[4]), (uint8_t *)ipv6_send_buf);
     }
     else {
         /* find appropriate next hop before sending */
@@ -940,7 +931,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
             }
         }
 
-        lowpan_init((ieee_802154_long_t *)&(next_hop->uint16[4]), (uint8_t *)ipv6_send_buf);
+        lowpan_init((ieee_802154_long_t *) & (next_hop->uint16[4]), (uint8_t *)ipv6_send_buf);
     }
 
 }

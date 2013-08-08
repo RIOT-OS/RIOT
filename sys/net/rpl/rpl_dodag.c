@@ -1,5 +1,5 @@
 /**
- * RPL dodag implementation 
+ * RPL dodag implementation
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,10 +7,10 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup rpl 
+ * @ingroup rpl
  * @{
  * @file    rpl_dodag.c
- * @brief   RPL dodag functions 
+ * @brief   RPL dodag functions
  * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @}
  */
@@ -179,7 +179,7 @@ void rpl_delete_parent(rpl_parent_t *parent)
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 
     if ((my_dodag != NULL) && rpl_equal_id(&my_dodag->my_preferred_parent->addr,
-                                          &parent->addr)) {
+                                           &parent->addr)) {
         my_dodag->my_preferred_parent = NULL;
     }
 
@@ -275,7 +275,7 @@ void rpl_parent_update(rpl_parent_t *parent)
     }
 
     if (rpl_calc_rank(old_rank, my_dodag->minhoprankincrease) !=
-       rpl_calc_rank(my_dodag->my_rank, my_dodag->minhoprankincrease)) {
+        rpl_calc_rank(my_dodag->my_rank, my_dodag->minhoprankincrease)) {
         if (my_dodag->my_rank < my_dodag->min_rank) {
             my_dodag->min_rank = my_dodag->my_rank;
         }
@@ -348,7 +348,7 @@ void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank)
     else {
         /* Calc new Rank */
         my_dodag->my_rank = my_dodag->of->calc_rank(my_dodag->my_preferred_parent,
-                                                    my_dodag->my_rank);
+                            my_dodag->my_rank);
         my_dodag->min_rank = my_dodag->my_rank;
         reset_trickletimer();
         delay_dao();

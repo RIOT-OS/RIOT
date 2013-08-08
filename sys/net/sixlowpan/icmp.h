@@ -274,7 +274,7 @@ uint16_t icmpv6_csum(uint8_t proto);
 def_rtr_lst_t *def_rtr_lst_search(ipv6_addr_t *ipaddr);
 void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime);
 void def_rtr_lst_rem(def_rtr_lst_t *entry);
-void init_para_prob(ipv6_addr_t *src, ipv6_addr_t *dest, uint8_t code, 
+void init_para_prob(ipv6_addr_t *src, ipv6_addr_t *dest, uint8_t code,
                     uint32_t pointer, uint8_t *packet, uint8_t packet_len);
 void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
                   uint8_t slloa, uint8_t aro);

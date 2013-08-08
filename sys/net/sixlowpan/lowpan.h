@@ -10,7 +10,7 @@
  * @ingroup sixlowpan
  * @{
  * @file    sixlowpan.h
- * @brief   6lowpan header 
+ * @brief   6lowpan header
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
@@ -118,7 +118,7 @@ void sixlowpan_init(transceiver_type_t trans, uint8_t r_addr, int as_border);
  * @param[in] prefix    the address prefix to advertise
  * @param[in] r_addr    phy layer address
  */
-void sixlowpan_adhoc_init(transceiver_type_t trans, ipv6_addr_t *prefix, 
+void sixlowpan_adhoc_init(transceiver_type_t trans, ipv6_addr_t *prefix,
                           uint8_t r_addr);
 void lowpan_init(ieee_802154_long_t *addr, uint8_t *data);
 void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,

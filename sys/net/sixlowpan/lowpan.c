@@ -10,7 +10,7 @@
  * @ingroup sixlowpan
  * @{
  * @file    sixlowpan.c
- * @brief   6lowpan functions 
+ * @brief   6lowpan functions
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
@@ -18,7 +18,6 @@
  * @}
  */
 
-#include "ip.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -31,12 +30,14 @@
 #include "mutex.h"
 #include "hwtimer.h"
 #include "msg.h"
+#include "transceiver.h"
+
 #include "mac.h"
 #include "lowpan.h"
 #include "border.h"
 #include "ip.h"
 #include "icmp.h"
-#include "transceiver.h"
+
 #include "sys/net/ieee802154/ieee802154_frame.h"
 #include "sys/net/destiny/in.h"
 #include "sys/net/net_help/net_help.h"
@@ -207,7 +208,7 @@ void printFIFOBuffers(void)
     while (temp_buffer != NULL) {
         printLongLocalAddr(&temp_buffer->s_laddr);
         printf("Ident.: %i, Packet Size: %i/%i, Timestamp: %li\n",
-               temp_buffer->ident_no, temp_buffer->current_packet_size, 
+               temp_buffer->ident_no, temp_buffer->current_packet_size,
                temp_buffer->packet_size, temp_buffer->timestamp);
         temp_interval = temp_buffer->interval_list_head;
 
@@ -353,10 +354,10 @@ lowpan_reas_buf_t *get_packet_frag_buf(uint16_t datagram_size,
 
     while (current_buf != NULL) {
         if (((ll_get_addr_match(&current_buf->s_laddr, s_laddr)) == 64) &&
-           ((ll_get_addr_match(&current_buf->d_laddr, d_laddr)) == 64) &&
-           (current_buf->packet_size == datagram_size) &&
-           (current_buf->ident_no == datagram_tag) &&
-           current_buf->interval_list_head != NULL) {
+            ((ll_get_addr_match(&current_buf->d_laddr, d_laddr)) == 64) &&
+            (current_buf->packet_size == datagram_size) &&
+            (current_buf->ident_no == datagram_tag) &&
+            current_buf->interval_list_head != NULL) {
             /* Found buffer for current packet fragment */
             timex_t now;
             vtimer_now(&now);
@@ -378,8 +379,8 @@ uint8_t isInInterval(uint8_t start1, uint8_t end1, uint8_t start2, uint8_t end2)
     /* 0: Interval 1 and 2 are not overlapping or the same */
 
     if (((start1 < start2) && (start2 <= end1)) ||
-       ((start2 < start1) && (start1 <= end2)) ||
-       ((start1 == start2) && (end1 == end2))) {
+        ((start2 < start1) && (start1 <= end2)) ||
+        ((start1 == start2) && (end1 == end2))) {
         return 1;
     }
     else {
@@ -505,7 +506,7 @@ lowpan_reas_buf_t *collect_garbage(lowpan_reas_buf_t *current_buf)
     return return_buf;
 }
 
-void handle_packet_fragment(uint8_t *data, uint8_t datagram_offset, 
+void handle_packet_fragment(uint8_t *data, uint8_t datagram_offset,
                             uint16_t datagram_size, uint16_t datagram_tag,
                             ieee_802154_long_t *s_laddr,
                             ieee_802154_long_t *d_laddr, uint8_t hdr_length,
@@ -516,8 +517,8 @@ void handle_packet_fragment(uint8_t *data, uint8_t datagram_offset,
     current_buf = get_packet_frag_buf(datagram_size, datagram_tag, s_laddr, d_laddr);
 
     if ((current_buf != NULL) && (handle_packet_frag_interval(current_buf,
-                                                             datagram_offset,
-                                                             frag_size) == 1)) {
+                                  datagram_offset,
+                                  frag_size) == 1)) {
         /* Copy fragment bytes into corresponding packet space area */
         memcpy(current_buf->packet + datagram_offset, data + hdr_length, frag_size);
         current_buf->current_packet_size += frag_size;
@@ -633,7 +634,7 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
         /* get 16-bit datagram tag */
         datagram_tag = (((uint16_t)(data[2] << 8)) | data[3]);
 
-        switch(data[0] & 0xf8) {
+        switch (data[0] & 0xf8) {
                 /* First Fragment */
             case (0xc0): {
                 datagram_offset = 0;
@@ -665,7 +666,7 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
     /* Regular Packet */
     else {
         lowpan_reas_buf_t *current_buf = get_packet_frag_buf(length, 0, s_laddr,
-                                                             d_laddr);
+                                         d_laddr);
         /* Copy packet bytes into corresponding packet space area */
         memcpy(current_buf->packet, data, length);
         current_buf->current_packet_size += length;
@@ -711,12 +712,12 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
     tc = (tc >> 2) | (tc << 6);
 
     if ((ipv6_buf->flowlabel == 0) &&
-       (ipv6_buf->trafficclass_flowlabel & 0x0f) == 0) {
+        (ipv6_buf->trafficclass_flowlabel & 0x0f) == 0) {
         /* flowlabel is elided */
         lowpan_iphc[0] |= LOWPAN_IPHC_FL_C;
 
         if (((ipv6_buf->version_trafficclass & 0x0f) == 0) &&
-           ((ipv6_buf->trafficclass_flowlabel & 0xf0) == 0)) {
+            ((ipv6_buf->trafficclass_flowlabel & 0xf0) == 0)) {
             /* traffic class is elided */
             lowpan_iphc[0] |= LOWPAN_IPHC_TC_C;
         }
@@ -729,7 +730,7 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
     else {
         /* flowlabel not compressible */
         if (((ipv6_buf->version_trafficclass & 0x0f) == 0) &&
-           ((ipv6_buf->trafficclass_flowlabel & 0xf0) == 0)) {
+            ((ipv6_buf->trafficclass_flowlabel & 0xf0) == 0)) {
             /* traffic class is elided */
             lowpan_iphc[0] |= LOWPAN_IPHC_TC_C;
             /* ECN + 2-bit Pad + Flow Label (3 bytes), DSCP is elided */
@@ -752,7 +753,7 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
     hdr_pos++;
 
     /* HLIM: Hop Limit: */
-    switch(ipv6_buf->hoplimit) {
+    switch (ipv6_buf->hoplimit) {
         case (1): {
             /* 01: The Hop Limit field is compressed and the hop limit is 1. */
             lowpan_iphc[0] |= 0x01;
@@ -782,7 +783,7 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
 
     /* CID: Context Identifier Extension: */
     if ((lowpan_context_lookup(&ipv6_buf->srcaddr) != NULL) ||
-       (lowpan_context_lookup(&ipv6_buf->destaddr) != NULL)) {
+        (lowpan_context_lookup(&ipv6_buf->destaddr) != NULL)) {
         lowpan_iphc[1] |= LOWPAN_IPHC_CID;
         memmove(&ipv6_hdr_fields[1], &ipv6_hdr_fields[0], hdr_pos);
         hdr_pos++;
@@ -805,9 +806,9 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
             lowpan_iphc[1] |= 0x30;
         }
         else if ((ipv6_buf->srcaddr.uint16[4] == 0) &&
-                (ipv6_buf->srcaddr.uint16[5] == 0) &&
-                (ipv6_buf->srcaddr.uint16[6] == 0) &&
-                ((ipv6_buf->srcaddr.uint8[14]) & 0x80) == 0) {
+                 (ipv6_buf->srcaddr.uint16[5] == 0) &&
+                 (ipv6_buf->srcaddr.uint16[6] == 0) &&
+                 ((ipv6_buf->srcaddr.uint8[14]) & 0x80) == 0) {
             /* 49-bit of interface identifier are 0, so we can compress
              * source address-iid to 16-bit */
             memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->srcaddr.uint16[7], 2);
@@ -832,9 +833,9 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
             lowpan_iphc[1] |= 0x30;
         }
         else if ((ipv6_buf->srcaddr.uint16[4] == 0) &&
-                (ipv6_buf->srcaddr.uint16[5] == 0) &&
-                (ipv6_buf->srcaddr.uint16[6] == 0) &&
-                ((ipv6_buf->srcaddr.uint8[14]) & 0x80) == 0) {
+                 (ipv6_buf->srcaddr.uint16[5] == 0) &&
+                 (ipv6_buf->srcaddr.uint16[6] == 0) &&
+                 ((ipv6_buf->srcaddr.uint8[14]) & 0x80) == 0) {
             /* 49-bit of interface identifier are 0, so we can compress
              * source address-iid to 16-bit */
             memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->srcaddr.uint16[7], 2);
@@ -864,24 +865,24 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
 
         /* just another cool if condition */
         if ((ipv6_buf->destaddr.uint8[1] == 2) &&
-           (ipv6_buf->destaddr.uint16[1] == 0) &&
-           (ipv6_buf->destaddr.uint16[2] == 0) &&
-           (ipv6_buf->destaddr.uint16[3] == 0) &&
-           (ipv6_buf->destaddr.uint16[4] == 0) &&
-           (ipv6_buf->destaddr.uint16[5] == 0) &&
-           (ipv6_buf->destaddr.uint16[6] == 0) &&
-           (ipv6_buf->destaddr.uint8[14] == 0)) {
+            (ipv6_buf->destaddr.uint16[1] == 0) &&
+            (ipv6_buf->destaddr.uint16[2] == 0) &&
+            (ipv6_buf->destaddr.uint16[3] == 0) &&
+            (ipv6_buf->destaddr.uint16[4] == 0) &&
+            (ipv6_buf->destaddr.uint16[5] == 0) &&
+            (ipv6_buf->destaddr.uint16[6] == 0) &&
+            (ipv6_buf->destaddr.uint8[14] == 0)) {
             /* 11: 8 bits. The address takes the form FF02::00XX. */
             lowpan_iphc[1] |= 0x03;
             ipv6_hdr_fields[hdr_pos] = ipv6_buf->destaddr.uint8[15];
             hdr_pos++;
         }
         else if ((ipv6_buf->destaddr.uint16[1] == 0) &&
-                (ipv6_buf->destaddr.uint16[2] == 0) &&
-                (ipv6_buf->destaddr.uint16[3] == 0) &&
-                (ipv6_buf->destaddr.uint16[4] == 0) &&
-                (ipv6_buf->destaddr.uint16[5] == 0) &&
-                (ipv6_buf->destaddr.uint8[12] == 0)) {
+                 (ipv6_buf->destaddr.uint16[2] == 0) &&
+                 (ipv6_buf->destaddr.uint16[3] == 0) &&
+                 (ipv6_buf->destaddr.uint16[4] == 0) &&
+                 (ipv6_buf->destaddr.uint16[5] == 0) &&
+                 (ipv6_buf->destaddr.uint8[12] == 0)) {
             /* 10: 32 bits. The address takes the form FFXX::00XX:XXXX. */
             lowpan_iphc[1] |= 0x02;
             /* copy second and last 3 byte */
@@ -891,10 +892,10 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
             hdr_pos += 3;
         }
         else if ((ipv6_buf->destaddr.uint16[1] == 0) &&
-                (ipv6_buf->destaddr.uint16[2] == 0) &&
-                (ipv6_buf->destaddr.uint16[3] == 0) &&
-                (ipv6_buf->destaddr.uint16[4] == 0) &&
-                (ipv6_buf->destaddr.uint8[10] == 0)) {
+                 (ipv6_buf->destaddr.uint16[2] == 0) &&
+                 (ipv6_buf->destaddr.uint16[3] == 0) &&
+                 (ipv6_buf->destaddr.uint16[4] == 0) &&
+                 (ipv6_buf->destaddr.uint8[10] == 0)) {
             /* 01: 48 bits.  The address takes the form FFXX::00XX:XXXX:XXXX */
             lowpan_iphc[1] |= 0x01;
             /* copy second and last 5 byte */
@@ -922,9 +923,9 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
                 lowpan_iphc[1] |= 0x03;
             }
             else if ((ipv6_buf->destaddr.uint16[4] == 0) &&
-                    (ipv6_buf->destaddr.uint16[5] == 0) &&
-                    (ipv6_buf->destaddr.uint16[6] == 0) &&
-                    ((ipv6_buf->destaddr.uint8[14]) & 0x80) == 0) {
+                     (ipv6_buf->destaddr.uint16[5] == 0) &&
+                     (ipv6_buf->destaddr.uint16[6] == 0) &&
+                     ((ipv6_buf->destaddr.uint8[14]) & 0x80) == 0) {
                 /* 49-bit of interface identifier are 0, so we can compress
                  * source address-iid to 16-bit */
                 memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint16[7], 2);
@@ -948,9 +949,9 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
                 lowpan_iphc[1] |= 0x03;
             }
             else if ((ipv6_buf->destaddr.uint16[4] == 0) &&
-                    (ipv6_buf->destaddr.uint16[5] == 0) &&
-                    (ipv6_buf->destaddr.uint16[6] == 0) &&
-                    ((ipv6_buf->destaddr.uint8[14]) & 0x80) == 0) {
+                     (ipv6_buf->destaddr.uint16[5] == 0) &&
+                     (ipv6_buf->destaddr.uint16[6] == 0) &&
+                     ((ipv6_buf->destaddr.uint8[14]) & 0x80) == 0) {
                 /* 49-bit of interface identifier are 0, so we can compress
                  * source address-iid to 16-bit */
                 memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint16[7], 2);
@@ -1076,7 +1077,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
 
     /* HLIM: Hop Limit: */
     if (lowpan_iphc[0] & 0x03) {
-        switch(lowpan_iphc[0] & 0x03) {
+        switch (lowpan_iphc[0] & 0x03) {
             case (0x01): {
                 ipv6_buf->hoplimit = 1;
                 break;
@@ -1121,7 +1122,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
             return;
         }
 
-        switch(((lowpan_iphc[1] & LOWPAN_IPHC_SAM) >> 4) & 0x03) {
+        switch (((lowpan_iphc[1] & LOWPAN_IPHC_SAM) >> 4) & 0x03) {
             case (0x01): {
                 /* 64-bits */
                 memcpy(&(ipv6_buf->srcaddr.uint8[8]), &ipv6_hdr_fields[hdr_pos], 8);
@@ -1163,7 +1164,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
         mutex_unlock(&lowpan_context_mutex);
     }
     else {
-        switch(((lowpan_iphc[1] & LOWPAN_IPHC_SAM) >> 4) & 0x03) {
+        switch (((lowpan_iphc[1] & LOWPAN_IPHC_SAM) >> 4) & 0x03) {
             case (0x01): {
                 /* 64-bits */
                 memcpy(&(ipv6_buf->srcaddr.uint8[0]), &ll_prefix[0], 2);
@@ -1227,7 +1228,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
         }
         else {
             /* If M=1 and DAC=0: */
-            switch(lowpan_iphc[1] & 0x03) {
+            switch (lowpan_iphc[1] & 0x03) {
                 case (0x01): {
                     m_prefix[1] = ipv6_hdr_fields[hdr_pos];
                     hdr_pos++;
@@ -1244,7 +1245,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                     break;
             }
 
-            switch(lowpan_iphc[1] & 0x03) {
+            switch (lowpan_iphc[1] & 0x03) {
                 case (0x01): {
                     memcpy(&(ipv6_buf->destaddr.uint8[0]), &m_prefix[0], 2);
                     memset(&(ipv6_buf->destaddr.uint8[2]), 0, 9);
@@ -1296,7 +1297,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                 return;
             }
 
-            switch((lowpan_iphc[1] & LOWPAN_IPHC_DAM) & 0x03) {
+            switch ((lowpan_iphc[1] & LOWPAN_IPHC_DAM) & 0x03) {
                 case (0x01): {
                     memcpy(&(ipv6_buf->destaddr.uint8[8]), &ipv6_hdr_fields[hdr_pos], 8);
                     /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context information are always used. */
@@ -1329,7 +1330,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
             mutex_unlock(&lowpan_context_mutex);
         }
         else {
-            switch((lowpan_iphc[1] & LOWPAN_IPHC_DAM) & 0x03) {
+            switch ((lowpan_iphc[1] & LOWPAN_IPHC_DAM) & 0x03) {
                 case (0x01): {
                     memcpy(&(ipv6_buf->destaddr.uint8[0]), &ll_prefix[0], 2);
                     memset(&(ipv6_buf->destaddr.uint8[2]), 0, 6);
@@ -1441,7 +1442,7 @@ lowpan_context_t *lowpan_context_lookup(ipv6_addr_t *addr)
 
     for (i = 0; i < lowpan_context_len(); i++) {
         if (contexts[i].length > 0 && memcmp((void *)addr, &(contexts[i].prefix),
-                                            contexts[i].length) == 0) {
+                                             contexts[i].length) == 0) {
             /* longer prefixes are always prefered */
             if (context == NULL || context->length < contexts[i].length) {
                 context = &contexts[i];

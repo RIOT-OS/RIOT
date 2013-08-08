@@ -1,5 +1,5 @@
 /**
- * 6lowpan border router multiplexer 
+ * 6lowpan border router multiplexer
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -9,7 +9,7 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    bordermultiplex.h 
+ * @file    bordermultiplex.h
  * @brief   data structs for border router multiplexing
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>

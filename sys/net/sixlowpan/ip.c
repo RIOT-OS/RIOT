@@ -1,5 +1,5 @@
 /**
- * IPv6 implementation 
+ * IPv6 implementation
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -10,7 +10,7 @@
  * @ingroup sixlowpan
  * @{
  * @file    sixlowip.c
- * @brief   6lowpan IP layer functions 
+ * @brief   6lowpan IP layer functions
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Eric Engel <eric.engel@fu-berlin.de>
@@ -20,13 +20,16 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <vtimer.h>
-#include <mutex.h>
+
+#include "vtimer.h"
+#include "mutex.h"
 #include "msg.h"
+
 #include "ip.h"
 #include "mac.h"
 #include "icmp.h"
 #include "lowpan.h"
+
 #include "sys/net/destiny/in.h"
 #include "sys/net/destiny/socket.h"
 #include "sys/net/net_help/net_help.h"
@@ -55,11 +58,10 @@ uint8_t *get_payload_buf_send(uint8_t ext_len)
 
 ipv6_hdr_t *get_ipv6_buf(void)
 {
-    return ((ipv6_hdr_t *)&(buffer[LL_HDR_LEN]));
+    return ((ipv6_hdr_t *) & (buffer[LL_HDR_LEN]));
 }
 
-struct icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len)
-{
+struct icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len) {
     return ((struct icmpv6_hdr_t *) & (buffer[LLHDR_IPV6HDR_LEN + ext_len]));
 }
 
@@ -105,13 +107,13 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len,
 
     packet_length = IPV6_HDR_LEN + p_len;
 
-    lowpan_init((ieee_802154_long_t *)&(ipv6_buf->destaddr.uint16[4]), 
+    lowpan_init((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
                 (uint8_t *)ipv6_buf);
 }
 
 int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr)
 {
-    switch(hdr->type) {
+    switch (hdr->type) {
         case (ICMP_ECHO_REQ): {
             puts("INFO: packet type: icmp echo request");
             /* processing echo request */
@@ -193,14 +195,14 @@ void ipv6_process(void)
         nextheader = &ipv6_buf->nextheader;
 
         if ((ipv6_get_addr_match(&myaddr, &ipv6_buf->destaddr) >= 112) &&
-           (ipv6_buf->destaddr.uint8[15] != myaddr.uint8[15])) {
+            (ipv6_buf->destaddr.uint8[15] != myaddr.uint8[15])) {
             memcpy(get_ipv6_buf_send(), get_ipv6_buf(),
                    IPV6_HDR_LEN + ipv6_buf->length);
-            lowpan_init((ieee_802154_long_t *)&(ipv6_buf->destaddr.uint16[4]),
+            lowpan_init((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
                         (uint8_t *)get_ipv6_buf_send());
         }
         else {
-            switch(*nextheader) {
+            switch (*nextheader) {
                 case (PROTO_NUM_ICMPV6): {
                     /* checksum test*/
                     if (icmpv6_csum(PROTO_NUM_ICMPV6) != 0xffff) {
@@ -277,7 +279,7 @@ void ipv6_iface_add_addr(ipv6_addr_t *addr, uint8_t state, uint32_t val_ltime,
 
         /* Register to Solicited-Node multicast address according to RFC 4291 */
         if (type == ADDR_TYPE_ANYCAST || type == ADDR_TYPE_LINK_LOCAL ||
-           type == ADDR_TYPE_GLOBAL || type == ADDR_TYPE_UNICAST) {
+            type == ADDR_TYPE_GLOBAL || type == ADDR_TYPE_UNICAST) {
             ipv6_addr_t sol_node_mcast_addr;
             ipv6_set_sol_node_mcast_addr(addr, &sol_node_mcast_addr);
 
@@ -294,7 +296,7 @@ addr_list_t *ipv6_iface_addr_match(ipv6_addr_t *addr)
 
     for (i = 0; i < iface_addr_list_count; i++) {
         if (memcmp(&(iface.addr_list[i].addr.uint8[0]),
-                  &(addr->uint8[0]), 16) == 0) {
+                   &(addr->uint8[0]), 16) == 0) {
             return &(iface.addr_list[i]);
         }
     }
@@ -308,7 +310,7 @@ addr_list_t *ipv6_iface_addr_prefix_eq(ipv6_addr_t *addr)
 
     for (i = 0; i < iface_addr_list_count; i++) {
         if (memcmp(&(iface.addr_list[i].addr.uint8[0]),
-                  &(addr->uint8[0]), 8) == 0) {
+                   &(addr->uint8[0]), 8) == 0) {
             return &(iface.addr_list[i]);
         }
     }
@@ -405,7 +407,7 @@ void ipv6_get_saddr(ipv6_addr_t *src, ipv6_addr_t *dst)
     else {
         for (int j = 0; j < IFACE_ADDR_LIST_LEN; j++) {
             if ((iface.addr_list[j].state == ADDR_STATE_PREFERRED) &&
-               ipv6_prefix_ll_match(&(iface.addr_list[j].addr))) {
+                ipv6_prefix_ll_match(&(iface.addr_list[j].addr))) {
                 itmp = j;
             }
         }
@@ -490,9 +492,9 @@ uint8_t ipv6_prefix_mcast_match(ipv6_addr_t *addr)
 uint8_t ipv6_addr_unspec_match(ipv6_addr_t *addr)
 {
     if ((addr->uint16[0] == 0) && (addr->uint16[1] == 0) &&
-       (addr->uint16[2] == 0) && (addr->uint16[3] == 0) &&
-       (addr->uint16[4] == 0) && (addr->uint16[5] == 0) &&
-       (addr->uint16[6] == 0) && (addr->uint16[7] == 0)) {
+        (addr->uint16[2] == 0) && (addr->uint16[3] == 0) &&
+        (addr->uint16[4] == 0) && (addr->uint16[5] == 0) &&
+        (addr->uint16[6] == 0) && (addr->uint16[7] == 0)) {
         return 1;
     }
 
@@ -503,10 +505,10 @@ uint8_t ipv6_addr_sol_node_mcast_match(ipv6_addr_t *addr)
 {
     /* note: cool if-condition*/
     if ((addr->uint8[0] == 0xFF) && (addr->uint8[1] == 0x02) &&
-       (addr->uint16[1] == 0x00) && (addr->uint16[2] == 0x00) &&
-       (addr->uint16[3] == 0x00) && (addr->uint16[4] == 0x00) &&
-       (addr->uint8[10] == 0x00) && (addr->uint8[11] == 0x01) &&
-       (addr->uint8[12] == 0xFF)) {
+        (addr->uint16[1] == 0x00) && (addr->uint16[2] == 0x00) &&
+        (addr->uint16[3] == 0x00) && (addr->uint16[4] == 0x00) &&
+        (addr->uint8[10] == 0x00) && (addr->uint8[11] == 0x01) &&
+        (addr->uint8[12] == 0xFF)) {
         return 1;
     }
 

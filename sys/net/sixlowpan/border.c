@@ -1,5 +1,5 @@
 /**
- * 6lowpan border router implementation 
+ * 6lowpan border router implementation
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -10,7 +10,7 @@
  * @ingroup sixlowpan
  * @{
  * @file    sixlowborder.c
- * @brief   constraint node implementation for a 6lowpan border router 
+ * @brief   constraint node implementation for a 6lowpan border router
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
@@ -19,12 +19,12 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
-#include <mutex.h>
-#include <thread.h>
-#include <msg.h>
 
-#include <posix_io.h>
-#include <board_uart0.h>
+#include "mutex.h"
+#include "thread.h"
+#include "msg.h"
+#include "posix_io.h"
+#include "board_uart0.h"
 #include "sixlowpan/error.h"
 
 #include "bordermultiplex.h"
@@ -86,7 +86,7 @@ void serial_reader_f(void)
         bytes = readpacket(get_serial_in_buffer(0), BORDER_BUFFER_SIZE);
 
         if (bytes < 0) {
-            switch(bytes) {
+            switch (bytes) {
                 case (-SIXLOWERROR_ARRAYFULL): {
                     printf("ERROR: Array was full\n");
                     break;
@@ -139,9 +139,9 @@ uint8_t border_initialize(transceiver_type_t trans, ipv6_addr_t *border_router_a
      * -- for now
      */
     if (border_router_addr->uint16[4] != HTONS(IEEE_802154_PAN_ID ^ 0x0200) ||
-       border_router_addr->uint16[5] != HTONS(0x00FF) ||
-       border_router_addr->uint16[6] != HTONS(0xFE00)
-      ) {
+        border_router_addr->uint16[5] != HTONS(0x00FF) ||
+        border_router_addr->uint16[6] != HTONS(0xFE00)
+       ) {
         return SIXLOWERROR_ADDRESS;
     }
 
@@ -169,7 +169,7 @@ void border_send_ipv6_over_lowpan(ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t 
     memset(buffer, 0, BUFFER_SIZE);
     memcpy(buffer + LL_HDR_LEN, packet, offset);
 
-    lowpan_init((ieee_802154_long_t *)&(packet->destaddr.uint16[4]), (uint8_t *)packet);
+    lowpan_init((ieee_802154_long_t *) & (packet->destaddr.uint16[4]), (uint8_t *)packet);
 }
 
 void border_process_lowpan(void)

@@ -1,5 +1,5 @@
 /**
- * 6lowpan border router flow control 
+ * 6lowpan border router flow control
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -20,7 +20,8 @@
 #define _SIXLOWPAN_FLOWCONTROL_H
 
 #include <stdint.h>
-#include <vtimer.h>
+
+#include "vtimer.h"
 
 #include "semaphore.h"
 #include "ip.h"

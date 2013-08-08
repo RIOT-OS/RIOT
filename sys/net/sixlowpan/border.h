@@ -10,7 +10,7 @@
  * @ingroup sixlowpan
  * @{
  * @file    sixlowborder.h
- * @brief   header for 6lowpan border router 
+ * @brief   header for 6lowpan border router
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
@@ -22,8 +22,9 @@
 #define _SIXLOWPAN_BORDER_H
 
 #include <stdint.h>
-#include <mutex.h>
-#include <transceiver.h>
+
+#include "mutex.h"
+#include "transceiver.h"
 
 #include "ip.h"
 #include "semaphore.h"

@@ -23,9 +23,11 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "ip.h"
+
 #include "radio/radio.h"
-#include <transceiver.h>
+#include "transceiver.h"
+
+#include "ip.h"
 
 #define RADIO_STACK_SIZE            (MINIMUM_STACK_SIZE + 256)
 #define RADIO_RCV_BUF_SIZE          (64)

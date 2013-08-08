@@ -1,5 +1,5 @@
 /**
- * Objective function 0 for RPL implementation 
+ * Objective function 0 for RPL implementation
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,10 +7,10 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup rpl 
+ * @ingroup rpl
  * @{
- * @file    of0.c 
- * @brief   RPL objective function 0 
+ * @file    of0.c
+ * @brief   RPL objective function 0
  * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @}
  */

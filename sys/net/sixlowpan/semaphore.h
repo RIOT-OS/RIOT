@@ -20,7 +20,8 @@
 #define _SIXLOWPAN_SEMAPHORE_H
 
 #include <stdint.h>
-#include <mutex.h>
+
+#include "mutex.h"
 
 typedef struct sem_t {
     int8_t value;

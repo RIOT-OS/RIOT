@@ -1,5 +1,5 @@
 /**
- * RPL constants and prototypes 
+ * RPL constants and prototypes
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,7 +7,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup rpl 
+ * @ingroup rpl
  * @{
  * @file    rpl.h
  * @brief   RPL header

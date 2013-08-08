@@ -9,8 +9,8 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    sixlowmac.c 
- * @brief   6lowpan link layer functions 
+ * @file    sixlowmac.c
+ * @brief   6lowpan link layer functions
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Eric Engel <eric.engel@fu-berlin.de>
@@ -21,20 +21,21 @@
 
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
-#include <inttypes.h>
 
-#include "mac.h"
-#include "ip.h"
-#include "icmp.h"
-#include "lowpan.h"
-#include <ltc4150.h>
-#include <hwtimer.h>
+#include "ltc4150.h"
+#include "hwtimer.h"
 #include "thread.h"
 #include "msg.h"
 #include "radio/radio.h"
 #include "transceiver.h"
 #include "vtimer.h"
+
+#include "mac.h"
+#include "ip.h"
+#include "icmp.h"
+#include "lowpan.h"
 #include "sys/net/ieee802154/ieee802154_frame.h"
 #include "sys/net/net_help/net_help.h"
 
