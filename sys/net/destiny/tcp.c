@@ -85,7 +85,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
         tcp_socket->socket_values.tcp_control.rcv_wnd = 0;
         tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end +
             tcp_socket->socket_values.tcp_control.rcv_wnd;
-        mutex_unlock(&tcp_socket->tcp_buffer_mutex, 0);
+        mutex_unlock(&tcp_socket->tcp_buffer_mutex);
     }
     else {
         mutex_lock(&tcp_socket->tcp_buffer_mutex);
@@ -95,7 +95,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
         acknowledged_bytes = tcp_payload_len;
         tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end +
             tcp_payload_len;
-        mutex_unlock(&tcp_socket->tcp_buffer_mutex, 0);
+        mutex_unlock(&tcp_socket->tcp_buffer_mutex);
     }
 
     if (thread_getstatus(tcp_socket->recv_pid) == STATUS_RECEIVE_BLOCKED) {

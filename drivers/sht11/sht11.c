@@ -347,7 +347,7 @@ uint8_t sht11_read_sensor(sht11_val_t *value, sht11_mode_t mode)
     /* break on error */
     if (error != 0) {
         connection_reset();
-        mutex_unlock(&sht11_mutex, 0);
+        mutex_unlock(&sht11_mutex);
         return 0;
     }
 
@@ -363,7 +363,7 @@ uint8_t sht11_read_sensor(sht11_val_t *value, sht11_mode_t mode)
         }
     }
 
-    mutex_unlock(&sht11_mutex, 0);
+    mutex_unlock(&sht11_mutex);
     return 1;
 }
 

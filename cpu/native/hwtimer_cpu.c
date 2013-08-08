@@ -244,6 +244,7 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
 {
     DEBUG("hwtimer_arch_init()\n");
 
+    (void) fcpu;
     hwtimer_arch_disable_interrupt();
     int_handler = handler;
 
