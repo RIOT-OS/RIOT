@@ -40,6 +40,8 @@ endif
 endif
 endif
 
+.PHONY: all clean flash doc term
+
 ## make script for your project. Build RIOT-base here!
 all: $(PROJBINDIR)/$(PROJECT).a
 	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(MCU)."

@@ -1,5 +1,7 @@
 DIRS = $(RIOTCPU) core drivers sys 
 
+.PHONY: all clean doc
+
 all:
 	mkdir -p $(BINDIR)
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
