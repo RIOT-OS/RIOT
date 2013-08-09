@@ -47,8 +47,6 @@
 
 /* icmp message types rfc4443 */
 #define ICMP_PARA_PROB                 	(4)
-#define ICMP_ECHO_REQ                   (128)
-#define ICMP_ECHO_REPL                  (129)
 /* icmp message types rfc4861 4.*/
 #define ICMP_RTR_ADV                   	(134)
 #define ICMP_RTR_SOL                   	(133)

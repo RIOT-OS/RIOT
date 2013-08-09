@@ -30,10 +30,6 @@
 #define PARA_PROB_CODE_ERR             	(0)   /* Erroneous header field encountered */
 #define PARA_PROB_NXT_HDR_UNREC        	(1)   /* Unrecognized Next Header type encountered */
 #define PARA_PROB_IPV6_OPT_UNREC       	(2)   /* Unrecognized IPv6 option encountered */
-/* echo request */
-#define ECHO_REQ_LEN                    (8)
-/* echo reply */
-#define ECHO_REPL_LEN                   (8)
 /* router solicitation */
 #define RTR_SOL_LEN                    	(4)
 #define RTR_SOL_INTERVAL               	(4)
@@ -187,16 +183,6 @@ typedef struct __attribute__((packed)) {
     uint8_t infinite;
 } plist_t;
 
-struct __attribute__((packed)) echo_req_t {
-    uint16_t id;
-    uint16_t seq;
-};
-
-struct __attribute__((packed)) echo_repl_t {
-    uint16_t id;
-    uint16_t seq;
-};
-
 struct __attribute__((packed)) rtr_adv_t {
     uint8_t hoplimit;
     uint8_t autoconfig_flags;
@@ -249,10 +235,6 @@ void recv_rtr_sol(void);
 void recv_rtr_adv(void);
 void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
                   uint8_t sixco, uint8_t abro);
-void recv_echo_req(void);
-void init_echo_req(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data, size_t data_len);
-void recv_echo_repl(void);
-void init_echo_repl(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data, size_t data_len);
 uint8_t plist_search(ipv6_addr_t *addr);
 uint8_t plist_cmp(ipv6_addr_t *addr1, ipv6_addr_t *addr2);
 int8_t plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
