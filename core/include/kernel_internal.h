@@ -29,7 +29,7 @@ void board_init(void);
  *
  * @return stack pointer
  */
-char *thread_stack_init(void  *task_func, void *stack_start, int stack_size);
+char *thread_stack_init(void  (*task_func)(void), void *stack_start, int stack_size);
 
 /**
  * @brief  Removes thread from scheduler and set status to STATUS_STOPPED
