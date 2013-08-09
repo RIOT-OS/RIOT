@@ -145,9 +145,6 @@ void transceiver_init(transceiver_type_t t)
     else if (t & TRANSCEIVER_MC1322X) {
         transceivers |= t;
     }
-    else if (t & TRANSCEIVER_MC1322X) {
-        transceivers |= t;
-    }
     else {
         puts("Invalid transceiver type");
     }
