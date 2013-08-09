@@ -56,6 +56,26 @@
  * @name Heaps (defined in linker script)
  * @{
  */
+// FIXME: with a real MODULE_MC1322X
+#define MODULE_MC1322X 
+
+
+#ifdef MODULE_MC1322X
+
+#define NUM_HEAPS 1
+extern uintptr_t __heap_start;     ///< start of heap memory space
+extern uintptr_t __heap_end;       ///< maximum for end of heap memory space
+
+/// current position in heap
+static caddr_t heap = (caddr_t)&__heap_start;
+/// maximum position in heap
+static const caddr_t heap_max = (caddr_t)&__heap_end;
+// start position in heap
+static const caddr_t heap_start = (caddr_t)&__heap_start;
+
+#else /* MODULE_MC1322X */
+
+#define NUM_HEAPS 3//2
 
 // FIXME: with a real MODULE_MC1322X
 #define MODULE_MC1322X 

@@ -145,6 +145,9 @@ void transceiver_init(transceiver_type_t t)
     else if (t & TRANSCEIVER_MC1322X) {
         transceivers |= t;
     }
+    else if (t & TRANSCEIVER_MC1322X) {
+        transceivers |= t;
+    }
     else {
         puts("Invalid transceiver type");
     }
@@ -229,8 +232,6 @@ void run(void)
             case RCV_PKT_CC1020:
             case RCV_PKT_CC1100:
             case RCV_PKT_MC1322X:
-                receive_packet(m.type, m.content.value);
-                break;
             case RCV_PKT_CC2420:
                 receive_packet(m.type, m.content.value);
                 break;
@@ -331,9 +332,6 @@ static void receive_packet(uint16_t type, uint8_t pos)
             break;
         case RCV_PKT_CC2420:
             t = TRANSCEIVER_CC2420;
-        case RCV_PKT_MC1322X:
-            t = TRANSCEIVER_MC1322X;
-            break;
         case RCV_PKT_MC1322X:
             t = TRANSCEIVER_MC1322X;
             break;
@@ -478,7 +476,6 @@ void receive_mc1322x_packet(radio_packet_t *trans_p) {
 }
 #endif
 
- 
 /*------------------------------------------------------------------------------------*/
 /*
  * @brief Sends a radio packet to the receiver
@@ -660,7 +657,9 @@ static uint16_t get_pan(transceiver_type_t t) {
             return cc2420_get_pan();
 #endif
         case TRANSCEIVER_MC1322X:
+#ifdef MODULE_MC1322X
             return maca_get_pan();
+#endif
         default:
             return -1;
     }
@@ -686,8 +685,8 @@ static int16_t get_address(transceiver_type_t t)
 #ifdef MODULE_CC2420
             return cc2420_get_address();
 #endif
-#ifdef MODULE_MC1322X
         case TRANSCEIVER_MC1322X:
+#ifdef MODULE_MC1322X
             return maca_get_address();
 #endif
         default:
@@ -718,8 +717,8 @@ static int16_t set_address(transceiver_type_t t, void *address)
 #ifdef MODULE_CC2420
             return cc2420_set_address(addr);
 #endif
-#ifdef MODULE_MC1322X
         case TRANSCEIVER_MC1322X:
+#ifdef MODULE_MC1322X
             return maca_set_address(addr);
 #endif
         default:
