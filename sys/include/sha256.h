@@ -40,8 +40,29 @@ typedef struct SHA256Context {
     unsigned char buf[64];
 } SHA256_CTX;
 
-void SHA256_Init(SHA256_CTX *);
-void SHA256_Update(SHA256_CTX *, const void *, size_t);
-void SHA256_Final(unsigned char[32], SHA256_CTX *);
+/**
+ * @brief SHA-256 initialization.  Begins a SHA-256 operation.
+ *
+ * @param ctx  SHA256_CTX handle to init
+ */
+void SHA256_Init(SHA256_CTX *ctx);
+
+/**
+ * @brief Add bytes into the hash
+ *
+ * @param ctx  SHA256_CTX handle to use
+ * @param in   pointer to the input buffer
+ * @param len  length of the buffer
+ */
+void SHA256_Update(SHA256_CTX *ctx, const void *in, size_t len);
+
+/**
+ * @brief SHA-256 finalization.  Pads the input data, exports the hash value,
+ * and clears the context state.
+ *
+ * @param digest resulting digest, this is the hash of all the bytes
+ * @param ctx    SHA256_CTX handle to use
+ */
+void SHA256_Final(unsigned char digest[32], SHA256_CTX *ctx);
 
 #endif /* !_SHA256_H_ */
