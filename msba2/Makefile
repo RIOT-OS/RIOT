@@ -5,6 +5,7 @@ export ARCH = msba2_base.a
 
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
+INCLUDES += -I$(RIOTBOARD)/msba2/include/
 INCLUDES += -I$(RIOTBOARD)/msba2-common/include/
 INCLUDES += -I$(RIOTBASE)/cpu/arm_common/include/
 INCLUDES += -I$(RIOTBASE)/cpu/lpc2387/include/
