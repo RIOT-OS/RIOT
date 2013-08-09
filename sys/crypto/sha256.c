@@ -40,29 +40,16 @@
 
 #else /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 
-static void be32enc(void *pp, uint32_t u)
-{
-    unsigned char *p = pp;
-    p[0] = (u >> 24) & 0xff;
-    p[1] = (u >> 16) & 0xff;
-    p[2] = (u >>  8) & 0xff;
-    p[3] = (u >>  0) & 0xff;
-}
-
-static uint32_t be32dec(const void *pp)
-{
-    unsigned char const *p = pp;
-    return ((p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3]);
-}
-
 /*
  * Encode a length len/4 vector of (uint32_t) into a length len vector of
  * (unsigned char) in big-endian form.  Assumes len is a multiple of 4.
  */
-static void be32enc_vect(unsigned char *dst, const uint32_t *src, size_t len)
+static void be32enc_vect(void *dst_, const void *src_, size_t len)
 {
+    uint32_t *dst = dst_;
+    const uint32_t *src = src_;
     for (size_t i = 0; i < len / 4; i++) {
-        be32enc(dst + i * 4, src[i]);
+        dst[i] = __builtin_bswap32(src[i]);
     }
 }
 
@@ -70,12 +57,7 @@ static void be32enc_vect(unsigned char *dst, const uint32_t *src, size_t len)
  * Decode a big-endian length len vector of (unsigned char) into a length
  * len/4 vector of (uint32_t).  Assumes len is a multiple of 4.
  */
-static void be32dec_vect(uint32_t *dst, const unsigned char *src, size_t len)
-{
-    for (size_t i = 0; i < len / 4; i++) {
-        dst[i] = be32dec(src + i * 4);
-    }
-}
+#define be32dec_vect be32enc_vect
 
 #endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 
