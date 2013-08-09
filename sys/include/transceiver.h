@@ -80,7 +80,7 @@ typedef struct {
 typedef struct {
     transceiver_type_t transceivers;
     void *data;
-} transceiver_command_t;;
+} transceiver_command_t;
 
 /* The transceiver thread's pid */
 extern int transceiver_pid;
