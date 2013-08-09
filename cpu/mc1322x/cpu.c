@@ -12,9 +12,10 @@
 #include "mc1322x.h"
 #include "arm_cpu.h"
 
-__attribute__((naked,noreturn)) void arm_reset(void)
+__attribute__((naked, noreturn)) void arm_reset(void)
 {
     dINT();
     CRM->SW_RST = SW_RST_VAL;
-    while(1);
+
+    while (1);
 }
