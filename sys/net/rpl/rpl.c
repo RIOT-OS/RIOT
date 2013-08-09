@@ -280,7 +280,7 @@ void send_DIO(ipv6_addr_t *destination)
 
     if (mydodag == NULL) {
         DEBUG("Error - trying to send DIO without being part of a dodag.\n");
-        mutex_unlock(&rpl_send_mutex, 0);
+        mutex_unlock(&rpl_send_mutex);
         return;
     }
 
@@ -321,7 +321,7 @@ void send_DIO(ipv6_addr_t *destination)
 
     uint16_t plen = ICMPV6_HDR_LEN + DIO_BASE_LEN + opt_hdr_len;
     rpl_send(destination, (uint8_t *)icmp_send_buf, plen, PROTO_NUM_ICMPV6, NULL);
-    mutex_unlock(&rpl_send_mutex, 0);
+    mutex_unlock(&rpl_send_mutex);
 }
 
 void send_DIS(ipv6_addr_t *destination)
@@ -337,7 +337,7 @@ void send_DIS(ipv6_addr_t *destination)
 
     uint16_t plen = ICMPV6_HDR_LEN + DIS_BASE_LEN;
     rpl_send(destination, (uint8_t *)icmp_send_buf, plen, PROTO_NUM_ICMPV6, NULL);
-    mutex_unlock(&rpl_send_mutex, 0);
+    mutex_unlock(&rpl_send_mutex);
 }
 
 
@@ -366,7 +366,7 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
     icmp_send_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
 
     if (my_dodag == NULL) {
-        mutex_unlock(&rpl_send_mutex, 0);
+        mutex_unlock(&rpl_send_mutex);
         return;
     }
 
@@ -428,7 +428,7 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
 
     uint16_t plen = ICMPV6_HDR_LEN + DAO_BASE_LEN + opt_len;
     rpl_send(destination, (uint8_t *)icmp_send_buf, plen, PROTO_NUM_ICMPV6, NULL);
-    mutex_unlock(&rpl_send_mutex, 0);
+    mutex_unlock(&rpl_send_mutex);
 
     if (continue_index > 1) {
         send_DAO(destination, lifetime, default_lifetime, continue_index);
@@ -460,7 +460,7 @@ void send_DAO_ACK(ipv6_addr_t *destination)
 
     uint16_t plen = ICMPV6_HDR_LEN + DIS_BASE_LEN;
     rpl_send(destination, (uint8_t *)icmp_send_buf, plen, PROTO_NUM_ICMPV6, NULL);
-    mutex_unlock(&rpl_send_mutex, 0);
+    mutex_unlock(&rpl_send_mutex);
 }
 
 void rpl_process(void)
@@ -480,30 +480,30 @@ void rpl_process(void)
         switch(*code) {
             case (ICMP_CODE_DIS): {
                 recv_rpl_dis();
-                mutex_unlock(&rpl_recv_mutex, 0);
+                mutex_unlock(&rpl_recv_mutex);
                 break;
             }
 
             case (ICMP_CODE_DIO): {
                 recv_rpl_dio();
-                mutex_unlock(&rpl_recv_mutex, 0);
+                mutex_unlock(&rpl_recv_mutex);
                 break;
             }
 
             case (ICMP_CODE_DAO): {
                 recv_rpl_dao();
-                mutex_unlock(&rpl_recv_mutex, 0);
+                mutex_unlock(&rpl_recv_mutex);
                 break;
             }
 
             case (ICMP_CODE_DAO_ACK): {
                 recv_rpl_dao_ack();
-                mutex_unlock(&rpl_recv_mutex, 0);
+                mutex_unlock(&rpl_recv_mutex);
                 break;
             }
 
             default:
-                mutex_unlock(&rpl_recv_mutex, 0);
+                mutex_unlock(&rpl_recv_mutex);
                 break;
         }
     }

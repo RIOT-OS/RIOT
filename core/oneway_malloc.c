@@ -49,6 +49,9 @@ void *_realloc(void *ptr, size_t size)
 
 void _free(void *ptr)
 {
+    /* who cares about pointers? */
+    (void) ptr;
+
     DEBUG("_free(): block at 0x%X lost.\n", (unsigned int)ptr);
 }
 

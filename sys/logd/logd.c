@@ -117,7 +117,7 @@ static void logd_process(void)
             free(node);
         }
 
-        mutex_unlock(&log_mutex, 0);
+        mutex_unlock(&log_mutex);
     }
     while (m.type != MSG_EXIT && !exit_flag);
 
@@ -184,7 +184,7 @@ bool logd_log(char *str, int str_len)
     lq->str[str_len] = '\0';	/* add string termination char at end of buffer */
     mutex_lock(&log_mutex);
     list_append(&log_msg_queue, (list_node_t *) lq);
-    mutex_unlock(&log_mutex, 0);
+    mutex_unlock(&log_mutex);
     m.type = MSG_POLL;
     m.content.ptr = NULL;
     msg_send(&m, log_pid, false);

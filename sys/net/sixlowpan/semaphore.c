@@ -47,7 +47,7 @@ int sem_signal(sem_t *sem)
 {
     if (++(sem->value) > 0 && sem->locked) {
         sem->locked = !(sem->locked);
-        mutex_unlock(&(sem->mutex), 0);
+        mutex_unlock(&(sem->mutex));
     }
 
     return 0;

@@ -529,14 +529,14 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     current_tcp_socket->tcp_control.rcv_irs	= 0;
     mutex_lock(&global_sequence_clunter_mutex);
     current_tcp_socket->tcp_control.send_iss = global_sequence_counter;
-    mutex_unlock(&global_sequence_clunter_mutex, 0);
+    mutex_unlock(&global_sequence_clunter_mutex);
     current_tcp_socket->tcp_control.state = SYN_SENT;
 
 #ifdef TCP_HC
     /* Choosing random number Context ID */
     mutex_lock(&global_context_counter_mutex);
     current_tcp_socket->tcp_control.tcp_context.context_id = global_context_counter;
-    mutex_unlock(&global_context_counter_mutex, 0);
+    mutex_unlock(&global_context_counter_mutex);
 
     current_tcp_socket->tcp_control.tcp_context.hc_type = FULL_HEADER;
 
@@ -871,7 +871,7 @@ uint8_t read_from_socket(socket_internal_t *current_int_tcp_socket,
                current_int_tcp_socket->tcp_input_buffer_end);
         current_int_tcp_socket->tcp_input_buffer_end = 0;
         current_int_tcp_socket->socket_values.tcp_control.rcv_wnd += read_bytes;
-        mutex_unlock(&current_int_tcp_socket->tcp_buffer_mutex, 0);
+        mutex_unlock(&current_int_tcp_socket->tcp_buffer_mutex);
         return read_bytes;
     }
     else {
@@ -883,7 +883,7 @@ uint8_t read_from_socket(socket_internal_t *current_int_tcp_socket,
         current_int_tcp_socket->tcp_input_buffer_end =
             current_int_tcp_socket->tcp_input_buffer_end - len;
         current_int_tcp_socket->socket_values.tcp_control.rcv_wnd += len;
-        mutex_unlock(&current_int_tcp_socket->tcp_buffer_mutex, 0);
+        mutex_unlock(&current_int_tcp_socket->tcp_buffer_mutex);
         return len;
     }
 }
@@ -1326,7 +1326,7 @@ socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
     mutex_lock(&global_sequence_clunter_mutex);
     current_queued_socket->socket_values.tcp_control.send_iss =
         global_sequence_counter;
-    mutex_unlock(&global_sequence_clunter_mutex, 0);
+    mutex_unlock(&global_sequence_clunter_mutex);
     current_queued_socket->socket_values.tcp_control.state = SYN_RCVD;
     set_tcp_cb(&current_queued_socket->socket_values.tcp_control,
                tcp_header->seq_nr + 1, STATIC_WINDOW,

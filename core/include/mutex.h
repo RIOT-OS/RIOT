@@ -57,10 +57,8 @@ int mutex_lock(struct mutex_t *mutex);
  * @brief Unlocks the mutex.
  *
  * @param mutex Mutex-Object to unlock.
- *
- * @param yield If yield==MUTEX_YIELD, force context-switch after waking up other waiter.
  */
-void mutex_unlock(struct mutex_t *mutex, int yield);
+void mutex_unlock(struct mutex_t *mutex);
 
 #define MUTEX_YIELD 1
 #define MUTEX_INISR 2
