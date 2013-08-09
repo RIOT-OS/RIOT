@@ -283,3 +283,4 @@ uint32_t compare(uint32_t tmp_adr_dst, uint32_t tmp_adr_src, uint32_t tmp_size)
 {
     return iap(COMPARE, tmp_adr_dst, tmp_adr_src, tmp_size, 0);
 }
+
