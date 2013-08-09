@@ -84,6 +84,7 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len,
                     uint8_t next_header)
 {
     uint8_t *p_ptr;
+    uint16_t packet_length;
 
     if (next_header == IPPROTO_TCP) {
         p_ptr = get_payload_buf_send(ipv6_ext_hdr_len);
@@ -95,7 +96,6 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len,
     }
 
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
-    packet_length = 0;
 
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
@@ -111,8 +111,8 @@ void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len,
 
     packet_length = IPV6_HDR_LEN + p_len;
 
-    lowpan_init((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
-                (uint8_t *)ipv6_buf);
+    sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
+                            (uint8_t *)ipv6_buf, packet_length);
 }
 
 /* Register an upper layer thread */
@@ -120,8 +120,10 @@ uint8_t sixlowip_register(int pid)
 {
     uint8_t i;
 
-    for (i = 0; ((sixlowip_reg[i] != pid) && (i < SIXLOWIP_MAX_REGISTERED) && 
-                 (sixlowip_reg[i] != 0)); i++);
+    for (i = 0; ((sixlowip_reg[i] != pid) && (i < SIXLOWIP_MAX_REGISTERED) &&
+                 (sixlowip_reg[i] != 0)); i++) {
+        ;
+    }
 
     if (i >= SIXLOWIP_MAX_REGISTERED) {
         return ENOMEM;
@@ -205,6 +207,7 @@ void ipv6_process(void)
     msg_t m_recv, m_send;
     ipv6_addr_t myaddr;
     uint8_t i;
+    uint16_t packet_length;
 
     ipv6_init_address(&myaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00,
                       sixlowpan_mac_get_radio_address());
@@ -219,10 +222,11 @@ void ipv6_process(void)
 
         if ((ipv6_get_addr_match(&myaddr, &ipv6_buf->destaddr) >= 112) &&
             (ipv6_buf->destaddr.uint8[15] != myaddr.uint8[15])) {
-            memcpy(get_ipv6_buf_send(), get_ipv6_buf(),
-                   IPV6_HDR_LEN + ipv6_buf->length);
-            lowpan_init((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
-                        (uint8_t *)get_ipv6_buf_send());
+            packet_length = IPV6_HDR_LEN + ipv6_buf->length;
+            memcpy(get_ipv6_buf_send(), get_ipv6_buf(), packet_length);
+            sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
+                                    (uint8_t *)get_ipv6_buf_send(),
+                                    packet_length);
         }
         else {
             for (i = 0; i < SIXLOWIP_MAX_REGISTERED; i++) {
@@ -232,6 +236,7 @@ void ipv6_process(void)
                     msg_send(&m_send, sixlowip_reg[i], 1);
                 }
             }
+
             switch (*nextheader) {
                 case (PROTO_NUM_ICMPV6): {
                     /* checksum test*/
@@ -365,7 +370,7 @@ void ipv6_init_addr_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix)
     memcpy(&(inout->uint8[8]), &(iface.laddr.uint8[0]), 8);
 }
 
-void ipv6_set_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix)
+void ipv6_set_prefix(ipv6_addr_t *inout, const ipv6_addr_t *prefix)
 {
     inout->uint16[0] = prefix->uint16[0];
     inout->uint16[1] = prefix->uint16[1];

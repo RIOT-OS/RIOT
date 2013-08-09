@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include "vtimer.h"
+#include "sixlowpan/icmp.h"
 #include "lowpan.h"
 #include "ip.h"
 

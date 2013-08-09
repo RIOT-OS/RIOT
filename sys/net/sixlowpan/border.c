@@ -153,7 +153,7 @@ uint8_t border_initialize(transceiver_type_t trans, ipv6_addr_t *border_router_a
 
     memcpy(&(abr_addr.uint8[0]), &(border_router_addr->uint8[0]), 16);
 
-    sixlowpan_init(trans, border_router_addr->uint8[15], 1);
+    sixlowpan_lowpan_init(trans, border_router_addr->uint8[15], 1);
 
     ipv6_init_iface_as_router();
 
@@ -170,7 +170,9 @@ void border_send_ipv6_over_lowpan(ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t 
     memset(buffer, 0, BUFFER_SIZE);
     memcpy(buffer + LL_HDR_LEN, packet, offset);
 
-    lowpan_init((ieee_802154_long_t *) & (packet->destaddr.uint16[4]), (uint8_t *)packet);
+    sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (packet->destaddr.uint16[4]),
+                            (uint8_t *)packet,
+                            offset);
 }
 
 void border_process_lowpan(void)

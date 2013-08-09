@@ -48,7 +48,6 @@
 #include "sixlowpan/mac.h"
 
 #include "../border.h"      /* TODO: remove if not needed anymore */
-#include "../lowpan.h"      /* TODO: remove if not needed anymore */
 
 /**
  * @}

@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <math.h>
+#include "ipv6.h"
 #include "udp.h"
 #include "tcp.h"
 #include "socket.h"

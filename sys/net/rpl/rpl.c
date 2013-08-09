@@ -19,6 +19,7 @@
 #include <vtimer.h>
 #include <thread.h>
 #include <mutex.h>
+
 #include "msg.h"
 #include "rpl.h"
 #include "etx_beaconing.h"
@@ -193,7 +194,7 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address)
     objective_functions[0] = rpl_get_of0();
     /* objective_functions[1] = rpl_get_of_ETX() */
 
-    sixlowpan_init(trans, rpl_address, 0);
+    sixlowpan_lowpan_init(trans, rpl_address, 0);
     /* need link local prefix to query _our_ corresponding address  */
     ipv6_addr_t ll_address;
     ipv6_set_ll_prefix(&ll_address);
@@ -887,7 +888,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
     uint8_t *p_ptr;
     ipv6_send_buf = get_rpl_send_ipv6_buf();
     p_ptr = get_rpl_send_payload_buf(ipv6_ext_hdr_len);
-    packet_length = 0;
+    uint16_t packet_length = 0;
 
     ipv6_send_buf->version_trafficclass = IPV6_VER;
     ipv6_send_buf->trafficclass_flowlabel = 0;
@@ -910,7 +911,9 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
     packet_length = IPV6_HDR_LEN + p_len;
 
     if (ipv6_prefix_mcast_match(&ipv6_send_buf->destaddr)) {
-        lowpan_init((ieee_802154_long_t *) & (ipv6_send_buf->destaddr.uint16[4]), (uint8_t *)ipv6_send_buf);
+        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(ipv6_send_buf->destaddr.uint16[4]), 
+                                (uint8_t *)ipv6_send_buf,
+                                packet_length);
     }
     else {
         /* find appropriate next hop before sending */
@@ -931,7 +934,9 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
             }
         }
 
-        lowpan_init((ieee_802154_long_t *) & (next_hop->uint16[4]), (uint8_t *)ipv6_send_buf);
+        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(next_hop->uint16[4]), 
+                                (uint8_t *)ipv6_send_buf,
+                                packet_length);
     }
 
 }

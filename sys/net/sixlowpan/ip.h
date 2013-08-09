@@ -52,7 +52,6 @@
 /* extern variables */
 extern uint8_t ipv6_ext_hdr_len;
 extern uint8_t opt_hdr_len;
-extern uint16_t packet_length;
 extern uint8_t packet_dispatch;
 extern uint8_t iface_addr_list_count;
 extern mutex_t buf_mutex;
@@ -168,7 +167,7 @@ void ipv6_init_address(ipv6_addr_t *addr, uint16_t addr0, uint16_t addr1,
                        uint16_t addr5, uint16_t addr6, uint16_t addr7);
 uint32_t get_remaining_time(timex_t *t);
 void set_remaining_time(timex_t *t, uint32_t time);
-void ipv6_set_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix);
+void ipv6_set_prefix(ipv6_addr_t *inout, const ipv6_addr_t *prefix);
 uint8_t ipv6_addr_unspec_match(ipv6_addr_t *addr);
 uint8_t ipv6_addr_sol_node_mcast_match(ipv6_addr_t *addr);
 uint8_t ipv6_next_hdr_unrec(uint8_t next_hdr);
