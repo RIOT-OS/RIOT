@@ -55,8 +55,8 @@ static void msb_ports_init(void)
     //   0 - P2.7 [IN ] - SD-KARTE Detect
 
     P3SEL = 0xC0;	// Port3 Zweitfunktion
-    P3OUT = 0x09;	// Port3 Ausgangsregister: 00001001 = 0x09
-    P3DIR = 0x2B;	// Port3 Direction
+    P3OUT = 0x49;	// Port3 Ausgangsregister: 00001001 = 0x09
+    P3DIR = 0xAB;	// Port3 Direction
     //   1 - P3.0
     //   1 - P3.1
     //   0 - P3.2
@@ -119,7 +119,10 @@ void msp430_set_cpu_speed(uint32_t speed)
     UBR11  = br >> 8;
     UMCTL1 = calc_umctl(br);	// set modulation
 
+    ME2 |= (UTXE1 | URXE1);
     UCTL1 &= ~SWRST;
+
+    IE2 |= URXIE1;
     //clock_init();
     eint();
 }

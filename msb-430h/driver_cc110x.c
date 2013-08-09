@@ -337,8 +337,6 @@ void cc110x_spi_init(uint8_t clockrate)
 interrupt(PORT2_VECTOR) __attribute__((naked)) cc110x_isr(void)
 {
     __enter_isr();
-    puts("cc110x_isr()");
-
     //	if (system_state.POWERDOWN) SPI_INIT; /* Initialize SPI after wakeup */
     /* Check IFG */
     if ((P2IFG & 0x01) != 0) {
