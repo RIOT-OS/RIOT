@@ -82,6 +82,9 @@ endif
 ifneq (,$(findstring ieee802154,$(USEMODULE)))
     DIRS += net/ieee802154
 endif
+ifneq (,$(findstring bloom,$(USEMODULE)))
+    DIRS += bloom
+endif
 
 all: $(BINDIR)$(MODULE).a 
 	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
