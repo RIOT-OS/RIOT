@@ -1,6 +1,23 @@
-/******************************************************************************
+/**
+ * This file contains some simple hash function
+ *
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @file
+ * @autor       Jason Linehan <patientulysses@gmail.com>
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
+ * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
+ */
+
+/**
  * djb2_hash
- * `````````
+ *
  * HISTORY
  * This algorithm (k=33) was first reported by Dan Bernstein many years
  * ago in comp.lang.c. Another version of this algorithm (now favored by
@@ -10,8 +27,7 @@
  *
  * The magic of number 33 (why it works better than many other constants,
  * prime or not) has never been adequately explained.
- *
- ******************************************************************************/
+ */
 static inline unsigned long djb2_hash(const char *str)
 {
     unsigned long hash;
@@ -26,9 +42,9 @@ static inline unsigned long djb2_hash(const char *str)
     return hash;
 }
 
-/******************************************************************************
+/**
  * sdbm_hash
- * `````````
+ *
  * HISTORY
  * This algorithm was created for sdbm (a public-domain reimplementation
  * of ndbm) database library. It was found to do well in scrambling bits,
@@ -45,7 +61,7 @@ static inline unsigned long djb2_hash(const char *str)
  * out to be a prime. this is one of the algorithms used in berkeley db
  * (see sleepycat) and elsewhere.
  *
- ******************************************************************************/
+ */
 static inline unsigned long sdbm_hash(const char *str)
 {
     unsigned long hash;
@@ -60,9 +76,9 @@ static inline unsigned long sdbm_hash(const char *str)
     return hash;
 }
 
-/******************************************************************************
+/**
  * lose lose
- * `````````
+ *
  * HISTORY
  * This hash function appeared in K&R (1st ed) but at least the reader
  * was warned:
@@ -78,8 +94,7 @@ static inline unsigned long sdbm_hash(const char *str)
  * checking something like Knuth's Sorting and Searching, so it stuck.
  * It is now found mixed with otherwise respectable code, eg. cnews. sigh.
  * [see also: tpop]
- *
- ******************************************************************************/
+ */
 static inline unsigned long kr_hash(const char *str)
 {
     unsigned int hash;
@@ -94,12 +109,11 @@ static inline unsigned long kr_hash(const char *str)
     return hash;
 }
 
-/******************************************************************************
+/**
  * sax_hash
- * ````````
- * Shift, Add, XOR
  *
- ******************************************************************************/
+ * Shift, Add, XOR
+ */
 static inline unsigned int sax_hash(const char *key)
 {
     unsigned int h;
@@ -114,14 +128,13 @@ static inline unsigned int sax_hash(const char *key)
 }
 
 
-/******************************************************************************
+/**
  * dek_hash
- * ````````
+ *
  * HISTORY
  * Proposed by Donald E. Knuth in The Art Of Computer Programming Vol. 3,
  * under the topic of "Sorting and Search", Chapter 6.4.
- *
- ******************************************************************************/
+ */
 static inline unsigned int dek_hash(const char *str, unsigned int len)
 {
     unsigned int hash;
@@ -138,13 +151,12 @@ static inline unsigned int dek_hash(const char *str, unsigned int len)
 }
 
 
-/******************************************************************************
+/**
  * fnv_hash
- * ````````
+ *
  * NOTE
  * For a more fully featured and modern version of this hash, see fnv32.c
- *
- ******************************************************************************/
+ */
 static inline unsigned int fnv_hash(const char *str)
 {
 #define FNV_PRIME 0x811C9DC5
