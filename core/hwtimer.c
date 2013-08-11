@@ -13,6 +13,7 @@
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Oliver Hahm <oliver.hahm@fu-berlin.de>
  * @}
  */
 
@@ -43,6 +44,10 @@ static void multiplexer(int source)
     lpm_prevent_sleep--;
 
     timer[source].callback(timer[source].data);
+}
+
+static void hwtimer_releasemutex(void* mutex) {
+    mutex_unlock((mutex_t*) mutex);
 }
 
 static void hwtimer_wakeup(void *ptr)
@@ -98,20 +103,25 @@ unsigned long hwtimer_now(void)
 
 void hwtimer_wait(unsigned long ticks)
 {
+    mutex_t mutex;
+
     if (ticks <= 6 || inISR()) {
         hwtimer_spin(ticks);
         return;
     }
-
+    mutex_init(&mutex);
+    mutex_lock(&mutex);
     /* -2 is to adjust the real value */
-    int res = hwtimer_set(ticks - 2, hwtimer_wakeup, (void*)(unsigned int)(active_thread->pid));
-
+    int res = hwtimer_set(ticks - 2, hwtimer_releasemutex, &mutex);
     if (res == -1) {
+        mutex_unlock(&mutex);
         hwtimer_spin(ticks);
         return;
     }
-
-    thread_sleep();
+    
+    /* try to lock mutex again will cause the thread to go into
+     * STATUS_MUTEX_BLOCKED until hwtimer fires the releasemutex */
+    mutex_lock(&mutex);
 }
 
 /*---------------------------------------------------------------------------*/
