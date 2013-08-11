@@ -49,8 +49,8 @@
 
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
-    #undef TRANSCEIVER_STACK_SIZE
-    #define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_PRINTF)
+#undef TRANSCEIVER_STACK_SIZE
+#define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_PRINTF)
 #endif
 #include "debug.h"
 
@@ -63,7 +63,7 @@ registered_t reg[TRANSCEIVER_MAX_REGISTERED];
 
 /* packet buffers */
 radio_packet_t transceiver_buffer[TRANSCEIVER_BUFFER_SIZE];
-uint8_t data_buffer[TRANSCEIVER_BUFFER_SIZE *PAYLOAD_SIZE];
+uint8_t data_buffer[TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE];
 
 /* message buffer */
 msg_t msg_buffer[TRANSCEIVER_MSG_BUFFER_SIZE];
@@ -152,18 +152,18 @@ int transceiver_start(void)
     }
 #ifdef MODULE_CC110X_NG
     else if (transceivers & TRANSCEIVER_CC1100) {
-        DEBUG("Transceiver started for CC1100\n");
+        DEBUG("transceiver: Transceiver started for CC1100\n");
         cc110x_init(transceiver_pid);
     }
 #elif MODULE_CC110X
     else if (transceivers & TRANSCEIVER_CC1100) {
-        DEBUG("Transceiver started for CC1100\n");
+        DEBUG("transceiver: Transceiver started for CC1100\n");
         cc1100_init();
         cc1100_set_packet_monitor(cc1100_packet_monitor);
     }
 #elif MODULE_CC2420
     else if(transceivers & TRANSCEIVER_CC2420) {
-        DEBUG("Transceiver started for CC2420\n");
+        DEBUG("transceiver: Transceiver started for CC2420\n");
         cc2420_init(transceiver_pid);
     }
 #endif
@@ -190,7 +190,7 @@ uint8_t transceiver_register(transceiver_type_t t, int pid)
     else {
         reg[i].transceivers |= t;
         reg[i].pid         = pid;
-        DEBUG("Thread %i registered for %i\n", reg[i].pid, reg[i].transceivers);
+        DEBUG("transceiver: Thread %i registered for %i\n", reg[i].pid, reg[i].transceivers);
         return 1;
     }
 }
@@ -211,11 +211,11 @@ void run(void)
     msg_init_queue(msg_buffer, TRANSCEIVER_MSG_BUFFER_SIZE);
 
     while (1) {
-        DEBUG("Waiting for next message\n");
+        DEBUG("transceiver: Waiting for next message\n");
         msg_receive(&m);
         /* only makes sense for messages for upper layers */
         cmd = (transceiver_command_t *) m.content.ptr;
-        DEBUG("Transceiver: Message received\n");
+        DEBUG("transceiver: Transceiver: Message received\n");
 
         switch(m.type) {
             case RCV_PKT_CC1020:
@@ -278,7 +278,7 @@ void run(void)
 #endif
 
             default:
-                DEBUG("Unknown message received\n");
+                DEBUG("transceiver: Unknown message received\n");
                 break;
         }
     }
@@ -298,7 +298,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
     rx_buffer_pos = pos;
     msg_t m;
 
-    DEBUG("Packet received\n");
+    DEBUG("transceiver: Packet received\n");
 
     /* search first free position in transceiver buffer */
     for (i = 0; (i < TRANSCEIVER_BUFFER_SIZE) && (transceiver_buffer[transceiver_buffer_pos].processing); i++) {
@@ -356,7 +356,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
     while (reg[i].transceivers != TRANSCEIVER_NONE) {
         if (reg[i].transceivers & type) {
             m.content.ptr = (char *) & (transceiver_buffer[transceiver_buffer_pos]);
-            DEBUG("Notify thread %i\n", reg[i].pid);
+            DEBUG("transceiver: Notify thread %i\n", reg[i].pid);
 
             if (msg_send(&m, reg[i].pid, false) && (m.type != ENOBUFFER)) {
                 transceiver_buffer[transceiver_buffer_pos].processing++;
@@ -375,7 +375,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
  */
 static void receive_cc110x_packet(radio_packet_t *trans_p)
 {
-    DEBUG("Handling CC1100 packet\n");
+    DEBUG("transceiver: Handling CC1100 packet\n");
     /* disable interrupts while copying packet */
     dINT();
     cc110x_packet_t p = cc110x_rx_buffer[rx_buffer_pos].packet;
@@ -388,8 +388,8 @@ static void receive_cc110x_packet(radio_packet_t *trans_p)
     memcpy((void *)&(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p.data, CC1100_MAX_DATA_LENGTH);
     eINT();
 
-    DEBUG("Packet %p was from %hu to %hu, size: %u\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
     trans_p->data = (uint8_t *)&(data_buffer[transceiver_buffer_pos * CC1100_MAX_DATA_LENGTH]);
+    DEBUG("transceiver: Packet %p (%p) was from %hu to %hu, size: %u\n", trans_p, trans_p->data, trans_p->src, trans_p->dst, trans_p->length);
 }
 #endif
 
@@ -412,7 +412,7 @@ void receive_cc1100_packet(radio_packet_t *trans_p)
 
 #ifdef MODULE_CC2420
 void receive_cc2420_packet(radio_packet_t *trans_p) {
-    DEBUG("Handling CC2420 packet\n");
+    DEBUG("transceiver: Handling CC2420 packet\n");
     dINT();
     cc2420_packet_t p = cc2420_rx_buffer[rx_buffer_pos];
     trans_p->src = (uint16_t)((p.frame.src_addr[1] << 8) | p.frame.src_addr[0]);
@@ -423,9 +423,9 @@ void receive_cc2420_packet(radio_packet_t *trans_p) {
     memcpy((void*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p.frame.payload, CC2420_MAX_DATA_LENGTH);
     eINT();
 
-    DEBUG("Packet %p was from %u to %u, size: %u\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
+    DEBUG("transceiver: Packet %p was from %u to %u, size: %u\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
     trans_p->data = (uint8_t*) &(data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH]);
-    DEBUG("Content: %s\n", trans_p->data);
+    DEBUG("transceiver: Content: %s\n", trans_p->data);
 }
 #endif
 
@@ -476,7 +476,7 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
     switch (t) {
         case TRANSCEIVER_CC1100:
 #ifdef MODULE_CC110X_NG
-            DEBUG("Send packet to %" PRIu16 "\n", p.dst);
+            DEBUG("transceiver: Send packet to %" PRIu16 "\n", p.dst);
             cc110x_pkt.length = p.length + CC1100_HEADER_LENGTH;
             cc110x_pkt.address = p.dst;
             cc110x_pkt.flags = 0;
@@ -486,7 +486,7 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
             memcpy(cc1100_pkt, p.data, p.length);
 
             if ((snd_ret = cc1100_send_csmaca(p.dst, 4, 0, (char *) cc1100_pkt, p.length)) < 0) {
-                DEBUG("snd_ret (%u) = %i\n", p.length, snd_ret);
+                DEBUG("transceiver: snd_ret (%u) = %i\n", p.length, snd_ret);
                 res = 0;
             }
             else {
