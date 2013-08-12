@@ -50,6 +50,21 @@ int rpl_process_pid = 0;
 /* registered upper layer threads */
 int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
+void ipv6_send_buf(ipv6_hdr_t *buffer)
+{
+    uint16_t offset = IPV6_HDR_LEN + HTONS(buffer->length);
+
+    buffer->flowlabel = HTONS(buffer->flowlabel);
+    buffer->length = HTONS(buffer->length);
+
+    memset(buffer, 0, BUFFER_SIZE);
+    memcpy(buffer + LL_HDR_LEN, buffer, offset);
+
+    sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (buffer->destaddr.uint16[4]),
+                            (uint8_t *)buffer,
+                            offset);
+}
+
 ipv6_hdr_t *get_ipv6_buf_send(void)
 {
     return ((ipv6_hdr_t *) & (ip_send_buffer[LL_HDR_LEN]));

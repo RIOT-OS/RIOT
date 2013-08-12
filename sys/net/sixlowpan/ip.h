@@ -134,6 +134,7 @@ typedef struct __attribute__((packed)) {
 
 extern iface_t iface;
 
+void ipv6_send_buf(ipv6_hdr_t *buffer);
 /* function prototypes */
 struct icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len);
 ipv6_hdr_t *get_ipv6_buf(void);

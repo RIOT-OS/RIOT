@@ -37,7 +37,7 @@
 #include "sys/net/ieee802154/ieee802154_frame.h"
 #include "sys/net/net_help/net_help.h"
 
-#define READER_STACK_SIZE   512
+#define READER_STACK_SIZE   (KERNEL_CONF_STACKSIZE_IDLE)
 
 ipv6_addr_t abr_addr;
 
@@ -120,7 +120,8 @@ void serial_reader_f(void)
     }
 }
 
-uint8_t border_initialize(transceiver_type_t trans, ipv6_addr_t *border_router_addr)
+uint8_t sixlowpan_lowpan_border_init(transceiver_type_t trans, 
+        const ipv6_addr_t *border_router_addr)
 {
     ipv6_addr_t addr;
 
@@ -158,21 +159,6 @@ uint8_t border_initialize(transceiver_type_t trans, ipv6_addr_t *border_router_a
     ipv6_init_iface_as_router();
 
     return SUCCESS;
-}
-
-void border_send_ipv6_over_lowpan(ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag)
-{
-    uint16_t offset = IPV6_HDR_LEN + HTONS(packet->length);
-
-    packet->flowlabel = HTONS(packet->flowlabel);
-    packet->length = HTONS(packet->length);
-
-    memset(buffer, 0, BUFFER_SIZE);
-    memcpy(buffer + LL_HDR_LEN, packet, offset);
-
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (packet->destaddr.uint16[4]),
-                            (uint8_t *)packet,
-                            offset);
 }
 
 void border_process_lowpan(void)

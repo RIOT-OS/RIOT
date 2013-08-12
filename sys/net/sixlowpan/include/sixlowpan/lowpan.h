@@ -194,6 +194,22 @@ void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,
                                  uint8_t r_addr);
 
 /**
+ * @brief   Initializes a 6LoWPAN border router with an address
+ *
+ * @note    Currently only working with addresses generated from
+ *          IEEE 802.15.4 16-bit short addresses.
+ *
+ * @param[in] trans    transceiver to use with 6LoWPAN.
+ * @param[in] border_router_addr    Address of this border router.
+ *
+ * @return  SUCCESS on success, otherwise SIXLOWERROR_ADDRESS if
+ *          address was not generated from IEEE 802.15.4 16-bit short
+ *          address.
+ */
+uint8_t sixlowpan_lowpan_border_init(transceiver_type_t trans,
+        const ipv6_addr_t *border_router_addr);
+
+/**
  * @brief   Send data via 6LoWPAN to destination node dest.
  *
  * @param[in] dest      EUI-64 of destination node.

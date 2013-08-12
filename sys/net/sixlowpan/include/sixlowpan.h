@@ -43,11 +43,8 @@
 
 #include "sixlowpan/error.h"
 #include "sixlowpan/types.h"
-#include "sixlowpan/borderrouter.h"
 #include "sixlowpan/lowpan.h"
 #include "sixlowpan/mac.h"
-
-#include "../border.h"      /* TODO: remove if not needed anymore */
 
 /**
  * @}

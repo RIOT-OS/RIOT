@@ -29,15 +29,15 @@
 #include "bordermultiplex.h"
 
 /* packet types for flowcontrol */
-#define BORDER_PACKET_ACK_TYPE    1
+#define BORDER_PACKET_ACK_TYPE    (1)
 
 /* configuration types for flowcontrol */
-#define BORDER_CONF_SYN           0
-#define BORDER_CONF_SYNACK        1
+#define BORDER_CONF_SYN           (0)
+#define BORDER_CONF_SYNACK        (1)
 
-#define BORDER_SWS                1
-#define BORDER_RWS                1
-#define BORDER_SL_TIMEOUT         500 // microseconds, maybe smaller
+#define BORDER_SWS                (1)
+#define BORDER_RWS                (1)
+#define BORDER_SL_TIMEOUT         (500) // microseconds, maybe smaller
 
 #define SENDING_SLOT_STACK_SIZE     (256)
 

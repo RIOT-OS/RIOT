@@ -36,8 +36,6 @@ uint16_t border_get_serial_reader(void);
 uint8_t *get_serial_out_buffer(int offset);
 uint8_t *get_serial_in_buffer(int offset);
 
-uint8_t border_initialize(transceiver_type_t trans, ipv6_addr_t *border_router_addr);
-void border_send_ipv6_over_lowpan(ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag);
 void border_process_lowpan(void);
 
 #endif /* _SIXLOWPAN_BORDER_H*/
