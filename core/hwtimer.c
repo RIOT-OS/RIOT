@@ -18,13 +18,15 @@
  */
 
 #include <stdio.h>
-#include <hwtimer.h>
-#include <hwtimer_cpu.h>
-#include <hwtimer_arch.h>
 
-#include <kernel.h>
-#include <thread.h>
-#include <lifo.h>
+#include "kernel.h"
+#include "thread.h"
+#include "lifo.h"
+#include "mutex.h"
+
+#include "hwtimer.h"
+#include "hwtimer_cpu.h"
+#include "hwtimer_arch.h"
 
 /*---------------------------------------------------------------------------*/
 
@@ -48,12 +50,6 @@ static void multiplexer(int source)
 
 static void hwtimer_releasemutex(void* mutex) {
     mutex_unlock((mutex_t*) mutex);
-}
-
-static void hwtimer_wakeup(void *ptr)
-{
-    int pid = (int)ptr;
-    thread_wakeup(pid);
 }
 
 void hwtimer_spin(unsigned long ticks)
