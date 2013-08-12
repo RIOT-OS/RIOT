@@ -651,6 +651,7 @@ static int16_t set_channel(transceiver_type_t t, void *channel)
 #ifdef MODULE_MC1322X
             maca_set_channel(c);
             return c; ///< TODO: should be changed! implement get channel
+#endif
         case TRANSCEIVER_AT86RF231:
 #ifdef MODULE_AT86RF231
             return at86rf231_set_channel(c);
