@@ -156,7 +156,7 @@ int tap_init(char *name)
     strncpy(clonedev+5, name, 250);
 #else /* Linux */
     struct ifreq ifr;
-    char *clonedev = "/dev/net/tun";
+    char clonedev[] = "/dev/net/tun";
 #endif
 
     /* implicitly create the tap interface */
