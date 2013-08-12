@@ -62,7 +62,10 @@ int thread_wakeup(int pid);
  * @brief   Returns the process ID of the currently running thread.
  * @return  Obviously you are not a golfer.
  */
-int thread_getpid(void);
+inline int thread_getpid(void)
+{
+    return active_thread->pid;
+}
 
 /**
  * @brief   Returns the process ID of the thread running before the current one.

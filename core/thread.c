@@ -27,11 +27,6 @@
 #include "hwtimer.h"
 #include "sched.h"
 
-inline int thread_getpid()
-{
-    return active_thread->pid;
-}
-
 int thread_getlastpid()
 {
     extern int last_pid;
