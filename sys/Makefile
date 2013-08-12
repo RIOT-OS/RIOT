@@ -43,9 +43,6 @@ endif
 ifneq (,$(findstring timex,$(USEMODULE)))
     DIRS += timex
 endif
-ifneq (,$(findstring tracelog,$(USEMODULE)))
-    DIRS += tracelog
-endif
 ifneq (,$(findstring transceiver,$(USEMODULE)))
     DIRS += transceiver
 endif

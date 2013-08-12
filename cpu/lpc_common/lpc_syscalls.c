@@ -54,14 +54,8 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
     for (volatile uint8_t iUsedHeap = 0; iUsedHeap < NUM_HEAPS; iUsedHeap++ ) {
         caddr_t new_heap = heap[iUsedHeap] + incr;
 
-        #ifdef MODULE_TRACELOG
-        trace_pointer(TRACELOG_EV_MEMORY, heap[iUsedHeap]);
-        #endif
         if( new_heap <= heap_max[iUsedHeap] ) {
             caddr_t prev_heap = heap[iUsedHeap];
-            #ifdef MODULE_TRACELOG
-            trace_pointer(TRACELOG_EV_MEMORY, new_heap);
-            #endif
             heap[iUsedHeap] = new_heap;
 
             r->_errno = 0;
@@ -70,9 +64,6 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
         }
     }
     restoreIRQ(cpsr);
-    #ifdef MODULE_TRACELOG
-    trace_string(TRACELOG_EV_MEMORY, "heap!");                                  // heap full
-    #endif
 
     r->_errno = ENOMEM;
     return NULL;

@@ -249,9 +249,6 @@ int _unlink_r(struct _reent *r, char *path)
 /*---------------------------------------------------------------------------*/
 void _exit(int n)
 {
-#ifdef MODULE_TRACELOG
-    trace_number(TRACELOG_EV_EXIT, n);
-#endif
     printf("#!exit %i: resetting\n", n);
 
     stdio_flush();
