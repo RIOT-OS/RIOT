@@ -64,6 +64,7 @@ int unregister_interrupt(int sig);
 /* this should be defined elsewhere */
 void thread_yield(void);
 
+#ifndef __cplusplus 
 extern void _native_sig_leave_tramp(void);
 extern ucontext_t *_native_cur_ctx, *_native_isr_ctx;
 extern volatile unsigned int _native_saved_eip;
@@ -73,6 +74,18 @@ extern volatile int _native_sigpend;
 #ifdef MODULE_UART0
 #include <sys/select.h>
 extern fd_set _native_rfds;
+#endif
+#else /* If this is a C++ compiler, use C linkage */
+extern "C" void _native_sig_leave_tramp(void);
+extern "C" ucontext_t *_native_cur_ctx, *_native_isr_ctx;
+extern "C" unsigned int _native_saved_eip;
+extern "C" int _native_in_isr;
+extern "C" int _native_in_syscall;
+extern "C" int _native_sigpend;
+#ifdef MODULE_UART0
+#include <sys/select.h>
+extern "C" fd_set _native_rfds;
+#endif
 #endif
 /** @} */
 #endif //_CPU_H
