@@ -15,6 +15,7 @@
  * @}
  */
 
+#define __STDC_FORMAT_MACROS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,7 +39,7 @@ void _nativenet_get_set_address_handler(char *addr)
     a = atoi(addr + 5);
 
     if (strlen(addr) > 5) {
-        printf("[nativenet] trying to set address %"PRIu16"\n", a);
+        printf("[nativenet] trying to set address %" PRIu16 "\n", a);
         mesg.type = SET_ADDRESS;
     }
     else {
@@ -46,7 +47,7 @@ void _nativenet_get_set_address_handler(char *addr)
     }
 
     msg_send_receive(&mesg, &mesg, transceiver_pid);
-    printf("[nativenet] got address: %"PRIu16"\n", a);
+    printf("[nativenet] got address: %" PRIu16 "\n", a);
 }
 
 void _nativenet_get_set_channel_handler(char *chan)
@@ -61,7 +62,7 @@ void _nativenet_get_set_channel_handler(char *chan)
     c = atoi(chan + 5);
 
     if (strlen(chan) > 5) {
-        printf("[nativenet] Trying to set channel %"PRIu8"\n", c);
+        printf("[nativenet] Trying to set channel %" PRIu8 "\n", c);
         mesg.type = SET_CHANNEL;
     }
     else {
@@ -69,7 +70,7 @@ void _nativenet_get_set_channel_handler(char *chan)
     }
 
     msg_send_receive(&mesg, &mesg, transceiver_pid);
-    printf("[nativenet] Got channel: %"PRIu8"\n", c);
+    printf("[nativenet] Got channel: %" PRIu8 "\n", c);
 }
 
 void _nativenet_send_handler(char *pkt)
@@ -100,10 +101,10 @@ void _nativenet_send_handler(char *pkt)
             p.dst = addr;
             mesg.type = SND_PKT;
             mesg.content.ptr = (char *)&tcmd;
-            printf("[nativenet] Sending packet of length %"PRIu16" to %"PRIu16": %s\n", p.length, p.dst, (char*) p.data);
+            printf("[nativenet] Sending packet of length %" PRIu16 " to %" PRIu16 ": %s\n", p.length, p.dst, (char*) p.data);
             msg_send_receive(&mesg, &mesg, transceiver_pid);
             response = mesg.content.value;
-            printf("[nativenet] Packet sent: %"PRIu32"\n", response);
+            printf("[nativenet] Packet sent: %" PRIu32 "\n", response);
             return;
         }
     }
@@ -123,7 +124,7 @@ void _nativenet_monitor_handler(char *mode)
     m = atoi(mode + 8);
 
     if (strlen(mode) > 8) {
-        printf("Setting monitor mode: %"PRIu8"\n", m);
+        printf("Setting monitor mode: %" PRIu8 "\n", m);
         mesg.type = SET_MONITOR;
         msg_send(&mesg, transceiver_pid, 1);
     }
