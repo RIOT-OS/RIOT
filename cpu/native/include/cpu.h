@@ -29,7 +29,9 @@
 #ifdef BSD // BSD = (FreeBSD, Darwin, ...)
 #define _XOPEN_SOURCE
 #elif defined(__linux__)
+#ifndef __USE_GNU
 #define __USE_GNU
+#endif
 #endif
 #include <ucontext.h>
 #ifdef BSD

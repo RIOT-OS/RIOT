@@ -19,7 +19,9 @@
 #include <stdlib.h>
 
 // __USE_GNU for gregs[REG_EIP] access under Linux
+#ifndef __USE_GNU
 #define __USE_GNU
+#endif
 #include <signal.h>
 #undef __USE_GNU
 
