@@ -7,7 +7,7 @@
  */
 
 #ifndef CPU_H
-#define CPU_H 
+#define CPU_H
 
 #include <stdint.h>
 #include "arm_cpu.h"

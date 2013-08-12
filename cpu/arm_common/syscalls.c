@@ -52,18 +52,6 @@
 #include "ff_ansi.h"
 #endif
 
-/**
- * @name Heaps (defined in linker script)
- * @{
- */
-
-extern uintptr_t __heap1_start;     ///< start of heap memory space
-extern uintptr_t __heap1_max;       ///< maximum for end of heap memory space
-extern uintptr_t __heap2_start;     ///< start of heap memory space
-extern uintptr_t __heap2_max;       ///< maximum for end of heap memory space
-extern uintptr_t __heap3_start;     ///< start of heap memory space
-extern uintptr_t __heap3_max;       ///< maximum for end of heap memory space
-
 /*-----------------------------------------------------------------------------------*/
 void __assert_func(const char *file, int line, const char *func, const char *failedexpr)
 {
@@ -79,7 +67,6 @@ void __assert(const char *file, int line, const char *failedexpr)
 {
     __assert_func(file, line, "?", failedexpr);
 }
-
 /*---------------------------------------------------------------------------*/
 int _isatty_r(struct _reent *r, int fd)
 {
