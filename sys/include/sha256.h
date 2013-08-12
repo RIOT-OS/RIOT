@@ -65,4 +65,16 @@ void SHA256_Update(SHA256_CTX *ctx, const void *in, size_t len);
  */
 void SHA256_Final(unsigned char digest[32], SHA256_CTX *ctx);
 
+/**
+ * @brief A wrapper function to simplify the generation of a hash, this is
+ * usefull for generating sha256 for one buffer
+ *
+ * @param d pointer to the buffer to generate hash from
+ * @param n length of the buffer
+ * @param md optional pointer to an array for the result, length must be
+ *           SHA256_DIGEST_LENGTH
+ *           if md == NULL, one static buffer is used
+ */
+unsigned char *SHA256(const unsigned char *d, size_t n,unsigned char *md);
+
 #endif /* !_SHA256_H_ */
