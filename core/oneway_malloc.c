@@ -47,6 +47,15 @@ void *_realloc(void *ptr, size_t size)
     return newptr;
 }
 
+void *_calloc(int size, size_t cnt)
+{
+    void *mem = _malloc(size * cnt);
+    if (mem) {
+        memset(mem, 0, size * cnt);
+    }
+    return mem;
+}
+
 void _free(void *ptr)
 {
     /* who cares about pointers? */
