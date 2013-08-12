@@ -85,6 +85,9 @@ endif
 ifneq (,$(findstring bloom,$(USEMODULE)))
     DIRS += bloom
 endif
+ifneq (,$(findstring crypto,$(USEMODULE)))
+    DIRS += crypto
+endif
 
 all: $(BINDIR)$(MODULE).a 
 	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
