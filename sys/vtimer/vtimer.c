@@ -23,6 +23,10 @@
 #define SECONDS_PER_TICK (4096U)
 #define MICROSECONDS_PER_TICK (4096UL * 1000000)
 
+#ifndef __cplusplus
+extern int thread_getpid(void);
+#endif
+
 void vtimer_callback(void *ptr);
 void vtimer_tick(void *ptr);
 static int vtimer_set(vtimer_t *timer);
