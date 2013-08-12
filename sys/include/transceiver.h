@@ -5,17 +5,33 @@
 
 /* Stack size for transceiver thread */
 #ifndef TRANSCEIVER_STACK_SIZE
-#if ENABLE_DEBUG
-#define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_PRINTF)
-#else
-#define TRANSCEIVER_STACK_SIZE      (512)
-#endif
+    #define TRANSCEIVER_STACK_SIZE      (512)
 #endif
 
+#define PAYLOAD_SIZE  (0)
+#ifdef MODULE_CC110X
+    #if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+        #undef PAYLOAD_SIZE
+        #define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
+    #endif
+#endif
+#ifdef MODULE_CC110X_NG
+    #if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+        #undef PAYLOAD_SIZE
+        #define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
+    #endif
+#endif
 #ifdef MODULE_CC2420
-#define PAYLOAD_SIZE  (118)
-#else
-#define PAYLOAD_SIZE  (58)
+    #if (CC2420_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+        #undef PAYLOAD_SIZE
+        #define PAYLOAD_SIZE (CC2420_MAX_DATA_LENGTH)
+    #endif
+#endif
+#ifdef MODULE_MC1322X
+    #if (MC1322X_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+        #undef PAYLOAD_SIZE
+        #define PAYLOAD_SIZE (MC1322X_MAX_DATA_LENGTH)
+    #endif
 #endif
 /* The maximum of threads to register */
 #define TRANSCEIVER_MAX_REGISTERED  (4)
