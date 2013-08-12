@@ -13,6 +13,7 @@
 
 void *_malloc(size_t size);
 void *_realloc(void *ptr, size_t size);
+void *_calloc(int size, size_t cnt);
 void _free(void *ptr);
 
 /** @} */
