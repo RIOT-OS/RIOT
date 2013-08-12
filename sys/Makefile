@@ -10,9 +10,6 @@ endif
 ifneq (,$(findstring lib,$(USEMODULE)))
     DIRS += lib
 endif
-ifneq (,$(findstring logd,$(USEMODULE)))
-    DIRS += logd
-endif
 ifneq (,$(findstring cmdd,$(USEMODULE)))
     DIRS += cmdd
 endif
