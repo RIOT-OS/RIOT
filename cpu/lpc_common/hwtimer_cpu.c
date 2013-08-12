@@ -198,4 +198,3 @@ void hwtimer_arch_setcounter(unsigned int val)
 {
     T0TC = val;
 }
-
