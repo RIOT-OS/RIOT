@@ -25,6 +25,7 @@
 #include <kernel.h>
 #include <thread.h>
 #include <lifo.h>
+#include "mutex.h"
 
 /*---------------------------------------------------------------------------*/
 
