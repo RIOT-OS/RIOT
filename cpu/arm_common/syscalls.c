@@ -67,10 +67,6 @@ extern uintptr_t __heap3_max;       ///< maximum for end of heap memory space
 /*-----------------------------------------------------------------------------------*/
 void __assert_func(const char *file, int line, const char *func, const char *failedexpr)
 {
-#if SYSLOG_CONF_ASSERT
-    trace_number(TRACELOG_EV_ASSERTION, line);
-    syslog(SL_EMERGENCY, "assert", "%s() in %s:%u\n", func, file, line);
-#endif
     printf("#!assertion %s failed\n\t%s() in %s:%u\n", failedexpr, func, file, line);
     _exit(3);
 }

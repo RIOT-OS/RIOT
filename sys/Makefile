@@ -25,9 +25,6 @@ endif
 ifneq (,$(findstring sync_read,$(USEMODULE)))
     DIRS += sync_read
 endif
-ifneq (,$(findstring syslog,$(USEMODULE)))
-    DIRS += syslog
-endif
 ifneq (,$(findstring sysmon,$(USEMODULE)))
     DIRS += sysmon
 endif
