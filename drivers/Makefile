@@ -29,6 +29,9 @@ endif
 ifneq (,$(findstring srf08,$(USEMODULE)))
     DIRS += srf08
 endif
+ifneq (,$(findstring lm75a,$(USEMODULE)))
+    DIRS += lm75a
+endif
 
 all:
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
