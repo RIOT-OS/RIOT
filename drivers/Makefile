@@ -23,15 +23,19 @@ endif
 ifneq (,$(findstring gps_ublox,$(USEMODULE)))
     DIRS += gps_ublox
 endif
+ifneq (,$(findstring srf02,$(USEMODULE)))
+    DIRS += srf02
+endif
 
 all:
-	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
 include $(RIOTBASE)/Makefile.base
 
 # remove compilation products
 clean::
-	@for i in $(DIRS) ; do $(MAKE) -C $$i clean ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
+
 
 
 
