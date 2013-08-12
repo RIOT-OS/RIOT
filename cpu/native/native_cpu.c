@@ -72,7 +72,7 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksiz
 
     DEBUG("thread_stack_init()\n");
 
-    stk = stack_start;
+    stk = (unsigned int *)stack_start;
 
 #ifdef NATIVESPONTOP
     p = (ucontext_t *)stk;
