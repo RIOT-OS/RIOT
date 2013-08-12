@@ -228,3 +228,19 @@ void SHA256_Final(unsigned char digest[32], SHA256_CTX *ctx)
     /* Clear the context state */
     memset((void *) ctx, 0, sizeof(*ctx));
 }
+
+unsigned char *SHA256(const unsigned char *d, size_t n, unsigned char *md)
+{
+    SHA256_CTX c;
+    static unsigned char m[SHA256_DIGEST_LENGTH];
+
+    if (md == NULL) {
+        md = m;
+    }
+
+    SHA256_Init(&c);
+    SHA256_Update(&c, d, n);
+    SHA256_Final(md, &c);
+
+    return md;
+}
