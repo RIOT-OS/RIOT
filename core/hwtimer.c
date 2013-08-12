@@ -52,12 +52,6 @@ static void hwtimer_releasemutex(void* mutex) {
     mutex_unlock((mutex_t*) mutex);
 }
 
-static void hwtimer_wakeup(void *ptr)
-{
-    int pid = (int)ptr;
-    thread_wakeup(pid);
-}
-
 void hwtimer_spin(unsigned long ticks)
 {
     unsigned long co = hwtimer_arch_now() + ticks;
