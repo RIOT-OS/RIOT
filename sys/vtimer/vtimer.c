@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
 #include <irq.h>
@@ -300,7 +301,7 @@ void vtimer_print_long_queue(){
 
 void vtimer_print(vtimer_t *t)
 {
-    printf("Seconds: %"PRIu32" - Microseconds: %"PRIu32"\n \
+    printf("Seconds: %" PRIu32 " - Microseconds: %" PRIu32 "\n \
             action: %p\n \
             action: %p\n \
             pid: %u\n",
