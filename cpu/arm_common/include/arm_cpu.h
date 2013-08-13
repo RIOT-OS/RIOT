@@ -8,8 +8,14 @@
 #define NEW_TASK_CPSR 0x1F
 #define WORDSIZE 32
 
+#ifndef __cplusplus
 extern void dINT(void);
 extern void eINT(void);
+#else
+extern "C" void dINT(void);
+extern "C" void eINT(void);
+
+#endif
 
 void thread_yield(void);
 uint32_t get_system_speed(void);
