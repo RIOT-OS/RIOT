@@ -5,12 +5,6 @@ ifeq ($(CPU),lpc2387)
   export INCLUDES += -I$(RIOTCPU)/arm_common/include
   export INCLUDES += -I$(RIOTCPU)/lpc_common/include
 endif
-ifeq ($(CPU),lpc214x)
-  export USEMODULE += arm_common lpc_common
-  export UNDEF += $(BINDIR)syscalls.o $(BINDIR)lpc_syscalls.o
-  export INCLUDES += -I$(RIOTCPU)/arm_common/include
-  export INCLUDES += -I$(RIOTCPU)/lpc_common/include
-endif
 ifeq ($(CPU),mc1322x)
   export USEMODULE += arm_common
   export UNDEF += $(BINDIR)syscalls.o

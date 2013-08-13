@@ -2,10 +2,6 @@ ifeq ($(CPU),lpc2387)
  DIRS = arm_common lpc_common lpc2387
 endif
 
-ifeq ($(CPU),lpc214x)
- DIRS = arm_common lpc_common lpc214x
-endif
-
 ifeq ($(CPU),mc1322x)
 	DIRS = arm_common mc1322x
 endif

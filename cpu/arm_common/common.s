@@ -139,10 +139,6 @@ arm_irq_handler:
     /* jump into vic interrupt */
     mov    r0, #0xffffff00    /* lpc23xx */
 
-.ifdef lpc214x
-    sub    r0, r0, #0xed0     /* lpc214x won't accept non-8bit aligned constant... */
-.endif
-
     ldr    r0, [r0]
     add    lr,pc,#4
     mov     pc, r0

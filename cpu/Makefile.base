@@ -3,11 +3,6 @@ ifeq ($(CPU),lpc2387)
  INCLUDES += -I$(MAKEBASE)/cpu/lpc_common/include/
  INCLUDES += -I$(MAKEBASE)/cpu/lpc2387/include
 endif
-ifeq ($(CPU),lpc214x)
- INCLUDES += -I$(MAKEBASE)/cpu/arm_common/include/
- INCLUDES += -I$(MAKEBASE)/cpu/lpc_common/include/
- INCLUDES += -I$(MAKEBASE)/cpu/lpc214x/include
-endif
 ifeq ($(CPU),mc1322x)
  INCLUDES += -I$(MAKEBASE)/cpu/arm_common/include/
  INCLUDES += -I$(MAKEBASE)/cpu/mc1322x/include

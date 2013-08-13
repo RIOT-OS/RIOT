@@ -32,14 +32,8 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
     /* check all heaps for a chunk of the requested size */
     caddr_t new_heap = heap + incr;
 
-    #ifdef MODULE_TRACELOG
-    trace_pointer(TRACELOG_EV_MEMORY, heap);
-    #endif
     if( new_heap <= heap_max ) {
         caddr_t prev_heap = heap;
-#ifdef MODULE_TRACELOG
-        trace_pointer(TRACELOG_EV_MEMORY, new_heap);
-#endif
         heap = new_heap;
 
         r->_errno = 0;
@@ -47,9 +41,6 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
         return prev_heap;
     }
     restoreIRQ(cpsr);
-    #ifdef MODULE_TRACELOG
-    trace_string(TRACELOG_EV_MEMORY, "heap!");                                  // heap full
-    #endif
 
     r->_errno = ENOMEM;
     return NULL;
