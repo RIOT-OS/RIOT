@@ -13,7 +13,11 @@
 /**
  * @brief   Initializes scheduler and creates main and idle task
  */
-void kernel_init(void);
+#ifndef __cplusplus
+extern void kernel_init(void);
+#else
+extern "C" void kernel_init(void);
+#endif
 
 /**
  * @brief   Optionally: initializes platform specifics (devices, pin configuration etc.)
