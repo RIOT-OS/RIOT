@@ -711,13 +711,13 @@ static void set_monitor(transceiver_type_t t, void *mode)
 #ifdef MODULE_CC110X_NG
         case TRANSCEIVER_CC1100:
             cc110x_set_monitor(*((uint8_t *)mode));
-#endif
             break;
+#endif
 #ifdef MODULE_CC2420
         case TRANSCEIVER_CC2420:
             cc2420_set_monitor(*((uint8_t*) mode));
-#endif
             break;
+#endif
         default:
             break;
     }
@@ -740,13 +740,13 @@ static void powerdown(transceiver_type_t t)
 #ifdef MODULE_CC110X_NG
         case TRANSCEIVER_CC1100:
             cc110x_switch_to_pwd();
-#endif
             break;
+#endif
 #ifdef MODULE_MC1322X
         case TRANSCEIVER_MC1322X:
             maca_off();
-#endif
             break;
+#endif
         default:
             break;
     }
@@ -759,13 +759,13 @@ static void switch_to_rx(transceiver_type_t t)
 #ifdef MODULE_CC110X_NG
         case TRANSCEIVER_CC1100:
             cc110x_switch_to_rx();
-#endif
             break;
+#endif
 #ifdef MODULE_CC2420
         case TRANSCEIVER_CC2420:
             cc2420_switch_to_rx();
-#endif
             break;
+#endif
         default:
             break;
     }
