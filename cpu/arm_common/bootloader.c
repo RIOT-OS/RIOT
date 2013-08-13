@@ -37,7 +37,12 @@
 
 void FIQ_Routine(void)   __attribute__((interrupt("FIQ")));
 //void SWI_Routine (void)   __attribute__((interrupt("SWI")));
-void UNDEF_Routine(void) __attribute__((interrupt("UNDEF")));
+#ifndef __cplusplus
+extern void UNDEF_Routine(void) __attribute__((interrupt("UNDEF")));
+#else
+extern "C" void UNDEF_Routine(void) __attribute__((interrupt("UNDEF")));
+#endif
+
 
 void IRQ_Routine(void)
 {
@@ -103,6 +108,11 @@ void UNDEF_Routine(void)
     exit(1);
 }
 /*-----------------------------------------------------------------------------------*/
+#ifndef __cplusplus
+extern 
+#else
+extern "C" 
+#endif
 void PABT_Routine(void)
 {
     register u_long    *lnk_ptr;
@@ -116,6 +126,11 @@ void PABT_Routine(void)
     exit(1);
 }
 /*-----------------------------------------------------------------------------------*/
+#ifndef __cplusplus
+extern 
+#else
+extern "C" 
+#endif
 void DABT_Routine(void)
 {
     register u_long    *lnk_ptr;
