@@ -54,7 +54,11 @@ void sched_switch(uint16_t current_prio, uint16_t other_prio, int in_isr);
 /**
  * @brief   Call context switching at task exit
  */
-void cpu_switch_context_exit(void);
+#ifndef __cplusplus
+extern void cpu_switch_context_exit(void);
+#else
+extern "C" void cpu_switch_context_exit(void);
+#endif
 
 /**
  * Flag indicating whether a context switch is necessary after handling an
