@@ -29,7 +29,11 @@ void sched_init(void);
 /**
  * @brief   Triggers the scheduler to schedule the next task
  */
-void sched_run(void);
+#ifndef __cplusplus
+extern void sched_run(void);
+#else
+extern "C" void sched_run(void);
+#endif
 
 /**
  * @brief   Set the status of the specified process

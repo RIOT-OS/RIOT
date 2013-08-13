@@ -177,6 +177,11 @@ bl_init_data(void)
     }
 }
 /*-----------------------------------------------------------------------------------*/
+#ifndef __cplusplus
+extern 
+#else
+extern "C" 
+#endif
 void bootloader(void)
 {
     extern void bl_uart_init(void);
