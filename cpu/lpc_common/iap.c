@@ -142,7 +142,13 @@ static uint32_t iap(uint32_t code, uint32_t p1, uint32_t p2, uint32_t p3, uint32
     iap_command[3] = p3;		// set 3rd param
     iap_command[4] = p4;		// set 4th param
 
+#ifndef __cplusplus
     ((void (*)())0x7ffffff1)(iap_command, iap_result);		// IAP entry point
+#else
+    typedef void(*func_ri)(unsigned int *, unsigned int *);
+    func_ri func = reinterpret_cast<func_ri>(((void (*)(unsigned int *, unsigned int *))0x7ffffff1));
+    func(iap_command, iap_result);
+#endif
     return *iap_result;
 }
 
