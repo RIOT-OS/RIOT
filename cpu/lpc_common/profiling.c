@@ -23,7 +23,12 @@ static uint8_t function_pending = 0;
 static uint16_t traced_functions = 0;
 static uint8_t profiling = 0;
 
-void __attribute__((__no_instrument_function__)) profiling_init(void)
+void __attribute__((__no_instrument_function__)) profiling_init(void);
+static int16_t __attribute__((__no_instrument_function__)) get_function_index(uint32_t addr);
+void __attribute__((__no_instrument_function__))  __cyg_profile_func_enter(void *func,  void *caller);
+void __attribute__((__no_instrument_function__)) __cyg_profile_func_exit(void *func, void *caller);
+
+void profiling_init(void)
 {
     uint16_t i;
 
@@ -43,7 +48,7 @@ void __attribute__((__no_instrument_function__)) profiling_init(void)
     profiling = 1;
 }
 
-static int16_t __attribute__((__no_instrument_function__)) get_function_index(uint32_t addr)
+static int16_t get_function_index(uint32_t addr)
 {
     uint16_t i;
 
@@ -56,7 +61,7 @@ static int16_t __attribute__((__no_instrument_function__)) get_function_index(ui
     return -1;
 }
 
-void __attribute__((__no_instrument_function__))  __cyg_profile_func_enter(void *func,  void *caller)
+void __cyg_profile_func_enter(void *func,  void *caller)
 {
     if (!profiling) {
         return;
@@ -92,7 +97,7 @@ void __attribute__((__no_instrument_function__))  __cyg_profile_func_enter(void 
     // functions[idx].consumption_start = ltc4150_get_intcount();
 }
 
-void __attribute__((__no_instrument_function__)) __cyg_profile_func_exit(void *func, void *caller)
+void __cyg_profile_func_exit(void *func, void *caller)
 {
     if (!profiling) {
         return;
