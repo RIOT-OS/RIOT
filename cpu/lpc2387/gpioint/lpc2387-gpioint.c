@@ -50,7 +50,13 @@ void gpioint_init(void)
 
     /* GPIO Init */
     INTWAKE |= GPIO0WAKE | GPIO2WAKE;                       /* allow GPIO to wake up from power down */
-    install_irq(GPIO_INT, &GPIO_IRQHandler, IRQP_GPIO);     /* install irq handler */
+    void * ptr = NULL;
+#ifndef __cplusplus    
+    ptr = &GPIO_IRQHandler;
+#else
+    ptr = reinterpret_cast<void*>(&GPIO_IRQHandler);
+#endif
+    install_irq(GPIO_INT, ptr, IRQP_GPIO);     /* install irq handler */
 }
 
 /*---------------------------------------------------------------------------*/

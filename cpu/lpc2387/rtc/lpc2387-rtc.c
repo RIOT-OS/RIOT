@@ -150,7 +150,13 @@ void rtc_enable(void)
 {
     RTC_ILR = (ILR_RTSSF | ILR_RTCCIF | ILR_RTCALF);	/* clear interrupt flags */
     RTC_CCR |= CCR_CLKEN;								/* enable clock */
-    install_irq(RTC_INT, &RTC_IRQHandler, IRQP_RTC);	/* install interrupt handler */
+    void * ptr = NULL;
+#ifndef __cplusplus    
+    ptr = &RTC_IRQHandler;
+#else
+    ptr = reinterpret_cast<void*>(&RTC_IRQHandler);
+#endif
+    install_irq(RTC_INT, ptr, IRQP_RTC);	/* install interrupt handler */
 
     time_t now = rtc_time(NULL);
     epoch = now - (now % 3600);

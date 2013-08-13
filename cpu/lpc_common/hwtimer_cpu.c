@@ -82,7 +82,13 @@ static void timer0_init(uint32_t cpsr)
     T0CCR = 0;              /* capture is disabled */
     T0EMR = 0;              /* no external match output */
     T0PR = cpsr;            /* set prescaler */
-    install_irq(TIMER0_INT, &timer_irq, 1);
+    void * ptr = 0;         /* NULL is not available in this scope */ 
+#ifndef __cplusplus    
+    ptr = &timer_irq;
+#else
+    ptr = reinterpret_cast<void*>(&timer_irq);
+#endif
+    install_irq(TIMER0_INT, ptr, 1);
     T0TCR = 1;              /* reset counter */
 }
 
@@ -94,7 +100,13 @@ static void timer1_init(uint32_t cpsr)
     T1CCR = 0;              /* capture is disabled */
     T1EMR = 0;              /* no external match output */
     T1PR = cpsr;            /* set prescaler */
-    install_irq(TIMER1_INT, &timer_irq, 1);
+    void * ptr = 0;         /* NULL is not available in this scope */ 
+#ifndef __cplusplus    
+    ptr = &timer_irq;
+#else
+    ptr = reinterpret_cast<void*>(&timer_irq);
+#endif
+    install_irq(TIMER1_INT, ptr, 1);
     T1TCR = 1;              /* reset counter */
 }
 
@@ -106,7 +118,13 @@ static void timer2_init(uint32_t cpsr)
     T2CCR = 0;              /* capture is disabled */
     T2EMR = 0;              /* no external match output */
     T2PR = cpsr;            /* set prescaler */
-    install_irq(TIMER2_INT, &timer_irq, 1);
+    void * ptr = 0;         /* NULL is not available in this scope */ 
+#ifndef __cplusplus    
+    ptr = &timer_irq;
+#else
+    ptr = reinterpret_cast<void*>(&timer_irq);
+#endif
+    install_irq(TIMER2_INT, ptr, 1);
     T2TCR = 1;              /* reset counter */
 }
 
