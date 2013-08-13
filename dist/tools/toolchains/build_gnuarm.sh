@@ -143,7 +143,7 @@ download_file() {
 }
 
 check_space() {
-    echo "Checkign disk space in ${TMP_DIR}"
+    echo "Checking disk space in ${TMP_DIR}"
     if [ $FREETMP -lt $SPACE_NEEDED ]
     then
         echo "Not enough available space in ${TMP_DIR}. Minimum ${SPACE_NEEDED} free bytes required."
