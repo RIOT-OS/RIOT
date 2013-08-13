@@ -237,7 +237,7 @@ static void start_transmission(unsigned char blks)
     for (n = 0; n < N_BUF; n++) {
         LinkList[n][0] = (unsigned long)DmaBuff[n];
         LinkList[n][1] = (unsigned long)&MCI_FIFO;
-        LinkList[n][2] = (n == blks - 1) ? 0 : (unsigned long)LinkList[(n + 1) % N_BUF];
+        LinkList[n][2] = ((int)n == blks - 1) ? 0 : (unsigned long)LinkList[(n + 1) % N_BUF];
         LinkList[n][3] = dma_ctrl;
     }
 
