@@ -20,7 +20,9 @@
 #ifndef _SIXLOWPAN_LOWPAN_H
 #define _SIXLOWPAN_LOWPAN_H
 
+#include "mutex.h"
 #include "vtimer.h"
+
 #include "sixlowpan/lowpan.h"
 
 #define LOWPAN_CONTEXT_MAX     	(16)

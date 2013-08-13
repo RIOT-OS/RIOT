@@ -48,9 +48,12 @@
 #define CON_STACKSIZE                  	(KERNEL_CONF_STACKSIZE_IDLE)
 #define LOWPAN_TRANSFER_BUF_STACKSIZE  	(KERNEL_CONF_STACKSIZE_IDLE)
 
-#define SIXLOWPAN_MAX_REGISTERED     (4)
+#define SIXLOWPAN_MAX_REGISTERED        (4)
 
-#define LOWPAN_REAS_BUF_TIMEOUT (15 * 1000 * 1000) /* TODO: Set back to 3 * 1000 *	(1000) */
+#define LOWPAN_REAS_BUF_TIMEOUT         (15 * 1000 * 1000)
+/* TODO: Set back to 3 * 1000 *	(1000) */
+
+#define IPV6_LL_ADDR_LEN                (8)
 
 typedef struct lowpan_interval_list_t {
     uint8_t                         start;
@@ -79,7 +82,7 @@ typedef struct lowpan_reas_buf_t {
     struct lowpan_reas_buf_t *next;
 } lowpan_reas_buf_t;
 
-uint8_t packet_dispatch;
+extern mutex_t lowpan_context_mutex;
 uint16_t tag;
 uint8_t header_size = 0;
 uint8_t max_frame = 0;
@@ -110,7 +113,6 @@ unsigned int transfer_pid = 0;
 iface_t iface;
 ipv6_addr_t lladdr;
 ieee_802154_long_t laddr;
-mutex_t buf_mutex;
 mutex_t lowpan_context_mutex;
 
 /* registered upper layer threads */
@@ -141,7 +143,7 @@ lowpan_context_t *lowpan_context_lookup(ipv6_addr_t *addr);
 void lowpan_ipv6_set_dispatch(uint8_t *data);
 
 /* deliver packet to mac*/
-void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest, 
+void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
                              uint8_t *data, uint16_t data_len)
 {
     uint8_t mcast = 0;
@@ -151,7 +153,7 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
 
     memcpy(&laddr.uint8[0], &dest->uint8[0], 8);
 
-    if (ipv6_prefix_mcast_match(&ipv6_buf->destaddr)) {
+    if (ipv6_addr_is_multicast(&ipv6_buf->destaddr)) {
         /* send broadcast */
         mcast = 1;
     }
@@ -314,7 +316,7 @@ void lowpan_transfer(void)
             mutex_unlock(&fifo_mutex);
 
             if ((current_buf->packet)[0] == SIXLOWPAN_IPV6_DISPATCH) {
-                ipv6_buf = get_ipv6_buf();
+                ipv6_buf = ipv6_get_buf();
                 memcpy(ipv6_buf, (current_buf->packet) + 1, current_buf->packet_size - 1);
                 m_send.content.ptr = (char *)ipv6_buf;
                 packet_length = current_buf->packet_size - 1;
@@ -326,7 +328,7 @@ void lowpan_transfer(void)
                                      &(current_buf->s_laddr),
                                      &(current_buf->d_laddr));
 
-                ipv6_buf = get_ipv6_buf();
+                ipv6_buf = ipv6_get_buf();
                 m_send.content.ptr = (char *) ipv6_buf;
                 msg_send_receive(&m_send, &m_recv, ip_process_pid);
             }
@@ -392,8 +394,8 @@ lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size,
         new_buf->packet = malloc(datagram_size);
 
         if (new_buf->packet != NULL) {
-            memcpy(&new_buf->s_laddr, s_laddr, SIXLOWPAN_IPV6_LL_ADDR_LEN);
-            memcpy(&new_buf->d_laddr, d_laddr, SIXLOWPAN_IPV6_LL_ADDR_LEN);
+            memcpy(&new_buf->s_laddr, s_laddr, IPV6_LL_ADDR_LEN);
+            memcpy(&new_buf->d_laddr, d_laddr, IPV6_LL_ADDR_LEN);
 
             new_buf->ident_no = datagram_tag;
             new_buf->packet_size = datagram_size;
@@ -897,7 +899,7 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
     }
 
     /* SAC: Source Address Compression */
-    if (ipv6_addr_unspec_match(&(ipv6_buf->srcaddr))) {
+    if (ipv6_addr_is_unspecified(&(ipv6_buf->srcaddr))) {
         /* SAC = 1 and SAM = 00 */
         lowpan_iphc[1] |= SIXLOWPAN_IPHC2_SAC;
     }
@@ -932,7 +934,7 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
             lowpan_iphc[1] |= 0x10;
         }
     }
-    else if (ipv6_prefix_ll_match(&ipv6_buf->srcaddr)) {
+    else if (ipv6_addr_is_link_local(&ipv6_buf->srcaddr)) {
         /* 0: Source address compression uses stateless compression.*/
         if (memcmp(&(ipv6_buf->srcaddr.uint8[8]), &(iface.laddr.uint8[0]), 8) == 0) {
             /* 0 bits. The address is derived using context information
@@ -966,7 +968,7 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
     }
 
     /* M: Multicast Compression */
-    if (ipv6_prefix_mcast_match(&ipv6_buf->destaddr)) {
+    if (ipv6_addr_is_multicast(&ipv6_buf->destaddr)) {
         /* 1: Destination address is a multicast address. */
         lowpan_iphc[1] |= SIXLOWPAN_IPHC2_M;
 
@@ -1049,7 +1051,7 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
                 lowpan_iphc[1] |= 0x01;
             }
         }
-        else if (ipv6_prefix_ll_match(&ipv6_buf->destaddr)) {
+        else if (ipv6_addr_is_link_local(&ipv6_buf->destaddr)) {
             if (memcmp(&(ipv6_buf->destaddr.uint8[8]), &(dest->uint8[0]), 8) == 0) {
                 /* 0 bits. The address is derived using context information
                 * and possibly the link-layer addresses.*/
@@ -1087,7 +1089,7 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
     comp_buf[1] = lowpan_iphc[1];
 
     /*uint8_t *ptr;
-    if (ipv6_buf->nextheader == IPPROTO_TCP)
+    if (ipv6_buf->nextheader == IPV6_PROTO_NUM_TCP)
     	{
     	ptr = get_payload_buf_send(ipv6_ext_hdr_len);
     	}
@@ -1116,7 +1118,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
     uint8_t m_prefix[2] = {0xff, 0x02};
     lowpan_context_t *con = NULL;
 
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
 
     lowpan_iphc[0] = ipv6_hdr_fields[0];
     lowpan_iphc[1] = ipv6_hdr_fields[1];
@@ -1601,8 +1603,8 @@ void lowpan_context_auto_remove(void)
 
 void init_reas_bufs(lowpan_reas_buf_t *buf)
 {
-    memset(&buf->s_laddr, 0, SIXLOWPAN_IPV6_LL_ADDR_LEN);
-    memset(&buf->d_laddr, 0, SIXLOWPAN_IPV6_LL_ADDR_LEN);
+    memset(&buf->s_laddr, 0, IPV6_LL_ADDR_LEN);
+    memset(&buf->d_laddr, 0, IPV6_LL_ADDR_LEN);
     buf->ident_no = 			0;
     buf->timestamp =			0;
     buf->packet_size =			0;
@@ -1626,8 +1628,6 @@ void sixlowpan_lowpan_init(transceiver_type_t trans, uint8_t r_addr,
     sixlowpan_mac_set_radio_address(r_addr);
     sixlowpan_mac_init_802154_short_addr(&(iface.saddr));
     sixlowpan_mac_init_802154_long_addr(&(iface.laddr));
-    /* init global buffer mutex */
-    mutex_init(&buf_mutex);
 
     /* init lowpan context mutex */
     mutex_init(&lowpan_context_mutex);
@@ -1638,20 +1638,20 @@ void sixlowpan_lowpan_init(transceiver_type_t trans, uint8_t r_addr,
     local_address = r_addr;
 
     /* init link-local address */
-    ipv6_set_ll_prefix(&lladdr);
+    ipv6_addr_set_link_local_prefix(&lladdr);
 
     memcpy(&(lladdr.uint8[8]), &(iface.laddr.uint8[0]), 8);
-    ipv6_iface_add_addr(&lladdr, ADDR_STATE_PREFERRED, 0, 0,
-                        ADDR_TYPE_LINK_LOCAL);
-    ipv6_set_loaddr(&tmp);
-    ipv6_iface_add_addr(&tmp, ADDR_STATE_PREFERRED, 0, 0,
-                        ADDR_TYPE_LOOPBACK);
-    ipv6_set_all_nds_mcast_addr(&tmp);
-    ipv6_iface_add_addr(&tmp, ADDR_STATE_PREFERRED, 0, 0,
-                        ADDR_TYPE_LOOPBACK);
+    ipv6_iface_add_addr(&lladdr, IPV6_ADDR_TYPE_LINK_LOCAL,
+                        NDP_ADDR_STATE_PREFERRED, 0, 0);
+    ipv6_addr_set_loopback_addr(&tmp);
+    ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_LOOPBACK,
+                        NDP_ADDR_STATE_PREFERRED, 0, 0);
+    ipv6_addr_set_all_nodes_addr(&tmp);
+    ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_LOOPBACK,
+                        NDP_ADDR_STATE_PREFERRED, 0, 0);
 
-    ipv6_iface_add_addr(&lladdr, ADDR_STATE_PREFERRED, 0, 0,
-                        ADDR_CONFIGURED_AUTO);
+    ipv6_iface_add_addr(&lladdr, IPV6_ADDR_TYPE_LINK_LOCAL,
+                        NDP_ADDR_STATE_PREFERRED, 0, 0);
 
     if (as_border) {
         ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
@@ -1681,15 +1681,22 @@ void sixlowpan_lowpan_init(transceiver_type_t trans, uint8_t r_addr,
 
 }
 
-void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans, 
+void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,
                                  const ipv6_addr_t *prefix,
                                  uint8_t r_addr)
 {
     /* init network prefix */
     ipv6_addr_t save_prefix;
-    ipv6_set_prefix(&save_prefix, prefix);
-    plist_add(&save_prefix, 64, OPT_PI_VLIFETIME_INFINITE, 0, 1, 
+    ipv6_addr_init_prefix(&save_prefix, prefix, 64);
+    plist_add(&save_prefix, 64, OPT_PI_VLIFETIME_INFINITE, 0, 1,
               OPT_PI_FLAG_A);
     ipv6_init_iface_as_router();
     sixlowpan_lowpan_init(trans, r_addr, 0);
 }
+
+void sixlowpan_lowpan_bootstrapping(void)
+{
+
+    init_rtr_sol(OPT_SLLAO);
+}
+

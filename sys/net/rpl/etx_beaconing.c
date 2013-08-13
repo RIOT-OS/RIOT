@@ -382,8 +382,8 @@ void etx_radio(void)
     ipv6_addr_t ll_address;
     ipv6_addr_t candidate_addr;
 
-    ipv6_set_ll_prefix(&ll_address);
-    ipv6_get_saddr(&candidate_addr, &ll_address);
+    ipv6_addr_set_link_local_prefix(&ll_address);
+    ipv6_iface_get_best_src_addr(&candidate_addr, &ll_address);
 
     while (1) {
         msg_receive(&m);

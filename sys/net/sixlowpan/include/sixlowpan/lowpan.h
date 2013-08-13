@@ -160,7 +160,8 @@ typedef enum __attribute__((packed))
 {
     LOWPAN_IPHC_DISABLE = 0,    ///< header compression disabled
     LOWPAN_IPHC_ENABLE = 1      ///< header compression enabled
-} sixlowpan_lowpan_iphc_status_t;
+}
+                     sixlowpan_lowpan_iphc_status_t;
 
 /**
  * @brief   Data type to represent an 6LoWPAN frame as byte stream.
@@ -190,7 +191,7 @@ void sixlowpan_lowpan_init(transceiver_type_t trans, uint8_t r_addr,
  * @param[in] r_addr    PHY layer address.
  */
 void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,
-                                 const ipv6_addr_t *prefix, 
+                                 const ipv6_addr_t *prefix,
                                  uint8_t r_addr);
 
 /**
@@ -207,17 +208,17 @@ void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,
  *          address.
  */
 uint8_t sixlowpan_lowpan_border_init(transceiver_type_t trans,
-        const ipv6_addr_t *border_router_addr);
+                                     const ipv6_addr_t *border_router_addr);
 
 /**
  * @brief   Send data via 6LoWPAN to destination node dest.
  *
  * @param[in] dest      EUI-64 of destination node.
- * @param[in] data      Data to send to destination node (may be 
+ * @param[in] data      Data to send to destination node (may be
  *                      manipulated).
  * @param[in] data_len  Length of data.
  */
-void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest, 
+void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
                              uint8_t *data, uint16_t data_len);
 
 /**
@@ -227,6 +228,19 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
  */
 void sixlowpan_lowpan_set_iphc_status(
     sixlowpan_lowpan_iphc_status_t status);
+
+/**
+ * @brief   Initialize 6LoWPAN neighbor discovery (i.e. send
+ *          router advertisement with Source Link-Layer Address Option)
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4861">
+ *          RFC 4861
+ *      </a>, <a href="http://tools.ietf.org/html/rfc6775">
+ *          RFC 6775
+ *      </a>
+ *
+ */
+void sixlowpan_lowpan_bootstrapping(void);
 
 /**
  * @brief   Registers a thread to read received 6LoWPAN frames. The

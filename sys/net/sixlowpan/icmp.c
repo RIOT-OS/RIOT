@@ -35,8 +35,11 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#define LLHDR_ICMPV6HDR_LEN         (LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)
+#define IPV6HDR_ICMPV6HDR_LEN       (IPV6_HDR_LEN + ipv6_ext_hdr_len + ICMPV6_HDR_LEN)
+#define ND_HOPLIMIT                 (0xFF)
+
 /* extern variables */
-uint8_t opt_hdr_len = 0;
 uint8_t ipv6_ext_hdr_len = 0;
 
 /* counter */
@@ -57,7 +60,7 @@ static uint8_t *llao;
 addr_list_t *addr_list_ptr;
 
 static ipv6_hdr_t *ipv6_buf;
-static struct icmpv6_hdr_t *icmp_buf;
+static icmpv6_hdr_t *icmp_buf;
 static struct rtr_adv_t *rtr_adv_buf;
 static struct nbr_sol_t *nbr_sol_buf;
 static struct nbr_adv_t *nbr_adv_buf;
@@ -77,6 +80,7 @@ def_rtr_lst_t *def_rtr_entry;
 //ipv6_addr_t tmpaddr;
 
 uint8_t recvd_cids[LOWPAN_CONTEXT_MAX];
+uint8_t icmpv6_opt_hdr_len = 0;
 uint8_t recvd_cids_len = 0;
 plist_t *recvd_prefixes[OPT_PI_LIST_LEN];
 uint8_t recvd_pref_len = 0;
@@ -169,7 +173,7 @@ void init_echo_req(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data,
 {
     uint16_t packet_length;
 
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
     struct echo_req_t *echo_buf = get_echo_req_buf(ipv6_ext_hdr_len);
     char *echo_data_buf = ((char *)echo_buf) + sizeof(struct echo_req_t);
@@ -179,11 +183,11 @@ void init_echo_req(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data,
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
+    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
     ipv6_buf->hoplimit = 0xff;
 
     memcpy(&ipv6_buf->destaddr, destaddr, sizeof(ipv6_addr_t));
-    ipv6_get_saddr(&ipv6_buf->srcaddr, &ipv6_buf->destaddr);
+    ipv6_iface_get_best_src_addr(&ipv6_buf->srcaddr, &ipv6_buf->destaddr);
     echo_buf->id = id;
     echo_buf->seq = seq;
 
@@ -194,11 +198,12 @@ void init_echo_req(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data,
     ipv6_buf->length = packet_length - IPV6_HDR_LEN;
 
     icmp_buf->checksum = 0;
-    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
+    icmp_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 
 #ifdef ENABLE_DEBUG
-    printf("INFO: send echo request to: ");
-    ipv6_print_addr(&ipv6_buf->destaddr);
+    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    printf("INFO: send echo request to: %s\n",
+           ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
     sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
                             (uint8_t *)ipv6_buf,
@@ -209,7 +214,7 @@ void init_echo_repl(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data
 {
     uint16_t packet_length;
 
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
     struct echo_repl_t *echo_buf = get_echo_repl_buf(ipv6_ext_hdr_len);
     char *echo_data_buf = ((char *)echo_buf) + sizeof(struct echo_repl_t);
@@ -219,11 +224,11 @@ void init_echo_repl(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
+    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
     ipv6_buf->hoplimit = 0xff;
 
     memcpy(&ipv6_buf->destaddr, destaddr, sizeof(ipv6_addr_t));
-    ipv6_get_saddr(&ipv6_buf->srcaddr, &ipv6_buf->destaddr);
+    ipv6_iface_get_best_src_addr(&ipv6_buf->srcaddr, &ipv6_buf->destaddr);
     echo_buf->id = id;
     echo_buf->seq = seq;
 
@@ -234,11 +239,12 @@ void init_echo_repl(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data
     ipv6_buf->length = packet_length - IPV6_HDR_LEN;
 
     icmp_buf->checksum = 0;
-    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
+    icmp_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 
 #ifdef ENABLE_DEBUG
-    printf("INFO: send echo request to: ");
-    ipv6_print_addr(&ipv6_buf->destaddr);
+    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    printf("INFO: send echo request to: %s\n",
+           ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
     sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
                             (uint8_t *)ipv6_buf,
@@ -250,7 +256,7 @@ void init_rtr_sol(uint8_t sllao)
 {
     uint16_t packet_length;
 
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
 
     icmp_buf->type = ICMP_RTR_SOL;
@@ -258,20 +264,20 @@ void init_rtr_sol(uint8_t sllao)
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
+    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
     ipv6_buf->hoplimit = ND_HOPLIMIT;
 
-    ipv6_set_all_rtrs_mcast_addr(&ipv6_buf->destaddr);
-    //iface_find_src_ipaddr(&ipv6_buf->srcaddr, ADDR_STATE_PREFERRED,
-    /*                      ADDR_TYPE_MULTICAST); */
+    ipv6_addr_set_all_routers_addr(&ipv6_buf->destaddr);
+    //iface_find_src_ipaddr(&ipv6_buf->srcaddr, NDP_ADDR_STATE_PREFERRED,
+    /*                      IPV6_ADDR_TYPE_MULTICAST); */
 
-    ipv6_get_saddr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
+    ipv6_iface_get_best_src_addr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
 
-    opt_hdr_len = RTR_SOL_LEN;
+    icmpv6_opt_hdr_len = RTR_SOL_LEN;
     ipv6_buf->length = HTONS(ICMPV6_HDR_LEN + RTR_SOL_LEN + OPT_STLLAO_MAX_LEN);
 
     if (sllao == OPT_SLLAO) {
-        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
+        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
         set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 2);
         packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
                         RTR_SOL_LEN + OPT_STLLAO_MAX_LEN;
@@ -282,11 +288,12 @@ void init_rtr_sol(uint8_t sllao)
     }
 
     icmp_buf->checksum = 0;
-    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
+    icmp_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 
 #if ENABLE_DEBUG
-    printf("INFO: send router solicitation to: ");
-    ipv6_print_addr(&ipv6_buf->destaddr);
+    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    printf("INFO: send router solicitation to: %s\n",
+           ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
     sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
                             (uint8_t *)ipv6_buf,
@@ -295,14 +302,15 @@ void init_rtr_sol(uint8_t sllao)
 
 void recv_echo_req(void)
 {
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
     struct echo_req_t *echo_buf = get_echo_req_buf(ipv6_ext_hdr_len);
     char *echo_data_buf = ((char *)echo_buf) + sizeof(struct echo_repl_t);
     size_t data_len = ipv6_buf->length - (IPV6_HDR_LEN + ICMPV6_HDR_LEN +
                                           ipv6_ext_hdr_len + ECHO_REQ_LEN);
 #ifdef ENABLE_DEBUG
-    printf("INFO: received echo request from: ");
-    ipv6_print_addr(&ipv6_buf->srcaddr);
+    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    printf("INFO: received echo request from: %s\n",
+           ipv6_addr_to_str(addr_str, &ipv6_buf->srcaddr));
     printf("\n");
     printf("id = 0x%04x, seq = %d\n", echo_buf->id, echo_buf->seq);
 
@@ -321,14 +329,15 @@ void recv_echo_req(void)
 
 void recv_echo_repl(void)
 {
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
     struct echo_repl_t *echo_buf = get_echo_repl_buf(ipv6_ext_hdr_len);
     char *echo_data_buf = ((char *)echo_buf) + sizeof(struct echo_repl_t);
     size_t data_len = ipv6_buf->length - (IPV6_HDR_LEN + ICMPV6_HDR_LEN +
                                           ipv6_ext_hdr_len + ECHO_REPL_LEN);
 #ifdef ENABLE_DEBUG
-    printf("INFO: received echo reply from: ");
-    ipv6_print_addr(&ipv6_buf->srcaddr);
+    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    printf("INFO: received echo reply from: %s\n",
+           ipv6_addr_to_str(addr_str, &ipv6_buf->srcaddr));
     printf("\n");
     printf("id = 0x%04x, seq = %d\n", echo_buf->id, echo_buf->seq);
 
@@ -345,14 +354,14 @@ void recv_echo_repl(void)
 
 void recv_rtr_sol(void)
 {
-    opt_hdr_len = RTR_SOL_LEN;
-    ipv6_buf = get_ipv6_buf();
+    icmpv6_opt_hdr_len = RTR_SOL_LEN;
+    ipv6_buf = ipv6_get_buf();
 
     /* check if source option is set*/
     if (opt_stllao_buf->type == OPT_SLLAO_TYPE) {
-        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
+        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
         llao = (uint8_t *)opt_stllao_buf;
-        opt_hdr_len += (opt_stllao_buf->length) << 3;
+        icmpv6_opt_hdr_len += (opt_stllao_buf->length) << 3;
     }
 
     if (llao != NULL) {
@@ -387,8 +396,9 @@ void recv_rtr_sol(void)
     }
 
 #if ENABLE_DEBUG
-    printf("INFO: send router advertisment to: ");
-    ipv6_print_addr(&ipv6_buf->destaddr);
+    char addr_str[IPV6_MAX_ADDR_STR_LEN];
+    printf("INFO: send router advertisment to: %s\n",
+           ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
     sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
                             (uint8_t *)ipv6_buf,
@@ -427,24 +437,24 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
     lowpan_context_t *contexts = NULL;
 
     abr_cache_t *msg_abr = NULL;
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
 
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
+    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
     ipv6_buf->hoplimit = ND_HOPLIMIT;
 
     if (addr == NULL) {
         /* not solicited */
-        ipv6_set_all_nds_mcast_addr(&ipv6_buf->destaddr);
+        ipv6_addr_set_all_nodes_addr(&ipv6_buf->destaddr);
     }
     else {
         memcpy(&ipv6_buf->destaddr, addr, 16);
     }
 
-    ipv6_get_saddr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
+    ipv6_iface_get_best_src_addr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
 
     icmp_buf->type = ICMP_RTR_ADV;
     icmp_buf->code = 0;
@@ -458,26 +468,26 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
     rtr_adv_buf->router_lifetime = HTONS(RTR_ADV_MAX_INTERVAL * RTR_ADV_MAX);
     rtr_adv_buf->reachable_time = 0;
     rtr_adv_buf->retrans_timer = 0;
-    opt_hdr_len = RTR_ADV_LEN;
+    icmpv6_opt_hdr_len = RTR_ADV_LEN;
 
     packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + RTR_ADV_LEN;
 
     if (sllao == OPT_SLLAO) {
         /* set link layer address option */
-        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
+        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
         set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 2);
-        opt_hdr_len += OPT_STLLAO_MAX_LEN;
+        icmpv6_opt_hdr_len += OPT_STLLAO_MAX_LEN;
         packet_length += OPT_STLLAO_MAX_LEN;
     }
 
     if (mtu == OPT_MTU) {
         /* set MTU options */
-        opt_mtu_buf = get_opt_mtu_buf(ipv6_ext_hdr_len, opt_hdr_len);
+        opt_mtu_buf = get_opt_mtu_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
         opt_mtu_buf->type = OPT_MTU_TYPE;
         opt_mtu_buf->length = OPT_MTU_LEN;
         opt_mtu_buf->reserved = 0;
         opt_mtu_buf->mtu = HTONL(1500);
-        opt_hdr_len += OPT_MTU_HDR_LEN;
+        icmpv6_opt_hdr_len += OPT_MTU_HDR_LEN;
         packet_length += OPT_MTU_HDR_LEN;
     }
 
@@ -487,7 +497,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
         /* set authoritive border router option */
         if (abr_count > 0) {
             msg_abr = abr_get_most_current();
-            opt_abro_buf = get_opt_abro_buf(ipv6_ext_hdr_len, opt_hdr_len);
+            opt_abro_buf = get_opt_abro_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
             opt_abro_buf->type = OPT_ABRO_TYPE;
             opt_abro_buf->length = OPT_ABRO_LEN;
             opt_abro_buf->version = HTONS(msg_abr->version);
@@ -523,7 +533,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
         }
 
         for (int i = 0; i < contexts_len; i++) {
-            opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_ext_hdr_len, opt_hdr_len);
+            opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
             opt_6co_hdr_buf->type = OPT_6CO_TYPE;
 
             if (contexts[i].length > 64) {
@@ -538,21 +548,21 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
             opt_6co_hdr_buf->reserved = 0;
             opt_6co_hdr_buf->val_ltime = HTONS(contexts[i].lifetime);
 
-            opt_hdr_len += OPT_6CO_HDR_LEN;
+            icmpv6_opt_hdr_len += OPT_6CO_HDR_LEN;
             packet_length += OPT_6CO_HDR_LEN;
             /* attach prefixes */
-            opt_6co_prefix_buf = get_opt_6co_prefix_buf(ipv6_ext_hdr_len, opt_hdr_len);
+            opt_6co_prefix_buf = get_opt_6co_prefix_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
             if (opt_6co_hdr_buf->c_length > 64) {
                 memset((void *)opt_6co_prefix_buf, 0, 16);
                 memcpy((void *)opt_6co_prefix_buf, (void *) & (contexts[i].prefix.uint8[0]), opt_6co_hdr_buf->c_length / 8);
-                opt_hdr_len += 16;
+                icmpv6_opt_hdr_len += 16;
                 packet_length += 16;
             }
             else {
                 memset((void *)opt_6co_prefix_buf, 0, 8);
                 memcpy((void *)opt_6co_prefix_buf, (void *) & (contexts[i].prefix.uint8[0]), opt_6co_hdr_buf->c_length / 8);
-                opt_hdr_len += 8;
+                icmpv6_opt_hdr_len += 8;
                 packet_length += 8;
             }
 
@@ -569,7 +579,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
         /* set prefix option */
         for (int i = 0; i < OPT_PI_LIST_LEN; i++) {
             if (plist[i].inuse && plist[i].adv) {
-                opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, opt_hdr_len);
+                opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
                 memcpy(&(opt_pi_buf->addr.uint8[0]), &(plist[i].addr.uint8[0]), 16);
                 opt_pi_buf->type = OPT_PI_TYPE;
                 opt_pi_buf->length = OPT_PI_LEN;
@@ -579,7 +589,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
                 opt_pi_buf->pref_ltime = HTONL(plist[i].pref_ltime);
                 opt_pi_buf->reserved2 = 0;
                 packet_length += OPT_PI_HDR_LEN;
-                opt_hdr_len += OPT_PI_HDR_LEN;
+                icmpv6_opt_hdr_len += OPT_PI_HDR_LEN;
             }
         }
     }
@@ -588,7 +598,7 @@ void init_rtr_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8_t pi,
 
     /* calculate checksum */
     icmp_buf->checksum = 0;
-    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
+    icmp_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 }
 
 void recv_rtr_adv(void)
@@ -599,9 +609,9 @@ void recv_rtr_adv(void)
     uint16_t packet_length;
     ipv6_addr_t abro_addr;
 
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
     packet_length = IPV6_HDR_LEN + ipv6_buf->length;
-    opt_hdr_len = RTR_ADV_LEN;
+    icmpv6_opt_hdr_len = RTR_ADV_LEN;
     rtr_adv_buf = get_rtr_adv_buf(ipv6_ext_hdr_len);
     ipv6_addr_t newaddr;
     recvd_cids_len = 0;
@@ -636,8 +646,8 @@ void recv_rtr_adv(void)
     mutex_lock(&lowpan_context_mutex);
 
     /* read options */
-    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len) {
-        opt_buf = get_opt_buf(ipv6_ext_hdr_len, opt_hdr_len);
+    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + icmpv6_opt_hdr_len) {
+        opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
         switch (opt_buf->type) {
             case (OPT_SLLAO_TYPE): {
@@ -650,10 +660,10 @@ void recv_rtr_adv(void)
 
             /* rfc 4862 section 5.5.3 */
             case (OPT_PI_TYPE): {
-                opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, opt_hdr_len);
+                opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
                 /* crazy condition, read 5.5.3a-b-c for further information */
-                if (ipv6_prefix_ll_match(&opt_pi_buf->addr) ||
+                if (ipv6_addr_is_link_local(&opt_pi_buf->addr) ||
                     (HTONL(opt_pi_buf->pref_ltime) >
                      HTONL(opt_pi_buf->val_ltime))) {
                     break;
@@ -671,16 +681,17 @@ void recv_rtr_adv(void)
                             /* 5.5.3d */
                             if (opt_pi_buf->val_ltime != 0) {
                                 /* iid will also be added here */
-                                ipv6_init_addr_prefix(&newaddr, &opt_pi_buf->addr);
+                                ipv6_addr_set_by_eui64(&newaddr,
+                                                       &opt_pi_buf->addr);
                                 /* add into address list
                                 * TODO: duplicate address detection is not
                                 *       implementet yet, so all new addresse will
                                 *       be added with state PREFFERED */
                                 ipv6_iface_add_addr(&newaddr,
-                                                    ADDR_STATE_PREFERRED,
+                                                    IPV6_ADDR_TYPE_UNICAST,
+                                                    NDP_ADDR_STATE_PREFERRED,
                                                     opt_pi_buf->val_ltime,
-                                                    opt_pi_buf->pref_ltime,
-                                                    ADDR_CONFIGURED_AUTO);
+                                                    opt_pi_buf->pref_ltime);
                                 printf("INFO: added address to interface\n");
                                 trigger_ns = 1;
                             }
@@ -711,14 +722,14 @@ void recv_rtr_adv(void)
                 uint8_t comp;
                 uint8_t num;
 
-                opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_ext_hdr_len, opt_hdr_len);
+                opt_6co_hdr_buf = get_opt_6co_hdr_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
                 get_opt_6co_flags(&comp, &num, opt_6co_hdr_buf->c_flags);
 
                 ipv6_addr_t prefix;
                 memset(&prefix, 0, 16);
 
-                opt_6co_prefix_buf = get_opt_6co_prefix_buf(ipv6_ext_hdr_len, opt_hdr_len + OPT_6CO_HDR_LEN);
+                opt_6co_prefix_buf = get_opt_6co_prefix_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len + OPT_6CO_HDR_LEN);
 
                 memcpy(&prefix, opt_6co_prefix_buf, opt_6co_hdr_buf->c_length);
 
@@ -735,7 +746,7 @@ void recv_rtr_adv(void)
             }
 
             case (OPT_ABRO_TYPE): {
-                opt_abro_buf = get_opt_abro_buf(ipv6_ext_hdr_len, opt_hdr_len);
+                opt_abro_buf = get_opt_abro_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
                 abro_found = 1;
                 abro_version = HTONS(opt_abro_buf->version);
                 memcpy(&(abro_addr), &(opt_abro_buf->addr), sizeof(ipv6_addr_t));
@@ -747,7 +758,7 @@ void recv_rtr_adv(void)
         }
 
         /* multiplied with 8 because options length is in units of 8 bytes */
-        opt_hdr_len += (opt_buf->length * 8);
+        icmpv6_opt_hdr_len += (opt_buf->length * 8);
     }
 
     if (abro_found) {
@@ -771,8 +782,9 @@ void recv_rtr_adv(void)
          * if new address was configured, set src to newaddr(gp16) */
         init_nbr_sol(&newaddr, &(ipv6_buf->srcaddr), &(ipv6_buf->srcaddr), OPT_SLLAO, OPT_ARO);
 #if ENABLE_DEBUG
-        printf("INFO: send neighbor solicitation to: ");
-        ipv6_print_addr(&(ipv6_buf->destaddr));
+        char addr_str[IPV6_MAX_ADDR_STR_LEN];
+        printf("INFO: send neighbor solicitation to: %s\n",
+               ipv6_addr_to_str(addr_str, &(ipv6_buf->destaddr)));
 #endif
         sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
                                 (uint8_t *)ipv6_buf,
@@ -785,15 +797,15 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
 {
     uint16_t packet_length;
 
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
+    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
     ipv6_buf->hoplimit = ND_HOPLIMIT;
 
     if (dest == NULL) {
-        ipv6_set_sol_node_mcast_addr(targ, &(ipv6_buf->destaddr));
+        ipv6_addr_set_solicited_node_addr(&(ipv6_buf->destaddr), targ);
     }
     else {
         memcpy(&(ipv6_buf->destaddr.uint8[0]), &(dest->uint8[0]), 16);
@@ -807,13 +819,13 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
     nbr_sol_buf = get_nbr_sol_buf(ipv6_ext_hdr_len);
     nbr_sol_buf->reserved = 0;
     memcpy(&(nbr_sol_buf->tgtaddr), targ, 16);
-    opt_hdr_len = NBR_SOL_LEN;
+    icmpv6_opt_hdr_len = NBR_SOL_LEN;
 
     packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + NBR_SOL_LEN;
 
     if (ipv6_iface_addr_match(targ) == NULL) {
         if (src == NULL) {
-            ipv6_get_saddr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
+            ipv6_iface_get_best_src_addr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
         }
         else {
             memcpy(&(ipv6_buf->srcaddr), src, 16);
@@ -821,9 +833,9 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
 
         if (sllao == OPT_SLLAO) {
             /* set sllao option */
-            opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
+            opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
             set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 1);
-            opt_hdr_len += OPT_STLLAO_MIN_LEN;
+            icmpv6_opt_hdr_len += OPT_STLLAO_MIN_LEN;
 
             packet_length += OPT_STLLAO_MIN_LEN;
         }
@@ -831,14 +843,14 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
 
     if (aro == OPT_ARO) {
         /* set aro option */
-        opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len, opt_hdr_len);
+        opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
         opt_aro_buf->type = OPT_ARO_TYPE;
         opt_aro_buf->length = OPT_ARO_LEN;
         opt_aro_buf->status = 0;
         opt_aro_buf->reserved1 = 0;
         opt_aro_buf->reserved2 = 0;
         memcpy(&(opt_aro_buf->eui64), sixlowpan_mac_get_eui64(src), 8);
-        opt_hdr_len += OPT_ARO_HDR_LEN;
+        icmpv6_opt_hdr_len += OPT_ARO_HDR_LEN;
 
         packet_length += OPT_ARO_HDR_LEN;
     }
@@ -846,14 +858,14 @@ void init_nbr_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *targ,
     ipv6_buf->length = HTONS(packet_length - IPV6_HDR_LEN);
 
     icmp_buf->checksum = 0;
-    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
+    icmp_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 }
 
 void recv_nbr_sol(void)
 {
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
     llao = NULL;
-    opt_hdr_len = NBR_SOL_LEN;
+    icmpv6_opt_hdr_len = NBR_SOL_LEN;
 
     uint8_t send_na = 0;
     uint8_t sllao_set = 0;
@@ -864,29 +876,29 @@ void recv_nbr_sol(void)
      * option condition is that a sllao option is set. thus that we don't
      * know which option comes first we need to this here */
 
-    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len) {
-        opt_buf = get_opt_buf(ipv6_ext_hdr_len, opt_hdr_len);
+    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + icmpv6_opt_hdr_len) {
+        opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
         if (opt_buf->type == OPT_SLLAO_TYPE) {
             sllao_set = 1;
         }
 
-        opt_hdr_len += (opt_buf->length * 8);
+        icmpv6_opt_hdr_len += (opt_buf->length * 8);
     }
 
-    opt_hdr_len = NBR_SOL_LEN;
+    icmpv6_opt_hdr_len = NBR_SOL_LEN;
 
-    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len) {
-        opt_buf = get_opt_buf(ipv6_ext_hdr_len, opt_hdr_len);
+    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + icmpv6_opt_hdr_len) {
+        opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
         switch (opt_buf->type) {
             case (OPT_SLLAO_TYPE): {
                 opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len,
-                                                    opt_hdr_len);
+                                                    icmpv6_opt_hdr_len);
                 llao = (uint8_t *)opt_stllao_buf;
 
                 if (llao != NULL &&
-                    !(ipv6_addr_unspec_match(&ipv6_buf->srcaddr))) {
+                    !(ipv6_addr_is_unspecified(&ipv6_buf->srcaddr))) {
                     nbr_entry = nbr_cache_search(&(ipv6_buf->srcaddr));
 
                     if (nbr_entry != NULL) {
@@ -954,10 +966,10 @@ void recv_nbr_sol(void)
             case (OPT_ARO_TYPE): {
                 /* check if sllao option is set, and if address src address
                  * isn't unspecified - draft-ietf-6lowpan-nd-15#section-6.5 */
-                if (!(ipv6_addr_unspec_match(&ipv6_buf->srcaddr)) &&
+                if (!(ipv6_addr_is_unspecified(&ipv6_buf->srcaddr)) &&
                     sllao_set == 1) {
                     opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len,
-                                                  opt_hdr_len);
+                                                  icmpv6_opt_hdr_len);
 
                     if ((opt_aro_buf->length == 2) &&
                         (opt_aro_buf->status == 0)) {
@@ -1004,7 +1016,7 @@ void recv_nbr_sol(void)
                 break;
         }
 
-        opt_hdr_len += (opt_buf->length * 8);
+        icmpv6_opt_hdr_len += (opt_buf->length * 8);
     }
 
     addr_list_t *alist_targ, *alist_dest;
@@ -1016,7 +1028,7 @@ void recv_nbr_sol(void)
         alist_dest = ipv6_iface_addr_match(&(ipv6_buf->destaddr));
 
         if ((memcmp(&(alist_targ->addr), &(alist_dest->addr), 16) == 0) ||
-            ipv6_addr_sol_node_mcast_match(&ipv6_buf->destaddr)) {
+            ipv6_addr_is_solicited_node(&ipv6_buf->destaddr)) {
             memcpy(&(ipv6_buf->destaddr.uint8[0]),
                    &(ipv6_buf->srcaddr.uint8[0]), 16);
             memcpy(&(ipv6_buf->srcaddr.uint8[0]),
@@ -1031,8 +1043,9 @@ void recv_nbr_sol(void)
         init_nbr_adv(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr),
                      &(alist_targ->addr), flags, 0, OPT_ARO, aro_state);
 #if ENABLE_DEBUG
-        printf("INFO: send neighbor advertisment to: ");
-        ipv6_print_addr(&ipv6_buf->destaddr);
+        char addr_str[IPV6_MAX_ADDR_STR_LEN];
+        printf("INFO: send neighbor advertisment to: %s\n",
+               ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
         sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
                                 (uint8_t *)ipv6_buf,
@@ -1045,11 +1058,11 @@ void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
 {
     uint16_t packet_length;
 
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
+    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
     ipv6_buf->hoplimit = ND_HOPLIMIT;
 
     ipv6_ext_hdr_len = 0;
@@ -1070,23 +1083,23 @@ void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
 
     if (sllao == OPT_SLLAO) {
         /* set sllao option */
-        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, opt_hdr_len);
+        opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
         set_llao(opt_stllao_buf, OPT_SLLAO_TYPE, 1);
-        opt_hdr_len += OPT_STLLAO_MIN_LEN;
+        icmpv6_opt_hdr_len += OPT_STLLAO_MIN_LEN;
 
         packet_length += OPT_STLLAO_MIN_LEN;
     }
 
     if (aro == OPT_ARO) {
         /* set aro option */
-        opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len, opt_hdr_len);
+        opt_aro_buf = get_opt_aro_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
         opt_aro_buf->type = OPT_ARO_TYPE;
         opt_aro_buf->length = OPT_ARO_LEN;
         opt_aro_buf->status = 0;    /* TODO */
         opt_aro_buf->reserved1 = 0;
         opt_aro_buf->reserved2 = 0;
         memcpy(&(opt_aro_buf->eui64), sixlowpan_mac_get_eui64(dst), 8);
-        opt_hdr_len += OPT_ARO_HDR_LEN;
+        icmpv6_opt_hdr_len += OPT_ARO_HDR_LEN;
 
         packet_length += OPT_ARO_HDR_LEN;
     }
@@ -1094,27 +1107,27 @@ void init_nbr_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
     ipv6_buf->length = HTONS(packet_length - IPV6_HDR_LEN);
 
     icmp_buf->checksum = 0;
-    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
+    icmp_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 }
 
 void recv_nbr_adv(void)
 {
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
     uint16_t packet_length = IPV6_HDR_LEN + ipv6_buf->length;
-    opt_hdr_len = NBR_ADV_LEN;
+    icmpv6_opt_hdr_len = NBR_ADV_LEN;
     llao = NULL;
     nbr_entry = NULL;
     int8_t new_ll = -1;
     nbr_adv_buf = get_nbr_adv_buf(ipv6_ext_hdr_len);
 
     /* check if options are present */
-    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + opt_hdr_len) {
-        opt_buf = get_opt_buf(ipv6_ext_hdr_len, opt_hdr_len);
+    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + icmpv6_opt_hdr_len) {
+        opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
         switch (opt_buf->type) {
             case (OPT_TLLAO_TYPE): {
                 llao = (uint8_t *)get_opt_stllao_buf(ipv6_ext_hdr_len,
-                                                     opt_hdr_len);
+                                                     icmpv6_opt_hdr_len);
                 break;
             }
 
@@ -1123,7 +1136,7 @@ void recv_nbr_adv(void)
             }
         }
 
-        opt_hdr_len += (opt_buf->length * 8);
+        icmpv6_opt_hdr_len += (opt_buf->length * 8);
     }
 
     addr_list_t *addr;
@@ -1219,7 +1232,7 @@ void set_llao(opt_stllao_t *sllao, uint8_t type, uint8_t length)
 
 uint16_t icmpv6_csum(uint8_t proto)
 {
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
     uint16_t sum;
     uint16_t len = NTOHS(ipv6_buf->length);
     sum = len + proto;
@@ -1236,13 +1249,13 @@ void init_para_prob(ipv6_addr_t *src, ipv6_addr_t *dest, uint8_t code, uint32_t 
     uint16_t packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + PARA_PROB_LEN;
     struct para_prob_t *para_prob_buf;
 
-    memcpy(&(ipv6_buf[packet_length]), packet, min(MTU - packet_length, packet_len));
+    memcpy(&(ipv6_buf[packet_length]), packet, min(IPV6_MTU - packet_length, packet_len));
 
-    ipv6_buf = get_ipv6_buf();
+    ipv6_buf = ipv6_get_buf();
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = PROTO_NUM_ICMPV6;
+    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
     ipv6_buf->hoplimit = ND_HOPLIMIT;
 
     ipv6_ext_hdr_len = 0;
@@ -1257,12 +1270,12 @@ void init_para_prob(ipv6_addr_t *src, ipv6_addr_t *dest, uint8_t code, uint32_t 
 
     para_prob_buf->pointer = pointer;
 
-    packet_length += min(MTU - packet_length, packet_len);
+    packet_length += min(IPV6_MTU - packet_length, packet_len);
 
     ipv6_buf->length = HTONS(packet_length - IPV6_HDR_LEN);
 
     icmp_buf->checksum = 0;
-    icmp_buf->checksum = ~icmpv6_csum(PROTO_NUM_ICMPV6);
+    icmp_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 }
 
 //------------------------------------------------------------------------------

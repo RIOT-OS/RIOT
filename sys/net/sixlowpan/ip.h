@@ -28,99 +28,39 @@
 #include "timex.h"
 #include "mutex.h"
 
+#include "sixlowpan/ip.h"
 #include "sixlowpan/types.h"
 
-/* set maximum transmission unit */
-#define MTU                         256
 /* IPv6 field values */
-#define IPV6_VER                    0x60
-#define PROTO_NUM_ICMPV6            58
-#define PROTO_NUM_NONE              59
-#define ND_HOPLIMIT                 0xFF
-#define SIXLOWPAN_IPV6_LL_ADDR_LEN  8
+#define IPV6_VER                    (0x60)
 /* size of global buffer */
-#define BUFFER_SIZE (LL_HDR_LEN + MTU)
+#define BUFFER_SIZE (LL_HDR_LEN + IPV6_MTU)
 
-#define MULTIHOP_HOPLIMIT           64
-
-#define IP_PKT_RECV_BUF_SIZE        64
+#define MULTIHOP_HOPLIMIT           (64)
 
 #define SIXLOWIP_MAX_REGISTERED     (4)
 
-#define DEBUGLINE printf("%s:%d\n",__FILE__,__LINE__)
-
 /* extern variables */
 extern uint8_t ipv6_ext_hdr_len;
-extern uint8_t opt_hdr_len;
-extern uint8_t packet_dispatch;
-extern uint8_t iface_addr_list_count;
-extern mutex_t buf_mutex;
-
-extern double start;
 
 /* base header lengths */
-#define LL_HDR_LEN                  0x4
-#define ICMPV6_HDR_LEN              0x4
-#define IPV6_HDR_LEN                0x28
-#define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)
-#define LLHDR_ICMPV6HDR_LEN         (LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)
-#define IPV6HDR_ICMPV6HDR_LEN       (IPV6_HDR_LEN + ipv6_ext_hdr_len + ICMPV6_HDR_LEN)
+#define LL_HDR_LEN                  (0x4)
+#define ICMPV6_HDR_LEN              (0x4)
+#define IPV6_HDR_LEN                (0x28)
 
-#define IFACE_ADDR_LIST_LEN         10 // maybe to much
-/* rfc 4862 section 2. address states */
-#define ADDR_STATE_TENTATIVE        0
-#define ADDR_STATE_PREFERRED        1
-#define ADDR_STATE_DEPRECATED       2
-/* addresses with this state are always permitted */
-#define ADDR_STATE_ANY              4
-/* how the address is configured */
-#define ADDR_CONFIGURED_AUTO        1
-#define ADDR_CONFIGURED_MANUAL      2
-/* address types */
-#define ADDR_TYPE_NONE              0
-#define ADDR_TYPE_UNICAST           1
-#define ADDR_TYPE_MULTICAST         2
-#define ADDR_TYPE_ANYCAST           3
-#define ADDR_TYPE_SOL_NODE_MCAST    4
-#define ADDR_TYPE_LOOPBACK          5
-#define ADDR_TYPE_LINK_LOCAL        6
-#define ADDR_TYPE_GLOBAL            7
-/* dispatch types */
-#define DISPATCH_TYPE_IPV6          0x41
-#define DISPATCH_TYPE_LOWPAN_HC1    0x42
-/* compression types */
-#define COMPRESSION_TYPE_NONE
+#define IFACE_ADDR_LIST_LEN         (10) // maybe to much
 
 /* buffer */
 extern uint8_t buffer[BUFFER_SIZE];
 
 extern int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
-/* ipv6 extension header length */
-
-struct __attribute__((packed)) icmpv6_hdr_t {
-    uint8_t type;
-    uint8_t code;
-    uint16_t checksum;
-};
-
 typedef struct __attribute__((packed)) {
-    uint8_t version_trafficclass;
-    uint8_t trafficclass_flowlabel;
-    uint16_t flowlabel;
-    uint16_t length;
-    uint8_t nextheader;
-    uint8_t hoplimit;
-    ipv6_addr_t srcaddr;
-    ipv6_addr_t destaddr;
-} ipv6_hdr_t;
-
-typedef struct __attribute__((packed)) {
-    uint8_t state;
+    ipv6_addr_t addr;
+    ipv6_addr_type_t type;
+    ndp_addr_state_t state;
     timex_t val_ltime;
     timex_t pref_ltime;
-    uint8_t type;
-    ipv6_addr_t addr;
 } addr_list_t;
 
 typedef struct __attribute__((packed)) {
@@ -134,45 +74,18 @@ typedef struct __attribute__((packed)) {
 
 extern iface_t iface;
 
-void ipv6_send_buf(ipv6_hdr_t *buffer);
 /* function prototypes */
-struct icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len);
-ipv6_hdr_t *get_ipv6_buf(void);
+void ipv6_send_bytes(ipv6_hdr_t *bytes);
+icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len);
 uint8_t *get_payload_buf(uint8_t ext_len);
 uint8_t *get_payload_buf_send(uint8_t ext_len);
 
-int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr);
+int icmpv6_demultiplex(const icmpv6_hdr_t *hdr);
 void ipv6_init_iface_as_router(void);
-uint8_t ipv6_is_router(void);
-void ipv6_set_ll_prefix(ipv6_addr_t *ipaddr);
-void ipv6_set_all_rtrs_mcast_addr(ipv6_addr_t *ipaddr);
-void ipv6_set_all_nds_mcast_addr(ipv6_addr_t *ipaddr);
-void ipv6_set_loaddr(ipv6_addr_t *ipaddr);
-void ipv6_set_sol_node_mcast_addr(ipv6_addr_t *addr_in, ipv6_addr_t *addr_out);
-void sixlowpan_bootstrapping(void);
-void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len, uint8_t next_header);
-void ipv6_print_addr(ipv6_addr_t *ipaddr);
 void ipv6_process(void);
-void ipv6_get_saddr(ipv6_addr_t *src, ipv6_addr_t *dst);
-uint8_t ipv6_get_addr_match(ipv6_addr_t *src, ipv6_addr_t *dst);
-uint8_t ipv6_prefix_mcast_match(ipv6_addr_t *addr);
-uint8_t ipv6_prefix_ll_match(ipv6_addr_t *addr);
-void ipv6_iface_add_addr(ipv6_addr_t *addr, uint8_t state, uint32_t val_ltime,
-                         uint32_t pref_ltime, uint8_t type);
 addr_list_t *ipv6_iface_addr_prefix_eq(ipv6_addr_t *addr);
-addr_list_t *ipv6_iface_addr_match(ipv6_addr_t *addr);
-void ipv6_iface_print_addrs(void);
-void ipv6_init_addr_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix);
-void ipv6_init_address(ipv6_addr_t *addr, uint16_t addr0, uint16_t addr1,
-                       uint16_t addr2, uint16_t addr3, uint16_t addr4,
-                       uint16_t addr5, uint16_t addr6, uint16_t addr7);
+addr_list_t *ipv6_iface_addr_match(const ipv6_addr_t *addr);
 uint32_t get_remaining_time(timex_t *t);
 void set_remaining_time(timex_t *t, uint32_t time);
-void ipv6_set_prefix(ipv6_addr_t *inout, const ipv6_addr_t *prefix);
-uint8_t ipv6_addr_unspec_match(ipv6_addr_t *addr);
-uint8_t ipv6_addr_sol_node_mcast_match(ipv6_addr_t *addr);
-uint8_t ipv6_next_hdr_unrec(uint8_t next_hdr);
-void set_tcp_packet_handler_pid(int pid);
-void set_udp_packet_handler_pid(int pid);
-void set_rpl_process_pid(int pid);
+
 #endif /* _SIXLOWPAN_IP_H*/

@@ -23,7 +23,6 @@
 #include "sixlowpan/icmp.h"
 #include "sixlowpan/ndp.h"
 
-#include "../ip.h"          /* TODO: remove if not needed anymore */
 #include "../icmp.h"        /* TODO: remove if not needed anymore */
 
 /**

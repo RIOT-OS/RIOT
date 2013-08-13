@@ -140,7 +140,7 @@ void trickle_increment_counter(void)
 void trickle_timer_over(void)
 {
     ipv6_addr_t mcast;
-    ipv6_set_all_nds_mcast_addr(&mcast);
+    ipv6_addr_set_all_nodes_addr(&mcast);
 
     while (1) {
         thread_sleep();

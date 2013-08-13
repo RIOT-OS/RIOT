@@ -120,8 +120,8 @@ void serial_reader_f(void)
     }
 }
 
-uint8_t sixlowpan_lowpan_border_init(transceiver_type_t trans, 
-        const ipv6_addr_t *border_router_addr)
+uint8_t sixlowpan_lowpan_border_init(transceiver_type_t trans,
+                                     const ipv6_addr_t *border_router_addr)
 {
     ipv6_addr_t addr;
 
@@ -170,8 +170,8 @@ void border_process_lowpan(void)
         msg_receive(&m);
         ipv6_buf = (ipv6_hdr_t *)m.content.ptr;
 
-        if (ipv6_buf->nextheader == PROTO_NUM_ICMPV6) {
-            struct icmpv6_hdr_t *icmp_buf = (struct icmpv6_hdr_t *)(((uint8_t *)ipv6_buf) + IPV6_HDR_LEN);
+        if (ipv6_buf->nextheader == IPV6_PROTO_NUM_ICMPV6) {
+            icmpv6_hdr_t *icmp_buf = (icmpv6_hdr_t *)(((uint8_t *)ipv6_buf) + IPV6_HDR_LEN);
 
             if (icmp_buf->type == ICMP_REDIRECT) {
                 continue;

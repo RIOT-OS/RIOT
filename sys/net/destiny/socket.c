@@ -100,12 +100,13 @@ void print_tcp_cb(tcp_cb_t *cb)
 void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
                       tcp_hdr_t *tcp_header, socket_t *tcp_socket)
 {
+    char addr_str[IPV6_MAX_ADDR_STR_LEN];
     printf("--- %s TCP packet: ---\n",
            (in_or_out == INC_PACKET ? "Incoming" : "Outgoing"));
-    printf("IPv6 Source:");
-    ipv6_print_addr(&ipv6_header->srcaddr);
-    printf("IPv6 Dest:");
-    ipv6_print_addr(&ipv6_header->destaddr);
+    printf("IPv6 Source: %s\n", 
+           ipv6_addr_to_str(addr_str, &ipv6_header->srcaddr));
+    printf("IPv6 Dest: %s\n", 
+           ipv6_addr_to_str(addr_str, &ipv6_header->destaddr));
     printf("TCP Length: %x\n", ipv6_header->length - TCP_HDR_LEN);
     printf("Source Port: %x, Dest. Port: %x\n",
            NTOHS(tcp_header->src_port), NTOHS(tcp_header->dst_port));
@@ -124,12 +125,17 @@ void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
 
 void print_socket(socket_t *current_socket)
 {
+    char addr_str[IPV6_MAX_ADDR_STR_LEN];
     printf("Domain: %i, Type: %i, Protocol: %i \n",
            current_socket->domain,
            current_socket->type,
            current_socket->protocol);
-    ipv6_print_addr(&current_socket->local_address.sin6_addr);
-    ipv6_print_addr(&current_socket->foreign_address.sin6_addr);
+    printf("Local address: %s\n", 
+           ipv6_addr_to_str(addr_str, 
+                            &current_socket->local_address.sin6_addr));
+    printf("Foreign address: %s\n",
+           ipv6_addr_to_str(addr_str,
+                            &current_socket->foreign_address.sin6_addr));
     printf("Local Port: %u, Foreign Port: %u\n",
            NTOHS(current_socket->local_address.sin6_port),
            NTOHS(current_socket->foreign_address.sin6_port));
@@ -294,11 +300,11 @@ socket_internal_t *get_udp_socket(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header
 bool is_four_touple(socket_internal_t *current_socket, ipv6_hdr_t *ipv6_header,
                     tcp_hdr_t *tcp_header)
 {
-    return ((ipv6_get_addr_match(&current_socket->socket_values.local_address.sin6_addr,
-                                 &ipv6_header->destaddr) == 128) &&
+    return (ipv6_addr_is_equal(&current_socket->socket_values.local_address.sin6_addr,
+                               &ipv6_header->destaddr) &&
             (current_socket->socket_values.local_address.sin6_port == tcp_header->dst_port) &&
-            (ipv6_get_addr_match(&current_socket->socket_values.foreign_address.sin6_addr,
-                                 &ipv6_header->srcaddr) == 128) &&
+            ipv6_addr_is_equal(&current_socket->socket_values.foreign_address.sin6_addr,
+                               &ipv6_header->srcaddr) &&
             (current_socket->socket_values.foreign_address.sin6_port == tcp_header->src_port));
 }
 
@@ -470,15 +476,15 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
         return -1;
     }
 
-    sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr,
-                   (uint8_t *)(current_tcp_packet), compressed_size,
-                   IPPROTO_TCP);
+    ipv6_sendto(&current_tcp_socket->foreign_address.sin6_addr,
+                IPPROTO_TCP, (uint8_t *)(current_tcp_packet), 
+                compressed_size);
     return 1;
 #else
     switch_tcp_packet_byte_order(current_tcp_packet);
-    sixlowpan_send(&current_tcp_socket->foreign_address.sin6_addr,
-                   (uint8_t *)(current_tcp_packet),
-                   header_length * 4 + payload_length, IPPROTO_TCP);
+    ipv6_sendto(&current_tcp_socket->foreign_address.sin6_addr,
+                IPPROTO_TCP, (uint8_t *)(current_tcp_packet),
+                header_length * 4 + payload_length);
     return 1;
 #endif
 }
@@ -516,7 +522,7 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     current_int_tcp_socket->recv_pid = thread_getpid();
 
     /* Local address information */
-    ipv6_get_saddr(&src_addr, &addr->sin6_addr);
+    ipv6_iface_get_best_src_addr(&src_addr, &addr->sin6_addr);
     set_socket_address(&current_tcp_socket->local_address, PF_INET6,
                        HTONS(get_free_source_port(IPPROTO_TCP)), 0, &src_addr);
 
@@ -979,7 +985,7 @@ int32_t sendto(int s, const void *msg, uint32_t len, int flags,
         uint8_t *payload = &send_buffer[IPV6_HDR_LEN + UDP_HDR_LEN];
 
         memcpy(&(temp_ipv6_header->destaddr), &to->sin6_addr, 16);
-        ipv6_get_saddr(&(temp_ipv6_header->srcaddr), &(temp_ipv6_header->destaddr));
+        ipv6_iface_get_best_src_addr(&(temp_ipv6_header->srcaddr), &(temp_ipv6_header->destaddr));
 
         current_udp_packet->src_port = get_free_source_port(IPPROTO_UDP);
         current_udp_packet->dst_port = to->sin6_port;
@@ -992,8 +998,9 @@ int32_t sendto(int s, const void *msg, uint32_t len, int flags,
         current_udp_packet->checksum = ~udp_csum(temp_ipv6_header,
                                                  current_udp_packet);
 
-        sixlowpan_send(&to->sin6_addr, (uint8_t *)(current_udp_packet),
-                       current_udp_packet->length, IPPROTO_UDP);
+        ipv6_sendto(&to->sin6_addr, IPPROTO_UDP, 
+                    (uint8_t *)(current_udp_packet),
+                    current_udp_packet->length);
         return current_udp_packet->length;
     }
     else {

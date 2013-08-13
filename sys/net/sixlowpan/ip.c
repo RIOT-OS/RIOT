@@ -31,17 +31,20 @@
 #include "icmp.h"
 #include "lowpan.h"
 
-#include "sys/net/destiny/in.h"
 #include "sys/net/destiny/socket.h"
 #include "sys/net/net_help/net_help.h"
 #include "sys/net/net_help/msg_help.h"
+
+#define IP_PKT_RECV_BUF_SIZE        (64)
+#define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)
 
 uint8_t ip_send_buffer[BUFFER_SIZE];
 uint8_t buffer[BUFFER_SIZE];
 msg_t msg_queue[IP_PKT_RECV_BUF_SIZE];
 ipv6_hdr_t *ipv6_buf;
-struct icmpv6_hdr_t *icmp_buf;
+icmpv6_hdr_t *icmp_buf;
 uint8_t *nextheader;
+
 uint8_t iface_addr_list_count = 0;
 int udp_packet_handler_pid = 0;
 int tcp_packet_handler_pid = 0;
@@ -50,22 +53,22 @@ int rpl_process_pid = 0;
 /* registered upper layer threads */
 int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
-void ipv6_send_buf(ipv6_hdr_t *buffer)
+void ipv6_send_bytes(ipv6_hdr_t *bytes)
 {
-    uint16_t offset = IPV6_HDR_LEN + HTONS(buffer->length);
+    uint16_t offset = IPV6_HDR_LEN + HTONS(bytes->length);
 
-    buffer->flowlabel = HTONS(buffer->flowlabel);
-    buffer->length = HTONS(buffer->length);
+    bytes->flowlabel = HTONS(bytes->flowlabel);
+    bytes->length = HTONS(bytes->length);
 
-    memset(buffer, 0, BUFFER_SIZE);
-    memcpy(buffer + LL_HDR_LEN, buffer, offset);
+    memset(bytes, 0, BUFFER_SIZE);
+    memcpy(bytes + LL_HDR_LEN, bytes, offset);
 
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (buffer->destaddr.uint16[4]),
-                            (uint8_t *)buffer,
+    sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (bytes->destaddr.uint16[4]),
+                            (uint8_t *)bytes,
                             offset);
 }
 
-ipv6_hdr_t *get_ipv6_buf_send(void)
+ipv6_hdr_t *ipv6_get_buf_send(void)
 {
     return ((ipv6_hdr_t *) & (ip_send_buffer[LL_HDR_LEN]));
 }
@@ -75,13 +78,14 @@ uint8_t *get_payload_buf_send(uint8_t ext_len)
     return &(ip_send_buffer[LLHDR_IPV6HDR_LEN + ext_len]);
 }
 
-ipv6_hdr_t *get_ipv6_buf(void)
+ipv6_hdr_t *ipv6_get_buf(void)
 {
     return ((ipv6_hdr_t *) & (buffer[LL_HDR_LEN]));
 }
 
-struct icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len) {
-    return ((struct icmpv6_hdr_t *) & (buffer[LLHDR_IPV6HDR_LEN + ext_len]));
+icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len)
+{
+    return ((icmpv6_hdr_t *) & (buffer[LLHDR_IPV6HDR_LEN + ext_len]));
 }
 
 uint8_t *get_payload_buf(uint8_t ext_len)
@@ -89,49 +93,41 @@ uint8_t *get_payload_buf(uint8_t ext_len)
     return &(buffer[LLHDR_IPV6HDR_LEN + ext_len]);
 }
 
-void sixlowpan_bootstrapping(void)
-{
-
-    init_rtr_sol(OPT_SLLAO);
-}
-
-void sixlowpan_send(ipv6_addr_t *addr, uint8_t *payload, uint16_t p_len,
-                    uint8_t next_header)
+void ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
+                 const uint8_t *payload, uint16_t payload_length)
 {
     uint8_t *p_ptr;
     uint16_t packet_length;
 
-    if (next_header == IPPROTO_TCP) {
+    if (next_header == IPV6_PROTO_NUM_TCP) {
         p_ptr = get_payload_buf_send(ipv6_ext_hdr_len);
-        ipv6_buf = get_ipv6_buf_send();
+        ipv6_buf = ipv6_get_buf_send();
     }
     else {
-        ipv6_buf = get_ipv6_buf();
+        ipv6_buf = ipv6_get_buf();
         p_ptr = get_payload_buf(ipv6_ext_hdr_len);
     }
-
-    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
 
     ipv6_buf->version_trafficclass = IPV6_VER;
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
     ipv6_buf->nextheader = next_header;
     ipv6_buf->hoplimit = MULTIHOP_HOPLIMIT;
-    ipv6_buf->length = p_len;
+    ipv6_buf->length = payload_length;
 
-    memcpy(&(ipv6_buf->destaddr), addr, 16);
-    ipv6_get_saddr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
+    memcpy(&(ipv6_buf->destaddr), dest, 16);
+    ipv6_iface_get_best_src_addr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
 
-    memcpy(p_ptr, payload, p_len);
+    memcpy(p_ptr, payload, payload_length);
 
-    packet_length = IPV6_HDR_LEN + p_len;
+    packet_length = IPV6_HDR_LEN + payload_length;
 
     sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
                             (uint8_t *)ipv6_buf, packet_length);
 }
 
 /* Register an upper layer thread */
-uint8_t sixlowip_register(int pid)
+uint8_t ipv6_register_packet_handler(int pid)
 {
     uint8_t i;
 
@@ -149,7 +145,7 @@ uint8_t sixlowip_register(int pid)
     }
 }
 
-int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr)
+int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
 {
     switch (hdr->type) {
         case (ICMP_ECHO_REQ): {
@@ -216,6 +212,35 @@ int icmpv6_demultiplex(const struct icmpv6_hdr_t *hdr)
     return 0;
 }
 
+uint8_t ipv6_get_addr_match(const ipv6_addr_t *src,
+                            const ipv6_addr_t *dst)
+{
+    uint8_t val = 0, xor;
+
+    for (int i = 0; i < 16; i++) {
+        /* if bytes are equal add 8 */
+        if (src->uint8[i] == dst->uint8[i]) {
+            val += 8;
+        }
+        else {
+            xor = src->uint8[i] ^ dst->uint8[i];
+
+            /* while bits from byte equal add 1 */
+            for (int j = 0; j < 8; j++) {
+                if ((xor & 0x80) == 0) {
+                    val++;
+                    xor = xor << 1;
+                }
+                else {
+                    break;
+                }
+            }
+        }
+    }
+
+    return val;
+}
+
 void ipv6_process(void)
 {
     msg_t m_recv_lowpan, m_send_lowpan;
@@ -224,8 +249,8 @@ void ipv6_process(void)
     uint8_t i;
     uint16_t packet_length;
 
-    ipv6_init_address(&myaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00,
-                      sixlowpan_mac_get_radio_address());
+    ipv6_addr_init(&myaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00,
+                   sixlowpan_mac_get_radio_address());
 
     while (1) {
         msg_receive(&m_recv_lowpan);
@@ -238,9 +263,9 @@ void ipv6_process(void)
         if ((ipv6_get_addr_match(&myaddr, &ipv6_buf->destaddr) >= 112) &&
             (ipv6_buf->destaddr.uint8[15] != myaddr.uint8[15])) {
             packet_length = IPV6_HDR_LEN + ipv6_buf->length;
-            memcpy(get_ipv6_buf_send(), get_ipv6_buf(), packet_length);
+            memcpy(ipv6_get_buf_send(), ipv6_get_buf(), packet_length);
             sixlowpan_lowpan_sendto((ieee_802154_long_t *) & (ipv6_buf->destaddr.uint16[4]),
-                                    (uint8_t *)get_ipv6_buf_send(),
+                                    (uint8_t *)ipv6_get_buf_send(),
                                     packet_length);
         }
         else {
@@ -253,9 +278,9 @@ void ipv6_process(void)
             }
 
             switch (*nextheader) {
-                case (PROTO_NUM_ICMPV6): {
+                case (IPV6_PROTO_NUM_ICMPV6): {
                     /* checksum test*/
-                    if (icmpv6_csum(PROTO_NUM_ICMPV6) != 0xffff) {
+                    if (icmpv6_csum(IPV6_PROTO_NUM_ICMPV6) != 0xffff) {
                         printf("ERROR: wrong checksum\n");
                     }
 
@@ -264,7 +289,7 @@ void ipv6_process(void)
                     break;
                 }
 
-                case (IPPROTO_TCP): {
+                case (IPV6_PROTO_NUM_TCP): {
                     if (tcp_packet_handler_pid != 0) {
                         m_send.content.ptr = (char *) ipv6_buf;
                         msg_send_receive(&m_send, &m_recv, tcp_packet_handler_pid);
@@ -276,7 +301,7 @@ void ipv6_process(void)
                     break;
                 }
 
-                case (IPPROTO_UDP): {
+                case (IPV6_PROTO_NUM_UDP): {
                     if (udp_packet_handler_pid != 0) {
                         m_send.content.ptr = (char *) ipv6_buf;
                         msg_send_receive(&m_send, &m_recv, udp_packet_handler_pid);
@@ -288,7 +313,7 @@ void ipv6_process(void)
                     break;
                 }
 
-                case (PROTO_NUM_NONE): {
+                case (IPV6_PROTO_NUM_NONE): {
                     printf("INFO: Packet with no Header following the IPv6 Header received.\n");
                     break;
                 }
@@ -302,10 +327,11 @@ void ipv6_process(void)
     }
 }
 
-void ipv6_iface_add_addr(ipv6_addr_t *addr, uint8_t state, uint32_t val_ltime,
-                         uint32_t pref_ltime, uint8_t type)
+void ipv6_iface_add_addr(const ipv6_addr_t *addr, ipv6_addr_type_t type,
+                         ndp_addr_state_t state, uint32_t val_ltime,
+                         uint32_t pref_ltime)
 {
-    if (ipv6_addr_unspec_match(addr) == 128) {
+    if (ipv6_addr_is_unspecified(addr) == 128) {
         printf("ERROR: unspecified address (::) can't be assigned to interface.\n");
         return;
     }
@@ -328,19 +354,21 @@ void ipv6_iface_add_addr(ipv6_addr_t *addr, uint8_t state, uint32_t val_ltime,
         iface_addr_list_count++;
 
         /* Register to Solicited-Node multicast address according to RFC 4291 */
-        if (type == ADDR_TYPE_ANYCAST || type == ADDR_TYPE_LINK_LOCAL ||
-            type == ADDR_TYPE_GLOBAL || type == ADDR_TYPE_UNICAST) {
+        if (type == IPV6_ADDR_TYPE_ANYCAST || type == IPV6_ADDR_TYPE_LINK_LOCAL ||
+            type == IPV6_ADDR_TYPE_GLOBAL || type == IPV6_ADDR_TYPE_UNICAST) {
             ipv6_addr_t sol_node_mcast_addr;
-            ipv6_set_sol_node_mcast_addr(addr, &sol_node_mcast_addr);
+            ipv6_addr_set_solicited_node_addr(&sol_node_mcast_addr, addr);
 
             if (ipv6_iface_addr_match(&sol_node_mcast_addr) == NULL) {
-                ipv6_iface_add_addr(&sol_node_mcast_addr, state, val_ltime, pref_ltime, ADDR_TYPE_SOL_NODE_MCAST);
+                ipv6_iface_add_addr(&sol_node_mcast_addr,
+                                    IPV6_ADDR_TYPE_SOLICITED_NODE,
+                                    state, val_ltime, pref_ltime);
             }
         }
     }
 }
 
-addr_list_t *ipv6_iface_addr_match(ipv6_addr_t *addr)
+addr_list_t *ipv6_iface_addr_match(const ipv6_addr_t *addr)
 {
     int i;
 
@@ -371,80 +399,92 @@ addr_list_t *ipv6_iface_addr_prefix_eq(ipv6_addr_t *addr)
 void ipv6_iface_print_addrs(void)
 {
     for (int i = 0; i < iface_addr_list_count; i++) {
-        ipv6_print_addr(&(iface.addr_list[i].addr));
+        char addr_str[IPV6_MAX_ADDR_STR_LEN];
+        printf("%s\n", ipv6_addr_to_str(addr_str,
+                                        &(iface.addr_list[i].addr)));
     }
 }
 
-void ipv6_init_addr_prefix(ipv6_addr_t *inout, ipv6_addr_t *prefix)
+void ipv6_addr_set_by_eui64(ipv6_addr_t *out, const ipv6_addr_t *prefix)
 {
-    inout->uint16[0] = prefix->uint16[0];
-    inout->uint16[1] = prefix->uint16[1];
-    inout->uint16[2] = prefix->uint16[2];
-    inout->uint16[3] = prefix->uint16[3];
+    out->uint16[0] = prefix->uint16[0];
+    out->uint16[1] = prefix->uint16[1];
+    out->uint16[2] = prefix->uint16[2];
+    out->uint16[3] = prefix->uint16[3];
 
-    memcpy(&(inout->uint8[8]), &(iface.laddr.uint8[0]), 8);
+    memcpy(&(out->uint8[8]), &(iface.laddr.uint8[0]), 8);
 }
 
-void ipv6_set_prefix(ipv6_addr_t *inout, const ipv6_addr_t *prefix)
+void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix,
+                           uint8_t bits)
 {
-    inout->uint16[0] = prefix->uint16[0];
-    inout->uint16[1] = prefix->uint16[1];
-    inout->uint16[2] = prefix->uint16[2];
-    inout->uint16[3] = prefix->uint16[3];
-    inout->uint16[4] = 0;
-    inout->uint16[5] = 0;
-    inout->uint16[6] = 0;
-    inout->uint16[7] = 0;
+    if (bits > 128) {
+        bits = 128;
+    }
+
+    uint8_t bytes = bits / 8, mask;
+
+    if (bits % 8) {
+        mask = 0xff << (bits - (bytes * 8));
+    }
+    else {
+        mask = 0x00;
+    }
+
+    bytes++;
+    memset(out, 0, 16);
+    memcpy(out, prefix, bytes);
+    out->uint8[bytes] = prefix->uint8[bytes] & mask;
 }
 
-void ipv6_set_all_rtrs_mcast_addr(ipv6_addr_t *ipaddr)
+void ipv6_addr_set_all_routers_addr(ipv6_addr_t *ipv6_addr)
 {
-    ipaddr->uint16[0] = HTONS(0xff02);
-    ipaddr->uint16[1] = 0;
-    ipaddr->uint16[2] = 0;
-    ipaddr->uint16[3] = 0;
-    ipaddr->uint16[4] = 0;
-    ipaddr->uint16[5] = 0;
-    ipaddr->uint16[6] = 0;
-    ipaddr->uint16[7] = HTONS(0x0002);
+    ipv6_addr->uint16[0] = HTONS(0xff02);
+    ipv6_addr->uint16[1] = 0;
+    ipv6_addr->uint16[2] = 0;
+    ipv6_addr->uint16[3] = 0;
+    ipv6_addr->uint16[4] = 0;
+    ipv6_addr->uint16[5] = 0;
+    ipv6_addr->uint16[6] = 0;
+    ipv6_addr->uint16[7] = HTONS(0x0002);
 }
 
-void ipv6_set_all_nds_mcast_addr(ipv6_addr_t *ipaddr)
+void ipv6_addr_set_all_nodes_addr(ipv6_addr_t *ipv6_addr)
 {
-    ipaddr->uint16[0] = HTONS(0xff02);
-    ipaddr->uint16[1] = 0;
-    ipaddr->uint16[2] = 0;
-    ipaddr->uint16[3] = 0;
-    ipaddr->uint16[4] = 0;
-    ipaddr->uint16[5] = 0;
-    ipaddr->uint16[6] = 0;
-    ipaddr->uint16[7] = HTONS(0x0001);
+    ipv6_addr->uint16[0] = HTONS(0xff02);
+    ipv6_addr->uint16[1] = 0;
+    ipv6_addr->uint16[2] = 0;
+    ipv6_addr->uint16[3] = 0;
+    ipv6_addr->uint16[4] = 0;
+    ipv6_addr->uint16[5] = 0;
+    ipv6_addr->uint16[6] = 0;
+    ipv6_addr->uint16[7] = HTONS(0x0001);
 }
 
-void ipv6_set_loaddr(ipv6_addr_t *ipaddr)
+void ipv6_addr_set_loopback_addr(ipv6_addr_t *ipv6_addr)
 {
-    ipaddr->uint16[0] = 0;
-    ipaddr->uint16[1] = 0;
-    ipaddr->uint16[2] = 0;
-    ipaddr->uint16[3] = 0;
-    ipaddr->uint16[4] = 0;
-    ipaddr->uint16[5] = 0;
-    ipaddr->uint16[6] = 0;
-    ipaddr->uint16[7] = HTONS(0x0001);
+    ipv6_addr->uint16[0] = 0;
+    ipv6_addr->uint16[1] = 0;
+    ipv6_addr->uint16[2] = 0;
+    ipv6_addr->uint16[3] = 0;
+    ipv6_addr->uint16[4] = 0;
+    ipv6_addr->uint16[5] = 0;
+    ipv6_addr->uint16[6] = 0;
+    ipv6_addr->uint16[7] = HTONS(0x0001);
 }
 
-void ipv6_get_saddr(ipv6_addr_t *src, ipv6_addr_t *dst)
+void ipv6_iface_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
 {
     /* try to find best match if dest is not mcast or link local */
     int8_t itmp = -1;
     uint8_t tmp = 0;
     uint8_t bmatch = 0;
 
-    if (!(ipv6_prefix_ll_match(dst)) && !(ipv6_prefix_mcast_match(dst))) {
+    if (!(ipv6_addr_is_link_local(dest)) && !(ipv6_addr_is_multicast(dest))) {
         for (int i = 0; i < IFACE_ADDR_LIST_LEN; i++) {
-            if (iface.addr_list[i].state == ADDR_STATE_PREFERRED) {
-                if (!(ipv6_prefix_ll_match(&(iface.addr_list[i].addr)))) {
-                    tmp = ipv6_get_addr_match(dst, &(iface.addr_list[i].addr));
+            if (iface.addr_list[i].state == NDP_ADDR_STATE_PREFERRED) {
+                if (!(ipv6_addr_is_link_local(&(iface.addr_list[i].addr)))) {
+                    tmp = ipv6_get_addr_match(dest, &(iface.addr_list[i].addr));
 
                     if (tmp >= bmatch) {
                         bmatch = tmp;
@@ -456,8 +496,8 @@ void ipv6_get_saddr(ipv6_addr_t *src, ipv6_addr_t *dst)
     }
     else {
         for (int j = 0; j < IFACE_ADDR_LIST_LEN; j++) {
-            if ((iface.addr_list[j].state == ADDR_STATE_PREFERRED) &&
-                ipv6_prefix_ll_match(&(iface.addr_list[j].addr))) {
+            if ((iface.addr_list[j].state == NDP_ADDR_STATE_PREFERRED) &&
+                ipv6_addr_is_link_local(&(iface.addr_list[j].addr))) {
                 itmp = j;
             }
         }
@@ -471,131 +511,87 @@ void ipv6_get_saddr(ipv6_addr_t *src, ipv6_addr_t *dst)
     }
 }
 
-uint8_t ipv6_get_addr_match(ipv6_addr_t *src, ipv6_addr_t *dst)
+int ipv6_addr_is_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
 {
-    uint8_t val = 0, xor;
-
-    for (int i = 0; i < 16; i++) {
-        /* if bytes are equal add 8 */
-        if (src->uint8[i] == dst->uint8[i]) {
-            val += 8;
-        }
-        else {
-            xor = src->uint8[i] ^ dst->uint8[i];
-
-            /* while bits from byte equal add 1 */
-            for (int j = 0; j < 8; j++) {
-                if ((xor & 0x80) == 0) {
-                    val++;
-                    xor = xor << 1;
-                }
-                else {
-                    break;
-                }
-            }
-        }
-    }
-
-    return val;
+    return ipv6_get_addr_match(a, b) == 128;
 }
 
-void ipv6_set_ll_prefix(ipv6_addr_t *ipaddr)
+void ipv6_addr_set_link_local_prefix(ipv6_addr_t *ipv6_addr)
 {
-    ipaddr->uint16[0] = HTONS(0xfe80);
-    ipaddr->uint16[1] = 0;
-    ipaddr->uint16[2] = 0;
-    ipaddr->uint16[3] = 0;
+    ipv6_addr->uint16[0] = HTONS(0xfe80);
+    ipv6_addr->uint16[1] = 0;
+    ipv6_addr->uint16[2] = 0;
+    ipv6_addr->uint16[3] = 0;
 }
 
-void ipv6_init_address(ipv6_addr_t *addr, uint16_t addr0, uint16_t addr1,
-                       uint16_t addr2, uint16_t addr3, uint16_t addr4,
-                       uint16_t addr5, uint16_t addr6, uint16_t addr7)
+void ipv6_addr_init(ipv6_addr_t *out, uint16_t addr0, uint16_t addr1,
+                    uint16_t addr2, uint16_t addr3, uint16_t addr4,
+                    uint16_t addr5, uint16_t addr6, uint16_t addr7)
 {
-    addr->uint16[0] = HTONS(addr0);
-    addr->uint16[1] = HTONS(addr1);
-    addr->uint16[2] = HTONS(addr2);
-    addr->uint16[3] = HTONS(addr3);
-    addr->uint16[4] = HTONS(addr4);
-    addr->uint16[5] = HTONS(addr5);
-    addr->uint16[6] = HTONS(addr6);
-    addr->uint16[7] = HTONS(addr7);
+    out->uint16[0] = HTONS(addr0);
+    out->uint16[1] = HTONS(addr1);
+    out->uint16[2] = HTONS(addr2);
+    out->uint16[3] = HTONS(addr3);
+    out->uint16[4] = HTONS(addr4);
+    out->uint16[5] = HTONS(addr5);
+    out->uint16[6] = HTONS(addr6);
+    out->uint16[7] = HTONS(addr7);
 }
 
-uint8_t ipv6_prefix_ll_match(ipv6_addr_t *addr)
+int ipv6_addr_is_link_local(const ipv6_addr_t *addr)
 {
-    if (addr->uint8[0] == 0xfe && addr->uint8[1] == 0x80) {
-        return 1;
-    }
-
-    return 0;
+    return addr->uint8[0] == 0xfe && addr->uint8[0] == 0x80;
 }
 
-uint8_t ipv6_prefix_mcast_match(ipv6_addr_t *addr)
+int ipv6_addr_is_multicast(const ipv6_addr_t *addr)
 {
-    if (addr->uint8[0] == 0xff && addr->uint8[1] == 0x02) {
-        return 1;
-    }
-
-    return 0;
+    return addr->uint8[0] == 0xff;
 }
 
-uint8_t ipv6_addr_unspec_match(ipv6_addr_t *addr)
+int ipv6_addr_is_unspecified(const ipv6_addr_t *ipv6_addr)
 {
-    if ((addr->uint16[0] == 0) && (addr->uint16[1] == 0) &&
-        (addr->uint16[2] == 0) && (addr->uint16[3] == 0) &&
-        (addr->uint16[4] == 0) && (addr->uint16[5] == 0) &&
-        (addr->uint16[6] == 0) && (addr->uint16[7] == 0)) {
-        return 1;
-    }
-
-    return 0;
+    return (ipv6_addr->uint32[0] == 0) && (ipv6_addr->uint32[1] == 0) &&
+           (ipv6_addr->uint32[2] == 0) && (ipv6_addr->uint32[3] == 0);
 }
 
-uint8_t ipv6_addr_sol_node_mcast_match(ipv6_addr_t *addr)
+int ipv6_addr_is_solicited_node(const ipv6_addr_t *ipv6_addr)
 {
-    /* note: cool if-condition*/
-    if ((addr->uint8[0] == 0xFF) && (addr->uint8[1] == 0x02) &&
-        (addr->uint16[1] == 0x00) && (addr->uint16[2] == 0x00) &&
-        (addr->uint16[3] == 0x00) && (addr->uint16[4] == 0x00) &&
-        (addr->uint8[10] == 0x00) && (addr->uint8[11] == 0x01) &&
-        (addr->uint8[12] == 0xFF)) {
-        return 1;
-    }
-
-    return 0;
+    return (ipv6_addr->uint8[0] == 0xFF) &&
+           (ipv6_addr->uint8[1] == 0x02) &&
+           (ipv6_addr->uint16[1] == 0x00) &&
+           (ipv6_addr->uint16[2] == 0x00) &&
+           (ipv6_addr->uint16[3] == 0x00) &&
+           (ipv6_addr->uint16[4] == 0x00) &&
+           (ipv6_addr->uint8[10] == 0x00) &&
+           (ipv6_addr->uint8[11] == 0x01) &&
+           (ipv6_addr->uint8[12] == 0xFF);
 }
 
-void ipv6_set_sol_node_mcast_addr(ipv6_addr_t *addr_in, ipv6_addr_t *addr_out)
+void ipv6_addr_set_solicited_node_addr(ipv6_addr_t *ipv6_addr_out,
+                                       const ipv6_addr_t *ipv6_addr_in)
 {
     /* copy only the last 24-bit of the ip-address that is beeing resolved */
-    addr_out->uint16[0] = HTONS(0xff02);
-    addr_out->uint16[1] = 0;
-    addr_out->uint16[2] = 0;
-    addr_out->uint16[3] = 0;
-    addr_out->uint16[4] = 0;
-    addr_out->uint16[5] = HTONS(0x0001);
-    addr_out->uint8[12] = 0xff;
-    addr_out->uint8[13] = addr_in->uint8[13];
-    addr_out->uint16[7] = addr_in->uint16[7];
+    ipv6_addr_out->uint16[0] = HTONS(0xff02);
+    ipv6_addr_out->uint16[1] = 0;
+    ipv6_addr_out->uint16[2] = 0;
+    ipv6_addr_out->uint16[3] = 0;
+    ipv6_addr_out->uint16[4] = 0;
+    ipv6_addr_out->uint16[5] = HTONS(0x0001);
+    ipv6_addr_out->uint8[12] = 0xff;
+    ipv6_addr_out->uint8[13] = ipv6_addr_in->uint8[13];
+    ipv6_addr_out->uint16[7] = ipv6_addr_in->uint16[7];
 }
 
-void ipv6_print_addr(ipv6_addr_t *ipaddr)
+char *ipv6_addr_to_str(char *addr_str, const ipv6_addr_t *ipv6_addr)
 {
-    printf("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x\n",
-           ((uint8_t *)ipaddr)[0], ((uint8_t *)ipaddr)[1], ((uint8_t *)ipaddr)[2],
-           ((uint8_t *)ipaddr)[3], ((uint8_t *)ipaddr)[4], ((uint8_t *)ipaddr)[5],
-           ((uint8_t *)ipaddr)[6], ((uint8_t *)ipaddr)[7], ((uint8_t *)ipaddr)[8],
-           ((uint8_t *)ipaddr)[9], ((uint8_t *)ipaddr)[10], ((uint8_t *)ipaddr)[11],
-           ((uint8_t *)ipaddr)[12], ((uint8_t *)ipaddr)[13], ((uint8_t *)ipaddr)[14],
-           ((uint8_t *)ipaddr)[15]);
+    sprintf(addr_str,
+            "%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x",
+            ipv6_addr->uint16[0], ipv6_addr->uint16[1],
+            ipv6_addr->uint16[2], ipv6_addr->uint16[3],
+            ipv6_addr->uint16[4], ipv6_addr->uint16[5],
+            ipv6_addr->uint16[6], ipv6_addr->uint16[7]);
+    return addr_str;
 }
-
-uint8_t ipv6_next_hdr_unknown(uint8_t next_hdr)
-{
-    return  next_hdr == PROTO_NUM_ICMPV6 ||
-            next_hdr == PROTO_NUM_NONE;
-}
-
 
 uint32_t get_remaining_time(timex_t *t)
 {
@@ -618,8 +614,8 @@ void ipv6_init_iface_as_router(void)
 {
     ipv6_addr_t addr;
 
-    ipv6_set_all_rtrs_mcast_addr(&addr);
-    ipv6_iface_add_addr(&addr, ADDR_STATE_PREFERRED, 0, 0, ADDR_TYPE_MULTICAST);
+    ipv6_addr_set_all_routers_addr(&addr);
+    ipv6_iface_add_addr(&addr, NDP_ADDR_STATE_PREFERRED, 0, 0, IPV6_ADDR_TYPE_MULTICAST);
 }
 
 
@@ -627,7 +623,7 @@ uint8_t ipv6_is_router(void)
 {
     ipv6_addr_t addr;
 
-    ipv6_set_all_rtrs_mcast_addr(&addr);
+    ipv6_addr_set_all_routers_addr(&addr);
 
     if (ipv6_iface_addr_match(&addr) != NULL) {
         return 1;
@@ -646,7 +642,22 @@ void set_udp_packet_handler_pid(int pid)
     udp_packet_handler_pid = pid;
 }
 
-void set_rpl_process_pid(int pid)
+void ipv6_register_next_header_handler(uint8_t next_header, int pid)
+{
+    switch (next_header) {
+        case (IPV6_PROTO_NUM_TCP):
+            set_tcp_packet_handler_pid(pid);
+            break;
+        case (IPV6_PROTO_NUM_UDP):
+            set_udp_packet_handler_pid(pid);
+            break;
+        default:
+            /* TODO */
+            break;
+    }
+}
+
+void ipv6_register_rpl_handler(int pid)
 {
     rpl_process_pid = pid;
 }

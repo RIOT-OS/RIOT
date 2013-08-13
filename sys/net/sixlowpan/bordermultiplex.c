@@ -48,7 +48,7 @@ void demultiplex(border_packet_t *packet, int len)
             switch (l3_header_buf->ethertype) {
                 case (BORDER_ETHERTYPE_IPV6): {
                     ipv6_hdr_t *ipv6_buf = (ipv6_hdr_t *)(((unsigned char *)packet) + sizeof(border_l3_header_t));
-                    ipv6_send_buf(ipv6_buf);
+                    ipv6_send_bytes(ipv6_buf);
                     break;
                 }
 
@@ -67,7 +67,7 @@ void demultiplex(border_packet_t *packet, int len)
                 case (BORDER_CONF_CONTEXT): {
                     border_context_packet_t *context = (border_context_packet_t *)packet;
                     ipv6_addr_t target_addr;
-                    ipv6_set_all_nds_mcast_addr(&target_addr);
+                    ipv6_addr_set_all_nodes_addr(&target_addr);
                     mutex_lock(&lowpan_context_mutex);
                     lowpan_context_update(
                         context->context.cid,

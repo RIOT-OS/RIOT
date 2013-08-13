@@ -40,7 +40,7 @@ void init_transport_layer(void)
     int udp_thread_pid = thread_create(udp_stack_buffer, UDP_STACK_SIZE,
                                        PRIORITY_MAIN, CREATE_STACKTEST,
                                        udp_packet_handler,"udp_packet_handler");
-    set_udp_packet_handler_pid(udp_thread_pid);
+    ipv6_register_next_header_handler(IPV6_PROTO_NUM_UDP, udp_thread_pid);
 
     /* TCP */
     timex_t now;
@@ -55,7 +55,7 @@ void init_transport_layer(void)
     int tcp_thread_pid = thread_create(tcp_stack_buffer, TCP_STACK_SIZE,
                                        PRIORITY_MAIN, CREATE_STACKTEST,
                                        tcp_packet_handler, "tcp_packet_handler");
-    set_tcp_packet_handler_pid(tcp_thread_pid);
+    ipv6_register_next_header_handler(IPV6_PROTO_NUM_TCP, tcp_thread_pid);
 
     thread_create(tcp_timer_stack, TCP_TIMER_STACKSIZE, PRIORITY_MAIN + 1,
                   CREATE_STACKTEST, tcp_general_timer, "tcp_general_timer");

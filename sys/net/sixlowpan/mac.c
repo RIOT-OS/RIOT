@@ -184,8 +184,8 @@ void set_ieee802154_frame_values(ieee802154_frame_t *frame)
 }
 
 void sixlowpan_mac_send_ieee802154_frame(const ieee_802154_long_t *addr,
-                                         const uint8_t *payload, 
-                                         uint8_t length, uint8_t mcast)
+        const uint8_t *payload,
+        uint8_t length, uint8_t mcast)
 {
     uint16_t daddr;
     /* TODO: check if dedicated response struct is necessary */
@@ -216,9 +216,6 @@ void sixlowpan_mac_send_ieee802154_frame(const ieee_802154_long_t *addr,
     init_802154_frame(&frame, (uint8_t *)&buf);
     memcpy(&buf[hdrlen], frame.payload, frame.payload_len);
     DEBUG("IEEE802.15.4 frame - FCF: %02X %02X DPID: %02X SPID: %02X DSN: %02X\n", buf[0], buf[1], frame->dest_pan_id, frame->src_pan_id, frame->seq_nr);
-
-    /* mutex unlock */
-    mutex_unlock(&buf_mutex);
 
     p.length = hdrlen + frame.payload_len;
 
