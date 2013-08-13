@@ -10,9 +10,6 @@ endif
 ifneq (,$(findstring lib,$(USEMODULE)))
     DIRS += lib
 endif
-ifneq (,$(findstring logd,$(USEMODULE)))
-    DIRS += logd
-endif
 ifneq (,$(findstring cmdd,$(USEMODULE)))
     DIRS += cmdd
 endif
@@ -27,9 +24,6 @@ ifneq (,$(findstring ps,$(USEMODULE)))
 endif
 ifneq (,$(findstring sync_read,$(USEMODULE)))
     DIRS += sync_read
-endif
-ifneq (,$(findstring syslog,$(USEMODULE)))
-    DIRS += syslog
 endif
 ifneq (,$(findstring sysmon,$(USEMODULE)))
     DIRS += sysmon
@@ -48,9 +42,6 @@ ifneq (,$(findstring shell_commands,$(USEMODULE)))
 endif
 ifneq (,$(findstring timex,$(USEMODULE)))
     DIRS += timex
-endif
-ifneq (,$(findstring tracelog,$(USEMODULE)))
-    DIRS += tracelog
 endif
 ifneq (,$(findstring transceiver,$(USEMODULE)))
     DIRS += transceiver
