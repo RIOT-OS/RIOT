@@ -33,6 +33,11 @@
         #define PAYLOAD_SIZE (MC1322X_MAX_DATA_LENGTH)
     #endif
 #endif
+
+#ifdef MODULE_AT86RF231
+#define PAYLOAD_SIZE  (118)
+#endif
+
 /* The maximum of threads to register */
 #define TRANSCEIVER_MAX_REGISTERED  (4)
 
@@ -43,11 +48,12 @@
 /**
  * @brief All supported transceivers
  */
-#define TRANSCEIVER_NONE    (0x0)       ///< Invalid
-#define TRANSCEIVER_CC1100  (0x01)      ///< CC110X transceivers
-#define TRANSCEIVER_CC1020  (0x02)      ///< CC1020 transceivers
-#define TRANSCEIVER_CC2420  (0x04)      ///< CC2420 transceivers
-#define TRANSCEIVER_MC1322X (0x08)      ///< MC1322X transceivers
+#define TRANSCEIVER_NONE        (0x0)       ///< Invalid
+#define TRANSCEIVER_CC1100      (0x01)      ///< CC110X transceivers
+#define TRANSCEIVER_CC1020      (0x02)      ///< CC1020 transceivers
+#define TRANSCEIVER_CC2420      (0x04)      ///< CC2420 transceivers
+#define TRANSCEIVER_MC1322X     (0x08)      ///< MC1322X transceivers
+#define TRANSCEIVER_AT86RF231   (0x10)      ///< AT86RF231 transceivers
 
 /**
  * @brief Data type for transceiver specification
@@ -63,6 +69,7 @@ enum transceiver_msg_type_t {
     RCV_PKT_CC1100,        ///< packet was received by CC1100 transceiver
     RCV_PKT_CC2420,        ///< packet was received by CC2420 transceiver
     RCV_PKT_MC1322X,       ///< packet was received by mc1322x transceiver
+    RCV_PKT_AT86RF231,     ///< packet was received by AT86RF231 transceiver
 
     /* Message types for transceiver <-> upper layer communication */
     PKT_PENDING,    ///< packet pending in transceiver buffer
