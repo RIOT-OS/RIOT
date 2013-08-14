@@ -36,7 +36,6 @@ extern volatile tcb_t *active_thread;
 extern volatile int num_tasks;
 extern volatile int thread_pid;
 
-//#define SCHEDSTATISTICS
 #if SCHEDSTATISTICS
 
 typedef struct {
@@ -46,6 +45,8 @@ typedef struct {
 } schedstat;
 
 extern schedstat pidlist[MAXTHREADS];
+
+void sched_register_cb(void (*callback)(uint32_t, uint32_t));
 #endif
 
 /** @} */
