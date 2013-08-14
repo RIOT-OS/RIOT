@@ -179,10 +179,10 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
 
         memcpy(fragbuf + 4, data, max_frag_initial);
 
-        fragbuf[0] = (((SIXLOWPAN_FRAG1_DISPATCH << 8) | packet_length) >> 8) & 0xff;
-        fragbuf[1] = ((SIXLOWPAN_FRAG1_DISPATCH << 8) | packet_length) & 0xff;
-        fragbuf[2] = (tag >> 8) & 0xff;
-        fragbuf[3] = tag & 0xff;
+        fragbuf[0] = ((SIXLOWPAN_FRAG1_DISPATCH << 8) | packet_length) >> 8;
+        fragbuf[1] = (SIXLOWPAN_FRAG1_DISPATCH << 8) | packet_length;
+        fragbuf[2] = tag >> 8;
+        fragbuf[3] = tag;
 
         sixlowpan_mac_send_ieee802154_frame(&laddr,
                                             (uint8_t *)&fragbuf,
@@ -198,10 +198,10 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
             memset(&fragbuf, 0, packet_length + header_size);
             memcpy(fragbuf + 5, data, max_frag);
 
-            fragbuf[0] = (((SIXLOWPAN_FRAGN_DISPATCH << 8) | packet_length) >> 8) & 0xff;
-            fragbuf[1] = ((SIXLOWPAN_FRAGN_DISPATCH << 8) | packet_length) & 0xff;
-            fragbuf[2] = (tag >> 8) & 0xff;
-            fragbuf[3] = tag & 0xff;
+            fragbuf[0] = ((SIXLOWPAN_FRAGN_DISPATCH << 8) | packet_length) >> 8;
+            fragbuf[1] = (SIXLOWPAN_FRAGN_DISPATCH << 8) | packet_length;
+            fragbuf[2] = tag >> 8;
+            fragbuf[3] = tag;
             fragbuf[4] = position / 8;
 
             sixlowpan_mac_send_ieee802154_frame(&laddr,
@@ -218,10 +218,10 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
         memset(&fragbuf, 0, packet_length + header_size);
         memcpy(fragbuf + 5, data, remaining);
 
-        fragbuf[0] = (((SIXLOWPAN_FRAGN_DISPATCH << 8) | packet_length) >> 8) & 0xff;
-        fragbuf[1] = ((SIXLOWPAN_FRAGN_DISPATCH << 8) | packet_length) & 0xff;
-        fragbuf[2] = (tag >> 8) & 0xff;
-        fragbuf[3] = tag & 0xff;
+        fragbuf[0] = ((SIXLOWPAN_FRAGN_DISPATCH << 8) | packet_length) >> 8;
+        fragbuf[1] = (SIXLOWPAN_FRAGN_DISPATCH << 8) | packet_length;
+        fragbuf[2] = tag >> 8;
+        fragbuf[3] = tag;
         fragbuf[4] = position / 8;
 
         sixlowpan_mac_send_ieee802154_frame(&laddr,
