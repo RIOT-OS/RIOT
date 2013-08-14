@@ -323,24 +323,31 @@ static void receive_packet(uint16_t type, uint8_t pos)
         if (type == RCV_PKT_CC1100) {
 #ifdef MODULE_CC110X_NG
             receive_cc110x_packet(trans_p); 
+            type = TRANSCEIVER_CC1100;
 #elif MODULE_CC110X
             receive_cc1100_packet(trans_p);
+            type = TRANSCEIVER_CC1100;
 #else
             trans_p = NULL;
+            type = TRANSCEIVER_NONE;
 #endif
         } 
         else if (type == RCV_PKT_MC1322X) {
 #ifdef MODULE_MC1322X
             receive_mc1322x_packet(trans_p);
+            type = TRANSCEIVER_MC1322X;
 #else
             trans_p = NULL;
+            type = TRANSCEIVER_NONE;
 #endif
         }
         else if (type == RCV_PKT_CC2420) {
 #ifdef MODULE_CC2420
             receive_cc2420_packet(trans_p);
+            type = TRANSCEIVER_CC2420;
 #else
             trans_p = NULL;
+            type = TRANSCEIVER_NONE;
 #endif
         }
         else {
