@@ -56,6 +56,8 @@
 
 #define IPV6_LL_ADDR_LEN                (8)
 
+#define SIXLOWPAN_FRAG_HDR_MASK         (0xf8)
+
 typedef struct lowpan_interval_list_t {
     uint8_t                         start;
     uint8_t                         end;
@@ -737,14 +739,15 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
     }
 
     /* Fragmented Packet */
-    if (((data[0] & 0xf8) == SIXLOWPAN_FRAG1_DISPATCH) || ((data[0] & 0xf8) == SIXLOWPAN_FRAGN_DISPATCH)) {
+    if (((data[0] & SIXLOWPAN_FRAG_HDR_MASK) == SIXLOWPAN_FRAG1_DISPATCH) || 
+        ((data[0] & SIXLOWPAN_FRAG_HDR_MASK) == SIXLOWPAN_FRAGN_DISPATCH)) {
         /* get 11-bit from first 2 byte*/
         datagram_size = (((uint16_t)(data[0] << 8)) | data[1]) & 0x07ff;
 
         /* get 16-bit datagram tag */
         datagram_tag = (((uint16_t)(data[2] << 8)) | data[3]);
 
-        switch (data[0] & 0xf8) {
+        switch (data[0] & SIXLOWPAN_FRAG_HDR_MASK) {
                 /* First Fragment */
             case (SIXLOWPAN_FRAG1_DISPATCH): {
                 datagram_offset = 0;
