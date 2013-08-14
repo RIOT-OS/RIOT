@@ -46,6 +46,11 @@ void heap_stats(void)
 }
 
 /*-----------------------------------------------------------------------------------*/
+#ifndef __cplusplus
+extern 
+#else
+extern "C" 
+#endif
 caddr_t _sbrk_r(struct _reent *r, size_t incr)
 {
     uint32_t cpsr = disableIRQ();
