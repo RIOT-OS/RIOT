@@ -77,6 +77,11 @@ void __assert(const char *file, int line, const char *failedexpr)
 }
 
 /*---------------------------------------------------------------------------*/
+#ifndef __cplusplus
+extern 
+#else
+extern "C" 
+#endif
 int _isatty_r(struct _reent *r, int fd)
 {
     r->_errno = 0;
@@ -89,6 +94,11 @@ int _isatty_r(struct _reent *r, int fd)
     }
 }
 /*---------------------------------------------------------------------------*/
+#ifndef __cplusplus
+extern 
+#else
+extern "C" 
+#endif
 _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int whence)
 {
     /* to get rid of gcc warnings */
@@ -139,6 +149,11 @@ int _stat_r(struct _reent *r, char *name, struct stat *st)
     return ret;
 }
 /*---------------------------------------------------------------------------*/
+#ifndef __cplusplus
+extern 
+#else
+extern "C" 
+#endif
 int _fstat_r(struct _reent *r, int fd, struct stat *st)
 {
     int ret = -1;
@@ -166,6 +181,11 @@ int _fstat_r(struct _reent *r, int fd, struct stat *st)
     return ret;
 }
 /*---------------------------------------------------------------------------*/
+#ifndef __cplusplus
+extern 
+#else
+extern "C" 
+#endif
 int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 {
     int result = EOF;
@@ -200,6 +220,11 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
     return result;
 }
 /*---------------------------------------------------------------------------*/
+#ifndef __cplusplus
+extern 
+#else
+extern "C" 
+#endif
 int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 {
     /* to get rid of gcc warnings */
@@ -217,6 +242,11 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
     return result;
 }
 /*---------------------------------------------------------------------------*/
+#ifndef __cplusplus
+extern 
+#else
+extern "C" 
+#endif
 int _close_r(struct _reent *r, int fd)
 {
     (void) fd;
@@ -257,6 +287,11 @@ void _exit(int n)
     while (1);
 }
 /*---------------------------------------------------------------------------*/
+#ifndef __cplusplus
+extern 
+#else
+extern "C" 
+#endif
 int _getpid(void)
 {
     return active_thread->pid;
@@ -270,4 +305,10 @@ int _kill_r(struct _reent *r, int pid, int sig)
 }
 /*---------------------------------------------------------------------------*/
 void _init(void) {}
+#ifndef __cplusplus
+extern 
+#else
+extern "C" 
+#endif
 void _fini(void) {}
+
