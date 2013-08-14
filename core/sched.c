@@ -37,9 +37,6 @@ volatile int last_pid = -1;
 clist_node_t *runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;
 
-void sched_register_cb(void (*callback)(uint32_t, uint32_t));
-
-
 #if SCHEDSTATISTICS
 static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
 schedstat pidlist[MAXTHREADS];
@@ -125,7 +122,11 @@ void sched_run()
         thread_pid = (volatile int) my_active_thread->pid;
 #if SCHEDSTATISTICS
         pidlist[my_active_thread->pid].laststart = time;
-        pidlist[my_active_thread->pid].schedules ++;
+        pidlist[my_active_thread->pid].schedules++;
+        if ((sched_cb) && (my_active_thread->pid != last_pid)) {
+            sched_cb(hwtimer_now(), my_active_thread->pid);
+            last_pid = my_active_thread->pid;
+        }
 #endif
 #ifdef MODULE_NSS
 
