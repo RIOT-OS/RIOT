@@ -100,9 +100,9 @@
 #define ICMPV6_PARAMETER_PROB_CODE_NXT_HDR_UNREC    (1)   /* Unrecognized Next Header type encountered */
 #define ICMPV6_PARAMETER_PROB_CODE_IPV6_OPT_UNREC   (2)   /* Unrecognized IPv6 option encountered */
 
-void icmpv6_send_parmeter_prob(ipv6_addr_t *src, ipv6_addr_t *dest,
-                               uint8_t code, uint32_t pointer,
-                               uint8_t *packet, uint8_t packet_len);
+void icmpv6_send_parameter_prob(ipv6_addr_t *src, ipv6_addr_t *dest,
+                                uint8_t code, uint32_t pointer,
+                                uint8_t *packet, uint8_t packet_len);
 void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id,
                               uint16_t seq, char *data,
                               size_t data_len);

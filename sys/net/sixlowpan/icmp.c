@@ -1308,7 +1308,9 @@ uint16_t icmpv6_csum(uint8_t proto)
 }
 
 
-void icmpv6_send_parmeter_prob(ipv6_addr_t *src, ipv6_addr_t *dest, uint8_t code, uint32_t pointer, uint8_t *packet, uint8_t packet_len)
+void icmpv6_send_parameter_prob(ipv6_addr_t *src, ipv6_addr_t *dest,
+                                uint8_t code, uint32_t pointer, 
+                                uint8_t *packet, uint8_t packet_len)
 {
     uint16_t packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + PARA_PROB_LEN;
     icmpv6_parameter_prob_hdr_t *para_prob_buf;
