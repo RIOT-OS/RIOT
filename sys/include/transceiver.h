@@ -1,27 +1,27 @@
 #ifndef TRANSCEIVER_H
 #define TRANSCEIVER_H
 
-#include <radio/types.h>
+#include "radio/types.h"
 
 /* supported transceivers *
  * NOTE: necessary to include here again due to
  * https://github.com/RIOT-OS/RIOT/issues/117 */
 #ifdef MODULE_CC110X
-#include <cc1100-interface.h>
+#include "cc1100-interface.h"
 #endif
 
 #ifdef MODULE_CC110X_NG
-#include <cc110x_ng.h>
+#include "cc110x_ng.h"
 #endif
 
 #ifdef MODULE_CC2420
-#include <cc2420.h>
+#include "cc2420.h"
 #endif
 
 #ifdef MODULE_MC1322X
-#include <mc1322x.h>
-#include <maca.h>
-#include <maca_packet.h>
+#include "mc1322x.h"
+#include "maca.h"
+#include "maca_packet.h"
 #endif
 
 /* Stack size for transceiver thread */
@@ -29,22 +29,6 @@
 #define TRANSCEIVER_STACK_SIZE      (512)
 #endif
 
-#ifndef PAYLOAD_SIZE
-#define PAYLOAD_SIZE  (0)
-#endif
-#ifdef MODULE_CC110X
-#if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
-#undef PAYLOAD_SIZE
-#define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
-#endif
-#endif
-#ifdef MODULE_CC110X_NG
-#if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
-#undef PAYLOAD_SIZE
-#define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
-#endif
-#endif
-
 #define PAYLOAD_SIZE  (0)
 #ifdef MODULE_CC110X
 #if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
@@ -56,7 +40,7 @@
 #if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
 #undef PAYLOAD_SIZE
 #define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
-    #endif
+#endif
 #endif
 #ifdef MODULE_CC2420
 #if (CC2420_MAX_DATA_LENGTH > PAYLOAD_SIZE)
