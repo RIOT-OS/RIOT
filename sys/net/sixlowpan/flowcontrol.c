@@ -125,7 +125,7 @@ static int in_window(uint8_t seq_num, uint8_t min, uint8_t max)
 {
     uint8_t pos = seq_num - min;
     uint8_t maxpos = max - min + 1;
-    return pos < maxpos;
+    return (pos < maxpos);
 }
 
 void flowcontrol_send_over_uart(border_packet_t *packet, int len)

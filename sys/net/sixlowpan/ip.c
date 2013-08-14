@@ -516,7 +516,7 @@ void ipv6_iface_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
 
 int ipv6_addr_is_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
 {
-    return ipv6_get_addr_match(a, b) == 128;
+    return (ipv6_get_addr_match(a, b) == 128);
 }
 
 void ipv6_addr_set_link_local_prefix(ipv6_addr_t *ipv6_addr)
@@ -543,17 +543,17 @@ void ipv6_addr_init(ipv6_addr_t *out, uint16_t addr0, uint16_t addr1,
 
 int ipv6_addr_is_link_local(const ipv6_addr_t *addr)
 {
-    return addr->uint8[0] == 0xfe && addr->uint8[0] == 0x80;
+    return (addr->uint8[0] == 0xfe && addr->uint8[0] == 0x80);
 }
 
 int ipv6_addr_is_unique_local_unicast(const ipv6_addr_t *addr)
 {
-    return addr->uint8[0] == 0xfc || addr->uint8[0] == 0xfd;
+    return (addr->uint8[0] == 0xfc || addr->uint8[0] == 0xfd);
 }
 
 int ipv6_addr_is_multicast(const ipv6_addr_t *addr)
 {
-    return addr->uint8[0] == 0xff;
+    return (addr->uint8[0] == 0xff);
 }
 
 int ipv6_addr_is_unspecified(const ipv6_addr_t *ipv6_addr)
