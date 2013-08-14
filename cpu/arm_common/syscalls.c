@@ -311,4 +311,11 @@ extern
 extern "C" 
 #endif
 void _fini(void) {}
+#ifndef __cplusplus
+extern 
+#else
+extern "C" 
+#endif
+void _kill(void) {}
+
 
