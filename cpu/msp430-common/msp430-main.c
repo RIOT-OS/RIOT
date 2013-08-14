@@ -104,8 +104,7 @@ init_ports(void)
 extern int _end;		/* Not in sys/unistd.h */
 static char *cur_break = (char *) &_end;
 
-void
-msp430_cpu_init(void)
+void msp430_cpu_init(void)
 {
     dint();
     init_ports();
