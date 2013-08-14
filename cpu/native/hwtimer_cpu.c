@@ -184,7 +184,7 @@ void hwtimer_arch_unset(short timer)
 
 void hwtimer_arch_set(unsigned long offset, short timer)
 {
-    DEBUG("hwtimer_arch_set(%li, %i)\n", offset, timer);
+    DEBUG("hwtimer_arch_set(%lu, %i)\n", offset, timer);
 
     if (offset < HWTIMERMINOFFSET) {
         offset = HWTIMERMINOFFSET;
@@ -195,9 +195,9 @@ void hwtimer_arch_set(unsigned long offset, short timer)
     native_hwtimer_isset[timer] = 1;
 
     ticks2tv(offset, &(native_hwtimer[timer].it_value));
-    DEBUG("hwtimer_arch_set(): that is %lis %lius from now\n",
-          native_hwtimer[timer].it_value.tv_sec,
-          native_hwtimer[timer].it_value.tv_usec);
+    DEBUG("hwtimer_arch_set(): that is %lu s %lu us from now\n",
+          (unsigned long)native_hwtimer[timer].it_value.tv_sec,
+          (unsigned long)native_hwtimer[timer].it_value.tv_usec);
 
     schedule_timer();
 
@@ -206,7 +206,7 @@ void hwtimer_arch_set(unsigned long offset, short timer)
 
 void hwtimer_arch_set_absolute(unsigned long value, short timer)
 {
-    DEBUG("hwtimer_arch_set_absolute(%li, %i)\n", value, timer);
+    DEBUG("hwtimer_arch_set_absolute(%lu, %i)\n", value, timer);
     value -= native_hwtimer_now;
     return(hwtimer_arch_set(value, timer));
 }
@@ -235,8 +235,9 @@ unsigned long hwtimer_arch_now(void)
 
     native_hwtimer_now = ts2ticks(&t);
 
-    DEBUG("hwtimer_arch_now(): it is now %lis %lins\n", t.tv_sec, t.tv_nsec);
-    DEBUG("hwtimer_arch_now(): returning %li\n", native_hwtimer_now);
+    DEBUG("hwtimer_arch_now(): it is now %lu s %lu ns\n",
+            (unsigned long)t.tv_sec, (unsigned long)t.tv_nsec);
+    DEBUG("hwtimer_arch_now(): returning %lu\n", native_hwtimer_now);
     return native_hwtimer_now;
 }
 
