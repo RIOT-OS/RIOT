@@ -35,6 +35,32 @@
 #define NDP_OPT_ARO_STATE_DUP_ADDR         	(1)
 #define NDP_OPT_ARO_STATE_NBR_CACHE_FULL   	(2)
 
+/**
+ * @brief   Neighbor cache entry state according to
+ *          <a href="http://tools.ietf.org/html/rfc4861#section-7.3.2">
+ *              RFC 4861, section 7.3.2
+ *          </a>.
+ */
+typedef enum __attribute__((packed)) {
+    NDP_NCE_STATUS_INCOMPLETE,
+    NDP_NCE_STATUS_REACHABLE,
+    NDP_NCE_STATUS_STALE,
+    NDP_NCE_STATUS_DELAY,
+    NDP_NCE_STATUS_PROBE,
+} ndp_nce_state_t;
+
+/**
+ * @brief   Neighbor cache entry type according to
+ *          <a href="http://tools.ietf.org/html/rfc6775#section-3.5">
+ *              RFC 6775, section 3.5
+ *          </a>.
+ */
+typedef enum __attribute__((packed)) {
+    NDP_NCE_TYPE_GC = 1,        ///< Garbage-collectible.
+    NDP_NCE_TYPE_REGISTERED,    ///< Registered.
+    NDP_NCE_TYPE_TENTATIVE      ///< Tentetive.
+} ndp_nce_type_t;
+
 typedef struct __attribute__((packed)) {
     uint8_t inuse;
     uint8_t adv;
@@ -54,8 +80,8 @@ typedef struct __attribute__((packed)) {
 
 /* neighbor cache - rfc4861 5.1. */
 typedef struct __attribute__((packed)) {
-    uint8_t type;
-    uint8_t state;
+    ndp_nce_type_t type;
+    ndp_nce_state_t state;
     uint8_t isrouter;
     ipv6_addr_t addr;
     ieee_802154_long_t laddr;

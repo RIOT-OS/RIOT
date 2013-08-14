@@ -273,7 +273,7 @@ int ipv6_addr_is_link_local(const ipv6_addr_t *ipv6_addr);
  *
  * @param[in] ipv6_addr     An IPv6 address.
  *
- * @return  1 if *ipv6_addr* is unique local unicast address, 
+ * @return  1 if *ipv6_addr* is unique local unicast address,
  *          0 otherwise.
  */
 int ipv6_addr_is_unique_local_unicast(const ipv6_addr_t *addr);

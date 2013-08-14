@@ -483,7 +483,7 @@ void ipv6_iface_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
     if (!(ipv6_addr_is_link_local(dest)) && !(ipv6_addr_is_multicast(dest))) {
         for (int i = 0; i < IFACE_ADDR_LIST_LEN; i++) {
             if (iface.addr_list[i].state == NDP_ADDR_STATE_PREFERRED) {
-                if (!ipv6_addr_is_link_local(&(iface.addr_list[i].addr)) && 
+                if (!ipv6_addr_is_link_local(&(iface.addr_list[i].addr)) &&
                     !ipv6_addr_is_multicast(&(iface.addr_list[i].addr)) &&
                     !ipv6_addr_is_unique_local_unicast(&(iface.addr_list[i].addr))) {
                     tmp = ipv6_get_addr_match(dest, &(iface.addr_list[i].addr));

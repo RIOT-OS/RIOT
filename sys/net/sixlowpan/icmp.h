@@ -57,7 +57,7 @@ int8_t plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
                  uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
 
 ndp_a6br_cache_t *abr_add_context(uint16_t version, ipv6_addr_t *abr_addr,
-                             uint8_t cid);
+                                  uint8_t cid);
 void abr_remove_context(uint8_t cid);
 
 uint16_t icmpv6_csum(uint8_t proto);

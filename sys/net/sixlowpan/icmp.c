@@ -88,16 +88,7 @@
 #define ABR_CACHE_SIZE                 	(2)
 /* neighbor cache size */
 #define NBR_CACHE_SIZE                 	(8)
-#define NBR_CACHE_TYPE_GC              	(1)
-#define NBR_CACHE_TYPE_REG             	(2)
-#define NBR_CACHE_TYPE_TEN             	(3)
 #define NBR_CACHE_LTIME_TEN            	(20)
-/* neighbor status values */
-#define NBR_STATUS_INCOMPLETE          	(0)
-#define NBR_STATUS_REACHABLE           	(1)
-#define NBR_STATUS_STALE               	(2)
-#define NBR_STATUS_DELAY               	(3)
-#define NBR_STATUS_PROBE               	(4)
 /* default router list size */
 #define DEF_RTR_LST_SIZE                   	(3) /* geeigneten wert finden */
 
@@ -150,8 +141,9 @@ uint8_t recvd_pref_len = 0;
 void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime);
 void def_rtr_lst_rem(ndp_default_router_list_t *entry);
 uint8_t nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr,
-                      uint8_t isrouter, uint8_t state, uint8_t type,
-                      uint16_t ltime, ieee_802154_short_t *saddr);
+                      uint8_t isrouter, ndp_nce_state_t state,
+                      ndp_nce_type_t type, uint16_t ltime,
+                      ieee_802154_short_t *saddr);
 void nbr_cache_rem(ipv6_addr_t *addr);
 
 int min(int a, int b)
@@ -447,14 +439,14 @@ void recv_rtr_sol(void)
             else {
                 /* new long addr found, update */
                 memcpy(&nbr_entry->laddr, &llao[2], 8);
-                nbr_entry->state = NBR_STATUS_STALE;
+                nbr_entry->state = NDP_NCE_STATUS_STALE;
                 nbr_entry->isrouter = 0;
             }
         }
         else {
             /* nothing found, add neigbor into cache*/
             nbr_cache_add(&ipv6_buf->srcaddr, (ieee_802154_long_t *)&llao[2],
-                          0, NBR_STATUS_STALE, NBR_CACHE_TYPE_TEN,
+                          0, NDP_NCE_STATUS_STALE, NDP_NCE_TYPE_TENTATIVE,
                           NBR_CACHE_LTIME_TEN, NULL);
         }
     }
@@ -981,7 +973,7 @@ void recv_nbr_sol(void)
                                 }
                                 else {
                                     memcpy(&nbr_entry->saddr, &llao[2], 2);
-                                    nbr_entry->state = NBR_STATUS_STALE;
+                                    nbr_entry->state = NDP_NCE_STATUS_STALE;
                                     nbr_entry->isrouter = 0;
                                 }
 
@@ -994,7 +986,7 @@ void recv_nbr_sol(void)
                                 }
                                 else {
                                     memcpy(&nbr_entry->laddr, &llao[2], 8);
-                                    nbr_entry->state = NBR_STATUS_STALE;
+                                    nbr_entry->state = NDP_NCE_STATUS_STALE;
                                     nbr_entry->isrouter = 0;
                                 }
 
@@ -1009,8 +1001,8 @@ void recv_nbr_sol(void)
                         switch (opt_stllao_buf->length) {
                             case (1): {
                                 nbr_cache_add(&ipv6_buf->srcaddr,
-                                              NULL , 0, NBR_STATUS_STALE,
-                                              NBR_CACHE_TYPE_TEN,
+                                              NULL , 0, NDP_NCE_STATUS_STALE,
+                                              NDP_NCE_TYPE_TENTATIVE,
                                               NBR_CACHE_LTIME_TEN,
                                               (ieee_802154_short_t *)&llao[2]);
 
@@ -1020,8 +1012,8 @@ void recv_nbr_sol(void)
                             case (2): {
                                 nbr_cache_add(&ipv6_buf->srcaddr,
                                               (ieee_802154_long_t *)&llao[2], 0,
-                                              NBR_STATUS_STALE,
-                                              NBR_CACHE_TYPE_TEN,
+                                              NDP_NCE_STATUS_STALE,
+                                              NDP_NCE_TYPE_TENTATIVE,
                                               NBR_CACHE_LTIME_TEN, NULL);
                                 break;
                             }
@@ -1052,7 +1044,7 @@ void recv_nbr_sol(void)
                             /* create neighbor cache */
                             aro_state = nbr_cache_add(&ipv6_buf->srcaddr,
                                                       &(opt_aro_buf->eui64), 0,
-                                                      NBR_STATUS_STALE, NBR_CACHE_TYPE_TEN,
+                                                      NDP_NCE_STATUS_STALE, NDP_NCE_TYPE_TENTATIVE,
                                                       opt_aro_buf->reg_ltime, NULL);
                         }
                         else {
@@ -1065,7 +1057,7 @@ void recv_nbr_sol(void)
                                 }
                                 else {
                                     set_remaining_time(&(nbr_entry->ltime), (uint32_t)opt_aro_buf->reg_ltime);
-                                    nbr_entry->state = NBR_STATUS_STALE;
+                                    nbr_entry->state = NDP_NCE_STATUS_STALE;
                                     nbr_entry->isrouter = 0;
                                     memcpy(&(nbr_entry->addr.uint8[0]),
                                            &(ipv6_buf->srcaddr.uint8[0]), 16);
@@ -1223,7 +1215,7 @@ void recv_nbr_adv(void)
                 new_ll = memcmp(&llao[2], &(nbr_entry->laddr), 8);
             }
 
-            if (nbr_entry->state == NBR_STATUS_INCOMPLETE) {
+            if (nbr_entry->state == NDP_NCE_STATUS_INCOMPLETE) {
                 if (llao == NULL) {
                     return;
                 }
@@ -1232,19 +1224,19 @@ void recv_nbr_adv(void)
                 memcpy(&nbr_entry->laddr, &llao[2], 8);
 
                 if (nbr_adv_buf->rso & ICMPV6_NEIGHBOR_ADV_FLAG_SOLICITED) {
-                    nbr_entry->state = NBR_STATUS_REACHABLE;
+                    nbr_entry->state = NDP_NCE_STATUS_REACHABLE;
                     /* TODO: set rechability */
                 }
                 else {
-                    nbr_entry->state = NBR_STATUS_STALE;
+                    nbr_entry->state = NDP_NCE_STATUS_STALE;
                 }
 
                 nbr_entry->isrouter = nbr_adv_buf->rso & ICMPV6_NEIGHBOR_ADV_FLAG_ROUTER;
             }
             else {
                 if (new_ll && !(nbr_adv_buf->rso & ICMPV6_NEIGHBOR_ADV_FLAG_OVERRIDE)) {
-                    if (nbr_entry->state == NBR_STATUS_REACHABLE) {
-                        nbr_entry->state = NBR_STATUS_STALE;
+                    if (nbr_entry->state == NDP_NCE_STATUS_REACHABLE) {
+                        nbr_entry->state = NDP_NCE_STATUS_STALE;
                     }
 
                     return;
@@ -1258,12 +1250,12 @@ void recv_nbr_adv(void)
                         }
 
                         if (nbr_adv_buf->rso & ICMPV6_NEIGHBOR_ADV_FLAG_SOLICITED) {
-                            nbr_entry->state = NBR_STATUS_REACHABLE;
+                            nbr_entry->state = NDP_NCE_STATUS_REACHABLE;
                             /* TODO: set rechablility */
                         }
                         else {
                             if (llao != 0 && new_ll) {
-                                nbr_entry->state = NBR_STATUS_STALE;
+                                nbr_entry->state = NDP_NCE_STATUS_STALE;
                             }
                         }
                     }
@@ -1367,8 +1359,9 @@ ndp_neighbor_cache_t *ndp_neighbor_cache_search(ipv6_addr_t *ipaddr)
 }
 
 uint8_t nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr,
-                      uint8_t isrouter, uint8_t state, uint8_t type,
-                      uint16_t ltime, ieee_802154_short_t *saddr)
+                      uint8_t isrouter, ndp_nce_state_t state,
+                      ndp_nce_type_t type, uint16_t ltime,
+                      ieee_802154_short_t *saddr)
 {
     if (nbr_count == NBR_CACHE_SIZE) {
         printf("ERROR: neighbor cache full\n");
@@ -1395,7 +1388,7 @@ void nbr_cache_auto_rem(void)
 
     for (i = 0; i < NBR_CACHE_SIZE; i++) {
         if (get_remaining_time(&(nbr_cache[i].ltime)) == 0 &&
-            nbr_cache[i].type == NBR_CACHE_TYPE_TEN) {
+            nbr_cache[i].type == NDP_NCE_TYPE_TENTATIVE) {
             memmove(&(nbr_cache[i]), &(nbr_cache[nbr_count]),
                     sizeof(ndp_neighbor_cache_t));
             memset(&(nbr_cache[nbr_count]), 0, sizeof(ndp_neighbor_cache_t));
@@ -1485,7 +1478,7 @@ lowpan_context_t *abr_get_context(ndp_a6br_cache_t *abr, uint8_t cid)
 }
 
 ndp_a6br_cache_t *abr_add_context(uint16_t version, ipv6_addr_t *abr_addr,
-                             uint8_t cid)
+                                  uint8_t cid)
 {
     ndp_a6br_cache_t *abr = abr_get_version(version, abr_addr);
 
