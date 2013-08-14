@@ -37,7 +37,7 @@
 #include "sys/net/ieee802154/ieee802154_frame.h"
 #include "sys/net/net_help/net_help.h"
 
-#define READER_STACK_SIZE   (KERNEL_CONF_STACKSIZE_IDLE)
+#define READER_STACK_SIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
 
 ipv6_addr_t abr_addr;
 
