@@ -33,6 +33,7 @@
 #include "msg.h"
 #include "transceiver.h"
 #include "sixlowpan/mac.h"
+#include "sixlowpan/ndp.h"
 
 #include "lowpan.h"
 #include "border.h"
@@ -122,7 +123,7 @@ char ip_process_buf[IP_PROCESS_STACKSIZE];
 char nc_buf[NC_STACKSIZE];
 char con_buf[CON_STACKSIZE];
 char lowpan_transfer_buf[LOWPAN_TRANSFER_BUF_STACKSIZE];
-lowpan_context_t contexts[LOWPAN_CONTEXT_MAX];
+lowpan_context_t contexts[NDP_6LOWPAN_CONTEXT_MAX];
 uint8_t context_len = 0;
 uint16_t local_address = 0;
 
@@ -1493,7 +1494,7 @@ void lowpan_context_remove(uint8_t num)
 {
     int i, j;
 
-    for (i = 0; i < LOWPAN_CONTEXT_MAX; i++) {
+    for (i = 0; i < NDP_6LOWPAN_CONTEXT_MAX; i++) {
         if (contexts[i].num == num) {
             context_len--;
             break;
@@ -1502,7 +1503,7 @@ void lowpan_context_remove(uint8_t num)
 
     abr_remove_context(num);
 
-    for (j = i; j < LOWPAN_CONTEXT_MAX; j++) {
+    for (j = i; j < NDP_6LOWPAN_CONTEXT_MAX; j++) {
         contexts[j] = contexts[j + 1];
     }
 }
@@ -1518,7 +1519,7 @@ lowpan_context_t *lowpan_context_update(uint8_t num, const ipv6_addr_t *prefix,
         return NULL;
     }
 
-    if (context_len == LOWPAN_CONTEXT_MAX) {
+    if (context_len == NDP_6LOWPAN_CONTEXT_MAX) {
         return NULL;
     }
 
@@ -1579,7 +1580,7 @@ void lowpan_context_auto_remove(void)
 {
     timex_t minute = timex_set(60, 0);
     int i;
-    int8_t to_remove[LOWPAN_CONTEXT_MAX];
+    int8_t to_remove[NDP_6LOWPAN_CONTEXT_MAX];
     int8_t to_remove_size;
 
     while (1) {
@@ -1688,8 +1689,8 @@ void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,
     /* init network prefix */
     ipv6_addr_t save_prefix;
     ipv6_addr_init_prefix(&save_prefix, prefix, 64);
-    plist_add(&save_prefix, 64, OPT_PI_VLIFETIME_INFINITE, 0, 1,
-              OPT_PI_FLAG_A);
+    plist_add(&save_prefix, 64, NDP_OPT_PI_VLIFETIME_INFINITE, 0, 1,
+              ICMPV6_NDP_OPT_PI_FLAG_AUTONOM);
     ipv6_init_iface_as_router();
     sixlowpan_lowpan_init(trans, r_addr, 0);
 }
@@ -1697,6 +1698,6 @@ void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,
 void sixlowpan_lowpan_bootstrapping(void)
 {
 
-    init_rtr_sol(OPT_SLLAO);
+    icmpv6_send_router_sol(OPT_SLLAO);
 }
 

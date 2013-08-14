@@ -76,8 +76,8 @@ ieee_802154_long_t *sixlowpan_mac_get_eui64(const ipv6_addr_t *ipaddr);
  *                      give a destination address of 0).
  */
 void sixlowpan_mac_send_ieee802154_frame(const ieee_802154_long_t *addr,
-                                         const uint8_t *payload, 
-                                         uint8_t length, uint8_t mcast);
+        const uint8_t *payload,
+        uint8_t length, uint8_t mcast);
 
 /**
  * @brief   Initialise 6LoWPAN MAC interface

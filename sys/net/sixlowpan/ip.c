@@ -148,21 +148,21 @@ uint8_t ipv6_register_packet_handler(int pid)
 int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
 {
     switch (hdr->type) {
-        case (ICMP_ECHO_REQ): {
+        case (ICMPV6_TYPE_ECHO_REQUEST): {
             puts("INFO: packet type: icmp echo request");
             /* processing echo request */
             recv_echo_req();
             break;
         }
 
-        case (ICMP_ECHO_REPL): {
+        case (ICMPV6_TYPE_ECHO_REPLY): {
             puts("INFO: packet type: icmp echo reply");
             /* processing echo reply */
             recv_echo_repl();
             break;
         }
 
-        case (ICMP_RTR_SOL): {
+        case (ICMPV6_TYPE_ROUTER_SOL): {
             puts("INFO: packet type: icmp router solicitation");
             /* processing router solicitation */
             recv_rtr_sol();
@@ -170,7 +170,7 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
             break;
         }
 
-        case (ICMP_RTR_ADV): {
+        case (ICMPV6_TYPE_ROUTER_ADV): {
             puts("INFO: packet type: icmp router advertisment");
             /* processing router advertisment */
             recv_rtr_adv();
@@ -178,19 +178,19 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
             break;
         }
 
-        case (ICMP_NBR_SOL): {
+        case (ICMPV6_TYPE_NEIGHBOR_SOL): {
             puts("INFO: packet type: icmp neighbor solicitation");
             recv_nbr_sol();
             break;
         }
 
-        case (ICMP_NBR_ADV): {
+        case (ICMPV6_TYPE_NEIGHBOR_ADV): {
             puts("INFO: packet type: icmp neighbor advertisment");
             recv_nbr_adv();
             break;
         }
 
-        case (ICMP_RPL_CONTROL): {
+        case (ICMPV6_TYPE_RPL_CONTROL): {
             puts("INFO: packet type: RPL message");
 
             if (rpl_process_pid != 0) {

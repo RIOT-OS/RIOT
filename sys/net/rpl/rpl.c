@@ -273,7 +273,7 @@ void send_DIO(ipv6_addr_t *destination)
         return;
     }
 
-    icmp_send_buf->type = ICMP_RPL_CONTROL;
+    icmp_send_buf->type = ICMPV6_TYPE_RPL_CONTROL;
     icmp_send_buf->code = ICMP_CODE_DIO;
     icmp_send_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 
@@ -318,7 +318,7 @@ void send_DIS(ipv6_addr_t *destination)
     mutex_lock(&rpl_send_mutex);
     icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
 
-    icmp_send_buf->type = ICMP_RPL_CONTROL;
+    icmp_send_buf->type = ICMPV6_TYPE_RPL_CONTROL;
     icmp_send_buf->code = ICMP_CODE_DIS;
     icmp_send_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 
@@ -350,7 +350,7 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
 
     icmp_send_buf  = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
 
-    icmp_send_buf->type = ICMP_RPL_CONTROL;
+    icmp_send_buf->type = ICMPV6_TYPE_RPL_CONTROL;
     icmp_send_buf->code = ICMP_CODE_DAO;
     icmp_send_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 
@@ -438,7 +438,7 @@ void send_DAO_ACK(ipv6_addr_t *destination)
     mutex_lock(&rpl_send_mutex);
     icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
 
-    icmp_send_buf->type = ICMP_RPL_CONTROL;
+    icmp_send_buf->type = ICMPV6_TYPE_RPL_CONTROL;
     icmp_send_buf->code = ICMP_CODE_DAO_ACK;
     icmp_send_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 

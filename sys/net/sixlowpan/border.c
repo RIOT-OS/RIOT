@@ -9,7 +9,7 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    sixlowborder.c
+ n @file    sixlowborder.c
  * @brief   constraint node implementation for a 6lowpan border router
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
@@ -173,7 +173,7 @@ void border_process_lowpan(void)
         if (ipv6_buf->nextheader == IPV6_PROTO_NUM_ICMPV6) {
             icmpv6_hdr_t *icmp_buf = (icmpv6_hdr_t *)(((uint8_t *)ipv6_buf) + IPV6_HDR_LEN);
 
-            if (icmp_buf->type == ICMP_REDIRECT) {
+            if (icmp_buf->type == ICMPV6_TYPE_REDIRECT) {
                 continue;
             }
 

@@ -25,8 +25,6 @@
 
 #include "sixlowpan/lowpan.h"
 
-#define LOWPAN_CONTEXT_MAX     	(16)
-
 typedef struct {
     uint8_t num;
     ipv6_addr_t prefix;
