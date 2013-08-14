@@ -117,10 +117,7 @@ void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest,
                               uint8_t aro);
 void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst,
                               ipv6_addr_t *tgt, uint8_t rso,
-                              uint8_t sllao, uint8_t aro,
-                              uint8_t aro_state);
-
-void icmpv6_ndp_set_llao(icmpv6_ndp_opt_stllao_t *sllao, uint8_t type, uint8_t length);
+                              uint8_t sllao, uint8_t aro);
 
 /**
  * @}

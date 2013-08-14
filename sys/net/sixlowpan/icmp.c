@@ -146,6 +146,17 @@ uint8_t nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr,
                       ieee_802154_short_t *saddr);
 void nbr_cache_rem(ipv6_addr_t *addr);
 
+/**
+ * @brief   Set Source link-layer address option according to interface
+ *          configuration.
+ *
+ * @param[out]  sllao   The SLLAO to set.
+ * @param[in]   type    The value for the type field of the SLLAO.
+ * @param[in]   length  The value for the length field of the SLLAO 
+ */
+void icmpv6_ndp_set_sllao(icmpv6_ndp_opt_stllao_t *sllao, uint8_t type,
+                          uint8_t length);
+
 int min(int a, int b)
 {
     if (a < b) {
@@ -342,7 +353,7 @@ void icmpv6_send_router_sol(uint8_t sllao)
 
     if (sllao == OPT_SLLAO) {
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
-        icmpv6_ndp_set_llao(opt_stllao_buf, NDP_OPT_SLLAO_TYPE, 2);
+        icmpv6_ndp_set_sllao(opt_stllao_buf, NDP_OPT_SLLAO_TYPE, 2);
         packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
                         RTR_SOL_LEN + OPT_STLLAO_MAX_LEN;
     }
@@ -539,7 +550,7 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
     if (sllao == OPT_SLLAO) {
         /* set link layer address option */
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
-        icmpv6_ndp_set_llao(opt_stllao_buf, NDP_OPT_SLLAO_TYPE, 2);
+        icmpv6_ndp_set_sllao(opt_stllao_buf, NDP_OPT_SLLAO_TYPE, 2);
         icmpv6_opt_hdr_len += OPT_STLLAO_MAX_LEN;
         packet_length += OPT_STLLAO_MAX_LEN;
     }
@@ -898,7 +909,7 @@ void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *
         if (sllao == OPT_SLLAO) {
             /* set sllao option */
             opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
-            icmpv6_ndp_set_llao(opt_stllao_buf, NDP_OPT_SLLAO_TYPE, 1);
+            icmpv6_ndp_set_sllao(opt_stllao_buf, NDP_OPT_SLLAO_TYPE, 1);
             icmpv6_opt_hdr_len += OPT_STLLAO_MIN_LEN;
 
             packet_length += OPT_STLLAO_MIN_LEN;
@@ -1105,7 +1116,7 @@ void recv_nbr_sol(void)
         /* solicited na */
         uint8_t flags = (ICMPV6_NEIGHBOR_ADV_FLAG_OVERRIDE | ICMPV6_NEIGHBOR_ADV_FLAG_SOLICITED);
         icmpv6_send_neighbor_adv(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr),
-                                 &(alist_targ->addr), flags, 0, OPT_ARO, aro_state);
+                                 &(alist_targ->addr), flags, 0, OPT_ARO);
 #if ENABLE_DEBUG
         char addr_str[IPV6_MAX_ADDR_STR_LEN];
         printf("INFO: send neighbor advertisment to: %s\n",
@@ -1118,7 +1129,7 @@ void recv_nbr_sol(void)
 }
 
 void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
-                              uint8_t rso, uint8_t sllao, uint8_t aro, uint8_t aro_state)
+                              uint8_t rso, uint8_t sllao, uint8_t aro)
 {
     uint16_t packet_length;
 
@@ -1148,7 +1159,7 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *t
     if (sllao == OPT_SLLAO) {
         /* set sllao option */
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
-        icmpv6_ndp_set_llao(opt_stllao_buf, NDP_OPT_SLLAO_TYPE, 1);
+        icmpv6_ndp_set_sllao(opt_stllao_buf, NDP_OPT_SLLAO_TYPE, 1);
         icmpv6_opt_hdr_len += OPT_STLLAO_MIN_LEN;
 
         packet_length += OPT_STLLAO_MIN_LEN;
@@ -1266,7 +1277,7 @@ void recv_nbr_adv(void)
 }
 
 /* link-layer address option - RFC4861 section 4.6.1/ RFC4944 8. */
-void icmpv6_ndp_set_llao(icmpv6_ndp_opt_stllao_t *sllao, uint8_t type, uint8_t length)
+void icmpv6_ndp_set_sllao(icmpv6_ndp_opt_stllao_t *sllao, uint8_t type, uint8_t length)
 {
     sllao->type = type;
     sllao->length = length;
