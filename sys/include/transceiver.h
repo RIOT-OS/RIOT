@@ -3,35 +3,72 @@
 
 #include <radio/types.h>
 
+/* supported transceivers *
+ * NOTE: necessary to include here again due to
+ * https://github.com/RIOT-OS/RIOT/issues/117 */
+#ifdef MODULE_CC110X
+#include <cc1100-interface.h>
+#endif
+
+#ifdef MODULE_CC110X_NG
+#include <cc110x_ng.h>
+#endif
+
+#ifdef MODULE_CC2420
+#include <cc2420.h>
+#endif
+
+#ifdef MODULE_MC1322X
+#include <mc1322x.h>
+#include <maca.h>
+#include <maca_packet.h>
+#endif
+
 /* Stack size for transceiver thread */
 #ifndef TRANSCEIVER_STACK_SIZE
-    #define TRANSCEIVER_STACK_SIZE      (512)
+#define TRANSCEIVER_STACK_SIZE      (512)
+#endif
+
+#ifndef PAYLOAD_SIZE
+#define PAYLOAD_SIZE  (0)
+#endif
+#ifdef MODULE_CC110X
+#if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+#undef PAYLOAD_SIZE
+#define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
+#endif
+#endif
+#ifdef MODULE_CC110X_NG
+#if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+#undef PAYLOAD_SIZE
+#define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
+#endif
 #endif
 
 #define PAYLOAD_SIZE  (0)
 #ifdef MODULE_CC110X
-    #if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
-        #undef PAYLOAD_SIZE
-        #define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
-    #endif
+#if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+#undef PAYLOAD_SIZE
+#define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
+#endif
 #endif
 #ifdef MODULE_CC110X_NG
-    #if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
-        #undef PAYLOAD_SIZE
-        #define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
+#if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+#undef PAYLOAD_SIZE
+#define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
     #endif
 #endif
 #ifdef MODULE_CC2420
-    #if (CC2420_MAX_DATA_LENGTH > PAYLOAD_SIZE)
-        #undef PAYLOAD_SIZE
-        #define PAYLOAD_SIZE (CC2420_MAX_DATA_LENGTH)
-    #endif
+#if (CC2420_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+#undef PAYLOAD_SIZE
+#define PAYLOAD_SIZE (CC2420_MAX_DATA_LENGTH)
+#endif
 #endif
 #ifdef MODULE_MC1322X
-    #if (MC1322X_MAX_DATA_LENGTH > PAYLOAD_SIZE)
-        #undef PAYLOAD_SIZE
-        #define PAYLOAD_SIZE (MC1322X_MAX_DATA_LENGTH)
-    #endif
+#if (MC1322X_MAX_DATA_LENGTH > PAYLOAD_SIZE)
+#undef PAYLOAD_SIZE
+#define PAYLOAD_SIZE (MC1322X_MAX_DATA_LENGTH)
+#endif
 #endif
 /* The maximum of threads to register */
 #define TRANSCEIVER_MAX_REGISTERED  (4)
