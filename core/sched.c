@@ -122,7 +122,11 @@ void sched_run()
         thread_pid = (volatile int) my_active_thread->pid;
 #if SCHEDSTATISTICS
         pidlist[my_active_thread->pid].laststart = time;
-        pidlist[my_active_thread->pid].schedules ++;
+        pidlist[my_active_thread->pid].schedules++;
+        if ((sched_cb) && (my_active_thread->pid != last_pid)) {
+            sched_cb(hwtimer_now(), my_active_thread->pid);
+            last_pid = my_active_thread->pid;
+        }
 #endif
 #ifdef MODULE_NSS
 
