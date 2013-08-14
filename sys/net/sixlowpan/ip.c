@@ -483,7 +483,9 @@ void ipv6_iface_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
     if (!(ipv6_addr_is_link_local(dest)) && !(ipv6_addr_is_multicast(dest))) {
         for (int i = 0; i < IFACE_ADDR_LIST_LEN; i++) {
             if (iface.addr_list[i].state == NDP_ADDR_STATE_PREFERRED) {
-                if (!(ipv6_addr_is_link_local(&(iface.addr_list[i].addr)))) {
+                if (!ipv6_addr_is_link_local(&(iface.addr_list[i].addr)) && 
+                    !ipv6_addr_is_multicast(&(iface.addr_list[i].addr)) &&
+                    !ipv6_addr_is_unique_local_unicast(&(iface.addr_list[i].addr))) {
                     tmp = ipv6_get_addr_match(dest, &(iface.addr_list[i].addr));
 
                     if (tmp >= bmatch) {
@@ -497,7 +499,8 @@ void ipv6_iface_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
     else {
         for (int j = 0; j < IFACE_ADDR_LIST_LEN; j++) {
             if ((iface.addr_list[j].state == NDP_ADDR_STATE_PREFERRED) &&
-                ipv6_addr_is_link_local(&(iface.addr_list[j].addr))) {
+                ipv6_addr_is_link_local(&(iface.addr_list[j].addr)) &&
+                !ipv6_addr_is_multicast(&(iface.addr_list[j].addr))) {
                 itmp = j;
             }
         }
@@ -541,6 +544,11 @@ void ipv6_addr_init(ipv6_addr_t *out, uint16_t addr0, uint16_t addr1,
 int ipv6_addr_is_link_local(const ipv6_addr_t *addr)
 {
     return addr->uint8[0] == 0xfe && addr->uint8[0] == 0x80;
+}
+
+int ipv6_addr_is_unique_local_unicast(const ipv6_addr_t *addr)
+{
+    return addr->uint8[0] == 0xfc || addr->uint8[0] == 0xfd;
 }
 
 int ipv6_addr_is_multicast(const ipv6_addr_t *addr)
