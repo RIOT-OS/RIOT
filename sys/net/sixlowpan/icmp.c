@@ -238,7 +238,7 @@ static icmpv6_ndp_opt_pi_t *get_opt_pi_buf(uint8_t ext_len, uint8_t opt_len)
 static icmpv6_ndp_opt_aro_t *get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len)
 {
     return ((icmpv6_ndp_opt_aro_t *) &(buffer[LLHDR_ICMPV6HDR_LEN + ext_len +
-                                        opt_len]));
+                                       opt_len]));
 }
 
 void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data, size_t data_len)
