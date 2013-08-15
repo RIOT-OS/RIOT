@@ -94,7 +94,7 @@ int vtimer_remove(vtimer_t *t);
 /**
  * @brief Prints a vtimer_t
  */
-static void vtimer_print(vtimer_t *t);
+void vtimer_print(vtimer_t *t);
 
 /**
  * @brief Prints the vtimer shortterm queue (use for debug purposes)
