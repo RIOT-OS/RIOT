@@ -35,6 +35,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
         printf("usage: %s <tap interface>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
+#else /* args unused here */
+    (void) argc;
+    (void) argv;
 #endif
 
     native_cpu_init();
