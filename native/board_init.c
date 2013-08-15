@@ -26,7 +26,7 @@ void board_init()
 #ifdef MODULE_UART0
     _native_init_uart0();
 #endif
-    LED_GREEN_OFF();
-    LED_RED_ON();
+    LED_GREEN_OFF;
+    LED_RED_ON;
     puts("RIOT native board initialized.");
 }
