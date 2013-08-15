@@ -6,6 +6,8 @@
 
 static volatile uint32_t __msp430_cpu_speed = MSP430_INITIAL_CPU_SPEED;
 
+void msp430_init_dco(void);
+
 /*---------------------------------------------------------------------------*/
 static uint8_t calc_umctl(uint16_t br)
 {
@@ -128,8 +130,7 @@ void msp430_set_cpu_speed(uint32_t speed)
 }
 
 /*---------------------------------------------------------------------------*/
-void
-msp430_init_dco()
+void msp430_init_dco(void)
 {
 #if MSP430_HAS_EXTERNAL_CRYSTAL
     /*------------------ use external oszillator -----------------------*/
