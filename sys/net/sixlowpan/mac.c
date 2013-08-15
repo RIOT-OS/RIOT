@@ -109,7 +109,7 @@ void sixlowpan_mac_init_802154_short_addr(ieee_802154_short_t *saddr)
 
 ieee_802154_long_t *sixlowpan_mac_get_eui64(const ipv6_addr_t *ipaddr)
 {
-    return ((ieee_802154_long_t *) &(ipaddr->uint8[8]));
+    return ((ieee_802154_long_t *) &ipaddr->uint8[8]);
 }
 
 void sixlowpan_mac_init_802154_long_addr(ieee_802154_long_t *laddr)
