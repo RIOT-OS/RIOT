@@ -14,15 +14,17 @@
 /**
  *  Structure to represent a at86rf231 packet.
  */
-typedef struct __attribute__ ((packed)) {
-	/* @{ */
-  uint8_t length;  			      /** < the length of the frame of the frame including fcs*/
-  ieee802154_frame_t frame;   /** < the ieee802154 frame */
-  int8_t rssi;                /** < the rssi value */
-  uint8_t crc;                /** < 1 if crc was successfull, 0 otherwise */
-  uint8_t lqi;                /** < the link quality indicator */
-  /* @} */
-} at86rf231_packet_t;
+typedef struct __attribute__((packed))
+{
+    /* @{ */
+    uint8_t length;  			      /** < the length of the frame of the frame including fcs*/
+    ieee802154_frame_t frame;   /** < the ieee802154 frame */
+    int8_t rssi;                /** < the rssi value */
+    uint8_t crc;                /** < 1 if crc was successfull, 0 otherwise */
+    uint8_t lqi;                /** < the link quality indicator */
+    /* @} */
+}
+at86rf231_packet_t;
 
 
 void at86rf231_init(int tpid);
@@ -50,8 +52,7 @@ void at86rf231_set_monitor(uint8_t mode);
 
 void at86rf231_swap_fcf_bytes(uint8_t *buf);
 
-enum
-{
+enum {
     RF86RF231_MAX_TX_LENGTH = 125,
     RF86RF231_MAX_RX_LENGTH = 127,
     RF86RF231_MIN_CHANNEL = 11,

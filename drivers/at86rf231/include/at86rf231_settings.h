@@ -3,8 +3,7 @@
 
 #define AT86RF231_RX_BUF_SIZE   3
 
-enum at86rf231_access
-{
+enum at86rf231_access {
     AT86RF231_ACCESS_REG = 0x80,
     AT86RF231_ACCESS_FRAMEBUFFER = 0x20,
     AT86RF231_ACCESS_SRAM = 0x00,
@@ -13,8 +12,7 @@ enum at86rf231_access
     AT86RF231_ACCESS_WRITE = 0x40,
 };
 
-enum at86rf231_register
-{
+enum at86rf231_register {
     AT86RF231_REG__TRX_STATUS = 0x01,
     AT86RF231_REG__TRX_STATE = 0x02,
     AT86RF231_REG__TRX_CTRL_0 = 0x03,
@@ -68,8 +66,7 @@ enum at86rf231_register
     AT86RF231_REG__TST_CTRL_DIGI = 0x36,
 };
 
-enum
-{
+enum {
     AT86RF231_TRX_CTRL_0_MASK__PAD_IO = 0xC0,
     AT86RF231_TRX_CTRL_0_MASK__PAD_IO_CLKM = 0x30,
     AT86RF231_TRX_CTRL_0_MASK__CLKM_SHA_SEL = 0x08,
@@ -90,8 +87,7 @@ enum
     AT86RF231_TRX_CTRL_0_CLKM_CTRL__62_5kHz = 0x07,
 };
 
-enum
-{
+enum {
     AT86RF231_TRX_CTRL_1_MASK__PA_EXT_EN = 0x80,
     AT86RF231_TRX_CTRL_1_MASK__IRQ_2_EXT_EN = 0x40,
     AT86RF231_TRX_CTRL_1_MASK__TX_AUTO_CRC_ON = 0x20,
@@ -101,14 +97,12 @@ enum
     AT86RF231_TRX_CTRL_1_MASK__IRQ_POLARITY = 0x01,
 };
 
-enum
-{
+enum {
     AT86RF231_TRX_CTRL_2_MASK__RX_SAFE_MODE = 0x80,
     AT86RF231_TRX_CTRL_2_MASK__OQPSK_DATA_RATE = 0x03,
 };
 
-enum
-{
+enum {
     AT86RF231_IRQ_STATUS_MASK__BAT_LOW = 0x80,
     AT86RF231_IRQ_STATUS_MASK__TRX_UR = 0x40,
     AT86RF231_IRQ_STATUS_MASK__AMI = 0x20,
@@ -119,8 +113,7 @@ enum
     AT86RF231_IRQ_STATUS_MASK__PLL_LOCK = 0x01,
 };
 
-enum at86rf231_trx_status
-{
+enum at86rf231_trx_status {
     AT86RF231_TRX_STATUS_MASK__CCA_DONE = 0x80,
     AT86RF231_TRX_STATUS_MASK__CCA_STATUS = 0x40,
     AT86RF231_TRX_STATUS_MASK__TRX_STATUS = 0x1F,
@@ -142,8 +135,7 @@ enum at86rf231_trx_status
     AT86RF231_TRX_STATUS__STATE_TRANSITION_IN_PROGRESS = 0x1F,
 };
 
-enum at86rf231_trx_state
-{
+enum at86rf231_trx_state {
     AT86RF231_TRX_STATE__NOP = 0x00,
     AT86RF231_TRX_STATE__TX_START = 0x02,
     AT86RF231_TRX_STATE__FORCE_TRX_OFF = 0x03,
@@ -155,8 +147,7 @@ enum at86rf231_trx_state
     AT86RF231_TRX_STATE__TX_ARET_ON = 0x19,
 };
 
-enum at86rf231_phy_cc_cca
-{
+enum at86rf231_phy_cc_cca {
     AT86RF231_PHY_CC_CCA_MASK__CCA_REQUEST = 0x80,
     AT86RF231_PHY_CC_CCA_MASK__CCA_MODE = 0x60,
     AT86RF231_PHY_CC_CCA_MASK__CHANNEL = 0x1F,
@@ -164,8 +155,7 @@ enum at86rf231_phy_cc_cca
     AT86RF231_PHY_CC_CCA_DEFAULT__CCA_MODE = 0x20,
 };
 
-enum at86rf231_phy_tx_pwr
-{
+enum at86rf231_phy_tx_pwr {
     AT86RF231_PHY_TX_PWR_MASK__PA_BUF_LT = 0xC0,
     AT86RF231_PHY_TX_PWR_MASK__PA_LT = 0x30,
     AT86RF231_PHY_TX_PWR_MASK__TX_PWR = 0x0F,
@@ -193,21 +183,18 @@ enum at86rf231_phy_tx_pwr
 
 };
 
-enum at86rf231_phy_rssi
-{
+enum at86rf231_phy_rssi {
     AT86RF231_PHY_RSSI_MASK__RX_CRC_VALID = 0x80,
     AT86RF231_PHY_RSSI_MASK__RND_VALUE = 0x60,
     AT86RF231_PHY_RSSI_MASK__RSSI = 0x1F,
 };
 
-enum at86rf231_xosc_ctrl
-{
+enum at86rf231_xosc_ctrl {
     AT86RF231_XOSC_CTRL__XTAL_MODE_CRYSTAL = 0xF0,
     AT86RF231_XOSC_CTRL__XTAL_MODE_EXTERNAL = 0xF0,
 };
 
-enum
-{
+enum {
     AT86RF231_TIMING__VCC_TO_P_ON = 330,
     AT86RF231_TIMING__SLEEP_TO_TRX_OFF = 380,
     AT86RF231_TIMING__TRX_OFF_TO_PLL_ON = 110,
