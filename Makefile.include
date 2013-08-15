@@ -92,3 +92,6 @@ term:
 
 doc:
 	make -BC $(RIOTBASE) doc
+
+debug:
+	$(DEBUGGER) $(DEBUGGER_FLAGS)

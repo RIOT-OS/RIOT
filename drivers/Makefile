@@ -20,6 +20,9 @@ ifneq (,$(findstring cc110x,$(USEMODULE)))
     	DIRS += cc110x
     endif
 endif
+ifneq (,$(findstring at86rf231,$(USEMODULE)))
+    DIRS += at86rf231
+endif
 ifneq (,$(findstring gps_ublox,$(USEMODULE)))
     DIRS += gps_ublox
 endif
