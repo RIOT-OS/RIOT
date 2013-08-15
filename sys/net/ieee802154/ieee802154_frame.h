@@ -24,8 +24,8 @@
 
 /* maximum 802.15.4 header length */
 #define IEEE_802154_MAX_HDR_LEN         23
-/* mininmum */
-#define IEEE_802154_PAYLOAD_LEN         21
+/* ...and FCS*/
+#define IEEE_802154_FCS_LEN             2
 
 #define IEEE_802154_BEACON_FRAME        0
 #define IEEE_802154_DATA_FRAME          1
