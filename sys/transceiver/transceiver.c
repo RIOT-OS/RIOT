@@ -102,14 +102,18 @@ static void run(void);
 static void receive_packet(uint16_t type, uint8_t pos);
 #ifdef MODULE_CC110X_NG
 static void receive_cc110x_packet(radio_packet_t *trans_p);
-#elif MODULE_CC110X
+#endif
+#ifdef MODULE_CC110X
 void cc1100_packet_monitor(void *payload, int payload_size, protocol_t protocol, packet_info_t *packet_info);
 void receive_cc1100_packet(radio_packet_t *trans_p);
-#elif MODULE_CC2420
+#endif
+#ifdef MODULE_CC2420
 static void receive_cc2420_packet(radio_packet_t *trans_p);
-#elif MODULE_NATIVENET
+#endif
+#ifdef MODULE_NATIVENET
 static void receive_nativenet_packet(radio_packet_t *trans_p);
-#elif MODULE_AT86RF231
+#endif
+#ifdef MODULE_AT86RF231
 void receive_at86rf231_packet(radio_packet_t *trans_p);
 #endif
 static uint8_t send_packet(transceiver_type_t t, void *pkt);
