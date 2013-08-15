@@ -156,12 +156,10 @@
 /**
  * @brief   Data type to configure 6LoWPAN IPv6 header compression.
  */
-typedef enum __attribute__((packed))
-{
+typedef enum __attribute__((packed)) {
     LOWPAN_IPHC_DISABLE = 0,    ///< header compression disabled
     LOWPAN_IPHC_ENABLE = 1      ///< header compression enabled
-}
-                     sixlowpan_lowpan_iphc_status_t;
+} sixlowpan_lowpan_iphc_status_t;
 
 /**
  * @brief   Data type to represent an 6LoWPAN frame as byte stream.

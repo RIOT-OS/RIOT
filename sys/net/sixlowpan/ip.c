@@ -63,14 +63,14 @@ void ipv6_send_bytes(ipv6_hdr_t *bytes)
     memset(bytes, 0, BUFFER_SIZE);
     memcpy(bytes + LL_HDR_LEN, bytes, offset);
 
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(bytes->destaddr.uint16[4]),
+    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &bytes->destaddr.uint16[4],
                             (uint8_t *)bytes,
                             offset);
 }
 
 ipv6_hdr_t *ipv6_get_buf_send(void)
 {
-    return ((ipv6_hdr_t *) &(ip_send_buffer[LL_HDR_LEN]));
+    return ((ipv6_hdr_t *) &ip_send_buffer[LL_HDR_LEN]);
 }
 
 uint8_t *get_payload_buf_send(uint8_t ext_len)
@@ -80,12 +80,12 @@ uint8_t *get_payload_buf_send(uint8_t ext_len)
 
 ipv6_hdr_t *ipv6_get_buf(void)
 {
-    return ((ipv6_hdr_t *) &(buffer[LL_HDR_LEN]));
+    return ((ipv6_hdr_t *) &buffer[LL_HDR_LEN]);
 }
 
 icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len)
 {
-    return ((icmpv6_hdr_t *) &(buffer[LLHDR_IPV6HDR_LEN + ext_len]));
+    return ((icmpv6_hdr_t *) &buffer[LLHDR_IPV6HDR_LEN + ext_len]);
 }
 
 uint8_t *get_payload_buf(uint8_t ext_len)
@@ -122,7 +122,7 @@ void ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
 
     packet_length = IPV6_HDR_LEN + payload_length;
 
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(ipv6_buf->destaddr.uint16[4]),
+    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
                             (uint8_t *)ipv6_buf, packet_length);
 }
 
@@ -264,7 +264,7 @@ void ipv6_process(void)
             (ipv6_buf->destaddr.uint8[15] != myaddr.uint8[15])) {
             packet_length = IPV6_HDR_LEN + ipv6_buf->length;
             memcpy(ipv6_get_buf_send(), ipv6_get_buf(), packet_length);
-            sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(ipv6_buf->destaddr.uint16[4]),
+            sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
                                     (uint8_t *)ipv6_get_buf_send(),
                                     packet_length);
         }

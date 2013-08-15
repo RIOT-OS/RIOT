@@ -169,79 +169,72 @@ int min(int a, int b)
 
 static icmpv6_parameter_prob_hdr_t *get_para_prob_buf(uint8_t ext_len)
 {
-    return ((icmpv6_parameter_prob_hdr_t *) &(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+    return ((icmpv6_parameter_prob_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_echo_request_hdr_t *get_echo_req_buf(uint8_t ext_len)
 {
-    return ((icmpv6_echo_request_hdr_t *) &(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+    return ((icmpv6_echo_request_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_echo_reply_hdr_t *get_echo_repl_buf(uint8_t ext_len)
 {
-    return ((icmpv6_echo_reply_hdr_t *) &(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+    return ((icmpv6_echo_reply_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_router_adv_hdr_t *get_rtr_adv_buf(uint8_t ext_len)
 {
-    return ((icmpv6_router_adv_hdr_t *) &(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+    return ((icmpv6_router_adv_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_neighbor_sol_hdr_t *get_nbr_sol_buf(uint8_t ext_len)
 {
-    return ((icmpv6_neighbor_sol_hdr_t *) &(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+    return ((icmpv6_neighbor_sol_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_neighbor_adv_hdr_t *get_nbr_adv_buf(uint8_t ext_len)
 {
-    return ((icmpv6_neighbor_adv_hdr_t *) &(buffer[LLHDR_ICMPV6HDR_LEN + ext_len]));
+    return ((icmpv6_neighbor_adv_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_ndp_opt_hdr_t *get_opt_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_hdr_t *) &(buffer[LLHDR_ICMPV6HDR_LEN +
-                                       ext_len + opt_len]));
+    return ((icmpv6_ndp_opt_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_stllao_t *get_opt_stllao_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_stllao_t *) &(buffer[LLHDR_ICMPV6HDR_LEN +
-                                          ext_len + opt_len]));
+    return ((icmpv6_ndp_opt_stllao_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_mtu_t *get_opt_mtu_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_mtu_t *) &(buffer[LLHDR_ICMPV6HDR_LEN +
-                                       ext_len + opt_len]));
+    return ((icmpv6_ndp_opt_mtu_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_abro_t *get_opt_abro_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_abro_t *) &(buffer[LLHDR_ICMPV6HDR_LEN +
-                                        ext_len + opt_len]));
+    return ((icmpv6_ndp_opt_abro_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_6co_hdr_t *get_opt_6co_hdr_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_6co_hdr_t *) &(buffer[LLHDR_ICMPV6HDR_LEN +
-                                           ext_len + opt_len]));
+    return ((icmpv6_ndp_opt_6co_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static uint8_t *get_opt_6co_prefix_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((uint8_t *) &(buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]));
+    return ((uint8_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_pi_t *get_opt_pi_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_pi_t *) &(buffer[LLHDR_ICMPV6HDR_LEN + ext_len +
-                                      opt_len]));
+    return ((icmpv6_ndp_opt_pi_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_aro_t *get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_aro_t *) &(buffer[LLHDR_ICMPV6HDR_LEN + ext_len +
-                                       opt_len]));
+    return ((icmpv6_ndp_opt_aro_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data, size_t data_len)
@@ -280,9 +273,7 @@ void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, 
     printf("INFO: send echo request to: %s\n",
            ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(ipv6_buf->destaddr.uint16[4]),
-                            (uint8_t *)ipv6_buf,
-                            packet_length);
+    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4], (uint8_t *)ipv6_buf, packet_length);
 }
 
 void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data, size_t data_len)
@@ -321,7 +312,7 @@ void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, ch
     printf("INFO: send echo request to: %s\n",
            ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(ipv6_buf->destaddr.uint16[4]),
+    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
                             (uint8_t *)ipv6_buf,
                             packet_length);
 }
@@ -370,7 +361,7 @@ void icmpv6_send_router_sol(uint8_t sllao)
     printf("INFO: send router solicitation to: %s\n",
            ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(ipv6_buf->destaddr.uint16[4]),
+    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
                             (uint8_t *)ipv6_buf,
                             packet_length);
 }
@@ -475,7 +466,7 @@ void recv_rtr_sol(void)
     printf("INFO: send router advertisment to: %s\n",
            ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(ipv6_buf->destaddr.uint16[4]),
+    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
                             (uint8_t *)ipv6_buf,
                             IPV6_HDR_LEN + NTOHS(ipv6_buf->length));
 
@@ -630,13 +621,13 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
 
             if (opt_6co_hdr_buf->c_length > 64) {
                 memset((void *)opt_6co_prefix_buf, 0, 16);
-                memcpy((void *)opt_6co_prefix_buf, (void *) &(contexts[i].prefix.uint8[0]), opt_6co_hdr_buf->c_length / 8);
+                memcpy((void *)opt_6co_prefix_buf, (void *) &contexts[i].prefix.uint8[0], opt_6co_hdr_buf->c_length / 8);
                 icmpv6_opt_hdr_len += 16;
                 packet_length += 16;
             }
             else {
                 memset((void *)opt_6co_prefix_buf, 0, 8);
-                memcpy((void *)opt_6co_prefix_buf, (void *) &(contexts[i].prefix.uint8[0]), opt_6co_hdr_buf->c_length / 8);
+                memcpy((void *)opt_6co_prefix_buf, (void *) &contexts[i].prefix.uint8[0], opt_6co_hdr_buf->c_length / 8);
                 icmpv6_opt_hdr_len += 8;
                 packet_length += 8;
             }
@@ -861,7 +852,7 @@ void recv_rtr_adv(void)
         printf("INFO: send neighbor solicitation to: %s\n",
                ipv6_addr_to_str(addr_str, &(ipv6_buf->destaddr)));
 #endif
-        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(ipv6_buf->destaddr.uint16[4]),
+        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
                                 (uint8_t *)ipv6_buf,
                                 packet_length);
     }
@@ -1122,7 +1113,7 @@ void recv_nbr_sol(void)
         printf("INFO: send neighbor advertisment to: %s\n",
                ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
-        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(ipv6_buf->destaddr.uint16[4]),
+        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
                                 (uint8_t *)ipv6_buf,
                                 packet_length);
     }
