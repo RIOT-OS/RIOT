@@ -13,6 +13,10 @@ ifneq (,$(findstring cc110x,$(USEMODULE)))
 	INCLUDES += -I$(RIOTBASE)/drivers/cc110x/
 	SRC += sc_cc1100.c
 endif
+ifneq (,$(findstring nativenet,$(USEMODULE)))
+	INCLUDES += -I$(RIOTBASE)/cpu/native/include
+	SRC += sc_nativenet.c
+endif
 ifneq (,$(findstring mci,$(USEMODULE)))
 	SRC += sc_disk.c
 endif

@@ -18,16 +18,16 @@
 #include <signal.h>
 
 /* TODO: choose more sensibly? */
-#define KERNEL_CONF_STACKSIZE_PRINTF    (8192)
+#define KERNEL_CONF_STACKSIZE_PRINTF    (81920)
 
-#ifdef __MACH__
+#ifdef __MACH__ /* OSX */
 #define KERNEL_CONF_STACKSIZE_DEFAULT   (163840)
 #define KERNEL_CONF_STACKSIZE_IDLE      (163840)
 #define NATIVE_ISR_STACKSIZE            (163840)
 #define TRANSCEIVER_STACK_SIZE          (163840)
 #define MINIMUM_STACK_SIZE              (163840)
-#else
-#define KERNEL_CONF_STACKSIZE_DEFAULT	(8192)
+#else /* Linux etc. */
+#define KERNEL_CONF_STACKSIZE_DEFAULT	(KERNEL_CONF_STACKSIZE_PRINTF + 8192)
 #define KERNEL_CONF_STACKSIZE_IDLE      (16384)
 #define NATIVE_ISR_STACKSIZE            (16384)
 /* undefine the TRANSCEIVER_STACK_SIZE (2048 or 512) defined in transceiver.h */
@@ -35,12 +35,9 @@
 #undef TRANSCEIVER_STACK_SIZE
 #endif
 #define TRANSCEIVER_STACK_SIZE          (16384)
-
 #define MINIMUM_STACK_SIZE              (16384)
-#endif
+#endif /* OS */
 
-/* for cc110x_ng */
-#define RX_BUF_SIZE (10)
-#define TRANSCEIVER_BUFFER_SIZE (3)
+#define NATIVE_ETH_PROTO 0x1234
 
 #endif /* CPUCONF_H_ */

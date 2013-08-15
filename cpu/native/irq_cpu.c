@@ -49,6 +49,10 @@ struct int_handler_t {
 static struct int_handler_t native_irq_handlers[255];
 char sigalt_stk[SIGSTKSZ];
 
+
+void native_irq_handler();
+
+
 void print_thread_sigmask(ucontext_t *cp)
 {
     sigset_t *p = &cp->uc_sigmask;
@@ -133,6 +137,10 @@ unsigned disableIRQ(void)
     _native_in_syscall = 1;
     DEBUG("disableIRQ()\n");
 
+    if (_native_in_isr == 1) {
+        DEBUG("disableIRQ + _native_in_isr\n");
+    }
+
     if (sigfillset(&mask) == -1) {
         err(1, "disableIRQ(): sigfillset");
     }
@@ -155,10 +163,13 @@ unsigned disableIRQ(void)
     prev_state = native_interrupts_enabled;
     native_interrupts_enabled = 0;
 
-    if (_native_sigpend > 0) {
+    // XXX: does this make sense?
+    if ((_native_sigpend > 0) && (_native_in_isr == 0)) {
         DEBUG("\n\n\t\treturn from syscall, calling native_irq_handler\n\n");
         _native_in_syscall = 0;
-        printf("calling swapcontext()\n");
+        DEBUG("disableIRQ: calling swapcontext()\n");
+        DEBUG("disableIRQ: _native_cur_ctx == %p, _native_isr_ctx == %p\n", _native_cur_ctx, _native_isr_ctx);
+        makecontext(&native_isr_context, native_irq_handler, 0);
         swapcontext(_native_cur_ctx, _native_isr_ctx);
     }
     else {
@@ -180,6 +191,10 @@ unsigned enableIRQ(void)
     _native_in_syscall = 1;
     DEBUG("enableIRQ()\n");
 
+    if (_native_in_isr == 1) {
+        DEBUG("enableIRQ + _native_in_isr\n");
+    }
+
     if (sigprocmask(SIG_SETMASK, &native_sig_set, NULL) == -1) {
         err(1, "enableIRQ(): sigprocmask()");
     }
@@ -189,10 +204,12 @@ unsigned enableIRQ(void)
 
     //print_sigmasks();
     //native_print_signals();
-    if (_native_sigpend > 0) {
+    if ((_native_sigpend > 0) && (_native_in_isr == 0)) {
         DEBUG("\n\n\t\treturn from syscall, calling native_irq_handler\n\n");
         _native_in_syscall = 0;
-        printf("calling swapcontext()\n");
+        DEBUG("enableIRQ: calling swapcontext()\n");
+        DEBUG("enableIRQ: _native_cur_ctx == %p, _native_isr_ctx == %p\n", _native_cur_ctx, _native_isr_ctx);
+        makecontext(&native_isr_context, native_irq_handler, 0);
         swapcontext(_native_cur_ctx, _native_isr_ctx);
     }
     else {
@@ -243,6 +260,7 @@ int _native_popsig(void)
     nleft = sizeof(int);
     i = 0;
 
+    _native_in_syscall = 1;
     while ((nleft > 0) && ((nread = read(pipefd[0], &sig + i, nleft))  != -1)) {
         i += nread;
         nleft -= nread;
@@ -251,6 +269,7 @@ int _native_popsig(void)
     if (nread == -1) {
         err(1, "_native_popsig(): read()");
     }
+    _native_in_syscall = 0;
 
     return sig;
 }
@@ -278,7 +297,7 @@ void native_irq_handler()
             DEBUG("ignoring SIGUSR1\n");
         }
         else {
-            printf("XXX: no handler for signal %i\n", sig);
+            DEBUG("XXX: no handler for signal %i\n", sig);
             errx(1, "XXX: this should not have happened!\n");
         }
     }
