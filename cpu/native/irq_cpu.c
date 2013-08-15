@@ -358,7 +358,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
  * TODO: use appropriate data structure for signal
  *       handlers.
  */
-int register_interrupt(int sig, void *handler)
+int register_interrupt(int sig, void (*handler)(void))
 {
     struct sigaction sa;
     DEBUG("XXX: register_interrupt()\n");
