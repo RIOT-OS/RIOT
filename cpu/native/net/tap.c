@@ -183,20 +183,20 @@ int tap_init(char *name)
     memcpy(_native_tap_mac, ifr.ifr_hwaddr.sa_data, ETHER_ADDR_LEN);
 #endif
 
-/*TODO:  check OSX vvv */
     /* configure signal handler for fds */
     register_interrupt(SIGIO, _native_handle_tap_input);
 
+#ifndef __MACH__ /* tuntap signalled IO not working in OSX */
     /* configure fds to send signals on io */
     if (fcntl(_native_tap_fd, F_SETOWN, getpid()) == -1) {
-        err(1, "_native_init_uart0(): fcntl()");
+        err(1, "tap_init(): fcntl(F_SETOWN)");
     }
 
     /* set file access mode to nonblocking */
     if (fcntl(_native_tap_fd, F_SETFL, O_NONBLOCK|O_ASYNC) == -1) {
-        err(1, "_native_init_uart0(): fcntl()");
+        err(1, "tap_init(): fcntl(F_SETFL)");
     }
-/*TODO:  check OSX ^^^ */
+#endif /* OSX */
 
     puts("RIOT native tap initialized.");
     return _native_tap_fd;

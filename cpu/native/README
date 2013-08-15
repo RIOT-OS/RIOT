@@ -22,5 +22,11 @@ OSX
 For tun/tap networking in OSX you will need:
 http://tuntaposx.sourceforge.net/
 
-For OSX there is a seperate script called tapsetup-osx.sh. Usage is
-just like the other one.
+For OSX there is a seperate script called tapsetup-osx.sh.
+Run it, (it instructs you to start the RIOT instances).
+In contrast to linux you will need to run 'tapsetup-osx.sh delete'
+after killing your instances and rerun 'tapsetup-osx.sh create' before
+restarting.
+Packet delivery under OSX only works with user assistance at the
+moment. run 'kill -SIGIO <RIOT process ID>' to deliver a packet to a
+specific RIOT instance.
