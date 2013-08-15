@@ -1,3 +1,6 @@
+#ifndef NATIVENET_H
+#define NATIVENET_H
+
 #include <net/ethernet.h>
 
 #define RX_BUF_SIZE (10)
@@ -27,3 +30,4 @@ uint16_t nativenet_set_pan(uint16_t pan);
 uint16_t nativenet_get_pan();
 
 void nativenet_switch_to_rx();
+#endif /* NATIVENET_H */
