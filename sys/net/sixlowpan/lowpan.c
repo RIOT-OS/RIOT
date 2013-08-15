@@ -739,7 +739,7 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
     }
 
     /* Fragmented Packet */
-    if (((data[0] & SIXLOWPAN_FRAG_HDR_MASK) == SIXLOWPAN_FRAG1_DISPATCH) || 
+    if (((data[0] & SIXLOWPAN_FRAG_HDR_MASK) == SIXLOWPAN_FRAG1_DISPATCH) ||
         ((data[0] & SIXLOWPAN_FRAG_HDR_MASK) == SIXLOWPAN_FRAGN_DISPATCH)) {
         /* get 11-bit from first 2 byte*/
         datagram_size = (((uint16_t)(data[0] << 8)) | data[1]) & 0x07ff;

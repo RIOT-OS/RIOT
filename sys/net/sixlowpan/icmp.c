@@ -152,7 +152,7 @@ void nbr_cache_rem(ipv6_addr_t *addr);
  *
  * @param[out]  sllao   The SLLAO to set.
  * @param[in]   type    The value for the type field of the SLLAO.
- * @param[in]   length  The value for the length field of the SLLAO 
+ * @param[in]   length  The value for the length field of the SLLAO
  */
 void icmpv6_ndp_set_sllao(icmpv6_ndp_opt_stllao_t *sllao, uint8_t type,
                           uint8_t length);
@@ -1320,7 +1320,7 @@ uint16_t icmpv6_csum(uint8_t proto)
 
 
 void icmpv6_send_parameter_prob(ipv6_addr_t *src, ipv6_addr_t *dest,
-                                uint8_t code, uint32_t pointer, 
+                                uint8_t code, uint32_t pointer,
                                 uint8_t *packet, uint8_t packet_len)
 {
     uint16_t packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + PARA_PROB_LEN;
