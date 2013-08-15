@@ -36,6 +36,10 @@ extern volatile tcb_t *active_thread;
 static ucontext_t end_context;
 static char __isr_stack[SIGSTKSZ];
 
+#ifdef MODULE_UART0
+fd_set _native_rfds;
+#endif
+
 /**
  * TODO: implement
  */

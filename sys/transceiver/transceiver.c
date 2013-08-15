@@ -23,6 +23,7 @@
 
 #include "thread.h"
 #include "msg.h"
+#include "irq.h"
 
 #include "radio/types.h"
 
@@ -45,6 +46,11 @@
 #include "mc1322x.h"
 #include "maca.h"
 #include "maca_packet.h"
+#endif
+
+#ifdef MODULE_NATIVENET
+#include "nativenet.h"
+#include "nativenet_internal.h"
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -97,6 +103,8 @@ void cc1100_packet_monitor(void *payload, int payload_size, protocol_t protocol,
 void receive_cc1100_packet(radio_packet_t *trans_p);
 #elif MODULE_CC2420
 static void receive_cc2420_packet(radio_packet_t *trans_p);
+#elif MODULE_NATIVENET
+static void receive_nativenet_packet(radio_packet_t *trans_p);
 #endif
 static uint8_t send_packet(transceiver_type_t t, void *pkt);
 static int16_t get_channel(transceiver_type_t t);
@@ -134,7 +142,7 @@ void transceiver_init(transceiver_type_t t)
         reg[i].pid          = 0;
     }
     /* check if a non defined bit is set */
-    if (t & ~(TRANSCEIVER_CC1100 | TRANSCEIVER_CC2420 | TRANSCEIVER_MC1322X)) {
+    if (t & ~(TRANSCEIVER_CC1100 | TRANSCEIVER_CC2420 | TRANSCEIVER_MC1322X | TRANSCEIVER_NATIVE)) {
         puts("Invalid transceiver type");
     }
     else {
@@ -170,6 +178,11 @@ int transceiver_start(void)
 #ifdef MODULE_MC1322X
     else if (transceivers & TRANSCEIVER_MC1322X) {
         maca_init();
+    }
+#endif
+#ifdef MODULE_NATIVENET
+    else if (transceivers & TRANSCEIVER_NATIVE) {
+        nativenet_init(transceiver_pid);
     }
 #endif
     return transceiver_pid;
@@ -222,6 +235,7 @@ void run(void)
             case RCV_PKT_CC1100:
             case RCV_PKT_CC2420:
             case RCV_PKT_MC1322X:
+            case RCV_PKT_NATIVE:
                 receive_packet(m.type, m.content.value);
                 break;
             case SND_PKT:
@@ -350,6 +364,12 @@ static void receive_packet(uint16_t type, uint8_t pos)
             type = TRANSCEIVER_NONE;
 #endif
         }
+        else if (type == RCV_PKT_NATIVE) {
+#ifdef MODULE_NATIVENET
+            receive_nativenet_packet(trans_p);
+            type = TRANSCEIVER_NATIVE;
+#endif
+        }
         else {
             puts("Invalid transceiver type");
             return;
@@ -452,6 +472,26 @@ void receive_mc1322x_packet(radio_packet_t *trans_p) {
 #endif
 
  
+#ifdef MODULE_NATIVENET
+void receive_nativenet_packet(radio_packet_t *trans_p) {
+    unsigned state;
+    radio_packet_t *p = &_nativenet_rx_buffer[rx_buffer_pos].packet;
+
+    /* disable interrupts while copying packet */
+    state = disableIRQ();
+
+    DEBUG("Handling nativenet packet\n");
+
+    memcpy(trans_p, p, sizeof(radio_packet_t));
+    memcpy((void*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p->data, p->length);
+    trans_p->data =  (uint8_t*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]);
+
+    DEBUG("Packet %p was from %hu to %hu, size: %u\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
+
+    /* reset interrupts */
+    restoreIRQ(state);
+}
+#endif
 /*------------------------------------------------------------------------------------*/
 /*
  * @brief Sends a radio packet to the receiver
@@ -527,6 +567,11 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
             res = 1;
             break;
 #endif
+#ifdef MODULE_NATIVENET
+        case TRANSCEIVER_NATIVE:
+            res = nativenet_send(&p);
+            break;
+#endif
         default:
             puts("Unknown transceiver");
             break;
@@ -566,6 +611,10 @@ static int16_t set_channel(transceiver_type_t t, void *channel)
             maca_set_channel(c);
             return c; ///< TODO: should be changed! implement get channel
 #endif
+#ifdef MODULE_NATIVENET
+        case TRANSCEIVER_NATIVE:
+            return nativenet_set_channel(c);
+#endif
         default:
             return -1;
     }
@@ -593,8 +642,14 @@ static int16_t get_channel(transceiver_type_t t)
         case TRANSCEIVER_CC2420:
             return cc2420_get_channel();
 #endif
+#ifdef MODULE_MC1322X
         case TRANSCEIVER_MC1322X:
             ///< TODO:implement return maca_get_channel(); 
+#endif
+#ifdef MODULE_NATIVENET
+        case TRANSCEIVER_NATIVE:
+            return nativenet_get_channel();
+#endif
         default:
             return -1;
     }
@@ -616,6 +671,10 @@ static uint16_t set_pan(transceiver_type_t t, void *pan) {
         case TRANSCEIVER_CC2420:
             return cc2420_set_pan(c);
 #endif
+#ifdef MODULE_NATIVENET
+        case TRANSCEIVER_NATIVE:
+            return nativenet_set_pan(c);
+#endif
         default:
             /* get rid of compiler warning about unused variable */
             (void) c;
@@ -635,6 +694,10 @@ static uint16_t get_pan(transceiver_type_t t) {
 #ifdef MODULE_CC2420
         case TRANSCEIVER_CC2420:
             return cc2420_get_pan();
+#endif
+#ifdef MODULE_NATIVENET
+        case TRANSCEIVER_NATIVE:
+            return nativenet_get_pan();
 #endif
         default:
             return -1;
@@ -666,6 +729,10 @@ static int16_t get_address(transceiver_type_t t)
 #ifdef MODULE_MC1322X
         case TRANSCEIVER_MC1322X:
             return maca_get_address();
+#endif
+#ifdef MODULE_NATIVENET
+        case TRANSCEIVER_NATIVE:
+            return nativenet_get_address();
 #endif
         default:
             return -1;
@@ -701,6 +768,10 @@ static int16_t set_address(transceiver_type_t t, void *address)
         case TRANSCEIVER_MC1322X:
             return maca_set_address(addr);
 #endif
+#ifdef MODULE_NATIVENET
+        case TRANSCEIVER_NATIVE:
+            return nativenet_set_address(addr);
+#endif
         default:
             return -1;
     }
@@ -723,6 +794,11 @@ static void set_monitor(transceiver_type_t t, void *mode)
 #ifdef MODULE_CC2420
         case TRANSCEIVER_CC2420:
             cc2420_set_monitor(*((uint8_t*) mode));
+            break;
+#endif
+#ifdef MODULE_NATIVENET
+        case TRANSCEIVER_NATIVE:
+            nativenet_set_monitor(*((uint8_t*) mode));
             break;
 #endif
         default:
@@ -754,6 +830,11 @@ static void powerdown(transceiver_type_t t)
             maca_off();
             break;
 #endif
+#ifdef MODULE_NATIVENET
+        case TRANSCEIVER_NATIVE:
+            nativenet_powerdown();
+            break;
+#endif
         default:
             break;
     }
@@ -771,6 +852,11 @@ static void switch_to_rx(transceiver_type_t t)
 #ifdef MODULE_CC2420
         case TRANSCEIVER_CC2420:
             cc2420_switch_to_rx();
+            break;
+#endif
+#ifdef MODULE_NATIVENET
+        case TRANSCEIVER_NATIVE:
+            nativenet_switch_to_rx();
             break;
 #endif
         default:
