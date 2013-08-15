@@ -24,6 +24,15 @@
 #include "maca_packet.h"
 #endif
 
+#ifdef MODULE_NATIVENET
+#include "nativenet.h"
+#include "nativenet_internal.h"
+#endif
+
+#ifdef MODULE_AT86RF231
+#include <at86rf231.h>
+#endif
+
 /* Stack size for transceiver thread */
 #ifndef TRANSCEIVER_STACK_SIZE
 #define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_DEFAULT)
@@ -49,10 +58,12 @@
 #undef PAYLOAD_SIZE
 #define PAYLOAD_SIZE (CC2420_MAX_DATA_LENGTH)
 #endif
+#endif
 #ifdef MODULE_AT86RF231
 #if (AT86RF231_MAX_DATA_LENGTH > PAYLOAD_SIZE)
 #undef PAYLOAD_SIZE
 #define PAYLOAD_SIZE  (AT86RF231_MAX_DATA_LENGTH)
+#endif
 #endif
 #ifdef MODULE_MC1322X
 #if (MC1322X_MAX_DATA_LENGTH > PAYLOAD_SIZE)

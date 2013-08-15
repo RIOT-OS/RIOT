@@ -109,7 +109,6 @@ void receive_cc1100_packet(radio_packet_t *trans_p);
 static void receive_cc2420_packet(radio_packet_t *trans_p);
 #elif MODULE_NATIVENET
 static void receive_nativenet_packet(radio_packet_t *trans_p);
-#endif
 #elif MODULE_AT86RF231
 void receive_at86rf231_packet(radio_packet_t *trans_p);
 #endif
@@ -404,6 +403,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
             receive_at86rf231_packet(trans_p);
 #else
             trans_p = NULL;
+        }
 #endif
         else if (type == RCV_PKT_NATIVE) {
 #ifdef MODULE_NATIVENET
@@ -411,7 +411,6 @@ static void receive_packet(uint16_t type, uint8_t pos)
 #else
             trans_p = NULL;
 #endif
-
         }
         else {
             puts("Invalid transceiver type");
