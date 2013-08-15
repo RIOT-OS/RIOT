@@ -54,19 +54,17 @@ typedef union __attribute__((packed)) {
  *          RFC 4291
  *      </a>
  */
-typedef enum __attribute__((packed))
-{
+typedef enum __attribute__((packed)) {
     IPV6_ADDR_TYPE_NONE,            ///< address has no type/is invalid.
     IPV6_ADDR_TYPE_UNICAST,         ///< address is an unicast address.
     IPV6_ADDR_TYPE_MULTICAST,       ///< address is a multicast address.
     IPV6_ADDR_TYPE_ANYCAST,         ///< address is an anycast address.
     IPV6_ADDR_TYPE_SOLICITED_NODE,  ///< address is a solicitated node
-    ///< multicast address.
+                                    ///< multicast address.
     IPV6_ADDR_TYPE_LOOPBACK,        ///< address is a loopback address.
     IPV6_ADDR_TYPE_LINK_LOCAL,      ///< address is a link-local address.
     IPV6_ADDR_TYPE_GLOBAL           ///< address is a global address.
-}
-ipv6_addr_type_t;
+} ipv6_addr_type_t;
 
 /**
  * @brief   Data type to represent an IPv6 packet header
@@ -78,7 +76,7 @@ ipv6_addr_type_t;
 typedef struct __attribute__((packed)) {
     uint8_t version_trafficclass;   ///< Version field + first 4 bit of Traffic Class.
     uint8_t trafficclass_flowlabel; ///< last 4 bit of Traffic Class
-    ///< and first 4 bit of Flow Label.
+                                    ///< and first 4 bit of Flow Label.
     uint16_t flowlabel;             ///< last 16 bit of Flow Label.
     uint16_t length;                ///< payload length of this packet.
     uint8_t nextheader;             ///< type of next header in this packet.
@@ -389,14 +387,12 @@ typedef struct __attribute__((packed)) {
  * @brief   Data type to represent address types according to
  *          <a href="http://tools.ietf.org/hmtl/rfc4862">RFC 4862</a>.
  */
-typedef enum __attribute__((packed))
-{
+typedef enum __attribute__((packed)) {
     NDP_ADDR_STATE_TENTATIVE,   ///< tentative address, uniqueness to be verified.
     NDP_ADDR_STATE_PREFERRED,   ///< preferred address, for unrestricted use.
     NDP_ADDR_STATE_DEPRECATED,  ///< deprecated address, use discouraged.
     NDP_ADDR_STATE_ANY          ///< addresses of this state are always permitted.
-}
-ndp_addr_state_t;
+} ndp_addr_state_t;
 
 /**
  * @}
