@@ -215,9 +215,14 @@ void sixlowpan_mac_send_ieee802154_frame(const ieee_802154_long_t *addr,
     memset(&buf, 0, PAYLOAD_SIZE);
     init_802154_frame(&frame, (uint8_t *)&buf);
     memcpy(&buf[hdrlen], frame.payload, frame.payload_len);
+    /* set FCS */
+    /* RSSI = 0 */
+    buf[frame.payload_len+hdrlen] = 0;
+    /* FCS Valid = 1 / LQI Correlation Value = 0 */
+    buf[frame.payload_len+hdrlen+1] = 0x80;
     DEBUG("IEEE802.15.4 frame - FCF: %02X %02X DPID: %02X SPID: %02X DSN: %02X\n", buf[0], buf[1], frame->dest_pan_id, frame->src_pan_id, frame->seq_nr);
 
-    p.length = hdrlen + frame.payload_len;
+    p.length = hdrlen + frame.payload_len + IEEE_802154_FCS_LEN;
 
     if (mcast == 0) {
         p.dst = daddr;
