@@ -26,6 +26,7 @@
                                                                                  
 The friendly Operating System for IoT!
 
+## FEATURES
 RIOT OS is an operating system for Internet of Things (IoT) devices. It is based on a microkernel and designed for
 * energy efficiency
 * hardware independent development
@@ -36,29 +37,13 @@ Its features comprise
 * flexible memory managment
 * high resolution timers
 * virtual, long-term timers
+* the native port allows to run RIOT as-is on Linux, BSD, and MacOS. Multiple instances of RIOT running on a single machine can also be interconnected via a simple virtual Ethernet bridge
 * Wiselib support (C++ algorithm library, including routing, clustering, timesync, localization, security and more algorithms)
 * IPv6
 * TCP and UDP
 * 6LoWPAN
 * RPL
  
-## DEVELOPMENT PROCEDURES
-1. Check if your code follows the https://github.com/RIOT-OS/RIOT/wiki/Coding-conventions. If the code does not comply these style rules, your code will not be merged.
-
-2. Create a new branch in your own fork for every new feature or fix. Then create the pull request from this branch, once you completed your task (feature or fix). Every commit in this branch will be added to the pull request.
-
-3. The master branch should always be in a working state. The RIOT maintainers will create release tags based on this branch, whenever a milestone is completed.
-
-4. New features and fixes will always be submitted as pull requests. A pull request will be merged if the RIOT maintainers acknowledge the request. Before it will get merged, the pull request has to stay open long enough to discuss possible issues, but no longer than 30 days. The more extensive the changes in the pull request, the more time should be given for discussion.
-
-5. Comments on a pull request should be added to the request itself, and *not* to the commit.
-
-6. Only RIOT maintainers have commit rights to the main RIOT repository. However, even they have to create pull requests to submit their changes. A RIOT contributor cannot acknowledge his own pull request. All current RIOT maintainers are listed in the wiki.
-
-7. Keep commits to the point, e.g., don't add whitespace/typo fixes to other code changes. If changes are layered, layer the patches.
-
-8. Describe the technical detail of the change(s) as specific as possible.
-
 ## GETTING STARTED
 * You want to start the RIOT? Just follow our [Getting started documentation](http://riot-os.org/doc/getting_started.html)
 * The RIOT API itself can be built from the code using doxygen. The latest version is uploaded daily to http://riot-os.org/api.
@@ -77,6 +62,23 @@ To create a bridge and two (or count at your option) tap interfaces:
 In the `projects` repository you can find some example applications. The `default` application demonstrates all available features for the current platform.
 
 For example, you can use it to the test the native networking by running the `bin/default-native.elf` twice with two different tap interfaces as parameters, e.g. tap0 and tap1. Now configure two different addresses for both RIOT instances by typing `addr 1` and `addr 2`accordingly and send a text message from one "node" to another by typing `txtsnd 2 hello` on the first "node".
+
+## CONTRIBUTE
+1. Check if your code follows the https://github.com/RIOT-OS/RIOT/wiki/Coding-conventions. If the code does not comply these style rules, your code will not be merged.
+
+2. Create a new branch in your own fork for every new feature or fix. Then create the pull request from this branch, once you completed your task (feature or fix). Every commit in this branch will be added to the pull request.
+
+3. The master branch should always be in a working state. The RIOT maintainers will create release tags based on this branch, whenever a milestone is completed.
+
+4. New features and fixes will always be submitted as pull requests. A pull request will be merged if the RIOT maintainers acknowledge the request. Before it will get merged, the pull request has to stay open long enough to discuss possible issues, but no longer than 30 days. The more extensive the changes in the pull request, the more time should be given for discussion.
+
+5. Comments on a pull request should be added to the request itself, and *not* to the commit.
+
+6. Only RIOT maintainers have commit rights to the main RIOT repository. However, even they have to create pull requests to submit their changes. A RIOT contributor cannot acknowledge his own pull request. All current RIOT maintainers are listed in the wiki.
+
+7. Keep commits to the point, e.g., don't add whitespace/typo fixes to other code changes. If changes are layered, layer the patches.
+
+8. Describe the technical detail of the change(s) as specific as possible.
 
 ## MAILING LISTS
 * RIOT OS kernel developers list
