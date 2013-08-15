@@ -29,7 +29,7 @@
 
 #define UDP_STACK_SIZE 				512
 
-#include "../sixlowpan/sixlowip.h"
+#include "ipv6.h"
 
 typedef struct __attribute__((packed)) udp_h_t {
     uint16_t src_port;

@@ -26,8 +26,8 @@
 #include "thread.h"
 #include "destiny.h"
 #include "socket.h"
-#include "net_help/msg_help.h"
-#include "../sixlowpan/sixlowpan.h"
+#include "../net_help/msg_help.h"
+#include "sixlowpan.h"
 
 void handle_synchro_timeout(socket_internal_t *current_socket)
 {

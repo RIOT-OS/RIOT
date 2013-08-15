@@ -9,20 +9,20 @@
 #ifndef ETX_BEACONING_H_
 #define ETX_BEACONING_H_
 
-#include "sys/net/sixlowpan/sixlowip.h"
+#include "ipv6.h"
 
 //For debugging purposes
 #define ENABLE_DEBUG (0)
 #include <debug.h>
 
 #if ENABLE_DEBUG
-    #define ETX_BEACON_STACKSIZE    (4500)
-    #define ETX_RADIO_STACKSIZE     (4500)
-    #define ETX_CLOCK_STACKSIZE      (500)
+#define ETX_BEACON_STACKSIZE    (4500)
+#define ETX_RADIO_STACKSIZE     (4500)
+#define ETX_CLOCK_STACKSIZE      (500)
 #else
-    #define ETX_BEACON_STACKSIZE    (2500) //TODO optimize, maybe 2000 is enough
-    #define ETX_RADIO_STACKSIZE     (2500) //TODO optimize, maybe 2000 is enough
-    #define ETX_CLOCK_STACKSIZE     (500) //TODO optimize, maybe  250 is enough
+#define ETX_BEACON_STACKSIZE    (2500) //TODO optimize, maybe 2000 is enough
+#define ETX_RADIO_STACKSIZE     (2500) //TODO optimize, maybe 2000 is enough
+#define ETX_CLOCK_STACKSIZE     (500) //TODO optimize, maybe  250 is enough
 #endif
 
 //[option|length|ipaddr.|packetcount] with up to 15 ipaddr|packetcount pairs
@@ -36,9 +36,9 @@
  * In my tests, the maximum count of neighbors was around 30-something
  */
 #if ENABLE_DEBUG
-    #define ETX_MAX_CANDIDATE_NEIGHBORS (15) //Stacksizes are huge in debug mode, so memory is rare
+#define ETX_MAX_CANDIDATE_NEIGHBORS (15) //Stacksizes are huge in debug mode, so memory is rare
 #else
-    #define ETX_MAX_CANDIDATE_NEIGHBORS (40)
+#define ETX_MAX_CANDIDATE_NEIGHBORS (40)
 #endif
 //ETX Interval parameters
 #define MS  (1000)
@@ -86,7 +86,7 @@
  * information.
  * The information processed shall not exceed the value set in Option Length.
  */
-typedef struct __attribute__((packed)) etx_probe_t{
+typedef struct __attribute__((packed)) etx_probe_t {
     uint8_t code;
     uint8_t length;
     uint8_t data[30];
@@ -102,11 +102,11 @@ typedef struct etx_neighbor_t {
 } etx_neighbor_t;
 
 //prototypes
-void etx_init_beaconing(ipv6_addr_t * address);
+void etx_init_beaconing(ipv6_addr_t *address);
 void etx_beacon(void);
 void etx_clock(void);
-double etx_get_metric(ipv6_addr_t * address);
-void etx_update(etx_neighbor_t * neighbor);
+double etx_get_metric(ipv6_addr_t *address);
+void etx_update(etx_neighbor_t *neighbor);
 void etx_radio(void);
 
 #define ETX_PKT_OPT         (0)     //Position of Option-Type-Byte

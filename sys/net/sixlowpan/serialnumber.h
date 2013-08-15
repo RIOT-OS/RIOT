@@ -2,8 +2,8 @@
  * Header file for serial number arithmetics [RFC1982]
  */
 
-#ifndef SERIALNUMBER_H
-#define SERIALNUMBER_H
+#ifndef _SIXLOWPAN_SERIALNUMBER_H
+#define _SIXLOWPAN_SERIALNUMBER_H
 #include <stdint.h>
 
 typedef enum serial_comp_res_t {
@@ -79,4 +79,4 @@ serial_comp_res_t serial_comp16(uint16_t s1, uint16_t s2);
  **/
 serial_comp_res_t serial_comp32(uint32_t s1, uint32_t s2);
 
-#endif /* SERIALNUMBER_H*/
+#endif /* _SIXLOWPAN_SERIALNUMBER_H*/

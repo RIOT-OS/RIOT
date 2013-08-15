@@ -1,5 +1,5 @@
 /**
- * RPL data structs 
+ * RPL data structs
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,7 +7,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup rpl 
+ * @ingroup rpl
  * @{
  * @file    rpl_structs.h
  * @brief   RPL data structs
@@ -16,7 +16,7 @@
  */
 
 #include <string.h>
-#include "sixlowpan/sixlowip.h"
+#include "ipv6.h"
 
 #ifndef RPL_STRUCTS_H_INCLUDED
 #define RPL_STRUCTS_H_INCLUDED
@@ -219,12 +219,12 @@ struct rpl_dodag_t;
 typedef struct {
     ipv6_addr_t         addr;
     uint16_t            rank;
-	uint8_t             dtsn;
+    uint8_t             dtsn;
     struct rpl_dodag_t *dodag;
-	uint16_t            lifetime;
-	double              link_metric;
-	uint8_t             link_metric_type;
-	uint8_t             used;
+    uint16_t            lifetime;
+    double              link_metric;
+    uint8_t             link_metric_type;
+    uint8_t             used;
 } rpl_parent_t;
 
 struct rpl_of_t;
@@ -264,13 +264,13 @@ typedef struct rpl_dodag_t {
 
 typedef struct rpl_of_t {
     uint16_t ocp;
-    uint16_t (*calc_rank)(rpl_parent_t * parent, uint16_t base_rank);
+    uint16_t (*calc_rank)(rpl_parent_t *parent, uint16_t base_rank);
     rpl_parent_t *(*which_parent)(rpl_parent_t *, rpl_parent_t *);
     rpl_dodag_t *(*which_dodag)(rpl_dodag_t *, rpl_dodag_t *);
     void (*reset)(rpl_dodag_t *);
     void (*parent_state_callback)(rpl_parent_t *, int, int);
-    void (*init) (void); //OF specific init function
-    void (*process_dio) (void); //DIO processing callback (acc. to OF0 spec, chpt 5)
+    void (*init)(void);  //OF specific init function
+    void (*process_dio)();  //DIO processing callback (acc. to OF0 spec, chpt 5)
 } rpl_of_t;
 
 typedef struct {

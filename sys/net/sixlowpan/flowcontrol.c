@@ -1,5 +1,5 @@
 /**
- * 6lowpan border router flow control 
+ * 6lowpan border router flow control
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -10,7 +10,7 @@
  * @ingroup sixlowpan
  * @{
  * @file    flowcontrol.c
- * @brief   flowcontrol for constraint node border router implementation 
+ * @brief   flowcontrol for constraint node border router implementation
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
@@ -125,7 +125,7 @@ static int in_window(uint8_t seq_num, uint8_t min, uint8_t max)
 {
     uint8_t pos = seq_num - min;
     uint8_t maxpos = max - min + 1;
-    return pos < maxpos;
+    return (pos < maxpos);
 }
 
 void flowcontrol_send_over_uart(border_packet_t *packet, int len)
@@ -181,8 +181,8 @@ void flowcontrol_deliver_from_uart(border_packet_t *packet, int len)
         slot = &(slwin_stat.recv_win[packet->seq_num % BORDER_RWS]);
 
         if (!in_window(packet->seq_num,
-                      slwin_stat.next_exp,
-                      slwin_stat.next_exp + BORDER_RWS - 1)) {
+                       slwin_stat.next_exp,
+                       slwin_stat.next_exp + BORDER_RWS - 1)) {
             return;
         }
 

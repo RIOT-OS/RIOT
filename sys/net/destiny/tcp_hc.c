@@ -23,7 +23,7 @@
 #include "tcp_hc.h"
 #include "socket.h"
 #include "tcp.h"
-#include "../sixlowpan/sixlowip.h"
+#include "ipv6.h"
 #include "../net_help/net_help.h"
 
 #ifdef TCP_HC
@@ -37,10 +37,10 @@ socket_internal_t *get_tcp_socket_by_context(ipv6_hdr_t *current_ipv6_header,
         temp_socket = getSocket(i);
 
         if ((temp_socket != NULL) &&
-           (ipv6_get_addr_match(&temp_socket->socket_values.foreign_address.sin6_addr,
-                                &current_ipv6_header->srcaddr) == 128) &&
-           (ipv6_get_addr_match(&temp_socket->socket_values.local_address.sin6_addr,
-                                &current_ipv6_header->destaddr) == 128) &&
+           ipv6_addr_is_equal(&temp_socket->socket_values.foreign_address.sin6_addr,
+                              &current_ipv6_header->srcaddr) &&
+           ipv6_addr_is_equal(&temp_socket->socket_values.local_address.sin6_addr,
+                              &current_ipv6_header->destaddr) &&
            (temp_socket->socket_values.tcp_control.tcp_context.context_id ==
             current_context)) {
             return temp_socket;

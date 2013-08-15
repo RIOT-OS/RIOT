@@ -30,7 +30,7 @@
 #include "socket.h"
 #include "../net_help/net_help.h"
 #include "../net_help/msg_help.h"
-#include "../sixlowpan/sixlowpan.h"
+#include "sixlowpan.h"
 
 void printTCPHeader(tcp_hdr_t *tcp_header)
 {

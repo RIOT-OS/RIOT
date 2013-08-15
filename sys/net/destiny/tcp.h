@@ -78,7 +78,7 @@ enum tcp_codes {
 
 #define TCP_STACK_SIZE 			1024
 
-#include "../sixlowpan/sixlowip.h"
+#include "ipv6.h"
 
 typedef struct __attribute__((packed)) tcp_mms_o_t {
     uint8_t		kind;

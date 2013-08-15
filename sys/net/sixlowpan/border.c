@@ -1,5 +1,5 @@
 /**
- * 6lowpan border router implementation 
+ * 6lowpan border router implementation
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -10,7 +10,7 @@
  * @ingroup sixlowpan
  * @{
  * @file    sixlowborder.c
- * @brief   constraint node implementation for a 6lowpan border router 
+ * @brief   constraint node implementation for a 6lowpan border router
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
@@ -19,24 +19,25 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
-#include <mutex.h>
-#include <thread.h>
-#include <msg.h>
 
-#include <posix_io.h>
-#include <board_uart0.h>
+#include "mutex.h"
+#include "thread.h"
+#include "msg.h"
+#include "posix_io.h"
+#include "board_uart0.h"
 
+#include "sixlowpan/error.h"
 #include "bordermultiplex.h"
-#include "ieee802154/ieee802154_frame.h"
 #include "flowcontrol.h"
-#include "sixlowborder.h"
-#include "sixlowip.h"
-#include "sixlownd.h"
+#include "border.h"
+#include "ip.h"
+#include "icmp.h"
 #include "serialnumber.h"
-#include "sixlowerror.h"
+
+#include "sys/net/ieee802154/ieee802154_frame.h"
 #include "sys/net/net_help/net_help.h"
 
-#define READER_STACK_SIZE   512
+#define READER_STACK_SIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
 
 ipv6_addr_t abr_addr;
 
@@ -86,7 +87,7 @@ void serial_reader_f(void)
         bytes = readpacket(get_serial_in_buffer(0), BORDER_BUFFER_SIZE);
 
         if (bytes < 0) {
-            switch(bytes) {
+            switch (bytes) {
                 case (-SIXLOWERROR_ARRAYFULL): {
                     printf("ERROR: Array was full\n");
                     break;
@@ -119,7 +120,8 @@ void serial_reader_f(void)
     }
 }
 
-uint8_t border_initialize(transceiver_type_t trans, ipv6_addr_t *border_router_addr)
+uint8_t sixlowpan_lowpan_border_init(transceiver_type_t trans,
+                                     const ipv6_addr_t *border_router_addr)
 {
     ipv6_addr_t addr;
 
@@ -139,9 +141,9 @@ uint8_t border_initialize(transceiver_type_t trans, ipv6_addr_t *border_router_a
      * -- for now
      */
     if (border_router_addr->uint16[4] != HTONS(IEEE_802154_PAN_ID ^ 0x0200) ||
-       border_router_addr->uint16[5] != HTONS(0x00FF) ||
-       border_router_addr->uint16[6] != HTONS(0xFE00)
-      ) {
+        border_router_addr->uint16[5] != HTONS(0x00FF) ||
+        border_router_addr->uint16[6] != HTONS(0xFE00)
+       ) {
         return SIXLOWERROR_ADDRESS;
     }
 
@@ -152,24 +154,11 @@ uint8_t border_initialize(transceiver_type_t trans, ipv6_addr_t *border_router_a
 
     memcpy(&(abr_addr.uint8[0]), &(border_router_addr->uint8[0]), 16);
 
-    sixlowpan_init(trans, border_router_addr->uint8[15], 1);
+    sixlowpan_lowpan_init(trans, border_router_addr->uint8[15], 1);
 
     ipv6_init_iface_as_router();
 
     return SUCCESS;
-}
-
-void border_send_ipv6_over_lowpan(ipv6_hdr_t *packet, uint8_t aro_flag, uint8_t sixco_flag)
-{
-    uint16_t offset = IPV6_HDR_LEN + HTONS(packet->length);
-
-    packet->flowlabel = HTONS(packet->flowlabel);
-    packet->length = HTONS(packet->length);
-
-    memset(buffer, 0, BUFFER_SIZE);
-    memcpy(buffer + LL_HDR_LEN, packet, offset);
-
-    lowpan_init((ieee_802154_long_t *)&(packet->destaddr.uint16[4]), (uint8_t *)packet);
 }
 
 void border_process_lowpan(void)
@@ -181,10 +170,10 @@ void border_process_lowpan(void)
         msg_receive(&m);
         ipv6_buf = (ipv6_hdr_t *)m.content.ptr;
 
-        if (ipv6_buf->nextheader == PROTO_NUM_ICMPV6) {
-            struct icmpv6_hdr_t *icmp_buf = (struct icmpv6_hdr_t *)(((uint8_t *)ipv6_buf) + IPV6_HDR_LEN);
+        if (ipv6_buf->nextheader == IPV6_PROTO_NUM_ICMPV6) {
+            icmpv6_hdr_t *icmp_buf = (icmpv6_hdr_t *)(((uint8_t *)ipv6_buf) + IPV6_HDR_LEN);
 
-            if (icmp_buf->type == ICMP_REDIRECT) {
+            if (icmp_buf->type == ICMPV6_TYPE_REDIRECT) {
                 continue;
             }
 
