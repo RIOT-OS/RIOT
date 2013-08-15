@@ -1,5 +1,5 @@
 /**
- * Semaphore implemenation 
+ * Semaphore implemenation
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -15,8 +15,6 @@
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
-
-#include <mutex.h>
 
 #include "semaphore.h"
 

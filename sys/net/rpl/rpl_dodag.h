@@ -1,5 +1,5 @@
 /**
- * RPL dodag prototypes 
+ * RPL dodag prototypes
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,15 +7,16 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup rpl 
+ * @ingroup rpl
  * @{
  * @file    rpl_dodag.h
- * @brief   RPL dodag header 
+ * @brief   RPL dodag header
  * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @}
  */
 
 #include <string.h>
+#include "ipv6.h"
 #include "rpl_structs.h"
 
 rpl_instance_t *rpl_new_instance(uint8_t instanceid);

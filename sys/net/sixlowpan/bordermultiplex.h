@@ -1,5 +1,5 @@
 /**
- * 6lowpan border router multiplexer 
+ * 6lowpan border router multiplexer
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -9,32 +9,32 @@
  *
  * @ingroup sixlowpan
  * @{
- * @file    bordermultiplex.h 
+ * @file    bordermultiplex.h
  * @brief   data structs for border router multiplexing
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 
-#ifndef BORDERMULTIPLEX_H
-#define BORDERMULTIPLEX_H
+#ifndef _SIXLOWPAN_BORDERMULTIPLEX_H
+#define _SIXLOWPAN_BORDERMULTIPLEX_H
 
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "sixlowip.h"
+#include "ip.h"
 
 /* packet types of uart-packets */
-#define BORDER_PACKET_RAW_TYPE    0
-#define BORDER_PACKET_CONF_TYPE   2
-#define BORDER_PACKET_L3_TYPE     3
+#define BORDER_PACKET_RAW_TYPE    (0)
+#define BORDER_PACKET_CONF_TYPE   (2)
+#define BORDER_PACKET_L3_TYPE     (3)
 
 /* configuration types */
-#define BORDER_CONF_CONTEXT       2
-#define BORDER_CONF_IPADDR        3
+#define BORDER_CONF_CONTEXT       (2)
+#define BORDER_CONF_IPADDR        (3)
 
 /* ethertypes for L3 packets */
-#define BORDER_ETHERTYPE_IPV6     0x86DD
+#define BORDER_ETHERTYPE_IPV6     (0x86DD)
 
 typedef struct __attribute__((packed)) {
     uint8_t empty;
@@ -80,7 +80,7 @@ typedef struct __attribute__((packed)) {
     } context;
 } border_context_packet_t;
 
-#define BORDER_BUFFER_SIZE (sizeof(border_l3_header_t) + MTU)
+#define BORDER_BUFFER_SIZE (sizeof(border_l3_header_t) + IPV6_MTU)
 
 void demultiplex(border_packet_t *packet, int len);
 void multiplex_send_ipv6_over_uart(ipv6_hdr_t *packet);
@@ -89,4 +89,4 @@ void multiplex_send_addr_over_uart(ipv6_addr_t *addr);
 int readpacket(uint8_t *packet_buf, size_t size);
 int writepacket(uint8_t *packet_buf, size_t size);
 
-#endif /* BORDERMULTIPLEX_H*/
+#endif /* _SIXLOWPAN_BORDERMULTIPLEX_H*/

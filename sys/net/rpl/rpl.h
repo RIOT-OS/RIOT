@@ -1,5 +1,5 @@
 /**
- * RPL constants and prototypes 
+ * RPL constants and prototypes
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,7 +7,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup rpl 
+ * @ingroup rpl
  * @{
  * @file    rpl.h
  * @brief   RPL header
@@ -20,7 +20,7 @@
 #include <vtimer.h>
 #include <mutex.h>
 #include <transceiver.h>
-#include "sixlowpan/sixlowip.h"
+#include "ipv6.h"
 #include "rpl_dodag.h"
 
 #define CC1100_RADIO_MODE CC1100_MODE_WOR

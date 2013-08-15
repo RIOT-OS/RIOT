@@ -9,33 +9,37 @@ static uint16_t calc_rank(rpl_parent_t *, uint16_t);
 static rpl_parent_t *which_parent(rpl_parent_t *, rpl_parent_t *);
 static rpl_dodag_t *which_dodag(rpl_dodag_t *, rpl_dodag_t *);
 static void reset(rpl_dodag_t *);
-static uint16_t calc_path_cost(rpl_parent_t * parent);
+static uint16_t calc_path_cost(rpl_parent_t *parent);
 
 uint16_t cur_min_path_cost = MAX_PATH_COST;
-rpl_parent_t * cur_preferred_parent = NULL;
+rpl_parent_t *cur_preferred_parent = NULL;
 
 rpl_of_t rpl_of_mrhof = {
-        0x1,
-        calc_rank,
-        which_parent,
-        which_dodag,
-        reset,
-        NULL
-        };
+    0x1,
+    calc_rank,
+    which_parent,
+    which_dodag,
+    reset,
+    NULL
+};
 
-rpl_of_t * rpl_get_of_mrhof(void) {
+rpl_of_t *rpl_get_of_mrhof(void)
+{
     return &rpl_of_mrhof;
 }
 
-void reset(rpl_dodag_t *dodag) {
+void reset(rpl_dodag_t *dodag)
+{
 }
 
-static uint16_t calc_path_cost(rpl_parent_t * parent) {
+static uint16_t calc_path_cost(rpl_parent_t *parent)
+{
     puts("calc_pathcost");
+
     /*
      * Calculates the path cost through the parent, for now, only for ETX
      */
-    if (parent == NULL ) {
+    if (parent == NULL) {
         // Shouldn't ever happen since this function is supposed to be always
         // run with a parent. If it does happen, we can assume a root called it.
         puts("[WARNING] calc_path_cost called without parent!");
@@ -44,6 +48,7 @@ static uint16_t calc_path_cost(rpl_parent_t * parent) {
 
     double etx_value = etx_get_metric(&(parent->addr));
     printf("Metric for parent returned: %f", etx_value);
+
     if (etx_value != 0) {
         /*
          * (ETX_for_link_to_neighbor * 128) + Rank_of_that_neighbor
@@ -60,14 +65,16 @@ static uint16_t calc_path_cost(rpl_parent_t * parent) {
         }
 
         if (etx_value * ETX_RANK_MULTIPLIER + parent->rank
-                < parent->rank) {
+            < parent->rank) {
             //Overflow
             return MAX_PATH_COST;
         }
+
         //TODO runden
         return etx_value * ETX_RANK_MULTIPLIER
-                + parent->rank;
-    } else {
+               + parent->rank;
+    }
+    else {
         // IMPLEMENT HANDLING OF OTHER METRICS HERE
         // if it is 0, it hasn't been computed, thus we cannot compute a path
         // cost
@@ -75,8 +82,10 @@ static uint16_t calc_path_cost(rpl_parent_t * parent) {
     }
 }
 
-static uint16_t calc_rank(rpl_parent_t * parent, uint16_t base_rank) {
+static uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
+{
     puts("calc_rank");
+
     /*
      * Return the rank for this node.
      *
@@ -84,7 +93,7 @@ static uint16_t calc_rank(rpl_parent_t * parent, uint16_t base_rank) {
      * putation will always be assumed to be done for the ETX metric.
      * Baserank is pretty much only used to find out if a node is a root or not.
      */
-    if (parent == NULL ) {
+    if (parent == NULL) {
         if (base_rank == 0) {
             //No parent, no rank, a root node would have a rank != 0
             return INFINITE_RANK;
@@ -97,7 +106,8 @@ static uint16_t calc_rank(rpl_parent_t * parent, uint16_t base_rank) {
          * (see rpl.c, function global_repair), we can assume this node is root.
          */
         return DEFAULT_MIN_HOP_RANK_INCREASE;
-    } else {
+    }
+    else {
         /*
          * We have a parent and are a non-root node, calculate the path cost for
          * the parent and choose the maximum of that value and the advertised
@@ -107,19 +117,22 @@ static uint16_t calc_rank(rpl_parent_t * parent, uint16_t base_rank) {
 
         if (calculated_pcost < MAX_PATH_COST) {
             if ((parent->rank + parent->dodag->minhoprankincrease)
-                    > calculated_pcost) {
+                > calculated_pcost) {
                 return parent->rank + parent->dodag->minhoprankincrease;
-            } else {
+            }
+            else {
                 return calculated_pcost;
             }
-        } else {
+        }
+        else {
             //Path costs are greater than allowed
             return INFINITE_RANK;
         }
     }
 }
 
-static rpl_parent_t * which_parent(rpl_parent_t * p1, rpl_parent_t * p2) {
+static rpl_parent_t *which_parent(rpl_parent_t *p1, rpl_parent_t *p2)
+{
     puts("which_parent");
     /*
      * Return the parent with the lowest path cost.
@@ -130,12 +143,12 @@ static rpl_parent_t * which_parent(rpl_parent_t * p1, rpl_parent_t * p2) {
     uint16_t path_p1    = calc_path_cost(p1);
     uint16_t path_p2    = calc_path_cost(p2);
 
-    if(cur_preferred_parent != NULL){
+    if (cur_preferred_parent != NULL) {
         //test if the parent from which we got this path is still active
-        if(cur_preferred_parent->used != 0){
+        if (cur_preferred_parent->used != 0) {
             // Test, if the current best path is better than both parents given
-            if(cur_min_path_cost < path_p1 + PARENT_SWITCH_THRESHOLD
-                && cur_min_path_cost < path_p2 + PARENT_SWITCH_THRESHOLD){
+            if (cur_min_path_cost < path_p1 + PARENT_SWITCH_THRESHOLD
+                && cur_min_path_cost < path_p2 + PARENT_SWITCH_THRESHOLD) {
                 return cur_preferred_parent;
             }
         }
@@ -149,12 +162,14 @@ static rpl_parent_t * which_parent(rpl_parent_t * p1, rpl_parent_t * p2) {
         cur_preferred_parent = p1;
         return p1;
     }
+
     cur_min_path_cost = path_p2;
     cur_preferred_parent = p2;
     return p2;
 }
 
 //Not used yet, as the implementation only makes use of one dodag for now.
-static rpl_dodag_t * which_dodag(rpl_dodag_t *d1, rpl_dodag_t *d2) {
+static rpl_dodag_t *which_dodag(rpl_dodag_t *d1, rpl_dodag_t *d2)
+{
     return d1;
 }

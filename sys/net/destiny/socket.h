@@ -20,10 +20,11 @@
 #define SOCKET_H_
 
 #include <stdint.h>
+#include "ipv6.h"
 #include "tcp.h"
 #include "udp.h"
 #include "in.h"
-#include "../sixlowpan/sixlowip.h"
+#include "ipv6.h"
 
 /*
  * POSIX compatibility

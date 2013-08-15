@@ -39,4 +39,7 @@ ifneq (,$(findstring sixlowpan,$(USEMODULE)))
 	ifeq (,$(findstring ieee802154,$(USEMODULE)))
 		USEMODULE += ieee802154
 	endif
+	ifeq (,$(findstring net_help,$(USEMODULE)))
+		USEMODULE += net_help
+	endif
 endif

@@ -7,7 +7,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup rpl 
+ * @ingroup rpl
  * @{
  * @file    trickle.c
  * @brief   Trickle implementation
@@ -25,9 +25,9 @@
 #include "rpl/rpl.h"
 
 //TODO in pointer umwandeln, speicher mit malloc holen
-char * timer_over_buf;
-char * interval_over_buf;
-char * dao_delay_over_buf;
+char *timer_over_buf;
+char *interval_over_buf;
+char *dao_delay_over_buf;
 char routing_table_buf[RT_STACKSIZE];
 int timer_over_pid;
 int interval_over_pid;
@@ -71,18 +71,23 @@ void reset_trickletimer(void)
 
 void init_trickle(void)
 {
-    timer_over_buf      =  calloc(TRICKLE_TIMER_STACKSIZE,sizeof(char));
-    if(timer_over_buf == NULL){
+    timer_over_buf      =  calloc(TRICKLE_TIMER_STACKSIZE, sizeof(char));
+
+    if (timer_over_buf == NULL) {
         puts("[ERROR] Could not allocate enough memory for timer_over_buf!");
         return;
     }
-    interval_over_buf   =  calloc(TRICKLE_INTERVAL_STACKSIZE,sizeof(char));
-    if(interval_over_buf == NULL){
+
+    interval_over_buf   =  calloc(TRICKLE_INTERVAL_STACKSIZE, sizeof(char));
+
+    if (interval_over_buf == NULL) {
         puts("[ERROR] Could not allocate enough memory for interval_over_buf!");
         return;
     }
-    dao_delay_over_buf  =  calloc(DAO_DELAY_STACKSIZE,sizeof(char));
-    if(dao_delay_over_buf == NULL){
+
+    dao_delay_over_buf  =  calloc(DAO_DELAY_STACKSIZE, sizeof(char));
+
+    if (dao_delay_over_buf == NULL) {
         puts("[ERROR] Could not allocate enough memory for interval_over_buf!");
         return;
     }
@@ -135,7 +140,7 @@ void trickle_increment_counter(void)
 void trickle_timer_over(void)
 {
     ipv6_addr_t mcast;
-    ipv6_set_all_nds_mcast_addr(&mcast);
+    ipv6_addr_set_all_nodes_addr(&mcast);
 
     while (1) {
         thread_sleep();

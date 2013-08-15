@@ -19,24 +19,24 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <board_uart0.h>
+#include "board_uart0.h"
+#include "sixlowpan/error.h"
 
 #include "flowcontrol.h"
-#include "sixlowpan.h"
-#include "sixlownd.h"
-#include "sixlowborder.h"
-#include "sixlowerror.h"
+#include "lowpan.h"
+#include "icmp.h"
+#include "border.h"
 
 #include "bordermultiplex.h"
 
-#define END         0xC0
-#define ESC         0xDB
-#define END_ESC     0xDC
-#define ESC_ESC     0xDD
+#define END         (0xC0)
+#define ESC         (0xDB)
+#define END_ESC     (0xDC)
+#define ESC_ESC     (0xDD)
 
 void demultiplex(border_packet_t *packet, int len)
 {
-    switch(packet->type) {
+    switch (packet->type) {
         case (BORDER_PACKET_RAW_TYPE): {
             fputs(((char *)packet) + sizeof(border_packet_t), stdin);
             break;
@@ -45,10 +45,10 @@ void demultiplex(border_packet_t *packet, int len)
         case (BORDER_PACKET_L3_TYPE): {
             border_l3_header_t *l3_header_buf = (border_l3_header_t *)packet;
 
-            switch(l3_header_buf->ethertype) {
+            switch (l3_header_buf->ethertype) {
                 case (BORDER_ETHERTYPE_IPV6): {
                     ipv6_hdr_t *ipv6_buf = (ipv6_hdr_t *)(((unsigned char *)packet) + sizeof(border_l3_header_t));
-                    border_send_ipv6_over_lowpan(ipv6_buf, 1, 1);
+                    ipv6_send_bytes(ipv6_buf);
                     break;
                 }
 
@@ -63,11 +63,11 @@ void demultiplex(border_packet_t *packet, int len)
         case (BORDER_PACKET_CONF_TYPE): {
             border_conf_header_t *conf_header_buf = (border_conf_header_t *)packet;
 
-            switch(conf_header_buf->conftype) {
+            switch (conf_header_buf->conftype) {
                 case (BORDER_CONF_CONTEXT): {
                     border_context_packet_t *context = (border_context_packet_t *)packet;
                     ipv6_addr_t target_addr;
-                    ipv6_set_all_nds_mcast_addr(&target_addr);
+                    ipv6_addr_set_all_nodes_addr(&target_addr);
                     mutex_lock(&lowpan_context_mutex);
                     lowpan_context_update(
                         context->context.cid,
@@ -148,7 +148,7 @@ int readpacket(uint8_t *packet_buf, size_t size)
         if (esc) {
             esc = 0;
 
-            switch(byte) {
+            switch (byte) {
                 case (END_ESC): {
                     *line_buf_ptr++ = END;
                     continue;
@@ -184,7 +184,7 @@ int writepacket(uint8_t *packet_buf, size_t size)
             return -1;
         }
 
-        switch(*byte_ptr) {
+        switch (*byte_ptr) {
             case (END): {
                 *byte_ptr = END_ESC;
                 uart0_putc(ESC);

@@ -1,5 +1,5 @@
 /**
- * 6lowpan border router flow control 
+ * 6lowpan border router flow control
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -16,29 +16,30 @@
  * @}
  */
 
-#ifndef FLOWCONTROL_H
-#define FLOWCONTROL_H
+#ifndef _SIXLOWPAN_FLOWCONTROL_H
+#define _SIXLOWPAN_FLOWCONTROL_H
 
 #include <stdint.h>
-#include <vtimer.h>
+
+#include "vtimer.h"
 
 #include "semaphore.h"
-#include "sixlowip.h"
-#include "sixlowborder.h"
+#include "ip.h"
+#include "border.h"
 #include "bordermultiplex.h"
 
 /* packet types for flowcontrol */
-#define BORDER_PACKET_ACK_TYPE    1
+#define BORDER_PACKET_ACK_TYPE    (1)
 
 /* configuration types for flowcontrol */
-#define BORDER_CONF_SYN           0
-#define BORDER_CONF_SYNACK        1
+#define BORDER_CONF_SYN           (0)
+#define BORDER_CONF_SYNACK        (1)
 
-#define BORDER_SWS                1
-#define BORDER_RWS                1
-#define BORDER_SL_TIMEOUT         500 // microseconds, maybe smaller
+#define BORDER_SWS                (1)
+#define BORDER_RWS                (1)
+#define BORDER_SL_TIMEOUT         (500) // microseconds, maybe smaller
 
-#define SENDING_SLOT_STACK_SIZE     (256)
+#define SENDING_SLOT_STACK_SIZE     (MINIMUM_STACK_SIZE + 256)
 
 typedef struct {
     /* Sender state */
@@ -73,4 +74,4 @@ ipv6_addr_t flowcontrol_init(void);
 void flowcontrol_send_over_uart(border_packet_t *packet, int len);
 void flowcontrol_deliver_from_uart(border_packet_t *packet, int len);
 
-#endif /* FLOWCONTROL_H*/
+#endif /* _SIXLOWPAN_FLOWCONTROL_H*/
