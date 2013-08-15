@@ -15,9 +15,15 @@
  * @}
  */
 
-void LED_GREEN_OFF(void);
-void LED_GREEN_ON(void);
-void LED_GREEN_TOGGLE(void);
-void LED_RED_OFF(void);
-void LED_RED_ON(void);
-void LED_RED_TOGGLE(void);
+void _native_LED_GREEN_OFF(void);
+#define LED_GREEN_OFF (_native_LED_GREEN_OFF())
+void _native_LED_GREEN_ON(void);
+#define LED_GREEN_ON (_native_LED_GREEN_ON())
+void _native_LED_GREEN_TOGGLE(void);
+#define LED_GREEN_TOGGLE (_native_LED_GREEN_TOGGLE())
+void _native_LED_RED_OFF(void);
+#define LED_RED_OFF (_native_LED_RED_OFF())
+void _native_LED_RED_ON(void);
+#define LED_RED_ON (_native_LED_RED_ON())
+void _native_LED_RED_TOGGLE(void);
+#define LED_RED_TOGGLE (_native_LED_RED_TOGGLE())
