@@ -158,6 +158,8 @@ void transceiver_init(transceiver_type_t transceivers);
 
 /**
  * @brief Runs the transceiver thread
+ *
+ * @return              The transceiver thread's pid
  */
 int transceiver_start(void);
 
@@ -167,7 +169,7 @@ int transceiver_start(void);
  * @param transceivers  The transceiver types to register for
  * @param pid           The pid of the thread to register
  *
- * return               1 on success, 0 otherwise
+ * @return              1 on success, 0 otherwise
  */
 uint8_t transceiver_register(transceiver_type_t transceivers, int pid);
 
