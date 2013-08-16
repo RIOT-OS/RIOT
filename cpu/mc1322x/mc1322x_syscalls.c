@@ -2,8 +2,8 @@
  * mc1322x_syscalls.c - MCU dependent syscall implementation
  * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr>
  *
- * This source code is licensed under the GNU General Public License,
- * Version 3.  See the file LICENSE for more details.
+ * This source code is licensed under the GNU Lesser General Public License,
+ * Version 2.  See the file LICENSE for more details.
  *
  * This file is part of RIOT.
  */
