@@ -38,6 +38,8 @@
 #include "cpu.h"
 #include "cpu-conf.h"
 
+#define ENABLE_DEBUG (0)
+
 #include "debug.h"
 
 #define HWTIMERMINOFFSET 100000
