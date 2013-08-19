@@ -1,22 +1,23 @@
 /*
- * msba2acc-smb380.h - header file of the Driver for the SMB380 acceleration sensor.
- * Copyright (C) 2013 Freie Universit√§t Berlin
+ * smb380-board.h - definitions of the Driver for the SMB380 acceleration sensor.
+ * Copyright (C) 2013 Freie Universit‰t Berlin
  *
- * This source code is licensed under the GNU General Public License,
- * Version 3. See the file LICENSE for more details.
+ * This source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ *
  */
 
 /**
  * @file
  * @internal
- * @brief	SMB380 acceleration sensor definitions for the LPC2387
+ * @brief       SMB380 acceleration sensor definitions for the LPC2387
  *
- * @author      Freie Universit√§t Berlin, Computer Systems & Telematics
- * @author 	Marco Ziegert <ziegert@inf.fu-berlin.de>
- * @author	Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
+ * @author      Freie Universit‰t Berlin, Computer Systems & Telematics
+ * @author      Marco Ziegert <ziegert@inf.fu-berlin.de>
+ * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3854 $
  *
- * @note	$Id:  msba2acc-smb380.h 3854 2010-01-18 15:27:01Z zkasmi $
+ * @note        $Id:  msba2acc-smb380.h 3854 2013-06-19 17:33:01Z zkasmi $
  *
  */
 
@@ -35,12 +36,12 @@
 
 #define LPM_PREVENT_SLEEP_ACCSENSOR		BIT2
 
-enum SMB380_MODE{
-	SMB380_POLL,
-	SMB380_POLL_AFTER_CONTINOUS,
-	SMB380_CONTINOUS,
-	SMB380_THRESHOLD,
-	SMB380_FALSEALERT
+enum SMB380_MODE {
+    SMB380_POLL,
+    SMB380_POLL_AFTER_CONTINOUS,
+    SMB380_CONTINOUS,
+    SMB380_THRESHOLD,
+    SMB380_FALSEALERT
 };
 //volatile enum SMB380_MODE
 volatile enum SMB380_MODE smb380_mode;// = SMB380_POLL;
@@ -165,27 +166,27 @@ volatile enum SMB380_MODE smb380_mode;// = SMB380_POLL;
 void SMB380_update_image(void);
 
 /* change from Header (public) to internal use (private)
- * set ee_w Bit in control1 to 
+ * set ee_w Bit in control1 to
  * enable read to 0x16 to 0x22	and
  * enable write to 0x16 to 0x3D */
 void SMB380_enable_eeprom_default(void);
 
-uint8_t SMB380_HystereseFunctionSample(int16_t* value);		//Example Hysterese functon
+uint8_t SMB380_HystereseFunctionSample(int16_t *value);		//Example Hysterese functon
 
 // simple api for single-sample, single thread interrupt mode
 uint8_t SMB380_init_simple(uint16_t samplerate, uint8_t bandwidth, uint8_t range);
 
 
 
-uint8_t SMB380_init(uint8_t (*func)(int16_t*));			 //	enables Interrupts (normally only once called)
+uint8_t SMB380_init(uint8_t (*func)(int16_t *));			 //	enables Interrupts (normally only once called)
 void SMB380_setSampleRate(uint16_t rate);
 uint16_t SMB380_getSampleRate(void);
 void freeRingReadPointer(void);
 void actualizeRingReadPointer(void);
-uint8_t readRingBuff(int16_t* value);
-uint8_t writeRingBuff(int16_t* value);
+uint8_t readRingBuff(int16_t *value);
+uint8_t writeRingBuff(int16_t *value);
 void SMB380_activateDynRangeSet(uint8_t activate);
-uint8_t checkRange(int16_t* value);
+uint8_t checkRange(int16_t *value);
 
 void SMB380_enableEEPROM(void);
 void SMB380_disableEEPROM(void);
@@ -231,4 +232,4 @@ void SMB380_ShowMemory(void);
 void SMB380_Selftest_1(void);
 
 
-#endif   /* SMB380_H_ */																  
+#endif   /* SMB380_H_ */

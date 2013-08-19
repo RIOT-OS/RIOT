@@ -3,7 +3,7 @@ BINDIR = $(RIOTBOARD)/$(BOARD)/bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
-INCLUDES += -I$(RIOTBASE)/sys/include/ -I$(RIOTBASE)/drivers/cc110x_ng/include/
+INCLUDES += -I$(RIOTBASE)/sys/include/ -I$(RIOTBASE)/drivers/cc110x_ng/include/ -I$(RIOTBOARD)/$(BOARD)/include
 
 $(BINDIR)avsextrem_base.a: $(OBJ)
 	$(AR) rcs $(BINDIR)${ARCH} $(OBJ)

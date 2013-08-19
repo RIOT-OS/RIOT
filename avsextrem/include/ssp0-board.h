@@ -1,22 +1,23 @@
 /*
  * ssp0-borad.h - header file of the SPI interface for the LPC2387.
- * Copyright (C) 2013 Freie Universit√§t Berlin
+ * Copyright (C) 2013 Freie Universit‰t Berlin
  *
- * This source code is licensed under the GNU General Public License,
- * Version 3. See the file LICENSE for more details.
+ * This source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ *
  */
 
 /**
  * @file
  * @internal
- * @brief	SPI interface definitions for the LPC2387
+ * @brief       SPI interface definitions for the LPC2387
  *
- * @author      Freie Universit√§t Berlin, Computer Systems & Telematics
- * @author 	Marco Ziegert <ziegert@inf.fu-berlin.de>
- * @author	Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
+ * @author      Freie Universit‰t Berlin, Computer Systems & Telematics
+ * @author      Marco Ziegert <ziegert@inf.fu-berlin.de>
+ * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3854 $
  *
- * @note	$Id:  avsextrem-ssp0.c  3854 2010-01-18 15:27:01Z zkasmi $
+ * @note        $Id:  avsextrem-ssp0.c  3854 2010-01-18 15:27:01Z zkasmi $
  */
 #ifndef __SSP_H__
 #define __SSP_H__
@@ -94,8 +95,8 @@
 #define SMB380_EXTINT_MODE  	1
 #define BMA180_EXTINT_MODE  	1
 
-uint32_t SSP0Init( void );
-uint8_t SSP0Prepare(uint8_t chip, uint8_t datasize, uint8_t cpol,uint8_t cpha, uint16_t freq);
+uint32_t SSP0Init(void);
+uint8_t SSP0Prepare(uint8_t chip, uint8_t datasize, uint8_t cpol, uint8_t cpha, uint16_t freq);
 uint8_t SSP0Unprepare(uint8_t chip);
 unsigned char SSP0_write(const uint16_t data, uint8_t device);
 unsigned short SSP0_read(uint8_t device);
