@@ -2,8 +2,8 @@
    * board.c - Board initiazilation for the TelosB
    * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr>
    *
-   * This file subject to the terms and conditions of the GLGPLv2 License. See the file LICENSE in the  
-   * top level directory for more details.
+   * This file subject to the terms and conditions of the LGPLv2. See the file
+   * LICENSE in the  top level directory for more details.
    */
 
 #include "cpu.h"
