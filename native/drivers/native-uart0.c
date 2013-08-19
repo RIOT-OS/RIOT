@@ -5,6 +5,7 @@
 #include <err.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include <sys/select.h>
 
@@ -19,7 +20,27 @@ fd_set _native_uart_rfds;
 
 inline int uart0_puts(char *astring, int length)
 {
-    return puts(astring);
+    int nwritten, offset;
+
+    nwritten = 0;
+    offset = 0;
+
+    _native_in_syscall = 1;
+
+    while ((length > 0) &&(nwritten = write(_native_uart_out, astring+offset, length-offset)) > 0) {
+        offset += nwritten;
+    }
+    if (nwritten == -1) {
+        err(EXIT_FAILURE, "uart0_puts: write");
+    }
+    else if ((length > 0) && (nwritten == 0)) {
+        /* XXX: handle properly */
+        errx(EXIT_FAILURE, "uart0_puts: Could not write to stdout. I don't know what to do now.");
+    }
+
+    _native_in_syscall = 0;
+
+    return length;
 }
 
 void _native_handle_uart0_input()
