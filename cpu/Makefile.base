@@ -18,4 +18,13 @@ endif
 ifeq ($(CPU),native)
  INCLUDES += -I$(MAKEBASE)/cpu/native/include/
 endif
-
+ifeq ($(CPU),stm32f407vg)
+ INCLUDES += -I$(MAKEBASE)/cpu/stm32f407vg/include
+ INCLUDES += -I$(MAKEBASE)/cpu/cortex_common/CMSIS/Include
+ INCLUDES += -I$(MAKEBASE)/cpu/stm32_common/STM32F4xx_StdPeriph_Driver/inc
+endif
+ifeq ($(CPU),stm32f415rg)
+ INCLUDES += -I$(MAKEBASE)/cpu/stm32f415rg/include
+ INCLUDES += -I$(MAKEBASE)/cpu/cortex_common/CMSIS/Include
+ INCLUDES += -I$(MAKEBASE)/cpu/stm32_common/STM32F4xx_StdPeriph_Driver/inc
+endif
