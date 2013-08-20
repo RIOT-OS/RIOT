@@ -116,7 +116,7 @@
 /**
  * hashfp_t  hash function to use in thee filter
  */
-typedef unsigned int (*hashfp_t)(const char *);
+typedef uint32_t (*hashfp_t)(const uint8_t *, int len);
 
 /**
  * struct bloom_t bloom filter object
@@ -124,7 +124,7 @@ typedef unsigned int (*hashfp_t)(const char *);
 struct bloom_t {
     size_t m;
     size_t k;
-    unsigned char *a;
+    uint8_t *a;
     hashfp_t *hash;
 };
 
@@ -162,7 +162,7 @@ void bloom_del(struct bloom_t *bloom);
  * @return       nothing
  *
  */
-void bloom_add(struct bloom_t *bloom, const char *s);
+void bloom_add(struct bloom_t *bloom, const uint8_t *buf, size_t len);
 
 /**
  * bloom_check  Determine if a string is in the Bloom filter.
@@ -199,6 +199,6 @@ void bloom_add(struct bloom_t *bloom, const char *s);
  * @return       true if string is may be in the filter
  *
  */
-bool bloom_check(struct bloom_t *bloom, const char *s);
+bool bloom_check(struct bloom_t *bloom, const uint8_t *buf, size_t len);
 
 #endif
