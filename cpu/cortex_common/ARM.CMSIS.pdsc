@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<package schemaVersion="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="PACK.xsd">
+  <name>CMSIS</name>
+  <description>CMSIS for ARM Cortex-M processor-based devices</description>
+  <vendor>ARM</vendor>
+  <license>CMSIS\CMSIS END USER LICENCE AGREEMENT.rtf</license>
+  <url>http://www.keil.com/pack/</url>
+
+  <releases>
+    <release version="3.20.0">
+	The software portions that are deployed in the application program are now under a BSD license which allows usage
+	of CMSIS components in any commercial or open source projects.  The Pack Description file Arm.CMSIS.pdsc describes the use cases 
+    The individual components have been update as listed below:
+    - CMSIS-CORE adds functions for setting breakpoints, supports the latest GCC Compiler, and contains several corrections.
+    - CMSIS-DSP library is optimized for more performance and contains several bug fixes.
+    - CMSIS-RTOS API is extended with capabilities for short timeouts, Kernel initialization, and prepared for a C++ interface.
+    - CMSIS-SVD is unchanged.
+    </release>
+  </releases>
+
+  <apis>
+    <api Cclass="CMSIS" Cgroup="RTOS">
+      <description>CMSIS RTOS API for ARM Cortex-M processor based devices</description>
+      <files>
+        <file category="doc" name="CMSIS\Documentation\RTOS\html\index.html"/>
+        <!-- template only: <file category="header" name="CMSIS\RTOS\cmsis_os.h"/> -->
+      </files>
+    </api>
+  </apis>
+  
+  <!-- conditions are dependency rules that can apply to a component or an individual file -->
+  <conditions>
+    <condition id="CM0">
+      <require Dcore="Cortex-M0"/>
+    </condition>
+    <condition id="CM0+">
+      <require Dcore="Cortex-M0+"/>
+    </condition>
+    <condition id="CM3">
+      <require Dcore="Cortex-M3"/>
+    </condition>
+    <condition id="CM4">
+      <require Dcore="Cortex-M4"/>
+    </condition>
+    <condition id="SC000">
+      <require Dcore="SC000"/>
+    </condition>
+    <condition id="SC300">
+      <require Dcore="SC300"/>
+    </condition>
+    <condition id="Pelican">
+      <require Dcore="Pelican"/>
+    </condition>
+
+    <condition id="Cortex-M Device">
+      <description>An ARM Cortex-M processor based device is equipped with one of CM0, CM0+, CM3, CM4, SC000 or SC3000</description>
+      <accept Dcore="Cortex-M0"/>
+      <accept Dcore="Cortex-M0+"/>
+      <accept Dcore="Cortex-M3"/>
+      <accept Dcore="Cortex-M4"/>
+      <accept Dcore="Pelican"/>
+      <accept Dcore="SC000"/>
+      <accept Dcore="SC300"/>
+    </condition>
+
+    <condition id="CMSIS Core">
+      <description>CMSIS CORE processor and device specific Startup files</description>
+      <require condition="Cortex-M Device"/>
+      <require Cclass="Device" Cgroup="Startup"/>
+    </condition>
+
+    <condition id="CMSIS DSP">
+      <description>CMSIS DSP Library is for ARM Cortex-M Devices only and is prebuild for one of the compilers ARMCC, GCC, G++ or IAR</description>
+      <require condition="Cortex-M Device"/>
+      <accept Tcompiler="GCC"/>
+      <accept Tcompiler="G++"/>
+      <accept Tcompiler="ARMCC"/>
+      <accept Tcompiler="IAR"/>
+    </condition>
+
+    <condition id="CM0_LE_ARMCC">
+      <description>Cortex-M0 or Cortex-M0+ or SC000 processor based device in little endian mode for the ARM Compiler</description>
+      <accept Dcore="Cortex-M0"/>
+      <accept Dcore="Cortex-M0+"/>
+      <accept Dcore="SC000"/>
+      <require Dendian="Little-endian"/>
+      <require Tcompiler="ARMCC"/>
+    </condition>
+
+    <condition id="CM0_BE_ARMCC">
+      <description>Cortex-M0 or Cortex-M0+ or SC000 processor based device in big endian mode for the ARM Compiler</description>
+      <accept Dcore="Cortex-M0"/>
+      <accept Dcore="Cortex-M0+"/>
+      <accept Dcore="SC000"/>
+      <require Dendian="Big-endian"/>
+      <require Tcompiler="ARMCC"/>
+    </condition>
+
+    <condition id="CM3_LE_ARMCC">
+      <description>Cortex-M3 or SC300 processor based device in little endian mode for the ARM Compiler</description>
+      <accept Dcore="Cortex-M3"/>
+      <accept Dcore="SC300"/>
+      <require Dendian="Little-endian"/>
+      <require Tcompiler="ARMCC"/>
+    </condition>
+
+    <condition id="CM3_BE_ARMCC">
+      <description>Cortex-M3 or SC300 processor based device in big endian mode for the ARM Compiler</description>
+      <accept Dcore="Cortex-M3"/>
+      <accept Dcore="SC300"/>
+      <require Dendian="Big-endian"/>
+      <require Tcompiler="ARMCC"/>
+    </condition>
+
+    <condition id="CM4_LE_ARMCC">
+      <description>Cortex-M4 processor based device in little endian mode for the ARM Compiler</description>
+      <require Dcore="Cortex-M4" Dfpu="NO_FPU" Dendian="Little-endian"/>
+      <require Tcompiler="ARMCC"/>
+    </condition>
+
+    <condition id="CM4_BE_ARMCC">
+      <description>Cortex-M4 processor based device in big endian mode for the ARM Compiler</description>
+      <require Dcore="Cortex-M4" Dfpu="NO_FPU" Dendian="Big-endian"/>
+      <require Tcompiler="ARMCC"/>
+    </condition>
+
+    <condition id="CM4F_LE_ARMCC">
+      <description>Cortex-M4 processor based device using Floating Point Unit in little endian mode for the ARM Compiler</description>
+      <require Dcore="Cortex-M4" Dfpu="FPU" Dendian="Little-endian"/>
+      <require Tcompiler="ARMCC"/>
+    </condition>
+
+    <condition id="CM4F_BE_ARMCC">
+      <description>Cortex-M4 processor based device using Floating Point Unit in big endian mode for the ARM Compiler</description>
+      <require Dcore="Cortex-M4" Dfpu="FPU" Dendian="Big-endian"/>
+      <require Tcompiler="ARMCC"/>
+    </condition>
+
+    <condition id="CM0_LE_GCC">
+      <description>Cortex-M0 or Cortex-M0+ or SC000 processor based device in little endian mode for the GCC Compiler</description>
+      <accept Dcore="Cortex-M0"/>
+      <accept Dcore="Cortex-M0+"/>
+      <accept Dcore="SC000"/>
+      <require Dendian="Little-endian"/>
+      <require Tcompiler="GCC"/>
+    </condition>
+
+    <condition id="CM3_LE_GCC">
+      <description>Cortex-M3 or SC300 processor based device in little endian mode for the GCC Compiler</description>
+      <accept Dcore="Cortex-M3"/>
+      <accept Dcore="SC300"/>
+      <require Dendian="Little-endian"/>
+      <require Tcompiler="GCC"/>
+    </condition>
+
+    <condition id="CM4_LE_GCC">
+      <description>Cortex-M4 processor based device in little endian mode for the GCC Compiler</description>
+      <require Dcore="Cortex-M4" Dfpu="NO_FPU" Dendian="Little-endian"/>
+      <require Tcompiler="GCC"/>
+    </condition>
+
+    <condition id="CM4F_LE_GCC">
+      <description>Cortex-M4 processor based device using Floating Point Unit in little endian mode for the GCC Compiler</description>
+      <require Dcore="Cortex-M4" Dfpu="FPU" Dendian="Little-endian"/>
+      <require Tcompiler="GCC"/>
+    </condition>
+    <!-- G++ compiler -->
+    <condition id="CM0_LE_G++">
+      <description>Cortex-M0 or Cortex-M0+ or SC000 processor based device in little endian mode for the G++ Compiler</description>
+      <accept Dcore="Cortex-M0"/>
+      <accept Dcore="Cortex-M0+"/>
+      <accept Dcore="SC000"/>
+      <require Dendian="Little-endian"/>
+      <require Tcompiler="G++"/>
+    </condition>
+
+    <condition id="CM3_LE_G++">
+      <description>Cortex-M3 or SC300 processor based device in little endian mode for the G++ Compiler</description>
+      <accept Dcore="Cortex-M3"/>
+      <accept Dcore="SC300"/>
+      <require Dendian="Little-endian"/>
+      <require Tcompiler="G++"/>
+    </condition>
+
+    <condition id="CM4_LE_G++">
+      <description>Cortex-M4 processor based device in little endian mode for the G++ Compiler</description>
+      <require Dcore="Cortex-M4" Dfpu="NO_FPU" Dendian="Little-endian"/>
+      <require Tcompiler="G++"/>
+    </condition>
+
+    <condition id="CM4F_LE_G++">
+      <description>Cortex-M4 processor based device using Floating Point Unit in little endian mode for the G++ Compiler</description>
+      <require Dcore="Cortex-M4" Dfpu="FPU" Dendian="Little-endian"/>
+      <require Tcompiler="G++"/>
+    </condition>
+
+    <condition id="Compiler_ARM">
+      <require Tcompiler="ARMCC"/>
+    </condition>
+
+    <condition id="Compiler_GCC">
+      <require Tcompiler="GCC"/>
+    </condition>
+
+    <condition id="Compiler_G++">
+      <require Tcompiler="G++"/>
+    </condition>
+
+    <condition id="Compiler_IAR">
+      <require Tcompiler="IAR"/>
+    </condition>
+
+
+    <condition id="ARM_CM0">
+      <description>Generic ARM Cortex-M0 device</description>
+      <require Dvendor="ARM:82" Dname="Cortex-M0"/>
+    </condition>
+
+    <condition id="ARM_CM0plus">
+      <description>Generic ARM Cortex-M0+ device</description>
+      <require Dvendor="ARM:82" Dname="Cortex-M0+"/>
+    </condition>
+
+    <condition id="ARM_CM3">
+      <description>Generic ARM Cortex-M3 device</description>
+      <require Dvendor="ARM:82" Dname="Cortex-M3"/>
+    </condition>
+
+    <condition id="ARM_CM4">
+      <description>Generic ARM Cortex-M4 device</description>
+      <accept Dvendor="ARM:82" Dname="Cortex-M4"/>
+      <accept Dvendor="ARM:82" Dname="Cortex-M4 FPU"/>
+    </condition>
+
+    <condition id="ARM_SC000">
+      <description>Generic ARM Cortex-SC000 device</description>
+      <require Dvendor="ARM:82" Dname="SC000"/>
+    </condition>
+
+    <condition id="ARM_SC300">
+      <description>Generic ARM Cortex-SC300 device</description>
+      <require Dvendor="ARM:82" Dname="SC300"/>
+    </condition>
+
+  </conditions>
+
+  
+  <components>
+    <!-- component has dependency described by "Cortex-M" condition" -->
+    <component Cclass="CMSIS" Cgroup="CORE" Cversion="3.1.0" condition="CMSIS Core">
+      <description>CMSIS-CORE for Cortex-M, SC000, and SC300 processor.</description>
+      <files>
+        <!-- CPU independent -->
+        <file category="doc"    name="CMSIS\Documentation\Core\html\index.html"/>
+        <file category="header" name="CMSIS\Include\core_cm0.h" condition="ARM_CM0"/>
+        <file category="header" name="CMSIS\Include\core_cm0plus.h" condition="ARM_CM0plus"/>
+       <!-- CPU dependent -->
+        <file category="header" condition="CM0" name="CMSIS\Include\core_cm0.h"/>
+        <file category="header" condition="CM0+" name="CMSIS\Include\core_cm0plus.h"/>
+        <file category="header" condition="CM3" name="CMSIS\Include\core_cm3.h"/>
+        <file category="header" condition="CM4" name="CMSIS\Include\core_cm4.h"/>
+        <file category="header" condition="SC000" name="CMSIS\Include\core_sc000.h"/>
+        <file category="header" condition="SC300" name="CMSIS\Include\core_sc300.h"/>
+      </files>
+    </component>
+
+    <component Cclass="CMSIS" Cgroup="DSP" Cversion="1.10.0" condition="CMSIS DSP">
+      <description>CMSIS-DSP Library for Cortex-M0, Cortex-M3 and Cortex-M4 as well as SC000 and SC300 processor based devices</description>
+
+      <files>
+        <!-- CPU independent -->
+        <file category="doc" name="CMSIS\Documentation\DSP\html\index.html"/>
+        <!-- <file category="header" name="CMSIS\Include\arm_common_tables.h"/> -->
+        <file category="header" name="CMSIS\Include\arm_math.h"/>
+        <!-- CPU and Compiler dependent -->
+        <!-- ARMCC -->
+        <file category="library" condition="CM0_LE_ARMCC"  name="CMSIS\Lib\ARM\arm_cortexM0l_math.lib"/>
+        <file category="library" condition="CM0_BE_ARMCC"  name="CMSIS\Lib\ARM\arm_cortexM0b_math.lib"/>
+        <file category="library" condition="CM3_LE_ARMCC"  name="CMSIS\Lib\ARM\arm_cortexM3l_math.lib"/>
+        <file category="library" condition="CM3_BE_ARMCC"  name="CMSIS\Lib\ARM\arm_cortexM3b_math.lib"/>
+        <file category="library" condition="CM4_LE_ARMCC"  name="CMSIS\Lib\ARM\arm_cortexM4l_math.lib"/>
+        <file category="library" condition="CM4_BE_ARMCC"  name="CMSIS\Lib\ARM\arm_cortexM4b_math.lib"/>
+        <file category="library" condition="CM4F_LE_ARMCC" name="CMSIS\Lib\ARM\arm_cortexM4lf_math.lib"/>
+        <file category="library" condition="CM4F_BE_ARMCC" name="CMSIS\Lib\ARM\arm_cortexM4bf_math.lib"/>
+        <!-- GCC -->
+        <file category="library" condition="CM0_LE_GCC"    name="CMSIS\Lib\GCC\libarm_cortexM0l_math.a"/>
+        <file category="library" condition="CM3_LE_GCC"    name="CMSIS\Lib\GCC\libarm_cortexM3l_math.a"/>
+        <file category="library" condition="CM4_LE_GCC"    name="CMSIS\Lib\GCC\libarm_cortexM4l_math.a"/>
+        <file category="library" condition="CM4F_LE_GCC"   name="CMSIS\Lib\GCC\libarm_cortexM4lf_math.a"/>
+        <!-- G++ -->
+        <file category="library" condition="CM0_LE_G++"    name="CMSIS\Lib\G++\libarm_cortexM0l_math.a"/>
+        <file category="library" condition="CM3_LE_G++"    name="CMSIS\Lib\G++\libarm_cortexM3l_math.a"/>
+        <file category="library" condition="CM4_LE_G++"    name="CMSIS\Lib\G++\libarm_cortexM4l_math.a"/>
+        <file category="library" condition="CM4F_LE_G++"   name="CMSIS\Lib\G++\libarm_cortexM4lf_math.a"/>
+      </files>
+    </component>
+
+    <component condition="ARM_CM0" Cclass="Device" Cgroup="Startup" Cversion="1.0.0">
+      <description>System Startup for generic ARM Cortex-M0 device</description>
+      <files>
+        <file category="header" name="Device\ARM\ARMCM0\Include\ARMCM0.h"/>
+        <!-- <file category="header" name="Device\ARM\ARMCM0\Include\system_ARMCM0.h"/> -->
+        <file category="source" condition="Compiler_ARM" name="Device\ARM\ARMCM0\Source\ARM\startup_ARMCM0.s"/>
+        <file category="source" condition="Compiler_GCC" name="Device\ARM\ARMCM0\Source\GCC\startup_ARMCM0.S"/>
+        <file category="source" condition="Compiler_G++" name="Device\ARM\ARMCM0\Source\G++\startup_ARMCM0.S"/>
+        <file category="source" condition="Compiler_IAR" name="Device\ARM\ARMCM0\Source\IAR\startup_ARMCM0.s"/>
+        <file category="source" name="Device\ARM\ARMCM0\Source\system_ARMCM0.c" copy="1"/>
+      </files>
+    </component>
+
+    <component condition="ARM_CM0plus" Cclass="Device" Cgroup="Startup" Cversion="1.0.0">
+      <description>System Startup for generic ARM Cortex-M0+ device</description>
+      <files>
+        <file category="header" name="Device\ARM\ARMCM0plus\Include\ARMCM0plus.h"/>
+        <!-- <file category="header" name="Device\ARM\ARMCM0plus\Include\system_ARMCM0plus.h"/> -->
+        <file category="source" condition="Compiler_ARM" name="Device\ARM\ARMCM0plus\Source\ARM\startup_ARMCM0plus.s"/>
+        <file category="source" condition="Compiler_GCC" name="Device\ARM\ARMCM0plus\Source\GCC\startup_ARMCM0plus.S"/>
+        <file category="source" condition="Compiler_G++" name="Device\ARM\ARMCM0plus\Source\G++\startup_ARMCM0plus.S"/>
+        <file category="source" condition="Compiler_IAR" name="Device\ARM\ARMCM0plus\Source\IAR\startup_ARMCM0plus.s"/>
+        <file category="source" name="Device\ARM\ARMCM0plus\Source\system_ARMCM0plus.c" copy="1"/>
+      </files>
+    </component>
+
+    <component condition="ARM_CM3" Cclass="Device" Cgroup="Startup" Cversion="1.0.0">
+      <description>System Startup for generic ARM Cortex-M3 device</description>
+      <files>
+        <file category="header" name="Device\ARM\ARMCM3\Include\ARMCM3.h"/>
+        <!-- <file category="header" name="Device\ARM\ARMCM3\Include\system_ARMCM3.h"/> -->
+        <file category="source" condition="Compiler_ARM" name="Device\ARM\ARMCM3\Source\ARM\startup_ARMCM3.s"/>
+        <file category="source" condition="Compiler_GCC" name="Device\ARM\ARMCM3\Source\GCC\startup_ARMCM3.S"/>
+        <file category="source" condition="Compiler_G++" name="Device\ARM\ARMCM3\Source\G++\startup_ARMCM3.S"/>
+        <file category="source" condition="Compiler_IAR" name="Device\ARM\ARMCM3\Source\IAR\startup_ARMCM3.s"/>
+        <file category="source" name="Device\ARM\ARMCM3\Source\system_ARMCM3.c" copy="1"/>
+      </files>
+    </component>
+
+    <component condition="ARM_CM4" Cclass="Device" Cgroup="Startup" Cversion="1.0.0">
+      <description>System Startup for generic ARM Cortex-M4 device</description>
+      <files>
+        <file category="header" name="Device\ARM\ARMCM4\Include\ARMCM4.h"/>
+        <!-- <file category="header" name="Device\ARM\ARMCM4\Include\system_ARMCM4.h"/> -->
+        <file category="source" condition="Compiler_ARM" name="Device\ARM\ARMCM4\Source\ARM\startup_ARMCM4.s"/>
+        <file category="source" condition="Compiler_GCC" name="Device\ARM\ARMCM4\Source\GCC\startup_ARMCM4.S"/>
+        <file category="source" condition="Compiler_G++" name="Device\ARM\ARMCM4\Source\G++\startup_ARMCM4.S"/>
+        <file category="source" condition="Compiler_IAR" name="Device\ARM\ARMCM4\Source\IAR\startup_ARMCM4.s"/>
+        <file category="source" name="Device\ARM\ARMCM4\Source\system_ARMCM4.c" copy="1"/>
+      </files>
+    </component>
+
+    <component condition="ARM_SC000" Cclass="Device" Cgroup="Startup" Cversion="1.0.0">
+      <description>System Startup for generic ARM SC000 device</description>
+      <files>
+        <file category="header" name="Device\ARM\ARMSC000\Include\ARMSC000.h"/>
+        <!-- <file category="header" name="Device\ARM\ARMSC000\Include\system_ARMSC000.h"/> -->
+        <file category="source" condition="Compiler_ARM" name="Device\ARM\ARMSC000\Source\ARM\startup_ARMSC000.s"/>
+        <file category="source" condition="Compiler_GCC" name="Device\ARM\ARMSC000\Source\GCC\startup_ARMSC000.S"/>
+        <file category="source" condition="Compiler_G++" name="Device\ARM\ARMSC000\Source\G++\startup_ARMSC000.S"/>
+        <file category="source" condition="Compiler_IAR" name="Device\ARM\ARMSC000\Source\IAR\startup_ARMSC000.s"/>
+        <file category="source" name="Device\ARM\ARMSC000\Source\system_ARMSC000.c" copy="1"/>
+      </files>
+    </component>
+
+    <component condition="ARM_SC300" Cclass="Device" Cgroup="Startup" Cversion="1.0.0">
+      <description>System Startup for generic ARM SC300 device</description>
+      <files>
+        <file category="header" name="Device\ARM\ARMSC300\Include\ARMSC300.h"/>
+        <!-- <file category="header" name="Device\ARM\ARMSC300\Include\system_ARMSC300.h"/> -->
+        <file category="source" condition="Compiler_ARM" name="Device\ARM\ARMSC300\Source\ARM\startup_ARMSC300.s"/>
+        <file category="source" condition="Compiler_GCC" name="Device\ARM\ARMSC300\Source\GCC\startup_ARMSC300.S"/>
+        <file category="source" condition="Compiler_G++" name="Device\ARM\ARMSC300\Source\G++\startup_ARMSC300.S"/>
+        <file category="source" condition="Compiler_IAR" name="Device\ARM\ARMSC300\Source\IAR\startup_ARMSC300.s"/>
+        <file category="source" name="Device\ARM\ARMSC300\Source\system_ARMSC300.c" copy="1"/>
+      </files>
+    </component>
+  </components>
+</package>
+
