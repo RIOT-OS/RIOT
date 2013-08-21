@@ -20,8 +20,8 @@ void nativenet_set_monitor(uint8_t mode);
 
 uint8_t nativenet_send(radio_packet_t *packet);
 
-int16_t nativenet_set_address(radio_address_t address);
-int16_t nativenet_get_address();
+radio_address_t nativenet_set_address(radio_address_t address);
+radio_address_t nativenet_get_address();
 
 int16_t nativenet_set_channel(uint8_t channel);
 int16_t nativenet_get_channel();

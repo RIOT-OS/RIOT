@@ -18,12 +18,23 @@ int send_buf(radio_packet_t *packet);
 extern int _native_tap_fd;
 extern unsigned char _native_tap_mac[ETHER_ADDR_LEN];
 
+struct nativenet_header {
+    uint16_t length;
+    radio_address_t dst;
+    radio_address_t src;
+} __attribute__((packed));
+
+struct nativenet_packet {
+    struct nativenet_header nn_header;
+    unsigned char data[ETHERMTU - sizeof(struct nativenet_header)];
+} __attribute__((packed));
+
 union eth_frame {
     struct {
         struct ether_header header;
-        unsigned char data[ETHERMTU];
+        struct nativenet_packet payload;
     } field;
     unsigned char buffer[ETHER_MAX_LEN];
-};
+} __attribute__((packed));
 
 #endif /* _TAP_H */
