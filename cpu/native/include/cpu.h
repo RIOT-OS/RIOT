@@ -52,7 +52,7 @@ void eINT(void);
 /**
  * register interrupt handler handler for interrupt sig
  */
-int register_interrupt(int sig, void *handler);
+int register_interrupt(int sig, void (*handler)(void));
 
 /**
  * unregister interrupt handler for interrupt sig

@@ -106,7 +106,7 @@ void nativenet_switch_to_rx()
 /* nativenet_internal.h *************************************************/
 /************************************************************************/
 
-int _nativenet_register_cb(int event, void *func)
+int _nativenet_register_cb(int event, void (*func)(void))
 {
     if (event > NNEV_MAXEV) {
         DEBUG("_nativenet_register_cb: event > NNEV_MAXEV");
