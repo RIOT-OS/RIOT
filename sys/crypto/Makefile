@@ -4,5 +4,6 @@ MODULE = crypto
 include $(RIOTBASE)/Makefile.base
 
 ifeq ($(strip $(BOARD)),msba2)
-	$(error "sha256 produces wrong results on msba2 currently, aborting...")
+$(warning sha256 produces wrong results on msba2 with our old toolchain)
 endif
+
