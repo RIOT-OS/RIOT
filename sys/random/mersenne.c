@@ -50,46 +50,45 @@
 #define UPPER_MASK 0x80000000UL /** most significant w-r bits */
 #define LOWER_MASK 0x7fffffffUL /** least significant r bits */
 
-static uint32_t mt[N]; /** the array for the state vector  */
-static uint32_t mti = N + 1; /** mti==N+1 means mt[N] is not initialized */
+#define MTI_UNINITIALIZED (N + 1)
 
-void init_genrand(uint32_t s)
+static uint32_t mt[N]; /** the array for the state vector  */
+static uint16_t mti = MTI_UNINITIALIZED;
+
+void genrand_init(uint32_t s)
 {
-    mt[0] = s & 0xffffffffUL;
-    for (mti = 1; mti < N; mti++) {
-        mt[mti] = (1812433253UL * (mt[mti - 1] ^ (mt[mti - 1] >> 30)) + mti);
+    mt[0] = s;
+    for (int i = 1; i < N; ++i) {
+        mt[i] = 1812433253UL * (mt[i - 1] ^ (mt[i - 1] >> 30)) + i;
         /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
         /* In the previous versions, MSBs of the seed affect   */
         /* only MSBs of the array mt[].                        */
         /* 2002/01/09 modified by Makoto Matsumoto             */
-        mt[mti] &= 0xffffffffUL;
-        /* for >32 bit machines */
     }
+
+    mti = N;
 }
 
-void init_by_array(uint32_t init_key[], int key_length)
+void genrand_init_by_array(uint32_t *init_key, int key_length)
 {
-    int i, j, k;
-    init_genrand(19650218UL);
-    i = 1;
-    j = 0;
-    k = (N > key_length ? N : key_length);
-    for (; k; k--) {
+    genrand_init(19650218UL);
+    int i = 1;
+    int j = 0;
+    for (int k = N > key_length ? N : key_length; k; --k) {
         mt[i] = (mt[i] ^ ((mt[i - 1] ^ (mt[i - 1] >> 30)) * 1664525UL))
                 + init_key[j] + j; /* non linear */
-        mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
-        i++;
-        j++;
+        ++i;
+        ++j;
         if (i >= N) {
             mt[0] = mt[N - 1];
             i = 1;
         }
-        if (j >= key_length)
+        if (j >= key_length) {
             j = 0;
+        }
     }
-    for (k = N - 1; k; k--) {
+    for (int k = N - 1; k; k--) {
         mt[i] = (mt[i] ^ ((mt[i - 1] ^ (mt[i - 1] >> 30)) * 1566083941UL)) - i; /* non linear */
-        mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
         i++;
         if (i >= N) {
             mt[0] = mt[N - 1];
@@ -100,67 +99,67 @@ void init_by_array(uint32_t init_key[], int key_length)
     mt[0] = 0x80000000UL; /* MSB is 1; assuring non-zero initial array */
 }
 
-uint32_t genrand_uint32(void)
+/** generates N words at one time */
+static void generate_numbers(void)
 {
-    uint32_t y;
-    static uint32_t mag01[2] = { 0x0UL, MATRIX_A };
-    /* mag01[x] = x * MATRIX_A  for x=0,1 */
-
-    if (mti >= N) { /* generate N words at one time */
-        int kk;
-
-        if (mti == N + 1) /* if init_genrand() has not been called, */
-            init_genrand(5489UL); /* a default initial seed is used */
-
-        for (kk = 0; kk < N - M; kk++) {
-            y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
-            mt[kk] = mt[kk + M] ^ (y >> 1) ^ mag01[y & 0x1UL];
-        }
-        for (; kk < N - 1; kk++) {
-            y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
-            mt[kk] = mt[kk + (M - N)] ^ (y >> 1) ^ mag01[y & 0x1UL];
-        }
-        y = (mt[N - 1] & UPPER_MASK) | (mt[0] & LOWER_MASK);
-        mt[N - 1] = mt[M - 1] ^ (y >> 1) ^ mag01[y & 0x1UL];
-
-        mti = 0;
+    if (mti == MTI_UNINITIALIZED) {
+        /* if init_genrand() has not been called, a default initial seed is used */
+        genrand_init(5489UL);
     }
 
-    y = mt[mti++];
+    for (int k = 0; k < N; ++k) {
+        uint32_t y = (mt[k] & UPPER_MASK) | (mt[(k + 1) % N] & LOWER_MASK);
+        mt[k] = mt[(k + M) % N] ^ (y >> 1);
+        if (y & 1) {
+            mt[k] ^= MATRIX_A;
+        }
+    }
 
-    /* Tempering */
-    y ^= (y >> 11);
+    mti = 0;
+}
+
+uint32_t genrand_uint32(void)
+{
+    if (mti >= N) {
+        generate_numbers();
+    }
+
+    uint32_t y = mt[mti++];
+    y ^= y >> 11;
     y ^= (y << 7) & 0x9d2c5680UL;
     y ^= (y << 15) & 0xefc60000UL;
-    y ^= (y >> 18);
-
+    y ^= y >> 18;
     return y;
 }
 
 #if PRNG_FLOAT
 
-double genrand_real1(void)
+#define TWO_POW_6 64.0
+#define TWO_POW_26 67108864.0
+#define TWO_POW_32_M1 4294967295.0
+#define TWO_POW_32 4294967296.0
+#define TWO_POW_53 9007199254740992.0
+
+double genrand_real(void)
 {
-    return genrand_int32() * (1.0 / 4294967295.0);
-    /* divided by 2^32-1 */
+    return genrand_int32() * (1.0 / TWO_POW_32);
 }
 
-double genrand_real2(void)
+double genrand_real_inclusive(void)
 {
-    return genrand_int32() * (1.0 / 4294967296.0);
-    /* divided by 2^32 */
+    return genrand_int32() * (1.0 / TWO_POW_32_M1);
 }
 
-double genrand_real3(void)
+double genrand_real_exclusive(void)
 {
-    return (((double) genrand_int32()) + 0.5) * (1.0 / 4294967296.0);
-    /* divided by 2^32 */
+    return ((double) genrand_int32() + 0.5) * (1.0 / TWO_POW_32);
 }
 
 double genrand_res53(void)
 {
-    uint32_t a = genrand_int32() >> 5, b = genrand_int32() >> 6;
-    return (a * 67108864.0 + b) * (1.0 / 9007199254740992.0);
+    double a = genrand_int32() * TWO_POW_26;
+    double b = genrand_int32() * (1.0 / TWO_POW_6);
+    return (a + b) * (1.0 / TWO_POW_53);
 }
 
 #endif /* PRNG_FLOAT */

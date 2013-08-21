@@ -7,7 +7,7 @@
  *
  * @param s seed for the PRNG
  */
-void init_genrand(uint32_t s);
+void genrand_init(uint32_t s);
 
 /**
  * @brief initialize by an array with array-length
@@ -18,7 +18,7 @@ void init_genrand(uint32_t s);
  * @param init_key array of keys (seeds) to initialize the PRNG
  * @param key_length number of lements in init_key
  */
-void init_by_array(uint32_t init_key[], int key_length);
+void genrand_init_by_array(uint32_t init_key[], int key_length);
 
 /**
  * @brief generates a random number on [0,0xffffffff]-interval
@@ -31,22 +31,22 @@ uint32_t genrand_uint32(void);
 /* These real versions are due to Isaku Wada, 2002/01/09 added */
 
 /**
- * @brief generates a random number on [0,1]-real-interval
- * @return a random number on [0,1]-real-interval
- */
-double genrand_real1(void);
-
-/**
  * @brief generates a random number on [0,1)-real-interval
  * @return a random number on [0,1)-real-interval
  */
-double genrand_real2(void);
+double genrand_real(void);
+
+/**
+ * @brief generates a random number on [0,1]-real-interval
+ * @return a random number on [0,1]-real-interval
+ */
+double genrand_real_inclusive(void);
 
 /**
  * @brief generates a random number on (0,1)-real-interval
  * @return a random number on (0,1)-real-interval
  */
-double genrand_real3(void);
+double genrand_real_exclusive(void);
 
 /**
  * @brief generates a random number on [0,1) with 53-bit resolution
