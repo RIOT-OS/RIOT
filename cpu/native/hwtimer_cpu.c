@@ -210,7 +210,10 @@ void hwtimer_arch_set_absolute(unsigned long value, short timer)
 {
     DEBUG("hwtimer_arch_set_absolute(%lu, %i)\n", value, timer);
     value -= native_hwtimer_now;
-    return(hwtimer_arch_set(value, timer));
+
+    hwtimer_arch_set(value, timer);
+
+    return;
 }
 
 unsigned long hwtimer_arch_now(void)
