@@ -48,6 +48,8 @@ void rtc_disable(void)
 void rtc_set_localtime(struct tm *localt)
 {
     DEBUG("rtc_set_localtime()\n");
+
+    (void)localt; /* not implemented atm */
     printf("setting time not supported.");
 }
 
