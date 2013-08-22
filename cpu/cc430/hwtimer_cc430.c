@@ -10,16 +10,16 @@
 static uint32_t ticks = 0;
 
 extern void (*int_handler)(int);
-extern void TA0_unset(short timer);
+extern void TB_unset(short timer);
 
-void timerA_init(void)
+void timerB_init(void)
 {
     ticks = 0;								 // Set tick counter value to 0
-    TA0CTL = TASSEL_1 + TACLR;   	  		 // Clear the timer counter, set ACLK
-    TA0CTL &= ~TAIE;						 // Clear the IFG
+    TBCTL = TBSSEL_1 + TBCLR;   	  		 // Clear the timer counter, set ACLK
+    TBCTL &= ~TBIE;						     // Clear the IFG
 
-    volatile unsigned int *ccr = &TA0CCR0;
-    volatile unsigned int *ctl = &TA0CCTL0;
+    volatile unsigned int *ccr = &TBCCR0;
+    volatile unsigned int *ctl = &TBCCTL0;
 
     for (int i = 0; i < ARCH_MAXTIMERS; i++) {
         *(ccr + i) = 0;
@@ -27,31 +27,31 @@ void timerA_init(void)
         *(ctl + i) &= ~(CCIE);
     }
 
-    TA0CTL |= MC_2;
+    TBCTL |= MC_2;
 }
 
-interrupt(TIMER0_A0_VECTOR) __attribute__((naked)) timer0_a0_isr(void)
+interrupt(TIMER0_B0_VECTOR) __attribute__((naked)) timerb0_isr(void)
 {
     __enter_isr();
 
-    TA0_unset(0);
+    TB_unset(0);
     int_handler(0);
     __exit_isr();
 }
 
-interrupt(TIMER0_A1_VECTOR) __attribute__((naked)) timer0_a1_5_isr(void)
+interrupt(TIMER0_B1_VECTOR) __attribute__((naked)) timerb16_isr(void)
 {
     __enter_isr();
 
-    short taiv = TA0IV;
+    short intvec = TBIV;
     short timer;
 
-    if (taiv & TAIFG) {
+    if (intvec & TBIV_TBIFG) {
         DEBUG("Overflow\n");
     }
     else {
-        timer = (taiv / 2);
-        TA0_unset(timer);
+        timer = (intvec / 2);
+        TB_unset(timer);
         int_handler(timer);
     }
 

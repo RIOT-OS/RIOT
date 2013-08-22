@@ -30,6 +30,10 @@ License. See the file LICENSE in the top level directory for more details.
 #define ARCH_MAXTIMERS 5
 #endif
 
+#ifdef __MSP430_HAS_TB7__
+#define ARCH_MAXTIMERS 7
+#endif
+
 
 #ifndef ARCH_MAXTIMERS
 #warning "ARCH_MAXTIMERS UNSET!"
