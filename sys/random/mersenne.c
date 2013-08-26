@@ -142,23 +142,23 @@ uint32_t genrand_uint32(void)
 
 double genrand_real(void)
 {
-    return genrand_int32() * (1.0 / TWO_POW_32);
+    return genrand_uint32() * (1.0 / TWO_POW_32);
 }
 
 double genrand_real_inclusive(void)
 {
-    return genrand_int32() * (1.0 / TWO_POW_32_M1);
+    return genrand_uint32() * (1.0 / TWO_POW_32_M1);
 }
 
 double genrand_real_exclusive(void)
 {
-    return ((double) genrand_int32() + 0.5) * (1.0 / TWO_POW_32);
+    return ((double) genrand_uint32() + 0.5) * (1.0 / TWO_POW_32);
 }
 
 double genrand_res53(void)
 {
-    double a = genrand_int32() * TWO_POW_26;
-    double b = genrand_int32() * (1.0 / TWO_POW_6);
+    double a = genrand_uint32() * TWO_POW_26;
+    double b = genrand_uint32() * (1.0 / TWO_POW_6);
     return (a + b) * (1.0 / TWO_POW_53);
 }
 

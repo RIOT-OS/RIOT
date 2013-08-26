@@ -1,6 +1,8 @@
 #include <inttypes.h>
 
-#define PRNG_FLOAT (0)
+#ifndef PRNG_FLOAT
+#  define PRNG_FLOAT (0)
+#endif
 
 /**
  * @brief initializes mt[N] with a seed
