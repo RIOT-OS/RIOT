@@ -61,7 +61,7 @@ void TA0_unset(short timer)
 
 unsigned long hwtimer_arch_now()
 {
-    return TA0R;
+    return ((uint32_t)timer_round << 16)+TA0R;
 }
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
@@ -88,7 +88,7 @@ void hwtimer_arch_disable_interrupt(void)
 
 void hwtimer_arch_set(unsigned long offset, short timer)
 {
-    unsigned int value = hwtimer_arch_now() + offset;
+    uint32_t value = hwtimer_arch_now() + offset;
     hwtimer_arch_set_absolute(value, timer);
 }
 
