@@ -71,7 +71,7 @@ typedef struct __attribute__((packed))
     uint8_t rssi;           ///< Radio Signal Strength Indication
     uint8_t lqi;            ///< Link Quality Indicator
     timex_t toa;            ///< Time of Arrival
-    uint8_t length;         ///< Length of payload
+    uint16_t length;        ///< Length of payload
     uint8_t *data;          ///< Payload
 }
 radio_packet_t;

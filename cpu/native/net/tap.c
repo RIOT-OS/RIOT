@@ -60,9 +60,9 @@ void _native_handle_tap_input(void)
             }
             else {
                 /* XXX: check overflow */
-                p.length = (uint8_t)buf[ETHER_HDR_LEN];
-                p.dst = (uint8_t)buf[ETHER_HDR_LEN+1];
-                p.data = buf+ETHER_HDR_LEN+2;
+                memcpy(&p.length, &buf[ETHER_HDR_LEN], sizeof(uint16_t));
+                p.dst = (uint8_t)buf[ETHER_HDR_LEN+2];
+                p.data = buf+ETHER_HDR_LEN+3;
                 DEBUG("_native_handle_tap_input: received packet of length %u for %u: %s\n", p.length, p.dst, (char*) p.data);
                 _nativenet_handle_packet(&p);
             }
@@ -93,10 +93,10 @@ int _native_marshall_ethernet(uint8_t *framebuf, radio_packet_t *packet)
     f->field.header.ether_type = htons(NATIVE_ETH_PROTO);
 
     /* XXX: check overflow */
-    memcpy(f->field.data+2, packet->data, packet->length);
-    f->field.data[0] = packet->length;
-    f->field.data[1] = packet->dst;
-    data_len = packet->length + 2;
+    memcpy(f->field.data+3, packet->data, packet->length);
+    memcpy(&f->field.data[0], &packet->length, sizeof(uint16_t));
+    f->field.data[2] = packet->dst;
+    data_len = packet->length + 4;
 
     return data_len;
 }
