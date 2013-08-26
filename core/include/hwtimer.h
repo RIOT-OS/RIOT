@@ -46,14 +46,14 @@
  * @param[in]   us number of microseconds
  * @return      kernel timer ticks
  */
-#define HWTIMER_TICKS(us)        (us / (1000000L / HWTIMER_SPEED))
+#define HWTIMER_TICKS(us)        ((us) / (1000000L / HWTIMER_SPEED))
 
 /**
  * @brief       Convert ticks to microseconds
  * @param[in]   ticks   number of ticks
  * @return      microseconds
  */
-#define HWTIMER_TICKS_TO_US(ticks)        (ticks * (1000000L/HWTIMER_SPEED))
+#define HWTIMER_TICKS_TO_US(ticks)        ((ticks) * (1000000L/HWTIMER_SPEED))
 
 /**
  * @def    HWTIMER_MAXTICKS
