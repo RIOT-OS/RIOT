@@ -7,18 +7,23 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
+ *
  * @ingroup shell_commands
  * @{
  * @file    shell_commands.c
  * @brief   sets up the system shell command struct
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
+ * @author  Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @}
  */
 
 #include <shell_commands.h>
 #include <stdlib.h>
 
-extern void _id_handler(char *id);
+
+
+extern void _id_handler(char* id);
+extern void _heap_handler(char* unused);
 
 #ifdef MODULE_PS
 extern void _ps_handler(char *unused);
