@@ -25,7 +25,7 @@ static uint8_t sequenz_nr;
 
 int16_t cc2420_send(cc2420_packet_t *packet)
 {
-    volatile uint32_t abort_count;
+    volatile uint32_t abort_count = 0;
 
     /* Set missing frame information */
     packet->frame.fcf.frame_ver = 0;
