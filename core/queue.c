@@ -16,7 +16,6 @@
 
 #include <stddef.h>
 #include <inttypes.h>
-
 #include "queue.h"
 
 //#define ENABLE_DEBUG 0
