@@ -12,7 +12,7 @@ export CFLAGS_BASIC = -std=gnu99 -march=armv4t -mtune=arm7tdmi-s -mlong-calls \
 		-ffixed-r8 -ffunction-sections -ffreestanding -fno-builtin \
 		-nodefaultlibs -Wcast-align -Wall -Wstrict-prototypes -Wextra \
 		-Os -pipe 
-export CFLAGS += $(CFLAGS_BASIC) -mthumb
+# export CFLAGS += $(CFLAGS_BASIC) -mthumb
 $(warning TODO add -mthumb)
 export AFLAGS = -Wa,-gstabs $(CFLAGS)
 export AS = $(PREFIX)as

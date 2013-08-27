@@ -407,7 +407,7 @@ struct MACA_struct {
         {
             uint32_t TXCCADELAY :12;    // Delay from end of CCA to Tx start
             uint32_t :20;               // reserved
-        }RXENDbits;
+        }TXCCADELAYbits;
     };
     uint32_t KEY3;              // see (9.7.45)
     uint32_t KEY2;              // see (9.7.45)

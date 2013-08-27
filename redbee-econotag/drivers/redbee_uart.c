@@ -2,8 +2,8 @@
  * redbee_uart.c - UART driver for redbee
  * Copyright (C) 2013 Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *
- * This source code is licensed under the GNU General Public License,
- * Version 3.  See the file LICENSE for more details.
+ * This source code is licensed under the GNU Lesser General Public License,
+ * Version 2.  See the file LICENSE for more details.
  *
  * This file is part of RIOT.
  */
@@ -11,7 +11,6 @@
 #include "mc1322x.h"
 #include "uart.h"
 #include "gpio.h"
-#include "io.h"
 
 #define MOD_ 9999
 #define CLK_ 24000000
@@ -26,16 +25,16 @@ void uart_set_baudrate(volatile struct UART_struct *uart, uint32_t baudrate)
     /* calculate inc following equation 13-1 from datasheet */
     /* multiply by another 10 to get a fixed point*/
     inc = ((uint64_t) baudrate * DIV_ * MOD_ * 10 / CLK_) - 10;
-    /* add 5 and div by 10 to get a rounding */
-    inc = (inc + 5) / 10;
+    /* add 5 and div by 10 to get a proper rounding */
+    inc = (inc + 5) / 10; 
 
     /* disable UARTx to set baudrate */
     uart->CONbits.TXE = 0;
     uart->CONbits.RXE = 0;
 
     /* set baudrate */
-    uart->BRbits.INC = inc;
-    uart->BRbits.MOD = MOD_;
+    /* BR register is 32bit access only */
+    uart->BR = (((uint16_t) inc << 16) | MOD_);
 
     /* reenable UARTx again */
     /* uart->CON.XTIM = 0 is 16x oversample (datasheet is incorrect) */
@@ -92,16 +91,12 @@ void uart_flow_ctl(volatile struct UART_struct *uart, uint8_t on)
     }
 }
 
-// TODO: clean from u*_(rx|tx)_(head|tail)
 void uart_init(volatile struct UART_struct *uart, uint32_t baudrate)
 {
     /* enable the uart so we can set the gpio mode */
     /* has to be enabled before setting the function with GPIO->FUNC_SEL */
     uart->CONbits.TXE = 1;
     uart->CONbits.RXE = 1;
-
-    /* interrupt when this or more bytes are free in the tx buffer */
-    uart->TXCON = 16;
 
     if (uart == UART1) {
         /* TX and RX direction */
@@ -112,27 +107,17 @@ void uart_init(volatile struct UART_struct *uart, uint32_t baudrate)
         GPIO->FUNC_SEL.U1TX = 1;
         GPIO->FUNC_SEL.U1RX = 1;
 
-        UART1->CONbits.TXE = 1;                         /*< enable transmit */
-        UART1->CONbits.RXE = 1;                         /*< enable receive */
-#if UART1_RX_BUFFERSIZE > 32
-        UART1->RXCONbits.LVL = 30;                      /*< interrupt when fifo is nearly full */
-        //u1_rx_head = 0;
-        //u1_rx_tail = 0;
-#elif UART1_RX_BUFFERSIZE < 32
-        UART1->CONbits.FCE = 1;                         /*< enable flowcontrol */
-        UART1->CONbits.MRXR = 1;                        /*< disable Rx interrupt */
-        UART1->CTSbits.LVL = UART1_RX_BUFFERSIZE;       /*< drop cts when tx buffer at trigger level */
-        GPIO->FUNC_SEL1.U1CTS = 1;                      /*< set GPIO 16 to UART1 CTS */
-        GPIO->FUNC_SEL1.U1RTS = 1;                      /*< set GPIO 17 to UART1 RTS */
-#else
-        UART1->CONbits.MRXR = 1;                        /*< disable rx interrupt */
-#endif
+        UART1->CONbits.TXE = 1;          /*< enable transmit */
+        UART1->CONbits.RXE = 1;          /*< enable receive */
 
-        //u1_tx_head = 0;
-        //u1_tx_tail = 0;
+        UART1->CONbits.FCE = 1;          /*< enable flowcontrol */
+        UART1->CONbits.MRXR = 1;         /*< disable Rx interrupt */
+        UART1->CTSbits.LVL = 31;         /*< drop cts when tx buffer at trigger level */
+        GPIO->FUNC_SEL.U1CTS = 1;        /*< set GPIO 16 to UART1 CTS */
+        GPIO->FUNC_SEL.U1RTS = 1;        /*< set GPIO 17 to UART1 RTS */
 
-        //enable_irq(UART1);
         ITC->INTENABLEbits.UART1 = 1;
+
     }
     else {
         /* UART2 */
@@ -144,30 +129,20 @@ void uart_init(volatile struct UART_struct *uart, uint32_t baudrate)
         GPIO->FUNC_SEL.U2TX = 1;
         GPIO->FUNC_SEL.U2RX = 1;
 
-        UART2->CONbits.TXE = 1;                         /*< enable transmit */
-        UART2->CONbits.RXE = 1;                         /*< enable receive */
-#if UART2_RX_BUFFERSIZE > 32
-        UART2->RXCONbits.LVL = 30;                      /*< interrupt when fifo is nearly full */
-        //u2_rx_head = 0;
-        //u2_rx_tail = 0;
-#elif UART2_RX_BUFFERSIZE < 32
-        UART2->CONbits.FCE = 1;                         /*< enable flowcontrol */
-        UART2->CONbits.MRXR = 1;                        /*< disable Rx interrupt */
-        UART2->CTSbits.LVL = UART2_RX_BUFFERSIZE;       /*< drop cts when tx buffer at trigger level */
-        GPIO->FUNC_SEL1.U1CTS = 1;                      /*< set GPIO 16 to UART2 CTS */
-        GPIO->FUNC_SEL1.U1RTS = 1;                      /*< set GPIO 17 to UART2 RTS */
-#else
-        UART2->CONbits.MRXR = 1;                        /*< disable rx interrupt */
-#endif
+        UART2->CONbits.TXE = 1;          /*< enable transmit */
+        UART2->CONbits.RXE = 1;          /*< enable receive */
 
-        // u2_tx_head = 0;
-        //u2_tx_tail = 0;
+        UART2->CONbits.FCE = 1;          /*< enable flowcontrol */
+        UART2->CONbits.MRXR = 1;         /*< disable Rx interrupt */
+        UART2->CTSbits.LVL = 31;         /*< drop cts when tx buffer at trigger level */
+        GPIO->FUNC_SEL.U2CTS = 1;        /*< set GPIO 20 to UART2 CTS */
+        GPIO->FUNC_SEL.U2RTS = 1;        /*< set GPIO 21 to UART2 RTS */
 
-        //enable_irq(UART2);
         ITC->INTENABLEbits.UART2 = 1;
     }
 
     uart_set_baudrate(uart, baudrate);
+
 }
 
 static inline uint32_t uart0_puts(uint8_t *astring, uint32_t length)
@@ -186,17 +161,16 @@ void stdio_flush(void)
     ITC->INTENABLEbits.UART1 = 0;
     ITC->INTENABLEbits.UART2 = 0;
 
+    while (UART1->RXCON != 0 || UART2->RXCON != 0) {
+        UART1->DATA;
+        UART2->DATA;
+    }
+    while (UART1->TXCON != 0 || UART2->TXCON != 0) {
+        /* wait */
+    }
+
     ITC->INTENABLEbits.UART1 = 1;
     ITC->INTENABLEbits.UART2 = 1;
-    /** taken from msba2-uart0.c
-    U0IER &= ~BIT1;                             // disable THRE interrupt
-    while(running) {
-        while(!(U0LSR & (BIT5|BIT6))){};        // transmit fifo
-        fifo=0;
-        push_queue();                           // dequeue to fifo
-    }
-    U0IER |= BIT1;                              // enable THRE interrupt
-    */
 }
 
 
@@ -208,5 +182,4 @@ int fw_puts(char *astring, int length)
 int bl_uart_init(void)
 {
     uart_init(UART1, BAUTRATE_UART1);
-    uart_init(UART2, BAUTRATE_UART2);
 }
