@@ -94,6 +94,11 @@ int cc2420_get_gio1(void)
     return  CC2420_GIO1;
 }
 
+int cc2420_get_fifop(void)
+{
+    return  CC2420_FIFOP;
+}
+
 int cc2420_get_sfd(void)
 {
     return CC2420_SFD;
@@ -140,9 +145,16 @@ void cc2420_init_interrupts(void)
 {
     unsigned int state = disableIRQ();  /* Disable all interrupts */
     P1SEL &= ~CC2420_FIFOP_PIN;         /* must be <> 1 to use interrupts */
+    P1SEL &= ~CC2420_GIO0_PIN;         /* must be <> 1 to use interrupts */
 
-    P1IE &= ~CC2420_FIFOP_PIN;      /* Disable interrupt for GIO0 */
-    P1IFG &= ~CC2420_FIFOP_PIN;     /* Clear IFG for GIO0 */
+    /* FIFO <-> GIO0 interrupt */
+    P1IES |= CC2420_GIO0_PIN;      /* Enables external interrupt on falling edge (for GIO0/FIFO) */
+    P1IE |= CC2420_GIO0_PIN;       /* Enable interrupt */
+    P1IFG &= ~CC2420_GIO0_PIN;     /* Clears the interrupt flag */
+
+    /* FIFOP <-> Packet interrupt */
+    P1IE |= CC2420_FIFOP_PIN;      /* Enable interrupt for FIFOP */
+    P1IFG &= ~CC2420_FIFOP_PIN;     /* Clear IFG for FIFOP */
     restoreIRQ(state);              /* Enable all interrupts */
 }
 
@@ -185,63 +197,26 @@ void cc2420_spi_init(void)
 /*
  * CC1100 receive interrupt
  */
-interrupt (PORT1_VECTOR) __attribute__ ((naked)) cc2420_isr(void){
+interrupt (PORT1_VECTOR) __attribute__ ((naked)) cc2420_isr(void)
+{
     __enter_isr();
      /* Check IFG */
     if ((P1IFG & CC2420_FIFOP_PIN) != 0) {
         P1IFG &= ~CC2420_FIFOP_PIN;
-        if (cc2420_get_gio0()) {
-            cc2420_rx_irq();
-            DEBUG("rx interrupt");
-        }
-        else {
+        cc2420_rx_irq();
+        DEBUG("rx interrupt");
+    }
+    /* GIO0 is falling => check if FIFOP is high, indicating an RXFIFO overflow */
+    else if ((P1IFG & CC2420_GIO0) != 0) {
+        P1IFG &= ~CC2420_GIO0_PIN;
+        if (cc2420_get_fifop()) {
             cc2420_rxoverflow_irq();
             DEBUG("[CC2420] rxfifo overflow");
         }
     }
-
     else {
         puts("cc2420_isr(): unexpected IFG!");
         /* Should not occur - only GDO1 and GIO1 interrupts are enabled */
     }
     __exit_isr();
-}
-    
-/**
-\brief TimerB CCR1-6 interrupt service routine (taken from OpenWSN)
-*/
-interrupt (TIMERB0_VECTOR) __attribute__ ((naked)) radiotimer_isr(void) {
-   uint16_t tbiv_local;
-   
-   /* reading TBIV returns the value of the highest pending interrupt flag */
-   /* and automatically resets that flag. We therefore copy its value to the */
-   /* tbiv_local local variable exactly once. If there is more than one  */
-   /* interrupt pending, we will reenter this function after having just left */
-   /* it. */
-   tbiv_local = TBIV;
-   
-   switch (tbiv_local) {
-      case 0x0002: /* CCR1 fires */
-        if (TBCCTL1 & CCI) {
-            /* SFD pin is high */
-            DEBUG("start of a frame\n");
-        }
-        else {
-            /* SFD pin is low */
-            DEBUG("end of a frame\n");
-         }
-         break;
-      case 0x0004: /* CCR2 fires */
-         break;
-      case 0x0006: /* CCR3 fires */
-         break;
-      case 0x0008: /* CCR4 fires */
-         break;
-      case 0x000a: /* CCR5 fires */
-         break;
-      case 0x000c: /* CCR6 fires */
-         break;
-      case 0x000e: /* timer overflow */
-         break;
-   }
 }
