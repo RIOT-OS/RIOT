@@ -155,10 +155,6 @@ char * thread_stack_init(void * task_func, void * stack_start) {
 		*stk = i;
 	}
 
-	/* foo */
-	/*stk--;
-	*stk = (unsigned int) 0xDEADBEEF;*/
-
 	/* lr means exception return code  */
 	stk--;
 	*stk = (unsigned int) 0xfffffffd; // return to taskmode main stack pointer

@@ -66,8 +66,7 @@ and the mailinglist (subscription via web site)
 #include "ff_ansi.h"
 #endif
 
-#include "stm32f4xx.h"
-#include "stm32f4xx_usart.h"
+#include "stm32f407vg-uart.h"
 
 /**
  * @name Heaps (defined in linker script)
@@ -250,10 +249,7 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 
 				char* chars = data;
 				for(int i = 0;i < count;i++) {
-				  USART_SendData(USART6, chars[i]);
-
-				  /* Loop until the end of transmission */
-				  while (USART_GetFlagStatus(USART6, USART_FLAG_TC) == RESET){}
+					uart_writec(chars[i]);
 				}
 
 				return count;

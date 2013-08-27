@@ -1,10 +1,8 @@
 MODULE =cpu
 
-INCLUDES += -I../include -I../stm32_common/STM32F4xx_StdPeriph_Driver/inc
-
-USEMODULE += stm32f4xxstdperi
+INCLUDES += -I../include
  
-DIRS =
+DIRS = uart
 ifneq (,$(findstring gpioint,$(USEMODULE)))
 	DIRS += gpioint
 endif

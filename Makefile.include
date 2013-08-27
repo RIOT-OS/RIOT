@@ -53,7 +53,11 @@ ifeq ($(BUILDOSXNATIVE),1)
 else
 	@$(LINK) $(UNDEF) -o $(PROJBINDIR)/$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(PROJBINDIR)/$(PROJECT).map $(LINKFLAGS) 
 	@$(SIZE) $(PROJBINDIR)/$(PROJECT).elf
+ifneq (,$(findstring stm32f4,$(CPU)))
+	@$(OBJCOPY) -O binary $(PROJBINDIR)/$(PROJECT).elf $(PROJBINDIR)/$(PROJECT).bin
+else
 	@$(OBJCOPY) -O ihex $(PROJBINDIR)/$(PROJECT).elf $(PROJBINDIR)/$(PROJECT).hex
+endif
 endif
 
 ## your make rules
@@ -68,7 +72,7 @@ SRC = $(wildcard *.c)
 OBJ = $(SRC:%.c=${PROJBINDIR}/%.o)
 
 ${PROJBINDIR}/$(PROJECT).a:  $(OBJ)
-	$(AR) -rc bin/$(PROJECT).a $(OBJ)
+	@$(AR) -rc bin/$(PROJECT).a $(OBJ)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)

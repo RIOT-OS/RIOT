@@ -12,11 +12,15 @@ ifeq ($(CPU),mc1322x)
   export INCLUDES += -I$(RIOTBASE)/cpu/arm_common/include
 endif
 ifeq ($(CPU),stm32f407vg)
-  USEMODULE += stm32f4xxstdperi
+  USEMODULE += Stm32f4StdPeriphDriver
+  USEMODULE += uart
+  USEMODULE += lib
   export UNDEF += $(BINDIR)syscalls.o
 endif
 ifeq ($(CPU),stm32f415rg)
-  USEMODULE += stm32f4xxstdperi
+  USEMODULE += Stm32f4StdPeriphDriver
+  USEMODULE += uart
+  USEMODULE += lib
   export UNDEF += $(BINDIR)syscalls.o
 endif
 ifeq ($(CPU),native)
