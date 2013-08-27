@@ -21,3 +21,16 @@ ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
 		USEMODULE += hwtimer
 	endif
 endif
+
+ifneq (,$(findstring cc2420,$(USEMODULE)))
+	ifeq (,$(findstring transceiver,$(USEMODULE)))
+		USEMODULE += transceiver
+		USEMODULE += ieee802154
+	endif
+endif
+
+ifneq (,$(findstring sixlowpan,$(USEMODULE)))
+	ifeq (,$(findstring ieee802154,$(USEMODULE)))
+		USEMODULE += ieee802154
+	endif
+endif

@@ -27,7 +27,7 @@
 #include <board_uart0.h>
 
 #include "bordermultiplex.h"
-#include "ieee802154_frame.h"
+#include "ieee802154/ieee802154_frame.h"
 #include "flowcontrol.h"
 #include "sixlowborder.h"
 #include "sixlowip.h"
