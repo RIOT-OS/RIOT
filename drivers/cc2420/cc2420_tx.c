@@ -16,13 +16,16 @@
 
 #include <irq.h>
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 static void cc2420_gen_pkt(uint8_t *buf, cc2420_packet_t *packet);
 
 static uint8_t sequenz_nr;
 
 int16_t cc2420_send(cc2420_packet_t *packet)
 {
-    volatile uint32_t abort_count;
+    volatile uint32_t abort_count = 0;
 
     /* Set missing frame information */
     packet->frame.fcf.frame_ver = 0;
@@ -80,11 +83,12 @@ int16_t cc2420_send(cc2420_packet_t *packet)
                // Abort waiting. CC2420 maybe in wrong mode
                // e.g. sending preambles for always
                puts("[CC2420 TX] fatal error\n");
+               /* TODO: error handling */
                packet->length = 0;
                break;
          }
     }
-    printf("SEQ: %u\n", packet->frame.seq_nr);
+    DEBUG("SEQ: %u\n", packet->frame.seq_nr);
     restoreIRQ(cpsr);
 
     /* wait for packet to be send */
