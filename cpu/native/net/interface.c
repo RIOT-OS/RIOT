@@ -54,6 +54,7 @@ radio_address_t _native_net_addr;
 void nativenet_init(int transceiver_pid)
 {
     DEBUG("nativenet_init(transceiver_pid=%d)", transceiver_pid);
+    rx_buffer_next = 0;
     _native_net_pan = 0;
     _native_net_chan = 0;
     _native_net_monitor = 0;
