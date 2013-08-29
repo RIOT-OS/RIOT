@@ -40,6 +40,7 @@ struct nativenet_header {
     radio_address_t dst;
     radio_address_t src;
 } __attribute__((packed));
+#define TAP_MAX_DATA ((ETHERMTU) - 6) /* XXX: this is suboptimal */
 
 struct nativenet_packet {
     struct nativenet_header nn_header;

@@ -30,10 +30,10 @@
 #define TRANSCEIVER_BUFFER_SIZE (3)
 
 #ifndef NATIVE_MAX_DATA_LENGTH
-/* TODO: set this properly: */
-#define NATIVE_MAX_DATA_LENGTH (ETHER_MAX_LEN - (ETHER_HDR_LEN+2))
+#include "tap.h"
+#define NATIVE_MAX_DATA_LENGTH (TAP_MAX_DATA)
 #else
-#warning be careful not to exceed (ETHER_MAX_LEN) with NATIVE_MAX_DATA_LENGTH
+#warning be careful not to exceed (TAP_MAX_DATA) with NATIVE_MAX_DATA_LENGTH
 #endif /* NATIVE_MAX_DATA_LENGTH */
 
 /**
