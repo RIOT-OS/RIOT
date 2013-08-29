@@ -24,11 +24,13 @@ if [ "${COMMAND}" = 'create' ]; then
         COUNT="${DEFCOUNT}"
     fi
 
+    echo "creating ${BRNAME} ..."
     sudo brctl addbr ${BRNAME} || exit 1
     sudo -s sh -c "echo 1  > /proc/sys/net/ipv6/conf/${BRNAME}/disable_ipv6" || exit 1
     sudo ip link set ${BRNAME} up || exit 1
 
     for N in $(seq 0 "$((COUNT - 1))"); do
+        echo "creating tap${N} ..."
         sudo ip tuntap add dev tap${N} mode tap user ${USER} || exit 1
         sudo -s sh -c "echo 1 > /proc/sys/net/ipv6/conf/tap${N}/disable_ipv6" || exit 1
         sudo brctl addif ${BRNAME} tap${N} || exit 1
@@ -37,8 +39,10 @@ if [ "${COMMAND}" = 'create' ]; then
 
 elif [ "${COMMAND}" = 'delete' ]; then
     for IF in $(ls /sys/class/net/${BRNAME}/brif); do
+        echo "deleting ${IF} ..."
         sudo ip link delete "${IF}"
     done
+    echo "deleting ${BRNAME} ..."
     sudo ip link set ${BRNAME} down
     sudo brctl delbr ${BRNAME}
 
