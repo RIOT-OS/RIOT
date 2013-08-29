@@ -532,7 +532,7 @@ void receive_nativenet_packet(radio_packet_t *trans_p) {
     memcpy((void*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p->data, p->length);
     trans_p->data =  (uint8_t*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]);
 
-    DEBUG("Packet %p was from %hu to %hu, size: %u\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
+    DEBUG("Packet %p was from %"PRIu16" to %"PRIu16", size: %"PRIu8"\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
 
     /* reset interrupts */
     restoreIRQ(state);
