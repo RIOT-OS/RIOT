@@ -1,3 +1,18 @@
+/**
+ * tap.h implementation
+ *
+ * Copyright (C) 2013 Ludwig Ortmann
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup native_cpu
+ * @{
+ * @file
+ * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,6 +22,7 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <arpa/inet.h>
+#include <inttypes.h>
 
 #ifdef __MACH__
 #define _POSIX_C_SOURCE
@@ -38,8 +54,7 @@ unsigned char _native_tap_mac[ETHER_ADDR_LEN];
 void _native_handle_tap_input(void)
 {
     int nread;
-    unsigned char buf[TAP_BUFFER_LENGTH];
-    union eth_frame *f;
+    union eth_frame frame;
     radio_packet_t p;
 
     DEBUG("_native_handle_tap_input\n");
@@ -48,22 +63,22 @@ void _native_handle_tap_input(void)
        TODO: refactor this into general io-signal multiplexer */
 
     _native_in_syscall = 1;
-    nread = read(_native_tap_fd, buf, TAP_BUFFER_LENGTH);
+    nread = read(_native_tap_fd, &frame, sizeof(union eth_frame));
     _native_in_syscall = 0;
     DEBUG("_native_handle_tap_input - read %d bytes\n", nread);
     if (nread > 0) {
-        f = (union eth_frame*)&buf;
-        if (ntohs(f->field.header.ether_type) == NATIVE_ETH_PROTO) {
+        if (ntohs(frame.field.header.ether_type) == NATIVE_ETH_PROTO) {
             nread = nread - ETHER_HDR_LEN;
             if ((nread - 1) <= 0) {
                 DEBUG("_native_handle_tap_input: no payload");
             }
             else {
                 /* XXX: check overflow */
-                p.length = (uint8_t)buf[ETHER_HDR_LEN];
-                p.dst = (uint8_t)buf[ETHER_HDR_LEN+1];
-                p.data = buf+ETHER_HDR_LEN+2;
-                DEBUG("_native_handle_tap_input: received packet of length %u for %u: %s\n", p.length, p.dst, (char*) p.data);
+                p.length = ntohs(frame.field.payload.nn_header.length);
+                p.dst = ntohs(frame.field.payload.nn_header.dst);
+                p.src = ntohs(frame.field.payload.nn_header.src);
+                p.data = frame.field.payload.data;
+                DEBUG("_native_handle_tap_input: received packet of length %"PRIu16" for %"PRIu16" from %"PRIu16": %s\n", p.length, p.dst, p.src, (char*) p.data);
                 _nativenet_handle_packet(&p);
             }
         }
@@ -93,10 +108,12 @@ int _native_marshall_ethernet(uint8_t *framebuf, radio_packet_t *packet)
     f->field.header.ether_type = htons(NATIVE_ETH_PROTO);
 
     /* XXX: check overflow */
-    memcpy(f->field.data+2, packet->data, packet->length);
-    f->field.data[0] = packet->length;
-    f->field.data[1] = packet->dst;
-    data_len = packet->length + 2;
+    memcpy(f->field.payload.data, packet->data, packet->length);
+    f->field.payload.nn_header.length = htons(packet->length);
+    f->field.payload.nn_header.dst = htons(packet->dst);
+    f->field.payload.nn_header.src = htons(packet->src);
+
+    data_len = packet->length + sizeof(struct nativenet_header);
 
     return data_len;
 }
@@ -106,12 +123,12 @@ int send_buf(radio_packet_t *packet)
     uint8_t buf[TAP_BUFFER_LENGTH];
     int nsent, to_send;
 
-    DEBUG("send_buf:  Sending packet of length %u to %u: %s\n", packet->length, packet->dst, (char*) packet->data);
+    DEBUG("send_buf:  Sending packet of length %"PRIu16" from %"PRIu16" to %"PRIu16": %s\n", packet->length, packet->src, packet->dst, (char*) packet->data);
     to_send = _native_marshall_ethernet(buf, packet);
 
     if ((ETHER_HDR_LEN + to_send) < ETHERMIN) {
         DEBUG("padding data! (%d ->", to_send);
-        to_send = ETHERMIN - ETHER_HDR_LEN;
+        to_send = ETHERMIN - (ETHER_HDR_LEN + sizeof(struct nativenet_header));
         DEBUG("%d)\n", to_send);
     }
 
@@ -201,3 +218,4 @@ int tap_init(char *name)
     puts("RIOT native tap initialized.");
     return _native_tap_fd;
 }
+/** @} */

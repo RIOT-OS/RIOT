@@ -1,9 +1,26 @@
+/**
+ * nativenet.h implementation
+ *
+ * Copyright (C) 2013 Ludwig Ortmann
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup native_cpu
+ * @ingroup net
+ * @{
+ * @file
+ * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ */
+
 #include <stdio.h>
 #include <err.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include <arpa/inet.h>
 
@@ -76,25 +93,27 @@ uint16_t nativenet_get_pan()
     return _native_net_pan;
 }
 
-int16_t nativenet_set_address(radio_address_t address)
+radio_address_t nativenet_set_address(radio_address_t address)
 {
     _native_net_addr = address;
     return _native_net_addr;
 }
 
-int16_t nativenet_get_address()
+radio_address_t nativenet_get_address()
 {
     return _native_net_addr;
 }
 
 uint8_t nativenet_send(radio_packet_t *packet)
 {
-    DEBUG("nativenet_send:  Sending packet of length %u to %u: %s\n", packet->length, packet->dst, (char*) packet->data);
+    packet->src = _native_net_addr;
+    DEBUG("nativenet_send:  Sending packet of length %"PRIu16" from %"PRIu16" to %"PRIu16": %s\n", packet->length, packet->src, packet->dst, (char*) packet->data);
 
     if (send_buf(packet) == -1) {
         warnx("nativenet_send: error sending packet");
+        return 0;
     }
-    return 0;
+    return true;
 }
 
 void nativenet_switch_to_rx()
@@ -142,7 +161,7 @@ void do_cb(int event)
 
 void _nativenet_handle_packet(radio_packet_t *packet)
 { 
-    uint8_t dst_addr = packet->dst;
+    radio_address_t dst_addr = packet->dst;
 
     /* address filter / monitor mode */
     if (_native_net_monitor == 1) {
@@ -182,5 +201,5 @@ void _nativenet_handle_packet(radio_packet_t *packet)
     if (++rx_buffer_next == RX_BUF_SIZE) {
         rx_buffer_next = 0;
     }
-    
 }
+/** @} */
