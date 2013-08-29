@@ -1,3 +1,18 @@
+/**
+ * internal nativenet tap network layer interface
+ *
+ * Copyright (C) 2013 Ludwig Ortmann
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @{
+ * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @}
+ */
 #ifndef _TAP_H
 #define _TAP_H
 
@@ -11,6 +26,8 @@
  * if "name" is an empty string, the kernel chooses a name
  * if "name" is an existing device, that device is used
  * otherwise a device named "name" is created
+ *
+ * On OSX a name has to be provided.
  */
 int tap_init(char *name);
 int send_buf(radio_packet_t *packet);

@@ -1,3 +1,19 @@
+/**
+ * nativenet.h implementation
+ *
+ * Copyright (C) 2013 Ludwig Ortmann
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup native_cpu
+ * @ingroup net
+ * @{
+ * @file
+ * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ */
+
 #include <stdio.h>
 #include <err.h>
 #include <stdint.h>
@@ -186,3 +202,4 @@ void _nativenet_handle_packet(radio_packet_t *packet)
         rx_buffer_next = 0;
     }
 }
+/** @} */
