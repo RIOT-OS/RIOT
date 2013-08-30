@@ -19,7 +19,8 @@
 
 extern void heap_stats(void);
 
-void _heap_handler(char* unnused){
+void _heap_handler(char* unused){
+    (void) unused;
     heap_stats();
 }
 
