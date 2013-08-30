@@ -26,12 +26,10 @@
 
 #define TEXT_SIZE           (255) /* XXX: this aint enough for everybody */
 
-char text_msg[TEXT_SIZE];
-msg_t mesg;
-transceiver_command_t tcmd;
-
 void _nativenet_get_set_address_handler(char *addr)
 {
+    msg_t mesg;
+    transceiver_command_t tcmd;
     uint16_t a;
 
     tcmd.transceivers = TRANSCEIVER_NATIVE;
@@ -53,6 +51,8 @@ void _nativenet_get_set_address_handler(char *addr)
 
 void _nativenet_get_set_channel_handler(char *chan)
 {
+    msg_t mesg;
+    transceiver_command_t tcmd;
     uint8_t c;
 
     tcmd.transceivers = TRANSCEIVER_NATIVE;
@@ -74,6 +74,10 @@ void _nativenet_get_set_channel_handler(char *chan)
 
 void _nativenet_send_handler(char *pkt)
 {
+    msg_t mesg;
+    transceiver_command_t tcmd;
+    char text_msg[TEXT_SIZE];
+
     radio_packet_t p;
     uint32_t response;
     uint16_t addr;
@@ -109,6 +113,8 @@ void _nativenet_send_handler(char *pkt)
 
 void _nativenet_monitor_handler(char *mode)
 {
+    msg_t mesg;
+    transceiver_command_t tcmd;
     uint8_t m;
 
     tcmd.transceivers = TRANSCEIVER_NATIVE;
