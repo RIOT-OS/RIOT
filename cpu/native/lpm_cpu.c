@@ -44,18 +44,17 @@ void lpm_init(void)
 void _native_lpm_sleep()
 {
 #ifdef MODULE_UART0
-    int retval, nfds;
+    int nfds;
 
     /* set fds */
-    nfds = 0;
     FD_ZERO(&_native_rfds);
     nfds = _native_set_uart_fds();
     nfds++;
 
-    retval = select(nfds, &_native_rfds, NULL, NULL, NULL);
-    DEBUG("_native_lpm_sleep: retval: %i\n", retval);
+    nfds = select(nfds, &_native_rfds, NULL, NULL, NULL);
+    DEBUG("_native_lpm_sleep: returned: %i\n", nfds);
 
-    if (retval != -1) {
+    if (nfds != -1) {
         /* uart ready, handle input */
         /* TODO: switch to ISR context */
         _native_handle_uart0_input();
