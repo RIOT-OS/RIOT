@@ -39,6 +39,7 @@
 #define SRF02_FAKE_RANGING_MODE_CM          0x57
 #define SRF02_FAKE_RANGING_MODE_MICRO_SEC   0x58
 
+
 /* Define the used I2C Interface */
 //#define SRF02_I2C_INTERFACE I2C0     // P0.27 SDA0, P0.28 SCL0
 //#define SRF02_I2C_INTERFACE I2C1_0   // P0.0  SDA1, P0.1  SCL1
@@ -60,6 +61,7 @@
  * @return true if the SRF02 is successfully initialized, otherwise false.
  */
 bool srf02_init(uint8_t i2c_interface, uint32_t baud_rate);
+
 
 
 /**
