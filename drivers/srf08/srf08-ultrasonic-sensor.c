@@ -155,15 +155,6 @@ void srf08_start_ranging(void)
     uint8_t i;
     uint8_t echo_number;
     puts("Ultrasonic SRF08 engine is started");
-    bool status = false;
-    uint8_t reg_size = 1;
-    uint8_t range_high_byte = 0;
-    uint8_t range_low_byte = 0;
-    uint32_t distance = 0;
-    uint8_t rx_buff[reg_size];
-    uint8_t tx_buff[reg_size];
-    tx_buff[0] = SRF08_REAL_RANGING_MODE_CM;
-    uint8_t register_location;
 
     //wait due to calibration
     hwtimer_wait(HWTIMER_TICKS(700000));
