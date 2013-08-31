@@ -73,7 +73,7 @@ ${PROJBINDIR}/$(PROJECT).a:  $(OBJ)
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
 
-${PROJBINDIR}/%.o: %.c
+${PROJBINDIR}/%.o: %.c $(PROJDEPS)
 	@echo; echo "Compiling.... $*.c"; echo
 	@test -d $(PROJBINDIR) || mkdir -p $(PROJBINDIR)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o bin/$*.o
