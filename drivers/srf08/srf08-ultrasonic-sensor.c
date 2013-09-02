@@ -90,6 +90,7 @@ int32_t srf08_get_distances(uint32_t *range_array, uint8_t ranging_mode)
     uint8_t tx_buff[reg_size];
     uint8_t register_location;
     uint8_t echo_number = 0;
+	uint8_t echo_number = 0;
 
     tx_buff[0] = ranging_mode;
     status = i2c_write(SRF08_I2C_INTERFACE, SRF08_DEFAULT_ADDR,
@@ -109,6 +110,7 @@ int32_t srf08_get_distances(uint32_t *range_array, uint8_t ranging_mode)
         //read the high echo byte
         status = i2c_read(SRF08_I2C_INTERFACE, SRF08_DEFAULT_ADDR,
                           register_location, rx_buff, reg_size);
+              echo_number++;
 
         if (!status) {
             puts("Read the the high echo byte from the i2c-interface is \
