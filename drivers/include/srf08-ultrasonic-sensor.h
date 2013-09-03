@@ -18,7 +18,7 @@
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3857 $
  *
- * @note        $Id: srf08-ultrasonic-sensor.h 3854 2013-09-03 14:06:23 kasmi $
+ * @note        $Id: srf08-ultrasonic-sensor.h 3854 2013-09-03 16:26:13 kasmi $
  *
  */
 
@@ -62,15 +62,20 @@ bool srf08_init(uint8_t i2c_interface, uint32_t baud_rate);
  *              range-finder.
  *              The ranging results are given over the RS232-Interface.
  *
+ * @param[in] ranging_mode  there are three real ranging modes, which return 
+ *                          the result in inches, centimeters or microseconds. 
+ *                          Another set of three fake ranging modes do the same
+ *                          but without transmitting the burst.
+ *
  */
-void srf08_start_ranging(void);
+void srf08_start_ranging(uint8_t ranging_mode);
 
 
 /**
  * @brief       Set the maximum range of the SRF08.
  *
- * @param[in] max_range the adjusted maximal range is:
- *            max_range = (max_rangex43mm) + 43mm.
+ * @param[in] max_range  the adjusted maximal range is:
+ *                       max_range = (max_rangex43mm) + 43mm.
  *
  */
 void srf08_set_range(uint8_t max_range);
@@ -104,11 +109,11 @@ uint8_t srf08_get_gain(void);
 
 
 /**
- * @brief       Get all distances measured from the SRF08 ultrasonic
- *              sensor. The results of a ranging can be returned in inches,
- *              centimeters or microseconds. The SRF08 can detect up to
- *              targets. This function prints the distance values over
-  *             the rs232 interface
+ * @brief       Get all distances measured from the SRF08 ultrasonic sensor. 
+ *              The results of a ranging can be returned in inches, centimeters 
+ *              or microseconds. The SRF08 can detect up to targets. 
+ *              This function prints the distance values over the rs232 
+ *              interface
  *
  * @param[in] range_array   a pointer to a buffer holding the ranging results.
  * @param[in] ranging_mode  there are three real ranging modes, which return
