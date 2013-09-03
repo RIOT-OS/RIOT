@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2013 Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  *
- * This source code is licensed under the  LGPLv2 license,
+ * This source code is licensed under the LGPLv2 license,
  * See the file LICENSE for more details.
  */
 
@@ -17,7 +17,7 @@
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3854 $
  *
- * @note        $Id: srf08-ultrasonic-sensor.c 3857 2013-09-02 16:45:49 kasmi $
+ * @note        $Id: srf08-ultrasonic-sensor.c 3857 2013-09-03 17:55:49 kasmi $
  *
  */
 
@@ -151,7 +151,7 @@ int32_t srf08_get_distances(uint32_t *range_array, uint8_t ranging_mode)
     return echo_number;
 }
 
-void srf08_start_ranging(void)
+void srf08_start_ranging(uint8_t ranging_mode)
 {
     uint32_t range_array[SRF08_MAX_ECHO_NUMBER];
     uint8_t i;
@@ -165,7 +165,7 @@ void srf08_start_ranging(void)
 
     while (1) {
         puts("--------------------------------------------");
-        echo_number = srf08_get_distances(range_array, SRF08_REAL_RANGING_MODE_CM);
+        echo_number = srf08_get_distances(range_array, ranging_mode);
 
         if (echo_number > 0) {
             for (i = 0; i < echo_number; i++) {
