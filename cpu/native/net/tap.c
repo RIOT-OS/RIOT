@@ -77,6 +77,8 @@ void _native_handle_tap_input(void)
                 p.length = ntohs(frame.field.payload.nn_header.length);
                 p.dst = ntohs(frame.field.payload.nn_header.dst);
                 p.src = ntohs(frame.field.payload.nn_header.src);
+                p.rssi = 0;
+                p.lqi = 0;
                 p.data = frame.field.payload.data;
                 DEBUG("_native_handle_tap_input: received packet of length %"PRIu16" for %"PRIu16" from %"PRIu16": %s\n", p.length, p.dst, p.src, (char*) p.data);
                 _nativenet_handle_packet(&p);
