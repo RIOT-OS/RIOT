@@ -185,7 +185,7 @@ void _nativenet_handle_packet(radio_packet_t *packet)
     /* copy packet to rx buffer */
     memcpy(&_nativenet_rx_buffer[rx_buffer_next].data, packet->data, packet->length);
     memcpy(&_nativenet_rx_buffer[rx_buffer_next].packet, packet, sizeof(radio_packet_t));
-    _nativenet_rx_buffer[rx_buffer_next].packet.data = &_nativenet_rx_buffer[rx_buffer_next].data;
+    _nativenet_rx_buffer[rx_buffer_next].packet.data = (uint8_t *) &_nativenet_rx_buffer[rx_buffer_next].data;
 
     /* notify transceiver thread if any */
     if (_native_net_tpid) {
