@@ -15,9 +15,9 @@
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
- * @version     $Revision: 3854 $
+ * @version     $Revision: 3855 $
  *
- * @note        $Id: srf08-ultrasonic-sensor.c 3857 2013-09-03 17:55:49 kasmi $
+ * @note        $Id: srf08-ultrasonic-sensor.c 3857 2013-09-04 14:10:23 kasmi $
  *
  */
 
@@ -32,10 +32,8 @@ bool srf08_init(uint8_t i2c_interface, uint32_t baud_rate)
 {
     if (i2c_initialize(i2c_interface, (uint32_t) I2CMASTER, 0, baud_rate, NULL)
         == false) { /* initialize I2C */
-        puts("fatal error!happened in i2cInitialize() \n");
-
-        while (1)
-            ; /* Fatal error */
+        puts("fatal error happened in i2c_initialize()\n");
+        return false;
     }
     else {
         i2c_enable_pull_up_resistor(i2c_interface);
