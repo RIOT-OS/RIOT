@@ -20,7 +20,7 @@
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3855 $
  *
- * @note        $Id: lm75a-temp-sensor.c 3854 2013-09-04 13:56:37 kasmi $
+ * @note        $Id: lm75a-temp-sensor.c 3855 2013-09-05 13:53:49 kasmi $
  */
 
 #include <stdlib.h>
@@ -69,7 +69,6 @@ static uint16_t to_uint16(uint8_t *buff)
 //Read: Sensor --> MC
 volatile static float_t to_float(uint8_t reg_addr, uint16_t reg_value)
 {
-
     uint16_t sign = reg_value & LM75A_SIGN_BIT_MASK;
     float_t f_temp = 0.0;
     float_t factor = 0.0;
@@ -90,9 +89,7 @@ volatile static float_t to_float(uint8_t reg_addr, uint16_t reg_value)
     }
     else {   //the number is positive
         f_temp = reg_value * factor;
-
     }
-
     return f_temp;
 }
 
@@ -137,12 +134,9 @@ static uint16_t lm75A_get_register_value(uint8_t i2c_interface,
     uint8_t rx_buff[reg_size];
 
     i2c_clear_buffer(rx_buff, reg_size);
-
     if ((reg_size > 0) && (reg_size < 3)) {
-
         status = i2c_read(i2c_interface, LM75A_ADDR, reg_addr, rx_buff,
                           reg_size);
-
         if (!status) { //Slave is not ready
             puts(
                 "[lm75a_tempSensorI2C/lm75A_getConfigReg]: Slave is not\
@@ -209,7 +203,6 @@ void lm75A_reset(void)
     lm75A_set_hysteresis_temperature(LM75A_DEFAULT_THYST);
     set_register(LM75A_I2C_INTERFACE, LM75A_CONFIG_REG,
                  LM75A_DEFAULT_CONFIG_VALUE);
-
 }
 
 void lm75A_set_operation_mode(uint8_t op_mode)
@@ -236,7 +229,6 @@ void lm75A_set_operation_mode(uint8_t op_mode)
         default:
             config_reg &= ~(1 << LM75A_BIT0);
     }
-
     set_register(LM75A_I2C_INTERFACE, LM75A_CONFIG_REG, config_reg);
 }
 
@@ -254,7 +246,6 @@ bool lm75A_init(uint8_t i2c_interface, uint32_t baud_rate,
         puts("fatal error happened in i2c_initialize()\n");
         return false;
     }
-
     //i2c_enable_pull_up_resistor(i2c_interface);
     i2c_disable_pull_up_resistor(i2c_interface);
 
@@ -321,11 +312,9 @@ void lm75A_start_sensor_sampling(void (*handler)(void))
             handler();
             my_alarm = false;
         }
-
         hwtimer_wait(HWTIMER_TICKS(100000));
         LED_RED_TOGGLE;
         hwtimer_wait(HWTIMER_TICKS(100000));
     }
 }
-
 

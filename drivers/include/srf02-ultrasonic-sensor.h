@@ -92,6 +92,6 @@ uint32_t srf02_get_distance(uint8_t ranging_mode);
  *                          but without transmitting the burst.
  *
  */
-void srf02_start_ranging(void);
+void srf02_start_ranging(uint16_t ranging_mode);
 
 #endif /* SRF02_ULTRASONIC_SENSOR_I2C_H_ */
