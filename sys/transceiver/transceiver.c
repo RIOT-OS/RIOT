@@ -144,7 +144,7 @@ void transceiver_init(transceiver_type_t t)
     }
 
     /* Initializing transceiver buffer and data buffer */
-    memset(transceiver_buffer, 0, TRANSCEIVER_BUFFER_SIZE);
+    memset(transceiver_buffer, 0, TRANSCEIVER_BUFFER_SIZE * sizeof(radio_packet_t));
     memset(data_buffer, 0, TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE);
 
     for (i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
@@ -529,7 +529,7 @@ void receive_nativenet_packet(radio_packet_t *trans_p) {
     DEBUG("Handling nativenet packet\n");
 
     memcpy(trans_p, p, sizeof(radio_packet_t));
-    memcpy((void*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p->data, p->length);
+    memcpy(&(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p->data, p->length);
     trans_p->data =  (uint8_t*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]);
 
     DEBUG("Packet %p was from %"PRIu16" to %"PRIu16", size: %"PRIu8"\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
