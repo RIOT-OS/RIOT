@@ -18,7 +18,7 @@
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3855 $
  *
- * @note        $Id: srf02-ultrasonic-sensor.c 3857 2013-09-04 14:05:41 kasmi $
+ * @note        $Id: srf02-ultrasonic-sensor.c 3857 2013-09-04 17:25:41 kasmi $
  *
  */
 
@@ -59,39 +59,39 @@ uint32_t srf02_get_distance(uint8_t ranging_mode)
 
     tx_buff[0] = ranging_mode;
     status = i2c_write(SRF02_I2C_INTERFACE, SRF02_DEFAULT_ADDR,
-	                           SRF02_COMMAND_REG, tx_buff, reg_size);
+                       SRF02_COMMAND_REG, tx_buff, reg_size);
 
-	        if (!status) {
-	            puts("Write the ranging command to the i2c-interface is failed");
-	            distance = UINT32_MAX;
-	            return distance;
-	        }
+    if (!status) {
+        puts("Write the ranging command to the i2c-interface is failed");
+        distance = UINT32_MAX;
+        return distance;
+    }
 
-	        hwtimer_wait(HWTIMER_TICKS(65000));
-	        status = i2c_read(SRF02_I2C_INTERFACE, SRF02_DEFAULT_ADDR,
-	                          SRF02_RANGE_HIGH_BYTE, rx_buff, reg_size);
-	        if (!status) {
-	            puts("Read the distance from the i2c-interface is failed");
-	            distance = UINT32_MAX;
-	            return distance;
-	        }
-	        range_high_byte = rx_buff[0];
+    hwtimer_wait(HWTIMER_TICKS(65000));
+    status = i2c_read(SRF02_I2C_INTERFACE, SRF02_DEFAULT_ADDR,
+		      SRF02_RANGE_HIGH_BYTE, rx_buff, reg_size);
 
-	        status = i2c_read(SRF02_I2C_INTERFACE, SRF02_DEFAULT_ADDR,
-	                          SRF02_RANGE_LOW_BYTE, rx_buff, reg_size);
-	        range_low_byte = rx_buff[0];
+    if (!status) {
+        puts("Read the distance from the i2c-interface is failed");
+        distance = UINT32_MAX;
+        return distance;
+    }
+    range_high_byte = rx_buff[0];
 
-	        distance = (range_high_byte << 8) | range_low_byte;
-	        //printf("%u | %u\n", range_high_byte, range_low_byte);
-	        return distance;
+    status = i2c_read(SRF02_I2C_INTERFACE, SRF02_DEFAULT_ADDR,
+		      SRF02_RANGE_LOW_BYTE, rx_buff, reg_size);
+    range_low_byte = rx_buff[0];
+
+    distance = (range_high_byte << 8) | range_low_byte;
+    //printf("%u | %u\n", range_high_byte, range_low_byte);
+    return distance;
 }
 
 void srf02_start_ranging(uint16_t ranging_mode)
 {
-   uint32_t distance = 0;
+    uint32_t distance = 0;
 
     while (1) {
-
         distance = srf02_get_distance(ranging_mode);
 
         if (distance != UINT32_MAX) {
@@ -118,7 +118,6 @@ void srf02_start_ranging(uint16_t ranging_mode)
                 default:
                     printf("distance = %lu cm\n", distance);
             }
-
             hwtimer_wait(HWTIMER_TICKS(50000));
         }
         else {
