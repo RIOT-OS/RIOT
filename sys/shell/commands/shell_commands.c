@@ -15,15 +15,15 @@
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @author  Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  *
- * @note    $Id: shell_commands.c 3855 2013-09-05 12:27:47 kasmi $
+ * @note    $Id: shell_commands.c 3855 2013-09-05 12:54:57 kasmi $
  * @}
  */
 
 #include <shell_commands.h>
 #include <stdlib.h>
 
-extern void _id_handler(char* id);
-extern void _heap_handler(char* unused);
+extern void _id_handler(char *id);
+extern void _heap_handler(char *unused);
 
 #ifdef MODULE_PS
 extern void _ps_handler(char *unused);
