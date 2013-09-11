@@ -157,6 +157,11 @@ int msg_reply(msg_t *m, msg_t *reply)
 
     tcb_t *target = (tcb_t*) sched_threads[m->sender_pid];
 
+    if (!target) {
+        DEBUG("msg_reply(): target \"%" PRIu16 "\" not existing...dropping msg!\n", m->sender_pid);
+        return -1;
+    }
+
     if (target->status != STATUS_REPLY_BLOCKED) {
         DEBUG("%s: msg_reply(): target \"%s\" not waiting for reply.", active_thread->name, target->name);
         restoreIRQ(state);
