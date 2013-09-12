@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <math.h>
-#include "oneway_malloc.h"
+#include "malloc.h"
 #include "hashtable.h"
 #include "hashtable_private.h"
 

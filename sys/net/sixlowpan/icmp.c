@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "malloc.h"
 #include "vtimer.h"
 #include "mutex.h"
 #include "sixlowpan/error.h"
