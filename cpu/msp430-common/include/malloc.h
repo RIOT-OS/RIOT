@@ -4,6 +4,7 @@
 #include "oneway_malloc.h"
 
 #define malloc _malloc
+#define calloc _calloc
 #define realloc _realloc
 #define free _free
 
