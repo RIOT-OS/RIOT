@@ -129,8 +129,8 @@ int send_buf(radio_packet_t *packet)
     to_send = _native_marshall_ethernet(buf, packet);
 
     if ((ETHER_HDR_LEN + to_send) < ETHERMIN) {
-        DEBUG("padding data! (%d ->", to_send);
-        to_send = ETHERMIN - (ETHER_HDR_LEN + sizeof(struct nativenet_header));
+        DEBUG("padding data! (%d -> ", to_send);
+        to_send = ETHERMIN;
         DEBUG("%d)\n", to_send);
     }
 
