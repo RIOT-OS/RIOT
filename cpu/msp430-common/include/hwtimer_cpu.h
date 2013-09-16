@@ -36,7 +36,7 @@ License. See the file LICENSE in the top level directory for more details.
 #define ARCH_MAXTIMERS 0
 #endif
 
-#define HWTIMER_SPEED 32768
+#define HWTIMER_SPEED  (F_RC_OSCILLATOR)
 #define HWTIMER_MAXTICKS (0xFFFFFFFF)
 
 #endif // __HWTIMER_CPU_H
