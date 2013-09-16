@@ -25,6 +25,7 @@
 #include "udp.h"
 #include "in.h"
 #include "ipv6.h"
+#include "cpu.h"
 
 /*
  * POSIX compatibility
