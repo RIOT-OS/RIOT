@@ -80,6 +80,8 @@ msg_t msg_buffer[TRANSCEIVER_MSG_BUFFER_SIZE];
 
 uint32_t response; ///< response bytes for messages to upper layer threads
 
+int transceiver_pid = -1; ///< the transceiver thread's pid
+
 static volatile uint8_t rx_buffer_pos = 0;
 static volatile uint8_t transceiver_buffer_pos = 0;
 
