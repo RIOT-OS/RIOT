@@ -10,12 +10,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <hwtimer.h>
-#include <vtimer.h>
-#include <thread.h>
-#include <transceiver.h>
+#include "mutex.h"
+#include "hwtimer.h"
+#include "vtimer.h"
+#include "thread.h"
+#include "transceiver.h"
 
-#include "sixlowpan.h"
+#include "sixlowpan/ip.h"
 #include "ieee802154_frame.h"
 
 //prototytpes
@@ -183,7 +184,7 @@ void etx_beacon(void)
         }
 
         packet->length = p_length;
-        send_ieee802154_frame(&empty_addr, &etx_send_buf[0],
+        sixlowpan_mac_send_ieee802154_frame(&empty_addr, &etx_send_buf[0],
                               ETX_DATA_MAXLEN + ETX_PKT_HDR_LEN, 1);
         DEBUG("sent beacon!\n");
         etx_set_packets_received();
