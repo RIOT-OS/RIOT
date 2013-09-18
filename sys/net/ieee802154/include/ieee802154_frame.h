@@ -61,7 +61,6 @@ typedef struct __attribute__((packed)) {
 
 uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf);
 uint8_t get_802154_hdr_len(ieee802154_frame_t *frame);
-uint8_t get_802154_pkt_len(void);
 uint8_t read_802154_frame(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len);
 void print_802154_fcf_frame(ieee802154_frame_t *frame);
 
