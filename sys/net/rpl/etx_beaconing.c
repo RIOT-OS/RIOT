@@ -391,7 +391,7 @@ void etx_radio(void)
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t *) m.content.ptr;
 
-            read_802154_frame(p->data, &frame, p->length);
+            ieee802154_frame_read(p->data, &frame, p->length);
 
             if (frame.payload[0] == ETX_PKT_OPTVAL) {
                 //copy to receive buffer

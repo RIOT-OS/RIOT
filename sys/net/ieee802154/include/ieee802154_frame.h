@@ -46,10 +46,10 @@ typedef struct __attribute__((packed)) {
     uint8_t dest_addr_m;
     uint8_t frame_ver;
     uint8_t src_addr_m;
-} ieee802154_fcf_frame_t;
+} ieee802154_frame_fcf_frame_t;
 
 typedef struct __attribute__((packed)) {
-    ieee802154_fcf_frame_t fcf;
+    ieee802154_frame_fcf_frame_t fcf;
     uint8_t seq_nr;
     uint16_t dest_pan_id;
     uint8_t dest_addr[8];
@@ -59,9 +59,10 @@ typedef struct __attribute__((packed)) {
     uint8_t payload_len;
 } ieee802154_frame_t;
 
-uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf);
-uint8_t get_802154_hdr_len(ieee802154_frame_t *frame);
-uint8_t read_802154_frame(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len);
-void print_802154_fcf_frame(ieee802154_frame_t *frame);
+uint8_t ieee802154_frame_init(ieee802154_frame_t *frame, uint8_t *buf);
+uint8_t ieee802154_frame_get_hdr_len(ieee802154_frame_t *frame);
+uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame,
+                              uint8_t len);
+void ieee802154_frame_print_fcf_frame(ieee802154_frame_t *frame);
 
 #endif /* IEEE802154_IEEE802154_FRAME */
