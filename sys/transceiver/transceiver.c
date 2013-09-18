@@ -211,8 +211,8 @@ uint8_t transceiver_register(transceiver_type_t t, int pid)
 {
     uint8_t i;
 
-    for (i = 0; ((reg[i].pid != pid) &&
-                (i < TRANSCEIVER_MAX_REGISTERED) &&
+    for (i = 0; ((i < TRANSCEIVER_MAX_REGISTERED) &&
+                (reg[i].pid != pid) &&
                 (reg[i].transceivers != TRANSCEIVER_NONE)); i++);
 
     if (i >= TRANSCEIVER_MAX_REGISTERED) {
