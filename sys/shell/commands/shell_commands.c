@@ -94,7 +94,9 @@ extern void _read_bytes(char *bytes);
 
 const shell_command_t _shell_command_list[] = {
     {"id", "Gets or sets the node's id.", _id_handler},
+#ifdef MODULE_LPC_COMMON
     {"heap", "Shows the heap state for the LPC2387 on the command shell.", _heap_handler},
+#endif
 #ifdef MODULE_PS
     {"ps", "Prints information about running threads.", _ps_handler},
 #endif
