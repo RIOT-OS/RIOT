@@ -66,7 +66,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
 
     dINT();
 
-    if (target->status !=  STATUS_RECEIVE_BLOCKED) {
+    if (target->status != STATUS_RECEIVE_BLOCKED && target->status != STATUS_REPLY_BLOCKED) {
         if (target->msg_array && queue_msg(target, m)) {
             eINT();
             return 1;
@@ -89,16 +89,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
 
         active_thread->wait_data = (void*) m;
 
-        int newstatus;
-
-        if (active_thread->status == STATUS_REPLY_BLOCKED) {
-            newstatus = STATUS_REPLY_BLOCKED;
-        }
-        else {
-            newstatus = STATUS_SEND_BLOCKED;
-        }
-
-        sched_set_status((tcb_t*) active_thread,  newstatus);
+        sched_set_status((tcb_t*) active_thread, STATUS_SEND_BLOCKED);
 
         DEBUG("%s: back from send block.\n", active_thread->name);
     }
