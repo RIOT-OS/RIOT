@@ -1,6 +1,6 @@
 /*
-* avsextrem-cc1100.c - CC100 Transceiver Driver for the AVSEXTREM-BOARD.
-* Copyright (C) 2013 Heiko Will <hwill@inf.fu-berlin.de>
+* configure.h - Configuration file for the avsextrem board.
+* Copyright (C) 2013 Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
 *
 * This source code is licensed under the LGPLv2 license,
 * See the file LICENSE for more details.
@@ -11,20 +11,18 @@
  * @file
  * @brief       definitions for the avsextrem board configuration
  *
- * @author      Freie Universit�t Berlin, Computer Systems & Telematics
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      baar
  * @author      Zakaria Kasmi
  * @version     $Revision: 1127 $
  *
- * @note        $Id: board-conf.h 1127 2013-06-13 08:48:29Z baar $
+ * @note        $Id: board-conf.h 1127 2013-08-20 17:15:29 kasmi $
  */
 
 #ifndef CONFIGURE_H_
 #define CONFIGURE_H_
 
 /**
- * @defgroup	conf	Offline Configuration
- * @ingroup		feuerware
  *
  * The offline configuration file "configure.h" is automatically
  * included in every file by the build system and allows to configure
@@ -37,17 +35,6 @@
  * All of which are chosen by the build system depending on your arguments.
  *
  * @{
- */
-
-/**
- * @file
- * @brief	Central offline configuration
- *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
- * @author	baar
- * @version     $Revision: 3854 $
- *
- * @note	$Id: configure.h 3854 2011-12-06 15:27:01Z hwill $
  */
 
 //#include "project-conf.h"

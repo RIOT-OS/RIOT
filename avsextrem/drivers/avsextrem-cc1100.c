@@ -13,7 +13,7 @@
  * @ingroup	LPC2387
  * @brief	CC1100 LPC2387 dependend functions
  *
- * @author      Freie Universit‰t Berlin, Computer Systems & Telematics
+ * @author      Freie Universit√§t Berlin, Computer Systems & Telematics
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
@@ -33,16 +33,16 @@
 #include "cc1100_spi.h"
 #include "gpioint.h"
 
-#define CC1100_GDO0         (FIO2PIN & BIT6)	// read serial I/O (GDO0)
-#define CC1100_GDO1         (FIO0PIN & BIT8)	// read serial I/O (GDO1)
-#define CC1100_GDO2         (FIO0PIN & BIT28)	// read serial I/O (GDO2)
+#define CC1100_GDO0   (FIO2PIN & BIT6)  // read serial I/O (GDO0)
+#define CC1100_GDO1   (FIO0PIN & BIT8)  // read serial I/O (GDO1)
+#define CC1100_GDO2   (FIO0PIN & BIT28)	// read serial I/O (GDO2)
 
-#define SPI_TX_EMPTY				(SSP1SR & SSPSR_TFE)
-#define SPI_BUSY					(SSP1SR & SSPSR_BSY)
-#define SPI_RX_AVAIL				(SSP1SR & SSPSR_RNE)
+#define SPI_TX_EMPTY  (SSP1SR & SSPSR_TFE)
+#define SPI_BUSY      (SSP1SR & SSPSR_BSY)
+#define SPI_RX_AVAIL  (SSP1SR & SSPSR_RNE)
 
-#define CC1100_GDO1_LOW_RETRY		 (100)		// max. retries for GDO1 to go low
-#define CC1100_GDO1_LOW_COUNT		(2700)		// loop count (timeout ~ 500 us) to wait
+#define CC1100_GDO1_LOW_RETRY   (100)   // max. retries for GDO1 to go low
+#define CC1100_GDO1_LOW_COUNT   (2700)  // loop count (timeout ~ 500 us) to wait
 // for GDO1 to go low when CS low
 
 //#define DEBUG
@@ -73,17 +73,17 @@ static int test_time(int code)
 
 int cc1100_get_gdo0(void)
 {
-    return 	CC1100_GDO0;
+    return CC1100_GDO0;
 }
 
 int cc1100_get_gdo1(void)
 {
-    return 	CC1100_GDO1;
+    return CC1100_GDO1;
 }
 
 int cc1100_get_gdo2(void)
 {
-    return 	CC1100_GDO2;
+    return CC1100_GDO2;
 }
 
 void cc1100_spi_init(void)
@@ -93,14 +93,14 @@ void cc1100_spi_init(void)
     FIO0SET = BIT6;
 
     // Power
-    PCONP |= PCSSP1;								// Enable power for SSP1 (default is on)
+    PCONP |= PCSSP1;    // Enable power for SSP1 (default is on)
 
     // PIN Setup
-    PINSEL0 |= BIT15; 						// Set CLK function to SSP1
+    PINSEL0 |= BIT15;   // Set CLK function to SSP1
     PINSEL0 &= ~BIT14;
-    PINSEL0 |= BIT17 ;						// Set MISO function to SSP1
+    PINSEL0 |= BIT17 ;  // Set MISO function to SSP1
     PINSEL0 &= ~BIT16;
-    PINSEL0 |= BIT19;  						// Set MOSI function to SSP1
+    PINSEL0 |= BIT19;   // Set MOSI function to SSP1
     PINSEL0 &= ~BIT18;
     // Interface Setup
     SSP1CR0 = 7;
@@ -109,17 +109,17 @@ void cc1100_spi_init(void)
     uint32_t pclksel;
     uint32_t cpsr;
     lpc2387_pclk_scale(F_CPU / 1000, 6000, &pclksel, &cpsr);
-    PCLKSEL0 &= ~(BIT21 | BIT20);						// CCLK to PCLK divider
+    PCLKSEL0 &= ~(BIT21 | BIT20);   // CCLK to PCLK divider
     PCLKSEL0 |= pclksel << 20;
     SSP1CPSR = cpsr;
 
     // Enable
-    SSP1CR1 |= BIT1; 								// SSP-Enable
+    SSP1CR1 |= BIT1;    // SSP-Enable
     int dummy;
 
     // Clear RxFIFO:
-    while (SPI_RX_AVAIL) {						// while RNE (Receive FIFO Not Empty)...
-        dummy = SSP1DR;							// read data
+    while (SPI_RX_AVAIL) {   // while RNE (Receive FIFO Not Empty)...
+        dummy = SSP1DR;	     // read data
     }
 }
 
@@ -173,7 +173,7 @@ cc1100_spi_select(void)
     volatile int retry_count = 0;
     volatile int abort_count;
     // Switch to GDO mode input
-    PINSEL0 &= ~(BIT17 + BIT16);// Set MISO function to GPIO
+    PINSEL0 &= ~(BIT17 + BIT16);   // Set MISO function to GPIO
     FIO0DIR &= ~BIT8;
 cs_low:
     // CS to low
@@ -195,8 +195,8 @@ loop:
                 goto final;
             }
 
-            FIO0SET = BIT6;		// CS to high
-            goto cs_low;		// try again
+            FIO0SET = BIT6;   // CS to high
+            goto cs_low;      // try again
         }
 
         goto loop;
@@ -204,7 +204,7 @@ loop:
 
 final:
     // Switch to SPI mode
-    PINSEL0 |= BIT17;			// Set MISO function to SSP1
+    PINSEL0 |= BIT17;   // Set MISO function to SSP1
     PINSEL0 &= ~BIT16;
 }
 
@@ -245,9 +245,6 @@ void cc1100_gdo0_disable(void)
 {
     gpioint_set(2, BIT6, GPIOINT_DISABLE, NULL);
 }
-
-
-
 
 void cc1100_init_interrupts(void)
 {

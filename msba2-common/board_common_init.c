@@ -72,9 +72,10 @@ pllfeed(void)
 }
 
 
-void init_clks2(void){
+void init_clks2(void)
+{
     // Wait for the PLL to lock to set frequency
-    while(!(PLLSTAT & BIT26));
+    while (!(PLLSTAT & BIT26));
 
     // Connect the PLL as the clock source
     PLLCON = 0x0003;

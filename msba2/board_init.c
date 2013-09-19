@@ -2,7 +2,7 @@
  * main.c - Main function of the SRF02 ultrasonic sensor project.
  * Copyright (C) 2013 Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  *
- * The source code is licensed under the LGPLv2 license, 
+ * The source code is licensed under the LGPLv2 license,
  * See the file LICENSE for more details.
  */
 
@@ -15,7 +15,7 @@
  * @file
  * @brief       MSB-A2 board initialization
  *
- * @author      Freie Universit‰t Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Freie Universit√§t Berlin, Computer Systems & Telematics, FeuerWhere project
  * @author      Heiko Will
  * @author      Kaspar Schleiser
  * @author      Michael Baar <baar@inf.fu-berlin.de>
@@ -86,7 +86,8 @@ void init_clks1(void)
     pllfeed();
 
     SCS |= 0x20;                        // Enable main OSC
-    while( !(SCS & 0x40) );             // Wait until main OSC is usable
+
+    while (!(SCS & 0x40));              // Wait until main OSC is usable
 
     /* select main OSC, 16MHz, as the PLL clock source */
     CLKSRCSEL = 0x0001;

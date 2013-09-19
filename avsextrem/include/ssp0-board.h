@@ -1,6 +1,6 @@
 /*
  * ssp0-borad.h - header file of the SPI interface for the LPC2387.
- * Copyright (C) 2013 Freie Universit‰t Berlin
+ * Copyright (C) 2013 Freie Universit√§t Berlin
  *
  * This source code is licensed under the LGPLv2 license,
  * See the file LICENSE for more details.
@@ -12,7 +12,7 @@
  * @internal
  * @brief       SPI interface definitions for the LPC2387
  *
- * @author      Freie Universit‰t Berlin, Computer Systems & Telematics
+ * @author      Freie Universit√§t Berlin, Computer Systems & Telematics
  * @author      Marco Ziegert <ziegert@inf.fu-berlin.de>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3854 $
@@ -26,10 +26,16 @@
 
 #define DMA_ENABLED		0
 
-/* if USE_CS is zero, set SSEL as GPIO that you have total control of the sequence */
+/*
+ * if USE_CS is zero, set SSEL as GPIO that you have total control of the
+ * sequence
+ **/
 #define USE_CS			0
 
-/* if 1, use driver for onboard BMA180, otherwise for external BMA180 utilizing Nanopan Connector */
+/*
+ * if 1, use driver for onboard BMA180, otherwise for external BMA180 utilizing
+ * Nanopan Connector
+ **/
 #define BMA180_ONBOARD		1
 
 #define SMB380_ACC		0
@@ -96,18 +102,17 @@
 #define BMA180_EXTINT_MODE  	1
 
 uint32_t SSP0Init(void);
-uint8_t SSP0Prepare(uint8_t chip, uint8_t datasize, uint8_t cpol, uint8_t cpha, uint16_t freq);
+uint8_t SSP0Prepare(uint8_t chip, uint8_t datasize, uint8_t cpol, uint8_t cpha,
+                    uint16_t freq);
 uint8_t SSP0Unprepare(uint8_t chip);
 unsigned char SSP0_write(const uint16_t data, uint8_t device);
 unsigned short SSP0_read(uint8_t device);
-unsigned char SMB380_ssp_write(const unsigned char regAddr, const unsigned char data, unsigned char flag);
+unsigned char SMB380_ssp_write(const unsigned char regAddr,
+                               const unsigned char data, unsigned char flag);
 unsigned short SMB380_ssp_read(void);
 unsigned short nrf24l01_ssp_read_write(const uint8_t data);
 unsigned short acam_trx(const uint8_t data);
 void SSP0Handler(void);
 
 #endif  /* __SSP_H__ */
-/*****************************************************************************
-**                            End Of File
-******************************************************************************/
 

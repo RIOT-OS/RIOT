@@ -1,7 +1,7 @@
 /*
  * msba2acc-smb380.c - implementation of the Driver for the SMB380 acceleration
  * sensor on the AVSEXTREM board.
- * Copyright (C) 2013 Freie Universit�t Berlin
+ * Copyright (C) 2013 Freie Universität Berlin
  *
  * This source code is licensed under the LGPLv2 license,
  * See the file LICENSE for more details.
@@ -11,10 +11,10 @@
 /**
  * @file
  * @internal
- * @brief       SMB380 acceleration sensor driver for the LPC2387 on the 
+ * @brief       SMB380 acceleration sensor driver for the LPC2387 on the
  *              AVSEXTREM board.
  *
- * @author      Freie Universit�t Berlin, Computer Systems & Telematics
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Marco Ziegert <ziegert@inf.fu-berlin.de>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3854 $
@@ -23,7 +23,7 @@
  */
 
 
-#include "lpc23xx.h"			/* LPC23XX/24xx Peripheral Registers */
+#include "lpc23xx.h"   /* LPC23XX/24xx Peripheral Registers */
 #include "cpu.h"
 #include "lpm.h"
 //#include "PatrecInit.h"
@@ -45,22 +45,6 @@
 #include "math.h"
 #include "lpc2387.h"
 
-/* program example
- *
- *
- *
- *
-SMB380_init(); //Initializes SPI and the SMB380 accelerator sensor
-SMB380_setRange(SMB380_RANGE_8G);
-//SMB380_setBandWidth(SMB380_BAND_WIDTH_100HZ);
-SMB380_enableNewDataInt();
-
-while ( readRingBuff(accInt) ) {
-	printf("[%4i|%4i|%4i|%4i]\r\n", accInt[0], accInt[1], accInt[2], accInt[3]);
-	ktimer_wait(KTIMER_TICKS(1000000));
-	//actualizeRingReadPointer(); //update read-pointer position to a current measurement (drop unread ones)
-}
-*/
 
 uint8_t simple_pid;
 int16_t simple_buffer[4];
@@ -73,24 +57,30 @@ uint16_t readPointerPos[SMB380_RING_BUFF_MAX_THREADS];
 u_char PointerList[SMB380_RING_BUFF_MAX_THREADS];
 static msg_t wakeupmessage;
 
-uint8_t (*smb380function)(int16_t *);			//pointer to a user-defined function which is called during a writepointer action
-
-uint16_t sampleRateSMB380;
-
-bool dynRange = false;							//condition if range-check should be done
+/*
+ * pointer to a user-defined function which is called during a writepointer
+ * action
+ */
+uint8_t (*smb380function)(int16_t *);
+uint16_t sampleRateSMB380;  // condition if range-check should be done
+bool dynRange = false;
 uint8_t counter_Decreasing = 0;
 
 volatile uint16_t interruptTicksSMB380;
 
 typedef struct {
-    u_int writePointerPos;				//Writepointer position
-    uint8_t countRange;					//check value for updated range settings (only needed for multiplication in Float-mode
-    uint8_t range;						//current range
+    u_int writePointerPos;  //Writepointer position
+    /*
+     * check value for updated range settings (only needed for multiplication
+     * in Float-mode
+     */
+    uint8_t countRange;
+    uint8_t range;	    //current range
 } settingsSMB380;
 
 settingsSMB380 settings;
 
-/* measuring temperature dependent internal sample rate of SMB380 */
+// measuring temperature dependent internal sample rate of SMB380
 static volatile uint32_t tickStart = 0;
 static volatile uint32_t tickLastSample = 0;
 static volatile uint32_t tickCurrentSamples = 0;
@@ -105,7 +95,8 @@ extern unsigned long ktimer_now(void);
 
 float SMB380_getSampleRatio(void)
 {
-    return ((1.0 / ((float)(tickLastSample - tickStart) / tickCurrentSamples)) * 100000) /*/ (float)(SMB380_SAMPLE_RATE_MAX / sampleRateSMB380)*/;
+    return ((1.0 / ((float)(tickLastSample - tickStart) / tickCurrentSamples)) *
+            100000);
 }
 
 uint8_t smb380emptyfunction(int16_t *value)
@@ -119,7 +110,7 @@ uint8_t SMB380_HystereseFunctionSample(int16_t *value)
     static uint8_t counter = 0;
     int16_t delta = abs(value[0] - x) + abs(value[1] - y) + abs(value[2] - z);
 
-    if (delta < 40) {																//TODO: delta and counter are constant values, change it!
+    if (delta < 40) { //TODO: delta and counter are constant values, change it!
         counter++;
     }
     else {
@@ -142,14 +133,14 @@ uint8_t SMB380_HystereseFunctionSample(int16_t *value)
         //SMB380_setAnyMotionLimit(100,0);
         SMB380_enableAnyMotionLimit();
         smb380_mode = SMB380_THRESHOLD;
-        counter = 0;		//n�tig?
+        counter = 0;
     }
     else if (counter == 100) {
         SMB380_disableNewDataInt();
         //SMB380_setAnyMotionLimit(100,0);
         SMB380_enableAnyMotionLimit();
         smb380_mode = SMB380_FALSEALERT;
-        counter = 0;		//n�tig?
+        counter = 0;
         return 0;
     }
 
@@ -179,7 +170,8 @@ static void SMB380_simple_interrupthandler(void)
 }
 
 // enables simple Interrupt driven Mode
-uint8_t SMB380_init_simple(uint16_t samplerate, uint8_t bandwidth, uint8_t range)
+uint8_t SMB380_init_simple(uint16_t samplerate, uint8_t bandwidth, uint8_t
+                           range)
 {
     SSP0Init();
     interruptTicksSMB380 = 0;
@@ -215,7 +207,7 @@ uint8_t SMB380_init(uint8_t (*func)(int16_t *))
         smb380function = smb380emptyfunction;
     }
 
-    //smb380function = SMB380_HystereseFunctionSample;	//Platzhalter
+    //smb380function = SMB380_HystereseFunctionSample;	//placeholder
 
     SMB380_softReset();
     hwtimer_wait(HWTIMER_TICKS(100000));
@@ -223,7 +215,7 @@ uint8_t SMB380_init(uint8_t (*func)(int16_t *))
     SMB380_disableLowerLimit();
 
     smb380_mode = SMB380_POLL;
-    SMB380_setSampleRate(SMB380_SAMPLE_RATE_MAX);		//set output to 3000 Hz
+    SMB380_setSampleRate(SMB380_SAMPLE_RATE_MAX);  //set output to 3000 Hz
 
     settings.writePointerPos = 0;
     settings.range = 0;
@@ -239,7 +231,8 @@ uint8_t SMB380_init(uint8_t (*func)(int16_t *))
     ringBuff_Z = (int16_t *)malloc(SMB380_RING_BUFF_SIZE * sizeof(int16_t));
     ringBuff_T = (int16_t *)malloc(SMB380_RING_BUFF_SIZE * sizeof(int16_t));
 
-    if ((ringBuff_X == NULL) | (ringBuff_Y == NULL) | (ringBuff_Z == NULL) | (ringBuff_T == NULL)) {
+    if ((ringBuff_X == NULL) | (ringBuff_Y == NULL) | (ringBuff_Z == NULL) |
+        (ringBuff_T == NULL)) {
         if (ringBuff_X != NULL) {
             free((int16_t *)ringBuff_X);
         }
@@ -276,8 +269,10 @@ static void SMB380_extIntHandler(void)
 
     writeRingBuff(accInt);
 
-    //	printf("SMB380 acc x,y,z: [%i|%i|%i|%2.3f]\r\n", accInt[0], accInt[1], accInt[2], acc[3]);
-    //	printf("SMB380 acc x,y,z: [%2.3f|%2.3f|%2.3f|%2.3f]\r\n\n\n", acc[0], acc[1], acc[2], acc[3]);
+    //	printf("SMB380 acc x,y,z: [%i|%i|%i|%2.3f]\r\n", accInt[0], accInt[1],
+    //         accInt[2], acc[3]);
+    //	printf("SMB380 acc x,y,z: [%2.3f|%2.3f|%2.3f|%2.3f]\r\n\n\n", acc[0],
+    //         acc[1], acc[2], acc[3]);
     //	printf("Nach Interrupt Reset:\n");
     //	SMB380_ShowMemory();
 }
@@ -307,12 +302,13 @@ uint8_t SMB380_Unprepare(void)
     return SSP0Unprepare(SMB380_ACC);
 }
 
-/* return the pointerNo related with the current thread */
+// return the pointerNo related with the current thread
 uint8_t getRingReadPointerforCurrentThread(void)
 {
     uint8_t pointerNo = 0;
 
-    while ((PointerList[pointerNo] != active_thread->pid) && (pointerNo < SMB380_RING_BUFF_MAX_THREADS)) {
+    while ((PointerList[pointerNo] != active_thread->pid) &&
+           (pointerNo < SMB380_RING_BUFF_MAX_THREADS)) {
         pointerNo++;
     }
 
@@ -321,10 +317,11 @@ uint8_t getRingReadPointerforCurrentThread(void)
 
 uint8_t initRingReadPointerforCurrentThread(void)
 {
-    //TODO make it Threadsafe
+    //TODO: make it Threadsafe
     uint8_t pointerNo = 0;
 
-    while ((PointerList[pointerNo] > 0) && (pointerNo < SMB380_RING_BUFF_MAX_THREADS)) {
+    while ((PointerList[pointerNo] > 0) &&
+           (pointerNo < SMB380_RING_BUFF_MAX_THREADS)) {
         pointerNo++;
     }
 
@@ -357,36 +354,21 @@ void actualizeRingReadPointer(void)
     }
 }
 
-//TODO more read-pointer
+//TODO: more read-pointer
 uint8_t readRingBuff(int16_t *value)
 {
 
-    //	if ( inISR() ) {
-    //		if ( readPointerPos[pointerNo] == settings.writePointerPos )
-    //			return 0;
-    //	} else {
-    //		while ( readPointerPos[pointerNo] != settings.writePointerPos ) {
-    //			uint8_t x = 254;
-    ////			while ( x )
-    ////				x--;
-    //		}
-    //	}
-
-    // zugriff auf pid
-    //	if (getRead  fk_thread->pid kenn ich schon)
-    //	{
-    //		pointerno[pid];
-    //	}
-    //	else
-    //	{
-    //		initRingReadPointerforCurrentThread();
-    //	}
     uint8_t pointerNo = getRingReadPointerforCurrentThread();
 
-    // If thread is not known to read on the ringbuffer, try adding him to the list of known threads, otherwise exit with error
+    /*
+     * If thread is not known to read on the ringbuffer, try adding him to the
+     * list of known threads, otherwise exit with error
+     */
+
     if (pointerNo == SMB380_RING_BUFF_MAX_THREADS) {
         if (!initRingReadPointerforCurrentThread()) {
-            //printf("%sNo Readpointer left, maximum of %u is reached!\n\r", SMB380_DEBUG_MESSAGE, SMB380_RING_BUFF_MAX_THREADS);
+            //printf("%sNo Readpointer left, maximum of %u is reached!\n\r",
+            //       SMB380_DEBUG_MESSAGE, SMB380_RING_BUFF_MAX_THREADS);
             return 0;
         }
         else {
@@ -415,7 +397,7 @@ uint8_t readRingBuff(int16_t *value)
     return 1;
 }
 
-//TODO more read-pointer
+//TODO: more read-pointer
 uint8_t writeRingBuff(int16_t *value)
 {
     if (smb380_mode == SMB380_FALSEALERT)	{
@@ -423,7 +405,8 @@ uint8_t writeRingBuff(int16_t *value)
         return 0;
     }
 
-    if ((interruptTicksSMB380 >= sampleRateSMB380 - 1) || (smb380_mode == SMB380_THRESHOLD)) {
+    if ((interruptTicksSMB380 >= sampleRateSMB380 - 1) ||
+        (smb380_mode == SMB380_THRESHOLD)) {
         interruptTicksSMB380 = 0;
 
         /* measuring temperature dependent internal sample rate of SMB380 */
@@ -583,7 +566,8 @@ void wakeUpRegisteredProcesses(void)
     //wake up waiting processes
     wakeupmessage.type = MSG_TYPE_SMB380_WAKEUP;
 
-    while ((PointerList[pointerNo] > 0) && (pointerNo < SMB380_RING_BUFF_MAX_THREADS)) {
+    while ((PointerList[pointerNo] > 0) &&
+           (pointerNo < SMB380_RING_BUFF_MAX_THREADS)) {
         msg_send(&wakeupmessage, PointerList[pointerNo], false);
         pointerNo++;
     }
@@ -819,7 +803,8 @@ void SMB380_softReset(void)
     unsigned char ur;
     unsigned long cpsr = disableIRQ();
     SMB380_Prepare();
-    SMB380_ssp_write(SMB380_CONTROL1, SMB380_CONTROL1_SOFT_RESET_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL1, SMB380_CONTROL1_SOFT_RESET_MASK,
+                     SMB380_WRITE_REGISTER);
     ur = ((unsigned char)SMB380_ssp_read()) & SMB380_CONTROL1_SOFT_RESET_MASK;
     SMB380_Unprepare();
     restoreIRQ(cpsr);
@@ -848,9 +833,7 @@ unsigned char SMB380_getCustomerReg(void)
     return uReg;
 }
 
-/* Selftest
- *
- * */
+// Selftest
 void SMB380_Selftest_1(void)
 {
     unsigned char uReg = 0;
@@ -912,7 +895,7 @@ void SMB380_setUpperLimit(void)
 {
     unsigned long cpsr = disableIRQ();
     SMB380_Prepare();
-    SMB380_ssp_write(SMB380_HG_THRES, 128, SMB380_WRITE_REGISTER);		//1g
+    SMB380_ssp_write(SMB380_HG_THRES, 128, SMB380_WRITE_REGISTER); //1g
     SMB380_ssp_read();
     SMB380_ssp_write(SMB380_HG_DUR, 0, SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
@@ -927,7 +910,8 @@ void SMB380_enableUpperLimit(void)
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL2, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    SMB380_ssp_write(SMB380_CONTROL2, uReg | SMB380_CONTROL2_ENABLE_HG_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL2, uReg | SMB380_CONTROL2_ENABLE_HG_MASK,
+                     SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);
@@ -940,7 +924,8 @@ void SMB380_disableUpperLimit(void)
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL2, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    SMB380_ssp_write(SMB380_CONTROL2, uReg & ~SMB380_CONTROL2_ENABLE_HG_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL2, uReg & ~SMB380_CONTROL2_ENABLE_HG_MASK,
+                     SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);
@@ -953,7 +938,8 @@ void SMB380_enableLowerLimit(void)
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL2, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    SMB380_ssp_write(SMB380_CONTROL2, uReg | SMB380_CONTROL2_ENABLE_LG_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL2, uReg | SMB380_CONTROL2_ENABLE_LG_MASK,
+                     SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);
@@ -966,7 +952,8 @@ void SMB380_disableLowerLimit(void)
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL2, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    SMB380_ssp_write(SMB380_CONTROL2, uReg & ~SMB380_CONTROL2_ENABLE_LG_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL2, uReg & ~SMB380_CONTROL2_ENABLE_LG_MASK,
+                     SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);
@@ -985,7 +972,8 @@ uint8_t SMB380_setAnyMotionLimit(uint16_t mg, uint16_t gvalueint)
         threshold = mg / (15.6 * (SMB380_getRange() / 2));
     }
     else if (gvalueint != 0) {
-        threshold = ceil(((gvalueint * 2000) / 512.0) / 15.6);							//Scaling for different gRanges is not needed
+        /* Scaling for different gRanges is not needed */
+        threshold = ceil(((gvalueint * 2000) / 512.0) / 15.6);
     }
     else {
         return 0;
@@ -994,13 +982,12 @@ uint8_t SMB380_setAnyMotionLimit(uint16_t mg, uint16_t gvalueint)
     unsigned short uReg;
     unsigned long cpsr = disableIRQ();
     SMB380_Prepare();
-    SMB380_ssp_write(SMB380_ANY_MOTION_THRES, threshold, SMB380_WRITE_REGISTER);		//0,3g = 300 / 15,6mg = 19
+    /* 0,3g = 300 / 15,6mg = 19 */
+    SMB380_ssp_write(SMB380_ANY_MOTION_THRES, threshold, SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     //Set duration at this point
     SMB380_ssp_write(SMB380_ANY_MOTION_DUR_HYST, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    //	SMB380_ssp_write(SMB380_ANY_MOTION_DUR_HYST, (uReg & ~SMB380_ANY_MOTION_DUR_MASK) |  0x40, SMB380_WRITE_REGISTER);
-    //	SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);
     return 1;
@@ -1013,11 +1000,13 @@ void SMB380_enableAnyMotionLimit(void)
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL4, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    SMB380_ssp_write(SMB380_CONTROL4, uReg | SMB380_CONTROL4_ENABLE_ADV_INT_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL4, uReg | SMB380_CONTROL4_ENABLE_ADV_INT_MASK,
+                     SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_ssp_write(SMB380_CONTROL2, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    SMB380_ssp_write(SMB380_CONTROL2, uReg | SMB380_CONTROL2_ANY_MOTION_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL2, uReg | SMB380_CONTROL2_ANY_MOTION_MASK,
+                     SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);
@@ -1030,11 +1019,15 @@ void SMB380_disableAnyMotionLimit(void)
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL2, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    SMB380_ssp_write(SMB380_CONTROL2, uReg & ~SMB380_CONTROL2_ANY_MOTION_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL2,
+                     uReg & ~SMB380_CONTROL2_ANY_MOTION_MASK,
+                     SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_ssp_write(SMB380_CONTROL4, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    SMB380_ssp_write(SMB380_CONTROL4, uReg & ~SMB380_CONTROL4_ENABLE_ADV_INT_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL4,
+                     uReg & ~SMB380_CONTROL4_ENABLE_ADV_INT_MASK,
+                     SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);
@@ -1044,15 +1037,19 @@ void SMB380_enableNewDataInt(void)
 {
     unsigned short uReg;
     unsigned long cpsr = disableIRQ();
-    //prevent deep sleep, reason: 400�s wake-up time is to long for 3kHz interrupts
+    /*
+     * prevent deep sleep, reason: 400 µs wake-up time is to long for 3kHz
+     * interrupts
+     */
     SETBIT(lpm_prevent_sleep, LPM_PREVENT_SLEEP_ACCSENSOR);
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL4, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    SMB380_ssp_write(SMB380_CONTROL4, uReg | SMB380_CONTROL4_NEW_DATA_INT_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL4, uReg | SMB380_CONTROL4_NEW_DATA_INT_MASK,
+                     SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    /* measuring temperature dependent internal sample rate of SMB380 */
+    // measuring temperature dependent internal sample rate of SMB380
     tickStart = ktimer_now();
     tickCurrentSamples = 0;
     restoreIRQ(cpsr);
@@ -1065,10 +1062,14 @@ void SMB380_disableNewDataInt(void)
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL4, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    SMB380_ssp_write(SMB380_CONTROL4, uReg & ~SMB380_CONTROL4_NEW_DATA_INT_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL4, uReg & ~SMB380_CONTROL4_NEW_DATA_INT_MASK,
+                     SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
-    //enable deep sleep, reason: 400�s wake-up time was to long for 3kHz interrupts
+    /*
+     * enable deep sleep, reason: 400 µs wake-up time was to long for 3kHz
+     * interrupts
+     */
     CLRBIT(lpm_prevent_sleep, LPM_PREVENT_SLEEP_ACCSENSOR);
     restoreIRQ(cpsr);
 }
@@ -1080,7 +1081,8 @@ void SMB380_resetInterruptFlags(void)
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL1, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    SMB380_ssp_write(SMB380_CONTROL1, uReg | SMB380_CONTROL1_RESET_INT_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL1, uReg | SMB380_CONTROL1_RESET_INT_MASK,
+                     SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);
@@ -1093,7 +1095,8 @@ void SMB380_enableEEPROM(void)
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL1, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    SMB380_ssp_write(SMB380_CONTROL1, uReg | SMB380_CONTROL1_EE_W_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL1, uReg | SMB380_CONTROL1_EE_W_MASK,
+                     SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);
@@ -1106,37 +1109,12 @@ void SMB380_disableEEPROM(void)
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL1, 0, SMB380_READ_REGISTER);
     uReg = SMB380_ssp_read();
-    SMB380_ssp_write(SMB380_CONTROL1, uReg & ~SMB380_CONTROL1_EE_W_MASK, SMB380_WRITE_REGISTER);
+    SMB380_ssp_write(SMB380_CONTROL1, uReg & ~SMB380_CONTROL1_EE_W_MASK,
+                     SMB380_WRITE_REGISTER);
     SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);
 }
-
-//void SMB380_calibrate(void){
-//	unsigned short uMSB, uLSB;
-//	//TODO 25Hz, 2G
-//
-//	SMB380_ssp_write(SMB380_ACC_X_MSB, 0, SMB380_READ_REGISTER);
-//	SMB380_ssp_write(SMB380_ACC_X_LSB_NEWDATA, 0, SMB380_READ_REGISTER);
-//	uMSB = (SMB380_ssp_read() & SMB380_ACC_MSB_MASK) << 2;
-//	uLSB = (SMB380_ssp_read() & SMB380_ACC_LSB_MASK) >> 6;
-//
-//	SMB380_ssp_write(SMB380_ACC_X_MSB + SMB380_EEPROM_OFFSET, uMSB, SMB380_WRITE_REGISTER);
-//	SMB380_ssp_write(SMB380_ACC_X_LSB_NEWDATA + SMB380_EEPROM_OFFSET, uLSB, SMB380_WRITE_REGISTER);
-//
-//
-//	SMB380_ssp_write(SMB380_ACC_Y_MSB, 0, SMB380_READ_REGISTER);
-//	SMB380_ssp_write(SMB380_ACC_Y_LSB_NEWDATA, 0, SMB380_READ_REGISTER);
-//	uMSB = (SMB380_ssp_read() & SMB380_ACC_MSB_MASK) << 2;
-//	uLSB |= (SMB380_ssp_read() & SMB380_ACC_LSB_MASK) >> 6;
-//
-//	SMB380_ssp_write(SMB380_ACC_Z_MSB, 0, SMB380_READ_REGISTER);
-//	SMB380_ssp_write(SMB380_ACC_Z_LSB_NEWDATA, 0, SMB380_READ_REGISTER);
-//	uMSB = (SMB380_ssp_read() & SMB380_ACC_MSB_MASK) << 2;
-//	uLSB |= (SMB380_ssp_read() & SMB380_ACC_LSB_MASK) >> 6;
-//
-//
-//}
 
 /*
  * Return offsets from offset registers,
@@ -1204,8 +1182,8 @@ unsigned char SMB380_readOffsetTemp(uint16_t *offset)
     return true;
 }
 
-/* EEPROM = 1 if data has to be written in EEPROM and not only in image
- *
+/*
+ * EEPROM = 1 if data has to be written in EEPROM and not only in image
  */
 void SMB380_writeOffset(uint16_t *offset, uint8_t EEPROM)
 {
@@ -1215,7 +1193,8 @@ void SMB380_writeOffset(uint16_t *offset, uint8_t EEPROM)
         uint16_t eeoffset = 0;
 
         if (EEPROM) {
-            eeoffset = SMB380_EEPROM_OFFSET;    //create offset if saving to EEPROM is needed
+            //create offset if saving to EEPROM is needed
+            eeoffset = SMB380_EEPROM_OFFSET;
         }
 
         unsigned short uReg;
@@ -1224,40 +1203,48 @@ void SMB380_writeOffset(uint16_t *offset, uint8_t EEPROM)
 
         //x-Axis
         uReg = (offset[0] & 0x03) << 6; //get both LSB Bits
-        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_X, 0, SMB380_READ_REGISTER); //write them to image or eeprom
+        //write them to image or eeprom
+        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_X, 0, SMB380_READ_REGISTER);
         uReg |= (SMB380_ssp_read() & 0x3F); //saves gain from same register
-        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_X + eeoffset, (uint8_t)uReg, SMB380_WRITE_REGISTER); //write them to image or eeprom
+        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_X + eeoffset, (uint8_t)uReg,
+                         SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
         hwtimer_wait(HWTIMER_TICKS(50000));
 
         uReg = (offset[0] & 0x3FC) >> 2; //get MSB Bits
-        SMB380_ssp_write(SMB380_OFFSET_MSB_X + eeoffset, (uint8_t)uReg, SMB380_WRITE_REGISTER); //write them to image or eeprom
+        SMB380_ssp_write(SMB380_OFFSET_MSB_X + eeoffset, (uint8_t)uReg,
+                         SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
         hwtimer_wait(HWTIMER_TICKS(50000));
 
         //y-Axis
         uReg = (offset[1] & 0x03) << 6; //get both LSB Bits
-        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_Y, 0, SMB380_READ_REGISTER); //write them to image or eeprom
+        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_Y, 0, SMB380_READ_REGISTER);
         uReg |= (SMB380_ssp_read() & 0x3F); //saves gain from same register
-        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_Y + eeoffset, (uint8_t)uReg, SMB380_WRITE_REGISTER); //write them to image or eeprom
+        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_Y + eeoffset, (uint8_t)uReg,
+                         SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
         hwtimer_wait(HWTIMER_TICKS(50000));
 
         uReg = (offset[1] & 0x3FC) >> 2; //get MSB Bits
-        SMB380_ssp_write(SMB380_OFFSET_MSB_Y + eeoffset, (uint8_t)uReg, SMB380_WRITE_REGISTER); //write them to image or eeprom
+        SMB380_ssp_write(SMB380_OFFSET_MSB_Y + eeoffset, (uint8_t)uReg,
+                         SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
         hwtimer_wait(HWTIMER_TICKS(50000));
 
         //z-Axis
         uReg = (offset[2] & 0x03) << 6; //get both LSB Bits
-        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_Z, 0, SMB380_READ_REGISTER); //write them to image or eeprom
+        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_Z, 0,
+                         SMB380_READ_REGISTER); //write them to image or eeprom
         uReg |= (SMB380_ssp_read() & 0x3F); //saves gain from same register
-        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_Z + eeoffset, (uint8_t)uReg, SMB380_WRITE_REGISTER); //write them to image or eeprom
+        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_Z + eeoffset, (uint8_t)uReg,
+                         SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
         hwtimer_wait(HWTIMER_TICKS(50000));
 
         uReg = (offset[2] & 0x3FC) >> 2; //get MSB Bits
-        SMB380_ssp_write(SMB380_OFFSET_MSB_Z + eeoffset, (uint8_t)uReg, SMB380_WRITE_REGISTER); //write them to image or eeprom
+        SMB380_ssp_write(SMB380_OFFSET_MSB_Z + eeoffset, (uint8_t)uReg,
+                         SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
         hwtimer_wait(HWTIMER_TICKS(50000));
 
@@ -1275,7 +1262,8 @@ void SMB380_writeOffsetTemp(uint16_t *offset, uint8_t EEPROM)
         uint16_t eeoffset = 0;
 
         if (EEPROM) {
-            eeoffset = SMB380_EEPROM_OFFSET;    //create offset if saving to EEPROM is needed
+            //create offset if saving to EEPROM is needed
+            eeoffset = SMB380_EEPROM_OFFSET;
         }
 
         unsigned short uReg;
@@ -1284,14 +1272,17 @@ void SMB380_writeOffsetTemp(uint16_t *offset, uint8_t EEPROM)
 
         //T-Axis
         uReg = (offset[0] & 0x03) << 6; //get both LSB Bits
-        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_T, 0, SMB380_READ_REGISTER); //write them to image or eeprom
+        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_T, 0,
+                         SMB380_READ_REGISTER); //write them to image or eeprom
         uReg |= (SMB380_ssp_read() & 0x3F); //saves gain from same register
-        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_T + eeoffset, (uint8_t)uReg, SMB380_WRITE_REGISTER); //write them to image or eeprom
+        SMB380_ssp_write(SMB380_OFFSET_LSB_GAIN_T + eeoffset, (uint8_t)uReg,
+                         SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
         hwtimer_wait(HWTIMER_TICKS(50000));
 
         uReg = (offset[0] & 0x3FC) >> 2; //get MSB Bits
-        SMB380_ssp_write(SMB380_OFFSET_MSB_T + eeoffset, (uint8_t)uReg, SMB380_WRITE_REGISTER); //write them to image or eeprom
+        SMB380_ssp_write(SMB380_OFFSET_MSB_T + eeoffset, (uint8_t)uReg,
+                         SMB380_WRITE_REGISTER); //write them to image or eeprom
         SMB380_ssp_read();
         hwtimer_wait(HWTIMER_TICKS(50000));
 

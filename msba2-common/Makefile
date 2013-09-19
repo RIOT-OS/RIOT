@@ -1,4 +1,4 @@
-SRC = $(wildcard *.c) 
+SRC = $(wildcard *.c)
 BINDIR = $(RIOTBOARD)/$(BOARD)/bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 DEP = $(SRC:%.c=$(BINDIR)%.d)

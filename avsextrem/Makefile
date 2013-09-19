@@ -10,7 +10,7 @@ INCLUDES += -I$(RIOTBASE)/cpu/arm_common/include/
 INCLUDES += -I$(RIOTBASE)/cpu/lpc2387/include/
 INCLUDES += -I$(RIOTBASE)/drivers/cc110x
 
-all: $(BINDIR)$(ARCH) 
+all: $(BINDIR)$(ARCH)
 	"$(MAKE)" -C ../msba2-common
 	"$(MAKE)" -C drivers
 
@@ -34,7 +34,5 @@ clean:
 	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
 	@if [ -d $(BINDIR) ] ; \
 	then rmdir $(BINDIR) ; \
-	fi 
-	
-
+	fi
 

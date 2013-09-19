@@ -1,9 +1,9 @@
 /*
- * avsextrem-ssp0.c - implementation of the SPI0 interface for the LPC2387, 
+ * avsextrem-ssp0.c - implementation of the SPI0 interface for the LPC2387,
  * and the AVSESTREM board.
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2013 Freie UniversitÃ¤t Berlin
  *
- * This source code is licensed under the LGPLv2 license, 
+ * This source code is licensed under the LGPLv2 license,
  * See the file LICENSE for more details.
  */
 
@@ -12,7 +12,7 @@
  * @internal
  * @brief       Implements the SPI0 interface for the LPC2387
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
+ * @author      Freie UniversitÃ¤t Berlin, Computer Systems & Telematics
  * @author      Marco Ziegert <ziegert@inf.fu-berlin.de>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3854 $
@@ -20,7 +20,7 @@
  * @note        $Id:  avsextrem-ssp0.c  3854 2013-08-14 15:27:01Z zkasmi $
  */
 
-#include "lpc23xx.h"			/* LPC23XX/24xx Peripheral Registers */
+#include "lpc23xx.h"   /* LPC23XX/24xx Peripheral Registers */
 #include "cpu.h"
 #include "VIC.h"
 #include "ssp0-board.h"
@@ -36,27 +36,21 @@
 //
 //static void MMA7455L_extIntHandler(void);
 
-/*****************************************************************************
- ** Function name:	        SSP0Init
- **
- ** Descriptions:	        SSP0 port initialization routine
- **
- ** parameters:		        None
- ** Returned value:	        true or false, if the interrupt handler
- **			        can't be installed correctly, return false.
- **
- *****************************************************************************/
 uint32_t SSP0Init(void)
 {
 
-    /* enable clock to SSP0 for security reason. By default, it's enabled already */
+    /*
+     * enable clock to SSP0 for security reason.
+     * By default, it's enabled already
+     */
     PCONP |= PCSSP0;
-    //TODO CLK, MISO, MOSI standardmï¿½ï¿½ig als GPIOs konfigurieren
+    //TODO: configure CLK, MISO, MOSI by default as  GPIOs.
 #if USE_CS
-    //	PINSEL3 |= BIT8 | BIT9 | BIT10 | BIT11 | BIT14 | BIT15 | BIT16 | BIT17;	//P1.20 1.21 1.23 1.24
+    //  P1.20 1.21 1.23 1.24
+    //	PINSEL3 |= BIT8 | BIT9 | BIT10 | BIT11 | BIT14 | BIT15 | BIT16 | BIT17;
 #else
-    //	PINSEL3 |= BIT8 | BIT9 | BIT14 | BIT15 | BIT16 | BIT17; //1.20 1.23 1.24 SSEL0 nicht
-
+    //  No SSEL0
+    //	PINSEL3 |= BIT8 | BIT9 | BIT14 | BIT15 | BIT16 | BIT17; //1.20 1.23 1.24
 #endif
 
 #if SSP1_INTERRUPT_MODE
@@ -65,27 +59,33 @@ uint32_t SSP0Init(void)
         return (FALSE);
     }
 
-    /* Set SSPINMS registers to enable interrupts */
-    /* enable all error related interrupts */
+    /*
+     * Set SSPINMS registers to enable interrupts,
+     * enable all error related interrupts
+     */
+
     SSP1IMSC = SSPIMSC_RORIM | SSPIMSC_RTIM;
 #endif
 
     return (1);
 }
 
-/* datasize (wordsize) in decimal (4-16), cpol&cpha =(0/1) and frequency divided by 1000 (e.g. 8 MHz = 8000)
- *
+/*
+ * datasize (wordsize) in decimal (4-16), cpol&cpha =(0/1) and frequency divided
+ * by 1000 (e.g. 8 MHz = 8000)
  */
-uint8_t SSP0Prepare(uint8_t chip, uint8_t datasize, uint8_t cpol, uint8_t cpha, uint16_t freq)
+uint8_t SSP0Prepare(uint8_t chip, uint8_t datasize, uint8_t cpol, uint8_t cpha,
+                    uint16_t freq)
 {
     switch (chip) {
         case BMA180_INTERN:
         case SMB380_ACC: {
 #if USE_CS
-            PINSEL3 |= BIT8 | BIT9 | BIT10 | BIT11 | BIT14 | BIT15 | BIT16 | BIT17;	//P1.20 1.21 1.23 1.24
+            PINSEL3 |= BIT8 | BIT9 | BIT10 | BIT11 | BIT14 | BIT15 | BIT16 |
+                       BIT17;	//P1.20 1.21 1.23 1.24
 #else
-
-            PINSEL3 |= BIT8 | BIT9 | BIT14 | BIT15 | BIT16 | BIT17; //1.20 1.23 1.24 SSEL0 nicht
+            // 1.20 1.23 1.24 are not configured as SSEL0
+            PINSEL3 |= BIT8 | BIT9 | BIT14 | BIT15 | BIT16 | BIT17;
 #endif
             break;
         }
@@ -96,18 +96,19 @@ uint8_t SSP0Prepare(uint8_t chip, uint8_t datasize, uint8_t cpol, uint8_t cpha, 
         case ACAMDMS: {
 #if USE_CS
             PINSEL0 |= BIT31;
-            PINSEL1 |= BIT1 | BIT3 | BIT5;	//P0.15 0.16 0.17 0.18
+            PINSEL1 |= BIT1 | BIT3 | BIT5;  // P0.15 0.16 0.17 0.18
 #else
-            //Turn on NanoPAN
+            // Turn on NanoPAN
             PINSEL0 |= BIT31;
-            PINSEL1 |= BIT3 | BIT5; //0.15 0.17 0.18 SSEL0 nicht
+            // 0.15 0.17 0.18 are not configured as SSEL0
+            PINSEL1 |= BIT3 | BIT5;
 #endif
             break;
         }
 
         case NORDIC: {
             PINSEL0 |= BIT31;
-            PINSEL1 |= BIT3 | BIT5; //0.15 0.17 0.18 SSEL0 nicht
+            PINSEL1 |= BIT3 | BIT5; // 0.15 0.17 0.18 SSEL0 (No)
             break;
         }
 
@@ -184,9 +185,9 @@ uint8_t SSP0Prepare(uint8_t chip, uint8_t datasize, uint8_t cpol, uint8_t cpha, 
         SSP0CR0tmp |= BIT7;
     }
 
-    SSP0CR1 = 0x00; //SSP0 disabled
+    SSP0CR1 = 0x00; // SSP0 disabled
 
-    /*	Setting	xx-Bit Datasize, CPOL and CPHA*/
+    // Setting	xx-Bit Datasize, CPOL and CPHA
     SSP0CR0 = SSP0CR0tmp;
 
     // Clock Setup
@@ -198,7 +199,7 @@ uint8_t SSP0Prepare(uint8_t chip, uint8_t datasize, uint8_t cpol, uint8_t cpha, 
     SSP0CPSR = cpsr;
 
     // Enable
-    SSP0CR1 |= BIT1; //SSP0 enabled
+    SSP0CR1 |= BIT1; // SSP0 enabled
 
     uint32_t Dummy;
 
@@ -214,11 +215,15 @@ uint8_t SSP0Unprepare(uint8_t chip)
     switch (chip) {
         case BMA180_INTERN:
         case SMB380_ACC: {
-            //Turn off Acceleration Sensor
-            PINSEL3 &= ~(BIT8 | BIT9 | BIT10 | BIT11 | BIT14 | BIT15 | BIT16 | BIT17);
+            // Turn off Acceleration Sensor
+            PINSEL3 &= ~(BIT8 | BIT9 | BIT10 | BIT11 | BIT14 | BIT15 | BIT16 |
+                         BIT17);
             FIO1DIR |= BIT20 | BIT21 | BIT24;
-            FIO1DIR &= ~BIT23;							//MISO as Input
-            FIO1SET = BIT20 | BIT24;			//CLK + SSEL + MOSI GPIO as Output //TODO depends on CPOL+CPHA Settings
+            FIO1DIR &= ~BIT23;		 // MISO as Input
+            FIO1SET = BIT20 | BIT24;	 /*
+                                          * CLK + SSEL + MOSI GPIO as Output
+                                          * TODO: depends on CPOL+CPHA Settings
+                                          */
             FIO1CLR = BIT21;
             break;
         }
@@ -228,12 +233,15 @@ uint8_t SSP0Unprepare(uint8_t chip)
         case NORDIC:
         case NANOPAN:
         case ACAMDMS: {
-            //Turn off Nanopan (Pins to GPIO)
+            // Turn off Nanopan (Pins to GPIO)
             PINSEL0 &= ~(BIT30 | BIT31); //CLK to GPIO
             PINSEL1 &= ~(BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5);
             FIO0DIR |= BIT15 | BIT16 | BIT18; //CLK + SSEL + MOSI GPIO as Output
-            FIO0DIR &= ~BIT17; //MISO as Input
-            FIO0SET = BIT15 | BIT16; //CLK + SSEL + MOSI GPIO as Output //TODO depends on CPOL+CPHA Settings
+            FIO0DIR &= ~BIT17; // MISO as Input
+            FIO0SET = BIT15 | BIT16; /*
+                           * CLK + SSEL + MOSI GPIO as Output
+      * TODO: depends on CPOL+CPHA Settings
+      */
             FIO0CLR = BIT18;
             break;
         }
@@ -247,7 +255,8 @@ uint8_t SSP0Unprepare(uint8_t chip)
     return 1;
 }
 
-unsigned char SMB380_ssp_write(const unsigned char regAddr, const unsigned char data, unsigned char flag)
+unsigned char SMB380_ssp_write(const unsigned char regAddr,
+                               const unsigned char data, unsigned char flag)
 {
 
     uint16_t temp = 0;
@@ -288,7 +297,7 @@ unsigned char SSP0_write(const uint16_t data, uint8_t device)
 
             case ACAMDMS:
             case NORDIC:
-                //Chip Select is done in Nordic driver
+                // Chip Select is done in Nordic driver
                 break;
 
             default:
@@ -319,7 +328,7 @@ unsigned char SSP0_write(const uint16_t data, uint8_t device)
 
             case ACAMDMS:
             case NORDIC:
-                //Chip Select is done in Nordic driver
+                // Chip Select is done in Nordic driver
                 break;
 
             default:
@@ -356,7 +365,7 @@ unsigned short SSP0_read(uint8_t device)
 
             case NORDIC:
             case ACAMDMS:
-                //Chip Select is done in Nordic driver
+                // Chip Select is done in Nordic driver
                 break;
 
             default:
@@ -384,7 +393,7 @@ unsigned short SSP0_read(uint8_t device)
 
             case ACAMDMS:
             case NORDIC:
-                //Chip Select is done in Nordic driver
+                // Chip Select is done in Nordic driver
                 break;
 
             default:
