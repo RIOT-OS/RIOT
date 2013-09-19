@@ -27,7 +27,7 @@
 #include <transceiver.h>
 
 #include <cpu-conf.h>
-//#include <board.h>
+#include "cpu.h"
 
 #ifdef DBG_IGNORE
 #include <stdio.h>
