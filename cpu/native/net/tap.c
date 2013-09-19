@@ -117,7 +117,16 @@ int _native_marshall_ethernet(uint8_t *framebuf, radio_packet_t *packet)
 
     data_len = packet->length + sizeof(struct nativenet_header);
 
-    return data_len;
+    /* Pad to minimum payload size.
+     * Linux does this on its own, but it doesn't hurt to do it here.
+     * As of now only tuntaposx needs this. */
+    if (data_len < ETHERMIN) {
+        DEBUG("padding data! (%d -> ", data_len);
+        data_len = ETHERMIN;
+        DEBUG("%d)\n", data_len);
+    }
+
+    return data_len + ETHER_HDR_LEN;
 }
 
 int send_buf(radio_packet_t *packet)
@@ -128,15 +137,9 @@ int send_buf(radio_packet_t *packet)
     DEBUG("send_buf:  Sending packet of length %"PRIu16" from %"PRIu16" to %"PRIu16": %s\n", packet->length, packet->src, packet->dst, (char*) packet->data);
     to_send = _native_marshall_ethernet(buf, packet);
 
-    if ((ETHER_HDR_LEN + to_send) < ETHERMIN) {
-        DEBUG("padding data! (%d ->", to_send);
-        to_send = ETHERMIN - (ETHER_HDR_LEN + sizeof(struct nativenet_header));
-        DEBUG("%d)\n", to_send);
-    }
-
     DEBUG("send_buf: trying to send %d bytes\n", to_send);
 
-    if ((nsent = write(_native_tap_fd, buf, to_send + ETHER_HDR_LEN)) == -1) {;
+    if ((nsent = write(_native_tap_fd, buf, to_send)) == -1) {;
         warn("write");
         return -1;
     }
