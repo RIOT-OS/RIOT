@@ -18,6 +18,8 @@
  * @note    $Id: sc_heap.c 3855 2013-09-05 12:40:11 kasmi $
  */
 
+#ifdef MODULE_LPC_COMMON
+
 extern void heap_stats(void);
 
 void _heap_handler(char *unused)
@@ -25,4 +27,6 @@ void _heap_handler(char *unused)
     (void) unused;
     heap_stats();
 }
+
+#endif
 
