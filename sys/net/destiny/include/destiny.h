@@ -33,6 +33,8 @@
 #ifndef DESTINY_H
 #define DESTINY_H
 
+#include "destiny/in.h"
+
 /**
  * Initializes transport layer.
  *
