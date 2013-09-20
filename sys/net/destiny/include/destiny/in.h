@@ -5,8 +5,8 @@
  *      Author: Oliver
  */
 
-#ifndef IN_H_
-#define IN_H_
+#ifndef DESTINY_IN_H
+#define DESTINY_IN_H
 /*
  * Constants and structures defined by the internet system,
  * Per RFC 790, September 1981, and numerous additions.
@@ -131,4 +131,4 @@
 
 #define IN_LOOPBACKNET         	(127)             /* official! */
 
-#endif /* IN_H_ */
+#endif /* DESTINY_IN_H */
