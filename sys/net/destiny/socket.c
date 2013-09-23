@@ -24,7 +24,6 @@
 #include "ipv6.h"
 #include "udp.h"
 #include "tcp.h"
-#include "socket.h"
 #include "vtimer.h"
 #include "hwtimer.h"
 #include "tcp_timer.h"
@@ -32,7 +31,23 @@
 #include "../net_help/net_help.h"
 #include "../net_help/msg_help.h"
 
+#include "socket.h"
+
+#define EPHEMERAL_PORTS 	49152
+
 socket_internal_t sockets[MAX_SOCKETS];
+
+void print_socket(socket_t *current_socket);
+void print_internal_socket(socket_internal_t *current_socket_internal);
+void printf_tcp_context(tcp_hc_context_t *current_tcp_context);
+int exists_socket(int socket);
+void set_socket_address(sockaddr6_t *sockaddr, sa_family_t sin6_family,
+                        uint16_t sin6_port, uint32_t sin6_flowinfo,
+                        ipv6_addr_t *sin6_addr);
+void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port,
+                    uint32_t seq_nr, uint32_t ack_nr,
+                    uint8_t dataOffset_reserved, uint8_t reserved_flags,
+                    uint16_t window, uint16_t checksum, uint16_t urg_pointer);
 
 void printf_tcp_context(tcp_hc_context_t *current_tcp_context)
 {
@@ -152,7 +167,7 @@ void print_internal_socket(socket_internal_t *current_socket_internal)
     printf("\n--------------------------\n");
 }
 
-socket_internal_t *getSocket(uint8_t s)
+socket_internal_t *get_socket(int s)
 {
     if (exists_socket(s)) {
         return &(sockets[s - 1]);
@@ -162,19 +177,19 @@ socket_internal_t *getSocket(uint8_t s)
     }
 }
 
-void print_sockets(void)
+void destiny_socket_print_sockets(void)
 {
     int i;
     printf("\n---   Socket list:   ---\n");
 
     for (i = 1; i < MAX_SOCKETS + 1; i++) {
-        if (getSocket(i) != NULL) {
-            print_internal_socket(getSocket(i));
+        if (get_socket(i) != NULL) {
+            print_internal_socket(get_socket(i));
         }
     }
 }
 
-bool exists_socket(uint8_t socket)
+int exists_socket(int socket)
 {
     if (sockets[socket - 1].socket_id == 0) {
         return false;
@@ -192,10 +207,10 @@ void close_socket(socket_internal_t *current_socket)
 bool isUDPSocket(uint8_t s)
 {
     if ((exists_socket(s)) &&
-       (getSocket(s)->socket_values.domain == PF_INET6) &&
-       (getSocket(s)->socket_values.type == SOCK_DGRAM) &&
-       ((getSocket(s)->socket_values.protocol == IPPROTO_UDP) ||
-        (getSocket(s)->socket_values.protocol == 0))) {
+       (get_socket(s)->socket_values.domain == PF_INET6) &&
+       (get_socket(s)->socket_values.type == SOCK_DGRAM) &&
+       ((get_socket(s)->socket_values.protocol == IPPROTO_UDP) ||
+        (get_socket(s)->socket_values.protocol == 0))) {
         return true;
     }
     else {
@@ -203,13 +218,13 @@ bool isUDPSocket(uint8_t s)
     }
 }
 
-bool isTCPSocket(uint8_t s)
+bool is_tcp_socket(int s)
 {
     if ((exists_socket(s)) &&
-       (getSocket(s)->socket_values.domain == PF_INET6) &&
-       (getSocket(s)->socket_values.type == SOCK_STREAM) &&
-       ((getSocket(s)->socket_values.protocol == IPPROTO_TCP) ||
-        (getSocket(s)->socket_values.protocol == 0))) {
+       (get_socket(s)->socket_values.domain == PF_INET6) &&
+       (get_socket(s)->socket_values.type == SOCK_STREAM) &&
+       ((get_socket(s)->socket_values.protocol == IPPROTO_TCP) ||
+        (get_socket(s)->socket_values.protocol == 0))) {
         return true;
     }
     else {
@@ -227,14 +242,14 @@ int bind_udp_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
 
     for (i = 1; i < MAX_SOCKETS + 1; i++) {
         if (isUDPSocket(i) &&
-           (getSocket(i)->socket_values.local_address.sin6_port == name->sin6_port)) {
+           (get_socket(i)->socket_values.local_address.sin6_port == name->sin6_port)) {
             return -1;
         }
     }
 
-    memcpy(&getSocket(s)->socket_values.local_address, name, namelen);
-    getSocket(s)->recv_pid = pid;
-    return 1;
+    memcpy(&get_socket(s)->socket_values.local_address, name, namelen);
+    get_socket(s)->recv_pid = pid;
+    return 0;
 }
 
 int bind_tcp_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
@@ -246,23 +261,23 @@ int bind_tcp_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
     }
 
     for (i = 1; i < MAX_SOCKETS + 1; i++) {
-        if (isTCPSocket(i) &&
-           (getSocket(i)->socket_values.local_address.sin6_port == name->sin6_port)) {
+        if (is_tcp_socket(i) &&
+           (get_socket(i)->socket_values.local_address.sin6_port == name->sin6_port)) {
             return -1;
         }
     }
 
-    memcpy(&getSocket(s)->socket_values.local_address, name, namelen);
-    getSocket(s)->recv_pid = pid;
-    getSocket(s)->socket_values.tcp_control.rto = TCP_INITIAL_ACK_TIMEOUT;
-    return 1;
+    memcpy(&get_socket(s)->socket_values.local_address, name, namelen);
+    get_socket(s)->recv_pid = pid;
+    get_socket(s)->socket_values.tcp_control.rto = TCP_INITIAL_ACK_TIMEOUT;
+    return 0;
 }
 
-int socket(int domain, int type, int protocol)
+int destiny_socket(int domain, int type, int protocol)
 {
     int i = 1;
 
-    while (getSocket(i) != NULL) {
+    while (get_socket(i) != NULL) {
         i++;
     }
 
@@ -286,9 +301,9 @@ socket_internal_t *get_udp_socket(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header
 
     while (i < MAX_SOCKETS + 1) {
         if (isUDPSocket(i) &&
-           (getSocket(i)->socket_values.local_address.sin6_port ==
+           (get_socket(i)->socket_values.local_address.sin6_port ==
             udp_header->dst_port)) {
-            return getSocket(i);
+            return get_socket(i);
         }
 
         i++;
@@ -317,15 +332,15 @@ socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header
     memset(compare, 0, 16);
 
     while (i < MAX_SOCKETS + 1) {
-        current_socket = getSocket(i);
+        current_socket = get_socket(i);
 
         /* Check for matching 4 touple, ESTABLISHED connection */
-        if (isTCPSocket(i) && is_four_touple(current_socket, ipv6_header,
+        if (is_tcp_socket(i) && is_four_touple(current_socket, ipv6_header,
                     tcp_header)) {
             return current_socket;
         }
         /* Sockets in LISTEN and SYN_RCVD state should only be tested on local TCP values */
-        else if (isTCPSocket(i) &&
+        else if (is_tcp_socket(i) &&
                 ((current_socket->socket_values.tcp_control.state == LISTEN) ||
                 (current_socket->socket_values.tcp_control.state == SYN_RCVD)) &&
                 (current_socket->socket_values.local_address.sin6_addr.uint8[15] ==
@@ -442,7 +457,7 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
 
         current_mss_option.kind 	= TCP_MSS_OPTION;
         current_mss_option.len 		= sizeof(tcp_mss_option_t);
-        current_mss_option.mss		= STATIC_MSS;
+        current_mss_option.mss		= DESTINY_SOCKET_STATIC_MSS;
         memcpy(((uint8_t *)current_tcp_packet) + TCP_HDR_LEN,
                 &current_mss_option, sizeof(tcp_mss_option_t));
     }
@@ -499,7 +514,7 @@ void set_tcp_cb(tcp_cb_t *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd,
     tcp_control->send_wnd = send_wnd;
 }
 
-int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
+int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 {
     /* Variables */
     ipv6_addr_t src_addr;
@@ -511,7 +526,7 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
     /* Check if socket exists */
-    current_int_tcp_socket = getSocket(socket);
+    current_int_tcp_socket = get_socket(socket);
 
     if (current_int_tcp_socket == NULL) {
         return -1;
@@ -553,7 +568,7 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
            sizeof(tcp_hc_context_t));
 #endif
 
-    set_tcp_cb(&current_tcp_socket->tcp_control, 0, STATIC_WINDOW,
+    set_tcp_cb(&current_tcp_socket->tcp_control, 0, DESTINY_SOCKET_STATIC_WINDOW,
                current_tcp_socket->tcp_control.send_iss,
                current_tcp_socket->tcp_control.send_iss, 0);
 
@@ -608,7 +623,7 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
             *((uint16_t *)(((uint8_t *)tcp_header) + TCP_HDR_LEN + 2));
     }
     else {
-        current_tcp_socket->tcp_control.mss = STATIC_MSS;
+        current_tcp_socket->tcp_control.mss = DESTINY_SOCKET_STATIC_MSS;
     }
 
     current_tcp_socket->tcp_control.rcv_irs = tcp_header->seq_nr;
@@ -660,7 +675,7 @@ int connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 
     current_int_tcp_socket->recv_pid = 255;
 
-    print_sockets();
+    destiny_socket_print_sockets();
     return 0;
 }
 
@@ -695,7 +710,7 @@ void calculate_rto(tcp_cb_t *tcp_control, long current_time)
     tcp_control->rto = rto;
 }
 
-int32_t send(int s, void *msg, uint32_t len, int flags)
+int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags)
 {
     /* Variables */
     msg_t recv_msg;
@@ -708,11 +723,11 @@ int32_t send(int s, void *msg, uint32_t len, int flags)
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
     /* Check if socket exists and is TCP socket */
-    if (!isTCPSocket(s)) {
+    if (!is_tcp_socket(s)) {
         return -1;
     }
 
-    current_int_tcp_socket = getSocket(s);
+    current_int_tcp_socket = get_socket(s);
     current_tcp_socket = &current_int_tcp_socket->socket_values;
 
     /* Check for ESTABLISHED STATE */
@@ -742,14 +757,14 @@ int32_t send(int s, void *msg, uint32_t len, int flags)
                current_tcp_socket->tcp_control.mss) {
                 /* Window size > Maximum Segment Size */
                 if ((len - total_sent_bytes) > current_tcp_socket->tcp_control.mss) {
-                    memcpy(&send_buffer[IPV6_HDR_LEN + TCP_HDR_LEN], msg,
+                    memcpy(&send_buffer[IPV6_HDR_LEN + TCP_HDR_LEN], buf,
                            current_tcp_socket->tcp_control.mss);
                     sent_bytes = current_tcp_socket->tcp_control.mss;
                     total_sent_bytes += sent_bytes;
                 }
                 else {
                     memcpy(&send_buffer[IPV6_HDR_LEN + TCP_HDR_LEN],
-                           msg + total_sent_bytes, len - total_sent_bytes);
+                           buf + total_sent_bytes, len - total_sent_bytes);
                     sent_bytes = len - total_sent_bytes;
                     total_sent_bytes = len;
                 }
@@ -757,14 +772,14 @@ int32_t send(int s, void *msg, uint32_t len, int flags)
             else {
                 /* Window size <= Maximum Segment Size */
                 if ((len - total_sent_bytes) > current_tcp_socket->tcp_control.send_wnd) {
-                    memcpy(&send_buffer[IPV6_HDR_LEN + TCP_HDR_LEN], msg,
+                    memcpy(&send_buffer[IPV6_HDR_LEN + TCP_HDR_LEN], buf,
                            current_tcp_socket->tcp_control.send_wnd);
                     sent_bytes = current_tcp_socket->tcp_control.send_wnd;
                     total_sent_bytes += sent_bytes;
                 }
                 else {
                     memcpy(&send_buffer[IPV6_HDR_LEN + TCP_HDR_LEN],
-                           msg + total_sent_bytes, len - total_sent_bytes);
+                           buf + total_sent_bytes, len - total_sent_bytes);
                     sent_bytes = len - total_sent_bytes;
                     total_sent_bytes = len;
                 }
@@ -895,7 +910,7 @@ uint8_t read_from_socket(socket_internal_t *current_int_tcp_socket,
     }
 }
 
-int recv(int s, void *buf, uint32_t len, int flags)
+int32_t destiny_socket_recv(int s, void *buf, uint32_t len, int flags)
 {
     /* Variables */
     uint8_t read_bytes;
@@ -903,12 +918,12 @@ int recv(int s, void *buf, uint32_t len, int flags)
     socket_internal_t *current_int_tcp_socket;
 
     /* Check if socket exists */
-    if (!isTCPSocket(s)) {
+    if (!is_tcp_socket(s)) {
         printf("INFO: NO TCP SOCKET!\n");
         return -1;
     }
 
-    current_int_tcp_socket = getSocket(s);
+    current_int_tcp_socket = get_socket(s);
 
     /* Setting Thread PID */
     current_int_tcp_socket->recv_pid = thread_getpid();
@@ -937,15 +952,15 @@ int recv(int s, void *buf, uint32_t len, int flags)
     return -1;
 }
 
-int32_t recvfrom(int s, void *buf, uint32_t len, int flags, sockaddr6_t *from,
-                 uint32_t *fromlen)
+int32_t destiny_socket_recvfrom(int s, void *buf, uint32_t len, int flags,
+                                sockaddr6_t *from, uint32_t *fromlen)
 {
     if (isUDPSocket(s)) {
         msg_t m_recv, m_send;
         ipv6_hdr_t *ipv6_header;
         udp_hdr_t *udp_header;
         uint8_t *payload;
-        getSocket(s)->recv_pid = thread_getpid();
+        get_socket(s)->recv_pid = thread_getpid();
 
         msg_receive(&m_recv);
 
@@ -964,8 +979,8 @@ int32_t recvfrom(int s, void *buf, uint32_t len, int flags, sockaddr6_t *from,
         msg_reply(&m_recv, &m_send);
         return udp_header->length - UDP_HDR_LEN;
     }
-    else if (isTCPSocket(s)) {
-        return recv(s, buf, len, flags);
+    else if (is_tcp_socket(s)) {
+        return destiny_socket_recv(s, buf, len, flags);
     }
     else {
         printf("Socket Type not supported!\n");
@@ -973,11 +988,11 @@ int32_t recvfrom(int s, void *buf, uint32_t len, int flags, sockaddr6_t *from,
     }
 }
 
-int32_t sendto(int s, const void *msg, uint32_t len, int flags,
-               sockaddr6_t *to, uint32_t tolen)
+int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
+                              sockaddr6_t *to, uint32_t tolen)
 {
     if (isUDPSocket(s) &&
-       (getSocket(s)->socket_values.foreign_address.sin6_port == 0)) {
+       (get_socket(s)->socket_values.foreign_address.sin6_port == 0)) {
         uint8_t send_buffer[BUFFER_SIZE];
 
         ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
@@ -991,7 +1006,7 @@ int32_t sendto(int s, const void *msg, uint32_t len, int flags,
         current_udp_packet->dst_port = to->sin6_port;
         current_udp_packet->checksum = 0;
 
-        memcpy(payload, msg, len);
+        memcpy(payload, buf, len);
         current_udp_packet->length = UDP_HDR_LEN + len;
         temp_ipv6_header->length = UDP_HDR_LEN + len;
 
@@ -1008,12 +1023,12 @@ int32_t sendto(int s, const void *msg, uint32_t len, int flags,
     }
 }
 
-int close(int s)
+int destiny_socket_close(int s)
 {
-    socket_internal_t *current_socket = getSocket(s);
+    socket_internal_t *current_socket = get_socket(s);
 
     if (current_socket != NULL) {
-        if (isTCPSocket(s)) {
+        if (is_tcp_socket(s)) {
             /* Variables */
             msg_t m_recv;
             uint8_t send_buffer[BUFFER_SIZE];
@@ -1021,14 +1036,14 @@ int close(int s)
             tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
             /* Check if socket exists and is TCP socket */
-            if (!isTCPSocket(s)) {
+            if (!is_tcp_socket(s)) {
                 return -1;
             }
 
             /* Check for ESTABLISHED STATE */
             if (current_socket->socket_values.tcp_control.state != ESTABLISHED) {
                 close_socket(current_socket);
-                return 1;
+                return 0;
             }
 
             current_socket->send_pid = thread_getpid();
@@ -1049,7 +1064,7 @@ int close(int s)
         }
         else if (isUDPSocket(s)) {
             close_socket(current_socket);
-            return 1;
+            return 0;
         }
 
         return -1;
@@ -1059,10 +1074,10 @@ int close(int s)
     }
 }
 
-int bind(int s, sockaddr6_t *name, int namelen)
+int destiny_socket_bind(int s, sockaddr6_t *addr, int addrlen)
 {
     if (exists_socket(s)) {
-        socket_t *current_socket = &getSocket(s)->socket_values;
+        socket_t *current_socket = &get_socket(s)->socket_values;
 
         switch(current_socket->domain) {
             case (PF_INET): {
@@ -1077,7 +1092,7 @@ int bind(int s, sockaddr6_t *name, int namelen)
                     case (SOCK_STREAM): {
                         if ((current_socket->protocol == 0) ||
                             (current_socket->protocol == IPPROTO_TCP)) {
-                            return bind_tcp_socket(s, name, namelen,
+                            return bind_tcp_socket(s, addr, addrlen,
                                                    thread_getpid());
                             break;
                         }
@@ -1093,7 +1108,7 @@ int bind(int s, sockaddr6_t *name, int namelen)
                     case (SOCK_DGRAM): {
                         if ((current_socket->protocol == 0) ||
                             (current_socket->protocol == IPPROTO_UDP)) {
-                            return bind_udp_socket(s, name, namelen,
+                            return bind_udp_socket(s, addr, addrlen,
                                                    thread_getpid());
                             break;
                         }
@@ -1141,10 +1156,10 @@ int bind(int s, sockaddr6_t *name, int namelen)
     return -1;
 }
 
-int listen(int s, int backlog)
+int destiny_socket_listen(int s, int backlog)
 {
-    if (isTCPSocket(s) && getSocket(s)->socket_values.tcp_control.state == CLOSED) {
-        socket_internal_t *current_socket = getSocket(s);
+    if (is_tcp_socket(s) && get_socket(s)->socket_values.tcp_control.state == CLOSED) {
+        socket_internal_t *current_socket = get_socket(s);
         current_socket->socket_values.tcp_control.state = LISTEN;
         return 0;
     }
@@ -1153,15 +1168,15 @@ int listen(int s, int backlog)
     }
 }
 
-socket_internal_t *getWaitingConnectionSocket(int socket,
-                                              ipv6_hdr_t *ipv6_header,
-                                              tcp_hdr_t *tcp_header)
+socket_internal_t *get_waiting_connection_socket(int socket,
+                                                 ipv6_hdr_t *ipv6_header,
+                                                 tcp_hdr_t *tcp_header)
 {
     int i;
-    socket_internal_t *current_socket, *listening_socket = getSocket(socket);
+    socket_internal_t *current_socket, *listening_socket = get_socket(socket);
 
     for (i = 1; i < MAX_SOCKETS + 1; i++) {
-        current_socket = getSocket(i);
+        current_socket = get_socket(i);
 
         /* Connection establishment ACK, Check for 4 touple and state */
         if ((ipv6_header != NULL) && (tcp_header != NULL)) {
@@ -1264,18 +1279,18 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
     /* Waiting for Clients ACK waiting period to time out */
     vtimer_usleep(TCP_SYN_INITIAL_TIMEOUT / 2);
 
-    print_sockets();
+    destiny_socket_print_sockets();
 
     return current_queued_int_socket->socket_id;
 }
 
-int accept(int s, sockaddr6_t *addr, uint32_t *addrlen)
+int destiny_socket_accept(int s, sockaddr6_t *addr, uint32_t *addrlen)
 {
-    socket_internal_t *server_socket = getSocket(s);
+    socket_internal_t *server_socket = get_socket(s);
 
-    if (isTCPSocket(s) && (server_socket->socket_values.tcp_control.state == LISTEN)) {
+    if (is_tcp_socket(s) && (server_socket->socket_values.tcp_control.state == LISTEN)) {
         socket_internal_t *current_queued_socket =
-            getWaitingConnectionSocket(s, NULL, NULL);
+            get_waiting_connection_socket(s, NULL, NULL);
 
         if (current_queued_socket != NULL) {
             return handle_new_tcp_connection(current_queued_socket,
@@ -1290,7 +1305,7 @@ int accept(int s, sockaddr6_t *addr, uint32_t *addrlen)
                 msg_receive(&msg_recv_client_syn);
             }
 
-            current_queued_socket = getWaitingConnectionSocket(s, NULL, NULL);
+            current_queued_socket = get_waiting_connection_socket(s, NULL, NULL);
 
             return handle_new_tcp_connection(current_queued_socket,
                                              server_socket, thread_getpid());
@@ -1306,8 +1321,8 @@ socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
 {
     int queued_socket_id;
 
-    queued_socket_id = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
-    socket_internal_t *current_queued_socket = getSocket(queued_socket_id);
+    queued_socket_id = destiny_socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
+    socket_internal_t *current_queued_socket = get_socket(queued_socket_id);
 
     /* Foreign address */
     set_socket_address(&current_queued_socket->socket_values.foreign_address,
@@ -1326,7 +1341,7 @@ socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
             *((uint16_t *)(((uint8_t *)tcp_header) + TCP_HDR_LEN + 2));
     }
     else {
-        current_queued_socket->socket_values.tcp_control.mss = STATIC_MSS;
+        current_queued_socket->socket_values.tcp_control.mss = DESTINY_SOCKET_STATIC_MSS;
     }
 
     current_queued_socket->socket_values.tcp_control.rcv_irs =
@@ -1337,7 +1352,7 @@ socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
     mutex_unlock(&global_sequence_clunter_mutex);
     current_queued_socket->socket_values.tcp_control.state = SYN_RCVD;
     set_tcp_cb(&current_queued_socket->socket_values.tcp_control,
-               tcp_header->seq_nr + 1, STATIC_WINDOW,
+               tcp_header->seq_nr + 1, DESTINY_SOCKET_STATIC_WINDOW,
                current_queued_socket->socket_values.tcp_control.send_iss,
                current_queued_socket->socket_values.tcp_control.send_iss,
                tcp_header->window);

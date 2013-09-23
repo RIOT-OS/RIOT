@@ -21,10 +21,11 @@
 #include <stdint.h>
 
 #include "tcp_hc.h"
-#include "socket.h"
 #include "tcp.h"
 #include "ipv6.h"
 #include "../net_help/net_help.h"
+
+#include "socket.h"
 
 #ifdef TCP_HC
 
@@ -34,7 +35,7 @@ socket_internal_t *get_tcp_socket_by_context(ipv6_hdr_t *current_ipv6_header,
     socket_internal_t *temp_socket;
 
     for (int i = 1; i < MAX_SOCKETS + 1; i++) {
-        temp_socket = getSocket(i);
+        temp_socket = get_socket(i);
 
         if ((temp_socket != NULL) &&
            ipv6_addr_is_equal(&temp_socket->socket_values.foreign_address.sin6_addr,

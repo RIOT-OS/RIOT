@@ -24,10 +24,11 @@
 #include "msg.h"
 #include "ipv6.h"
 #include "sixlowpan.h"
-#include "socket.h"
 #include "destiny/in.h"
 #include "../net_help/net_help.h"
 #include "../net_help/msg_help.h"
+
+#include "socket.h"
 
 uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
 {
