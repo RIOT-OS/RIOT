@@ -543,7 +543,7 @@ void ipv6_addr_init(ipv6_addr_t *out, uint16_t addr0, uint16_t addr1,
 
 int ipv6_addr_is_link_local(const ipv6_addr_t *addr)
 {
-    return (addr->uint8[0] == 0xfe && addr->uint8[0] == 0x80);
+    return (addr->uint16[0] == HTONS(0xfe80));
 }
 
 int ipv6_addr_is_unique_local_unicast(const ipv6_addr_t *addr)
