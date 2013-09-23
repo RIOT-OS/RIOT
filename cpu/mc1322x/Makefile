@@ -1,6 +1,9 @@
 MODULE =cpu
 
 DIRS =
+ifneq (,$(findstring mc1322x_adc,$(USEMODULE)))
+  DIRS += adc
+endif
 
 all: $(BINDIR)$(MODULE).a
 	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
