@@ -25,9 +25,10 @@
 #include "vtimer.h"
 #include "thread.h"
 #include "destiny.h"
-#include "socket.h"
 #include "../net_help/msg_help.h"
 #include "sixlowpan.h"
+
+#include "socket.h"
 
 void handle_synchro_timeout(socket_internal_t *current_socket)
 {
@@ -101,9 +102,9 @@ void check_sockets(void)
     uint8_t i = 1;
 
     while (i < MAX_SOCKETS + 1) {
-        current_socket = getSocket(i);
+        current_socket = get_socket(i);
 
-        if (isTCPSocket(i)) {
+        if (is_tcp_socket(i)) {
             switch(current_socket->socket_values.tcp_control.state) {
                 case ESTABLISHED: {
                     handle_established(current_socket);

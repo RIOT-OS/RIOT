@@ -27,10 +27,11 @@
 #include "tcp_hc.h"
 #include "tcp.h"
 #include "destiny/in.h"
-#include "socket.h"
 #include "../net_help/net_help.h"
 #include "../net_help/msg_help.h"
 #include "sixlowpan.h"
+
+#include "socket.h"
 
 void printTCPHeader(tcp_hdr_t *tcp_header)
 {
@@ -122,8 +123,8 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
         msg_send(&m_send_tcp, tcp_socket->send_pid, 0);
         return;
     }
-    else if (getWaitingConnectionSocket(tcp_socket->socket_id, ipv6_header,
-                                       tcp_header) != NULL) {
+    else if (get_waiting_connection_socket(tcp_socket->socket_id, ipv6_header,
+                                           tcp_header) != NULL) {
         m_send_tcp.content.ptr = (char *)tcp_header;
         net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->recv_pid, TCP_ACK);
         return;
@@ -158,10 +159,10 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 #ifdef TCP_HC
             update_tcp_hc_context(true, new_socket, tcp_header);
 #endif
-            /* notify socket function accept(..) that a new connection request
-             * has arrived. No need to wait for an answer because the server
-             * accept() function isnt reading from anything other than the
-             * queued sockets */
+            /* notify socket function destiny_socket_accept(..) that a new
+             * connection request has arrived. No need to wait for an answer
+             * because the server destiny_socket_accept() function isnt reading
+             * from anything other than the queued sockets */
             net_msg_send(&m_send_tcp, tcp_socket->recv_pid, 0, TCP_SYN);
         }
         else {

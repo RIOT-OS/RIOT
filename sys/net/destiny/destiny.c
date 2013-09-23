@@ -22,9 +22,10 @@
 #include <vtimer.h>
 #include "udp.h"
 #include "tcp.h"
-#include "socket.h"
 #include "tcp_timer.h"
 #include "destiny.h"
+
+#include "socket.h"
 
 char tcp_stack_buffer[TCP_STACK_SIZE];
 char udp_stack_buffer[UDP_STACK_SIZE];

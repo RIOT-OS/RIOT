@@ -34,6 +34,7 @@
 #define DESTINY_H
 
 #include "destiny/in.h"
+#include "destiny/socket.h"
 
 /**
  * Initializes transport layer.
