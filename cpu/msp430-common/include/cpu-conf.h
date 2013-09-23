@@ -17,13 +17,13 @@ License. See the file LICENSE in the top level directory for more details.
  * @name Kernel configuration
  * @{
  */
-#define KERNEL_CONF_STACKSIZE_PRINTF    (512)
+#define KERNEL_CONF_STACKSIZE_PRINTF    (256)
 
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT	(KERNEL_CONF_STACKSIZE_PRINTF)
+#define KERNEL_CONF_STACKSIZE_DEFAULT	(256)
 #endif
 
-#define KERNEL_CONF_STACKSIZE_IDLE 64
+#define KERNEL_CONF_STACKSIZE_IDLE 96
 #define MSP430_ISR_STACK_SIZE 256
 
 #define RX_BUF_SIZE (3)
