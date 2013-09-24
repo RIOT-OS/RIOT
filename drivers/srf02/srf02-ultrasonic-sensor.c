@@ -16,9 +16,9 @@
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
- * @version     $Revision: 3855 $
+ * @version     $Revision: 3856 $
  *
- * @note        $Id: srf02-ultrasonic-sensor.c 3857 2013-09-04 17:25:41 kasmi $
+ * @note        $Id: srf02-ultrasonic-sensor.c 3857 2013-09-24 17:39:33 kasmi $
  *
  */
 
@@ -68,18 +68,29 @@ uint32_t srf02_get_distance(uint8_t ranging_mode)
     }
 
     hwtimer_wait(HWTIMER_TICKS(65000));
+
     status = i2c_read(SRF02_I2C_INTERFACE, SRF02_DEFAULT_ADDR,
-		      SRF02_RANGE_HIGH_BYTE, rx_buff, reg_size);
+                      SRF02_RANGE_HIGH_BYTE, rx_buff, reg_size);
 
     if (!status) {
-        puts("Read the distance from the i2c-interface is failed");
+        puts("Read the the high echo byte from the i2c-interface is \
+             failed");
         distance = UINT32_MAX;
         return distance;
     }
+
     range_high_byte = rx_buff[0];
 
     status = i2c_read(SRF02_I2C_INTERFACE, SRF02_DEFAULT_ADDR,
-		      SRF02_RANGE_LOW_BYTE, rx_buff, reg_size);
+                      SRF02_RANGE_LOW_BYTE, rx_buff, reg_size);
+
+    if (!status) {
+        puts("Read the the low echo byte from the i2c-interface \
+    	      is failed");
+        distance = UINT32_MAX;
+        return distance;
+    }
+
     range_low_byte = rx_buff[0];
 
     distance = (range_high_byte << 8) | range_low_byte;
@@ -118,11 +129,13 @@ void srf02_start_ranging(uint16_t ranging_mode)
                 default:
                     printf("distance = %lu cm\n", distance);
             }
+
             hwtimer_wait(HWTIMER_TICKS(50000));
         }
         else {
             break;
         }
     }
+
     puts("The SRF02 range sampling is ended!!");
 }
