@@ -14,7 +14,7 @@
  *              The connection between the MCU and the SRF08 is based on the
  *              i2c-interface.
  *
- * @author      Freie Universit‰t Berlin, Computer Systems & Telematics
+ * @author      Freie Universit√§t Berlin, Computer Systems & Telematics
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3856 $
  *
@@ -73,8 +73,7 @@ uint32_t srf02_get_distance(uint8_t ranging_mode)
                       SRF02_RANGE_HIGH_BYTE, rx_buff, reg_size);
 
     if (!status) {
-        puts("Read the the high echo byte from the i2c-interface is \
-             failed");
+        puts("Read the high echo byte from the i2c-interface is failed");
         distance = UINT32_MAX;
         return distance;
     }
@@ -85,8 +84,7 @@ uint32_t srf02_get_distance(uint8_t ranging_mode)
                       SRF02_RANGE_LOW_BYTE, rx_buff, reg_size);
 
     if (!status) {
-        puts("Read the the low echo byte from the i2c-interface \
-    	      is failed");
+        puts("Read the low echo byte from the i2c-interface is failed");
         distance = UINT32_MAX;
         return distance;
     }

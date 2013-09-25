@@ -16,7 +16,7 @@
  *              The connection between the LM75A and the MCU is based
  *              on the I2C-interface.
  *
- * @author      Freie Universit‰t Berlin, Computer Systems & Telematics
+ * @author      Freie Universit√§t Berlin, Computer Systems & Telematics
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3859 $
  *

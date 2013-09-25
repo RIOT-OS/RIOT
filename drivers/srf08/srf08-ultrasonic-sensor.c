@@ -13,7 +13,7 @@
  * @internal
  * @brief       Driver for the SRF08 ultrasonic ranger using the i2c interface.
  *
- * @author      Freie Universit‰t Berlin, Computer Systems & Telematics
+ * @author      Freie Universit√§t Berlin, Computer Systems & Telematics
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3857 $
  *
@@ -107,8 +107,7 @@ int32_t srf08_get_distances(uint32_t *range_array, uint8_t ranging_mode)
         status = i2c_read(SRF08_I2C_INTERFACE, SRF08_DEFAULT_ADDR,
                           register_location, rx_buff, reg_size);
         if (!status) {
-            puts("Read the the high echo byte from the i2c-interface is \
-                   failed");
+            puts("Read the high echo byte from the i2c-interface is failed");
             return -1;
         }
         range_high_byte = rx_buff[0];
@@ -116,8 +115,7 @@ int32_t srf08_get_distances(uint32_t *range_array, uint8_t ranging_mode)
         status = i2c_read(SRF08_I2C_INTERFACE, SRF08_DEFAULT_ADDR,
                           register_location + 1, rx_buff, reg_size);
         if (!status) {
-            puts("Read the the low echo byte from the i2c-interface \
-                    is failed");
+            puts("Read the low echo byte from the i2c-interface is failed");
             return -1;
         }
         range_low_byte = rx_buff[0];
