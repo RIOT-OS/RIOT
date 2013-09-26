@@ -171,7 +171,9 @@ void set_ieee802154_fcf_values(ieee802154_frame_t *frame, uint8_t dest_mode,
     frame->fcf.frame_ver = 0;
     frame->fcf.src_addr_m = src_mode;
     frame->fcf.dest_addr_m = dest_mode;
+#if ENABLE_DEBUG
     print_802154_fcf_frame(frame);
+#endif
 }
 
 void set_ieee802154_frame_values(ieee802154_frame_t *frame)
