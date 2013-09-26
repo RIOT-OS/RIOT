@@ -743,7 +743,7 @@ void cc1100_phy_rx_handler(void)
                 /* Stop the burst */
                 rflags.LL_ACK = true;
                 rflags.RSSI_SEND = p->phy_src;
-                rflags.TCP = (uint32_t)((uint16_t *)p->data)[0];
+                rflags.TCP = (uint32_t)((uint16_t *)p->data);
             }
 
             return;
