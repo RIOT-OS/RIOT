@@ -780,11 +780,15 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
     else {
         lowpan_reas_buf_t *current_buf = get_packet_frag_buf(length, 0, s_laddr,
                                          d_laddr);
-        /* Copy packet bytes into corresponding packet space area */
-        memcpy(current_buf->packet, data, length);
-        current_buf->current_packet_size += length;
-        add_fifo_packet(current_buf);
-
+        if (current_buf && current_buf->packet) {
+            /* Copy packet bytes into corresponding packet space area */
+            memcpy(current_buf->packet, data, length);
+            current_buf->current_packet_size += length;
+            add_fifo_packet(current_buf);
+        }
+        else {
+            DEBUG("ERROR: no memory left in packet buffer!\n");
+        }
         if (thread_getstatus(transfer_pid) == STATUS_SLEEPING) {
             thread_wakeup(transfer_pid);
         }
