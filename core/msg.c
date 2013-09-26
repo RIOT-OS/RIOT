@@ -24,6 +24,7 @@
 #include <stddef.h>
 #include <irq.h>
 #include <cib.h>
+#include <inttypes.h>
 
 #include "flags.h"
 
