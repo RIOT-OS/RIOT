@@ -59,7 +59,7 @@ License. See the file LICENSE in the top level directory for more details.
 #define KERNEL_CONF_STACKSIZE_DEFAULT	(512)
 #endif
 
-#define KERNEL_CONF_STACKSIZE_IDLE		(512)
+#define KERNEL_CONF_STACKSIZE_IDLE		(160)
 /** @} */
 
 /**
