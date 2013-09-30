@@ -24,6 +24,10 @@
 #ifndef _UNISTD_H
 #define _UNISTD_H
 
+#define STDIN_FILENO    0   ///< stdin file descriptor
+#define STDOUT_FILENO   1   ///< stdout file descriptor
+#define STDERR_FILENO   2   ///< stderr file descriptor
+
 /**
  * @brief   Close a file descriptor.
  * @details shall deallocate the file descriptor indicated by *fildes*. To
