@@ -88,14 +88,19 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksiz
 void cpu_switch_context_exit(void)
 {
     ucontext_t *ctx;
+    extern int native_interrupts_enabled;
 
     DEBUG("XXX: cpu_switch_context_exit()\n");
-    //active_thread = sched_threads[0];
-    sched_run();
+    if ((sched_context_switch_request == 1) || (active_thread == NULL)) {
+        sched_run();
+    }
 
     DEBUG("XXX: cpu_switch_context_exit(): calling setcontext(%s)\n\n", active_thread->name);
     ctx = (ucontext_t *)(active_thread->sp);
-    eINT(); // XXX: workaround for bug (?) in sched_task_exit
+
+    /* the next context will have interrupts enabled due to ucontext */
+    DEBUG("XXX: cpu_switch_context_exit: native_interrupts_enabled = 1;\n");
+    native_interrupts_enabled = 1;
 
     if (setcontext(ctx) == -1) {
         err(1, "cpu_switch_context_exit(): setcontext():");
