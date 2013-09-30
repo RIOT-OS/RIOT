@@ -15,20 +15,22 @@
  * @}
  */
 
-
 #include <stdio.h>
-#include <thread.h>
 #include <string.h>
 
-#include "udp.h"
-#include "msg.h"
 #include "ipv6.h"
+#include "msg.h"
 #include "sixlowpan.h"
-#include "destiny/in.h"
-#include "../net_help/net_help.h"
-#include "msg_help.h"
+#include "thread.h"
 
+#include "destiny/in.h"
+
+#include "../net_help/net_help.h"
+
+#include "msg_help.h"
 #include "socket.h"
+
+#include "udp.h"
 
 uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
 {

@@ -15,20 +15,22 @@
  * @}
  */
 
-
-#include <thread.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <math.h>
-#include "tcp_timer.h"
-#include "msg_help.h"
-#include "vtimer.h"
-#include "thread.h"
-#include "destiny.h"
-#include "sixlowpan.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+#include "sixlowpan.h"
+#include "thread.h"
+#include "vtimer.h"
+
+#include "destiny.h"
+
+#include "msg_help.h"
 #include "socket.h"
+
+#include "tcp_timer.h"
+
 
 void handle_synchro_timeout(socket_internal_t *current_socket)
 {

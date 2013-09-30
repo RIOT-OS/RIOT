@@ -7,8 +7,12 @@
 
 #include <thread.h>
 #include <stdio.h>
-#include "msg_help.h"
+
+#include "thread.h"
+
 #include "tcp_timer.h"
+
+#include "msg_help.h"
 
 void block_continue_thread(void)
 {

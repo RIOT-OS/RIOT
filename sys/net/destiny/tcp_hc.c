@@ -16,16 +16,18 @@
  */
 
 
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdint.h>
 
-#include "tcp_hc.h"
-#include "tcp.h"
 #include "ipv6.h"
+
 #include "../net_help/net_help.h"
 
 #include "socket.h"
+#include "tcp.h"
+
+#include "tcp_hc.h"
 
 #ifdef TCP_HC
 

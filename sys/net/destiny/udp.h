@@ -25,11 +25,11 @@
 #ifndef UDP_H_
 #define UDP_H_
 
+#include "ipv6.h"
+
 #define UDP_HDR_LEN 				8
 
 #define UDP_STACK_SIZE 				KERNEL_CONF_STACKSIZE_DEFAULT
-
-#include "ipv6.h"
 
 typedef struct __attribute__((packed)) udp_h_t {
     uint16_t src_port;
