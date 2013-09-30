@@ -39,7 +39,7 @@ struct nativenet_callback_s {
 static struct nativenet_callback_s _nativenet_callbacks[255];
 
 struct rx_buffer_s _nativenet_rx_buffer[RX_BUF_SIZE];
-volatile uint8_t rx_buffer_next;
+static volatile uint8_t rx_buffer_next;
 
 uint8_t _native_net_chan;
 uint16_t _native_net_pan;
@@ -108,7 +108,7 @@ radio_address_t nativenet_get_address()
 uint8_t nativenet_send(radio_packet_t *packet)
 {
     packet->src = _native_net_addr;
-    DEBUG("nativenet_send:  Sending packet of length %"PRIu16" from %"PRIu16" to %"PRIu16": %s\n", packet->length, packet->src, packet->dst, (char*) packet->data);
+    DEBUG("nativenet_send:  Sending packet of length %"PRIu16" from %"PRIu16" to %"PRIu16"\n", packet->length, packet->src, packet->dst);
 
     if (send_buf(packet) == -1) {
         warnx("nativenet_send: error sending packet");
@@ -183,6 +183,7 @@ void _nativenet_handle_packet(radio_packet_t *packet)
     }
 
     /* copy packet to rx buffer */
+    DEBUG("\n\t\trx_buffer_next: %i\n\n", rx_buffer_next);
     memcpy(&_nativenet_rx_buffer[rx_buffer_next].data, packet->data, packet->length);
     memcpy(&_nativenet_rx_buffer[rx_buffer_next].packet, packet, sizeof(radio_packet_t));
     _nativenet_rx_buffer[rx_buffer_next].packet.data = (uint8_t *) &_nativenet_rx_buffer[rx_buffer_next].data;
