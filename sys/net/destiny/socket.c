@@ -26,10 +26,10 @@
 #include "tcp.h"
 #include "vtimer.h"
 #include "hwtimer.h"
+#include "msg_help.h"
 #include "tcp_timer.h"
 #include "tcp_hc.h"
 #include "../net_help/net_help.h"
-#include "../net_help/msg_help.h"
 
 #include "socket.h"
 
