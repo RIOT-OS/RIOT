@@ -15,23 +15,25 @@
  * @}
  */
 
-
-#include <stdio.h>
-#include <thread.h>
-#include <string.h>
-#include <stdlib.h>
 #include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include "vtimer.h"
-#include "tcp_timer.h"
-#include "tcp_hc.h"
-#include "tcp.h"
-#include "destiny/in.h"
-#include "msg_help.h"
-#include "../net_help/net_help.h"
 #include "sixlowpan.h"
+#include "thread.h"
+#include "vtimer.h"
 
+#include "destiny/in.h"
+
+#include "../net_help/net_help.h"
+
+#include "msg_help.h"
 #include "socket.h"
+#include "tcp_hc.h"
+#include "tcp_timer.h"
+
+#include "tcp.h"
 
 void printTCPHeader(tcp_hdr_t *tcp_header)
 {

@@ -18,6 +18,8 @@
 #ifndef TCP_H_
 #define TCP_H_
 
+#include "ipv6.h"
+
 #define TCP_HDR_LEN 			20
 
 #define TCP_EOO_OPTION			0x00		// End of option list
@@ -77,8 +79,6 @@ enum tcp_codes {
 #define SET_TCP_FIN_ACK(a) 		a = ((a & 0x00) | TCP_FIN_ACK)
 
 #define TCP_STACK_SIZE 			KERNEL_CONF_STACKSIZE_DEFAULT
-
-#include "ipv6.h"
 
 typedef struct __attribute__((packed)) tcp_mms_o_t {
     uint8_t		kind;

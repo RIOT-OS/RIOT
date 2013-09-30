@@ -15,21 +15,24 @@
  * @}
  */
 
-#include <thread.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <inttypes.h>
 #include <math.h>
-#include "ipv6.h"
-#include "udp.h"
-#include "tcp.h"
-#include "vtimer.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "hwtimer.h"
-#include "msg_help.h"
-#include "tcp_timer.h"
-#include "tcp_hc.h"
+#include "ipv6.h"
+#include "thread.h"
+#include "vtimer.h"
+
 #include "../net_help/net_help.h"
+
+#include "msg_help.h"
+#include "tcp.h"
+#include "tcp_hc.h"
+#include "tcp_timer.h"
+#include "udp.h"
 
 #include "socket.h"
 

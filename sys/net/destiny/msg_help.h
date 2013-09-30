@@ -8,6 +8,8 @@
 #ifndef MSG_HELP_H_
 #define MSG_HELP_H_
 
+#include <stdint.h>
+
 // Function IDs
 #define FID_SIXLOWIP_TCP				0
 #define FID_SIXLOWIP_UDP				1

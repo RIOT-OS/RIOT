@@ -23,7 +23,9 @@
 #define DESTINY_SOCKET_H
 
 #include <stdint.h>
+
 #include "ipv6.h"
+
 #include "destiny/in.h"
 
 typedef uint8_t sa_family_t;    ///< POSIX compatible type for address family.

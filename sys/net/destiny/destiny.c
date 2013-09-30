@@ -19,13 +19,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <vtimer.h>
-#include "udp.h"
-#include "tcp.h"
-#include "tcp_timer.h"
+
 #include "destiny.h"
+#include "vtimer.h"
 
 #include "socket.h"
+#include "tcp.h"
+#include "tcp_timer.h"
+#include "udp.h"
 
 char tcp_stack_buffer[TCP_STACK_SIZE];
 char udp_stack_buffer[UDP_STACK_SIZE];

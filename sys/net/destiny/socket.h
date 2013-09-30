@@ -1,7 +1,9 @@
 #ifndef _DESTINY_SOCKET
 #define _DESTINY_SOCKET
-#include "destiny/socket.h"
+
 #include "cpu.h"
+
+#include "destiny/socket.h"
 
 #include "tcp.h"
 #include "udp.h"
