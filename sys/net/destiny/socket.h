@@ -72,8 +72,8 @@ typedef struct __attribute__((packed)) {
 extern socket_internal_t sockets[MAX_SOCKETS];
 
 socket_internal_t *get_waiting_connection_socket(int socket,
-                                                 ipv6_hdr_t *ipv6_header,
-                                                 tcp_hdr_t *tcp_header);
+        ipv6_hdr_t *ipv6_header,
+        tcp_hdr_t *tcp_header);
 void close_socket(socket_internal_t *current_socket);
 socket_internal_t *get_socket(int s);
 socket_internal_t *get_udp_socket(ipv6_hdr_t *ipv6_header,
@@ -81,7 +81,7 @@ socket_internal_t *get_udp_socket(ipv6_hdr_t *ipv6_header,
 socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header,
                                   tcp_hdr_t *tcp_header);
 socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
-                                         tcp_hdr_t *tcp_header);
+        tcp_hdr_t *tcp_header);
 void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
                       tcp_hdr_t *tcp_header, socket_t *tcp_socket);
 void set_tcp_cb(tcp_cb_t *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd,

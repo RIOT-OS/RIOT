@@ -1,5 +1,5 @@
 /**
- * Destiny UDP implementation 
+ * Destiny UDP implementation
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,10 +7,10 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny 
+ * @ingroup destiny
  * @{
  * @file    udp.c
- * @brief   UDP implementation 
+ * @brief   UDP implementation
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @}
  */

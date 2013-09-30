@@ -1,5 +1,5 @@
 /**
- * Destiny TCP implementation 
+ * Destiny TCP implementation
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,10 +7,10 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny 
+ * @ingroup destiny
  * @{
  * @file    tcp.c
- * @brief   TCP implementation 
+ * @brief   TCP implementation
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @}
  */
@@ -87,7 +87,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
         acknowledged_bytes = tcp_socket->socket_values.tcp_control.rcv_wnd;
         tcp_socket->socket_values.tcp_control.rcv_wnd = 0;
         tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end +
-            tcp_socket->socket_values.tcp_control.rcv_wnd;
+                                           tcp_socket->socket_values.tcp_control.rcv_wnd;
         mutex_unlock(&tcp_socket->tcp_buffer_mutex);
     }
     else {
@@ -97,7 +97,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
             tcp_socket->socket_values.tcp_control.rcv_wnd - tcp_payload_len;
         acknowledged_bytes = tcp_payload_len;
         tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end +
-            tcp_payload_len;
+                                           tcp_payload_len;
         mutex_unlock(&tcp_socket->tcp_buffer_mutex);
     }
 
@@ -155,7 +155,7 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 
     if (tcp_socket->socket_values.tcp_control.state == LISTEN) {
         socket_internal_t *new_socket = new_tcp_queued_socket(ipv6_header,
-                                                              tcp_header);
+                                        tcp_header);
 
         if (new_socket != NULL) {
 #ifdef TCP_HC
@@ -312,7 +312,7 @@ void tcp_packet_handler(void)
         chksum = tcp_csum(ipv6_header, tcp_header);
 
         payload = (uint8_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN +
-                tcp_header->dataOffset_reserved * 4);
+                              tcp_header->dataOffset_reserved * 4);
 
         if ((chksum == 0xffff) && (tcp_socket != NULL)) {
 #ifdef TCP_HC
@@ -321,7 +321,7 @@ void tcp_packet_handler(void)
             /* Remove reserved bits from tcp flags field */
             uint8_t tcp_flags = tcp_header->reserved_flags & REMOVE_RESERVED;
 
-            switch(tcp_flags) {
+            switch (tcp_flags) {
                 case TCP_ACK: {
                     /* only ACK Bit set */
                     handle_tcp_ack_packet(ipv6_header, tcp_header, tcp_socket);
