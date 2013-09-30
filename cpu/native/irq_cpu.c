@@ -16,6 +16,7 @@
 #include <err.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 // __USE_GNU for gregs[REG_EIP] access under Linux
 #define __USE_GNU
@@ -25,21 +26,21 @@
 #include "irq.h"
 #include "cpu.h"
 
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
-static int native_interrupts_enabled;
+volatile int native_interrupts_enabled;
 
-int _native_sigpend;
-int _native_in_isr;
-int _native_in_syscall;
-static ucontext_t native_isr_context;
+volatile int _native_sigpend;
+volatile int _native_in_isr;
+volatile int _native_in_syscall;
+ucontext_t native_isr_context;
 static sigset_t native_sig_set;
 static char __isr_stack[SIGSTKSZ];
 extern volatile tcb_t *active_thread;
 
-unsigned int _native_saved_eip;
+volatile unsigned int _native_saved_eip;
 ucontext_t *_native_cur_ctx, *_native_isr_ctx;
-int _native_in_isr;
 
 static int pipefd[2];
 
@@ -261,7 +262,7 @@ int _native_popsig(void)
     i = 0;
 
     _native_in_syscall = 1;
-    while ((nleft > 0) && ((nread = read(pipefd[0], &sig + i, nleft))  != -1)) {
+    while ((nleft > 0) && ((nread = read(pipefd[0], ((uint8_t*)&sig) + i, nleft))  != -1)) {
         i += nread;
         nleft -= nread;
     }
