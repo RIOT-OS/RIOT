@@ -142,7 +142,7 @@ void recv_ieee802154_frame(void)
         if (m.type == PKT_PENDING) {
 
             p = (radio_packet_t *) m.content.ptr;
-            hdrlen = read_802154_frame(p->data, &frame, p->length);
+            hdrlen = ieee802154_frame_read(p->data, &frame, p->length);
             length = p->length - hdrlen;
 
             /* deliver packet to network(6lowpan)-layer */
@@ -172,7 +172,7 @@ void set_ieee802154_fcf_values(ieee802154_frame_t *frame, uint8_t dest_mode,
     frame->fcf.src_addr_m = src_mode;
     frame->fcf.dest_addr_m = dest_mode;
 #if ENABLE_DEBUG
-    print_802154_fcf_frame(frame);
+    ieee802154_frame_print_fcf_frame(frame);
 #endif
 }
 
@@ -212,10 +212,10 @@ void sixlowpan_mac_send_ieee802154_frame(const ieee_802154_long_t *addr,
     daddr = HTONS(addr->uint16[3]);
     frame.payload = (uint8_t *)payload; // payload won't be changed so cast is legal.
     frame.payload_len = length;
-    uint8_t hdrlen = get_802154_hdr_len(&frame);
+    uint8_t hdrlen = ieee802154_frame_get_hdr_len(&frame);
 
     memset(&buf, 0, PAYLOAD_SIZE);
-    init_802154_frame(&frame, (uint8_t *)&buf);
+    ieee802154_frame_init(&frame, (uint8_t *)&buf);
     memcpy(&buf[hdrlen], frame.payload, frame.payload_len);
     /* set FCS */
     /* RSSI = 0 */

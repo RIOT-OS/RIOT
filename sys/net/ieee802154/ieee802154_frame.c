@@ -23,7 +23,7 @@ uint8_t ieee802154_hdr_ptr;
 uint8_t ieee802154_payload_ptr;
 uint16_t ieee802154_payload_len;
 
-uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf)
+uint8_t ieee802154_frame_init(ieee802154_frame_t *frame, uint8_t *buf)
 {
     /* Frame Control Field - 802.15.4 - 2006 - 7.2.1.1  */
     uint8_t index = 0;
@@ -105,7 +105,7 @@ uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf)
   * |  FCF  | DSN | DPID  | DAD | SPID  | SAD |
   * -------------------------------------------
   */
-uint8_t get_802154_hdr_len(ieee802154_frame_t *frame)
+uint8_t ieee802154_frame_get_hdr_len(ieee802154_frame_t *frame)
 {
     uint8_t len = 0;
 
@@ -141,7 +141,8 @@ uint8_t get_802154_hdr_len(ieee802154_frame_t *frame)
     return (len + 3);
 }
 
-uint8_t read_802154_frame(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len)
+uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame,
+                              uint8_t len)
 {
     uint8_t index = 0;
     uint8_t hdrlen;
@@ -157,8 +158,6 @@ uint8_t read_802154_frame(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len)
     frame->fcf.frame_pend = (buf[index] >> 4) & 0x01;
     frame->fcf.ack_req = (buf[index] >> 5) & 0x01;
     frame->fcf.panid_comp = (buf[index] >> 6) & 0x01;
-
-    //print_802154_fcf_frame(frame);
 
     index++;
 
@@ -236,7 +235,7 @@ uint8_t read_802154_frame(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len)
     return hdrlen;
 }
 
-void print_802154_fcf_frame(ieee802154_frame_t *frame)
+void ieee802154_frame_print_fcf_frame(ieee802154_frame_t *frame)
 {
     printf("frame type: %02x\n"
            "security enabled: %02x\n"
