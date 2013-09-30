@@ -25,11 +25,24 @@
 #endif
 #include <err.h>
 
+#ifdef HAVE_VALGRIND_H
+#include <valgrind.h>
+#define VALGRIND_DEBUG DEBUG
+#elif defined(HAVE_VALGRIND_VALGRIND_H)
+#include <valgrind/valgrind.h>
+#define VALGRIND_DEBUG DEBUG
+#else
+#define VALGRIND_STACK_REGISTER(...)
+#define VALGRIND_DEBUG(...)
+#endif
+
 #include "kernel_internal.h"
 #include "sched.h"
 
 #include "cpu.h"
 #include "cpu-conf.h"
+
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 extern volatile tcb_t *active_thread;
@@ -53,6 +66,9 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksiz
 {
     unsigned int *stk;
     ucontext_t *p;
+
+    VALGRIND_STACK_REGISTER(stack_start, stack_start + stacksize);
+    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", stack_start, (void*)((int)stack_start + stacksize));
 
     DEBUG("thread_stack_init()\n");
 
@@ -144,6 +160,8 @@ void native_cpu_init()
     end_context.uc_stack.ss_size = SIGSTKSZ;
     end_context.uc_stack.ss_flags = 0;
     makecontext(&end_context, sched_task_exit, 0);
+    VALGRIND_STACK_REGISTER(__end_stack, __end_stack + sizeof(__end_stack));
+    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", __end_stack, (void*)((int)__end_stack + sizeof(__end_stack)));
 
     DEBUG("RIOT native cpu initialized.");
 }
