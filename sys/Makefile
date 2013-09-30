@@ -18,6 +18,9 @@ ifneq (,$(findstring posix,$(USEMODULE)))
 	INCLUDES += -I$(RIOTBASE)/sys/posix/include
     DIRS += posix
 endif
+ifneq (,$(findstring pnet,$(USEMODULE)))
+    DIRS += posix/pnet
+endif
 ifneq (,$(findstring shell,$(USEMODULE)))
     DIRS += shell
 endif
