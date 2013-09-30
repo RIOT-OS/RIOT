@@ -7,7 +7,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny 
+ * @ingroup destiny
  * @{
  * @file    tcp.c
  * @brief   TCP data structs and prototypes

@@ -7,7 +7,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny 
+ * @ingroup destiny
  * @{
  * @file    udp.c
  * @brief   UDP data structs and prototypes

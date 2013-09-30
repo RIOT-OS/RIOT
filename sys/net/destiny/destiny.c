@@ -1,5 +1,5 @@
 /**
- * Destiny transpor layer implementation 
+ * Destiny transport layer implementation
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,10 +7,10 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny 
+ * @ingroup destiny
  * @{
  * @file    destiny.c
- * @brief   transpor layer functions 
+ * @brief   transpor layer functions
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @}
  */
