@@ -34,6 +34,9 @@ endif
 ifneq (,$(findstring posix,$(USEMODULE)))
     DIRS += posix
 endif
+ifneq (,$(findstring pnet,$(USEMODULE)))
+    DIRS += posix/pnet
+endif
 ifneq (,$(findstring shell,$(USEMODULE)))
     DIRS += shell
 endif
