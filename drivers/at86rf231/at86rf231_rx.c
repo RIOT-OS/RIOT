@@ -42,12 +42,12 @@ void at86rf231_rx_handler(void)
         return;
     }
 
-    read_802154_frame(&buf[1], &at86rf231_rx_buffer[rx_buffer_next].frame,
-                      at86rf231_rx_buffer[rx_buffer_next].length - 2);
+    ieee802154_frame_read(&buf[1], &at86rf231_rx_buffer[rx_buffer_next].frame,
+                          at86rf231_rx_buffer[rx_buffer_next].length - 2);
 
     if (at86rf231_rx_buffer[rx_buffer_next].frame.fcf.frame_type != 2) {
 #ifdef ENABLE_DEBUG
-        print_802154_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
+        ieee802154_frame_print_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
 #endif
 
         /* notify transceiver thread if any */
@@ -61,7 +61,7 @@ void at86rf231_rx_handler(void)
     else {
 #ifdef ENABLE_DEBUG
         DEBUG("GOT ACK for SEQ %u\n", at86rf231_rx_buffer[rx_buffer_next].frame.seq_nr);
-        print_802154_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
+        ieee802154_frame_print_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
 #endif
     }
 

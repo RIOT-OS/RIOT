@@ -26,6 +26,7 @@
 #include "posix_io.h"
 #include "board_uart0.h"
 
+#include "ieee802154_frame.h"
 #include "sixlowpan/error.h"
 #include "bordermultiplex.h"
 #include "flowcontrol.h"
@@ -34,7 +35,6 @@
 #include "icmp.h"
 #include "serialnumber.h"
 
-#include "sys/net/ieee802154/ieee802154_frame.h"
 #include "sys/net/net_help/net_help.h"
 
 #define READER_STACK_SIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)

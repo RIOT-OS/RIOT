@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include <ieee802154/ieee802154_frame.h>
+#include "ieee802154_frame.h"
 
 #include <at86rf231_settings.h>
 
