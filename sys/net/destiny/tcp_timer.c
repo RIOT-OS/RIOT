@@ -22,10 +22,10 @@
 #include <stdlib.h>
 #include <math.h>
 #include "tcp_timer.h"
+#include "msg_help.h"
 #include "vtimer.h"
 #include "thread.h"
 #include "destiny.h"
-#include "../net_help/msg_help.h"
 #include "sixlowpan.h"
 
 #include "socket.h"
