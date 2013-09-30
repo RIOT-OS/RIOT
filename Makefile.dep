@@ -7,6 +7,25 @@ ifneq (,$(findstring vtimer,$(USEMODULE)))
 	endif
 endif
 
+
+ifneq (,$(findstring pnet, $(USEMODULE)))
+	ifeq (,$(findstring posix, $(USEMODULE)))
+		USEMODULE += posix
+	endif
+	ifeq (,$(findstring destiny, $(USEMODULE)))
+		USEMODULE += destiny
+	endif
+	ifeq (,$(findstring net_help, $(USEMODULE)))
+		USEMODULE += net_help
+	endif
+endif
+
+ifneq (,$(findstring posix, $(USEMODULE)))
+	ifeq (,$(findstring uart0, $(USEMODULE)))
+		USEMODULE += uart0
+	endif
+endif
+
 ifneq (,$(findstring uart0,$(USEMODULE)))
 	ifeq (,$(findstring lib,$(USEMODULE)))
 		USEMODULE += lib	
@@ -39,18 +58,6 @@ ifneq (,$(findstring at86rf231,$(USEMODULE)))
 	ifeq (,$(findstring transceiver,$(USEMODULE)))
 		USEMODULE += transceiver
 		USEMODULE += ieee802154
-	endif
-endif
-
-ifneq (,$(findstring pnet, $(USEMODULE)))
-	ifeq (,$(findstring posix, $(USEMODULE)))
-		USEMODULE += posix
-	endif
-	ifeq (,$(findstring destiny, $(USEMODULE)))
-		USEMODULE += destiny
-	endif
-	ifeq (,$(findstring net_help, $(USEMODULE)))
-		USEMODULE += net_help
 	endif
 endif
 
