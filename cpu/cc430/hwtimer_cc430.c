@@ -10,7 +10,7 @@
 static uint32_t ticks = 0;
 
 extern void (*int_handler)(int);
-extern void TA0_unset(short timer);
+extern void timer_unset(short timer);
 
 void timerA_init(void)
 {
@@ -34,7 +34,7 @@ interrupt(TIMER0_A0_VECTOR) __attribute__((naked)) timer0_a0_isr(void)
 {
     __enter_isr();
 
-    TA0_unset(0);
+    timer_unset(0);
     int_handler(0);
     __exit_isr();
 }
@@ -51,7 +51,7 @@ interrupt(TIMER0_A1_VECTOR) __attribute__((naked)) timer0_a1_5_isr(void)
     }
     else {
         timer = (taiv / 2);
-        TA0_unset(timer);
+        timer_unset(timer);
         int_handler(timer);
     }
 
