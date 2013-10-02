@@ -1581,6 +1581,6 @@ int8_t plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
         plist[prefix_count].pref_ltime = HTONL(pref_ltime);
         memcpy(&(plist[prefix_count].addr.uint8[0]), &(addr->uint8[0]), 16);
 
-        return SUCCESS;
+        return SIXLOWERROR_SUCCESS;
     }
 }

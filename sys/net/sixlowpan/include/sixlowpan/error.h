@@ -18,13 +18,11 @@
 #ifndef SIXLOWPAN_ERROR_H
 #define SIXLOWPAN_ERROR_H
 
-#ifndef SUCCESS
 /**
  * Functions return this if call was success. Only defined if not
  * already defined by other header.
  */
-#define SUCCESS                 (0)
-#endif
+#define SIXLOWERROR_SUCCESS                 (0)
 
 /**
  * Error code that signals that array is full.

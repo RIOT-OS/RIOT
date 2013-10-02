@@ -201,7 +201,7 @@ void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,
  * @param[in] trans    transceiver to use with 6LoWPAN.
  * @param[in] border_router_addr    Address of this border router.
  *
- * @return  SUCCESS on success, otherwise SIXLOWERROR_ADDRESS if
+ * @return  SIXLOWERROR_SUCCESS on success, otherwise SIXLOWERROR_ADDRESS if
  *          address was not generated from IEEE 802.15.4 16-bit short
  *          address.
  */
