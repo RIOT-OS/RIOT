@@ -207,7 +207,7 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address)
         etx_init_beaconing(&my_address);
     }
 
-    return SUCCESS;
+    return SIXLOWERROR_SUCCESS;
 }
 
 void rpl_init_root(void)

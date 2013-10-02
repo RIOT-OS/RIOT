@@ -158,7 +158,7 @@ uint8_t sixlowpan_lowpan_border_init(transceiver_type_t trans,
 
     ipv6_init_iface_as_router();
 
-    return SUCCESS;
+    return SIXLOWERROR_SUCCESS;
 }
 
 void border_process_lowpan(void)
