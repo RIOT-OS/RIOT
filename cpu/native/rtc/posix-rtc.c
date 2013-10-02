@@ -23,7 +23,7 @@
 
 #include "debug.h"
 
-#include <rtc.h>
+#include "rtc.h"
 
 static int native_rtc_enabled;
 

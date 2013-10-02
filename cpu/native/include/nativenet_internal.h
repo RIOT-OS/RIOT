@@ -38,7 +38,6 @@ struct rx_buffer_s {
 };
 
 extern struct rx_buffer_s _nativenet_rx_buffer[];
-extern volatile uint8_t rx_buffer_next;
 
 void _nativenet_handle_packet(radio_packet_t *packet);
 #endif /* NATIVENET_INTERNAL_H */

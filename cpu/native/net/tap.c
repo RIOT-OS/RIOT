@@ -80,7 +80,7 @@ void _native_handle_tap_input(void)
                 p.rssi = 0;
                 p.lqi = 0;
                 p.data = frame.field.payload.data;
-                DEBUG("_native_handle_tap_input: received packet of length %"PRIu16" for %"PRIu16" from %"PRIu16": %s\n", p.length, p.dst, p.src, (char*) p.data);
+                DEBUG("_native_handle_tap_input: received packet of length %"PRIu16" for %"PRIu16" from %"PRIu16"\n", p.length, p.dst, p.src);
                 _nativenet_handle_packet(&p);
             }
         }
@@ -103,7 +103,7 @@ int _native_marshall_ethernet(uint8_t *framebuf, radio_packet_t *packet)
     unsigned char addr[ETHER_ADDR_LEN];
 
     f = (union eth_frame*)framebuf;
-    addr[0] = addr[1] = addr[2] = addr[3] = addr[4] = addr[5] = (char)0xFF;
+    addr[0] = addr[1] = addr[2] = addr[3] = addr[4] = addr[5] = 0xFF;
 
     memcpy(f->field.header.ether_dhost, addr, ETHER_ADDR_LEN);
     memcpy(f->field.header.ether_shost, _native_tap_mac, ETHER_ADDR_LEN);
@@ -134,7 +134,9 @@ int send_buf(radio_packet_t *packet)
     uint8_t buf[TAP_BUFFER_LENGTH];
     int nsent, to_send;
 
-    DEBUG("send_buf:  Sending packet of length %"PRIu16" from %"PRIu16" to %"PRIu16": %s\n", packet->length, packet->src, packet->dst, (char*) packet->data);
+    memset(buf, 0, sizeof(buf));
+
+    DEBUG("send_buf:  Sending packet of length %"PRIu16" from %"PRIu16" to %"PRIu16"\n", packet->length, packet->src, packet->dst);
     to_send = _native_marshall_ethernet(buf, packet);
 
     DEBUG("send_buf: trying to send %d bytes\n", to_send);
@@ -220,7 +222,7 @@ int tap_init(char *name)
     }
 #endif /* OSX */
 
-    puts("RIOT native tap initialized.");
+    DEBUG("RIOT native tap initialized.\n");
     return _native_tap_fd;
 }
 /** @} */

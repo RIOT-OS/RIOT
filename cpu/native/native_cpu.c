@@ -34,7 +34,7 @@
 
 extern volatile tcb_t *active_thread;
 static ucontext_t end_context;
-static char __isr_stack[SIGSTKSZ];
+static char __end_stack[SIGSTKSZ];
 
 #ifdef MODULE_UART0
 fd_set _native_rfds;
@@ -135,11 +135,11 @@ void native_cpu_init()
         err(1, "end_context(): getcontext()");
     }
 
-    end_context.uc_stack.ss_sp = __isr_stack;
+    end_context.uc_stack.ss_sp = __end_stack;
     end_context.uc_stack.ss_size = SIGSTKSZ;
     end_context.uc_stack.ss_flags = 0;
     makecontext(&end_context, sched_task_exit, 0);
 
-    puts("RIOT native cpu initialized.");
+    DEBUG("RIOT native cpu initialized.");
 }
 /** @} */
