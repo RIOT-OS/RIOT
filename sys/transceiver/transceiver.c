@@ -772,6 +772,10 @@ static uint16_t set_pan(transceiver_type_t t, void *pan) {
         case TRANSCEIVER_AT86RF231:
             return at86rf231_set_pan(c);
 #endif
+#ifdef MODULE_MC1322X
+        case TRANSCEIVER_MC1322X:
+            return maca_set_pan(c);
+#endif
         default:
             /* get rid of compiler warning about unused variable */
             (void) c;
@@ -799,6 +803,10 @@ static uint16_t get_pan(transceiver_type_t t) {
 #ifdef MODULE_AT86RF231
         case TRANSCEIVER_AT86RF231:
             return at86rf231_get_pan();
+#endif
+#ifdef MODULE_MC1322X
+        case TRANSCEIVER_MC1322X:
+            return maca_get_pan();
 #endif
         default:
             return -1;
