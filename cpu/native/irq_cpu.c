@@ -41,6 +41,7 @@ extern volatile tcb_t *active_thread;
 
 volatile unsigned int _native_saved_eip;
 ucontext_t *_native_cur_ctx, *_native_isr_ctx;
+int *process_heap_address;
 
 static int pipefd[2];
 
@@ -164,20 +165,8 @@ unsigned disableIRQ(void)
     prev_state = native_interrupts_enabled;
     native_interrupts_enabled = 0;
 
-    // XXX: does this make sense?
-    if ((_native_sigpend > 0) && (_native_in_isr == 0)) {
-        DEBUG("\n\n\t\treturn from syscall, calling native_irq_handler\n\n");
-        _native_in_syscall = 0;
-        DEBUG("disableIRQ: calling swapcontext()\n");
-        DEBUG("disableIRQ: _native_cur_ctx == %p, _native_isr_ctx == %p\n", _native_cur_ctx, _native_isr_ctx);
-        makecontext(&native_isr_context, native_irq_handler, 0);
-        swapcontext(_native_cur_ctx, _native_isr_ctx);
-    }
-    else {
-        _native_in_syscall = 0;
-    }
-
     DEBUG("disableIRQ(): return\n");
+    _native_in_syscall = 0;
 
     return prev_state;
 }
@@ -206,6 +195,7 @@ unsigned enableIRQ(void)
     //print_sigmasks();
     //native_print_signals();
     if ((_native_sigpend > 0) && (_native_in_isr == 0)) {
+        _native_cur_ctx = (ucontext_t *)active_thread->sp;
         DEBUG("\n\n\t\treturn from syscall, calling native_irq_handler\n\n");
         _native_in_syscall = 0;
         DEBUG("enableIRQ: calling swapcontext()\n");
@@ -317,23 +307,23 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     (void) info; /* unused at the moment */
     DEBUG("\n\n\t\tnative_isr_entry\n\n");
 
-    if (native_interrupts_enabled == 0) {
-        errx(1, "interrupts are off, but I caught a signal.");
-    }
-
     /* save the signal */
     if (write(pipefd[1], &sig, sizeof(int)) == -1) {
         err(1, "native_isr_entry(): write()");
     }
-
     _native_sigpend++;
-    /* indicate irs status */
 
     makecontext(&native_isr_context, native_irq_handler, 0);
     _native_cur_ctx = (ucontext_t *)active_thread->sp;
 
+    /* XXX: Workaround safety check - whenever this happens it really
+     * indicates a bug in disableIRQ */
+    if (native_interrupts_enabled == 0) {
+        warnx("interrupts are off, but I caught a signal.");
+        return;
+    }
+
     if (_native_in_syscall == 0) {
-        _native_in_isr = 1;
         DEBUG("\n\n\t\treturn to _native_sig_leave_tramp\n\n");
 #ifdef __MACH__
         _native_saved_eip = ((ucontext_t *)context)->uc_mcontext->__ss.__eip;
@@ -342,8 +332,18 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
         _native_saved_eip = ((struct sigcontext *)context)->sc_eip;
         ((struct sigcontext *)context)->sc_eip = (unsigned int)&_native_sig_leave_tramp;
 #else
-        _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP];
-        ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
+        if (
+                ((void*)(((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP]))
+                > ((void*)process_heap_address)
+           ) {
+            DEBUG("\nEIP:\t%p\nHEAP:\t%p\nnot switching\n\n", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP], (void*)process_heap_address);
+        }
+        else {
+            _native_in_isr = 1;
+            warnx("\nEIP:\t%p\nHEAP:\t%p\ngo switching\n\n", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP], (void*)process_heap_address);
+            _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP];
+            ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
+        }
 #endif
         // TODO: change sigmask?
     }
@@ -428,6 +428,11 @@ void native_interrupt_init(void)
 {
     struct sigaction sa;
     DEBUG("XXX: native_interrupt_init()\n");
+
+   process_heap_address = malloc(sizeof(int));
+    if (process_heap_address == NULL) {
+        err(EXIT_FAILURE, "native_interrupt_init: malloc");
+    }
 
     native_interrupts_enabled = 1;
     _native_sigpend = 0;
