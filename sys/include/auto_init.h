@@ -5,6 +5,10 @@
 #include <hwtimer.h>
 #endif
 
+#ifdef MODULE_SWTIMER
+#include <swtimer.h>
+#endif
+
 #ifdef MODULE_SHT11
 #include <sht11.h>
 #endif

@@ -40,6 +40,9 @@ endif
 ifneq (,$(findstring shell_commands,$(USEMODULE)))
     DIRS += shell/commands
 endif
+ifneq (,$(findstring swtimer,$(USEMODULE)))
+    DIRS += swtimer
+endif
 ifneq (,$(findstring timex,$(USEMODULE)))
     DIRS += timex
 endif
