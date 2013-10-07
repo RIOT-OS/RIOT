@@ -431,7 +431,7 @@ void native_interrupt_init(void)
     struct sigaction sa;
     DEBUG("XXX: native_interrupt_init()\n");
 
-   process_heap_address = malloc(sizeof(int));
+   process_heap_address = (int*)malloc(sizeof(int));
     if (process_heap_address == NULL) {
         err(EXIT_FAILURE, "native_interrupt_init: malloc");
     }
