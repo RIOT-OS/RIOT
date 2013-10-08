@@ -9,8 +9,8 @@
 
 
 /*
- * @file  		secure_routing.c
- * @brief		Main controller for Secure Routing functionality.
+ * @file        secure_routing.c
+ * @brief       Main controller for Secure Routing functionality.
  *              The secure routing class functions as the main controller
  *              class for the entire secure routing layer. It receives send
  *              requests from applications on the higher classes, secures the
@@ -20,11 +20,11 @@
  * @author      Mark Essien <markessien@gmail.com>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  *
- * @date	    15.09.2013 17:41:11
+ * @date        15.09.2013 17:41:11
  */
 
 /*---------------------------------------------------------------------------*/
-//					Included Files
+//                                      Included Files
 /*---------------------------------------------------------------------------*/
 /*  Radio includes */
 #include "drivers/cc110x/cc1100.h"
@@ -81,7 +81,7 @@
 #include "replay_protection.h"
 
 /*---------------------------------------------------------------------------*/
-//					Structures
+//                                      Structures
 /*---------------------------------------------------------------------------*/
 
 /**
@@ -104,7 +104,7 @@ typedef struct radio_process_packet {
 } radio_process_packet_t;
 
 /*---------------------------------------------------------------------------*/
-//					Local Variables
+//                                      Local Variables
 /*---------------------------------------------------------------------------*/
 // The table for storing the protocol handlers
 static pm_table_t protocol_handler_table;
@@ -161,7 +161,7 @@ static int watchdog_process_pid = -1;
 static char watchdog_stack_buffer[4500];
 
 /*---------------------------------------------------------------------------*/
-//					Function Declarations
+//                                      Function Declarations
 /*---------------------------------------------------------------------------*/
 static packet_handler_t packet_handler(void *datav, int data_length,
                                        packet_info_t *info);
@@ -171,7 +171,7 @@ static void watchdog_thread(void);
 static int pump_radio_process_queue(void);
 
 /**
- * @brief	Initialises the secure-routing layer
+ * @brief       Initialises the secure-routing layer
  */
 int secure_routing_init()
 {
@@ -186,7 +186,7 @@ int secure_routing_init()
            sizeof(radio_process_packet_t) * RADIO_PROCESS_QUEUE_SIZE);
 
     mutex_init(&send_mutex);
-    //	mutex_init(&p_mutex);
+    //  mutex_init(&p_mutex);
 
     messages_sent = 0;
     initialized = 1;
@@ -278,7 +278,7 @@ int secure_routing_init()
 }
 
 /**
- * @brief	Prints out information about this node
+ * @brief       Prints out information about this node
  */
 void secure_routing_print_info(void)
 {
@@ -319,7 +319,7 @@ void secure_routing_print_info(void)
 
     if (security_level == SecurityMode_MACWithInitialKey) {
         printf("     --- Security Level for packets is AUTH with \
-        		     Initial Key\n");
+                             Initial Key\n");
     }
 
     if (security_level == SecurityMode_Encrypt) {
@@ -332,17 +332,17 @@ void secure_routing_print_info(void)
 
     if (security_level == SecurityMode_EncryptAndMACPriorKey) {
         printf("     --- Security Level for packets is AUTH+ENCRYPT prior \
-        		     Key\n");
+                             Key\n");
     }
 
     if (security_level == SecurityMode_EncryptAndMACPairwise) {
         printf("     --- Security Level for packets is AUTH+ENCRYPT \
-        		     Pairwise\n");
+                             Pairwise\n");
     }
 
     if (security_level == SecurityMode_EncryptAndMACPairwiseBroadcast) {
         printf("     --- Security Level for packets is AUTH+ENC Pairwise \
-        		     Broadcast\n");
+                             Broadcast\n");
     }
 
     if (enable_net_sec) {
@@ -383,9 +383,9 @@ void secure_routing_print_info(void)
 }
 
 /**
- * @brief	Set the security level
+ * @brief       Set the security level
  *
- * @param	sec_level New security level. One of the SecurityPreset enums
+ * @param       sec_level New security level. One of the SecurityPreset enums
  */
 void set_security_level_preset(uint8_t sec_level)
 {
@@ -459,7 +459,7 @@ void set_security_level_preset(uint8_t sec_level)
         keyexchange_set_key_refresh_interval(USER_DEF_SECURITY_KEY_INTERVAL);
         keyexchange_set_encryption_mode(USER_DEF_SECURITY_ENC_MODE);
         security_update_set_encrypt_security_status(USER_DEF_SECURITY_ENC_MODE
-        		                                    );
+                                                            );
         security_level = USER_DEF_SECURITY_SEC_LEVEL;
 
         // Calls start
@@ -469,12 +469,12 @@ void set_security_level_preset(uint8_t sec_level)
 }
 
 /**
- * @brief	Executes a textual command passed to it. See extended description
+ * @brief       Executes a textual command passed to it. See extended description
  *          in header file
  *
- * @param 	cmd The command to be executed
+ * @param       cmd The command to be executed
  *
- * @return 	Error code indicating the result of the command. Type dependent on
+ * @return      Error code indicating the result of the command. Type dependent on
  *          the command executed
  */
 int secure_routing_exec(char *cmd)
@@ -635,7 +635,7 @@ int secure_routing_exec(char *cmd)
         }
         else if (strcmp(first, "ciphers") == 0) {
             ulog("The ciphers command is not supported \
-            	 (multiple encryption not enabled)");
+                 (multiple encryption not enabled)");
         }
         else if (strcmp(first, "overflow") == 0) {
             ulog("Setting node soft overflow flag to %d", atoi(second));
@@ -649,7 +649,7 @@ int secure_routing_exec(char *cmd)
     else if (STARTS_WITH(cmd, "delete")) {
         if (strcmp(first, "nodes") == 0) {
             ulog("> Deleting node table. DO NOT USE FUNCTON WHILE TREE ACTIVE \
-            	 (not threadsafe)");
+                 (not threadsafe)");
             network_nodes_delete_all(network_nodes_get_root());
         }
     }
@@ -709,7 +709,7 @@ int secure_send(radio_address_t destination_address, protocol_t protocol,
 
     if (payload_len > MAX_PAYLOAD_LEN) {
         ulog_error("The packet being sent was too long. Length=%d bytes. \
-        		    MaxLength=%d bytes", payload_len, MAX_PAYLOAD_LEN);
+                    MaxLength=%d bytes", payload_len, MAX_PAYLOAD_LEN);
         return SecureRouting_TooLong;
     }
 
@@ -798,7 +798,7 @@ int send_packet(secure_packet_t *packet)
 }
 
 /**
- * @brief	Places specified buffer in queue for later sending
+ * @brief       Places specified buffer in queue for later sending
  */
 int enqueue_for_send(radio_address_t gateway, uint8_t protocol,
                      uint8_t priority, uint8_t *packet, uint16_t packet_len,
@@ -812,7 +812,7 @@ int enqueue_for_send(radio_address_t gateway, uint8_t protocol,
 
     if (send_attempts == 0) {
         ulog_error("Calling radio send with attempts = 0. Probably not what \
-        		   you meant");
+                    you meant");
     }
 
     /* Special handling for pairwise broadcast mode. The packet was secured
@@ -883,7 +883,7 @@ int enqueue_for_send(radio_address_t gateway, uint8_t protocol,
         else {
             // If this fails, find out why. It should never fail!
             ulog_error("MAJOR ERROR: Could not send message to radio_receive \
-            		    thread");
+                        thread");
             return SecureRouting_Error;
         }
     }
@@ -896,7 +896,7 @@ int enqueue_for_send(radio_address_t gateway, uint8_t protocol,
 }
 
 /**
- * @brief	Takes a byte buffer and sends it directly via the radio interface
+ * @brief       Takes a byte buffer and sends it directly via the radio interface
  *          without further manipulation. See header file for further details.
  */
 int radio_send_private(radio_address_t gateway, uint8_t protocol,
@@ -931,7 +931,7 @@ int radio_send_private(radio_address_t gateway, uint8_t protocol,
 #if ULOG_ENABLED
                 error_name = "RADIO_OP_FAILED";
                 ulog_info("> EXPERIMENT(SendError, %s, RadioFail=%lu, \
-                		  RadioBusy=%lu)", error_name, radio_failed,
+                           RadioBusy=%lu)", error_name, radio_failed,
                           radio_busy);
 #endif
             }
@@ -941,12 +941,12 @@ int radio_send_private(radio_address_t gateway, uint8_t protocol,
                 // Carrier Sense timeout: air was never free
                 error_name = "RADIO_CS_TIMEOUT";
                 ulog_info("> EXPERIMENT(SendError, RadioFail=%lu, \
-                		  RadioBusy=%lu)", radio_failed, radio_busy);
+                           RadioBusy=%lu)", radio_failed, radio_busy);
 #endif
             }
 
             ulog_error("Radio send failed code %i. Err=%s Gateway=%d, \
-            		   protocol=%d, priority=%d, packet_len=%d", res,
+                        protocol=%d, priority=%d, packet_len=%d", res,
                        error_name, gateway, protocol, priority, packet_len);
 
             if (packet_len > MAX_DATA_LENGTH) {
@@ -978,7 +978,7 @@ int radio_send_private(radio_address_t gateway, uint8_t protocol,
             if (source_node && source_node->gateway > 0 &&
                 destination_node && destination_node->gateway > 0) {
                 ulog("> -- Broken-Route on packet. Sending back to = %d. \
-                	 Packet Destination was =%d", source_node->node_id,
+                      Packet Destination was =%d", source_node->node_id,
                      sec_packet->destination);
                 micromesh_packet_dropped(sec_packet, destination_node->gateway,
                                          ROUTE_ERROR_BROKEN_ROUTE);
@@ -995,11 +995,11 @@ int radio_send_private(radio_address_t gateway, uint8_t protocol,
 }
 
 /**
- * @brief	Called by a higher layer to set the handler for a particular
+ * @brief       Called by a higher layer to set the handler for a particular
  *          protocol
  *
- * @param 	protocol   The protocol for which it should be set
- * @param 	handler    The packet handler
+ * @param       protocol   The protocol for which it should be set
+ * @param       handler    The packet handler
  *
  * @return If the send was successful or not
  */
@@ -1018,7 +1018,7 @@ int secure_routing_sethandler(protocol_t protocol, packet_handler_t handler)
 
     if (res < 0) {
         ulog_error("Could not register protocol %i with the cc1100 radio. \
-        		   cc1100_set_packet_handler returned %i", protocol, res);
+                    cc1100_set_packet_handler returned %i", protocol, res);
         return res;
     }
 
@@ -1029,7 +1029,7 @@ int secure_routing_sethandler(protocol_t protocol, packet_handler_t handler)
 
     if (res < 0) {
         ulog_error("Could not register protocol %i in the handler table. \
-        		   pm_set_handler returned %i", protocol, res);
+                    pm_set_handler returned %i", protocol, res);
         return res;
     }
 
@@ -1098,7 +1098,7 @@ packet_handler_t route_packet(radio_process_packet_t *radio_packet)
             if (secure_packet(packet, get_this_node_address()) <
                 PacketSecurity_OK) {
                 ulog_error("Peeked at packet but could not re-encrypt it. \
-                		   Sorry. Drop.");
+                                   Sorry. Drop.");
                 return 0;
             }
         }
@@ -1116,7 +1116,7 @@ packet_handler_t route_packet(radio_process_packet_t *radio_packet)
                 if (secure_packet(packet, get_this_node_address()) <
                     PacketSecurity_OK) {
                     ulog_error("Could not re-secure packet in pairwise mode.\
-                    		    Drop.");
+                                Drop.");
                     return 0;
                 }
             }
@@ -1184,7 +1184,7 @@ packet_handler_t route_packet(radio_process_packet_t *radio_packet)
                 }
                 else {
                     ulog_error("> Could not send route error because no \
-                    		   route");
+                                route");
                 }
             }
         }
@@ -1268,9 +1268,9 @@ packet_handler_t handle_local_packet(radio_process_packet_t *radio_packet)
         /*
         if (network_nodes_is_neighbour(radio_packet->packet_info.phy_src) == 0)
         {
-        	ulog("> EXPERIMENT(RREQCoverage, REJECTED=1)");
-        	ulog_error("Only packets from neighbours accepted.");
-        	return 0;
+                ulog("> EXPERIMENT(RREQCoverage, REJECTED=1)");
+                ulog_error("Only packets from neighbours accepted.");
+                return 0;
         }
         */
     }
@@ -1281,7 +1281,7 @@ packet_handler_t handle_local_packet(radio_process_packet_t *radio_packet)
 
     if (net_res < NetworkSecurity_OK) {
         ulog_error("> The network security tried but failed to process \
-        		   packet");
+                    packet");
         return 0;
     }
 
@@ -1350,9 +1350,9 @@ packet_handler_t handle_local_packet(radio_process_packet_t *radio_packet)
         if (net_res != NetworkSecurity_PacketHandled &&
             mm_res != NetworkSecurity_PacketHandled) {
             ulog("> This packet had SecureRouting protocol, but could not be \
-            	 handled. Cross-check");
+                 handled. Cross-check");
             ulog("!Unknown packet arrived. Check that handler component \
-            	 enabled");
+                 enabled");
         }
 
         ulog_info("Internally handled. Local=%d Prot=%d",
@@ -1473,7 +1473,7 @@ packet_handler_t packet_handler(void *datav, int data_length,
 }
 
 /**
- * @brief	Sends out everything in the send queue
+ * @brief       Sends out everything in the send queue
  */
 int pump_radio_process_queue()
 {

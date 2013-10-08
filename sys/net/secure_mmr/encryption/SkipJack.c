@@ -8,15 +8,15 @@
  */
 
 /**
- * @file 	SkipJack.c
- * @brief	implementation of the SkipJack Cipher-Algorithm
+ * @file        SkipJack.c
+ * @brief       implementation of the SkipJack Cipher-Algorithm
  *
- * @author	Freie Universitaet Berlin, Computer Systems & Telematics
- * @author	Nicolai Schmittberger <nicolai.schmittberger@fu-berlin.de>
- * @author  Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
- * @author	Naveen Sastry
+ * @author      Freie Universitaet Berlin, Computer Systems & Telematics
+ * @author      Nicolai Schmittberger <nicolai.schmittberger@fu-berlin.de>
+ * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
+ * @author      Naveen Sastry
  *
- * @date	18.09.2013 19:14:19
+ * @date        18.09.2013 19:14:19
  *
  */
 
@@ -81,7 +81,7 @@ static const uint8_t SJ_F[] /*__attribute__((C))*/ = {
 
 
 int SkipJack_init(CipherContext *context, uint8_t blockSize, uint8_t keySize,
-		          uint8_t *key)
+                  uint8_t *key)
 {
     // 8 byte blocks only
     if (blockSize != BSIZE) {
@@ -94,8 +94,8 @@ int SkipJack_init(CipherContext *context, uint8_t blockSize, uint8_t keySize,
 /**
  * @brief convert 2x uint8_t to uint16_t
  *
- * @param c	pointer to the 2x uint8_t input
- * @param s	pointer to the resulting uint16_t
+ * @param c     pointer to the 2x uint8_t input
+ * @param s     pointer to the resulting uint16_t
  *
  */
 static void c2sM(uint8_t *c, uint16_t *s)
@@ -118,7 +118,7 @@ static void s2cM(uint16_t s, uint8_t *c)
 
 
 int SkipJack_encrypt(CipherContext *context, uint8_t *plainBlock,
-		             uint8_t *cipherBlock)
+                     uint8_t *cipherBlock)
 {
 
     // prologue 10 pushs = 20 cycles
@@ -216,7 +216,7 @@ int SkipJack_encrypt(CipherContext *context, uint8_t *plainBlock,
 
 
 int SkipJack_decrypt(CipherContext *context, uint8_t *cipherBlock,
-		             uint8_t *plainBlock)
+                     uint8_t *plainBlock)
 {
     /*register*/ uint8_t counter = 32;
     /*register*/ uint8_t *skey  = ((SJContext *)context->context)->skey + 4;

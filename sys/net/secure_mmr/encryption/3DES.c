@@ -264,7 +264,7 @@ int three_DES_init(CipherContext *context, uint8_t blockSize, uint8_t keySize,
 }
 
 int three_DES_setup_key(CipherContext *context, uint8_t *key,
-		                uint8_t keysize) //To change !!!
+                                uint8_t keysize) //To change !!!
 {
     return three_DES_init(context, three_DES_info_get_preferred_block_size(),
                          keysize, key);
@@ -278,7 +278,7 @@ int three_DES_encrypt(CipherContext *context, uint8_t *plain, uint8_t *crypt)
 
     if (!key) {
         printf("%-40s: [ERROR] Could NOT malloc space for the des3_key_s \
-        	   struct.\r\n", __FUNCTION__);
+                   struct.\r\n", __FUNCTION__);
         return -1;
     }
 
@@ -313,7 +313,7 @@ int three_DES_decrypt(CipherContext *context, uint8_t *crypt, uint8_t *plain)
 
     if (!key) {
         printf("%-40s: [ERROR] Could NOT malloc space for the des3_key_s \
-        		struct.\r\n", __FUNCTION__);
+                        struct.\r\n", __FUNCTION__);
         return -1;
     }
 

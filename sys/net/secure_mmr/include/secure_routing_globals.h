@@ -254,12 +254,12 @@ extern mutex_t  processing_mutex;
  * @return the number
  */
 static inline uint32_t three_bytes_to_24bits(uint8_t sequence_nmbrC,
-		                                     uint8_t sequence_nmbrB,
-		                                     uint8_t sequence_nmbrA)
+                                             uint8_t sequence_nmbrB,
+                                             uint8_t sequence_nmbrA)
 {
     uint32_t val = (uint32_t)(sequence_nmbrC << 16) |
-    		       (uint32_t)(sequence_nmbrB << 8)  |
-    		       (uint32_t)sequence_nmbrA ;
+                       (uint32_t)(sequence_nmbrB << 8)  |
+                       (uint32_t)sequence_nmbrA ;
     return val;
 }
 

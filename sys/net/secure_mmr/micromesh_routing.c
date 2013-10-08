@@ -100,7 +100,7 @@ static uint32_t rtc_now(void)
  * @param       list Address list with route information
  */
 static void rt_extract_routes(uint16_t local_addr, uint8_t length,
-		                      uint16_t *list)
+                                      uint16_t *list)
 {
     ulog_info("Extracting routes...");
 
@@ -146,7 +146,7 @@ static void rt_extract_routes(uint16_t local_addr, uint8_t length,
                 distance *= -1;
             }
             network_nodes_add_route((uint8_t)next, (uint8_t)router,
-            		                (uint8_t)distance, list, length);
+                                        (uint8_t)distance, list, length);
         }
         i++;
     }
@@ -206,7 +206,7 @@ static packet_queue_entry_t *pq_add(secure_packet_t *packet)
         if (packet_queue[i].timestamp == 0) {
             // Free position found, add entry
             memcpy((void *) & (packet_queue[i].packet),
-            	   packet, sizeof(secure_packet_t));
+                   packet, sizeof(secure_packet_t));
 
             if (pFirstFoundDup != NULL) {
                 /* There is already a RREQ for this destination, so don't
@@ -241,7 +241,7 @@ static int pq_msgs_for_destination(uint16_t dst)
 
     for (i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
         if (packet_queue[i].timestamp != 0 &&
-        	packet_queue[i].packet.destination == dst) {
+                packet_queue[i].packet.destination == dst) {
             dst_count++;
         }
     }
@@ -261,7 +261,7 @@ static void pq_remove_msgs_for_destination(uint16_t dst)
 
     for (i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
         if (packet_queue[i].timestamp != 0 &&
-        	packet_queue[i].packet.destination == dst) {
+                packet_queue[i].packet.destination == dst) {
             packet_queue[i].timestamp = 0;
         }
     }
@@ -287,7 +287,7 @@ static void pq_dequeue_and_send(uint16_t dst)
 
     if (node != NULL) {
         ulog("> Found node for dst=%d. Gateway=%d.",
-        	 (uint8_t)dst, node->gateway);
+                 (uint8_t)dst, node->gateway);
 
         if (node->gateway == 0) {
             ulog("> Will not send to gateway 0");
@@ -295,8 +295,8 @@ static void pq_dequeue_and_send(uint16_t dst)
 
         for (i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
             if (packet_queue[i].timestamp != 0 &&
-            	packet_queue[i].packet.destination == dst &&
-            	node->gateway != 0) {
+                packet_queue[i].packet.destination == dst &&
+                node->gateway != 0) {
                 // Set send function here
                 ulog("> Sending packet via gateway %d", node->gateway);
 
@@ -306,15 +306,15 @@ static void pq_dequeue_and_send(uint16_t dst)
 
                 // Encrypt, mac the packet. Will be done in-place
                 if (secure_packet(packet,
-                		      get_this_node_address()) >= PacketSecurity_OK) {
+                                      get_this_node_address()) >= PacketSecurity_OK) {
                     int res = enqueue_for_send(node->gateway,
-                    		  SECURE_ROUTING_PROTOCOL,
-                    		  PRIORITY_DATA,
-                    		  (uint8_t *)packet,
-                    		  sizeof(secure_packet_t),
-                    		  1,
-                    		  RADIO_SEND_RETRY,
-                    		  0);
+                                  SECURE_ROUTING_PROTOCOL,
+                                  PRIORITY_DATA,
+                                  (uint8_t *)packet,
+                                  sizeof(secure_packet_t),
+                                  1,
+                                  RADIO_SEND_RETRY,
+                                  0);
 
                     if (res == SecureRouting_OK) {
                         packet_queue[i].timestamp = 0;
@@ -331,9 +331,9 @@ static void pq_dequeue_and_send(uint16_t dst)
     // Now all other packets
     for (i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
         if (packet_queue[i].timestamp != 0 &&
-        	packet_queue[i].packet.destination != dst) {
+                packet_queue[i].packet.destination != dst) {
             network_node_t *node = network_nodes_find(packet_queue[i].
-            		                                  packet.destination);
+                                                          packet.destination);
 
             if (node != NULL) {
                 ulog("> Sending packet via gateway %d", node->gateway);
@@ -349,15 +349,15 @@ static void pq_dequeue_and_send(uint16_t dst)
 
                 // Encrypt, mac the packet. Will be done in-place
                 if (secure_packet(packet,
-                		       get_this_node_address()) >= PacketSecurity_OK) {
+                                       get_this_node_address()) >= PacketSecurity_OK) {
                     int res = enqueue_for_send(node->gateway,
-                    		                   SECURE_ROUTING_PROTOCOL,
-                    		                   PRIORITY_DATA,
-                    		                   (uint8_t *)packet,
-                    		                   sizeof(secure_packet_t),
-                    		                   1,
-                    		                   RADIO_SEND_RETRY,
-                    		                   0);
+                                                   SECURE_ROUTING_PROTOCOL,
+                                                   PRIORITY_DATA,
+                                                   (uint8_t *)packet,
+                                                   sizeof(secure_packet_t),
+                                                   1,
+                                                   RADIO_SEND_RETRY,
+                                                   0);
 
                     if (res == SecureRouting_OK) {
                         packet_queue[i].timestamp = 0;
@@ -392,9 +392,9 @@ void micromesh_init(void)
 
     if (rreq_timeout_process_pid < 0) {
         rreq_timeout_process_pid = thread_create(micromesh_thread_stack_buffer,
-        		                                 4500,
-        		                                 PRIORITY_MAIN + 2,
-        		                                 CREATE_STACKTEST,
+                                                         4500,
+                                                         PRIORITY_MAIN + 2,
+                                                         CREATE_STACKTEST,
                                                  rreq_timeout_process,
                                                  rreq_timeout_process_name);
     }
@@ -423,8 +423,8 @@ static void generate_route_reply_message(mmr_rreq_message_t *rreq_msg)
     rrep_msg.destination = rreq_msg->source;
     rrep_msg.source = rreq_msg->destination;
     memcpy(rrep_msg.address,
-    	   rreq_msg->address,
-    	   rreq_msg->length * sizeof(uint16_t));
+           rreq_msg->address,
+           rreq_msg->length * sizeof(uint16_t));
 
     // Create MMR message containing the RREP message
     secure_packet_t packet;
@@ -449,7 +449,7 @@ static void generate_route_reply_message(mmr_rreq_message_t *rreq_msg)
 
     if (node != NULL) {
         ulog("> Sending route-reply to %d via %d", packet.destination,
-        	 node->gateway);
+              node->gateway);
 
         // Send message to next hop
         mmr_stats.rrep_originated++;
@@ -467,12 +467,12 @@ static void generate_route_reply_message(mmr_rreq_message_t *rreq_msg)
         */
 
         enqueue_for_send(node->gateway,
-        		         SECURE_ROUTING_PROTOCOL,
-        		         PRIORITY_DATA, (uint8_t *)&packet,
-        		         sizeof(secure_packet_t),
-        		         1,
-        		         RADIO_SEND_RETRY,
-        		         0);
+                                 SECURE_ROUTING_PROTOCOL,
+                                 PRIORITY_DATA, (uint8_t *)&packet,
+                                 sizeof(secure_packet_t),
+                                 1,
+                                 RADIO_SEND_RETRY,
+                                 0);
     }
     else {
         ulog_error("Node was not found in table");
@@ -489,9 +489,9 @@ static void generate_route_reply_message(mmr_rreq_message_t *rreq_msg)
  * @param       type_data Type specific data of RERR packet
  */
 static void generate_route_error_message(uint16_t dst,
-		                                 uint16_t gateway,
-		                                 uint8_t type,
-		                                 uint16_t destination)
+                                                 uint16_t gateway,
+                                                 uint8_t type,
+                                                 uint16_t destination)
 {
     ulog("> call generate_route_error_message");
 
@@ -532,20 +532,20 @@ static void generate_route_error_message(uint16_t dst,
 
     if (node != NULL) {
         ulog("> Sending route-error to %d via %d", packet.destination,
-        	 node->gateway);
+                 node->gateway);
 
         if (node->gateway != 0) {
             enqueue_for_send(node->gateway,
-            		         SECURE_ROUTING_PROTOCOL,
-            		         PRIORITY_DATA, (uint8_t *)&packet,
-            		         sizeof(secure_packet_t),
-            		         1,
-            		         1,
-            		         0);
+                                 SECURE_ROUTING_PROTOCOL,
+                                 PRIORITY_DATA, (uint8_t *)&packet,
+                                 sizeof(secure_packet_t),
+                                 1,
+                                 1,
+                                 0);
         }
         else {
             ulog_error("> Not sending route-error cause it would be through 0 \
-            		   gateway");
+                           gateway");
         }
     }
     else {
@@ -560,10 +560,10 @@ static void generate_route_error_message(uint16_t dst,
  * @param       packet_info Additional packet information
  */
 static int receive_route_request_message(mmr_rreq_message_t *msg,
-		                                 packet_info_t *packet_info)
+                                                 packet_info_t *packet_info)
 {
     ulog("Received Route Request Message. Source=%lu, AddressCount=%d. \
-    	  Dest=%lu", msg->source, msg->length, msg->destination);
+          Dest=%lu", msg->source, msg->length, msg->destination);
 
     uint16_t my_addr = get_this_node_address();
 
@@ -648,16 +648,16 @@ void micromesh_peek(secure_packet_t *packet)
              */
             if (packet->destination != my_addr) {
                 mmr_rerr_message_t *rerr_msg = (mmr_rerr_message_t *)
-                		                       packet->data;
+                                                       packet->data;
 
                 ulog("> Route Error at node: %lu. Could not send to %lu. \
-                	 Intended destination was %lu", rerr_msg->node_id,
-                	                                rerr_msg->next_hop_address,
-                	                                rerr_msg->destination);
+                         Intended destination was %lu", rerr_msg->node_id,
+                                                        rerr_msg->next_hop_address,
+                                                        rerr_msg->destination);
 
                 if (rerr_msg->error_type == RERR_NODE_UNREACHABLE) {
                     network_nodes_set_node_unreachable(network_nodes_get_root(),
-                    		                           rerr_msg->destination);
+                                                           rerr_msg->destination);
                 }
             }
         }
@@ -672,7 +672,7 @@ void micromesh_peek(secure_packet_t *packet)
  * @param       packet_info Additional packet information
  */
 static void receive_route_reply_message(mmr_rrep_message_t *msg,
-		                                packet_info_t *packet_info)
+                                                packet_info_t *packet_info)
 {
     ulog_info("> receive_route_reply_message.");
 
@@ -691,17 +691,17 @@ static void receive_route_reply_message(mmr_rrep_message_t *msg,
  * @param       packet_info Additional packet information
  */
 static void receive_route_error_message(mmr_rerr_message_t *msg,
-		                                packet_info_t *packet_info)
+                                                packet_info_t *packet_info)
 {
     switch (msg->error_type) {
         case RERR_NODE_UNREACHABLE:
             ulog("> Route Error at node: %lu. Could not send to %lu. \
-            	 Intended destination was %lu",
-            	 msg->node_id,
-            	 msg->next_hop_address,
-            	 msg->destination);
+                 Intended destination was %lu",
+                 msg->node_id,
+                 msg->next_hop_address,
+                 msg->destination);
             network_nodes_set_node_unreachable(network_nodes_get_root(),
-            		                           msg->destination);
+                                                   msg->destination);
             break;
 
         default:
@@ -739,7 +739,7 @@ static int compute_rreq_timeout(int ttl, uint16_t dst)
 static void rreq_broadcast(packet_queue_entry_t *pq_entry)
 {
     ulog("> Started Route-Request. TTL=%d",
-    	 pq_entry->retry_count == 0 ? TTL_START : TTL_THRESHOLD);
+         pq_entry->retry_count == 0 ? TTL_START : TTL_THRESHOLD);
 
     if (pq_entry->retry_count == RREQ_NONE) {
         ulog("rreq duplicated do not send");
@@ -777,12 +777,12 @@ static void rreq_broadcast(packet_queue_entry_t *pq_entry)
 
     ulog("> Executing Radio-Send");
     enqueue_for_send(GLOBAL_BROADCAST,
-    		         SECURE_ROUTING_PROTOCOL,
-    		         PRIORITY_DATA, (uint8_t *)&packet,
-    		         sizeof(secure_packet_t),
-    		         1,
-    		         1,
-    		         0);
+                         SECURE_ROUTING_PROTOCOL,
+                         PRIORITY_DATA, (uint8_t *)&packet,
+                         sizeof(secure_packet_t),
+                         1,
+                         1,
+                         0);
 }
 
 /**
@@ -800,12 +800,12 @@ static void post_next_rreq_timeout(void)
         if (packet_queue[i].timestamp != 0 &&
             packet_queue[i].retry_count != RREQ_NONE) {
             int ttl = packet_queue[i].retry_count == 1 ?
-            		  TTL_START : TTL_THRESHOLD;
+                          TTL_START : TTL_THRESHOLD;
             int to = compute_rreq_timeout(ttl,
-            		                      packet_queue[i].packet.destination);
+                                              packet_queue[i].packet.destination);
 
             ulog_info("> Packet found in queue. TS=%lu. Pack-Timeout=%d",
-            		  packet_queue[i].timestamp, to);
+                       packet_queue[i].timestamp, to);
 
             if (packet_queue[i].timestamp + to < next) {
                 next = packet_queue[i].timestamp + to;
@@ -899,7 +899,7 @@ static void rreq_timeout(packet_queue_entry_t *pqe)
             // Added just for security but this case should never occur
 #if (MMR_INFO_LEVEL >= LEVEL_WARN)
             puts("MMR [WARN]: RREQ-Timeout occurred, route is available but \
-            	  no messages for destination");
+                  no messages for destination");
 #endif
             // Anyway: jump to update next RREQ-Timeout
             goto post_next_to;
@@ -977,28 +977,28 @@ bool micromesh_send(secure_packet_t *packet)
     // bool enqueue = true;
     if (IS_LOCAL_ADDRESS(packet->destination)) {
         ulog_error("> Micromesh message is already at destination %d, why is \
-        		   routing called?", packet->destination);
+                    routing called?", packet->destination);
         return false;
     }
 
     if (packet->destination == 0 || packet->ttl == 1) {
         // If the ttl of a packet is 1, then it is a keep-alive packet. Or it
         // is supposed to be directly within range. So no route-request is
-    	// started for this packet.
+        // started for this packet.
 
         ulog_info("> Broadcast packet not routed");
 
         // Encrypt, mac the packet. Will be done in-place
         if (secure_packet(packet,
-        		          get_this_node_address()) >= PacketSecurity_OK) {
+                                  get_this_node_address()) >= PacketSecurity_OK) {
             // broadcast, does not need routing
             if (enqueue_for_send(packet->destination,
-            		             SECURE_ROUTING_PROTOCOL,
-            		             PRIORITY_DATA, (uint8_t *)packet,
-            		             sizeof(secure_packet_t),
-            		             1,
-            		             1,
-            		             0) == SecureRouting_OK) {
+                                     SECURE_ROUTING_PROTOCOL,
+                                     PRIORITY_DATA, (uint8_t *)packet,
+                                     sizeof(secure_packet_t),
+                                     1,
+                                     1,
+                                     0) == SecureRouting_OK) {
                 return 1;
             }
             else {
@@ -1021,16 +1021,16 @@ bool micromesh_send(secure_packet_t *packet)
     // If next hop address found in routing table, forward message
     if (node != 0 && node->gateway != 0) {
         ulog("> Gateway %d found for address %d",
-        	 node->gateway, packet->destination);
+              node->gateway, packet->destination);
 
         // Encrypt, mac the packet. Will be done in-place
         if (secure_packet(packet,
-        		          get_this_node_address()) >= PacketSecurity_OK) {
+                                  get_this_node_address()) >= PacketSecurity_OK) {
             if (enqueue_for_send(node->gateway,
-            	                 SECURE_ROUTING_PROTOCOL,
-            	                 PRIORITY_DATA, (uint8_t *)packet,
-            	                 sizeof(secure_packet_t),
-            	                 1, RADIO_SEND_RETRY, 0) == SecureRouting_OK) {
+                                 SECURE_ROUTING_PROTOCOL,
+                                 PRIORITY_DATA, (uint8_t *)packet,
+                                 sizeof(secure_packet_t),
+                                 1, RADIO_SEND_RETRY, 0) == SecureRouting_OK) {
                 return 1;
             }
         }
@@ -1067,8 +1067,8 @@ bool micromesh_send(secure_packet_t *packet)
  *
  */
 void micromesh_packet_dropped(secure_packet_t *packet,
-		                      uint16_t next_hop,
-		                      int error)
+                                      uint16_t next_hop,
+                                      int error)
 {
     if (error == ROUTE_ERROR_BROKEN_ROUTE) {
         ulog("> Broken route detected (%lu). Removing nodes using it",
@@ -1103,13 +1103,13 @@ void micromesh_packet_dropped(secure_packet_t *packet,
         if (node != NULL) {
             ulog("> Sending Route-error message via %d",  node->gateway);
             generate_route_error_message(packet->source,
-            		                     node->gateway,
+                                             node->gateway,
                                          RERR_NODE_UNREACHABLE,
                                          packet->destination);
         }
         else {
             ulog_error("Cannot send RERR to source %d, no route!",
-            		   packet->source);
+                           packet->source);
         }
     }
     else {
@@ -1138,25 +1138,25 @@ int micromesh_receive(secure_packet_t *packet, packet_info_t *packet_info)
     if (type == MMR_TYPE_RREQ) {
         ulog("> Micromesh route request arrived");
         handled = receive_route_request_message((mmr_rreq_message_t *)
-        		                                 packet->data,
-        		                                 packet_info);
+                                                         packet->data,
+                                                         packet_info);
         mmr_stats.rreq_received++;
         ulog_info("> EXPERIMENT(RREQCoverage, RREQS=%lu",
-        		  mmr_stats.rreq_received);
+                   mmr_stats.rreq_received);
         packet_for_mm = 1;
 
     }
     else if (type == MMR_TYPE_RREP) {
         ulog("> !!!Micromesh route reply arrived");
         receive_route_reply_message((mmr_rrep_message_t *)packet->data,
-        		                     packet_info);
+                                             packet_info);
         mmr_stats.rrep_received++;
         packet_for_mm = 1;
     }
     else if (type == MMR_TYPE_RERR) {
         ulog("> Micromesh route error arrived");
         receive_route_error_message((mmr_rerr_message_t *)packet->data,
-        		                     packet_info);
+                                             packet_info);
         mmr_stats.rerr_received++;
         packet_for_mm = 1;
     }
@@ -1189,18 +1189,18 @@ void micromesh_print_stats(void)
     printf("Route errors received:     %lu\n", mmr_stats.rerr_received);
     printf("\n");
     printf("#Messages with no route found: %lu\n",
-    		mmr_stats.messages_no_route_found);
+                mmr_stats.messages_no_route_found);
     printf("#Messages with broken link on forward: %lu\n",
-    		mmr_stats.messages_broken_link_on_forward);
+                mmr_stats.messages_broken_link_on_forward);
     printf("#Messages with no route available on forward: %lu\n",
-    		mmr_stats.messages_no_route_avail_on_forward);
+                mmr_stats.messages_no_route_avail_on_forward);
     printf("\n");
 
     for (int i = 0; i < MESSAGE_QUEUE_SIZE; i++) {
         if (packet_queue[i].timestamp > 0) {
             printf("Queue %d: Pack to %d\n",
-            	   i,
-            	   packet_queue[i].packet.destination);
+                   i,
+                   packet_queue[i].packet.destination);
         }
     }
 }

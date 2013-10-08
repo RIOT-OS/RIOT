@@ -91,7 +91,7 @@
  * @typedef SJContext
  */
 typedef struct SJContext {
-	// 2 times keysize. makes unrolling keystream easier / efficient
+        // 2 times keysize. makes unrolling keystream easier / efficient
     uint8_t skey [ 20 ];
 } SJContext;
 

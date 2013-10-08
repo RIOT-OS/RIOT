@@ -75,13 +75,13 @@ typedef struct BlockCipherInterface_t {
     char name[10];
     // the init function
     int (*BlockCipher_init)(CipherContext *context, uint8_t blockSize,
-    		                uint8_t keySize, uint8_t *key);
+                            uint8_t keySize, uint8_t *key);
     // the encrypt function
     int (*BlockCipher_encrypt)(CipherContext *context, uint8_t *plainBlock,
-    		                   uint8_t *cipherBlock);
+                               uint8_t *cipherBlock);
     // the decrypt function
     int (*BlockCipher_decrypt)(CipherContext *context, uint8_t *cipherBlock,
-    		                   uint8_t *plainBlock);
+                               uint8_t *plainBlock);
     // the setupKey function
     int (*setupKey)(CipherContext *context, uint8_t *key, uint8_t keysize);
     // read the BlockSize of this Cipher
@@ -103,14 +103,14 @@ typedef struct CipherModeContext {
  * @typedef     BlockCipher_Archive_t
  */
 typedef struct BlockCipher_Archive_t {
-	// the number of available ciphers
+        // the number of available ciphers
     uint8_t NoCiphers;
     // the ciphers in form or BlockCipherInterface_ts
     block_cipher_interface_t ciphers[PARSEC_MAX_BLOCK_CIPHERS];
 } BlockCipher_Archive_t;
 
 typedef struct MACContext {
-	// CipherContext for the cipher-operations
+        // CipherContext for the cipher-operations
     CipherContext cc;
 #if defined(AES) || defined (TWOFISH)
     // supports 16-Byte blocksize

@@ -50,7 +50,7 @@ void ulog_result(int res); // 0 = success, negative = failure
 #define ulog_debug(x, ...) ulogdf_impl(x, LOG_DEBUG, __FILE__, __LINE__,    \
                                       __FUNCTION__, ##__VA_ARGS__)
 #define ulog_error(x, ...) ulogdf_impl(x, LOG_CRITICAL, __FILE__, __LINE__, \
-		                               __FUNCTION__, ##__VA_ARGS__)
+                                               __FUNCTION__, ##__VA_ARGS__)
 #define ulog_force printf
 #else
 #define ulog(x, ...)

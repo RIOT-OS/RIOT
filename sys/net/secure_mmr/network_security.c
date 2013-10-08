@@ -81,10 +81,10 @@ int network_security_init()
     if (timer_thread_pid < 0) {
         ulog("> Creating timer thread");
         timer_thread_pid = thread_create(timer_thread_stack_buffer,
-        		                         4500, PRIORITY_MAIN + 1,
-        		                         CREATE_STACKTEST | CREATE_WOUT_YIELD,
-        		                         timer_handling_thread,
-        		                         "timer-thread");
+                                                 4500, PRIORITY_MAIN + 1,
+                                                 CREATE_STACKTEST | CREATE_WOUT_YIELD,
+                                                 timer_handling_thread,
+                                                 "timer-thread");
 
         if (timer_thread_pid <= 0) {
             ulog_error("Could not start timer thread");
@@ -106,7 +106,7 @@ int network_security_init()
 
             if (res < 0) {
                 ulog_error("Component init failed on security component %d. \
-                		    Error=%d", i, res);
+                                    Error=%d", i, res);
             }
         }
     }
@@ -163,7 +163,7 @@ int network_security_start()
 
             if (res < 0) {
                 ulog_error("Component start failed on security component %d. \
-                		    Error=%d", i, res);
+                                    Error=%d", i, res);
             }
         }
     }
@@ -197,7 +197,7 @@ int network_security_stop()
 
             if (res < 0) {
                 ulog_error("Component stop failed on security component %d. \
-                		   Error=%d", i, res);
+                                   Error=%d", i, res);
             }
         }
     }
@@ -228,7 +228,7 @@ int network_security_packet_arrived(secure_packet_t *packet)
 
             if (local_res < 0) {
                 ulog_error("Packet processing failed on security component %d. \
-                		    Error=%d", i, local_res);
+                                    Error=%d", i, local_res);
                 return local_res;
             }
 
@@ -252,7 +252,7 @@ int network_security_packet_arrived(secure_packet_t *packet)
  *        extended description
  */
 int network_security_set_send_function(int (*send_packet_ptr)
-		                               (secure_packet_t *packet))
+                                               (secure_packet_t *packet))
 {
     send_packet = send_packet_ptr;
     return NetworkSecurity_OK;
@@ -263,11 +263,11 @@ int network_security_set_send_function(int (*send_packet_ptr)
  *        extended description
  */
 int network_security_send_packet(uint8_t *payload,
-		                         int payload_len,
-		                         uint8_t destination,
-		                         uint8_t ttl,
-		                         enum SecurityMode sec_mode,
-		                         enum PeekHint peek_hint)
+                                         int payload_len,
+                                         uint8_t destination,
+                                         uint8_t ttl,
+                                         enum SecurityMode sec_mode,
+                                         enum PeekHint peek_hint)
 {
     if (payload_len > MAX_PAYLOAD_LEN) {
         ulog_error("Payload Length greater than max payload len");
@@ -311,11 +311,11 @@ int network_security_send_packet(uint8_t *payload,
  *        file for extended description
  */
 int network_security_register_timer(uint32_t interval_in_secs,
-		                            uint8_t user_param,
-		                            int (*timer_ticked_ptr)(int user_param))
+                                            uint8_t user_param,
+                                            int (*timer_ticked_ptr)(int user_param))
 {
     ulog_info("> Registering the timer. Interval=%lu",
-    		  (uint8_t)interval_in_secs);
+                  (uint8_t)interval_in_secs);
 
     // Init the timer registration in the tick table
     int timer_index = last_timer_id - TIMER_MSG_START;
@@ -333,9 +333,9 @@ int network_security_register_timer(uint32_t interval_in_secs,
     // Set the timer to tick at the specified interval
     timex_t interval = timex_set(interval_in_secs, 0);
     vtimer_set_msg(&(timer_callbacks[timer_index].timer),
-    		       interval,
-    		       (unsigned int)timer_thread_pid,
-    		       (void *)timer_callbacks[timer_index].timer_id);
+                       interval,
+                       (unsigned int)timer_thread_pid,
+                       (void *)timer_callbacks[timer_index].timer_id);
 
     last_timer_id++;
 
@@ -364,8 +364,8 @@ int network_security_continue_timer(int timer_id)
     // Reset the timer
     timex_t interval = timex_set(timer_callbacks[timer_index].interval, 0);
     vtimer_set_msg(&(timer_callbacks[timer_index].timer),
-    		       interval, timer_thread_pid,
-    		       (void *)timer_callbacks[timer_index].timer_id);
+                       interval, timer_thread_pid,
+                       (void *)timer_callbacks[timer_index].timer_id);
 
     return NetworkSecurity_OK;
 }
@@ -421,8 +421,8 @@ int network_security_restart_timer(int timer_id, uint32_t new_interval)
     // Reset the timer
     timex_t interval = timex_set(timer_callbacks[timer_index].interval, 0);
     vtimer_set_msg(&(timer_callbacks[timer_index].timer),
-    		       interval, timer_thread_pid,
-    		       (void *)timer_callbacks[timer_index].timer_id);
+                       interval, timer_thread_pid,
+                       (void *)timer_callbacks[timer_index].timer_id);
 
     return NetworkSecurity_OK;
 }
@@ -436,7 +436,6 @@ static void timer_handling_thread()
     /* Waits for a timer message then passes it on to the
      * appropriate handler component
      */
-
 
     ulog("Timer thread started");
 
@@ -460,7 +459,7 @@ static void timer_handling_thread()
                  * component which matches value will react to the event
                  * network_security_raise_event(NetworkSecurity_TimerTicked,
                  * timer_msg.content.value);
-				 */
+                                 */
                 // smutex_lock(&netsec_mutex);
                 ulog("> Timer %lu ticked!", timer_msg.content.value);
 
@@ -477,10 +476,10 @@ static void timer_handling_thread()
 
                         // Call the timer handlers
                         if (ptimer->timer_ticked_ptr(ptimer->user_param) ==
-                        	NetworkSecurity_Continue) {
+                                NetworkSecurity_Continue) {
                             ulog_info("Setting timer to tick again");
                             network_security_continue_timer(
-                            		                     TIMER_MSG_START + i);
+                                                            TIMER_MSG_START + i);
                         }
                     }
                 } // for

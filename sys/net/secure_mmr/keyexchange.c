@@ -585,7 +585,7 @@ int keyexchange_keytransfer_arrived(secure_packet_t *packet)
     ulog("> Received new global key. Broadcast: %d:%lu",
          last_seen_keyrefresh_node, last_seen_keyrefresh_seq);
     keyexchange_set_new_key(msg->gkey, SECURE_ROUTING_KEYSIZE,
-    		                msg->gkey_seq_nmbr);
+                                msg->gkey_seq_nmbr);
 
     if (packet->destination == GLOBAL_BROADCAST ||
         GET_SECURITY_MODE(packet->flags) ==
@@ -897,17 +897,17 @@ void keyexchange_set_encryption_mode(enum SecurityMode m)
 {
     if (m == SecurityMode_EncryptAndMACPairwise) {
         ulog("> Changing key exchange encryption mode to \
-                 SecurityMode_EncryptAndMACPairwise");
+              SecurityMode_EncryptAndMACPairwise");
     }
     else if (m == SecurityMode_EncryptAndMACPriorKey) {
         ulog("> Changing key exchange encryption mode to \
-                 SecurityMode_EncryptAndMACPriorKey");
+              SecurityMode_EncryptAndMACPriorKey");
     }
     else if (m == SecurityMode_EncryptAndMAC) {
         m = SecurityMode_EncryptAndMACPriorKey;
         ulog("> Forcing mode SecurityMode_EncryptAndMACPriorKey. \
-                 Attempt to change key exchange encryption mode to \
-                 SecurityMode_EncryptAndMAC");
+              Attempt to change key exchange encryption mode to \
+              SecurityMode_EncryptAndMAC");
     }
     else {
         ulog("> Changing key exchange encryption mode to %d", m);

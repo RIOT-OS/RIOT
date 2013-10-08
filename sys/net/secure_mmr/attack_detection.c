@@ -121,7 +121,7 @@ int check_security_limits(void)
         }
         else {
             ulog("> Less than %d nodes found with errors, no security \
-            		adaptation", NODES_WITH_ERRORS_LIMIT_SOFT);
+                  adaptation", NODES_WITH_ERRORS_LIMIT_SOFT);
         }
     }
     else {
@@ -207,7 +207,7 @@ int attack_detection_security_status_arrived(uint16_t sender_id,
         security_status_item_t *item = &(msg->items[i]);
 
         ulog("> Checking %d for attack. NodeID=%d, KeySeq=%d. WrongMacs=%d. \
-        		WrongMacsInterval=%d. SeqOverlow=%d", i, item->node_id,
+                        WrongMacsInterval=%d. SeqOverlow=%d", i, item->node_id,
              item->gkey_seqnmbr, item->wrong_macs, item->wrong_mac_interval,
              item->seqnmbr_overflow_warning);
 
@@ -215,7 +215,7 @@ int attack_detection_security_status_arrived(uint16_t sender_id,
 
         if (item->seqnmbr_overflow_warning > 0) {
             ulog_error("Received warning about sequence number overflow from \
-            		    %lu", sender_id);
+                            %lu", sender_id);
             seq_overflow_warning = 1;
         }
     }

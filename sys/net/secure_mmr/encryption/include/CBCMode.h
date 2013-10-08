@@ -74,7 +74,7 @@ enum {
  * @param   spill1  test1
  */
 typedef struct CBCModeContext {
-	// Spill-Block 1 for temporary usage
+        // Spill-Block 1 for temporary usage
     uint8_t spill1 [CBCMODE_MAX_BLOCK_SIZE ];
     // Spill-Block 2 for temporary usage
     uint8_t spill2 [CBCMODE_MAX_BLOCK_SIZE ];
@@ -113,7 +113,7 @@ typedef struct CBCModeContext {
  *          the cipher does not agree with the preferred size of the mode.
  */
 int block_cipher_mode_init(CipherModeContext *context, uint8_t key_size,
-		                   uint8_t *key);
+                           uint8_t *key);
 
 /**
  * @brief   same as BlockCipherMode_init but with the possibility to specify
@@ -135,7 +135,7 @@ int block_cipher_mode_init(CipherModeContext *context, uint8_t key_size,
  *          the cipher does not agree with the preferred size of the mode.
  */
 int block_cipher_mode_init0(CipherModeContext *context, uint8_t key_size,
-		                    uint8_t *key, uint8_t cipher_index);
+                            uint8_t *key, uint8_t cipher_index);
 
 /**
  * @brief   prints the debug-messages passed by ::dumpBuffer
@@ -175,8 +175,8 @@ void dump_buffer(char *bufName, uint8_t *buf, uint8_t size);
  *          include not calling init().
  */
 int block_cipher_mode_encrypt(CipherModeContext *context, uint8_t *plain_blocks,
-		                      uint8_t *cipher_blocks, uint16_t num_bytes,
-		                      uint8_t *IV);
+                              uint8_t *cipher_blocks, uint16_t num_bytes,
+                              uint8_t *IV);
 
 /**
  * @brief   Decrypts num_bytes of ciphertext blocks (each of size blockSize)
@@ -199,9 +199,9 @@ int block_cipher_mode_encrypt(CipherModeContext *context, uint8_t *plain_blocks,
  *          include not calling init().
  */
 int block_cipher_mode_decrypt(CipherModeContext *context,
-		                      uint8_t *cipher_blocks,
-		                      uint8_t *plain_blocks,
-		                      uint16_t num_bytes,
-		                      uint8_t *IV);
+                              uint8_t *cipher_blocks,
+                              uint8_t *plain_blocks,
+                              uint16_t num_bytes,
+                              uint8_t *IV);
 
 #endif /* CBCMODE_H_ */

@@ -156,7 +156,7 @@ void network_nodes_pop_oldest_node(network_node_t *start_node,
     memset(&stats, 0, sizeof(network_stats_t));
     network_nodes_get_network_stats(network_nodes_get_root(), 0, &stats);
     ulog("> Stats result. OldestNeighbour=%d OldestRoute=%d. \
-    	 NeigbourCount=%d RouteCount=%d",
+         NeigbourCount=%d RouteCount=%d",
          stats.oldest_neighbour ? (uint8_t)stats.oldest_neighbour->node_id : 0,
          stats.oldest_route ? (uint8_t)stats.oldest_route->node_id : 0,
          (uint8_t)stats.neighbour_count,
@@ -181,7 +181,7 @@ void network_nodes_pop_oldest_node(network_node_t *start_node,
     }
     else {
         // Both allocations are equally filled. In this case, we want to delete
-    	// the same type as the one we are about to delete
+        // the same type as the one we are about to delete
 
         if (going_to_add_neighbour) {
             network_nodes_delete_node(network_nodes_get_root(),
@@ -298,7 +298,7 @@ void network_nodes_delete_all(network_node_t *start_node)
  *                      file for further documentation
  */
 int network_nodes_set_node_unreachable(network_node_t *start_node,
-		                               uint16_t addr)
+                                               uint16_t addr)
 {
     // same as deleting from routing table. But in our case just set
     // gateway to 0
@@ -331,11 +331,11 @@ int network_nodes_set_node_unreachable(network_node_t *start_node,
 
 
     change_count = network_nodes_set_node_unreachable((network_node_t *)
-    		                                          start_node->left,
-    		                                          addr);
+                                                          start_node->left,
+                                                          addr);
     change_count += network_nodes_set_node_unreachable((network_node_t *)
-    		                                           start_node->right,
-    		                                           addr);
+                                                           start_node->right,
+                                                           addr);
 
     return change_count;
 }
@@ -345,8 +345,8 @@ int network_nodes_set_node_unreachable(network_node_t *start_node,
  *         in the field
  */
 void network_nodes_extract_route(network_node_t *node,
-		                         uint16_t *list,
-		                         uint8_t list_len)
+                                         uint16_t *list,
+                                         uint8_t list_len)
 {
     int this_node_pos = -1;
     int dst_node_pos = -1;
@@ -370,7 +370,7 @@ void network_nodes_extract_route(network_node_t *node,
     }
 
     ulog_info("ER: this node pos = %d dst node pos = %d",
-    		   this_node_pos, dst_node_pos);
+                   this_node_pos, dst_node_pos);
 
     int k = 0;
 
@@ -393,9 +393,9 @@ void network_nodes_extract_route(network_node_t *node,
  *         file for detailed explanation.
  */
 int network_nodes_add_route(uint8_t dst, uint8_t gateway,
-		                    uint8_t hop_count,
-		                    uint16_t *list,
-		                    uint8_t list_len)
+                                    uint8_t hop_count,
+                                    uint16_t *list,
+                                    uint8_t list_len)
 {
     network_nodes_pop_oldest_node(network_nodes_get_root(), 0);
 
@@ -404,7 +404,7 @@ int network_nodes_add_route(uint8_t dst, uint8_t gateway,
     if (node != 0) {
         if (node->gateway == 0) {
             ulog("> Route to %d (gateway=%d) not in table. Adding. \
-            	 Hop Distance=%d", dst, gateway, hop_count);
+                 Hop Distance=%d", dst, gateway, hop_count);
             node->gateway = gateway;
             node->hop_distance = hop_count;
 
@@ -418,7 +418,7 @@ int network_nodes_add_route(uint8_t dst, uint8_t gateway,
 
                 if (hop_count < node->hop_distance) {
                     ulog("> Shorter route found for %d. NewHops=%d, \
-                    		OldHops=%d. OldGateway=%d, NewGateway=%d",
+                          OldHops=%d. OldGateway=%d, NewGateway=%d",
                           node->node_id, hop_count, node->hop_distance,
                           node->gateway, gateway);
                           node->gateway = gateway;
@@ -428,7 +428,7 @@ int network_nodes_add_route(uint8_t dst, uint8_t gateway,
                 }
                 else {
                     ulog("> New route for %d was longer!Not updating. \
-                    	 NewHops=%d, OldHops=%d. OldGateway=%d, NewGateway=%d",
+                         NewHops=%d, OldHops=%d. OldGateway=%d, NewGateway=%d",
                          node->node_id,
                          hop_count,
                          node->hop_distance,
@@ -453,13 +453,13 @@ void network_nodes_print(network_node_t *node)
 {
     uint32_t seq_nmbr = node->seq_nmbr;
     printf("Node-ID:%d|Neighbour?%d| Gateway:%d|Distance(Hops):%d| \
-    		Missed-Keep-Alive:%d|SeqNmbr:%lu\n",
-    		node->node_id,
-    		node->is_neighbour,
-    		node->gateway,
-    		node->hop_distance,
-    		node->missed_keep_alives,
-    		seq_nmbr);
+                Missed-Keep-Alive:%d|SeqNmbr:%lu\n",
+                node->node_id,
+                node->is_neighbour,
+                node->gateway,
+                node->hop_distance,
+                node->missed_keep_alives,
+                seq_nmbr);
     printf("-- PairwiseKey=");
 
     for (int i = 0; i < SECURE_ROUTING_KEYSIZE; i++) {
@@ -512,9 +512,9 @@ void network_nodes_print_nodes(network_node_t *start_node, int only_neighbours)
     }
 
     network_nodes_print_nodes((network_node_t *)start_node->left,
-    		                   only_neighbours);
+                                   only_neighbours);
     network_nodes_print_nodes((network_node_t *)start_node->right,
-    		                   only_neighbours);
+                                   only_neighbours);
 }
 
 
@@ -522,13 +522,13 @@ void network_nodes_print_nodes(network_node_t *start_node, int only_neighbours)
  * @brief  sets the sequence number of a node. See the header file for details.
  */
 network_node_t *network_nodes_set_sequence_nmbr(uint16_t node_id,
-		                                        sequence_number_t seq_nmbr)
+                                                        sequence_number_t seq_nmbr)
 {
     network_nodes_pop_oldest_node(network_nodes_get_root(), 0);
 
     network_node_t *node = network_nodes_find_or_add(tree_root,
-    		                                         node_id,
-    		                                         false);
+                                                         node_id,
+                                                         false);
 
     if (node != 0) {
         node->seq_nmbr = seq_nmbr;
@@ -543,13 +543,13 @@ network_node_t *network_nodes_set_sequence_nmbr(uint16_t node_id,
  *         See header file for further details
  */
 network_node_t *network_nodes_set_neighbour(uint8_t node_id,
-		                                    uint8_t *pairwise_key)
+                                                    uint8_t *pairwise_key)
 {
     network_nodes_pop_oldest_node(network_nodes_get_root(), 1);
 
     network_node_t *node = network_nodes_find_or_add(tree_root,
-    		                                         node_id,
-    		                                         false);
+                                                         node_id,
+                                                         false);
 
     if (node == 0) {
         return 0;
@@ -557,7 +557,7 @@ network_node_t *network_nodes_set_neighbour(uint8_t node_id,
 
     if (node->is_neighbour == 0) {
         ulog_info("> EXPERIMENT(NewNeighbour, CurCount=%lu",
-        		  network_nodes_count_neighbours(network_nodes_get_root()));
+                   network_nodes_count_neighbours(network_nodes_get_root()));
     }
 
     node->is_neighbour = 1;
@@ -591,13 +591,13 @@ int network_nodes_increment_neighbours_keepalive(network_node_t *start_node)
         count = 1;
         start_node->missed_keep_alives += 1;
         ulog("> Node %d missed-keep-alive=%d", start_node->node_id,
-        		                               start_node->missed_keep_alives);
+                                                       start_node->missed_keep_alives);
     }
 
     count += network_nodes_increment_neighbours_keepalive((network_node_t *)
-    		                                               start_node->left);
+                                                               start_node->left);
     count += network_nodes_increment_neighbours_keepalive((network_node_t *)
-    		                                               start_node->right);
+                                                               start_node->right);
 
     return count;
 }
@@ -653,7 +653,7 @@ void network_nodes_deneighbour(network_node_t *t)
  *        description
  */
 void network_nodes_set_globalkey(network_node_t *start_node,
-		                         uint8_t *new_encryption_key)
+                                         uint8_t *new_encryption_key)
 {
     if (start_node == 0) {
         return;
@@ -668,9 +668,9 @@ void network_nodes_set_globalkey(network_node_t *start_node,
     start_node->seq_nmbr = 0;
 
     network_nodes_set_globalkey((network_node_t *) start_node->left,
-    		                     new_encryption_key);
+                                     new_encryption_key);
     network_nodes_set_globalkey((network_node_t *) start_node->right,
-    		                     new_encryption_key);
+                                     new_encryption_key);
 }
 
 /**
@@ -698,9 +698,9 @@ int network_nodes_count_neighbours(network_node_t *start_node)
     }
 
     count += network_nodes_count_neighbours((network_node_t *)
-    		                                 start_node->left);
+                                                 start_node->left);
     count += network_nodes_count_neighbours((network_node_t *)
-    		                                 start_node->right);
+                                                 start_node->right);
 
     return count;
 }
@@ -709,10 +709,10 @@ int network_nodes_count_neighbours(network_node_t *start_node)
  * @brief Will search for all neighbours, then copy to the specified array
  */
 int network_nodes_packets_to_neighbors(network_node_t *start_node,
-		                               secure_packet_t *packet,
-		                               secure_packet_t *list,
-		                               int list_size,
-		                               int cur_pos)
+                                               secure_packet_t *packet,
+                                               secure_packet_t *list,
+                                               int list_size,
+                                               int cur_pos)
 {
     if (start_node == 0) {
         return cur_pos;
@@ -742,16 +742,16 @@ int network_nodes_packets_to_neighbors(network_node_t *start_node,
     }
 
     cur_pos = network_nodes_packets_to_neighbors((network_node_t *)
-    		                                      start_node->left,
-    		                                      packet, list,
-    		                                      list_size,
-    		                                      cur_pos);
+                                                      start_node->left,
+                                                      packet, list,
+                                                      list_size,
+                                                      cur_pos);
     return network_nodes_packets_to_neighbors((network_node_t *)
-    		                                   start_node->right,
-    		                                   packet,
-    		                                   list,
-    		                                   list_size,
-    		                                   cur_pos);
+                                                   start_node->right,
+                                                   packet,
+                                                   list,
+                                                   list_size,
+                                                   cur_pos);
 }
 
 /**
@@ -768,14 +768,14 @@ network_node_t *network_nodes_get_any_neighbour(network_node_t *start_node)
     }
 
     network_node_t *node = network_nodes_get_any_neighbour((network_node_t *)
-    		                                                start_node->left);
+                                                                start_node->left);
 
     if (node != 0) {
         return node;
     }
 
     node = network_nodes_get_any_neighbour((network_node_t *)
-    		                                start_node->right);
+                                                start_node->right);
 
     if (node != 0) {
         return node;
@@ -789,7 +789,7 @@ network_node_t *network_nodes_get_any_neighbour(network_node_t *start_node)
  *              than the specified limit. See header for more details
  */
 int network_nodes_count_mac_errors(network_node_t *start_node,
-		                           uint8_t greater_than_limit)
+                                           uint8_t greater_than_limit)
 {
     if (start_node == 0) {
         return 0;
@@ -802,11 +802,11 @@ int network_nodes_count_mac_errors(network_node_t *start_node,
     }
 
     count += network_nodes_count_mac_errors((network_node_t *)
-    		                                 start_node->left,
-    		                                 greater_than_limit);
+                                                 start_node->left,
+                                                 greater_than_limit);
     count += network_nodes_count_mac_errors((network_node_t *)
-    		                                 start_node->right,
-    		                                 greater_than_limit);
+                                                 start_node->right,
+                                                 greater_than_limit);
 
     return count;
 }
@@ -910,7 +910,7 @@ void network_nodes_print_all_nodes(network_node_t *root)
  *              D. Sleator <sleator@cs.cmu.edu> March 1992
  **/
 network_node_t *network_nodes_delete_node(network_node_t *root,
-		                                  uint16_t node_id)
+                                                  uint16_t node_id)
 {
     network_node_t *x = 0;
 

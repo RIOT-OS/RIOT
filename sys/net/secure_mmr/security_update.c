@@ -224,7 +224,7 @@ int security_refresh_arrived(secure_packet_t *packet)
 {
     security_refresh_msg_t *msg = (security_refresh_msg_t *)packet->data;
     ulog("> Received sec-refresh msg. global key transfer mode=%d, gk-seq=%d, \
-    	 enc-sec=%d", msg->gkey_transfer_mode, msg->gkey_seqnmbr,
+	      enc-sec=%d", msg->gkey_transfer_mode, msg->gkey_seqnmbr,
          msg->encrypt_security_status);
 
     security_update_set_encrypt_security_status(msg->encrypt_security_status);
@@ -259,7 +259,7 @@ int security_status_arrived(secure_packet_t *packet)
             security_status_item_t *item = &(msg->items[i]);
 
             ulog("> Processed sec-item %d. NodeID=%d, KeySeq=%d. WrongMacs=%d.\
-            	 WrongMacsInterval=%d, Overflow=%d", i, item->node_id,
+		          WrongMacsInterval=%d, Overflow=%d", i, item->node_id,
                  item->gkey_seqnmbr, item->wrong_macs,
                  item->wrong_mac_interval, item->seqnmbr_overflow_warning);
 
@@ -277,7 +277,7 @@ int security_status_arrived(secure_packet_t *packet)
     else {
         if (packet->destination == get_this_node_address()) {
             ulog_error("Sec-Status sent directly to node. Send it to the \
-            		   base-station. Not processing");
+			            base-station. Not processing");
             return NetworkSecurity_PacketHandled;
         }
 
@@ -324,8 +324,8 @@ int security_status_arrived(secure_packet_t *packet)
             packet_mac_reset_mac_errors();
 
             ulog("> Added this node to sec-status at pos %d. KeySeq=%d. \
-            	 Node_id=%d, wrong_macs=%lu. wrong_macs_interval=%d, \
-            	 Overflow=%d", i,
+		          Node_id=%d, wrong_macs=%lu. wrong_macs_interval=%d, \
+		          Overflow=%d", i,
                  msg->items[i].gkey_seqnmbr, msg->items[i].node_id,
                  msg->items[i].wrong_macs, msg->items[i].wrong_mac_interval,
                  msg->items[i].seqnmbr_overflow_warning);
@@ -347,7 +347,7 @@ int send_security_refresh(uint16_t destination, uint8_t gkey_transfer_mode,
 {
     if (!i_am_basestation) {
         ulog_error("This is sensor node. Send security refresh from \
-        		   base-station");
+			        base-station");
         return NetworkSecurity_NotBaseStation;
     }
 
@@ -392,7 +392,7 @@ int send_security_status(uint16_t destination)
 
     if (i_am_basestation) {
         ulog_error("This is base-station. Will not send security status \
-        		   messages");
+			        messages");
         return NetworkSecurity_NotBaseStation;
     }
 
@@ -429,7 +429,7 @@ int send_security_status(uint16_t destination)
     }
 
     ulog("> Sending SecStatus - wrong_macs=%d. Interval=%d gkey=%d. Sec=%d. \
-    	 Overflow=%d", sec_item.wrong_macs, sec_item.wrong_mac_interval,
+	      Overflow=%d", sec_item.wrong_macs, sec_item.wrong_mac_interval,
          sec_item.gkey_seqnmbr, sec, sec_item.seqnmbr_overflow_warning);
     result = network_security_send_packet((uint8_t *)&msg,
                                           sizeof(security_status_msg_t),

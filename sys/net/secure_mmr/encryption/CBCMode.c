@@ -318,7 +318,7 @@ int block_cipher_mode_encrypt(CipherModeContext *context, uint8_t *plain_blocks,
 
         if (fp_encrypt(&(context->cc), IV, eIV) == FAIL) {
             printf("%-40s: [ERROR] fp_encrypt(&(context->cc), IV, eIV) == \
-            	   FAIL (1) \r\n", __FUNCTION__);
+                   FAIL (1) \r\n", __FUNCTION__);
             return FAIL;
         }
 
@@ -335,7 +335,7 @@ int block_cipher_mode_encrypt(CipherModeContext *context, uint8_t *plain_blocks,
             if (fp_encrypt(&(context->cc), cipher_blocks + bc,
                            cipher_blocks + bc) == FAIL) {
                 printf("%-40s: [ERROR] fp_encrypt (&(context->cc), \
-                	   cipherBlocks + bc, cipherBlocks + bc) == FAIL (1) \r\n",
+                           cipherBlocks + bc, cipherBlocks + bc) == FAIL (1) \r\n",
                        __FUNCTION__);
                 return FAIL;
             }
@@ -358,8 +358,8 @@ int block_cipher_mode_encrypt(CipherModeContext *context, uint8_t *plain_blocks,
                 if (fp_encrypt(&context->cc, cipher_blocks + bc,
                                cipher_blocks + bc) == FAIL) {
                     printf("%-40s: [ERROR] fp_encrypt(&context->cc, \
-                    	   cipherBlocks + bc, cipherBlocks + bc) == \
-                    	   FAIL (2) \r\n", __FUNCTION__);
+                           cipherBlocks + bc, cipherBlocks + bc) == \
+                           FAIL (2) \r\n", __FUNCTION__);
                     return FAIL;
                 }
 
@@ -389,7 +389,7 @@ int block_cipher_mode_encrypt(CipherModeContext *context, uint8_t *plain_blocks,
 
         if (fp_encrypt(&context->cc, spillblock, spillblock) == FAIL) {
             printf("%-40s: [ERROR] fp_encrypt(&context->cc, spillblock, \
-            	   spillblock) == FAIL \r\n", __FUNCTION__);
+                   spillblock) == FAIL \r\n", __FUNCTION__);
             return FAIL;
         }
 
@@ -413,7 +413,7 @@ int block_cipher_mode_encrypt(CipherModeContext *context, uint8_t *plain_blocks,
         // ordinarily go.
         if (fp_encrypt(&context->cc, spillblock, cipher_blocks + bc) == FAIL) {
             printf("%-40s: [ERROR] fp_encrypt(&context->cc, spillblock, \
-            	   cipherBlocks + bc) == FAIL \r\n", __FUNCTION__);
+                   cipherBlocks + bc) == FAIL \r\n", __FUNCTION__);
             return FAIL;
         }
 

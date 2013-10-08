@@ -285,7 +285,7 @@ int packet_mac_secure_packet(secure_packet_t *packet, uint16_t phy_src)
 
         if (node == 0) {
             ulog_error("Node not found. Pairwise decryption to non-neighbours \
-            		   not supported");
+                        not supported");
             return PacketSecurity_NotAvailable;
         }
 
@@ -294,7 +294,7 @@ int packet_mac_secure_packet(secure_packet_t *packet, uint16_t phy_src)
 
             if (node == 0 || node->is_neighbour == 0) {
                 ulog_error("Pairwise encryption not possible. Gateway not \
-                		   found");
+                            found");
                 return PacketSecurity_NotAvailable;
             }
 
@@ -380,13 +380,13 @@ int packet_mac_verify_packet(secure_packet_t *packet, uint16_t phy_src)
 
         if (node == 0) {
             ulog_error("Node not found. Pairwise decryption to non-neighbours \
-            		   not supported");
+                        not supported");
             return PacketSecurity_NotAvailable;
         }
 
         if (node->is_neighbour == 0) {
             ulog_error("Pairwise key verification can only be done for \
-            		    neighbours. %d not neighbour.", node->node_id);
+                        neighbours. %d not neighbour.", node->node_id);
             return PacketSecurity_NotAvailable;
         }
 
@@ -431,7 +431,7 @@ int packet_mac_verify_packet(secure_packet_t *packet, uint16_t phy_src)
         if (packet->mac[i] != this_MAC[i] || force_error == 1) {
 
             ulog_error("MAC Verification failed. Received MAC= [%x][%x][%x]\
-            		   [%x] and calculated MAC= [%x][%x][%x][%x].",
+                        [%x] and calculated MAC= [%x][%x][%x][%x].",
                        packet->mac[0],
                        packet->mac[1],
                        packet->mac[2],
@@ -458,7 +458,7 @@ int packet_mac_verify_packet(secure_packet_t *packet, uint16_t phy_src)
 
     if (mac_error != PacketSecurity_Error) {
         ulog_info("> MAC Succeeded. Received MAC= [%x][%x][%x][%x] and \
-        		  calculated MAC= [%x][%x][%x][%x].",
+                          calculated MAC= [%x][%x][%x][%x].",
                   packet->mac[0],
                   packet->mac[1],
                   packet->mac[2],

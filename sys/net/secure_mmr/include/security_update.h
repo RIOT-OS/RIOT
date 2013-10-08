@@ -25,14 +25,14 @@
 
 // defines the number of security stauts structs that one packet can contain
 #define MAX_SECURE_ITEMS (((MAX_PAYLOAD_LEN-2)/ \
-		sizeof(security_status_item_t)) - 1)
+                sizeof(security_status_item_t)) - 1)
 
 
 /**
  * @brief Packet Structure for the Security-Refresh message
  */
 typedef struct security_refresh_msg {
-	// the type of the packet = security refresh
+    // the type of the packet = security refresh
     uint8_t type;
     // the transmission mode of the global key to use from now on
     uint8_t gkey_transfer_mode;
@@ -46,7 +46,7 @@ typedef struct security_refresh_msg {
  * @brief Structure for each status item as sent by a node
  */
 typedef struct security_status_item {
-	// ID of the reporting node
+    // ID of the reporting node
     uint8_t node_id;
     // currently used global key sequence number
     uint16_t gkey_seqnmbr;
@@ -62,7 +62,7 @@ typedef struct security_status_item {
  * @brief Structure for the security status message that will be sent
  */
 typedef struct security_status_msg {
-	// the type of the packet = security status
+    // the type of the packet = security status
     uint8_t type;
     // the number of status_items valid in the message
     uint8_t item_count;
@@ -118,7 +118,7 @@ int security_update_stop(void);
  * @return NetworkSecurity_Result saying if the operation succeeded or failed
  */
 int send_security_refresh(uint16_t destination, uint8_t gkey_transfer_mode,
-		                  uint8_t encrypt_security_status);
+                          uint8_t encrypt_security_status);
 
 /**
  * Will send a security status between this node and the basestation.

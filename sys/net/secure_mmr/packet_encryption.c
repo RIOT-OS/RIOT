@@ -227,7 +227,7 @@ int packet_encryption_secure_packet(secure_packet_t *packet, uint16_t phy_src)
 
         if (node == 0) {
             ulog_error("Node not found. Pairwise encryption to non-neighbours \
-            		   not yet supported");
+                        not yet supported");
             return PacketSecurity_NotAvailable;
         }
 
@@ -238,7 +238,7 @@ int packet_encryption_secure_packet(secure_packet_t *packet, uint16_t phy_src)
 
             if (node == 0 || node->is_neighbour == 0) {
                 ulog_error("Pairwise encryption not possible. Gateway not \
-                		    found");
+                            found");
                 return PacketSecurity_NotAvailable;
             }
 
@@ -295,10 +295,10 @@ int packet_encryption_secure_packet(secure_packet_t *packet, uint16_t phy_src)
     ulog_info("Encrypting payload. Payload Length is %d. Packet Length is %d",
               packet->payload_len, sizeof(secure_packet_t));
     res = block_cipher_mode_encrypt(&cipherModeContext,
-                                  packetcopy,
-                                  packet->data,
-                                  payload_len,
-                                  init_vector);
+                                    packetcopy,
+                                    packet->data,
+                                    payload_len,
+                                    init_vector);
 
     if (res <= 0) {     //if error occurred
         ulog_error("Encryption failed code = %i", res);
@@ -349,14 +349,14 @@ int packet_encryption_desecure_packet(secure_packet_t *packet,
 
         if (node == 0) {
             ulog_error("Node %d not known. PW decryption to non-neighbours \
-            		    not supported", phy_src);
+                        not supported", phy_src);
             network_nodes_print_nodes(network_nodes_get_root(), 1);
             return PacketSecurity_NotAvailable;
         }
 
         if (node->is_neighbour == 0) {
             ulog_error("Pairwise key verification can only be done for \
-            		    neighbours. %d not neighbour", node->node_id);
+                        neighbours. %d not neighbour", node->node_id);
             return PacketSecurity_NotAvailable;
         }
 
@@ -454,9 +454,9 @@ int block_cipher_init(CipherContext *context,
     else {
         ulog_info("Calling init on the particular cipher");
         res = archive.ciphers[cipher_index].BlockCipher_init(context,
-        		                                             blockSize,
-        		                                             keySize,
-        		                                             key);
+                                                                     blockSize,
+                                                                     keySize,
+                                                                     key);
     }
 
     if (res) {
@@ -480,6 +480,6 @@ uint8_t block_cipher_info_get_preferred_block_size(uint8_t cipher_index)
 {
     uint8_t res;
     res = archive.ciphers[cipher_index].BlockCipherInfo_getPreferredBlockSize(
-    		                                                                 );
+                                                                             );
     return res;
 }

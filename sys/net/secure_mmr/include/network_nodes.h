@@ -106,7 +106,7 @@ void network_nodes_print_nodes(network_node_t *start_node,
  * @return Pointer to the node modified, or node newly created
  */
 network_node_t *network_nodes_set_sequence_nmbr(uint16_t node_id,
-        sequence_number_t seq_nmbr);
+                                                sequence_number_t seq_nmbr);
 
 
 /**
@@ -245,9 +245,8 @@ int network_nodes_count_mac_errors(network_node_t *start_node,
  * @return      Pointer to the found or added node
  */
 network_node_t *network_nodes_find_or_add(network_node_t *start_node,
-        uint16_t node_id,
-        int only_find);
-
+                                          uint16_t node_id,
+                                          int only_find);
 
 /**
  * Given the id of a node, will say if this node is a neighbour of us
@@ -307,7 +306,7 @@ void network_nodes_print_all_nodes(network_node_t *root);
  * @return The root of the resulting tree
  */
 network_node_t *network_nodes_delete_node(network_node_t *root,
-        uint16_t node_id);
+                                          uint16_t node_id);
 
 /**
  * @brief  Removes oldest route

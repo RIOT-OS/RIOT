@@ -644,7 +644,7 @@ int TwoFish_encrypt(CipherContext *context, uint8_t *in, uint8_t *out)
 
     if (!ctx) {
         printf("%-40s: [ERROR] Could NOT malloc space for the TWOFISH_context \
-        	   struct.\r\n", __FUNCTION__);
+                struct.\r\n", __FUNCTION__);
         return -1;
     }
 
@@ -697,7 +697,7 @@ int TwoFish_decrypt(CipherContext *context, uint8_t *in, uint8_t *out)
 
     if (!ctx) {
         printf("%-40s: [ERROR] Could NOT malloc space for the TWOFISH_context \
-        	   struct.\r\n", __FUNCTION__);
+                struct.\r\n", __FUNCTION__);
         return -1;
     }
 

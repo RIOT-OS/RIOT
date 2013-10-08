@@ -185,7 +185,7 @@ int verify_packet(secure_packet_t *packet, uint16_t phy_src)
             if (res < 0) {
                 if (res != PacketSecurity_ReplayedBroadcast) {
                     ulog_error("Packet verification failed on component %d. \
-                    		   Error=%d", i, res);
+                                Error=%d", i, res);
                 }
 
                 // mutex_unlock(&pack_sec_mutex, MUTEX_YIELD);
