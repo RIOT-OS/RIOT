@@ -87,11 +87,11 @@ ifneq (,$(findstring hashes,$(USEMODULE)))
 endif
 
 all: $(BINDIR)$(MODULE).a 
-	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
 include $(RIOTBASE)/Makefile.base
 
 # remove compilation products
 clean::
-	@for i in $(DIRS) ; do $(MAKE) -C $$i clean ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
 
