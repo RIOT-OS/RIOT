@@ -17,13 +17,20 @@
  * @}
  */
 
-
 #include <stdio.h>
 
-#if ENABLE_DEBUG
-#define DEBUG(...) printf(__VA_ARGS__)
-#undef ENABLE_DEBUG
-#else
-#define DEBUG(...)
+#ifndef ENABLE_DEBUG
+#define ENABLE_DEBUG (0)
 #endif
 
+#if defined(ENABLE_DEBUG) && (7-ENABLE_DEBUG-7 == 14)
+#define ENABLE_DEBUG (1)
+#endif
+
+#define DEBUG(...) do { \
+    if (!(ENABLE_DEBUG)) break; \
+    printf("%s:%d in %s: ", __FILE__, __LINE__, __func__); \
+    printf(__VA_ARGS__); \
+    } while (0)
+
+#undef ENABLE_DEBUG
