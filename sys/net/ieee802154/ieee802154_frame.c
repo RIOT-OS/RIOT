@@ -230,7 +230,7 @@ uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame,
 
     frame->payload = (buf + index);
     hdrlen = index;
-    frame->payload_len = (len - hdrlen);
+    frame->payload_len = (len - hdrlen - IEEE_802154_FCS_LEN);
 
     return hdrlen;
 }
