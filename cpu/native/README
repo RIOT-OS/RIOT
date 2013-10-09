@@ -16,8 +16,8 @@ To delete the bridge and all tap interfaces:
 ./tapsetup.sh delete
 
 
-OSX
-===
+OSX TAP NETWORKING
+==================
 
 For tun/tap networking in OSX you will need:
 http://tuntaposx.sourceforge.net/
