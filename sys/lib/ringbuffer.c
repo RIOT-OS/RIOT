@@ -25,10 +25,10 @@
 #include "malloc.h"
 #endif
 
-#include "ringbuffer.h"
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
-//#define DEBUG(...) printf (__VA_ARGS__)
-#define DEBUG(...)
+#include "ringbuffer.h"
 
 void ringbuffer_init(ringbuffer_t *rb, char *buffer, unsigned int bufsize)
 {
