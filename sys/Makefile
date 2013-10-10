@@ -73,6 +73,10 @@ endif
 ifneq (,$(findstring ieee802154,$(USEMODULE)))
     DIRS += net/ieee802154
 endif
+ifneq (,$(findstring secure_mmr,$(USEMODULE)))
+    DIRS += net/secure_mmr
+	DIRS += net/secure_mmr/encryption
+endif
 ifneq (,$(findstring bloom,$(USEMODULE)))
     DIRS += bloom
 endif
@@ -87,11 +91,11 @@ ifneq (,$(findstring hashes,$(USEMODULE)))
 endif
 
 all: $(BINDIR)$(MODULE).a 
-	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
 include $(RIOTBASE)/Makefile.base
 
 # remove compilation products
 clean::
-	@for i in $(DIRS) ; do $(MAKE) -C $$i clean ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
 
