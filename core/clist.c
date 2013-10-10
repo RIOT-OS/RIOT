@@ -54,6 +54,8 @@ void clist_remove(clist_node_t **list, clist_node_t *node)
     }
 }
 
+#if ENABLE_DEBUG
+
 void clist_print(clist_node_t *clist)
 {
     clist_node_t *start = clist;
@@ -67,6 +69,8 @@ void clist_print(clist_node_t *clist)
         }
     }
 }
+
+#endif
 
 /*
 int main (int argc, char* argv[]) {
