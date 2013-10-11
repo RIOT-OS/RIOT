@@ -19,7 +19,7 @@ export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
-FLASHER = lpc2k_pgm
+FLASHER = mc1322x-load.pl
 TERM = pyterm.py
 LINKFLAGS = -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T$(RIOTBASE)/cpu/$(CPU)/mc1322x.lds
 
@@ -27,4 +27,5 @@ ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
 export HEXFILE = bin/$(PROJECT).hex
-export FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
+export FFLAGS = -t $(PORT) -f $(HEXFILE) -c 'bbmc -l redbee-econotag reset'
+export OFLAGS = -O binary --gap-fill=0xff

@@ -24,3 +24,4 @@ export FFLAGS = -j olimex "prog $(HEXFILE)"
 
 export USEMODULE += msp430_common 
 export INCLUDES += -I $(RIOTCPU)/msp430-common/include/
+export OFLAGS = -O ihex

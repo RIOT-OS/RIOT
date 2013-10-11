@@ -19,3 +19,4 @@ ifeq ($(strip $(PORT)),)
 endif
 export HEXFILE = bin/$(PROJECT).hex
 export FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
+export OFLAGS = -O ihex
