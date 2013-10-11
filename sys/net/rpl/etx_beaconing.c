@@ -44,7 +44,7 @@ int etx_clock_pid = 0;
  * See: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
  */
 //Message queue for radio
-msg_t msg_que[ETX_RCV_QUEUE_SIZE] = { 0 };
+msg_t msg_que[ETX_RCV_QUEUE_SIZE] = { {0} };
 
 /*
  * The counter for the current 'round'. An ETX beacon is sent every ETX_INTERVAL
@@ -73,7 +73,7 @@ static char reached_window = 0;
  * See: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
  */
 //Candidate array
-static etx_neighbor_t candidates[ETX_MAX_CANDIDATE_NEIGHBORS] = { 0 };
+static etx_neighbor_t candidates[ETX_MAX_CANDIDATE_NEIGHBORS] = { {{{0}}} };
 
 /*
  * Each time we send a beacon packet we need to reset some values for the
@@ -165,7 +165,7 @@ void etx_beacon(void)
      * Please delete this information once it's fixed
      * See: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
      */
-    ieee_802154_long_t empty_addr = { 0 };
+    ieee_802154_long_t empty_addr = { {0} };
 
     while (true) {
         thread_sleep();
