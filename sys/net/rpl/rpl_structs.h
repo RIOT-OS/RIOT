@@ -121,7 +121,7 @@
 #define RPL_DIS_I_MASK 0x40
 #define RPL_DIS_D_MASK 0x20
 #define RPL_GROUNDED_SHIFT 7
-#define RPL_DEFAULT_OCP 1
+#define RPL_DEFAULT_OCP 0
 
 /* DIO Base Object (RFC 6550 Fig. 14) */
 struct __attribute__((packed)) rpl_dio_t {
