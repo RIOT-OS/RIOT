@@ -440,10 +440,11 @@ void native_interrupt_init(void)
     struct sigaction sa;
     DEBUG("XXX: native_interrupt_init()\n");
 
-   process_heap_address = malloc(sizeof(int));
+    process_heap_address = malloc(sizeof(int));
     if (process_heap_address == NULL) {
         err(EXIT_FAILURE, "native_interrupt_init: malloc");
     }
+    free(process_heap_address);
 
     VALGRIND_STACK_REGISTER(__isr_stack, __isr_stack + sizeof(__isr_stack));
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", __isr_stack, (void*)((int)__isr_stack + sizeof(__isr_stack)));
