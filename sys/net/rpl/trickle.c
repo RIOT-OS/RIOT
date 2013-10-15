@@ -22,7 +22,7 @@
 #include <math.h>
 #include "inttypes.h"
 #include "trickle.h"
-#include "rpl/rpl.h"
+#include "rpl.h"
 
 //TODO in pointer umwandeln, speicher mit malloc holen
 char *timer_over_buf;

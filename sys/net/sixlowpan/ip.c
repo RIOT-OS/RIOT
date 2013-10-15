@@ -31,9 +31,8 @@
 #include "icmp.h"
 #include "lowpan.h"
 
-#include "sys/net/destiny/socket.h"
-#include "sys/net/net_help/net_help.h"
-#include "sys/net/net_help/msg_help.h"
+#include "net_help.h"
+#include "msg_help.h"
 
 #define IP_PKT_RECV_BUF_SIZE        (64)
 #define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)

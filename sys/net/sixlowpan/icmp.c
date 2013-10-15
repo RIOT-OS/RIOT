@@ -32,7 +32,7 @@
 #include "icmp.h"
 #include "lowpan.h"
 #include "serialnumber.h"
-#include "sys/net/net_help/net_help.h"
+#include "net_help.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
