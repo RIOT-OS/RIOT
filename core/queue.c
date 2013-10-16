@@ -96,7 +96,7 @@ void queue_priority_add_generic(queue_node_t *root, queue_node_t *new_obj, int (
     new_obj->next = NULL;
 }
 
-
+#if ENABLE_DEBUG
 void queue_print(queue_node_t *node)
 {
     printf("queue:\n");
@@ -111,6 +111,7 @@ void queue_print_node(queue_node_t *node)
 {
     printf("Data: %u Priority: %"PRIu32" Next: %u\n", (unsigned int)node->data, node->priority, (unsigned int)node->next);
 }
+#endif
 
 /*
 int main() {
