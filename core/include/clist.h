@@ -39,8 +39,9 @@ static inline void clist_advance(clist_node_t **list)
     *list = (*list)->next;
 }
 
-
+#if ENABLE_DEBUG
 void clist_print(clist_node_t *clist);
+#endif
 
 /**
  * @}

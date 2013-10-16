@@ -290,6 +290,8 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr)
     return 0;
 }
 
+#if ENABLE_DEBUG
+
 void vtimer_print_short_queue(){
     queue_print(&shortterm_queue_root);
 }
@@ -309,3 +311,5 @@ void vtimer_print(vtimer_t *t)
            t->arg,
            t->pid);
 }
+
+#endif
