@@ -23,6 +23,7 @@
 #include "ipv6.h"
 #include "rpl_dodag.h"
 
+#undef CC1100_RADIO_MODE
 #define CC1100_RADIO_MODE CC1100_MODE_WOR
 
 #define RPL_PKT_RECV_BUF_SIZE 20

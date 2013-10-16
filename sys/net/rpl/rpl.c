@@ -12,6 +12,7 @@
  * @file    rpl.c
  * @brief   basic RPL functions
  * @author  Eric Engel <eric.engel@fu-berlin.de>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 
@@ -28,7 +29,6 @@
 #include "trickle.h"
 
 #include "sixlowpan.h"
-#include "ipv6.h"
 
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 /* global variables */
@@ -47,7 +47,7 @@ uint8_t rpl_send_buffer[BUFFER_SIZE];
 msg_t msg_queue[RPL_PKT_RECV_BUF_SIZE];
 /* SEND BUFFERS */
 static ipv6_hdr_t *ipv6_send_buf;
-static struct icmpv6_hdr_t *icmp_send_buf;
+static icmpv6_hdr_t *icmp_send_buf;
 static struct rpl_dio_t *rpl_send_dio_buf;
 static struct rpl_dis_t *rpl_send_dis_buf;
 static struct rpl_dao_t *rpl_send_dao_buf;
@@ -80,39 +80,39 @@ static uint8_t *get_rpl_send_payload_buf(uint8_t ext_len)
     return &(rpl_send_buffer[IPV6_HDR_LEN + ext_len]);
 }
 
-static struct icmpv6_hdr_t *get_rpl_send_icmpv6_buf(uint8_t ext_len) {
-    return ((struct icmpv6_hdr_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ext_len]));
+static icmpv6_hdr_t *get_rpl_send_icmpv6_buf(uint8_t ext_len) {
+    return ((icmpv6_hdr_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ext_len]));
 }
 
 static struct rpl_dio_t *get_rpl_send_dio_buf(void) {
-    return ((struct rpl_dio_t *) &(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+    return ((struct rpl_dio_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
 static struct rpl_dao_t *get_rpl_send_dao_buf(void) {
-    return ((struct rpl_dao_t *) &(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+    return ((struct rpl_dao_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
 static struct rpl_dao_ack_t *get_rpl_send_dao_ack_buf(void) {
-    return ((struct rpl_dao_ack_t *) &(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+    return ((struct rpl_dao_ack_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
 static struct rpl_dis_t *get_rpl_send_dis_buf(void) {
-    return ((struct rpl_dis_t *) &(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+    return ((struct rpl_dis_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
 static rpl_opt_dodag_conf_t *get_rpl_send_opt_dodag_conf_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_dodag_conf_t *) &(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_dodag_conf_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN + rpl_msg_len]));
 }
 
 static rpl_opt_target_t *get_rpl_send_opt_target_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_target_t *) &(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_target_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN + rpl_msg_len]));
 }
 
 static rpl_opt_transit_t *get_rpl_send_opt_transit_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_transit_t *) &(rpl_send_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_transit_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN + rpl_msg_len]));
 }
 
 /* RECEIVE BUFFERS */
@@ -122,44 +122,44 @@ static ipv6_hdr_t *get_rpl_ipv6_buf(void)
 }
 
 static struct rpl_dio_t *get_rpl_dio_buf(void) {
-    return ((struct rpl_dio_t *) &(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+    return ((struct rpl_dio_t *) &(rpl_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
 static struct rpl_dao_t *get_rpl_dao_buf(void) {
-    return ((struct rpl_dao_t *) &(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+    return ((struct rpl_dao_t *) &(rpl_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
 static struct rpl_dao_ack_t *get_rpl_dao_ack_buf(void) {
-    return ((struct rpl_dao_ack_t *) &(buffer[LLHDR_ICMPV6HDR_LEN]));
+    return ((struct rpl_dao_ack_t *) &(buffer[(LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)]));
 }
 
 static struct rpl_dis_t *get_rpl_dis_buf(void) {
-    return ((struct rpl_dis_t *) & (rpl_buffer[IPV6HDR_ICMPV6HDR_LEN]));
+    return ((struct rpl_dis_t *) & (rpl_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
 static rpl_opt_t *get_rpl_opt_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_t *) &(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_t *) &(rpl_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN + rpl_msg_len]));
 }
 
 static rpl_opt_dodag_conf_t *get_rpl_opt_dodag_conf_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_dodag_conf_t *) &(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_dodag_conf_t *) &(rpl_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN + rpl_msg_len]));
 }
 
 static rpl_opt_solicited_t *get_rpl_opt_solicited_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_solicited_t *) &(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_solicited_t *) &(rpl_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN + rpl_msg_len]));
 }
 
 static rpl_opt_target_t *get_rpl_opt_target_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_target_t *) &(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_target_t *) &(rpl_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN + rpl_msg_len]));
 }
 
 static rpl_opt_transit_t *get_rpl_opt_transit_buf(uint8_t rpl_msg_len)
 {
-    return ((rpl_opt_transit_t *) &(rpl_buffer[IPV6HDR_ICMPV6HDR_LEN + rpl_msg_len]));
+    return ((rpl_opt_transit_t *) &(rpl_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN + rpl_msg_len]));
 }
 
 /* find implemented OF via objective code point */
