@@ -8,7 +8,7 @@
 #include <thread.h>
 #include <stdio.h>
 #include "msg_help.h"
-#include "sys/net/destiny/tcp_timer.h"
+#include "tcp_timer.h"
 
 void block_continue_thread(void)
 {

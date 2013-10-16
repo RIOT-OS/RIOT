@@ -18,7 +18,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "sys/net/destiny/socket.h"
+#include "socket.h"
 
 #include "inet_pton.h"
 

@@ -14,6 +14,7 @@
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 
@@ -31,13 +32,12 @@
 #include "icmp.h"
 #include "lowpan.h"
 #include "serialnumber.h"
-#include "sys/net/net_help/net_help.h"
+#include "net_help.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define LLHDR_ICMPV6HDR_LEN         (LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)
-#define IPV6HDR_ICMPV6HDR_LEN       (IPV6_HDR_LEN + ipv6_ext_hdr_len + ICMPV6_HDR_LEN)
 #define ND_HOPLIMIT                 (0xFF)
 
 /* parameter problem [rfc4443] */
@@ -713,7 +713,7 @@ void recv_rtr_adv(void)
     mutex_lock(&lowpan_context_mutex);
 
     /* read options */
-    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + icmpv6_opt_hdr_len) {
+    while (packet_length > IPV6_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
         switch (opt_buf->type) {
@@ -943,7 +943,7 @@ void recv_nbr_sol(void)
      * option condition is that a sllao option is set. thus that we don't
      * know which option comes first we need to this here */
 
-    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + icmpv6_opt_hdr_len) {
+    while (packet_length > IPV6_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
         if (opt_buf->type == NDP_OPT_SLLAO_TYPE) {
@@ -955,7 +955,7 @@ void recv_nbr_sol(void)
 
     icmpv6_opt_hdr_len = NBR_SOL_LEN;
 
-    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + icmpv6_opt_hdr_len) {
+    while (packet_length > IPV6_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
         switch (opt_buf->type) {
@@ -1188,7 +1188,7 @@ void recv_nbr_adv(void)
     nbr_adv_buf = get_nbr_adv_buf(ipv6_ext_hdr_len);
 
     /* check if options are present */
-    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + icmpv6_opt_hdr_len) {
+    while (packet_length > IPV6_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
         switch (opt_buf->type) {
