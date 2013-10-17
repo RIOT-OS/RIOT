@@ -46,6 +46,12 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
 unsigned int thread_getstatus(int pid);
 
 /**
+ * @brief   returns the name of a process.
+ * @return  NULL if pid is unknown
+ */
+const char *thread_getname(int pid);
+
+/**
  * @brief   Puts the current thread into sleep mode. Has to be woken up externally.
  */
 void thread_sleep(void);
