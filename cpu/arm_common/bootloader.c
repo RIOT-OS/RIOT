@@ -174,7 +174,9 @@ void bootloader(void)
     bl_init_clks();
 
     /* initialize bss and data */
+#if CPU != mc1322x
     bl_init_data();
+#endif
 
     /* board specific setup of i/o pins */
     bl_init_ports();
