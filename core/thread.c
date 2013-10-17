@@ -47,6 +47,15 @@ unsigned int thread_getstatus(int pid)
     return sched_threads[pid]->status;
 }
 
+const char *thread_getname(int pid)
+{
+    if (sched_threads[pid] == NULL) {
+        return NULL;
+    }
+
+    return sched_threads[pid]->name;
+}
+
 void thread_sleep()
 {
     if (inISR()) {
