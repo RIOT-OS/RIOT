@@ -24,3 +24,4 @@ export FFLAGS = $(PORT) $(PROJBINDIR)/$(PROJECT).hex
 include $(RIOTBOARD)/msba2-common/Makefile.dep
 
 export INCLUDES += -I$(RIOTCPU)/lpc2387/include
+export OFLAGS = -O ihex
