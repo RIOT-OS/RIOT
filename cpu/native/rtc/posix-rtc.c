@@ -68,3 +68,17 @@ void rtc_get_localtime(struct tm *localt)
         _native_in_syscall--;
     }
 }
+
+time_t rtc_time(struct timeval *time)
+{
+    if (native_rtc_enabled == 1) {
+        _native_in_syscall++;
+        if (gettimeofday(time, 0) == 0) {
+            errx(1, "rtc_time: gettimeofday: error");
+        }
+        _native_in_syscall--;
+    }
+    return time->tv_sec;
+}
+
+
