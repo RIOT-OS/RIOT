@@ -66,5 +66,7 @@ and the mailinglist (subscription via web site)
 
 #include <msp430x16x.h>
 
+typedef uint8_t radio_packet_length_t;
+
 /** @} */
 #endif // _MSB_BOARD_H
