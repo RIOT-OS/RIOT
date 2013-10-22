@@ -187,6 +187,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     cb->sp = thread_stack_init(function, stack, stacksize);
     cb->stack_start = stack;
     cb->stack_size = total_stacksize;
+    cb->auto_free = !!(flags & AUTO_FREE);
 
     cb->priority = priority;
     cb->status = 0;
