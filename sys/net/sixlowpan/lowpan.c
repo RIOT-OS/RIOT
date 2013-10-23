@@ -167,6 +167,7 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
         packet_length = comp_len;
     }
     else {
+        ipv6_buf->length = HTONS(ipv6_buf->length);
         lowpan_ipv6_set_dispatch(data);
     }
 
