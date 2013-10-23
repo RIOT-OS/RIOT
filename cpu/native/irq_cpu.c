@@ -337,9 +337,11 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     if (_native_in_syscall == 0) {
         DEBUG("\n\n\t\treturn to _native_sig_leave_tramp\n\n");
 #ifdef __MACH__
+        _native_in_isr = 1;
         _native_saved_eip = ((ucontext_t *)context)->uc_mcontext->__ss.__eip;
         ((ucontext_t *)context)->uc_mcontext->__ss.__eip = (unsigned int)&_native_sig_leave_tramp;
 #elif BSD
+        _native_in_isr = 1;
         _native_saved_eip = ((struct sigcontext *)context)->sc_eip;
         ((struct sigcontext *)context)->sc_eip = (unsigned int)&_native_sig_leave_tramp;
 #else
@@ -347,11 +349,11 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
                 ((void*)(((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP]))
                 > ((void*)process_heap_address)
            ) {
-            DEBUG("\nEIP:\t%p\nHEAP:\t%p\nnot switching\n\n", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP], (void*)process_heap_address);
+            DEBUG("\n\033[36mEIP:\t%p\nHEAP:\t%p\nnot switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP], (void*)process_heap_address);
         }
         else {
             _native_in_isr = 1;
-            warnx("\nEIP:\t%p\nHEAP:\t%p\ngo switching\n\n", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP], (void*)process_heap_address);
+            DEBUG("\n\033[31mEIP:\t%p\nHEAP:\t%p\ngo switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP], (void*)process_heap_address);
             _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP];
             ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
         }
