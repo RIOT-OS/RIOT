@@ -1010,7 +1010,7 @@ int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
         current_udp_packet->checksum = 0;
 
         memcpy(payload, buf, len);
-        current_udp_packet->length = UDP_HDR_LEN + len;
+        current_udp_packet->length = HTONS(UDP_HDR_LEN + len);
         temp_ipv6_header->length = UDP_HDR_LEN + len;
 
         current_udp_packet->checksum = ~udp_csum(temp_ipv6_header,
@@ -1018,7 +1018,7 @@ int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
 
         ipv6_sendto(&to->sin6_addr, IPPROTO_UDP,
                     (uint8_t *)(current_udp_packet),
-                    current_udp_packet->length);
+                    NTOHS(current_udp_packet->length));
         return current_udp_packet->length;
     }
     else {
