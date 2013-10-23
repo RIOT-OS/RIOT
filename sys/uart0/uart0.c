@@ -25,7 +25,7 @@ static void uart0_loop(void)
 void board_uart0_init(void)
 {
     ringbuffer_init(&uart0_ringbuffer, buffer, UART0_BUFSIZE);
-    int pid = thread_create(uart0_thread_stack, sizeof(uart0_thread_stack), PRIORITY_MAIN - 1, CREATE_STACKTEST, uart0_loop, "uart0");
+    int pid = thread_create(uart0_thread_stack, sizeof(uart0_thread_stack), PRIORITY_MAIN - 1, CREATE_STACKTEST|CREATE_WOUT_YIELD, uart0_loop, "uart0");
     uart0_handler_pid = pid;
     puts("uart0_init() [OK]");
 }
