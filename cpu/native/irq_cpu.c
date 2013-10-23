@@ -37,6 +37,8 @@
 #include "irq.h"
 #include "cpu.h"
 
+#include "lpm.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -430,6 +432,10 @@ int unregister_interrupt(int sig)
     return 0;
 }
 
+void shutdown(void)
+{
+    lpm_set(LPM_OFF);
+}
 
 /**
  * register internal signal handler,
@@ -512,6 +518,9 @@ void native_interrupt_init(void)
     if (pipe(pipefd) == -1) {
         err(1, "native_interrupt_init(): pipe()");
     }
+
+    /* allow for ctrl+c to shut down gracefully */
+    register_interrupt(SIGINT, shutdown);
 
     puts("RIOT native interrupts/signals initialized.");
 }
