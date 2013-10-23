@@ -76,7 +76,7 @@ enum tcp_codes {
 #define SET_TCP_FIN(a) 			a = ((a & 0x00) | TCP_FIN)
 #define SET_TCP_FIN_ACK(a) 		a = ((a & 0x00) | TCP_FIN_ACK)
 
-#define TCP_STACK_SIZE 			1024
+#define TCP_STACK_SIZE 			KERNEL_CONF_STACKSIZE_DEFAULT
 
 #include "ipv6.h"
 
