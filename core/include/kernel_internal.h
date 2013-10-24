@@ -41,14 +41,5 @@ void sched_task_exit(void);
  */
 void thread_print_stack(void);
 
-/**
- * @brief   Calculates stack usage if thread was created using CREATE_STACKTEST
- *
- * @param[in] stack The thread's stack
- *
- * @return  The current usage (overwritten addresses) of the thread's stack
- */
-int thread_measure_stack_usage(char *stack);
-
 /** @} */
 #endif /* KERNEL_INTERNAL_H_ */
