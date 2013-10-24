@@ -176,7 +176,7 @@ SWI_Addr:       .word   ctx_switch
 PAbt_Addr:      .word   PABT_Routine        
 DAbt_Addr:      .word   DABT_Routine        
 _not_used:      .word   not_used
-IRQ_Addr:       .word   irq                 
+IRQ_Addr:       .word   arm_irq_handler
 _fiq:           .word   fiq
     .balignl    16, 0xdeadbeef
 

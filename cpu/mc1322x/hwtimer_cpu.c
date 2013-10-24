@@ -11,11 +11,30 @@
 
 #include <stdint.h>
 #include "mc1322x.h"
+#include "cpu.h"
 #include "hwtimer_arch.h"
 #include "irq.h"
 
 /* High level interrupt handler */
 static void (*int_handler)(int);
+
+#define TMRx_ANY_INTERRUPT 0xa800
+
+void tmr_isr(void) {
+    /* detemine which timer caused the interrupt */
+    if (TMR0->SCTRL & TMRx_ANY_INTERRUPT) {
+        int_handler(TMR0_BASE);
+    }
+    else if (TMR1->SCTRL & TMRx_ANY_INTERRUPT) {
+        int_handler(TMR1_BASE);
+    }
+    else if (TMR2->SCTRL & TMRx_ANY_INTERRUPT) {
+        int_handler(TMR2_BASE);
+    }
+    else if (TMR3->SCTRL & TMRx_ANY_INTERRUPT) {
+        int_handler(TMR3_BASE);
+    }
+}
 
 void timer_x_init(volatile struct TMR_struct* const TMRx) {
     /* Reset the timer */
@@ -45,8 +64,6 @@ void timer_x_init(volatile struct TMR_struct* const TMRx) {
     TMRx->CTRLbits.OUTPUT_MODE = 0x00;          /* OFLAG is asserted while counter is active */
     
     TMRx->ENBL = 0xf;                           /* enable all the timers --- why not? */
-    
-    /* TODO: install ISR */
 }
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu) {
@@ -59,6 +76,8 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu) {
     timer_x_init(TMR1);
     timer_x_init(TMR2);
     timer_x_init(TMR3);
+
+    install_irq(INT_NUM_TMR, &tmr_isr, 0);
 }
 
 /*---------------------------------------------------------------------------*/
