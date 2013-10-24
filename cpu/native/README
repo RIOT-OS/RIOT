@@ -6,11 +6,32 @@ HAVE_VALGRIND_H or HAVE_VALGRIND_VALGRIND_H depending on the location
 of the valgrind header (i.e. <valgrind.h> or <valgrind/valgrind.h>)
 like this:
 
-CFLAGS="-DHAVE_VALGRIND_VALGRIND_H" make
+    CFLAGS="-DHAVE_VALGRIND_VALGRIND_H" make
 
 That way native can tell valgrind about RIOTs stacks and prevent
 valgrind from reporting lots of false positives.
 
+Usage:
+Simply pass the ordinary command to valgrind like this:
+
+    valgrind ./bin/RIOT.elf tap0
+
+This will yield some information whenever valgrind detects an invalid
+memory access.
+
+In order to debug the program when this occurs you can pass the
+--db-attach parameter to valgrind like this:
+
+    valgrind --db-attach=yes ./bin/RIOT.elf tap0
+
+Now, you will be asked whether you would like to attach the running
+process to gdb whenever a problem occurs.
+
+In order for this to work under Linux 3.4 or newer, you might need to
+disable the ptrace access restrictions:
+As root call:
+
+    echo 0 > /proc/sys/kernel/yama/ptrace_scope
 
 
 NETWORK SUPPORT
@@ -18,7 +39,8 @@ NETWORK SUPPORT
 
 If you compile RIOT for the native cpu and include the native_net
 module, you need to specify a network interface like this:
-./bin/default-native.elf tap0
+
+    ./bin/default-native.elf tap0
 
 
 SETTING UP A TAP NETWORK
@@ -29,9 +51,12 @@ can use to create a network of tap interfaces.
 
 Usage:
 To create a bridge and two (or count at your option) tap interfaces:
-./tapsetup.sh create [count]
+
+    ./tapsetup.sh create [count]
+
 To delete the bridge and all tap interfaces:
-./tapsetup.sh delete
+
+    ./tapsetup.sh delete
 
 
 OSX TAP NETWORKING
