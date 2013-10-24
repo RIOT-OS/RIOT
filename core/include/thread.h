@@ -81,6 +81,7 @@ int thread_getlastpid(void);
  * Only works if the thread was created with the flag CREATE_STACKTEST.
  *
  * @param stack The stack you want to measure. try active_thread->stack_start.
+ * @return  The current usage (overwritten addresses) of the thread's stack
  */
 int thread_measure_stack_usage(char *stack);
 
