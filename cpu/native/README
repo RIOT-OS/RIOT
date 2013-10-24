@@ -79,3 +79,19 @@ restarting.
 Packet delivery under OSX only works with user assistance at the
 moment. run 'kill -SIGIO <RIOT process ID>' to deliver a packet to a
 specific RIOT instance.
+
+ZEP NETWORKING
+==============
+
+Zep is the ZigBee Encapsulation Protocol and is useful if you want
+debug/analyze 802.15.4 based protocols with Wireshark.
+Compile with -DNATIVENET_ZEP to enable zep networking and pass an IP
+to bind to.
+
+If you want to use zep in a virtual network, you need to configure the
+tap interfaces with IPs (which is not currently done by tapsetup).
+
+Usage:
+
+    ./bin/default.elf 0.0.0.0           # bind to any interface
+    ./bin/default.elf 10.0.0.1 tap0     # bind to tap interface with given IP
