@@ -45,6 +45,7 @@
 #define HWTIMERMINOFFSET 100000
 
 static unsigned long native_hwtimer_now;
+static unsigned long time_null;
 
 static int native_hwtimer_irq[ARCH_MAXTIMERS];
 static struct itimerval native_hwtimer[ARCH_MAXTIMERS];
@@ -240,7 +241,7 @@ unsigned long hwtimer_arch_now(void)
 #endif
     _native_in_syscall = 0;
 
-    native_hwtimer_now = ts2ticks(&t);
+    native_hwtimer_now = ts2ticks(&t) - time_null;
 
     DEBUG("hwtimer_arch_now(): it is now %lu s %lu ns\n",
             (unsigned long)t.tv_sec, (unsigned long)t.tv_nsec);
@@ -262,6 +263,10 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
         native_hwtimer[i].it_interval.tv_sec = 0;
         native_hwtimer[i].it_interval.tv_usec = 0;
     }
+
+    /* init time delta */
+    time_null = 0;
+    time_null = hwtimer_arch_now();
 
     hwtimer_arch_enable_interrupt();
     return;
