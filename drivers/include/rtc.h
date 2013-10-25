@@ -24,6 +24,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #define RTC_SECOND 10001U
 
 #include <time.h>
+#include <sys/time.h>
 
 /**
  * @brief Initializes the RTC for calendar mode
@@ -51,6 +52,12 @@ void rtc_set_localtime(struct tm *localt);
  * @param[out]	localt		Pointer to structure to receive time
  */
 void rtc_get_localtime(struct tm *localt);
+
+/**
+ * @brief	Get the current time as a struct timeval
+ * @param[out]	time		Pointer to structure to receive time
+ */
+time_t rtc_time(struct timeval *time);
 
 extern int rtc_second_pid;
 
