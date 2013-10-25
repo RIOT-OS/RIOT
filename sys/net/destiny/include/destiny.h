@@ -35,6 +35,7 @@
 
 #include "destiny/in.h"
 #include "destiny/socket.h"
+#include "destiny/types.h"
 
 /**
  * Initializes transport layer.
