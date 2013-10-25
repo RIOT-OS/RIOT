@@ -7,34 +7,24 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny 
+ * @ingroup destiny
  * @{
- * @file    tcp.c
+ * @file
  * @brief   TCP data structs and prototypes
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
- * @}
  */
 
 #ifndef TCP_H_
 #define TCP_H_
 
-#define TCP_HDR_LEN 			20
+#include "ipv6.h"
+#include "destiny/types.h"
 
 #define TCP_EOO_OPTION			0x00		// End of option list
 #define TCP_NOP_OPTION			0x01		// No operation
 #define TCP_MSS_OPTION			0x02		// Maximum segment size
 #define TCP_WSF_OPTION			0x03		// Window scale factor
 #define TCP_TS_OPTION			0x08		// Timestamp
-
-enum tcp_flags {
-    TCP_ACK			= 0x08,
-    TCP_URG_PSH		= 0x14,
-    TCP_RST			= 0x20,
-    TCP_SYN			= 0x40,
-    TCP_SYN_ACK		= 0x48,
-    TCP_FIN			= 0x80,
-    TCP_FIN_ACK		= 0x88
-};
 
 enum tcp_states {
     CLOSED      	= 0,
@@ -78,8 +68,6 @@ enum tcp_codes {
 
 #define TCP_STACK_SIZE 			KERNEL_CONF_STACKSIZE_DEFAULT
 
-#include "ipv6.h"
-
 typedef struct __attribute__((packed)) tcp_mms_o_t {
     uint8_t		kind;
     uint8_t		len;
@@ -110,5 +98,9 @@ void tcp_packet_handler(void);
 uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
 void printTCPHeader(tcp_hdr_t *tcp_header);
 void printArrayRange_tcp(uint8_t *udp_header, uint16_t len);
+
+/**
+ * @}
+ */
 
 #endif /* TCP_H_ */

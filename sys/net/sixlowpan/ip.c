@@ -31,6 +31,7 @@
 #include "icmp.h"
 #include "lowpan.h"
 
+#include "destiny/socket.h"
 #include "net_help.h"
 
 #define IP_PKT_RECV_BUF_SIZE        (64)

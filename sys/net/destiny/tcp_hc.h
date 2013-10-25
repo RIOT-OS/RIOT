@@ -8,9 +8,11 @@
 #ifndef TCP_HC_H_
 #define TCP_HC_H_
 
-#include "tcp.h"
 #include "sixlowpan.h"
-#include "socket.h"
+
+#include "destiny/socket.h"
+
+#include "tcp.h"
 
 #ifdef TCP_HC
 
