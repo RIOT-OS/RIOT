@@ -1,5 +1,5 @@
 /**
- * Destiny UDP implementation 
+ * Destiny UDP implementation
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,27 +7,30 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny 
+ * @ingroup destiny
  * @{
  * @file    udp.c
- * @brief   UDP implementation 
+ * @brief   UDP implementation
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @}
  */
 
-
 #include <stdio.h>
-#include <thread.h>
 #include <string.h>
 
-#include "udp.h"
-#include "msg.h"
 #include "ipv6.h"
+#include "msg.h"
 #include "sixlowpan.h"
-#include "socket.h"
-#include "in.h"
+#include "thread.h"
+
+#include "destiny/in.h"
+
 #include "../net_help/net_help.h"
-#include "../net_help/msg_help.h"
+
+#include "msg_help.h"
+#include "socket.h"
+
+#include "udp.h"
 
 uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
 {

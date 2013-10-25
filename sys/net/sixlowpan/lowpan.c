@@ -41,6 +41,7 @@
 #include "icmp.h"
 
 #include "ieee802154_frame.h"
+#include "destiny/in.h"
 #include "net_help.h"
 
 #define IP_PROCESS_STACKSIZE           	(KERNEL_CONF_STACKSIZE_DEFAULT * 6)
