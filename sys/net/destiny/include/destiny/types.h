@@ -72,4 +72,4 @@ typedef struct __attribute__((packed)) {
  * @}
  */
 
-#endif DESTINY_TYPES_H_
+#endif /* DESTINY_TYPES_H_ */
