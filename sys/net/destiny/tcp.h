@@ -26,6 +26,16 @@
 #define TCP_WSF_OPTION			0x03		// Window scale factor
 #define TCP_TS_OPTION			0x08		// Timestamp
 
+enum tcp_flags {
+    TCP_ACK                    = 0x08,
+    TCP_URG_PSH                = 0x14,
+    TCP_RST                    = 0x20,
+    TCP_SYN                    = 0x40,
+    TCP_SYN_ACK                = 0x48,
+    TCP_FIN                    = 0x80,
+    TCP_FIN_ACK                = 0x88
+};
+
 enum tcp_states {
     CLOSED      	= 0,
     LISTEN      	= 1,
@@ -73,18 +83,6 @@ typedef struct __attribute__((packed)) tcp_mms_o_t {
     uint8_t		len;
     uint16_t	mss;
 } tcp_mss_option_t;
-
-typedef struct __attribute__((packed)) tcp_h_t {
-    uint16_t 	src_port;
-    uint16_t 	dst_port;
-    uint32_t 	seq_nr;
-    uint32_t 	ack_nr;
-    uint8_t 	dataOffset_reserved;
-    uint8_t 	reserved_flags;
-    uint16_t 	window;
-    uint16_t	checksum;
-    uint16_t	urg_pointer;
-} tcp_hdr_t;
 
 #ifdef TCP_HC
 mutex_t				global_context_counter_mutex;
