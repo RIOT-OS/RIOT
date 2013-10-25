@@ -32,7 +32,6 @@
 #include "lowpan.h"
 
 #include "net_help.h"
-#include "msg_help.h"
 
 #define IP_PKT_RECV_BUF_SIZE        (64)
 #define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)
@@ -593,10 +592,10 @@ char *ipv6_addr_to_str(char *addr_str, const ipv6_addr_t *ipv6_addr)
 {
     sprintf(addr_str,
             "%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x",
-            ipv6_addr->uint16[0], ipv6_addr->uint16[1],
-            ipv6_addr->uint16[2], ipv6_addr->uint16[3],
-            ipv6_addr->uint16[4], ipv6_addr->uint16[5],
-            ipv6_addr->uint16[6], ipv6_addr->uint16[7]);
+            NTOHS(ipv6_addr->uint16[0]), NTOHS(ipv6_addr->uint16[1]),
+            NTOHS(ipv6_addr->uint16[2]), NTOHS(ipv6_addr->uint16[3]),
+            NTOHS(ipv6_addr->uint16[4]), NTOHS(ipv6_addr->uint16[5]),
+            NTOHS(ipv6_addr->uint16[6]), NTOHS(ipv6_addr->uint16[7]));
     return addr_str;
 }
 

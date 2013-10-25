@@ -27,7 +27,7 @@
 
 #define UDP_HDR_LEN 				8
 
-#define UDP_STACK_SIZE 				512
+#define UDP_STACK_SIZE 				KERNEL_CONF_STACKSIZE_DEFAULT
 
 #include "ipv6.h"
 
