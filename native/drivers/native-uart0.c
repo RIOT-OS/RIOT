@@ -66,7 +66,7 @@ void _native_handle_uart0_input()
     uart0_notify_thread();
 
     _native_in_isr = 0;
-    cpu_switch_context_exit();
+    thread_yield();
 }
 
 int _native_set_uart_fds(void)
