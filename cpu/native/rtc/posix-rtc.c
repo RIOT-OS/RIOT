@@ -73,12 +73,10 @@ time_t rtc_time(struct timeval *time)
 {
     if (native_rtc_enabled == 1) {
         _native_in_syscall++;
-        if (gettimeofday(time, 0) == 0) {
-            errx(1, "rtc_time: gettimeofday: error");
+        if (gettimeofday(time, NULL) == -1) {
+            err(1, "rtc_time: gettimeofday");
         }
         _native_in_syscall--;
     }
     return time->tv_sec;
 }
-
-
