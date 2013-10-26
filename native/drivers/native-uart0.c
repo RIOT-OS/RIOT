@@ -60,6 +60,14 @@ void _native_handle_uart0_input()
     if (nread == -1) {
         err(1, "_native_handle_uart0_input(): read()");
     }
+    else if (nread == 0) {
+        /* XXX:
+         * preliminary resolution for this situation, will be coped
+         * with properly in #161 */
+        close(_native_uart_in);
+        _native_uart_in = -1;
+        warnx("stdin closed");
+    }
     for(int pos = 0; pos < nread; pos++) {
         uart0_handle_incoming(buf[pos]);
     }
