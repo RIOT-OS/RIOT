@@ -1,11 +1,13 @@
-#include <chardev_thread.h>
-#include <ringbuffer.h>
 #include <stdio.h>
-#include <thread.h>
-#include <msg.h>
-#include <posix_io.h>
 
-#include <board_uart0.h>
+#include "chardev_thread.h"
+#include "ringbuffer.h"
+#include "thread.h"
+#include "msg.h"
+#include "posix_io.h"
+#include "irq.h"
+
+#include "board_uart0.h"
 
 #define UART0_BUFSIZE 		(32)
 #define UART0_STACKSIZE 	(MINIMUM_STACK_SIZE + 256)
