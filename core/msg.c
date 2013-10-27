@@ -250,11 +250,11 @@ static int _msg_receive(msg_t *m, int block)
         return 1;
     }
     else {
-        DEBUG("%s: msg_receive(): Wakeing up waiting thread.\n", active_thread->name);
+        DEBUG("%s: msg_receive(): Waking up waiting thread.\n", active_thread->name);
         tcb_t *sender = (tcb_t*) node->data;
 
         if (n >= 0) {
-            /* we've already got a messgage from the queue.  as there is a
+            /* We've already got a message from the queue.  As there is a
              * waiter, take it's message into the just freed queue space.
              */
             m = &(me->msg_array[cib_put(&(me->msg_queue))]);
