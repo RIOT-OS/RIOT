@@ -36,9 +36,9 @@ void _cc110x_ng_get_set_address_handler(char *addr)
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &a;
     mesg.content.ptr = (char *) &tcmd;
-    a = atoi(addr + 5);
 
     if (strlen(addr) > 5) {
+        a = atoi(addr + 5);
         printf("[cc110x] Trying to set address %i\n", a);
         mesg.type = SET_ADDRESS;
     }
@@ -57,9 +57,9 @@ void _cc110x_ng_get_set_channel_handler(char *chan)
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &c;
     mesg.content.ptr = (char *) &tcmd;
-    c = atoi(chan + 5);
 
     if (strlen(chan) > 5) {
+        c = atoi(chan + 5);
         printf("[cc110x] Trying to set channel %i\n", c);
         mesg.type = SET_CHANNEL;
     }
@@ -113,9 +113,9 @@ void _cc110x_ng_monitor_handler(char *mode)
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &m;
     mesg.content.ptr = (char *) &tcmd;
-    m = atoi(mode + 8);
 
     if (strlen(mode) > 8) {
+        m = atoi(mode + 8);
         printf("Setting monitor mode: %u\n", m);
         mesg.type = SET_MONITOR;
         msg_send(&mesg, transceiver_pid, 1);
