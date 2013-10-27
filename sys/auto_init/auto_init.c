@@ -16,14 +16,27 @@
  */
 #include <stdint.h>
 #include <stdio.h>
+
+#include "auto_init.h"
+
+#ifdef MODULE_UART0
 #include "board_uart0.h"
-#include "rtc.h"
+#endif
+
+#ifdef MODULE_MCI
 #include "diskio.h"
-#include <auto_init.h>
+#endif
+
+#ifdef MODULE_VTIMER
 #include "vtimer.h"
+#endif
+
+#ifdef MODULE_RTC
+#include "rtc.h"
+#endif
 
 #define ENABLE_DEBUG (0)
-#include <debug.h>
+#include "debug.h"
 
 extern int main(void);
 
