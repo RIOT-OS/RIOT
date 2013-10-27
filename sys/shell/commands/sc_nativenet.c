@@ -35,9 +35,9 @@ void _nativenet_get_set_address_handler(char *addr)
     tcmd.transceivers = TRANSCEIVER_NATIVE;
     tcmd.data = &a;
     mesg.content.ptr = (char *) &tcmd;
-    a = atoi(addr + 5);
 
     if (strlen(addr) > 5) {
+        a = atoi(addr + 5);
         printf("[nativenet] trying to set address %"PRIu16"\n", a);
         mesg.type = SET_ADDRESS;
     }
@@ -58,9 +58,9 @@ void _nativenet_get_set_channel_handler(char *chan)
     tcmd.transceivers = TRANSCEIVER_NATIVE;
     tcmd.data = &c;
     mesg.content.ptr = (char *) &tcmd;
-    c = atoi(chan + 5);
 
     if (strlen(chan) > 5) {
+        c = atoi(chan + 5);
         printf("[nativenet] Trying to set channel %"PRIu8"\n", c);
         mesg.type = SET_CHANNEL;
     }
@@ -120,9 +120,9 @@ void _nativenet_monitor_handler(char *mode)
     tcmd.transceivers = TRANSCEIVER_NATIVE;
     tcmd.data = &m;
     mesg.content.ptr = (char *) &tcmd;
-    m = atoi(mode + 8);
 
     if (strlen(mode) > 8) {
+        m = atoi(mode + 8);
         printf("Setting monitor mode: %"PRIu8"\n", m);
         mesg.type = SET_MONITOR;
         msg_send(&mesg, transceiver_pid, 1);
