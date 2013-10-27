@@ -38,9 +38,9 @@ void _cc1100_get_set_address_handler(char *addr)
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &a;
     mesg.content.ptr = (char *) &tcmd;
-    a = atoi(addr + 5);
 
     if (strlen(addr) > 5) {
+        a = atoi(addr + 5);
         printf("[cc110x] Trying to set address %i\n", a);
         mesg.type = SET_ADDRESS;
     }
@@ -59,9 +59,9 @@ void _cc1100_get_set_channel_handler(char *chan)
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &c;
     mesg.content.ptr = (char *) &tcmd;
-    c = atoi(chan + 5);
 
     if (strlen(chan) > 5) {
+        c = atoi(chan + 5);
         printf("[cc110x] Trying to set channel %i\n", c);
         mesg.type = SET_CHANNEL;
     }
@@ -114,9 +114,8 @@ void _cc110x_get_set_address_handler(char *addr)
 {
     int16_t a;
 
-    a = atoi(addr + 5);
-
     if (strlen(addr) > 5) {
+        a = atoi(addr + 5);
         printf("[cc110x] Setting address %i ... ", a);
         cc1100_set_address((radio_address_t)a);
 
@@ -136,9 +135,8 @@ void _cc110x_get_set_channel_handler(char *addr)
 {
     int16_t a;
 
-    a = atoi(addr + 5);
-
     if (strlen(addr) > 5) {
+        a = atoi(addr + 5);
         printf("[cc110x] Setting channel %i...", a);
         cc1100_set_channel(a);
 
