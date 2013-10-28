@@ -52,5 +52,7 @@ void init_clks1(void);
 void init_clks2(void);
 void bl_init_clks(void);
 
+typedef uint8_t radio_packet_length_t;
+
 /** @} */
 #endif // __BOARD_H
