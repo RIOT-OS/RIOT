@@ -34,7 +34,7 @@
 /* IPv6 field values */
 #define IPV6_VER                    (0x60)
 /* size of global buffer */
-#define BUFFER_SIZE (LL_HDR_LEN + IPV6_MTU)
+#define SIXLOWPAN_BUFFER_SIZE (LL_HDR_LEN + IPV6_MTU)
 
 #define MULTIHOP_HOPLIMIT           (64)
 
@@ -51,7 +51,7 @@ extern uint8_t ipv6_ext_hdr_len;
 #define IFACE_ADDR_LIST_LEN         (10) // maybe to much
 
 /* buffer */
-extern uint8_t buffer[BUFFER_SIZE];
+extern uint8_t buffer[SIXLOWPAN_BUFFER_SIZE];
 
 extern int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
