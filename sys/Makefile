@@ -85,6 +85,9 @@ endif
 ifneq (,$(findstring hashes,$(USEMODULE)))
     DIRS += hashes
 endif
+ifneq (,$(findstring semaphore,$(USEMODULE)))
+    DIRS += semaphore
+endif
 
 all: $(BINDIR)$(MODULE).a 
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
