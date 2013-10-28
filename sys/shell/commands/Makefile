@@ -6,7 +6,7 @@ ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
 	SRC += sc_cc110x_ng.c
 endif
 ifneq (,$(findstring cc2420,$(USEMODULE)))
-	INCLUDES += -I$(RIOTBASE)/drivers/cc2420/include/ -I$(RIOTBASE)/sys/net/
+	INCLUDES += -I$(RIOTBASE)/drivers/cc2420/include/ -I$(RIOTBASE)/sys/net/include
 	SRC += sc_cc2420.c
 endif
 ifneq (,$(findstring cc110x,$(USEMODULE)))
