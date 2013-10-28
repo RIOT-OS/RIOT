@@ -130,6 +130,9 @@ int msg_reply(msg_t *m, msg_t *reply);
  *
  * @param array Pointer to preallocated array of msg objects
  * @param num Number of msg objects in array. MUST BE POWER OF TWO!
+ *
+ * @return 0 if successful
+ * @return -1 on error
  */
 int msg_init_queue(msg_t *array, int num);
 
