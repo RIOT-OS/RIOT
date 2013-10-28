@@ -1,6 +1,7 @@
 #ifndef _MSB_BOARD_H
 #define _MSB_BOARD_H
 
+#include <stdint.h>
 #include <cc430f6137.h>
 
 #define MSP430_INITIAL_CPU_SPEED    7372800uL

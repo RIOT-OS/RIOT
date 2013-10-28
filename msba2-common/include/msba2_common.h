@@ -43,7 +43,8 @@ and the mailinglist (subscription via web site)
  * @note		$Id$
  */
 
-#include <lpc2387.h>
+#include <stdint.h>
+#include "lpc2387.h"
 
 #define VICIntEnClear VICIntEnClr
 

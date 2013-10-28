@@ -24,7 +24,7 @@
 #ifndef BOARDCONF_H_
 #define BOARDCONF_H_
 #include <bitarithm.h>
-
+#include "msba2-common.h"
 
 #define FEUERWARE_CONF_BOARD_NAME	      "FU Berlin AVSEXTREM BOARD"
 

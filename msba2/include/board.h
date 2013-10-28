@@ -1,8 +1,8 @@
 #ifndef __BOARD_H
 #define __BOARD_H
 
-#include <msba2_common.h>
-#include <bitarithm.h>
+#include "msba2_common.h"
+#include "bitarithm.h"
 
 #define LED_RED_PIN (BIT25)
 #define LED_GREEN_PIN (BIT26)

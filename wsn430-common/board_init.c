@@ -14,6 +14,8 @@
 
 volatile static uint32_t __msp430_cpu_speed = MSP430_INITIAL_CPU_SPEED;
 
+void msp430_init_dco(void);
+
 typedef enum {
     MCLK_2MHZ_SCLK_1MHZ = 1000002uL,
     MCLK_4MHZ_SCLK_1MHZ = 1000004uL,

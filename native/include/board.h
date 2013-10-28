@@ -15,6 +15,8 @@
  * @}
  */
 
+#include <stdint.h>
+
 void _native_LED_GREEN_OFF(void);
 #define LED_GREEN_OFF (_native_LED_GREEN_OFF())
 void _native_LED_GREEN_ON(void);

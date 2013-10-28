@@ -65,6 +65,7 @@ and the mailinglist (subscription via web site)
 #define LED_RED_TOGGLE     LEDS_PxOUT ^= LEDS_CONF_RED
 
 #include <msp430x16x.h>
+#include "board-conf.h"
 
 typedef uint8_t radio_packet_length_t;
 

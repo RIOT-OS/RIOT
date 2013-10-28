@@ -48,6 +48,8 @@ and the mailinglist (subscription via web site)
  * @note		$Id$
  */
 
+#include "board-conf.h"
+
 //MSB430 core
 #define MSP430_INITIAL_CPU_SPEED 2457600uL
 #define MSP430_HAS_DCOR             1
