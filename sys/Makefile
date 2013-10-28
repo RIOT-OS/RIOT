@@ -88,6 +88,12 @@ endif
 ifneq (,$(findstring semaphore,$(USEMODULE)))
     DIRS += semaphore
 endif
+ifneq (,$(findstring ccn_lite,$(USEMODULE)))
+    DIRS += net/ccn_lite
+endif
+ifneq (,$(findstring ccn_lite_client,$(USEMODULE)))
+    DIRS += net/ccn_lite/util
+endif
 
 all: $(BINDIR)$(MODULE).a 
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
