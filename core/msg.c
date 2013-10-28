@@ -275,7 +275,7 @@ static int _msg_receive(msg_t *m, int block)
 
 int msg_init_queue(msg_t *array, int num)
 {
-    /* make sure brainfuck condition is met */
+    /* check if num is a power of two by comparing to its complement */
     if (num && (num & (num - 1)) == 0) {
         tcb_t *me = (tcb_t*) active_thread;
         me->msg_array = array;
