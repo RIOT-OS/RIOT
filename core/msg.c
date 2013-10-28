@@ -44,6 +44,8 @@ static int queue_msg(tcb_t *target, msg_t *m)
         return 1;
     }
 
+    DEBUG("queue_msg: no memory to queue message\n");
+
     return 0;
 }
 
