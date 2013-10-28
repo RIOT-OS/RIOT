@@ -71,7 +71,7 @@ ipv6_addr_t flowcontrol_init(void)
 {
     int i;
 
-    sem_init(&slwin_stat.send_win_not_full, BORDER_SWS);
+    sem_init(&slwin_stat.send_win_not_full, 0, BORDER_SWS);
 
     for (i = 0; i < BORDER_SWS; i++) {
         slwin_stat.send_win[i].frame_len = 0;
@@ -162,7 +162,7 @@ void flowcontrol_deliver_from_uart(border_packet_t *packet, int len)
         if (in_window(packet->seq_num, slwin_stat.last_ack + 1, slwin_stat.last_frame)) {
             if (synack_seqnum == packet->seq_num) {
                 synack_seqnum = -1;
-                sem_signal(&connection_established);
+                sem_post(&connection_established);
             }
 
             do {
@@ -170,7 +170,7 @@ void flowcontrol_deliver_from_uart(border_packet_t *packet, int len)
                 slot = &(slwin_stat.send_win[++slwin_stat.last_ack % BORDER_SWS]);
                 vtimer_remove(&slot->timeout);
                 memset(&slot->frame, 0, BORDER_BUFFER_SIZE);
-                sem_signal(&slwin_stat.send_win_not_full);
+                sem_post(&slwin_stat.send_win_not_full);
             }
             while (slwin_stat.last_ack != packet->seq_num);
         }
