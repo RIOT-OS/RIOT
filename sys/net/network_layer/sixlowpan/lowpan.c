@@ -112,6 +112,7 @@ uint8_t max_frag;
 
 static uint16_t packet_length;
 static sixlowpan_lowpan_iphc_status_t iphc_status = LOWPAN_IPHC_ENABLE;
+static sixlowpan_lowpan_nhc_status_t nhc_status = LOWPAN_NHC_DISABLE;
 static ipv6_hdr_t *ipv6_buf;
 static lowpan_reas_buf_t *head = NULL;
 static lowpan_reas_buf_t *packet_fifo = NULL;
@@ -883,10 +884,18 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
         }
     }
 
-    /* NH: Next Header:
-     * TODO: NHC */
-    ipv6_hdr_fields[hdr_pos] = ipv6_buf->nextheader;
-    hdr_pos++;
+    /* NH: Next Header: */
+    if (nhc_status == LOWPAN_NHC_ENABLE) {
+        /* The Next Header field is compressed and the next header is encoded
+         * using LOWPAN_NHCi, see RFC282#section-4.1 */
+        lowpan_iphc[0] |= SIXLOWPAN_IPHC1_NH;
+        /* TODO: NHC */
+    }
+    else {
+        /* Full 8 bits for Next Header are carried in-line */
+        ipv6_hdr_fields[hdr_pos] = ipv6_buf->nextheader;
+        hdr_pos++;
+    }
 
     /* HLIM: Hop Limit: */
     switch (ipv6_buf->hoplimit) {
@@ -1121,16 +1130,10 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
     comp_buf[0] = lowpan_iphc[0];
     comp_buf[1] = lowpan_iphc[1];
 
-    /*uint8_t *ptr;
-    if (ipv6_buf->nextheader == IPV6_PROTO_NUM_TCP)
-    	{
+    if ((ipv6_buf->nextheader == IPV6_PROTO_NUM_UDP) || (ipv6_buf->nextheader == IPV6_PROTO_NUM_TCP)) {
     	ptr = get_payload_buf_send(ipv6_ext_hdr_len);
-    	}
-    else
-    	{
-    	ptr = get_payload_buf(ipv6_ext_hdr_len);
-    	}
-    */
+    }
+
     memcpy(&ipv6_hdr_fields[hdr_pos], &ptr[IPV6_HDR_LEN], ipv6_buf->length);
 
     comp_len = 2 + hdr_pos + payload_length;

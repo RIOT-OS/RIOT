@@ -171,6 +171,14 @@ typedef enum __attribute__((packed)) {
 } sixlowpan_lowpan_iphc_status_t;
 
 /**
+ * @brief   Data type to configure 6LoWPAN next header compression.
+ */
+typedef enum __attribute__((packed)) {
+    LOWPAN_NHC_DISABLE = 0,    ///< NHC disabled
+    LOWPAN_NHC_ENABLE = 1      ///< NHC enabled
+} sixlowpan_lowpan_nhc_status_t;
+
+/**
  * @brief   Data type to represent an 6LoWPAN frame as byte stream.
  */
 typedef struct __attribute__((packed)) {
