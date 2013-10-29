@@ -43,6 +43,13 @@
 #include "ieee802154_frame.h"
 #include "destiny/in.h"
 #include "net_help.h"
+#include "destiny.h"
+
+#define ENABLE_DEBUG    (1)
+#if ENABLE_DEBUG
+char addr_str[IPV6_MAX_ADDR_STR_LEN];
+#endif
+#include "debug.h"
 
 #define ENABLE_DEBUG    (1)
 #if ENABLE_DEBUG
@@ -112,7 +119,7 @@ uint8_t max_frag;
 
 static uint16_t packet_length;
 static sixlowpan_lowpan_iphc_status_t iphc_status = LOWPAN_IPHC_ENABLE;
-static sixlowpan_lowpan_nhc_status_t nhc_status = LOWPAN_NHC_DISABLE;
+static sixlowpan_lowpan_nhc_status_t nhc_status = LOWPAN_NHC_ENABLE;
 static ipv6_hdr_t *ipv6_buf;
 static lowpan_reas_buf_t *head = NULL;
 static lowpan_reas_buf_t *packet_fifo = NULL;
@@ -885,9 +892,9 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
     }
 
     /* NH: Next Header: */
-    if (nhc_status == LOWPAN_NHC_ENABLE) {
+    if ((nhc_status == LOWPAN_NHC_ENABLE) && (ipv6_buf->nextheader == IPV6_PROTO_NUM_UDP)) {
         /* The Next Header field is compressed and the next header is encoded
-         * using LOWPAN_NHCi, see RFC282#section-4.1 */
+         * using LOWPAN_NHC, see RFC282#section-4.1 */
         lowpan_iphc[0] |= SIXLOWPAN_IPHC1_NH;
         /* TODO: NHC */
     }
@@ -1130,8 +1137,37 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
     comp_buf[0] = lowpan_iphc[0];
     comp_buf[1] = lowpan_iphc[1];
 
-    if ((ipv6_buf->nextheader == IPV6_PROTO_NUM_UDP) || (ipv6_buf->nextheader == IPV6_PROTO_NUM_TCP)) {
-    	ptr = get_payload_buf_send(ipv6_ext_hdr_len);
+    if ((nhc_status == LOWPAN_NHC_ENABLE) && (ipv6_buf->nextheader == IPV6_PROTO_NUM_UDP)) {
+        if ((ipv6_buf->nextheader == IPV6_PROTO_NUM_UDP) || (ipv6_buf->nextheader == IPV6_PROTO_NUM_TCP)) {
+            if (ipv6_buf->nextheader == IPV6_PROTO_NUM_UDP) {
+                ipv6_hdr_fields[hdr_pos] |= LOWPAN_NHC_UDP;
+                if (((((udp_hdr_t *)&ptr[IPV6_HDR_LEN])->src_port & LOWPAN_NHC_UDP_12BIT_PORT_PREFIX)
+                            == LOWPAN_NHC_UDP_12BIT_PORT_PREFIX) && 
+                    ((((udp_hdr_t *)&ptr[IPV6_HDR_LEN])->src_port & LOWPAN_NHC_UDP_12BIT_PORT_PREFIX)
+                            == LOWPAN_NHC_UDP_12BIT_PORT_PREFIX)) {
+                    DEBUG("Elide source and destination port prefix\n");
+                }
+                else if ((((udp_hdr_t *)&ptr[IPV6_HDR_LEN])->src_port & LOWPAN_NHC_UDP_8BIT_PORT_PREFIX)
+                         == LOWPAN_NHC_UDP_8BIT_PORT_PREFIX) {
+                    DEBUG("Elide source port prefix\n");
+                    ipv6_hdr_fields[hdr_pos] |= LOWPAN_NHC_UDP_P_SRC;
+                }
+                else if ((((udp_hdr_t *)&ptr[IPV6_HDR_LEN])->dst_port & LOWPAN_NHC_UDP_8BIT_PORT_PREFIX)
+                         == LOWPAN_NHC_UDP_8BIT_PORT_PREFIX) {
+                    DEBUG("Elide destination port prefix\n");
+                    ipv6_hdr_fields[hdr_pos] |= LOWPAN_NHC_UDP_P_DST;
+                }
+
+                /* TODO: checksum elision */
+
+                /* TODO: length elision */
+                DEBUG("Adding %02X as LOWPAN_NHC header\n", LOWPAN_NHC_UDP);
+                hdr_pos++;
+            }
+        }
+        for (int i = 0; i < hdr_pos; i++) {
+            DEBUG("ipv6_hdr_fields[%i]: %02X\n", i, ipv6_hdr_fields[i]);
+        }
     }
 
     memcpy(&ipv6_hdr_fields[hdr_pos], &ptr[IPV6_HDR_LEN], ipv6_buf->length);

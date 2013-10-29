@@ -156,6 +156,54 @@
 #define SIXLOWPAN_FRAGN_HDR_LEN    	(5)
 
 /**
+ * @brief LOWPAN_NHC header type: UDP Header
+ * @see <a href="http://tools.ietf.org/html/rfc6282#section-4.3.3">
+ *         RFC 6282, section 4.3.3
+ *      </a>
+ */
+#define LOWPAN_NHC_UDP (0xf0)
+
+/**
+ * @brief UDP LOWPAN_NHC Checksum
+ * @see <a href="http://tools.ietf.org/html/rfc6282#section-4.3.3">
+ *         RFC 6282, section 4.3.3
+ *      </a>
+ */
+#define LOWPAN_NHC_UDP_C (0x04)
+
+/**
+ * @brief UDP LOWPAN_NHC source port elision
+ * @see <a href="http://tools.ietf.org/html/rfc6282#section-4.3.3">
+ *         RFC 6282, section 4.3.3
+ *      </a>
+ */
+#define LOWPAN_NHC_UDP_P_SRC (0x02)
+
+/**
+ * @brief UDP LOWPAN_NHC destination port elision
+ * @see <a href="http://tools.ietf.org/html/rfc6282#section-4.3.3">
+ *         RFC 6282, section 4.3.3
+ *      </a>
+ */
+#define LOWPAN_NHC_UDP_P_DST (0x01)
+
+/**
+ * @brief UDP port 8-bit prefix for elision
+ * @see <a href="http://tools.ietf.org/html/rfc6282#section-4.3.3">
+ *         RFC 6282, section 4.3.3
+ *      </a>
+ */
+#define LOWPAN_NHC_UDP_8BIT_PORT_PREFIX     (0xf0)
+
+/**
+ * @brief UDP port 12-bit prefix for elision
+ * @see <a href="http://tools.ietf.org/html/rfc6282#section-4.3.3">
+ *         RFC 6282, section 4.3.3
+ *      </a>
+ */
+#define LOWPAN_NHC_UDP_12BIT_PORT_PREFIX    (0xf0b)
+
+/**
  * @brief message type for notification
  *
  * @see sixlowpan_lowpan_register()
