@@ -3,7 +3,9 @@ ASSMSRC = $(wildcard *.S)
 ASMOBJ = $(ASMSRC:%.s=$(BINDIR)%.o)
 ASMOBJ += $(ASSMSRC:%.S=$(BINDIR)%.o)
 
-SRC = $(wildcard *.c)
+ifeq ($(strip $(SRC)),)
+	SRC = $(wildcard *.c)
+endif
 OBJ = $(SRC:%.c=$(BINDIR)%.o)
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
