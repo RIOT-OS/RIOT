@@ -1,11 +1,13 @@
-#include <chardev_thread.h>
-#include <ringbuffer.h>
 #include <stdio.h>
-#include <thread.h>
-#include <msg.h>
-#include <posix_io.h>
 
-#include <board_uart0.h>
+#include "chardev_thread.h"
+#include "ringbuffer.h"
+#include "thread.h"
+#include "msg.h"
+#include "posix_io.h"
+#include "irq.h"
+
+#include "board_uart0.h"
 
 #define UART0_BUFSIZE 		(32)
 #define UART0_STACKSIZE 	(MINIMUM_STACK_SIZE + 256)
@@ -29,11 +31,12 @@ void board_uart0_init(void)
             uart0_thread_stack,
             sizeof(uart0_thread_stack),
             PRIORITY_MAIN - 1,
-            CREATE_STACKTEST|CREATE_WOUT_YIELD,
+            CREATE_STACKTEST|CREATE_SLEEPING,
             uart0_loop,
             "uart0"
             );
     uart0_handler_pid = pid;
+    thread_wakeup(pid);
     puts("uart0_init() [OK]");
 }
 
