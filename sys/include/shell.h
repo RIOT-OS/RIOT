@@ -34,6 +34,8 @@ typedef struct shell_t {
     void (*put_char)(int);
 } shell_t;
 
+#define SHELL_BUFFER_SIZE (127)
+
 /**
  * @brief Initialize a shell object
  * @param shell Pointer to preallocated shell object
