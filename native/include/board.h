@@ -1,3 +1,6 @@
+#ifndef BOARD_H
+#define BOARD_H
+
 /**
  * Native Board interface
  *
@@ -31,3 +34,4 @@ void _native_LED_RED_TOGGLE(void);
 #define LED_RED_TOGGLE (_native_LED_RED_TOGGLE())
 
 typedef uint16_t radio_packet_length_t;
+#endif /* BOARD_H */
