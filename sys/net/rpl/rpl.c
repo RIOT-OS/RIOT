@@ -448,7 +448,7 @@ void send_DAO_ACK(ipv6_addr_t *destination)
     rpl_send_dao_ack_buf->dao_sequence = my_dodag->dao_seq;
     rpl_send_dao_ack_buf->status = 0;
 
-    uint16_t plen = ICMPV6_HDR_LEN + DIS_BASE_LEN;
+    uint16_t plen = ICMPV6_HDR_LEN + DAO_ACK_LEN;
     rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6, NULL);
     mutex_unlock(&rpl_send_mutex);
 }
