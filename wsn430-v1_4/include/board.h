@@ -31,6 +31,8 @@
  * @note		$Id$
  */
 
+#include "board-conf.h"
+
 //MSB430 core
 #define MSP430_INITIAL_CPU_SPEED    800000uL
 #define MSP430_HAS_DCOR             0

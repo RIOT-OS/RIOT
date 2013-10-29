@@ -52,6 +52,7 @@
 #define LED_BLUE_OFF     LEDS_PxOUT |= LEDS_CONF_BLUE
 #define LED_BLUE_TOGGLE     LEDS_PxOUT ^= LEDS_CONF_BLUE
 
+#include <stdint.h>
 #include <msp430x16x.h>
 
 typedef uint8_t radio_packet_length_t;
