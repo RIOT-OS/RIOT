@@ -26,7 +26,6 @@
 
 #include "vtimer.h"
 #include "timex.h"
-#include "debug.h"
 #include "thread.h"
 #include "mutex.h"
 #include "hwtimer.h"
@@ -43,6 +42,12 @@
 #include "ieee802154_frame.h"
 #include "destiny/in.h"
 #include "net_help.h"
+
+#define ENABLE_DEBUG    (0)
+#if ENABLE_DEBUG
+char addr_str[IPV6_MAX_ADDR_STR_LEN];
+#endif
+#include "debug.h"
 
 #define IP_PROCESS_STACKSIZE           	(KERNEL_CONF_STACKSIZE_DEFAULT * 6)
 #define NC_STACKSIZE                   	(KERNEL_CONF_STACKSIZE_DEFAULT)
@@ -129,6 +134,8 @@ lowpan_context_t contexts[NDP_6LOWPAN_CONTEXT_MAX];
 uint8_t context_len = 0;
 uint16_t local_address = 0;
 
+void lowpan_init(transceiver_type_t trans, uint8_t r_addr,
+                 const ipv6_addr_t *prefix, int as_border);
 void lowpan_context_auto_remove(void);
 void lowpan_iphc_encoding(ieee_802154_long_t *dest,
                           ipv6_hdr_t *ipv6_buf_extra, uint8_t *ptr);
@@ -1625,6 +1632,19 @@ void init_reas_bufs(lowpan_reas_buf_t *buf)
 void sixlowpan_lowpan_init(transceiver_type_t trans, uint8_t r_addr,
                            int as_border)
 {
+    lowpan_init(trans, r_addr, NULL, 0);
+}
+
+void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,
+                                 const ipv6_addr_t *prefix,
+                                 uint8_t r_addr)
+{
+    lowpan_init(trans, r_addr, prefix, 0);
+}
+
+void lowpan_init(transceiver_type_t trans, uint8_t r_addr,
+                 const ipv6_addr_t *prefix, int as_border)
+{
     ipv6_addr_t tmp;
     short i;
 
@@ -1645,20 +1665,40 @@ void sixlowpan_lowpan_init(transceiver_type_t trans, uint8_t r_addr,
 
     local_address = r_addr;
 
+    /* if prefix is set */
+    if (prefix != NULL) {
+        /* init network prefix */
+        ipv6_addr_t save_prefix;
+        ipv6_addr_init_prefix(&save_prefix, prefix, 64);
+        plist_add(&save_prefix, 64, NDP_OPT_PI_VLIFETIME_INFINITE, 0, 1,
+                  ICMPV6_NDP_OPT_PI_FLAG_AUTONOM);
+        ipv6_init_iface_as_router();
+        /* add global address */
+        ipv6_addr_set_by_eui64(&tmp, prefix);
+        DEBUG("%s, %d: set unique address to %s, according to prefix %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, &tmp), ipv6_addr_to_str(addr_str, prefix));
+        ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_GLOBAL,
+                NDP_ADDR_STATE_PREFERRED, 0, 0);
+    }
+
+    DEBUG("%s, %d: set link local prefix to %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, &lladdr));
     /* init link-local address */
     ipv6_addr_set_link_local_prefix(&lladdr);
 
+    /* add link local address */
     memcpy(&(lladdr.uint8[8]), &(iface.laddr.uint8[0]), 8);
+    DEBUG("%s, %d: sixlowpan_lowpan_init(): add link local address: %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, &lladdr));
     ipv6_iface_add_addr(&lladdr, IPV6_ADDR_TYPE_LINK_LOCAL,
                         NDP_ADDR_STATE_PREFERRED, 0, 0);
+
+    /* add loopback address */
     ipv6_addr_set_loopback_addr(&tmp);
-    ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_LOOPBACK,
-                        NDP_ADDR_STATE_PREFERRED, 0, 0);
-    ipv6_addr_set_all_nodes_addr(&tmp);
+    DEBUG("%s, %d: sixlowpan_lowpan_init(): add loopback address: %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, &tmp));
     ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_LOOPBACK,
                         NDP_ADDR_STATE_PREFERRED, 0, 0);
 
-    ipv6_iface_add_addr(&lladdr, IPV6_ADDR_TYPE_LINK_LOCAL,
+    /* add all nodes multicast address */
+    DEBUG("%s, %d: sixlowpan_lowpan_init(): add all nodes multicast address: %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, &tmp));
+    ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_LOOPBACK,
                         NDP_ADDR_STATE_PREFERRED, 0, 0);
 
     if (as_border) {
@@ -1689,18 +1729,6 @@ void sixlowpan_lowpan_init(transceiver_type_t trans, uint8_t r_addr,
 
 }
 
-void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,
-                                 const ipv6_addr_t *prefix,
-                                 uint8_t r_addr)
-{
-    /* init network prefix */
-    ipv6_addr_t save_prefix;
-    ipv6_addr_init_prefix(&save_prefix, prefix, 64);
-    plist_add(&save_prefix, 64, NDP_OPT_PI_VLIFETIME_INFINITE, 0, 1,
-              ICMPV6_NDP_OPT_PI_FLAG_AUTONOM);
-    ipv6_init_iface_as_router();
-    sixlowpan_lowpan_init(trans, r_addr, 0);
-}
 
 void sixlowpan_lowpan_bootstrapping(void)
 {
