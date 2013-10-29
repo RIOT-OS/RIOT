@@ -1020,8 +1020,8 @@ int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
         memcpy(&(temp_ipv6_header->destaddr), &to->sin6_addr, 16);
         ipv6_net_if_get_best_src_addr(&(temp_ipv6_header->srcaddr), &(temp_ipv6_header->destaddr));
 
-        current_udp_packet->src_port = get_free_source_port(IPPROTO_UDP);
-        current_udp_packet->dst_port = to->sin6_port;
+        current_udp_packet->src_port = HTONS(get_free_source_port(IPPROTO_UDP));
+        current_udp_packet->dst_port = HTONS(to->sin6_port);
         current_udp_packet->checksum = 0;
 
         memcpy(payload, buf, len);
