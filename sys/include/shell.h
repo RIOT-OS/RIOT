@@ -2,7 +2,7 @@
  * Copyright 2009, Freie Universitaet Berlin (FUB). All rights reserved.
  *
  * These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
+ * and Telematics group (http://cst.mi.fu-berlin.de).
  * ----------------------------------------------------------------------------
  * This file is part of RIOT.
  *
@@ -19,8 +19,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * @defgroup shell Simple Shell Interpreter
  * @ingroup feuerware
  */
-
-//#include "hashtable.h"
 
 typedef struct shell_command_t {
     char *name;

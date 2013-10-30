@@ -26,7 +26,6 @@
  * @author		Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-//#include <sys/unistd.h>
 #include <string.h>
 #include <stdio.h>
 #include <shell.h>
