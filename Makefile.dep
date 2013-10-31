@@ -32,6 +32,15 @@ ifneq (,$(findstring uart0,$(USEMODULE)))
 	endif
 endif
 
+ifneq (,$(findstring libcoap,$(USEMODULE)))
+	ifeq (,$(findstring posix,$(USEMODULE)))
+		USEMODULE += posix
+	endif
+	ifeq (,$(findstring pnet,$(USEMODULE)))
+		USEMODULE += pnet
+	endif
+endif
+
 ifneq (,$(findstring cc110x,$(USEMODULE)))
 	ifeq (,$(findstring protocol_multiplex,$(USEMODULE)))
 		USEMODULE += protocol_multiplex
