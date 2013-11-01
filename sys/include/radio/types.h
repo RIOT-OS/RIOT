@@ -27,7 +27,9 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <timex.h>
+
+#include "board.h"
+#include "timex.h"
 
 typedef uint8_t protocol_t;			///< Packet protocol type
 typedef uint16_t radio_address_t;	///< Radio layer address type
@@ -71,7 +73,7 @@ typedef struct __attribute__((packed))
     uint8_t rssi;           ///< Radio Signal Strength Indication
     uint8_t lqi;            ///< Link Quality Indicator
     timex_t toa;            ///< Time of Arrival
-    uint8_t length;         ///< Length of payload
+    radio_packet_length_t length;         ///< Length of payload
     uint8_t *data;          ///< Payload
 }
 radio_packet_t;
