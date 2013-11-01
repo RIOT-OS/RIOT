@@ -88,6 +88,9 @@ endif
 ifneq (,$(findstring semaphore,$(USEMODULE)))
     DIRS += semaphore
 endif
+ifneq (,$(findstring memmgnt,$(USEMODULE)))
+    DIRS += memmgnt
+endif
 
 all: $(BINDIR)$(MODULE).a 
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
