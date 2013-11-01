@@ -18,6 +18,7 @@
 
 #include <net/ethernet.h>
 
+#include "board.h"
 #include "radio/types.h"
 
 /**
@@ -36,7 +37,7 @@ extern int _native_tap_fd;
 extern unsigned char _native_tap_mac[ETHER_ADDR_LEN];
 
 struct nativenet_header {
-    uint16_t length;
+    radio_packet_length_t length;
     radio_address_t dst;
     radio_address_t src;
 } __attribute__((packed));
