@@ -27,17 +27,18 @@ uint8_t ieee802154_frame_init(ieee802154_frame_t *frame, uint8_t *buf)
 {
     /* Frame Control Field - 802.15.4 - 2006 - 7.2.1.1  */
     uint8_t index = 0;
-    
-    buf[index] = ((frame->fcf.dest_addr_m << 2) |
-                 (frame->fcf.frame_ver << 4) |
-                 (frame->fcf.src_addr_m << 6));
 
-    index++;
     buf[index] = ((frame->fcf.frame_type) |
                  (frame->fcf.sec_enb << 3) |
                  (frame->fcf.frame_pend << 4) |
                  (frame->fcf.ack_req << 5) |
                  (frame->fcf.panid_comp << 6));
+    index++;
+
+    buf[index] = ((frame->fcf.dest_addr_m << 2) |
+                 (frame->fcf.frame_ver << 4) |
+                 (frame->fcf.src_addr_m << 6));
+
     index++;
 
     /* Sequence Number - 802.15.4 - 2006 - 7.2.1.2 */
@@ -46,8 +47,8 @@ uint8_t ieee802154_frame_init(ieee802154_frame_t *frame, uint8_t *buf)
 
     /* Destination PAN Identifier - 802.15.4 - 2006 - 7.2.1.3 */
     if (frame->fcf.dest_addr_m == 0x02 || frame->fcf.dest_addr_m == 0x03) {
-        buf[index] = ((frame->dest_pan_id >> 8) & 0xff);
-        buf[index + 1] = (frame->dest_pan_id & 0xff);
+        buf[index + 1] = ((frame->dest_pan_id >> 8) & 0xff);
+        buf[index] = (frame->dest_pan_id & 0xff);
     }
 
     index += 2;
