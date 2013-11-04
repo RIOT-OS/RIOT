@@ -21,6 +21,7 @@
 #ifndef SIXLOWPAN_ICMP_H
 #define SIXLOWPAN_ICMP_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "sixlowpan/types.h"
