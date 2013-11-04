@@ -350,6 +350,20 @@ void ipv6_iface_get_best_src_addr(ipv6_addr_t *src,
 void ipv6_iface_print_addrs(void);
 
 /**
+ * @brief   Registers a function that decides how to route incomming
+ *          IP packets with a destination that is not this interface.
+ *          The default behaviour is to try forwarding such packets to
+ *          the neighborhood.
+ *          Register a function to change the default behaviour.
+ *          Such function shall return the next hop to reach the destination
+ *          of the IP packet, or NULL if no such next hop is known.
+ *          In this case, the packet will be discarded.
+ *
+ * @param   next_hop    function that returns the next hop to reach dest
+ */
+void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t* dest));
+
+/**
  * @}
  */
 #endif /* SIXLOWPAN_IP_H */

@@ -48,6 +48,7 @@ uint8_t iface_addr_list_count = 0;
 int udp_packet_handler_pid = 0;
 int tcp_packet_handler_pid = 0;
 int rpl_process_pid = 0;
+ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t*) = 0;
 
 /* registered upper layer threads */
 int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
@@ -121,7 +122,19 @@ void ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
 
     packet_length = IPV6_HDR_LEN + payload_length;
 
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
+    /* see if dest should be routed to a different next hop */
+    if (ip_get_next_hop == NULL || ipv6_addr_is_multicast(&ipv6_buf->destaddr)) {
+        dest = &ipv6_buf->destaddr;
+    }
+    else {
+        dest = ip_get_next_hop(&ipv6_buf->destaddr);
+    }
+
+    if (dest == NULL) {
+        return;
+    }
+
+    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &dest->uint16[4],
                             (uint8_t *)ipv6_buf, packet_length);
 }
 
@@ -259,14 +272,31 @@ void ipv6_process(void)
         /* identifiy packet */
         nextheader = &ipv6_buf->nextheader;
 
+        /* destination is foreign address */
         if ((ipv6_get_addr_match(&myaddr, &ipv6_buf->destaddr) >= 112) &&
             (ipv6_buf->destaddr.uint8[15] != myaddr.uint8[15])) {
             packet_length = IPV6_HDR_LEN + ipv6_buf->length;
+
+            ipv6_addr_t* dest;
+            if (ip_get_next_hop == NULL) {
+                dest = &ipv6_buf->destaddr;
+            }
+            else {
+                dest = ip_get_next_hop(&ipv6_buf->destaddr);
+            }
+
+            if (dest == NULL || --ipv6_buf->hoplimit == 0) {
+                continue;
+            }
+
+            /* copy received packet to send buffer */
             memcpy(ipv6_get_buf_send(), ipv6_get_buf(), packet_length);
-            sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
+            /* send packet to node ID derived from dest IP */
+            sixlowpan_lowpan_sendto((ieee_802154_long_t *) &dest->uint16[4],
                                     (uint8_t *)ipv6_get_buf_send(),
                                     packet_length);
         }
+        /* destination is our address */
         else {
             for (i = 0; i < SIXLOWIP_MAX_REGISTERED; i++) {
                 if (sixlowip_reg[i]) {
@@ -662,6 +692,11 @@ void ipv6_register_next_header_handler(uint8_t next_header, int pid)
             /* TODO */
             break;
     }
+}
+
+/* register routing function */
+void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t* dest)) {
+    ip_get_next_hop = next_hop;
 }
 
 void ipv6_register_rpl_handler(int pid)
