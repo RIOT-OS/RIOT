@@ -64,4 +64,7 @@ ifneq (,$(findstring sixlowpan,$(USEMODULE)))
 	ifeq (,$(findstring transceiver, $(USEMODULE)))
 		USEMODULE += transceiver
 	endif
+	ifeq (,$(findstring list, $(USEMODULE)))
+		USEMODULE += list
+	endif
 endif
