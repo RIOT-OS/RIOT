@@ -1,0 +1,7 @@
+ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
+    ifeq (,$(findstring cc110x_spi,$(USEMODULE)))
+        USEMODULE += cc110x_spi
+    endif
+endif
+
+USEMODULE += msp430_common

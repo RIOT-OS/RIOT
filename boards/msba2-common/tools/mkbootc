@@ -1,0 +1,28 @@
+#! /usr/bin/perl
+
+$h = '[0-9A-Fa-f]';
+$n = 1;
+while (<stdin>) {
+	next unless /^\s*$h+:\s+($h{8})/;
+	$data[$n++] = "0x$1";
+}
+$data[0] = $n;
+#$size = $ARGV[0];
+#$size =~ tr/a-z/A-Z/;
+#$size .= '_SIZE';
+
+open H, ">$ARGV[0].h" or die "unable to write boot.h\n";
+print H "/* automatically generated from $ARGV[0].armasm */\n";
+#print H "#define $size $n\n";
+print H "extern const unsigned int ${ARGV[0]}[];\n";
+close H;
+
+open C, ">$ARGV[0].c" or die "unable to write boot.c\n";
+print C "/* automatically generated from $ARGV[0].armasm */\n";
+print C "#include \"$ARGV[0].h\"\n";
+print C "const unsigned int ${ARGV[0]}[] = {\n";
+print C "\t", join(', ', @data), "\n";
+print C "};\n";
+close C;
+
+
