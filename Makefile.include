@@ -3,6 +3,10 @@ ifeq ($(strip $(RIOTCPU)),)
 	export RIOTCPU =$(RIOTBASE)/cpu
 endif
 	
+ifeq ($(strip $(RIOTBOARD)),)
+	export RIOTBOARD =$(RIOTBASE)/boards
+endif
+
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
 endif
