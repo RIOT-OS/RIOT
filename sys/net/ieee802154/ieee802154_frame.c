@@ -148,17 +148,17 @@ uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame,
     uint8_t index = 0;
     uint8_t hdrlen;
 
-    frame->fcf.dest_addr_m = (buf[index] >> 2) & 0x03;
-    frame->fcf.frame_ver = (buf[index] >> 4) & 0x03;
-    frame->fcf.src_addr_m = (buf[index] >> 6) & 0x03;
-
-    index++;
-
     frame->fcf.frame_type = (buf[index]) & 0x07;
     frame->fcf.sec_enb = (buf[index] >> 3) & 0x01;
     frame->fcf.frame_pend = (buf[index] >> 4) & 0x01;
     frame->fcf.ack_req = (buf[index] >> 5) & 0x01;
     frame->fcf.panid_comp = (buf[index] >> 6) & 0x01;
+
+    index++;
+
+    frame->fcf.dest_addr_m = (buf[index] >> 2) & 0x03;
+    frame->fcf.frame_ver = (buf[index] >> 4) & 0x03;
+    frame->fcf.src_addr_m = (buf[index] >> 6) & 0x03;
 
     index++;
 
