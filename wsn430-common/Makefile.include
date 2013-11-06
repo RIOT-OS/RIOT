@@ -20,6 +20,6 @@ endif
 export HEXFILE = bin/$(PROJECT).hex
 export FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
 
-export INCLUDES += -I $(RIOTCPU)/msp430-common/include/ -I$(RIOTBASE)/sys/net/ieee802154/include/
+export INCLUDES += -I $(RIOTCPU)/msp430-common/include/ -I$(RIOTBASE)/sys/net/include/
 export OFLAGS = -O ihex
 

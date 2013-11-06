@@ -9,7 +9,7 @@ INCLUDES += -I${RIOTBOARD}/${BOARD}/include/
 INCLUDES += -I${RIOTBASE}/core/include/
 INCLUDES += -I$(RIOTBASE)/cpu/msp430-common/include/ -I$(RIOTBASE)/cpu/msp430x16x/include/
 INCLUDES += -I$(RIOTBASE)/drivers/cc2420/include/ -I$(RIOTBASE)/sys/include
-INCLUDES += -I$(RIOTBASE)/sys/net/
+INCLUDES += -I$(RIOTBASE)/sys/net/include
 
 all: $(BINDIR)$(ARCH)
 
