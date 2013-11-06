@@ -26,6 +26,7 @@
 #define STRINGS_H
 
 #include <sys/types.h>
+#include <stddef.h>
 
 /**
  * @brief   Returns the position of the first (least significant) bit set in
