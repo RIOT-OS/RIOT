@@ -22,7 +22,7 @@
 
 #include "ipv6.h"
 
-#include "../net_help/net_help.h"
+#include "net_help.h"
 
 #include "socket.h"
 #include "tcp.h"

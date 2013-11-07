@@ -25,7 +25,7 @@
 
 #include "destiny/in.h"
 
-#include "../net_help/net_help.h"
+#include "net_help.h"
 
 #include "msg_help.h"
 #include "socket.h"
