@@ -15,7 +15,11 @@
  * @}
  */
 
+#include "swtimer.h"
+
 #include "time.h"
+
+typedef swtimer_t clockid_t;
 
 clock_t clock(void)
 {
@@ -92,7 +96,7 @@ char *tzname[2];
 
 void tzset(void)
 {
-
+    /* unspported */
 }
 
 int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
@@ -126,31 +130,48 @@ int clock_getcpuclockid(pid_t pid, clockid_t *clock_id)
     return -1; /* TODO */
 }
 
+/*****************************************************************************/
+#define POSIX_TIMER_MAX 10
+swtimer_t posix_timer[POSIX_TIMER_MAX];
+
 int timer_create(clockid_t clock_id, struct sigevent * evp, timer_t * timerid)
 {
-    return -1; /* TODO */
+    return 1;
 }
 
 int timer_delete(timer_t timerid)
 {
-    return -1; /* TODO */
+    swtimer_t *cur = posix_timer[timerid];
+    swtimer_remove(cur);
+    memset(cur, 0, sizeof(swtimer_t));
+    return 1;
 }
 
 int timer_settime(timer_t timerid, int flags, const struct itimerspec * value,
         struct itimerspec * ovalue)
 {
+    swtimer_t *cur = posix_timer[timerid];
+
+    ovalue->it_interval = cur->interval;
+    ovalue->it_value = cur->start;
+
+    cur->start = value->it_value;
+    swtimer_set(cur, value->it_interval);
     return 1; /* TODO */
 }
 
 int timer_gettime(timer_t timerid, struct itimerspec *value)
 {
-    return -1; /* TODO */
+    swtimer_t *cur = posix_timer[timerid];
+    return cur->start;
 }
 
 int timer_getoverrun(timer_t timerid)
 {
     return -1; /* TODO */
 }
+
+/*****************************************************************************/
 
 int getdate_err;
 
