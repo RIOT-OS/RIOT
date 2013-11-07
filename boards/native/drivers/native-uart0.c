@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
 
 #include <sys/select.h>
 
@@ -13,21 +15,27 @@
 #include "debug.h"
 #include "board_uart0.h"
 
-int _native_uart_in;
-int _native_uart_out;
+#include "native_internal.h"
+
+static int _native_uart_in;
 
 fd_set _native_uart_rfds;
 
-inline int uart0_puts(char *astring, int length)
+int uart0_puts(char *astring, int length)
 {
     int nwritten, offset;
 
     nwritten = 0;
     offset = 0;
 
-    _native_in_syscall = 1;
-
-    while ((length > 0) &&(nwritten = write(_native_uart_out, astring+offset, length-offset)) > 0) {
+    while (
+            (length - offset > 0) && (
+                (nwritten = write(
+                               STDOUT_FILENO,
+                               astring+offset,
+                               length-offset)
+                ) > 0)
+          ) {
         offset += nwritten;
     }
     if (nwritten == -1) {
@@ -37,8 +45,6 @@ inline int uart0_puts(char *astring, int length)
         /* XXX: handle properly */
         errx(EXIT_FAILURE, "uart0_puts: Could not write to stdout. I don't know what to do now.");
     }
-
-    _native_in_syscall = 0;
 
     return length;
 }
@@ -53,8 +59,6 @@ void _native_handle_uart0_input()
         return;
     }
     DEBUG("_native_handle_uart0_input\n");
-    _native_in_syscall = 0;
-    _native_in_isr = 1;
 
     nread = read(_native_uart_in, buf, sizeof(buf));
     if (nread == -1) {
@@ -66,33 +70,28 @@ void _native_handle_uart0_input()
          * with properly in #161 */
         close(_native_uart_in);
         _native_uart_in = -1;
-        warnx("stdin closed");
+        printf("stdin closed");
     }
     for(int pos = 0; pos < nread; pos++) {
         uart0_handle_incoming(buf[pos]);
     }
     uart0_notify_thread();
 
-    _native_in_isr = 0;
     thread_yield();
 }
 
 int _native_set_uart_fds(void)
 {
     DEBUG("_native_set_uart_fds");
-    FD_SET(_native_uart_in, &_native_rfds);
+    if (_native_uart_in != -1) {
+        FD_SET(_native_uart_in, &_native_rfds);
+    }
     return _native_uart_in;
 }
 
 void _native_init_uart0()
 {
-    _native_uart_out = STDOUT_FILENO;
     _native_uart_in = STDIN_FILENO;
 
     puts("RIOT native uart0 initialized.");
-}
-
-int putchar(int c) {
-    write(_native_uart_out, &c, 1);
-    return 0;
 }

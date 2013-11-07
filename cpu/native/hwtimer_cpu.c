@@ -31,12 +31,14 @@
 #include <signal.h>
 #include <stdint.h>
 #include <err.h>
+
 #include "hwtimer.h"
 #include "hwtimer_arch.h"
 
 #include "hwtimer_cpu.h"
 #include "cpu.h"
 #include "cpu-conf.h"
+#include "native_internal.h"
 
 #define ENABLE_DEBUG (0)
 
@@ -223,7 +225,7 @@ unsigned long hwtimer_arch_now(void)
 
     DEBUG("hwtimer_arch_now()\n");
 
-    _native_in_syscall = 1;
+    _native_syscall_enter();
 #ifdef __MACH__
     clock_serv_t cclock;
     mach_timespec_t mts;
@@ -239,7 +241,7 @@ unsigned long hwtimer_arch_now(void)
     }
 
 #endif
-    _native_in_syscall = 0;
+    _native_syscall_leave();
 
     native_hwtimer_now = ts2ticks(&t) - time_null;
 

@@ -42,12 +42,15 @@
 #include "cpu.h"
 #include "cpu-conf.h"
 
+#include "native_internal.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
 extern volatile tcb_t *active_thread;
-static ucontext_t end_context;
-static char __end_stack[SIGSTKSZ];
+
+ucontext_t end_context;
+char __end_stack[SIGSTKSZ];
 
 #ifdef MODULE_UART0
 fd_set _native_rfds;
@@ -104,7 +107,6 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksiz
 void cpu_switch_context_exit(void)
 {
     ucontext_t *ctx;
-    extern int native_interrupts_enabled;
 
     DEBUG("XXX: cpu_switch_context_exit()\n");
     if ((sched_context_switch_request == 1) || (active_thread == NULL)) {

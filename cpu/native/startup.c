@@ -14,21 +14,29 @@
  * @}
  */
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#include <dlfcn.h>
+#else
+#include <dlfcn.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <err.h>
 
-#include <kernel_internal.h>
-#include <cpu.h>
 
+#include "kernel_internal.h"
+#include "cpu.h"
+
+#include "native_internal.h"
 #include "tap.h"
-
-extern void board_init(void);
-extern void native_cpu_init(void);
-extern void native_interrupt_init(void);
 
 __attribute__((constructor)) static void startup(int argc, char **argv)
 {
+    /* get system read/write */
+    *(void **)(&real_read) = dlsym(RTLD_NEXT, "read");
+    *(void **)(&real_write) = dlsym(RTLD_NEXT, "write");
 
 #ifdef MODULE_NATIVENET
     if (argc < 2) {
