@@ -16,6 +16,21 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * @defgroup ccnl   CCN lite
+ * @ingroup net
+ * @brief   CCN-lite, a lightweight implementation of the Content Centric
+ * Networking Protocol of XEROX Parc
+ *
+ * @see     <a href="http://www.ccnx.org/releases/latest/doc/technical/CCNxProtocol.html">
+ *          CCNx Protocol
+ *          </a>
+ *
+ * @{
+ * @file
+ * @brief   CCN lite interface
+ * @author  Christian Mehlis <christian@m3hlis.de>
+ */
 #ifndef RIOT_CCN_COMPAT_H_
 #define RIOT_CCN_COMPAT_H_
 
@@ -43,18 +58,20 @@ typedef enum ccnl_riot_event {
 #define CCNL_RIOT_CHUNK_SIZE 90
 
 /**
- * riot_ccnl_relay_start  starts the ccnl relay
+ * @brief starts the ccnl relay
  *
- * to stop the relay send msg "RIOT_HALT" to this thread
+ * @note  to stop the relay send msg "RIOT_HALT" to this thread
  */
 void ccnl_riot_relay_start(void);
 
 /**
- * riot_ccnl_appserver_start  starts an appication server,
- * which can repy to ccn interests
+ * @brief  starts an appication server, which can repy to ccn interests
  *
  * @param relay_pid the pid of the relay
  */
 void ccnl_riot_appserver_start(int relay_pid);
 
+/**
+ * @}
+ */
 #endif /* RIOT_CCN_COMPAT_H_ */
