@@ -17,7 +17,18 @@
  */
 
 /**
- * riot_get  high level function to fetch a file (all chunks of a file)
+ * @ingroup ccnl
+ * @{
+ * @file    ccnl-riot-client.h
+ * @brief   CCN high level client functions
+ * @author  Christian Mehlis <christian@m3hlis.de>
+ * @}
+ */
+#ifndef CCNL_RIOT_CLIENT_H
+#define CCNL_RIOT_CLIENT_H
+
+/**
+ * @brief  high level function to fetch a file (all chunks of a file)
  *
  * @param relay_pid pid of the relay thread
  *
@@ -30,11 +41,11 @@
 int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf);
 
 /**
- * riot_publish  high level function to publish a name, e.g. "/riot/test"
- *               all interest with "prefix" as prefix  received by the rely
- *               are forwarded to this thread
+ * @brief   high level function to publish a name, e.g. "/riot/test"
+ *          all interest with "prefix" as prefix  received by the rely
+ *          are forwarded to this thread
  *
- *               this function uses riot_new_face and riot_register_prefix
+ * @note    this function uses riot_new_face and riot_register_prefix
  *
  * @param relay_pid pid of the relay thread
  *
@@ -55,7 +66,7 @@ int ccnl_riot_client_publish(unsigned int relay_pid, char *prefix, char *faceid,
         char *type, unsigned char *reply_buf);
 
 /**
- * riot_new_face  lower layer function to register a new face in the relay
+ * @brief  lower layer function to register a new face in the relay
  *
  * @param relay_pid pid of the relay
  *
@@ -74,7 +85,7 @@ int ccnl_riot_client_new_face(unsigned int relay_pid, char *type, char *faceid,
         unsigned char *reply_buf);
 
 /**
- * riot_register_prefix lower layer function to register a new prefix
+ * @brief lower layer function to register a new prefix
  *                      in the relay
  *
  * @param relay_pid pid of the relay
@@ -91,3 +102,8 @@ int ccnl_riot_client_new_face(unsigned int relay_pid, char *type, char *faceid,
  */
 int ccnl_riot_client_register_prefix(unsigned int relay_pid, char *prefix,
         char *faceid, unsigned char *reply_buf);
+
+/**
+ * @}
+ */
+#endif /* CCNL_RIOT_CLIENT_H */
