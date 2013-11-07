@@ -41,7 +41,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #include "cc1100_phy.h"
 #include "cc1100-defaultSettings.h"
 
-#include "protocol-multiplex/protocol-multiplex.h"
+#include "protocol-multiplex.h"
 
 #include "kernel.h"
 #include "thread.h"
