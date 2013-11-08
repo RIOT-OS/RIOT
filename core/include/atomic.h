@@ -20,12 +20,15 @@
 /**
  * @brief sets "val" to "set", returns old "val", atomically
  */
-#ifndef __cplusplus
-extern unsigned int atomic_set_return(unsigned int *val, unsigned int set);
-#else
-extern "C" unsigned int atomic_set_return(unsigned int *val, unsigned int set);
+#ifdef __cplusplus
+extern "C" {
 #endif
 
+extern unsigned int atomic_set_return(unsigned int *val, unsigned int set);
+
+#ifdef __cplusplus
+}
+#endif
 /**
  * @}
  */
