@@ -1,0 +1,8 @@
+#ifndef HWTIMER_CPU_H_
+#define HWTIMER_CPU_H_
+
+#define ARCH_MAXTIMERS 	3
+#define HWTIMER_SPEED 	1000000
+#define HWTIMER_MAXTICKS (0xFFFFFFFF)
+
+#endif /* HWTIMER_CPU_H_ */
