@@ -13,10 +13,12 @@
 /**
  * @brief   Initializes scheduler and creates main and idle task
  */
-#ifndef __cplusplus
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern void kernel_init(void);
-#else
-extern "C" void kernel_init(void);
+#ifdef __cplusplus
+}
 #endif
 
 /**
