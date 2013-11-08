@@ -23,6 +23,7 @@
 #include <fcntl.h>
 #include <arpa/inet.h>
 #include <inttypes.h>
+#include <errno.h>
 
 #ifdef __MACH__
 #define _POSIX_C_SOURCE
@@ -87,9 +88,35 @@ void _native_handle_tap_input(void)
         else {
             DEBUG("ignoring non-native frame\n");
         }
+
+        /* work around lost signals */
+        fd_set rfds;
+        struct timeval t;
+        memset(&t, 0, sizeof(t));
+        FD_ZERO(&rfds);
+        FD_SET(_native_tap_fd, &rfds);
+
+        _native_in_syscall++; // no switching here
+        if (select(_native_tap_fd +1, &rfds, NULL, NULL, &t) == 1) {
+            int sig = SIGIO;
+            extern int _sig_pipefd[2];
+            extern ssize_t (*real_write)(int fd, const void *buf, size_t count);
+            real_write(_sig_pipefd[1], &sig, sizeof(int));
+            _native_sigpend++;
+            DEBUG("_native_handle_tap_input: sigpend++\n");
+        }
+        else {
+            DEBUG("_native_handle_tap_input: no more pending tap data\n");
+        }
+        _native_in_syscall--;
     }
     else if (nread == -1) {
-        err(EXIT_FAILURE, "read");
+        if ((errno == EAGAIN ) || (errno == EWOULDBLOCK)) {
+            //warn("read");
+        }
+        else {
+            err(EXIT_FAILURE, "_native_handle_tap_input: read");
+        }
     }
     else {
         errx(EXIT_FAILURE, "internal error _native_handle_tap_input");
