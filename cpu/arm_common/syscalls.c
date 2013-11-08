@@ -77,12 +77,10 @@ void __assert(const char *file, int line, const char *failedexpr)
 }
 
 /*---------------------------------------------------------------------------*/
-#ifndef __cplusplus
-extern 
-#else
-extern "C" 
+#ifdef __cplusplus
+extern "C" {
 #endif
-int _isatty_r(struct _reent *r, int fd)
+extern int _isatty_r(struct _reent *r, int fd)
 {
     r->_errno = 0;
 
@@ -94,12 +92,8 @@ int _isatty_r(struct _reent *r, int fd)
     }
 }
 /*---------------------------------------------------------------------------*/
-#ifndef __cplusplus
-extern 
-#else
-extern "C" 
-#endif
-_off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int whence)
+
+extern _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int whence)
 {
     /* to get rid of gcc warnings */
     (void) fd;
@@ -117,44 +111,7 @@ _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int whence)
     return result;
 }
 /*---------------------------------------------------------------------------*/
-int _open_r(struct _reent *r, const char *name, int mode)
-{
-    /* to get rid of gcc warnings */
-    (void) name;
-    (void) mode;
-    int ret = -1;
-    PRINTF("open '%s' mode %#x\n", name, mode);
-
-    r->_errno = ENODEV; // no such device
-#ifdef MODULE_FAT
-    ret = ff_open_r(r, name, mode);
-#endif
-
-    PRINTF("open [%i] errno %i\n", ret, r->_errno);
-    return ret;
-}
-/*---------------------------------------------------------------------------*/
-int _stat_r(struct _reent *r, char *name, struct stat *st)
-{
-    /* to get rid of gcc warnings */
-    (void) name;
-    (void) st;
-    int ret = -1;
-    PRINTF("_stat_r '%s' \n", name);
-    r->_errno = ENODEV; // no such device
-#ifdef MODULE_FAT
-    ret = ff_stat_r(r, name, st);
-#endif
-    PRINTF("_stat_r [%i] errno %i\n", ret, r->_errno);
-    return ret;
-}
-/*---------------------------------------------------------------------------*/
-#ifndef __cplusplus
-extern 
-#else
-extern "C" 
-#endif
-int _fstat_r(struct _reent *r, int fd, struct stat *st)
+extern int _fstat_r(struct _reent *r, int fd, struct stat *st)
 {
     int ret = -1;
 
@@ -181,12 +138,7 @@ int _fstat_r(struct _reent *r, int fd, struct stat *st)
     return ret;
 }
 /*---------------------------------------------------------------------------*/
-#ifndef __cplusplus
-extern 
-#else
-extern "C" 
-#endif
-int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
+extern int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 {
     int result = EOF;
     r->_errno = EBADF;
@@ -220,12 +172,7 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
     return result;
 }
 /*---------------------------------------------------------------------------*/
-#ifndef __cplusplus
-extern 
-#else
-extern "C" 
-#endif
-int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
+extern int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 {
     /* to get rid of gcc warnings */
     (void) fd;
@@ -242,12 +189,7 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
     return result;
 }
 /*---------------------------------------------------------------------------*/
-#ifndef __cplusplus
-extern 
-#else
-extern "C" 
-#endif
-int _close_r(struct _reent *r, int fd)
+extern int _close_r(struct _reent *r, int fd)
 {
     (void) fd;
     int result = -1;
@@ -259,6 +201,49 @@ int _close_r(struct _reent *r, int fd)
     PRINTF("close returned %i errno %i\n", result, errno);
 
     return result;
+}
+/*---------------------------------------------------------------------------*/
+extern int _getpid(void)
+{
+    return active_thread->pid;
+}
+
+void _fini(void) {}
+void _kill(void) {}
+#ifdef __cplusplus
+}
+#endif
+/*---------------------------------------------------------------------------*/
+int _open_r(struct _reent *r, const char *name, int mode)
+{
+    /* to get rid of gcc warnings */
+    (void) name;
+    (void) mode;
+    int ret = -1;
+    PRINTF("open '%s' mode %#x\n", name, mode);
+
+    r->_errno = ENODEV; // no such device
+#ifdef MODULE_FAT
+    ret = ff_open_r(r, name, mode);
+#endif
+
+    PRINTF("open [%i] errno %i\n", ret, r->_errno);
+    return ret;
+}
+/*---------------------------------------------------------------------------*/
+int _stat_r(struct _reent *r, char *name, struct stat *st)
+{
+    /* to get rid of gcc warnings */
+    (void) name;
+    (void) st;
+    int ret = -1;
+    PRINTF("_stat_r '%s' \n", name);
+    r->_errno = ENODEV; // no such device
+#ifdef MODULE_FAT
+    ret = ff_stat_r(r, name, st);
+#endif
+    PRINTF("_stat_r [%i] errno %i\n", ret, r->_errno);
+    return ret;
 }
 /*---------------------------------------------------------------------------*/
 int _unlink_r(struct _reent *r, char *path)
@@ -287,16 +272,6 @@ void _exit(int n)
     while (1);
 }
 /*---------------------------------------------------------------------------*/
-#ifndef __cplusplus
-extern 
-#else
-extern "C" 
-#endif
-int _getpid(void)
-{
-    return active_thread->pid;
-}
-/*---------------------------------------------------------------------------*/
 int _kill_r(struct _reent *r, int pid, int sig)
 {
     /* not implemented */
@@ -305,17 +280,7 @@ int _kill_r(struct _reent *r, int pid, int sig)
 }
 /*---------------------------------------------------------------------------*/
 void _init(void) {}
-#ifndef __cplusplus
-extern 
-#else
-extern "C" 
-#endif
-void _fini(void) {}
-#ifndef __cplusplus
-extern 
-#else
-extern "C" 
-#endif
-void _kill(void) {}
+
+
 
 
