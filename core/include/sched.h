@@ -26,13 +26,20 @@
  */
 void sched_init(void);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief   Triggers the scheduler to schedule the next task
  */
-#ifndef __cplusplus
 extern void sched_run(void);
-#else
-extern "C" void sched_run(void);
+
+/**
+ * @brief   Call context switching at task exit
+ */
+extern void cpu_switch_context_exit(void);
+#ifdef __cplusplus
+}
 #endif
 
 /**
@@ -54,15 +61,6 @@ void sched_set_status(tcb_t *process, unsigned int status);
  * @param[in]   in_isr          1 if currently in interrupt context, 0 otherwise 
  */ 
 void sched_switch(uint16_t current_prio, uint16_t other_prio, int in_isr);
-
-/**
- * @brief   Call context switching at task exit
- */
-#ifndef __cplusplus
-extern void cpu_switch_context_exit(void);
-#else
-extern "C" void cpu_switch_context_exit(void);
-#endif
 
 /**
  * Flag indicating whether a context switch is necessary after handling an
