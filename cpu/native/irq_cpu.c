@@ -295,6 +295,10 @@ void native_irq_handler()
     cpu_switch_context_exit();
 }
 
+void isr_set_sigmask(ucontext_t *ctx)
+{
+    sigfillset(&(ctx->uc_sigmask));
+}
 
 /**
  * save signal, return to _native_sig_leave_tramp if possible
@@ -339,7 +343,8 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
             //printf("\n\033[36mEIP:\t%p\nHEAP:\t%p\nnot switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP], (void*)process_heap_address);
         }
         else {
-            
+            /* disable interrupts in context */
+            isr_set_sigmask((ucontext_t *)context);
             _native_in_isr = 1;
             //printf("\n\033[31mEIP:\t%p\nHEAP:\t%p\ngo switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP], (void*)process_heap_address);
             _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP];
