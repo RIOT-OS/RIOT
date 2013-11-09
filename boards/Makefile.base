@@ -1,0 +1,30 @@
+ifeq ($(BOARD),msba2)
+ INCLUDES += -I$(RIOTBOARD)/msba2/include/
+ INCLUDES += -I$(RIOTBOARD)/msba2-common/include/
+ INCLUDES += -I$(RIOTBOARD)/msba2-common/drivers/include/
+endif
+ifeq ($(BOARD),msb-430)
+ INCLUDES += -I$(RIOTBOARD)/msb-430/include/
+ INCLUDES += -I$(RIOTBOARD)/msb-430-common/include/
+ INCLUDES += -I$(RIOTBOARD)/msb-430-common/drivers/include/
+endif
+ifeq ($(BOARD),msb-430h)
+ INCLUDES += -I$(RIOTBOARD)/msb-430h/include/
+ INCLUDES += -I$(RIOTBOARD)/msb-430-common/include/
+ INCLUDES += -I$(RIOTBOARD)/msb-430-common/drivers/include/
+endif
+ifeq ($(BOARD),wsn430-v1_3b)
+ INCLUDES += -I$(RIOTBOARD)/wsn430-v1_3b/include/
+ INCLUDES += -I$(RIOTBOARD)/wsn430-common/include/
+endif
+ifeq ($(BOARD),wsn430-v1_4)
+ INCLUDES += -I$(RIOTBOARD)/wsn430-v1_4/include/
+ INCLUDES += -I$(RIOTBOARD)/wsn430-common/include/
+endif
+ifeq ($(BOARD),chronos)
+ INCLUDES += -I$(RIOTBOARD)/chronos/include/
+ INCLUDES += -I$(RIOTBOARD)/chronos/drivers/include/
+endif
+ifeq ($(BOARD),native)
+ INCLUDES += -I$(RIOTBOARD)/native/include/
+endif

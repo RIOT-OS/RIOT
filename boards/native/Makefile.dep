@@ -1,0 +1,6 @@
+ifneq (,$(findstring ltc4150,$(USEMODULE)))
+	ifeq (,$(findstring hwtimer,$(USEMODULE)))
+		USEMODULE += hwtimer
+	endif
+endif
+
