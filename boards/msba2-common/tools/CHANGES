@@ -1,0 +1,23 @@
+(heavily hacked by Heiko Will & Kaspar Schleiser since then)
+
+1.05 (9-Apr-2007)
+-----------------
+Added boot jump code specific to 2378 (and similar chips) to
+disable the PLL before jumping to the user's code.
+
+1.04 (19-Dec-2006)
+------------------
+Added 2364, 2366, 2368, 2378 & 2468 to list.  Untested.
+
+1.03 (2-Jun-2006)
+-----------------
+Added 2103 chip to chip list.  ID numbers for 2101 and 2102 unknown
+
+1.02 (31-Jul-2005)
+------------------
+Added support for other chips
+Added soft boot code
+Added user configurable crystal value (for baud sync protocol)
+
+
+

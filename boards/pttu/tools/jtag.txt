@@ -1,0 +1,14 @@
+compile openocd release v0.1:
+[extract to somewhere]
+./configure --prefix=CHANGEMEtowhatever --enable-ft2232_libftdi
+make
+make install
+
+to flash run from within board/pttu/tools:
+./openocd-pttu.sh olimex-usb-jtag-tiny-a "mt_flash CHANGEME/absolute/path/to/hexfile/pttu.hex;shutdown"
+
+
+to debug, first start the following from within board/pttu/tools:
+./openocd-pttu.sh olimex-usb-jtag-tiny-a
+
+then just run "jam debug". this will flash bin/pttu.hex, run it and stop at the bootloader.
