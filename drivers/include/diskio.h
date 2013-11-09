@@ -20,9 +20,14 @@
 #endif
 
 /* These functions are defined in asmfunc.S */
-void Copy_al2un(unsigned char *dst, const unsigned long *src, int count);	/* Copy aligned to unaligned. */
-void Copy_un2al(unsigned long *dst, const unsigned char *src, int count);	/* Copy unaligned to aligned. */
-
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern void Copy_al2un(unsigned char *dst, const unsigned long *src, int count);	/* Copy aligned to unaligned. */
+extern void Copy_un2al(unsigned long *dst, const unsigned char *src, int count);	/* Copy unaligned to aligned. */
+#ifdef __cplusplus
+}
+#endif
 
 /* Status of Disk Functions */
 typedef unsigned char	DSTATUS;

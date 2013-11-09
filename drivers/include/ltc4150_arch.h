@@ -37,20 +37,20 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #define SUPPLY_VOLTAGE  (5)
 
 /** board specific ltc4150 interrupt disable */
-void ltc4150_disable_int(void);
+void __attribute__((__no_instrument_function__)) ltc4150_disable_int(void);
 /** board specific ltc4150 interrupt enable */
-void ltc4150_enable_int(void);
+void __attribute__((__no_instrument_function__)) ltc4150_enable_int(void);
 /** board specific synchronization of ltc4150 */
-void ltc4150_sync_blocking(void);
+void __attribute__((__no_instrument_function__)) ltc4150_sync_blocking(void);
 /** board specific ltc4150 initialization */
-void ltc4150_arch_init(void);
+void __attribute__((__no_instrument_function__)) ltc4150_arch_init(void);
 
 /**
  * ltc4150 interrupt handler,
  * shall be called on ltc4150 interrupt,
  * implemented in driver
  */
-void ltc4150_interrupt(void);
+void __attribute__((__no_instrument_function__)) ltc4150_interrupt(void);
 
 /** * @} */
 #endif /* __LTC4150_ARCH_H */

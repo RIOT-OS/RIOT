@@ -37,7 +37,14 @@
 
 void FIQ_Routine(void)   __attribute__((interrupt("FIQ")));
 //void SWI_Routine (void)   __attribute__((interrupt("SWI")));
-void UNDEF_Routine(void) __attribute__((interrupt("UNDEF")));
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern void UNDEF_Routine(void) __attribute__((interrupt("UNDEF")));
+#ifdef __cplusplus
+}
+#endif
+
 
 void IRQ_Routine(void)
 {
@@ -103,32 +110,6 @@ void UNDEF_Routine(void)
     exit(1);
 }
 /*-----------------------------------------------------------------------------------*/
-void PABT_Routine(void)
-{
-    register u_long    *lnk_ptr;
-    __asm__ __volatile__("sub %0, lr, #8" : "=r"(lnk_ptr));     // get aborting instruction
-
-    if (arm_abortflag == 0) {
-        arm_abortflag = 1;                                          // remember state (if printing should fail again)
-        abtorigin("pabt", lnk_ptr);
-    }
-
-    exit(1);
-}
-/*-----------------------------------------------------------------------------------*/
-void DABT_Routine(void)
-{
-    register u_long    *lnk_ptr;
-    __asm__ __volatile__("sub %0, lr, #8" : "=r"(lnk_ptr));     // get aborting instruction
-
-    if (arm_abortflag == 0) {
-        arm_abortflag = 1;                                          // remember state (if printing should fail again)
-        abtorigin("data", lnk_ptr);
-    }
-
-    exit(1);
-}
-/*-----------------------------------------------------------------------------------*/
 static inline void
 bl_init_data(void)
 {
@@ -162,7 +143,39 @@ bl_init_data(void)
     }
 }
 /*-----------------------------------------------------------------------------------*/
-void bootloader(void)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern void PABT_Routine(void)
+{
+    register u_long    *lnk_ptr;
+    __asm__ __volatile__("sub %0, lr, #8" : "=r"(lnk_ptr));     // get aborting instruction
+
+    if (arm_abortflag == 0) {
+        arm_abortflag = 1;                                          // remember state (if printing should fail again)
+        abtorigin("pabt", lnk_ptr);
+    }
+
+    exit(1);
+}
+/*-----------------------------------------------------------------------------------*/
+
+extern void DABT_Routine(void)
+{
+    register u_long    *lnk_ptr;
+    __asm__ __volatile__("sub %0, lr, #8" : "=r"(lnk_ptr));     // get aborting instruction
+
+    if (arm_abortflag == 0) {
+        arm_abortflag = 1;                                          // remember state (if printing should fail again)
+        abtorigin("data", lnk_ptr);
+    }
+
+    exit(1);
+}
+/*-----------------------------------------------------------------------------------*/
+
+extern void bootloader(void)
 {
     extern void bl_uart_init(void);
     extern void bl_init_ports(void);
@@ -184,5 +197,9 @@ void bootloader(void)
 
     puts("Board initialized.");
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */

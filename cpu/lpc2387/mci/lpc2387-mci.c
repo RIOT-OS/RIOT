@@ -237,7 +237,7 @@ static void start_transmission(unsigned char blks)
     for (n = 0; n < N_BUF; n++) {
         LinkList[n][0] = (unsigned long)DmaBuff[n];
         LinkList[n][1] = (unsigned long)&MCI_FIFO;
-        LinkList[n][2] = (n == blks - 1) ? 0 : (unsigned long)LinkList[(n + 1) % N_BUF];
+        LinkList[n][2] = ((int)n == blks - 1) ? 0 : (unsigned long)LinkList[(n + 1) % N_BUF];
         LinkList[n][3] = dma_ctrl;
     }
 
@@ -879,7 +879,7 @@ DRESULT MCI_ioctl(
 )
 {
     DRESULT res;
-    unsigned char b, *ptr = buff;
+    unsigned char b, *ptr = (unsigned char *)buff;
     unsigned long resp[4], d, *dp, st, ed;
 
 
@@ -937,7 +937,7 @@ DRESULT MCI_ioctl(
                 break;    /* Check if sector erase can be applied to the card */
             }
 
-            dp = buff;
+            dp = (unsigned long *)buff;
             st = dp[0];
             ed = dp[1];
 
@@ -1000,7 +1000,7 @@ DRESULT MCI_ioctl(
                         while ((XferWp == 0) && !(XferStat & 0xC));
 
                         if (!(XferStat & 0xC)) {
-                            Copy_al2un(buff, DmaBuff[0], 64);
+                            Copy_al2un((unsigned char*)buff, DmaBuff[0], 64);
                             res = RES_OK;
                         }
                     }

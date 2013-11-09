@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
 #include <irq.h>
@@ -21,6 +22,10 @@
 
 #define SECONDS_PER_TICK (4096U)
 #define MICROSECONDS_PER_TICK (4096UL * 1000000)
+
+#ifndef __cplusplus
+extern int thread_getpid(void);
+#endif
 
 void vtimer_callback(void *ptr);
 void vtimer_tick(void *ptr);
@@ -243,7 +248,16 @@ int vtimer_init()
 int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid)
 {
     int ret;
-    t->action = (void *) thread_wakeup;
+#ifndef __cplusplus
+    t->action = (void*) thread_wakeup;
+#else
+    // this is dangerous
+    // if the thread_wakeup prototype ( int(*)(int) )
+    // is not used reading or accessing t->action
+    typedef void (*action_ri)(void*);
+    action_ri new_action = reinterpret_cast<action_ri>(thread_wakeup);
+    t->action = new_action;
+#endif
     t->arg = (void *) pid;
     t->absolute = interval;
     t->pid = 0;
@@ -282,7 +296,13 @@ int vtimer_remove(vtimer_t *t)
 
 int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr)
 {
-    t->action = (void *) msg_send_int;
+#ifndef __cplusplus
+    t->action = (void* ) msg_send_int;
+#else
+    typedef void (*action_ri)(void*);
+    action_ri new_action = reinterpret_cast<action_ri>(msg_send_int);
+    t->action = new_action;
+#endif
     t->arg = ptr;
     t->absolute = interval;
     t->pid = pid;
@@ -302,7 +322,7 @@ void vtimer_print_long_queue(){
 
 void vtimer_print(vtimer_t *t)
 {
-    printf("Seconds: %"PRIu32" - Microseconds: %"PRIu32"\n \
+    printf("Seconds: %" PRIu32 " - Microseconds: %" PRIu32 "\n \
             action: %p\n \
             action: %p\n \
             pid: %u\n",

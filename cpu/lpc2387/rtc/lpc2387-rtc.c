@@ -116,8 +116,12 @@ rtc_get_alarm(struct tm *localt)
         localt->tm_year = RTC_ALYEAR;
         localt->tm_isdst = -1; /* not available */
     }
-
-    return (~RTC_AMR) & 0xff;										/* return which alarm fields are checked */
+#ifndef __cplusplus
+    return (~RTC_AMR) & 0xff;  /* return which alarm fields are checked */
+#else
+    rtc_alarm_mask retval = static_cast<rtc_alarm_mask>((~RTC_AMR) & 0xff);
+    return retval;										/* return which alarm fields are checked */
+#endif
 }
 /*---------------------------------------------------------------------------*/
 void RTC_IRQHandler(void) __attribute__((interrupt("IRQ")));
@@ -150,7 +154,13 @@ void rtc_enable(void)
 {
     RTC_ILR = (ILR_RTSSF | ILR_RTCCIF | ILR_RTCALF);	/* clear interrupt flags */
     RTC_CCR |= CCR_CLKEN;								/* enable clock */
-    install_irq(RTC_INT, &RTC_IRQHandler, IRQP_RTC);	/* install interrupt handler */
+    void * ptr = NULL;
+#ifndef __cplusplus    
+    ptr = &RTC_IRQHandler;
+#else
+    ptr = reinterpret_cast<void*>(&RTC_IRQHandler);
+#endif
+    install_irq(RTC_INT, ptr, IRQP_RTC);	/* install interrupt handler */
 
     time_t now = rtc_time(NULL);
     epoch = now - (now % 3600);

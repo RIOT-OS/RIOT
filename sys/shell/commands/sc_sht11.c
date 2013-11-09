@@ -29,7 +29,12 @@ void _get_humidity_handler(char *unused)
 {
     uint8_t success;
     sht11_val_t sht11_val;
+#ifndef __cplusplus
     success = sht11_read_sensor(&sht11_val, HUMIDITY | TEMPERATURE);
+#else
+    sht11_mode_t mode = static_cast<sht11_mode_t>(HUMIDITY | TEMPERATURE);
+    success = sht11_read_sensor(&sht11_val, mode);
+#endif
 
     if (!success) {
         printf("Error reading SHT11\n");
@@ -43,7 +48,12 @@ void _get_temperature_handler(char *unused)
 {
     uint8_t success;
     sht11_val_t sht11_val;
+#ifndef __cplusplus
     success = sht11_read_sensor(&sht11_val, TEMPERATURE);
+#else
+     sht11_mode_t mode = static_cast<sht11_mode_t>(TEMPERATURE);
+    success = sht11_read_sensor(&sht11_val, mode);
+#endif
 
     if (!success) {
         printf("Error reading SHT11\n");
@@ -56,7 +66,12 @@ void _get_weather_handler(char *unused)
 {
     uint8_t success;
     sht11_val_t sht11_val;
+#ifndef __cplusplus
     success = sht11_read_sensor(&sht11_val, HUMIDITY | TEMPERATURE);
+#else
+    sht11_mode_t mode = static_cast<sht11_mode_t>(HUMIDITY | TEMPERATURE);
+    success = sht11_read_sensor(&sht11_val, mode);
+#endif
 
     if (!success) {
         printf("Error reading SHT11\n");

@@ -46,7 +46,10 @@ void heap_stats(void)
 }
 
 /*-----------------------------------------------------------------------------------*/
-caddr_t _sbrk_r(struct _reent *r, size_t incr)
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern caddr_t _sbrk_r(struct _reent *r, size_t incr)
 {
     uint32_t cpsr = disableIRQ();
 
@@ -68,3 +71,7 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
     r->_errno = ENOMEM;
     return NULL;
 }
+#ifdef __cplusplus
+}
+#endif
+

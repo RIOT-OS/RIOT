@@ -1,3 +1,4 @@
+#define __STDC_FORMAT_MACROS
 #include <stdio.h>
 #include <inttypes.h>
 
@@ -66,5 +67,5 @@ int timex_cmp(const timex_t a, const timex_t b)
 
 void timex_print(const timex_t t)
 {
-    printf("Seconds: %"PRIu32" - Microseconds: %"PRIu32"\n", t.seconds, t.microseconds);
+    printf("Seconds: %" PRIu32 " - Microseconds: %" PRIu32 "\n", t.seconds, t.microseconds);
 }

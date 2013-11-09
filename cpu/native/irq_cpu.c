@@ -30,7 +30,9 @@
 #endif
 
 // __USE_GNU for gregs[REG_EIP] access under Linux
+#ifndef __USE_GNU
 #define __USE_GNU
+#endif
 #include <signal.h>
 #undef __USE_GNU
 
@@ -448,7 +450,7 @@ void native_interrupt_init(void)
     struct sigaction sa;
     DEBUG("XXX: native_interrupt_init()\n");
 
-    process_heap_address = malloc(sizeof(int));
+    process_heap_address = (int*)malloc(sizeof(int));
     if (process_heap_address == NULL) {
         err(EXIT_FAILURE, "native_interrupt_init: malloc");
     }

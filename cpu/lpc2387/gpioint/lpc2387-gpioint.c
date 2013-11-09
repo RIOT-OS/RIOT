@@ -41,6 +41,8 @@ struct irq_callback_t {
 static struct irq_callback_t gpioint0[32];
 static struct irq_callback_t gpioint2[32];
 
+static void __attribute__((__no_instrument_function__)) test_irq(int port, unsigned long f_mask, unsigned long r_mask, struct irq_callback_t *pcb);
+void __attribute__((__no_instrument_function__)) GPIO_IRQHandler(void);
 
 void gpioint_init(void)
 {
@@ -48,7 +50,13 @@ void gpioint_init(void)
 
     /* GPIO Init */
     INTWAKE |= GPIO0WAKE | GPIO2WAKE;                       /* allow GPIO to wake up from power down */
-    install_irq(GPIO_INT, &GPIO_IRQHandler, IRQP_GPIO);     /* install irq handler */
+    void * ptr = NULL;
+#ifndef __cplusplus    
+    ptr = &GPIO_IRQHandler;
+#else
+    ptr = reinterpret_cast<void*>(&GPIO_IRQHandler);
+#endif
+    install_irq(GPIO_INT, ptr, IRQP_GPIO);     /* install irq handler */
 }
 
 /*---------------------------------------------------------------------------*/
@@ -114,7 +122,7 @@ gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
     return true;												/* success */
 }
 /*---------------------------------------------------------------------------*/
-static void __attribute__((__no_instrument_function__)) test_irq(int port, unsigned long f_mask, unsigned long r_mask, struct irq_callback_t *pcb)
+static void test_irq(int port, unsigned long f_mask, unsigned long r_mask, struct irq_callback_t *pcb)
 {
     /* Test each bit of rising and falling masks, if set trigger interrupt
      * on corresponding device */
@@ -140,7 +148,7 @@ void GPIO_IRQHandler(void) __attribute__((interrupt("IRQ")));
  * Invoked whenever an activated gpio interrupt is triggered by a rising
  * or falling edge.
  */
-void __attribute__((__no_instrument_function__)) GPIO_IRQHandler(void)
+void GPIO_IRQHandler(void)
 {
     if (IO_INT_STAT & BIT0) {										/* interrupt(s) on PORT0 pending */
         unsigned long int_stat_f = IO0_INT_STAT_F;					/* save content */
