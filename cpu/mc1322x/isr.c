@@ -11,7 +11,6 @@
 #include "mc1322x.h"
 
 #define MAX_IRQ_INDEX 10
-#define MAX_IRQ_NUM 11
 
 static void (*isr_funcs[11])(void) = {
     asm_isr,
@@ -35,16 +34,12 @@ void register_isr(uint8_t interrupt, void (*isr)(void)) {
 
 void isr(void)
 {
-    /* set irq_num to an invalid value */
-    uint8_t irq_num = MAX_IRQ_NUM;
-
     /* pending interrupt? */
     while (ITC->NIPEND) {
         /* get interrupt source, range 0-10 */
-        irq_num = ITC->NIVECTOR;
         /* call corresponding ISR */
-        if (isr_funcs[irq_num] != 0) {
-            (isr_funcs[irq_num])();
+        if (isr_funcs[ITC->NIVECTOR]) {
+            (isr_funcs[ITC->NIVECTOR])();
         }
     }
 }

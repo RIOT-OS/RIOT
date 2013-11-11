@@ -139,13 +139,13 @@ arm_irq_handler:
 #if CPU != mc1322x
     /* jump into vic interrupt */
     mov    r0, #0xffffff00    /* lpc23xx */
+    ldr    r0, [r0]
+    add    lr,pc,#4
 #else
     /* mc1322x seems to lack a VIC, distinction of IRQ has to be done in SW */
 	ldr    r0, =isr           /* mc1322x */
 #endif
 
-    ldr    r0, [r0]
-    add    lr,pc,#4
     mov     pc, r0
     
     /* restore spsr from stack */
