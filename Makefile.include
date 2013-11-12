@@ -99,3 +99,9 @@ doc:
 
 debug:
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
+
+buildtest:
+	@for BOARD in $$(sed -n -e 's/ifeq[^,]*,\([^)]*\))/\1/p' $(RIOTBASE)/boards/Makefile.base); do \
+		echo -n "Building for $${BOARD} .. "; \
+		env -i PATH=$${PATH} BOARD=$${BOARD} $(MAKE) -B clean all >/dev/null 2>&1 && echo "success" || echo "failed"  ; \
+	done
