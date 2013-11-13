@@ -33,6 +33,8 @@ _native_sig_leave_tramp:
     call swapcontext
     addl $8, %esp
 
+    call eINT
+
     movl $0x0, _native_in_isr
     popa
     popf

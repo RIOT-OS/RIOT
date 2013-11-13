@@ -31,12 +31,14 @@
 #include <signal.h>
 #include <stdint.h>
 #include <err.h>
+
 #include "hwtimer.h"
 #include "hwtimer_arch.h"
 
 #include "hwtimer_cpu.h"
 #include "cpu.h"
 #include "cpu-conf.h"
+#include "native_internal.h"
 
 #define ENABLE_DEBUG (0)
 
@@ -223,7 +225,7 @@ unsigned long hwtimer_arch_now(void)
 
     DEBUG("hwtimer_arch_now()\n");
 
-    _native_in_syscall = 1;
+    _native_syscall_enter();
 #ifdef __MACH__
     clock_serv_t cclock;
     mach_timespec_t mts;
@@ -239,7 +241,7 @@ unsigned long hwtimer_arch_now(void)
     }
 
 #endif
-    _native_in_syscall = 0;
+    _native_syscall_leave();
 
     native_hwtimer_now = ts2ticks(&t) - time_null;
 
@@ -247,6 +249,17 @@ unsigned long hwtimer_arch_now(void)
             (unsigned long)t.tv_sec, (unsigned long)t.tv_nsec);
     DEBUG("hwtimer_arch_now(): returning %lu\n", native_hwtimer_now);
     return native_hwtimer_now;
+}
+
+/**
+ * Called once on process creation in order to mimic the behaviour a
+ * regular hardware timer.
+ */
+void native_hwtimer_pre_init()
+{
+    /* initialize time delta */
+    time_null = 0;
+    time_null = hwtimer_arch_now();
 }
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
@@ -263,10 +276,6 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
         native_hwtimer[i].it_interval.tv_sec = 0;
         native_hwtimer[i].it_interval.tv_usec = 0;
     }
-
-    /* init time delta */
-    time_null = 0;
-    time_null = hwtimer_arch_now();
 
     hwtimer_arch_enable_interrupt();
     return;
