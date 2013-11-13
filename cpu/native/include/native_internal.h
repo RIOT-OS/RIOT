@@ -19,6 +19,7 @@
  */
 void native_cpu_init(void);
 void native_interrupt_init(void);
+extern void native_hwtimer_pre_init();
 
 void native_irq_handler();
 extern void _native_sig_leave_tramp(void);

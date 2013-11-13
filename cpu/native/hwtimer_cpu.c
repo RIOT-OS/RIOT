@@ -251,6 +251,17 @@ unsigned long hwtimer_arch_now(void)
     return native_hwtimer_now;
 }
 
+/**
+ * Called once on process creation in order to mimic the behaviour a
+ * regular hardware timer.
+ */
+void native_hwtimer_pre_init()
+{
+    /* initialize time delta */
+    time_null = 0;
+    time_null = hwtimer_arch_now();
+}
+
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
 {
     DEBUG("hwtimer_arch_init()\n");
@@ -265,10 +276,6 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
         native_hwtimer[i].it_interval.tv_sec = 0;
         native_hwtimer[i].it_interval.tv_usec = 0;
     }
-
-    /* init time delta */
-    time_null = 0;
-    time_null = hwtimer_arch_now();
 
     hwtimer_arch_enable_interrupt();
     return;
