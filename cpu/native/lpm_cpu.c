@@ -71,7 +71,9 @@ void _native_lpm_sleep()
 
     /* otherwise select was interrupted because of a signal, continue below */
 #else
+    _native_in_syscall++; // no switching here
     pause();
+    _native_in_syscall--;
 #endif
 
     if (_native_sigpend > 0) {
