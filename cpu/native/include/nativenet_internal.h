@@ -37,7 +37,7 @@ struct rx_buffer_s {
     char data[NATIVE_MAX_DATA_LENGTH];
 };
 
-extern struct rx_buffer_s _nativenet_rx_buffer[];
+extern struct rx_buffer_s _nativenet_rx_buffer[RX_BUF_SIZE];
 
 void _nativenet_handle_packet(radio_packet_t *packet);
 #endif /* NATIVENET_INTERNAL_H */

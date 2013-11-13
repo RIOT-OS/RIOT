@@ -42,12 +42,15 @@
 #include "cpu.h"
 #include "cpu-conf.h"
 
+#include "native_internal.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
 extern volatile tcb_t *active_thread;
-static ucontext_t end_context;
-static char __end_stack[SIGSTKSZ];
+
+ucontext_t end_context;
+char __end_stack[SIGSTKSZ];
 
 #ifdef MODULE_UART0
 fd_set _native_rfds;
@@ -101,10 +104,9 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksiz
     return (char *) p;
 }
 
-void cpu_switch_context_exit(void)
+void isr_cpu_switch_context_exit(void)
 {
     ucontext_t *ctx;
-    extern int native_interrupts_enabled;
 
     DEBUG("XXX: cpu_switch_context_exit()\n");
     if ((sched_context_switch_request == 1) || (active_thread == NULL)) {
@@ -117,36 +119,64 @@ void cpu_switch_context_exit(void)
     /* the next context will have interrupts enabled due to ucontext */
     DEBUG("XXX: cpu_switch_context_exit: native_interrupts_enabled = 1;\n");
     native_interrupts_enabled = 1;
+    _native_in_isr = 0;
 
     if (setcontext(ctx) == -1) {
         err(1, "cpu_switch_context_exit(): setcontext():");
     }
 }
 
-void thread_yield()
+void cpu_switch_context_exit()
 {
-    /**
-     * XXX: check whether it is advisable to switch context for sched_run()
-     */
-    ucontext_t *oc, *nc;
-
-    DEBUG("thread_yield()\n");
-
-    oc = (ucontext_t *)(active_thread->sp);
-
-    sched_run();
-
-    nc = (ucontext_t *)(active_thread->sp);
-
-    if (nc != oc) {
-        DEBUG("thread_yield(): calling swapcontext(%s)\n\n", active_thread->name);
-
-        if (swapcontext(oc, nc) == -1) {
-            err(1, "thread_yield(): swapcontext()");
+    if (_native_in_isr == 0) {
+        dINT();
+        _native_in_isr = 1;
+        native_isr_context.uc_stack.ss_sp = __isr_stack;
+        native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+        native_isr_context.uc_stack.ss_flags = 0;
+        makecontext(&native_isr_context, isr_cpu_switch_context_exit, 0);
+        if (setcontext(&native_isr_context) == -1) {
+            err(1, "cpu_switch_context_exit: swapcontext");
         }
     }
     else {
-        DEBUG("thread_yield(): old = new, returning to context (%s)\n\n", active_thread->name);
+        isr_cpu_switch_context_exit();
+    }
+    errx(EXIT_FAILURE, "this should have never been reached!!");
+}
+
+void isr_thread_yield()
+{
+    DEBUG("isr_thread_yield()\n");
+
+    sched_run();
+    ucontext_t *ctx = (ucontext_t *)(active_thread->sp);
+    DEBUG("isr_thread_yield(): switching to(%s)\n\n", active_thread->name);
+
+    native_interrupts_enabled = 1;
+    _native_in_isr = 0;
+    if (setcontext(ctx) == -1) {
+        err(1, "isr_thread_yield(): setcontext()");
+    }
+}
+
+void thread_yield()
+{
+    ucontext_t *ctx = (ucontext_t *)(active_thread->sp);
+    if (_native_in_isr == 0) {
+        _native_in_isr = 1;
+        dINT();
+        native_isr_context.uc_stack.ss_sp = __isr_stack;
+        native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+        native_isr_context.uc_stack.ss_flags = 0;
+        makecontext(&native_isr_context, isr_thread_yield, 0);
+        if (swapcontext(ctx, &native_isr_context) == -1) {
+            err(1, "thread_yield: swapcontext");
+        }
+        eINT();
+    }
+    else {
+        isr_thread_yield();
     }
 }
 

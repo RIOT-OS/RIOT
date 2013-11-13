@@ -26,6 +26,8 @@
 #include "rtc.h"
 #include "cpu.h"
 
+#include "native_internal.h"
+
 static int native_rtc_enabled;
 
 void rtc_init(void)
@@ -59,24 +61,24 @@ void rtc_get_localtime(struct tm *localt)
     time_t t;
 
     if (native_rtc_enabled == 1) {
-        _native_in_syscall++;
+        _native_syscall_enter();
         t = time(NULL);
 
         if (localtime_r(&t, localt) == NULL) {
             err(1, "rtc_get_localtime: localtime_r");
         }
-        _native_in_syscall--;
+        _native_syscall_leave();
     }
 }
 
 time_t rtc_time(struct timeval *time)
 {
     if (native_rtc_enabled == 1) {
-        _native_in_syscall++;
+        _native_syscall_enter();
         if (gettimeofday(time, NULL) == -1) {
             err(1, "rtc_time: gettimeofday");
         }
-        _native_in_syscall--;
+        _native_syscall_leave();
     }
     return time->tv_sec;
 }
