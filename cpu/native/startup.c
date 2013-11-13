@@ -48,6 +48,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     (void) argv;
 #endif
 
+    native_hwtimer_pre_init();
     native_cpu_init();
     native_interrupt_init();
 #ifdef MODULE_NATIVENET
