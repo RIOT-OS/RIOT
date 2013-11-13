@@ -56,7 +56,11 @@ void hwtimer_spin(unsigned long ticks)
 {
     unsigned long co = hwtimer_arch_now() + ticks;
 
-    while (hwtimer_arch_now() > co);
+    /* only if the system clock will overflow until ticks has been reached,
+     * ticks has to be at least 1 larger than co */
+    if (co < ticks) {
+        while (hwtimer_arch_now() > co);
+    }
 
     while (hwtimer_arch_now() < co);
 }
