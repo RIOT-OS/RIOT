@@ -54,22 +54,28 @@ static void hwtimer_releasemutex(void* mutex) {
 
 void hwtimer_spin(unsigned long ticks)
 {
-    unsigned long x = hwtimer_arch_now();
+    unsigned long t = hwtimer_arch_now();
 
     /**
      * If hwtimer_arch_now + ticks results in an overflow,
      * hwtimer_arch_now needs to spin until it has overflowed as well.
      *
-     * If it has overflowed, the result is smaller than ticks by at
-     * least one.
+     * If the destination time will result in an overflow, the result
+     * is smaller than ticks by at least one.
      */
-    if (x + ticks < ticks) {
-        while (hwtimer_arch_now() > x);
+    if (t + ticks < ticks) {
+        while (hwtimer_arch_now() > t);
     }
 
-    x += ticks;
+    /**
+     * set t to destination time, possibly overflowing it
+     */
+    t += ticks;
 
-    while (hwtimer_arch_now() < x);
+    /**
+     * wait until the present has past destination time t
+     */
+    while (hwtimer_arch_now() < t);
 }
 
 /*---------------------------------------------------------------------------*/
