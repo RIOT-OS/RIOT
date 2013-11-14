@@ -13,6 +13,8 @@ License. See the file LICENSE in the top level directory for more details.
 #ifndef __HWTIMER_CPU_H
 #define __HWTIMER_CPU_H
 
+#include "cpu.h"
+
 #ifdef CC430
 #include <cc430f6137.h>
 #else

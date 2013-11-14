@@ -153,13 +153,9 @@ void msp430_init_dco(void)
 
     BCSCTL2 = SELM_2 + SELS;		/* MCLK und SMCLK = XT2 (safe) */
 #else
-    /* Thdeltais code taken from the FU Berlin sources and reformatted. */
     int delta = __msp430_cpu_speed >> 12;
-    //#define DELTA    600
-
     unsigned int compare, oldcapture = 0;
     unsigned int i;
-
 
     BCSCTL1 = 0xa4; /* ACLK is devided by 4. RSEL=6 no division for MCLK
 		     and SSMCLK. XT2 is off. */
@@ -181,7 +177,6 @@ void msp430_init_dco(void)
 
 
     while (1) {
-
         while ((CCTL2 & CCIFG) != CCIFG);   /* Wait until capture occured! */
 
         CCTL2 &= ~CCIFG;                    /* Capture occured, clear flag */
