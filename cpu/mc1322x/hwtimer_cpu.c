@@ -26,21 +26,25 @@ void tmr_isr(void) {
     /* detemine which timer caused the interrupt */
     if (TMR0->SCTRLbits.TCF && TMR0->SCTRLbits.TCFIE) {
         TMR0->SCTRLbits.TCF = 0;
+        TMR0->CSCTRLbits.TCF1 = 0;
         TMR0->ENBL &= ~(1<<0);
         int_handler(0);
     }
     else if (TMR1->SCTRLbits.TCF && TMR1->SCTRLbits.TCFIE) {
         TMR1->SCTRLbits.TCF = 0;
+        TMR1->CSCTRLbits.TCF1 = 0;
         TMR0->ENBL &= ~(1<<1);
         int_handler(1);
     }
     else if (TMR2->SCTRLbits.TCF && TMR2->SCTRLbits.TCFIE) {
         TMR2->SCTRLbits.TCF = 0;
+        TMR2->CSCTRLbits.TCF1 = 0;
         TMR0->ENBL &= ~(1<<2);
         int_handler(2);
     }
     else if (TMR3->SCTRLbits.TCF && TMR3->SCTRLbits.TCFIE) {
         TMR3->SCTRLbits.TCF = 0;
+        TMR3->CSCTRLbits.TCF1 = 0;
         TMR0->ENBL &= ~(1<<3);
         int_handler(3);
     }
@@ -67,7 +71,7 @@ void timer_x_init(volatile struct TMR_struct* const TMRx) {
     TMRx->CTRLbits.COUNT_MODE = 1;              /* use rising edge of primary source */
     TMRx->CTRLbits.PRIMARY_CNT_SOURCE = 0x0f;   /* Perip. clock with 128 prescale (for 24MHz = 187500Hz) */
     TMRx->CTRLbits.SECONDARY_CNT_SOURCE = 0x00; /* don't need this */
-    TMRx->CTRLbits.ONCE = 0x00;                 /* keep counting */
+    TMRx->CTRLbits.ONCE = 0x01;                 /* don't keep counting */
     TMRx->CTRLbits.LENGTH = 0x00;               /* continue counting */
     TMRx->CTRLbits.DIR = 0x00;                  /* count up */
     TMRx->CTRLbits.CO_INIT = 0x00;              /* other counters cannot force a reinitialization of this counter*/
