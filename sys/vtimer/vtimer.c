@@ -135,7 +135,7 @@ void vtimer_callback(void *ptr)
         timer->action(timer->arg);
     }
     else {
-        DEBUG("Timer was poisoned.");
+        DEBUG("Timer was poisoned.\n");
     }
 
     in_callback = false;
