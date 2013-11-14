@@ -246,7 +246,7 @@ void run(void)
         msg_receive(&m);
         /* only makes sense for messages for upper layers */
         cmd = (transceiver_command_t *) m.content.ptr;
-        DEBUG("transceiver: Transceiver: Message received\n");
+        DEBUG("transceiver: Transceiver: Message received, type: %02X\n", m.type);
 
         switch(m.type) {
             case RCV_PKT_CC1020:

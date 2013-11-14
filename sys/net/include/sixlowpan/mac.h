@@ -27,6 +27,11 @@
 #include "sixlowpan/types.h"
 
 /**
+ * @brief   Maximum length of a IEEE 802.15.4 long address represented as string.
+ */
+#define IEEE_802154_MAX_ADDR_STR_LEN   (12)
+
+/**
  * @brief   Gets current radio transmitter address.
  *
  * @return  Current radio address as 8-bit value.
@@ -85,6 +90,20 @@ void sixlowpan_mac_send_ieee802154_frame(const ieee_802154_long_t *addr,
  * @param[in]   type    Type of transceiver.
  */
 void sixlowpan_mac_init(transceiver_type_t type);
+
+/**
+ * @brief   Converts IEEE 802.15.4 long address into string.
+ *          Note that addr_str must allocate at least
+ *          IEEE_802154_MAX_ADDR_STR_LEN byte (12 byte).
+ *
+ * @param[out]  addr_str    The IEEE 802.15.4 long address as string. Must
+ *                          allocate at least IEEE_802154_ADDR_STR_LEN byte (12
+ *                          byte).
+ * @param[in]   laddr       IEEE 802.15.4 address to be converted.
+ *
+ * @return  Pointer to addr_str.
+ */
+char *sixlowpan_mac_802154_long_addr_to_str(char *addr_str, const ieee_802154_long_t *laddr);
 
 /**
  * @}

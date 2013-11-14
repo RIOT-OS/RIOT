@@ -53,7 +53,7 @@ radio_address_t _native_net_addr;
 
 void nativenet_init(int transceiver_pid)
 {
-    DEBUG("nativenet_init(transceiver_pid=%d)", transceiver_pid);
+    DEBUG("nativenet_init(transceiver_pid=%d)\n", transceiver_pid);
     rx_buffer_next = 0;
     _native_net_pan = 0;
     _native_net_chan = 0;
@@ -96,12 +96,14 @@ uint16_t nativenet_get_pan()
 
 radio_address_t nativenet_set_address(radio_address_t address)
 {
+    DEBUG("nativenet_set_address(address=%d)\n", address);
     _native_net_addr = address;
     return _native_net_addr;
 }
 
 radio_address_t nativenet_get_address()
 {
+    DEBUG("nativenet_get_address -> address = %d\n", _native_net_addr);
     return _native_net_addr;
 }
 
