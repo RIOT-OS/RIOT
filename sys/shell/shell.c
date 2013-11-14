@@ -26,7 +26,6 @@
  * @author		Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-//#include <sys/unistd.h>
 #include <string.h>
 #include <stdio.h>
 #include <shell.h>
@@ -92,9 +91,10 @@ static void print_help(const shell_command_t *command_list)
 
 static void handle_input_line(shell_t *shell, char *line)
 {
+    char line_copy[SHELL_BUFFER_SIZE];
     char *saveptr;
-    char *linedup = strdup(line);
-    char *command = strtok_r(linedup, " ", &saveptr);
+    strncpy(line_copy, line, sizeof(line_copy));
+    char *command = strtok_r(line_copy, " ", &saveptr);
 
     void (*handler)(char *) = NULL;
 
@@ -113,8 +113,6 @@ static void handle_input_line(shell_t *shell, char *line)
             }
         }
     }
-
-    free(linedup);
 }
 
 static int readline(shell_t *shell, char *buf, size_t size)
@@ -155,7 +153,7 @@ static inline void print_prompt(shell_t *shell)
 
 void shell_run(shell_t *shell)
 {
-    char line_buf[255];
+    char line_buf[SHELL_BUFFER_SIZE];
 
     print_prompt(shell);
 
@@ -163,9 +161,7 @@ void shell_run(shell_t *shell)
         int res = readline(shell, line_buf, sizeof(line_buf));
 
         if (!res) {
-            char *line_copy = strdup(line_buf);
-            handle_input_line(shell, line_copy);
-            free(line_copy);
+            handle_input_line(shell, line_buf);
         }
 
         print_prompt(shell);
