@@ -15,18 +15,20 @@
  * @}
  */
 
-#include <thread.h>
-#include <kernel.h>
-#include <msg.h>
-#include <ringbuffer.h>
-
 #include <stdio.h>
 #include <errno.h>
-#include <irq.h>
-#include <posix_io.h>
+
+#include "kernel.h"
+#include "irq.h"
+
+#include "thread.h"
+#include "msg.h"
+
+#include "ringbuffer.h"
+#include "posix_io.h"
 
 #define ENABLE_DEBUG    (0)
-#include <debug.h>
+#include "debug.h"
 
 static int min(int a, int b)
 {
