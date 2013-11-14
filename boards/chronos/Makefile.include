@@ -1,3 +1,6 @@
+export INCLUDES += -I$(RIOTBOARD)/chronos/include -I$(RIOTBOARD)/chronos/drivers/include/
+export INCLUDES += -I$(RIOTCPU)/msp430-common/include/ -I$(RIOTCPU)/cc430/include/
+
 ## the cpu to build for
 export CPU = cc430
 export MCU = cc430f6137

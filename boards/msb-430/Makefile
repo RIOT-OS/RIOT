@@ -32,6 +32,3 @@ clean:
 	@if [ -d $(BINDIR) ] ; \
 	then rmdir $(BINDIR) ; \
 	fi 
-
-
-

@@ -1,21 +1,22 @@
-SRC = $(wildcard *.c)
-BINDIR = bin/
-OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
+export ARCH = chronos_base.a
 
+SRC = $(wildcard *.c)
+BINDIR = $(RIOTBOARD)/$(BOARD)/bin/
+OBJ = $(SRC:%.c=$(BINDIR)%.o)
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
-INCLUDES += -Iinclude -I$(RIOTBASE)/sys/lib -I$(RIOTBASE)/sys/drivers/include
+INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/sys/lib -I$(RIOTBASE)/sys/drivers/include
 INCLUDES += -I$(RIOTBASE)/sys/drivers/cc110x_ng/include
 INCLUDES += -I$(RIOTBASE)/core/include
-INCLUDES += -I$(RIOTBASE)/cpu/msp430-common/include/
-INCLUDES += -I$(RIOTBASE)/cpu/cc430/include/
-#INCLUDES += -I/usr/msp430/include/
+INCLUDES += -I$(RIOTCPU)/msp430-common/include/
+INCLUDES += -I$(RIOTCPU)/cc430/include/
 
-all: $(BINDIR)chronos_base.a 
+all: $(BINDIR)$(ARCH)
 	$(MAKE) -C drivers
 
-$(BINDIR)chronos_base.a: $(OBJ)
-	$(AR) rcs $(BINDIR)chronos_base.a $(OBJ)
+$(BINDIR)$(ARCH): $(OBJ)
+	mkdir -p $(BINDIR)
+	$(AR) rcs $(BINDIR)$(ARCH) $(OBJ)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
@@ -28,8 +29,6 @@ $(BINDIR)%.o: %.c
 
 # remove compilation products
 clean:
-	rm -f $(BINDIR)chronos_base.a $(OBJ) $(DEP)
 	$(MAKE) -C drivers clean
-
-
-
+	rm -f $(OBJ) $(DEP)
+	rm -f $(BINDIR)$(ARCH)
