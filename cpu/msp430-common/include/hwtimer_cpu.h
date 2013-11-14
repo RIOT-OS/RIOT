@@ -18,6 +18,7 @@ License. See the file LICENSE in the top level directory for more details.
 #else
 #include <msp430x16x.h>
 #endif
+#include <cpu.h>
 #include <stdint.h>
 
 #ifdef __MSP430_HAS_TA2__
