@@ -30,11 +30,11 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #include <stdio.h>
 #include <stdint.h>
 
-#include <hwtimer.h>
-#include <mutex.h>
-#include <sht11.h>
-#include <sht11-board.h>
-#include <bitarithm.h>
+#include "hwtimer.h"
+#include "mutex.h"
+#include "sht11.h"
+#include "sht11-board.h"
+#include "bitarithm.h"
 
 float sht11_temperature_offset;
 
