@@ -1,5 +1,5 @@
 export INCLUDES += -I$(RIOTBOARD)/chronos/include -I$(RIOTBOARD)/chronos/drivers/include/
-export INCLUDES += -I$(RIOTCPU)/msp430-common/include/ -I$(RIOTCPU)/cc430/include/
+export INCLUDES += -I$(RIOTCPU)/cc430/include/ -I$(RIOTCPU)/msp430-common/include/
 
 ## the cpu to build for
 export CPU = cc430
@@ -21,5 +21,6 @@ ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
 export HEXFILE = bin/$(PROJECT).hex
+export USEMODULE += msp430_common
 export FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
 export OFLAGS = -O ihex
