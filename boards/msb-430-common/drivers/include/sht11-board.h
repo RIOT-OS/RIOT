@@ -39,8 +39,8 @@ and the mailinglist (subscription via web site)
  * @author      Freie Universität Berlin, Computer Systems & Telematics, RIOT
  *
  */
-#include <msp430x16x.h>
-#include <bitarithm.h>
+#include "msp430x16x.h"
+#include "bitarithm.h"
 
 /* SCK  = P3B5
  * DATA = P3B4
