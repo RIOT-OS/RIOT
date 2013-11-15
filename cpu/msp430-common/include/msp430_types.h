@@ -13,4 +13,10 @@ struct timespec {
     long  tv_nsec;    /* Nanoseconds */
 };
 
+/* TODO: remove once msp430 libc supports struct timeval */
+struct timeval {
+    time_t tv_sec;
+    time_t tv_usec;
+};
+
 #endif /* MSP430_TYPES_H */
