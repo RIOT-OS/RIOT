@@ -26,12 +26,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #include <time.h>
 
 /* TODO: remove once msp430 libc supports struct timeval */
-#ifdef MSP430
-struct timeval {
-    time_t tv_sec;
-    time_t tv_usec;
-};
-#else
+#ifndef MSP430
 #include <sys/time.h>
 #endif
 
