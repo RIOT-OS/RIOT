@@ -8,6 +8,8 @@
 #include "tcp.h"
 #include "udp.h"
 
+#define DESTINY_BUFFER_SIZE 1000
+
 #define MAX_SOCKETS			5
 // #define MAX_QUEUED_SOCKETS	2
 

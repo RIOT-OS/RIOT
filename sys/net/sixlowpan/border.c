@@ -49,7 +49,7 @@ uint8_t serial_in_buf[BORDER_BUFFER_SIZE];
 
 uint8_t *get_serial_out_buffer(int offset)
 {
-    if (offset > BUFFER_SIZE) {
+    if (offset > BORDER_BUFFER_SIZE) {
         return NULL;
     }
 
@@ -58,7 +58,7 @@ uint8_t *get_serial_out_buffer(int offset)
 
 uint8_t *get_serial_in_buffer(int offset)
 {
-    if (offset > BUFFER_SIZE) {
+    if (offset > BORDER_BUFFER_SIZE) {
         return NULL;
     }
 

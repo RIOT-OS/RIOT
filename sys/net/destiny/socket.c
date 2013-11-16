@@ -524,7 +524,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     socket_internal_t *current_int_tcp_socket;
     socket_t *current_tcp_socket;
     msg_t msg_from_server;
-    uint8_t send_buffer[BUFFER_SIZE];
+    uint8_t send_buffer[DESTINY_BUFFER_SIZE];
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
@@ -720,8 +720,8 @@ int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags)
     int32_t sent_bytes = 0, total_sent_bytes = 0;
     socket_internal_t *current_int_tcp_socket;
     socket_t *current_tcp_socket;
-    uint8_t send_buffer[BUFFER_SIZE];
-    memset(send_buffer, 0, BUFFER_SIZE);
+    uint8_t send_buffer[DESTINY_BUFFER_SIZE];
+    memset(send_buffer, 0, DESTINY_BUFFER_SIZE);
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
@@ -996,7 +996,7 @@ int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
 {
     if (isUDPSocket(s) &&
         (get_socket(s)->socket_values.foreign_address.sin6_port == 0)) {
-        uint8_t send_buffer[BUFFER_SIZE];
+        uint8_t send_buffer[DESTINY_BUFFER_SIZE];
 
         ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
         udp_hdr_t *current_udp_packet = ((udp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
@@ -1034,7 +1034,7 @@ int destiny_socket_close(int s)
         if (is_tcp_socket(s)) {
             /* Variables */
             msg_t m_recv;
-            uint8_t send_buffer[BUFFER_SIZE];
+            uint8_t send_buffer[DESTINY_BUFFER_SIZE];
             ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
             tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
@@ -1206,7 +1206,7 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
 {
     msg_t msg_recv_client_ack, msg_send_client_ack;
     socket_t *current_queued_socket = &current_queued_int_socket->socket_values;
-    uint8_t send_buffer[BUFFER_SIZE];
+    uint8_t send_buffer[DESTINY_BUFFER_SIZE];
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *syn_ack_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 

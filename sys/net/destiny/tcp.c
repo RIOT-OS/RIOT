@@ -196,7 +196,7 @@ void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 {
     msg_t m_send;
     socket_t *current_tcp_socket = &tcp_socket->socket_values;
-    uint8_t send_buffer[BUFFER_SIZE];
+    uint8_t send_buffer[DESTINY_BUFFER_SIZE];
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
@@ -227,7 +227,7 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 {
     msg_t m_send;
     socket_t *current_tcp_socket = &tcp_socket->socket_values;
-    uint8_t send_buffer[BUFFER_SIZE];
+    uint8_t send_buffer[DESTINY_BUFFER_SIZE];
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
@@ -252,7 +252,7 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 {
     uint8_t tcp_payload_len = ipv6_header->length - TCP_HDR_LEN, read_bytes = 0;
     socket_t *current_tcp_socket = &tcp_socket->socket_values;
-    uint8_t send_buffer[BUFFER_SIZE];
+    uint8_t send_buffer[DESTINY_BUFFER_SIZE];
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 

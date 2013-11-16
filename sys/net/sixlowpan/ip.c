@@ -37,8 +37,8 @@
 #define IP_PKT_RECV_BUF_SIZE        (64)
 #define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)
 
-uint8_t ip_send_buffer[BUFFER_SIZE];
-uint8_t buffer[BUFFER_SIZE];
+uint8_t ip_send_buffer[SIXLOWPAN_BUFFER_SIZE];
+uint8_t buffer[SIXLOWPAN_BUFFER_SIZE];
 msg_t msg_queue[IP_PKT_RECV_BUF_SIZE];
 ipv6_hdr_t *ipv6_buf;
 icmpv6_hdr_t *icmp_buf;
@@ -60,7 +60,7 @@ void ipv6_send_bytes(ipv6_hdr_t *bytes)
     bytes->flowlabel = HTONS(bytes->flowlabel);
     bytes->length = HTONS(bytes->length);
 
-    memset(bytes, 0, BUFFER_SIZE);
+    memset(bytes, 0, SIXLOWPAN_BUFFER_SIZE);
     memcpy(bytes + LL_HDR_LEN, bytes, offset);
 
     sixlowpan_lowpan_sendto((ieee_802154_long_t *) &bytes->destaddr.uint16[4],
