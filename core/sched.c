@@ -7,6 +7,8 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
+ * TODO: setup dependency from SCHEDSTATISTICS to MODULE_HWTIMER
+ *
  * @ingroup kernel
  * @{
  * @file
@@ -20,6 +22,10 @@
 #include <kernel_internal.h>
 #include <clist.h>
 #include <bitarithm.h>
+
+#if SCHEDSTATISTICS
+#include "hwtimer.h"
+#endif
 
 #define ENABLE_DEBUG (0)
 #include <debug.h>
@@ -87,10 +93,8 @@ void sched_run()
 
     }
 
-#if SCHEDSTATISTICS
-    /* TODO: setup dependency from SCHEDSTATISTICS to MODULE_HWTIMER */
-    extern unsigned long hwtimer_now(void);
-    unsigned int time = hwtimer_now();
+#ifdef SCHEDSTATISTICS
+    unsigned long time = hwtimer_now();
 
     if (my_active_thread && (pidlist[my_active_thread->pid].laststart)) {
         pidlist[my_active_thread->pid].runtime += time - pidlist[my_active_thread->pid].laststart;
