@@ -57,7 +57,7 @@ void sched_init()
         sched_threads[i] = NULL;
 #if SCHEDSTATISTICS
         pidlist[i].laststart = 0;
-        pidlist[i].runtime = 0;
+        pidlist[i].runtime_ticks = 0;
         pidlist[i].schedules = 0;
 #endif
     }
@@ -97,7 +97,7 @@ void sched_run()
     unsigned long time = hwtimer_now();
 
     if (my_active_thread && (pidlist[my_active_thread->pid].laststart)) {
-        pidlist[my_active_thread->pid].runtime += time - pidlist[my_active_thread->pid].laststart;
+        pidlist[my_active_thread->pid].runtime_ticks += time - pidlist[my_active_thread->pid].laststart;
     }
 
 #endif
