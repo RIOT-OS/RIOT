@@ -74,6 +74,12 @@ void hwtimer_init(void);
 void hwtimer_init_comp(uint32_t fcpu);
 
 /**
+ * @brief   Get the hardware time
+ * @return  The current tick count of the hardware timer
+ */
+unsigned long hwtimer_now(void);
+
+/**
  * @brief Set a kernel timer
  * @param[in]    offset        Offset until callback invocation in timer ticks
  * @param[in]    callback    Callback function
@@ -119,12 +125,6 @@ int hwtimer_active(void);
  * @internal
  */
 void hwtimer_cpu_init(void (*handler)(int), uint32_t fcpu);
-void hwtimer_t0_disable_interrupt(void);
-void hwtimer_t0_enable_interrupt(void);
-void hwtimer_t0_set(unsigned long value, short timer);
-void hwtimer_t0_unset(short timer);
-unsigned long hwtimer_t0_now(void);
-unsigned long hwtimer_now(void);
 
 /** @} */
 #endif /* __HWTIMER_H */
