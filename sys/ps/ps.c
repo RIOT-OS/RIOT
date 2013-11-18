@@ -15,11 +15,11 @@
  * @}
  */
 
-#include <thread.h>
-#include <thread.h>
-#include <hwtimer.h>
-#include <sched.h>
 #include <stdio.h>
+
+#include "thread.h"
+#include "hwtimer.h"
+#include "sched.h"
 
 /* list of states copied from tcb.h */
 const char *state_names[] = {
