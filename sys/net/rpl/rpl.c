@@ -30,6 +30,13 @@
 
 #include "sixlowpan.h"
 
+#define ENABLE_DEBUG (0)
+#if ENABLE_DEBUG
+#undef TRICKLE_TIMER_STACKSIZE
+#define TRICKLE_TIMER_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
+#endif
+#include "debug.h"
+
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 /* global variables */
 char i_am_root = 0;
