@@ -20,15 +20,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
 #include "inttypes.h"
 #include "trickle.h"
 #include "rpl.h"
 
-//TODO in pointer umwandeln, speicher mit malloc holen
-char *timer_over_buf;
-char *interval_over_buf;
-char *dao_delay_over_buf;
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
+/* thread stacks */
+char timer_over_buf[TRICKLE_TIMER_STACKSIZE];
+char interval_over_buf[TRICKLE_INTERVAL_STACKSIZE];
+char dao_delay_over_buf[DAO_DELAY_STACKSIZE];
 char routing_table_buf[RT_STACKSIZE];
+
 int timer_over_pid;
 int interval_over_pid;
 int dao_delay_over_pid;
@@ -71,27 +76,6 @@ void reset_trickletimer(void)
 
 void init_trickle(void)
 {
-    timer_over_buf      =  calloc(TRICKLE_TIMER_STACKSIZE, sizeof(char));
-
-    if (timer_over_buf == NULL) {
-        puts("[ERROR] Could not allocate enough memory for timer_over_buf!");
-        return;
-    }
-
-    interval_over_buf   =  calloc(TRICKLE_INTERVAL_STACKSIZE, sizeof(char));
-
-    if (interval_over_buf == NULL) {
-        puts("[ERROR] Could not allocate enough memory for interval_over_buf!");
-        return;
-    }
-
-    dao_delay_over_buf  =  calloc(DAO_DELAY_STACKSIZE, sizeof(char));
-
-    if (dao_delay_over_buf == NULL) {
-        puts("[ERROR] Could not allocate enough memory for interval_over_buf!");
-        return;
-    }
-
     /* Create threads */
     ack_received = true;
     timer_over_pid = thread_create(timer_over_buf, TRICKLE_TIMER_STACKSIZE,
@@ -145,7 +129,7 @@ void trickle_timer_over(void)
     while (1) {
         thread_sleep();
 
-        /* Laut RPL Spezifikation soll k=0 wie k= Unendlich behandelt werden, also immer gesendet werden */
+        /* Handle k=0 like k=infinity (according to RFC6206, section 6.5) */
         if ((c < k) || (k == 0)) {
             send_DIO(&mcast);
         }
@@ -157,7 +141,7 @@ void trickle_interval_over(void)
     while (1) {
         thread_sleep();
         I = I * 2;
-        printf("TRICKLE new Interval %"PRIu32"\n", I);
+        DEBUG("TRICKLE new Interval %"PRIu32"\n", I);
 
         if (I == 0) {
             puts("[WARNING] Interval was 0");
