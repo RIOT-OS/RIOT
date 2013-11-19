@@ -90,7 +90,7 @@ typedef struct {
     unsigned int laststart; /*< Time stamp of the last time this thread was
                                 scheduled to run */
     unsigned int schedules; /*< How often the thread was scheduled to run */
-    unsigned int runtime;   /*< The total runtime of this thread */
+    unsigned long runtime_ticks;   /*< The total runtime of this thread in ticks */
 } schedstat;
 
 /**
