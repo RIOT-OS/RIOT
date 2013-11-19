@@ -21,7 +21,7 @@
 #define TRICKLE_TIMER_STACKSIZE 3072
 #define TRICKLE_INTERVAL_STACKSIZE 3072
 #define DAO_DELAY_STACKSIZE 3072
-#define RT_STACKSIZE 512
+#define RT_STACKSIZE 3072
 
 void reset_trickletimer(void);
 void init_trickle(void);
