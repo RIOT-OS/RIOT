@@ -972,15 +972,15 @@ int32_t destiny_socket_recvfrom(int s, void *buf, uint32_t len, int flags,
         payload = (uint8_t *)(m_recv.content.ptr + IPV6_HDR_LEN + UDP_HDR_LEN);
 
         memset(buf, 0, len);
-        memcpy(buf, payload, udp_header->length - UDP_HDR_LEN);
+        memcpy(buf, payload, NTOHS(udp_header->length) - UDP_HDR_LEN);
         memcpy(&from->sin6_addr, &ipv6_header->srcaddr, 16);
         from->sin6_family = AF_INET6;
         from->sin6_flowinfo = 0;
-        from->sin6_port = udp_header->src_port;
+        from->sin6_port = NTOHS(udp_header->src_port);
         *fromlen = sizeof(sockaddr6_t);
 
         msg_reply(&m_recv, &m_send);
-        return udp_header->length - UDP_HDR_LEN;
+        return NTOHS(udp_header->length) - UDP_HDR_LEN;
     }
     else if (is_tcp_socket(s)) {
         return destiny_socket_recv(s, buf, len, flags);
