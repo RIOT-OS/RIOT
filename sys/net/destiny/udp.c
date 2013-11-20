@@ -35,7 +35,7 @@
 uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
 {
     uint16_t sum;
-    uint16_t len = udp_header->length;
+    uint16_t len = NTOHS(udp_header->length);
 
     sum = len + IPPROTO_UDP;
     sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
