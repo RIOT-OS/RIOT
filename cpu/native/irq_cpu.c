@@ -315,6 +315,9 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     _native_sigpend++;
     //real_write(STDOUT_FILENO, "sigpend\n", 8);
 
+    native_isr_context.uc_stack.ss_sp = __isr_stack;
+    native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+    native_isr_context.uc_stack.ss_flags = 0;
     makecontext(&native_isr_context, native_irq_handler, 0);
     _native_cur_ctx = (ucontext_t *)active_thread->sp;
 
