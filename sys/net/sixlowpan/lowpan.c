@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -179,6 +180,8 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
     }
 
     /* check if packet needs to be fragmented */
+    DEBUG("sixlowpan_lowpan_sendto(%s, data, %"PRIu16"): packet_length: %"PRIu16", header_size: %"PRIu16"\n",
+            sixlowpan_mac_802154_long_addr_to_str(addr_str, dest), data_len, packet_length, header_size);
     if (packet_length + header_size > PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN) {
         uint8_t fragbuf[packet_length + header_size];
         uint8_t remaining;
