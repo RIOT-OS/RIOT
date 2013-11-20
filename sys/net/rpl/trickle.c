@@ -78,6 +78,7 @@ void init_trickle(void)
 {
     /* Create threads */
     ack_received = true;
+    dao_counter = 0;
     timer_over_pid = thread_create(timer_over_buf, TRICKLE_TIMER_STACKSIZE,
                                    PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                    trickle_timer_over, "trickle_timer_over");
