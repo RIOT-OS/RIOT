@@ -66,7 +66,7 @@ void _native_lpm_sleep()
     }
     else if (errno != EINTR) {
         /* select failed for reason other than signal */
-        err(1, "lpm_set(): select()");
+        err(EXIT_FAILURE, "lpm_set(): select()");
     }
 
     /* otherwise select was interrupted because of a signal, continue below */

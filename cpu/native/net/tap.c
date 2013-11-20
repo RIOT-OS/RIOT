@@ -246,12 +246,12 @@ int tap_init(char *name)
 #ifndef __MACH__ /* tuntap signalled IO not working in OSX */
     /* configure fds to send signals on io */
     if (fcntl(_native_tap_fd, F_SETOWN, getpid()) == -1) {
-        err(1, "tap_init(): fcntl(F_SETOWN)");
+        err(EXIT_FAILURE, "tap_init(): fcntl(F_SETOWN)");
     }
 
     /* set file access mode to nonblocking */
     if (fcntl(_native_tap_fd, F_SETFL, O_NONBLOCK|O_ASYNC) == -1) {
-        err(1, "tap_init(): fcntl(F_SETFL)");
+        err(EXIT_FAILURE, "tap_init(): fcntl(F_SETFL)");
     }
 #endif /* OSX */
 
