@@ -316,7 +316,7 @@ void send_DIO(ipv6_addr_t *destination)
 
 
     uint16_t plen = ICMPV6_HDR_LEN + DIO_BASE_LEN + opt_hdr_len;
-    rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6, NULL);
+    rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6);
     mutex_unlock(&rpl_send_mutex);
 }
 
@@ -332,7 +332,7 @@ void send_DIS(ipv6_addr_t *destination)
     rpl_send_dis_buf = get_rpl_send_dis_buf();
 
     uint16_t plen = ICMPV6_HDR_LEN + DIS_BASE_LEN;
-    rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6, NULL);
+    rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6);
     mutex_unlock(&rpl_send_mutex);
 }
 
@@ -423,7 +423,7 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
     opt_len += RPL_OPT_TRANSIT_LEN + 2;
 
     uint16_t plen = ICMPV6_HDR_LEN + DAO_BASE_LEN + opt_len;
-    rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6, NULL);
+    rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6);
     mutex_unlock(&rpl_send_mutex);
 
     if (continue_index > 1) {
@@ -454,7 +454,7 @@ void send_DAO_ACK(ipv6_addr_t *destination)
     rpl_send_dao_ack_buf->status = 0;
 
     uint16_t plen = ICMPV6_HDR_LEN + DAO_ACK_LEN;
-    rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6, NULL);
+    rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6);
     mutex_unlock(&rpl_send_mutex);
 }
 
@@ -886,8 +886,7 @@ void recv_rpl_dao_ack(void)
 
 }
 
-/* TODO: tcp_socket unused? */
-void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_t next_header, void *tcp_socket)
+void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_t next_header)
 {
     uint8_t *p_ptr;
     ipv6_send_buf = get_rpl_send_ipv6_buf();
