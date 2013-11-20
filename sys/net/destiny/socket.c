@@ -29,9 +29,11 @@
 #include "net_help.h"
 
 #include "msg_help.h"
+#ifdef DESTINY_WITH_TCP
 #include "tcp.h"
 #include "tcp_hc.h"
 #include "tcp_timer.h"
+#endif
 #include "udp.h"
 
 #include "socket.h"
@@ -42,11 +44,14 @@ socket_internal_t sockets[MAX_SOCKETS];
 
 void print_socket(socket_t *current_socket);
 void print_internal_socket(socket_internal_t *current_socket_internal);
+#ifdef DESTINY_WITH_TCP
 void printf_tcp_context(tcp_hc_context_t *current_tcp_context);
+#endif
 int exists_socket(int socket);
 void set_socket_address(sockaddr6_t *sockaddr, sa_family_t sin6_family,
                         uint16_t sin6_port, uint32_t sin6_flowinfo,
                         ipv6_addr_t *sin6_addr);
+#ifdef DESTINY_WITH_TCP
 void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port,
                     uint32_t seq_nr, uint32_t ack_nr,
                     uint8_t dataOffset_reserved, uint8_t reserved_flags,
@@ -140,6 +145,7 @@ void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
     printf_tcp_context(&tcp_socket->tcp_control.tcp_context);
 #endif
 }
+#endif
 
 void print_socket(socket_t *current_socket)
 {
@@ -221,6 +227,7 @@ bool isUDPSocket(uint8_t s)
     }
 }
 
+#ifdef DESTINY_WITH_TCP
 bool is_tcp_socket(int s)
 {
     if ((exists_socket(s)) &&
@@ -234,6 +241,7 @@ bool is_tcp_socket(int s)
         return false;
     }
 }
+#endif
 
 int bind_udp_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
 {
@@ -255,6 +263,7 @@ int bind_udp_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
     return 0;
 }
 
+#ifdef DESTINY_WITH_TCP
 int bind_tcp_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
 {
     int i;
@@ -275,6 +284,7 @@ int bind_tcp_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
     get_socket(s)->socket_values.tcp_control.rto = TCP_INITIAL_ACK_TIMEOUT;
     return 0;
 }
+#endif
 
 int destiny_socket(int domain, int type, int protocol)
 {
@@ -326,6 +336,7 @@ bool is_four_touple(socket_internal_t *current_socket, ipv6_hdr_t *ipv6_header,
             (current_socket->socket_values.foreign_address.sin6_port == tcp_header->src_port));
 }
 
+#ifdef DESTINY_WITH_TCP
 socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
 {
     uint8_t i = 1;
@@ -362,6 +373,7 @@ socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header
     /* Return either NULL if nothing was matched or the listening 2 touple socket */
     return listening_socket;
 }
+#endif
 
 uint16_t get_free_source_port(uint8_t protocol)
 {
@@ -388,6 +400,7 @@ void set_socket_address(sockaddr6_t *sockaddr, uint8_t sin6_family,
     memcpy(&sockaddr->sin6_addr, sin6_addr, 16);
 }
 
+#ifdef DESTINY_WITH_TCP
 void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port,
                     uint32_t seq_nr, uint32_t ack_nr, uint8_t dataOffset_reserved,
                     uint8_t reserved_flags, uint16_t window, uint16_t checksum,
@@ -725,10 +738,12 @@ int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags)
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
+#ifdef DESTINY_WITH_TCP
     /* Check if socket exists and is TCP socket */
     if (!is_tcp_socket(s)) {
         return -1;
     }
+#endif
 
     current_int_tcp_socket = get_socket(s);
     current_tcp_socket = &current_int_tcp_socket->socket_values;
@@ -920,11 +935,13 @@ int32_t destiny_socket_recv(int s, void *buf, uint32_t len, int flags)
     msg_t m_recv, m_send;
     socket_internal_t *current_int_tcp_socket;
 
+#ifdef DESTINY_WITH_TCP
     /* Check if socket exists */
     if (!is_tcp_socket(s)) {
         printf("INFO: NO TCP SOCKET!\n");
         return -1;
     }
+#endif
 
     current_int_tcp_socket = get_socket(s);
 
@@ -954,6 +971,7 @@ int32_t destiny_socket_recv(int s, void *buf, uint32_t len, int flags)
     /* Received Last ACK (connection closed) or no data to read yet */
     return -1;
 }
+#endif
 
 int32_t destiny_socket_recvfrom(int s, void *buf, uint32_t len, int flags,
                                 sockaddr6_t *from, uint32_t *fromlen)
@@ -982,9 +1000,11 @@ int32_t destiny_socket_recvfrom(int s, void *buf, uint32_t len, int flags,
         msg_reply(&m_recv, &m_send);
         return udp_header->length - UDP_HDR_LEN;
     }
+#ifdef DESTINY_WITH_TCP
     else if (is_tcp_socket(s)) {
         return destiny_socket_recv(s, buf, len, flags);
     }
+#endif
     else {
         printf("Socket Type not supported!\n");
         return -1;
@@ -1031,6 +1051,7 @@ int destiny_socket_close(int s)
     socket_internal_t *current_socket = get_socket(s);
 
     if (current_socket != NULL) {
+#ifdef DESTINY_WITH_TCP
         if (is_tcp_socket(s)) {
             /* Variables */
             msg_t m_recv;
@@ -1065,7 +1086,9 @@ int destiny_socket_close(int s)
             close_socket(current_socket);
             return 1;
         }
-        else if (isUDPSocket(s)) {
+        else
+#endif
+        if (isUDPSocket(s)) {
             close_socket(current_socket);
             return 0;
         }
@@ -1092,6 +1115,7 @@ int destiny_socket_bind(int s, sockaddr6_t *addr, int addrlen)
             case (PF_INET6): {
                 switch (current_socket->type) {
                         /* TCP */
+#ifdef DESTINY_WITH_TCP
                     case (SOCK_STREAM): {
                         if ((current_socket->protocol == 0) ||
                             (current_socket->protocol == IPPROTO_TCP)) {
@@ -1106,6 +1130,7 @@ int destiny_socket_bind(int s, sockaddr6_t *addr, int addrlen)
 
                         break;
                     }
+#endif
 
                     /* UDP */
                     case (SOCK_DGRAM): {
@@ -1159,6 +1184,7 @@ int destiny_socket_bind(int s, sockaddr6_t *addr, int addrlen)
     return -1;
 }
 
+#ifdef DESTINY_WITH_TCP
 int destiny_socket_listen(int s, int backlog)
 {
     if (is_tcp_socket(s) && get_socket(s)->socket_values.tcp_control.state == CLOSED) {
@@ -1362,3 +1388,4 @@ socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
 
     return current_queued_socket;
 }
+#endif

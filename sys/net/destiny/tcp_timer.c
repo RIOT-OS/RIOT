@@ -15,6 +15,7 @@
  * @}
  */
 
+#ifdef DESTINY_WITH_TCP
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -157,3 +158,4 @@ void tcp_general_timer(void)
         thread_sleep();
     }
 }
+#endif
