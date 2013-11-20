@@ -589,10 +589,10 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
     at86rf231_packet_t at86rf231_pkt;
 #endif
 
+    DEBUG("transceiver: Send packet to %" PRIu16 "\n", p.dst);
     switch (t) {
         case TRANSCEIVER_CC1100:
 #ifdef MODULE_CC110X_NG
-            DEBUG("transceiver: Send packet to %" PRIu16 "\n", p.dst);
             cc110x_pkt.length = p.length + CC1100_HEADER_LENGTH;
             cc110x_pkt.address = p.dst;
             cc110x_pkt.flags = 0;
