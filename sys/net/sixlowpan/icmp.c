@@ -759,7 +759,7 @@ void recv_rtr_adv(void)
                                                     NDP_ADDR_STATE_PREFERRED,
                                                     opt_pi_buf->val_ltime,
                                                     opt_pi_buf->pref_ltime);
-                                printf("INFO: added address to interface\n");
+                                DEBUG("INFO: added address to interface\n");
                                 trigger_ns = 1;
                             }
                         }
