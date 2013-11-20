@@ -327,6 +327,10 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
         //printf("interrupts are off, but I caught a signal.\n");
         return;
     }
+    if (_native_in_isr != 0) {
+        //real_write(STDOUT_FILENO, "interrupts in ISR!!\n", 20);
+        return;
+    }
 
     if (_native_in_syscall == 0) {
         DEBUG("\n\n\t\treturn to _native_sig_leave_tramp\n\n");
