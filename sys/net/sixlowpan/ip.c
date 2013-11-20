@@ -34,6 +34,9 @@
 #include "destiny/socket.h"
 #include "net_help.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 #define IP_PKT_RECV_BUF_SIZE        (64)
 #define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)
 
@@ -161,21 +164,21 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
 {
     switch (hdr->type) {
         case (ICMPV6_TYPE_ECHO_REQUEST): {
-            puts("INFO: packet type: icmp echo request");
+            DEBUG("INFO: packet type: icmp echo request\n");
             /* processing echo request */
             recv_echo_req();
             break;
         }
 
         case (ICMPV6_TYPE_ECHO_REPLY): {
-            puts("INFO: packet type: icmp echo reply");
+            DEBUG("INFO: packet type: icmp echo reply\n");
             /* processing echo reply */
             recv_echo_repl();
             break;
         }
 
         case (ICMPV6_TYPE_ROUTER_SOL): {
-            puts("INFO: packet type: icmp router solicitation");
+            DEBUG("INFO: packet type: icmp router solicitation\n");
             /* processing router solicitation */
             recv_rtr_sol();
             /* init solicited router advertisment*/
@@ -183,7 +186,7 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
         }
 
         case (ICMPV6_TYPE_ROUTER_ADV): {
-            puts("INFO: packet type: icmp router advertisment");
+            DEBUG("INFO: packet type: icmp router advertisment\n");
             /* processing router advertisment */
             recv_rtr_adv();
             /* init neighbor solicitation */
@@ -191,19 +194,19 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
         }
 
         case (ICMPV6_TYPE_NEIGHBOR_SOL): {
-            puts("INFO: packet type: icmp neighbor solicitation");
+            DEBUG("INFO: packet type: icmp neighbor solicitation\n");
             recv_nbr_sol();
             break;
         }
 
         case (ICMPV6_TYPE_NEIGHBOR_ADV): {
-            puts("INFO: packet type: icmp neighbor advertisment");
+            DEBUG("INFO: packet type: icmp neighbor advertisment\n");
             recv_nbr_adv();
             break;
         }
 
         case (ICMPV6_TYPE_RPL_CONTROL): {
-            puts("INFO: packet type: RPL message");
+            DEBUG("INFO: packet type: RPL message\n");
 
             if (rpl_process_pid != 0) {
                 msg_t m_send;
@@ -211,7 +214,7 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
                 msg_send(&m_send, rpl_process_pid, 1);
             }
             else {
-                puts("INFO: no RPL handler registered");
+                DEBUG("INFO: no RPL handler registered\n");
             }
 
             break;
