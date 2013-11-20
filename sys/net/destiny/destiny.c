@@ -63,7 +63,7 @@ int destiny_init_transport_layer(void)
                                        PRIORITY_MAIN, CREATE_STACKTEST,
                                        tcp_packet_handler, "tcp_packet_handler");
 
-    if (udp_thread_pid < 0) {
+    if (tcp_thread_pid < 0) {
         return -1;
     }
 
