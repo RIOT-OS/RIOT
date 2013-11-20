@@ -16,6 +16,7 @@
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  */
 #include <stdio.h>
+#include <stdlib.h>
 #ifdef __MACH__
 #define _XOPEN_SOURCE
 #endif
