@@ -28,6 +28,4 @@
 
 void tcp_general_timer(void);
 
-char tcp_timer_stack[TCP_TIMER_STACKSIZE];
-
 #endif /* TCP_TIMER_H_ */
