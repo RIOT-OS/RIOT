@@ -21,7 +21,7 @@
 #include "ipv6.h"
 #include "destiny/types.h"
 
-#define UDP_STACK_SIZE 				KERNEL_CONF_STACKSIZE_DEFAULT
+#define UDP_STACK_SIZE 				KERNEL_CONF_STACKSIZE_MAIN
 
 uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header);
 void udp_packet_handler(void);
