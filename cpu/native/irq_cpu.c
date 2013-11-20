@@ -385,8 +385,8 @@ int register_interrupt(int sig, void (*handler)(void))
 
     sa.sa_sigaction = native_isr_entry;
 
-    if (sigemptyset(&sa.sa_mask) == -1) {
-        err(EXIT_FAILURE, "register_interrupt: sigemptyset");
+    if (sigfillset(&sa.sa_mask) == -1) {
+        err(EXIT_FAILURE, "register_interrupt: sigfillset");
     }
 
     sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_ONSTACK;
@@ -417,8 +417,8 @@ int unregister_interrupt(int sig)
 
     sa.sa_handler = SIG_IGN;
 
-    if (sigemptyset(&sa.sa_mask) == -1) {
-        err(EXIT_FAILURE, "unregister_interrupt: sigemptyset");
+    if (sigfillset(&sa.sa_mask) == -1) {
+        err(EXIT_FAILURE, "unregister_interrupt: sigfillset");
     }
 
     sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_ONSTACK;
@@ -464,8 +464,8 @@ void native_interrupt_init(void)
 
     sa.sa_sigaction = native_isr_entry;
 
-    if (sigemptyset(&sa.sa_mask) == -1) {
-        err(EXIT_FAILURE, "native_interrupt_init: sigemptyset");
+    if (sigfillset(&sa.sa_mask) == -1) {
+        err(EXIT_FAILURE, "native_interrupt_init: sigfillset");
     }
 
     sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_ONSTACK;
