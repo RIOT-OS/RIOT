@@ -74,7 +74,7 @@ void print_thread_sigmask(ucontext_t *cp)
     sigset_t *p = &cp->uc_sigmask;
 
     if (sigemptyset(p) == -1) {
-        err(1, "print_thread_sigmask: sigemptyset");
+        err(EXIT_FAILURE, "print_thread_sigmask: sigemptyset");
     }
 
     for (int i = 1; i < (NSIG); i++) {
@@ -113,15 +113,15 @@ void native_print_signals()
     puts("native signals:\n");
 
     if (sigemptyset(&p) == -1) {
-        err(1, "native_print_signals: sigemptyset");
+        err(EXIT_FAILURE, "native_print_signals: sigemptyset");
     }
 
     if (sigpending(&p) == -1) {
-        err(1, "native_print_signals: sigpending");
+        err(EXIT_FAILURE, "native_print_signals: sigpending");
     }
 
     if (sigprocmask(SIG_SETMASK, NULL, &q) == -1) {
-        err(1, "native_print_signals(): sigprocmask");
+        err(EXIT_FAILURE, "native_print_signals(): sigprocmask");
     }
 
     for (int i = 1; i < (NSIG); i++) {
@@ -158,21 +158,21 @@ unsigned disableIRQ(void)
     }
 
     if (sigfillset(&mask) == -1) {
-        err(1, "disableIRQ(): sigfillset");
+        err(EXIT_FAILURE, "disableIRQ(): sigfillset");
     }
 
     if (native_interrupts_enabled == 1) {
         DEBUG("sigprocmask(..native_sig_set)\n");
 
         if (sigprocmask(SIG_SETMASK, &mask, &native_sig_set) == -1) {
-            err(1, "disableIRQ(): sigprocmask");
+            err(EXIT_FAILURE, "disableIRQ(): sigprocmask");
         }
     }
     else {
         DEBUG("sigprocmask()\n");
 
         if (sigprocmask(SIG_SETMASK, &mask, NULL) == -1) {
-            err(1, "disableIRQ(): sigprocmask()");
+            err(EXIT_FAILURE, "disableIRQ(): sigprocmask()");
         }
     }
 
@@ -200,7 +200,7 @@ unsigned enableIRQ(void)
     }
 
     if (sigprocmask(SIG_SETMASK, &native_sig_set, NULL) == -1) {
-        err(1, "enableIRQ(): sigprocmask()");
+        err(EXIT_FAILURE, "enableIRQ(): sigprocmask()");
     }
 
     prev_state = native_interrupts_enabled;
@@ -257,7 +257,7 @@ int _native_popsig(void)
     }
 
     if (nread == -1) {
-        err(1, "_native_popsig(): real_read()");
+        err(EXIT_FAILURE, "_native_popsig(): real_read()");
     }
 
     return sig;
@@ -310,7 +310,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
 
     /* save the signal */
     if (real_write(_sig_pipefd[1], &sig, sizeof(int)) == -1) {
-        err(1, "native_isr_entry(): real_write()");
+        err(EXIT_FAILURE, "native_isr_entry(): real_write()");
     }
     _native_sigpend++;
     //real_write(STDOUT_FILENO, "sigpend\n", 8);
@@ -374,7 +374,7 @@ int register_interrupt(int sig, void (*handler)(void))
     DEBUG("XXX: register_interrupt()\n");
 
     if (sigdelset(&native_sig_set, sig)) {
-        err(1, "register_interrupt: sigdelset");
+        err(EXIT_FAILURE, "register_interrupt: sigdelset");
     }
 
     native_irq_handlers[sig].func = handler;
@@ -382,13 +382,13 @@ int register_interrupt(int sig, void (*handler)(void))
     sa.sa_sigaction = native_isr_entry;
 
     if (sigemptyset(&sa.sa_mask) == -1) {
-        err(1, "register_interrupt: sigemptyset");
+        err(EXIT_FAILURE, "register_interrupt: sigemptyset");
     }
 
     sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_ONSTACK;
 
     if (sigaction(sig, &sa, NULL)) {
-        err(1, "register_interrupt: sigaction");
+        err(EXIT_FAILURE, "register_interrupt: sigaction");
     }
 
     return 0;
@@ -406,7 +406,7 @@ int unregister_interrupt(int sig)
     DEBUG("XXX: unregister_interrupt()\n");
 
     if (sigaddset(&native_sig_set, sig) == -1) {
-        err(1, "unregister_interrupt: sigaddset");
+        err(EXIT_FAILURE, "unregister_interrupt: sigaddset");
     }
 
     native_irq_handlers[sig].func = NULL;
@@ -414,13 +414,13 @@ int unregister_interrupt(int sig)
     sa.sa_handler = SIG_IGN;
 
     if (sigemptyset(&sa.sa_mask) == -1) {
-        err(1, "unregister_interrupt: sigemptyset");
+        err(EXIT_FAILURE, "unregister_interrupt: sigemptyset");
     }
 
     sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_ONSTACK;
 
     if (sigaction(sig, &sa, NULL)) {
-        err(1, "unregister_interrupt: sigaction");
+        err(EXIT_FAILURE, "unregister_interrupt: sigaction");
     }
 
     return 0;
@@ -461,34 +461,34 @@ void native_interrupt_init(void)
     sa.sa_sigaction = native_isr_entry;
 
     if (sigemptyset(&sa.sa_mask) == -1) {
-        err(1, "native_interrupt_init: sigemptyset");
+        err(EXIT_FAILURE, "native_interrupt_init: sigemptyset");
     }
 
     sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_ONSTACK;
 
     /*
     if (sigemptyset(&native_sig_set) == -1) {
-        err(1, "native_interrupt_init: sigemptyset");
+        err(EXIT_FAILURE, "native_interrupt_init: sigemptyset");
     }
     */
     if (sigprocmask(SIG_SETMASK, NULL, &native_sig_set) == -1) {
-        err(1, "native_interrupt_init(): sigprocmask");
+        err(EXIT_FAILURE, "native_interrupt_init(): sigprocmask");
     }
 
     if (sigdelset(&native_sig_set, SIGUSR1) == -1) {
-        err(1, "native_interrupt_init: sigdelset");
+        err(EXIT_FAILURE, "native_interrupt_init: sigdelset");
     }
 
     if (sigaction(SIGUSR1, &sa, NULL)) {
-        err(1, "native_interrupt_init: sigaction");
+        err(EXIT_FAILURE, "native_interrupt_init: sigaction");
     }
 
     if (getcontext(&native_isr_context) == -1) {
-        err(1, "native_isr_entry(): getcontext()");
+        err(EXIT_FAILURE, "native_isr_entry(): getcontext()");
     }
 
     if (sigfillset(&(native_isr_context.uc_sigmask)) == -1) {
-        err(1, "native_isr_entry(): sigfillset()");
+        err(EXIT_FAILURE, "native_isr_entry(): sigfillset()");
     }
 
     native_isr_context.uc_stack.ss_sp = __isr_stack;
@@ -502,7 +502,7 @@ void native_interrupt_init(void)
     sigstk.ss_flags = 0;
 
     if (sigaltstack(&sigstk, NULL) < 0) {
-        err(1, "main: sigaltstack");
+        err(EXIT_FAILURE, "main: sigaltstack");
     }
 
     makecontext(&native_isr_context, native_irq_handler, 0);
@@ -510,7 +510,7 @@ void native_interrupt_init(void)
     _native_in_syscall = 0;
 
     if (pipe(_sig_pipefd) == -1) {
-        err(1, "native_interrupt_init(): pipe()");
+        err(EXIT_FAILURE, "native_interrupt_init(): pipe()");
     }
 
     /* allow for ctrl+c to shut down gracefully */

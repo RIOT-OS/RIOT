@@ -30,6 +30,7 @@
 #include <sys/time.h>
 #include <signal.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <err.h>
 
 #include "hwtimer.h"
@@ -118,7 +119,7 @@ void schedule_timer(void)
      * are set at all */
     if (native_hwtimer_isset[next_timer] == 1) {
         if (setitimer(ITIMER_REAL, &native_hwtimer[next_timer], NULL) == -1) {
-            err(1, "schedule_timer");
+            err(EXIT_FAILURE, "schedule_timer");
         }
         else {
             DEBUG("schedule_timer(): set next timer.\n");
@@ -237,7 +238,7 @@ unsigned long hwtimer_arch_now(void)
 #else
 
     if (clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
-        err(1, "hwtimer_arch_now: clock_gettime");
+        err(EXIT_FAILURE, "hwtimer_arch_now: clock_gettime");
     }
 
 #endif
