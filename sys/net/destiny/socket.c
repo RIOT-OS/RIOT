@@ -1013,8 +1013,10 @@ int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
         current_udp_packet->length = HTONS(UDP_HDR_LEN + len);
         temp_ipv6_header->length = UDP_HDR_LEN + len;
 
-        current_udp_packet->checksum = ~udp_csum(temp_ipv6_header,
-                                       current_udp_packet);
+        current_udp_packet->checksum = ~ipv6_csum(temp_ipv6_header,
+                                                   (uint8_t*) current_udp_packet,
+                                                   UDP_HDR_LEN + len,
+                                                   IPPROTO_UDP);
 
         ipv6_sendto(&to->sin6_addr, IPPROTO_UDP,
                     (uint8_t *)(current_udp_packet),
