@@ -34,7 +34,7 @@
 #define END_ESC     (0xDC)
 #define ESC_ESC     (0xDD)
 
-void demultiplex(border_packet_t *packet, int len)
+void demultiplex(border_packet_t *packet)
 {
     switch (packet->type) {
         case (BORDER_PACKET_RAW_TYPE): {
