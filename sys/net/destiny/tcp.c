@@ -76,6 +76,8 @@ uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
 uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                        socket_internal_t *tcp_socket, uint8_t *payload)
 {
+    (void) tcp_header;
+
     msg_t m_send_tcp, m_recv_tcp;
     uint8_t tcp_payload_len = ipv6_header->length - TCP_HDR_LEN;
     uint8_t acknowledged_bytes = 0;
@@ -145,6 +147,10 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 void handle_tcp_rst_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                            socket_internal_t *tcp_socket)
 {
+    (void) ipv6_header;
+    (void) tcp_header;
+    (void) tcp_socket;
+
     /* TODO: Reset connection */
 }
 
@@ -180,6 +186,8 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 void handle_tcp_syn_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                                socket_internal_t *tcp_socket)
 {
+    (void) ipv6_header;
+
     msg_t m_send_tcp;
 
     if (tcp_socket->socket_values.tcp_control.state == SYN_SENT) {
@@ -194,6 +202,8 @@ void handle_tcp_syn_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                            socket_internal_t *tcp_socket)
 {
+    (void) ipv6_header;
+
     msg_t m_send;
     socket_t *current_tcp_socket = &tcp_socket->socket_values;
     uint8_t send_buffer[BUFFER_SIZE];
@@ -225,6 +235,8 @@ void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                                socket_internal_t *tcp_socket)
 {
+    (void) ipv6_header;
+
     msg_t m_send;
     socket_t *current_tcp_socket = &tcp_socket->socket_values;
     uint8_t send_buffer[BUFFER_SIZE];

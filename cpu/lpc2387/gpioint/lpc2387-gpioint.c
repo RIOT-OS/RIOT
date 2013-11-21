@@ -116,6 +116,8 @@ gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
 /*---------------------------------------------------------------------------*/
 static void __attribute__((__no_instrument_function__)) test_irq(int port, unsigned long f_mask, unsigned long r_mask, struct irq_callback_t *pcb)
 {
+    (void) port;
+
     /* Test each bit of rising and falling masks, if set trigger interrupt
      * on corresponding device */
     do {
