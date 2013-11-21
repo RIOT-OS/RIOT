@@ -742,6 +742,7 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
     for (i = 0; i < SIXLOWPAN_MAX_REGISTERED; i++) {
         if (sixlowpan_reg[i]) {
             msg_t m_send;
+            m_send.type = LOWPAN_FRAME_RECEIVED;;
             current_frame.length = length;
             current_frame.data = data;
             m_send.content.ptr = (char *) &current_frame;
