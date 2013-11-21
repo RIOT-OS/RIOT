@@ -18,6 +18,7 @@ License. See the file LICENSE in the top level directory for more details.
  * @{
  */
 #define KERNEL_CONF_STACKSIZE_PRINTF    (256)
+#define KERNEL_CONF_STACKSIZE_PRINTF_FLOAT (KERNEL_CONF_STACKSIZE_PRINTF)
 
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
 #define KERNEL_CONF_STACKSIZE_DEFAULT	(256)

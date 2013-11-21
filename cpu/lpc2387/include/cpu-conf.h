@@ -53,7 +53,8 @@ License. See the file LICENSE in the top level directory for more details.
  * @name Kernel configuration
  * @{
  */
-#define KERNEL_CONF_STACKSIZE_PRINTF    (4096)
+#define KERNEL_CONF_STACKSIZE_PRINTF_FLOAT  (4096)
+#define KERNEL_CONF_STACKSIZE_PRINTF        (2048)
 
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
 #define KERNEL_CONF_STACKSIZE_DEFAULT	(512)

@@ -19,9 +19,10 @@
 
 /* TODO: tighten stack sizes */
 #ifdef __MACH__ /* OSX */
-#define KERNEL_CONF_STACKSIZE_DEFAULT   (163840)
-#define KERNEL_CONF_STACKSIZE_IDLE      (163840)
-#define KERNEL_CONF_STACKSIZE_PRINTF    (163840)
+#define KERNEL_CONF_STACKSIZE_DEFAULT       (163840)
+#define KERNEL_CONF_STACKSIZE_IDLE          (163840)
+#define KERNEL_CONF_STACKSIZE_PRINTF        (163840)
+#define KERNEL_CONF_STACKSIZE_PRINTF_FLOAT  (163840)
 /* for core/include/thread.h */
 #define MINIMUM_STACK_SIZE              (163840)
 /* undefine the TRANSCEIVER_STACK_SIZE (2048 or 512) defined in transceiver.h */
@@ -34,9 +35,10 @@
 #define NATIVE_ISR_STACKSIZE            (163840)
 
 #else /* Linux etc. */
-#define KERNEL_CONF_STACKSIZE_DEFAULT	(8192)
-#define KERNEL_CONF_STACKSIZE_IDLE      (8192)
-#define KERNEL_CONF_STACKSIZE_PRINTF    (8192)
+#define KERNEL_CONF_STACKSIZE_DEFAULT       (8192)
+#define KERNEL_CONF_STACKSIZE_IDLE          (8192)
+#define KERNEL_CONF_STACKSIZE_PRINTF        (8192)
+#define KERNEL_CONF_STACKSIZE_PRINTF_FLOAT  (8192)
 /* for core/include/thread.h */
 #define MINIMUM_STACK_SIZE              (8192)
 /* undefine the TRANSCEIVER_STACK_SIZE (2048 or 512) defined in transceiver.h */
