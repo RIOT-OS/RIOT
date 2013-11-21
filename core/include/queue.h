@@ -9,7 +9,6 @@
 #ifndef __QUEUE_H
 #define __QUEUE_H
 
-#include <stdlib.h>
 #include <stdint.h>
 #include <inttypes.h>
 
