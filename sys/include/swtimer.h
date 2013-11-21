@@ -17,15 +17,13 @@
 
 #ifndef __SWTIMER_H__
 #define __SWTIMER_H__
-#warning Swtimers are deprecated. use virtual timers (vtimer) instead.
 
 #include <stdint.h>
 
 #define MSG_TIMER 12345
 
 #define SWTIMER_WAKEUP 0
-#define SWTIMER_CALLBACK 1
-#define SWTIMER_MSG 2
+#define SWTIMER_MSG 1
 
 #undef wakeup
 
@@ -41,19 +39,15 @@ typedef uint32_t swtime_t;
  */
 typedef struct swtimer_t {
     swtime_t start;
-	swtime_t interval;
+    swtime_t interval;
 
     struct swtimer_t *next;
 
     int action_type;
     union {
-        struct { 
+        struct {
             int pid;
         } wakeup;
-        struct {
-            void (*f)(void*);
-            void *ptr;
-        } callback;
         struct {
             unsigned int value;
             int target_pid;
@@ -124,15 +118,6 @@ int swtimer_set_msg(swtimer_t *t, swtime_t interval, int pid, void *ptr);
  * @return      0 on success, < 0 on error
  */
 int swtimer_set_wakeup(swtimer_t *t, swtime_t interval, int pid);
-
-/**
- * @brief   set a swtimer with callback function event handler 
- * @param[in]   t           pointer to preinitialised swtimer_t
- * @param[in]   interval    swtimer interval
- * @param[in]   f_ptr       pointer to callback function
- * @return      0 on success, < 0 on error
- */
-int swtimer_set_cb(swtimer_t *t, swtime_t interval, void (*f_ptr)(void *), void *ptr);
 
 /**
  * @brief   remove a swtimer
