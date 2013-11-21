@@ -26,6 +26,14 @@
 #include "sixlowpan/types.h"
 
 /**
+ * @brief   Data type to configure usage of 6LoWPAN
+ */
+typedef enum __attribute__((packed)) {
+    IPV6_6LOWPAN_DISABLE = 0,   ///< 6LoWPAN disabled
+    IPV6_6LOWPAN_ENABLE = 1,    ///< 6LoWPAN enabled
+} ipv6_6lowpan_status_t; 
+
+/**
  * @brief   IPv6 maximum transmission unit.
  */
 #define IPV6_MTU                (256)
@@ -59,6 +67,20 @@
  * @brief   L4 protocol number for IPv6 destination options.
  */
 #define IPV6_PROTO_NUM_IPV6_OPTS    (60)
+
+/**
+ * @brief   Disable or enable 6LoWPAN compression layer (enabled by default).
+ *
+ * @param[in] status    Status to set 6LoWPAN compression layer to.
+ */
+void ipv6_set_6lowpan_status(ipv6_6lowpan_status_t status);
+
+/**
+ * @brief   Get current status of the 6LoWPAN compression layer.
+ *
+ * @return  Status of the 6LoWPAN compression layer.
+ */
+ipv6_6lowpan_status_t ipv6_get_6lowpan_status(void);
 
 /**
  * @brief   Get IPv6 send/receive buffer.

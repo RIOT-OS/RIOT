@@ -40,6 +40,8 @@
 #define IP_PKT_RECV_BUF_SIZE        (64)
 #define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)
 
+static ipv6_6lowpan_status_t sixlowpan_enabled = IPV6_6LOWPAN_ENABLE;
+
 uint8_t ip_send_buffer[BUFFER_SIZE];
 uint8_t buffer[BUFFER_SIZE];
 msg_t msg_queue[IP_PKT_RECV_BUF_SIZE];
@@ -55,6 +57,14 @@ ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t*) = 0;
 
 /* registered upper layer threads */
 int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
+
+void ipv6_set_6lowpan_status(ipv6_6lowpan_status_t status) {
+    sixlowpan_enabled = status;
+}
+
+ipv6_6lowpan_status_t ipv6_get_6lowpan_status(void) {
+    return IPV6_6LOWPAN_ENABLE;    
+}
 
 void ipv6_send_bytes(ipv6_hdr_t *bytes)
 {
