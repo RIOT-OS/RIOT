@@ -59,7 +59,7 @@ void udp_packet_handler(void)
         chksum = udp_csum(ipv6_header, udp_header);
 
         if (chksum == 0xffff) {
-            udp_socket = get_udp_socket(ipv6_header, udp_header);
+            udp_socket = get_udp_socket(udp_header);
 
             if (udp_socket != NULL) {
                 m_send_udp.content.ptr = (char *)ipv6_header;
