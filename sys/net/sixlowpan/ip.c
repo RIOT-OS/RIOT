@@ -22,6 +22,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include "transceiver.h"
 #include "vtimer.h"
 #include "mutex.h"
 #include "msg.h"
@@ -66,6 +67,16 @@ ipv6_6lowpan_status_t ipv6_get_6lowpan_status(void) {
     return IPV6_6LOWPAN_ENABLE;    
 }
 
+/**
+ * @brief   Send IPv6 packets directly over the transceiver (with no 6LoWPAN
+ *          or IEEE 802.15.4 in between).
+ *
+ * @param[in] bytes An IPv6 packet
+ */
+void ipv6_send_bytes_directly(ipv6_hdr_t *bytes, uint16_t packet_length) {
+
+}
+
 void ipv6_send_bytes(ipv6_hdr_t *bytes)
 {
     uint16_t offset = IPV6_HDR_LEN + HTONS(bytes->length);
@@ -76,9 +87,14 @@ void ipv6_send_bytes(ipv6_hdr_t *bytes)
     memset(bytes, 0, BUFFER_SIZE);
     memcpy(bytes + LL_HDR_LEN, bytes, offset);
 
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &bytes->destaddr.uint16[4],
-                            (uint8_t *)bytes,
-                            offset);
+    if (sixlowpan_enable) {
+        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &bytes->destaddr.uint16[4],
+                                (uint8_t *)bytes,
+                                offset);
+    }
+    else {
+        ipv6_send_bytes_directly(bytes, offset);
+    }
 }
 
 ipv6_hdr_t *ipv6_get_buf_send(void)
@@ -147,8 +163,13 @@ void ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
         return;
     }
 
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &dest->uint16[4],
-                            (uint8_t *)ipv6_buf, packet_length);
+    if (sixlowpan_enable) {
+        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &dest->uint16[4],
+                                (uint8_t *)ipv6_buf, packet_length);
+    }
+    else {
+        ipv6_send_bytes_directly(ipv6_buf, packet_length);
+    }
 }
 
 /* Register an upper layer thread */
@@ -305,9 +326,14 @@ void ipv6_process(void)
             /* copy received packet to send buffer */
             memcpy(ipv6_get_buf_send(), ipv6_get_buf(), packet_length);
             /* send packet to node ID derived from dest IP */
-            sixlowpan_lowpan_sendto((ieee_802154_long_t *) &dest->uint16[4],
-                                    (uint8_t *)ipv6_get_buf_send(),
-                                    packet_length);
+            if (sixlowpan_enable) {
+                sixlowpan_lowpan_sendto((ieee_802154_long_t *) &dest->uint16[4],
+                                        (uint8_t *)ipv6_get_buf_send(),
+                                        packet_length);
+            }
+            else {
+                ipv6_send_bytes_directly(ipv6_get_buf_send(), packet_length);
+            }
         }
         /* destination is our address */
         else {
