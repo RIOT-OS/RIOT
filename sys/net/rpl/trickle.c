@@ -39,6 +39,19 @@ int interval_over_pid;
 int dao_delay_over_pid;
 int rt_timer_over_pid;
 
+
+char tvo_delay_over_buf[TVO_DELAY_STACKSIZE]; // trail
+int tvo_delay_over_pid; // trail
+bool tvo_auto_send = false; // trail
+timex_t tvo_time; // trail
+vtimer_t tvo_timer; // trail
+uint32_t tvo_resend_seconds; // trail
+uint32_t tvo_resend_micro; // trail: random micro delay
+bool tvo_ack_received; // trail
+//uint8_t tvo_counter; // trail
+struct rpl_tvo_local_t * tvo_resend; //trail
+
+
 bool ack_received;
 uint8_t dao_counter;
 
@@ -86,12 +99,19 @@ void init_trickle(void)
     interval_over_pid = thread_create(interval_over_buf, TRICKLE_INTERVAL_STACKSIZE,
                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                       trickle_interval_over, "trickle_interval_over");
-    dao_delay_over_pid = thread_create(dao_delay_over_buf, DAO_DELAY_STACKSIZE,
-                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                       dao_delay_over, "dao_delay_over");
+   // dao_delay_over_pid = thread_create(dao_delay_over_buf, DAO_DELAY_STACKSIZE,
+     //                                  PRIORITY_MAIN - 1, CREATE_STACKTEST,
+      //                                 dao_delay_over, "dao_delay_over");
     rt_timer_over_pid = thread_create(routing_table_buf, RT_STACKSIZE,
                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                       rt_timer_over, "rt_timer_over");
+
+    //trail
+    tvo_ack_received = true;
+    tvo_delay_over_pid = thread_create(tvo_delay_over_buf, TVO_DELAY_STACKSIZE,
+                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                       tvo_delay_over, "tvo_delay_over");
+
 }
 
 void start_trickle(uint8_t DIOIntMin, uint8_t DIOIntDoubl,
@@ -143,6 +163,7 @@ void trickle_interval_over(void)
         thread_sleep();
         I = I * 2;
         DEBUG("TRICKLE new Interval %"PRIu32"\n", I);
+        printf("Setting new TRICKLE interval to %"PRIu32" ms\n", I);
 
         if (I == 0) {
             puts("[WARNING] Interval was 0");
@@ -175,6 +196,60 @@ void trickle_interval_over(void)
         }
     }
 
+}
+
+
+//trail
+void tvo_delay_over(void){
+
+        while(1){
+
+                thread_sleep();
+
+                //if((tvo_ack_received == false) && (tvo_counter < TVO_SEND_RETRIES)){
+         //       if(tvo_counter < TVO_SEND_RETRIES){
+ //                       tvo_counter++;
+                        rpl_dodag_t * mydodag = rpl_get_my_dodag();
+
+/*
+                        struct rpl_tvo_t tvo;
+                        //rpl_tvo_init(&tvo);
+
+                        memcpy(&tvo, tvo_resend, sizeof(tvo));
+
+                        //printf("\n(checking trickle) tvo_nonce: %u, tvo_rank: %u, resend_nonce: %u, resend_rank: %u \n\n", tvo.nonce, tvo.rank, tvo_resend->nonce, tvo_resend->rank);
+
+                        printf("*RE*");
+                        send_TVO(&(tvo_resend->dst_addr), &tvo, NULL);
+*/
+                        resend_tvos();
+                        tvo_time = timex_set(tvo_resend_seconds, tvo_resend_micro);
+                        vtimer_remove(&tvo_timer);
+                        vtimer_set_wakeup(&tvo_timer, tvo_time, tvo_delay_over_pid);
+    //            }
+        //        else if (tvo_ack_received == false){
+        //                long_delay_tvo();
+        //        }
+        }
+}
+
+//trail
+void delay_tvo(uint32_t seconds){
+
+	//delay tvos differently: reduce risk of collisions by neighbors
+	timex_t now;
+	vtimer_now(&now);
+	srand(now.microseconds);
+	uint32_t random = rand() % 1000000;
+
+	printf("setting new TVO delay to %u seconds and %u ms\n",seconds, (random/1000));
+	tvo_time = timex_set(seconds,random);
+    tvo_resend_seconds = seconds;
+    tvo_resend_micro = random;
+//    tvo_counter = 0;
+    tvo_ack_received = false;
+    vtimer_remove(&tvo_timer);
+    vtimer_set_wakeup(&tvo_timer, tvo_time, tvo_delay_over_pid);
 }
 
 void delay_dao(void)

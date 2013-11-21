@@ -37,6 +37,21 @@ void send_DIO(ipv6_addr_t *destination);
 void send_DIS(ipv6_addr_t *destination);
 void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index);
 void send_DAO_ACK(ipv6_addr_t *destination);
+
+void send_TVO(ipv6_addr_t *destination, struct rpl_tvo_t * tvo,  rpl_tvo_signature_t * signature); //trail
+void send_TVO_ACK(ipv6_addr_t *destination, uint8_t sequence_number); //trail
+void recv_rpl_tvo(void); //trail
+void recv_rpl_tvo_ack(void); // trail
+void enable_tvo_auto_send(void); //trail
+void rpl_tvo_sign_data(void); //trail
+void forward_rpl_tvo(ipv6_addr_t *destination); //trail
+uint32_t global_zero_timestamp; //trail
+void join_dodag(rpl_dodag_t * dio_dodag, ipv6_addr_t * src_addr, uint16_t parent_rank, uint8_t parent_dtsn); // trail
+uint8_t include_parent_into_trail_buffer(void); //trail
+uint8_t get_parent_from_trail_buffer(ipv6_addr_t * src_addr); // trail
+uint8_t is_parent_verified(ipv6_addr_t * src_addr, uint16_t dio_rank); //trail
+
+
 void rpl_process(void);
 void recv_rpl_dio(void);
 void recv_rpl_dis(void);

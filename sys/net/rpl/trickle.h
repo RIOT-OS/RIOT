@@ -23,6 +23,10 @@
 #define DAO_DELAY_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
 #define RT_STACKSIZE (KERNEL_CONF_STACKSIZE_DEFAULT)
 
+#define TVO_DELAY_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN) //trail
+void tvo_delay_over(void); // trail
+void delay_tvo(uint32_t seconds); //trail
+
 void reset_trickletimer(void);
 void init_trickle(void);
 void start_trickle(uint8_t DIOINtMin, uint8_t DIOIntDoubl, uint8_t DIORedundancyConstatnt);
