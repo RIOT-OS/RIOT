@@ -43,7 +43,7 @@ void thread_print_all(void)
     int i;
     int overall_stacksz = 0;
 
-    printf("\tpid | %-21s| %-9sQ | pri | stack ( used) location   | runtime | switches \n", "name", "state");
+    printf("\tpid | %-21s| %-9sQ | pri | stack ( used) location  | runtime | switches \n", "name", "state");
 
     for (i = 0; i < MAXTHREADS; i++) {
         tcb_t *p = (tcb_t *)sched_threads[i];
