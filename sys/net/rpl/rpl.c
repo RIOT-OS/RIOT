@@ -623,22 +623,18 @@ void recv_rpl_dio(void)
         if (!has_dodag_conf_opt) {
             DEBUG("send DIS\n");
             send_DIS(&ipv6_buf->srcaddr);
-            return;
         }
 
         if (rpl_dio_buf->rank < ROOT_RANK) {
             DEBUG("DIO with Rank < ROOT_RANK\n");
-            return;
         }
 
         if (dio_dodag.mop != RPL_DEFAULT_MOP) {
             DEBUG("Required MOP not supported\n");
-            return;
         }
 
         if (dio_dodag.of == NULL) {
             DEBUG("Required objective function not supported\n");
-            return;
         }
 
         if (rpl_dio_buf->rank != INFINITE_RANK) {
@@ -647,8 +643,8 @@ void recv_rpl_dio(void)
         }
         else {
             DEBUG("Cannot access DODAG because of DIO with infinite rank\n");
-            return;
         }
+        return;
     }
 
     if (rpl_equal_id(&my_dodag->dodag_id, &dio_dodag.dodag_id)) {
