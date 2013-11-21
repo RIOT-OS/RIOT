@@ -76,8 +76,7 @@ socket_internal_t *get_waiting_connection_socket(int socket,
         tcp_hdr_t *tcp_header);
 void close_socket(socket_internal_t *current_socket);
 socket_internal_t *get_socket(int s);
-socket_internal_t *get_udp_socket(ipv6_hdr_t *ipv6_header,
-                                  udp_hdr_t *udp_header);
+socket_internal_t *get_udp_socket(udp_hdr_t *udp_header);
 socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header,
                                   tcp_hdr_t *tcp_header);
 socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,

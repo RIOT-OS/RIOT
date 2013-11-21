@@ -298,7 +298,7 @@ int destiny_socket(int domain, int type, int protocol)
     }
 }
 
-socket_internal_t *get_udp_socket(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
+socket_internal_t *get_udp_socket(udp_hdr_t *udp_header)
 {
     uint8_t i = 1;
 
