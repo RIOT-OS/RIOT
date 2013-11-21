@@ -304,7 +304,7 @@ void vtimer_print(vtimer_t *t)
 {
     printf("Seconds: %"PRIu32" - Microseconds: %"PRIu32"\n \
             action: %p\n \
-            action: %p\n \
+            arg: %p\n \
             pid: %u\n",
            t->absolute.seconds, t->absolute.microseconds,
            t->action,
