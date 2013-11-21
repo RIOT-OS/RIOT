@@ -519,6 +519,8 @@ void set_tcp_cb(tcp_cb_t *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd,
 
 int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 {
+    (void) addrlen;
+
     /* Variables */
     ipv6_addr_t src_addr;
     socket_internal_t *current_int_tcp_socket;
@@ -715,9 +717,12 @@ void calculate_rto(tcp_cb_t *tcp_control, long current_time)
 
 int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags)
 {
+    (void) flags;
+
     /* Variables */
     msg_t recv_msg;
-    int32_t sent_bytes = 0, total_sent_bytes = 0;
+    int32_t sent_bytes = 0;
+    uint32_t total_sent_bytes = 0;
     socket_internal_t *current_int_tcp_socket;
     socket_t *current_tcp_socket;
     uint8_t send_buffer[BUFFER_SIZE];
@@ -915,6 +920,8 @@ uint8_t read_from_socket(socket_internal_t *current_int_tcp_socket,
 
 int32_t destiny_socket_recv(int s, void *buf, uint32_t len, int flags)
 {
+    (void) flags;
+
     /* Variables */
     uint8_t read_bytes;
     msg_t m_recv, m_send;
@@ -958,6 +965,8 @@ int32_t destiny_socket_recv(int s, void *buf, uint32_t len, int flags)
 int32_t destiny_socket_recvfrom(int s, void *buf, uint32_t len, int flags,
                                 sockaddr6_t *from, uint32_t *fromlen)
 {
+    (void) flags;
+
     if (isUDPSocket(s)) {
         msg_t m_recv, m_send;
         ipv6_hdr_t *ipv6_header;
@@ -994,6 +1003,9 @@ int32_t destiny_socket_recvfrom(int s, void *buf, uint32_t len, int flags,
 int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
                               sockaddr6_t *to, uint32_t tolen)
 {
+    (void) flags;
+    (void) tolen;
+
     if (isUDPSocket(s) &&
         (get_socket(s)->socket_values.foreign_address.sin6_port == 0)) {
         uint8_t send_buffer[BUFFER_SIZE];
@@ -1161,6 +1173,8 @@ int destiny_socket_bind(int s, sockaddr6_t *addr, int addrlen)
 
 int destiny_socket_listen(int s, int backlog)
 {
+    (void) backlog;
+
     if (is_tcp_socket(s) && get_socket(s)->socket_values.tcp_control.state == CLOSED) {
         socket_internal_t *current_socket = get_socket(s);
         current_socket->socket_values.tcp_control.state = LISTEN;
@@ -1204,6 +1218,8 @@ socket_internal_t *get_waiting_connection_socket(int socket,
 int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
                               socket_internal_t *server_socket, uint8_t pid)
 {
+    (void) pid;
+
     msg_t msg_recv_client_ack, msg_send_client_ack;
     socket_t *current_queued_socket = &current_queued_int_socket->socket_values;
     uint8_t send_buffer[BUFFER_SIZE];
@@ -1289,6 +1305,9 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
 
 int destiny_socket_accept(int s, sockaddr6_t *addr, uint32_t *addrlen)
 {
+    (void) addr;
+    (void) addrlen;
+
     socket_internal_t *server_socket = get_socket(s);
 
     if (is_tcp_socket(s) && (server_socket->socket_values.tcp_control.state == LISTEN)) {

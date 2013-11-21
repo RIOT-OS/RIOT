@@ -903,6 +903,8 @@ static int16_t set_address(transceiver_type_t t, void *address)
  */
 static void set_monitor(transceiver_type_t t, void *mode)
 {
+    (void) mode;
+
     switch(t) {
 #ifdef MODULE_CC110X_NG
         case TRANSCEIVER_CC1100:
@@ -931,6 +933,8 @@ static void set_monitor(transceiver_type_t t, void *mode)
 #ifdef MODULE_CC110X
 void cc1100_packet_monitor(void *payload, int payload_size, protocol_t protocol, packet_info_t *packet_info)
 {
+    (void) protocol;
+
     cc1100_payload = payload;
     cc1100_payload_size = payload_size - 3;
     cc1100_packet_info = packet_info;

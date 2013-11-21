@@ -125,13 +125,13 @@ void vtimer_callback(void *ptr)
     DEBUG("vtimer_callback(): Shooting %" PRIu32 ".\n", timer->absolute.microseconds);
 
     /* shoot timer */
-    if (timer->action == (void *) msg_send_int) {
+    if (timer->action == (void (*)(void *)) msg_send_int) {
         msg_t msg;
         msg.type = MSG_TIMER;
         msg.content.value = (unsigned int) timer->arg;
         msg_send_int(&msg, timer->pid);
     }
-    else if (timer->action == (void*) thread_wakeup){
+    else if (timer->action == (void (*)(void *)) thread_wakeup){
         timer->action(timer->arg);
     }
     else {
