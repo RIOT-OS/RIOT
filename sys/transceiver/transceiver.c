@@ -129,7 +129,11 @@ static void powerdown(transceiver_type_t t);
 static void switch_to_rx(transceiver_type_t t);
 
 #ifdef DBG_IGNORE
-static void ignore_add(transceiver_type_t t, void *address);
+static int16_t ignore_add(transceiver_type_t t, void *address);
+
+#define MAX_IGNORED_ADDR     (10)
+
+radio_address_t ignored_addr[MAX_IGNORED_ADDR];
 #endif
 
 /*------------------------------------------------------------------------------------*/
@@ -146,6 +150,9 @@ void transceiver_init(transceiver_type_t t)
     /* Initializing transceiver buffer and data buffer */
     memset(transceiver_buffer, 0, TRANSCEIVER_BUFFER_SIZE * sizeof(radio_packet_t));
     memset(data_buffer, 0, TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE);
+#ifdef DBG_IGNORE
+    memset(ignored_addr, 0, MAX_IGNORED_ADDR * sizeof(radio_address_t));
+#endif
 
     for (i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
         reg[i].transceivers = TRANSCEIVER_NONE;
@@ -303,10 +310,10 @@ void run(void)
                 msg_reply(&m, &m);
                 break;
 #ifdef DBG_IGNORE
-
             case DBG_IGN:
-                printf("Transceiver PID: %i (%p), rx_buffer_next: %u\n", transceiver_pid, &transceiver_pid, rx_buffer_next);
-                ignore_add(cmd->transceivers, cmd->data);
+                DEBUG("Transceiver PID: %i (%p), rx_buffer_next: %u\n", transceiver_pid, &transceiver_pid, rx_buffer_next);
+                *((int16_t*) cmd->data) = ignore_add(cmd->transceivers, cmd->data);
+                msg_reply(&m, &m);
                 break;
 #endif
 
@@ -421,6 +428,14 @@ static void receive_packet(uint16_t type, uint8_t pos)
             return;
         }
     }
+#ifdef DBG_IGN
+    for (uint8_t i = 0; (i < MAX_IGNORED_ADDR) && (ignored_addr[i]); i++) {
+        if (trans_p->src == ignored_addr[i]) {
+            DEBUG("ignored packet from %"PRIu16"\n", trans_p->src);
+            return;
+        }
+    }
+#endif
 
     /* finally notify waiting upper layers
      * this is done non-blocking, so packets can get lost */
@@ -991,17 +1006,16 @@ static void switch_to_rx(transceiver_type_t t)
 }
 
 #ifdef DBG_IGNORE
-static void ignore_add(transceiver_type_t t, void *address)
+static int16_t ignore_add(transceiver_type_t t, void *address)
 {
     radio_address_t addr = *((radio_address_t *)address);
 
-    switch(t) {
-        case TRANSCEIVER_CC1100:
-            cc110x_add_ignored(addr);
-            break;
-
-        default:
-            break;
+    for (uint8_t i = 0; i < MAX_IGNORED_ADDR; i++) {
+        if (ignored_addr[i] == 0) {
+            ignored_addr[i] = addr;
+            return i;
+        }
     }
+    return -1;
 }
 #endif
