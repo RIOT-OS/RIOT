@@ -23,6 +23,9 @@
 #include "trickle.h"
 #include "rpl.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 rpl_instance_t instances[RPL_MAX_INSTANCES];
 rpl_dodag_t dodags[RPL_MAX_DODAGS];
 rpl_parent_t parents[RPL_MAX_PARENTS];
@@ -225,11 +228,11 @@ rpl_parent_t *rpl_find_preferred_parent(void)
     for (uint8_t i = 0; i < RPL_MAX_PARENTS; i++) {
         if (parents[i].used) {
             if ((parents[i].rank == INFINITE_RANK) || (parents[i].lifetime <= 1)) {
-                puts("bad parent");
+                DEBUG("Infinite rank, bad parent\n");
                 continue;
             }
             else if (best == NULL) {
-                puts("parent");
+                DEBUG("possible parent\n");
                 best = &parents[i];
             }
             else {
