@@ -58,8 +58,6 @@
 /** message buffer */
 msg_t msg_buffer_relay[RELAY_MSG_BUFFER_SIZE];
 
-uint8_t packet_out[PAYLOAD_SIZE];
-
 // ----------------------------------------------------------------------
 
 struct ccnl_relay_s theRelay;
@@ -124,8 +122,7 @@ void ccnl_ll_TX(struct ccnl_relay_s *ccnl, struct ccnl_if_s *ifc,
 {
     (void) ccnl; /* unused */
 
-    memcpy(&packet_out, &buf->data, buf->datalen);
-    ifc->sendfunc(packet_out, (uint16_t) buf->datalen, (uint16_t) dest->id);
+    ifc->sendfunc(buf->data, (uint16_t) buf->datalen, (uint16_t) dest->id);
 }
 
 // ----------------------------------------------------------------------
