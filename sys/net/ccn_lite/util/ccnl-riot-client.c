@@ -70,11 +70,10 @@ int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
 
         msg_receive(&rep);
         riot_ccnl_msg_t *rmsg_reply = (riot_ccnl_msg_t *) rep.content.ptr;
-        memcpy(&compat_small_buf, rmsg_reply->payload, rmsg_reply->size);
-        unsigned char *data = compat_small_buf;
-        int datalen = (int) rmsg_reply->size;
-        DEBUGMSG(1, "%d bytes left; msg from=%u '%s'\n", datalen, rep.sender_pid, compat_small_buf);
 
+        unsigned char *data = rmsg_reply->payload;
+        int datalen = (int) rmsg_reply->size;
+        DEBUGMSG(1, "%d bytes left; msg from=%u '%s'\n", datalen, rep.sender_pid, data);
 
         int scope = 3, aok = 3, minsfx = 0, maxsfx = CCNL_MAX_NAME_COMP,
             contlen = 0;
@@ -96,6 +95,7 @@ int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
 
         free_prefix(p);
         free_3ptr_list(buf, nonce, ppkd);
+        ccnl_free(rmsg_reply);
 
         if (contlen < CCNL_RIOT_CHUNK_SIZE || CCNL_RIOT_CHUNK_SIZE < contlen) {
             /* last chunk */
