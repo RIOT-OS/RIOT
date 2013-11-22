@@ -1,3 +1,21 @@
+/**
+ * virtual timer
+ *
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup vtimer
+ * @{
+ * @file
+ * @author Kaspar Schleiser <kaspar.schleiser@fu-berlin.de> (author)
+ * @author Oliver Hahm <oliver.hahm@inria.fr> (modifications)
+ * @author Ludwig Ortmann <ludwig.ortmann@fu-berlin.de> (cleaning up the mess)
+ * @}
+ */
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
