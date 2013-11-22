@@ -118,6 +118,7 @@ static int set_timeout(vtimer_t *timeout, long useconds, void *args)
     interval.seconds = useconds / 1000000;
     interval.microseconds = (useconds % 1000000) * 1000;
 
+    vtimer_remove(timeout);
     return vtimer_set_msg(timeout, interval, sending_slot_pid, args);
 }
 

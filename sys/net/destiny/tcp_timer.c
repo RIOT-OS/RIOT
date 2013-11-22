@@ -154,6 +154,7 @@ void tcp_general_timer(void)
     while (1) {
         inc_global_variables();
         check_sockets();
+        vtimer_remove(&tcp_vtimer);
         vtimer_set_wakeup(&tcp_vtimer, interval, thread_getpid());
         thread_sleep();
     }
