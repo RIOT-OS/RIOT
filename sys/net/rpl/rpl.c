@@ -286,9 +286,13 @@ void send_DIO(ipv6_addr_t *destination)
 
     rpl_send_dio_buf = get_rpl_send_dio_buf();
     memset(rpl_send_dio_buf, 0, sizeof(*rpl_send_dio_buf));
+
+    DEBUG("Sending DIO with ");
     rpl_send_dio_buf->rpl_instanceid = mydodag->instance->id;
+    DEBUG("instance %02X ", rpl_send_dio_buf->rpl_instanceid);
     rpl_send_dio_buf->version_number = mydodag->version;
     rpl_send_dio_buf->rank = mydodag->my_rank;
+    DEBUG("rank %04X\n", rpl_send_dio_buf->rank);
     rpl_send_dio_buf->g_mop_prf = (mydodag->grounded << RPL_GROUNDED_SHIFT) | (mydodag->mop << RPL_MOP_SHIFT) | mydodag->prf;
     rpl_send_dio_buf->dtsn = mydodag->dtsn;
     rpl_send_dio_buf->flags = 0;
@@ -506,9 +510,12 @@ void rpl_process(void)
 
 void recv_rpl_dio(void)
 {
+    DEBUG("Received DIO with ");
     ipv6_buf = get_rpl_ipv6_buf();
 
     rpl_dio_buf = get_rpl_dio_buf();
+    DEBUG("instance %04X ", rpl_dio_buf->rpl_instanceid);
+    DEBUG("rank %04X\n", rpl_dio_buf->rank);
     int len = DIO_BASE_LEN;
 
     rpl_instance_t *dio_inst = rpl_get_instance(rpl_dio_buf->rpl_instanceid);
@@ -517,12 +524,14 @@ void recv_rpl_dio(void)
     if (dio_inst == NULL) {
         if (my_inst != NULL) {
             /* already part of a DODAG -> impossible to join other instance */
+            DEBUG("Not joining another DODAG!\n");
             return;
         }
 
         dio_inst = rpl_new_instance(rpl_dio_buf->rpl_instanceid);
 
         if (dio_inst == NULL) {
+            DEBUG("Failed to create a new RPL instance!\n");
             return;
         }
     }
@@ -555,6 +564,7 @@ void recv_rpl_dio(void)
      * icmpv6 header, so only ICMPV6_HDR_LEN remains to be
      * subtracted.  */
     while (len < (ipv6_buf->length - ICMPV6_HDR_LEN)) {
+        DEBUG("parsing DIO options\n");
         rpl_opt_buf = get_rpl_opt_buf(len);
 
         switch (rpl_opt_buf->type) {
@@ -583,6 +593,7 @@ void recv_rpl_dio(void)
                 has_dodag_conf_opt = 1;
 
                 if (rpl_opt_buf->length != RPL_OPT_DODAG_CONF_LEN) {
+                    DEBUG("DODAG configuration is malformed.\n");
                     /* error malformed */
                     return;
                 }
