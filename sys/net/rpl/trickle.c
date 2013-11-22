@@ -166,10 +166,12 @@ void trickle_interval_over(void)
         I_time = timex_set(0, I * 1000);
         timex_normalize(&I_time);
 
+        vtimer_remove(&trickle_t_timer);
         if (vtimer_set_wakeup(&trickle_t_timer, t_time, timer_over_pid) != 0) {
             puts("[ERROR] setting Wakeup");
         }
 
+        vtimer_remove(&trickle_I_timer);
         if (vtimer_set_wakeup(&trickle_I_timer, I_time, interval_over_pid) != 0) {
             puts("[ERROR] setting Wakeup");
         }
@@ -205,6 +207,7 @@ void dao_delay_over(void)
             dao_counter++;
             send_DAO(NULL, 0, true, 0);
             dao_time = timex_set(DEFAULT_WAIT_FOR_DAO_ACK, 0);
+            vtimer_remove(&dao_timer);
             vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
         }
         else if (ack_received == false) {
