@@ -22,6 +22,10 @@ ifeq ($(CPU),stm32f407vg)
  DIRS = stm32_common stm32f407vg
 endif
 
+ifeq ($(CPU),stm32f415rg)
+ DIRS = stm32_common stm32f415rg
+endif
+
 .PHONY: cpus
 .PHONY: $(DIRS)
 
@@ -40,4 +44,5 @@ clean:
 	@$(MAKE) -C msp430x16x clean
 	@$(MAKE) -C native clean
 	@$(MAKE) -C stm32f407vg clean
+	@$(MAKE) -C stm32f415rg clean
 
