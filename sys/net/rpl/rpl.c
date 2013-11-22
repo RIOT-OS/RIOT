@@ -190,6 +190,8 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address)
         return SIXLOWERROR_ADDRESS;
     }
 
+    rpl_instances_init();
+
     /* initialize routing table */
     rpl_clear_routing_table();
     init_trickle();
