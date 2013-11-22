@@ -53,6 +53,10 @@ static int set_longterm(vtimer_t *timer)
 
 static int update_shortterm(void)
 {
+    if (shortterm_queue_root.next == NULL) {
+        DEBUG("update_shortterm: shortterm_queue_root.next == NULL - dont know what to do here\n");
+        return 0;
+    }
     if (hwtimer_id != -1) {
         if (hwtimer_next_absolute != shortterm_queue_root.next->priority) {
             hwtimer_remove(hwtimer_id);
@@ -64,10 +68,16 @@ static int update_shortterm(void)
 
     hwtimer_next_absolute = shortterm_queue_root.next->priority;
 
-    uint32_t next = hwtimer_next_absolute + longterm_tick_start;
+    uint32_t next = hwtimer_next_absolute;
     uint32_t now = HWTIMER_TICKS_TO_US(hwtimer_now());
 
+    /* make sure the longterm_tick_timer does not get truncated */
+    if (((vtimer_t*)shortterm_queue_root.next)->action != vtimer_tick) {
+        next += longterm_tick_start;
+    }
+
     if((next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now) > MICROSECONDS_PER_TICK ) {
+        DEBUG("truncating next (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now): %i\n", (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now));
         next = now +  HWTIMER_TICKS_TO_US(VTIMER_BACKOFF);
     }
     
@@ -80,11 +90,11 @@ static int update_shortterm(void)
 void vtimer_tick(void *ptr)
 {
     (void) ptr;
-    DEBUG("vtimer_tick().");
+    DEBUG("vtimer_tick().\n");
     seconds += SECONDS_PER_TICK;
 
     longterm_tick_start = longterm_tick_timer.absolute.microseconds;
-    longterm_tick_timer.absolute.microseconds = longterm_tick_timer.absolute.microseconds + MICROSECONDS_PER_TICK;
+    longterm_tick_timer.absolute.microseconds += MICROSECONDS_PER_TICK;
     set_shortterm(&longterm_tick_timer);
 
     while (longterm_queue_root.next) {
@@ -98,8 +108,6 @@ void vtimer_tick(void *ptr)
             break;
         }
     }
-
-    update_shortterm();
 }
 
 static int set_shortterm(vtimer_t *timer)
@@ -133,6 +141,9 @@ void vtimer_callback(void *ptr)
     }
     else if (timer->action == (void (*)(void *)) thread_wakeup){
         timer->action(timer->arg);
+    }
+    else if (timer->action == vtimer_tick) {
+        vtimer_tick(NULL);
     }
     else {
         DEBUG("Timer was poisoned.\n");
