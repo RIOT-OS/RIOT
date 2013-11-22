@@ -526,6 +526,9 @@ void recv_rpl_dio(void)
             return;
         }
     }
+    else if (my_inst == NULL) {
+        DEBUG("Not joined an instance yet\n");
+    }
     else if (my_inst->id != dio_inst->id) {
         /* TODO: Add support support for several instances.  */
 
