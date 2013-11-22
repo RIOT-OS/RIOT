@@ -8,7 +8,7 @@
  *
  * Copyright (C) 2013 Ludwig Ortmann
  *
- * This file subject to the terms and conditions of the GNU Lesser General Public
+ * This file is subject to the terms and conditions of the GNU Lesser General Public
  * License. See the file LICENSE in the top level directory for more details.
  *
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
