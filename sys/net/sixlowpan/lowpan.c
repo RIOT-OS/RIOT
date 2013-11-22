@@ -160,7 +160,7 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
     uint8_t mcast = 0;
 
     ipv6_buf = (ipv6_hdr_t *) data;
-    packet_length = data_len;
+    uint16_t send_packet_length = data_len;
 
     memcpy(&laddr.uint8[0], &dest->uint8[0], 8);
 
@@ -172,7 +172,7 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
     if (iphc_status == LOWPAN_IPHC_ENABLE) {
         lowpan_iphc_encoding(&laddr, ipv6_buf, data);
         data = &comp_buf[0];
-        packet_length = comp_len;
+        send_packet_length = comp_len;
     }
     else {
         ipv6_buf->length = HTONS(ipv6_buf->length);
@@ -180,10 +180,10 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
     }
 
     /* check if packet needs to be fragmented */
-    DEBUG("sixlowpan_lowpan_sendto(%s, data, %"PRIu16"): packet_length: %"PRIu16", header_size: %"PRIu16"\n",
-            sixlowpan_mac_802154_long_addr_to_str(addr_str, dest), data_len, packet_length, header_size);
-    if (packet_length + header_size > PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN) {
-        uint8_t fragbuf[packet_length + header_size];
+    DEBUG("sixlowpan_lowpan_sendto(%s, data, %"PRIu16"): send_packet_length: %"PRIu16", header_size: %"PRIu16"\n",
+            sixlowpan_mac_802154_long_addr_to_str(addr_str, dest), data_len, send_packet_length, header_size);
+    if (send_packet_length + header_size > PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN) {
+        uint8_t fragbuf[send_packet_length + header_size];
         uint8_t remaining;
         uint8_t i = 2;
         /* first fragment */
@@ -192,8 +192,8 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
 
         memcpy(fragbuf + 4, data, max_frag_initial);
 
-        fragbuf[0] = ((SIXLOWPAN_FRAG1_DISPATCH << 8) | packet_length) >> 8;
-        fragbuf[1] = (SIXLOWPAN_FRAG1_DISPATCH << 8) | packet_length;
+        fragbuf[0] = ((SIXLOWPAN_FRAG1_DISPATCH << 8) | send_packet_length) >> 8;
+        fragbuf[1] = (SIXLOWPAN_FRAG1_DISPATCH << 8) | send_packet_length;
         fragbuf[2] = tag >> 8;
         fragbuf[3] = tag;
 
@@ -207,12 +207,12 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
 
         data += position;
 
-        while (packet_length - position > max_frame - 5) {
-            memset(&fragbuf, 0, packet_length + header_size);
+        while (send_packet_length - position > max_frame - 5) {
+            memset(&fragbuf, 0, send_packet_length + header_size);
             memcpy(fragbuf + 5, data, max_frag);
 
-            fragbuf[0] = ((SIXLOWPAN_FRAGN_DISPATCH << 8) | packet_length) >> 8;
-            fragbuf[1] = (SIXLOWPAN_FRAGN_DISPATCH << 8) | packet_length;
+            fragbuf[0] = ((SIXLOWPAN_FRAGN_DISPATCH << 8) | send_packet_length) >> 8;
+            fragbuf[1] = (SIXLOWPAN_FRAGN_DISPATCH << 8) | send_packet_length;
             fragbuf[2] = tag >> 8;
             fragbuf[3] = tag;
             fragbuf[4] = position / 8;
@@ -226,13 +226,13 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
             i++;
         }
 
-        remaining = packet_length - position;
+        remaining = send_packet_length - position;
 
-        memset(&fragbuf, 0, packet_length + header_size);
+        memset(&fragbuf, 0, send_packet_length + header_size);
         memcpy(fragbuf + 5, data, remaining);
 
-        fragbuf[0] = ((SIXLOWPAN_FRAGN_DISPATCH << 8) | packet_length) >> 8;
-        fragbuf[1] = (SIXLOWPAN_FRAGN_DISPATCH << 8) | packet_length;
+        fragbuf[0] = ((SIXLOWPAN_FRAGN_DISPATCH << 8) | send_packet_length) >> 8;
+        fragbuf[1] = (SIXLOWPAN_FRAGN_DISPATCH << 8) | send_packet_length;
         fragbuf[2] = tag >> 8;
         fragbuf[3] = tag;
         fragbuf[4] = position / 8;
@@ -243,7 +243,7 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
     }
     else {
         sixlowpan_mac_send_ieee802154_frame(&laddr, data,
-                                            packet_length, mcast);
+                                            send_packet_length, mcast);
     }
 
     tag++;
