@@ -34,6 +34,11 @@ void rpl_set_attacker(uint16_t rank){
 	attacker_dodag_rank = rank;
 }
 
+void rpl_disable_attacker(void){
+	attacker_dodag = 0;
+	attacker_dodag_rank = 0;
+}
+
 rpl_instance_t *rpl_new_instance(uint8_t instanceid)
 {
     rpl_instance_t *inst;
@@ -276,11 +281,24 @@ void rpl_delete_worst_parent(void)
 
 void rpl_delete_all_parents(void)
 {
+
+	ipv6_addr_t ll_address;
+    ipv6_addr_t my_address;
+    ipv6_addr_set_link_local_prefix(&ll_address);
+    ipv6_iface_get_best_src_addr(&my_address, &ll_address);
+
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
-    my_dodag->my_preferred_parent = NULL;
+    if(my_dodag != NULL){
+    	printf("p_d: ID %u deleted ID %u as parent #color15\n", my_address.uint8[15], my_dodag->my_preferred_parent->addr.uint8[15]);
+    	my_dodag->my_preferred_parent = NULL;
+    }
 
     for (int i = 0; i < RPL_MAX_PARENTS; i++) {
-        memset(&parents[i], 0, sizeof(parents[i]));
+    	if(parents[i].addr.uint8[15] != 0){
+    		printf("p_d: ID %u deleted ID %u as parent #color15\n", my_address.uint8[15], parents[i].addr.uint8[15]);
+    	}
+    	memset(&parents[i], 0, sizeof(parents[i]));
+
     }
 }
 
@@ -398,7 +416,14 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
 
     start_trickle(my_dodag->dio_min, my_dodag->dio_interval_doubling, my_dodag->dio_redundancy);
    // delay_dao(); //trail: disable downward routes
-    printf("Calculated rank to %u (based on parent's rank %u)\n" , my_dodag->my_rank, parent_rank);
+   // printf("Calculated rank to %u (based on parent's rank %u)\n" , my_dodag->my_rank, parent_rank);
+
+    ipv6_addr_t ll_address;
+    ipv6_addr_t my_address;
+    ipv6_addr_set_link_local_prefix(&ll_address);
+    ipv6_iface_get_best_src_addr(&my_address, &ll_address);
+
+    printf("r: ID %u selected rank %u\n",my_address.uint8[15],my_dodag->my_rank);
 
     //printf("done (rank: %u)\n", my_dodag->my_rank);
 }

@@ -44,7 +44,7 @@ uint8_t tvo_sequence_number = 0; // trail
 uint8_t do_trail = 0; // trail: enables / disables trail on startup
 uint8_t attacker = 0; // trail: enables / disables attacker mode on startup
 uint16_t attacker_rank = 0; // trail: rank of the attacker -> is constant
-uint16_t ignore_root_addr = 0;
+uint16_t ignore_root_addr = 0; //trail: ignore the root: just for SAFEST demo
 
 
 struct rpl_tvo_local_t tvo_local_buffer[TVO_LOCAL_BUFFER_LEN]; //trail
@@ -331,7 +331,8 @@ void change_rank(uint16_t new_rank){
 
 }
 
-void ignore_root(uint16_t root_addr){
+void ignore_root(uint16_t my_id,uint16_t root_addr){
+	printf("i: ID %u ignores ID %u\n", my_id ,root_addr);
 	ignore_root_addr = root_addr;
 }
 
@@ -391,13 +392,66 @@ void start_with_trail(void){
 	printf("TRAIL enabled\n");
 }
 
+// trail: disable TRAIL during runtime
+void disable_trail(void){
+	do_trail = 0;
+	printf("TRAIL disabled\n");
+}
 
-// trail: enable attacker - only use chosen rank
+
+// trail: enable attacker at startup- only use the chosen rank
 void start_as_attacker(uint16_t rank){
 	attacker = 1;
 	attacker_rank = rank;
 	rpl_set_attacker(rank);
 	printf("Attacker enabled with rank %u\n",rank);
+}
+
+void disable_attacker(void){
+	attacker = 0;
+	attacker_rank = 0;
+	rpl_disable_attacker();
+}
+
+// trail: enable attacker during runtime - only use the chosen rank
+void configure_as_attacker(uint16_t rank){
+	attacker = 1;
+	attacker_rank = rank;
+	rpl_set_attacker(rank);
+	rpl_dodag_t *my_dodag = rpl_get_my_dodag();
+	if(my_dodag != NULL){
+		my_dodag->my_rank = rank;
+		my_dodag->min_rank = rank;
+	}
+	printf("Attacker enabled with rank %u\n",rank);
+	 printf("r: ID %u selected rank %u\n",my_address.uint8[15],rank);
+}
+
+// trail: enable attacker at startup- only use the chosen rank
+void reset_rpl(void){
+	rpl_dodag_t *my_dodag = rpl_get_my_dodag();
+	if(my_dodag != NULL){
+		//my_dodag->my_rank = INFINITE_RANK;
+		//my_dodag->min_rank = INFINITE_RANK;
+		rpl_delete_all_parents();
+		reset_trail_buffers();
+		rpl_del_dodag(my_dodag);
+		my_dodag = NULL;
+	}
+}
+
+void reset_trail_buffers(){
+	rpl_dodag_trail_t trail_parent_buffer[RPL_MAX_PARENTS]; //trail: buffer parents when receiving DIOs
+	uint8_t i;
+	for(i=0;i<RPL_MAX_PARENTS;i++){
+		memset(&trail_parent_buffer, 0, sizeof(rpl_dodag_trail_t));
+	}
+
+	for(i=0;i<TVO_LOCAL_BUFFER_LEN;i++){
+		memset(&tvo_local_buffer, 0, sizeof(struct rpl_tvo_local_t));
+		tvo_local_flags[i] = 0;
+	}
+
 }
 
 /*
@@ -1034,7 +1088,7 @@ void rpl_process(void)
         // trail: for SAFEST DEMO ONLY - ignore root for "ideal" network (delete if-else)
        // printf("\n\nSrc.adr: %u ... ignore_root_addr: %u\n\n",ipv6_buf->srcaddr.uint8[15], (uint8_t)ignore_root_addr);
         if(ipv6_buf->srcaddr.uint8[15] == (uint8_t)ignore_root_addr){
-        	printf("Ignore node RPL message from node %u\n",ignore_root_addr);
+        	//printf("Ignore node RPL message from node %u\n",ignore_root_addr);
         	mutex_unlock(&rpl_recv_mutex);
         	//return;
         }
@@ -1328,7 +1382,7 @@ void recv_rpl_dio(void)
       }
       else{
     	  myRank = mydodag->my_rank;
-    	  if(rpl_dio_buf->rank >= myRank){
+    	  if(attacker == 0 && rpl_dio_buf->rank >= myRank){
     		  //printf("received DIO (rank: %u / my rank: %u / inst: %u) from %s (IPv6)\n", rpl_dio_buf->rank, myRank,rpl_dio_buf->rpl_instanceid ,ipv6_addr_to_str(addr_str, &(ipv6_buf->srcaddr)));
     		  //printf("received DIO from *ID %u* (rank: %u / my rank: %u / inst: %u)\n", ipv6_buf->srcaddr.uint8[15], rpl_dio_buf->rank, myRank,rpl_dio_buf->rpl_instanceid);
     		 // printf(" ---> ignoring DIO due to greater/equal rank \n");
@@ -1339,7 +1393,7 @@ void recv_rpl_dio(void)
 
     //printf("received DIO (rank: %u / my rank: %u / inst: %u) from %s (IPv6)\n", rpl_dio_buf->rank, myRank, rpl_dio_buf->rpl_instanceid,ipv6_addr_to_str(addr_str, &(ipv6_buf->srcaddr)));
      // printf("received DIO from *ID %u* (rank: %u / my rank: %u / inst: %u)\n", ipv6_buf->srcaddr.uint8[15], rpl_dio_buf->rank, myRank,rpl_dio_buf->rpl_instanceid);
-      printf("m: ID %u received msg DIO from ID %u #color6  - Rank %u\n", my_address.uint8[15], ipv6_buf->srcaddr.uint8[15], rpl_dio_buf->rank);
+    printf("m: ID %u received msg DIO from ID %u #color6  - Rank %u\n", my_address.uint8[15], ipv6_buf->srcaddr.uint8[15], rpl_dio_buf->rank);
     uint8_t trail_index;
     uint8_t flag_send_TVO = 0;
     if(do_trail){
@@ -1591,6 +1645,12 @@ void recv_rpl_dio(void)
 		trail_parent_buffer[trail_index].parent_addr = ipv6_buf->srcaddr;
 		trail_parent_buffer[trail_index].parent_rank = rpl_dio_buf->rank;
 		trail_parent_buffer[trail_index].parent_dtsn = rpl_dio_buf->dtsn;
+
+		srand(now.microseconds);
+		uint32_t random = rand() % 1000000;
+		printf(" ** Delay TVO verification for %u ms\n",(random/1000));
+		timex_t time = timex_set(0, random);
+		vtimer_sleep(time);
 
 		delay_tvo(DEFAULT_WAIT_FOR_TVO_ACK);
 		send_TVO(&next_hop, &tvo, NULL);

@@ -50,6 +50,7 @@ void join_dodag(rpl_dodag_t * dio_dodag, ipv6_addr_t * src_addr, uint16_t parent
 uint8_t include_parent_into_trail_buffer(void); //trail
 uint8_t get_parent_from_trail_buffer(ipv6_addr_t * src_addr); // trail
 uint8_t is_parent_verified(ipv6_addr_t * src_addr, uint16_t dio_rank); //trail
+void disable_attacker(void); //trail: safest demo
 
 
 void rpl_process(void);

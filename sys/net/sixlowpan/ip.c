@@ -313,7 +313,7 @@ void ipv6_process(void)
                 case (IPV6_PROTO_NUM_ICMPV6): {
                     /* checksum test*/
                     if (icmpv6_csum(IPV6_PROTO_NUM_ICMPV6) != 0xffff) {
-                        printf("ERROR: wrong checksum\n");
+                        //printf("ERROR: wrong checksum\n");
                     }
 
                     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
