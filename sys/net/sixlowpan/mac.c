@@ -45,7 +45,7 @@
 #endif
 #include "debug.h"
 
-#define RADIO_STACK_SIZE            (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define RADIO_STACK_SIZE            (KERNEL_CONF_STACKSIZE_MAIN)
 #define RADIO_RCV_BUF_SIZE          (64)
 #define RADIO_SENDING_DELAY         (1000)
 
