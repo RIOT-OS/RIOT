@@ -52,11 +52,22 @@ void _native_syscall_leave()
 {
     _native_in_syscall--;
     DEBUG("< _native_in_syscall: %d\n", _native_in_syscall);
-    if ((_native_sigpend > 0) && (_native_in_isr == 0) && (_native_in_syscall == 0)) {
+    if (
+            (_native_sigpend > 0)
+            && (_native_in_isr == 0)
+            && (_native_in_syscall == 0)
+            && (native_interrupts_enabled == 1)
+       )
+    {
         _native_in_isr = 1;
         _native_cur_ctx = (ucontext_t *)active_thread->sp;
+        native_isr_context.uc_stack.ss_sp = __isr_stack;
+        native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+        native_isr_context.uc_stack.ss_flags = 0;
         makecontext(&native_isr_context, native_irq_handler, 0);
-        swapcontext(_native_cur_ctx, &native_isr_context);
+        if (swapcontext(_native_cur_ctx, &native_isr_context) == -1) {
+            _native_syscall_leave(EXIT_FAILURE, "thread_yield: swapcontext");
+        }
     }
 }
 
