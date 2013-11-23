@@ -88,7 +88,7 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksiz
 #endif
 
     if (getcontext(p) == -1) {
-        err(1, "thread_stack_init(): getcontext()");
+        err(EXIT_FAILURE, "thread_stack_init(): getcontext()");
     }
 
     p->uc_stack.ss_sp = stk;
@@ -97,7 +97,7 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksiz
     p->uc_link = &end_context;
 
     if (sigemptyset(&(p->uc_sigmask)) == -1) {
-        err(1, "thread_stack_init(): sigemptyset()");
+        err(EXIT_FAILURE, "thread_stack_init(): sigemptyset()");
     }
 
     makecontext(p, task_func, 0);
@@ -123,7 +123,7 @@ void isr_cpu_switch_context_exit(void)
     _native_in_isr = 0;
 
     if (setcontext(ctx) == -1) {
-        err(1, "cpu_switch_context_exit(): setcontext():");
+        err(EXIT_FAILURE, "cpu_switch_context_exit(): setcontext():");
     }
 }
 
@@ -137,7 +137,7 @@ void cpu_switch_context_exit()
         native_isr_context.uc_stack.ss_flags = 0;
         makecontext(&native_isr_context, isr_cpu_switch_context_exit, 0);
         if (setcontext(&native_isr_context) == -1) {
-            err(1, "cpu_switch_context_exit: swapcontext");
+            err(EXIT_FAILURE, "cpu_switch_context_exit: swapcontext");
         }
     }
     else {
@@ -157,7 +157,7 @@ void isr_thread_yield()
     native_interrupts_enabled = 1;
     _native_in_isr = 0;
     if (setcontext(ctx) == -1) {
-        err(1, "isr_thread_yield(): setcontext()");
+        err(EXIT_FAILURE, "isr_thread_yield(): setcontext()");
     }
 }
 
@@ -172,7 +172,7 @@ void thread_yield()
         native_isr_context.uc_stack.ss_flags = 0;
         makecontext(&native_isr_context, isr_thread_yield, 0);
         if (swapcontext(ctx, &native_isr_context) == -1) {
-            err(1, "thread_yield: swapcontext");
+            err(EXIT_FAILURE, "thread_yield: swapcontext");
         }
         eINT();
     }
@@ -184,7 +184,7 @@ void thread_yield()
 void native_cpu_init()
 {
     if (getcontext(&end_context) == -1) {
-        err(1, "end_context(): getcontext()");
+        err(EXIT_FAILURE, "end_context(): getcontext()");
     }
 
     end_context.uc_stack.ss_sp = __end_stack;
