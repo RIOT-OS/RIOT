@@ -1019,7 +1019,7 @@ int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
         ipv6_sendto(&to->sin6_addr, IPPROTO_UDP,
                     (uint8_t *)(current_udp_packet),
                     NTOHS(current_udp_packet->length));
-        return current_udp_packet->length;
+        return NTOHS(current_udp_packet->length);
     }
     else {
         return -1;
