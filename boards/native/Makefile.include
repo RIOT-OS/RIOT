@@ -5,7 +5,7 @@ export CPU = native
 export PREFIX = 
 #export CC = @$(PREFIX)gcc
 export AR = @$(PREFIX)ar
-export CFLAGS += -std=gnu99 -Wall -m32
+export CFLAGS += -std=gnu99 -Wall -Wextra -pedantic -m32
 export ASFLAGS =
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
