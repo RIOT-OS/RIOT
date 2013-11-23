@@ -47,6 +47,9 @@
 #include "nativenet_internal.h"
 #include "native_internal.h"
 
+#include "hwtimer.h"
+#include "timex.h"
+
 #define TAP_BUFFER_LENGTH (ETHER_MAX_LEN)
 int _native_marshall_ethernet(uint8_t *framebuf, radio_packet_t *packet);
 
@@ -73,13 +76,16 @@ void _native_handle_tap_input(void)
                 DEBUG("_native_handle_tap_input: no payload");
             }
             else {
-                /* XXX: check overflow */
-                p.length = ntohs(frame.field.payload.nn_header.length);
-                p.dst = ntohs(frame.field.payload.nn_header.dst);
+                unsigned long t = hwtimer_now();
+                p.processing = 0;
                 p.src = ntohs(frame.field.payload.nn_header.src);
+                p.dst = ntohs(frame.field.payload.nn_header.dst);
                 p.rssi = 0;
                 p.lqi = 0;
-                p.processing = 0;
+                p.toa.seconds = HWTIMER_TICKS_TO_US(t)/1000000;
+                p.toa.microseconds = HWTIMER_TICKS_TO_US(t)%1000000;
+                /* XXX: check overflow */
+                p.length = ntohs(frame.field.payload.nn_header.length);
                 p.data = frame.field.payload.data;
                 DEBUG("_native_handle_tap_input: received packet of length %"PRIu16" for %"PRIu16" from %"PRIu16"\n", p.length, p.dst, p.src);
                 _nativenet_handle_packet(&p);
