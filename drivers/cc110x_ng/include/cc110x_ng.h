@@ -116,7 +116,7 @@ void cc110x_init(int transceiver_pid);
 
 void cc110x_rx_handler(void);
 
-uint8_t cc110x_send(cc110x_packet_t *pkt);
+int8_t cc110x_send(cc110x_packet_t *pkt);
 
 uint8_t cc110x_get_buffer_pos(void);
 

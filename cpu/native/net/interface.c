@@ -107,16 +107,12 @@ radio_address_t nativenet_get_address()
     return _native_net_addr;
 }
 
-uint8_t nativenet_send(radio_packet_t *packet)
+int8_t nativenet_send(radio_packet_t *packet)
 {
     packet->src = _native_net_addr;
     DEBUG("nativenet_send:  Sending packet of length %"PRIu16" from %"PRIu16" to %"PRIu16"\n", packet->length, packet->src, packet->dst);
 
-    if (send_buf(packet) == -1) {
-        warnx("nativenet_send: error sending packet");
-        return 0;
-    }
-    return true;
+    return send_buf(packet);
 }
 
 void nativenet_switch_to_rx()

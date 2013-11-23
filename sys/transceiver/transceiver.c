@@ -116,7 +116,7 @@ static void receive_nativenet_packet(radio_packet_t *trans_p);
 #ifdef MODULE_AT86RF231
 void receive_at86rf231_packet(radio_packet_t *trans_p);
 #endif
-static uint8_t send_packet(transceiver_type_t t, void *pkt);
+static int8_t send_packet(transceiver_type_t t, void *pkt);
 static int16_t get_channel(transceiver_type_t t);
 static int16_t set_channel(transceiver_type_t t, void *channel);
 static int16_t get_address(transceiver_type_t t);
@@ -580,14 +580,11 @@ void receive_at86rf231_packet(radio_packet_t *trans_p) {
  * @param t     The transceiver device
  * @param pkt   Generic pointer to the packet
  *
- * @return 1 on success, 0 otherwise
+ * @return A negative value if operation failed, 0 or the number of bytes sent otherwise.
  */
-static uint8_t send_packet(transceiver_type_t t, void *pkt)
+static int8_t send_packet(transceiver_type_t t, void *pkt)
 {
-    uint8_t res = 0;
-#ifdef MODULE_CC110X
-    int snd_ret;
-#endif
+    int8_t res = -1;
     radio_packet_t p = *((radio_packet_t *)pkt);
 
 #ifdef MODULE_CC110X_NG
@@ -617,13 +614,8 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
 #elif MODULE_CC110X
             memcpy(cc1100_pkt, p.data, p.length);
 
-            if ((snd_ret = cc1100_send_csmaca(p.dst, 4, 0, (char *) cc1100_pkt, p.length)) < 0) {
-                DEBUG("transceiver: snd_ret (%u) = %i\n", p.length, snd_ret);
-                res = 0;
-            }
-            else {
-                res = 1;
-            }
+            res = cc1100_send_csmaca(p.dst, 4, 0, (char *) cc1100_pkt, p.length);
+            DEBUG("transceiver: snd_ret (%u) = %i\n", p.length, snd_ret);
 #else
             puts("Unknown transceiver");
 #endif

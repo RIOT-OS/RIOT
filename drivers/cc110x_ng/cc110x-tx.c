@@ -28,7 +28,7 @@
 
 //#include <board.h>
 
-uint8_t cc110x_send(cc110x_packet_t *packet)
+int8_t cc110x_send(cc110x_packet_t *packet)
 {
     volatile uint32_t abort_count;
     uint8_t size;
@@ -95,6 +95,6 @@ uint8_t cc110x_send(cc110x_packet_t *packet)
     /* Go to mode after TX (CONST_RX -> RX, WOR -> WOR) */
     cc110x_switch_to_rx();
 
-    return true;
+    return size;
 }
 

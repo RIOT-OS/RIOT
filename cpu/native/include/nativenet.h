@@ -59,9 +59,9 @@ void nativenet_set_monitor(uint8_t mode);
  * Send a packet
  *
  * @param packet a radio packet
- * @return 1 on success, 0 otherwise
+ * @return -1 if the operation failed, 0 otherwise
  */
-uint8_t nativenet_send(radio_packet_t *packet);
+int8_t nativenet_send(radio_packet_t *packet);
 
 /**
  * Set transceiver address
