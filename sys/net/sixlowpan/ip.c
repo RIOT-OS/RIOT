@@ -275,6 +275,15 @@ void ipv6_process(void)
         /* identifiy packet */
         nextheader = &ipv6_buf->nextheader;
 
+        for (i = 0; i < SIXLOWIP_MAX_REGISTERED; i++) {
+            if (sixlowip_reg[i]) {
+                msg_t m_send;
+                m_send.type = IPV6_PACKET_RECEIVED;
+                m_send.content.ptr = (char *) ipv6_buf;
+                msg_send(&m_send, sixlowip_reg[i], 1);
+            }
+        }
+
         /* destination is foreign address */
         if ((ipv6_get_addr_match(&myaddr, &ipv6_buf->destaddr) >= 112) &&
             (ipv6_buf->destaddr.uint8[15] != myaddr.uint8[15])) {
@@ -301,15 +310,6 @@ void ipv6_process(void)
         }
         /* destination is our address */
         else {
-            for (i = 0; i < SIXLOWIP_MAX_REGISTERED; i++) {
-                if (sixlowip_reg[i]) {
-                    msg_t m_send;
-                    m_send.type = IPV6_PACKET_RECEIVED;
-                    m_send.content.ptr = (char *) &ipv6_buf;
-                    msg_send(&m_send, sixlowip_reg[i], 1);
-                }
-            }
-
             switch (*nextheader) {
                 case (IPV6_PROTO_NUM_ICMPV6): {
                     /* checksum test*/
