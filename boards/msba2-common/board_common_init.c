@@ -51,6 +51,8 @@ and the mailinglist (subscription via web site)
 #define PCRTC         BIT9
 #define CL_CPU_DIV    4
 
+#define WD_INTERVAL    10      ///< number of seconds before WD triggers
+
 /*---------------------------------------------------------------------------*/
 /**
  * @brief   Enabling MAM and setting number of clocks used for Flash memory fetch
@@ -85,8 +87,17 @@ void init_clks2(void)
     while (!(PLLSTAT & BIT25));
 }
 
+void watchdog_init(void)
+{
+    WDCLKSEL = 0;                                   // clock source: RC oscillator
+    WDMOD &= ~WDTOF;                                // clear time-out flag
+    WDTC = (F_RC_OSCILLATOR / 4) * WD_INTERVAL;
+}
+
+
 void bl_init_clks(void)
 {
+    watchdog_init();
     PCONP = PCRTC;          // switch off everything except RTC
     init_clks1();
     init_clks2();
