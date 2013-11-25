@@ -79,7 +79,9 @@ void auto_init(void)
 #endif
 #ifdef MODULE_CC110X
     DEBUG("Auto init CC1100 module.\n");
+#ifndef MODULE_TRANSCEIVER
     cc1100_init();
+#endif
 #endif
 #ifdef MODULE_LTC4150
     DEBUG("Auto init ltc4150 module.\n");
