@@ -745,7 +745,7 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
             m_send.type = LOWPAN_FRAME_RECEIVED;;
             current_frame.length = length;
             current_frame.data = data;
-            m_send.content.ptr = (char *) &current_frame;
+            m_send.content.ptr = (char *) current_frame;
             msg_send(&m_send, sixlowpan_reg[i], 1);
         }
     }
