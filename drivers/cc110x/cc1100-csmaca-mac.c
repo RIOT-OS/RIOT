@@ -50,12 +50,13 @@ static double collisions_per_sec = 0;
 static int collision_state = COLLISION_STATE_INITIAL;
 static uint64_t collision_measurement_start = 0;
 
-volatile static int cs_hwtimer_id = -1;
-volatile static int cs_timeout_flag = 0;
+static volatile int cs_hwtimer_id = -1;
+static volatile int cs_timeout_flag = 0;
 
 /*---------------------------------------------------------------------------*/
 static void cs_timeout_cb(void *ptr)
 {
+    (void) ptr;
     cs_timeout_flag = 1;
 }
 
@@ -181,10 +182,6 @@ window:
     }
 
     backoff = rand() % windowSize;			/* ...and choose new backoff */
-
-    if (backoff < 0) {
-        backoff *= -1;
-    }
 
     backoff += (uint16_t) 1;
 cycle:

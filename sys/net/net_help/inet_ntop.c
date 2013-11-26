@@ -145,7 +145,7 @@ static const char *inet_ntop6(const unsigned char *src, char *dst, size_t size)
      */
     tp = tmp;
 
-    for (i = 0; i < (IN6ADDRSZ / INT16SZ);) {
+    for (i = 0; i < ((int) (IN6ADDRSZ / INT16SZ));) {
         /* Are we inside the best run of 0x00's? */
         if (i == best.base) {
             *tp++ = ':';

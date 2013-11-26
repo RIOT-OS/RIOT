@@ -264,6 +264,8 @@ int _getpid(void)
 /*---------------------------------------------------------------------------*/
 int _kill_r(struct _reent *r, int pid, int sig)
 {
+    (void) pid;
+    (void) sig;
     /* not implemented */
     r->_errno = ESRCH;      // no such process
     return -1;

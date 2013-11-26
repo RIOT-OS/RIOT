@@ -3,7 +3,7 @@
 
 int strncasecmp(const char *s1, const char *s2, size_t n)
 {
-    while (n-- && tolower(*s1) == tolower(*s2)) {
+    while (n-- && tolower((unsigned char) *s1) == tolower((unsigned char) *s2)) {
         if (!n && !*s1) {
             break;
         }
@@ -12,5 +12,5 @@ int strncasecmp(const char *s1, const char *s2, size_t n)
         s2++;
     }
 
-    return (tolower(*s1) - tolower(*s2));
+    return (tolower((unsigned char) *s1) - tolower((unsigned char) *s2));
 }

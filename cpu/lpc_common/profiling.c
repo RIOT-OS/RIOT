@@ -58,6 +58,8 @@ static int16_t __attribute__((__no_instrument_function__)) get_function_index(ui
 
 void __attribute__((__no_instrument_function__))  __cyg_profile_func_enter(void *func,  void *caller)
 {
+    (void) caller;
+
     if (!profiling) {
         return;
     }
@@ -94,6 +96,7 @@ void __attribute__((__no_instrument_function__))  __cyg_profile_func_enter(void 
 
 void __attribute__((__no_instrument_function__)) __cyg_profile_func_exit(void *func, void *caller)
 {
+    (void) caller;
     if (!profiling) {
         return;
     }
