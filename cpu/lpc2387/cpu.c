@@ -70,7 +70,7 @@ void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale)
 ******************************************************************************/
 #define VIC_BASE_ADDR   0xFFFFF000
 
-bool install_irq(int IntNumber, void *HandlerAddr, int Priority)
+bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority)
 {
     int *vect_addr;
     int *vect_cntl;

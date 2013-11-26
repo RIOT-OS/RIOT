@@ -48,7 +48,6 @@ void udp_packet_handler(void)
     msg_t m_recv_ip, m_send_ip, m_recv_udp, m_send_udp;
     ipv6_hdr_t *ipv6_header;
     udp_hdr_t *udp_header;
-    uint8_t *payload;
     socket_internal_t *udp_socket = NULL;
     uint16_t chksum;
 
@@ -56,12 +55,11 @@ void udp_packet_handler(void)
         msg_receive(&m_recv_ip);
         ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
         udp_header = ((udp_hdr_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
-        payload = (uint8_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN + UDP_HDR_LEN);
 
         chksum = udp_csum(ipv6_header, udp_header);
 
         if (chksum == 0xffff) {
-            udp_socket = get_udp_socket(ipv6_header, udp_header);
+            udp_socket = get_udp_socket(udp_header);
 
             if (udp_socket != NULL) {
                 m_send_udp.content.ptr = (char *)ipv6_header;
