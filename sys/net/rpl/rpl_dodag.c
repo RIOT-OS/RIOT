@@ -23,6 +23,12 @@
 #include "trickle.h"
 #include "rpl.h"
 
+#define ENABLE_DEBUG (0)
+#if ENABLE_DEBUG
+char addr_str[IPV6_MAX_ADDR_STR_LEN];
+#endif
+#include "debug.h"
+
 rpl_instance_t instances[RPL_MAX_INSTANCES];
 rpl_dodag_t dodags[RPL_MAX_DODAGS];
 rpl_parent_t parents[RPL_MAX_PARENTS];
@@ -232,11 +238,11 @@ rpl_parent_t *rpl_find_preferred_parent(void)
     for (uint8_t i = 0; i < RPL_MAX_PARENTS; i++) {
         if (parents[i].used) {
             if ((parents[i].rank == INFINITE_RANK) || (parents[i].lifetime <= 1)) {
-                puts("bad parent");
+                DEBUG("Infinite rank, bad parent\n");
                 continue;
             }
             else if (best == NULL) {
-                puts("parent");
+                DEBUG("possible parent\n");
                 best = &parents[i];
             }
             else {
@@ -332,6 +338,14 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     my_dodag->my_rank = dodag->of->calc_rank(preferred_parent, dodag->my_rank);
     my_dodag->dao_seq = RPL_COUNTER_INIT;
     my_dodag->min_rank = my_dodag->my_rank;
+    DEBUG("Joint DODAG:\n");
+    DEBUG("\tMOP:\t%02X\n", my_dodag->mop);
+    DEBUG("\tminhoprankincrease :\t%04X\n", my_dodag->minhoprankincrease);
+    DEBUG("\tdefault_lifetime:\t%02X\n", my_dodag->default_lifetime);
+    DEBUG("\tgrounded:\t%02X\n", my_dodag->grounded);
+    DEBUG("\tmy_preferred_parent:\t%s\n", ipv6_addr_to_str(addr_str, &my_dodag->my_preferred_parent->addr));
+    DEBUG("\tmy_preferred_parent rank\t%02X\n", my_dodag->my_preferred_parent->rank);
+    DEBUG("\tmy_preferred_parent lifetime\t%04X\n", my_dodag->my_preferred_parent->lifetime);
 
     start_trickle(my_dodag->dio_min, my_dodag->dio_interval_doubling, my_dodag->dio_redundancy);
     delay_dao();
