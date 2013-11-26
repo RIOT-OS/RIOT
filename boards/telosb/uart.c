@@ -2,7 +2,7 @@
  * uart.c - Implementation for the TelosB UART
  * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr>
  *
- * This file subject to the terms and conditions of the LGPLv2. See the file
+ * This file is subject to the terms and conditions of the LGPLv2. See the file
  * LICENSE in the top level directory for more details.
  */
 
