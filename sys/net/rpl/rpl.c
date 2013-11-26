@@ -387,7 +387,7 @@ struct rpl_tvo_t * rpl_tvo_auto_init(struct rpl_tvo_t * tvo, uint8_t instance, u
 
 
 // trail: enable TRAIL at startup
-void start_with_trail(void){
+void enable_trail(void){
 	do_trail = 1;
 	printf("TRAIL enabled\n");
 }
