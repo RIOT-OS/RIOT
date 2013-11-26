@@ -280,7 +280,7 @@ void rpl_init_root(void)
     inst = rpl_new_instance(RPL_DEFAULT_INSTANCE);
 
     if (inst == NULL) {
-        DEBUG("Error - No memory for another RPL instance\n");
+    	printf("Error - No memory for another RPL instance\n");
         return;
     }
 
@@ -310,13 +310,13 @@ void rpl_init_root(void)
         dodag->my_preferred_parent = NULL;
     }
     else {
-        DEBUG("Error - could not generate DODAG\n");
+    	printf("Error - could not generate DODAG\n");
         return;
     }
-
+    printf("r: ID %u selected rank %u\n",my_address.uint8[15],dodag->my_rank);
     i_am_root = 1;
     start_trickle(dodag->dio_min, dodag->dio_interval_doubling, dodag->dio_redundancy);
-    DEBUG("ROOT INIT FINISHED\n");
+    printf("ROOT INIT FINISHED\n");
 
 }
 
@@ -430,25 +430,34 @@ void configure_as_attacker(uint16_t rank){
 // trail: enable attacker at startup- only use the chosen rank
 void reset_rpl(void){
 	rpl_dodag_t *my_dodag = rpl_get_my_dodag();
+
+	printf("Node %u deleting all TRAIL buffers and RPL tables\n",my_address.uint8[15]);
+	reset_trail_buffers();
+	rpl_delete_all_parents();
+
 	if(my_dodag != NULL){
 		//my_dodag->my_rank = INFINITE_RANK;
 		//my_dodag->min_rank = INFINITE_RANK;
-		rpl_delete_all_parents();
-		reset_trail_buffers();
+		//printf("Node %u deleting all tables\n",my_address.uint8[15]);
+
 		rpl_del_dodag(my_dodag);
 		my_dodag = NULL;
+
 	}
+	printf("r: ID %u selected rank 0\n",my_address.uint8[15]);
+	printf("...done resetting\n");
 }
 
 void reset_trail_buffers(){
-	rpl_dodag_trail_t trail_parent_buffer[RPL_MAX_PARENTS]; //trail: buffer parents when receiving DIOs
+	//rpl_dodag_trail_t trail_parent_buffer[RPL_MAX_PARENTS]; //trail: buffer parents when receiving DIOs
 	uint8_t i;
 	for(i=0;i<RPL_MAX_PARENTS;i++){
-		memset(&trail_parent_buffer, 0, sizeof(rpl_dodag_trail_t));
+		trail_parent_buffer[i].in_progress = 0;
+		memset(&trail_parent_buffer[i], 0, sizeof(trail_parent_buffer[i]));
 	}
 
 	for(i=0;i<TVO_LOCAL_BUFFER_LEN;i++){
-		memset(&tvo_local_buffer, 0, sizeof(struct rpl_tvo_local_t));
+		memset(&tvo_local_buffer[i], 0, sizeof(tvo_local_buffer[i]));
 		tvo_local_flags[i] = 0;
 	}
 
@@ -553,25 +562,15 @@ void resend_tvos(){
 	for(i=0;i<TVO_LOCAL_BUFFER_LEN;i++){
 		if(tvo_local_flags[i] == 1){ //only resend for which no ack has been received
 			resend++;
-		//	printf("%u: ((%u - %u) > %u) && (%u < %u) --> %u \n",i, now.microseconds, tvo_local_buffer[i].timestamp_received, (DEFAULT_WAIT_FOR_TVO_ACK*1000000), tvo_local_buffer[i].number_resend, TVO_SEND_RETRIES, (now.microseconds - tvo_local_buffer[i].timestamp_received));
 			if(((now.microseconds - tvo_local_buffer[i].timestamp_received) > (DEFAULT_WAIT_FOR_TVO_ACK * 1000000)) && (tvo_local_buffer[i].number_resend < TVO_SEND_RETRIES)){
 				//resend tvo
 				struct rpl_tvo_t tvo;
 				memcpy(&tvo, &tvo_local_buffer[i], sizeof(tvo));
-			//	tvo.tvo_seq = tvo_local_buffer[i].his_tvo_seq;
 				printf("*RE*");
-
-				//test: send via multicast
-	//			ipv6_addr_t next_hop;
-//				memcpy(&next_hop, &(ipv6_buf->srcaddr), sizeof(next_hop));
-
-			//	ipv6_addr_set_all_nodes_addr(&next_hop);
-			//	send_TVO(&next_hop, &tvo, NULL);
 
 				send_TVO(&tvo_local_buffer[i].dst_addr, &tvo, NULL);
 
 				tvo_local_buffer[i].number_resend++;
-				//usleep(500000);
 				timex_t time = timex_set(0, 250000);
 				vtimer_sleep(time);
 			}
@@ -583,11 +582,8 @@ void resend_tvos(){
 		}
 	}
 	if(resend == 0){
-		delay_tvo(TEST_WAIT_FOR_TVO_ACK);
+		delay_tvo(LONG_WAIT_FOR_TVO_ACK);
 	}
-//	else{
-//		printf("Number of TVOs for resend at later point: %u\n",resend);
-//	}
 }
 
 

@@ -133,14 +133,7 @@
 #define TVO_LOCAL_BUFFER_LEN        10 //trail: for TVO ACK keep TVOs
 #define DEFAULT_WAIT_FOR_TVO_ACK     4 // trail TVO
 #define LONG_WAIT_FOR_TVO_ACK        1000000 // trail TVO
-#define TEST_WAIT_FOR_TVO_ACK        1000000 // trail TVO
 #define TVO_SEND_RETRIES             10 // trail TVO
-
-
-//trail signature
-typedef struct __attribute__ ((packed)) signature_t {
-    uint8_t uint8[12];
-} signature_t;
 
 //trail rpl_tvo
 struct __attribute__((packed)) rpl_tvo_t{

@@ -205,31 +205,12 @@ void tvo_delay_over(void){
         while(1){
 
                 thread_sleep();
+                rpl_dodag_t * mydodag = rpl_get_my_dodag();
 
-                //if((tvo_ack_received == false) && (tvo_counter < TVO_SEND_RETRIES)){
-         //       if(tvo_counter < TVO_SEND_RETRIES){
- //                       tvo_counter++;
-                        rpl_dodag_t * mydodag = rpl_get_my_dodag();
-
-/*
-                        struct rpl_tvo_t tvo;
-                        //rpl_tvo_init(&tvo);
-
-                        memcpy(&tvo, tvo_resend, sizeof(tvo));
-
-                        //printf("\n(checking trickle) tvo_nonce: %u, tvo_rank: %u, resend_nonce: %u, resend_rank: %u \n\n", tvo.nonce, tvo.rank, tvo_resend->nonce, tvo_resend->rank);
-
-                        printf("*RE*");
-                        send_TVO(&(tvo_resend->dst_addr), &tvo, NULL);
-*/
-                        resend_tvos();
-                        tvo_time = timex_set(tvo_resend_seconds, tvo_resend_micro);
-                        vtimer_remove(&tvo_timer);
-                        vtimer_set_wakeup(&tvo_timer, tvo_time, tvo_delay_over_pid);
-    //            }
-        //        else if (tvo_ack_received == false){
-        //                long_delay_tvo();
-        //        }
+                resend_tvos();
+                tvo_time = timex_set(tvo_resend_seconds, tvo_resend_micro);
+                vtimer_remove(&tvo_timer);
+                vtimer_set_wakeup(&tvo_timer, tvo_time, tvo_delay_over_pid);
         }
 }
 

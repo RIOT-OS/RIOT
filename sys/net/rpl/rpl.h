@@ -51,6 +51,18 @@ uint8_t include_parent_into_trail_buffer(void); //trail
 uint8_t get_parent_from_trail_buffer(ipv6_addr_t * src_addr); // trail
 uint8_t is_parent_verified(ipv6_addr_t * src_addr, uint16_t dio_rank); //trail
 void disable_attacker(void); //trail: safest demo
+void reset_rpl(void); //trail safest demo
+void reset_trail_buffers(); // trail
+void resend_tvos(); //trail
+void configure_as_attacker(uint16_t rank); //trail
+struct rpl_tvo_local_t * has_tvo_been_received(ipv6_addr_t * source, uint8_t tvo_seq); //trail
+void save_tvo_locally(struct rpl_tvo_local_t * tvo_copy); //trail
+void reset_tvo_timer(); //trail
+void disable_attacker(void); //trail
+void start_as_attacker(uint16_t rank); //trail
+void disable_trail(void); //trail
+void start_with_trail(void); //trail
+
 
 
 void rpl_process(void);
