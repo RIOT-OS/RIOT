@@ -1,0 +1,20 @@
+export CPU = stm32f407vg
+
+# toolchain config
+export FPU_USAGE = -mfloat-abi=hard -mfpu=fpv4-sp-d16
+export PREFIX = arm-none-eabi-
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
+#export CFLAGS += -std=gnu99 -O2 -Wall -Wstrict-prototypes -mcpu=arm7tdmi-s -gdwarf-2 
+export CFLAGS = -DUSE_STDPERIPH_DRIVER -DUSE_STM32_DISCOVERY -DSTM32F4XX -ggdb -g3 -std=gnu99 -O0 -Wall -Wstrict-prototypes -mcpu=cortex-m4 $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
+export ASFLAGS = -ggdb -g3 -mcpu=cortex-m4 $(FPU_USAGE) -mlittle-endian 
+export AS = $(PREFIX)as
+export LINK = $(PREFIX)gcc
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+export FLASHER = st-flash
+export FFLAGS = write bin/$(PROJECT).bin 0x8000000  
+TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
+LINKFLAGS = -DUSE_STDPERIPH_DRIVER -DUSE_STM32_DISCOVERY -g3 -ggdb -std=gnu99 -mcpu=cortex-m4 $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles -T$(RIOTBASE)/cpu/$(CPU)/stm32f407vg_linkerscript.ld
+
+export INCLUDES += -I$(RIOTBOARD)/stm32f4discovery/include
