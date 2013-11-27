@@ -10,8 +10,12 @@ OBJ = $(SRC:%.c=$(BINDIR)%.o)
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
 GIT_STRING := $(shell git describe --abbrev=4 --dirty=-`hostname`)
-GIT_STRING += $(shell git rev-parse --abbrev-ref HEAD)
-GIT_VERSION = $(shell echo $(GIT_STRING) | sed 's/ /-/')
+GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+ifeq ($(strip $(GIT_BRANCH)),master)
+	GIT_VERSION = $(GIT_STRING)
+else
+	GIT_VERSION = $(shell echo $(GIT_STRING) $(GIT_BRANCH) | sed 's/ /-/')
+endif
 ifeq ($(strip $(GIT_VERSION)),)
 	GIT_VERSION := "UNKNOWN"
 endif
