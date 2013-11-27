@@ -1,7 +1,4 @@
 /*
-
- * lm75a-temp-sensor.h - Definitions of the LM75A temperature sensor driver.
- *
  * Copyright (C) 2013 Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  *
  * This source code is licensed under the LGPLv2 license,
@@ -9,26 +6,22 @@
  */
  
 /**
- * @defgroup	lm75a LM75A
- * @ingroup		drivers
- * @brief		Driver for the LM75A digital temperature sensor and thermal watchdog
+ * @defgroup    lm75a LM75A
+ * @ingroup     drivers
+ * @brief       Driver for the LM75A digital temperature sensor and thermal watchdog
  * 
  * The connection between the MCU and the LM75A is based on the i2c-interface.
- */
-
-/**
+ *
+ * @{
+ *
  * @file
  * @internal
  * @brief       Definitions of the LM75A temperature sensor driver.
  *
- *              The connection between the LM75A and the MCU is based
- *              on the I2C-interface.
+ * The connection between the LM75A and the MCU is based on the I2C-interface.
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
- * @version     $Revision: 3859 $
- *
- * @note        $Id: lm75a-temp-sensor.h 3854 2013-09-2 15:35:21 kasmi $
  */
 
 #ifndef LM75A_H_
@@ -260,4 +253,5 @@ bool lm75A_external_interrupt_register(void *handler);
  */
 void lm75A_set_in_alarm(bool b);
 
+/** @} */
 #endif /* LM75A_H_ */

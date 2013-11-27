@@ -57,5 +57,5 @@ void restoreIRQ(unsigned state);
  */
 int inISR(void);
 
-/**  @} */
+/** @} */
 #endif /* IRQ_H_ */

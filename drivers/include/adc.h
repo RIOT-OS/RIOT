@@ -1,27 +1,30 @@
+/**
+ * @defgroup    drivers_adc ADC
+ * @ingroup     drivers
+ * @brief       Generic ADC driver
+ * @{
+ *
+ * @file        adc.h
+ */
+
 #ifndef ADC_H
 #define ADC_H
 
 #include <stdint.h>
 
-
 /**
- * @defgroup	drivers_adc ADC
- * @ingroup		drivers
- * @brief		Generic ADC driver
- */
-
-/**
- * @brief	Initialize ADC.
+ * @brief   Initialize ADC.
  */
 void adc_init(void);
 
 /**
- * @brief	Read ADC value of selected channel.
+ * @brief   Read ADC value of selected channel.
  *
  * Valid channel numbers are from 0 to 2.
  *
- * @return	ADC value of selected channel.
+ * @return  ADC value of selected channel.
  */
 uint16_t adc_read(uint8_t channel);
 
+/** @} */
 #endif /* ADC_H */

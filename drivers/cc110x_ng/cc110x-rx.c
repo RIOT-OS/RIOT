@@ -8,13 +8,15 @@
  */
 
 /**
- * @ingroup 	drivers_cc110x_ng
+ * @ingroup     drivers_cc110x_ng
  * @{
- * @file		cc110x-rx.c
- * @brief		Functions for packet reception on cc110x
- * @author 		Oliver Hahm <oliver.hahm@inria.fr>
+ * @file        cc110x-rx.c
+ * @brief       Functions for packet reception on cc110x
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
+
 #include <cc110x_ng.h>
 #include <cc110x-internal.h>
 #include <cc110x-config.h>
@@ -41,8 +43,8 @@ static uint8_t is_ignored(radio_address_t addr);
 static uint8_t receive_packet_variable(uint8_t *rxBuffer, uint8_t length);
 static uint8_t receive_packet(uint8_t *rxBuffer, uint8_t length);
 
-rx_buffer_t cc110x_rx_buffer[RX_BUF_SIZE];		    ///< RX buffer
-volatile uint8_t rx_buffer_next;	    ///< Next packet in RX queue
+rx_buffer_t cc110x_rx_buffer[RX_BUF_SIZE];          ///< RX buffer
+volatile uint8_t rx_buffer_next;        ///< Next packet in RX queue
 
 void cc110x_rx_handler(void)
 {
@@ -66,13 +68,13 @@ void cc110x_rx_handler(void)
 
         cc110x_rx_buffer[rx_buffer_next].rssi = rflags._RSSI;
         cc110x_rx_buffer[rx_buffer_next].lqi = rflags._LQI;
-        cc110x_strobe(CC1100_SFRX);		/* ...for flushing the RX FIFO */
+        cc110x_strobe(CC1100_SFRX);     /* ...for flushing the RX FIFO */
 
         /* Valid packet. After a wake-up, the radio should be in IDLE.
          * So put CC1100 to RX for WOR_TIMEOUT (have to manually put
          * the radio back to sleep/WOR). */
-        //cc110x_spi_write_reg(CC1100_MCSM0, 0x08);	/* Turn off FS-Autocal */
-        cc110x_write_reg(CC1100_MCSM2, 0x07);	/* Configure RX_TIME (until end of packet) */
+        //cc110x_spi_write_reg(CC1100_MCSM0, 0x08); /* Turn off FS-Autocal */
+        cc110x_write_reg(CC1100_MCSM2, 0x07);   /* Configure RX_TIME (until end of packet) */
         cc110x_strobe(CC1100_SRX);
         hwtimer_wait(IDLE_TO_RX_TIME);
         radio_state = RADIO_RX;
@@ -106,8 +108,8 @@ void cc110x_rx_handler(void)
         rflags.TOF = 0;
 
         /* CRC false or RX buffer full -> clear RX FIFO in both cases */
-        cc110x_strobe(CC1100_SIDLE);	/* Switch to IDLE (should already be)... */
-        cc110x_strobe(CC1100_SFRX);		/* ...for flushing the RX FIFO */
+        cc110x_strobe(CC1100_SIDLE);    /* Switch to IDLE (should already be)... */
+        cc110x_strobe(CC1100_SFRX);     /* ...for flushing the RX FIFO */
 
         /* If packet interrupted this nodes send call,
          * don't change anything after this point. */

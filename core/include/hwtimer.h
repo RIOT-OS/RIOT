@@ -122,12 +122,9 @@ void hwtimer_spin(unsigned long ticks);
 
 int hwtimer_active(void);
 
-/**
- * @}
- */
+/** @} */
 
 /* internal */
-
 /**
  * @brief    TODO
  * @internal

@@ -14,12 +14,12 @@ See the file LICENSE in the top level directory for more details.
 #define _CPU_H
 
 /**
- * @defgroup	msp430		TI MSP430
- * @ingroup		cpu
- * @brief		Texas Instruments MSP430 specific code
+ * @defgroup    msp430 TI MSP430
+ * @ingroup     cpu
+ * @brief       Texas Instruments MSP430 specific code
 
 <h2>First steps</h2>
-\li	See the <a href="../manual/index.html">manual</a> for toolchain and ide setup
+\li See the <a href="../manual/index.html">manual</a> for toolchain and ide setup
 
  * @{
  */
@@ -34,7 +34,7 @@ See the file LICENSE in the top level directory for more details.
 
 /* CPU speed */
 #define F_CPU               (2457600ul)
-#define F_RC_OSCILLATOR		(32768)	///< Frequency of internal RC oscillator
+#define F_RC_OSCILLATOR     (32768) ///< Frequency of internal RC oscillator
 
 extern volatile int __inISR;
 extern char __isr_stack[MSP430_ISR_STACK_SIZE];
@@ -132,4 +132,3 @@ void msp430_cpu_init(void);
 
 /** @} */
 #endif // _CPU_H
-

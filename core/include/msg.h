@@ -19,7 +19,7 @@
  * queue are never dropped and the sending never blocks. Threads with a full message queue behaves
  * like in synchronous mode.
  * 
- * @{ 
+ * @{
  *
  * @file        msg.h
  * @brief       Messaging API for inter process communication

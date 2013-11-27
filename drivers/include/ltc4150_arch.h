@@ -18,19 +18,14 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 /**
  * @defgroup    ltc4150 LTC4150
  * @ingroup     drivers
- * @brief		Driver for the Linear Technology LTC4150 Coulomb Counter
+ * @brief       Driver for the Linear Technology LTC4150 Coulomb Counter
  * @{
- */
-
-/**
- * @file
+ *
+ * @file        ltc4150_arch.h
  * @brief       LTC4150 Coulomb Counter
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will
- * @version     $Revision: 1203 $
- *
- * @note        $Id: ltc4150_arch.h 1203 2009-07-07 10:23:18Z baar $
  */
 
 #define _GFH (double)32.631375

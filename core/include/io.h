@@ -24,5 +24,5 @@
 
 int fw_puts(char *data, int count);
 
-/**  @} */
+/** @} */
 #endif /* IO_H */

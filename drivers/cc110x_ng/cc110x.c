@@ -8,12 +8,12 @@
  */
 
 /**
- * @ingroup 	drivers_cc110x_ng
+ * @ingroup     drivers_cc110x_ng
  * @{
+ * @file        cc110x.c
+ * @brief       Basic functionality of cc110x driver
  *
- * @file		cc110x.c
- * @brief		Basic functionality of cc110x driver
- * @author		Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 #include <cc110x_ng.h>
@@ -32,15 +32,15 @@
 #include <debug.h>
 
 /* some externals */
-extern uint8_t pa_table[];				///< PATABLE with available output powers
+extern uint8_t pa_table[];              ///< PATABLE with available output powers
 extern uint8_t pa_table_index;          ///< Current PATABLE Index
 
 /* global variables */
 
 cc110x_statistic_t cc110x_statistic;
 
-volatile cc110x_flags rflags;		                ///< Radio control flags
-volatile uint8_t radio_state = RADIO_UNKNOWN;		///< Radio state
+volatile cc110x_flags rflags;                       ///< Radio control flags
+volatile uint8_t radio_state = RADIO_UNKNOWN;       ///< Radio state
 
 static radio_address_t radio_address;                     ///< Radio address
 static uint8_t radio_channel;                             ///< Radio channel
@@ -54,7 +54,7 @@ static void power_up_reset(void);
 static void write_register(uint8_t r, uint8_t value);
 
 /*---------------------------------------------------------------------------*
- * 								Radio Driver API                             *
+ *                              Radio Driver API                             *
  *---------------------------------------------------------------------------*/
 void cc110x_init(int tpid)
 {
@@ -353,7 +353,7 @@ int16_t cc110x_get_channel(void)
 
 
 /*---------------------------------------------------------------------------
- * 							CC1100 reset functionality
+ *                          CC1100 reset functionality
  *---------------------------------------------------------------------------*/
 
 static void reset(void)
@@ -409,13 +409,13 @@ static int rd_set_mode(int mode)
     switch(mode) {
         case RADIO_MODE_ON:
             DEBUG("Enabling rx mode\n");
-            cc110x_init_interrupts();			/* Enable interrupts */
-            cc110x_setup_rx_mode();				/* Set chip to desired mode */
+            cc110x_init_interrupts();           /* Enable interrupts */
+            cc110x_setup_rx_mode();             /* Set chip to desired mode */
             break;
 
         case RADIO_MODE_OFF:
-            cc110x_disable_interrupts();		/* Disable interrupts */
-            cc110x_switch_to_pwd();					/* Set chip to power down mode */
+            cc110x_disable_interrupts();        /* Disable interrupts */
+            cc110x_switch_to_pwd();                 /* Set chip to power down mode */
             break;
 
         case RADIO_MODE_GET:

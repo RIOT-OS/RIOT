@@ -13,8 +13,6 @@
  * @file        queue.h
  * @brief       A simple queue implementation
  *
- * TODO document functions and datastructures
- *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */

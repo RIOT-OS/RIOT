@@ -7,9 +7,9 @@
  */
  
 /**
- * @defgroup	mc1322x Freescale MC1322x
- * @ingroup		cpu
- * @brief		Freescale MC1322x specific code
+ * @defgroup    mc1322x Freescale MC1322x
+ * @ingroup     cpu
+ * @brief       Freescale MC1322x specific code
  */
 
 #ifndef CPU_H
@@ -19,6 +19,6 @@
 #include "arm_cpu.h"
 #include "mc1322x.h"
 
-extern uintptr_t __stack_start;		///< end of user stack memory space
+extern uintptr_t __stack_start;     ///< end of user stack memory space
 
 #endif /* CPU_H */

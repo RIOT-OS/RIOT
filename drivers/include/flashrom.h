@@ -1,10 +1,12 @@
-
-
-
-/**
- * @defgroup	flashrom Flash memory driver
- * @ingroup		drivers
- * @brief		Generic flash memory driver
+/*
+ * @defgroup    flashrom Flash memory driver
+ * @ingroup     drivers
+ * @brief       Generic flash memory driver
+ * @{
+ *
+ * @file        flashrom.h
+ *
+ * @author      unknown
  */
 
 #ifndef FLASHROM_H
@@ -20,7 +22,7 @@
  *
  * @return          1 on success, 0 otherwise
  */
-uint8_t          	flashrom_erase(uint8_t *addr);
+uint8_t             flashrom_erase(uint8_t *addr);
 
 /* @brief Write buffer from ram to flash
  *
@@ -30,7 +32,7 @@ uint8_t          	flashrom_erase(uint8_t *addr);
  *
  * @return          1 on success, 0 otherwise
  */
-uint8_t 			flashrom_write(uint8_t *dst, char *src, size_t size);
+uint8_t             flashrom_write(uint8_t *dst, char *src, size_t size);
 
-
+/** @} */
 #endif /* FLASHROM_H */

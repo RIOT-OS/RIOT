@@ -1,8 +1,8 @@
 
 /**
- * @defgroup 	sys_timex Timex
- * @ingroup 	sys
- * @brief		Utility library for comparing and computing timestamps
+ * @defgroup    sys_timex Timex
+ * @ingroup     sys
+ * @brief       Utility library for comparing and computing timestamps
  */
 
 #ifndef __TIMEX_H

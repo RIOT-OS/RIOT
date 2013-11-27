@@ -1,18 +1,20 @@
-/**
- * Configuration parameters for the cc110x radio chip
- *
+/*
  * Copyright (C) 2009 Freie Universität Berlin
  * Copyright (C) 2013 INRIA 
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup		drivers_cc110x_ng
+ */
+
+/**
+ * @ingroup     drivers_cc110x_ng
  * @{
  *
- * @file		cc110x-config.h
- * @author Oliver Hahm <oliver.hahm@inria.fr>
+ * @file        cc110x-config.h
+ * @brief       Configuration parameters for the cc110x radio chip
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 #ifndef CC1100_CONFIG_H
 #define CC1100_CONFIG_H
@@ -65,47 +67,47 @@ typedef struct {
 
 /** CC1100 radio configuration */
 typedef struct {
-    cc110x_reg_t reg_cfg;	 	///< CC1100 register configuration
-    uint8_t pa_power;			///< Output power setting
+    cc110x_reg_t reg_cfg;       ///< CC1100 register configuration
+    uint8_t pa_power;           ///< Output power setting
 } cc110x_cfg_t;
 
 /**
- * @brief	Radio Control Flags
+ * @brief   Radio Control Flags
  */
 typedef struct {
-    uint32_t TOF;				///< Time of flight of the last packet and last ACK
+    uint32_t TOF;               ///< Time of flight of the last packet and last ACK
     timex_t  TOA;               ///< Time of packet arriveal
-    uint32_t TCP;				///< Time to compute packet
-    unsigned RPS		: 16;	///< Raw packets sent to transmit last packet
-    unsigned RETC		: 8;	///< Retransmission count of last send packet
-    unsigned _RSSI	 	: 8;	///< The RSSI value of last received packet
-    unsigned RSSI_SEND 	: 8; 	///< The RSSI value of the last send unicast packet of this node
-    unsigned _LQI		: 8;	///< The LQI value of the last received packet
-    unsigned LL_ACK  	: 1;	///< Is set if Link-Level ACK is received, otherwise 0 (reset on new burst)
-    unsigned CAA     	: 1;	///< The status of the air (1 = air free, 0 = air not free)
-    unsigned CRC_STATE  : 1;	///< The CRC status of last received packet (1 = OK, 0 = not OK)
-    unsigned SEQ	 	: 1;	///< Sequence number (toggles between 0 and 1)
-    unsigned MAN_WOR 	: 1; 	///< Manual WOR set (for randomized WOR times => no synch)
-    unsigned KT_RES_ERR : 1;	///< A hwtimer resource error has occurred (no free timers available)
-    unsigned TX         : 1;	///< State machine TX lock, only ACKs will be received
-    unsigned WOR_RST 	: 1;	///< Reset CC1100 real time clock (WOR) on next WOR strobe
+    uint32_t TCP;               ///< Time to compute packet
+    unsigned RPS        : 16;   ///< Raw packets sent to transmit last packet
+    unsigned RETC       : 8;    ///< Retransmission count of last send packet
+    unsigned _RSSI      : 8;    ///< The RSSI value of last received packet
+    unsigned RSSI_SEND  : 8;    ///< The RSSI value of the last send unicast packet of this node
+    unsigned _LQI       : 8;    ///< The LQI value of the last received packet
+    unsigned LL_ACK     : 1;    ///< Is set if Link-Level ACK is received, otherwise 0 (reset on new burst)
+    unsigned CAA        : 1;    ///< The status of the air (1 = air free, 0 = air not free)
+    unsigned CRC_STATE  : 1;    ///< The CRC status of last received packet (1 = OK, 0 = not OK)
+    unsigned SEQ        : 1;    ///< Sequence number (toggles between 0 and 1)
+    unsigned MAN_WOR    : 1;    ///< Manual WOR set (for randomized WOR times => no synch)
+    unsigned KT_RES_ERR : 1;    ///< A hwtimer resource error has occurred (no free timers available)
+    unsigned TX         : 1;    ///< State machine TX lock, only ACKs will be received
+    unsigned WOR_RST    : 1;    ///< Reset CC1100 real time clock (WOR) on next WOR strobe
 } cc110x_flags;
 
 /**
- * @brief	Statistic interface for debugging
+ * @brief   Statistic interface for debugging
  */
 typedef struct cc110x_statistic {
-    uint32_t	packets_in;
-    uint32_t	packets_in_crc_fail;
-    uint32_t	packets_in_while_tx;
-    uint32_t	packets_in_dups;
-    uint32_t	packets_in_up;
-    uint32_t	packets_out;
-    uint32_t	packets_out_broadcast;
-    uint32_t	raw_packets_out;
-    uint32_t	acks_send;
-    uint32_t	rx_buffer_max;
-    uint32_t	watch_dog_resets;
+    uint32_t    packets_in;
+    uint32_t    packets_in_crc_fail;
+    uint32_t    packets_in_while_tx;
+    uint32_t    packets_in_dups;
+    uint32_t    packets_in_up;
+    uint32_t    packets_out;
+    uint32_t    packets_out_broadcast;
+    uint32_t    raw_packets_out;
+    uint32_t    acks_send;
+    uint32_t    rx_buffer_max;
+    uint32_t    watch_dog_resets;
 } cc110x_statistic_t;
 
 /** @} */

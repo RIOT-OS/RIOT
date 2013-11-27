@@ -16,30 +16,26 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #define SHT11_H_
 
 /**
- * @defgroup	sht11	SHT11
- * @ingroup		drivers
+ * @defgroup    sht11   SHT11
+ * @ingroup     drivers
  * @{
- */
-
-/**
- * @file
- * @brief		SHT11 Device Driver
+ *
+ * @file        sht11.h
+ * @brief       SHT11 Device Driver
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
- * @version     $Revision: 667 $
- *
- * @note		$Id: sht11.h 667 2009-02-19 15:06:38Z baar $
  */
+
 #include <stdint.h>
 
-#define SHT11_NO_ACK		(0)
-#define SHT11_ACK			(1)
+#define SHT11_NO_ACK        (0)
+#define SHT11_ACK           (1)
 //adr command  r/w
-#define SHT11_STATUS_REG_W	(0x06) 	//000  0011    0
-#define SHT11_STATUS_REG_R	(0x07) 	//000  0011    1
-#define SHT11_MEASURE_TEMP	(0x03) 	//000  0001	   1
-#define SHT11_MEASURE_HUMI	(0x05) 	//000  0010	   1
-#define SHT11_RESET			(0x1E) 	//000  1111	   0
+#define SHT11_STATUS_REG_W  (0x06)  //000  0011    0
+#define SHT11_STATUS_REG_R  (0x07)  //000  0011    1
+#define SHT11_MEASURE_TEMP  (0x03)  //000  0001    1
+#define SHT11_MEASURE_HUMI  (0x05)  //000  0010    1
+#define SHT11_RESET         (0x1E)  //000  1111    0
 
 /* time to wait after toggling the data line */
 #define SHT11_DATA_WAIT     (HWTIMER_TICKS(1))
@@ -53,13 +49,13 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * @brief   sht11 measureable data
  */
 typedef struct {
-    float	temperature;    /**< temperature value */
-    float	relhum;         /**< linear relative humidity */
-    float	relhum_temp;    /**< temperature compensated relative humidity */
+    float   temperature;    /**< temperature value */
+    float   relhum;         /**< linear relative humidity */
+    float   relhum_temp;    /**< temperature compensated relative humidity */
 } sht11_val_t;
 
 /**
- * @brief	SHT11 modes that can be measured
+ * @brief   SHT11 modes that can be measured
  */
 typedef enum {
     TEMPERATURE = 1,
@@ -67,12 +63,12 @@ typedef enum {
 } sht11_mode_t;
 
 /**
- * @brief	Initialize SHT11 ports
+ * @brief   Initialize SHT11 ports
  */
 void sht11_init(void);
 
 /**
- * @brief	Read sensor
+ * @brief   Read sensor
  *
  * @param value The struct to be filled with measured values
  * @param mode  Specifies type of data to be read
@@ -107,4 +103,3 @@ uint8_t sht11_read_status(uint8_t *p_value, uint8_t *p_checksum);
 
 /** @} */
 #endif /*SHT11_H_*/
-

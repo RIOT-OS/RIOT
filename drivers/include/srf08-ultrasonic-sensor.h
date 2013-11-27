@@ -1,6 +1,4 @@
 /*
- * srf08-ultrasonic-sensor.h - Definitions for the SRF08 ultrasonic ranger.
- *
  * Copyright (C) 2013 Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  *
  * This source code is licensed under the LGPLv2 license,
@@ -8,26 +6,22 @@
  */
  
 /**
- * @defgroup	srf08 SRF08
- * @ingroup		drivers
- * @brief		Driver for the SRF08 ultrasonic range sensor
+ * @defgroup    srf08 SRF08
+ * @ingroup     drivers
+ * @brief       Driver for the SRF08 ultrasonic range sensor
  * 
  * The connection between the MCU and the SRF08 is based on the i2c-interface.
- */
-
-/**
+ * 
+ * @{
+ *
  * @file
  * @internal
  * @brief       Driver definitions for the SRF08 ultrasonic.
- *              The communication between the MCU and SRF08 is via the i2c
- *              interface.
+ *
+ * The communication between the MCU and SRF08 is via the i2c interface.
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
- * @version     $Revision: 3857 $
- *
- * @note        $Id: srf08-ultrasonic-sensor.h 3854 2013-09-03 16:26:13 kasmi $
- *
  */
 
 #ifndef SRF08_ULTRASONIC_SENSOR_I2C_H_
@@ -134,4 +128,5 @@ uint8_t srf08_get_gain(void);
  */
 int32_t srf08_get_distances(uint32_t *range_array, uint8_t ranging_mode);
 
+/** @} */
 #endif /* SRF08_ULTRASONIC_SENSOR_I2C_H_ */

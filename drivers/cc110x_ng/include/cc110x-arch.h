@@ -1,8 +1,8 @@
-/******************************************************************************
+/*
  * Copyright 2008, Freie Universitaet Berlin (FUB). All rights reserved.
  *
  * These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
+ * and Telematics group (http://cst.mi.fu-berlin.de).
  * ----------------------------------------------------------------------------
  * This file is part of RIOT.
  *
@@ -13,18 +13,16 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 *******************************************************************************/
 
 /**
- * @ingroup		drivers_cc110x_ng
+ * @ingroup     drivers_cc110x_ng
  * @{
  *
- * @file		cc110x-arch.h
- * @brief		CC1100 architecture dependent functions
+ * @file        cc110x-arch.h
+ * @brief       CC1100 architecture dependent functions
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
- * @author		Heiko Will <hwill@inf.fu-berlin.de>
- * @version     $Revision: 1775 $
- *
- * @note    	$Id: arch_cc110x.h 1775 2010-01-26 09:37:03Z hillebra $
+ * @author      Heiko Will <hwill@inf.fu-berlin.de>
  */
+
 #ifndef __CC1100_ARCH_H
 #define __CC1100_ARCH_H
 

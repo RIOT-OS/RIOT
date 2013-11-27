@@ -13,8 +13,8 @@
  * @file        config.h
  * @brief       Kernel configuration interface
  *
+ * @author      unknown
  */
-
 
 #ifndef CONFIG_H
 #define CONFIG_H

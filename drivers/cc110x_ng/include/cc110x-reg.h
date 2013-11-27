@@ -8,15 +8,16 @@
  */
 
 /**
- * @ingroup		drivers_cc110x_ng
+ * @ingroup     drivers_cc110x_ng
  * @{
  *
- * @file    	cc110x-reg.h
- * @brief   	Access to CC110X registers
+ * @file        cc110x-reg.h
+ * @brief       Access to CC110X registers
  *
- * @author  	INRIA
- * @author  	Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      INRIA
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
+
 #ifndef __CC110X_REG_H
 #define __CC110X_REG_H
 

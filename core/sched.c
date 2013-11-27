@@ -17,9 +17,9 @@
  * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
  *
  * @}
+ *
+ * TODO: setup dependency from SCHEDSTATISTICS to MODULE_HWTIMER 
  */
-
-/* TODO: setup dependency from SCHEDSTATISTICS to MODULE_HWTIMER */
 
 #include <stdint.h>
 #include <sched.h>

@@ -13,6 +13,9 @@
  * @file        lifo.c
  * @brief       LIFO buffer implementation
  *
+ * @file        lifo.c
+ * @brief       LIFO buffer implementation
+ * @author      unknown
  * @}
  */
 

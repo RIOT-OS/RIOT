@@ -1,6 +1,4 @@
-/**
- * Default configuration for the cc110x chip
- *
+/*
  * Copyright (C) 2013 INRIA 
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
@@ -9,19 +7,17 @@
  */
 
 /**
- * @ingroup		drivers_cc110x_ng
+ * @ingroup   drivers_cc110x_ng
  * @{
  *
  * @file
- * @brief		TI Chipcon CC110x default settings
+ * @brief   TI Chipcon CC110x default settings
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      INRIA
- * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
- * @author		Heiko Will <hwill@inf.fu-berlin.de>
+ * @author    Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
+ * @author    Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- *
- * @note		$Id: cc110x-defaultSettings.c 2058 2010-03-31 08:59:31Z hillebra $
  * @}
  */
 
@@ -35,7 +31,7 @@
  * -----------------------------------------
  *              0 |      0 | 869.525
  *              1 |     10 | 871.61
- *              2 |     20 | 873.58			~ seems to be bad (hang-ups with this channel)
+ *              2 |     20 | 873.58     ~ seems to be bad (hang-ups with this channel)
  *              3 |     30 | 875.61
  *              4 |     40 | 877.58
  *              5 |     50 | 879.61
@@ -68,9 +64,9 @@ char cc110x_conf[] = {
     0x0F, // FIFOTHR
     0x9B, // SYNC1
     0xAD, // SYNC0
-    0x3D, // PKTLEN 		(maximum value of packet length byte = 61)
+    0x3D, // PKTLEN     (maximum value of packet length byte = 61)
     0x06, // PKTCTRL1
-    0x45, // PKTCTRL0 	(variable packet length)
+    0x45, // PKTCTRL0   (variable packet length)
     0xFF, // ADDR
     CC1100_DEFAULT_CHANNR * 10, // CHANNR
     0x0B, // FSCTRL1
@@ -105,18 +101,18 @@ char cc110x_conf[] = {
     0x00  // padding to 4 bytes
 };
 
-uint8_t pa_table_index = PATABLE;	///< Current PATABLE Index
-uint8_t pa_table[] = {				///< PATABLE with available output powers
-              0x00,					///< -52 dBm
-              0x03,					///< -30 dBm
-              0x0D,					///< -20 dBm
-              0x1C,					///< -15 dBm
-              0x34,					///< -10 dBm
-              0x57,					///< - 5 dBm
-              0x3F,					///< - 1 dBm
-              0x8E,					///<   0 dBm
-              0x85,					///< + 5 dBm
-              0xCC,					///< + 7 dBm
-              0xC6, 				///< + 9 dBm
-              0xC3  				///< +10 dBm
+uint8_t pa_table_index = PATABLE; ///< Current PATABLE Index
+uint8_t pa_table[] = {        ///< PATABLE with available output powers
+              0x00,         ///< -52 dBm
+              0x03,         ///< -30 dBm
+              0x0D,         ///< -20 dBm
+              0x1C,         ///< -15 dBm
+              0x34,         ///< -10 dBm
+              0x57,         ///< - 5 dBm
+              0x3F,         ///< - 1 dBm
+              0x8E,         ///<   0 dBm
+              0x85,         ///< + 5 dBm
+              0xCC,         ///< + 7 dBm
+              0xC6,         ///< + 9 dBm
+              0xC3          ///< +10 dBm
 }; // If PATABLE is changed in size, adjust MAX_OUTPUT_POWER definition in CC1100 interface!

@@ -8,11 +8,12 @@
  */
 
 /**
- * @ingroup 	drivers_cc110x_ng
+ * @ingroup     drivers_cc110x_ng
  * @{
- * @file		cc110x-tx.c
- * @brief		Functions for packet transmission on cc110x
- * @author 		Oliver Hahm <oliver.hahm@inria.fr>
+ * @file        cc110x-tx.c
+ * @brief       Functions for packet transmission on cc110x
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 #include <stdio.h>

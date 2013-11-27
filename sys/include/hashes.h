@@ -1,6 +1,4 @@
-/**
- * This file contains some simple hash function
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
@@ -9,17 +7,21 @@
  */
 
 /**
- * @defgroup 	sys_hashes Hashes
- * @ingroup		sys
- * @brief		Hash function library
- */
-
-/**
- * @file
+ * @defgroup    sys_hashes Hashes
+ * @ingroup     sys
+ * @brief       Hash function library
+ * @{
+ *
+ * @file        hashes.h
+ * @brief       Hash function API
+ *
  * @autor       Jason Linehan <patientulysses@gmail.com>
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
+
+#ifndef __HASHES_H
+#define __HASHES_H
 
 #include <stddef.h>
 #include <inttypes.h>
@@ -153,3 +155,6 @@ uint32_t rotating_hash(const uint8_t *buf, size_t len);
  * @return 32 bit sized hash
  */
 uint32_t one_at_a_time_hash(const uint8_t *buf, size_t len);
+
+/** @} */
+#endif /* __HASHES_H */

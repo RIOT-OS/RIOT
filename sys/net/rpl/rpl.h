@@ -1,21 +1,25 @@
-/**
- * RPL constants and prototypes
- *
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @defgroup 	net_rpl RPL
- * @ingroup 	net
- * @brief		Routing Protocol for Low power and Lossy Networks
- * @{
- * @file    rpl.h
- * @brief   RPL header
- * @author  Eric Engel <eric.engel@fu-berlin.de>
- * @}
  */
+
+/**
+ * @defgroup    net_rpl RPL
+ * @ingroup     net
+ * @brief       Routing Protocol for Low power and Lossy Networks
+ * @{
+ *
+ * @file        rpl.h
+ * @brief       RPL header
+ *
+ * @author      Eric Engel <eric.engel@fu-berlin.de>
+ */
+
+#ifndef __RPL_H
+#define __RPL_H
 
 #include <string.h>
 #include <stdint.h>
@@ -51,3 +55,6 @@ void rpl_del_routing_entry(ipv6_addr_t *addr);
 rpl_routing_entry_t *rpl_find_routing_entry(ipv6_addr_t *addr);
 void rpl_clear_routing_table(void);
 rpl_routing_entry_t *rpl_get_routing_table(void);
+
+/** @} */
+#endif /* __RPL_H */

@@ -13,8 +13,8 @@
 /**
  * @ingroup arch
  * @defgroup    native_cpu  Native CPU
- * @ingroup		cpu
- * @brief		CPU abstraction for the native port
+ * @ingroup     cpu
+ * @brief       CPU abstraction for the native port
  * @{
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  */

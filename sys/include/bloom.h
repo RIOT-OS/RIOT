@@ -1,11 +1,4 @@
-
-/**
- * @defgroup 	sys_bloom Bloom filter
- * @ingroup		sys
- * @brief		Bloom filter library
- */
-
-/**
+/*
  * bloom.c
  *
  * Bloom filters
@@ -108,7 +101,14 @@
  */
 
 /**
- * @file
+ * @defgroup    sys_bloom Bloom filter
+ * @ingroup     sys
+ * @brief       Bloom filter library
+ * @{
+ *
+ * @file        bloom.h
+ * @brief       Bloom filter API
+ *
  * @autor Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @autor Freie Universität Berlin, Computer Systems & Telematics
  */
@@ -208,4 +208,5 @@ void bloom_add(struct bloom_t *bloom, const uint8_t *buf, size_t len);
  */
 bool bloom_check(struct bloom_t *bloom, const uint8_t *buf, size_t len);
 
-#endif
+/** @} */
+#endif /* _BLOOM_FILTER_H */

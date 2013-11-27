@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup	lpc_common LPC common
- * @brief		Common code for all arm-based LPC controllers
- * @ingroup		cpu
+ * @defgroup    lpc_common LPC common
+ * @brief       Common code for all arm-based LPC controllers
+ * @ingroup     cpu
  */

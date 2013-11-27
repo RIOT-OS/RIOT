@@ -13,9 +13,9 @@
 *******************************************************************************/
 
 /**
- * @defgroup 	sys_shell Shell
- * @ingroup 	sys
- * @brief		Simple shell interpreter
+ * @defgroup    sys_shell Shell
+ * @ingroup     sys
+ * @brief       Simple shell interpreter
  */
 
 #ifndef __SHELL_H

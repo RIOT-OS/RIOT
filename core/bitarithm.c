@@ -9,10 +9,15 @@
 /**
  * @ingroup     core_util
  * @{
+<<<<<<< HEAD
  *
  * @file        bitarithm.c
  * @brief       Bit arithmetic helper functions implementation
  *
+=======
+ * @file        bitarithm.c
+ * @brief       Bit arithmetic helper functions implementation
+>>>>>>> 94fedda... Fixed a lot of comments by removing tabs and correcting format.
  * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
  * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
  *

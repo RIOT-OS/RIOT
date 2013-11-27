@@ -7,6 +7,6 @@
  */
 
 /**
- * @defgroup 	sys System
- * @brief 		System library contains tools and utilities that make RIOT an actual operating system
+ * @defgroup    sys System
+ * @brief       System library contains tools and utilities that make RIOT an actual operating system
  */

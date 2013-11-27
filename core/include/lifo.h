@@ -13,6 +13,7 @@
  * @file        lifo.h
  * @brief       LIFO buffer API
  *
+ * @author      unknwon
  */
 
 #ifndef __LIFO_H

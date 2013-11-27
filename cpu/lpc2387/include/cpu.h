@@ -14,9 +14,9 @@ See the file LICENSE in the top level directory for more details.
 #define __CPU_H
 
 /**
- * @defgroup	lpc2387		NXP LPC2387
- * @ingroup		cpu
- * @brief		NXP LPC2387 specific code
+ * @defgroup    lpc2387     NXP LPC2387
+ * @ingroup     cpu
+ * @brief       NXP LPC2387 specific code
  * @{
  */
 
@@ -24,7 +24,7 @@ See the file LICENSE in the top level directory for more details.
 #include "lpc2387.h"
 #include "arm_cpu.h"
 
-extern uintptr_t __stack_start;		///< end of user stack memory space
+extern uintptr_t __stack_start;     ///< end of user stack memory space
 
 void lpc2387_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale);
 bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority);

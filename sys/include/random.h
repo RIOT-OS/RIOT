@@ -1,8 +1,8 @@
 
 /**
- * @defgroup 	sys_random Random
- * @ingroup		sys
- * @brief		Random number generator
+ * @defgroup    sys_random Random
+ * @ingroup     sys
+ * @brief       Random number generator
  */
  
 #include <inttypes.h>

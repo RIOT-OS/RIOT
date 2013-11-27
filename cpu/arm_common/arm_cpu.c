@@ -15,11 +15,6 @@
  * @author Heiko Will <heiko.will@fu-berlin.de>
  * @}
  */
-/**
- *
- *
- *
- */
 
 #include <stdio.h>
 #include "arm_cpu.h"

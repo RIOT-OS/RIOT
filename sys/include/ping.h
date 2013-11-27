@@ -1,8 +1,8 @@
 
 /**
- * @defgroup 	sys_ping Ping
- * @ingroup		sys
- * @brief		Ping
+ * @defgroup    sys_ping Ping
+ * @ingroup     sys
+ * @brief       Ping
  */
 
 #include "radio/radio.h"

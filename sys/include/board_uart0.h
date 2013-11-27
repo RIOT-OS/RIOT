@@ -1,8 +1,12 @@
 
 /**
- * @defgroup 	sys_uart0 UART0
- * @ingroup		sys
- * @brief		UART0 interface abstraction
+ * @defgroup    sys_uart0 UART0
+ * @ingroup     sys
+ * @brief       UART0 interface abstraction
+ * @{
+ *
+ * @file        board_uart0.h
+ * @brief       Interface definitions for the UART0 abstraction
  */
 
 #ifndef __BOARD_UART0_H
@@ -17,4 +21,5 @@ void uart0_notify_thread(void);
 int uart0_readc(void);
 void uart0_putc(int c);
 
+/** @} */
 #endif /* __BOARD_UART0_H */

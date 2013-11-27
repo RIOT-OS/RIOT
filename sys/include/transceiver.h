@@ -1,8 +1,8 @@
 
 /**
- * @defgroup 	sys_transceiver Transceiver
- * @ingroup 	sys
- * @brief		Transceiver library
+ * @defgroup    sys_transceiver Transceiver
+ * @ingroup     sys
+ * @brief       Transceiver library
  */
 
 #ifndef TRANSCEIVER_H

@@ -7,9 +7,9 @@
  */
 
 /**
- * @defgroup 	sys_posixio Posix IO
- * @ingroup		sys
- * @brief		Posix compatible IO
+ * @defgroup    sys_posixio Posix IO
+ * @ingroup     sys
+ * @brief       Posix compatible IO
  * @{
  * @file
  * @brief   POSIX-like IO
