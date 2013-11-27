@@ -9,11 +9,9 @@
  */
 
 /**
- * @ingroup		dev_cc110x
+ * @ingroup		drivers_cc110x_ng
  * @{
- */
-
-/**
+ *
  * @file
  * @brief		TI Chipcon CC110x default settings
  *
@@ -24,6 +22,7 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  *
  * @note		$Id: cc110x-defaultSettings.c 2058 2010-03-31 08:59:31Z hillebra $
+ * @}
  */
 
 #include "cc110x-defaultSettings.h"
@@ -121,6 +120,3 @@ uint8_t pa_table[] = {				///< PATABLE with available output powers
               0xC6, 				///< + 9 dBm
               0xC3  				///< +10 dBm
 }; // If PATABLE is changed in size, adjust MAX_OUTPUT_POWER definition in CC1100 interface!
-
-
-/** @} */

@@ -1,19 +1,20 @@
-/**
- * Circular linked list implementation
- *
- * Used by the scheduler
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup	lib
+ */
+
+/**
+ * @addtogroup  core_util
  * @{
- * @file
- * @author Freie Universität Berlin, Computer Systems & Telematics
- * @author Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * @file        clist.h
+ * @brief       Circular linkes list
+ *
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
+ * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
  */
 
 #ifndef __CLIST_H
@@ -43,8 +44,6 @@ static inline void clist_advance(clist_node_t **list)
 void clist_print(clist_node_t *clist);
 #endif
 
-/**
- * @}
- */
+/** @} */
 #endif // __CLIST_H
 

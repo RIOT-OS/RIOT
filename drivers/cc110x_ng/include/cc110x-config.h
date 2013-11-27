@@ -8,11 +8,11 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup dev_cc110x_ng
+ * @ingroup		drivers_cc110x_ng
  * @{
- * @file
+ *
+ * @file		cc110x-config.h
  * @author Oliver Hahm <oliver.hahm@inria.fr>
- * @}
  */
 #ifndef CC1100_CONFIG_H
 #define CC1100_CONFIG_H
@@ -108,4 +108,5 @@ typedef struct cc110x_statistic {
     uint32_t	watch_dog_resets;
 } cc110x_statistic_t;
 
-#endif
+/** @} */
+#endif /* __CC110X_CONFIG_H */

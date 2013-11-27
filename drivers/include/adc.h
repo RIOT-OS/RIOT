@@ -3,6 +3,13 @@
 
 #include <stdint.h>
 
+
+/**
+ * @defgroup	drivers_adc ADC
+ * @ingroup		drivers
+ * @brief		Generic ADC driver
+ */
+
 /**
  * @brief	Initialize ADC.
  */

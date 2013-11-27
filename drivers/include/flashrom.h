@@ -1,3 +1,12 @@
+
+
+
+/**
+ * @defgroup	flashrom Flash memory driver
+ * @ingroup		drivers
+ * @brief		Generic flash memory driver
+ */
+
 #ifndef FLASHROM_H
 #define FLASHROM_H
 

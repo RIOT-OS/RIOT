@@ -1,7 +1,20 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
 /**
- * @ingroup kernel
+ * @defgroup    core_sched Scheduler
+ * @ingroup     core
+ * @brief       The RIOT scheduler
  * @{
+ *
  * @file        sched.h
+ * @brief       Scheduler API definion
+ *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */

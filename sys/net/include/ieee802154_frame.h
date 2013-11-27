@@ -7,7 +7,9 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
+ * @defgroup	net_ieee802154 IEEE802.15.4
  * @ingroup net
+ * @brief	IEEE802.15.4 adapaption layer
  * @{
  * @file    ieee802154/ieee802154_frame.h
  * @brief   IEEE 802.14.4 framing data structs and prototypes

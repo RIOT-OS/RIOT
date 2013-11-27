@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
@@ -6,8 +6,10 @@
  * details.
  */
 
-/** 
- * @addtogroup posix
+/**
+ * @defgroup 	sys_posixio Posix IO
+ * @ingroup		sys
+ * @brief		Posix compatible IO
  * @{
  * @file
  * @brief   POSIX-like IO

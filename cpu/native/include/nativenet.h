@@ -16,7 +16,8 @@
  */
 
 /**
- * @defgroup native_net
+ * @defgroup 	native_net
+ * @ingroup		native_cpu
  * @{
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  */

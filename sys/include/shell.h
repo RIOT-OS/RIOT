@@ -12,13 +12,14 @@
  *
 *******************************************************************************/
 
+/**
+ * @defgroup 	sys_shell Shell
+ * @ingroup 	sys
+ * @brief		Simple shell interpreter
+ */
+
 #ifndef __SHELL_H
 #define __SHELL_H
-
-/**
- * @defgroup shell Simple Shell Interpreter
- * @ingroup feuerware
- */
 
 typedef struct shell_command_t {
     char *name;

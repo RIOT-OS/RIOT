@@ -16,6 +16,7 @@ See the file LICENSE in the top level directory for more details.
 /**
  * @defgroup	lpc2387		NXP LPC2387
  * @ingroup		cpu
+ * @brief		NXP LPC2387 specific code
  * @{
  */
 

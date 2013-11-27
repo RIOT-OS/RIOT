@@ -1,3 +1,10 @@
+
+/**
+ * @defgroup 	sys_uart0 UART0
+ * @ingroup		sys
+ * @brief		UART0 interface abstraction
+ */
+
 #ifndef __BOARD_UART0_H
 #define __BOARD_UART0_H
 

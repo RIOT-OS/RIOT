@@ -1,16 +1,20 @@
-/**
- * kernel mutex implementation
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup kernel
+ */
+
+/**
+ * @ingroup     core_sync
  * @{
- * @file
- * @author Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * @file        mutex.c
+ * @brief       Kernel mutex implementation
+ *
+ * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ *
  * @}
  */
 
@@ -113,4 +117,3 @@ void mutex_unlock(struct mutex_t *mutex)
 
     restoreIRQ(irqstate);
 }
-

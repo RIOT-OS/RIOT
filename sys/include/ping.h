@@ -1,3 +1,10 @@
+
+/**
+ * @defgroup 	sys_ping Ping
+ * @ingroup		sys
+ * @brief		Ping
+ */
+
 #include "radio/radio.h"
 
 void init_payload(void);

@@ -13,7 +13,9 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 *******************************************************************************/
 
 /**
- * @ingroup	sht11
+ * @defgroup	sht11 SHT11
+ * @ingroup		drivers
+ * @brief		Driver for the Sensirion SHT11 humidity and temperature sensor
  * @{
  */
 

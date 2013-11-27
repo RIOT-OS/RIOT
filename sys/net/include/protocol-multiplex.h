@@ -16,7 +16,9 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #define PROTOCOLMULTIPLEX_H_
 
 /**
- * @addtogroup	net
+ * @defgroup	net_mmstack Protocol multiplex
+ * @ingroup		net
+ * @brief		Protocol handler multiplexing
  * @{
  */
 

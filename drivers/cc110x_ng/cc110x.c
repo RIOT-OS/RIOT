@@ -1,17 +1,19 @@
-/**
- * Basic functionality of cc110x driver
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  * Copyright (C) 2013 INRIA 
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup dev_cc110x_ng
+ */
+
+/**
+ * @ingroup 	drivers_cc110x_ng
  * @{
- * @file
- * @author Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ * @file		cc110x.c
+ * @brief		Basic functionality of cc110x driver
+ * @author		Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 #include <cc110x_ng.h>

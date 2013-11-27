@@ -16,8 +16,9 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #define __LTC4150_ARCH_H
 
 /**
- * @defgroup    ltc4150 LTC4150 Coulomb Counter
+ * @defgroup    ltc4150 LTC4150
  * @ingroup     drivers
+ * @brief		Driver for the Linear Technology LTC4150 Coulomb Counter
  * @{
  */
 

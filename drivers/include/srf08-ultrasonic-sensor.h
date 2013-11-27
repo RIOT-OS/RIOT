@@ -6,6 +6,14 @@
  * This source code is licensed under the LGPLv2 license,
  * See the file LICENSE for more details.
  */
+ 
+/**
+ * @defgroup	srf08 SRF08
+ * @ingroup		drivers
+ * @brief		Driver for the SRF08 ultrasonic range sensor
+ * 
+ * The connection between the MCU and the SRF08 is based on the i2c-interface.
+ */
 
 /**
  * @file

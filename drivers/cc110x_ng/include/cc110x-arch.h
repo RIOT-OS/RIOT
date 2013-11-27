@@ -13,9 +13,11 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 *******************************************************************************/
 
 /**
- * @file
- * @ingroup		LPC2387
- * @brief		CC1100 LPC2387 dependend functions
+ * @ingroup		drivers_cc110x_ng
+ * @{
+ *
+ * @file		cc110x-arch.h
+ * @brief		CC1100 architecture dependent functions
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
@@ -23,6 +25,8 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  *
  * @note    	$Id: arch_cc110x.h 1775 2010-01-26 09:37:03Z hillebra $
  */
+#ifndef __CC1100_ARCH_H
+#define __CC1100_ARCH_H
 
 #include <stdint.h>
 
@@ -36,3 +40,6 @@ void cc110x_init_interrupts(void);
 
 void cc110x_before_send(void);
 void cc110x_after_send(void);
+
+/** @} */
+#endif /* __CC1100_ARCH_H */

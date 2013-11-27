@@ -13,8 +13,9 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 *******************************************************************************/
 
 /**
- * @defgroup rtc Realtime Clock
- * @ingroup drivers
+ * @defgroup 	rtc Realtime Clock
+ * @ingroup 	drivers
+ * @brief		Generic real time clock driver
  * @{
  */
 

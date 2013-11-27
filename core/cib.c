@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+ 
+ /**
+ * @ingroup     core_util
+ * @{
+ *
+ * @file        cib.c
+ * @brief       Circular integer buffer implementation
+ *
+ * @}
+ */
+
 #include <cib.h>
 
 void cib_init(cib_t *cib, unsigned int size)

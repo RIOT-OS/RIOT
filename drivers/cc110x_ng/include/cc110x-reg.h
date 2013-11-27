@@ -1,15 +1,24 @@
-/**
- * @file    cc110x-reg.h
- * @ingroup dev_cc110x_ng
- * @brief   Access to CC110X registers
+/*
+ * Copyright (C) 2008 Freie Universität Berlin
+ * Copyright (C) 2013 INRIA
  *
- * @author  INRIA 
- * @author  Oliver Hahm <oliver.hahm@inria.fr>
- *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
  */
 
-#ifndef CC110X_REG_H
-#define CC110X_REG_H
+/**
+ * @ingroup		drivers_cc110x_ng
+ * @{
+ *
+ * @file    	cc110x-reg.h
+ * @brief   	Access to CC110X registers
+ *
+ * @author  	INRIA
+ * @author  	Oliver Hahm <oliver.hahm@inria.fr>
+ */
+#ifndef __CC110X_REG_H
+#define __CC110X_REG_H
 
 #include <stdint.h>
 
@@ -79,4 +88,5 @@ uint8_t cc110x_read_status(uint8_t addr);
  */
 uint8_t cc110x_strobe(uint8_t c);
 
-#endif
+/** @} */
+#endif /* __CC110X_REG_H */

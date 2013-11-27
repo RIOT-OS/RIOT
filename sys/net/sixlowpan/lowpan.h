@@ -7,7 +7,9 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup sixlowpan
+ * @defgroup	net_sixlowpan 6LoWPAN
+ * @ingroup 	net
+ * @brief		Riots 6LowPAN implementation
  * @{
  * @file    sixlowpan.h
  * @brief   6lowpan header

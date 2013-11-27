@@ -1,0 +1,14 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @defgroup 	drivers Drivers
+ * @brief 		Drivers for external devices as radios, sensors, memory etc.
+ * 
+ * The module contains all kind of drivers for specific devices.
+ */

@@ -2,6 +2,14 @@
 /  Low level disk interface modlue include file   (C)ChaN, 2010
 /-----------------------------------------------------------------------*/
 
+/**
+ * @defgroup	diskio Disk IO Driver
+ * @ingroup		drivers
+ * @brief		Low level disk interface
+ * 
+ * The connection between the MCU and the SRF08 is based on the i2c-interface.
+ */
+
 #ifndef DEF_DISKIO
 #define DEF_DISKIO
 

@@ -1,18 +1,20 @@
-/**
- * Data structures and variables for the cc110x driver interface
- *
+/*
  * Copyright (C) 2009 Freie Universität Berlin
  * Copyright (C) 2013 INRIA 
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup dev_cc110x_ng
+ */
+
+/**
+ * @defgroup 	drivers_cc110x_ng CC110x_ng
+ * @brief		Next generation version of the TI CC110x driver
+ * @ingroup		drivers
  * @{
- * @file
+ * @file		cc110x_ng.h
+ * @brief		Data structures and variables for the cc110x driver interface
  * @author Oliver Hahm <oliver.hahm@inria.fr>
- * @}
  */
 #ifndef CC1100_H
 #define CC1100_H
@@ -166,6 +168,8 @@ void cc110x_init_ignore(void);
 uint8_t cc110x_add_ignored(radio_address_t addr);
 #endif
 
-
+/**
+ * @}
+ */
 
 #endif

@@ -13,13 +13,12 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 *******************************************************************************/
 
 /**
- * @ingroup		dev_cc110x
+ * @ingroup		drivers_cc110x_ng
  * @{
  */
 
 /**
  * @file
- * @internal
  * @brief		TI Chipcon CC1100 SPI driver
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics

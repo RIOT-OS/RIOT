@@ -12,7 +12,6 @@ See the file LICENSE in the top level directory for more details.
 
 /**
  * @ingroup		lpc2387
- * @addtogroup	dev_gpioint
  * @{
  */
 

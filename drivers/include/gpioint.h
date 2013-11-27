@@ -16,10 +16,9 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #define GPIOINT_H_
 
 /**
- * @defgroup	dev_gpioint		GPIO IRQ Multiplexer
- * @ingroup		dev
- *
- * Provides an API to implement interrupt handlers on IO pins.
+ * @defgroup	drivers_gpioint GPIO IRQ Multiplexer
+ * @ingroup		drivers
+ * @brief 		Provides an API to implement interrupt handlers on IO pins.
  *
  * Multiplexer and interrupt handling must be implemented platform specific.
  *

@@ -1,3 +1,10 @@
+
+/**
+ * @defgroup 	sys_transceiver Transceiver
+ * @ingroup 	sys
+ * @brief		Transceiver library
+ */
+
 #ifndef TRANSCEIVER_H
 #define TRANSCEIVER_H
 

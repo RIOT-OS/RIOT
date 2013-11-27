@@ -13,8 +13,9 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 *******************************************************************************/
 
 /**
- * @defgroup		dev_cc110x		TI Chipcon CC110x radio driver
- * @ingroup			dev
+ * @defgroup		drivers_cc110x		CC110x
+ * @ingroup			drivers
+ * @brief			Texas Instruments CC110x driver
  *
  * <h3>Quick links</h3>
  * \li \ref cc1100_packet_layer0_t		MAC packet format

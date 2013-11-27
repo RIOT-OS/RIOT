@@ -12,11 +12,11 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  *
 *******************************************************************************/
 
-#ifndef CC1100_DEFAULTSETTINGS_H
-#define CC1100_DEFAULTSETTINGS_H
+#ifndef __CC1100_DEFAULTSETTINGS_H
+#define __CC1100_DEFAULTSETTINGS_H
 
 /**
- * @ingroup		dev_cc110x
+ * @ingroup		drivers_cc110x_ng
  * @{
  */
 
@@ -95,4 +95,4 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 
 
 /** @} */
-#endif
+#endif /* __CC110X_DEFAULTSETTINGS_H */

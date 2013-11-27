@@ -1,40 +1,27 @@
-/**
- * Driver internal constants for 110x chip configuration
- *
+/*
  * Copyright (C) 2008 Freie Universität Berlin
  * Copyright (C) 2013 INRIA 
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
+ */
+
+/**
+ * @ingroup 	drivers_cc110x_ng
+ * @{
  *
- * @ingroup dev_cc110x_ng
- * @{
  * @file
- * @author Oliver Hahm <oliver.hahm@inria.fr>
- * @}
- */
-
-#ifndef CC1100_INTERNAL_H
-#define CC1100_INTERNAL_H
-
-/**
- * @ingroup		dev_cc110x
- * @{
- */
-
-/**
- * @file
- * @internal
- * @brief		TI Chipcon CC110x internal hardware constants
+ * @brief		Driver internal constants for 110x chip configuration
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
- * @version     $Revision: 1231 $
- *
- * @note		$Id: cc110x-internal.h 1231 2009-08-20 08:31:32Z baar $
+ * @author 		Oliver Hahm <oliver.hahm@inria.fr>
  */
+#ifndef CC1100_INTERNAL_H
+#define CC1100_INTERNAL_H
+
 
 #define FIXED_PKTLEN		(0x00)		///< Fixed length packets, length configured in PKTLEN register.
 #define	VARIABLE_PKTLEN		(0x01)		///< Variable length packets, packet length configured by the first
@@ -203,7 +190,7 @@
 #define CC1100_PATABLE      (0x3E)
 #define CC1100_TXFIFO       (0x3F)		///< TX FIFO: Write operations write to the TX FIFO (SB: +0x00; BURST: +0x40)
 #define CC1100_RXFIFO       (0x3F)		///< RX FIFO: Read operations read from the RX FIFO (SB: +0x80; BURST: +0xC0)
-
 /** @} */
 
+/** @} */
 #endif

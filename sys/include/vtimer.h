@@ -1,4 +1,4 @@
-/** \addtogroup system
+/** \addtogroup sys
  * @{ */
 
 /**

@@ -5,6 +5,12 @@
  *      Author: Oliver
  */
 
+/**
+ * @defgroup	net_help Net help
+ * @ingroup		net
+ * @brief		Helper functions for networking as byte order conversions and checksum calculations
+ */
+
 #ifndef COMMON_H_
 #define COMMON_H_
 #include <string.h>

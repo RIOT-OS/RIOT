@@ -7,7 +7,9 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup rpl
+ * @defgroup 	net_rpl RPL
+ * @ingroup 	net
+ * @brief		Routing Protocol for Low power and Lossy Networks
  * @{
  * @file    rpl.h
  * @brief   RPL header

@@ -16,6 +16,7 @@ See the file LICENSE in the top level directory for more details.
 /**
  * @defgroup	msp430		TI MSP430
  * @ingroup		cpu
+ * @brief		Texas Instruments MSP430 specific code
 
 <h2>First steps</h2>
 \li	See the <a href="../manual/index.html">manual</a> for toolchain and ide setup

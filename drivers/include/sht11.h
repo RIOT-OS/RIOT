@@ -16,7 +16,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #define SHT11_H_
 
 /**
- * @defgroup	sht11	Sensirion SHT11 Driver
+ * @defgroup	sht11	SHT11
  * @ingroup		drivers
  * @{
  */

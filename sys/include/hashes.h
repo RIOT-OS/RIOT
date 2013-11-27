@@ -9,6 +9,12 @@
  */
 
 /**
+ * @defgroup 	sys_hashes Hashes
+ * @ingroup		sys
+ * @brief		Hash function library
+ */
+
+/**
  * @file
  * @autor       Jason Linehan <patientulysses@gmail.com>
  * @author      Freie Universität Berlin, Computer Systems & Telematics

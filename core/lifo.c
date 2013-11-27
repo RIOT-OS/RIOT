@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     core_util
+ * @{
+ *
+ * @file        lifo.c
+ * @brief       LIFO buffer implementation
+ *
+ * @}
+ */
+
 #include <lifo.h>
 
 int lifo_empty(int *array)

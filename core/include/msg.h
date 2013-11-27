@@ -1,19 +1,29 @@
-/**
- *  There are two ways to use the IPC Messaging system of RIOT. The default is synchronous
- *  messaging. In this manner, messages are either dropped when the receiver is not waiting and the
- *  message was sent non-blocking, or will be delivered immediately when the receiver calls
- *  msg_receive(msg_t* m). To use asynchronous messaging any thread can create its own queue by
- *  calling msg_init_queue(msg_t* array, int num). Messages sent to a thread with a non full message
- *  queue are never dropped and the sending never blocks. Threads with a full message queue behaves
- *  like in synchronous mode.
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
  *
- * @defgroup    kernel_msg  Messaging / IPC
- * @ingroup     kernel
- * @{
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
  */
 
 /**
- * @file
+ * @defgroup    core_msg  Messaging / IPC
+ * @ingroup     core
+ * @brief       Messaging API for inter process communication
+ *
+ * There are two ways to use the IPC Messaging system of RIOT. The default is synchronous
+ * messaging. In this manner, messages are either dropped when the receiver is not waiting and the
+ * message was sent non-blocking, or will be delivered immediately when the receiver calls
+ * msg_receive(msg_t* m). To use asynchronous messaging any thread can create its own queue by
+ * calling msg_init_queue(msg_t* array, int num). Messages sent to a thread with a non full message
+ * queue are never dropped and the sending never blocks. Threads with a full message queue behaves
+ * like in synchronous mode.
+ * 
+ * @{ 
+ *
+ * @file        msg.h
+ * @brief       Messaging API for inter process communication
+ *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
