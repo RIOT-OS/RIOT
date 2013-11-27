@@ -368,15 +368,14 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
  * @param pointer to count transceiver pids
  *
  */
-void ccnl_riot_relay_start(void)
+void ccnl_riot_relay_start(int max_cache_entries)
 {
-    int max_cache_entries = 20;
-
     struct timeval now;
     theRelay.startup_time = rtc_time(&now);
 
     DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", now.tv_sec, now.tv_usec);
     DEBUGMSG(1, "  compile time: %s %s\n", __DATE__, __TIME__);
+    DEBUGMSG(1, "  max_cache_entries: %d\n", max_cache_entries);
     DEBUGMSG(1, "  compile options: %s\n", compile_string());
 
     ccnl_relay_config(&theRelay, max_cache_entries);

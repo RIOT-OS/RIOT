@@ -74,8 +74,10 @@ typedef enum ccnl_riot_event {
  * @brief starts the ccnl relay
  *
  * @note  to stop the relay send msg "RIOT_HALT" to this thread
+ *
+ * @param max_cache_entries number of slots in the CS
  */
-void ccnl_riot_relay_start(void);
+void ccnl_riot_relay_start(int max_cache_entries);
 
 /**
  * @brief  starts an appication server, which can repy to ccn interests
