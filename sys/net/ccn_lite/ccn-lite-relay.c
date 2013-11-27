@@ -69,17 +69,20 @@ ccnl_run_events(void)
     long usec;
 
     rtc_time(&now);
+    DEBUGMSG(1, "ccnl_run_events now: %ld:%ld\n", now.tv_sec, now.tv_usec);
 
     while (eventqueue) {
         struct ccnl_timer_s *t = eventqueue;
         usec = timevaldelta(&(t->timeout), &now);
 
         if (usec >= 0) {
+            DEBUGMSG(1, "ccnl_run_events nothing to do: %ld:%ld\n", now.tv_sec, now.tv_usec);
             now.tv_sec = usec / 1000000;
             now.tv_usec = usec % 1000000;
             return &now;
         }
 
+        DEBUGMSG(1, "ccnl_run_events run event handler: %ld:%ld\n", now.tv_sec, now.tv_usec);
         if (t->fct) {
             (t->fct)(t->node, t->intarg);
         }
@@ -192,6 +195,8 @@ void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries)
     else {
         DEBUGMSG(1, "sorry, could not open riot trans device\n");
     }
+
+    ccnl_set_timer(1000000, ccnl_ageing, relay, 0);
 }
 
 #if RIOT_CCNL_POPULATE
@@ -305,9 +310,9 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
     riot_ccnl_msg_t *m;
 
     while (!ccnl->halt_flag) {
-        //        struct timeval *timeout = ccnl_run_events();
         DEBUGMSG(1, "waiting for incomming msg\n");
         msg_receive(&in);
+        struct timeval *timeout = ccnl_run_events();
 
         switch (in.type) {
             case PKT_PENDING:
