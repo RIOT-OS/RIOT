@@ -76,8 +76,23 @@ endif
 ifneq (,$(findstring bloom,$(USEMODULE)))
     DIRS += bloom
 endif
-ifneq (,$(findstring crypto,$(USEMODULE)))
-    DIRS += crypto
+ifneq (,$(findstring crypto_3des,$(USEMODULE)))
+    DIRS += crypto/3des
+endif
+ifneq (,$(findstring crypto_aes,$(USEMODULE)))
+    DIRS += crypto/aes
+endif
+ifneq (,$(findstring crypto_rc5,$(USEMODULE)))
+    DIRS += crypto/rc5
+endif
+ifneq (,$(findstring crypto_sha256,$(USEMODULE)))
+    DIRS += crypto/sha256
+endif
+ifneq (,$(findstring crypto_skipjack,$(USEMODULE)))
+    DIRS += crypto/skipjack
+endif
+ifneq (,$(findstring crypto_twofish,$(USEMODULE)))
+    DIRS += crypto/twofish
 endif
 ifneq (,$(findstring random,$(USEMODULE)))
     DIRS += random

@@ -27,9 +27,23 @@
  * $FreeBSD: src/lib/libmd/sha256c.c,v 1.2 2006/01/17 15:35:56 phk Exp $
  */
 
+/**
+ * @ingroup     sys_crypto
+ * @{
+ *
+ * @file        sha256.c
+ * @brief       SHA256 hash function implementation
+ *
+ * @author      Colin Percival
+ * @author      Christian Mehlis
+ * @author      Rene Kijewski
+ * 
+ * @}
+ */
+
 #include <string.h>
 
-#include "sha256.h"
+#include "crypto/sha256.h"
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 /* Copy a vector of big-endian uint32_t into a vector of bytes */
@@ -94,7 +108,7 @@ static const uint32_t K[64] = {
  * SHA256 block compression function.  The 256-bit state is transformed via
  * the 512-bit input block to produce a new state.
  */
-static void SHA256_Transform(uint32_t *state, const unsigned char block[64])
+static void sha256_transform(uint32_t *state, const unsigned char block[64])
 {
     uint32_t W[64];
     uint32_t S[8];
@@ -136,7 +150,7 @@ static unsigned char PAD[64] = {
 };
 
 /* Add padding and terminating bit-count. */
-static void SHA256_Pad(SHA256_CTX *ctx)
+static void sha256_pad(sha256_context_t *ctx)
 {
     /*
      * Convert length to a vector of bytes -- we do this now rather
@@ -148,14 +162,14 @@ static void SHA256_Pad(SHA256_CTX *ctx)
     /* Add 1--64 bytes so that the resulting length is 56 mod 64 */
     uint32_t r = (ctx->count[1] >> 3) & 0x3f;
     uint32_t plen = (r < 56) ? (56 - r) : (120 - r);
-    SHA256_Update(ctx, PAD, (size_t) plen);
+    sha256_update(ctx, PAD, (size_t) plen);
 
     /* Add the terminating bit-count */
-    SHA256_Update(ctx, len, 8);
+    sha256_update(ctx, len, 8);
 }
 
 /* SHA-256 initialization.  Begins a SHA-256 operation. */
-void SHA256_Init(SHA256_CTX *ctx)
+void sha256_init(sha256_context_t *ctx)
 {
     /* Zero bits processed so far */
     ctx->count[0] = ctx->count[1] = 0;
@@ -172,7 +186,7 @@ void SHA256_Init(SHA256_CTX *ctx)
 }
 
 /* Add bytes into the hash */
-void SHA256_Update(SHA256_CTX *ctx, const void *in, size_t len)
+void sha256_update(sha256_context_t *ctx, const void *in, size_t len)
 {
     /* Number of bytes left in the buffer from previous updates */
     uint32_t r = (ctx->count[1] >> 3) & 0x3f;
@@ -198,13 +212,13 @@ void SHA256_Update(SHA256_CTX *ctx, const void *in, size_t len)
     const unsigned char *src = in;
 
     memcpy(&ctx->buf[r], src, 64 - r);
-    SHA256_Transform(ctx->state, ctx->buf);
+    sha256_transform(ctx->state, ctx->buf);
     src += 64 - r;
     len -= 64 - r;
 
     /* Perform complete blocks */
     while (len >= 64) {
-        SHA256_Transform(ctx->state, src);
+        sha256_transform(ctx->state, src);
         src += 64;
         len -= 64;
     }
@@ -217,10 +231,10 @@ void SHA256_Update(SHA256_CTX *ctx, const void *in, size_t len)
  * SHA-256 finalization.  Pads the input data, exports the hash value,
  * and clears the context state.
  */
-void SHA256_Final(unsigned char digest[32], SHA256_CTX *ctx)
+void sha256_final(unsigned char digest[32], sha256_context_t *ctx)
 {
     /* Add padding */
-    SHA256_Pad(ctx);
+    sha256_pad(ctx);
 
     /* Write the hash */
     be32enc_vect(digest, ctx->state, 32);
@@ -229,18 +243,18 @@ void SHA256_Final(unsigned char digest[32], SHA256_CTX *ctx)
     memset((void *) ctx, 0, sizeof(*ctx));
 }
 
-unsigned char *SHA256(const unsigned char *d, size_t n, unsigned char *md)
+unsigned char *sha256(const unsigned char *d, size_t n, unsigned char *md)
 {
-    SHA256_CTX c;
+    sha256_context_t c;
     static unsigned char m[SHA256_DIGEST_LENGTH];
 
     if (md == NULL) {
         md = m;
     }
 
-    SHA256_Init(&c);
-    SHA256_Update(&c, d, n);
-    SHA256_Final(md, &c);
+    sha256_init(&c);
+    sha256_update(&c, d, n);
+    sha256_final(md, &c);
 
     return md;
 }
