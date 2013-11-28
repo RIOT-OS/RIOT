@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @defgroup    boards_msb430-common MSB-430 common
+ * @ingroup     boards
+ * @brief       Common files for all MSB-430 boards
+ * @{
+ *
+ * @file        board-config.h
+ * @brief       Common definitions for all msb-430 based boards
+ *
+ * @author      unknown
+ */
+
 #ifndef BOARD_CONF_H
 #define BOARD_CONF_H
 

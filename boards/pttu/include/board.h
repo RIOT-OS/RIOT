@@ -1,4 +1,4 @@
-/******************************************************************************
+/*
 Copyright 2008-2009, Freie Universitaet Berlin (FUB). All rights reserved.
 
 These sources were developed at the Freie Universitaet Berlin, Computer Systems
@@ -24,24 +24,21 @@ and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
-#ifndef __BOARD_H
-#define __BOARD_H
-
 /**
- * @ingroup		pttu
+ * @defgroup    boards_pttu PTTU
+ * @ingroup     boards
+ * @brief       Support for the PTTU board
  * @{
- */
-
-/**
- * @file
- * @brief		PTTU Board
+ *
+ * @file        board.h
+ * @brief       Basic definitions for the PTTU board
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
- * @author		Kaspar Schleiser <kaspar@schleiser.de>
- * @version     $Revision$
- *
- * @note		$Id: board.h 664 2009-02-19 10:54:44Z baar $
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
+
+#ifndef __BOARD_H
+#define __BOARD_H
 
 #include <lpc2387.h>
 #include <cpu-conf.h>

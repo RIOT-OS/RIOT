@@ -1,32 +1,29 @@
+/*
+ * Copyright (C) 2013 INRIA
+ *
+ * This source code is licensed under the GNU Lesser General Public License,
+ * Version 2.  See the file LICENSE for more details.
+ */
+
 /**
-  * board.h - TelosB Board.
-  * Copyright (C) 2013 INRIA
-  *
-  * This source code is licensed under the GNU Lesser General Public License,
-  * Version 2.  See the file LICENSE for more details.
-  */
+ * @defgroup    boards_telosb TelosB
+ * @ingroup     boards
+ * @brief       Support for the TelosB board
+ *
+ * <h2>Compontents</h2>
+ * \li MSP430
+ * \li CC2420
+ *
+ * @{
+ *
+ * @file        board.h
+ * @brief       Basic definitions for the TelosB board
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ */
 
 #ifndef _TELOSB_BOARD_H
 #define _TELOSB_BOARD_H
-
-/**
- * @defgroup    TelosB
- * @ingroup		TelosB
- *
-<h2>Compontents</h2>
-\li MSP430
-\li CC2420
-
-* @{
-*/
-
-/**
- * @file
- * @brief		TelosB Board
- *
- * @author      Oliver Hahm <oliver.hahm@inria.fr>
- *
- */
 
 //MSB430 core
 #define MSP430_INITIAL_CPU_SPEED    8000000uL

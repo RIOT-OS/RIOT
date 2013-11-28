@@ -1,22 +1,27 @@
-#ifndef BOARD_H
-#define BOARD_H
-
-/**
- * Native Board interface
- *
- * The native board uses call level hardware simulation.
- *
+/*
  * Copyright (C) 2013 Ludwig Ortmann
  *
  * This file is subject to the terms and conditions of the LGPLv2. See
  * the file LICENSE in the top level directory for more details.
- *
- * @defgroup native_board
- * @{
- * @file
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
- * @}
  */
+
+/**
+ * @defgroup    boards_native Native Board
+ * @ingroup     boards
+ * @brief       Board emulation for the native port
+ *
+ * The native board uses call level hardware simulation
+ *
+ * @{
+ *
+ * @file        board.h
+ * @brief       Basic definitions for the native board
+ *
+ * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ */
+
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <stdint.h>
 
@@ -34,4 +39,6 @@ void _native_LED_RED_TOGGLE(void);
 #define LED_RED_TOGGLE (_native_LED_RED_TOGGLE())
 
 typedef uint16_t radio_packet_length_t;
+
+/** @} */
 #endif /* BOARD_H */

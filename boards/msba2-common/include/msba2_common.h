@@ -1,4 +1,4 @@
-/******************************************************************************
+/*
 Copyright 2008, Freie Universitaet Berlin (FUB). All rights reserved.
 
 These sources were developed at the Freie Universitaet Berlin, Computer Systems
@@ -24,24 +24,21 @@ and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
+/**
+ * @defgroup    boards_msba2-common MSB-A2 common
+ * @ingroup     boards
+ * @brief       Common files for all MSB-A2 based boards
+ * @{
+ *
+ * @files       msba2-common.h
+ * @brief       MSB-A2 Common Board Definitions
+ *
+ * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ */
 #ifndef __MSBA2_COMMON_H
 #define __MSBA2_COMMON_H
 
-/**
- * @ingroup		msb_a2
- * @{
- */
-
-/**
- * @file
- * @brief		MSB-A2 Common Board Definitions
- *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
- * @author		Kaspar Schleiser <kaspar@schleiser.de>
- * @version     $Revision$
- *
- * @note		$Id$
- */
 
 #include <stdint.h>
 #include "lpc2387.h"

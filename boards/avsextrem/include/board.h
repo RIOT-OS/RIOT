@@ -1,23 +1,24 @@
 /*
-* board.h - Definitions for the AVSEXTREM board configuration.
-* Copyright (C) 2013 Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
-*
-* This source code is licensed under the LGPLv2 license,
-* See the file LICENSE for more details.
-*
-*/
+ * Copyright (C) 2013 Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
+ *
+ * This source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ *
+ */
 
 
 /**
- * @file
+ * @defgroup    boards_avsextrem Avsextrem
+ * @ingroup     boards
+ * @brief       Boards specific drivers and configuration for the Avsextrem board
+ * @{
+ *
+ * @file        board.h
  * @brief       avsextrem board configuration
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will
  * @author      Zakaria Kasmi
- * @version     $Revision: 1127 $
- *
- * @note        $Id: board-conf.h 1127 2013-06-13 08:48:29Z kasmi$
  */
 
 
@@ -63,4 +64,3 @@ typedef uint8_t radio_packet_length_t;
 
 /** @} */
 #endif /* BOARDCONF_H_ */
-
