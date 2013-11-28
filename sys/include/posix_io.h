@@ -7,18 +7,16 @@
  */
 
 /**
- * @defgroup    sys_posixio Posix IO
- * @ingroup     sys
- * @brief       Posix compatible IO
+ * @ingroup     sys_posix
  * @{
- * @file
- * @brief   POSIX-like IO
+ * @file        posix_io.h
+ * @brief       POSIX-like IO
  *
- * @author Freie Universität Berlin
- * @author Kaspar Schleiser <kaspar@schleiser.de>
- * @author Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author Oliver Hahm <oleg@hobbykeller.org>
- * @author Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Freie Universität Berlin
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
+ * @author      Oliver Hahm <oleg@hobbykeller.org>
+ * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef __READ_H
 #define __READ_H
@@ -37,7 +35,6 @@ int posix_open(int pid, int flags);
 int posix_close(int pid);
 int posix_read(int pid, char *buffer, int bufsize);
 int posix_write(int pid, char *buffer, int bufsize);
-/**
- * @}
- */
+
+/** @} */
 #endif /* __READ_H */

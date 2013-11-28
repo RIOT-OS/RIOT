@@ -1,21 +1,22 @@
-/**
- * sixlowpan/ndp.h  - 6LoWPAN constants, data structs, and prototypes
- *                    related to NDP
- *
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup sixlowpan
+ */
+
+/**
+ * @ingroup     net_sixlowpan
  * @{
- * @file
- * @brief   6LoWPAN NDP related header
- * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
- * @author  Eric Engel <eric.engel@fu-berlin.de>
- * @author  Oliver Gesch <oliver.gesch@googlemail.com>
+ *
+ * @file        sixlowpan/ndp.h
+ * @brief       6LoWPAN constants, data structs, and prototypes related to NDP
+ *
+ * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
+ * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Eric Engel <eric.engel@fu-berlin.de>
+ * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
 #ifndef SIXLOWPAN_NDP_H
@@ -123,7 +124,5 @@ uint8_t ndp_prefix_list_search(ipv6_addr_t *addr);
 ndp_a6br_cache_t *ndp_a6br_cache_get_most_current(void);
 ndp_a6br_cache_t *ndp_a6br_cache_get_oldest(void);
 
-/**
- * @}
- */
+/** @} */
 #endif /* SIXLOWPAN_NDP_H */

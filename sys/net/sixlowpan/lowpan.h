@@ -9,10 +9,10 @@
 /**
  * @defgroup    net_sixlowpan 6LoWPAN
  * @ingroup     net
- * @brief       Riots 6LowPAN implementation
+ * @brief       RIOTs 6LowPAN implementation
  * @{
  *
- * @file        sixlowpan.h
+ * @file        lowpan.h
  * @brief       6lowpan header
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
@@ -7,11 +7,9 @@
  */
 
 /**
- * @addtogroup posix
+ * @ingroup     sys_posix
  * @{
- */
-
-/**
+ *
  * @file    strings.h
  * @brief   string operations
  *

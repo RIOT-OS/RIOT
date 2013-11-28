@@ -1,6 +1,6 @@
 /**
  * @defgroup    sys_vtimer Virtual (Software) Timer library
- * @addtogroup  sys
+ * @ingroup  sys
  * @brief       Virtual software timer for general timer functionality in applications
  * @{
  *

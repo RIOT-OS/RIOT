@@ -7,7 +7,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup posix
+ * @ingroup sys_posix
  * @{
  * @file    posix_io.c
  * @brief   Implementation of basic POSIX IO functionality.
