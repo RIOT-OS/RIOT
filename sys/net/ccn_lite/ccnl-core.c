@@ -38,6 +38,7 @@
 #include "ccnl-riot-compat.h"
 
 #define USE_RIOT_MSG
+#define CCNL_DYNAMIC_FIB (0)
 
 static struct ccnl_interest_s *ccnl_interest_remove(struct ccnl_relay_s *ccnl,
         struct ccnl_interest_s *i);
@@ -75,6 +76,12 @@ void free_content(struct ccnl_content_s *c)
 {
     free_prefix(c->name);
     free_2ptr_list(c->pkt, c);
+}
+
+void free_forward(struct ccnl_forward_s *fwd)
+{
+    free_prefix(fwd->prefix);
+    ccnl_free(fwd);
 }
 
 // ----------------------------------------------------------------------
@@ -409,9 +416,12 @@ ccnl_get_face_or_create(struct ccnl_relay_s *ccnl, int ifndx, uint16_t sender_id
         return NULL;
     }
 
-    f->faceid = sender_id; // ++seqno;
+    f->faceid = sender_id;
     DEBUGMSG(1, "faceid=%d\n", f->faceid);
     f->ifndx = ifndx;
+    if (sender_id == RIOT_BROADCAST) {
+        f->flags |= CCNL_FACE_FLAGS_BROADCAST;
+    }
 
     if (ifndx >= 0) {
         if (ccnl->defaultFaceScheduler)
@@ -495,9 +505,9 @@ ccnl_face_remove(struct ccnl_relay_s *ccnl, struct ccnl_face_s *f)
     for (ppfwd = &ccnl->fib; *ppfwd;) {
         if ((*ppfwd)->face == f) {
             struct ccnl_forward_s *pfwd = *ppfwd;
-            free_prefix(pfwd->prefix);
             *ppfwd = pfwd->next;
-            ccnl_free(pfwd);
+
+            ccnl_forward_remove(ccnl, pfwd);
         }
         else {
             ppfwd = &(*ppfwd)->next;
@@ -778,11 +788,10 @@ void ccnl_interest_propagate(struct ccnl_relay_s *ccnl,
 
     ccnl_print_stats(ccnl, STAT_SND_I); // log_send_i
 
-    int hits = 0;
-
     // CONFORM: "A node MUST implement some strategy rule, even if it is only to
     // transmit an Interest Message on all listed dest faces in sequence."
     // CCNL strategy: we forward on all FWD entries with a prefix match
+    int forward_cnt = 0;
     for (fwd = ccnl->fib; fwd; fwd = fwd->next) {
         int rc = ccnl_prefix_cmp(fwd->prefix, NULL, i->prefix, CMP_LONGEST);
         DEBUGMSG(40, "  ccnl_interest_propagate, rc=%d/%d\n", rc,
@@ -797,15 +806,16 @@ void ccnl_interest_propagate(struct ccnl_relay_s *ccnl,
         // suppress forwarding to origin of interest, except wireless
         if (!i->from || fwd->face != i->from
             || (i->from->flags & CCNL_FACE_FLAGS_REFLECT)) {
+
+            i->forwarded_over = fwd;
             ccnl_face_enqueue(ccnl, fwd->face, buf_dup(i->pkt));
-            hits++;
+            ccnl_get_timeval(&fwd->last_used);
+            forward_cnt++;
         }
     }
 
-    if (hits == 0) {
-        DEBUGMSG(1, "no hits in the fib...find riot transceiver face\n");
-        struct ccnl_face_s *face = ccnl_get_face_or_create(ccnl, RIOT_TRANS_IDX, 0 /* broadcast */);
-        ccnl_face_enqueue(ccnl, face, buf_dup(i->pkt));
+    if (forward_cnt == 0) {
+        ccnl_face_enqueue(ccnl, ccnl->ifs[RIOT_TRANS_IDX].broadcast_face, buf_dup(i->pkt));
     }
 
     return;
@@ -923,18 +933,17 @@ ccnl_content_add2cache(struct ccnl_relay_s *ccnl, struct ccnl_content_s *c)
     while (ccnl->max_cache_entries <= ccnl->contentcnt) {
         DEBUGMSG(1, "  remove oldest content...\n");
         struct ccnl_content_s *c2, *oldest = NULL;
-        int age = 0;
 
         for (c2 = ccnl->contents; c2; c2 = c2->next) {
+            DEBUGMSG(1, "    '%s' -> %ld:%ld\n", ccnl_prefix_to_path(c2->name), c2->last_used.tv_sec, c2->last_used.tv_usec);
             if (!(c2->flags & CCNL_CONTENT_FLAGS_STATIC)
-                && ((age == 0) || c2->last_used < age)) {
-                age = c2->last_used;
+                && ((!oldest) || timevaldelta(&c2->last_used, &oldest->last_used) < 0)) {
                 oldest = c2;
             }
         }
 
         if (oldest) {
-            DEBUGMSG(1, "   replaced: '%s'\n",ccnl_prefix_to_path(oldest->name));
+            DEBUGMSG(1, "   replaced: '%s'\n", ccnl_prefix_to_path(oldest->name));
             ccnl_content_remove(ccnl, oldest);
         } else {
             DEBUGMSG(1, "   no dynamic content to remove...\n");
@@ -994,6 +1003,7 @@ int ccnl_content_serve_pending(struct ccnl_relay_s *ccnl,
             }
 
             c->served_cnt++;
+            ccnl_get_timeval(&c->last_used);
             cnt++;
         }
 
@@ -1001,6 +1011,100 @@ int ccnl_content_serve_pending(struct ccnl_relay_s *ccnl,
     }
 
     return cnt;
+}
+
+/**
+ * returns an entry from the fib which has a common prefix with p.
+ * only returns that entry if it fullfils the aggregate threshold!
+ */
+struct ccnl_forward_s *ccn_forward_find_common_prefix_to_aggregate(struct ccnl_relay_s *ccnl, struct ccnl_prefix_s *p, int *match_len)
+{
+    if (!ccnl->fib) {
+        DEBUGMSG(999, "ccn_forward_find_common_prefix: fib was empty\n");
+        return NULL;
+    }
+
+    /* fib as at least one enty */
+    struct ccnl_forward_s *fwd2 = ccnl->fib;
+    while (fwd2) {
+        DEBUGMSG(1, "ccn_forward_find_common_prefix: '%s' vs. '%s'\n", ccnl_prefix_to_path(p), ccnl_prefix_to_path(fwd2->prefix));
+        *match_len = ccnl_prefix_cmp(fwd2->prefix, 0, p, CMP_LONGEST);
+
+        /* check for threshold and never date up a static enty */
+        if ((ccnl->fib_threshold_aggregate <= *match_len) && !(fwd2->flags & CCNL_FORWARD_FLAGS_STATIC)) {
+            return fwd2;
+        }
+
+        fwd2 = fwd2->next;
+    }
+
+    return NULL;
+}
+
+static struct ccnl_forward_s *ccnl_forward_new(struct ccnl_prefix_s *p, struct ccnl_face_s *f, int threshold_prefix, int flags)
+{
+    struct ccnl_forward_s *fwd = ccnl_calloc(1, sizeof(struct ccnl_forward_s));
+    fwd->prefix = ccnl_prefix_clone_strip(p, threshold_prefix);
+    fwd->face = f;
+    fwd->flags = flags;
+    return fwd;
+}
+
+void ccnl_content_learn_name_route(struct ccnl_relay_s *ccnl, struct ccnl_prefix_s *p, struct ccnl_face_s *f, int threshold_prefix, int flags)
+{
+    /*
+     * we want to insert a new dynamic route in the fib, let's try to aggregate!
+     * for aggregation we ask the fib for a prefix match
+     */
+    int match_len;
+    struct ccnl_forward_s *fwd = ccn_forward_find_common_prefix_to_aggregate(ccnl, p, &match_len);
+    if (!fwd) {
+        /* there was no prefix match with the user defined creteria. */
+
+        /* create a new fib entry */
+        fwd = ccnl_forward_new(p, f, threshold_prefix, flags);
+        DBL_LINKED_LIST_ADD(ccnl->fib, fwd);
+        DEBUGMSG(999, "ccnl_content_learn_name_route: new route '%s' on face %d learned\n", ccnl_prefix_to_path(fwd->prefix), f->faceid);
+    } else {
+        /* there was a prefix match with the user defined creteria. */
+
+        /* if the new entry has shorter prefix */
+        if (p->compcnt < fwd->prefix->compcnt) {
+            /* we need to aggregate! */
+            DBL_LINKED_LIST_REMOVE(ccnl->fib, fwd);
+
+            /* create a new fib entry */
+            fwd = ccnl_forward_new(p, f, (p->compcnt - match_len), flags);
+            DBL_LINKED_LIST_ADD(ccnl->fib, fwd);
+            DEBUGMSG(999, "ccnl_content_learn_name_route: route '%s' on face %d replaced\n", ccnl_prefix_to_path(fwd->prefix), f->faceid);
+        } else {
+            /* we don't need to do an update, because we know a shorter prefix already */
+        }
+    }
+
+    /* refresh fwd entry */
+    DEBUGMSG(999, "ccnl_content_learn_name_route refresh route '%s' on face %d\n", ccnl_prefix_to_path(fwd->prefix), f->faceid);
+    ccnl_get_timeval(&fwd->last_used);
+}
+
+struct ccnl_forward_s *
+ccnl_forward_remove(struct ccnl_relay_s *ccnl, struct ccnl_forward_s *fwd)
+{
+    struct ccnl_forward_s *fwd2;
+    DEBUGMSG(40, "ccnl_forward_remove %p\n", (void *) fwd);
+
+    fwd2 = fwd->next;
+    DBL_LINKED_LIST_REMOVE(ccnl->fib, fwd);
+
+    struct ccnl_interest_s *pit;
+    for (pit = ccnl->pit; pit;) {
+        if (pit->forwarded_over == fwd) {
+            pit->forwarded_over = NULL;
+        }
+    }
+
+    free_forward(fwd);
+    return fwd2;
 }
 
 void ccnl_do_ageing(void *ptr, void *dummy)
@@ -1036,8 +1140,14 @@ void ccnl_do_ageing(void *ptr, void *dummy)
             // periodically for pending PIT entries."
             DEBUGMSG(7, " retransmit %d <%s>\n", i->retries,
                      ccnl_prefix_to_path(i->prefix));
-            ccnl_interest_propagate(relay, i);
+
+            if (i->forwarded_over && !(i->forwarded_over->flags & CCNL_FORWARD_FLAGS_STATIC)) {
+                ccnl_forward_remove(relay, i->forwarded_over);
+            }
+
             i->retries++;
+            ccnl_interest_propagate(relay, i);
+
             i = i->next;
         }
     }
@@ -1049,6 +1159,17 @@ void ccnl_do_ageing(void *ptr, void *dummy)
         }
         else {
             f = f->next;
+        }
+    }
+
+    struct ccnl_forward_s *fwd = relay->fib;
+    while (fwd) {
+        DEBUGMSG(1, "cleaning up fwd: %p\n", fwd);
+        if (!(fwd->flags & CCNL_FORWARD_FLAGS_STATIC)
+            && ccnl_is_timeouted(&now, &fwd->last_used, CCNL_FWD_TIMEOUT_SEC, CCNL_FWD_TIMEOUT_USEC)) {
+            fwd = ccnl_forward_remove(relay, fwd);
+        } else {
+            fwd = fwd->next;
         }
     }
 }
@@ -1196,6 +1317,11 @@ int ccnl_core_RX_i_or_c(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
                 DEBUGMSG(7, "  removed because no matching interest\n");
                 free_content(c);
                 goto Skip;
+            } else {
+#if CCNL_DYNAMIC_FIB
+                /* content has matched an interest, we considder this name as availeble on this face */
+                ccnl_content_learn_name_route(relay, c->name, from, relay->fib_threshold_prefix, 0);
+#endif
             }
 
             if (relay->max_cache_entries != 0) { // it's set to -1 or a limit

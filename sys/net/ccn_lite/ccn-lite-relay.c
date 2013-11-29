@@ -138,13 +138,15 @@ void ccnl_ageing(void *relay, void *aux)
 
 // ----------------------------------------------------------------------
 
-void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries)
+void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries, int fib_threshold_prefix, int fib_threshold_aggregate)
 {
     struct ccnl_if_s *i;
 
     DEBUGMSG(99, "ccnl_relay_config\n");
 
     relay->max_cache_entries = max_cache_entries;
+    relay->fib_threshold_prefix = fib_threshold_prefix;
+    relay->fib_threshold_aggregate = fib_threshold_aggregate;
 
     if (RIOT_MSG_IDX != relay->ifcount) {
         DEBUGMSG(1, "sorry, idx did not match: riot msg device\n");
@@ -195,6 +197,11 @@ void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries)
     else {
         DEBUGMSG(1, "sorry, could not open riot trans device\n");
     }
+
+    /* create default boardcast face on transceiver interface */
+    struct ccnl_face_s * f = ccnl_get_face_or_create(relay, RIOT_TRANS_IDX, RIOT_BROADCAST);
+    f->flags |= CCNL_FACE_FLAGS_STATIC;
+    i->broadcast_face = f;
 
     ccnl_set_timer(1000000, ccnl_ageing, relay, 0);
 }
@@ -373,7 +380,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
  * @param pointer to count transceiver pids
  *
  */
-void ccnl_riot_relay_start(int max_cache_entries)
+void ccnl_riot_relay_start(int max_cache_entries, int fib_threshold_prefix, int fib_threshold_aggregate)
 {
     struct timeval now;
     theRelay.startup_time = rtc_time(&now);
@@ -381,9 +388,11 @@ void ccnl_riot_relay_start(int max_cache_entries)
     DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", now.tv_sec, now.tv_usec);
     DEBUGMSG(1, "  compile time: %s %s\n", __DATE__, __TIME__);
     DEBUGMSG(1, "  max_cache_entries: %d\n", max_cache_entries);
+    DEBUGMSG(1, "  threshold_prefix: %d\n", fib_threshold_prefix);
+    DEBUGMSG(1, "  threshold_aggregate: %d\n", fib_threshold_aggregate);
     DEBUGMSG(1, "  compile options: %s\n", compile_string());
 
-    ccnl_relay_config(&theRelay, max_cache_entries);
+    ccnl_relay_config(&theRelay, max_cache_entries, fib_threshold_prefix, fib_threshold_aggregate);
 
     ccnl_io_loop(&theRelay);
     DEBUGMSG(1, "ioloop stopped\n");

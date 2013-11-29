@@ -63,7 +63,7 @@ ccnl_is_local_addr(sockunion *su)
 }
 
 struct ccnl_prefix_s *
-ccnl_prefix_clone(struct ccnl_prefix_s *p)
+ccnl_prefix_clone_strip(struct ccnl_prefix_s *p, int strip)
 {
     int i, len;
     struct ccnl_prefix_s *p2;
@@ -74,19 +74,22 @@ ccnl_prefix_clone(struct ccnl_prefix_s *p)
         return NULL;
     }
 
-    for (i = 0, len = 0; i < p->compcnt; len += p->complen[i++]);
+    int stripped_compcnt = p->compcnt;
+    stripped_compcnt -= (p->compcnt > strip) ? strip : 0;
+
+    for (i = 0, len = 0; i < stripped_compcnt; len += p->complen[i++]);
 
     p2->path = (unsigned char *) ccnl_malloc(len);
-    p2->comp = (unsigned char **) ccnl_malloc(p->compcnt * sizeof(char *));
-    p2->complen = (int *) ccnl_malloc(p->compcnt * sizeof(int));
+    p2->comp = (unsigned char **) ccnl_malloc(stripped_compcnt * sizeof(char *));
+    p2->complen = (int *) ccnl_malloc(stripped_compcnt * sizeof(int));
 
     if (!p2->comp || !p2->complen || !p2->path) {
         goto Bail;
     }
 
-    p2->compcnt = p->compcnt;
+    p2->compcnt = stripped_compcnt;
 
-    for (i = 0, len = 0; i < p->compcnt; len += p2->complen[i++]) {
+    for (i = 0, len = 0; i < stripped_compcnt; len += p2->complen[i++]) {
         p2->complen[i] = p->complen[i];
         p2->comp[i] = p2->path + len;
         memcpy(p2->comp[i], p->comp[i], p2->complen[i]);
@@ -98,6 +101,11 @@ Bail:
     return NULL;
 }
 
+struct ccnl_prefix_s *
+ccnl_prefix_clone(struct ccnl_prefix_s *p)
+{
+    return ccnl_prefix_clone_strip(p, 0U);
+}
 // ----------------------------------------------------------------------
 // management protocols
 
@@ -474,7 +482,6 @@ ccnl_mgmt_prefixreg(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
     // should (re)verify that action=="prefixreg"
     if (faceid && p->compcnt > 0) {
         struct ccnl_face_s *f;
-        struct ccnl_forward_s *fwd, **fwd2;
         int fi = strtol((const char *)faceid, NULL, 0);
 
         DEBUGMSG(1, "mgmt: adding prefix %s to faceid='%s'='%d'\n",
@@ -490,22 +497,8 @@ ccnl_mgmt_prefixreg(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
         }
 
         DEBUGMSG(1, "Face %s found! ifndx=%d\n", faceid, f->ifndx);
-        fwd = (struct ccnl_forward_s *) ccnl_calloc(1, sizeof(*fwd));
 
-        if (!fwd) {
-            goto Bail;
-        }
-
-        fwd->prefix = ccnl_prefix_clone(p);
-        fwd->face = f;
-        fwd2 = &ccnl->fib;
-
-        while (*fwd2) {
-            fwd2 = &((*fwd2)->next);
-        }
-
-        *fwd2 = fwd;
-
+        ccnl_content_learn_name_route(ccnl, p, f, 0, CCNL_FORWARD_FLAGS_STATIC);
         cp = "prefixreg cmd worked";
     }
     else {

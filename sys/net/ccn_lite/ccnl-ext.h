@@ -84,6 +84,12 @@ int ccnl_is_fragment(unsigned char *data, int datalen);
 int ccnl_mgmt(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *buf,
               struct ccnl_prefix_s *prefix, struct ccnl_face_s *from);
 
+struct ccnl_prefix_s *
+ccnl_prefix_clone(struct ccnl_prefix_s *p);
+
+struct ccnl_prefix_s *
+ccnl_prefix_clone_strip(struct ccnl_prefix_s *p, int strip);
+
 // ----------------------------------------------------------------------
 
 # define ccnl_sched_CTS_done(S,C,L)	do{}while(0)

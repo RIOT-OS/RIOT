@@ -76,8 +76,10 @@ typedef enum ccnl_riot_event {
  * @note  to stop the relay send msg "RIOT_HALT" to this thread
  *
  * @param max_cache_entries number of slots in the CS
+ * @param fib_threshold_prefix conservative value how long a common prefix is (elemnts from behind)
+ * @param fib_threshold_aggregate optimistic value how long a common prefix is (elemnts from front)
  */
-void ccnl_riot_relay_start(int max_cache_entries);
+void ccnl_riot_relay_start(int max_cache_entries, int fib_threshold_prefix, int fib_threshold_aggregate);
 
 /**
  * @brief  starts an appication server, which can repy to ccn interests
