@@ -247,7 +247,7 @@ void ccnl_populate_cache(struct ccnl_relay_s *ccnl, unsigned char *buf, int data
     }
 }
 
-void handle_populate_cache()
+void handle_populate_cache(void)
 {
     DEBUGMSG(1, "ccnl_populate_cache with: text_txt_ccnb\n");
     ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_0, (int) text_txt_ccnb_0_len);
