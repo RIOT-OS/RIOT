@@ -33,7 +33,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "assert.h"
 #include "crypto/aes.h"
 #include "crypto/ciphers.h"
 
@@ -962,7 +961,7 @@ int aes_encrypt(cipher_context_t *context, uint8_t *plainBlock,
     int r;
 #endif /* ?FULL_UNROLL */
 
-    assert(plainBlock && cipherBlock && key);
+    //assert(plainBlock && cipherBlock && key);         is this really needed?
     rk = key->rd_key;
 
     /*
@@ -1223,7 +1222,7 @@ int aes_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
     int r;
 #endif /* ?FULL_UNROLL */
 
-    assert(cipherBlock && plainBlock && key);
+    // assert(cipherBlock && plainBlock && key);        // nedded? see above
     rk = key->rd_key;
 
     /*
