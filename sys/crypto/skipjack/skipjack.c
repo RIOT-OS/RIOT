@@ -53,7 +53,7 @@
  * @brief Interface to the skipjack cipher
  */
 block_cipher_interface_t skipjack_interface = {
-    "SkipJack\0",
+    "SkipJack",
     skipjack_init,
     skipjack_encrypt,
     skipjack_decrypt,

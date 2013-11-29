@@ -37,7 +37,7 @@
  * @brief Interface to the rc5 cipher
  */
 block_cipher_interface_t rc5_interface = {
-    "RC5\0",
+    "RC5",
     rc5_init,
     rc5_encrypt,
     rc5_decrypt,

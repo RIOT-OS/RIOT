@@ -35,7 +35,7 @@ static int twofish_set_key(twofish_context_t *ctx, uint8_t *key, uint8_t keylen)
 
 // twofish interface
 block_cipher_interface_t twofish_interface = {
-    "TWOFISH\0",
+    "TWOFISH",
     twofish_init,
     twofish_encrypt,
     twofish_decrypt,

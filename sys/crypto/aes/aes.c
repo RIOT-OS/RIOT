@@ -40,7 +40,7 @@
  * Interface to the aes cipher
  */
 block_cipher_interface_t aes_interface = {
-    "AES\0",
+    "AES",
     aes_init,
     aes_encrypt,
     aes_decrypt,

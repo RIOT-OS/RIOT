@@ -44,7 +44,7 @@
  * @brief Interface to the 3DES cipher
  */
 block_cipher_interface_t tripledes_interface = {
-    "3DES\0",
+    "3DES",
     tripledes_init,
     tripledes_encrypt,
     tripledes_decrypt,
