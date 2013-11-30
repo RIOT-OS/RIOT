@@ -68,7 +68,7 @@ ccnl_run_events(void)
     static struct timeval now;
     long usec;
 
-    rtc_time(&now);
+    ccnl_get_timeval(&now);
     DEBUGMSG(1, "ccnl_run_events now: %ld:%ld\n", now.tv_sec, now.tv_usec);
 
     while (eventqueue) {
@@ -382,10 +382,9 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
  */
 void ccnl_riot_relay_start(int max_cache_entries, int fib_threshold_prefix, int fib_threshold_aggregate)
 {
-    struct timeval now;
-    theRelay.startup_time = rtc_time(&now);
+    ccnl_get_timeval(&theRelay.startup_time);
 
-    DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", now.tv_sec, now.tv_usec);
+    DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", theRelay.startup_time.tv_sec, theRelay.startup_time.tv_usec);
     DEBUGMSG(1, "  compile time: %s %s\n", __DATE__, __TIME__);
     DEBUGMSG(1, "  max_cache_entries: %d\n", max_cache_entries);
     DEBUGMSG(1, "  threshold_prefix: %d\n", fib_threshold_prefix);

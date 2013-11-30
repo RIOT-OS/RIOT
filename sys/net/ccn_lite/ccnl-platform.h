@@ -20,9 +20,6 @@
 
 #include <sys/time.h>
 
-double current_time(void);
-#define CCNL_NOW()            current_time()
-
 // (ms) I moved the following struct def here because it is used by all
 // containers apart from the kernel (this way I don't need to redefine it
 // for omnet.
@@ -38,6 +35,8 @@ struct ccnl_timer_s {
     void *aux2;
     int handler;
 };
+
+void ccnl_get_timeval(struct timeval *tv);
 
 long timevaldelta(struct timeval *a, struct timeval *b);
 

@@ -394,7 +394,7 @@ ccnl_get_face_or_create(struct ccnl_relay_s *ccnl, int ifndx, uint16_t sender_id
 
         if (ifndx == f->ifndx && (f->faceid == sender_id)) {
             DEBUGMSG(1, "face found! ifidx=%d sender_id=%d faceid=%d\n", ifndx, sender_id, f->faceid);
-            f->last_used = CCNL_NOW();
+            ccnl_get_timeval(&f->last_used);
             return f;
         }
     }
@@ -459,7 +459,7 @@ ccnl_get_face_or_create(struct ccnl_relay_s *ccnl, int ifndx, uint16_t sender_id
 
 #endif
 
-    f->last_used = CCNL_NOW();
+    ccnl_get_timeval(&f->last_used);
     DBL_LINKED_LIST_ADD(ccnl->faces, f);
 
     return f;
@@ -738,7 +738,7 @@ ccnl_interest_new(struct ccnl_relay_s *ccnl, struct ccnl_face_s *from,
     *ppkd = 0;
     i->minsuffix = minsuffix;
     i->maxsuffix = maxsuffix;
-    i->last_used = CCNL_NOW();
+    ccnl_get_timeval(&i->last_used);
     DBL_LINKED_LIST_ADD(ccnl->pit, i);
     return i;
 }
@@ -752,7 +752,7 @@ int ccnl_interest_append_pending(struct ccnl_interest_s *i,
     for (pi = i->pending; pi; pi = pi->next) { // check whether already listed
         if (pi->face == from) {
             DEBUGMSG(40, "  we found a matching interest, updating time\n");
-            pi->last_used = CCNL_NOW();
+            ccnl_get_timeval(&pi->last_used);
             return 0;
         }
 
@@ -768,7 +768,7 @@ int ccnl_interest_append_pending(struct ccnl_interest_s *i,
     }
 
     pi->face = from;
-    pi->last_used = CCNL_NOW();
+    ccnl_get_timeval(&pi->last_used);
 
     if (last) {
         last->next = pi;
@@ -890,7 +890,7 @@ ccnl_content_new(struct ccnl_relay_s *ccnl, struct ccnl_buf_s **pkt,
         return NULL;
     }
 
-    c->last_used = CCNL_NOW();
+    ccnl_get_timeval(&c->last_used);
     c->content = content;
     c->contentlen = contlen;
     c->pkt = *pkt;
@@ -1107,6 +1107,12 @@ ccnl_forward_remove(struct ccnl_relay_s *ccnl, struct ccnl_forward_s *fwd)
     return fwd2;
 }
 
+bool ccnl_is_timeouted(struct timeval *now, struct timeval *last_used, time_t timeout_s, time_t timeout_us)
+{
+    struct timeval abs_timeout = { last_used->tv_sec + timeout_s, last_used->tv_usec + timeout_us };
+    return timevaldelta(now, &abs_timeout) > 0;
+}
+
 void ccnl_do_ageing(void *ptr, void *dummy)
 {
 
@@ -1116,11 +1122,12 @@ void ccnl_do_ageing(void *ptr, void *dummy)
     struct ccnl_content_s *c = relay->contents;
     struct ccnl_interest_s *i = relay->pit;
     struct ccnl_face_s *f = relay->faces;
-    time_t t = CCNL_NOW();
-    DEBUGMSG(999, "ccnl_do_ageing %d\n", (int) t);
+    struct timeval now;
+    ccnl_get_timeval(&now);
+    DEBUGMSG(999, "ccnl_do_ageing %ld:%ld\n", now.tv_sec, now.tv_usec);
 
     while (c) {
-        if ((c->last_used + CCNL_CONTENT_TIMEOUT) <= t
+        if (ccnl_is_timeouted(&now, &c->last_used, CCNL_CONTENT_TIMEOUT_SEC, CCNL_CONTENT_TIMEOUT_USEC)
             && !(c->flags & CCNL_CONTENT_FLAGS_STATIC)) {
             c = ccnl_content_remove(relay, c);
         }
@@ -1131,7 +1138,7 @@ void ccnl_do_ageing(void *ptr, void *dummy)
 
     while (i) { // CONFORM: "Entries in the PIT MUST timeout rather
         // than being held indefinitely."
-        if ((i->last_used + CCNL_INTEREST_TIMEOUT) <= t ||
+        if (ccnl_is_timeouted(&now, &i->last_used, CCNL_INTEREST_TIMEOUT_SEC, CCNL_INTEREST_TIMEOUT_SEC) ||
             i->retries > CCNL_MAX_INTEREST_RETRANSMIT) {
             i = ccnl_interest_remove(relay, i);
         }
@@ -1154,7 +1161,7 @@ void ccnl_do_ageing(void *ptr, void *dummy)
 
     while (f) {
         if (!(f->flags & CCNL_FACE_FLAGS_STATIC)
-            && (f->last_used + CCNL_FACE_TIMEOUT) <= t) {
+            && ccnl_is_timeouted(&now, &f->last_used, CCNL_FACE_TIMEOUT_SEC, CCNL_FACE_TIMEOUT_USEC)) {
             f = ccnl_face_remove(relay, f);
         }
         else {

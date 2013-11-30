@@ -52,6 +52,7 @@ enum {STAT_RCV_I, STAT_RCV_C, STAT_SND_I, STAT_SND_C, STAT_QLEN, STAT_EOP1};
 
 #include <inttypes.h>
 #include <time.h>
+#include <sys/time.h>
 
 #include "ccnl.h"
 
@@ -84,7 +85,7 @@ struct ccnl_if_s { // interface for packet IO
 };
 
 struct ccnl_relay_s {
-    time_t startup_time;
+    struct timeval startup_time;
     int id;
     struct ccnl_face_s *faces;
     struct ccnl_forward_s *fib;
@@ -146,7 +147,7 @@ struct ccnl_face_s {
     int ifndx;
     sockunion peer;
     int flags;
-    int last_used; // updated when we receive a packet
+    struct timeval last_used; // updated when we receive a packet
     struct ccnl_buf_s *outq, *outqend; // queue of packets to send
     struct ccnl_frag_s *frag;  // which special datagram armoring
     struct ccnl_sched_s *sched;
@@ -168,7 +169,7 @@ struct ccnl_interest_s {
     int minsuffix, maxsuffix;
     struct ccnl_buf_s *ppkd;	   // publisher public key digest
     struct ccnl_buf_s *pkt;	   // full datagram
-    int last_used;
+    struct timeval last_used;
     int retries;
     struct ccnl_forward_s *forwarded_over;
 };
@@ -176,7 +177,7 @@ struct ccnl_interest_s {
 struct ccnl_pendint_s { // pending interest
     struct ccnl_pendint_s *next; // , *prev;
     struct ccnl_face_s *face;
-    int last_used;
+    struct timeval last_used;
 };
 
 struct ccnl_content_s {
@@ -189,7 +190,7 @@ struct ccnl_content_s {
     int contentlen;
     // NON-CONFORM: "The [ContentSTore] MUST also implement the Staleness Bit."
     // >> CCNL: currently no stale bit, old content is fully removed <<
-    int last_used;
+    struct timeval last_used;
     int served_cnt;
 };
 
