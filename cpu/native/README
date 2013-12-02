@@ -6,10 +6,12 @@ HAVE_VALGRIND_H or HAVE_VALGRIND_VALGRIND_H depending on the location
 of the valgrind header (i.e. <valgrind.h> or <valgrind/valgrind.h>)
 like this:
 
-    CFLAGS="-DHAVE_VALGRIND_VALGRIND_H" make
+    CFLAGS="-DHAVE_VALGRIND_VALGRIND_H -g" make
 
-That way native can tell valgrind about RIOTs stacks and prevent
+That way native will tell valgrind about RIOTs stacks and prevent
 valgrind from reporting lots of false positives.
+The debug information flag "-g" is not strictly necessary, but passing
+it allows valgrind to tell you precisely which code triggered the error.
 
 Usage:
 Simply pass the ordinary command to valgrind like this:
@@ -32,6 +34,10 @@ disable the ptrace access restrictions:
 As root call:
 
     echo 0 > /proc/sys/kernel/yama/ptrace_scope
+
+Another helpful valgrind parameter is "--track-origins=yes" which
+will allow valrgind to tell you where references to uninitialized
+values stem from.
 
 
 NETWORK SUPPORT
