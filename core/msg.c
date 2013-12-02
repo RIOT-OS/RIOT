@@ -213,20 +213,20 @@ static int _msg_receive(msg_t *m, int block)
 
     tcb_t *me = (tcb_t*) sched_threads[thread_pid];
 
-    int n = -1;
+    int queue_index = -1;
 
     if (me->msg_array) {
-        n = cib_get(&(me->msg_queue));
+        queue_index = cib_get(&(me->msg_queue));
     }
 
     /* no message, fail */
-    if ((!block) && (n == -1)) {
+    if ((!block) && (queue_index == -1)) {
         return -1;
     }
 
-    if (n >= 0) {
+    if (queue_index >= 0) {
         DEBUG("_msg_receive: %s: _msg_receive(): We've got a queued message.\n", active_thread->name);
-        *m = me->msg_array[n];
+        *m = me->msg_array[queue_index];
     }
     else {
         me->wait_data = (void *) m;
@@ -237,7 +237,7 @@ static int _msg_receive(msg_t *m, int block)
     if (node == NULL) {
         DEBUG("_msg_receive: %s: _msg_receive(): No thread in waiting list.\n", active_thread->name);
 
-        if (n < 0) {
+        if (queue_index < 0) {
             DEBUG("_msg_receive(): %s: No msg in queue. Going blocked.\n", active_thread->name);
             sched_set_status(me,  STATUS_RECEIVE_BLOCKED);
 
@@ -253,7 +253,7 @@ static int _msg_receive(msg_t *m, int block)
         DEBUG("_msg_receive: %s: _msg_receive(): Waking up waiting thread.\n", active_thread->name);
         tcb_t *sender = (tcb_t*) node->data;
 
-        if (n >= 0) {
+        if (queue_index >= 0) {
             /* We've already got a message from the queue.  As there is a
              * waiter, take it's message into the just freed queue space.
              */
