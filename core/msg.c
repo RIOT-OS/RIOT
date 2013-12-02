@@ -67,7 +67,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
 
     dINT();
 
-    if (target->status !=  STATUS_RECEIVE_BLOCKED) {
+    if (target->status != STATUS_RECEIVE_BLOCKED) {
         if (target->msg_array && queue_msg(target, m)) {
             eINT();
             return 1;
@@ -121,7 +121,7 @@ int msg_send_int(msg_t *m, unsigned int target_pid)
 {
     tcb_t *target = (tcb_t *) sched_threads[target_pid];
 
-    if (target->status ==  STATUS_RECEIVE_BLOCKED) {
+    if (target->status == STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send_int: Direct msg copy from %i to %i.\n", thread_getpid(), target_pid);
 
         m->sender_pid = target_pid;
