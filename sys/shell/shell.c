@@ -35,58 +35,57 @@
 
 static void(*find_handler(const shell_command_t *command_list, char *command))(char *)
 {
-    const shell_command_t *entry = command_list;
-
-    if (entry) {
-        while (entry->name != NULL) {
-            if (strcmp(entry->name, command) == 0) {
-                return entry->handler;
-            }
-            else {
-                entry++;
-            }
-        }
-    }
-
+    const shell_command_t *command_lists[] = {
+        command_list,
 #ifdef MODULE_SHELL_COMMANDS
-    entry = _shell_command_list;
+        _shell_command_list,
+#endif
+    };
 
-    while (entry->name != NULL) {
-        if (strcmp(entry->name, command) == 0) {
-            return entry->handler;
-        }
-        else {
-            entry++;
+    const shell_command_t *entry;
+
+    /* iterating over command_lists */
+    for (unsigned int i = 0; i < sizeof(command_lists)/sizeof(entry); i++) {
+        if ((entry = command_lists[i])) {
+            /* iterating over commands in command_lists entry */
+            while (entry->name != NULL) {
+                if (strcmp(entry->name, command) == 0) {
+                    return entry->handler;
+                }
+                else {
+                    entry++;
+                }
+            }
         }
     }
 
-#endif
     return NULL;
 }
 
 static void print_help(const shell_command_t *command_list)
 {
-    const shell_command_t *entry = command_list;
-
     printf("%-20s %s\n", "Command", "Description");
     puts("---------------------------------------");
 
-    if (entry) {
-        while (entry->name != NULL) {
-            printf("%-20s %s\n", entry->name, entry->desc);
-            entry++;
+    const shell_command_t *command_lists[] = {
+        command_list,
+#ifdef MODULE_SHELL_COMMANDS
+        _shell_command_list,
+#endif
+    };
+
+    const shell_command_t *entry;
+
+    /* iterating over command_lists */
+    for (unsigned int i = 0; i < sizeof(command_lists)/sizeof(entry); i++) {
+        if ((entry = command_lists[i])) {
+            /* iterating over commands in command_lists entry */
+            while (entry->name != NULL) {
+                printf("%-20s %s\n", entry->name, entry->desc);
+                entry++;
+            }
         }
     }
-
-#ifdef MODULE_SHELL_COMMANDS
-    entry = _shell_command_list;
-
-    while (entry->name != NULL) {
-        printf("%-20s %s\n", entry->name, entry->desc);
-        entry++;
-    }
-
-#endif
 }
 
 static void handle_input_line(shell_t *shell, char *line)
