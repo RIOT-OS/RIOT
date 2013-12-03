@@ -738,7 +738,6 @@ ccnl_interest_new(struct ccnl_relay_s *ccnl, struct ccnl_face_s *from,
     *ppkd = 0;
     i->minsuffix = minsuffix;
     i->maxsuffix = maxsuffix;
-    ccnl_get_timeval(&i->last_used);
     DBL_LINKED_LIST_ADD(ccnl->pit, i);
     return i;
 }
@@ -1097,12 +1096,12 @@ ccnl_forward_remove(struct ccnl_relay_s *ccnl, struct ccnl_forward_s *fwd)
     fwd2 = fwd->next;
     DBL_LINKED_LIST_REMOVE(ccnl->fib, fwd);
 
-    struct ccnl_interest_s *pit;
-    for (pit = ccnl->pit; pit;) {
-        if (pit->forwarded_over == fwd) {
-            pit->forwarded_over = NULL;
+    for (struct ccnl_interest_s *p = ccnl->pit; p; p = p->next) {
+        if (p->forwarded_over == fwd) {
+            p->forwarded_over = NULL;
         }
     }
+    DEBUGMSG(40, "  ccnl_forward_remove next=%p\n", (void *) fwd2);
 
     free_forward(fwd);
     return fwd2;
@@ -1114,6 +1113,39 @@ bool ccnl_is_timeouted(struct timeval *now, struct timeval *last_used, time_t ti
     return timevaldelta(now, &abs_timeout) > 0;
 }
 
+void ccnl_do_retransmit(void *ptr, void *dummy)
+{
+    (void) dummy; /* unused */
+
+    struct ccnl_relay_s *relay = (struct ccnl_relay_s *) ptr;
+    struct ccnl_interest_s *i = relay->pit;
+
+    while (i) { // CONFORM: "Entries in the PIT MUST timeout rather
+        // than being held indefinitely."
+        if (i->retries > CCNL_MAX_INTEREST_RETRANSMIT) {
+            i = ccnl_interest_remove(relay, i);
+        }
+        else {
+            // CONFORM: "A node MUST retransmit Interest Messages
+            // periodically for pending PIT entries."
+            DEBUGMSG(7, " retransmit %d <%s>\n", i->retries,
+                     ccnl_prefix_to_path(i->prefix));
+
+            if (i->forwarded_over
+                && !(i->forwarded_over->flags & CCNL_FORWARD_FLAGS_STATIC)
+                && (i->retries >= CCNL_MAX_INTEREST_OPTIMISTIC)) {
+                DEBUGMSG(1, "  removed dynamic forward %p\n", (void *) i->forwarded_over);
+                ccnl_forward_remove(relay, i->forwarded_over);
+            }
+
+            i->retries++;
+            ccnl_interest_propagate(relay, i);
+
+            i = i->next;
+        }
+    }
+}
+
 void ccnl_do_ageing(void *ptr, void *dummy)
 {
 
@@ -1121,7 +1153,7 @@ void ccnl_do_ageing(void *ptr, void *dummy)
 
     struct ccnl_relay_s *relay = (struct ccnl_relay_s *) ptr;
     struct ccnl_content_s *c = relay->contents;
-    struct ccnl_interest_s *i = relay->pit;
+
     struct ccnl_face_s *f = relay->faces;
     struct timeval now;
     ccnl_get_timeval(&now);
@@ -1134,29 +1166,6 @@ void ccnl_do_ageing(void *ptr, void *dummy)
         }
         else {
             c = c->next;
-        }
-    }
-
-    while (i) { // CONFORM: "Entries in the PIT MUST timeout rather
-        // than being held indefinitely."
-        if (ccnl_is_timeouted(&now, &i->last_used, CCNL_INTEREST_TIMEOUT_SEC, CCNL_INTEREST_TIMEOUT_SEC) ||
-            i->retries > CCNL_MAX_INTEREST_RETRANSMIT) {
-            i = ccnl_interest_remove(relay, i);
-        }
-        else {
-            // CONFORM: "A node MUST retransmit Interest Messages
-            // periodically for pending PIT entries."
-            DEBUGMSG(7, " retransmit %d <%s>\n", i->retries,
-                     ccnl_prefix_to_path(i->prefix));
-
-            if (i->forwarded_over && !(i->forwarded_over->flags & CCNL_FORWARD_FLAGS_STATIC)) {
-                ccnl_forward_remove(relay, i->forwarded_over);
-            }
-
-            i->retries++;
-            ccnl_interest_propagate(relay, i);
-
-            i = i->next;
         }
     }
 

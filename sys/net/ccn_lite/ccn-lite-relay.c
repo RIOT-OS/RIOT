@@ -134,7 +134,13 @@ void ccnl_ll_TX(struct ccnl_relay_s *ccnl, struct ccnl_if_s *ifc,
 void ccnl_ageing(void *relay, void *aux)
 {
     ccnl_do_ageing(relay, aux);
-    ccnl_set_timer(1000000, ccnl_ageing, relay, 0);
+    ccnl_set_timer(CCNL_CHECK_TIMEOUT_USEC, ccnl_ageing, relay, 0);
+}
+
+void ccnl_retransmit(void *relay, void *aux)
+{
+    ccnl_do_retransmit(relay, aux);
+    ccnl_set_timer(CCNL_CHECK_RETRANSMIT_USEC, ccnl_retransmit, relay, 0);
 }
 
 // ----------------------------------------------------------------------
@@ -204,7 +210,8 @@ void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries, int fi
     f->flags |= CCNL_FACE_FLAGS_STATIC;
     i->broadcast_face = f;
 
-    ccnl_set_timer(1000000, ccnl_ageing, relay, 0);
+    ccnl_set_timer(CCNL_CHECK_TIMEOUT_USEC, ccnl_ageing, relay, 0);
+    ccnl_set_timer(CCNL_CHECK_RETRANSMIT_USEC, ccnl_retransmit, relay, 0);
 }
 
 #if RIOT_CCNL_POPULATE
@@ -326,7 +333,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
     radio_packet_t *p;
     riot_ccnl_msg_t *m;
     struct timeval *timeout;
-    unsigned long us = 100 * 1000;
+    unsigned long us = CCNL_CHECK_RETRANSMIT_USEC;
     int hwtimer_id;
 
     while (!ccnl->halt_flag) {

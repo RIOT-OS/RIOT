@@ -170,7 +170,6 @@ struct ccnl_interest_s {
     int minsuffix, maxsuffix;
     struct ccnl_buf_s *ppkd;	   // publisher public key digest
     struct ccnl_buf_s *pkt;	   // full datagram
-    struct timeval last_used;
     int retries;
     struct ccnl_forward_s *forwarded_over;
 };
@@ -255,6 +254,7 @@ ccnl_extract_prefix_nonce_ppkd(unsigned char **data, int *datalen, int *scope,
                                struct ccnl_buf_s **nonce, struct ccnl_buf_s **ppkd,
                                unsigned char **content, int *contlen);
 
+void ccnl_do_retransmit(void *ptr, void *dummy);
 void ccnl_do_ageing(void *ptr, void *dummy);
 
 void ccnl_interface_CTS(void *aux1, void *aux2);
