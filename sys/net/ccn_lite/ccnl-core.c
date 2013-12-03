@@ -915,22 +915,34 @@ ccnl_content_add2cache(struct ccnl_relay_s *ccnl, struct ccnl_content_s *c)
     DEBUGMSG(99, "ccnl_content_add2cache (%d/%d)\n", ccnl->contentcnt,
              ccnl->max_cache_entries);
 
-    if (ccnl->max_cache_entries > 0
-        && ccnl->contentcnt >= ccnl->max_cache_entries) { // remove oldest content
-        struct ccnl_content_s *c2;
+    if (ccnl->max_cache_entries <= 0) {
+        DEBUGMSG(1, "  content store disabled...\n");
+        return NULL;
+    }
+
+    while (ccnl->max_cache_entries <= ccnl->contentcnt) {
+        DEBUGMSG(1, "  remove oldest content...\n");
+        struct ccnl_content_s *c2, *oldest = NULL;
         int age = 0;
 
-        for (c2 = ccnl->contents; c2; c2 = c2->next)
+        for (c2 = ccnl->contents; c2; c2 = c2->next) {
             if (!(c2->flags & CCNL_CONTENT_FLAGS_STATIC)
                 && ((age == 0) || c2->last_used < age)) {
                 age = c2->last_used;
+                oldest = c2;
             }
+        }
 
-        if (c2) {
-            ccnl_content_remove(ccnl, c2);
+        if (oldest) {
+            DEBUGMSG(1, "   replaced: '%s'\n",ccnl_prefix_to_path(oldest->name));
+            ccnl_content_remove(ccnl, oldest);
+        } else {
+            DEBUGMSG(1, "   no dynamic content to remove...\n");
+            break;
         }
     }
 
+    DEBUGMSG(1, "  add new content to store: '%s'\n", ccnl_prefix_to_path(c->name));
     DBL_LINKED_LIST_ADD(ccnl->contents, c);
     ccnl->contentcnt++;
     return c;

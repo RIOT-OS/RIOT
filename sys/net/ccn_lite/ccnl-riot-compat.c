@@ -17,6 +17,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
 
@@ -60,13 +61,21 @@ int riot_send_msg(uint8_t *buf, uint16_t size, uint16_t to)
     DEBUGMSG(1, "this is a RIOT MSG based connection\n");
     DEBUGMSG(1, "size=%" PRIu16 " to=%" PRIu16 "\n", size, to);
 
-    static riot_ccnl_msg_t rmsg;
-    rmsg.payload = buf;
-    rmsg.size = size;
+    uint8_t *buf2 = malloc(sizeof(riot_ccnl_msg_t) + size);
+    if (!buf2) {
+        DEBUGMSG(1, "  malloc failed...dorpping msg!\n");
+        return 0;
+    }
+
+    riot_ccnl_msg_t *rmsg = (riot_ccnl_msg_t *) buf2;
+    rmsg->payload = buf2 + sizeof(riot_ccnl_msg_t);
+    rmsg->size = size;
+
+    memcpy(rmsg->payload, buf, size);
 
     msg_t m;
     m.type = CCNL_RIOT_MSG;
-    m.content.ptr = (char *) &rmsg;
+    m.content.ptr = (char *) rmsg;
     DEBUGMSG(1, "sending msg to pid=%u\n", to);
     msg_send(&m, to, 1);
 
