@@ -86,7 +86,7 @@ int msg_send_int(msg_t *m, unsigned int target_pid);
  * This function blocks until a message was received.
  * @param m pointer to preallocated msg
  *
- * @return 1 Function always succeeds or blocks forever.
+ * @return 1 if msg was received
  */
 int msg_receive(msg_t *m);
 
@@ -96,9 +96,22 @@ int msg_receive(msg_t *m);
  * This function does not block if no message can be received.
  * @param m pointer to preallocated msg
  *
- * @return 1 if a message was received, -1 otherwise.
+ * @return 1 if msg was received.
+ * @return -1 if there was no msg to receive
  */
 int msg_try_receive(msg_t *m);
+
+/**
+ * @brief Receive a message.
+ *
+ * This function blocks until msg was received OR timeout was triggered
+ * @param m pointer to preallocated msg
+ * @param timeout_us timeout in micro seconds
+ *
+ * @return 1 if msg was received.
+ * @return -1 if there was a timeout, msg invalid
+ */
+int msg_receive_timeout(msg_t *m, int timeout_us);
 
 /**
  * @brief Send a message, block until reply received.
