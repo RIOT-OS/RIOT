@@ -16,7 +16,7 @@
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  */
 #include <stdio.h>
-#include <stdlib.h>
+
 #ifdef __MACH__
 #define _XOPEN_SOURCE
 #endif
@@ -36,6 +36,8 @@
 #define VALGRIND_STACK_REGISTER(...)
 #define VALGRIND_DEBUG(...)
 #endif
+
+#include <stdlib.h>
 
 #include "kernel_internal.h"
 #include "sched.h"
