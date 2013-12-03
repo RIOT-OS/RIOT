@@ -58,8 +58,6 @@
 /** message buffer */
 msg_t msg_buffer_relay[RELAY_MSG_BUFFER_SIZE];
 
-uint8_t packet_out[PAYLOAD_SIZE];
-
 // ----------------------------------------------------------------------
 
 struct ccnl_relay_s theRelay;
@@ -71,17 +69,20 @@ ccnl_run_events(void)
     long usec;
 
     rtc_time(&now);
+    DEBUGMSG(1, "ccnl_run_events now: %ld:%ld\n", now.tv_sec, now.tv_usec);
 
     while (eventqueue) {
         struct ccnl_timer_s *t = eventqueue;
         usec = timevaldelta(&(t->timeout), &now);
 
         if (usec >= 0) {
+            DEBUGMSG(1, "ccnl_run_events nothing to do: %ld:%ld\n", now.tv_sec, now.tv_usec);
             now.tv_sec = usec / 1000000;
             now.tv_usec = usec % 1000000;
             return &now;
         }
 
+        DEBUGMSG(1, "ccnl_run_events run event handler: %ld:%ld\n", now.tv_sec, now.tv_usec);
         if (t->fct) {
             (t->fct)(t->node, t->intarg);
         }
@@ -124,8 +125,7 @@ void ccnl_ll_TX(struct ccnl_relay_s *ccnl, struct ccnl_if_s *ifc,
 {
     (void) ccnl; /* unused */
 
-    memcpy(&packet_out, &buf->data, buf->datalen);
-    ifc->sendfunc(packet_out, (uint16_t) buf->datalen, (uint16_t) dest->id);
+    ifc->sendfunc(buf->data, (uint16_t) buf->datalen, (uint16_t) dest->id);
 }
 
 // ----------------------------------------------------------------------
@@ -195,6 +195,8 @@ void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries)
     else {
         DEBUGMSG(1, "sorry, could not open riot trans device\n");
     }
+
+    ccnl_set_timer(1000000, ccnl_ageing, relay, 0);
 }
 
 #if RIOT_CCNL_POPULATE
@@ -245,7 +247,7 @@ void ccnl_populate_cache(struct ccnl_relay_s *ccnl, unsigned char *buf, int data
     }
 }
 
-void handle_populate_cache()
+void handle_populate_cache(void)
 {
     DEBUGMSG(1, "ccnl_populate_cache with: text_txt_ccnb\n");
     ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_0, (int) text_txt_ccnb_0_len);
@@ -308,9 +310,9 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
     riot_ccnl_msg_t *m;
 
     while (!ccnl->halt_flag) {
-        //        struct timeval *timeout = ccnl_run_events();
         DEBUGMSG(1, "waiting for incomming msg\n");
         msg_receive(&in);
+        struct timeval *timeout = ccnl_run_events();
 
         switch (in.type) {
             case PKT_PENDING:
@@ -371,15 +373,14 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
  * @param pointer to count transceiver pids
  *
  */
-void ccnl_riot_relay_start(void)
+void ccnl_riot_relay_start(int max_cache_entries)
 {
-    int max_cache_entries = 20;
-
     struct timeval now;
     theRelay.startup_time = rtc_time(&now);
 
     DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", now.tv_sec, now.tv_usec);
     DEBUGMSG(1, "  compile time: %s %s\n", __DATE__, __TIME__);
+    DEBUGMSG(1, "  max_cache_entries: %d\n", max_cache_entries);
     DEBUGMSG(1, "  compile options: %s\n", compile_string());
 
     ccnl_relay_config(&theRelay, max_cache_entries);
