@@ -64,7 +64,7 @@ static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
 void kernel_init(void)
 {
     dINT();
-    printf("kernel_init(): This is RIOT!\n");
+    printf("kernel_init(): This is RIOT! (Version: %s)\n", VERSION);
 
     sched_init();
 
