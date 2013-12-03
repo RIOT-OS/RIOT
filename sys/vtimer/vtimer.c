@@ -272,7 +272,7 @@ int vtimer_init()
 int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid)
 {
     int ret;
-    t->action = (void *) thread_wakeup;
+    t->action = (void(*)(void *)) thread_wakeup;
     t->arg = (void *) pid;
     t->absolute = interval;
     t->pid = 0;
@@ -311,7 +311,7 @@ int vtimer_remove(vtimer_t *t)
 
 int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr)
 {
-    t->action = (void *) msg_send_int;
+    t->action = (void(*)(void *)) msg_send_int;
     t->arg = ptr;
     t->absolute = interval;
     t->pid = pid;
