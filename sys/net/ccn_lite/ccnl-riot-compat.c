@@ -97,6 +97,9 @@ char *riot_ccnl_event_to_string(ccnl_riot_event_t event)
         case CCNL_RIOT_POPULATE:
             return "RIOT_POPULATE";
 
+        case CCNL_RIOT_TIMEOUT:
+            return "CCNL_RIOT_TIMEOUT";
+
         default:
             return "UNKNOWN";
     }

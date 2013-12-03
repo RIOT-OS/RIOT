@@ -815,6 +815,7 @@ void ccnl_interest_propagate(struct ccnl_relay_s *ccnl,
     }
 
     if (forward_cnt == 0) {
+        DEBUGMSG(40, "  ccnl_interest_propagate: using broadcast face!\n");
         ccnl_face_enqueue(ccnl, ccnl->ifs[RIOT_TRANS_IDX].broadcast_face, buf_dup(i->pkt));
     }
 
@@ -1124,7 +1125,7 @@ void ccnl_do_ageing(void *ptr, void *dummy)
     struct ccnl_face_s *f = relay->faces;
     struct timeval now;
     ccnl_get_timeval(&now);
-    DEBUGMSG(999, "ccnl_do_ageing %ld:%ld\n", now.tv_sec, now.tv_usec);
+    //DEBUGMSG(999, "ccnl_do_ageing %ld:%ld\n", now.tv_sec, now.tv_usec);
 
     while (c) {
         if (ccnl_is_timeouted(&now, &c->last_used, CCNL_CONTENT_TIMEOUT_SEC, CCNL_CONTENT_TIMEOUT_USEC)
@@ -1171,7 +1172,6 @@ void ccnl_do_ageing(void *ptr, void *dummy)
 
     struct ccnl_forward_s *fwd = relay->fib;
     while (fwd) {
-        DEBUGMSG(1, "cleaning up fwd: %p\n", fwd);
         if (!(fwd->flags & CCNL_FORWARD_FLAGS_STATIC)
             && ccnl_is_timeouted(&now, &fwd->last_used, CCNL_FWD_TIMEOUT_SEC, CCNL_FWD_TIMEOUT_USEC)) {
             fwd = ccnl_forward_remove(relay, fwd);
