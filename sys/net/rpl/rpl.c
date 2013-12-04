@@ -190,6 +190,8 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address)
         return SIXLOWERROR_ADDRESS;
     }
 
+    rpl_instances_init();
+
     /* initialize routing table */
     rpl_clear_routing_table();
     init_trickle();
@@ -724,7 +726,10 @@ void recv_rpl_dio(void)
     parent->rank = rpl_dio_buf->rank;
     rpl_parent_update(parent);
 
-    if (rpl_equal_id(&parent->addr, &my_dodag->my_preferred_parent->addr) && (parent->dtsn != rpl_dio_buf->dtsn)) {
+    if (my_dodag->my_preferred_parent == NULL) {
+        DEBUG("my dodag has no preferred_parent yet - seems to be odd since I have a parent...\n");
+    }
+    else if (rpl_equal_id(&parent->addr, &my_dodag->my_preferred_parent->addr) && (parent->dtsn != rpl_dio_buf->dtsn)) {
         delay_dao();
     }
 

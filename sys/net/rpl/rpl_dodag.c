@@ -33,6 +33,11 @@ rpl_instance_t instances[RPL_MAX_INSTANCES];
 rpl_dodag_t dodags[RPL_MAX_DODAGS];
 rpl_parent_t parents[RPL_MAX_PARENTS];
 
+void rpl_instances_init(void)
+{
+    memset(instances, 0, sizeof(rpl_instance_t) * RPL_MAX_INSTANCES);
+}
+
 rpl_instance_t *rpl_new_instance(uint8_t instanceid)
 {
     rpl_instance_t *inst;
@@ -156,6 +161,7 @@ rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t 
             parent->addr = *address;
             parent->rank = rank;
             parent->dodag = dodag;
+            parent->lifetime = dodag->default_lifetime * dodag->lifetime_unit;
             /* dtsn is set at the end of recv_dio function */
             parent->dtsn = 0;
             return parent;
@@ -315,7 +321,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
         return;
     }
 
-    preferred_parent = rpl_new_parent(my_dodag, parent, parent_rank);
+    preferred_parent = rpl_new_parent(dodag, parent, parent_rank);
 
     if (preferred_parent == NULL) {
         rpl_del_dodag(my_dodag);
