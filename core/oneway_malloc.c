@@ -12,7 +12,7 @@
  * @ingroup kernel
  * @{
  * @file
- * @author Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @}
  */
 

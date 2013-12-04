@@ -12,7 +12,7 @@
  * @file
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Oliver Hahm <oliver.hahm@fu-berlin.de>
  * @}
  */
