@@ -23,7 +23,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #include <hwtimer.h>
