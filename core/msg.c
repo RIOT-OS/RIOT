@@ -44,6 +44,8 @@ static int queue_msg(tcb_t *target, msg_t *m)
         return 1;
     }
 
+    DEBUG("queue_msg: no memory to queue message\n");
+
     return 0;
 }
 
@@ -149,6 +151,7 @@ int msg_send_receive(msg_t *m, msg_t *reply, unsigned int target_pid)
 
     /* msg_send blocks until reply received */
 
+    eINT();
     return msg_send(m, target_pid, true);
 }
 
@@ -160,6 +163,7 @@ int msg_reply(msg_t *m, msg_t *reply)
 
     if (!target) {
         DEBUG("msg_reply(): %s: Target \"%" PRIu16 "\" not existing...dropping msg!\n", active_thread->name, m->sender_pid);
+        restoreIRQ(state);
         return -1;
     }
 
@@ -221,6 +225,7 @@ static int _msg_receive(msg_t *m, int block)
 
     /* no message, fail */
     if ((!block) && (n == -1)) {
+        eINT();
         return -1;
     }
 
@@ -247,6 +252,7 @@ static int _msg_receive(msg_t *m, int block)
             /* sender copied message */
         }
 
+        eINT();
         return 1;
     }
     else {
