@@ -394,6 +394,12 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                 handle_populate_cache();
                 break;
 #endif
+            case (CCNL_RIOT_PRINT_STAT):
+                hwtimer_remove(hwtimer_id);
+                for (struct ccnl_face_s *f = ccnl->faces; f; f = f->next) {
+                    ccnl_face_print_stat(f);
+                }
+                break;
             case (CCNL_RIOT_TIMEOUT):
                 timeout = ccnl_run_events();
                 us = timeout->tv_sec * 1000 * 1000 + timeout->tv_usec;

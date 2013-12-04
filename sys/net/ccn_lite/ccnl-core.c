@@ -520,10 +520,28 @@ ccnl_face_remove(struct ccnl_relay_s *ccnl, struct ccnl_face_s *f)
         f->outq = tmp;
     }
 
+    ccnl_face_print_stat(f);
+
     f2 = f->next;
     DBL_LINKED_LIST_REMOVE(ccnl->faces, f);
     ccnl_free(f);
     return f2;
+}
+
+void ccnl_face_print_stat(struct ccnl_face_s *f)
+{
+    DEBUGMSG(1, "ccnl_face_print_stat: faceid=%d ifndx=%d\n", f->faceid, f->ifndx);
+    DEBUGMSG(1, "  STAT interest send=%d:%d:%d:%d:%d\n", f->stat.send_interest[0],
+             f->stat.send_interest[1], f->stat.send_interest[2],
+             f->stat.send_interest[3], f->stat.send_interest[4]);
+
+    DEBUGMSG(1, "  STAT content  send=%d:%d:%d:%d:%d\n", f->stat.send_content[0],
+             f->stat.send_content[1], f->stat.send_content[2],
+             f->stat.send_content[3], f->stat.send_content[4]);
+
+    DEBUGMSG(1, "  STAT interest received=%d\n", f->stat.received_interest);
+
+    DEBUGMSG(1, "  STAT content  received=%d\n", f->stat.received_content);
 }
 
 void ccnl_interface_cleanup(struct ccnl_if_s *i)
@@ -785,8 +803,6 @@ void ccnl_interest_propagate(struct ccnl_relay_s *ccnl,
     struct ccnl_forward_s *fwd;
     DEBUGMSG(99, "ccnl_interest_propagate\n");
 
-    ccnl_print_stats(ccnl, STAT_SND_I); // log_send_i
-
     // CONFORM: "A node MUST implement some strategy rule, even if it is only to
     // transmit an Interest Message on all listed dest faces in sequence."
     // CCNL strategy: we forward on all FWD entries with a prefix match
@@ -807,6 +823,7 @@ void ccnl_interest_propagate(struct ccnl_relay_s *ccnl,
             || (i->from->flags & CCNL_FACE_FLAGS_REFLECT)) {
 
             i->forwarded_over = fwd;
+            fwd->face->stat.send_interest[i->retries]++;
             ccnl_face_enqueue(ccnl, fwd->face, buf_dup(i->pkt));
             ccnl_get_timeval(&fwd->last_used);
             forward_cnt++;
@@ -815,6 +832,7 @@ void ccnl_interest_propagate(struct ccnl_relay_s *ccnl,
 
     if (forward_cnt == 0) {
         DEBUGMSG(40, "  ccnl_interest_propagate: using broadcast face!\n");
+        ccnl->ifs[RIOT_TRANS_IDX].broadcast_face->stat.send_interest[i->retries]++;
         ccnl_face_enqueue(ccnl, ccnl->ifs[RIOT_TRANS_IDX].broadcast_face, buf_dup(i->pkt));
     }
 
@@ -993,13 +1011,8 @@ int ccnl_content_serve_pending(struct ccnl_relay_s *ccnl,
             if (pi->face->ifndx >= 0) {
                 DEBUGMSG(6, "  forwarding content <%s>\n",
                          ccnl_prefix_to_path(c->name));
-                ccnl_print_stats(ccnl, STAT_SND_C); //log sent c
+                pi->face->stat.send_content[c->served_cnt % CCNL_MAX_CONTENT_SERVED_STAT]++;
                 ccnl_face_enqueue(ccnl, pi->face, buf_dup(c->pkt));
-            }
-            else
-                // upcall to deliver content to local client
-            {
-                ccnl_app_RX(ccnl, c);
             }
 
             c->served_cnt++;
@@ -1248,7 +1261,7 @@ int ccnl_core_RX_i_or_c(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
 
     if (buf->data[0] == 0x01 && buf->data[1] == 0xd2) { // interest
         DEBUGMSG(1, "ccnl_core_RX_i_or_c: interest=<%s>\n", ccnl_prefix_to_path(p));
-        ccnl_print_stats(relay, STAT_RCV_I); //log count recv_interest
+        from->stat.received_interest++;
 
         if (p->compcnt > 0 && p->comp[0][0] == (unsigned char) 0xc1) {
             goto Skip;
@@ -1271,13 +1284,11 @@ int ccnl_core_RX_i_or_c(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
                 // FIXME: should check stale bit in aok here
                 DEBUGMSG(7, "  matching content for interest, content %p\n",
                          (void *) c);
-                ccnl_print_stats(relay, STAT_SND_C); //log sent_c
+                from->stat.send_content[c->served_cnt % CCNL_MAX_CONTENT_SERVED_STAT]++;
+                c->served_cnt++;
 
                 if (from->ifndx >= 0) {
                     ccnl_face_enqueue(relay, from, buf_dup(c->pkt));
-                }
-                else {
-                    ccnl_app_RX(relay, c);
                 }
 
                 goto Skip;
@@ -1317,7 +1328,7 @@ int ccnl_core_RX_i_or_c(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
     }
     else {   // content
         DEBUGMSG(6, "  content=<%s>\n", ccnl_prefix_to_path(p));
-        ccnl_print_stats(relay, STAT_RCV_C); //log count recv_content
+        from->stat.received_content++;
 
         // CONFORM: Step 1:
         for (c = relay->contents; c; c = c->next)

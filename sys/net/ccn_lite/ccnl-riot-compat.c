@@ -100,6 +100,9 @@ char *riot_ccnl_event_to_string(ccnl_riot_event_t event)
         case CCNL_RIOT_TIMEOUT:
             return "CCNL_RIOT_TIMEOUT";
 
+        case CCNL_RIOT_PRINT_STAT:
+            return "CCNL_RIOT_PRINT_STAT";
+
         default:
             return "UNKNOWN";
     }

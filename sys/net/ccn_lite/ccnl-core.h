@@ -48,8 +48,6 @@
 
 #define CCNL_FORWARD_FLAGS_STATIC  0x01
 
-enum {STAT_RCV_I, STAT_RCV_C, STAT_SND_I, STAT_SND_C, STAT_QLEN, STAT_EOP1};
-
 #include <inttypes.h>
 #include <time.h>
 #include <sys/time.h>
@@ -122,6 +120,13 @@ struct ccnl_prefix_s {
     unsigned char *path; // memory for name component copies
 };
 
+struct ccnl_stat_s {
+    int send_interest[CCNL_MAX_INTEREST_RETRANSMIT];
+    int send_content[CCNL_MAX_CONTENT_SERVED_STAT];
+    int received_interest;
+    int received_content;
+};
+
 struct ccnl_frag_s {
     int protocol; // (0=plain CCNx)
     int mtu;
@@ -152,6 +157,8 @@ struct ccnl_face_s {
     struct ccnl_buf_s *outq, *outqend; // queue of packets to send
     struct ccnl_frag_s *frag;  // which special datagram armoring
     struct ccnl_sched_s *sched;
+
+    struct ccnl_stat_s stat;
 };
 
 struct ccnl_forward_s {
@@ -259,8 +266,7 @@ void ccnl_do_ageing(void *ptr, void *dummy);
 
 void ccnl_interface_CTS(void *aux1, void *aux2);
 
-#define ccnl_app_RX(x,y)        do{}while(0)
-#define ccnl_print_stats(x,y)       do{}while(0)
+void ccnl_face_print_stat(struct ccnl_face_s *f);
 
 #define ccnl_malloc(s)  malloc(s)
 #define ccnl_calloc(n,s)    calloc(n,s)
