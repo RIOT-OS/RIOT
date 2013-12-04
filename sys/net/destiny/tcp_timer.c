@@ -32,6 +32,7 @@
 
 #include "tcp_timer.h"
 
+char tcp_timer_stack[TCP_TIMER_STACKSIZE];
 
 void handle_synchro_timeout(socket_internal_t *current_socket)
 {
@@ -154,6 +155,7 @@ void tcp_general_timer(void)
     while (1) {
         inc_global_variables();
         check_sockets();
+        vtimer_remove(&tcp_vtimer);
         vtimer_set_wakeup(&tcp_vtimer, interval, thread_getpid());
         thread_sleep();
     }
