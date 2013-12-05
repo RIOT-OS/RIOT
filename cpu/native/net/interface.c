@@ -33,6 +33,8 @@
 #include "nativenet_internal.h"
 #include "cpu.h"
 
+int (*_nativenet_send_packet)(radio_packet_t *packet);
+
 struct nativenet_callback_s {
     void (*func)(void);
 };
@@ -44,7 +46,7 @@ static volatile uint8_t rx_buffer_next;
 uint8_t _native_net_chan;
 uint16_t _native_net_pan;
 uint8_t _native_net_monitor;
-static int _native_net_tpid;
+int _native_net_tpid;
 radio_address_t _native_net_addr;
 
 /************************************************************************/
@@ -112,7 +114,7 @@ uint8_t nativenet_send(radio_packet_t *packet)
     packet->src = _native_net_addr;
     DEBUG("nativenet_send:  Sending packet of length %"PRIu16" from %"PRIu16" to %"PRIu16"\n", packet->length, packet->src, packet->dst);
 
-    if (send_buf(packet) == -1) {
+    if (_nativenet_send_packet(packet) == -1) {
         warnx("nativenet_send: error sending packet");
         return 0;
     }

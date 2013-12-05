@@ -39,5 +39,13 @@ struct rx_buffer_s {
 
 extern struct rx_buffer_s _nativenet_rx_buffer[RX_BUF_SIZE];
 
+extern uint8_t _native_net_chan;
+extern uint16_t _native_net_pan;
+extern uint8_t _native_net_monitor;
+extern int _native_net_tpid;
+extern radio_address_t _native_net_addr;
+
+
 void _nativenet_handle_packet(radio_packet_t *packet);
+extern int (*_nativenet_send_packet)(radio_packet_t *packet);
 #endif /* NATIVENET_INTERNAL_H */

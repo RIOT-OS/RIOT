@@ -255,6 +255,9 @@ int tap_init(char *name)
     }
 #endif /* OSX */
 
+    /* set send callback */
+    _nativenet_send_packet = send_buf;
+
     DEBUG("RIOT native tap initialized.\n");
     return _native_tap_fd;
 }
