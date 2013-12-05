@@ -13,7 +13,7 @@
  * @{
  * @file
  * @author Freie Universität Berlin, Computer Systems & Telematics
- * @author Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @}
  */
 

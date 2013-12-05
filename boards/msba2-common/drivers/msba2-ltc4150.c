@@ -37,7 +37,7 @@ and the mailinglist (subscription via web site)
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @author		Heiko Will
  * @author		Michael Baar
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #include <stdio.h>
