@@ -83,13 +83,17 @@ specific RIOT instance.
 ZEP NETWORKING
 ==============
 
-Zep is the ZigBee Encapsulation Protocol and is useful if you want
+ZEP is the ZigBee Encapsulation Protocol and is useful if you want
 debug/analyze 802.15.4 based protocols with Wireshark.
-Compile with -DNATIVENET_ZEP to enable zep networking and pass an IP
+Compile with -DNATIVENET_ZEP to enable ZEP networking and pass an IP
 to bind to.
 
-If you want to use zep in a virtual network, you need to configure the
-tap interfaces with IPs (which is not currently done by tapsetup).
+If you want to use ZEP in a virtual network, you need to configure the
+tap interfaces with IPs (which is not currently done by tapsetup). It
+is necessary for the process to open the interface which is why you
+need to pass the interfaces name in this case.
+
+It is an error to pass the interface name of non-tap interfaces.
 
 Usage:
 
