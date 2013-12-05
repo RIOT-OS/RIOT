@@ -11,7 +11,7 @@
  * @ingroup sys_lib
  * @{
  * @file   ringbuffer.c
- * @author Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @}
  */
 
