@@ -20,7 +20,7 @@
 
 #define RIOT_CCN_EVENT_NUMBER_OFFSET (1 << 8)
 
-#define RIOT_BROADCAST ((1 << sizeof(radio_address_t))-1)
+#define RIOT_BROADCAST (UINT16_MAX)
 
 typedef struct riot_ccnl_msg {
     void *payload;
