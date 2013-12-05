@@ -197,6 +197,7 @@ int zep_init(char *node, char *name, char *service)
             err(EXIT_FAILURE, "open(%s)", clonedev);
         }
 
+#ifndef __MACH__ /* Linux */
         memset(&ifr, 0, sizeof(ifr));
         ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
         strncpy(ifr.ifr_name, name, IFNAMSIZ);
@@ -208,6 +209,10 @@ int zep_init(char *node, char *name, char *service)
             }
             exit(EXIT_FAILURE);
         }
+#else
+        printf("Please configure the IP address of %s to %s now and then press return\n", name, node);
+        read(STDIN_FILENO, clonedev, 1);
+#endif
     }
 
     /* set send callback */
@@ -265,7 +270,9 @@ int zep_init(char *node, char *name, char *service)
 
     /* allow for broadcast transmission */
     s = 1;
-    setsockopt(_native_zep_fd, SOL_SOCKET, SO_BROADCAST, &s, sizeof(s));
+    if (setsockopt(_native_zep_fd, SOL_SOCKET, SO_BROADCAST, &s, sizeof(s)) == -1) {
+        err(EXIT_FAILURE, "setsockopt(SO_BROADCAST)");
+    }
 
     printf("RIOT native zep interface initialized.\n");
     return _native_zep_fd;
