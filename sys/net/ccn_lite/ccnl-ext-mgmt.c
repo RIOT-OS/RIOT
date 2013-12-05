@@ -56,10 +56,9 @@ ccnl_addr2ascii(sockunion *su)
 
 // ----------------------------------------------------------------------
 int
-ccnl_is_local_addr(sockunion *su)
+ccnl_is_local_addr(struct ccnl_face_s *f)
 {
-    (void) su ; /*unused */
-    return 1;
+    return (f->ifndx == RIOT_MSG_IDX);
 }
 
 struct ccnl_prefix_s *
@@ -588,11 +587,10 @@ int ccnl_mgmt(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
 
     DEBUGMSG(99, "ccnl_mgmt request \"%s\"\n", cmd);
 
-    if (ccnl_is_local_addr(&from->peer))
+    if (ccnl_is_local_addr(from))
         goto MGMT;
 
-    DEBUGMSG(99, " rejecting because src=%s is not a local addr\n",
-            ccnl_addr2ascii(&from->peer));
+    DEBUGMSG(99, " rejecting because src is not a local addr\n");
     ccnl_mgmt_return_msg(ccnl, orig, from,
             "refused: origin of mgmt cmd is not local");
     return -1;
