@@ -39,6 +39,7 @@ typedef struct {
 
 extern uint16_t local_address;
 extern mutex_t lowpan_context_mutex;
+extern unsigned int sixlowpan_lowpan_pid;
 
 void lowpan_read(uint8_t *data, uint8_t length,
                  ieee_802154_long_t *s_laddr,

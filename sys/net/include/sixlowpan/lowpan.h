@@ -216,17 +216,6 @@ uint8_t sixlowpan_lowpan_border_init(transceiver_type_t trans,
                                      const ipv6_addr_t *border_router_addr);
 
 /**
- * @brief   Send data via 6LoWPAN to destination node dest.
- *
- * @param[in] dest      EUI-64 of destination node.
- * @param[in] data      Data to send to destination node (may be
- *                      manipulated).
- * @param[in] data_len  Length of data.
- */
-void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
-                             uint8_t *data, uint16_t data_len);
-
-/**
  * @brief   Set header compression status for 6LoWPAN.
  *
  * @param[in] status    Header compression status to set to.
