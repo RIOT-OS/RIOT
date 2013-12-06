@@ -94,6 +94,9 @@ endif
 ifneq (,$(findstring ccn_lite_client,$(USEMODULE)))
     DIRS += net/ccn_lite/util
 endif
+ifneq (,$(findstring profiling,$(USEMODULE)))
+    DIRS += profiling
+endif
 
 all: $(BINDIR)$(MODULE).a 
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;

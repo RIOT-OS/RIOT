@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
-#include <cpu.h>
-#include <ltc4150.h>
+
+#include "cpu.h"
+#include "ltc4150.h"
+#include "hwtimer.h"
 
 #define MAX_TRACED_FUNCTIONS    (256)
 #define PROFILING_STACK_SIZE    (256)
