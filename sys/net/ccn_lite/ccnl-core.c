@@ -383,15 +383,9 @@ int ccnl_addr_cmp(sockunion *s1, sockunion *s2)
 struct ccnl_face_s *
 ccnl_get_face_or_create(struct ccnl_relay_s *ccnl, int ifndx, uint16_t sender_id)
 {
-    DEBUGMSG(1, "ifndx=%d sender_id=%d\n", ifndx, sender_id);
-
-    static int i;
-
     struct ccnl_face_s *f;
 
     for (f = ccnl->faces; f; f = f->next) {
-        DEBUGMSG(1, "f=%p\n", (void *) f);
-
         if (ifndx == f->ifndx && (f->faceid == sender_id)) {
             DEBUGMSG(1, "face found! ifidx=%d sender_id=%d faceid=%d\n", ifndx, sender_id, f->faceid);
             ccnl_get_timeval(&f->last_used);
@@ -399,26 +393,14 @@ ccnl_get_face_or_create(struct ccnl_relay_s *ccnl, int ifndx, uint16_t sender_id
         }
     }
 
-    if (ifndx == -1) {
-        for (i = 0; i < ccnl->ifcount; i++) {
-            ifndx = i;
-            break;
-        }
-
-        if (ifndx == -1) { // no suitable interface found
-            return NULL;
-        }
-    }
-
     f = (struct ccnl_face_s *) ccnl_calloc(1, sizeof(struct ccnl_face_s));
-
     if (!f) {
         return NULL;
     }
 
     f->faceid = sender_id;
-    DEBUGMSG(1, "faceid=%d\n", f->faceid);
     f->ifndx = ifndx;
+
     if (sender_id == RIOT_BROADCAST) {
         f->flags |= CCNL_FACE_FLAGS_BROADCAST;
     }
