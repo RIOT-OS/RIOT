@@ -1,12 +1,13 @@
 SRC = $(wildcard *.c)
-BINDIR = $(RIOTBOARD)/$(BOARD)/bin/
+BINDIR = bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 DEP = $(SRC:%.c=$(BINDIR)%.d)
-export ARCH = redbee-econotag_base.a
+export ARCH = $(BOARD)_base.a
 
-INCLUDES += -I$(RIOTBOARD)/redbee-econotag/drivers/include
-INCLUDES += -I$(RIOTBASE)/cpu/arm_common/include
-INCLUDES += -I$(RIOTBASE)/cpu/mc1322x/include
+INCLUDES += -I$(RIOTBOARD)/$(BOARD)/drivers/include
+INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
+INCLUDES += -I$(RIOTCPU)/arm_common/include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 
 .PHONY: $(BINDIR)/$(ARCH)
 
@@ -21,12 +22,16 @@ $(BINDIR)$(ARCH): $(OBJ)
 
 # compile and generate dependency info
 $(BINDIR)%.o: %.c
+	mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $(CFLAGS_MTHUMB) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
 	$(CC) $(CFLAGS) $(CFLAGS_MTHUMB) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 
 # remove compilation products
 clean:
-	${MAKE} -C drivers clean
-	rm -f $(OBJ) $(DEP)
+	"$(MAKE)" -C drivers clean
+	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
+	@if [ -d $(BINDIR) ] ; \
+	then rmdir $(BINDIR) ; \
+	fi
 
