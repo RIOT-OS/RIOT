@@ -6,8 +6,8 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 -------------------------------------------------------------------------------
 This file is part of RIOT.
 
-This file subject to the terms and conditions of the GNU Lesser General Public
-License. See the file LICENSE in the top level directory for more details.
+This file is subject to the terms and conditions of the LGPLv2.
+See the file LICENSE in the top level directory for more details.
 *******************************************************************************/
 
 #ifndef __CPU_H
@@ -26,7 +26,7 @@ License. See the file LICENSE in the top level directory for more details.
 extern uintptr_t __stack_start;		///< end of user stack memory space
 
 void lpc2387_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale);
-bool install_irq(int IntNumber, void *HandlerAddr, int Priority);
+bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority);
 
 /** @} */
 #endif /* __CPU_H */

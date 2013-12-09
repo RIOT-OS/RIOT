@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -18,10 +18,10 @@
 #include <vtimer.h>
 #include <thread.h>
 
-#define TRICKLE_TIMER_STACKSIZE 3072
-#define TRICKLE_INTERVAL_STACKSIZE 3072
-#define DAO_DELAY_STACKSIZE 3072
-#define RT_STACKSIZE 512
+#define TRICKLE_TIMER_STACKSIZE (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define TRICKLE_INTERVAL_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
+#define DAO_DELAY_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
+#define RT_STACKSIZE (KERNEL_CONF_STACKSIZE_DEFAULT)
 
 void reset_trickletimer(void);
 void init_trickle(void);

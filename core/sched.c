@@ -3,14 +3,16 @@
  *
  * Copyright (C) 2013 Freie Universität Berlin
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
+ *
+ * TODO: setup dependency from SCHEDSTATISTICS to MODULE_HWTIMER
  *
  * @ingroup kernel
  * @{
  * @file
- * @author Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @}
  */
 
@@ -20,6 +22,10 @@
 #include <kernel_internal.h>
 #include <clist.h>
 #include <bitarithm.h>
+
+#if SCHEDSTATISTICS
+#include "hwtimer.h"
+#endif
 
 #define ENABLE_DEBUG (0)
 #include <debug.h>
@@ -51,7 +57,7 @@ void sched_init()
         sched_threads[i] = NULL;
 #if SCHEDSTATISTICS
         pidlist[i].laststart = 0;
-        pidlist[i].runtime = 0;
+        pidlist[i].runtime_ticks = 0;
         pidlist[i].schedules = 0;
 #endif
     }
@@ -87,13 +93,11 @@ void sched_run()
 
     }
 
-#if SCHEDSTATISTICS
-    /* TODO: setup dependency from SCHEDSTATISTICS to MODULE_HWTIMER */
-    extern unsigned long hwtimer_now(void);
-    unsigned int time = hwtimer_now();
+#ifdef SCHEDSTATISTICS
+    unsigned long time = hwtimer_now();
 
     if (my_active_thread && (pidlist[my_active_thread->pid].laststart)) {
-        pidlist[my_active_thread->pid].runtime += time - pidlist[my_active_thread->pid].laststart;
+        pidlist[my_active_thread->pid].runtime_ticks += time - pidlist[my_active_thread->pid].laststart;
     }
 
 #endif

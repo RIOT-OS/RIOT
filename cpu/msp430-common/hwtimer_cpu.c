@@ -6,8 +6,8 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 -------------------------------------------------------------------------------
 This file is part of RIOT.
 
-This file subject to the terms and conditions of the GNU Lesser General Public
-License. See the file LICENSE in the top level directory for more details.
+This file is subject to the terms and conditions of the LGPLv2.
+See the file LICENSE in the top level directory for more details.
 *******************************************************************************/
 
 #include <stdint.h>
@@ -25,43 +25,56 @@ extern void timerA_init(void);
 uint16_t overflow_interrupt[ARCH_MAXTIMERS+1];
 uint16_t timer_round;
 
-static void TA0_disable_interrupt(short timer)
+#ifdef CC430
+  /* CC430 have "TimerA0", "TimerA1" and so on... */
+  #define CNT_CTRL_BASE_REG  (TA0CCTL0)
+  #define CNT_COMP_BASE_REG  (TA0CCR0)
+  #define TIMER_VAL_REG      (TA0R)
+#else
+  /* ... while other MSP430 MCUs have "TimerA", "TimerB".
+     Cheers for TI and its consistency! */
+  #define CNT_CTRL_BASE_REG  (TACCTL0)
+  #define CNT_COMP_BASE_REG  (TACCR0)
+  #define TIMER_VAL_REG      (TAR)
+#endif
+
+static void timer_disable_interrupt(short timer)
 {
-    volatile unsigned int *ptr = &TA0CCTL0 + (timer);
+    volatile unsigned int *ptr = &CNT_CTRL_BASE_REG + (timer);
     *ptr &= ~(CCIFG);
     *ptr &= ~(CCIE);
 }
 
-static void TA0_enable_interrupt(short timer)
+static void timer_enable_interrupt(short timer)
 {
-    volatile unsigned int *ptr = &TA0CCTL0 + (timer);
+    volatile unsigned int *ptr = &CNT_CTRL_BASE_REG + (timer);
     *ptr |= CCIE;
     *ptr &= ~(CCIFG);
 }
 
-static void TA0_set_nostart(unsigned long value, short timer)
+static void timer_set_nostart(unsigned long value, short timer)
 {
-    volatile unsigned int *ptr = &TA0CCR0 + (timer);
+    volatile unsigned int *ptr = &CNT_COMP_BASE_REG + (timer);
     *ptr = value;
 }
 
-static void TA0_set(unsigned long value, short timer)
+static void timer_set(unsigned long value, short timer)
 {
     DEBUG("Setting timer %u to %lu\n", timer, value);
-    TA0_set_nostart(value, timer);
-    TA0_enable_interrupt(timer);
+    timer_set_nostart(value, timer);
+    timer_enable_interrupt(timer);
 }
 
-void TA0_unset(short timer)
+void timer_unset(short timer)
 {
-    volatile unsigned int *ptr = &TA0CCR0 + (timer);
-    TA0_disable_interrupt(timer);
+    volatile unsigned int *ptr = &CNT_COMP_BASE_REG + (timer);
+    timer_disable_interrupt(timer);
     *ptr = 0;
 }
 
 unsigned long hwtimer_arch_now()
 {
-    return TA0R;
+    return ((uint32_t)timer_round << 16)+TIMER_VAL_REG;
 }
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
@@ -69,26 +82,26 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
     (void) fcpu;
     timerA_init();
     int_handler = handler;
-    TA0_enable_interrupt(0);
+    timer_enable_interrupt(0);
 }
 
 void hwtimer_arch_enable_interrupt(void)
 {
     for (int i = 0; i < ARCH_MAXTIMERS; i++) {
-        TA0_enable_interrupt(i);
+        timer_enable_interrupt(i);
     }
 }
 
 void hwtimer_arch_disable_interrupt(void)
 {
     for (int i = 0; i < ARCH_MAXTIMERS; i++) {
-        TA0_disable_interrupt(i);
+        timer_disable_interrupt(i);
     }
 }
 
 void hwtimer_arch_set(unsigned long offset, short timer)
 {
-    unsigned int value = hwtimer_arch_now() + offset;
+    uint32_t value = hwtimer_arch_now() + offset;
     hwtimer_arch_set_absolute(value, timer);
 }
 
@@ -96,10 +109,10 @@ void hwtimer_arch_set_absolute(unsigned long value, short timer)
 {
     uint16_t small_value = value % 0xFFFF;
     overflow_interrupt[timer] = (uint16_t)(value >> 16);
-    TA0_set(small_value,timer);
+    timer_set(small_value,timer);
 }
 
 void hwtimer_arch_unset(short timer)
 {
-    TA0_unset(timer);
+    timer_unset(timer);
 }

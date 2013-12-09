@@ -11,7 +11,7 @@
 #define TCP_TIMER_RESOLUTION		500*1000
 
 #define SECOND						1000.0f*1000.0f
-#define TCP_TIMER_STACKSIZE			512
+#define TCP_TIMER_STACKSIZE			KERNEL_CONF_STACKSIZE_DEFAULT
 #define TCP_SYN_INITIAL_TIMEOUT		6*SECOND
 #define TCP_SYN_TIMEOUT				24*SECOND
 #define TCP_MAX_SYN_RETRIES			3
@@ -27,7 +27,5 @@
 #define TCP_CONTINUE				3
 
 void tcp_general_timer(void);
-
-char tcp_timer_stack[TCP_TIMER_STACKSIZE];
 
 #endif /* TCP_TIMER_H_ */

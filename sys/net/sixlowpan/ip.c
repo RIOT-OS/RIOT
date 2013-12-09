@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -31,9 +31,14 @@
 #include "icmp.h"
 #include "lowpan.h"
 
-#include "sys/net/destiny/socket.h"
-#include "sys/net/net_help/net_help.h"
-#include "sys/net/net_help/msg_help.h"
+#include "destiny/socket.h"
+#include "net_help.h"
+
+#define ENABLE_DEBUG    (0)
+#if ENABLE_DEBUG
+char addr_str[IPV6_MAX_ADDR_STR_LEN];
+#endif
+#include "debug.h"
 
 #define IP_PKT_RECV_BUF_SIZE        (64)
 #define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)
@@ -49,6 +54,7 @@ uint8_t iface_addr_list_count = 0;
 int udp_packet_handler_pid = 0;
 int tcp_packet_handler_pid = 0;
 int rpl_process_pid = 0;
+ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t*) = 0;
 
 /* registered upper layer threads */
 int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
@@ -122,7 +128,19 @@ void ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
 
     packet_length = IPV6_HDR_LEN + payload_length;
 
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
+    /* see if dest should be routed to a different next hop */
+    if (ip_get_next_hop == NULL || ipv6_addr_is_multicast(&ipv6_buf->destaddr)) {
+        dest = &ipv6_buf->destaddr;
+    }
+    else {
+        dest = ip_get_next_hop(&ipv6_buf->destaddr);
+    }
+
+    if (dest == NULL) {
+        return;
+    }
+
+    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &dest->uint16[4],
                             (uint8_t *)ipv6_buf, packet_length);
 }
 
@@ -131,7 +149,7 @@ uint8_t ipv6_register_packet_handler(int pid)
 {
     uint8_t i;
 
-    for (i = 0; ((sixlowip_reg[i] != pid) && (i < SIXLOWIP_MAX_REGISTERED) &&
+    for (i = 0; ((i < SIXLOWIP_MAX_REGISTERED) && (sixlowip_reg[i] != pid) && 
                  (sixlowip_reg[i] != 0)); i++) {
         ;
     }
@@ -149,21 +167,21 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
 {
     switch (hdr->type) {
         case (ICMPV6_TYPE_ECHO_REQUEST): {
-            puts("INFO: packet type: icmp echo request");
+            DEBUG("INFO: packet type: icmp echo request\n");
             /* processing echo request */
             recv_echo_req();
             break;
         }
 
         case (ICMPV6_TYPE_ECHO_REPLY): {
-            puts("INFO: packet type: icmp echo reply");
+            DEBUG("INFO: packet type: icmp echo reply\n");
             /* processing echo reply */
             recv_echo_repl();
             break;
         }
 
         case (ICMPV6_TYPE_ROUTER_SOL): {
-            puts("INFO: packet type: icmp router solicitation");
+            DEBUG("INFO: packet type: icmp router solicitation\n");
             /* processing router solicitation */
             recv_rtr_sol();
             /* init solicited router advertisment*/
@@ -171,7 +189,7 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
         }
 
         case (ICMPV6_TYPE_ROUTER_ADV): {
-            puts("INFO: packet type: icmp router advertisment");
+            DEBUG("INFO: packet type: icmp router advertisment\n");
             /* processing router advertisment */
             recv_rtr_adv();
             /* init neighbor solicitation */
@@ -179,19 +197,19 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
         }
 
         case (ICMPV6_TYPE_NEIGHBOR_SOL): {
-            puts("INFO: packet type: icmp neighbor solicitation");
+            DEBUG("INFO: packet type: icmp neighbor solicitation\n");
             recv_nbr_sol();
             break;
         }
 
         case (ICMPV6_TYPE_NEIGHBOR_ADV): {
-            puts("INFO: packet type: icmp neighbor advertisment");
+            DEBUG("INFO: packet type: icmp neighbor advertisment\n");
             recv_nbr_adv();
             break;
         }
 
         case (ICMPV6_TYPE_RPL_CONTROL): {
-            puts("INFO: packet type: RPL message");
+            DEBUG("INFO: packet type: RPL message\n");
 
             if (rpl_process_pid != 0) {
                 msg_t m_send;
@@ -199,7 +217,7 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
                 msg_send(&m_send, rpl_process_pid, 1);
             }
             else {
-                puts("INFO: no RPL handler registered");
+                DEBUG("INFO: no RPL handler registered\n");
             }
 
             break;
@@ -260,14 +278,31 @@ void ipv6_process(void)
         /* identifiy packet */
         nextheader = &ipv6_buf->nextheader;
 
+        /* destination is foreign address */
         if ((ipv6_get_addr_match(&myaddr, &ipv6_buf->destaddr) >= 112) &&
             (ipv6_buf->destaddr.uint8[15] != myaddr.uint8[15])) {
             packet_length = IPV6_HDR_LEN + ipv6_buf->length;
+
+            ipv6_addr_t* dest;
+            if (ip_get_next_hop == NULL) {
+                dest = &ipv6_buf->destaddr;
+            }
+            else {
+                dest = ip_get_next_hop(&ipv6_buf->destaddr);
+            }
+
+            if (dest == NULL || --ipv6_buf->hoplimit == 0) {
+                continue;
+            }
+
+            /* copy received packet to send buffer */
             memcpy(ipv6_get_buf_send(), ipv6_get_buf(), packet_length);
-            sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
+            /* send packet to node ID derived from dest IP */
+            sixlowpan_lowpan_sendto((ieee_802154_long_t *) &dest->uint16[4],
                                     (uint8_t *)ipv6_get_buf_send(),
                                     packet_length);
         }
+        /* destination is our address */
         else {
             for (i = 0; i < SIXLOWIP_MAX_REGISTERED; i++) {
                 if (sixlowip_reg[i]) {
@@ -279,12 +314,11 @@ void ipv6_process(void)
 
             switch (*nextheader) {
                 case (IPV6_PROTO_NUM_ICMPV6): {
+                    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
                     /* checksum test*/
-                    if (icmpv6_csum(IPV6_PROTO_NUM_ICMPV6) != 0xffff) {
+                    if (ipv6_csum(ipv6_buf, (uint8_t*) icmp_buf, ipv6_buf->length, IPV6_PROTO_NUM_ICMPV6) != 0xffff) {
                         printf("ERROR: wrong checksum\n");
                     }
-
-                    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
                     icmpv6_demultiplex(icmp_buf);
                     break;
                 }
@@ -543,7 +577,7 @@ void ipv6_addr_init(ipv6_addr_t *out, uint16_t addr0, uint16_t addr1,
 
 int ipv6_addr_is_link_local(const ipv6_addr_t *addr)
 {
-    return (addr->uint8[0] == 0xfe && addr->uint8[0] == 0x80);
+    return (addr->uint16[0] == HTONS(0xfe80));
 }
 
 int ipv6_addr_is_unique_local_unicast(const ipv6_addr_t *addr)
@@ -594,10 +628,10 @@ char *ipv6_addr_to_str(char *addr_str, const ipv6_addr_t *ipv6_addr)
 {
     sprintf(addr_str,
             "%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x",
-            ipv6_addr->uint16[0], ipv6_addr->uint16[1],
-            ipv6_addr->uint16[2], ipv6_addr->uint16[3],
-            ipv6_addr->uint16[4], ipv6_addr->uint16[5],
-            ipv6_addr->uint16[6], ipv6_addr->uint16[7]);
+            NTOHS(ipv6_addr->uint16[0]), NTOHS(ipv6_addr->uint16[1]),
+            NTOHS(ipv6_addr->uint16[2]), NTOHS(ipv6_addr->uint16[3]),
+            NTOHS(ipv6_addr->uint16[4]), NTOHS(ipv6_addr->uint16[5]),
+            NTOHS(ipv6_addr->uint16[6]), NTOHS(ipv6_addr->uint16[7]));
     return addr_str;
 }
 
@@ -665,7 +699,25 @@ void ipv6_register_next_header_handler(uint8_t next_header, int pid)
     }
 }
 
+/* register routing function */
+void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t* dest)) {
+    ip_get_next_hop = next_hop;
+}
+
 void ipv6_register_rpl_handler(int pid)
 {
     rpl_process_pid = pid;
+}
+
+uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t proto)
+{
+    uint16_t sum = 0;
+    DEBUG("Calculate checksum over src: %s, dst: %s, len: %04X, buf: %p, proto: %u\n",
+            ipv6_addr_to_str(addr_str, &ipv6_header->srcaddr),
+            ipv6_addr_to_str(addr_str, &ipv6_header->destaddr),
+            len, buf, proto);
+    sum = len + proto;
+    sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
+    sum = csum(sum, buf, len);
+    return (sum == 0) ? 0xffff : HTONS(sum);
 }

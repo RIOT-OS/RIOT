@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -110,7 +110,7 @@
 #define RPL_MAX_INSTANCES 1
 #define RPL_MAX_PARENTS 5
 #define RPL_MAX_ROUTING_ENTRIES 128
-#define RPL_ROOT_RANK 1
+#define RPL_ROOT_RANK 256
 #define RPL_DEFAULT_LIFETIME 0xff
 #define RPL_LIFETIME_UNIT 2
 #define RPL_GROUNDED 1
@@ -121,7 +121,7 @@
 #define RPL_DIS_I_MASK 0x40
 #define RPL_DIS_D_MASK 0x20
 #define RPL_GROUNDED_SHIFT 7
-#define RPL_DEFAULT_OCP 1
+#define RPL_DEFAULT_OCP 0
 
 /* DIO Base Object (RFC 6550 Fig. 14) */
 struct __attribute__((packed)) rpl_dio_t {
@@ -270,7 +270,7 @@ typedef struct rpl_of_t {
     void (*reset)(rpl_dodag_t *);
     void (*parent_state_callback)(rpl_parent_t *, int, int);
     void (*init)(void);  //OF specific init function
-    void (*process_dio)();  //DIO processing callback (acc. to OF0 spec, chpt 5)
+    void (*process_dio)(void);  //DIO processing callback (acc. to OF0 spec, chpt 5)
 } rpl_of_t;
 
 typedef struct {

@@ -4,7 +4,7 @@
 
 uint8_t iap_get_sector(uint32_t addr)
 {
-    if ((addr >= 0x00000000) && (addr <= 0x00000FFF)) {
+    if (addr <= 0x00000FFF) {
         return 0;
     }
 

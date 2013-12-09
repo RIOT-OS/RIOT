@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -30,6 +30,8 @@ rpl_of_t rpl_of0 = {
     which_parent,
     which_dodag,
     reset,
+    NULL,
+    NULL,
     NULL
 };
 
@@ -41,6 +43,7 @@ rpl_of_t *rpl_get_of0(void)
 void reset(rpl_dodag_t *dodag)
 {
     /* Nothing to do in OF0 */
+    (void) dodag;
 }
 
 uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
@@ -82,5 +85,6 @@ rpl_parent_t *which_parent(rpl_parent_t *p1, rpl_parent_t *p2)
 /* Not used yet, as the implementation only makes use of one dodag for now. */
 rpl_dodag_t *which_dodag(rpl_dodag_t *d1, rpl_dodag_t *d2)
 {
+    (void) d2;
     return d1;
 }

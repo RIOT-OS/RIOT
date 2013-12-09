@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -20,15 +20,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
 #include "inttypes.h"
 #include "trickle.h"
-#include "rpl/rpl.h"
+#include "rpl.h"
 
-//TODO in pointer umwandeln, speicher mit malloc holen
-char *timer_over_buf;
-char *interval_over_buf;
-char *dao_delay_over_buf;
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
+/* thread stacks */
+char timer_over_buf[TRICKLE_TIMER_STACKSIZE];
+char interval_over_buf[TRICKLE_INTERVAL_STACKSIZE];
+char dao_delay_over_buf[DAO_DELAY_STACKSIZE];
 char routing_table_buf[RT_STACKSIZE];
+
 int timer_over_pid;
 int interval_over_pid;
 int dao_delay_over_pid;
@@ -71,29 +76,9 @@ void reset_trickletimer(void)
 
 void init_trickle(void)
 {
-    timer_over_buf      =  calloc(TRICKLE_TIMER_STACKSIZE, sizeof(char));
-
-    if (timer_over_buf == NULL) {
-        puts("[ERROR] Could not allocate enough memory for timer_over_buf!");
-        return;
-    }
-
-    interval_over_buf   =  calloc(TRICKLE_INTERVAL_STACKSIZE, sizeof(char));
-
-    if (interval_over_buf == NULL) {
-        puts("[ERROR] Could not allocate enough memory for interval_over_buf!");
-        return;
-    }
-
-    dao_delay_over_buf  =  calloc(DAO_DELAY_STACKSIZE, sizeof(char));
-
-    if (dao_delay_over_buf == NULL) {
-        puts("[ERROR] Could not allocate enough memory for interval_over_buf!");
-        return;
-    }
-
     /* Create threads */
     ack_received = true;
+    dao_counter = 0;
     timer_over_pid = thread_create(timer_over_buf, TRICKLE_TIMER_STACKSIZE,
                                    PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                    trickle_timer_over, "trickle_timer_over");
@@ -145,7 +130,7 @@ void trickle_timer_over(void)
     while (1) {
         thread_sleep();
 
-        /* Laut RPL Spezifikation soll k=0 wie k= Unendlich behandelt werden, also immer gesendet werden */
+        /* Handle k=0 like k=infinity (according to RFC6206, section 6.5) */
         if ((c < k) || (k == 0)) {
             send_DIO(&mcast);
         }
@@ -157,7 +142,7 @@ void trickle_interval_over(void)
     while (1) {
         thread_sleep();
         I = I * 2;
-        printf("TRICKLE new Interval %"PRIu32"\n", I);
+        DEBUG("TRICKLE new Interval %"PRIu32"\n", I);
 
         if (I == 0) {
             puts("[WARNING] Interval was 0");
@@ -181,10 +166,12 @@ void trickle_interval_over(void)
         I_time = timex_set(0, I * 1000);
         timex_normalize(&I_time);
 
+        vtimer_remove(&trickle_t_timer);
         if (vtimer_set_wakeup(&trickle_t_timer, t_time, timer_over_pid) != 0) {
             puts("[ERROR] setting Wakeup");
         }
 
+        vtimer_remove(&trickle_I_timer);
         if (vtimer_set_wakeup(&trickle_I_timer, I_time, interval_over_pid) != 0) {
             puts("[ERROR] setting Wakeup");
         }
@@ -220,6 +207,7 @@ void dao_delay_over(void)
             dao_counter++;
             send_DAO(NULL, 0, true, 0);
             dao_time = timex_set(DEFAULT_WAIT_FOR_DAO_ACK, 0);
+            vtimer_remove(&dao_timer);
             vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
         }
         else if (ack_received == false) {

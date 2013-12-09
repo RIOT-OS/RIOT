@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -23,10 +23,11 @@
 #include "ipv6.h"
 #include "rpl_dodag.h"
 
+#undef CC1100_RADIO_MODE
 #define CC1100_RADIO_MODE CC1100_MODE_WOR
 
 #define RPL_PKT_RECV_BUF_SIZE 20
-#define RPL_PROCESS_STACKSIZE 4096
+#define RPL_PROCESS_STACKSIZE KERNEL_CONF_STACKSIZE_DEFAULT
 
 uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address);
 void rpl_init_root(void);
@@ -41,7 +42,7 @@ void recv_rpl_dio(void);
 void recv_rpl_dis(void);
 void recv_rpl_dao(void);
 void recv_rpl_dao_ack(void);
-void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_t next_header, void *tcp_socket);
+void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_t next_header);
 ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr);
 void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t lifetime);
 void rpl_del_routing_entry(ipv6_addr_t *addr);

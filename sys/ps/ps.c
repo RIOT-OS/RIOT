@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013, INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -15,11 +15,11 @@
  * @}
  */
 
-#include <thread.h>
-#include <thread.h>
-#include <hwtimer.h>
-#include <sched.h>
 #include <stdio.h>
+
+#include "thread.h"
+#include "hwtimer.h"
+#include "sched.h"
 
 /* list of states copied from tcb.h */
 const char *state_names[] = {
@@ -43,7 +43,7 @@ void thread_print_all(void)
     int i;
     int overall_stacksz = 0;
 
-    printf("\tpid | %-21s| %-9sQ | pri | stack ( used) location   | runtime | switches \n", "name", "state");
+    printf("\tpid | %-21s| %-9sQ | pri | stack ( used) location  | runtime | switches \n", "name", "state");
 
     for (i = 0; i < MAXTHREADS; i++) {
         tcb_t *p = (tcb_t *)sched_threads[i];
@@ -54,16 +54,17 @@ void thread_print_all(void)
             const char *sname = state_names[statebit];                      // get state name
             const char *queued = queued_name + (state & BIT0);              // get queued flag
             int stacksz = p->stack_size;                                    // get max used stack
-            double runtime = 0 / 0.0;
+            double runtime_ticks = 0 / 0.0;
             int switches = -1;
 #if SCHEDSTATISTICS
-            runtime =  pidlist[i].runtime / (double) hwtimer_now() * 100;
+            runtime_ticks =  pidlist[i].runtime_ticks / (double) hwtimer_now() * 100;
             switches = pidlist[i].schedules;
 #endif
             overall_stacksz += stacksz;
             stacksz -= thread_measure_stack_usage(p->stack_start);
-            printf("\t%3u | %-21s| %-8s %.1s | %3i | %5i (%5i) %p | %6.3f%% | %8i\n",
-                   p->pid, p->name, sname, queued, p->priority, p->stack_size, stacksz, p->stack_start, runtime, switches);
+            printf("\t%3u | %-21s| %-8s %.1s | %3i | %5i (%5i) %p | %6.3f%% | ",
+                   p->pid, p->name, sname, queued, p->priority, p->stack_size, stacksz, p->stack_start, runtime_ticks);
+            printf(" %8u\n", switches);
         }
     }
 

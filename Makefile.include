@@ -3,6 +3,10 @@ ifeq ($(strip $(RIOTCPU)),)
 	export RIOTCPU =$(RIOTBASE)/cpu
 endif
 	
+ifeq ($(strip $(RIOTBOARD)),)
+	export RIOTBOARD =$(RIOTBASE)/boards
+endif
+
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
 endif
@@ -45,19 +49,15 @@ endif
 ## make script for your project. Build RIOT-base here!
 all: $(PROJBINDIR)/$(PROJECT).a
 	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
-	$(MAKE) -C $(RIOTBOARD)
-	$(MAKE) -C $(RIOTBASE)
-	@for i in $(EXTERNAL_MODULES) ; do $(MAKE) -C $$i ; done ;
+	"$(MAKE)" -C $(RIOTBOARD)
+	"$(MAKE)" -C $(RIOTBASE)
+	@for i in $(EXTERNAL_MODULES) ; do "$(MAKE)" -C $$i ; done ;
 ifeq ($(BUILDOSXNATIVE),1)	
 	@$(LINK) $(UNDEF) -o $(PROJBINDIR)/$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
 	@$(LINK) $(UNDEF) -o $(PROJBINDIR)/$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(PROJBINDIR)/$(PROJECT).map $(LINKFLAGS) 
 	@$(SIZE) $(PROJBINDIR)/$(PROJECT).elf
-ifneq (,$(findstring stm32f4,$(CPU)))
-	@$(OBJCOPY) -O binary $(PROJBINDIR)/$(PROJECT).elf $(PROJBINDIR)/$(PROJECT).bin
-else
-	@$(OBJCOPY) -O ihex $(PROJBINDIR)/$(PROJECT).elf $(PROJBINDIR)/$(PROJECT).hex
-endif
+	@$(OBJCOPY) $(OFLAGS) $(PROJBINDIR)/$(PROJECT).elf $(PROJBINDIR)/$(PROJECT).hex
 endif
 
 ## your make rules
@@ -71,21 +71,21 @@ SRC = $(wildcard *.c)
 # string array of all names replaced .c with .o 
 OBJ = $(SRC:%.c=${PROJBINDIR}/%.o)
 
-${PROJBINDIR}/$(PROJECT).a:  $(OBJ)
-	@$(AR) -rc bin/$(PROJECT).a $(OBJ)
+$(PROJBINDIR)/$(PROJECT).a:  $(OBJ)
+	$(AR) -rc $(PROJBINDIR)/$(PROJECT).a $(OBJ)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
 
-${PROJBINDIR}/%.o: %.c
+$(PROJBINDIR)/%.o: %.c $(PROJDEPS)
 	@echo; echo "Compiling.... $*.c"; echo
 	@test -d $(PROJBINDIR) || mkdir -p $(PROJBINDIR)
-	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o bin/$*.o
+	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(PROJBINDIR)/$*.o
 
 clean:
-	$(MAKE) -C $(RIOTBOARD) clean
-	$(MAKE) -C $(RIOTBASE) clean
-	@for i in $(EXTERNAL_MODULES) ; do $(MAKE) -C $$i clean ; done ;
+	"$(MAKE)" -C $(RIOTBOARD) clean
+	"$(MAKE)" -C $(RIOTBASE) clean
+	@for i in $(EXTERNAL_MODULES) ; do "$(MAKE)" -C $$i clean ; done ;
 	rm -rf $(PROJBINDIR)
 
 flash: all
@@ -99,3 +99,9 @@ doc:
 
 debug:
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
+
+buildtest:
+	@for BOARD in $$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); do \
+		echo -n "Building for $${BOARD} .. "; \
+		env -i HOME=$${HOME} PATH=$${PATH} BOARD=$${BOARD} RIOTBASE=$${RIOTBASE} RIOTBOARD=$${RIOTBOARD} RIOTCPU=$${RIOTCPU} $(MAKE) -B clean all >/dev/null 2>&1 && echo "success" || echo "failed"  ; \
+	done

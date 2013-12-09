@@ -1,3 +1,23 @@
+/**
+ * Copyright (C) 2013  INRIA.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/** 
+ * @addtogroup posix
+ * @{
+ * @file
+ * @brief   POSIX-like IO
+ *
+ * @author Freie Universität Berlin
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
+ * @author Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
+ * @author Oliver Hahm <oleg@hobbykeller.org>
+ * @author Martin Lenders <mlenders@inf.fu-berlin.de>
+ */
 #ifndef __READ_H
 #define __READ_H
 
@@ -15,5 +35,7 @@ int posix_open(int pid, int flags);
 int posix_close(int pid);
 int posix_read(int pid, char *buffer, int bufsize);
 int posix_write(int pid, char *buffer, int bufsize);
-
+/**
+ * @}
+ */
 #endif /* __READ_H */

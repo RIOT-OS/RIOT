@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2013 Ludwig Ortmann
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -28,6 +28,8 @@
 #include "lpm.h"
 #include "debug.h"
 #include "cpu.h"
+
+#include "native_internal.h"
 #ifdef MODULE_UART0
 #include "board_internal.h"
 #endif
@@ -44,37 +46,40 @@ void lpm_init(void)
 void _native_lpm_sleep()
 {
 #ifdef MODULE_UART0
-    int retval, nfds;
+    int nfds;
 
     /* set fds */
-    nfds = 0;
     FD_ZERO(&_native_rfds);
     nfds = _native_set_uart_fds();
     nfds++;
 
-    retval = select(nfds, &_native_rfds, NULL, NULL, NULL);
-    DEBUG("_native_lpm_sleep: retval: %i\n", retval);
+    _native_in_syscall++; // no switching here
+    nfds = select(nfds, &_native_rfds, NULL, NULL, NULL);
+    _native_in_syscall--;
 
-    if (retval != -1) {
+    DEBUG("_native_lpm_sleep: returned: %i\n", nfds);
+
+    if (nfds != -1) {
         /* uart ready, handle input */
         /* TODO: switch to ISR context */
         _native_handle_uart0_input();
     }
     else if (errno != EINTR) {
         /* select failed for reason other than signal */
-        err(1, "lpm_set(): select()");
+        err(EXIT_FAILURE, "lpm_set(): select()");
     }
 
     /* otherwise select was interrupted because of a signal, continue below */
 #else
+    _native_in_syscall++; // no switching here
     pause();
+    _native_in_syscall--;
 #endif
 
     if (_native_sigpend > 0) {
         DEBUG("\n\n\t\treturn from syscall, calling native_irq_handler\n\n");
-        _native_in_syscall = 0;
-        _native_in_isr = 1;
-        swapcontext(_native_cur_ctx, _native_isr_ctx);
+        _native_in_syscall++;
+        _native_syscall_leave();
     }
 }
 
@@ -99,7 +104,6 @@ enum lpm_mode lpm_set(enum lpm_mode target)
         case LPM_IDLE:
             //DEBUG("lpm_set(): pause()\n");
 
-            _native_in_syscall = 1;
             //pause();
             _native_lpm_sleep();
             break;

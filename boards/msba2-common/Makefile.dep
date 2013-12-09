@@ -1,0 +1,14 @@
+ifneq (,$(findstring cc110x,$(USEMODULE)))
+	ifeq (,$(findstring gpioint,$(USEMODULE)))
+		USEMODULE += gpioint
+	endif
+endif
+
+ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
+	ifeq (,$(findstring cc110x_spi,$(USEMODULE)))
+		USEMODULE += cc110x_spi
+	endif
+	ifeq (,$(findstring gpioint,$(USEMODULE)))
+		USEMODULE += gpioint
+	endif
+endif

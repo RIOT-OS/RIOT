@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2013 Ludwig Ortmann
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  */
@@ -27,16 +27,22 @@
  * http://sourceforge.net/p/predef/wiki/OperatingSystems/
  */
 #ifdef BSD // BSD = (FreeBSD, Darwin, ...)
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE
-#elif defined(__linux__)
-#define __USE_GNU
-#endif
 #include <ucontext.h>
-#ifdef BSD
 #undef _XOPEN_SOURCE
-#elif defined(__linux__)
-#undef __USE_GNU
+#else
+#include <ucontext.h>
 #endif
+#elif defined(__linux__)
+#ifndef _GNU_SOURCE
+#define GNU_SOURCE
+#include <ucontext.h>
+#undef GNU_SOURCE
+#else
+#include <ucontext.h>
+#endif
+#endif // BSD/Linux
 
 #include "kernel_internal.h"
 #include "sched.h"
@@ -52,7 +58,7 @@ void eINT(void);
 /**
  * register interrupt handler handler for interrupt sig
  */
-int register_interrupt(int sig, void *handler);
+int register_interrupt(int sig, void (*handler)(void));
 
 /**
  * unregister interrupt handler for interrupt sig
@@ -62,15 +68,5 @@ int unregister_interrupt(int sig);
 /* this should be defined elsewhere */
 void thread_yield(void);
 
-extern void _native_sig_leave_tramp(void);
-extern ucontext_t *_native_cur_ctx, *_native_isr_ctx;
-extern unsigned int _native_saved_eip;
-extern int _native_in_isr;
-extern int _native_in_syscall;
-extern int _native_sigpend;
-#ifdef MODULE_UART0
-#include <sys/select.h>
-extern fd_set _native_rfds;
-#endif
 /** @} */
 #endif //_CPU_H

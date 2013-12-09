@@ -1,3 +1,19 @@
+/**
+ * internal nativenet transceiver interface
+ *
+ * Copyright (C) 2013 Ludwig Ortmann
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @{
+ * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @}
+ */
+
 #ifndef NATIVENET_INTERNAL_H
 #define NATIVENET_INTERNAL_H
 
@@ -21,8 +37,7 @@ struct rx_buffer_s {
     char data[NATIVE_MAX_DATA_LENGTH];
 };
 
-extern struct rx_buffer_s _nativenet_rx_buffer[];
-extern volatile uint8_t rx_buffer_next;
+extern struct rx_buffer_s _nativenet_rx_buffer[RX_BUF_SIZE];
 
 void _nativenet_handle_packet(radio_packet_t *packet);
 #endif /* NATIVENET_INTERNAL_H */

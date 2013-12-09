@@ -3,14 +3,14 @@
  *
  * Copyright (C) 2013 Freie Universität Berlin
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
  * @ingroup kernel
  * @{
  * @file
- * @author Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @}
  */
 
@@ -64,7 +64,7 @@ static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
 void kernel_init(void)
 {
     dINT();
-    printf("kernel_init(): This is RIOT!\n");
+    printf("kernel_init(): This is RIOT! (Version: %s)\n", VERSION);
 
     sched_init();
 

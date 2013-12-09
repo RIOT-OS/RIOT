@@ -16,13 +16,16 @@
 
 #include <irq.h>
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 static void cc2420_gen_pkt(uint8_t *buf, cc2420_packet_t *packet);
 
 static uint8_t sequenz_nr;
 
 int16_t cc2420_send(cc2420_packet_t *packet)
 {
-    volatile uint32_t abort_count;
+    volatile uint32_t abort_count = 0;
 
     /* Set missing frame information */
     packet->frame.fcf.frame_ver = 0;
@@ -51,7 +54,8 @@ int16_t cc2420_send(cc2420_packet_t *packet)
     sequenz_nr += 1;
 
     /* calculate size of the package (header + payload + fcs) */
-    packet->length = get_802154_hdr_len(&packet->frame) + packet->frame.payload_len + 2;
+    packet->length = ieee802154_frame_get_hdr_len(&packet->frame) +
+                     packet->frame.payload_len + 2;
 
     if(packet->length > CC2420_MAX_PKT_LENGTH) {
         return -1;
@@ -80,11 +84,12 @@ int16_t cc2420_send(cc2420_packet_t *packet)
                // Abort waiting. CC2420 maybe in wrong mode
                // e.g. sending preambles for always
                puts("[CC2420 TX] fatal error\n");
+               /* TODO: error handling */
                packet->length = 0;
                break;
          }
     }
-    printf("SEQ: %u\n", packet->frame.seq_nr);
+    DEBUG("SEQ: %u\n", packet->frame.seq_nr);
     restoreIRQ(cpsr);
 
     /* wait for packet to be send */
@@ -102,7 +107,7 @@ int16_t cc2420_send(cc2420_packet_t *packet)
 static void cc2420_gen_pkt(uint8_t *buf, cc2420_packet_t *packet)
 {
     uint8_t index, offset;
-    index = init_802154_frame(&packet->frame, buf);
+    index = ieee802154_frame_init(&packet->frame, buf);
     offset = index;
     while(index < packet->length-2) {
         buf[index] = packet->frame.payload[index-offset];

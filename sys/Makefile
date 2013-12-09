@@ -79,13 +79,28 @@ endif
 ifneq (,$(findstring crypto,$(USEMODULE)))
     DIRS += crypto
 endif
+ifneq (,$(findstring random,$(USEMODULE)))
+    DIRS += random
+endif
+ifneq (,$(findstring hashes,$(USEMODULE)))
+    DIRS += hashes
+endif
+ifneq (,$(findstring semaphore,$(USEMODULE)))
+    DIRS += semaphore
+endif
+ifneq (,$(findstring ccn_lite,$(USEMODULE)))
+    DIRS += net/ccn_lite
+endif
+ifneq (,$(findstring ccn_lite_client,$(USEMODULE)))
+    DIRS += net/ccn_lite/util
+endif
 
 all: $(BINDIR)$(MODULE).a 
-	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
 include $(RIOTBASE)/Makefile.base
 
 # remove compilation products
 clean::
-	@for i in $(DIRS) ; do $(MAKE) -C $$i clean ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
 

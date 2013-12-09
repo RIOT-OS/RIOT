@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -16,14 +16,27 @@
  */
 #include <stdint.h>
 #include <stdio.h>
+
+#include "auto_init.h"
+
+#ifdef MODULE_UART0
 #include "board_uart0.h"
-#include "rtc.h"
+#endif
+
+#ifdef MODULE_MCI
 #include "diskio.h"
-#include <auto_init.h>
+#endif
+
+#ifdef MODULE_VTIMER
 #include "vtimer.h"
+#endif
+
+#ifdef MODULE_RTC
+#include "rtc.h"
+#endif
 
 #define ENABLE_DEBUG (0)
-#include <debug.h>
+#include "debug.h"
 
 extern int main(void);
 
@@ -66,7 +79,9 @@ void auto_init(void)
 #endif
 #ifdef MODULE_CC110X
     DEBUG("Auto init CC1100 module.\n");
+#ifndef MODULE_TRANSCEIVER
     cc1100_init();
+#endif
 #endif
 #ifdef MODULE_LTC4150
     DEBUG("Auto init ltc4150 module.\n");

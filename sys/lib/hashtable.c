@@ -5,7 +5,13 @@
 #include <string.h>
 #include <stdint.h>
 #include <math.h>
-#include "oneway_malloc.h"
+
+#if (defined(__MACH__) || defined(__FreeBSD__))
+#include <stdlib.h>
+#else
+#include "malloc.h"
+#endif
+
 #include "hashtable.h"
 #include "hashtable_private.h"
 

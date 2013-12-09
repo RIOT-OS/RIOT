@@ -6,7 +6,7 @@
  *
  * Copyright (C) 2013 Ludwig Ortmann
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -16,6 +16,7 @@
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  */
 #include <stdio.h>
+
 #ifdef __MACH__
 #define _XOPEN_SOURCE
 #endif
@@ -25,16 +26,34 @@
 #endif
 #include <err.h>
 
+#ifdef HAVE_VALGRIND_H
+#include <valgrind.h>
+#define VALGRIND_DEBUG DEBUG
+#elif defined(HAVE_VALGRIND_VALGRIND_H)
+#include <valgrind/valgrind.h>
+#define VALGRIND_DEBUG DEBUG
+#else
+#define VALGRIND_STACK_REGISTER(...)
+#define VALGRIND_DEBUG(...)
+#endif
+
+#include <stdlib.h>
+
 #include "kernel_internal.h"
 #include "sched.h"
 
 #include "cpu.h"
 #include "cpu-conf.h"
+
+#include "native_internal.h"
+
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 extern volatile tcb_t *active_thread;
-static ucontext_t end_context;
-static char __isr_stack[SIGSTKSZ];
+
+ucontext_t end_context;
+char __end_stack[SIGSTKSZ];
 
 #ifdef MODULE_UART0
 fd_set _native_rfds;
@@ -54,6 +73,9 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksiz
     unsigned int *stk;
     ucontext_t *p;
 
+    VALGRIND_STACK_REGISTER(stack_start, stack_start + stacksize);
+    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", stack_start, (void*)((int)stack_start + stacksize));
+
     DEBUG("thread_stack_init()\n");
 
     stk = stack_start;
@@ -68,7 +90,7 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksiz
 #endif
 
     if (getcontext(p) == -1) {
-        err(1, "thread_stack_init(): getcontext()");
+        err(EXIT_FAILURE, "thread_stack_init(): getcontext()");
     }
 
     p->uc_stack.ss_sp = stk;
@@ -77,7 +99,7 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksiz
     p->uc_link = &end_context;
 
     if (sigemptyset(&(p->uc_sigmask)) == -1) {
-        err(1, "thread_stack_init(): sigemptyset()");
+        err(EXIT_FAILURE, "thread_stack_init(): sigemptyset()");
     }
 
     makecontext(p, task_func, 0);
@@ -85,61 +107,95 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksiz
     return (char *) p;
 }
 
-void cpu_switch_context_exit(void)
+void isr_cpu_switch_context_exit(void)
 {
     ucontext_t *ctx;
 
     DEBUG("XXX: cpu_switch_context_exit()\n");
-    //active_thread = sched_threads[0];
-    sched_run();
+    if ((sched_context_switch_request == 1) || (active_thread == NULL)) {
+        sched_run();
+    }
 
     DEBUG("XXX: cpu_switch_context_exit(): calling setcontext(%s)\n\n", active_thread->name);
     ctx = (ucontext_t *)(active_thread->sp);
-    eINT(); // XXX: workaround for bug (?) in sched_task_exit
+
+    /* the next context will have interrupts enabled due to ucontext */
+    DEBUG("XXX: cpu_switch_context_exit: native_interrupts_enabled = 1;\n");
+    native_interrupts_enabled = 1;
+    _native_in_isr = 0;
 
     if (setcontext(ctx) == -1) {
-        err(1, "cpu_switch_context_exit(): setcontext():");
+        err(EXIT_FAILURE, "cpu_switch_context_exit(): setcontext():");
+    }
+}
+
+void cpu_switch_context_exit()
+{
+    if (_native_in_isr == 0) {
+        dINT();
+        _native_in_isr = 1;
+        native_isr_context.uc_stack.ss_sp = __isr_stack;
+        native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+        native_isr_context.uc_stack.ss_flags = 0;
+        makecontext(&native_isr_context, isr_cpu_switch_context_exit, 0);
+        if (setcontext(&native_isr_context) == -1) {
+            err(EXIT_FAILURE, "cpu_switch_context_exit: swapcontext");
+        }
+    }
+    else {
+        isr_cpu_switch_context_exit();
+    }
+    errx(EXIT_FAILURE, "this should have never been reached!!");
+}
+
+void isr_thread_yield()
+{
+    DEBUG("isr_thread_yield()\n");
+
+    sched_run();
+    ucontext_t *ctx = (ucontext_t *)(active_thread->sp);
+    DEBUG("isr_thread_yield(): switching to(%s)\n\n", active_thread->name);
+
+    native_interrupts_enabled = 1;
+    _native_in_isr = 0;
+    if (setcontext(ctx) == -1) {
+        err(EXIT_FAILURE, "isr_thread_yield(): setcontext()");
     }
 }
 
 void thread_yield()
 {
-    /**
-     * XXX: check whether it is advisable to switch context for sched_run()
-     */
-    ucontext_t *oc, *nc;
-
-    DEBUG("thread_yield()\n");
-
-    oc = (ucontext_t *)(active_thread->sp);
-
-    sched_run();
-
-    nc = (ucontext_t *)(active_thread->sp);
-
-    if (nc != oc) {
-        DEBUG("thread_yield(): calling swapcontext(%s)\n\n", active_thread->name);
-
-        if (swapcontext(oc, nc) == -1) {
-            err(1, "thread_yield(): swapcontext()");
+    ucontext_t *ctx = (ucontext_t *)(active_thread->sp);
+    if (_native_in_isr == 0) {
+        _native_in_isr = 1;
+        dINT();
+        native_isr_context.uc_stack.ss_sp = __isr_stack;
+        native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+        native_isr_context.uc_stack.ss_flags = 0;
+        makecontext(&native_isr_context, isr_thread_yield, 0);
+        if (swapcontext(ctx, &native_isr_context) == -1) {
+            err(EXIT_FAILURE, "thread_yield: swapcontext");
         }
+        eINT();
     }
     else {
-        DEBUG("thread_yield(): old = new, returning to context (%s)\n\n", active_thread->name);
+        isr_thread_yield();
     }
 }
 
 void native_cpu_init()
 {
     if (getcontext(&end_context) == -1) {
-        err(1, "end_context(): getcontext()");
+        err(EXIT_FAILURE, "end_context(): getcontext()");
     }
 
-    end_context.uc_stack.ss_sp = __isr_stack;
+    end_context.uc_stack.ss_sp = __end_stack;
     end_context.uc_stack.ss_size = SIGSTKSZ;
     end_context.uc_stack.ss_flags = 0;
     makecontext(&end_context, sched_task_exit, 0);
+    VALGRIND_STACK_REGISTER(__end_stack, __end_stack + sizeof(__end_stack));
+    VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", __end_stack, (void*)((int)__end_stack + sizeof(__end_stack)));
 
-    puts("RIOT native cpu initialized.");
+    DEBUG("RIOT native cpu initialized.");
 }
 /** @} */

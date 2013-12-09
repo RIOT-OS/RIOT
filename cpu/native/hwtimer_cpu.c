@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2013 Ludwig Ortmann
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -30,19 +30,25 @@
 #include <sys/time.h>
 #include <signal.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <err.h>
+
 #include "hwtimer.h"
 #include "hwtimer_arch.h"
 
 #include "hwtimer_cpu.h"
 #include "cpu.h"
 #include "cpu-conf.h"
+#include "native_internal.h"
+
+#define ENABLE_DEBUG (0)
 
 #include "debug.h"
 
 #define HWTIMERMINOFFSET 100000
 
 static unsigned long native_hwtimer_now;
+static unsigned long time_null;
 
 static int native_hwtimer_irq[ARCH_MAXTIMERS];
 static struct itimerval native_hwtimer[ARCH_MAXTIMERS];
@@ -113,7 +119,7 @@ void schedule_timer(void)
      * are set at all */
     if (native_hwtimer_isset[next_timer] == 1) {
         if (setitimer(ITIMER_REAL, &native_hwtimer[next_timer], NULL) == -1) {
-            err(1, "schedule_timer");
+            err(EXIT_FAILURE, "schedule_timer");
         }
         else {
             DEBUG("schedule_timer(): set next timer.\n");
@@ -208,7 +214,10 @@ void hwtimer_arch_set_absolute(unsigned long value, short timer)
 {
     DEBUG("hwtimer_arch_set_absolute(%lu, %i)\n", value, timer);
     value -= native_hwtimer_now;
-    return(hwtimer_arch_set(value, timer));
+
+    hwtimer_arch_set(value, timer);
+
+    return;
 }
 
 unsigned long hwtimer_arch_now(void)
@@ -217,7 +226,7 @@ unsigned long hwtimer_arch_now(void)
 
     DEBUG("hwtimer_arch_now()\n");
 
-    _native_in_syscall = 1;
+    _native_syscall_enter();
 #ifdef __MACH__
     clock_serv_t cclock;
     mach_timespec_t mts;
@@ -229,18 +238,29 @@ unsigned long hwtimer_arch_now(void)
 #else
 
     if (clock_gettime(CLOCK_MONOTONIC, &t) == -1) {
-        err(1, "hwtimer_arch_now: clock_gettime");
+        err(EXIT_FAILURE, "hwtimer_arch_now: clock_gettime");
     }
 
 #endif
-    _native_in_syscall = 0;
+    _native_syscall_leave();
 
-    native_hwtimer_now = ts2ticks(&t);
+    native_hwtimer_now = ts2ticks(&t) - time_null;
 
     DEBUG("hwtimer_arch_now(): it is now %lu s %lu ns\n",
             (unsigned long)t.tv_sec, (unsigned long)t.tv_nsec);
     DEBUG("hwtimer_arch_now(): returning %lu\n", native_hwtimer_now);
     return native_hwtimer_now;
+}
+
+/**
+ * Called once on process creation in order to mimic the behaviour a
+ * regular hardware timer.
+ */
+void native_hwtimer_pre_init()
+{
+    /* initialize time delta */
+    time_null = 0;
+    time_null = hwtimer_arch_now();
 }
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)

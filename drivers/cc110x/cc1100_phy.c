@@ -6,7 +6,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * ----------------------------------------------------------------------------
  *  This file is part of RIOT.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -41,7 +41,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #include "cc1100_phy.h"
 #include "cc1100-defaultSettings.h"
 
-#include "protocol-multiplex/protocol-multiplex.h"
+#include "protocol-multiplex.h"
 
 #include "kernel.h"
 #include "thread.h"
@@ -138,7 +138,7 @@ uint16_t cc1100_burst_count;			///< Burst count, number of packets in a burst tr
 uint8_t cc1100_retransmission_count_uc;	///< Number of retransmissions for unicast
 uint8_t cc1100_retransmission_count_bc;	///< Number of retransmissions for broadcast
 
-const static double duty_cycle[2][DUTY_CYCLE_SIZE] = {	///< Duty cycle values from AN047
+static const double duty_cycle[2][DUTY_CYCLE_SIZE] = {	///< Duty cycle values from AN047
     {12.5, 6.25, 3.125, 1.563, 0.781, 0.391, 0.195},
     {1.95, 0.9765, 0.4883, 0.2441, 0.1221, 0.061035, 0.030518}
 };
@@ -279,7 +279,7 @@ void cc1100_print_config(void)
 
 inline uint16_t iround(double d)
 {
-    return (uint16_t) d < 0 ? d - .5 : d + .5;
+    return (uint16_t) (d + 0.5);
 }
 
 int cc1100_phy_calc_wor_settings(uint16_t millis)
@@ -513,6 +513,8 @@ static bool send_burst(cc1100_packet_layer0_t *packet, uint8_t retries, uint8_t 
 
 int cc1100_send(radio_address_t addr, protocol_t protocol, int priority, char *payload, int payload_len)
 {
+    (void) priority;
+
     bool result;
     int return_code;
     uint8_t address;
@@ -743,7 +745,7 @@ void cc1100_phy_rx_handler(void)
                 /* Stop the burst */
                 rflags.LL_ACK = true;
                 rflags.RSSI_SEND = p->phy_src;
-                rflags.TCP = (uint32_t)((uint16_t *)p->data)[0];
+                rflags.TCP = (uint32_t)((uint16_t *)p->data);
             }
 
             return;

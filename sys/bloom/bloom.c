@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013 Freie Universität Berlin
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -24,10 +24,11 @@
 #define GETBIT(a,n) (a[n/CHAR_BIT] &  (1<<(n%CHAR_BIT)))
 #define ROUND(size) ((size + CHAR_BIT - 1) / CHAR_BIT)
 
-struct bloom_t *bloom_new(size_t size, size_t num_hashes, ...) {
+struct bloom_t *bloom_new(size_t size, size_t num_hashes, ...)
+{
     struct bloom_t *bloom;
     va_list hashes;
-    int n;
+    size_t n;
 
     /* Allocate Bloom filter container */
     if (!(bloom = malloc(sizeof(struct bloom_t)))) {
@@ -41,7 +42,7 @@ struct bloom_t *bloom_new(size_t size, size_t num_hashes, ...) {
     }
 
     /* Allocate Bloom filter hash function pointers */
-    if (!(bloom->hash = (hashfp_t *)malloc(num_hashes *sizeof(hashfp_t)))) {
+    if (!(bloom->hash = (hashfp_t *)malloc(num_hashes * sizeof(hashfp_t)))) {
         free(bloom->a);
         free(bloom);
         return NULL;
@@ -73,24 +74,24 @@ void bloom_del(struct bloom_t *bloom)
     free(bloom);
 }
 
-void bloom_add(struct bloom_t *bloom, const char *s)
+void bloom_add(struct bloom_t *bloom, const uint8_t *buf, size_t len)
 {
-    unsigned int hash;
-    int n;
+    uint32_t hash;
+    size_t n;
 
     for (n = 0; n < bloom->k; n++) {
-        hash = (unsigned int)bloom->hash[n](s);
+        hash = bloom->hash[n](buf, len);
         SETBIT(bloom->a, (hash % bloom->m));
     }
 }
 
-bool bloom_check(struct bloom_t *bloom, const char *s)
+bool bloom_check(struct bloom_t *bloom, const uint8_t *buf, size_t len)
 {
-    unsigned int hash;
-    int n;
+    uint32_t hash;
+    size_t n;
 
     for (n = 0; n < bloom->k; n++) {
-        hash = (unsigned int)bloom->hash[n](s);
+        hash = bloom->hash[n](buf, len);
 
         if (!(GETBIT(bloom->a, (hash % bloom->m)))) {
             return false;

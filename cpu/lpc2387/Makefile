@@ -11,12 +11,15 @@ endif
 ifneq (,$(findstring rtc,$(USEMODULE)))
 	DIRS += rtc
 endif
+ifneq (,$(findstring i2c,$(USEMODULE)))
+	DIRS += i2c
+endif
 
 all: $(BINDIR)$(MODULE).a
-	@for i in $(DIRS) ; do $(MAKE) -C $$i ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
 include $(RIOTBASE)/Makefile.base
 
 clean::
-	@for i in $(DIRS) ; do $(MAKE) -C $$i clean ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
 

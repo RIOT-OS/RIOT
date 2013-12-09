@@ -45,12 +45,12 @@ void cc2420_rx_handler(void)
         DEBUG("Got packet with invalid crc.\n");
         return;
     }
-    read_802154_frame(buf,
-                      &cc2420_rx_buffer[rx_buffer_next].frame,
-                      cc2420_rx_buffer[rx_buffer_next].length-2);
+    ieee802154_frame_read(buf,
+                          &cc2420_rx_buffer[rx_buffer_next].frame,
+                          cc2420_rx_buffer[rx_buffer_next].length-2);
     if(cc2420_rx_buffer[rx_buffer_next].frame.fcf.frame_type != 2) {
 #ifdef DEBUG
-    print_802154_fcf_frame(&cc2420_rx_buffer[rx_buffer_next].frame);
+    ieee802154_frame_print_fcf_frame(&cc2420_rx_buffer[rx_buffer_next].frame);
 #endif
     /* notify transceiver thread if any */
     if (transceiver_pid) {
@@ -62,7 +62,7 @@ void cc2420_rx_handler(void)
     } else {
 #ifdef DEBUG
         DEBUG("GOT ACK for SEQ %u\n", cc2420_rx_buffer[rx_buffer_next].frame.seq_nr);
-        print_802154_fcf_frame(&cc2420_rx_buffer[rx_buffer_next].frame);
+        ieee802154_frame_print_fcf_frame(&cc2420_rx_buffer[rx_buffer_next].frame);
 #endif
     }
 

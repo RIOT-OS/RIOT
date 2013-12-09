@@ -4,14 +4,14 @@
  * Copyright (C) 2013 Freie Universität Berlin
  * Copyright (C) 2013 INRIA
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
  * @ingroup sys_lib
  * @{
  * @file   ringbuffer.c
- * @author Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @}
  */
 
@@ -25,10 +25,10 @@
 #include "malloc.h"
 #endif
 
-#include "ringbuffer.h"
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
-//#define DEBUG(...) printf (__VA_ARGS__)
-#define DEBUG(...)
+#include "ringbuffer.h"
 
 void ringbuffer_init(ringbuffer_t *rb, char *buffer, unsigned int bufsize)
 {

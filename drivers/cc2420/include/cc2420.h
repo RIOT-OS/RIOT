@@ -76,7 +76,7 @@ Frame type value:
 #ifndef CC2420_H
 #define CC2420_H
 
-#include <ieee802154/ieee802154_frame.h>
+#include <ieee802154_frame.h>
 #include <cc2420_settings.h>
 
 #define CC2420_MAX_PKT_LENGTH 127

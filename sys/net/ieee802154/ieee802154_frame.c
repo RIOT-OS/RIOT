@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -23,21 +23,22 @@ uint8_t ieee802154_hdr_ptr;
 uint8_t ieee802154_payload_ptr;
 uint16_t ieee802154_payload_len;
 
-uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf)
+uint8_t ieee802154_frame_init(ieee802154_frame_t *frame, uint8_t *buf)
 {
     /* Frame Control Field - 802.15.4 - 2006 - 7.2.1.1  */
     uint8_t index = 0;
-    
-    buf[index] = ((frame->fcf.dest_addr_m << 2) |
-                 (frame->fcf.frame_ver << 4) |
-                 (frame->fcf.src_addr_m << 6));
 
-    index++;
     buf[index] = ((frame->fcf.frame_type) |
                  (frame->fcf.sec_enb << 3) |
                  (frame->fcf.frame_pend << 4) |
                  (frame->fcf.ack_req << 5) |
                  (frame->fcf.panid_comp << 6));
+    index++;
+
+    buf[index] = ((frame->fcf.dest_addr_m << 2) |
+                 (frame->fcf.frame_ver << 4) |
+                 (frame->fcf.src_addr_m << 6));
+
     index++;
 
     /* Sequence Number - 802.15.4 - 2006 - 7.2.1.2 */
@@ -46,8 +47,8 @@ uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf)
 
     /* Destination PAN Identifier - 802.15.4 - 2006 - 7.2.1.3 */
     if (frame->fcf.dest_addr_m == 0x02 || frame->fcf.dest_addr_m == 0x03) {
-        buf[index] = ((frame->dest_pan_id >> 8) & 0xff);
-        buf[index + 1] = (frame->dest_pan_id & 0xff);
+        buf[index + 1] = ((frame->dest_pan_id >> 8) & 0xff);
+        buf[index] = (frame->dest_pan_id & 0xff);
     }
 
     index += 2;
@@ -105,7 +106,7 @@ uint8_t init_802154_frame(ieee802154_frame_t *frame, uint8_t *buf)
   * |  FCF  | DSN | DPID  | DAD | SPID  | SAD |
   * -------------------------------------------
   */
-uint8_t get_802154_hdr_len(ieee802154_frame_t *frame)
+uint8_t ieee802154_frame_get_hdr_len(ieee802154_frame_t *frame)
 {
     uint8_t len = 0;
 
@@ -141,16 +142,11 @@ uint8_t get_802154_hdr_len(ieee802154_frame_t *frame)
     return (len + 3);
 }
 
-uint8_t read_802154_frame(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len)
+uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame,
+                              uint8_t len)
 {
     uint8_t index = 0;
     uint8_t hdrlen;
-
-    frame->fcf.dest_addr_m = (buf[index] >> 2) & 0x03;
-    frame->fcf.frame_ver = (buf[index] >> 4) & 0x03;
-    frame->fcf.src_addr_m = (buf[index] >> 6) & 0x03;
-
-    index++;
 
     frame->fcf.frame_type = (buf[index]) & 0x07;
     frame->fcf.sec_enb = (buf[index] >> 3) & 0x01;
@@ -158,7 +154,11 @@ uint8_t read_802154_frame(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len)
     frame->fcf.ack_req = (buf[index] >> 5) & 0x01;
     frame->fcf.panid_comp = (buf[index] >> 6) & 0x01;
 
-    //print_802154_fcf_frame(frame);
+    index++;
+
+    frame->fcf.dest_addr_m = (buf[index] >> 2) & 0x03;
+    frame->fcf.frame_ver = (buf[index] >> 4) & 0x03;
+    frame->fcf.src_addr_m = (buf[index] >> 6) & 0x03;
 
     index++;
 
@@ -231,12 +231,12 @@ uint8_t read_802154_frame(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len)
 
     frame->payload = (buf + index);
     hdrlen = index;
-    frame->payload_len = (len - hdrlen);
+    frame->payload_len = (len - hdrlen - IEEE_802154_FCS_LEN);
 
     return hdrlen;
 }
 
-void print_802154_fcf_frame(ieee802154_frame_t *frame)
+void ieee802154_frame_print_fcf_frame(ieee802154_frame_t *frame)
 {
     printf("frame type: %02x\n"
            "security enabled: %02x\n"

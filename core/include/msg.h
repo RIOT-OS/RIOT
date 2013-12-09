@@ -59,7 +59,7 @@ typedef struct msg {
  * @param  block If true and receiver is not receive-blocked, function will block. If not, function
  * returns.
  *
- * @return 1 if sending was successfull (message delivered directly or to a queue)
+ * @return 1 if sending was successful (message delivered directly or to a queue)
  * @return 0 if receiver is not waiting or has a full message queue and block == false
  * @return -1 on error (invalid PID)
  */
@@ -74,7 +74,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block);
  * @param  m pointer to message structure
  * @param  target_pid PID of target thread
  *
- * @return 1 if sending was successfull
+ * @return 1 if sending was successful
  * @return 0 if receiver is not waiting and block == false
  */
 int msg_send_int(msg_t *m, unsigned int target_pid);
@@ -120,8 +120,8 @@ int msg_send_receive(msg_t *m, msg_t *reply, unsigned int target_pid);
  * @param m msg to reply to.
  * @param reply message that target will get as reply
  *
- * @return 1 if succcessful
- * qreturn 0 on error
+ * @return 1 if successful
+ * @return 0 on error
  */
 int msg_reply(msg_t *m, msg_t *reply);
 
@@ -130,6 +130,9 @@ int msg_reply(msg_t *m, msg_t *reply);
  *
  * @param array Pointer to preallocated array of msg objects
  * @param num Number of msg objects in array. MUST BE POWER OF TWO!
+ *
+ * @return 0 if successful
+ * @return -1 on error
  */
 int msg_init_queue(msg_t *array, int num);
 

@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2009-2013 Freie Universität Berlin
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -318,6 +318,7 @@ void switch_to_wor2(void)
  */
 static void hwtimer_switch_to_wor2_wrapper(void *ptr)
 {
+    (void) ptr;
     wor_hwtimer_id = -1;							/* kernel timer handler function called, clear timer id */
 
     if (rflags.TX) {
@@ -531,6 +532,8 @@ char *cc1100_state_to_text(uint8_t state)
 
 void cc1100_hwtimer_go_receive_wrapper(void *ptr)
 {
+    (void) ptr;
+
     /* kernel timer handler function called, clear timer id */
     wor_hwtimer_id = -1;
 

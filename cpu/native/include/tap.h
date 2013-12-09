@@ -1,8 +1,24 @@
+/**
+ * internal nativenet tap network layer interface
+ *
+ * Copyright (C) 2013 Ludwig Ortmann
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @{
+ * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @}
+ */
 #ifndef _TAP_H
 #define _TAP_H
 
 #include <net/ethernet.h>
 
+#include "board.h"
 #include "radio/types.h"
 
 /**
@@ -11,6 +27,8 @@
  * if "name" is an empty string, the kernel chooses a name
  * if "name" is an existing device, that device is used
  * otherwise a device named "name" is created
+ *
+ * On OSX a name has to be provided.
  */
 int tap_init(char *name);
 int send_buf(radio_packet_t *packet);
@@ -18,12 +36,24 @@ int send_buf(radio_packet_t *packet);
 extern int _native_tap_fd;
 extern unsigned char _native_tap_mac[ETHER_ADDR_LEN];
 
+struct nativenet_header {
+    radio_packet_length_t length;
+    radio_address_t dst;
+    radio_address_t src;
+} __attribute__((packed));
+#define TAP_MAX_DATA ((ETHERMTU) - 6) /* XXX: this is suboptimal */
+
+struct nativenet_packet {
+    struct nativenet_header nn_header;
+    unsigned char data[ETHERMTU - sizeof(struct nativenet_header)];
+} __attribute__((packed));
+
 union eth_frame {
     struct {
         struct ether_header header;
-        unsigned char data[ETHERMTU];
+        struct nativenet_packet payload;
     } field;
     unsigned char buffer[ETHER_MAX_LEN];
-};
+} __attribute__((packed));
 
 #endif /* _TAP_H */

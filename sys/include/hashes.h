@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013 Freie Universität Berlin
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  */
@@ -15,8 +15,11 @@
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 
+#include <stddef.h>
+#include <inttypes.h>
+
 /**
- * djb2_hash
+ * @brief djb2_hash
  *
  * HISTORY
  * This algorithm (k=33) was first reported by Dan Bernstein many years
@@ -27,23 +30,15 @@
  *
  * The magic of number 33 (why it works better than many other constants,
  * prime or not) has never been adequately explained.
+ *
+ * @param buf input buffer to hash
+ * @param len length of buffer
+ * @return 32 bit sized hash
  */
-static inline unsigned long djb2_hash(const char *str)
-{
-    unsigned long hash;
-    int c;
-
-    hash = 5381;
-
-    while ((c = (unsigned char) * str++)) {
-        hash = ((hash << 5) + hash) + c;    /* hash * 33 + c */
-    }
-
-    return hash;
-}
+uint32_t djb2_hash(const uint8_t *buf, size_t len);
 
 /**
- * sdbm_hash
+ * @brief sdbm_hash
  *
  * HISTORY
  * This algorithm was created for sdbm (a public-domain reimplementation
@@ -61,23 +56,14 @@ static inline unsigned long djb2_hash(const char *str)
  * out to be a prime. this is one of the algorithms used in berkeley db
  * (see sleepycat) and elsewhere.
  *
+ * @param buf input buffer to hash
+ * @param len length of buffer
+ * @return 32 bit sized hash
  */
-static inline unsigned long sdbm_hash(const char *str)
-{
-    unsigned long hash;
-    int c;
-
-    hash = 0;
-
-    while ((c = (unsigned char) * str++)) {
-        hash = c + (hash << 6) + (hash << 16) - hash;
-    }
-
-    return hash;
-}
+uint32_t sdbm_hash(const uint8_t *buf, size_t len);
 
 /**
- * lose lose
+ * @brief lose lose
  *
  * HISTORY
  * This hash function appeared in K&R (1st ed) but at least the reader
@@ -94,83 +80,70 @@ static inline unsigned long sdbm_hash(const char *str)
  * checking something like Knuth's Sorting and Searching, so it stuck.
  * It is now found mixed with otherwise respectable code, eg. cnews. sigh.
  * [see also: tpop]
+ *
+ * @param buf input buffer to hash
+ * @param len length of buffer
+ * @return 32 bit sized hash
  */
-static inline unsigned long kr_hash(const char *str)
-{
-    unsigned int hash;
-    unsigned int c;
-
-    hash = 0;
-
-    while ((c = (unsigned char) * str++)) {
-        hash += c;
-    }
-
-    return hash;
-}
+uint32_t kr_hash(const uint8_t *buf, size_t len);
 
 /**
- * sax_hash
+ * @bief sax_hash
  *
  * Shift, Add, XOR
+ *
+ * @param buf input buffer to hash
+ * @param len length of buffer
+ * @return 32 bit sized hash
  */
-static inline unsigned int sax_hash(const char *key)
-{
-    unsigned int h;
-
-    h = 0;
-
-    while (*key) {
-        h ^= (h << 5) + (h >> 2) + (unsigned char) * key++;
-    }
-
-    return h;
-}
-
+uint32_t sax_hash(const uint8_t *buf, size_t len);
 
 /**
- * dek_hash
+ * @brief dek_hash
  *
  * HISTORY
  * Proposed by Donald E. Knuth in The Art Of Computer Programming Vol. 3,
  * under the topic of "Sorting and Search", Chapter 6.4.
+ *
+ * @param buf input buffer to hash
+ * @param len length of buffer
+ * @return 32 bit sized hash
  */
-static inline unsigned int dek_hash(const char *str, unsigned int len)
-{
-    unsigned int hash;
-    unsigned int c;
-
-    hash = len;
-    c = 0;
-
-    while ((c = (unsigned int) * str++)) {
-        hash = ((hash << 5) ^ (hash >> 27)) ^ (c);
-    }
-
-    return hash;
-}
-
+uint32_t dek_hash(const uint8_t *buf, size_t len);
 
 /**
- * fnv_hash
+ * @brief fnv_hash
  *
  * NOTE
  * For a more fully featured and modern version of this hash, see fnv32.c
+ *
+ * @param buf input buffer to hash
+ * @param len length of buffer
+ * @return 32 bit sized hash
  */
-static inline unsigned int fnv_hash(const char *str)
-{
-#define FNV_PRIME 0x811C9DC5
-    unsigned int hash;
-    unsigned int c;
+uint32_t fnv_hash(const uint8_t *buf, size_t len);
 
-    hash = 0;
-    c    = 0;
 
-    while ((c = (unsigned int) * str++)) {
-        hash *= FNV_PRIME;
-        hash ^= (c);
-    }
+/**
+ * @brief rotating_hash
+ *
+ * found on
+ * http://burtleburtle.net/bob/hash/doobs.html
+ *
+ * @param buf input buffer to hash
+ * @param len length of buffer
+ * @return 32 bit sized hash
+ */
+uint32_t rotating_hash(const uint8_t *buf, size_t len);
 
-    return hash;
-}
-
+/**
+ * @brief one_at_a_time_hash
+ *
+ * found on
+ * http://burtleburtle.net/bob/hash/doobs.html
+ *
+ * @param buf input buffer to hash
+ * @param len length of buffer
+ * @return 32 bit sized hash
+ */
+uint32_t one_at_a_time_hash(const uint8_t *buf, size_t len);

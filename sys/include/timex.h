@@ -2,6 +2,12 @@
 #define __TIMEX_H
 
 #include <stdint.h>
+#include <inttypes.h>
+
+// mspgcc bug : PRIxxx macros not defined before mid-2011 versions
+#ifndef PRIu32
+#define PRIu32 "lu"
+#endif
 
 typedef struct timex_t {
     uint32_t seconds;

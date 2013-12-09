@@ -3,22 +3,17 @@
 #ifdef __MACH__
 .globl __native_sig_leave_tramp
 __native_sig_leave_tramp:
-    pushl %eax
     pushf
-    pushl %ebp
-    pushl %esp
+    pusha
 
-    movl  %esp, %ebp
-    subl  $24, %esp
-    movl  $__native_isr_ctx, 4(%esp)
-    movl  $__native_cur_ctx, (%esp)
+    pushl __native_isr_ctx
+    pushl __native_cur_ctx
     call _swapcontext
+    addl $8, %esp
 
-    addl  $24, %esp
-    popl %esp
-    popl %ebp
-    popf 
-    popl %eax
+    movl $0x0, __native_in_isr
+    popa
+    popf
 
     jmp *__native_saved_eip
 #else
@@ -30,23 +25,19 @@ __native_sig_leave_tramp:
 .globl _native_sig_leave_tramp
 
 _native_sig_leave_tramp:
-    pushl %eax
     pushf
-    pushl %ebp
-    pushl %esp
+    pusha
 
-    movl  %esp, %ebp
-    subl  $24, %esp
-    movl  $_native_isr_ctx, 4(%esp)
-    movl  $_native_cur_ctx, (%esp)
+    pushl _native_isr_ctx
+    pushl _native_cur_ctx
     call swapcontext
+    addl $8, %esp
 
-    addl  $24, %esp
-    popl %esp
-    popl %ebp
-    popf 
-    popl %eax
-    movl $0x0, _native_in_isr;
+    call eINT
+
+    movl $0x0, _native_in_isr
+    popa
+    popf
 
     jmp *_native_saved_eip
 #endif

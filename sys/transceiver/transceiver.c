@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -129,7 +129,11 @@ static void powerdown(transceiver_type_t t);
 static void switch_to_rx(transceiver_type_t t);
 
 #ifdef DBG_IGNORE
-static void ignore_add(transceiver_type_t t, void *address);
+static int16_t ignore_add(transceiver_type_t t, void *address);
+
+#define MAX_IGNORED_ADDR     (10)
+
+radio_address_t ignored_addr[MAX_IGNORED_ADDR];
 #endif
 
 /*------------------------------------------------------------------------------------*/
@@ -144,8 +148,11 @@ void transceiver_init(transceiver_type_t t)
     }
 
     /* Initializing transceiver buffer and data buffer */
-    memset(transceiver_buffer, 0, TRANSCEIVER_BUFFER_SIZE);
+    memset(transceiver_buffer, 0, TRANSCEIVER_BUFFER_SIZE * sizeof(radio_packet_t));
     memset(data_buffer, 0, TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE);
+#ifdef DBG_IGNORE
+    memset(ignored_addr, 0, MAX_IGNORED_ADDR * sizeof(radio_address_t));
+#endif
 
     for (i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
         reg[i].transceivers = TRANSCEIVER_NONE;
@@ -211,6 +218,7 @@ uint8_t transceiver_register(transceiver_type_t t, int pid)
 {
     uint8_t i;
 
+    /* find pid in registered threads or first unused space */
     for (i = 0; ((reg[i].pid != pid) &&
                 (i < TRANSCEIVER_MAX_REGISTERED) &&
                 (reg[i].transceivers != TRANSCEIVER_NONE)); i++);
@@ -246,7 +254,7 @@ void run(void)
         msg_receive(&m);
         /* only makes sense for messages for upper layers */
         cmd = (transceiver_command_t *) m.content.ptr;
-        DEBUG("transceiver: Transceiver: Message received\n");
+        DEBUG("transceiver: Transceiver: Message received, type: %02X\n", m.type);
 
         switch(m.type) {
             case RCV_PKT_CC1020:
@@ -303,10 +311,9 @@ void run(void)
                 msg_reply(&m, &m);
                 break;
 #ifdef DBG_IGNORE
-
             case DBG_IGN:
-                printf("Transceiver PID: %i (%p), rx_buffer_next: %u\n", transceiver_pid, &transceiver_pid, rx_buffer_next);
-                ignore_add(cmd->transceivers, cmd->data);
+                *((int16_t*) cmd->data) = ignore_add(cmd->transceivers, cmd->data);
+                msg_reply(&m, &m);
                 break;
 #endif
 
@@ -420,6 +427,15 @@ static void receive_packet(uint16_t type, uint8_t pos)
             puts("Invalid transceiver type");
             return;
         }
+#ifdef DBG_IGNORE
+        for (uint8_t i = 0; (i < MAX_IGNORED_ADDR) && (ignored_addr[i]); i++) {
+            DEBUG("check if source (%u) is ignored -> %u\n", trans_p->src, ignored_addr[i]);
+            if (trans_p->src == ignored_addr[i]) {
+                DEBUG("ignored packet from %"PRIu16"\n", trans_p->src);
+                return;
+            }
+        }
+#endif
     }
 
     /* finally notify waiting upper layers
@@ -529,10 +545,10 @@ void receive_nativenet_packet(radio_packet_t *trans_p) {
     DEBUG("Handling nativenet packet\n");
 
     memcpy(trans_p, p, sizeof(radio_packet_t));
-    memcpy((void*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p->data, p->length);
+    memcpy(&(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p->data, p->length);
     trans_p->data =  (uint8_t*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]);
 
-    DEBUG("Packet %p was from %hu to %hu, size: %u\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
+    DEBUG("Packet %p was from %"PRIu16" to %"PRIu16", size: %"PRIu8"\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
 
     /* reset interrupts */
     restoreIRQ(state);
@@ -589,10 +605,10 @@ static uint8_t send_packet(transceiver_type_t t, void *pkt)
     at86rf231_packet_t at86rf231_pkt;
 #endif
 
+    DEBUG("transceiver: Send packet to %" PRIu16 "\n", p.dst);
     switch (t) {
         case TRANSCEIVER_CC1100:
 #ifdef MODULE_CC110X_NG
-            DEBUG("transceiver: Send packet to %" PRIu16 "\n", p.dst);
             cc110x_pkt.length = p.length + CC1100_HEADER_LENGTH;
             cc110x_pkt.address = p.dst;
             cc110x_pkt.flags = 0;
@@ -772,6 +788,10 @@ static uint16_t set_pan(transceiver_type_t t, void *pan) {
         case TRANSCEIVER_AT86RF231:
             return at86rf231_set_pan(c);
 #endif
+#ifdef MODULE_MC1322X
+        case TRANSCEIVER_MC1322X:
+            return maca_set_pan(c);
+#endif
         default:
             /* get rid of compiler warning about unused variable */
             (void) c;
@@ -799,6 +819,10 @@ static uint16_t get_pan(transceiver_type_t t) {
 #ifdef MODULE_AT86RF231
         case TRANSCEIVER_AT86RF231:
             return at86rf231_get_pan();
+#endif
+#ifdef MODULE_MC1322X
+        case TRANSCEIVER_MC1322X:
+            return maca_get_pan();
 #endif
         default:
             return -1;
@@ -894,6 +918,8 @@ static int16_t set_address(transceiver_type_t t, void *address)
  */
 static void set_monitor(transceiver_type_t t, void *mode)
 {
+    (void) mode;
+
     switch(t) {
 #ifdef MODULE_CC110X_NG
         case TRANSCEIVER_CC1100:
@@ -922,6 +948,8 @@ static void set_monitor(transceiver_type_t t, void *mode)
 #ifdef MODULE_CC110X
 void cc1100_packet_monitor(void *payload, int payload_size, protocol_t protocol, packet_info_t *packet_info)
 {
+    (void) protocol;
+
     cc1100_payload = payload;
     cc1100_payload_size = payload_size - 3;
     cc1100_packet_info = packet_info;
@@ -983,17 +1011,17 @@ static void switch_to_rx(transceiver_type_t t)
 }
 
 #ifdef DBG_IGNORE
-static void ignore_add(transceiver_type_t t, void *address)
+static int16_t ignore_add(transceiver_type_t t, void *address)
 {
     radio_address_t addr = *((radio_address_t *)address);
 
-    switch(t) {
-        case TRANSCEIVER_CC1100:
-            cc110x_add_ignored(addr);
-            break;
-
-        default:
-            break;
+    for (uint8_t i = 0; i < MAX_IGNORED_ADDR; i++) {
+        if (ignored_addr[i] == 0) {
+            ignored_addr[i] = addr;
+            DEBUG("addr %u will be ignored (%u)\n", addr, i);
+            return i;
+        }
     }
+    return -1;
 }
 #endif

@@ -4,7 +4,6 @@
 #### The Sample Filesystem Layout is:
 #### /this makefile
 #### ../../RIOT 
-#### ../../boards   for board definitions (if you have one or more)
 #### 
 
 # name of your project
@@ -12,13 +11,16 @@ export PROJECT =foobar
 
 # for easy switching of boards
 ifeq ($(strip $(BOARD)),)
-	export BOARD = msba2
+	export BOARD = native
 endif
 
 # this has to be the absolute path of the RIOT-base dir
 export RIOTBASE =$(CURDIR)/../../RIOT
-export RIOTCPU =$(CURDIR)/../../RIOT/cpu
-export RIOTBOARD =$(CURDIR)/../../boards
+
+# uncomment these lines if you want to use platform support from external
+# repositories
+#export RIOTCPU =$(CURDIR)/../../RIOT/thirdparty_cpu
+#export RIOTBOARD =$(CURDIR)/../../RIOT/thirdparty_boards
 
 ## Modules to include. 
 

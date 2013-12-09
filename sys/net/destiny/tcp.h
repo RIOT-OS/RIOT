@@ -3,22 +3,22 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny 
+ * @ingroup destiny
  * @{
- * @file    tcp.c
+ * @file
  * @brief   TCP data structs and prototypes
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
- * @}
  */
 
 #ifndef TCP_H_
 #define TCP_H_
 
-#define TCP_HDR_LEN 			20
+#include "ipv6.h"
+#include "destiny/types.h"
 
 #define TCP_EOO_OPTION			0x00		// End of option list
 #define TCP_NOP_OPTION			0x01		// No operation
@@ -27,13 +27,13 @@
 #define TCP_TS_OPTION			0x08		// Timestamp
 
 enum tcp_flags {
-    TCP_ACK			= 0x08,
-    TCP_URG_PSH		= 0x14,
-    TCP_RST			= 0x20,
-    TCP_SYN			= 0x40,
-    TCP_SYN_ACK		= 0x48,
-    TCP_FIN			= 0x80,
-    TCP_FIN_ACK		= 0x88
+    TCP_ACK                    = 0x08,
+    TCP_URG_PSH                = 0x14,
+    TCP_RST                    = 0x20,
+    TCP_SYN                    = 0x40,
+    TCP_SYN_ACK                = 0x48,
+    TCP_FIN                    = 0x80,
+    TCP_FIN_ACK                = 0x88
 };
 
 enum tcp_states {
@@ -76,27 +76,13 @@ enum tcp_codes {
 #define SET_TCP_FIN(a) 			a = ((a & 0x00) | TCP_FIN)
 #define SET_TCP_FIN_ACK(a) 		a = ((a & 0x00) | TCP_FIN_ACK)
 
-#define TCP_STACK_SIZE 			1024
-
-#include "ipv6.h"
+#define TCP_STACK_SIZE 			KERNEL_CONF_STACKSIZE_DEFAULT
 
 typedef struct __attribute__((packed)) tcp_mms_o_t {
     uint8_t		kind;
     uint8_t		len;
     uint16_t	mss;
 } tcp_mss_option_t;
-
-typedef struct __attribute__((packed)) tcp_h_t {
-    uint16_t 	src_port;
-    uint16_t 	dst_port;
-    uint32_t 	seq_nr;
-    uint32_t 	ack_nr;
-    uint8_t 	dataOffset_reserved;
-    uint8_t 	reserved_flags;
-    uint16_t 	window;
-    uint16_t	checksum;
-    uint16_t	urg_pointer;
-} tcp_hdr_t;
 
 #ifdef TCP_HC
 mutex_t				global_context_counter_mutex;
@@ -110,5 +96,9 @@ void tcp_packet_handler(void);
 uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
 void printTCPHeader(tcp_hdr_t *tcp_header);
 void printArrayRange_tcp(uint8_t *udp_header, uint16_t len);
+
+/**
+ * @}
+ */
 
 #endif /* TCP_H_ */

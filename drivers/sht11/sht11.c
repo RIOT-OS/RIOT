@@ -6,7 +6,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * ----------------------------------------------------------------------------
  * This file is part of RIOT.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -30,11 +30,11 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #include <stdio.h>
 #include <stdint.h>
 
-#include <hwtimer.h>
-#include <mutex.h>
-#include <sht11.h>
-#include <sht11-board.h>
-#include <bitarithm.h>
+#include "hwtimer.h"
+#include "mutex.h"
+#include "sht11.h"
+#include "sht11-board.h"
+#include "bitarithm.h"
 
 float sht11_temperature_offset;
 

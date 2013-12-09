@@ -6,7 +6,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * ----------------------------------------------------------------------------
  * This file is part of RIOT.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -32,7 +32,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #include <cc1100.h>
 #include <cc1100_phy.h>
 #include <cc1100-csmaca-mac.h>
-#include "protocol-multiplex/protocol-multiplex.h"
+#include "protocol-multiplex.h"
 
 #include "hwtimer.h"
 #include <vtimer.h>
@@ -50,12 +50,13 @@ static double collisions_per_sec = 0;
 static int collision_state = COLLISION_STATE_INITIAL;
 static uint64_t collision_measurement_start = 0;
 
-volatile static int cs_hwtimer_id = -1;
-volatile static int cs_timeout_flag = 0;
+static volatile int cs_hwtimer_id = -1;
+static volatile int cs_timeout_flag = 0;
 
 /*---------------------------------------------------------------------------*/
 static void cs_timeout_cb(void *ptr)
 {
+    (void) ptr;
     cs_timeout_flag = 1;
 }
 
@@ -181,10 +182,6 @@ window:
     }
 
     backoff = rand() % windowSize;			/* ...and choose new backoff */
-
-    if (backoff < 0) {
-        backoff *= -1;
-    }
 
     backoff += (uint16_t) 1;
 cycle:

@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -14,6 +14,7 @@
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 
@@ -21,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "malloc.h"
 #include "vtimer.h"
 #include "mutex.h"
 #include "sixlowpan/error.h"
@@ -30,13 +32,12 @@
 #include "icmp.h"
 #include "lowpan.h"
 #include "serialnumber.h"
-#include "sys/net/net_help/net_help.h"
+#include "net_help.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define LLHDR_ICMPV6HDR_LEN         (LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)
-#define IPV6HDR_ICMPV6HDR_LEN       (IPV6_HDR_LEN + ipv6_ext_hdr_len + ICMPV6_HDR_LEN)
 #define ND_HOPLIMIT                 (0xFF)
 
 /* parameter problem [rfc4443] */
@@ -712,7 +713,7 @@ void recv_rtr_adv(void)
     mutex_lock(&lowpan_context_mutex);
 
     /* read options */
-    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + icmpv6_opt_hdr_len) {
+    while (packet_length > IPV6_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
         switch (opt_buf->type) {
@@ -758,7 +759,7 @@ void recv_rtr_adv(void)
                                                     NDP_ADDR_STATE_PREFERRED,
                                                     opt_pi_buf->val_ltime,
                                                     opt_pi_buf->pref_ltime);
-                                printf("INFO: added address to interface\n");
+                                DEBUG("INFO: added address to interface\n");
                                 trigger_ns = 1;
                             }
                         }
@@ -942,7 +943,7 @@ void recv_nbr_sol(void)
      * option condition is that a sllao option is set. thus that we don't
      * know which option comes first we need to this here */
 
-    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + icmpv6_opt_hdr_len) {
+    while (packet_length > IPV6_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
         if (opt_buf->type == NDP_OPT_SLLAO_TYPE) {
@@ -954,7 +955,7 @@ void recv_nbr_sol(void)
 
     icmpv6_opt_hdr_len = NBR_SOL_LEN;
 
-    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + icmpv6_opt_hdr_len) {
+    while (packet_length > IPV6_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
         switch (opt_buf->type) {
@@ -1187,7 +1188,7 @@ void recv_nbr_adv(void)
     nbr_adv_buf = get_nbr_adv_buf(ipv6_ext_hdr_len);
 
     /* check if options are present */
-    while (packet_length > IPV6HDR_ICMPV6HDR_LEN + icmpv6_opt_hdr_len) {
+    while (packet_length > IPV6_HDR_LEN + ICMPV6_HDR_LEN + icmpv6_opt_hdr_len) {
         opt_buf = get_opt_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
 
         switch (opt_buf->type) {
@@ -1580,6 +1581,6 @@ int8_t plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
         plist[prefix_count].pref_ltime = HTONL(pref_ltime);
         memcpy(&(plist[prefix_count].addr.uint8[0]), &(addr->uint8[0]), 16);
 
-        return SUCCESS;
+        return SIXLOWERROR_SUCCESS;
     }
 }

@@ -50,10 +50,16 @@ git clone git://github.com/RIOT-OS/thirdparty_cpu.git
 <h4><em>Optional (recommended):</em> Examplary projects</h4>
 <pre>
 git clone git://github.com/RIOT-OS/projects.git
+git submodule init
+git submodule update
 </pre>
 
 <h3>Download the tarballs</h3>
-<p class="todo">TODO: Build tarballs!</p>
+<ul>
+<li><a href="https://github.com/RIOT-OS/RIOT/archive/2013.08.tar.gz">tarball for RIOT 2013.08</a></li>
+<li><a href="https://github.com/RIOT-OS/boards/archive/2013.08.tar.gz">tarball for boards 2013.08</a></li>
+<li><a href="https://github.com/RIOT-OS/projects/archive/2013.08.tar.gz">tarball for projects 2013.08</a></li>
+</ul>
 
 	<h2 id="toolchains">Setup the toolchain</h2>
     <p>You can either build RIOT for one of the supported hardware platforms (check
@@ -88,6 +94,7 @@ export PATH=${PATH}:/path/to/arm-none-eabi-gcc
 <h3>For the native port</h3>
 <p>In order to build RIOT for the native port, you just need the <a class="download" href="http://gcc.gnu.org/" title="GCC, the GNU Compiler Collection" target="_blank">GNU
 Compiler Collection</a>.</p>
+<p>There is a <a href="https://raw.github.com/RIOT-OS/RIOT/master/cpu/native/README" title="README">README</a> that explains how to use natives network controller.</p>
 
     <h2 id="flasher">Setup a flashing tool</h2>
 	<h3>For MSB-A2</h3>
@@ -107,10 +114,10 @@ Drivers" target="_blank">FTDI homepage</a>.</li>
     <p>Download and install <a class="download" href="http://mspdebug.sourceforge.net/download.html" title="Debugging and programming tool for MSP430 MCUs" target="_blank">MSPDebug</a> according to the information provided on the website. You can also use MSPDebug for debugging.</p>
     <h3>For redbee-econotag</h3>
     <p>Folow the instructions for <a href="http://mc1322x.devl.org/libmc1322x.html" title="LIBMC1322X"target="_blank">Getting Started with MC1322x</a>.
-	<h3>For STM32F4DISCOVERY</h3>
-<p class="todo">TODO</p>
+<!--	<h3>For STM32F4DISCOVERY</h3>
+<p class="todo">TODO</p>-->
 
-	<h2 id="hello"><em>Optional:</em> Hello World!</h2>
+	<h2 id="hello"><em>First test:</em> Hello World!</h2>
 	If you have obtained a copy of the projects repository, you can build the
 famous <em>Hello World</em> application for RIOT.
 <ul>

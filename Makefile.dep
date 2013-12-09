@@ -42,11 +42,26 @@ ifneq (,$(findstring at86rf231,$(USEMODULE)))
 	endif
 endif
 
+ifneq (,$(findstring destiny,$(USEMODULE)))
+	ifeq (,$(findstring sixlowpan,$(USEMODULE)))
+		USEMODULE += sixlowpan
+	endif
+	ifeq (,$(findstring net_help,$(USEMODULE)))
+		USEMODULE += net_help
+	endif
+endif
+
 ifneq (,$(findstring sixlowpan,$(USEMODULE)))
 	ifeq (,$(findstring ieee802154,$(USEMODULE)))
 		USEMODULE += ieee802154
 	endif
 	ifeq (,$(findstring net_help,$(USEMODULE)))
 		USEMODULE += net_help
+	endif
+	ifeq (,$(findstring semaphore, $(USEMODULE)))
+		USEMODULE += semaphore
+	endif
+	ifeq (,$(findstring transceiver, $(USEMODULE)))
+		USEMODULE += transceiver
 	endif
 endif

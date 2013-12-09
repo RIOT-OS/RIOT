@@ -32,7 +32,7 @@ endif
 cpus: $(DIRS)
 
 $(DIRS): 
-	@$(MAKE) -C $@
+	@"$(MAKE)" -C $@
 
 clean:
 	@$(MAKE) -C lpc2387 clean
@@ -45,4 +45,3 @@ clean:
 	@$(MAKE) -C native clean
 	@$(MAKE) -C stm32f407vg clean
 	@$(MAKE) -C stm32f415rg clean
-

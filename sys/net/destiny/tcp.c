@@ -1,36 +1,39 @@
 /**
- * Destiny TCP implementation 
+ * Destiny TCP implementation
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny 
+ * @ingroup destiny
  * @{
  * @file    tcp.c
- * @brief   TCP implementation 
+ * @brief   TCP implementation
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @}
  */
 
-
-#include <stdio.h>
-#include <thread.h>
-#include <string.h>
-#include <stdlib.h>
 #include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include "vtimer.h"
-#include "tcp_timer.h"
-#include "tcp_hc.h"
-#include "tcp.h"
-#include "in.h"
-#include "socket.h"
-#include "../net_help/net_help.h"
-#include "../net_help/msg_help.h"
 #include "sixlowpan.h"
+#include "thread.h"
+#include "vtimer.h"
+
+#include "destiny/in.h"
+
+#include "net_help.h"
+
+#include "msg_help.h"
+#include "socket.h"
+#include "tcp_hc.h"
+#include "tcp_timer.h"
+
+#include "tcp.h"
 
 void printTCPHeader(tcp_hdr_t *tcp_header)
 {
@@ -73,6 +76,8 @@ uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
 uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                        socket_internal_t *tcp_socket, uint8_t *payload)
 {
+    (void) tcp_header;
+
     msg_t m_send_tcp, m_recv_tcp;
     uint8_t tcp_payload_len = ipv6_header->length - TCP_HDR_LEN;
     uint8_t acknowledged_bytes = 0;
@@ -84,7 +89,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
         acknowledged_bytes = tcp_socket->socket_values.tcp_control.rcv_wnd;
         tcp_socket->socket_values.tcp_control.rcv_wnd = 0;
         tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end +
-            tcp_socket->socket_values.tcp_control.rcv_wnd;
+                                           tcp_socket->socket_values.tcp_control.rcv_wnd;
         mutex_unlock(&tcp_socket->tcp_buffer_mutex);
     }
     else {
@@ -94,7 +99,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
             tcp_socket->socket_values.tcp_control.rcv_wnd - tcp_payload_len;
         acknowledged_bytes = tcp_payload_len;
         tcp_socket->tcp_input_buffer_end = tcp_socket->tcp_input_buffer_end +
-            tcp_payload_len;
+                                           tcp_payload_len;
         mutex_unlock(&tcp_socket->tcp_buffer_mutex);
     }
 
@@ -122,8 +127,8 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
         msg_send(&m_send_tcp, tcp_socket->send_pid, 0);
         return;
     }
-    else if (getWaitingConnectionSocket(tcp_socket->socket_id, ipv6_header,
-                                       tcp_header) != NULL) {
+    else if (get_waiting_connection_socket(tcp_socket->socket_id, ipv6_header,
+                                           tcp_header) != NULL) {
         m_send_tcp.content.ptr = (char *)tcp_header;
         net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->recv_pid, TCP_ACK);
         return;
@@ -142,6 +147,10 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 void handle_tcp_rst_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                            socket_internal_t *tcp_socket)
 {
+    (void) ipv6_header;
+    (void) tcp_header;
+    (void) tcp_socket;
+
     /* TODO: Reset connection */
 }
 
@@ -152,16 +161,16 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 
     if (tcp_socket->socket_values.tcp_control.state == LISTEN) {
         socket_internal_t *new_socket = new_tcp_queued_socket(ipv6_header,
-                                                              tcp_header);
+                                        tcp_header);
 
         if (new_socket != NULL) {
 #ifdef TCP_HC
             update_tcp_hc_context(true, new_socket, tcp_header);
 #endif
-            /* notify socket function accept(..) that a new connection request
-             * has arrived. No need to wait for an answer because the server
-             * accept() function isnt reading from anything other than the
-             * queued sockets */
+            /* notify socket function destiny_socket_accept(..) that a new
+             * connection request has arrived. No need to wait for an answer
+             * because the server destiny_socket_accept() function isnt reading
+             * from anything other than the queued sockets */
             net_msg_send(&m_send_tcp, tcp_socket->recv_pid, 0, TCP_SYN);
         }
         else {
@@ -177,6 +186,8 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 void handle_tcp_syn_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                                socket_internal_t *tcp_socket)
 {
+    (void) ipv6_header;
+
     msg_t m_send_tcp;
 
     if (tcp_socket->socket_values.tcp_control.state == SYN_SENT) {
@@ -191,6 +202,8 @@ void handle_tcp_syn_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                            socket_internal_t *tcp_socket)
 {
+    (void) ipv6_header;
+
     msg_t m_send;
     socket_t *current_tcp_socket = &tcp_socket->socket_values;
     uint8_t send_buffer[BUFFER_SIZE];
@@ -222,6 +235,8 @@ void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                                socket_internal_t *tcp_socket)
 {
+    (void) ipv6_header;
+
     msg_t m_send;
     socket_t *current_tcp_socket = &tcp_socket->socket_values;
     uint8_t send_buffer[BUFFER_SIZE];
@@ -309,7 +324,7 @@ void tcp_packet_handler(void)
         chksum = tcp_csum(ipv6_header, tcp_header);
 
         payload = (uint8_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN +
-                tcp_header->dataOffset_reserved * 4);
+                              tcp_header->dataOffset_reserved * 4);
 
         if ((chksum == 0xffff) && (tcp_socket != NULL)) {
 #ifdef TCP_HC
@@ -318,7 +333,7 @@ void tcp_packet_handler(void)
             /* Remove reserved bits from tcp flags field */
             uint8_t tcp_flags = tcp_header->reserved_flags & REMOVE_RESERVED;
 
-            switch(tcp_flags) {
+            switch (tcp_flags) {
                 case TCP_ACK: {
                     /* only ACK Bit set */
                     handle_tcp_ack_packet(ipv6_header, tcp_header, tcp_socket);

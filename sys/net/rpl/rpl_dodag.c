@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -23,9 +23,20 @@
 #include "trickle.h"
 #include "rpl.h"
 
+#define ENABLE_DEBUG (0)
+#if ENABLE_DEBUG
+char addr_str[IPV6_MAX_ADDR_STR_LEN];
+#endif
+#include "debug.h"
+
 rpl_instance_t instances[RPL_MAX_INSTANCES];
 rpl_dodag_t dodags[RPL_MAX_DODAGS];
 rpl_parent_t parents[RPL_MAX_PARENTS];
+
+void rpl_instances_init(void)
+{
+    memset(instances, 0, sizeof(rpl_instance_t) * RPL_MAX_INSTANCES);
+}
 
 rpl_instance_t *rpl_new_instance(uint8_t instanceid)
 {
@@ -150,6 +161,7 @@ rpl_parent_t *rpl_new_parent(rpl_dodag_t *dodag, ipv6_addr_t *address, uint16_t 
             parent->addr = *address;
             parent->rank = rank;
             parent->dodag = dodag;
+            parent->lifetime = dodag->default_lifetime * dodag->lifetime_unit;
             /* dtsn is set at the end of recv_dio function */
             parent->dtsn = 0;
             return parent;
@@ -210,7 +222,9 @@ void rpl_delete_worst_parent(void)
 void rpl_delete_all_parents(void)
 {
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
-    my_dodag->my_preferred_parent = NULL;
+    if (my_dodag != NULL) {
+        my_dodag->my_preferred_parent = NULL;
+    }
 
     for (int i = 0; i < RPL_MAX_PARENTS; i++) {
         memset(&parents[i], 0, sizeof(parents[i]));
@@ -222,14 +236,19 @@ rpl_parent_t *rpl_find_preferred_parent(void)
     rpl_parent_t *best = NULL;
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 
+    if (my_dodag == NULL) {
+        DEBUG("Not part of a dodag\n");
+        return NULL;
+    }
+
     for (uint8_t i = 0; i < RPL_MAX_PARENTS; i++) {
         if (parents[i].used) {
             if ((parents[i].rank == INFINITE_RANK) || (parents[i].lifetime <= 1)) {
-                puts("bad parent");
+                DEBUG("Infinite rank, bad parent\n");
                 continue;
             }
             else if (best == NULL) {
-                puts("parent");
+                DEBUG("possible parent\n");
                 best = &parents[i];
             }
             else {
@@ -240,6 +259,10 @@ rpl_parent_t *rpl_find_preferred_parent(void)
 
     if (best == NULL) {
         return NULL;
+    }
+
+    if (my_dodag->my_preferred_parent == NULL) {
+        my_dodag->my_preferred_parent = best;
     }
 
     if (!rpl_equal_id(&my_dodag->my_preferred_parent->addr, &best->addr)) {
@@ -265,6 +288,10 @@ void rpl_parent_update(rpl_parent_t *parent)
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
     uint16_t old_rank = my_dodag->my_rank;
 
+    if (my_dodag == NULL) {
+        DEBUG("Not part of a dodag - this should not happen");
+        return;
+    }
     /* update Parent lifetime */
     if (parent != NULL) {
         parent->lifetime = my_dodag->default_lifetime * my_dodag->lifetime_unit;
@@ -294,7 +321,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
         return;
     }
 
-    preferred_parent = rpl_new_parent(my_dodag, parent, parent_rank);
+    preferred_parent = rpl_new_parent(dodag, parent, parent_rank);
 
     if (preferred_parent == NULL) {
         rpl_del_dodag(my_dodag);
@@ -321,6 +348,14 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     my_dodag->my_rank = dodag->of->calc_rank(preferred_parent, dodag->my_rank);
     my_dodag->dao_seq = RPL_COUNTER_INIT;
     my_dodag->min_rank = my_dodag->my_rank;
+    DEBUG("Joint DODAG:\n");
+    DEBUG("\tMOP:\t%02X\n", my_dodag->mop);
+    DEBUG("\tminhoprankincrease :\t%04X\n", my_dodag->minhoprankincrease);
+    DEBUG("\tdefault_lifetime:\t%02X\n", my_dodag->default_lifetime);
+    DEBUG("\tgrounded:\t%02X\n", my_dodag->grounded);
+    DEBUG("\tmy_preferred_parent:\t%s\n", ipv6_addr_to_str(addr_str, &my_dodag->my_preferred_parent->addr));
+    DEBUG("\tmy_preferred_parent rank\t%02X\n", my_dodag->my_preferred_parent->rank);
+    DEBUG("\tmy_preferred_parent lifetime\t%04X\n", my_dodag->my_preferred_parent->lifetime);
 
     start_trickle(my_dodag->dio_min, my_dodag->dio_interval_doubling, my_dodag->dio_redundancy);
     delay_dao();

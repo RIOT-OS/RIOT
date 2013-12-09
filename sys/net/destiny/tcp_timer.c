@@ -1,33 +1,38 @@
 /**
- * Destiny TCP timer implementation 
+ * Destiny TCP timer implementation
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny 
+ * @ingroup destiny
  * @{
  * @file    tcp_timer.c
- * @brief   TCP timer 
+ * @brief   TCP timer
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @}
  */
 
-
-#include <thread.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#ifdef DESTINY_WITH_TCP
 #include <math.h>
-#include "tcp_timer.h"
-#include "vtimer.h"
-#include "thread.h"
-#include "destiny.h"
-#include "socket.h"
-#include "../net_help/msg_help.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "sixlowpan.h"
+#include "thread.h"
+#include "vtimer.h"
+
+#include "destiny.h"
+
+#include "msg_help.h"
+#include "socket.h"
+
+#include "tcp_timer.h"
+
+char tcp_timer_stack[TCP_TIMER_STACKSIZE];
 
 void handle_synchro_timeout(socket_internal_t *current_socket)
 {
@@ -38,21 +43,21 @@ void handle_synchro_timeout(socket_internal_t *current_socket)
         vtimer_now(&now);
 
         if ((current_socket->socket_values.tcp_control.no_of_retries == 0) &&
-           (timex_sub(now,
-                      current_socket->socket_values.tcp_control.last_packet_time).microseconds >
-            TCP_SYN_INITIAL_TIMEOUT)) {
+            (timex_sub(now,
+                       current_socket->socket_values.tcp_control.last_packet_time).microseconds >
+             TCP_SYN_INITIAL_TIMEOUT)) {
             current_socket->socket_values.tcp_control.no_of_retries++;
             net_msg_send(&send, current_socket->recv_pid, 0, TCP_RETRY);
         }
         else if ((current_socket->socket_values.tcp_control.no_of_retries > 0) &&
-                (timex_sub(now,
-                          current_socket->socket_values.tcp_control.last_packet_time).microseconds >
-                 (current_socket->socket_values.tcp_control.no_of_retries *
-                  TCP_SYN_TIMEOUT + TCP_SYN_INITIAL_TIMEOUT))) {
+                 (timex_sub(now,
+                            current_socket->socket_values.tcp_control.last_packet_time).microseconds >
+                  (current_socket->socket_values.tcp_control.no_of_retries *
+                   TCP_SYN_TIMEOUT + TCP_SYN_INITIAL_TIMEOUT))) {
             current_socket->socket_values.tcp_control.no_of_retries++;
 
             if (current_socket->socket_values.tcp_control.no_of_retries >
-                    TCP_MAX_SYN_RETRIES) {
+                TCP_MAX_SYN_RETRIES) {
                 net_msg_send(&send, current_socket->recv_pid, 0, TCP_TIMEOUT);
             }
             else {
@@ -74,10 +79,10 @@ void handle_established(socket_internal_t *current_socket)
     uint8_t i;
 
     if ((current_socket->socket_values.tcp_control.send_nxt >
-       current_socket->socket_values.tcp_control.send_una) &&
-       (thread_getstatus(current_socket->send_pid) == STATUS_RECEIVE_BLOCKED)) {
+         current_socket->socket_values.tcp_control.send_una) &&
+        (thread_getstatus(current_socket->send_pid) == STATUS_RECEIVE_BLOCKED)) {
         for (i = 0; i < current_socket->socket_values.tcp_control.no_of_retries;
-            i++) {
+             i++) {
             current_timeout *= 2;
         }
 
@@ -88,7 +93,7 @@ void handle_established(socket_internal_t *current_socket)
             net_msg_send(&send, current_socket->send_pid, 0, TCP_TIMEOUT);
         }
         else if (timex_sub(now, current_socket->socket_values.tcp_control.last_packet_time).microseconds >
-                current_timeout) {
+                 current_timeout) {
             current_socket->socket_values.tcp_control.no_of_retries++;
             net_msg_send(&send, current_socket->send_pid, 0, TCP_RETRY);
         }
@@ -101,10 +106,10 @@ void check_sockets(void)
     uint8_t i = 1;
 
     while (i < MAX_SOCKETS + 1) {
-        current_socket = getSocket(i);
+        current_socket = get_socket(i);
 
-        if (isTCPSocket(i)) {
-            switch(current_socket->socket_values.tcp_control.state) {
+        if (is_tcp_socket(i)) {
+            switch (current_socket->socket_values.tcp_control.state) {
                 case ESTABLISHED: {
                     handle_established(current_socket);
                     break;
@@ -150,7 +155,9 @@ void tcp_general_timer(void)
     while (1) {
         inc_global_variables();
         check_sockets();
+        vtimer_remove(&tcp_vtimer);
         vtimer_set_wakeup(&tcp_vtimer, interval, thread_getpid());
         thread_sleep();
     }
 }
+#endif

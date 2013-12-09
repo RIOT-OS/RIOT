@@ -6,18 +6,21 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 -------------------------------------------------------------------------------
 This file is part of RIOT.
 
-This file subject to the terms and conditions of the GNU Lesser General Public
-License. See the file LICENSE in the top level directory for more details.
+This file is subject to the terms and conditions of the LGPLv2.
+See the file LICENSE in the top level directory for more details.
 *******************************************************************************/
 
 #ifndef __HWTIMER_CPU_H
 #define __HWTIMER_CPU_H
+
+#include "cpu.h"
 
 #ifdef CC430
 #include <cc430f6137.h>
 #else
 #include <msp430x16x.h>
 #endif
+#include <cpu.h>
 #include <stdint.h>
 
 #ifdef __MSP430_HAS_TA2__
@@ -36,7 +39,7 @@ License. See the file LICENSE in the top level directory for more details.
 #define ARCH_MAXTIMERS 0
 #endif
 
-#define HWTIMER_SPEED 32768
+#define HWTIMER_SPEED  (F_RC_OSCILLATOR)
 #define HWTIMER_MAXTICKS (0xFFFFFFFF)
 
 #endif // __HWTIMER_CPU_H

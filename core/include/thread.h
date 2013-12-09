@@ -46,6 +46,12 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
 unsigned int thread_getstatus(int pid);
 
 /**
+ * @brief   returns the name of a process.
+ * @return  NULL if pid is unknown
+ */
+const char *thread_getname(int pid);
+
+/**
  * @brief   Puts the current thread into sleep mode. Has to be woken up externally.
  */
 void thread_sleep(void);
@@ -75,6 +81,7 @@ int thread_getlastpid(void);
  * Only works if the thread was created with the flag CREATE_STACKTEST.
  *
  * @param stack The stack you want to measure. try active_thread->stack_start.
+ * @return  The current usage (overwritten addresses) of the thread's stack
  */
 int thread_measure_stack_usage(char *stack);
 

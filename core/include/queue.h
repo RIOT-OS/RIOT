@@ -9,8 +9,13 @@
 #ifndef __QUEUE_H
 #define __QUEUE_H
 
-#include <stdlib.h>
 #include <stdint.h>
+#include <inttypes.h>
+
+// mspgcc bug : PRIxxx macros not defined before mid-2011 versions
+#ifndef PRIu32
+#define PRIu32 "lu"
+#endif
 
 typedef struct queue_node_t {
     struct queue_node_t *next;
@@ -26,8 +31,10 @@ void queue_priority_add(queue_node_t *root, queue_node_t *new_obj);
 void queue_priority_add_generic(queue_node_t *root, queue_node_t *new_obj, int(*cmp)(queue_node_t *, queue_node_t *)) ;
 void queue_remove(queue_node_t *root, queue_node_t *node);
 
+#if ENABLE_DEBUG
 void queue_print(queue_node_t *node);
 void queue_print_node(queue_node_t *node);
+#endif
 
 /** @} */
 #endif // __QUEUE_H

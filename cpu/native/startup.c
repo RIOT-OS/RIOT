@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013 Ludwig Ortmann
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -14,29 +14,41 @@
  * @}
  */
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#include <dlfcn.h>
+#else
+#include <dlfcn.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <err.h>
 
-#include <kernel_internal.h>
-#include <cpu.h>
 
+#include "kernel_internal.h"
+#include "cpu.h"
+
+#include "native_internal.h"
 #include "tap.h"
-
-extern void board_init(void);
-extern void native_cpu_init(void);
-extern void native_interrupt_init(void);
 
 __attribute__((constructor)) static void startup(int argc, char **argv)
 {
+    /* get system read/write */
+    *(void **)(&real_read) = dlsym(RTLD_NEXT, "read");
+    *(void **)(&real_write) = dlsym(RTLD_NEXT, "write");
 
 #ifdef MODULE_NATIVENET
     if (argc < 2) {
         printf("usage: %s <tap interface>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
+#else /* args unused here */
+    (void) argc;
+    (void) argv;
 #endif
 
+    native_hwtimer_pre_init();
     native_cpu_init();
     native_interrupt_init();
 #ifdef MODULE_NATIVENET

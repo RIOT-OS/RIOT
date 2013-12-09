@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013 Ludwig Ortmann.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -26,21 +26,19 @@
 
 #define TEXT_SIZE           (255) /* XXX: this aint enough for everybody */
 
-char text_msg[TEXT_SIZE];
-msg_t mesg;
-transceiver_command_t tcmd;
-
 void _nativenet_get_set_address_handler(char *addr)
 {
-    int16_t a;
+    msg_t mesg;
+    transceiver_command_t tcmd;
+    uint16_t a;
 
     tcmd.transceivers = TRANSCEIVER_NATIVE;
     tcmd.data = &a;
     mesg.content.ptr = (char *) &tcmd;
-    a = (int16_t)atoi(addr + 5);
+    a = atoi(addr + 5);
 
     if (strlen(addr) > 5) {
-        printf("[nativenet] trying to set address %" PRIi16 "\n", a);
+        printf("[nativenet] trying to set address %"PRIu16"\n", a);
         mesg.type = SET_ADDRESS;
     }
     else {
@@ -48,12 +46,14 @@ void _nativenet_get_set_address_handler(char *addr)
     }
 
     msg_send_receive(&mesg, &mesg, transceiver_pid);
-    printf("[nativenet] got address: %i\n", a);
+    printf("[nativenet] got address: %"PRIu16"\n", a);
 }
 
 void _nativenet_get_set_channel_handler(char *chan)
 {
-    int16_t c;
+    msg_t mesg;
+    transceiver_command_t tcmd;
+    uint8_t c;
 
     tcmd.transceivers = TRANSCEIVER_NATIVE;
     tcmd.data = &c;
@@ -61,7 +61,7 @@ void _nativenet_get_set_channel_handler(char *chan)
     c = atoi(chan + 5);
 
     if (strlen(chan) > 5) {
-        printf("[nativenet] Trying to set channel %i\n", c);
+        printf("[nativenet] Trying to set channel %"PRIu8"\n", c);
         mesg.type = SET_CHANNEL;
     }
     else {
@@ -69,11 +69,15 @@ void _nativenet_get_set_channel_handler(char *chan)
     }
 
     msg_send_receive(&mesg, &mesg, transceiver_pid);
-    printf("[nativenet] Got channel: %i\n", c);
+    printf("[nativenet] Got channel: %"PRIu8"\n", c);
 }
 
 void _nativenet_send_handler(char *pkt)
 {
+    msg_t mesg;
+    transceiver_command_t tcmd;
+    char text_msg[TEXT_SIZE];
+
     radio_packet_t p;
     uint32_t response;
     uint16_t addr;
@@ -96,10 +100,10 @@ void _nativenet_send_handler(char *pkt)
             p.dst = addr;
             mesg.type = SND_PKT;
             mesg.content.ptr = (char *)&tcmd;
-            printf("[nativenet] Sending packet of length %u to %u: %s\n", p.length, p.dst, (char*) p.data);
+            printf("[nativenet] Sending packet of length %"PRIu16" to %"PRIu16": %s\n", p.length, p.dst, (char*) p.data);
             msg_send_receive(&mesg, &mesg, transceiver_pid);
             response = mesg.content.value;
-            printf("[nativenet] Packet sent: %" PRIu32 "\n", response);
+            printf("[nativenet] Packet sent: %"PRIu32"\n", response);
             return;
         }
     }
@@ -109,7 +113,9 @@ void _nativenet_send_handler(char *pkt)
 
 void _nativenet_monitor_handler(char *mode)
 {
-    unsigned int m;
+    msg_t mesg;
+    transceiver_command_t tcmd;
+    uint8_t m;
 
     tcmd.transceivers = TRANSCEIVER_NATIVE;
     tcmd.data = &m;
@@ -117,7 +123,7 @@ void _nativenet_monitor_handler(char *mode)
     m = atoi(mode + 8);
 
     if (strlen(mode) > 8) {
-        printf("Setting monitor mode: %u\n", m);
+        printf("Setting monitor mode: %"PRIu8"\n", m);
         mesg.type = SET_MONITOR;
         msg_send(&mesg, transceiver_pid, 1);
     }

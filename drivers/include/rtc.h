@@ -6,7 +6,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * ----------------------------------------------------------------------------
  * This file is part of RIOT.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -24,6 +24,11 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #define RTC_SECOND 10001U
 
 #include <time.h>
+
+/* TODO: remove once msp430 libc supports struct timeval */
+#ifndef MSP430
+#include <sys/time.h>
+#endif
 
 /**
  * @brief Initializes the RTC for calendar mode
@@ -51,6 +56,12 @@ void rtc_set_localtime(struct tm *localt);
  * @param[out]	localt		Pointer to structure to receive time
  */
 void rtc_get_localtime(struct tm *localt);
+
+/**
+ * @brief	Get the current time as a struct timeval
+ * @param[out]	time		Pointer to structure to receive time
+ */
+time_t rtc_time(struct timeval *time);
 
 extern int rtc_second_pid;
 

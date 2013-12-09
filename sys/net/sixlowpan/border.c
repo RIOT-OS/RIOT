@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -26,6 +26,7 @@
 #include "posix_io.h"
 #include "board_uart0.h"
 
+#include "ieee802154_frame.h"
 #include "sixlowpan/error.h"
 #include "bordermultiplex.h"
 #include "flowcontrol.h"
@@ -34,8 +35,7 @@
 #include "icmp.h"
 #include "serialnumber.h"
 
-#include "sys/net/ieee802154/ieee802154_frame.h"
-#include "sys/net/net_help/net_help.h"
+#include "net_help.h"
 
 #define READER_STACK_SIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
 
@@ -158,7 +158,7 @@ uint8_t sixlowpan_lowpan_border_init(transceiver_type_t trans,
 
     ipv6_init_iface_as_router();
 
-    return SUCCESS;
+    return SIXLOWERROR_SUCCESS;
 }
 
 void border_process_lowpan(void)

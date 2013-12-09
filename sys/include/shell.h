@@ -2,11 +2,11 @@
  * Copyright 2009, Freie Universitaet Berlin (FUB). All rights reserved.
  *
  * These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
+ * and Telematics group (http://cst.mi.fu-berlin.de).
  * ----------------------------------------------------------------------------
  * This file is part of RIOT.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -20,8 +20,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * @ingroup feuerware
  */
 
-//#include "hashtable.h"
-
 typedef struct shell_command_t {
     char *name;
     char *desc;
@@ -33,6 +31,8 @@ typedef struct shell_t {
     int (*readchar)(void);
     void (*put_char)(int);
 } shell_t;
+
+#define SHELL_BUFFER_SIZE (127)
 
 /**
  * @brief Initialize a shell object

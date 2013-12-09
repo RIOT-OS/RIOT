@@ -10,13 +10,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <hwtimer.h>
-#include <vtimer.h>
-#include <thread.h>
-#include <transceiver.h>
+#include "mutex.h"
+#include "hwtimer.h"
+#include "vtimer.h"
+#include "thread.h"
+#include "transceiver.h"
 
-#include "sixlowpan.h"
-#include "ieee802154/ieee802154_frame.h"
+#include "sixlowpan/ip.h"
+#include "ieee802154_frame.h"
 
 //prototytpes
 static uint8_t etx_count_packet_tx(etx_neighbor_t *candidate);
@@ -43,7 +44,7 @@ int etx_clock_pid = 0;
  * See: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
  */
 //Message queue for radio
-msg_t msg_que[ETX_RCV_QUEUE_SIZE] = { 0 };
+msg_t msg_que[ETX_RCV_QUEUE_SIZE] = { {0} };
 
 /*
  * The counter for the current 'round'. An ETX beacon is sent every ETX_INTERVAL
@@ -72,7 +73,7 @@ static char reached_window = 0;
  * See: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
  */
 //Candidate array
-static etx_neighbor_t candidates[ETX_MAX_CANDIDATE_NEIGHBORS] = { 0 };
+static etx_neighbor_t candidates[ETX_MAX_CANDIDATE_NEIGHBORS] = { {{{0}}} };
 
 /*
  * Each time we send a beacon packet we need to reset some values for the
@@ -164,7 +165,7 @@ void etx_beacon(void)
      * Please delete this information once it's fixed
      * See: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
      */
-    ieee_802154_long_t empty_addr = { 0 };
+    ieee_802154_long_t empty_addr = { {0} };
 
     while (true) {
         thread_sleep();
@@ -183,7 +184,7 @@ void etx_beacon(void)
         }
 
         packet->length = p_length;
-        send_ieee802154_frame(&empty_addr, &etx_send_buf[0],
+        sixlowpan_mac_send_ieee802154_frame(&empty_addr, &etx_send_buf[0],
                               ETX_DATA_MAXLEN + ETX_PKT_HDR_LEN, 1);
         DEBUG("sent beacon!\n");
         etx_set_packets_received();
@@ -391,7 +392,7 @@ void etx_radio(void)
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t *) m.content.ptr;
 
-            read_802154_frame(p->data, &frame, p->length);
+            ieee802154_frame_read(p->data, &frame, p->length);
 
             if (frame.payload[0] == ETX_PKT_OPTVAL) {
                 //copy to receive buffer

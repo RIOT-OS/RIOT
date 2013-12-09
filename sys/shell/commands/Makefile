@@ -1,4 +1,4 @@
-SRC = shell_commands.c sc_id.c
+SRC = shell_commands.c sc_id.c sc_heap.c
 INCLUDES = -I../../../core/include -I../../include -I../../../drivers/include/
 
 ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
@@ -6,7 +6,7 @@ ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
 	SRC += sc_cc110x_ng.c
 endif
 ifneq (,$(findstring cc2420,$(USEMODULE)))
-	INCLUDES += -I$(RIOTBASE)/drivers/cc2420/include/ -I$(RIOTBASE)/sys/net/
+	INCLUDES += -I$(RIOTBASE)/drivers/cc2420/include/ -I$(RIOTBASE)/sys/net/include
 	SRC += sc_cc2420.c
 endif
 ifneq (,$(findstring cc110x,$(USEMODULE)))
@@ -38,18 +38,5 @@ DEP = $(SRC:%.c=$(BINDIR)%.d)
 
 MODULE =shell_commands
 
-$(BINDIR)$(MODULE).a: $(OBJ)
-	$(AR) rc $(BINDIR)$(MODULE).a $(OBJ)
+include $(RIOTBASE)/Makefile.base
 
-# pull in dependency info for *existing* .o files
--include $(OBJ:.o=.d)
-
-# compile and generate dependency info
-$(BINDIR)%.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$*.o
-	$(CC) $(CFLAGS) $(INCLUDES) -MM $*.c > $(BINDIR)$*.d
-	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
-
-# remove compilation products
-clean::
-	rm -f $(BINDIR)$(MODULE).a $(OBJ) $(DEP) $(ASMOBJ)

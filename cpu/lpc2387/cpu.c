@@ -6,8 +6,8 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 -------------------------------------------------------------------------------
 This file is part of RIOT.
 
-This file subject to the terms and conditions of the GNU Lesser General Public
-License. See the file LICENSE in the top level directory for more details.
+This file is subject to the terms and conditions of the LGPLv2.
+See the file LICENSE in the top level directory for more details.
 *******************************************************************************/
 
 /**
@@ -70,7 +70,7 @@ void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale)
 ******************************************************************************/
 #define VIC_BASE_ADDR   0xFFFFF000
 
-bool install_irq(int IntNumber, void *HandlerAddr, int Priority)
+bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority)
 {
     int *vect_addr;
     int *vect_cntl;

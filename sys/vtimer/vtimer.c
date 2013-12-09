@@ -1,3 +1,21 @@
+/**
+ * virtual timer
+ *
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup vtimer
+ * @{
+ * @file
+ * @author Kaspar Schleiser <kaspar.schleiser@fu-berlin.de> (author)
+ * @author Oliver Hahm <oliver.hahm@inria.fr> (modifications)
+ * @author Ludwig Ortmann <ludwig.ortmann@fu-berlin.de> (cleaning up the mess)
+ * @}
+ */
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,6 +71,10 @@ static int set_longterm(vtimer_t *timer)
 
 static int update_shortterm(void)
 {
+    if (shortterm_queue_root.next == NULL) {
+        DEBUG("update_shortterm: shortterm_queue_root.next == NULL - dont know what to do here\n");
+        return 0;
+    }
     if (hwtimer_id != -1) {
         if (hwtimer_next_absolute != shortterm_queue_root.next->priority) {
             hwtimer_remove(hwtimer_id);
@@ -64,10 +86,16 @@ static int update_shortterm(void)
 
     hwtimer_next_absolute = shortterm_queue_root.next->priority;
 
-    uint32_t next = hwtimer_next_absolute + longterm_tick_start;
+    uint32_t next = hwtimer_next_absolute;
     uint32_t now = HWTIMER_TICKS_TO_US(hwtimer_now());
 
+    /* make sure the longterm_tick_timer does not get truncated */
+    if (((vtimer_t*)shortterm_queue_root.next)->action != vtimer_tick) {
+        next += longterm_tick_start;
+    }
+
     if((next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now) > MICROSECONDS_PER_TICK ) {
+        DEBUG("truncating next (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now): %i\n", (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now));
         next = now +  HWTIMER_TICKS_TO_US(VTIMER_BACKOFF);
     }
     
@@ -80,11 +108,11 @@ static int update_shortterm(void)
 void vtimer_tick(void *ptr)
 {
     (void) ptr;
-    DEBUG("vtimer_tick().");
+    DEBUG("vtimer_tick().\n");
     seconds += SECONDS_PER_TICK;
 
     longterm_tick_start = longterm_tick_timer.absolute.microseconds;
-    longterm_tick_timer.absolute.microseconds = longterm_tick_timer.absolute.microseconds + MICROSECONDS_PER_TICK;
+    longterm_tick_timer.absolute.microseconds += MICROSECONDS_PER_TICK;
     set_shortterm(&longterm_tick_timer);
 
     while (longterm_queue_root.next) {
@@ -98,8 +126,6 @@ void vtimer_tick(void *ptr)
             break;
         }
     }
-
-    update_shortterm();
 }
 
 static int set_shortterm(vtimer_t *timer)
@@ -125,17 +151,20 @@ void vtimer_callback(void *ptr)
     DEBUG("vtimer_callback(): Shooting %" PRIu32 ".\n", timer->absolute.microseconds);
 
     /* shoot timer */
-    if (timer->action == (void *) msg_send_int) {
+    if (timer->action == (void (*)(void *)) msg_send_int) {
         msg_t msg;
         msg.type = MSG_TIMER;
         msg.content.value = (unsigned int) timer->arg;
         msg_send_int(&msg, timer->pid);
     }
-    else if (timer->action == (void*) thread_wakeup){
+    else if (timer->action == (void (*)(void *)) thread_wakeup){
         timer->action(timer->arg);
     }
+    else if (timer->action == vtimer_tick) {
+        vtimer_tick(NULL);
+    }
     else {
-        DEBUG("Timer was poisoned.");
+        DEBUG("Timer was poisoned.\n");
     }
 
     in_callback = false;
@@ -243,7 +272,7 @@ int vtimer_init()
 int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid)
 {
     int ret;
-    t->action = (void *) thread_wakeup;
+    t->action = (void(*)(void *)) thread_wakeup;
     t->arg = (void *) pid;
     t->absolute = interval;
     t->pid = 0;
@@ -282,13 +311,15 @@ int vtimer_remove(vtimer_t *t)
 
 int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr)
 {
-    t->action = (void *) msg_send_int;
+    t->action = (void(*)(void *)) msg_send_int;
     t->arg = ptr;
     t->absolute = interval;
     t->pid = pid;
     vtimer_set(t);
     return 0;
 }
+
+#if ENABLE_DEBUG
 
 void vtimer_print_short_queue(){
     queue_print(&shortterm_queue_root);
@@ -302,10 +333,12 @@ void vtimer_print(vtimer_t *t)
 {
     printf("Seconds: %"PRIu32" - Microseconds: %"PRIu32"\n \
             action: %p\n \
-            action: %p\n \
+            arg: %p\n \
             pid: %u\n",
            t->absolute.seconds, t->absolute.microseconds,
            t->action,
            t->arg,
            t->pid);
 }
+
+#endif

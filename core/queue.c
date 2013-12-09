@@ -3,14 +3,14 @@
  *
  * Copyright (C) 2013 Freie Universität Berlin
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
  * @ingroup kernel
  * @{
  * @file
- * @author Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @}
  */
 
@@ -96,7 +96,7 @@ void queue_priority_add_generic(queue_node_t *root, queue_node_t *new_obj, int (
     new_obj->next = NULL;
 }
 
-
+#if ENABLE_DEBUG
 void queue_print(queue_node_t *node)
 {
     printf("queue:\n");
@@ -111,6 +111,7 @@ void queue_print_node(queue_node_t *node)
 {
     printf("Data: %u Priority: %"PRIu32" Next: %u\n", (unsigned int)node->data, node->priority, (unsigned int)node->next);
 }
+#endif
 
 /*
 int main() {

@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -82,7 +82,7 @@ typedef struct __attribute__((packed)) {
 
 #define BORDER_BUFFER_SIZE (sizeof(border_l3_header_t) + IPV6_MTU)
 
-void demultiplex(border_packet_t *packet, int len);
+void demultiplex(border_packet_t *packet);
 void multiplex_send_ipv6_over_uart(ipv6_hdr_t *packet);
 void multiplex_send_addr_over_uart(ipv6_addr_t *addr);
 

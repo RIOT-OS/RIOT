@@ -8,8 +8,8 @@
 
 #ifndef ETX_BEACONING_H_
 #define ETX_BEACONING_H_
-
-#include "ipv6.h"
+#include <stdint.h>
+#include "sixlowpan.h"
 
 //For debugging purposes
 #define ENABLE_DEBUG (0)

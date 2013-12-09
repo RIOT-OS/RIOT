@@ -4,14 +4,14 @@
  * Copyright (C) 2008, 2009  Heiko Will <hwill@inf.fu-berlin.de>
  * Copyright (C) 2009  Kaspar Schleiser <kaspar@schleiser.de>
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
  * @ingroup arch
  * @{
  * @file
- * @author Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @author Heiko Will <heiko.will@fu-berlin.de>
  * @}
  */
@@ -89,17 +89,3 @@ void thread_print_stack(void)
 
     printf("STACK (%u)= %X \n", i, *s);
 }
-
-/* LPC specific */
-#ifdef WDTC
-__attribute__((naked,noreturn)) void arm_reset(void)
-{
-    dINT();
-    WDTC   = 0x00FFF;
-    WDMOD  = 0x03;
-    WDFEED = 0xAA;
-    WDFEED = 0x55;
-
-    while (1);
-}
-#endif

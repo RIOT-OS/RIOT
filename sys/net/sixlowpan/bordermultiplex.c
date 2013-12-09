@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2013  INRIA.
  *
- * This file subject to the terms and conditions of the GNU Lesser General
+ * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
@@ -34,7 +34,7 @@
 #define END_ESC     (0xDC)
 #define ESC_ESC     (0xDD)
 
-void demultiplex(border_packet_t *packet, int len)
+void demultiplex(border_packet_t *packet)
 {
     switch (packet->type) {
         case (BORDER_PACKET_RAW_TYPE): {

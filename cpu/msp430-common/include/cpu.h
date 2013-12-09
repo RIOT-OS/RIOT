@@ -6,8 +6,8 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 -------------------------------------------------------------------------------
 This file is part of RIOT.
 
-This file subject to the terms and conditions of the GNU Lesser General Public
-License. See the file LICENSE in the top level directory for more details.
+This file is subject to the terms and conditions of the LGPLv2.
+See the file LICENSE in the top level directory for more details.
 *******************************************************************************/
 
 #ifndef _CPU_H
@@ -26,12 +26,14 @@ License. See the file LICENSE in the top level directory for more details.
 #include <sched.h>
 #include <stdio.h>
 #include <legacymsp430.h>
+#include <msp430_types.h>
 #include <cpu-conf.h>
 
 #define WORDSIZE 16
 
-/* not used(?) */
-#define F_CPU 10000000
+/* CPU speed */
+#define F_CPU               (2457600ul)
+#define F_RC_OSCILLATOR		(32768)	///< Frequency of internal RC oscillator
 
 extern volatile int __inISR;
 extern char __isr_stack[MSP430_ISR_STACK_SIZE];
