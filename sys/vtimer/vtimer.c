@@ -319,6 +319,23 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr)
     return 0;
 }
 
+int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout) {
+    msg_t timeout_message;
+    timeout_message.type = MSG_TIMER;
+    timeout_message.content.ptr = (char *) &timeout_message;
+
+    vtimer_t t;
+    vtimer_set_msg(&t, timeout, thread_pid, &timeout_message);
+    msg_receive(m);
+    if (m->type == MSG_TIMER && m->content.ptr == (char *) &timeout_message) {
+        /* we hit the timeout */
+        return -1;
+    } else {
+        vtimer_remove(&t);
+        return 1;
+    }
+}
+
 #if ENABLE_DEBUG
 
 void vtimer_print_short_queue(){
