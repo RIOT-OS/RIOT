@@ -25,7 +25,6 @@ See the file LICENSE in the top level directory for more details.
 #include <cpu.h>
 #include <irq.h>
 #include <hwtimer.h>
-#include <cc430f6137.h>
 
 /** min and max portnumber to generate interrupts */
 #define PORTINT_MIN     (1)

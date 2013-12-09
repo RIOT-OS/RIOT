@@ -22,7 +22,6 @@ See the file LICENSE in the top level directory for more details.
 #include <legacymsp430.h>
 #include <irq.h>
 #include <cpu.h>
-#include <cc430f6137.h>
 #include <cc430-rtc.h>
 
 //static volatile time_t epoch;
