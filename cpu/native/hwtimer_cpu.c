@@ -89,45 +89,39 @@ unsigned long ts2ticks(struct timespec *tp)
  */
 void schedule_timer(void)
 {
-    int l = next_timer;
+    next_timer = -1;
 
-    for (
-        int i = ((next_timer + 1) % ARCH_MAXTIMERS);
-        i != next_timer;
-        i = ((i + 1) % ARCH_MAXTIMERS)
-    ) {
-
-        if (native_hwtimer_isset[l] != 1) {
-            /* make sure we dont compare to garbage in the following
-             * if condition */
-            l = i;
+    /* try to find *an active* timer */
+    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
+        if (native_hwtimer_isset[i] == 1) {
+            next_timer = i;
+            break;
         }
+    }
 
+    if (next_timer == -1) {
+        DEBUG("schedule_timer(): no valid timer found - nothing to schedule");
+        // TODO: unset  timer.
+        return;
+    }
+
+    /* find the next pending timer (next_timer now points to *a* valid pending timer) */
+    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
         if (
             (native_hwtimer_isset[i] == 1) &&
-            (tv2ticks(&(native_hwtimer[i].it_value)) < tv2ticks(&(native_hwtimer[l].it_value)))
+            (tv2ticks(&(native_hwtimer[i].it_value)) < tv2ticks(&(native_hwtimer[next_timer].it_value)))
         ) {
-            /* set l to the lowest active time */
-            l = i;
+            /* timer in slot i is active and the timeout is more recent than next_timer */
+            next_timer = i;
         }
-
     }
 
-    next_timer = l;
-
-    /* l could still point to some unused (garbage) timer if no timers
-     * are set at all */
-    if (native_hwtimer_isset[next_timer] == 1) {
-        if (setitimer(ITIMER_REAL, &native_hwtimer[next_timer], NULL) == -1) {
-            err(EXIT_FAILURE, "schedule_timer");
-        }
-        else {
-            DEBUG("schedule_timer(): set next timer.\n");
-        }
+    /* next pending timer is in slot next_timer */
+    if (setitimer(ITIMER_REAL, &native_hwtimer[next_timer], NULL) == -1) {
+        err(EXIT_FAILURE, "schedule_timer");
     }
     else {
-        DEBUG("schedule_timer(): no next timer!? This looks suspicous.\n");
-        // TODO: unset  timer.
+        DEBUG("schedule_timer(): set next timer.\n");
     }
 }
 
@@ -138,21 +132,22 @@ void schedule_timer(void)
  */
 void hwtimer_isr_timer()
 {
-    int i;
-
     DEBUG("hwtimer_isr_timer()\n");
 
-    i = next_timer;
-    native_hwtimer_isset[next_timer] = 0;
-    schedule_timer();
+    if (next_timer == -1) {
+        DEBUG("hwtimer_isr_timer(): next_timer in invalid\n");
+        return;
+    }
 
-    if (native_hwtimer_irq[i] == 1) {
-        DEBUG("hwtimer_isr_timer(): calling hwtimer.int_handler(%i)\n", i);
-        int_handler(i);
+    if (native_hwtimer_irq[next_timer] == 1) {
+        DEBUG("hwtimer_isr_timer(): calling hwtimer.int_handler(%i)\n", next_timer);
+        int_handler(next_timer);
+        native_hwtimer_isset[next_timer] = 0;
     }
     else {
         DEBUG("hwtimer_isr_timer(): this should not have happened");
     }
+    schedule_timer();
 }
 
 void hwtimer_arch_enable_interrupt(void)
