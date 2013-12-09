@@ -24,11 +24,15 @@ See the file LICENSE in the top level directory for more details.
  * @{
  */
 
-#include <sched.h>
 #include <stdio.h>
 #include <legacymsp430.h>
-#include <msp430_types.h>
-#include <cpu-conf.h>
+
+#include "board.h"
+#include <msp430.h>
+
+#include "sched.h"
+#include "msp430_types.h"
+#include "cpu-conf.h"
 
 #define WORDSIZE 16
 

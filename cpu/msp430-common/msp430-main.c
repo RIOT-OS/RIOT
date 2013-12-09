@@ -34,12 +34,6 @@
  */
 
 #include "cpu.h"
-#ifdef CC430
-#include <cc430f6137.h>
-#else
-#include <msp430x16x.h>
-#endif
-
 
 /*---------------------------------------------------------------------------*/
 static void

@@ -9,11 +9,7 @@ This file is part of RIOT.
 This file is subject to the terms and conditions of the LGPLv2.
 See the file LICENSE in the top level directory for more details.
 *******************************************************************************/
-#ifdef CC430
-#include <cc430f6137.h>
-#else
-#include <msp430x16x.h>
-#endif
+
 #include "cpu.h"
 #include "kernel.h"
 #include "kernel_internal.h"
