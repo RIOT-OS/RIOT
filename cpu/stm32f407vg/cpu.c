@@ -1,9 +1,17 @@
-/*
- * cpu.c
+/**
+ * riot cpu specific port of kernel functions
  *
- *  Created on: 07.09.2012
- *      Author: pfeiffer
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @file
+ * @author      Stefan Pfeiffer <pfeiffer@inf.fu-berlin.de>
+ *
  */
+
 
 #include <stdint.h>
 #include "stm32f4xx_tim.h"

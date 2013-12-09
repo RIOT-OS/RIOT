@@ -1,9 +1,18 @@
-/*
- * stm32f415rg-lpm.c
+/**
+ * cpu specific low power mode implementation
  *
- *  Created on: 09.08.2012
- *      Author: pfeiffer
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @file
+ * @author		Marco Ziegert <ziegert@inf.fu-berlin.de>
+ * @author      Stefan Pfeiffer <pfeiffer@inf.fu-berlin.de>
+ *
  */
+
 #include <stdio.h>
 #include <stdint.h>
 #include "lpm.h"

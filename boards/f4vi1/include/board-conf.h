@@ -1,49 +1,19 @@
-/******************************************************************************
-Copyright 2008, Freie Universitaet Berlin (FUB). All rights reserved.
-
-These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
--------------------------------------------------------------------------------
-This file is part of FeuerWare.
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-FeuerWare is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see http://www.gnu.org/licenses/ .
---------------------------------------------------------------------------------
-For further information and questions please use the web site
-	http://scatterweb.mi.fu-berlin.de
-and the mailinglist (subscription via web site)
-	scatterweb@lists.spline.inf.fu-berlin.de
-*******************************************************************************/
+/**
+ * board configuration header
+ *
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @file
+ * @author      Stefan Pfeiffer <pfeiffer@inf.fu-berlin.de>
+ *
+ */
 
 #ifndef BOARDCONF_H_
 #define BOARDCONF_H_
-
-/**
- * @ingroup		conf
- * @ingroup		f4vi1
- *
- * @{
- */
-
-/**
- * @file
- * @brief		board configuration
- *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
- * @author		pfeiffer
- * @version     $Revision: 1127 $
- *
- * @note		$Id: board-conf.h 1127 2009-05-13 08:48:29Z baar $
- */
 
 #define FEUERWARE_CONF_BOARD_NAME				"F4VI1 BOARD"
 

@@ -1,11 +1,15 @@
-/*
- * stm32f4xx_timer_0_1.h
+/**
  *
- *  Created on: 15.01.2009
- *      Author: heiko, kaspar
  *
- *      Changelog:
- *                  26.01.09 kaspar: renamed file, misc changes for firekernel
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @file
+ * @author      Stefan Pfeiffer <pfeiffer@inf.fu-berlin.de>
+ *
  */
 
 #ifndef HWTIMER_CPU_H_
