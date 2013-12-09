@@ -1,0 +1,27 @@
+## the cpu to build for
+export CPU = lpc2387
+
+# toolchain config
+export PREFIX = @arm-none-eabi-
+#export PREFIX = @arm-elf-
+export CC = @$(PREFIX)gcc
+export AR = @$(PREFIX)ar
+export CFLAGS += -std=gnu99 -O2 -Wall -Wstrict-prototypes -mcpu=arm7tdmi-s -gdwarf-2
+export ASFLAGS = -gdwarf-2 -mcpu=arm7tdmi-s
+export AS = $(PREFIX)as
+export LINK = $(PREFIX)gcc
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+FLASHER = lpc2k_pgm
+TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
+LINKFLAGS = -gdwarf-2 -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T$(RIOTBASE)/cpu/$(CPU)/linkerscript.x
+
+ifeq ($(strip $(PORT)),)
+	export PORT = /dev/ttyUSB0
+endif
+export HEXFILE = bin/$(PROJECT).hex
+export FFLAGS = $(PORT) $(PROJBINDIR)/$(PROJECT).hex
+include $(RIOTBOARD)/msba2-common/Makefile.dep
+
+export INCLUDES += -I$(RIOTCPU)/lpc2387/include
+export OFLAGS = -O ihex

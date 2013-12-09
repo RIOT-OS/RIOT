@@ -1,0 +1,23 @@
+export INCLUDES += -I$(RIOTBOARD)/native/include
+export CPU = native
+
+# toolchain config
+export PREFIX = 
+#export CC = @$(PREFIX)gcc
+export AR = @$(PREFIX)ar
+export CFLAGS += -std=gnu99 -Wall -m32
+export ASFLAGS =
+export AS = $(PREFIX)as
+export LINK = $(PREFIX)gcc
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+FLASHER = lpc2k_pgm
+TERM = pyterm.py
+
+LINKFLAGS += -m32 -gc
+
+ifeq ($(strip $(PORT)),)
+	export PORT = /dev/ttyUSB0
+endif
+
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
