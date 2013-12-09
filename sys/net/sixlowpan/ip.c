@@ -35,6 +35,9 @@
 #include "net_help.h"
 
 #define ENABLE_DEBUG    (0)
+#if ENABLE_DEBUG
+char addr_str[IPV6_MAX_ADDR_STR_LEN];
+#endif
 #include "debug.h"
 
 #define IP_PKT_RECV_BUF_SIZE        (64)
@@ -311,12 +314,11 @@ void ipv6_process(void)
 
             switch (*nextheader) {
                 case (IPV6_PROTO_NUM_ICMPV6): {
+                    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
                     /* checksum test*/
-                    if (icmpv6_csum(IPV6_PROTO_NUM_ICMPV6) != 0xffff) {
+                    if (ipv6_csum(ipv6_buf, (uint8_t*) icmp_buf, ipv6_buf->length, IPV6_PROTO_NUM_ICMPV6) != 0xffff) {
                         printf("ERROR: wrong checksum\n");
                     }
-
-                    icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
                     icmpv6_demultiplex(icmp_buf);
                     break;
                 }
@@ -705,4 +707,17 @@ void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t* dest)
 void ipv6_register_rpl_handler(int pid)
 {
     rpl_process_pid = pid;
+}
+
+uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t proto)
+{
+    uint16_t sum = 0;
+    DEBUG("Calculate checksum over src: %s, dst: %s, len: %04X, buf: %p, proto: %u\n",
+            ipv6_addr_to_str(addr_str, &ipv6_header->srcaddr),
+            ipv6_addr_to_str(addr_str, &ipv6_header->destaddr),
+            len, buf, proto);
+    sum = len + proto;
+    sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
+    sum = csum(sum, buf, len);
+    return (sum == 0) ? 0xffff : HTONS(sum);
 }

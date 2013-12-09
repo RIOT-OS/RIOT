@@ -1314,7 +1314,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
             case (0x03): {
                 /* 0-bits */
                 memcpy(&(ipv6_buf->srcaddr.uint8[0]), &ll_prefix[0], 2);
-                memset(&(ipv6_buf->srcaddr.uint8[8]), 0, 14);
+                memset(&(ipv6_buf->srcaddr.uint8[2]), 0, 20);
                 memcpy(&(ipv6_buf->srcaddr.uint8[8]), &s_laddr->uint8[0], 8);
                 break;
             }
