@@ -6,15 +6,15 @@ export ARCH = stm32f4discovery_base.a
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
 INCLUDES += -I$(RIOTBOARD)/stm32f4discovery/include/
-INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.1.0/Libraries/CMSIS/Include/
-INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.1.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include/
-INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.1.0/Libraries/STM32F4xx_StdPeriph_Driver/inc/
+INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/CMSIS/Include/
+INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include/
+INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/STM32F4xx_StdPeriph_Driver/inc/
 
 
-all: $(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.1.0 $(BINDIR)$(ARCH)
+all: $(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0 $(BINDIR)$(ARCH)
 	#$(MAKE) -C drivers
 	
-$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.1.0:
+$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0:
 	$(MAKE) -C $(RIOTBASE)/cpu/stm32_common
 
 $(BINDIR)$(ARCH): $(OBJ)

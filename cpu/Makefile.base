@@ -21,14 +21,14 @@ endif
 ifeq ($(CPU),stm32f407vg)
  INCLUDES += -include $(RIOTBOARD)/$(BOARD)/include/board-conf.h
  INCLUDES += -I$(MAKEBASE)/cpu/stm32f407vg/include
- INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.1.0/Libraries/CMSIS/Include/
- INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.1.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include/
- INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.1.0/Libraries/STM32F4xx_StdPeriph_Driver/inc/
+ INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/CMSIS/Include/
+ INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include/
+ INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/STM32F4xx_StdPeriph_Driver/inc/
 endif
 ifeq ($(CPU),stm32f415rg)
  INCLUDES += -include $(RIOTBOARD)/$(BOARD)/include/board-conf.h
  INCLUDES += -I$(MAKEBASE)/cpu/stm32f415rg/include
- INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.1.0/Libraries/CMSIS/Include/
- INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.1.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include/
- INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.1.0/Libraries/STM32F4xx_StdPeriph_Driver/inc/
+ INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/CMSIS/Include/
+ INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/CMSIS/Device/ST/STM32F4xx/Include/
+ INCLUDES += -I$(RIOTBASE)/cpu/stm32_common/STM32F4xx_DSP_StdPeriph_Lib_V1.3.0/Libraries/STM32F4xx_StdPeriph_Driver/inc/
 endif
