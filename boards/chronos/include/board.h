@@ -22,7 +22,11 @@
 #define _MSB_BOARD_H
 
 #include <stdint.h>
-#include <cc430f6137.h>
+
+// for correct inclusion of <msp430.h>
+#ifndef __CC430F6137__
+#define __CC430F6137__
+#endif
 
 #define MSP430_INITIAL_CPU_SPEED    7372800uL
 #define MSP430_HAS_DCOR             1

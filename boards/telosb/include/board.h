@@ -25,6 +25,11 @@
 #ifndef _TELOSB_BOARD_H
 #define _TELOSB_BOARD_H
 
+// for correct inclusion of <msp430.h>
+#ifndef __MSP430F1611__
+#define __MSP430F1611__
+#endif
+
 //MSB430 core
 #define MSP430_INITIAL_CPU_SPEED    8000000uL
 #define MSP430_HAS_DCOR             0
@@ -50,7 +55,6 @@
 #define LED_BLUE_TOGGLE     LEDS_PxOUT ^= LEDS_CONF_BLUE
 
 #include <stdint.h>
-#include <msp430x16x.h>
 
 typedef uint8_t radio_packet_length_t;
 
