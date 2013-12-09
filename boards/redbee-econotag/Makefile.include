@@ -27,3 +27,5 @@ endif
 export HEXFILE = bin/$(PROJECT).hex
 export FFLAGS = -t $(PORT) -f $(HEXFILE) -c 'bbmc -l redbee-econotag reset'
 export OFLAGS = -O binary --gap-fill=0xff
+
+export INCLUDES += -I $(RIOTCPU)/$(CPU)/include/
