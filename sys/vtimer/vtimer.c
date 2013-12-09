@@ -37,8 +37,8 @@
 #define VTIMER_THRESHOLD 20UL
 #define VTIMER_BACKOFF 10UL
 
-#define SECONDS_PER_TICK (4096U)
-#define MICROSECONDS_PER_TICK (4096UL * 1000000)
+#define SECONDS_PER_TICK (4096UL)
+#define MICROSECONDS_PER_TICK (4096UL * 1000000UL)
 
 void vtimer_callback(void *ptr);
 void vtimer_tick(void *ptr);
@@ -95,7 +95,7 @@ static int update_shortterm(void)
     }
 
     if((next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now) > MICROSECONDS_PER_TICK ) {
-        DEBUG("truncating next (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now): %i\n", (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now));
+        DEBUG("truncating next (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now): %lu\n", (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now));
         next = now +  HWTIMER_TICKS_TO_US(VTIMER_BACKOFF);
     }
     
