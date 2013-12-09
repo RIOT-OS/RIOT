@@ -364,6 +364,20 @@ void ipv6_iface_print_addrs(void);
 void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t* dest));
 
 /**
+ * @brief Calculates the IPv6 upper-layer checksum.
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc2460#section-8.1">
+ *          RFC 2460, section 8.1
+ *      </a>
+ * @param[in] ipv6_header   Pointer to the IPv6 header of the packet.
+ * @param[in] buf           Pointer to the upper-layer payload of the IP datagram.
+ * @param[in] len           The length of the upper-layer header and data.
+ * @param[in] proto         Upper-layer protocol number according to RFC1700.
+ *
+ * @return The IPv6 upper-layer checksum.
+ */
+uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t proto);
+/**
  * @}
  */
 #endif /* SIXLOWPAN_IP_H */

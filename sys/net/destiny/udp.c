@@ -56,7 +56,7 @@ void udp_packet_handler(void)
         ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
         udp_header = ((udp_hdr_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
 
-        chksum = udp_csum(ipv6_header, udp_header);
+        chksum = ipv6_csum(ipv6_header, (uint8_t*) udp_header, NTOHS(udp_header->length), IPPROTO_UDP);
 
         if (chksum == 0xffff) {
             udp_socket = get_udp_socket(udp_header);

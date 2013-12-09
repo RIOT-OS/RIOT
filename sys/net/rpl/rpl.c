@@ -29,6 +29,7 @@
 #include "trickle.h"
 
 #include "sixlowpan.h"
+#include "net_help.h"
 
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
@@ -270,6 +271,7 @@ void rpl_init_root(void)
 
 void send_DIO(ipv6_addr_t *destination)
 {
+    DEBUG("Send DIO\n");
     mutex_lock(&rpl_send_mutex);
     rpl_dodag_t *mydodag;
     icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
@@ -284,7 +286,6 @@ void send_DIO(ipv6_addr_t *destination)
 
     icmp_send_buf->type = ICMPV6_TYPE_RPL_CONTROL;
     icmp_send_buf->code = ICMP_CODE_DIO;
-    icmp_send_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 
     rpl_send_dio_buf = get_rpl_send_dio_buf();
     memset(rpl_send_dio_buf, 0, sizeof(*rpl_send_dio_buf));
@@ -317,9 +318,7 @@ void send_DIO(ipv6_addr_t *destination)
     rpl_send_opt_dodag_conf_buf->default_lifetime = mydodag->default_lifetime;
     rpl_send_opt_dodag_conf_buf->lifetime_unit = mydodag->lifetime_unit;
 
-
     opt_hdr_len += RPL_OPT_LEN + RPL_OPT_DODAG_CONF_LEN;
-
 
     uint16_t plen = ICMPV6_HDR_LEN + DIO_BASE_LEN + opt_hdr_len;
     rpl_send(destination, (uint8_t *)icmp_send_buf, plen, IPV6_PROTO_NUM_ICMPV6);
@@ -328,12 +327,12 @@ void send_DIO(ipv6_addr_t *destination)
 
 void send_DIS(ipv6_addr_t *destination)
 {
+    DEBUG("Send DIS\n");
     mutex_lock(&rpl_send_mutex);
     icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
 
     icmp_send_buf->type = ICMPV6_TYPE_RPL_CONTROL;
     icmp_send_buf->code = ICMP_CODE_DIS;
-    icmp_send_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 
     rpl_send_dis_buf = get_rpl_send_dis_buf();
 
@@ -345,6 +344,7 @@ void send_DIS(ipv6_addr_t *destination)
 
 void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index)
 {
+    DEBUG("Send DAO\n");
     if (i_am_root) {
         return;
     }
@@ -375,7 +375,6 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
 
     icmp_send_buf->type = ICMPV6_TYPE_RPL_CONTROL;
     icmp_send_buf->code = ICMP_CODE_DAO;
-    icmp_send_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 
     rpl_send_dao_buf = get_rpl_send_dao_buf();
     memset(rpl_send_dao_buf, 0, sizeof(*rpl_send_dao_buf));
@@ -444,6 +443,7 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
 
 void send_DAO_ACK(ipv6_addr_t *destination)
 {
+    DEBUG("Send DAO ACK\n");
     rpl_dodag_t *my_dodag;
     my_dodag = rpl_get_my_dodag();
 
@@ -456,7 +456,6 @@ void send_DAO_ACK(ipv6_addr_t *destination)
 
     icmp_send_buf->type = ICMPV6_TYPE_RPL_CONTROL;
     icmp_send_buf->code = ICMP_CODE_DAO_ACK;
-    icmp_send_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 
     rpl_send_dao_ack_buf = get_rpl_send_dao_ack_buf();
     rpl_send_dao_ack_buf->rpl_instanceid = my_dodag->instance->id;
@@ -922,6 +921,10 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
 
     memcpy(&(ipv6_send_buf->destaddr), destination, 16);
     ipv6_iface_get_best_src_addr(&(ipv6_send_buf->srcaddr), &(ipv6_send_buf->destaddr));
+
+    icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
+    icmp_send_buf->checksum = 0;
+    icmp_send_buf->checksum = ~ipv6_csum(ipv6_send_buf, (uint8_t*) icmp_send_buf, ipv6_send_buf->length, IPV6_PROTO_NUM_ICMPV6);
 
     /* The packet was "assembled" in rpl.c. Therefore rpl_send_buf was used.
      * Therefore memcpy is not needed because the payload is at the
