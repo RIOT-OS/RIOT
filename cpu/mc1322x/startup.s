@@ -33,7 +33,7 @@
  *
  */
 
-	
+  
 /*
 The following lincence is for all parts of this code done by 
 Martin Thomas. Code from others used here may have other license terms.
@@ -57,56 +57,63 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-	
+
+/*
+ * startup.s - mc1322x specific startup code
+ * Copyright (C) 2013 Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ *
+ * This source code is licensed under the GNU Lesser General Public License,
+ * Version 2.  See the file LICENSE for more details.
+ *
+ * This file is part of RIOT.
+ */
+    
 /* Standard definitions of Mode bits and Interrupt (I & F) flags in PSRs (program status registers) */
-.set  MODE_USR, 0x10            		/* Normal User Mode 										*/
-.set  MODE_FIQ, 0x11            		/* FIQ Processing Fast Interrupts Mode 						*/
-.set  MODE_IRQ, 0x12            		/* IRQ Processing Standard Interrupts Mode 					*/
-.set  MODE_SVC, 0x13            		/* Supervisor Processing Software Interrupts Mode 			*/
-.set  MODE_ABT, 0x17            		/* Abort Processing memory Faults Mode 						*/
-.set  MODE_UND, 0x1B            		/* Undefined Processing Undefined Instructions Mode 		*/
-.set  MODE_SYS, 0x1F            		/* System Running Priviledged Operating System Tasks  Mode	*/
+.set  USR_MODE, 0x10                    /* Normal User Mode                                         */
+.set  FIQ_MODE, 0x11                    /* FIQ Processing Fast Interrupts Mode                      */
+.set  IRQ_MODE, 0x12                    /* IRQ Processing Standard Interrupts Mode                  */
+.set  SVC_MODE, 0x13                    /* Supervisor Processing Software Interrupts Mode           */
+.set  ABT_MODE, 0x17                    /* Abort Processing memory Faults Mode                      */
+.set  UND_MODE, 0x1B                    /* Undefined Processing Undefined Instructions Mode         */
+.set  SYS_MODE, 0x1F                    /* System Running Priviledged Operating System Tasks  Mode  */
 
-.set  I_BIT, 0x80               		/* when I bit is set, IRQ is disabled (program status registers) */
-.set  F_BIT, 0x40               		/* when F bit is set, FIQ is disabled (program status registers) */
+.set  IRQ_DISABLE, 0x80                     /* when I bit is set, IRQ is disabled (program status registers) */
+.set  FIQ_DISABLE, 0x40                     /* when F bit is set, FIQ is disabled (program status registers) */
 
 
-        .section .startup
-	
+       .section .startup
+    
        .set _rom_data_init, 0x108d0
        .global _startup
        .func _startup
 
 _startup:
         b     _begin                    /* reset - _start */
-        ldr     PC, Undef_Addr		/* Undefined Instruction */
-        ldr     PC, SWI_Addr		/* Software Interrupt */
-        ldr     PC, PAbt_Addr		/* Prefetch Abort */
-        ldr     PC, DAbt_Addr		/* Data Abort */
-        nop				/* Reserved Vector (holds Philips ISP checksum) */
-        
-        /* see page 71 of "Insiders Guide to the Philips ARM7-Based Microcontrollers" by Trevor Martin  */
-        /* ldr     PC, [PC,#-0x0120]  	/* Interrupt Request Interrupt (load from VIC) */
-        ldr     PC, IRQ_Addr    	/* Interrupt Request Interrupt (load from VIC) */
-        ldr     r0, =__fiq_handler	/* Fast Interrupt Request Interrupt */
+        ldr     PC, Undef_Addr      /* Undefined Instruction */
+        ldr     PC, SWI_Addr        /* Software Interrupt */
+        ldr     PC, PAbt_Addr       /* Prefetch Abort */
+        ldr     PC, DAbt_Addr       /* Data Abort */
+        ldr     PC, _not_used
+        ldr     PC, IRQ_Addr        /* Interrupt Request Interrupt (load from VIC) */
+        ldr     PC, _fiq
 
- /* these vectors are used for rom patching */	
+ /* these vectors are used for rom patching */  
 .org 0x20
 .code 16
 _RPTV_0_START:
- 	bx lr /* do nothing */
+    bx lr /* do nothing */
 
 .org 0x60
 _RPTV_1_START:
- 	bx lr /* do nothing */
+    bx lr /* do nothing */
 
 .org 0xa0
 _RPTV_2_START:
- 	bx lr /* do nothing */
+    bx lr /* do nothing */
 
 .org 0xe0
 _RPTV_3_START:
- 	bx lr /* do nothing */
+    bx lr /* do nothing */
 
 .org 0x120
 ROM_var_start: .word 0
@@ -114,40 +121,40 @@ ROM_var_start: .word 0
 ROM_var_end:   .word 0
 
 .code 32
-.align			
-_begin:	
-	/* FIQ mode stack */
-	msr	CPSR_c, #(MODE_FIQ | I_BIT | F_BIT)
-	ldr	sp, =__fiq_stack_top__	/* set the FIQ stack pointer */
+.align          
+_begin: 
+    /* FIQ mode stack */
+    msr CPSR_c, #(FIQ_MODE | IRQ_DISABLE | FIQ_DISABLE)
+    ldr sp, =__fiq_stack_top__  /* set the FIQ stack pointer */
 
-	/* IRQ mode stack */
-	msr	CPSR_c, #(MODE_IRQ | I_BIT | F_BIT)
-	ldr	sp, =__irq_stack_top__	/* set the IRQ stack pointer */
+    /* IRQ mode stack */
+    msr CPSR_c, #(IRQ_MODE | IRQ_DISABLE | FIQ_DISABLE)
+    ldr sp, =__irq_stack_top__  /* set the IRQ stack pointer */
 
-	/* Supervisor mode stack */
-	msr	CPSR_c, #(MODE_SVC | I_BIT | F_BIT)
-	ldr	sp, =__svc_stack_top__	/* set the SVC stack pointer */
+    /* Supervisor mode stack */
+    msr CPSR_c, #(SVC_MODE | IRQ_DISABLE | FIQ_DISABLE)
+    ldr sp, =__svc_stack_top__  /* set the SVC stack pointer */
 
-	/* Undefined mode stack */
-	msr	CPSR_c, #(MODE_UND | I_BIT | F_BIT)
-	ldr	sp, =__und_stack_top__	/* set the UND stack pointer */
+    /* Undefined mode stack */
+    msr CPSR_c, #(UND_MODE | IRQ_DISABLE | FIQ_DISABLE)
+    ldr sp, =__und_stack_top__  /* set the UND stack pointer */
 
-	/* Abort mode stack */
-	msr	CPSR_c, #(MODE_ABT | I_BIT | F_BIT)
-	ldr	sp, =__abt_stack_top__	/* set the ABT stack pointer */
+    /* Abort mode stack */
+    msr CPSR_c, #(ABT_MODE | IRQ_DISABLE | FIQ_DISABLE)
+    ldr sp, =__abt_stack_top__  /* set the ABT stack pointer */
 
-	/* System mode stack */
-	msr	CPSR_c, #(MODE_SYS | I_BIT | F_BIT)
-	ldr	sp, =__sys_stack_top__	/* set the SYS stack pointer */
+    /* System mode stack */
+    msr CPSR_c, #(SYS_MODE | IRQ_DISABLE | FIQ_DISABLE)
+    ldr sp, =__sys_stack_top__  /* set the SYS stack pointer */
 
-	/* call the rom_data_init function in ROM */
-	/* initializes ROM_var space defined by ROM_var_start and ROM_var_end */
-	/* this area is used by ROM functions (e.g. nvm_read) */
- 	ldr r12,=_rom_data_init
- 	mov lr,pc
- 	bx  r12
+    /* call the rom_data_init function in ROM */
+    /* initializes ROM_var space defined by ROM_var_start and ROM_var_end */
+    /* this area is used by ROM functions (e.g. nvm_read) */
+    ldr r12,=_rom_data_init
+    mov lr,pc
+    bx  r12
 
- 	msr	CPSR_c, #(MODE_SYS)
+    msr CPSR_c, #(SYS_MODE)
 
         /* Clear BSS */
 clear_bss:
@@ -160,17 +167,18 @@ clbss_l:
         cmp     r0, r1
         blt     clbss_l
 
-        b main
+        bl bootloader
+        b  kernel_init
 
 /* Exception vector handlers branching table */
-Undef_Addr:     .word   UNDEF_Routine		/* defined in main.c  */
-SWI_Addr:       .word   ctx_switch		/* defined in main.c  */
-PAbt_Addr:      .word   PABT_Routine		/* defined in main.c  */
-DAbt_Addr:      .word   DABT_Routine		/* defined in main.c  */
-IRQ_Addr:       .word   arm_irq_handler         /* defined in main.c  */
-__fiq_handler:  .word   __fiq                   /* FIQ */
-
-__fiq:  b     .                         /* FIQ */
+Undef_Addr:     .word   UNDEF_Routine       
+SWI_Addr:       .word   ctx_switch          
+PAbt_Addr:      .word   PABT_Routine        
+DAbt_Addr:      .word   DABT_Routine        
+_not_used:      .word   not_used
+IRQ_Addr:       .word   irq                 
+_fiq:           .word   fiq
+    .balignl    16, 0xdeadbeef
 
 /*
  * These are defined in the board-specific linker script.
@@ -179,6 +187,17 @@ __fiq:  b     .                         /* FIQ */
 _bss_start:
         .word __bss_start
 
-	.globl _bss_end
+    .globl _bss_end
 _bss_end:
         .word _end
+
+.align  5
+not_used:
+
+    .align  5
+/*irq:
+//
+//  .align  5*/
+fiq:
+
+    .align  5
