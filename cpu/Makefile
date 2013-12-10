@@ -45,4 +45,3 @@ clean:
 	@"$(MAKE)" -C native clean
 	@"$(MAKE)" -C stm32f407vg clean
 	@"$(MAKE)" -C stm32f415rg clean
-
