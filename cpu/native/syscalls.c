@@ -24,6 +24,7 @@
 #endif
 
 #include <err.h>
+#include <errno.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -162,4 +163,81 @@ int vprintf(const char *format, va_list argp)
     free(m);
 
     return r;
+}
+
+
+void vwarn(const char *fmt, va_list args)
+{
+    char *m, *e;
+
+    e = strerror(errno);
+
+    if ((m = make_message(fmt, args)) == NULL) {
+        write(STDERR_FILENO, "malloc\n", 7);
+        exit(EXIT_FAILURE);
+    }
+    write(STDERR_FILENO, _progname, strlen(_progname));
+    write(STDERR_FILENO, ": ", 2);
+    write(STDERR_FILENO, m, strlen(m));
+    write(STDERR_FILENO, ": ", 2);
+    write(STDERR_FILENO, e, strlen(e));
+    write(STDERR_FILENO, "\n", 1);
+    free(m);
+}
+
+void vwarnx(const char *fmt, va_list args)
+{
+    char *m;
+
+    if ((m = make_message(fmt, args)) == NULL) {
+        write(STDERR_FILENO, "malloc\n", 7);
+        exit(EXIT_FAILURE);
+    }
+    write(STDERR_FILENO, _progname, strlen(_progname));
+    write(STDERR_FILENO, ": ", 2);
+    write(STDERR_FILENO, m, strlen(m));
+    write(STDERR_FILENO, "\n", 1);
+    free(m);
+}
+
+void verr(int eval, const char *fmt, va_list args)
+{
+    vwarn(fmt, args);
+    exit(eval);
+}
+
+void verrx(int eval, const char *fmt, va_list args)
+{
+    vwarnx(fmt, args);
+    exit(eval);
+}
+
+void warn(const char *fmt, ...)
+{
+    va_list argp;
+    va_start(argp, fmt);
+    vwarn(fmt, argp);
+    va_end(argp);
+}
+
+void warnx(const char *fmt, ...)
+{
+    va_list argp;
+    va_start(argp, fmt);
+    vwarnx(fmt, argp);
+    va_end(argp);
+}
+
+void err(int eval, const char *fmt, ...)
+{
+    va_list argp;
+    va_start(argp, fmt);
+    verr(eval, fmt, argp);
+}
+
+void errx(int eval, const char *fmt, ...)
+{
+    va_list argp;
+    va_start(argp, fmt);
+    verrx(eval, fmt, argp);
 }
