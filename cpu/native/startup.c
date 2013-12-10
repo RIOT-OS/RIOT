@@ -41,9 +41,9 @@
 #include "tap.h"
 
 int (*real_printf)(const char *format, ...);
-char *argv0;
 int _native_null_in_pipe[2];
 int _native_null_out_file;
+const char *_progname;
 
 /**
  * initialize _native_null_in_pipe to allow for reading from stdin
@@ -152,7 +152,7 @@ void daemonize()
 
 void usage_exit()
 {
-    real_printf("usage: %s", argv0);
+    real_printf("usage: %s", _progname);
 
 #ifdef MODULE_NATIVENET
     real_printf(" <tap interface>");
@@ -189,7 +189,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     *(void **)(&real_write) = dlsym(RTLD_NEXT, "write");
     *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
 
-    argv0 = argv[0];
+    _progname = argv[0];
     int argp = 1;
     char *stderrtype = "stdio";
     char *stdouttype = "stdio";

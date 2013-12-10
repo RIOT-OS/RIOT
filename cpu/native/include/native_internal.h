@@ -49,6 +49,8 @@ extern ucontext_t native_isr_context;
 extern ucontext_t end_context;
 extern ucontext_t *_native_cur_ctx, *_native_isr_ctx;
 
+extern const char *_progname;
+
 #ifdef MODULE_UART0
 #include <sys/select.h>
 extern fd_set _native_rfds;
