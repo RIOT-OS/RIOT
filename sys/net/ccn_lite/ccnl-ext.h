@@ -26,11 +26,7 @@
 #ifndef CCNL_EXT_H__
 #define CCNL_EXT_H__
 
-#ifdef USE_CCNxDIGEST
-#  define compute_ccnx_digest(buf) SHA256(buf->data, buf->datalen, NULL)
-#else
-#  define compute_ccnx_digest(b) NULL
-#endif
+#define compute_ccnx_digest(buf) SHA256(buf->data, buf->datalen, NULL)
 
 #ifdef USE_FRAG
 

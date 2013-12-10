@@ -22,9 +22,6 @@
  * 2013-04-04 modified (ms): #if defined(CCNL_SIMULATION) || defined(CCNL_OMNET)
  */
 
-#ifndef CCNL_PDU
-#define CCNL_PDU
-
 #include <string.h>
 
 #include "ccnl-core.h"
@@ -235,5 +232,4 @@ mkContent(char **namecomp, char *data, int datalen, unsigned char *out)
     return len;
 }
 
-#endif /*CCNL_PDU*/
 // eof

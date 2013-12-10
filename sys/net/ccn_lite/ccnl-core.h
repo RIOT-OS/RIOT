@@ -24,8 +24,6 @@
 #ifndef CCNL_CORE_H__
 #define CCNL_CORE_H__
 
-//#define CCNL_UNIX
-
 #define EXACT_MATCH 1
 #define PREFIX_MATCH 0
 

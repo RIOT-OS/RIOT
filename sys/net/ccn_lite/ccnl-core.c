@@ -37,7 +37,6 @@
 
 #include "ccnl-riot-compat.h"
 
-#define USE_RIOT_MSG
 #define CCNL_DYNAMIC_FIB (0)
 
 static struct ccnl_interest_s *ccnl_interest_remove(struct ccnl_relay_s *ccnl,
@@ -1407,47 +1406,6 @@ ccnl_core_RX(struct ccnl_relay_s *relay, int ifndx, unsigned char *data,
     }
 
     ccnl_core_RX_datagram(relay, from, &data, &datalen);
-}
-
-const char *
-compile_string(void)
-{
-    static const char *cp = ""
-#ifdef USE_CCNxDIGEST
-                            "USE_CCNxDIGEST "
-#endif
-#ifdef USE_DEBUG
-                            "USE_DEBUG "
-#endif
-#ifdef USE_DEBUG_MALLOC
-                            "USE_DEBUG_MALLOC "
-#endif
-#ifdef USE_FRAG
-                            "USE_FRAG "
-#endif
-#ifdef USE_ETHERNET
-                            "USE_ETHERNET "
-#endif
-#ifdef USE_UDP
-                            "USE_UDP "
-#endif
-#ifdef USE_HTTP_STATUS
-                            "USE_HTTP_STATUS "
-#endif
-#ifdef USE_MGMT
-                            "USE_MGMT "
-#endif
-#ifdef USE_SCHEDULER
-                            "USE_SCHEDULER "
-#endif
-#ifdef USE_UNIXSOCKET
-                            "USE_UNIXSOCKET "
-#endif
-#ifdef USE_APPSERVER
-                            "USE_APPSERVER "
-#endif
-                            ;
-    return cp;
 }
 
 // eof

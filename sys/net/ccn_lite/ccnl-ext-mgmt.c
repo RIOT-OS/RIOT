@@ -21,16 +21,6 @@
  * 2012-05-06 created
  */
 
-#ifndef USE_MGMT
-#define USE_MGMT 1
-#endif
-
-#ifndef CCNL_RIOT
-#define CCNL_RIOT 1
-#endif
-
-#ifdef USE_MGMT
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -630,5 +620,4 @@ int ccnl_mgmt(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
 }
 #endif
 
-#endif // USE_MGMT
 // eof

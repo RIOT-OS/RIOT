@@ -23,13 +23,6 @@
 
 #include <inttypes.h>
 
-#define CCNL_RIOT
-
-#define USE_CCNxDIGEST
-#define USE_RIOT_MSG
-#define USE_RIOT_TRANS
-#define USE_APPSERVER
-#define USE_MGMT
 #define RIOT_CCNL_POPULATE (1)
 
 #include "ccnl-includes.h"
@@ -431,7 +424,6 @@ void ccnl_riot_relay_start(int max_cache_entries, int fib_threshold_prefix, int 
     DEBUGMSG(1, "  max_cache_entries: %d\n", max_cache_entries);
     DEBUGMSG(1, "  threshold_prefix: %d\n", fib_threshold_prefix);
     DEBUGMSG(1, "  threshold_aggregate: %d\n", fib_threshold_aggregate);
-    DEBUGMSG(1, "  compile options: %s\n", compile_string());
 
     ccnl_relay_config(&theRelay, max_cache_entries, fib_threshold_prefix, fib_threshold_aggregate);
 
