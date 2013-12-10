@@ -44,7 +44,7 @@
 #include "hwtimer.h"
 
 #include "ccnl-riot-compat.h"
-#include "test_data/text.txt.ccnb.h"
+#include "ccn_lite/test_data/text.txt.ccnb.h"
 
 /** The size of the message queue between router daemon and transceiver AND clients */
 #define RELAY_MSG_BUFFER_SIZE (64)

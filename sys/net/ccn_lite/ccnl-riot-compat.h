@@ -16,7 +16,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "ccnl-riot.h"
+#include "ccn_lite/ccnl-riot.h"
 
 #define RIOT_CCN_EVENT_NUMBER_OFFSET (1 << 8)
 

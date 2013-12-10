@@ -16,8 +16,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "ccnl-riot.h"
-
 int dehead(unsigned char **buf, int *len, int *num, int *typ);
 int mkHeader(unsigned char *buf, unsigned int num, unsigned int tt);
 int mkBlob(unsigned char *out, unsigned int num, unsigned int tt, char *cp, int cnt);
