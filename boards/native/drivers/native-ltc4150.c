@@ -29,7 +29,7 @@
 #include "hwtimer.h"
 
 #define native_ltc4150_startup_delay 10
-#define LTC_TIMER_INTERVAL (100 * 1000UL) // 100 ms
+#define LTC_TIMER_INTERVAL (10 * 1000UL) // 10 ms
 
 static int _int_enabled;
 static int hwtimer_id;
