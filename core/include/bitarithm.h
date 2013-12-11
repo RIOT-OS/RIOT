@@ -13,7 +13,6 @@
  * @file
  * @author Freie Universität Berlin, Computer Systems & Telematics
  * @author Kaspar Schleiser <kaspar@schleiser.de>
- * @author Martin Lenders <mlenders@inf.fu-berlin.de>
  */
 
 #ifndef BITARITHM_H_
@@ -79,17 +78,22 @@ unsigned number_of_highest_bit(unsigned v);
 
 /**
  * @brief	Returns the number of the lowest '1' bit in a value
- * @param[in]	v	Input value
- * @return			Bit Number, 0 for least significant bit, -1 if input is 0
+ * @param[in]	v	Input value - must be unequal to '0', otherwise the
+ *                  function will produce an infinite loop
+ * @return			Bit Number
+ *
+ * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
  */
-#define number_of_lowest_bit(v) (__builtin_ffs(v)-1)
+unsigned number_of_lowest_bit(register unsigned v);
 
 /**
  * @brief	Returns the number of bits set in a value
  * @param[in]	v	Input value
  * @return			Number of set bits
+ *
+ * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
  */
-#define number_of_bits_set(v) (__builtin_popcount(v))
+unsigned number_of_bits_set(unsigned v);
 
 /**
  * @}
