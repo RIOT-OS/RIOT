@@ -32,3 +32,4 @@ clean:
 	$(MAKE) -C drivers clean
 	rm -f $(OBJ) $(DEP)
 	rm -f $(BINDIR)$(ARCH)
+	-rmdir $(BINDIR)
