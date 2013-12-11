@@ -15,7 +15,6 @@ all: $(BINDIR)$(ARCH)
 	$(MAKE) -C drivers
 
 $(BINDIR)$(ARCH): $(OBJ)
-	mkdir -p $(BINDIR)
 	$(AR) rcs $(BINDIR)$(ARCH) $(OBJ)
 
 # pull in dependency info for *existing* .o files
@@ -23,6 +22,7 @@ $(BINDIR)$(ARCH): $(OBJ)
 
 # compile and generate dependency info
 $(BINDIR)%.o: %.c
+	mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/fw_out && mv /tmp/fw_out $(BINDIR)$*.d
@@ -32,3 +32,4 @@ clean:
 	$(MAKE) -C drivers clean
 	rm -f $(OBJ) $(DEP)
 	rm -f $(BINDIR)$(ARCH)
+	-rmdir $(BINDIR)
