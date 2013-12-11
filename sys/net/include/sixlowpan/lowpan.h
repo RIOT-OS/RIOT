@@ -152,6 +152,12 @@
  */
 #define SIXLOWPAN_FRAGN_HDR_LEN    	(5)
 
+/**
+ * @brief message type for notification
+ *
+ * @see sixlowpan_lowpan_register()
+ */
+#define LOWPAN_FRAME_RECEIVED        (UPPER_LAYER_1)
 
 /**
  * @brief   Data type to configure 6LoWPAN IPv6 header compression.

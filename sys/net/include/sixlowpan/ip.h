@@ -61,6 +61,13 @@
 #define IPV6_PROTO_NUM_IPV6_OPTS    (60)
 
 /**
+ * @brief message type for notification
+ *
+ * @see ipv6_register_packet_handler()
+ */
+#define IPV6_PACKET_RECEIVED        (UPPER_LAYER_2)
+
+/**
  * @brief   Get IPv6 send/receive buffer.
  *
  * @return  Pointer to IPv6 header in send/receive bouffer.

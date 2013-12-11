@@ -131,6 +131,13 @@ enum transceiver_msg_type_t {
 
     /* Error messages */
     ENOBUFFER,      ///< No buffer left
+
+    /* reserve message types for higher layer notifications */
+    UPPER_LAYER_1,  ///< reserved
+    UPPER_LAYER_2,  ///< reserved
+    UPPER_LAYER_3,  ///< reserved
+    UPPER_LAYER_4,  ///< reserved
+    UPPER_LAYER_5,  ///< reserved
 };
 
 /**
