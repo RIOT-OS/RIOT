@@ -136,10 +136,10 @@ void hwtimer_isr_timer()
         return;
     }
 
-    if (native_hwtimer_irq[next_timer] == 1) {
+    if (native_hwtimer_isset[next_timer] == 1) {
+        native_hwtimer_isset[next_timer] = 0;
         DEBUG("hwtimer_isr_timer(): calling hwtimer.int_handler(%i)\n", next_timer);
         int_handler(next_timer);
-        native_hwtimer_isset[next_timer] = 0;
     }
     else {
         DEBUG("hwtimer_isr_timer(): this should not have happened");
