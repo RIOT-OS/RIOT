@@ -53,7 +53,7 @@ void recv_nbr_adv(void);
 void recv_nbr_sol(void);
 
 void nbr_cache_auto_rem(void);
-int8_t plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
+int plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
                  uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
 
 ndp_a6br_cache_t *abr_add_context(uint16_t version, ipv6_addr_t *abr_addr,

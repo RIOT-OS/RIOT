@@ -381,7 +381,7 @@ void recv_echo_req(void)
     printf("\n");
     printf("id = 0x%04x, seq = %d\n", echo_buf->id, echo_buf->seq);
 
-    for (int i = 0; i < data_len; i++) {
+    for (size_t i = 0; i < data_len; i++) {
         printf("%02x ", echo_data_buf[i]);
 
         if ((i + 1) % 16 || i == data_len - 1) {
@@ -408,7 +408,7 @@ void recv_echo_repl(void)
     printf("\n");
     printf("id = 0x%04x, seq = %d\n", echo_buf->id, echo_buf->seq);
 
-    for (int i = 0; i < data_len; i++) {
+    for (size_t i = 0; i < data_len; i++) {
         printf("%02x ", echo_data_buf[i]);
 
         if ((i + 1) % 16 || i == data_len - 1) {
@@ -1566,7 +1566,7 @@ void def_rtr_lst_rem(ndp_default_router_list_t *entry)
 //------------------------------------------------------------------------------
 /* prefix list functions */
 
-int8_t plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
+int plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
                  uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1)
 {
     if (prefix_count == OPT_PI_LIST_LEN) {
