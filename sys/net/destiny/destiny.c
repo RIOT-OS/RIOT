@@ -28,9 +28,7 @@
 #include "tcp_timer.h"
 #include "udp.h"
 
-#ifdef DESTINY_WITH_TCP
 char tcp_stack_buffer[TCP_STACK_SIZE];
-#endif
 char udp_stack_buffer[UDP_STACK_SIZE];
 
 int destiny_init_transport_layer(void)
@@ -51,7 +49,6 @@ int destiny_init_transport_layer(void)
 
     ipv6_register_next_header_handler(IPV6_PROTO_NUM_UDP, udp_thread_pid);
 
-#ifdef DESTINY_WITH_TCP
     /* TCP */
     timex_t now;
     vtimer_now(&now);
@@ -76,7 +73,6 @@ int destiny_init_transport_layer(void)
                       CREATE_STACKTEST, tcp_general_timer, "tcp_general_timer") < 0) {
         return -1;
     }
-#endif
 
     return 0;
 }
