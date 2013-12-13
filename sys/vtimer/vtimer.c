@@ -95,7 +95,7 @@ static int update_shortterm(void)
     }
 
     if((next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now) > MICROSECONDS_PER_TICK ) {
-        DEBUG("truncating next (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now): %i\n", (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now));
+        DEBUG("truncating next (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now): %lu\n", (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now));
         next = now +  HWTIMER_TICKS_TO_US(VTIMER_BACKOFF);
     }
     
