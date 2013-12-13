@@ -127,13 +127,13 @@ void ccnl_ll_TX(struct ccnl_relay_s *ccnl, struct ccnl_if_s *ifc,
 void ccnl_ageing(void *relay, void *aux)
 {
     ccnl_do_ageing(relay, aux);
-    ccnl_set_timer(CCNL_CHECK_TIMEOUT_USEC, ccnl_ageing, relay, 0);
+    ccnl_set_timer(CCNL_CHECK_TIMEOUT_SEC * (1000*1000) + CCNL_CHECK_TIMEOUT_USEC, ccnl_ageing, relay, 0);
 }
 
 void ccnl_retransmit(void *relay, void *aux)
 {
     ccnl_do_retransmit(relay, aux);
-    ccnl_set_timer(CCNL_CHECK_RETRANSMIT_USEC, ccnl_retransmit, relay, 0);
+    ccnl_set_timer(CCNL_CHECK_RETRANSMIT_SEC * (1000*1000) + CCNL_CHECK_RETRANSMIT_USEC, ccnl_retransmit, relay, 0);
 }
 
 // ----------------------------------------------------------------------

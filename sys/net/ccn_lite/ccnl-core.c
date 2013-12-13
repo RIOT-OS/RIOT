@@ -737,6 +737,7 @@ ccnl_interest_new(struct ccnl_relay_s *ccnl, struct ccnl_face_s *from,
     *ppkd = 0;
     i->minsuffix = minsuffix;
     i->maxsuffix = maxsuffix;
+    ccnl_get_timeval(&i->last_used);
     DBL_LINKED_LIST_ADD(ccnl->pit, i);
     return i;
 }
@@ -805,6 +806,7 @@ void ccnl_interest_propagate(struct ccnl_relay_s *ccnl,
 
             i->forwarded_over = fwd;
             fwd->face->stat.send_interest[i->retries]++;
+            ccnl_get_timeval(&i->last_used);
             ccnl_face_enqueue(ccnl, fwd->face, buf_dup(i->pkt));
             ccnl_get_timeval(&fwd->last_used);
             forward_cnt++;
@@ -814,6 +816,7 @@ void ccnl_interest_propagate(struct ccnl_relay_s *ccnl,
     if (forward_cnt == 0) {
         DEBUGMSG(40, "  ccnl_interest_propagate: using broadcast face!\n");
         ccnl->ifs[RIOT_TRANS_IDX].broadcast_face->stat.send_interest[i->retries]++;
+        ccnl_get_timeval(&i->last_used);
         ccnl_face_enqueue(ccnl, ccnl->ifs[RIOT_TRANS_IDX].broadcast_face, buf_dup(i->pkt));
     }
 
@@ -1112,14 +1115,11 @@ void ccnl_do_retransmit(void *ptr, void *dummy)
     (void) dummy; /* unused */
 
     struct ccnl_relay_s *relay = (struct ccnl_relay_s *) ptr;
-    struct ccnl_interest_s *i = relay->pit;
 
-    while (i) { // CONFORM: "Entries in the PIT MUST timeout rather
+    for (struct ccnl_interest_s *i = relay->pit; i; i = i->next) {
+        // CONFORM: "Entries in the PIT MUST timeout rather
         // than being held indefinitely."
-        if (i->retries > CCNL_MAX_INTEREST_RETRANSMIT) {
-            i = ccnl_interest_remove(relay, i);
-        }
-        else {
+        if(i->retries <= CCNL_MAX_INTEREST_RETRANSMIT) {
             // CONFORM: "A node MUST retransmit Interest Messages
             // periodically for pending PIT entries."
             DEBUGMSG(7, " retransmit %d <%s>\n", i->retries,
@@ -1134,8 +1134,6 @@ void ccnl_do_retransmit(void *ptr, void *dummy)
 
             i->retries++;
             ccnl_interest_propagate(relay, i);
-
-            i = i->next;
         }
     }
 }
@@ -1146,12 +1144,22 @@ void ccnl_do_ageing(void *ptr, void *dummy)
     (void) dummy; /* unused */
 
     struct ccnl_relay_s *relay = (struct ccnl_relay_s *) ptr;
+    struct ccnl_interest_s *i = relay->pit;
     struct ccnl_content_s *c = relay->contents;
 
     struct ccnl_face_s *f = relay->faces;
     struct timeval now;
     ccnl_get_timeval(&now);
     //DEBUGMSG(999, "ccnl_do_ageing %ld:%ld\n", now.tv_sec, now.tv_usec);
+
+    while (i) {
+        if (ccnl_is_timeouted(&now, &i->last_used, CCNL_INTEREST_TIMEOUT_SEC,
+                CCNL_INTEREST_TIMEOUT_USEC)) {
+            i = ccnl_interest_remove(relay, i);
+        } else {
+            i = i->next;
+        }
+    }
 
     while (c) {
         if (ccnl_is_timeouted(&now, &c->last_used, CCNL_CONTENT_TIMEOUT_SEC, CCNL_CONTENT_TIMEOUT_USEC)

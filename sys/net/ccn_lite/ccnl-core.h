@@ -175,6 +175,7 @@ struct ccnl_interest_s {
     int minsuffix, maxsuffix;
     struct ccnl_buf_s *ppkd;	   // publisher public key digest
     struct ccnl_buf_s *pkt;	   // full datagram
+    struct timeval last_used;
     int retries;
     struct ccnl_forward_s *forwarded_over;
 };
