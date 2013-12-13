@@ -59,7 +59,6 @@ else
 	@$(SIZE) $(PROJBINDIR)/$(PROJECT).elf
 	@$(OBJCOPY) $(OFLAGS) $(PROJBINDIR)/$(PROJECT).elf $(PROJBINDIR)/$(PROJECT).hex
 endif
-endif
 
 ## your make rules
 ## Only basic example - modify it for larger projects!!
