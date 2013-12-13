@@ -31,6 +31,8 @@
 char tcp_stack_buffer[TCP_STACK_SIZE];
 char udp_stack_buffer[UDP_STACK_SIZE];
 
+char tcp_timer_stack[TCP_TIMER_STACKSIZE];
+
 int destiny_init_transport_layer(void)
 {
     printf("Initializing transport layer packages. Size of socket_type: %u\n",

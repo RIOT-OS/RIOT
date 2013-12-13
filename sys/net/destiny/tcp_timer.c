@@ -31,8 +31,6 @@
 
 #include "tcp_timer.h"
 
-char tcp_timer_stack[TCP_TIMER_STACKSIZE];
-
 void handle_synchro_timeout(socket_internal_t *current_socket)
 {
     msg_t send;
