@@ -53,7 +53,7 @@ ifneq (,$(findstring vtimer,$(USEMODULE)))
     DIRS += vtimer
 endif
 ifneq (,$(findstring destiny,$(USEMODULE)))
-    DIRS += net/destiny
+    DIRS += net/transport_layer/destiny
 endif
 ifneq (,$(findstring net_mm,$(USEMODULE)))
     DIRS += net/mm
