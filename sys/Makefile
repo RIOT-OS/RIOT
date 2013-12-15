@@ -62,7 +62,7 @@ ifneq (,$(findstring net_help,$(USEMODULE)))
     DIRS += net/net_help
 endif
 ifneq (,$(findstring protocol_multiplex,$(USEMODULE)))
-    DIRS += net/protocol-multiplex
+    DIRS += net/link_layer/protocol-multiplex
 endif
 ifneq (,$(findstring sixlowpan,$(USEMODULE)))
     DIRS += net/sixlowpan
