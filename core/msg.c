@@ -25,15 +25,17 @@
 #include <irq.h>
 #include <cib.h>
 #include <inttypes.h>
+#include <string.h>
 
 #include "flags.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
 #include "thread.h"
 
-static int _msg_receive(msg_t *m, int block);
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
 
+static int _msg_receive(msg_t *m, int block);
+static int _msg_copy_data(msg_t *src, msg_t *target);
 
 static int queue_msg(tcb_t *target, msg_t *m)
 {
@@ -68,6 +70,13 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
     dINT();
 
     if (target->status != STATUS_RECEIVE_BLOCKED) {
+        if (m->size > 0 && target->msg_array) {
+            DEBUG("msg_send: %s: Receiver has a queue and msg size > 0."
+                  " This is unsupported.\n", active_thread->name);
+            eINT();
+            return 2;
+        }
+
         if (target->msg_array && queue_msg(target, m)) {
             eINT();
             return 1;
@@ -79,12 +88,12 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
             return 0;
         }
 
-        DEBUG("msg_send: %s: send_blocked.\n", active_thread->name);
+        DEBUG("msg_send: %s: preparing send_blocked.\n", active_thread->name);
         queue_node_t n;
         n.priority = active_thread->priority;
         n.data = (unsigned int) active_thread;
         n.next = NULL;
-        DEBUG("msg_send: %s: Adding node to msg_waiters:\n", active_thread->name);
+        DEBUG("msg_send: %s: Adding node to msg_waiters.\n", active_thread->name);
 
         queue_priority_add(&(target->msg_waiters), &n);
 
@@ -99,20 +108,41 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
             newstatus = STATUS_SEND_BLOCKED;
         }
 
+        /* save content. might be overwritten by msg_receive. */
+        char *saved_ptr = m->content.ptr;
+
+        DEBUG("msg_send: %s: Going blocked.\n", active_thread->name);
         sched_set_status((tcb_t*) active_thread, newstatus);
 
+        eINT();
+        thread_yield();
+
         DEBUG("msg_send: %s: Back from send block.\n", active_thread->name);
+
+        if ( m->size > 0 ) {
+            int ret = m->content.value;
+            DEBUG("msg_send: %s: Returning error %i.\n", active_thread->name, ret);
+            m->content.ptr = saved_ptr;
+            return ret;
+        }
     }
     else {
         DEBUG("msg_send: %s: Direct msg copy from %i to %i.\n", active_thread->name, thread_getpid(), target_pid);
-        /* copy msg to target */
         msg_t *target_message = (msg_t*) target->wait_data;
-        *target_message = *m;
-        sched_set_status(target, STATUS_PENDING);
-    }
 
-    eINT();
-    thread_yield();
+        /* copy any extra msg data */
+        if (_msg_copy_data(m, target_message)) {
+            DEBUG("%s: other thread's buffer too small. Returning Error.\n", active_thread->name);
+            return -2;
+        }
+
+        /* copy msg to target */
+        *target_message = *m;
+
+        sched_set_status(target, STATUS_PENDING);
+        eINT();
+        thread_yield();
+    }
 
     return 1;
 }
@@ -128,6 +158,12 @@ int msg_send_int(msg_t *m, unsigned int target_pid)
 
         /* copy msg to target */
         msg_t *target_message = (msg_t*) target->wait_data;
+
+        if (_msg_copy_data(m, target_message)) {
+            DEBUG("msg_send_int: Couldn't copy msg data.\n");
+            return -2;
+        }
+
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
 
@@ -136,6 +172,10 @@ int msg_send_int(msg_t *m, unsigned int target_pid)
     }
     else {
         DEBUG("msg_send_int: Receiver not waiting.\n");
+        if (m->size) {
+            DEBUG("msg_send_int: Queuing of msg with size>0 not supported.\n");
+            return -2;
+        }
         return (queue_msg(target, m));
     }
 }
@@ -213,64 +253,87 @@ static int _msg_receive(msg_t *m, int block)
 
     tcb_t *me = (tcb_t*) sched_threads[thread_pid];
 
-    int queue_index = -1;
+    while(1) {
+        int queue_index = -1;
 
-    if (me->msg_array) {
-        queue_index = cib_get(&(me->msg_queue));
-    }
-
-    /* no message, fail */
-    if ((!block) && (queue_index == -1)) {
-        return -1;
-    }
-
-    if (queue_index >= 0) {
-        DEBUG("_msg_receive: %s: _msg_receive(): We've got a queued message.\n", active_thread->name);
-        *m = me->msg_array[queue_index];
-    }
-    else {
-        me->wait_data = (void *) m;
-    }
-
-    queue_node_t *node = queue_remove_head(&(me->msg_waiters));
-
-    if (node == NULL) {
-        DEBUG("_msg_receive: %s: _msg_receive(): No thread in waiting list.\n", active_thread->name);
-
-        if (queue_index < 0) {
-            DEBUG("_msg_receive(): %s: No msg in queue. Going blocked.\n", active_thread->name);
-            sched_set_status(me, STATUS_RECEIVE_BLOCKED);
-
-            eINT();
-            thread_yield();
-
-            /* sender copied message */
+        if (me->msg_array) {
+            queue_index = cib_get(&(me->msg_queue));
         }
 
-        return 1;
-    }
-    else {
-        DEBUG("_msg_receive: %s: _msg_receive(): Waking up waiting thread.\n", active_thread->name);
-        tcb_t *sender = (tcb_t*) node->data;
+        /* no message, fail */
+        if ((!block) && (queue_index == -1)) {
+            return -1;
+        }
 
         if (queue_index >= 0) {
-            /* We've already got a message from the queue. As there is a
-             * waiter, take it's message into the just freed queue space.
-             */
-            m = &(me->msg_array[cib_put(&(me->msg_queue))]);
+            DEBUG("_msg_receive: %s: _msg_receive(): We've got a queued message.\n", active_thread->name);
+            /* no need to check return. checked for buffer space above. */
+            _msg_copy_data (&(me->msg_array[queue_index]), m);
+            *m = me->msg_array[queue_index];
+        }
+        else {
+            me->wait_data = (void *) m;
         }
 
-        /* copy msg */
-        msg_t *sender_msg = (msg_t*) sender->wait_data;
-        *m = *sender_msg;
+        queue_node_t *node = queue_remove_head(&(me->msg_waiters));
 
-        /* remove sender from queue */
-        sender->wait_data = NULL;
-        sched_set_status(sender, STATUS_PENDING);
+        if (node == NULL) {
+            DEBUG("_msg_receive: %s: _msg_receive(): No thread in waiting list.\n", active_thread->name);
 
-        eINT();
-        return 1;
-    }
+            if (queue_index < 0) {
+                DEBUG("_msg_receive(): %s: No msg in queue. Going blocked.\n", active_thread->name);
+                sched_set_status(me, STATUS_RECEIVE_BLOCKED);
+
+                eINT();
+                thread_yield();
+
+                /* sender copied message */
+            }
+
+            return 1;
+        }
+        else {
+            int try_again = 0;
+            DEBUG("_msg_receive: %s: _msg_receive(): Checking waiting thread.\n", active_thread->name);
+            tcb_t *sender = (tcb_t*) node->data;
+
+            if (queue_index >= 0) {
+                /* We've already got a message from the queue.  As there is a
+                 * waiter, take it's message into the just freed queue space.
+                 */
+                m = &(me->msg_array[cib_put(&(me->msg_queue))]);
+            }
+
+            /* copy msg */
+            msg_t *sender_msg = (msg_t*) sender->wait_data;
+
+            if ( _msg_copy_data (sender_msg, m)) {
+                /* we don't have enough space for this msg.
+                 * Inform sender through his msg_t structure. */
+                DEBUG("_msg_receive: %s: Informing sender.\n", active_thread->name);
+                sender_msg->content.value = -2;
+                try_again = 1;
+            } else {
+                *m = *sender_msg;
+                sender_msg->content.value = 1;
+            }
+
+            /* remove sender from queue */
+            sender->wait_data = NULL;
+
+            /* wakeup sender */
+            sched_set_status(sender, STATUS_PENDING);
+
+            eINT();
+
+            /* if we couldn't receive a message beacuse of missing/too little
+             * buffer space, try again */
+            if (try_again)
+                continue;
+            else
+                return 1;
+        }
+    } // while(1)
 }
 
 int msg_init_queue(msg_t *array, int num)
@@ -284,4 +347,40 @@ int msg_init_queue(msg_t *array, int num)
     }
 
     return -1;
+}
+
+/*
+ * helper function to copy the data portion of messages
+ * with extra data.
+ *
+ * Tries to copy src->size bytes from src->content.ptr to
+ * target->content.ptr.
+ *
+ * returns 0 on success, -1 if src->size > target->size
+ */
+static int _msg_copy_data(msg_t *src, msg_t *target) {
+    /* if src->size is >0, we're also sending data
+     * with size=src->size and located at src->content.ptr
+     */
+    if (src->size > 0) {
+        /* make sure receiver has enough reserved space */
+        if (src->size <= target->size) {
+            DEBUG("_msg_copy_data: %s: Copying %i bytes of data. (target space:%ib).\n",
+                    active_thread->name, src->size, target->size);
+
+            /* copy over data */
+            memcpy(target->content.ptr, src->content.ptr, src->size);
+
+            /* save target's buffer pointer in our structure.
+             * This way, the receiver can still access it after
+             * it's msg_t is overwritten by ours.
+             */
+            src->content.ptr = target->content.ptr;
+        } else {
+            DEBUG("_msg_copy_data: %s: Target buffer to small (msg size: %ib target space: %ib)\n",
+                    active_thread->name, src->size, target->size);
+            return -1;
+        }
+    }
+    return 0;
 }

@@ -31,9 +31,14 @@
 /**
  * @brief Describes a message object which can be sent between threads.
  *
- * User can set type and one of content.ptr and content.value. (content is a union)
- * The meaning of type and the content fields is totally up to the user,
+ * User can set size field to 0 and use type and one of content.ptr and
+ * content.value for transmittine data. (Warning: content is a union)
+ * In this case the meaning of type and the content fields is totally up to the user,
  * the corresponding fields are never read by the kernel.
+ *
+ * It's also possible to have the kernel copy over an arbitrarily sized buffer.
+ * In this case, set content.ptr to the buffer's address and size to the amount
+ * of data that should be copied.
  *
  */
 typedef struct msg {
@@ -43,8 +48,10 @@ typedef struct msg {
         char     *ptr;          ///< pointer content field
         uint32_t value;         ///< value content field
     } content;
-} msg_t;
 
+    int32_t      size;          ///< size of buffer pointed to by content.ptr.
+                                ///< only used when sending extra data along.
+} msg_t;
 
 /**
  * @brief Send a message.
@@ -62,6 +69,7 @@ typedef struct msg {
  * @return 1 if sending was successful (message delivered directly or to a queue)
  * @return 0 if receiver is not waiting or has a full message queue and block == false
  * @return -1 on error (invalid PID)
+ * @return -2 if m->size larger than receiver's buffer
  */
 int msg_send(msg_t *m, unsigned int target_pid, bool block);
 
@@ -76,6 +84,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block);
  *
  * @return 1 if sending was successful
  * @return 0 if receiver is not waiting and block == false
+ * @return -2 if m->size larger than receiver's buffer
  */
 int msg_send_int(msg_t *m, unsigned int target_pid);
 
