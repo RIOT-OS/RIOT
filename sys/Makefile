@@ -71,7 +71,7 @@ ifneq (,$(findstring rpl,$(USEMODULE)))
     DIRS += net/routing/rpl
 endif
 ifneq (,$(findstring ieee802154,$(USEMODULE)))
-    DIRS += net/ieee802154
+    DIRS += net/link_layer/ieee802154
 endif
 ifneq (,$(findstring bloom,$(USEMODULE)))
     DIRS += bloom
