@@ -59,7 +59,7 @@ ifneq (,$(findstring net_mm,$(USEMODULE)))
     DIRS += net/mm
 endif
 ifneq (,$(findstring net_help,$(USEMODULE)))
-    DIRS += net/net_help
+    DIRS += net/crosslayer/net_help
 endif
 ifneq (,$(findstring protocol_multiplex,$(USEMODULE)))
     DIRS += net/link_layer/protocol-multiplex
