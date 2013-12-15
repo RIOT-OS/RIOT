@@ -42,8 +42,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 //					    CC1100 SPI access
 /*---------------------------------------------------------------------------*/
 
-#define NOBYTE 0xFF
-
 uint8_t
 cc1100_spi_writeburst_reg(uint8_t addr, char *src, uint8_t count)
 {
@@ -71,7 +69,7 @@ cc1100_spi_readburst_reg(uint8_t addr, char *buffer, uint8_t count)
     cc110x_txrx(addr | CC1100_READ_BURST);
 
     while (i < count) {
-        buffer[i] = cc110x_txrx(NOBYTE);
+        buffer[i] = cc110x_txrx(CC1100_NOBYTE);
         i++;
     }
 
@@ -96,7 +94,7 @@ uint8_t cc1100_spi_read_reg(uint8_t addr)
     unsigned int cpsr = disableIRQ();
     cc110x_spi_select();
     cc110x_txrx(addr | CC1100_READ_SINGLE);
-    result = cc110x_txrx(NOBYTE);
+    result = cc110x_txrx(CC1100_NOBYTE);
     cc110x_spi_unselect();
     restoreIRQ(cpsr);
     return result;
@@ -108,7 +106,7 @@ uint8_t cc1100_spi_read_status(uint8_t addr)
     unsigned int cpsr = disableIRQ();
     cc110x_spi_select();
     cc110x_txrx(addr | CC1100_READ_BURST);
-    result = cc110x_txrx(NOBYTE);
+    result = cc110x_txrx(CC1100_NOBYTE);
     cc110x_spi_unselect();
     restoreIRQ(cpsr);
     return result;
