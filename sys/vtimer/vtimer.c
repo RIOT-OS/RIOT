@@ -242,8 +242,10 @@ static int vtimer_set(vtimer_t *timer)
 
 void vtimer_now(timex_t *out)
 {
-    timex_t t = timex_set(seconds, hwtimer_now() - longterm_tick_start);
-    memcpy(out, &t, sizeof(timex_t));
+    uint32_t us = HWTIMER_TICKS_TO_US(hwtimer_now() - longterm_tick_start);
+
+    out->seconds = seconds + us / (1000 * 1000);
+    out->microseconds = us % (1000 * 1000);
 }
 
 int vtimer_init()
