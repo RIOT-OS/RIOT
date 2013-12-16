@@ -109,10 +109,10 @@ static int update_shortterm(void)
         DEBUG("truncating next (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now): %lu\n", (next -  HWTIMER_TICKS_TO_US(VTIMER_THRESHOLD) - now));
         next = now +  HWTIMER_TICKS_TO_US(VTIMER_BACKOFF);
     }
-    
-    hwtimer_id = hwtimer_set_absolute(HWTIMER_TICKS(next), vtimer_callback, NULL);
 
     DEBUG("update_shortterm: Set hwtimer to %" PRIu32 " (now=%lu)\n", next, HWTIMER_TICKS_TO_US(hwtimer_now()));
+    hwtimer_id = hwtimer_set_absolute(HWTIMER_TICKS(next), vtimer_callback, NULL);
+
     return 0;
 }
 
