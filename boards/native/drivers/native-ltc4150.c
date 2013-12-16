@@ -28,7 +28,6 @@
 #include "cpu-conf.h"
 #include "hwtimer.h"
 
-#define native_ltc4150_startup_delay 10
 #define LTC_TIMER_INTERVAL (10 * 1000UL) // 10 ms
 
 static int _int_enabled;
@@ -78,8 +77,6 @@ void ltc4150_enable_int(void)
 void ltc4150_sync_blocking(void)
 {
     DEBUG("ltc4150_sync_blocking()\n");
-
-    for (int i = native_ltc4150_startup_delay; i > 0; i--);
 }
 
 /**
