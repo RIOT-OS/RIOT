@@ -28,6 +28,9 @@
 #include "lifo.h"
 #include "mutex.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 #include "hwtimer.h"
 #include "hwtimer_cpu.h"
 #include "hwtimer_arch.h"
@@ -58,6 +61,7 @@ static void hwtimer_releasemutex(void* mutex) {
 
 void hwtimer_spin(unsigned long ticks)
 {
+    DEBUG("hwtimer_spin ticks=%lu\n", ticks);
     unsigned long t = hwtimer_arch_now();
 
     /**
@@ -120,6 +124,8 @@ unsigned long hwtimer_now(void)
 
 void hwtimer_wait(unsigned long ticks)
 {
+    DEBUG("hwtimer_wait ticks=%lu\n", ticks);
+
     mutex_t mutex;
 
     if (ticks <= 6 || inISR()) {
@@ -146,6 +152,8 @@ void hwtimer_wait(unsigned long ticks)
 
 static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr, bool absolute)
 {
+    DEBUG("_hwtimer_set: offset=%lu callback=%p ptr=%p absolute=%d\n", offset, callback, ptr, absolute);
+
     if (!inISR()) {
         dINT();
     }
@@ -165,9 +173,11 @@ static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr
     timer[n].data = ptr;
 
     if (absolute) {
+        DEBUG("hwtimer_arch_set_absolute n=%d\n", n);
         hwtimer_arch_set_absolute(offset, n);
     }
     else {
+        DEBUG("hwtimer_arch_set n=%d\n", n);
         hwtimer_arch_set(offset, n);
     }
 
@@ -195,6 +205,7 @@ int hwtimer_set_absolute(unsigned long offset, void (*callback)(void*), void *pt
 
 int hwtimer_remove(int n)
 {
+    DEBUG("hwtimer_remove n=%d\n", n);
     hwtimer_arch_disable_interrupt();
     hwtimer_arch_unset(n);
 
