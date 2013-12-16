@@ -5,7 +5,6 @@
  *      Author: Oliver
  */
 
-#include <thread.h>
 #include <stdio.h>
 
 #include "thread.h"

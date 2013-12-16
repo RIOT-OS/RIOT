@@ -6,7 +6,7 @@
 
 #include "ieee802154_frame.h"
 
-#include <at86rf231_settings.h>
+#include "at86rf231_settings.h"
 
 #define AT86RF231_MAX_PKT_LENGTH 127
 #define AT86RF231_MAX_DATA_LENGTH 118

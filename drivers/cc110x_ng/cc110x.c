@@ -16,20 +16,20 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
-#include <cc110x_ng.h>
-#include <cc110x-arch.h>
-#include <cc110x-config.h>
-#include <cc110x-defaultSettings.h>
-#include <cc110x-internal.h>
-#include <cc110x_spi.h>
-#include <cc110x-reg.h>
+#include "cc110x_ng.h"
+#include "cc110x-arch.h"
+#include "cc110x-config.h"
+#include "cc110x-defaultSettings.h"
+#include "cc110x-internal.h"
+#include "cc110x_spi.h"
+#include "cc110x-reg.h"
 
-#include <hwtimer.h>
-#include <config.h>
+#include "hwtimer.h"
+#include "config.h"
 #include "cpu.h"
 
 #define ENABLE_DEBUG    (0)
-#include <debug.h>
+#include "debug.h"
 
 /* some externals */
 extern uint8_t pa_table[];              ///< PATABLE with available output powers

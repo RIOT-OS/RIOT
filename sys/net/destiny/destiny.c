@@ -15,10 +15,11 @@
  * @}
  */
 
-#include <thread.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include "thread.h"
 
 #include "destiny.h"
 #include "vtimer.h"

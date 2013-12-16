@@ -17,18 +17,18 @@
  * @}
  */
 
-#include <cc110x_ng.h>
-#include <cc110x-internal.h>
-#include <cc110x-config.h>
-#include <cc110x-defaultSettings.h>
-#include <cc110x_spi.h>
-#include <cc110x-reg.h>
+#include "cc110x_ng.h"
+#include "cc110x-internal.h"
+#include "cc110x-config.h"
+#include "cc110x-defaultSettings.h"
+#include "cc110x_spi.h"
+#include "cc110x-reg.h"
 
-#include <hwtimer.h>
-#include <msg.h>
-#include <transceiver.h>
+#include "hwtimer.h"
+#include "msg.h"
+#include "transceiver.h"
 
-#include <cpu-conf.h>
+#include "cpu-conf.h"
 #include "cpu.h"
 
 #ifdef DBG_IGNORE

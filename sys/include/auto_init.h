@@ -23,23 +23,23 @@
 #define AUTO_INIT_H
 
 #ifdef MODULE_HWTIMER
-#include <hwtimer.h>
+#include "hwtimer.h"
 #endif
 
 #ifdef MODULE_SHT11
-#include <sht11.h>
+#include "sht11.h"
 #endif
 
 #ifdef MODULE_GPIOINT
-#include <gpioint.h>
+#include "gpioint.h"
 #endif
 
 #ifdef MODULE_CC110X
-#include <cc1100-interface.h>
+#include "cc1100-interface.h"
 #endif
 
 #ifdef MODULE_LTC4150
-#include <ltc4150.h>
+#include "ltc4150.h"
 #endif
 
 void auto_init(void);

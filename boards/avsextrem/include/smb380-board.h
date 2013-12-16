@@ -24,7 +24,7 @@
 #ifndef SMB380_H_
 #define SMB380_H_
 #include <stdint.h>
-#include <bitarithm.h>
+#include "bitarithm.h"
 
 #define SMB380_DEBUG_MESSAGE "SMB380 Driver Error: "
 

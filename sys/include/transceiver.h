@@ -37,7 +37,7 @@
 #endif
 
 #ifdef MODULE_AT86RF231
-#include <at86rf231.h>
+#include "at86rf231.h"
 #endif
 
 /* Stack size for transceiver thread */

@@ -8,15 +8,15 @@
 
 #include <stdio.h>
 
-#include <cc2420.h>
-#include <cc2420_settings.h>
-#include <cc2420_arch.h>
-#include <cc2420_spi.h>
-#include <ieee802154_frame.h>
+#include "cc2420.h"
+#include "cc2420_settings.h"
+#include "cc2420_arch.h"
+#include "cc2420_spi.h"
+#include "ieee802154_frame.h"
 
-#include <transceiver.h>
-#include <msg.h>
-#include <debug.h>
+#include "transceiver.h"
+#include "msg.h"
+#include "debug.h"
 
 cc2420_packet_t cc2420_rx_buffer[CC2420_RX_BUF_SIZE];
 volatile uint8_t rx_buffer_next;

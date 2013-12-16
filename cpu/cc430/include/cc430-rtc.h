@@ -12,8 +12,8 @@ See the file LICENSE in the top level directory for more details.
 
 #ifndef CC430_RTC_H
 #define CC430_RTC_H
-#include <rtc.h>
-#include <time.h>
+#include "rtc.h"
+#include "time.h"
 
 /**
  * @defgroup    cc430_rtc   CC430 Real Time Clock

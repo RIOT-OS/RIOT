@@ -1,6 +1,6 @@
 #include <stdint.h>
-#include <flashrom.h>
-#include <iap.h>
+#include "flashrom.h"
+#include "iap.h"
 
 uint8_t iap_get_sector(uint32_t addr)
 {

@@ -24,9 +24,8 @@
  * @note        $Id$
  */
 
-
-#include <board.h>
-#include <cpu.h>
+#include "board.h"
+#include "cpu.h"
 
 void loop_delay(void)
 {

@@ -12,12 +12,12 @@ See the file LICENSE in the top level directory for more details.
 
 #include <stdint.h>
 
-#include <cpu.h>
-#include <hwtimer.h>
-#include <hwtimer_arch.h>
+#include "cpu.h"
+#include "hwtimer.h"
+#include "hwtimer_arch.h"
 
 #define ENABLE_DEBUG (0)
-#include <debug.h>
+#include "debug.h"
 
 
 void (*int_handler)(int);

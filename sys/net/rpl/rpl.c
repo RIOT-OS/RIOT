@@ -17,9 +17,9 @@
  */
 
 #include <string.h>
-#include <vtimer.h>
-#include <thread.h>
-#include <mutex.h>
+#include "vtimer.h"
+#include "thread.h"
+#include "mutex.h"
 
 #include "msg.h"
 #include "rpl.h"

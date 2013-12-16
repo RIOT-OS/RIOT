@@ -4,14 +4,14 @@
  *
  */
 
-#include <irq.h>
-#include <flashrom.h>
-#include <iap.h>
+#include "irq.h"
+#include "flashrom.h"
+#include "iap.h"
 /* TODO: replace by a lpc generic header */
-#include <lpc2387.h>
+#include "lpc2387.h"
 
 #define ENABLE_DEBUG    (0)
-#include <debug.h>
+#include "debug.h"
 
 /* pointer to reserved flash rom section for configuration data */
 __attribute((aligned(256))) char configmem[256] __attribute__((section(".configmem")));

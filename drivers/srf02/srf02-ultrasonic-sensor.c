@@ -25,10 +25,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <msg.h>
-#include <vtimer.h>
-#include <timex.h>
-#include <thread.h>
+#include "msg.h"
+#include "vtimer.h"
+#include "timex.h"
+#include "thread.h"
 #include "hwtimer.h"
 #include "srf02-ultrasonic-sensor.h"
 #include "i2c.h"

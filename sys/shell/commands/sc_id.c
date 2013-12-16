@@ -17,8 +17,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <config.h>
 #include <stdlib.h>
+#include "config.h"
 
 void _id_handler(char *id)
 {

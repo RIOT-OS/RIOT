@@ -6,8 +6,8 @@
  */
 
 #include <stdio.h>
-#include <thread.h>
 #include <string.h>
+#include "thread.h"
 
 #include "net_help.h"
 

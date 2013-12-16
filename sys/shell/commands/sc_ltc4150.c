@@ -16,7 +16,7 @@
  */
 
 #include <stdio.h>
-#include <ltc4150.h>
+#include "ltc4150.h"
 
 void _get_current_handler(char *unused)
 {

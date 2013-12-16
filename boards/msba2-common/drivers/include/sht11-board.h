@@ -42,8 +42,8 @@ and the mailinglist (subscription via web site)
  * @note		$Id$
  */
 
-#include <lpc23xx.h>
-#include <board.h>
+#include "lpc23xx.h"
+#include "board.h"
 
 #define SHT11_SCK_LOW	FIO1CLR = BIT25;	// serial clock line low
 #define SHT11_SCK_HIGH	FIO1SET = BIT25;    // serial clock line high

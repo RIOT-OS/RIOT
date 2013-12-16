@@ -19,8 +19,8 @@
 #ifndef CC1100_CONFIG_H
 #define CC1100_CONFIG_H
 
-#include <timex.h>
 #include <stdint.h>
+#include "timex.h"
 
 /** CC1100 register configuration */
 typedef struct {

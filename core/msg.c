@@ -20,15 +20,15 @@
  * @}
  */
 
+#include <stddef.h>
+#include <inttypes.h>
 #include "kernel.h"
 #include "sched.h"
 #include "msg.h"
 #include "queue.h"
 #include "tcb.h"
-#include <stddef.h>
-#include <irq.h>
-#include <cib.h>
-#include <inttypes.h>
+#include "irq.h"
+#include "cib.h"
 
 #include "flags.h"
 

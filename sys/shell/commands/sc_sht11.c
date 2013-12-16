@@ -18,8 +18,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <sht11.h>
 #include <string.h>
+#include "sht11.h"
 
 #ifdef MODULE_SHT11
 

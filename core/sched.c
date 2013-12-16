@@ -22,11 +22,11 @@
  */
 
 #include <stdint.h>
-#include <sched.h>
-#include <kernel.h>
-#include <kernel_internal.h>
-#include <clist.h>
-#include <bitarithm.h>
+#include "sched.h"
+#include "kernel.h"
+#include "kernel_internal.h"
+#include "clist.h"
+#include "bitarithm.h"
 #include "thread.h"
 
 #if SCHEDSTATISTICS
@@ -34,7 +34,7 @@
 #endif
 
 #define ENABLE_DEBUG (0)
-#include <debug.h>
+#include "debug.h"
 
 volatile int num_tasks = 0;
 

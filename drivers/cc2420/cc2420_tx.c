@@ -8,13 +8,13 @@
 
 #include <stdio.h>
 
-#include <cc2420.h>
-#include <cc2420_spi.h>
-#include <cc2420_settings.h>
-#include <cc2420_arch.h>
-#include <ieee802154_frame.h>
+#include "cc2420.h"
+#include "cc2420_spi.h"
+#include "cc2420_settings.h"
+#include "cc2420_arch.h"
+#include "ieee802154_frame.h"
 
-#include <irq.h>
+#include "irq.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"

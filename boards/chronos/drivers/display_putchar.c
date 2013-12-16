@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <display.h>
 #include <string.h>
+#include "display.h"
 
 extern int toupper(int c);
 extern void (*_putchar)(int c);

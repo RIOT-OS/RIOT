@@ -19,8 +19,8 @@
  * @}
  */
 
-#include <shell_commands.h>
 #include <stdlib.h>
+#include "shell_commands.h"
 
 extern void _id_handler(char *id);
 extern void _heap_handler(char *unused);

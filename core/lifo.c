@@ -19,7 +19,7 @@
  * @}
  */
 
-#include <lifo.h>
+#include "lifo.h"
 
 int lifo_empty(int *array)
 {

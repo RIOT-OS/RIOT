@@ -40,7 +40,7 @@
 /* Include section */
 #include <stdint.h>
 #include <cc430f6137.h>
-#include <display.h>
+#include "display.h"
 
 /* ************************************************************************************************* */
 /* Global Variable section */

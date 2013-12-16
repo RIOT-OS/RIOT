@@ -34,7 +34,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #include <string.h>
 
 #include "hwtimer.h"
-#include <vtimer.h>
+#include "vtimer.h"
 
 #include "cc1100.h"
 #include "cc1100_spi.h"

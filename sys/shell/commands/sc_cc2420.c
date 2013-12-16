@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <transceiver.h>
-#include <cc2420.h>
-#include <msg.h>
+#include "transceiver.h"
+#include "cc2420.h"
+#include "msg.h"
 
 #define TEXT_SIZE           CC2420_MAX_DATA_LENGTH
 

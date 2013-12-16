@@ -18,16 +18,14 @@
  */
 #include <stdio.h>
 
-#include <cc110x_ng.h>
-#include <cc110x-defaultSettings.h>
-#include <cc110x-internal.h>
-#include <cc110x-arch.h>
-#include <cc110x_spi.h>
-#include <cc110x-reg.h>
+#include "cc110x_ng.h"
+#include "cc110x-defaultSettings.h"
+#include "cc110x-internal.h"
+#include "cc110x-arch.h"
+#include "cc110x_spi.h"
+#include "cc110x-reg.h"
 
-#include <irq.h>
-
-//#include <board.h>
+#include "irq.h"
 
 int8_t cc110x_send(cc110x_packet_t *packet)
 {

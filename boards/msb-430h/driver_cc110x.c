@@ -19,12 +19,12 @@ Boston, MA 02111-1307, USA.  */
 
 #include <stdio.h>
 
-#include <board.h>
-#include <cpu.h>
-#include <irq.h>
+#include "board.h"
+#include "cpu.h"
+#include "irq.h"
 
-#include <cc110x_ng.h>
-#include <cc110x-arch.h>
+#include "cc110x_ng.h"
+#include "cc110x-arch.h"
 
 #define CC1100_GDO0         (P2IN & 0x02)   // read serial I/O (GDO0)
 #define CC1100_GDO1         (P3IN & 0x04)   // read serial I/O (GDO1)

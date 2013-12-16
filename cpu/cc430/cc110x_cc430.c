@@ -1,9 +1,9 @@
-#include <irq.h>
-#include <cc110x-defaultSettings.h>
-#include <cc110x-reg.h>
 #include <stdint.h>
-#include <board.h>
-#include <hwtimer.h>
+#include "irq.h"
+#include "cc110x-defaultSettings.h"
+#include "cc110x-reg.h"
+#include "board.h"
+#include "hwtimer.h"
 
 /**************************************************************************************************
  * @fn          Strobe

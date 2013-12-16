@@ -6,14 +6,14 @@
   * Version 2.  See the file LICENSE for more details.
   */
 
-#include <cc2420.h>
-#include <cc2420_spi.h>
-#include <cc2420_settings.h>
-#include <cc2420_arch.h>
-#include <hwtimer.h>
+#include "cc2420.h"
+#include "cc2420_spi.h"
+#include "cc2420_settings.h"
+#include "cc2420_arch.h"
+#include "hwtimer.h"
 
 #define ENABLE_DEBUG    (0)
-#include <debug.h>
+#include "debug.h"
 
 static uint16_t radio_channel;
 static uint16_t radio_address;
