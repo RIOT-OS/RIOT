@@ -85,7 +85,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = ../../core ../../cpu ../../../boards ../../sys src/ ../../drivers
+INPUT                  = ../../core ../../cpu ../../boards ../../sys src/ ../../drivers
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.txt *.c *.h 
 RECURSIVE              = YES

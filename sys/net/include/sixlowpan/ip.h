@@ -1,21 +1,22 @@
-/**
- * sixlowpan/ip.h   - 6LoWPAN constants, data structs, and prototypes
- *                    for network layer
- *
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup sixlowpan
+ */
+
+/**
+ * @ingroup     net_sixlowpan
  * @{
- * @file
- * @brief   6LoWPAN network layer header
- * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
- * @author  Eric Engel <eric.engel@fu-berlin.de>
- * @author  Oliver Gesch <oliver.gesch@googlemail.com>
+ *
+ * @file        sixlowpan/ip.h
+ * @brief       6LoWPAN constants, data structs, and prototypes for network layer
+ *
+ * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
+ * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Eric Engel <eric.engel@fu-berlin.de>
+ * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
 #ifndef SIXLOWPAN_IP_H
@@ -384,7 +385,6 @@ void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t* dest)
  * @return The IPv6 upper-layer checksum.
  */
 uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t proto);
-/**
- * @}
- */
+
+/** @} */
 #endif /* SIXLOWPAN_IP_H */

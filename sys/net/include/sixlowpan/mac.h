@@ -1,20 +1,22 @@
-/**
- * sixlowpan/mac.h    - 6LoWPAN data structs, and prototypes for MAC layer
- *
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup sixlowpan
+ */
+
+/**
+ * @ingroup     net_sixlowpan
  * @{
- * @file
- * @brief   6LoWPAN MAC layer header
- * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
- * @author  Eric Engel <eric.engel@fu-berlin.de>
- * @author  Oliver Gesch <oliver.gesch@googlemail.com>
+ *
+ * @file        sixlowpan/mac.h
+ * @brief       6LoWPAN data structs, and prototypes for MAC layer
+ *
+ * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
+ * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Eric Engel <eric.engel@fu-berlin.de>
+ * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
 #ifndef SIXLOWPAN_MAC_H
@@ -105,7 +107,5 @@ void sixlowpan_mac_init(transceiver_type_t type);
  */
 char *sixlowpan_mac_802154_long_addr_to_str(char *addr_str, const ieee_802154_long_t *laddr);
 
-/**
- * @}
- */
+/** @} */
 #endif /* SIXLOWPAN_MAC_H */

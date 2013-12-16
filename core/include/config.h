@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @addtogroup  core_internal
+ * @{
+ *
+ * @file        config.h
+ * @brief       Kernel configuration interface
+ *
+ * @author      unknown
+ */
+
 #ifndef CONFIG_H
 #define CONFIG_H
 
@@ -36,4 +54,5 @@ uint8_t config_save(void);
  */
 void config_load(void);
 
+/** @} */
 #endif /* CONFIG_H */

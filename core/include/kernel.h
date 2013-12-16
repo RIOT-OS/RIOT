@@ -1,26 +1,24 @@
-/**
- * Kernel compile time configuration
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup kernel
+ */
+
+/**
+ * @addtogroup  core_internal
  * @{
- * @file
- * @author Freie Universität Berlin, Computer Systems & Telematics
- * @author Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * @file        kernel.h
+ * @brief       Kernel compile time configuration
+ *
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
+ * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
  */
 
 #ifndef KERNEL_H_
 #define KERNEL_H_
-
-/**
- * @defgroup    kernel  Kernel
- * @{
- */
 
 #include <stdbool.h>
 #include "config.h"
@@ -30,15 +28,8 @@
 #include "sched.h"
 #include "cpu-conf.h"
 
-/* ------------------------------------------------------------------------- */
-/**
- * @name Kernel Compile-Time Configuration
- * @{
- */
-
 /**
  * @def KERNEL_CONF_STACKSIZE_DEFAULT
- * @ingroup conf
  * @brief A reasonable default stack size that will suffice most smaller tasks
  */
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
@@ -47,7 +38,6 @@
 
 /**
  * @def KERNEL_CONF_STACKSIZE_IDLE
- * @ingroup conf
  * @brief Size of the idle task's stack in bytes
  */
 #ifndef KERNEL_CONF_STACKSIZE_IDLE
@@ -65,14 +55,12 @@
 
 /**
  * @def KERNEL_CONF_STACKSIZE_MAIN
- * @ingroup conf
  * @brief Size of the main task's stack in bytes
  */
 #ifndef KERNEL_CONF_STACKSIZE_MAIN
 #define KERNEL_CONF_STACKSIZE_MAIN      (KERNEL_CONF_STACKSIZE_DEFAULT + KERNEL_CONF_STACKSIZE_PRINTF)
 #endif
 
-/** @} */
 /* ------------------------------------------------------------------------- */
 
 

@@ -1,4 +1,4 @@
-/******************************************************************************
+/*
 Copyright 2009, Freie Universitaet Berlin (FUB). All rights reserved.
 
 These sources were developed at the Freie Universitaet Berlin, Computer Systems
@@ -24,29 +24,25 @@ and the mailinglist (subscription via web site)
 	scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
-#ifndef _MSB_BOARD_H
-#define _MSB_BOARD_H
-
 /**
- * @defgroup	msb_430h		ScatterWeb MSB-430H
- * @ingroup		msp430
+ * @defgroup    boards_msb430 MSB-430
+ * @ingroup     boards
+ * @brief       Support for the msb-430 board
  *
-<h2>Compontents</h2>
-\li MSP430
-\li CC1100
-
-* @{
-*/
-
-/**
- * @file
- * @brief		MSB-430H Board
+ * <h2>Compontents</h2>
+ * \li MSP430
+ * \li CC1100
+ * 
+ * @{
+ *
+ * @file        board.h
+ * @brief       Central defnitions for the ScatterWeb MSB-430 board
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
- * @version     $Revision$
- *
- * @note		$Id$
  */
+
+#ifndef _MSB_BOARD_H
+#define _MSB_BOARD_H
 
 #include "board-conf.h"
 

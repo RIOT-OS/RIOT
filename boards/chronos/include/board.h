@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @defgroup    boards_chronos Chronos
+ * @ingroup     boards
+ * @brief       Support for the chronos board
+ * @{
+ *
+ * @file        board.h
+ * @brief       Header for the chronos board
+ *
+ * @author      unknwon
+ */
+
 #ifndef _MSB_BOARD_H
 #define _MSB_BOARD_H
 

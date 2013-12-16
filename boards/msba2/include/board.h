@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @defgroup    boards_msba2 MSB-A2
+ * @ingroup     boards
+ * @brief       Support for the MSB-A2 board
+ * @{
+ *
+ * @file        board.h
+ * @brief       Basic definitions for the MSB-A2 board
+ *
+ * @author      unknown
+ */
+
 #ifndef __BOARD_H
 #define __BOARD_H
 

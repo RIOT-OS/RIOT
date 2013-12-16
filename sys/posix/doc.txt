@@ -7,10 +7,10 @@
  */
 
 /**
- * @defgroup posix  POSIX wrapper of RIOT
+ * @defgroup sys_posix  POSIX wrapper for RIOT
  * @brief   POSIX header files
  * @see <a href="http://pubs.opengroup.org/onlinepubs/9699919799/">
  *          The Open Group Specifications Issue 7
  *      </a>
- * @ingroup posix
+ * @ingroup sys
  */

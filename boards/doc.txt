@@ -1,0 +1,16 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @defgroup    boards Boards
+ * @brief       Board specific definitions and implementations
+ * 
+ * The boards module contains all definitions and implementations, that are specific to a certain board. Boards
+ * generally consist of a fixed configuration of a controller and some external devices as sensors or radios. All
+ * aspects concerning pin-configurion, mcu clock and driver configuration should go into this module.
+ */

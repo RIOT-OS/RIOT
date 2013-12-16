@@ -1,20 +1,22 @@
-/**
- * 6LoWPAN data types
- *
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup sixlowpan
+ */
+
+/**
+ * @ingroup     net_sixlowpan
  * @{
- * @file    sixlowpan/types.h
- * @brief   6LoWPAN data types
- * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
- * @author  Eric Engel <eric.engel@fu-berlin.de>
- * @author  Oliver Gesch <oliver.gesch@googlemail.com>
+ *
+ * @file        sixlowpan/types.h
+ * @brief       6LoWPAN data types
+ *
+ * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
+ * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Eric Engel <eric.engel@fu-berlin.de>
+ * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
 #ifndef SIXLOWPAN_TYPES_H
@@ -394,7 +396,5 @@ typedef enum __attribute__((packed)) {
     NDP_ADDR_STATE_ANY          ///< addresses of this state are always permitted.
 } ndp_addr_state_t;
 
-/**
- * @}
- */
+/** @} */
 #endif /* SIXLOWPAN_TYPES_H */

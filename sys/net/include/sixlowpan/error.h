@@ -1,18 +1,19 @@
-/**
- * sixlowpan/error.h - 6LoWPAN error codes
- *
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup sixlowpan
+ */
+
+/**
+ * @ingroup     net_sixlowpan
  * @{
- * @file
- * @brief   6LoWPAN error codes
+ *
+ * @file        sixlowpan/error.h
+ * @brief       6LoWPAN error codes
+ *
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
- * @}
  */
 
 #ifndef SIXLOWPAN_ERROR_H
@@ -94,7 +95,5 @@
  */
 #define SIXLOWERROR_CSUM        (141)
 
-/**
- * @}
- */
+/** @} */
 #endif /* SIXLOWPAN_ERROR_H */

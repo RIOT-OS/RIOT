@@ -1,8 +1,8 @@
-/******************************************************************************
+/*
  * Copyright 2008, Freie Universitaet Berlin (FUB). All rights reserved.
  *
  * These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
+ * and Telematics group (http://cst.mi.fu-berlin.de).
  * ----------------------------------------------------------------------------
  * This file is part of RIOT.
  *
@@ -13,21 +13,16 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 *******************************************************************************/
 
 /**
- * @ingroup		dev_cc110x
+ * @ingroup     drivers_cc110x_ng
  * @{
- */
-
-/**
- * @file
- * @internal
- * @brief		TI Chipcon CC1100 SPI driver
+ *
+ * @file        cc110x_spi.c
+ * @brief       TI Chipcon CC1100 SPI driver
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
- * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
- * @author		Heiko Will <hwill@inf.fu-berlin.de>
- * @version     $Revision: 1775 $
- *
- * @note		$Id: cc110x_spi.c 1775 2010-01-26 09:37:03Z hillebra $
+ * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
+ * @author      Heiko Will <hwill@inf.fu-berlin.de>
+ * @}
  */
 
 #include <stdio.h>
@@ -41,7 +36,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #include "irq.h"
 
 /*---------------------------------------------------------------------------*/
-//					    CC1100 SPI access
+//                      CC1100 SPI access
 /*---------------------------------------------------------------------------*/
 
 uint8_t cc110x_writeburst_reg(uint8_t addr, char *src, uint8_t count)
@@ -126,5 +121,3 @@ uint8_t cc110x_strobe(uint8_t c)
     restoreIRQ(cpsr);
     return result;
 }
-
-/** @} */

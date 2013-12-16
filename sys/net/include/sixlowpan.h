@@ -1,7 +1,4 @@
-/**
- * sixlowpan.h - Wraps all API types, constants and functions
- *               of 6LoWPAN concerning layers under 3.
- *
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
@@ -10,11 +7,12 @@
  */
 
 /**
- * @defgroup sixlowpan      6LoWPAN
- * @ingroup net
- * @brief   6LoWPAN module implements (parts of) the 6LoWPAN adaption layer
- *          for IPv6 over Low Power Wireless Personal Area Networks
- *          (6LoWPANs)
+ * @defgroup    net_sixlowpan 6LoWPAN
+ * @ingroup     net
+ * @brief       6LoWPAN module implements (parts of) the 6LoWPAN adaption layer
+ *              for IPv6 over Low Power Wireless Personal Area Networks
+ *              (6LoWPANs)
+ *
  * @see     <a href="http://tools.ietf.org/html/rfc4919">
  *              RFC 4919 - IPv6 over Low-Power Wireless Personal Area
  *                  Networks (6LoWPANs): Overview, Assumptions, Problem
@@ -34,9 +32,11 @@
  *              (6LoWPANs)
  *          </a>
  * @{
- * @file
- * @brief   6lowpan link layer and lowpan functions
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ *
+ * @file        sixlowpan.h
+ * @brief       6lowpan link layer and lowpan functions
+ *
+ * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef SIXLOWPAN_H
 #define SIXLOWPAN_H
@@ -46,7 +46,5 @@
 #include "sixlowpan/lowpan.h"
 #include "sixlowpan/mac.h"
 
-/**
- * @}
- */
+/** @} */
 #endif /* SIXLOWPAN_H */

@@ -1,17 +1,22 @@
-/**
- * bit arithmetic helper functions
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
+ */
+ 
+/**
+ * @ingroup     core_util
+ * @{
  *
- * \ingroup bitarithm
- * \{
- * \file
- * \author Kaspar Schleiser <kaspar@schleiser.de>
- * \}
+ * @file        bitarithm.c
+ * @brief       Bit arithmetic helper functions implementation
+ *
+ * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
+ *
+ * @}
  */
 
 #include <stdio.h>

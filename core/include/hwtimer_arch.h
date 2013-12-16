@@ -1,20 +1,24 @@
-/**
- * Hardware timer abstraction
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup	kernel
- * @{
- * @file
- * @author Freie Universität Berlin, Computer Systems & Telematics
- * @author Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
- * @author Heiko Will <hwill@inf.fu-berlin.de>
- * @author Kaspar Schleiser <kaspar@schleiser.de>
  */
+ 
+/**
+ * @addtogroup  core_hwtimer
+ * @{
+ *
+ * @file        hwtimer_arch.h
+ * @brief       Architecture specific hwtimer API
+ *
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
+ * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
+ * @author      Heiko Will <hwill@inf.fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ */
+ 
 #ifndef HWTIMER_ARCH_H_
 #define HWTIMER_ARCH_H_
 
@@ -56,7 +60,5 @@ void hwtimer_arch_unset(short timer);
  */
 unsigned long hwtimer_arch_now(void);
 
-/**
- * @}
- */
+/** @} */
 #endif /* HWTIMER_ARCH_H_ */

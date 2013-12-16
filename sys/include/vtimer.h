@@ -1,21 +1,20 @@
-/** \addtogroup system
- * @{ */
-
 /**
- * \defgroup vtimer Virtual (Software) Timer library
+ * @defgroup    sys_vtimer Virtual (Software) Timer library
+ * @ingroup  sys
+ * @brief       Virtual software timer for general timer functionality in applications
+ * @{
+ *
+ * @file        vtimer.h
+ * @brief       VTimer API
  *
  * The vtimer library provides functions for setting, resetting and restarting
  * software timers, and for checking if a vtimer has expired.
  *
  * (As of now, not resetting, restarting, removing and checking are not implemented)
  *
- * @{
+ * @author      unknown
  */
 
-/**
- * \file
- * Timer library header file.
- */
 #ifndef __VTIMER_H
 #define __VTIMER_H
 
@@ -120,4 +119,5 @@ void vtimer_print_long_queue(void);
 
 #endif
 
+/** @} */
 #endif /* __VTIMER_H */

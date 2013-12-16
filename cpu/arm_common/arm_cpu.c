@@ -8,17 +8,12 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup arch
+ * @ingroup arm_common
  * @{
  * @file
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @author Heiko Will <heiko.will@fu-berlin.de>
  * @}
- */
-/**
- *
- *
- *
  */
 
 #include <stdio.h>

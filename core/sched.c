@@ -1,19 +1,24 @@
-/**
- * The RIOT scheduler implementation
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * TODO: setup dependency from SCHEDSTATISTICS to MODULE_HWTIMER
- *
- * @ingroup kernel
+ */
+
+/**
+ * @ingroup     core_shed
  * @{
- * @file
- * @author Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * @file        shed.c
+ * @brief       Scheduler implementation
+ *
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
+ * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ *
  * @}
+ *
+ * TODO: setup dependency from SCHEDSTATISTICS to MODULE_HWTIMER 
  */
 
 #include <stdint.h>
@@ -215,4 +220,3 @@ void sched_task_exit(void)
     active_thread = NULL;
     cpu_switch_context_exit();
 }
-

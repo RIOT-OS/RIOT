@@ -1,12 +1,17 @@
-/*
- * common.h
+/**
+ * @defgroup    net_help Net help
+ * @ingroup     net
+ * @brief       Helper functions for networking as byte order conversions and checksum calculations
+ * @{
  *
- *  Created on: 05.10.2011
- *      Author: Oliver
+ * @file        net_help.h
+ *
+ * @author      Oliver
  */
 
-#ifndef COMMON_H_
-#define COMMON_H_
+#ifndef __NET_HELP_H
+#define __NET_HELP_H
+
 #include <string.h>
 #include <stdint.h>
 
@@ -24,4 +29,5 @@
 uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len);
 void printArrayRange(uint8_t *array, uint16_t len, char *str);
 
-#endif /* COMMON_H_ */
+/** @} */
+#endif /* __NET_HELP_H */

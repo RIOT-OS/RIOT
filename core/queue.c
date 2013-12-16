@@ -1,16 +1,20 @@
-/**
- * simple queue implementation
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup kernel
+ */
+ 
+/**
+ * @ingroup     core_util
  * @{
- * @file
- * @author Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * @file        queue.c
+ * @brief       A simple queue implementation
+ *
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
+ * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
  * @}
  */
 

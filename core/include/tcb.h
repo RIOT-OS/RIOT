@@ -1,16 +1,21 @@
-/**
- * @ingroup kernel
- * @{
- * @file
- * @author      Freie Universität Berlin, Computer Systems & Telematics
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
- */
-
 /*
- * tcb.h
+ * Copyright (C) 2013 Freie Universität Berlin
  *
- *  Created on: 19.08.2008
- *      Author: heiko, kaspar
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+ 
+/**
+ * @addtogroup  core_thread
+ * @{
+ *
+ * @file        tcb.h
+ * @brief       Thread context block definition
+ *
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
+ * @author      Heiko Will
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #ifndef TCB_H_
@@ -23,17 +28,17 @@
 #include <msg.h>
 
 /* uneven means has to be on runqueue */
-#define STATUS_NOT_FOUND 		(0x0000)
-#define STATUS_ON_RUNQUEUE 		(0x0001)
-#define STATUS_RUNNING 			(0x0002 + STATUS_ON_RUNQUEUE)
-#define STATUS_PENDING 			(0x0004 + STATUS_ON_RUNQUEUE)
-#define STATUS_STOPPED 			(0x0008)
-#define STATUS_SLEEPING 		(0x0010)
-#define STATUS_MUTEX_BLOCKED 	(0x0020)
-#define STATUS_RECEIVE_BLOCKED 	(0x0040)
-#define STATUS_SEND_BLOCKED 	(0x0080)
-#define STATUS_REPLY_BLOCKED 	(0x0100)
-#define STATUS_TIMER_WAITING	(0x0200)
+#define STATUS_NOT_FOUND        (0x0000)
+#define STATUS_ON_RUNQUEUE      (0x0001)
+#define STATUS_RUNNING          (0x0002 + STATUS_ON_RUNQUEUE)
+#define STATUS_PENDING          (0x0004 + STATUS_ON_RUNQUEUE)
+#define STATUS_STOPPED          (0x0008)
+#define STATUS_SLEEPING         (0x0010)
+#define STATUS_MUTEX_BLOCKED    (0x0020)
+#define STATUS_RECEIVE_BLOCKED  (0x0040)
+#define STATUS_SEND_BLOCKED     (0x0080)
+#define STATUS_REPLY_BLOCKED    (0x0100)
+#define STATUS_TIMER_WAITING    (0x0200)
 
 typedef struct tcb_t {
     char *sp;

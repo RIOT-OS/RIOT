@@ -1,5 +1,15 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
 /**
- * Hardware timer interface
+ * @defgroup    core_hwtimer Hardware timer
+ * @ingroup     core
+ * @brief       Hardware timer interface
  *
  * The Hardware timers are directly mapped to hardware timers with minimum
  * latency. They are intended for short intervals and to be used in time
@@ -7,24 +17,18 @@
  * interrupt context and must use the shortest possible execution time (e.g.
  * set a flag and trigger a worker thread).
  *
- * <b>hwtimer must not be used within applications</b>, use \ref vtimer
+ * <b>The hardware timer must not be used within applications</b>, use \ref vtimer
  * instead.
  *
- * @defgroup hwtimer    Hardware timer
- * @ingroup kernel
  * @{
- * @file
  *
- * @author Freie Universität Berlin, Computer Systems & Telematics
- * @author Heiko Will
- * @author Kaspar Schleiser <kaspar@schleiser.de>
- * @author Michael Baar
+ * @file        hwtimer.h
+ * @brief       HW-timer abstraction
  *
- * Copyright (C) 2013 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License. See the file LICENSE in the top level directory for more
- * details.
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
+ * @author      Heiko Will
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Michael Baar
  */
 
 #ifndef __HWTIMER_H
@@ -118,8 +122,9 @@ void hwtimer_spin(unsigned long ticks);
 
 int hwtimer_active(void);
 
-/* internal */
+/** @} */
 
+/* internal */
 /**
  * @brief    TODO
  * @internal

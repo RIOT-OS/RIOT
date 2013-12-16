@@ -1,0 +1,27 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @defgroup core Kernel
+ * @brief The RIOT micro-kernel containing the core functionality
+ * 
+ * The kernel module contains only the basic OS functionality such as the sheduler, threading, synchronization
+ * and IRQ-handling. The only exception is the integration of the hardware timer into this module.
+ */
+ 
+/**
+ * @defgroup    core_util Kernel utilities
+ * @ingroup     core
+ * @brief       Utilies and data structures used by the kernel
+ */
+ 
+/**
+ * @defgroup    core_internal Startup and Configuration
+ * @ingroup     core
+ * @brief       Configuration data and startup code for the kernel
+ */

@@ -1,3 +1,13 @@
+
+/**
+ * @defgroup    sys_autoinit Auto-init
+ * @ingroup     sys
+ * @brief       Autoconfigure libraries
+ * @{
+ *
+ * @file        auto_init.h
+ */
+
 #ifndef AUTO_INIT_H
 #define AUTO_INIT_H
 
@@ -23,4 +33,5 @@
 
 void auto_init(void);
 
-#endif
+/** @} */
+#endif /* AUTO_INIT_H */

@@ -1,30 +1,33 @@
-/**
- * Helper functions for bit arithmetic
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @defgroup bitarithm Bit Arithmetic
- * @ingroup	lib
+ */
+
+/** 
+ * @addtogroup  core_util
  * @{
- * @file
- * @author Freie Universität Berlin, Computer Systems & Telematics
- * @author Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * @file        bitarithm.h
+ * @brief       Helper functions for bit arithmetic
+ *
+ * @author      Freie Universität Berlin, Computer Systems & Telematics
+ * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
  */
 
 #ifndef BITARITHM_H_
 #define BITARITHM_H_
 
-#define BS(val, bit)		((val) & (bit))
-#define BS_COND(condition, target, mask)		(target) ^= ( (-(condition) ^ (target)) & (mask) )
-#define SETBIT(val, bit)	val |= (bit)
-#define CLRBIT(val, bit)	val &= (~(bit))
+#define BS(val, bit)        ((val) & (bit))
+#define BS_COND(condition, target, mask)        (target) ^= ( (-(condition) ^ (target)) & (mask) )
+#define SETBIT(val, bit)    val |= (bit)
+#define CLRBIT(val, bit)    val &= (~(bit))
 
 /**
- * @name	Single Bit Defines
+ * @name    Single Bit Defines
  * @{
  */
 #ifndef BIT0
@@ -68,35 +71,32 @@
 #define ARCH_32_BIT   (__INT_MAX__ == 2147483647)
 
 /**
- * @brief	Returns the number of the highest '1' bit in a value
- * @param[in]	v	Input value
- * @return			Bit Number
+ * @brief   Returns the number of the highest '1' bit in a value
+ * @param[in]   v   Input value
+ * @return          Bit Number
  *
  * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
  */
 unsigned number_of_highest_bit(unsigned v);
 
 /**
- * @brief	Returns the number of the lowest '1' bit in a value
- * @param[in]	v	Input value - must be unequal to '0', otherwise the
+ * @brief   Returns the number of the lowest '1' bit in a value
+ * @param[in]   v   Input value - must be unequal to '0', otherwise the
  *                  function will produce an infinite loop
- * @return			Bit Number
+ * @return          Bit Number
  *
  * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
  */
 unsigned number_of_lowest_bit(register unsigned v);
 
 /**
- * @brief	Returns the number of bits set in a value
- * @param[in]	v	Input value
- * @return			Number of set bits
+ * @brief   Returns the number of bits set in a value
+ * @param[in]   v   Input value
+ * @return          Number of set bits
  *
  * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
  */
 unsigned number_of_bits_set(unsigned v);
 
-/**
- * @}
- */
-
+/** @} */
 #endif /* BITARITHM_H_ */
