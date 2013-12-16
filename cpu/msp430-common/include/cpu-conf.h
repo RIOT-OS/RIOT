@@ -23,8 +23,8 @@ See the file LICENSE in the top level directory for more details.
 #define KERNEL_CONF_STACKSIZE_DEFAULT	(256)
 #endif
 
-#define KERNEL_CONF_STACKSIZE_IDLE 96
-#define MSP430_ISR_STACK_SIZE 256
+#define KERNEL_CONF_STACKSIZE_IDLE      (96)
+#define MSP430_ISR_STACK_SIZE           (256)
 
 #define RX_BUF_SIZE (3)
 #define TRANSCEIVER_BUFFER_SIZE (3)
