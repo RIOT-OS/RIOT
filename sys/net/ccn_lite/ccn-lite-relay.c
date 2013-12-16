@@ -330,8 +330,6 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
     int hwtimer_id;
 
     while (!ccnl->halt_flag) {
-        //DEBUGMSG(1, "waiting for incomming msg\n");
-
         hwtimer_id = hwtimer_set(HWTIMER_TICKS(us), ccnl_timeout_callback, ccnl);
         if (hwtimer_id == -1) {
             puts("NO MORE TIMERS!");
@@ -339,12 +337,12 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
             //DEBUGMSG(1, "hwtimer_id is %d\n", hwtimer_id);
         }
         msg_receive(&in);
+        //DEBUGMSG(1, "%s Packet waiting, us was %lu\n", riot_ccnl_event_to_string(in.type), us);
 
         switch (in.type) {
             case PKT_PENDING:
                 hwtimer_remove(hwtimer_id);
                 p = (radio_packet_t *) in.content.ptr;
-                DEBUGMSG(1, "%s Packet waiting\n", riot_ccnl_event_to_string(in.type));
                 DEBUGMSG(1, "\tLength:\t%u\n", p->length);
                 DEBUGMSG(1, "\tSrc:\t%u\n", p->src);
                 DEBUGMSG(1, "\tDst:\t%u\n", p->dst);
@@ -361,7 +359,6 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
             case (CCNL_RIOT_MSG):
                 hwtimer_remove(hwtimer_id);
                 m = (riot_ccnl_msg_t *) in.content.ptr;
-                DEBUGMSG(1, "%s Packet waiting\n", riot_ccnl_event_to_string(in.type));
                 DEBUGMSG(1, "\tLength:\t%u\n", m->size);
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
 
@@ -371,16 +368,15 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 
             case (CCNL_RIOT_HALT):
                 hwtimer_remove(hwtimer_id);
-                DEBUGMSG(1, "%s Packet waiting\n", riot_ccnl_event_to_string(in.type));
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
                 DEBUGMSG(1, "\tNumb:\t%" PRIu32 "\n", in.content.value);
 
                 ccnl->halt_flag = 1;
                 break;
+
 #if RIOT_CCNL_POPULATE
             case (CCNL_RIOT_POPULATE):
                 hwtimer_remove(hwtimer_id);
-                DEBUGMSG(1, "%s Packet waiting\n", riot_ccnl_event_to_string(in.type));
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
                 DEBUGMSG(1, "\tNumb:\t%" PRIu32 "\n", in.content.value);
 
