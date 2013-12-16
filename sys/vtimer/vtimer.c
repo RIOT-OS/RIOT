@@ -72,25 +72,36 @@ static int set_longterm(vtimer_t *timer)
 static int update_shortterm(void)
 {
     if (shortterm_queue_root.next == NULL) {
+        /* there is no vtimer to schedule, queue is empty */
         DEBUG("update_shortterm: shortterm_queue_root.next == NULL - dont know what to do here\n");
         return 0;
     }
     if (hwtimer_id != -1) {
+        /* there is a running hwtimer for us */
         if (hwtimer_next_absolute != shortterm_queue_root.next->priority) {
+            /* the next timer in the vtimer queue is not the next hwtimer */
+
+            /* we have to remove the running hwtimer (and schedule a new one */
             hwtimer_remove(hwtimer_id);
         }
         else {
+            /* the next vtimer is the next hwtimer, nothing to do */
             return 0;
         }
     }
 
+    /* short term part of the next vtimer */
     hwtimer_next_absolute = shortterm_queue_root.next->priority;
 
     uint32_t next = hwtimer_next_absolute;
+
+    /* current short term time */
     uint32_t now = HWTIMER_TICKS_TO_US(hwtimer_now());
 
     /* make sure the longterm_tick_timer does not get truncated */
     if (((vtimer_t*)shortterm_queue_root.next)->action != vtimer_tick) {
+        /* the next vtimer to schedule is the long therm tick */
+        /* is has a shortterm offset of longterm_tick_start */
         next += longterm_tick_start;
     }
 
@@ -138,11 +149,14 @@ static int set_shortterm(vtimer_t *timer)
 
 void vtimer_callback(void *ptr)
 {
+    DEBUG("vtimer_callback ptr=%p\n", ptr);
+
     (void) ptr;
     vtimer_t *timer;
     in_callback = true;
     hwtimer_id = -1;
 
+    /* get the vtimer that fired */
     timer = (vtimer_t *)queue_remove_head(&shortterm_queue_root);
 
 #if ENABLE_DEBUG
