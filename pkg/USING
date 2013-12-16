@@ -1,0 +1,5 @@
+Packages are included to your project as external modules. Thus you only have
+to add the following line to your project (and update your INCLUDE path
+accordingly):
+
+EXTERNAL+=$(RIOTBASE)/pkg/<pkg_name>
