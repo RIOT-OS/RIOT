@@ -23,3 +23,4 @@ export HEXFILE = bin/$(PROJECT).hex
 export FFLAGS = --telosb -c $(PORT) -r -e -I -p $(HEXFILE)
 
 export INCLUDES += -I $(RIOTCPU)/msp430-common/include/
+export OFLAGS = -O ihex
