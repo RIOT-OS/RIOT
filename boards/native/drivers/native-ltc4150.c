@@ -55,7 +55,10 @@ void ltc4150_disable_int(void)
 {
     DEBUG("ltc4150_disable_int()\n");
     _native_ltc_int_enabled = 0;
-    hwtimer_remove(_native_ltc_hwtimer_id);
+    if (_native_ltc_hwtimer_id != -1) {
+        hwtimer_remove(_native_ltc_hwtimer_id);
+        _native_ltc_hwtimer_id = -1;
+    }
 }
 
 /**
@@ -84,6 +87,7 @@ void ltc4150_sync_blocking(void)
  */
 void ltc4150_arch_init(void)
 {
+    _native_ltc_hwtimer_id = -1;
     ltc4150_disable_int();
 
     puts("Native LTC4150 initialized.");
