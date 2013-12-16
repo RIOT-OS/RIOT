@@ -41,7 +41,7 @@ static void msb_ports_init(void)
 {
     /* Port 1: Free port, for energy saving all outputs are set to zero. */
     P1SEL = 0x00;	/* Port1 I/O Function */
-    P1OUT = 0x00;	/* Port1 Ausgangsregister: 00000000 = 0x00 */
+    P1OUT = 0x00;	/* Port1 Output register: 00000000 = 0x00 */
     P1DIR = 0xFF;	/* Port1 Direction: 11111111 = 0xFF */
 
     P2SEL = 0x20;	/* Port2 I/O Function */
