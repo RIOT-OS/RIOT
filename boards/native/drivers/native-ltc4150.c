@@ -30,19 +30,19 @@
 
 #define LTC_TIMER_INTERVAL (10 * 1000UL) // 10 ms
 
-static int _int_enabled;
-static int hwtimer_id;
+static int _native_ltc_int_enabled;
+static int _native_ltc_hwtimer_id;
 
 /**
  * native ltc4150 hwtimer - interrupt handler proxy
  */
-static void _int_handler()
+static void _native_ltc_int_handler()
 {
     DEBUG("ltc4150 _int_handler()\n");
     ltc4150_interrupt();
-    if (_int_enabled == 1) {
-        hwtimer_id = hwtimer_set(LTC_TIMER_INTERVAL, _int_handler, NULL);
-        if (hwtimer_id == -1) {
+    if (_native_ltc_int_enabled == 1) {
+        _native_ltc_hwtimer_id = hwtimer_set(LTC_TIMER_INTERVAL, _native_ltc_int_handler, NULL);
+        if (_native_ltc_hwtimer_id == -1) {
             errx(1, "_int_handler: hwtimer_set");
         }
     }
@@ -54,8 +54,8 @@ static void _int_handler()
 void ltc4150_disable_int(void)
 {
     DEBUG("ltc4150_disable_int()\n");
-    _int_enabled = 0;
-    hwtimer_remove(hwtimer_id);
+    _native_ltc_int_enabled = 0;
+    hwtimer_remove(_native_ltc_hwtimer_id);
 }
 
 /**
@@ -64,9 +64,9 @@ void ltc4150_disable_int(void)
 void ltc4150_enable_int(void)
 {
     DEBUG("ltc4150_enable_int()\n");
-    _int_enabled = 1;
-    hwtimer_id = hwtimer_set(LTC_TIMER_INTERVAL, _int_handler, NULL);
-    if (hwtimer_id == -1) {
+    _native_ltc_int_enabled = 1;
+    _native_ltc_hwtimer_id = hwtimer_set(LTC_TIMER_INTERVAL, _native_ltc_int_handler, NULL);
+    if (_native_ltc_hwtimer_id == -1) {
         errx(1, "ltc4150_enable_int: hwtimer_set");
     }
 }
