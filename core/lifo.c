@@ -21,6 +21,12 @@
 
 #include "lifo.h"
 
+#define ENABLE_DEBUG (0)
+#if (ENABLE_DEBUG == 1)
+#define DEBUG_LIFO
+#endif
+#include "debug.h"
+
 int lifo_empty(int *array)
 {
     return array[0] == -1;
@@ -28,6 +34,7 @@ int lifo_empty(int *array)
 
 void lifo_init(int *array, int n)
 {
+    DEBUG("lifo_init(%i)\n", n);
     for (int i = 0; i <= n; i++) {
         array[i] = -1;
     }
@@ -35,13 +42,28 @@ void lifo_init(int *array, int n)
 
 void lifo_insert(int *array, int i)
 {
+    DEBUG("lifo_insert(%i)\n", i);
+
     int index = i + 1;
+
+#ifdef DEBUG_LIFO
+    for (int x=0; x < index; x++) {
+        if (i == array[x]) {
+            printf("lifo_insert: inserting duplicate into lifo: %d\n", i);
+        }
+    }
+    if ((array[index] != -1) && (array[0] != -1)) {
+        printf("lifo_insert: overwriting array[%i] == %i with %i\n", index, array[index], array[0]);
+    }
+#endif
+
     array[index] = array[0];
     array[0] = i;
 }
 
 int lifo_get(int *array)
 {
+    DEBUG("lifo_get\n");
     int head = array[0];
 
     if (head != -1) {
@@ -60,12 +82,16 @@ int main()
 
     lifo_init(array, 4);
 
-    lifo_insert(array, 0);
-    lifo_insert(array, 1);
     lifo_insert(array, 2);
+    lifo_insert(array, 1);
     lifo_insert(array, 3);
+    lifo_insert(array, 0);
     printf("get: %i\n", lifo_get(array));
-
+    printf("get: %i\n", lifo_get(array));
+    printf("get: %i\n", lifo_get(array));
+    printf("get: %i\n", lifo_get(array));
+    printf("get: %i\n", lifo_get(array));
+    printf("get: %i\n", lifo_get(array));
 
     return 0;
 }
