@@ -15,7 +15,6 @@
  * @}
  */
 
-#ifdef DESTINY_WITH_TCP
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,8 +30,6 @@
 #include "socket.h"
 
 #include "tcp_timer.h"
-
-char tcp_timer_stack[TCP_TIMER_STACKSIZE];
 
 void handle_synchro_timeout(socket_internal_t *current_socket)
 {
@@ -160,4 +157,3 @@ void tcp_general_timer(void)
         thread_sleep();
     }
 }
-#endif
