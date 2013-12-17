@@ -69,6 +69,7 @@ int lifo_get(int *array)
     if (head != -1) {
         array[0] = array[head + 1];
     }
+    array[head+1] = -1;
 
     return head;
 }
