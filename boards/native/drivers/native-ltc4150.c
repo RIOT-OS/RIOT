@@ -22,29 +22,36 @@
 #include <err.h>
 
 #include "ltc4150_arch.h"
-#include "debug.h"
 
 #include "cpu.h"
 #include "cpu-conf.h"
 #include "hwtimer.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 #define LTC_TIMER_INTERVAL (10 * 1000UL) // 10 ms
 
-static int _native_ltc_int_enabled;
-static int _native_ltc_hwtimer_id;
+static int _native_ltc_hwtimer_id = -1;
 
 /**
  * native ltc4150 hwtimer - interrupt handler proxy
  */
 static void _native_ltc_int_handler()
 {
-    DEBUG("ltc4150 _int_handler()\n");
-    ltc4150_interrupt();
-    if (_native_ltc_int_enabled == 1) {
+    DEBUG("_native_ltc_int_handler()\n");
+    if (_native_ltc_hwtimer_id != -1) {
+        ltc4150_interrupt();
         _native_ltc_hwtimer_id = hwtimer_set(LTC_TIMER_INTERVAL, _native_ltc_int_handler, NULL);
         if (_native_ltc_hwtimer_id == -1) {
             errx(1, "_int_handler: hwtimer_set");
         }
+        else {
+            DEBUG("_native_ltc_int_handler: _native_ltc_hwtimer_id is  %d\n", _native_ltc_hwtimer_id);
+        }
+    }
+    else {
+        DEBUG("_native_ltc_int_handler was called although no hwtimer is set\n");
     }
 }
 
@@ -54,7 +61,6 @@ static void _native_ltc_int_handler()
 void ltc4150_disable_int(void)
 {
     DEBUG("ltc4150_disable_int()\n");
-    _native_ltc_int_enabled = 0;
     if (_native_ltc_hwtimer_id != -1) {
         hwtimer_remove(_native_ltc_hwtimer_id);
         _native_ltc_hwtimer_id = -1;
@@ -67,10 +73,12 @@ void ltc4150_disable_int(void)
 void ltc4150_enable_int(void)
 {
     DEBUG("ltc4150_enable_int()\n");
-    _native_ltc_int_enabled = 1;
     _native_ltc_hwtimer_id = hwtimer_set(LTC_TIMER_INTERVAL, _native_ltc_int_handler, NULL);
     if (_native_ltc_hwtimer_id == -1) {
         errx(1, "ltc4150_enable_int: hwtimer_set");
+    }
+    else {
+        DEBUG("ltc4150_enable_int: _native_ltc_hwtimer_id is %d\n", _native_ltc_hwtimer_id);
     }
 }
 
@@ -87,7 +95,6 @@ void ltc4150_sync_blocking(void)
  */
 void ltc4150_arch_init(void)
 {
-    _native_ltc_hwtimer_id = -1;
     ltc4150_disable_int();
 
     puts("Native LTC4150 initialized.");
