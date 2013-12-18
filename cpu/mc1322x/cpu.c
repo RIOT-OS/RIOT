@@ -1,7 +1,7 @@
 /*
  * cpu.c - MC1322X architecture common support functions
  * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr>
- *                    Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * Copyright (C) 2013 Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *
  * This source code is licensed under the GNU Lesser General Public License,
  * Version 2.  See the file LICENSE for more details.
