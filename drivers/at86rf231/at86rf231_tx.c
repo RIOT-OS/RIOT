@@ -54,6 +54,7 @@ int16_t at86rf231_send(at86rf231_packet_t *packet)
 
     // transmit packet
     at86rf231_xmit(pkt, packet->length);
+    return packet->length;
 }
 
 static void at86rf231_xmit(uint8_t *data, uint8_t length)
