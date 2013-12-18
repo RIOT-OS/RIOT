@@ -20,6 +20,8 @@ rpl_of_t rpl_of_mrhof = {
     which_parent,
     which_dodag,
     reset,
+    NULL,
+    NULL,
     NULL
 };
 
@@ -30,6 +32,7 @@ rpl_of_t *rpl_get_of_mrhof(void)
 
 void reset(rpl_dodag_t *dodag)
 {
+    (void) dodag;
 }
 
 static uint16_t calc_path_cost(rpl_parent_t *parent)
@@ -171,5 +174,6 @@ static rpl_parent_t *which_parent(rpl_parent_t *p1, rpl_parent_t *p2)
 //Not used yet, as the implementation only makes use of one dodag for now.
 static rpl_dodag_t *which_dodag(rpl_dodag_t *d1, rpl_dodag_t *d2)
 {
+    (void) d2;
     return d1;
 }

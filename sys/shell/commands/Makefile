@@ -1,4 +1,4 @@
-SRC = shell_commands.c sc_id.c sc_heap.c
+SRC = shell_commands.c sc_id.c
 INCLUDES = -I../../../core/include -I../../include -I../../../drivers/include/
 
 ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
@@ -31,6 +31,9 @@ ifneq (,$(findstring rtc,$(USEMODULE)))
 endif
 ifneq (,$(findstring sht11,$(USEMODULE)))
 	SRC += sc_sht11.c
+endif
+ifneq (,$(findstring lpc_common,$(USEMODULE)))
+	SRC += sc_heap.c
 endif
 
 OBJ = $(SRC:%.c=$(BINDIR)%.o)

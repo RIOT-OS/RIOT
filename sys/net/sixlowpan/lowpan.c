@@ -1637,7 +1637,7 @@ void init_reas_bufs(lowpan_reas_buf_t *buf)
 void sixlowpan_lowpan_init(transceiver_type_t trans, uint8_t r_addr,
                            int as_border)
 {
-    lowpan_init(trans, r_addr, NULL, 0);
+    lowpan_init(trans, r_addr, NULL, as_border);
 }
 
 void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,

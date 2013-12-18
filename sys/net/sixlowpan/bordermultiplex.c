@@ -141,7 +141,7 @@ int readpacket(uint8_t *packet_buf, size_t size)
             break;
         }
 
-        if ((line_buf_ptr - packet_buf) >= size - 1) {
+        if ((size_t) (line_buf_ptr - packet_buf) >= size - 1) {
             return -SIXLOWERROR_ARRAYFULL;
         }
 
@@ -179,8 +179,8 @@ int writepacket(uint8_t *packet_buf, size_t size)
 {
     uint8_t *byte_ptr = packet_buf;
 
-    while ((byte_ptr - packet_buf) < size) {
-        if ((byte_ptr - packet_buf) > BORDER_BUFFER_SIZE) {
+    while ((size_t) (byte_ptr - packet_buf) < size) {
+        if ((size_t) (byte_ptr - packet_buf) > BORDER_BUFFER_SIZE) {
             return -1;
         }
 
