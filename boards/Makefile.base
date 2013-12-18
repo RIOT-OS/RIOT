@@ -25,6 +25,9 @@ ifeq ($(BOARD),chronos)
  INCLUDES += -I$(RIOTBOARD)/chronos/include/
  INCLUDES += -I$(RIOTBOARD)/chronos/drivers/include/
 endif
+ifeq ($(BOARD),telosb)
+ INCLUDES += -I$(RIOTBOARD)/telosb/include/
+endif
 ifeq ($(BOARD),native)
  INCLUDES += -I$(RIOTBOARD)/native/include/
 endif
