@@ -133,6 +133,8 @@ static void riot_ccnl_appserver_ioloop(void)
                 DEBUGMSG(1, "new msg: size=%" PRIu16 " sender_pid=%" PRIu16 "\n",
                          m->size, in.sender_pid);
                 appserver_handle_interest(m->payload, m->size, in.sender_pid);
+
+                ccnl_free(m);
                 break;
 
             default:
