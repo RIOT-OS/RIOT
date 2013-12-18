@@ -415,12 +415,11 @@ enum interrupt_nums {
         x; \
         __int_enable(); } while(0)
 
+extern void register_isr(uint8_t interrupt, void (*isr)(void));
 
-extern void tmr0_isr(void) __attribute__((weak));
-extern void tmr1_isr(void) __attribute__((weak));
-extern void tmr2_isr(void) __attribute__((weak));
-extern void tmr3_isr(void) __attribute__((weak));
+extern void tmr_isr(void) __attribute__((weak));
 
+extern void crm_isr(void) __attribute__((weak));
 extern void rtc_isr(void) __attribute__((weak));
 extern void kbi4_isr(void) __attribute__((weak));
 extern void kbi5_isr(void) __attribute__((weak));
@@ -437,5 +436,13 @@ extern void maca_isr(void) __attribute__((weak));
 extern void asm_isr(void) __attribute__((weak));
 
 extern void i2c_isr(void) __attribute__((weak));
+
+extern void spif_isr(void) __attribute__((weak));
+
+extern void ssi_isr(void) __attribute__((weak));
+
+extern void adc_isr(void) __attribute__((weak));
+
+extern void spi_isr(void) __attribute__((weak));
 
 #endif /* MC1322X_H */

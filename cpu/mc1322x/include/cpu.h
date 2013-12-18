@@ -15,10 +15,18 @@
 #ifndef CPU_H
 #define CPU_H 
 
-#include <stdint.h>
+/**
+ * @defgroup	mc1322x		Freescale mc1322x
+ * @ingroup		cpu
+ * @{
+ */
+
+#include <stdbool.h>
 #include "arm_cpu.h"
 #include "mc1322x.h"
 
-extern uintptr_t __stack_start;     ///< end of user stack memory space
+extern uintptr_t __stack_start;		///< end of user stack memory space
+bool install_irq(int int_number, void *handler_addr, int priority);
 
+/** @} */
 #endif /* CPU_H */
