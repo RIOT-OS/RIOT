@@ -22,8 +22,8 @@
 #include "lifo.h"
 
 #define ENABLE_DEBUG (0)
-#if (ENABLE_DEBUG == 1)
-#define DEBUG_LIFO
+#if ENABLE_DEBUG
+#define DEBUG_LIFO 1
 #endif
 #include "debug.h"
 
@@ -46,7 +46,7 @@ void lifo_insert(int *array, int i)
 
     int index = i + 1;
 
-#ifdef DEBUG_LIFO
+#if DEBUG_LIFO
     for (int x=0; x < index; x++) {
         if (i == array[x]) {
             printf("lifo_insert: inserting duplicate into lifo: %d\n", i);
@@ -71,6 +71,7 @@ int lifo_get(int *array)
     }
     array[head+1] = -1;
 
+    DEBUG("lifo_get: returning %i\n", head);
     return head;
 }
 
