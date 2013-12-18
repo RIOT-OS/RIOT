@@ -67,6 +67,11 @@ const char *thread_getname(int pid);
 void thread_sleep(void);
 
 /**
+ * @brief   The current thread yields and let the scheduler run.
+ */
+void thread_yield(void);
+
+/**
  * @brief   Wakes up a sleeping thread.
  * @param   pid The PID of the thread to be woken up
  * @return  STATUS_NOT_FOUND if pid is unknown or not sleeping
