@@ -29,4 +29,5 @@ typedef struct riot_ccnl_msg {
 
 int riot_send_transceiver(uint8_t *buf, uint16_t size, uint16_t to);
 int riot_send_msg(uint8_t *buf, uint16_t size, uint16_t to);
+void riot_send_nack(uint16_t to);
 char *riot_ccnl_event_to_string(ccnl_riot_event_t event);

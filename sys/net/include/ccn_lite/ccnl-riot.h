@@ -53,6 +53,7 @@ typedef enum ccnl_riot_event {
     CCNL_RIOT_POPULATE,
     CCNL_RIOT_PRINT_STAT,
     CCNL_RIOT_TIMEOUT,
+    CCNL_RIOT_NACK,
 
     CCNL_RIOT_RESERVED
 } ccnl_riot_event_t;

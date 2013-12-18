@@ -69,6 +69,12 @@ int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
         /* ######################################################################### */
 
         msg_receive(&rep);
+        if (rep.type == CCNL_RIOT_NACK) {
+            /* network stack was not able to fetch this chunk */
+            return 0;
+        }
+
+        /* we got a chunk of data from the network stack */
         riot_ccnl_msg_t *rmsg_reply = (riot_ccnl_msg_t *) rep.content.ptr;
 
         unsigned char *data = rmsg_reply->payload;

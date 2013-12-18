@@ -1155,6 +1155,11 @@ void ccnl_do_ageing(void *ptr, void *dummy)
     while (i) {
         if (ccnl_is_timeouted(&now, &i->last_used, CCNL_INTEREST_TIMEOUT_SEC,
                 CCNL_INTEREST_TIMEOUT_USEC)) {
+            if (i->from->ifndx == RIOT_MSG_IDX) {
+                /* this interest was requested by an app from this node */
+                /* inform this app about this problem */
+                riot_send_nack(i->from->faceid);
+            }
             i = ccnl_interest_remove(relay, i);
         } else {
             i = i->next;

@@ -82,6 +82,14 @@ int riot_send_msg(uint8_t *buf, uint16_t size, uint16_t to)
     return size;
 }
 
+void riot_send_nack(uint16_t to)
+{
+    msg_t m;
+    m.type = CCNL_RIOT_NACK;
+    DEBUGMSG(1, "sending NACK msg to pid=%u\n", to);
+    msg_send(&m, to, 0);
+}
+
 char *riot_ccnl_event_to_string(ccnl_riot_event_t event)
 {
     switch (event) {
