@@ -31,6 +31,7 @@
 #include "mutex.h"
 #include "hwtimer.h"
 #include "msg.h"
+#include "list.h"
 #include "transceiver.h"
 #include "sixlowpan/mac.h"
 #include "sixlowpan/ndp.h"
@@ -65,12 +66,14 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #define SIXLOWPAN_FRAG_HDR_MASK         (0xf8)
 
 typedef struct lowpan_interval_list_t {
+    struct lowpan_interval_list_t   *next;
     uint8_t                         start;
     uint8_t                         end;
-    struct lowpan_interval_list_t   *next;
 } lowpan_interval_list_t;
 
 typedef struct lowpan_reas_buf_t {
+    /* Pointer to next reassembly buffer (if any) */
+    struct lowpan_reas_buf_t *next;
     /* Source Address */
     ieee_802154_long_t       s_laddr;
     /* Destination Address */
@@ -87,8 +90,6 @@ typedef struct lowpan_reas_buf_t {
     uint8_t                  *packet;
     /* Pointer to list of intervals of received packet fragments (if any) */
     lowpan_interval_list_t   *interval_list_head;
-    /* Pointer to next reassembly buffer (if any) */
-    struct lowpan_reas_buf_t *next;
 } lowpan_reas_buf_t;
 
 extern mutex_t lowpan_context_mutex;
@@ -144,8 +145,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                           ieee_802154_long_t *s_laddr,
                           ieee_802154_long_t *d_laddr);
 void add_fifo_packet(lowpan_reas_buf_t *current_packet);
-lowpan_reas_buf_t *collect_garbage_fifo(lowpan_reas_buf_t *current_buf);
-lowpan_reas_buf_t *collect_garbage(lowpan_reas_buf_t *current_buf);
+void collect_garbage_fifo(lowpan_reas_buf_t *current_buf);
 void init_reas_bufs(lowpan_reas_buf_t *buf);
 void check_timeout(void);
 
@@ -268,23 +268,18 @@ void sixlowpan_lowpan_print_reassembly_buffers(void)
 {
     lowpan_reas_buf_t *temp_buffer;
     lowpan_interval_list_t *temp_interval;
-    temp_buffer = head;
 
     printf("\n\n--- Reassembly Buffers ---\n");
 
-    while (temp_buffer != NULL) {
+    simple_list_for_each(head, temp_buffer) {
         print_long_local_addr(&temp_buffer->s_laddr);
         printf("Ident.: %i, Packet Size: %i/%i, Timestamp: %li\n",
                temp_buffer->ident_no, temp_buffer->current_packet_size,
                temp_buffer->packet_size, temp_buffer->timestamp);
-        temp_interval = temp_buffer->interval_list_head;
 
-        while (temp_interval != NULL) {
+        simple_list_for_each(temp_buffer->interval_list_head, temp_interval) {
             printf("\t%i - %i\n", temp_interval->start, temp_interval->end);
-            temp_interval = temp_interval->next;
         }
-
-        temp_buffer = temp_buffer->next;
     }
 }
 
@@ -292,23 +287,18 @@ void sixlowpan_lowpan_print_fifo_buffers(void)
 {
     lowpan_reas_buf_t *temp_buffer;
     lowpan_interval_list_t *temp_interval;
-    temp_buffer = packet_fifo;
 
     printf("\n\n--- Reassembly Buffers ---\n");
 
-    while (temp_buffer != NULL) {
+    simple_list_for_each(packet_fifo, temp_buffer) {
         print_long_local_addr(&temp_buffer->s_laddr);
         printf("Ident.: %i, Packet Size: %i/%i, Timestamp: %li\n",
                temp_buffer->ident_no, temp_buffer->current_packet_size,
                temp_buffer->packet_size, temp_buffer->timestamp);
-        temp_interval = temp_buffer->interval_list_head;
 
-        while (temp_interval != NULL) {
+        simple_list_for_each(temp_buffer->interval_list_head, temp_interval) {
             printf("\t%i - %i\n", temp_interval->start, temp_interval->end);
-            temp_interval = temp_interval->next;
         }
-
-        temp_buffer = temp_buffer->next;
     }
 }
 #endif
@@ -347,7 +337,7 @@ void lowpan_transfer(void)
                 msg_send_receive(&m_send, &m_recv, ip_process_pid);
             }
             else {
-                //				printf("ERROR: packet with unknown dispatch received\n");
+                printf("ERROR: packet with unknown dispatch received\n");
             }
 
             collect_garbage_fifo(current_buf);
@@ -393,14 +383,12 @@ uint8_t ll_get_addr_match(ieee_802154_long_t *src, ieee_802154_long_t *dst)
 lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size,
                                      uint16_t datagram_tag,
                                      ieee_802154_long_t *s_laddr,
-                                     ieee_802154_long_t *d_laddr,
-                                     lowpan_reas_buf_t *current_buf,
-                                     lowpan_reas_buf_t *temp_buf)
+                                     ieee_802154_long_t *d_laddr)
 {
-    lowpan_reas_buf_t *new_buf = NULL;
+    lowpan_reas_buf_t *new_buf;
 
     /* Allocate new memory for a new packet to be reassembled */
-    new_buf = malloc(sizeof(lowpan_reas_buf_t));
+    new_buf = simple_list_add_head(&head);
 
     if (new_buf != NULL) {
         init_reas_bufs(new_buf);
@@ -418,20 +406,16 @@ lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size,
             vtimer_now(&now);
             new_buf->timestamp = now.microseconds;
 
-            if ((current_buf == NULL) && (temp_buf == NULL)) {
-                head = new_buf;
-            }
-            else {
-                temp_buf->next = new_buf;
-            }
-
             return new_buf;
         }
         else {
+            /* not enough memory for packet */
+            simple_list_remove(&head, new_buf);
             return NULL;
         }
     }
     else {
+        /* not enough memory for new_buf */
         return NULL;
     }
 }
@@ -441,10 +425,8 @@ lowpan_reas_buf_t *get_packet_frag_buf(uint16_t datagram_size,
                                        ieee_802154_long_t *s_laddr,
                                        ieee_802154_long_t *d_laddr)
 {
-    lowpan_reas_buf_t *current_buf = NULL, *temp_buf = NULL;
-    current_buf = head;
-
-    while (current_buf != NULL) {
+    lowpan_reas_buf_t *current_buf;
+    simple_list_for_each(head, current_buf) {
         if (((ll_get_addr_match(&current_buf->s_laddr, s_laddr)) == 64) &&
             ((ll_get_addr_match(&current_buf->d_laddr, d_laddr)) == 64) &&
             (current_buf->packet_size == datagram_size) &&
@@ -456,13 +438,9 @@ lowpan_reas_buf_t *get_packet_frag_buf(uint16_t datagram_size,
             current_buf->timestamp = now.microseconds;
             return current_buf;
         }
-
-        temp_buf = current_buf;
-        current_buf = current_buf->next;
     }
 
-    return new_packet_buffer(datagram_size, datagram_tag, s_laddr, d_laddr,
-                             current_buf, temp_buf);
+    return new_packet_buffer(datagram_size, datagram_tag, s_laddr, d_laddr);
 }
 
 uint8_t is_in_interval(uint8_t start1, uint8_t end1, uint8_t start2, uint8_t end2)
@@ -485,32 +463,21 @@ uint8_t handle_packet_frag_interval(lowpan_reas_buf_t *current_buf,
 {
     /* 0: Error, discard fragment */
     /* 1: Finished correctly */
-    lowpan_interval_list_t *temp_interval = NULL, *current_interval = NULL, *new_interval = NULL;
-    current_interval = current_buf->interval_list_head;
+    lowpan_interval_list_t *current_interval;
 
-    while (current_interval != NULL) {
+    simple_list_for_each(current_buf->interval_list_head, current_interval) {
         if (is_in_interval(current_interval->start, current_interval->end, datagram_offset, datagram_offset + frag_size) == 1) {
             /* Interval is overlapping or the same as one of a previous fragment, discard fragment */
             return 0;
         }
-
-        temp_interval = current_interval;
-        current_interval = current_interval->next;
     }
 
-    new_interval = malloc(sizeof(lowpan_interval_list_t));
+    current_interval = simple_list_add_tail(&current_buf->interval_list_head);
 
-    if (new_interval != NULL) {
-        new_interval->start = datagram_offset;
-        new_interval->end = datagram_offset + frag_size - 1;
-        new_interval->next = NULL;
-
-        if ((current_interval == NULL) && (temp_interval == NULL)) {
-            current_buf->interval_list_head = new_interval;
-        }
-        else {
-            temp_interval->next = new_interval;
-        }
+    if (current_interval != NULL) {
+        current_interval->start = datagram_offset;
+        current_interval->end = datagram_offset + frag_size - 1;
+        current_interval->next = NULL;
 
         return 1;
     }
@@ -518,84 +485,14 @@ uint8_t handle_packet_frag_interval(lowpan_reas_buf_t *current_buf,
     return 0;
 }
 
-lowpan_reas_buf_t *collect_garbage_fifo(lowpan_reas_buf_t *current_buf)
+void collect_garbage_fifo(lowpan_reas_buf_t *current_buf)
 {
-    lowpan_interval_list_t *temp_list, *current_list;
-    lowpan_reas_buf_t *temp_buf, *my_buf, *return_buf;
+    free(current_buf->packet);
+    simple_list_clear(&current_buf->interval_list_head);
 
     mutex_lock(&fifo_mutex);
-
-    temp_buf = packet_fifo;
-    my_buf = temp_buf;
-
-    if (packet_fifo == current_buf) {
-        packet_fifo = current_buf->next;
-        return_buf = packet_fifo;
-    }
-    else {
-        while (temp_buf != current_buf) {
-            my_buf = temp_buf;
-            temp_buf = temp_buf->next;
-        }
-
-        my_buf->next = current_buf->next;
-
-        return_buf = my_buf->next;
-    }
-
+    simple_list_remove(&packet_fifo, current_buf);
     mutex_unlock(&fifo_mutex);
-
-    current_list = current_buf->interval_list_head;
-    temp_list = current_list;
-
-    while (current_list != NULL) {
-        temp_list = current_list->next;
-        free(current_list);
-        current_list = temp_list;
-    }
-
-    free(current_buf->packet);
-    free(current_buf);
-
-    return return_buf;
-}
-
-lowpan_reas_buf_t *collect_garbage(lowpan_reas_buf_t *current_buf)
-{
-    lowpan_interval_list_t *temp_list, *current_list;
-    lowpan_reas_buf_t *temp_buf, *my_buf, *return_buf;
-
-    temp_buf = head;
-    my_buf = temp_buf;
-
-    if (head == current_buf) {
-        head = current_buf->next;
-        return_buf = head;
-    }
-    else {
-        while (temp_buf != current_buf) {
-            my_buf = temp_buf;
-            temp_buf = temp_buf->next;
-        }
-
-        my_buf->next = current_buf->next;
-
-        return_buf = my_buf->next;
-    }
-
-    current_list = current_buf->interval_list_head;
-    temp_list = current_list;
-
-    while (current_list != NULL) {
-        temp_list = current_list->next;
-        free(current_list);
-        current_list = temp_list;
-    }
-
-    free(current_buf->packet);
-    free(current_buf);
-
-    return return_buf;
 }
 
 void handle_packet_fragment(uint8_t *data, uint8_t datagram_offset,
@@ -645,11 +542,16 @@ void check_timeout(void)
     cur_time = now.microseconds;
     temp_buf = head;
 
-    while (temp_buf != NULL) {
+    int skipped = 0;
+    lowpan_reas_buf_t *prev;
+    simple_list_for_each_safe(head, temp_buf, prev, skipped) {
         if ((cur_time - temp_buf->timestamp) >= LOWPAN_REAS_BUF_TIMEOUT) {
             printf("TIMEOUT!cur_time: %li, temp_buf: %li\n", cur_time,
                    temp_buf->timestamp);
-            temp_buf = collect_garbage(temp_buf);
+
+            free(temp_buf->packet);
+            simple_list_clear(&temp_buf->interval_list_head);
+            simple_list_for_each_remove(&head, temp_buf, prev);
         }
         else {
             if (smallest_time == NULL) {
@@ -659,52 +561,27 @@ void check_timeout(void)
                 smallest_time = temp_buf;
             }
 
-            temp_buf = temp_buf->next;
             count++;
         }
     }
 
     if ((count > 10) && (smallest_time != NULL)) {
-        collect_garbage(smallest_time);
+        free(smallest_time->packet);
+        simple_list_clear(&smallest_time->interval_list_head);
+        simple_list_remove(&head, smallest_time);
     }
 }
 
 void add_fifo_packet(lowpan_reas_buf_t *current_packet)
 {
-    lowpan_reas_buf_t *temp_buf, *my_buf;
-
-    if (head == current_packet) {
-        head = current_packet->next;
-    }
-    else {
-        temp_buf = head;
-
-        while (temp_buf != current_packet) {
-            my_buf = temp_buf;
-            temp_buf = temp_buf->next;
-        }
-
-        my_buf->next = current_packet->next;
-    }
+    simple_list_extract(&head, current_packet);
+    current_packet->next = NULL;
 
     mutex_lock(&fifo_mutex);
 
-    if (packet_fifo == NULL) {
-        packet_fifo = current_packet;
-    }
-    else {
-        temp_buf = packet_fifo;
-
-        while (temp_buf != NULL) {
-            my_buf = temp_buf;
-            temp_buf = temp_buf->next;
-        }
-
-        my_buf->next = current_packet;
-    }
+    simple_list_set_tail(&packet_fifo, current_packet);
 
     mutex_unlock(&fifo_mutex);
-    current_packet->next = NULL;
 }
 
 /* Register an upper layer thread */
