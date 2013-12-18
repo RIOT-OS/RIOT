@@ -259,6 +259,18 @@ void vtimer_now(timex_t *out)
     memcpy(out, &t, sizeof(timex_t));
 }
 
+void vtimer_get_localtime(struct tm *localt)
+{
+    timex_t now;
+    vtimer_now(&now);
+
+    localt->tm_sec = now.seconds % 60;
+    localt->tm_min = (now.seconds / 60) % 60;
+    localt->tm_hour = (now.seconds / 60 / 60) % 24;
+
+    // TODO: fill the other fields
+}
+
 int vtimer_init()
 {
     DEBUG("vtimer_init().\n");
