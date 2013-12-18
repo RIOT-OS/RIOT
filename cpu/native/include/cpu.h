@@ -67,8 +67,5 @@ int register_interrupt(int sig, void (*handler)(void));
  */
 int unregister_interrupt(int sig);
 
-/* this should be defined elsewhere */
-void thread_yield(void);
-
 /** @} */
 #endif //_CPU_H
