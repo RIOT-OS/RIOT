@@ -26,6 +26,7 @@
 #include "cpu.h"
 #include "cpu-conf.h"
 #include "hwtimer.h"
+#include "irq.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -60,11 +61,13 @@ static void _native_ltc_int_handler()
  */
 void ltc4150_disable_int(void)
 {
+    unsigned state = disableIRQ();
     DEBUG("ltc4150_disable_int()\n");
     if (_native_ltc_hwtimer_id != -1) {
         hwtimer_remove(_native_ltc_hwtimer_id);
         _native_ltc_hwtimer_id = -1;
     }
+    restoreIRQ(state);
 }
 
 /**
