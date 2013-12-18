@@ -69,6 +69,12 @@ int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
         /* ######################################################################### */
 
         msg_receive(&rep);
+        if (rep.type == CCNL_RIOT_NACK) {
+            /* network stack was not able to fetch this chunk */
+            return 0;
+        }
+
+        /* we got a chunk of data from the network stack */
         riot_ccnl_msg_t *rmsg_reply = (riot_ccnl_msg_t *) rep.content.ptr;
 
         unsigned char *data = rmsg_reply->payload;
@@ -128,7 +134,11 @@ int ccnl_riot_client_new_face(unsigned int relay_pid, char *type, char *faceid,
     DEBUGMSG(1, "  received reply from relay\n");
     riot_ccnl_msg_t *rmsg_reply = (riot_ccnl_msg_t *) rep.content.ptr;
     memcpy(reply_buf, rmsg_reply->payload, rmsg_reply->size);
-    return rmsg_reply->size;
+    int size = rmsg_reply->size;
+
+    ccnl_free(rmsg_reply);
+
+    return size;
 }
 
 int ccnl_riot_client_register_prefix(unsigned int relay_pid, char *prefix, char *faceid,
@@ -154,8 +164,11 @@ int ccnl_riot_client_register_prefix(unsigned int relay_pid, char *prefix, char 
     riot_ccnl_msg_t *rmsg_reply = (riot_ccnl_msg_t *) rep.content.ptr;
     memcpy(reply_buf, rmsg_reply->payload, rmsg_reply->size);
     reply_buf[rmsg_reply->size] = '\0';
+    int size = rmsg_reply->size;
 
-    return rmsg_reply->size;
+    ccnl_free(rmsg_reply);
+
+    return size;
 }
 
 int ccnl_riot_client_publish(unsigned int relay_pid, char *prefix, char *faceid, char *type, unsigned char *reply_buf)

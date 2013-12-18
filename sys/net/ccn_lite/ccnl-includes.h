@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rtc.h"
 #include "sha256.h"
 
 #define RIOT_MSG_DEV    (1)

@@ -24,8 +24,6 @@
 #ifndef CCNL_CORE_H__
 #define CCNL_CORE_H__
 
-//#define CCNL_UNIX
-
 #define EXACT_MATCH 1
 #define PREFIX_MATCH 0
 
@@ -37,6 +35,7 @@
 #define CCNL_FACE_FLAGS_REFLECT	2
 #define CCNL_FACE_FLAGS_SERVED	4
 #define CCNL_FACE_FLAGS_FWDALLI	8 // forward all interests, also known ones
+#define CCNL_FACE_FLAGS_BROADCAST  16
 
 #define CCNL_FRAG_NONE		0
 #define CCNL_FRAG_SEQUENCED2012	1
@@ -45,10 +44,11 @@
 #define CCNL_CONTENT_FLAGS_STATIC  0x01
 #define CCNL_CONTENT_FLAGS_STALE   0x02
 
-enum {STAT_RCV_I, STAT_RCV_C, STAT_SND_I, STAT_SND_C, STAT_QLEN, STAT_EOP1};
+#define CCNL_FORWARD_FLAGS_STATIC  0x01
 
 #include <inttypes.h>
 #include <time.h>
+#include <sys/time.h>
 
 #include "ccnl.h"
 
@@ -77,10 +77,11 @@ struct ccnl_if_s { // interface for packet IO
     int qfront; // index of next packet to send
     struct ccnl_txrequest_s queue[CCNL_MAX_IF_QLEN];
     struct ccnl_sched_s *sched;
+    struct ccnl_face_s *broadcast_face;
 };
 
 struct ccnl_relay_s {
-    time_t startup_time;
+    struct timeval startup_time;
     int id;
     struct ccnl_face_s *faces;
     struct ccnl_forward_s *fib;
@@ -99,6 +100,9 @@ struct ccnl_relay_s {
     struct ccnl_http_s *http;
     struct ccnl_stats_s *stats;
     void *aux;
+    int fib_threshold_prefix; /* how may name components should be considdered as dynamic */
+    int fib_threshold_aggregate;
+    int riot_pid;
 };
 
 struct ccnl_buf_s {
@@ -112,6 +116,13 @@ struct ccnl_prefix_s {
     int *complen;
     int compcnt;
     unsigned char *path; // memory for name component copies
+};
+
+struct ccnl_stat_s {
+    int send_interest[CCNL_MAX_INTEREST_RETRANSMIT];
+    int send_content[CCNL_MAX_CONTENT_SERVED_STAT];
+    int received_interest;
+    int received_content;
 };
 
 struct ccnl_frag_s {
@@ -140,16 +151,20 @@ struct ccnl_face_s {
     int ifndx;
     sockunion peer;
     int flags;
-    int last_used; // updated when we receive a packet
+    struct timeval last_used; // updated when we receive a packet
     struct ccnl_buf_s *outq, *outqend; // queue of packets to send
     struct ccnl_frag_s *frag;  // which special datagram armoring
     struct ccnl_sched_s *sched;
+
+    struct ccnl_stat_s stat;
 };
 
 struct ccnl_forward_s {
-    struct ccnl_forward_s *next;
+    struct ccnl_forward_s *next, *prev;
     struct ccnl_prefix_s *prefix;
     struct ccnl_face_s *face;
+    int flags;
+    struct timeval last_used; // updated when we use this fib entry
 };
 
 struct ccnl_interest_s {
@@ -160,14 +175,15 @@ struct ccnl_interest_s {
     int minsuffix, maxsuffix;
     struct ccnl_buf_s *ppkd;	   // publisher public key digest
     struct ccnl_buf_s *pkt;	   // full datagram
-    int last_used;
+    struct timeval last_used;
     int retries;
+    struct ccnl_forward_s *forwarded_over;
 };
 
 struct ccnl_pendint_s { // pending interest
     struct ccnl_pendint_s *next; // , *prev;
     struct ccnl_face_s *face;
-    int last_used;
+    struct timeval last_used;
 };
 
 struct ccnl_content_s {
@@ -180,7 +196,7 @@ struct ccnl_content_s {
     int contentlen;
     // NON-CONFORM: "The [ContentSTore] MUST also implement the Staleness Bit."
     // >> CCNL: currently no stale bit, old content is fully removed <<
-    int last_used;
+    struct timeval last_used;
     int served_cnt;
 };
 
@@ -223,6 +239,9 @@ ccnl_content_new(struct ccnl_relay_s *ccnl, struct ccnl_buf_s **pkt,
 struct ccnl_content_s *
 ccnl_content_add2cache(struct ccnl_relay_s *ccnl, struct ccnl_content_s *c);
 
+void ccnl_content_learn_name_route(struct ccnl_relay_s *ccnl, struct ccnl_prefix_s *p,
+                                   struct ccnl_face_s *f, int threshold_prefix, int flags);
+
 struct ccnl_face_s *
 ccnl_get_face_or_create(struct ccnl_relay_s *ccnl, int ifndx, uint16_t sender_id);
 
@@ -232,18 +251,21 @@ int ccnl_face_enqueue(struct ccnl_relay_s *ccnl, struct ccnl_face_s *to,
 struct ccnl_face_s *
 ccnl_face_remove(struct ccnl_relay_s *ccnl, struct ccnl_face_s *f);
 
+struct ccnl_forward_s *
+ccnl_forward_remove(struct ccnl_relay_s *ccnl, struct ccnl_forward_s *fwd);
+
 struct ccnl_buf_s *
 ccnl_extract_prefix_nonce_ppkd(unsigned char **data, int *datalen, int *scope,
                                int *aok, int *min, int *max, struct ccnl_prefix_s **prefix,
                                struct ccnl_buf_s **nonce, struct ccnl_buf_s **ppkd,
                                unsigned char **content, int *contlen);
 
+void ccnl_do_retransmit(void *ptr, void *dummy);
 void ccnl_do_ageing(void *ptr, void *dummy);
 
 void ccnl_interface_CTS(void *aux1, void *aux2);
 
-#define ccnl_app_RX(x,y)        do{}while(0)
-#define ccnl_print_stats(x,y)       do{}while(0)
+void ccnl_face_print_stat(struct ccnl_face_s *f);
 
 #define ccnl_malloc(s)  malloc(s)
 #define ccnl_calloc(n,s)    calloc(n,s)

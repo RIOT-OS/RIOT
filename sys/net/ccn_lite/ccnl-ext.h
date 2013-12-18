@@ -26,11 +26,7 @@
 #ifndef CCNL_EXT_H__
 #define CCNL_EXT_H__
 
-#ifdef USE_CCNxDIGEST
-#  define compute_ccnx_digest(buf) SHA256(buf->data, buf->datalen, NULL)
-#else
-#  define compute_ccnx_digest(b) NULL
-#endif
+#define compute_ccnx_digest(buf) SHA256(buf->data, buf->datalen, NULL)
 
 #ifdef USE_FRAG
 
@@ -83,6 +79,12 @@ int ccnl_is_fragment(unsigned char *data, int datalen);
 
 int ccnl_mgmt(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *buf,
               struct ccnl_prefix_s *prefix, struct ccnl_face_s *from);
+
+struct ccnl_prefix_s *
+ccnl_prefix_clone(struct ccnl_prefix_s *p);
+
+struct ccnl_prefix_s *
+ccnl_prefix_clone_strip(struct ccnl_prefix_s *p, int strip);
 
 // ----------------------------------------------------------------------
 

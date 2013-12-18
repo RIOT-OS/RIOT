@@ -22,8 +22,8 @@
 
 #include "msg.h"
 #include "thread.h"
-#include "util/ccnl-riot-client.h"
-#include "ccnl-riot-compat.h"
+#include "ccn_lite/util/ccnl-riot-client.h"
+#include "ccn_lite/ccnl-riot-compat.h"
 
 #include "ccnl-includes.h"
 #include "ccnl-core.h"
@@ -133,6 +133,8 @@ static void riot_ccnl_appserver_ioloop(void)
                 DEBUGMSG(1, "new msg: size=%" PRIu16 " sender_pid=%" PRIu16 "\n",
                          m->size, in.sender_pid);
                 appserver_handle_interest(m->payload, m->size, in.sender_pid);
+
+                ccnl_free(m);
                 break;
 
             default:

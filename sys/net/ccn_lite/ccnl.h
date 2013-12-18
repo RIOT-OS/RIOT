@@ -21,21 +21,35 @@
  * 2011-03-30 created
  */
 
-#define CCNL_MAX_INTERFACES		10
-#define CCNL_MAX_PACKET_SIZE		NATIVE_MAX_DATA_LENGTH
+#define CCNL_MAX_INTERFACES             2 /* transceiver and msg interfaces */
 
-#define CCNL_CONTENT_TIMEOUT		30 // sec
-#define CCNL_INTEREST_TIMEOUT		4  // sec
-#define CCNL_MAX_INTEREST_RETRANSMIT	2
+#define CCNL_INTEREST_TIMEOUT_SEC       0
+#define CCNL_INTEREST_TIMEOUT_USEC      (CCNL_CHECK_RETRANSMIT_USEC * (CCNL_MAX_INTEREST_RETRANSMIT + 1))
 
-#define CCNL_FACE_TIMEOUT	15 // sec
+#define CCNL_CONTENT_TIMEOUT_SEC        2
+#define CCNL_CONTENT_TIMEOUT_USEC       0
 
-#define CCNL_MAX_NAME_COMP	16
-#define CCNL_MAX_IF_QLEN	64
+#define CCNL_MAX_CONTENT_SERVED_STAT    10
 
-#define CCNL_DEFAULT_MAX_CACHE_ENTRIES	0   // means: no content caching
-#define CCNL_MAX_NONCES			256 // for detected dups
+#define CCNL_MAX_INTEREST_RETRANSMIT    5
+#define CCNL_MAX_INTEREST_OPTIMISTIC    2
 
+#define CCNL_FACE_TIMEOUT_SEC           10
+#define CCNL_FACE_TIMEOUT_USEC          0
+
+#define CCNL_FWD_TIMEOUT_SEC            10
+#define CCNL_FWD_TIMEOUT_USEC           0
+
+#define CCNL_CHECK_TIMEOUT_SEC          1
+#define CCNL_CHECK_TIMEOUT_USEC         0
+
+#define CCNL_CHECK_RETRANSMIT_SEC       0
+#define CCNL_CHECK_RETRANSMIT_USEC      (     100 * 1000)
+
+#define CCNL_MAX_NAME_COMP              16
+#define CCNL_MAX_IF_QLEN                64
+
+#define CCNL_MAX_NONCES                 256 // for detected dups
 
 // ----------------------------------------------------------------------
 // our own CCN-lite extensions for the ccnb encoding:

@@ -23,13 +23,6 @@
 
 #include <inttypes.h>
 
-#define CCNL_RIOT
-
-#define USE_CCNxDIGEST
-#define USE_RIOT_MSG
-#define USE_RIOT_TRANS
-#define USE_APPSERVER
-#define USE_MGMT
 #define RIOT_CCNL_POPULATE (1)
 
 #include "ccnl-includes.h"
@@ -48,9 +41,10 @@
 #include "msg.h"
 #include "thread.h"
 #include "transceiver.h"
+#include "hwtimer.h"
 
 #include "ccnl-riot-compat.h"
-#include "test_data/text.txt.ccnb.h"
+#include "ccn_lite/test_data/text.txt.ccnb.h"
 
 /** The size of the message queue between router daemon and transceiver AND clients */
 #define RELAY_MSG_BUFFER_SIZE (64)
@@ -68,21 +62,21 @@ ccnl_run_events(void)
     static struct timeval now;
     long usec;
 
-    rtc_time(&now);
-    DEBUGMSG(1, "ccnl_run_events now: %ld:%ld\n", now.tv_sec, now.tv_usec);
+    ccnl_get_timeval(&now);
+    //DEBUGMSG(1, "ccnl_run_events now: %ld:%ld\n", now.tv_sec, now.tv_usec);
 
     while (eventqueue) {
         struct ccnl_timer_s *t = eventqueue;
         usec = timevaldelta(&(t->timeout), &now);
 
         if (usec >= 0) {
-            DEBUGMSG(1, "ccnl_run_events nothing to do: %ld:%ld\n", now.tv_sec, now.tv_usec);
+            //DEBUGMSG(1, "ccnl_run_events nothing to do: %ld:%ld\n", now.tv_sec, now.tv_usec);
             now.tv_sec = usec / 1000000;
             now.tv_usec = usec % 1000000;
             return &now;
         }
 
-        DEBUGMSG(1, "ccnl_run_events run event handler: %ld:%ld\n", now.tv_sec, now.tv_usec);
+        //DEBUGMSG(1, "ccnl_run_events run event handler: %ld:%ld\n", now.tv_sec, now.tv_usec);
         if (t->fct) {
             (t->fct)(t->node, t->intarg);
         }
@@ -133,18 +127,26 @@ void ccnl_ll_TX(struct ccnl_relay_s *ccnl, struct ccnl_if_s *ifc,
 void ccnl_ageing(void *relay, void *aux)
 {
     ccnl_do_ageing(relay, aux);
-    ccnl_set_timer(1000000, ccnl_ageing, relay, 0);
+    ccnl_set_timer(CCNL_CHECK_TIMEOUT_SEC * (1000*1000) + CCNL_CHECK_TIMEOUT_USEC, ccnl_ageing, relay, 0);
+}
+
+void ccnl_retransmit(void *relay, void *aux)
+{
+    ccnl_do_retransmit(relay, aux);
+    ccnl_set_timer(CCNL_CHECK_RETRANSMIT_SEC * (1000*1000) + CCNL_CHECK_RETRANSMIT_USEC, ccnl_retransmit, relay, 0);
 }
 
 // ----------------------------------------------------------------------
 
-void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries)
+void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries, int fib_threshold_prefix, int fib_threshold_aggregate)
 {
     struct ccnl_if_s *i;
 
     DEBUGMSG(99, "ccnl_relay_config\n");
 
     relay->max_cache_entries = max_cache_entries;
+    relay->fib_threshold_prefix = fib_threshold_prefix;
+    relay->fib_threshold_aggregate = fib_threshold_aggregate;
 
     if (RIOT_MSG_IDX != relay->ifcount) {
         DEBUGMSG(1, "sorry, idx did not match: riot msg device\n");
@@ -196,7 +198,13 @@ void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries)
         DEBUGMSG(1, "sorry, could not open riot trans device\n");
     }
 
-    ccnl_set_timer(1000000, ccnl_ageing, relay, 0);
+    /* create default boardcast face on transceiver interface */
+    struct ccnl_face_s * f = ccnl_get_face_or_create(relay, RIOT_TRANS_IDX, RIOT_BROADCAST);
+    f->flags |= CCNL_FACE_FLAGS_STATIC;
+    i->broadcast_face = f;
+
+    ccnl_set_timer(CCNL_CHECK_TIMEOUT_USEC, ccnl_ageing, relay, 0);
+    ccnl_set_timer(CCNL_CHECK_RETRANSMIT_USEC, ccnl_retransmit, relay, 0);
 }
 
 #if RIOT_CCNL_POPULATE
@@ -282,6 +290,15 @@ void handle_populate_cache(void)
 
 // ----------------------------------------------------------------------
 
+void ccnl_timeout_callback(void *ptr)
+{
+    struct ccnl_relay_s *ccnl = ptr;
+
+    msg_t ccnl_timeout_msg;
+    ccnl_timeout_msg.type = CCNL_RIOT_TIMEOUT;
+    msg_send(&ccnl_timeout_msg, ccnl->riot_pid, false);
+}
+
 int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 {
     int i, maxfd = -1;
@@ -308,16 +325,24 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
     msg_t in;
     radio_packet_t *p;
     riot_ccnl_msg_t *m;
+    struct timeval *timeout;
+    unsigned long us = CCNL_CHECK_RETRANSMIT_USEC;
+    int hwtimer_id;
 
     while (!ccnl->halt_flag) {
-        DEBUGMSG(1, "waiting for incomming msg\n");
+        hwtimer_id = hwtimer_set(HWTIMER_TICKS(us), ccnl_timeout_callback, ccnl);
+        if (hwtimer_id == -1) {
+            puts("NO MORE TIMERS!");
+        } else {
+            //DEBUGMSG(1, "hwtimer_id is %d\n", hwtimer_id);
+        }
         msg_receive(&in);
-        struct timeval *timeout = ccnl_run_events();
+        //DEBUGMSG(1, "%s Packet waiting, us was %lu\n", riot_ccnl_event_to_string(in.type), us);
 
         switch (in.type) {
             case PKT_PENDING:
+                hwtimer_remove(hwtimer_id);
                 p = (radio_packet_t *) in.content.ptr;
-                DEBUGMSG(1, "%s Packet waiting\n", riot_ccnl_event_to_string(in.type));
                 DEBUGMSG(1, "\tLength:\t%u\n", p->length);
                 DEBUGMSG(1, "\tSrc:\t%u\n", p->src);
                 DEBUGMSG(1, "\tDst:\t%u\n", p->dst);
@@ -332,8 +357,8 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                 break;
 
             case (CCNL_RIOT_MSG):
+                hwtimer_remove(hwtimer_id);
                 m = (riot_ccnl_msg_t *) in.content.ptr;
-                DEBUGMSG(1, "%s Packet waiting\n", riot_ccnl_event_to_string(in.type));
                 DEBUGMSG(1, "\tLength:\t%u\n", m->size);
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
 
@@ -342,22 +367,34 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                 break;
 
             case (CCNL_RIOT_HALT):
-                DEBUGMSG(1, "%s Packet waiting\n", riot_ccnl_event_to_string(in.type));
+                hwtimer_remove(hwtimer_id);
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
                 DEBUGMSG(1, "\tNumb:\t%" PRIu32 "\n", in.content.value);
 
                 ccnl->halt_flag = 1;
                 break;
+
 #if RIOT_CCNL_POPULATE
             case (CCNL_RIOT_POPULATE):
-                DEBUGMSG(1, "%s Packet waiting\n", riot_ccnl_event_to_string(in.type));
+                hwtimer_remove(hwtimer_id);
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
                 DEBUGMSG(1, "\tNumb:\t%" PRIu32 "\n", in.content.value);
 
                 handle_populate_cache();
                 break;
 #endif
+            case (CCNL_RIOT_PRINT_STAT):
+                hwtimer_remove(hwtimer_id);
+                for (struct ccnl_face_s *f = ccnl->faces; f; f = f->next) {
+                    ccnl_face_print_stat(f);
+                }
+                break;
+            case (CCNL_RIOT_TIMEOUT):
+                timeout = ccnl_run_events();
+                us = timeout->tv_sec * 1000 * 1000 + timeout->tv_usec;
+                break;
             default:
+                hwtimer_remove(hwtimer_id);
                 DEBUGMSG(1, "%s Packet waiting\n", riot_ccnl_event_to_string(in.type));
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
                 DEBUGMSG(1, "\tdropping it...\n");
@@ -373,17 +410,18 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
  * @param pointer to count transceiver pids
  *
  */
-void ccnl_riot_relay_start(int max_cache_entries)
+void ccnl_riot_relay_start(int max_cache_entries, int fib_threshold_prefix, int fib_threshold_aggregate)
 {
-    struct timeval now;
-    theRelay.startup_time = rtc_time(&now);
+    ccnl_get_timeval(&theRelay.startup_time);
+    theRelay.riot_pid = thread_pid;
 
-    DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", now.tv_sec, now.tv_usec);
+    DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", theRelay.startup_time.tv_sec, theRelay.startup_time.tv_usec);
     DEBUGMSG(1, "  compile time: %s %s\n", __DATE__, __TIME__);
     DEBUGMSG(1, "  max_cache_entries: %d\n", max_cache_entries);
-    DEBUGMSG(1, "  compile options: %s\n", compile_string());
+    DEBUGMSG(1, "  threshold_prefix: %d\n", fib_threshold_prefix);
+    DEBUGMSG(1, "  threshold_aggregate: %d\n", fib_threshold_aggregate);
 
-    ccnl_relay_config(&theRelay, max_cache_entries);
+    ccnl_relay_config(&theRelay, max_cache_entries, fib_threshold_prefix, fib_threshold_aggregate);
 
     ccnl_io_loop(&theRelay);
     DEBUGMSG(1, "ioloop stopped\n");

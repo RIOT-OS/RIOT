@@ -62,8 +62,7 @@ ccnl_set_timer(int usec, void (*fct)(void *aux1, void *aux2),
     }
 
     t->fct2 = fct;
-    //gettimeofday(&t->timeout, NULL);
-    rtc_time(&t->timeout);
+    ccnl_get_timeval(&t->timeout);
     usec += t->timeout.tv_usec;
     t->timeout.tv_sec += usec / 1000000;
     t->timeout.tv_usec = usec % 1000000;
@@ -133,30 +132,14 @@ ccnl_rem_timer(void *h)
     }
 }
 
-double
-current_time(void)
-{
-    struct timeval tv;
-    static time_t start;
-    static time_t start_usec;
-
-    ccnl_get_timeval(&tv);
-
-    if (!start) {
-        start = tv.tv_sec;
-        start_usec = tv.tv_usec;
-    }
-
-    return (double)(tv.tv_sec) - start +
-           ((double)(tv.tv_usec) - start_usec) / 1000000;
-}
-
 char *
 timestamp(void)
 {
     static char ts[30], *cp;
+    struct timeval now;
+    ccnl_get_timeval(&now);
 
-    sprintf(ts, "%.4g", CCNL_NOW());
+    sprintf(ts, "%.4lu", (time_t) 100000 * now.tv_sec + now.tv_usec);
     cp = strchr(ts, '.');
 
     if (!cp) {
