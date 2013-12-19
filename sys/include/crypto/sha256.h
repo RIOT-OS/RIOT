@@ -34,6 +34,18 @@
  * @brief       SHA264 hash generator
  */
 
+/**
+ * @ingroup     sys_crypto
+ * @{
+ *
+ * @file        sha256.h
+ * @brief       Header definitions for the SHA256 hash function
+ *
+ * @author      Colin Percival
+ * @author      Christian Mehlis
+ * @author      Rene Kijewski
+ */
+
 #ifndef _SHA256_H_
 #define _SHA256_H_
 
@@ -41,36 +53,36 @@
 
 #define SHA256_DIGEST_LENGTH 32
 
-typedef struct SHA256Context {
+typedef struct {
     uint32_t state[8];
     uint32_t count[2];
     unsigned char buf[64];
-} SHA256_CTX;
+} sha256_context_t;
 
 /**
  * @brief SHA-256 initialization.  Begins a SHA-256 operation.
  *
- * @param ctx  SHA256_CTX handle to init
+ * @param ctx  sha256_context_t handle to init
  */
-void SHA256_Init(SHA256_CTX *ctx);
+void sha256_init(sha256_context_t *ctx);
 
 /**
  * @brief Add bytes into the hash
  *
- * @param ctx  SHA256_CTX handle to use
+ * @param ctx  sha256_context_t handle to use
  * @param in   pointer to the input buffer
  * @param len  length of the buffer
  */
-void SHA256_Update(SHA256_CTX *ctx, const void *in, size_t len);
+void sha256_update(sha256_context_t *ctx, const void *in, size_t len);
 
 /**
  * @brief SHA-256 finalization.  Pads the input data, exports the hash value,
  * and clears the context state.
  *
  * @param digest resulting digest, this is the hash of all the bytes
- * @param ctx    SHA256_CTX handle to use
+ * @param ctx    sha256_context_t handle to use
  */
-void SHA256_Final(unsigned char digest[32], SHA256_CTX *ctx);
+void sha256_final(unsigned char digest[32], sha256_context_t *ctx);
 
 /**
  * @brief A wrapper function to simplify the generation of a hash, this is
@@ -82,6 +94,7 @@ void SHA256_Final(unsigned char digest[32], SHA256_CTX *ctx);
  *           SHA256_DIGEST_LENGTH
  *           if md == NULL, one static buffer is used
  */
-unsigned char *SHA256(const unsigned char *d, size_t n,unsigned char *md);
+unsigned char *sha256(const unsigned char *d, size_t n, unsigned char *md);
 
-#endif /* !_SHA256_H_ */
+/** @} */
+#endif /* _SHA256_H_ */
