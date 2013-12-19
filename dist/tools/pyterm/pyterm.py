@@ -146,4 +146,7 @@ if __name__ == "__main__":
     myshell = SerCmd(port)
     myshell.prompt = ''
 
-    myshell.cmdloop("Welcome to pyterm")
+    try:
+        myshell.cmdloop("Welcome to pyterm!\nType 'exit' to exit.")
+    except KeyboardInterrupt:
+        sys.exit(0)
