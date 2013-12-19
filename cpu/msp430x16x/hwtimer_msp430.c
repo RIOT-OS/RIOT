@@ -1,6 +1,6 @@
-#include <cpu.h>
-#include <hwtimer.h>
-#include <hwtimer_arch.h>
+#include "cpu.h"
+#include "hwtimer.h"
+#include "hwtimer_arch.h"
 
 static uint32_t ticks = 0;
 

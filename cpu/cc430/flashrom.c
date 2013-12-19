@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
-#include <cpu.h>
-#include <irq.h>
+#include "cpu.h"
+#include "irq.h"
 
 static uint8_t prepare(void);
 static void finish(uint8_t istate);
