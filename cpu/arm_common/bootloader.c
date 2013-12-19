@@ -174,7 +174,7 @@ void bootloader(void)
     bl_init_clks();
 
     /* initialize bss and data */
-#if CPU != mc1322x
+#ifndef CPU_MC1322X
     bl_init_data();
 #endif
 
