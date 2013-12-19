@@ -1,7 +1,12 @@
 #include <stdint.h>
+
 #include "board.h"
 #include "cpu.h"
 #include "irq.h"
+#include "debug.h"
+
+#include "display.h"
+#include "display_putchar.h"
 
 void cc430_cpu_init(void)
 {
@@ -73,4 +78,7 @@ void cc430_cpu_init(void)
 void board_init(void)
 {
     cc430_cpu_init();
+    lcd_init();
+    init_display_putchar();
+    DEBUG("DISP OK");
 }

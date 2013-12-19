@@ -42,16 +42,6 @@ extern int main(void);
 
 void auto_init(void)
 {
-#ifdef MODULE_BOARD_DISPLAY
-    extern void lcd_init();
-    lcd_init();
-    DEBUG("DISP OK");
-#endif
-#ifdef MODULE_DISPLAY_PUTCHAR
-    extern void init_display_putchar();
-    init_display_putchar();
-    DEBUG("DISP OK");
-#endif
 #ifdef MODULE_HWTIMER
     DEBUG("Auto init hwtimer module.\n");
     hwtimer_init();

@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <cc430f6137.h>
+
 #include "buzzer.h"
 #include "hwtimer.h"
 

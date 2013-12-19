@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <cc430f6137.h>
+
 #include "cc430-adc.h"
 
 uint32_t battery_get_voltage(void)
