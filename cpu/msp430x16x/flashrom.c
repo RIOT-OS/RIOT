@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
-#include <msp430x16x.h>
-#include <irq.h>
+#include "cpu.h"
+#include "irq.h"
 
 uint8_t ie1, ie2;
 

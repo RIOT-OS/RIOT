@@ -28,6 +28,11 @@
 
 #include "board-conf.h"
 
+// for correct inclusion of <msp430.h>
+#ifndef __MSP430F1611__
+#define __MSP430F1611__
+#endif
+
 //MSB430 core
 #define MSP430_INITIAL_CPU_SPEED    800000uL
 #define MSP430_HAS_DCOR             0

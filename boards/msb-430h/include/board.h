@@ -39,6 +39,11 @@ and the mailinglist (subscription via web site)
 #ifndef _MSB_BOARD_H
 #define _MSB_BOARD_H
 
+// for correct inclusion of <msp430.h>
+#ifndef __MSP430F1612__
+#define __MSP430F1612__
+#endif
+
 //MSB430 core
 #define MSP430_INITIAL_CPU_SPEED    7372800uL
 #define MSP430_HAS_DCOR             1
@@ -55,7 +60,6 @@ and the mailinglist (subscription via web site)
 #define LED_RED_OFF     LEDS_PxOUT |= LEDS_CONF_RED
 #define LED_RED_TOGGLE     LEDS_PxOUT ^= LEDS_CONF_RED
 
-#include <msp430x16x.h>
 #include "board-conf.h"
 
 typedef uint8_t radio_packet_length_t;
