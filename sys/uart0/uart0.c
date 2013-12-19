@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "cpu-conf.h"
 #include "chardev_thread.h"
 #include "ringbuffer.h"
 #include "thread.h"
@@ -9,7 +10,10 @@
 
 #include "board_uart0.h"
 
-#define UART0_BUFSIZE 		(32)
+#ifndef UART0_BUFSIZE
+#define UART0_BUFSIZE       (128)
+#endif
+
 #define UART0_STACKSIZE 	(MINIMUM_STACK_SIZE + 256)
 
 ringbuffer_t uart0_ringbuffer;

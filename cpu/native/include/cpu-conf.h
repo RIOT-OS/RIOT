@@ -48,6 +48,11 @@
 #define NATIVE_ISR_STACKSIZE            (8192)
 #endif /* OS */
 
+#ifdef UART0_BUFSIZE
+#undef UART0_BUFSIZE
+#endif
+#define UART0_BUFSIZE                   (128)
+
 /* for nativenet */
 #define NATIVE_ETH_PROTO 0x1234
 
