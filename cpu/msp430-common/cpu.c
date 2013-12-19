@@ -53,6 +53,10 @@ __attribute__((section (".fini9"))) void __main_epilogue(void) { __asm__("ret");
 char *thread_stack_init(void (*task_func)(void), void *stack_start, int stack_size)
 {
     unsigned short *stk;
+
+    /* XXX: work around for misalignment, remove once solved properly in thread.c */
+    stack_size--;
+
     stk = (unsigned short *)(stack_start + stack_size);
 
     *stk = (unsigned short) sched_task_exit;
