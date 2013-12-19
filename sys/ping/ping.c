@@ -65,7 +65,7 @@ void ping(radio_address_t addr, uint8_t channr)
             print_failed();
         }
 
-        hwtimer_wait(500000);
+        hwtimer_wait(HWTIMER_TICKS(500 * 1000));
     }
 }
 
