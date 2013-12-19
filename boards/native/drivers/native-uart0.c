@@ -33,6 +33,7 @@
 
 #include "cpu.h"
 #include "board_uart0.h"
+#include "thread.h"
 
 #include "native_internal.h"
 #include "board_internal.h"
