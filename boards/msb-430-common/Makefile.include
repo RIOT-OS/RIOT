@@ -14,13 +14,26 @@ export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export LINKFLAGS = -mmcu=$(MCU) -lgcc $(RIOTBASE)/bin/startup.o
 TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
-export FLASHER = mspdebug
+export HEXFILE = bin/$(PROJECT).hex
+
+
+ifeq ($(strip $(FLASHER)),)
+	export FLASHER = mspdebug
+endif
+
+# set programmer port in FFLAGS manually if needed like this:
+# FFLAGS="-d /dev/ttyUSB0" PROGRAMMER="uif" make flash
+
+ifeq ($(strip $(PROGRAMMER)),)
+	export PROGRAMMER = olimex
+endif
+export FFLAGS += -j $(PROGRAMMER)
+
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
-export HEXFILE = bin/$(PROJECT).hex
-#export FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
-export FFLAGS = -j olimex "prog $(HEXFILE)"
+
+export FFLAGS += "prog $(HEXFILE)"
 
 export USEMODULE += msp430_common 
 export INCLUDES += -I $(RIOTCPU)/msp430-common/include/ -I$(RIOTBOARD)/msb-430-common/include
