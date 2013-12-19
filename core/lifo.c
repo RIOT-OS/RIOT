@@ -9,22 +9,15 @@
 /**
  * @ingroup     core_util
  * @{
- *
  * @file        lifo.c
  * @brief       LIFO buffer implementation
- *
- * @file        lifo.c
- * @brief       LIFO buffer implementation
- * @author      unknown
+ * @author      probably Kaspar Schleiser
  * @}
  */
 
 #include "lifo.h"
 
 #define ENABLE_DEBUG (0)
-#if ENABLE_DEBUG
-#define DEBUG_LIFO 1
-#endif
 #include "debug.h"
 
 int lifo_empty(int *array)
@@ -46,10 +39,10 @@ void lifo_insert(int *array, int i)
 
     int index = i + 1;
 
-#if DEBUG_LIFO
+#if DEVELHELP
     for (int x=0; x < index; x++) {
         if (i == array[x]) {
-            printf("lifo_insert: inserting duplicate into lifo: %d\n", i);
+            printf("\nlifo_insert: inserting duplicate into lifo: %d\n\n\n\t\tThe lifo is broken now.\n\n\n", i);
         }
     }
     if ((array[index] != -1) && (array[0] != -1)) {
@@ -92,6 +85,7 @@ int main()
     lifo_insert(array, 2);
     lifo_insert(array, 1);
     lifo_insert(array, 3);
+    lifo_insert(array, 0);
     lifo_insert(array, 0);
     printf("get: %i\n", lifo_get(array));
     printf("get: %i\n", lifo_get(array));
