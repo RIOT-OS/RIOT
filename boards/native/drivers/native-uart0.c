@@ -32,11 +32,14 @@
 #include <sys/select.h>
 
 #include "cpu.h"
-#include "debug.h"
 #include "board_uart0.h"
+#include "thread.h"
 
 #include "native_internal.h"
 #include "board_internal.h"
+
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
 int _native_uart_sock;
 int _native_uart_conn;
