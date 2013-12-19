@@ -44,6 +44,7 @@ void lpm_init(void);
 /**
  * @brief   Switches the MCU to a new power mode
  * @param[in]   target      Target power mode
+ * @return                  The previous power mode
  */
 enum lpm_mode lpm_set(enum lpm_mode target);
 

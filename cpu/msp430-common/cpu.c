@@ -14,6 +14,7 @@ See the file LICENSE in the top level directory for more details.
 #include "kernel.h"
 #include "kernel_internal.h"
 #include "sched.h"
+#include "thread.h"
 
 volatile int __inISR = 0;
 
@@ -39,12 +40,24 @@ void cpu_switch_context_exit(void)
     __restore_context();
 }
 
+/**
+ * mspgcc handles main specially - it does not return but falls
+ * through to section .fini9.
+ * To "fix" this, we put a return in section .fini9 to make main
+ * behave like a regular function. This enables a common
+ * thread_stack_init behavior. */
+__attribute__((section (".fini9"))) void __main_epilogue(void) { __asm__("ret"); }
+
 //----------------------------------------------------------------------------
 // Processor specific routine - here for MSP
 //----------------------------------------------------------------------------
 char *thread_stack_init(void (*task_func)(void), void *stack_start, int stack_size)
 {
     unsigned short *stk;
+
+    /* XXX: work around for misalignment, remove once solved properly in thread.c */
+    stack_size--;
+
     stk = (unsigned short *)(stack_start + stack_size);
 
     *stk = (unsigned short) sched_task_exit;

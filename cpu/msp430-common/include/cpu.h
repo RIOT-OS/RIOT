@@ -125,11 +125,6 @@ inline void dINT(void)
     dint();
 }
 
-#define lpm_set(...)
-
-void thread_yield(void);
-
-
 int inISR(void);
 
 void msp430_cpu_init(void);
