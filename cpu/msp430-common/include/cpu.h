@@ -125,9 +125,6 @@ inline void dINT(void)
     dint();
 }
 
-void thread_yield(void);
-
-
 int inISR(void);
 
 void msp430_cpu_init(void);

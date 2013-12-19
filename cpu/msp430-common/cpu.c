@@ -14,6 +14,7 @@ See the file LICENSE in the top level directory for more details.
 #include "kernel.h"
 #include "kernel_internal.h"
 #include "sched.h"
+#include "thread.h"
 
 volatile int __inISR = 0;
 
