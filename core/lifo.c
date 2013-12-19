@@ -69,7 +69,12 @@ int lifo_get(int *array)
     if (head != -1) {
         array[0] = array[head + 1];
     }
+
+#if DEVELHELP
+    /* make sure a double insert does not result in an infinite
+     * resource of values */
     array[head+1] = -1;
+#endif
 
     DEBUG("lifo_get: returning %i\n", head);
     return head;
