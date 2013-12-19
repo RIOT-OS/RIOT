@@ -17,8 +17,8 @@
  * @long        This LIFO implementation very efficiently handles
  *              integer values. The caveat is that it can only handle
  *              values between 0 and its own size -1. Also it can only
- *              handle up to one element of each value. I.e. you can
- *              not insert a value twice or the LIFO will break.
+ *              handle up to one element of each value. If you insert
+ *              a value twice the LIFO will break.
  */
 
 #ifndef __LIFO_H
@@ -55,7 +55,7 @@ void lifo_insert(int *array, int i);
  * @param array:    an integer array
  *
  * @return:         -1 if the lifo is empty, the least recently
- *                  inserted elment otherwise
+ *                  inserted element otherwise
  */
 int lifo_get(int *array);
 
