@@ -1,4 +1,7 @@
 ### Minimal setup
+ifeq ($(CPU),lpc1768)
+  export UNDEF += $(BINDIR)syscalls.o
+endif
 ifeq ($(CPU),lpc2387)
   export USEMODULE += arm_common lpc_common
   export UNDEF += $(BINDIR)syscalls.o $(BINDIR)lpc_syscalls.o

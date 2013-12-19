@@ -1,3 +1,7 @@
+ifeq ($(CPU),lpc1768)
+ DIRS = lpc1768
+endif
+
 ifeq ($(CPU),lpc2387)
  DIRS = arm_common lpc_common lpc2387
 endif
@@ -27,6 +31,7 @@ $(DIRS):
 	@"$(MAKE)" -C $@
 
 clean:
+	@"$(MAKE)" -C lpc1768 clean
 	@"$(MAKE)" -C lpc2387 clean
 	@"$(MAKE)" -C mc1322x clean
 	@"$(MAKE)" -C lpc_common clean

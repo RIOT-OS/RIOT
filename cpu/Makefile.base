@@ -1,3 +1,6 @@
+ifeq ($(CPU),lpc1768)
+ INCLUDES += -I$(MAKEBASE)/cpu/lpc1768/include
+endif
 ifeq ($(CPU),lpc2387)
  INCLUDES += -I$(MAKEBASE)/cpu/arm_common/include/
  INCLUDES += -I$(MAKEBASE)/cpu/lpc_common/include/

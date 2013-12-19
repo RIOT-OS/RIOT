@@ -31,3 +31,6 @@ endif
 ifeq ($(BOARD),native)
  INCLUDES += -I$(RIOTBOARD)/native/include/
 endif
+ifeq ($(BOARD),mbed_lpc1768)
+ INCLUDES += -I$(RIOTBOARD)/mbed_lpc1768/include/
+endif
