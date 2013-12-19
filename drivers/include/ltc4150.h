@@ -1,7 +1,7 @@
 #ifndef __LTC4150_H
 #define __LTC4150_H
 
-#include <ltc4150_arch.h>
+#include "ltc4150_arch.h"
 
 void ltc4150_init(void);
 void ltc4150_start(void);

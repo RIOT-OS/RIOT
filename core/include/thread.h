@@ -23,8 +23,8 @@
 #define __THREAD_H
 
 
-#include <kernel.h>
-#include <tcb.h>
+#include "kernel.h"
+#include "tcb.h"
 
 /** Minimum stack size */
 #ifndef MINIMUM_STACK_SIZE

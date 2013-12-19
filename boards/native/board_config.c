@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include <config.h>
+#include "config.h"
 
 /**
  * XXX: loading not implemented

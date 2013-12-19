@@ -18,11 +18,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <cc1100-interface.h>
+#include "cc1100-interface.h"
 
 #ifdef MODULE_CC110X
-#include <msg.h>
-#include <transceiver.h>
+#include "msg.h"
+#include "transceiver.h"
 
 #ifdef MODULE_TRANSCEIVER
 #define TEXT_SIZE           CC1100_MAX_DATA_LENGTH

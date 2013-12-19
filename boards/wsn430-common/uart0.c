@@ -6,15 +6,15 @@
    * Version 3.  See the file LICENSE for more details.
    */
 
+#include <stdio.h>
 #include "board.h"
 
 #define   UART0_TX                        U0TXBUF
 #define   UART0_WAIT_TXDONE()       while( (U0TCTL & TXEPT) == 0 ) { _NOP(); }
 
-#include <stdio.h>
-#include <kernel.h>
+#include "kernel.h"
 
-#include <board_uart0.h>
+#include "board_uart0.h"
 
 int putchar(int c)
 {

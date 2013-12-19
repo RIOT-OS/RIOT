@@ -36,7 +36,7 @@ See the file LICENSE in the top level directory for more details.
 #define PREFRAC_RTC	0x000061C0  /* Prescaler value, fraction portion, PCLK = 15Mhz */
 
 #define ENABLE_DEBUG (0)
-#include <debug.h>
+#include "debug.h"
 
 /**
  * @brief	epoch time in hour granularity

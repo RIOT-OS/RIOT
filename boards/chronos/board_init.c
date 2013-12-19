@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include <board.h>
-#include <cpu.h>
-#include <irq.h>
+#include "board.h"
+#include "cpu.h"
+#include "irq.h"
 
 void cc430_cpu_init(void)
 {

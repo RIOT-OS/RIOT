@@ -9,12 +9,12 @@
 
 #include <stdio.h>
 
-#include <board.h>
-#include <cpu.h>
-#include <irq.h>
-#include <hwtimer.h>
+#include "board.h"
+#include "cpu.h"
+#include "irq.h"
+#include "hwtimer.h"
 
-#include <cc2420.h>
+#include "cc2420.h"
 
 #define ENABLE_DEBUG    (1)
 #include "debug.h"

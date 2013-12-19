@@ -22,14 +22,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <errno.h>
-#include <tcb.h>
-#include <kernel.h>
-#include <kernel_internal.h>
-#include <sched.h>
-#include <flags.h>
-#include <cpu.h>
-#include <lpm.h>
-#include <thread.h>
+#include "tcb.h"
+#include "kernel.h"
+#include "kernel_internal.h"
+#include "sched.h"
+#include "flags.h"
+#include "cpu.h"
+#include "lpm.h"
+#include "thread.h"
 
 #ifdef MODULE_AUTO_INIT
 #include <auto_init.h>

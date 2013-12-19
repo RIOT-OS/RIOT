@@ -1,13 +1,11 @@
 #include <stdint.h>
-
-#include <cpu.h>
-#include <irq.h>
-#include <cc110x_ng.h>
-#include <cc110x-arch.h>
-
-//#include <cc430_.h>
 #include <cc430f6137.h>
-//#include <msp430/rf1a.h>
+
+#include "cpu.h"
+#include "irq.h"
+#include "cc110x_ng.h"
+#include "cc110x-arch.h"
+
 
 #define CC1100_GDO0     (RF1AIN & BIT0)
 #define CC1100_GDO1     (RF1AIN & BIT1)

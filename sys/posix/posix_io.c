@@ -15,10 +15,10 @@
  * @}
  */
 
-#include <thread.h>
-#include <msg.h>
+#include "thread.h"
+#include "msg.h"
 
-#include <posix_io.h>
+#include "posix_io.h"
 
 
 static int _posix_fileop(int pid, int op, int flags)

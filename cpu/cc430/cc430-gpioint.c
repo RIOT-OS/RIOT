@@ -20,11 +20,11 @@ See the file LICENSE in the top level directory for more details.
 
 #include <stdlib.h>
 #include <legacymsp430.h>
-#include <gpioint.h>
-#include <bitarithm.h>
-#include <cpu.h>
-#include <irq.h>
-#include <hwtimer.h>
+#include "gpioint.h"
+#include "bitarithm.h"
+#include "cpu.h"
+#include "irq.h"
+#include "hwtimer.h"
 
 /** min and max portnumber to generate interrupts */
 #define PORTINT_MIN     (1)

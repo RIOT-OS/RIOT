@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <string.h>
-#include <board-conf.h>
-#include <config.h>
-#include <flashrom.h>
+#include "board-conf.h"
+#include "config.h"
+#include "flashrom.h"
 
 void config_load(void)
 {

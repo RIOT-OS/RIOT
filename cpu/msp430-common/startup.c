@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <kernel_internal.h>
+#include "kernel_internal.h"
 
 extern void board_init(void);
 

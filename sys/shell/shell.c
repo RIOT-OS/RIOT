@@ -28,10 +28,10 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <shell.h>
-#include <shell_commands.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "shell.h"
+#include "shell_commands.h"
 
 static void(*find_handler(const shell_command_t *command_list, char *command))(char *)
 {

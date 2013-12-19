@@ -15,8 +15,8 @@
  * @}
  */
 
-#include <vtimer.h>
-#include <thread.h>
+#include "vtimer.h"
+#include "thread.h"
 
 #define TRICKLE_TIMER_STACKSIZE (KERNEL_CONF_STACKSIZE_DEFAULT)
 #define TRICKLE_INTERVAL_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)

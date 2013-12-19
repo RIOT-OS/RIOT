@@ -1,5 +1,5 @@
-#include <at86rf231.h>
-#include <at86rf231_arch.h>
+#include "at86rf231.h"
+#include "at86rf231_arch.h"
 
 static void at86rf231_xmit(uint8_t *data, uint8_t length);
 static void at86rf231_gen_pkt(uint8_t *buf, at86rf231_packet_t *packet);

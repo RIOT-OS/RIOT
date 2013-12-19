@@ -34,9 +34,9 @@ See the file LICENSE in the top level directory for more details.
  * @note    	$Id: lpc2387-rtc.h 1998 2010-03-16 13:05:41Z baar $
  */
 
-#include <rtc.h>
 #include <time.h>
 #include <sys/time.h>
+#include "rtc.h"
 #include "lpc2387.h"
 
 /* ------------------------------------------------------------------------- */

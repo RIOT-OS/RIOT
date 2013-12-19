@@ -37,9 +37,9 @@
 
 
 #include <legacymsp430.h>
-#include <cpu.h>
-#include <cc430-adc.h>
-#include <hwtimer.h>
+#include "cpu.h"
+#include "cc430-adc.h"
+#include "hwtimer.h"
 
 uint16_t adc12_result;
 uint8_t  adc12_data_ready;

@@ -20,7 +20,7 @@
 #include <string.h>
 
 #ifdef MODULE_RTC
-#include <rtc.h>
+#include "rtc.h"
 
 void _gettime_handler(void)
 {

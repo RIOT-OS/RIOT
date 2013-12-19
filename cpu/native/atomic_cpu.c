@@ -14,9 +14,9 @@
  * @}
  */
 
-#include <atomic.h>
-#include <irq.h>
-#include <debug.h>
+#include "atomic.h"
+#include "irq.h"
+#include "debug.h"
 
 unsigned int atomic_set_return(unsigned int *val, unsigned int set)
 {

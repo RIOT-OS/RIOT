@@ -12,7 +12,7 @@
 #define GPIO_H
 
 // TODO: why do we need to include this for macro expansion?
-#include "stdint.h"
+#include <stdint.h>
 
 /* Structure-based GPIO access
    Example usage:

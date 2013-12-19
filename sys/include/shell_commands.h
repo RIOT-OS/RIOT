@@ -1,7 +1,7 @@
 #ifndef __SHELL_COMMANDS_H
 #define __SHELL_COMMANDS_H
 
-#include <shell.h>
+#include "shell.h"
 
 #define DISK_GET_SECTOR_SIZE    "dget_ssize"
 #define DISK_GET_SECTOR_COUNT   "dget_scount"

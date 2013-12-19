@@ -6,11 +6,11 @@
   * Version 2.  See the file LICENSE for more details.
   */
 
-#include <cc2420_spi.h>
-#include <cc2420_arch.h>
+#include "cc2420_spi.h"
+#include "cc2420_arch.h"
 
-#include <cc2420_settings.h>
-#include <irq.h>
+#include "cc2420_settings.h"
+#include "irq.h"
 
 /* reg */
 void cc2420_write_reg(uint8_t addr, uint16_t value) {

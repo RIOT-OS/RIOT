@@ -48,8 +48,6 @@
 //#define DEBUG
 #ifdef DEBUG
 
-#include "stdio.h"
-
 static unsigned long time_value;
 
 static void set_time(void)

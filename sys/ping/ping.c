@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <thread.h>
-#include <msg.h>
+#include "thread.h"
+#include "msg.h"
 
 #include "cc110x/cc1100.h"
 #include "lpc2387.h"
@@ -9,7 +9,7 @@
 #include "vtimer.h"
 #include "timex.h"
 #include "gpioint.h"
-#include <ping.h>
+#include "ping.h"
 
 ping_payload *pipa;
 protocol_t protocol_id = 0;

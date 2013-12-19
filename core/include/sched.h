@@ -23,7 +23,7 @@
 #define _SCHEDULER_H
 
 #include <stddef.h>
-#include <bitarithm.h>
+#include "bitarithm.h"
 #include "tcb.h"
 
 #define MAXTHREADS 32

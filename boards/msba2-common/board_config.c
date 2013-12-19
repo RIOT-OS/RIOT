@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <string.h>
-#include <config.h>
-#include <flashrom.h>
+#include "config.h"
+#include "flashrom.h"
 
 void config_load(void) {
     extern char configmem[];

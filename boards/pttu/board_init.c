@@ -38,9 +38,9 @@ and the mailinglist (subscription via web site)
  * @author		Kaspar Schleiser
  *
  */
-#include <board.h>
-#include <VIC.h>
-#include <cpu.h>
+#include "board.h"
+#include "VIC.h"
+#include "cpu.h"
 
 #define PCRTC         BIT9
 #define CL_CPU_DIV    4

@@ -21,18 +21,18 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include <irq.h>
-#include <queue.h>
-#include <timex.h>
-#include <hwtimer.h>
-#include <msg.h>
-#include <thread.h>
-#include <queue.h>
+#include "irq.h"
+#include "queue.h"
+#include "timex.h"
+#include "hwtimer.h"
+#include "msg.h"
+#include "thread.h"
+#include "queue.h"
 
-#include <vtimer.h>
+#include "vtimer.h"
 
 #define ENABLE_DEBUG    (0)
-#include <debug.h>
+#include "debug.h"
 
 #define VTIMER_THRESHOLD 20UL
 #define VTIMER_BACKOFF 10UL

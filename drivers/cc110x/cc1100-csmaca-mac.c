@@ -29,13 +29,13 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #include <stdlib.h>
 #include <string.h>
 
-#include <cc1100.h>
-#include <cc1100_phy.h>
-#include <cc1100-csmaca-mac.h>
+#include "cc1100.h"
+#include "cc1100_phy.h"
+#include "cc1100-csmaca-mac.h"
 #include "protocol-multiplex.h"
 
 #include "hwtimer.h"
-#include <vtimer.h>
+#include "vtimer.h"
 
 /*---------------------------------------------------------------------------*/
 

@@ -23,25 +23,23 @@
  */
 
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <malloc.h>
+
 #include "lpc23xx.h"   /* LPC23XX/24xx Peripheral Registers */
 #include "cpu.h"
 #include "lpm.h"
-//#include "PatrecInit.h"
 #include "VIC.h"
 #include "kernel.h"
 #include "ssp0-board.h"
 #include "smb380-board.h"
 #include "hwtimer.h"
-#include <stdio.h>
-#include <malloc.h>
-// for fk_thread:
 #include "sched.h"
 #include "msg.h"
 #include "irq.h"
 
-//#include "hal-board.h"
 #include "gpioint.h"
-#include "stdlib.h"
 #include "math.h"
 #include "lpc2387.h"
 

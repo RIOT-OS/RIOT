@@ -1,11 +1,11 @@
 #include <legacymsp430.h>
-#include <board.h>
-#include <hwtimer.h>
-#include <hwtimer_arch.h>
-#include <cpu.h>
+#include "board.h"
+#include "hwtimer.h"
+#include "hwtimer_arch.h"
+#include "cpu.h"
 
 #define ENABLE_DEBUG (0)
-#include <debug.h>
+#include "debug.h"
 
 static uint32_t ticks = 0;
 

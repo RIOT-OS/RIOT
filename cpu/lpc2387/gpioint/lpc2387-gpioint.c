@@ -31,7 +31,7 @@ See the file LICENSE in the top level directory for more details.
 #include "lpc2387.h"
 #include "gpioint.h"
 #include "cpu.h"
-#include <irq.h>
+#include "irq.h"
 
 struct irq_callback_t {
     fp_irqcb    callback;

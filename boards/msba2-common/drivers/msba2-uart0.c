@@ -35,9 +35,9 @@ and the mailinglist (subscription via web site)
 #include <stdio.h>
 #include "lpc23xx.h"
 #include "VIC.h"
-#include <kernel.h>
+#include "kernel.h"
 
-#include <board_uart0.h>
+#include "board_uart0.h"
 
 /**
  * @file

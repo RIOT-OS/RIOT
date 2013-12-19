@@ -16,7 +16,7 @@
  * @}
  */
 
-#include <cib.h>
+#include "cib.h"
 
 void cib_init(cib_t *cib, unsigned int size)
 {

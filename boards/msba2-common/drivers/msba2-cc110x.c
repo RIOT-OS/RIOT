@@ -40,13 +40,13 @@ and the mailinglist (subscription via web site)
 #include <stdio.h>
 #include <stddef.h>
 // core
-#include <cpu.h>
-#include <irq.h>
+#include "cpu.h"
+#include "irq.h"
 // sys
-#include <cc110x_ng.h>
-#include <cc110x-arch.h>
-#include <cc110x_spi.h>
-#include <gpioint.h>
+#include "cc110x_ng.h"
+#include "cc110x-arch.h"
+#include "cc110x_spi.h"
+#include "gpioint.h"
 
 #define CC1100_GDO0         (FIO0PIN & BIT27)	// read serial I/O (GDO0)
 #define CC1100_GDO1         (FIO1PIN & BIT23)	// read serial I/O (GDO1)
@@ -62,8 +62,6 @@ and the mailinglist (subscription via web site)
 
 //#define DEBUG
 #ifdef DEBUG
-
-#include "stdio.h"
 
 static unsigned long time_value;
 

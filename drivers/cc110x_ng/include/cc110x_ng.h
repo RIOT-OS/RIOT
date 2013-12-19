@@ -22,10 +22,10 @@
 #ifndef CC1100_H
 #define CC1100_H
 
-#include <radio/radio.h>
-#include <radio/types.h>
 #include <stdint.h>
-#include <cc110x-config.h>
+#include "radio/radio.h"
+#include "radio/types.h"
+#include "cc110x-config.h"
 
 #define CC1100_MAX_DATA_LENGTH (58)
 

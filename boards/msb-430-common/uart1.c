@@ -1,12 +1,12 @@
+#include <stdio.h>
 #include "board.h"
+#include "kernel.h"
+
+#include "board_uart0.h"
 
 #define UART1_TX                        TXBUF1
 #define UART1_WAIT_TXDONE()       while( (UTCTL1 & TXEPT) == 0 ) { _NOP(); }
 
-#include <stdio.h>
-#include <kernel.h>
-
-#include <board_uart0.h>
 
 int putchar(int c)
 {

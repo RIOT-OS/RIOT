@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include <buzzer.h>
-#include <hwtimer.h>
 #include <cc430f6137.h>
+#include "buzzer.h"
+#include "hwtimer.h"
 
 void buzzer_beep(uint8_t pitch, uint16_t duration)
 {

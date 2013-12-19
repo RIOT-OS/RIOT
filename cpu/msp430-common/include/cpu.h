@@ -27,8 +27,8 @@ See the file LICENSE in the top level directory for more details.
 #include <stdio.h>
 #include <legacymsp430.h>
 
-#include "board.h"
 #include <msp430.h>
+#include "board.h"
 
 #include "sched.h"
 #include "msp430_types.h"

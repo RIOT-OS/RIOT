@@ -18,10 +18,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <transceiver.h>
-#include <cc110x_ng.h>
-#include <msg.h>
 #include <inttypes.h>
+#include "transceiver.h"
+#include "cc110x_ng.h"
+#include "msg.h"
 
 #define TEXT_SIZE           CC1100_MAX_DATA_LENGTH
 

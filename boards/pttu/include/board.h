@@ -40,8 +40,8 @@ and the mailinglist (subscription via web site)
 #ifndef __BOARD_H
 #define __BOARD_H
 
-#include <lpc2387.h>
-#include <cpu-conf.h>
+#include "lpc2387.h"
+#include "cpu-conf.h"
 
 #define VICIntEnClear VICIntEnClr
 

@@ -20,9 +20,9 @@ See the file LICENSE in the top level directory for more details.
 
 #include <string.h>
 #include <legacymsp430.h>
-#include <irq.h>
-#include <cpu.h>
-#include <cc430-rtc.h>
+#include "irq.h"
+#include "cpu.h"
+#include "cc430-rtc.h"
 
 //static volatile time_t epoch;
 static struct tm time_to_set;

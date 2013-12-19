@@ -29,10 +29,10 @@
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
-#include <msg.h>
-#include <thread.h>
-#include <vtimer.h>
-#include <timex.h>
+#include "msg.h"
+#include "thread.h"
+#include "vtimer.h"
+#include "timex.h"
 #include "lpc2387.h"
 #include "gpioint.h"
 #include "i2c.h"
