@@ -183,11 +183,10 @@ void cc1100_phy_init()
 
     /* Active watchdog for the first time */
     if (radio_mode == CC1100_MODE_CONSTANT_RX) {
-        cc1100_watch_dog_period.microseconds = CC1100_WATCHDOG_PERIOD;
+        cc1100_watch_dog_period = timex_set(CC1100_WATCHDOG_PERIOD, 0);
 
-        if (cc1100_watch_dog_period.microseconds != 0) {
-            timex_t temp = timex_set(0, 5000000L);
-            vtimer_set_msg(&cc1100_watch_dog, temp, cc1100_event_handler_pid, NULL);
+        if (timex_cmp(cc1100_watch_dog_period, timex_set(0, 0)) != 0) {
+            vtimer_set_msg(&cc1100_watch_dog, cc1100_watch_dog_period, cc1100_event_handler_pid, NULL);
         }
     }
 }
@@ -367,14 +366,13 @@ static bool contains_seq_entry(uint8_t src, uint8_t id)
     uint32_t cmp;
     timex_t now_timex;
     vtimer_now(&now_timex);
-    uint64_t now = now_timex.microseconds;
 
     for (i = 0; i < MAX_SEQ_BUFFER_SIZE; i++) {
         if ((seq_buffer[i].source == src) && (seq_buffer[i].identification == id)) {
             /* Check if time stamp is OK */
             cmp = (radio_mode == CC1100_MODE_WOR) ? cc1100_wor_config.rx_interval : 16000; /* constant RX ~16ms */
 
-            if ((now - seq_buffer[i].m_ticks) <= cmp) {
+            if ((timex_uint64(now_timex) - seq_buffer[i].m_ticks < cmp)) {
                 return true;
             }
             else {
@@ -404,7 +402,7 @@ static void add_seq_entry(uint8_t src, uint8_t id)
     seq_buffer[seq_buffer_pos].identification = id;
     timex_t now;
     vtimer_now(&now);
-    seq_buffer[seq_buffer_pos].m_ticks = now.microseconds;
+    seq_buffer[seq_buffer_pos].m_ticks = timex_uint64(now);
 
     /* Store 16 bit sequence number of layer 0 for speedup */
     last_seq_num = src;
@@ -629,7 +627,7 @@ static void cc1100_event_handler_function(void)
     msg_t m;
 
     while (1) {
-        if (cc1100_watch_dog_period.microseconds != 0) {
+        if (timex_uint64(cc1100_watch_dog_period) != 0) {
             vtimer_remove(&cc1100_watch_dog);
         }
 
@@ -685,9 +683,8 @@ static void cc1100_event_handler_function(void)
         dINT();
 
         if (rx_buffer_size == 0) {
-            if (cc1100_watch_dog_period.microseconds != 0) {
-                timex_t temp = timex_set(0, cc1100_watch_dog_period.microseconds * 1000000L);
-                vtimer_set_msg(&cc1100_watch_dog, temp,
+            if (timex_uint64(cc1100_watch_dog_period) != 0) {
+                vtimer_set_msg(&cc1100_watch_dog, cc1100_watch_dog_period,
                                cc1100_event_handler_pid, NULL);
             }
 
