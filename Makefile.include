@@ -13,7 +13,8 @@ endif
 
 # if you want to publish the board into the sources as an uppercase #define
 BB = $(shell echo $(BOARD)|tr 'a-z' 'A-Z')
-CFLAGS += -DBOARD=$(BB)
+CPUDEF = $(shell echo $(CPU)|tr 'a-z' 'A-Z')
+CFLAGS += -DBOARD=$(BB) -DCPU_$(CPUDEF)
 export CFLAGS
 
 # mandatory includes!
