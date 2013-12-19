@@ -27,6 +27,7 @@
 #include <kernel_internal.h>
 #include <clist.h>
 #include <bitarithm.h>
+#include "thread.h"
 
 #if SCHEDSTATISTICS
 #include "hwtimer.h"

@@ -27,6 +27,7 @@
 #include "tcb.h"
 #include "kernel.h"
 #include "sched.h"
+#include "thread.h"
 #include "irq.h"
 
 #include "debug.h"
