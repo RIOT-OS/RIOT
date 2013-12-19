@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
+
 #include "display.h"
 
-extern int toupper(int c);
 extern void (*_putchar)(int c);
 
 static char display_buf[11];

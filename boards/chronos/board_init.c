@@ -1,7 +1,9 @@
 #include <stdint.h>
+
 #include "board.h"
 #include "cpu.h"
 #include "irq.h"
+#include "debug.h"
 
 #include "display.h"
 #include "display_putchar.h"
