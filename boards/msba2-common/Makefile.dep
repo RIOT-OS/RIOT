@@ -12,3 +12,9 @@ ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
 		USEMODULE += gpioint
 	endif
 endif
+
+ifneq (,$(findstring ltc4150,$(USEMODULE)))
+	ifeq (,$(findstring gpioint,$(USEMODULE)))
+		USEMODULE += gpioint
+	endif
+endif
