@@ -26,7 +26,7 @@
 #ifndef CCNL_EXT_H__
 #define CCNL_EXT_H__
 
-#define compute_ccnx_digest(buf) SHA256(buf->data, buf->datalen, NULL)
+#define compute_ccnx_digest(buf) sha256(buf->data, buf->datalen, NULL)
 
 #ifdef USE_FRAG
 

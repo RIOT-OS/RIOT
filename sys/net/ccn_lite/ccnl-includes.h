@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sha256.h"
+#include "crypto/sha256.h"
 
 #define RIOT_MSG_DEV    (1)
 #define RIOT_TRANS_DEV  (2)
