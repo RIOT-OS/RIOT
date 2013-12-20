@@ -31,6 +31,7 @@
 #include <signal.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <err.h>
 
 #include "hwtimer.h"
@@ -55,6 +56,41 @@ static int native_hwtimer_isset[ARCH_MAXTIMERS];
 
 static int next_timer = -1;
 static void (*int_handler)(int);
+
+
+/**
+ * Subtract the `struct timeval' values x and y, storing the result in
+ * result.
+ * Return 1 if the difference is negative, otherwise 0.
+ *
+ * Source:
+ * http://www.gnu.org/software/libc/manual/html_node/Elapsed-Time.html
+ */
+int timeval_subtract(struct timeval *result, struct timeval *x, struct timeval *y)
+{
+    /* Perform the carry for the later subtraction by updating y. */
+    if (x->tv_usec < y->tv_usec) {
+        int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;
+        y->tv_usec -= 1000000 * nsec;
+        y->tv_sec += nsec;
+    }
+    if (x->tv_usec - y->tv_usec > 1000000) {
+        int nsec = (x->tv_usec - y->tv_usec) / 1000000;
+        y->tv_usec += 1000000 * nsec;
+        y->tv_sec -= nsec;
+    }
+
+    /**
+     * Compute the time remaining to wait.
+     * tv_usec is certainly positive.
+     */
+    result->tv_sec = x->tv_sec - y->tv_sec;
+    result->tv_usec = x->tv_usec - y->tv_usec;
+
+    /* Return 1 if result is negative. */
+    return x->tv_sec < y->tv_sec;
+}
+
 
 /**
  * sets timeval to given ticks
@@ -114,8 +150,25 @@ void schedule_timer(void)
     }
 
     /* next pending timer is in slot next_timer */
-    if (setitimer(ITIMER_REAL, &native_hwtimer[next_timer], NULL) == -1) {
-        err(EXIT_FAILURE, "schedule_timer");
+    struct timeval now;
+    ticks2tv(native_hwtimer_now, &now);
+
+    struct itimerval result;
+    memset(&result, 0, sizeof(result));
+
+    int retval = timeval_subtract(&result.it_value, &native_hwtimer[next_timer].it_value, &now);
+    if (retval || (tv2ticks(&result.it_value) < HWTIMERMINOFFSET)) {
+        /* the timeout has happened already, schedule an interrupt */
+        int sig = SIGALRM;
+        if (real_write(_sig_pipefd[1], &sig, sizeof(int)) == -1) {
+            err(EXIT_FAILURE, "schedule_timer(): real_write()");
+        }
+        _native_sigpend++;
+        return;
+    }
+
+    if (setitimer(ITIMER_REAL, &result, NULL) == -1) {
+        err(EXIT_FAILURE, "schedule_timer: setitimer");
     }
     else {
         DEBUG("schedule_timer(): set next timer (%i).\n", next_timer);
@@ -184,19 +237,8 @@ void hwtimer_arch_set(unsigned long offset, short timer)
 {
     DEBUG("hwtimer_arch_set(%lu, \033[31m%i\033[0m)\n", offset, timer);
 
-    if (offset < HWTIMERMINOFFSET) {
-        offset = HWTIMERMINOFFSET;
-        DEBUG("hwtimer_arch_set: offset < MIN, set to: %lu\n", offset);
-    }
-
-    native_hwtimer_isset[timer] = 1;
-
-    ticks2tv(offset, &(native_hwtimer[timer].it_value));
-    DEBUG("hwtimer_arch_set(): that is %lu s %lu us from now\n",
-          (unsigned long)native_hwtimer[timer].it_value.tv_sec,
-          (unsigned long)native_hwtimer[timer].it_value.tv_usec);
-
-    schedule_timer();
+    offset += native_hwtimer_now;
+    hwtimer_arch_set_absolute(offset, timer);
 
     return;
 }
@@ -204,9 +246,15 @@ void hwtimer_arch_set(unsigned long offset, short timer)
 void hwtimer_arch_set_absolute(unsigned long value, short timer)
 {
     DEBUG("hwtimer_arch_set_absolute(%lu, %i)\n", value, timer);
-    value -= native_hwtimer_now;
 
-    hwtimer_arch_set(value, timer);
+    ticks2tv(value, &(native_hwtimer[timer].it_value));
+
+    DEBUG("hwtimer_arch_set_absolute(): that is %lu s %lu us from now\n",
+          (unsigned long)native_hwtimer[timer].it_value.tv_sec,
+          (unsigned long)native_hwtimer[timer].it_value.tv_usec);
+
+    native_hwtimer_isset[timer] = 1;
+    schedule_timer();
 
     return;
 }
