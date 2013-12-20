@@ -102,3 +102,9 @@ ifneq (,$(filter vtimer,$(USEMODULE)))
 		USEMODULE += timex
 	endif
 endif
+
+ifneq (,$(filter net_if,$(USEMODULE)))
+	ifeq (,$(filter transceiver,$(USEMODULE)))
+		USEMODULE += transceiver
+	endif
+endif

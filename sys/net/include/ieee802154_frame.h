@@ -38,6 +38,10 @@
 #define IEEE_802154_SHORT_ADDR_M        2
 #define IEEE_802154_LONG_ADDR_M         3
 
+#define IEEE_802154_SHORT_MCAST_ADDR    (0xffff)
+#define IEEE_802154_LONG_MCAST_ADDR     {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
+                                          0xff, 0xff}}
+
 #define IEEE_802154_PAN_ID              0x1234
 
 typedef struct __attribute__((packed)) {

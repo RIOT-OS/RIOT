@@ -42,6 +42,9 @@ endif
 ifneq (,$(filter vtimer,$(USEMODULE)))
     DIRS += vtimer
 endif
+ifneq (,$(filter net_if,$(USEMODULE)))
+    DIRS += net/link_layer/net_if
+endif
 ifneq (,$(filter destiny,$(USEMODULE)))
     DIRS += net/transport_layer/destiny
 endif
