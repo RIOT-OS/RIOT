@@ -28,6 +28,10 @@ See the file LICENSE in the top level directory for more details.
 
 #define RX_BUF_SIZE (3)
 #define TRANSCEIVER_BUFFER_SIZE (3)
+
+#ifndef UART0_BUFSIZE
+#define UART0_BUFSIZE                   (32)
+#endif
 /** @} */
 
 #endif /* CPUCONF_H_ */

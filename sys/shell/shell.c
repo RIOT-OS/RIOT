@@ -1,5 +1,5 @@
 /**
- * Shell interpreter 
+ * Shell interpreter
  *
  * Copyright (C) 2009, Freie Universitaet Berlin (FUB).
  * Copyright (C) 2013, INRIA.
@@ -45,7 +45,7 @@ static void(*find_handler(const shell_command_t *command_list, char *command))(c
     const shell_command_t *entry;
 
     /* iterating over command_lists */
-    for (unsigned int i = 0; i < sizeof(command_lists)/sizeof(entry); i++) {
+    for (unsigned int i = 0; i < sizeof(command_lists) / sizeof(entry); i++) {
         if ((entry = command_lists[i])) {
             /* iterating over commands in command_lists entry */
             while (entry->name != NULL) {
@@ -77,7 +77,7 @@ static void print_help(const shell_command_t *command_list)
     const shell_command_t *entry;
 
     /* iterating over command_lists */
-    for (unsigned int i = 0; i < sizeof(command_lists)/sizeof(entry); i++) {
+    for (unsigned int i = 0; i < sizeof(command_lists) / sizeof(entry); i++) {
         if ((entry = command_lists[i])) {
             /* iterating over commands in command_lists entry */
             while (entry->name != NULL) {
@@ -90,7 +90,7 @@ static void print_help(const shell_command_t *command_list)
 
 static void handle_input_line(shell_t *shell, char *line)
 {
-    char line_copy[SHELL_BUFFER_SIZE];
+    char line_copy[shell->shell_buffer_size];
     char *saveptr;
     strncpy(line_copy, line, sizeof(line_copy));
     char *command = strtok_r(line_copy, " ", &saveptr);
@@ -152,7 +152,7 @@ static inline void print_prompt(shell_t *shell)
 
 void shell_run(shell_t *shell)
 {
-    char line_buf[SHELL_BUFFER_SIZE];
+    char line_buf[shell->shell_buffer_size];
 
     print_prompt(shell);
 
@@ -167,9 +167,11 @@ void shell_run(shell_t *shell)
     }
 }
 
-void shell_init(shell_t *shell, const shell_command_t *shell_commands, int(*readchar)(void), void(*put_char)(int))
+void shell_init(shell_t *shell, const shell_command_t *shell_commands,
+                uint16_t shell_buffer_size, int(*readchar)(void), void(*put_char)(int))
 {
     shell->command_list = shell_commands;
+    shell->shell_buffer_size = shell_buffer_size;
     shell->readchar = readchar;
     shell->put_char = put_char;
 }
