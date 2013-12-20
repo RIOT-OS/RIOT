@@ -40,13 +40,8 @@ void lifo_insert(int *array, int i)
     int index = i + 1;
 
 #if DEVELHELP
-    for (int x=0; x < index; x++) {
-        if (i == array[x]) {
-            printf("\nlifo_insert: inserting duplicate into lifo: %d\n\n\n\t\tThe lifo is broken now.\n\n\n", i);
-        }
-    }
     if ((array[index] != -1) && (array[0] != -1)) {
-        printf("lifo_insert: overwriting array[%i] == %i with %i\n", index, array[index], array[0]);
+        printf("lifo_insert: overwriting array[%i] == %i with %i\n\n\n\t\tThe lifo is broken now.\n\n\n", index, array[index], array[0]);
     }
 #endif
 
@@ -86,7 +81,10 @@ int main()
     lifo_insert(array, 1);
     lifo_insert(array, 3);
     lifo_insert(array, 0);
-    lifo_insert(array, 0);
+    lifo_insert(array, 3);
+    printf("get: %i\n", lifo_get(array));
+    printf("get: %i\n", lifo_get(array));
+    printf("get: %i\n", lifo_get(array));
     printf("get: %i\n", lifo_get(array));
     printf("get: %i\n", lifo_get(array));
     printf("get: %i\n", lifo_get(array));
