@@ -44,15 +44,16 @@
 #include <string.h>
 
 #include "crypto/sha256.h"
+#include "board.h"
 
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#ifdef __BIG_ENDIAN__
 /* Copy a vector of big-endian uint32_t into a vector of bytes */
 #define be32enc_vect memcpy
 
 /* Copy a vector of bytes into a vector of big-endian uint32_t */
 #define be32dec_vect memcpy
 
-#else /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#else /* !__BIG_ENDIAN__ */
 
 /*
  * Encode a length len/4 vector of (uint32_t) into a length len vector of
