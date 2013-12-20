@@ -1,3 +1,7 @@
 MODULE = auto_init
 
+ifneq (,$(findstring net_if,$(USEMODULE)))
+	INCLUDES += -I$(RIOTBASE)/sys/net/include/
+endif
+
 include $(RIOTBASE)/Makefile.base

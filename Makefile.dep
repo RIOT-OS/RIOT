@@ -102,3 +102,9 @@ ifneq (,$(findstring vtimer,$(USEMODULE)))
 		USEMODULE += timex
 	endif
 endif
+
+ifneq (,$(findstring net_if,$(USEMODULE)))
+	ifeq (,$(findstring transceiver,$(USEMODULE)))
+		USEMODULE += transceiver
+	endif
+endif
