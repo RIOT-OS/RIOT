@@ -21,6 +21,9 @@
 #include <string.h>
 #include <inttypes.h>
 
+#ifdef MODULE_NET_IF
+#include "net_if.h"
+#endif
 #include "transceiver.h"
 #include "msg.h"
 
@@ -80,6 +83,56 @@ void _transceiver_get_set_address_handler(int argc, char **argv)
     printf("[transceiver] got address: %" PRIu16 "\n", a);
 }
 
+#ifndef MODULE_NET_IF
+uint8_t hex_to_dec(char c)
+{
+    if (c >= '0' && c <= '9') {
+        return (uint8_t)(c - '0');
+    }
+    else if (c >= 'A' && c <= 'F') {
+        return (uint8_t)(c - 55);
+    }
+    else if (c >= 'a' && c <= 'f') {
+        return (uint8_t)(c - 87);
+    }
+    else {
+        return 0xff;
+    }
+}
+
+uint64_t _str_to_eui64(const char *eui64_str)
+{
+    int i;
+    const char *eui64_rev = &eui64_str[strlen(eui64_str) - 1];
+    uint64_t eui64 = 0;
+
+    for (i = 7; i >= 0 || eui64_rev >= eui64_str; i--) {
+        uint8_t digit;
+        eui64 <<= 8;
+
+        while ((digit = hex_to_dec(*eui64_rev)) == 0xFF) {
+            if (--eui64_rev < eui64_str) {
+                return eui64;
+            }
+        }
+
+        eui64 = digit;
+        eui64_rev--;
+
+        while ((digit = hex_to_dec(*eui64_rev)) == 0xFF) {
+            if (--eui64_rev < eui64_str) {
+                return eui64;
+            }
+        }
+
+        eui64 |= digit << 4;
+        eui64_rev--;
+    }
+
+    return eui64;
+}
+#endif
+
 /* checked for type safety */
 void _transceiver_get_set_long_addr_handler(int argc, char **argv)
 {
@@ -97,7 +150,13 @@ void _transceiver_get_set_long_addr_handler(int argc, char **argv)
     mesg.content.ptr = (char *) &tcmd;
 
     if (argc > 1) {
-        a = atoll(argv[1]);
+#ifdef MODULE_NET_IF
+        net_if_eui64_t eui64;
+        net_if_hex_to_eui64(&eui64, argv[1]);
+        a = eui64.uint64;
+#else
+        a = _str_to_eui64(argv[1]);
+#endif
         printf("[transceiver] trying to set EUI-64 %016"PRIx64"\n", a);
         mesg.type = SET_LONG_ADDR;
     }

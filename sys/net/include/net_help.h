@@ -21,8 +21,17 @@
                   (((uint32_t) (a) & 0x00ff0000) >> 8)  | \
                   (((uint32_t) (a) & 0x0000ff00) << 8)  | \
                   (((uint32_t) (a) & 0x000000ff) << 24))
+#define HTONLL(a) ((((uint64_t) (a) & 0xff00000000000000) >> 56) | \
+                   (((uint64_t) (a) & 0x00ff000000000000) >> 40)  | \
+                   (((uint64_t) (a) & 0x0000ff0000000000) >> 24) | \
+                   (((uint64_t) (a) & 0x000000ff00000000) >> 8)  | \
+                   (((uint64_t) (a) & 0x00000000ff000000) << 8)  | \
+                   (((uint64_t) (a) & 0x0000000000ff0000) << 24)  | \
+                   (((uint64_t) (a) & 0x000000000000ff00) << 40)  | \
+                   (((uint64_t) (a) & 0x00000000000000ff) << 56))
 #define NTOHS HTONS
 #define NTOHL HTONL
+#define NTOHLL HTONLL
 
 #define CMP_IPV6_ADDR(a, b) (memcmp(a, b, 16))
 
