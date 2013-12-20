@@ -32,6 +32,8 @@
 
 //MSB430 core
 #define MSP430_INITIAL_CPU_SPEED    8000000uL
+#define F_CPU                       MSP430_INITIAL_CPU_SPEED
+#define F_RC_OSCILLATOR             32768
 #define MSP430_HAS_DCOR             0
 #define MSP430_HAS_EXTERNAL_CRYSTAL 1
 
