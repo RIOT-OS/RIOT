@@ -1,5 +1,4 @@
 SRC = $(wildcard *.c)
-BINDIR = bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 export ARCH = telosb_base.a
 
@@ -30,5 +29,5 @@ $(BINDIR)%.o: %.c
 clean:
 	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
 	@if [ -d $(BINDIR) ] ; \
-	then rmdir $(BINDIR) ; \
+	then rm -rf $(BINDIR) ; \
 	fi

@@ -1,5 +1,4 @@
 SRC = $(wildcard *.c)
-BINDIR = bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 export ARCH = wsn430-v1_3b_base.a
 
@@ -32,5 +31,5 @@ clean:
 	$(MAKE) -C ../wsn430-common clean
 	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
 	@if [ -d $(BINDIR) ] ; \
-	then rmdir $(BINDIR) ; \
+	then rm -rf $(BINDIR) ; \
 	fi 

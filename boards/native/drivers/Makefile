@@ -1,5 +1,4 @@
 SRC = $(wildcard *.c)
-BINDIR = $(RIOTBOARD)/$(BOARD)/bin/
 OBJ = $(BINDIR)native-led.o
 ifneq (,$(findstring ltc4150,$(USEMODULE)))
 	OBJ += $(BINDIR)native-ltc4150.o

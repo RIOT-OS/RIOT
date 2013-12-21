@@ -1,5 +1,4 @@
 SRC = $(wildcard *.c)
-BINDIR = bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 export ARCH = msba2_base.a
 
@@ -31,7 +30,7 @@ clean:
 	$(MAKE) -C ../msba2-common clean
 	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
 	@if [ -d $(BINDIR) ] ; \
-	then rmdir $(BINDIR) ; \
+	then rm -rf $(BINDIR) ; \
 	fi 
 
 

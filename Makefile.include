@@ -17,16 +17,16 @@ CPUDEF = $(shell echo $(CPU)|tr 'a-z' 'A-Z')
 CFLAGS += -DBOARD=$(BB) -DCPU_$(CPUDEF)
 export CFLAGS
 
+export BINDIR =$(CURDIR)/bin/
+
 # mandatory includes!
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/Makefile.include
 include $(RIOTBASE)/Makefile.modules 
 
 # your binaries to link
-BASELIBS += $(RIOTBOARD)/$(BOARD)/bin/$(BOARD)_base.a
-BASELIBS += $(PROJBINDIR)/${PROJECT}.a
-
-PROJBINDIR =$(CURDIR)/bin
+BASELIBS += $(BINDIR)/$(BOARD)_base.a
+BASELIBS += $(BINDIR)/${PROJECT}.a
 
 # clumsy way to enable building native on osx:
 BUILDOSXNATIVE = 0
@@ -48,46 +48,46 @@ endif
 .PHONY: all clean flash doc term
 
 ## make script for your project. Build RIOT-base here!
-all: $(PROJBINDIR)/$(PROJECT).a
+all: $(BINDIR)/$(PROJECT).a
 	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
 	"$(MAKE)" -C $(RIOTBOARD)
 	"$(MAKE)" -C $(RIOTBASE)
 	@for i in $(EXTERNAL_MODULES) ; do "$(MAKE)" -C $$i ; done ;
 ifeq ($(BUILDOSXNATIVE),1)	
-	@$(LINK) $(UNDEF) -o $(PROJBINDIR)/$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
+	@$(LINK) $(UNDEF) -o $(BINDIR)/$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
-	@$(LINK) $(UNDEF) -o $(PROJBINDIR)/$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(PROJBINDIR)/$(PROJECT).map $(LINKFLAGS) 
-	@$(SIZE) $(PROJBINDIR)/$(PROJECT).elf
-	@$(OBJCOPY) $(OFLAGS) $(PROJBINDIR)/$(PROJECT).elf $(PROJBINDIR)/$(PROJECT).hex
+	@$(LINK) $(UNDEF) -o $(BINDIR)/$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)/$(PROJECT).map $(LINKFLAGS) 
+	@$(SIZE) $(BINDIR)/$(PROJECT).elf
+	@$(OBJCOPY) $(OFLAGS) $(BINDIR)/$(PROJECT).elf $(BINDIR)/$(PROJECT).hex
 endif
 
 ## your make rules
 ## Only basic example - modify it for larger projects!!
-#$(PROJBINDIR)/$(PROJECT).a: $(PROJBINDIR)/$(PROJECT).o
-#	$(AR) -rc $(PROJBINDIR)/project.a $(PROJBINDIR)/$(PROJECT).o 
+#$(BINDIR)/$(PROJECT).a: $(BINDIR)/$(PROJECT).o
+#	$(AR) -rc $(BINDIR)/project.a $(BINDIR)/$(PROJECT).o 
 
 # string array of all names of c files in dir
 SRC = $(wildcard *.c)
 
 # string array of all names replaced .c with .o 
-OBJ = $(SRC:%.c=${PROJBINDIR}/%.o)
+OBJ = $(SRC:%.c=${BINDIR}/%.o)
 
-$(PROJBINDIR)/$(PROJECT).a:  $(OBJ)
-	$(AR) -rc $(PROJBINDIR)/$(PROJECT).a $(OBJ)
+$(BINDIR)/$(PROJECT).a:  $(OBJ)
+	$(AR) -rc $(BINDIR)/$(PROJECT).a $(OBJ)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
 
-$(PROJBINDIR)/%.o: %.c $(PROJDEPS)
+$(BINDIR)/%.o: %.c $(PROJDEPS)
 	@echo; echo "Compiling.... $*.c"; echo
-	@test -d $(PROJBINDIR) || mkdir -p $(PROJBINDIR)
-	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(PROJBINDIR)/$*.o
+	@test -d $(BINDIR) || mkdir -p $(BINDIR)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)/$*.o
 
 clean:
 	"$(MAKE)" -C $(RIOTBOARD) clean
 	"$(MAKE)" -C $(RIOTBASE) clean
 	@for i in $(EXTERNAL_MODULES) ; do "$(MAKE)" -C $$i clean ; done ;
-	rm -rf $(PROJBINDIR)
+	rm -rf $(BINDIR)
 
 flash: all
 	$(FLASHER) $(FFLAGS)

@@ -1,7 +1,6 @@
 export ARCH = chronos_base.a
 
 SRC = $(wildcard *.c)
-BINDIR = $(RIOTBOARD)/$(BOARD)/bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 
@@ -32,4 +31,4 @@ clean:
 	$(MAKE) -C drivers clean
 	rm -f $(OBJ) $(DEP)
 	rm -f $(BINDIR)$(ARCH)
-	-rmdir $(BINDIR)
+	-rm -rf $(BINDIR)

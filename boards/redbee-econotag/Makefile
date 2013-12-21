@@ -1,5 +1,4 @@
 SRC = $(wildcard *.c)
-BINDIR = bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 export ARCH = $(BOARD)_base.a
@@ -32,6 +31,6 @@ clean:
 	"$(MAKE)" -C drivers clean
 	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
 	@if [ -d $(BINDIR) ] ; \
-	then rmdir $(BINDIR) ; \
+	then rm -rf $(BINDIR) ; \
 	fi
 

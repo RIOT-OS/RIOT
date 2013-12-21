@@ -1,5 +1,4 @@
 SRC = $(wildcard *.c)
-BINDIR = bin/
 OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
 DEP = $(SRC:%.c=$(BINDIR)%.d)
 export ARCH = native_base.a
@@ -27,5 +26,5 @@ $(BINDIR)%.o: %.c
 clean:
 	${MAKE} -C drivers clean
 	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
-	-rmdir -p $(BINDIR)
+	-rm -rf -p $(BINDIR)
 
