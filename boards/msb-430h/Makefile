@@ -1,36 +1,13 @@
-SRC = $(wildcard *.c)
-OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
-export ARCH = msb-430h_base.a
+MODULE =$(BOARD)_base
 
-DEP = $(SRC:%.c=$(BINDIR)%.d)
+include $(RIOTBOARD)/$(BOARD)/Makefile.include
 
-INCLUDES += -I${RIOTBASE}/core/include/
-INCLUDES += -Iinclude/ -I$(RIOTBOARD)/msb-430-common/include/
-INCLUDES += -I$(RIOTBASE)/cpu/msp430-common/include/ -I$(RIOTBASE)/cpu/msp430x16x/include/
-INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include/ -I$(RIOTBASE)/sys/include
+DIRS = $(RIOTBOARD)/msb-430-common 
 
-all: $(BINDIR)$(ARCH)
-	$(MAKE) -C ../msb-430-common
+all: $(BINDIR)$(MODULE).a
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
-$(BINDIR)$(ARCH): $(OBJ)
-	$(AR) rcs $(BINDIR)$(ARCH) $(OBJ)
+include $(RIOTBASE)/Makefile.base
 
-# pull in dependency info for *existing* .o files
--include $(OBJ:.o=.d)
-
-# compile and generate dependency info
-$(BINDIR)%.o: %.c
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
-	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
-
-# remove compilation products
-clean:
-	$(MAKE) -C ../msb-430-common clean
-	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
-	@if [ -d $(BINDIR) ] ; \
-	then rm -rf $(BINDIR) ; \
-	fi 
-
-
+clean::
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;

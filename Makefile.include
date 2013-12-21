@@ -50,7 +50,7 @@ endif
 ## make script for your project. Build RIOT-base here!
 all: $(BINDIR)/$(PROJECT).a
 	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
-	"$(MAKE)" -C $(RIOTBOARD)
+	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
 	"$(MAKE)" -C $(RIOTBASE)
 	@for i in $(EXTERNAL_MODULES) ; do "$(MAKE)" -C $$i ; done ;
 ifeq ($(BUILDOSXNATIVE),1)	
@@ -84,7 +84,7 @@ $(BINDIR)/%.o: %.c $(PROJDEPS)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)/$*.o
 
 clean:
-	"$(MAKE)" -C $(RIOTBOARD) clean
+	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD) clean
 	"$(MAKE)" -C $(RIOTBASE) clean
 	@for i in $(EXTERNAL_MODULES) ; do "$(MAKE)" -C $$i clean ; done ;
 	rm -rf $(BINDIR)

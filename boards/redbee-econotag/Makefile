@@ -1,36 +1,13 @@
-SRC = $(wildcard *.c)
-OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
-DEP = $(SRC:%.c=$(BINDIR)%.d)
-export ARCH = $(BOARD)_base.a
+MODULE =$(BOARD)_base
 
-INCLUDES += -I$(RIOTBOARD)/$(BOARD)/drivers/include
-INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
-INCLUDES += -I$(RIOTCPU)/arm_common/include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+include $(RIOTBOARD)/$(BOARD)/Makefile.include
 
-.PHONY: $(BINDIR)/$(ARCH)
+DIRS = drivers
 
-all: $(BINDIR)$(ARCH)
-	$(MAKE) -C drivers
+all: $(BINDIR)$(MODULE).a
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
-$(BINDIR)$(ARCH): $(OBJ)
-	$(AR) rcs $(BINDIR)$(ARCH) $(OBJ)
+include $(RIOTBASE)/Makefile.base
 
-# pull in dependency info for *existing* .o files
--include $(OBJ:.o=.d)
-
-# compile and generate dependency info
-$(BINDIR)%.o: %.c
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(CFLAGS_MTHUMB) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-	$(CC) $(CFLAGS) $(CFLAGS_MTHUMB) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
-	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
-
-# remove compilation products
-clean:
-	"$(MAKE)" -C drivers clean
-	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
-	@if [ -d $(BINDIR) ] ; \
-	then rm -rf $(BINDIR) ; \
-	fi
-
+clean::
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;

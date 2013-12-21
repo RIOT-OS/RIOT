@@ -1,23 +1,6 @@
-SRC = $(wildcard *.c)
-OBJ = $(SRC:%.c=$(BINDIR)%.o)
-DEP = $(SRC:%.c=$(BINDIR)%.d)
+MODULE =$(BOARD)_base
+include $(RIOTBOARD)/$(BOARD)/Makefile.include
+INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include
 
-INCLUDES += -I$(RIOTBASE)/sys/include/ -I$(RIOTBASE)/drivers/cc110x_ng/include/
-
-$(BINDIR)msba2_common_drivers.a: $(OBJ)
-	$(AR) rcs $(BINDIR)${ARCH} $(OBJ)
-
-# pull in dependency info for *existing* .o files
--include $(OBJ:.o=.d)
-
-# compile and generate dependency info
-$(BINDIR)%.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
-	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
-
-# remove compilation products
-
-clean:
-	rm -f $(OBJ) $(DEP)
+include $(RIOTBASE)/Makefile.base
 

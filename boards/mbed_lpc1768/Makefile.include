@@ -5,7 +5,7 @@ export CPU = lpc1768
 export PREFIX = arm-none-eabi-
 export CC = @$(PREFIX)gcc
 export AR = @$(PREFIX)ar
-export CFLAGS = -DUSE_STDPERIPH_DRIVER -ggdb -g3 -std=gnu99 -O0 -Wall -Wstrict-prototypes -mcpu=cortex-m3 $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
+export CFLAGS += -DUSE_STDPERIPH_DRIVER -ggdb -g3 -std=gnu99 -O0 -Wall -Wstrict-prototypes -mcpu=cortex-m3 $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
 export ASFLAGS = -ggdb -g3 -mcpu=cortex-m3 $(FPU_USAGE) -mlittle-endian
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc

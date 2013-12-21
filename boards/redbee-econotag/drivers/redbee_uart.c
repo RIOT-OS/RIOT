@@ -179,7 +179,8 @@ int fw_puts(char *astring, int length)
     return uart0_puts((uint8_t *) astring, (uint32_t) length);
 }
 
-int bl_uart_init(void)
+void bl_uart_init(void)
 {
     uart_init(UART1, BAUTRATE_UART1);
 }
+

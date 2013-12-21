@@ -1,31 +1,8 @@
-SRC = $(wildcard *.c)
-OBJ = $(BINDIR)native-led.o
-ifneq (,$(findstring ltc4150,$(USEMODULE)))
-	OBJ += $(BINDIR)native-ltc4150.o
-endif
-ifneq (,$(findstring uart0,$(USEMODULE)))
-	OBJ += $(BINDIR)native-uart0.o
-endif
-DEP = $(SRC:%.c=$(BINDIR)%.d)
+MODULE =$(BOARD)_base
 
-INCLUDES += -I$(RIOTBOARD)/native/include/
+include $(RIOTBOARD)/$(BOARD)/Makefile.include
 
-EXCLUDES := -I$(RIOTBASE)/sys/posix/%
+all: $(BINDIR)$(MODULE).a
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
-$(BINDIR)native_drivers.a: $(OBJ)
-	@$(AR) rcs $(BINDIR)${ARCH} $(OBJ)
-
-# pull in dependency info for *existing* .o files
--include $(OBJ:.o=.d)
-
-# compile and generate dependency info
-$(BINDIR)%.o: %.c
-	$(CC) $(CFLAGS) $(filter-out $(EXCLUDES),$(INCLUDES)) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-	@$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
-	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
-
-# remove compilation products
-
-clean:
-	rm -f $(OBJ) $(DEP)
-
+include $(RIOTBASE)/Makefile.base

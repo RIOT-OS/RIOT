@@ -93,7 +93,7 @@ void uart_init(volatile struct UART_struct *uart, uint32_t baud);
 void uart_set_baudrate(volatile struct UART_struct *uart, uint32_t baud);
 void uart_flow_ctl(volatile struct UART_struct *uart, uint8_t on);
 
-
+#undef UART0_BUFSIZE
 #define UART0_BUFSIZE (32)
 
 void uart1_putc(uint8_t c);

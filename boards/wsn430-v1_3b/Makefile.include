@@ -1,4 +1,4 @@
-export INCLUDES += -I$(RIOTBOARD)/wsn430-v1_3b/include -I$(RIOTBOARD)/wsn430-common/include
+export INCLUDES += -I$(RIOTBOARD)/wsn430-v1_3b/include -I$(RIOTBOARD)/wsn430-common/include -I$(RIOTBASE)/drivers/cc110x_ng/include
 
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
 include $(RIOTBOARD)/wsn430-common/Makefile.include

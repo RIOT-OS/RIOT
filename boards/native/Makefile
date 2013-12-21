@@ -1,30 +1,13 @@
-SRC = $(wildcard *.c)
-OBJ = $(SRC:%.c=$(BINDIR)%.o)## defines
-DEP = $(SRC:%.c=$(BINDIR)%.d)
-export ARCH = native_base.a
+MODULE =$(BOARD)_base
 
-INCLUDES += -I$(RIOTBASE)/cpu/native/include/
-INCLUDES += -I$(RIOTBOARD)/native/include/
+include $(RIOTBOARD)/$(BOARD)/Makefile.include
 
-all: $(BINDIR)$(ARCH)
-	$(MAKE) -C drivers
+DIRS = drivers
 
-$(BINDIR)$(ARCH): $(OBJ)
-	$(AR) rcs $(BINDIR)$(ARCH) $(OBJ)
+all: $(BINDIR)$(MODULE).a
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
-# pull in dependency info for *existing* .o files
--include $(OBJ:.o=.d)
+include $(RIOTBASE)/Makefile.base
 
-# compile and generate dependency info
-$(BINDIR)%.o: %.c
-	-mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
-	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
-
-# remove compilation products
-clean:
-	${MAKE} -C drivers clean
-	rm -f $(BINDIR)$(ARCH) $(OBJ) $(DEP)
-	-rm -rf -p $(BINDIR)
-
+clean::
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;

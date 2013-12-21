@@ -119,6 +119,9 @@ void cc1100_spi_init(void)
     while (SPI_RX_AVAIL) {   // while RNE (Receive FIFO Not Empty)...
         dummy = SSP1DR;	     // read data
     }
+    
+    /* to suppress unused-but-set-variable */
+    (void) dummy;
 }
 
 uint8_t

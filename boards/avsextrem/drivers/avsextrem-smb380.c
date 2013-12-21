@@ -977,7 +977,6 @@ uint8_t SMB380_setAnyMotionLimit(uint16_t mg, uint16_t gvalueint)
         return 0;
     }
 
-    unsigned short uReg;
     unsigned long cpsr = disableIRQ();
     SMB380_Prepare();
     /* 0,3g = 300 / 15,6mg = 19 */
@@ -985,7 +984,7 @@ uint8_t SMB380_setAnyMotionLimit(uint16_t mg, uint16_t gvalueint)
     SMB380_ssp_read();
     //Set duration at this point
     SMB380_ssp_write(SMB380_ANY_MOTION_DUR_HYST, 0, SMB380_READ_REGISTER);
-    uReg = SMB380_ssp_read();
+    SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);
     return 1;

@@ -1,34 +1,13 @@
-export ARCH = chronos_base.a
+MODULE =$(BOARD)_base
 
-SRC = $(wildcard *.c)
-OBJ = $(SRC:%.c=$(BINDIR)%.o)
-DEP = $(SRC:%.c=$(BINDIR)%.d)
+include $(RIOTBOARD)/$(BOARD)/Makefile.include
 
-INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/sys/lib -I$(RIOTBASE)/sys/drivers/include
-INCLUDES += -I$(RIOTBASE)/sys/drivers/cc110x_ng/include
-INCLUDES += -I$(RIOTBASE)/core/include
-INCLUDES += -I$(RIOTCPU)/msp430-common/include/
-INCLUDES += -I$(RIOTCPU)/cc430/include/
+DIRS = drivers
 
-all: $(BINDIR)$(ARCH)
-	$(MAKE) -C drivers
+all: $(BINDIR)$(MODULE).a
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
-$(BINDIR)$(ARCH): $(OBJ)
-	$(AR) rcs $(BINDIR)$(ARCH) $(OBJ)
+include $(RIOTBASE)/Makefile.base
 
-# pull in dependency info for *existing* .o files
--include $(OBJ:.o=.d)
-
-# compile and generate dependency info
-$(BINDIR)%.o: %.c
-	mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
-	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/fw_out && mv /tmp/fw_out $(BINDIR)$*.d
-
-# remove compilation products
-clean:
-	$(MAKE) -C drivers clean
-	rm -f $(OBJ) $(DEP)
-	rm -f $(BINDIR)$(ARCH)
-	-rm -rf $(BINDIR)
+clean::
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
