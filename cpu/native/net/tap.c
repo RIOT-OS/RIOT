@@ -162,7 +162,7 @@ int _native_marshall_ethernet(uint8_t *framebuf, radio_packet_t *packet)
     return data_len + ETHER_HDR_LEN;
 }
 
-int send_buf(radio_packet_t *packet)
+int8_t send_buf(radio_packet_t *packet)
 {
     uint8_t buf[TAP_BUFFER_LENGTH];
     int nsent, to_send;
@@ -178,7 +178,7 @@ int send_buf(radio_packet_t *packet)
         warn("write");
         return -1;
     }
-    return 0;
+    return (nsent > INT8_MAX ? INT8_MAX : nsent);
 }
 
 int tap_init(char *name)
