@@ -12,7 +12,7 @@ export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
-export LINKFLAGS = -mmcu=$(MCU) -lgcc $(BINDIR)/startup.o
+export LINKFLAGS = -mmcu=$(MCU) -lgcc
 TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
 export HEXFILE = bin/$(PROJECT).hex
 
@@ -36,5 +36,5 @@ endif
 export FFLAGS += "prog $(HEXFILE)"
 
 export USEMODULE += msp430_common 
-export INCLUDES += -I $(RIOTCPU)/msp430-common/include/ -I$(RIOTBOARD)/msb-430-common/include
+export INCLUDES += -I $(RIOTCPU)/msp430-common/include/ -I$(RIOTBOARD)/msb-430-common/include -I$(RIOTBOARD)/msb-430-common/drivers/include
 export OFLAGS = -O ihex

@@ -1,7 +1,6 @@
 SRC = shell.c
 OBJ = $(SRC:%.c=$(BINDIR)%.o)
 DEP = $(SRC:%.c=$(BINDIR)%.d)
-INCLUDES = -I../include
 
 MODULE =shell
 

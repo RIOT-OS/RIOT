@@ -1,5 +1,5 @@
 MODULE =core
 
-INCLUDES += -Iinclude/ -I../sys/include -I../sys/lib -I$(RIOTBASE)/drivers/include -I$(RIOTCPU)/$(CPU)/include
+INCLUDES = -Iinclude -I$(RIOTBASE)/sys/include -I$(RIOTCPU)/$(CPU)/include
 
 include $(RIOTBASE)/Makefile.base

@@ -1,4 +1,5 @@
 MODULE:=$(shell basename $(CURDIR))
-INCLUDES += -I$(RIOTBASE) -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/core/include  -I$(RIOTBASE)/sys/net/include
+
+INCLUDES += -I$(RIOTBASE)/drivers/cc110x -I$(RIOTBASE)/drivers/cc110x_ng/include
 
 include $(RIOTBASE)/Makefile.base

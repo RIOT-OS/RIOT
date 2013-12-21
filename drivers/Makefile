@@ -1,4 +1,5 @@
 MODULE = drivers
+INCLUDES = -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/core/include -I$(CURDIR)/include -Iinclude -I$(RIOTBASE)/sys/net/include
 
 DIRS=
 ifneq (,$(findstring powermon,$(USEMODULE)))
@@ -44,7 +45,4 @@ include $(RIOTBASE)/Makefile.base
 # remove compilation products
 clean::
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
-
-
-
 
