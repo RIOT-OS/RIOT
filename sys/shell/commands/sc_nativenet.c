@@ -103,7 +103,7 @@ void _nativenet_send_handler(char *pkt)
             printf("[nativenet] Sending packet of length %"PRIu16" to %"PRIu16": %s\n", p.length, p.dst, (char*) p.data);
             msg_send_receive(&mesg, &mesg, transceiver_pid);
             response = mesg.content.value;
-            printf("[nativenet] Packet sent: %"PRIu32"\n", response);
+            printf("[nativenet] Packet sent: %"PRIi8"\n", response);
             return;
         }
     }

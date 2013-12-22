@@ -31,7 +31,6 @@
  * On OSX a name has to be provided.
  */
 int tap_init(char *name);
-int send_buf(radio_packet_t *packet);
 
 extern int _native_tap_fd;
 extern unsigned char _native_tap_mac[ETHER_ADDR_LEN];

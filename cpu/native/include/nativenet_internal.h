@@ -40,4 +40,5 @@ struct rx_buffer_s {
 extern struct rx_buffer_s _nativenet_rx_buffer[RX_BUF_SIZE];
 
 void _nativenet_handle_packet(radio_packet_t *packet);
+int8_t send_buf(radio_packet_t *packet);
 #endif /* NATIVENET_INTERNAL_H */
