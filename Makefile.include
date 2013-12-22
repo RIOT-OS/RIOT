@@ -21,7 +21,7 @@ export BINDIR =$(CURDIR)/bin/
 
 # mandatory includes!
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
-include $(RIOTCPU)/Makefile.include
+include $(RIOTCPU)/$(CPU)/Makefile.include
 include $(RIOTBASE)/Makefile.modules 
 
 # your binaries to link

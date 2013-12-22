@@ -1,0 +1,3 @@
+INCLUDES += -I$(MAKEBASE)/cpu/lpc1768/include
+
+export UNDEF += $(BINDIR)syscalls.o

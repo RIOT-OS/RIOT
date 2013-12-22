@@ -1,0 +1,2 @@
+INCLUDES += -I$(MAKEBASE)/cpu/msp430-common/include/
+

@@ -1,7 +1,7 @@
 MODULE =cpu
 
 INCLUDES = -I../include -Idrivers/include -I../arm_common/include -I../../sys/lib -I../../drivers/include -I../../core/include -I../../sys/include -I../../hal/include -I../../.. 
-DIRS =
+DIRS = $(RIOTCPU)/arm_common $(RIOTCPU)/lpc_common
 ifneq (,$(findstring gpioint,$(USEMODULE)))
 	DIRS += gpioint
 endif

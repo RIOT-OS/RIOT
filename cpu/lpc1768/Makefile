@@ -7,8 +7,7 @@ CC_SYMBOLS = -DTARGET_LPC1769 -DTOOLCHAIN_GCC_ARM -DNDEBUG -D__CORTEX_M3
 LD_FLAGS = -mcpu=cortex-m3 -mthumb -Wl,--gc-sections,-Map=$(PROJECT).map,--cref --specs=nano.specs
 LD_SYS_LIBS = -lc -lgcc -lnosys
 
-INCLUDES = -Iinclude
-INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/sys/lib 
+INCLUDES = -Iinclude -I$(RIOTBASE)/core/include -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/sys/lib 
 
 all: $(BINDIR)$(MODULE).a
 

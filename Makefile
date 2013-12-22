@@ -1,4 +1,4 @@
-DIRS = $(RIOTCPU) core drivers sys 
+DIRS = $(RIOTCPU)/$(CPU) core drivers sys
 
 .PHONY: all clean doc
 
