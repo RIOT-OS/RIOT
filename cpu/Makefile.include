@@ -15,5 +15,5 @@ ifeq ($(CPU),mc1322x)
   export INCLUDES += -I$(RIOTBASE)/cpu/arm_common/include
 endif
 ifeq ($(CPU),native)
-  export INCLUDES += -I$(RIOTBASE)/cpu/native/include
+  export INCLUDES += -I$(RIOTCPU)/native/include
 endif
