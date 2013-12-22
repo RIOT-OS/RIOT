@@ -22,50 +22,14 @@
 #ifndef _CPU_H
 #define _CPU_H
 
-#include <sys/param.h>
-
-/* enable signal handler register access on different platforms
- * check here for more:
- * http://sourceforge.net/p/predef/wiki/OperatingSystems/
- */
-#ifdef BSD // BSD = (FreeBSD, Darwin, ...)
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE
-#include <ucontext.h>
-#undef _XOPEN_SOURCE
-#else
-#include <ucontext.h>
-#endif
-#elif defined(__linux__)
-#ifndef _GNU_SOURCE
-#define GNU_SOURCE
-#include <ucontext.h>
-#undef GNU_SOURCE
-#else
-#include <ucontext.h>
-#endif
-#endif // BSD/Linux
-
-#include "kernel_internal.h"
-#include "sched.h"
-
 #include "cpu-conf.h"
 
 /* TODO: choose better value? */
 #define F_CPU 1000000
 
+/* TODO: remove once these have been removed from RIOT: */
 void dINT(void);
 void eINT(void);
-
-/**
- * register interrupt handler handler for interrupt sig
- */
-int register_interrupt(int sig, void (*handler)(void));
-
-/**
- * unregister interrupt handler for interrupt sig
- */
-int unregister_interrupt(int sig);
 
 /** @} */
 #endif //_CPU_H

@@ -27,6 +27,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 #include "transceiver.h"
+#include "msg.h"
 
 #include "tap.h"
 #include "nativenet.h"
