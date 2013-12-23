@@ -55,10 +55,11 @@ void chardev_loop(ringbuffer_t *rb)
         msg_receive(&m);
 
         if (m.sender_pid != pid) {
-            DEBUG("Receiving message from another thread\n");
+            DEBUG("Receiving message from another thread: ");
 
             switch(m.type) {
                 case OPEN:
+                    DEBUG("OPEN\n");
                     if (reader_pid == -1) {
                         reader_pid = m.sender_pid;
                         /* no error */
@@ -72,6 +73,7 @@ void chardev_loop(ringbuffer_t *rb)
                     break;
 
                 case READ:
+                    DEBUG("READ\n");
                     if (m.sender_pid != reader_pid) {
                         m.content.value = -EINVAL;
                         r = NULL;
@@ -84,6 +86,7 @@ void chardev_loop(ringbuffer_t *rb)
                     break;
 
                 case CLOSE:
+                    DEBUG("CLOSE\n");
                     if (m.sender_pid == reader_pid) {
                         DEBUG("uart0_thread: closing file from %i\n", reader_pid);
                         reader_pid = -1;
@@ -98,12 +101,14 @@ void chardev_loop(ringbuffer_t *rb)
                     break;
 
                 default:
+                    DEBUG("UNKNOWN\n");
                     m.content.value = -EINVAL;
                     msg_reply(&m, &m);
             }
         }
 
         if (rb->avail && (r != NULL)) {
+            DEBUG("Data is available\n");
             int state = disableIRQ();
             int nbytes = min(r->nbytes, rb->avail);
             DEBUG("uart0_thread [%i]: sending %i bytes received from %i to pid %i\n", pid, nbytes, m.sender_pid, reader_pid);
