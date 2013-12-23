@@ -1,0 +1,4 @@
+[submodule "sys/lib/libcoap"]
+    path = sys/lib/libcoap
+    url = git@github.com:RIOT-OS/libcoap.git
+    ignore = dirty

@@ -7,9 +7,37 @@ ifneq (,$(findstring vtimer,$(USEMODULE)))
 	endif
 endif
 
+
+ifneq (,$(findstring pnet, $(USEMODULE)))
+	ifeq (,$(findstring posix, $(USEMODULE)))
+		USEMODULE += posix
+	endif
+	ifeq (,$(findstring destiny, $(USEMODULE)))
+		USEMODULE += destiny
+	endif
+	ifeq (,$(findstring net_help, $(USEMODULE)))
+		USEMODULE += net_help
+	endif
+endif
+
+ifneq (,$(findstring posix, $(USEMODULE)))
+	ifeq (,$(findstring uart0, $(USEMODULE)))
+		USEMODULE += uart0
+	endif
+endif
+
 ifneq (,$(findstring uart0,$(USEMODULE)))
 	ifeq (,$(findstring lib,$(USEMODULE)))
 		USEMODULE += lib	
+	endif
+endif
+
+ifneq (,$(findstring libcoap,$(USEMODULE)))
+	ifeq (,$(findstring posix,$(USEMODULE)))
+		USEMODULE += posix
+	endif
+	ifeq (,$(findstring pnet,$(USEMODULE)))
+		USEMODULE += pnet
 	endif
 endif
 
