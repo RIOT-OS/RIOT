@@ -15,7 +15,6 @@
  */
 #ifndef CPUCONF_H_
 #define CPUCONF_H_
-#include <signal.h>
 
 /* TODO: tighten stack sizes */
 #ifdef __MACH__ /* OSX */

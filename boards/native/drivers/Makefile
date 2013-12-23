@@ -11,6 +11,8 @@ DEP = $(SRC:%.c=$(BINDIR)%.d)
 
 INCLUDES += -I$(RIOTBOARD)/native/include/
 
+EXCLUDES := -I$(RIOTBASE)/sys/posix/%
+
 $(BINDIR)native_drivers.a: $(OBJ)
 	@$(AR) rcs $(BINDIR)${ARCH} $(OBJ)
 
@@ -19,7 +21,7 @@ $(BINDIR)native_drivers.a: $(OBJ)
 
 # compile and generate dependency info
 $(BINDIR)%.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
+	$(CC) $(CFLAGS) $(filter-out $(EXCLUDES),$(INCLUDES)) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
 	@$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 
