@@ -1,5 +1,3 @@
-INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/sys/include
-
 EXCLUDES := -I$(RIOTBASE)/sys/posix/%
 
 MODULE = nativenet

@@ -1,6 +1,7 @@
 MODULE =cpu
 
-INCLUDES = -I../include -I$(RIOTBASE)/core/include
+include $(RIOTCPU)/$(CPU)/Makefile.include
+
 DIRS = $(RIOTCPU)/msp430-common/
 
 all: $(BINDIR)$(MODULE).a

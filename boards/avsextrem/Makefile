@@ -1,7 +1,5 @@
 MODULE =$(BOARD)_base
 
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
-
 DIRS = drivers $(RIOTBOARD)/msba2-common
 
 all: $(BINDIR)$(MODULE).a

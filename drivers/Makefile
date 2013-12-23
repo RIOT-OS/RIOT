@@ -1,5 +1,4 @@
 MODULE = drivers
-INCLUDES = -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/core/include -I$(CURDIR)/include -Iinclude -I$(RIOTBASE)/sys/net/include
 
 DIRS=
 ifneq (,$(findstring powermon,$(USEMODULE)))

@@ -1,7 +1,5 @@
 MODULE =$(BOARD)_base
 
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
-
 DIRS = $(RIOTBOARD)/msb-430-common 
 
 all: $(BINDIR)$(MODULE).a

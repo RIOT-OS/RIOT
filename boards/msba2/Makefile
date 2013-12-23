@@ -1,5 +1,4 @@
 MODULE =$(BOARD)_base
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
 INCLUDES += -I$(RIOTBASE)/drivers/cc110x
 
 DIRS = $(RIOTBOARD)/msba2-common 

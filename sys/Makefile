@@ -1,5 +1,3 @@
-export INCLUDES = -Iinclude -I$(CURDIR)/include -I$(RIOTBASE)/sys/net/include -I$(RIOTBASE)/drivers/include -I$(RIOTCPU)/$(CPU)/include -I$(RIOTBASE)/core/include
-
 MODULE =sys
 ifneq (,$(findstring auto_init,$(USEMODULE)))
     DIRS += auto_init
@@ -17,6 +15,7 @@ ifneq (,$(findstring ps,$(USEMODULE)))
     DIRS += ps
 endif
 ifneq (,$(findstring posix,$(USEMODULE)))
+	INCLUDES += -I$(RIOTBASE)/sys/posix/include
     DIRS += posix
 endif
 ifneq (,$(findstring shell,$(USEMODULE)))

@@ -23,6 +23,5 @@ export FFLAGS = $(HEXFILE)
 export ELFFILE = bin/$(PROJECT).elf
 export DEBUGGER_FLAGS = $(ELFFILE)
 
-INCLUDES += -Iinclude/
-INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+INCLUDES += -Iinclude/ -I$(RIOTCPU)/$(CPU)/include
 export OFLAGS = -O binary

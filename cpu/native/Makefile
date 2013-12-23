@@ -1,7 +1,5 @@
 MODULE = cpu
 
-INCLUDES += -I../include -I$(RIOTBASE)/core/include
-
 EXCLUDES := -I$(RIOTBASE)/sys/posix/%
 
 DIRS =

@@ -1,5 +1,4 @@
 MODULE =$(BOARD)_base
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
 
 DIRS = drivers
 

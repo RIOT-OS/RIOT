@@ -23,9 +23,6 @@ export CFLAGS += -DVERSION=\"$(GIT_VERSION)\"
 
 .PHONY: clean
 
-include $(RIOTCPU)/$(CPU)/Makefile.include
-include $(RIOTBOARD)/$(BOARD)/Makefile.include
-
 $(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ)
 	@$(AR) -rc $(BINDIR)$(MODULE).a $(OBJ) $(ASMOBJ)
 
