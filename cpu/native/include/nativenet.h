@@ -64,7 +64,8 @@ void nativenet_set_monitor(uint8_t mode);
  * Send a packet
  *
  * @param packet a radio packet
- * @return -1 if the operation failed, 0 otherwise
+ * @return -1 if the operation failed, the number of transmitted bytes
+ *         up to INT8_MAX otherwise
  */
 int8_t nativenet_send(radio_packet_t *packet);
 
