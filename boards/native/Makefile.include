@@ -1,4 +1,4 @@
-export INCLUDES += -I$(RIOTBOARD)/native/include
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
 export CPU = native
 
 # toolchain config

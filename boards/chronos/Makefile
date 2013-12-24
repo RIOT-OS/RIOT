@@ -1,5 +1,6 @@
 MODULE =$(BOARD)_base
 
+INCLUDES += -I$(RIOTBOARD)/$(BOARD)/drivers/include
 DIRS = drivers
 
 all: $(BINDIR)$(MODULE).a

@@ -20,9 +20,9 @@ export CFLAGS
 export BINDIR =$(CURDIR)/bin/
 
 # mandatory includes!
+include $(RIOTBASE)/Makefile.modules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/$(CPU)/Makefile.include
-include $(RIOTBASE)/Makefile.modules 
 
 # your binaries to link
 BASELIBS += $(BINDIR)$(BOARD)_base.a
