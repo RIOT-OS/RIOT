@@ -21,7 +21,10 @@
  * @}
  */
 
-#include "cc110x-defaultSettings.h"
+#include "cc110x_ng.h"
+
+// Default PA table index (output power)
+#define PATABLE                 (11)
 
 /**
  * Usable, non overlapping channels and corresponding frequencies

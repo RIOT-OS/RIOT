@@ -176,7 +176,7 @@ void cc110x_init_interrupts(void)
     restoreIRQ(state);  /* Enable all interrupts */
 }
 
-void cc110x_spi_init(uint8_t clockrate)
+void cc110x_spi_init(void)
 {
     // Switch off async UART
     while (!(UTCTL0 & TXEPT));  // Wait for empty UxTXBUF register

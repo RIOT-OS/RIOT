@@ -14,7 +14,6 @@
 #include "irq.h"
 
 #include "cc110x_ng.h"
-#include "cc110x-arch.h"
 
 #define CC1100_GDO0         (P1IN & 0x08)   // read serial I/O (GDO0)
 #define CC1100_GDO1         (P5IN & 0x04)   // read serial I/O (GDO1)
@@ -153,7 +152,7 @@ void cc110x_init_interrupts(void)
     restoreIRQ(state);  /* Enable all interrupts */
 }
 
-void cc110x_spi_init(uint8_t clockrate)
+void cc110x_spi_init(void)
 {
     // Switch off async UART
     while(!(U1TCTL & TXEPT));   // Wait for empty UxTXBUF register

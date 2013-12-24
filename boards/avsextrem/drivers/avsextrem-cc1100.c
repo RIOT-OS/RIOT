@@ -28,9 +28,7 @@
 // cpu
 #include "cpu.h"
 // sys
-#include "cc1100.h"
-#include "arch_cc1100.h"
-#include "cc1100_spi.h"
+#include "cc110x_ng.h"
 #include "gpioint.h"
 
 #define CC1100_GDO0   (FIO2PIN & BIT6)  // read serial I/O (GDO0)
@@ -222,7 +220,7 @@ void cc1100_gdo2_disable(void)
 
 void cc1100_gdo2_enable(void)
 {
-    gpioint_set(0, BIT28, GPIOINT_FALLING_EDGE, &cc1100_gdo2_irq);
+    gpioint_set(0, BIT28, GPIOINT_FALLING_EDGE, &cc110x_gdo2_irq);
 }
 
 void cc1100_before_send(void)
@@ -239,7 +237,7 @@ void cc1100_after_send(void)
 
 void cc1100_gdo0_enable(void)
 {
-    gpioint_set(2, BIT6, GPIOINT_RISING_EDGE, &cc1100_gdo0_irq);
+    gpioint_set(2, BIT6, GPIOINT_RISING_EDGE, &cc110x_gdo0_irq);
 }
 
 void cc1100_gdo0_disable(void)
