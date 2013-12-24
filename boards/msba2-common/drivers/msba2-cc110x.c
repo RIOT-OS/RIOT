@@ -45,8 +45,6 @@ and the mailinglist (subscription via web site)
 #include "cpu.h"
 /* drivers  */
 #include "cc110x_ng.h"
-#include "cc110x-arch.h"
-#include "cc110x_spi.h"
 
 #include "gpioint.h"
 

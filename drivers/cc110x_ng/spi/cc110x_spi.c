@@ -28,10 +28,7 @@
 #include <stdio.h>
 
 #include "cc110x_ng.h"
-#include "cc110x-arch.h"
 #include "cc110x-internal.h"
-#include "cc110x_spi.h"
-#include "cc110x-reg.h"
 
 #include "irq.h"
 

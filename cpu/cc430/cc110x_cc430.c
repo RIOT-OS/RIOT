@@ -20,8 +20,7 @@
 
 #include <stdint.h>
 #include "irq.h"
-#include "cc110x-defaultSettings.h"
-#include "cc110x-reg.h"
+#include "cc110x_ng.h"
 #include "board.h"
 #include "hwtimer.h"
 

@@ -1,5 +1,5 @@
 MODULE =$(BOARD)_base
 
-INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include
+INCLUDES += -I$(RIOTBASE)/drivers/include
 
 include $(RIOTBASE)/Makefile.base
