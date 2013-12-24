@@ -25,8 +25,8 @@ include $(RIOTCPU)/$(CPU)/Makefile.include
 include $(RIOTBASE)/Makefile.modules 
 
 # your binaries to link
-BASELIBS += $(BINDIR)/$(BOARD)_base.a
-BASELIBS += $(BINDIR)/${PROJECT}.a
+BASELIBS += $(BINDIR)$(BOARD)_base.a
+BASELIBS += $(BINDIR)${PROJECT}.a
 
 # clumsy way to enable building native on osx:
 BUILDOSXNATIVE = 0
@@ -48,17 +48,17 @@ endif
 .PHONY: all clean flash doc term
 
 ## make script for your project. Build RIOT-base here!
-all: $(BINDIR)/$(PROJECT).a
+all: $(BINDIR)$(PROJECT).a
 	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
 	"$(MAKE)" -C $(RIOTBASE)
 	@for i in $(EXTERNAL_MODULES) ; do "$(MAKE)" -C $$i ; done ;
 ifeq ($(BUILDOSXNATIVE),1)	
-	@$(LINK) $(UNDEF) -o $(BINDIR)/$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
+	@$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
-	@$(LINK) $(UNDEF) -o $(BINDIR)/$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)/$(PROJECT).map $(LINKFLAGS) 
-	@$(SIZE) $(BINDIR)/$(PROJECT).elf
-	@$(OBJCOPY) $(OFLAGS) $(BINDIR)/$(PROJECT).elf $(BINDIR)/$(PROJECT).hex
+	@$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS)
+	@$(SIZE) $(BINDIR)$(PROJECT).elf
+	@$(OBJCOPY) $(OFLAGS) $(BINDIR)$(PROJECT).elf $(BINDIR)$(PROJECT).hex
 endif
 
 ## your make rules
@@ -70,18 +70,18 @@ endif
 SRC = $(wildcard *.c)
 
 # string array of all names replaced .c with .o 
-OBJ = $(SRC:%.c=${BINDIR}/%.o)
+OBJ = $(SRC:%.c=${BINDIR}%.o)
 
-$(BINDIR)/$(PROJECT).a:  $(OBJ)
-	$(AR) -rc $(BINDIR)/$(PROJECT).a $(OBJ)
+$(BINDIR)$(PROJECT).a:  $(OBJ)
+	$(AR) -rc $(BINDIR)$(PROJECT).a $(OBJ)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
 
-$(BINDIR)/%.o: %.c $(PROJDEPS)
+$(BINDIR)%.o: %.c $(PROJDEPS)
 	@echo; echo "Compiling.... $*.c"; echo
 	@test -d $(BINDIR) || mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)/$*.o
+	$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$*.o
 
 clean:
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD) clean

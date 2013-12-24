@@ -20,7 +20,7 @@ ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
 export HEXFILE = bin/$(PROJECT).hex
-export FFLAGS = $(PORT) $(BINDIR)/$(PROJECT).hex
+export FFLAGS = $(PORT) $(BINDIR)$(PROJECT).hex
 include $(RIOTBOARD)/msba2-common/Makefile.dep
 
 export INCLUDES += -I$(RIOTCPU)/lpc2387/include -I$(RIOTBOARD)/msba2-common/include -I$(RIOTBOARD)/msba2-common/drivers/include/
