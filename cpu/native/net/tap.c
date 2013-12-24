@@ -56,6 +56,10 @@ int _native_marshall_ethernet(uint8_t *framebuf, radio_packet_t *packet);
 int _native_tap_fd;
 unsigned char _native_tap_mac[ETHER_ADDR_LEN];
 
+#ifdef __MACH__
+pid_t sigio_child_pid;
+#endif
+
 void _native_handle_tap_input(void)
 {
     int nread;
@@ -113,6 +117,9 @@ void _native_handle_tap_input(void)
         }
         else {
             DEBUG("_native_handle_tap_input: no more pending tap data\n");
+#ifdef __MACH__
+            kill(sigio_child_pid, SIGCONT);
+#endif
         }
         _native_in_syscall--;
     }
@@ -128,6 +135,39 @@ void _native_handle_tap_input(void)
         errx(EXIT_FAILURE, "internal error _native_handle_tap_input");
     }
 }
+
+#ifdef __MACH__
+void sigio_child()
+{
+    pid_t parent = getpid();
+
+    if ((sigio_child_pid = fork()) == -1) {
+        err(EXIT_FAILURE, "sigio_child: fork");
+    }
+
+    if (sigio_child_pid > 0) {
+        /* return in parent process */
+        return;
+    }
+
+    /* watch tap interface and signal parent process if data is
+     * available */
+
+    fd_set rfds;
+    while (1) {
+        FD_ZERO(&rfds);
+        FD_SET(_native_tap_fd, &rfds);
+        if (select(_native_tap_fd +1, &rfds, NULL, NULL, NULL) == 1) {
+            kill(parent, SIGIO);
+        }
+        else {
+            kill(parent, SIGKILL);
+            err(EXIT_FAILURE, "osx_sigio_child: select");
+        }
+        pause();
+    }
+}
+#endif
 
 int _native_marshall_ethernet(uint8_t *framebuf, radio_packet_t *packet)
 {
@@ -243,7 +283,11 @@ int tap_init(char *name)
     /* configure signal handler for fds */
     register_interrupt(SIGIO, _native_handle_tap_input);
 
-#ifndef __MACH__ /* tuntap signalled IO not working in OSX */
+#ifdef __MACH__
+    /* tuntap signalled IO is not working in OSX,
+     * check http://sourceforge.net/p/tuntaposx/bugs/17/ */
+    sigio_child();
+#else
     /* configure fds to send signals on io */
     if (fcntl(_native_tap_fd, F_SETOWN, getpid()) == -1) {
         err(EXIT_FAILURE, "tap_init(): fcntl(F_SETOWN)");
@@ -253,7 +297,7 @@ int tap_init(char *name)
     if (fcntl(_native_tap_fd, F_SETFL, O_NONBLOCK|O_ASYNC) == -1) {
         err(EXIT_FAILURE, "tap_init(): fcntl(F_SETFL)");
     }
-#endif /* OSX */
+#endif /* not OSX */
 
     DEBUG("RIOT native tap initialized.\n");
     return _native_tap_fd;
