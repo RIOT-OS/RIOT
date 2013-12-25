@@ -78,7 +78,7 @@ typedef struct lowpan_reas_buf_t {
     /* Identification Number */
     uint16_t                 ident_no;
     /* Timestamp of last packet fragment */
-    long                     timestamp;
+    timex_t                  timestamp;
     /* Size of reassembled packet with possible IPHC header */
     uint16_t                 packet_size;
     /* Additive size of currently already received fragments */
@@ -274,9 +274,9 @@ void sixlowpan_lowpan_print_reassembly_buffers(void)
 
     while (temp_buffer != NULL) {
         print_long_local_addr(&temp_buffer->s_laddr);
-        printf("Ident.: %i, Packet Size: %i/%i, Timestamp: %li\n",
+        printf("Ident.: %i, Packet Size: %i/%i, Timestamp: %lu\n",
                temp_buffer->ident_no, temp_buffer->current_packet_size,
-               temp_buffer->packet_size, temp_buffer->timestamp);
+               temp_buffer->packet_size, timex_uint64(temp_buffer->timestamp));
         temp_interval = temp_buffer->interval_list_head;
 
         while (temp_interval != NULL) {
@@ -298,9 +298,9 @@ void sixlowpan_lowpan_print_fifo_buffers(void)
 
     while (temp_buffer != NULL) {
         print_long_local_addr(&temp_buffer->s_laddr);
-        printf("Ident.: %i, Packet Size: %i/%i, Timestamp: %li\n",
+        printf("Ident.: %i, Packet Size: %i/%i, Timestamp: %lu\n",
                temp_buffer->ident_no, temp_buffer->current_packet_size,
-               temp_buffer->packet_size, temp_buffer->timestamp);
+               temp_buffer->packet_size, timex_uint64(temp_buffer->timestamp));
         temp_interval = temp_buffer->interval_list_head;
 
         while (temp_interval != NULL) {
@@ -414,9 +414,7 @@ lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size,
             new_buf->ident_no = datagram_tag;
             new_buf->packet_size = datagram_size;
 
-            timex_t now;
-            vtimer_now(&now);
-            new_buf->timestamp = now.microseconds;
+            vtimer_now(&new_buf->timestamp);
 
             if ((current_buf == NULL) && (temp_buf == NULL)) {
                 head = new_buf;
@@ -451,9 +449,7 @@ lowpan_reas_buf_t *get_packet_frag_buf(uint16_t datagram_size,
             (current_buf->ident_no == datagram_tag) &&
             current_buf->interval_list_head != NULL) {
             /* Found buffer for current packet fragment */
-            timex_t now;
-            vtimer_now(&now);
-            current_buf->timestamp = now.microseconds;
+            vtimer_now(&current_buf->timestamp);
             return current_buf;
         }
 
@@ -637,25 +633,23 @@ void handle_packet_fragment(uint8_t *data, uint8_t datagram_offset,
 void check_timeout(void)
 {
     lowpan_reas_buf_t *temp_buf, *smallest_time = NULL;
-    long cur_time;
     int count = 0;
 
     timex_t now;
     vtimer_now(&now);
-    cur_time = now.microseconds;
     temp_buf = head;
 
     while (temp_buf != NULL) {
-        if ((cur_time - temp_buf->timestamp) >= LOWPAN_REAS_BUF_TIMEOUT) {
-            printf("TIMEOUT!cur_time: %li, temp_buf: %li\n", cur_time,
-                   temp_buf->timestamp);
+        if ((timex_uint64(now) - timex_uint64(temp_buf->timestamp)) >= LOWPAN_REAS_BUF_TIMEOUT) {
+            printf("TIMEOUT!cur_time: %lu, temp_buf: %lu\n", timex_uint64(now),
+                    timex_uint64(temp_buf->timestamp));
             temp_buf = collect_garbage(temp_buf);
         }
         else {
             if (smallest_time == NULL) {
                 smallest_time = temp_buf;
             }
-            else if (temp_buf->timestamp < smallest_time->timestamp) {
+            else if (timex_cmp(temp_buf->timestamp, smallest_time->timestamp) < 0) {
                 smallest_time = temp_buf;
             }
 
@@ -1626,7 +1620,7 @@ void init_reas_bufs(lowpan_reas_buf_t *buf)
     memset(&buf->s_laddr, 0, IPV6_LL_ADDR_LEN);
     memset(&buf->d_laddr, 0, IPV6_LL_ADDR_LEN);
     buf->ident_no = 			0;
-    buf->timestamp =			0;
+    memset(&buf->timestamp, 0, sizeof(timex_t));
     buf->packet_size =			0;
     buf->current_packet_size = 	0;
     buf->packet = 				NULL;
