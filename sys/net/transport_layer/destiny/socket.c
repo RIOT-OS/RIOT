@@ -111,8 +111,8 @@ void print_tcp_cb(tcp_cb_t *cb)
            cb->send_iss, cb->send_una, cb->send_nxt, cb->send_wnd);
     printf("Rcv_IRS: %" PRIu32 "\nRcv_NXT: %" PRIu32 "\nRcv_WND: %u\n",
            cb->rcv_irs, cb->rcv_nxt, cb->rcv_wnd);
-    printf("Time difference: %" PRIu32 ", No_of_retries: %u, State: %u\n\n",
-           timex_sub(now, cb->last_packet_time).microseconds, cb->no_of_retries, cb->state);
+    printf("Time difference: %" PRIu64 ", No_of_retries: %u, State: %u\n\n",
+           timex_uint64(timex_sub(now, cb->last_packet_time)), cb->no_of_retries, cb->state);
 }
 
 void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
@@ -684,9 +684,9 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     return 0;
 }
 
-void calculate_rto(tcp_cb_t *tcp_control, long current_time)
+void calculate_rto(tcp_cb_t *tcp_control, timex_t current_time)
 {
-    double rtt = current_time - tcp_control->last_packet_time.microseconds;
+    double rtt = (double) timex_uint64(timex_sub(current_time, tcp_control->last_packet_time));
     double srtt = tcp_control->srtt;
     double rttvar = tcp_control->rttvar;
     double rto = tcp_control->rto;
@@ -812,15 +812,14 @@ int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags)
             }
 
             /* Remember current time */
-            current_tcp_socket->tcp_control.last_packet_time.microseconds =
-                hwtimer_now();
+            vtimer_now(&current_tcp_socket->tcp_control.last_packet_time);
             net_msg_receive(&recv_msg);
 
             switch (recv_msg.type) {
                 case TCP_ACK: {
                     if (current_tcp_socket->tcp_control.no_of_retries == 0) {
                         calculate_rto(&current_tcp_socket->tcp_control,
-                                      hwtimer_now());
+                                      current_tcp_socket->tcp_control.last_packet_time);
                     }
 
                     tcp_hdr_t *tcp_header = ((tcp_hdr_t *)(recv_msg.content.ptr));
