@@ -55,7 +55,7 @@ int destiny_init_transport_layer(void)
     /* TCP */
     timex_t now;
     vtimer_now(&now);
-    srand(now.microseconds);
+    srand(timex_uint64(now));
 #ifdef TCP_HC
     printf("TCP_HC enabled!\n");
     global_context_counter = rand();
