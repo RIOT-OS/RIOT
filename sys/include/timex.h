@@ -42,6 +42,13 @@ int timex_cmp(const timex_t a, const timex_t b);
 void timex_normalize(timex_t *time);
 
 /**
+ * @brief Denormalizes a timex_t to a uint64_t
+ *
+ * @return timex representation as uint64_t
+ */
+uint64_t timex_uint64(const timex_t a);
+
+/**
  * @brief Prints a timex_t
  */
 void timex_print(const timex_t t);

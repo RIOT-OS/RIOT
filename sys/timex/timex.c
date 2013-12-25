@@ -3,6 +3,8 @@
 
 #include "timex.h"
 
+#define SEC_IN_USEC 1000000
+
 timex_t timex_add(const timex_t a, const timex_t b)
 {
     timex_t result;
@@ -13,8 +15,8 @@ timex_t timex_add(const timex_t a, const timex_t b)
         result.seconds++;
     }
 
-    /*    if (result.microseconds > 1000000) {
-            result.microseconds -= 1000000;
+    /*    if (result.microseconds > SEC_IN_USEC) {
+            result.microseconds -= SEC_IN_USEC;
             result.seconds++;
         }
     */
@@ -23,8 +25,8 @@ timex_t timex_add(const timex_t a, const timex_t b)
 
 void timex_normalize(timex_t *time)
 {
-    time->seconds += (time->microseconds / 1000000);
-    time->microseconds %= 1000000;
+    time->seconds += (time->microseconds / SEC_IN_USEC);
+    time->microseconds %= SEC_IN_USEC;
 }
 
 timex_t timex_set(uint32_t seconds, uint32_t microseconds)
@@ -62,6 +64,11 @@ int timex_cmp(const timex_t a, const timex_t b)
     }
 
     return 1;
+}
+
+uint64_t timex_uint64(const timex_t a)
+{
+    return (uint64_t) a.seconds * SEC_IN_USEC + a.microseconds;
 }
 
 void timex_print(const timex_t t)
