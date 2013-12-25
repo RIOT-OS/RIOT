@@ -100,6 +100,10 @@ extern void _transceiver_set_ignore_handler(int argc, char **argv);
 #endif
 #endif
 
+#ifdef MODULE_NET_IF
+extern void _net_if_ifconfig(int argc, char **argv);
+#endif
+
 #ifdef MODULE_MCI
 extern void _get_sectorsize(int argc, char **argv);
 extern void _get_blocksize(int argc, char **argv);
@@ -137,7 +141,6 @@ const shell_command_t _shell_command_list[] = {
     {"cur", "Prints current and average power consumption.", _get_current_handler},
     {"rstcur", "Resets coulomb counter.", _reset_current_handler},
 #endif
-
 #ifdef MODULE_TRANSCEIVER
 #ifdef _TC_ADDR
     {"addr", "Gets or sets the address for the transceiver", _transceiver_get_set_address_handler},
@@ -166,7 +169,9 @@ const shell_command_t _shell_command_list[] = {
     {"chan", "Gets or sets the channel for the CC1100 transceiver", _cc110x_get_set_channel_handler},
 #endif
 #endif
-
+#ifdef MODULE_NET_IF
+    {"ifconfig", "Configures a network interface", _net_if_ifconfig},
+#endif
 #ifdef MODULE_MCI
     {DISK_READ_SECTOR_CMD, "Reads the specified sector of inserted memory card", _read_sector},
     {DISK_READ_BYTES_CMD, "Reads the specified bytes from inserted memory card", _read_bytes},
@@ -178,6 +183,5 @@ const shell_command_t _shell_command_list[] = {
     { "mersenne_init", "initializes the PRNG", _mersenne_init },
     { "mersenne_get", "returns 32 bit of pseudo randomness", _mersenne_get },
 #endif
-
     {NULL, NULL, NULL}
 };
