@@ -108,3 +108,9 @@ ifneq (,$(findstring net_if,$(USEMODULE)))
 		USEMODULE += transceiver
 	endif
 endif
+
+ifneq (,$(findstring shell_commands,$(USEMODULE)))
+	ifneq (,$(findstring net_if,$(USEMODULE)))
+		USEMODULE += net_help
+	endif
+endif

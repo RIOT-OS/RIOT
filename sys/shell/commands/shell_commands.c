@@ -93,6 +93,10 @@ extern void _transceiver_set_ignore_handler(char *addr);
 #endif
 #endif
 
+#ifdef MODULE_NET_IF
+extern void _net_if_ifconfig(char *args);
+#endif
+
 #ifdef MODULE_MCI
 extern void _get_sectorsize(char *unused);
 extern void _get_blocksize(char *unused);
@@ -157,8 +161,9 @@ const shell_command_t _shell_command_list[] = {
     {"chan", "Gets or sets the channel for the CC1100 transceiver", _cc110x_get_set_channel_handler},
 #endif
 #endif
-
-
+#ifdef MODULE_NET_IF
+    {"ifconfig", "Configures a network interface", _net_if_ifconfig},
+#endif
 #ifdef MODULE_MCI
     {DISK_READ_SECTOR_CMD, "Reads the specified sector of inserted memory card", _read_sector},
     {DISK_READ_BYTES_CMD, "Reads the specified bytes from inserted memory card", _read_bytes},
