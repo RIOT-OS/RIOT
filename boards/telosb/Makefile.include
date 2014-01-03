@@ -4,9 +4,9 @@ export CPU = msp430x16x
 export MCU = msp430f1611
 
 # toolchain config
-export PREFIX = @msp430-
-export CC = @$(PREFIX)gcc
-export AR = @$(PREFIX)ar
+export PREFIX = msp430-
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
 export CFLAGS += -std=gnu99 -Wstrict-prototypes -gdwarf-2 -Os -Wall -mmcu=$(MCU)
 export ASFLAGS += -mmcu=$(MCU) --defsym $(MCU)=1 --gdwarf-2
 export AS = $(PREFIX)as

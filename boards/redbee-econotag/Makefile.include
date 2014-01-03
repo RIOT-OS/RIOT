@@ -2,9 +2,9 @@
 export CPU = mc1322x
 
 # toolchain config
-export PREFIX = @arm-none-eabi-
-export CC = @$(PREFIX)gcc
-export AR = @$(PREFIX)ar
+export PREFIX = arm-none-eabi-
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
 export CFLAGS += -std=gnu99 -march=armv4t -mtune=arm7tdmi-s -mlong-calls \
 		-msoft-float -mthumb-interwork -fno-strict-aliasing -fno-common \
 		-ffixed-r8 -ffunction-sections -ffreestanding -fno-builtin \
