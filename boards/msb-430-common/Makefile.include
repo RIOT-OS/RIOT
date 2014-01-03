@@ -14,7 +14,7 @@ export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export LINKFLAGS = -mmcu=$(MCU) -lgcc
 TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
-export HEXFILE = bin/$(PROJECT).hex
+export HEXFILE = $(BINDIR)$(PROJECT).hex
 
 
 ifeq ($(strip $(FLASHER)),)

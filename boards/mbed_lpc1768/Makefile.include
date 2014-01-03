@@ -17,7 +17,7 @@ LINKFLAGS = -mcpu=cortex-m3 -mthumb -Wl,--gc-sections,--cref -lc -lgcc -lnosys -
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
-export HEXFILE = bin/$(PROJECT).hex
+export HEXFILE = $(BINDIR)$(PROJECT).hex
 export FFLAGS = $(HEXFILE)
 
 export ELFFILE = bin/$(PROJECT).elf
