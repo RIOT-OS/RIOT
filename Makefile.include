@@ -17,7 +17,7 @@ CPUDEF = $(shell echo $(CPU)|tr 'a-z' 'A-Z')
 CFLAGS += -DBOARD=$(BB) -DCPU_$(CPUDEF)
 export CFLAGS
 
-export BINDIR =$(CURDIR)/bin/
+export BINDIR =$(CURDIR)/bin/$(BOARD)/
 
 # mandatory includes!
 include $(RIOTBASE)/Makefile.modules
