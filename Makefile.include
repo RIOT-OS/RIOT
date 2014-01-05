@@ -19,6 +19,13 @@ export CFLAGS
 
 export BINDIR =$(CURDIR)/bin/$(BOARD)/
 
+ifeq ($(QUIET),1)
+	AD=@
+else
+	AD=
+endif
+export AD
+
 # mandatory includes!
 include $(RIOTBASE)/Makefile.modules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include

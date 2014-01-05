@@ -35,12 +35,6 @@ export RIOTBASE =$(CURDIR)/../../RIOT
 
 export INCLUDES = -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/core/include -I$(RIOTCPU)/$(CPU)/include -I$(RIOTBASE)/sys/lib -I$(RIOTBASE)/sys/include/ -I$(RIOTBASE)/drivers/include/
 
-QUIET := 1
-ifeq($(QUIET),1)
-	AD=@
-else
-	AD=
-endif
-export AD
+export QUIET := 1
 
 include $(RIOTBASE)/Makefile.include
