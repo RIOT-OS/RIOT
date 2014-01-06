@@ -30,9 +30,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <kernel_internal.h>
-#include <cpu.h>
-
 #include "kernel_internal.h"
 #include "cpu.h"
 
