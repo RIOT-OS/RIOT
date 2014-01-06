@@ -1,5 +1,4 @@
---style=linux
---attach-namespaces
+--style=1tbs
 --indent=spaces=4
 --indent-switches
 --indent-labels
