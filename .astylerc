@@ -1,5 +1,5 @@
 --style=linux
---brackets=attach
+--attach-namespaces
 --indent=spaces=4
 --indent-switches
 --indent-labels
