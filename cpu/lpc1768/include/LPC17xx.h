@@ -97,7 +97,6 @@ typedef enum IRQn
 
 
 #include "core_cm3.h"                       /* Cortex-M3 processor and core peripherals           */
-#include "system_LPC17xx.h"                 /* System Header                                      */
 
 
 /******************************************************************************/

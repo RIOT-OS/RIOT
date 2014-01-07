@@ -1,4 +1,3 @@
-INCLUDES = -I$(RIOTBASE)/sys/include  -I$(RIOTBASE)/core/include -Iinclude/ -I$(RIOTBASE)/sys/net/include
 MODULE =cc2420
 
 DIRS =

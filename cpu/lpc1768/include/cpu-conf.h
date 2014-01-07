@@ -13,6 +13,8 @@
 #endif
 
 #define KERNEL_CONF_STACKSIZE_IDLE		1000
+
+#define UART0_BUFSIZE                   (128)
 /** @} */
 
 #endif /* CPU_CONF_H */

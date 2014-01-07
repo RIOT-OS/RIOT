@@ -1,8 +1,8 @@
 export MAKEBASE =$(RIOTBASE)
-export BINDIR =$(RIOTBASE)/bin/
 UNDEF += $(BINDIR)startup.o
 
 USEMODULE += cpu core sys
+INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
 ED = $(USEMODULE:%=-DMODULE_%)
 EXTDEFINES = $(shell echo $(ED)|tr 'a-z' 'A-Z')
 BL=$(USEMODULE:%= $(BINDIR)%.a)
@@ -16,4 +16,3 @@ include $(RIOTBASE)/Makefile.dep
 
 export USEMODULE
 
-export INCLUDES += -I$(RIOTBASE)/core/include

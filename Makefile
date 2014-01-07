@@ -1,6 +1,9 @@
-DIRS = $(RIOTCPU) core drivers sys 
+DIRS = $(RIOTCPU)/$(CPU) core drivers sys
 
 .PHONY: all clean doc
+
+include $(RIOTCPU)/$(CPU)/Makefile.include
+include $(RIOTBOARD)/$(BOARD)/Makefile.include
 
 all:
 	mkdir -p $(BINDIR)

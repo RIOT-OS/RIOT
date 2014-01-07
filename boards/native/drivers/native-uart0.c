@@ -225,6 +225,7 @@ void handle_uart_sock()
     _native_uart_conn = s;
 }
 
+#ifdef MODULE_UART0
 void _native_handle_uart0_input()
 {
     if (FD_ISSET(STDIN_FILENO, &_native_rfds)) {
@@ -250,6 +251,7 @@ int _native_set_uart_fds(void)
         return ((STDIN_FILENO > _native_uart_sock) ? STDIN_FILENO : _native_uart_sock);
     }
 }
+#endif
 
 void _native_init_uart0(char *stdiotype, char *ioparam)
 {

@@ -1,7 +1,8 @@
 MODULE = cpu
 
-INCLUDES += -I$(RIOTCPU)/$(CPU)/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/cc110x_ng/include
-DIRS =
+DIRS = $(RIOTCPU)/msp430-common
+
+INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include
 
 all: $(BINDIR)$(MODULE).a
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;

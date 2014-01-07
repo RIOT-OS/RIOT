@@ -3,9 +3,9 @@ export CPU = lpc1768
 
 # toolchain config
 export PREFIX = arm-none-eabi-
-export CC = @$(PREFIX)gcc
-export AR = @$(PREFIX)ar
-export CFLAGS = -DUSE_STDPERIPH_DRIVER -ggdb -g3 -std=gnu99 -O0 -Wall -Wstrict-prototypes -mcpu=cortex-m3 $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
+export CFLAGS += -DUSE_STDPERIPH_DRIVER -ggdb -g3 -std=gnu99 -O0 -Wall -Wstrict-prototypes -mcpu=cortex-m3 $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
 export ASFLAGS = -ggdb -g3 -mcpu=cortex-m3 $(FPU_USAGE) -mlittle-endian
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
@@ -17,12 +17,11 @@ LINKFLAGS = -mcpu=cortex-m3 -mthumb -Wl,--gc-sections,--cref -lc -lgcc -lnosys -
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
-export HEXFILE = bin/$(PROJECT).hex
+export HEXFILE = $(BINDIR)$(PROJECT).hex
 export FFLAGS = $(HEXFILE)
 
 export ELFFILE = bin/$(PROJECT).elf
 export DEBUGGER_FLAGS = $(ELFFILE)
 
-INCLUDES += -Iinclude/
-INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/ -I$(RIOTCPU)/$(CPU)/include
 export OFLAGS = -O binary

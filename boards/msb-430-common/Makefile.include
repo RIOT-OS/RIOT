@@ -3,18 +3,18 @@ export CPU = msp430x16x
 export MCU = msp430f1612
 
 # toolchain config
-export PREFIX = @msp430-
-export CC = @$(PREFIX)gcc
-export AR = @$(PREFIX)ar
+export PREFIX = msp430-
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
 export CFLAGS += -std=gnu99 -Wstrict-prototypes -gdwarf-2 -Os -Wall -mmcu=$(MCU)
 export ASFLAGS += -mmcu=$(MCU) --defsym $(MCU)=1 --gdwarf-2
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
-export LINKFLAGS = -mmcu=$(MCU) -lgcc $(RIOTBASE)/bin/startup.o
+export LINKFLAGS = -mmcu=$(MCU) -lgcc
 TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
-export HEXFILE = bin/$(PROJECT).hex
+export HEXFILE = $(BINDIR)$(PROJECT).hex
 
 
 ifeq ($(strip $(FLASHER)),)
@@ -36,5 +36,5 @@ endif
 export FFLAGS += "prog $(HEXFILE)"
 
 export USEMODULE += msp430_common 
-export INCLUDES += -I $(RIOTCPU)/msp430-common/include/ -I$(RIOTBOARD)/msb-430-common/include
+export INCLUDES += -I $(RIOTCPU)/msp430-common/include/ -I$(RIOTBOARD)/msb-430-common/include -I$(RIOTBOARD)/msb-430-common/drivers/include
 export OFLAGS = -O ihex

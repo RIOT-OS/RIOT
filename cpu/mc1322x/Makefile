@@ -1,6 +1,6 @@
 MODULE =cpu
 
-DIRS =
+DIRS = $(RIOTCPU)/arm_common
 ifneq (,$(findstring mc1322x_adc,$(USEMODULE)))
   DIRS += adc
 endif

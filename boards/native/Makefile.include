@@ -1,10 +1,10 @@
-export INCLUDES += -I$(RIOTBOARD)/native/include
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
 export CPU = native
 
 # toolchain config
 export PREFIX = 
-#export CC = @$(PREFIX)gcc
-export AR = @$(PREFIX)ar
+#export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
 export CFLAGS += -std=gnu99 -Wall -Wextra -pedantic -m32
 export ASFLAGS =
 export AS = $(PREFIX)as

@@ -1,4 +1,3 @@
-INCLUDES = -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/core/include -Iinclude/ -I$(RIOTBASE)/sys/net/include
 MODULE =at86rf231
 
 DIRS =

@@ -201,11 +201,14 @@ uint8_t SSP0Prepare(uint8_t chip, uint8_t datasize, uint8_t cpol, uint8_t cpha,
     // Enable
     SSP0CR1 |= BIT1; // SSP0 enabled
 
-    uint32_t Dummy;
+    uint32_t dummy;
 
     for (uint32_t i = 0; i < FIFOSIZE; i++) {
-        Dummy = SSP0DR; // clear the RxFIFO
+        dummy = SSP0DR; // clear the RxFIFO
     }
+    
+    /* to suppress unused-but-set-variable */
+    (void) dummy;
 
     return 1;
 }

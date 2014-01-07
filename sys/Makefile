@@ -1,5 +1,3 @@
-INCLUDES += -Iinclude -I$(RIOTBASE)/drivers/ -I$(RIOTBASE)/drivers/include -Ilib -I$(RIOTCPU)/$(CPU)/include -Inet -I../core/include
-
 MODULE =sys
 ifneq (,$(findstring auto_init,$(USEMODULE)))
     DIRS += auto_init
@@ -10,28 +8,14 @@ endif
 ifneq (,$(findstring lib,$(USEMODULE)))
     DIRS += lib
 endif
-ifneq (,$(findstring cmdd,$(USEMODULE)))
-    DIRS += cmdd
-endif
-ifneq (,$(findstring mprint,$(USEMODULE)))
-    DIRS += mprint
-endif
 ifneq (,$(findstring ping,$(USEMODULE)))
     DIRS += ping
 endif
 ifneq (,$(findstring ps,$(USEMODULE)))
     DIRS += ps
 endif
-ifneq (,$(findstring sync_read,$(USEMODULE)))
-    DIRS += sync_read
-endif
-ifneq (,$(findstring sysmon,$(USEMODULE)))
-    DIRS += sysmon
-endif
-ifneq (,$(findstring mqueue,$(USEMODULE)))
-    DIRS += mqueue
-endif
 ifneq (,$(findstring posix,$(USEMODULE)))
+	INCLUDES += -I$(RIOTBASE)/sys/posix/include
     DIRS += posix
 endif
 ifneq (,$(findstring shell,$(USEMODULE)))
@@ -54,9 +38,6 @@ ifneq (,$(findstring vtimer,$(USEMODULE)))
 endif
 ifneq (,$(findstring destiny,$(USEMODULE)))
     DIRS += net/transport_layer/destiny
-endif
-ifneq (,$(findstring net_mm,$(USEMODULE)))
-    DIRS += net/mm
 endif
 ifneq (,$(findstring net_help,$(USEMODULE)))
     DIRS += net/crosslayer/net_help

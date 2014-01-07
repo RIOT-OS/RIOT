@@ -2,10 +2,10 @@
 export CPU = lpc2387
 
 # toolchain config
-export PREFIX = @arm-none-eabi-
-#export PREFIX = @arm-elf-
-export CC = @$(PREFIX)gcc
-export AR = @$(PREFIX)ar
+export PREFIX = arm-none-eabi-
+#export PREFIX = arm-elf-
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
 export CFLAGS += -std=gnu99 -O2 -Wall -Wstrict-prototypes -mcpu=arm7tdmi-s -gdwarf-2
 export ASFLAGS = -gdwarf-2 -mcpu=arm7tdmi-s
 export AS = $(PREFIX)as
@@ -19,9 +19,10 @@ LINKFLAGS = -gdwarf-2 -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T$(RIOTBASE)
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
-export HEXFILE = bin/$(PROJECT).hex
-export FFLAGS = $(PORT) $(PROJBINDIR)/$(PROJECT).hex
+export HEXFILE = $(BINDIR)$(PROJECT).hex
+export FFLAGS = $(PORT) $(HEXFILE)
 include $(RIOTBOARD)/msba2-common/Makefile.dep
 
-export INCLUDES += -I$(RIOTCPU)/lpc2387/include
+export INCLUDES += -I$(RIOTBOARD)/msba2-common/include -I$(RIOTBOARD)/msba2-common/drivers/include
+
 export OFLAGS = -O ihex

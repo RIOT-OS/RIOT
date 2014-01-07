@@ -19,6 +19,26 @@
 
 #include "auto_init.h"
 
+#ifdef MODULE_HWTIMER
+#include "hwtimer.h"
+#endif
+
+#ifdef MODULE_SHT11
+#include "sht11.h"
+#endif
+
+#ifdef MODULE_GPIOINT
+#include "gpioint.h"
+#endif
+
+#ifdef MODULE_CC110X
+#include "cc1100-interface.h"
+#endif
+
+#ifdef MODULE_LTC4150
+#include "ltc4150.h"
+#endif
+
 #ifdef MODULE_UART0
 #include "board_uart0.h"
 #endif

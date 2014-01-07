@@ -2,9 +2,9 @@
 export CPU = mc1322x
 
 # toolchain config
-export PREFIX = @arm-none-eabi-
-export CC = @$(PREFIX)gcc
-export AR = @$(PREFIX)ar
+export PREFIX = arm-none-eabi-
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
 export CFLAGS += -std=gnu99 -march=armv4t -mtune=arm7tdmi-s -mlong-calls \
 		-msoft-float -mthumb-interwork -fno-strict-aliasing -fno-common \
 		-ffixed-r8 -ffunction-sections -ffreestanding -fno-builtin \
@@ -24,7 +24,7 @@ LINKFLAGS = -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T$(RIOTBASE)/cpu/$(CPU
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
-export HEXFILE = bin/$(PROJECT).hex
+export HEXFILE = $(BINDIR)/$(PROJECT).hex
 export FFLAGS = -t $(PORT) -f $(HEXFILE) -c 'bbmc -l redbee-econotag reset'
 export OFLAGS = -O binary --gap-fill=0xff
 

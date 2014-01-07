@@ -43,10 +43,8 @@ and the mailinglist (subscription via web site)
 #include <string.h>
 #include "board.h"
 #include "lpc23xx.h"
-#include "VIC.h"
 #include "cpu.h"
 #include "config.h"
-#include "flashrom.h"
 
 #define PCRTC         BIT9
 #define CL_CPU_DIV    4
