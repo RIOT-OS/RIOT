@@ -7,15 +7,13 @@
 #### 
 
 # name of your project
-export PROJECT =foobar
+export PROJECT = foobar
 
 # for easy switching of boards
-ifeq ($(strip $(BOARD)),)
-	export BOARD = native
-endif
+export BOARD ?= native
 
 # this has to be the absolute path of the RIOT-base dir
-export RIOTBASE =$(CURDIR)/../../RIOT
+export RIOTBASE = $(CURDIR)/../../RIOT
 
 # uncomment these lines if you want to use platform support from external
 # repositories
