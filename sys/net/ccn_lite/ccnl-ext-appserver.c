@@ -23,6 +23,7 @@
 #include "msg.h"
 #include "thread.h"
 #include "ccnl-riot-compat.h"
+#include "ccn_lite/util/ccnl-riot-client.h"
 
 #include "ccnl-includes.h"
 #include "ccnl-core.h"
