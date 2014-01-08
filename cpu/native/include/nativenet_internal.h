@@ -39,6 +39,7 @@ struct rx_buffer_s {
 
 extern struct rx_buffer_s _nativenet_rx_buffer[RX_BUF_SIZE];
 extern uint64_t _native_net_addr_long;
+extern radio_address_t _native_net_addr;
 
 void _nativenet_handle_packet(radio_packet_t *packet);
 int8_t send_buf(radio_packet_t *packet);
