@@ -26,6 +26,8 @@ else
 endif
 export AD
 
+BOARD := $(strip $(BOARD))
+
 # mandatory includes!
 include $(RIOTBASE)/Makefile.modules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
