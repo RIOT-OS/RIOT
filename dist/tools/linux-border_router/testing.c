@@ -36,6 +36,8 @@ void init_file(const char *skeleton_file_name,
             fprintf(stats_file, "%s", line);
         }
     }
+
+    fclose(skeleton_file);
 }
 
 int testing_init(const char *stats_file_name,
