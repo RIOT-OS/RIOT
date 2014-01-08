@@ -62,7 +62,7 @@ enum lpm_mode lpm_set(enum lpm_mode target)
 /* Return the current LPM mode of the MSP430 MCU. */
 enum lpm_mode lpm_get(void)
 {
-    enum lpm_mode current_mode;
+    enum lpm_mode current_mode = LPM_UNKNOWN;
 
     unsigned int current_sr = __read_status_register();
     switch (current_sr & LPM_MASK_SR) {
