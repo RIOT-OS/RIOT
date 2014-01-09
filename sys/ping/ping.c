@@ -65,7 +65,7 @@ void ping(radio_address_t addr, uint8_t channr)
             print_failed();
         }
 
-        hwtimer_wait(500000);
+        hwtimer_wait(HWTIMER_TICKS(500 * 1000));
     }
 }
 
@@ -75,7 +75,7 @@ void calc_rtt(void)
     vtimer_now(&end);
     timex_t result = vtimer_sub(end, start);
 
-    rtt = result.seconds + (float)result.microseconds / 100000;
+    rtt = result.seconds + (float)result.microseconds / (1000.0 * 1000.0);
 }
 
 void print_success(void)
