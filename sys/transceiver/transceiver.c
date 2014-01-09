@@ -414,8 +414,8 @@ static void receive_packet(uint16_t type, uint8_t pos)
             receive_at86rf231_packet(trans_p);
 #else
             trans_p = NULL;
-        }
 #endif
+        }
         else if (type == RCV_PKT_NATIVE) {
 #ifdef MODULE_NATIVENET
             receive_nativenet_packet(trans_p);
