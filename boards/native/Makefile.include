@@ -11,13 +11,19 @@ export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
-FLASHER = lpc2k_pgm
-TERM = pyterm.py
 
 LINKFLAGS += -m32 -gc -ldl
 
+TERMPROG = $(BINDIR)/$(PROJECT).elf
+FLASHER = true
+
+
+ifneq (,$(findstring nativenet,$(USEMODULE)))
 ifeq ($(strip $(PORT)),)
-	export PORT = /dev/ttyUSB0
+	export PORT = tap0
+endif
+else
+	export PORT = 
 endif
 
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
