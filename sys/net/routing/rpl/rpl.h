@@ -32,7 +32,7 @@
 #undef CC1100_RADIO_MODE
 #define CC1100_RADIO_MODE CC1100_MODE_WOR
 
-#define RPL_PKT_RECV_BUF_SIZE 20
+#define RPL_PKT_RECV_BUF_SIZE 16
 #define RPL_PROCESS_STACKSIZE KERNEL_CONF_STACKSIZE_DEFAULT
 
 uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address);
