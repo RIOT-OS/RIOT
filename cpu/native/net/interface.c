@@ -160,7 +160,7 @@ void do_cb(int event)
 }
 
 void _nativenet_handle_packet(radio_packet_t *packet)
-{ 
+{
     radio_address_t dst_addr = packet->dst;
 
     /* address filter / monitor mode */

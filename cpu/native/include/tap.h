@@ -44,7 +44,7 @@ struct nativenet_header {
 
 struct nativenet_packet {
     struct nativenet_header nn_header;
-    unsigned char data[ETHERMTU - sizeof(struct nativenet_header)];
+    uint8_t data[ETHERMTU - sizeof(struct nativenet_header)];
 } __attribute__((packed));
 
 union eth_frame {

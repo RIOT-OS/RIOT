@@ -91,8 +91,13 @@ void _native_handle_tap_input(void)
                 /* XXX: check overflow */
                 p.length = ntohs(frame.field.payload.nn_header.length);
                 p.data = frame.field.payload.data;
-                DEBUG("_native_handle_tap_input: received packet of length %"PRIu16" for %"PRIu16" from %"PRIu16"\n", p.length, p.dst, p.src);
-                _nativenet_handle_packet(&p);
+                if (p.length > (nread - sizeof(struct nativenet_header))) {
+                    warnx("_native_handle_tap_input: packet with malicious length field received, discarding");
+                }
+                else {
+                    DEBUG("_native_handle_tap_input: received packet of length %"PRIu16" for %"PRIu16" from %"PRIu16"\n", p.length, p.dst, p.src);
+                    _nativenet_handle_packet(&p);
+                }
             }
         }
         else {
