@@ -65,9 +65,9 @@ all: $(BINDIR)$(PROJECT).a
 ifeq ($(BUILDOSXNATIVE),1)	
 	$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
-	@$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS)
-	@$(SIZE) $(BINDIR)$(PROJECT).elf
-	@$(OBJCOPY) $(OFLAGS) $(BINDIR)$(PROJECT).elf $(BINDIR)$(PROJECT).hex
+	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS)
+	$(AD)$(SIZE) $(BINDIR)$(PROJECT).elf
+	$(AD)$(OBJCOPY) $(OFLAGS) $(BINDIR)$(PROJECT).elf $(BINDIR)$(PROJECT).hex
 endif
 
 ## your make rules
