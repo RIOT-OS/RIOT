@@ -79,7 +79,7 @@ int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
 
         unsigned char *data = rmsg_reply->payload;
         int datalen = (int) rmsg_reply->size;
-        DEBUGMSG(1, "%d bytes left; msg from=%u '%s'\n", datalen, rep.sender_pid, data);
+        DEBUGMSG(1, "%d bytes left; msg from=%u\n", datalen, rep.sender_pid);
 
         int scope = 3, aok = 3, minsfx = 0, maxsfx = CCNL_MAX_NAME_COMP,
             contlen = 0;
