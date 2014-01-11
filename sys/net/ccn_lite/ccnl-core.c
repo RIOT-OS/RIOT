@@ -1325,10 +1325,12 @@ int ccnl_core_RX_i_or_c(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
         from->stat.received_content++;
 
         // CONFORM: Step 1:
-        for (c = relay->contents; c; c = c->next)
+        for (c = relay->contents; c; c = c->next) {
             if (buf_equal(c->pkt, buf)) {
-                goto Skip;    // content is dup
+                DEBUGMSG(1, "content is dup: skip\n");
+                goto Skip;
             }
+        }
 
         c = ccnl_content_new(relay, &buf, &p, &ppkd, content, contlen);
 
