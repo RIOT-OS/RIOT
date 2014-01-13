@@ -34,7 +34,7 @@ RIOT OS is an operating system for Internet of Things (IoT) devices. It is based
 
 Its features comprise
 * a preemptive, tickless scheduler with priorities
-* flexible memory managment
+* flexible memory management
 * high resolution timers
 * virtual, long-term timers
 * the native port allows to run RIOT as-is on Linux, BSD, and MacOS. Multiple instances of RIOT running on a single machine can also be interconnected via a simple virtual Ethernet bridge
