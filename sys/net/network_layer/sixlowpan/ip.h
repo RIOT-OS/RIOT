@@ -27,6 +27,7 @@
 
 #include "timex.h"
 #include "mutex.h"
+#include "transceiver.h"
 
 #include "sixlowpan/ip.h"
 #include "sixlowpan/types.h"
@@ -76,12 +77,14 @@ extern iface_t iface;
 
 /* function prototypes */
 void ipv6_send_bytes(ipv6_hdr_t *bytes);
+void ipv6_send_next_layer(radio_packet_t *p);
 icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len);
 uint8_t *get_payload_buf(uint8_t ext_len);
 uint8_t *get_payload_buf_send(uint8_t ext_len);
 
 int icmpv6_demultiplex(const icmpv6_hdr_t *hdr);
 void ipv6_init_iface_as_router(void);
+void ipv6_init(transceiver_type_t trans);
 void ipv6_process(void);
 addr_list_t *ipv6_iface_addr_prefix_eq(ipv6_addr_t *addr);
 addr_list_t *ipv6_iface_addr_match(const ipv6_addr_t *addr);

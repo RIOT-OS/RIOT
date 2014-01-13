@@ -56,10 +56,9 @@ static uint8_t r_src_addr;
 uint8_t buf[PAYLOAD_SIZE];
 static uint8_t macdsn;
 
-static radio_packet_t p;
-static msg_t mesg;
 int transceiver_type;
 static transceiver_command_t tcmd;
+static msg_t mesg;
 
 uint8_t sixlowpan_mac_get_radio_address(void)
 {
@@ -204,20 +203,29 @@ void set_ieee802154_frame_values(ieee802154_frame_t *frame)
     macdsn++;
 }
 
+void sixlowpan_mac_send_to_transceiver(radio_packet_t *p)
+{
+    /* TODO: check if dedicated response struct is necessary */
+    msg_t transceiver_rsp;
+
+    mesg.type = SND_PKT;
+    mesg.content.ptr = (char *) &tcmd;
+
+    tcmd.transceivers = transceiver_type;
+    tcmd.data = p;
+
+    msg_send_receive(&mesg, &transceiver_rsp, transceiver_pid);
+
+    hwtimer_wait(5000);
+}
+
 void sixlowpan_mac_send_ieee802154_frame(const ieee_802154_long_t *addr,
         const uint8_t *payload,
         uint8_t length, uint8_t mcast)
 {
     uint16_t daddr;
-    /* TODO: check if dedicated response struct is necessary */
-    msg_t transceiver_rsp;
+
     r_src_addr = local_address;
-    mesg.type = SND_PKT;
-    mesg.content.ptr = (char *) &tcmd;
-
-    tcmd.transceivers = transceiver_type;
-    tcmd.data = &p;
-
     ieee802154_frame_t frame;
 
     memset(&frame, 0, sizeof(frame));
@@ -243,6 +251,7 @@ void sixlowpan_mac_send_ieee802154_frame(const ieee_802154_long_t *addr,
     buf[frame.payload_len+hdrlen+1] = 0x80;
     DEBUG("IEEE802.15.4 frame - FCF: %02X %02X DPID: %02X SPID: %02X DSN: %02X\n", buf[0], buf[1], frame.dest_pan_id, frame.src_pan_id, frame.seq_nr);
 
+    radio_packet_t p;
     p.length = hdrlen + frame.payload_len + IEEE_802154_FCS_LEN;
 
     if (mcast == 0) {
@@ -253,9 +262,7 @@ void sixlowpan_mac_send_ieee802154_frame(const ieee_802154_long_t *addr,
     }
 
     p.data = buf;
-    msg_send_receive(&mesg, &transceiver_rsp, transceiver_pid);
-
-    hwtimer_wait(5000);
+    sixlowpan_mac_send_to_transceiver(&p);
 }
 
 void sixlowpan_mac_init(transceiver_type_t type)

@@ -22,6 +22,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include "hwtimer.h"
 #include "vtimer.h"
 #include "mutex.h"
 #include "msg.h"
@@ -40,6 +41,8 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
+#define USE_SIXLOWPAN (0)
+
 #define IP_PKT_RECV_BUF_SIZE        (64)
 #define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)
 
@@ -49,6 +52,7 @@ msg_t msg_queue[IP_PKT_RECV_BUF_SIZE];
 ipv6_hdr_t *ipv6_buf;
 icmpv6_hdr_t *icmp_buf;
 uint8_t *nextheader;
+transceiver_type_t ipv6_transceiver_type;
 
 uint8_t iface_addr_list_count = 0;
 int udp_packet_handler_pid = 0;
@@ -58,6 +62,42 @@ ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t*) = 0;
 
 /* registered upper layer threads */
 int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
+
+#if USE_SIXLOWPAN
+static void ipv6_send_to_lowpan(radio_packet_t *p)
+{
+    msg_t m, rep;
+    m.content.ptr = (char *) p;
+    msg_send_receive(&m, &rep, sixlowpan_lowpan_pid);
+}
+#else
+static void ipv6_send_to_transceiver(radio_packet_t *p)
+{
+    /* TODO: use p->dest.uint16[4]; */
+    msg_t transceiver_rsp;
+
+    static transceiver_command_t tcmd;
+    tcmd.transceivers = ipv6_transceiver_type;
+    tcmd.data = p;
+
+    msg_t mesg;
+    mesg.type = SND_PKT;
+    mesg.content.ptr = (char *) &tcmd;
+
+    msg_send_receive(&mesg, &transceiver_rsp, transceiver_pid);
+
+    hwtimer_wait(5000);
+}
+#endif
+
+void ipv6_send_next_layer(radio_packet_t *p)
+{
+#if USE_SIXLOWPAN
+    ipv6_send_to_lowpan(p);
+#else
+    ipv6_send_to_transceiver(p);
+#endif
+}
 
 void ipv6_send_bytes(ipv6_hdr_t *bytes)
 {
@@ -69,9 +109,11 @@ void ipv6_send_bytes(ipv6_hdr_t *bytes)
     memset(bytes, 0, BUFFER_SIZE);
     memcpy(bytes + LL_HDR_LEN, bytes, offset);
 
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &bytes->destaddr.uint16[4],
-                            (uint8_t *)bytes,
-                            offset);
+    radio_packet_t p;
+    p.data = (uint8_t *) ipv6_buf;
+    p.length = offset;
+    p.dst = (ieee_802154_long_t *) &bytes->destaddr.uint16[4];
+    ipv6_send_next_layer(&p);
 }
 
 ipv6_hdr_t *ipv6_get_buf_send(void)
@@ -140,8 +182,11 @@ void ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
         return;
     }
 
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &dest->uint16[4],
-                            (uint8_t *)ipv6_buf, packet_length);
+    radio_packet_t p;
+    p.data = (uint8_t *) ipv6_buf;
+    p.length = packet_length;
+    p.dst = (ieee_802154_long_t *) &dest->uint16[4];
+    ipv6_send_next_layer(&p);
 }
 
 /* Register an upper layer thread */
@@ -259,6 +304,11 @@ uint8_t ipv6_get_addr_match(const ipv6_addr_t *src,
     return val;
 }
 
+void ipv6_init(transceiver_type_t trans)
+{
+    ipv6_transceiver_type = trans;
+}
+
 void ipv6_process(void)
 {
     msg_t m_recv_lowpan, m_send_lowpan;
@@ -307,9 +357,12 @@ void ipv6_process(void)
             /* copy received packet to send buffer */
             memcpy(ipv6_get_buf_send(), ipv6_get_buf(), packet_length);
             /* send packet to node ID derived from dest IP */
-            sixlowpan_lowpan_sendto((ieee_802154_long_t *) &dest->uint16[4],
-                                    (uint8_t *)ipv6_get_buf_send(),
-                                    packet_length);
+
+            radio_packet_t p;
+            p.data = (uint8_t *) ipv6_get_buf_send();
+            p.length = packet_length;
+            p.dst = (ieee_802154_long_t *) &dest->uint16[4];
+            ipv6_send_next_layer(&p);
         }
         /* destination is our address */
         else {

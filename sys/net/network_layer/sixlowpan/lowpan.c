@@ -118,6 +118,7 @@ unsigned int ip_process_pid;
 unsigned int nd_nbr_cache_rem_pid = 0;
 unsigned int contexts_rem_pid = 0;
 unsigned int transfer_pid = 0;
+unsigned int sixlowpan_lowpan_pid = 0;
 
 iface_t iface;
 ipv6_addr_t lladdr;
@@ -154,7 +155,7 @@ lowpan_context_t *lowpan_context_lookup(ipv6_addr_t *addr);
 void lowpan_ipv6_set_dispatch(uint8_t *data);
 
 /* deliver packet to mac*/
-void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
+static void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
                              uint8_t *data, uint16_t data_len)
 {
     uint8_t mcast = 0;
@@ -247,6 +248,27 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
     }
 
     tag++;
+}
+
+void sixlowpan_lowpan_process(void)
+{
+    static msg_t m;
+    while (1) {
+        msg_receive(&m);
+
+        switch (m.type) {
+            case (SND_PKT): {
+                radio_packet_t *p = (radio_packet_t *) m.content.ptr;
+                sixlowpan_lowpan_sendto(p->dst, p->data, p->length);
+                msg_reply(&m, &m);
+                break;
+            }
+            default: {
+                DEBUG("unknown msg: dropping msg\n");
+                break;
+            }
+        }
+    }
 }
 
 void sixlowpan_lowpan_set_iphc_status(
@@ -1653,6 +1675,8 @@ void lowpan_init(transceiver_type_t trans, uint8_t r_addr,
     ipv6_addr_t tmp;
     short i;
 
+    sixlowpan_lowpan_pid = thread_pid;
+
     /* init mac-layer and radio transceiver */
     sixlowpan_mac_init(trans);
 
@@ -1705,6 +1729,8 @@ void lowpan_init(transceiver_type_t trans, uint8_t r_addr,
     DEBUG("%s, %d: sixlowpan_lowpan_init(): add all nodes multicast address: %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, &tmp));
     ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_LOOPBACK,
                         NDP_ADDR_STATE_PREFERRED, 0, 0);
+
+    ipv6_init(trans);
 
     if (as_border) {
         ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,

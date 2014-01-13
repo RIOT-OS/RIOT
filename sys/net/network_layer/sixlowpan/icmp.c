@@ -274,7 +274,12 @@ void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, 
     printf("INFO: send echo request to: %s\n",
            ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4], (uint8_t *)ipv6_buf, packet_length);
+
+    radio_packet_t p;
+    p.data = (uint8_t *) ipv6_buf;
+    p.length = packet_length;
+    p.dst = (ieee_802154_long_t *) &ipv6_buf->destaddr;
+    ipv6_send_next_layer(&p);
 }
 
 void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data, size_t data_len)
@@ -313,9 +318,12 @@ void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, ch
     printf("INFO: send echo request to: %s\n",
            ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
-                            (uint8_t *)ipv6_buf,
-                            packet_length);
+
+    radio_packet_t p;
+    p.data = (uint8_t *) ipv6_buf;
+    p.length = packet_length;
+    p.dst = (ieee_802154_long_t *) &ipv6_buf->destaddr;
+    ipv6_send_next_layer(&p);
 }
 
 /* send router solicitation message - RFC4861 section 4.1 */
@@ -362,9 +370,12 @@ void icmpv6_send_router_sol(uint8_t sllao)
     printf("INFO: send router solicitation to: %s\n",
            ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
-                            (uint8_t *)ipv6_buf,
-                            packet_length);
+
+    radio_packet_t p;
+    p.data = (uint8_t *) ipv6_buf;
+    p.length = packet_length;
+    p.dst = (ieee_802154_long_t *) &ipv6_buf->destaddr;
+    ipv6_send_next_layer(&p);
 }
 
 void recv_echo_req(void)
@@ -467,10 +478,12 @@ void recv_rtr_sol(void)
     printf("INFO: send router advertisment to: %s\n",
            ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
-                            (uint8_t *)ipv6_buf,
-                            IPV6_HDR_LEN + NTOHS(ipv6_buf->length));
 
+    radio_packet_t p;
+    p.data = (uint8_t *) ipv6_buf;
+    p.length = IPV6_HDR_LEN + NTOHS(ipv6_buf->length);
+    p.dst = (ieee_802154_long_t *) &ipv6_buf->destaddr;
+    ipv6_send_next_layer(&p);
 }
 
 uint8_t set_opt_6co_flags(uint8_t compression_flag, uint8_t cid)
@@ -853,9 +866,12 @@ void recv_rtr_adv(void)
         printf("INFO: send neighbor solicitation to: %s\n",
                ipv6_addr_to_str(addr_str, &(ipv6_buf->destaddr)));
 #endif
-        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
-                                (uint8_t *)ipv6_buf,
-                                packet_length);
+
+        radio_packet_t p;
+        p.data = (uint8_t *) ipv6_buf;
+        p.length = packet_length;
+        p.dst = (ieee_802154_long_t *) &ipv6_buf->destaddr;
+        ipv6_send_next_layer(&p);
     }
 }
 
@@ -1114,9 +1130,12 @@ void recv_nbr_sol(void)
         printf("INFO: send neighbor advertisment to: %s\n",
                ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
 #endif
-        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
-                                (uint8_t *)ipv6_buf,
-                                packet_length);
+
+        radio_packet_t p;
+        p.data = (uint8_t *) ipv6_buf;
+        p.length = packet_length;
+        p.dst = (ieee_802154_long_t *) &ipv6_buf->destaddr;
+        ipv6_send_next_layer(&p);
     }
 }
 
