@@ -1,14 +1,13 @@
 # name of your project
 export PROJECT = hello-world
 
-# for easy switching of boards
-ifeq ($(strip $(BOARD)),)
-	export BOARD = native
-endif
+# If not BOARD is found in the environment, use this default:
+export BOARD ?= native
 
-# this has to be the absolute path of the RIOT-base dir
-export RIOTBASE = $(CURDIR)/../..
+# This has to be the absolute path to the RIOT base directory:
+export RIOTBASE ?= $(CURDIR)/../../
 
-export QUIET := 1
+# Change this to 0 show compiler invocation lines by default:
+export QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
