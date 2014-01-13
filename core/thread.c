@@ -14,6 +14,7 @@
  * @brief       Threading implementation
  *
  * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -199,6 +200,8 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     cb->rq_entry.next = NULL;
     cb->rq_entry.prev = NULL;
 
+    cb->local_mem = NULL;
+
     cb->name = name;
 
     cb->wait_data = NULL;
@@ -236,4 +239,26 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     }
 
     return pid;
+}
+
+int thread_create_with_local_mem(char *stack, int stacksize, int localmemsize, char priority, 
+                                 int flags, void (*function) (void), const char *name)
+{
+    // the thread-local memory is put in the beginning
+    char *localmam = stack;
+    stack += localmemsize;
+    stacksize -= localmemsize;
+
+    // create the thread
+    int pid = thread_create(stack, stacksize, priority, flags, function, name);
+
+    // set pointer to local mem
+    sched_threads[pid]->local_mem = localmem;
+
+    return pid;
+}
+
+char *thread_get_local_mem(int pid)
+{
+    return sched_threads[pid]->local_mem;
 }

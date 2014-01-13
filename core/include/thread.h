@@ -17,6 +17,7 @@
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef __THREAD_H
@@ -48,6 +49,37 @@
  * @return  returns <0 on error, pid of newly created task else.
 */
 int thread_create(char *stack, int stacksize, char priority, int flags, void (*function) (void), const char *name);
+
+
+/**
+ * @brief   Reserve a given amount of memory on the top of the stack as thread local memory
+ *
+ * Always reserve the full number size of bytes or none, do not try to fit as many bytes as possible into the stack
+ *
+ * @param   stack Lowest address of preallocated stack space
+ * @param   stacksize
+ * @param   localmemsize        number of bytes to reserve for the thread-local memory (taken from given stack memory)
+ * @param   flags Options:
+ * YIELD: force context switch.
+ * CREATE_SLEEPING: set new thread to sleeping state, thread must be woken up manually.
+ * CREATE_STACKTEST: initialize stack with values needed for stack overflow testing.
+ *
+ * @param priority Priority of newly created thread. Lower number means higher
+ * priority. 0 means highest possible priority. Lowest priority is
+ * PRIORITY_IDLE-1, usually 30.
+ *
+ * @return  returns <0 on error, pid of newly created task else.
+ */
+int thread_create_with_local_mem(char *stack, int stacksize, int localmemsize, char priority, 
+                                 int flags, void (*function) (void), const char *name);
+
+/**
+ * @brief   Acces the threads local memory
+ *
+ * @param[in] pid       pid of the thread to access
+ * @return pointer to the threads local memory, 0 on error
+ */
+char *thread_get_local_mem(int pid);
 
 /**
  * @brief   returns the status of a process.
