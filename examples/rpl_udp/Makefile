@@ -1,7 +1,7 @@
 # name of your project
 export PROJECT = rpl_udp
 
-# If not BOARD is found in the environment, use this default:
+# If no BOARD is found in the environment, use this default:
 export BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
@@ -34,7 +34,7 @@ export QUIET ?= 1
 # get rid of the mandatory RPL warning
 CFLAGS += "-Wno-cpp"
 
-## Modules to include:
+# Modules to include:
 
 USEMODULE += auto_init
 USEMODULE += shell

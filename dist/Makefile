@@ -9,7 +9,7 @@
 # Set the name of your project:
 export PROJECT = foobar
 
-# If not BOARD is found in the environment, use this default:
+# If no BOARD is found in the environment, use this default:
 export BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
@@ -39,7 +39,7 @@ export RIOTBASE ?= $(CURDIR)/../../RIOT
 # Change this to 0 show compiler invocation lines by default:
 export QUIET ?= 1
 
-## Modules to include:
+# Modules to include:
 
 #USEMODULE += shell
 #USEMODULE += uart0

@@ -1,7 +1,7 @@
 # name of your project
 export PROJECT = hello-world
 
-# If not BOARD is found in the environment, use this default:
+# If no BOARD is found in the environment, use this default:
 export BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
