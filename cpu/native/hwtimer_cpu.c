@@ -249,7 +249,7 @@ void hwtimer_arch_set_absolute(unsigned long value, short timer)
 
     ticks2tv(value, &(native_hwtimer[timer].it_value));
 
-    DEBUG("hwtimer_arch_set_absolute(): that is %lu s %lu us from now\n",
+    DEBUG("hwtimer_arch_set_absolute(): that is at %lu s %lu us\n",
           (unsigned long)native_hwtimer[timer].it_value.tv_sec,
           (unsigned long)native_hwtimer[timer].it_value.tv_usec);
 
