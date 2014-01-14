@@ -41,7 +41,7 @@ int main(void)
     printf("busy_thread created\n");
 
     printf("hwtimer_wait()\n");
-    hwtimer_wait(HWTIMER_TICKS(10));
+    hwtimer_wait(HWTIMER_TICKS(100000));
     busy = 0;
 
     printf("main: return\n");
