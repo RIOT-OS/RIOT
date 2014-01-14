@@ -300,6 +300,7 @@ void native_hwtimer_pre_init()
     /* initialize time delta */
     time_null = 0;
     time_null = hwtimer_arch_now();
+    hwtimer_arch_now();
 }
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
