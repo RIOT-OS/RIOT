@@ -494,16 +494,14 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
         return -1;
     }
 
-    ipv6_sendto(&current_tcp_socket->foreign_address.sin6_addr,
+    return ipv6_sendto(&current_tcp_socket->foreign_address.sin6_addr,
                 IPPROTO_TCP, (uint8_t *)(current_tcp_packet),
                 compressed_size);
-    return 1;
 #else
     switch_tcp_packet_byte_order(current_tcp_packet);
-    ipv6_sendto(&current_tcp_socket->foreign_address.sin6_addr,
+    return ipv6_sendto(&current_tcp_socket->foreign_address.sin6_addr,
                 IPPROTO_TCP, (uint8_t *)(current_tcp_packet),
                 header_length * 4 + payload_length);
-    return 1;
 #endif
 }
 
@@ -1030,10 +1028,9 @@ int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
                                                    UDP_HDR_LEN + len,
                                                    IPPROTO_UDP);
 
-        ipv6_sendto(&to->sin6_addr, IPPROTO_UDP,
+        return ipv6_sendto(&to->sin6_addr, IPPROTO_UDP,
                     (uint8_t *)(current_udp_packet),
                     NTOHS(current_udp_packet->length));
-        return NTOHS(current_udp_packet->length);
     }
     else {
         return -1;

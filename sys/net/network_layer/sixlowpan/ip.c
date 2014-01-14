@@ -99,7 +99,7 @@ uint8_t *get_payload_buf(uint8_t ext_len)
     return &(buffer[LLHDR_IPV6HDR_LEN + ext_len]);
 }
 
-void ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
+int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
                  const uint8_t *payload, uint16_t payload_length)
 {
     uint8_t *p_ptr;
@@ -137,11 +137,13 @@ void ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
     }
 
     if (dest == NULL) {
-        return;
+        return -1;
     }
 
     sixlowpan_lowpan_sendto((ieee_802154_long_t *) &dest->uint16[4],
                             (uint8_t *)ipv6_buf, packet_length);
+
+    return payload_length;
 }
 
 /* Register an upper layer thread */
