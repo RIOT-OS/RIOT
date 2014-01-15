@@ -300,6 +300,8 @@ void native_hwtimer_pre_init()
     /* initialize time delta */
     time_null = 0;
     time_null = hwtimer_arch_now();
+    /* need to call hwtimer_arch_now as hwtimer_arch_now uses
+     * time_null to delta native_hwtimer_now: */
     hwtimer_arch_now();
 }
 
