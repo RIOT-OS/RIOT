@@ -31,8 +31,6 @@
 
 msg_t mesg, rep;
 
-unsigned char compat_small_buf[PAYLOAD_SIZE];
-
 int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
 {
     char *prefix[CCNL_MAX_NAME_COMP];
@@ -54,11 +52,16 @@ int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
         memset(segment_string, 0, 16);
         snprintf(segment_string, 16, "%d", segment);
         prefix[i] = segment_string;
-        int interest_len = mkInterest(prefix, NULL, compat_small_buf);
+        unsigned char *interest_pkg = malloc(PAYLOAD_SIZE);
+        if (!interest_pkg) {
+            puts("ccnl_riot_client_get: malloc failed");
+            return 0;
+        }
+        int interest_len = mkInterest(prefix, NULL, interest_pkg);
         DEBUGMSG(1, "relay_pid=%u interest_len=%d\n", relay_pid, interest_len);
 
         riot_ccnl_msg_t rmsg;
-        rmsg.payload = &compat_small_buf;
+        rmsg.payload = interest_pkg;
         rmsg.size = interest_len;
 
         msg_t m, rep;
@@ -69,6 +72,7 @@ int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
         /* ######################################################################### */
 
         msg_receive(&rep);
+        free(interest_pkg);
         if (rep.type == CCNL_RIOT_NACK) {
             /* network stack was not able to fetch this chunk */
             return 0;
