@@ -5136,7 +5136,7 @@ diff -crB openwsn/02a-MAClow/Makefile ../../../sys/net/openwsn/02a-MAClow/Makefi
 *** 0 ****
 --- 1,32 ----
 + SUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -5152,15 +5152,15 @@ diff -crB openwsn/02a-MAClow/Makefile ../../../sys/net/openwsn/02a-MAClow/Makefi
 + .PHONY: $(BINDIR)$(SUBMOD)
 + 
 + $(BINDIR)$(SUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -6207,7 +6207,7 @@ diff -crB openwsn/02b-MAChigh/Makefile ../../../sys/net/openwsn/02b-MAChigh/Make
 *** 0 ****
 --- 1,32 ----
 + SUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -6223,15 +6223,15 @@ diff -crB openwsn/02b-MAChigh/Makefile ../../../sys/net/openwsn/02b-MAChigh/Make
 + .PHONY: $(BINDIR)$(SUBMOD)
 + 
 + $(BINDIR)$(SUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -10215,7 +10215,7 @@ diff -crB openwsn/03a-IPHC/Makefile ../../../sys/net/openwsn/03a-IPHC/Makefile
 *** 0 ****
 --- 1,32 ----
 + SUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -10231,15 +10231,15 @@ diff -crB openwsn/03a-IPHC/Makefile ../../../sys/net/openwsn/03a-IPHC/Makefile
 + .PHONY: $(BINDIR)$(SUBMOD)
 + 
 + $(BINDIR)$(SUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -12101,7 +12101,7 @@ diff -crB openwsn/03b-IPv6/Makefile ../../../sys/net/openwsn/03b-IPv6/Makefile
 *** 0 ****
 --- 1,32 ----
 + SUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -12117,15 +12117,15 @@ diff -crB openwsn/03b-IPv6/Makefile ../../../sys/net/openwsn/03b-IPv6/Makefile
 + .PHONY: $(BINDIR)$(SUBMOD)
 + 
 + $(BINDIR)$(SUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -15238,7 +15238,7 @@ diff -crB openwsn/04-TRAN/Makefile ../../../sys/net/openwsn/04-TRAN/Makefile
 *** 0 ****
 --- 1,42 ----
 + SUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -15264,15 +15264,15 @@ diff -crB openwsn/04-TRAN/Makefile ../../../sys/net/openwsn/04-TRAN/Makefile
 + .PHONY: $(BINDIR)$(SUBMOD)
 + 
 + $(BINDIR)$(SUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -18632,7 +18632,7 @@ diff -crB openwsn/07-App/Makefile ../../../sys/net/openwsn/07-App/Makefile
 *** 0 ****
 --- 1,49 ----
 + SUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -18666,7 +18666,7 @@ diff -crB openwsn/07-App/Makefile ../../../sys/net/openwsn/07-App/Makefile
 + 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 + 
 + $(BINDIR)$(SUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
@@ -18674,8 +18674,8 @@ diff -crB openwsn/07-App/Makefile ../../../sys/net/openwsn/07-App/Makefile
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
 + 	mkdir -p $(BINDIR)
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + clean::
@@ -20436,7 +20436,7 @@ diff -crB openwsn/07-App/ohlone/Makefile ../../../sys/net/openwsn/07-App/ohlone/
 *** 0 ****
 --- 1,32 ----
 + SUBSUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -20452,15 +20452,15 @@ diff -crB openwsn/07-App/ohlone/Makefile ../../../sys/net/openwsn/07-App/ohlone/
 + .PHONY: $(BINDIR)$(SUBSUBMOD)
 + 
 + $(BINDIR)$(SUBSUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -21950,7 +21950,7 @@ diff -crB openwsn/07-App/rinfo/Makefile ../../../sys/net/openwsn/07-App/rinfo/Ma
 *** 0 ****
 --- 1,32 ----
 + SUBSUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -21966,15 +21966,15 @@ diff -crB openwsn/07-App/rinfo/Makefile ../../../sys/net/openwsn/07-App/rinfo/Ma
 + .PHONY: $(BINDIR)$(SUBSUBMOD)
 + 
 + $(BINDIR)$(SUBSUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -23860,7 +23860,7 @@ diff -crB openwsn/07-App/rwellknown/Makefile ../../../sys/net/openwsn/07-App/rwe
 *** 0 ****
 --- 1,32 ----
 + SUBSUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -23876,15 +23876,15 @@ diff -crB openwsn/07-App/rwellknown/Makefile ../../../sys/net/openwsn/07-App/rwe
 + .PHONY: $(BINDIR)$(SUBSUBMOD)
 + 
 + $(BINDIR)$(SUBSUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -24535,7 +24535,7 @@ diff -crB openwsn/07-App/tcpecho/Makefile ../../../sys/net/openwsn/07-App/tcpech
 *** 0 ****
 --- 1,32 ----
 + SUBSUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -24551,15 +24551,15 @@ diff -crB openwsn/07-App/tcpecho/Makefile ../../../sys/net/openwsn/07-App/tcpech
 + .PHONY: $(BINDIR)$(SUBSUBMOD)
 + 
 + $(BINDIR)$(SUBSUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -24755,7 +24755,7 @@ diff -crB openwsn/07-App/tcpinject/Makefile ../../../sys/net/openwsn/07-App/tcpi
 *** 0 ****
 --- 1,32 ----
 + SUBSUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -24771,15 +24771,15 @@ diff -crB openwsn/07-App/tcpinject/Makefile ../../../sys/net/openwsn/07-App/tcpi
 + .PHONY: $(BINDIR)$(SUBSUBMOD)
 + 
 + $(BINDIR)$(SUBSUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -25061,7 +25061,7 @@ diff -crB openwsn/07-App/tcpprint/Makefile ../../../sys/net/openwsn/07-App/tcppr
 *** 0 ****
 --- 1,32 ----
 + SUBSUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -25077,15 +25077,15 @@ diff -crB openwsn/07-App/tcpprint/Makefile ../../../sys/net/openwsn/07-App/tcppr
 + .PHONY: $(BINDIR)$(SUBSUBMOD)
 + 
 + $(BINDIR)$(SUBSUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -25249,7 +25249,7 @@ diff -crB openwsn/07-App/udpecho/Makefile ../../../sys/net/openwsn/07-App/udpech
 *** 0 ****
 --- 1,32 ----
 + SUBSUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -25265,15 +25265,15 @@ diff -crB openwsn/07-App/udpecho/Makefile ../../../sys/net/openwsn/07-App/udpech
 + .PHONY: $(BINDIR)$(SUBSUBMOD)
 + 
 + $(BINDIR)$(SUBSUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -25545,7 +25545,7 @@ diff -crB openwsn/07-App/udpinject/Makefile ../../../sys/net/openwsn/07-App/udpi
 *** 0 ****
 --- 1,32 ----
 + SUBSUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -25561,15 +25561,15 @@ diff -crB openwsn/07-App/udpinject/Makefile ../../../sys/net/openwsn/07-App/udpi
 + .PHONY: $(BINDIR)$(SUBSUBMOD)
 + 
 + $(BINDIR)$(SUBSUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -25807,7 +25807,7 @@ diff -crB openwsn/07-App/udplatency/Makefile ../../../sys/net/openwsn/07-App/udp
 *** 0 ****
 --- 1,32 ----
 + SUBSUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -25823,15 +25823,15 @@ diff -crB openwsn/07-App/udplatency/Makefile ../../../sys/net/openwsn/07-App/udp
 + .PHONY: $(BINDIR)$(SUBSUBMOD)
 + 
 + $(BINDIR)$(SUBSUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -26184,7 +26184,7 @@ diff -crB openwsn/07-App/udpprint/Makefile ../../../sys/net/openwsn/07-App/udppr
 *** 0 ****
 --- 1,32 ----
 + SUBSUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -26200,15 +26200,15 @@ diff -crB openwsn/07-App/udpprint/Makefile ../../../sys/net/openwsn/07-App/udppr
 + .PHONY: $(BINDIR)$(SUBSUBMOD)
 + 
 + $(BINDIR)$(SUBSUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -26356,7 +26356,7 @@ diff -crB openwsn/07-App/udprand/Makefile ../../../sys/net/openwsn/07-App/udpran
 *** 0 ****
 --- 1,32 ----
 + SUBSUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -26372,15 +26372,15 @@ diff -crB openwsn/07-App/udprand/Makefile ../../../sys/net/openwsn/07-App/udpran
 + .PHONY: $(BINDIR)$(SUBSUBMOD)
 + 
 + $(BINDIR)$(SUBSUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -26649,7 +26649,7 @@ diff -crB openwsn/07-App/udpstorm/Makefile ../../../sys/net/openwsn/07-App/udpst
 *** 0 ****
 --- 1,32 ----
 + SUBSUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -26665,15 +26665,15 @@ diff -crB openwsn/07-App/udpstorm/Makefile ../../../sys/net/openwsn/07-App/udpst
 + .PHONY: $(BINDIR)$(SUBSUBMOD)
 + 
 + $(BINDIR)$(SUBSUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products
@@ -27073,7 +27073,7 @@ diff -crB openwsn/Makefile ../../../sys/net/openwsn/Makefile
 *** 0 ****
 --- 1,57 ----
 + export MODULE:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -27114,7 +27114,7 @@ diff -crB openwsn/Makefile ../../../sys/net/openwsn/Makefile
 + 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 + 
 + $(BINDIR)$(MODULE): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
@@ -27122,8 +27122,8 @@ diff -crB openwsn/Makefile ../../../sys/net/openwsn/Makefile
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
 + 	mkdir -p $(BINDIR)
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + 
@@ -28431,7 +28431,7 @@ diff -crB openwsn/cross-layers/Makefile ../../../sys/net/openwsn/cross-layers/Ma
 *** 0 ****
 --- 1,32 ----
 + SUBMOD:=$(shell basename $(CURDIR)).a
-+ BINDIR = $(RIOTBASE)/bin/
++ #BINDIR = $(RIOTBASE)/bin/
 + SRC = $(wildcard *.c)
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
@@ -28447,15 +28447,15 @@ diff -crB openwsn/cross-layers/Makefile ../../../sys/net/openwsn/cross-layers/Ma
 + .PHONY: $(BINDIR)$(SUBMOD)
 + 
 + $(BINDIR)$(SUBMOD): $(OBJ)
-+ 	$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
++ 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
 + 
 + # pull in dependency info for *existing* .o files
 + -include $(OBJ:.o=.d)
 + 
 + # compile and generate dependency info
 + $(BINDIR)%.o: %.c
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-+ 	$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
++ 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c > $(BINDIR)$*.d
 + 	@printf "$(BINDIR)" | cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + # remove compilation products

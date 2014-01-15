@@ -1,7 +1,7 @@
 DIRS =
 DIRS += openwsn
 
-all: $(BINDIR)$(MODULE)
+all::
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
 # remove compilation products
