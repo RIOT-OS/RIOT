@@ -46,7 +46,7 @@
 
 #include "debug.h"
 
-#define HWTIMERMINOFFSET (10 * 1000UL) // 10 ms
+#define HWTIMERMINOFFSET (1000UL) // 1ms
 
 static unsigned long native_hwtimer_now;
 static unsigned long time_null;
@@ -237,6 +237,7 @@ void hwtimer_arch_set(unsigned long offset, short timer)
 {
     DEBUG("hwtimer_arch_set(%lu, \033[31m%i\033[0m)\n", offset, timer);
 
+    hwtimer_arch_now(); /* update native_hwtimer_now */
     offset += native_hwtimer_now;
     hwtimer_arch_set_absolute(offset, timer);
 
@@ -249,7 +250,7 @@ void hwtimer_arch_set_absolute(unsigned long value, short timer)
 
     ticks2tv(value, &(native_hwtimer[timer].it_value));
 
-    DEBUG("hwtimer_arch_set_absolute(): that is %lu s %lu us from now\n",
+    DEBUG("hwtimer_arch_set_absolute(): that is at %lu s %lu us\n",
           (unsigned long)native_hwtimer[timer].it_value.tv_sec,
           (unsigned long)native_hwtimer[timer].it_value.tv_usec);
 
@@ -300,6 +301,9 @@ void native_hwtimer_pre_init()
     /* initialize time delta */
     time_null = 0;
     time_null = hwtimer_arch_now();
+    /* need to call hwtimer_arch_now as hwtimer_arch_now uses
+     * time_null to delta native_hwtimer_now: */
+    hwtimer_arch_now();
 }
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
