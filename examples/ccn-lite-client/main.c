@@ -92,10 +92,7 @@ static void riot_ccn_express_interest(char *str)
 
     DEBUG("in='%s'\n", small_buf);
 
-    ltc4150_start();
     int content_len = ccnl_riot_client_get(relay_pid, small_buf, (char *) big_buf); // small_buf=name to request
-    ltc4150_stop();
-    printf("mAh=%f\n", ltc4150_get_total_mAh());
 
     if (content_len == 0) {
         puts("riot_get returned 0 bytes...aborting!");
@@ -294,21 +291,6 @@ static void riot_ccn_stat(char *str)
     msg_send(&m, relay_pid, 1);
 }
 
-static void riot_ccn_columb(char *str)
-{
-    (void) str; /* unused */
-
-    ltc4150_start();
-}
-
-static void riot_ccn_columb_stop(char *str)
-{
-    (void) str; /* unused */
-
-    ltc4150_stop();
-    printf("mAh=%lf\n", ltc4150_get_total_mAh());
-}
-
 static const shell_command_t sc[] = {
     { "ccn", "starts ccn relay", riot_ccn_relay_start },
     { "haltccn", "stops ccn relay", riot_ccn_relay_stop },
@@ -316,8 +298,6 @@ static const shell_command_t sc[] = {
     { "populate", "populate the cache of the relay with data", riot_ccn_populate },
     { "prefix", "registers a prefix to a face", riot_ccn_register_prefix },
     { "stat", "prints out forwarding statistics", riot_ccn_stat },
-    { "columb", "starts the columb counter", riot_ccn_columb },
-    { "columbstop", "stops the columb counter", riot_ccn_columb_stop },
 #if RIOT_CCN_APPSERVER
     { "appserver", "starts an application server to reply to interests", riot_ccn_appserver },
 #endif
