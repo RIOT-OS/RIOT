@@ -39,7 +39,6 @@
 #define STATUS_SEND_BLOCKED     (0x0080)
 #define STATUS_REPLY_BLOCKED    (0x0100)
 #define STATUS_TIMER_WAITING    (0x0200)
-#define STATUS_LOCAL_MEMORY     (0x8000)        ///< flag is set if thread-local memory was reserved
 
 typedef struct tcb_t {
     char *sp;

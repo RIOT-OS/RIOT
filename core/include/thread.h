@@ -54,7 +54,8 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
 /**
  * @brief   Reserve a given amount of memory on the top of the stack as thread local memory
  *
- * Always reserve the full number size of bytes or none, do not try to fit as many bytes as possible into the stack
+ * CAUTION: The function will not check wether there is actually enough space on the stack 
+ * memory for the local memory. So it is up to the caller to make sure that stacksize >> localmemsize.
  *
  * @param   stack Lowest address of preallocated stack space
  * @param   stacksize
@@ -75,9 +76,14 @@ int thread_create_with_local_mem(char *stack, int stacksize, int localmemsize, c
 
 /**
  * @brief   Acces the threads local memory
+ * 
+ * CAUTION: This function should only be called when the thread identified pid was created
+ * using thread_create_with_local_mem(), otherwise an invalid pointer poiting to how-knows-what
+ * will be returned and something hard to debug will break!
  *
  * @param[in] pid       pid of the thread to access
- * @return pointer to the threads local memory, 0 on error
+ * @return pointer to the threads local memory, random invalid memory location if 
+ *         no local memory was defined
  */
 char *thread_get_local_mem(int pid);
 

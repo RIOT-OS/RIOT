@@ -242,17 +242,10 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
 int thread_create_with_local_mem(char *stack, int stacksize, int localmemsize, char priority, 
                                  int flags, void (*function) (void), const char *name)
 {
-    int pid = thread_create(stack, stacksize - localmemsize, priority, flags, function, name);
-    sched_threads[pid]->status |= STATUS_LOCAL_MEMORY;
-    return pid;
+    return thread_create(stack, stacksize - localmemsize, priority, flags, function, name);
 }
 
 char *thread_get_local_mem(int pid)
 {
-    if (sched_threads[pid]->status & STATUS_LOCAL_MEMORY) {
-        return sched_threads[pid]->stack_start + sched_threads[pid]->stack_size;
-    } else {
-        return NULL;
-    }
-    
+    return sched_threads[pid]->stack_start + sched_threads[pid]->stack_size;
 }
