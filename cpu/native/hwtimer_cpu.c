@@ -237,6 +237,7 @@ void hwtimer_arch_set(unsigned long offset, short timer)
 {
     DEBUG("hwtimer_arch_set(%lu, \033[31m%i\033[0m)\n", offset, timer);
 
+    hwtimer_arch_now(); /* update native_hwtimer_now */
     offset += native_hwtimer_now;
     hwtimer_arch_set_absolute(offset, timer);
 
