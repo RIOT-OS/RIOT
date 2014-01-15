@@ -39,8 +39,6 @@ static volatile int halt_flag;
 /** message buffer */
 msg_t msg_buffer_appserver[APPSERVER_MSG_BUFFER_SIZE];
 
-unsigned char big_buf[2 * 1024];
-
 int relay_pid;
 char prefix[] = "/riot/appserver/";
 
@@ -99,7 +97,12 @@ static int appserver_handle_interest(char *data, uint16_t datalen, uint16_t from
     char name[] = "/riot/appserver/test/0";
     appserver_create_prefix(name, prefix);
 
-    int len = appserver_create_content(prefix, big_buf);
+    unsigned char *content_pkg = malloc(PAYLOAD_SIZE);
+    if (!content_pkg) {
+        puts("appserver_handle_interest: malloc failed");
+        return 0;
+    }
+    int len = appserver_create_content(prefix, content_pkg);
     /*
      struct ccnl_prefix *myprefix = ccnl_path_to_prefix(name);
 
@@ -107,7 +110,8 @@ static int appserver_handle_interest(char *data, uint16_t datalen, uint16_t from
      DEBUGMSG(1, "APPSERVER: it's a match");
      }
      */
-    int ret = appserver_sent_content(big_buf, len, from);
+    int ret = appserver_sent_content(content_pkg, len, from);
+    free(content_pkg);
 
     return ret;
 }
@@ -152,9 +156,16 @@ static void riot_ccnl_appserver_register(void)
     snprintf(faceid, sizeof(faceid), "%d", thread_getpid());
     char *type = "newMSGface";
 
-    int content_len = ccnl_riot_client_publish(relay_pid, prefix, faceid, type, big_buf);
+    unsigned char *mgnt_pkg = malloc(256);
+    if (!mgnt_pkg) {
+        puts("riot_ccnl_appserver_register: malloc failed");
+        return;
+    }
+    int content_len = ccnl_riot_client_publish(relay_pid, prefix, faceid, type, mgnt_pkg);
     DEBUG("received %d bytes.\n", content_len);
-    DEBUG("appserver received: '%s'\n", big_buf);
+    DEBUG("appserver received: '%s'\n", mgnt_pkg);
+
+    free(mgnt_pkg);
 }
 
 void ccnl_riot_appserver_start(int _relay_pid)
