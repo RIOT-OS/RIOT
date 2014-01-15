@@ -40,15 +40,12 @@ void handle_synchro_timeout(socket_internal_t *current_socket)
         vtimer_now(&now);
 
         if ((current_socket->socket_values.tcp_control.no_of_retries == 0) &&
-            (timex_sub(now,
-                       current_socket->socket_values.tcp_control.last_packet_time).microseconds >
-             TCP_SYN_INITIAL_TIMEOUT)) {
+            (timex_uint64(timex_sub(now, current_socket->socket_values.tcp_control.last_packet_time)) > TCP_SYN_INITIAL_TIMEOUT)) {
             current_socket->socket_values.tcp_control.no_of_retries++;
             net_msg_send(&send, current_socket->recv_pid, 0, TCP_RETRY);
         }
         else if ((current_socket->socket_values.tcp_control.no_of_retries > 0) &&
-                 (timex_sub(now,
-                            current_socket->socket_values.tcp_control.last_packet_time).microseconds >
+                 (timex_uint64(timex_sub(now, current_socket->socket_values.tcp_control.last_packet_time)) >
                   (current_socket->socket_values.tcp_control.no_of_retries *
                    TCP_SYN_TIMEOUT + TCP_SYN_INITIAL_TIMEOUT))) {
             current_socket->socket_values.tcp_control.no_of_retries++;
@@ -89,7 +86,7 @@ void handle_established(socket_internal_t *current_socket)
         if (current_timeout > TCP_ACK_MAX_TIMEOUT) {
             net_msg_send(&send, current_socket->send_pid, 0, TCP_TIMEOUT);
         }
-        else if (timex_sub(now, current_socket->socket_values.tcp_control.last_packet_time).microseconds >
+        else if (timex_uint64(timex_sub(now, current_socket->socket_values.tcp_control.last_packet_time)) >
                  current_timeout) {
             current_socket->socket_values.tcp_control.no_of_retries++;
             net_msg_send(&send, current_socket->send_pid, 0, TCP_RETRY);

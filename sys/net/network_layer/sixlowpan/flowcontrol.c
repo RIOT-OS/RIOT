@@ -28,7 +28,7 @@
 #include "flowcontrol.h"
 
 
-static int set_timeout(vtimer_t *timeout, long useconds, void *args);
+static int set_timeout(vtimer_t *timeout, timex_t val, void *args);
 static void sending_slot(void);
 
 char sending_slot_stack[SENDING_SLOT_STACK_SIZE];
@@ -105,21 +105,19 @@ static void sending_slot(void)
         if (seq_num == tmp->seq_num) {
             writepacket(slot->frame, slot->frame_len);
 
-            if (set_timeout(&slot->timeout, BORDER_SL_TIMEOUT, (void *)m.content.ptr) != 0) {
+            if (set_timeout(&slot->timeout, timex_set(0, BORDER_SL_TIMEOUT), (void *)m.content.ptr) != 0) {
                 printf("ERROR: Error invoking timeout timer\n");
             }
         }
     }
 }
 
-static int set_timeout(vtimer_t *timeout, long useconds, void *args)
+static int set_timeout(vtimer_t *timeout, timex_t val, void *args)
 {
-    timex_t interval;
-    interval.seconds = useconds / 1000000;
-    interval.microseconds = (useconds % 1000000) * 1000;
-
     vtimer_remove(timeout);
-    return vtimer_set_msg(timeout, interval, sending_slot_pid, args);
+
+    timex_normalize(&val);
+    return vtimer_set_msg(timeout, val, sending_slot_pid, args);
 }
 
 static int in_window(uint8_t seq_num, uint8_t min, uint8_t max)
@@ -140,7 +138,7 @@ void flowcontrol_send_over_uart(border_packet_t *packet, int len)
     memcpy(slot->frame, (uint8_t *)packet, len);
     slot->frame_len = len;
 
-    if (set_timeout(&slot->timeout, BORDER_SL_TIMEOUT, (void *)args) != 0) {
+    if (set_timeout(&slot->timeout, timex_set(0, BORDER_SL_TIMEOUT * 1000), (void *)args) != 0) {
         printf("ERROR: Error invoking timeout timer\n");
         return;
     }
