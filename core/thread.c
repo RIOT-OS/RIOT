@@ -244,21 +244,15 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
 int thread_create_with_local_mem(char *stack, int stacksize, int localmemsize, char priority, 
                                  int flags, void (*function) (void), const char *name)
 {
-    // the thread-local memory is put in the beginning
-    char *localmam = stack;
-    stack += localmemsize;
-    stacksize -= localmemsize;
-
-    // create the thread
-    int pid = thread_create(stack, stacksize, priority, flags, function, name);
-
-    // set pointer to local mem
-    sched_threads[pid]->local_mem = localmem;
-
-    return pid;
+    return thread_create(stack, stacksize - localmemsize, priority, flags, function, name);
 }
 
 char *thread_get_local_mem(int pid)
 {
-    return sched_threads[pid]->local_mem;
+    if (sched_threads[pid]->status & STATUS_LOCAL_MEMORY) {
+        return sched_threads[pid]->stack_start + sched_threads[pid]->stack_size;
+    } else {
+        return NULL;
+    }
+    
 }
