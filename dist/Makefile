@@ -52,4 +52,12 @@ export QUIET ?= 1
 
 export INCLUDES = -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/core/include -I$(RIOTCPU)/$(CPU)/include -I$(RIOTBASE)/sys/lib -I$(RIOTBASE)/sys/include/ -I$(RIOTBASE)/drivers/include/
 
+# Specify custom dependencies for your project here ...
+# export PROJDEPS = proj_data.h
+
 include $(RIOTBASE)/Makefile.include
+
+# ... and define them here (after including Makefile.include,
+# otherwise you modify the standard target):
+#proj_data.h: script.py data.tar.gz
+#	./script.py
