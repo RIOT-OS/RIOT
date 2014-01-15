@@ -5,7 +5,7 @@ export PROJECT = rpl_udp
 export BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
-export RIOTBASE ?= $(CURDIR)/../../
+export RIOTBASE ?= $(CURDIR)/../..
 
 # Uncomment these lines if you want to use platform support from external
 # repositories:

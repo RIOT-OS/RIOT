@@ -5,7 +5,7 @@ export PROJECT = hello-world
 export BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
-export RIOTBASE ?= $(CURDIR)/../../
+export RIOTBASE ?= $(CURDIR)/../..
 
 # Change this to 0 show compiler invocation lines by default:
 export QUIET ?= 1
