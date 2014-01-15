@@ -46,7 +46,7 @@
 
 #include "debug.h"
 
-#define HWTIMERMINOFFSET (10 * 1000UL) // 10 ms
+#define HWTIMERMINOFFSET (1000UL) // 1ms
 
 static unsigned long native_hwtimer_now;
 static unsigned long time_null;
