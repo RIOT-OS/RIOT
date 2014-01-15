@@ -200,8 +200,6 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     cb->rq_entry.next = NULL;
     cb->rq_entry.prev = NULL;
 
-    cb->local_mem = NULL;
-
     cb->name = name;
 
     cb->wait_data = NULL;
@@ -244,7 +242,9 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
 int thread_create_with_local_mem(char *stack, int stacksize, int localmemsize, char priority, 
                                  int flags, void (*function) (void), const char *name)
 {
-    return thread_create(stack, stacksize - localmemsize, priority, flags, function, name);
+    int pid = thread_create(stack, stacksize - localmemsize, priority, flags, function, name);
+    sched_threads[pid]->status |= STATUS_LOCAL_MEMORY;
+    return pid;
 }
 
 char *thread_get_local_mem(int pid)
