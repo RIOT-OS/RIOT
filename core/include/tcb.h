@@ -55,7 +55,7 @@ typedef struct tcb_t {
     cib_t msg_queue;
     msg_t *msg_array;
 
-    char *lcoal_mem;
+    char *local_mem;
 
     const char *name;
     char *stack_start;
