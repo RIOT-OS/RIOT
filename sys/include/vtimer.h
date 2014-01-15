@@ -18,6 +18,8 @@
 #ifndef __VTIMER_H
 #define __VTIMER_H
 
+#include <time.h>
+
 #include "queue.h"
 #include "timex.h"
 #include "msg.h"
@@ -44,6 +46,12 @@ typedef struct vtimer_t {
  * @return  Time as timex_t since system boot
  */
 void vtimer_now(timex_t *out);
+
+/**
+ * @brief   Returns the current time in broken down format
+ * @param[out]  localt      Pointer to structure to receive time
+ */
+void vtimer_get_localtime(struct tm *localt);
 
 /**
  * @brief   Initializes the vtimer subsystem. To be called once at system initialization. Will be initialized by auto_init.
