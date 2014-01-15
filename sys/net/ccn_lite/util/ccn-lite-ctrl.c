@@ -33,15 +33,23 @@
 
 // ----------------------------------------------------------------------
 
-static unsigned char contentobj[2000];
-static unsigned char faceinst[2000];
-static unsigned char fwdentry[2000];
-
 int
 mkNewFaceRequest(unsigned char *out, char *macsrc, char *ip4src,
                  char *host, char *port, char *flags)
 {
     int len = 0, len2, len3;
+
+    unsigned char *contentobj = malloc(500);
+    if (!contentobj) {
+        puts("mkNewFaceRequest: malloc failed");
+        return 0;
+    }
+
+    unsigned char *faceinst = malloc(500);
+    if (!faceinst) {
+        puts("mkNewFaceRequest: malloc failed");
+        return 0;
+    }
 
     len = mkHeader(out, CCN_DTAG_INTEREST, CCN_TT_DTAG);   // interest
     len += mkHeader(out + len, CCN_DTAG_NAME, CCN_TT_DTAG); // name
@@ -94,6 +102,9 @@ mkNewFaceRequest(unsigned char *out, char *macsrc, char *ip4src,
     out[len++] = 0; // end-of-name
     out[len++] = 0; // end-of-interest
 
+    free(contentobj);
+    free(faceinst);
+
     return len;
 }
 
@@ -104,6 +115,18 @@ mkPrefixregRequest(unsigned char *out, char reg, char *path, char *faceid)
 {
     int len = 0, len2, len3;
     char *cp;
+
+    unsigned char *contentobj = malloc(500);
+    if (!contentobj) {
+        puts("mkNewFaceRequest: malloc failed");
+        return 0;
+    }
+
+    unsigned char *fwdentry = malloc(500);
+    if (!contentobj) {
+        puts("mkNewFaceRequest: malloc failed");
+        return 0;
+    }
 
     len = mkHeader(out, CCN_DTAG_INTEREST, CCN_TT_DTAG);   // interest
     len += mkHeader(out + len, CCN_DTAG_NAME, CCN_TT_DTAG); // name
@@ -143,6 +166,9 @@ mkPrefixregRequest(unsigned char *out, char reg, char *path, char *faceid)
 
     out[len++] = 0; // end-of-name
     out[len++] = 0; // end-of-interest
+
+    free(contentobj);
+    free(fwdentry);
 
     //    ccnl_prefix_free(p);
     return len;
