@@ -84,8 +84,14 @@ ipv6_hdr_t *ipv6_get_buf(void);
  * @param[in] next_header       Next header ID of payload.
  * @param[in] payload           Payload of the packet.
  * @param[in] payload_length    Length of payload.
+ *
+ * @return  payload_length : on success
+ *          -1             : if no route to the given dest could be obtained
+ *                           Packet is dropped
+ *                           In case of reactive routing: routing
+ *                           is going to try to find a route
  */
-void ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
+int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
                  const uint8_t *payload, uint16_t payload_length);
 
 /**
