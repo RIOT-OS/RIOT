@@ -53,6 +53,9 @@ extern void _get_current_handler(int argc, char **argv);
 extern void _reset_current_handler(int argc, char **argv);
 #endif
 
+#ifdef CPU_X86
+extern void _x86_lspci(int argc, char **argv);
+#endif
 
 /* configure available commands for each transceiver device: */
 #ifdef MODULE_TRANSCEIVER
@@ -189,6 +192,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_RANDOM
     { "mersenne_init", "initializes the PRNG", _mersenne_init },
     { "mersenne_get", "returns 32 bit of pseudo randomness", _mersenne_get },
+#endif
+#ifdef CPU_X86
+    {"lspci", "Lists PCI devices", _x86_lspci},
 #endif
     {NULL, NULL, NULL}
 };

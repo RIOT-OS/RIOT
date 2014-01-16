@@ -1,6 +1,7 @@
 export PROJECT = test_net_if
 
-BOARD_BLACKLIST = mbed_lpc1768 arduino-due udoo
+BOARD_BLACKLIST = mbed_lpc1768 arduino-due udoo qemu-i386
+# qemu-i386: no tranceiver, yet
 
 include ../Makefile.tests_common
 
