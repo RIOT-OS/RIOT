@@ -55,6 +55,10 @@
 #include "rtc.h"
 #endif
 
+#ifdef MODULE_DESTINY
+#include "destiny.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -105,5 +109,10 @@ void auto_init(void)
     extern void profiling_init(void);
     profiling_init();
 #endif
+#ifdef MODULE_DESTINY
+    DEBUG("Auto init transport layer [destiny] module.\n");
+    destiny_init_transport_layer();
+#endif
+
     main();
 }
