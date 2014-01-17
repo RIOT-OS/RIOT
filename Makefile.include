@@ -79,7 +79,7 @@ endif
 SRC = $(wildcard *.c)
 
 # string array of all names replaced .c with .o 
-OBJ = $(SRC:%.c=${BINDIR}%.o)
+OBJ = $(SRC:%.c=${BINDIR}${PROJECT}/%.o)
 
 $(BINDIR)$(PROJECT).a:  $(OBJ)
 	$(AD)$(AR) -rc $(BINDIR)$(PROJECT).a $(OBJ)
@@ -87,10 +87,10 @@ $(BINDIR)$(PROJECT).a:  $(OBJ)
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
 
-$(BINDIR)%.o: %.c $(PROJDEPS)
+$(BINDIR)$(PROJECT)/%.o: %.c $(PROJDEPS)
 	@echo; echo "Compiling.... $*.c"; echo
-	@test -d $(BINDIR) || mkdir -p $(BINDIR)
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$*.o
+	@test -d $(BINDIR)$(PROJECT) || mkdir -p $(BINDIR)$(PROJECT)
+	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$(PROJECT)/$*.o
 
 clean:
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD) clean
