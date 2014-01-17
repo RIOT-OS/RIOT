@@ -26,19 +26,16 @@ patch: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/Makefile
 $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/Makefile: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/
 	# Here you apply your patch.
 	cd $< && sh ../structure_changes.sh
-	cd $< && patch -p0 -i ../patch.txt
+	cd $< && patch -p0 -N -i ../patch.txt
 
 $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
+	rm -rf $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)
 	$(UNPACK) $< -d $(PKG_NAME)-$(PKG_VERSION)
 
 $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT):
+	# rm -rf $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)
 	# Get PKG_VERSION of package from PKG_URL
 	@$(FETCH) -O $@ $(PKG_URL)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT) || true
-
-clean::
-	# Reset package to checkout state.
-	rm -rf $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION) && \
-		make $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/Makefile
 
 clean::
 	rm -rf $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION) $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
