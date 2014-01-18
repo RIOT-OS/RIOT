@@ -26,15 +26,15 @@ void rpl_udp_init(char *str)
     msg_t m;
     uint8_t chan = RADIO_CHANNEL;
 
-    char command;
-
-    int res = sscanf(str, "init %c", &command);
-
-    if (res < 1) {
+    char *toc_str = strtok(str, " ");
+    toc_str = strtok(NULL, " ");
+    if (!toc_str) {
         printf("Usage: init (r|n)\n");
         printf("\tr\tinitialize as root\n");
         printf("\tn\tinitialize as node router\n");
+        return;
     }
+    char command = *toc_str;
 
     uint8_t state;
 
