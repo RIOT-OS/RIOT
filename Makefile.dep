@@ -1,13 +1,3 @@
-ifneq (,$(findstring vtimer,$(USEMODULE)))
-	ifeq (,$(findstring hwtimer,$(USEMODULE)))
-		USEMODULE += hwtimer
-	endif
-	ifeq (,$(findstring timex,$(USEMODULE)))
-		USEMODULE += timex
-	endif
-endif
-
-
 ifneq (,$(findstring pnet, $(USEMODULE)))
 	ifeq (,$(findstring posix, $(USEMODULE)))
 		USEMODULE += posix
@@ -36,6 +26,9 @@ ifneq (,$(findstring cc110x,$(USEMODULE)))
 	ifeq (,$(findstring protocol_multiplex,$(USEMODULE)))
 		USEMODULE += protocol_multiplex
 	endif
+	ifeq (,$(findstring vtimer, $(USEMODULE)))
+		USEMODULE += vtimer
+	endif
 endif
 
 ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
@@ -59,6 +52,9 @@ ifneq (,$(findstring at86rf231,$(USEMODULE)))
 		USEMODULE += transceiver
 		USEMODULE += ieee802154
 	endif
+	ifeq (,$(findstring vtimer, $(USEMODULE)))
+		USEMODULE += vtimer
+	endif
 endif
 
 ifneq (,$(findstring destiny,$(USEMODULE)))
@@ -67,6 +63,9 @@ ifneq (,$(findstring destiny,$(USEMODULE)))
 	endif
 	ifeq (,$(findstring net_help,$(USEMODULE)))
 		USEMODULE += net_help
+	endif
+	ifeq (,$(findstring vtimer, $(USEMODULE)))
+		USEMODULE += vtimer
 	endif
 endif
 
@@ -82,5 +81,17 @@ ifneq (,$(findstring sixlowpan,$(USEMODULE)))
 	endif
 	ifeq (,$(findstring transceiver, $(USEMODULE)))
 		USEMODULE += transceiver
+	endif
+	ifeq (,$(findstring vtimer, $(USEMODULE)))
+		USEMODULE += vtimer
+	endif
+endif
+
+ifneq (,$(findstring vtimer,$(USEMODULE)))
+	ifeq (,$(findstring hwtimer,$(USEMODULE)))
+		USEMODULE += hwtimer
+	endif
+	ifeq (,$(findstring timex,$(USEMODULE)))
+		USEMODULE += timex
 	endif
 endif
