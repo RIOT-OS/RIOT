@@ -78,7 +78,7 @@ int net_if_init_interface(uint8_t protocols, transceiver_type_t transceivers)
 
 int net_if_iter_interfaces(int start)
 {
-    if (start == NET_IF_MAX) {
+    if (start == NET_IF_MAX - 1) {
         return -1;
     }
 
