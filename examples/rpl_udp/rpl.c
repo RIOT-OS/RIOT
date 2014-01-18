@@ -20,7 +20,7 @@ ipv6_addr_t std_addr;
 
 uint8_t is_root = 0;
 
-void init(char *str)
+void rpl_udp_init(char *str)
 {
     transceiver_command_t tcmd;
     msg_t m;
@@ -61,7 +61,7 @@ void init(char *str)
         else {
             ipv6_iface_set_routing_provider(rpl_get_next_hop);
         }
-        int monitor_pid = thread_create(monitor_stack_buffer, MONITOR_STACK_SIZE, PRIORITY_MAIN-2, CREATE_STACKTEST, monitor, "monitor");
+        int monitor_pid = thread_create(monitor_stack_buffer, MONITOR_STACK_SIZE, PRIORITY_MAIN-2, CREATE_STACKTEST, rpl_udp_monitor, "monitor");
         transceiver_register(TRANSCEIVER, monitor_pid);
         ipv6_register_packet_handler(monitor_pid);
         //sixlowpan_lowpan_register(monitor_pid);
@@ -95,7 +95,7 @@ void init(char *str)
     /* start transceiver watchdog */
 }
 
-void loop(char *unused)
+void rpl_udp_loop(char *unused)
 {
     (void) unused;
 
@@ -136,7 +136,7 @@ void loop(char *unused)
     printf("########################\n");
 }
 
-void table(char *unused)
+void rpl_udp_table(char *unused)
 {
     (void) unused;
 
@@ -162,7 +162,7 @@ void table(char *unused)
     printf("$\n");
 }
 
-void dodag(char *unused)
+void rpl_udp_dodag(char *unused)
 {
     (void) unused;
 

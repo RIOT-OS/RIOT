@@ -20,13 +20,13 @@ extern uint8_t ipv6_ext_hdr_len;
 msg_t msg_q[RCV_BUFFER_SIZE];
 
 /* prints current IPv6 adresses */
-void ip(char *unused)
+void rpl_udp_ip(char *unused)
 {
     (void) unused;
     ipv6_iface_print_addrs();
 }
 
-void set_id(char *id_str)
+void rpl_udp_set_id(char *id_str)
 {
     int res = sscanf(id_str, "set %hu", &id);
 
@@ -40,7 +40,7 @@ void set_id(char *id_str)
     printf("Set node ID to %u\n", id);
 }
 
-void monitor(void)
+void rpl_udp_monitor(void)
 {
     msg_t m;
     radio_packet_t *p;
@@ -95,7 +95,7 @@ void monitor(void)
 
 transceiver_command_t tcmd;
 
-void ignore(char *addr) {
+void rpl_udp_ignore(char *addr) {
     uint16_t a;
     if (transceiver_pid < 0) {
         puts("Transceiver not runnning.");

@@ -16,47 +16,47 @@
  *
  * @param[in] str  Shell input
  */
-void init(char *str);
+void rpl_udp_init(char *str);
 
 /**
  * @brief   Shell command to set node's ID
  *
  * @param[in] str  Shell input
  */
-void set_id(char *id);
+void rpl_udp_set_id(char *id);
 
 /**
  * @brief   Loops through the routing table
  *
  * @param[in] unused  Guess what
  */
-void loop(char *unused);
+void rpl_udp_loop(char *unused);
 
 /**
  * @brief   Shows the routing table
  *
  * @param[in] unused  Guess what
  */
-void table(char *unused);
+void rpl_udp_table(char *unused);
 
 /**
  * @brief   Shows the dodag 
  *
  * @param[in] unused  Guess what
  */
-void dodag(char *unused);
+void rpl_udp_dodag(char *unused);
 
 /* UDP shell command handlers */
 void udp_server(char *unused);
 void udp_send(char *str);
 
 /* helper command handlers */
-void ip(char *unused);
+void rpl_udp_ip(char *unused);
 
-void ignore(char *addr);
+void rpl_udp_ignore(char *addr);
 
 /* monitoring thread */
-void monitor(void);
+void rpl_udp_monitor(void);
 
 extern radio_address_t id;
 extern ipv6_addr_t std_addr;
