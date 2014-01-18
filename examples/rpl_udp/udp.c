@@ -25,7 +25,7 @@ void udp_server(char *unused)
 {
     (void) unused;
     int udp_server_thread_pid = thread_create(udp_server_stack_buffer, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN, CREATE_STACKTEST, init_udp_server, "init_udp_server");
-    printf("UDP SERVER THREAD PID: %i\n", udp_server_thread_pid);
+    printf("UDP SERVER ON PORT %d (THREAD PID: %d)\n", HTONS(SERVER_PORT), udp_server_thread_pid);
 }
 
 void init_udp_server(void)

@@ -171,7 +171,7 @@ void rpl_udp_dodag(char *unused)
 
     if (mydodag == NULL) {
         printf("Not part of a dodag\n");
-        printf("---------------------------$\n");
+        printf("---------------------------\n");
         return;
     }
 
@@ -182,5 +182,5 @@ void rpl_udp_dodag(char *unused)
         printf("my preferred parent:\n");
         printf("%s\n", ipv6_addr_to_str(addr_str, (&mydodag->my_preferred_parent->addr)));
     }
-    printf("---------------------------$\n");
+    printf("---------------------------\n");
 }
