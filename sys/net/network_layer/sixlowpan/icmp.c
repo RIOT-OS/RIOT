@@ -1368,6 +1368,9 @@ uint8_t nbr_cache_add(ipv6_addr_t *ipaddr, ieee_802154_long_t *laddr,
                       ndp_nce_type_t type, uint16_t ltime,
                       ieee_802154_short_t *saddr)
 {
+    (void) ltime;
+    (void) saddr;
+
     if (nbr_count == NBR_CACHE_SIZE) {
         printf("ERROR: neighbor cache full\n");
         return NDP_OPT_ARO_STATE_NBR_CACHE_FULL;
