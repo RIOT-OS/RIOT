@@ -93,6 +93,9 @@ endif
 ifneq (,$(findstring ccn_lite_client,$(USEMODULE)))
     DIRS += net/ccn_lite/util
 endif
+ifneq (,$(findstring quad_math,$(USEMODULE)))
+    DIRS += quad_math
+endif
 
 all: $(BINDIR)$(MODULE).a 
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
