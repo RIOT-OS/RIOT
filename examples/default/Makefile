@@ -66,6 +66,7 @@ ifneq (,$(findstring msba2,$(BOARD)))
 	USEMODULE += mci
 	USEMODULE += cc110x_ng
 	USEMODULE += config
+	USEMODULE += random
 	export INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include
 endif
 ifneq (,$(findstring native,$(BOARD)))
@@ -74,6 +75,7 @@ ifneq (,$(findstring native,$(BOARD)))
 	USEMODULE += nativenet
 	USEMODULE += transceiver
 	USEMODULE += config
+	USEMODULE += random
 endif
 
 export INCLUDES += -I${RIOTBASE}/core/include/ -I${RIOTBASE}/sys/include/ -I${RIOTBASE}/drivers/include/
