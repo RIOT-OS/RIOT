@@ -34,6 +34,9 @@ endif
 ifneq (,$(findstring lpc_common,$(USEMODULE)))
 	SRC += sc_heap.c
 endif
+ifneq (,$(findstring random,$(USEMODULE)))
+	SRC += sc_mersenne.c
+endif
 
 OBJ = $(SRC:%.c=$(BINDIR)%.o)
 DEP = $(SRC:%.c=$(BINDIR)%.d)
