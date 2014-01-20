@@ -99,7 +99,7 @@ void start_trickle(uint8_t DIOIntMin, uint8_t DIOIntDoubl,
 {
     c = 0;
     k = DIORedundancyConstant;
-    Imin = pow(2, DIOIntMin);
+    Imin = (1 << DIOIntMin);
     Imax = DIOIntDoubl;
     /* Eigentlich laut Spezifikation erste Bestimmung von I wie auskommentiert: */
     /* I = Imin + ( rand() % ( (Imin << Imax) - Imin + 1 ) ); */
