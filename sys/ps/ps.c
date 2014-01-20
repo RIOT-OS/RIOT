@@ -53,7 +53,7 @@ void thread_print_all(void)
             int statebit = number_of_highest_bit(state >> 1);               // get state index
             const char *sname = state_names[statebit];                      // get state name
             const char *queued = queued_name + (state & BIT0);              // get queued flag
-            int stacksz = p->stack_size;                                    // get max used stack
+            int stacksz = p->stack_size;                                    // get stack size
             double runtime_ticks = 0 / 0.0;
             int switches = -1;
 #if SCHEDSTATISTICS
