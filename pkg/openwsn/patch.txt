@@ -15249,16 +15249,16 @@ diff -crB openwsn/04-TRAN/Makefile ../../../sys/net/openwsn/04-TRAN/Makefile
 + INCLUDES += -I$(CURDIR)/03a-IPHC
 + INCLUDES += -I$(CURDIR)/03b-IPv6
 + INCLUDES += -I$(CURDIR)/04-TRAN
-+ INCLUDES += -I$(CURDIR)/07-APP/ohlone
-+ INCLUDES += -I$(CURDIR)/07-APP/tcpecho
-+ INCLUDES += -I$(CURDIR)/07-APP/tcpinject
-+ INCLUDES += -I$(CURDIR)/07-APP/tcpprint
-+ INCLUDES += -I$(CURDIR)/07-APP/udpecho
-+ INCLUDES += -I$(CURDIR)/07-APP/udpinject
-+ INCLUDES += -I$(CURDIR)/07-APP/udplatency
-+ INCLUDES += -I$(CURDIR)/07-APP/udpprint
-+ INCLUDES += -I$(CURDIR)/07-APP/udprand
-+ INCLUDES += -I$(CURDIR)/07-APP/udpstorm
++ INCLUDES += -I$(CURDIR)/07-App/ohlone
++ INCLUDES += -I$(CURDIR)/07-App/tcpecho
++ INCLUDES += -I$(CURDIR)/07-App/tcpinject
++ INCLUDES += -I$(CURDIR)/07-App/tcpprint
++ INCLUDES += -I$(CURDIR)/07-App/udpecho
++ INCLUDES += -I$(CURDIR)/07-App/udpinject
++ INCLUDES += -I$(CURDIR)/07-App/udplatency
++ INCLUDES += -I$(CURDIR)/07-App/udpprint
++ INCLUDES += -I$(CURDIR)/07-App/udprand
++ INCLUDES += -I$(CURDIR)/07-App/udpstorm
 + INCLUDES += -I$(CURDIR)/cross-layers
 + 
 + .PHONY: $(BINDIR)$(SUBMOD)
@@ -18643,10 +18643,10 @@ diff -crB openwsn/07-App/Makefile ../../../sys/net/openwsn/07-App/Makefile
 + INCLUDES += -I$(CURDIR)/03a-IPHC
 + INCLUDES += -I$(CURDIR)/03b-IPv6
 + INCLUDES += -I$(CURDIR)/04-TRAN
-+ INCLUDES += -I$(CURDIR)/07-APP/ohlone
-+ INCLUDES += -I$(CURDIR)/07-APP/tcpecho
-+ INCLUDES += -I$(CURDIR)/07-APP/tcpinject
-+ INCLUDES += -I$(CURDIR)/07-APP/tcpprint
++ INCLUDES += -I$(CURDIR)/07-App/ohlone
++ INCLUDES += -I$(CURDIR)/07-App/tcpecho
++ INCLUDES += -I$(CURDIR)/07-App/tcpinject
++ INCLUDES += -I$(CURDIR)/07-App/tcpprint
 + INCLUDES += -I$(CURDIR)/cross-layers
 + 
 + DIRS += rinfo
@@ -27087,18 +27087,18 @@ diff -crB openwsn/Makefile ../../../sys/net/openwsn/Makefile
 + INCLUDES += -I$(CURDIR)/03b-IPv6
 + INCLUDES += -I$(CURDIR)/04-TRAN
 + INCLUDES += -I$(CURDIR)/cross-layers
-+ INCLUDES += -I$(CURDIR)/07-APP/rinfo
-+ INCLUDES += -I$(CURDIR)/07-APP/rwellknown
-+ INCLUDES += -I$(CURDIR)/07-APP/ohlone
-+ INCLUDES += -I$(CURDIR)/07-APP/tcpecho
-+ INCLUDES += -I$(CURDIR)/07-APP/tcpinject
-+ INCLUDES += -I$(CURDIR)/07-APP/tcpprint
-+ INCLUDES += -I$(CURDIR)/07-APP/udpecho
-+ INCLUDES += -I$(CURDIR)/07-APP/udpinject
-+ INCLUDES += -I$(CURDIR)/07-APP/udplatency
-+ INCLUDES += -I$(CURDIR)/07-APP/udpprint
-+ INCLUDES += -I$(CURDIR)/07-APP/udprand
-+ INCLUDES += -I$(CURDIR)/07-APP/udpstorm
++ INCLUDES += -I$(CURDIR)/07-App/rinfo
++ INCLUDES += -I$(CURDIR)/07-App/rwellknown
++ INCLUDES += -I$(CURDIR)/07-App/ohlone
++ INCLUDES += -I$(CURDIR)/07-App/tcpecho
++ INCLUDES += -I$(CURDIR)/07-App/tcpinject
++ INCLUDES += -I$(CURDIR)/07-App/tcpprint
++ INCLUDES += -I$(CURDIR)/07-App/udpecho
++ INCLUDES += -I$(CURDIR)/07-App/udpinject
++ INCLUDES += -I$(CURDIR)/07-App/udplatency
++ INCLUDES += -I$(CURDIR)/07-App/udpprint
++ INCLUDES += -I$(CURDIR)/07-App/udprand
++ INCLUDES += -I$(CURDIR)/07-App/udpstorm
 + 
 + 
 + DIRS =
