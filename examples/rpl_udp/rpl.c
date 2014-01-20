@@ -90,7 +90,6 @@ void init(char *str)
     msg_send_receive(&m, &m, transceiver_pid);
     printf("Channel set to %u\n", RADIO_CHANNEL);
 
-    destiny_init_transport_layer();
     puts("Destiny initialized");
     /* start transceiver watchdog */
 }
