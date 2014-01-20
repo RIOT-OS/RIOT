@@ -67,13 +67,6 @@ void bl_init_ports(void)
     bl_blink();
 }
 
-static inline void
-pllfeed(void)
-{
-    PLLFEED = 0xAA;
-    PLLFEED = 0x55;
-}
-
 void init_clks1(void)
 {
     // Disconnect PLL
