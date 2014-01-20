@@ -6,7 +6,7 @@ mv openwsn-fw-RB-1.4/firmware/openos/openwsn/ ./
 
 # and all needed hw dependent files too
 mv openwsn-fw-RB-1.4/firmware/openos/bsp/boards/telosb/spi.c openwsn
-mv openwsn-fw-RB-1.4/firmware/openos/bsp/boards/telosb/uart.c openwsn
+mv openwsn-fw-RB-1.4/firmware/openos/bsp/boards/telosb/uart.c openwsn/uart_ow.c
 mv openwsn-fw-RB-1.4/firmware/openos/bsp/boards/telosb/leds.c openwsn
 mv openwsn-fw-RB-1.4/firmware/openos/bsp/boards/telosb/board.c openwsn/board_ow.c
 mv openwsn-fw-RB-1.4/firmware/openos/bsp/boards/telosb/board_info.h openwsn
@@ -19,7 +19,7 @@ mv openwsn-fw-RB-1.4/firmware/openos/bsp/boards/eui64.h openwsn
 mv openwsn-fw-RB-1.4/firmware/openos/bsp/boards/leds.h openwsn
 mv openwsn-fw-RB-1.4/firmware/openos/bsp/boards/radio.h openwsn
 mv openwsn-fw-RB-1.4/firmware/openos/bsp/boards/radiotimer.h openwsn
-mv openwsn-fw-RB-1.4/firmware/openos/bsp/boards/uart.h openwsn
+mv openwsn-fw-RB-1.4/firmware/openos/bsp/boards/uart.h openwsn/uart_ow.h
 mv openwsn-fw-RB-1.4/firmware/openos/bsp/chips/spi.h openwsn
 mv openwsn-fw-RB-1.4/firmware/openos/bsp/chips/cc2420/radio.c openwsn
 mv openwsn-fw-RB-1.4/firmware/openos/bsp/chips/cc2420/cc2420.h openwsn

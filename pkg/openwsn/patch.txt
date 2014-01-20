@@ -27457,7 +27457,7 @@ diff -crB openwsn/board_ow.c ../../../sys/net/openwsn/board_ow.c
 ! #include "board_ow.h"
 ! 
 ! #include "leds.h"
-! #include "uart.h"
+! #include "uart_ow.h"
 ! #include "spi.h"
 ! //#include "bsp_timer.h"
 ! #include "radio.h"
@@ -32996,7 +32996,7 @@ diff -crB openwsn/openserial.c ../../../sys/net/openwsn/openserial.c
 ! #include "openbridge.h"
 ! #include "leds.h"
 ! #include "schedule.h"
-! #include "uart.h"
+! #include "uart_ow.h"
 ! #include "opentimers.h"
 ! #include "openhdlc.h"
 ! 
@@ -38113,9 +38113,9 @@ diff -crB openwsn/spi.h ../../../sys/net/openwsn/spi.h
 ! kick_scheduler_t spi_isr(void);
 ! 
 ! #endif
-diff -crB openwsn/uart.c ../../../sys/net/openwsn/uart.c
-*** openwsn/uart.c	Thu Mar 21 21:36:59 2013
---- ../../../sys/net/openwsn/uart.c	Wed Jan 15 13:48:27 2014
+diff -crB openwsn/uart_ow.c ../../../sys/net/openwsn/uart_ow.c
+*** openwsn/uart_ow.c	Thu Mar 21 21:36:59 2013
+--- ../../../sys/net/openwsn/uart_ow.c	Wed Jan 15 13:48:27 2014
 ***************
 *** 1,94 ****
 ! /**
@@ -38221,7 +38221,7 @@ diff -crB openwsn/uart.c ../../../sys/net/openwsn/uart.c
 ! */
 ! 
 ! #include "msp430f1611.h"
-! #include "uart.h"
+! #include "uart_ow.h"
 ! #include "board_ow.h"
 ! 
 ! //=========================== defines =========================================
@@ -38309,9 +38309,9 @@ diff -crB openwsn/uart.c ../../../sys/net/openwsn/uart.c
 !    return DO_NOT_KICK_SCHEDULER;
   }
 \ No newline at end of file
-diff -crB openwsn/uart.h ../../../sys/net/openwsn/uart.h
-*** openwsn/uart.h	Thu Mar 21 21:36:59 2013
---- ../../../sys/net/openwsn/uart.h	Wed Jan 15 13:48:27 2014
+diff -crB openwsn/uart_ow.h ../../../sys/net/openwsn/uart_ow.h
+*** openwsn/uart_ow.h	Thu Mar 21 21:36:59 2013
+--- ../../../sys/net/openwsn/uart_ow.h	Wed Jan 15 13:48:27 2014
 ***************
 *** 1,42 ****
 ! /**
