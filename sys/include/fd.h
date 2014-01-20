@@ -23,6 +23,7 @@
 #define FD_H
 #include <stdlib.h>
 #include <sys/types.h>
+#include "cpu.h"
 
 /**
  * File descriptor table.
