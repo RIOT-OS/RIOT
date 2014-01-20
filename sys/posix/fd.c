@@ -17,7 +17,7 @@
 
 #include "fd.h"
 
-#if BOARD == MSB-430
+#ifdef CPU_MSP430
 #define FD_MAX 5
 #else
 #define FD_MAX 15
