@@ -113,13 +113,14 @@ int thread_measure_stack_usage(char *stack)
 {
     unsigned int *stackp = (unsigned int *)stack;
 
-    /* assumption that the comparison fails before or after end of stack */
+    /* assume that the comparison fails before or after end of stack */
+    /* assume that the stack grows "downwards" */
     while (*stackp == (unsigned int)stackp) {
         stackp++;
     }
 
-    int space = (unsigned int)stackp - (unsigned int)stack;
-    return space;
+    int space_free = (unsigned int)stackp - (unsigned int)stack;
+    return space_free;
 }
 
 int thread_create(char *stack, int stacksize, char priority, int flags, void (*function)(void), const char *name)
