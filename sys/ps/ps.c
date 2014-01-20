@@ -53,7 +53,7 @@ void thread_print_all(void)
             int statebit = number_of_highest_bit(state >> 1);               // get state index
             const char *sname = state_names[statebit];                      // get state name
             const char *queued = queued_name + (state & BIT0);              // get queued flag
-            int stacksz = p->stack_size;                                    // get max used stack
+            int stacksz = p->stack_size;                                    // get stack size
             double runtime_ticks = 0 / 0.0;
             int switches = -1;
 #if SCHEDSTATISTICS
@@ -61,7 +61,7 @@ void thread_print_all(void)
             switches = pidlist[i].schedules;
 #endif
             overall_stacksz += stacksz;
-            stacksz -= thread_measure_stack_usage(p->stack_start);
+            stacksz -= thread_measure_stack_free(p->stack_start);
             printf("\t%3u | %-21s| %-8s %.1s | %3i | %5i (%5i) %p | %6.3f%% | ",
                    p->pid, p->name, sname, queued, p->priority, p->stack_size, stacksz, p->stack_start, runtime_ticks);
             printf(" %8u\n", switches);
