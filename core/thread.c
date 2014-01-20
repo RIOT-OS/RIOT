@@ -109,7 +109,7 @@ int thread_wakeup(int pid)
     }
 }
 
-int thread_measure_stack_usage(char *stack)
+int thread_measure_stack_free(char *stack)
 {
     unsigned int *stackp = (unsigned int *)stack;
 

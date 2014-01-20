@@ -98,7 +98,7 @@ int thread_getlastpid(void);
  * @param stack The stack you want to measure. try active_thread->stack_start.
  * @return  The amount of unused space of the thread's stack
  */
-int thread_measure_stack_usage(char *stack);
+int thread_measure_stack_free(char *stack);
 
 /* @} */
 #endif /* __THREAD_H */

@@ -61,7 +61,7 @@ void thread_print_all(void)
             switches = pidlist[i].schedules;
 #endif
             overall_stacksz += stacksz;
-            stacksz -= thread_measure_stack_usage(p->stack_start);
+            stacksz -= thread_measure_stack_free(p->stack_start);
             printf("\t%3u | %-21s| %-8s %.1s | %3i | %5i (%5i) %p | %6.3f%% | ",
                    p->pid, p->name, sname, queued, p->priority, p->stack_size, stacksz, p->stack_start, runtime_ticks);
             printf(" %8u\n", switches);
