@@ -3,8 +3,9 @@
 #ifdef __MACH__
 .globl __native_sig_leave_tramp
 __native_sig_leave_tramp:
-    pushf
-    pusha
+    pushl __native_saved_eip
+    pushfl
+    pushal
 
     pushl __native_isr_ctx
     pushl __native_cur_ctx
@@ -14,10 +15,11 @@ __native_sig_leave_tramp:
     call _eINT
 
     movl $0x0, __native_in_isr
-    popa
-    popf
+    popal
+    popfl
 
-    jmp *__native_saved_eip
+    popl __native_saved_eip
+    jmp *-4(%esp)
 #else
 .extern $_native_saved_eip
 .extern $_native_isr_ctx
@@ -27,8 +29,9 @@ __native_sig_leave_tramp:
 .globl _native_sig_leave_tramp
 
 _native_sig_leave_tramp:
-    pushf
-    pusha
+    pushl _native_saved_eip
+    pushfl
+    pushal
 
     pushl _native_isr_ctx
     pushl _native_cur_ctx
@@ -38,8 +41,9 @@ _native_sig_leave_tramp:
     call eINT
 
     movl $0x0, _native_in_isr
-    popa
-    popf
+    popal
+    popfl
 
-    jmp *_native_saved_eip
+    popl _native_saved_eip
+    jmp *-4(%esp)
 #endif
