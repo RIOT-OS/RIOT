@@ -770,7 +770,7 @@ int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags)
                 }
                 else {
                     memcpy(&send_buffer[IPV6_HDR_LEN + TCP_HDR_LEN],
-                           buf + total_sent_bytes, len - total_sent_bytes);
+                           (uint8_t *) buf + total_sent_bytes, len - total_sent_bytes);
                     sent_bytes = len - total_sent_bytes;
                     total_sent_bytes = len;
                 }
@@ -785,7 +785,7 @@ int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags)
                 }
                 else {
                     memcpy(&send_buffer[IPV6_HDR_LEN + TCP_HDR_LEN],
-                           buf + total_sent_bytes, len - total_sent_bytes);
+                           (uint8_t *) buf + total_sent_bytes, len - total_sent_bytes);
                     sent_bytes = len - total_sent_bytes;
                     total_sent_bytes = len;
                 }

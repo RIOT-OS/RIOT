@@ -10,15 +10,15 @@
 #include "demo.h"
 
 const shell_command_t shell_commands[] = {
-    {"init", "Initialize network", init},
-    {"set", "Set ID", set_id},
-    {"table", "", table},
-    {"dodag", "", dodag},
-    {"loop", "", loop},
+    {"init", "Initialize network", rpl_udp_init},
+    {"set", "Set ID", rpl_udp_set_id},
+    {"table", "Shows the routing table", rpl_udp_table},
+    {"dodag", "Shows the dodag", rpl_udp_dodag},
+    {"loop", "", rpl_udp_loop},
     {"server", "Starts a UDP server", udp_server},
     {"send", "Send a UDP datagram", udp_send},
-    {"ip", "Print all assigned IP addresses", ip},
-    {"ign", "ignore node", ignore},
+    {"ip", "Print all assigned IP addresses", rpl_udp_ip},
+    {"ign", "ignore node", rpl_udp_ignore},
     {NULL, NULL, NULL}
 };
 

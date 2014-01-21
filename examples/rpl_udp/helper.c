@@ -20,13 +20,13 @@ extern uint8_t ipv6_ext_hdr_len;
 msg_t msg_q[RCV_BUFFER_SIZE];
 
 /* prints current IPv6 adresses */
-void ip(char *unused)
+void rpl_udp_ip(char *unused)
 {
     (void) unused;
     ipv6_iface_print_addrs();
 }
 
-void set_id(char *id_str)
+void rpl_udp_set_id(char *id_str)
 {
     int res = sscanf(id_str, "set %hu", &id);
 
@@ -40,7 +40,7 @@ void set_id(char *id_str)
     printf("Set node ID to %u\n", id);
 }
 
-void monitor(void)
+void rpl_udp_monitor(void)
 {
     msg_t m;
     radio_packet_t *p;
@@ -70,7 +70,7 @@ void monitor(void)
         }
         else if (m.type == IPV6_PACKET_RECEIVED) {
             ipv6_buf = (ipv6_hdr_t*) m.content.ptr;
-            printf("IPv& datagram received (next header: %02X)", ipv6_buf->nextheader); 
+            printf("IPv6 datagram received (next header: %02X)", ipv6_buf->nextheader);
             printf(" from %s ", ipv6_addr_to_str(addr_str, &ipv6_buf->srcaddr));
             if (ipv6_buf->nextheader == IPV6_PROTO_NUM_ICMPV6) {
                 icmpv6_buf = (icmpv6_hdr_t*) &ipv6_buf[(LL_HDR_LEN + IPV6_HDR_LEN) + ipv6_ext_hdr_len];
@@ -95,7 +95,7 @@ void monitor(void)
 
 transceiver_command_t tcmd;
 
-void ignore(char *addr) {
+void rpl_udp_ignore(char *addr) {
     uint16_t a;
     if (transceiver_pid < 0) {
         puts("Transceiver not runnning.");

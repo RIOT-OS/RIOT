@@ -641,7 +641,7 @@ void check_timeout(void)
 
     while (temp_buf != NULL) {
         if ((timex_uint64(now) - timex_uint64(temp_buf->timestamp)) >= LOWPAN_REAS_BUF_TIMEOUT) {
-            printf("TIMEOUT!cur_time: %lu, temp_buf: %lu\n", timex_uint64(now),
+            printf("TIMEOUT!cur_time: %" PRIu64 ", temp_buf: %" PRIu64 "\n", timex_uint64(now),
                     timex_uint64(temp_buf->timestamp));
             temp_buf = collect_garbage(temp_buf);
         }
