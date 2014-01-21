@@ -108,6 +108,11 @@
 typedef uint16_t transceiver_type_t;
 
 /**
+ * @brief Data type to represent the transceiver's EUI-64.
+ */
+typedef uint64_t transceiver_eui64_t;
+
+/**
  * @brief Message types for transceiver interface
  */
 enum transceiver_msg_type_t {
@@ -129,6 +134,8 @@ enum transceiver_msg_type_t {
     SET_CHANNEL,    ///< Set a new channel
     GET_ADDRESS,    ///< Get the radio address
     SET_ADDRESS,    ///< Set the radio address
+    GET_LONG_ADDR,  ///< Get the long radio address, if existing
+    SET_LONG_ADDR,  ///< Set the long radio address, if supported by hardware
     SET_MONITOR,    ///< Set transceiver to monitor mode (disable address checking)
     GET_PAN,        ///< Get current pan
     SET_PAN,        ///< Set a new pan
