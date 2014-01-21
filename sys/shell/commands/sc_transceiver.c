@@ -81,6 +81,36 @@ void _transceiver_get_set_address_handler(int argc, char **argv)
 }
 
 /* checked for type safety */
+void _transceiver_get_set_long_addr_handler(int argc, char **argv)
+{
+    msg_t mesg;
+    transceiver_command_t tcmd;
+    transceiver_eui64_t a;
+
+    if (transceiver_pid < 0) {
+        puts("Transceiver not initialized");
+        return;
+    }
+
+    tcmd.transceivers = _TC_TYPE;
+    tcmd.data = &a;
+    mesg.content.ptr = (char *) &tcmd;
+
+    if (argc > 1) {
+        a = atoll(argv[1]);
+        printf("[transceiver] trying to set EUI-64 %016"PRIx64"\n", a);
+        mesg.type = SET_LONG_ADDR;
+    }
+    else {
+        mesg.type = GET_LONG_ADDR;
+    }
+
+    msg_send_receive(&mesg, &mesg, transceiver_pid);
+    printf("[transceiver] got EUI-64: %016"PRIx64"\n", a);
+}
+
+
+/* checked for type safety */
 void _transceiver_get_set_channel_handler(int argc, char **argv)
 {
     msg_t mesg;
