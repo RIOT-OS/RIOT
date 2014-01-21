@@ -24,7 +24,7 @@
 #ifndef _SYS_SOCKET_H
 #define _SYS_SOCKET_H
 
-#if BOARD == NATIVE
+#ifdef CPU_NATIVE
 /* Ignore Linux definitions in native */
 #define _BITS_SOCKADDR_H	1
 #define	__SOCKADDR_COMMON(sa_prefix) \
@@ -34,6 +34,8 @@
 #endif
 
 #include <sys/types.h>
+
+#include "cpu.h"
 
 #include "destiny/socket.h"
 
