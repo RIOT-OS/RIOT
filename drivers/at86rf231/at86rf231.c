@@ -29,6 +29,24 @@ void at86rf231_init(int tpid)
     // TODO : Enable addr decode, auto ack, auto crc
     // and configure security, power, channel, pan
 
+    radio_pan = 0;
+    radio_pan = 0x00FF & (uint16_t)at86rf231_reg_read(AT86RF231_REG__PAN_ID_0);
+    radio_pan |= (uint16_t)at86rf231_reg_read(AT86RF231_REG__PAN_ID_1) << 8;
+
+    radio_channel = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA) & AT86RF231_PHY_CC_CCA_MASK__CHANNEL;
+
+    radio_address = 0x00FF & (uint16_t)at86rf231_reg_read(AT86RF231_REG__SHORT_ADDR_0);
+    radio_address |= at86rf231_reg_read(AT86RF231_REG__SHORT_ADDR_1) << 8;
+
+    radio_address_long = 0x00000000000000FF & (uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_0);
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 8;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 16;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 24;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 32;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 40;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 48;
+    radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 56;
+
     at86rf231_switch_to_rx();
 }
 
