@@ -30,8 +30,8 @@
 #define __MSP430F1611__
 #endif
 
-//MSB430 core
-#define MSP430_INITIAL_CPU_SPEED    8000000uL
+//TelosB core
+#define MSP430_INITIAL_CPU_SPEED    2457600uL
 #define F_CPU                       MSP430_INITIAL_CPU_SPEED
 #define F_RC_OSCILLATOR             32768
 #define MSP430_HAS_DCOR             0
