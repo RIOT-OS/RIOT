@@ -58,7 +58,8 @@ extern void _reset_current_handler(char *unused);
 #define _TC_MON
 #define _TC_SEND
 #endif
-#if (defined(MODULE_CC2420) || defined(MODULE_NATIVENET))
+#if (defined(MODULE_CC2420) || defined(MODULE_AT86RF231) || defined(MODULE_NATIVENET))
+#define _TC_LONG_ADDR
 #define _TC_PAN
 #endif
 #else /* WITHOUT MODULE_TRANSCEIVER */
@@ -71,6 +72,9 @@ extern void _cc110x_get_set_channel_handler(char *addr);
 #ifdef MODULE_TRANSCEIVER
 #ifdef _TC_ADDR
 extern void _transceiver_get_set_address_handler(char *addr);
+#endif
+#ifdef _TC_LONG_ADDR
+extern void _transceiver_get_set_long_addr_handler(char *addr);
 #endif
 #ifdef _TC_CHAN
 extern void _transceiver_get_set_channel_handler(char *chan);
@@ -128,6 +132,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_TRANSCEIVER
 #ifdef _TC_ADDR
     {"addr", "Gets or sets the address for the transceiver", _transceiver_get_set_address_handler},
+#endif
+#ifdef _TC_LONG_ADDR
+    {"eui64", "Gets or sets the EUI-64 for the transceiver", _transceiver_get_set_long_addr_handler},
 #endif
 #ifdef _TC_CHAN
     {"chan", "Gets or sets the channel for the transceiver", _transceiver_get_set_channel_handler},

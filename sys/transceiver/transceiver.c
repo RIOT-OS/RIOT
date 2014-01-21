@@ -128,6 +128,9 @@ static int32_t get_channel(transceiver_type_t t);
 static int32_t set_channel(transceiver_type_t t, void *channel);
 static radio_address_t get_address(transceiver_type_t t);
 static radio_address_t set_address(transceiver_type_t t, void *address);
+static transceiver_eui64_t get_long_addr(transceiver_type_t t);
+static transceiver_eui64_t set_long_addr(transceiver_type_t t,
+        void *address);
 static int32_t get_pan(transceiver_type_t t);
 static int32_t set_pan(transceiver_type_t t, void *pan);
 
@@ -304,6 +307,14 @@ void run(void)
 
             case SET_ADDRESS:
                 *((radio_address_t *) cmd->data) = set_address(cmd->transceivers, cmd->data);
+
+            case GET_LONG_ADDR:
+                *((transceiver_eui64_t *) cmd->data) = get_long_addr(cmd->transceivers);
+                msg_reply(&m, &m);
+                break;
+
+            case SET_LONG_ADDR:
+                *((transceiver_eui64_t *) cmd->data) = set_long_addr(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;
 
@@ -1069,6 +1080,62 @@ static radio_address_t set_address(transceiver_type_t t, void *address)
 
         default:
             return 0; /* XXX see TODO above */
+    }
+}
+
+/*
+ * @brief Get the current long address of transceiver device
+ *
+ * @param t     The transceiver device
+ *
+ * @return  The configured long address of the device, 0 on error
+ */
+static transceiver_eui64_t get_long_addr(transceiver_type_t t)
+{
+    switch (t) {
+#ifdef MODULE_CC2420
+
+        case TRANSCEIVER_CC2420:
+            return cc2420_get_address_long();
+#endif
+#ifdef MODULE_AT86RF231
+
+        case TRANSCEIVER_AT86RF231:
+            return at86rf231_get_address_long();
+#endif
+
+        default:
+            return 0;
+    }
+}
+
+/*
+ * @brief Set the long address of the transceiver device
+ *
+ * @param t         The transceiver device
+ * @param address   Generic pointer to the long address to set
+ *
+ * @return  The new long radio address of the device, 0 on error
+ */
+static transceiver_eui64_t set_long_addr(transceiver_type_t t, void *address)
+{
+    uint64_t addr = *((uint64_t *)address);
+
+    switch (t) {
+#ifdef MODULE_CC2420
+
+        case TRANSCEIVER_CC2420:
+            return cc2420_set_address_long(addr);
+#endif
+#ifdef MODULE_AT86RF231
+
+        case TRANSCEIVER_AT86RF231:
+            return at86rf231_set_address_long(addr);
+#endif
+
+        default:
+            (void) addr;
+            return 0;
     }
 }
 
