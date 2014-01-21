@@ -13,5 +13,7 @@ clean:
 	fi 
 
 doc:
-	make -BC doc/doxygen	
+	"$(MAKE)" -BC doc/doxygen
 
+docclean:
+	"$(MAKE)" -BC doc/doxygen clean
