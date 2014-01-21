@@ -57,8 +57,6 @@ char __isr_stack[SIGSTKSZ];
 ucontext_t native_isr_context;
 ucontext_t *_native_cur_ctx, *_native_isr_ctx;
 
-int *process_heap_address;
-
 volatile unsigned int _native_saved_eip;
 volatile int _native_sigpend;
 int _sig_pipefd[2];
@@ -318,32 +316,20 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
 
     if (_native_in_syscall == 0) {
         DEBUG("\n\n\t\treturn to _native_sig_leave_tramp\n\n");
-#ifdef __MACH__
+        /* disable interrupts in context */
         isr_set_sigmask((ucontext_t *)context);
         _native_in_isr = 1;
+#ifdef __MACH__
         _native_saved_eip = ((ucontext_t *)context)->uc_mcontext->__ss.__eip;
         ((ucontext_t *)context)->uc_mcontext->__ss.__eip = (unsigned int)&_native_sig_leave_tramp;
 #elif BSD
-        _native_in_isr = 1;
         _native_saved_eip = ((struct sigcontext *)context)->sc_eip;
         ((struct sigcontext *)context)->sc_eip = (unsigned int)&_native_sig_leave_tramp;
 #else
-        if (
-                ((void*)(((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP]))
-                > ((void*)process_heap_address)
-           ) {
-            //printf("\n\033[36mEIP:\t%p\nHEAP:\t%p\nnot switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP], (void*)process_heap_address);
-        }
-        else {
-            /* disable interrupts in context */
-            isr_set_sigmask((ucontext_t *)context);
-            _native_in_isr = 1;
-            //printf("\n\033[31mEIP:\t%p\nHEAP:\t%p\ngo switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP], (void*)process_heap_address);
-            _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP];
-            ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
-        }
+        //printf("\n\033[31mEIP:\t%p\ngo switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP]);
+        _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP];
+        ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
 #endif
-        // TODO: change sigmask?
     }
     else {
         DEBUG("\n\n\t\treturn to syscall\n\n");
@@ -445,12 +431,6 @@ void native_interrupt_init(void)
 {
     struct sigaction sa;
     DEBUG("XXX: native_interrupt_init()\n");
-
-    process_heap_address = malloc(sizeof(int));
-    if (process_heap_address == NULL) {
-        err(EXIT_FAILURE, "native_interrupt_init: malloc");
-    }
-    free(process_heap_address);
 
     VALGRIND_STACK_REGISTER(__isr_stack, __isr_stack + sizeof(__isr_stack));
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", __isr_stack, (void*)((int)__isr_stack + sizeof(__isr_stack)));
