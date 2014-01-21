@@ -3,7 +3,7 @@ simple appserver (all in one shell)
 
 0. create tap devices: *./cpu/native/tapsetup.sh create 3*
 1. build ccn-lite-client: *CFLAGS="-DHAVE_VALGRIND_VALGRIND_H" make -B clean all*
-2. start: *./bin/ccn-lite-client.elf tap0* (valgrind support included)
+2. start: *./bin/native/ccn-lite-client.elf tap0* (valgrind support included)
 3. start ccn thread: *ccn* [enter] (this starts the ccn relay network stack)
 4. start appserver thread: *appserver* [enter] (this starts the userland appserver, which registers for "/riot/appserver/"
 5. request content: *interest /riot/appserver/test* [enter] (ask the relay for this "file", userland code splits this up in
@@ -19,7 +19,7 @@ SHELL 1                                                                        |
 --------------------------------------------------------------------------------------------------------------
 0. create tap devices: *./cpu/native/tapsetup.sh create 3*                     |
 1. build ccn-lite-client: *make -B clean all*                                  | build ccn-lite: *make clean all*
-2. start: *./bin/ccn-lite-client.elf tap0*                                     | start: *./bin/ccn-lite-relay.elf tap1*
+2. start: *./bin/native/ccn-lite-client.elf tap0*                              | start: *./bin/ccn-lite-relay.elf tap1*
 3. start ccn thread: *ccn* [enter]                                             | [it starts ccn automaticly]
 4. set address: *addr 1* [enter]                                               | [it picks address 42 automaticly]
 5. register prefix the ccn-lite stack: *prefix /riot/ newTRANSface 42* [enter] | [it populates the cache automaticly]
@@ -29,27 +29,27 @@ SHELL 1                                                                        |
 advanced forward (needs three [four] shells)
 ====================================================
 
-SHELL 1                                                                     | SHELL 2                                    | SHELL 3                               | SHELL 4 (currently a bug in the native port on heavy traffic)
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-0. create tap devices: *./cpu/native/tapsetup.sh create 3*                  |                                            |                                       |
-1. build ccn-lite-client: *make -B clean all*                               |                                            | build ccn-lite: make clean all        | ping -Itapbr0 8.8.8.8
-2. start: *./bin/ccn-lite-client.elf tap0*                                  | start: *./bin/ccn-lite-client.elf tap1*    | start: ./bin/ccn-lite-relay.elf tap2  |
-3. start ccn thread: *ccn* [enter]                                          | start ccn thread: *ccn* [enter]            | [it starts ccn automaticly]           |
-4. set address: *addr 1* [enter]                                            | set address: *addr 2* [enter]              | [it picks address 42 automaticly]     |
-5. *prefix /riot/ newTRANSface 2* [enter]                                   | *prefix /riot/ newTRANSface 42* [enter]    | [it populates the cache automaticly]  |
-6. request content: *interest /riot/text* [enter]                           |                                            |                                       |
+SHELL 1                                                                     | SHELL 2                                    | SHELL 3                               
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+0. create tap devices: *./cpu/native/tapsetup.sh create 3*                  |                                            |
+1. build ccn-lite-client: *make -B clean all*                               |                                            | build ccn-lite: make clean all
+2. start: *./bin/native/ccn-lite-client.elf tap0*                           | start: *./bin/native/ccn-lite-client.elf tap1*  | start: ./bin/ccn-lite-relay.elf tap2
+3. start ccn thread: *ccn* [enter]                                          | start ccn thread: *ccn* [enter]            | [it starts ccn automaticly]
+4. set address: *addr 1* [enter]                                            | set address: *addr 2* [enter]              | [it picks address 42 automaticly]
+5. *prefix /riot/ newTRANSface 2* [enter]                                   | *prefix /riot/ newTRANSface 42* [enter]    | [it populates the cache automaticly]
+6. request content: *interest /riot/text* [enter]                           |                                            |
 
 
 overdosed forward (needs three [four] shells)
 ====================================================
 
-SHELL 1                                                                     | SHELL 2                                 | SHELL 3                                 | SHELL 4
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-0. create tap devices: *./cpu/native/tapsetup.sh create 3*                  |                                         |                                         |
-1. build ccn-lite-client: *make -B clean all*                               |                                         |                                         | ping -Itapbr0 8.8.8.8
-2. start: *./bin/ccn-lite-client.elf tap0*                                  | start: *./bin/ccn-lite-client.elf tap1* | start: *./bin/ccn-lite-client.elf tap2* |
-3. start ccn thread: *ccn* [enter]                                          | start ccn thread: *ccn* [enter]         | start ccn thread: *ccn* [enter]         |
-4. set address: *addr 1* [enter]                                            | set address: *addr 2* [enter]           | set address: *addr 3* [enter]           |
-5.                                                                          |                                         | start appserver: *appserver* [enter]    |
-6. *prefix /riot/ newTRANSface 2* [enter]                                   | *prefix /riot/ newTRANSface 3* [enter]  |                                         |
-7. request content: *interest /riot/appserver/test* [enter]                 |                                         |                                         |
+SHELL 1                                                                     | SHELL 2                                 | SHELL 3
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+0. create tap devices: *./cpu/native/tapsetup.sh create 3*                  |                                         |
+1. build ccn-lite-client: *make -B clean all*                               |                                         |
+2. start: *./bin/native/ccn-lite-client.elf tap0*                           | start: *./bin/native/ccn-lite-client.elf tap1* | start: *./bin/native/ccn-lite-client.elf tap2*
+3. start ccn thread: *ccn* [enter]                                          | start ccn thread: *ccn* [enter]         | start ccn thread: *ccn* [enter]
+4. set address: *addr 1* [enter]                                            | set address: *addr 2* [enter]           | set address: *addr 3* [enter]
+5.                                                                          |                                         | start appserver: *appserver* [enter]
+6. *prefix /riot/ newTRANSface 2* [enter]                                   | *prefix /riot/ newTRANSface 3* [enter]  |
+7. request content: *interest /riot/appserver/test* [enter]                 |                                         |
