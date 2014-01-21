@@ -50,7 +50,7 @@ export QUIET ?= 1
 #USEMODULE += cc110x
 #USEMODULE += fat
 
-export INCLUDES = -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/core/include -I$(RIOTCPU)/$(CPU)/include -I$(RIOTBASE)/sys/lib -I$(RIOTBASE)/sys/include/ -I$(RIOTBASE)/drivers/include/
+#export INCLUDES += -Iproject_include
 
 # Specify custom dependencies for your project here ...
 # export PROJDEPS = proj_data.h
