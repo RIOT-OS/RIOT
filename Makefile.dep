@@ -43,6 +43,8 @@ endif
 ifneq (,$(findstring cc2420,$(USEMODULE)))
 	ifeq (,$(findstring transceiver,$(USEMODULE)))
 		USEMODULE += transceiver
+	endif
+	ifeq (,$(findstring ieee802154,$(USEMODULE)))
 		USEMODULE += ieee802154
 	endif
 endif
@@ -50,6 +52,8 @@ endif
 ifneq (,$(findstring at86rf231,$(USEMODULE)))
 	ifeq (,$(findstring transceiver,$(USEMODULE)))
 		USEMODULE += transceiver
+	endif
+	ifeq (,$(findstring ieee802154,$(USEMODULE)))
 		USEMODULE += ieee802154
 	endif
 	ifeq (,$(findstring vtimer, $(USEMODULE)))
