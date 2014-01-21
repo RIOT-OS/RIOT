@@ -319,6 +319,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     if (_native_in_syscall == 0) {
         DEBUG("\n\n\t\treturn to _native_sig_leave_tramp\n\n");
 #ifdef __MACH__
+        isr_set_sigmask((ucontext_t *)context);
         _native_in_isr = 1;
         _native_saved_eip = ((ucontext_t *)context)->uc_mcontext->__ss.__eip;
         ((ucontext_t *)context)->uc_mcontext->__ss.__eip = (unsigned int)&_native_sig_leave_tramp;
