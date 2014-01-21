@@ -42,6 +42,7 @@ and the mailinglist (subscription via web site)
  */
 #include <string.h>
 #include "board.h"
+#include "msba2_common.h"
 #include "lpc23xx.h"
 #include "cpu.h"
 #include "config.h"
@@ -64,14 +65,6 @@ init_mam(void)
     MAMCR  = 0x0002;
 }
 /*---------------------------------------------------------------------------*/
-static inline void
-pllfeed(void)
-{
-    PLLFEED = 0xAA;
-    PLLFEED = 0x55;
-}
-
-
 void init_clks2(void)
 {
     // Wait for the PLL to lock to set frequency

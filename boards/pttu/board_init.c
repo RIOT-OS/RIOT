@@ -1,56 +1,73 @@
-/******************************************************************************
-Copyright 2008-2009, Freie Universitaet Berlin (FUB). All rights reserved.
-
-These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
--------------------------------------------------------------------------------
-This file is part of FeuerWare.
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-FeuerWare is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see http://www.gnu.org/licenses/ .
---------------------------------------------------------------------------------
-For further information and questions please use the web site
-	http://scatterweb.mi.fu-berlin.de
-and the mailinglist (subscription via web site)
-	scatterweb@lists.spline.inf.fu-berlin.de
-*******************************************************************************/
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
 
 /**
- * @ingroup	pttu
+ * @ingroup pttu
  * @{
  */
 
 /**
  * @file
- * @brief 		PTTU board initialization
+ * @brief   PTTU board initialization
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
- * @author		Heiko Will
- * @author		Kaspar Schleiser
+ * @author  Heiko Will
+ * @author  Kaspar Schleiser
  *
  */
 #include "board.h"
+#include "msba2_common.h"
 #include "VIC.h"
 #include "cpu.h"
 
 #define PCRTC         BIT9
 #define CL_CPU_DIV    4
 
+/*---------------------------------------------------------------------------*/
+void init_clks1(void)
+{
+	// Disconnect PLL
+	PLLCON &= ~0x0002;
+	pllfeed();
+	while (PLLSTAT & BIT25);			// wait until PLL is disconnected before disabling - deadlock otherwise
+
+	// Disable PLL
+	PLLCON &= ~0x0001;
+	pllfeed();
+	while (PLLSTAT & BIT24);			// wait until PLL is disabled
+
+	SCS |= 0x20;						// Enable main OSC
+	while( !(SCS & 0x40) );				// Wait until main OSC is usable
+
+	/* select main OSC, 16MHz, as the PLL clock source */
+	CLKSRCSEL = 0x0001;
+
+	// Setting Multiplier and Divider values
+  	PLLCFG = 0x0008;					// M=9 N=1 Fcco = 288 MHz
+  	pllfeed();
+
+	// Enabling the PLL */
+	PLLCON = 0x0001;
+	pllfeed();
+
+	/* Set clock divider to 4 (value+1) */
+	CCLKCFG = CL_CPU_DIV - 1;			// Fcpu = 72 MHz
+
+#if USE_USB
+	USBCLKCFG = USBCLKDivValue;		/* usbclk = 288 MHz/6 = 48 MHz */
+#endif
+}
+
 void bl_init_ports(void)
 {
-    SCS |= BIT0;											// Set IO Ports to fast switching mode
+    SCS |= BIT0;                                            // Set IO Ports to fast switching mode
 
     /* UART0 */
-    PINSEL0 |= BIT4 + BIT6;									// RxD0 and TxD0
+    PINSEL0 |= BIT4 + BIT6;                                 // RxD0 and TxD0
     PINSEL0 &= ~(BIT5 + BIT7);
 
     /*Turn Board on*/
@@ -94,24 +111,24 @@ void bl_init_ports(void)
     PINSEL9 |= BIT24 + BIT25 + BIT26 + BIT27; //4.28 & 4.29 as Uart3
 
     // Nanotron
-    FIO2DIR &= ~BIT8;	// nanotron uC IRQ as input
-    FIO1DIR |= BIT15;	// nanotron power on reset
-    FIO1DIR &= ~BIT14;	// nanotron uC RESET as input
-    FIO1DIR &= ~BIT10;	// nanotron uC Vcc as input
-    FIO1DIR |= BIT9;	// nanotron ENABLE as output
-    FIO1DIR &= ~BIT4;	// nanotron Rx/Tx as input
+    FIO2DIR &= ~BIT8;   // nanotron uC IRQ as input
+    FIO1DIR |= BIT15;   // nanotron power on reset
+    FIO1DIR &= ~BIT14;  // nanotron uC RESET as input
+    FIO1DIR &= ~BIT10;  // nanotron uC Vcc as input
+    FIO1DIR |= BIT9;    // nanotron ENABLE as output
+    FIO1DIR &= ~BIT4;   // nanotron Rx/Tx as input
 
     FIO1CLR = BIT15;
-    FIO1CLR = BIT9;		// Enable power
+    FIO1CLR = BIT9;     // Enable power
 
     PINMODE1 |= BIT1;   // No Pullup for CS
     FIO0DIR |= BIT16;   // CS as output
-    FIO0SET = BIT16;	// drive cs inactive
+    FIO0SET = BIT16;    // drive cs inactive
     FIO0DIR |= BIT18 + BIT15;   // SPi Output
 
     // RFID
     FIO1DIR |= BIT1;    // RFID Power
-    FIO1CLR = BIT1;		//
+    FIO1CLR = BIT1;     //
 
     FIO0DIR |= BIT1;    // RFID Reset
     FIO0SET = BIT1;     // Hold in Reset
