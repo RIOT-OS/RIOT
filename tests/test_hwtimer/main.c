@@ -17,7 +17,7 @@ int main(void)
     puts("Initializing hwtimer [OK].");
 
 #define BASE_DELAY (1000UL * 1000UL)
-#define DELTA_DELAY (100UL * 1000UL)
+#define DELTA_DELAY (1000UL * 1000UL)
 #define MSGLEN 12 // == strlen("callback %2i")
     char msg[MSGLEN * ARCH_MAXTIMERS]; // == [callback  1\0callback  2\0...]
     unsigned long delay = BASE_DELAY + ((ARCH_MAXTIMERS-1) * DELTA_DELAY);
