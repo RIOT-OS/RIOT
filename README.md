@@ -59,7 +59,7 @@ To create a bridge and two (or count at your option) tap interfaces:
 ./tapsetup.sh create [count]
 
 ### EXAMPLE APPLICATIONS
-In the `examples` folder you can find some example applications. The `default` application demonstrates all available features for the current platform.
+In the `examples` directory you can find some example applications. The `default` application demonstrates all available features for the current platform.
 
 For example, you can use it to the test the native networking by running the `bin/default-native.elf` twice with two different tap interfaces as parameters, e.g. tap0 and tap1. Now configure two different addresses for both RIOT instances by typing `addr 1` and `addr 2`accordingly and send a text message from one "node" to another by typing `txtsnd 2 hello` on the first "node".
 

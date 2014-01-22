@@ -56,7 +56,7 @@ Further Changes
   the RIOT repository itself
 * full refactoring of the network stack and introducing a substructure
   according to the modules' functionalities
-* cleaned up Makefile system and simplified binary folder
+* cleaned up Makefile system and simplified binary directory
 * more documentation
 * various bug fixes and cleanups
 
