@@ -159,6 +159,7 @@ void schedule_timer(void)
 
     int retval = timeval_subtract(&result.it_value, &native_hwtimer[next_timer].it_value, &now);
     if (retval || (tv2ticks(&result.it_value) < HWTIMERMINOFFSET)) {
+        DEBUG("schedule_timer(): schduling interrupt for expired timer (%i).\n", next_timer);
         /* the timeout has happened already, schedule an interrupt */
         int sig = SIGALRM;
         if (real_write(_sig_pipefd[1], &sig, sizeof(int)) == -1) {
@@ -287,8 +288,10 @@ unsigned long hwtimer_arch_now(void)
 
     native_hwtimer_now = ts2ticks(&t) - time_null;
 
-    DEBUG("hwtimer_arch_now(): it is now %lu s %lu ns\n",
-            (unsigned long)t.tv_sec, (unsigned long)t.tv_nsec);
+    struct timeval tv;
+    ticks2tv(native_hwtimer_now, &tv);
+    DEBUG("hwtimer_arch_now(): it is now %lu s %lu us\n",
+            (unsigned long)tv.tv_sec, (unsigned long)tv.tv_usec);
     DEBUG("hwtimer_arch_now(): returning %lu\n", native_hwtimer_now);
     return native_hwtimer_now;
 }
