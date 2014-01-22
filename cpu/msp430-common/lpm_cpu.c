@@ -1,5 +1,7 @@
 #include <stdio.h>
-#include <intrinsics.h>   // MSP430-gcc compiler instrinsics
+#if (__GNUC__ >= 4) && (__GNUC_MINOR__ > 5)
+    #include <intrinsics.h>   // MSP430-gcc compiler instrinsics
+#endif
 
 #include "board.h"
 #include <msp430.h>
