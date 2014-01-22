@@ -42,7 +42,7 @@ void board_init(void);
 char *thread_stack_init(void  (*task_func)(void), void *stack_start, int stack_size);
 
 /**
- * @brief  Removes thread from scheduler and set status to STATUS_STOPPED
+ * @brief  Removes thread from scheduler and set status to #STATUS_STOPPED
  */
 void sched_task_exit(void);
 
