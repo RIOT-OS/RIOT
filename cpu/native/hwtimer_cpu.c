@@ -159,14 +159,9 @@ void schedule_timer(void)
 
     int retval = timeval_subtract(&result.it_value, &native_hwtimer[next_timer].it_value, &now);
     if (retval || (tv2ticks(&result.it_value) < HWTIMERMINOFFSET)) {
-        DEBUG("schedule_timer(): schduling interrupt for expired timer (%i).\n", next_timer);
-        /* the timeout has happened already, schedule an interrupt */
-        int sig = SIGALRM;
-        if (real_write(_sig_pipefd[1], &sig, sizeof(int)) == -1) {
-            err(EXIT_FAILURE, "schedule_timer(): real_write()");
-        }
-        _native_sigpend++;
-        return;
+        DEBUG("\033[31mschedule_timer(): timer is already due (%i), mitigating.\033[0m\n", next_timer);
+        result.it_value.tv_sec = 0;
+        result.it_value.tv_usec = 1;
     }
 
     if (setitimer(ITIMER_REAL, &result, NULL) == -1) {
