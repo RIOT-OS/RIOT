@@ -195,7 +195,7 @@ void hwtimer_isr_timer()
         int_handler(next_timer);
     }
     else {
-        DEBUG("hwtimer_isr_timer(): this should not have happened");
+        DEBUG("hwtimer_isr_timer(): this should not have happened\n");
     }
 
     schedule_timer();
