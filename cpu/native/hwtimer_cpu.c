@@ -151,6 +151,7 @@ void schedule_timer(void)
 
     /* next pending timer is in slot next_timer */
     struct timeval now;
+    hwtimer_arch_now(); // update timer
     ticks2tv(native_hwtimer_now, &now);
 
     struct itimerval result;
