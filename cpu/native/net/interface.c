@@ -128,7 +128,7 @@ void nativenet_switch_to_rx()
 int _nativenet_register_cb(int event, void (*func)(void))
 {
     if (event > NNEV_MAXEV) {
-        DEBUG("_nativenet_register_cb: event > NNEV_MAXEV");
+        DEBUG("_nativenet_register_cb: event > NNEV_MAXEV\n");
         return -1;
     }
 
@@ -139,7 +139,7 @@ int _nativenet_register_cb(int event, void (*func)(void))
 int _nativenet_unregister_cb(int event)
 {
     if (event > NNEV_MAXEV) {
-        DEBUG("_nativenet_unregister_cb: event > NNEV_MAXEV");
+        DEBUG("_nativenet_unregister_cb: event > NNEV_MAXEV\n");
         return -1;
     }
 
@@ -150,7 +150,7 @@ int _nativenet_unregister_cb(int event)
 void do_cb(int event)
 {
     if (event > NNEV_MAXEV) {
-        DEBUG("do_cb: event > NNEV_MAXEV");
+        DEBUG("do_cb: event > NNEV_MAXEV\n");
         return;
     }
 

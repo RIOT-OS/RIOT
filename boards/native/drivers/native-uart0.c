@@ -241,7 +241,7 @@ void _native_handle_uart0_input()
 
 int _native_set_uart_fds(void)
 {
-    DEBUG("_native_set_uart_fds");
+    DEBUG("_native_set_uart_fds\n");
     FD_SET(STDIN_FILENO, &_native_rfds);
     if (_native_uart_sock == -1) {
         return (STDIN_FILENO);

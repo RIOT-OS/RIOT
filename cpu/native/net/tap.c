@@ -77,7 +77,7 @@ void _native_handle_tap_input(void)
         if (ntohs(frame.field.header.ether_type) == NATIVE_ETH_PROTO) {
             nread = nread - ETHER_HDR_LEN;
             if ((nread - 1) <= 0) {
-                DEBUG("_native_handle_tap_input: no payload");
+                DEBUG("_native_handle_tap_input: no payload\n");
             }
             else {
                 unsigned long t = hwtimer_now();

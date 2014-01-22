@@ -273,7 +273,7 @@ void native_irq_handler()
         }
     }
 
-    DEBUG("native_irq_handler(): return");
+    DEBUG("native_irq_handler(): return\n");
     cpu_switch_context_exit();
 }
 

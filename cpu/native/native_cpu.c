@@ -196,6 +196,6 @@ void native_cpu_init()
     VALGRIND_STACK_REGISTER(__end_stack, __end_stack + sizeof(__end_stack));
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n", __end_stack, (void*)((int)__end_stack + sizeof(__end_stack)));
 
-    DEBUG("RIOT native cpu initialized.");
+    DEBUG("RIOT native cpu initialized.\n");
 }
 /** @} */
