@@ -45,7 +45,7 @@ Its features comprise
 * RPL
  
 ## GETTING STARTED
-* You want to start the RIOT? Just follow our [Getting started documentation](http://riot-os.org/doc/getting_started.html)
+* You want to start the RIOT? Just follow our [Getting started documentation](https://github.com/RIOT-OS/RIOT/wiki/Introduction)
 * The RIOT API itself can be built from the code using doxygen. The latest version is uploaded daily to http://riot-os.org/api.
 
 ### USING THE NATIVE PORT WITH NETWORKING
@@ -59,7 +59,7 @@ To create a bridge and two (or count at your option) tap interfaces:
 ./tapsetup.sh create [count]
 
 ### EXAMPLE APPLICATIONS
-In the `projects` repository you can find some example applications. The `default` application demonstrates all available features for the current platform.
+In the `examples` folder you can find some example applications. The `default` application demonstrates all available features for the current platform.
 
 For example, you can use it to the test the native networking by running the `bin/default-native.elf` twice with two different tap interfaces as parameters, e.g. tap0 and tap1. Now configure two different addresses for both RIOT instances by typing `addr 1` and `addr 2`accordingly and send a text message from one "node" to another by typing `txtsnd 2 hello` on the first "node".
 
