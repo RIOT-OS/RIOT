@@ -262,7 +262,7 @@ int tap_init(char *name)
 
     if (ioctl(_native_tap_fd, TUNSETIFF, (void *)&ifr) == -1) {
         warn("ioctl TUNSETIFF");
-        warnx("probably the tap interface (%s) does not exist or is already taken", name);
+        warnx("probably the tap interface (%s) does not exist or is already in use", name);
         exit(EXIT_FAILURE);
     }
 
