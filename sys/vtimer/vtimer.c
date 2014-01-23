@@ -26,6 +26,7 @@
 #include "timex.h"
 #include "hwtimer.h"
 #include "msg.h"
+#include "mutex.h"
 #include "thread.h"
 #include "queue.h"
 
@@ -176,6 +177,10 @@ void vtimer_callback(void *ptr)
     else if (timer->action == vtimer_tick) {
         vtimer_tick(NULL);
     }
+    else if (timer->action == (void (*)(void *)) mutex_unlock) {
+        mutex_t *mutex = (mutex_t *) timer->arg;
+        timer->action(mutex);
+    }
     else {
         DEBUG("Timer was poisoned.\n");
     }
@@ -317,8 +322,16 @@ int vtimer_sleep(timex_t time)
 {
     int ret;
     vtimer_t t;
-    ret = vtimer_set_wakeup(&t, time, thread_getpid());
-    thread_sleep();
+    mutex_t mutex;
+    mutex_init(&mutex);
+    mutex_lock(&mutex);
+
+    t.action = (void(*)(void *)) mutex_unlock;
+    t.arg = (void *) &mutex;
+    t.absolute = time;
+    
+    ret = vtimer_set(&t);
+    mutex_lock(&mutex);    
     return ret;
 }
 
