@@ -261,10 +261,8 @@ int tap_init(char *name)
     strncpy(ifr.ifr_name, name, IFNAMSIZ);
 
     if (ioctl(_native_tap_fd, TUNSETIFF, (void *)&ifr) == -1) {
-        warn("ioctl");
-        if (close(_native_tap_fd) == -1) {
-            warn("close");
-        }
+        warn("ioctl TUNSETIFF");
+        warnx("probably the tap interface (%s) does not exist or is already in use", name);
         exit(EXIT_FAILURE);
     }
 
@@ -276,7 +274,7 @@ int tap_init(char *name)
     memset (&ifr, 0, sizeof (ifr));
     snprintf (ifr.ifr_name, sizeof (ifr.ifr_name), "%s", name);
     if (ioctl(_native_tap_fd, SIOCGIFHWADDR, &ifr) == -1) {
-        warn("ioctl");
+        warn("ioctl SIOCGIFHWADDR");
         if (close(_native_tap_fd) == -1) {
             warn("close");
         }
