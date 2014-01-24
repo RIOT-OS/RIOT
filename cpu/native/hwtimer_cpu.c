@@ -151,6 +151,7 @@ void schedule_timer(void)
 
     /* next pending timer is in slot next_timer */
     struct timeval now;
+    hwtimer_arch_now(); // update timer
     ticks2tv(native_hwtimer_now, &now);
 
     struct itimerval result;
@@ -158,13 +159,9 @@ void schedule_timer(void)
 
     int retval = timeval_subtract(&result.it_value, &native_hwtimer[next_timer].it_value, &now);
     if (retval || (tv2ticks(&result.it_value) < HWTIMERMINOFFSET)) {
-        /* the timeout has happened already, schedule an interrupt */
-        int sig = SIGALRM;
-        if (real_write(_sig_pipefd[1], &sig, sizeof(int)) == -1) {
-            err(EXIT_FAILURE, "schedule_timer(): real_write()");
-        }
-        _native_sigpend++;
-        return;
+        DEBUG("\033[31mschedule_timer(): timer is already due (%i), mitigating.\033[0m\n", next_timer);
+        result.it_value.tv_sec = 0;
+        result.it_value.tv_usec = 1;
     }
 
     if (setitimer(ITIMER_REAL, &result, NULL) == -1) {
@@ -286,8 +283,10 @@ unsigned long hwtimer_arch_now(void)
 
     native_hwtimer_now = ts2ticks(&t) - time_null;
 
-    DEBUG("hwtimer_arch_now(): it is now %lu s %lu ns\n",
-            (unsigned long)t.tv_sec, (unsigned long)t.tv_nsec);
+    struct timeval tv;
+    ticks2tv(native_hwtimer_now, &tv);
+    DEBUG("hwtimer_arch_now(): it is now %lu s %lu us\n",
+            (unsigned long)tv.tv_sec, (unsigned long)tv.tv_usec);
     DEBUG("hwtimer_arch_now(): returning %lu\n", native_hwtimer_now);
     return native_hwtimer_now;
 }
