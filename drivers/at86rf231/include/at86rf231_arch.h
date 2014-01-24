@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "vtimer.h"
+
 void at86rf231_gpio_spi_interrupts_init(void);
 
 void at86rf231_reset(void);
