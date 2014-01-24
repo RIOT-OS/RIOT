@@ -127,11 +127,10 @@ static int readline(shell_t *shell, char *buf, size_t size)
         c = shell->readchar();
         shell->put_char(c);
 
-        if (c == 13) {
-            continue;
-        }
-
-        if (c == 10) {
+        /* We allow Unix linebreaks (\n), DOS linebreaks (\r\n), and Mac linebreaks (\r). */
+        /* QEMU transmits only a single '\r' == 13 on hitting enter ("-serial stdio"). */
+        /* DOS newlines are handled like hitting enter twice, but handle_input_line() ignores empty lines. */
+        if (c == 10 || c == 13) {
             *line_buf_ptr = '\0';
             return 0;
         }
