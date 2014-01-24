@@ -109,8 +109,8 @@
  * @file        bloom.h
  * @brief       Bloom filter API
  *
- * @autor Christian Mehlis <mehlis@inf.fu-berlin.de>
- * @autor Freie Universität Berlin, Computer Systems & Telematics
+ * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * @author Freie Universität Berlin, Computer Systems & Telematics
  */
 
 #ifndef _BLOOM_FILTER_H

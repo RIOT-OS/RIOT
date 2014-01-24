@@ -8,9 +8,9 @@
  * details.
  *
  * @file
- * @autor Jason Linehan <patientulysses@gmail.com>
- * @autor Christian Mehlis <mehlis@inf.fu-berlin.de>
- * @autor Freie Universität Berlin, Computer Systems & Telematics
+ * @author Jason Linehan <patientulysses@gmail.com>
+ * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * @author Freie Universität Berlin, Computer Systems & Telematics
  *
  */
 
