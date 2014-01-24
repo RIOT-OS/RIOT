@@ -36,23 +36,34 @@
 #include "native_internal.h"
 
 #define ENABLE_DEBUG (0)
+#if ENABLE_DEBUG
+#define LOCAL_DEBUG (1)
+#endif
 #include "debug.h"
 
 extern volatile tcb_t *active_thread;
 
 ssize_t (*real_read)(int fd, void *buf, size_t count);
 ssize_t (*real_write)(int fd, const void *buf, size_t count);
+void* (*real_malloc)(size_t size);
+void (*real_free)(void *ptr);
+void* (*real_calloc)(size_t nmemb, size_t size);
+void* (*real_realloc)(void *ptr, size_t size);
 
 void _native_syscall_enter()
 {
     _native_in_syscall++;
-    DEBUG("> _native_in_syscall: %d\n", _native_in_syscall);
+#if LOCAL_DEBUG
+    real_write(STDERR_FILENO, "> _native_in_syscall\n", 21);
+#endif
 }
 
 void _native_syscall_leave()
 {
+#if LOCAL_DEBUG
+    real_write(STDERR_FILENO, "< _native_in_syscall\n", 21);
+#endif
     _native_in_syscall--;
-    DEBUG("< _native_in_syscall: %d\n", _native_in_syscall);
     if (
             (_native_sigpend > 0)
             && (_native_in_isr == 0)
@@ -70,6 +81,40 @@ void _native_syscall_leave()
             _native_syscall_leave(EXIT_FAILURE, "thread_yield: swapcontext");
         }
     }
+}
+
+void *malloc(size_t size)
+{
+    void *r;
+    _native_syscall_enter();
+    r = real_malloc(size);
+    _native_syscall_leave();
+    return r;
+}
+
+void free(void *ptr)
+{
+    _native_syscall_enter();
+    real_free(ptr);
+    _native_syscall_leave();
+}
+
+void *calloc(size_t nmemb, size_t size)
+{
+    void *r;
+    _native_syscall_enter();
+    r = real_calloc(nmemb, size);
+    _native_syscall_leave();
+    return r;
+}
+
+void *realloc(void *ptr, size_t size)
+{
+    void *r;
+    _native_syscall_enter();
+    r = real_realloc(ptr, size);
+    _native_syscall_leave();
+    return r;
 }
 
 ssize_t read(int fd, void *buf, size_t count)

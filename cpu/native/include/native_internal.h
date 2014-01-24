@@ -32,6 +32,10 @@ void _native_syscall_enter();
  */
 extern ssize_t (*real_read)(int fd, void *buf, size_t count);
 extern ssize_t (*real_write)(int fd, const void *buf, size_t count);
+extern void* (*real_malloc)(size_t size);
+extern void (*real_free)(void *ptr);
+extern void* (*real_calloc)(size_t nmemb, size_t size);
+extern void* (*real_realloc)(void *ptr, size_t size);
 
 /**
  * data structures
