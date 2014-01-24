@@ -40,12 +40,14 @@
 
 #ifdef MODULE_CC2420
 #include "cc2420.h"
+#include "ieee802154_frame.h"
 #endif
 
 #ifdef MODULE_MC1322X
 #include "mc1322x.h"
 #include "maca.h"
 #include "maca_packet.h"
+#include "ieee802154_frame.h"
 #endif
 
 #ifdef MODULE_NATIVENET
@@ -55,10 +57,12 @@
 
 #ifdef MODULE_AT86RF231
 #include "at86rf231.h"
+#include "ieee802154_frame.h"
 #endif
 
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
+#define DEBUG_ENABLED
 #undef TRANSCEIVER_STACK_SIZE
 #define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_PRINTF)
 #endif
@@ -72,7 +76,11 @@ transceiver_type_t transceivers = TRANSCEIVER_NONE;
 registered_t reg[TRANSCEIVER_MAX_REGISTERED];
 
 /* packet buffers */
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+ieee802154_packet_t transceiver_buffer[TRANSCEIVER_BUFFER_SIZE];
+#else
 radio_packet_t transceiver_buffer[TRANSCEIVER_BUFFER_SIZE];
+#endif
 uint8_t data_buffer[TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE];
 
 /* message buffer */
@@ -108,13 +116,13 @@ void cc1100_packet_monitor(void *payload, int payload_size, protocol_t protocol,
 void receive_cc1100_packet(radio_packet_t *trans_p);
 #endif
 #ifdef MODULE_CC2420
-static void receive_cc2420_packet(radio_packet_t *trans_p);
+static void receive_cc2420_packet(ieee802154_packet_t *trans_p);
 #endif
 #ifdef MODULE_NATIVENET
 static void receive_nativenet_packet(radio_packet_t *trans_p);
 #endif
 #ifdef MODULE_AT86RF231
-void receive_at86rf231_packet(radio_packet_t *trans_p);
+void receive_at86rf231_packet(ieee802154_packet_t *trans_p);
 #endif
 static int8_t send_packet(transceiver_type_t t, void *pkt);
 static int32_t get_channel(transceiver_type_t t);
@@ -148,7 +156,7 @@ void transceiver_init(transceiver_type_t t)
     }
 
     /* Initializing transceiver buffer and data buffer */
-    memset(transceiver_buffer, 0, TRANSCEIVER_BUFFER_SIZE * sizeof(radio_packet_t));
+    memset(transceiver_buffer, 0, sizeof(transceiver_buffer));
     memset(data_buffer, 0, TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE);
 #ifdef DBG_IGNORE
     memset(ignored_addr, 0, MAX_IGNORED_ADDR * sizeof(radio_address_t));
@@ -398,46 +406,41 @@ static void receive_packet(uint16_t type, uint8_t pos)
     }
     /* copy packet and handle it */
     else {
-        radio_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
         m.type = PKT_PENDING;
 
         /* pass a null pointer if a packet from a undefined transceiver is
          * received */
         if (type == RCV_PKT_CC1100) {
 #ifdef MODULE_CC110X_NG
+            radio_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_cc110x_packet(trans_p);
 #elif MODULE_CC110X
+            radio_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_cc1100_packet(trans_p);
-#else
-            trans_p = NULL;
 #endif
         }
         else if (type == RCV_PKT_MC1322X) {
 #ifdef MODULE_MC1322X
+            ieee802154_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_mc1322x_packet(trans_p);
-#else
-            trans_p = NULL;
 #endif
         }
         else if (type == RCV_PKT_CC2420) {
 #ifdef MODULE_CC2420
+            ieee802154_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_cc2420_packet(trans_p);
-#else
-            trans_p = NULL;
 #endif
         }
         else if (type == RCV_PKT_AT86RF231) {
 #ifdef MODULE_AT86RF231
+            ieee802154_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_at86rf231_packet(trans_p);
-#else
-            trans_p = NULL;
 #endif
         }
         else if (type == RCV_PKT_NATIVE) {
 #ifdef MODULE_NATIVENET
+            radio_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_nativenet_packet(trans_p);
-#else
-            trans_p = NULL;
 #endif
         }
         else {
@@ -521,21 +524,56 @@ void receive_cc1100_packet(radio_packet_t *trans_p)
 
 
 #ifdef MODULE_CC2420
-void receive_cc2420_packet(radio_packet_t *trans_p)
+void receive_cc2420_packet(ieee802154_packet_t *trans_p)
 {
     DEBUG("transceiver: Handling CC2420 packet\n");
     dINT();
-    cc2420_packet_t p = cc2420_rx_buffer[rx_buffer_pos];
-    trans_p->src = (uint16_t)((p.frame.src_addr[1] << 8) | p.frame.src_addr[0]);
-    trans_p->dst = (uint16_t)((p.frame.dest_addr[1] << 8)| p.frame.dest_addr[0]);
-    trans_p->rssi = p.rssi;
-    trans_p->lqi = p.lqi;
-    trans_p->length = p.frame.payload_len;
-    memcpy((void*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p.frame.payload, CC2420_MAX_DATA_LENGTH);
+    cc2420_packet_t *p = &cc2420_rx_buffer[rx_buffer_pos];
+    trans_p->length = p->length;
+    memcpy(&trans_p->frame, &p->frame, p->length);
+    trans_p->rssi = p->rssi;
+    trans_p->crc = p->crc;
+    trans_p->lqi = p->lqi;
+    memcpy(&data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH],
+           p->frame.payload, p->frame.payload_len);
+    trans_p->frame.payload = (uint8_t *) & (data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH]);
     eINT();
 
-    DEBUG("transceiver: Packet %p was from %u to %u, size: %u\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
-    trans_p->data = (uint8_t*) &(data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH]);
+#ifdef DEBUG_ENABLED
+
+    if (trans_p->frame.fcf.dest_addr_m == IEEE_802154_SHORT_ADDR_M) {
+        if (trans_p->frame.fcf.src_addr_m == IEEE_802154_SHORT_ADDR_M) {
+            DEBUG("Packet %p was from %" PRIu16 " to %" PRIu16 ", size: %u\n", trans_p, *((uint16_t *) &trans_p->frame.src_addr[0]), *((uint16_t *) &trans_p->frame.dest_addr), trans_p->frame.payload_len);
+        }
+        else if (trans_p->frame.fcf.src_addr_m == IEEE_802154_LONG_ADDR_M) {
+            DEBUG("Packet %p was from %016" PRIx64 " to %" PRIu16 ", size: %u\n", trans_p, *((uint64_t *) &trans_p->frame.src_addr[0]), *((uint16_t *) &trans_p->frame.dest_addr), trans_p->frame.payload_len);
+
+        }
+        else {
+            DEBUG("Illegal source address mode: %d\n", trans_p->frame.fcf.src_addr_m);
+            return;
+        }
+    }
+    else if (trans_p->frame.fcf.dest_addr_m == IEEE_802154_LONG_ADDR_M) {
+        if (trans_p->frame.fcf.src_addr_m == IEEE_802154_SHORT_ADDR_M) {
+            DEBUG("Packet %p was from %" PRIu16 " to %016" PRIx64 ", size: %u\n", trans_p, *((uint16_t *) &trans_p->frame.src_addr[0]), *((uint64_t *) &trans_p->frame.dest_addr), trans_p->frame.payload_len);
+        }
+        else if (trans_p->frame.fcf.src_addr_m == IEEE_802154_LONG_ADDR_M) {
+            DEBUG("Packet %p was from %016" PRIx64 " to %016" PRIx64 ", size: %u\n", trans_p, *((uint64_t *) &trans_p->frame.src_addr[0]), *((uint16_t *) &trans_p->frame.dest_addr), trans_p->frame.payload_len);
+
+        }
+        else {
+            DEBUG("Illegal source address mode: %d\n", trans_p->frame.fcf.src_addr_m);
+            return;
+        }
+    }
+    else {
+        DEBUG("Illegal destination address mode: %d\n", trans_p->frame.fcf.src_addr_m);
+        return;
+    }
+#endif
+    trans_p->frame.payload = (uint8_t *) &(data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH]);
+    trans_p->frame.payload_len = p->frame.payload_len;
     DEBUG("transceiver: Content: %s\n", trans_p->data);
 }
 #endif
@@ -580,22 +618,44 @@ void receive_nativenet_packet(radio_packet_t *trans_p)
 #endif
 
 #ifdef MODULE_AT86RF231
-void receive_at86rf231_packet(radio_packet_t *trans_p)
+void receive_at86rf231_packet(ieee802154_packet_t *trans_p)
 {
     DEBUG("Handling AT86RF231 packet\n");
     dINT();
-    at86rf231_packet_t p = at86rf231_rx_buffer[rx_buffer_pos];
-    trans_p->src = (uint16_t)((p.frame.src_addr[1] << 8) | p.frame.src_addr[0]);
-    trans_p->dst = (uint16_t)((p.frame.dest_addr[1] << 8)| p.frame.dest_addr[0]);
-    trans_p->rssi = p.rssi;
-    trans_p->lqi = p.lqi;
-    trans_p->length = p.frame.payload_len;
-    memcpy((void*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p.frame.payload, AT86RF231_MAX_DATA_LENGTH);
+    at86rf231_packet_t *p = &at86rf231_rx_buffer[rx_buffer_pos];
+    trans_p->length = p->length;
+    trans_p->rssi = p->rssi;
+    trans_p->crc = p->crc;
+    trans_p->lqi = p->lqi;
+    memcpy(&trans_p->frame, &p->frame, p->length);
+    memcpy(&data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH], p->frame.payload,
+           p->frame.payload_len);
+    trans_p->frame.payload = (uint8_t *) & (data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH]);
     eINT();
 
-    DEBUG("Packet %p was from %u to %u, size: %u\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
-    trans_p->data = (uint8_t*) &(data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH]);
-    DEBUG("Content: %s\n", trans_p->data);
+#ifdef DEBUG_ENABLED
+
+    if (trans_p->frame.fcf.dest_addr_m == IEEE_802154_SHORT_ADDR_M) {
+        if (trans_p->frame.fcf.src_addr_m == IEEE_802154_SHORT_ADDR_M) {
+            DEBUG("Packet %p was from %" PRIu16 " to %" PRIu16 ", size: %u\n", trans_p, *((uint16_t *) &trans_p->frame.src_addr[0]), *((uint16_t *) &trans_p->frame.dest_addr), trans_p->frame.payload_len);
+        }
+        else {
+            DEBUG("Packet %p was from %016" PRIx64 " to %" PRIu16 ", size: %u\n", trans_p, *((uint64_t *) &trans_p->frame.src_addr[0]), *((uint16_t *) &trans_p->frame.dest_addr), trans_p->frame.payload_len);
+
+        }
+    }
+    else {
+        if (trans_p->frame.fcf.src_addr_m == IEEE_802154_SHORT_ADDR_M) {
+            DEBUG("Packet %p was from %" PRIu16 " to %016" PRIx64 ", size: %u\n", trans_p, *((uint16_t *) &trans_p->frame.src_addr[0]), *((uint64_t *) &trans_p->frame.dest_addr), trans_p->frame.payload_len);
+        }
+        else {
+            DEBUG("Packet %p was from %016" PRIx64 " to %016" PRIx64 ", size: %u\n", trans_p, *((uint64_t *) &trans_p->frame.src_addr[0]), *((uint16_t *) &trans_p->frame.dest_addr), trans_p->frame.payload_len);
+
+        }
+    }
+
+#endif
+    DEBUG("Content: %s\n", trans_p->frame.payload);
 }
 #endif
 /*------------------------------------------------------------------------------------*/
@@ -603,14 +663,29 @@ void receive_at86rf231_packet(radio_packet_t *trans_p)
  * @brief Sends a radio packet to the receiver
  *
  * @param t     The transceiver device
- * @param pkt   Generic pointer to the packet
+ * @param pkt   Generic pointer to the packet (use ieee802154_packet_t for
+ *              AT86RF231, CC2420, and MC1322X)
  *
  * @return A negative value if operation failed, 0 or the number of bytes sent otherwise.
  */
 static int8_t send_packet(transceiver_type_t t, void *pkt)
 {
     int8_t res = -1;
-    radio_packet_t p = *((radio_packet_t *)pkt);
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+    ieee802154_packet_t *p = (ieee802154_packet_t *)pkt;
+    DEBUG("transceiver: Send packet to ");
+#ifdef DEBUG_ENABLED
+
+    for (size_t i = 0; i < 8; i++) {
+        printf("%02x ", p->frame.dest_addr[i]);
+    }
+
+    printf("\n");
+#endif
+#else
+    radio_packet_t *p = (radio_packet_t *)pkt;
+    DEBUG("transceiver: Send packet to %" PRIu16 "\n", p->dst);
+#endif
 
 #ifdef MODULE_CC110X_NG
     cc110x_packet_t cc110x_pkt;
@@ -627,21 +702,19 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
     at86rf231_packet_t at86rf231_pkt;
 #endif
 
-    DEBUG("transceiver: Send packet to %" PRIu16 "\n", p.dst);
-
     switch (t) {
         case TRANSCEIVER_CC1100:
 #ifdef MODULE_CC110X_NG
-            cc110x_pkt.length = p.length + CC1100_HEADER_LENGTH;
-            cc110x_pkt.address = p.dst;
+            cc110x_pkt.length = p->length + CC1100_HEADER_LENGTH;
+            cc110x_pkt.address = p->dst;
             cc110x_pkt.flags = 0;
-            memcpy(cc110x_pkt.data, p.data, p.length);
+            memcpy(cc110x_pkt.data, p->data, p->length);
             res = cc110x_send(&cc110x_pkt);
 #elif MODULE_CC110X
-            memcpy(cc1100_pkt, p.data, p.length);
+            memcpy(cc1100_pkt, p->data, p->length);
 
-            res = cc1100_send_csmaca(p.dst, 4, 0, (char *) cc1100_pkt, p.length);
-            DEBUG("transceiver: snd_ret (%u) = %i\n", p.length, snd_ret);
+            res = cc1100_send_csmaca(p->dst, 4, 0, (char *) cc1100_pkt, p->length);
+            DEBUG("transceiver: snd_ret (%u) = %i\n", p->length, snd_ret);
 #else
             puts("Unknown transceiver");
 #endif
@@ -649,46 +722,31 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
 #ifdef MODULE_CC2420
 
         case TRANSCEIVER_CC2420:
-            cc2420_pkt.frame.payload_len = p.length;
-            cc2420_pkt.frame.dest_addr[1] = (uint8_t)(p.dst >> 8);
-            cc2420_pkt.frame.dest_addr[0] = (uint8_t)(p.dst & 0xFF);
-            cc2420_pkt.frame.dest_pan_id = cc2420_get_pan();
-            cc2420_pkt.frame.fcf.dest_addr_m = 2;
-            cc2420_pkt.frame.fcf.src_addr_m = 2;
-            cc2420_pkt.frame.fcf.ack_req = 0;
-            cc2420_pkt.frame.fcf.sec_enb = 0;
-            cc2420_pkt.frame.fcf.frame_type = 1;
-            cc2420_pkt.frame.fcf.frame_pend = 0;
-            cc2420_pkt.frame.payload = p.data;
+            memcpy(&cc2420_pkt.frame, &p->frame, sizeof(ieee802154_frame_t));
+            cc2420_pkt.length = p->frame.payload_len + IEEE_802154_FCS_LEN;
             res = cc2420_send(&cc2420_pkt);
             break;
 #endif
 #ifdef MODULE_MC1322X
+
         case TRANSCEIVER_MC1322X:
-            maca_pkt->length = p.length;
-            memcpy(maca_pkt->data, p.data, p.length);
+            maca_pkt->length = p->length;
+            memcpy(maca_pkt->data, p->data, p->length);
             maca_set_tx_packet(maca_pkt);
             res = 1;
             break;
 #endif
 #ifdef MODULE_NATIVENET
+
         case TRANSCEIVER_NATIVE:
-            res = nativenet_send(&p);
+            res = nativenet_send(p);
             break;
 #endif
 #ifdef MODULE_AT86RF231
+
         case TRANSCEIVER_AT86RF231:
-            at86rf231_pkt.frame.payload_len = p.length;
-            at86rf231_pkt.frame.dest_addr[1] = (uint8_t)(p.dst >> 8);
-            at86rf231_pkt.frame.dest_addr[0] = (uint8_t)(p.dst & 0xFF);
-            at86rf231_pkt.frame.dest_pan_id = at86rf231_get_pan();
-            at86rf231_pkt.frame.fcf.dest_addr_m = 2;
-            at86rf231_pkt.frame.fcf.src_addr_m = 2;
-            at86rf231_pkt.frame.fcf.ack_req = 0;
-            at86rf231_pkt.frame.fcf.sec_enb = 0;
-            at86rf231_pkt.frame.fcf.frame_type = 1;
-            at86rf231_pkt.frame.fcf.frame_pend = 0;
-            at86rf231_pkt.frame.payload = p.data;
+            memcpy(&at86rf231_pkt.frame, &p->frame, sizeof(ieee802154_frame_t));
+            at86rf231_pkt.length = p->frame.payload_len + IEEE_802154_FCS_LEN;
             res = at86rf231_send(&at86rf231_pkt);
             break;
 #endif
