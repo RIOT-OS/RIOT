@@ -50,13 +50,13 @@ void* (*real_realloc)(void *ptr, size_t size);
 void _native_syscall_enter()
 {
     _native_in_syscall++;
-    DEBUG("> _native_in_syscall: %d\n", _native_in_syscall);
+    //real_write(STDOUT_FILENO, "> _native_in_syscall\n", 21);
 }
 
 void _native_syscall_leave()
 {
+    //real_write(STDOUT_FILENO, "< _native_in_syscall\n", 21);
     _native_in_syscall--;
-    DEBUG("< _native_in_syscall: %d\n", _native_in_syscall);
     if (
             (_native_sigpend > 0)
             && (_native_in_isr == 0)
