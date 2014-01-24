@@ -42,6 +42,10 @@ extern volatile tcb_t *active_thread;
 
 ssize_t (*real_read)(int fd, void *buf, size_t count);
 ssize_t (*real_write)(int fd, const void *buf, size_t count);
+void* (*real_malloc)(size_t size);
+void (*real_free)(void *ptr);
+void* (*real_calloc)(size_t nmemb, size_t size);
+void* (*real_realloc)(void *ptr, size_t size);
 
 void _native_syscall_enter()
 {
@@ -70,6 +74,40 @@ void _native_syscall_leave()
             _native_syscall_leave(EXIT_FAILURE, "thread_yield: swapcontext");
         }
     }
+}
+
+void *malloc(size_t size)
+{
+    void *r;
+    _native_syscall_enter();
+    r = real_malloc(size);
+    _native_syscall_leave();
+    return r;
+}
+
+void free(void *ptr)
+{
+    _native_syscall_enter();
+    real_free(ptr);
+    _native_syscall_leave();
+}
+
+void *calloc(size_t nmemb, size_t size)
+{
+    void *r;
+    _native_syscall_enter();
+    r = real_calloc(nmemb, size);
+    _native_syscall_leave();
+    return r;
+}
+
+void *realloc(void *ptr, size_t size)
+{
+    void *r;
+    _native_syscall_enter();
+    r = real_realloc(ptr, size);
+    _native_syscall_leave();
+    return r;
 }
 
 ssize_t read(int fd, void *buf, size_t count)
