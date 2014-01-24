@@ -10,7 +10,7 @@
 
 /**
  * @file
- * @autor       Jason Linehan <patientulysses@gmail.com>
+ * @author      Jason Linehan <patientulysses@gmail.com>
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
