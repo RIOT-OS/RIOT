@@ -36,6 +36,9 @@
 #include "native_internal.h"
 
 #define ENABLE_DEBUG (0)
+#if ENABLE_DEBUG
+#define LOCAL_DEBUG (1)
+#endif
 #include "debug.h"
 
 extern volatile tcb_t *active_thread;
@@ -50,12 +53,16 @@ void* (*real_realloc)(void *ptr, size_t size);
 void _native_syscall_enter()
 {
     _native_in_syscall++;
-    //real_write(STDOUT_FILENO, "> _native_in_syscall\n", 21);
+#if LOCAL_DEBUG
+    real_write(STDERR_FILENO, "> _native_in_syscall\n", 21);
+#endif
 }
 
 void _native_syscall_leave()
 {
-    //real_write(STDOUT_FILENO, "< _native_in_syscall\n", 21);
+#if LOCAL_DEBUG
+    real_write(STDERR_FILENO, "< _native_in_syscall\n", 21);
+#endif
     _native_in_syscall--;
     if (
             (_native_sigpend > 0)
