@@ -33,7 +33,8 @@
 char radio_stack_buffer[RADIO_STACK_SIZE];
 msg_t msg_q[RCV_BUFFER_SIZE];
 
-void radio(void) {
+void radio(void)
+{
     msg_t m;
     radio_packet_t *p;
     radio_packet_length_t i;
@@ -42,8 +43,9 @@ void radio(void) {
 
     while (1) {
         msg_receive(&m);
+
         if (m.type == PKT_PENDING) {
-            p = (radio_packet_t*) m.content.ptr;
+            p = (radio_packet_t *) m.content.ptr;
             printf("Got radio packet:\n");
             printf("\tLength:\t%u\n", p->length);
             printf("\tSrc:\t%u\n", p->src);
@@ -54,6 +56,7 @@ void radio(void) {
             for (i = 0; i < p->length; i++) {
                 printf("%02X ", p->data[i]);
             }
+
             p->processing--;
             puts("\n");
         }
@@ -69,12 +72,12 @@ void radio(void) {
 void init_transceiver(void)
 {
     int radio_pid = thread_create(
-            radio_stack_buffer,
-            RADIO_STACK_SIZE,
-            PRIORITY_MAIN-2,
-            CREATE_STACKTEST,
-            radio,
-            "radio");
+                        radio_stack_buffer,
+                        RADIO_STACK_SIZE,
+                        PRIORITY_MAIN - 2,
+                        CREATE_STACKTEST,
+                        radio,
+                        "radio");
 
     uint16_t transceivers = 0;
 #ifdef MODULE_CC110X
@@ -102,17 +105,20 @@ void init_transceiver(void)
 }
 #endif /* MODULE_TRANSCEIVER */
 
-static int shell_readc(void) {
+static int shell_readc(void)
+{
     char c = 0;
     (void) posix_read(uart0_handler_pid, &c, 1);
     return c;
 }
 
-static void shell_putchar(int c) {
+static void shell_putchar(int c)
+{
     (void) putchar(c);
 }
 
-int main(void) {
+int main(void)
+{
     shell_t shell;
     (void) posix_open(uart0_handler_pid, 0);
 
@@ -123,7 +129,7 @@ int main(void) {
 #ifdef MODULE_TRANSCEIVER
     init_transceiver();
 #endif
-    
+
     (void) puts("Welcome to RIOT!");
 
     shell_init(&shell, NULL, UART0_BUFSIZE, shell_readc, shell_putchar);
