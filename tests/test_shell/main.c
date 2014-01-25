@@ -74,7 +74,7 @@ int main(void)
 
     /* define own shell commands */
     shell_t shell;
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, shell_readc, 
+    shell_init(&shell, shell_commands, SHELL_BUFSIZE, shell_readc,
                shell_putchar);
     shell_run(&shell);
 

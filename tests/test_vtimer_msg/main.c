@@ -11,7 +11,7 @@ char timer_stack_local[KERNEL_CONF_STACKSIZE_PRINTF];
 struct timer_msg {
     vtimer_t timer;
     timex_t interval;
-    char* msg;
+    char *msg;
 };
 
 timex_t now;
@@ -32,14 +32,15 @@ void timer_thread(void)
     while (1) {
         msg_t m;
         msg_receive(&m);
-        struct timer_msg* tmsg = (struct timer_msg*) m.content.ptr;
+        struct timer_msg *tmsg = (struct timer_msg *) m.content.ptr;
         vtimer_now(&now);
         printf("now=%" PRIu32 ":%" PRIu32 " -> every %u.%us: %s\n",
-                now.seconds,
-                now.microseconds,
-                tmsg->interval.seconds,
-                tmsg->interval.microseconds,
-                tmsg->msg);
+               now.seconds,
+               now.microseconds,
+               tmsg->interval.seconds,
+               tmsg->interval.microseconds,
+               tmsg->msg);
+
         if (vtimer_set_msg(&tmsg->timer, tmsg->interval, thread_getpid(), tmsg) != 0) {
             puts("something went wrong");
         }
@@ -63,33 +64,35 @@ void timer_thread_local(void)
     }
 }
 
-int main(void) {
+int main(void)
+{
     msg_t m;
     int pid = thread_create(
-            timer_stack,
-            sizeof timer_stack,
-            PRIORITY_MAIN-1,
-            CREATE_STACKTEST,
-            timer_thread,
-            "timer");
+                  timer_stack,
+                  sizeof timer_stack,
+                  PRIORITY_MAIN - 1,
+                  CREATE_STACKTEST,
+                  timer_thread,
+                  "timer");
 
     puts("sending 1st msg");
-    m.content.ptr = (char*) &msg_a;
+    m.content.ptr = (char *) &msg_a;
     msg_send(&m, pid, false);
 
     puts("sending 2nd msg");
-    m.content.ptr = (char*) &msg_b;
+    m.content.ptr = (char *) &msg_b;
     msg_send(&m, pid, false);
 
     int pid2 = thread_create(
-            timer_stack_local,
-            sizeof timer_stack_local,
-            PRIORITY_MAIN-1,
-            CREATE_STACKTEST,
-            timer_thread_local,
-            "timer local");
+                   timer_stack_local,
+                   sizeof timer_stack_local,
+                   PRIORITY_MAIN - 1,
+                   CREATE_STACKTEST,
+                   timer_thread_local,
+                   "timer local");
 
     timex_t sleep = timex_set(1, 0);
+
     while (1) {
         vtimer_sleep(sleep);
         msg_send(&m, pid2, 0);

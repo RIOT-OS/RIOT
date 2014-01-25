@@ -18,9 +18,11 @@ void busy_thread(void)
     printf("busy_thread starting\n");
 
     i = 0;
+
     while (busy) {
         k = j = ++i;
     }
+
     printf("i: %i\n", i);
     printf("j: %i\n", j);
     printf("k: %i\n", k);
@@ -36,8 +38,8 @@ int main(void)
     busy = 1;
     k = 23;
     thread_create(busy_stack, KERNEL_CONF_STACKSIZE_PRINTF,
-            PRIORITY_MAIN+1, CREATE_WOUT_YIELD, busy_thread,
-            "busy_thread");
+                  PRIORITY_MAIN + 1, CREATE_WOUT_YIELD, busy_thread,
+                  "busy_thread");
     printf("busy_thread created\n");
 
     printf("hwtimer_wait()\n");

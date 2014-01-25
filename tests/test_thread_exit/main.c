@@ -7,26 +7,29 @@
 char second_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char third_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
-void fourth_thread(void) {
+void fourth_thread(void)
+{
     puts("4th: starting");
     puts("4th: exiting");
 }
 
-void third_thread(void) {
+void third_thread(void)
+{
     puts("3rd: starting");
     puts("3rd: exiting");
 }
 
-void second_thread(void) {
+void second_thread(void)
+{
     puts("2nd: starting");
 
     if ((thread_create(
-                    third_thread_stack,
-                    sizeof(third_thread_stack),
-                    PRIORITY_MAIN-2,
-                    CREATE_STACKTEST,
-                    third_thread,
-                    "nr3")
+             third_thread_stack,
+             sizeof(third_thread_stack),
+             PRIORITY_MAIN - 2,
+             CREATE_STACKTEST,
+             third_thread,
+             "nr3")
         ) == -1) {
         puts("2nd: Error creating 3rd thread.");
     }
@@ -34,12 +37,12 @@ void second_thread(void) {
     /* thread should have returned already */
 
     if ((thread_create(
-                    third_thread_stack,
-                    sizeof(third_thread_stack),
-                    PRIORITY_MAIN-1,
-                    CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                    fourth_thread,
-                    "nr4")
+             third_thread_stack,
+             sizeof(third_thread_stack),
+             PRIORITY_MAIN - 1,
+             CREATE_WOUT_YIELD | CREATE_STACKTEST,
+             fourth_thread,
+             "nr4")
         ) == -1) {
         puts("2nd: Error creating 4rd thread.");
     }
@@ -50,15 +53,17 @@ void second_thread(void) {
 int main(void)
 {
     puts("main: starting");
+
     if ((thread_create(
-                    second_thread_stack,
-                    sizeof(second_thread_stack),
-                    PRIORITY_MAIN-1,
-                    CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                    second_thread,
-                    "nr2")
+             second_thread_stack,
+             sizeof(second_thread_stack),
+             PRIORITY_MAIN - 1,
+             CREATE_WOUT_YIELD | CREATE_STACKTEST,
+             second_thread,
+             "nr2")
         ) == -1) {
         puts("main: Error creating 3rd thread.");
     }
+
     puts("main: exiting");
 }
