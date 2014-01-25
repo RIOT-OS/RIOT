@@ -28,18 +28,21 @@ void rpl_udp_init(char *str)
 
     char *toc_str = strtok(str, " ");
     toc_str = strtok(NULL, " ");
+
     if (!toc_str) {
         printf("Usage: init (r|n)\n");
         printf("\tr\tinitialize as root\n");
         printf("\tn\tinitialize as node router\n");
         return;
     }
+
     char command = *toc_str;
 
     uint8_t state;
 
     if ((command == 'n') || (command == 'r')) {
         printf("INFO: Initialize as %s on address %d\n", ((command == 'n') ? "node" : "root"), id);
+
         if (!id || (id > 255)) {
             printf("ERROR: address not a valid 8 bit integer\n");
             return;
@@ -61,7 +64,8 @@ void rpl_udp_init(char *str)
         else {
             ipv6_iface_set_routing_provider(rpl_get_next_hop);
         }
-        int monitor_pid = thread_create(monitor_stack_buffer, MONITOR_STACK_SIZE, PRIORITY_MAIN-2, CREATE_STACKTEST, rpl_udp_monitor, "monitor");
+
+        int monitor_pid = thread_create(monitor_stack_buffer, MONITOR_STACK_SIZE, PRIORITY_MAIN - 2, CREATE_STACKTEST, rpl_udp_monitor, "monitor");
         transceiver_register(TRANSCEIVER, monitor_pid);
         ipv6_register_packet_handler(monitor_pid);
         //sixlowpan_lowpan_register(monitor_pid);
@@ -80,7 +84,7 @@ void rpl_udp_init(char *str)
     /* add global address */
     ipv6_addr_set_by_eui64(&tmp, &std_addr);
     ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_GLOBAL, NDP_ADDR_STATE_PREFERRED, 0, 0);
-            
+
     /* set channel to 10 */
     tcmd.transceivers = TRANSCEIVER;
     tcmd.data = &chan;
@@ -110,11 +114,13 @@ void rpl_udp_loop(char *unused)
     printf("---------------------------\n");
     printf("OUTPUT\n");
     printf("my rank: %d\n", mydodag->my_rank);
+
     if (!is_root) {
         printf("my preferred parent:\n");
         printf("%s\n", ipv6_addr_to_str(addr_str, (&mydodag->my_preferred_parent->addr)));
         printf("parent lifetime: %d\n", mydodag->my_preferred_parent->lifetime);
     }
+
     printf("---------------------------$\n");
 
     for (int i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
@@ -177,9 +183,11 @@ void rpl_udp_dodag(char *unused)
     printf("Part of Dodag:\n");
     printf("%s\n", ipv6_addr_to_str(addr_str, (&mydodag->dodag_id)));
     printf("my rank: %d\n", mydodag->my_rank);
+
     if (!is_root) {
         printf("my preferred parent:\n");
         printf("%s\n", ipv6_addr_to_str(addr_str, (&mydodag->my_preferred_parent->addr)));
     }
+
     printf("---------------------------\n");
 }

@@ -157,23 +157,29 @@ static void riot_ccn_relay_start(char *str)
     char *toc_str = strtok(str, " ");
 
     toc_str = strtok(NULL, " ");
+
     if (!toc_str) {
         shell_max_cache_entries = CCNL_DEFAULT_MAX_CACHE_ENTRIES;
-    } else {
+    }
+    else {
         shell_max_cache_entries = atoi(toc_str);
     }
 
     toc_str = strtok(NULL, " ");
+
     if (!toc_str) {
         shell_threshold_prefix = CCNL_DEFAULT_THRESHOLD_PREFIX;
-    } else {
+    }
+    else {
         shell_threshold_prefix = atoi(toc_str);
     }
 
     toc_str = strtok(NULL, " ");
+
     if (!toc_str) {
         shell_threshold_aggregate = CCNL_DEFAULT_THRESHOLD_AGGREGATE;
-    } else {
+    }
+    else {
         shell_threshold_aggregate = atoi(toc_str);
     }
 

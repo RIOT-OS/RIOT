@@ -48,11 +48,11 @@ void init_udp_server(void)
         destiny_socket_close(sock);
     }
 
-    for(;;) {
-        recsize = destiny_socket_recvfrom(sock, (void *)buffer_main, UDP_BUFFER_SIZE, 0, 
+    for (;;) {
+        recsize = destiny_socket_recvfrom(sock, (void *)buffer_main, UDP_BUFFER_SIZE, 0,
                                           &sa, &fromlen);
 
-        if(recsize < 0) {
+        if (recsize < 0) {
             printf("ERROR: recsize < 0!\n");
         }
 
@@ -71,6 +71,7 @@ void udp_send(char *str)
     int bytes_sent;
     int address;
     char text[5];
+
     if (sscanf(str, "send %i %s", &address, text) < 2) {
         printf("usage: send <addr> <text>\n");
         return;
@@ -78,7 +79,7 @@ void udp_send(char *str)
 
     sock = destiny_socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 
-    if(-1 == sock) {
+    if (-1 == sock) {
         printf("Error Creating Socket!");
         return;
     }
@@ -92,10 +93,10 @@ void udp_send(char *str)
     sa.sin6_port = HTONS(SERVER_PORT);
 
     bytes_sent = destiny_socket_sendto(sock, (char *)text,
-            strlen(text) + 1, 0, &sa,
-            sizeof sa);
+                                       strlen(text) + 1, 0, &sa,
+                                       sizeof sa);
 
-    if(bytes_sent < 0) {
+    if (bytes_sent < 0) {
         printf("Error sending packet!\n");
     }
     else {
