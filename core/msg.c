@@ -269,8 +269,10 @@ static int _msg_receive(msg_t *m, int block)
         *m = *sender_msg;
 
         /* remove sender from queue */
-        sender->wait_data = NULL;
-        sched_set_status(sender, STATUS_PENDING);
+        if (sender->status != STATUS_REPLY_BLOCKED) {
+            sender->wait_data = NULL;
+            sched_set_status(sender, STATUS_PENDING);
+        }
 
         eINT();
         return 1;
