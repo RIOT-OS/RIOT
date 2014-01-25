@@ -39,30 +39,33 @@ int main(void)
     hwtimer_init();
 
     struct bloom_t *bloom = bloom_new(1 << 12, 8, fnv_hash, sax_hash, sdbm_hash,
-            djb2_hash, kr_hash, dek_hash, rotating_hash, one_at_a_time_hash);
+                                      djb2_hash, kr_hash, dek_hash, rotating_hash, one_at_a_time_hash);
 
     printf("Testing Bloom filter.\n\n");
     printf("m: %" PRIu32 " k: %" PRIu32 "\n\n", (uint32_t) bloom->m,
-            (uint32_t) bloom->k);
+           (uint32_t) bloom->k);
 
     genrand_init(myseed);
 
     unsigned long t1 = hwtimer_now();
+
     for (int i = 0; i < lenB; i++) {
         buf_fill(buf, BUF_SIZE);
         buf[0] = MAGIC_B;
         bloom_add(bloom,
                   (uint8_t *) buf,
-                  BUF_SIZE * sizeof(uint32_t)/ sizeof(uint8_t));
+                  BUF_SIZE * sizeof(uint32_t) / sizeof(uint8_t));
     }
+
     unsigned long t2 = hwtimer_now();
     printf("adding %d elements took %" PRIu32 "ms\n", lenB,
-            (uint32_t) HWTIMER_TICKS_TO_US(t2-t1) / 1000);
+           (uint32_t) HWTIMER_TICKS_TO_US(t2 - t1) / 1000);
 
     int in = 0;
     int not_in = 0;
 
     unsigned long t3 = hwtimer_now();
+
     for (int i = 0; i < lenA; i++) {
         buf_fill(buf, BUF_SIZE);
         buf[0] = MAGIC_A;
@@ -71,13 +74,15 @@ int main(void)
                         (uint8_t *) buf,
                         BUF_SIZE * sizeof(uint32_t) / sizeof(uint8_t))) {
             in++;
-        } else {
+        }
+        else {
             not_in++;
         }
     }
+
     unsigned long t4 = hwtimer_now();
     printf("checking %d elements took %" PRIu32 "ms\n", lenA,
-            (uint32_t) HWTIMER_TICKS_TO_US(t4-t3) / 1000);
+           (uint32_t) HWTIMER_TICKS_TO_US(t4 - t3) / 1000);
 
     printf("\n");
     printf("%d elements probably in the filter.\n", in);

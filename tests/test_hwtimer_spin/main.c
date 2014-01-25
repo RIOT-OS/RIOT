@@ -18,8 +18,9 @@
 int main(void)
 {
     printf("when the race condition is hit, hwtimer will wait a very very long time...\n");
-    while(1) {
-        for (unsigned long i = 256; i; i = i>>1) {
+
+    while (1) {
+        for (unsigned long i = 256; i; i = i >> 1) {
             printf("wait %lu\n", i);
             hwtimer_wait(i);
         }

@@ -17,7 +17,7 @@
 int main(void)
 {
     struct bloom_t *bloom = bloom_new(1 << 7, 6, fnv_hash, sax_hash, sdbm_hash,
-            djb2_hash, kr_hash, dek_hash, rotating_hash, one_at_a_time_hash);
+                                      djb2_hash, kr_hash, dek_hash, rotating_hash, one_at_a_time_hash);
 
     printf("Testing Bloom filter.\n\n");
     printf("m: %zd\nk: %zd\n\n", bloom->m, bloom->k);
@@ -33,7 +33,8 @@ int main(void)
     for (int i = 0; i < lenA; i++) {
         if (bloom_check(bloom, (const uint8_t *) A[i], strlen(A[i]))) {
             in++;
-        } else {
+        }
+        else {
             not_in++;
         }
     }

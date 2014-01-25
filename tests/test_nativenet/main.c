@@ -32,7 +32,8 @@ uint8_t receiving = 1;
 unsigned int last_seq = 0, missed_cnt = 0;
 int first = -1;
 
-void radio(void) {
+void radio(void)
+{
     msg_t m;
     radio_packet_t *p;
     unsigned int tmp = 0, cur_seq = 0;
@@ -40,27 +41,34 @@ void radio(void) {
     msg_init_queue(msg_q, RCV_BUFFER_SIZE);
 
     puts("Start receiving");
+
     while (receiving) {
         msg_receive(&m);
+
         if (m.type == PKT_PENDING) {
-            p = (radio_packet_t*) m.content.ptr;
+            p = (radio_packet_t *) m.content.ptr;
+
             if ((p->src == SENDER_ADDR) && (p->length == PACKET_SIZE)) {
                 puts("received");
                 cur_seq = (p->data[0] << 8) + p->data[1];
+
                 if (first < 0) {
                     first = cur_seq;
                 }
                 else {
                     tmp = cur_seq - last_seq;
+
                     if (last_seq && (tmp > 1)) {
                         missed_cnt += (tmp - 1);
                     }
                 }
+
                 last_seq = cur_seq;
             }
             else {
                 printf("sender was %i\n", p->src);
             }
+
             p->processing--;
         }
         else if (m.type == ENOBUFFER) {
@@ -72,14 +80,15 @@ void radio(void) {
     }
 }
 
-void sender(void) {
-    unsigned int i=0;
+void sender(void)
+{
+    unsigned int i = 0;
     msg_t mesg;
     transceiver_command_t tcmd;
     radio_packet_t p;
 
     mesg.type = SND_PKT;
-    mesg.content.ptr = (char*) &tcmd;
+    mesg.content.ptr = (char *) &tcmd;
 
     tcmd.transceivers = TRANSCEIVER_NATIVE;
     tcmd.data = &p;
@@ -88,6 +97,7 @@ void sender(void) {
     p.dst = 0;
 
     puts("Start sending packets");
+
     while (1) {
         /* filling uint8_t buffer with uint16_t sequence number */
         snd_buffer[0] = (i & 0xFF00) >> 8;
@@ -116,7 +126,7 @@ int main(void)
 
 #ifndef SENDER
     printf("\n\tmain(): starting radio thread\n");
-    radio_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE, PRIORITY_MAIN-2, CREATE_STACKTEST, radio, "radio");
+    radio_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE, PRIORITY_MAIN - 2, CREATE_STACKTEST, radio, "radio");
     transceiver_register(TRANSCEIVER_NATIVE, radio_pid);
 #endif
 
