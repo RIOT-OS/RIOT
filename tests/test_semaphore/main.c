@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Christian Mehlis <christian.mehlis@fu-berlin.de>
+ * Copyright (C) 2013 Christian Mehlis <mehlis@inf.fu-berlin.de>
  * Copyright (C) 2013 René Kijewski <rene.kijewski@fu-berlin.de>
  *
  * This file subject to the terms and conditions of the GNU Lesser General

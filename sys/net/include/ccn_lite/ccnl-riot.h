@@ -29,7 +29,7 @@
  * @{
  * @file
  * @brief   CCN lite interface
- * @author  Christian Mehlis <christian@m3hlis.de>
+ * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 #ifndef RIOT_CCN_COMPAT_H_
 #define RIOT_CCN_COMPAT_H_
