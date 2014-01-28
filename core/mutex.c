@@ -13,7 +13,7 @@
  * @file        mutex.c
  * @brief       Kernel mutex implementation
  *
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */

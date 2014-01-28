@@ -13,7 +13,7 @@
  * @file        flags.h
  * @brief       Misc flag definitions
  *
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #ifndef _FLAGS_H

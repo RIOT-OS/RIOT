@@ -13,7 +13,7 @@
  * @file        thread.c
  * @brief       Threading implementation
  *
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
