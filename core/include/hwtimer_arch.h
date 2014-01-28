@@ -16,7 +16,7 @@
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
  
 #ifndef HWTIMER_ARCH_H_

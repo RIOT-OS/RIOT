@@ -14,7 +14,7 @@
  * @brief       Circular linkes list
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
 #ifndef __CLIST_H

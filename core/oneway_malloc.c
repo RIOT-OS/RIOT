@@ -19,7 +19,7 @@
  * 
  * Simple malloc implementation for plattforms without malloc in libc.
  * 
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */

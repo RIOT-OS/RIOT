@@ -13,7 +13,7 @@
  * @file        clist.c
  * @brief       Circular linked list implementation
  *
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */

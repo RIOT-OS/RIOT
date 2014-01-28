@@ -8,7 +8,7 @@
  * details.
  *
  * @file   cpu.c
- * @author Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @author Oliver Hahm <oliver.hahm@inria.fr>
  */
 
