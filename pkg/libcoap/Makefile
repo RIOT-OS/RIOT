@@ -21,7 +21,7 @@ patch: $(CURDIR)/$(PKG_NAME)/Makefile
 $(CURDIR)/$(PKG_NAME)/Makefile: $(CURDIR)/$(PKG_NAME)
 	cd $< && git apply ../patch.txt
 
-$(CURDIR)/$(PKG_NAME):
+$(CURDIR)/$(PKG_NAME)/:
 	git clone $(PKG_URL) $@ && \
 		cd $@ && git checkout $(PKG_VERSION)
 
