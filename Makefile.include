@@ -49,6 +49,7 @@ include $(RIOTBASE)/Makefile.dep
 # your binaries to link
 BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${PROJECT}.a
+BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
 .PHONY: all clean flash doc term
 
@@ -57,7 +58,7 @@ all: $(BINDIR)$(PROJECT).a
 	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
 	"$(MAKE)" -C $(RIOTBASE)
-	@for i in $(EXTERNAL_MODULES) ; do "$(MAKE)" -C $$i ; done ;
+	@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i ; done ;
 ifeq ($(BUILDOSXNATIVE),1)
 	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
@@ -91,7 +92,7 @@ $(BINDIR)$(PROJECT)/%.o: %.c $(PROJDEPS)
 clean:
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD) clean
 	"$(MAKE)" -C $(RIOTBASE) clean
-	@for i in $(EXTERNAL_MODULES) ; do "$(MAKE)" -C $$i clean ; done ;
+	@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i clean ; done ;
 	rm -rf $(BINDIR)
 
 flash: all
