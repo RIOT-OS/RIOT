@@ -32,3 +32,6 @@ clean::
 
 distclean::
 	rm -rf $(CURDIR)/$(PKG_NAME)
+
+Makefile.include:
+	@true
