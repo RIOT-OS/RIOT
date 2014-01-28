@@ -78,21 +78,34 @@ SRC = $(wildcard *.c)
 # string array of all names replaced .c with .o
 OBJ = $(SRC:%.c=${BINDIR}${PROJECT}/%.o)
 
-$(BINDIR)$(PROJECT).a:  $(OBJ)
+$(BINDIR)$(PROJECT).a: $(OBJ)
 	$(AD)$(AR) -rc $(BINDIR)$(PROJECT).a $(OBJ)
+
+# include Makefile.includes for packages in $(USEPKG)
+$(RIOTBASE)/pkg/%/Makefile.include::
+	$(AD)"$(MAKE)" -C $(RIOTBASE)/pkg/$* Makefile.include
+
+.PHONY: $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include)
+
+-include $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include)
 
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
 
-$(BINDIR)$(PROJECT)/%.o: %.c $(PROJDEPS)
+$(BINDIR)$(PROJECT)/%.o: %.c $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
+	@mkdir -p ${BINDIR}
 	@echo; echo "Compiling.... $*.c"; echo
 	@test -d $(BINDIR)$(PROJECT) || mkdir -p $(BINDIR)$(PROJECT)
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$(PROJECT)/$*.o
 
+$(USEPKG:%=${BINDIR}%.a)::
+	@mkdir -p ${BINDIR}
+	"$(MAKE)" -C $(RIOTBASE)/pkg/$(patsubst ${BINDIR}%.a,%,$@)
+
 clean:
+	@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i clean ; done ;
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD) clean
 	"$(MAKE)" -C $(RIOTBASE) clean
-	@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i clean ; done ;
 	rm -rf $(BINDIR)
 
 flash: all
