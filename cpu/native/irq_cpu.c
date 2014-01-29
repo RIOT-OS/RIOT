@@ -174,12 +174,16 @@ unsigned enableIRQ(void)
 {
     unsigned int prev_state;
 
+    if (_native_in_isr == 1) {
+#if DEVELHELP
+        real_write(STDERR_FILENO, "enableIRQ + _native_in_isr\n", 27);
+#else
+        DEBUG("enableIRQ + _native_in_isr\n");
+#endif
+    }
+
     _native_syscall_enter();
     DEBUG("enableIRQ()\n");
-
-    if (_native_in_isr == 1) {
-        DEBUG("enableIRQ + _native_in_isr\n");
-    }
 
     if (sigprocmask(SIG_SETMASK, &_native_sig_set, NULL) == -1) {
         err(EXIT_FAILURE, "enableIRQ(): sigprocmask()");
