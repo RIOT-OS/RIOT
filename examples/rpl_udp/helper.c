@@ -52,8 +52,9 @@ void rpl_udp_monitor(void)
 
     while (1) {
         msg_receive(&m);
+
         if (m.type == PKT_PENDING) {
-            p = (radio_packet_t*) m.content.ptr;
+            p = (radio_packet_t *) m.content.ptr;
 
             DEBUG("Received packet from ID %u\n", p->src);
             DEBUG("\tLength:\t%u\n", p->length);
@@ -65,15 +66,17 @@ void rpl_udp_monitor(void)
             for (uint8_t i = 0; i < p->length; i++) {
                 DEBUG("%02X ", p->data[i]);
             }
+
             p->processing--;
             DEBUG("\n");
         }
         else if (m.type == IPV6_PACKET_RECEIVED) {
-            ipv6_buf = (ipv6_hdr_t*) m.content.ptr;
+            ipv6_buf = (ipv6_hdr_t *) m.content.ptr;
             printf("IPv6 datagram received (next header: %02X)", ipv6_buf->nextheader);
             printf(" from %s ", ipv6_addr_to_str(addr_str, &ipv6_buf->srcaddr));
+
             if (ipv6_buf->nextheader == IPV6_PROTO_NUM_ICMPV6) {
-                icmpv6_buf = (icmpv6_hdr_t*) &ipv6_buf[(LL_HDR_LEN + IPV6_HDR_LEN) + ipv6_ext_hdr_len];
+                icmpv6_buf = (icmpv6_hdr_t *) &ipv6_buf[(LL_HDR_LEN + IPV6_HDR_LEN) + ipv6_ext_hdr_len];
                 icmp_type = icmpv6_buf->type;
                 icmp_code = icmpv6_buf->code;
             }
@@ -82,6 +85,7 @@ void rpl_udp_monitor(void)
                 DEBUG("\t ICMP type: %02X ", icmp_type);
                 DEBUG("\t ICMP code: %02X ", icmp_code);
             }
+
             printf("\n");
         }
         else if (m.type == ENOBUFFER) {
@@ -95,8 +99,10 @@ void rpl_udp_monitor(void)
 
 transceiver_command_t tcmd;
 
-void rpl_udp_ignore(char *addr) {
+void rpl_udp_ignore(char *addr)
+{
     uint16_t a;
+
     if (transceiver_pid < 0) {
         puts("Transceiver not runnning.");
         return;
@@ -104,13 +110,14 @@ void rpl_udp_ignore(char *addr) {
 
     msg_t mesg;
     mesg.type = DBG_IGN;
-    mesg.content.ptr = (char*) &tcmd;
+    mesg.content.ptr = (char *) &tcmd;
 
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &a;
     a = atoi(addr + strlen("ign "));
+
     if (strlen(addr) > strlen("ign ")) {
-        printf("sending to transceiver (%u): %u\n", transceiver_pid, (*(uint8_t*)tcmd.data));
+        printf("sending to transceiver (%u): %u\n", transceiver_pid, (*(uint8_t *)tcmd.data));
         msg_send(&mesg, transceiver_pid, 1);
     }
     else {
