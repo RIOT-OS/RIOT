@@ -164,12 +164,14 @@ void schedule_timer(void)
         result.it_value.tv_usec = 1;
     }
 
+    _native_syscall_enter();
     if (setitimer(ITIMER_REAL, &result, NULL) == -1) {
         err(EXIT_FAILURE, "schedule_timer: setitimer");
     }
     else {
         DEBUG("schedule_timer(): set next timer (%i).\n", next_timer);
     }
+    _native_syscall_leave();
 }
 
 /**
