@@ -78,7 +78,7 @@ void _native_syscall_leave()
         native_isr_context.uc_stack.ss_flags = 0;
         makecontext(&native_isr_context, native_irq_handler, 0);
         if (swapcontext(_native_cur_ctx, &native_isr_context) == -1) {
-            _native_syscall_leave(EXIT_FAILURE, "thread_yield: swapcontext");
+            err(EXIT_FAILURE, "_native_syscall_leave: swapcontext");
         }
     }
 }
