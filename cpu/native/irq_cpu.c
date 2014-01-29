@@ -357,9 +357,6 @@ int register_interrupt(int sig, void (*handler)(void))
     if (sigdelset(&_native_sig_set, sig)) {
         err(EXIT_FAILURE, "register_interrupt: sigdelset");
     }
-    if (sigaddset(&_native_sig_set_dint, sig)) {
-        err(EXIT_FAILURE, "register_interrupt: sigaddset");
-    }
 
     native_irq_handlers[sig].func = handler;
 
@@ -390,9 +387,6 @@ int unregister_interrupt(int sig)
     _native_syscall_enter();
     if (sigaddset(&_native_sig_set, sig) == -1) {
         err(EXIT_FAILURE, "unregister_interrupt: sigaddset");
-    }
-    if (sigdelset(&_native_sig_set_dint, sig) == -1) {
-        err(EXIT_FAILURE, "unregister_interrupt: sigdelset");
     }
 
     native_irq_handlers[sig].func = NULL;
