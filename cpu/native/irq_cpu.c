@@ -455,8 +455,10 @@ void native_interrupt_init(void)
     if (sigprocmask(SIG_SETMASK, NULL, &_native_sig_set) == -1) {
         err(EXIT_FAILURE, "native_interrupt_init(): sigprocmask");
     }
-    if (sigprocmask(SIG_SETMASK, NULL, &_native_sig_set_dint) == -1) {
-        err(EXIT_FAILURE, "native_isr_entry(): sigprocmask");
+    /* we need to disable all signals during our signal handler as it
+     * can not cope with interrupted signals ... */
+    if (sigfillset(&_native_sig_set_dint) == -1) {
+        err(EXIT_FAILURE, "native_isr_entry(): sigfillset");
     }
 
     /* SIGUSR1 is intended for debugging purposes and shall always be
