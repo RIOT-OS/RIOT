@@ -17,6 +17,7 @@
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef __THREAD_H
@@ -48,6 +49,43 @@
  * @return  returns <0 on error, pid of newly created task else.
 */
 int thread_create(char *stack, int stacksize, char priority, int flags, void (*function) (void), const char *name);
+
+
+/**
+ * @brief   Reserve a given amount of memory on the top of the stack as thread local memory
+ *
+ * CAUTION: The function will not check wether there is actually enough space on the stack 
+ * memory for the local memory. So it is up to the caller to make sure that stacksize >> localmemsize.
+ *
+ * @param   stack Lowest address of preallocated stack space
+ * @param   stacksize
+ * @param   localmemsize        number of bytes to reserve for the thread-local memory (taken from given stack memory)
+ * @param   flags Options:
+ * YIELD: force context switch.
+ * CREATE_SLEEPING: set new thread to sleeping state, thread must be woken up manually.
+ * CREATE_STACKTEST: initialize stack with values needed for stack overflow testing.
+ *
+ * @param priority Priority of newly created thread. Lower number means higher
+ * priority. 0 means highest possible priority. Lowest priority is
+ * PRIORITY_IDLE-1, usually 30.
+ *
+ * @return  returns <0 on error, pid of newly created task else.
+ */
+int thread_create_with_local_mem(char *stack, int stacksize, int localmemsize, char priority, 
+                                 int flags, void (*function) (void), const char *name);
+
+/**
+ * @brief   Acces the threads local memory
+ * 
+ * CAUTION: This function should only be called when the thread identified pid was created
+ * using thread_create_with_local_mem(), otherwise an invalid pointer poiting to how-knows-what
+ * will be returned and something hard to debug will break!
+ *
+ * @param[in] pid       pid of the thread to access
+ * @return pointer to the threads local memory, random invalid memory location if 
+ *         no local memory was defined
+ */
+char *thread_get_local_mem(int pid);
 
 /**
  * @brief   returns the status of a process.

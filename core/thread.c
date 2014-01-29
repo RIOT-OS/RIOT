@@ -14,6 +14,7 @@
  * @brief       Threading implementation
  *
  * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -237,4 +238,15 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     }
 
     return pid;
+}
+
+int thread_create_with_local_mem(char *stack, int stacksize, int localmemsize, char priority, 
+                                 int flags, void (*function) (void), const char *name)
+{
+    return thread_create(stack, stacksize - localmemsize, priority, flags, function, name);
+}
+
+char *thread_get_local_mem(int pid)
+{
+    return sched_threads[pid]->stack_start + sched_threads[pid]->stack_size;
 }
