@@ -64,6 +64,14 @@ void _native_lpm_sleep()
         /* TODO: switch to ISR context */
         _native_handle_uart0_input();
     }
+    else if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
+        /* would block / resource unavailable .. it appears a
+         * contended socket can show this behavior sometimes */
+        _native_in_syscall++;
+        warn("_native_lpm_sleep: select()");
+        _native_in_syscall--;
+        return;
+    }
     else if (errno != EINTR) {
         /* select failed for reason other than signal */
         err(EXIT_FAILURE, "lpm_set(): select()");
