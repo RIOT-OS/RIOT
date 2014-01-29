@@ -305,7 +305,10 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
         errx(EXIT_FAILURE, "native_isr_entry: context is null - unhandled");
     }
     if (active_thread == NULL) {
-        errx(EXIT_FAILURE, "native_isr_entry: active_thread is null - unhandled");
+        _native_in_isr++;
+        warnx("native_isr_entry: active_thread is null - unhandled");
+        _native_in_isr--;
+        return;
     }
 
     /* XXX: Workaround safety check - whenever this happens it really
