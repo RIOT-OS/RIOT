@@ -32,6 +32,7 @@
 #include <stdarg.h>
 
 #include "cpu.h"
+#include "irq.h"
 
 #include "native_internal.h"
 
@@ -72,14 +73,16 @@ void _native_syscall_leave()
        )
     {
         _native_in_isr = 1;
+        dINT();
         _native_cur_ctx = (ucontext_t *)active_thread->sp;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
         native_isr_context.uc_stack.ss_flags = 0;
         makecontext(&native_isr_context, native_irq_handler, 0);
         if (swapcontext(_native_cur_ctx, &native_isr_context) == -1) {
-            _native_syscall_leave(EXIT_FAILURE, "thread_yield: swapcontext");
+            err(EXIT_FAILURE, "_native_syscall_leave: swapcontext");
         }
+        eINT();
     }
 }
 

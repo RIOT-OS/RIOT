@@ -127,6 +127,7 @@ void isr_cpu_switch_context_exit(void)
     if (setcontext(ctx) == -1) {
         err(EXIT_FAILURE, "cpu_switch_context_exit(): setcontext():");
     }
+    errx(EXIT_FAILURE, "2 this should have never been reached!!");
 }
 
 void cpu_switch_context_exit()
@@ -141,11 +142,12 @@ void cpu_switch_context_exit()
         if (setcontext(&native_isr_context) == -1) {
             err(EXIT_FAILURE, "cpu_switch_context_exit: swapcontext");
         }
+        errx(EXIT_FAILURE, "1 this should have never been reached!!");
     }
     else {
         isr_cpu_switch_context_exit();
     }
-    errx(EXIT_FAILURE, "this should have never been reached!!");
+    errx(EXIT_FAILURE, "3 this should have never been reached!!");
 }
 
 void isr_thread_yield()
