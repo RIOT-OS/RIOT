@@ -297,11 +297,12 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     _native_sigpend++;
     //real_write(STDOUT_FILENO, "sigpend\n", 8);
 
-    native_isr_context.uc_stack.ss_sp = __isr_stack;
-    native_isr_context.uc_stack.ss_size = SIGSTKSZ;
-    native_isr_context.uc_stack.ss_flags = 0;
-    makecontext(&native_isr_context, native_irq_handler, 0);
-    _native_cur_ctx = (ucontext_t *)active_thread->sp;
+    if (context == NULL) {
+        errx(EXIT_FAILURE, "native_isr_entry: context is null - unhandled");
+    }
+    if (active_thread == NULL) {
+        errx(EXIT_FAILURE, "native_isr_entry: active_thread is null - unhandled");
+    }
 
     /* XXX: Workaround safety check - whenever this happens it really
      * indicates a bug in disableIRQ */
@@ -314,26 +315,32 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
         return;
     }
 
-    if (_native_in_syscall == 0) {
-        DEBUG("\n\n\t\treturn to _native_sig_leave_tramp\n\n");
-        /* disable interrupts in context */
-        isr_set_sigmask((ucontext_t *)context);
-        _native_in_isr = 1;
-#ifdef __MACH__
-        _native_saved_eip = ((ucontext_t *)context)->uc_mcontext->__ss.__eip;
-        ((ucontext_t *)context)->uc_mcontext->__ss.__eip = (unsigned int)&_native_sig_leave_tramp;
-#elif BSD
-        _native_saved_eip = ((struct sigcontext *)context)->sc_eip;
-        ((struct sigcontext *)context)->sc_eip = (unsigned int)&_native_sig_leave_tramp;
-#else
-        //printf("\n\033[31mEIP:\t%p\ngo switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP]);
-        _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP];
-        ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
-#endif
-    }
-    else {
+    if (_native_in_syscall != 0) {
         DEBUG("\n\n\t\treturn to syscall\n\n");
+        return;
     }
+
+    native_isr_context.uc_stack.ss_sp = __isr_stack;
+    native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+    native_isr_context.uc_stack.ss_flags = 0;
+    makecontext(&native_isr_context, native_irq_handler, 0);
+    _native_cur_ctx = (ucontext_t *)active_thread->sp;
+
+    DEBUG("\n\n\t\treturn to _native_sig_leave_tramp\n\n");
+    /* disable interrupts in context */
+    isr_set_sigmask((ucontext_t *)context);
+    _native_in_isr = 1;
+#ifdef __MACH__
+    _native_saved_eip = ((ucontext_t *)context)->uc_mcontext->__ss.__eip;
+    ((ucontext_t *)context)->uc_mcontext->__ss.__eip = (unsigned int)&_native_sig_leave_tramp;
+#elif BSD
+    _native_saved_eip = ((struct sigcontext *)context)->sc_eip;
+    ((struct sigcontext *)context)->sc_eip = (unsigned int)&_native_sig_leave_tramp;
+#else
+    //printf("\n\033[31mEIP:\t%p\ngo switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP]);
+    _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP];
+    ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
+#endif
 }
 
 /**
