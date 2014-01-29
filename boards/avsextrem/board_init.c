@@ -14,7 +14,7 @@
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will
- * @author      Kaspar Schleise
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Michael Baar
  * @author      Zakaria Kasmi
  * @author      Marco Ziegert

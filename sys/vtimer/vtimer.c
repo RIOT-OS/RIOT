@@ -10,7 +10,7 @@
  * @ingroup vtimer
  * @{
  * @file
- * @author Kaspar Schleiser <kaspar.schleiser@fu-berlin.de> (author)
+ * @author Kaspar Schleiser <kaspar@schleiser.de> (author)
  * @author Oliver Hahm <oliver.hahm@inria.fr> (modifications)
  * @author Ludwig Ortmann <ludwig.ortmann@fu-berlin.de> (cleaning up the mess)
  * @}

@@ -13,7 +13,7 @@
  * @file        bitarithm.c
  * @brief       Bit arithmetic helper functions implementation
  *
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
  *
  * @}

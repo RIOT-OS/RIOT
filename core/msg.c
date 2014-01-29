@@ -14,7 +14,7 @@
  * @brief       Kernel messaging implementation
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  *
  * @}

@@ -13,7 +13,7 @@
  * @file        kernel_init.c
  * @brief       Platform-independent kernel initilization
  *
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
