@@ -47,11 +47,13 @@
 #include "download.h"
 
 int programming_done = 0;
+int programming_status = 0;
 
 int done_program(int i)
 {
     printf("Programming done.\n");
     programming_done = 1;
+    programming_status = i;
     return 0;
 }
 
@@ -96,6 +98,6 @@ int main(int argc, char **argv)
 
     close_serial_port();
 
-    return 0;
+    return programming_status;
 }
 
