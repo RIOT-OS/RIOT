@@ -92,6 +92,11 @@ extern void _read_sector(char *sector);
 extern void _read_bytes(char *bytes);
 #endif
 
+#ifdef MODULE_RANDOM
+extern void _mersenne_init(char *str);
+extern void _mersenne_get(char *str);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"id", "Gets or sets the node's id.", _id_handler},
 #ifdef MODULE_LPC_COMMON
@@ -154,6 +159,10 @@ const shell_command_t _shell_command_list[] = {
     {DISK_GET_SECTOR_SIZE, "Get the sector size of inserted memory card", _get_sectorsize},
     {DISK_GET_SECTOR_COUNT, "Get the sector count of inserted memory card", _get_sectorcount},
     {DISK_GET_BLOCK_SIZE, "Get the block size of inserted memory card", _get_blocksize},
+#endif
+#ifdef MODULE_RANDOM
+    { "mersenne_init", "initializes the PRNG", _mersenne_init },
+    { "mersenne_get", "returns 32 bit of pseudo randomness", _mersenne_get },
 #endif
     {NULL, NULL, NULL}
 };
