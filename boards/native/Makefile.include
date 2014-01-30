@@ -17,7 +17,6 @@ LINKFLAGS += -m32 -gc -ldl
 TERMPROG = $(BINDIR)/$(PROJECT).elf
 FLASHER = true
 
-
 ifneq (,$(findstring nativenet,$(USEMODULE)))
 ifeq ($(strip $(PORT)),)
 	export PORT = tap0
@@ -25,5 +24,8 @@ endif
 else
 	export PORT = 
 endif
+
+DEBUGGER = gdb
+DEBUGGER_FLAGS = $(BINDIR)$(PROJECT).elf
 
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
