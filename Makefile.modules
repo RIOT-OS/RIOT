@@ -1,5 +1,4 @@
 export MAKEBASE =$(RIOTBASE)
-UNDEF += $(BINDIR)startup.o
 
 USEMODULE += cpu core sys
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include

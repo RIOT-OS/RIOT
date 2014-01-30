@@ -1,2 +1,3 @@
 INCLUDES += -I$(MAKEBASE)/cpu/msp430-common/include/
 
+export UNDEF += $(BINDIR)msp430_common/startup.o
