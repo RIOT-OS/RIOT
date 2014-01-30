@@ -100,7 +100,13 @@ void mutex_wait(struct mutex_t *mutex)
 void mutex_unlock(struct mutex_t *mutex)
 {
     DEBUG("%s: unlocking mutex. val: %u pid: %u\n", active_thread->name, mutex->val, thread_pid);
-    int irqstate = disableIRQ();
+
+    int irqstate;
+    int in_isr = inISR();
+
+    if (!in_isr) {
+        irqstate = disableIRQ();
+    }
 
     if (mutex->val != 0) {
         if (mutex->queue.next) {
@@ -109,12 +115,14 @@ void mutex_unlock(struct mutex_t *mutex)
             DEBUG("%s: waking up waiter.\n", process->name);
             sched_set_status(process, STATUS_PENDING);
 
-            sched_switch(active_thread->priority, process->priority, inISR());
+            sched_switch(active_thread->priority, process->priority, in_isr);
         }
         else {
             mutex->val = 0;
         }
     }
 
-    restoreIRQ(irqstate);
+    if (!in_isr) {
+        restoreIRQ(irqstate);
+    }
 }
