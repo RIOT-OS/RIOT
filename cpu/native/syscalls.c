@@ -70,6 +70,7 @@ void _native_syscall_leave()
             && (_native_in_isr == 0)
             && (_native_in_syscall == 0)
             && (native_interrupts_enabled == 1)
+            && (active_thread != NULL)
        )
     {
         _native_in_isr = 1;
