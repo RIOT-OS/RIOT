@@ -5,6 +5,13 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  */
+
+/**
+ * @{
+ * @file    fd.c
+ * @brief   Providing implementation for close for fds defined in fd.h.
+ * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ */
 #include <errno.h>
 
 #include "fd.h"
@@ -28,3 +35,7 @@ int close(int fildes)
 
     return 0;
 }
+
+/**
+ * @}
+ */

@@ -6,6 +6,12 @@
  * details.
  */
 
+/**
+ * @{
+ * @file    sys_socket.c
+ * @brief   Providing implementation for POSIX socket wrapper.
+ * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ */
 #include <errno.h>
 
 #include "destiny/socket.h"
@@ -175,3 +181,7 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
     // TODO
     return -1;
 }
+
+/**
+ * @}
+ */
