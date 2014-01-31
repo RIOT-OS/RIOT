@@ -1,8 +1,15 @@
 /*
- * tcp_timer.h
+ * Copyright (C) 2013  Freie Universität Berlin.
  *
- *  Created on: 21.01.2012
- *      Author: Oliver
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @{
+ * @file    tcp_timer.h
+ * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
 #ifndef TCP_TIMER_H_
@@ -29,3 +36,6 @@
 void tcp_general_timer(void);
 
 #endif /* TCP_TIMER_H_ */
+/**
+ * @}
+ */

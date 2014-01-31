@@ -1,8 +1,16 @@
 /*
- * msg_help.c
+ * Copyright (C) 2013  Freie Universität Berlin.
  *
- *  Created on: 24.11.2011
- *      Author: Oliver
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @{
+ * @file    msg_help.c
+ * @brief   Providing implementation for prototypes defined in msg_help.h.
+ * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
 #include <stdio.h>
@@ -45,3 +53,7 @@ int net_msg_send_recv(msg_t *m, msg_t *reply, unsigned int pid, uint16_t message
     m->type = message;
     return msg_send_receive(m, reply, pid);;
 }
+
+/**
+ * @}
+ */

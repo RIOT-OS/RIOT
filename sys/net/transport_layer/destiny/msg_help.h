@@ -1,10 +1,16 @@
 /*
- * msg_help.h
+ * Copyright (C) 2013  Freie Universität Berlin.
  *
- *  Created on: 24.11.2011
- *      Author: Oliver
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
  */
 
+/**
+ * @{
+ * @file    msg_help.h
+ * @author  Oliver Gesch <oliver.gesch@googlemail.com>
+ */
 #ifndef MSG_HELP_H_
 #define MSG_HELP_H_
 
@@ -35,3 +41,6 @@ int net_msg_send(msg_t *m, unsigned int pid, bool block, uint16_t message);
 int net_msg_send_recv(msg_t *m, msg_t *reply, unsigned int pid, uint16_t message);
 
 #endif /* MSG_HELP_H_ */
+/**
+ * @}
+ */
