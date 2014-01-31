@@ -84,13 +84,14 @@ OBJ = $(SRC:%.c=${BINDIR}${PROJECT}/%.o)
 $(BINDIR)$(PROJECT).a:  $(OBJ)
 	$(AD)$(AR) -rc $(BINDIR)$(PROJECT).a $(OBJ)
 
-# pull in dependency info for *existing* .o files
--include $(OBJ:.o=.d)
-
 $(BINDIR)$(PROJECT)/%.o: %.c $(PROJDEPS)
 	@echo; echo "Compiling.... $*.c"; echo
-	@test -d $(BINDIR)$(PROJECT) || mkdir -p $(BINDIR)$(PROJECT)
+	@mkdir -p $(BINDIR)$(PROJECT)
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$(PROJECT)/$*.o
+
+$(OBJ:.o=.d): $(BINDIR)$(PROJECT)/%.d: %.c $(PROJDEPS)
+	@mkdir -p $(BINDIR)$(PROJECT)
+	@$(CC) $(CFLAGS) $(INCLUDES) -M -MF $(BINDIR)$(PROJECT)/$*.d -MT $(BINDIR)$(PROJECT)/$*.o $*.c
 
 clean:
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD) clean
@@ -115,3 +116,6 @@ buildtest:
 		echo -n "Building for $${BOARD} .. "; \
 		env -i HOME=$${HOME} PATH=$${PATH} BOARD=$${BOARD} RIOTBASE=$${RIOTBASE} RIOTBOARD=$${RIOTBOARD} RIOTCPU=$${RIOTCPU} $(MAKE) -B clean all >/dev/null 2>&1 && echo -e "\033[1;32msuccess\033[0m" || echo -e "\033[1;31mfailed\033[0m" ; \
 	done
+
+.PHONY: $(OBJ:.o=.d)
+-include $(OBJ:.o=.d)
