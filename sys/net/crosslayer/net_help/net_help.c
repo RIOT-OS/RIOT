@@ -1,8 +1,16 @@
 /*
- * common.c
+ * Copyright (C) 2013  Freie Universität Berlin.
  *
- *  Created on: 05.10.2011
- *      Author: Oliver
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @{
+ * @file    net_help.c
+ * @brief   Providing implementation for prototypes defined in net_help.h.
+ * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
 #include <stdio.h>
@@ -59,3 +67,7 @@ uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len)
 
     return sum;
 }
+
+/**
+ * @}
+ */
