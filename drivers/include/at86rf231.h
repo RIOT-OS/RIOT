@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "radio/types.h"
+
 #include "ieee802154_frame.h"
 
 #include "at86rf231_arch.h"
@@ -42,8 +44,8 @@ uint8_t at86rf231_get_channel(void);
 uint16_t at86rf231_set_pan(uint16_t pan);
 uint16_t at86rf231_get_pan(void);
 
-uint16_t at86rf231_set_address(uint16_t address);
-uint16_t at86rf231_get_address(void);
+radio_address_t at86rf231_set_address(radio_address_t address);
+radio_address_t at86rf231_get_address(void);
 uint64_t at86rf231_get_address_long(void);
 uint64_t at86rf231_set_address_long(uint64_t address);
 
