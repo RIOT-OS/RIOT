@@ -1,10 +1,16 @@
 /*
- * tcp_hc.h
+ * Copyright (C) 2013  Freie Universität Berlin.
  *
- *  Created on: 01.02.2012
- *      Author: Oliver
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
  */
 
+/**
+ * @{
+ * @file    tcp_hc.c
+ * @author  Oliver Gesch <oliver.gesch@googlemail.com>
+ */
 #ifndef TCP_HC_H_
 #define TCP_HC_H_
 
@@ -25,3 +31,6 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current
 socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header);
 #endif
 #endif /* TCP_HC_H_ */
+/**
+ * @}
+ */
