@@ -10,9 +10,11 @@
 
 #ifndef MACA_H_
 #define MACA_H_
+#include <stdint.h>
+
+#include "radio/types.h"
 
 #include "maca_packet.h"
-#include <stdint.h>
 
 /*********************************************************/
 /* function definitions                                  */
@@ -29,8 +31,8 @@ void maca_check ( void );
 /* functions to configure MACA */
 void maca_set_power ( uint8_t power );
 void maca_set_channel ( uint8_t channel );
-uint16_t maca_set_address ( uint16_t addr );
-uint16_t maca_get_address ( void );
+radio_address_t maca_set_address (radio_address_t addr );
+radio_address_t maca_get_address ( void );
 uint16_t maca_set_pan(uint16_t pan);
 uint16_t maca_get_pan(void);
 
