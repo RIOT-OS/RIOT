@@ -13,6 +13,9 @@
  * @file        cib.c
  * @brief       Circular integer buffer implementation
  *
+ * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ *
  * @}
  */
 
