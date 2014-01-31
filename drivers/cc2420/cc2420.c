@@ -124,7 +124,7 @@ uint16_t cc2420_get_channel(void)
     return ((cc2420_read_reg(CC2420_REG_FSCTRL) - 357) / 5) + 11;
 }
 
-uint16_t cc2420_set_address(uint16_t addr)
+radio_address_t cc2420_set_address(radio_address_t addr)
 {
     uint8_t buf[2];
     buf[0] = (uint8_t)(addr & 0xFF);
@@ -149,7 +149,7 @@ uint64_t cc2420_set_address_long(uint64_t addr)
     return addr;
 }
 
-uint16_t cc2420_get_address(void)
+radio_address_t cc2420_get_address(void)
 {
     uint16_t addr;
     cc2420_read_ram(CC2420_RAM_SHORTADR, (uint8_t *)&addr, sizeof(addr));
