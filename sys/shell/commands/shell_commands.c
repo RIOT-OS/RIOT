@@ -14,6 +14,7 @@
  * @brief   sets up the system shell command struct
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @author  Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
+ * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  *
  * @note    $Id: shell_commands.c 3855 2013-09-05 12:54:57 kasmi $
  * @}
@@ -45,42 +46,46 @@ extern void _get_current_handler(char *unused);
 extern void _reset_current_handler(char *unused);
 #endif
 
-#ifdef MODULE_CC110X
+
+/* configure available commands for each transceiver device: */
 #ifdef MODULE_TRANSCEIVER
-extern void _cc1100_get_set_address_handler(char *addr);
-extern void _cc1100_get_set_channel_handler(char *chan);
-extern void _cc1100_send_handler(char *pkt);
-#else
+#ifdef DBG_IGNORE
+#define _TC_IGN
+#endif
+#if (defined(MODULE_CC110X_NG) || defined(MODULE_CC2420) || defined(MODULE_NATIVENET))
+#define _TC_ADDR
+#define _TC_CHAN
+#define _TC_MON
+#define _TC_SEND
+#endif
+#if (defined(MODULE_CC2420) || defined(MODULE_NATIVENET))
+#define _TC_PAN
+#endif
+#else /* WITHOUT MODULE_TRANSCEIVER */
+#ifdef MODULE_CC110X
 extern void _cc110x_get_set_address_handler(char *addr);
 extern void _cc110x_get_set_channel_handler(char *addr);
 #endif
 #endif
 
 #ifdef MODULE_TRANSCEIVER
-#ifdef MODULE_CC110X_NG
-extern void _cc110x_ng_get_set_address_handler(char *addr);
-extern void _cc110x_ng_get_set_channel_handler(char *chan);
-extern void _cc110x_ng_send_handler(char *pkt);
-extern void _cc110x_ng_monitor_handler(char *mode);
+#ifdef _TC_ADDR
+extern void _transceiver_get_set_address_handler(char *addr);
 #endif
+#ifdef _TC_CHAN
+extern void _transceiver_get_set_channel_handler(char *chan);
 #endif
-
-#ifdef MODULE_TRANSCEIVER
-#ifdef MODULE_CC2420
-extern void _cc2420_get_set_address_handler(char *addr);
-extern void _cc2420_get_set_channel_handler(char *chan);
-extern void _cc2420_get_set_pan_handler(char *pan);
-extern void _cc2420_send_handler(char *pkt);
-extern void _cc2420_monitor_handler(char *mode);
+#ifdef _TC_SEND
+extern void _transceiver_send_handler(char *pkt);
 #endif
+#ifdef _TC_MON
+extern void _transceiver_monitor_handler(char *mode);
 #endif
-
-#ifdef MODULE_TRANSCEIVER
-#ifdef MODULE_NATIVENET
-extern void _nativenet_get_set_address_handler(char *addr);
-extern void _nativenet_get_set_channel_handler(char *chan);
-extern void _nativenet_send_handler(char *pkt);
-extern void _nativenet_monitor_handler(char *mode);
+#ifdef _TC_PAN
+extern void _transceiver_get_set_pan_handler(char *chan);
+#endif
+#ifdef _TC_IGN
+extern void _transceiver_set_ignore_handler(char *addr);
 #endif
 #endif
 
@@ -118,41 +123,35 @@ const shell_command_t _shell_command_list[] = {
     {"cur", "Prints current and average power consumption.", _get_current_handler},
     {"rstcur", "Resets coulomb counter.", _reset_current_handler},
 #endif
-#ifdef MODULE_CC110X
+
+
 #ifdef MODULE_TRANSCEIVER
-    {"addr", "Gets or sets the address for the CC1100 transceiver", _cc1100_get_set_address_handler},
-    {"chan", "Gets or sets the channel for the CC1100 transceiver", _cc1100_get_set_channel_handler},
-    {"txtsnd", "Sends a text message to a given node via the CC1100 transceiver", _cc1100_send_handler},
-#else
+#ifdef _TC_ADDR
+    {"addr", "Gets or sets the address for the transceiver", _transceiver_get_set_address_handler},
+#endif
+#ifdef _TC_CHAN
+    {"chan", "Gets or sets the channel for the transceiver", _transceiver_get_set_channel_handler},
+#endif
+#ifdef _TC_SEND
+    {"txtsnd", "Sends a text message to a given node via the transceiver", _transceiver_send_handler},
+#endif
+#ifdef _TC_PAN
+    {"pan", "Gets or sets the pan id for the transceiver", _transceiver_get_set_pan_handler},
+#endif
+#ifdef _TC_MON
+    {"monitor", "Enables or disables address checking for the transceiver", _transceiver_monitor_handler},
+#endif
+#ifdef _TC_IGN
+    {"ign", "Ignore the address at the transceiver", _transceiver_set_ignore_handler},
+#endif
+#else /* WITHOUT MODULE_TRANSCEIVER */
+#ifdef MODULE_CC110X
     {"addr", "Gets or sets the address for the CC1100 transceiver", _cc110x_get_set_address_handler},
     {"chan", "Gets or sets the channel for the CC1100 transceiver", _cc110x_get_set_channel_handler},
 #endif
 #endif
-#ifdef MODULE_TRANSCEIVER
-#ifdef MODULE_CC110X_NG
-    {"addr", "Gets or sets the address for the CC1100 transceiver", _cc110x_ng_get_set_address_handler},
-    {"chan", "Gets or sets the channel for the CC1100 transceiver", _cc110x_ng_get_set_channel_handler},
-    {"txtsnd", "Sends a text message to a given node via the CC1100 transceiver", _cc110x_ng_send_handler},
-    {"monitor", "Enables or disables address checking for the CC1100 transceiver", _cc110x_ng_monitor_handler},
-#endif
-#endif
-#ifdef MODULE_TRANSCEIVER
-#ifdef MODULE_CC2420
-    {"addr", "Gets or sets the address for the CC2420 transceiver", _cc2420_get_set_address_handler},
-    {"chan", "Gets or sets the channel for the CC2420 transceiver", _cc2420_get_set_channel_handler},
-    {"pan", "Gets or sets the pan id for the CC2420 transceiver", _cc2420_get_set_pan_handler},
-    {"txtsnd", "Sends a text message to a given node via the C2420 transceiver", _cc2420_send_handler},
-    {"monitor", "Enables or disables address checking for the CC2420 transceiver", _cc2420_monitor_handler},
-#endif
-#endif
-#ifdef MODULE_TRANSCEIVER
-#ifdef MODULE_NATIVENET
-    {"addr", "Gets or sets the address for the native transceiver", _nativenet_get_set_address_handler},
-    {"chan", "Gets or sets the channel for the native transceiver", _nativenet_get_set_channel_handler},
-    {"txtsnd", "Sends a text message to a given node via the native transceiver", _nativenet_send_handler},
-    {"monitor", "Enables or disables address checking for the native transceiver", _nativenet_monitor_handler},
-#endif
-#endif
+
+
 #ifdef MODULE_MCI
     {DISK_READ_SECTOR_CMD, "Reads the specified sector of inserted memory card", _read_sector},
     {DISK_READ_BYTES_CMD, "Reads the specified bytes from inserted memory card", _read_bytes},
