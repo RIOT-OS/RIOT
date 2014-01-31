@@ -120,8 +120,8 @@ void receive_at86rf231_packet(radio_packet_t *trans_p);
 static int8_t send_packet(transceiver_type_t t, void *pkt);
 static int32_t get_channel(transceiver_type_t t);
 static int32_t set_channel(transceiver_type_t t, void *channel);
-static int16_t get_address(transceiver_type_t t);
-static int16_t set_address(transceiver_type_t t, void *address);
+static radio_address_t get_address(transceiver_type_t t);
+static radio_address_t set_address(transceiver_type_t t, void *address);
 static int32_t get_pan(transceiver_type_t t);
 static int32_t set_pan(transceiver_type_t t, void *pan);
 
@@ -283,12 +283,12 @@ void run(void)
                 break;
 
             case GET_ADDRESS:
-                *((int16_t *) cmd->data) = get_address(cmd->transceivers);
+                *((radio_address_t *) cmd->data) = get_address(cmd->transceivers);
                 msg_reply(&m, &m);
                 break;
 
             case SET_ADDRESS:
-                *((int16_t *) cmd->data) = set_address(cmd->transceivers, cmd->data);
+                *((radio_address_t *) cmd->data) = set_address(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;
 
@@ -827,9 +827,11 @@ static int32_t get_pan(transceiver_type_t t) {
  *
  * @param t     The transceiver device
  *
- * @return  The configured address of the device, -1 on error
+ * @return  The configured address of the device
+ *
+ * TODO: define error behavior
  */
-static int16_t get_address(transceiver_type_t t)
+static radio_address_t get_address(transceiver_type_t t)
 {
     switch(t) {
         case TRANSCEIVER_CC1100:
@@ -838,7 +840,7 @@ static int16_t get_address(transceiver_type_t t)
 #elif MODULE_CC110X
             return cc1100_get_address();
 #else
-            return -1;
+            return 0; /* XXX see TODO above */
 #endif
 #ifdef MODULE_CC2420
         case TRANSCEIVER_CC2420:
@@ -857,7 +859,7 @@ static int16_t get_address(transceiver_type_t t)
             return at86rf231_get_address();
 #endif
         default:
-            return -1;
+            return 0; /* XXX see TODO above */
     }
 }
 
@@ -868,8 +870,10 @@ static int16_t get_address(transceiver_type_t t)
  * @param address   Generic pointer to the address to set
  *
  * @return  The new radio address of the device
+ *
+ * TODO: define error behavior
  */
-static int16_t set_address(transceiver_type_t t, void *address)
+static radio_address_t set_address(transceiver_type_t t, void *address)
 {
     radio_address_t addr = *((radio_address_t *)address);
 
@@ -880,7 +884,7 @@ static int16_t set_address(transceiver_type_t t, void *address)
 #elif MODULE_CC110X
             return cc1100_set_address(addr);
 #else
-            return -1;
+            return 0; /* XXX see TODO above */
 #endif
 #ifdef MODULE_CC2420
         case TRANSCEIVER_CC2420:
@@ -899,7 +903,7 @@ static int16_t set_address(transceiver_type_t t, void *address)
             return at86rf231_set_address(addr);
 #endif
         default:
-            return -1;
+            return 0; /* XXX see TODO above */
     }
 }
 
