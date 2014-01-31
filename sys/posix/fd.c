@@ -6,6 +6,15 @@
  * details.
  */
 
+/**
+ * @ingroup posix
+ * @{
+ * @file    fd.c
+ * @brief   Providing unifying file descriptor wrapper for POSIX-compliant
+ *          operations.
+ * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ */
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -97,3 +106,7 @@ void fd_destroy(int fd)
 
     memset(cur, 0, sizeof(fd_t));
 }
+
+/**
+ * @}
+ */
