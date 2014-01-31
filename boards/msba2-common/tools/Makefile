@@ -40,7 +40,7 @@ boot_23xx.c boot_23xx.h: src/boot_23xx.armasm mkbootc
 	arm-none-eabi-objdump -d obj/boot_23xx.armobj | ./mkbootc boot_23xx
 
 clean:
-	rm -f bin/lpc2k_pgm cksum_test obj/*.o core core.* obj/*.armobj bin/pseudoterm
+	rm -f bin/lpc2k_pgm cksum_test obj/*.o obj/*.d core core.* obj/*.armobj bin/pseudoterm
 
 install:
 	install -m 0755 bin/lpc2k_pgm $(prefix)/bin
