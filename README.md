@@ -49,7 +49,7 @@ Its features comprise
 * The RIOT API itself can be built from the code using doxygen. The latest version is uploaded daily to http://riot-os.org/api.
 
 ### USING THE NATIVE PORT WITH NETWORKING
-If you compile RIOT for the native cpu and include the nativenet module, you need to specify a network interface like this: `./bin/default-native.elf tap0`
+If you compile RIOT for the native cpu and include the nativenet module, you need to specify a network interface like this: `./bin/native/default.elf tap0`
 
 #### SETTING UP A TAP NETWORK
 There is a shellscript in `RIOT/cpu/native` called `tapsetup.sh` which you can use to create a network of tap interfaces.
@@ -61,7 +61,7 @@ To create a bridge and two (or count at your option) tap interfaces:
 ### EXAMPLE APPLICATIONS
 In the `examples` directory you can find some example applications. The `default` application demonstrates all available features for the current platform.
 
-For example, you can use it to the test the native networking by running the `bin/default-native.elf` twice with two different tap interfaces as parameters, e.g. tap0 and tap1. Now configure two different addresses for both RIOT instances by typing `addr 1` and `addr 2`accordingly and send a text message from one "node" to another by typing `txtsnd 2 hello` on the first "node".
+For example, you can use it to the test the native networking by running the `./bin/native/default.elf` twice with two different tap interfaces as parameters, e.g. tap0 and tap1. Now configure two different addresses for both RIOT instances by typing `addr 1` and `addr 2`accordingly and send a text message from one "node" to another by typing `txtsnd 2 hello` on the first "node".
 
 ## CONTRIBUTE
 1. Check if your code follows the https://github.com/RIOT-OS/RIOT/wiki/Coding-conventions. If the code does not comply these style rules, your code will not be merged.
