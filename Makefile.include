@@ -37,23 +37,6 @@ include $(RIOTCPU)/$(CPU)/Makefile.include
 BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${PROJECT}.a
 
-# clumsy way to enable building native on osx:
-BUILDOSXNATIVE = 0
-ifeq ($(CPU),native)
-ifeq ($(shell uname -s),Darwin)
-	BUILDOSXNATIVE = 1
-endif
-endif
-
-# backward compatability with glibc <= 2.17 for native
-ifeq ($(CPU),native)
-ifeq ($(shell uname -s),Linux)
-ifeq ($(shell ldd --version |  awk '/^ldd/{if ($$NF < 2.17) {print "yes"} else {print "no"} }'),yes)
-	LINKFLAGS += -lrt
-endif
-endif
-endif
-
 .PHONY: all clean flash doc term
 
 ## make script for your project. Build RIOT-base here!
@@ -63,12 +46,12 @@ all: $(BINDIR)$(PROJECT).a
 	"$(MAKE)" -C $(RIOTBASE)
 	@for i in $(EXTERNAL_MODULES) ; do "$(MAKE)" -C $$i ; done ;
 ifeq ($(BUILDOSXNATIVE),1)	
-	$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
+	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
 	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS)
+endif
 	$(AD)$(SIZE) $(BINDIR)$(PROJECT).elf
 	$(AD)$(OBJCOPY) $(OFLAGS) $(BINDIR)$(PROJECT).elf $(BINDIR)$(PROJECT).hex
-endif
 
 ## your make rules
 ## Only basic example - modify it for larger projects!!
