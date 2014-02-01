@@ -73,7 +73,7 @@ void calc_rtt(void)
 {
     timex_t end;
     vtimer_now(&end);
-    timex_t result = vtimer_sub(end, start);
+    timex_t result = timex_sub(end, start);
 
     rtt = result.seconds + (float)result.microseconds / (1000.0 * 1000.0);
 }
