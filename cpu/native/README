@@ -16,7 +16,7 @@ it allows valgrind to tell you precisely which code triggered the error.
 Usage:
 Simply pass the ordinary command to valgrind like this:
 
-    valgrind ./bin/RIOT.elf tap0
+    valgrind ./bin/native/default.elf tap0
 
 This will yield some information whenever valgrind detects an invalid
 memory access.
@@ -24,7 +24,7 @@ memory access.
 In order to debug the program when this occurs you can pass the
 --db-attach parameter to valgrind like this:
 
-    valgrind --db-attach=yes ./bin/RIOT.elf tap0
+    valgrind --db-attach=yes ./bin/native/default.elf tap0
 
 Now, you will be asked whether you would like to attach the running
 process to gdb whenever a problem occurs.
@@ -46,7 +46,7 @@ NETWORK SUPPORT
 If you compile RIOT for the native cpu and include the native_net
 module, you need to specify a network interface like this:
 
-    ./bin/default-native.elf tap0
+    ./bin/native/default.elf tap0
 
 
 SETTING UP A TAP NETWORK
@@ -86,7 +86,7 @@ Valgrind will fork along with the riot process and dump its output in
 the terminal.
 
 Usage:
-    ./bin/default.elf -d
+    ./bin/native/default.elf -d
 
 Use uart redirection if you want to use a shell or get stderr/stdout
 output with/from a daemonized process.
@@ -100,14 +100,14 @@ options.
 
 Usage:
 To redirect stdio to a UNIX socket run:
-    ./bin/default.elf -u -d
+    ./bin/native/default.elf -u -d
     RIOT pid: 18663
 
 Attach this UNIX socket:
     nc -U /tmp/riot.tty.18663
 
 To redirect stdio to a TCP socket:
-    ./bin/default.elf -t 4711 -d
+    ./bin/native/default.elf -t 4711 -d
     RIOT pid: 18663
 
 Attach this TCP socket:
@@ -117,14 +117,14 @@ Stop the process:
     kill 18663
 
 To redirect stderr to a file:
-    ./bin/default.elf -d -e
+    ./bin/native/default.elf -d -e
     RIOT pid: 18663
 
 Read from it:
     tail -f /tmp/riot.stderr.18663
 
 To redirect stdout to a file:
-    ./bin/default.elf -d -o
+    ./bin/native/default.elf -d -o
     RIOT pid: 18663
 
 Read from it:
