@@ -9,7 +9,7 @@ export AR = $(PREFIX)ar
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
-export OBJCOPY = $(PREFIX)objcopy
+export OBJCOPY = true
 
 export DEBUGGER = gdb
 export TERMPROG = $(ELF)
@@ -24,6 +24,24 @@ export DEBUGGER_FLAGS = $(ELF)
 export VALGRIND_FLAGS ?= --track-origins=yes
 all-valgrind: export CFLAGS += -DHAVE_VALGRIND_VALGRIND_H -g
 
+# backward compatability with glibc <= 2.17 for native
+ifeq ($(CPU),native)
+ifeq ($(shell uname -s),Linux)
+ifeq ($(shell ldd --version |  awk '/^ldd/{if ($$NF < 2.17) {print "yes"} else {print "no"} }'),yes)
+	LINKFLAGS += -lrt
+endif
+endif
+endif
+
+# clumsy way to enable building native on osx:
+BUILDOSXNATIVE = 0
+ifeq ($(CPU),native)
+ifeq ($(shell uname -s),Darwin)
+	BUILDOSXNATIVE = 1
+endif
+endif
+
+# set the tap interface for term/valgrind
 ifneq (,$(findstring nativenet,$(USEMODULE)))
 	export PORT ?= tap0
 else
