@@ -14,7 +14,7 @@
  * @file
  * @brief       msba2 common config module functions
  *
- * @author	    Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  *
  */

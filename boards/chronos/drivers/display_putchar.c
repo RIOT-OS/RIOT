@@ -17,7 +17,7 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
- * @author      mikoff
+ * @author      Aleksandr Mikoff <sir.enmity@gmail.com>
  *
  */
 

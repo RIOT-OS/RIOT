@@ -14,7 +14,7 @@
  * @file
  * @brief       msb-430 common putchar implementation
  *
- * @author	    Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 

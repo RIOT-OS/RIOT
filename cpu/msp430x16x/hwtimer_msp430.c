@@ -10,8 +10,8 @@
  * @ingroup     cpu
  * @{
  *
- * @file        flashrom.c
- * @brief       MSP430x16xx flashrom functions
+ * @file        hwtimer_msp430_.c
+ * @brief       MSP430x16xx timer functions
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Milan Babel <babel@inf.fu-berlin.de>

@@ -16,7 +16,7 @@
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
- * @author      mikoff
+ * @author      Aleksandr Mikoff <sir.enmity@gmail.com>
  *
  */
 
