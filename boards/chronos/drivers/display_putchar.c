@@ -1,3 +1,26 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * The source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ */
+
+/**
+ * @ingroup chronos
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       eZ430-chronos putchar via display implementation
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      mikoff
+ *
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>

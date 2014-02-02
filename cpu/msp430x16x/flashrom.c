@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     cpu
+ * @{
+ *
+ * @file        flashrom.c
+ * @brief       MSP430x16xx flashrom functions
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ * @}
+ */
+
+#include "irq.h"
 #include <stddef.h>
 #include <stdint.h>
 #include "cpu.h"

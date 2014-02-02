@@ -1,8 +1,23 @@
 /*
- * lpc2387_timer0.c
+ * Copyright (C) 2014 INRIA
  *
- *  Created on: 13.01.2009
- *      Author: heiko
+ * The source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ */
+
+/**
+ * @ingroup msba2
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       msba2 benchmark functions
+ *
+ * @author      Heiko Will <heiko.will@fu-berlin.de>
+ * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ *
  */
 
 #include <stdint.h>

@@ -1,40 +1,55 @@
 /* *************************************************************************************************
  *
- *	Copyright (C) 2009 Texas Instruments Incorporated - http://www.ti.com/
+ *  Copyright (C) 2009 Texas Instruments Incorporated - http://www.ti.com/
  *
  *
- *	  Redistribution and use in source and binary forms, with or without
- *	  modification, are permitted provided that the following conditions
- *	  are met:
+ *    Redistribution and use in source and binary forms, with or without
+ *    modification, are permitted provided that the following conditions
+ *    are met:
  *
- *	    Redistributions of source code must retain the above copyright
- *	    notice, this list of conditions and the following disclaimer.
+ *      Redistributions of source code must retain the above copyright
+ *      notice, this list of conditions and the following disclaimer.
  *
- *	    Redistributions in binary form must reproduce the above copyright
- *	    notice, this list of conditions and the following disclaimer in the
- *	    documentation and/or other materials provided with the
- *	    distribution.
+ *      Redistributions in binary form must reproduce the above copyright
+ *      notice, this list of conditions and the following disclaimer in the
+ *      documentation and/or other materials provided with the
+ *      distribution.
  *
- *	    Neither the name of Texas Instruments Incorporated nor the names of
- *	    its contributors may be used to endorse or promote products derived
- *	    from this software without specific prior written permission.
+ *      Neither the name of Texas Instruments Incorporated nor the names of
+ *      its contributors may be used to endorse or promote products derived
+ *      from this software without specific prior written permission.
  *
- *	  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *	  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *	  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- *	  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *	  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *	  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- *	  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *	  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *	  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *	  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- *	  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ *    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ *    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ *    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * *************************************************************************************************
  * Basic display functions.
  * ************************************************************************************************/
 
+/**
+ * @ingroup chronos
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       eZ430-chronos display driver
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      mikoff
+ *
+ */
 /* *************************************************************************************************
  * Include section
  */
@@ -134,12 +149,12 @@ void write_lcd_mem(uint8_t *lcdmem, uint8_t bits, uint8_t bitmask, uint8_t state
     }
     else if (state == SEG_ON_BLINK_ON) {
         /* Clear visible / blink segments before writing */
-        *lcdmem 		= (uint8_t)(*lcdmem & ~bitmask);
-        *(lcdmem + 0x20) 	= (uint8_t)(*(lcdmem + 0x20) & ~bitmask);
+        *lcdmem         = (uint8_t)(*lcdmem & ~bitmask);
+        *(lcdmem + 0x20)    = (uint8_t)(*(lcdmem + 0x20) & ~bitmask);
 
         /* Set visible / blink segments */
-        *lcdmem 		= (uint8_t)(*lcdmem | bits);
-        *(lcdmem + 0x20) 	= (uint8_t)(*(lcdmem + 0x20) | bits);
+        *lcdmem         = (uint8_t)(*lcdmem | bits);
+        *(lcdmem + 0x20)    = (uint8_t)(*(lcdmem + 0x20) | bits);
     }
     else if (state == SEG_ON_BLINK_OFF) {
         /* Clear visible segments before writing */
@@ -149,14 +164,14 @@ void write_lcd_mem(uint8_t *lcdmem, uint8_t bits, uint8_t bitmask, uint8_t state
         *lcdmem = (uint8_t)(*lcdmem | bits);
 
         /* Clear blink segments */
-        *(lcdmem + 0x20) 	= (uint8_t)(*(lcdmem + 0x20) & ~bitmask);
+        *(lcdmem + 0x20)    = (uint8_t)(*(lcdmem + 0x20) & ~bitmask);
     }
     else if (state == SEG_OFF_BLINK_OFF) {
         /* Clear segments */
         *lcdmem = (uint8_t)(*lcdmem & ~bitmask);
 
         /* Clear blink segments */
-        *(lcdmem + 0x20) 	= (uint8_t)(*(lcdmem + 0x20) & ~bitmask);
+        *(lcdmem + 0x20)    = (uint8_t)(*(lcdmem + 0x20) & ~bitmask);
     }
 }
 
@@ -196,7 +211,7 @@ char *itoa(uint32_t n, uint8_t digits, uint8_t blanks)
     /* Remove specified number of leading '0', always keep last one */
     i = 0;
 
-    while ((itoa_str[i] == '0') && (i < digits1 - 1))	{
+    while ((itoa_str[i] == '0') && (i < digits1 - 1))   {
         if (blanks > 0) {
             /* Convert only specified number of leading '0' */
             itoa_str[i] = ' ';
@@ -227,24 +242,24 @@ void display_symbol(uint8_t symbol, uint8_t mode)
 
     if (symbol <= LCD_SEG_L2_DP) {
         /* Get LCD memory address for symbol from table */
-        lcdmem 	= (uint8_t *)segments_lcdmem[symbol];
+        lcdmem  = (uint8_t *)segments_lcdmem[symbol];
 
         /* Get bits for symbol from table */
-        bits 	= segments_bitmask[symbol];
+        bits    = segments_bitmask[symbol];
 
         /* Bitmask for symbols equals bits */
         bitmask = bits;
 
-        /* Write LCD memory 	 */
+        /* Write LCD memory      */
         write_lcd_mem(lcdmem, bits, bitmask, mode);
     }
 }
 
 void display_char(uint8_t segment, char chr, uint8_t mode)
 {
-    uint8_t *lcdmem;			/* Pointer to LCD memory */
-    uint8_t bitmask;			/* Bitmask for character */
-    uint8_t bits, bits1;		/* Bits to write */
+    uint8_t *lcdmem;            /* Pointer to LCD memory */
+    uint8_t bitmask;            /* Bitmask for character */
+    uint8_t bits, bits1;        /* Bits to write */
 
     /* Write to single 7-segment character */
     if ((segment >= LCD_SEG_L1_3) && (segment <= LCD_SEG_L2_DP)) {
@@ -283,7 +298,7 @@ void display_char(uint8_t segment, char chr, uint8_t mode)
             }
         }
 
-        /* Physically write to LCD memory		 */
+        /* Physically write to LCD memory        */
         write_lcd_mem(lcdmem, bits, bitmask, mode);
     }
 }
@@ -291,8 +306,8 @@ void display_char(uint8_t segment, char chr, uint8_t mode)
 void display_chars(uint8_t segments, char *str, uint8_t mode)
 {
     uint8_t i;
-    uint8_t length = 0;			/* Write length */
-    uint8_t char_start = 0;			/* Starting point for consecutive write */
+    uint8_t length = 0;         /* Write length */
+    uint8_t char_start = 0;         /* Starting point for consecutive write */
 
     switch (segments) {
             /* LINE1 */

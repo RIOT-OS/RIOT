@@ -1,6 +1,27 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * The source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ */
+
+/**
+ * @ingroup cpu
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       lpc iap  driver
+ * @note        based on iap driver for LPC2148 Controller made by Andreas Weschenfelder, 2008
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ */
+
+#include <stddef.h>
 /* iap driver
  *
- * based on iap driver for LPC2148 Controller made by Andreas Weschenfelder, 2008
  *
  */
 

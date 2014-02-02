@@ -1,3 +1,25 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     cpu
+ * @{
+ *
+ * @file        lpm_cpu.c
+ * @brief       low-power mode implementation for MSP430 MCUs
+ *
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
+ * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ *
+ * @}
+ */
+
 #include <stdio.h>
 #if (__GNUC__ >= 4) && (__GNUC_MINOR__ > 5)
     #include <intrinsics.h>   // MSP430-gcc compiler instrinsics
