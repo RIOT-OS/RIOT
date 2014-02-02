@@ -14,7 +14,7 @@
  * @file
  * @brief       msb-430 common board initialization
  *
- * @author	    Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  */
@@ -40,12 +40,12 @@ static uint8_t calc_umctl(uint16_t br)
     a <<= 1;
 
     do {
-        if (a & 0x80) {		/* Overflow to integer? */
-            a = a - 128 + CMOD;	/* Yes, subtract 1.000000 */
+        if (a & 0x80) {     /* Overflow to integer? */
+            a = a - 128 + CMOD; /* Yes, subtract 1.000000 */
             c |= 0x80;
         }
         else {
-            a += CMOD;			/* No, add fraction */
+            a += CMOD;          /* No, add fraction */
         }
 
         if (i == 7) {
@@ -61,13 +61,13 @@ static uint8_t calc_umctl(uint16_t br)
 static void msb_ports_init(void)
 {
     /* Port 1: Free port, for energy saving all outputs are set to zero. */
-    P1SEL = 0x00;	/* Port1 I/O Function */
-    P1OUT = 0x00;	/* Port1 Output register: 00000000 = 0x00 */
-    P1DIR = 0xFF;	/* Port1 Direction: 11111111 = 0xFF */
+    P1SEL = 0x00;   /* Port1 I/O Function */
+    P1OUT = 0x00;   /* Port1 Output register: 00000000 = 0x00 */
+    P1DIR = 0xFF;   /* Port1 Direction: 11111111 = 0xFF */
 
-    P2SEL = 0x20;	/* Port2 I/O Function */
-    P2OUT = 0x00;	/* Port2 Output register: 00000000 = 0x00 */
-    P2DIR = 0x1C;	/* Port2 Direction: 00011010 = 0x1C */
+    P2SEL = 0x20;   /* Port2 I/O Function */
+    P2OUT = 0x00;   /* Port2 Output register: 00000000 = 0x00 */
+    P2DIR = 0x1C;   /* Port2 Direction: 00011010 = 0x1C */
     /*   0 - P2.0 [IN ] - */
     /*   0 - P2.1 [OUT] - */
     /*   1 - P2.2 [IN ] - */
@@ -77,9 +77,9 @@ static void msb_ports_init(void)
     /*   0 - P2.6 [IN ] - SDC Protect */
     /*   0 - P2.7 [IN ] - SDC Detect */
 
-    P3SEL = 0xC0;	/* Port3 Pins 6 & 7 for USART */
-    P3OUT = 0x49;	/* Port3 Output register: 01001001: 0x49 */
-    P3DIR = 0xAB;	/* Port3 Direction: 10101011: 0xAB */
+    P3SEL = 0xC0;   /* Port3 Pins 6 & 7 for USART */
+    P3OUT = 0x49;   /* Port3 Output register: 01001001: 0x49 */
+    P3DIR = 0xAB;   /* Port3 Direction: 10101011: 0xAB */
     /*   1 - P3.0 */
     /*   1 - P3.1 */
     /*   0 - P3.2 */
@@ -90,9 +90,9 @@ static void msb_ports_init(void)
     /*   1 - P3.7 [2-Funktion] - RS232_TxD */
 
     /* Port 4: Free port, for energy saving all outputs are set to zero. */
-    P4SEL = 0x00;	/* Port4 I/O Function */
-    P4OUT = 0x00;	/* Port4 Output register: 00000000 = 0x00 */
-    P4DIR = 0xFF;	/* Port4 Direction: 11111111 = 0xFF */
+    P4SEL = 0x00;   /* Port4 I/O Function */
+    P4OUT = 0x00;   /* Port4 Output register: 00000000 = 0x00 */
+    P4DIR = 0xFF;   /* Port4 Direction: 11111111 = 0xFF */
     /*   1 - P4.0 [OUT] - unused */
     /*   1 - P4.1 [OUT] - unused */
     /*   1 - P4.2 [OUT] - unused */
@@ -102,9 +102,9 @@ static void msb_ports_init(void)
     /*   1 - P4.6 [OUT] - unused */
     /*   1 - P4.7 [OUT] - unused */
 
-    P5SEL = 0x00;	/* Port5 I/O Function: 00000000 = 0x00 */
-    P5OUT = 0x80;	/* Port5 Output register: 00001001 = 0x09 */
-    P5DIR = 0xFF;	/* Port5 Direction: 11111011 = 0xFB */
+    P5SEL = 0x00;   /* Port5 I/O Function: 00000000 = 0x00 */
+    P5OUT = 0x80;   /* Port5 Output register: 00001001 = 0x09 */
+    P5DIR = 0xFF;   /* Port5 Direction: 11111011 = 0xFB */
     /*   1 - P5.0 [OUT] - SDC /CS */
     /*   1 - P5.1 [OUT] - SDC DI */
     /*   0 - P5.2 [IN ] - SDC DO */
@@ -114,9 +114,9 @@ static void msb_ports_init(void)
     /*   1 - P5.6 [OUT] - MMA /SLEEP */
     /*   1 - P5.7 [OUT] - LED_RED 0-on, 1-off */
 
-    P6SEL = 0x00;	/* Port6 I/O Function = 0x07 */
-    P6OUT = 0x00;	/* Port6 Output register: 00000000 = 0x00 */
-    P6DIR = 0xFF;	/* Port6 Direction: 11111000 = 0xF8 */
+    P6SEL = 0x00;   /* Port6 I/O Function = 0x07 */
+    P6OUT = 0x00;   /* Port6 Output register: 00000000 = 0x00 */
+    P6DIR = 0xFF;   /* Port6 Direction: 11111000 = 0xF8 */
     /*   0 - P6.0 [AD-IN] - MMA X-Axis */
     /*   0 - P6.1 [AD-IN] - MMA Y-Axis */
     /*   0 - P6.2 [AD-IN] - MMA Z-Axis */
@@ -133,14 +133,14 @@ void msp430_set_cpu_speed(uint32_t speed)
     __msp430_cpu_speed = speed;
     msp430_init_dco();
     uint16_t br;
-    UCTL1 = SWRST | CHAR;		/* 8-bit character */
-    UTCTL1 |= SSEL1 | URXSE;	/* UCLK = MCLK */
+    UCTL1 = SWRST | CHAR;       /* 8-bit character */
+    UTCTL1 |= SSEL1 | URXSE;    /* UCLK = MCLK */
     /* activate */
-    U1ME |= UTXE1 | URXE1;		/* Enable USART1 TXD/RXD */
+    U1ME |= UTXE1 | URXE1;      /* Enable USART1 TXD/RXD */
     br = (uint16_t)(__msp430_cpu_speed / 115200uL);
-    UBR01  = br;				/* set baudrate */
+    UBR01  = br;                /* set baudrate */
     UBR11  = br >> 8;
-    UMCTL1 = calc_umctl(br);	/* set modulation */
+    UMCTL1 = calc_umctl(br);    /* set modulation */
 
     ME2 |= (UTXE1 | URXE1);
     UCTL1 &= ~SWRST;
@@ -166,20 +166,20 @@ void msp430_init_dco(void)
 
     /* Wait for xtal to stabilize */
     do {
-        IFG1 &= ~OFIFG;				/* Clear oscillator fault flag */
+        IFG1 &= ~OFIFG;             /* Clear oscillator fault flag */
 
         for (i = 0xFF; i > 0; i--); /* Time for flag to set */
     }
-    while ((IFG1 & OFIFG) != 0);	/* Oscillator fault flag still set? */
+    while ((IFG1 & OFIFG) != 0);    /* Oscillator fault flag still set? */
 
-    BCSCTL2 = SELM_2 + SELS;		/* MCLK und SMCLK = XT2 (safe) */
+    BCSCTL2 = SELM_2 + SELS;        /* MCLK und SMCLK = XT2 (safe) */
 #else
     int delta = __msp430_cpu_speed >> 12;
     unsigned int compare, oldcapture = 0;
     unsigned int i;
 
     BCSCTL1 = 0xa4; /* ACLK is devided by 4. RSEL=6 no division for MCLK
-		     and SSMCLK. XT2 is off. */
+             and SSMCLK. XT2 is off. */
 
     /* Init FLL to desired frequency using the 32762Hz crystal */
 #if MSP430_HAS_DCOR
