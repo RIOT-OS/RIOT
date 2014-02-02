@@ -26,11 +26,20 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * This file is part of the Contiki operating system.
- *
- * @(#)$Id$
- *
  * Modified by Kaspar Schleiser
+ */
+
+/**
+ * @ingroup     cpu
+ * @{
+ *
+ * @file        msp430-main.c
+ * @brief       MSP430 CPU initialization
+ *
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ * @}
  */
 
 #include "cpu.h"
@@ -95,7 +104,7 @@ init_ports(void)
 
 /*---------------------------------------------------------------------------*/
 /* msp430-ld may align _end incorrectly. Workaround in cpu_init. */
-extern int _end;		/* Not in sys/unistd.h */
+extern int _end;        /* Not in sys/unistd.h */
 static char *cur_break = (char *) &_end;
 
 void msp430_cpu_init(void)
@@ -151,7 +160,7 @@ splhigh_(void)
     int sr;
     asmv("mov r2, %0" : "=r"(sr));
     asmv("bic %0, r2" : : "i"(GIE));
-    return sr & GIE;		/* Ignore other sr bits. */
+    return sr & GIE;        /* Ignore other sr bits. */
 }
 /*---------------------------------------------------------------------------*/
 /*

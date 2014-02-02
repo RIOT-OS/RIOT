@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * The source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ */
+
+/**
+ * @ingroup cc430
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       cc430 flashrom driver
+ *
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
+ *
+ */
+
 #include <stddef.h>
 #include <stdint.h>
 #include "cpu.h"
@@ -10,7 +30,7 @@ static inline void busy_wait(void);
 /*---------------------------------------------------------------------------*/
 uint8_t flashrom_erase(uint8_t *addr)
 {
-	// TODO implement this function
+    // TODO implement this function
     return 0;
 }
 /*---------------------------------------------------------------------------*/

@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * The source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ */
+
+/**
+ * @ingroup chronos
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       eZ430-chronos radio driver (board dependent part)
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ */
+
+#include <stdint.h>
 #include <stdint.h>
 #include <cc430f6137.h>
 
@@ -13,17 +34,17 @@
 
 int cc110x_get_gdo0(void)
 {
-    return 	CC1100_GDO0;
+    return  CC1100_GDO0;
 }
 
 int cc110x_get_gdo1(void)
 {
-    return 	CC1100_GDO1;
+    return  CC1100_GDO1;
 }
 
 int cc110x_get_gdo2(void)
 {
-    return 	CC1100_GDO2;
+    return  CC1100_GDO2;
 }
 
 void cc110x_before_send(void)

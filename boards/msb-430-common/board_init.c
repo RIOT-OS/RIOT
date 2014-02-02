@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * The source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ */
+
+/**
+ * @ingroup boards
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       msb-430 common board initialization
+ *
+ * @author	    Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ */
+
 #include "cpu.h"
 #include "board.h"
 #include "kernel_internal.h"

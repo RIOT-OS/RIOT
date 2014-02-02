@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     cpu
+ * @{
+ *
+ * @file        atomic.c
+ * @brief       atomic set and return function
+ *
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ * @}
+ */
+
 #include "atomic.h"
 #include "cpu.h"
 
