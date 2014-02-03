@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup examples
+ * @{
+ *
+ * @file
+ * @brief UDP RPL example application
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ * @}
+ */
+
 #include <stdio.h>
 
 #include "posix_io.h"
