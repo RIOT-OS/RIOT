@@ -24,6 +24,9 @@
 
 #include <stdint.h>
 
+#include "inet_ntop.h"
+#include "net_help.h"
+#include "net_if.h"
 #include "sixlowpan/types.h"
 
 /**
@@ -95,6 +98,21 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
                 const uint8_t *payload, uint16_t payload_length);
 
 /**
+ * @brief   Send an IPv6 packet defined by its header.
+ *
+ * @param[in] packet            Pointer to an prepared IPv6 packet header.
+ *                              The payload is expected directly after the
+ *                              packet.
+ *
+ * @return  length of payload : on success
+ *          -1                : if no route to the given dest could be obtained
+ *                              Packet is dropped
+ *                              In case of reactive routing: routing is going
+ *                              to try to find a route
+ */
+int ipv6_send_packet(ipv6_hdr_t *packet);
+
+/**
  * @brief   Determines if node is a router.
  *
  * @return  1 if node is router, 0 otherwise.
@@ -131,7 +149,11 @@ void ipv6_register_rpl_handler(int pid);
  *
  * @param[in,out] ipv6_addr The address to set.
  */
-void ipv6_addr_set_link_local_prefix(ipv6_addr_t *ipv6_addr);
+static inline void ipv6_addr_set_link_local_prefix(ipv6_addr_t *ipv6_addr)
+{
+    ipv6_addr->uint32[0] = HTONL(0xfe800000);
+    ipv6_addr->uint32[1] = 0;
+}
 
 /**
  * @brief   Sets IPv6 address *out* according to the remaining
@@ -152,16 +174,20 @@ void ipv6_addr_init(ipv6_addr_t *out, uint16_t addr0, uint16_t addr1,
                     uint16_t addr5, uint16_t addr6, uint16_t addr7);
 
 /**
- * @brief   Sets IPv6 address *out* using the given *prefix* and this
- *          nodes EUI-64 (i. e. interface must be initialized).
+ * @brief   Sets IPv6 address *out* using the given *prefix* and an interface's
+ *          EUI-64.
+ *
  *
  * @param[out]  out     Address to be set.
+ * @param[in]   if_id   The interface to take the EUI-64 from.
  * @param[in]   prefix  64-bit network prefix to be used for *out*
  *                      (only the first 64 bit of the ipv6_addr_t type
  *                      are copied to *out*)
+ *
+ * @return  The Address to be set on success, NULL on error.
  */
-void ipv6_addr_set_by_eui64(ipv6_addr_t *out,
-                            const ipv6_addr_t *prefix);
+ipv6_addr_t *ipv6_addr_set_by_eui64(ipv6_addr_t *out, int if_id,
+                                    const ipv6_addr_t *prefix);
 
 /**
  * @brief   Sets IPv6 address *out* with the first *bits* bit taken
@@ -184,7 +210,13 @@ void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix,
  *
  * @param[out] ipv6_addr    Is set to the loopback address.
  */
-void ipv6_addr_set_loopback_addr(ipv6_addr_t *ipv6_addr);
+static inline void ipv6_addr_set_loopback_addr(ipv6_addr_t *ipv6_addr)
+{
+    ipv6_addr->uint32[0] = 0;
+    ipv6_addr->uint32[1] = 0;
+    ipv6_addr->uint32[2] = 0;
+    ipv6_addr->uint32[3] = HTONL(1);
+}
 
 /**
  * @brief   Set *ipv6_addr* to a link-local all routers multicast
@@ -197,7 +229,13 @@ void ipv6_addr_set_loopback_addr(ipv6_addr_t *ipv6_addr);
  * @param[out] ipv6_addr    Is set to a link-local all routers multicast
  *                          address.
  */
-void ipv6_addr_set_all_routers_addr(ipv6_addr_t *ipv6_addr);
+static inline void ipv6_addr_set_all_routers_addr(ipv6_addr_t *ipv6_addr)
+{
+    ipv6_addr->uint32[0] = HTONL(0xff020000);
+    ipv6_addr->uint32[1] = 0;
+    ipv6_addr->uint32[2] = 0;
+    ipv6_addr->uint32[3] = HTONL(2);
+}
 
 /**
  * @brief   Set *ipv6_addr* to a link-local all nodes multicast address
@@ -210,7 +248,13 @@ void ipv6_addr_set_all_routers_addr(ipv6_addr_t *ipv6_addr);
  * @param[out] ipv6_addr    Is set to a link-local all nodes multicast
  *                          address.
  */
-void ipv6_addr_set_all_nodes_addr(ipv6_addr_t *ipv6_addr);
+static inline void ipv6_addr_set_all_nodes_addr(ipv6_addr_t *ipv6_addr)
+{
+    ipv6_addr->uint32[0] = HTONL(0xff020000);
+    ipv6_addr->uint32[1] = 0;
+    ipv6_addr->uint32[2] = 0;
+    ipv6_addr->uint32[3] = HTONL(1);
+}
 
 /**
  * @brief   Set *ipv6_addr_out* to the solicited-node multicast address
@@ -225,22 +269,34 @@ void ipv6_addr_set_all_nodes_addr(ipv6_addr_t *ipv6_addr);
  * @param[in]   ipv6_addr_in    The IPv6 address the solicited-node
  *                              address.
  */
-void ipv6_addr_set_solicited_node_addr(ipv6_addr_t *ipv6_addr_out,
-                                       const ipv6_addr_t *ipv6_addr_in);
+static inline void ipv6_addr_set_solicited_node_addr(ipv6_addr_t *ipv6_addr_out,
+        const ipv6_addr_t *ipv6_addr_in)
+{
+    /* copy only the last 24-bit of the ip-address that is beeing resolved */
+    ipv6_addr_out->uint32[0] = HTONL(0xff020000);
+    ipv6_addr_out->uint32[1] = 0;
+    ipv6_addr_out->uint32[2] = HTONS(1);
+    ipv6_addr_out->uint8[12] = 0xff;
+    ipv6_addr_out->uint8[13] = ipv6_addr_in->uint8[13];
+    ipv6_addr_out->uint16[7] = ipv6_addr_in->uint16[7];
+}
 
 /**
- * @brief   Converts IPv6 address into string (unabbrivated notation).
- *          Note that addr_str must allocate at least
- *          IPV6_MAX_ADDR_STR_LEN byte (40 byte).
+ * @brief   Converts IPv6 address into string.
  *
  * @param[out]  addr_str    The IPv6 address as string. Must allocate
  *                          at least IPV6_MAX_ADDR_STR_LEN byte (40
  *                          byte).
+ * @param[in]   str_len     The maximum length available to *addr_str*.
  * @param[in]   ipv6_addr   IPv6 address to be converted.
  *
  * @return  Pointer to addr_str.
  */
-char *ipv6_addr_to_str(char *addr_str, const ipv6_addr_t *ipv6_addr);
+static inline const char *ipv6_addr_to_str(char *addr_str, uint8_t str_len,
+        const ipv6_addr_t *ipv6_addr)
+{
+    return inet_ntop(AF_INET6, ipv6_addr, addr_str, (size_t)str_len);
+}
 
 /**
  * @brief   Checks if two IPv6 addresses are equal.
@@ -250,7 +306,13 @@ char *ipv6_addr_to_str(char *addr_str, const ipv6_addr_t *ipv6_addr);
  *
  * @return  1 if *a* and *b* are equal, 0 otherwise.
  */
-int ipv6_addr_is_equal(const ipv6_addr_t *a, const ipv6_addr_t *b);
+static inline int ipv6_addr_is_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
+{
+    return a->uint32[0] == b->uint32[0] &&
+           a->uint32[1] == b->uint32[1] &&
+           a->uint32[2] == b->uint32[2] &&
+           a->uint32[3] == b->uint32[3];
+}
 
 /**
  * @brief   Checks if *ipv6_addr* is unspecified (all zero).
@@ -263,7 +325,48 @@ int ipv6_addr_is_equal(const ipv6_addr_t *a, const ipv6_addr_t *b);
  *
  * @return  1 if *ipv6_addr* is unspecified address, 0 otherwise.
  */
-int ipv6_addr_is_unspecified(const ipv6_addr_t *ipv6_addr);
+static inline int ipv6_addr_is_unspecified(const ipv6_addr_t *ipv6_addr)
+{
+    return ipv6_addr->uint32[0] == 0 &&
+           ipv6_addr->uint32[1] == 0 &&
+           ipv6_addr->uint32[2] == 0 &&
+           ipv6_addr->uint32[3] == 0;
+}
+
+/**
+ * @brief   Check if *ipv6_addr* is a multicast address.
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4291">
+ *          RFC 4291
+ *      </a>
+ *
+ * @param[in] ipv6_addr     An IPv6 address.
+ *
+ * @return  1 if *ipv6_addr* is multicast address, 0 otherwise.
+ */
+static inline int ipv6_addr_is_multicast(const ipv6_addr_t *ipv6_addr)
+{
+    return (ipv6_addr->uint8[0] == 0xff);
+}
+
+/**
+ * @brief   Checks if *ipv6_addr* is a loopback address.
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4291">
+ *          RFC 4291
+ *      </a>
+ *
+ * @param[in] ipv6_addr An IPv6 address.
+ *
+ * @return  1 if *ipv6_addr* is loopback address, 0 otherwise.
+ */
+static inline int ipv6_addr_is_loopback(const ipv6_addr_t *ipv6_addr)
+{
+    return ipv6_addr->uint32[0] == 0 &&
+           ipv6_addr->uint32[1] == 0 &&
+           ipv6_addr->uint32[2] == 0 &&
+           NTOHL(ipv6_addr->uint32[3]) == 1;
+}
 
 /**
  * @brief   Check if *ipv6_addr* is a link-local address.
@@ -276,7 +379,13 @@ int ipv6_addr_is_unspecified(const ipv6_addr_t *ipv6_addr);
  *
  * @return  1 if *ipv6_addr* is link-local address, 0 otherwise.
  */
-int ipv6_addr_is_link_local(const ipv6_addr_t *ipv6_addr);
+static inline int ipv6_addr_is_link_local(const ipv6_addr_t *ipv6_addr)
+{
+    return (ipv6_addr->uint32[0] == HTONL(0xfe800000) &&
+            ipv6_addr->uint32[1] == 0) ||
+           (ipv6_addr_is_multicast(ipv6_addr) &&
+            (ipv6_addr->uint8[1] & 0x0f) == 2);
+}
 
 /**
  * @brief   Check if *ipv6_addr* is unique local unicast address.
@@ -290,20 +399,10 @@ int ipv6_addr_is_link_local(const ipv6_addr_t *ipv6_addr);
  * @return  1 if *ipv6_addr* is unique local unicast address,
  *          0 otherwise.
  */
-int ipv6_addr_is_unique_local_unicast(const ipv6_addr_t *addr);
-
-/**
- * @brief   Check if *ipv6_addr* is a multicast address.
- *
- * @see <a href="http://tools.ietf.org/html/rfc4291">
- *          RFC 4291
- *      </a>
- *
- * @param[in] ipv6_addr     An IPv6 address.
- *
- * @return  1 if *ipv6_addr* is multicast address, 0 otherwise.
- */
-int ipv6_addr_is_multicast(const ipv6_addr_t *ipv6_addr);
+static inline int ipv6_addr_is_unique_local_unicast(const ipv6_addr_t *ipv6_addr)
+{
+    return (ipv6_addr->uint8[0] == 0xfc || ipv6_addr->uint8[0] == 0xfd);
+}
 
 /**
  * @brief   Check if *ipv6_addr* is solicited-node multicast address.
@@ -317,7 +416,28 @@ int ipv6_addr_is_multicast(const ipv6_addr_t *ipv6_addr);
  * @return  1 if *ipv6_addr* is solicited-node multicast address,
  *          0 otherwise.
  */
-int ipv6_addr_is_solicited_node(const ipv6_addr_t *ipv6_addr);
+static inline int ipv6_addr_is_solicited_node(const ipv6_addr_t *ipv6_addr)
+{
+    return ipv6_addr->uint32[0] == HTONL(0xff020000) &&
+           ipv6_addr->uint32[1] == 0 &&
+           ipv6_addr->uint32[2] == HTONL(1) &&
+           ipv6_addr->uint8[12] == 0xff;
+}
+
+/**
+ * @brief   Get pointer to potential EUI-64 bit of the IPv6 address.
+ *
+ * @param[in] ipv6_addr     An IPv6 address of this node.
+ * @param[in] prefix_len    Length of the prefix. Only multiples of 8 are
+ *                          possible.
+ *
+ * @return  The IID (as EUI-64) of this node.
+ */
+static inline net_if_eui64_t *ipv6_addr_get_iid(const ipv6_addr_t *ipv6_addr,
+        uint8_t prefix_len)
+{
+    return ((net_if_eui64_t *) &ipv6_addr->uint8[prefix_len / 8]);
+}
 
 /*
  * TODO to wrap sixlowpan initialisations
@@ -325,26 +445,35 @@ int ipv6_addr_is_solicited_node(const ipv6_addr_t *ipv6_addr);
  */
 
 /**
- * @brief   Add an IPv6 address to this nodes interface.
+ * @brief   Add an IPv6 address to one of this nodes interfaces.
  *
  * @see <a href="http://tools.ietf.org/html/rfc4862">
  *          RFC 4862
  *      </a>
  *
+ * @param[in] if_id         The interface's ID.
  * @param[in] addr          Address to be added to the interface.
  * @param[in] type          Type of this address.
  * @param[in] state         Initial state of the address.
- * @param[in] val_ltime     Valid lifetime of this address in seconds.
+ * @param[in] val_ltime     Valid lifetime of this address in seconds. Set 0
+ *                          for unspecified.
  * @param[in] pref_ltime    Preferred lifetime of this address in
- *                          seconds.
+ *                          seconds. Set 0 for unspecified.
+ * @param[in] is_anycast    Determines if an address is anycast. Anycast
+ *                          addresses are syntactically undistinguishable
+ *                          from unicast addresses and can only be identified
+ *                          with this flag. If *addr* is no unicast address
+ *                          and *is_anycast* is set, this function will fail.
+ *
+ * @return 1 on success, 0 on failure.
  */
-void ipv6_iface_add_addr(const ipv6_addr_t *addr, ipv6_addr_type_t type,
+int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
                          ndp_addr_state_t state, uint32_t val_ltime,
-                         uint32_t pref_ltime);
+                         uint32_t pref_ltime, uint8_t is_anycast);
 
 /**
  * @brief   Tries to determine best suitable source address attached to
- *          the interface of this node based on the given destination
+ *          an interface of this node based on the given destination
  *          address. The use-case for this function is to find a
  *          suitable address for the source address field of an IPv6
  *          address upon sending. *src* may be empty (all zero) if there
@@ -352,16 +481,11 @@ void ipv6_iface_add_addr(const ipv6_addr_t *addr, ipv6_addr_type_t type,
  *
  * @param[out]  src     The best source address for this node (may be
  *                      all zero if ther is none).
+ * @param[in]   if_id   The interface's ID.
  * @param[in]   dest    The destination address for a packet we search
  *                      the source address for.
  */
-void ipv6_iface_get_best_src_addr(ipv6_addr_t *src,
-                                  const ipv6_addr_t *dest);
-
-/**
- * @brief   Print all addresses attached to the interface to stdout.
- */
-void ipv6_iface_print_addrs(void);
+void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest);
 
 /**
  * @brief   Registers a function that decides how to route incomming

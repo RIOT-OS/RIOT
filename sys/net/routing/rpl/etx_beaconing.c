@@ -169,14 +169,6 @@ void etx_beacon(void)
     etx_probe_t *packet = etx_get_send_buf();
     uint8_t p_length = 0;
 
-    /*
-     * xxx If you get a -Wmissing-braces warning here:
-     * A -Wmissing-braces warning at this point is a gcc-bug!
-     * Please delete this information once it's fixed
-     * See: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
-     */
-    ieee_802154_long_t empty_addr = { {0} };
-
     while (true) {
         thread_sleep();
         mutex_lock(&etx_mutex);
@@ -194,7 +186,7 @@ void etx_beacon(void)
         }
 
         packet->length = p_length;
-        sixlowpan_mac_send_ieee802154_frame(&empty_addr, &etx_send_buf[0],
+        sixlowpan_mac_send_ieee802154_frame_long(0, NULL, &etx_send_buf[0],
                               ETX_DATA_MAXLEN + ETX_PKT_HDR_LEN, 1);
         DEBUG("sent beacon!\n");
         etx_set_packets_received();
@@ -394,7 +386,7 @@ void etx_radio(void)
     ipv6_addr_t candidate_addr;
 
     ipv6_addr_set_link_local_prefix(&ll_address);
-    ipv6_iface_get_best_src_addr(&candidate_addr, &ll_address);
+    ipv6_net_if_get_best_src_addr(&candidate_addr, &ll_address);
 
     while (1) {
         msg_receive(&m);
