@@ -1,3 +1,16 @@
 export INCLUDES += -I$(RIOTBOARD)/avsextrem/include
 
+ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
+	ifeq (,$(filter cc110x,$(USEMODULE)))
+		USEMODULE += cc110x
+	endif
+	ifeq (,$(filter transceiver,$(USEMODULE)))
+		USEMODULE += transceiver
+	endif
+endif
+
+ifneq (,$(filter cc110x,$(USEMODULE)))
+	INCLUDES += -I$(RIOTBASE)/sys/net/include
+endif
+
 include $(RIOTBOARD)/msba2-common/Makefile.include
