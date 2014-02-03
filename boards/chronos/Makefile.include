@@ -20,3 +20,5 @@ export HEXFILE = $(BINDIR)$(PROJECT).hex
 export USEMODULE += msp430_common
 export FFLAGS = rf2500 "prog $(HEXFILE)"
 export OFLAGS = -O ihex
+
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep

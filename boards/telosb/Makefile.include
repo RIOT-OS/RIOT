@@ -24,3 +24,12 @@ export FFLAGS = --telosb -c $(PORT) -r -e -I -p $(HEXFILE)
 
 export INCLUDES += -I$(RIOTCPU)/msp430-common/include -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/drivers/cc2420/include -I$(RIOTBASE)/sys/net/include
 export OFLAGS = -O ihex
+
+ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
+	ifeq (,$(filter cc2240,$(USEMODULE)))
+		USEMODULE += cc2420
+	endif
+	ifeq (,$(filter transceiver,$(USEMODULE)))
+		USEMODULE += transceiver
+	endif
+endif

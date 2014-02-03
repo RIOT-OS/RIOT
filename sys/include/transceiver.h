@@ -15,29 +15,54 @@
  * https://github.com/RIOT-OS/RIOT/issues/117 */
 #ifdef MODULE_CC110X
 #include "cc110x.h"
+#ifndef TRANSCEIVER_DEFAULT
+#define TRANSCEIVER_DEFAULT TRANSCEIVER_CC1100
+#endif
 #endif
 
 #ifdef MODULE_CC110X_NG
 #include "cc110x_ng.h"
+#ifndef TRANSCEIVER_DEFAULT
+#define TRANSCEIVER_DEFAULT TRANSCEIVER_CC1100
+#endif
+#endif
+
+#ifdef MODULE_CC11020
+#include "cc1020.h"
+#ifndef TRANSCEIVER_DEFAULT
+#define TRANSCEIVER_DEFAULT TRANSCEIVER_CC1020
+#endif
 #endif
 
 #ifdef MODULE_CC2420
 #include "cc2420.h"
+#ifndef TRANSCEIVER_DEFAULT
+#define TRANSCEIVER_DEFAULT TRANSCEIVER_CC2420
+#endif
 #endif
 
 #ifdef MODULE_MC1322X
 #include "mc1322x.h"
 #include "maca.h"
 #include "maca_packet.h"
+#ifndef TRANSCEIVER_DEFAULT
+#define TRANSCEIVER_DEFAULT TRANSCEIVER_MC1322X
+#endif
 #endif
 
 #ifdef MODULE_NATIVENET
 #include "nativenet.h"
 #include "nativenet_internal.h"
+#ifndef TRANSCEIVER_DEFAULT
+#define TRANSCEIVER_DEFAULT TRANSCEIVER_NATIVE
+#endif
 #endif
 
 #ifdef MODULE_AT86RF231
 #include "at86rf231.h"
+#ifndef TRANSCEIVER_DEFAULT
+#define TRANSCEIVER_DEFAULT TRANSCEIVER_AT86RF231
+#endif
 #endif
 
 /* Stack size for transceiver thread */
