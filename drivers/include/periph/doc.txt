@@ -1,0 +1,16 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the LGPLv2 License.
+ * See the file LICENSE in the top level directory for more details.
+ */
+
+/**
+ * @defgroup    driver_periph
+ * @ingroup     driver
+ * @brief       Low-level periphial drivers
+ *
+ * The module contains the low-level periphial driver layer. It consists of a set
+ * of platform independent interface definitions and cpu specific implementations
+ * for every targeted platform.
+ */
