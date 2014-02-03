@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2013 INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup sys
+ * @{
+ *
+ * @file
+ * @brief UART implementation
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ *
+ * @}
+ */
+
 #include <stdio.h>
 
 #include "cpu-conf.h"
