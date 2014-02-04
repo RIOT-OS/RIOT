@@ -1,31 +1,43 @@
 export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
 export CPU = native
+export ELF = $(BINDIR)$(PROJECT).elf
 
-# toolchain config
-export PREFIX = 
-#export CC = $(PREFIX)gcc
+# toolchain:
+export PREFIX =
+export CC ?= $(PREFIX)gcc
 export AR = $(PREFIX)ar
-export CFLAGS += -std=gnu99 -Wall -Wextra -pedantic -m32
-export ASFLAGS =
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 
-LINKFLAGS += -m32 -gc -ldl
+export DEBUGGER = gdb
+export TERMPROG = $(ELF)
+export FLASHER = true
+export VALGRIND ?= valgrind
 
-TERMPROG = $(BINDIR)/$(PROJECT).elf
-FLASHER = true
+# flags:
+export CFLAGS += -std=gnu99 -Wall -Wextra -pedantic -m32
+export LINKFLAGS += -m32 -gc -ldl
+export ASFLAGS =
+export DEBUGGER_FLAGS = $(ELF)
+export VALGRIND_FLAGS ?= --track-origins=yes
+all-valgrind: export CFLAGS += -DHAVE_VALGRIND_VALGRIND_H -g
 
 ifneq (,$(findstring nativenet,$(USEMODULE)))
-ifeq ($(strip $(PORT)),)
-	export PORT = tap0
-endif
+	export PORT ?= tap0
 else
-	export PORT = 
+	export PORT =
 endif
 
-DEBUGGER = gdb
-DEBUGGER_FLAGS = $(BINDIR)$(PROJECT).elf
+all: # do not override first target
+
+all-valgrind: all
+
+valgrind:
+# use this if you want to attach gdb from valgrind:
+#	echo 0 > /proc/sys/kernel/yama/ptrace_scope
+#	VALGRIND_FLAGS += --db-attach=yes
+	$(VALGRIND) $(VALGRIND_FLAGS) $(ELF) $(PORT)
 
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep
