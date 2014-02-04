@@ -7,11 +7,11 @@
 
 /**
  * @ingroup     driver_periph
- * @brief       Low-level GPIO periphial driver
+ * @brief       Low-level GPIO peripheral driver
  * @{
  *
  * @file        gpio.h
- * @brief       Low-level GPIO periphial driver interface definitions
+ * @brief       Low-level GPIO peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
@@ -23,7 +23,7 @@
 
 
 /**
- * @brief Definition of available GPIO devices. Each device is managin exactly one pin.
+ * @brief Definition of available GPIO devices. Each device is managing exactly one pin.
  */
 #ifdef GPIO_NUMOF
 typedef enum {
@@ -115,7 +115,7 @@ void gpio_init_in(gpio_t dev, gpio_pp_t pullup);
 /**
  * @brief Initialize a GPIO pin for external interrupt usage
  * 
- * The registerd callback function will be called in interrupt context everytime the defined flank(s)
+ * The registered callback function will be called in interrupt context every time the defined flank(s)
  * are detected.
  * 
  * The interrupt is activated automatically after the initialization.
