@@ -1,3 +1,26 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * The source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ */
+
+/**
+ * @ingroup chronos
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       eZ430-chronos beeper
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      mikoff
+ *
+ */
+
+#include <stdint.h>
 #include <stdint.h>
 #include <cc430f6137.h>
 

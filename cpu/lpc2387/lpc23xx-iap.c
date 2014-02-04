@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * The source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ */
+
+/**
+ * @ingroup lpc2387
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       lpc2387 in-application programming driver (for flashrom)
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ */
+
 #include <stdint.h>
 #include "flashrom.h"
 #include "iap.h"

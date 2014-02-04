@@ -1,3 +1,25 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * The source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ */
+
+/**
+ * @ingroup cc430
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       cc430 hardware timer driver
+ *
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Aleksandr Mikoff <sir.enmity@gmail.com>
+ *
+ */
+
 #include <legacymsp430.h>
 #include "board.h"
 #include "hwtimer.h"
@@ -14,9 +36,9 @@ extern void timer_unset(short timer);
 
 void timerA_init(void)
 {
-    ticks = 0;								 // Set tick counter value to 0
-    TA0CTL = TASSEL_1 + TACLR;   	  		 // Clear the timer counter, set ACLK
-    TA0CTL &= ~TAIE;						 // Clear the IFG
+    ticks = 0;                               // Set tick counter value to 0
+    TA0CTL = TASSEL_1 + TACLR;               // Clear the timer counter, set ACLK
+    TA0CTL &= ~TAIE;                         // Clear the IFG
 
     volatile unsigned int *ccr = &TA0CCR0;
     volatile unsigned int *ctl = &TA0CCTL0;

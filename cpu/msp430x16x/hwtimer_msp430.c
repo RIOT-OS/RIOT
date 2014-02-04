@@ -1,3 +1,25 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     cpu
+ * @{
+ *
+ * @file        hwtimer_msp430_.c
+ * @brief       MSP430x16xx timer functions
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Milan Babel <babel@inf.fu-berlin.de>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
+ *
+ * @}
+ */
+
 #include "cpu.h"
 #include "hwtimer.h"
 #include "hwtimer_arch.h"

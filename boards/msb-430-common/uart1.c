@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * The source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ */
+
+/**
+ * @ingroup boards
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       msb-430 common putchar implementation
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ */
+
 #include <stdio.h>
 #include "board.h"
 #include "kernel.h"
@@ -24,7 +44,7 @@ void usart0irq(void);
 /**
  * \brief the interrupt function
  */
-interrupt(USART1RX_VECTOR) usart0irq(void) 
+interrupt(USART1RX_VECTOR) usart0irq(void)
 {
     U1TCTL &= ~URXSE; /* Clear the URXS signal */
     U1TCTL |= URXSE;  /* Re-enable URXS - needed here?*/

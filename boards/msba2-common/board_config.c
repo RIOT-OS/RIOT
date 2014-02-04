@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * The source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ */
+
+/**
+ * @ingroup boards
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       msba2 common config module functions
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
+ *
+ */
+
 #include <stdint.h>
 #include <string.h>
 #include "config.h"

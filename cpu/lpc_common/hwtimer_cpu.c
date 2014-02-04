@@ -1,11 +1,17 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * The source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ */
+
 /**
- * @ingroup arm_common
+ * @ingroup cpu
  * @file
  * @internal
  * @brief       ARM kernel timer CPU dependent functions implementation
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
- * @author      INRIA
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

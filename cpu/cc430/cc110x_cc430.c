@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * The source code is licensed under the LGPLv2 license,
+ * See the file LICENSE for more details.
+ */
+
+/**
+ * @ingroup cc430
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       eZ430 radio driver (cpu dependent part)
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
+ */
+
 #include <stdint.h>
 #include "irq.h"
 #include "cc110x-defaultSettings.h"
@@ -34,18 +54,18 @@ uint8_t cc110x_strobe(uint8_t c)
 
             RF1AINSTRB = c;
 
-            if ((RF1AIN & 0x04) == 0x04) {		/* chip at sleep mode */
+            if ((RF1AIN & 0x04) == 0x04) {      /* chip at sleep mode */
                 if ((c == RF_SXOFF) || (c == RF_SPWD) || (c == RF_SWOR)) { }
                 else {
-                    while ((RF1AIN & 0x04) == 0x04);       			/* c-ready ? */
+                    while ((RF1AIN & 0x04) == 0x04);                /* c-ready ? */
 
-                    hwtimer_wait(RTIMER_TICKS(9800));	/* Delay for ~810usec at 12MHz CPU clock */
+                    hwtimer_wait(RTIMER_TICKS(9800));   /* Delay for ~810usec at 12MHz CPU clock */
                 }
             }
 
             cc110x_write_reg(IOCFG2, gdo_state); /* restore IOCFG2 setting */
         }
-        else {	/* chip active mode */
+        else {  /* chip active mode */
             RF1AINSTRB = c;
         }
 
