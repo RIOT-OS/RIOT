@@ -1,25 +1,21 @@
 /*
- * main.c - Main function of the test_shell project.
  * Copyright (C) 2013 Kaspar Schleiser <kaspar@schleiser.de>
+ * Copyright (C) 2013 Freie Universität Berlin
  *
- * This source code is licensed under the LGPLv2 license,
- * See the file LICENSE for more details.
- *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
  */
 
 /**
  * @file
- * @internal
  * @brief       shows how to set up own and use the system shell commands.
  *              By typing help in the serial console, all the supported commands
  *              are listed.
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
- * @version     $Revision: 3855 $
  *
- * @note        $Id: main.c 3855 2013-09-04 17:00:33 kasmi $
  */
 
 #include <stdio.h>

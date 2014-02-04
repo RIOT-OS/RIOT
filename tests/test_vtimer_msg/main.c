@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2013 INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup tests
+ * @{
+ *
+ * @file
+ * @brief Thread test application
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
+ *
+ * @}
+ */
+
 #include <stdio.h>
 #include <time.h>
 
