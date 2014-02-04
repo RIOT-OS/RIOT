@@ -197,7 +197,7 @@ void etx_beacon(void)
 
         packet->length = p_length;
         sixlowpan_mac_send_ieee802154_frame(&empty_addr, &etx_send_buf[0],
-                              ETX_DATA_MAXLEN + ETX_PKT_HDR_LEN, 1);
+                                            ETX_DATA_MAXLEN + ETX_PKT_HDR_LEN, 1);
         DEBUG("sent beacon!\n");
         etx_set_packets_received();
         cur_round++;
@@ -459,7 +459,7 @@ void etx_update(etx_neighbor_t *candidate)
     /*
      * Calculate the current ETX value for my link to this candidate.
      */
-    if (d_f *d_r != 0) {
+    if (d_f * d_r != 0) {
         candidate->cur_etx = 1 / (d_f * d_r);
     }
     else {

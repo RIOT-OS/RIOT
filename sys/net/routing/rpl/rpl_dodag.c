@@ -222,6 +222,7 @@ void rpl_delete_worst_parent(void)
 void rpl_delete_all_parents(void)
 {
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
+
     if (my_dodag != NULL) {
         my_dodag->my_preferred_parent = NULL;
     }
