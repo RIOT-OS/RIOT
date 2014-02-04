@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2013 Milan Babel <babel@inf.fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup shell_commands
+ * @{
+ *
+ * @file
+ * @brief provides shell commands to configure cc2420 driver
+ *
+ * @author Milan Babel <babel@inf.fu-berlin.de>
+ *
+ * @}
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
