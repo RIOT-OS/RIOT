@@ -181,7 +181,8 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
 
     /* check if packet needs to be fragmented */
     DEBUG("sixlowpan_lowpan_sendto(%s, data, %"PRIu16"): send_packet_length: %"PRIu16", header_size: %"PRIu16"\n",
-            sixlowpan_mac_802154_long_addr_to_str(addr_str, dest), data_len, send_packet_length, header_size);
+          sixlowpan_mac_802154_long_addr_to_str(addr_str, dest), data_len, send_packet_length, header_size);
+
     if (send_packet_length + header_size > PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN) {
         uint8_t fragbuf[send_packet_length + header_size];
         uint8_t remaining;
@@ -642,7 +643,7 @@ void check_timeout(void)
     while (temp_buf != NULL) {
         if ((timex_uint64(now) - timex_uint64(temp_buf->timestamp)) >= LOWPAN_REAS_BUF_TIMEOUT) {
             printf("TIMEOUT!cur_time: %" PRIu64 ", temp_buf: %" PRIu64 "\n", timex_uint64(now),
-                    timex_uint64(temp_buf->timestamp));
+                   timex_uint64(temp_buf->timestamp));
             temp_buf = collect_garbage(temp_buf);
         }
         else {
@@ -786,6 +787,7 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
     else {
         lowpan_reas_buf_t *current_buf = get_packet_frag_buf(length, 0, s_laddr,
                                          d_laddr);
+
         if (current_buf && current_buf->packet) {
             /* Copy packet bytes into corresponding packet space area */
             memcpy(current_buf->packet, data, length);
@@ -795,6 +797,7 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
         else {
             DEBUG("ERROR: no memory left in packet buffer!\n");
         }
+
         if (thread_getstatus(transfer_pid) == STATUS_SLEEPING) {
             thread_wakeup(transfer_pid);
         }
@@ -1676,7 +1679,7 @@ void lowpan_init(transceiver_type_t trans, uint8_t r_addr,
         ipv6_addr_set_by_eui64(&tmp, prefix);
         DEBUG("%s, %d: set unique address to %s, according to prefix %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, &tmp), ipv6_addr_to_str(addr_str, prefix));
         ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_GLOBAL,
-                NDP_ADDR_STATE_PREFERRED, 0, 0);
+                            NDP_ADDR_STATE_PREFERRED, 0, 0);
     }
 
     DEBUG("%s, %d: set link local prefix to %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, &lladdr));

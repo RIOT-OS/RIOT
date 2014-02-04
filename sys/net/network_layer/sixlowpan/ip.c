@@ -54,7 +54,7 @@ uint8_t iface_addr_list_count = 0;
 int udp_packet_handler_pid = 0;
 int tcp_packet_handler_pid = 0;
 int rpl_process_pid = 0;
-ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t*) = 0;
+ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t *) = 0;
 
 /* registered upper layer threads */
 int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
@@ -100,7 +100,7 @@ uint8_t *get_payload_buf(uint8_t ext_len)
 }
 
 int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
-                 const uint8_t *payload, uint16_t payload_length)
+                const uint8_t *payload, uint16_t payload_length)
 {
     uint8_t *p_ptr;
     uint16_t packet_length;
@@ -294,7 +294,8 @@ void ipv6_process(void)
             (ipv6_buf->destaddr.uint8[15] != myaddr.uint8[15])) {
             packet_length = IPV6_HDR_LEN + ipv6_buf->length;
 
-            ipv6_addr_t* dest;
+            ipv6_addr_t *dest;
+
             if (ip_get_next_hop == NULL) {
                 dest = &ipv6_buf->destaddr;
             }
@@ -318,10 +319,12 @@ void ipv6_process(void)
             switch (*nextheader) {
                 case (IPV6_PROTO_NUM_ICMPV6): {
                     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
+
                     /* checksum test*/
-                    if (ipv6_csum(ipv6_buf, (uint8_t*) icmp_buf, ipv6_buf->length, IPV6_PROTO_NUM_ICMPV6) != 0xffff) {
+                    if (ipv6_csum(ipv6_buf, (uint8_t *) icmp_buf, ipv6_buf->length, IPV6_PROTO_NUM_ICMPV6) != 0xffff) {
                         printf("ERROR: wrong checksum\n");
                     }
+
                     icmpv6_demultiplex(icmp_buf);
                     break;
                 }
@@ -693,9 +696,11 @@ void ipv6_register_next_header_handler(uint8_t next_header, int pid)
         case (IPV6_PROTO_NUM_TCP):
             set_tcp_packet_handler_pid(pid);
             break;
+
         case (IPV6_PROTO_NUM_UDP):
             set_udp_packet_handler_pid(pid);
             break;
+
         default:
             /* TODO */
             break;
@@ -703,7 +708,8 @@ void ipv6_register_next_header_handler(uint8_t next_header, int pid)
 }
 
 /* register routing function */
-void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t* dest)) {
+void ipv6_iface_set_routing_provider(ipv6_addr_t * (*next_hop)(ipv6_addr_t *dest))
+{
     ip_get_next_hop = next_hop;
 }
 
@@ -716,9 +722,9 @@ uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t 
 {
     uint16_t sum = 0;
     DEBUG("Calculate checksum over src: %s, dst: %s, len: %04X, buf: %p, proto: %u\n",
-            ipv6_addr_to_str(addr_str, &ipv6_header->srcaddr),
-            ipv6_addr_to_str(addr_str, &ipv6_header->destaddr),
-            len, buf, proto);
+          ipv6_addr_to_str(addr_str, &ipv6_header->srcaddr),
+          ipv6_addr_to_str(addr_str, &ipv6_header->destaddr),
+          len, buf, proto);
     sum = len + proto;
     sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
     sum = csum(sum, buf, len);

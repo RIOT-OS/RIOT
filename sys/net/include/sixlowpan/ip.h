@@ -92,7 +92,7 @@ ipv6_hdr_t *ipv6_get_buf(void);
  *                           is going to try to find a route
  */
 int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
-                 const uint8_t *payload, uint16_t payload_length);
+                const uint8_t *payload, uint16_t payload_length);
 
 /**
  * @brief   Determines if node is a router.
@@ -375,7 +375,7 @@ void ipv6_iface_print_addrs(void);
  *
  * @param   next_hop    function that returns the next hop to reach dest
  */
-void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t* dest));
+void ipv6_iface_set_routing_provider(ipv6_addr_t * (*next_hop)(ipv6_addr_t *dest));
 
 /**
  * @brief Calculates the IPv6 upper-layer checksum.
