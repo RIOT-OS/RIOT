@@ -138,12 +138,13 @@ void sixlowpan_mac_init_802154_long_addr(ieee_802154_long_t *laddr)
     laddr->uint8[7] = sixlowpan_mac_get_radio_address();
 }
 
-char *sixlowpan_mac_802154_long_addr_to_str(char *addr_str, const ieee_802154_long_t *laddr) {
-     sprintf(addr_str,
-                  "%02x:%02x:%02x:%02x",
-                  laddr->uint16[0], laddr->uint16[1],
-                  laddr->uint16[2], laddr->uint16[3]);
-     return addr_str;
+char *sixlowpan_mac_802154_long_addr_to_str(char *addr_str, const ieee_802154_long_t *laddr)
+{
+    sprintf(addr_str,
+            "%02x:%02x:%02x:%02x",
+            laddr->uint16[0], laddr->uint16[1],
+            laddr->uint16[2], laddr->uint16[3]);
+    return addr_str;
 }
 
 void recv_ieee802154_frame(void)
@@ -238,9 +239,9 @@ void sixlowpan_mac_send_ieee802154_frame(const ieee_802154_long_t *addr,
     memcpy(&buf[hdrlen], frame.payload, frame.payload_len);
     /* set FCS */
     /* RSSI = 0 */
-    buf[frame.payload_len+hdrlen] = 0;
+    buf[frame.payload_len + hdrlen] = 0;
     /* FCS Valid = 1 / LQI Correlation Value = 0 */
-    buf[frame.payload_len+hdrlen+1] = 0x80;
+    buf[frame.payload_len + hdrlen + 1] = 0x80;
     DEBUG("IEEE802.15.4 frame - FCF: %02X %02X DPID: %02X SPID: %02X DSN: %02X\n", buf[0], buf[1], frame.dest_pan_id, frame.src_pan_id, frame.seq_nr);
 
     p.length = hdrlen + frame.payload_len + IEEE_802154_FCS_LEN;

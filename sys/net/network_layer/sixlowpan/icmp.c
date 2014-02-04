@@ -1570,7 +1570,7 @@ void def_rtr_lst_rem(ndp_default_router_list_t *entry)
 /* prefix list functions */
 
 int plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
-                 uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1)
+              uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1)
 {
     if (prefix_count == OPT_PI_LIST_LEN) {
         return SIXLOWERROR_ARRAYFULL;
