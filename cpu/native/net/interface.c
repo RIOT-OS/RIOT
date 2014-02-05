@@ -47,6 +47,7 @@ uint16_t _native_net_pan;
 uint8_t _native_net_monitor;
 static int _native_net_tpid;
 radio_address_t _native_net_addr;
+uint64_t _native_net_addr_long;
 
 /************************************************************************/
 /* nativenet.h **********************************************************/
@@ -106,6 +107,20 @@ radio_address_t nativenet_get_address()
 {
     DEBUG("nativenet_get_address -> address = %d\n", _native_net_addr);
     return _native_net_addr;
+}
+
+uint64_t nativenet_get_address_long(void)
+{
+    DEBUG("nativenet_get_address_long -> address = %"PRIx64"\n", _native_net_addr_long);
+    return _native_net_addr_long;
+}
+
+uint64_t nativenet_set_address_long(uint64_t address)
+{
+    DEBUG("nativenet_set_address_long(address=%"PRIx64")\n", address);
+    warnx("nativenet_set_address_long: this does not actually change the interfaces address");
+    _native_net_addr_long = address;
+    return _native_net_addr_long;
 }
 
 int8_t nativenet_send(radio_packet_t *packet)

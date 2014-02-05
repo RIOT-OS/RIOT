@@ -284,6 +284,17 @@ int tap_init(char *name)
     }
     memcpy(_native_tap_mac, ifr.ifr_hwaddr.sa_data, ETHER_ADDR_LEN);
 #endif
+    DEBUG("_native_tap_mac: %02x:%02x:%02x:%02x:%02x:%02x\n", _native_tap_mac[0], _native_tap_mac[1], _native_tap_mac[2], _native_tap_mac[3], _native_tap_mac[4], _native_tap_mac[5]);
+
+    unsigned char *eui_64 = (unsigned char*)&_native_net_addr_long;
+    eui_64[0] = _native_tap_mac[0];
+    eui_64[1] = _native_tap_mac[1];
+    eui_64[2] = _native_tap_mac[2];
+    eui_64[3] = 0xff;
+    eui_64[4] = 0xfe;
+    eui_64[5] = _native_tap_mac[3];
+    eui_64[6] = _native_tap_mac[4];
+    eui_64[7] = _native_tap_mac[5];
 
     /* configure signal handler for fds */
     register_interrupt(SIGIO, _native_handle_tap_input);
