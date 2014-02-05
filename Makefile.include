@@ -111,8 +111,16 @@ debug:
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
 buildtest:
-	@for BOARD in $$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); do \
-		echo -n "Building for $${BOARD} .. "; \
+	@if [ -z "$${JENKINS_URL}" ] && tput colors 2>&1 > /dev/null; then \
+		GREEN='\033[1;32m'; RED='\033[1;31m'; RESET='\033[0m'; \
+		ECHO='echo -e'; \
+	else \
+		GREEN=''; RED=''; RESET=''; \
+		ECHO='echo'; \
+	fi; \
+	\
+	for BOARD in $$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); do \
+		$${ECHO} -n "Building for $${BOARD} .. "; \
 		env -i \
 			HOME=$${HOME} \
 			PATH=$${PATH} \
@@ -122,8 +130,8 @@ buildtest:
 			RIOTCPU=$${RIOTCPU} \
 			$(MAKE) -B clean all >/dev/null 2>&1 ; \
 		if [ "$${?}" = "0" ]; then \
-			echo  -e "\033[1;32msuccess\033[0m"; \
+			$${ECHO} "$${GREEN}success$${RESET}"; \
 		else \
-			echo -e "\033[1;31mfailed\033[0m"; \
+			$${ECHO} "$${RED}failed$${RESET}"; \
 		fi; \
 	done; \
