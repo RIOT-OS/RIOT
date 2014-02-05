@@ -113,5 +113,17 @@ debug:
 buildtest:
 	@for BOARD in $$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); do \
 		echo -n "Building for $${BOARD} .. "; \
-		env -i HOME=$${HOME} PATH=$${PATH} BOARD=$${BOARD} RIOTBASE=$${RIOTBASE} RIOTBOARD=$${RIOTBOARD} RIOTCPU=$${RIOTCPU} $(MAKE) -B clean all >/dev/null 2>&1 && echo -e "\033[1;32msuccess\033[0m" || echo -e "\033[1;31mfailed\033[0m" ; \
-	done
+		env -i \
+			HOME=$${HOME} \
+			PATH=$${PATH} \
+			BOARD=$${BOARD} \
+			RIOTBASE=$${RIOTBASE} \
+			RIOTBOARD=$${RIOTBOARD} \
+			RIOTCPU=$${RIOTCPU} \
+			$(MAKE) -B clean all >/dev/null 2>&1 ; \
+		if [ "$${?}" = "0" ]; then \
+			echo  -e "\033[1;32msuccess\033[0m"; \
+		else \
+			echo -e "\033[1;31mfailed\033[0m"; \
+		fi; \
+	done; \
