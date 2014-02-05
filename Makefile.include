@@ -14,7 +14,7 @@ endif
 # if you want to publish the board into the sources as an uppercase #define
 BB = $(shell echo $(BOARD)|tr 'a-z' 'A-Z')
 CPUDEF = $(shell echo $(CPU)|tr 'a-z' 'A-Z')
-CFLAGS += -DBOARD=$(BB) -DCPU_$(CPUDEF)
+CFLAGS += -DBOARD=$(BB) -DCPU_$(CPUDEF) -fno-delete-null-pointer-checks
 export CFLAGS
 
 export BINDIR =$(CURDIR)/bin/$(BOARD)/
