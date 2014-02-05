@@ -133,5 +133,9 @@ buildtest:
 			$${ECHO} "$${GREEN}success$${RESET}"; \
 		else \
 			$${ECHO} "$${RED}failed$${RESET}"; \
+			BUILDTESTFAILED=1; \
 		fi; \
 	done; \
+	if [ "$${BUILDTESTFAILED}" = "1" ]; then \
+		exit 1; \
+	fi
