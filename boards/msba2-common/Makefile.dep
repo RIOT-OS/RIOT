@@ -18,3 +18,7 @@ ifneq (,$(findstring ltc4150,$(USEMODULE)))
 		USEMODULE += gpioint
 	endif
 endif
+
+ifneq (,$(findstring uart0,$(USEMODULE)))
+	USEMODULE += posix
+endif
