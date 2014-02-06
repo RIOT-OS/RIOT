@@ -1,3 +1,19 @@
+/**
+ * Hash string implementation
+ *
+ * Copyright (C) 2013 Kaspar Schleiser <kaspar@schleiser.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup sys_lib
+ * @{
+ * @file
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
+ * @}
+ */
+
 #include <string.h>
 #include "hash_string.h"
 

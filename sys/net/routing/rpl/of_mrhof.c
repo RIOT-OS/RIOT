@@ -1,3 +1,19 @@
+/**
+ * OF MRHOF implementation
+ *
+ * Copyright (C) 2013 Stephan Arndt <arndtste@zedat.fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup rpl
+ * @{
+ * @file
+ * @author  Stephan Arndt <arndtste@zedat.fu-berlin.de>
+ * @}
+ */
+
 #include <string.h>
 #include <stdio.h>
 #include "of_mrhof.h"
