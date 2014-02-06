@@ -12,7 +12,6 @@ export RIOTBASE = $(CURDIR)/../..
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += uart0
 USEMODULE += posix
 
 include $(RIOTBASE)/Makefile.include
