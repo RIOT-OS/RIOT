@@ -118,12 +118,12 @@ static void receive_nativenet_packet(radio_packet_t *trans_p);
 void receive_at86rf231_packet(radio_packet_t *trans_p);
 #endif
 static int8_t send_packet(transceiver_type_t t, void *pkt);
-static int16_t get_channel(transceiver_type_t t);
-static int16_t set_channel(transceiver_type_t t, void *channel);
+static int32_t get_channel(transceiver_type_t t);
+static int32_t set_channel(transceiver_type_t t, void *channel);
 static int16_t get_address(transceiver_type_t t);
 static int16_t set_address(transceiver_type_t t, void *address);
-static uint16_t get_pan(transceiver_type_t t);
-static uint16_t set_pan(transceiver_type_t t, void *pan);
+static int32_t get_pan(transceiver_type_t t);
+static int32_t set_pan(transceiver_type_t t, void *pan);
 
 static void set_monitor(transceiver_type_t t, void *mode);
 static void powerdown(transceiver_type_t t);
@@ -273,12 +273,12 @@ void run(void)
                 break;
 
             case GET_CHANNEL:
-                *((int16_t *) cmd->data) = get_channel(cmd->transceivers);
+                *((int32_t *) cmd->data) = get_channel(cmd->transceivers);
                 msg_reply(&m, &m);
                 break;
 
             case SET_CHANNEL:
-                *((int16_t *) cmd->data) = set_channel(cmd->transceivers, cmd->data);
+                *((int32_t *) cmd->data) = set_channel(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;
 
@@ -304,11 +304,11 @@ void run(void)
                 switch_to_rx(cmd->transceivers);
                 break;
             case GET_PAN:
-                *((int16_t*) cmd->data) = get_pan(cmd->transceivers);
+                *((int32_t *) cmd->data) = get_pan(cmd->transceivers);
                 msg_reply(&m, &m);
                 break;
             case SET_PAN:
-                *((int16_t*) cmd->data) = set_pan(cmd->transceivers, cmd->data);
+                *((int32_t *) cmd->data) = set_pan(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;
 #ifdef DBG_IGNORE
@@ -683,7 +683,7 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
  *
  * @return The radio channel AFTER calling the set command, -1 on error
  */
-static int16_t set_channel(transceiver_type_t t, void *channel)
+static int32_t set_channel(transceiver_type_t t, void *channel)
 {
     uint8_t c = *((uint8_t *)channel);
 
@@ -725,7 +725,7 @@ static int16_t set_channel(transceiver_type_t t, void *channel)
  *
  * @return The current radio channel of the transceiver, -1 on error
  */
-static int16_t get_channel(transceiver_type_t t)
+static int32_t get_channel(transceiver_type_t t)
 {
     switch(t) {
         case TRANSCEIVER_CC1100:
@@ -766,7 +766,7 @@ static int16_t get_channel(transceiver_type_t t)
  *
  * @return The pan AFTER calling the set command, -1 on error
  */
-static uint16_t set_pan(transceiver_type_t t, void *pan) {
+static int32_t set_pan(transceiver_type_t t, void *pan) {
     uint16_t c = *((uint16_t*) pan);
     switch (t) {
 #ifdef MODULE_CC2420
@@ -799,7 +799,7 @@ static uint16_t set_pan(transceiver_type_t t, void *pan) {
  *
  * @return The current pan of the transceiver, -1 on error
  */
-static uint16_t get_pan(transceiver_type_t t) {
+static int32_t get_pan(transceiver_type_t t) {
     switch (t) {
 #ifdef MODULE_CC2420
         case TRANSCEIVER_CC2420:
