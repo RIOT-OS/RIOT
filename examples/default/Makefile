@@ -48,10 +48,6 @@ endif
 ifneq (,$(findstring wsn430-v1_3b,$(BOARD)))
 	USEMODULE += cc110x_ng
 endif
-ifneq (,$(findstring wsn430-v1_4,$(BOARD)))
-	USEMODULE += cc2420
-	export INCLUDES += -I$(RIOTBASE)/drivers/cc2420/include
-endif
 ifneq (,$(findstring msb-430h,$(BOARD)))
 	USEMODULE += cc110x_ng
 endif
