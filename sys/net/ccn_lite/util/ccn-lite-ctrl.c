@@ -47,6 +47,7 @@ mkNewFaceRequest(unsigned char *out, char *macsrc, char *ip4src,
 
     unsigned char *faceinst = malloc(500);
     if (!faceinst) {
+        free(contentobj);
         puts("mkNewFaceRequest: malloc failed");
         return 0;
     }
@@ -123,7 +124,8 @@ mkPrefixregRequest(unsigned char *out, char reg, char *path, char *faceid)
     }
 
     unsigned char *fwdentry = malloc(500);
-    if (!contentobj) {
+    if (!fwdentry) {
+        free(contentobj);
         puts("mkNewFaceRequest: malloc failed");
         return 0;
     }
