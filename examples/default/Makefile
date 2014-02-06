@@ -67,7 +67,6 @@ ifneq (,$(findstring msba2,$(BOARD)))
 	USEMODULE += cc110x_ng
 	USEMODULE += config
 	USEMODULE += random
-	export INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include
 endif
 ifneq (,$(findstring native,$(BOARD)))
 	USEMODULE += ltc4150

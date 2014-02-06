@@ -44,9 +44,4 @@ else
 					   -I$(RIOTBASE)/sys/posix/include
 endif
 
-ifeq ($(BOARD),msba2)
-	export INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include \
-					   -I$(RIOTBASE)/boards/msba2-common/include
-endif
-
 include $(RIOTBASE)/Makefile.include
