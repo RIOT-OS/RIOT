@@ -20,6 +20,9 @@ ifneq (,$(findstring uart0,$(USEMODULE)))
 	ifeq (,$(findstring lib,$(USEMODULE)))
 		USEMODULE += lib	
 	endif
+	ifeq (,$(findstring posix,$(USEMODULE)))
+		USEMODULE += posix
+	endif
 endif
 
 ifneq (,$(findstring cc110x,$(USEMODULE)))
