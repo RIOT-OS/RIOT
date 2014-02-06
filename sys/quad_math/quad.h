@@ -53,6 +53,9 @@
 #include <limits.h>
 
 #include <machine/endian.h>
+typedef char ___QUAD_ASSERT__LENGHTS[sizeof (long long) == 2*sizeof (int) ? +1 : -1];
+typedef char ___QUAD_ASSERT__2COMPLEMENT[-1234 == (~1234 + 1) ? +1 : -1];
+
 typedef long long quad_t;
 typedef unsigned long long u_quad_t;
 
