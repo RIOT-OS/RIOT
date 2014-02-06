@@ -34,7 +34,6 @@ export QUIET ?= 1
 # Modules to include:
 
 USEMODULE += config
-USEMODULE += uart0
 USEMODULE += posix
 USEMODULE += auto_init
 USEMODULE += hwtimer

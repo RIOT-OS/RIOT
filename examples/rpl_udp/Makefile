@@ -39,7 +39,6 @@ CFLAGS += "-Wno-cpp"
 USEMODULE += auto_init
 USEMODULE += shell
 USEMODULE += shell_commands
-USEMODULE += uart0
 USEMODULE += posix
 USEMODULE += ps 
 USEMODULE += vtimer 

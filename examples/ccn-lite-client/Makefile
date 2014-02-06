@@ -36,7 +36,6 @@ export QUIET ?= 1
 USEMODULE += config
 USEMODULE += shell
 USEMODULE += shell_commands
-USEMODULE += uart0
 USEMODULE += posix
 USEMODULE += ps
 USEMODULE += auto_init

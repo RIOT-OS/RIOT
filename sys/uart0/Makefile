@@ -1,5 +1,3 @@
-MODULE =uart0
+MODULE = uart0
 
 include $(MAKEBASE)/Makefile.base
-
-
