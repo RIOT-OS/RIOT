@@ -11,6 +11,7 @@ ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
 	ifeq (,$(findstring gpioint,$(USEMODULE)))
 		USEMODULE += gpioint
 	endif
+	export INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include
 endif
 
 ifneq (,$(findstring ltc4150,$(USEMODULE)))
