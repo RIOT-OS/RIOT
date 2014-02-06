@@ -22,6 +22,7 @@
 #include <stdint.h>
 
 #define CONFIG_KEY      (0x1701)
+#define CONFIG_NAME_LEN (10)
 
 extern char configmem[];
 
@@ -30,6 +31,7 @@ typedef struct {
     uint16_t id;                ///< unique node identifier
     uint8_t radio_address;      ///< address for radio communication
     uint8_t radio_channel;      ///< current frequency
+    char name[CONFIG_NAME_LEN]; ///< name of the node
 } config_t;
 
 /* @brief:  Element to store in flashrom */
