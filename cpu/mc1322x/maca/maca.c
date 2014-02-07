@@ -7,12 +7,12 @@
  *
  * This file is part of RIOT.
  */
+#include <stdio.h>
 
 #include "maca.h"
 #include "maca_packet.h"
 #include "nvm.h"
 #include "mc1322x.h"
-#include <stdio.h>
 
 // number of packets in the maca_packet_pool
 #ifndef MACA_NUM_PACKETS
@@ -897,7 +897,7 @@ void maca_set_channel ( uint8_t chan ) {
     }
 }
 
-uint16_t maca_set_address ( uint16_t addr ) {
+radio_address_t maca_set_address (radio_address_t addr) {
     safe_irq_disable ( INT_NUM_MACA );
 
     MACA->MAC16ADDR = addr;
@@ -910,7 +910,7 @@ uint16_t maca_set_address ( uint16_t addr ) {
     return MACA->MAC16ADDR;
 }
 
-uint16_t maca_get_address ( void ) {
+radio_address_t maca_get_address ( void ) {
     return MACA->MAC16ADDR;
 }
 

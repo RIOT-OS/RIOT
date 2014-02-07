@@ -1,16 +1,12 @@
 SRC = shell_commands.c sc_id.c
 
-ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
-	SRC += sc_cc110x_ng.c
-endif
-ifneq (,$(findstring cc2420,$(USEMODULE)))
-	SRC += sc_cc2420.c
+ifneq (,$(findstring transceiver,$(USEMODULE)))
+	SRC += sc_transceiver.c
 endif
 ifneq (,$(findstring cc110x,$(USEMODULE)))
-	SRC += sc_cc1100.c
-endif
-ifneq (,$(findstring nativenet,$(USEMODULE)))
-	SRC += sc_nativenet.c
+	ifeq (,$(findstring transceiver,$(USEMODULE)))
+		SRC += sc_cc1100.c
+	endif
 endif
 ifneq (,$(findstring mci,$(USEMODULE)))
 	SRC += sc_disk.c

@@ -79,6 +79,8 @@ Frame type value:
 #include "ieee802154_frame.h"
 #include "cc2420_settings.h"
 
+#include "radio/types.h"
+
 #define CC2420_MAX_PKT_LENGTH 127
 #define CC2420_MAX_DATA_LENGTH (118)
 
@@ -144,7 +146,7 @@ uint16_t cc2420_get_channel(void);
  *
  * @return The set address after calling.
  */
-uint16_t cc2420_set_address(uint16_t addr);
+radio_address_t cc2420_set_address(radio_address_t addr);
 
 /**
  * @brief Gets the current short address of the cc2420.
@@ -152,7 +154,7 @@ uint16_t cc2420_set_address(uint16_t addr);
  * @return The current short address.
  *
  */
-uint16_t cc2420_get_address(void);
+radio_address_t cc2420_get_address(void);
 
 /**
  * @brief Sets the IEEE long address of the cc2420.

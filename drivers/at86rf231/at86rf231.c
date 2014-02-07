@@ -90,7 +90,7 @@ void at86rf231_rx_irq(void)
     at86rf231_rx_handler();
 }
 
-uint16_t at86rf231_set_address(uint16_t address)
+radio_address_t at86rf231_set_address(radio_address_t address)
 {
     radio_address = address;
 
@@ -100,7 +100,7 @@ uint16_t at86rf231_set_address(uint16_t address)
     return radio_address;
 }
 
-uint16_t at86rf231_get_address(void)
+radio_address_t at86rf231_get_address(void)
 {
     return radio_address;
 }
