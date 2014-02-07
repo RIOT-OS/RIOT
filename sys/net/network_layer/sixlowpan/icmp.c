@@ -384,7 +384,7 @@ void recv_echo_req(void)
     for (size_t i = 0; i < data_len; i++) {
         printf("%02x ", echo_data_buf[i]);
 
-        if ((i + 1) % 16 || i == data_len - 1) {
+        if (!((i + 1) % 16) || i == data_len - 1) {
             printf("\n");
         }
     }
@@ -411,7 +411,7 @@ void recv_echo_repl(void)
     for (size_t i = 0; i < data_len; i++) {
         printf("%02x ", echo_data_buf[i]);
 
-        if ((i + 1) % 16 || i == data_len - 1) {
+        if (!((i + 1) % 16) || i == data_len - 1) {
             printf("\n");
         }
     }
