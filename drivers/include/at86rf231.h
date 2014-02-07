@@ -30,6 +30,7 @@ typedef struct __attribute__((packed))
 }
 at86rf231_packet_t;
 
+extern int transceiver_pid;
 
 void at86rf231_init(int tpid);
 //void at86rf231_reset(void);
