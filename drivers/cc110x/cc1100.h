@@ -34,7 +34,7 @@
 #define CC1100_H
 
 #include <stdbool.h>
-#include "cc1100-interface.h"
+#include "cc110x.h"
 
 /**
  * @name    Defines used as state values for state machine

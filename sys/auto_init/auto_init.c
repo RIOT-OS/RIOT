@@ -32,7 +32,7 @@
 #endif
 
 #ifdef MODULE_CC110X
-#include "cc1100-interface.h"
+#include "cc110x.h"
 #endif
 
 #ifdef MODULE_LTC4150
