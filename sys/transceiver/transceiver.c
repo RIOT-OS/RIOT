@@ -743,6 +743,7 @@ static int32_t get_channel(transceiver_type_t t)
 #ifdef MODULE_MC1322X
         case TRANSCEIVER_MC1322X:
             ///< TODO:implement return maca_get_channel(); 
+            return -1;
 #endif
 #ifdef MODULE_NATIVENET
         case TRANSCEIVER_NATIVE:
