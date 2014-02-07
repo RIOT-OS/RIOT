@@ -37,7 +37,7 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stack_si
 {
     unsigned int *stk;
     int i;
-    stk = (unsigned int *)(stack_start + stack_size);
+    stk = (unsigned int *)((unsigned int)stack_start + stack_size);
     stk--;
 
     *stk = STACK_MARKER;
@@ -48,7 +48,7 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stack_si
 
     /* set the stack pointer (SP) */
     stk--;
-    *stk = (unsigned int)(stack_start + stack_size) - 4;
+    *stk = (unsigned int)((unsigned int)stack_start + stack_size) - 4;
 
     /* build base stack */
     for (i = REGISTER_CNT; i >= 0 ; i--) {
