@@ -25,7 +25,7 @@
 #include "msg.h"
 
 #if   defined( MODULE_CC110X )
-#include "cc1100-interface.h"
+#include "cc110x.h"
 #define TEXT_SIZE           CC1100_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_CC1100
 

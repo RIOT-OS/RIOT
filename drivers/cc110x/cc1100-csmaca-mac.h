@@ -28,7 +28,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #ifndef CC1100_CSMACA_MAC_
 #define CC1100_CSMACA_MAC_
 
-#include "cc1100-interface.h"
 #include "cc1100-defaultSettings.h"
 
 //#define CSMACA_MAC_AGGRESSIVE_MODE		   		// MAC aggressive mode on/off switch
