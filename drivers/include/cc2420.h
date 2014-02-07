@@ -102,6 +102,8 @@ typedef struct __attribute__ ((packed)) {
     /* @} */
 } cc2420_packet_t;
 
+extern int transceiver_pid;
+
 /**
  * @brief Init the cc2420.
  *
