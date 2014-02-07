@@ -43,7 +43,7 @@ volatile unsigned int sched_context_switch_request;
 volatile tcb_t *sched_threads[MAXTHREADS];
 volatile tcb_t *active_thread;
 
-volatile int thread_pid;
+volatile int thread_pid = -1;
 volatile int last_pid = -1;
 
 clist_node_t *runqueues[SCHED_PRIO_LEVELS];
@@ -53,30 +53,6 @@ static uint32_t runqueue_bitcache = 0;
 static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
 schedstat pidlist[MAXTHREADS];
 #endif
-
-void sched_init()
-{
-    printf("Scheduler...");
-    int i;
-
-    for (i = 0; i < MAXTHREADS; i++) {
-        sched_threads[i] = NULL;
-#if SCHEDSTATISTICS
-        pidlist[i].laststart = 0;
-        pidlist[i].runtime_ticks = 0;
-        pidlist[i].schedules = 0;
-#endif
-    }
-
-    active_thread = NULL;
-    thread_pid = -1;
-
-    for (i = 0; i < SCHED_PRIO_LEVELS; i++) {
-        runqueues[i] = NULL;
-    }
-
-    printf("[OK]\n");
-}
 
 void sched_run()
 {

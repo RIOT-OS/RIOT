@@ -35,11 +35,6 @@
 #endif
 
 /**
- * @brief   Initializes thread table, active thread information, and runqueues
- */
-void sched_init(void);
-
-/**
  * @brief   Triggers the scheduler to schedule the next task
  */
 void sched_run(void);
