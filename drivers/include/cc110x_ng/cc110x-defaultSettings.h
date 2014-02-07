@@ -34,9 +34,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 
 #define TIMER_TICK_USEC_RES     (122)
 
-// Default PA table index (output power)
-#define PATABLE                 (11)
-
 // Watchdog cycle time in seconds, set 0 to disable watchdog
 #define CC1100_WATCHDOG_PERIOD  (5)
 

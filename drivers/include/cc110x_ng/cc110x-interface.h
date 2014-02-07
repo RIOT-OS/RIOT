@@ -19,8 +19,8 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef CC1100_H
-#define CC1100_H
+#ifndef CC110X_NG_INTERFACE_H
+#define CC110X_NG_INTERFACE_H
 
 #include <stdint.h>
 #include "radio/radio.h"
@@ -172,4 +172,4 @@ uint8_t cc110x_add_ignored(radio_address_t addr);
 #endif
 
 /** @} */
-#endif
+#endif /* CC110X_NG_INTERFACE_H */

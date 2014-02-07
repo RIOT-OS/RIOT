@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "cc1100-interface.h"
+#include "cc110x.h"
 
 #ifdef MODULE_CC110X
 #include "msg.h"
