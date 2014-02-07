@@ -879,7 +879,7 @@ DRESULT MCI_ioctl(
 )
 {
     DRESULT res;
-    unsigned char b, *ptr = buff;
+    unsigned char b, *ptr = (unsigned char *)buff;
     unsigned long resp[4], d, *dp, st, ed;
 
 
@@ -937,7 +937,7 @@ DRESULT MCI_ioctl(
                 break;    /* Check if sector erase can be applied to the card */
             }
 
-            dp = buff;
+            dp = (unsigned long *)buff;
             st = dp[0];
             ed = dp[1];
 
@@ -1000,7 +1000,7 @@ DRESULT MCI_ioctl(
                         while ((XferWp == 0) && !(XferStat & 0xC));
 
                         if (!(XferStat & 0xC)) {
-                            Copy_al2un(buff, DmaBuff[0], 64);
+                            Copy_al2un((unsigned char *)buff, DmaBuff[0], 64);
                             res = RES_OK;
                         }
                     }
