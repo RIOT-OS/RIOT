@@ -44,11 +44,9 @@ ifneq (,$(findstring msb-430,$(BOARD)))
 endif
 ifneq (,$(findstring chronos,$(BOARD)))
 	USEMODULE += cc110x_ng
-	export INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include
 endif
 ifneq (,$(findstring wsn430-v1_3b,$(BOARD)))
 	USEMODULE += cc110x_ng
-	export INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include
 endif
 ifneq (,$(findstring wsn430-v1_4,$(BOARD)))
 	USEMODULE += cc2420
@@ -56,7 +54,6 @@ ifneq (,$(findstring wsn430-v1_4,$(BOARD)))
 endif
 ifneq (,$(findstring msb-430h,$(BOARD)))
 	USEMODULE += cc110x_ng
-	export INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include
 endif
 ifneq (,$(findstring msba2,$(BOARD)))
 	USEMODULE += sht11
@@ -66,7 +63,6 @@ ifneq (,$(findstring msba2,$(BOARD)))
 	USEMODULE += cc110x_ng
 	USEMODULE += config
 	USEMODULE += random
-	export INCLUDES += -I$(RIOTBASE)/drivers/cc110x_ng/include
 endif
 ifneq (,$(findstring native,$(BOARD)))
 	USEMODULE += ltc4150
