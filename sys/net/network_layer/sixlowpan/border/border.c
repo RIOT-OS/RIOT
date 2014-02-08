@@ -142,10 +142,6 @@ int sixlowpan_lowpan_border_init(int if_id)
         return 0;
     }
 
-    if (!sixlowpan_lowpan_init()) {
-        return 0;
-    }
-
     if (!sixlowpan_lowpan_init_interface(if_id)) {
         return 0;
     }

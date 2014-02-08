@@ -51,6 +51,10 @@
 #include "rtc.h"
 #endif
 
+#ifdef MODULE_SIXLOWPAN
+#include "sixlowpan.h"
+#endif
+
 #ifdef MODULE_DESTINY
 #include "destiny.h"
 #endif
@@ -62,6 +66,14 @@
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
+
+#ifndef CONF_RADIO_ADDR
+#define CONF_RADIO_ADDR (1)
+#endif
+
+#ifndef CONF_PAN_ID
+#define CONF_PAN_ID     (0xabcd)
+#endif
 
 extern int main(void);
 
@@ -103,6 +115,7 @@ void auto_init(void)
     MCI_initialize();
 #endif
 #ifdef MODULE_NET_IF
+    int iface;
     DEBUG("Auto init net_if module.\n");
     transceiver_type_t transceivers = 0;
 #ifdef MODULE_AT86RF231
@@ -128,13 +141,32 @@ void auto_init(void)
     if (transceivers != 0) {
         transceiver_init(transceivers);
         transceiver_start();
-        int iface = net_if_init_interface(0, transceivers);
+        iface = net_if_init_interface(0, transceivers);
+
+        if (!net_if_get_hardware_address(iface)) {
+            DEBUG("Auto init radio address on interface %d to 0x%04x\n", iface, CONF_RADIO_ADDR);
+            DEBUG("Change this value at compile time with macro CONF_RADIO_ADDR\n");
+            net_if_set_hardware_address(iface, CONF_RADIO_ADDR);
+        }
+
+        if (net_if_get_pan_id(iface) <= 0) {
+            DEBUG("Auto init PAN ID on interface %d to 0x%04x\n", iface, CONF_PAN_ID);
+            DEBUG("Change this value at compile time with macro CONF_PAN_ID\n");
+            net_if_set_pan_id(iface, CONF_PAN_ID);
+        }
 
         if (iface >= 0) {
-            DEBUG("Interface %d initialized\n", iface);
+            DEBUG("Auto init interface %d\n", iface);
         }
     }
+    else {
+        iface = -1;
+    }
 
+#ifdef MODULE_SIXLOWPAN
+    DEBUG("Auto init 6LoWPAN module.\n");
+    sixlowpan_lowpan_init();
+#endif
 #endif
 #ifdef MODULE_PROFILING
     extern void profiling_init(void);

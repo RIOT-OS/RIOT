@@ -209,10 +209,6 @@ uint8_t rpl_init(int if_id)
     objective_functions[0] = rpl_get_of0();
     /* objective_functions[1] = rpl_get_of_ETX() */
 
-    if (!sixlowpan_lowpan_init()) {
-        return 0;
-    }
-
     sixlowpan_lowpan_init_interface(if_id);
     /* need link local prefix to query _our_ corresponding address  */
     ipv6_addr_t ll_address;
