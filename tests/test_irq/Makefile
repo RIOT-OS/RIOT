@@ -1,6 +1,3 @@
-valgrind: CFLAGS += -g
-valgrind: CFLAGS += -DHAVE_VALGRIND_VALGRIND_H
-
 # name of your project
 export PROJECT = test_irq
 #
@@ -19,7 +16,3 @@ else
 USEMODULE += auto_init
 USEMODULE += hwtimer
 USEMODULE += posix
-
-include $(RIOTBASE)/Makefile.include
-valgrind: all
-endif

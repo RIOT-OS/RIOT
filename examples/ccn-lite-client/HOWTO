@@ -2,7 +2,7 @@ simple appserver (all in one shell)
 ====================================================
 
 0. create tap devices: *./cpu/native/tapsetup.sh create 3*
-1. build ccn-lite-client: *CFLAGS="-DHAVE_VALGRIND_VALGRIND_H" make -B clean all*
+1. build ccn-lite-client: *make -B clean all-valgrind*
 2. start: *./bin/native/ccn-lite-client.elf tap0* (valgrind support included)
 3. start ccn thread: *ccn* [enter] (this starts the ccn relay network stack)
 4. start appserver thread: *appserver* [enter] (this starts the userland appserver, which registers for "/riot/appserver/"
