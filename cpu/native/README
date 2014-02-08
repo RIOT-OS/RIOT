@@ -32,14 +32,6 @@ As root call:
 
     echo 0 > /proc/sys/kernel/yama/ptrace_scope
 
-PS:
-If the all-valgrind make target fails you might have to adjust the
-headers path. Change the parameter in boards/native/Makefile.include
-from HAVE_VALGRIND_VALGRIND_H to HAVE_VALGRIND_H to resolve the
-situation locally and open an issue to get it resolved permanently. (I
-have not yet encountered a platform that actually uses the other
-header path.)
-
 
 NETWORK SUPPORT
 ===============

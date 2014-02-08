@@ -22,7 +22,8 @@ export LINKFLAGS += -m32 -gc -ldl
 export ASFLAGS =
 export DEBUGGER_FLAGS = $(ELF)
 export VALGRIND_FLAGS ?= --track-origins=yes
-all-valgrind: export CFLAGS += -DHAVE_VALGRIND_VALGRIND_H -g
+all-valgrind: export CFLAGS += -DHAVE_VALGRIND_H -g
+all-valgrind: export INCLUDES += $(shell pkg-config valgrind --cflags)
 
 # backward compatability with glibc <= 2.17 for native
 ifeq ($(CPU),native)
