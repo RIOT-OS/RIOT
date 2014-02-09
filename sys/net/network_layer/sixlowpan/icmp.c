@@ -138,6 +138,7 @@ uint8_t icmpv6_opt_hdr_len = 0;
 uint8_t recvd_cids_len = 0;
 ndp_prefix_list_t *recvd_prefixes[OPT_PI_LIST_LEN];
 uint8_t recvd_pref_len = 0;
+void (*handle_echo_reply)(ipv6_hdr_t *ipv6_buf, icmpv6_echo_reply_hdr_t *echo_buf) = 0;
 
 void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime);
 void def_rtr_lst_rem(ndp_default_router_list_t *entry);
@@ -417,6 +418,14 @@ void recv_echo_repl(void)
     }
 
 #endif
+
+    if (handle_echo_reply != NULL) {
+        handle_echo_reply(ipv6_buf, echo_buf);
+    }
+}
+
+void icmpv6_register_echo_reply_handler(void (*handle_reply)(ipv6_hdr_t *ipv6_buf, icmpv6_echo_reply_hdr_t *echo_buf)) {
+    handle_echo_reply = handle_reply;
 }
 
 void recv_rtr_sol(void)

@@ -166,6 +166,14 @@ void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id,
                             uint16_t seq, char *data, size_t data_len);
 
 /**
+ * @brief Register a handler for ICMPv6 echo replys.
+ *
+ * @param[in] handle_reply  Function to handle a ICMPv6 echo reply.
+ */
+void icmpv6_register_echo_reply_handler(void (*handle_reply)(ipv6_hdr_t *ipv6_buf,
+                            icmpv6_echo_reply_hdr_t *echo_buf));
+
+/**
  * @brief Send ICMPv6 router solicitation.
  *
  * @param[in] sllao     Flag to include source link-layer address
