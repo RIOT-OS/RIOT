@@ -1,12 +1,12 @@
 ####
-#### Sample Makefile for building projects with the RIOT OS
+#### Sample Makefile for building applications with the RIOT OS
 ####
 #### The example file system layout is:
-#### ./project makefile
+#### ./application makefile
 #### ../../RIOT
 ####
 
-# Set the name of your project:
+# Set the name of your application:
 export PROJECT = foobar
 
 # If no BOARD is found in the environment, use this default:
@@ -46,9 +46,9 @@ export QUIET ?= 1
 #USEMODULE += cc110x
 #USEMODULE += fat
 
-#export INCLUDES += -Iproject_include
+#export INCLUDES += -I application_include
 
-# Specify custom dependencies for your project here ...
+# Specify custom dependencies for your application here ...
 # export PROJDEPS = proj_data.h
 
 include $(RIOTBASE)/Makefile.include

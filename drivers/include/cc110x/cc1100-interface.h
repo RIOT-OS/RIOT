@@ -51,7 +51,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #define CC1100_MAX_DATA_LENGTH (58)
 
 // Define default radio mode to constant RX if no
-// project specific setting is available.
+// application specific setting is available.
 #ifndef CC1100_RADIO_MODE
 #ifdef MODULE_RPL
 #warning RPL currently works with CC1100_MODE_WOR

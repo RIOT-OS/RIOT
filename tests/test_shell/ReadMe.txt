@@ -1,9 +1,9 @@
-This project shows how to use own or the system shell commands. In order to use
+This application shows how to use own or the system shell commands. In order to use
 the system shell commands:
 
 1. Additionally to the module: shell, shell_commands and posix,
    the module for the corresponding system command is to include, e.g.
-   module ps for the ps command (cf. the Makefile in the project root
+   module ps for the ps command (cf. the Makefile in the application root
    directory).
 2. The shell must be initialized as follows:
         2.1 shell_t sys_shell;

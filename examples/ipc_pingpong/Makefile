@@ -1,4 +1,4 @@
-# name of your project
+# name of your application
 export PROJECT = ipc_pingpong
 
 # If no BOARD is found in the environment, use this default:

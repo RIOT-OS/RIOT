@@ -1,4 +1,4 @@
-# define project name
+# define application name
 export PROJECT = test_hwtimer_spin
 
 # for easy switching of boards

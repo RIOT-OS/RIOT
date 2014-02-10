@@ -79,9 +79,9 @@ BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
 .PHONY: all clean flash doc term
 
-## make script for your project. Build RIOT-base here!
+## make script for your application. Build RIOT-base here!
 all: $(BINDIR)$(PROJECT).a
-	@echo "Building project $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
+	@echo "Building application $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
 	"$(MAKE)" -C $(RIOTBASE)
 	@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i ; done ;
@@ -94,7 +94,7 @@ endif
 	$(AD)$(OBJCOPY) $(OFLAGS) $(BINDIR)$(PROJECT).elf $(BINDIR)$(PROJECT).hex
 
 ## your make rules
-## Only basic example - modify it for larger projects!!
+## Only basic example - modify it for larger applications!!
 #$(BINDIR)/$(PROJECT).a: $(BINDIR)/$(PROJECT).o
 #	$(AR) -rc $(BINDIR)/project.a $(BINDIR)/$(PROJECT).o
 
