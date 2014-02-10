@@ -36,7 +36,7 @@ USEMODULE += posix
 USEMODULE += ps
 USEMODULE += auto_init
 USEMODULE += hwtimer
-
+USEMODULE += random
 USEMODULE += transceiver
 ifeq ($(BOARD),msba2)
 	USEMODULE += cc110x_ng

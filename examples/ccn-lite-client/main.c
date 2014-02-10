@@ -235,7 +235,8 @@ static void riot_ccn_pit_test(char *str)
         memset(segment_string, 0, 16);
         snprintf(segment_string, 16, "%d", segment);
         prefix[i] = segment_string;
-        int interest_len = mkInterest(prefix, NULL, (unsigned char *) small_buf);
+        unsigned int interest_nonce = genrand_uint32();
+        int interest_len = mkInterest(prefix, &interest_nonce, (unsigned char *) small_buf);
 
         rmsg.payload = &small_buf;
         rmsg.size = interest_len;
