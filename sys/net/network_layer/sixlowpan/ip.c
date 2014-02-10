@@ -269,8 +269,8 @@ void ipv6_process(void)
     uint8_t i;
     uint16_t packet_length;
 
-    ipv6_addr_init(&myaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00,
-                   sixlowpan_mac_get_radio_address());
+    ipv6_addr_set_all_nodes_addr(&myaddr);
+    ipv6_iface_get_best_src_addr(&myaddr, &myaddr);
 
     while (1) {
         msg_receive(&m_recv_lowpan);
