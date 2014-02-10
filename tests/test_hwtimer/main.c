@@ -29,7 +29,7 @@ void callback(void *ptr)
 
 int main(void)
 {
-    puts("hwtimer test project...");
+    puts("hwtimer test application...");
 
     puts("Initializing hwtimer...");
     hwtimer_init();

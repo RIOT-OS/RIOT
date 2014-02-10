@@ -30,7 +30,7 @@ If this chunk has the default chunk size the next chunk is requested, ...
 If a smaller chunk arrives the user land code prints out the complete file which was requested.
 
 To populate the cache type `ccn 100` and `populate`.
-You can test this functionality by typing `interest /riot/text` in the shell. *See HOWTO.md in the projects directory*.
+You can test this functionality by typing `interest /riot/text` in the shell. *See HOWTO.md in the applications directory*.
 
 ### ccn-lite-relay
 

@@ -1,4 +1,4 @@
-# name of your project
+# name of your application
 export PROJECT = test_sha256
 
 # for easy switching of boards
