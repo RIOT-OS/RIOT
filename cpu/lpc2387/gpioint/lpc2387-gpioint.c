@@ -40,7 +40,6 @@ struct irq_callback_t {
 static struct irq_callback_t gpioint0[32];
 static struct irq_callback_t gpioint2[32];
 
-
 void gpioint_init(void)
 {
     extern void GPIO_IRQHandler(void);
@@ -113,7 +112,8 @@ gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
     return true;                                                /* success */
 }
 /*---------------------------------------------------------------------------*/
-static void __attribute__((__no_instrument_function__)) test_irq(int port, unsigned long f_mask, unsigned long r_mask, struct irq_callback_t *pcb)
+static void __attribute__((__no_instrument_function__)) test_irq(int port, unsigned long f_mask, unsigned long r_mask, struct irq_callback_t *pcb);
+static void test_irq(int port, unsigned long f_mask, unsigned long r_mask, struct irq_callback_t *pcb)
 {
     (void) port;
 
@@ -133,7 +133,7 @@ static void __attribute__((__no_instrument_function__)) test_irq(int port, unsig
     while ((f_mask != 0) || (r_mask != 0));
 }
 /*---------------------------------------------------------------------------*/
-void GPIO_IRQHandler(void) __attribute__((interrupt("IRQ")));
+void __attribute__((__no_instrument_function__)) GPIO_IRQHandler(void) __attribute__((interrupt("IRQ")));
 /**
  * @brief   GPIO Interrupt handler function
  * @internal
@@ -141,7 +141,7 @@ void GPIO_IRQHandler(void) __attribute__((interrupt("IRQ")));
  * Invoked whenever an activated gpio interrupt is triggered by a rising
  * or falling edge.
  */
-void __attribute__((__no_instrument_function__)) GPIO_IRQHandler(void)
+void GPIO_IRQHandler(void)
 {
     if (IO_INT_STAT & BIT0) {                                       /* interrupt(s) on PORT0 pending */
         unsigned long int_stat_f = IO0_INT_STAT_F;                  /* save content */
