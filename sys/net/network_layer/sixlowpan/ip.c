@@ -226,6 +226,7 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
         }
 
         default:
+            DEBUG("INFO: packet type: Unknown\n");
             return -1;
     }
 
