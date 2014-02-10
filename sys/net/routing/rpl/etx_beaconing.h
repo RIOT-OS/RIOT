@@ -1,11 +1,3 @@
-/*
- * Header for the ETX-beaconing module
- * etx_beaconing.h
- *
- *  Created on: Feb 26, 2013
- *      Author: stephan
- */
-
 #ifndef ETX_BEACONING_H_
 #define ETX_BEACONING_H_
 #include <stdint.h>
