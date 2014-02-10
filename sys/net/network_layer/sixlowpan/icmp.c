@@ -240,82 +240,52 @@ static icmpv6_ndp_opt_aro_t *get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len)
 
 void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data, size_t data_len)
 {
-    uint16_t packet_length;
-
     ipv6_buf = ipv6_get_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
     icmpv6_echo_request_hdr_t *echo_buf = get_echo_req_buf(ipv6_ext_hdr_len);
     char *echo_data_buf = ((char *)echo_buf) + sizeof(icmpv6_echo_request_hdr_t);
 
     icmp_buf->type = ICMPV6_TYPE_ECHO_REQUEST;
-    icmp_buf->code = 0;
-    ipv6_buf->version_trafficclass = IPV6_VER;
-    ipv6_buf->trafficclass_flowlabel = 0;
-    ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
-    ipv6_buf->hoplimit = 0xff;
-
-    memcpy(&ipv6_buf->destaddr, destaddr, sizeof(ipv6_addr_t));
-    ipv6_iface_get_best_src_addr(&ipv6_buf->srcaddr, &ipv6_buf->destaddr);
     echo_buf->id = id;
     echo_buf->seq = seq;
 
     memcpy(echo_data_buf, data, data_len);
-    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
-                    ECHO_REQ_LEN + data_len;
-
-    ipv6_buf->length = packet_length - IPV6_HDR_LEN;
+    ipv6_buf->length = ICMPV6_HDR_LEN + ipv6_ext_hdr_len + ECHO_REQ_LEN + data_len;
 
     icmp_buf->checksum = 0;
     icmp_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 
 #ifdef ENABLE_DEBUG
     char addr_str[IPV6_MAX_ADDR_STR_LEN];
-    printf("INFO: send echo request to: %s\n",
-           ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
+    printf("INFO: send echo request to: %s\n", ipv6_addr_to_str(addr_str, destaddr));
 #endif
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4], (uint8_t *)ipv6_buf, packet_length);
+
+    ipv6_sendto(destaddr, IPV6_PROTO_NUM_ICMPV6, (uint8_t*) icmp_buf, ipv6_buf->length);
 }
 
 void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, char *data, size_t data_len)
 {
-    uint16_t packet_length;
-
     ipv6_buf = ipv6_get_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
     icmpv6_echo_reply_hdr_t *echo_buf = get_echo_repl_buf(ipv6_ext_hdr_len);
     char *echo_data_buf = ((char *)echo_buf) + sizeof(icmpv6_echo_reply_hdr_t);
 
     icmp_buf->type = ICMPV6_TYPE_ECHO_REPLY;
-    icmp_buf->code = 0;
-    ipv6_buf->version_trafficclass = IPV6_VER;
-    ipv6_buf->trafficclass_flowlabel = 0;
-    ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
-    ipv6_buf->hoplimit = 0xff;
-
-    memcpy(&ipv6_buf->destaddr, destaddr, sizeof(ipv6_addr_t));
-    ipv6_iface_get_best_src_addr(&ipv6_buf->srcaddr, &ipv6_buf->destaddr);
     echo_buf->id = id;
     echo_buf->seq = seq;
 
     memcpy(echo_data_buf, data, data_len);
-    packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + ipv6_ext_hdr_len +
-                    ECHO_REPL_LEN + data_len;
-
-    ipv6_buf->length = packet_length - IPV6_HDR_LEN;
+    ipv6_buf->length  = ICMPV6_HDR_LEN + ipv6_ext_hdr_len + ECHO_REPL_LEN + data_len;
 
     icmp_buf->checksum = 0;
     icmp_buf->checksum = ~icmpv6_csum(IPV6_PROTO_NUM_ICMPV6);
 
 #ifdef ENABLE_DEBUG
     char addr_str[IPV6_MAX_ADDR_STR_LEN];
-    printf("INFO: send echo request to: %s\n",
-           ipv6_addr_to_str(addr_str, &ipv6_buf->destaddr));
+    printf("INFO: send echo reply to: %s\n", ipv6_addr_to_str(addr_str, destaddr));
 #endif
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &ipv6_buf->destaddr.uint16[4],
-                            (uint8_t *)ipv6_buf,
-                            packet_length);
+
+    ipv6_sendto(destaddr, IPV6_PROTO_NUM_ICMPV6, (uint8_t*) icmp_buf, ipv6_buf->length);
 }
 
 /* send router solicitation message - RFC4861 section 4.1 */
@@ -372,7 +342,7 @@ void recv_echo_req(void)
     ipv6_buf = ipv6_get_buf();
     icmpv6_echo_request_hdr_t *echo_buf = get_echo_req_buf(ipv6_ext_hdr_len);
     char *echo_data_buf = ((char *)echo_buf) + sizeof(icmpv6_echo_reply_hdr_t);
-    size_t data_len = ipv6_buf->length - (IPV6_HDR_LEN + ICMPV6_HDR_LEN +
+    size_t data_len = ipv6_buf->length - (ICMPV6_HDR_LEN +
                                           ipv6_ext_hdr_len + ECHO_REQ_LEN);
 #ifdef ENABLE_DEBUG
     char addr_str[IPV6_MAX_ADDR_STR_LEN];
@@ -399,7 +369,7 @@ void recv_echo_repl(void)
     ipv6_buf = ipv6_get_buf();
     icmpv6_echo_reply_hdr_t *echo_buf = get_echo_repl_buf(ipv6_ext_hdr_len);
     char *echo_data_buf = ((char *)echo_buf) + sizeof(icmpv6_echo_reply_hdr_t);
-    size_t data_len = ipv6_buf->length - (IPV6_HDR_LEN + ICMPV6_HDR_LEN +
+    size_t data_len = ipv6_buf->length - (ICMPV6_HDR_LEN +
                                           ipv6_ext_hdr_len + ECHO_REPL_LEN);
 #ifdef ENABLE_DEBUG
     char addr_str[IPV6_MAX_ADDR_STR_LEN];
