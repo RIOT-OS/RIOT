@@ -87,7 +87,7 @@ struct ccnl_relay_s {
     struct ccnl_forward_s *fib;
     struct ccnl_interest_s *pit;
     struct ccnl_content_s *contents; //, *contentsend;
-    struct ccnl_buf_s *nonces;
+    struct ccnl_nonce_s *nonces;
     int contentcnt;		// number of cached items
     int max_cache_entries;	// -1: unlimited
     struct ccnl_if_s ifs[CCNL_MAX_INTERFACES];
@@ -109,6 +109,12 @@ struct ccnl_buf_s {
     struct ccnl_buf_s *next;
     unsigned int datalen;
     unsigned char data[1];
+};
+
+struct ccnl_nonce_s {
+    struct ccnl_nonce_s *next, *prev;
+    struct timeval created;
+    struct ccnl_buf_s *buf;
 };
 
 struct ccnl_prefix_s {
@@ -262,6 +268,7 @@ ccnl_extract_prefix_nonce_ppkd(unsigned char **data, int *datalen, int *scope,
 
 void ccnl_do_retransmit(void *ptr, void *dummy);
 void ccnl_do_ageing(void *ptr, void *dummy);
+void ccnl_do_nonce_timeout(void *ptr, void *dummy);
 
 void ccnl_interface_CTS(void *aux1, void *aux2);
 

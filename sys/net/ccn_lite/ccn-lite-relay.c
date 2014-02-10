@@ -136,6 +136,12 @@ void ccnl_retransmit(void *relay, void *aux)
     ccnl_set_timer(TIMEOUT_TO_US(CCNL_CHECK_RETRANSMIT_SEC, CCNL_CHECK_RETRANSMIT_USEC), ccnl_retransmit, relay, 0);
 }
 
+void ccnl_nonce_timeout(void *relay, void *aux)
+{
+    ccnl_do_nonce_timeout(relay, aux);
+    ccnl_set_timer(TIMEOUT_TO_US(CCNL_NONCE_TIMEOUT_SEC, CCNL_NONCE_TIMEOUT_USEC), ccnl_nonce_timeout, relay, 0);
+}
+
 // ----------------------------------------------------------------------
 
 void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries, int fib_threshold_prefix, int fib_threshold_aggregate)
@@ -205,6 +211,7 @@ void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries, int fi
 
     ccnl_set_timer(TIMEOUT_TO_US(CCNL_CHECK_TIMEOUT_SEC, CCNL_CHECK_TIMEOUT_USEC), ccnl_ageing, relay, 0);
     ccnl_set_timer(TIMEOUT_TO_US(CCNL_CHECK_RETRANSMIT_SEC, CCNL_CHECK_RETRANSMIT_USEC), ccnl_retransmit, relay, 0);
+    ccnl_set_timer(TIMEOUT_TO_US(CCNL_NONCE_TIMEOUT_SEC, CCNL_NONCE_TIMEOUT_USEC), ccnl_nonce_timeout, relay, 0);
 }
 
 #if RIOT_CCNL_POPULATE
