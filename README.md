@@ -1,29 +1,29 @@
-                          ZZZZZZ                                                
-                        ZZZZZZZZZZZZ                                             
-                      ZZZZZZZZZZZZZZZZ                                           
-                     ZZZZZZZ     ZZZZZZ                                          
-                    ZZZZZZ        ZZZZZ                                          
-                    ZZZZZ          ZZZZ                                          
-                    ZZZZ           ZZZZZ                                         
-                    ZZZZ           ZZZZ                                          
-                    ZZZZ          ZZZZZ                                          
-                    ZZZZ        ZZZZZZ                                           
-                    ZZZZ     ZZZZZZZZ       777        7777       7777777777     
-              ZZ    ZZZZ   ZZZZZZZZ         777      77777777    77777777777     
-          ZZZZZZZ   ZZZZ  ZZZZZZZ           777     7777  7777       777         
-        ZZZZZZZZZ   ZZZZ    Z               777     777    777       777         
-       ZZZZZZ       ZZZZ                    777     777    777       777         
-      ZZZZZ         ZZZZ                    777     777    777       777         
-     ZZZZZ          ZZZZZ    ZZZZ           777     777    777       777         
-     ZZZZ           ZZZZZ    ZZZZZ          777     777    777       777         
-     ZZZZ           ZZZZZ     ZZZZZ         777     777    777       777         
-     ZZZZ           ZZZZ       ZZZZZ        777     777    777       777         
-     ZZZZZ         ZZZZZ        ZZZZZ       777     777    777       777         
-      ZZZZZZ     ZZZZZZ          ZZZZZ      777     7777777777       777         
-       ZZZZZZZZZZZZZZZ            ZZZZ      777      77777777        777         
-         ZZZZZZZZZZZ               Z                                             
-            ZZZZZ                                                                
-                                                                                 
+                          ZZZZZZ
+                        ZZZZZZZZZZZZ
+                      ZZZZZZZZZZZZZZZZ
+                     ZZZZZZZ     ZZZZZZ
+                    ZZZZZZ        ZZZZZ
+                    ZZZZZ          ZZZZ
+                    ZZZZ           ZZZZZ
+                    ZZZZ           ZZZZ
+                    ZZZZ          ZZZZZ
+                    ZZZZ        ZZZZZZ
+                    ZZZZ     ZZZZZZZZ       777        7777       7777777777
+              ZZ    ZZZZ   ZZZZZZZZ         777      77777777    77777777777
+          ZZZZZZZ   ZZZZ  ZZZZZZZ           777     7777  7777       777
+        ZZZZZZZZZ   ZZZZ    Z               777     777    777       777
+       ZZZZZZ       ZZZZ                    777     777    777       777
+      ZZZZZ         ZZZZ                    777     777    777       777
+     ZZZZZ          ZZZZZ    ZZZZ           777     777    777       777
+     ZZZZ           ZZZZZ    ZZZZZ          777     777    777       777
+     ZZZZ           ZZZZZ     ZZZZZ         777     777    777       777
+     ZZZZ           ZZZZ       ZZZZZ        777     777    777       777
+     ZZZZZ         ZZZZZ        ZZZZZ       777     777    777       777
+      ZZZZZZ     ZZZZZZ          ZZZZZ      777     7777777777       777
+       ZZZZZZZZZZZZZZZ            ZZZZ      777      77777777        777
+         ZZZZZZZZZZZ               Z
+            ZZZZZ
+
 The friendly Operating System for IoT!
 
 ## FEATURES
@@ -43,7 +43,7 @@ Its features comprise
 * TCP and UDP
 * 6LoWPAN
 * RPL
- 
+
 ## GETTING STARTED
 * You want to start the RIOT? Just follow our [Getting started documentation](https://github.com/RIOT-OS/RIOT/wiki/Introduction)
 * The RIOT API itself can be built from the code using doxygen. The latest version is uploaded daily to http://riot-os.org/api.
@@ -96,7 +96,7 @@ For example, you can use it to the test the native networking by running the `./
   Free Software Foundation.
 * Some external sources, especially files developed by SICS are published under
   a separate license.
-  
+
 All code files contain licensing information.
 
 For more information, see the RIOT website:

@@ -36,4 +36,3 @@ DEP = $(SRC:%.c=$(BINDIR)%.d)
 MODULE =shell_commands
 
 include $(RIOTBASE)/Makefile.base
-

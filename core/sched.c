@@ -18,7 +18,7 @@
  *
  * @}
  *
- * TODO: setup dependency from SCHEDSTATISTICS to MODULE_HWTIMER 
+ * TODO: setup dependency from SCHEDSTATISTICS to MODULE_HWTIMER
  */
 
 #include <stdint.h>

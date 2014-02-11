@@ -173,4 +173,3 @@ void at86rf231_swap_fcf_bytes(uint8_t *buf)
     buf[1] = buf[2];
     buf[2] = tmp;
 }
-

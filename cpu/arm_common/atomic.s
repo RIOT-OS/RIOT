@@ -15,4 +15,3 @@ atomic_set_return:
     MOV r0, r2
     mov pc, lr
 .endfunc
-

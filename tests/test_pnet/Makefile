@@ -3,9 +3,9 @@
 ####
 #### The Sample Filesystem Layout is:
 #### /this makefile
-#### ../../RIOT 
+#### ../../RIOT
 #### ../../boards   for board definitions (if you have one or more)
-#### 
+####
 
 # name of your project
 export PROJECT =test_pnet
@@ -23,7 +23,7 @@ ifeq ($(BOARD),stm32f4discovery)
 	include Makefile.$(BOARD)
 endif
 
-## Modules to include. 
+## Modules to include.
 
 USEMODULE += auto_init
 USEMODULE += posix

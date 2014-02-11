@@ -48,4 +48,3 @@ void _native_LED_RED_TOGGLE(void)
 {
     printf("LED_RED_TOGGLE\n");
 }
-

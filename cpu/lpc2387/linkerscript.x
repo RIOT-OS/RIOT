@@ -11,7 +11,7 @@ This file is part of RIOT.
  */
 
 /* specify the LPC2387 memory areas (see LPC2387 datasheet page 15)  */
-MEMORY 
+MEMORY
 {
 	flash     			: ORIGIN = 0,          LENGTH = 504K	/* FLASH ROM 512kByte without ISP bootloader*/
     infomem             : ORIGIN = 0x0007D000, LENGTH = 4K      /* Last sector in FLASH ROM for config data */
@@ -30,9 +30,9 @@ __stack_usr_size = 4096;		/* stack for user operation (kernel init)				    */
 __stack_size = __stack_und_size + __stack_abt_size + __stack_fiq_size + __stack_irq_size + __stack_svc_size + __stack_usr_size;
 
 /* now define the output sections  */
-SECTIONS 
+SECTIONS
 {
-	.text :								/* collect all sections that should go into FLASH after startup  */ 
+	.text :								/* collect all sections that should go into FLASH after startup  */
 	{
 		*(.vectors)						/* Exception Vectors and branch table >= 64 bytes */
 		. = ALIGN(64);
@@ -47,7 +47,7 @@ SECTIONS
 	    *(.init7)
 	    *(.init8)
 	    *(.init9) 						/* Call main().  */
-		
+
 		*(.text)						/* all .text sections (code)  */
 		*(.text.*)
 		*(.gnu.linkonce.t.*)
@@ -59,9 +59,9 @@ SECTIONS
 		. = ALIGN(4);
 		__cfgspec_start = .;
 		*(.cfgspec)						/* configuration spec table */
-		__cfgspec_end = .;		
+		__cfgspec_end = .;
 		. = ALIGN(4);
-		
+
 		__ctors_start = .;
         	PROVIDE (_os_ctor_start = .);
         	*(.ctors);
@@ -76,7 +76,7 @@ SECTIONS
 		*(.gnu.linkonce.r.*)
 		*(.glue_7)						/* all .glue_7 sections  (no idea what these are) */
 		*(.glue_7t)						/* all .glue_7t sections (no idea what these are) */
-		
+
 		*(.fini9)
 		*(.fini8)
 		*(.fini7)
@@ -88,10 +88,10 @@ SECTIONS
 		*(.fini1)
 		*(.fini0)						/* Infinite loop after program termination.  */
 		*(.fini)
-		
+
 		*(.gcc_except_table)
-		
-	} >flash							/* put all the above into FLASH */	
+
+	} >flash							/* put all the above into FLASH */
 	. = ALIGN(4);
 
     /* .ARM.exidx is sorted, so has to go in its own output section.  */
@@ -104,9 +104,9 @@ SECTIONS
 
 	_etext = . ;						/* define a global symbol _etext just after the last code byte */
 
-    .config : 
+    .config :
     {
-        *(.configmem) 
+        *(.configmem)
         . = ALIGN(256);
     } >infomem
     . = ALIGN(4);
@@ -136,7 +136,7 @@ SECTIONS
 
 	/*
 	 * collect all uninitialized sections that go into RAM
-	 */	
+	 */
 	.noinit (NOLOAD) :
 	{
 		__noinit_start = .;
@@ -159,7 +159,7 @@ SECTIONS
 	} > ram								/* put all the above in RAM (it will be cleared in the startup code */
 	. = ALIGN(4);						/* ensure data is aligned so relocation can use 4-byte operations */
 	__bss_end = . ;						/* define a global symbol marking the end of the .bss section */
-	
+
 	/*
 	 * collect all initialized .data sections that go into RAM
 	 * initial values get placed at the end of .text in flash
@@ -192,10 +192,10 @@ SECTIONS
     } >ram								/* put all the above into RAM (but load the LMA copy into FLASH) */
 	. = ALIGN(4);						/* ensure data is aligned so relocation can use 4-byte operations */
 	_edata = .;							/* define a global symbol marking the end of the .data section  */
-	
-	
+
+
 	/*
-	 * Exception frames (newer linker versions generate these but they use of 
+	 * Exception frames (newer linker versions generate these but they use of
 	 * most of the RAM.
 	 */
     /DISCARD/ :							/* discard exception frames */
@@ -205,13 +205,13 @@ SECTIONS
 
 	/* to enable exception frames */
 	/*
-	.eh_frame :					
+	.eh_frame :
 	{
 		 KEEP (*(.eh_frame))
 	} > ram
 	. = ALIGN(4);
 	*/
-	
+
 	_end = .;							/* define a global symbol marking the end of application RAM */
 
 	__heap1_size = ORIGIN(ram) + LENGTH(ram) - . - __stack_size;
@@ -219,16 +219,16 @@ SECTIONS
 	{
 		PROVIDE(__heap1_start = .);
 		. = . + __heap1_size;
-		PROVIDE(__heap1_max = .);	
-	} > ram	
-	
+		PROVIDE(__heap1_max = .);
+	} > ram
+
 	/*
 	 * Stacks
 	 */
 	.stack (NOLOAD) :
 	{
 		PROVIDE(__stack_start = .);
-	
+
 		. = . + __stack_usr_size;
 		__stack_usr_start = .;
 		. = . + __stack_und_size;
@@ -241,10 +241,10 @@ SECTIONS
 		__stack_abt_start = .;
 		. = . + __stack_svc_size;
 		__stack_svc_start = .;
-		
+
 		PROVIDE(__stack_end = .);
 	} > ram
-	
+
 	__heap2_size = LENGTH(ram_ethernet);
 	.heap2 (NOLOAD) :
 	{
@@ -258,7 +258,7 @@ SECTIONS
 	{
 		*(.usbdata)
 	} > ram_usb
-	
+
 	.heap3 ALIGN(0x1000) (NOLOAD) :
 	{
 		__heap3_size = ORIGIN(ram_usb) + LENGTH(ram_usb) - ABSOLUTE(.);
@@ -267,10 +267,10 @@ SECTIONS
 		PROVIDE(__heap3_max = .);
 	} > ram_usb
 	__heap_size = SIZEOF(.heap3);
-	
-	
+
+
 	.batteryram (NOLOAD) :				/* battery ram stays on during powerdown but needs to be handled specially */
 	{
 		*(.batteryram)
-	} > ram_battery	
+	} > ram_battery
 }

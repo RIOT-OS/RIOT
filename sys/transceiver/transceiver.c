@@ -388,13 +388,13 @@ static void receive_packet(uint16_t type, uint8_t pos)
          * received */
         if (type == RCV_PKT_CC1100) {
 #ifdef MODULE_CC110X_NG
-            receive_cc110x_packet(trans_p); 
+            receive_cc110x_packet(trans_p);
 #elif MODULE_CC110X
             receive_cc1100_packet(trans_p);
 #else
             trans_p = NULL;
 #endif
-        } 
+        }
         else if (type == RCV_PKT_MC1322X) {
 #ifdef MODULE_MC1322X
             receive_mc1322x_packet(trans_p);
@@ -528,12 +528,12 @@ void receive_mc1322x_packet(radio_packet_t *trans_p) {
     memcpy((void*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), maca_pkt->data, MACA_MAX_PAYLOAD_SIZE);
     maca_free_packet( maca_pkt );
     eINT();
-    
+
     trans_p->data = (uint8_t*) &(data_buffer[transceiver_buffer_pos * MACA_MAX_PAYLOAD_SIZE]);
 }
 #endif
 
- 
+
 #ifdef MODULE_NATIVENET
 void receive_nativenet_packet(radio_packet_t *trans_p) {
     unsigned state;
@@ -741,7 +741,7 @@ static int32_t get_channel(transceiver_type_t t)
 #endif
 #ifdef MODULE_MC1322X
         case TRANSCEIVER_MC1322X:
-            ///< TODO:implement return maca_get_channel(); 
+            ///< TODO:implement return maca_get_channel();
             return -1;
 #endif
 #ifdef MODULE_NATIVENET

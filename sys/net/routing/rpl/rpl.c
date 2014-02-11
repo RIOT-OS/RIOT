@@ -937,7 +937,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
     packet_length = IPV6_HDR_LEN + p_len;
 
     if (ipv6_addr_is_multicast(&ipv6_send_buf->destaddr)) {
-        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(ipv6_send_buf->destaddr.uint16[4]), 
+        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(ipv6_send_buf->destaddr.uint16[4]),
                                 (uint8_t *)ipv6_send_buf,
                                 packet_length);
     }
@@ -960,7 +960,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
             }
         }
 
-        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(next_hop->uint16[4]), 
+        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(next_hop->uint16[4]),
                                 (uint8_t *)ipv6_send_buf,
                                 packet_length);
     }

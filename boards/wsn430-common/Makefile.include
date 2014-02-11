@@ -22,4 +22,3 @@ export FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
 
 export INCLUDES += -I$(RIOTBOARD)/wsn430-common/include
 export OFLAGS = -O ihex
-

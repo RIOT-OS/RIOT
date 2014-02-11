@@ -28,5 +28,3 @@ sudo make link
 # Load firmware, not yet building it locally.
 goodfet.bsl --fromweb
 goodfet.monitor test
-
-

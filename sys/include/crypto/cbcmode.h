@@ -8,7 +8,7 @@
 /**
  * @ingroup     sys_crypto
  * @{
- * 
+ *
  * @file        cbcmode.h
  * @brief       Headers of the implementation of the CBC Mode of Operation
  *

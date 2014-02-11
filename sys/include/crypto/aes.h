@@ -8,7 +8,7 @@
 /**
  * @ingroup     sys_crypto
  * @{
- * 
+ *
  * @file        aes.h
  * @brief       Headers for the implementation of the AES cipher-algorithm
  *

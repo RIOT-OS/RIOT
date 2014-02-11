@@ -317,4 +317,3 @@ void lm75A_start_sensor_sampling(void (*handler)(void))
         hwtimer_wait(HWTIMER_TICKS(100000));
     }
 }
-

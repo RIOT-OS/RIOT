@@ -1,5 +1,5 @@
 /**
- * Ringbuffer header 
+ * Ringbuffer header
  *
  * Copyright (C) 2013 Freie Universität Berlin
  * Copyright (C) 2013 INRIA

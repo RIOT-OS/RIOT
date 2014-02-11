@@ -145,8 +145,8 @@ void msp430_init_dco(void)
 void board_init() {
     msp430_cpu_init();
     msb_ports_init();
-    
+
     LED_RED_ON;
-   
+
     msp430_set_cpu_speed(MCLK_8MHZ_SCLK_8MHZ);
 }

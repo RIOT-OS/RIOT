@@ -73,4 +73,3 @@ void at86rf231_rx_handler(void)
     // Read IRQ to clear it
     at86rf231_reg_read(AT86RF231_REG__IRQ_STATUS);
 }
-

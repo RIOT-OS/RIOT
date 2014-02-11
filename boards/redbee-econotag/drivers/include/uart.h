@@ -82,7 +82,7 @@ struct UART_struct {
             uint32_t : 27;
         } CTSbits;
     };
-    
+
     uint32_t BR;                    /*< BR is 32bit access only */
 };
 

@@ -26,7 +26,7 @@ void uart_set_baudrate(volatile struct UART_struct *uart, uint32_t baudrate)
     /* multiply by another 10 to get a fixed point*/
     inc = ((uint64_t) baudrate * DIV_ * MOD_ * 10 / CLK_) - 10;
     /* add 5 and div by 10 to get a proper rounding */
-    inc = (inc + 5) / 10; 
+    inc = (inc + 5) / 10;
 
     /* disable UARTx to set baudrate */
     uart->CONbits.TXE = 0;
@@ -183,4 +183,3 @@ void bl_uart_init(void)
 {
     uart_init(UART1, BAUTRATE_UART1);
 }
-

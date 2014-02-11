@@ -62,7 +62,7 @@
 #define OPT_STLLAO_MIN_LEN             	(8)
 #define OPT_STLLAO_MAX_LEN             	(16)
 /* prefix info option rfc 4.6.2 */
-#define OPT_PI_LIST_LEN                	(5) //TODO: initalwert suchen        
+#define OPT_PI_LIST_LEN                	(5) //TODO: initalwert suchen
 #define OPT_PI_TYPE                    	(3)
 #define OPT_PI_LEN                     	(4)
 #define OPT_PI_HDR_LEN                 	(32)

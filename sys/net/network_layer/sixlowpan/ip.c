@@ -151,7 +151,7 @@ uint8_t ipv6_register_packet_handler(int pid)
 {
     uint8_t i;
 
-    for (i = 0; ((i < SIXLOWIP_MAX_REGISTERED) && (sixlowip_reg[i] != pid) && 
+    for (i = 0; ((i < SIXLOWIP_MAX_REGISTERED) && (sixlowip_reg[i] != pid) &&
                  (sixlowip_reg[i] != 0)); i++) {
         ;
     }

@@ -8,7 +8,7 @@
 /**
  * @ingroup     sys_crypto
  * @{
- * 
+ *
  * @file        skipjack.h
  * @brief       Headers for the implementation of the SkipJack cipher-algorithm
  *
@@ -62,7 +62,7 @@
     w3 = tmp;                                \
     counter--;                               \
     skey -= 4; }                             \
- 
+
 // B-RULE:
 #define RULE_B(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight ) { \
     tmp = w1;                                \

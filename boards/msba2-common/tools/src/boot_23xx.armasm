@@ -28,5 +28,3 @@ const:
 	.int	0xE01FC040	/* MEMMAP register */
 	.int	0xE01FC080	/* PLLCON */
 	.int	0xE01FC08C	/* PLLFEED */
-
-

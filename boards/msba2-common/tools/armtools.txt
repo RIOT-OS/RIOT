@@ -1,4 +1,4 @@
-This directory contains flash & terminal-utilities for use with 
+This directory contains flash & terminal-utilities for use with
 the msb_av2 platform used by the FeuerWhere-Project.
 
 Usage:

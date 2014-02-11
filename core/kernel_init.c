@@ -82,4 +82,3 @@ void kernel_init(void)
 
     cpu_switch_context_exit();
 }
-

@@ -1,5 +1,5 @@
 /**
- * Shell commands for coulomb counter 
+ * Shell commands for coulomb counter
  *
  * Copyright (C) 2013  INRIA.
  *

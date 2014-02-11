@@ -4,13 +4,13 @@ TOOLROOT=${TOOLROOT:-.}
 
 flash() {
     echo "Building ${1}..."
-    jam -aq flash || ( echo "[BUILD FAILED] ${1}" && false ) 
+    jam -aq flash || ( echo "[BUILD FAILED] ${1}" && false )
 }
 
 run_tests() {
     TESTDIR=projects/${1}/tests
     flash ${PROJECT} || return
-    for tst in `ls ${TESTDIR}/`; do 
+    for tst in `ls ${TESTDIR}/`; do
         echo "Project \"${1}\": Running test ${tst}..."
         $TESTDIR/$tst || (
             echo
@@ -19,7 +19,7 @@ run_tests() {
     done
 }
 
-echo 
+echo
 echo "Running tests..."
 echo
 
@@ -40,4 +40,3 @@ for i in projects/*; do
         } 2>&1
     fi
 done
-

@@ -40,8 +40,8 @@ USEMODULE += auto_init
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += posix
-USEMODULE += ps 
-USEMODULE += vtimer 
+USEMODULE += ps
+USEMODULE += vtimer
 ifeq ($(strip $(BOARD)),native)
 	USEMODULE += nativenet
 else ifeq ($(strip $(BOARD)),msba2)

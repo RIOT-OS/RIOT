@@ -5,7 +5,7 @@
  * This source code is licensed under the GNU Lesser General Public License,
  * Version 2.  See the file LICENSE for more details.
  */
- 
+
 /**
  * @defgroup    mc1322x Freescale MC1322x
  * @ingroup     cpu
@@ -13,7 +13,7 @@
  */
 
 #ifndef CPU_H
-#define CPU_H 
+#define CPU_H
 
 /**
  * @defgroup	mc1322x		Freescale mc1322x

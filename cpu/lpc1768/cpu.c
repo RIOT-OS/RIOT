@@ -1,5 +1,5 @@
 /**
- * CPU specific functions for the RIOT scheduler on NXP LPC1768 
+ * CPU specific functions for the RIOT scheduler on NXP LPC1768
  *
  * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr>
  *

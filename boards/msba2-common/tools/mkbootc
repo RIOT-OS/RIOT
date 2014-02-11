@@ -24,5 +24,3 @@ print C "const unsigned int ${ARGV[0]}[] = {\n";
 print C "\t", join(', ', @data), "\n";
 print C "};\n";
 close C;
-
-

@@ -18,6 +18,3 @@ Added 2103 chip to chip list.  ID numbers for 2101 and 2102 unknown
 Added support for other chips
 Added soft boot code
 Added user configurable crystal value (for baud sync protocol)
-
-
-

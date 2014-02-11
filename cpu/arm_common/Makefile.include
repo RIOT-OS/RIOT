@@ -1,4 +1,3 @@
 INCLUDES += -I$(MAKEBASE)/cpu/arm_common/include/
 
 export UNDEF += $(BINDIR)syscalls.o
-

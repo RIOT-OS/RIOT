@@ -177,5 +177,3 @@ int main(int argc, char **argv)
     close_serial_port();
     return 0;
 }
-
-

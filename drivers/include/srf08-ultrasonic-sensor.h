@@ -4,14 +4,14 @@
  * This source code is licensed under the LGPLv2 license,
  * See the file LICENSE for more details.
  */
- 
+
 /**
  * @defgroup    srf08 SRF08
  * @ingroup     drivers
  * @brief       Driver for the SRF08 ultrasonic range sensor
- * 
+ *
  * The connection between the MCU and the SRF08 is based on the i2c-interface.
- * 
+ *
  * @{
  *
  * @file
@@ -64,8 +64,8 @@ bool srf08_init(uint8_t i2c_interface, uint32_t baud_rate);
  *              range-finder.
  *              The ranging results are given over the RS232-Interface.
  *
- * @param[in] ranging_mode  there are three real ranging modes, which return 
- *                          the result in inches, centimeters or microseconds. 
+ * @param[in] ranging_mode  there are three real ranging modes, which return
+ *                          the result in inches, centimeters or microseconds.
  *                          Another set of three fake ranging modes do the same
  *                          but without transmitting the burst.
  *
@@ -111,10 +111,10 @@ uint8_t srf08_get_gain(void);
 
 
 /**
- * @brief       Get all distances measured from the SRF08 ultrasonic sensor. 
- *              The results of a ranging can be returned in inches, centimeters 
- *              or microseconds. The SRF08 can detect up to targets. 
- *              This function prints the distance values over the rs232 
+ * @brief       Get all distances measured from the SRF08 ultrasonic sensor.
+ *              The results of a ranging can be returned in inches, centimeters
+ *              or microseconds. The SRF08 can detect up to targets.
+ *              This function prints the distance values over the rs232
  *              interface
  *
  * @param[in] range_array   a pointer to a buffer holding the ranging results.

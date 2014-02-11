@@ -44,4 +44,3 @@ $(BINDIR)%.o: %.S
 # remove compilation products
 clean::
 	$(AD)rm -f $(BINDIR)$(MODULE).a $(OBJ) $(DEP) $(ASMOBJ)
-	

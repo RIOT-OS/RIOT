@@ -18,7 +18,7 @@ windows_flash_fm() {
 		echo "  target mismatch: target board is \"${FTDI_ID}\", connected is ${BOARDCHECK}"
 		exit 1
 	fi
-	
+
 	echo "Flashing ${HEXFILE} to COM${1} (${BOARDCHECK} serial ${SERIAL})"
 	# Using FlashMagic on Windows (in separate window)
 	cmd /C start "FlashMagic ${HEXFILE} to ${BOARDCHECK} on COM${1}" fm.exe "COM(${1}, 230400) DEVICE(LPC2387, 16.000000) HARDWARE(BOOTEXEC, 50, 100) HIGHSPEED(0, 230400) ERASEUSED(${HEXFILE}, PROTECTISP) HEXFILE(${HEXFILE}, NOCHECKSUMS, NOFILL, PROTECTISP) RESET"
@@ -75,7 +75,7 @@ pids=""
 if [ ${PORTS} = "openocd" ]; then
 	[ "$OPENOCD" != "" ] || exit 1
 	[ "$OPENOCD_IF" != "" ] || exit 1
-#    echo -n "Is the board connected to the JTAG a '${FTDI_ID}' (y/n)? " 
+#    echo -n "Is the board connected to the JTAG a '${FTDI_ID}' (y/n)? "
 #	read REPLY
 #	[ "$REPLY" = "y" ] || exit 1
 fi

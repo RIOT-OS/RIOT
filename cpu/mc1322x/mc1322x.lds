@@ -26,7 +26,7 @@ HEAP_SIZE = 4096;
   .text           :
   {
     *(.startup)
-    *(.irq)		
+    *(.irq)
     *(.text .stub .text.* .gnu.linkonce.t.*)
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
@@ -96,7 +96,7 @@ HEAP_SIZE = 4096;
 /*  . = ALIGN (CONSTANT (MAXPAGESIZE)) - ((CONSTANT (MAXPAGESIZE) - .) & (CONSTANT (MAXPAGESIZE) - 1)); . = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE)); */
 
 	. = ALIGN(4);
-	. = DATA_SEGMENT_ALIGN(4,4); 
+	. = DATA_SEGMENT_ALIGN(4,4);
 
   /* Exception handling  */
   .eh_frame       : ONLY_IF_RW { KEEP (*(.eh_frame)) }
@@ -153,10 +153,10 @@ HEAP_SIZE = 4096;
     KEEP (*(SORT(.dtors.*)))
     KEEP (*(.dtors))
   }
-  .jcr            : { KEEP (*(.jcr)) } 
+  .jcr            : { KEEP (*(.jcr)) }
   .data.rel.ro : { *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*) *(.data.rel.ro* .gnu.linkonce.d.rel.ro.*) }
-  .dynamic        : { *(.dynamic) } 
-  . = DATA_SEGMENT_RELRO_END (0, .);  
+  .dynamic        : { *(.dynamic) }
+  . = DATA_SEGMENT_RELRO_END (0, .);
   .got            : { *(.got.plt) *(.got) }
   .data           :
   {

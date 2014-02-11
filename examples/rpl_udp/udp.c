@@ -125,5 +125,3 @@ void udp_send(char *str)
 
     destiny_socket_close(sock);
 }
-
-

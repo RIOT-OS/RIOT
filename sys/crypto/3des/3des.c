@@ -529,4 +529,3 @@ static uint8_t des3_key_setup(const uint8_t *key, struct des3_key_s *dkey)
     deskey(key + 16, 1, dkey->dk[0]);
     return 1;
 }
-

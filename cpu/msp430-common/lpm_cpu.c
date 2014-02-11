@@ -121,4 +121,3 @@ inline void lpm_awake(void)
 /* the following two functions have no actual role to play MSP430s */
 inline void lpm_begin_awake(void) { }
 inline void lpm_end_awake(void) { }
-

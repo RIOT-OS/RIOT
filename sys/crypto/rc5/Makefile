@@ -6,4 +6,3 @@ DEP = $(SRC:%.c=$(BINDIR)%.d)
 MODULE = crypto_rc5
 
 include $(RIOTBASE)/Makefile.base
-

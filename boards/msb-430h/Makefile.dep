@@ -3,4 +3,3 @@ ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
 		USEMODULE += cc110x_spi
 	endif
 endif
-

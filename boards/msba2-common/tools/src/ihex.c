@@ -302,14 +302,3 @@ void put_ihex_data(int addr, int len, const unsigned char *bytes)
         addr++;
     }
 }
-
-
-
-
-
-
-
-
-
-
-

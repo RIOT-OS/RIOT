@@ -5,7 +5,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  */
- 
+
 /**
  * @addtogroup  core_thread
  * @{
@@ -37,12 +37,12 @@
 #define STATUS_STOPPED          (0x0008)                      /**< has terminated */
 #define STATUS_SLEEPING         (0x0010)                      /**< sleeping */
 #define STATUS_MUTEX_BLOCKED    (0x0020)                      /**< waiting for a locked mutex */
-#define STATUS_RECEIVE_BLOCKED  (0x0040)                      /**< waiting for a message */ 
-#define STATUS_SEND_BLOCKED     (0x0080)                      /**< waiting for message to be 
+#define STATUS_RECEIVE_BLOCKED  (0x0040)                      /**< waiting for a message */
+#define STATUS_SEND_BLOCKED     (0x0080)                      /**< waiting for message to be
                                                                 *  delivered */
 #define STATUS_REPLY_BLOCKED    (0x0100)                      /**< waiting for a message response */
 #define STATUS_TIMER_WAITING    (0x0200)                      /**< waiting for a timer to fire
-                                                                *  (deprecated) */ 
+                                                                *  (deprecated) */
 
 typedef struct tcb_t {
     char *sp;

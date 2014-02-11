@@ -206,7 +206,7 @@ uint8_t SSP0Prepare(uint8_t chip, uint8_t datasize, uint8_t cpol, uint8_t cpha,
     for (uint32_t i = 0; i < FIFOSIZE; i++) {
         dummy = SSP0DR; // clear the RxFIFO
     }
-    
+
     /* to suppress unused-but-set-variable */
     (void) dummy;
 
@@ -425,4 +425,3 @@ unsigned short acam_trx(const uint8_t data)
     SSP0_write(data, ACAMDMS);
     return SSP0_read(ACAMDMS);
 }
-

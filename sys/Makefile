@@ -97,7 +97,7 @@ ifneq (,$(findstring quad_math,$(USEMODULE)))
     DIRS += quad_math
 endif
 
-all: $(BINDIR)$(MODULE).a 
+all: $(BINDIR)$(MODULE).a
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
 include $(RIOTBASE)/Makefile.base
@@ -105,4 +105,3 @@ include $(RIOTBASE)/Makefile.base
 # remove compilation products
 clean::
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
-

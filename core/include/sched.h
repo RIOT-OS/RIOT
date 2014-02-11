@@ -42,7 +42,7 @@ void sched_run(void);
 /**
  * @brief   Set the status of the specified process
  *
- * @param[in]   process     Pointer to the thread control block of the 
+ * @param[in]   process     Pointer to the thread control block of the
  *                          targeted process
  * @param[in]   status      The new status of this thread
  */
@@ -55,8 +55,8 @@ void sched_set_status(tcb_t *process, unsigned int status);
  *
  * @param[in]   current_prio    The priority of the current thread
  * @param[in]   other_prio      The priority of the target thread
- * @param[in]   in_isr          1 if currently in interrupt context, 0 otherwise 
- */ 
+ * @param[in]   in_isr          1 if currently in interrupt context, 0 otherwise
+ */
 void sched_switch(uint16_t current_prio, uint16_t other_prio, int in_isr);
 
 /**

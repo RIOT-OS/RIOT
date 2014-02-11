@@ -118,6 +118,3 @@ static char uuchar(unsigned int val)
 
     return val;
 }
-
-
-

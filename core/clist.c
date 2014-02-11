@@ -5,7 +5,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  */
- 
+
 /**
  * @ingroup     core_util
  * @{
