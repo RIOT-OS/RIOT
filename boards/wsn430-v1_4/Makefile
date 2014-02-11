@@ -1,4 +1,4 @@
-MODULE =$(BOARD)_base
+MODULE = $(BOARD)_base
 
 DIRS = $(RIOTBOARD)/wsn430-common
 
