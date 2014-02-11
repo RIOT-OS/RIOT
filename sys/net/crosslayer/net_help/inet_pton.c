@@ -18,8 +18,6 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "destiny/socket.h"
-
 #include "inet_pton.h"
 
 /* int

@@ -1,5 +1,18 @@
 #ifndef INET_PTON_H_
 #define INET_PTON_H_
+#include <stdlib.h>
+
+#ifndef AF_INET
+#define AF_INET             2           ///< internetwork address family: UDP, TCP, etc.
+#endif
+#ifndef AF_INET6
+/**
+ * IPv6 address family.
+ *
+ * @see AF_INET
+ */
+#define AF_INET6            28
+#endif
 
 #ifndef IN6ADDRSZ
 #define IN6ADDRSZ   16

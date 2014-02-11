@@ -41,7 +41,9 @@ typedef uint32_t  socklen_t;    ///< POSIX compatible type for address length.
 #define AF_UNSPEC           0           ///< unspecified address family.
 #define AF_LOCAL            1           ///< local to host (pipes, portals) address family.
 #define AF_UNIX             AF_LOCAL    ///< alias for AF_LOCAL for backward compatibility.
+#ifndef AF_INET
 #define AF_INET             2           ///< internetwork address family: UDP, TCP, etc.
+#endif
 #define AF_IMPLINK          3           ///< ARPAnet IMP address family.
 #define AF_PUP              4           ///< PUP protocols address family: e.g. BSP
 #define AF_CHAOS            5           ///< MIT CHAOS protocols address family
@@ -69,12 +71,14 @@ typedef uint32_t  socklen_t;    ///< POSIX compatible type for address length.
 #define AF_ISDN             26          ///< Integrated Services Digital Network address family
 #define AF_E164             AF_ISDN     ///< CCITT E.164 recommendation
 #define pseudo_AF_KEY       27          ///< Internal key-management function (no AF)
+#ifndef AF_INET6
 /**
  * IPv6 address family.
  *
  * @see AF_INET
  */
 #define AF_INET6            28
+#endif
 #define AF_NATM             29          ///< native ATM access address family
 #define AF_ATM              30          ///< ATM address family
 #define pseudo_AF_HDRCMPLT  31          ///< Used by BPF to not rewrite headers in interface output routine
