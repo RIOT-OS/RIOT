@@ -197,4 +197,3 @@ void bl_init_ports(void)
     PINMODE4 |= (BIT23) | (BIT25) | (BIT27); // no resistors
 
 }
-

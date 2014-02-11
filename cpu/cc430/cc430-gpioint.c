@@ -241,4 +241,3 @@ interrupt(PORT2_VECTOR) __attribute__((naked)) port2_isr(void)
     P2IE  = int_enable;
     __exit_isr();
 }
-

@@ -22,8 +22,8 @@ my $zerolen;
 GetOptions ('file=s' => \$filename,
 	    'secondfile=s' => \$second,
 	    'zerolen' => \$zerolen,
-	    'terminal=s' => \$term, 
-	    'verbose' => \$verbose, 
+	    'terminal=s' => \$term,
+	    'verbose' => \$verbose,
 	    'u|baud=s' => \$baud,
 	    'rts=s' => \$rts,
 	    'command=s' => \$command,
@@ -77,12 +77,12 @@ my $s = 0;
 my $reset = 0;
 my $size = 0;
 
-while(1) { 
-    
+while(1) {
+
     my $c; my $count; my $ret = ''; my $test='';
-    
+
     if($s == 1) { print "secondary send...\n"; }
-    
+
     $ob->write(pack('C','0'));
 
     if(($command ne '') &&
@@ -91,25 +91,25 @@ while(1) {
 	system($command);
     }
 
-    if($s == 1) { 
-	$test = 'ready'; 
+    if($s == 1) {
+	$test = 'ready';
     } else {
 	$test = 'CONNECT';
     }
-    
+
     until($ret =~ /$test$/) {
 	($count,$c) = $ob->read(1);
-	if ($count == 0) { 
+	if ($count == 0) {
 	    print '.';
-	    $ob->write(pack('C','0')); 
+	    $ob->write(pack('C','0'));
 	    next;
 	}
 	$ret .= $c;
     }
     print $ret . "\n";
-    
+
     if (-e $filename || (defined($zerolen) && ($s == 1))) {
-	
+
 	if(defined($zerolen) && ($s == 1)) {
 	    $size = 0;
 	} else {
@@ -123,7 +123,7 @@ while(1) {
 	   ((!defined($zerolen)) && ($s == 1))) {
 	    open(FILE, $filename) or die($!);
 	    print "Sending $filename\n";
-	    
+
 	    my $i = 1;
 	    while(read(FILE, $c, 1)) {
 		$i++;
@@ -133,7 +133,7 @@ while(1) {
 	    }
 	}
     }
-    
+
     last if ($s==1);
     if((-e $second) || defined($zerolen)) {
 	$s=1; $filename = $second;
@@ -141,7 +141,7 @@ while(1) {
 	last;
     }
 
-} 
+}
 
 print "done sending files.\n";
 
@@ -168,4 +168,3 @@ $ob -> close or die "Close failed: $!\n";
 ReadMode 0;
 undef $ob;  # closes port AND frees memory in perl
 exit;
-

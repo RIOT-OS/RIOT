@@ -2,7 +2,7 @@ VALGRIND SUPPORT
 ================
 
 Rebuild your project using the all-valgrind target like this:
-    
+
     make -B clean all-valgrind
 
 That way native will tell valgrind about RIOTs stacks and prevent

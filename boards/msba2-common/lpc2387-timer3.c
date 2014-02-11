@@ -48,4 +48,3 @@ unsigned int  benchmark_read_stop(void)
 	T3TCR = 0;												// disable timer
 	return T3TC;
 }
-

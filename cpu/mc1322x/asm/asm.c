@@ -42,9 +42,9 @@ void asm_turn_off(void)
  * This function blocks until the encryption/decryption finished after 13 clocks.
  *
  * \param keys The 128 bit key. \sa asm_keys_t
- * \param data A 128 bit block to encrypt/decrypt. Holds the encrypted/decrypted 
- *             data when finished \sa asm_data_t 
- * \param ctr Structure holding the counter for the encryption/decrpytion. The user 
+ * \param data A 128 bit block to encrypt/decrypt. Holds the encrypted/decrypted
+ *             data when finished \sa asm_data_t
+ * \param ctr Structure holding the counter for the encryption/decrpytion. The user
  *			  is responsible to provide a decend counter function. \sa asm_ctr_t
  */
 void asm_ctr_encryption_blocking(asm_keys_t *keys, asm_data_t *data, asm_ctr_t *ctr)
@@ -146,7 +146,7 @@ void asm_ctr_cbc_mac_init(asm_keys_t *keys)
  * Updates a MAC stream and encrypts data.
  * \param data Structure holding 128 bits of data to use in MAC stream and to encrypt.
  			   Holds the encrypted data when finished. \sa asm_data_t
- * \param ctr  Structure holding the counter for the encryption/decrpytion. The user 
+ * \param ctr  Structure holding the counter for the encryption/decrpytion. The user
  *			   is responsible to provide a decend counter function. \sa asm_ctr_t
  */
 void asm_ctr_cbc_mac_update(asm_data_t *data, asm_ctr_t *ctr)

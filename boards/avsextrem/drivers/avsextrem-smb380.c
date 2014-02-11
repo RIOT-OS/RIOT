@@ -1331,5 +1331,3 @@ unsigned char SMB380_readGainTemp(uint16_t *gain)
 
     return true;
 }
-
-

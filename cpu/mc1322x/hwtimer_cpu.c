@@ -63,10 +63,10 @@ void timer_x_init(volatile struct TMR_struct* const TMRx) {
     /* disable comparison */
     TMRx->COMP1 = 0;
     TMRx->CMPLD1 = 0;
-    
+
     /* set counter to zero */
     TMRx->CNTR = TMRx->LOAD;
-    
+
     /* set timer control bits */
     TMRx->CTRLbits.COUNT_MODE = 1;              /* use rising edge of primary source */
     TMRx->CTRLbits.PRIMARY_CNT_SOURCE = 0x0f;   /* Perip. clock with 128 prescale (for 24MHz = 187500Hz) */
@@ -80,10 +80,10 @@ void timer_x_init(volatile struct TMR_struct* const TMRx) {
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu) {
     int_handler = handler;
-    
+
     /* TODO: do scaling voodoo */
     (void) fcpu;
-    
+
     /* disable all timers */
     TMR0->ENBL = 0;
     timer_x_init(TMR0);
@@ -115,7 +115,7 @@ void hwtimer_arch_disable_interrupt(void) {
 void hwtimer_arch_set(unsigned long offset, short timer) {
     /* get corresponding struct for the given ::timer parameter */
     struct TMR_struct* tmr = (void *) TMR_BASE + (timer * TMR_OFFSET);
-    
+
     /* disable IRQs and save the status register */
     uint32_t cpsr = disableIRQ();
 
@@ -124,8 +124,8 @@ void hwtimer_arch_set(unsigned long offset, short timer) {
     tmr->CSCTRLbits.TCF1 = 0;                   /* reset compare flag */
     tmr->CSCTRLbits.TCF1EN = 1;                 /* enable intterupts when TCF1 is set \ */
     TMR0->ENBL |= (1<<timer);                   /* enable timer */
-    tmr->SCTRLbits.TCFIE = 1;                   /* enable interrupts when TCF is one  - do we need both?*/ 
-    
+    tmr->SCTRLbits.TCFIE = 1;                   /* enable interrupts when TCF is one  - do we need both?*/
+
     /* restore status register */
     restoreIRQ(cpsr);
 }
@@ -134,17 +134,17 @@ void hwtimer_arch_set(unsigned long offset, short timer) {
 void hwtimer_arch_set_absolute(unsigned long value, short timer) {
     /* get corresponding struct for the given ::timer parameter */
     struct TMR_struct* tmr = (void *) TMR_BASE + (timer * TMR_OFFSET);
-    
+
     /* disable IRQs and save the status register */
     uint32_t cpsr = disableIRQ();
-    
+
     TMR0->ENBL &= ~(1<<timer);                  /* disable timer */
     tmr->COMP1 = value;                         /* load the value into the compare register */
     tmr->CSCTRLbits.TCF1 = 0;                   /* reset compare flag */
     tmr->CSCTRLbits.TCF1EN = 1;                 /* enable interrupts when TCF1 is set \ */
     TMR0->ENBL |= (1<<timer);                   /* enable timer */
-    tmr->SCTRLbits.TCFIE = 1;                   /* enable interrupts when TCF is one  - do we need both?*/ 
-    
+    tmr->SCTRLbits.TCFIE = 1;                   /* enable interrupts when TCF is one  - do we need both?*/
+
     /* restore status register */
     restoreIRQ(cpsr);
 }
@@ -153,7 +153,7 @@ void hwtimer_arch_set_absolute(unsigned long value, short timer) {
 void hwtimer_arch_unset(short timer) {
     /* get corresponding struct for the given ::timer parameter */
     struct TMR_struct* tmr = (void *) TMR_BASE + (timer + TMR_OFFSET);
-    
+
     tmr->CSCTRLbits.TCF1 = 0;                   /* reset compare flag */
     tmr->CSCTRLbits.TCF1EN = 0;                 /* disable interrupts for TCF1 */
     tmr->SCTRLbits.TCFIE = 0;                   /* disable interrupts for TCF */

@@ -67,4 +67,3 @@ enum {
 extern at86rf231_packet_t at86rf231_rx_buffer[AT86RF231_RX_BUF_SIZE];
 
 #endif
-

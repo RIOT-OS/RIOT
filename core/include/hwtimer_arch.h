@@ -5,7 +5,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  */
- 
+
 /**
  * @addtogroup  core_hwtimer
  * @{
@@ -18,7 +18,7 @@
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
- 
+
 #ifndef HWTIMER_ARCH_H_
 #define HWTIMER_ARCH_H_
 

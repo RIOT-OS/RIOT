@@ -1,5 +1,5 @@
 /**
- * Shell commands for real time clock 
+ * Shell commands for real time clock
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -10,7 +10,7 @@
  * @ingroup shell_commands
  * @{
  * @file    sc_rtc.c
- * @brief   provides shell commands to access the rtc 
+ * @brief   provides shell commands to access the rtc
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */

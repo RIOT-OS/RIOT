@@ -16,9 +16,9 @@
  *
  * @file        oneway_malloc.c
  * @brief       Simple malloc wrapper for SBRK
- * 
+ *
  * Simple malloc implementation for plattforms without malloc in libc.
- * 
+ *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}

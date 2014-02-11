@@ -1,5 +1,5 @@
 /**
- * Shell commands for configuring the node id 
+ * Shell commands for configuring the node id
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -10,7 +10,7 @@
  * @ingroup shell_commands
  * @{
  * @file    sc_id.c
- * @brief   provides shell commands to configure node id 
+ * @brief   provides shell commands to configure node id
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */

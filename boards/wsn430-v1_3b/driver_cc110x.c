@@ -169,14 +169,14 @@ void cc110x_spi_init(void)
     // CKPL works also, but not CKPH+CKPL or none of them!!
     U1CTL |= CHAR + SYNC + MM;
     U1TCTL = CKPH + SSEL1 + SSEL0 + STC;
-    
+
     // Ignore clockrate argument for now, just use clock source/2
     // SMCLK = 8 MHz
     U1BR0 = 0x02;  // Ensure baud rate >= 2
     U1BR1 = 0x00;
     U1MCTL = 0x00; // No modulation
     U1RCTL = 0x00; // Reset Receive Control Register
-   
+
     // Enable SPI mode
     ME2 |= USPIE1;
 

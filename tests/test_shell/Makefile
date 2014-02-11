@@ -7,7 +7,7 @@ export BOARD ?= native
 # this has to be the absolute path of the RIOT-base dir
 export RIOTBASE = $(CURDIR)/../..
 
-## Modules to include. 
+## Modules to include.
 
 USEMODULE += shell
 USEMODULE += shell_commands

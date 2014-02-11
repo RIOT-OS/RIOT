@@ -1,7 +1,7 @@
 /**
  * nativenet transceiver interface
  *
- * A configurable transceiver for the native port. 
+ * A configurable transceiver for the native port.
  *
  * At the moment only the tap interface is supported, but more network
  * layers are intended. So the "configurable" part is a lie for now ;-)

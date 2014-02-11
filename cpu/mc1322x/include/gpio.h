@@ -76,12 +76,12 @@
 #define TXON GPIO_44
 #define RXON GPIO_45
 #define ANT1 GPIO_42
-#define ANT2 GPIO_43 
+#define ANT2 GPIO_43
 #define VREF2H GPIO_38
 #define VREF2L GPIO_39
 #define VREF1H GPIO_40
 #define VREF1L GPIO_41
-#define MDO0 GPIO_51 
+#define MDO0 GPIO_51
 #define MDO1 GPIO_52
 #define MDO2 GPIO_53
 #define MDO3 GPIO_54
@@ -157,4 +157,3 @@ enum { _REP(0,0) };
 static volatile struct GPIO_struct * const GPIO = (void *) (0x80000000);
 
 #endif
-

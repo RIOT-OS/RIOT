@@ -195,5 +195,5 @@
  * \section info_sec Community
  *
  * Whether you are looking for help with writing an application for RIOT, want to learn more about it, or just stay in the loop you are invited to join the RIOT-users mailing list. For developers who want to participate and contribute to the kernel development or integrate new MCU and platform support the [RIOT-devel mailing list](http://lists.riot-os.org/mailman/listinfo/devel) is the right place.
- * 
+ *
  */

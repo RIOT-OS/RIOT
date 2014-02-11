@@ -38,7 +38,7 @@
 .func
 dINT:
     mrs     r0,  cpsr
-    
+
     orr     r0, r0, #NOINT              /* Disable Int */
     msr     CPSR_c, r0
     mov     pc,lr
@@ -83,9 +83,9 @@ ctx_switch2:
     ldr     r1, =active_thread   /* r1 = &active_thread */
     ldr     r1, [r1]                /* r1 = *r1 = active_thread */
 
-    str     lr, [r1]                /* store stack pointer in tasks tcb*/    
+    str     lr, [r1]                /* store stack pointer in tasks tcb*/
     /* now the calling task has all its registers saved on its stack and it's SP is saved in its tcb */
-   
+
 
     /* call scheduler so active_thread points to the next task */
     bl      sched_run
@@ -95,7 +95,7 @@ ctx_switch2:
 cpu_switch_context_exit:
     mov r0, #NOINT|SVCMODE
     msr cpsr, r0
-    
+
     /* call scheduler so active_thread points to the next task */
     bl      sched_run
 
@@ -106,7 +106,7 @@ task_return:
     ldr     r0, =active_thread   /* r0 = &active_thread */
     ldr     r0, [r0]                /* r0 = *r0 = active_thread */
     ldr     r0, [r0]
-    
+
     /* restore saved spsr and return address from tasks stack */
     ldmfd   r0!, {r1,lr}
     msr     SPSR, r1
@@ -125,7 +125,7 @@ arm_irq_handler:
 
     /* save interrupted tasks PC onto stack */
     stmfd  sp!, {lr}
-    
+
     /* save all registers on isr stack */
     stmfd  sp!, {r0-r12}
 
@@ -133,8 +133,8 @@ arm_irq_handler:
     MRS R0, SPSR
     STMFD  SP!, {R0}
 
-    MRS R1, CPSR 
-    MSR SPSR, R1 
+    MRS R1, CPSR
+    MSR SPSR, R1
 
 .if CPU != mc1322x
     /* jump into vic interrupt */
@@ -147,10 +147,10 @@ arm_irq_handler:
 .endif
 
     mov     pc, r0
-    
+
     /* restore spsr from stack */
     LDMFD  SP!, {R0}
-    MSR SPSR, R0    
+    MSR SPSR, R0
 
     /* check if context switch was requested by irq */
     ldr r0, =sched_context_switch_request
@@ -160,7 +160,7 @@ arm_irq_handler:
     bne     switch_context_int
 
 exit_irq_int:
-    /* recover general purpose registers */ 
+    /* recover general purpose registers */
     ldmfd  sp!, {r0-r12}
 
     /* recover tasks PC into lr */
@@ -170,8 +170,7 @@ exit_irq_int:
     movs pc, lr
 
 switch_context_int:
-    /* recover general purpose registers */ 
+    /* recover general purpose registers */
     ldmfd  sp!, {r0-r12}
 
     b ctx_switch2
-    

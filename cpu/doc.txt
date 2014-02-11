@@ -9,7 +9,7 @@
 /**
  * @defgroup cpu CPU
  * @brief CPU specific implementations
- * 
+ *
  * This module contains all CPU specific source files. In case of multiple CPUs
  * sharing the same architecture, the implementation is split in a cpu specific
  * and a architecture specific part (eg. arm-common and lpc2387).

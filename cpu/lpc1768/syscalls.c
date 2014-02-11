@@ -1,7 +1,7 @@
 /**
  * Syscall implementation for NXP LPC1768
  *
- * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr> 
+ * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr>
  *
  * This file subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -11,7 +11,7 @@
  * @{
  * @file    syscalls.c
  * @author Oliver Hahm <oliver.hahm@inria.fr>
- * @author Alaeddine Weslati <alaeddine.weslati@inria.fr> 
+ * @author Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * @}
  */
 
@@ -148,7 +148,7 @@ int _fstat_r(struct _reent *r, int fd, struct stat * st)
 	if (fd == STDOUT_FILENO || fd == STDERR_FILENO) {
 		st->st_mode = S_IFCHR;
 		ret = 0;
-	} 
+	}
     else {
         r->_errno = ENODEV;
 	}

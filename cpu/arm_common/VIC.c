@@ -94,5 +94,3 @@ unsigned enableFIQ(void)
     __set_cpsr(_cpsr & ~FIQ_MASK);
     return _cpsr;
 }
-
-

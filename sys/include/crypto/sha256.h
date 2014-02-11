@@ -26,8 +26,8 @@
  *
  * $FreeBSD: src/lib/libmd/sha256.h,v 1.1.2.1 2005/06/24 13:32:25 cperciva Exp $
  */
- 
- 
+
+
 /**
  * @defgroup    sys_sha256 SHA264
  * @ingroup     sys

@@ -100,4 +100,3 @@ bool bloom_check(struct bloom_t *bloom, const uint8_t *buf, size_t len)
 
     return true; /* ? */
 }
-

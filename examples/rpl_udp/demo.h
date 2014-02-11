@@ -40,7 +40,7 @@ void rpl_udp_loop(char *unused);
 void rpl_udp_table(char *unused);
 
 /**
- * @brief   Shows the dodag 
+ * @brief   Shows the dodag
  *
  * @param[in] unused  Guess what
  */

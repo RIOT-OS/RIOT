@@ -18,7 +18,7 @@
  * calling msg_init_queue(msg_t* array, int num). Messages sent to a thread with a non full message
  * queue are never dropped and the sending never blocks. Threads with a full message queue behaves
  * like in synchronous mode.
- * 
+ *
  * @{
  *
  * @file        msg.h

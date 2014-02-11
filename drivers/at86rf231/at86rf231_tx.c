@@ -107,4 +107,3 @@ static void at86rf231_gen_pkt(uint8_t *buf, at86rf231_packet_t *packet)
 
     at86rf231_swap_fcf_bytes(buf);
 }
-

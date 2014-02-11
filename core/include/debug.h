@@ -5,7 +5,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  */
- 
+
 /**
  * @addtogroup  core_util
  * @{
@@ -18,10 +18,10 @@
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
- 
+
 #ifndef __DEBUG_H
 #define __DEBUG_H
- 
+
 #include <stdio.h>
 
 #if ENABLE_DEBUG

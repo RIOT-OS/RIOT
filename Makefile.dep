@@ -18,7 +18,7 @@ endif
 
 ifneq (,$(findstring uart0,$(USEMODULE)))
 	ifeq (,$(findstring lib,$(USEMODULE)))
-		USEMODULE += lib	
+		USEMODULE += lib
 	endif
 	ifeq (,$(findstring posix,$(USEMODULE)))
 		USEMODULE += posix

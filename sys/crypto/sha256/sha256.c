@@ -37,7 +37,7 @@
  * @author      Colin Percival
  * @author      Christian Mehlis
  * @author      Rene Kijewski
- * 
+ *
  * @}
  */
 

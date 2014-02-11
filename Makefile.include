@@ -2,7 +2,7 @@
 ifeq ($(strip $(RIOTCPU)),)
 	export RIOTCPU =$(RIOTBASE)/cpu
 endif
-	
+
 ifeq ($(strip $(RIOTBOARD)),)
 	export RIOTBOARD =$(RIOTBASE)/boards
 endif
@@ -46,7 +46,7 @@ all: $(BINDIR)$(PROJECT).a
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
 	"$(MAKE)" -C $(RIOTBASE)
 	@for i in $(EXTERNAL_MODULES) ; do "$(MAKE)" -C $$i ; done ;
-ifeq ($(BUILDOSXNATIVE),1)	
+ifeq ($(BUILDOSXNATIVE),1)
 	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
 	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS)
@@ -57,12 +57,12 @@ endif
 ## your make rules
 ## Only basic example - modify it for larger projects!!
 #$(BINDIR)/$(PROJECT).a: $(BINDIR)/$(PROJECT).o
-#	$(AR) -rc $(BINDIR)/project.a $(BINDIR)/$(PROJECT).o 
+#	$(AR) -rc $(BINDIR)/project.a $(BINDIR)/$(PROJECT).o
 
 # string array of all names of c files in dir
 SRC = $(wildcard *.c)
 
-# string array of all names replaced .c with .o 
+# string array of all names replaced .c with .o
 OBJ = $(SRC:%.c=${BINDIR}${PROJECT}/%.o)
 
 $(BINDIR)$(PROJECT).a:  $(OBJ)

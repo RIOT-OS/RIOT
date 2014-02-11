@@ -9,7 +9,7 @@
  *----------------------------------------------------------------------------
  *
  * Copyright (C) 2009 ARM Limited. All rights reserved.
- * Copyright (C) 2013 Oliver Hahm <oliver.hahm@fu-berlin.de> 
+ * Copyright (C) 2013 Oliver Hahm <oliver.hahm@fu-berlin.de>
  *
  * ARM Limited (ARM) is supplying this software for use with Cortex-M3
  * processor based microcontrollers.  This file can be freely distributed

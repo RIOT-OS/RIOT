@@ -29,7 +29,7 @@ SHELL 1                                                                        |
 advanced forward (needs three [four] shells)
 ====================================================
 
-SHELL 1                                                                     | SHELL 2                                    | SHELL 3                               
+SHELL 1                                                                     | SHELL 2                                    | SHELL 3
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 0. create tap devices: *./cpu/native/tapsetup.sh create 3*                  |                                            |
 1. build ccn-lite-client: *make -B clean all*                               |                                            | build ccn-lite: make clean all

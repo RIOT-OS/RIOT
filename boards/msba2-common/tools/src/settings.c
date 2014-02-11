@@ -206,4 +206,3 @@ void new_crystal_setting(const char *new_xtal)
         write_settings_file();
     }
 }
-

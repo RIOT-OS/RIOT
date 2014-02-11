@@ -10,7 +10,7 @@ OUTFILE=${HTMLFILE:-${HOME}/riot.html}
 LOGDIR=${BUILDLOGS:-${HOME}/buildlogs}
 
 {
-cat ${HTMLDIR}/header 
+cat ${HTMLDIR}/header
 
 for i in `ls -t $LOGDIR/*.log`; do
     ${TOOLROOT}/tools/testsuite/parse_buildlog.sh $i
@@ -21,7 +21,5 @@ for i in `ls -t $LOGDIR/*.log`; do
 
 done
 
-cat ${HTMLDIR}/footer 
+cat ${HTMLDIR}/footer
 } > ${OUTFILE}
-
-

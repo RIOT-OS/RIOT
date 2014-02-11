@@ -6,7 +6,7 @@
  * details.
  */
 
-/** 
+/**
  * @addtogroup  core_util
  * @{
  *

@@ -2,7 +2,7 @@
 #define CPU_H
 
 /**
- * @defgroup    lpc1768 NXP LPC1768	
+ * @defgroup    lpc1768 NXP LPC1768
  * @ingroup		cpu
  * @{
  */

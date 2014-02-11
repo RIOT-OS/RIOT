@@ -1,6 +1,6 @@
 MODULE =$(BOARD)_base
 
-DIRS = $(RIOTBOARD)/msb-430-common 
+DIRS = $(RIOTBOARD)/msb-430-common
 
 all: $(BINDIR)$(MODULE).a
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;

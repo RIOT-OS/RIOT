@@ -13,11 +13,11 @@ endif
 
 .PHONY: all clean patch reset
 
-all: patch 
+all: patch
 	make -C $(CURDIR)/$(PKG_NAME)
 
 patch: $(CURDIR)/$(PKG_NAME)/Makefile
-	
+
 $(CURDIR)/$(PKG_NAME)/Makefile: $(CURDIR)/$(PKG_NAME)
 	cd $< && git apply ../patch.txt
 

@@ -1,6 +1,6 @@
 MODULE =cpu
 
-OBJECTS = system_LPC17xx.o startup_LPC17xx.o main.o 
+OBJECTS = system_LPC17xx.o startup_LPC17xx.o main.o
 
 CC_SYMBOLS = -DTARGET_LPC1769 -DTOOLCHAIN_GCC_ARM -DNDEBUG -D__CORTEX_M3
 

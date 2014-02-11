@@ -3,7 +3,7 @@
 # directory to install compiled binaries into
 PREFIX=${HOME}/gnuarm-naked
 
-# directory to download source files and store intermediates 
+# directory to download source files and store intermediates
 GNUARM_BUILDDIR=${GNUARM_BUILDDIR:-"/tmp/gnuarm-naked-${USER}"}
 
 #GCC_VER=4.5.1
@@ -33,10 +33,10 @@ FILES=.
 
 build_binutils() {
     echo "Building binutils..."
-    if [ ! -e .binutils_extracted ] ; then 
+    if [ ! -e .binutils_extracted ] ; then
         tar -xjf ${FILES}/binutils-${BINUTILS_VER}.tar.bz2
         touch .binutils_extracted
-    fi 
+    fi
 	rm -rf binutils-build && mkdir -p binutils-build && cd binutils-build &&
 	../binutils-${BINUTILS_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilibi --with-float=soft --with-fpu=vfp &&
 	make ${MAKE_THREADS} all CFLAGS=-Wformat=0 &&
@@ -46,16 +46,16 @@ build_binutils() {
 
 build_gcc() {
     echo "Building gcc..."
-    if [ ! -e .gcc_extracted ] ; then 
+    if [ ! -e .gcc_extracted ] ; then
 	    tar -xjf ${FILES}/gcc-core-${GCC_VER}.tar.bz2 &&
         touch .gcc_extracted
-    fi 
+    fi
     rm -rf gcc-build && mkdir -p gcc-build && cd gcc-build &&
-	../gcc-${GCC_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib --enable-languages="c" --enable-lto --disable-libssp --disable-hardfloat --with-float=soft --with-fpu=vfp --without-headers && 
-	
+	../gcc-${GCC_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib --enable-languages="c" --enable-lto --disable-libssp --disable-hardfloat --with-float=soft --with-fpu=vfp --without-headers &&
+
     make ${MAKE_THREADS} all &&
 	make install &&
-	
+
     cd ${GNUARM_BUILDDIR}
 }
 
@@ -70,27 +70,27 @@ extract_newlib() {
 
 build_newlib() {
 	cd ${GNUARM_BUILDDIR} &&
-    
-    if [ ! -e .newlib_extracted ] ; then 
+
+    if [ ! -e .newlib_extracted ] ; then
         extract_newlib
-    fi 
-	
+    fi
+
     rm -rf newlib-build && mkdir -p newlib-build && cd newlib-build &&
 	../newlib-${NEWLIB_VER}/configure --target=arm-elf --prefix=${PREFIX} --enable-interwork --enable-multilib --disable-newlib-supplied-syscalls --enable-newlib-reent-small --enable-newlib-io-long-long --enable-newlib-io-float --with-float=soft --with-fpu=vfp &&
 	#--enable-newlib-supplied-syscalls &&
 	# options to try: --enable-newlib-reent-small
     make ${MAKE_THREADS} TARGET_CFLAGS=-DREENTRANT_SYSCALLS_PROVIDED all &&
     make install &&
-	
+
 	# generate zip-file to provide binary download
     cd ${PREFIX}/arm-elf &&
-    
+
     #
     # package compiled newlib for windows users. any new version must be uploaded to the
     # webserver. see manual arm/toolchain/windows for paths and documentation.
     #
     zip -ru newlib-${NEWLIB_VER}.zip include sys-include lib/*.a lib/thumb/*.a
-    
+
     cd ${GNUARM_BUILDDIR}
 }
 
@@ -105,7 +105,7 @@ build_gdb() {
 
     make ${MAKE_THREADS} all CFLAGS=-D_FORTIFY_SOURCE=0 &&
 	make install &&
-	
+
     cd ${GNUARM_BUILDDIR}
 }
 
@@ -134,7 +134,7 @@ download_file() {
 build_all() {
     echo "Starting in ${GNUARM_BUILDDIR}. Installing to ${PREFIX}."
     download &&
-	build_binutils && 
+	build_binutils &&
 	build_gcc &&
 	build_gdb &&
 
@@ -160,4 +160,3 @@ mkdir -p ${GNUARM_BUILDDIR}
 cd ${GNUARM_BUILDDIR}
 
 $*
-

@@ -8,7 +8,7 @@
  *----------------------------------------------------------------------------
  *
  * Copyright (C) 2009 ARM Limited. All rights reserved.
- * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr> 
+ * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr>
  *
  * ARM Limited (ARM) is supplying this software for use with Cortex-Mx
  * processor based microcontrollers.  This file can be freely distributed

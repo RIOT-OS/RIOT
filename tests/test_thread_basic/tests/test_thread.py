@@ -12,4 +12,3 @@ subprocess.call(['jam', 'reset'], stdout=null)
 child.expect ('first thread\r\n')
 child.expect ('second thread\r\n')
 print("Test successful!")
-

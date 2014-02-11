@@ -153,4 +153,3 @@ char *lpc_return_strings[] = {
     "INVALID_CODE", "INVALID_BAUD_RATE", "INVALID_STOP_BIT",
     "CODE_READ_PROTECTION_ENABLED"
 };
-

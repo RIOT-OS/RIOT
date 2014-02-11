@@ -325,4 +325,3 @@ int border_initialize(char *if_name, const char *ip_addr, const char *tty_dev)
 
     return 0;
 }
-

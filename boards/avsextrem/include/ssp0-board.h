@@ -115,4 +115,3 @@ unsigned short acam_trx(const uint8_t data);
 void SSP0Handler(void);
 
 #endif  /* __SSP_H__ */
-
