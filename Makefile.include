@@ -32,6 +32,7 @@ BOARD := $(strip $(BOARD))
 include $(RIOTBASE)/Makefile.modules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/$(CPU)/Makefile.include
+include $(RIOTBASE)/Makefile.dep
 
 # your binaries to link
 BASELIBS += $(BINDIR)$(BOARD)_base.a

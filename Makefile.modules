@@ -12,7 +12,4 @@ export BASELIBS = $(shell echo $(BL)|sed 's/[^ ]*hwtimer.a//')
 
 CFLAGS += $(EXTDEFINES)
 
-include $(RIOTBASE)/Makefile.dep
-
 export USEMODULE
-
