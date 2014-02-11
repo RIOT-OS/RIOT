@@ -17,8 +17,6 @@
 
 /* Radio driver API */
 
-int transceiver_pid;
-
 void cc2420_init(int tpid)
 {
     uint16_t reg;
