@@ -1,7 +1,7 @@
-/*	$OpenBSD: floatunsdidf.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
+/* $OpenBSD: floatunsdidf.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -38,14 +38,13 @@
  * Convert (unsigned) quad to double.
  * This is exactly like floatdidf.c except that negatives never occur.
  */
-double
-__floatunsdidf(u_quad_t x)
+double __floatunsdidf(u_quad_t x)
 {
-	double d;
-	union uu u;
+    double d;
+    union uu u;
 
-	u.uq = x;
-	d = (double)u.ul[H] * (((int)1 << (INT_BITS - 2)) * 4.0);
-	d += u.ul[L];
-	return (d);
+    u.uq = x;
+    d = (double) u.ul[H] * (((int) 1 << (INT_BITS - 2)) * 4.0);
+    d += u.ul[L];
+    return d;
 }

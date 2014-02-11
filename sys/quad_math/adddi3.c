@@ -1,7 +1,7 @@
-/*	$OpenBSD: adddi3.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
+/* $OpenBSD: adddi3.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -39,14 +39,13 @@
  * u_int addition x+y occurs if and only if the sum x+y is less than
  * either x or y (the choice to compare with x or y is arbitrary).
  */
-quad_t
-__adddi3(quad_t a, quad_t b)
+quad_t __adddi3(quad_t a, quad_t b)
 {
-	union uu aa, bb, sum;
+    union uu aa, bb, sum;
 
-	aa.q = a;
-	bb.q = b;
-	sum.ul[L] = aa.ul[L] + bb.ul[L];
-	sum.ul[H] = aa.ul[H] + bb.ul[H] + (sum.ul[L] < bb.ul[L]);
-	return (sum.q);
+    aa.q = a;
+    bb.q = b;
+    sum.ul[L] = aa.ul[L] + bb.ul[L];
+    sum.ul[H] = aa.ul[H] + bb.ul[H] + (sum.ul[L] < bb.ul[L]);
+    return sum.q;
 }

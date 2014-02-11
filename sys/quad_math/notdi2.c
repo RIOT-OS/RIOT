@@ -1,7 +1,7 @@
-/*	$OpenBSD: notdi2.c,v 1.5 2005/08/08 08:05:35 espie Exp $ */
+/* $OpenBSD: notdi2.c,v 1.5 2005/08/08 08:05:35 espie Exp $ */
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -38,13 +38,12 @@
  * Return ~a.  For some reason gcc calls this `one's complement' rather
  * than `not'.
  */
-quad_t
-__one_cmpldi2(quad_t a)
+quad_t __one_cmpldi2(quad_t a)
 {
-	union uu aa;
+    union uu aa;
 
-	aa.q = a;
-	aa.ul[0] = ~aa.ul[0];
-	aa.ul[1] = ~aa.ul[1];
-	return (aa.q);
+    aa.q = a;
+    aa.ul[0] = ~aa.ul[0];
+    aa.ul[1] = ~aa.ul[1];
+    return aa.q;
 }

@@ -1,7 +1,7 @@
-/*	$OpenBSD: umoddi3.c,v 1.5 2005/08/08 08:05:35 espie Exp $ */
+/* $OpenBSD: umoddi3.c,v 1.5 2005/08/08 08:05:35 espie Exp $ */
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -37,11 +37,9 @@
 /*
  * Return remainder after dividing two unsigned quads.
  */
-u_quad_t
-__umoddi3(u_quad_t a, u_quad_t b)
+u_quad_t __umoddi3(u_quad_t a, u_quad_t b)
 {
-	u_quad_t r;
-
-	(void)__qdivrem(a, b, &r);
-	return (r);
+    u_quad_t r;
+    (void) __qdivrem(a, b, &r);
+    return r;
 }

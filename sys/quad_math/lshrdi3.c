@@ -1,7 +1,7 @@
-/*	$OpenBSD: lshrdi3.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
+/* $OpenBSD: lshrdi3.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -37,21 +37,23 @@
 /*
  * Shift an (unsigned) quad value right (logical shift right).
  */
-quad_t
-__lshrdi3(quad_t a, qshift_t shift)
+quad_t __lshrdi3(quad_t a, qshift_t shift)
 {
-	union uu aa;
+    union uu aa;
 
-	if (shift == 0)
-		return(a);
-	aa.q = a;
-	if (shift >= INT_BITS) {
-		aa.ul[L] = aa.ul[H] >> (shift - INT_BITS);
-		aa.ul[H] = 0;
-	} else {
-		aa.ul[L] = (aa.ul[L] >> shift) |
-		    (aa.ul[H] << (INT_BITS - shift));
-		aa.ul[H] >>= shift;
-	}
-	return (aa.q);
+    if (shift == 0) {
+        return a;
+    }
+
+    aa.q = a;
+
+    if (shift >= INT_BITS) {
+        aa.ul[L] = aa.ul[H] >> (shift - INT_BITS);
+        aa.ul[H] = 0;
+    } else {
+        aa.ul[L] = (aa.ul[L] >> shift) | (aa.ul[H] << (INT_BITS - shift));
+        aa.ul[H] >>= shift;
+    }
+
+    return aa.q;
 }
