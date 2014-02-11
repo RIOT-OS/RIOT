@@ -1,7 +1,7 @@
-/*	$OpenBSD: ucmpdi2.c,v 1.5 2005/08/08 08:05:35 espie Exp $ */
+/* $OpenBSD: ucmpdi2.c,v 1.5 2005/08/08 08:05:35 espie Exp $ */
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -38,13 +38,15 @@
  * Return 0, 1, or 2 as a <, =, > b respectively.
  * Neither a nor b are considered signed.
  */
-int
-__ucmpdi2(u_quad_t a, u_quad_t b)
+int __ucmpdi2(u_quad_t a, u_quad_t b)
 {
-	union uu aa, bb;
+    union uu aa, bb;
 
-	aa.uq = a;
-	bb.uq = b;
-	return (aa.ul[H] < bb.ul[H] ? 0 : aa.ul[H] > bb.ul[H] ? 2 :
-	    aa.ul[L] < bb.ul[L] ? 0 : aa.ul[L] > bb.ul[L] ? 2 : 1);
+    aa.uq = a;
+    bb.uq = b;
+    return aa.ul[H] < bb.ul[H] ? 0
+           : aa.ul[H] > bb.ul[H] ? 2
+           : aa.ul[L] < bb.ul[L] ? 0
+           : aa.ul[L] > bb.ul[L] ? 2
+           : 1;
 }

@@ -1,4 +1,4 @@
-/*	$OpenBSD: fixsfdi.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
+/* $OpenBSD: fixsfdi.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
 /*-
  * Copyright (c) 1992 The Regents of the University of California.
  * All rights reserved.
@@ -40,17 +40,19 @@
  *
  * N.B.: must use new ANSI syntax (sorry).
  */
-quad_t
-__fixsfdi(float x)
+quad_t __fixsfdi(float x)
 {
-	if (x < 0)
-		if (x <= QUAD_MIN)
-			return (QUAD_MIN);
-		else
-			return ((quad_t)-(u_quad_t)-x);
-	else
-		if (x >= QUAD_MAX)
-			return (QUAD_MAX);
-		else
-			return ((quad_t)(u_quad_t)x);
+    if (x < 0) {
+        if (x <= QUAD_MIN) {
+            return QUAD_MIN;
+        } else {
+            return (quad_t) -(u_quad_t) -x;
+        }
+    } else {
+        if (x >= QUAD_MAX) {
+            return QUAD_MAX;
+        } else {
+            return (quad_t) (u_quad_t) x;
+        }
+    }
 }

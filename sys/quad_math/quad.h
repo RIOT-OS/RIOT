@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -30,7 +30,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	$OpenBSD: quad.h,v 1.7 2009/11/07 23:09:35 jsg Exp $
+ * $OpenBSD: quad.h,v 1.7 2009/11/07 23:09:35 jsg Exp $
  */
 
 /*
@@ -59,14 +59,18 @@ typedef char ___QUAD_ASSERT__2COMPLEMENT[-1234 == (~1234 + 1) ? +1 : -1];
 typedef long long quad_t;
 typedef unsigned long long u_quad_t;
 
+/*
+ * Define high and low parts of a quad_t.
+ */
+
 #if BYTE_ORDER == LITTLE_ENDIAN
-#	define _QUAD_LOWWORD (0)
-#	define _QUAD_HIGHWORD (1)
+#   define L (0)
+#   define H (1)
 #elif BYTE_ORDER == BIG_ENDIAN
-#	define _QUAD_LOWWORD (1)
-#	define _QUAD_HIGHWORD (0)
+#   define L (1)
+#   define H (0)
 #else
-#	error "BYTE_ORDER must be either LITTLE_ENDIAN or BIG_ENDIAN!"
+#   error "BYTE_ORDER must be either LITTLE_ENDIAN or BIG_ENDIAN!"
 #endif
 
 #define QUAD_MIN (LLONG_MIN)
@@ -78,26 +82,20 @@ typedef unsigned long long u_quad_t;
  * one or more of the following formats.
  */
 union uu {
-	quad_t	q;		/* as a (signed) quad */
-	u_quad_t uq;		/* as an unsigned quad */
-	int	sl[2];		/* as two signed ints */
-	u_int	ul[2];		/* as two unsigned ints */
+    quad_t  q;      /* as a (signed) quad */
+    u_quad_t uq;    /* as an unsigned quad */
+    int sl[2];      /* as two signed ints */
+    u_int   ul[2];  /* as two unsigned ints */
 };
-
-/*
- * Define high and low parts of a quad_t.
- */
-#define	H		_QUAD_HIGHWORD
-#define	L		_QUAD_LOWWORD
 
 /*
  * Total number of bits in a quad_t and in the pieces that make it up.
  * These are used for shifting, and also below for halfword extraction
  * and assembly.
  */
-#define	QUAD_BITS	(sizeof(quad_t) * CHAR_BIT)
-#define	INT_BITS	(sizeof(int) * CHAR_BIT)
-#define	HALF_BITS	(sizeof(int) * CHAR_BIT / 2)
+#define QUAD_BITS   (sizeof(quad_t) * CHAR_BIT)
+#define INT_BITS    (sizeof(int) * CHAR_BIT)
+#define HALF_BITS   (sizeof(int) * CHAR_BIT / 2)
 
 /*
  * Extract high and low shortwords from longword, and move low shortword of
@@ -108,11 +106,11 @@ union uu {
  * and lower halves, and to reassemble a product as a quad_t, shifted left
  * (sizeof(int)*CHAR_BIT/2).
  */
-#define	HHALF(x)	((u_int)(x) >> HALF_BITS)
-#define	LHALF(x)	((u_int)(x) & (((int)1 << HALF_BITS) - 1))
-#define	LHUP(x)		((u_int)(x) << HALF_BITS)
+#define HHALF(x)    ((u_int) (x) >> HALF_BITS)
+#define LHALF(x)    ((u_int) (x) & (((int) 1 << HALF_BITS) - 1))
+#define LHUP(x)     ((u_int) (x) << HALF_BITS)
 
-typedef unsigned int	qshift_t;
+typedef unsigned int    qshift_t;
 
 quad_t __adddi3(quad_t, quad_t);
 quad_t __anddi3(quad_t, quad_t);

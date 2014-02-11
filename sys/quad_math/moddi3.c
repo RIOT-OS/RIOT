@@ -1,7 +1,7 @@
-/*	$OpenBSD: moddi3.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
+/* $OpenBSD: moddi3.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -37,23 +37,29 @@
 /*
  * Return remainder after dividing two signed quads.
  *
- * XXX	we assume a % b < 0 iff a < 0, but this is actually machine-dependent.
+ * XXX  we assume a % b < 0 iff a < 0, but this is actually machine-dependent.
  */
-quad_t
-__moddi3(quad_t a, quad_t b)
+quad_t __moddi3(quad_t a, quad_t b)
 {
-	u_quad_t ua, ub, ur;
-	int neg = 0;
+    u_quad_t ua, ub, ur;
+    int neg = 0;
 
-	ua = a;
-	ub = b;
+    ua = a;
+    ub = b;
 
-	if (a < 0)
-		ua = -ua, neg ^= 1;
-	if (b < 0)
-		ub = -ub;
-	(void)__qdivrem(ua, ub, &ur);
-	if (neg)
-		ur = -ur;
-	return (ur);
+    if (a < 0) {
+        ua = -ua;
+        neg = 1;
+    }
+    if (b < 0) {
+        ub = -ub;
+    }
+
+    (void) __qdivrem(ua, ub, &ur);
+
+    if (neg) {
+        ur = -ur;
+    }
+
+    return ur;
 }

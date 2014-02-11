@@ -1,7 +1,7 @@
-/*	$OpenBSD: cmpdi2.c,v 1.5 2005/08/08 08:05:35 espie Exp $ */
+/* $OpenBSD: cmpdi2.c,v 1.5 2005/08/08 08:05:35 espie Exp $ */
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -39,13 +39,15 @@
  * Both a and b are considered signed---which means only the high word is
  * signed.
  */
-int
-__cmpdi2(quad_t a, quad_t b)
+int __cmpdi2(quad_t a, quad_t b)
 {
-	union uu aa, bb;
+    union uu aa, bb;
 
-	aa.q = a;
-	bb.q = b;
-	return (aa.sl[H] < bb.sl[H] ? 0 : aa.sl[H] > bb.sl[H] ? 2 :
-	    aa.ul[L] < bb.ul[L] ? 0 : aa.ul[L] > bb.ul[L] ? 2 : 1);
+    aa.q = a;
+    bb.q = b;
+    return aa.sl[H] < bb.sl[H] ? 0
+           : aa.sl[H] > bb.sl[H] ? 2
+           : aa.ul[L] < bb.ul[L] ? 0
+           : aa.ul[L] > bb.ul[L] ? 2
+           : 1;
 }

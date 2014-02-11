@@ -1,7 +1,7 @@
-/*	$OpenBSD: divdi3.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
+/* $OpenBSD: divdi3.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -38,22 +38,29 @@
  * Divide two signed quads.
  * ??? if -1/2 should produce -1 on this machine, this code is wrong
  */
-quad_t
-__divdi3(quad_t a, quad_t b)
+quad_t __divdi3(quad_t a, quad_t b)
 {
-	u_quad_t ua, ub, uq;
-	int neg = 0;
+    u_quad_t ua, ub, uq;
+    int neg = 0;
 
-	ua = a;
-	ub = b;
+    ua = a;
+    ub = b;
 
-	if (a < 0)
-		ua = -ua, neg ^= 1;
-	if (b < 0)
-		ub = -ub, neg ^= 1;
+    if (a < 0) {
+        ua = -ua;
+        neg = !neg;
+    }
 
-	uq = __qdivrem(ua, ub, (u_quad_t *)0);
-	if (neg)
-		uq = - uq;
-	return uq;
+    if (b < 0) {
+        ub = -ub;
+        neg = !neg;
+    }
+
+    uq = __qdivrem(ua, ub, NULL);
+
+    if (neg) {
+        uq = -uq;
+    }
+
+    return uq;
 }

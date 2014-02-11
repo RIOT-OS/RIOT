@@ -1,7 +1,7 @@
-/*	$OpenBSD: ashldi3.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
+/* $OpenBSD: ashldi3.c,v 1.6 2005/08/08 08:05:35 espie Exp $ */
 /*-
  * Copyright (c) 1992, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * The Regents of the University of California.  All rights reserved.
  *
  * This software was developed by the Computer Systems Engineering group
  * at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
@@ -38,21 +38,23 @@
  * Shift a (signed) quad value left (arithmetic shift left).
  * This is the same as logical shift left!
  */
-quad_t
-__ashldi3(quad_t a, qshift_t shift)
+quad_t __ashldi3(quad_t a, qshift_t shift)
 {
-	union uu aa;
+    union uu aa;
 
-	if (shift == 0)
-		return(a);
-	aa.q = a;
-	if (shift >= INT_BITS) {
-		aa.ul[H] = aa.ul[L] << (shift - INT_BITS);
-		aa.ul[L] = 0;
-	} else {
-		aa.ul[H] = (aa.ul[H] << shift) |
-		    (aa.ul[L] >> (INT_BITS - shift));
-		aa.ul[L] <<= shift;
-	}
-	return (aa.q);
+    if (shift == 0) {
+        return a;
+    }
+
+    aa.q = a;
+
+    if (shift >= INT_BITS) {
+        aa.ul[H] = aa.ul[L] << (shift - INT_BITS);
+        aa.ul[L] = 0;
+    } else {
+        aa.ul[H] = (aa.ul[H] << shift) | (aa.ul[L] >> (INT_BITS - shift));
+        aa.ul[L] <<= shift;
+    }
+
+    return aa.q;
 }
