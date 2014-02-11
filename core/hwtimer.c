@@ -5,7 +5,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  */
- 
+
 /**
  * @ingroup     core_hwtimer
  * @{
@@ -141,7 +141,7 @@ void hwtimer_wait(unsigned long ticks)
         hwtimer_spin(ticks);
         return;
     }
-    
+
     /* try to lock mutex again will cause the thread to go into
      * STATUS_MUTEX_BLOCKED until hwtimer fires the releasemutex */
     mutex_lock(&mutex);
@@ -217,4 +217,3 @@ int hwtimer_remove(int n)
     hwtimer_arch_enable_interrupt();
     return 1;
 }
-

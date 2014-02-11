@@ -171,7 +171,7 @@ void cc2420_spi_init(void)
     P3DIR     &= ~(0x04);                         /* P3.2 as input for SOMI */
     P4OUT     |=  0x04;                           /* P4.2 radio CS, hold high */
     P4DIR     |=  0x04;                           /* P4.2 radio CS, output */
- 
+
     /* Keep peripheral in reset state */
     U0CTL  = SWRST;
 
@@ -179,14 +179,14 @@ void cc2420_spi_init(void)
     /* CKPL works also, but not CKPH+CKPL or none of them!! */
     U0CTL |= CHAR + SYNC + MM;
     U0TCTL = CKPH + SSEL1 + SSEL0 + STC + TXEPT;;
-    
+
     /* Ignore clockrate argument for now, just use clock source/2 */
     /* SMCLK = 8 MHz */
     U0BR0 = 0x02;  /* Ensure baud rate >= 2 */
     U0BR1 = 0x00;
     U0MCTL = 0x00; /* No modulation */
     U0RCTL = 0x00; /* Reset Receive Control Register */
-   
+
     /* Enable SPI mode */
     ME1 |= USPIE0;
 

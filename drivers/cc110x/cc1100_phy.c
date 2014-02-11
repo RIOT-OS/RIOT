@@ -287,14 +287,14 @@ int cc1100_phy_calc_wor_settings(uint16_t millis)
     double t_packet_interval = (double)((T_PACKET_INTERVAL) / 1000.0);
 
     /* Calculate minimal T_EVENT0:
-      
+
        (1) t_rx_time > t_packet_interval
        (2) t_rx_time = T_EVENT0 / 2 ^ (RX_TIME + 3 + WOR_RES)
        ------------------------------------------------------
        with RX_TIME = 0 && WOR_RES = 0 => event0_min > t_packet_interval * 8
-      
+
        t_packet_interval = 3.8 ms (@400kbit/s)
-      
+
        => event0_min = Math.ceil(3.8 * 8) + 10 */
     uint16_t event0_min = (uint16_t)(t_packet_interval * 8) + 1 + 10;
 

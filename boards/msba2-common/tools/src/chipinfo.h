@@ -16,5 +16,3 @@ struct chip_info_struct {
 };
 
 extern struct chip_info_struct chip_info[];
-
-

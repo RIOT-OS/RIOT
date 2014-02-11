@@ -11,7 +11,7 @@ SRC = main.c sixlowdriver.c serial.c control_2xxx.c multiplex.c flowcontrol.c se
 TARGETDIR = ../../bin/linux
 DOCDIR = ../../Documentation/linux
 
-sixlowdriver: $(SRC) 
+sixlowdriver: $(SRC)
 	mkdir -p $(TARGETDIR) &> /dev/null
 	$(CC) $(CFLAGS) -o $(TARGETDIR)/sixlowpan $(SRC)
 

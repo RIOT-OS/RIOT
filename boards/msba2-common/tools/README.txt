@@ -140,5 +140,3 @@ of the following:
 
 If you get "Command not found" when trying to run "gtk-config", this
 is a sure sign that you do not have GTK+ 1.2 installed.
-
-

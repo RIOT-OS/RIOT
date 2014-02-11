@@ -14,7 +14,7 @@ ifeq (,$(findstring native,$(BOARD)))
 	include $(RIOTBASE)/Makefile.unsupported
 else
 
-## Modules to include. 
+## Modules to include.
 
 USEMODULE += auto_init
 USEMODULE += hwtimer

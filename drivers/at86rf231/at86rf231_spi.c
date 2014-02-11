@@ -63,4 +63,3 @@ void at86rf231_write_fifo(const uint8_t *data, uint8_t length)
     // End the SPI transfer
     at86rf231_spi_unselect();
 }
-

@@ -227,4 +227,3 @@ bl_uart_init(void)
     U0IER |= BIT0;       // enable only RX irq
     return 1;
 }
-

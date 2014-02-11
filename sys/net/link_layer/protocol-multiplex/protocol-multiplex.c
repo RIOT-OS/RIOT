@@ -101,7 +101,7 @@ int pm_set_handler(const pm_table_t *table, protocol_t protocol,
     return index;
 }
 /*---------------------------------------------------------------------------*/
-void pm_remove_handler(const pm_table_t *table, protocol_t protocol, 
+void pm_remove_handler(const pm_table_t *table, protocol_t protocol,
                        packet_handler_t handler)
 {
     int i;

@@ -117,7 +117,7 @@ void cc1100_spi_init(void)
     while (SPI_RX_AVAIL) {   // while RNE (Receive FIFO Not Empty)...
         dummy = SSP1DR;	     // read data
     }
-    
+
     /* to suppress unused-but-set-variable */
     (void) dummy;
 }
@@ -253,4 +253,3 @@ void cc1100_init_interrupts(void)
     // Enable external interrupt on low edge (for GDO0)
     FIO2DIR &= ~BIT6;
 }
-

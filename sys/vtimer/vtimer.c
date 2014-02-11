@@ -329,9 +329,9 @@ int vtimer_sleep(timex_t time)
     t.action = (void(*)(void *)) mutex_unlock;
     t.arg = (void *) &mutex;
     t.absolute = time;
-    
+
     ret = vtimer_set(&t);
-    mutex_lock(&mutex);    
+    mutex_lock(&mutex);
     return ret;
 }
 

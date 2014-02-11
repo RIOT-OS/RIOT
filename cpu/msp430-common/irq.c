@@ -54,4 +54,3 @@ void restoreIRQ(unsigned int state)
         eINT();
     }
 }
-

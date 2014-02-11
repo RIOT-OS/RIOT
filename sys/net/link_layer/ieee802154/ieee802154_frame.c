@@ -1,5 +1,5 @@
 /**
- * implementation for the IEEE 802.15.4 frame format 
+ * implementation for the IEEE 802.15.4 frame format
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -10,7 +10,7 @@
  * @ingroup sixlowpan
  * @{
  * @file    ieee802154_frame.c
- * @brief   IEEE 802.14.4 framing operations 
+ * @brief   IEEE 802.14.4 framing operations
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}

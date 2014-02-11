@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2013 Freie Universität Berlin
- * Copyright (C) 2013 INRIA 
+ * Copyright (C) 2013 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -204,15 +204,15 @@ char *cc110x_get_marc_state(void)
      * Only goes to IDLE if state was RX/WOR */
     cc110x_wakeup_from_rx();
 
-    /* Have to put radio back to WOR/RX if old radio state 
+    /* Have to put radio back to WOR/RX if old radio state
      * was WOR/RX, otherwise no action is necessary */
     if (old_state == RADIO_WOR || old_state == RADIO_RX) {
         cc110x_switch_to_rx();
     }
 
     switch(state) {
-            /* Note: it is not possible to read back the SLEEP or XOFF state numbers 
-             * because setting CSn low will make the chip enter the IDLE mode from the 
+            /* Note: it is not possible to read back the SLEEP or XOFF state numbers
+             * because setting CSn low will make the chip enter the IDLE mode from the
              * SLEEP (0) or XOFF (2) states. */
         case 1:
             return "IDLE";

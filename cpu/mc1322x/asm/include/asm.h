@@ -51,7 +51,7 @@ struct ASM_struct {
         uint32_t CONTROL_1;			///< Control 1 register
         struct ASM_CONTROL_1 {
             uint32_t ON: 1;			///< Turn ASM module on
-            uint32_t NORMAL_MODE: 1;///< exit boot mode 
+            uint32_t NORMAL_MODE: 1;///< exit boot mode
             uint32_t BYPASS: 1;		///< Data passes through unmodified
             uint32_t : 21;
             uint32_t CBC: 1;		///< enable CBC-MAC mode

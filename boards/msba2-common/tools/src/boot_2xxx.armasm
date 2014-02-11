@@ -9,7 +9,3 @@ begin:
 	mov	pc, #0		/* and then jump to the user's code */
 const:
 	.int	0xE01FC040	/* MEMMAP register */
-
-
-
-

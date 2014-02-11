@@ -42,7 +42,7 @@ void lifo_init(int *array, int n);
  * @brief:          insert an element into the lifo
  *
  * @param array:    an integer array of least i+1 size that does not
- *                  already contain i 
+ *                  already contain i
  * @param i:        the integer value to store, between 0 and the size
  *                  of the array -1, must not be stored already
  *
@@ -51,7 +51,7 @@ void lifo_insert(int *array, int i);
 
 /**
  * @brief:          extract the least recently inserted element from the lifo
- * 
+ *
  * @param array:    an integer array
  *
  * @return:         -1 if the lifo is empty, the least recently

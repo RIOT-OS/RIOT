@@ -33,9 +33,9 @@
  *
  */
 
-  
+
 /*
-The following lincence is for all parts of this code done by 
+The following lincence is for all parts of this code done by
 Martin Thomas. Code from others used here may have other license terms.
 
 Copyright (C) 2004 Martin THOMAS
@@ -67,7 +67,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * This file is part of RIOT.
  */
-    
+
 /* Standard definitions of Mode bits and Interrupt (I & F) flags in PSRs (program status registers) */
 .set  USR_MODE, 0x10                    /* Normal User Mode                                         */
 .set  FIQ_MODE, 0x11                    /* FIQ Processing Fast Interrupts Mode                      */
@@ -82,7 +82,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
        .section .startup
-    
+
        .set _rom_data_init, 0x108d0
        .global _startup
        .func _startup
@@ -97,7 +97,7 @@ _startup:
         ldr     PC, IRQ_Addr        /* Interrupt Request Interrupt (load from VIC) */
         ldr     PC, _fiq
 
- /* these vectors are used for rom patching */  
+ /* these vectors are used for rom patching */
 .org 0x20
 .code 16
 _RPTV_0_START:
@@ -121,8 +121,8 @@ ROM_var_start: .word 0
 ROM_var_end:   .word 0
 
 .code 32
-.align          
-_begin: 
+.align
+_begin:
     /* FIQ mode stack */
     msr CPSR_c, #(FIQ_MODE | IRQ_DISABLE | FIQ_DISABLE)
     ldr sp, =__fiq_stack_top__  /* set the FIQ stack pointer */
@@ -171,10 +171,10 @@ clbss_l:
         b  kernel_init
 
 /* Exception vector handlers branching table */
-Undef_Addr:     .word   UNDEF_Routine       
-SWI_Addr:       .word   ctx_switch          
-PAbt_Addr:      .word   PABT_Routine        
-DAbt_Addr:      .word   DABT_Routine        
+Undef_Addr:     .word   UNDEF_Routine
+SWI_Addr:       .word   ctx_switch
+PAbt_Addr:      .word   PABT_Routine
+DAbt_Addr:      .word   DABT_Routine
 _not_used:      .word   not_used
 IRQ_Addr:       .word   arm_irq_handler
 _fiq:           .word   fiq

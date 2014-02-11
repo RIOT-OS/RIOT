@@ -160,4 +160,3 @@ void srf08_start_ranging(uint8_t ranging_mode)
         }
     }
 }
-

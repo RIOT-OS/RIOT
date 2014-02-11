@@ -18,5 +18,5 @@ else
 		echo "Usage:";
 		echo "termctrl.sh continue/pause/stop";
 	fi
-	
+
 fi

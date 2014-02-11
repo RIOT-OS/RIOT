@@ -444,9 +444,3 @@ void set_dtr(int val)
         printf("Error %i while setting port io flags\n", errno);
     }
 }
-
-
-
-
-
-

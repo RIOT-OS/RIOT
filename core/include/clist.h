@@ -46,4 +46,3 @@ void clist_print(clist_node_t *clist);
 
 /** @} */
 #endif // __CLIST_H
-

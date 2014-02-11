@@ -1,5 +1,5 @@
 /**
- * Shell commands for accessing storage 
+ * Shell commands for accessing storage
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -10,7 +10,7 @@
  * @ingroup shell_commands
  * @{
  * @file    sc_disk.c
- * @brief   provides shell commands to access storage (like mmc) 
+ * @brief   provides shell commands to access storage (like mmc)
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */

@@ -159,5 +159,3 @@ interrupt(ADC12_VECTOR) __attribute__((naked)) adc_isr(void)
 
     __exit_isr();
 }
-
-

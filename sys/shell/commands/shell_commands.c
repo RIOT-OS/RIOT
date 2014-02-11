@@ -165,4 +165,3 @@ const shell_command_t _shell_command_list[] = {
 #endif
     {NULL, NULL, NULL}
 };
-

@@ -1734,4 +1734,3 @@ void sixlowpan_lowpan_bootstrapping(void)
 
     icmpv6_send_router_sol(OPT_SLLAO);
 }
-

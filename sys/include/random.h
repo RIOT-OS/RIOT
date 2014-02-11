@@ -4,7 +4,7 @@
  * @ingroup     sys
  * @brief       Random number generator
  */
- 
+
 #include <inttypes.h>
 
 #ifndef PRNG_FLOAT

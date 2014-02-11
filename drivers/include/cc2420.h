@@ -242,4 +242,3 @@ extern cc2420_packet_t cc2420_rx_buffer[CC2420_RX_BUF_SIZE];
 
 
 #endif
-

@@ -5,12 +5,12 @@ DIRS = $(RIOTCPU)/$(CPU) core drivers sys
 all:
 	mkdir -p $(BINDIR)
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
-	
+
 clean:
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
 	-@if [ -d $(BINDIR) ] ; \
 	then rm -rf $(BINDIR) ; \
-	fi 
+	fi
 
 doc:
 	"$(MAKE)" -BC doc/doxygen

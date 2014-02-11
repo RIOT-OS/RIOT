@@ -3,4 +3,3 @@ ifneq (,$(findstring ltc4150,$(USEMODULE)))
 		USEMODULE += hwtimer
 	endif
 endif
-

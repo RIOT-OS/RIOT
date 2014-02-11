@@ -1,7 +1,7 @@
 #tl;dr
 
 command order:
-	
+
 	set <node-id>
 	init [r|n]
 	server
@@ -20,17 +20,17 @@ Set up a bridge for *two* tap devices to communicate over
 # rpl init
 
 Run the first node
-	
+
 	sudo ./bin/native/rpl_udp.elf tap0
 
-Type ``help`` to see the commands available.  
+Type ``help`` to see the commands available.
 Now you need set the node ID. This ID will be used by other nodes to address this node.
 
 	> set 1
     set 1
     Set node ID to 1
 
-Init your rpl node as either a root or a node router. 
+Init your rpl node as either a root or a node router.
 
 	> init n
 	init n
@@ -38,9 +38,9 @@ Init your rpl node as either a root or a node router.
 	6LoWPAN and RPL initialized.
 	Channel set to 10
 	Destiny initialized
-	
+
 or
-	
+
 	> init r
 	init r
 	INFO: Initialize as root on address 1
@@ -51,8 +51,8 @@ or
 (It is advised to start all nodes before running the root node, because the interval for sending DIOs from the root increases over time)
 A few seconds withing running, setting and initializing your second node, the nodes will automatically start to exchange control traffic. You should be seeing output similar to the following:
 
-	41 CC FC 34 12 36 12 00 FF FE 00 00 02 36 12 00 FF FE 00 00 01 7A 33 3A 9B 03 F9 90 00 00 04 00 00 80 
-	IPv6 datagram received (next header: 3A) from fe80:0000:0000:0000:3612:00ff:fe00:0001 	 ICMP type: 5A 	 ICMP code: 08 
+	41 CC FC 34 12 36 12 00 FF FE 00 00 02 36 12 00 FF FE 00 00 01 7A 33 3A 9B 03 F9 90 00 00 04 00 00 80
+	IPv6 datagram received (next header: 3A) from fe80:0000:0000:0000:3612:00ff:fe00:0001 	 ICMP type: 5A 	 ICMP code: 08
 	Received packet from ID 1
 		Length:	34
 		Src:	1

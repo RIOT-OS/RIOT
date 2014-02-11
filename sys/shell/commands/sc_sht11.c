@@ -1,5 +1,5 @@
 /**
- * Shell commands for temperature and humidity sensor 
+ * Shell commands for temperature and humidity sensor
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -10,7 +10,7 @@
  * @ingroup shell_commands
  * @{
  * @file    sc_sht11.c
- * @brief   provides shell commands to poll sht11 sensor 
+ * @brief   provides shell commands to poll sht11 sensor
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */

@@ -16,7 +16,7 @@
  */
 
 #ifndef BOARD_CONF_H
-#define BOARD_CONF_H 
+#define BOARD_CONF_H
 
 #include <stdint.h>
 

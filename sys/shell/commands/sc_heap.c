@@ -25,4 +25,3 @@ void _heap_handler(char *unused)
     (void) unused;
     heap_stats();
 }
-

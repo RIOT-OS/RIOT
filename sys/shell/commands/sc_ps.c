@@ -10,7 +10,7 @@
  * @ingroup shell_commands
  * @{
  * @file    sc_ps.c
- * @brief   shows all thread information 
+ * @brief   shows all thread information
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
@@ -23,4 +23,3 @@ void _ps_handler(char *unused)
 
     thread_print_all();
 }
-

@@ -9,7 +9,7 @@
  */
 
 #ifndef MC1322X_H
-#define MC1322X_H 
+#define MC1322X_H
 
 #include <stdint.h>
 

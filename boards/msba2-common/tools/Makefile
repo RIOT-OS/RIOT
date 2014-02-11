@@ -18,7 +18,7 @@ lpc2k_pgm: $(OBJS)
 
 pseudoterm: $(PSEUDOTERM_OBJS)
 	mkdir -p $(TARGETDIR)
-	$(CC) -o $(TARGETDIR)/pseudoterm $(PSEUDOTERM_OBJS) -lpthread 
+	$(CC) -o $(TARGETDIR)/pseudoterm $(PSEUDOTERM_OBJS) -lpthread
 
 chipinfo.o: boot_2xxx.h boot_23xx.h
 

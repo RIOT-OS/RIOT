@@ -60,4 +60,3 @@ interrupt(USART0RX_VECTOR) usart0irq(void) {
             }
 #endif
 }
-

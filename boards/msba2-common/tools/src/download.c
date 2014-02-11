@@ -1189,5 +1189,3 @@ void download_rx_term(const unsigned char *buf, int num)
     // while we are in the middle of downloading.  Maybe
     // we should look for CTRL-C and abort??
 }
-
-
