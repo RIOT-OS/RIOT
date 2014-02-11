@@ -16,8 +16,6 @@ static uint8_t  radio_channel;
 static uint16_t radio_address;
 static uint64_t radio_address_long;
 
-int transceiver_pid;
-
 void at86rf231_init(int tpid)
 {
     transceiver_pid = tpid;
