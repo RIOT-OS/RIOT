@@ -36,7 +36,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #include <stdint.h>
 //#include "cc1100.h"
 #include "cc1100-internal.h"
-#include "cc1100-interface.h"
+#include "cc110x.h"
 
 #define MAX_DATA_LENGTH		(0x3A)	///< Maximum data length of layer 0 = 58 Bytes.
 
