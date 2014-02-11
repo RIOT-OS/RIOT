@@ -45,7 +45,7 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 uint8_t ip_send_buffer[BUFFER_SIZE];
 uint8_t buffer[BUFFER_SIZE];
-msg_t msg_queue[IP_PKT_RECV_BUF_SIZE];
+msg_t ip_msg_queue[IP_PKT_RECV_BUF_SIZE];
 ipv6_hdr_t *ipv6_buf;
 icmpv6_hdr_t *icmp_buf;
 uint8_t *nextheader;
@@ -268,6 +268,8 @@ void ipv6_process(void)
     ipv6_addr_t myaddr;
     uint8_t i;
     uint16_t packet_length;
+
+    msg_init_queue(ip_msg_queue, IP_PKT_RECV_BUF_SIZE);
 
     ipv6_addr_init(&myaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00,
                    sixlowpan_mac_get_radio_address());
