@@ -32,6 +32,8 @@
 
 #include "udp.h"
 
+msg_t udp_msg_queue[UDP_PKT_RECV_BUF_SIZE];
+
 uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
 {
     uint16_t sum;
@@ -50,6 +52,8 @@ void udp_packet_handler(void)
     udp_hdr_t *udp_header;
     socket_internal_t *udp_socket = NULL;
     uint16_t chksum;
+
+    msg_init_queue(udp_msg_queue, UDP_PKT_RECV_BUF_SIZE);
 
     while (1) {
         msg_receive(&m_recv_ip);
