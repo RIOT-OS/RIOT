@@ -22,13 +22,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  *
  * Multiplexer and interrupt handling must be implemented platform specific.
  *
- * See gpioint-example.c for an example of how to use gpioint.
- *
  * @{
- *
- * @example gpioint-example.c
- * This example shows how to setup an interrupt handler for a GPIO pin
- * without using the HAL.
  *
  * @file
  * @brief       GPIO IRQ Multiplexer interface
