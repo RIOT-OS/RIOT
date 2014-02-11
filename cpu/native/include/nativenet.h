@@ -85,6 +85,23 @@ radio_address_t nativenet_set_address(radio_address_t address);
 radio_address_t nativenet_get_address();
 
 /**
+ * @brief Sets the IEEE long address of the nativenet transceiver.
+ *
+ * @param[in] addr The desired address.
+ *
+ * @return The set address after calling.
+ */
+uint64_t nativenet_set_address_long(uint64_t addr);
+
+/**
+ * @brief Gets the current IEEE long address of the nativenet
+ * transceiver.
+ *
+ * @return The current IEEE long address.
+ */
+uint64_t nativenet_get_address_long(void);
+
+/**
  * Set transceiver channel
  *
  * @param channel the channel
