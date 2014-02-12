@@ -1,1 +1,1 @@
-INCLUDES += -I $(RIOTBASE)/pkg/libcoap/include
+INCLUDES += -I $(RIOTBASE)/pkg/libcoap/libcoap
