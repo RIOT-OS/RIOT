@@ -35,7 +35,10 @@
 
 #include "socket.h"
 
-#define EPHEMERAL_PORTS 	49152
+#include "debug.h"
+#define ENABLE_DEBUG    (0)
+
+#define EPHEMERAL_PORTS     (65535)
 
 socket_internal_t sockets[MAX_SOCKETS];
 
@@ -121,9 +124,11 @@ void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
     printf("--- %s TCP packet: ---\n",
            (in_or_out == INC_PACKET ? "Incoming" : "Outgoing"));
     printf("IPv6 Source: %s\n",
-           ipv6_addr_to_str(addr_str, &ipv6_header->srcaddr));
+           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                            &ipv6_header->srcaddr));
     printf("IPv6 Dest: %s\n",
-           ipv6_addr_to_str(addr_str, &ipv6_header->destaddr));
+           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                            &ipv6_header->destaddr));
     printf("TCP Length: %x\n", ipv6_header->length - TCP_HDR_LEN);
     printf("Source Port: %x, Dest. Port: %x\n",
            NTOHS(tcp_header->src_port), NTOHS(tcp_header->dst_port));
@@ -148,10 +153,10 @@ void print_socket(socket_t *current_socket)
            current_socket->type,
            current_socket->protocol);
     printf("Local address: %s\n",
-           ipv6_addr_to_str(addr_str,
+           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &current_socket->local_address.sin6_addr));
     printf("Foreign address: %s\n",
-           ipv6_addr_to_str(addr_str,
+           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &current_socket->foreign_address.sin6_addr));
     printf("Local Port: %u, Foreign Port: %u\n",
            NTOHS(current_socket->local_address.sin6_port),
@@ -365,17 +370,19 @@ socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header
 uint16_t get_free_source_port(uint8_t protocol)
 {
     int i;
-    uint16_t biggest_port = EPHEMERAL_PORTS - 1;
+    uint16_t smallest_port = EPHEMERAL_PORTS;
 
-    /* Remember biggest ephemeral port number used so far and add 1 */
+    /* Remember smallest ephemeral port number used so far and add 1 */
     for (i = 0; i < MAX_SOCKETS; i++) {
         if ((sockets[i].socket_values.protocol == protocol) &&
-            (sockets[i].socket_values.local_address.sin6_port > biggest_port)) {
-            biggest_port = sockets[i].socket_values.local_address.sin6_port;
+            sockets[i].socket_values.local_address.sin6_port &&
+            (sockets[i].socket_values.local_address.sin6_port < smallest_port)) {
+            smallest_port = sockets[i].socket_values.local_address.sin6_port;
         }
     }
 
-    return biggest_port + 1;
+    DEBUG("Found free port: %02X\n", (smallest_port - 1));
+    return (smallest_port - 1);
 }
 
 void set_socket_address(sockaddr6_t *sockaddr, uint8_t sin6_family,
@@ -539,7 +546,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     current_int_tcp_socket->recv_pid = thread_getpid();
 
     /* Local address information */
-    ipv6_iface_get_best_src_addr(&src_addr, &addr->sin6_addr);
+    ipv6_net_if_get_best_src_addr(&src_addr, &addr->sin6_addr);
     set_socket_address(&current_tcp_socket->local_address, PF_INET6,
                        HTONS(get_free_source_port(IPPROTO_TCP)), 0, &src_addr);
 
@@ -1011,10 +1018,10 @@ int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
         uint8_t *payload = &send_buffer[IPV6_HDR_LEN + UDP_HDR_LEN];
 
         memcpy(&(temp_ipv6_header->destaddr), &to->sin6_addr, 16);
-        ipv6_iface_get_best_src_addr(&(temp_ipv6_header->srcaddr), &(temp_ipv6_header->destaddr));
+        ipv6_net_if_get_best_src_addr(&(temp_ipv6_header->srcaddr), &(temp_ipv6_header->destaddr));
 
-        current_udp_packet->src_port = get_free_source_port(IPPROTO_UDP);
-        current_udp_packet->dst_port = to->sin6_port;
+        current_udp_packet->src_port = HTONS(get_free_source_port(IPPROTO_UDP));
+        current_udp_packet->dst_port = HTONS(to->sin6_port);
         current_udp_packet->checksum = 0;
 
         memcpy(payload, buf, len);

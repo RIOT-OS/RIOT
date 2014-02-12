@@ -83,11 +83,11 @@ ifneq (,$(findstring sixlowpan,$(USEMODULE)))
 	ifeq (,$(findstring net_help,$(USEMODULE)))
 		USEMODULE += net_help
 	endif
+	ifeq (,$(findstring net_if,$(USEMODULE)))
+		USEMODULE += net_if
+	endif
 	ifeq (,$(findstring semaphore, $(USEMODULE)))
 		USEMODULE += semaphore
-	endif
-	ifeq (,$(findstring transceiver, $(USEMODULE)))
-		USEMODULE += transceiver
 	endif
 	ifeq (,$(findstring vtimer, $(USEMODULE)))
 		USEMODULE += vtimer
@@ -100,5 +100,17 @@ ifneq (,$(findstring vtimer,$(USEMODULE)))
 	endif
 	ifeq (,$(findstring timex,$(USEMODULE)))
 		USEMODULE += timex
+	endif
+endif
+
+ifneq (,$(findstring net_if,$(USEMODULE)))
+	ifeq (,$(findstring transceiver,$(USEMODULE)))
+		USEMODULE += transceiver
+	endif
+endif
+
+ifneq (,$(findstring shell_commands,$(USEMODULE)))
+	ifneq (,$(findstring net_if,$(USEMODULE)))
+		USEMODULE += net_help
 	endif
 endif

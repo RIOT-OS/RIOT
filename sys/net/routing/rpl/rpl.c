@@ -92,19 +92,23 @@ static icmpv6_hdr_t *get_rpl_send_icmpv6_buf(uint8_t ext_len) {
     return ((icmpv6_hdr_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ext_len]));
 }
 
-static struct rpl_dio_t *get_rpl_send_dio_buf(void) {
+static struct rpl_dio_t *get_rpl_send_dio_buf(void)
+{
     return ((struct rpl_dio_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
-static struct rpl_dao_t *get_rpl_send_dao_buf(void) {
+static struct rpl_dao_t *get_rpl_send_dao_buf(void)
+{
     return ((struct rpl_dao_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
-static struct rpl_dao_ack_t *get_rpl_send_dao_ack_buf(void) {
+static struct rpl_dao_ack_t *get_rpl_send_dao_ack_buf(void)
+{
     return ((struct rpl_dao_ack_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
-static struct rpl_dis_t *get_rpl_send_dis_buf(void) {
+static struct rpl_dis_t *get_rpl_send_dis_buf(void)
+{
     return ((struct rpl_dis_t *) &(rpl_send_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
@@ -129,19 +133,23 @@ static ipv6_hdr_t *get_rpl_ipv6_buf(void)
     return ((ipv6_hdr_t *) &(rpl_buffer[0]));
 }
 
-static struct rpl_dio_t *get_rpl_dio_buf(void) {
+static struct rpl_dio_t *get_rpl_dio_buf(void)
+{
     return ((struct rpl_dio_t *) &(rpl_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
-static struct rpl_dao_t *get_rpl_dao_buf(void) {
+static struct rpl_dao_t *get_rpl_dao_buf(void)
+{
     return ((struct rpl_dao_t *) &(rpl_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
-static struct rpl_dao_ack_t *get_rpl_dao_ack_buf(void) {
+static struct rpl_dao_ack_t *get_rpl_dao_ack_buf(void)
+{
     return ((struct rpl_dao_ack_t *) &(buffer[(LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)]));
 }
 
-static struct rpl_dis_t *get_rpl_dis_buf(void) {
+static struct rpl_dis_t *get_rpl_dis_buf(void)
+{
     return ((struct rpl_dis_t *) & (rpl_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN]));
 }
 
@@ -182,14 +190,10 @@ rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp)
     return NULL;
 }
 
-uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address)
+uint8_t rpl_init(int if_id)
 {
     mutex_init(&rpl_send_mutex);
     mutex_init(&rpl_recv_mutex);
-
-    if (rpl_address == 0) {
-        return SIXLOWERROR_ADDRESS;
-    }
 
     rpl_instances_init();
 
@@ -204,11 +208,11 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address)
     objective_functions[0] = rpl_get_of0();
     /* objective_functions[1] = rpl_get_of_ETX() */
 
-    sixlowpan_lowpan_init(trans, rpl_address, 0);
+    sixlowpan_lowpan_init_interface(if_id);
     /* need link local prefix to query _our_ corresponding address  */
     ipv6_addr_t ll_address;
     ipv6_addr_set_link_local_prefix(&ll_address);
-    ipv6_iface_get_best_src_addr(&my_address, &ll_address);
+    ipv6_net_if_get_best_src_addr(&my_address, &ll_address);
     ipv6_register_rpl_handler(rpl_process_pid);
 
     /* initialize ETX-calculation if needed */
@@ -345,6 +349,7 @@ void send_DIS(ipv6_addr_t *destination)
 void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index)
 {
     DEBUG("Send DAO\n");
+
     if (i_am_root) {
         return;
     }
@@ -364,6 +369,7 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
             mutex_unlock(&rpl_send_mutex);
             return;
         }
+
         destination = &my_dodag->my_preferred_parent->addr;
     }
 
@@ -664,6 +670,7 @@ void recv_rpl_dio(void)
         else {
             DEBUG("Cannot access DODAG because of DIO with infinite rank\n");
         }
+
         return;
     }
 
@@ -694,7 +701,7 @@ void recv_rpl_dio(void)
         reset_trickletimer();
     }
 
-    /* We are root, all done! */
+    /* We are root, all done!*/
     if (my_dodag->my_rank == ROOT_RANK) {
         if (rpl_dio_buf->rank != INFINITE_RANK) {
             trickle_increment_counter();
@@ -920,11 +927,11 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
     ipv6_send_buf->length = p_len;
 
     memcpy(&(ipv6_send_buf->destaddr), destination, 16);
-    ipv6_iface_get_best_src_addr(&(ipv6_send_buf->srcaddr), &(ipv6_send_buf->destaddr));
+    ipv6_net_if_get_best_src_addr(&(ipv6_send_buf->srcaddr), &(ipv6_send_buf->destaddr));
 
     icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
     icmp_send_buf->checksum = 0;
-    icmp_send_buf->checksum = ~ipv6_csum(ipv6_send_buf, (uint8_t*) icmp_send_buf, ipv6_send_buf->length, IPV6_PROTO_NUM_ICMPV6);
+    icmp_send_buf->checksum = ~ipv6_csum(ipv6_send_buf, (uint8_t *) icmp_send_buf, ipv6_send_buf->length, IPV6_PROTO_NUM_ICMPV6);
 
     /* The packet was "assembled" in rpl.c. Therefore rpl_send_buf was used.
      * Therefore memcpy is not needed because the payload is at the
@@ -937,13 +944,15 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
     packet_length = IPV6_HDR_LEN + p_len;
 
     if (ipv6_addr_is_multicast(&ipv6_send_buf->destaddr)) {
-        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(ipv6_send_buf->destaddr.uint16[4]),
-                                (uint8_t *)ipv6_send_buf,
-                                packet_length);
+        int if_id = 0;  // TODO: get this somehow or better: wrap this with IP
+                        //       Layer!
+        ipv6_send_packet(ipv6_send_buf);
     }
     else {
         /* find appropriate next hop before sending */
         ipv6_addr_t *next_hop = rpl_get_next_hop(&ipv6_send_buf->destaddr);
+        int if_id = 0;  // TODO: get this somehow or better: wrap this with IP
+                        //       Layer!
 
         if (next_hop == NULL) {
             if (i_am_root) {
@@ -960,9 +969,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
             }
         }
 
-        sixlowpan_lowpan_sendto((ieee_802154_long_t *) &(next_hop->uint16[4]),
-                                (uint8_t *)ipv6_send_buf,
-                                packet_length);
+        ipv6_send_packet(ipv6_buf);
     }
 
 }

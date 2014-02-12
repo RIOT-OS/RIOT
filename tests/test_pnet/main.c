@@ -27,7 +27,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-#include "transceiver.h"
+#include "net_if.h"
 #include "ipv6.h"
 
 #ifdef MODULE_NATIVENET
@@ -42,12 +42,13 @@
 
 #define PORT    (1234)
 
-void init_local_address(uint16_t r_addr)
+int init_local_address(uint16_t r_addr)
 {
     ipv6_addr_t std_addr;
     ipv6_addr_init(&std_addr, 0xabcd, 0xef12, 0, 0, 0x1034, 0x00ff, 0xfe00,
-                   r_addr);
-    sixlowpan_lowpan_adhoc_init(TRANSCEIVER, &std_addr, r_addr);
+                   0);
+    return net_if_set_hardware_address(r_addr) && 
+           sixlowpan_lowpan_adhoc_init(0, &std_addr);
 }
 
 int main(void)
@@ -80,7 +81,10 @@ int main(void)
     };
     char buffer[14];
 
-    init_local_address(R_ADDR);
+    if (!init_local_address(R_ADDR)) {
+        fprintf(stderr, "Can not initialize IP for hardware address %d.", R_ADDR);
+        return 1;
+    }
 
     memcpy(buffer, "Hello, World!", 14);
     memcpy(&my_addr, &in6addr_any, sizeof(my_addr));

@@ -37,7 +37,6 @@ const shell_command_t shell_commands[] = {
     {"loop", "", rpl_udp_loop},
     {"server", "Starts a UDP server", udp_server},
     {"send", "Send a UDP datagram", udp_send},
-    {"ip", "Print all assigned IP addresses", rpl_udp_ip},
     {"ign", "ignore node", rpl_udp_ignore},
     {NULL, NULL, NULL}
 };
