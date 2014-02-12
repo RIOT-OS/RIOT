@@ -78,6 +78,9 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
         if (target->msg_array && queue_msg(target, m)) {
             DEBUG("msg_send() %s:%i: Target %i has a msg_queue. Queueing message.\n", __FILE__, __LINE__, target_pid);
             eINT();
+            if (active_thread->status == STATUS_REPLY_BLOCKED) {
+                thread_yield();
+            }
             return 1;
         }
 
