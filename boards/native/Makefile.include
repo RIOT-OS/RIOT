@@ -17,7 +17,7 @@ export FLASHER = true
 export VALGRIND ?= valgrind
 
 # flags:
-export CFLAGS += -std=gnu99 -Wall -Wextra -pedantic -m32
+export CFLAGS += -Wall -Wextra -pedantic -m32
 export LINKFLAGS += -m32 -gc -ldl
 export ASFLAGS =
 export DEBUGGER_FLAGS = $(ELF)
