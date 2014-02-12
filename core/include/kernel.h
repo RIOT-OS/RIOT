@@ -23,6 +23,8 @@
 #define KERNEL_H_
 
 #include <stdbool.h>
+
+#include "attributes.h"
 #include "config.h"
 #include "tcb.h"
 #include "cpu.h"
@@ -89,12 +91,6 @@ extern volatile int lpm_prevent_sleep;
 extern config_t sysconfig;
 
 /* ------------------------------------------------------------------------- */
-
-#ifdef __GNUC__
-#define NORETURN  __attribute__((noreturn))
-#else
-#define NORETURN   /* insert other compiler attributes/pragmas/whatever here */
-#endif
 
 /**
  * @brief Immediately reboots the system.
