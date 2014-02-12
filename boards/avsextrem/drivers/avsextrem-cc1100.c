@@ -67,22 +67,22 @@ static int test_time(int code)
 }
 #endif
 
-int cc1100_get_gdo0(void)
+int cc110x_get_gdo0(void)
 {
     return CC1100_GDO0;
 }
 
-int cc1100_get_gdo1(void)
+int cc110x_get_gdo1(void)
 {
     return CC1100_GDO1;
 }
 
-int cc1100_get_gdo2(void)
+int cc110x_get_gdo2(void)
 {
     return CC1100_GDO2;
 }
 
-void cc1100_spi_init(void)
+void cc110x_spi_init(void)
 {
     // configure chip-select
     FIO0DIR |= BIT6;
@@ -123,7 +123,7 @@ void cc1100_spi_init(void)
 }
 
 uint8_t
-cc1100_txrx(uint8_t c)
+cc110x_txrx(uint8_t c)
 {
     uint8_t result;
     SSP1DR = c;
@@ -161,13 +161,13 @@ cc1100_txrx(uint8_t c)
     return result;
 }
 
-void cc1100_spi_cs(void)
+void cc110x_spi_cs(void)
 {
     FIO0CLR = BIT6;
 }
 
 void
-cc1100_spi_select(void)
+cc110x_spi_select(void)
 {
     volatile int retry_count = 0;
     volatile int abort_count;
@@ -208,48 +208,48 @@ final:
 }
 
 void
-cc1100_spi_unselect(void)
+cc110x_spi_unselect(void)
 {
     FIO0SET = BIT6;
 }
 
-void cc1100_gdo2_disable(void)
+void cc110x_gdo2_disable(void)
 {
     gpioint_set(0, BIT28, GPIOINT_DISABLE, NULL);
 }
 
-void cc1100_gdo2_enable(void)
+void cc110x_gdo2_enable(void)
 {
     gpioint_set(0, BIT28, GPIOINT_FALLING_EDGE, &cc110x_gdo2_irq);
 }
 
-void cc1100_before_send(void)
+void cc110x_before_send(void)
 {
     // Disable GDO2 interrupt before sending packet
-    cc1100_gdo2_disable();
+    cc110x_gdo2_disable();
 }
 
-void cc1100_after_send(void)
+void cc110x_after_send(void)
 {
     // Enable GDO2 interrupt after sending packet
-    cc1100_gdo2_enable();
+    cc110x_gdo2_enable();
 }
 
-void cc1100_gdo0_enable(void)
+void cc110x_gdo0_enable(void)
 {
     gpioint_set(2, BIT6, GPIOINT_RISING_EDGE, &cc110x_gdo0_irq);
 }
 
-void cc1100_gdo0_disable(void)
+void cc110x_gdo0_disable(void)
 {
     gpioint_set(2, BIT6, GPIOINT_DISABLE, NULL);
 }
 
-void cc1100_init_interrupts(void)
+void cc110x_init_interrupts(void)
 {
     // Enable external interrupt on low edge (for GDO2)
     FIO0DIR &= ~BIT28;
-    cc1100_gdo2_enable();
+    cc110x_gdo2_enable();
     // Enable external interrupt on low edge (for GDO0)
     FIO2DIR &= ~BIT6;
 }
