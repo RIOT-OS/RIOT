@@ -1,11 +1,12 @@
 # set undefined variables
-ifeq ($(strip $(RIOTCPU)),)
-	export RIOTCPU =$(RIOTBASE)/cpu
-endif
+RIOTBASE ?= $(shell dirname "$(lastword $(MAKEFILE_LIST))")
+export RIOTBASE := $(abspath $(RIOTBASE))
 
-ifeq ($(strip $(RIOTBOARD)),)
-	export RIOTBOARD =$(RIOTBASE)/boards
-endif
+RIOTCPU ?= $(RIOTBASE)/cpu
+export RIOTCPU := $(abspath $(RIOTCPU))
+
+RIOTBOARD ?= $(RIOTBASE)/boards
+export RIOTBOARD := $(abspath $(RIOTBOARD))
 
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
