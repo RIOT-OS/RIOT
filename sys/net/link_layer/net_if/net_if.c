@@ -229,7 +229,7 @@ uint32_t net_if_transceiver_get_set_handler(int if_id, uint16_t op_type,
 int net_if_send_packet_broadcast(net_if_trans_addr_m_t preferred_dest_mode,
                                  const void *payload, size_t payload_len)
 {
-    int if_id = 0;
+    int if_id = -1;
     int res = 0, res_prev = 0;
 
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
