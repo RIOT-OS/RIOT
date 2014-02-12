@@ -5,7 +5,7 @@ export CPU = mc1322x
 export PREFIX = arm-none-eabi-
 export CC = $(PREFIX)gcc
 export AR = $(PREFIX)ar
-export CFLAGS += -std=gnu99 -march=armv4t -mtune=arm7tdmi-s -mlong-calls \
+export CFLAGS += -march=armv4t -mtune=arm7tdmi-s -mlong-calls \
 		-msoft-float -mthumb-interwork -fno-strict-aliasing -fno-common \
 		-ffixed-r8 -ffunction-sections -ffreestanding -fno-builtin \
 		-nodefaultlibs -Wcast-align -Wall -Wstrict-prototypes -Wextra \
