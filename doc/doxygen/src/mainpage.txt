@@ -17,16 +17,16 @@
  *
  * In order to build an application or library with RIOT, you need first to
  * download the source code ([Getting the source
- * code](https://github.com/RIOT-OS/RIOT/wiki/Introduction#getting-the-source-code)). This contains - besides the
+ * code](https://github.com/RIOT-OS/RIOT/wiki/Introduction#wiki-getting-the-source-code)). This contains - besides the
  * before mentioned features - also some example applications (located in the
  * `examples` subdirectory) and a sample Makefile you may use for your own
  * project. This Makefile template shows you how to compile and link your project
- * against RIOT ([Compiling RIOT](https://github.com/RIOT-OS/RIOT/wiki/Introduction#compiling-riot)).
+ * against RIOT ([Compiling RIOT](https://github.com/RIOT-OS/RIOT/wiki/Introduction#wiki-compiling-riot)).
  *
  * If you want to use RIOT directly with your embedded platform, you need to
  * install the corresponding toolchain for the deployed microcontroller ([ARM
- * based platforms](https://github.com/RIOT-OS/RIOT/wiki/Introduction#platforms-based-on-arm), [TI MSP430 based
- * platforms](https://github.com/RIOT-OS/RIOT/wiki/Introduction#platforms-based-on-ti-msp430)).
+ * based platforms](https://github.com/RIOT-OS/RIOT/wiki/Introduction#wiki-platforms-based-on-arm), [TI MSP430 based
+ * platforms](https://github.com/RIOT-OS/RIOT/wiki/Introduction#wiki-platforms-based-on-ti-msp430)).
  *
  * ###Native RIOT - Run RIOT on your PC!
  *
