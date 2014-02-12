@@ -13,6 +13,8 @@
  * @file        kernel.h
  * @brief       Kernel compile time configuration
  *
+ * A reboot() function is also provided (and used by panic() when needed).
+ *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
@@ -85,6 +87,23 @@ int inISR(void);
 extern volatile int lpm_prevent_sleep;
 
 extern config_t sysconfig;
+
+/* ------------------------------------------------------------------------- */
+
+#ifdef __GNUC__
+#define NORETURN  __attribute__((noreturn))
+#else
+#define NORETURN   /* insert other compiler attributes/pragmas/whatever here */
+#endif
+
+/**
+ * @brief Immediately reboots the system.
+ *
+ * This function is used by panic() when the DEVELHELP macro is not defined.
+ *
+ * @return WARNING: this function NEVER returns!
+ */
+NORETURN void reboot(void);
 
 /** @} */
 #endif /* KERNEL_H_ */
