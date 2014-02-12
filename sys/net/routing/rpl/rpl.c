@@ -946,7 +946,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
     if (ipv6_addr_is_multicast(&ipv6_send_buf->destaddr)) {
         int if_id = 0;  // TODO: get this somehow or better: wrap this with IP
                         //       Layer!
-        ipv6_send_packet(ipv6_buf);
+        ipv6_send_packet(ipv6_send_buf);
     }
     else {
         /* find appropriate next hop before sending */

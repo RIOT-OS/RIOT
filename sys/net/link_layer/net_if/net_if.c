@@ -234,7 +234,7 @@ int net_if_send_packet_broadcast(net_if_trans_addr_m_t preferred_dest_mode,
 
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
         if (preferred_dest_mode == NET_IF_TRANS_ADDR_M_SHORT) {
-            res = net_if_send_packet(if_id, 0, payload, payload_len);
+            res = net_if_send_packet(if_id, 0xffff, payload, payload_len);
         }
         else {
             res = net_if_send_packet_long(if_id, 0, payload, payload_len);

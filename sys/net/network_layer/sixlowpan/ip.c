@@ -72,7 +72,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
 
     ipv6_net_if_get_best_src_addr(&packet->srcaddr, &packet->destaddr);
 
-    if (!ipv6_addr_is_multicast(&packet->destaddr) ||
+    if (!ipv6_addr_is_multicast(&packet->destaddr) &&
         ndp_addr_is_on_link(&packet->destaddr)) {
         nce = ndp_get_ll_address(&packet->destaddr);
 
@@ -90,7 +90,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
         /* see if dest should be routed to a different next hop */
         if (ipv6_addr_is_multicast(&packet->destaddr)) {
             /* if_id will be ignored */
-            uint16_t addr = 0;
+            uint16_t addr = 0xffff;
             return sixlowpan_lowpan_sendto(0, &addr, 2, (uint8_t *)packet,
                                            length);
         }
