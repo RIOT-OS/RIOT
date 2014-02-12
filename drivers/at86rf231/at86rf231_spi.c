@@ -1,6 +1,6 @@
 #include "at86rf231_spi.h"
 #include "at86rf231_arch.h"
-#include "at86rf231_settings.h"
+#include "at86rf231.h"
 
 void at86rf231_reg_write(uint8_t addr, uint8_t value)
 {

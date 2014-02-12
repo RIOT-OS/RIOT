@@ -39,6 +39,11 @@
 #define TEXT_SIZE           CC2420_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_CC2420
 
+#elif defined( MODULE_AT86RF231 )
+#include "at86rf231.h"
+#define TEXT_SIZE           AT86RF231_MAX_DATA_LENGTH
+#define _TC_TYPE            TRANSCEIVER_AT86RF231
+
 #elif defined( MODULE_NATIVENET )
 #include "nativenet.h"
 #define TEXT_SIZE           NATIVE_MAX_DATA_LENGTH
