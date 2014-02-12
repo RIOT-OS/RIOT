@@ -71,8 +71,12 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
 
     dINT();
 
+    DEBUG("msg_send() %s:%i: Sending from %i to %i. block=%i src->state=%i target->state=%i\n", __FILE__, __LINE__, thread_pid, target_pid, block, active_thread->status, target->status);
+
     if (target->status != STATUS_RECEIVE_BLOCKED) {
+        DEBUG("msg_send() %s:%i: Target %i is not RECEIVE_BLOCKED.\n", __FILE__, __LINE__, target_pid);
         if (target->msg_array && queue_msg(target, m)) {
+            DEBUG("msg_send() %s:%i: Target %i has a msg_queue. Queueing message.\n", __FILE__, __LINE__, target_pid);
             eINT();
             return 1;
         }
