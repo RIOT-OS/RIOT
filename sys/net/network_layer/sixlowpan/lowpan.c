@@ -159,6 +159,7 @@ void lowpan_ipv6_set_dispatch(uint8_t *data);
 void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
                              uint8_t *data, uint16_t data_len)
 {
+    int if_id = 0;
     uint8_t mcast = 0;
 
     ipv6_buf = (ipv6_hdr_t *) data;
@@ -200,10 +201,11 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
         fragbuf[2] = tag >> 8;
         fragbuf[3] = tag;
 
-        sixlowpan_mac_send_ieee802154_frame(&laddr,
-                                            (uint8_t *)&fragbuf,
+        sixlowpan_mac_send_ieee802154_frame(if_id, dest, dest_len,
+                                            &fragbuf,
                                             max_frag_initial + header_size + 4,
                                             mcast);
+
         /* subsequent fragments */
         position = max_frag_initial;
         max_frag = ((max_frame - 5) / 8) * 8;
@@ -220,9 +222,9 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
             fragbuf[3] = tag;
             fragbuf[4] = position / 8;
 
-            sixlowpan_mac_send_ieee802154_frame(&laddr,
-                                                (uint8_t *)&fragbuf,
-                                                max_frag + 5, mcast);
+            sixlowpan_mac_send_ieee802154_frame(if_id, dest, dest_len,
+                                                &fragbuf,
+                                                max_frame + 5, mcast);
             data += max_frag;
             position += max_frag;
 
@@ -240,13 +242,15 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
         fragbuf[3] = tag;
         fragbuf[4] = position / 8;
 
-        sixlowpan_mac_send_ieee802154_frame(&laddr,
-                                            (uint8_t *)&fragbuf,
-                                            remaining + 5, mcast);
+        if (sixlowpan_mac_send_ieee802154_frame(if_id, dest, dest_len,
+                                                &fragbuf, remaining + 5, mcast) < 0) {
+            return -1;
+        }
     }
     else {
-        sixlowpan_mac_send_ieee802154_frame(&laddr, data,
-                                            send_packet_length, mcast);
+        return sixlowpan_mac_send_ieee802154_frame(if_id, dest, dest_len,
+                data, send_packet_length,
+                mcast);
     }
 
     tag++;
@@ -1649,17 +1653,13 @@ void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,
 void lowpan_init(transceiver_type_t trans, uint8_t r_addr,
                  const ipv6_addr_t *prefix, int as_border)
 {
+    int if_id = 0;
     ipv6_addr_t tmp;
     short i;
 
-    /* init mac-layer and radio transceiver */
-    sixlowpan_mac_init(trans);
 
     /* init interface addresses */
     memset(&iface, 0, sizeof(iface_t));
-    sixlowpan_mac_set_radio_address(r_addr);
-    sixlowpan_mac_init_802154_short_addr(&(iface.saddr));
-    sixlowpan_mac_init_802154_long_addr(&(iface.laddr));
 
     /* init lowpan context mutex */
     mutex_init(&lowpan_context_mutex);
@@ -1705,6 +1705,8 @@ void lowpan_init(transceiver_type_t trans, uint8_t r_addr,
     ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_LOOPBACK,
                         NDP_ADDR_STATE_PREFERRED, 0, 0);
 
+    /* init mac-layer and radio transceiver */
+    sixlowpan_mac_init();
     if (as_border) {
         ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
                                        PRIORITY_MAIN - 1, CREATE_STACKTEST,
