@@ -16,3 +16,6 @@ else
 USEMODULE += auto_init
 USEMODULE += hwtimer
 USEMODULE += posix
+
+include $(RIOTBASE)/Makefile.include
+endif
