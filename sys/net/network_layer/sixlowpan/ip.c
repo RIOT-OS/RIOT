@@ -59,7 +59,7 @@ ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t *) = 0;
 /* registered upper layer threads */
 int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
-void ipv6_send_bytes(ipv6_hdr_t *bytes)
+int ipv6_send_packet(ipv6_hdr_t *bytes)
 {
     uint16_t offset = IPV6_HDR_LEN + HTONS(bytes->length);
 
