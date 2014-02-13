@@ -1,104 +1,104 @@
-ifneq (,$(findstring pnet, $(USEMODULE)))
-	ifeq (,$(findstring posix, $(USEMODULE)))
+ifneq (,$(filter pnet,$(USEMODULE)))
+	ifeq (,$(filter posix,$(USEMODULE)))
 		USEMODULE += posix
 	endif
-	ifeq (,$(findstring destiny, $(USEMODULE)))
+	ifeq (,$(filter destiny,$(USEMODULE)))
 		USEMODULE += destiny
 	endif
-	ifeq (,$(findstring net_help, $(USEMODULE)))
+	ifeq (,$(filter net_help,$(USEMODULE)))
 		USEMODULE += net_help
 	endif
 endif
 
-ifneq (,$(findstring posix, $(USEMODULE)))
-	ifeq (,$(findstring uart0, $(USEMODULE)))
+ifneq (,$(filter posix,$(USEMODULE)))
+	ifeq (,$(filter uart0,$(USEMODULE)))
 		USEMODULE += uart0
 	endif
 endif
 
-ifneq (,$(findstring uart0,$(USEMODULE)))
-	ifeq (,$(findstring lib,$(USEMODULE)))
+ifneq (,$(filter uart0,$(USEMODULE)))
+	ifeq (,$(filter lib,$(USEMODULE)))
 		USEMODULE += lib
 	endif
-	ifeq (,$(findstring posix,$(USEMODULE)))
+	ifeq (,$(filter posix,$(USEMODULE)))
 		USEMODULE += posix
 	endif
 endif
 
-ifneq (,$(findstring cc110x,$(USEMODULE)))
-	ifeq (,$(findstring protocol_multiplex,$(USEMODULE)))
+ifneq (,$(filter cc110x,$(USEMODULE)))
+	ifeq (,$(filter protocol_multiplex,$(USEMODULE)))
 		USEMODULE += protocol_multiplex
 	endif
-	ifeq (,$(findstring vtimer, $(USEMODULE)))
+	ifeq (,$(filter vtimer,$(USEMODULE)))
 		USEMODULE += vtimer
 	endif
 endif
 
-ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
-	ifeq (,$(findstring transceiver,$(USEMODULE)))
+ifneq (,$(filter cc110x_ng,$(USEMODULE)))
+	ifeq (,$(filter transceiver,$(USEMODULE)))
 		USEMODULE += transceiver
 	endif
-	ifeq (,$(findstring hwtimer,$(USEMODULE)))
+	ifeq (,$(filter hwtimer,$(USEMODULE)))
 		USEMODULE += hwtimer
 	endif
 endif
 
-ifneq (,$(findstring cc2420,$(USEMODULE)))
-	ifeq (,$(findstring transceiver,$(USEMODULE)))
+ifneq (,$(filter cc2420,$(USEMODULE)))
+	ifeq (,$(filter transceiver,$(USEMODULE)))
 		USEMODULE += transceiver
 	endif
-	ifeq (,$(findstring ieee802154,$(USEMODULE)))
+	ifeq (,$(filter ieee802154,$(USEMODULE)))
 		USEMODULE += ieee802154
 	endif
 endif
 
-ifneq (,$(findstring at86rf231,$(USEMODULE)))
-	ifeq (,$(findstring transceiver,$(USEMODULE)))
+ifneq (,$(filter at86rf231,$(USEMODULE)))
+	ifeq (,$(filter transceiver,$(USEMODULE)))
 		USEMODULE += transceiver
 	endif
-	ifeq (,$(findstring ieee802154,$(USEMODULE)))
+	ifeq (,$(filter ieee802154,$(USEMODULE)))
 		USEMODULE += ieee802154
 	endif
-	ifeq (,$(findstring vtimer, $(USEMODULE)))
+	ifeq (,$(filter vtimer,$(USEMODULE)))
 		USEMODULE += vtimer
 	endif
 endif
 
-ifneq (,$(findstring destiny,$(USEMODULE)))
-	ifeq (,$(findstring sixlowpan,$(USEMODULE)))
+ifneq (,$(filter destiny,$(USEMODULE)))
+	ifeq (,$(filter sixlowpan,$(USEMODULE)))
 		USEMODULE += sixlowpan
 	endif
-	ifeq (,$(findstring net_help,$(USEMODULE)))
+	ifeq (,$(filter net_help,$(USEMODULE)))
 		USEMODULE += net_help
 	endif
-	ifeq (,$(findstring vtimer, $(USEMODULE)))
+	ifeq (,$(filter vtimer,$(USEMODULE)))
 		USEMODULE += vtimer
 	endif
 endif
 
-ifneq (,$(findstring sixlowpan,$(USEMODULE)))
-	ifeq (,$(findstring ieee802154,$(USEMODULE)))
+ifneq (,$(filter sixlowpan,$(USEMODULE)))
+	ifeq (,$(filter ieee802154,$(USEMODULE)))
 		USEMODULE += ieee802154
 	endif
-	ifeq (,$(findstring net_help,$(USEMODULE)))
+	ifeq (,$(filter net_help,$(USEMODULE)))
 		USEMODULE += net_help
 	endif
-	ifeq (,$(findstring semaphore, $(USEMODULE)))
+	ifeq (,$(filter semaphore,$(USEMODULE)))
 		USEMODULE += semaphore
 	endif
-	ifeq (,$(findstring transceiver, $(USEMODULE)))
+	ifeq (,$(filter transceiver,$(USEMODULE)))
 		USEMODULE += transceiver
 	endif
-	ifeq (,$(findstring vtimer, $(USEMODULE)))
+	ifeq (,$(filter vtimer,$(USEMODULE)))
 		USEMODULE += vtimer
 	endif
 endif
 
-ifneq (,$(findstring vtimer,$(USEMODULE)))
-	ifeq (,$(findstring hwtimer,$(USEMODULE)))
+ifneq (,$(filter vtimer,$(USEMODULE)))
+	ifeq (,$(filter hwtimer,$(USEMODULE)))
 		USEMODULE += hwtimer
 	endif
-	ifeq (,$(findstring timex,$(USEMODULE)))
+	ifeq (,$(filter timex,$(USEMODULE)))
 		USEMODULE += timex
 	endif
 endif

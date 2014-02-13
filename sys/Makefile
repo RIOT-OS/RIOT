@@ -1,96 +1,96 @@
-MODULE =sys
-ifneq (,$(findstring auto_init,$(USEMODULE)))
+MODULE = sys
+ifneq (,$(filter auto_init,$(USEMODULE)))
     DIRS += auto_init
 endif
-ifneq (,$(findstring config,$(USEMODULE)))
+ifneq (,$(filter config,$(USEMODULE)))
     DIRS += config
 endif
-ifneq (,$(findstring lib,$(USEMODULE)))
+ifneq (,$(filter lib,$(USEMODULE)))
     DIRS += lib
 endif
-ifneq (,$(findstring ping,$(USEMODULE)))
+ifneq (,$(filter ping,$(USEMODULE)))
     DIRS += ping
 endif
-ifneq (,$(findstring ps,$(USEMODULE)))
+ifneq (,$(filter ps,$(USEMODULE)))
     DIRS += ps
 endif
-ifneq (,$(findstring posix,$(USEMODULE)))
+ifneq (,$(filter posix,$(USEMODULE)))
 	INCLUDES += -I$(RIOTBASE)/sys/posix/include
     DIRS += posix
 endif
-ifneq (,$(findstring pnet,$(USEMODULE)))
+ifneq (,$(filter pnet,$(USEMODULE)))
     DIRS += posix/pnet
 endif
-ifneq (,$(findstring shell,$(USEMODULE)))
+ifneq (,$(filter shell,$(USEMODULE)))
     DIRS += shell
 endif
-ifneq (,$(findstring shell_commands,$(USEMODULE)))
+ifneq (,$(filter shell_commands,$(USEMODULE)))
     DIRS += shell/commands
 endif
-ifneq (,$(findstring timex,$(USEMODULE)))
+ifneq (,$(filter timex,$(USEMODULE)))
     DIRS += timex
 endif
-ifneq (,$(findstring transceiver,$(USEMODULE)))
+ifneq (,$(filter transceiver,$(USEMODULE)))
     DIRS += transceiver
 endif
-ifneq (,$(findstring uart0,$(USEMODULE)))
+ifneq (,$(filter uart0,$(USEMODULE)))
     DIRS += uart0
 endif
-ifneq (,$(findstring vtimer,$(USEMODULE)))
+ifneq (,$(filter vtimer,$(USEMODULE)))
     DIRS += vtimer
 endif
-ifneq (,$(findstring destiny,$(USEMODULE)))
+ifneq (,$(filter destiny,$(USEMODULE)))
     DIRS += net/transport_layer/destiny
 endif
-ifneq (,$(findstring net_help,$(USEMODULE)))
+ifneq (,$(filter net_help,$(USEMODULE)))
     DIRS += net/crosslayer/net_help
 endif
-ifneq (,$(findstring protocol_multiplex,$(USEMODULE)))
+ifneq (,$(filter protocol_multiplex,$(USEMODULE)))
     DIRS += net/link_layer/protocol-multiplex
 endif
-ifneq (,$(findstring sixlowpan,$(USEMODULE)))
+ifneq (,$(filter sixlowpan,$(USEMODULE)))
     DIRS += net/network_layer/sixlowpan
 endif
-ifneq (,$(findstring rpl,$(USEMODULE)))
+ifneq (,$(filter rpl,$(USEMODULE)))
     DIRS += net/routing/rpl
 endif
-ifneq (,$(findstring ieee802154,$(USEMODULE)))
+ifneq (,$(filter ieee802154,$(USEMODULE)))
     DIRS += net/link_layer/ieee802154
 endif
-ifneq (,$(findstring bloom,$(USEMODULE)))
+ifneq (,$(filter bloom,$(USEMODULE)))
     DIRS += bloom
 endif
-ifneq (,$(findstring crypto_3des,$(USEMODULE)))
+ifneq (,$(filter crypto_3des,$(USEMODULE)))
     DIRS += crypto/3des
 endif
-ifneq (,$(findstring crypto_aes,$(USEMODULE)))
+ifneq (,$(filter crypto_aes,$(USEMODULE)))
     DIRS += crypto/aes
 endif
-ifneq (,$(findstring crypto_rc5,$(USEMODULE)))
+ifneq (,$(filter crypto_rc5,$(USEMODULE)))
     DIRS += crypto/rc5
 endif
-ifneq (,$(findstring crypto_sha256,$(USEMODULE)))
+ifneq (,$(filter crypto_sha256,$(USEMODULE)))
     DIRS += crypto/sha256
 endif
-ifneq (,$(findstring crypto_skipjack,$(USEMODULE)))
+ifneq (,$(filter crypto_skipjack,$(USEMODULE)))
     DIRS += crypto/skipjack
 endif
-ifneq (,$(findstring crypto_twofish,$(USEMODULE)))
+ifneq (,$(filter crypto_twofish,$(USEMODULE)))
     DIRS += crypto/twofish
 endif
-ifneq (,$(findstring random,$(USEMODULE)))
+ifneq (,$(filter random,$(USEMODULE)))
     DIRS += random
 endif
-ifneq (,$(findstring hashes,$(USEMODULE)))
+ifneq (,$(filter hashes,$(USEMODULE)))
     DIRS += hashes
 endif
-ifneq (,$(findstring semaphore,$(USEMODULE)))
+ifneq (,$(filter semaphore,$(USEMODULE)))
     DIRS += semaphore
 endif
-ifneq (,$(findstring ccn_lite,$(USEMODULE)))
+ifneq (,$(filter ccn_lite,$(USEMODULE)))
     DIRS += net/ccn_lite
 endif
-ifneq (,$(findstring ccn_lite_client,$(USEMODULE)))
+ifneq (,$(filter ccn_lite_client,$(USEMODULE)))
     DIRS += net/ccn_lite/util
 endif
 
