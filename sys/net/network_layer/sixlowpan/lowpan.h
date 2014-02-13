@@ -25,6 +25,7 @@
 #define _SIXLOWPAN_LOWPAN_H
 
 #include "mutex.h"
+#include "net_if.h"
 #include "vtimer.h"
 
 #include "sixlowpan/lowpan.h"
@@ -42,9 +43,8 @@ typedef struct {
 extern uint16_t local_address;
 extern mutex_t lowpan_context_mutex;
 
-void lowpan_read(uint8_t *data, uint8_t length,
-                 ieee_802154_long_t *s_laddr,
-                 ieee_802154_long_t *d_laddr);
+void lowpan_read(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
+                 net_if_eui64_t *d_addr);
 uint8_t lowpan_context_len(void);
 lowpan_context_t *lowpan_context_update(uint8_t num,
                                         const ipv6_addr_t *prefix,

@@ -121,9 +121,11 @@ void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
     printf("--- %s TCP packet: ---\n",
            (in_or_out == INC_PACKET ? "Incoming" : "Outgoing"));
     printf("IPv6 Source: %s\n",
-           ipv6_addr_to_str(addr_str, &ipv6_header->srcaddr));
+           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                            &ipv6_header->srcaddr));
     printf("IPv6 Dest: %s\n",
-           ipv6_addr_to_str(addr_str, &ipv6_header->destaddr));
+           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                            &ipv6_header->destaddr));
     printf("TCP Length: %x\n", ipv6_header->length - TCP_HDR_LEN);
     printf("Source Port: %x, Dest. Port: %x\n",
            NTOHS(tcp_header->src_port), NTOHS(tcp_header->dst_port));
@@ -148,10 +150,10 @@ void print_socket(socket_t *current_socket)
            current_socket->type,
            current_socket->protocol);
     printf("Local address: %s\n",
-           ipv6_addr_to_str(addr_str,
+           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &current_socket->local_address.sin6_addr));
     printf("Foreign address: %s\n",
-           ipv6_addr_to_str(addr_str,
+           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &current_socket->foreign_address.sin6_addr));
     printf("Local Port: %u, Foreign Port: %u\n",
            NTOHS(current_socket->local_address.sin6_port),
@@ -494,13 +496,13 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
     }
 
     return ipv6_sendto(&current_tcp_socket->foreign_address.sin6_addr,
-                IPPROTO_TCP, (uint8_t *)(current_tcp_packet),
-                compressed_size);
+                       IPPROTO_TCP, (uint8_t *)(current_tcp_packet),
+                       compressed_size);
 #else
     switch_tcp_packet_byte_order(current_tcp_packet);
     return ipv6_sendto(&current_tcp_socket->foreign_address.sin6_addr,
-                IPPROTO_TCP, (uint8_t *)(current_tcp_packet),
-                header_length * 4 + payload_length);
+                       IPPROTO_TCP, (uint8_t *)(current_tcp_packet),
+                       header_length * 4 + payload_length);
 #endif
 }
 
@@ -539,7 +541,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     current_int_tcp_socket->recv_pid = thread_getpid();
 
     /* Local address information */
-    ipv6_iface_get_best_src_addr(&src_addr, &addr->sin6_addr);
+    ipv6_net_if_get_best_src_addr(&src_addr, &addr->sin6_addr);
     set_socket_address(&current_tcp_socket->local_address, PF_INET6,
                        HTONS(get_free_source_port(IPPROTO_TCP)), 0, &src_addr);
 
@@ -1011,7 +1013,7 @@ int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
         uint8_t *payload = &send_buffer[IPV6_HDR_LEN + UDP_HDR_LEN];
 
         memcpy(&(temp_ipv6_header->destaddr), &to->sin6_addr, 16);
-        ipv6_iface_get_best_src_addr(&(temp_ipv6_header->srcaddr), &(temp_ipv6_header->destaddr));
+        ipv6_net_if_get_best_src_addr(&(temp_ipv6_header->srcaddr), &(temp_ipv6_header->destaddr));
 
         current_udp_packet->src_port = get_free_source_port(IPPROTO_UDP);
         current_udp_packet->dst_port = to->sin6_port;
@@ -1022,13 +1024,13 @@ int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
         temp_ipv6_header->length = UDP_HDR_LEN + len;
 
         current_udp_packet->checksum = ~ipv6_csum(temp_ipv6_header,
-                                                   (uint8_t*) current_udp_packet,
-                                                   UDP_HDR_LEN + len,
-                                                   IPPROTO_UDP);
+                                       (uint8_t *) current_udp_packet,
+                                       UDP_HDR_LEN + len,
+                                       IPPROTO_UDP);
 
         return ipv6_sendto(&to->sin6_addr, IPPROTO_UDP,
-                    (uint8_t *)(current_udp_packet),
-                    NTOHS(current_udp_packet->length));
+                           (uint8_t *)(current_udp_packet),
+                           NTOHS(current_udp_packet->length));
     }
     else {
         return -1;

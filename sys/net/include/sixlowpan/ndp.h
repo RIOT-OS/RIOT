@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 
+#include "net_if.h"
 #include "timex.h"
 #include "sixlowpan/types.h"
 
@@ -32,6 +33,7 @@
 #define NDP_OPT_SLLAO_TYPE                 	(1)
 #define NDP_OPT_TLLAO_TYPE                 	(2)
 #define NDP_OPT_PI_VLIFETIME_INFINITE      	(0xffffffff)
+#define NDP_OPT_PI_PLIFETIME_INFINITE      	(0xffffffff)
 #define NDP_OPT_ARO_STATE_SUCCESS          	(0)
 #define NDP_OPT_ARO_STATE_DUP_ADDR         	(1)
 #define NDP_OPT_ARO_STATE_NBR_CACHE_FULL   	(2)
@@ -64,18 +66,37 @@ typedef enum __attribute__((packed)) {
 
 /**
  * @brief   Prefix list type to store information spread by prefix
- *          information option.
+ *          information option on the interface.
+ *
+ * @see net_if_addr_t
  */
-typedef struct __attribute__((packed)) {
-    uint8_t inuse;          ///< Prefix is in in use.
-    uint8_t adv;
-    ipv6_addr_t addr;       ///< The Prefix.
-    uint8_t length;         ///< Length of the prefix.
-    uint8_t l_a_reserved1;  ///< L and A flag of prefix information option
-    uint32_t val_ltime;     ///< valid lifetime
-    uint32_t pref_ltime;    ///< preferred lifetime
-    uint8_t infinite;       ///< flag to set to infinite lifetime
-} ndp_prefix_list_t;
+typedef struct __attribute__((packed)) ndp_prefix_info_t {
+    /**
+     * @brief The next on the interface. Intialise with NULL
+     */
+    struct ndp_prefix_info_t *addr_next;
+    /**
+     * @brief The prev address on the interface. Initialise with NULL
+     */
+    struct ndp_prefix_info_t *addr_prev;
+    /**
+     * @brief Flags to define upper layer protocols this address applies to.
+     *        For this layer NET_IF_L3P_IPV6_PREFIX must be set.
+     */
+    net_if_l3p_t prefix_protocol;
+    ipv6_addr_t *prefix_data;       ///< The Prefix.
+    uint8_t prefix_len;             ///< Length of the prefix.
+    uint8_t inuse;                  ///< Prefix is in in use.
+    /**
+     * Use this information in Prefix Information Options of Router
+     * Advertisements.
+     */
+    uint8_t advertisable;
+    uint8_t flags;                  ///< flags of the prefix information option
+    uint32_t valid_lifetime;        ///< valid lifetime
+    uint32_t preferred_lifetime;    ///< preferred lifetime
+    uint8_t infinite;               ///< flag to set to infinite lifetime
+} ndp_prefix_info_t;
 
 /**
  * @brief   Default router list to store information spread by
@@ -84,7 +105,7 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed)) {
     ipv6_addr_t addr;       ///< Address of router.
     timex_t inval_time;     ///< remaining time until this entry is
-                            ///< invalid.
+    ///< invalid.
 } ndp_default_router_list_t;
 
 /**
@@ -94,14 +115,16 @@ typedef struct __attribute__((packed)) {
  *          </a>.
  */
 typedef struct __attribute__((packed)) {
+    int if_id;                  ///< Interface the IPv6 address is reachable
+    ///< over
     ndp_nce_type_t type;        ///< Type of neighbor cache entry.
     ndp_nce_state_t state;      ///< State of neighbor cache entry.
     uint8_t isrouter;           ///< Flag to signify that this neighbor
-                                ///< is a router.
+    ///< is a router.
     ipv6_addr_t addr;           ///< IPv6 address of the neighbor.
-    ieee_802154_long_t laddr;   ///< EUI-64 of neighbor
-    ieee_802154_short_t saddr;  ///< IEEE 802.15.4 16-bit short address
-                                ///< of neighbor.
+    uint8_t lladdr[8];          ///< Link-layer address of the neighbor
+    uint8_t lladdr_len;         ///< Length of link-layer address of the
+    ///< neighbor
     timex_t ltime;              ///< lifetime of entry.
 } ndp_neighbor_cache_t;
 
@@ -118,9 +141,76 @@ typedef struct __attribute__((packed)) {
 } ndp_a6br_cache_t;
 
 ndp_default_router_list_t *ndp_default_router_list_search(ipv6_addr_t *ipaddr);
+uint8_t ndp_neighbor_cache_add(int if_id, const ipv6_addr_t *ipaddr,
+                               const void *lladdr, uint8_t lladdr_len,
+                               uint8_t isrouter, ndp_nce_state_t state,
+                               ndp_nce_type_t type, uint16_t ltime);
 ndp_neighbor_cache_t *ndp_neighbor_cache_search(ipv6_addr_t *ipaddr);
-/*TODO: to implement*/
-uint8_t ndp_prefix_list_search(ipv6_addr_t *addr);
+ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_addr_t *ipaddr);
+int ndp_addr_is_on_link(ipv6_addr_t *dest_addr);
+
+/**
+ * @brief   Adds a prefix information to an interface. If it already exists,
+ *          the values *valid_lifetime*, *preferred_lifetime*, *advertisable*,
+ *          and flags will be updated accordingly and the prefix will be marked
+ *          as *in_use*.
+ *
+ * @see     <a href="http://tools.ietf.org/html/rfc4861#section-4.6.2">
+ *              RFC 4861, section 4.6.2
+ *          </a>.
+ *
+ * @param[in]   if_id               The interface's ID.
+ * @param[in]   prefix              The prefix.
+ * @param[in]   prefix_len          The length of the prefix in bit.
+ * @param[in]   valid_lifetime      The time in seconds this prefix is valid
+ *                                  for on-link determination.
+ *                                  NDP_OPT_PI_VLIFETIME_INFINITE for infinite
+ *                                  lifetime.
+ * @param[in]   preferred_lifetime  The time in seconds addresses generated with
+ *                                  this prefix remain preferred.
+ *                                  NDP_OPT_PI_PLIFETIME_INFINITE for infinite
+ *                                  lifetime.
+ * @param[in]   advertisable        Set this to a value != 0 to advertise this
+ *                                  prefix information with the Prefix
+ *                                  Information Option, set it to 0 if not.
+ * @param[in]   flags               Flags for the Prefix Information Option.
+ *                                  Valid values are
+ *                                  ICMPV6_NDP_OPT_PI_FLAG_ON_LINK and
+ *                                  ICMPV6_NDP_OPT_PI_FLAG_AUTONOM
+ */
+int ndp_add_prefix_info(int if_id, const ipv6_addr_t *prefix,
+                        uint8_t prefix_len, uint32_t valid_lifetime,
+                        uint32_t preferred_lifetime, uint8_t advertisable,
+                        uint8_t flags);
+
+/**
+ * @brief   Searches the information for the longest prefix up to *up_to* bits
+ *          on an interface fitting to an address *addr*.
+ *
+ * @param[in]   if_id   The interface's ID.
+ * @param[in]   addr    The address to search the prefix for.
+ * @param[in]   up_to   The number of bits up to which point the search should
+ *                      go. Set to IPV6_ADDR_BIT_LEN for the whole address.
+ *                      Values greater then IPV6_ADDR_BIT_LEN are set to
+ *                      IPV6_ADDR_BIT_LEN.
+ *
+ * @return The found prefix information, NULL when none is found.
+ */
+ndp_prefix_info_t *ndp_prefix_info_search(int if_id, const ipv6_addr_t *addr,
+        uint8_t up_to);
+
+/**
+ * @brief   Searches the information for the prefix that matches *prefix* with
+ *          length *prefix_len*.
+ *
+ * @param[in]   if_id       The interface's ID.
+ * @param[in]   prefix      The prefix to search for.
+ * @param[in]   prefix_len  The length of the prefix in bit.
+ *
+ * @return The found prefix information, NULL when none is found.
+ */
+ndp_prefix_info_t *ndp_prefix_info_match(int if_id, const ipv6_addr_t *prefix,
+        uint8_t prefix_len);
 ndp_a6br_cache_t *ndp_a6br_cache_get_most_current(void);
 ndp_a6br_cache_t *ndp_a6br_cache_get_oldest(void);
 

@@ -29,7 +29,7 @@
 #include "ip.h"
 #include "semaphore.h"
 
-extern ipv6_addr_t abr_addr;
+extern ipv6_addr_t *abr_addr;
 
 uint16_t border_get_serial_reader(void);
 

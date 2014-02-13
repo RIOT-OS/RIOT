@@ -150,7 +150,7 @@ void icmpv6_send_parameter_prob(ipv6_addr_t *src, ipv6_addr_t *dest,
  * @param[in] data_len  Length of data payload.
  */
 void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id,
-                              uint16_t seq, char *data,
+                              uint16_t seq, uint8_t *data,
                               size_t data_len);
 
 /**
@@ -163,7 +163,7 @@ void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id,
  * @param[in] data_len  Length of data payload.
  */
 void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id,
-                            uint16_t seq, char *data, size_t data_len);
+                            uint16_t seq, uint8_t *data, size_t data_len);
 
 /**
  * @brief Send ICMPv6 router solicitation.
