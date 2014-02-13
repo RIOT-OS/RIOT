@@ -33,6 +33,15 @@
 #include "pthread.h"
 
 #define ENABLE_DEBUG (0)
+
+#if ENABLE_DEBUG
+#define PTHREAD_REAPER_STACKSIZE KERNEL_CONF_STACKSIZE_PRINTF
+#define PTHREAD_STACKSIZE KERNEL_CONF_STACKSIZE_PRINTF
+#else
+#define PTHREAD_REAPER_STACKSIZE KERNEL_CONF_STACKSIZE_IDLE
+#define PTHREAD_STACKSIZE KERNEL_CONF_STACKSIZE_DEFAULT
+#endif
+
 #include "debug.h"
 
 enum pthread_thread_status {
@@ -58,6 +67,8 @@ static pthread_thread_t *volatile pthread_sched_threads[MAXTHREADS];
 static struct mutex_t pthread_mutex;
 
 static volatile int pthread_reaper_pid = -1;
+
+static char pthread_reaper_stack[PTHREAD_REAPER_STACKSIZE];
 
 static void pthread_start_routine(void)
 {
@@ -107,24 +118,21 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
     pt->arg = arg;
 
     bool autofree = attr == NULL || attr->ss_sp == NULL || attr->ss_size == 0;
-    size_t stack_size = attr && attr->ss_size > 0 ? attr->ss_size : KERNEL_CONF_STACKSIZE_DEFAULT;
+    size_t stack_size = attr && attr->ss_size > 0 ? attr->ss_size : PTHREAD_STACKSIZE;
     void *stack = autofree ? malloc(stack_size) : attr->ss_sp;
     pt->stack = autofree ? stack : NULL;
 
     if (autofree && pthread_reaper_pid < 0) {
         mutex_lock(&pthread_mutex);
         if (pthread_reaper_pid < 0) {
-            void *reaper_stack = malloc(KERNEL_CONF_STACKSIZE_IDLE);
-            if (reaper_stack) {
-                /* volatile pid to overcome problems with double checking */
-                volatile int pid = thread_create(reaper_stack,
-                                                 KERNEL_CONF_STACKSIZE_IDLE,
-                                                 0,
-                                                 0,
-                                                 pthread_reaper,
-                                                 "pthread-reaper");
-                pthread_reaper_pid = pid;
-            }
+            /* volatile pid to overcome problems with double checking */
+            volatile int pid = thread_create(pthread_reaper_stack,
+                                             PTHREAD_REAPER_STACKSIZE,
+                                             0,
+                                             0,
+                                             pthread_reaper,
+                                             "pthread-reaper");
+            pthread_reaper_pid = pid;
         }
         mutex_unlock(&pthread_mutex);
     }
