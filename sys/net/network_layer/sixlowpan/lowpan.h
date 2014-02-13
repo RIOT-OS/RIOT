@@ -29,6 +29,8 @@
 
 #include "sixlowpan/lowpan.h"
 
+#define IEEE802154_TRANSCEIVER      (TRANSCEIVER_AT86RF231 | TRANSCEIVER_CC2420 | TRANSCEIVER_MC1322X)
+
 typedef struct {
     uint8_t num;
     ipv6_addr_t prefix;
