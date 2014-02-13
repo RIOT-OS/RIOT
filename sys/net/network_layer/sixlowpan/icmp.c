@@ -22,15 +22,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "malloc.h"
 #include "vtimer.h"
 #include "mutex.h"
+#include "net_if.h"
 #include "sixlowpan/error.h"
-#include "sixlowpan/mac.h"
 
 #include "ip.h"
 #include "icmp.h"
-#include "lowpan.h"
 #include "serialnumber.h"
 #include "net_help.h"
 
@@ -857,6 +855,7 @@ void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *
                               uint8_t sllao, uint8_t aro)
 {
     uint16_t packet_length;
+    int if_id = 0;          // TODO: get this somehow
 
     ipv6_buf = ipv6_get_buf();
     ipv6_buf->version_trafficclass = IPV6_VER;
@@ -910,7 +909,14 @@ void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *
         opt_aro_buf->status = 0;
         opt_aro_buf->reserved1 = 0;
         opt_aro_buf->reserved2 = 0;
-        memcpy(&(opt_aro_buf->eui64), sixlowpan_mac_get_eui64(src), 8);
+
+        if (net_if_get_src_address_mode(if_id) == NET_IF_TRANS_ADDR_M_SHORT) {
+            net_if_get_eui64((net_if_eui64_t *) &opt_aro_buf->eui64, if_id, 1);
+        }
+        else if (net_if_get_src_address_mode(if_id) == NET_IF_TRANS_ADDR_M_LONG) {
+            net_if_get_eui64((net_if_eui64_t *) &opt_aro_buf->eui64, if_id, 0);
+        }
+
         icmpv6_opt_hdr_len += OPT_ARO_HDR_LEN;
 
         packet_length += OPT_ARO_HDR_LEN;
@@ -1114,6 +1120,7 @@ void recv_nbr_sol(void)
 void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *tgt,
                               uint8_t rso, uint8_t sllao, uint8_t aro)
 {
+    int if_id = 0;              // TODO: get this somehow
     uint16_t packet_length;
 
     ipv6_buf = ipv6_get_buf();
@@ -1156,7 +1163,14 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *t
         opt_aro_buf->status = 0;    /* TODO */
         opt_aro_buf->reserved1 = 0;
         opt_aro_buf->reserved2 = 0;
-        memcpy(&(opt_aro_buf->eui64), sixlowpan_mac_get_eui64(dst), 8);
+
+        if (net_if_get_src_address_mode(if_id) == NET_IF_TRANS_ADDR_M_SHORT) {
+            net_if_get_eui64((net_if_eui64_t *) &opt_aro_buf->eui64, if_id, 1);
+        }
+        else if (net_if_get_src_address_mode(if_id) == NET_IF_TRANS_ADDR_M_LONG) {
+            net_if_get_eui64((net_if_eui64_t *) &opt_aro_buf->eui64, if_id, 0);
+        }
+
         icmpv6_opt_hdr_len += OPT_ARO_HDR_LEN;
 
         packet_length += OPT_ARO_HDR_LEN;
