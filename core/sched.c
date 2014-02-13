@@ -49,6 +49,8 @@ volatile int last_pid = -1;
 clist_node_t *runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;
 
+static char *sched_free_stack;
+
 #if SCHEDSTATISTICS
 static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
 schedstat pidlist[MAXTHREADS];
@@ -161,6 +163,12 @@ void sched_run()
 
     active_thread = (volatile tcb_t *) my_active_thread;
 
+    if (sched_free_stack) {
+        DEBUG("scheduler: freeing stack.\n");
+        free(sched_free_stack);
+        sched_free_stack = NULL;
+    }
+
     DEBUG("scheduler: done.\n");
 }
 
@@ -217,6 +225,10 @@ void sched_task_exit(void)
     num_tasks--;
 
     sched_set_status((tcb_t *)active_thread,  STATUS_STOPPED);
+
+    if (active_thread->auto_free) {
+        sched_free_stack = active_thread->stack_start;
+    }
 
     active_thread = NULL;
     cpu_switch_context_exit();

@@ -62,6 +62,7 @@ typedef struct tcb_t {
     const char *name;
     char *stack_start;
     int stack_size;
+    uint8_t auto_free;
 } tcb_t;
 
 /** @} */
