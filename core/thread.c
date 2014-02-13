@@ -30,6 +30,7 @@
 #include "bitarithm.h"
 #include "hwtimer.h"
 #include "sched.h"
+#include "irq.h"
 
 inline int thread_getpid()
 {
@@ -75,38 +76,29 @@ void thread_sleep()
 int thread_wakeup(int pid)
 {
     DEBUG("thread_wakeup: Trying to wakeup PID %i...\n", pid);
-    int isr = inISR();
 
-    if (!isr) {
-        DEBUG("thread_wakeup: Not in interrupt.\n");
-        dINT();
+    int old_state = disableIRQ();
+
+    int result = STATUS_NOT_FOUND;
+
+    tcb_t *other_thread = (tcb_t *) &sched_threads[pid];
+    if (!other_thread) {
+        DEBUG("thread_wakeup: Thread does not exist.\n");
     }
-
-    int result = sched_threads[pid]->status;
-
-    if (result == STATUS_SLEEPING) {
-        DEBUG("thread_wakeup: Thread is sleeping.\n");
-        sched_set_status((tcb_t *)sched_threads[pid], STATUS_RUNNING);
-
-        if (!isr) {
-            eINT();
-            thread_yield();
-        }
-        else {
-            sched_context_switch_request = 1;
-        }
-
-        return 1;
+    else if (other_thread->status != STATUS_SLEEPING) {
+        DEBUG("thread_wakeup: Thread is not sleeping!\n");
     }
     else {
-        DEBUG("thread_wakeup: Thread is not sleeping!\n");
+        DEBUG("thread_wakeup: Thread is sleeping.\n");
 
-        if (!isr) {
-            eINT();
-        }
+        sched_set_status(other_thread, STATUS_RUNNING);
+        sched_switch(active_thread->priority, other_thread->priority, inISR());
 
-        return STATUS_NOT_FOUND;
+        result = 1;
     }
+
+    restoreIRQ(old_state);
+    return result;
 }
 
 int thread_measure_stack_free(char *stack)
