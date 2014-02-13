@@ -95,6 +95,21 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
                 const uint8_t *payload, uint16_t payload_length);
 
 /**
+ * @brief   Send an IPv6 packet defined by its header.
+ *
+ * @param[in] packet            Pointer to an prepared IPv6 packet header.
+ *                              The payload is expected directly after the
+ *                              packet.
+ *
+ * @return  length of payload : on success
+ *          -1                : if no route to the given dest could be obtained
+ *                              Packet is dropped
+ *                              In case of reactive routing: routing is going
+ *                              to try to find a route
+ */
+int ipv6_send_packet(ipv6_hdr_t *packet);
+
+/**
  * @brief   Determines if node is a router.
  *
  * @return  1 if node is router, 0 otherwise.
