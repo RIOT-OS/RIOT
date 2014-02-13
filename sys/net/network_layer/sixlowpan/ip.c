@@ -64,6 +64,7 @@ int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
 int ipv6_send_packet(ipv6_hdr_t *bytes)
 {
+    int if_id = 0;
     uint16_t offset = IPV6_HDR_LEN + HTONS(bytes->length);
 
     bytes->flowlabel = HTONS(bytes->flowlabel);
@@ -72,9 +73,12 @@ int ipv6_send_packet(ipv6_hdr_t *bytes)
     memset(bytes, 0, BUFFER_SIZE);
     memcpy(bytes + LL_HDR_LEN, bytes, offset);
 
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &bytes->destaddr.uint16[4],
-                            (uint8_t *)bytes,
-                            offset);
+    if (sixlowpan_lowpan_sendto(nce->if_id, &nce->lladdr, nce->lladdr_len,
+                                (uint8_t *)packet, length) < 0) {
+        return -1;
+    }
+
+    return length;
 }
 
 ipv6_hdr_t *ipv6_get_buf_send(void)
@@ -143,7 +147,7 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
         return -1;
     }
 
-    sixlowpan_lowpan_sendto((ieee_802154_long_t *) &dest->uint16[4],
+    sixlowpan_lowpan_sendto(0, &dest->uint16[4], 8,
                             (uint8_t *)ipv6_buf, packet_length);
 
     return payload_length;

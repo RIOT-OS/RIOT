@@ -25,6 +25,8 @@
 #include <stdint.h>
 
 #include "transceiver.h"
+#include "net_help.h"
+#include "net_if.h"
 #include "sixlowpan/types.h"
 
 /**
@@ -178,26 +180,44 @@ typedef struct __attribute__((packed)) {
 
 
 /**
- * @brief   Initializes 6LoWPAN.
+ * @brief   Initializes all addresses on an interface needed for 6LoWPAN.
  *
- * @param[in] trans     Transceiver to use with 6LoWPAN.
- * @param[in] r_addr    PHY layer address.
- * @param[in] as_border 1 if node should act as border router,
- *                      0 otherwise.
+ * @param[in] if_id     The interface to use with 6LoWPAN.
+ *
+ * @return  1 on success, 0 on failure.
  */
-void sixlowpan_lowpan_init(transceiver_type_t trans, uint8_t r_addr,
-                           int as_border);
+int sixlowpan_lowpan_init_interface(int if_id);
 
 /**
- * @brief   Initializes a 6LoWPAN router with address prefix
+ * @brief   Checks if an EUI-64 was set from a short address. If so
+ *          it returns this address, else 0
  *
- * @param[in] trans     transceiver to use with 6LoWPAN.
- * @param[in] prefix    the address prefix to advertise.
- * @param[in] r_addr    PHY layer address.
+ * @param[in] iid   An EUI-64.
+ *
+ * @return  The short address on success, 0 on failure.
  */
-void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,
-                                 const ipv6_addr_t *prefix,
-                                 uint8_t r_addr);
+static inline uint16_t sixlowpan_lowpan_eui64_to_short_addr(const net_if_eui64_t *iid)
+{
+    if (iid->uint32[0] == HTONL(0x000000ff) &&
+        iid->uint16[2] == HTONS(0xfe00)) {
+        return NTOHS(iid->uint16[3]);
+    }
+
+    return 0;
+}
+
+/**
+ * @brief   Initializes all addresses and prefixes on an interface needed
+ *          for 6LoWPAN. Calling this function together with
+ *          sixlowpan_lowpan_init_interface() is not necessary.
+ *
+ * @param[in] if_id     The interface to use with 6LoWPAN.
+ * @param[in] prefix    the address prefix to advertise.
+ *
+ * @return  1 on success, 0 on failure.
+ */
+int sixlowpan_lowpan_init_adhoc_interface(int if_id,
+        const ipv6_addr_t *prefix);
 
 /**
  * @brief   Initializes a 6LoWPAN border router with an address
@@ -205,26 +225,26 @@ void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,
  * @note    Currently only working with addresses generated from
  *          IEEE 802.15.4 16-bit short addresses.
  *
- * @param[in] trans    transceiver to use with 6LoWPAN.
- * @param[in] border_router_addr    Address of this border router.
+ * @param[in] if_id                 The interface to use with 6LoWPAN.
  *
- * @return  SIXLOWERROR_SUCCESS on success, otherwise SIXLOWERROR_ADDRESS if
- *          address was not generated from IEEE 802.15.4 16-bit short
- *          address.
+ * @return  1 on success, 0 on failure.
  */
-uint8_t sixlowpan_lowpan_border_init(transceiver_type_t trans,
-                                     const ipv6_addr_t *border_router_addr);
+int sixlowpan_lowpan_border_init(int if_id);
 
 /**
- * @brief   Send data via 6LoWPAN to destination node dest.
+ * @brief   Send data via 6LoWPAN to destination node or next hop dest.
  *
- * @param[in] dest      EUI-64 of destination node.
+ * @param[in] if_id     The interface to send the data over.
+ * @param[in] dest      Hardware address of the next hop or destination node.
+ * @param[in] dest_len  Length of the destination address in byte.
  * @param[in] data      Data to send to destination node (may be
  *                      manipulated).
  * @param[in] data_len  Length of data.
+ *
+ * @return  length of transmitted data on success, -1 on failure.
  */
-void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
-                             uint8_t *data, uint16_t data_len);
+int sixlowpan_lowpan_sendto(int if_id, const void *dest, int dest_len,
+                            uint8_t *data, uint16_t data_len);
 
 /**
  * @brief   Set header compression status for 6LoWPAN.
@@ -271,6 +291,13 @@ void sixlowpan_lowpan_print_fifo_buffers(void);
  */
 void sixlowpan_lowpan_print_reassembly_buffers(void);
 #endif
+
+/**
+ * @brief   Initializes 6LoWPAN module.
+ *
+ * @return  1 on success, 0 on failure.
+ */
+int sixlowpan_lowpan_init(void);
 
 /** @} */
 #endif /* SIXLOWPAN_LOWPAN_H */
