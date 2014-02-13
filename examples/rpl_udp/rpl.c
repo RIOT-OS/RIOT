@@ -22,6 +22,7 @@
 #include <string.h>
 #include "vtimer.h"
 #include "thread.h"
+#include "net_if.h"
 #include "sixlowpan.h"
 #include "destiny.h"
 #include "rpl.h"
@@ -64,7 +65,9 @@ void rpl_udp_init(int argc, char **argv)
             return;
         }
 
-        state = rpl_init(TRANSCEIVER, id);
+        net_if_set_hardware_address(0, id);
+
+        state = rpl_init(0);
 
         if (state != SIXLOWERROR_SUCCESS) {
             printf("Error initializing RPL\n");
@@ -95,11 +98,13 @@ void rpl_udp_init(int argc, char **argv)
     ipv6_addr_t prefix, tmp;
     ipv6_addr_init(&std_addr, 0xABCD, 0xEF12, 0, 0, 0x1034, 0x00FF, 0xFE00, id);
     ipv6_addr_init_prefix(&prefix, &std_addr, 64);
-    plist_add(&prefix, 64, NDP_OPT_PI_VLIFETIME_INFINITE, 0, 1, ICMPV6_NDP_OPT_PI_FLAG_AUTONOM);
-    ipv6_init_iface_as_router();
+    ndp_add_prefix_info(0, &prefix, 64, NDP_OPT_PI_VLIFETIME_INFINITE,
+                        NDP_OPT_PI_PLIFETIME_INFINITE, 1,
+                        ICMPV6_NDP_OPT_PI_FLAG_AUTONOM);
+    ipv6_init_as_router();
     /* add global address */
-    ipv6_addr_set_by_eui64(&tmp, &std_addr);
-    ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_GLOBAL, NDP_ADDR_STATE_PREFERRED, 0, 0);
+    ipv6_addr_set_by_eui64(&tmp, 0, &std_addr);
+    ipv6_net_if_add_addr(0, &tmp, NDP_ADDR_STATE_PREFERRED, 0, 0, 0);
 
     /* set channel to 10 */
     tcmd.transceivers = TRANSCEIVER;
@@ -134,7 +139,8 @@ void rpl_udp_loop(int argc, char **argv)
 
     if (!is_root) {
         printf("my preferred parent:\n");
-        printf("%s\n", ipv6_addr_to_str(addr_str, (&mydodag->my_preferred_parent->addr)));
+        printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                                        (&mydodag->my_preferred_parent->addr)));
         printf("parent lifetime: %d\n", mydodag->my_preferred_parent->lifetime);
     }
 
@@ -142,9 +148,11 @@ void rpl_udp_loop(int argc, char **argv)
 
     for (int i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
         if (rtable[i].used) {
-            printf("%s\n", ipv6_addr_to_str(addr_str, (&rtable[i].address)));
+            printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                                            (&rtable[i].address)));
             puts("next hop");
-            printf("%s\n", ipv6_addr_to_str(addr_str, (&rtable[i].next_hop)));
+            printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                                            (&rtable[i].next_hop)));
             printf("entry %d lifetime %d\n", i, rtable[i].lifetime);
 
             if (!rpl_equal_id(&rtable[i].address, &rtable[i].next_hop)) {
@@ -171,7 +179,8 @@ void rpl_udp_table(int argc, char **argv)
 
     for (int i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
         if (rtable[i].used) {
-            printf("%s\n", ipv6_addr_to_str(addr_str, (&rtable[i].address)));
+            printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                                            (&rtable[i].address)));
             printf("entry %d lifetime %d\n", i, rtable[i].lifetime);
 
             if (!rpl_equal_id(&rtable[i].address, &rtable[i].next_hop)) {
@@ -200,12 +209,14 @@ void rpl_udp_dodag(int argc, char **argv)
     }
 
     printf("Part of Dodag:\n");
-    printf("%s\n", ipv6_addr_to_str(addr_str, (&mydodag->dodag_id)));
+    printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                                    (&mydodag->dodag_id)));
     printf("my rank: %d\n", mydodag->my_rank);
 
     if (!is_root) {
         printf("my preferred parent:\n");
-        printf("%s\n", ipv6_addr_to_str(addr_str, (&mydodag->my_preferred_parent->addr)));
+        printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                                        (&mydodag->my_preferred_parent->addr)));
     }
 
     printf("---------------------------\n");
