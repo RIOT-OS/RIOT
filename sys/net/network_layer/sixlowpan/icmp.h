@@ -42,7 +42,7 @@ enum option_types_t {
     OPT_DAC,
 };
 
-extern unsigned int nd_nbr_cache_rem_pid;
+extern int nd_nbr_cache_rem_pid;
 
 
 void recv_echo_req(void);
@@ -53,9 +53,6 @@ void recv_nbr_adv(void);
 void recv_nbr_sol(void);
 
 void nbr_cache_auto_rem(void);
-int plist_add(ipv6_addr_t *addr, uint8_t size, uint32_t val_ltime,
-              uint32_t pref_ltime, uint8_t adv_opt, uint8_t l_a_reserved1);
-
 ndp_a6br_cache_t *abr_add_context(uint16_t version, ipv6_addr_t *abr_addr,
                                   uint8_t cid);
 void abr_remove_context(uint8_t cid);

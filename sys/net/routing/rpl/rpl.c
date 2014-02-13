@@ -191,14 +191,10 @@ rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp)
     return NULL;
 }
 
-uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address)
+uint8_t rpl_init(int if_id)
 {
     mutex_init(&rpl_send_mutex);
     mutex_init(&rpl_recv_mutex);
-
-    if (rpl_address == 0) {
-        return SIXLOWERROR_ADDRESS;
-    }
 
     rpl_instances_init();
 
@@ -213,11 +209,15 @@ uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address)
     objective_functions[0] = rpl_get_of0();
     /* objective_functions[1] = rpl_get_of_ETX() */
 
-    sixlowpan_lowpan_init(trans, rpl_address, 0);
+    if (!sixlowpan_lowpan_init()) {
+        return 0;
+    }
+
+    sixlowpan_lowpan_init_interface(if_id);
     /* need link local prefix to query _our_ corresponding address  */
     ipv6_addr_t ll_address;
     ipv6_addr_set_link_local_prefix(&ll_address);
-    ipv6_iface_get_best_src_addr(&my_address, &ll_address);
+    ipv6_net_if_get_best_src_addr(&my_address, &ll_address);
     ipv6_register_rpl_handler(rpl_process_pid);
 
     /* initialize ETX-calculation if needed */
@@ -932,7 +932,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
     ipv6_send_buf->length = HTONS(p_len);
 
     memcpy(&(ipv6_send_buf->destaddr), destination, 16);
-    ipv6_iface_get_best_src_addr(&(ipv6_send_buf->srcaddr), &(ipv6_send_buf->destaddr));
+    ipv6_net_if_get_best_src_addr(&(ipv6_send_buf->srcaddr), &(ipv6_send_buf->destaddr));
 
     icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
     icmp_send_buf->checksum = 0;

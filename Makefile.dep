@@ -92,13 +92,13 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
 	ifeq (,$(filter net_help,$(USEMODULE)))
 		USEMODULE += net_help
 	endif
-	ifeq (,$(filter semaphore,$(USEMODULE)))
+	ifeq (,$(filter net_if,$(USEMODULE)))
+		USEMODULE += net_if
+	endif
+	ifeq (,$(filter semaphore, $(USEMODULE)))
 		USEMODULE += semaphore
 	endif
-	ifeq (,$(filter transceiver,$(USEMODULE)))
-		USEMODULE += transceiver
-	endif
-	ifeq (,$(filter vtimer,$(USEMODULE)))
+	ifeq (,$(filter vtimer, $(USEMODULE)))
 		USEMODULE += vtimer
 	endif
 endif

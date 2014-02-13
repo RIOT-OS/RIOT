@@ -23,18 +23,21 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "destiny/socket.h"     /* for AF_INET6 */
 #include "inet_pton.h"
 #include "inet_ntop.h"
 #include "net_help.h"
 #include "net_if.h"
 #include "transceiver.h"
 
+#ifndef MODULE_SIXLOWPAN
 #define ADDR_REGISTERED_MAX (6)
 #define ADDRS_LEN_MAX       (16)
 
 static uint8_t addr_registered = 0;
 static uint8_t addrs[ADDR_REGISTERED_MAX][ADDRS_LEN_MAX];
+#else
+#include "ipv6.h"
+#endif
 
 void _net_if_ifconfig_add(int if_id, int argc, char **argv);
 void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv);
@@ -45,8 +48,9 @@ void _net_if_ifconfig_set_hwaddr(int if_id, char *addr);
 void _net_if_ifconfig_set_pan_id(int if_id, char *pan_id);
 void _net_if_ifconfig_set_channel(int if_id, char *channel);
 void _net_if_ifconfig_create(char *transceivers_str);
-int _net_if_ifconfig_ipv6_addr_convert(net_if_addr_t *addr, char *type,
-                                       char *addr_data_str, char *addr_data_len);
+int _net_if_ifconfig_ipv6_addr_convert(net_if_addr_t *addr, void *addr_data,
+                                       char *type, char *addr_data_str,
+                                       char *addr_data_len);
 void _net_if_ifconfig_list(int if_id);
 
 int isnumber(char *str)
@@ -335,13 +339,52 @@ void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
         type = NULL;
     }
 
+#ifdef MODULE_SIXLOWPAN
+    ipv6_addr_t ipv6_addr;
+    void *addr_data = &ipv6_addr;
+#else
+    void *addr_data = (void *)&addrs[addr_registered][0];
+#endif
+
     addr_data_str = strtok(addr_str, "/");
     addr_data_len = strtok(NULL, "/");
 
-    if (!_net_if_ifconfig_ipv6_addr_convert(&addr, type, addr_data_str, addr_data_len)) {
+    if (!_net_if_ifconfig_ipv6_addr_convert(&addr, addr_data, type,
+                                            addr_data_str, addr_data_len)) {
         add_usage();
         return;
     }
+
+#ifdef MODULE_SIXLOWPAN
+
+    if (addr.addr_protocol & NET_IF_L3P_IPV6_PREFIX) {
+        if (ndp_add_prefix_info(if_id, &ipv6_addr, addr.addr_len,
+                                NDP_OPT_PI_VLIFETIME_INFINITE,
+                                NDP_OPT_PI_PLIFETIME_INFINITE, 1,
+                                ICMPV6_NDP_OPT_PI_FLAG_AUTONOM) != SIXLOWERROR_SUCCESS) {
+            add_usage();
+            return;
+        }
+    }
+    else if (addr.addr_protocol & NET_IF_L3P_IPV6_ADDR) {
+        uint8_t is_anycast = 0;
+
+        if (addr.addr_protocol & NET_IF_L3P_IPV6_ANYCAST) {
+            is_anycast = 1;
+        }
+
+        if (!ipv6_net_if_add_addr(if_id, &ipv6_addr, NDP_ADDR_STATE_PREFERRED,
+                                  0, 0, is_anycast)) {
+            add_usage();
+            return;
+        }
+    }
+    else {
+        add_usage();
+        return;
+    }
+
+#else
 
     if (net_if_add_address(if_id, &addr) < 0) {
         add_usage();
@@ -349,6 +392,7 @@ void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
     }
 
     addr_registered++;
+#endif
 }
 
 void _net_if_ifconfig_add(int if_id, int argc, char **argv)
@@ -413,13 +457,21 @@ void _net_if_ifconfig_create(char *transceivers_str)
 
 static inline int _is_multicast(uint8_t *addr)
 {
+#ifdef MODULE_SIXLOWPAN
+    return ipv6_addr_is_multicast((ipv6_addr_t *) addr);
+#else
     return *addr == 0xff;
+#endif
 }
 
 static inline int _is_link_local(uint8_t *addr)
 {
+#ifdef MODULE_SIXLOWPAN
+    return ipv6_addr_is_link_local((ipv6_addr_t *) addr);
+#else
     return (addr[0] == 0xfe && addr[1] == 0x80) ||
            (_is_multicast(addr) && (addr[1] & 0x0f) == 2);
+#endif
 }
 
 int _set_protocol_from_type(char *type, net_if_addr_t *addr)
@@ -448,14 +500,15 @@ int _set_protocol_from_type(char *type, net_if_addr_t *addr)
     }
 }
 
-int _net_if_ifconfig_ipv6_addr_convert(net_if_addr_t *addr, char *type,
-                                       char *addr_data_str, char *addr_data_len)
+int _net_if_ifconfig_ipv6_addr_convert(net_if_addr_t *addr, void *addr_data,
+                                       char *type, char *addr_data_str,
+                                       char *addr_data_len)
 {
     if (addr_data_len && !isnumber(addr_data_len)) {
         return 0;
     }
 
-    addr->addr_data = (void *)&addrs[addr_registered][0];
+    addr->addr_data = addr_data;
 
     if (!inet_pton(AF_INET6, addr_data_str, addr->addr_data)) {
         return 0;
