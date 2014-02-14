@@ -1,4 +1,4 @@
-SRC = shell_commands.c sc_id.c
+SRC = shell_commands.c sc_id.c sc_sys.c
 
 ifneq (,$(findstring transceiver,$(USEMODULE)))
 	SRC += sc_transceiver.c
