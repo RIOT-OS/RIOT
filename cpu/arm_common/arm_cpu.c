@@ -92,4 +92,3 @@ NORETURN void reboot(void)
         arm_reset();
     }
 }
-

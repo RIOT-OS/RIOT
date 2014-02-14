@@ -98,4 +98,3 @@ NORETURN void reboot(void)
         WDTCTL = 0x0000;
     }
 }
-
