@@ -1,13 +1,13 @@
 MODULE =cc110x_ng
 
 DIRS =
-ifneq (,$(findstring msb-430h,$(BOARD)))
+ifneq (,$(filter msb-430h,$(BOARD)))
 	DIRS += spi
 endif
-ifneq (,$(findstring msba2,$(BOARD)))
+ifneq (,$(filter msba2,$(BOARD)))
 	DIRS += spi
 endif
-ifneq (,$(findstring wsn430-v1_3b,$(BOARD)))
+ifneq (,$(filter wsn430-v1_3b,$(BOARD)))
 	DIRS += spi
 endif
 

@@ -1,10 +1,10 @@
 MODULE =cpu
 
 DIRS = $(RIOTCPU)/arm_common
-ifneq (,$(findstring mc1322x_adc,$(USEMODULE)))
-  DIRS += adc
+ifneq (,$(filter mc1322x_adc,$(USEMODULE)))
+	DIRS += adc
 endif
-ifneq (,$(findstring mc1322x_asm,$(USEMODULE)))
+ifneq (,$(filter mc1322x_asm,$(USEMODULE)))
 	DIRS += asm
 endif
 

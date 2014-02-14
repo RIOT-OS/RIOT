@@ -10,7 +10,7 @@ export BOARD = native
 # this has to be the absolute path of the RIOT-base dir
 export RIOTBASE = $(CURDIR)/../..
 
-ifeq (,$(findstring native,$(BOARD)))
+ifeq (,$(filter native,$(BOARD)))
 include $(RIOTBASE)/Makefile.unsupported
 else
 
