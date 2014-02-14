@@ -430,7 +430,7 @@ ccnl_mgmt_prefixreg(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
         }
 
         if (typ == CCN_TT_DTAG && num == CCN_DTAG_NAME) {
-            for (;;) {
+            while (1) {
                 if (dehead(&buf, &buflen, &num, &typ) != 0) {
                     goto Bail;
                 }

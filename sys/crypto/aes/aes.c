@@ -1104,7 +1104,7 @@ int aes_encrypt(cipher_context_t *context, uint8_t *plainBlock,
      */
     r = key->rounds >> 1;
 
-    for (;;) {
+    while (1) {
         t0 =
             Te0[(s0 >> 24)       ] ^
             Te1[(s1 >> 16) & 0xff] ^
@@ -1365,7 +1365,7 @@ int aes_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
      */
     r = key->rounds >> 1;
 
-    for (;;) {
+    while (1) {
         t0 =
             Td0[(s0 >> 24)       ] ^
             Td1[(s3 >> 16) & 0xff] ^
