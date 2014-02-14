@@ -88,6 +88,8 @@ void thread_print_stack(void)
 
 NORETURN void reboot(void)
 {
-  arm_reset();
+    while (1) {
+        arm_reset();
+    }
 }
 
