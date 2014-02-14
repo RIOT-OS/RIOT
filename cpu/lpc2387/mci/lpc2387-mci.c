@@ -417,7 +417,7 @@ static int send_cmd(unsigned int idx, unsigned long arg, unsigned int rt, unsign
     //Timer[1] = 100;
     uint32_t timerstart = hwtimer_now();
 
-    for (;;) {						/* Wait for end of the cmd/resp transaction */
+    while (1) {						/* Wait for end of the cmd/resp transaction */
 
         //if (!Timer[1]) return 0;
         if (hwtimer_now() - timerstart > 10000) {

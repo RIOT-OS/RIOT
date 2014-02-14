@@ -243,7 +243,7 @@ ccnl_extract_prefix_nonce_ppkd(unsigned char **data, int *datalen, int *scope,
 
         if (typ == CCN_TT_DTAG) {
             if (num == CCN_DTAG_NAME) {
-                for (;;) {
+                while (1) {
                     if (dehead(data, datalen, &num, &typ) != 0) {
                         goto Bail;
                     }
