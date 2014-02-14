@@ -12,6 +12,18 @@ ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
 endif
 
+ifeq (,$(filter buildtest,$(MAKECMDGOALS)))
+	ifneq (,$(BOARD_WHITELIST))
+		ifeq (,$(filter $(BOARD),$(BOARD_WHITELIST)))
+$(error This application only runs on following boards: $(BOARD_WHITELIST))
+		endif
+	endif
+
+	ifneq (,$(findstring $(BOARD),$(BOARD_BLACKLIST)))
+$(error This application does not run on following boards: $(BOARD_BLACKLIST))
+	endif
+endif
+
 # if you want to publish the board into the sources as an uppercase #define
 BB = $(shell echo $(BOARD)|tr 'a-z' 'A-Z')
 CPUDEF = $(shell echo $(CPU)|tr 'a-z' 'A-Z')
@@ -143,7 +155,18 @@ buildtest:
 		ECHO='echo'; \
 	fi; \
 	\
-	for BOARD in $$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); do \
+	if [ -z "$(BOARD_WHITELIST)" ]; then \
+		BOARDS=$$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); \
+	else \
+		BOARDS="$(BOARD_WHITELIST)"; \
+	fi; \
+	\
+	for BOARD in $(BOARD_BLACKLIST); do \
+		echo "Ignoring $${BOARD} (blacklisted)"; \
+		BOARDS=$$(echo \ $${BOARDS}\  | sed -e 's/ '$${BOARD}' / /'); \
+	done; \
+	\
+	for BOARD in $${BOARDS}; do \
 		$${ECHO} -n "Building for $${BOARD} .. "; \
 		env -i \
 			HOME=$${HOME} \
