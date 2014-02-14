@@ -50,7 +50,8 @@ quad_t __lshrdi3(quad_t a, qshift_t shift)
     if (shift >= INT_BITS) {
         aa.ul[L] = aa.ul[H] >> (shift - INT_BITS);
         aa.ul[H] = 0;
-    } else {
+    }
+    else {
         aa.ul[L] = (aa.ul[L] >> shift) | (aa.ul[H] << (INT_BITS - shift));
         aa.ul[H] >>= shift;
     }

@@ -49,7 +49,8 @@ float __floatdisf(quad_t x)
     if (x < 0) {
         u.q = -x;
         neg = 1;
-    } else {
+    }
+    else {
         u.q = x;
         neg = 0;
     }
