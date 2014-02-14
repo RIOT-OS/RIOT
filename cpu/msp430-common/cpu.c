@@ -92,10 +92,10 @@ int inISR()
 /* System reboot */
 NORETURN void reboot(void)
 {
-  /* force an hardware reboot ("Power-Up Clear"), by writing
-     an illegal value to the watchdog control register */
-  while (1) {
-    WDTCTL = 0x0000;
-  }
+    /* force an hardware reboot ("Power-Up Clear"), by writing
+       an illegal value to the watchdog control register */
+    while (1) {
+        WDTCTL = 0x0000;
+    }
 }
 
