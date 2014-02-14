@@ -8,7 +8,7 @@ export MCU = cc430f6137
 export PREFIX = msp430-
 export CC = $(PREFIX)gcc
 export AR = $(PREFIX)ar
-export CFLAGS += -std=gnu99 -Wstrict-prototypes -gdwarf-2 -Os -Wall -mmcu=$(MCU) -D CC430
+export CFLAGS += -Wstrict-prototypes -gdwarf-2 -Os -Wall -mmcu=$(MCU) -D CC430
 export ASFLAGS += -mmcu=$(MCU) --defsym $(MCU)=1 --gdwarf-2
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
