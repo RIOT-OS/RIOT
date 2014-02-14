@@ -1,7 +1,7 @@
 /**
  * Provides prototypes for available shell commands
  *
- * Copyright (C) 2013  INRIA.
+ * Copyright (C) 2014  INRIA.
  *
  * This source code is licensed under the LGPLv2 license,
  * See the file LICENSE for more details.
@@ -24,6 +24,7 @@
 #include "shell_commands.h"
 
 extern void _id_handler(char *id);
+extern void _reboot_handler(char *unused);
 extern void _heap_handler(char *unused);
 
 #ifdef MODULE_PS
@@ -104,6 +105,7 @@ extern void _mersenne_get(char *str);
 
 const shell_command_t _shell_command_list[] = {
     {"id", "Gets or sets the node's id.", _id_handler},
+    {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_LPC_COMMON
     {"heap", "Shows the heap state for the LPC2387 on the command shell.", _heap_handler},
 #endif
