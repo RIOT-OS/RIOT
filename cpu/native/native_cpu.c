@@ -15,7 +15,9 @@
  * @file
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  */
+
 #include <stdio.h>
+#include <unistd.h>
 
 #ifdef __MACH__
 #define _XOPEN_SOURCE
@@ -40,6 +42,8 @@
 #include <stdlib.h>
 
 #include "kernel_internal.h"
+#include "kernel.h"
+#include "irq.h"
 #include "sched.h"
 
 #include "cpu.h"
@@ -58,6 +62,15 @@ char __end_stack[SIGSTKSZ];
 #ifdef MODULE_UART0
 fd_set _native_rfds;
 #endif
+
+NORETURN void reboot(void)
+{
+    printf("\n\n\t\t!! REBOOT !!\n\n");
+    if (execve(_native_argv[0], _native_argv, NULL) == -1) {
+        err(EXIT_FAILURE, "reboot: execve");
+    }
+    errx(EXIT_FAILURE, "reboot: this should not habe been reached");
+}
 
 /**
  * TODO: implement
