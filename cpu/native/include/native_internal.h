@@ -54,6 +54,7 @@ extern ucontext_t end_context;
 extern ucontext_t *_native_cur_ctx, *_native_isr_ctx;
 
 extern const char *_progname;
+extern char **_native_argv;
 
 #ifdef MODULE_UART0
 #include <sys/select.h>
