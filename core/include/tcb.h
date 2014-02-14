@@ -43,6 +43,13 @@
 #define STATUS_REPLY_BLOCKED    (0x0100)                      /**< waiting for a message response */
 #define STATUS_TIMER_WAITING    (0x0200)                      /**< waiting for a timer to fire
                                                                 *  (deprecated) */
+typedef struct msg_tcb_t {
+    void *wait_data;
+    queue_node_t msg_waiters;
+
+    cib_t msg_queue;
+    msg_t *msg_array;
+} msg_tcb_t;
 
 typedef struct tcb_t {
     char *sp;
@@ -53,11 +60,7 @@ typedef struct tcb_t {
 
     clist_node_t rq_entry;
 
-    void *wait_data;
-    queue_node_t msg_waiters;
-
-    cib_t msg_queue;
-    msg_t *msg_array;
+    msg_tcb_t *msg_tcb;
 
     const char *name;
     char *stack_start;

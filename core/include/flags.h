@@ -23,6 +23,7 @@
 #define AUTO_FREE           (2)
 #define CREATE_WOUT_YIELD   (4)
 #define CREATE_STACKTEST    (8)
+#define CREATE_NOMSG        (16)
 
 /** @} */
 #endif // _FLAGS_H

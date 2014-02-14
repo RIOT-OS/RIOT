@@ -39,7 +39,7 @@
 static int _msg_receive(msg_t *m, int block);
 
 
-static int queue_msg(tcb_t *target, msg_t *m)
+static int queue_msg(msg_tcb_t *target, msg_t *m)
 {
     int n = cib_put(&(target->msg_queue));
 
@@ -59,20 +59,20 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
 
     tcb_t *target = (tcb_t*) sched_threads[target_pid];
 
+    if (target == NULL || target->msg_tcb == NULL) {
+        return -1;
+    }
+
     m->sender_pid = thread_pid;
 
     if (m->sender_pid == target_pid) {
         return -1;
     }
 
-    if (target == NULL) {
-        return -1;
-    }
-
     dINT();
 
     if (target->status != STATUS_RECEIVE_BLOCKED) {
-        if (target->msg_array && queue_msg(target, m)) {
+        if (target->msg_tcb->msg_array && queue_msg(target->msg_tcb, m)) {
             eINT();
             return 1;
         }
@@ -83,6 +83,12 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
             return 0;
         }
 
+        if (active_thread->msg_tcb == NULL) {
+            DEBUG("msg_send: %s: Receiver not waiting, but sender has been created with CREATE_NOMSG.\n");
+            eINT();
+            return -1;
+        }
+
         DEBUG("msg_send: %s: send_blocked.\n", active_thread->name);
         queue_node_t n;
         n.priority = active_thread->priority;
@@ -90,9 +96,9 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
         n.next = NULL;
         DEBUG("msg_send: %s: Adding node to msg_waiters:\n", active_thread->name);
 
-        queue_priority_add(&(target->msg_waiters), &n);
+        queue_priority_add(&(target->msg_tcb->msg_waiters), &n);
 
-        active_thread->wait_data = (void*) m;
+        active_thread->msg_tcb->wait_data = (void*) m;
 
         int newstatus;
 
@@ -110,7 +116,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
     else {
         DEBUG("msg_send: %s: Direct msg copy from %i to %i.\n", active_thread->name, thread_getpid(), target_pid);
         /* copy msg to target */
-        msg_t *target_message = (msg_t*) target->wait_data;
+        msg_t *target_message = (msg_t*) target->msg_tcb->wait_data;
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
     }
@@ -125,13 +131,18 @@ int msg_send_int(msg_t *m, unsigned int target_pid)
 {
     tcb_t *target = (tcb_t *) sched_threads[target_pid];
 
+    if (target->msg_tcb == NULL) {
+        DEBUG("msg_send_int: target has been created with CREATE_NOMSG. Can't send.\n");
+        return -1;
+    }
+
     if (target->status == STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send_int: Direct msg copy from %i to %i.\n", thread_getpid(), target_pid);
 
         m->sender_pid = target_pid;
 
         /* copy msg to target */
-        msg_t *target_message = (msg_t*) target->wait_data;
+        msg_t *target_message = (msg_t*) target->msg_tcb->wait_data;
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
 
@@ -140,16 +151,21 @@ int msg_send_int(msg_t *m, unsigned int target_pid)
     }
     else {
         DEBUG("msg_send_int: Receiver not waiting.\n");
-        return (queue_msg(target, m));
+        return (queue_msg(target->msg_tcb, m));
     }
 }
 
 int msg_send_receive(msg_t *m, msg_t *reply, unsigned int target_pid)
 {
-    dINT();
     tcb_t *me = (tcb_t*) sched_threads[thread_pid];
+    if (me->msg_tcb == NULL) {
+        DEBUG("msg_send_int: target has been created with CREATE_NOMSG. Can't send.\n");
+        return -1;
+    }
+
+    dINT();
     sched_set_status(me, STATUS_REPLY_BLOCKED);
-    me->wait_data = (void*) reply;
+    me->msg_tcb->wait_data = (void*) reply;
 
     /* msg_send blocks until reply received */
 
@@ -175,7 +191,7 @@ int msg_reply(msg_t *m, msg_t *reply)
 
     DEBUG("msg_reply(): %s: Direct msg copy.\n", active_thread->name);
     /* copy msg to target */
-    msg_t *target_message = (msg_t*) target->wait_data;
+    msg_t *target_message = (msg_t*) target->msg_tcb->wait_data;
     *target_message = *reply;
     sched_set_status(target, STATUS_PENDING);
     restoreIRQ(state);
@@ -193,7 +209,7 @@ int msg_reply_int(msg_t *m, msg_t *reply)
         return -1;
     }
 
-    msg_t *target_message = (msg_t*) target->wait_data;
+    msg_t *target_message = (msg_t*) target->msg_tcb->wait_data;
     *target_message = *reply;
     sched_set_status(target, STATUS_PENDING);
     sched_context_switch_request = 1;
@@ -216,11 +232,16 @@ static int _msg_receive(msg_t *m, int block)
     DEBUG("_msg_receive: %s: _msg_receive.\n", active_thread->name);
 
     tcb_t *me = (tcb_t*) sched_threads[thread_pid];
+    if (!me->msg_tcb) {
+        DEBUG("_msg_receive(): can't receive messages (created with CREATE_NOMSG)\n");
+        eINT();
+        return -1;
+    }
 
     int queue_index = -1;
 
-    if (me->msg_array) {
-        queue_index = cib_get(&(me->msg_queue));
+    if (me->msg_tcb->msg_array) {
+        queue_index = cib_get(&(me->msg_tcb->msg_queue));
     }
 
     /* no message, fail */
@@ -230,13 +251,13 @@ static int _msg_receive(msg_t *m, int block)
 
     if (queue_index >= 0) {
         DEBUG("_msg_receive: %s: _msg_receive(): We've got a queued message.\n", active_thread->name);
-        *m = me->msg_array[queue_index];
+        *m = me->msg_tcb->msg_array[queue_index];
     }
     else {
-        me->wait_data = (void *) m;
+        me->msg_tcb->wait_data = (void *) m;
     }
 
-    queue_node_t *node = queue_remove_head(&(me->msg_waiters));
+    queue_node_t *node = queue_remove_head(&(me->msg_tcb->msg_waiters));
 
     if (node == NULL) {
         DEBUG("_msg_receive: %s: _msg_receive(): No thread in waiting list.\n", active_thread->name);
@@ -261,15 +282,15 @@ static int _msg_receive(msg_t *m, int block)
             /* We've already got a message from the queue. As there is a
              * waiter, take it's message into the just freed queue space.
              */
-            m = &(me->msg_array[cib_put(&(me->msg_queue))]);
+            m = &(me->msg_tcb->msg_array[cib_put(&(me->msg_tcb->msg_queue))]);
         }
 
         /* copy msg */
-        msg_t *sender_msg = (msg_t*) sender->wait_data;
+        msg_t *sender_msg = (msg_t*) sender->msg_tcb->wait_data;
         *m = *sender_msg;
 
         /* remove sender from queue */
-        sender->wait_data = NULL;
+        sender->msg_tcb->wait_data = NULL;
         sched_set_status(sender, STATUS_PENDING);
 
         eINT();
@@ -282,8 +303,8 @@ int msg_init_queue(msg_t *array, int num)
     /* check if num is a power of two by comparing to its complement */
     if (num && (num & (num - 1)) == 0) {
         tcb_t *me = (tcb_t*) active_thread;
-        me->msg_array = array;
-        cib_init(&(me->msg_queue), num);
+        me->msg_tcb->msg_array = array;
+        cib_init(&(me->msg_tcb->msg_queue), num);
         return 0;
     }
 
