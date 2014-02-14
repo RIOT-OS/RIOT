@@ -1,5 +1,5 @@
-ifneq (,$(findstring ltc4150,$(USEMODULE)))
-	ifeq (,$(findstring hwtimer,$(USEMODULE)))
+ifneq (,$(filter ltc4150,$(USEMODULE)))
+	ifeq (,$(filter hwtimer,$(USEMODULE)))
 		USEMODULE += hwtimer
 	endif
 endif

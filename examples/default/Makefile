@@ -35,19 +35,22 @@ USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += vtimer
 USEMODULE += auto_init
-ifneq (,$(findstring msb-430,$(BOARD)))
+ifneq (,$(filter msb-430,$(BOARD)))
 	USEMODULE += sht11
 endif
-ifneq (,$(findstring chronos,$(BOARD)))
+ifneq (,$(filter msb-430h,$(BOARD)))
+	USEMODULE += sht11
+endif
+ifneq (,$(filter chronos,$(BOARD)))
 	USEMODULE += cc110x_ng
 endif
-ifneq (,$(findstring wsn430-v1_3b,$(BOARD)))
+ifneq (,$(filter wsn430-v1_3b,$(BOARD)))
 	USEMODULE += cc110x_ng
 endif
-ifneq (,$(findstring msb-430h,$(BOARD)))
+ifneq (,$(filter msb-430h,$(BOARD)))
 	USEMODULE += cc110x_ng
 endif
-ifneq (,$(findstring msba2,$(BOARD)))
+ifneq (,$(filter msba2,$(BOARD)))
 	USEMODULE += sht11
 	USEMODULE += ltc4150
 	USEMODULE += rtc
@@ -56,7 +59,7 @@ ifneq (,$(findstring msba2,$(BOARD)))
 	USEMODULE += config
 	USEMODULE += random
 endif
-ifneq (,$(findstring native,$(BOARD)))
+ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += ltc4150
 	USEMODULE += rtc
 	USEMODULE += nativenet

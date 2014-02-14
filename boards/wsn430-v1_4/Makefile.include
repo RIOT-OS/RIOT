@@ -1,10 +1,10 @@
 export INCLUDES += -I$(RIOTBOARD)/wsn430-v1_4/include -I$(RIOTBOARD)/wsn430-common/include
 
-ifeq (,$(findstring cc2420,$(USEMODULE)))
+ifeq (,$(filter cc2420,$(USEMODULE)))
 	USEMODULE += cc2420
 endif
 
-ifneq (,$(findstring cc2420,$(USEMODULE)))
+ifneq (,$(filter cc2420,$(USEMODULE)))
 	INCLUDES += -I$(RIOTBASE)/drivers/cc2420/include \
 				-I$(RIOTBASE)/sys/net/include
 endif

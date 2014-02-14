@@ -3,10 +3,10 @@ MODULE = cpu
 EXCLUDES := -I$(RIOTBASE)/sys/posix/%
 
 DIRS =
-ifneq (,$(findstring rtc,$(USEMODULE)))
+ifneq (,$(filter rtc,$(USEMODULE)))
 	DIRS += rtc
 endif
-ifneq (,$(findstring nativenet,$(USEMODULE)))
+ifneq (,$(filter nativenet,$(USEMODULE)))
 	DIRS += net
 endif
 

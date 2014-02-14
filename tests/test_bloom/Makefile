@@ -7,8 +7,11 @@ export BOARD ?= native
 # this has to be the absolute path of the RIOT-base dir
 export RIOTBASE = $(CURDIR)/../..
 
-ifneq (,$(findstring msb-430,$(BOARD)))
-include $(RIOTBASE)/Makefile.unsupported
+ifneq (,$(filter msb-430,$(BOARD)))
+	include $(RIOTBASE)/Makefile.unsupported
+else
+ifneq (,$(filter msb-430h,$(BOARD)))
+	include $(RIOTBASE)/Makefile.unsupported
 else
 
 ## Modules to include.

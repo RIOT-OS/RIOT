@@ -1,20 +1,20 @@
-ifneq (,$(findstring cc110x,$(USEMODULE)))
-	ifeq (,$(findstring gpioint,$(USEMODULE)))
+ifneq (,$(filter cc110x,$(USEMODULE)))
+	ifeq (,$(filter gpioint,$(USEMODULE)))
 		USEMODULE += gpioint
 	endif
 endif
 
-ifneq (,$(findstring cc110x_ng,$(USEMODULE)))
-	ifeq (,$(findstring cc110x_spi,$(USEMODULE)))
+ifneq (,$(filter cc110x_ng,$(USEMODULE)))
+	ifeq (,$(filter cc110x_spi,$(USEMODULE)))
 		USEMODULE += cc110x_spi
 	endif
-	ifeq (,$(findstring gpioint,$(USEMODULE)))
+	ifeq (,$(filter gpioint,$(USEMODULE)))
 		USEMODULE += gpioint
 	endif
 endif
 
-ifneq (,$(findstring ltc4150,$(USEMODULE)))
-	ifeq (,$(findstring gpioint,$(USEMODULE)))
+ifneq (,$(filter ltc4150,$(USEMODULE)))
+	ifeq (,$(filter gpioint,$(USEMODULE)))
 		USEMODULE += gpioint
 	endif
 endif
