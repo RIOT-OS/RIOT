@@ -45,13 +45,16 @@ quad_t __fixsfdi(float x)
     if (x < 0) {
         if (x <= QUAD_MIN) {
             return QUAD_MIN;
-        } else {
+        }
+        else {
             return (quad_t) -(u_quad_t) -x;
         }
-    } else {
+    }
+    else {
         if (x >= QUAD_MAX) {
             return QUAD_MAX;
-        } else {
+        }
+        else {
             return (quad_t) (u_quad_t) x;
         }
     }

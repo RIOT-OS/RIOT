@@ -214,7 +214,8 @@ __qdivrem(u_quad_t uq, u_quad_t vq, u_quad_t *arq)
             qhat = B;
             rhat = uj1;
             goto qhat_too_big;
-        } else {
+        }
+        else {
             u_int nn = COMBINE(uj0, uj1);
             qhat = nn / v1;
             rhat = nn % v1;

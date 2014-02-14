@@ -110,13 +110,15 @@ quad_t __muldi3(quad_t a, quad_t b)
      */
     if (a >= 0) {
         u.q = a, negall = 0;
-    } else {
+    }
+    else {
         u.q = -a, negall = 1;
     }
 
     if (b >= 0) {
         v.q = b;
-    } else {
+    }
+    else {
         v.q = -b, negall ^= 1;
     }
 
@@ -127,7 +129,8 @@ quad_t __muldi3(quad_t a, quad_t b)
          * are small.  Here the product is just u0*v0.
          */
         prod.q = __lmulq(u0, v0);
-    } else {
+    }
+    else {
         /*
          * Compute the three intermediate products, remembering
          * whether the middle term is negative.  We can discard
@@ -138,13 +141,15 @@ quad_t __muldi3(quad_t a, quad_t b)
 
         if (u1 >= u0) {
             negmid = 0, udiff = u1 - u0;
-        } else {
+        }
+        else {
             negmid = 1, udiff = u0 - u1;
         }
 
         if (v0 >= v1) {
             vdiff = v0 - v1;
-        } else {
+        }
+        else {
             vdiff = v1 - v0, negmid ^= 1;
         }
 
@@ -204,13 +209,15 @@ static quad_t __lmulq(u_int u, u_int v)
 
     if (u1 >= u0) {
         udiff = u1 - u0, neg = 0;
-    } else {
+    }
+    else {
         udiff = u0 - u1, neg = 1;
     }
 
     if (v0 >= v1) {
         vdiff = v0 - v1;
-    } else {
+    }
+    else {
         vdiff = v1 - v0, neg ^= 1;
     }
 
@@ -227,7 +234,8 @@ static quad_t __lmulq(u_int u, u_int v)
         was = prodl;
         prodl -= LHUP(mid);
         prodh -= HHALF(mid) + (prodl > was);
-    } else {
+    }
+    else {
         was = prodl;
         prodl += LHUP(mid);
         prodh += HHALF(mid) + (prodl < was);
