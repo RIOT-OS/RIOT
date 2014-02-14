@@ -95,7 +95,7 @@ static void sem_thread_blocked(sem_t *sem)
 int sem_wait(sem_t *sem)
 {
     int old_state = disableIRQ();
-    for (;;) {
+    while (1) {
         unsigned value = sem->value;
         if (value == 0) {
             sem_thread_blocked(sem);

@@ -68,7 +68,7 @@ void init_udp_server(void)
         destiny_socket_close(sock);
     }
 
-    for (;;) {
+    while (1) {
         recsize = destiny_socket_recvfrom(sock, (void *)buffer_main, UDP_BUFFER_SIZE, 0,
                                           &sa, &fromlen);
 
