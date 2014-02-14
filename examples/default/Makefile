@@ -40,14 +40,12 @@ ifneq (,$(filter msb-430,$(BOARD)))
 endif
 ifneq (,$(filter msb-430h,$(BOARD)))
 	USEMODULE += sht11
+	USEMODULE += cc110x_ng
 endif
 ifneq (,$(filter chronos,$(BOARD)))
 	USEMODULE += cc110x_ng
 endif
 ifneq (,$(filter wsn430-v1_3b,$(BOARD)))
-	USEMODULE += cc110x_ng
-endif
-ifneq (,$(filter msb-430h,$(BOARD)))
 	USEMODULE += cc110x_ng
 endif
 ifneq (,$(filter msba2,$(BOARD)))
