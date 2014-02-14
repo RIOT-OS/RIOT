@@ -90,8 +90,10 @@ static void print_help(const shell_command_t *command_list)
 
 static void handle_input_line(shell_t *shell, char *line)
 {
+    char line_copy[shell->shell_buffer_size];
     char *saveptr;
-    char *command = strtok_r(line, " ", &saveptr);
+    strncpy(line_copy, line, sizeof(line_copy));
+    char *command = strtok_r(line_copy, " ", &saveptr);
 
     void (*handler)(char *) = NULL;
 
