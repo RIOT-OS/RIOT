@@ -30,13 +30,13 @@ void _gettime_handler(void)
     printf("%s", asctime(&now));
 }
 
-void _settime_handler(char *c)
+void _settime_handler(char *tok)
 {
     struct tm now;
     int res;
     uint16_t month, epoch_year;
 
-    res = sscanf(c, "date %hu-%hu-%u %u:%u:%u",
+    res = sscanf(tok, "%hu-%hu-%u %u:%u:%u",
                  &epoch_year,
                  &month,
                  (unsigned int *) & (now.tm_mday),
@@ -57,13 +57,14 @@ void _settime_handler(char *c)
     rtc_set_localtime(&now);
 }
 
-void _date_handler(char *c)
+void _date_handler(char *tok)
 {
-    if (strlen(c) == 4) {
+    /* XXX: relies strtok implementation internals */
+    if (strlen(tok) == 0) {
         _gettime_handler();
     }
     else {
-        _settime_handler(c);
+        _settime_handler(tok);
     }
 }
 
