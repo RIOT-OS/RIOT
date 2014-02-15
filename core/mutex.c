@@ -108,7 +108,7 @@ void mutex_unlock(struct mutex_t *mutex)
             DEBUG("%s: waking up waiter.\n", process->name);
             sched_set_status(process, STATUS_PENDING);
 
-            sched_switch(active_thread->priority, process->priority, inISR());
+            sched_switch(active_thread->priority, process->priority);
         }
         else {
             mutex->val = 0;
