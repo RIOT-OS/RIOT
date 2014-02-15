@@ -52,8 +52,8 @@ unsigned enableIRQ(void);
 void restoreIRQ(unsigned state);
 
 /**
- * @brief   Checks if the mcu is currently processing an interrupt.
- * @return  true, if in interrupt service routine
+ * @brief   Check whether called from interrupt service routine
+ * @return  true, if in interrupt service routine, false if not
  */
 int inISR(void);
 
