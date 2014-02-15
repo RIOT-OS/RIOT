@@ -58,5 +58,3 @@ valgrind:
 #	echo 0 > /proc/sys/kernel/yama/ptrace_scope
 #	VALGRIND_FLAGS += --db-attach=yes
 	$(VALGRIND) $(VALGRIND_FLAGS) $(ELF) $(PORT)
-
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep

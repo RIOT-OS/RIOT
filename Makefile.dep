@@ -44,9 +44,6 @@ ifneq (,$(filter cc110x_ng,$(USEMODULE)))
 	ifeq (,$(filter transceiver,$(USEMODULE)))
 		USEMODULE += transceiver
 	endif
-	ifeq (,$(filter hwtimer,$(USEMODULE)))
-		USEMODULE += hwtimer
-	endif
 endif
 
 ifneq (,$(filter cc2420,$(USEMODULE)))
@@ -101,9 +98,6 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
 endif
 
 ifneq (,$(filter vtimer,$(USEMODULE)))
-	ifeq (,$(filter hwtimer,$(USEMODULE)))
-		USEMODULE += hwtimer
-	endif
 	ifeq (,$(filter timex,$(USEMODULE)))
 		USEMODULE += timex
 	endif

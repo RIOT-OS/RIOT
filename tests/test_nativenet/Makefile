@@ -6,7 +6,6 @@ include $(RIOTBASE)/Makefile.unsupported
 else
 
 USEMODULE += auto_init
-USEMODULE += hwtimer
 USEMODULE += nativenet
 USEMODULE += transceiver
 
