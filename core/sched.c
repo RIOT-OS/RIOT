@@ -28,6 +28,7 @@
 #include "clist.h"
 #include "bitarithm.h"
 #include "thread.h"
+#include "irq.h"
 
 #if SCHEDSTATISTICS
 #include "hwtimer.h"

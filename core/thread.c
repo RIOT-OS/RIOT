@@ -23,6 +23,7 @@
 
 #include "thread.h"
 #include "kernel.h"
+#include "irq.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"

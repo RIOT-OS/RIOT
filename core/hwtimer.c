@@ -27,6 +27,7 @@
 #include "thread.h"
 #include "lifo.h"
 #include "mutex.h"
+#include "irq.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
