@@ -20,17 +20,17 @@
 #include "thread.h"
 #include "hwtimer.h"
 #include "sched.h"
+#include "tcb.h"
 
-/* list of states copied from tcb.h */
-const char *state_names[] = {
-    "running",
-    "pending",
-    "stopped",
-    "sleeping",
-    "bl mutex",
-    "bl rx",
-    "bl send",
-    "bl reply"
+static const char *const state_names[] = {
+    [STATUS_RUNNING >> STATUS_RUNLEVEL_SHIFT] = "running",
+    [STATUS_PENDING >> STATUS_RUNLEVEL_SHIFT] = "pending",
+    [STATUS_STOPPED >> STATUS_RUNLEVEL_SHIFT] = "stopped",
+    [STATUS_SLEEPING >> STATUS_RUNLEVEL_SHIFT] = "sleeping",
+    [STATUS_MUTEX_BLOCKED >> STATUS_RUNLEVEL_SHIFT] = "bl mutex",
+    [STATUS_RECEIVE_BLOCKED >> STATUS_RUNLEVEL_SHIFT] = "bl rx",
+    [STATUS_SEND_BLOCKED >> STATUS_RUNLEVEL_SHIFT] = "bl send",
+    [STATUS_REPLY_BLOCKED >> STATUS_RUNLEVEL_SHIFT] = "bl reply"
 };
 
 /**
@@ -41,7 +41,7 @@ void thread_print_all(void)
     extern unsigned long hwtimer_now(void);
     const char queued_name[] = {'_', 'Q'};
     int i;
-    int overall_stacksz = 0;
+    int overall_stacksz = 0, overall_usedstacksz = 0;
 
     printf("\tpid | %-21s| %-9sQ | pri | stack ( used) location  | runtime | switches \n", "name", "state");
 
@@ -49,11 +49,10 @@ void thread_print_all(void)
         tcb_t *p = (tcb_t *)sched_threads[i];
 
         if (p != NULL) {
-            int state = p->status;                                          // copy state
-            int statebit = number_of_highest_bit(state >> 1);               // get state index
-            const char *sname = state_names[statebit];                      // get state name
-            const char *queued = queued_name + (state & BIT0);              // get queued flag
-            int stacksz = p->stack_size;                                    // get stack size
+            int runlevel = thread_runlevel(p);                                   // copy runlevel
+            const char *sname = state_names[runlevel >> STATUS_RUNLEVEL_SHIFT];  // get state name
+            const char queued = queued_name[!!(p->status & STATUS_ON_RUNQUEUE)]; // get queued flag
+            int stacksz = p->stack_size;                                         // get stack size
             double runtime_ticks = 0 / 0.0;
             int switches = -1;
 #if SCHEDSTATISTICS
@@ -62,11 +61,13 @@ void thread_print_all(void)
 #endif
             overall_stacksz += stacksz;
             stacksz -= thread_measure_stack_free(p->stack_start);
-            printf("\t%3u | %-21s| %-8s %.1s | %3i | %5i (%5i) %p | %6.3f%% | ",
+            overall_usedstacksz += stacksz;
+            printf("\t%3u | %-21s| %-8s %c | %3i | %5i (%5i) %p | %6.3f%% | ",
                    p->pid, p->name, sname, queued, p->priority, p->stack_size, stacksz, p->stack_start, runtime_ticks);
             printf(" %8u\n", switches);
         }
     }
 
-    printf("\t%5s %-21s|%13s%6s %5i\n", "|", "SUM", "|", "|", overall_stacksz);
+    printf("\t%5s %-21s|%13s%6s %5i (%5i)\n",
+           "|", "SUM", "|", "|", overall_stacksz, overall_usedstacksz);
 }

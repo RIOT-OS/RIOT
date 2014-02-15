@@ -42,15 +42,6 @@ int thread_getlastpid()
     return last_pid;
 }
 
-unsigned int thread_getstatus(int pid)
-{
-    if (sched_threads[pid] == NULL) {
-        return STATUS_NOT_FOUND;
-    }
-
-    return sched_threads[pid]->status;
-}
-
 const char *thread_getname(int pid)
 {
     if (sched_threads[pid] == NULL) {
@@ -82,7 +73,7 @@ int thread_wakeup(int pid)
         dINT();
     }
 
-    int result = sched_threads[pid]->status;
+    int result = thread_runlevel((tcb_t *) sched_threads[pid]);
 
     if (result == STATUS_SLEEPING) {
         DEBUG("thread_wakeup: Thread is sleeping.\n");
@@ -194,7 +185,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     cb->stack_size = total_stacksize;
 
     cb->priority = priority;
-    cb->status = 0;
+    cb->status = STATUS_NOT_FOUND;
 
     cb->rq_entry.data = (unsigned int) cb;
     cb->rq_entry.next = NULL;

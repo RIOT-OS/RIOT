@@ -103,7 +103,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
         mutex_unlock(&tcp_socket->tcp_buffer_mutex);
     }
 
-    if (thread_getstatus(tcp_socket->recv_pid) == STATUS_RECEIVE_BLOCKED) {
+    if (thread_runlevel(tcp_socket->recv_pid) == STATUS_RECEIVE_BLOCKED) {
         net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->recv_pid, UNDEFINED);
     }
 

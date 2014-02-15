@@ -614,7 +614,7 @@ void handle_packet_fragment(uint8_t *data, uint8_t datagram_offset,
         if (current_buf->current_packet_size == current_buf->packet_size) {
             add_fifo_packet(current_buf);
 
-            if (thread_getstatus(transfer_pid) == STATUS_SLEEPING) {
+            if (thread_runlevel(transfer_pid) == STATUS_SLEEPING) {
                 thread_wakeup(transfer_pid);
             }
         }
@@ -795,7 +795,7 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
         else {
             DEBUG("ERROR: no memory left in packet buffer!\n");
         }
-        if (thread_getstatus(transfer_pid) == STATUS_SLEEPING) {
+        if (thread_runlevel(transfer_pid) == STATUS_SLEEPING) {
             thread_wakeup(transfer_pid);
         }
     }
