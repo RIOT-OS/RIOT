@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 #include "cpu.h"
+#include "kernel.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -105,4 +106,29 @@ void restore_context(void)
 //	asm("pop 		{r4}"); /*foo*/
 	asm("bx		r0");				/* load exception return value to pc causes end of exception*/
 							/* {r0-r3,r12,LR,PC,xPSR} are restored automatically on exception return */
+}
+
+#define USR_RESET   (0x102)
+#define SWI         (0xAB)
+
+__attribute__((naked,noreturn)) void arm_reset(void)
+{
+     int value;
+
+     asm volatile (
+        "mov r0, %1"          "\n\t"
+        "mov r1, %2"          "\n\t"
+        "bkpt" " %a3"   "\n\t"
+        "mov %0, r0"
+        : "=r" (value)                                         /* output operands             */
+        : "r" USR_RESET, "r" NULL, "i" SWI                     /* input operands              */
+        : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc"   /* list of clobbered registers */
+     );
+}
+
+NORETURN void reboot(void)
+{
+    while (1) {
+        arm_reset();
+    }
 }
