@@ -26,3 +26,5 @@ include $(RIOTBOARD)/msba2-common/Makefile.dep
 export INCLUDES += -I$(RIOTBOARD)/msba2-common/include -I$(RIOTBOARD)/msba2-common/drivers/include
 
 export OFLAGS = -O ihex
+
+export UNDEF += $(BINDIR)cpu/startup.o

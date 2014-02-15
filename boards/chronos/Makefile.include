@@ -14,11 +14,13 @@ export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
-export LINKFLAGS = -mmcu=$(MCU) -lgcc $(BINDIR)startup.o
+export LINKFLAGS = -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
 export FLASHER = mspdebug
 export HEXFILE = $(BINDIR)$(PROJECT).hex
 export USEMODULE += msp430_common
 export FFLAGS = rf2500 "prog $(HEXFILE)"
 export OFLAGS = -O ihex
+
+export UNDEF += $(BINDIR)msp430_common/startup.o
 
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep

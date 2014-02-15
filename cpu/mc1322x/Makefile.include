@@ -2,6 +2,6 @@ INCLUDES += -I$(RIOTBASE)/cpu/mc1322x/include
 
 include $(RIOTCPU)/arm_common/Makefile.include
 
-export UNDEF += $(BINDIR)mc1322x_syscalls.o
+export UNDEF += $(BINDIR)cpu/mc1322x_syscalls.o
 
 export USEMODULE += arm_common
