@@ -25,7 +25,7 @@ ifneq (,$(filter uart0,$(USEMODULE)))
 	endif
 endif
 
-ifneq (,$(filter cc110x,$(USEMODULE)))
+ifneq (,$(filter cc110x%,$(USEMODULE)))
 	ifeq (,$(filter protocol_multiplex,$(USEMODULE)))
 		USEMODULE += protocol_multiplex
 	endif

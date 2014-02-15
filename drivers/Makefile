@@ -14,11 +14,10 @@ ifneq (,$(filter ltc4150,$(USEMODULE)))
     DIRS += ltc4150
 endif
 ifneq (,$(filter cc110x,$(USEMODULE)))
-    ifneq (,$(filter cc110x_ng,$(USEMODULE)))
-    	DIRS += cc110x_ng
-    else
-    	DIRS += cc110x
-    endif
+    DIRS += cc110x
+endif
+ifneq (,$(filter cc110x_ng,$(USEMODULE)))
+    DIRS += cc110x_ng
 endif
 ifneq (,$(filter at86rf231,$(USEMODULE)))
     DIRS += at86rf231
