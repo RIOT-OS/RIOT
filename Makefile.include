@@ -19,7 +19,7 @@ $(error This application only runs on following boards: $(BOARD_WHITELIST))
 		endif
 	endif
 
-	ifneq (,$(findstring $(BOARD),$(BOARD_BLACKLIST)))
+	ifneq (,$(filter $(BOARD),$(BOARD_BLACKLIST)))
 $(error This application does not run on following boards: $(BOARD_BLACKLIST))
 	endif
 endif
