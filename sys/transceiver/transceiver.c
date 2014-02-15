@@ -1008,8 +1008,9 @@ static void switch_to_rx(transceiver_type_t t)
 }
 
 #ifdef DBG_IGNORE
-static int16_t ignore_add(transceiver_type_t t, void *address)
+static int16_t ignore_add(transceiver_type_t unused, void *address)
 {
+    (void) unused;
     radio_address_t addr = *((radio_address_t *)address);
 
     for (uint8_t i = 0; i < MAX_IGNORED_ADDR; i++) {
