@@ -144,6 +144,21 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
 
     tcb_t *cb = (tcb_t *) tcb_address;
 
+    /* allocate messaging tcb if needed */
+    if (! (flags & CREATE_NOMSG)) {
+        stacksize -= sizeof(msg_tcb_t);
+        cb->msg_tcb = (msg_tcb_t*) ((unsigned int) stack + stacksize);
+
+        cb->msg_tcb->wait_data = NULL;
+
+        cb->msg_tcb->msg_waiters.data = 0;
+        cb->msg_tcb->msg_waiters.priority = 0;
+        cb->msg_tcb->msg_waiters.next = NULL;
+
+        cib_init(&(cb->msg_tcb->msg_queue), 0);
+        cb->msg_tcb->msg_array = NULL;
+    }
+
     if (priority >= SCHED_PRIO_LEVELS) {
         return -EINVAL;
     }
@@ -201,15 +216,6 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     cb->rq_entry.prev = NULL;
 
     cb->name = name;
-
-    cb->wait_data = NULL;
-
-    cb->msg_waiters.data = 0;
-    cb->msg_waiters.priority = 0;
-    cb->msg_waiters.next = NULL;
-
-    cib_init(&(cb->msg_queue), 0);
-    cb->msg_array = NULL;
 
     num_tasks++;
 
