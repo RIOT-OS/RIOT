@@ -20,18 +20,17 @@
 #include <stdlib.h>
 #include "config.h"
 
-void _id_handler(char *id)
+void _id_handler(char *tok)
 {
-    long newid;
+    tok = strtok(tok, " ");
 
-    newid = atoi(id + 3);
-
-    if (strlen(id) < 3) {
+    if (!tok) {
 #ifdef MODULE_CONFIG
         printf("Current id: %u\n", sysconfig.id);
 #endif
     }
     else {
+        long newid = atoi(tok);
         printf("Setting new id %lu\n", newid);
 #ifdef MODULE_CONFIG
         sysconfig.id = newid;
@@ -39,7 +38,6 @@ void _id_handler(char *id)
         if (!config_save()) {
             puts("ERROR setting new id");
         }
-
 #endif
     }
 }
