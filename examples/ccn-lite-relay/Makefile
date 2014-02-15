@@ -32,7 +32,6 @@ export QUIET ?= 1
 USEMODULE += config
 USEMODULE += posix
 USEMODULE += auto_init
-USEMODULE += hwtimer
 
 USEMODULE += auto_init
 

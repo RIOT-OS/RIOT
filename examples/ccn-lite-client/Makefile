@@ -35,7 +35,6 @@ USEMODULE += shell_commands
 USEMODULE += posix
 USEMODULE += ps
 USEMODULE += auto_init
-USEMODULE += hwtimer
 USEMODULE += random
 USEMODULE += transceiver
 ifeq ($(BOARD),msba2)

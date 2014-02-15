@@ -30,6 +30,7 @@
 #include "cpu.h"
 #include "lpm.h"
 #include "thread.h"
+#include "hwtimer.h"
 
 #ifdef MODULE_AUTO_INIT
 #include <auto_init.h>
@@ -69,6 +70,8 @@ void kernel_init(void)
 {
     dINT();
     printf("kernel_init(): This is RIOT! (Version: %s)\n", VERSION);
+
+    hwtimer_init();
 
     if (thread_create(idle_stack, sizeof(idle_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, idle_name) < 0) {
         printf("kernel_init(): error creating idle task.\n");

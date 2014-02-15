@@ -19,10 +19,6 @@
 
 #include "auto_init.h"
 
-#ifdef MODULE_HWTIMER
-#include "hwtimer.h"
-#endif
-
 #ifdef MODULE_SHT11
 #include "sht11.h"
 #endif
@@ -66,10 +62,6 @@ extern int main(void);
 
 void auto_init(void)
 {
-#ifdef MODULE_HWTIMER
-    DEBUG("Auto init hwtimer module.\n");
-    hwtimer_init();
-#endif
 #ifdef MODULE_VTIMER
     DEBUG("Auto init vtimer module.\n");
     vtimer_init();
