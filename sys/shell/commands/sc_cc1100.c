@@ -23,13 +23,12 @@
 #include "cc110x.h"
 
 
-void _cc110x_get_set_address_handler(char *addr)
+void _cc110x_get_set_address_handler(char *tok)
 {
-    int16_t a;
+    tok = strtok(tok, " ");
 
-    a = atoi(addr + 5);
-
-    if (strlen(addr) > 5) {
+    if (tok) {
+        int16_t a = atoi(tok);
         printf("[cc110x] Setting address %i ... ", a);
         cc1100_set_address((radio_address_t)a);
 
@@ -45,13 +44,12 @@ void _cc110x_get_set_address_handler(char *addr)
     }
 }
 
-void _cc110x_get_set_channel_handler(char *addr)
+void _cc110x_get_set_channel_handler(char *tok)
 {
-    int16_t a;
+    tok = strtok(tok, " ");
 
-    a = atoi(addr + 5);
-
-    if (strlen(addr) > 5) {
+    if (tok) {
+        int16_t a = atoi(tok);
         printf("[cc110x] Setting channel %i...", a);
         cc1100_set_channel(a);
 

@@ -52,7 +52,7 @@
 
 
 /* checked for type safety */
-void _transceiver_get_set_address_handler(char *addr)
+void _transceiver_get_set_address_handler(char *tok)
 {
     msg_t mesg;
     transceiver_command_t tcmd;
@@ -67,8 +67,10 @@ void _transceiver_get_set_address_handler(char *addr)
     tcmd.data = &a;
     mesg.content.ptr = (char *) &tcmd;
 
-    if (strlen(addr) > 5) {
-        a = atoi(addr + 5);
+    tok = strtok(tok , " ");
+
+    if (tok) {
+        a = atoi(tok);
         printf("[transceiver] trying to set address %"PRIu16"\n", a);
         mesg.type = SET_ADDRESS;
     }
@@ -81,7 +83,7 @@ void _transceiver_get_set_address_handler(char *addr)
 }
 
 /* checked for type safety */
-void _transceiver_get_set_channel_handler(char *chan)
+void _transceiver_get_set_channel_handler(char *tok)
 {
     msg_t mesg;
     transceiver_command_t tcmd;
@@ -96,8 +98,10 @@ void _transceiver_get_set_channel_handler(char *chan)
     tcmd.data = &c;
     mesg.content.ptr = (char *) &tcmd;
 
-    if (strlen(chan) > 5) {
-        c = atoi(chan + 5);
+    tok = strtok(tok , " ");
+
+    if (tok) {
+        c = atoi(tok);
         printf("[transceiver] Trying to set channel %"PRIi32"\n", c);
         mesg.type = SET_CHANNEL;
     }
@@ -114,7 +118,7 @@ void _transceiver_get_set_channel_handler(char *chan)
     }
 }
 
-void _transceiver_send_handler(char *pkt)
+void _transceiver_send_handler(char *tok)
 {
     msg_t mesg;
     transceiver_command_t tcmd;
@@ -123,7 +127,6 @@ void _transceiver_send_handler(char *pkt)
     radio_packet_t p;
     int8_t response;
     radio_address_t addr;
-    char *tok;
 
     if (transceiver_pid < 0) {
         puts("Transceiver not initialized");
@@ -133,7 +136,7 @@ void _transceiver_send_handler(char *pkt)
     tcmd.transceivers = _TC_TYPE;
     tcmd.data = &p;
 
-    tok = strtok(pkt + 7, " ");
+    tok = strtok(tok , " ");
 
     if (tok) {
         addr = atoi(tok);
@@ -159,7 +162,7 @@ void _transceiver_send_handler(char *pkt)
 }
 
 /* checked for type safety */
-void _transceiver_monitor_handler(char *mode)
+void _transceiver_monitor_handler(char *tok)
 {
     msg_t mesg;
     transceiver_command_t tcmd;
@@ -174,8 +177,10 @@ void _transceiver_monitor_handler(char *mode)
     tcmd.data = &m;
     mesg.content.ptr = (char *) &tcmd;
 
-    if (strlen(mode) > 8) {
-        m = atoi(mode + 8);
+    tok = strtok(tok , " ");
+
+    if (tok) {
+        m = atoi(tok);
         printf("Setting monitor mode: %"PRIu8"\n", m);
         mesg.type = SET_MONITOR;
         msg_send(&mesg, transceiver_pid, 1);
@@ -186,7 +191,7 @@ void _transceiver_monitor_handler(char *mode)
 }
 
 /* checked for type safety */
-void _transceiver_get_set_pan_handler(char *pan) {
+void _transceiver_get_set_pan_handler(char *tok) {
     transceiver_command_t tcmd;
     msg_t mesg;
     int32_t p;
@@ -199,8 +204,11 @@ void _transceiver_get_set_pan_handler(char *pan) {
     tcmd.transceivers = _TC_TYPE;
     tcmd.data = &p;
     mesg.content.ptr = (char*) &tcmd;
-    if (strlen(pan) > 4) {
-        p = atoi(pan+4);
+
+    tok = strtok(tok , " ");
+
+    if (tok) {
+        p = atoi(tok);
         printf("[transceiver] Trying to set pan %"PRIi32"\n", p);
         mesg.type = SET_PAN;
     }
@@ -218,7 +226,7 @@ void _transceiver_get_set_pan_handler(char *pan) {
 
 /* checked for type safety */
 #ifdef DBG_IGNORE
-void _transceiver_set_ignore_handler(char *addr)
+void _transceiver_set_ignore_handler(char *tok)
 {
     transceiver_command_t tcmd;
     msg_t mesg;
@@ -234,8 +242,10 @@ void _transceiver_set_ignore_handler(char *addr)
     tcmd.data = &a;
     mesg.content.ptr = (char*) &tcmd;
 
-    if (strlen(addr) > 4) {
-        a = atoi(addr + 4);
+    tok = strtok(tok , " ");
+
+    if (tok) {
+        a = atoi(tok);
         printf("[transceiver] trying to add address %"PRIu16" to the ignore list \n", a);
         mesg.type = DBG_IGN;
         msg_send_receive(&mesg, &mesg, transceiver_pid);

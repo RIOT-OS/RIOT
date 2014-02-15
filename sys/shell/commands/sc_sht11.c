@@ -68,13 +68,14 @@ void _get_weather_handler(char *unused)
     }
 }
 
-void _set_offset_handler(char *offset)
+void _set_offset_handler(char *tok)
 {
-    if (strlen(offset) == 6) {
+    tok = strtok(tok, " ");
+    if (!tok) {
         puts("Usage: offset <OFFSET>");
     }
     else {
-        sht11_temperature_offset = atoi(offset + 7);
+        sht11_temperature_offset = atoi(tok);
         printf("Temperature offset set to %f\n", (double) sht11_temperature_offset);
     }
 }

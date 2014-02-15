@@ -80,14 +80,16 @@ void _get_sectorcount(char *unused)
     }
 }
 
-void _read_sector(char *sector)
+void _read_sector(char *tok)
 {
     unsigned long sectornr, scount;
     unsigned short ssize;
 
-    if (strlen(sector) > strlen(DISK_READ_SECTOR_CMD) + 1) {
+    tok = strtok(tok, " ");
 
-        sectornr = atol(sector + strlen(DISK_READ_SECTOR_CMD) + 1);
+    if (tok) {
+
+        sectornr = atol(tok);
 
         if ((MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) && (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK)) {
             unsigned char read_buf[ssize];
@@ -105,14 +107,13 @@ void _read_sector(char *sector)
     }
 }
 
-void _read_bytes(char *bytes)
+void _read_bytes(char *tok)
 {
     unsigned long sector = 1, scount, offset;
     unsigned short ssize, length;
-    char *tok;
 
     /* tokenize user input */
-    tok = strtok(bytes + strlen(DISK_READ_BYTES_CMD) + 1, " ");
+    tok = strtok(tok, " ");
 
     if (tok) {
         offset = atol(tok);

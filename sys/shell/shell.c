@@ -19,8 +19,9 @@
  * @brief 		Implementation of a very simple command interpreter.
  *              For each command (i.e. "echo"), a handler can be specified.
  *              If the first word of a user-entered command line matches the
- *              name of a handler, the handler will be called with the whole
- *              command line as parameter.
+ *              name of a handler, the handler will be called.
+ *              The handler receives a pointer to a char* that can be
+ *              used with strtok to parse parameters.
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Kaspar Schleiser <kaspar@schleiser.de>
@@ -99,7 +100,7 @@ static void handle_input_line(shell_t *shell, char *line)
         handler = find_handler(shell->command_list, command);
 
         if (handler != NULL) {
-            handler(line);
+            handler(saveptr);
         }
         else {
             if (strcmp("help", command) == 0) {
