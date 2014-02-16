@@ -36,7 +36,9 @@
 #include "sixlowpan/ndp.h"
 
 #include "lowpan.h"
-#include "border.h"
+#ifdef MODULE_SIXLOWBORDER
+#include "border/border.h"
+#endif
 #include "ip.h"
 #include "icmp.h"
 

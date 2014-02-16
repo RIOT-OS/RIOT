@@ -79,6 +79,12 @@ ifneq (,$(filter destiny,$(USEMODULE)))
 	endif
 endif
 
+ifneq (,$(filter sixlowborder,$(USEMODULE)))
+	ifeq (,$(filter sixlowpan,$(USEMODULE)))
+		USEMODULE += sixlowpan
+	endif
+endif
+
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
 	ifeq (,$(filter ieee802154,$(USEMODULE)))
 		USEMODULE += ieee802154
