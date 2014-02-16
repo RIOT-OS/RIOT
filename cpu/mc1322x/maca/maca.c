@@ -819,7 +819,8 @@ const uint32_t AIMVAL[19] = {
 //     uint32_t val = *(uint32_t*)(MRRF_BASE);
 //     if ( demod == MACA_DEMOD_NCD ) {
 //         val = (val & ~1);
-//     } else {
+//     }
+//     else {
 //         val = (val | 1);
 //     }
 //     *(uint32_t*)(MRRF_BASE) = val;

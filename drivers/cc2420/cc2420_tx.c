@@ -31,14 +31,16 @@ int16_t cc2420_send(cc2420_packet_t *packet)
     packet->frame.fcf.frame_ver = 0;
     if(packet->frame.src_pan_id == packet->frame.dest_pan_id) {
         packet->frame.fcf.panid_comp = 1;
-    } else {
+    }
+    else {
         packet->frame.fcf.panid_comp = 0;
     }
 
     if(packet->frame.fcf.src_addr_m == 2) {
         packet->frame.src_addr[1] = (uint8_t)(cc2420_get_address() >> 8);
         packet->frame.src_addr[0] = (uint8_t)(cc2420_get_address() & 0xFF);
-    } else if (packet->frame.fcf.src_addr_m == 3) {
+    }
+    else if (packet->frame.fcf.src_addr_m == 3) {
         packet->frame.src_addr[7] = (uint8_t)(cc2420_get_address_long() >> 56);
         packet->frame.src_addr[6] = (uint8_t)(cc2420_get_address_long() >> 48);
         packet->frame.src_addr[5] = (uint8_t)(cc2420_get_address_long() >> 40);

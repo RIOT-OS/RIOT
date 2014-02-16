@@ -199,7 +199,8 @@ interrupt (PORT1_VECTOR) __attribute__ ((naked)) cc2420_isr(void){
         puts("[CC2420] rxfifo overflow");
         //P1IE &= ~CC2420_GDO0_PIN;                // Disable interrupt for GDO0
         P1IFG &= ~CC2420_GDO0_PIN;                // Clear IFG for GDO0
-    } else if ((P1IFG & CC2420_SFD_PIN) != 0) {
+    }
+    else if ((P1IFG & CC2420_SFD_PIN) != 0) {
         puts("sfd interrupt");
         P1IFG &= ~CC2420_SFD_PIN;
         cc2420_switch_to_rx();
