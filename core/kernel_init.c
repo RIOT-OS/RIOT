@@ -70,8 +70,6 @@ void kernel_init(void)
     dINT();
     printf("kernel_init(): This is RIOT! (Version: %s)\n", VERSION);
 
-    sched_init();
-
     if (thread_create(idle_stack, sizeof(idle_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, idle_name) < 0) {
         printf("kernel_init(): error creating idle task.\n");
     }
