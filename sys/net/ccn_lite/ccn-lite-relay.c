@@ -333,7 +333,8 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
         hwtimer_id = hwtimer_set(HWTIMER_TICKS(us), ccnl_timeout_callback, ccnl);
         if (hwtimer_id == -1) {
             puts("NO MORE TIMERS!");
-        } else {
+        }
+        else {
             //DEBUGMSG(1, "hwtimer_id is %d\n", hwtimer_id);
         }
         msg_receive(&in);

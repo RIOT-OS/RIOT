@@ -50,21 +50,22 @@ void cc2420_rx_handler(void)
                           cc2420_rx_buffer[rx_buffer_next].length-2);
     if(cc2420_rx_buffer[rx_buffer_next].frame.fcf.frame_type != 2) {
 #ifdef DEBUG
-    ieee802154_frame_print_fcf_frame(&cc2420_rx_buffer[rx_buffer_next].frame);
-#endif
-    /* notify transceiver thread if any */
-    if (transceiver_pid) {
-        msg_t m;
-        m.type = (uint16_t) RCV_PKT_CC2420;
-        m.content.value = rx_buffer_next;
-        msg_send_int(&m, transceiver_pid);
-    }
-    } else {
-#ifdef DEBUG
-        DEBUG("GOT ACK for SEQ %u\n", cc2420_rx_buffer[rx_buffer_next].frame.seq_nr);
         ieee802154_frame_print_fcf_frame(&cc2420_rx_buffer[rx_buffer_next].frame);
 #endif
+        /* notify transceiver thread if any */
+        if (transceiver_pid) {
+            msg_t m;
+            m.type = (uint16_t) RCV_PKT_CC2420;
+            m.content.value = rx_buffer_next;
+            msg_send_int(&m, transceiver_pid);
+        }
     }
+#ifdef DEBUG
+    else {
+        DEBUG("GOT ACK for SEQ %u\n", cc2420_rx_buffer[rx_buffer_next].frame.seq_nr);
+        ieee802154_frame_print_fcf_frame(&cc2420_rx_buffer[rx_buffer_next].frame);
+    }
+#endif
 
     /* shift to next buffer element */
     if (++rx_buffer_next == CC2420_RX_BUF_SIZE) {

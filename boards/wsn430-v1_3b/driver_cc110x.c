@@ -198,7 +198,8 @@ interrupt (PORT1_VECTOR) __attribute__ ((naked)) cc110x_isr(void){
         cc110x_gdo0_irq();
         P1IE &= ~0x08;                // Disable interrupt for GDO0
            P1IFG &= ~0x08;                // Clear IFG for GDO0
-    } else {
+    }
+    else {
         puts("cc110x_isr(): unexpected IFG!");
         /* Should not occur - only GDO1 and GDO2 interrupts are enabled */
     }

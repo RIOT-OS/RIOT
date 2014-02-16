@@ -176,7 +176,8 @@ char *make_message(const char *format, va_list argp)
         if ((temp = realloc(message, size)) == NULL) {
             free(message);
             return NULL;
-        } else {
+        }
+        else {
             message = temp;
         }
     }

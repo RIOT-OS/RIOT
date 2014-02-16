@@ -32,7 +32,8 @@ void _mersenne_init(char *str)
     if (!toc_str) {
         initval = hwtimer_now();
         printf("PRNG inizialized to current time: %d\n", initval);
-    } else {
+    }
+    else {
         initval = atoi(toc_str);
         printf("PRNG inizialized given value: %d\n", initval);
     }

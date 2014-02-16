@@ -837,7 +837,8 @@ static void download_main(int event)
                 //	if (chip->bootprog) {
                 //		state = BOOT_SOFT;
                 //		break;
-                //	} else {
+                //	}
+                //	else {
                 printf("Booting (hardware reset)...\r\n\r\n");
                 hard_reset_to_user_code();
                 done_program(0);
