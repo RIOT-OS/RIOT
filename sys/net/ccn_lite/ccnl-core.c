@@ -1342,7 +1342,7 @@ int ccnl_core_RX_i_or_c(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
                 goto Skip;
             } else {
 #if CCNL_DYNAMIC_FIB
-                /* content has matched an interest, we considder this name as availeble on this face */
+                /* content has matched an interest, we consider this name as available on this face */
                 ccnl_content_learn_name_route(relay, c->name, from, relay->fib_threshold_prefix, 0);
 #endif
             }
