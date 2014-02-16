@@ -71,9 +71,16 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
 
     dINT();
 
+    DEBUG("msg_send() %s:%i: Sending from %i to %i. block=%i src->state=%i target->state=%i\n", __FILE__, __LINE__, thread_pid, target_pid, block, active_thread->status, target->status);
+
     if (target->status != STATUS_RECEIVE_BLOCKED) {
+        DEBUG("msg_send() %s:%i: Target %i is not RECEIVE_BLOCKED.\n", __FILE__, __LINE__, target_pid);
         if (target->msg_array && queue_msg(target, m)) {
+            DEBUG("msg_send() %s:%i: Target %i has a msg_queue. Queueing message.\n", __FILE__, __LINE__, target_pid);
             eINT();
+            if (active_thread->status == STATUS_REPLY_BLOCKED) {
+                thread_yield();
+            }
             return 1;
         }
 
@@ -269,8 +276,10 @@ static int _msg_receive(msg_t *m, int block)
         *m = *sender_msg;
 
         /* remove sender from queue */
-        sender->wait_data = NULL;
-        sched_set_status(sender, STATUS_PENDING);
+        if (sender->status != STATUS_REPLY_BLOCKED) {
+            sender->wait_data = NULL;
+            sched_set_status(sender, STATUS_PENDING);
+        }
 
         eINT();
         return 1;
