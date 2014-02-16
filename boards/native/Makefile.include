@@ -43,7 +43,7 @@ endif
 endif
 
 # set the tap interface for term/valgrind
-ifneq (,$(findstring nativenet,$(USEMODULE)))
+ifneq (,$(filter nativenet,$(USEMODULE)))
 	export PORT ?= tap0
 else
 	export PORT =

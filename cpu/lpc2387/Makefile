@@ -3,16 +3,16 @@ MODULE =cpu
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
 DIRS = $(RIOTCPU)/arm_common $(RIOTCPU)/lpc_common
-ifneq (,$(findstring gpioint,$(USEMODULE)))
+ifneq (,$(filter gpioint,$(USEMODULE)))
 	DIRS += gpioint
 endif
-ifneq (,$(findstring mci,$(USEMODULE)))
+ifneq (,$(filter mci,$(USEMODULE)))
 	DIRS += mci
 endif
-ifneq (,$(findstring rtc,$(USEMODULE)))
+ifneq (,$(filter rtc,$(USEMODULE)))
 	DIRS += rtc
 endif
-ifneq (,$(findstring i2c,$(USEMODULE)))
+ifneq (,$(filter i2c,$(USEMODULE)))
 	DIRS += i2c
 endif
 
