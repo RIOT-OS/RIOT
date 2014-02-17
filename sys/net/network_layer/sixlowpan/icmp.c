@@ -256,7 +256,7 @@ void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, 
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
     ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
-    ipv6_buf->hoplimit = 0xff;
+    ipv6_buf->hoplimit = ipv6_get_default_hop_limit();
 
     memcpy(&ipv6_buf->destaddr, destaddr, sizeof(ipv6_addr_t));
     ipv6_iface_get_best_src_addr(&ipv6_buf->srcaddr, &ipv6_buf->destaddr);
@@ -295,7 +295,7 @@ void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, ch
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
     ipv6_buf->nextheader = IPV6_PROTO_NUM_ICMPV6;
-    ipv6_buf->hoplimit = 0xff;
+    ipv6_buf->hoplimit = ipv6_get_default_hop_limit();
 
     memcpy(&ipv6_buf->destaddr, destaddr, sizeof(ipv6_addr_t));
     ipv6_iface_get_best_src_addr(&ipv6_buf->srcaddr, &ipv6_buf->destaddr);
