@@ -117,6 +117,20 @@ int ipv6_send_packet(ipv6_hdr_t *packet);
 uint8_t ipv6_is_router(void);
 
 /**
+ * @brief   Sets the default hop limit to use with IPv6 packets.
+ *
+ * @param[in] hop_limit The hop limit to set the default hop limit to.
+ */
+void ipv6_set_default_hop_limit(uint8_t hop_limit);
+
+/**
+ * @brief   Gets the default hop limit that is used for IPv6 packets.
+ *
+ * @return  The current default hop limit for IPv6 packets.
+ */
+uint8_t ipv6_get_default_hop_limit(void);
+
+/**
  * @brief   Registers a handler thread for incoming IP packets.
  *
  * @param[in] pid   PID of handler thread.

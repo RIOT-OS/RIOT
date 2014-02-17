@@ -56,6 +56,8 @@ int tcp_packet_handler_pid = 0;
 int rpl_process_pid = 0;
 ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t *) = 0;
 
+static uint8_t default_hop_limit = MULTIHOP_HOPLIMIT;
+
 /* registered upper layer threads */
 int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
@@ -118,7 +120,7 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
     ipv6_buf->trafficclass_flowlabel = 0;
     ipv6_buf->flowlabel = 0;
     ipv6_buf->nextheader = next_header;
-    ipv6_buf->hoplimit = MULTIHOP_HOPLIMIT;
+    ipv6_buf->hoplimit = default_hop_limit;
     ipv6_buf->length = payload_length;
 
     memcpy(&(ipv6_buf->destaddr), dest, 16);
@@ -144,6 +146,16 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
                             (uint8_t *)ipv6_buf, packet_length);
 
     return payload_length;
+}
+
+void ipv6_set_default_hop_limit(uint8_t hop_limit)
+{
+    default_hop_limit = hop_limit;
+}
+
+uint8_t ipv6_get_default_hop_limit(void)
+{
+    return default_hop_limit;
 }
 
 /* Register an upper layer thread */
