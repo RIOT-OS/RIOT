@@ -74,11 +74,10 @@ endif
 endif
 
 # Put every function and static variable in it's own segment, enabling the linker to drop it if it's unused.
-$(warning $(shell echo $(LINK) -Wl,--gc-sections -E - </dev/null))
 ifeq ($(shell $(CC) -ffunction-sections -fdata-sections -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
 ifeq ($(shell $(LINK) -Wl,--gc-sections -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
 CFLAGS += -ffunction-sections -fdata-sections
-LINKFLAGS += -Wl,--gc-sections
+LINKFLAGS += -Wl,--gc-sections,--print-gc-sections
 endif
 endif
 
