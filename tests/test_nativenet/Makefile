@@ -1,7 +1,7 @@
 debug: CFLAGS += -g
 debug: CFLAGS += -DENABLE_DEBUG
 
-# name of your project
+# name of your application
 export PROJECT = test_nativenet
 #
 # for easy switching of boards

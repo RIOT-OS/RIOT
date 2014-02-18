@@ -20,7 +20,7 @@
  * code](https://github.com/RIOT-OS/RIOT/wiki/Introduction#wiki-getting-the-source-code)). This contains - besides the
  * before mentioned features - also some example applications (located in the
  * `examples` subdirectory) and a sample Makefile you may use for your own
- * project. This Makefile template shows you how to compile and link your project
+ * project. This Makefile template shows you how to compile and link your application
  * against RIOT ([Compiling RIOT](https://github.com/RIOT-OS/RIOT/wiki/Introduction#wiki-compiling-riot)).
  *
  * If you want to use RIOT directly with your embedded platform, you need to
@@ -33,7 +33,7 @@
  * As a special platform, you will find a CPU and board called `native` in the
  * repository. This target allows you to run RIOT as a process on Linux on most
  * supported hardware platforms. Just set CPU and BOARD to `native` in your
- * project's Makefile, call `make`, and execute the resulting elf-file. Further
+ * application's Makefile, call `make`, and execute the resulting elf-file. Further
  * documentation about the native port can be found in `cpu/native/README`.
  *
  * \subsection structure Structure
@@ -68,15 +68,15 @@
  * ####The build system
  *
  * RIOT uses GNU make as build system. The simplest way to compile and link a
- * project (application or library) with RIOT, is to set up a Makefile providing
+ * application (application or library) with RIOT, is to set up a Makefile providing
  * at least the following variables:
  *  * PROJECT
  *  * BOARD
  *  * RIOTBASE
  *
  * and an instruction to include the `Makefile.include`, located in RIOT's root
- * directory. `PROJECT` should contain the (unique) name of your project, `BOARD`
- * specifies the platform the project should be built for by default, and
+ * directory. `PROJECT` should contain the (unique) name of your application, `BOARD`
+ * specifies the platform the application should be built for by default, and
  * `RIOTBASE` specifies the path to your copy of the RIOT repository (note, that
  * you may want to use `$(CURDIR)` here, to give a relative path). You can use Make's
  * `?=` operator in order to allow overwriting variables from the command line. For
@@ -102,10 +102,10 @@
  *
  * ####Including modules
  *
- * By default a RIOT project comprises only the projects' code itself, the kernel,
+ * By default a RIOT application comprises only the applications' code itself, the kernel,
  * and platform specific code. In order to use additional modules, such as a
  * particular device driver or a system library, you have to append the modules'
- * names to the USEMODULE variable. For example, to build a project using the SHT11
+ * names to the USEMODULE variable. For example, to build a application using the SHT11
  * temperature sensor and 6LoWPAN network stack, your Makefile needs to contain
  * these lines:
  * \code
@@ -124,7 +124,7 @@
  * power mode for the device. The main thread - configured with a default priority
  * that is right in the middle between the lowest and the highest available
  * priority - is the first thread that runs and calls the main function. This
- * function needs to be defined by the project.
+ * function needs to be defined by the application.
  *
  * ####Choosing the right stack size
  *

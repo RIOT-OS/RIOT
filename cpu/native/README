@@ -1,7 +1,7 @@
 VALGRIND SUPPORT
 ================
 
-Rebuild your project using the all-valgrind target like this:
+Rebuild your application using the all-valgrind target like this:
 
     make -B clean all-valgrind
 

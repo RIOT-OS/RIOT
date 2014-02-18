@@ -3,8 +3,8 @@
  * @defgroup    sys_autoinit Auto-init
  * @ingroup     sys
  * @brief       Auto initialize modules
- * @note        This feature can be used by any project by adding auto_init to
- *              USEMODULE in the project's Makefile. auto_init will initialize
+ * @note        This feature can be used by any application by adding auto_init to
+ *              USEMODULE in the application's Makefile. auto_init will initialize
  *              any other included module that does not require a parameter in
  *              its init function, i.e. if the prototype looks like this: void
  *              MODULE_init(void). Most timer modules or simple drivers can be

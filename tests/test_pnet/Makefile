@@ -7,7 +7,7 @@
 #### ../../boards   for board definitions (if you have one or more)
 ####
 
-# name of your project
+# name of your application
 export PROJECT =test_pnet
 
 # for easy switching of boards

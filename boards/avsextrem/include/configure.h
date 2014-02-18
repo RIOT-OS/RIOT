@@ -26,10 +26,10 @@
  *
  * The offline configuration file "configure.h" is automatically
  * included in every file by the build system and allows to configure
- * all neccessary defines on cpu, board and project level.
+ * all neccessary defines on cpu, board and application level.
  *
  * The configuration is built of
- * \li a project specific file (project-conf.h)
+ * \li a application specific file (project-conf.h)
  * \li a board specific file (board-conf.h) and
  * \li a cpu specific file (cpu-conf.h).
  * All of which are chosen by the build system depending on your arguments.
