@@ -22,9 +22,8 @@
 #include <inttypes.h>
 
 #include "mutex.h"
-#include "atomic.h"
-#include "queue.h"
 #include "tcb.h"
+#include "atomic.h"
 #include "kernel.h"
 #include "sched.h"
 #include "thread.h"
