@@ -242,8 +242,12 @@ void ccnl_populate_cache(struct ccnl_relay_s *ccnl, unsigned char *buf, int data
             goto Done;
         }
 
-        ccnl_content_add2cache(ccnl, c);
         c->flags |= CCNL_CONTENT_FLAGS_STATIC;
+        if (!ccnl_content_add2cache(ccnl, c)) {
+            // content store error
+            free_content(c);
+        }
+
     Done:
         free_prefix(prefix);
         ccnl_free(pkt);
