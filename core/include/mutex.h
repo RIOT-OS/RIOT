@@ -23,7 +23,6 @@
 #define _MUTEX_H
 
 #include "queue.h"
-#include "tcb.h"
 
 /**
  * @brief Mutex structure. Should never be modified by the user.
