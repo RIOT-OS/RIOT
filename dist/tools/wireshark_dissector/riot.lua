@@ -12,6 +12,7 @@ do
     local f_length = ProtoField.uint16("RIOT.length", "Length", base.DEC, nil)
     local f_dst = ProtoField.uint16("RIOT.dst", "Destination", base.DEC, nil)
     local f_src = ProtoField.uint16("RIOT.src", "Source", base.DEC, nil)
+    local f_pad = ProtoField.bytes("RIOT.pad", "Padding")
     
     p_riot.fields = { f_length, f_dst, f_src }
 
@@ -29,7 +30,7 @@ do
         local dst = buf(2,2):uint()
         local src = buf(4,2):uint()
 
-        if buf_len - 6 ~= packet_len then return false end
+        if packet_len >= 46 and buf_len - 6 ~= packet_len then return false end
 
         riot_tree:append_text(", Dst: ")
         riot_tree:append_text(dst)
@@ -41,8 +42,9 @@ do
         riot_tree:add(f_length, buf(0, 2))
         riot_tree:add(f_dst, buf(2, 2))
         riot_tree:add(f_src, buf(4, 2))
+        riot_tree:add(f_pad, buf(packet_len + 6))
         
-        next_dis:call(buf(6, packet_len):tvb(),pkt,root) 
+        next_dis:call(buf(6, packet_len):tvb(), pkt, root)
 
         return true        
     end
