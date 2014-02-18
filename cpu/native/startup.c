@@ -41,6 +41,7 @@ int (*real_printf)(const char *format, ...);
 int _native_null_in_pipe[2];
 int _native_null_out_file;
 const char *_progname;
+char **_native_argv;
 
 /**
  * initialize _native_null_in_pipe to allow for reading from stdin
@@ -191,7 +192,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 
    *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
 
+   _native_argv = argv;
     _progname = argv[0];
+
     int argp = 1;
     char *stderrtype = "stdio";
     char *stdouttype = "stdio";
