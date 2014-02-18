@@ -99,6 +99,7 @@ static void handle_input_line(shell_t *shell, char *line)
         handler = find_handler(shell->command_list, command);
 
         if (handler != NULL) {
+            line[strlen(command)] = ' ';
             handler(line);
         }
         else {
