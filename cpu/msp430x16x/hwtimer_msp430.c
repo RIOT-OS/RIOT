@@ -57,7 +57,6 @@ interrupt(TIMERA0_VECTOR) __attribute__((naked)) timer_isr_ccr0(void)
     __enter_isr();
     timer_round += 1;
     __exit_isr();
-
 }
 
 interrupt(TIMERA1_VECTOR) __attribute__((naked)) timer_isr(void)
@@ -65,16 +64,13 @@ interrupt(TIMERA1_VECTOR) __attribute__((naked)) timer_isr(void)
     __enter_isr();
 
     short taiv = TAIV;
-
-    if (taiv & TAIV_TAIFG) {
-    } else {
-
-        short timer = (taiv/2);
-        if(overflow_interrupt[timer] == timer_round)
-        {
+    if (!(taiv & TAIV_TAIFG)) {
+        short timer = taiv / 2;
+        if (overflow_interrupt[timer] == timer_round) {
             timer_unset(timer);
             int_handler(timer);
         }
     }
+
     __exit_isr();
 }

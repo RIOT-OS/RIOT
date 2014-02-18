@@ -947,7 +947,8 @@ ccnl_content_add2cache(struct ccnl_relay_s *ccnl, struct ccnl_content_s *c)
         if (oldest) {
             DEBUGMSG(1, "   replaced: '%s'\n", ccnl_prefix_to_path(oldest->name));
             ccnl_content_remove(ccnl, oldest);
-        } else {
+        }
+        else {
             DEBUGMSG(1, "   no dynamic content to remove...\n");
             break;
         }
@@ -1062,7 +1063,8 @@ void ccnl_content_learn_name_route(struct ccnl_relay_s *ccnl, struct ccnl_prefix
         fwd = ccnl_forward_new(p, f, threshold_prefix, flags);
         DBL_LINKED_LIST_ADD(ccnl->fib, fwd);
         DEBUGMSG(999, "ccnl_content_learn_name_route: new route '%s' on face %d learned\n", ccnl_prefix_to_path(fwd->prefix), f->faceid);
-    } else {
+    }
+    else {
         /* there was a prefix match with the user defined creteria. */
 
         /* if the new entry has shorter prefix */
@@ -1074,7 +1076,8 @@ void ccnl_content_learn_name_route(struct ccnl_relay_s *ccnl, struct ccnl_prefix
             fwd = ccnl_forward_new(p, f, (p->compcnt - match_len), flags);
             DBL_LINKED_LIST_ADD(ccnl->fib, fwd);
             DEBUGMSG(999, "ccnl_content_learn_name_route: route '%s' on face %d replaced\n", ccnl_prefix_to_path(fwd->prefix), f->faceid);
-        } else {
+        }
+        else {
             /* we don't need to do an update, because we know a shorter prefix already */
         }
     }
@@ -1161,7 +1164,8 @@ void ccnl_do_ageing(void *ptr, void *dummy)
                 riot_send_nack(i->from->faceid);
             }
             i = ccnl_interest_remove(relay, i);
-        } else {
+        }
+        else {
             i = i->next;
         }
     }
@@ -1191,7 +1195,8 @@ void ccnl_do_ageing(void *ptr, void *dummy)
         if (!(fwd->flags & CCNL_FORWARD_FLAGS_STATIC)
             && ccnl_is_timeouted(&now, &fwd->last_used, CCNL_FWD_TIMEOUT_SEC, CCNL_FWD_TIMEOUT_USEC)) {
             fwd = ccnl_forward_remove(relay, fwd);
-        } else {
+        }
+        else {
             fwd = fwd->next;
         }
     }
@@ -1340,12 +1345,13 @@ int ccnl_core_RX_i_or_c(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
                 DEBUGMSG(7, "  removed because no matching interest\n");
                 free_content(c);
                 goto Skip;
-            } else {
+            }
 #if CCNL_DYNAMIC_FIB
+            else {
                 /* content has matched an interest, we consider this name as available on this face */
                 ccnl_content_learn_name_route(relay, c->name, from, relay->fib_threshold_prefix, 0);
-#endif
             }
+#endif
 
             if (relay->max_cache_entries != 0) { // it's set to -1 or a limit
                 DEBUGMSG(7, "  adding content to cache\n");

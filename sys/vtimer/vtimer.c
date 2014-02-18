@@ -370,7 +370,8 @@ int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout) {
     if (m->type == MSG_TIMER && m->content.ptr == (char *) &timeout_message) {
         /* we hit the timeout */
         return -1;
-    } else {
+    }
+    else {
         vtimer_remove(&t);
         return 1;
     }

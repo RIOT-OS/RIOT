@@ -100,7 +100,8 @@ int sem_wait(sem_t *sem)
         if (value == 0) {
             sem_thread_blocked(sem);
             continue;
-        } else {
+        }
+        else {
             sem->value = value - 1;
             break;
         }
@@ -124,7 +125,8 @@ int sem_trywait(sem_t *sem)
     unsigned value = sem->value;
     if (value == 0) {
         result = -1;
-    } else {
+    }
+    else {
         result = 0;
         sem->value = value - 1;
     }

@@ -35,7 +35,8 @@ static uint8_t calc_umctl(uint16_t br) {
         if( a & 0x80 ) {           // Overflow to integer?
             a = a - 128 + CMOD;    // Yes, subtract 1.000000
             c |= 0x80;
-        } else {
+        }
+        else {
             a += CMOD;              // No, add fraction
         }
         if( i == 7 ) {

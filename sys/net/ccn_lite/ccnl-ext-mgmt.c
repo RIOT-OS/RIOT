@@ -551,10 +551,12 @@ static int ccnl_mgmt_handle(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
     if (!strcmp(cmd, "newface")) {
         DEBUGMSG(1, "ccnl_mgmt_newface msg\n");
         ccnl_mgmt_newface(ccnl, orig, prefix, from);
-    } else if (!strcmp(cmd, "prefixreg")) {
+    }
+    else if (!strcmp(cmd, "prefixreg")) {
         DEBUGMSG(1, "ccnl_mgmt_prefixreg msg\n");
         ccnl_mgmt_prefixreg(ccnl, orig, prefix, from);
-    } else {
+    }
+    else {
         DEBUGMSG(99, "unknown mgmt command %s\n", cmd);
 
         ccnl_mgmt_return_msg(ccnl, orig, from, "unknown mgmt command");
@@ -571,14 +573,16 @@ int ccnl_mgmt(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
     if (prefix->complen[2] < (int) sizeof(cmd)) {
         memcpy(cmd, prefix->comp[2], prefix->complen[2]);
         cmd[prefix->complen[2]] = '\0';
-    } else {
+    }
+    else {
         strcpy(cmd, "cmd-is-too-long-to-display");
     }
 
     DEBUGMSG(99, "ccnl_mgmt request \"%s\"\n", cmd);
 
-    if (ccnl_is_local_addr(from))
+    if (ccnl_is_local_addr(from)) {
         goto MGMT;
+    }
 
     DEBUGMSG(99, " rejecting because src is not a local addr\n");
     ccnl_mgmt_return_msg(ccnl, orig, from,
