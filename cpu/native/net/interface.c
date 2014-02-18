@@ -111,13 +111,13 @@ radio_address_t nativenet_get_address()
 
 uint64_t nativenet_get_address_long(void)
 {
-    DEBUG("nativenet_get_address_long -> address = %"PRIx64"\n", _native_net_addr_long);
+    DEBUG("nativenet_get_address_long -> address = %" PRIx64 "\n", _native_net_addr_long);
     return _native_net_addr_long;
 }
 
 uint64_t nativenet_set_address_long(uint64_t address)
 {
-    DEBUG("nativenet_set_address_long(address=%"PRIx64")\n", address);
+    DEBUG("nativenet_set_address_long(address=%" PRIx64 ")\n", address);
     warnx("nativenet_set_address_long: this does not actually change the interfaces address");
     _native_net_addr_long = address;
     return _native_net_addr_long;
@@ -126,7 +126,7 @@ uint64_t nativenet_set_address_long(uint64_t address)
 int8_t nativenet_send(radio_packet_t *packet)
 {
     packet->src = _native_net_addr;
-    DEBUG("nativenet_send:  Sending packet of length %"PRIu16" from %"PRIu16" to %"PRIu16"\n", packet->length, packet->src, packet->dst);
+    DEBUG("nativenet_send:  Sending packet of length %" PRIu16 " from %" PRIu16 " to %" PRIu16 "\n", packet->length, packet->src, packet->dst);
 
     return send_buf(packet);
 }

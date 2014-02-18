@@ -431,7 +431,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
         for (uint8_t i = 0; (i < MAX_IGNORED_ADDR) && (ignored_addr[i]); i++) {
             DEBUG("check if source (%u) is ignored -> %u\n", trans_p->src, ignored_addr[i]);
             if (trans_p->src == ignored_addr[i]) {
-                DEBUG("ignored packet from %"PRIu16"\n", trans_p->src);
+                DEBUG("ignored packet from %" PRIu16 "\n", trans_p->src);
                 return;
             }
         }
@@ -548,7 +548,7 @@ void receive_nativenet_packet(radio_packet_t *trans_p) {
     memcpy(&(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]), p->data, p->length);
     trans_p->data =  (uint8_t*) &(data_buffer[transceiver_buffer_pos * PAYLOAD_SIZE]);
 
-    DEBUG("Packet %p was from %"PRIu16" to %"PRIu16", size: %"PRIu8"\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
+    DEBUG("Packet %p was from %" PRIu16 " to %" PRIu16 ", size: %" PRIu8 "\n", trans_p, trans_p->src, trans_p->dst, trans_p->length);
 
     /* reset interrupts */
     restoreIRQ(state);

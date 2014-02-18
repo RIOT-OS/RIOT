@@ -124,5 +124,5 @@ uint64_t timex_uint64(const timex_t a)
 
 void timex_print(const timex_t t)
 {
-    printf("Seconds: %"PRIu32" - Microseconds: %"PRIu32"\n", t.seconds, t.microseconds);
+    printf("Seconds: %" PRIu32 " - Microseconds: %" PRIu32 "\n", t.seconds, t.microseconds);
 }

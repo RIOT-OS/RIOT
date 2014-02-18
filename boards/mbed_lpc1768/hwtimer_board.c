@@ -62,6 +62,6 @@ unsigned long hwtimer_arch_now(void)
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
 {
-    DEBUG("hwtimer_arch_init(%p, %"PRIu32"): not implemented\n", handler, fcpu);
+    DEBUG("hwtimer_arch_init(%p, %" PRIu32 "): not implemented\n", handler, fcpu);
     return;
 }
