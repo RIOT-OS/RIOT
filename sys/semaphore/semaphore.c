@@ -80,7 +80,7 @@ static void sem_thread_blocked(sem_t *sem)
     n.data = (size_t) active_thread;
     n.next = NULL;
 
-    DEBUG("%s: Adding node to mutex queue: prio: %"PRIu32"\n",
+    DEBUG("%s: Adding node to mutex queue: prio: %" PRIu32 "\n",
           active_thread->name, n.priority);
 
     /* add myself to the waiters queue */

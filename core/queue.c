@@ -107,13 +107,13 @@ void queue_print(queue_node_t *node)
 
     while (node->next != NULL) {
         node = node->next;
-        printf("Data: %u Priority: %"PRIu32"\n", node->data, node->priority);
+        printf("Data: %u Priority: %" PRIu32 "\n", node->data, node->priority);
     }
 }
 
 void queue_print_node(queue_node_t *node)
 {
-    printf("Data: %u Priority: %"PRIu32" Next: %u\n", (unsigned int)node->data, node->priority, (unsigned int)node->next);
+    printf("Data: %u Priority: %" PRIu32 " Next: %u\n", (unsigned int)node->data, node->priority, (unsigned int)node->next);
 }
 #endif
 
