@@ -1434,7 +1434,7 @@ int ccnl_core_RX_datagram(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
 
         switch (num) {
             case CCN_DTAG_INTEREST:
-                DEBUGMSG(1, "INTEREST\n");
+                /* no break */
 
             case CCN_DTAG_CONTENTOBJ:
                 rc = ccnl_core_RX_i_or_c(relay, from, data, datalen);
