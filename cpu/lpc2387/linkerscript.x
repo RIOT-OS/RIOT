@@ -29,6 +29,8 @@ __stack_svc_size = 400;			/* stack for "SVC" supervisor mode							*/
 __stack_usr_size = 4096;		/* stack for user operation (kernel init)				    */
 __stack_size = __stack_und_size + __stack_abt_size + __stack_fiq_size + __stack_irq_size + __stack_svc_size + __stack_usr_size;
 
+ENTRY(_startup_vectors)
+
 /* now define the output sections  */
 SECTIONS
 {

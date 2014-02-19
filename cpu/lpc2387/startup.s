@@ -38,6 +38,8 @@
 /* Exception vectors and handler addresses.
 It is 64 bytes and can be mapped (see documentation 1.4.2). */
 .section .vectors
+.global _startup_vectors
+_startup_vectors:
 /* Exception Vectors */
       			ldr     PC, Reset_Addr		/* Reset */
                 ldr     PC, Undef_Addr		/* Undefined Instruction */
@@ -50,6 +52,7 @@ It is 64 bytes and can be mapped (see documentation 1.4.2). */
                 ldr     PC, IRQ_Addr    	/* Interrupt Request Interrupt (load from VIC) */
                 ldr		r0, =__fiq_handler	/* Fast Interrupt Request Interrupt */
                 ldr		pc, [r0]			/* jump to handler in pointer at __fiq_handler */
+                nop       /* not needed, strictly speaking, but the disassembler gets confused w/o a nop here */
 
 /* Exception vector handlers branching table */
 Reset_Addr:     .word   Reset_Handler		/* defined in this module below  */
@@ -68,7 +71,7 @@ IRQ_Addr:       .word   arm_irq_handler      /* defined in main.c  */
 .func   _startup
 
 _startup:
-				ldr    pc, =Reset_Handler
+                                b .init0
 
 /*.func Reset_Handler */
 Reset_Handler:
@@ -89,6 +92,7 @@ Reset_Handler:
     			ldr   sp, =__stack_svc_start
     			msr   CPSR_c, #MODE_SYS|I_BIT|F_BIT 	/* User Mode */
     			ldr   sp, =__stack_usr_start
+                        b .init2
 
 .section .init2							/* copy .data section (Copy from ROM to RAM) */
 .extern _etext
@@ -103,6 +107,8 @@ LoopRel:   		cmp     R2, R3
                 strlo   R0, [R2], #4
                 blo     LoopRel
 */
+                b .init4
+
 .section .init4							/* Clear .bss section (Zero init)  */
 .extern __bss_start
 .extern __bss_end
@@ -114,6 +120,8 @@ LoopZI:			cmp     R1, R2
                 strlo   R0, [R1], #4
                 blo     LoopZI
 */
+                b .init9
+
 				/* Enter the C code  */
 .section .init9
                 bl  bootloader
@@ -121,7 +129,7 @@ LoopZI:			cmp     R1, R2
 
                 /* Infinite Loop */
 .section .fini0
-__main_exit:    B       __main_exit
+__main_exit:    b       __main_exit
 
 
 .endfunc

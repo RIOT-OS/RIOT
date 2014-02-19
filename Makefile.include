@@ -30,6 +30,7 @@ CPUDEF = $(shell echo $(CPU)|tr 'a-z' 'A-Z')
 CFLAGS += -DBOARD=$(BB) -DCPU_$(CPUDEF)
 
 export CFLAGS
+export LINKFLAGS
 
 export BINDIR =$(CURDIR)/bin/$(BOARD)/
 
@@ -69,6 +70,14 @@ endif
 ifeq ($(shell $(CC) -fno-delete-null-pointer-checks -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
 ifeq ($(shell LANG=C $(CC) -fno-delete-null-pointer-checks -E - 2>&1 1>/dev/null </dev/null | grep warning: | grep -- -fno-delete-null-pointer-checks),)
 CFLAGS += -fno-delete-null-pointer-checks
+endif
+endif
+
+# Put every function and static variable in it's own segment, enabling the linker to drop it if it's unused.
+ifeq ($(shell $(CC) -ffunction-sections -fdata-sections -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+ifeq ($(shell $(LINK) -Wl,--gc-sections -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+CFLAGS += -ffunction-sections -fdata-sections
+LINKFLAGS += -Wl,--gc-sections,--print-gc-sections
 endif
 endif
 
