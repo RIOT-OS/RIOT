@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include "msg.h"
+#include "random.h"
 
 #include "ccnl.h"
 #include "ccnl-core.h"
@@ -57,7 +58,8 @@ int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
             puts("ccnl_riot_client_get: malloc failed");
             return 0;
         }
-        int interest_len = mkInterest(prefix, NULL, interest_pkg);
+        unsigned int interest_nonce = genrand_uint32();
+        int interest_len = mkInterest(prefix, &interest_nonce, interest_pkg);
         DEBUGMSG(1, "relay_pid=%u interest_len=%d\n", relay_pid, interest_len);
 
         riot_ccnl_msg_t rmsg;

@@ -208,6 +208,33 @@ static int data2uint(unsigned char *cp, int len)
     return val;
 }
 
+struct ccnl_nonce_s *ccnl_nonce_new(struct ccnl_buf_s *that)
+{
+    struct ccnl_nonce_s *n = (struct ccnl_nonce_s *) ccnl_malloc(sizeof(struct ccnl_nonce_s));
+
+    n->buf = buf_dup(that);
+    ccnl_get_timeval(&n->created);
+
+    n->next = NULL;
+    n->prev = NULL;
+
+    return n;
+}
+
+struct ccnl_nonce_s *ccnl_nonce_remove(struct ccnl_relay_s *ccnl, struct ccnl_nonce_s *nonce)
+{
+    DEBUGMSG(99, "ccnl_nonce_remove: %u:%u:%u:%u\n",
+             nonce->buf->data[0], nonce->buf->data[1], nonce->buf->data[2], nonce->buf->data[3]);
+
+    struct ccnl_nonce_s *next = nonce->next;
+    DBL_LINKED_LIST_REMOVE(ccnl->nonces, nonce);
+
+    free(nonce->buf);
+    free(nonce);
+
+    return next;
+}
+
 struct ccnl_buf_s *
 ccnl_extract_prefix_nonce_ppkd(unsigned char **data, int *datalen, int *scope,
                                int *aok, int *min, int *max, struct ccnl_prefix_s **prefix,
@@ -685,30 +712,33 @@ int ccnl_face_enqueue(struct ccnl_relay_s *ccnl, struct ccnl_face_s *to,
 int ccnl_nonce_find_or_append(struct ccnl_relay_s *ccnl,
                               struct ccnl_buf_s *nonce)
 {
-    struct ccnl_buf_s *n, *n2 = 0;
+    struct ccnl_nonce_s *n, *last;
     int i;
-    DEBUGMSG(99, "ccnl_nonce_find_or_append\n");
+    DEBUGMSG(99, "ccnl_nonce_find_or_append: %u:%u:%u:%u\n",
+             nonce->data[0], nonce->data[1], nonce->data[2], nonce->data[3]);
+
+    /* test for noce in nonce cache */
 
     for (n = ccnl->nonces, i = 0; n; n = n->next, i++) {
-        if (buf_equal(n, nonce)) {
+        DEBUGMSG(1, "known: %u:%u:%u:%u\n",
+                 n->buf->data[0], n->buf->data[1], n->buf->data[2], n->buf->data[3]);
+        if (buf_equal(n->buf, nonce)) {
+            /* nonce in cache -> known */
             return -1;
         }
-
         if (n->next) {
-            n2 = n;
+            last = n->next;
         }
     }
 
-    n = ccnl_buf_new(nonce->data, nonce->datalen);
+    /* nonce not in local cache, add it */
+    n = ccnl_nonce_new(nonce);
+    DBL_LINKED_LIST_ADD(ccnl->nonces, n);
 
-    if (n) {
-        n->next = ccnl->nonces;
-        ccnl->nonces = n;
-
-        if (i >= CCNL_MAX_NONCES && n2) {
-            ccnl_free(n2->next);
-            n2->next = 0;
-        }
+    /* nonce chache full? */
+    if (i >= CCNL_MAX_NONCES) {
+        /* cache is full, drop oldest nonce: its the last element in the list */
+        ccnl_nonce_remove(ccnl, last);
     }
 
     return 0;
@@ -1141,6 +1171,25 @@ void ccnl_do_retransmit(void *ptr, void *dummy)
     }
 }
 
+void ccnl_do_nonce_timeout(void *ptr, void *dummy)
+{
+    (void) dummy; /* unused */
+
+    struct ccnl_relay_s *relay = (struct ccnl_relay_s *) ptr;
+
+    struct timeval now;
+    ccnl_get_timeval(&now);
+    //DEBUGMSG(99, "ccnl_do_nonce_timeout: %lu:%lu\n", now.tv_sec, now.tv_usec);
+
+    for (struct ccnl_nonce_s *n = relay->nonces; n;) {
+        if (ccnl_is_timeouted(&now, &n->created, CCNL_NONCE_TIMEOUT_SEC, CCNL_NONCE_TIMEOUT_USEC)) {
+            n = ccnl_nonce_remove(relay, n);
+        } else {
+            n = n->next;
+        }
+    }
+}
+
 void ccnl_do_ageing(void *ptr, void *dummy)
 {
 
@@ -1220,9 +1269,7 @@ void ccnl_core_cleanup(struct ccnl_relay_s *ccnl)
     }
 
     while (ccnl->nonces) {
-        struct ccnl_buf_s *tmp = ccnl->nonces->next;
-        ccnl_free(ccnl->nonces);
-        ccnl->nonces = tmp;
+        ccnl_nonce_remove(ccnl, ccnl->nonces);
     }
 
     for (k = 0; k < ccnl->ifcount; k++) {
@@ -1387,7 +1434,7 @@ int ccnl_core_RX_datagram(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
 
         switch (num) {
             case CCN_DTAG_INTEREST:
-                DEBUGMSG(1, "INTEREST\n");
+                /* no break */
 
             case CCN_DTAG_CONTENTOBJ:
                 rc = ccnl_core_RX_i_or_c(relay, from, data, datalen);
