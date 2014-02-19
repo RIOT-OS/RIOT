@@ -21,6 +21,9 @@ endif
 ifneq (,$(filter pnet,$(USEMODULE)))
     DIRS += posix/pnet
 endif
+ifneq (,$(filter pthread,$(USEMODULE)))
+    DIRS += posix/pthread
+endif
 ifneq (,$(filter shell,$(USEMODULE)))
     DIRS += shell
 endif
