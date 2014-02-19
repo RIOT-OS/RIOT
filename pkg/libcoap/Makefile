@@ -1,6 +1,6 @@
 PKG_NAME=libcoap
 PKG_URL=http://git.code.sf.net/p/libcoap/code
-PKG_VERSION=89acaa6775ca3a4aedea510557e6b9c0c01fa5db
+PKG_VERSION=ef41ce5d02d64cec0751882ae8fd95f6c32bc018
 
 ifneq ($(RIOTBOARD),)
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
@@ -19,7 +19,7 @@ all: patch
 patch: $(CURDIR)/$(PKG_NAME)/Makefile
 
 $(CURDIR)/$(PKG_NAME)/Makefile: $(CURDIR)/$(PKG_NAME)
-	cd $< && git apply ../patch.txt
+	cd "$<" && git am --ignore-whitespace $(CURDIR)/*.patch || true
 
 $(CURDIR)/$(PKG_NAME)/:
 	git clone $(PKG_URL) $@ && \
