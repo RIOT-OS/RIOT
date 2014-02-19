@@ -42,8 +42,8 @@ int fd_init(void)
     fd_t fd;
     fd.__active = 1;
     fd.fd = uart0_handler_pid;
-    fd.read = (ssize_t ( *)(int, void *, size_t))posix_read;
-    fd.write = (ssize_t ( *)(int, const void *, size_t))posix_write;
+    fd.read = (ssize_t (*)(int, void *, size_t))posix_read;
+    fd.write = (ssize_t (*)(int, const void *, size_t))posix_write;
     fd.close = posix_close;
 
     memcpy(&fd_table[STDIN_FILENO], &fd, sizeof(fd_t));
