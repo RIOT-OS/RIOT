@@ -15,6 +15,7 @@ void at86rf231_switch_to_rx(void);
 void at86rf231_spi_select(void);
 void at86rf231_spi_unselect(void);
 
+void at86rf231_spi_transfer(const uint8_t *data_out, uint8_t *data_in, uint16_t length);
 uint8_t at86rf231_spi_transfer_byte(uint8_t byte);
 
 void at86rf231_init_interrupts(void);

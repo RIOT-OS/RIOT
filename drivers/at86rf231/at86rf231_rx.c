@@ -1,6 +1,7 @@
 
 #include "at86rf231.h"
 #include "at86rf231_arch.h"
+#include "at86rf231_spi.h"
 
 #include "transceiver.h"
 #include "msg.h"
