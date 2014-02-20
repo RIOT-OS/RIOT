@@ -1467,11 +1467,12 @@ ccnl_core_RX(struct ccnl_relay_s *relay, int ifndx, unsigned char *data,
     DEBUGMSG(14, "ccnl_core_RX ifndx=%d, %d bytes\n", ifndx, datalen);
 
     from = ccnl_get_face_or_create(relay, ifndx, sender_id);
-    DEBUGMSG(1, "ccnl_core_RX: faceid=%d frag=%p\n", from->faceid, (void *) from->frag);
 
     if (!from) {
         return;
     }
+
+    DEBUGMSG(1, "ccnl_core_RX: faceid=%d frag=%p\n", from->faceid, (void *) from->frag);
 
     ccnl_core_RX_datagram(relay, from, &data, &datalen);
 }
