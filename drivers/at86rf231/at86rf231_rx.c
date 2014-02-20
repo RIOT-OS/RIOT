@@ -22,8 +22,6 @@ void at86rf231_rx_handler(void)
     uint8_t *buf = buffer[rx_buffer_next];
     at86rf231_read_fifo(buf, at86rf231_rx_buffer[rx_buffer_next].length);
 
-    at86rf231_swap_fcf_bytes(buf);
-
     // read lqi which is appended after the psdu
     lqi = buf[at86rf231_rx_buffer[rx_buffer_next].length - 1];
 
@@ -43,7 +41,7 @@ void at86rf231_rx_handler(void)
     }
 
     ieee802154_frame_read(&buf[1], &at86rf231_rx_buffer[rx_buffer_next].frame,
-                          at86rf231_rx_buffer[rx_buffer_next].length - 2);
+                          at86rf231_rx_buffer[rx_buffer_next].length);
 
     if (at86rf231_rx_buffer[rx_buffer_next].frame.fcf.frame_type != 2) {
 #ifdef ENABLE_DEBUG
