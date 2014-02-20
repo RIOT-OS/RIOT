@@ -1796,13 +1796,7 @@ int sixlowpan_lowpan_init(void)
         return 0;
     }
 
-    nd_nbr_cache_rem_pid = thread_create(nc_buf, NC_STACKSIZE,
-                                         PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                         nbr_cache_auto_rem, "nbr_cache_rem");
-
-    if (nd_nbr_cache_rem_pid < 0) {
-        return 0;
-    }
+    nbr_cache_auto_rem();
 
     contexts_rem_pid = thread_create(con_buf, CON_STACKSIZE,
                                      PRIORITY_MAIN + 1, CREATE_STACKTEST,
