@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#include <sys/time.h>
 
 #include "irq.h"
 #include "queue.h"
@@ -400,3 +401,13 @@ void vtimer_print(vtimer_t *t)
 }
 
 #endif
+
+int _gettimeofday(struct timeval *tp, void *restrict tzp) {
+    timex_t now;
+    vtimer_now(&now);
+
+    tp->tv_sec = now.seconds;
+    tp->tv_usec = now.microseconds;
+
+    return 0;
+}
