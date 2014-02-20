@@ -51,10 +51,6 @@ uint64_t at86rf231_set_address_long(uint64_t address);
 
 void at86rf231_set_monitor(uint8_t mode);
 
-
-
-void at86rf231_swap_fcf_bytes(uint8_t *buf);
-
 enum {
     RF86RF231_MAX_TX_LENGTH = 125,
     RF86RF231_MAX_RX_LENGTH = 127,

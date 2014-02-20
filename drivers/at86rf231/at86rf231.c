@@ -165,11 +165,3 @@ void at86rf231_set_monitor(uint8_t mode)
     (void) mode;
     // TODO
 }
-
-void at86rf231_swap_fcf_bytes(uint8_t *buf)
-{
-    uint8_t tmp;
-    tmp = buf[1];
-    buf[1] = buf[2];
-    buf[2] = tmp;
-}
