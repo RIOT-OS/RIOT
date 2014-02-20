@@ -389,7 +389,7 @@ void vtimer_print_long_queue(){
 
 void vtimer_print(vtimer_t *t)
 {
-    printf("Seconds: %"PRIu32" - Microseconds: %"PRIu32"\n \
+    printf("Seconds: %" PRIu32 " - Microseconds: %" PRIu32 "\n \
             action: %p\n \
             arg: %p\n \
             pid: %u\n",

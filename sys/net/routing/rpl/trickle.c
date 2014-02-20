@@ -141,7 +141,7 @@ void trickle_interval_over(void)
     while (1) {
         thread_sleep();
         I = I * 2;
-        DEBUG("TRICKLE new Interval %"PRIu32"\n", I);
+        DEBUG("TRICKLE new Interval %" PRIu32 "\n", I);
 
         if (I == 0) {
             puts("[WARNING] Interval was 0");

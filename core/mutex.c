@@ -85,7 +85,7 @@ void mutex_wait(struct mutex_t *mutex)
     n.data = (unsigned int) active_thread;
     n.next = NULL;
 
-    DEBUG("%s: Adding node to mutex queue: prio: %"PRIu32"\n", active_thread->name, n.priority);
+    DEBUG("%s: Adding node to mutex queue: prio: %" PRIu32 "\n", active_thread->name, n.priority);
 
     queue_priority_add(&(mutex->queue), &n);
 

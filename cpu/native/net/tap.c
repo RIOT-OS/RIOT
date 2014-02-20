@@ -95,7 +95,7 @@ void _native_handle_tap_input(void)
                     warnx("_native_handle_tap_input: packet with malicious length field received, discarding");
                 }
                 else {
-                    DEBUG("_native_handle_tap_input: received packet of length %"PRIu16" for %"PRIu16" from %"PRIu16"\n", p.length, p.dst, p.src);
+                    DEBUG("_native_handle_tap_input: received packet of length %" PRIu16 " for %" PRIu16 " from %" PRIu16 "\n", p.length, p.dst, p.src);
                     _nativenet_handle_packet(&p);
                 }
             }
@@ -214,7 +214,7 @@ int8_t send_buf(radio_packet_t *packet)
 
     memset(buf, 0, sizeof(buf));
 
-    DEBUG("send_buf:  Sending packet of length %"PRIu16" from %"PRIu16" to %"PRIu16"\n", packet->length, packet->src, packet->dst);
+    DEBUG("send_buf:  Sending packet of length %" PRIu16 " from %" PRIu16 " to %" PRIu16 "\n", packet->length, packet->src, packet->dst);
     to_send = _native_marshall_ethernet(buf, packet);
 
     DEBUG("send_buf: trying to send %d bytes\n", to_send);

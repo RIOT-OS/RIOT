@@ -38,8 +38,9 @@ static int _native_ltc_hwtimer_id = -1;
 /**
  * native ltc4150 hwtimer - interrupt handler proxy
  */
-static void _native_ltc_int_handler()
+static void _native_ltc_int_handler(void *param)
 {
+    (void) param;
     DEBUG("_native_ltc_int_handler()\n");
     if (_native_ltc_hwtimer_id != -1) {
         ltc4150_interrupt();

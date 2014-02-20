@@ -69,7 +69,7 @@ void _transceiver_get_set_address_handler(char *addr)
 
     if (strlen(addr) > 5) {
         a = atoi(addr + 5);
-        printf("[transceiver] trying to set address %"PRIu16"\n", a);
+        printf("[transceiver] trying to set address %" PRIu16 "\n", a);
         mesg.type = SET_ADDRESS;
     }
     else {
@@ -77,7 +77,7 @@ void _transceiver_get_set_address_handler(char *addr)
     }
 
     msg_send_receive(&mesg, &mesg, transceiver_pid);
-    printf("[transceiver] got address: %"PRIu16"\n", a);
+    printf("[transceiver] got address: %" PRIu16 "\n", a);
 }
 
 /* checked for type safety */
@@ -98,7 +98,7 @@ void _transceiver_get_set_channel_handler(char *chan)
 
     if (strlen(chan) > 5) {
         c = atoi(chan + 5);
-        printf("[transceiver] Trying to set channel %"PRIi32"\n", c);
+        printf("[transceiver] Trying to set channel %" PRIi32 "\n", c);
         mesg.type = SET_CHANNEL;
     }
     else {
@@ -110,7 +110,7 @@ void _transceiver_get_set_channel_handler(char *chan)
         puts("[transceiver] Error setting/getting channel");
     }
     else {
-        printf("[transceiver] Got channel: %"PRIi32"\n", c);
+        printf("[transceiver] Got channel: %" PRIi32 "\n", c);
     }
 }
 
@@ -147,10 +147,10 @@ void _transceiver_send_handler(char *pkt)
             p.dst = addr;
             mesg.type = SND_PKT;
             mesg.content.ptr = (char *)&tcmd;
-            printf("[transceiver] Sending packet of length %"PRIu16" to %"PRIu16": %s\n", p.length, p.dst, (char*) p.data);
+            printf("[transceiver] Sending packet of length %" PRIu16 " to %" PRIu16 ": %s\n", p.length, p.dst, (char*) p.data);
             msg_send_receive(&mesg, &mesg, transceiver_pid);
             response = mesg.content.value;
-            printf("[transceiver] Packet sent: %"PRIi8"\n", response);
+            printf("[transceiver] Packet sent: %" PRIi8 "\n", response);
             return;
         }
     }
@@ -176,7 +176,7 @@ void _transceiver_monitor_handler(char *mode)
 
     if (strlen(mode) > 8) {
         m = atoi(mode + 8);
-        printf("Setting monitor mode: %"PRIu8"\n", m);
+        printf("Setting monitor mode: %" PRIu8 "\n", m);
         mesg.type = SET_MONITOR;
         msg_send(&mesg, transceiver_pid, 1);
     }
@@ -201,7 +201,7 @@ void _transceiver_get_set_pan_handler(char *pan) {
     mesg.content.ptr = (char*) &tcmd;
     if (strlen(pan) > 4) {
         p = atoi(pan+4);
-        printf("[transceiver] Trying to set pan %"PRIi32"\n", p);
+        printf("[transceiver] Trying to set pan %" PRIi32 "\n", p);
         mesg.type = SET_PAN;
     }
     else {
@@ -212,7 +212,7 @@ void _transceiver_get_set_pan_handler(char *pan) {
         puts("[transceiver] Error setting/getting pan");
     }
     else {
-        printf("[transceiver] Got pan: %"PRIi32"\n", p);
+        printf("[transceiver] Got pan: %" PRIi32 "\n", p);
     }
 }
 
@@ -236,7 +236,7 @@ void _transceiver_set_ignore_handler(char *addr)
 
     if (strlen(addr) > 4) {
         a = atoi(addr + 4);
-        printf("[transceiver] trying to add address %"PRIu16" to the ignore list \n", a);
+        printf("[transceiver] trying to add address %" PRIu16 " to the ignore list \n", a);
         mesg.type = DBG_IGN;
         msg_send_receive(&mesg, &mesg, transceiver_pid);
         response = a;
@@ -244,7 +244,7 @@ void _transceiver_set_ignore_handler(char *addr)
             printf("Error: ignore list full\n");
         }
         else {
-            printf("Success (added at index %"PRIi16").\n", response);
+            printf("Success (added at index %" PRIi16 ").\n", response);
         }
     }
     else {
