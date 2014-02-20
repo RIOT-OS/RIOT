@@ -474,9 +474,9 @@ int print_and_prompt(struct ftdi_device_list *devlist)
         if (input[last] == '\n') {
             input[last] = '\0';
         }
-    }
 
-    sscanf(s, "%i", &sel);
+        sscanf(s, "%i", &sel);
+    }
 
     return sel;
 }

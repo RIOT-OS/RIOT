@@ -286,12 +286,15 @@ rpl_parent_t *rpl_find_preferred_parent(void)
 void rpl_parent_update(rpl_parent_t *parent)
 {
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
-    uint16_t old_rank = my_dodag->my_rank;
+    uint16_t old_rank;
 
     if (my_dodag == NULL) {
         DEBUG("Not part of a dodag - this should not happen");
         return;
     }
+
+    old_rank = my_dodag->my_rank;
+
     /* update Parent lifetime */
     if (parent != NULL) {
         parent->lifetime = my_dodag->default_lifetime * my_dodag->lifetime_unit;
