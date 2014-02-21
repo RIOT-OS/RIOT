@@ -20,8 +20,10 @@
 
 extern void heap_stats(void);
 
-void _heap_handler(char *unused)
+void _heap_handler(int argc, char **argv)
 {
-    (void) unused;
+    (void) argc;
+    (void) argv;
+
     heap_stats();
 }

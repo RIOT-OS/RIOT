@@ -44,10 +44,12 @@ static inline uint8_t sector_read(unsigned char *read_buf, unsigned long sector,
     return 0;
 }
 
-void _get_sectorsize(char *unused)
+void _get_sectorsize(int argc, char **argv)
 {
-    unsigned short ssize;
+    (void) argc;
+    (void) argv;
 
+    unsigned short ssize;
     if (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK) {
         printf("[disk] sector size is %u\n", ssize);
     }
@@ -56,10 +58,12 @@ void _get_sectorsize(char *unused)
     }
 }
 
-void _get_blocksize(char *unused)
+void _get_blocksize(int argc, char **argv)
 {
-    unsigned long bsize;
+    (void) argc;
+    (void) argv;
 
+    unsigned long bsize;
     if (MCI_ioctl(GET_BLOCK_SIZE, &bsize) == RES_OK) {
         printf("[disk] block size is %lu\n", bsize);
     }
@@ -68,10 +72,12 @@ void _get_blocksize(char *unused)
     }
 }
 
-void _get_sectorcount(char *unused)
+void _get_sectorcount(int argc, char **argv)
 {
-    unsigned long scount;
+    (void) argc;
+    (void) argv;
 
+    unsigned long scount;
     if (MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) {
         printf("[disk] sector count is %lu\n", scount);
     }
@@ -80,14 +86,13 @@ void _get_sectorcount(char *unused)
     }
 }
 
-void _read_sector(char *sector)
+void _read_sector(int argc, char **argv)
 {
     unsigned long sectornr, scount;
     unsigned short ssize;
 
-    if (strlen(sector) > strlen(DISK_READ_SECTOR_CMD) + 1) {
-
-        sectornr = atol(sector + strlen(DISK_READ_SECTOR_CMD) + 1);
+    if (argc == 2) {
+        sectornr = atol(argv[1]);
 
         if ((MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) && (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK)) {
             unsigned char read_buf[ssize];
@@ -100,65 +105,57 @@ void _read_sector(char *sector)
         printf("[disk] Error while reading sector %lu\n", sectornr);
     }
     else {
-        printf("[disk] Usage:\n%s <SECTOR>\n", DISK_READ_SECTOR_CMD);
+        printf("[disk] Usage:\n%s <SECTOR>\n", argv[0]);
         return;
     }
 }
 
-void _read_bytes(char *bytes)
+void _read_bytes(int argc, char **argv)
 {
     unsigned long sector = 1, scount, offset;
     unsigned short ssize, length;
-    char *tok;
 
-    /* tokenize user input */
-    tok = strtok(bytes + strlen(DISK_READ_BYTES_CMD) + 1, " ");
+    if (argc != 3) {
+        printf("[disk] Usage:\n%s <OFFSET> <LENGTH>\n", argv[0]);
+        return;
+    }
 
-    if (tok) {
-        offset = atol(tok);
-        tok = strtok(NULL, " ");
+    offset = atol(argv[1]);
+    length = atoi(argv[2]);
 
-        if (tok) {
-            length = atoi(tok);
+    /* get card info */
+    if ((MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) && (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK)) {
+        /* calculate sector and offset position */
+        sector = (offset / ssize) + 1;
+        offset = (offset % ssize);
+        /* preapre buffer (size must be a multiple of sector size) */
+        unsigned char read_buf[((length / ssize) + 1) * 512];
 
-            if (length) {
-                /* get card info */
-                if ((MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) && (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK)) {
-                    /* calculate sector and offset position */
-                    sector = (offset / ssize) + 1;
-                    offset = (offset % ssize);
-                    /* preapre buffer (size must be a multiple of sector size) */
-                    unsigned char read_buf[((length / ssize) + 1) * 512];
+        /* read from several sectors */
+        if (length > (ssize - offset)) {
+            /* buffer offset */
+            unsigned long j = 0;
+            /* chunk from current sector */
+            unsigned short tmp = ssize - offset;
 
-                    /* read from several sectors */
-                    if (length > (ssize - offset)) {
-                        /* buffer offset */
-                        unsigned long j = 0;
-                        /* chunk from current sector */
-                        unsigned short tmp = ssize - offset;
+            while (length) {
+                sector_read(read_buf + j, sector++, tmp, offset);
+                /* decrease length  and recalculate chunk */
+                length -= tmp;
+                tmp = (length >= ssize) ? ssize : length;
+            }
 
-                        while (length) {
-                            sector_read(read_buf + j, sector++, tmp, offset);
-                            /* decrease length  and recalculate chunk */
-                            length -= tmp;
-                            tmp = (length >= ssize) ? ssize : length;
-                        }
-
-                        return;
-                    } /* length > (ssize - offset) */
-                    /* read only one sector */
-                    else {
-                        if (sector_read(read_buf, sector, length, offset)) {
-                            return;
-                        }
-                    } /* length < (ssize - offset) */
-                } /* ioctl */
-
-                printf("[disk] Error while reading sector %lu\n", sector);
+            return;
+        } /* length > (ssize - offset) */
+        /* read only one sector */
+        else {
+            if (sector_read(read_buf, sector, length, offset)) {
                 return;
-            } /* length */
-        } /* strtok #2 */
-    } /* strtok #1 */
+            }
+        } /* length < (ssize - offset) */
+    } /* ioctl */
 
-    printf("[disk] Usage:\n%s <OFFSET> <LENGTH>\n", DISK_READ_BYTES_CMD);
+    printf("[disk] Error while reading sector %lu\n", sector);
+    return;
+
 }

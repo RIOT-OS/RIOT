@@ -17,8 +17,10 @@
 
 #include "kernel.h"
 
-void _reboot_handler(char *unused)
+void _reboot_handler(int argc, char **argv)
 {
-    (void) unused;
+    (void) argc;
+    (void) argv;
+
     reboot();
 }

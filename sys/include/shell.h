@@ -22,10 +22,12 @@
 #define __SHELL_H
 #include <stdint.h>
 
+typedef void (*shell_command_handler_t)(int argc, char **argv);
+
 typedef struct shell_command_t {
     char *name;
     char *desc;
-    void (*handler)(char *);
+    shell_command_handler_t handler;
 } shell_command_t;
 
 typedef struct shell_t {
