@@ -1,11 +1,5 @@
-# define application name
 export PROJECT = test_hwtimer_spin
-
-# for easy switching of boards
-export BOARD ?= native
-
-# the absolute path of the RIOT-base dir
-export RIOTBASE = $(CURDIR)/../..
+include ../Makefile.tests_common
 
 # modules to include
 USEMODULE += auto_init

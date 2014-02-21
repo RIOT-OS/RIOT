@@ -7,17 +7,8 @@
 #### ../../boards   for board definitions (if you have one or more)
 ####
 
-# name of your application
 export PROJECT =test_pnet
-
-# for easy switching of boards
-ifeq ($(strip $(BOARD)),)
-	export BOARD = native
-endif
-
-# this has to be the absolute path of the RIOT-base dir
-export RIOTBASE =$(CURDIR)/../..
-export RIOTBOARD =$(RIOTBASE)/boards
+include ../Makefile.tests_common
 
 ifeq ($(BOARD),stm32f4discovery)
 	include Makefile.$(BOARD)
