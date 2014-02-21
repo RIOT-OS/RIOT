@@ -51,9 +51,10 @@ enum pthread_thread_status {
 };
 
 typedef struct pthread_thread {
+    int thread_pid;
+
     enum pthread_thread_status status;
     int joining_thread;
-    int thread_pid;
     void *returnval;
     bool should_cancel;
 
@@ -159,6 +160,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
 void pthread_exit(void *retval)
 {
     pthread_thread_t *self = pthread_sched_threads[pthread_self()];
+    self->thread_pid = -1;
     DEBUG("pthread_exit(%p), self == %p\n", retval, (void *) self);
     if (self->status != PTS_DETACHED) {
         self->returnval = retval;
