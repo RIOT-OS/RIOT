@@ -28,34 +28,44 @@
 
 #define SHELL_BUFSIZE   (UART0_BUFSIZE)
 
-void print_teststart(char *unused)
+static void print_teststart(int argc, char **argv)
 {
-    (void) unused;
+    (void) argc;
+    (void) argv;
     printf("[TEST_START]\n");
-
 }
 
-void print_testend(char *unused)
+static void print_testend(int argc, char **argv)
 {
-    (void) unused;
+    (void) argc;
+    (void) argv;
     printf("[TEST_END]\n");
 }
 
-int shell_readc(void)
+static void print_echo(int argc, char **argv)
+{
+    for (int i = 0; i < argc; ++i) {
+        printf("“%s” ", argv[i]);
+    }
+    puts("");
+}
+
+static int shell_readc(void)
 {
     char c = 0;
     posix_read(uart0_handler_pid, &c, 1);
     return c;
 }
 
-void shell_putchar(int c)
+static void shell_putchar(int c)
 {
     putchar(c);
 }
 
-const shell_command_t shell_commands[] = {
+static const shell_command_t shell_commands[] = {
     { "start_test", "starts a test", print_teststart },
     { "end_test", "ends a test", print_testend },
+    { "echo", "prints the input command", print_echo },
     { NULL, NULL, NULL }
 };
 

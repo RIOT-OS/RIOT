@@ -90,6 +90,8 @@ static void print_help(const shell_command_t *command_list)
 
 static void handle_input_line(shell_t *shell, char *line)
 {
+    static const char *INCORRECT_QUOTING = "shell: incorrect quoting";
+
     /* first we need to calculate the number of arguments */
     unsigned argc = 0;
     char *pos;
@@ -102,14 +104,22 @@ static void handle_input_line(shell_t *shell, char *line)
             do {
                 ++pos;
                 if (!*pos) {
-                    puts("shell: incorrect quoting");
+                    puts(INCORRECT_QUOTING);
                     return;
                 }
             } while (*pos != '"');
+            if (pos[1] > ' ') {
+                puts(INCORRECT_QUOTING);
+                return;
+            }
         }
         else {
             do {
                 ++pos;
+                if (*pos == '"') {
+                    puts(INCORRECT_QUOTING);
+                    return;
+                }
             } while (*pos > ' ');
         }
         ++argc;
