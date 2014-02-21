@@ -20,16 +20,13 @@
 #include <stdlib.h>
 #include "config.h"
 
-void _id_handler(char *id)
+void _id_handler(int argc, char **argv)
 {
-    long newid;
-
-    newid = atoi(id + 3);
-
-    if (strlen(id) < 3) {
+    if (argc < 2) {
         printf("Current id: %u\n", sysconfig.id);
     }
     else {
+        long newid = atoi(argv[1]);
         printf("Setting new id %lu\n", newid);
         sysconfig.id = newid;
 

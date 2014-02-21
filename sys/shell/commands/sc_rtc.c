@@ -22,7 +22,7 @@
 #ifdef MODULE_RTC
 #include "rtc.h"
 
-void _gettime_handler(void)
+static void _gettime_handler(void)
 {
     struct tm now;
     rtc_get_localtime(&now);
@@ -30,19 +30,19 @@ void _gettime_handler(void)
     printf("%s", asctime(&now));
 }
 
-void _settime_handler(char *c)
+static void _settime_handler(char *c)
 {
     struct tm now;
     int res;
     uint16_t month, epoch_year;
 
-    res = sscanf(c, "date %hu-%hu-%u %u:%u:%u",
+    res = sscanf(c, "%hu-%hu-%u %u:%u:%u",
                  &epoch_year,
                  &month,
-                 (unsigned int *) & (now.tm_mday),
-                 (unsigned int *) & (now.tm_hour),
-                 (unsigned int *) & (now.tm_min),
-                 (unsigned int *) & (now.tm_sec));
+                 (unsigned int *) &(now.tm_mday),
+                 (unsigned int *) &(now.tm_hour),
+                 (unsigned int *) &(now.tm_min),
+                 (unsigned int *) &(now.tm_sec));
 
     if (res < 6) {
         printf("Usage: date YYYY-MM-DD hh:mm:ss\n");
@@ -57,13 +57,13 @@ void _settime_handler(char *c)
     rtc_set_localtime(&now);
 }
 
-void _date_handler(char *c)
+void _date_handler(int argc, char **argv)
 {
-    if (strlen(c) == 4) {
+    if (argc == 1) {
         _gettime_handler();
     }
     else {
-        _settime_handler(c);
+        _settime_handler(argv[1]);
     }
 }
 

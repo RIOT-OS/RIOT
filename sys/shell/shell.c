@@ -33,7 +33,7 @@
 #include "shell.h"
 #include "shell_commands.h"
 
-static void(*find_handler(const shell_command_t *command_list, char *command))(char *)
+static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
 {
     const shell_command_t *command_lists[] = {
         command_list,
@@ -90,25 +90,64 @@ static void print_help(const shell_command_t *command_list)
 
 static void handle_input_line(shell_t *shell, char *line)
 {
-    char *saveptr;
-    char *command = strtok_r(line, " ", &saveptr);
-
-    void (*handler)(char *) = NULL;
-
-    if (command) {
-        handler = find_handler(shell->command_list, command);
-
-        if (handler != NULL) {
-            line[strlen(command)] = ' ';
-            handler(line);
+    /* first we need to calculate the number of arguments */
+    unsigned argc = 0;
+    char *pos;
+    for (pos = line; *pos; ++pos) {
+        if (*pos <= ' ') {
+            *pos = 0;
+            continue;
+        }
+        else if (*pos == '"') {
+            do {
+                ++pos;
+                if (!*pos) {
+                    puts("shell: incorrect quoting");
+                    return;
+                }
+            } while (*pos != '"');
         }
         else {
-            if (strcmp("help", command) == 0) {
-                print_help(shell->command_list);
-            }
-            else {
-                puts("shell: command not found.");
-            }
+            do {
+                ++pos;
+            } while (*pos > ' ');
+        }
+        ++argc;
+        *pos = 0;
+    }
+
+    if (!argc) {
+        return;
+    }
+
+    /* then we fill the argv array */
+    char *argv[argc + 1];
+    argv[argc] = NULL;
+    pos = line;
+    for (unsigned i = 0; i < argc; ++i) {
+        while (!*pos) {
+            ++pos;
+        }
+        if (*pos == '"') {
+            ++pos;
+        }
+        argv[i] = pos;
+        while (*pos) {
+            ++pos;
+        }
+    }
+
+    /* then we call the appropriate handler */
+    shell_command_handler_t handler = find_handler(shell->command_list, argv[0]);
+    if (handler != NULL) {
+        handler(argc, argv);
+    }
+    else {
+        if (strcmp("help", argv[0]) == 0) {
+            print_help(shell->command_list);
+        }
+        else {
+            puts("shell: command not found.");
         }
     }
 }
