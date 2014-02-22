@@ -105,6 +105,12 @@ void free(void *ptr)
 
 void *calloc(size_t nmemb, size_t size)
 {
+    /* XXX: This is a dirty hack to enable old dlsym versions to run.
+     * Throw it out when Ubuntu 12.04 support runs out (in 2017-04)! */
+    if (!real_calloc) {
+        return NULL;
+    }
+
     void *r;
     _native_syscall_enter();
     r = real_calloc(nmemb, size);
