@@ -2,6 +2,24 @@ ifneq (,$(filter libcoap,$(USEPKG)))
 	USEMODULE += pnet
 endif
 
+ifneq (,$(filter olsr2,$(USEMODULE)))
+	ifeq (,$(filter vtimer,$(USEMODULE)))
+		USEMODULE += vtimer
+	endif
+	ifeq (,$(filter destiny,$(USEMODULE)))
+		USEMODULE += destiny
+	endif
+	ifeq (,$(filter sixlowpan,$(USEMODULE)))
+		USEMODULE += sixlowpan
+	endif
+	ifeq (,$(filter oonf_common,$(USEMODULE)))
+		USEMODULE += oonf_common
+	endif
+	ifeq (,$(filter oonf_rfc5444,$(USEMODULE)))
+		USEMODULE += oonf_rfc5444
+	endif
+endif
+
 ifneq (,$(filter pnet,$(USEMODULE)))
 	USEMODULE += posix
 	USEMODULE += socket_base

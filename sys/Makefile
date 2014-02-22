@@ -80,6 +80,9 @@ endif
 ifneq (,$(filter rpl,$(USEMODULE)))
     DIRS += net/routing/rpl
 endif
+ifneq (,$(filter olsr2,$(USEMODULE)))
+    DIRS += net/routing/olsr2
+endif
 ifneq (,$(filter routing,$(USEMODULE)))
 	DIRS += net/routing
 endif
