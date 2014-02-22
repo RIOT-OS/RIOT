@@ -1,6 +1,3 @@
-debug: CFLAGS += -g
-debug: CFLAGS += -DENABLE_DEBUG
-
 export PROJECT = test_nativenet
 include ../Makefile.tests_common
 
@@ -14,7 +11,6 @@ USEMODULE += nativenet
 USEMODULE += transceiver
 
 include $(RIOTBASE)/Makefile.include
-debug: all
 
 FORCE:
 	touch main.c
