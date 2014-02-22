@@ -5,7 +5,6 @@ ifneq (,$(filter msb-430,$(BOARD)))
 include $(RIOTBASE)/Makefile.unsupported
 else
 
-## Modules to include.
 USEMODULE += hashes
 USEMODULE += bloom
 USEMODULE += random
