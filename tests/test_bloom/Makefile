@@ -8,7 +8,6 @@ ifneq (,$(filter msb-430h,$(BOARD)))
 	include $(RIOTBASE)/Makefile.unsupported
 else
 
-## Modules to include.
 USEMODULE += hashes
 USEMODULE += bloom
 

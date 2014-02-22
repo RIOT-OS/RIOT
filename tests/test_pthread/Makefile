@@ -1,8 +1,6 @@
 export PROJECT = test_pthread
 include ../Makefile.tests_common
 
-
-## Modules to include.
 USEMODULE += posix
 USEMODULE += pthread
 
@@ -14,4 +12,3 @@ else
 endif
 
 include $(RIOTBASE)/Makefile.include
-
