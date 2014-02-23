@@ -32,7 +32,6 @@ void cc2420_rx_handler(void)
     uint8_t buf[cc2420_rx_buffer[rx_buffer_next].length-2];
     cc2420_read_fifo(buf, cc2420_rx_buffer[rx_buffer_next].length-2);
 
-    cc2420_swap_fcf_bytes(buf);
     /* read rssi, lqi and crc */
     cc2420_read_fifo(rssi_crc_lqi, 2);
 
@@ -47,7 +46,7 @@ void cc2420_rx_handler(void)
     }
     ieee802154_frame_read(buf,
                           &cc2420_rx_buffer[rx_buffer_next].frame,
-                          cc2420_rx_buffer[rx_buffer_next].length-2);
+                          cc2420_rx_buffer[rx_buffer_next].length);
     if(cc2420_rx_buffer[rx_buffer_next].frame.fcf.frame_type != 2) {
 #ifdef DEBUG
         ieee802154_frame_print_fcf_frame(&cc2420_rx_buffer[rx_buffer_next].frame);
