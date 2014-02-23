@@ -28,7 +28,11 @@ export RIOTBASE ?= $(CURDIR)/../..
 export QUIET ?= 1
 
 # get rid of the mandatory RPL warning
-CFLAGS += "-Wno-cpp"
+ifeq ($(shell $(CC) -Wno-cpp -E - 2>/dev/null >/dev/null dev/null ; echo $$?),0)
+	ifeq ($(shell LANG=C $(CC) -Wno-cpp -E - 2>&1 1>/dev/null dev/null | grep warning: | grep -- -Wno-cpp),)
+		CFLAGS += -Wno-cpp
+	endif
+endif
 
 # Modules to include:
 
