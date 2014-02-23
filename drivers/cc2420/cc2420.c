@@ -176,11 +176,3 @@ uint16_t cc2420_get_pan(void)
     cc2420_read_ram(CC2420_RAM_SHORTADR, (uint8_t *)&pan, sizeof(pan));
     return pan;
 }
-
-void cc2420_swap_fcf_bytes(uint8_t *buf)
-{
-    uint8_t tmp;
-    tmp = buf[0];
-    buf[0] = buf[1];
-    buf[1] = tmp;
-}

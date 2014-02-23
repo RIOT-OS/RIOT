@@ -37,18 +37,18 @@ int16_t cc2420_send(cc2420_packet_t *packet)
     }
 
     if(packet->frame.fcf.src_addr_m == 2) {
-        packet->frame.src_addr[1] = (uint8_t)(cc2420_get_address() >> 8);
-        packet->frame.src_addr[0] = (uint8_t)(cc2420_get_address() & 0xFF);
+        packet->frame.src_addr[0] = (uint8_t)(cc2420_get_address() >> 8);
+        packet->frame.src_addr[1] = (uint8_t)(cc2420_get_address() & 0xFF);
     }
     else if (packet->frame.fcf.src_addr_m == 3) {
-        packet->frame.src_addr[7] = (uint8_t)(cc2420_get_address_long() >> 56);
-        packet->frame.src_addr[6] = (uint8_t)(cc2420_get_address_long() >> 48);
-        packet->frame.src_addr[5] = (uint8_t)(cc2420_get_address_long() >> 40);
-        packet->frame.src_addr[4] = (uint8_t)(cc2420_get_address_long() >> 32);
-        packet->frame.src_addr[3] = (uint8_t)(cc2420_get_address_long() >> 24);
-        packet->frame.src_addr[2] = (uint8_t)(cc2420_get_address_long() >> 16);
-        packet->frame.src_addr[1] = (uint8_t)(cc2420_get_address_long() >> 8);
-        packet->frame.src_addr[0] = (uint8_t)(cc2420_get_address_long() & 0xFF);
+        packet->frame.src_addr[0] = (uint8_t)(cc2420_get_address_long() >> 56);
+        packet->frame.src_addr[1] = (uint8_t)(cc2420_get_address_long() >> 48);
+        packet->frame.src_addr[2] = (uint8_t)(cc2420_get_address_long() >> 40);
+        packet->frame.src_addr[3] = (uint8_t)(cc2420_get_address_long() >> 32);
+        packet->frame.src_addr[4] = (uint8_t)(cc2420_get_address_long() >> 24);
+        packet->frame.src_addr[5] = (uint8_t)(cc2420_get_address_long() >> 16);
+        packet->frame.src_addr[6] = (uint8_t)(cc2420_get_address_long() >> 8);
+        packet->frame.src_addr[7] = (uint8_t)(cc2420_get_address_long() & 0xFF);
     }
     packet->frame.src_pan_id = cc2420_get_pan();
     packet->frame.seq_nr = sequenz_nr;
@@ -112,8 +112,7 @@ static void cc2420_gen_pkt(uint8_t *buf, cc2420_packet_t *packet)
     index = ieee802154_frame_init(&packet->frame, buf);
     offset = index;
     while(index < packet->length-2) {
-        buf[index] = packet->frame.payload[index-offset];
+        buf[index] = packet->frame.payload[index - offset];
         index += 1;
     }
-    cc2420_swap_fcf_bytes(buf);
 }
