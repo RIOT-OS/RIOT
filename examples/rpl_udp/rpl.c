@@ -40,26 +40,22 @@ ipv6_addr_t std_addr;
 
 uint8_t is_root = 0;
 
-void rpl_udp_init(char *str)
+void rpl_udp_init(int argc, char **argv)
 {
     transceiver_command_t tcmd;
     msg_t m;
     uint8_t chan = RADIO_CHANNEL;
 
-    char *toc_str = strtok(str, " ");
-    toc_str = strtok(NULL, " ");
-
-    if (!toc_str) {
-        printf("Usage: init (r|n)\n");
+    if (argc != 2) {
+        printf("Usage: %s (r|n)\n", argv[0]);
         printf("\tr\tinitialize as root\n");
         printf("\tn\tinitialize as node router\n");
         return;
     }
 
-    char command = *toc_str;
-
     uint8_t state;
 
+    char command = argv[1][0];
     if ((command == 'n') || (command == 'r')) {
         printf("INFO: Initialize as %s on address %d\n", ((command == 'n') ? "node" : "root"), id);
 
@@ -118,9 +114,10 @@ void rpl_udp_init(char *str)
     /* start transceiver watchdog */
 }
 
-void rpl_udp_loop(char *unused)
+void rpl_udp_loop(int argc, char **argv)
 {
-    (void) unused;
+    (void) argc;
+    (void) argv;
 
     rpl_routing_entry_t *rtable;
 
@@ -161,9 +158,10 @@ void rpl_udp_loop(char *unused)
     printf("########################\n");
 }
 
-void rpl_udp_table(char *unused)
+void rpl_udp_table(int argc, char **argv)
 {
-    (void) unused;
+    (void) argc;
+    (void) argv;
 
     rpl_routing_entry_t *rtable;
     rtable = rpl_get_routing_table();
@@ -187,9 +185,10 @@ void rpl_udp_table(char *unused)
     printf("$\n");
 }
 
-void rpl_udp_dodag(char *unused)
+void rpl_udp_dodag(int argc, char **argv)
 {
-    (void) unused;
+    (void) argc;
+    (void) argv;
 
     printf("---------------------------\n");
     rpl_dodag_t *mydodag = rpl_get_my_dodag();
