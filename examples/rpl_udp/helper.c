@@ -40,22 +40,24 @@ extern uint8_t ipv6_ext_hdr_len;
 msg_t msg_q[RCV_BUFFER_SIZE];
 
 /* prints current IPv6 adresses */
-void rpl_udp_ip(char *unused)
+void rpl_udp_ip(int argc, char **argv)
 {
-    (void) unused;
+    (void) argc;
+    (void) argv;
+
     ipv6_iface_print_addrs();
 }
 
-void rpl_udp_set_id(char *id_str)
+void rpl_udp_set_id(int argc, char **argv)
 {
-    int res = sscanf(id_str, "set %hu", &id);
-
-    if (res < 1) {
-        printf("Usage: init address\n");
+    if (argc != 2) {
+        printf("Usage: %s address\n", argv[0]);
         printf("\taddress must be an 8 bit integer\n");
         printf("\n\t(Current address is %u)\n", id);
         return;
     }
+
+    id = atoi(argv[1]);
 
     printf("Set node ID to %u\n", id);
 }
@@ -119,7 +121,7 @@ void rpl_udp_monitor(void)
 
 transceiver_command_t tcmd;
 
-void rpl_udp_ignore(char *addr)
+void rpl_udp_ignore(int argc, char **argv)
 {
     uint16_t a;
 
@@ -134,13 +136,13 @@ void rpl_udp_ignore(char *addr)
 
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &a;
-    a = atoi(addr + strlen("ign "));
 
-    if (strlen(addr) > strlen("ign ")) {
+    if (argc == 2) {
+        a = atoi(argv[1]);
         printf("sending to transceiver (%u): %u\n", transceiver_pid, (*(uint8_t *)tcmd.data));
         msg_send(&mesg, transceiver_pid, 1);
     }
     else {
-        puts("Usage:\tign <addr>");
+        printf("Usage: %s <addr>\n", argv[0]);
     }
 }
