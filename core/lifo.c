@@ -11,7 +11,8 @@
  * @{
  * @file        lifo.c
  * @brief       LIFO buffer implementation
- * @author      probably Kaspar Schleiser
+ *
+ * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @}
  */
 
