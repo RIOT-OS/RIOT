@@ -98,6 +98,7 @@ else
 endif
 	$(AD)$(SIZE) $(BINDIR)$(PROJECT).elf
 	$(AD)$(OBJCOPY) $(OFLAGS) $(BINDIR)$(PROJECT).elf $(BINDIR)$(PROJECT).hex
+endif
 
 ## your make rules
 ## Only basic example - modify it for larger applications!!
