@@ -1,3 +1,9 @@
+ifneq (,$(filter libcoap,$(USEPKG)))
+	ifeq (,$(filter pnet,$(USEMODULE)))
+		USEMODULE += pnet
+	endif
+endif
+
 ifneq (,$(filter pnet,$(USEMODULE)))
 	ifeq (,$(filter posix,$(USEMODULE)))
 		USEMODULE += posix
