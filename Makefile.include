@@ -114,7 +114,7 @@ endif
 # string array of all names of c files in dir
 SRC = $(wildcard *.$(SRCEXTENSION))
 
-# string array of all names replaced .c with .o 
+# string array of all names replaced .c with .o
 OBJ = $(SRC:%.$(SRCEXTENSION)=${BINDIR}${PROJECT}/%.o)
 
 $(BINDIR)$(PROJECT).a: $(OBJ)
