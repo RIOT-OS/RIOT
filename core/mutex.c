@@ -120,7 +120,7 @@ void mutex_unlock(struct mutex_t *mutex)
 
 void mutex_unlock_and_sleep(struct mutex_t *mutex)
 {
-    DEBUG("%s: unlocking mutex. val: %u pid: %u, and take a nap\n", active_thread->name, mutex->val, thread_pid);
+    DEBUG("%s: unlocking mutex. val: %u pid: %u, and taking a nap\n", active_thread->name, mutex->val, thread_pid);
     int irqstate = disableIRQ();
 
     if (mutex->val != 0) {
