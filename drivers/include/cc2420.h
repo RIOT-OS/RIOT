@@ -223,14 +223,6 @@ void cc2420_rx_handler(void);
 int16_t cc2420_send(cc2420_packet_t *packet);
 
 /**
- * @brief Changes the byte order of the two fcf bytes in a buffer.
- *
- * @param[in] *buf The Packet to swap.
- *
- */
-void cc2420_swap_fcf_bytes(uint8_t *buf);
-
-/**
  * The PID of the transceiver thread.
  */
 extern int transceiver_pid;

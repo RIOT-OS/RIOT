@@ -7,6 +7,8 @@
   */
 
 #include "at86rf231.h"
+#include "at86rf231_arch.h"
+#include "at86rf231_spi.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -164,12 +166,4 @@ void at86rf231_set_monitor(uint8_t mode)
 {
     (void) mode;
     // TODO
-}
-
-void at86rf231_swap_fcf_bytes(uint8_t *buf)
-{
-    uint8_t tmp;
-    tmp = buf[1];
-    buf[1] = buf[2];
-    buf[2] = tmp;
 }

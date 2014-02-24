@@ -1,5 +1,6 @@
 #include "at86rf231.h"
 #include "at86rf231_arch.h"
+#include "at86rf231_spi.h"
 
 static void at86rf231_xmit(uint8_t *data, uint8_t length);
 static void at86rf231_gen_pkt(uint8_t *buf, at86rf231_packet_t *packet);
@@ -19,18 +20,18 @@ int16_t at86rf231_send(at86rf231_packet_t *packet)
     }
 
     if (packet->frame.fcf.src_addr_m == 2) {
-        packet->frame.src_addr[1] = (uint8_t)(at86rf231_get_address() >> 8);
-        packet->frame.src_addr[0] = (uint8_t)(at86rf231_get_address() & 0xFF);
+        packet->frame.src_addr[0] = (uint8_t)(at86rf231_get_address() >> 8);
+        packet->frame.src_addr[1] = (uint8_t)(at86rf231_get_address() & 0xFF);
     }
     else if (packet->frame.fcf.src_addr_m == 3) {
-        packet->frame.src_addr[7] = (uint8_t)(at86rf231_get_address_long() >> 56);
-        packet->frame.src_addr[6] = (uint8_t)(at86rf231_get_address_long() >> 48);
-        packet->frame.src_addr[5] = (uint8_t)(at86rf231_get_address_long() >> 40);
-        packet->frame.src_addr[4] = (uint8_t)(at86rf231_get_address_long() >> 32);
-        packet->frame.src_addr[3] = (uint8_t)(at86rf231_get_address_long() >> 24);
-        packet->frame.src_addr[2] = (uint8_t)(at86rf231_get_address_long() >> 16);
-        packet->frame.src_addr[1] = (uint8_t)(at86rf231_get_address_long() >> 8);
-        packet->frame.src_addr[0] = (uint8_t)(at86rf231_get_address_long() & 0xFF);
+        packet->frame.src_addr[0] = (uint8_t)(at86rf231_get_address_long() >> 56);
+        packet->frame.src_addr[1] = (uint8_t)(at86rf231_get_address_long() >> 48);
+        packet->frame.src_addr[2] = (uint8_t)(at86rf231_get_address_long() >> 40);
+        packet->frame.src_addr[3] = (uint8_t)(at86rf231_get_address_long() >> 32);
+        packet->frame.src_addr[4] = (uint8_t)(at86rf231_get_address_long() >> 24);
+        packet->frame.src_addr[5] = (uint8_t)(at86rf231_get_address_long() >> 16);
+        packet->frame.src_addr[6] = (uint8_t)(at86rf231_get_address_long() >> 8);
+        packet->frame.src_addr[7] = (uint8_t)(at86rf231_get_address_long() & 0xFF);
     }
 
     packet->frame.src_pan_id = at86rf231_get_pan();
@@ -101,9 +102,7 @@ static void at86rf231_gen_pkt(uint8_t *buf, at86rf231_packet_t *packet)
     offset = index;
 
     while (index < packet->length) {
-        buf[index] = packet->frame.payload[index - offset + 1];
+        buf[index] = packet->frame.payload[index - offset];
         index += 1;
     }
-
-    at86rf231_swap_fcf_bytes(buf);
 }
