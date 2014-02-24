@@ -85,9 +85,16 @@ all: $(BINDIR)$(PROJECT).a
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
 	"$(MAKE)" -C $(RIOTBASE)
 ifeq ($(BUILDOSXNATIVE),1)
+ifneq ($(CPPMIX),1)
 	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
+	$(AD)$(CPPMIXCC) $(UNDEF) -o $(BINDIR)$(PROJECT).elf $(CPPMIXEXTRALIBS) $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
+endif
+else
+ifneq ($(CPPMIX),1)
 	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS)
+else
+	$(AD)$(CPPMIXCC) $(UNDEF) -o $(BINDIR)$(PROJECT).elf -Wl,--start-group $(CPPMIXEXTRALIBS) $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS) 
 endif
 	$(AD)$(SIZE) $(BINDIR)$(PROJECT).elf
 	$(AD)$(OBJCOPY) $(OFLAGS) $(BINDIR)$(PROJECT).elf $(BINDIR)$(PROJECT).hex
@@ -97,11 +104,17 @@ endif
 #$(BINDIR)/$(PROJECT).a: $(BINDIR)/$(PROJECT).o
 #	$(AR) -rc $(BINDIR)/project.a $(BINDIR)/$(PROJECT).o
 
-# string array of all names of c files in dir
-SRC = $(wildcard *.c)
+# source extension set for mixedmode compilation
+SRCEXTENSION = c
+ifeq ($(CPPMIX),1)
+SRCEXTENSION = cpp
+endif
 
-# string array of all names replaced .c with .o
-OBJ = $(SRC:%.c=${BINDIR}${PROJECT}/%.o)
+# string array of all names of c files in dir
+SRC = $(wildcard *.$(SRCEXTENSION))
+
+# string array of all names replaced .c with .o 
+OBJ = $(SRC:%.$(SRCEXTENSION)=${BINDIR}${PROJECT}/%.o)
 
 $(BINDIR)$(PROJECT).a: $(OBJ)
 	$(AD)$(AR) -rc $(BINDIR)$(PROJECT).a $(OBJ)
@@ -117,11 +130,15 @@ $(RIOTBASE)/pkg/%/Makefile.include::
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
 
-$(BINDIR)$(PROJECT)/%.o: %.c $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
+$(BINDIR)$(PROJECT)/%.o: %.$(SRCEXTENSION) $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
 	@mkdir -p ${BINDIR}
-	@echo; echo "Compiling.... $*.c"; echo
+	@echo; echo "Compiling.... $*.$(SRCEXTENSION)"; echo
 	@test -d $(BINDIR)$(PROJECT) || mkdir -p $(BINDIR)$(PROJECT)
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$(PROJECT)/$*.o
+ifneq ($(CPPMIX),1)
+	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.$(SRCEXTENSION) -o $(BINDIR)$(PROJECT)/$*.o
+else
+	$(AD)$(CPPMIXCC) $(CPPMIXCFLAGS) $(INCLUDES) -c $*.$(SRCEXTENSION) -o $(BINDIR)$(PROJECT)/$*.o
+endif
 
 $(USEPKG:%=${BINDIR}%.a)::
 	@mkdir -p ${BINDIR}
