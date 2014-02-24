@@ -1,20 +1,12 @@
 ifneq (,$(filter cc110x,$(USEMODULE)))
-	ifeq (,$(filter gpioint,$(USEMODULE)))
-		USEMODULE += gpioint
-	endif
+	USEMODULE += gpioint
 endif
 
 ifneq (,$(filter cc110x_ng,$(USEMODULE)))
-	ifeq (,$(filter cc110x_spi,$(USEMODULE)))
-		USEMODULE += cc110x_spi
-	endif
-	ifeq (,$(filter gpioint,$(USEMODULE)))
-		USEMODULE += gpioint
-	endif
+	USEMODULE += cc110x_spi
+	USEMODULE += gpioint
 endif
 
 ifneq (,$(filter ltc4150,$(USEMODULE)))
-	ifeq (,$(filter gpioint,$(USEMODULE)))
-		USEMODULE += gpioint
-	endif
+	USEMODULE += gpioint
 endif

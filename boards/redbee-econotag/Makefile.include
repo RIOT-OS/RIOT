@@ -33,12 +33,8 @@ export INCLUDES += -I$(RIOTCPU)/$(CPU)/maca/include
 export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/drivers/include
 
 ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-	ifeq (,$(filter mc1322x,$(USEMODULE)))
-		USEMODULE += mc1322x
-	endif
-	ifeq (,$(filter transceiver,$(USEMODULE)))
-		USEMODULE += transceiver
-	endif
+	USEMODULE += mc1322x
+	USEMODULE += transceiver
 endif
 
 export UNDEF += $(BINDIR)cpu/startup.o
