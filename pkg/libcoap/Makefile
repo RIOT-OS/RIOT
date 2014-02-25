@@ -1,6 +1,7 @@
 PKG_NAME=libcoap
 PKG_URL=http://git.code.sf.net/p/libcoap/code
 PKG_VERSION=ef41ce5d02d64cec0751882ae8fd95f6c32bc018
+PKG_DIR=$(CURDIR)/$(PKG_NAME)
 
 ifneq ($(RIOTBOARD),)
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
@@ -14,24 +15,28 @@ endif
 .PHONY: all clean patch reset
 
 all: patch
-	make -C $(CURDIR)/$(PKG_NAME)
+	make -C $(PKG_DIR)
 
-patch: $(CURDIR)/$(PKG_NAME)/Makefile
+patch: $(PKG_DIR)/Makefile
 
-$(CURDIR)/$(PKG_NAME)/Makefile: $(CURDIR)/$(PKG_NAME)
-	cd "$<" && git am --ignore-whitespace $(CURDIR)/*.patch || true
+$(PKG_DIR)/Makefile: $(PKG_DIR)/.git/config
+	cd "$(PKG_DIR)" && git am --ignore-whitespace "$(CURDIR)"/*.patch || true
 
-$(CURDIR)/$(PKG_NAME)/:
-	git clone $(PKG_URL) $@ && \
-		cd $@ && git checkout $(PKG_VERSION)
+$(PKG_DIR)/.git/config:
+	test -d "$(PKG_DIR)" || git clone "$(PKG_URL)" "$(PKG_DIR)"; \
+		cd "$(PKG_DIR)" && git checkout -f "$(PKG_VERSION)"
 
 clean::
-	cd $(CURDIR)/$(PKG_NAME) && \
+	@echo "Cleaning up libcoap package..."
+	@cd "$(PKG_DIR)" 2> /dev/null > /dev/null && \
 		git clean -x -f && \
-		git reset --hard $(PKG_VERSION) || true
+		git am --abort && \
+		git reset --hard "$(PKG_VERSION)" && \
+		$(MAKE) patch || true
 
-distclean::
-	rm -rf $(CURDIR)/$(PKG_NAME)
+
+distclean:: 
+	rm -rf "$(PKG_DIR)"
 
 Makefile.include:
 	@true
