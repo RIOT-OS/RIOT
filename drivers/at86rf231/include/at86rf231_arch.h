@@ -10,8 +10,6 @@ void at86rf231_gpio_spi_interrupts_init(void);
 void at86rf231_reset(void);
 uint8_t at86rf231_get_status(void);
 
-void at86rf231_switch_to_rx(void);
-
 void at86rf231_spi_select(void);
 void at86rf231_spi_unselect(void);
 
