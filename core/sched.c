@@ -28,6 +28,7 @@
 #include "clist.h"
 #include "bitarithm.h"
 #include "thread.h"
+#include "irq.h"
 
 #if SCHEDSTATISTICS
 #include "hwtimer.h"
@@ -170,8 +171,10 @@ void sched_set_status(tcb_t *process, unsigned int status)
     process->status = status;
 }
 
-void sched_switch(uint16_t current_prio, uint16_t other_prio, int in_isr)
+void sched_switch(uint16_t current_prio, uint16_t other_prio)
 {
+    int in_isr = inISR();
+
     DEBUG("%s: %i %i %i\n", active_thread->name, (int)current_prio, (int)other_prio, in_isr);
 
     if (current_prio >= other_prio) {

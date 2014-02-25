@@ -75,14 +75,6 @@
 #define PRIORITY_IDLE           PRIORITY_MIN
 #define PRIORITY_MAIN           (PRIORITY_MIN - (SCHED_PRIO_LEVELS/2))
 
-/**
- * @brief   Check whether called from interrupt service routine
- *
- * @return  true if called from within interrupt
- * @return  false if not.
- */
-int inISR(void);
-
 #define LPM_PREVENT_SLEEP_UART    BIT2
 #define LPM_PREVENT_SLEEP_HWTIMER    BIT1
 

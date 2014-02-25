@@ -152,7 +152,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
         return -1;
     }
 
-    sched_switch(active_thread->priority, PRIORITY_MAIN, inISR());
+    sched_switch(active_thread->priority, PRIORITY_MAIN);
 
     return 0;
 }
