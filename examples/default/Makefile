@@ -65,7 +65,14 @@ ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += config
 	USEMODULE += random
 endif
+ifneq (,$(filter iot-lab_M3,$(BOARD)))
+	USEMODULE += transceiver
+	USEMODULE += at86rf231
+	USEMODULE += random
+	export RIOTCPU ?= $(CURDIR)/../../RIOT/thirdparty_cpu
+	export RIOTBOARD ?= $(CURDIR)/../../RIOT/thirdparty_boards
+endif
 
-export INCLUDES += -I${RIOTBASE}/core/include/ -I${RIOTBASE}/sys/include/ -I${RIOTBASE}/drivers/include/
+export INCLUDES += -I$(RIOTBASE)/sys/net/include -I${RIOTBASE}/core/include/ -I${RIOTBASE}/sys/include/ -I${RIOTBASE}/drivers/include/
 
 include $(RIOTBASE)/Makefile.include
