@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2014 Hamburg University of Applied Siences (HAW)
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup tests
+ * @{
+ *
+ * @file
+ * @brief   simple test application for atomic mutex unlocking and sleeping
+ *
+ * @author  Martin Landsmann <martin.landsmann@haw-hamburg.de>
+ *
+ * @}
+ */
+
 #include <stdio.h>
 #include "thread.h"
 #include "mutex.h"
@@ -6,28 +26,30 @@ mutex_t mutex;
 int indicator, count;
 
 char stack[KERNEL_CONF_STACKSIZE_MAIN];
-void second_thread(void) {
-    while(1) {
-        mutex_lock(&mutex);	
+void second_thread(void)
+{
+    while (1) {
+        mutex_lock(&mutex);
         thread_wakeup(1);
         indicator--;
         mutex_unlock_and_sleep(&mutex);
-	}
+    }
 }
 
-int main(void) {
+int main(void)
+{
     indicator = 0;
     count = 0;
     mutex_init(&mutex);
 
     thread_create(stack,
-                    KERNEL_CONF_STACKSIZE_MAIN,
-                    PRIORITY_MAIN-1,
-                    CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                    second_thread,
-                    "second_thread");
+                  KERNEL_CONF_STACKSIZE_MAIN,
+                  PRIORITY_MAIN - 1,
+                  CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                  second_thread,
+                  "second_thread");
 
-    while(1) {
+    while (1) {
         mutex_lock(&mutex);
         thread_wakeup(2);
         indicator++;
@@ -37,8 +59,9 @@ int main(void) {
             printf("Error, threads did not sleep properly. [indicator: %d]\n", indicator);
             return -1;
         }
-        if ((count%100000) == 0) {
-            printf("Still alive alternated [count: %dk] times.\n", count/1000);
+
+        if ((count % 100000) == 0) {
+            printf("Still alive alternated [count: %dk] times.\n", count / 1000);
         }
 
         mutex_unlock_and_sleep(&mutex);
