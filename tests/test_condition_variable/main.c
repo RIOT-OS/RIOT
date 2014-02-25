@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2014 Hamburg University of Applied Siences (HAW)
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup tests
+ * @{
+ *
+ * @file
+ * @brief   simple condition variable test application
+ *
+ * @author  Martin Landsmann <martin.landsmann@haw-hamburg.de>
+ *
+ * @}
+ */
+
 #include <stdio.h>
 #include "condition_variable.h"
 #include "thread.h"
