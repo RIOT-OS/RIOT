@@ -29,7 +29,9 @@ extern void _reboot_handler(char *unused);
 extern void _id_handler(char *id);
 #endif
 
+#ifdef MODULE_LPC_COMMON
 extern void _heap_handler(char *unused);
+#endif
 
 #ifdef MODULE_PS
 extern void _ps_handler(char *unused);
