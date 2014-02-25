@@ -35,6 +35,7 @@
 #define UART0_BUFSIZE       (128)
 #endif
 
+/* increase when ENABLE_DEBUG in chardev_thread is set to 1! */
 #define UART0_STACKSIZE 	(MINIMUM_STACK_SIZE + 256)
 
 ringbuffer_t uart0_ringbuffer;
