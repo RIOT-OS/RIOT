@@ -23,9 +23,15 @@
 #include <stdlib.h>
 #include "shell_commands.h"
 
-extern void _id_handler(char *id);
 extern void _reboot_handler(char *unused);
+
+#ifdef MODULE_CONFIG
+extern void _id_handler(char *id);
+#endif
+
+#ifdef MODULE_LPC_COMMON
 extern void _heap_handler(char *unused);
+#endif
 
 #ifdef MODULE_PS
 extern void _ps_handler(char *unused);
@@ -104,8 +110,10 @@ extern void _mersenne_get(char *str);
 #endif
 
 const shell_command_t _shell_command_list[] = {
-    {"id", "Gets or sets the node's id.", _id_handler},
     {"reboot", "Reboot the node", _reboot_handler},
+#ifdef MODULE_CONFIG
+    {"id", "Gets or sets the node's id.", _id_handler},
+#endif
 #ifdef MODULE_LPC_COMMON
     {"heap", "Shows the heap state for the LPC2387 on the command shell.", _heap_handler},
 #endif
