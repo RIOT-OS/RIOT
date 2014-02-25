@@ -30,9 +30,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#ifdef MODULE_VTIMER
+#include <sys/time.h>
+#endif
 
 #include "cpu.h"
 #include "irq.h"
+#include "vtimer.h"
 
 #include "native_internal.h"
 
@@ -297,3 +301,11 @@ void errx(int eval, const char *fmt, ...)
     va_start(argp, fmt);
     verrx(eval, fmt, argp);
 }
+
+#ifdef MODULE_VTIMER
+int _gettimeofday(struct timeval *tp, void *restrict tzp) {
+    (void) tzp;
+    vtimer_gettimeofday(tp);
+    return 0;
+}
+#endif
