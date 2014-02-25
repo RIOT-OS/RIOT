@@ -1,5 +1,8 @@
-SRC = shell_commands.c sc_id.c sc_sys.c
+SRC = shell_commands.c sc_sys.c
 
+ifneq (,$(filter config,$(USEMODULE)))
+	SRC += sc_id.c
+endif
 ifneq (,$(filter transceiver,$(USEMODULE)))
 	SRC += sc_transceiver.c
 endif
