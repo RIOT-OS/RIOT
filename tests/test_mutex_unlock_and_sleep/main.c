@@ -22,11 +22,11 @@
 #include "thread.h"
 #include "mutex.h"
 
-mutex_t mutex;
-int indicator, count;
+static mutex_t mutex;
+static volatile int indicator, count;
 
-char stack[KERNEL_CONF_STACKSIZE_MAIN];
-void second_thread(void)
+static char stack[KERNEL_CONF_STACKSIZE_MAIN];
+static void second_thread(void)
 {
     while (1) {
         mutex_lock(&mutex);
