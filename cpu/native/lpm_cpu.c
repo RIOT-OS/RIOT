@@ -130,7 +130,6 @@ enum lpm_mode lpm_set(enum lpm_mode target)
         case LPM_OFF:
             printf("lpm_set(): exit()\n");
             exit(0);
-            break;
 
         default:
             DEBUG("XXX: unsupported power mode: %i\n", native_lpm);
