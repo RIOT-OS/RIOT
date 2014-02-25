@@ -23,16 +23,16 @@
 #include "thread.h"
 #include "mutex.h"
 
-mutex_t mutex;
-struct pthread_cond_t cv;
-int count;
-char stack[KERNEL_CONF_STACKSIZE_MAIN];
+static mutex_t mutex;
+static struct pthread_cond_t cv;
+static volatile int count;
+static char stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 /**
  * @brief   This thread tries to lock the mutex to enter the critical section.
  *          Then it sets cv true (==1), signals one waiting thread to check cv state and sleep
  */
-void second_thread(void)
+static void second_thread(void)
 {
     while (1) {
         mutex_lock(&mutex);
