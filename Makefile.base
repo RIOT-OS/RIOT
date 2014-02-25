@@ -33,7 +33,8 @@ $(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ)
 $(BINDIR)%.o: %.c
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$*.o
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MM $*.c > $(BINDIR)$*.d
-	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
+	@# prepend path to dependency info file
+	$(AD)sed -i -e "1s|^|$(BINDIR)|" $(BINDIR)$*.d
 
 $(BINDIR)%.o: %.s
 	$(AD)$(AS) $(ASFLAGS) $*.s -o $(BINDIR)$*.o
