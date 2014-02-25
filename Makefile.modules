@@ -6,10 +6,7 @@ INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBAS
 ED = $(USEMODULE:%=-DMODULE_%)
 ED += $(USEPKG:%=-DMODULE_%)
 EXTDEFINES = $(shell echo $(ED)|tr 'a-z' 'A-Z')
-BL=$(USEMODULE:%= $(BINDIR)%.a)
-
-# exclude hwtimer, because it is part of the kernel but the define is needed for auto_init
-export BASELIBS = $(shell echo $(BL)|sed 's/[^ ]*hwtimer.a//')
+export BASELIBS = $(USEMODULE:%= $(BINDIR)%.a)
 
 CFLAGS += $(EXTDEFINES)
 
