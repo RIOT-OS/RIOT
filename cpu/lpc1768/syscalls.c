@@ -21,8 +21,12 @@
 #include <sys/stat.h>
 #include <sys/unistd.h>
 #include <stdint.h>
+#include <sys/time.h>
 #include "kernel.h"
 #include "irq.h"
+#ifdef MODULE_VTIMER
+#include "vtimer.h"
+#endif
 
 /**
  * @name Heaps (defined in linker script)
@@ -227,5 +231,13 @@ int _kill_r(struct _reent *r, int pid, int sig)
 	return -1;
 }
 /*---------------------------------------------------------------------------*/
+#ifdef MODULE_VTIMER
+int _gettimeofday(struct timeval *tp, void *restrict tzp) {
+    (void) tzp;
+    vtimer_gettimeofday(tp);
+    return 0;
+}
+#endif
+
 void _init(void){}
 void _fini(void){}
