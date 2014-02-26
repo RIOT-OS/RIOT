@@ -14,7 +14,6 @@
  * @}
  */
 
-#include "etx_beaconing.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -28,45 +27,53 @@
 
 #include "sixlowpan/ip.h"
 #include "ieee802154_frame.h"
+#include "etx_beaconing.h"
 
-//prototytpes
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
+#if ENABLE_DEBUG
+#define ETX_BEACON_STACKSIZE    (KERNEL_CONF_STACKSIZE_DEFAULT + KERNEL_CONF_STACKSIZE_PRINTF_FLOAT)
+#define ETX_RADIO_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT + KERNEL_CONF_STACKSIZE_PRINTF_FLOAT)
+#define ETX_CLOCK_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT)
+#else
+#define ETX_BEACON_STACKSIZE    (KERNEL_CONF_STACKSIZE_MAIN)
+#define ETX_RADIO_STACKSIZE     (KERNEL_CONF_STACKSIZE_MAIN)
+#define ETX_CLOCK_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT)
+#endif
+
+/* prototytpes */
 static uint8_t etx_count_packet_tx(etx_neighbor_t *candidate);
 static void etx_set_packets_received(void);
 static bool etx_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2);
 
 //Buffer
-char etx_beacon_buf[ETX_BEACON_STACKSIZE] = { 0 };
-char etx_radio_buf[ETX_RADIO_STACKSIZE] = { 0 };
-char etx_clock_buf[ETX_CLOCK_STACKSIZE] = { 0 };
+static char etx_beacon_buf[ETX_BEACON_STACKSIZE];
+static char etx_radio_buf[ETX_RADIO_STACKSIZE];
+static char etx_clock_buf[ETX_CLOCK_STACKSIZE];
 
-uint8_t etx_send_buf[ETX_BUF_SIZE] = { 0 };
-uint8_t etx_rec_buf[ETX_BUF_SIZE] = { 0 };
+static uint8_t etx_send_buf[ETX_BUF_SIZE];
+static uint8_t etx_rec_buf[ETX_BUF_SIZE];
 
 //PIDs
 int etx_beacon_pid = 0;
 int etx_radio_pid = 0;
 int etx_clock_pid = 0;
 
-/*
- * xxx If you get a -Wmissing-braces warning here:
- * A -Wmissing-braces warning at this point is a gcc-bug!
- * Please delete this information once it's fixed
- * See: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
- */
 //Message queue for radio
-msg_t msg_que[ETX_RCV_QUEUE_SIZE] = { {0} };
+msg_t msg_que[ETX_RCV_QUEUE_SIZE];
 
 /*
  * The counter for the current 'round'. An ETX beacon is sent every ETX_INTERVAL
  * u-seconds and a node computes the ETX value by comparing the the received
  * probes vs the expected probes from a neighbor every ETX_ROUND intervals.
  */
-static uint8_t cur_round = 0;
+static uint8_t cur_round;
 
 /*
  * If we have not yet reached WINDOW intervals, won't calculate the ETX just yet
  */
-static char reached_window = 0;
+static char reached_window;
 
 /*
  * This could (and should) be done differently, once the RPL implementation
@@ -76,14 +83,9 @@ static char reached_window = 0;
  * needing them to be in our parent array, so we have another array here in
  * which we put all necessary info for up to ETX_MAX_CANDIDATE_NEIHGBORS
  * candidates.
- *
- * xxx If you get a -Wmissing-braces warning here:
- * A -Wmissing-braces warning at this point is a gcc-bug!
- * Please delete this information once it's fixed
- * See: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
  */
 //Candidate array
-static etx_neighbor_t candidates[ETX_MAX_CANDIDATE_NEIGHBORS] = { {{{0}}} };
+static etx_neighbor_t candidates[ETX_MAX_CANDIDATE_NEIGHBORS];
 
 /*
  * Each time we send a beacon packet we need to reset some values for the
