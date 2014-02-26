@@ -39,13 +39,13 @@ int fd_init(void)
     memset(fd_table, 0, sizeof(fd_t) * FD_MAX);
 
     posix_open(uart0_handler_pid, 0);
-    fd_t fd = {
-        .__active = 1,
-        .fd = uart0_handler_pid,
-        .read = (ssize_t ( *)(int, void *, size_t))posix_read,
-        .write = (ssize_t ( *)(int, const void *, size_t))posix_write,
-        .close = posix_close
-    };
+    fd_t fd;
+    fd.__active = 1;
+    fd.fd = uart0_handler_pid;
+    fd.read = (ssize_t (*)(int, void *, size_t))posix_read;
+    fd.write = (ssize_t (*)(int, const void *, size_t))posix_write;
+    fd.close = posix_close;
+
     memcpy(&fd_table[STDIN_FILENO], &fd, sizeof(fd_t));
     memcpy(&fd_table[STDOUT_FILENO], &fd, sizeof(fd_t));
     memcpy(&fd_table[STDERR_FILENO], &fd, sizeof(fd_t));
