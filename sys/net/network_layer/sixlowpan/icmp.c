@@ -672,7 +672,7 @@ void recv_rtr_adv(void)
     ipv6_addr_t abro_addr;
 
     ipv6_buf = ipv6_get_buf();
-    packet_length = IPV6_HDR_LEN + ipv6_buf->length;
+    packet_length = IPV6_HDR_LEN + NTOHS(ipv6_buf->length);
     icmpv6_opt_hdr_len = RTR_ADV_LEN;
     rtr_adv_buf = get_rtr_adv_buf(ipv6_ext_hdr_len);
     ipv6_addr_t newaddr;
@@ -937,7 +937,7 @@ void recv_nbr_sol(void)
     uint8_t send_na = 0;
     uint8_t sllao_set = 0;
     uint8_t aro_state = NDP_OPT_ARO_STATE_SUCCESS;
-    uint16_t packet_length = IPV6_HDR_LEN + ipv6_buf->length;
+    uint16_t packet_length = IPV6_HDR_LEN + NTOHS(ipv6_buf->length);
 
     /* check whick options are set, we need that because an aro
      * option condition is that a sllao option is set. thus that we don't

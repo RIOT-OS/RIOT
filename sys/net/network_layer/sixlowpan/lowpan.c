@@ -1154,7 +1154,7 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
     	ptr = get_payload_buf(ipv6_ext_hdr_len);
     	}
     */
-    memcpy(&ipv6_hdr_fields[hdr_pos], &ptr[IPV6_HDR_LEN], ipv6_buf->length);
+    memcpy(&ipv6_hdr_fields[hdr_pos], &ptr[IPV6_HDR_LEN], NTOHS(ipv6_buf->length));
 
     comp_len = 2 + hdr_pos + payload_length;
 
