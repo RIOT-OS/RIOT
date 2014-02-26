@@ -56,6 +56,4 @@ void nbr_cache_auto_rem(void);
 ndp_a6br_cache_t *abr_add_context(uint16_t version, ipv6_addr_t *abr_addr,
                                   uint8_t cid);
 void abr_remove_context(uint8_t cid);
-
-uint16_t icmpv6_csum(uint8_t proto);
 #endif /* _SIXLOWPAN_ICMP_H*/

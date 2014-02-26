@@ -384,22 +384,22 @@ void lowpan_transfer(void)
                 packet_length = current_buf->packet_size - 1;
                 msg_send_receive(&m_send, &m_recv, ip_process_pid);
             }
-            else if ((current_buf->packet[0] & 0xf0) == IPV6_VER &&
-                     iphc_status == LOWPAN_IPHC_DISABLE) {
+            else if (((current_buf->packet[0] & 0xf0) == IPV6_VER) &&
+                     (iphc_status == LOWPAN_IPHC_DISABLE)) {
                 ipv6_buf = ipv6_get_buf();
                 memcpy(ipv6_buf, (current_buf->packet), current_buf->packet_size);
                 m_send.content.ptr = (char *)ipv6_buf;
                 packet_length = current_buf->packet_size;
                 msg_send_receive(&m_send, &m_recv, ip_process_pid);
             }
-            else if ((current_buf->packet[0] & 0xe0) == SIXLOWPAN_IPHC1_DISPATCH &&
-                     iphc_status == LOWPAN_IPHC_ENABLE) {
+            else if (((current_buf->packet[0] & 0xe0) == SIXLOWPAN_IPHC1_DISPATCH) &&
+                     (iphc_status == LOWPAN_IPHC_ENABLE)) {
                 DEBUG("INFO: IPHC1 dispatch 0x%02x received, decompress\n",
                       current_buf->packet[0]);
                 lowpan_iphc_decoding(current_buf->packet,
                                      current_buf->packet_size,
-                                     &current_buf->s_addr,
-                                     &current_buf->d_addr);
+                                     &(current_buf->s_addr),
+                                     &(current_buf->d_addr));
 
                 ipv6_buf = ipv6_get_buf();
                 m_send.content.ptr = (char *) ipv6_buf;
