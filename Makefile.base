@@ -29,12 +29,12 @@ $(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ)
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
 
-# compile and generate dependency info
+# compile and generate dependency info,
+# prepend path to dependency info file
 $(BINDIR)%.o: %.c
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$*.o
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MM $*.c > $(BINDIR)$*.d
-	@# prepend path to dependency info file
-	$(AD)sed -i -e "1s|^|$(BINDIR)|" $(BINDIR)$*.d
+	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MM $*.c |\
+		sed -e "1s|^|$(BINDIR)|" > $(BINDIR)$*.d
 
 $(BINDIR)%.o: %.s
 	$(AD)$(AS) $(ASFLAGS) $*.s -o $(BINDIR)$*.o
