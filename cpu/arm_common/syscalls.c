@@ -26,12 +26,18 @@
 #include <sys/stat.h>
 #include <sys/unistd.h>
 #include <stdint.h>
+#include <sys/time.h>
 
 #include "arm_cpu.h"
 // core
 #include "kernel.h"
 #include "irq.h"
 #include "io.h"
+#if defined MODULE_RTC
+#include "rtc.h"
+#elif defined MODULE_VTIMER
+#include "vtimer.h"
+#endif
 
 /* When using the HAL standard in and out are handled by HAL
    devices. */
@@ -271,5 +277,17 @@ int _kill_r(struct _reent *r, int pid, int sig)
     return -1;
 }
 /*---------------------------------------------------------------------------*/
+int _gettimeofday(struct timeval *tp, void *restrict tzp) {
+    (void) tzp;
+#if defined MODULE_RTC
+    rtc_time(tp);
+#elif defined MODULE_VTIMER
+    vtimer_gettimeofday(tp);
+#else
+#warning gettimeofday syscall is not implemented without vtimer or rtc module
+#endif
+    return 0;
+}
+
 void _init(void) {}
 void _fini(void) {}

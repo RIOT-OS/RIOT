@@ -266,6 +266,14 @@ void vtimer_now(timex_t *out)
     out->microseconds = us % (1000 * 1000);
 }
 
+void vtimer_gettimeofday(struct timeval *tp) {
+    timex_t now;
+    vtimer_now(&now);
+
+    tp->tv_sec = now.seconds;
+    tp->tv_usec = now.microseconds;
+}
+
 void vtimer_get_localtime(struct tm *localt)
 {
     timex_t now;
