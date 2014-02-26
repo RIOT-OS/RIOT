@@ -13,7 +13,7 @@
  * @file        crash.h
  * @brief       Crash handling header
  *
- * Define a panic() function that allows to stop/reboot the system
+ * Define a core_panic() function that allows to stop/reboot the system
  *  when an unrecoverable problem has occured.
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
@@ -28,11 +28,11 @@
     A numeric code indicating the failure reason can be given
     as the ::crash_code parameter.
     Detailing the failure is possible using the ::message parameter.
-    This function should serve a similar purpose than the panic()
+    This function should serve a similar purpose as the panic()
     function of Unix/Linux kernels.
 
-    if DEVELHELP macro is defined, system will be halted;
-    system will be rebooted otherwise.
+    If the DEVELHELP macro is defined, the system will be halted;
+    the system will be rebooted otherwise.
 
     WARNING: this function NEVER returns! */
 NORETURN void core_panic(int crash_code, const char *message);

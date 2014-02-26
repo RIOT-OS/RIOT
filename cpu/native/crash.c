@@ -41,12 +41,23 @@ NORETURN void core_panic(int crash_code, const char *message)
         /* try to print panic message to console (if possible) */
         puts("******** SYSTEM FAILURE ********\n");
         puts(message);
+#if DEVELHELP
         puts("******** RIOT HALTS HERE ********\n");
+#else
+        puts("******** RIOT WILL REBOOT ********\n");
+#endif
         puts("\n\n");
     }
+
+    dINT();
+#if DEVELHELP
     /* since we're atop an Unix-like platform,
        just use the (developer-)friendly core-dump feature */
     kill(getpid(), SIGTRAP);
+#else
+    reboot();
+#endif
+
     /* proove the compiler that we won't return from this function
        (even if we actually won't even get here...) */
     while (1) {
