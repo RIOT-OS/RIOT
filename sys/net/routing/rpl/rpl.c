@@ -490,7 +490,7 @@ void rpl_process(void)
         code = ((uint8_t *)m_recv.content.ptr);
         /* differentiate packet types */
         ipv6_buf = ipv6_get_buf();
-        memcpy(&rpl_buffer, ipv6_buf, ipv6_buf->length + IPV6_HDR_LEN);
+        memcpy(&rpl_buffer, ipv6_buf, NTOHS(ipv6_buf->length) + IPV6_HDR_LEN);
 
         switch (*code) {
             case (ICMP_CODE_DIS): {
@@ -583,7 +583,7 @@ void recv_rpl_dio(void)
      * ipv6_buf->length contains the packet length minus ipv6 and
      * icmpv6 header, so only ICMPV6_HDR_LEN remains to be
      * subtracted.  */
-    while (len < (ipv6_buf->length - ICMPV6_HDR_LEN)) {
+    while (len < (NTOHS(ipv6_buf->length) - ICMPV6_HDR_LEN)) {
         DEBUG("parsing DIO options\n");
         rpl_opt_buf = get_rpl_opt_buf(len);
 
@@ -970,7 +970,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
             }
         }
 
-        ipv6_send_packet(ipv6_buf);
+        ipv6_send_packet(ipv6_send_buf);
     }
 
 }
