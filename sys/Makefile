@@ -15,7 +15,6 @@ ifneq (,$(filter ps,$(USEMODULE)))
     DIRS += ps
 endif
 ifneq (,$(filter posix,$(USEMODULE)))
-	INCLUDES += -I$(RIOTBASE)/sys/posix/include
     DIRS += posix
 endif
 ifneq (,$(filter pnet,$(USEMODULE)))

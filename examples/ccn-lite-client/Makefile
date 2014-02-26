@@ -48,6 +48,4 @@ USEMODULE += crypto_sha256
 USEMODULE += ccn_lite
 USEMODULE += ccn_lite_client
 
-export INCLUDES = -I$(RIOTBASE)/sys/net/include
-
 include $(RIOTBASE)/Makefile.include

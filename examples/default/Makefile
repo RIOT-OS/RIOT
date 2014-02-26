@@ -55,6 +55,4 @@ ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += random
 endif
 
-export INCLUDES += -I${RIOTBASE}/core/include/ -I${RIOTBASE}/sys/include/ -I${RIOTBASE}/drivers/include/
-
 include $(RIOTBASE)/Makefile.include
