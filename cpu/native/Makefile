@@ -17,7 +17,7 @@ include $(RIOTBASE)/Makefile.base
 
 $(BINDIR)%.o: %.c
 	$(AD)$(CC) $(CFLAGS) $(filter-out $(EXCLUDES),$(INCLUDES)) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -c $*.c -o $(BINDIR)$*.o
-	@$(CC) $(CFLAGS) $(INCLUDES) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c |\
+	$(AD)$(CC) $(CFLAGS) $(filter-out $(EXCLUDES),$(INCLUDES)) $(BOARDINCLUDE) $(PROJECTINCLUDE) $(CPUINCLUDE) -MM $*.c |\
 		sed -e "1s|^|$(BINDIR)|" > $(BINDIR)$*.d
 
 
