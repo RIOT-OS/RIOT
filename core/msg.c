@@ -73,7 +73,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
 
     DEBUG("msg_send() %s:%i: Sending from %i to %i. block=%i src->state=%i target->state=%i\n", __FILE__, __LINE__, thread_pid, target_pid, block, active_thread->status, target->status);
 
-    if (target->status != STATUS_RECEIVE_BLOCKED) {
+    if (thread_runlevel(target) != STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send() %s:%i: Target %i is not RECEIVE_BLOCKED.\n", __FILE__, __LINE__, target_pid);
         if (target->msg_array && queue_msg(target, m)) {
             DEBUG("msg_send() %s:%i: Target %i has a msg_queue. Queueing message.\n", __FILE__, __LINE__, target_pid);
@@ -103,7 +103,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
 
         int newstatus;
 
-        if (active_thread->status == STATUS_REPLY_BLOCKED) {
+        if (thread_runlevel((tcb_t *) active_thread) == STATUS_REPLY_BLOCKED) {
             newstatus = STATUS_REPLY_BLOCKED;
         }
         else {
@@ -132,7 +132,7 @@ int msg_send_int(msg_t *m, unsigned int target_pid)
 {
     tcb_t *target = (tcb_t *) sched_threads[target_pid];
 
-    if (target->status == STATUS_RECEIVE_BLOCKED) {
+    if (thread_runlevel(target) == STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send_int: Direct msg copy from %i to %i.\n", thread_getpid(), target_pid);
 
         m->sender_pid = target_pid;
@@ -174,7 +174,7 @@ int msg_reply(msg_t *m, msg_t *reply)
         return -1;
     }
 
-    if (target->status != STATUS_REPLY_BLOCKED) {
+    if (thread_runlevel(target) != STATUS_REPLY_BLOCKED) {
         DEBUG("msg_reply(): %s: Target \"%s\" not waiting for reply.", active_thread->name, target->name);
         restoreIRQ(state);
         return -1;
@@ -195,7 +195,7 @@ int msg_reply_int(msg_t *m, msg_t *reply)
 {
     tcb_t *target = (tcb_t*) sched_threads[m->sender_pid];
 
-    if (target->status != STATUS_REPLY_BLOCKED) {
+    if (thread_runlevel(target) != STATUS_REPLY_BLOCKED) {
         DEBUG("msg_reply_int(): %s: Target \"%s\" not waiting for reply.", active_thread->name, target->name);
         return -1;
     }
@@ -276,7 +276,7 @@ static int _msg_receive(msg_t *m, int block)
         *m = *sender_msg;
 
         /* remove sender from queue */
-        if (sender->status != STATUS_REPLY_BLOCKED) {
+        if (thread_runlevel(sender) != STATUS_REPLY_BLOCKED) {
             sender->wait_data = NULL;
             sched_set_status(sender, STATUS_PENDING);
         }

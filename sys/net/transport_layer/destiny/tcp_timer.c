@@ -34,7 +34,7 @@ void handle_synchro_timeout(socket_internal_t *current_socket)
 {
     msg_t send;
 
-    if (thread_getstatus(current_socket->recv_pid) == STATUS_RECEIVE_BLOCKED) {
+    if (thread_runlevel(current_socket->recv_pid) == STATUS_RECEIVE_BLOCKED) {
         timex_t now;
         vtimer_now(&now);
 
@@ -73,7 +73,7 @@ void handle_established(socket_internal_t *current_socket)
 
     if ((current_socket->socket_values.tcp_control.send_nxt >
          current_socket->socket_values.tcp_control.send_una) &&
-        (thread_getstatus(current_socket->send_pid) == STATUS_RECEIVE_BLOCKED)) {
+        (thread_runlevel(current_socket) == STATUS_RECEIVE_BLOCKED)) {
         for (i = 0; i < current_socket->socket_values.tcp_control.no_of_retries;
              i++) {
             current_timeout *= 2;

@@ -62,8 +62,8 @@ void sched_run()
     tcb_t *my_active_thread = (tcb_t *)active_thread;
 
     if (my_active_thread) {
-        if (my_active_thread->status == STATUS_RUNNING) {
-            my_active_thread->status = STATUS_PENDING;
+        if (thread_runlevel(my_active_thread) == STATUS_RUNNING) {
+            thread_runlevel_set(my_active_thread, STATUS_PENDING);
         }
 
 #ifdef SCHED_TEST_STACK
@@ -128,8 +128,8 @@ void sched_run()
 
     if (my_active_thread != active_thread) {
         if (active_thread != NULL) {  /* TODO: necessary? */
-            if (active_thread->status ==  STATUS_RUNNING) {
-                active_thread->status =  STATUS_PENDING ;
+            if (thread_runlevel((tcb_t *) active_thread) ==  STATUS_RUNNING) {
+                thread_runlevel_set((tcb_t *) active_thread, STATUS_PENDING);
             }
         }
 
@@ -168,7 +168,7 @@ void sched_set_status(tcb_t *process, unsigned int status)
         }
     }
 
-    process->status = status;
+    thread_runlevel_set(process, status);
 }
 
 void sched_switch(uint16_t current_prio, uint16_t other_prio)

@@ -50,12 +50,6 @@
 int thread_create(char *stack, int stacksize, char priority, int flags, void (*function) (void), const char *name);
 
 /**
- * @brief   returns the status of a process.
- * @return  STATUS_NOT_FOUND if pid is unknown
- */
-unsigned int thread_getstatus(int pid);
-
-/**
  * @brief   returns the name of a process.
  * @return  NULL if pid is unknown
  */
