@@ -281,7 +281,7 @@ int _gettimeofday(struct timeval *tp, void *restrict tzp) {
     (void) tzp;
 #if defined MODULE_RTC
     rtc_time(tp);
-#elif defined MODULE_VTIMERa
+#elif defined MODULE_VTIMER
     vtimer_gettimeofday(tp);
 #else
 #warning gettimeofday syscall is not implemented without vtimer or rtc module
