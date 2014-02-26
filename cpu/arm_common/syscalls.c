@@ -291,3 +291,4 @@ int _gettimeofday(struct timeval *tp, void *restrict tzp) {
 
 void _init(void) {}
 void _fini(void) {}
+void _kill(void) {}
