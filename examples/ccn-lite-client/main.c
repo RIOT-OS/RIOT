@@ -110,34 +110,18 @@ static void riot_ccn_express_interest(int argc, char **argv)
     puts("done");
 }
 
-static void riot_ccn_register_prefix(char *str)
+static void riot_ccn_register_prefix(int argc, char **argv)
 {
-    char *given_prefix = strtok(str, " ");
-    given_prefix = strtok(NULL, " ");
-    static const char *default_prefix = "/ccnx/0.7.1/doc/technical";
-
-    if (!given_prefix) {
-        strncpy(small_buf, default_prefix, 100);
-    }
-    else {
-        strncpy(small_buf, given_prefix, 100);
+    if (argc < 4) {
+        puts("enter: prefix </path/to/abc> <type> <faceid>");
+        return;
     }
 
+    strncpy(small_buf, argv[1], 100);
     DEBUG("prefix='%s'\n", small_buf);
 
-    char *type = strtok(NULL, " ");
-
-    if (!type) {
-        puts("enter: prefix /path/to/abc <type> faceid");
-        return;
-    }
-
-    char *faceid = strtok(NULL, " ");//"2"; // 0=trans;1=msg
-
-    if (!faceid) {
-        puts("enter: prefix /path/to/abc <type> faceid");
-        return;
-    }
+    char *type = argv[2];
+    char *faceid = argv[3]; // 0=trans;1=msg
 
     int content_len = ccnl_riot_client_publish(relay_pid, small_buf, faceid, type, big_buf);
 
