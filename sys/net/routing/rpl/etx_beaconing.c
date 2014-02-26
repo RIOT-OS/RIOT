@@ -61,7 +61,7 @@ int etx_radio_pid = 0;
 int etx_clock_pid = 0;
 
 //Message queue for radio
-msg_t msg_que[ETX_RCV_QUEUE_SIZE];
+static msg_t msg_que[ETX_RCV_QUEUE_SIZE];
 
 /*
  * The counter for the current 'round'. An ETX beacon is sent every ETX_INTERVAL
