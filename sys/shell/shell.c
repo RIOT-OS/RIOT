@@ -94,38 +94,48 @@ static void handle_input_line(shell_t *shell, char *line)
 
     /* first we need to calculate the number of arguments */
     unsigned argc = 0;
-    char *pos;
-    for (pos = line; *pos; ++pos) {
-        if (*pos <= ' ') {
-            *pos = 0;
-            continue;
-        }
-        else if (*pos == '"') {
-            do {
-                ++pos;
-                if (!*pos) {
+    char *pos = line;
+    while (1) {
+        if (*pos > ' ') {
+            /* found an argument */
+            if (*pos == '"') {
+                /* it's an quoted argument */
+                do {
+                    ++pos;
+                    if (!*pos) {
+                        puts(INCORRECT_QUOTING);
+                        return;
+                    }
+                } while (*pos != '"');
+                if (pos[1] > ' ') {
                     puts(INCORRECT_QUOTING);
                     return;
                 }
-            } while (*pos != '"');
-            if (pos[1] > ' ') {
-                puts(INCORRECT_QUOTING);
-                return;
             }
+            else {
+                /* it's an unquoted argument */
+                do {
+                    ++pos;
+                    if (*pos == '"') {
+                        puts(INCORRECT_QUOTING);
+                        return;
+                    }
+                } while (*pos > ' ');
+            }
+
+            /* count the number of arguments we got */
+            ++argc;
+        }
+
+        /* zero out the current position (space or quotation mark) and advance */
+        if (*pos > 0) {
+            *pos = 0;
+            ++pos;
         }
         else {
-            do {
-                ++pos;
-                if (*pos == '"') {
-                    puts(INCORRECT_QUOTING);
-                    return;
-                }
-            } while (*pos > ' ');
+            break;
         }
-        ++argc;
-        *pos = 0;
     }
-
     if (!argc) {
         return;
     }
