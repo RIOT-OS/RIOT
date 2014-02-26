@@ -232,5 +232,16 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst,
                               ipv6_addr_t *tgt, uint8_t rso,
                               uint8_t sllao, uint8_t aro);
 
+/**
+ * @brief Calculates the checksum for ICMPv6 packets.
+ *
+ * @param[in] ipv6_buf      The initialized IPv6 header of the packet.
+ * @param[in] icmpv6_buf    The initialized ICMPv6_header of the packet
+ *                          (except checksum, payload is expected directly
+ *                          after the packet header in memory).
+ *
+ * @return The internet checksum of the given ICMPv6 packet.
+ */
+uint16_t icmpv6_csum(ipv6_hdr_t *ipv6_buf, icmpv6_hdr_t *icmpv6_buf);
 /** @} */
 #endif /* SIXLOWPAN_ICMP_H */

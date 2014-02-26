@@ -931,8 +931,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
     ipv6_net_if_get_best_src_addr(&(ipv6_send_buf->srcaddr), &(ipv6_send_buf->destaddr));
 
     icmp_send_buf = get_rpl_send_icmpv6_buf(ipv6_ext_hdr_len);
-    icmp_send_buf->checksum = 0;
-    icmp_send_buf->checksum = ~ipv6_csum(ipv6_send_buf, (uint8_t *) icmp_send_buf, ipv6_send_buf->length, IPV6_PROTO_NUM_ICMPV6);
+    icmp_send_buf->checksum = icmpv6_csum(ipv6_send_buf, icmp_send_buf);
 
     /* The packet was "assembled" in rpl.c. Therefore rpl_send_buf was used.
      * Therefore memcpy is not needed because the payload is at the
