@@ -14,7 +14,6 @@ ifneq (,$(filter cc110x,$(USEMODULE)))
 	endif
 endif
 ifneq (,$(filter net_if,$(USEMODULE)))
-	INCLUDES += -I$(RIOTBASE)/sys/net/include
 	SRC += sc_net_if.c
 endif
 ifneq (,$(filter mci,$(USEMODULE)))

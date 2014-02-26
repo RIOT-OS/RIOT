@@ -12,6 +12,4 @@ USEMODULE += auto_init
 USEMODULE += net_if
 USEMODULE += defaulttransceiver
 
-export INCLUDES += -I$(RIOTBASE)/sys/net/include
-
 include $(RIOTBASE)/Makefile.include
