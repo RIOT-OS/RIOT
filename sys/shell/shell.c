@@ -95,18 +95,30 @@ static void handle_input_line(shell_t *shell, char *line)
     /* first we need to calculate the number of arguments */
     unsigned argc = 0;
     char *pos = line;
+    int contains_esc_seq = 0;
     while (1) {
         if (*pos > ' ') {
             /* found an argument */
-            if (*pos == '"') {
-                /* it's an quoted argument */
+            if (*pos == '"' || *pos == '\'') {
+                /* it's a quoted argument */
+                const char quote_char = *pos;
                 do {
                     ++pos;
                     if (!*pos) {
                         puts(INCORRECT_QUOTING);
                         return;
                     }
-                } while (*pos != '"');
+                    else if (*pos == '\\') {
+                        /* skip over the next character */
+                        ++contains_esc_seq;
+                        ++pos;
+                        if (!*pos) {
+                            puts(INCORRECT_QUOTING);
+                            return;
+                        }
+                        continue;
+                    }
+                } while (*pos != quote_char);
                 if (pos[1] > ' ') {
                     puts(INCORRECT_QUOTING);
                     return;
@@ -115,6 +127,15 @@ static void handle_input_line(shell_t *shell, char *line)
             else {
                 /* it's an unquoted argument */
                 do {
+                    if (*pos == '\\') {
+                        /* skip over the next character */
+                        ++contains_esc_seq;
+                        ++pos;
+                        if (!*pos) {
+                            puts(INCORRECT_QUOTING);
+                            return;
+                        }
+                    }
                     ++pos;
                     if (*pos == '"') {
                         puts(INCORRECT_QUOTING);
@@ -148,12 +169,25 @@ static void handle_input_line(shell_t *shell, char *line)
         while (!*pos) {
             ++pos;
         }
-        if (*pos == '"') {
+        if (*pos == '"' || *pos == '\'') {
             ++pos;
         }
         argv[i] = pos;
         while (*pos) {
             ++pos;
+        }
+    }
+    for (char **arg = argv; contains_esc_seq && *arg; ++arg) {
+        for (char *c = *arg; *c; ++c) {
+            if (*c != '\\') {
+                continue;
+            }
+            for (char *d = c; *d; ++d) {
+                *d = d[1];
+            }
+            if (--contains_esc_seq == 0) {
+                break;
+            }
         }
     }
 
