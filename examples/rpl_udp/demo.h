@@ -12,7 +12,7 @@
 
 /* RPL shell command handlers */
 /**
- * @brief   Shell command to initializes RPL and Destiny
+ * @brief   Shell command to initializes RPL
  */
 void rpl_udp_init(int argc, char **argv);
 

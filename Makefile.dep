@@ -4,14 +4,17 @@ endif
 
 ifneq (,$(filter pnet,$(USEMODULE)))
 	USEMODULE += posix
-	USEMODULE += destiny
+	USEMODULE += udp
+	USEMODULE += tcp
 	USEMODULE += net_help
 endif
 
-ifneq (,$(filter destiny,$(USEMODULE)))
-    USEMODULE += sixlowpan
-    USEMODULE += net_help
-    USEMODULE += vtimer
+ifneq (,$(filter udp,$(USEMODULE)))
+    USEMODULE += tl_socket 
+endif
+
+ifneq (,$(filter tcp,$(USEMODULE)))
+    USEMODULE += tl_socket
 endif
 
 ifneq (,$(filter sixlowborder,$(USEMODULE)))
@@ -63,6 +66,12 @@ ifneq (,$(filter at86rf231,$(USEMODULE)))
 	USEMODULE += transceiver
 	USEMODULE += ieee802154
 	USEMODULE += vtimer
+endif
+
+ifneq (,$(filter tl_socket,$(USEMODULE)))
+    USEMODULE += sixlowpan
+    USEMODULE += net_help
+    USEMODULE += vtimer
 endif
 
 ifneq (,$(filter vtimer,$(USEMODULE)))

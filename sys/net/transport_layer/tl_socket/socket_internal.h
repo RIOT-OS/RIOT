@@ -1,12 +1,11 @@
-#ifndef _DESTINY_SOCKET
-#define _DESTINY_SOCKET
+#ifndef SOCKET_INTERNAL_H
+
+#define SOCKET_INTERNAL_H
 
 #include "cpu.h"
-
-#include "destiny/socket.h"
-
-#include "tcp.h"
-#include "udp.h"
+#include "socket_internal.h"
+#include "tl_socket/socket.h"
+#include "tl_socket/types.h"
 
 #define MAX_SOCKETS			5
 // #define MAX_QUEUED_SOCKETS	2
@@ -66,30 +65,16 @@ typedef struct __attribute__((packed)) {
     uint8_t				tcp_input_buffer_end;
     mutex_t				tcp_buffer_mutex;
     socket_t			socket_values;
-    uint8_t				tcp_input_buffer[DESTINY_SOCKET_MAX_TCP_BUFFER];
+    uint8_t				tcp_input_buffer[TL_SOCKET_SOCKET_MAX_TCP_BUFFER];
 } socket_internal_t;
 
-extern socket_internal_t sockets[MAX_SOCKETS];
-
-socket_internal_t *get_waiting_connection_socket(int socket,
-        ipv6_hdr_t *ipv6_header,
-        tcp_hdr_t *tcp_header);
 void close_socket(socket_internal_t *current_socket);
-socket_internal_t *get_socket(int s);
-socket_internal_t *get_udp_socket(udp_hdr_t *udp_header);
-socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header,
-                                  tcp_hdr_t *tcp_header);
-socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
-        tcp_hdr_t *tcp_header);
-void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
-                      tcp_hdr_t *tcp_header, socket_t *tcp_socket);
-void set_tcp_cb(tcp_cb_t *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd,
-                uint32_t send_nxt, uint32_t send_una, uint16_t send_wnd);
-int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header);
-void switch_tcp_packet_byte_order(tcp_hdr_t *current_tcp_packet);
-int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
-             ipv6_hdr_t *temp_ipv6_header, uint8_t flags,
-             uint8_t payload_length);
-bool is_tcp_socket(int s);
 
-#endif /* _DESTINY_SOCKET */
+socket_internal_t *get_socket(int s);
+
+bool socket_is_udp(int s);
+bool socket_is_tcp(int s);
+int socket_exist(int socket);
+uint16_t socket_get_free_source_port(uint8_t protocol);
+void tl_socket_print_sockets(void);
+#endif /* SOCKET_INTERNAL_H */

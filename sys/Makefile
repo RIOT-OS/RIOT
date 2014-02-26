@@ -44,8 +44,14 @@ endif
 ifneq (,$(filter net_if,$(USEMODULE)))
     DIRS += net/link_layer/net_if
 endif
-ifneq (,$(filter destiny,$(USEMODULE)))
-    DIRS += net/transport_layer/destiny
+ifneq (,$(filter tl_socket,$(USEMODULE)))
+    DIRS += net/transport_layer/tl_socket
+endif
+ifneq (,$(filter udp,$(USEMODULE)))
+    DIRS += net/transport_layer/udp
+endif
+ifneq (,$(filter tcp,$(USEMODULE)))
+    DIRS += net/transport_layer/tcp
 endif
 ifneq (,$(filter net_help,$(USEMODULE)))
     DIRS += net/crosslayer/net_help

@@ -1,5 +1,5 @@
 /**
- * Destiny TCP header
+ * TCP header
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,7 +7,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny
+ * @ingroup socket 
  * @{
  * @file
  * @brief   TCP data structs and prototypes
@@ -18,7 +18,8 @@
 #define TCP_H_
 
 #include "ipv6.h"
-#include "destiny/types.h"
+#include "socket_internal.h"
+#include "tl_socket/types.h"
 
 #define TCP_EOO_OPTION          (0x00)        /* End of option list */
 #define TCP_NOP_OPTION          (0x01)        /* No operation */
@@ -94,8 +95,34 @@ extern uint32_t            global_sequence_counter;
 
 void tcp_packet_handler(void);
 uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
-void printTCPHeader(tcp_hdr_t *tcp_header);
-void printArrayRange_tcp(uint8_t *udp_header, uint16_t len);
+
+/**
+ * @brief Assign the given address to the socket
+ *
+ * @param[in] s         The socket to be bound
+ * @param[in] name      Assign this address to the socket
+ * @param[in] namelen   Address type size
+ * @param[in] pid       Receiver's thread PID
+ *
+ * @return On success 0, a negative value otherwise
+ */
+int tcp_bind_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid);
+
+/**
+ * @brief Sends a TCP segment
+ *
+ * @param[in] current_socket        The socket to use
+ * @param[in] current_tcp_packet    Pointer to the TCP header to send
+ * @param[in] temp_ipv6_header      Pointer to the IPv6 header
+ * @param[in] flags                 TCP flags
+ * @param[in] payload_length        Size of the payload
+ *
+ * @return The amount of data that has been sent or a negative value in the error case
+ */
+int tcp_send(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
+             ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length);
+
+int tcp_accept(int s);
 
 /**
  * @}

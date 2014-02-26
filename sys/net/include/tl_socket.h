@@ -1,8 +1,8 @@
 /**
- * destiny.h - Wraps all API types, constants and functions of the transport
- *             layer implementation.
+ * tl_socket.h - Wraps all API types, constants and functions of the transport
+ *               layer implementation.
  *
- * Copyright (C) 2013  INRIA.
+ * Copyright (C) 2014  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -10,9 +10,9 @@
  */
 
 /**
- * @defgroup destiny    DESTiny - Transport layer implementation
+ * @defgroup tl_socket Transport layer socket functionality and UDP/TCP implementation
  * @ingroup net
- * @brief   DESTiny module implements the transport layer. This includes
+ * @brief   This module implements the transport layer. This includes
  *          6LoWPAN UDP header compression and (experimental) 6LoWPAN TCP header
  *          compression.
  * @see     <a href="http://tools.ietf.org/html/rfc6282#section-4.3">
@@ -25,23 +25,30 @@
  *          </a>
  * @{
  * @file
- * @brief   destiny functions
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef DESTINY_H
-#define DESTINY_H
+#ifndef TL_SOCKET_H
+#define TL_SOCKET_H
 
-#include "destiny/in.h"
-#include "destiny/socket.h"
-#include "destiny/types.h"
+#include "tl_socket/in.h"
+#include "tl_socket/socket.h"
+#include "tl_socket/types.h"
 
 /**
- * Initializes transport layer.
+ * Initializes TCP.
  *
  * @return 0 on success, other else.
  */
-int destiny_init_transport_layer(void);
+int tcp_init(void);
 
-#endif /* DESTINY_H */
+/**
+ * Initializes UDP.
+ *
+ * @return 0 on success, other else.
+ */
+int udp_init(void);
+
+#endif /* TL_SOCKET_H */

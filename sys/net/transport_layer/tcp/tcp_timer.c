@@ -1,5 +1,5 @@
 /**
- * Destiny TCP timer implementation
+ * TCP timer implementation
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,7 +7,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny
+ * @ingroup tl_socket
  * @{
  * @file    tcp_timer.c
  * @brief   TCP timer
@@ -23,11 +23,12 @@
 #include "thread.h"
 #include "vtimer.h"
 
-#include "destiny.h"
+#include "tl_socket.h"
+#include "socket_internal.h"
 
 #include "msg_help.h"
-#include "socket.h"
 
+#include "tcp.h"
 #include "tcp_timer.h"
 
 void handle_synchro_timeout(socket_internal_t *current_socket)
@@ -101,7 +102,7 @@ void check_sockets(void)
     while (i < MAX_SOCKETS + 1) {
         current_socket = get_socket(i);
 
-        if (is_tcp_socket(i)) {
+        if (socket_is_tcp(i)) {
             switch (current_socket->socket_values.tcp_control.state) {
                 case TCP_ESTABLISHED: {
                     handle_established(current_socket);

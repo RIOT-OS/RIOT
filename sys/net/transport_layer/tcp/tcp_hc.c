@@ -1,5 +1,5 @@
 /**
- * Destiny TCP header compression
+ * TCP header compression
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,7 +7,7 @@
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny
+ * @ingroup tl_socket
  * @{
  * @file    tcp_hc.c
  * @brief   TCP HC
@@ -24,7 +24,7 @@
 
 #include "net_help.h"
 
-#include "socket.h"
+#include "tl_socket.h"
 #include "tcp.h"
 
 #include "tcp_hc.h"
