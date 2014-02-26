@@ -23,27 +23,26 @@
 #include "hwtimer.h"
 #include "random.h"
 
-void _mersenne_init(char *str)
+void _mersenne_init(int argc, char **argv)
 {
     int initval;
-    char *toc_str = strtok(str, " ");
 
-    toc_str = strtok(NULL, " ");
-    if (!toc_str) {
+    if (argc == 1) {
         initval = hwtimer_now();
-        printf("PRNG inizialized to current time: %d\n", initval);
+        printf("PRNG initialized to current time: %d\n", initval);
     }
     else {
-        initval = atoi(toc_str);
-        printf("PRNG inizialized given value: %d\n", initval);
+        initval = atoi(argv[1]);
+        printf("PRNG initialized given value: %d\n", initval);
     }
 
     genrand_init(initval);
 }
 
-void _mersenne_get(char *str)
+void _mersenne_get(int argc, char **argv)
 {
-    (void) str;
+    (void) argc;
+    (void) argv;
 
     printf("%" PRIu32 "\n", genrand_uint32());
 }

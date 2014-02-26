@@ -13,47 +13,37 @@
 /* RPL shell command handlers */
 /**
  * @brief   Shell command to initializes RPL and Destiny
- *
- * @param[in] str  Shell input
  */
-void rpl_udp_init(char *str);
+void rpl_udp_init(int argc, char **argv);
 
 /**
  * @brief   Shell command to set node's ID
- *
- * @param[in] str  Shell input
  */
-void rpl_udp_set_id(char *id);
+void rpl_udp_set_id(int argc, char **argv);
 
 /**
  * @brief   Loops through the routing table
- *
- * @param[in] unused  Guess what
  */
-void rpl_udp_loop(char *unused);
+void rpl_udp_loop(int argc, char **argv);
 
 /**
  * @brief   Shows the routing table
- *
- * @param[in] unused  Guess what
  */
-void rpl_udp_table(char *unused);
+void rpl_udp_table(int argc, char **argv);
 
 /**
  * @brief   Shows the dodag
- *
- * @param[in] unused  Guess what
  */
-void rpl_udp_dodag(char *unused);
+void rpl_udp_dodag(int argc, char **argv);
 
 /* UDP shell command handlers */
-void udp_server(char *unused);
-void udp_send(char *str);
+void udp_server(int argc, char **argv);
+void udp_send(int argc, char **argv);
 
 /* helper command handlers */
-void rpl_udp_ip(char *unused);
+void rpl_udp_ip(int argc, char **argv);
 
-void rpl_udp_ignore(char *addr);
+void rpl_udp_ignore(int argc, char **argv);
 
 /* monitoring thread */
 void rpl_udp_monitor(void);

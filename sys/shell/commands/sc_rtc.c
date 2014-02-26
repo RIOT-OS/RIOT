@@ -22,7 +22,7 @@
 #ifdef MODULE_RTC
 #include "rtc.h"
 
-void _gettime_handler(void)
+static void _gettime_handler(void)
 {
     struct tm now;
     rtc_get_localtime(&now);
@@ -30,40 +30,44 @@ void _gettime_handler(void)
     printf("%s", asctime(&now));
 }
 
-void _settime_handler(char *c)
+static void _settime_handler(char **argv)
 {
     struct tm now;
+    short i1, i2, i3;
     int res;
-    uint16_t month, epoch_year;
 
-    res = sscanf(c, "date %hu-%hu-%u %u:%u:%u",
-                 &epoch_year,
-                 &month,
-                 (unsigned int *) & (now.tm_mday),
-                 (unsigned int *) & (now.tm_hour),
-                 (unsigned int *) & (now.tm_min),
-                 (unsigned int *) & (now.tm_sec));
+    do {
+        res = sscanf(argv[1], "%hd-%hd-%hd", &i1, &i2, &i3);
+        if (res != 3) {
+            break;
+        }
+        now.tm_year = i1 - 1900;
+        now.tm_mon = i2 - 1;
+        now.tm_mday = i3;
 
-    if (res < 6) {
-        printf("Usage: date YYYY-MM-DD hh:mm:ss\n");
-        return;
-    }
-    else {
+        res = sscanf(argv[2], "%hd:%hd:%hd", &i1, &i2, &i3);
+        if (res != 3) {
+            break;
+        }
+        now.tm_hour = i1;
+        now.tm_min = i2;
+        now.tm_sec = i3;
+
+        rtc_set_localtime(&now);
         puts("OK");
-    }
+        return;
+    } while (0);
 
-    now.tm_year = epoch_year - 1900;
-    now.tm_mon = month - 1;
-    rtc_set_localtime(&now);
+    printf("Usage: %s YYYY-MM-DD hh:mm:ss\n", argv[0]);
 }
 
-void _date_handler(char *c)
+void _date_handler(int argc, char **argv)
 {
-    if (strlen(c) == 4) {
+    if (argc != 3) {
         _gettime_handler();
     }
     else {
-        _settime_handler(c);
+        _settime_handler(argv);
     }
 }
 

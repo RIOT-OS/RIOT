@@ -9,6 +9,6 @@
 #define __PS_H
 
 void thread_print_all(void);
-void _ps_handler(char *);
+void _ps_handler(int argc, char **argv);
 
 #endif /* __PS_H */
