@@ -107,12 +107,22 @@ void free(void *ptr)
     _native_syscall_leave();
 }
 
+int _native_in_calloc;
 void *calloc(size_t nmemb, size_t size)
 {
-    /* XXX: This is a dirty hack to enable old dlsym versions to run.
-     * Throw it out when Ubuntu 12.04 support runs out (in 2017-04)! */
+    /* dynamically load calloc when it's needed - this is necessary to
+     * support profiling as it uses calloc before startup runs */
     if (!real_calloc) {
-        return NULL;
+        if (_native_in_calloc) {
+            /* XXX: This is a dirty hack to enable old dlsym versions to run.
+             * Throw it out when Ubuntu 12.04 support runs out (in 2017-04)! */
+            return NULL;
+        }
+        else {
+            _native_in_calloc = 1;
+            *(void **)(&real_calloc) = dlsym(RTLD_NEXT, "calloc");
+            _native_in_calloc = 0;
+        }
     }
 
     void *r;
