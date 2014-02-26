@@ -3,20 +3,6 @@
 #include <stdint.h>
 #include "sixlowpan.h"
 
-//For debugging purposes
-#define ENABLE_DEBUG (0)
-#include "debug.h"
-
-#if ENABLE_DEBUG
-#define ETX_BEACON_STACKSIZE    (KERNEL_CONF_STACKSIZE_DEFAULT + KERNEL_CONF_STACKSIZE_PRINTF_FLOAT)
-#define ETX_RADIO_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT + KERNEL_CONF_STACKSIZE_PRINTF_FLOAT)
-#define ETX_CLOCK_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT)
-#else
-#define ETX_BEACON_STACKSIZE    (KERNEL_CONF_STACKSIZE_MAIN)
-#define ETX_RADIO_STACKSIZE     (KERNEL_CONF_STACKSIZE_MAIN)
-#define ETX_CLOCK_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT)
-#endif
-
 //[option|length|ipaddr.|packetcount] with up to 15 ipaddr|packetcount pairs
 // 1 Byte 1 Byte  1 Byte  1 Byte
 #define ETX_BUF_SIZE   (32)
