@@ -1,0 +1,38 @@
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+## the cpu to build for
+export CPU = msp430x16x
+export MCU = msp430f2617
+
+# toolchain config
+export PREFIX = msp430-
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
+export CFLAGS += -std=c99 -Wstrict-prototypes -gdwarf-2 -Os -Wall -mmcu=$(MCU)
+export ASFLAGS += -mmcu=$(MCU) --defsym $(MCU)=1 --gdwarf-2
+export AS = $(PREFIX)as
+export LINK = $(PREFIX)gcc
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+export LINKFLAGS = -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
+export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
+export FLASHER = goodfet.bsl
+ifeq ($(strip $(PORT)),)
+    export PORT = /dev/ttyUSB0
+endif
+export HEXFILE = $(BINDIR)$(PROJECT).hex
+export FFLAGS = --z1 -I -c $(PORT) -r -e -p $(HEXFILE)
+export OFLAGS = -O ihex
+
+export INCLUDES += -I $(RIOTCPU)/msp430-common/include -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/drivers/cc2420/include -I$(RIOTBASE)/sys/net/include
+
+ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
+	ifeq (,$(filter cc2240,$(USEMODULE)))
+		USEMODULE += cc2420
+	endif
+	ifeq (,$(filter transceiver,$(USEMODULE)))
+		USEMODULE += transceiver
+	endif
+endif
+
+export UNDEF += $(BINDIR)msp430_common/startup.o
+
