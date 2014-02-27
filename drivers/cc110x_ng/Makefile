@@ -7,6 +7,9 @@ endif
 ifneq (,$(filter msba2,$(BOARD)))
 	DIRS += spi
 endif
+ifneq (,$(filter avsextrem,$(BOARD)))
+	DIRS += spi
+endif
 ifneq (,$(filter wsn430-v1_3b,$(BOARD)))
 	DIRS += spi
 endif
