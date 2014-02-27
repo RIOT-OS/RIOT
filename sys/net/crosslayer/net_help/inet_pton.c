@@ -18,6 +18,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "kernel.h"
+
 #include "inet_pton.h"
 
 /* int
