@@ -34,6 +34,9 @@ endif
 ifneq (,$(filter lm75a,$(USEMODULE)))
     DIRS += lm75a
 endif
+ifneq (,$(filter rgbled,$(USEMODULE)))
+    DIRS += rgbled
+endif
 
 all:
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i || exit 1; done ;
