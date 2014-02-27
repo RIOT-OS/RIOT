@@ -21,7 +21,7 @@ Set up a bridge for *two* tap devices to communicate over
 
 Run the first node
 
-	sudo ./bin/native/rpl_udp.elf tap0
+	make term
 
 Type ``help`` to see the commands available.
 Now you need set the node ID. This ID will be used by other nodes to address this node.
