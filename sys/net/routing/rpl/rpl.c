@@ -492,7 +492,7 @@ void rpl_process(void)
         code = ((uint8_t *)m_recv.content.ptr);
         /* differentiate packet types */
         ipv6_buf = ipv6_get_buf();
-        memcpy(&rpl_buffer, ipv6_buf, ipv6_buf->length + IPV6_HDR_LEN);
+        memcpy(&rpl_buffer, ipv6_buf, NTOHS(ipv6_buf->length) + IPV6_HDR_LEN);
         DEBUG("%s, %d: Reveived RPL information of type %04X\n", __FILE__, __LINE__, *code);
 
         switch (*code) {
@@ -763,7 +763,7 @@ void recv_rpl_dis(void)
     rpl_dis_buf = get_rpl_dis_buf();
     int len = DIS_BASE_LEN;
 
-    while (len < (ipv6_buf->length - ICMPV6_HDR_LEN)) {
+    while (len < (NTOHS(ipv6_buf->length) - ICMPV6_HDR_LEN)) {
         rpl_opt_buf = get_rpl_opt_buf(len);
 
         switch (rpl_opt_buf->type) {
@@ -836,7 +836,7 @@ void recv_rpl_dao(void)
     int len = DAO_BASE_LEN;
     uint8_t increment_seq = 0;
 
-    while (len < (ipv6_buf->length - ICMPV6_HDR_LEN)) {
+    while (len < (NTOHS(ipv6_buf->length) - ICMPV6_HDR_LEN)) {
         rpl_opt_buf = get_rpl_opt_buf(len);
 
         switch (rpl_opt_buf->type) {
