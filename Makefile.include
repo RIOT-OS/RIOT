@@ -84,7 +84,6 @@ all: $(BINDIR)$(PROJECT).a
 	@echo "Building application $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
 	"$(MAKE)" -C $(RIOTBASE)
-	@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i ; done ;
 ifeq ($(BUILDOSXNATIVE),1)
 	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
