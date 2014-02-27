@@ -36,5 +36,5 @@ endif
 export FFLAGS += "prog $(HEXFILE)"
 
 export USEMODULE += msp430_common
-export INCLUDES += -I $(RIOTCPU)/msp430-common/include/ -I$(RIOTBOARD)/msb-430-common/include -I$(RIOTBOARD)/msb-430-common/drivers/include
+export INCLUDES += -I$(RIOTCPU)/msp430-common/include/ -I$(RIOTBOARD)/msb-430-common/include -I$(RIOTBOARD)/msb-430-common/drivers/include
 export OFLAGS = -O ihex
