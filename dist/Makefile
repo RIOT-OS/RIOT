@@ -46,7 +46,7 @@ export QUIET ?= 1
 #USEMODULE += cc110x
 #USEMODULE += fat
 
-#export INCLUDES += -I application_include
+#export INCLUDES += -Iapplication_include
 
 # Specify custom dependencies for your application here ...
 # export PROJDEPS = proj_data.h
