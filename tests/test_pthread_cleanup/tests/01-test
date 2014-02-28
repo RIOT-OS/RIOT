@@ -1,0 +1,87 @@
+#!/usr/bin/env expect
+
+set timeout 5
+
+set pid [spawn make term]
+puts "-*- Spawened $pid -*-\n"
+
+set once 0
+set result 1
+while { $once == 0 } {
+    set once 1
+
+    expect {
+        "Start." {}
+        timeout { break }
+    }
+    expect {
+        "<SCOPE 0>" {}
+        timeout { break }
+    }
+    expect {
+        "<SCOPE 1>" {}
+        timeout { break }
+    }
+    expect {
+        "<SCOPE 2>" {}
+        timeout { break }
+    }
+    expect {
+        "<SCOPE 3>" {}
+        timeout { break }
+    }
+    expect {
+        "<SCOPE 4>" {}
+        timeout { break }
+    }
+    expect {
+        "<SCOPE 5 />" {}
+        timeout { break }
+    }
+    expect {
+        "Cleanup: <5>" {}
+        timeout { break }
+    }
+    expect {
+        "</SCOPE 4>" {}
+        timeout { break }
+    }
+    # Cleanup 4 has execute == 0.
+    expect {
+        "</SCOPE 3>" {}
+        timeout { break }
+    }
+    # pthread_exit is called  here
+    expect {
+        "Cleanup: <3>" {}
+        timeout { break }
+    }
+    expect {
+        "Cleanup: <2>" {}
+        timeout { break }
+    }
+    expect {
+        "Cleanup: <1>" {}
+        timeout { break }
+    }
+    expect {
+        "Result: 1234" {}
+        timeout { break }
+    }
+    expect {
+        "Done." {}
+        timeout { break }
+    }
+
+    set result 0
+}
+
+if { $result == 0 } {
+    puts "\n-*- Test successful! -*-\n"
+} else {
+    puts "\n-*- TEST HAD ERRORS! -*-\n"
+}
+spawn kill -9 $pid
+wait
+close
+exit $result

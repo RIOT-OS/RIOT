@@ -33,4 +33,11 @@ typedef unsigned long int pthread_rwlockattr_t;
 
 typedef volatile int pthread_spinlock_t;
 
+typedef struct __pthread_cleanup_datum
+{
+    struct __pthread_cleanup_datum *__next;
+    void (*__routine)(void *arg);
+    void *__arg;
+} __pthread_cleanup_datum_t;
+
 #endif /* PTHREADTYPES_H_ */
