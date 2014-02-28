@@ -62,4 +62,6 @@ int main(void)
         msg_receive(&msg);
         printf("Got msg from pid %i: \"%s\"\n", msg.sender_pid, msg.content.ptr);
     }
+
+    return 0;
 }
