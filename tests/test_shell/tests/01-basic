@@ -2,7 +2,7 @@
 
 set timeout 5
 
-spawn pseudoterm $env(PORT)
+spawn make term
 
 sleep 1
 send "\n"
