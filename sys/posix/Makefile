@@ -1,3 +1,3 @@
-MODULE =posix
+MODULE = posix
 
 include $(RIOTBASE)/Makefile.base
