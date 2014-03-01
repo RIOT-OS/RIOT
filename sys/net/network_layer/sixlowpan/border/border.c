@@ -16,6 +16,7 @@
  * @}
  */
 
+/* TODO: Put this in its own module */
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
@@ -37,15 +38,18 @@
 
 #include "net_help.h"
 
-#define READER_STACK_SIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
 
-ipv6_addr_t abr_addr;
+#define READER_STACK_SIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
 
 char serial_reader_stack[READER_STACK_SIZE];
 uint16_t serial_reader_pid;
 
 uint8_t serial_out_buf[BORDER_BUFFER_SIZE];
 uint8_t serial_in_buf[BORDER_BUFFER_SIZE];
+
+ipv6_addr_t *abr_addr;
 
 uint8_t *get_serial_out_buffer(int offset)
 {
@@ -120,45 +124,48 @@ void serial_reader_f(void)
     }
 }
 
-uint8_t sixlowpan_lowpan_border_init(transceiver_type_t trans,
-                                     const ipv6_addr_t *border_router_addr)
+int sixlowpan_lowpan_border_init(int if_id)
 {
-    ipv6_addr_t addr;
+    ipv6_net_if_addr_t *addr = NULL;
+    uint8_t abr_addr_initialized = 0;
 
     serial_reader_pid = thread_create(
                             serial_reader_stack, READER_STACK_SIZE,
                             PRIORITY_MAIN - 1, CREATE_STACKTEST,
                             serial_reader_f, "serial_reader");
+    ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
+                                   PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                   border_process_lowpan,
+                                   "border_process_lowpan");
 
-    if (border_router_addr == NULL) {
-        border_router_addr = &addr;
-
-        addr = flowcontrol_init();
+    if (ip_process_pid < 0) {
+        return 0;
     }
 
-    /* only allow addresses generated accoding to
-     * RFC 4944 (Section 6) & RFC 2464 (Section 4) from short address
-     * -- for now
-     */
-    if (border_router_addr->uint16[4] != HTONS(IEEE_802154_PAN_ID ^ 0x0200) ||
-        border_router_addr->uint16[5] != HTONS(0x00FF) ||
-        border_router_addr->uint16[6] != HTONS(0xFE00)
-       ) {
-        return SIXLOWERROR_ADDRESS;
+    if (!sixlowpan_lowpan_init_interface(if_id)) {
+        return 0;
     }
 
-    /* radio-address is 8-bit so this must be tested extra */
-    if (border_router_addr->uint8[14] != 0) {
-        return SIXLOWERROR_ADDRESS;
+    while (net_if_iter_addresses(if_id, (net_if_addr_t **) &addr)) {
+        if (!ipv6_addr_is_multicast(addr->addr_data) &&
+            !ipv6_addr_is_link_local(addr->addr_data) &&
+            !ipv6_addr_is_loopback(addr->addr_data) &&
+            !ipv6_addr_is_unique_local_unicast(addr->addr_data)) {
+            abr_addr_initialized = 1;
+            abr_addr = addr->addr_data;
+            break;
+        }
     }
 
-    memcpy(&(abr_addr.uint8[0]), &(border_router_addr->uint8[0]), 16);
+    if (!abr_addr_initialized) {
+        DEBUG("sixlowpan_lowpan_border_init(): A prefix must be initialized to"
+              "interface %d first", if_id);
+        return 0;
+    }
 
-    sixlowpan_lowpan_init(trans, border_router_addr->uint8[15], 1);
+    ipv6_init_as_router();
 
-    ipv6_init_iface_as_router();
-
-    return SIXLOWERROR_SUCCESS;
+    return 1;
 }
 
 void border_process_lowpan(void)

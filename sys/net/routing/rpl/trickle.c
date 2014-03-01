@@ -166,11 +166,13 @@ void trickle_interval_over(void)
         timex_normalize(&I_time);
 
         vtimer_remove(&trickle_t_timer);
+
         if (vtimer_set_wakeup(&trickle_t_timer, t_time, timer_over_pid) != 0) {
             puts("[ERROR] setting Wakeup");
         }
 
         vtimer_remove(&trickle_I_timer);
+
         if (vtimer_set_wakeup(&trickle_I_timer, I_time, interval_over_pid) != 0) {
             puts("[ERROR] setting Wakeup");
         }

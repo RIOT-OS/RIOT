@@ -128,7 +128,9 @@ void udp_send(int argc, char **argv)
         printf("Error sending packet!\n");
     }
     else {
-        printf("Successful deliverd %i bytes over UDP to %s to 6LoWPAN\n", bytes_sent, ipv6_addr_to_str(addr_str, &ipaddr));
+        printf("Successful deliverd %i bytes over UDP to %s to 6LoWPAN\n",
+               bytes_sent, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                                            &ipaddr));
     }
 
     destiny_socket_close(sock);

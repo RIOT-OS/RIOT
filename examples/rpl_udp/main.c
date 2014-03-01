@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 
+#include "net_if.h"
 #include "posix_io.h"
 #include "shell.h"
 #include "shell_commands.h"
@@ -37,7 +38,6 @@ const shell_command_t shell_commands[] = {
     {"loop", "", rpl_udp_loop},
     {"server", "Starts a UDP server", udp_server},
     {"send", "Send a UDP datagram", udp_send},
-    {"ip", "Print all assigned IP addresses", rpl_udp_ip},
     {"ign", "ignore node", rpl_udp_ignore},
     {NULL, NULL, NULL}
 };
@@ -48,6 +48,7 @@ int main(void)
 
     /* start shell */
     posix_open(uart0_handler_pid, 0);
+    net_if_set_src_address_mode(0, NET_IF_TRANS_ADDR_M_SHORT);
 
     shell_t shell;
     shell_init(&shell, shell_commands, UART0_BUFSIZE, uart0_readc, uart0_putc);

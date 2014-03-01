@@ -48,7 +48,7 @@ void demultiplex(border_packet_t *packet)
             switch (l3_header_buf->ethertype) {
                 case (BORDER_ETHERTYPE_IPV6): {
                     ipv6_hdr_t *ipv6_buf = (ipv6_hdr_t *)(((unsigned char *)packet) + sizeof(border_l3_header_t));
-                    ipv6_send_bytes(ipv6_buf);
+                    ipv6_send_packet(ipv6_buf);
                     break;
                 }
 
@@ -77,7 +77,7 @@ void demultiplex(border_packet_t *packet)
                         context->context.lifetime
                     );
                     mutex_unlock(&lowpan_context_mutex);
-                    abr_add_context(context->context.version, &abr_addr, context->context.cid);
+                    abr_add_context(context->context.version, abr_addr, context->context.cid);
                     /* Send router advertisement */
                     break;
                 }
@@ -141,7 +141,7 @@ int readpacket(uint8_t *packet_buf, size_t size)
             break;
         }
 
-        if ((size_t) (line_buf_ptr - packet_buf) >= size - 1) {
+        if ((size_t)(line_buf_ptr - packet_buf) >= size - 1) {
             return -SIXLOWERROR_ARRAYFULL;
         }
 
@@ -179,8 +179,8 @@ int writepacket(uint8_t *packet_buf, size_t size)
 {
     uint8_t *byte_ptr = packet_buf;
 
-    while ((size_t) (byte_ptr - packet_buf) < size) {
-        if ((size_t) (byte_ptr - packet_buf) > BORDER_BUFFER_SIZE) {
+    while ((size_t)(byte_ptr - packet_buf) < size) {
+        if ((size_t)(byte_ptr - packet_buf) > BORDER_BUFFER_SIZE) {
             return -1;
         }
 

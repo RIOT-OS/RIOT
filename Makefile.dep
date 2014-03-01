@@ -79,6 +79,12 @@ ifneq (,$(filter destiny,$(USEMODULE)))
 	endif
 endif
 
+ifneq (,$(filter sixlowborder,$(USEMODULE)))
+	ifeq (,$(filter sixlowpan,$(USEMODULE)))
+		USEMODULE += sixlowpan
+	endif
+endif
+
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
 	ifeq (,$(filter ieee802154,$(USEMODULE)))
 		USEMODULE += ieee802154
@@ -86,13 +92,13 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
 	ifeq (,$(filter net_help,$(USEMODULE)))
 		USEMODULE += net_help
 	endif
-	ifeq (,$(filter semaphore,$(USEMODULE)))
+	ifeq (,$(filter net_if,$(USEMODULE)))
+		USEMODULE += net_if
+	endif
+	ifeq (,$(filter semaphore, $(USEMODULE)))
 		USEMODULE += semaphore
 	endif
-	ifeq (,$(filter transceiver,$(USEMODULE)))
-		USEMODULE += transceiver
-	endif
-	ifeq (,$(filter vtimer,$(USEMODULE)))
+	ifeq (,$(filter vtimer, $(USEMODULE)))
 		USEMODULE += vtimer
 	endif
 endif

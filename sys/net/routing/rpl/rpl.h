@@ -35,7 +35,7 @@
 #define RPL_PKT_RECV_BUF_SIZE 16
 #define RPL_PROCESS_STACKSIZE KERNEL_CONF_STACKSIZE_DEFAULT
 
-uint8_t rpl_init(transceiver_type_t trans, uint16_t rpl_address);
+uint8_t rpl_init(int if_id);
 void rpl_init_root(void);
 rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp);
 

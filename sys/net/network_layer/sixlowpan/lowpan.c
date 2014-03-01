@@ -36,7 +36,9 @@
 #include "sixlowpan/ndp.h"
 
 #include "lowpan.h"
-#include "border.h"
+#ifdef MODULE_SIXLOWBORDER
+#include "border/border.h"
+#endif
 #include "ip.h"
 #include "icmp.h"
 
@@ -46,14 +48,14 @@
 
 #define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
+#define DEBUG_ENABLED
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
-#define IP_PROCESS_STACKSIZE           	(KERNEL_CONF_STACKSIZE_MAIN)
-#define NC_STACKSIZE                   	(KERNEL_CONF_STACKSIZE_DEFAULT)
-#define CON_STACKSIZE                  	(KERNEL_CONF_STACKSIZE_DEFAULT)
-#define LOWPAN_TRANSFER_BUF_STACKSIZE  	(KERNEL_CONF_STACKSIZE_DEFAULT)
+#define NC_STACKSIZE                    (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define CON_STACKSIZE                   (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define LOWPAN_TRANSFER_BUF_STACKSIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
 
 #define SIXLOWPAN_MAX_REGISTERED        (4)
 
@@ -70,33 +72,42 @@ typedef struct lowpan_interval_list_t {
     struct lowpan_interval_list_t   *next;
 } lowpan_interval_list_t;
 
+/**
+ * @brief   6LoWPAN reassembly buffer.
+ *
+ * @see <a href="http://tools.ietf.org/html/rfc4944#section-5.3">
+ *          RFC 4944, section 5.3
+ *      </a>
+ */
 typedef struct lowpan_reas_buf_t {
-    /* Source Address */
-    ieee_802154_long_t       s_laddr;
-    /* Destination Address */
-    ieee_802154_long_t       d_laddr;
-    /* Identification Number */
-    uint16_t                 ident_no;
-    /* Timestamp of last packet fragment */
-    timex_t                  timestamp;
-    /* Size of reassembled packet with possible IPHC header */
-    uint16_t                 packet_size;
-    /* Additive size of currently already received fragments */
-    uint16_t                 current_packet_size;
-    /* Pointer to allocated memory for reassembled packet + 6LoWPAN Dispatch Byte */
-    uint8_t                  *packet;
-    /* Pointer to list of intervals of received packet fragments (if any) */
-    lowpan_interval_list_t   *interval_list_head;
-    /* Pointer to next reassembly buffer (if any) */
+    net_if_eui64_t s_addr;      ///< Source address
+    net_if_eui64_t d_addr;      ///< Destination address
+    uint16_t tag;               ///< Fragment tag
+    timex_t timestamp;          ///< Timestamp of last packet fragment
+    /**
+     * @brief   Size of reassembled packet with possible IPHC header
+     */
+    uint16_t packet_size;
+    /**
+     * @brief   Additive size of currently already received fragments
+     */
+    uint16_t current_packet_size;
+    /**
+     * @brief   Pointer to allocated memory for reassembled packet + 6LoWPAN
+     *          Dispatch Byte
+     */
+    uint8_t *packet;
+    /**
+     * @brief   Pointer to list of intervals of received packet fragments
+     *          (if any)
+     */
+    lowpan_interval_list_t *interval_list_head;
     struct lowpan_reas_buf_t *next;
 } lowpan_reas_buf_t;
 
 extern mutex_t lowpan_context_mutex;
-uint16_t tag;
-uint8_t header_size = 0;
-uint8_t max_frame = 0;
+uint16_t tag = 0;
 uint8_t max_frag_initial = 0;
-uint8_t position;
 uint8_t max_frag;
 
 static uint16_t packet_length;
@@ -110,22 +121,19 @@ uint16_t comp_len;
 uint8_t frag_size;
 uint8_t reas_buf[512];
 uint8_t comp_buf[512];
-uint8_t byte_offset;
 uint8_t first_frag = 0;
 mutex_t fifo_mutex;
 
-unsigned int ip_process_pid;
-unsigned int nd_nbr_cache_rem_pid = 0;
-unsigned int contexts_rem_pid = 0;
-unsigned int transfer_pid = 0;
+int ip_process_pid = 0;
+int nd_nbr_cache_rem_pid = 0;
+int contexts_rem_pid = 0;
+int transfer_pid = 0;
 
-iface_t iface;
-ipv6_addr_t lladdr;
-ieee_802154_long_t laddr;
 mutex_t lowpan_context_mutex;
 
 /* registered upper layer threads */
 int sixlowpan_reg[SIXLOWPAN_MAX_REGISTERED];
+static sixlowpan_lowpan_frame_t current_frame;
 
 char ip_process_buf[IP_PROCESS_STACKSIZE];
 char nc_buf[NC_STACKSIZE];
@@ -135,72 +143,109 @@ lowpan_context_t contexts[NDP_6LOWPAN_CONTEXT_MAX];
 uint8_t context_len = 0;
 uint16_t local_address = 0;
 
-void lowpan_init(transceiver_type_t trans, uint8_t r_addr,
-                 const ipv6_addr_t *prefix, int as_border);
+int lowpan_init(int as_border);
 void lowpan_context_auto_remove(void);
-void lowpan_iphc_encoding(ieee_802154_long_t *dest,
-                          ipv6_hdr_t *ipv6_buf_extra, uint8_t *ptr);
-void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
-                          ieee_802154_long_t *s_laddr,
-                          ieee_802154_long_t *d_laddr);
+uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
+                             ipv6_hdr_t *ipv6_buf_extra, uint8_t *ptr);
+void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
+                          net_if_eui64_t *d_addr);
 void add_fifo_packet(lowpan_reas_buf_t *current_packet);
 lowpan_reas_buf_t *collect_garbage_fifo(lowpan_reas_buf_t *current_buf);
 lowpan_reas_buf_t *collect_garbage(lowpan_reas_buf_t *current_buf);
 void init_reas_bufs(lowpan_reas_buf_t *buf);
 void check_timeout(void);
+void print_long_local_addr(net_if_eui64_t *saddr);
 
 lowpan_context_t *lowpan_context_lookup(ipv6_addr_t *addr);
 
-void lowpan_ipv6_set_dispatch(uint8_t *data);
-
 /* deliver packet to mac*/
-void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
-                             uint8_t *data, uint16_t data_len)
+int sixlowpan_lowpan_sendto(int if_id, const void *dest, int dest_len,
+                            uint8_t *data, uint16_t data_len)
 {
     uint8_t mcast = 0;
 
     ipv6_buf = (ipv6_hdr_t *) data;
     uint16_t send_packet_length = data_len;
 
-    memcpy(&laddr.uint8[0], &dest->uint8[0], 8);
-
     if (ipv6_addr_is_multicast(&ipv6_buf->destaddr)) {
         /* send broadcast */
         mcast = 1;
     }
 
+    /* check if packet needs to be fragmented */
+    DEBUG("sixlowpan_lowpan_sendto(%d, dest, %d, data, %"PRIu16")\n",
+          if_id, dest_len, data_len);
+#ifdef DEBUG_ENABLED
+    DEBUG("dest: ");
+
+    if (dest_len == 8) {
+        print_long_local_addr((net_if_eui64_t *)dest);
+    }
+    else {
+        printf("0x%04"PRIx16"\n", NTOHS(*((uint16_t *)dest)));
+    }
+
+    DEBUG("data: \n");
+
+    for (int i = 0; i < data_len; i++) {
+        printf("%02x ", data[i]);
+
+        if (!((i + 1) % 16) || i == data_len - 1) {
+            printf("\n");
+        }
+    }
+
+#endif
+
+
     if (iphc_status == LOWPAN_IPHC_ENABLE) {
-        lowpan_iphc_encoding(&laddr, ipv6_buf, data);
+        if (!lowpan_iphc_encoding(if_id, dest, dest_len, ipv6_buf, data)) {
+            return -1;
+        }
+
         data = &comp_buf[0];
         send_packet_length = comp_len;
     }
     else {
-        ipv6_buf->length = HTONS(ipv6_buf->length);
-        lowpan_ipv6_set_dispatch(data);
+        memmove(data + 1, data, data_len);
+        data[0] = SIXLOWPAN_IPV6_DISPATCH;
+        send_packet_length++;
     }
 
-    /* check if packet needs to be fragmented */
-    DEBUG("sixlowpan_lowpan_sendto(%s, data, %" PRIu16 "): send_packet_length: %" PRIu16 ", header_size: %" PRIu16 "\n",
-            sixlowpan_mac_802154_long_addr_to_str(addr_str, dest), data_len, send_packet_length, header_size);
-    if (send_packet_length + header_size > PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN) {
-        uint8_t fragbuf[send_packet_length + header_size];
-        uint8_t remaining;
-        uint8_t i = 2;
+    if (send_packet_length > PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN) {
+        uint16_t remaining;
+        uint16_t position, datagram_size = send_packet_length;
+        uint8_t max_frame = PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN;
+        uint8_t fragbuf[max_frame + 5];
+
+        if (!(net_if_get_interface(if_id)->transceivers & (IEEE802154_TRANSCEIVER))) {
+            max_frame = PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN;
+        }
+        else {
+            max_frame = PAYLOAD_SIZE;
+        }
+
         /* first fragment */
-        max_frame = PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN;
-        max_frag_initial = ((max_frame - 4 - header_size) / 8) * 8;
+        max_frag_initial = ((max_frame - 4) / 8) * 8;
 
-        memcpy(fragbuf + 4, data, max_frag_initial);
+        if (data[0] == (char)SIXLOWPAN_IPV6_DISPATCH) {
+            /* XXX: weird, but only this way we get correct packet output */
+            max_frag_initial++;
+            datagram_size--;
+        }
 
-        fragbuf[0] = ((SIXLOWPAN_FRAG1_DISPATCH << 8) | send_packet_length) >> 8;
-        fragbuf[1] = (SIXLOWPAN_FRAG1_DISPATCH << 8) | send_packet_length;
+        memcpy(&fragbuf[4], data, max_frag_initial);
+
+        fragbuf[0] = ((SIXLOWPAN_FRAG1_DISPATCH << 8) | datagram_size) >> 8;
+        fragbuf[1] = (SIXLOWPAN_FRAG1_DISPATCH << 8) | datagram_size;
         fragbuf[2] = tag >> 8;
         fragbuf[3] = tag;
 
-        sixlowpan_mac_send_ieee802154_frame(&laddr,
-                                            (uint8_t *)&fragbuf,
-                                            max_frag_initial + header_size + 4,
+        sixlowpan_mac_send_ieee802154_frame(if_id, dest, dest_len,
+                                            &fragbuf,
+                                            max_frag_initial + 4,
                                             mcast);
+
         /* subsequent fragments */
         position = max_frag_initial;
         max_frag = ((max_frame - 5) / 8) * 8;
@@ -208,45 +253,46 @@ void sixlowpan_lowpan_sendto(const ieee_802154_long_t *dest,
         data += position;
 
         while (send_packet_length - position > max_frame - 5) {
-            memset(&fragbuf, 0, send_packet_length + header_size);
-            memcpy(fragbuf + 5, data, max_frag);
+            memset(&fragbuf[0], 0, sizeof(fragbuf));
+            memcpy(&fragbuf[5], data, max_frag);
 
-            fragbuf[0] = ((SIXLOWPAN_FRAGN_DISPATCH << 8) | send_packet_length) >> 8;
-            fragbuf[1] = (SIXLOWPAN_FRAGN_DISPATCH << 8) | send_packet_length;
+            fragbuf[0] = ((SIXLOWPAN_FRAGN_DISPATCH << 8) | datagram_size) >> 8;
+            fragbuf[1] = (SIXLOWPAN_FRAGN_DISPATCH << 8) | datagram_size;
             fragbuf[2] = tag >> 8;
             fragbuf[3] = tag;
             fragbuf[4] = position / 8;
 
-            sixlowpan_mac_send_ieee802154_frame(&laddr,
-                                                (uint8_t *)&fragbuf,
-                                                max_frag + 5, mcast);
+            sixlowpan_mac_send_ieee802154_frame(if_id, dest, dest_len,
+                                                &fragbuf,
+                                                max_frame + 5, mcast);
             data += max_frag;
             position += max_frag;
-
-            i++;
         }
 
         remaining = send_packet_length - position;
 
-        memset(&fragbuf, 0, send_packet_length + header_size);
-        memcpy(fragbuf + 5, data, remaining);
+        memset(&fragbuf[0], 0, sizeof(fragbuf));
+        memcpy(&fragbuf[5], data, remaining);
 
-        fragbuf[0] = ((SIXLOWPAN_FRAGN_DISPATCH << 8) | send_packet_length) >> 8;
-        fragbuf[1] = (SIXLOWPAN_FRAGN_DISPATCH << 8) | send_packet_length;
+        fragbuf[0] = ((SIXLOWPAN_FRAGN_DISPATCH << 8) | datagram_size) >> 8;
+        fragbuf[1] = (SIXLOWPAN_FRAGN_DISPATCH << 8) | datagram_size;
         fragbuf[2] = tag >> 8;
         fragbuf[3] = tag;
         fragbuf[4] = position / 8;
 
-        sixlowpan_mac_send_ieee802154_frame(&laddr,
-                                            (uint8_t *)&fragbuf,
-                                            remaining + 5, mcast);
+        tag++;
+
+        if (sixlowpan_mac_send_ieee802154_frame(if_id, dest, dest_len,
+                                                &fragbuf, remaining + 5, mcast) < 0) {
+            return -1;
+        }
     }
     else {
-        sixlowpan_mac_send_ieee802154_frame(&laddr, data,
-                                            send_packet_length, mcast);
+        return sixlowpan_mac_send_ieee802154_frame(if_id, dest, dest_len, data,
+                                                   send_packet_length, mcast);
     }
 
-    tag++;
+    return data_len;
 }
 
 void sixlowpan_lowpan_set_iphc_status(
@@ -255,8 +301,8 @@ void sixlowpan_lowpan_set_iphc_status(
     iphc_status = status;
 }
 
-#if ENABLE_DEBUG
-void print_long_local_addr(ieee_802154_long_t *saddr)
+#ifdef DEBUG_ENABLED
+void print_long_local_addr(net_if_eui64_t *saddr)
 {
     printf("%02x%02x:%02x%02x:%02x%02x:%02x%02x\n",
            ((uint8_t *)saddr)[0], ((uint8_t *)saddr)[1], ((uint8_t *)saddr)[2],
@@ -273,9 +319,9 @@ void sixlowpan_lowpan_print_reassembly_buffers(void)
     printf("\n\n--- Reassembly Buffers ---\n");
 
     while (temp_buffer != NULL) {
-        print_long_local_addr(&temp_buffer->s_laddr);
-        printf("Ident.: %i, Packet Size: %i/%i, Timestamp: %lu\n",
-               temp_buffer->ident_no, temp_buffer->current_packet_size,
+        print_long_local_addr(&temp_buffer->s_addr);
+        printf("Ident.: %i, Packet Size: %i/%i, Timestamp: %"PRIu64"\n",
+               temp_buffer->tag, temp_buffer->current_packet_size,
                temp_buffer->packet_size, timex_uint64(temp_buffer->timestamp));
         temp_interval = temp_buffer->interval_list_head;
 
@@ -297,9 +343,9 @@ void sixlowpan_lowpan_print_fifo_buffers(void)
     printf("\n\n--- Reassembly Buffers ---\n");
 
     while (temp_buffer != NULL) {
-        print_long_local_addr(&temp_buffer->s_laddr);
-        printf("Ident.: %i, Packet Size: %i/%i, Timestamp: %lu\n",
-               temp_buffer->ident_no, temp_buffer->current_packet_size,
+        print_long_local_addr(&temp_buffer->s_addr);
+        printf("Ident.: %i, Packet Size: %i/%i, Timestamp: %"PRIu64"\n",
+               temp_buffer->tag, temp_buffer->current_packet_size,
                temp_buffer->packet_size, timex_uint64(temp_buffer->timestamp));
         temp_interval = temp_buffer->interval_list_head;
 
@@ -329,25 +375,39 @@ void lowpan_transfer(void)
         if (current_buf != NULL) {
             mutex_unlock(&fifo_mutex);
 
-            if ((current_buf->packet)[0] == SIXLOWPAN_IPV6_DISPATCH) {
+            if (current_buf->packet[0] == SIXLOWPAN_IPV6_DISPATCH) {
+                DEBUG("INFO: Uncompressed IPv6 dispatch (0x%02x) received\n",
+                      current_buf->packet[0]);
                 ipv6_buf = ipv6_get_buf();
                 memcpy(ipv6_buf, (current_buf->packet) + 1, current_buf->packet_size - 1);
                 m_send.content.ptr = (char *)ipv6_buf;
                 packet_length = current_buf->packet_size - 1;
                 msg_send_receive(&m_send, &m_recv, ip_process_pid);
             }
-            else if (((current_buf->packet)[0] & 0xe0) == SIXLOWPAN_IPHC1_DISPATCH) {
+            else if (((current_buf->packet[0] & 0xf0) == IPV6_VER) &&
+                     (iphc_status == LOWPAN_IPHC_DISABLE)) {
+                ipv6_buf = ipv6_get_buf();
+                memcpy(ipv6_buf, (current_buf->packet), current_buf->packet_size);
+                m_send.content.ptr = (char *)ipv6_buf;
+                packet_length = current_buf->packet_size;
+                msg_send_receive(&m_send, &m_recv, ip_process_pid);
+            }
+            else if (((current_buf->packet[0] & 0xe0) == SIXLOWPAN_IPHC1_DISPATCH) &&
+                     (iphc_status == LOWPAN_IPHC_ENABLE)) {
+                DEBUG("INFO: IPHC1 dispatch 0x%02x received, decompress\n",
+                      current_buf->packet[0]);
                 lowpan_iphc_decoding(current_buf->packet,
                                      current_buf->packet_size,
-                                     &(current_buf->s_laddr),
-                                     &(current_buf->d_laddr));
+                                     &(current_buf->s_addr),
+                                     &(current_buf->d_addr));
 
                 ipv6_buf = ipv6_get_buf();
                 m_send.content.ptr = (char *) ipv6_buf;
                 msg_send_receive(&m_send, &m_recv, ip_process_pid);
             }
             else {
-                //				printf("ERROR: packet with unknown dispatch received\n");
+                DEBUG("ERROR: packet with unknown dispatch 0x%02x received\n",
+                      current_buf->packet[0]);
             }
 
             collect_garbage_fifo(current_buf);
@@ -362,11 +422,11 @@ void lowpan_transfer(void)
     }
 }
 
-uint8_t ll_get_addr_match(ieee_802154_long_t *src, ieee_802154_long_t *dst)
+uint8_t ll_get_addr_match(net_if_eui64_t *src, net_if_eui64_t *dst)
 {
     uint8_t val = 0, xor;
 
-    for (int i = 0; i < 8; i++) {
+    for (uint8_t i = 0; i < sizeof(net_if_eui64_t); i++) {
         /* if bytes are equal add 8 */
         if (src->uint8[i] == dst->uint8[i]) {
             val += 8;
@@ -392,8 +452,8 @@ uint8_t ll_get_addr_match(ieee_802154_long_t *src, ieee_802154_long_t *dst)
 
 lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size,
                                      uint16_t datagram_tag,
-                                     ieee_802154_long_t *s_laddr,
-                                     ieee_802154_long_t *d_laddr,
+                                     net_if_eui64_t *s_addr,
+                                     net_if_eui64_t *d_addr,
                                      lowpan_reas_buf_t *current_buf,
                                      lowpan_reas_buf_t *temp_buf)
 {
@@ -408,10 +468,10 @@ lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size,
         new_buf->packet = malloc(datagram_size);
 
         if (new_buf->packet != NULL) {
-            memcpy(&new_buf->s_laddr, s_laddr, IPV6_LL_ADDR_LEN);
-            memcpy(&new_buf->d_laddr, d_laddr, IPV6_LL_ADDR_LEN);
+            memcpy(&new_buf->s_addr, s_addr, 8);
+            memcpy(&new_buf->d_addr, d_addr, 8);
 
-            new_buf->ident_no = datagram_tag;
+            new_buf->tag = datagram_tag;
             new_buf->packet_size = datagram_size;
 
             vtimer_now(&new_buf->timestamp);
@@ -436,17 +496,17 @@ lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size,
 
 lowpan_reas_buf_t *get_packet_frag_buf(uint16_t datagram_size,
                                        uint16_t datagram_tag,
-                                       ieee_802154_long_t *s_laddr,
-                                       ieee_802154_long_t *d_laddr)
+                                       net_if_eui64_t *s_addr,
+                                       net_if_eui64_t *d_addr)
 {
     lowpan_reas_buf_t *current_buf = NULL, *temp_buf = NULL;
     current_buf = head;
 
     while (current_buf != NULL) {
-        if (((ll_get_addr_match(&current_buf->s_laddr, s_laddr)) == 64) &&
-            ((ll_get_addr_match(&current_buf->d_laddr, d_laddr)) == 64) &&
+        if (((ll_get_addr_match(&current_buf->s_addr, s_addr)) == 64) &&
+            ((ll_get_addr_match(&current_buf->d_addr, d_addr)) == 64) &&
             (current_buf->packet_size == datagram_size) &&
-            (current_buf->ident_no == datagram_tag) &&
+            (current_buf->tag == datagram_tag) &&
             current_buf->interval_list_head != NULL) {
             /* Found buffer for current packet fragment */
             vtimer_now(&current_buf->timestamp);
@@ -457,7 +517,7 @@ lowpan_reas_buf_t *get_packet_frag_buf(uint16_t datagram_size,
         current_buf = current_buf->next;
     }
 
-    return new_packet_buffer(datagram_size, datagram_tag, s_laddr, d_laddr,
+    return new_packet_buffer(datagram_size, datagram_tag, s_addr, d_addr,
                              current_buf, temp_buf);
 }
 
@@ -596,13 +656,13 @@ lowpan_reas_buf_t *collect_garbage(lowpan_reas_buf_t *current_buf)
 
 void handle_packet_fragment(uint8_t *data, uint8_t datagram_offset,
                             uint16_t datagram_size, uint16_t datagram_tag,
-                            ieee_802154_long_t *s_laddr,
-                            ieee_802154_long_t *d_laddr, uint8_t hdr_length,
-                            uint8_t frag_size)
+                            net_if_eui64_t *s_addr, net_if_eui64_t *d_addr,
+                            uint8_t hdr_length, uint8_t frag_size)
 {
     lowpan_reas_buf_t *current_buf;
     /* Is there already a reassembly buffer for this packet fragment? */
-    current_buf = get_packet_frag_buf(datagram_size, datagram_tag, s_laddr, d_laddr);
+    current_buf = get_packet_frag_buf(datagram_size, datagram_tag, s_addr,
+                                      d_addr);
 
     if ((current_buf != NULL) && (handle_packet_frag_interval(current_buf,
                                   datagram_offset,
@@ -642,7 +702,7 @@ void check_timeout(void)
     while (temp_buf != NULL) {
         if ((timex_uint64(now) - timex_uint64(temp_buf->timestamp)) >= LOWPAN_REAS_BUF_TIMEOUT) {
             printf("TIMEOUT!cur_time: %" PRIu64 ", temp_buf: %" PRIu64 "\n", timex_uint64(now),
-                    timex_uint64(temp_buf->timestamp));
+                   timex_uint64(temp_buf->timestamp));
             temp_buf = collect_garbage(temp_buf);
         }
         else {
@@ -720,8 +780,8 @@ uint8_t sixlowpan_lowpan_register(int pid)
     }
 }
 
-void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
-                 ieee_802154_long_t *d_laddr)
+void lowpan_read(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
+                 net_if_eui64_t *d_addr)
 {
     /* check if packet is fragmented */
     uint8_t hdr_length = 0;
@@ -729,7 +789,6 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
     uint16_t datagram_size = 0;
     uint16_t datagram_tag = 0;
     short i;
-    sixlowpan_lowpan_frame_t current_frame;
 
     check_timeout();
 
@@ -747,6 +806,9 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
     /* Fragmented Packet */
     if (((data[0] & SIXLOWPAN_FRAG_HDR_MASK) == SIXLOWPAN_FRAG1_DISPATCH) ||
         ((data[0] & SIXLOWPAN_FRAG_HDR_MASK) == SIXLOWPAN_FRAGN_DISPATCH)) {
+        uint16_t byte_offset;
+        DEBUG("INFO: fragmentation dispatch 0x%02x received\n",
+              data[0] & SIXLOWPAN_FRAG_HDR_MASK);
         /* get 11-bit from first 2 byte*/
         datagram_size = (((uint16_t)(data[0] << 8)) | data[1]) & 0x07ff;
 
@@ -758,6 +820,11 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
             case (SIXLOWPAN_FRAG1_DISPATCH): {
                 datagram_offset = 0;
                 hdr_length += 4;
+
+                if (data[4] == (char)SIXLOWPAN_IPV6_DISPATCH) {
+                    hdr_length++;
+                }
+
                 break;
             }
 
@@ -780,12 +847,14 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
         }
 
         handle_packet_fragment(data, byte_offset, datagram_size, datagram_tag,
-                               s_laddr, d_laddr, hdr_length, frag_size);
+                               s_addr, d_addr, hdr_length, frag_size);
     }
     /* Regular Packet */
     else {
-        lowpan_reas_buf_t *current_buf = get_packet_frag_buf(length, 0, s_laddr,
-                                         d_laddr);
+        DEBUG("INFO: unfragmentated packet with first byte 0x%02x received\n",
+              data[0]);
+        lowpan_reas_buf_t *current_buf = get_packet_frag_buf(length, 0, s_addr, d_addr);
+
         if (current_buf && current_buf->packet) {
             /* Copy packet bytes into corresponding packet space area */
             memcpy(current_buf->packet, data, length);
@@ -795,6 +864,7 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
         else {
             DEBUG("ERROR: no memory left in packet buffer!\n");
         }
+
         if (thread_getstatus(transfer_pid) == STATUS_SLEEPING) {
             thread_wakeup(transfer_pid);
         }
@@ -802,25 +872,32 @@ void lowpan_read(uint8_t *data, uint8_t length, ieee_802154_long_t *s_laddr,
 
 }
 
-void lowpan_ipv6_set_dispatch(uint8_t *data)
-{
-    memmove(data + 1, data, packet_length);
-    data[0] = SIXLOWPAN_IPV6_DISPATCH;
-    packet_length++;
-}
-
 /* draft-ietf-6lowpan-hc-13#section-3.1 */
-void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
-                          uint8_t *ptr)
+uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
+                             ipv6_hdr_t *ipv6_buf_extra, uint8_t *ptr)
 {
-    ipv6_buf = ipv6_buf_extra;
-
-    uint16_t payload_length = ipv6_buf->length;
+    uint16_t payload_length = NTOHS(ipv6_buf->length);
     uint8_t lowpan_iphc[2];
     uint8_t *ipv6_hdr_fields = &comp_buf[2];
     lowpan_context_t *con = NULL;
     uint16_t hdr_pos = 0;
     uint8_t tc;
+    net_if_eui64_t own_iid;
+
+    if (net_if_get_src_address_mode(if_id) == NET_IF_TRANS_ADDR_M_SHORT) {
+        if (!net_if_get_eui64(&own_iid, if_id, 0)) {
+            return 1;
+        }
+    }
+    else {
+        if (!net_if_get_eui64(&own_iid, if_id, 1)) {
+            return 1;
+        }
+
+        own_iid.uint8[0] ^= 0x02;
+    }
+
+    ipv6_buf = ipv6_buf_extra;
 
     memset(&lowpan_iphc, 0, 2);
 
@@ -917,68 +994,46 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
         /* SAC = 1 and SAM = 00 */
         lowpan_iphc[1] |= SIXLOWPAN_IPHC2_SAC;
     }
-    else if ((con = lowpan_context_lookup(&ipv6_buf->srcaddr)) != NULL) {
-        /* 1: Source address compression uses stateful, context-based
-         *    compression. */
-        lowpan_iphc[1] |= SIXLOWPAN_IPHC2_SAC;
-        ipv6_hdr_fields[0] |= (con->num << 4);
-
-        if (memcmp(&(ipv6_buf->srcaddr.uint8[8]), &(iface.laddr.uint8[0]), 8) == 0) {
-            /* 0 bits. The address is derived using context information
-             * and possibly the link-layer addresses.*/
-            lowpan_iphc[1] |= 0x30;
-        }
-        else if ((ipv6_buf->srcaddr.uint16[4] == 0) &&
-                 (ipv6_buf->srcaddr.uint16[5] == 0) &&
-                 (ipv6_buf->srcaddr.uint16[6] == 0) &&
-                 ((ipv6_buf->srcaddr.uint8[14]) & 0x80) == 0) {
-            /* 49-bit of interface identifier are 0, so we can compress
-             * source address-iid to 16-bit */
-            memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->srcaddr.uint16[7], 2);
-            hdr_pos += 2;
-            /* 16 bits. The address is derived using context information
-             * and the 16 bits carried inline. */
-            lowpan_iphc[1] |= 0x20;
-        }
-        else {
-            memcpy(&ipv6_hdr_fields[hdr_pos], &(ipv6_buf->srcaddr.uint16[4]), 8);
-            hdr_pos += 8;
-            /* 64 bits. The address is derived using context information
-             * and the 64 bits carried inline. */
-            lowpan_iphc[1] |= 0x10;
-        }
-    }
-    else if (ipv6_addr_is_link_local(&ipv6_buf->srcaddr)) {
-        /* 0: Source address compression uses stateless compression.*/
-        if (memcmp(&(ipv6_buf->srcaddr.uint8[8]), &(iface.laddr.uint8[0]), 8) == 0) {
-            /* 0 bits. The address is derived using context information
-             * and possibly the link-layer addresses.*/
-            lowpan_iphc[1] |= 0x30;
-        }
-        else if ((ipv6_buf->srcaddr.uint16[4] == 0) &&
-                 (ipv6_buf->srcaddr.uint16[5] == 0) &&
-                 (ipv6_buf->srcaddr.uint16[6] == 0) &&
-                 ((ipv6_buf->srcaddr.uint8[14]) & 0x80) == 0) {
-            /* 49-bit of interface identifier are 0, so we can compress
-             * source address-iid to 16-bit */
-            memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->srcaddr.uint16[7], 2);
-            hdr_pos += 2;
-            /* 16 bits. The address is derived using context information
-             * and the 16 bits carried inline. */
-            lowpan_iphc[1] |= 0x20;
-        }
-        else {
-            memcpy(&ipv6_hdr_fields[hdr_pos], &(ipv6_buf->srcaddr.uint16[4]), 8);
-            hdr_pos += 8;
-            /* 64 bits. The address is derived using context information
-             * and the 64 bits carried inline. */
-            lowpan_iphc[1] |= 0x10;
-        }
-    }
     else {
-        /* full address carried inline */
-        memcpy(&ipv6_hdr_fields[hdr_pos], &(ipv6_buf->srcaddr.uint8[0]), 16);
-        hdr_pos += 16;
+        if ((con = lowpan_context_lookup(&ipv6_buf->srcaddr)) != NULL) {
+            /* 1: Source address compression uses stateful, context-based
+             *    compression. */
+            lowpan_iphc[1] |= SIXLOWPAN_IPHC2_SAC;
+            ipv6_hdr_fields[0] |= (con->num << 4);
+        }
+
+        if (con || ipv6_addr_is_link_local(&ipv6_buf->srcaddr)) {
+            /* 0: Source address compression uses stateless compression.*/
+            if (memcmp(&(ipv6_buf->srcaddr.uint8[8]), &own_iid, 8) == 0) {
+                /* 0 bits. The address is derived using context information
+                 * and possibly the link-layer addresses.*/
+                lowpan_iphc[1] |= 0x30;
+            }
+            else if ((ipv6_buf->srcaddr.uint16[4] == 0) &&
+                     (ipv6_buf->srcaddr.uint16[5] == 0) &&
+                     (ipv6_buf->srcaddr.uint16[6] == 0) &&
+                     ((ipv6_buf->srcaddr.uint8[14]) & 0x80) == 0) {
+                /* 49-bit of interface identifier are 0, so we can compress
+                 * source address-iid to 16-bit */
+                memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->srcaddr.uint16[7], 2);
+                hdr_pos += 2;
+                /* 16 bits. The address is derived using context information
+                 * and the 16 bits carried inline. */
+                lowpan_iphc[1] |= 0x20;
+            }
+            else {
+                memcpy(&ipv6_hdr_fields[hdr_pos], &(ipv6_buf->srcaddr.uint16[4]), 8);
+                hdr_pos += 8;
+                /* 64 bits. The address is derived using context information
+                 * and the 64 bits carried inline. */
+                lowpan_iphc[1] |= 0x10;
+            }
+        }
+        else {
+            /* full address carried inline */
+            memcpy(&ipv6_hdr_fields[hdr_pos], &(ipv6_buf->srcaddr.uint8[0]), 16);
+            hdr_pos += 16;
+        }
     }
 
     /* M: Multicast Compression */
@@ -1040,7 +1095,20 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
             lowpan_iphc[1] |= SIXLOWPAN_IPHC2_DAC;
             ipv6_hdr_fields[0] = con->num;
 
-            if (memcmp(&(ipv6_buf->destaddr.uint8[8]), &(dest->uint8[0]), 8) == 0) {
+        }
+
+        if (con || ipv6_addr_is_link_local(&ipv6_buf->destaddr)) {
+            if (dest_len == 8 &&
+                ipv6_buf->destaddr.uint8[8] == (dest[0] ^ 0x02) &&
+                memcmp(&ipv6_buf->destaddr.uint8[9], &dest[1], 7) == 0) {
+                /* 0 bits. The address is derived using context information
+                 * and possibly the link-layer addresses.*/
+                lowpan_iphc[1] |= 0x03;
+            }
+            else if (dest_len == 2 &&
+                     ipv6_buf->destaddr.uint32[2] == HTONL(0x000000ff) &&
+                     ipv6_buf->destaddr.uint16[6] == HTONS(0xfe00) &&
+                     ipv6_buf->destaddr.uint16[7] == *((uint16_t *) dest)) {
                 /* 0 bits. The address is derived using context information
                  * and possibly the link-layer addresses.*/
                 lowpan_iphc[1] |= 0x03;
@@ -1065,32 +1133,6 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
                 lowpan_iphc[1] |= 0x01;
             }
         }
-        else if (ipv6_addr_is_link_local(&ipv6_buf->destaddr)) {
-            if (memcmp(&(ipv6_buf->destaddr.uint8[8]), &(dest->uint8[0]), 8) == 0) {
-                /* 0 bits. The address is derived using context information
-                * and possibly the link-layer addresses.*/
-                lowpan_iphc[1] |= 0x03;
-            }
-            else if ((ipv6_buf->destaddr.uint16[4] == 0) &&
-                     (ipv6_buf->destaddr.uint16[5] == 0) &&
-                     (ipv6_buf->destaddr.uint16[6] == 0) &&
-                     ((ipv6_buf->destaddr.uint8[14]) & 0x80) == 0) {
-                /* 49-bit of interface identifier are 0, so we can compress
-                 * source address-iid to 16-bit */
-                memcpy(&ipv6_hdr_fields[hdr_pos], &ipv6_buf->destaddr.uint16[7], 2);
-                hdr_pos += 2;
-                /* 16 bits. The address is derived using context information
-                 * and the 16 bits carried inline. */
-                lowpan_iphc[1] |= 0x02;
-            }
-            else {
-                memcpy(&ipv6_hdr_fields[hdr_pos], &(ipv6_buf->destaddr.uint16[4]), 8);
-                hdr_pos += 8;
-                /* 64 bits. The address is derived using context information
-                 * and the 64 bits carried inline. */
-                lowpan_iphc[1] |= 0x01;
-            }
-        }
         else {
             memcpy(&ipv6_hdr_fields[hdr_pos], &(ipv6_buf->destaddr.uint8[0]), 16);
             hdr_pos += 16;
@@ -1112,14 +1154,15 @@ void lowpan_iphc_encoding(ieee_802154_long_t *dest, ipv6_hdr_t *ipv6_buf_extra,
     	ptr = get_payload_buf(ipv6_ext_hdr_len);
     	}
     */
-    memcpy(&ipv6_hdr_fields[hdr_pos], &ptr[IPV6_HDR_LEN], ipv6_buf->length);
+    memcpy(&ipv6_hdr_fields[hdr_pos], &ptr[IPV6_HDR_LEN], NTOHS(ipv6_buf->length));
 
     comp_len = 2 + hdr_pos + payload_length;
+
+    return 1;
 }
 
-void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
-                          ieee_802154_long_t *s_laddr,
-                          ieee_802154_long_t *d_laddr)
+void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
+                          net_if_eui64_t *d_addr)
 {
     uint8_t hdr_pos = 0;
     uint8_t *ipv6_hdr_fields = data;
@@ -1249,7 +1292,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
             case (0x01): {
                 /* 64-bits */
                 memcpy(&(ipv6_buf->srcaddr.uint8[8]), &ipv6_hdr_fields[hdr_pos], 8);
-                /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context
+                /* By RFC 6282 3.1.1. Bits covered by context
                  * information are always used. */
                 memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
                 hdr_pos += 8;
@@ -1260,7 +1303,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                 /* 16-bits */
                 memset(&(ipv6_buf->srcaddr.uint8[8]), 0, 6);
                 memcpy(&(ipv6_buf->srcaddr.uint8[14]), &ipv6_hdr_fields[hdr_pos], 2);
-                /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context
+                /* By RFC 6282 3.1.1. Bits covered by context
                  * information are always used. */
                 memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
                 hdr_pos += 2;
@@ -1269,9 +1312,8 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
 
             case (0x03): {
                 /* 0-bits */
-                memset(&(ipv6_buf->srcaddr.uint8[8]), 0, 8);
-                memcpy(&(ipv6_buf->srcaddr.uint8[8]), &s_laddr->uint8[0], 8);
-                /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context
+                memcpy(&(ipv6_buf->srcaddr.uint8[8]), &s_addr->uint8[0], 8);
+                /* By RFC 6282 3.1.1. Bits covered by context
                  * information are always used. */
                 memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
                 break;
@@ -1310,7 +1352,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                 /* 0-bits */
                 memcpy(&(ipv6_buf->srcaddr.uint8[0]), &ll_prefix[0], 2);
                 memset(&(ipv6_buf->srcaddr.uint8[2]), 0, 20);
-                memcpy(&(ipv6_buf->srcaddr.uint8[8]), &s_laddr->uint8[0], 8);
+                memcpy(&(ipv6_buf->srcaddr.uint8[8]), &s_addr->uint8[0], 8);
                 break;
             }
 
@@ -1440,7 +1482,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
 
                 case (0x03): {
                     memset(&(ipv6_buf->destaddr.uint8[0]), 0, 8);
-                    memcpy(&(ipv6_buf->destaddr.uint8[8]), &d_laddr->uint8[0], 8);
+                    memcpy(&(ipv6_buf->destaddr.uint8[8]), &d_addr->uint8[0], 8);
                     /* By draft-ietf-6lowpan-hc-15 3.1.1. Bits covered by context information are always used. */
                     memcpy(&(ipv6_buf->srcaddr.uint8[0]), &con->prefix, con->length);
                     break;
@@ -1475,7 +1517,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
                 case (0x03): {
                     memcpy(&(ipv6_buf->destaddr.uint8[0]), &ll_prefix, 2);
                     memset(&(ipv6_buf->destaddr.uint8[2]), 0, 14);
-                    memcpy(&(ipv6_buf->destaddr.uint8[8]), &d_laddr->uint8[0], 8);
+                    memcpy(&(ipv6_buf->destaddr.uint8[8]), &d_addr->uint8[0], 8);
                     break;
                 }
 
@@ -1494,7 +1536,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length,
     memcpy(ptr, &ipv6_hdr_fields[hdr_pos], length - hdr_pos);
 
     /* ipv6 length */
-    ipv6_buf->length = length - hdr_pos;
+    ipv6_buf->length = HTONS(length - hdr_pos);
     packet_length = IPV6_HDR_LEN + ipv6_buf->length;
 }
 
@@ -1617,44 +1659,126 @@ void lowpan_context_auto_remove(void)
 
 void init_reas_bufs(lowpan_reas_buf_t *buf)
 {
-    memset(&buf->s_laddr, 0, IPV6_LL_ADDR_LEN);
-    memset(&buf->d_laddr, 0, IPV6_LL_ADDR_LEN);
-    buf->ident_no = 			0;
+    memset(&buf->s_addr, 0, sizeof(net_if_eui64_t));
+    memset(&buf->d_addr, 0, sizeof(net_if_eui64_t));
+    buf->tag = 0;
     memset(&buf->timestamp, 0, sizeof(timex_t));
-    buf->packet_size =			0;
-    buf->current_packet_size = 	0;
-    buf->packet = 				NULL;
-    buf->interval_list_head	=	NULL;
-    buf->next = 				NULL;
+    buf->packet_size = 0;
+    buf->current_packet_size = 0;
+    buf->packet = NULL;
+    buf->interval_list_head = NULL;
+    buf->next = NULL;
 }
 
-void sixlowpan_lowpan_init(transceiver_type_t trans, uint8_t r_addr,
-                           int as_border)
-{
-    lowpan_init(trans, r_addr, NULL, as_border);
-}
-
-void sixlowpan_lowpan_adhoc_init(transceiver_type_t trans,
-                                 const ipv6_addr_t *prefix,
-                                 uint8_t r_addr)
-{
-    lowpan_init(trans, r_addr, prefix, 0);
-}
-
-void lowpan_init(transceiver_type_t trans, uint8_t r_addr,
-                 const ipv6_addr_t *prefix, int as_border)
+int sixlowpan_lowpan_init_adhoc_interface(int if_id, const ipv6_addr_t *prefix)
 {
     ipv6_addr_t tmp;
+
+    /* if prefix is set */
+    if (prefix != NULL) {
+        /* init network prefix */
+        ipv6_addr_t save_prefix;
+
+        ipv6_addr_init_prefix(&save_prefix, prefix, 64);
+        ndp_add_prefix_info(if_id, &save_prefix, 64,
+                            NDP_OPT_PI_VLIFETIME_INFINITE,
+                            NDP_OPT_PI_PLIFETIME_INFINITE, 1,
+                            ICMPV6_NDP_OPT_PI_FLAG_AUTONOM);
+        ipv6_init_as_router();
+
+        /* add global address */
+        if (!ipv6_addr_set_by_eui64(&tmp, if_id, prefix)) {
+            return 0;
+        }
+
+        DEBUG("%s, %d: set unique address for interface %d to %s, according "
+              "to prefix %s\n", __FILE__, __LINE__, if_id,
+              ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &tmp),
+              ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &tmp));
+
+        if (!ipv6_net_if_add_addr(if_id, &tmp, NDP_ADDR_STATE_PREFERRED,
+                                  NDP_OPT_PI_VLIFETIME_INFINITE,
+                                  NDP_OPT_PI_PLIFETIME_INFINITE, 0)) {
+            return 0;
+        }
+    }
+
+    return sixlowpan_lowpan_init_interface(if_id);
+}
+
+int sixlowpan_lowpan_init_interface(int if_id)
+{
+    ipv6_addr_t tmp;
+
+    /* init link-local prefix */
+    ipv6_addr_set_link_local_prefix(&tmp);
+
+    if (!ipv6_addr_set_by_eui64(&tmp, if_id, &tmp)) {
+        DEBUG("Can not set link-local by EUI-64 on interface %d\n", if_id);
+        return 0;
+    }
+
+    DEBUG("%s, %d: sixlowpan_lowpan_init(): add link local address to "
+          "interface %d: %s\n", __FILE__, __LINE__, if_id,
+          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &tmp));
+
+    if (!ipv6_net_if_add_addr(if_id, &tmp, NDP_ADDR_STATE_PREFERRED,
+                              NDP_OPT_PI_VLIFETIME_INFINITE,
+                              NDP_OPT_PI_PLIFETIME_INFINITE, 0)) {
+        DEBUG("Can not add link-local address to interface %d\n", if_id);
+        return 0;
+    }
+
+    /* add solicited nodes multicast address of link local address */
+    ipv6_addr_set_solicited_node_addr(&tmp, &tmp);
+    DEBUG("%s, %d: sixlowpan_lowpan_init(): add solicited nodes multicast address "
+          "to of link layer address interface %d: %s\n", __FILE__, __LINE__,
+          if_id, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &tmp));
+
+    if (!ipv6_net_if_add_addr(if_id, &tmp, NDP_ADDR_STATE_PREFERRED,
+                              NDP_OPT_PI_VLIFETIME_INFINITE,
+                              NDP_OPT_PI_PLIFETIME_INFINITE, 0)) {
+        DEBUG("Can not add all nodes address to interface %d\n", if_id);
+        return 0;
+    }
+
+    /* add all nodes multicast address */
+    ipv6_addr_set_all_nodes_addr(&tmp);
+    DEBUG("%s, %d: sixlowpan_lowpan_init(): add all nodes multicast address "
+          "to interface %d: %s\n", __FILE__, __LINE__, if_id,
+          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &tmp));
+
+    if (!ipv6_net_if_add_addr(if_id, &tmp, NDP_ADDR_STATE_PREFERRED,
+                              NDP_OPT_PI_VLIFETIME_INFINITE,
+                              NDP_OPT_PI_PLIFETIME_INFINITE, 0)) {
+        DEBUG("Can not add all nodes address to interface %d\n", if_id);
+        return 0;
+    }
+
+    /* add loopback address */
+    ipv6_addr_set_loopback_addr(&tmp);
+    DEBUG("%s, %d: sixlowpan_lowpan_init(): add loopback address to interface "
+          "0: %s\n", __FILE__, __LINE__,
+          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &tmp));
+
+    if (!ipv6_net_if_add_addr(0, &tmp, NDP_ADDR_STATE_PREFERRED,
+                              NDP_OPT_PI_VLIFETIME_INFINITE,
+                              NDP_OPT_PI_PLIFETIME_INFINITE, 0)) {
+        DEBUG("Can not add all nodes address to interface %d\n", if_id);
+        return 0;
+    }
+
+    icmpv6_send_router_sol(OPT_SLLAO);
+
+    return 1;
+}
+
+int sixlowpan_lowpan_init(void)
+{
     short i;
 
     /* init mac-layer and radio transceiver */
-    sixlowpan_mac_init(trans);
-
-    /* init interface addresses */
-    memset(&iface, 0, sizeof(iface_t));
-    sixlowpan_mac_set_radio_address(r_addr);
-    sixlowpan_mac_init_802154_short_addr(&(iface.saddr));
-    sixlowpan_mac_init_802154_long_addr(&(iface.laddr));
+    sixlowpan_mac_init();
 
     /* init lowpan context mutex */
     mutex_init(&lowpan_context_mutex);
@@ -1662,70 +1786,39 @@ void lowpan_init(transceiver_type_t trans, uint8_t r_addr,
     /* init packet_fifo mutex */
     mutex_init(&fifo_mutex);
 
-    local_address = r_addr;
-
-    /* if prefix is set */
-    if (prefix != NULL) {
-        /* init network prefix */
-        ipv6_addr_t save_prefix;
-        ipv6_addr_init_prefix(&save_prefix, prefix, 64);
-        plist_add(&save_prefix, 64, NDP_OPT_PI_VLIFETIME_INFINITE, 0, 1,
-                  ICMPV6_NDP_OPT_PI_FLAG_AUTONOM);
-        ipv6_init_iface_as_router();
-        /* add global address */
-        ipv6_addr_set_by_eui64(&tmp, prefix);
-        DEBUG("%s, %d: set unique address to %s, according to prefix %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, &tmp), ipv6_addr_to_str(addr_str, prefix));
-        ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_GLOBAL,
-                NDP_ADDR_STATE_PREFERRED, 0, 0);
-    }
-
-    DEBUG("%s, %d: set link local prefix to %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, &lladdr));
-    /* init link-local address */
-    ipv6_addr_set_link_local_prefix(&lladdr);
-
-    /* add link local address */
-    memcpy(&(lladdr.uint8[8]), &(iface.laddr.uint8[0]), 8);
-    DEBUG("%s, %d: sixlowpan_lowpan_init(): add link local address: %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, &lladdr));
-    ipv6_iface_add_addr(&lladdr, IPV6_ADDR_TYPE_LINK_LOCAL,
-                        NDP_ADDR_STATE_PREFERRED, 0, 0);
-
-    /* add loopback address */
-    ipv6_addr_set_loopback_addr(&tmp);
-    DEBUG("%s, %d: sixlowpan_lowpan_init(): add loopback address: %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, &tmp));
-    ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_LOOPBACK,
-                        NDP_ADDR_STATE_PREFERRED, 0, 0);
-
-    /* add all nodes multicast address */
-    DEBUG("%s, %d: sixlowpan_lowpan_init(): add all nodes multicast address: %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, &tmp));
-    ipv6_iface_add_addr(&tmp, IPV6_ADDR_TYPE_LOOPBACK,
-                        NDP_ADDR_STATE_PREFERRED, 0, 0);
-
-    if (as_border) {
-        ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
-                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                       border_process_lowpan,
-                                       "border_process_lowpan");
-    }
-    else {
+    if (!ip_process_pid) {
         ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
                                        PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                        ipv6_process, "ip_process");
     }
 
-    nd_nbr_cache_rem_pid = thread_create(nc_buf, NC_STACKSIZE,
-                                         PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                         nbr_cache_auto_rem, "nbr_cache_rem");
+    if (ip_process_pid < 0) {
+        return 0;
+    }
+
+    nbr_cache_auto_rem();
+
     contexts_rem_pid = thread_create(con_buf, CON_STACKSIZE,
                                      PRIORITY_MAIN + 1, CREATE_STACKTEST,
                                      lowpan_context_auto_remove, "lowpan_context_rem");
+
+    if (contexts_rem_pid < 0) {
+        return 0;
+    }
+
     transfer_pid = thread_create(lowpan_transfer_buf, LOWPAN_TRANSFER_BUF_STACKSIZE,
                                  PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                  lowpan_transfer, "lowpan_transfer");
+
+    if (transfer_pid < 0) {
+        return 0;
+    }
 
     for (i = 0; i < SIXLOWIP_MAX_REGISTERED; i++) {
         sixlowip_reg[i] = 0;
     }
 
+    return 0;
 }
 
 
