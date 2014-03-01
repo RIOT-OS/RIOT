@@ -27,7 +27,7 @@ $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PK
 	$(AD)rm -rf $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)
 	$(AD)$(UNPACK) $< -d $(PKG_NAME)-$(PKG_VERSION)
 	$(AD)cd $@ && sh ../structure_changes.sh
-	$(AD)cd $@ && patch -p0 -N -i ../patch.txt
+	$(AD)cd $@ && patch -p1 -N -i ../patch.txt
 
 $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT):
 	# Get PKG_VERSION of package from PKG_URL
