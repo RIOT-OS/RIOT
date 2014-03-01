@@ -63,13 +63,19 @@ char __end_stack[SIGSTKSZ];
 fd_set _native_rfds;
 #endif
 
-NORETURN void reboot(void)
+int reboot_arch(int mode)
 {
+    (void) mode;
+
     printf("\n\n\t\t!! REBOOT !!\n\n");
+
     if (execve(_native_argv[0], _native_argv, NULL) == -1) {
         err(EXIT_FAILURE, "reboot: execve");
     }
+
     errx(EXIT_FAILURE, "reboot: this should not habe been reached");
+
+    return -1;
 }
 
 /**
