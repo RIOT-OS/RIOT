@@ -28,6 +28,7 @@
 #include <unistd.h>
 
 #include "net_if.h"
+#include "sixlowpan.h"
 #include "ipv6.h"
 
 #ifndef R_ADDR
@@ -36,47 +37,45 @@
 
 #define PORT    (1234)
 
+#define ERROR(...)  printf("ERROR: " __VA_ARGS__)
+
 int init_local_address(uint16_t r_addr)
 {
     ipv6_addr_t std_addr;
     ipv6_addr_init(&std_addr, 0xabcd, 0xef12, 0, 0, 0x1034, 0x00ff, 0xfe00,
                    0);
-    return net_if_set_hardware_address(r_addr) &&
-           sixlowpan_lowpan_adhoc_init(0, &std_addr);
+    net_if_set_src_address_mode(0, NET_IF_TRANS_ADDR_M_SHORT);
+    return net_if_set_hardware_address(0, r_addr) &&
+           sixlowpan_lowpan_init_adhoc_interface(0, &std_addr);
 }
 
 int main(void)
 {
     int sockfd, res;
-    struct sockaddr_in6 my_addr, their_addr = {
-        .sin6_family = AF_INET6,
-#if R_ADDR == 1
-        .sin6_port = PORT,
-#else
-        .sin6_port = 0,
-#endif
-        .sin6_flowinfo = 0,
-#if R_ADDR == 1
-        .sin6_addr = {{{
-                    0xab, 0xcd, 0xef, 0x12, 0x00, 0x00, 0x00, 0x00,
-                    0x10, 0x34, 0x00, 0xff, 0xfe, 0x00, 0x00, 0x02
-                }
-            }
-        },
-#else
-        .sin6_addr = {{{
-                    0xab, 0xcd, 0xef, 0x12, 0x00, 0x00, 0x00, 0x00,
-                    0x10, 0x34, 0x00, 0xff, 0xfe, 0x00, 0x00, 0x01
-                }
-            }
-        },
-#endif
-        .sin6_scope_id = 0,
-    };
+    struct sockaddr_in6 my_addr, their_addr;
     char buffer[14];
 
+    their_addr.sin6_family = AF_INET6;
+#if R_ADDR == 1
+    their_addr.sin6_port = PORT;
+#else
+    their_addr.sin6_port = 0;
+#endif
+    their_addr.sin6_flowinfo = 0;
+    memset(&(their_addr.sin6_addr), 0, sizeof(their_addr.sin6_addr));
+    their_addr.sin6_addr.uint16[0] = htons(0xabcd);
+    their_addr.sin6_addr.uint16[1] = htons(0xef12);
+    their_addr.sin6_addr.uint16[5] = htons(0x00ff);
+    their_addr.sin6_addr.uint16[6] = htons(0xfe00);
+#if R_ADDR == 1
+    their_addr.sin6_addr.uint16[7] = htons(2);
+#else
+    their_addr.sin6_addr.uint16[7] = htons(1);
+#endif
+    their_addr.sin6_scope_id = 0;
+
     if (!init_local_address(R_ADDR)) {
-        fprintf(stderr, "Can not initialize IP for hardware address %d.", R_ADDR);
+        ERROR("Can not initialize IP for hardware address %d.", R_ADDR);
         return 1;
     }
 
@@ -89,7 +88,7 @@ int main(void)
     res = bind(sockfd, (struct sockaddr *)&my_addr, sizeof(my_addr));
 
     if (res < 0) {
-        perror("Socket could not be bind");
+        ERROR("Socket could not be bind");
         return 1;
     }
 
@@ -104,7 +103,7 @@ int main(void)
                    &their_len);
 
     if (their_addr.sin6_addr.uint8[15] != 1) {
-        fprintf(stderr, "Wrong sender address: %d\n", their_addr.sin6_addr.uint8[11]);
+        ERROR("Wrong sender address: %d\n", their_addr.sin6_addr.uint8[11]);
         return 1;
     }
 
@@ -112,7 +111,7 @@ int main(void)
 #endif
 
     if (res < 0) {
-        perror("Message error");
+        ERROR("Message error");
         return 1;
     }
 
