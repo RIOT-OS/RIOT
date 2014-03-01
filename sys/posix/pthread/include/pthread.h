@@ -31,6 +31,7 @@
 #include "pthread_scheduling.h"
 #include "pthread_cancellation.h"
 #include "pthread_cond.h"
+#include "pthread_keys.h"
 
 #endif
 
