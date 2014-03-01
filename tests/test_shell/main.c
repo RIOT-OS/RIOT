@@ -20,11 +20,11 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
-#include <shell_commands.h>
-#include <posix_io.h>
-#include <shell.h>
-#include <board_uart0.h>
+
+#include "shell_commands.h"
+#include "posix_io.h"
+#include "shell.h"
+#include "board_uart0.h"
 
 #define SHELL_BUFSIZE   (UART0_BUFSIZE)
 
