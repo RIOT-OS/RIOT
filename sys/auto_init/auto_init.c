@@ -55,6 +55,11 @@
 #include "destiny.h"
 #endif
 
+#ifdef MODULE_NET_IF
+#include "net_if.h"
+#include "transceiver.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -96,6 +101,40 @@ void auto_init(void)
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");
     MCI_initialize();
+#endif
+#ifdef MODULE_NET_IF
+    DEBUG("Auto init net_if module.\n");
+    transceiver_type_t transceivers = 0;
+#ifdef MODULE_AT86RF231
+    transceivers |= TRANSCEIVER_AT86RF231;
+#endif
+#ifdef MODULE_CC1020
+    transceivers |= TRANSCEIVER_CC1020;
+#endif
+#if MODULE_CC110X || MODULE_CC110X_NG
+    transceivers |= TRANSCEIVER_CC1100;
+#endif
+#ifdef MODULE_CC2420
+    transceivers |= TRANSCEIVER_CC2420;
+#endif
+#ifdef MODULE_MC1322X
+    transceivers |= TRANSCEIVER_MC1322X;
+#endif
+#ifdef MODULE_NATIVENET
+    transceivers |= TRANSCEIVER_NATIVE;
+#endif
+    net_if_init();
+
+    if (transceivers != 0) {
+        transceiver_init(transceivers);
+        transceiver_start();
+        int iface = net_if_init_interface(0, transceivers);
+
+        if (iface >= 0) {
+            DEBUG("Interface %d initialized\n", iface);
+        }
+    }
+
 #endif
 #ifdef MODULE_PROFILING
     extern void profiling_init(void);
