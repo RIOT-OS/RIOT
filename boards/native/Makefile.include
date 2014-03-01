@@ -24,11 +24,12 @@ export CFLAGS += -Wall -Wextra -pedantic -m32
 export LINKFLAGS += -m32 -gc -ldl
 export ASFLAGS =
 export DEBUGGER_FLAGS = $(ELF)
-export VALGRIND_FLAGS ?= --track-origins=yes
+valgrind: export VALGRIND_FLAGS ?= --track-origins=yes
+cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
 all-valgrind: export CFLAGS += -DHAVE_VALGRIND_H -g
 all-valgrind: export INCLUDES += $(shell pkg-config valgrind --cflags)
-all-profile: export CFLAGS += -pg
-all-profile: export LINKFLAGS += -pg
+all-gprof: export CFLAGS += -pg
+all-gprof: export LINKFLAGS += -pg
 
 # backward compatability with glibc <= 2.17 for native
 ifeq ($(CPU),native)
@@ -56,7 +57,7 @@ endif
 
 all: # do not override first target
 
-all-profile: all
+all-gprof: all
 
 all-valgrind: all
 
@@ -66,5 +67,8 @@ valgrind:
 #	VALGRIND_FLAGS += --db-attach=yes
 	$(VALGRIND) $(VALGRIND_FLAGS) $(ELF) $(PORT)
 
-profile:
+cachegrind:
+	$(VALGRIND) $(CACHEGRIND_FLAGS) $(ELF) $(PORT)
+
+gprof:
 	gprof $(ELF)
