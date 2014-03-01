@@ -14,18 +14,6 @@
 #include "net_help.h"
 #include "transceiver.h"
 
-#ifndef TRANSCEIVER
-#ifdef MODULE_AT86RF231
-#define TRANSCEIVER (TRANSCEIVER_AT86RF231)
-#elif MODULE_CC110X_NG
-#define TRANSCEIVER (TRANSCEIVER_CC1100)
-#elif MODULE_NATIVENET
-#define TRANSCEIVER (TRANSCEIVER_NATIVE)
-#elif MODULE_CC2420
-#define TRANSCEIVER (TRANSCEIVER_CC2420)
-#endif
-#endif
-
 int initialize_tests(void);
 int test_net_if_initialization(int iface);
 int test_net_if_get_add_l3p_types(int iface);
@@ -110,10 +98,10 @@ int initialize_tests(void)
     int iface;
 
 #ifndef MODULE_AUTO_INIT
-    transceiver_init(TRANSCEIVER);
+    transceiver_init(TRANSCEIVER_DEFAULT);
     transceiver_start();
     net_if_init();
-    iface = net_if_init_interface(0, TRANSCEIVER);
+    iface = net_if_init_interface(0, TRANSCEIVER_DEFAULT);
     return iface;
 #else
     iface = -1;
