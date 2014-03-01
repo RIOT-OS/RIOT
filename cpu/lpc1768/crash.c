@@ -59,6 +59,6 @@ NORETURN void core_panic(int crash_code, const char *message)
     }
 #else
     /* DEVELHELP not set => reboot system */
-    reboot();
+    (void) reboot(RB_AUTOBOOT);
 #endif
 }
