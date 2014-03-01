@@ -22,7 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "assert.h"
+
 #include "crypto/ciphers.h"
 
 #ifndef THREEDES_H_
