@@ -35,6 +35,7 @@
 #define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
+char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
@@ -95,6 +96,12 @@
 #define DEF_RTR_LST_SIZE                   	(3) /* geeigneten wert finden */
 
 #define PREFIX_BUF_LEN                  (NET_IF_MAX * OPT_PI_LIST_LEN)
+
+/**
+ * @brief Time in milliseconds ndp_get_ll_address() should wait for a neighbor
+ *        advertisement.
+ */
+#define NCE_UPDATE_TIME     (1000)  // TODO: maybe less
 
 /* extern variables */
 uint8_t ipv6_ext_hdr_len = 0;
@@ -171,72 +178,72 @@ int min(int a, int b)
 
 static icmpv6_parameter_prob_hdr_t *get_para_prob_buf(uint8_t ext_len)
 {
-    return ((icmpv6_parameter_prob_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
+    return ((icmpv6_parameter_prob_hdr_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_echo_request_hdr_t *get_echo_req_buf(uint8_t ext_len)
 {
-    return ((icmpv6_echo_request_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
+    return ((icmpv6_echo_request_hdr_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_echo_reply_hdr_t *get_echo_repl_buf(uint8_t ext_len)
 {
-    return ((icmpv6_echo_reply_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
+    return ((icmpv6_echo_reply_hdr_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_router_adv_hdr_t *get_rtr_adv_buf(uint8_t ext_len)
 {
-    return ((icmpv6_router_adv_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
+    return ((icmpv6_router_adv_hdr_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_neighbor_sol_hdr_t *get_nbr_sol_buf(uint8_t ext_len)
 {
-    return ((icmpv6_neighbor_sol_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
+    return ((icmpv6_neighbor_sol_hdr_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_neighbor_adv_hdr_t *get_nbr_adv_buf(uint8_t ext_len)
 {
-    return ((icmpv6_neighbor_adv_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
+    return ((icmpv6_neighbor_adv_hdr_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len]);
 }
 
 static icmpv6_ndp_opt_hdr_t *get_opt_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_hdr_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_stllao_t *get_opt_stllao_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_stllao_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_stllao_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_mtu_t *get_opt_mtu_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_mtu_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_mtu_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_abro_t *get_opt_abro_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_abro_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_abro_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_6co_hdr_t *get_opt_6co_hdr_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_6co_hdr_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_6co_hdr_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static uint8_t *get_opt_6co_prefix_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((uint8_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((uint8_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_pi_t *get_opt_pi_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_pi_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_pi_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 static icmpv6_ndp_opt_aro_t *get_opt_aro_buf(uint8_t ext_len, uint8_t opt_len)
 {
-    return ((icmpv6_ndp_opt_aro_t *) &buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
+    return ((icmpv6_ndp_opt_aro_t *) &ip_recv_buffer[LLHDR_ICMPV6HDR_LEN + ext_len + opt_len]);
 }
 
 void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, uint8_t *data, size_t data_len)
@@ -275,7 +282,7 @@ void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, 
            id, seq, data_len, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                    &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, 1);
 }
 
 void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, uint8_t *data, size_t data_len)
@@ -314,7 +321,7 @@ void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, ui
            id, seq, data_len, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                    &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, 1);
 }
 
 /* send router solicitation message - RFC4861 section 4.1 */
@@ -371,7 +378,7 @@ void icmpv6_send_router_sol(uint8_t sllao)
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, 1);
 }
 
 void recv_echo_req(void)
@@ -435,6 +442,8 @@ void recv_echo_repl(void)
 void recv_rtr_sol(void)
 {
     int if_id = 0;  // TODO, get this somehow
+    ipv6_addr_t *dest;
+
     icmpv6_opt_hdr_len = RTR_SOL_LEN;
     ipv6_buf = ipv6_get_buf();
 
@@ -482,12 +491,19 @@ void recv_rtr_sol(void)
         }
     }
 
-    /* send solicited router advertisment */
-    if (abr_count > 0) {
-        icmpv6_send_router_adv(&ipv6_buf->srcaddr, 0, 0, OPT_PI, OPT_6CO, OPT_ABRO);
+    if (ipv6_addr_is_unspecified(&ipv6_buf->srcaddr)) {
+        dest = NULL;
     }
     else {
-        icmpv6_send_router_adv(&ipv6_buf->srcaddr, 0, 0, OPT_PI, 0, 0);
+        dest = &ipv6_buf->srcaddr;
+    }
+
+    /* send solicited router advertisment */
+    if (abr_count > 0) {
+        icmpv6_send_router_adv(dest, 0, 0, OPT_PI, OPT_6CO, OPT_ABRO);
+    }
+    else {
+        icmpv6_send_router_adv(dest, 0, 0, OPT_PI, 0, 0);
     }
 }
 
@@ -678,7 +694,7 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
                 prefix->inuse && prefix->advertisable) {
                 opt_pi_buf = get_opt_pi_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
                 memset(&opt_pi_buf->addr, 0, sizeof(ipv6_addr_t));
-                memcpy(&opt_pi_buf->addr, &prefix->prefix_data, prefix->prefix_len);
+                memcpy(&opt_pi_buf->addr, prefix->prefix_data, prefix->prefix_len);
                 opt_pi_buf->type = OPT_PI_TYPE;
                 opt_pi_buf->length = OPT_PI_LEN;
                 opt_pi_buf->prefix_length = prefix->prefix_len;
@@ -703,7 +719,7 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, 1);
 }
 
 void recv_rtr_adv(void)
@@ -936,7 +952,7 @@ void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *
 
     packet_length = IPV6_HDR_LEN + ICMPV6_HDR_LEN + NBR_SOL_LEN;
 
-    if (!ipv6_net_if_addr_match(&hit, targ)) {
+    if (!ipv6_net_if_addr_prefix_eq(&hit, targ)) {
         if (src == NULL) {
             ipv6_net_if_get_best_src_addr(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr));
         }
@@ -967,6 +983,7 @@ void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *
         opt_aro_buf->type = OPT_ARO_TYPE;
         opt_aro_buf->length = OPT_ARO_LEN;
         opt_aro_buf->status = 0;
+        opt_aro_buf->reg_ltime = HTONS(5);  // Register for 5 minutes
         opt_aro_buf->reserved1 = 0;
         opt_aro_buf->reserved2 = 0;
 
@@ -992,7 +1009,7 @@ void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, 1);
 }
 
 void recv_nbr_sol(void)
@@ -1123,15 +1140,39 @@ void recv_nbr_sol(void)
                                                                opt_aro_buf->reg_ltime);
                         }
                         else {
-                            if (memcmp(&(nbr_entry->addr.uint16[4]),
-                                       &(opt_aro_buf->eui64.uint16[0]), 8) == 0) {
+                            if (nbr_entry->lladdr_len == sizeof(net_if_eui64_t) &&
+                                memcmp(&(nbr_entry->lladdr),
+                                       &(opt_aro_buf->eui64.uint16[0]),
+                                       nbr_entry->lladdr_len) == 0) {
                                 /* update neighbor cache entry */
                                 if (opt_aro_buf->reg_ltime == 0) {
                                     /* delete neighbor cache entry */
                                     nbr_cache_rem(&nbr_entry->addr);
                                 }
                                 else {
-                                    set_remaining_time(&(nbr_entry->ltime), (uint32_t)opt_aro_buf->reg_ltime);
+                                    set_remaining_time(&(nbr_entry->ltime), (uint32_t)NTOHS(opt_aro_buf->reg_ltime));
+                                    nbr_entry->state = NDP_NCE_STATUS_STALE;
+                                    nbr_entry->isrouter = 0;
+                                    memcpy(&(nbr_entry->addr.uint8[0]),
+                                           &(ipv6_buf->srcaddr.uint8[0]), 16);
+                                }
+
+                                aro_state = NDP_OPT_ARO_STATE_SUCCESS;
+                            }
+                            else if (nbr_entry->lladdr_len == sizeof(uint16_t) &&
+                                     opt_aro_buf->eui64.uint16[0] == 0 &&
+                                     opt_aro_buf->eui64.uint8[2] == 0 &&
+                                     opt_aro_buf->eui64.uint8[3] == 0xff &&
+                                     opt_aro_buf->eui64.uint8[4] == 0xfe &&
+                                     opt_aro_buf->eui64.uint8[5] == 0 &&
+                                     opt_aro_buf->eui64.uint16[3] == *((uint16_t *)nbr_entry->lladdr)) {
+                                /* update neighbor cache entry */
+                                if (opt_aro_buf->reg_ltime == 0) {
+                                    /* delete neighbor cache entry */
+                                    nbr_cache_rem(&nbr_entry->addr);
+                                }
+                                else {
+                                    set_remaining_time(&(nbr_entry->ltime), (uint32_t)NTOHS(opt_aro_buf->reg_ltime));
                                     nbr_entry->state = NDP_NCE_STATUS_STALE;
                                     nbr_entry->isrouter = 0;
                                     memcpy(&(nbr_entry->addr.uint8[0]),
@@ -1146,6 +1187,8 @@ void recv_nbr_sol(void)
                             }
                         }
                     }
+
+                    (void)aro_state;
                 }
 
                 break;
@@ -1179,7 +1222,8 @@ void recv_nbr_sol(void)
         /* solicited na */
         uint8_t flags = (ICMPV6_NEIGHBOR_ADV_FLAG_OVERRIDE | ICMPV6_NEIGHBOR_ADV_FLAG_SOLICITED);
         icmpv6_send_neighbor_adv(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr),
-                                 alist_targ.addr->addr_data, flags, 0, OPT_ARO);
+                                 alist_targ.addr->addr_data, flags, OPT_SLLAO,
+                                 OPT_ARO);
     }
 }
 
@@ -1264,7 +1308,7 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *t
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, 1);
 }
 
 void recv_nbr_adv(void)
@@ -1434,6 +1478,13 @@ uint16_t icmpv6_csum(ipv6_hdr_t *ipv6_buf, icmpv6_hdr_t *icmpv6_buf)
     uint16_t sum;
     uint16_t len = NTOHS(ipv6_buf->length);
 
+    DEBUG("Calculate checksum over src: %s, dst: %s, len: %d, icmpv6_buf: %p, proto: %u\n",
+          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                           &ipv6_buf->srcaddr),
+          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                           &ipv6_buf->destaddr),
+          len, (void *)icmpv6_buf, IPV6_PROTO_NUM_ICMPV6);
+
     icmpv6_buf->checksum = 0;
     sum = len + IPV6_PROTO_NUM_ICMPV6;
 
@@ -1484,7 +1535,7 @@ void icmpv6_send_parameter_prob(ipv6_addr_t *src, ipv6_addr_t *dest,
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, 1);
 }
 
 //------------------------------------------------------------------------------
@@ -1503,14 +1554,35 @@ ndp_neighbor_cache_t *ndp_neighbor_cache_search(ipv6_addr_t *ipaddr)
     return NULL;
 }
 
-ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_addr_t *ipaddr)
+/* XXX: Just a quick hack until IPv6 buffer issue is fixed */
+uint8_t ndp_tmp_buffer[BUFFER_SIZE];
+
+ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_addr_t *ip_addr,
+                                         ipv6_hdr_t *packet)
 {
-    ndp_neighbor_cache_t *nce = ndp_neighbor_cache_search(ipaddr);
+    ndp_neighbor_cache_t *nce = ndp_neighbor_cache_search(ip_addr);
 
     if (nce == NULL || nce->type == NDP_NCE_TYPE_GC ||
         nce->state == NDP_NCE_STATUS_INCOMPLETE) {
-        // TODO: send neighbor solicitation, wait, and recheck cache
-        return NULL;
+        int count = 0;
+        timex_t wait_time = timex_set(0, NCE_UPDATE_TIME);
+        memcpy(ndp_tmp_buffer, packet, IPV6_HDR_LEN + NTOHS(packet->length));
+
+        icmpv6_send_neighbor_sol(NULL, NULL, ip_addr, OPT_SLLAO, 0);
+
+        if (vtimer_sleep(wait_time) < 0) {
+            return NULL;
+        }
+
+        nce = ndp_neighbor_cache_search(ip_addr);
+
+        if (nce && nce->type != NDP_NCE_TYPE_GC &&
+            nce->state != NDP_NCE_STATUS_INCOMPLETE) {
+            return nce;
+        }
+
+        memcpy(packet, ndp_tmp_buffer, IPV6_HDR_LEN + NTOHS(packet->length));
+
     }
 
     return nce;
@@ -1771,7 +1843,7 @@ int ndp_add_prefix_info(int if_id, const ipv6_addr_t *prefix,
     }
 
     if ((prefix_info_count >= PREFIX_BUF_LEN) ||
-            (prefix_buf_count >= sizeof(prefix_buf))) {
+        (prefix_buf_count >= sizeof(prefix_buf))) {
         return SIXLOWERROR_ARRAYFULL;
     }
 
