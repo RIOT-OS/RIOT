@@ -53,7 +53,6 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
-#define NC_STACKSIZE                    (KERNEL_CONF_STACKSIZE_DEFAULT)
 #define CON_STACKSIZE                   (KERNEL_CONF_STACKSIZE_DEFAULT)
 #define LOWPAN_TRANSFER_BUF_STACKSIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
 
@@ -136,7 +135,6 @@ int sixlowpan_reg[SIXLOWPAN_MAX_REGISTERED];
 static sixlowpan_lowpan_frame_t current_frame;
 
 char ip_process_buf[IP_PROCESS_STACKSIZE];
-char nc_buf[NC_STACKSIZE];
 char con_buf[CON_STACKSIZE];
 char lowpan_transfer_buf[LOWPAN_TRANSFER_BUF_STACKSIZE];
 lowpan_context_t contexts[NDP_6LOWPAN_CONTEXT_MAX];
