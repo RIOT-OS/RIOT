@@ -24,8 +24,24 @@
 
 #include <stdio.h>
 
+#if DEVELHELP
+#include "sched.h"
+#include "cpu-conf.h"
+#define DEBUG_PRINT(...) \
+    do { \
+        if (active_thread->stack_size > KERNEL_CONF_STACKSIZE_PRINTF) { \
+            printf(__VA_ARGS__); \
+        } \
+        else { \
+            puts("Cannot debug, stack too small"); \
+        } \
+    } while (0)
+#else
+#define DEBUG_PRINT(...) printf(__VA_ARGS__)
+#endif
+
 #if ENABLE_DEBUG
-#define DEBUG(...) printf(__VA_ARGS__)
+#define DEBUG(...) DEBUG_PRINT(__VA_ARGS__)
 #undef ENABLE_DEBUG
 #else
 #define DEBUG(...)
