@@ -1,26 +1,26 @@
-/*
- *	ISO C99 Standard: 7.23 Date and time	<time.h>
- */
-
 #ifndef	_TIME_H
-# define _TIME_H	1
+#define _TIME_H	1
 
 /* Get size_t and NULL from <stddef.h>.  */
 #include <stddef.h>
 
+#include "hwtimer.h"
+#include "vtimer.h"
+
 /* This defines CLOCKS_PER_SEC, which is the number of processor clock
  ticks per second.  */
-#include <bits/time.h>
+#define US_PER_S (1000 * 1000)
+#define CLOCKS_PER_SEC HWTIMER_TICKS((US_PER_S))
 
 /* Returned by `time'.  */
 typedef long int time_t;
 
 /* POSIX.1b structure for a time value.  This is like a `struct timeval' but
  has nanoseconds instead of microseconds.  */
-struct timespec {
-    time_t tv_sec; /* Seconds.  */
-    time_t tv_nsec; /* Nanoseconds.  */
-};
+//struct timespec {
+//    time_t tv_sec; /* Seconds.  */
+//    time_t tv_nsec; /* Nanoseconds.  */
+//};
 
 /* Used by other time functions.  */
 struct tm {
@@ -39,15 +39,19 @@ struct tm {
 };
 
 /* POSIX.1b structure for timer start values and intervals.  */
-struct itimerspec {
-    struct timespec it_interval;
-    struct timespec it_value;
-};
+//struct itimerspec {
+//    struct timespec it_interval;
+//    struct timespec it_value;
+//};
 
 /* We can use a simple forward declaration.  */
 struct sigevent;
 
-typedef pid_t pid_t;
+//typedef uint8_t pid_t;
+//typedef uint64_t clock_t;
+typedef uint32_t locale_t;
+//typedef uint8_t clockid_t;
+//typedef vtimer_t timer_t;
 
 /* Time used by the program so far (user time + system time).
  The result / CLOCKS_PER_SECOND is program time in seconds.  */

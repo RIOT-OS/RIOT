@@ -2,18 +2,17 @@
 #define _SYS_TIME_H	1
 
 #include <time.h>
-#include <sys/select.h>
 
 typedef long int suseconds_t;
 
 /* Macros for converting between `struct timeval' and `struct timespec'.  */
-# define TIMEVAL_TO_TIMESPEC(tv, ts) {                                   \
-	(ts)->tv_sec = (tv)->tv_sec;                                    \
-	(ts)->tv_nsec = (tv)->tv_usec * 1000;                           \
+# define TIMEVAL_TO_TIMESPEC(tv, ts) {                              \
+    (ts)->tv_sec = (tv)->tv_sec;                                    \
+    (ts)->tv_nsec = (tv)->tv_usec * 1000;                           \
 }
-# define TIMESPEC_TO_TIMEVAL(tv, ts) {                                   \
-	(tv)->tv_sec = (ts)->tv_sec;                                    \
-	(tv)->tv_usec = (ts)->tv_nsec / 1000;                           \
+# define TIMESPEC_TO_TIMEVAL(tv, ts) {                              \
+    (tv)->tv_sec = (ts)->tv_sec;                                    \
+    (tv)->tv_usec = (ts)->tv_nsec / 1000;                           \
 }
 
 /* Structure crudely representing a timezone.
@@ -24,6 +23,11 @@ struct timezone {
 };
 
 typedef struct timezone * timezone_ptr_t;
+
+struct timeval {
+    uint32_t tv_sec;
+    uint32_t tv_usec;
+};
 
 /* Get the current time of day and timezone information,
  putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
