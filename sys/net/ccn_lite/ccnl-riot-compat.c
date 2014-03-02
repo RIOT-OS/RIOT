@@ -111,6 +111,9 @@ char *riot_ccnl_event_to_string(ccnl_riot_event_t event)
         case CCNL_RIOT_PRINT_STAT:
             return "CCNL_RIOT_PRINT_STAT";
 
+        case ENOBUFFER:
+            return "ENOBUFFER";
+
         default:
             return "UNKNOWN";
     }
