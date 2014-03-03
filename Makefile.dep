@@ -20,6 +20,12 @@ ifneq (,$(filter posix,$(USEMODULE)))
 	ifeq (,$(filter uart0,$(USEMODULE)))
 		USEMODULE += uart0
 	endif
+	ifeq (,$(filter timex,$(USEMODULE)))
+		USEMODULE += timex
+	endif
+	ifeq (,$(filter vtimer,$(USEMODULE)))
+		USEMODULE += vtimer
+	endif
 endif
 
 ifneq (,$(filter uart0,$(USEMODULE)))

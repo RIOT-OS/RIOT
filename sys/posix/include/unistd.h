@@ -24,6 +24,11 @@
 #ifndef _UNISTD_H
 #define _UNISTD_H
 
+#include <stdint.h>
+
+#include "timex.h"
+#include "vtimer.h"
+
 #define STDIN_FILENO    0   ///< stdin file descriptor
 #define STDOUT_FILENO   1   ///< stdout file descriptor
 #define STDERR_FILENO   2   ///< stderr file descriptor
@@ -46,6 +51,45 @@
  *          shall be returned and errno set to indicate the error.
  */
 int close(int fildes);
+
+typedef uint32_t useconds_t;
+
+/**
+ * @brief the caller will sleep for given amount of micro seconds
+ * @details The usleep() function will cause the calling thread to be
+ *          suspended from execution until either the number of real-time microseconds
+ *          specified by the argument useconds has elapsed or a signal is delivered to
+ *          the calling thread and its action is to invoke a signal-catching function
+ *          or to terminate the process. The suspension time may be longer than
+ *          requested due to the scheduling of other activity by the system.
+ *
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/7908799/xsh/usleep.html">
+ *          The Open Group Base Specification Issue 2, usleep
+ *      </a>
+ *
+ * @param useconds   time to sleep in micro seconds
+ * @return           0 on success
+ */
+int usleep(useconds_t useconds);
+
+/**
+ * @brief the caller will sleep for given amount of seconds
+ * @details The sleep() function shall cause the calling thread to be suspended
+ *          from execution until either the number of realtime seconds
+ *          specified by the argument seconds has elapsed or a signal is
+ *          delivered to the calling thread and its action is to invoke a
+ *          signal-catching function or to terminate the process. The
+ *          suspension time may be longer than requested due to the scheduling
+ *          of other activity by the system.
+ *
+ * @see <a href="http://pubs.opengroup.org/onlinepubs/009695399/functions/sleep.html">
+ *          The Open Group Base Specification Issue 6, sleep
+ *      </a>
+ *
+ * @param seconds   time to sleep in seconds
+ * @return          0 on success
+ */
+unsigned int sleep(unsigned int seconds);
 
 /**
  * @}
