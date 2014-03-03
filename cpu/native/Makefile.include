@@ -1,1 +1,1 @@
-export INCLUDES += -I$(RIOTCPU)/native/include
+export NATIVEINCLUDES += -I$(RIOTCPU)/native/include -I$(RIOTBASE)/sys/include
