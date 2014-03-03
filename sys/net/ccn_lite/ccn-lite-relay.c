@@ -353,6 +353,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 
         switch (in.type) {
             case PKT_PENDING:
+                /* msg from transceiver */
                 hwtimer_remove(hwtimer_id);
                 p = (radio_packet_t *) in.content.ptr;
                 DEBUGMSG(1, "\tLength:\t%u\n", p->length);
@@ -369,6 +370,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                 break;
 
             case (CCNL_RIOT_MSG):
+                /* msg from device local client */
                 hwtimer_remove(hwtimer_id);
                 m = (riot_ccnl_msg_t *) in.content.ptr;
                 DEBUGMSG(1, "\tLength:\t%u\n", m->size);
@@ -379,6 +381,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                 break;
 
             case (CCNL_RIOT_HALT):
+                /* cmd to stop the relay */
                 hwtimer_remove(hwtimer_id);
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
                 DEBUGMSG(1, "\tNumb:\t%" PRIu32 "\n", in.content.value);
@@ -388,6 +391,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 
 #if RIOT_CCNL_POPULATE
             case (CCNL_RIOT_POPULATE):
+                /* cmd to polulate the cache */
                 hwtimer_remove(hwtimer_id);
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
                 DEBUGMSG(1, "\tNumb:\t%" PRIu32 "\n", in.content.value);
@@ -396,14 +400,21 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                 break;
 #endif
             case (CCNL_RIOT_PRINT_STAT):
+                /* cmd to print face statistics */
                 hwtimer_remove(hwtimer_id);
                 for (struct ccnl_face_s *f = ccnl->faces; f; f = f->next) {
                     ccnl_face_print_stat(f);
                 }
                 break;
             case (CCNL_RIOT_TIMEOUT):
+                /* ccn timeout from hwtimer, run pending events */
                 timeout = ccnl_run_events();
                 us = timeout->tv_sec * 1000 * 1000 + timeout->tv_usec;
+                break;
+            case (ENOBUFFER):
+                /* transceiver has not enough buffer to store incoming packets, one packet is dropped  */
+                hwtimer_remove(hwtimer_id);
+                DEBUGMSG(1, "transceiver: one packet is dropped because buffers are full\n");
                 break;
             default:
                 hwtimer_remove(hwtimer_id);
