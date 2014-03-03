@@ -133,7 +133,7 @@ typedef uint8_t net_if_trans_addr_m_t;
 /**
  * @brief   Interface type.
  */
-typedef struct __attribute__((packed)) {
+typedef struct {
     uint8_t initialized;                ///< Detemines if interface is initialized
     uint8_t protocols;                  ///< Interface L3 protocols
     transceiver_type_t transceivers;    ///< Transceivers to use with this interface
