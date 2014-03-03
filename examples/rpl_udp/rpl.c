@@ -68,10 +68,10 @@ void rpl_udp_init(int argc, char **argv)
             return;
         }
 
-        DEBUG("%s, %d: Setting HW address to %u\n", __FILE__, __LINE__, id);
+        DEBUGF("Setting HW address to %u\n", id);
         net_if_set_hardware_address(0, id);
 
-        DEBUG("%s, %d: Initializing RPL for interface 0\n", __FILE__, __LINE__);
+        DEBUGF("Initializing RPL for interface 0\n");
         state = rpl_init(0);
 
         if (state != SIXLOWERROR_SUCCESS) {
@@ -89,9 +89,9 @@ void rpl_udp_init(int argc, char **argv)
             ipv6_iface_set_routing_provider(rpl_get_next_hop);
         }
 
-        DEBUG("%s, %d: Start monitor\n", __FILE__, __LINE__);
+        DEBUGF("Start monitor\n");
         int monitor_pid = thread_create(monitor_stack_buffer, MONITOR_STACK_SIZE, PRIORITY_MAIN - 2, CREATE_STACKTEST, rpl_udp_monitor, "monitor");
-        DEBUG("%s, %d: Register at transceiver %02X\n", __FILE__, __LINE__, TRANSCEIVER);
+        DEBUGF("Register at transceiver %02X\n", TRANSCEIVER);
         transceiver_register(TRANSCEIVER, monitor_pid);
         ipv6_register_packet_handler(monitor_pid);
         //sixlowpan_lowpan_register(monitor_pid);
