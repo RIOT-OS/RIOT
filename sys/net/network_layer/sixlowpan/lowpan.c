@@ -883,12 +883,12 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
     net_if_eui64_t own_iid;
 
     if (net_if_get_src_address_mode(if_id) == NET_IF_TRANS_ADDR_M_SHORT) {
-        if (!net_if_get_eui64(&own_iid, if_id, 0)) {
+        if (!net_if_get_eui64(&own_iid, if_id, 1)) {
             return 1;
         }
     }
     else {
-        if (!net_if_get_eui64(&own_iid, if_id, 1)) {
+        if (!net_if_get_eui64(&own_iid, if_id, 0)) {
             return 1;
         }
 
