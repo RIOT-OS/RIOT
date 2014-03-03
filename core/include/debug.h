@@ -23,9 +23,9 @@
 #define __DEBUG_H
 
 #include <stdio.h>
+#include "sched.h"
 
 #if DEVELHELP
-#include "sched.h"
 #include "cpu-conf.h"
 #define DEBUG_PRINT(...) \
     do { \
@@ -41,10 +41,18 @@
 #endif
 
 #if ENABLE_DEBUG
+#include "tcb.h"
 #define DEBUG(...) DEBUG_PRINT(__VA_ARGS__)
+#define DEBUGF(...) \
+    do { \
+        DEBUG_PRINT("DEBUG(%s): %s:%d in %s: ", \
+                active_thread->name, __FILE__, __LINE__, __func__); \
+        DEBUG_PRINT(__VA_ARGS__); \
+    } while (0)
 #undef ENABLE_DEBUG
 #else
 #define DEBUG(...)
+#define DEBUGF(...)
 #endif
 
 /** @} */
