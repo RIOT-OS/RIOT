@@ -64,11 +64,20 @@
 #endif
 
 #ifdef MODULE_NET_IF
+#include "cpu-conf.h"
+#include "cpu.h"
+#include "kernel.h"
 #include "net_if.h"
 #include "transceiver.h"
+#include "net_help.h"
+#include "hashes.h"
+#include "periph/cpuid.h"
 #endif
 
 #define ENABLE_DEBUG (0)
+#if ENABLE_DEBUG
+#define DEBUG_ENABLED
+#endif
 #include "debug.h"
 
 #ifndef CONF_RADIO_ADDR
@@ -141,16 +150,47 @@ void auto_init(void)
     net_if_init();
 
     if (transceivers != 0) {
+#if CPUID_ID_LEN && defined(MODULE_HASHES)
+        uint8_t cpuid[CPUID_ID_LEN];
+
+        cpuid_get(cpuid);
+#endif
         transceiver_init(transceivers);
         transceiver_start();
         iface = net_if_init_interface(0, transceivers);
+
+#if CPUID_ID_LEN && defined(MODULE_HASHES)
+        net_if_eui64_t eui64;
+
+        if (CPUID_ID_LEN < sizeof(net_if_eui64_t)) {
+            memset(&eui64, 0xff, sizeof(net_if_eui64_t));
+        }
+
+        memcpy(&eui64, djb2_hash(cpuid, CPUID_ID_LEN), sizeof(uint32_t));
+        net_if_set_eui64(iface, &eui64);
+
+#ifdef DEBUG_ENABLED
+        DEBUG("Auto init radio long address on interface %d to ", iface);
+
+        for (size_t i = 0; i < 8; i++) {
+            printf("%02x ", eui64.uint8[i]);
+        }
+
+        DEBUG("\n");
+#endif
+
+#undef CONF_RADIO_ADDR
+        uint16_t hwaddr = HTONS(*((uint16_t *)(&cpuid)));
+        net_if_set_hardware_address(iface, hwaddr);
+        DEBUG("Auto init radio address on interface %d to 0x%04x\n", iface, hwaddr);
+#else
 
         if (net_if_set_src_address_mode(iface, NET_IF_TRANS_ADDR_M_SHORT)) {
             DEBUG("Auto init source address mode to short on interface %d\n",
                   iface);
         }
         else {
-            net_if_set_hardware_address(iface, NET_IF_TRANS_ADDR_M_LONG);
+            net_if_set_src_address_mode(iface, NET_IF_TRANS_ADDR_M_LONG);
             DEBUG("Auto init source address mode to long on interface %d\n",
                   iface);
         }
@@ -160,6 +200,8 @@ void auto_init(void)
             DEBUG("Change this value at compile time with macro CONF_RADIO_ADDR\n");
             net_if_set_hardware_address(iface, CONF_RADIO_ADDR);
         }
+
+#endif
 
         if (net_if_get_pan_id(iface) <= 0) {
             DEBUG("Auto init PAN ID on interface %d to 0x%04x\n", iface, CONF_PAN_ID);
