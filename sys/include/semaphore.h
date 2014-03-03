@@ -1,7 +1,6 @@
 #ifndef _SEMAPHORE_H
 #define _SEMAPHORE_H	1
 
-#include <sys/types.h>
 #include <time.h>
 
 /** Value returned if `sem_open' failed.  */
