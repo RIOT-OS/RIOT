@@ -9,6 +9,11 @@
 /**
  * @file        main.cpp
  * @brief       Demonstration of mixed c++ user application with pure c RIOT
+ *              - introducing a namespace to declarative block, avoiding to qualify calls, e.g. std::vector
+ *              - using private and public member functions, e.g. 'oMix.greet()' cannot be accessed from main.cpp 
+ *              - overloading of function 'oMix.sayHallo(...)' for 'none', 'int' or 'float' 
+ *              - demonstration of templated c++ container 'std::vector'
+ *              - usage of iterator to access elements of the container type 
  *
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  *
