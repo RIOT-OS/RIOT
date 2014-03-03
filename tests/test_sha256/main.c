@@ -46,6 +46,8 @@ void sha256_calc(const char *str, const char *expected)
 
 int main(void)
 {
+    puts("Start.");
+
     sha256_calc("1234567890_1",
                 "3eda9ffe5537a588f54d0b2a453e5fa932986d0bc0f9556924f5c2379b2c91b0");
     sha256_calc("1234567890_2",
@@ -63,5 +65,6 @@ int main(void)
     sha256_calc("",
                 "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
 
+    puts("Done.");
     return 0;
 }
