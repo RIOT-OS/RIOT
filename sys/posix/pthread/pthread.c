@@ -32,7 +32,7 @@
 
 #include "pthread.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 
 #if ENABLE_DEBUG
 #   define PTHREAD_REAPER_STACKSIZE KERNEL_CONF_STACKSIZE_MAIN
