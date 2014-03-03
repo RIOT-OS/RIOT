@@ -35,7 +35,7 @@ void *run(void *parameter)
 
     int err = pthread_mutex_lock(&mtx);
 
-    if (err != 1) {
+    if (err != 0) {
         printf("[!!!] pthread_mutex_lock failed with %d\n", err);
         return NULL;
     }
