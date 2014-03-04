@@ -93,9 +93,6 @@ endif
 ifneq (,$(filter hashes,$(USEMODULE)))
     DIRS += hashes
 endif
-ifneq (,$(filter semaphore,$(USEMODULE)))
-    DIRS += semaphore
-endif
 ifneq (,$(filter ccn_lite,$(USEMODULE)))
     DIRS += net/ccn_lite
 endif
