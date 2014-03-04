@@ -185,3 +185,4 @@ static inline void irq_handler(uint8_t uartnum, USART_TypeDef *uart)
         config[uartnum].tx_cb();
     }
 }
+
