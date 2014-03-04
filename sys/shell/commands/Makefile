@@ -1,3 +1,5 @@
+MODULE = shell_commands
+
 SRC = shell_commands.c sc_sys.c
 
 ifneq (,$(filter config,$(USEMODULE)))
@@ -36,10 +38,5 @@ endif
 ifneq (,$(filter random,$(USEMODULE)))
 	SRC += sc_mersenne.c
 endif
-
-OBJ = $(SRC:%.c=$(BINDIR)%.o)
-DEP = $(SRC:%.c=$(BINDIR)%.d)
-
-MODULE =shell_commands
 
 include $(RIOTBASE)/Makefile.base
