@@ -382,21 +382,6 @@ int test_net_if_get_set_pan_id(int iface)
 int test_net_if_get_set_eui64(int iface, net_if_eui64_t *eui64,
                               uint16_t addr)
 {
-    uint16_t pan_id;
-
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-    int32_t res;
-
-    if ((res = net_if_get_pan_id(iface)) < 0) {
-        printf("FAILED: net_if_get_pan_id(%d) failed\n", iface);
-        return 0;
-    }
-
-    pan_id = (uint16_t)res;
-#else
-    pan_id = 0;
-#endif
-
     if (net_if_get_eui64(NULL, iface, 1)) {
         printf("FAILED: expected net_if_get_eui64(NULL, %d, 1) to fail\n",
                iface);
@@ -408,7 +393,7 @@ int test_net_if_get_set_eui64(int iface, net_if_eui64_t *eui64,
         return 0;
     }
 
-    if (eui64->uint16[0] != HTONS(pan_id) || eui64->uint8[2] != 0 ||
+    if (eui64->uint16[0] != 0 || eui64->uint8[2] != 0 ||
         eui64->uint8[3] != 0xff || eui64->uint8[4] != 0xfe ||
         eui64->uint8[5] != 0 || (uint16_t)eui64->uint16[3] != HTONS(addr)) {
         printf("FAILED: Expected last 16 bit of EUI-64 to be 0x%04x (is 0x%04x)\n",
