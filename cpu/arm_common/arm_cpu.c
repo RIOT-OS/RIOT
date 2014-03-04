@@ -34,7 +34,7 @@ void thread_yield(void)
  * Processor specific routine - here for ARM7
  * sizeof(void*) = sizeof(int)
  *--------------------------------------------------------------------------*/
-char *thread_stack_init(void (*task_func)(void), void *stack_start, int stack_size)
+char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size)
 {
     unsigned int *stk;
     int i;
@@ -52,10 +52,14 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stack_si
     *stk = (unsigned int)((unsigned int)stack_start + stack_size) - 4;
 
     /* build base stack */
-    for (i = REGISTER_CNT; i >= 0 ; i--) {
+    for (i = REGISTER_CNT; i > 0 ; i--) {
         stk--;
         *stk = i;
     }
+
+    /* set argument to task_func */
+    stk--;
+    *stk = ((unsigned int) arg);
 
     /* set the entry point */
     stk--;

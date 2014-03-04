@@ -85,7 +85,7 @@ void thread_print_stack(void)
     return;
 }
 
-char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksize)
+char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stacksize)
 {
     unsigned int *stk;
     ucontext_t *p;
@@ -119,7 +119,7 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksiz
         err(EXIT_FAILURE, "thread_stack_init(): sigemptyset()");
     }
 
-    makecontext(p, task_func, 0);
+    makecontext(p, (void (*)(void)) task_func, 1, arg);
 
     return (char *) p;
 }
