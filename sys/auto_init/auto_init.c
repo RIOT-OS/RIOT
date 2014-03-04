@@ -143,6 +143,16 @@ void auto_init(void)
         transceiver_start();
         iface = net_if_init_interface(0, transceivers);
 
+        if (net_if_set_src_address_mode(iface, NET_IF_TRANS_ADDR_M_SHORT)) {
+            DEBUG("Auto init source address mode to short on interface %d\n",
+                  iface);
+        }
+        else {
+            net_if_set_hardware_address(iface, NET_IF_TRANS_ADDR_M_LONG);
+            DEBUG("Auto init source address mode to long on interface %d\n",
+                  iface);
+        }
+
         if (!net_if_get_hardware_address(iface)) {
             DEBUG("Auto init radio address on interface %d to 0x%04x\n", iface, CONF_RADIO_ADDR);
             DEBUG("Change this value at compile time with macro CONF_RADIO_ADDR\n");
