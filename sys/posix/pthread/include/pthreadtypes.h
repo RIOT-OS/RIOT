@@ -19,8 +19,24 @@ typedef int pthread_once_t;
 /* Single execution handling.  */
 #define PTHREAD_ONCE_INIT 0
 
-typedef unsigned long int pthread_barrier_t;
-typedef unsigned long int pthread_barrierattr_t;
+typedef struct pthread_barrier_waiting_node
+{
+    struct pthread_barrier_waiting_node *next;
+    int pid;
+    volatile int cont;
+} pthread_barrier_waiting_node_t;
+
+typedef struct pthread_barrier
+{
+    struct pthread_barrier_waiting_node *next;
+    mutex_t mutex;
+    volatile int count;
+} pthread_barrier_t;
+
+typedef struct pthread_barrierattr
+{
+    int pshared;
+} pthread_barrierattr_t;
 
 typedef unsigned long int pthread_cond_t;
 typedef unsigned long int pthread_condattr_t;
