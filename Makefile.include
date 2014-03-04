@@ -25,8 +25,8 @@ $(error This application does not run on following boards: $(BOARD_BLACKLIST))
 endif
 
 # if you want to publish the board into the sources as an uppercase #define
-BB = $(shell echo $(BOARD)|tr 'a-z' 'A-Z')
-CPUDEF = $(shell echo $(CPU)|tr 'a-z' 'A-Z')
+BB = $(shell echo $(BOARD)|tr 'a-z' 'A-Z'|tr '-' '_')
+CPUDEF = $(shell echo $(CPU)|tr 'a-z' 'A-Z'|tr '-' '_')
 CFLAGS += -DBOARD=$(BB) -DCPU_$(CPUDEF)
 
 export CFLAGS
