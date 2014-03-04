@@ -33,7 +33,7 @@
 #define TCP_TIMEOUT					2
 #define TCP_CONTINUE				3
 
-void tcp_general_timer(void);
+void *tcp_general_timer(void *);
 
 #endif /* TCP_TIMER_H_ */
 /**

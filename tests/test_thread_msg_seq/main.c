@@ -31,8 +31,10 @@ char t3_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 uint16_t p1, p2, p3;
 
-void sub_thread(void)
+void *sub_thread(void *arg)
 {
+    (void) arg;
+
     int pid = thread_getpid();
     printf("THREAD %s (pid:%i) start\n", thread_getname(pid), pid);
 
@@ -43,6 +45,8 @@ void sub_thread(void)
     msg_send(&msg, 1, 1);
 
     printf("THREAD %s (pid:%i) end.\n", thread_getname(pid), pid);
+
+    return NULL;
 }
 
 
@@ -51,11 +55,14 @@ int main(void)
     msg_t msg;
 
     p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST, sub_thread, "nr1");
+                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                       sub_thread, NULL, "nr1");
     p2 = thread_create(t2_stack, sizeof(t2_stack), PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST, sub_thread, "nr2");
+                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                       sub_thread, NULL, "nr2");
     p3 = thread_create(t3_stack, sizeof(t3_stack), PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST, sub_thread, "nr3");
+                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                       sub_thread, NULL, "nr3");
 
     puts("THREADS CREATED\n");
     for(int i = 0; i < 3; i++) {

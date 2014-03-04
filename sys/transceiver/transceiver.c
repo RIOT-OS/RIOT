@@ -106,7 +106,7 @@ char transceiver_stack[TRANSCEIVER_STACK_SIZE];
 
 /*------------------------------------------------------------------------------------*/
 /* function prototypes */
-static void run(void);
+static void *run(void *arg);
 static void receive_packet(uint16_t type, uint8_t pos);
 #ifdef MODULE_CC110X_NG
 static void receive_cc110x_packet(radio_packet_t *trans_p);
@@ -180,7 +180,7 @@ void transceiver_init(transceiver_type_t t)
 /* Start the transceiver thread */
 int transceiver_start(void)
 {
-    transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN - 3, CREATE_STACKTEST, run, "Transceiver");
+    transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN - 3, CREATE_STACKTEST, run, NULL, "Transceiver");
 
     if (transceiver_pid < 0) {
         puts("Error creating transceiver thread");
@@ -259,8 +259,10 @@ uint8_t transceiver_register(transceiver_type_t t, int pid)
  * @brief The main thread run, receiving and processing messages in an infinite
  * loop
  */
-void run(void)
+static void *run(void *arg)
 {
+    (void) arg;
+
     msg_t m;
     transceiver_command_t *cmd;
 
@@ -340,8 +342,8 @@ void run(void)
                 *((int32_t *) cmd->data) = set_pan(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;
-#ifdef DBG_IGNORE
 
+#ifdef DBG_IGNORE
             case DBG_IGN:
                 *((int16_t *) cmd->data) = ignore_add(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
@@ -353,6 +355,8 @@ void run(void)
                 break;
         }
     }
+
+    return NULL;
 }
 
 /*------------------------------------------------------------------------------------*/

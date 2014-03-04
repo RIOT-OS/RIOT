@@ -34,8 +34,9 @@ static char stack[KERNEL_CONF_STACKSIZE_MAIN];
  *          Then it signals one waiting thread to check the condition and it goes to sleep again
  *          If is_finished is set to 1 second_thread ends
  */
-static void second_thread(void)
+static void *second_thread(void *arg)
 {
+    (void) arg;
     while (1) {
         mutex_lock(&mutex);
 
@@ -46,6 +47,7 @@ static void second_thread(void)
         pthread_cond_signal(&cv);
         mutex_unlock_and_sleep(&mutex);
     }
+    return NULL;
 }
 
 int main(void)
@@ -61,6 +63,7 @@ int main(void)
                             PRIORITY_MAIN - 1,
                             CREATE_WOUT_YIELD | CREATE_STACKTEST,
                             second_thread,
+                            NULL,
                             "second_thread");
 
     while (1) {

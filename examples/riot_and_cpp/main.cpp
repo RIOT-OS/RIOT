@@ -41,7 +41,7 @@ using namespace std;
 char threadA_stack [KERNEL_CONF_STACKSIZE_PRINTF];
 
 /* thread's function */
-void threadA_func(void);
+void *threadA_func(void *arg);
 
 /* main */
 int main()
@@ -50,7 +50,7 @@ int main()
     printf("\n");
 
     /* create thread A */
-    thread_create(threadA_stack, sizeof(threadA_stack), 0, CREATE_WOUT_YIELD, threadA_func, "thread A");
+    thread_create(threadA_stack, sizeof(threadA_stack), 0, CREATE_WOUT_YIELD, threadA_func, NULL, "thread A");
 
     printf("******** Hello, you're in thread %s ********\n", thread_getname(thread_getpid()));
     printf("We'll test C++ class and methods here!\n");
@@ -82,7 +82,7 @@ int main()
 }
 
 /* thread A function implemetation */
-void threadA_func(void)
+void *threadA_func(void *)
 {
     int day = 13, month = 6, year = 2014;
     int ret_day;
@@ -104,4 +104,6 @@ void threadA_func(void)
     }
 
     printf("\nThis demo ends here, press Ctrl-C to exit (if you're on native)!\n");
+
+    return NULL;
 }

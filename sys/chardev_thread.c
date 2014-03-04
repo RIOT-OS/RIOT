@@ -127,3 +127,10 @@ void chardev_loop(ringbuffer_t *rb)
         }
     }
 }
+
+void *chardev_thread_entry(void *rb_)
+{
+    ringbuffer_t *rb = rb_;
+    chardev_loop(rb);
+    return NULL;
+}

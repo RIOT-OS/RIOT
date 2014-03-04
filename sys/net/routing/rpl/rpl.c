@@ -82,7 +82,7 @@ uint8_t rpl_init(int if_id)
     init_trickle();
     rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
                                     PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                    rpl_process, "rpl_process");
+                                    rpl_process, NULL, "rpl_process");
 
     /* INSERT NEW OBJECTIVE FUNCTIONS HERE */
     rpl_objective_functions[0] = rpl_get_of0();
@@ -112,8 +112,10 @@ void rpl_init_root(void)
     rpl_init_root_mode();
 }
 
-void rpl_process(void)
+void *rpl_process(void *arg)
 {
+    (void) arg;
+
     msg_t m_recv;
     msg_init_queue(rpl_msg_queue, RPL_PKT_RECV_BUF_SIZE);
 

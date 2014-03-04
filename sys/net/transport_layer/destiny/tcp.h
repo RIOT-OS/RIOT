@@ -96,7 +96,7 @@ extern uint8_t             global_context_counter;
 extern mutex_t             global_sequence_counter_mutex;
 extern uint32_t            global_sequence_counter;
 
-void tcp_packet_handler(void);
+void *tcp_packet_handler(void *);
 uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
 void printTCPHeader(tcp_hdr_t *tcp_header);
 void printArrayRange_tcp(uint8_t *udp_header, uint16_t len);

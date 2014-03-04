@@ -112,27 +112,7 @@ int thread_measure_stack_free(char *stack)
     return space_free;
 }
 
-typedef union
-{
-    void *ptr;
-    void (*wo_args)(void);
-    void (*w_args)(void *arg);
-} task_funcs_t;
-
-static void *thread_create_entry(void *function_)
-{
-    task_funcs_t function = { .ptr = function_ };
-    function.wo_args();
-    return NULL;
-}
-
-int thread_create(char *stack, int stacksize, char priority, int flags, void (*function_)(void), const char *name)
-{
-    task_funcs_t function = { .wo_args = function_ };
-    return thread_create_arg(stack, stacksize, priority, flags, thread_create_entry, function.ptr, name);
-}
-
-int thread_create_arg(char *stack, int stacksize, char priority, int flags, void *(*function)(void *arg), void *arg, const char *name)
+int thread_create(char *stack, int stacksize, char priority, int flags, void *(*function)(void *arg), void *arg, const char *name)
 {
     /* allocate our thread control block at the top of our stackspace */
     int total_stacksize = stacksize;

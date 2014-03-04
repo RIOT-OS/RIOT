@@ -40,8 +40,10 @@ timex_t now;
 struct timer_msg msg_a = { .interval = { .seconds = 2, .microseconds = 0}, .msg = "Hello World" };
 struct timer_msg msg_b = { .interval = { .seconds = 5, .microseconds = 0}, .msg = "This is a Test" };
 
-void timer_thread(void)
+void *timer_thread(void *arg)
 {
+    (void) arg;
+
     printf("This is thread %d\n", thread_getpid());
 
     /* we need a queue if the second message arrives while the first is still processed */
@@ -71,8 +73,10 @@ void timer_thread(void)
     }
 }
 
-void timer_thread_local(void)
+void *timer_thread_local(void *arg)
 {
+    (void) arg;
+
     printf("This is thread %d\n", thread_getpid());
 
     while (1) {
@@ -94,6 +98,7 @@ int main(void)
                   PRIORITY_MAIN - 1,
                   CREATE_STACKTEST,
                   timer_thread,
+                  NULL,
                   "timer");
 
     puts("sending 1st msg");
@@ -110,6 +115,7 @@ int main(void)
                    PRIORITY_MAIN - 1,
                    CREATE_STACKTEST,
                    timer_thread_local,
+                   NULL,
                    "timer local");
 
     timex_t sleep = timex_set(1, 0);
