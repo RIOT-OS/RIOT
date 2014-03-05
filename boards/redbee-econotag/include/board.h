@@ -21,6 +21,8 @@
 #ifndef REDBEE_ECONOTAG_BOARD_H
 #define REDBEE_ECONOTAG_BOARD_H
 
+#include <stdint.h>
+
 #define CTUNE 		0xb
 #define IBIAS 		0x1f
 #define FTUNE		0x7
