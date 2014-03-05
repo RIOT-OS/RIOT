@@ -179,7 +179,7 @@ buildtest:
 			$${ECHO} "$${GREEN}success$${RESET}"; \
 		else \
 			$${ECHO} "$${RED}failed$${RESET}"; \
-			echo "$${LOG}" | grep -E '^[^[:space:]]*:[^:]*error:'; \
+			echo "$${LOG}" | grep -E '^[^[:space:]]*:[^:]*(error:|undefined reference to)'; \
 			BUILDTESTFAILED=1; \
 		fi; \
 	done; \
