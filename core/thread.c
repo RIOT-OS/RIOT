@@ -43,7 +43,7 @@ int thread_getlastpid()
     return last_pid;
 }
 
-unsigned int thread_getstatus(int pid)
+int thread_getstatus(int pid)
 {
     if (sched_threads[pid] == NULL) {
         return STATUS_NOT_FOUND;

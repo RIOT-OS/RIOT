@@ -20,17 +20,18 @@
 #include "thread.h"
 #include "hwtimer.h"
 #include "sched.h"
+#include "tcb.h"
 
 /* list of states copied from tcb.h */
 const char *state_names[] = {
-    "running",
-    "pending",
-    "stopped",
-    "sleeping",
-    "bl mutex",
-    "bl rx",
-    "bl send",
-    "bl reply"
+    [STATUS_RUNNING] = "running",
+    [STATUS_PENDING] = "pending",
+    [STATUS_STOPPED] = "stopped",
+    [STATUS_SLEEPING] = "sleeping",
+    [STATUS_MUTEX_BLOCKED] = "bl mutex",
+    [STATUS_RECEIVE_BLOCKED] = "bl rx",
+    [STATUS_SEND_BLOCKED] = "bl send",
+    [STATUS_REPLY_BLOCKED] = "bl reply"
 };
 
 /**
@@ -49,11 +50,10 @@ void thread_print_all(void)
         tcb_t *p = (tcb_t *)sched_threads[i];
 
         if (p != NULL) {
-            int state = p->status;                                          // copy state
-            int statebit = number_of_highest_bit(state >> 1);               // get state index
-            const char *sname = state_names[statebit];                      // get state name
-            const char *queued = queued_name + (state & BIT0);              // get queued flag
-            int stacksz = p->stack_size;                                    // get stack size
+            int state = p->status;                                                 // copy state
+            const char *sname = state_names[state];                                // get state name
+            const char *queued = &queued_name[(int)(state >= STATUS_ON_RUNQUEUE)]; // get queued flag
+            int stacksz = p->stack_size;                                           // get stack size
             double runtime_ticks = 0 / 0.0;
             int switches = -1;
 #if SCHEDSTATISTICS

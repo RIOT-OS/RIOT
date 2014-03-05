@@ -150,15 +150,15 @@ void sched_register_cb(void (*callback)(uint32_t, uint32_t))
 
 void sched_set_status(tcb_t *process, unsigned int status)
 {
-    if (status &  STATUS_ON_RUNQUEUE) {
-        if (!(process->status &  STATUS_ON_RUNQUEUE)) {
+    if (status >= STATUS_ON_RUNQUEUE) {
+        if (!(process->status >= STATUS_ON_RUNQUEUE)) {
             DEBUG("adding process %s to runqueue %u.\n", process->name, process->priority);
             clist_add(&runqueues[process->priority], &(process->rq_entry));
             runqueue_bitcache |= 1 << process->priority;
         }
     }
     else {
-        if (process->status & STATUS_ON_RUNQUEUE) {
+        if (process->status >= STATUS_ON_RUNQUEUE) {
             DEBUG("removing process %s from runqueue %u.\n", process->name, process->priority);
             clist_remove(&runqueues[process->priority], &(process->rq_entry));
 

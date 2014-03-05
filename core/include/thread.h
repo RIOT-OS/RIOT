@@ -26,6 +26,8 @@
 #include "kernel.h"
 #include "tcb.h"
 
+#define STATUS_NOT_FOUND (-1)
+
 /** Minimum stack size */
 #ifndef MINIMUM_STACK_SIZE
 #define MINIMUM_STACK_SIZE  (sizeof(tcb_t))
@@ -53,7 +55,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
  * @brief   returns the status of a process.
  * @return  STATUS_NOT_FOUND if pid is unknown
  */
-unsigned int thread_getstatus(int pid);
+int thread_getstatus(int pid);
 
 /**
  * @brief   returns the name of a process.
