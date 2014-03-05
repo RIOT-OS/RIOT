@@ -45,7 +45,7 @@ int mutex_init(struct mutex_t *mutex)
 int mutex_trylock(struct mutex_t *mutex)
 {
     DEBUG("%s: trylocking to get mutex. val: %u\n", active_thread->name, mutex->val);
-    return (atomic_set_return(&mutex->val, thread_pid) == 0);
+    return (atomic_set_return(&mutex->val, 1) == 0);
 }
 
 int prio(void)
@@ -72,7 +72,7 @@ void mutex_wait(struct mutex_t *mutex)
 
     if (mutex->val == 0) {
         /* somebody released the mutex. return. */
-        mutex->val = thread_pid;
+        mutex->val = 1;
         DEBUG("%s: mutex_wait early out. %u\n", active_thread->name, mutex->val);
         restoreIRQ(irqstate);
         return;
