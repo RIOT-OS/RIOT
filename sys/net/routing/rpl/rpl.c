@@ -351,12 +351,11 @@ void send_DIS(ipv6_addr_t *destination)
 
 void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index)
 {
-    DEBUG("Send DAO\n");
-
     if (i_am_root) {
         return;
     }
 
+    DEBUG("%s, %d: Send DAO\n", __FILE__, __LINE__);
     mutex_lock(&rpl_send_mutex);
     rpl_dodag_t *my_dodag;
 
@@ -456,7 +455,7 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
 
 void send_DAO_ACK(ipv6_addr_t *destination)
 {
-    DEBUG("%s, %d: Send DAO ACK\n", __FILE__, __LINE__);
+    DEBUG("%s, %d: Send DAO ACK to %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, destination));
     rpl_dodag_t *my_dodag;
     my_dodag = rpl_get_my_dodag();
 
@@ -876,7 +875,7 @@ void recv_rpl_dao(void)
                 /* route lifetime seconds = (DAO lifetime) * (Unit Lifetime) */
                 DEBUG("%s, %d: Adding routing information: Target: %s, Source: %s, Lifetime: %u\n",
                         __FILE__, __LINE__,
-                        ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->srcaddr),
+                        ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_opt_target_buf->target),
                         ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->srcaddr),
                         (rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit));
                 rpl_add_routing_entry(&rpl_opt_target_buf->target, &ipv6_buf->srcaddr, rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit);
@@ -909,6 +908,7 @@ void recv_rpl_dao(void)
 
 void recv_rpl_dao_ack(void)
 {
+    DEBUG("%s, %d: DAO ACK received\n", __FILE__, __LINE__);
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 
     if (my_dodag == NULL) {
