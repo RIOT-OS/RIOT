@@ -492,7 +492,7 @@ void rpl_process(void)
         /* differentiate packet types */
         ipv6_buf = ipv6_get_buf();
         memcpy(&rpl_buffer, ipv6_buf, NTOHS(ipv6_buf->length) + IPV6_HDR_LEN);
-        DEBUG("%s, %d: Reveived RPL information of type %04X\n", __FILE__, __LINE__, *code);
+        DEBUG("%s, %d: Reveived RPL information of type %04X and length %u\n", __FILE__, __LINE__, *code, NTOHS(ipv6_buf->length));
 
         switch (*code) {
             case (ICMP_CODE_DIS): {
@@ -968,7 +968,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
 
         if (next_hop == NULL) {
             if (i_am_root) {
-                DEBUG("%s, %d: [Error] destination unknown\n", __FILE__, __LINE__);
+                DEBUG("%s, %d: [Error] destination unknown: %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &ipv6_send_buf->destaddr));
                 return;
             }
             else {
@@ -1008,8 +1008,8 @@ void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t li
 
     for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
         if (!routing_table[i].used) {
-            routing_table[i].address = *addr;
-            routing_table[i].next_hop = *next_hop;
+            memcpy(&routing_table[i].address, addr, sizeof(ipv6_addr_t));
+            memcpy(&routing_table[i].next_hop, next_hop, sizeof(ipv6_addr_t));
             routing_table[i].lifetime = lifetime;
             routing_table[i].used = 1;
             break;

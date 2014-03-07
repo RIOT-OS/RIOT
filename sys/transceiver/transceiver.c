@@ -698,6 +698,11 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
 #else
     radio_packet_t *p = (radio_packet_t *)pkt;
     DEBUG("transceiver: Send packet to %" PRIu16 "\n", p->dst);
+    for (size_t i = 0; i < p->length; i++) {
+        DEBUG("%02x ", p->data[i]);
+    }
+
+    DEBUG("\n");
 #endif
 
 #ifdef MODULE_CC110X_NG
