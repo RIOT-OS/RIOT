@@ -1435,6 +1435,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
 
                 default: {
                     memcpy(&(ipv6_buf->destaddr.uint8[0]), &ipv6_hdr_fields[hdr_pos], 16);
+                    hdr_pos += 16;
                     break;
                 }
             }
