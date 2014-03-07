@@ -464,10 +464,10 @@ static void receive_packet(uint16_t type, uint8_t pos)
 #ifdef DBG_IGNORE
 
         for (uint8_t i = 0; (i < MAX_IGNORED_ADDR) && (ignored_addr[i]); i++) {
-            DEBUG("check if source (%u) is ignored -> %u\n", trans_p->src, ignored_addr[i]);
+            DEBUG("check if source (%u) is ignored -> %u\n", transceiver_buffer[transceiver_buffer_pos].src, ignored_addr[i]);
 
-            if (trans_p->src == ignored_addr[i]) {
-                DEBUG("ignored packet from %" PRIu16 "\n", trans_p->src);
+            if (transceiver_buffer[transceiver_buffer_pos].src == ignored_addr[i]) {
+                DEBUG("ignored packet from %" PRIu16 "\n", transceiver_buffer[transceiver_buffer_pos].src);
                 return;
             }
         }
