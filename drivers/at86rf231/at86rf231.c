@@ -151,7 +151,7 @@ uint8_t at86rf231_set_channel(uint8_t channel)
         radio_channel = RF86RF231_MAX_CHANNEL;
     }
 
-    cca_state = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA);
+    cca_state = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA) & ~AT86RF231_PHY_CC_CCA_MASK__CHANNEL;
     at86rf231_reg_write(AT86RF231_REG__PHY_CC_CCA, cca_state | (radio_channel & AT86RF231_PHY_CC_CCA_MASK__CHANNEL));
 
     return radio_channel;
