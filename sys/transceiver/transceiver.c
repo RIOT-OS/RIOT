@@ -532,6 +532,7 @@ void receive_cc1100_packet(radio_packet_t *trans_p)
     eINT();
 
     trans_p->data = (uint8_t *) &(data_buffer[transceiver_buffer_pos * CC1100_MAX_DATA_LENGTH]);
+    DEBUG("transceiver: Packet %p (%p) was from %hu to %hu, size: %u\n", trans_p, trans_p->data, trans_p->src, trans_p->dst, trans_p->length);
 }
 #endif
 
@@ -732,7 +733,7 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
             memcpy(cc1100_pkt, p->data, p->length);
 
             res = cc1100_send_csmaca(p->dst, 4, 0, (char *) cc1100_pkt, p->length);
-            DEBUG("transceiver: snd_ret (%u) = %i\n", p->length, snd_ret);
+            DEBUG("transceiver: snd_ret (%u) = %i\n", p->length, res);
 #else
             puts("Unknown transceiver");
 #endif
