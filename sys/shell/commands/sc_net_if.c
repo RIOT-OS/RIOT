@@ -628,11 +628,11 @@ void _net_if_ifconfig_list(int if_id)
         }
 
         if (addr_ptr->addr_protocol & NET_IF_L3P_IPV6) {
-            char addr_str[50];
+            char addr_str[IPV6_MAX_ADDR_STR_LEN];
             printf("            inet6 addr: ");
 
             if (inet_ntop(AF_INET6, addr_ptr->addr_data, addr_str,
-                          addr_ptr->addr_len / 8 + 1)) {
+                          IPV6_MAX_ADDR_STR_LEN)) {
                 printf("%s/%d", addr_str, addr_ptr->addr_len);
                 printf("  scope: ");
 
@@ -640,7 +640,7 @@ void _net_if_ifconfig_list(int if_id)
                     printf("local");
                 }
                 else {
-                    printf("local");
+                    printf("global");
                 }
 
                 if (!(addr_ptr->addr_protocol & NET_IF_L3P_IPV6_UNICAST)) {
