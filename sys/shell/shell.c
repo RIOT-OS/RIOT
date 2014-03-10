@@ -97,7 +97,7 @@ static void handle_input_line(shell_t *shell, char *line)
     char *pos = line;
     int contains_esc_seq = 0;
     while (1) {
-        if (*pos > ' ') {
+        if ((unsigned char) *pos > ' ') {
             /* found an argument */
             if (*pos == '"' || *pos == '\'') {
                 /* it's a quoted argument */
@@ -119,7 +119,7 @@ static void handle_input_line(shell_t *shell, char *line)
                         continue;
                     }
                 } while (*pos != quote_char);
-                if (pos[1] > ' ') {
+                if ((unsigned char) pos[1] > ' ') {
                     puts(INCORRECT_QUOTING);
                     return;
                 }
@@ -141,7 +141,7 @@ static void handle_input_line(shell_t *shell, char *line)
                         puts(INCORRECT_QUOTING);
                         return;
                     }
-                } while (*pos > ' ');
+                } while ((unsigned char) *pos > ' ');
             }
 
             /* count the number of arguments we got */
