@@ -217,6 +217,9 @@ static int readline(shell_t *shell, char *buf, size_t size)
         }
 
         c = shell->readchar();
+        if (c < 0) {
+            return 1;
+        }
         shell->put_char(c);
 
         /* We allow Unix linebreaks (\n), DOS linebreaks (\r\n), and Mac linebreaks (\r). */
