@@ -421,6 +421,9 @@ void ipv6_process(void)
             }
 
             if ((dest == NULL) || ((--ipv6_buf->hoplimit) == 0)) {
+                DEBUG("!!! Packet not for me, routing handler is set, but I "\
+                      " have no idea where to send or the hop limit is exceeded.\n");
+                msg_reply(&m_recv_lowpan, &m_send_lowpan);
                 continue;
             }
 
