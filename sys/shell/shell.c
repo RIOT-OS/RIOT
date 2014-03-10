@@ -10,20 +10,21 @@
  */
 
 /**
- * @ingroup	shell
+ * @ingroup     shell
  * @{
  */
 
 /**
  * @file
- * @brief 		Implementation of a very simple command interpreter.
+ * @brief       Implementation of a very simple command interpreter.
  *              For each command (i.e. "echo"), a handler can be specified.
  *              If the first word of a user-entered command line matches the
  *              name of a handler, the handler will be called with the whole
  *              command line as parameter.
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
- * @author		Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
 #include <string.h>
