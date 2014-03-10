@@ -307,7 +307,7 @@ void _transceiver_set_ignore_handler(int argc, char **argv)
         return;
     }
     else if (argc != 2) {
-        printf("Usage:\n%s <address>\n", argv[1]);
+        printf("Usage:\n%s <address>\n", argv[0]);
     }
 
     radio_address_t a;
