@@ -53,7 +53,10 @@ static void print_echo(int argc, char **argv)
 static int shell_readc(void)
 {
     char c;
-    posix_read(uart0_handler_pid, &c, 1);
+    int result = posix_read(uart0_handler_pid, &c, 1);
+    if (result != 1) {
+        return -1;
+    }
     return (unsigned char) c;
 }
 
