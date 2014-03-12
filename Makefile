@@ -4,10 +4,10 @@ DIRS = $(RIOTCPU)/$(CPU) core drivers sys
 
 all:
 	mkdir -p $(BINDIR)
-	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i || exit 1; done ;
 
 clean:
-	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean || exit 1; done ;
 	-@if [ -d $(BINDIR) ] ; \
 	then rm -rf $(BINDIR) ; \
 	fi

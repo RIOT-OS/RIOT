@@ -12,7 +12,7 @@ all: $(BINDIR)$(MODULE).a
 include $(RIOTBASE)/Makefile.base
 
 clean::
-	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean || exit 1; done ;
 
 # This is needed for NXP Cortex M devices
 nxpsum:
