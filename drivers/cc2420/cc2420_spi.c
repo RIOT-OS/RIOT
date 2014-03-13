@@ -29,8 +29,8 @@ uint16_t cc2420_read_reg(uint8_t addr) {
     cc2420_spi_select();
     cc2420_txrx(addr | CC2420_READ_ACCESS);
     result = cc2420_txrx(NOBYTE);
-    result = result << 8;
-    result = cc2420_txrx(NOBYTE);
+    result <<= 8;
+    result |= cc2420_txrx(NOBYTE);
     cc2420_spi_unselect();
     restoreIRQ(cpsr);
     return result;
