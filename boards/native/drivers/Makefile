@@ -1,7 +1,7 @@
 MODULE =$(BOARD)_base
 
 all: $(BINDIR)$(MODULE).a
-	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i || exit 1; done ;
 
 include $(RIOTBASE)/Makefile.base
 

@@ -18663,7 +18663,7 @@ diff -crB openwsn/07-App/Makefile ../../../sys/net/openwsn/07-App/Makefile
 + DIRS += udpstorm
 + 
 + all: $(BINDIR)$(SUBMOD)
-+ 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
++ 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i || exit 1; done ;
 + 
 + $(BINDIR)$(SUBMOD): $(OBJ)
 + 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
@@ -18679,7 +18679,7 @@ diff -crB openwsn/07-App/Makefile ../../../sys/net/openwsn/07-App/Makefile
 + 	@printf "$(BINDIR)"|cat - $(BINDIR)$*.d > /tmp/riot_out && mv /tmp/riot_out $(BINDIR)$*.d
 + 
 + clean::
-+ 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
++ 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean || exit 1; done ;
 diff -crB openwsn/07-App/heli/heli.c ../../../sys/net/openwsn/07-App/heli/heli.c
 *** openwsn/07-App/heli/heli.c	Thu Mar 21 21:36:59 2013
 --- ../../../sys/net/openwsn/07-App/heli/heli.c	Wed Jan 15 13:48:27 2014
@@ -27111,7 +27111,7 @@ diff -crB openwsn/Makefile ../../../sys/net/openwsn/Makefile
 + DIRS += 07-App
 + 
 + all: $(BINDIR)$(MODULE)
-+ 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
++ 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i || exit 1; done ;
 + 
 + $(BINDIR)$(MODULE): $(OBJ)
 + 	$(AD)$(AR) rcs $(BINDIR)$(MODULE) $(OBJ)
@@ -27129,7 +27129,7 @@ diff -crB openwsn/Makefile ../../../sys/net/openwsn/Makefile
 + 
 + # remove compilation products
 + clean::
-+ 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;
++ 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean || exit 1; done ;
 diff -crB openwsn/board_info.h ../../../sys/net/openwsn/board_info.h
 *** openwsn/board_info.h	Thu Mar 21 21:36:59 2013
 --- ../../../sys/net/openwsn/board_info.h	Wed Jan 15 13:48:27 2014
