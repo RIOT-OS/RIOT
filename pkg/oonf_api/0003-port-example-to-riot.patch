@@ -1,0 +1,90 @@
+From 329910e5c6942a70aa258907c887c6fa162266a4 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benpicco@zedat.fu-berlin.de>
+Date: Tue, 1 Oct 2013 17:39:03 +0200
+Subject: [PATCH 3/3] port example to riot
+
+---
+ examples/rfc5444_reader_writer/Makefile | 37 +++++++++++++++++++++++++++++++++
+ examples/rfc5444_reader_writer/reader.c |  5 +++++
+ examples/rfc5444_reader_writer/writer.c |  5 +++++
+ 3 files changed, 47 insertions(+)
+ create mode 100644 examples/rfc5444_reader_writer/Makefile
+
+diff --git a/examples/rfc5444_reader_writer/Makefile b/examples/rfc5444_reader_writer/Makefile
+new file mode 100644
+index 0000000..42f9a55
+--- /dev/null
++++ b/examples/rfc5444_reader_writer/Makefile
+@@ -0,0 +1,37 @@
++####
++#### Sample Makefile for building apps with the RIOT OS
++####
++#### The Sample Filesystem Layout is:
++#### /this makefile
++#### ../../RIOT 
++#### 
++
++# name of your project
++export PROJECT := $(shell basename $(CURDIR))
++
++# for easy switching of boards
++ifeq ($(strip $(BOARD)),)
++	export BOARD = native
++endif
++
++# this has to be the absolute path of the RIOT-base dir
++export RIOTBASE =$(CURDIR)/../../../../..
++
++export CFLAGS = -DRIOT -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
++
++## Modules to include. 
++
++USEMODULE += auto_init
++USEMODULE += config
++USEMODULE += uart0
++USEMODULE += posix
++
++USEMODULE += net_help
++USEMODULE += oonf_common
++USEMODULE += oonf_rfc5444
++
++USEPKG += oonf_api
++
++INCLUDES += -I$(RIOTBASE)/sys/net/include -I$(CURDIR)/..
++
++include $(RIOTBASE)/Makefile.include
+diff --git a/examples/rfc5444_reader_writer/reader.c b/examples/rfc5444_reader_writer/reader.c
+index 9cca869..c786d19 100644
+--- a/examples/rfc5444_reader_writer/reader.c
++++ b/examples/rfc5444_reader_writer/reader.c
+@@ -42,6 +42,11 @@
+ #include <string.h>
+ #include <stdio.h>
+ 
++#ifdef RIOT
++#include "net_help.h"
++#define ntohl(val)	NTOHL(val)
++#endif
++
+ #include "common/common_types.h"
+ #include "common/netaddr.h"
+ #include "rfc5444/rfc5444_reader.h"
+diff --git a/examples/rfc5444_reader_writer/writer.c b/examples/rfc5444_reader_writer/writer.c
+index 59bb741..d05c48c 100644
+--- a/examples/rfc5444_reader_writer/writer.c
++++ b/examples/rfc5444_reader_writer/writer.c
+@@ -42,6 +42,11 @@
+ #include <string.h>
+ #include <stdio.h>
+ 
++#ifdef RIOT
++#include "net_help.h"
++#define htonl(val)	HTONL(val)
++#endif
++
+ #include "common/common_types.h"
+ #include "common/netaddr.h"
+ #include "rfc5444/rfc5444_writer.h"
+-- 
+1.8.3.2
+
