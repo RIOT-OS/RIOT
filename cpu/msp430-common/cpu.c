@@ -53,33 +53,35 @@ __attribute__((section (".fini9"))) void __main_epilogue(void) { __asm__("ret");
 //----------------------------------------------------------------------------
 char *thread_stack_init(void (*task_func)(void), void *stack_start, int stack_size)
 {
-    unsigned short *stk;
+    unsigned short stk = (unsigned short)(stack_start + stack_size);
 
-    /* XXX: work around for misalignment, remove once solved properly in thread.c */
-    stack_size--;
+    /* ensure correct stack alignment (on 16-bit boundary) */
+    stk &= 0xfffe;
+    unsigned short *stackptr = (unsigned short *)stk;
 
-    stk = (unsigned short *)(stack_start + stack_size);
+    /* now make SP point on the first AVAILABLE slot in stack */
+    --stackptr;
 
-    *stk = (unsigned short) sched_task_exit;
-    --stk;
+    *stackptr = (unsigned short) sched_task_exit;
+    --stackptr;
 
-    *stk = (unsigned short) task_func;
-    --stk;
+    *stackptr = (unsigned short) task_func;
+    --stackptr;
 
     /* initial value for SR */
 
-    *stk = GIE;
-    --stk;
+    *stackptr = GIE;
+    --stackptr;
 
     /* Space for registers. */
     for (unsigned int i = 15; i > 4; i--) {
-        *stk = i;
-        --stk;
+        *stackptr = i;
+        --stackptr;
     }
 
-    //stk -= 11;
+    //stackptr -= 11;
 
-    return (char *) stk;
+    return (char *) stackptr;
 }
 
 int inISR()
