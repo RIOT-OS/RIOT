@@ -128,7 +128,7 @@ radio_address_t cc2420_set_address(radio_address_t addr)
     buf[0] = (uint8_t)(addr & 0xFF);
     buf[1] = (uint8_t)(addr >> 8);
     cc2420_write_ram(CC2420_RAM_SHORTADR, buf, 2);
-    cc2420_set_address_long(0x00FF & addr);
+    cc2420_set_address_long(0xFFFF & addr);
     return addr;
 }
 
@@ -149,7 +149,7 @@ uint64_t cc2420_set_address_long(uint64_t addr)
 
 radio_address_t cc2420_get_address(void)
 {
-    uint16_t addr;
+    radio_address_t addr;
     cc2420_read_ram(CC2420_RAM_SHORTADR, (uint8_t *)&addr, sizeof(addr));
     return addr;
 }
@@ -173,6 +173,6 @@ uint16_t cc2420_set_pan(uint16_t pan)
 uint16_t cc2420_get_pan(void)
 {
     uint16_t pan;
-    cc2420_read_ram(CC2420_RAM_SHORTADR, (uint8_t *)&pan, sizeof(pan));
+    cc2420_read_ram(CC2420_RAM_PANID, (uint8_t *)&pan, sizeof(pan));
     return pan;
 }
