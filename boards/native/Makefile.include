@@ -18,6 +18,8 @@ export DEBUGGER = gdb
 export TERMPROG = $(ELF)
 export FLASHER = true
 export VALGRIND ?= valgrind
+export CGANNOTATE ?= cg_annotate
+export GPROF ?= gprof
 
 # flags:
 export CFLAGS += -Wall -Wextra -pedantic -m32
@@ -80,7 +82,7 @@ term-cachegrind:
 term-gprof: term
 
 eval-gprof:
-	gprof $(ELF) $(shell ls -rt gmon.out* | tail -1)
+	$(GPROF) $(ELF) $(shell ls -rt gmon.out* | tail -1)
 
 eval-cachegrind:
-	cg_annotate $(shell ls -rt cachegrind.out* | tail -1)
+	$(CGANNOTATE) $(shell ls -rt cachegrind.out* | tail -1)
