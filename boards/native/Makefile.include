@@ -24,10 +24,13 @@ export CFLAGS += -Wall -Wextra -pedantic -m32
 export LINKFLAGS += -m32 -gc -ldl
 export ASFLAGS =
 export DEBUGGER_FLAGS = $(ELF)
-valgrind: export VALGRIND_FLAGS ?= --track-origins=yes
-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
+term-memcheck: export VALGRIND_FLAGS ?= --track-origins=yes
+term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
+term-gprof: export TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELF)
 all-valgrind: export CFLAGS += -DHAVE_VALGRIND_H -g
 all-valgrind: export NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
+all-debug: export CFLAGS += -g
+all-cachegrind: export CFLAGS += -g
 all-gprof: export CFLAGS += -pg
 all-gprof: export LINKFLAGS += -pg
 
@@ -63,14 +66,21 @@ all-gprof: all
 
 all-valgrind: all
 
-valgrind:
+all-cachegrind: all
+
+term-valgrind:
 # use this if you want to attach gdb from valgrind:
 #	echo 0 > /proc/sys/kernel/yama/ptrace_scope
 #	VALGRIND_FLAGS += --db-attach=yes
 	$(VALGRIND) $(VALGRIND_FLAGS) $(ELF) $(PORT)
 
-cachegrind:
+term-cachegrind:
 	$(VALGRIND) $(CACHEGRIND_FLAGS) $(ELF) $(PORT)
 
-gprof:
-	gprof $(ELF)
+term-gprof: term
+
+eval-gprof:
+	gprof $(ELF) $(shell ls -rt gmon.out* | tail -1)
+
+eval-cachegrind:
+	cg_annotate $(shell ls -rt cachegrind.out* | tail -1)
