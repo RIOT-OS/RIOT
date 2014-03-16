@@ -18,6 +18,7 @@
 #include <string.h>
 #include "ipv6.h"
 #include "rpl_structs.h"
+#include "rpl_config.h"
 
 void rpl_instances_init(void);
 rpl_instance_t *rpl_new_instance(uint8_t instanceid);

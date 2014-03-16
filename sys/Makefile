@@ -63,6 +63,9 @@ endif
 ifneq (,$(filter rpl,$(USEMODULE)))
     DIRS += net/routing/rpl
 endif
+ifneq (,$(filter routing,$(USEMODULE)))
+	DIRS += net/routing
+endif
 ifneq (,$(filter ieee802154,$(USEMODULE)))
     DIRS += net/link_layer/ieee802154
 endif
@@ -107,10 +110,10 @@ ifneq (,$(findstring quad_math,$(USEMODULE)))
 endif
 
 all: $(BINDIR)$(MODULE).a
-	@for i in $(DIRS) ; do "$(MAKE)" -C $$i || exit 1; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i ; done ;
 
 include $(RIOTBASE)/Makefile.base
 
 # remove compilation products
 clean::
-	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean || exit 1; done ;
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean ; done ;

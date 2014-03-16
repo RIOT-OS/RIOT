@@ -225,13 +225,13 @@ void dao_ack_received()
 
 void rt_timer_over(void)
 {
-    rpl_routing_entry_t *rt;
+    routing_entry_t *rt;
 
     while (1) {
         rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 
         if (my_dodag != NULL) {
-            rt = rpl_get_routing_table();
+            rt = get_forwarding_table();
 
             for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
                 if (rt[i].used) {

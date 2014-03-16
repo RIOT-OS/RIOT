@@ -160,7 +160,7 @@ void etx_init_beaconing(ipv6_addr_t *address)
 
 void etx_beacon(void)
 {
-    /*
+    /*sixlowpan_mac_send_ieee802154_frame
      * Sends a message every ETX_INTERVAL +/- a jitter-value (default is 10%) .
      * A correcting variable is needed to stay at a base interval of
      * ETX_INTERVAL between the wakeups. It takes the old jittervalue in account
