@@ -988,8 +988,13 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
 
 ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr)
 {
+    DEBUG("%s, %d: looking up the next hop to %s\n", __FILE__, __LINE__, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
     for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
+        if (routing_table[i].used) {
+            DEBUG("%s, %d: checking %d: %s\n", __FILE__, __LINE__, i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &routing_table[i].address));
+        }
         if (routing_table[i].used && rpl_equal_id(&routing_table[i].address, addr)) {
+            DEBUG("%s, %d: found %d: %s\n", __FILE__, __LINE__, i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &routing_table[i].next_hop));
             return &routing_table[i].next_hop;
         }
     }
