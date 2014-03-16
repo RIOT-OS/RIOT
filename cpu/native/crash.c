@@ -55,7 +55,7 @@ NORETURN void core_panic(int crash_code, const char *message)
        just use the (developer-)friendly core-dump feature */
     kill(getpid(), SIGTRAP);
 #else
-    reboot();
+    (void) reboot(RB_AUTOBOOT);
 #endif
 
     /* proove the compiler that we won't return from this function
