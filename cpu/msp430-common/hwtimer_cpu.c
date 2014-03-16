@@ -107,9 +107,9 @@ void hwtimer_arch_set(unsigned long offset, short timer)
 
 void hwtimer_arch_set_absolute(unsigned long value, short timer)
 {
-    uint16_t small_value = value % 0xFFFF;
+    uint16_t small_value = value & 0xFFFF;
     overflow_interrupt[timer] = (uint16_t)(value >> 16);
-    timer_set(small_value,timer);
+    timer_set(small_value, timer);
 }
 
 void hwtimer_arch_unset(short timer)
