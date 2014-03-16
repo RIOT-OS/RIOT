@@ -16,6 +16,42 @@ ifneq (,$(filter pnet,$(USEMODULE)))
 	endif
 endif
 
+ifneq (,$(filter destiny,$(USEMODULE)))
+    ifeq (,$(filter sixlowpan,$(USEMODULE)))
+        USEMODULE += sixlowpan
+    endif
+    ifeq (,$(filter net_help,$(USEMODULE)))
+        USEMODULE += net_help
+    endif
+    ifeq (,$(filter vtimer,$(USEMODULE)))
+        USEMODULE += vtimer
+    endif
+endif
+
+ifneq (,$(filter sixlowborder,$(USEMODULE)))
+    ifeq (,$(filter sixlowpan,$(USEMODULE)))
+        USEMODULE += sixlowpan
+    endif
+endif
+
+ifneq (,$(filter sixlowpan,$(USEMODULE)))
+    ifeq (,$(filter ieee802154,$(USEMODULE)))
+        USEMODULE += ieee802154
+    endif
+    ifeq (,$(filter net_help,$(USEMODULE)))
+        USEMODULE += net_help
+    endif
+    ifeq (,$(filter net_if,$(USEMODULE)))
+        USEMODULE += net_if
+    endif
+    ifeq (,$(filter posix, $(USEMODULE)))
+        USEMODULE += posix
+    endif
+    ifeq (,$(filter vtimer, $(USEMODULE)))
+        USEMODULE += vtimer
+    endif
+endif
+
 ifneq (,$(filter posix,$(USEMODULE)))
 	ifeq (,$(filter uart0,$(USEMODULE)))
 		USEMODULE += uart0
@@ -69,42 +105,6 @@ ifneq (,$(filter at86rf231,$(USEMODULE)))
 		USEMODULE += ieee802154
 	endif
 	ifeq (,$(filter vtimer,$(USEMODULE)))
-		USEMODULE += vtimer
-	endif
-endif
-
-ifneq (,$(filter destiny,$(USEMODULE)))
-	ifeq (,$(filter sixlowpan,$(USEMODULE)))
-		USEMODULE += sixlowpan
-	endif
-	ifeq (,$(filter net_help,$(USEMODULE)))
-		USEMODULE += net_help
-	endif
-	ifeq (,$(filter vtimer,$(USEMODULE)))
-		USEMODULE += vtimer
-	endif
-endif
-
-ifneq (,$(filter sixlowborder,$(USEMODULE)))
-	ifeq (,$(filter sixlowpan,$(USEMODULE)))
-		USEMODULE += sixlowpan
-	endif
-endif
-
-ifneq (,$(filter sixlowpan,$(USEMODULE)))
-	ifeq (,$(filter ieee802154,$(USEMODULE)))
-		USEMODULE += ieee802154
-	endif
-	ifeq (,$(filter net_help,$(USEMODULE)))
-		USEMODULE += net_help
-	endif
-	ifeq (,$(filter net_if,$(USEMODULE)))
-		USEMODULE += net_if
-	endif
-	ifeq (,$(filter semaphore, $(USEMODULE)))
-		USEMODULE += semaphore
-	endif
-	ifeq (,$(filter vtimer, $(USEMODULE)))
 		USEMODULE += vtimer
 	endif
 endif

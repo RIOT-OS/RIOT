@@ -1,18 +1,22 @@
 /**
  * Semaphore implemenation
  *
- * Copyright (C) 2013  INRIA.
+ * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup sixlowpan
+ * @ingroup posix
+ *
  * @{
+ *
  * @file    semaphore.c
  * @brief   Implementation of semaphores with priority queues
+ *
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author  René Kijewski <kijewski@inf.fu-berlin.de>
+ *
  * @}
  */
 
