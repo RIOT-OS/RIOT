@@ -174,7 +174,6 @@ buildtest:
 			RIOTBASE=$${RIOTBASE} \
 			RIOTBOARD=$${RIOTBOARD} \
 			RIOTCPU=$${RIOTCPU} \
-			CFLAGS="-w" \
 			$(MAKE) -B clean all 2>&1 >/dev/null) ; \
 		if [ "$${?}" = "0" ]; then \
 			$${ECHO} "$${GREEN}success$${RESET}"; \
