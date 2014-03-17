@@ -20,6 +20,8 @@
 #ifndef _ATOMIC_H
 #define _ATOMIC_H
 
+#include "arch/atomic_arch.h"
+
 /**
  * @brief Sets a new and returns the old value of a variable atomically
  *
