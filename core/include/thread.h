@@ -19,12 +19,14 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+
 #ifndef __THREAD_H
 #define __THREAD_H
 
 
 #include "kernel.h"
 #include "tcb.h"
+#include "arch/thread_arch.h"
 
 #define STATUS_NOT_FOUND (-1)
 
