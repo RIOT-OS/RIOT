@@ -103,17 +103,17 @@ void check_sockets(void)
 
         if (is_tcp_socket(i)) {
             switch (current_socket->socket_values.tcp_control.state) {
-                case ESTABLISHED: {
+                case TCP_ESTABLISHED: {
                     handle_established(current_socket);
                     break;
                 }
 
-                case SYN_SENT: {
+                case TCP_SYN_SENT: {
                     handle_synchro_timeout(current_socket);
                     break;
                 }
 
-                case SYN_RCVD: {
+                case TCP_SYN_RCVD: {
                     handle_synchro_timeout(current_socket);
                     break;
                 }

@@ -37,18 +37,18 @@ enum tcp_flags {
 };
 
 enum tcp_states {
-    CLOSED      	= 0,
-    LISTEN      	= 1,
-    SYN_SENT    	= 2,
-    SYN_RCVD    	= 3,
-    ESTABLISHED 	= 4,
-    FIN_WAIT_1  	= 5,
-    FIN_WAIT_2  	= 6,
-    CLOSE_WAIT  	= 7,
-    CLOSING     	= 8,
-    LAST_ACK    	= 9,
-    TIME_WAIT   	= 10,
-    UNKNOWN			= 11
+    TCP_CLOSED      	= 0,
+    TCP_LISTEN      	= 1,
+    TCP_SYN_SENT    	= 2,
+    TCP_SYN_RCVD    	= 3,
+    TCP_ESTABLISHED 	= 4,
+    TCP_FIN_WAIT_1  	= 5,
+    TCP_FIN_WAIT_2  	= 6,
+    TCP_CLOSE_WAIT  	= 7,
+    TCP_CLOSING     	= 8,
+    TCP_LAST_ACK    	= 9,
+    TCP_TIME_WAIT   	= 10,
+    TCP_UNKNOWN			= 11
 };
 
 enum tcp_codes {

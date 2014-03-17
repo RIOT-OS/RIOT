@@ -294,7 +294,7 @@ int destiny_socket(int domain, int type, int protocol)
         current_socket->domain = domain;
         current_socket->type = type;
         current_socket->protocol = protocol;
-        current_socket->tcp_control.state = CLOSED;
+        current_socket->tcp_control.state = TCP_CLOSED;
         return sockets[i - 1].socket_id;
     }
 }
@@ -338,15 +338,15 @@ socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header
     while (i < MAX_SOCKETS + 1) {
         current_socket = get_socket(i);
 
-        /* Check for matching 4 touple, ESTABLISHED connection */
+        /* Check for matching 4 touple, TCP_ESTABLISHED connection */
         if (is_tcp_socket(i) && is_four_touple(current_socket, ipv6_header,
                                                tcp_header)) {
             return current_socket;
         }
-        /* Sockets in LISTEN and SYN_RCVD state should only be tested on local TCP values */
+        /* Sockets in TCP_LISTEN and TCP_SYN_RCVD state should only be tested on local TCP values */
         else if (is_tcp_socket(i) &&
-                 ((current_socket->socket_values.tcp_control.state == LISTEN) ||
-                  (current_socket->socket_values.tcp_control.state == SYN_RCVD)) &&
+                 ((current_socket->socket_values.tcp_control.state == TCP_LISTEN) ||
+                  (current_socket->socket_values.tcp_control.state == TCP_SYN_RCVD)) &&
                  (current_socket->socket_values.local_address.sin6_addr.uint8[15] ==
                   ipv6_header->destaddr.uint8[15]) &&
                  (current_socket->socket_values.local_address.sin6_port ==
@@ -556,7 +556,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     mutex_lock(&global_sequence_clunter_mutex);
     current_tcp_socket->tcp_control.send_iss = global_sequence_counter;
     mutex_unlock(&global_sequence_clunter_mutex);
-    current_tcp_socket->tcp_control.state = SYN_SENT;
+    current_tcp_socket->tcp_control.state = TCP_SYN_SENT;
 
 #ifdef TCP_HC
     /* Choosing random number Context ID */
@@ -675,7 +675,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 #endif
     }
 
-    current_tcp_socket->tcp_control.state = ESTABLISHED;
+    current_tcp_socket->tcp_control.state = TCP_ESTABLISHED;
 
     current_int_tcp_socket->recv_pid = 255;
 
@@ -737,8 +737,8 @@ int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags)
     current_int_tcp_socket = get_socket(s);
     current_tcp_socket = &current_int_tcp_socket->socket_values;
 
-    /* Check for ESTABLISHED STATE */
-    if (current_tcp_socket->tcp_control.state != ESTABLISHED) {
+    /* Check for TCP_ESTABLISHED STATE */
+    if (current_tcp_socket->tcp_control.state != TCP_ESTABLISHED) {
         return -1;
     }
 
@@ -1054,8 +1054,8 @@ int destiny_socket_close(int s)
                 return -1;
             }
 
-            /* Check for ESTABLISHED STATE */
-            if (current_socket->socket_values.tcp_control.state != ESTABLISHED) {
+            /* Check for TCP_ESTABLISHED STATE */
+            if (current_socket->socket_values.tcp_control.state != TCP_ESTABLISHED) {
                 close_socket(current_socket);
                 return 0;
             }
@@ -1064,7 +1064,7 @@ int destiny_socket_close(int s)
 
             /* Refresh local TCP socket information */
             current_socket->socket_values.tcp_control.send_una++;
-            current_socket->socket_values.tcp_control.state = FIN_WAIT_1;
+            current_socket->socket_values.tcp_control.state = TCP_FIN_WAIT_1;
 #ifdef TCP_HC
             current_socket->socket_values.tcp_control.tcp_context.hc_type =
                 COMPRESSED_HEADER;
@@ -1174,9 +1174,9 @@ int destiny_socket_listen(int s, int backlog)
 {
     (void) backlog;
 
-    if (is_tcp_socket(s) && get_socket(s)->socket_values.tcp_control.state == CLOSED) {
+    if (is_tcp_socket(s) && get_socket(s)->socket_values.tcp_control.state == TCP_CLOSED) {
         socket_internal_t *current_socket = get_socket(s);
-        current_socket->socket_values.tcp_control.state = LISTEN;
+        current_socket->socket_values.tcp_control.state = TCP_LISTEN;
         return 0;
     }
     else {
@@ -1197,13 +1197,13 @@ socket_internal_t *get_waiting_connection_socket(int socket,
         /* Connection establishment ACK, Check for 4 touple and state */
         if ((ipv6_header != NULL) && (tcp_header != NULL)) {
             if (is_four_touple(current_socket, ipv6_header, tcp_header) &&
-                (current_socket->socket_values.tcp_control.state == SYN_RCVD)) {
+                (current_socket->socket_values.tcp_control.state == TCP_SYN_RCVD)) {
                 return current_socket;
             }
         }
         /* Connection establishment SYN ACK, check only for port and state */
         else {
-            if ((current_socket->socket_values.tcp_control.state == SYN_RCVD) &&
+            if ((current_socket->socket_values.tcp_control.state == TCP_SYN_RCVD) &&
                 (current_socket->socket_values.local_address.sin6_port ==
                  listening_socket->socket_values.local_address.sin6_port)) {
                 return current_socket;
@@ -1252,8 +1252,8 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
         msg_receive(&msg_recv_client_ack);
 
         if (msg_recv_client_ack.type == TCP_TIMEOUT) {
-            /* Set status of internal socket back to LISTEN */
-            server_socket->socket_values.tcp_control.state = LISTEN;
+            /* Set status of internal socket back to TCP_LISTEN */
+            server_socket->socket_values.tcp_control.state = TCP_LISTEN;
 
             close_socket(current_queued_int_socket);
             return -1;
@@ -1282,10 +1282,10 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
 #endif
 
     /* Update connection status information */
-    current_queued_socket->tcp_control.state = ESTABLISHED;
+    current_queued_socket->tcp_control.state = TCP_ESTABLISHED;
 
-    /* Set status of internal socket back to LISTEN */
-    server_socket->socket_values.tcp_control.state = LISTEN;
+    /* Set status of internal socket back to TCP_LISTEN */
+    server_socket->socket_values.tcp_control.state = TCP_LISTEN;
 
     /* send a reply to the TCP handler after processing every information from
      * the TCP ACK packet */
@@ -1309,7 +1309,7 @@ int destiny_socket_accept(int s, sockaddr6_t *addr, uint32_t *addrlen)
 
     socket_internal_t *server_socket = get_socket(s);
 
-    if (is_tcp_socket(s) && (server_socket->socket_values.tcp_control.state == LISTEN)) {
+    if (is_tcp_socket(s) && (server_socket->socket_values.tcp_control.state == TCP_LISTEN)) {
         socket_internal_t *current_queued_socket =
             get_waiting_connection_socket(s, NULL, NULL);
 
@@ -1371,7 +1371,7 @@ socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
     current_queued_socket->socket_values.tcp_control.send_iss =
         global_sequence_counter;
     mutex_unlock(&global_sequence_clunter_mutex);
-    current_queued_socket->socket_values.tcp_control.state = SYN_RCVD;
+    current_queued_socket->socket_values.tcp_control.state = TCP_SYN_RCVD;
     set_tcp_cb(&current_queued_socket->socket_values.tcp_control,
                tcp_header->seq_nr + 1, DESTINY_SOCKET_STATIC_WINDOW,
                current_queued_socket->socket_values.tcp_control.send_iss,
