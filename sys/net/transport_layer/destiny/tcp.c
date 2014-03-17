@@ -116,13 +116,13 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
     msg_t m_recv_tcp, m_send_tcp;
     uint8_t target_pid;
 
-    if (tcp_socket->socket_values.tcp_control.state == LAST_ACK) {
+    if (tcp_socket->socket_values.tcp_control.state == TCP_LAST_ACK) {
         target_pid = tcp_socket->recv_pid;
         close_socket(tcp_socket);
         msg_send(&m_send_tcp, target_pid, 0);
         return;
     }
-    else if (tcp_socket->socket_values.tcp_control.state == CLOSING) {
+    else if (tcp_socket->socket_values.tcp_control.state == TCP_CLOSING) {
         msg_send(&m_send_tcp, tcp_socket->recv_pid, 0);
         msg_send(&m_send_tcp, tcp_socket->send_pid, 0);
         return;
@@ -133,7 +133,7 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
         net_msg_send_recv(&m_send_tcp, &m_recv_tcp, tcp_socket->recv_pid, TCP_ACK);
         return;
     }
-    else if (tcp_socket->socket_values.tcp_control.state == ESTABLISHED) {
+    else if (tcp_socket->socket_values.tcp_control.state == TCP_ESTABLISHED) {
         if (check_tcp_consistency(&tcp_socket->socket_values, tcp_header) == PACKET_OK) {
             m_send_tcp.content.ptr = (char *)tcp_header;
             net_msg_send(&m_send_tcp, tcp_socket->send_pid, 0, TCP_ACK);
@@ -159,7 +159,7 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 {
     msg_t m_send_tcp;
 
-    if (tcp_socket->socket_values.tcp_control.state == LISTEN) {
+    if (tcp_socket->socket_values.tcp_control.state == TCP_LISTEN) {
         socket_internal_t *new_socket = new_tcp_queued_socket(ipv6_header,
                                         tcp_header);
 
@@ -179,7 +179,7 @@ void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
         }
     }
     else {
-        printf("Dropped TCP SYN Message because socket was not in state LISTEN!");
+        printf("Dropped TCP SYN Message because socket was not in state TCP_LISTEN!");
     }
 }
 
@@ -190,12 +190,12 @@ void handle_tcp_syn_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 
     msg_t m_send_tcp;
 
-    if (tcp_socket->socket_values.tcp_control.state == SYN_SENT) {
+    if (tcp_socket->socket_values.tcp_control.state == TCP_SYN_SENT) {
         m_send_tcp.content.ptr = (char *) tcp_header;
         net_msg_send(&m_send_tcp, tcp_socket->recv_pid, 0, TCP_SYN_ACK);
     }
     else {
-        printf("Socket not in state SYN_SENT, dropping SYN-ACK-packet!");
+        printf("Socket not in state TCP_SYN_SENT, dropping SYN-ACK-packet!");
     }
 }
 
@@ -218,13 +218,13 @@ void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
     current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
 #endif
 
-    if (current_tcp_socket->tcp_control.state == FIN_WAIT_1) {
-        current_tcp_socket->tcp_control.state = CLOSING;
+    if (current_tcp_socket->tcp_control.state == TCP_FIN_WAIT_1) {
+        current_tcp_socket->tcp_control.state = TCP_CLOSING;
 
         send_tcp(tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
     }
     else {
-        current_tcp_socket->tcp_control.state = LAST_ACK;
+        current_tcp_socket->tcp_control.state = TCP_LAST_ACK;
 
         send_tcp(tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_FIN_ACK, 0);
     }
@@ -243,7 +243,7 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
-    current_tcp_socket->tcp_control.state = CLOSED;
+    current_tcp_socket->tcp_control.state = TCP_CLOSED;
 
     set_tcp_cb(&current_tcp_socket->tcp_control, tcp_header->seq_nr + 1,
                current_tcp_socket->tcp_control.send_wnd, tcp_header->ack_nr,
@@ -274,7 +274,7 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
             read_bytes = handle_payload(ipv6_header, tcp_header, tcp_socket, payload);
 
             /* Refresh TCP status values */
-            current_tcp_socket->tcp_control.state = ESTABLISHED;
+            current_tcp_socket->tcp_control.state = TCP_ESTABLISHED;
 
             set_tcp_cb(&current_tcp_socket->tcp_control,
                        tcp_header->seq_nr + read_bytes,
@@ -357,7 +357,7 @@ void tcp_packet_handler(void)
 
                 case TCP_SYN_ACK: {
                     /* only SYN and ACK Bit set, complete three way handshake
-                     * when socket in state SYN_SENT */
+                     * when socket in state TCP_SYN_SENT */
                     handle_tcp_syn_ack_packet(ipv6_header, tcp_header, tcp_socket);
                     break;
                 }
