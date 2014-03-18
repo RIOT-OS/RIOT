@@ -24,7 +24,7 @@ patch: $(CURDIR)/$(PKG_NAME)/Makefile
 $(CURDIR)/$(PKG_NAME)/Makefile: $(CURDIR)/$(PKG_NAME)
 	$(foreach patch,$(shell ls [0-9][0-9][0-9][0-9]*.patch),cd "$<" && git am "../$(patch)";)
 
-$(CURDIR)/$(PKG_NAME)/:
+$(CURDIR)/$(PKG_NAME):
 	git clone $(PKG_URL) $@ && \
 		cd $@ && git reset --hard $(PKG_VERSION)
 
