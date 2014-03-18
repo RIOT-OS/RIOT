@@ -22,7 +22,7 @@ all: patch
 patch: $(CURDIR)/$(PKG_NAME)/Makefile
 
 $(CURDIR)/$(PKG_NAME)/Makefile: $(CURDIR)/$(PKG_NAME)
-	$(foreach patch,$(shell ls [0-9][0-9][0-9][0-9]*.patch),cd "$<" && git am "../$(patch)";)
+	$(foreach patch,$(shell ls [0-9][0-9][0-9][0-9]*.patch),cd "$<" && git am "../$(patch)" || { git am --abort; exit 1; };)
 
 $(CURDIR)/$(PKG_NAME):
 	git clone $(PKG_URL) $@ && \
