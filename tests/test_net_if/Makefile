@@ -1,6 +1,6 @@
 export PROJECT = test_net_if
 
-BOARD_WHITELIST = native msba2 telosb
+BOARD_BLACKLIST = mbed_lpc1768
 
 include ../Makefile.tests_common
 
