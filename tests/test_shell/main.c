@@ -52,9 +52,12 @@ static void print_echo(int argc, char **argv)
 
 static int shell_readc(void)
 {
-    char c = 0;
-    posix_read(uart0_handler_pid, &c, 1);
-    return c;
+    char c;
+    int result = posix_read(uart0_handler_pid, &c, 1);
+    if (result != 1) {
+        return -1;
+    }
+    return (unsigned char) c;
 }
 
 static void shell_putchar(int c)

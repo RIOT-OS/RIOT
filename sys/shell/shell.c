@@ -10,20 +10,21 @@
  */
 
 /**
- * @ingroup	shell
+ * @ingroup     shell
  * @{
  */
 
 /**
  * @file
- * @brief 		Implementation of a very simple command interpreter.
+ * @brief       Implementation of a very simple command interpreter.
  *              For each command (i.e. "echo"), a handler can be specified.
  *              If the first word of a user-entered command line matches the
  *              name of a handler, the handler will be called with the whole
  *              command line as parameter.
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
- * @author		Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 
 #include <string.h>
@@ -97,7 +98,7 @@ static void handle_input_line(shell_t *shell, char *line)
     char *pos = line;
     int contains_esc_seq = 0;
     while (1) {
-        if (*pos > ' ') {
+        if ((unsigned char) *pos > ' ') {
             /* found an argument */
             if (*pos == '"' || *pos == '\'') {
                 /* it's a quoted argument */
@@ -119,7 +120,7 @@ static void handle_input_line(shell_t *shell, char *line)
                         continue;
                     }
                 } while (*pos != quote_char);
-                if (pos[1] > ' ') {
+                if ((unsigned char) pos[1] > ' ') {
                     puts(INCORRECT_QUOTING);
                     return;
                 }
@@ -141,7 +142,7 @@ static void handle_input_line(shell_t *shell, char *line)
                         puts(INCORRECT_QUOTING);
                         return;
                     }
-                } while (*pos > ' ');
+                } while ((unsigned char) *pos > ' ');
             }
 
             /* count the number of arguments we got */
@@ -217,6 +218,9 @@ static int readline(shell_t *shell, char *buf, size_t size)
         }
 
         c = shell->readchar();
+        if (c < 0) {
+            return 1;
+        }
         shell->put_char(c);
 
         /* We allow Unix linebreaks (\n), DOS linebreaks (\r\n), and Mac linebreaks (\r). */
