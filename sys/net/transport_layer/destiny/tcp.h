@@ -62,19 +62,19 @@ enum tcp_codes {
 
 #define REMOVE_RESERVED         (0xFC)
 
-#define IS_TCP_ACK(a)           ((a & TCP_ACK)      == TCP_ACK) /* Test for ACK flag only, ignore URG und PSH flag */
-#define IS_TCP_RST(a)           ((a & TCP_RST)      == TCP_RST)
-#define IS_TCP_SYN(a)           ((a & TCP_SYN)      == TCP_SYN)
-#define IS_TCP_SYN_ACK(a)       ((a & TCP_SYN_ACK)  == TCP_SYN_ACK)
-#define IS_TCP_FIN(a)           ((a & TCP_FIN)      == TCP_FIN)
-#define IS_TCP_FIN_ACK(a)       ((a & TCP_FIN_ACK)  == TCP_FIN_ACK)
+#define IS_TCP_ACK(a)           (((a) & TCP_ACK)      == TCP_ACK) /* Test for ACK flag only, ignore URG und PSH flag */
+#define IS_TCP_RST(a)           (((a) & TCP_RST)      == TCP_RST)
+#define IS_TCP_SYN(a)           (((a) & TCP_SYN)      == TCP_SYN)
+#define IS_TCP_SYN_ACK(a)       (((a) & TCP_SYN_ACK)  == TCP_SYN_ACK)
+#define IS_TCP_FIN(a)           (((a) & TCP_FIN)      == TCP_FIN)
+#define IS_TCP_FIN_ACK(a)       (((a) & TCP_FIN_ACK)  == TCP_FIN_ACK)
 
-#define SET_TCP_ACK(a)          a = ((a & 0x00) | TCP_ACK)
-#define SET_TCP_RST(a)          a = ((a & 0x00) | TCP_RST)
-#define SET_TCP_SYN(a)          a = ((a & 0x00) | TCP_SYN)
-#define SET_TCP_SYN_ACK(a)      a = ((a & 0x00) | TCP_SYN_ACK)
-#define SET_TCP_FIN(a)          a = ((a & 0x00) | TCP_FIN)
-#define SET_TCP_FIN_ACK(a)      a = ((a & 0x00) | TCP_FIN_ACK)
+#define SET_TCP_ACK(a)          (a) = TCP_ACK
+#define SET_TCP_RST(a)          (a) = TCP_RST
+#define SET_TCP_SYN(a)          (a) = TCP_SYN
+#define SET_TCP_SYN_ACK(a)      (a) = TCP_SYN_ACK
+#define SET_TCP_FIN(a)          (a) = TCP_FIN
+#define SET_TCP_FIN_ACK(a)      (a) = TCP_FIN_ACK
 
 #define TCP_STACK_SIZE          (KERNEL_CONF_STACKSIZE_DEFAULT)
 
@@ -85,12 +85,12 @@ typedef struct __attribute__((packed)) tcp_mms_o_t {
 } tcp_mss_option_t;
 
 #ifdef TCP_HC
-mutex_t             global_context_counter_mutex;
-uint8_t             global_context_counter;
+extern mutex_t             global_context_counter_mutex;
+extern uint8_t             global_context_counter;
 #endif
 
-mutex_t             global_sequence_clunter_mutex;
-uint32_t            global_sequence_counter;
+extern mutex_t             global_sequence_counter_mutex;
+extern uint32_t            global_sequence_counter;
 
 void tcp_packet_handler(void);
 uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);

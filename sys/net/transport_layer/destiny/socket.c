@@ -553,9 +553,9 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     srand(addr->sin6_port);
 
     current_tcp_socket->tcp_control.rcv_irs	= 0;
-    mutex_lock(&global_sequence_clunter_mutex);
+    mutex_lock(&global_sequence_counter_mutex);
     current_tcp_socket->tcp_control.send_iss = global_sequence_counter;
-    mutex_unlock(&global_sequence_clunter_mutex);
+    mutex_unlock(&global_sequence_counter_mutex);
     current_tcp_socket->tcp_control.state = TCP_SYN_SENT;
 
 #ifdef TCP_HC
@@ -1367,10 +1367,10 @@ socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
 
     current_queued_socket->socket_values.tcp_control.rcv_irs =
         tcp_header->seq_nr;
-    mutex_lock(&global_sequence_clunter_mutex);
+    mutex_lock(&global_sequence_counter_mutex);
     current_queued_socket->socket_values.tcp_control.send_iss =
         global_sequence_counter;
-    mutex_unlock(&global_sequence_clunter_mutex);
+    mutex_unlock(&global_sequence_counter_mutex);
     current_queued_socket->socket_values.tcp_control.state = TCP_SYN_RCVD;
     set_tcp_cb(&current_queued_socket->socket_values.tcp_control,
                tcp_header->seq_nr + 1, DESTINY_SOCKET_STATIC_WINDOW,
