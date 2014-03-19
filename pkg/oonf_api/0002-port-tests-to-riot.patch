@@ -33,9 +33,9 @@ index 0000000..c286ad3
 +####
 +#### The Sample Filesystem Layout is:
 +#### /this makefile
-+#### ../../RIOT 
++#### ../../RIOT
 +#### ../../boards   for board definitions (if you have one or more)
-+#### 
++####
 +
 +# name of your project
 +export PROJECT = %TESTNAME%
@@ -50,7 +50,7 @@ index 0000000..c286ad3
 +
 +export CFLAGS = -DRIOT -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
 +
-+## Modules to include. 
++## Modules to include.
 +
 +USEMODULE += auto_init
 +USEMODULE += config
@@ -95,17 +95,17 @@ index b5ee8c0..e4e5b26 100644
 --- a/tests/common/test_common_avl.c
 +++ b/tests/common/test_common_avl.c
 @@ -816,17 +816,17 @@ static void random_delete(uint32_t *array, int count) {
- 
+
  /* insert/remove 1000's random numbers into tree and check if everything is okay */
  static void test_random_insert(void) {
 -  uint32_t array[1000];
 +  uint32_t array[100];
    struct tree_element *e, *ptr;
- 
+
    srand(0);
    START_TEST();
    avl_init(&head, avl_comp_uint32, true);
- 
+
 -  random_insert(array, 1000);
 -  random_delete(array, 500);
 -  random_insert(array, 400);
@@ -114,7 +114,7 @@ index b5ee8c0..e4e5b26 100644
 +  random_delete(array, 50);
 +  random_insert(array, 40);
 +  random_delete(array, 60);
- 
+
    avl_remove_all_elements(&head, e, node, ptr) {
      free(e);
 diff --git a/tests/cunit/Makefile b/tests/cunit/Makefile
@@ -137,9 +137,9 @@ index 0000000..8a0452d
 +####
 +#### The Sample Filesystem Layout is:
 +#### /this makefile
-+#### ../../RIOT 
++#### ../../RIOT
 +#### ../../boards   for board definitions (if you have one or more)
-+#### 
++####
 +
 +# name of your project
 +export PROJECT = %TESTNAME%
@@ -154,7 +154,7 @@ index 0000000..8a0452d
 +
 +export CFLAGS = -DRIOT -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
 +
-+## Modules to include. 
++## Modules to include.
 +
 +USEMODULE += auto_init
 +USEMODULE += config
@@ -200,7 +200,7 @@ index df203fd..29daff6 100644
 +
  #include <assert.h>
  #include <stdio.h>
- 
--- 
+
+--
 1.8.3.2
 

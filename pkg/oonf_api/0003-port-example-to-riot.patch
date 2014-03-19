@@ -21,8 +21,8 @@ index 0000000..42f9a55
 +####
 +#### The Sample Filesystem Layout is:
 +#### /this makefile
-+#### ../../RIOT 
-+#### 
++#### ../../RIOT
++####
 +
 +# name of your project
 +export PROJECT := $(shell basename $(CURDIR))
@@ -37,7 +37,7 @@ index 0000000..42f9a55
 +
 +export CFLAGS = -DRIOT -DOONF_LOG_INFO -DOONF_LOG_DEBUG_INFO
 +
-+## Modules to include. 
++## Modules to include.
 +
 +USEMODULE += auto_init
 +USEMODULE += config
@@ -60,7 +60,7 @@ index 9cca869..c786d19 100644
 @@ -42,6 +42,11 @@
  #include <string.h>
  #include <stdio.h>
- 
+
 +#ifdef RIOT
 +#include "net_help.h"
 +#define ntohl(val)	NTOHL(val)
@@ -76,7 +76,7 @@ index 59bb741..d05c48c 100644
 @@ -42,6 +42,11 @@
  #include <string.h>
  #include <stdio.h>
- 
+
 +#ifdef RIOT
 +#include "net_help.h"
 +#define htonl(val)	HTONL(val)
@@ -85,6 +85,6 @@ index 59bb741..d05c48c 100644
  #include "common/common_types.h"
  #include "common/netaddr.h"
  #include "rfc5444/rfc5444_writer.h"
--- 
+--
 1.8.3.2
 

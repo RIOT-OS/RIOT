@@ -20,18 +20,13 @@ all: patch
 	make $(BINDIR)$(MODULE).a
 
 patch: $(CURDIR)/$(PKG_NAME)/Makefile
-	# Dependancy might be changed accordingly though we think the Makefile
-	# will be the first thing you want to change
-	#
-	# Here might not happen anything besides dependancy checks
 
 $(CURDIR)/$(PKG_NAME)/Makefile: $(CURDIR)/$(PKG_NAME)
-	# Here you apply your patch.
-	$(foreach patch,$(shell ls [0-9][0-9][0-9][0-9]*.patch),cd "$<" && git am "../$(patch)";)
+	$(foreach patch,$(shell ls [0-9][0-9][0-9][0-9]*.patch),cd "$<" && git am "../$(patch)" || { git am --abort; exit 1; };)
 
-$(CURDIR)/$(PKG_NAME)/:
+$(CURDIR)/$(PKG_NAME):
 	git clone $(PKG_URL) $@ && \
-		cd $@ && git checkout $(PKG_VERSION)
+		cd $@ && git reset --hard $(PKG_VERSION)
 
 clean::
 	# Reset package to checkout state.
