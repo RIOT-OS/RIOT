@@ -1,3 +1,11 @@
+/*
+ * Header for the ETX-beaconing module
+ * etx_beaconing.h
+ *
+ *  Created on: Feb 26, 2013
+ *      Author: stephan
+ */
+
 #ifndef ETX_BEACONING_H_
 #define ETX_BEACONING_H_
 #include <stdint.h>
@@ -8,13 +16,13 @@
 #include "debug.h"
 
 #if ENABLE_DEBUG
-#define ETX_BEACON_STACKSIZE    (KERNEL_CONF_STACKSIZE_DEFAULT + KERNEL_CONF_STACKSIZE_PRINTF_FLOAT)
-#define ETX_RADIO_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT + KERNEL_CONF_STACKSIZE_PRINTF_FLOAT)
-#define ETX_CLOCK_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define ETX_BEACON_STACKSIZE    (4500)
+#define ETX_RADIO_STACKSIZE     (4500)
+#define ETX_CLOCK_STACKSIZE      (500)
 #else
-#define ETX_BEACON_STACKSIZE    (KERNEL_CONF_STACKSIZE_MAIN)
-#define ETX_RADIO_STACKSIZE     (KERNEL_CONF_STACKSIZE_MAIN)
-#define ETX_CLOCK_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define ETX_BEACON_STACKSIZE    (2500) //TODO optimize, maybe 2000 is enough
+#define ETX_RADIO_STACKSIZE     (2500) //TODO optimize, maybe 2000 is enough
+#define ETX_CLOCK_STACKSIZE     (500) //TODO optimize, maybe  250 is enough
 #endif
 
 //[option|length|ipaddr.|packetcount] with up to 15 ipaddr|packetcount pairs

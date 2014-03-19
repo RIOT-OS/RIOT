@@ -23,13 +23,17 @@
 
 #include "msg.h"
 #include "rpl.h"
-#include "etx_beaconing.h"
-#include "of0.h"
-#include "of_mrhof.h"
 #include "trickle.h"
 
 #include "sixlowpan.h"
 #include "net_help.h"
+
+/* You can only run Storing or Non-Storing Mode. Other unsupported modes lead to default (Storing Mode) */
+#if RPL_DEFAULT_MOP == STORING_MODE_NO_MC
+#include "rpl_sm.h"
+#elif RPL_DEFAULT_MOP == NON_STORING_MODE
+#include "rpl_nsm.h"
+#endif
 
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
@@ -43,8 +47,7 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 /* global variables */
 char i_am_root = 0;
-rpl_of_t *objective_functions[NUMBER_IMPLEMENTED_OFS];
-rpl_routing_entry_t routing_table[RPL_MAX_ROUTING_ENTRIES];
+routing_entry_t routing_table[RPL_MAX_ROUTING_ENTRIES];
 unsigned int rpl_process_pid;
 ipv6_addr_t my_address;
 mutex_t rpl_send_mutex;
@@ -181,18 +184,6 @@ static rpl_opt_transit_t *get_rpl_opt_transit_buf(uint8_t rpl_msg_len)
     return ((rpl_opt_transit_t *) &(rpl_buffer[IPV6_HDR_LEN + ICMPV6_HDR_LEN + rpl_msg_len]));
 }
 
-/* find implemented OF via objective code point */
-rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp)
-{
-    for (uint16_t i = 0; i < NUMBER_IMPLEMENTED_OFS; i++) {
-        if (ocp == objective_functions[i]->ocp) {
-            return objective_functions[i];
-        }
-    }
-
-    return NULL;
-}
-
 uint8_t rpl_init(int if_id)
 {
     mutex_init(&rpl_send_mutex);
@@ -201,15 +192,14 @@ uint8_t rpl_init(int if_id)
     rpl_instances_init();
 
     /* initialize routing table */
-    rpl_clear_routing_table();
+    forwarding_table_init(RPL_MAX_ROUTING_ENTRIES);
     init_trickle();
     rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
                                     PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                     rpl_process, "rpl_process");
 
-    /* INSERT NEW OBJECTIVE FUNCTIONS HERE */
-    objective_functions[0] = rpl_get_of0();
-    /* objective_functions[1] = rpl_get_of_ETX() */
+    // initialize objective function manager
+    init_of_manager(&my_address);
 
     sixlowpan_lowpan_init_interface(if_id);
     /* need link local prefix to query _our_ corresponding address  */
@@ -218,12 +208,13 @@ uint8_t rpl_init(int if_id)
     ipv6_net_if_get_best_src_addr(&my_address, &ll_address);
     ipv6_register_rpl_handler(rpl_process_pid);
 
-    /* initialize ETX-calculation if needed */
+    
+    /*
     if (RPL_DEFAULT_OCP == 1) {
         DEBUG("%s, %d: INIT ETX BEACONING\n", __FILE__, __LINE__);
         etx_init_beaconing(&my_address);
     }
-
+    */
     return SIXLOWERROR_SUCCESS;
 }
 
@@ -269,12 +260,16 @@ void rpl_init_root(void)
         return;
     }
 
+    if(RPL_DEFAULT_MOP == NON_STORING_MODE) {
+        rpl_init_root_nsm();
+    }
+
     i_am_root = 1;
     start_trickle(dodag->dio_min, dodag->dio_interval_doubling, dodag->dio_redundancy);
     DEBUG("%s, %d: ROOT INIT FINISHED\n", __FILE__, __LINE__);
 
+    
 }
-
 
 void send_DIO(ipv6_addr_t *destination)
 {
@@ -406,7 +401,7 @@ void send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime,
             rpl_send_opt_target_buf->length = RPL_OPT_TARGET_LEN;
             rpl_send_opt_target_buf->flags = 0x00;
             rpl_send_opt_target_buf->prefix_length = RPL_DODAG_ID_LEN;
-            memcpy(&rpl_send_opt_target_buf->target, &routing_table[i].address, sizeof(ipv6_addr_t));
+            memcpy(&rpl_send_opt_target_buf->target, &routing_table[i].destination, sizeof(ipv6_addr_t));
             opt_len += RPL_OPT_TARGET_LEN + 2;
             rpl_send_opt_transit_buf = get_rpl_send_opt_transit_buf(DAO_BASE_LEN + opt_len);
             rpl_send_opt_transit_buf->type = RPL_OPT_TRANSIT;
@@ -879,7 +874,7 @@ void recv_rpl_dao(void)
                         ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->srcaddr),
                         ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->srcaddr),
                         (rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit));
-                rpl_add_routing_entry(&rpl_opt_target_buf->target, &ipv6_buf->srcaddr, rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit);
+                add_forwarding_entry(&rpl_opt_target_buf->target, &ipv6_buf->srcaddr, rpl_opt_transit_buf->path_lifetime * my_dodag->lifetime_unit);
                 increment_seq = 1;
                 break;
             }
@@ -934,7 +929,6 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
     uint8_t *p_ptr;
     ipv6_send_buf = get_rpl_send_ipv6_buf();
     p_ptr = get_rpl_send_payload_buf(ipv6_ext_hdr_len);
-    uint16_t packet_length = 0;
 
     ipv6_send_buf->version_trafficclass = IPV6_VER;
     ipv6_send_buf->trafficclass_flowlabel = 0;
@@ -957,14 +951,14 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
         memcpy(p_ptr, payload, p_len);
     }
 
-    packet_length = IPV6_HDR_LEN + p_len;
+    //uint16_t packet_length = IPV6_HDR_LEN + p_len;
 
     if (ipv6_addr_is_multicast(&ipv6_send_buf->destaddr)) {
         ipv6_send_packet(ipv6_send_buf);
     }
     else {
         /* find appropriate next hop before sending */
-        ipv6_addr_t *next_hop = rpl_get_next_hop(&ipv6_send_buf->destaddr);
+        ipv6_addr_t *next_hop = get_next_hop(&ipv6_send_buf->destaddr);
 
         if (next_hop == NULL) {
             if (i_am_root) {
@@ -984,69 +978,4 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
         ipv6_send_packet(ipv6_send_buf);
     }
 
-}
-
-ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr)
-{
-    for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        if (routing_table[i].used && rpl_equal_id(&routing_table[i].address, addr)) {
-            return &routing_table[i].next_hop;
-        }
-    }
-
-    return (rpl_get_my_preferred_parent());
-}
-
-void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t lifetime)
-{
-    rpl_routing_entry_t *entry = rpl_find_routing_entry(addr);
-
-    if (entry != NULL) {
-        entry->lifetime = lifetime;
-        return;
-    }
-
-    for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        if (!routing_table[i].used) {
-            routing_table[i].address = *addr;
-            routing_table[i].next_hop = *next_hop;
-            routing_table[i].lifetime = lifetime;
-            routing_table[i].used = 1;
-            break;
-        }
-    }
-}
-
-void rpl_del_routing_entry(ipv6_addr_t *addr)
-{
-    for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        if (routing_table[i].used && rpl_equal_id(&routing_table[i].address, addr)) {
-            memset(&routing_table[i], 0, sizeof(routing_table[i]));
-            return;
-        }
-    }
-}
-
-rpl_routing_entry_t *rpl_find_routing_entry(ipv6_addr_t *addr)
-{
-    for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        if (routing_table[i].used && rpl_equal_id(&routing_table[i].address, addr)) {
-            return &routing_table[i];
-        }
-    }
-
-    return NULL;
-}
-
-void rpl_clear_routing_table(void)
-{
-    for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        memset(&routing_table[i], 0, sizeof(routing_table[i]));
-    }
-
-}
-
-rpl_routing_entry_t *rpl_get_routing_table(void)
-{
-    return routing_table;
 }

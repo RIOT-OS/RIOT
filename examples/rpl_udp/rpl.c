@@ -81,7 +81,7 @@ void rpl_udp_init(int argc, char **argv)
             is_root = 1;
         }
         else {
-            ipv6_iface_set_routing_provider(rpl_get_next_hop);
+            ipv6_iface_set_routing_provider(get_next_hop);
         }
 
         int monitor_pid = thread_create(monitor_stack_buffer, MONITOR_STACK_SIZE, PRIORITY_MAIN - 2, CREATE_STACKTEST, rpl_udp_monitor, "monitor");
@@ -124,9 +124,9 @@ void rpl_udp_loop(int argc, char **argv)
     (void) argc;
     (void) argv;
 
-    rpl_routing_entry_t *rtable;
+    routing_entry_t *rtable;
 
-    rtable = rpl_get_routing_table();
+    rtable = get_forwarding_table();
     rpl_dodag_t *mydodag = rpl_get_my_dodag();
 
     if (mydodag == NULL) {
@@ -149,13 +149,13 @@ void rpl_udp_loop(int argc, char **argv)
     for (int i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
         if (rtable[i].used) {
             printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                                            (&rtable[i].address)));
+                                            (&rtable[i].destination)));
             puts("next hop");
             printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                                             (&rtable[i].next_hop)));
             printf("entry %d lifetime %d\n", i, rtable[i].lifetime);
 
-            if (!rpl_equal_id(&rtable[i].address, &rtable[i].next_hop)) {
+            if (!rpl_equal_id(&rtable[i].destination, &rtable[i].next_hop)) {
                 puts("multi-hop");
             }
 
@@ -171,8 +171,8 @@ void rpl_udp_table(int argc, char **argv)
     (void) argc;
     (void) argv;
 
-    rpl_routing_entry_t *rtable;
-    rtable = rpl_get_routing_table();
+    routing_entry_t *rtable;
+    rtable = get_forwarding_table();
     printf("---------------------------\n");
     printf("OUTPUT\n");
     printf("---------------------------\n");
@@ -180,10 +180,10 @@ void rpl_udp_table(int argc, char **argv)
     for (int i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
         if (rtable[i].used) {
             printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                                            (&rtable[i].address)));
+                                            (&rtable[i].destination)));
             printf("entry %d lifetime %d\n", i, rtable[i].lifetime);
 
-            if (!rpl_equal_id(&rtable[i].address, &rtable[i].next_hop)) {
+            if (!rpl_equal_id(&rtable[i].destination, &rtable[i].next_hop)) {
                 puts("multi-hop");
             }
 
