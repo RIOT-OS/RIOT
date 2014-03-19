@@ -20,11 +20,11 @@ patch: $(CURDIR)/$(PKG_NAME)/Makefile
 
 $(CURDIR)/$(PKG_NAME)/Makefile: $(CURDIR)/$(PKG_NAME)
 	# Here you apply your patch.
-	$(foreach patch,$(shell ls [0-9][0-9][0-9][0-9]*.patch),cd "$<" && git am "$(patch)";)
+	$(foreach patch,$(shell ls [0-9][0-9][0-9][0-9]*.patch),cd "$<" && git am "$(patch)" || { git am --abort; exit 1; };)
 
-$(PKG_NAME)/:
+$(PKG_NAME):
 	# Get PKG_VERSION of package from PKG_URL
-	git clone $(PKG_URL) $(PKG_NAME) && cd $(PKG_NAME) && git checkout $(PKG_VERSION)
+	git clone $(PKG_URL) $(PKG_NAME) && cd $(PKG_NAME) && git reset --hard $(PKG_VERSION)
 
 clean::
 	# Reset package to checkout state.
