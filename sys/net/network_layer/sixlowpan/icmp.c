@@ -726,7 +726,8 @@ void recv_rtr_adv(void)
     if (rtr_adv_buf->reachable_time != 0) {
         ipv6_net_if_ext_t *iface;
 
-        if ((iface = ipv6_net_if_get_ext(if_id)) == NULL) {
+        iface = ipv6_net_if_get_ext(if_id);
+        if (iface) {
             iface->adv_reachable_time = NTOHL(rtr_adv_buf->reachable_time);
         }
     }
@@ -734,7 +735,8 @@ void recv_rtr_adv(void)
     if (rtr_adv_buf->retrans_timer != 0) {
         ipv6_net_if_ext_t *iface;
 
-        if ((iface = ipv6_net_if_get_ext(if_id)) == NULL) {
+        iface = ipv6_net_if_get_ext(if_id);
+        if (iface) {
             iface->adv_retrans_timer = NTOHL(rtr_adv_buf->retrans_timer);
         }
     }
