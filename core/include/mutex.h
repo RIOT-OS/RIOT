@@ -69,23 +69,19 @@ int mutex_lock(struct mutex_t *mutex);
 void mutex_unlock(struct mutex_t *mutex);
 
 /**
- * @brief Unlocks the mutex and sends the current thread to sleep
+ * @brief Atomically unlocks the mutex and sends the current thread to sleep
  *
  * @param mutex Mutex-Object to unlock.
  */
 void mutex_unlock_and_sleep(struct mutex_t *mutex);
 
-#define MUTEX_YIELD 1
-#define MUTEX_INISR 2
-
-/**********************
- * internal functions *
- **********************/
-
-void mutex_wake_waiters(struct mutex_t *mutex, int yield);
-void mutex_wait(struct mutex_t *mutex);
-
-/*struct mutex_entry_t * mutex_create_entry(int prio, struct tcb *proc);*/
+/**
+ * @brief Atomically unlock a mutex and lock another
+ *
+ * @param old_mutex Mutex to unlock
+ * @param new_mutex Mutex to lock
+ */
+void mutex_unlock_and_lock(struct mutex_t *old_mutex, struct mutex_t *new_mutex);
 
 /** @} */
 #endif /* _MUTEX_H */
