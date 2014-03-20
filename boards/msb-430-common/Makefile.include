@@ -16,21 +16,12 @@ export LINKFLAGS = -mmcu=$(MCU) -lgcc
 TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
 export HEXFILE = $(BINDIR)$(PROJECT).hex
 
-
-ifeq ($(strip $(FLASHER)),)
-	export FLASHER = mspdebug
-endif
-
-# set programmer port in FFLAGS manually if needed like this:
-# FFLAGS="-d /dev/ttyUSB0" PROGRAMMER="uif" make flash
-
-ifeq ($(strip $(PROGRAMMER)),)
-	export PROGRAMMER = olimex
-endif
+export FLASHER ?= mspdebug
+export PORT ?= /dev/ttyUSB0
+export PROGRAMMER ?= olimex
 export FFLAGS += -j $(PROGRAMMER)
-
-ifeq ($(strip $(PORT)),)
-	export PORT = /dev/ttyUSB0
+ifeq ($(strip $(PROGRAMMER)),uif)
+	export FFLAGS += -d $(PORT)
 endif
 
 export FFLAGS += "prog $(HEXFILE)"
