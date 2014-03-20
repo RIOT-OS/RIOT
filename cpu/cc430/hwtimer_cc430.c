@@ -20,11 +20,9 @@
  *
  */
 
-#include <legacymsp430.h>
-#include "board.h"
+#include "cpu.h"
 #include "hwtimer.h"
 #include "hwtimer_arch.h"
-#include "cpu.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -33,15 +31,18 @@ static uint32_t ticks = 0;
 
 extern void (*int_handler)(int);
 extern void timer_unset(short timer);
+extern uint16_t overflow_interrupt[HWTIMER:_MAXTIMERS+1];
+extern uint16_t timer_round;
 
 void timerA_init(void)
 {
-    ticks = 0;                               // Set tick counter value to 0
-    TA0CTL = TASSEL_1 + TACLR;               // Clear the timer counter, set ACLK
-    TA0CTL &= ~TAIE;                         // Clear the IFG
-
     volatile unsigned int *ccr = &TA0CCR0;
     volatile unsigned int *ctl = &TA0CCTL0;
+    ticks = 0;                               /* Set tick counter value to 0 */
+    timer_round = 0;                         /* Set to round 0 */
+    TA0CTL = TASSEL_1 + TACLR;               /* Clear the timer counter, set ACLK */
+    TA0CTL &= ~TAIFG;                        /* Clear the IFG */
+    TA0CTL |= TAIE;                          /* Enable TAIE (overflow IRQ) */
 
     for (int i = 0; i < HWTIMER_MAXTIMERS; i++) {
         *(ccr + i) = 0;
@@ -55,9 +56,10 @@ void timerA_init(void)
 interrupt(TIMER0_A0_VECTOR) __attribute__((naked)) timer0_a0_isr(void)
 {
     __enter_isr();
-
-    timer_unset(0);
-    int_handler(0);
+    if (overflow_interrupt[0] == timer_round) {
+        timer_unset(0);
+        int_handler(0);
+    }
     __exit_isr();
 }
 
@@ -66,13 +68,15 @@ interrupt(TIMER0_A1_VECTOR) __attribute__((naked)) timer0_a1_5_isr(void)
     __enter_isr();
 
     short taiv = TA0IV;
-    short timer;
-
-    if (taiv & TAIFG) {
+    short timer = taiv / 2;
+    /* TAIV = 0x0E means overflow */
+    if (taiv == 0x0E) {
         DEBUG("Overflow\n");
+        timer_round += 1;
     }
-    else {
-        timer = (taiv / 2);
+    /* check which CCR has been hit and if the overflow counter for this timer
+     * has been reached */
+    else if (overflow_interrupt[timer] == timer_round) {
         timer_unset(timer);
         int_handler(timer);
     }
