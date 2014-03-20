@@ -60,7 +60,7 @@ static void timer_set_nostart(unsigned long value, short timer)
 
 static void timer_set(unsigned long value, short timer)
 {
-    DEBUG("Setting timer %u to %lu\n", timer, value);
+    DEBUG("Setting timer %u to %u overflows and %lu\n", timer, overflow_interrupt[timer], value);
     timer_set_nostart(value, timer);
     timer_enable_interrupt(timer);
 }
