@@ -103,17 +103,17 @@ void check_sockets(void)
 
         if (is_tcp_socket(i)) {
             switch (current_socket->socket_values.tcp_control.state) {
-                case ESTABLISHED: {
+                case TCP_ESTABLISHED: {
                     handle_established(current_socket);
                     break;
                 }
 
-                case SYN_SENT: {
+                case TCP_SYN_SENT: {
                     handle_synchro_timeout(current_socket);
                     break;
                 }
 
-                case SYN_RCVD: {
+                case TCP_SYN_RCVD: {
                     handle_synchro_timeout(current_socket);
                     break;
                 }
@@ -130,9 +130,9 @@ void check_sockets(void)
 
 void inc_global_variables(void)
 {
-    mutex_lock(&global_sequence_clunter_mutex);
+    mutex_lock(&global_sequence_counter_mutex);
     global_sequence_counter += rand();
-    mutex_unlock(&global_sequence_clunter_mutex);
+    mutex_unlock(&global_sequence_counter_mutex);
 #ifdef TCP_HC
     mutex_lock(&global_context_counter_mutex);
     global_context_counter += rand();
