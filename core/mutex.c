@@ -29,6 +29,7 @@
 #include "thread.h"
 #include "irq.h"
 
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 int mutex_init(struct mutex_t *mutex)

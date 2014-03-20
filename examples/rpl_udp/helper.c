@@ -29,7 +29,7 @@
 
 #include "demo.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define LL_HDR_LEN  (0x4)
@@ -69,7 +69,7 @@ void rpl_udp_monitor(void)
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t *) m.content.ptr;
 
-            DEBUG("Received packet from ID %u\n", p->src);
+            DEBUGF("Received packet from ID %u\n", p->src);
             DEBUG("\tLength:\t%u\n", p->length);
             DEBUG("\tSrc:\t%u\n", p->src);
             DEBUG("\tDst:\t%u\n", p->dst);

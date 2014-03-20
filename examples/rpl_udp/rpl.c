@@ -29,6 +29,9 @@
 #include "rpl_dodag.h"
 #include "demo.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 #ifdef MODULE_NATIVENET
 #define TRANSCEIVER TRANSCEIVER_NATIVE
 #else
@@ -65,8 +68,10 @@ void rpl_udp_init(int argc, char **argv)
             return;
         }
 
+        DEBUGF("Setting HW address to %u\n", id);
         net_if_set_hardware_address(0, id);
 
+        DEBUGF("Initializing RPL for interface 0\n");
         state = rpl_init(0);
 
         if (state != SIXLOWERROR_SUCCESS) {
@@ -84,7 +89,9 @@ void rpl_udp_init(int argc, char **argv)
             ipv6_iface_set_routing_provider(rpl_get_next_hop);
         }
 
+        DEBUGF("Start monitor\n");
         int monitor_pid = thread_create(monitor_stack_buffer, MONITOR_STACK_SIZE, PRIORITY_MAIN - 2, CREATE_STACKTEST, rpl_udp_monitor, "monitor");
+        DEBUGF("Register at transceiver %02X\n", TRANSCEIVER);
         transceiver_register(TRANSCEIVER, monitor_pid);
         ipv6_register_packet_handler(monitor_pid);
         //sixlowpan_lowpan_register(monitor_pid);

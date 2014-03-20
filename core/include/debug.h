@@ -23,12 +23,37 @@
 #define __DEBUG_H
 
 #include <stdio.h>
+#include "sched.h"
+
+#if DEVELHELP
+#include "cpu-conf.h"
+#define DEBUG_PRINT(...) \
+    do { \
+        if ((active_thread == NULL) || (active_thread->stack_size > KERNEL_CONF_STACKSIZE_PRINTF)) { \
+            printf(__VA_ARGS__); \
+        } \
+        else { \
+            puts("Cannot debug, stack too small"); \
+        } \
+    } while (0)
+#else
+#define DEBUG_PRINT(...) printf(__VA_ARGS__)
+#endif
 
 #if ENABLE_DEBUG
-#define DEBUG(...) printf(__VA_ARGS__)
+#include "tcb.h"
+#define DEBUG(...) DEBUG_PRINT(__VA_ARGS__)
+#define DEBUGF(...) \
+    do { \
+        DEBUG_PRINT("DEBUG(%s): %s:%d in %s: ", \
+                active_thread ? active_thread->name : "NO THREAD", \
+                __FILE__, __LINE__, __func__); \
+        DEBUG_PRINT(__VA_ARGS__); \
+    } while (0)
 #undef ENABLE_DEBUG
 #else
 #define DEBUG(...)
+#define DEBUGF(...)
 #endif
 
 /** @} */
