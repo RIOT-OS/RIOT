@@ -18,19 +18,19 @@ See the file LICENSE in the top level directory for more details.
 #include "cpu.h"
 
 #ifdef __MSP430_HAS_TA2__
-#define ARCH_MAXTIMERS 2
+#define HWTIMER_MAXTIMERS 2
 #endif
 #ifdef __MSP430_HAS_TA3__
-#define ARCH_MAXTIMERS 3
+#define HWTIMER_MAXTIMERS 3
 #endif
 #ifdef __MSP430_HAS_T0A5__
-#define ARCH_MAXTIMERS 5
+#define HWTIMER_MAXTIMERS 5
 #endif
 
 
-#ifndef ARCH_MAXTIMERS
-#warning "ARCH_MAXTIMERS UNSET!"
-#define ARCH_MAXTIMERS 0
+#ifndef HWTIMER_MAXTIMERS
+#warning "HWTIMER_MAXTIMERS UNSET!"
+#define HWTIMER_MAXTIMERS 0
 #endif
 
 #define HWTIMER_SPEED  (F_RC_OSCILLATOR)
