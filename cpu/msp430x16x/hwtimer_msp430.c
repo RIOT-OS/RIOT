@@ -28,7 +28,7 @@ static uint32_t ticks = 0;
 
 extern void (*int_handler)(int);
 extern void timer_unset(short timer);
-extern uint16_t overflow_interrupt[ARCH_MAXTIMERS+1];
+extern uint16_t overflow_interrupt[HWTIMER_MAXTIMERS+1];
 extern uint16_t timer_round;
 
 void timerA_init(void)
@@ -41,7 +41,7 @@ void timerA_init(void)
     TACTL &= ~TAIFG;                         // Clear the IFG
     TACTL &= ~TAIE;                          // Clear the IFG
 
-    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
+    for (int i = 0; i < HWTIMER_MAXTIMERS; i++) {
         ccr = &TACCR0 + (i);
         ctl = &TACCTL0 + (i);
         *ccr = 0;

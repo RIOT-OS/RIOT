@@ -43,7 +43,7 @@ void timerA_init(void)
     volatile unsigned int *ccr = &TA0CCR0;
     volatile unsigned int *ctl = &TA0CCTL0;
 
-    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
+    for (int i = 0; i < HWTIMER_MAXTIMERS; i++) {
         *(ccr + i) = 0;
         *(ctl + i) &= ~(CCIFG);
         *(ctl + i) &= ~(CCIE);
