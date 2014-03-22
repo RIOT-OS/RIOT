@@ -36,11 +36,6 @@ int main(void)
 {
     puts("hwtimer test application...");
 
-    puts("Initializing hwtimer...");
-    hwtimer_init();
-
-    puts("Initializing hwtimer [OK].");
-
     puts("");
     puts("  Timers should print \"callback x\" once when they run out.");
     printf("  The order for x is 1, n-1, n-2, ..., 2 where n is the number of available hardware timers (%u on this platform).\n", ARCH_MAXTIMERS);
