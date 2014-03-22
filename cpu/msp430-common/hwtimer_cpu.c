@@ -82,7 +82,6 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
     (void) fcpu;
     timerA_init();
     int_handler = handler;
-    timer_enable_interrupt(0);
 }
 
 void hwtimer_arch_enable_interrupt(void)
