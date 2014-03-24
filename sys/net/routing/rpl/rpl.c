@@ -148,7 +148,7 @@ static struct rpl_dao_t *get_rpl_dao_buf(void)
 
 static struct rpl_dao_ack_t *get_rpl_dao_ack_buf(void)
 {
-    return ((struct rpl_dao_ack_t *) &(buffer[(LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)]));
+    return ((struct rpl_dao_ack_t *) &(ip_recv_buffer[(LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)]));
 }
 
 static struct rpl_dis_t *get_rpl_dis_buf(void)
@@ -960,7 +960,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
     packet_length = IPV6_HDR_LEN + p_len;
 
     if (ipv6_addr_is_multicast(&ipv6_send_buf->destaddr)) {
-        ipv6_send_packet(ipv6_send_buf);
+        ipv6_send_packet(ipv6_send_buf, 0);
     }
     else {
         /* find appropriate next hop before sending */
@@ -981,7 +981,7 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
             }
         }
 
-        ipv6_send_packet(ipv6_send_buf);
+        ipv6_send_packet(ipv6_send_buf, 1);
     }
 
 }

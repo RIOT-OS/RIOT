@@ -113,6 +113,9 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
  * @param[in] packet            Pointer to an prepared IPv6 packet header.
  *                              The payload is expected directly after the
  *                              packet.
+ * @param[in] keep_src          If 0 the function will set the source address
+ *                              itself, otherwise it assumes the caller had
+ *                              set the source address in *packet*.
  *
  * @return  length of payload : on success
  *          -1                : if no route to the given dest could be obtained
@@ -120,7 +123,7 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
  *                              In case of reactive routing: routing is going
  *                              to try to find a route
  */
-int ipv6_send_packet(ipv6_hdr_t *packet);
+int ipv6_send_packet(ipv6_hdr_t *packet, int keep_src);
 
 /**
  * @brief   Determines if node is a router.
@@ -299,7 +302,7 @@ static inline void ipv6_addr_set_solicited_node_addr(ipv6_addr_t *ipv6_addr_out,
     /* copy only the last 24-bit of the ip-address that is beeing resolved */
     ipv6_addr_out->uint32[0] = HTONL(0xff020000);
     ipv6_addr_out->uint32[1] = 0;
-    ipv6_addr_out->uint32[2] = HTONS(1);
+    ipv6_addr_out->uint32[2] = HTONL(1);
     ipv6_addr_out->uint8[12] = 0xff;
     ipv6_addr_out->uint8[13] = ipv6_addr_in->uint8[13];
     ipv6_addr_out->uint16[7] = ipv6_addr_in->uint16[7];

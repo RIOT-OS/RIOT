@@ -47,7 +47,7 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #define IPV6_NET_IF_ADDR_BUFFER_LEN (NET_IF_MAX * IPV6_NET_IF_ADDR_LIST_LEN)
 
 uint8_t ip_send_buffer[BUFFER_SIZE];
-uint8_t buffer[BUFFER_SIZE];
+uint8_t ip_recv_buffer[BUFFER_SIZE];
 msg_t ip_msg_queue[IP_PKT_RECV_BUF_SIZE];
 ipv6_hdr_t *ipv6_buf;
 icmpv6_hdr_t *icmp_buf;
@@ -68,17 +68,18 @@ static uint8_t default_hop_limit = MULTIHOP_HOPLIMIT;
 /* registered upper layer threads */
 int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
-int ipv6_send_packet(ipv6_hdr_t *packet)
+int ipv6_send_packet(ipv6_hdr_t *packet, int keep_src)
 {
     uint16_t length = IPV6_HDR_LEN + NTOHS(packet->length);
     ndp_neighbor_cache_t *nce;
 
-    ipv6_net_if_get_best_src_addr(&packet->srcaddr, &packet->destaddr);
+    if (!keep_src) {
+        ipv6_net_if_get_best_src_addr(&packet->srcaddr, &packet->destaddr);
+    }
 
     if (!ipv6_addr_is_multicast(&packet->destaddr) &&
         ndp_addr_is_on_link(&packet->destaddr)) {
-        nce = ndp_get_ll_address(&packet->destaddr);
-
+        nce = ndp_get_ll_address(&packet->destaddr, packet);
 
         if (nce == NULL || sixlowpan_lowpan_sendto(nce->if_id, &nce->lladdr,
                 nce->lladdr_len,
@@ -112,7 +113,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
             return -1;
         }
 
-        nce = ndp_get_ll_address(&packet->destaddr);
+        nce = ndp_get_ll_address(&packet->destaddr, packet);
 
         if (nce == NULL || sixlowpan_lowpan_sendto(nce->if_id, &nce->lladdr,
                 nce->lladdr_len,
@@ -140,17 +141,17 @@ uint8_t *get_payload_buf_send(uint8_t ext_len)
 
 ipv6_hdr_t *ipv6_get_buf(void)
 {
-    return ((ipv6_hdr_t *) &buffer[LL_HDR_LEN]);
+    return ((ipv6_hdr_t *) &ip_recv_buffer[LL_HDR_LEN]);
 }
 
 icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len)
 {
-    return ((icmpv6_hdr_t *) &buffer[LLHDR_IPV6HDR_LEN + ext_len]);
+    return ((icmpv6_hdr_t *) &ip_recv_buffer[LLHDR_IPV6HDR_LEN + ext_len]);
 }
 
 uint8_t *get_payload_buf(uint8_t ext_len)
 {
-    return &(buffer[LLHDR_IPV6HDR_LEN + ext_len]);
+    return &(ip_recv_buffer[LLHDR_IPV6HDR_LEN + ext_len]);
 }
 
 int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
@@ -178,7 +179,7 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
 
     memcpy(p_ptr, payload, payload_length);
 
-    return ipv6_send_packet(ipv6_buf);
+    return ipv6_send_packet(ipv6_buf, 0);
 }
 
 void ipv6_set_default_hop_limit(uint8_t hop_limit)
@@ -427,10 +428,10 @@ void ipv6_process(void)
                 continue;
             }
 
-            nce = ndp_get_ll_address(dest);
 
             /* copy received packet to send buffer */
             memcpy(ipv6_get_buf_send(), ipv6_get_buf(), packet_length);
+            nce = ndp_get_ll_address(dest, ipv6_get_buf_send());
 
             /* send packet to node ID derived from dest IP */
             if (nce != NULL) {
@@ -781,7 +782,7 @@ void ipv6_register_rpl_handler(int pid)
 uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t proto)
 {
     uint16_t sum = 0;
-    DEBUG("Calculate checksum over src: %s, dst: %s, len: %04X, buf: %p, proto: %u\n",
+    DEBUG("Calculate checksum over src: %s, dst: %s, len: %d, buf: %p, proto: %u\n",
           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                            &ipv6_header->srcaddr),
           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
