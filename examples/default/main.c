@@ -32,11 +32,11 @@
 #include "board_uart0.h"
 
 #ifdef MODULE_LTC4150
-#include <ltc4150.h>
+#include "ltc4150.h"
 #endif
 
 #ifdef MODULE_TRANSCEIVER
-#include <transceiver.h>
+#include "transceiver.h"
 #endif
 
 #define SND_BUFFER_SIZE     (100)
