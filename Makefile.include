@@ -167,18 +167,19 @@ buildtest:
 	\
 	for BOARD in $${BOARDS}; do \
 		$${ECHO} -n "Building for $${BOARD} .. "; \
-		env -i \
+		LOG=$$(env -i \
 			HOME=$${HOME} \
 			PATH=$${PATH} \
 			BOARD=$${BOARD} \
 			RIOTBASE=$${RIOTBASE} \
 			RIOTBOARD=$${RIOTBOARD} \
 			RIOTCPU=$${RIOTCPU} \
-			$(MAKE) -B clean all >/dev/null 2>&1 ; \
+			$(MAKE) -B clean all 2>&1 >/dev/null) ; \
 		if [ "$${?}" = "0" ]; then \
 			$${ECHO} "$${GREEN}success$${RESET}"; \
 		else \
 			$${ECHO} "$${RED}failed$${RESET}"; \
+			echo "$${LOG}" | grep -v -E '^make(\[[[:digit:]]])?:'; \
 			BUILDTESTFAILED=1; \
 		fi; \
 	done; \
