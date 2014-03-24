@@ -1,6 +1,6 @@
 export PROJECT = test_net_if
 
-BOARD_WHITELIST = native msba2 telosb
+BOARD_BLACKLIST = mbed_lpc1768
 
 include ../Makefile.tests_common
 
@@ -10,17 +10,7 @@ endif
 
 USEMODULE += auto_init
 USEMODULE += net_if
-ifeq ($(BOARD),native)
-	USEMODULE += nativenet
-else ifeq ($(BOARD),msba2)
-	USEMODULE += cc110x_ng
-else ifeq ($(BOARD),telosb)
-	USEMODULE += cc2420
-else ifeq ($(BOARD),wsn430-v1_4)
-	USEMODULE += cc2420
-else ifeq ($(BOARD),iot-lab_M3)
-	USEMODULE += at86rf231
-endif
+USEMODULE += defaulttransceiver
 
 export INCLUDES += -I$(RIOTBASE)/sys/net/include
 

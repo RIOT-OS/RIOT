@@ -94,25 +94,7 @@ void init_transceiver(void)
                         radio,
                         "radio");
 
-    uint16_t transceivers = 0;
-#ifdef MODULE_CC110X
-    transceivers |= TRANSCEIVER_CC1100;
-#endif
-#ifdef MODULE_CC110X_NG
-    transceivers |= TRANSCEIVER_CC1100;
-#endif
-#ifdef MODULE_CC2420
-    transceivers |= TRANSCEIVER_CC2420;
-#endif
-#ifdef MODULE_NATIVENET
-    transceivers |= TRANSCEIVER_NATIVE;
-#endif
-#ifdef MODULE_AT86RF231
-    transceivers |= TRANSCEIVER_AT86RF231;
-#endif
-#ifdef MODULE_MC1322X
-    transceivers |= TRANSCEIVER_MC1322X;
-#endif
+    uint16_t transceivers = TRANSCEIVER_DEFAULT;
 
     transceiver_init(transceivers);
     (void) transceiver_start();

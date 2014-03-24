@@ -30,12 +30,6 @@
 #include "net_if.h"
 #include "ipv6.h"
 
-#ifdef MODULE_NATIVENET
-#define TRANSCEIVER TRANSCEIVER_NATIVE
-#else
-#define TRANSCEIVER TRANSCEIVER_CC1100
-#endif
-
 #ifndef R_ADDR
 #define R_ADDR  (1)
 #endif

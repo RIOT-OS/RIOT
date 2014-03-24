@@ -1,8 +1,6 @@
-USEMODULE += msp430_common
-
 ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-	ifeq (,$(filter cc2420,$(USEMODULE)))
-		USEMODULE += cc2420
+	ifeq (,$(filter nativenet,$(USEMODULE)))
+		USEMODULE += nativenet
 	endif
 	ifeq (,$(filter transceiver,$(USEMODULE)))
 		USEMODULE += transceiver

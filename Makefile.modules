@@ -1,12 +1,15 @@
 export MAKEBASE =$(RIOTBASE)
 UNDEF += $(BINDIR)startup.o
 
+include $(RIOTBASE)/Makefile.pseudomodules
+
 USEMODULE += cpu core sys
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
 ED = $(USEMODULE:%=-DMODULE_%)
 ED += $(USEPKG:%=-DMODULE_%)
 EXTDEFINES = $(shell echo $(ED)|tr 'a-z' 'A-Z')
-export BASELIBS = $(USEMODULE:%= $(BINDIR)%.a)
+REALMODULES = $(filter-out $(PSEUDOMODULES), $(USEMODULE))
+export BASELIBS = $(REALMODULES:%= $(BINDIR)%.a)
 
 CFLAGS += $(EXTDEFINES)
 

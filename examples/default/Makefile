@@ -35,33 +35,22 @@ USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += vtimer
 USEMODULE += auto_init
+USEMODULE += defaulttransceiver
+
 ifneq (,$(filter msb-430,$(BOARD)))
 	USEMODULE += sht11
-endif
-ifneq (,$(filter msb-430h,$(BOARD)))
-	USEMODULE += sht11
-	USEMODULE += cc110x_ng
-endif
-ifneq (,$(filter chronos,$(BOARD)))
-	USEMODULE += cc110x_ng
-endif
-ifneq (,$(filter wsn430-v1_3b,$(BOARD)))
-	USEMODULE += cc110x_ng
 endif
 ifneq (,$(filter msba2,$(BOARD)))
 	USEMODULE += sht11
 	USEMODULE += ltc4150
 	USEMODULE += rtc
 	USEMODULE += mci
-	USEMODULE += cc110x_ng
 	USEMODULE += config
 	USEMODULE += random
 endif
 ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += ltc4150
 	USEMODULE += rtc
-	USEMODULE += nativenet
-	USEMODULE += transceiver
 	USEMODULE += config
 	USEMODULE += random
 endif
