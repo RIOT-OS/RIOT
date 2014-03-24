@@ -77,8 +77,8 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
 
     if (!ipv6_addr_is_multicast(&packet->destaddr) &&
         ndp_addr_is_on_link(&packet->destaddr)) {
+        /* not multicast, on-link */
         nce = ndp_get_ll_address(&packet->destaddr);
-
 
         if (nce == NULL || sixlowpan_lowpan_sendto(nce->if_id, &nce->lladdr,
                 nce->lladdr_len,
@@ -112,14 +112,14 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
             return -1;
         }
 
-        nce = ndp_get_ll_address(&packet->destaddr);
+        nce = ndp_get_ll_address(dest);
 
         if (nce == NULL || sixlowpan_lowpan_sendto(nce->if_id, &nce->lladdr,
                 nce->lladdr_len,
                 (uint8_t *)packet, length) < 0) {
             /* XXX: this is wrong, but until ND does not work correctly,
              *      this is the only way (aka the old way)*/
-            uint16_t raddr = NTOHS(packet->destaddr.uint16[7]);
+            uint16_t raddr = dest->uint16[7];
             sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *)packet, length);
             /* return -1; */
         }
