@@ -54,12 +54,13 @@ msg_t msg_q[RADIO_RCV_BUF_SIZE];
 uint8_t lowpan_mac_buf[PAYLOAD_SIZE];
 static uint8_t macdsn;
 
-static inline void mac_short_to_eui64(net_if_eui64_t *eui64,
-                                      uint16_t short_addr)
+static inline void mac_frame_short_to_eui64(net_if_eui64_t *eui64,
+                                            uint8_t *frame_short)
 {
     eui64->uint32[0] = HTONL(0x000000ff);
     eui64->uint16[2] = HTONS(0xfe00);
-    eui64->uint16[3] = LETONS(short_addr);
+    eui64->uint8[6] = frame_short[1];
+    eui64->uint8[7] = frame_short[0];
 }
 
 void recv_ieee802154_frame(void)
@@ -129,7 +130,7 @@ void recv_ieee802154_frame(void)
 #endif
 
             if (frame.fcf.src_addr_m == IEEE_802154_SHORT_ADDR_M) {
-                mac_short_to_eui64(&src, *((uint16_t *)frame.src_addr));
+                mac_frame_short_to_eui64(&src, frame.src_addr);
             }
             else if (frame.fcf.src_addr_m == IEEE_802154_LONG_ADDR_M) {
                 memcpy(&src, frame.src_addr, 8);
@@ -140,7 +141,7 @@ void recv_ieee802154_frame(void)
             }
 
             if (frame.fcf.dest_addr_m == IEEE_802154_SHORT_ADDR_M) {
-                mac_short_to_eui64(&dst, *((uint16_t *)frame.dest_addr));
+                mac_frame_short_to_eui64(&dst, frame.dest_addr);
             }
             else if (frame.fcf.dest_addr_m == IEEE_802154_LONG_ADDR_M) {
                 memcpy(&dst, frame.dest_addr, 8);
