@@ -59,6 +59,9 @@ endif
 ifneq (,$(filter sixlowborder,$(USEMODULE)))
     DIRS += net/network_layer/sixlowpan/border
 endif
+ifneq (,$(filter routing,$(USEMODULE)))
+    DIRS += net/routing
+endif
 ifneq (,$(filter rpl,$(USEMODULE)))
     DIRS += net/routing/rpl
 endif
