@@ -155,4 +155,4 @@ if __name__ == "__main__":
     try:
         myshell.cmdloop("Welcome to pyterm!\nType 'exit' to exit.")
     except KeyboardInterrupt:
-        sys.exit(0)
+        myshell.do_exit(0)
