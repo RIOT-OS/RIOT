@@ -10,14 +10,16 @@ import cmd, serial, sys, threading, readline, time, logging, os, argparse, re, c
 
 ### set some default options
 defaultport     = "/dev/ttyUSB0"
+defaultbaud     = 115200
 defaultdir      = os.environ['HOME'] + os.path.sep + '.pyterm'
 defaultfile     = "pyterm.conf"
 
 class SerCmd(cmd.Cmd):
 
-    def __init__(self, port=None, confdir=None, conffile=None,):
+    def __init__(self, port=None, baudrate=None, confdir=None, conffile=None,):
         cmd.Cmd.__init__(self)
         self.port = port
+        self.baudrate = baudrate
         self.configdir = confdir
         self.configfile = conffile
 
@@ -58,7 +60,7 @@ class SerCmd(cmd.Cmd):
         if not self.port:
             sys.stderr.write("No port specified, using default (%s)!\n" % (defaultport))
             self.port = defaultport
-        self.ser = serial.Serial(port=self.port, baudrate=115200, dsrdtr=0, rtscts=0)
+        self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, dsrdtr=0, rtscts=0)
         self.ser.setDTR(0)
         self.ser.setRTS(0)
 
@@ -194,7 +196,7 @@ class SerCmd(cmd.Cmd):
                 ignored = False
                 if (len(self.ignores)):
                     for i in self.ignores:
-                        if i.match(output):
+                        if i.search(output):
                             ignored = True
                             break
                 if (len(self.filters)):
@@ -214,15 +216,24 @@ class SerCmd(cmd.Cmd):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Pyterm - The Python terminal program")
-    parser.add_argument("-p", "--port", help="Specifies the serial port to use, default is %s" % defaultport, default=defaultport)
-    parser.add_argument('-d', '--directory', help="Specify the Pyterm directory, default is %s" % defaultdir, default=defaultdir)
-    parser.add_argument("-c", "--config", help="Specify the config filename, default is %s" % defaultfile, default=defaultfile)
+    parser.add_argument("-p", "--port",
+            help="Specifies the serial port to use, default is %s" % defaultport,
+            default=defaultport)
+    parser.add_argument("-b", "--baudrate",
+            help="Specifies baudrate for the serial port, default is %s" % defaultbaud,
+            default=defaultbaud)
+    parser.add_argument('-d', '--directory',
+            help="Specify the Pyterm directory, default is %s" % defaultdir,
+            default=defaultdir)
+    parser.add_argument("-c", "--config",
+            help="Specify the config filename, default is %s" % defaultfile,
+            default=defaultfile)
     args = parser.parse_args()
 
-    myshell = SerCmd(args.port, args.directory, args.config)
+    myshell = SerCmd(args.port, args.baudrate, args.directory, args.config)
     myshell.prompt = ''
 
     try:
         myshell.cmdloop("Welcome to pyterm!\nType 'exit' to exit.")
     except KeyboardInterrupt:
-        myshell.do_exit(0)
+        myshell.do_PYTERM_exit(0)
