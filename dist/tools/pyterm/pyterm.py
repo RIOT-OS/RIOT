@@ -6,18 +6,24 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
-import cmd, serial, sys, threading, readline, time, logging, os, codecs
+import cmd, serial, sys, threading, readline, time, logging, os, argparse, re, codecs
 
 ### set some default options
 defaultport     = "/dev/ttyUSB0"
-pytermdir       = os.environ['HOME'] + os.path.sep + '.pyterm'
-configfile      = "pyterm.conf"
+defaultdir      = os.environ['HOME'] + os.path.sep + '.pyterm'
+defaultfile     = "pyterm.conf"
 
 class SerCmd(cmd.Cmd):
 
-    def __init__(self, port=None):
+    def __init__(self, port=None, confdir=None, conffile=None,):
         cmd.Cmd.__init__(self)
         self.port = port
+        self.configdir = confdir
+        self.configfile = conffile
+
+        if not os.path.exists(self.configdir):
+            os.makedirs(self.configdir)
+
         self.aliases = dict()
         self.load_config()
         try:
@@ -31,7 +37,7 @@ class SerCmd(cmd.Cmd):
         # create formatter
         fmt_str = '%(asctime)s - %(levelname)s # %(message)s'
         formatter = logging.Formatter(fmt_str)
-        logging.basicConfig(filename=pytermdir + os.path.sep + date_str + '.log', level=logging.DEBUG, format=fmt_str)
+        logging.basicConfig(filename=self.configdir + os.path.sep + date_str + '.log', level=logging.DEBUG, format=fmt_str)
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)
 
@@ -118,7 +124,7 @@ class SerCmd(cmd.Cmd):
 
     def load_config(self):
         self.config = configparser.SafeConfigParser()
-        self.config.read([pytermdir + os.path.sep + configfile])
+        self.config.read([self.configdir + os.path.sep + self.configfile])
 
         for sec in self.config.sections():
             if sec == "aliases":
@@ -144,15 +150,14 @@ def reader(ser, logger):
         #sys.stdout.flush()
 
 if __name__ == "__main__":
-    if not os.path.exists(pytermdir):
-        os.makedirs(pytermdir)
 
-    if (len(sys.argv) > 1):
-        port = sys.argv[1]
-    else:
-        port = None
+    parser = argparse.ArgumentParser(description="Pyterm - The Python terminal program")
+    parser.add_argument("-p", "--port", help="Specifies the serial port to use, default is %s" % defaultport, default=defaultport)
+    parser.add_argument('-d', '--directory', help="Specify the Pyterm directory, default is %s" % defaultdir, default=defaultdir)
+    parser.add_argument("-c", "--config", help="Specify the config filename, default is %s" % defaultfile, default=defaultfile)
+    args = parser.parse_args()
 
-    myshell = SerCmd(port)
+    myshell = SerCmd(args.port, args.directory, args.config)
     myshell.prompt = ''
 
     try:
