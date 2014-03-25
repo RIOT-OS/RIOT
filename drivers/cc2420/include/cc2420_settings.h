@@ -97,6 +97,15 @@
 #define CC2420_REG_DACTST       0x2E
 #define CC2420_REG_TOPTST       0x2F
 
+/* Status byte flags */
+#define CC2420_STATUS_XOSC16M_STABLE   0x40
+#define CC2420_STATUS_TX_UNDERFLOW     0x20
+#define CC2420_STATUS_ENC_BUSY         0x10
+#define CC2420_STATUS_TX_ACTIVE        0x08
+#define CC2420_STATUS_PLL_LOCK         0x04
+#define CC2420_STATUS_RSSI_VALID       0x02
+
+/* Misc */
 #define NOBYTE 0x0
 
 /* Settings */

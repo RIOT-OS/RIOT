@@ -46,6 +46,14 @@ uint8_t cc2420_txrx(uint8_t c);
 uint8_t cc2420_get_sfd(void);
 
 /**
+ * @brief Gets the status of the cca pin
+ *
+ * @return Status of the cca pin.
+ *
+ */
+uint8_t cc2420_get_cca(void);
+
+/**
  * @brief Does a hardware reset of the cc2420.
  *
  */

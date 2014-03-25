@@ -176,3 +176,8 @@ uint16_t cc2420_get_pan(void)
     cc2420_read_ram(CC2420_RAM_PANID, (uint8_t *)&pan, sizeof(pan));
     return pan;
 }
+
+inline bool channel_clear(void)
+{
+    return (get_cca() != 0);
+}
