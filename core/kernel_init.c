@@ -27,6 +27,7 @@
 #include "kernel_internal.h"
 #include "sched.h"
 #include "flags.h"
+#include "irq.h"
 #include "cpu.h"
 #include "lpm.h"
 #include "thread.h"
@@ -75,7 +76,7 @@ static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
 
 void kernel_init(void)
 {
-    dINT();
+    disableIRQ();
     printf("kernel_init(): This is RIOT! (Version: %s)\n", VERSION);
 
     hwtimer_init();

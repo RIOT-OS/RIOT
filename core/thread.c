@@ -67,9 +67,9 @@ void thread_sleep()
         return;
     }
 
-    dINT();
+    disableIRQ();
     sched_set_status((tcb_t *)active_thread, STATUS_SLEEPING);
-    eINT();
+    enableIRQ();
     thread_yield();
 }
 
@@ -153,7 +153,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     }
 
     if (!inISR()) {
-        dINT();
+        disableIRQ();
     }
 
     int pid = 0;
@@ -172,7 +172,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
         DEBUG("thread_create(): too many threads!\n");
 
         if (!inISR()) {
-            eINT();
+            enableIRQ();
         }
 
         return -EOVERFLOW;
@@ -212,7 +212,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
 
         if (!(flags & CREATE_WOUT_YIELD)) {
             if (!inISR()) {
-                eINT();
+                enableIRQ();
                 thread_yield();
             }
             else {
@@ -222,7 +222,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     }
 
     if (!inISR() && active_thread != NULL) {
-        eINT();
+        enableIRQ();
     }
 
     return pid;
