@@ -8,8 +8,10 @@ except ImportError:
 
 import cmd, serial, sys, threading, readline, time, logging, os, codecs
 
+### set some default options
 defaultport     = "/dev/ttyUSB0"
 pytermdir       = os.environ['HOME'] + os.path.sep + '.pyterm'
+configfile      = "pyterm.conf"
 
 class SerCmd(cmd.Cmd):
 
@@ -116,7 +118,7 @@ class SerCmd(cmd.Cmd):
 
     def load_config(self):
         self.config = configparser.SafeConfigParser()
-        self.config.read([pytermdir + os.path.sep + 'pyterm.conf'])
+        self.config.read([pytermdir + os.path.sep + configfile])
 
         for sec in self.config.sections():
             if sec == "aliases":
