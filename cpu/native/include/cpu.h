@@ -22,11 +22,6 @@
 #ifndef _CPU_H
 #define _CPU_H
 
-#include "cpu-conf.h"
-
-/* TODO: choose better value? */
-#define F_CPU 1000000
-
 /* TODO: remove once these have been removed from RIOT: */
 void dINT(void);
 void eINT(void);

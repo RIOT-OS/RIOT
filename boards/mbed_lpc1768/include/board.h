@@ -13,6 +13,9 @@
 #include <stdint.h>
 #include "bitarithm.h"
 
+#define F_CPU                   (96000000)
+
+
 #define PIN_LED1 (BIT18)
 #define PIN_LED2 (BIT20)
 #define PIN_LED3 (BIT21)

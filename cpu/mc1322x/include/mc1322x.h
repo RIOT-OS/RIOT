@@ -203,8 +203,6 @@ static volatile struct CRM_struct * const CRM = (void*) (CRM_BASE);
 /*-----------------------------------------------------------------*/
 /* TIMERS */
 
-#define F_CPU   (24000000)				///< CPU target speed in Hz
-
 /* Timer registers are all 16-bit wide with 16-bit access only */
 #define TMR_OFFSET      (0x20)
 #define TMR_BASE        (0x80007000)
