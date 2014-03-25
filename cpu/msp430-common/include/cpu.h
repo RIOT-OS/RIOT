@@ -36,10 +36,6 @@ See the file LICENSE in the top level directory for more details.
 
 #define WORDSIZE 16
 
-/* CPU speed, to be defined in board.h */
-//#define F_CPU               (2457600ul)
-//#define F_RC_OSCILLATOR     (32768) ///< Frequency of internal RC oscillator
-
 extern volatile int __inISR;
 extern char __isr_stack[MSP430_ISR_STACK_SIZE];
 
