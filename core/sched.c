@@ -191,7 +191,7 @@ void sched_task_exit(void)
 {
     DEBUG("sched_task_exit(): ending task %s...\n", active_thread->name);
 
-    dINT();
+    disableIRQ();
     sched_threads[active_thread->pid] = NULL;
     num_tasks--;
 
