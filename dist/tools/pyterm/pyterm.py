@@ -67,6 +67,11 @@ class SerCmd(cmd.Cmd):
         receiver_thread.setDaemon(1)
         receiver_thread.start()
 
+    def precmd(self, line):
+        if (line.startswith("/")):
+                return "PYTERM_" + line[1:]
+        return line
+
     def default(self, line):
         for tok in line.split(';'):
             tok = self.get_alias(tok)
@@ -79,15 +84,15 @@ class SerCmd(cmd.Cmd):
         date = time.strftime("%Y-%m-%d %H:%M:%S")
         return ["{}".format(date)]
 
-    def do_reset(self, line):
+    def do_PYTERM_reset(self, line):
         self.ser.setDTR(1)
         self.ser.setDTR(0)
 
-    def do_exit(self, line):
+    def do_PYTERM_exit(self, line):
         readline.write_history_file()
         sys.exit(0)
 
-    def do_save(self, line):
+    def do_PYTERM_save(self, line):
         if not self.config.has_section("general"):
             self.config.add_section("general")
         self.config.set("general", "port", self.port)
@@ -115,11 +120,11 @@ class SerCmd(cmd.Cmd):
             self.config.write(config_fd)
             print("Config saved")
 
-    def do_show_config(self, line):
+    def do_PYTERM_show_config(self, line):
         for key in self.__dict__:
             print(str(key) + ": " + str(self.__dict__[key]))
 
-    def do_alias(self, line):
+    def do_PYTERM_alias(self, line):
         if line.endswith("list"):
             for alias in self.aliases:
                 print("{} = {}".format(alias, self.aliases[alias]))
@@ -129,7 +134,7 @@ class SerCmd(cmd.Cmd):
             return
         self.aliases[line.split('=')[0].strip()] = line.split('=')[1].strip()
 
-    def do_rmalias(self, line):
+    def do_PYTERM_rmalias(self, line):
         if not self.aliases.pop(line, None):
             sys.stderr.write("Alias not found")
 
@@ -139,10 +144,10 @@ class SerCmd(cmd.Cmd):
                 return self.aliases[alias] + tok[len(alias):]
         return tok
 
-    def do_ignore(self, line):
+    def do_PYTERM_ignore(self, line):
         self.ignores.append(re.compile(line.strip()))
 
-    def do_unignore(self, line):
+    def do_PYTERM_unignore(self, line):
         for r in self.ignores:
             if (r.pattern == line.strip()):
                 print("Remove ignore for %s" % r.pattern)
@@ -150,10 +155,10 @@ class SerCmd(cmd.Cmd):
                 return
         sys.stderr.write("Ignore for %s not found\n" % line.strip())
 
-    def do_filter(self, line):
+    def do_PYTERM_filter(self, line):
         self.filters.append(re.compile(line.strip()))
 
-    def do_unfilter(self, line):
+    def do_PYTERM_unfilter(self, line):
         for r in self.filters:
             if (r.pattern == line.strip()):
                 print("Remove filter for %s" % r.pattern)
