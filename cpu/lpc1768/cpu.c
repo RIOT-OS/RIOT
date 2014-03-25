@@ -33,6 +33,13 @@ unsigned int disableIRQ(void)
     return uiPriMask;
 }
 
+unsigned enableIRQ(void)
+{
+    unsigned int uiPriMask = __get_PRIMASK();
+    __enable_irq();
+    return uiPriMask;
+}
+
 void restoreIRQ(unsigned oldPRIMASK)
 {
     //PRIMASK lesen setzen
