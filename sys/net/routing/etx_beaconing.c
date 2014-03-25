@@ -101,7 +101,6 @@ transceiver_command_t tcmd;
 //Message to send probes with
 msg_t mesg;
 
-//RPL-address
 static ipv6_addr_t *own_address;
 
 static etx_probe_t *etx_get_send_buf(void)
@@ -113,7 +112,7 @@ static etx_probe_t *etx_get_rec_buf(void)
     return ((etx_probe_t *) &(etx_rec_buf[0]));
 }
 
-void show_candidates(void)
+void etx_show_candidates(void)
 {
     etx_neighbor_t *candidate;
     etx_neighbor_t *end;

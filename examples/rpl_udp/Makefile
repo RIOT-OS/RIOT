@@ -54,7 +54,6 @@ USEMODULE += posix
 USEMODULE += ps
 USEMODULE += vtimer
 USEMODULE += defaulttransceiver
-USEMODULE += sixlowpan
 USEMODULE += rpl
 USEMODULE += destiny
 
