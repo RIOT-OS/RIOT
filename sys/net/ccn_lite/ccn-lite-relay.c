@@ -312,19 +312,10 @@ void ccnl_timeout_callback(void *ptr)
 
 int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 {
-    int i, maxfd = -1;
-
     if (ccnl->ifcount == 0) {
         DEBUGMSG(1, "no socket to work with, not good, quitting\n");
         return -1;
     }
-
-    for (i = 0; i < ccnl->ifcount; i++)
-        if (ccnl->ifs[i].sock > maxfd) {
-            maxfd = ccnl->ifs[i].sock;
-        }
-
-    maxfd++;
 
     DEBUGMSG(1, "starting main event and IO loop\n");
 
