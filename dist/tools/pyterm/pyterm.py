@@ -8,7 +8,8 @@ except ImportError:
 
 import cmd, serial, sys, threading, readline, time, logging, os, codecs
 
-pytermdir     = os.environ['HOME'] + os.path.sep + '.pyterm'
+defaultport     = "/dev/ttyUSB0"
+pytermdir       = os.environ['HOME'] + os.path.sep + '.pyterm'
 
 class SerCmd(cmd.Cmd):
 
@@ -22,7 +23,7 @@ class SerCmd(cmd.Cmd):
         except IOError:
             pass
 
-                ### create Logging object
+        ### create Logging object
         my_millis = "{:.4f}".format(time.time())
         date_str = '{}.{}'.format(time.strftime('%Y%m%d-%H:%M:%S'), my_millis[-4:])
         # create formatter
@@ -44,8 +45,8 @@ class SerCmd(cmd.Cmd):
 
     def preloop(self):
         if not self.port:
-            sys.stderr.write("No port specified!\n")
-            sys.exit(-1)
+            sys.stderr.write("No port specified, using default (%s)!\n" % (defaultport))
+            self.port = defaultport
         self.ser = serial.Serial(port=self.port, baudrate=115200, dsrdtr=0, rtscts=0)
         self.ser.setDTR(0)
         self.ser.setRTS(0)
