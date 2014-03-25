@@ -25,8 +25,10 @@ class SerCmd(cmd.Cmd):
             os.makedirs(self.configdir)
 
         self.aliases = dict()
-        self.regs = []
+        self.filters = []
+        self.ignores = []
         self.load_config()
+
         try:
             readline.read_history_file()
         except IOError:
@@ -94,8 +96,22 @@ class SerCmd(cmd.Cmd):
                 self.config.add_section("aliases")
             for alias in self.aliases:
                 self.config.set("aliases", alias, self.aliases[alias])
+        if len(self.filters):
+            if not self.config.has_section("filters"):
+                self.config.add_section("filters")
+            i = 0
+            for r in self.filters:
+                self.config.set("filters", "filter%i" % i, r.pattern)
+                i += 1
+        if len(self.ignores):
+            if not self.config.has_section("ignores"):
+                self.config.add_section("ignores")
+            i = 0
+            for r in self.ignores:
+                self.config.set("ignores", "ignore%i" % i, r.pattern)
+                i += 1
 
-        with open(os.path.expanduser('~/.pyterm'), 'wb') as config_fd:
+        with open(self.configdir + os.path.sep + self.configfile, 'wb') as config_fd:
             self.config.write(config_fd)
             print("Config saved")
 
@@ -123,22 +139,39 @@ class SerCmd(cmd.Cmd):
                 return self.aliases[alias] + tok[len(alias):]
         return tok
 
+    def do_ignore(self, line):
+        self.ignores.append(re.compile(line.strip()))
+
+    def do_unignore(self, line):
+        for r in self.ignores:
+            if (r.pattern == line.strip()):
+                print("Remove ignore for %s" % r.pattern)
+                self.ignores.remove(r)
+                return
+        sys.stderr.write("Ignore for %s not found\n" % line.strip())
+
     def do_filter(self, line):
-        self.regs.append(re.compile(line.strip()))
+        self.filters.append(re.compile(line.strip()))
 
     def do_unfilter(self, line):
-        for r in self.regs:
+        for r in self.filters:
             if (r.pattern == line.strip()):
                 print("Remove filter for %s" % r.pattern)
-                self.regs.remove(r)
+                self.filters.remove(r)
                 return
-        sys.stderr.write("Filter for %s not found" % r.pattern)
+        sys.stderr.write("Filter for %s not found\n" % line.strip())
 
     def load_config(self):
         self.config = configparser.SafeConfigParser()
         self.config.read([self.configdir + os.path.sep + self.configfile])
 
         for sec in self.config.sections():
+            if sec == "filters":
+                for opt in self.config.options(sec):
+                    self.filters.append(re.compile(self.config.get(sec, opt)))
+            if sec == "ignores":
+                for opt in self.config.options(sec):
+                    self.ignores.append(re.compile(self.config.get(sec, opt)))
             if sec == "aliases":
                 for opt in self.config.options(sec):
                     self.aliases[opt] = self.config.get(sec, opt)
@@ -153,12 +186,20 @@ class SerCmd(cmd.Cmd):
         while (1):
             c = sr.read(1)
             if c == '\n' or c == '\r':
-                if (len(self.regs)):
-                    for r in self.regs:
-                        if r.match(output):
-                            self.logger.info(output)
+                ignored = False
+                if (len(self.ignores)):
+                    for i in self.ignores:
+                        if i.match(output):
+                            ignored = True
+                            break
+                if (len(self.filters)):
+                    for r in self.filters:
+                        if r.search(output):
+                            if not ignored:
+                                self.logger.info(output)
                 else:
-                    self.logger.info(output)
+                    if not ignored:
+                        self.logger.info(output)
                 output = ""
             else:
                 output += c
