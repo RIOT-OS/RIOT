@@ -1,0 +1,27 @@
+
+# define the cpu used by the stm32f3-discovery board
+export CPU = stm32f303vc
+
+# define tools used for building the project
+export PREFIX = arm-none-eabi-
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
+export AS = $(PREFIX)as
+export LINK = $(PREFIX)gcc
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+export FLASHER = st-flash
+export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
+
+# define build specific options
+export FPU_USAGE = -mfloat-abi=hard -mfpu=fpv4-sp-d16
+export CFLAGS = -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes -mcpu=cortex-m4 $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
+#export CFLAGS += -flto ffunction-sections -fdata-sections -fno-builtin  # addiontal compiler flags to optimize compiling for newlib-nano
+export ASFLAGS = -ggdb -g3 -mcpu=cortex-m4 $(FPU_USAGE) -mlittle-endian
+export FFLAGS = write bin/$(PROJECT).bin 0x8000000
+export LINKFLAGS = -g3 -ggdb -std=gnu99 -mcpu=cortex-m4 $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles -T$(RIOTBASE)/cpu/$(CPU)/$(CPU)_linkerscript.ld
+export LINKFLAGS += -specs=nano.specs -lc -lnosys                       # additional linker flags to enable newlib-nano
+
+
+# export board specific includes to the global includes-listing
+export INCLUDES += -I$(RIOTBOARD)/stm32f3discovery/include
