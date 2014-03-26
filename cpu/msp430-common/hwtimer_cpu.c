@@ -22,7 +22,7 @@ See the file LICENSE in the top level directory for more details.
 
 void (*int_handler)(int);
 extern void timerA_init(void);
-uint16_t overflow_interrupt[ARCH_MAXTIMERS+1];
+uint16_t overflow_interrupt[HWTIMER_MAXTIMERS+1];
 uint16_t timer_round;
 
 #ifdef CC430
@@ -87,14 +87,14 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
 
 void hwtimer_arch_enable_interrupt(void)
 {
-    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
+    for (int i = 0; i < HWTIMER_MAXTIMERS; i++) {
         timer_enable_interrupt(i);
     }
 }
 
 void hwtimer_arch_disable_interrupt(void)
 {
-    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
+    for (int i = 0; i < HWTIMER_MAXTIMERS; i++) {
         timer_disable_interrupt(i);
     }
 }

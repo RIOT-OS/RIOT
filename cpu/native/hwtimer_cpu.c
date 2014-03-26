@@ -51,8 +51,8 @@
 static unsigned long native_hwtimer_now;
 static unsigned long time_null;
 
-static struct itimerval native_hwtimer[ARCH_MAXTIMERS];
-static int native_hwtimer_isset[ARCH_MAXTIMERS];
+static struct itimerval native_hwtimer[HWTIMER_MAXTIMERS];
+static int native_hwtimer_isset[HWTIMER_MAXTIMERS];
 
 static int next_timer = -1;
 static void (*int_handler)(int);
@@ -126,7 +126,7 @@ void schedule_timer(void)
 {
     /* try to find *an active* timer */
     next_timer = -1;
-    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
+    for (int i = 0; i < HWTIMER_MAXTIMERS; i++) {
         if (native_hwtimer_isset[i] == 1) {
             next_timer = i;
             break;
@@ -139,7 +139,7 @@ void schedule_timer(void)
     }
 
     /* find the next pending timer (next_timer now points to *a* valid pending timer) */
-    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
+    for (int i = 0; i < HWTIMER_MAXTIMERS; i++) {
         if (
             (native_hwtimer_isset[i] == 1) &&
             (tv2ticks(&(native_hwtimer[i].it_value)) < tv2ticks(&(native_hwtimer[next_timer].it_value)))
@@ -315,7 +315,7 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
     hwtimer_arch_disable_interrupt();
     int_handler = handler;
 
-    for (int i = 0; i < ARCH_MAXTIMERS; i++) {
+    for (int i = 0; i < HWTIMER_MAXTIMERS; i++) {
         native_hwtimer_isset[i] = 0;
         native_hwtimer[i].it_interval.tv_sec = 0;
         native_hwtimer[i].it_interval.tv_usec = 0;
