@@ -34,27 +34,28 @@
 #   define FD_MAX 15
 #endif
 
-#ifdef CPU_X86
+#if defined (CPU_X86)
 #   include "x86_uart.h"
+#elif defined (CPU_NATIVE)
+#   include "native_internal.h"
 #endif
 
-static fd_t fd_table[FD_MAX];
+#define FD_TABLE_OFFSET 3
 
-static ssize_t stdio_read(int fd, void *buf_, size_t n)
-{
-    (void) fd;
-    char *buf = buf_;
-    return uart0_read(buf, n);
-}
+static fd_t fd_table[FD_MAX - FD_TABLE_OFFSET];
 
 static ssize_t stdio_write(int fd, const void *buf_, size_t n)
 {
-#ifndef CPU_X86
+    (void) fd;
+#if defined (CPU_X86)
+    return x86_uart_write(buf_, n);
+#elif defined (CPU_NATIVE)
+    return _native_write(fd, buf_, n);
+#else
     if (n == 0) {
         return 0;
     }
 
-    (void) fd;
     const char *buf = buf_;
 
     ssize_t wrote = 0;
@@ -73,24 +74,7 @@ static ssize_t stdio_write(int fd, const void *buf_, size_t n)
         }
     }
     return wrote;
-#else
-    (void) fd;
-    return x86_uart_write(buf_, n);
 #endif
-}
-
-static const fd_ops_t stdio_fd_ops = {
-    .read = stdio_read,
-    .write = stdio_write,
-};
-
-int fd_init(void)
-{
-    for (unsigned i = 0; i < 3; ++i) {
-        fd_table[i].ops = &stdio_fd_ops;
-        fd_table[i].fd = i;
-    }
-    return FD_MAX;
 }
 
 int fd_new(int internal_fd, const fd_ops_t *internal_ops)
@@ -98,12 +82,12 @@ int fd_new(int internal_fd, const fd_ops_t *internal_ops)
     unsigned old_state = disableIRQ();
 
     int result = -ENFILE;
-    for (int i = 0; i < FD_MAX; i++) {
-        if (!fd_table[i].ops) {
+    for (int i = FD_TABLE_OFFSET; i < FD_MAX; i++) {
+        if (!fd_table[i - FD_TABLE_OFFSET].ops) {
             result = i;
 
-            fd_table[i].fd = internal_fd;
-            fd_table[i].ops = internal_ops;
+            fd_table[i - FD_TABLE_OFFSET].fd = internal_fd;
+            fd_table[i - FD_TABLE_OFFSET].ops = internal_ops;
 
             break;
         }
@@ -113,13 +97,53 @@ int fd_new(int internal_fd, const fd_ops_t *internal_ops)
     return result;
 }
 
-fd_t *fd_get(int fd)
+static fd_t *fd_get(int fd)
 {
-    if ((fd >= 0) && (fd < FD_MAX) && fd_table[fd].ops) {
-        return &fd_table[fd];
+    if ((fd >= FD_TABLE_OFFSET) && (fd < FD_MAX) && fd_table[fd - FD_TABLE_OFFSET].ops) {
+        return &fd_table[fd - FD_TABLE_OFFSET];
     }
 
     return NULL;
+}
+
+ssize_t read(int fildes, void *buf, size_t n)
+{
+    if (fildes == STDIN_FILENO) {
+        return uart0_read(buf, n);
+    }
+
+    fd_t *fd_obj = fd_get(fildes);
+
+    if (!fd_obj || !fd_obj->ops->read) {
+        errno = EBADF;
+        return -1;
+    }
+
+    ssize_t result = fd_obj->ops->read(fd_obj->fd, buf, n);
+    if (result < 0) {
+        errno = EIO; // EINTR may not occur since RIOT has no signals yet.
+    }
+    return result;
+}
+
+ssize_t write(int fildes, const void *buf, size_t n)
+{
+    if ((fildes == STDOUT_FILENO) || (fildes == STDERR_FILENO)) {
+        return stdio_write(fildes, buf, n);
+    }
+
+    fd_t *fd_obj = fd_get(fildes);
+
+    if (!fd_obj || !fd_obj->ops->write) {
+        errno = EBADF;
+        return -1;
+    }
+
+    ssize_t result = fd_obj->ops->write(fd_obj->fd, buf, n);
+    if (result < 0) {
+        errno = EIO; // EINTR may not occur since RIOT has no signals yet.
+    }
+    return result;
 }
 
 int close(int fildes)
@@ -132,7 +156,7 @@ int close(int fildes)
     }
 
     if (fd_obj->ops->close && (fd_obj->ops->close(fd_obj->fd) != 0)) {
-        errno = EIO;    // EINTR may not occur since RIOT has no signals yet.
+        errno = EIO; // EINTR may not occur since RIOT has no signals yet.
         return -1;
     }
     fd_obj->ops = NULL;

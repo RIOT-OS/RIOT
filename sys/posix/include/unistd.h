@@ -20,11 +20,13 @@
  *
  * @author  Freie Universität Berlin
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 #ifndef _UNISTD_H
 #define _UNISTD_H
 
 #include <stdint.h>
+#include <sys/types.h>
 
 #include "timex.h"
 #include "vtimer.h"
@@ -32,6 +34,40 @@
 #define STDIN_FILENO    0   ///< stdin file descriptor
 #define STDOUT_FILENO   1   ///< stdout file descriptor
 #define STDERR_FILENO   2   ///< stderr file descriptor
+
+/**
+ * @brief        Read from a file descriptor.
+ * @details      shall attempt to read *nbyte* bytes from the file associated
+ *               with the open file descriptor, *fildes*, into the buffer pointed
+ *               to by *buf*. The behavior of multiple concurrent reads on the
+ *               same pipe, FIFO, or terminal device is unspecified.
+ * @see          <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/read.html">
+ *                   The Open Group Base Specifications Issue 7, read
+ *               </a>
+ * @param        fildes   The file descriptor to read from.
+ * @param[out]   buf      Buffer to read into.
+ * @param        n        Maximum number of bytes to read.
+ * @return       Upon successful completion, a non-negative integer indicating the
+ *               number of bytes actually read.
+ *               Otherwise, the function shall return -1 and set errno to indicate the error.
+ */
+ssize_t read(int fildes, void *buf, size_t n);
+
+/**
+ * @brief        Write to a file descriptor.
+ * @details      shall attempt to write *nbyte* bytes from the buffer pointed to by
+ *               *buf* to the file associated with the open file descriptor, *fildes*.
+ * @see          <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/write.html">
+ *                   The Open Group Base Specifications Issue 7, write
+ *               </a>
+ * @param        fildes   The file descriptor to read from.
+ * @param[int]   buf      Buffer to read from.
+ * @param        n        Maximum number of bytes to write.
+ * @return       Upon successful completion, a non-negative integer indicating the
+ *               number of bytes actually written.
+ *               Otherwise, the function shall return -1 and set errno to indicate the error.
+ */
+ssize_t write(int fildes, const void *buf, size_t n);
 
 /**
  * @brief   Close a file descriptor.

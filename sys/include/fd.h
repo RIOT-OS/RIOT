@@ -51,13 +51,6 @@ typedef struct fd {
 } fd_t;
 
 /**
- * @brief   Initializes file descriptors
- *
- * @return  maximum number of available file descriptors.
- */
-int fd_init(void);
-
-/**
  * @brief Creates a new file descriptor.
  *
  * @param[in] internal_fd RIOT-internal identifier for the new FD.
@@ -66,16 +59,5 @@ int fd_init(void);
  * @return 0 on success, -1 otherwise. *errno* is set accordingly.
  */
 int fd_new(int internal_fd, const fd_ops_t *internal_ops);
-
-/**
- * @brief   Gets the file descriptor table entry associated with file
- *          descriptor *fd*.
- *
- * @param[in] fd    A POSIX-like file descriptor.
- *
- * @return  The file descriptor table entry associated with file descriptor
-            *fd* or NULL if there is non.
- */
-fd_t *fd_get(int fd);
 
 #endif /* FD_H */

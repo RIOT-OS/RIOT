@@ -91,7 +91,6 @@ off_t lseek(int fildes, off_t offset, int whence)
 
 int close(int fildes)
 {
-    /* TODO */
     (void) fildes;
     return -1;
 }
@@ -114,10 +113,6 @@ ssize_t read(int fildes, void *buf, size_t nbyte)
 #endif
     }
 
-    /* TODO: find appropriate FILE */
-    (void) fildes;
-    (void) buf;
-    (void) nbyte;
     return -1;
 }
 
@@ -135,10 +130,6 @@ ssize_t write(int fildes, const void *buf, size_t nbyte)
         return x86_uart_write(buf, nbyte);
     }
 
-    /* TODO: find appropriate FILE */
-    (void) fildes;
-    (void) buf;
-    (void) nbyte;
     return -1;
 }
 
