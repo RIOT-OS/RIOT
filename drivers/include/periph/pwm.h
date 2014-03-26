@@ -24,25 +24,32 @@
 
 /**
  * @brief Definition of available PWM devices
+ * 
+ * To this point a maximum of four PWM device is available.
  */
-#ifdef PWM_NUMOF
 typedef enum {
-#ifdef PWM_0_EN
-    PWM_0,              ///< first PWM device
+#if PWM_0_EN
+    PWM_0,              /*< 1st PWM device */
 #endif
-#ifdef PWM_1_EN
-    PWM_1               ///< Second PWM device
+#if PWM_1_EN
+    PWM_1,              /*< 2nd PWM device */
 #endif
+#if PWM_2_EN
+    PWM_2,              /*< 3rd PWM device */
+#endif
+#if PWM_3_EN
+    PWM_3,              /*< 4th PWM device */
+#endif
+    PWM_UNDEFINED
 } pwm_t;
-#endif
 
 /**
  * @brief Definition of available PWM modes
  */
 typedef enum {
-    PWM_LEFT,           ///< use left aligned PWM
-    PWM_RIGHT,          ///< use right aligned PWM
-    PWM_CENTER          ///< use center aligned PWM
+    PWM_LEFT,           /*< use left aligned PWM */
+    PWM_RIGHT,          /*< use right aligned PWM */
+    PWM_CENTER          /*< use center aligned PWM */
 } pwm_mode_t;
 
 
@@ -54,7 +61,7 @@ typedef enum {
  * are always identical for the complete device, hence for every channel on a device.
  * 
  * The desired frequency and resolution may not be possible on a given device when chosen
- * to large. In this case the PWM driver will always keep the resolution and decrease the
+ * too large. In this case the PWM driver will always keep the resolution and decrease the
  * frequency if needed. To verify the correct settings compare the returned value which
  * is the actually set frequency.
  * 
@@ -62,9 +69,8 @@ typedef enum {
  * @param mode          PWM mode, left, right or center aligned
  * @param frequency     the PWM frequency in Hz
  * @param resolution    the PWM resolution
- * @return              the actually set frequency, 
- *                      0 if frequency and resolution settings are not applicable,
- *                      -1 on error
+ * @return              0 on success, -1 if requested mode and/or frequency and resolution
+ *                      not applicable
  */
 int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int resolution);
 
@@ -77,7 +83,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
  * @param dev           the PWM device to set
  * @param channel       the channel of the given device to set
  * @param value         the desired duty-cycle to set
- * @return              the actually set duty-cycle, -1 on invalid device or channel
+ * @return              0 on success, -1 on invalid device or channel
  */
 int pwm_set(pwm_t dev, int channel, unsigned int value);
 
