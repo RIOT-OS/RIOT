@@ -34615,7 +34615,7 @@ diff -crB openwsn/opentimers.h ../../../sys/net/openwsn/opentimers.h
 ! 
 ! typedef void (*opentimers_cbt)(void);
 ! 
-! #define OPENTIMERS_HWTIMER_ID (ARCH_MAXTIMERS - 1)
+! #define OPENTIMERS_HWTIMER_ID (HWTIMER_MAXTIMERS - 1)
 ! 
 ! //=========================== typedef =========================================
 ! 
