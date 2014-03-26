@@ -272,8 +272,7 @@ void native_irq_handler(void)
             DEBUG("ignoring SIGUSR1\n");
         }
         else {
-            DEBUG("XXX: no handler for signal %i\n", sig);
-            errx(1, "XXX: this should not have happened!\n");
+            errx(EXIT_FAILURE, "XXX: no handler for signal %i\nXXX: this should not have happened!\n", sig);
         }
     }
 
