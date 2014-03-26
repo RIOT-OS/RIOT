@@ -145,6 +145,17 @@ uint8_t ndp_neighbor_cache_add(int if_id, const ipv6_addr_t *ipaddr,
                                const void *lladdr, uint8_t lladdr_len,
                                uint8_t isrouter, ndp_nce_state_t state,
                                ndp_nce_type_t type, uint16_t ltime);
+
+/**
+ * @brief   Removes an address from the neighbor cache by IPv6 address.
+ *
+ * @param[in] ipaddr        IPv6 address to remove, leave NULL if you only want
+ *                          to remove by Link-layer address.
+ *
+ * @return  1 on success, 0 otherwise.
+ */
+uint8_t ndp_neighbor_cache_remove(const ipv6_addr_t *ipaddr);
+
 ndp_neighbor_cache_t *ndp_neighbor_cache_search(ipv6_addr_t *ipaddr);
 ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_addr_t *ipaddr);
 int ndp_addr_is_on_link(ipv6_addr_t *dest_addr);

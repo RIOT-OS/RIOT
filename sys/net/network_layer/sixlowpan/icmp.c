@@ -145,7 +145,6 @@ uint8_t recvd_pref_len = 0;
 
 void def_rtr_lst_add(ipv6_addr_t *ipaddr, uint32_t rtr_ltime);
 void def_rtr_lst_rem(ndp_default_router_list_t *entry);
-void nbr_cache_rem(ipv6_addr_t *addr);
 
 /**
  * @brief   Set Source link-layer address option according to interface
@@ -1130,7 +1129,7 @@ void recv_nbr_sol(void)
                                 /* update neighbor cache entry */
                                 if (opt_aro_buf->reg_ltime == 0) {
                                     /* delete neighbor cache entry */
-                                    nbr_cache_rem(&nbr_entry->addr);
+                                    ndp_neighbor_cache_remove(&nbr_entry->addr);
                                 }
                                 else {
                                     set_remaining_time(&(nbr_entry->ltime), (uint32_t)opt_aro_buf->reg_ltime);
@@ -1590,18 +1589,22 @@ void nbr_cache_auto_rem(void)
     }
 }
 
-void nbr_cache_rem(ipv6_addr_t *addr)
+uint8_t ndp_neighbor_cache_remove(const ipv6_addr_t *ipaddr)
 {
     int i;
+    uint8_t removed = 0;
 
     for (i = 0; i < NBR_CACHE_SIZE; i++) {
-        if (memcmp(&(nbr_cache[i].addr.uint8[0]), &(addr->uint8[0]), 16) == 0) {
+        if (memcmp(&(nbr_cache[i].addr.uint8[0]), &(ipaddr->uint8[0]), 16) == 0) {
             memmove(&(nbr_cache[i]), &(nbr_cache[nbr_count]),
                     sizeof(ndp_neighbor_cache_t));
             memset(&(nbr_cache[nbr_count]), 0, sizeof(ndp_neighbor_cache_t));
             nbr_count--;
+            removed = 1;
         }
     }
+
+    return removed;
 }
 
 //------------------------------------------------------------------------------
