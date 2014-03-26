@@ -24,6 +24,7 @@
 #include "posix_io.h"
 #include "board_uart0.h"
 #include "unistd.h"
+#include "irq.h"
 
 #include "fd.h"
 
@@ -31,6 +32,10 @@
 #   define FD_MAX 5
 #else
 #   define FD_MAX 15
+#endif
+
+#ifdef CPU_X86
+#   include "x86_uart.h"
 #endif
 
 static fd_t fd_table[FD_MAX];
@@ -44,6 +49,7 @@ static ssize_t stdio_read(int fd, void *buf_, size_t n)
 
 static ssize_t stdio_write(int fd, const void *buf_, size_t n)
 {
+#ifndef CPU_X86
     if (n == 0) {
         return 0;
     }
@@ -67,87 +73,53 @@ static ssize_t stdio_write(int fd, const void *buf_, size_t n)
         }
     }
     return wrote;
+#else
+    (void) fd;
+    return x86_uart_write(buf_, n);
+#endif
 }
 
-static int stdio_close(int fd)
-{
-    (void) fd;
-    return 0;
-}
+static const fd_ops_t stdio_fd_ops = {
+    .read = stdio_read,
+    .write = stdio_write,
+};
 
 int fd_init(void)
 {
-    fd_t fd = {
-        .__active = 1,
-        .read = stdio_read,
-        .write = stdio_write,
-        .close = stdio_close,
-    };
-
-    fd_table[STDIN_FILENO] = fd;
-    fd_table[STDOUT_FILENO] = fd;
-    fd_table[STDERR_FILENO] = fd;
-
-    fd_table[STDIN_FILENO].fd = STDIN_FILENO;
-    fd_table[STDOUT_FILENO].fd = STDOUT_FILENO;
-    fd_table[STDERR_FILENO].fd = STDERR_FILENO;
-
+    for (unsigned i = 0; i < 3; ++i) {
+        fd_table[i].ops = &stdio_fd_ops;
+        fd_table[i].fd = i;
+    }
     return FD_MAX;
 }
 
-static int fd_get_next_free(void)
+int fd_new(int internal_fd, const fd_ops_t *internal_ops)
 {
-    for (int i = 0; i < FD_MAX; i++) {
-        fd_t *cur = &fd_table[i];
+    unsigned old_state = disableIRQ();
 
-        if (!cur->__active) {
-            return i;
+    int result = -ENFILE;
+    for (int i = 0; i < FD_MAX; i++) {
+        if (!fd_table[i].ops) {
+            result = i;
+
+            fd_table[i].fd = internal_fd;
+            fd_table[i].ops = internal_ops;
+
+            break;
         }
     }
 
-    return -1;
-}
-
-int fd_new(int internal_fd, ssize_t (*internal_read)(int, void *, size_t),
-           ssize_t (*internal_write)(int, const void *, size_t),
-           int (*internal_close)(int))
-{
-    int fd = fd_get_next_free();
-
-    if (fd >= 0) {
-        fd_t *fd_s = fd_get(fd);
-        fd_s->__active = 1;
-        fd_s->fd = internal_fd;
-        fd_s->read = internal_read;
-        fd_s->write = internal_write;
-        fd_s->close = internal_close;
-    }
-    else {
-        errno = ENFILE;
-        return -1;
-    }
-
-    return fd;
+    restoreIRQ(old_state);
+    return result;
 }
 
 fd_t *fd_get(int fd)
 {
-    if (fd >= 0 && fd < FD_MAX) {
+    if ((fd >= 0) && (fd < FD_MAX) && fd_table[fd].ops) {
         return &fd_table[fd];
     }
 
     return NULL;
-}
-
-void fd_destroy(int fd)
-{
-    fd_t *cur = fd_get(fd);
-
-    if (!cur) {
-        return;
-    }
-
-    memset(cur, 0, sizeof(fd_t));
 }
 
 int close(int fildes)
@@ -159,12 +131,11 @@ int close(int fildes)
         return -1;
     }
 
-    if (fd_obj->close(fd_obj->fd) < 0) {
+    if (fd_obj->ops->close && (fd_obj->ops->close(fd_obj->fd) != 0)) {
         errno = EIO;    // EINTR may not occur since RIOT has no signals yet.
         return -1;
     }
-
-    fd_destroy(fd_obj->fd);
+    fd_obj->ops = NULL;
 
     return 0;
 }

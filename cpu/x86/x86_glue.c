@@ -49,17 +49,6 @@ void _exit(int status)
     UNREACHABLE();
 }
 
-#ifndef MODULE_POSIX
-/* Already defined in /sys/posix/unistd.c */
-
-int close(int fildes)
-{
-    /* TODO */
-    (void) fildes;
-    return -1;
-}
-#endif
-
 pid_t getpid(void)
 {
     return sched_active_pid;
@@ -95,6 +84,16 @@ off_t lseek(int fildes, off_t offset, int whence)
     (void) offset;
     (void) whence;
     return (off_t) -1;
+}
+
+#ifndef MODULE_POSIX
+/* Already defined in /sys/posix/unistd.c */
+
+int close(int fildes)
+{
+    /* TODO */
+    (void) fildes;
+    return -1;
 }
 
 ssize_t read(int fildes, void *buf, size_t nbyte)
@@ -143,3 +142,4 @@ ssize_t write(int fildes, const void *buf, size_t nbyte)
     return -1;
 }
 
+#endif /* ifndef MODULE_POSIX */
