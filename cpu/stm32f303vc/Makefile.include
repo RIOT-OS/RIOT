@@ -1,0 +1,37 @@
+
+# this CPU implementation is using the new core/CPU interface
+export CFLAGS += -DCOREIF_NG=1
+
+# tell the build system that the CPU depends on the Cortex-M common files
+export USEMODULE += cortexm_common
+
+# define path to cortex-m common module, which is needed for this CPU
+export CORTEX_COMMON = $(RIOTCPU)/cortexm_common
+
+# define the ST standard peripheral library and the specific CPU
+export STM_LIB_BASE = $(RIOTBASE)/pkg/stm32f3_stdperiph_lib/
+
+# add the type of MCU used to the compiler flags 
+# (see stmlib/Libraries/CMSIS/Device/ST/STM32F30x/Include/stm32f30x.h for available types)
+export CFLAGS += -DUSE_STDPERIPH_DRIVER -DSTM32F30X
+
+# define the linker script to use for this CPU
+export LINKERSCRIPT = $(RIOTCPU)/$(CPU)/stm32f303vc_linkerscript.ld
+
+# include CPU specific includes
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+# include the lib (for ringbuffer use) TODO remove this
+export INCLUDES += -I$(RIOTBASE)/sys/lib
+
+# add the CPU specific system calls implementations for the linker
+export UNDEF += $(BINDIR)syscalls.o
+
+# export the bsp to be linked into the final binary
+# TODO: this is only temporary, the CPU Makefile needs to be changed so the bsp objects are packed into cpu.a
+export USEMODULE += periph
+
+# CPU depends on the cortex-m common module, so include it
+include $(CORTEX_COMMON)/Makefile.include
+
+# the stm32f303vc depends on the STM32F3 std peripheral library, so include this
+include $(STM_LIB_BASE)Makefile.include
