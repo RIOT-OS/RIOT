@@ -6,6 +6,8 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
+from twisted.internet import reactor
+from twisted.internet.protocol import Protocol, ReconnectingClientFactory
 import cmd, serial, sys, threading, readline, time, logging, os, argparse, re, codecs
 
 ### set some default options
@@ -16,7 +18,7 @@ defaultfile     = "pyterm.conf"
 
 class SerCmd(cmd.Cmd):
 
-    def __init__(self, port=None, baudrate=None, confdir=None, conffile=None,):
+    def __init__(self, port=None, baudrate=None, confdir=None, conffile=None):
         cmd.Cmd.__init__(self)
         self.port = port
         self.baudrate = baudrate
@@ -29,6 +31,7 @@ class SerCmd(cmd.Cmd):
         self.aliases = dict()
         self.filters = []
         self.ignores = []
+        self.json_regs = dict()
         self.load_config()
 
         try:
@@ -92,7 +95,9 @@ class SerCmd(cmd.Cmd):
 
     def do_PYTERM_exit(self, line):
         readline.write_history_file()
-        sys.exit(0)
+        if reactor.running:
+            reactor.stop()
+        return True
 
     def do_PYTERM_save(self, line):
         if not self.config.has_section("general"):
@@ -103,6 +108,11 @@ class SerCmd(cmd.Cmd):
                 self.config.add_section("aliases")
             for alias in self.aliases:
                 self.config.set("aliases", alias, self.aliases[alias])
+        if len(self.json_regs):
+            if not self.config.has_section("json_regs"):
+                self.config.add_section("json_regs")
+            for j in self.json_regs:
+                self.config.set("json_regs", j, self.json_regs[j].pattern)
         if len(self.filters):
             if not self.config.has_section("filters"):
                 self.config.add_section("filters")
@@ -168,6 +178,13 @@ class SerCmd(cmd.Cmd):
                 return
         sys.stderr.write("Filter for %s not found\n" % line.strip())
 
+    def do_PYTERM_json(self, line):
+        self.json_regs[line.split(' ')[0].strip()] = re.compile(line.split(' ')[1].strip())
+
+    def do_PYTERM_unjson(self, line):
+        if not self.aliases.pop(line, None):
+            sys.stderr.write("JSON regex with ID %s not found" % line)
+
     def load_config(self):
         self.config = configparser.SafeConfigParser()
         self.config.read([self.configdir + os.path.sep + self.configfile])
@@ -179,6 +196,10 @@ class SerCmd(cmd.Cmd):
             if sec == "ignores":
                 for opt in self.config.options(sec):
                     self.ignores.append(re.compile(self.config.get(sec, opt)))
+            if sec == "json_regs":
+                for opt in self.config.options(sec):
+                    print("add json regex for %s" % self.config.get(sec, opt))
+                    self.json_regs[opt] = re.compile(self.config.get(sec, opt))
             if sec == "aliases":
                 for opt in self.config.options(sec):
                     self.aliases[opt] = self.config.get(sec, opt)
@@ -207,11 +228,58 @@ class SerCmd(cmd.Cmd):
                 else:
                     if not ignored:
                         self.logger.info(output)
+
+                if (len(self.json_regs)) and self.factory and self.factory.myproto:
+                    for j in self.json_regs:
+                        m = self.json_regs[j].search(output)
+                        if m:
+                            json_obj = '{"id":%d, ' % int(j)
+                            json_obj += '"raw":"%s", ' % output
+                            for g in m.groupdict():
+                                json_obj += '"%s":"%s", ' % (g, m.groupdict()[g])
+
+                            # eliminate the superfluous last ", "
+                            json_obj = json_obj[:-2]
+
+                            json_obj += "}"
+                            self.factory.myproto.sendMessage(json_obj)
+
                 output = ""
             else:
                 output += c
             #sys.stdout.write(c)
             #sys.stdout.flush()
+
+class PytermProt(Protocol):
+    def dataReceived(self, data):
+        stdout.write(data)
+
+    def sendMessage(self, msg):
+        self.transport.write("%d#%s\n" % (len(msg), msg))
+
+class PytermClientFactory(ReconnectingClientFactory):
+
+    def __init__(self):
+        self.myproto = None
+
+    def startedConnecting(self, connector):
+        print('Started to connect.')
+
+    def buildProtocol(self, addr):
+        print('Connected.')
+        print('Resetting reconnection delay')
+        self.resetDelay()
+        self.myproto = PytermProt()
+        return self.myproto
+
+    def clientConnectionLost(self, connector, reason):
+        print('Lost connection.  Reason:', reason)
+        ReconnectingClientFactory.clientConnectionLost(self, connector, reason)
+
+    def clientConnectionFailed(self, connector, reason):
+        print('Connection failed. Reason:', reason)
+        ReconnectingClientFactory.clientConnectionFailed(self, connector,
+                                                         reason)
 
 if __name__ == "__main__":
 
@@ -228,12 +296,25 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--config",
             help="Specify the config filename, default is %s" % defaultfile,
             default=defaultfile)
+    parser.add_argument("-s", "--server",
+            help="Connect via TCP to this server to send output as JSON")
+    parser.add_argument("-P", "--tcp_port", type=int,
+            help="Port at the JSON server")
     args = parser.parse_args()
 
     myshell = SerCmd(args.port, args.baudrate, args.directory, args.config)
     myshell.prompt = ''
 
     try:
-        myshell.cmdloop("Welcome to pyterm!\nType 'exit' to exit.")
+        if args.server and args.tcp_port:
+            myfactory = PytermClientFactory()
+            reactor.connectTCP(args.server, args.tcp_port, myfactory)
+            myshell.factory = myfactory
+            reactor.callInThread(myshell.cmdloop, "Welcome to pyterm!\nType 'exit' to exit.")
+            reactor.run()
+            sys.exit(0)
+        else:
+            myshell.cmdloop("Welcome to pyterm!\nType 'exit' to exit.")
+            sys.exit(0)
     except KeyboardInterrupt:
         myshell.do_PYTERM_exit(0)
