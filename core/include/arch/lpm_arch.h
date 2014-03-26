@@ -25,14 +25,19 @@
 /**
  * @brief Define the mapping between the architecture independent interfaces
           and the kernel internal interfaces
+ * 
+ * This mapping is done for compatibility of existing platforms, 
+ * new platforms should always use the *_arch_* interfaces.
  * @{
  */
+#ifdef COREIF_NG
 #define lpm_init            lpm_arch_init
 #define lpm_set             lpm_arch_set
 #define lpm_get             lpm_arch_get
 #define lpm_awake           lpm_arch_awake
 #define lpm_begin_awake     lpm_arch_begin_awake
 #define lpm_end_awake       lpm_arch_end_awake
+#endif
 /** @} */
 
 /**

@@ -24,12 +24,17 @@
 
 /**
  * @brief Define mapping between kernel internal and arch interfaces
+ * 
+ * This mapping is done for compatibility of existing platforms, 
+ * new platforms should always use the *_arch_* interfaces.
  * @{
  */
+#ifdef COREIF_NG
 #define enableIRQ       irq_arch_enable
 #define disableIRQ      irq_arch_disable
 #define restoreIRQ      irq_arch_restore
 #define inISR           irq_arch_in
+#endif
 /** @} */
 
 /**

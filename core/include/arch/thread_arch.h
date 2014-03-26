@@ -20,10 +20,21 @@
 #define __THREAD_ARCH_H
 
 
+/**
+ * @brief Define the mapping between the architecture independent interfaces
+          and the kernel internal interfaces
+ * 
+ * This mapping is done for compatibility of existing platforms, 
+ * new platforms should always use the *_arch_* interfaces.
+ * @{
+ */
+#ifdef COREIF_NG
 #define thread_stack_init               thread_arch_stack_init
 #define thread_print_stack              thread_arch_print_stack
 #define cpu_switch_context_exit         thread_arch_start_threading
 #define thread_yield                    thread_arch_yield
+#endif
+/** @} */
 
 
 

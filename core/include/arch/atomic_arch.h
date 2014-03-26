@@ -21,9 +21,14 @@
 
 /**
  * @brief Define mappings between arch and internal interfaces
+ * 
+ * This mapping is done for compatibility of existing platforms, 
+ * new platforms should always use the *_arch_* interfaces.
  * @{
  */
+#ifdef COREIF_NG
 #define atomic_set_return       atomic_arch_set_return
+#endif
 /** @} */
 
 /**
