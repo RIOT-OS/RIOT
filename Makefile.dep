@@ -80,3 +80,7 @@ endif
 ifneq (,$(filter ccn_lite,$(USEMODULE)))
 	USEMODULE += crypto
 endif
+
+ifneq (,$(filter pipe,$(USEMODULE)))
+	USEMODULE += lib
+endif
