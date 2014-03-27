@@ -39,11 +39,13 @@ void ringbuffer_init(ringbuffer_t *rb, char *buffer, unsigned int bufsize)
     rb->avail = 0;
 }
 
-void rb_add_elements(ringbuffer_t *rb, char *buf, int n)
+int rb_add_elements(ringbuffer_t *rb, const char *buf, int n)
 {
-    for (int i = 0; i < n; i++) {
-        rb_add_element(rb, buf[i]);
+    int i = 0;
+    while ((i < n) && (rb->avail < rb->size)) {
+        rb_add_element(rb, buf[i++]);
     }
+    return i;
 }
 
 void rb_add_element(ringbuffer_t *rb, char c)
