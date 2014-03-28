@@ -426,9 +426,6 @@ void recv_echo_repl(void)
             printf("\n");
         }
     }
-
-#else
-    return;
 #endif
 }
 
