@@ -31,9 +31,6 @@ export QUIET ?= 1
 
 USEMODULE += config
 USEMODULE += posix
-USEMODULE += auto_init
-
-USEMODULE += auto_init
 
 USEMODULE += transceiver
 ifeq ($(BOARD),msba2)

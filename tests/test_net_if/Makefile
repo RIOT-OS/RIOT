@@ -8,7 +8,6 @@ ifeq ($(BOARD),stm32f4discovery)
 	include Makefile.$(BOARD)
 endif
 
-USEMODULE += auto_init
 USEMODULE += net_if
 USEMODULE += defaulttransceiver
 
