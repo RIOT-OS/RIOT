@@ -32,7 +32,6 @@ CFLAGS += "-Wno-cpp"
 
 # Modules to include:
 
-USEMODULE += auto_init
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += posix

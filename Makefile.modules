@@ -1,8 +1,10 @@
 UNDEF += $(BINDIR)startup.o
 
 include $(RIOTBASE)/Makefile.pseudomodules
+include $(RIOTBASE)/Makefile.defaultmodules
 
-USEMODULE += cpu core sys
+USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
+
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
 ED = $(USEMODULE:%=-DMODULE_%)
 ED += $(USEPKG:%=-DMODULE_%)

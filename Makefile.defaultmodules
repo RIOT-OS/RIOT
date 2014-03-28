@@ -1,0 +1,3 @@
+DEFAULT_MODULE += cpu core sys
+
+DEFAULT_MODULE += auto_init

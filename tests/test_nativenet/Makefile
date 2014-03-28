@@ -5,7 +5,6 @@ ifeq (,$(filter native,$(BOARD)))
 include $(RIOTBASE)/Makefile.unsupported
 else
 
-USEMODULE += auto_init
 USEMODULE += nativenet
 USEMODULE += transceiver
 
