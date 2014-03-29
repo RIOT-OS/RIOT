@@ -20,18 +20,16 @@
 
 #include <stdio.h>
 
-#include "board_uart0.h"
-#include "posix_io.h"
 #include "hwtimer.h"
 #include "thread.h"
 
 char busy_stack[KERNEL_CONF_STACKSIZE_PRINTF];
-int busy, i, k;
+volatile int busy, i, k;
 
 void busy_thread(void)
 {
     int j;
-    printf("busy_thread starting\n");
+    puts("busy_thread starting");
 
     i = 0;
 
@@ -43,24 +41,24 @@ void busy_thread(void)
     printf("j: %i\n", j);
     printf("k: %i\n", k);
 
-    printf("success\n");
+    puts("success");
 }
 
 
 int main(void)
 {
-    posix_open(uart0_handler_pid, 0);
-
     busy = 1;
     k = 23;
     thread_create(busy_stack, KERNEL_CONF_STACKSIZE_PRINTF,
                   PRIORITY_MAIN + 1, CREATE_WOUT_YIELD, busy_thread,
                   "busy_thread");
-    printf("busy_thread created\n");
+    puts("busy_thread created");
 
-    printf("hwtimer_wait()\n");
+    puts("hwtimer_wait()");
     hwtimer_wait(HWTIMER_TICKS(100000));
     busy = 0;
 
-    printf("main: return\n");
+    puts("main: return");
+
+    return 0;
 }
