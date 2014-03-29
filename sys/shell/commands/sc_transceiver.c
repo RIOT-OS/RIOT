@@ -307,7 +307,8 @@ void _transceiver_set_ignore_handler(int argc, char **argv)
         return;
     }
     else if (argc != 2) {
-        printf("Usage:\n%s <address>\n", argv[1]);
+        printf("Usage:\n%s <address>\n", argv[0]);
+        return;
     }
 
     radio_address_t a;
@@ -319,7 +320,7 @@ void _transceiver_set_ignore_handler(int argc, char **argv)
     msg_t mesg;
     mesg.content.ptr = (char*) &tcmd;
 
-    a = atoi(addr + 4);
+    a = atoi(argv[1]);
     printf("[transceiver] trying to add address %" PRIu16 " to the ignore list \n", a);
     mesg.type = DBG_IGN;
     msg_send_receive(&mesg, &mesg, transceiver_pid);
