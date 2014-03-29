@@ -99,12 +99,6 @@ interrupt(USCIAB0RX_VECTOR) __attribute__ ((naked)) usart1irq(void)
 {
     __enter_isr();
 
-#ifndef MODULE_UART0
-    int __attribute__ ((unused)) c;
-#else
-    int c;
-#endif
-
     /* Check status register for receive errors. */
     if (UCA0STAT & UCRXERR) {
         if (UCA0STAT & UCFE) {
@@ -119,14 +113,17 @@ interrupt(USCIAB0RX_VECTOR) __attribute__ ((naked)) usart1irq(void)
         if (UCA0STAT & UCBRK) {
             puts("UART RX break condition -> error");
         }
+
         /* Clear error flags by forcing a dummy read. */
-        c = UCA0RXBUF;
+        volatile char c = UCA0RXBUF;
+        (void) c;
+    }
 #ifdef MODULE_UART0
-    } else if (uart0_handler_pid != KERNEL_PID_UNDEF) {
+    else if (uart0_handler_pid != KERNEL_PID_UNDEF) {
         /* All went well -> let's signal the reception to adequate callbacks */
-        c = UCA0RXBUF;
-        uart0_handle_incoming(c);
-        uart0_notify_thread();
+        char c = UCA0RXBUF;
+        uart0_handle_incoming(&c, 1);
+        thread_yield();
 #endif
     }
 

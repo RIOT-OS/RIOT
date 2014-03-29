@@ -34,6 +34,10 @@
 #include "sched.h"
 #include "x86_uart.h"
 
+#ifdef MODULE_UART0
+#   include "board_uart0.h"
+#endif
+
 #include <signal.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -104,7 +108,11 @@ ssize_t read(int fildes, void *buf, size_t nbyte)
         return -1;
     }
     else if (fildes == STDIN_FILENO) {
+#ifdef MODULE_UART0
+        return uart0_read(buf, nbyte);
+#else
         return x86_uart_read(buf, nbyte);
+#endif
     }
 
     /* TODO: find appropriate FILE */

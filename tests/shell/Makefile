@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += posix
+USEMODULE += uart0
 
 DISABLE_MODULE += auto_init
 

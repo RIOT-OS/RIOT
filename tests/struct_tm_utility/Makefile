@@ -6,8 +6,8 @@ BOARD_INSUFFICIENT_RAM := stm32f0discovery
 DISABLE_MODULE += auto_init
 
 USEMODULE += shell
-USEMODULE += posix
 USEMODULE += timex
+USEMODULE += uart0
 
 # The MSP-430 toolchain lacks sscanf:
 BOARD_BLACKLIST := chronos msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1

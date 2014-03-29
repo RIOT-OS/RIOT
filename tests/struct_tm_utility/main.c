@@ -30,7 +30,6 @@
 #include <stdbool.h>
 
 #include "shell.h"
-#include "posix_io.h"
 #include "board_uart0.h"
 #include "tm.h"
 
@@ -118,28 +117,10 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
-static int shell_readc(void)
-{
-    char c;
-    int result = posix_read(uart0_handler_pid, &c, 1);
-    if (result != 1) {
-        return -1;
-    }
-    return (unsigned char) c;
-}
-
-static void shell_putchar(int c)
-{
-    putchar(c);
-}
-
 int main(void)
 {
-    board_uart0_init();
-    posix_open(uart0_handler_pid, 0);
-
     shell_t shell;
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, shell_readc, shell_putchar);
+    shell_init(&shell, shell_commands, SHELL_BUFSIZE, uart0_readc, uart0_putc);
 
     puts("`struct tm` utility shell.");
     shell_run(&shell);

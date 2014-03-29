@@ -80,13 +80,10 @@ void serial_reader_f(void)
     msg_t m;
     border_packet_t *uart_buf;
 
-    posix_open(uart0_handler_pid, 0);
-
     msg_receive(&m);
     main_pid = m.sender_pid;
 
     while (1) {
-        posix_open(uart0_handler_pid, 0);
         int bytes = readpacket(get_serial_in_buffer(0), BORDER_BUFFER_SIZE);
 
         if (bytes < 0) {

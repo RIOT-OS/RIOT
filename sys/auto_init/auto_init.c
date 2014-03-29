@@ -85,10 +85,6 @@ void auto_init(void)
     DEBUG("Auto init vtimer module.\n");
     vtimer_init();
 #endif
-#ifdef MODULE_UART0
-    DEBUG("Auto init uart0 module.\n");
-    board_uart0_init();
-#endif
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");
     rtc_init();

@@ -16,21 +16,20 @@ void uart2_isr(void)
 {
     if (UART2->USTATbits.RXRDY == 1) {
 #ifdef MODULE_UART0
-
         if (uart0_handler_pid != KERNEL_PID_UNDEF) {
             uint32_t i = 0;
             while (UART2->RXCON != 0) {
-                uart0_handle_incoming(UART2->DATA);
-
+                char c = UART2->DATA;
+                uart0_handle_incoming(&c, 1);
                 if (++i >= UART0_BUFSIZE) {
                     uart0_notify_thread();
                     i = 0;
                 }
             }
-
-            uart0_notify_thread();
+            if (i > 0) {
+                thread_yield();
+            }
         }
-
 #endif
     }
 }

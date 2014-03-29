@@ -35,7 +35,6 @@ void usart0irq(void);
  * \brief the interrupt function
  */
 interrupt(USART0RX_VECTOR) usart0irq(void) {
-    int dummy = 0;
     /* Check status register for receive errors. */
     if(U0RCTL & RXERR) {
         if (U0RCTL & FE) {
@@ -51,13 +50,14 @@ interrupt(USART0RX_VECTOR) usart0irq(void) {
             puts("rx break error");
         }
         /* Clear error flags by forcing a dummy read. */
-        dummy = U0RXBUF;
+        volatile int dummy = U0RXBUF;
+        (void) dummy;
     }
 #ifdef MODULE_UART0
     else if (uart0_handler_pid != KERNEL_PID_UNDEF) {
-                dummy = U0RXBUF;
-                uart0_handle_incoming(dummy);
-                uart0_notify_thread();
-            }
+        int c = U0RXBUF;
+        uart0_handle_incoming(&c, 1);
+        thread_yield();
+    }
 #endif
 }

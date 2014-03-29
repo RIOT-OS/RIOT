@@ -18,6 +18,7 @@
 #include "lpc23xx.h"
 #include "VIC.h"
 #include "kernel.h"
+#include "thread.h"
 
 #include "board_uart0.h"
 
@@ -129,13 +130,19 @@ void UART0_IRQHandler(void)
         case UIIR_RDA_INT:                // Receive Data Available
 #ifdef MODULE_UART0
             if (uart0_handler_pid != KERNEL_PID_UNDEF) {
+                int read_count = 0;
                 do {
-                    int c = U0RBR;
-                    uart0_handle_incoming(c);
-                }
-                while (U0LSR & ULSR_RDR);
+                    char c = U0RBR;
+                    uart0_handle_incoming(&c, 1);
 
-                uart0_notify_thread();
+                    if (++read_count >= UART0_BUFSIZE) {
+                        thread_yield();
+                        read_count = 0;
+                    }
+                } while (U0LSR & ULSR_RDR);
+                if (read_count > 0) {
+                    thread_yield();
+                }
             }
 
 #endif

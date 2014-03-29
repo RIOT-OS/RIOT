@@ -15,70 +15,38 @@
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  *
  * @}
  */
 
 #include <stdio.h>
 
-#include "cpu-conf.h"
-#include "chardev_thread.h"
-#include "ringbuffer.h"
-#include "thread.h"
-#include "msg.h"
-#include "posix_io.h"
-#include "irq.h"
-
 #include "board_uart0.h"
+#include "pipe.h"
 
-#ifndef UART0_BUFSIZE
-#define UART0_BUFSIZE       (128)
-#endif
+static char uart0_buffer[UART0_BUFSIZE];
+static ringbuffer_t uart0_ringbuffer = RINGBUFFER_INIT(uart0_buffer);
+static pipe_t uart0_pipe = PIPE_INIT(uart0_ringbuffer);
 
-/* increase when ENABLE_DEBUG in chardev_thread is set to 1! */
-#define UART0_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT)
-
-ringbuffer_t uart0_ringbuffer;
-kernel_pid_t uart0_handler_pid = KERNEL_PID_UNDEF;
-
-static char buffer[UART0_BUFSIZE];
-
-static char uart0_thread_stack[UART0_STACKSIZE];
-
-void board_uart0_init(void)
+size_t uart0_handle_incoming(const char *buf, size_t n)
 {
-    ringbuffer_init(&uart0_ringbuffer, buffer, UART0_BUFSIZE);
-    kernel_pid_t pid = thread_create(
-                  uart0_thread_stack,
-                  sizeof(uart0_thread_stack),
-                  PRIORITY_MAIN - 1,
-                  CREATE_STACKTEST | CREATE_SLEEPING,
-                  chardev_thread_entry,
-                  &uart0_ringbuffer,
-                  "uart0"
-              );
-    uart0_handler_pid = pid;
-    thread_wakeup(pid);
-    puts("uart0_init() [OK]");
+    return pipe_write(&uart0_pipe, buf, n);
 }
 
-void uart0_handle_incoming(int c)
+ssize_t uart0_read(char *buf, size_t n)
 {
-    ringbuffer_add_one(&uart0_ringbuffer, c);
-}
-
-void uart0_notify_thread(void)
-{
-    msg_t m;
-    m.type = 0;
-    msg_send_int(&m, uart0_handler_pid);
+    return pipe_read(&uart0_pipe, buf, n);
 }
 
 int uart0_readc(void)
 {
-    char c = 0;
-    posix_read(uart0_handler_pid, &c, 1);
-    return c;
+    char c;
+    int result = pipe_read(&uart0_pipe, &c, 1);
+    if (result != 1) {
+        return -1;
+    }
+    return (unsigned char) c;
 }
 
 void uart0_putc(int c)

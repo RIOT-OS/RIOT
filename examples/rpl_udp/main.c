@@ -21,7 +21,6 @@
 #include <stdio.h>
 
 #include "net_if.h"
-#include "posix_io.h"
 #include "shell.h"
 #include "shell_commands.h"
 #include "board_uart0.h"
@@ -44,7 +43,6 @@ int main(void)
     puts("RPL router v"APP_VERSION);
 
     /* start shell */
-    posix_open(uart0_handler_pid, 0);
     net_if_set_src_address_mode(0, NET_IF_TRANS_ADDR_M_SHORT);
 
     shell_t shell;
