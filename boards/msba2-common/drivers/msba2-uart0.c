@@ -18,6 +18,7 @@
 #include "lpc23xx.h"
 #include "VIC.h"
 #include "kernel.h"
+#include "thread.h"
 
 #include "board_uart0.h"
 
@@ -120,6 +121,7 @@ void UART0_IRQHandler(void)
     int iir;
     iir = U0IIR;
 
+    int read_count;
     switch (iir & UIIR_ID_MASK) {
         case UIIR_THRE_INT:               // Transmit Holding Register Empty
             fifo = 0;
@@ -129,16 +131,19 @@ void UART0_IRQHandler(void)
         case UIIR_CTI_INT:                // Character Timeout Indicator
         case UIIR_RDA_INT:                // Receive Data Available
 #ifdef MODULE_UART0
-            if (uart0_handler_pid) {
-                do {
-                    int c = U0RBR;
-                    uart0_handle_incoming(c);
+            read_count = 0;
+            do {
+                char c = U0RBR;
+                uart0_handle_incoming(&c, 1);
+
+                if (++read_count >= UART0_BUFSIZE) {
+                    thread_yield();
+                    read_count = 0;
                 }
-                while (U0LSR & ULSR_RDR);
-
-                uart0_notify_thread();
+            } while (U0LSR & ULSR_RDR);
+            if (read_count > 0) {
+                thread_yield();
             }
-
 #endif
             break;
 

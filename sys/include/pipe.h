@@ -63,6 +63,14 @@ typedef struct riot_pipe
 void pipe_init(pipe_t *pipe, ringbuffer_t *rb, void (*free)(void *));
 
 /**
+ * @def          RINGBUFFER_INIT(BUF)
+ * @brief        Initialize a static pipe.
+ * @param[in]    RB   The static ringbuffer to use.
+ * @returns      The static initializer.
+ */
+#define PIPE_INIT(RB) { &(RB), NULL, NULL, NULL }
+
+/**
  * @brief        Read from a pipe.
  * @details      Only one thread may access the pipe readingly at once.
  *               If the pipe is empty, then the current thread is send sleeping.

@@ -41,8 +41,7 @@ ifneq (,$(filter posix,$(USEMODULE)))
 endif
 
 ifneq (,$(filter uart0,$(USEMODULE)))
-	USEMODULE += lib
-	USEMODULE += posix
+	USEMODULE += pipe
 endif
 
 ifneq (,$(filter cc110x%,$(USEMODULE)))
