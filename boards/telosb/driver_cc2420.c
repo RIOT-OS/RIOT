@@ -207,7 +207,7 @@ interrupt (PORT1_VECTOR) __attribute__ ((naked)) cc2420_isr(void)
         DEBUG("rx interrupt");
     }
     /* GIO0 is falling => check if FIFOP is high, indicating an RXFIFO overflow */
-    else if ((P1IFG & CC2420_GIO0) != 0) {
+    else if ((P1IFG & CC2420_GIO0_PIN) != 0) {
         P1IFG &= ~CC2420_GIO0_PIN;
         if (cc2420_get_fifop()) {
             cc2420_rxoverflow_irq();
