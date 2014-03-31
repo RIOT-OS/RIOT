@@ -39,10 +39,10 @@
 #define DAO_ACK_D_LEN               24
 #define RPL_OPT_LEN                 2
 #define RPL_OPT_DODAG_CONF_LEN      14
-#define RPL_OPT_PREFIX_INFO_LEN		30
-#define RPL_OPT_SOLICITED_INFO_LEN	19
-#define RPL_OPT_TARGET_LEN			18
-#define RPL_OPT_TRANSIT_LEN			4
+#define RPL_OPT_PREFIX_INFO_LEN     30
+#define RPL_OPT_SOLICITED_INFO_LEN  19
+#define RPL_OPT_TARGET_LEN          18
+#define RPL_OPT_TRANSIT_LEN         4
 
 /* message options */
 #define RPL_OPT_PAD1                 0
@@ -60,11 +60,27 @@
 #define RPL_COUNTER_MAX                 255
 #define RPL_COUNTER_LOWER_REGION        127
 #define RPL_COUNTER_SEQ_WINDOW          16
-#define RPL_COUNTER_INIT                RPL_COUNTER_MAX - RPL_COUNTER_SEQ_WINDOW + 1
-#define RPL_COUNTER_INCREMENT(counter)  (counter > RPL_COUNTER_LOWER_REGION ? (counter == RPL_COUNTER_MAX ? counter=0 : ++counter) : (counter == RPL_COUNTER_LOWER_REGION ? counter=0 : ++counter))
-#define RPL_COUNTER_IS_INIT(counter)    (counter > RPL_COUNTER_LOWER_REGION)
-#define RPL_COUNTER_GREATER_THAN_LOCAL(A,B) (((A<B) && (RPL_COUNTER_LOWER_REGION + 1 - B + A < RPL_COUNTER_SEQ_WINDOW)) || ((A > B) && (A-B < RPL_COUNTER_SEQ_WINDOW)))
-#define RPL_COUNTER_GREATER_THAN(A,B)   ((A>RPL_COUNTER_LOWER_REGION) ? ((B > RPL_COUNTER_LOWER_REGION ) ? RPL_COUNTER_GREATER_THAN_LOCAL(A,B) : 0): (( B>RPL_COUNTER_LOWER_REGION ) ? 1: RPL_COUNTER_GREATER_THAN_LOCAL(A,B)))
+#define RPL_COUNTER_INIT                (RPL_COUNTER_MAX - RPL_COUNTER_SEQ_WINDOW + 1)
+
+static inline uint8_t RPL_COUNTER_INCREMENT(uint8_t counter)
+{
+	return (counter > RPL_COUNTER_LOWER_REGION ? (counter == RPL_COUNTER_MAX ? counter=0 : ++counter) : (counter == RPL_COUNTER_LOWER_REGION ? counter=0 : ++counter));
+}
+
+static inline bool RPL_COUNTER_IS_INIT(uint8_t counter)
+{
+	return (counter > RPL_COUNTER_LOWER_REGION);
+}
+
+static inline bool RPL_COUNTER_GREATER_THAN_LOCAL(uint8_t A,uint8_t B)
+{
+	return (((A<B) && (RPL_COUNTER_LOWER_REGION + 1 - B + A < RPL_COUNTER_SEQ_WINDOW)) || ((A > B) && (A-B < RPL_COUNTER_SEQ_WINDOW)));
+}
+
+static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A,uint8_t B)
+{
+	return ((A>RPL_COUNTER_LOWER_REGION) ? ((B > RPL_COUNTER_LOWER_REGION ) ? RPL_COUNTER_GREATER_THAN_LOCAL(A,B) : 0): (( B>RPL_COUNTER_LOWER_REGION ) ? 1: RPL_COUNTER_GREATER_THAN_LOCAL(A,B)));
+}
 
 /* Node Status */
 #define NORMAL_NODE  0

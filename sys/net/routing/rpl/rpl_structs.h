@@ -62,16 +62,13 @@ struct __attribute__((packed)) dodag_id_t {
 };
 
 /* RPL-Option Generic Format (RFC 6550 Fig. 19) */
-typedef struct __attribute__((packed))
-{
+typedef struct __attribute__((packed)) {
     uint8_t type;
     uint8_t length;
-}
-rpl_opt_t;
+} rpl_opt_t;
 
 /* DODAG Configuration-Option (RFC 6550 Fig. 24) */
-typedef struct __attribute__((packed))
-{
+typedef struct __attribute__((packed)) {
     uint8_t type;
     uint8_t length;
     uint8_t flags_a_pcs;
@@ -84,44 +81,37 @@ typedef struct __attribute__((packed))
     uint8_t reserved;
     uint8_t default_lifetime;
     uint16_t lifetime_unit;
-}
-rpl_opt_dodag_conf_t;
+} rpl_opt_dodag_conf_t;
 
 /* RPL Solicited Information Option (RFC 6550 Fig. 28) */
-typedef struct __attribute__((packed))
-{
+typedef struct __attribute__((packed)) {
     uint8_t type;
     uint8_t length;
     uint8_t rplinstanceid;
     uint8_t VID_Flags;
     ipv6_addr_t dodagid;
     uint8_t version;
-}
-rpl_opt_solicited_t;
+} rpl_opt_solicited_t;
 
 /* RPL Target-Option (RFC 6550 Fig. 25) */
 /* TODO: ipv6_addr_t target may be replaced by a target prefix of variable length */
-typedef struct __attribute__((packed))
-{
+typedef struct __attribute__((packed)) {
     uint8_t type;
     uint8_t length;
     uint8_t flags;
     uint8_t prefix_length;
     ipv6_addr_t target;
-}
-rpl_opt_target_t;
+} rpl_opt_target_t;
 
 /* RPL Transit-Option (RFC 6550 Fig. 26) */
-typedef struct __attribute__((packed))
-{
+typedef struct __attribute__((packed)) {
     uint8_t type;
     uint8_t length;
     uint8_t e_flags;
     uint8_t path_control;
     uint8_t path_sequence;
     uint8_t path_lifetime;
-}
-rpl_opt_transit_t;
+} rpl_opt_transit_t;
 
 struct rpl_dodag_t;
 
