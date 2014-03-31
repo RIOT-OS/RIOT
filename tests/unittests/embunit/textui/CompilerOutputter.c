@@ -37,27 +37,40 @@
 
 static void CompilerOutputter_printHeader(OutputterRef self,TestRef test)
 {
+    (void)self;
+    (void)test;
 }
 
 static void CompilerOutputter_printStartTest(OutputterRef self,TestRef test)
 {
+    (void)self;
+    (void)test;
 }
 
 static void CompilerOutputter_printEndTest(OutputterRef self,TestRef test)
 {
+    (void)self;
+    (void)test;
 }
 
 static void CompilerOutputter_printSuccessful(OutputterRef self,TestRef test,int runCount)
 {
+    (void)self;
+    (void)test;
+    (void)runCount;
 }
 
 static void CompilerOutputter_printFailure(OutputterRef self,TestRef test,char *msg,int line,char *file,int runCount)
 {
+    (void)self;
+    (void)runCount;
 	fprintf(stdout,"%s %d: %s: %s\n", file, line, Test_name(test), msg);
 }
 
 static void CompilerOutputter_printStatistics(OutputterRef self,TestResultRef result)
 {
+    (void)self;
+    (void)result;
 }
 
 static const OutputterImplement CompilerOutputterImplement = {

@@ -39,6 +39,7 @@ static char *stylesheet_;
 
 static void XMLOutputter_printHeader(OutputterRef self)
 {
+    (void)self;
 	fprintf(stdout,"<?xml version=\"1.0\" encoding='shift_jis' standalone='yes' ?>\n");
 	if (stylesheet_)
 	fprintf(stdout,"<?xml-stylesheet type=\"text/xsl\" href=\"%s\" ?>\n",stylesheet_);
@@ -47,16 +48,19 @@ static void XMLOutputter_printHeader(OutputterRef self)
 
 static void XMLOutputter_printStartTest(OutputterRef self,TestRef test)
 {
+    (void)self;
 	fprintf(stdout,"<%s>\n",Test_name(test));
 }
 
 static void XMLOutputter_printEndTest(OutputterRef self,TestRef test)
 {
+    (void)self;
 	fprintf(stdout,"</%s>\n",Test_name(test));
 }
 
 static void XMLOutputter_printSuccessful(OutputterRef self,TestRef test,int runCount)
 {
+    (void)self;
 	fprintf(stdout,"<Test id=\"%d\">\n",runCount);
 	fprintf(stdout,"<Name>%s</Name>\n",Test_name(test));
 	fprintf(stdout,"</Test>\n");
@@ -64,6 +68,7 @@ static void XMLOutputter_printSuccessful(OutputterRef self,TestRef test,int runC
 
 static void XMLOutputter_printFailure(OutputterRef self,TestRef test,char *msg,int line,char *file,int runCount)
 {
+    (void)self;
 	fprintf(stdout,"<FailedTest id=\"%d\">\n",runCount);
 	fprintf(stdout,"<Name>%s</Name>\n",Test_name(test));
 	fprintf(stdout,"<Location>\n");
@@ -76,6 +81,7 @@ static void XMLOutputter_printFailure(OutputterRef self,TestRef test,char *msg,i
 
 static void XMLOutputter_printStatistics(OutputterRef self,TestResultRef result)
 {
+    (void)self;
 	fprintf(stdout,"<Statistics>\n");
 	fprintf(stdout,"<Tests>%d</Tests>\n",result->runCount);
 	if (result->failureCount) {

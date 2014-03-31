@@ -43,17 +43,21 @@ static int wasfailure_ = 0;
 
 static void TextUIRunner_startTest(TestListnerRef self,TestRef test)
 {
+    (void)self;
+    (void)test;
 	wasfailure_ = 0;
 }
 
 static void TextUIRunner_endTest(TestListnerRef self,TestRef test)
 {
+    (void)self;
 	if (!wasfailure_)
 		Outputter_printSuccessful(outputterRef_,test,result_.runCount);
 }
 
 static void TextUIRunner_addFailure(TestListnerRef self,TestRef test,char *msg,int line,char *file)
 {
+    (void)self;
 	wasfailure_ = 1;
 	Outputter_printFailure(outputterRef_,test,msg,line,file,result_.runCount);
 }

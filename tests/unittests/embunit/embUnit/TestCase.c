@@ -67,6 +67,7 @@ void TestCase_run(TestCase* self,TestResult* result)
 
 int TestCase_countTestCases(TestCase* self)
 {
+    (void)self;
 	return 1;
 }
 

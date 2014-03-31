@@ -43,11 +43,7 @@ struct __TestFixture {
 	void(*test)(void);
 };
 
-#define new_TestFixture(name,test)\
-	{\
-		name,\
-		test,\
-	}
+#define new_TestFixture(test) { #test, test }
 
 typedef struct __TestCaller		TestCaller;
 typedef struct __TestCaller*	TestCallerRef;/*downward compatible*/
