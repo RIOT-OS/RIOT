@@ -94,7 +94,7 @@ else
 ifneq ($(CPPMIX),1)
 	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS)
 else
-	$(AD)$(CPPMIXCC) $(UNDEF) -o $(BINDIR)$(PROJECT).elf -Wl,--start-group $(CPPMIXEXTRALIBS) $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS) 
+	$(AD)$(CPPMIXCC) $(UNDEF) -o $(BINDIR)$(PROJECT).elf -Wl,--start-group $(CPPMIXEXTRALIBS) $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS)
 endif
 	$(AD)$(SIZE) $(BINDIR)$(PROJECT).elf
 	$(AD)$(OBJCOPY) $(OFLAGS) $(BINDIR)$(PROJECT).elf $(BINDIR)$(PROJECT).hex
