@@ -60,7 +60,7 @@ static void timer_set_nostart(unsigned long value, short timer)
 
 static void timer_set(unsigned long value, short timer)
 {
-    DEBUG("Setting timer %u to %lu\n", timer, value);
+    DEBUG("Setting timer %u to %u overflows and %lu\n", timer, overflow_interrupt[timer], value);
     timer_set_nostart(value, timer);
     timer_enable_interrupt(timer);
 }
@@ -82,7 +82,6 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
     (void) fcpu;
     timerA_init();
     int_handler = handler;
-    timer_enable_interrupt(0);
 }
 
 void hwtimer_arch_enable_interrupt(void)
@@ -107,9 +106,9 @@ void hwtimer_arch_set(unsigned long offset, short timer)
 
 void hwtimer_arch_set_absolute(unsigned long value, short timer)
 {
-    uint16_t small_value = value % 0xFFFF;
+    uint16_t small_value = value & 0xFFFF;
     overflow_interrupt[timer] = (uint16_t)(value >> 16);
-    timer_set(small_value,timer);
+    timer_set(small_value, timer);
 }
 
 void hwtimer_arch_unset(short timer)
