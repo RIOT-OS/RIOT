@@ -66,9 +66,9 @@ void thread_sleep()
         return;
     }
 
-    disableIRQ();
+    disableIRQ(); /* former 'dINT()' */
     sched_set_status((tcb_t *)active_thread, STATUS_SLEEPING);
-    enableIRQ();
+    enableIRQ(); /* former 'eINT()' */
     thread_yield();
 }
 
@@ -152,7 +152,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     }
 
     if (!inISR()) {
-        disableIRQ();
+        disableIRQ();  /* former 'dINT()' */
     }
 
     int pid = 0;
@@ -171,7 +171,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
         DEBUG("thread_create(): too many threads!\n");
 
         if (!inISR()) {
-            enableIRQ();
+            enableIRQ(); /* former 'eINT()' */
         }
 
         return -EOVERFLOW;
@@ -211,7 +211,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
 
         if (!(flags & CREATE_WOUT_YIELD)) {
             if (!inISR()) {
-                enableIRQ();
+                enableIRQ();  /* former 'eINT()' */
                 thread_yield();
             }
             else {
@@ -221,7 +221,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     }
 
     if (!inISR() && active_thread != NULL) {
-        enableIRQ();
+        enableIRQ();  /* former 'eINT()' */
     }
 
     return pid;
