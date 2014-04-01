@@ -33,6 +33,8 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+static void mutex_wait(struct mutex_t *mutex);
+
 int mutex_init(struct mutex_t *mutex)
 {
     mutex->val = 0;
@@ -62,7 +64,7 @@ int mutex_lock(struct mutex_t *mutex)
     return 1;
 }
 
-void mutex_wait(struct mutex_t *mutex)
+static void mutex_wait(struct mutex_t *mutex)
 {
     int irqstate = disableIRQ();
     DEBUG("%s: Mutex in use. %u\n", active_thread->name, mutex->val);
@@ -75,7 +77,7 @@ void mutex_wait(struct mutex_t *mutex)
         return;
     }
 
-    sched_set_status((tcb_t*) active_thread, STATUS_MUTEX_BLOCKED);
+    sched_set_status((tcb_t *) active_thread, STATUS_MUTEX_BLOCKED);
 
     queue_node_t n;
     n.priority = (unsigned int) active_thread->priority;
@@ -101,7 +103,7 @@ void mutex_unlock(struct mutex_t *mutex)
     if (mutex->val != 0) {
         if (mutex->queue.next) {
             queue_node_t *next = queue_remove_head(&(mutex->queue));
-            tcb_t *process = (tcb_t*) next->data;
+            tcb_t *process = (tcb_t *) next->data;
             DEBUG("%s: waking up waiter.\n", process->name);
             sched_set_status(process, STATUS_PENDING);
 
@@ -123,7 +125,7 @@ void mutex_unlock_and_sleep(struct mutex_t *mutex)
     if (mutex->val != 0) {
         if (mutex->queue.next) {
             queue_node_t *next = queue_remove_head(&(mutex->queue));
-            tcb_t *process = (tcb_t*) next->data;
+            tcb_t *process = (tcb_t *) next->data;
             DEBUG("%s: waking up waiter.\n", process->name);
             sched_set_status(process, STATUS_PENDING);
         }
@@ -131,8 +133,9 @@ void mutex_unlock_and_sleep(struct mutex_t *mutex)
             mutex->val = 0;
         }
     }
+
     DEBUG("%s: going to sleep.\n", active_thread->name);
-    sched_set_status((tcb_t*) active_thread, STATUS_SLEEPING);
+    sched_set_status((tcb_t *) active_thread, STATUS_SLEEPING);
     restoreIRQ(irqstate);
     thread_yield();
 }
