@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -25,6 +25,16 @@
 #include <stdio.h>
 #include "sched.h"
 
+/**
+ * @name Print debug information if the calling thread stack is large enough
+ *
+ * Use this macro the same as printf. When DEVHELP is defined inside an
+ * implementation file, all usages of *DEBUG_PRINTF* will print the given
+ * information to std-out. If DEVHELP is not set, all occurrences of
+ * *DEBUG_PRINTF* will be ignored.
+ *
+ * @{
+ */
 #if DEVELHELP
 #include "cpu-conf.h"
 #define DEBUG_PRINT(...) \
@@ -39,7 +49,21 @@
 #else
 #define DEBUG_PRINT(...) printf(__VA_ARGS__)
 #endif
+/** @} */
 
+/**
+ * @brief Print debug information to std-out
+ *
+ * If *ENABLE_DEBUG* is defined inside an implementation file, all calls to
+ * *DEBUG* and *DEBUGF* will work the same as *printf* and output the given
+ * information to stdout. If *ENABLE_DEBUG* is not defined, all calls to
+ * *DEBUG* and *DEBUGF* will be ignored.
+ *
+ * In addition to just printing the given information *DEBUGF* will further
+ * print extended debug information about the current thread and function.
+ *
+ * @{
+ */
 #if ENABLE_DEBUG
 #include "tcb.h"
 #define DEBUG(...) DEBUG_PRINT(__VA_ARGS__)
@@ -55,6 +79,7 @@
 #define DEBUG(...)
 #define DEBUGF(...)
 #endif
-
 /** @} */
+
 #endif /* __DEBUG_H */
+/** @} */
