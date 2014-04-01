@@ -10,54 +10,57 @@
  * @addtogroup  core_util
  * @{
  *
- * @file        lifo.h
- * @brief       LIFO buffer API, read long description carefully
- * @author      probably Kaspar Schleiser
+ * @file    lifo.h
+ * @brief   LIFO buffer API, read long description carefully
+ * @author  Heiko Will <hwill@inf.fu-berlin.de>
  *
- * @long        This LIFO implementation very efficiently handles
- *              integer values. The caveat is that it can only handle
- *              values between 0 and its own size -1. Also it can only
- *              handle up to one element of each value. If you insert
- *              a value twice the LIFO will break.
+ * @detail  This LIFO implementation very efficiently handles integer values.
+ *          The caveat is that it **can only handle values between 0 and its own
+ *          size - 1**. Also it can only handle up to one element of each value.
+ *          If you insert a value twice the LIFO will break.
  */
 
-#ifndef __LIFO_H
-#define __LIFO_H
+#ifndef __LIFO_H_
+#define __LIFO_H_
 
 /**
- * @brief:  check if the given lifo is empty
- * @return: true if empty, false otherwise
+ * @brief   Check if the given lifo is empty.
+ *
+ * @param[in] array The lifo array to check.
+ *
+ * @return  1, if empty
+ * @return  0, otherwise.
  */
 int lifo_empty(int *array);
 
 /**
- * @brief:           initialize a lifo array
+ * @brief               Initialize a lifo array.
  *
- * @param array:     an array of int of size n+1
- * @param n:         maximum integer value the lifo is able to store
+ * @param[in,out] array An array of size *n* + 1, may not be NULL.
+ * @param[in] n         Maximum integer value the lifo is able to store.
  */
 void lifo_init(int *array, int n);
 
 /**
- * @brief:          insert an element into the lifo
+ * @brief               Insert an element into the lifo
  *
- * @param array:    an integer array of least i+1 size that does not
- *                  already contain i
- * @param i:        the integer value to store, between 0 and the size
- *                  of the array -1, must not be stored already
+ * @param[in,out] array An integer array of least *i* + 1 size that **does not
+ *                      already contain *i***, may not be NULL.
+ * @param[in] i         The integer value to store, between 0 and the size of
+ *                      the array - 1, must not be stored already.
  *
  */
 void lifo_insert(int *array, int i);
 
 /**
- * @brief:          extract the least recently inserted element from the lifo
+ * @brief           Extract the least recently inserted element from the lifo.
  *
- * @param array:    an integer array
+ * @param[in] array An integer array, may not be NULL.
  *
- * @return:         -1 if the lifo is empty, the least recently
- *                  inserted element otherwise
+ * @return          -1, if the lifo is empty.
+ * @return          the least recently inserted element, otherwise.
  */
 int lifo_get(int *array);
 
+#endif /* __LIFO_H_ */
 /** @} */
-#endif /* __LIFO_H */
