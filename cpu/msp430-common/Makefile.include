@@ -1,1 +1,1 @@
-INCLUDES += -I$(MAKEBASE)/cpu/msp430-common/include/
+INCLUDES += -I$(RIOTBASE)/cpu/msp430-common/include/
