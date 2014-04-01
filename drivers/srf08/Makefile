@@ -1,2 +1,2 @@
 MODULE =srf08
-include $(MAKEBASE)/Makefile.base
+include $(RIOTBASE)/Makefile.base

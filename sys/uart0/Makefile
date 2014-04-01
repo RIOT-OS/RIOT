@@ -1,3 +1,3 @@
 MODULE = uart0
 
-include $(MAKEBASE)/Makefile.base
+include $(RIOTBASE)/Makefile.base

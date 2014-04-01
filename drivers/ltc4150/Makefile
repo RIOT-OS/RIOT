@@ -1,2 +1,2 @@
 MODULE =ltc4150
-include $(MAKEBASE)/Makefile.base
+include $(RIOTBASE)/Makefile.base

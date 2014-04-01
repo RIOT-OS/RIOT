@@ -1,6 +1,6 @@
 MODULE =rtc
 
-include $(MAKEBASE)/Makefile.base
+include $(RIOTBASE)/Makefile.base
 
 $(BINDIR)%.o: %.c
 	$(AD)$(CC) $(CFLAGS) $(NATIVEINCLUDES) -c $*.c -o $(BINDIR)$*.o

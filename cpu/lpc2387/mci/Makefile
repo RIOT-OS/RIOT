@@ -1,3 +1,3 @@
 MODULE =mci
 
-include $(MAKEBASE)/Makefile.base
+include $(RIOTBASE)/Makefile.base
