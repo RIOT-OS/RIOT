@@ -106,6 +106,16 @@ OBJ = $(SRC:%.c=${BINDIR}${PROJECT}/%.o)
 $(BINDIR)$(PROJECT).a: $(OBJ)
 	$(AD)$(AR) -rc $(BINDIR)$(PROJECT).a $(OBJ)
 
+# add extra include paths for packages in $(USEMODULE)
+export USEMODULE_INCLUDES =
+
+include $(RIOTBASE)/sys/Makefile.include
+include $(RIOTBASE)/drivers/Makefile.include
+
+USEMODULE_INCLUDES_ = $(shell echo $(USEMODULE_INCLUDES) | tr ' ' '\n' | awk '!a[$$0]++' | tr '\n' ' ')
+
+INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
+
 # include Makefile.includes for packages in $(USEPKG)
 $(RIOTBASE)/pkg/%/Makefile.include::
 	$(AD)"$(MAKE)" -C $(RIOTBASE)/pkg/$* Makefile.include

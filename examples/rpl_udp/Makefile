@@ -49,6 +49,4 @@ USEMODULE += sixlowpan
 USEMODULE += rpl
 USEMODULE += destiny
 
-export INCLUDES += -I$(RIOTBASE)/sys/net/include -I$(RIOTBASE)/sys/net/routing/rpl -I$(RIOTBASE)/drivers/cc110x
-
 include $(RIOTBASE)/Makefile.include
