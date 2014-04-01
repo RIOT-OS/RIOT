@@ -12,7 +12,5 @@ $(BINDIR)%.o: %.c
 	$(AD)$(CC) $(CFLAGS) $(NATIVEINCLUDES) -MM $*.c |\
 		sed -e "1s|^|$(BINDIR)|" > $(BINDIR)$*.d
 
-
-
 clean::
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean || exit 1; done ;
