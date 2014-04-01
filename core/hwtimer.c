@@ -155,12 +155,16 @@ static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr
 {
     DEBUG("_hwtimer_set: offset=%lu callback=%p ptr=%p absolute=%d\n", offset, callback, ptr, absolute);
 
-    unsigned int state = disableIRQ(); /* former 'if(inISR()){dINT());}' */
+    if (!inISR()) {
+        disableIRQ(); /* former 'dINT()' */
+    }
 
     int n = lifo_get(lifo);
 
     if (n == -1) {
-        restoreIRQ(state); /* former 'if(inISR()){eINT());}' */
+        if (!inISR()) {
+            enableIRQ();/* former 'eINT' */
+        }
 
         puts("No hwtimer left.");
         return -1;
@@ -180,7 +184,9 @@ static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr
 
     lpm_prevent_sleep++;
 
-    restoreIRQ(state); /* former 'if(inISR()){eINT());}' */
+    if (!inISR()) {
+        enableIRQ(); /* former 'eINT()' */
+    }
 
     return n;
 }
