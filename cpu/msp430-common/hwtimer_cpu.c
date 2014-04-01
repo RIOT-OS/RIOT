@@ -22,8 +22,8 @@ See the file LICENSE in the top level directory for more details.
 
 void (*int_handler)(int);
 extern void timerA_init(void);
-uint16_t overflow_interrupt[HWTIMER_MAXTIMERS+1];
-uint16_t timer_round;
+volatile uint16_t overflow_interrupt[HWTIMER_MAXTIMERS+1];
+volatile uint16_t timer_round;
 
 #ifdef CC430
   /* CC430 have "TimerA0", "TimerA1" and so on... */
@@ -52,15 +52,20 @@ static void timer_enable_interrupt(short timer)
     *ptr &= ~(CCIFG);
 }
 
-static void timer_set_nostart(unsigned long value, short timer)
+static void timer_set_nostart(uint32_t value, short timer)
 {
     volatile unsigned int *ptr = &CNT_COMP_BASE_REG + (timer);
-    *ptr = value;
+    /* ensure we won't set the timer to a "past" tick */
+    if (value <= hwtimer_arch_now()) {
+        value = hwtimer_arch_now() + 2;
+    }
+    overflow_interrupt[timer] = (uint16_t)(value >> 16);
+    *ptr = (value & 0xFFFF);
 }
 
-static void timer_set(unsigned long value, short timer)
+static void timer_set(uint32_t value, short timer)
 {
-    DEBUG("Setting timer %u to %u overflows and %lu\n", timer, overflow_interrupt[timer], value);
+    DEBUG("Setting timer %u to %lu\n", timer, value);
     timer_set_nostart(value, timer);
     timer_enable_interrupt(timer);
 }
@@ -74,7 +79,7 @@ void timer_unset(short timer)
 
 unsigned long hwtimer_arch_now()
 {
-    return ((uint32_t)timer_round << 16)+TIMER_VAL_REG;
+    return ((uint32_t)timer_round << 16) + TIMER_VAL_REG;
 }
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
@@ -106,9 +111,7 @@ void hwtimer_arch_set(unsigned long offset, short timer)
 
 void hwtimer_arch_set_absolute(unsigned long value, short timer)
 {
-    uint16_t small_value = value & 0xFFFF;
-    overflow_interrupt[timer] = (uint16_t)(value >> 16);
-    timer_set(small_value, timer);
+    timer_set(value, timer);
 }
 
 void hwtimer_arch_unset(short timer)
