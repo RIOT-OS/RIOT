@@ -39,9 +39,19 @@ void lpm_init(void);
  */
 enum lpm_mode lpm_set(enum lpm_mode target);
 
+/**
+ * @brief   Switches the MCU to active power mode LPM_ON
+ */
 void lpm_awake(void);
 
+/**
+ * @brief   Begin to switch MCU to active power mode.
+ */
 void lpm_begin_awake(void);
+
+/**
+ * @brief   Finish to switch MCU to active power mode.
+ */
 void lpm_end_awake(void);
 
 /**
@@ -50,5 +60,5 @@ void lpm_end_awake(void);
  */
 enum lpm_mode lpm_get(void);
 
-#endif /* LPM_H_ */
+#endif /* __LPM_H_ */
 /** @} */
