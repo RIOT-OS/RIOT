@@ -2,4 +2,4 @@ INCLUDES = -I$(RIOTBASE)/cpu/mc1322x/include -I$(RIOTBASE)/cpu/mc1322x/maca/incl
 
 MODULE =mc1322x
 
-include $(MAKEBASE)/Makefile.base
+include $(RIOTBASE)/Makefile.base

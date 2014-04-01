@@ -1,3 +1,3 @@
 MODULE =i2c
 
-include $(MAKEBASE)/Makefile.base
+include $(RIOTBASE)/Makefile.base

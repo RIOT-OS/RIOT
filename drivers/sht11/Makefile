@@ -1,2 +1,2 @@
 MODULE =sht11
-include $(MAKEBASE)/Makefile.base
+include $(RIOTBASE)/Makefile.base
