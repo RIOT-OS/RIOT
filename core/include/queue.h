@@ -34,7 +34,6 @@ typedef struct queue_node_t {
     uint32_t priority;
 } queue_node_t;
 
-queue_node_t *queue_remove_head(queue_node_t *root);
 void queue_add_tail(queue_node_t *root, queue_node_t *new_obj);
 void queue_add_head(queue_node_t *root, queue_node_t *new_obj);
 queue_node_t *queue_remove_head(queue_node_t *root);
