@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -26,6 +26,7 @@
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
 #ifndef __MSG_H
@@ -75,6 +76,21 @@ typedef struct msg {
  */
 int msg_send(msg_t *m, unsigned int target_pid, bool block);
 
+
+/**
+ * @brief Send a message to the current thread.
+ * @details Will work only if the thread has a message queue.
+ *
+ * Will be automatically chosen instead of @c msg_send
+ * if @c target_pid == @c thread_pid.
+ * This function never blocks.
+ *
+ * @param  m pointer to message structure
+ *
+ * @return 1 if sending was successful
+ * @return 0 if the thread's message queue is full (or inexistent)
+ */
+int msg_send_to_self(msg_t *m);
 
 /**
  * @brief Send message from interrupt.
