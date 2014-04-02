@@ -9,5 +9,7 @@ USEMODULE += hashes
 USEMODULE += bloom
 USEMODULE += random
 
+DISABLE_MODULE += auto_init
+
 include $(RIOTBASE)/Makefile.include
 endif

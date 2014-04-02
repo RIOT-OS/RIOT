@@ -34,7 +34,6 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += vtimer
-USEMODULE += auto_init
 USEMODULE += defaulttransceiver
 
 ifneq (,$(filter msb-430,$(BOARD)))

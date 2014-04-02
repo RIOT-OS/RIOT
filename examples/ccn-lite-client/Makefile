@@ -34,7 +34,6 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += posix
 USEMODULE += ps
-USEMODULE += auto_init
 USEMODULE += random
 USEMODULE += transceiver
 ifeq ($(BOARD),msba2)

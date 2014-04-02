@@ -48,6 +48,11 @@ include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 include $(RIOTBASE)/Makefile.dep
 
+# Test if there where dependencies against a module in DISABLE_MODULE.
+ifneq (, $(filter $(DISABLE_MODULE), $(USEMODULE)))
+$(error "Required modules were disabled using DISABLE_MODULE: $(sort $(filter $(DISABLE_MODULE), $(USEMODULE)))")
+endif
+
 # Test if the input language was specified externally.
 # Otherwise test if the compiler unterstands the "-std=gnu99" flag, and use it if so.
 # Otherwise test if the compiler unterstands the "-std=c99" flag, and use it if so.

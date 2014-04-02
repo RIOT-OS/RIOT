@@ -12,6 +12,8 @@ USEMODULE += bloom
 
 export PROJDEPS = sets.h
 
+DISABLE_MODULE += auto_init
+
 include $(RIOTBASE)/Makefile.include
 
 sets.h: generate_sets.py words.txt.gz
