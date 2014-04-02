@@ -41,13 +41,7 @@ USEMODULE += shell_commands
 USEMODULE += posix
 USEMODULE += ps
 USEMODULE += vtimer
-ifeq ($(strip $(BOARD)),native)
-	USEMODULE += nativenet
-else ifeq ($(strip $(BOARD)),msba2)
-	USEMODULE += cc110x
-else ifeq ($(strip $(BOARD)),iot-lab_M3)
-	USEMODULE += at86rf231
-endif
+USEMODULE += defaulttransceiver
 USEMODULE += sixlowpan
 USEMODULE += rpl
 USEMODULE += destiny
