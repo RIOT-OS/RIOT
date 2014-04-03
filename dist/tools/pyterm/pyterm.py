@@ -263,18 +263,15 @@ class PytermClientFactory(ReconnectingClientFactory):
     def __init__(self):
         self.myproto = None
 
-    def startedConnecting(self, connector):
-        print('Started to connect.')
-
     def buildProtocol(self, addr):
         print('Connected.')
-        print('Resetting reconnection delay')
         self.resetDelay()
         self.myproto = PytermProt()
         return self.myproto
 
     def clientConnectionLost(self, connector, reason):
-        print('Lost connection.  Reason:', reason)
+        if reactor.running:
+            print('Lost connection.  Reason:', reason)
         ReconnectingClientFactory.clientConnectionLost(self, connector, reason)
 
     def clientConnectionFailed(self, connector, reason):
