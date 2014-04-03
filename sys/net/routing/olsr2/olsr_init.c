@@ -102,7 +102,7 @@ static void olsr_receiver_thread(void) {
 		DEBUG("received %d bytes from %s", recsize, netaddr_to_str_s(&nbuf[0], &_src));
 
 		mutex_lock(&olsr_data);
-		reader_handle_packet(&buffer, recsize, &_src);
+		reader_handle_packet(&buffer, recsize, &_src, 1); // TODO: proper metric
 		mutex_unlock(&olsr_data);
 	}
 }

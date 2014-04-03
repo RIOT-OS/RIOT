@@ -29,18 +29,21 @@
 
 static struct rfc5444_reader reader;
 static struct netaddr* current_src;
-static struct olsr_node* current_node;
+static struct olsr_node* current_node; // only set by _cb_nhdp_blocktlv_packet_okay
 
 /* ughh… these variables are needed in the addr callback, but read in the packet callback */
 static uint8_t vtime;
 static uint8_t hops;
 static uint16_t _seq_no;
+static metric_t metric;
 
 static enum rfc5444_result _cb_nhdp_blocktlv_packet_okay(struct rfc5444_reader_tlvblock_context *cont);
 static enum rfc5444_result _cb_nhdp_blocktlv_address_okay(struct rfc5444_reader_tlvblock_context *cont);
 
 static enum rfc5444_result _cb_olsr_blocktlv_packet_okay(struct rfc5444_reader_tlvblock_context *cont);
 static enum rfc5444_result _cb_olsr_blocktlv_address_okay(struct rfc5444_reader_tlvblock_context *cont);
+
+static enum rfc5444_result _cb_packet_end(struct rfc5444_reader_tlvblock_context *cont, bool dropped);
 
 /* HELLO message */
 static struct rfc5444_reader_tlvblock_consumer_entry _nhdp_message_tlvs[] = {
@@ -53,6 +56,7 @@ static struct rfc5444_reader_tlvblock_consumer_entry _nhdp_message_tlvs[] = {
 static struct rfc5444_reader_tlvblock_consumer_entry _nhdp_address_tlvs[] = {
 	[IDX_ADDRTLV_MPR] = { .type = RFC5444_ADDRTLV_MPR },
 	[IDX_ADDRTLV_LINK_STATUS] = { .type = RFC5444_ADDRTLV_LINK_STATUS },
+	[IDX_ADDRTLV_METRIC] = { .type = RFC5444_ADDRTLV_LINK_METRIC},
 #ifdef ENABLE_NAME
 	[IDX_ADDRTLV_NODE_NAME] = { .type = RFC5444_TLV_NODE_NAME },
 #endif
@@ -68,6 +72,7 @@ static struct rfc5444_reader_tlvblock_consumer_entry _olsr_message_tlvs[] = {
 
 static struct rfc5444_reader_tlvblock_consumer_entry _olsr_address_tlvs[] = {
 	[IDX_ADDRTLV_LINK_STATUS] = { .type = RFC5444_ADDRTLV_LINK_STATUS },
+	[IDX_ADDRTLV_METRIC] = { .type = RFC5444_ADDRTLV_LINK_METRIC},
 #ifdef ENABLE_NAME
 	[IDX_ADDRTLV_NODE_NAME] = { .type = RFC5444_TLV_NODE_NAME },
 #endif
@@ -77,6 +82,7 @@ static struct rfc5444_reader_tlvblock_consumer_entry _olsr_address_tlvs[] = {
 static struct rfc5444_reader_tlvblock_consumer _nhdp_consumer = {
 	.msg_id = RFC5444_MSGTYPE_HELLO,
 	.block_callback = _cb_nhdp_blocktlv_packet_okay,
+	.end_callback = _cb_packet_end,
 };
 
 static struct rfc5444_reader_tlvblock_consumer _nhdp_address_consumer = {
@@ -89,6 +95,7 @@ static struct rfc5444_reader_tlvblock_consumer _nhdp_address_consumer = {
 static struct rfc5444_reader_tlvblock_consumer _olsr_consumer = {
 	.msg_id = RFC5444_MSGTYPE_TC,
 	.block_callback = _cb_olsr_blocktlv_packet_okay,
+	.end_callback = _cb_packet_end,
 };
 
 static struct rfc5444_reader_tlvblock_consumer _olsr_address_consumer = {
@@ -116,7 +123,9 @@ _cb_nhdp_blocktlv_packet_okay(struct rfc5444_reader_tlvblock_context *cont __att
 	}
 #endif
 
-	current_node = add_neighbor(current_src, vtime, name);
+	DEBUG("\tmetric: %d", metric);
+
+	current_node = add_neighbor(current_src, metric, vtime, name);
 
 	if (current_node == NULL) {
 		puts("ERROR: add_neighbor failed - out of memory");
@@ -124,7 +133,8 @@ _cb_nhdp_blocktlv_packet_okay(struct rfc5444_reader_tlvblock_context *cont __att
 	}
 
 	/* reset MPR selector state, will be set by _cb_nhdp_blocktlv_address_okay */
-	current_node->mpr_selector = 0;
+	h1_deriv(current_node)->mpr_slctr_route = 0;
+	h1_deriv(current_node)->mpr_slctr_flood = 0;
 
 	if (current_node->pending)
 		return RFC5444_DROP_PACKET;
@@ -136,6 +146,7 @@ _cb_nhdp_blocktlv_packet_okay(struct rfc5444_reader_tlvblock_context *cont __att
 static enum rfc5444_result
 _cb_nhdp_blocktlv_address_okay(struct rfc5444_reader_tlvblock_context *cont) {
 	struct rfc5444_reader_tlvblock_entry* tlv;
+	metric_t link_metric = RFC5444_METRIC_MIN;
 
 	char* name = NULL;
 #ifdef ENABLE_NAME
@@ -145,19 +156,24 @@ _cb_nhdp_blocktlv_address_okay(struct rfc5444_reader_tlvblock_context *cont) {
 	}
 #endif
 
+	if ((tlv = _nhdp_address_tlvs[IDX_ADDRTLV_METRIC].tlv)) {
+		link_metric = rfc5444_metric_decode(*((uint16_t*) tlv->single_value));
+		DEBUG("\t\tmetric: %d", link_metric);
+	}
+
 	if ((tlv = _nhdp_address_tlvs[IDX_ADDRTLV_LINK_STATUS].tlv)) {
 		switch (* (char*) tlv->single_value) {
 		struct olsr_node* lost;
 		case RFC5444_LINKSTATUS_LOST:
 			lost = get_node(&cont->addr);
-			DEBUG("\texpired node reported, removing it (HELLO)%s", lost ? "" : " [not found]");
+			DEBUG("\t\texpired node reported, removing it (HELLO)%s", lost ? "" : " [not found]");
 
 			if (lost != NULL)
 				route_expired(lost, current_node->addr);
 
 			return RFC5444_DROP_ADDRESS;
 		default:
-			DEBUG("\tunknown LINKSTATUS = %d", * (char*) tlv->single_value);
+			DEBUG("\t\tunknown LINKSTATUS = %d", * (char*) tlv->single_value);
 		}
 	}
 
@@ -165,11 +181,15 @@ _cb_nhdp_blocktlv_address_okay(struct rfc5444_reader_tlvblock_context *cont) {
 	if (netaddr_cmp(&cont->addr, get_local_addr()) == 0) {
 
 		/* node selected us as mpr */
-		if ((tlv = _nhdp_address_tlvs[IDX_ADDRTLV_MPR].tlv))
-			current_node->mpr_selector = 1;
+		if ((tlv = _nhdp_address_tlvs[IDX_ADDRTLV_MPR].tlv)) {
+			h1_deriv(current_node)->mpr_slctr_flood = (*tlv->single_value & RFC5444_MPR_FLOODING) > 0;
+			h1_deriv(current_node)->mpr_slctr_route = (*tlv->single_value & RFC5444_MPR_ROUTING) > 0;
+
+			DEBUG("\tflood: %d, route: %d", h1_deriv(current_node)->mpr_slctr_flood, h1_deriv(current_node)->mpr_slctr_route);
+		}
 
 	} else
-		add_olsr_node(&cont->addr, current_src, vtime, 2, name);
+		add_olsr_node(&cont->addr, current_src, vtime, 2, link_metric, name);
 
 	return RFC5444_OKAY;
 }
@@ -214,6 +234,7 @@ _cb_olsr_blocktlv_packet_okay(struct rfc5444_reader_tlvblock_context *cont) {
 static enum rfc5444_result
 _cb_olsr_blocktlv_address_okay(struct rfc5444_reader_tlvblock_context *cont) {
 	struct rfc5444_reader_tlvblock_entry* tlv __attribute__((unused));
+	metric_t link_metric = RFC5444_METRIC_MIN;
 	char* name = NULL;
 
 	if (netaddr_cmp(get_local_addr(), &cont->addr) == 0)
@@ -234,7 +255,12 @@ _cb_olsr_blocktlv_address_okay(struct rfc5444_reader_tlvblock_context *cont) {
 			DEBUG("\texpired node reported, removing it (TC)%s", lost ? "" : " [not found]");
 
 			if (lost != NULL)
-				route_expired(lost, current_node->addr);
+				route_expired(lost, &cont->orig_addr);
+
+			/* emergency flood */
+			struct nhdp_node* node = h1_deriv(get_node(current_src));
+			if (node != NULL)
+					node->mpr_slctr_flood = 1;
 
 			return RFC5444_DROP_ADDRESS;
 		default:
@@ -242,8 +268,20 @@ _cb_olsr_blocktlv_address_okay(struct rfc5444_reader_tlvblock_context *cont) {
 		}
 	}
 
+	if ((tlv = _olsr_address_tlvs[IDX_ADDRTLV_METRIC].tlv)) {
+		link_metric = rfc5444_metric_decode(*((uint16_t*) tlv->single_value));
+		DEBUG("\t\tmetric: %d", link_metric);
+	}
+
 	/* hops is hopcount to orig_addr, addr is one more hop */
-	add_olsr_node(&cont->addr, &cont->orig_addr, vtime, hops + 1, name);
+	add_olsr_node(&cont->addr, &cont->orig_addr, vtime, hops + 1, link_metric, name);
+
+	return RFC5444_OKAY;
+}
+
+static enum rfc5444_result
+_cb_packet_end(struct rfc5444_reader_tlvblock_context *cont __attribute__((unused)), bool dropped __attribute__((unused))) {
+	fill_routing_table();
 
 	return RFC5444_OKAY;
 }
@@ -254,13 +292,14 @@ _cb_olsr_forward_message(struct rfc5444_reader_tlvblock_context *context __attri
 	uint8_t *buffer, size_t length) {
 	struct olsr_node* node = get_node(current_src);
 
-	/* only forward if node selected us as MPR */
-	if (node == NULL || node->mpr_selector == 0)
+	/* only forward if node selected us as flooding MPR */
+	if (node == NULL || h1_deriv(node)->mpr_slctr_flood == 0)
 		return;
 
-	if (RFC5444_OKAY == rfc5444_writer_forward_msg(&writer, buffer, length))
+	if (RFC5444_OKAY == rfc5444_writer_forward_msg(&writer, buffer, length)) {
+		DEBUG("\tforwarding");
 		rfc5444_writer_flush(&writer, &interface, true);
-	else
+	} else
 		DEBUG("\tfailed forwarding package");
 }
 
@@ -284,8 +323,9 @@ void reader_init(void) {
 /**
  * Inject a package into the RFC5444 reader
  */
-int reader_handle_packet(void* buffer, size_t length, struct netaddr* src) {
+int reader_handle_packet(void* buffer, size_t length, struct netaddr* src, uint8_t metric_in) {
 	current_src = src;
+	metric = metric_in;
 	return rfc5444_reader_handle_packet(&reader, buffer, length);
 }
 

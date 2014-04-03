@@ -39,10 +39,13 @@ static struct olsr_node* _node_replace(struct olsr_node* old_n) {
 	if (_free_node)
 		add_free_node(new_n);
 
+	new_n->pending = 1;
+	h1_deriv(new_n)->link_quality = HYST_SCALING;
+
 	return new_n;
 }
 
-struct olsr_node* add_neighbor(struct netaddr* addr, uint8_t vtime, char* name) {
+struct olsr_node* add_neighbor(struct netaddr* addr, metric_t metric, uint8_t vtime, char* name) {
 	struct olsr_node* n = get_node(addr);
 
 	if (n == NULL) {
@@ -61,6 +64,7 @@ struct olsr_node* add_neighbor(struct netaddr* addr, uint8_t vtime, char* name) 
 
 		n->type = NODE_TYPE_NHDP;
 		n->distance = 1;
+		n->link_metric = metric;
 		h1_deriv(n)->link_quality = HYST_SCALING;
 		n->pending = 1;
 #ifdef ENABLE_NAME
@@ -80,7 +84,7 @@ struct olsr_node* add_neighbor(struct netaddr* addr, uint8_t vtime, char* name) 
 	if (n->next_addr == NULL)
 		n->expires = time_now() + vtime;
 
-	add_other_route(n, get_local_addr(), vtime);
+	add_other_route(n, get_local_addr(), 1, metric, vtime);
 
 	return n;
 }
@@ -92,10 +96,11 @@ void print_neighbors(void) {
 	DEBUG("1-hop neighbors:");
 	avl_for_each_element(get_olsr_head(), node, node) {
 		if (node->distance == 1 && node->type == NODE_TYPE_NHDP)
-			DEBUG("\tneighbor: %s (%s) (mpr for %d nodes)",
+			DEBUG("\tneighbor: %s (%s) (mpr for [%d|%d] nodes)",
 				node->name,
 				netaddr_to_str_s(&nbuf[0], node->addr),
-				h1_deriv(node)->mpr_neigh);
+				h1_deriv(node)->mpr_neigh_flood,
+				h1_deriv(node)->mpr_neigh_route);
 	}
 
 	DEBUG("2-hop neighbors:");
