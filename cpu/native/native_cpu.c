@@ -151,6 +151,13 @@ void isr_cpu_switch_context_exit(void)
 
 void cpu_switch_context_exit()
 {
+#ifdef NATIVE_AUTO_EXIT
+    if (num_tasks == 1) {
+        DEBUG("cpu_switch_context_exit(): last task has ended. exiting.\n");
+        exit(0);
+    }
+#endif
+
     if (_native_in_isr == 0) {
         dINT();
         _native_in_isr = 1;
