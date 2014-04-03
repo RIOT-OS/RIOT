@@ -6,7 +6,7 @@
 
 #include "node.h"
 
-struct olsr_node* add_neighbor(struct netaddr* addr, uint8_t vtime, char* name);
+struct olsr_node* add_neighbor(struct netaddr* addr, metric_t metric, uint8_t vtime, char* name);
 
 void print_neighbors(void);
 

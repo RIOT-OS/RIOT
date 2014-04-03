@@ -63,6 +63,11 @@ struct netaddr* netaddr_free(struct netaddr* addr) {
 	return NULL;
 }
 
+void netaddr_switch(struct netaddr** old_addr, struct netaddr* new_addr) {
+	netaddr_free(*old_addr);
+	*old_addr = netaddr_reuse(new_addr);
+}
+
 time_t time_now(void) {
 #ifdef RIOT
 	struct timeval _tv;
