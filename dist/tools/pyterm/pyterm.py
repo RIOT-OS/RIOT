@@ -264,7 +264,7 @@ class PytermProt(Protocol):
         sys.stdout.write(data)
 
     def sendMessage(self, msg):
-        self.transport.write("%d#%s\n" % (len(msg), msg))
+        self.transport.writeSomeData("%d#%s\n" % (len(msg), msg))
 
 class PytermClientFactory(ReconnectingClientFactory):
 
