@@ -180,7 +180,7 @@ class SerCmd(cmd.Cmd):
         sys.stderr.write("Filter for %s not found\n" % line.strip())
 
     def do_PYTERM_json(self, line):
-        self.json_regs[line.split(' ')[0].strip()] = re.compile(line.split(' ')[1].strip())
+        self.json_regs[line.split(' ')[0].strip()] = re.compile(line.partition(' ')[2].strip())
 
     def do_PYTERM_unjson(self, line):
         if not self.aliases.pop(line, None):
