@@ -234,10 +234,18 @@ class SerCmd(cmd.Cmd):
                     for j in self.json_regs:
                         m = self.json_regs[j].search(output)
                         if m:
-                            json_obj = '{"id":%d, ' % int(j)
+                            try:
+                                json_obj = '{"jid":%d, ' % int(j)
+                            except ValueError:
+                                sys.stderr.write("Invalid JID: %s\n" % j)
+                                break
                             json_obj += '"raw":"%s", ' % output
+                            json_obj += '"date":%s, ' % int(time.time()*1000)
                             for g in m.groupdict():
-                                json_obj += '"%s":"%s", ' % (g, m.groupdict()[g])
+                                try:
+                                    json_obj += '"%s":%d, ' % (g, int(m.groupdict()[g]))
+                                except ValueError:
+                                    json_obj += '"%s":"%s", ' % (g, m.groupdict()[g])
 
                             # eliminate the superfluous last ", "
                             json_obj = json_obj[:-2]
