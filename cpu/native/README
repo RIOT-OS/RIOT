@@ -128,3 +128,11 @@ is established.
 
 Socket redirection is only available when the uart module has been
 compiled in.
+
+COMPILE TIME OPTIONS
+====================
+
+Compile with
+    CFLAGS=-DNATIVE_AUTO_EXIT make
+
+to exit the riot core after the last thread has exited.
