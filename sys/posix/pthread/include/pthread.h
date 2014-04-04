@@ -88,42 +88,6 @@ int pthread_cancel(pthread_t th);
  cancelled.  */
 void pthread_testcancel(void);
 
-void __pthread_cleanup_push(__pthread_cleanup_datum_t *datum);
-void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute);
-
-/*
- * Notice: `pthread_cleanup_*` has to be defined as a macro, because the cleanup
- * stack needs extra data. The standard explicitly allows defining these
- * functions as macros.   The alternative would be malloc.
- */
-
-/* The pthread_cleanup_push() function shall push the specified cancellation
- * cleanup handler routine onto the calling thread's cancellation cleanup stack.
- * The cancellation cleanup handler shall be popped from the cancellation
- * cleanup stack and invoked with the argument arg when:
- *  The thread exits (that is, calls pthread_exit()).
- *  The thread acts upon a cancellation request.
- *  The thread calls pthread_cleanup_pop() with a non-zero execute argument. */
-#define pthread_cleanup_push(ROUTINE, ARG) \
-    do { \
-        __extension__ __pthread_cleanup_datum_t ____datum__ = { \
-            .__routine = (ROUTINE), \
-            .__arg = (ARG), \
-        }; \
-        __extension__ int ____execute__ = 1; \
-        __pthread_cleanup_push(&____datum__); \
-        do { \
-            do { } while (0)
-
-/* The pthread_cleanup_pop() function shall remove the routine at the top of the
- * calling thread's cancellation cleanup stack and optionally invoke it
- * (if execute is non-zero). */
-#define pthread_cleanup_pop(EXECUTE) \
-            ____execute__ = (EXECUTE); \
-        } while (0); \
-        __pthread_cleanup_pop(&____datum__, ____execute__); \
-    } while (0)
-
 #include "pthread_mutex.h"
 
 #include "pthread_rwlock.h"
@@ -131,5 +95,7 @@ void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute);
 #include "pthread_spin.h"
 
 #include "pthread_barrier.h"
+
+#include "pthread_cleanup.h"
 
 #endif	/* pthread.h */
