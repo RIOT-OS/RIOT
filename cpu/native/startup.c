@@ -186,7 +186,6 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     *(void **)(&real_read) = dlsym(RTLD_NEXT, "read");
     *(void **)(&real_write) = dlsym(RTLD_NEXT, "write");
     *(void **)(&real_malloc) = dlsym(RTLD_NEXT, "malloc");
-    *(void **)(&real_calloc) = dlsym(RTLD_NEXT, "calloc");
     *(void **)(&real_realloc) = dlsym(RTLD_NEXT, "realloc");
     *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");
 
