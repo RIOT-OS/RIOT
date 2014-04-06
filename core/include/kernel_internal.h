@@ -53,5 +53,5 @@ NORETURN void sched_task_exit(void);
  */
 void thread_print_stack(void);
 
-/** @} */
 #endif /* KERNEL_INTERNAL_H_ */
+/** @} */
