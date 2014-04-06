@@ -1,8 +1,4 @@
 /*
- * simple malloc wrapper for sbrk
- *
- * Needed on platforms without malloc in libc, e.g. msb430
- *
  * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
@@ -16,9 +12,7 @@
  *
  * @file        oneway_malloc.c
  * @brief       Simple malloc wrapper for SBRK
- *
- * Simple malloc implementation for plattforms without malloc in libc.
- *
+
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
