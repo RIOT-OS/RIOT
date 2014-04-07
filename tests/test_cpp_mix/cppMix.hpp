@@ -17,7 +17,7 @@
  *
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
- 
+
 #ifndef __CPPMIX__
 #define __CPPMIX__
 

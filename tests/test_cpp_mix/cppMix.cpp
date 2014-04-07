@@ -17,7 +17,7 @@
  *
  * @}
  */
- 
+
 #include "cppMix.hpp"
 
 cppMix::cppMix()
