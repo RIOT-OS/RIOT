@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -11,7 +11,7 @@
  * @{
  *
  * @file        atomic.h
- * @brief       Atomic function declarations
+ * @brief       Atomic getter and setter functions
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
@@ -21,10 +21,14 @@
 #define _ATOMIC_H
 
 /**
- * @brief sets "val" to "set", returns old "val", atomically
+ * @brief Sets a new and returns the old value of a variable atomically
+ *
+ * @param[in] val   The variable to be set
+ * @param[in] set   The value to be written
+ *
+ * @return The old value of *val*
  */
+unsigned int atomic_set_return(unsigned int *val, unsigned int set);
 
-extern unsigned int atomic_set_return(unsigned int *val, unsigned int set);
-
-/** @} */
 #endif /* _ATOMIC_H */
+/** @} */

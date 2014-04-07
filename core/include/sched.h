@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -26,8 +26,12 @@
 #include "bitarithm.h"
 #include "tcb.h"
 
-#define MAXTHREADS 32
+#define MAXTHREADS 32 /**< the maximum number of threads to be scheduled */
 
+/**
+ * @def SCHED_PRIO_LEVELS
+ * @brief The number of thread priority levels
+ */
 #if ARCH_32_BIT
 #define SCHED_PRIO_LEVELS 32
 #else
@@ -89,6 +93,16 @@ extern volatile int num_tasks;
  */
 extern volatile int thread_pid;
 
+/**
+ *  Process ID of the thread that was active before the current one
+ */
+extern volatile int last_pid;
+
+/**
+ * List of runqueues per priority level
+ */
+extern clist_node_t *runqueues[SCHED_PRIO_LEVELS];
+
 #if SCHEDSTATISTICS
 /**
  *  Scheduler statistics
@@ -106,10 +120,13 @@ typedef struct {
 extern schedstat pidlist[MAXTHREADS];
 
 /**
- *  Register a callback that will be called on every scheduler run
+ *  @brief  Register a callback that will be called on every scheduler run
+ *
+ *  @param[in] callback The callback functions the will be called
  */
 void sched_register_cb(void (*callback)(uint32_t, uint32_t));
+
 #endif
 
-/** @} */
 #endif // _SCHEDULER_H
+/** @} */

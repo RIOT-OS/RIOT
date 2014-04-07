@@ -20,24 +20,40 @@
 #ifndef ATTRIBUTES_H_
 #define ATTRIBUTES_H_
 
+/**
+ * @def NORETURN
+ * @brief The *NORETURN* keyword tells the compiler to assume that the function
+ *        cannot return.
+ */
 #ifdef __GNUC__
 #define NORETURN  __attribute__((noreturn))
 #else
 #define NORETURN
 #endif
 
+/**
+ * @def CONST
+ * @brief A function declared as *CONST* is not allowed to read global memory
+ */
 #ifdef __GNUC__
 #define CONST  __attribute__((const))
 #else
 #define CONST
 #endif
 
+/**
+ * @def PURE
+ * @brief The function has no effects except the return value and its return
+ *        value depends only on the parameters and/or global variables. Such a
+ *        function can be subject to common subexpression elimination and loop
+ *        optimization just as an arithmetic operator would be.
+ */
 #ifdef __GNUC__
 #define PURE  __attribute__((pure))
 #else
 #define PURE
 #endif
 
-/** @} */
 #endif /* ATTRIBUTES_H_ */
+/** @} */
 
