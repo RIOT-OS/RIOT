@@ -105,17 +105,30 @@ endif
 #$(BINDIR)/$(PROJECT).a: $(BINDIR)/$(PROJECT).o
 #	$(AR) -rc $(BINDIR)/project.a $(BINDIR)/$(PROJECT).o
 
-# source extension set for mixedmode compilation
-SRCEXTENSION = c
-ifeq ($(CPPMIX),1)
-SRCEXTENSION = cpp
+# string array of all names of c files in dir
+ifneq ($(wildcard *.c),)
+SRC_C = $(wildcard *.c) 
 endif
 
-# string array of all names of c files in dir
-SRC = $(wildcard *.$(SRCEXTENSION))
-
 # string array of all names replaced .c with .o
-OBJ = $(SRC:%.$(SRCEXTENSION)=${BINDIR}${PROJECT}/%.o)
+ifneq ($(wildcard *.c),)
+OBJ_C += $(SRC_C:%.c=${BINDIR}${PROJECT}/%.o)
+endif
+
+# collect all c++ files only if CPPMIX is set
+ifeq ($(CPPMIX),1)
+# string array of all names of cpp files in dir
+ifneq ($(wildcard *.cpp),)
+SRC_CPP = $(wildcard *.cpp)
+endif
+
+# string array of all names replaced .cpp with .o
+ifneq ($(wildcard *.cpp),)
+OBJ_CPP += $(SRC_CPP:%.cpp=${BINDIR}${PROJECT}/%.o)
+endif
+endif
+
+OBJ = $(OBJ_C) $(OBJ_CPP)
 
 $(BINDIR)$(PROJECT).a: $(OBJ)
 	$(AD)$(AR) -rc $(BINDIR)$(PROJECT).a $(OBJ)
@@ -131,15 +144,17 @@ $(RIOTBASE)/pkg/%/Makefile.include::
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
 
-$(BINDIR)$(PROJECT)/%.o: %.$(SRCEXTENSION) $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
+${OBJ_C}: $(BINDIR)$(PROJECT)/%.o: %.c $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
 	@mkdir -p ${BINDIR}
-	@echo; echo "Compiling.... $*.$(SRCEXTENSION)"; echo
+	@echo; echo "Compiling.... $*.c"; echo
 	@test -d $(BINDIR)$(PROJECT) || mkdir -p $(BINDIR)$(PROJECT)
-ifneq ($(CPPMIX),1)
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.$(SRCEXTENSION) -o $(BINDIR)$(PROJECT)/$*.o
-else
-	$(AD)$(CPPMIXCC) $(CPPMIXCFLAGS) $(INCLUDES) -c $*.$(SRCEXTENSION) -o $(BINDIR)$(PROJECT)/$*.o
-endif
+	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$(PROJECT)/$*.o
+
+${OBJ_CPP}: $(BINDIR)$(PROJECT)/%.o: %.cpp $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
+	@mkdir -p ${BINDIR}
+	@echo; echo "Compiling.... $*.cpp"; echo
+	@test -d $(BINDIR)$(PROJECT) || mkdir -p $(BINDIR)$(PROJECT)
+	$(AD)$(CPPMIXCC) $(CPPMIXCFLAGS) $(INCLUDES) -c $*.cpp -o $(BINDIR)$(PROJECT)/$*.o
 
 $(USEPKG:%=${BINDIR}%.a)::
 	@mkdir -p ${BINDIR}
