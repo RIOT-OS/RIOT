@@ -62,6 +62,8 @@ typedef struct pthread_thread {
     void *arg;
 
     char *stack;
+
+    __pthread_cleanup_datum_t *cleanup_top;
 } pthread_thread_t;
 
 static pthread_thread_t *volatile pthread_sched_threads[MAXTHREADS];
@@ -160,6 +162,14 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
 void pthread_exit(void *retval)
 {
     pthread_thread_t *self = pthread_sched_threads[pthread_self()];
+
+    while (self->cleanup_top) {
+        __pthread_cleanup_datum_t *ct = self->cleanup_top;
+        self->cleanup_top = ct->__next;
+
+        ct->__routine(ct->__arg);
+    }
+
     self->thread_pid = -1;
     DEBUG("pthread_exit(%p), self == %p\n", retval, (void *) self);
     if (self->status != PTS_DETACHED) {
@@ -280,5 +290,25 @@ void pthread_testcancel(void)
     pthread_t self = pthread_self();
     if (pthread_sched_threads[self]->should_cancel) {
         pthread_exit(NULL);
+    }
+}
+
+void __pthread_cleanup_push(__pthread_cleanup_datum_t *datum)
+{
+    pthread_thread_t *self = pthread_sched_threads[pthread_self()];
+    datum->__next = self->cleanup_top;
+    self->cleanup_top = datum;
+}
+
+void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute)
+{
+    pthread_thread_t *self = pthread_sched_threads[pthread_self()];
+    self->cleanup_top = datum->__next;
+
+    if (execute != 0) {
+        /* "The pthread_cleanup_pop() function shall remove the routine at the
+         *  top of the calling thread's cancellation cleanup stack and optionally
+         *  invoke it (if execute is non-zero)." */
+        datum->__routine(datum->__arg);
     }
 }

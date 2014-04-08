@@ -96,4 +96,6 @@ void pthread_testcancel(void);
 
 #include "pthread_barrier.h"
 
+#include "pthread_cleanup.h"
+
 #endif	/* pthread.h */
