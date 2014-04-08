@@ -39,7 +39,7 @@
 #endif
 
 /**
- * @brief   Triggers the scheduler to schedule the next task
+ * @brief   Triggers the scheduler to schedule the next thread 
  */
 void sched_run(void);
 
@@ -63,7 +63,7 @@ void sched_set_status(tcb_t *process, unsigned int status);
 void sched_switch(uint16_t current_prio, uint16_t other_prio);
 
 /**
- * @brief   Call context switching at task exit
+ * @brief   Call context switching at thread exit
  */
 void cpu_switch_context_exit(void);
 
