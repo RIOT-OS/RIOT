@@ -44,10 +44,10 @@
 
 /**
  * @def SETBIT
- * @brief Sets a single bit in a bitfield
+ * @brief Sets a bitbitmask for a bitfield
  *
  * @param[in] val   The bitfield
- * @param[in] bit   Specifies the bit to be set
+ * @param[in] bit   Specifies the bits to be set
  *
  * @return The modified bitfield
  */
@@ -55,10 +55,10 @@
 
 /**
  * @def CLRBIT
- * @brief Clears a single bit in a bitfield
+ * @brief Clears bitmask for a bitfield
  *
  * @param[in] val   The bitfield
- * @param[in] bit   Specifies the bit to be cleared
+ * @param[in] bit   Specifies the bits to be cleared
  *
  * @return The modified bitfield
  */
