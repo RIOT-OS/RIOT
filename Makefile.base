@@ -1,13 +1,13 @@
 ASMSRC = $(wildcard *.s)
 ASSMSRC = $(wildcard *.S)
-ASMOBJ = $(ASMSRC:%.s=$(BINDIR)%.o)
-ASMOBJ += $(ASSMSRC:%.S=$(BINDIR)%.o)
+ASMOBJ = $(ASMSRC:%.s=$(BINDIR)$(MODULE)/%.o)
+ASMOBJ += $(ASSMSRC:%.S=$(BINDIR)$(MODULE)/%.o)
 
 ifeq ($(strip $(SRC)),)
 	SRC = $(wildcard *.c)
 endif
-OBJ = $(SRC:%.c=$(BINDIR)%.o)
-DEP = $(SRC:%.c=$(BINDIR)%.d)
+OBJ = $(SRC:%.c=$(BINDIR)$(MODULE)/%.o)
+DEP = $(SRC:%.c=$(BINDIR)$(MODULE)/%.d)
 
 GIT_STRING := $(shell git describe --abbrev=4 --dirty=-`hostname`)
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
@@ -31,16 +31,19 @@ $(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ)
 
 # compile and generate dependency info,
 # prepend path to dependency info file
-$(BINDIR)%.o: %.c
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$*.o
+$(BINDIR)$(MODULE)/%.o: %.c
+	@mkdir -p $(BINDIR)$(MODULE)
+	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$(MODULE)/$*.o
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MM $*.c |\
-		sed -e "1s|^|$(BINDIR)|" > $(BINDIR)$*.d
+		sed -e "1s|^|$(BINDIR)$(MODULE)/|" > $(BINDIR)$(MODULE)/$*.d
 
-$(BINDIR)%.o: %.s
-	$(AD)$(AS) $(ASFLAGS) $*.s -o $(BINDIR)$*.o
+$(BINDIR)$(MODULE)/%.o: %.s
+	@mkdir -p $(BINDIR)$(MODULE)
+	$(AD)$(AS) $(ASFLAGS) $*.s -o $(BINDIR)$(MODULE)/$*.o
 
-$(BINDIR)%.o: %.S
-	$(AD)$(CC) -c $(CFLAGS) $*.S -o $(BINDIR)$*.o
+$(BINDIR)$(MODULE)/%.o: %.S
+	@mkdir -p $(BINDIR)$(MODULE)
+	$(AD)$(CC) -c $(CFLAGS) $*.S -o $(BINDIR)$(MODULE)/$*.o
 
 # remove compilation products
 clean::

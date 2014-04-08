@@ -28,7 +28,7 @@ export HEXFILE = $(BINDIR)/$(PROJECT).hex
 export FFLAGS = -t $(PORT) -f $(HEXFILE) -c 'bbmc -l redbee-econotag reset'
 export OFLAGS = -O binary --gap-fill=0xff
 
-export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
 
 # un-comment once https://github.com/RIOT-OS/RIOT/issues/676 is fixed
 #ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
@@ -39,3 +39,5 @@ export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include
 #		USEMODULE += transceiver
 #	endif
 #endif
+
+export UNDEF += $(BINDIR)cpu/startup.o

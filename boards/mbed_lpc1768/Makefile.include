@@ -25,3 +25,5 @@ export DEBUGGER_FLAGS = $(ELFFILE)
 
 export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/ -I$(RIOTCPU)/$(CPU)/include
 export OFLAGS = -O binary
+
+export UNDEF += $(BINDIR)cpu/startup.o
