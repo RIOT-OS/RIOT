@@ -98,7 +98,7 @@ endif
 ifneq (,$(filter ccn_lite_client,$(USEMODULE)))
     DIRS += net/ccn_lite/util
 endif
-ifneq (,$(findstring quad_math,$(USEMODULE)))
+ifneq (,$(filter quad_math,$(USEMODULE)))
     DIRS += quad_math
 endif
 
