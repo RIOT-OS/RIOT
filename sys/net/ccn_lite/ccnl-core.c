@@ -994,7 +994,8 @@ ccnl_content_add2cache(struct ccnl_relay_s *ccnl, struct ccnl_content_s *c)
 // but only one copy per face
 // returns: number of forwards
 int ccnl_content_serve_pending(struct ccnl_relay_s *ccnl,
-                               struct ccnl_content_s *c)
+                               struct ccnl_content_s *c,
+                               struct ccnl_face_s *from)
 {
     struct ccnl_interest_s *i;
     struct ccnl_face_s *f;
@@ -1018,6 +1019,13 @@ int ccnl_content_serve_pending(struct ccnl_relay_s *ccnl,
         // an Interest that matches the Data."
         for (pi = i->pending; pi; pi = pi->next) {
             if (pi->face->flags & CCNL_FACE_FLAGS_SERVED) {
+                continue;
+            }
+
+            if (pi->face == from) {
+                // the existing pending interest is from the same face
+                // as the newly arrived content is...no need to send content back
+                DEBUGMSG(1, "  detected looping content, before loop could happen\n");
                 continue;
             }
 
@@ -1385,7 +1393,7 @@ int ccnl_core_RX_i_or_c(struct ccnl_relay_s *relay, struct ccnl_face_s *from,
         c = ccnl_content_new(relay, &buf, &p, &ppkd, content, contlen);
 
         if (c) { // CONFORM: Step 2 (and 3)
-            if (!ccnl_content_serve_pending(relay, c)) { // unsolicited content
+            if (!ccnl_content_serve_pending(relay, c, from)) { // unsolicited content
                 // CONFORM: "A node MUST NOT forward unsolicited data [...]"
                 DEBUGMSG(7, "  removed because no matching interest\n");
                 free_content(c);
