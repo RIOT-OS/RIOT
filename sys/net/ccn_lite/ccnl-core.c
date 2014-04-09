@@ -963,20 +963,20 @@ ccnl_content_add2cache(struct ccnl_relay_s *ccnl, struct ccnl_content_s *c)
     }
 
     while (ccnl->max_cache_entries <= ccnl->contentcnt) {
-        DEBUGMSG(1, "  remove oldest content...\n");
-        struct ccnl_content_s *c2, *oldest = NULL;
+        DEBUGMSG(1, "  remove Least Recently Used content...\n");
+        struct ccnl_content_s *c2, *lru = NULL;
 
         for (c2 = ccnl->contents; c2; c2 = c2->next) {
             DEBUGMSG(1, "    '%s' -> %ld:%ld\n", ccnl_prefix_to_path(c2->name), c2->last_used.tv_sec, c2->last_used.tv_usec);
             if (!(c2->flags & CCNL_CONTENT_FLAGS_STATIC)
-                && ((!oldest) || timevaldelta(&c2->last_used, &oldest->last_used) < 0)) {
-                oldest = c2;
+                && ((!lru) || timevaldelta(&c2->last_used, &lru->last_used) < 0)) {
+                lru = c2;
             }
         }
 
-        if (oldest) {
-            DEBUGMSG(1, "   replaced: '%s'\n", ccnl_prefix_to_path(oldest->name));
-            ccnl_content_remove(ccnl, oldest);
+        if (lru) {
+            DEBUGMSG(1, "   replaced: '%s'\n", ccnl_prefix_to_path(lru->name));
+            ccnl_content_remove(ccnl, lru);
         }
         else {
             DEBUGMSG(1, "   no dynamic content to remove...\n");
