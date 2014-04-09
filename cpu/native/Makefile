@@ -18,6 +18,3 @@ $(BINDIR)$(MODULE)/%.o: %.c
 	$(AD)$(CC) $(CFLAGS) $(NATIVEINCLUDES) -c $*.c -o $(BINDIR)$(MODULE)/$*.o
 	$(AD)$(CC) $(CFLAGS) $(NATIVEINCLUDES) -MM $*.c |\
 		sed -e "1s|^|$(BINDIR)$(MODULE)/|" > $(BINDIR)$(MODULE)/$*.d
-
-clean::
-	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean || exit 1; done ;

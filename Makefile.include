@@ -143,9 +143,7 @@ $(USEPKG:%=${BINDIR}%.a)::
 	"$(MAKE)" -C $(RIOTBASE)/pkg/$(patsubst ${BINDIR}%.a,%,$@)
 
 clean:
-	@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i clean || exit 1; done ;
-	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD) clean
-	"$(MAKE)" -C $(RIOTBASE) clean
+	@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i clean || exit 1; done
 	rm -rf $(BINDIR)
 
 flash: all
