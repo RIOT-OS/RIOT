@@ -57,7 +57,7 @@ int uart0_puts(char *astring, int length)
 
     while (
             (length - offset > 0) && (
-                (nwritten = write(
+                (nwritten = _native_write(
                                STDOUT_FILENO,
                                astring+offset,
                                length-offset)
@@ -168,7 +168,7 @@ void handle_uart_in()
 
     DEBUG("handle_uart_in\n");
 
-    nread = read(STDIN_FILENO, buf, sizeof(buf));
+    nread = _native_read(STDIN_FILENO, buf, sizeof(buf));
     if (nread == -1) {
         err(1, "handle_uart_in(): read()");
     }

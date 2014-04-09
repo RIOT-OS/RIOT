@@ -141,7 +141,7 @@ void *realloc(void *ptr, size_t size)
     return r;
 }
 
-ssize_t read(int fd, void *buf, size_t count)
+ssize_t _native_read(int fd, void *buf, size_t count)
 {
     ssize_t r;
 
@@ -152,12 +152,11 @@ ssize_t read(int fd, void *buf, size_t count)
     return r;
 }
 
-ssize_t write(int fd, const void *buf, size_t count)
+ssize_t _native_write(int fd, const void *buf, size_t count)
 {
     ssize_t r;
 
     _native_syscall_enter();
-    //real_write(fd, "real_write: ", 12);
     r = real_write(fd, buf, count);
     _native_syscall_leave();
 
@@ -165,14 +164,14 @@ ssize_t write(int fd, const void *buf, size_t count)
 }
 
 int putchar(int c) {
-    write(STDOUT_FILENO, &c, 1);
+    _native_write(STDOUT_FILENO, &c, 1);
     return 0;
 }
 
 int puts(const char *s)
 {
     int r;
-    r = write(STDOUT_FILENO, (char*)s, strlen(s));
+    r = _native_write(STDOUT_FILENO, (char*)s, strlen(s));
     putchar('\n');
     return r;
 }
@@ -213,7 +212,7 @@ int printf(const char *format, ...)
     if ((m = make_message(format, argp)) == NULL) {
         err(EXIT_FAILURE, "malloc");
     }
-    r = write(STDOUT_FILENO, m, strlen(m));
+    r = _native_write(STDOUT_FILENO, m, strlen(m));
     va_end(argp);
     free(m);
 
@@ -229,7 +228,7 @@ int vprintf(const char *format, va_list argp)
     if ((m = make_message(format, argp)) == NULL) {
         err(EXIT_FAILURE, "malloc");
     }
-    r = write(STDOUT_FILENO, m, strlen(m));
+    r = _native_write(STDOUT_FILENO, m, strlen(m));
     free(m);
 
     return r;
@@ -243,15 +242,15 @@ void vwarn(const char *fmt, va_list args)
     e = strerror(errno);
 
     if ((m = make_message(fmt, args)) == NULL) {
-        write(STDERR_FILENO, "malloc\n", 7);
+        _native_write(STDERR_FILENO, "malloc\n", 7);
         exit(EXIT_FAILURE);
     }
-    write(STDERR_FILENO, _progname, strlen(_progname));
-    write(STDERR_FILENO, ": ", 2);
-    write(STDERR_FILENO, m, strlen(m));
-    write(STDERR_FILENO, ": ", 2);
-    write(STDERR_FILENO, e, strlen(e));
-    write(STDERR_FILENO, "\n", 1);
+    _native_write(STDERR_FILENO, _progname, strlen(_progname));
+    _native_write(STDERR_FILENO, ": ", 2);
+    _native_write(STDERR_FILENO, m, strlen(m));
+    _native_write(STDERR_FILENO, ": ", 2);
+    _native_write(STDERR_FILENO, e, strlen(e));
+    _native_write(STDERR_FILENO, "\n", 1);
     free(m);
 }
 
@@ -260,13 +259,13 @@ void vwarnx(const char *fmt, va_list args)
     char *m;
 
     if ((m = make_message(fmt, args)) == NULL) {
-        write(STDERR_FILENO, "malloc\n", 7);
+        _native_write(STDERR_FILENO, "malloc\n", 7);
         exit(EXIT_FAILURE);
     }
-    write(STDERR_FILENO, _progname, strlen(_progname));
-    write(STDERR_FILENO, ": ", 2);
-    write(STDERR_FILENO, m, strlen(m));
-    write(STDERR_FILENO, "\n", 1);
+    _native_write(STDERR_FILENO, _progname, strlen(_progname));
+    _native_write(STDERR_FILENO, ": ", 2);
+    _native_write(STDERR_FILENO, m, strlen(m));
+    _native_write(STDERR_FILENO, "\n", 1);
     free(m);
 }
 

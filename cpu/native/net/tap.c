@@ -219,7 +219,7 @@ int8_t send_buf(radio_packet_t *packet)
 
     DEBUG("send_buf: trying to send %d bytes\n", to_send);
 
-    if ((nsent = write(_native_tap_fd, buf, to_send)) == -1) {;
+    if ((nsent = _native_write(_native_tap_fd, buf, to_send)) == -1) {;
         warn("write");
         return -1;
     }

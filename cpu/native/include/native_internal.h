@@ -61,6 +61,8 @@ extern char **_native_argv;
 extern fd_set _native_rfds;
 #endif
 
+ssize_t _native_read(int fd, void *buf, size_t count);
+ssize_t _native_write(int fd, const void *buf, size_t count);
 
 /**
  * register interrupt handler handler for interrupt sig
