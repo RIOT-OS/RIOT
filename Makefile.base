@@ -9,7 +9,7 @@ endif
 OBJ = $(SRC:%.c=$(BINDIR)$(MODULE)/%.o)
 DEP = $(SRC:%.c=$(BINDIR)$(MODULE)/%.d)
 
-GIT_STRING := $(shell git describe --abbrev=4 --dirty=-`hostname`)
+GIT_STRING := $(shell git describe --always --abbrev=4 --dirty=-`hostname`)
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 ifeq ($(strip $(GIT_BRANCH)),master)
 	GIT_VERSION = $(GIT_STRING)
