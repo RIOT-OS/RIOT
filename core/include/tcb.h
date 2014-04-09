@@ -44,27 +44,30 @@
 #define STATUS_RUNNING          7                      /**< currently running */
 #define STATUS_PENDING          8                      /**< waiting to be scheduled to run */
 
-
-
 typedef struct tcb_t {
     char *sp;
-    uint16_t status;
+    uint8_t status;
+    uint8_t flags;
 
     uint16_t pid;
     uint16_t priority;
 
     clist_node_t rq_entry;
 
+    const char *name;
+    char *stack_start;
+    int stack_size;
+} tcb_t;
+
+typedef struct msg_tcb_t {
+    tcb_t tcb;
+
     void *wait_data;
     queue_node_t msg_waiters;
 
     cib_t msg_queue;
     msg_t *msg_array;
-
-    const char *name;
-    char *stack_start;
-    int stack_size;
-} tcb_t;
+} msg_tcb_t;
 
 /** @} */
 #endif /* TCB_H_ */
