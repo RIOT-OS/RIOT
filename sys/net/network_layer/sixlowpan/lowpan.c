@@ -213,15 +213,16 @@ int sixlowpan_lowpan_sendto(int if_id, const void *dest, int dest_len,
     if (send_packet_length > PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN) {
         uint16_t remaining;
         uint16_t position, datagram_size = send_packet_length;
-        uint8_t max_frame = PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN;
-        uint8_t fragbuf[max_frame + 5];
+        uint8_t max_frame;
 
-        if (!(net_if_get_interface(if_id)->transceivers & (IEEE802154_TRANSCEIVER))) {
-            max_frame = PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN;
-        }
-        else {
+        if (net_if_get_interface(if_id)->transceivers & (IEEE802154_TRANSCEIVER)) {
             max_frame = PAYLOAD_SIZE;
         }
+        else {
+            max_frame = PAYLOAD_SIZE - IEEE_802154_MAX_HDR_LEN;
+        }
+
+        uint8_t fragbuf[max_frame + 5];
 
         /* first fragment */
         max_frag_initial = ((max_frame - 4) / 8) * 8;
@@ -262,7 +263,7 @@ int sixlowpan_lowpan_sendto(int if_id, const void *dest, int dest_len,
 
             sixlowpan_mac_send_ieee802154_frame(if_id, dest, dest_len,
                                                 &fragbuf,
-                                                max_frame + 5, mcast);
+                                                max_frag + 5, mcast);
             data += max_frag;
             position += max_frag;
         }
@@ -837,6 +838,8 @@ void lowpan_read(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
         frag_size = length - hdr_length;
         byte_offset = datagram_offset * 8;
 
+        DEBUG("Frag size is %u, offset is %u, datagram_size is %u\n",
+              frag_size, byte_offset, datagram_size);
         if ((frag_size % 8) != 0) {
             if ((byte_offset + frag_size) != datagram_size) {
                 printf("ERROR: received invalid fragment\n");
