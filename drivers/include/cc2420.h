@@ -76,6 +76,8 @@ Frame type value:
 #ifndef CC2420_H
 #define CC2420_H
 
+#include <stdbool.h>
+
 #include "ieee802154_frame.h"
 #include "cc2420_settings.h"
 
@@ -221,6 +223,16 @@ void cc2420_rx_handler(void);
  *
  */
 int16_t cc2420_send(cc2420_packet_t *packet);
+
+/**
+ * @brief Checks if the radio medium is available/clear to send
+ *         ("Clear Channel Assessment" a.k.a. CCA).
+ *
+ * @return a @c true value if radio medium is clear (available),
+ *         a @c false value otherwise.
+ *
+ */
+bool channel_clear(void);
 
 /**
  * The PID of the transceiver thread.

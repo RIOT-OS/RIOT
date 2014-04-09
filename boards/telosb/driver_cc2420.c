@@ -13,8 +13,10 @@
 #include "cpu.h"
 #include "irq.h"
 #include "hwtimer.h"
+#include "crash.h"
 
 #include "cc2420.h"
+#include "cc2420_arch.h"
 
 #define ENABLE_DEBUG    (1)
 #include "debug.h"
@@ -86,22 +88,35 @@ void cc2420_after_send(void)
 
 int cc2420_get_gio0(void)
 {
-    return  CC2420_GIO0;
+    return CC2420_GIO0;
 }
 
 int cc2420_get_gio1(void)
 {
-    return  CC2420_GIO1;
+    return CC2420_GIO1;
 }
 
 int cc2420_get_fifop(void)
 {
-    return  CC2420_FIFOP;
+    return CC2420_FIFOP;
 }
 
-int cc2420_get_sfd(void)
+uint8_t cc2420_get_sfd(void)
 {
     return CC2420_SFD;
+}
+
+uint8_t cc2420_get_cca(void)
+{
+    uint8_t status;
+    long c = 0;
+    do {
+        status = cc2420_txrx(NOBYTE);
+        if (c++ == 1000000) {
+            core_panic(0x2420, "cc2420_get_cca() alarm");
+        }
+    } while (!(status & CC2420_STATUS_RSSI_VALID));
+    return CC2420_GIO1;
 }
 
 void cc2420_spi_cs(void)
@@ -118,19 +133,18 @@ uint8_t cc2420_txrx(uint8_t data)
     U0TXBUF = data;
     while(!(IFG1 & UTXIFG0)) {
         if (c++ == 1000000) {
-            puts("cc2420_txrx alarm()");
+            core_panic(0x2420, "cc2420_txrx() alarm");
         }
     }
     /* Wait for Byte received */
     c = 0;
     while(!(IFG1 & URXIFG0)) {
         if (c++ == 1000000) {
-            puts("cc2420_txrx alarm()");
+            core_panic(0x2420, "cc2420_txrx() alarm");
         }
     }
     return U0RXBUF;
 }
-
 
 void cc2420_spi_select(void)
 {
