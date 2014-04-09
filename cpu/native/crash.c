@@ -58,9 +58,13 @@ NORETURN void core_panic(int crash_code, const char *message)
     (void) reboot(RB_AUTOBOOT);
 #endif
 
-    /* proove the compiler that we won't return from this function
+    /* tell the compiler that we won't return from this function
        (even if we actually won't even get here...) */
+#if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ >= 5)
+    __builtin_unreachable();
+#else
     while (1) {
-        /* nothing in particular */;
+        /* do nothing, but do it often */
     }
+#endif
 }
