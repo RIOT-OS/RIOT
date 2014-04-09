@@ -179,5 +179,5 @@ uint16_t cc2420_get_pan(void)
 
 inline bool channel_clear(void)
 {
-    return (get_cca() != 0);
+    return (cc2420_get_cca() != 0);
 }
