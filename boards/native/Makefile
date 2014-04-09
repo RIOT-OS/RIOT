@@ -7,10 +7,11 @@ all: $(BINDIR)$(MODULE).a
 
 include $(RIOTBASE)/Makefile.base
 
-$(BINDIR)%.o: %.c
-	$(AD)$(CC) $(CFLAGS) $(NATIVEINCLUDES) -c $*.c -o $(BINDIR)$*.o
+$(BINDIR)$(MODULE)/%.o: %.c
+	@mkdir -p $(BINDIR)$(MODULE)
+	$(AD)$(CC) $(CFLAGS) $(NATIVEINCLUDES) -c $*.c -o $(BINDIR)$(MODULE)/$*.o
 	$(AD)$(CC) $(CFLAGS) $(NATIVEINCLUDES) -MM $*.c |\
-		sed -e "1s|^|$(BINDIR)|" > $(BINDIR)$*.d
+		sed -e "1s|^|$(BINDIR)$(MODULE)/|" > $(BINDIR)$(MODULE)/$*.d
 
 clean::
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean || exit 1; done ;
