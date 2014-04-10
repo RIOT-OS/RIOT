@@ -46,7 +46,7 @@ int riot_send_transceiver(uint8_t *buf, uint16_t size, uint16_t to)
     p.dst = (to == RIOT_BROADCAST) ? 0 : to;
     p.data = buf;
 
-    tcmd.transceivers = transceiver_ids;
+    tcmd.transceivers = TRANSCEIVER;
     tcmd.data = &p;
 
     mesg.type = SND_PKT;

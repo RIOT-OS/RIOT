@@ -105,11 +105,11 @@ int ccnl_open_riotmsgdev(void)
 int ccnl_open_riottransdev(void)
 {
 
-    transceiver_init(transceiver_ids);
+    transceiver_init(TRANSCEIVER);
     transceiver_start();
 
     /** register for transceiver events */
-    transceiver_register(transceiver_ids, thread_getpid());
+    transceiver_register(TRANSCEIVER, thread_getpid());
 
     return RIOT_TRANS_DEV; /* sock id */
 }

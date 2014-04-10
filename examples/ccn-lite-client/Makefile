@@ -36,12 +36,7 @@ USEMODULE += posix
 USEMODULE += ps
 USEMODULE += random
 USEMODULE += transceiver
-ifeq ($(BOARD),msba2)
-	USEMODULE += cc110x_ng
-else ifeq ($(BOARD),native)
-	USEMODULE += nativenet
-endif
-
+USEMODULE += defaulttransceiver
 USEMODULE += rtc
 USEMODULE += crypto_sha256
 USEMODULE += ccn_lite
