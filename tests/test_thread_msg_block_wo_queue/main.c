@@ -50,7 +50,7 @@ void thread1(void)
 int main(void)
 {
     msg_t msg;
-    p_main = thread_pid;
+    p_main = sched_active_pid;
 
     p1 = thread_create(t1_stack, KERNEL_CONF_STACKSIZE_PRINTF, PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST, thread1, "nr1");

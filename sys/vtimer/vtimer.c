@@ -374,7 +374,7 @@ int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout) {
     timeout_message.content.ptr = (char *) &timeout_message;
 
     vtimer_t t;
-    vtimer_set_msg(&t, timeout, thread_pid, &timeout_message);
+    vtimer_set_msg(&t, timeout, sched_active_pid, &timeout_message);
     msg_receive(m);
     if (m->type == MSG_TIMER && m->content.ptr == (char *) &timeout_message) {
         /* we hit the timeout */

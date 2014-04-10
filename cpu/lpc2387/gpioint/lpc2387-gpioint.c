@@ -61,7 +61,7 @@ gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
     volatile unsigned long *en_clr;
 
     /* lookup registers */
-    bit = number_of_highest_bit(bitmask);                       /* get irq mapping table index */
+    bit = bitarithm_msb(bitmask);         /* get irq mapping table index */
 
     switch(port) {
         case 0:                                                 /* PORT0 */

@@ -49,7 +49,7 @@ int sem_init(sem_t *sem, int pshared, unsigned int value)
 int sem_destroy(sem_t *sem)
 {
     if (sem->queue.next) {
-        DEBUG("%s: tried to destroy active semaphore.\n", active_thread->name);
+        DEBUG("%s: tried to destroy active semaphore.\n", sched_active_thread->name);
         return -1;
     }
     return 0;
@@ -77,15 +77,15 @@ int sem_unlink(const char *name)
 static void sem_thread_blocked(sem_t *sem)
 {
     /* I'm going blocked */
-    sched_set_status((tcb_t*) active_thread, STATUS_MUTEX_BLOCKED);
+    sched_set_status((tcb_t*) sched_active_thread, STATUS_MUTEX_BLOCKED);
 
     queue_node_t n;
-    n.priority = (uint32_t) active_thread->priority;
-    n.data = (size_t) active_thread;
+    n.priority = (uint32_t) sched_active_thread->priority;
+    n.data = (size_t) sched_active_thread;
     n.next = NULL;
 
     DEBUG("%s: Adding node to mutex queue: prio: %" PRIu32 "\n",
-          active_thread->name, n.priority);
+          sched_active_thread->name, n.priority);
 
     /* add myself to the waiters queue */
     queue_priority_add(&sem->queue, &n);
@@ -147,9 +147,9 @@ int sem_post(sem_t *sem)
     queue_node_t *next = queue_remove_head(&sem->queue);
     if (next) {
         tcb_t *next_process = (tcb_t*) next->data;
-        DEBUG("%s: waking up %s\n", active_thread->name, next_process->name);
+        DEBUG("%s: waking up %s\n", sched_active_thread->name, next_process->name);
         sched_set_status(next_process, STATUS_PENDING);
-        sched_switch(active_thread->priority, next_process->priority);
+        sched_switch(sched_active_thread->priority, next_process->priority);
     }
 
     restoreIRQ(old_state);

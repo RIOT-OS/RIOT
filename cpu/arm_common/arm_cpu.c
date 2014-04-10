@@ -73,7 +73,7 @@ void thread_print_stack(void)
     asm("mov %0, sp" : "=r"(stack));
 
     register unsigned int *s = (unsigned int *)stack;
-    printf("task: %X SP: %X\n", (unsigned int) active_thread, (unsigned int) stack);
+    printf("task: %X SP: %X\n", (unsigned int) sched_active_thread, (unsigned int) stack);
     register int i = 0;
     s += 5;
 

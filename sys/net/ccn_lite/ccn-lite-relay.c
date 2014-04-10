@@ -427,7 +427,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 void ccnl_riot_relay_start(int max_cache_entries, int fib_threshold_prefix, int fib_threshold_aggregate)
 {
     ccnl_get_timeval(&theRelay.startup_time);
-    theRelay.riot_pid = thread_pid;
+    theRelay.riot_pid = sched_active_pid;
 
     DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", theRelay.startup_time.tv_sec, theRelay.startup_time.tv_usec);
     DEBUGMSG(1, "  compile time: %s %s\n", __DATE__, __TIME__);

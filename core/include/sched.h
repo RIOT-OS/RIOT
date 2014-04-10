@@ -82,17 +82,17 @@ extern volatile tcb_t *sched_threads[MAXTHREADS];
 /**
  *  Currently active thread
  */
-extern volatile tcb_t *active_thread;
+extern volatile tcb_t *sched_active_thread;
 
 /**
  *  Number of running (non-terminated) threads
  */
-extern volatile int num_tasks;
+extern volatile int sched_num_threads;
 
 /**
  *  Process ID of active thread
  */
-extern volatile int thread_pid;
+extern volatile int sched_active_pid;
 
 /**
  *  Process ID of the thread that was active before the current one

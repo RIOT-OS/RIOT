@@ -45,7 +45,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-extern volatile tcb_t *active_thread;
+extern volatile tcb_t *sched_active_thread;
 
 volatile int native_interrupts_enabled;
 volatile int _native_in_isr;
@@ -303,9 +303,9 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     if (context == NULL) {
         errx(EXIT_FAILURE, "native_isr_entry: context is null - unhandled");
     }
-    if (active_thread == NULL) {
+    if (sched_active_thread == NULL) {
         _native_in_isr++;
-        warnx("native_isr_entry: active_thread is null - unhandled");
+        warnx("native_isr_entry: sched_active_thread is null - unhandled");
         _native_in_isr--;
         return;
     }
@@ -330,7 +330,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     native_isr_context.uc_stack.ss_size = SIGSTKSZ;
     native_isr_context.uc_stack.ss_flags = 0;
     makecontext(&native_isr_context, native_irq_handler, 0);
-    _native_cur_ctx = (ucontext_t *)active_thread->sp;
+    _native_cur_ctx = (ucontext_t *)sched_active_thread->sp;
 
     DEBUG("\n\n\t\treturn to _native_sig_leave_tramp\n\n");
     /* disable interrupts in context */

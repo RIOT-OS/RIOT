@@ -39,7 +39,7 @@
 #include "cpu-conf.h"
 #define DEBUG_PRINT(...) \
     do { \
-        if ((active_thread == NULL) || (active_thread->stack_size > KERNEL_CONF_STACKSIZE_PRINTF)) { \
+        if ((sched_active_thread == NULL) || (sched_active_thread->stack_size > KERNEL_CONF_STACKSIZE_PRINTF)) { \
             printf(__VA_ARGS__); \
         } \
         else { \
@@ -70,7 +70,7 @@
 #define DEBUGF(...) \
     do { \
         DEBUG_PRINT("DEBUG(%s): %s:%d in %s: ", \
-                active_thread ? active_thread->name : "NO THREAD", \
+                sched_active_thread ? sched_active_thread->name : "NO THREAD", \
                 __FILE__, __LINE__, __func__); \
         DEBUG_PRINT(__VA_ARGS__); \
     } while (0)

@@ -140,58 +140,58 @@ static void test_CLRBIT_one_random(void)
     TEST_ASSERT_EQUAL_INT(0x00, res);
 }
 
-static void test_number_of_highest_bit_one(void)
+static void test_bitarithm_msb_one(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, number_of_highest_bit(1));
+    TEST_ASSERT_EQUAL_INT(0, bitarithm_msb(1));
 }
 
-static void test_number_of_highest_bit_limit(void)
+static void test_bitarithm_msb_limit(void)
 {
     TEST_ASSERT_EQUAL_INT(sizeof(unsigned) * 8 - 1,
-                          number_of_highest_bit(UINT_MAX));
+                          bitarithm_msb(UINT_MAX));
 }
 
-static void test_number_of_highest_bit_random(void)
+static void test_bitarithm_msb_random(void)
 {
-    TEST_ASSERT_EQUAL_INT(2, number_of_highest_bit(4)); /* randomized by fair
+    TEST_ASSERT_EQUAL_INT(2, bitarithm_msb(4)); /* randomized by fair
                                                            dice roll ;-) */
 }
 
-static void test_number_of_lowest_bit_one(void)
+static void test_bitarithm_lsb_one(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, number_of_lowest_bit(1));
+    TEST_ASSERT_EQUAL_INT(0, bitarithm_lsb(1));
 }
 
-static void test_number_of_lowest_bit_limit(void)
+static void test_bitarithm_lsb_limit(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, number_of_lowest_bit(UINT_MAX));
+    TEST_ASSERT_EQUAL_INT(0, bitarithm_lsb(UINT_MAX));
 }
 
-static void test_number_of_lowest_bit_random(void)
+static void test_bitarithm_lsb_random(void)
 {
-    TEST_ASSERT_EQUAL_INT(3, number_of_lowest_bit(8)); /* randomized by fair
+    TEST_ASSERT_EQUAL_INT(3, bitarithm_lsb(8)); /* randomized by fair
                                                           dice roll ;-) */
 }
 
-static void test_number_of_bits_set_null(void)
+static void test_bitarithm_bits_set_null(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, number_of_bits_set(0));
+    TEST_ASSERT_EQUAL_INT(0, bitarithm_bits_set(0));
 }
 
-static void test_number_of_bits_set_one(void)
+static void test_bitarithm_bits_set_one(void)
 {
-    TEST_ASSERT_EQUAL_INT(1, number_of_bits_set(1));
+    TEST_ASSERT_EQUAL_INT(1, bitarithm_bits_set(1));
 }
 
-static void test_number_of_bits_set_limit(void)
+static void test_bitarithm_bits_set_limit(void)
 {
     TEST_ASSERT_EQUAL_INT(sizeof(unsigned) * 8,
-                          number_of_bits_set(UINT_MAX));
+                          bitarithm_bits_set(UINT_MAX));
 }
 
-static void test_number_of_bits_set_random(void)
+static void test_bitarithm_bits_set_random(void)
 {
-    TEST_ASSERT_EQUAL_INT(3, number_of_bits_set(7)); /* randomized by fair
+    TEST_ASSERT_EQUAL_INT(3, bitarithm_bits_set(7)); /* randomized by fair
                                                         dice roll ;-) */
 }
 
@@ -212,16 +212,16 @@ Test *tests_core_bitarithm_tests(void)
         new_TestFixture(test_CLRBIT_null_one),
         new_TestFixture(test_CLRBIT_one_null),
         new_TestFixture(test_CLRBIT_one_random),
-        new_TestFixture(test_number_of_highest_bit_one),
-        new_TestFixture(test_number_of_highest_bit_limit),
-        new_TestFixture(test_number_of_highest_bit_random),
-        new_TestFixture(test_number_of_lowest_bit_one),
-        new_TestFixture(test_number_of_lowest_bit_limit),
-        new_TestFixture(test_number_of_lowest_bit_random),
-        new_TestFixture(test_number_of_bits_set_null),
-        new_TestFixture(test_number_of_bits_set_one),
-        new_TestFixture(test_number_of_bits_set_limit),
-        new_TestFixture(test_number_of_bits_set_random),
+        new_TestFixture(test_bitarithm_msb_one),
+        new_TestFixture(test_bitarithm_msb_limit),
+        new_TestFixture(test_bitarithm_msb_random),
+        new_TestFixture(test_bitarithm_lsb_one),
+        new_TestFixture(test_bitarithm_lsb_limit),
+        new_TestFixture(test_bitarithm_lsb_random),
+        new_TestFixture(test_bitarithm_bits_set_null),
+        new_TestFixture(test_bitarithm_bits_set_one),
+        new_TestFixture(test_bitarithm_bits_set_limit),
+        new_TestFixture(test_bitarithm_bits_set_random),
     };
 
     EMB_UNIT_TESTCALLER(core_bitarithm_tests, NULL, NULL, fixtures);

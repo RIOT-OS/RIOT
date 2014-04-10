@@ -48,16 +48,16 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
 
     mutex_lock(&barrier->mutex);
     DEBUG("%s: hit a synchronization barrier. pid=%u\n",
-          active_thread->name, active_thread->pid);
+          sched_active_thread->name, sched_active_thread->pid);
 
     if (--barrier->count > 0) {
         /* need to wait for further threads */
 
         DEBUG("%s: waiting for %u threads. pid=%u\n",
-              active_thread->name, barrier->count, active_thread->pid);
+              sched_active_thread->name, barrier->count, sched_active_thread->pid);
 
         pthread_barrier_waiting_node_t node;
-        node.pid = thread_pid;
+        node.pid = sched_active_pid;
         node.next = barrier->next;
         node.cont = 0;
 
@@ -80,7 +80,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
         /* all threads have arrived, wake everybody up */
 
         DEBUG("%s: waking every other thread up. pid=%u\n",
-              active_thread->name, active_thread->pid);
+              sched_active_thread->name, sched_active_thread->pid);
 
         int count = 1; /* Count number of woken up threads.
                         * The first thread is the current thread. */
