@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <errno.h>
 #include "tcb.h"
 #include "kernel.h"
 #include "kernel_internal.h"
