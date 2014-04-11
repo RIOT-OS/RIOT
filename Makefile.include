@@ -163,10 +163,10 @@ debug:
 buildtest:
 	@if [ -z "$${JENKINS_URL}" ] && tput colors 2>&1 > /dev/null; then \
 		GREEN='\033[1;32m'; RED='\033[1;31m'; RESET='\033[0m'; \
-		ECHO='echo -e'; \
+		ECHO='/bin/echo -e'; \
 	else \
 		GREEN=''; RED=''; RESET=''; \
-		ECHO='echo'; \
+		ECHO='/bin/echo'; \
 	fi; \
 	\
 	if [ -z "$(BOARD_WHITELIST)" ]; then \
