@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -17,6 +17,7 @@
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Oliver Hahm <oliver.hahm@fu-berlin.de>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  *
  * @}
  */
@@ -63,28 +64,21 @@ static void hwtimer_releasemutex(void* mutex) {
 void hwtimer_spin(unsigned long ticks)
 {
     DEBUG("hwtimer_spin ticks=%lu\n", ticks);
-    unsigned long t = hwtimer_arch_now();
 
-    /**
-     * If hwtimer_arch_now + ticks results in an overflow,
+    unsigned long start = hwtimer_arch_now();
+    /* compute destination time, possibly resulting in an overflow */
+    unsigned long stop = start + ticks;
+
+    /*
+     * If there is an overflow (that is: stop time is inferior to start),
      * hwtimer_arch_now needs to spin until it has overflowed as well.
-     *
-     * If the destination time will result in an overflow, the result
-     * is smaller than ticks by at least one.
      */
-    if (t + ticks < ticks) {
-        while (hwtimer_arch_now() > t);
+    if (stop < start) {
+        while (hwtimer_arch_now() > start) /* do nothing */;
     }
 
-    /**
-     * set t to destination time, possibly overflowing it
-     */
-    t += ticks;
-
-    /**
-     * wait until the present has past destination time t
-     */
-    while (hwtimer_arch_now() < t);
+    /* wait until we have passed destination (stop) time */
+    while (hwtimer_arch_now() < stop) /* do nothing again */;
 }
 
 /*---------------------------------------------------------------------------*/
