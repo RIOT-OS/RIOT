@@ -1,5 +1,14 @@
 DIRS = $(RIOTCPU)/$(CPU) core drivers sys
 
+ifneq (,$(filter embunit,$(USEMODULE)))
+	DIRS += tests/unittests/embunit/embUnit
+endif
+
+ifneq (,$(filter embunit_textui,$(USEMODULE)))
+	DIRS += tests/unittests/embunit/textui
+endif
+
+
 .PHONY: all clean doc
 
 all:
