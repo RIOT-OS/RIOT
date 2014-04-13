@@ -14,12 +14,14 @@
  * @brief       Threading implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  *
  * @}
  */
 
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "thread.h"
 #include "kernel.h"
@@ -114,21 +116,17 @@ int thread_measure_stack_free(char *stack)
 
 int thread_create(char *stack, int stacksize, char priority, int flags, void (*function)(void), const char *name)
 {
+    unsigned tcb_size = (flags & CREATE_NOMSG) == 0 ? sizeof (msg_tcb_t) : sizeof (tcb_t);
+
     /* allocate our thread control block at the top of our stackspace */
     int total_stacksize = stacksize;
-    stacksize -= sizeof(tcb_t);
+    stacksize -= tcb_size;
 
     /* align tcb address on 32bit boundary */
     unsigned int tcb_address = (unsigned int) stack + stacksize;
-
-    if (tcb_address & 1) {
+    while (tcb_address & 3) {
         tcb_address--;
         stacksize--;
-    }
-
-    if (tcb_address & 2) {
-        tcb_address -= 2;
-        stacksize -= 2;
     }
 
     tcb_t *cb = (tcb_t *) tcb_address;
@@ -152,53 +150,35 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
         *stack = (unsigned int)stack;
     }
 
-    if (!inISR()) {
-        dINT();
-    }
+    unsigned old_state = disableIRQ();
 
     int pid = 0;
 
     while (pid < MAXTHREADS) {
         if (sched_threads[pid] == NULL) {
-            sched_threads[pid] = cb;
-            cb->pid = pid;
             break;
         }
-
         pid++;
     }
 
     if (pid == MAXTHREADS) {
         DEBUG("thread_create(): too many threads!\n");
 
-        if (!inISR()) {
-            eINT();
-        }
-
+        restoreIRQ(old_state);
         return -EOVERFLOW;
     }
 
+    memset(cb, 0, tcb_size);
     cb->sp = thread_stack_init(function, stack, stacksize);
     cb->stack_start = stack;
     cb->stack_size = total_stacksize;
-
+    cb->pid = pid;
     cb->priority = priority;
-    cb->status = 0;
-
+    cb->flags = flags;
     cb->rq_entry.data = (unsigned int) cb;
-    cb->rq_entry.next = NULL;
-    cb->rq_entry.prev = NULL;
-
     cb->name = name;
 
-    cb->wait_data = NULL;
-
-    cb->msg_waiters.data = 0;
-    cb->msg_waiters.priority = 0;
-    cb->msg_waiters.next = NULL;
-
-    cib_init(&(cb->msg_queue), 0);
-    cb->msg_array = NULL;
+    sched_threads[pid] = cb;
 
     num_tasks++;
 
@@ -206,23 +186,15 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
 
     if (flags & CREATE_SLEEPING) {
         sched_set_status(cb, STATUS_SLEEPING);
+        restoreIRQ(old_state);
     }
     else {
         sched_set_status(cb, STATUS_PENDING);
+        restoreIRQ(old_state);
 
         if (!(flags & CREATE_WOUT_YIELD)) {
-            if (!inISR()) {
-                eINT();
-                thread_yield();
-            }
-            else {
-                sched_context_switch_request = 1;
-            }
+            sched_switch(active_thread ? active_thread->priority : SCHED_PRIO_LEVELS, priority);
         }
-    }
-
-    if (!inISR() && active_thread != NULL) {
-        eINT();
     }
 
     return pid;

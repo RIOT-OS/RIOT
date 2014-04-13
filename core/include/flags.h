@@ -19,10 +19,11 @@
 #ifndef _FLAGS_H
 #define _FLAGS_H
 
-#define CREATE_SLEEPING     (1)
-#define AUTO_FREE           (2)
-#define CREATE_WOUT_YIELD   (4)
-#define CREATE_STACKTEST    (8)
+#define CREATE_SLEEPING     (1u << 0)
+#define AUTO_FREE           (1u << 1)
+#define CREATE_WOUT_YIELD   (1u << 2)
+#define CREATE_STACKTEST    (1u << 3)
+#define CREATE_NOMSG        (1u << 4)
 
 /** @} */
 #endif // _FLAGS_H
