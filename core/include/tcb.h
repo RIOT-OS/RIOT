@@ -44,7 +44,15 @@
 #define STATUS_RUNNING          7                      /**< currently running */
 #define STATUS_PENDING          8                      /**< waiting to be scheduled to run */
 
-
+/**
+ *  Scheduler statistics
+ */
+typedef struct {
+    unsigned int laststart; /*< Time stamp of the last time this thread was
+                                scheduled to run */
+    unsigned int schedules; /*< How often the thread was scheduled to run */
+    unsigned long runtime_ticks;   /*< The total runtime of this thread in ticks */
+} schedstat_t;
 
 typedef struct tcb_t {
     char *sp;
@@ -64,6 +72,10 @@ typedef struct tcb_t {
     const char *name;
     char *stack_start;
     int stack_size;
+
+#if SCHEDSTATISTICS
+    schedstat_t schedstats;
+#endif
 } tcb_t;
 
 /** @} */
