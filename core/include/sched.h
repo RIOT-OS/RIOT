@@ -25,6 +25,7 @@
 #include <stddef.h>
 #include "bitarithm.h"
 #include "tcb.h"
+#include "clist.h"
 
 #if ARCH_32_BIT
 #define SCHED_PRIO_LEVELS 32
@@ -70,17 +71,14 @@ extern volatile unsigned int sched_context_switch_request;
 /**
  *  Currently active thread
  */
-extern volatile tcb_t *active_thread;
+extern tcb_t *active_thread;
 
 /**
  *  Number of running (non-terminated) threads
  */
 extern volatile int num_tasks;
 
-/**
- *  Process ID of active thread
- */
-extern volatile int thread_pid;
+extern clist_node_t *runqueues[SCHED_PRIO_LEVELS + 1];
 
 /** @} */
 #endif // _SCHEDULER_H
