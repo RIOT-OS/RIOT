@@ -23,16 +23,16 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include "tcb.h"
-
 // mspgcc bug : PRIxxx macros not defined before mid-2011 versions
 #ifndef PRIu32
 #define PRIu32 "lu"
 #endif
 
+struct tcb_t;
+
 typedef struct queue_node_t {
     struct queue_node_t *next;
-    tcb_t *thread;
+    struct tcb_t *thread;
 } queue_node_t;
 
 void queue_add_tail(queue_node_t *root, queue_node_t *new_obj);
@@ -40,11 +40,6 @@ void queue_add_head(queue_node_t *root, queue_node_t *new_obj);
 queue_node_t *queue_remove_head(queue_node_t *root);
 void queue_priority_add(queue_node_t *root, queue_node_t *new_obj);
 void queue_remove(queue_node_t *root, queue_node_t *node);
-
-#if ENABLE_DEBUG
-void queue_print(queue_node_t *node);
-void queue_print_node(queue_node_t *node);
-#endif
 
 /** @} */
 #endif /* __QUEUE_H */

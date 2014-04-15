@@ -34,11 +34,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "tcb.h"
-
 #define MESSAGE_SENT 1
 #define MESSAGE_PROCESS_NOT_WAITING 0
 #define MESSAGE_PROCESS_UNKNOWN 2
+
+struct tcb_t;
 
 /**
  * @brief Describes a message object which can be sent between threads.
@@ -49,11 +49,11 @@
  *
  */
 typedef struct msg {
-    tcb_t        *sender_pid;   ///< Sender thread. Will be filled in by msg_send
-    uint16_t     type;          ///< Type field.
+    struct tcb_t *sender;   ///< Sender thread. Will be filled in by msg_send
+    uint16_t     type;      ///< Type field.
     union {
-        char     *ptr;          ///< pointer content field
-        uint32_t value;         ///< value content field
+        char     *ptr;      ///< pointer content field
+        uint32_t value;     ///< value content field
     } content;
 } msg_t;
 
@@ -75,7 +75,7 @@ typedef struct msg {
  * @return 0 if receiver is not waiting or has a full message queue and block == false
  * @return -1 on error (invalid target)
  */
-int msg_send(msg_t *m, tcb_t *target, bool block);
+int msg_send(msg_t *m, struct tcb_t *target, bool block);
 
 
 /**
@@ -89,7 +89,7 @@ int msg_send(msg_t *m, tcb_t *target, bool block);
  * @return 1 if sending was successful
  * @return 0 if receiver is not waiting and block == false
  */
-int msg_send_int(msg_t *m, tcb_t *target);
+int msg_send_int(msg_t *m, struct tcb_t *target);
 
 
 /**
@@ -122,7 +122,7 @@ int msg_try_receive(msg_t *m);
  * @param target target process
  * @return 1 if successful
  */
-int msg_send_receive(msg_t *m, msg_t *reply, tcb_t *target);
+int msg_send_receive(msg_t *m, msg_t *reply, struct tcb_t *target);
 
 /**
  * @brief Replies to a message.

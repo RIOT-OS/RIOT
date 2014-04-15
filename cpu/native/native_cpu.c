@@ -54,7 +54,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-extern volatile tcb_t *active_thread;
+extern tcb_t *active_thread;
 
 ucontext_t end_context;
 char __end_stack[SIGSTKSZ];

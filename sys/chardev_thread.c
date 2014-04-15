@@ -45,9 +45,7 @@ void chardev_loop(ringbuffer_t *rb)
 {
     msg_t m;
 
-    int pid = thread_getpid();
-
-    int reader_pid = -1;
+    tcb_t *reader = NULL;
     struct posix_iop_t *r = NULL;
 
     puts("UART0 thread started.");
@@ -55,14 +53,14 @@ void chardev_loop(ringbuffer_t *rb)
     while (1) {
         msg_receive(&m);
 
-        if (m.sender_pid != pid) {
+        if (m.sender != active_thread) {
             DEBUG("Receiving message from another thread: ");
 
             switch(m.type) {
                 case OPEN:
                     DEBUG("OPEN\n");
-                    if (reader_pid == -1) {
-                        reader_pid = m.sender_pid;
+                    if (!reader) {
+                        reader = m.sender;
                         /* no error */
                         m.content.value = 0;
                     }
@@ -75,7 +73,7 @@ void chardev_loop(ringbuffer_t *rb)
 
                 case READ:
                     DEBUG("READ\n");
-                    if (m.sender_pid != reader_pid) {
+                    if (m.sender != reader) {
                         m.content.value = -EINVAL;
                         r = NULL;
                         msg_reply(&m, &m);
@@ -88,9 +86,9 @@ void chardev_loop(ringbuffer_t *rb)
 
                 case CLOSE:
                     DEBUG("CLOSE\n");
-                    if (m.sender_pid == reader_pid) {
+                    if (m.sender == reader) {
                         DEBUG("uart0_thread: closing file from %i\n", reader_pid);
-                        reader_pid = -1;
+                        reader = NULL;
                         r = NULL;
                         m.content.value = 0;
                     }
@@ -116,7 +114,7 @@ void chardev_loop(ringbuffer_t *rb)
             rb_get_elements(rb, r->buffer, nbytes);
             r->nbytes = nbytes;
 
-            m.sender_pid = reader_pid;
+            m.sender = reader;
             m.type = OPEN;
             m.content.ptr = (char *)r;
 

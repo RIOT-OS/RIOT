@@ -49,7 +49,7 @@
  *
  * @return  returns new thread, or NULL if an error occured.
 */
-tcb_t *thread_create(char *stack, int stacksize, char priority, int flags, void (*function) (void), const char *name);
+tcb_t *thread_create(char *stack, int stacksize, unsigned priority, int flags, void (*function) (void));
 
 /**
  * @brief   Puts the current thread into sleep mode. Has to be woken up externally.

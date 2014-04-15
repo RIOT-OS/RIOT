@@ -40,12 +40,12 @@ volatile int num_tasks = 0;
 
 volatile unsigned int sched_context_switch_request;
 
-volatile tcb_t *active_thread;
+tcb_t *active_thread;
 
 clist_node_t *runqueues[SCHED_PRIO_LEVELS + 1];
 static uint32_t runqueue_bitcache = 0;
 
-void sched_run()
+void sched_run(void)
 {
     sched_context_switch_request = 0;
 
@@ -89,11 +89,9 @@ void sched_run()
 
     while (!my_active_thread) {
         int nextrq = number_of_lowest_bit(runqueue_bitcache);
-        clist_node_t next = *(runqueues[nextrq]);
-        DEBUG("scheduler: first in queue: %s\n", ((tcb_t *)next.data)->name);
+        my_active_thread = container_of(runqueues[nextrq], tcb_t, rq_entry);
+        DEBUG("scheduler: first in queue: %s\n", my_active_thread->stack_start);
         clist_advance(&(runqueues[nextrq]));
-        my_active_thread = (tcb_t *)next.data;
-        thread_pid = (volatile int) my_active_thread->pid;
 
 #if SCHEDSTATISTICS
         my_active_thread->schedstats.laststart = time;
@@ -140,15 +138,16 @@ void sched_set_status(tcb_t *process, unsigned int status)
             runqueue_bitcache |= 1 << process->priority;
         }
     }
-    else {
-        if (process->status >= STATUS_ON_RUNQUEUE) {
-            DEBUG("removing process %s from runqueue %u.\n", process->name, process->priority);
-            clist_remove(&runqueues[process->priority], &(process->rq_entry));
-            clist_add(&runqueues[SCHED_PRIO_LEVELS], &(process->rq_entry));
+    else if (process->status >= STATUS_ON_RUNQUEUE) {
+        DEBUG("removing process %s from runqueue %u.\n", process->name, process->priority);
+        clist_remove(&runqueues[process->priority], &(process->rq_entry));
 
-            if (!runqueues[process->priority]) {
-                runqueue_bitcache &= ~(1 << process->priority);
-            }
+        if (status != STATUS_STOPPED) {
+            clist_add(&runqueues[SCHED_PRIO_LEVELS], &(process->rq_entry));
+        }
+
+        if (!runqueues[process->priority]) {
+            runqueue_bitcache &= ~(1 << process->priority);
         }
     }
 
@@ -176,10 +175,9 @@ void sched_task_exit(void)
     DEBUG("sched_task_exit(): ending task %s...\n", active_thread->name);
 
     dINT();
-    sched_threads[active_thread->pid] = NULL;
     num_tasks--;
 
-    sched_set_status((tcb_t *)active_thread,  STATUS_STOPPED);
+    sched_set_status(active_thread,  STATUS_STOPPED);
 
     active_thread = NULL;
     cpu_switch_context_exit();

@@ -23,6 +23,7 @@
 #include <stdio.h>
 
 #include "queue.h"
+#include "tcb.h"
 
 void queue_remove(queue_node_t *root, queue_node_t *node)
 {
@@ -68,8 +69,10 @@ void queue_priority_add(queue_node_t *root, queue_node_t *new_obj)
 {
     queue_node_t *node = root;
 
+    uint16_t new_obj_priority = new_obj->thread->priority;
+
     while (node->next != NULL) {
-        if (node->next->priority > new_obj->priority) {
+        if (node->next->thread->priority > new_obj_priority) {
             new_obj->next = node->next;
             node->next = new_obj;
             return;
@@ -99,59 +102,3 @@ void queue_priority_add_generic(queue_node_t *root, queue_node_t *new_obj, int (
     node->next = new_obj;
     new_obj->next = NULL;
 }
-
-#if ENABLE_DEBUG
-void queue_print(queue_node_t *node)
-{
-    printf("queue:\n");
-
-    while (node->next != NULL) {
-        node = node->next;
-        printf("Data: %u Priority: %" PRIu32 "\n", node->data, node->priority);
-    }
-}
-
-void queue_print_node(queue_node_t *node)
-{
-    printf("Data: %u Priority: %" PRIu32 " Next: %u\n", (unsigned int)node->data, node->priority, (unsigned int)node->next);
-}
-#endif
-
-/*
-int main() {
-    queue_node_t root, a, b, c,d;
-
-    memset(&d, '\0', sizeof(queue_node_t));
-    memset(&a, '\0', sizeof(queue_node_t));
-    memset(&b, '\0', sizeof(queue_node_t));
-    memset(&c, '\0', sizeof(queue_node_t));
-
-    root.data = 0;
-    root.next = NULL;
-
-    a.data = 1;
-    a.priority = 1;
-    b.data = 2;
-    b.priority = 2;
-    c.data = 0;
-    c.priority = 5;
-    d.data = 4;
-    d.priority = 4;
-
-    queue_add_tail(&root, &a);
-    queue_add_tail(&root, &b);
-    queue_add_tail(&root, &c);
-    queue_add_tail(&root, &d);
-
-    queue_print(&root);
-
-    queue_remove(&root, &c);
-
-    queue_print(&root);
-
-    queue_priority_add(&root, &c);
-
-    queue_print(&root);
-
-    return 0;
-}*/
