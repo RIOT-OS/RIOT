@@ -46,7 +46,7 @@
 #endif
 #include "debug.h"
 
-extern volatile tcb_t *active_thread;
+extern tcb_t *active_thread;
 
 ssize_t (*real_read)(int fd, void *buf, size_t count);
 ssize_t (*real_write)(int fd, const void *buf, size_t count);

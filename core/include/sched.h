@@ -25,8 +25,7 @@
 #include <stddef.h>
 #include "bitarithm.h"
 #include "tcb.h"
-
-#define MAXTHREADS 32
+#include "clist.h"
 
 #if ARCH_32_BIT
 #define SCHED_PRIO_LEVELS 32
@@ -70,46 +69,16 @@ void cpu_switch_context_exit(void);
 extern volatile unsigned int sched_context_switch_request;
 
 /**
- *  Thread table
- */
-extern volatile tcb_t *sched_threads[MAXTHREADS];
-
-/**
  *  Currently active thread
  */
-extern volatile tcb_t *active_thread;
+extern tcb_t *active_thread;
 
 /**
  *  Number of running (non-terminated) threads
  */
 extern volatile int num_tasks;
 
-/**
- *  Process ID of active thread
- */
-extern volatile int thread_pid;
-
-#if SCHEDSTATISTICS
-/**
- *  Scheduler statistics
- */
-typedef struct {
-    unsigned int laststart; /*< Time stamp of the last time this thread was
-                                scheduled to run */
-    unsigned int schedules; /*< How often the thread was scheduled to run */
-    unsigned long runtime_ticks;   /*< The total runtime of this thread in ticks */
-} schedstat;
-
-/**
- *  Thread statistics table
- */
-extern schedstat pidlist[MAXTHREADS];
-
-/**
- *  Register a callback that will be called on every scheduler run
- */
-void sched_register_cb(void (*callback)(uint32_t, uint32_t));
-#endif
+extern clist_node_t *runqueues[SCHED_PRIO_LEVELS + 1];
 
 /** @} */
 #endif // _SCHEDULER_H

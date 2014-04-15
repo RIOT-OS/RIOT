@@ -45,7 +45,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-extern volatile tcb_t *active_thread;
+extern tcb_t *active_thread;
 
 volatile int native_interrupts_enabled;
 volatile int _native_in_isr;
@@ -94,14 +94,20 @@ void print_sigmasks(void)
     ucontext_t *p;
     //tcb_t *cb = NULL;
 
-    for (int i = 0; i < MAXTHREADS; i++) {
-        if (sched_threads[i] != NULL) {
-            printf("%s:\n", sched_threads[i]->name);
-            //print_thread_sigmask(sched_threads[i]->sp);
-            p = (ucontext_t *)(sched_threads[i]->stack_start);
+    for (int i = 0; i < SCHED_PRIO_LEVELS + 1; i++) {
+        clist_node_t *start = runqueues[i], *node = start;
+        if (!start) {
+            continue;
+        }
+        do {
+            tcb_t *thread = container_of(node, tcb_t, rq_entry);
+            node = start->next;
+
+            printf("%s:\n", thread->stack_start);
+            p = (ucontext_t *) (thread->stack_start);
             print_thread_sigmask(p);
             puts("");
-        }
+        } while (node != start);
     }
 }
 

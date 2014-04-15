@@ -47,21 +47,9 @@
  * priority. 0 means highest possible priority. Lowest priority is
  * PRIORITY_IDLE-1, usually 30.
  *
- * @return  returns <0 on error, pid of newly created task else.
+ * @return  returns new thread, or NULL if an error occured.
 */
-int thread_create(char *stack, int stacksize, char priority, int flags, void (*function) (void), const char *name);
-
-/**
- * @brief   returns the status of a process.
- * @return  STATUS_NOT_FOUND if pid is unknown
- */
-int thread_getstatus(int pid);
-
-/**
- * @brief   returns the name of a process.
- * @return  NULL if pid is unknown
- */
-const char *thread_getname(int pid);
+tcb_t *thread_create(char *stack, int stacksize, unsigned priority, int flags, void (*function) (void));
 
 /**
  * @brief   Puts the current thread into sleep mode. Has to be woken up externally.
@@ -75,23 +63,10 @@ void thread_yield(void);
 
 /**
  * @brief   Wakes up a sleeping thread.
- * @param   pid The PID of the thread to be woken up
+ * @param   target the thread to be woken up
  * @return  STATUS_NOT_FOUND if pid is unknown or not sleeping
  */
-int thread_wakeup(int pid);
-
-
-/**
- * @brief   Returns the process ID of the currently running thread.
- * @return  Obviously you are not a golfer.
- */
-int thread_getpid(void);
-
-/**
- * @brief   Returns the process ID of the thread running before the current one.
- * @return  Obviously you are not a golfer.
- */
-int thread_getlastpid(void);
+int thread_wakeup(tcb_t *target);
 
 /**
  * @brief Measures the stack usage of a stack.

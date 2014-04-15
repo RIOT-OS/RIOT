@@ -20,10 +20,16 @@
 #ifndef __CLIST_H
 #define __CLIST_H
 
+#include <stddef.h>
+
+#ifndef container_of
+#define container_of(PTR, TYPE, MEMBER) \
+    ((TYPE *) ((char *) (const __typeof__ (((TYPE *) 0)->MEMBER) *) (PTR) - offsetof(TYPE, MEMBER)))
+#endif
+
 typedef struct clist_node_t {
     struct clist_node_t *next;
     struct clist_node_t *prev;
-    unsigned int data;
 } clist_node_t;
 
 /* inserts new_node after node */
@@ -39,10 +45,6 @@ static inline void clist_advance(clist_node_t **list)
 {
     *list = (*list)->next;
 }
-
-#if ENABLE_DEBUG
-void clist_print(clist_node_t *clist);
-#endif
 
 /** @} */
 #endif // __CLIST_H

@@ -52,12 +52,8 @@ static void print_echo(int argc, char **argv)
 
 static int shell_readc(void)
 {
-    char c;
-    int result = posix_read(uart0_handler_pid, &c, 1);
-    if (result != 1) {
-        return -1;
-    }
-    return (unsigned char) c;
+    int result = getchar();
+    return result >= 0 ? (unsigned char) result : result;
 }
 
 static void shell_putchar(int c)
@@ -76,10 +72,6 @@ int main(void)
 {
 
     printf("test_shell.\n");
-
-    board_uart0_init();
-
-    posix_open(uart0_handler_pid, 0);
 
     /* define own shell commands */
     shell_t shell;
