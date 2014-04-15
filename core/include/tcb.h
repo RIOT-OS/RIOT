@@ -58,7 +58,6 @@ typedef struct tcb_t {
     char *sp;
     uint16_t status;
 
-    uint16_t pid;
     uint16_t priority;
 
     clist_node_t rq_entry;
@@ -69,7 +68,6 @@ typedef struct tcb_t {
     cib_t msg_queue;
     msg_t *msg_array;
 
-    const char *name;
     char *stack_start;
     int stack_size;
 

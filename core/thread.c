@@ -32,43 +32,14 @@
 #include "hwtimer.h"
 #include "sched.h"
 
-inline int thread_getpid()
-{
-    return active_thread->pid;
-}
-
-int thread_getlastpid()
-{
-    extern int last_pid;
-    return last_pid;
-}
-
-int thread_getstatus(int pid)
-{
-    if (sched_threads[pid] == NULL) {
-        return STATUS_NOT_FOUND;
-    }
-
-    return sched_threads[pid]->status;
-}
-
-const char *thread_getname(int pid)
-{
-    if (sched_threads[pid] == NULL) {
-        return NULL;
-    }
-
-    return sched_threads[pid]->name;
-}
-
-void thread_sleep()
+void thread_sleep(void)
 {
     if (inISR()) {
         return;
     }
 
     dINT();
-    sched_set_status((tcb_t *)active_thread, STATUS_SLEEPING);
+    sched_set_status((tcb_t *) active_thread, STATUS_SLEEPING);
     eINT();
     thread_yield();
 }
