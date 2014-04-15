@@ -95,11 +95,7 @@ void sched_run(void)
 
 #if SCHEDSTATISTICS
         my_active_thread->schedstats.laststart = time;
-        my_active_thread->schedstats.schedules++;
-        if ((sched_cb) && (my_active_thread->pid != last_pid)) {
-            sched_cb(hwtimer_now(), my_active_thread->pid);
-            last_pid = my_active_thread->pid;
-        }
+        ++my_active_thread->schedstats.schedules;
 #endif
     }
 
@@ -119,13 +115,6 @@ void sched_run(void)
 
     DEBUG("scheduler: done.\n");
 }
-
-#if SCHEDSTATISTICS
-void sched_register_cb(void (*callback)(uint32_t, uint32_t))
-{
-    sched_cb = callback;
-}
-#endif
 
 void sched_set_status(tcb_t *process, unsigned int status)
 {
