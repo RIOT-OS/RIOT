@@ -1,8 +1,11 @@
-
 /**
  * @defgroup    sys_transceiver Transceiver
  * @ingroup     sys
+ * @{
+ *
+ * @file        transceiver.h
  * @brief       Transceiver library
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #ifndef TRANSCEIVER_H
@@ -220,3 +223,4 @@ int transceiver_start(void);
 uint8_t transceiver_register(transceiver_type_t transceivers, int pid);
 
 #endif /* TRANSCEIVER_H */
+/** @} */
