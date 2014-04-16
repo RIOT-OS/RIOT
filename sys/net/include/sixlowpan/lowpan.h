@@ -7,10 +7,12 @@
  */
 
 /**
+ * @defgroup    net_sixlowpan_lowpan 6LoWPAN adaptation layer
  * @ingroup     net_sixlowpan
+ * @brief       IPv6 over LoW Power wireless Area Networks
  * @{
  *
- * @file        sixlowpan/lowpan.h
+ * @file        include/sixlowpan/lowpan.h
  * @brief       6LoWPAN LoWPAN layer header
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -299,5 +301,5 @@ void sixlowpan_lowpan_print_reassembly_buffers(void);
  */
 int sixlowpan_lowpan_init(void);
 
-/** @} */
 #endif /* SIXLOWPAN_LOWPAN_H */
+/** @} */

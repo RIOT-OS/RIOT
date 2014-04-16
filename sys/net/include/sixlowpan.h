@@ -31,8 +31,9 @@
  *              over Low-Power Wireless Personal Area Networks
  *              (6LoWPANs)
  *          </a>
- * @{
  *
+ *
+ * @{
  * @file        sixlowpan.h
  * @brief       6lowpan link layer and lowpan functions
  *
@@ -46,5 +47,5 @@
 #include "sixlowpan/lowpan.h"
 #include "sixlowpan/mac.h"
 
-/** @} */
 #endif /* SIXLOWPAN_H */
+/** @} */

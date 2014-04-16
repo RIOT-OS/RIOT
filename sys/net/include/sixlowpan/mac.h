@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     net_sixlowpan
+ * @ingroup     net_sixlowpan_lowpan
  * @{
  *
  * @file        sixlowpan/mac.h

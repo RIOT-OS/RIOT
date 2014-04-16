@@ -7,10 +7,12 @@
  */
 
 /**
+ * @defgroup    net_sixlowpan_ip IPv6
  * @ingroup     net_sixlowpan
+ * @brief       Internet Protocol version 6
  * @{
  *
- * @file        sixlowpan/ip.h
+ * @file        include/sixlowpan/ip.h
  * @brief       6LoWPAN constants, data structs, and prototypes for network layer
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -540,5 +542,5 @@ void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t *dest)
  */
 uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t proto);
 
-/** @} */
 #endif /* SIXLOWPAN_IP_H */
+/** @} */

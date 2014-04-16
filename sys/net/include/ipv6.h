@@ -1,17 +1,20 @@
-/**
- * ipv6.h - Wraps all API types, constants and functions of
- *          6LoWPAN in layer 3.
- *
- * Copyright (C) 2013  INRIA.
+/*
+ * Copyright (C) 2014  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup sixlowpan
+ */
+
+/**
+ * @ingroup net_sixlowpan
  * @{
- * @file
+ * @file    ipv6.h
  * @brief   IPv6 and ICMP functions
+ *
+ *          Wraps all API types, constants and functions of
+ *          6LoWPAN in layer 3.
+ *
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef IPV6_H
@@ -25,7 +28,7 @@
 
 #include "../network_layer/sixlowpan/icmp.h"        /* TODO: remove if not needed anymore */
 
+#endif /* IPV6_H */
 /**
  * @}
  */
-#endif /* IPV6_H */
