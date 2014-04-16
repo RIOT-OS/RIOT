@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -16,6 +16,7 @@
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  *
  * @}
  */
@@ -62,7 +63,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
     m->sender_pid = thread_pid;
 
     if (m->sender_pid == target_pid) {
-        return -1;
+        return msg_send_to_self(m);
     }
 
     if (target == NULL) {
@@ -126,6 +127,16 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
     thread_yield();
 
     return 1;
+}
+
+int msg_send_to_self(msg_t *m)
+{
+    unsigned int state = disableIRQ();
+
+    int res = queue_msg(active_thread, m);
+
+    restoreIRQ(state);
+    return res;
 }
 
 int msg_send_int(msg_t *m, unsigned int target_pid)
