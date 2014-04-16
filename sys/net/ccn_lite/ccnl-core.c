@@ -1023,12 +1023,10 @@ int ccnl_content_serve_pending(struct ccnl_relay_s *ccnl,
 
             pi->face->flags |= CCNL_FACE_FLAGS_SERVED;
 
-            if (pi->face->ifndx >= 0) {
-                DEBUGMSG(6, "  forwarding content <%s>\n",
-                         ccnl_prefix_to_path(c->name));
-                pi->face->stat.send_content[c->served_cnt % CCNL_MAX_CONTENT_SERVED_STAT]++;
-                ccnl_face_enqueue(ccnl, pi->face, buf_dup(c->pkt));
-            }
+            DEBUGMSG(6, "  forwarding content <%s>\n",
+                     ccnl_prefix_to_path(c->name));
+            pi->face->stat.send_content[c->served_cnt % CCNL_MAX_CONTENT_SERVED_STAT]++;
+            ccnl_face_enqueue(ccnl, pi->face, buf_dup(c->pkt));
 
             c->served_cnt++;
             ccnl_get_timeval(&c->last_used);
