@@ -1,4 +1,6 @@
-/**************************************************************************//**
+/**
+ * @ingroup CMSIS
+ *
  * @file     core_cm3.h
  * @brief    CMSIS Cortex-M3 Core Peripheral Access Layer Header File
  * @version  V3.02
@@ -154,6 +156,7 @@
 /* IO definitions (access restrictions to peripheral registers) */
 /**
     \defgroup CMSIS_glob_defs CMSIS Global Defines
+    \ingroup CMSIS
 
     <strong>IO Type Qualifiers</strong> are used
     \li to specify the access to peripheral variables.
@@ -182,6 +185,7 @@
   - Core MPU Register
  ******************************************************************************/
 /** \defgroup CMSIS_core_register Defines and Type Definitions
+ *  \ingroup CMSIS
     \brief Type definitions and defines for Cortex-M processor based devices.
 */
 
@@ -1252,6 +1256,7 @@ typedef struct
   - Core Register Access Functions
  ******************************************************************************/
 /** \defgroup CMSIS_Core_FunctionInterface Functions and Instructions Reference
+ * \ingroup CMSIS
 */
 
 
