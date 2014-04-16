@@ -1,5 +1,8 @@
 /* Functions for handling conditional variables.  */
 
+typedef unsigned long int pthread_cond_t;
+typedef unsigned long int pthread_condattr_t;
+
 /* Initialize condition variable COND using attributes ATTR, or use
  the default values if later is NULL.  */
 int pthread_cond_init(pthread_cond_t *cond,

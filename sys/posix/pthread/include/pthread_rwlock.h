@@ -1,4 +1,9 @@
-/* Functions for handling read-write locks.  */
+/**
+ * @ingroup pthread
+ */
+
+typedef unsigned long int pthread_rwlock_t;
+typedef unsigned long int pthread_rwlockattr_t;
 
 /* Initialize read-write lock RWLOCK using attributes ATTR, or use
  the default values if later is NULL.  */

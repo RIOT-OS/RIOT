@@ -1,4 +1,4 @@
-/**
+/*
  * POSIX implementation of threading.
  *
  * Copyright (C) 2013 Freie Universität Berlin
@@ -6,11 +6,13 @@
  * This file subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup posix
+ */
+
+/**
+ * @ingroup pthread
  * @{
- * @file    pthread.c
- * @brief   Implementation of pthread.
+ * @file
+ * @brief   Singletons features / single-shot execution.
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author  René Kijewski <kijewski@inf.fu-berlin.de>
  * @}

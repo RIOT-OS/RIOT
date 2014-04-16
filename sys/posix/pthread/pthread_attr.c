@@ -1,16 +1,16 @@
-/**
- * POSIX implementation of threading.
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup posix
+ */
+
+/**
+ * @ingroup pthread
  * @{
- * @file    pthread.c
- * @brief   Implementation of pthread.
+ * @file
+ * @brief   Thread creation attributes.
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author  René Kijewski <kijewski@inf.fu-berlin.de>
  * @}
@@ -147,6 +147,9 @@ int pthread_attr_setstackaddr(pthread_attr_t *attr, void *stackaddr)
 int pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize)
 {
     *stacksize = attr->ss_size;
+    if (*stacksize == 0) {
+        /* FIXME: the standard says that this function should return the default value if no explicit value was set. */
+    }
     return 0;
 }
 

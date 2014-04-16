@@ -1,4 +1,8 @@
-/* Functions to handle spinlocks.  */
+/**
+ * @ingroup pthread
+ */
+
+typedef volatile int pthread_spinlock_t;
 
 /* Initialize the spinlock LOCK.  If PSHARED is nonzero the spinlock can
  be shared between different processes.  */

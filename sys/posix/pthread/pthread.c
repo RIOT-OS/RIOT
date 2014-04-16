@@ -1,16 +1,19 @@
-/**
- * POSIX implementation of threading.
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
+ */
+
+/**
+ * @defgroup pthread POSIX threads
+ * POSIX conforming multi-threading features.
  * @ingroup posix
  * @{
- * @file    pthread.c
- * @brief   Implementation of pthread.
+ * @file
+ * @brief   Thread creation features.
+ * @see     [The Open Group Base Specifications Issue 7: pthread.h - threads](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author  René Kijewski <kijewski@inf.fu-berlin.de>
  * @}
@@ -254,11 +257,6 @@ pthread_t pthread_self(void)
     return result;
 }
 
-int pthread_equal(pthread_t thread1, pthread_t thread2)
-{
-    return (thread1 == thread2);
-}
-
 int pthread_cancel(pthread_t th)
 {
     pthread_thread_t *other = pthread_sched_threads[th-1];
@@ -275,21 +273,21 @@ int pthread_setcancelstate(int state, int *oldstate)
 {
     (void) state;
     (void) oldstate;
-    return 0;
+    return -1;
 }
 
 int pthread_setcanceltype(int type, int *oldtype)
 {
     (void) type;
     (void) oldtype;
-    return 0;
+    return -1;
 }
 
 void pthread_testcancel(void)
 {
     pthread_t self = pthread_self();
     if (pthread_sched_threads[self-1]->should_cancel) {
-        pthread_exit(NULL);
+        pthread_exit(PTHREAD_CANCELED);
     }
 }
 
