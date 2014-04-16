@@ -8,6 +8,5 @@
 
 /**
  * @defgroup    net Net
- * @ingroup     sys
  * @brief       Networking libraries
  */
