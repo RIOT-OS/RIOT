@@ -26,23 +26,35 @@
 #include "kernel_internal.h"
 
 
+/**
+ * @name noticeable marker marking the beginning of a stack segment
+ *
+ * This marker is used e.g. by *thread_arch_start_threading* to identify the stacks start.
+ */
+#define STACK_MARKER                (0x77777777)
+
+/**
+ * @name ARM Cortex-M specific exception return value, that triggers the return to the task mode
+ *       stack pointer
+ */
+#define EXCEPT_RET_TASK_MODE        (0xfffffffd)
+
+
 static void context_save(void);
 static void context_restore(void);
 static void enter_thread_mode(void);
 
 /**
- * cortex m4 knows stacks and handles register backups
+ * Cortex-M knows stacks and handles register backups, so use different stack frame layout
  *
- * so use different stack frame layout
+ * TODO: How to handle different Cortex-Ms? Code is so far valid for M3 and M4 without FPU
  *
- *
- * with float storage
+ * Layout with storage of floating point registers (applicable for Cortex-M4):
  * ------------------------------------------------------------------------------------------------------------------------------------
  * | R0 | R1 | R2 | R3 | LR | PC | xPSR | S0 | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9 | S10 | S11 | S12 | S13 | S14 | S15 | FPSCR |
  * ------------------------------------------------------------------------------------------------------------------------------------
  *
- * without
- *
+ * Layout without floating point registers:
  * --------------------------------------
  * | R0 | R1 | R2 | R3 | LR | PC | xPSR |
  * --------------------------------------
@@ -50,19 +62,21 @@ static void enter_thread_mode(void);
  */
 char *thread_arch_stack_init(void  (*task_func)(void), void *stack_start, int stack_size)
 {
-    unsigned int * stk;
+    unsigned int *stk;
     stk = (unsigned int *)(stack_start + stack_size);
 
     /* marker */
     stk--;
-    *stk = 0x77777777;
+    *stk = STACK_MARKER;
 
     /* TODO: fix FPU handling for Cortex-M4 */
     /*
     stk--;
     *stk = (unsigned int) 0;
+    */
 
-    // S0 - S15
+    /* S0 - S15 */
+    /*
     for (int i = 15; i >= 0; i--) {
         stk--;
         *stk = i;
@@ -99,7 +113,7 @@ char *thread_arch_stack_init(void  (*task_func)(void), void *stack_start, int st
 
     /* lr means exception return code  */
     stk--;
-    *stk = (unsigned int) 0xfffffffd; /* return to task-mode main stack pointer */
+    *stk = EXCEPT_RET_TASK_MODE; /* return to task-mode main stack pointer */
 
     return (char*) stk;
 }
@@ -109,9 +123,6 @@ void thread_arch_stack_print(void)
     /* TODO */
 }
 
-/**
- *
- */
 void thread_arch_start_threading(void)
 {
     sched_run();
@@ -121,8 +132,6 @@ void thread_arch_start_threading(void)
 
 /**
  * @brief Set the MCU into Thread-Mode and load the initial task from the stack and run it
- *
- * This function is only called once on startup!
  */
 void enter_thread_mode(void)
 {
@@ -149,7 +158,8 @@ void thread_arch_yield(void)
 {
     if (irq_arch_in()) {
         SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;    /* set PendSV Bit */
-    } else {
+    }
+    else {
         asm("svc 0x01\n");                      /* trigger SVC interrupt, which will trigger the pendSV (needed?) */
     }
 }
@@ -157,29 +167,20 @@ void thread_arch_yield(void)
 /**
  * @brief SVC interrupt handler (to be discussed if this is really needed)
  */
-__attribute__((naked))
-void isr_svc(void)
+__attribute__((naked)) void isr_svc(void)
 {
-    /* {r0-r3,r12,LR,PC,xPSR} are saved automatically on exception entry */
-//    asm("push   {LR}");
-    /* save exception return value */
-    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
-
-//    asm("pop    {r0}"               );      /* restore exception return value from stack */
+    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;    /* trigger the pendsv interrupt */
     asm("bx     LR"                 );      /* load exception return value to PC causes end of exception*/
-    /* {r0-r3,r12,LR,PC,xPSR} are restored automatically on exception return */
 }
 
-__attribute__((naked))
-void isr_pendsv(void)
+__attribute__((naked)) void isr_pendsv(void)
 {
     context_save();
     sched_run();
     context_restore();
 }
 
-__attribute__( ( always_inline ) ) static __INLINE
-void context_save(void)
+__attribute__((always_inline)) static __INLINE void context_save(void)
 {
     /* {r0-r3,r12,LR,PC,xPSR} are saved automatically on exception entry */
 
@@ -187,20 +188,19 @@ void context_save(void)
     asm("mrs    r0, psp"            );      /* get stack pointer from user mode */
     asm("stmdb  r0!,{r4-r11}"       );      /* save regs */
     asm("stmdb  r0!,{lr}"           );      /* exception return value */
-//  asm("vstmdb sp!, {s16-s31}"     );      /* FIXME save FPU registers if needed */
+/*  asm("vstmdb sp!, {s16-s31}"     ); */   /* TODO save FPU registers if needed */
     asm("ldr    r1, =active_thread" );      /* load address of current tcb */
     asm("ldr    r1, [r1]"           );      /* dereference pdc */
     asm("str    r0, [r1]"           );      /* write r0 to pdc->sp means current threads stack pointer */
 }
 
-__attribute__( ( always_inline ) ) static __INLINE
-void context_restore(void)
+__attribute__((always_inline)) static __INLINE void context_restore(void)
 {
     asm("ldr    r0, =active_thread" );      /* load address of current TCB */
     asm("ldr    r0, [r0]"           );      /* dereference TCB */
     asm("ldr    r1, [r0]"           );      /* load tcb->sp to register 1 */
     asm("ldmia  r1!, {r0}"          );      /* restore exception return value from stack */
-//  asm("pop    {s16-s31}"          );      /* FIXME load FPU register if needed depends on r0 exret */
+/*  asm("pop    {s16-s31}"          ); */   /* TODO load FPU register if needed depends on r0 exret */
     asm("ldmia  r1!, {r4-r11}"      );      /* restore other registers */
     asm("msr    psp, r1"            );      /* restore PSP register (user mode SP)*/
     asm("bx     r0"                 );      /* load exception return value to PC causes end of exception*/
