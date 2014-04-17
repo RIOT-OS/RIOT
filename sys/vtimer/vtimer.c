@@ -261,9 +261,10 @@ static int vtimer_set(vtimer_t *timer)
 void vtimer_now(timex_t *out)
 {
     uint32_t us = HWTIMER_TICKS_TO_US(hwtimer_now() - longterm_tick_start);
+    uint32_t us_per_s = 1000ul * 1000ul;
 
-    out->seconds = seconds + us / (1000 * 1000);
-    out->microseconds = us % (1000 * 1000);
+    out->seconds = seconds + us / us_per_s;
+    out->microseconds = us % us_per_s;
 }
 
 void vtimer_gettimeofday(struct timeval *tp) {
