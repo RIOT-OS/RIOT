@@ -76,7 +76,7 @@ static char pthread_reaper_stack[PTHREAD_REAPER_STACKSIZE];
 static void pthread_start_routine(void)
 {
     pthread_t self = pthread_self();
-    pthread_thread_t *pt = pthread_sched_threads[self];
+    pthread_thread_t *pt = pthread_sched_threads[self-1];
     void *retval = pt->start_routine(pt->arg);
     pthread_exit(retval);
 }
@@ -88,7 +88,7 @@ static int insert(pthread_thread_t *pt)
     for (int i = 0; i < MAXTHREADS; i++){
         if (!pthread_sched_threads[i]) {
             pthread_sched_threads[i] = pt;
-            result = i;
+            result = i+1;
             break;
         }
     }
@@ -150,7 +150,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
     if (pt->thread_pid < 0) {
         free(pt->stack);
         free(pt);
-        pthread_sched_threads[pthread_pid] = NULL;
+        pthread_sched_threads[pthread_pid-1] = NULL;
         return -1;
     }
 
@@ -161,7 +161,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
 
 void pthread_exit(void *retval)
 {
-    pthread_thread_t *self = pthread_sched_threads[pthread_self()];
+    pthread_thread_t *self = pthread_sched_threads[pthread_self()-1];
 
     while (self->cleanup_top) {
         __pthread_cleanup_datum_t *ct = self->cleanup_top;
@@ -193,7 +193,7 @@ void pthread_exit(void *retval)
 
 int pthread_join(pthread_t th, void **thread_return)
 {
-    pthread_thread_t *other = pthread_sched_threads[th];
+    pthread_thread_t *other = pthread_sched_threads[th-1];
     if (!other) {
         return -1;
     }
@@ -211,7 +211,7 @@ int pthread_join(pthread_t th, void **thread_return)
             free(other);
             /* we only need to free the pthread layer struct,
             native thread stack is freed by other */
-            pthread_sched_threads[th] = NULL;
+            pthread_sched_threads[th-1] = NULL;
             return 0;
         case (PTS_DETACHED):
             return -1;
@@ -222,7 +222,7 @@ int pthread_join(pthread_t th, void **thread_return)
 
 int pthread_detach(pthread_t th)
 {
-    pthread_thread_t *other = pthread_sched_threads[th];
+    pthread_thread_t *other = pthread_sched_threads[th-1];
     if (!other) {
         return -1;
     }
@@ -231,7 +231,7 @@ int pthread_detach(pthread_t th)
         free(other);
         /* we only need to free the pthread layer struct,
         native thread stack is freed by other */
-        pthread_sched_threads[th] = NULL;
+        pthread_sched_threads[th-1] = NULL;
     } else {
         other->status = PTS_DETACHED;
     }
@@ -241,12 +241,12 @@ int pthread_detach(pthread_t th)
 
 pthread_t pthread_self(void)
 {
-    pthread_t result = -1;
+    pthread_t result = 0;
     mutex_lock(&pthread_mutex);
     int pid = thread_pid; /* thread_pid is volatile */
     for (int i = 0; i < MAXTHREADS; i++) {
         if (pthread_sched_threads[i] && pthread_sched_threads[i]->thread_pid == pid) {
-            result = i;
+            result = i+1;
             break;
         }
     }
@@ -261,7 +261,7 @@ int pthread_equal(pthread_t thread1, pthread_t thread2)
 
 int pthread_cancel(pthread_t th)
 {
-    pthread_thread_t *other = pthread_sched_threads[th];
+    pthread_thread_t *other = pthread_sched_threads[th-1];
     if (!other) {
         return -1;
     }
@@ -288,21 +288,21 @@ int pthread_setcanceltype(int type, int *oldtype)
 void pthread_testcancel(void)
 {
     pthread_t self = pthread_self();
-    if (pthread_sched_threads[self]->should_cancel) {
+    if (pthread_sched_threads[self-1]->should_cancel) {
         pthread_exit(NULL);
     }
 }
 
 void __pthread_cleanup_push(__pthread_cleanup_datum_t *datum)
 {
-    pthread_thread_t *self = pthread_sched_threads[pthread_self()];
+    pthread_thread_t *self = pthread_sched_threads[pthread_self()-1];
     datum->__next = self->cleanup_top;
     self->cleanup_top = datum;
 }
 
 void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute)
 {
-    pthread_thread_t *self = pthread_sched_threads[pthread_self()];
+    pthread_thread_t *self = pthread_sched_threads[pthread_self()-1];
     self->cleanup_top = datum->__next;
 
     if (execute != 0) {
