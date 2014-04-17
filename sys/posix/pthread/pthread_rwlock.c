@@ -35,11 +35,15 @@
 #include <stdint.h>
 #include <string.h>
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr)
 {
     (void) attr;
 
     if (rwlock == NULL) {
+        DEBUG("Thread %u: pthread_rwlock_%s(): rwlock=NULL supplied\n", thread_pid, "init");
         return EINVAL;
     }
 
@@ -50,6 +54,7 @@ int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *at
 int pthread_rwlock_destroy(pthread_rwlock_t *rwlock)
 {
     if (rwlock == NULL) {
+        DEBUG("Thread %u: pthread_rwlock_%s(): rwlock=NULL supplied\n", thread_pid, "destroy");
         return EINVAL;
     }
 
@@ -99,14 +104,21 @@ static int pthread_rwlock_lock(pthread_rwlock_t *rwlock,
                                bool allow_spurious)
 {
     if (rwlock == NULL) {
+        DEBUG("Thread %u: pthread_rwlock_%s(): is_writer=%u, allow_spurious=%u %s\n",
+              thread_pid, "lock", is_writer, allow_spurious, "rwlock=NULL");
         return EINVAL;
     }
 
     mutex_lock(&rwlock->mutex);
     if (!is_blocked(rwlock)) {
+        DEBUG("Thread %u: pthread_rwlock_%s(): is_writer=%u, allow_spurious=%u %s\n",
+              thread_pid, "lock", is_writer, allow_spurious, "is open");
         rwlock->readers += incr_when_held;
     }
     else {
+        DEBUG("Thread %u: pthread_rwlock_%s(): is_writer=%u, allow_spurious=%u %s\n",
+              thread_pid, "lock", is_writer, allow_spurious, "is locked");
+
         /* queue for the lock */
         __pthread_rwlock_waiter_node_t waiting_node = {
             .is_writer = is_writer,
@@ -127,9 +139,13 @@ static int pthread_rwlock_lock(pthread_rwlock_t *rwlock,
             mutex_lock(&rwlock->mutex);
             if (waiting_node.continue_) {
                 /* pthread_rwlock_unlock() already set rwlock->readers */
+                DEBUG("Thread %u: pthread_rwlock_%s(): is_writer=%u, allow_spurious=%u %s\n",
+                      thread_pid, "lock", is_writer, allow_spurious, "continued");
                 break;
             }
             else if (allow_spurious) {
+                DEBUG("Thread %u: pthread_rwlock_%s(): is_writer=%u, allow_spurious=%u %s\n",
+                      thread_pid, "lock", is_writer, allow_spurious, "is timed out");
                 queue_remove(&rwlock->queue, &waiting_node.qnode);
                 mutex_unlock(&rwlock->mutex);
                 return ETIMEDOUT;
@@ -146,6 +162,7 @@ static int pthread_rwlock_trylock(pthread_rwlock_t *rwlock,
                                   int incr_when_held)
 {
     if (rwlock == NULL) {
+        DEBUG("Thread %u: pthread_rwlock_%s(): rwlock=NULL supplied\n", thread_pid, "trylock");
         return EINVAL;
     }
     else if (mutex_trylock(&rwlock->mutex) == 0) {
@@ -226,25 +243,30 @@ int pthread_rwlock_timedwrlock(pthread_rwlock_t *rwlock, const struct timespec *
 int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
 {
     if (rwlock == NULL) {
+        DEBUG("Thread %u: pthread_rwlock_%s(): rwlock=NULL supplied\n", thread_pid, "unlock");
         return EINVAL;
     }
 
     mutex_lock(&rwlock->mutex);
     if (rwlock->readers == 0) {
         /* the lock is open */
+        DEBUG("Thread %u: pthread_rwlock_%s(): lock is open\n", thread_pid, "unlock");
         mutex_unlock(&rwlock->mutex);
         return EPERM;
     }
 
     if (rwlock->readers > 0) {
+        DEBUG("Thread %u: pthread_rwlock_%s(): release %s lock\n", thread_pid, "unlock", "read");
         --rwlock->readers;
     }
     else {
+        DEBUG("Thread %u: pthread_rwlock_%s(): release %s lock\n", thread_pid, "unlock", "write");
         rwlock->readers = 0;
     }
 
     if (rwlock->readers != 0 || rwlock->queue.next == NULL) {
         /* this thread was not the last reader, or no one is waiting to aquire the lock */
+        DEBUG("Thread %u: pthread_rwlock_%s(): no one is waiting\n", thread_pid, "unlock");
         mutex_unlock(&rwlock->mutex);
         return 0;
     }
@@ -257,9 +279,13 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
     sched_set_status(waiting_node->thread, STATUS_PENDING);
 
     if (waiting_node->is_writer) {
+        DEBUG("Thread %u: pthread_rwlock_%s(): continue %s %u\n",
+              thread_pid, "unlock", "writer", waiting_node->thread->pid);
         --rwlock->readers;
     }
     else {
+        DEBUG("Thread %u: pthread_rwlock_%s(): continue %s %u\n",
+              thread_pid, "unlock", "reader", waiting_node->thread->pid);
         ++rwlock->readers;
 
         /* wake up further readers */
@@ -267,9 +293,13 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
             waiting_node = (__pthread_rwlock_waiter_node_t *) rwlock->queue.next->data;
             if (waiting_node->is_writer) {
                 /* Not to be unfair to writers, we don't try to wake up readers that came after the first writer. */
+                DEBUG("Thread %u: pthread_rwlock_%s(): continuing readers blocked by writer %u\n",
+                      thread_pid, "unlock", waiting_node->thread->pid);
                 break;
             }
             waiting_node->continue_ = true;
+            DEBUG("Thread %u: pthread_rwlock_%s(): continue %s %u\n",
+                  thread_pid, "unlock", "reader", waiting_node->thread->pid);
 
             /* wake up this reader */
             qnode = queue_remove_head(&rwlock->queue);
