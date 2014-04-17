@@ -51,7 +51,7 @@ enum pthread_thread_status {
 };
 
 typedef struct pthread_thread {
-    int thread_pid;
+    int thread_pid, pthread_pid;
 
     enum pthread_thread_status status;
     int joining_thread;
@@ -65,6 +65,16 @@ typedef struct pthread_thread {
 
     __pthread_cleanup_datum_t *cleanup_top;
 } pthread_thread_t;
+
+#define PTHREAD_THREAD_NAME "pthread"
+
+typedef struct pthread_name {
+    char name[sizeof (PTHREAD_THREAD_NAME)];
+    pthread_thread_t pthread;
+} pthread_name_t;
+
+#define PTNAME_OF_PT(PT) \
+    ((pthread_name_t *) ((uintptr_t) (PT) - offsetof(pthread_name_t, pthread)))
 
 static pthread_thread_t *volatile pthread_sched_threads[MAXTHREADS];
 static struct mutex_t pthread_mutex;
@@ -108,14 +118,18 @@ static void pthread_reaper(void)
 
 int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*start_routine)(void *), void *arg)
 {
-    pthread_thread_t *pt = calloc(1, sizeof(pthread_thread_t));
+    pthread_name_t *pt_name = calloc(1, sizeof (*pt_name));
+    if (!pt_name) {
+        return -1;
+    }
+    pthread_thread_t *pt = &pt_name->pthread;
 
-    int pthread_pid = insert(pt);
-    if (pthread_pid < 0) {
+    pt->pthread_pid = insert(pt);
+    if (pt->pthread_pid < 0) {
         free(pt);
         return -1;
     }
-    *newthread = pthread_pid;
+    *newthread = pt->pthread_pid;
 
     pt->status = attr && attr->detached ? PTS_DETACHED : PTS_RUNNING;
     pt->start_routine = start_routine;
@@ -141,16 +155,17 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
         mutex_unlock(&pthread_mutex);
     }
 
+    memcpy(&PTNAME_OF_PT(pt)->name[0], PTHREAD_THREAD_NAME, sizeof (pt_name->name));
     pt->thread_pid = thread_create(stack,
                                    stack_size,
                                    PRIORITY_MAIN,
                                    CREATE_WOUT_YIELD | CREATE_STACKTEST,
                                    pthread_start_routine,
-                                   "pthread");
+                                   &PTNAME_OF_PT(pt)->name[0]);
     if (pt->thread_pid < 0) {
         free(pt->stack);
         free(pt);
-        pthread_sched_threads[pthread_pid] = NULL;
+        pthread_sched_threads[pt->pthread_pid] = NULL;
         return -1;
     }
 
@@ -208,7 +223,7 @@ int pthread_join(pthread_t th, void **thread_return)
             if (thread_return) {
                 *thread_return = other->returnval;
             }
-            free(other);
+            free(PTNAME_OF_PT(other));
             /* we only need to free the pthread layer struct,
             native thread stack is freed by other */
             pthread_sched_threads[th] = NULL;
@@ -241,17 +256,8 @@ int pthread_detach(pthread_t th)
 
 pthread_t pthread_self(void)
 {
-    pthread_t result = -1;
-    mutex_lock(&pthread_mutex);
-    int pid = thread_pid; /* thread_pid is volatile */
-    for (int i = 0; i < MAXTHREADS; i++) {
-        if (pthread_sched_threads[i] && pthread_sched_threads[i]->thread_pid == pid) {
-            result = i;
-            break;
-        }
-    }
-    mutex_unlock(&pthread_mutex);
-    return result;
+    pthread_name_t *pt_name = (void *) active_thread->name;
+    return pt_name->pthread.pthread_pid;
 }
 
 int pthread_equal(pthread_t thread1, pthread_t thread2)
