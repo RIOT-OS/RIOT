@@ -27,44 +27,55 @@
 #include "cib.h"
 #include "msg.h"
 
-/* thread status list */
-/* blocked states: */
-#define STATUS_STOPPED          0                      /**< has terminated */
-#define STATUS_SLEEPING         1                      /**< sleeping */
-#define STATUS_MUTEX_BLOCKED    2                      /**< waiting for a locked mutex */
-#define STATUS_RECEIVE_BLOCKED  3                      /**< waiting for a message */
-#define STATUS_SEND_BLOCKED     4                      /**< waiting for message to be
-                                                           *  delivered */
-#define STATUS_REPLY_BLOCKED    5                      /**< waiting for a message response */
-#define STATUS_TIMER_WAITING    6                      /**< waiting for a timer to fire */
+/**
+ * @brief Thread status list
+ * @{
+ */
+/**
+ * @brief Blocked states.
+ * @{
+ */
+#define STATUS_STOPPED          0               /**< has terminated                     */
+#define STATUS_SLEEPING         1               /**< sleeping                           */
+#define STATUS_MUTEX_BLOCKED    2               /**< waiting for a locked mutex         */
+#define STATUS_RECEIVE_BLOCKED  3               /**< waiting for a message              */
+#define STATUS_SEND_BLOCKED     4               /**< waiting for message to be delivered*/
+#define STATUS_REPLY_BLOCKED    5               /**< waiting for a message response     */
+#define STATUS_TIMER_WAITING    6               /**< waiting for a timer to fire        */
+/** @} */
 
-#define STATUS_ON_RUNQUEUE      7                      /**< */
+/**
+ * @brief These have to be on a run queue.
+ * @{*/
+#define STATUS_ON_RUNQUEUE      7               /**< to check if on run queue 
+                                                 `st >= STATUS_ON_RUNQUEUE`             */
+#define STATUS_RUNNING          7               /**< currently running                  */
+#define STATUS_PENDING          8               /**< waiting to be scheduled to run     */
+/** @} */
+/** @} */
 
-/* these have to be on a run queue: */
-#define STATUS_RUNNING          7                      /**< currently running */
-#define STATUS_PENDING          8                      /**< waiting to be scheduled to run */
-
-
-
+/**
+ * @brief @c tcb_t holds thread's context data.
+ */
 typedef struct tcb_t {
-    char *sp;
-    uint16_t status;
+    char *sp;                   /**< thread's stack pointer         */
+    uint16_t status;            /**< thread's status                */
 
-    uint16_t pid;
-    uint16_t priority;
+    uint16_t pid;               /**< thread's process id            */
+    uint16_t priority;          /**< thread's priority              */
 
-    clist_node_t rq_entry;
+    clist_node_t rq_entry;      /**< run queue entry                */
 
-    void *wait_data;
-    queue_node_t msg_waiters;
+    void *wait_data;            /**< holding messages               */
+    queue_node_t msg_waiters;   /**< threads waiting on message     */
 
-    cib_t msg_queue;
-    msg_t *msg_array;
+    cib_t msg_queue;            /**< message queue                  */
+    msg_t *msg_array;           /**< memory holding messages        */
 
-    const char *name;
-    char *stack_start;
-    int stack_size;
+    const char *name;           /**< thread's name                  */
+    char *stack_start;          /**< thread's stack start address   */
+    int stack_size;             /**< thread's stack size            */
 } tcb_t;
 
-/** @} */
 #endif /* TCB_H_ */
+/** @} */
