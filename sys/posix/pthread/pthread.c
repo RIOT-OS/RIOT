@@ -76,6 +76,7 @@ static char pthread_reaper_stack[PTHREAD_REAPER_STACKSIZE];
 static void pthread_start_routine(void)
 {
     pthread_t self = pthread_self();
+
     pthread_thread_t *pt = pthread_sched_threads[self-1];
     void *retval = pt->start_routine(pt->arg);
     pthread_exit(retval);
@@ -161,7 +162,15 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
 
 void pthread_exit(void *retval)
 {
-    pthread_thread_t *self = pthread_sched_threads[pthread_self()-1];
+    pthread_t self_id = pthread_self();
+
+    if (self_id == 0) {
+        DEBUG("ERROR called pthread_self() returned 0 in \"%s\"!\n", __func__);
+        sched_task_exit();
+        return;
+    }
+
+    pthread_thread_t *self = pthread_sched_threads[self_id-1];
 
     while (self->cleanup_top) {
         __pthread_cleanup_datum_t *ct = self->cleanup_top;
@@ -193,6 +202,11 @@ void pthread_exit(void *retval)
 
 int pthread_join(pthread_t th, void **thread_return)
 {
+    if (th < 1 || th > MAXTHREADS) {
+        DEBUG("passed pthread_t th (%d) exceeds bounds of pthread_sched_threads[] in \"%s\"!\n", th, __func__);
+        return -3;
+    }
+
     pthread_thread_t *other = pthread_sched_threads[th-1];
     if (!other) {
         return -1;
@@ -222,6 +236,11 @@ int pthread_join(pthread_t th, void **thread_return)
 
 int pthread_detach(pthread_t th)
 {
+    if (th < 1 || th > MAXTHREADS) {
+        DEBUG("passed pthread_t th (%d) exceeds bounds of pthread_sched_threads[] in \"%s\"!\n", th, __func__);
+        return -2;
+    }
+
     pthread_thread_t *other = pthread_sched_threads[th-1];
     if (!other) {
         return -1;
@@ -288,6 +307,12 @@ int pthread_setcanceltype(int type, int *oldtype)
 void pthread_testcancel(void)
 {
     pthread_t self = pthread_self();
+
+    if (self == 0) {
+        DEBUG("ERROR called pthread_self() returned 0 in \"%s\"!\n", __func__);
+        return;
+    }
+
     if (pthread_sched_threads[self-1]->should_cancel) {
         pthread_exit(NULL);
     }
@@ -295,14 +320,28 @@ void pthread_testcancel(void)
 
 void __pthread_cleanup_push(__pthread_cleanup_datum_t *datum)
 {
-    pthread_thread_t *self = pthread_sched_threads[pthread_self()-1];
+    pthread_t self_id = pthread_self();
+
+    if (self_id == 0) {
+        DEBUG("ERROR called pthread_self() returned 0 in \"%s\"!\n", __func__);
+        return;
+    }
+
+    pthread_thread_t *self = pthread_sched_threads[self_id-1];
     datum->__next = self->cleanup_top;
     self->cleanup_top = datum;
 }
 
 void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute)
 {
-    pthread_thread_t *self = pthread_sched_threads[pthread_self()-1];
+    pthread_t self_id = pthread_self();
+
+    if (self_id == 0) {
+        DEBUG("ERROR called pthread_self() returned 0 in \"%s\"!\n", __func__);
+        return;
+    }
+
+    pthread_thread_t *self = pthread_sched_threads[self_id-1];
     self->cleanup_top = datum->__next;
 
     if (execute != 0) {
