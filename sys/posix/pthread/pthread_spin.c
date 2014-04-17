@@ -17,9 +17,14 @@
  */
 
 #include "pthread.h"
+#include "atomic.h"
 
 int pthread_spin_init(pthread_spinlock_t *lock, int pshared)
 {
+    if (lock == NULL) {
+        return EINVAL;
+    }
+
     (void) pshared;
     *lock = 0;
     return 0;
@@ -27,29 +32,40 @@ int pthread_spin_init(pthread_spinlock_t *lock, int pshared)
 
 int pthread_spin_destroy(pthread_spinlock_t *lock)
 {
+    if (lock == NULL) {
+        return EINVAL;
+    }
+
     (void) lock;
     return 0;
 }
 
 int pthread_spin_lock(pthread_spinlock_t *lock)
 {
-    while (*lock) {
-        ; /* spin */
+    if (lock == NULL) {
+        return EINVAL;
+    }
+
+    while (atomic_set_return((unsigned *) lock, 1) != 0) {
+        /* spin */
     }
     return 0;
 }
 
 int pthread_spin_trylock(pthread_spinlock_t *lock)
 {
-    if (*lock) {
-        return 0;
+    if (lock == NULL) {
+        return EINVAL;
     }
 
-    return -1;
+    return atomic_set_return((unsigned *) lock, 1) == 0 ? 0 : EBUSY;
 }
 
 int pthread_spin_unlock(pthread_spinlock_t *lock)
 {
-    --*lock;
-    return 0;
+    if (lock == NULL) {
+        return EINVAL;
+    }
+
+    return atomic_set_return((unsigned *) lock, 0) != 0 ? 0 : EPERM;
 }
