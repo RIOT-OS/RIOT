@@ -135,12 +135,14 @@ void thread_arch_stack_print(void)
     printf("current stack size: %i byte\n", count);
 }
 
-NAKED NORETURN void thread_arch_start_threading(void)
+__attribute__((naked)) void NORETURN thread_arch_start_threading(void)
 {
     /* enable IRQs to make sure the SVC interrupt can be triggered */
     enableIRQ();
     /* trigger the SVC interrupt that will schedule and load the next thread */
     asm("svc    0x01");
+
+    UNREACHABLE();
 }
 
 void thread_arch_yield(void)
@@ -241,7 +243,7 @@ __attribute__((always_inline)) static __INLINE void context_restore(void)
  * 1) after system initialization for running the main thread
  * 2) after exiting from a thread
  */
-NAKED void isr_svc(void)
+__attribute__((naked)) void isr_svc(void)
 {
     sched_run();
     context_restore();
@@ -253,7 +255,7 @@ NAKED void isr_svc(void)
  * This interrupt saves the context, runs the scheduler and restores the context of the thread
  * that is run next.
  */
-NAKED void isr_pendsv(void)
+__attribute__((naked)) void isr_pendsv(void)
 {
     context_save();
     sched_run();
