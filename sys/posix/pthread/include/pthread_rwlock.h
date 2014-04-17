@@ -2,57 +2,154 @@
  * @ingroup pthread
  */
 
-typedef unsigned long int pthread_rwlock_t;
-typedef unsigned long int pthread_rwlockattr_t;
+#include "queue.h"
+#include "tcb.h"
 
-/* Initialize read-write lock RWLOCK using attributes ATTR, or use
- the default values if later is NULL.  */
-int pthread_rwlock_init(pthread_rwlock_t *rwlock,
-        const pthread_rwlockattr_t *attr);
+#include <errno.h>
+#include <stdbool.h>
 
-/* Destroy read-write lock RWLOCK.  */
+/**
+ * @brief     A fair reader writer lock.
+ * @details   The implementation ensures that readers and writers of the same priority
+ *            won't starve each other.
+ *            E.g. no new readers will get into the critical section
+ *            if a writer of the same or a higher priority already waits for the lock.
+ */
+typedef struct pthread_rwlock
+{
+    /**
+     * @brief     The current amount of reader inside the critical section.
+     * @details
+     *            * `== 0`: no thread is in the critical section.
+     *            * `> 0`: the number of readers currently in the critical section.
+     *            * `< 0`: a writer is currently in the critical section.
+     */
+    int readers;
+
+    /**
+     * @brief     Queue of waiting threads.
+     */
+    queue_node_t queue;
+
+    /**
+     * @brief     Provides mutual exclusion on reading and writing on the structure.
+     */
+    mutex_t mutex;
+} pthread_rwlock_t;
+
+/**
+ * @brief     Internal structure that stores one waiting thread.
+ */
+typedef struct __pthread_rwlock_waiter_node
+{
+    bool is_writer; /**< `false`: reader; `true`: writer */
+    tcb_t *thread; /**< waiting thread */
+    queue_node_t qnode; /**< Node to store in `pthread_rwlock_t::queue`. */
+    bool continue_; /**< This is not a spurious wakeup. */
+} __pthread_rwlock_waiter_node_t;
+
+/**
+ * @brief           Initialize a reader/writer lock.
+ * @details         A zeroed out datum is initialized.
+ * @param[in,out]   rwlock   Lock to initialize.
+ * @param[in]       attr     Unused.
+ * @returns         `0` on success.
+ *                  `EINVAL` if `rwlock == NULL`.
+ */
+int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr);
+
+/**
+ * @brief           Destroy a reader/writer lock.
+ * @details         This is a no-op.
+ *                  Destroying a reader/writer lock while a thread holds it, or
+ *                  there are threads waiting for it causes undefined behavior.
+ *                  Datum must be reinitialized before using it again.
+ * @param[in]       rwlock   Lock to destroy.
+ * @returns         `0` on success.
+ *                  `EINVAL` if `rwlock == NULL`.
+ *                  `EBUSY` if the lock was in use.
+ */
 int pthread_rwlock_destroy(pthread_rwlock_t *rwlock);
 
-/* Acquire read lock for RWLOCK.  */
+/**
+ * @brief           Lock a reader/writer lock for reading.
+ * @details         This function may block.
+ * @param[in]       rwlock   Lock to acquire for reading.
+ * @returns         `0` if the lock could be acquired.
+ *                  `EINVAL` if `rwlock == NULL`.
+ */
 int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock);
 
-/* Try to acquire read lock for RWLOCK.  */
+/**
+ * @brief           Try to lock a reader/writer lock for reader.
+ * @details         This function won't block.
+ * @param[in]       rwlock   Lock to acquire for reading.
+ * @returns         `0` if the lock could be acquired.
+ *                  `EBUSY` if acquiring the lock cannot be done without blocking.
+ *                  `EINVAL` if `rwlock == NULL`.
+ */
 int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock);
 
-/* Try to acquire read lock for RWLOCK or return after specfied time.  */
-int pthread_rwlock_timedrdlock(pthread_rwlock_t *rwlock,
-        const struct timespec *abstime);
+/**
+ * @brief           Try to acquire a read lock in a given timeframe
+ * @param[in]       rwlock    Lock to acquire for reading.
+ * @param[in]       abstime   Maximum timestamp when to wakeup, absolute.
+ * @returns         `0` if the lock could be acquired.
+ *                  `EDEADLK` if the lock could not be acquired in the given timeframe.
+ *                  `EINVAL` if `rwlock == NULL`.
+ */
+int pthread_rwlock_timedrdlock(pthread_rwlock_t *rwlock, const struct timespec *abstime);
 
-/* Acquire write lock for RWLOCK.  */
+/**
+ * @brief           Lock a reader/writer lock for writing.
+ * @details         This function may block.
+ * @param[in]       rwlock   Lock to acquire for writing.
+ * @returns         `0` if the lock could be acquired.
+ *                  `EINVAL` if `rwlock == NULL`.
+ */
 int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock);
 
-/* Try to acquire write lock for RWLOCK.  */
+/**
+ * @brief           Try to lock a reader/writer lock for writing.
+ * @details         This function won't block.
+ * @param[in]       rwlock   Lock to acquire for writing.
+ * @returns         `0` if the lock could be acquired.
+ *                  `EBUSY` if acquiring the lock cannot be done without blocking.
+ *                  `EINVAL` if `rwlock == NULL`.
+ */
 int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock);
 
-/* Try to acquire write lock for RWLOCK or return after specfied time.  */
-int pthread_rwlock_timedwrlock(pthread_rwlock_t *rwlock,
-        const struct timespec *abstime);
+/**
+ * @brief           Try to acquire a write lock in a given timeframe
+ * @param[in]       rwlock    Lock to acquire for writing.
+ * @param[in]       abstime   Maximum timestamp when to wakeup, absolute.
+ * @returns         `0` if the lock could be acquired.
+ *                  `EDEADLK` if the lock could not be acquired in the given timeframe.
+ *                  `EINVAL` if `rwlock == NULL`.
+ */
+int pthread_rwlock_timedwrlock(pthread_rwlock_t *rwlock, const struct timespec *abstime);
 
-/* Unlock RWLOCK.  */
+/**
+ * @brief           Unlock the reader/writer lock.
+ * @details         Must only be used if the lock is currently held.
+ *                  You may release the lock out of another thread, but the *lock*, *operate*, *unlock* logic must not be broken.
+ * @param[in]       rwlock   Lock to release
+ * @returns         `0` on success.
+ *                  `EPERM` if the lock was not held for any operation.
+ *                  `EINVAL` if `rwlock == NULL`.
+ */
 int pthread_rwlock_unlock(pthread_rwlock_t *rwlock);
 
-/* Functions for handling read-write lock attributes.  */
+/**
+ * @brief            Internal function to determine of the lock can be acquired for reading.
+ * @param[in]        rwlock   Lock to query.
+ * @returns          `false` if locking for reading is possible without blocking.
+ */
+bool __pthread_rwlock_blocked_readingly(const pthread_rwlock_t *rwlock);
 
-/* Initialize attribute object ATTR with default values.  */
-int pthread_rwlockattr_init(pthread_rwlockattr_t *attr);
-
-/* Destroy attribute object ATTR.  */
-int pthread_rwlockattr_destroy(pthread_rwlockattr_t *attr);
-
-/* Return current setting of process-shared attribute of ATTR in PSHARED.  */
-int pthread_rwlockattr_getpshared(const pthread_rwlockattr_t *attr,
-        int *pshared);
-
-/* Set process-shared attribute of ATTR to PSHARED.  */
-int pthread_rwlockattr_setpshared(pthread_rwlockattr_t *attr, int pshared);
-
-/* Return current setting of reader/writer preference.  */
-int pthread_rwlockattr_getkind_np(const pthread_rwlockattr_t *attr, int *pref);
-
-/* Set reader/write preference.  */
-int pthread_rwlockattr_setkind_np(pthread_rwlockattr_t *attr, int pref);
+/**
+ * @brief            Internal function to determine of the lock can be acquired for writing.
+ * @param[in]        rwlock   Lock to query.
+ * @returns          `false` if locking for writing is possible without blocking.
+ */
+bool __pthread_rwlock_blocked_writingly(const pthread_rwlock_t *rwlock);
