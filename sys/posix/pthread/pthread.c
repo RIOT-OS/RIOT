@@ -241,7 +241,7 @@ int pthread_detach(pthread_t th)
 
 pthread_t pthread_self(void)
 {
-    pthread_t result = -1;
+    pthread_t result = 0;
     mutex_lock(&pthread_mutex);
     int pid = thread_pid; /* thread_pid is volatile */
     for (int i = 0; i < MAXTHREADS; i++) {
