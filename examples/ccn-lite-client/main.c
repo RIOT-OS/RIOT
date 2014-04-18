@@ -29,7 +29,7 @@
 #include "shell.h"
 #include "board_uart0.h"
 #include "transceiver.h"
-#include "rtc.h"
+#include "vtimer.h"
 #include "ps.h"
 #include "ltc4150.h"
 
@@ -214,7 +214,7 @@ static void riot_ccn_pit_test(int argc, char **argv)
     msg_t m;
     riot_ccnl_msg_t rmsg;
     char segment_string[16]; //max=999\0
-    struct timeval now;
+    timex_t now;
 
     int segment;
 
@@ -233,7 +233,7 @@ static void riot_ccn_pit_test(int argc, char **argv)
         msg_send(&m, relay_pid, 1);
 
         if ((segment % 50) == 0) {
-            rtc_time(&now);
+            vtimer_now(&now);
             printf("done: %d - %ld.%ld\n", segment, now.tv_sec, now.tv_usec);
         }
     }
@@ -251,7 +251,7 @@ static void riot_ccn_fib_test(int argc, char **argv)
 
     riot_new_face(relay_pid, type, faceid, big_buf);
 
-    struct timeval now;
+    timex_t now;
     int i = -1;
 
     do {
@@ -260,7 +260,7 @@ static void riot_ccn_fib_test(int argc, char **argv)
         riot_register_prefix(relay_pid, small_buf, faceid, big_buf);
 
         if (i % 50 == 0) {
-            rtc_time(&now);
+            vtimer_now(&now);
             printf("done: %d - %ld.%ld\n", i, now.tv_sec, now.tv_usec);
         }
     }

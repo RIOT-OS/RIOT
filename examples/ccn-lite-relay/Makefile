@@ -27,14 +27,12 @@ RIOTBASE ?= $(CURDIR)/../..
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-BOARD_INSUFFICIENT_RAM := chronos msb-430h telosb wsn430-v1_3b wsn430-v1_4
-BOARD_BLACKLIST := arduino-due mbed_lpc1768 msb-430 pttu redbee-econotag udoo z1 qemu-i386 \
+BOARD_INSUFFICIENT_RAM := chronos msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1 redbee-econotag
+BOARD_BLACKLIST := arduino-due mbed_lpc1768 msb-430 pttu udoo qemu-i386 \
                    stm32f0discovery stm32f4discovery
 # mbed_lpc1768:     see https://github.com/RIOT-OS/RIOT/issues/675
 # msb-430:          see https://github.com/RIOT-OS/RIOT/issues/658
 # pttu:             see https://github.com/RIOT-OS/RIOT/issues/659
-# redbee-econotag:  see https://github.com/RIOT-OS/RIOT/issues/676
-# z1:               lacks RTC features
 # qemu-i386:        no transceiver, yet
 # stm32f0discovery: no transceiver, yet
 # stm32f4discovery: no transceiver, yet

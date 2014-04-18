@@ -41,7 +41,7 @@
 #include "msg.h"
 #include "thread.h"
 #include "transceiver.h"
-#include "hwtimer.h"
+#include "vtimer.h"
 
 #include "ccnl-riot-compat.h"
 #include "ccn_lite/test_data/text.txt.ccnb.h"
@@ -425,7 +425,7 @@ void ccnl_riot_relay_helper_start(void)
 {
     unsigned long us = CCNL_CHECK_RETRANSMIT_USEC;
     while (!theRelay.halt_flag) {
-        hwtimer_wait(HWTIMER_TICKS(us));
+        vtimer_usleep(us);
 
         mutex_lock(&theRelay.global_lock);
         ccnl_run_events();
