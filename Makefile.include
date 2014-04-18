@@ -82,7 +82,7 @@ BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${PROJECT}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
-.PHONY: all clean flash doc term buildsize buildsizes
+.PHONY: all clean flash doc term objsize buildsize buildsizes
 
 ## make script for your application. Build RIOT-base here!
 all: $(BINDIR)$(PROJECT).a
@@ -199,6 +199,21 @@ buildtest:
 	if [ "$${BUILDTESTFAILED}" = "1" ]; then \
 		exit 1; \
 	fi
+
+objsize:
+	@case "${SORTROW}" in \
+		text) SORTROW=1 ;; \
+		data) SORTROW=2 ;; \
+		bss) SORTROW=3 ;; \
+		dec) SORTROW=4 ;; \
+		"") SORTROW=4 ;; \
+		*) echo "Usage: $(MAKE) objsize SORTROW=[text|data|bss|dec]" ; return ;; \
+	esac; \
+	echo '   text\t   data\t    bss\t    dec\t    hex\tfilename'; \
+	$(SIZE) -dB $(BASELIBS) | \
+		tail -n+2 | \
+		sed -e 's#$(BINDIR)##' | \
+		sort -rnk$${SORTROW}
 
 buildsize:
 	@$(SIZE) -dB $(BINDIR)$(PROJECT).elf
