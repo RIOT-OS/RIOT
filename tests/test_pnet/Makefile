@@ -7,7 +7,7 @@ BOARD_BLACKLIST := chronos mbed_lpc1768 msb-430 msb-430h redbee-econotag \
 # mbed_lpc1768:     see https://github.com/RIOT-OS/RIOT/issues/675
 # msb-430:          see https://github.com/RIOT-OS/RIOT/issues/658
 # msb-430h:         not enough RAM
-# redbee-econotag:  not enough RAM
+# redbee-econotag:  see https://github.com/RIOT-OS/RIOT/issues/676
 # telosb:           not enough RAM
 # wsn430-v1_3b:     not enough RAM
 # wsn430-v1_4:      not enough RAM
