@@ -28,15 +28,12 @@
 #include "rpl.h"
 #include "rpl_dodag.h"
 #include "demo.h"
+#include "transceiver.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#ifdef MODULE_NATIVENET
-#define TRANSCEIVER TRANSCEIVER_NATIVE
-#else
-#define TRANSCEIVER TRANSCEIVER_CC1100
-#endif
+#define TRANSCEIVER TRANSCEIVER_DEFAULT
 
 char monitor_stack_buffer[MONITOR_STACK_SIZE];
 radio_address_t id;
