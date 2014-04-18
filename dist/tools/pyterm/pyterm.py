@@ -1,9 +1,10 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import cmd, serial, sys, threading, readline, time, ConfigParser, logging, os
+import cmd, serial, sys, threading, readline, time, configparser, logging, os
 
-pytermdir     = os.environ['HOME'] + os.path.sep + '.pyterm'
+pytermdir = os.environ['HOME'] + os.path.sep + '.pyterm'
+
 
 class SerCmd(cmd.Cmd):
 
@@ -36,7 +37,6 @@ class SerCmd(cmd.Cmd):
         # add ch to logger
         self.logger.addHandler(ch)
 
-
     def preloop(self):
         if not self.port:
             sys.stderr.write("No port specified!\n")
@@ -46,17 +46,19 @@ class SerCmd(cmd.Cmd):
         self.ser.setRTS(0)
 
         # start serial->console thread
-        receiver_thread = threading.Thread(target=reader, args=(self.ser,self.logger))
+        receiver_thread = threading.Thread(target=reader, args=(self.ser, self.logger))
         receiver_thread.setDaemon(1)
         receiver_thread.start()
 
     def default(self, line):
         for tok in line.split(';'):
             tok = self.get_alias(tok)
-            self.ser.write(tok.strip() + "\n")
+            s = tok.strip() + "\n"
+            self.ser.write(bytes(s, 'UTF-8'))
 
     def do_help(self, line):
-        self.ser.write("help\n")
+        s = "help\n"
+        self.ser.write(bytes(s, 'UTF-8'))
 
     def complete_date(self, text, line, begidx, endidm):
         date = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -109,7 +111,7 @@ class SerCmd(cmd.Cmd):
         return tok
 
     def load_config(self):
-        self.config = ConfigParser.SafeConfigParser()
+        self.config = configparser.SafeConfigParser()
         self.config.read([pytermdir + os.path.sep + 'pyterm.conf'])
 
         for sec in self.config.sections():
@@ -118,7 +120,7 @@ class SerCmd(cmd.Cmd):
                     self.aliases[opt] = self.config.get(sec, opt)
             else:
                 for opt in self.config.options(sec):
-                    if not self.__dict__.has_key(opt):
+                    if opt not in self.__dict__:
                         self.__dict__[opt] = self.config.get(sec, opt)
 
 
@@ -128,9 +130,9 @@ def reader(ser, logger):
         c = ser.read(1)
         if c == '\n' or c == '\r':
             logger.info(output)
-            output = ""
+            output = str("")
         else:
-            output += c
+            output += str(c)
         #sys.stdout.write(c)
         #sys.stdout.flush()
 
