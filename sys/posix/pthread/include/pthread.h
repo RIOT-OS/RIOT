@@ -15,6 +15,7 @@
 #include "pthread_threading.h"
 #include "pthread_mutex_attr.h"
 #include "pthread_mutex.h"
+#include "pthread_rwlock_attr.h"
 #include "pthread_rwlock.h"
 #include "pthread_spin.h"
 #include "pthread_barrier.h"
