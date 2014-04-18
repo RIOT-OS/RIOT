@@ -1,17 +1,64 @@
-/* Functions to handle spinlocks.  */
+/**
+ * @ingroup pthread
+ */
 
-/* Initialize the spinlock LOCK.  If PSHARED is nonzero the spinlock can
- be shared between different processes.  */
+#include <errno.h>
+
+/**
+ * @brief           A spinlock.
+ * @warning         Spinlocks should be avoided.
+ *                  They will burn away the battery needlessly, and may not work because RIOT is tickless.
+ *                  Use disableIRQ() and restoreIRQ() for shortterm locks instead.
+ */
+typedef volatile unsigned pthread_spinlock_t;
+
+/**
+ * @brief           Intializes a spinlock.
+ * @warning         See the warning in pthread_spinlock_t.
+ * @details         A zeroed out datum is initialized.
+ * @param[in,out]   lock      Datum to initialize.
+ * @param[in]       pshared   Unused.
+ * @returns         `0` on success.
+ *                  `EINVAL` if `lock == NULL`.
+ */
 int pthread_spin_init(pthread_spinlock_t *lock, int pshared);
 
-/* Destroy the spinlock LOCK.  */
+/**
+ * @brief           Destroys a spinlock.
+ * @warning         See the warning in pthread_spinlock_t.
+ * @details         Destroying a spinlock while a thread is waiting for it causes undefined behavior.
+ *                  This is a no-op.
+ * @param[in,out]   lock   Datum to destroy.
+ * @returns         `0` on success.
+ *                  `EINVAL` if `lock == NULL`.
+ */
 int pthread_spin_destroy(pthread_spinlock_t *lock);
 
-/* Wait until spinlock LOCK is retrieved.  */
+/**
+ * @brief           Lock a spinlock.
+ * @warning         See the warning in pthread_spinlock_t.
+ * @param[in,out]   lock   Lock to acquire.
+ * @return          `0` on success.
+ *                  `EINVAL` if `lock == NULL`.
+ */
 int pthread_spin_lock(pthread_spinlock_t *lock);
 
-/* Try to lock spinlock LOCK.  */
+/**
+ * @brief           Tries to lock a spinlock, returns immediately if already locked.
+ * @warning         See the warning in pthread_spinlock_t.
+ * @param[in,out]   lock   Lock to acquire.
+ * @return          `0` on success.
+ *                  `EBUSY` if the lock was already locked.
+ *                  `EINVAL` if `lock == NULL`.
+ */
 int pthread_spin_trylock(pthread_spinlock_t *lock);
 
-/* Release spinlock LOCK.  */
+/**
+ * @brief           Releases a spinlock.
+ * @warning         See the warning in pthread_spinlock_t.
+ * @param[in,out]   lock   Lock to release
+ * @return          `0` on success.
+ *                  `EPERM` if the lock was not locked.
+ *                  `EINVAL` if `lock == NULL`.
+ */
 int pthread_spin_unlock(pthread_spinlock_t *lock);

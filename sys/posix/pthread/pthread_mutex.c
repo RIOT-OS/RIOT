@@ -1,16 +1,16 @@
-/**
- * POSIX implementation of threading.
- *
+/*
  * Copyright (C) 2013 Freie Universität Berlin
  *
  * This file subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * @ingroup posix
+ */
+
+/**
+ * @ingroup pthread
  * @{
- * @file    pthread.c
- * @brief   Implementation of pthread.
+ * @file
+ * @brief   Mutual exclusion.
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author  René Kijewski <kijewski@inf.fu-berlin.de>
  * @}
@@ -45,7 +45,9 @@ int pthread_mutex_trylock(pthread_mutex_t *mutex)
         return -1;
     }
 
-    return (mutex_trylock(mutex) != 0);
+    /* mutex_trylock() returns 1 on success, and 0 otherwise. */
+    /* We want the reverse. */
+    return 1 - mutex_trylock(mutex);
 }
 
 int pthread_mutex_lock(pthread_mutex_t *mutex)

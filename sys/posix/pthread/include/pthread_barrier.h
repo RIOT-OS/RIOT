@@ -1,9 +1,23 @@
-/* Functions to handle barriers.  */
+/**
+ * @ingroup pthread
+ */
 
 #include "mutex.h"
 
-#define PTHREAD_PROCESS_SHARED (0) /**< Share the barrier with child processes (default). */
-#define PTHREAD_PROCESS_PRIVATE (1) /**< Do not share the barrier with child processes. */
+/**
+ * @def     PTHREAD_PROCESS_SHARED
+ * @brief   Share the structure with child processes (default).
+ * @note    RIOT is a single-process OS.
+ *          Setting the value of `pshared` does not change anything.
+ */
+#define PTHREAD_PROCESS_SHARED (0)
+/**
+ * @def     PTHREAD_PROCESS_SHARED
+ * @brief   Don't share the structure with child processes.
+ * @note    RIOT is a single-process OS.
+ *          Setting the value of `pshared` does not change anything.
+ */
+#define PTHREAD_PROCESS_PRIVATE (1)
 
 /**
  * @brief   Internal structure to store the list of waiting threads.
@@ -18,13 +32,14 @@ typedef struct pthread_barrier_waiting_node
 /**
  * @brief     A synchronization barrier.
  * @details   Initialize with pthread_barrier_init().
- *            For a zeroed out datum you do not need to call the initializer, it is enough to set `count`.
+ *            For a zeroed out datum you do not need to call the initializer,
+ *            it is enough to set pthread_barrier_t::count.
  */
 typedef struct pthread_barrier
 {
     struct pthread_barrier_waiting_node *next; /**< The first waiting thread. */
     mutex_t mutex; /**< Mutex to unlock to wake the thread up. */
-    volatile int count; /**< Wait to N more threads before waking everyone up. */
+    volatile int count; /**< Wait for N more threads before waking everyone up. */
 } pthread_barrier_t;
 
 /**
@@ -34,7 +49,7 @@ typedef struct pthread_barrier
  */
 typedef struct pthread_barrierattr
 {
-    int pshared; /**< Set pthread_barrierattr_setpshared() and pthread_barrierattr_getpshared(). */
+    int pshared; /**< See pthread_barrierattr_setpshared() and pthread_barrierattr_getpshared(). */
 } pthread_barrierattr_t;
 
 /**
@@ -93,7 +108,7 @@ int pthread_barrierattr_getpshared(const pthread_barrierattr_t *attr, int *pshar
  * @brief     Set if the barrier should be shared with child processes
  * @details   Since RIOT is a single process OS, pthread_barrier_init() wil ignore the value.
  * @param     attr      Attribute set for pthread_barrier_init()
- * @param     pshared   Either PTHREAD_PROCESS_PRIVATE or PTHREAD_PROCESS_SHARED
+ * @param     pshared   Either #PTHREAD_PROCESS_PRIVATE or #PTHREAD_PROCESS_SHARED
  * @returns   0, the invocation cannot fail
  */
 int pthread_barrierattr_setpshared(pthread_barrierattr_t *attr, int pshared);

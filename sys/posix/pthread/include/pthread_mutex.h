@@ -1,81 +1,91 @@
-/* Mutex handling.  */
+/**
+ * @ingroup pthread
+ */
 
 #include <time.h>
 
 #include "kernel.h"
 #include "mutex.h"
 
-/* Initialize a mutex.  */
-int pthread_mutex_init(pthread_mutex_t *mutex,
-        const pthread_mutexattr_t *mutexattr);
+/**
+ * @brief           Pthread mutexes are quite the same as RIOT mutexes.
+ * @details         Recursive locking is not supported.
+ *                  A thread can unlock a mutex even if it does not hold it.
+ */
+typedef mutex_t pthread_mutex_t;
 
-/* Destroy a mutex.  */
+/**
+ * @brief           Initialize a mutex.
+ * @details         A zeroed out datum is initialized.
+ * @param[in,out]   mutex       Mutex to initialize.
+ * @param[in]       mutexattr   Unused.
+ * @returns         `0` on success. `-1` iff `mutex == NULL`.
+ */
+int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr);
+
+/**
+ * @brief           Destroy a mutex.
+ * @details         This is currently a no-op.
+ *                  Destroying a mutex locked is undefined behavior.
+ * @param[in,out]   mutex   Datum to destroy.
+ * @returns         0, this invocation is a no-op that cannot fail.
+ */
 int pthread_mutex_destroy(pthread_mutex_t *mutex);
 
-/* Try locking a mutex.  */
+/**
+ * @brief           Try to lock a mutex.
+ * @details         This function won't block.
+ * @param[in]       mutex   Mutex to lock, must be initialized.
+ * @returns         `0` if you hold the mutex now.
+ *                  `+1` if the mutex already was locked.
+ *                  `-1` if you managed to supply `NULL`.
+ */
 int pthread_mutex_trylock(pthread_mutex_t *mutex);
 
-/* Lock a mutex.  */
+/**
+ * @brief           Lock and hold a mutex.
+ * @details         This invocation may block if the mutex was locked.
+ * @param[in]       mutex   Mutex to lock, must be initialized.
+ * @returns         `-1` iff you managed to supply `NULL`.
+ *                  `0` otherwise, you hold the mutex now.
+ */
 int pthread_mutex_lock(pthread_mutex_t *mutex);
 
-/* Wait until lock becomes available, or specified time passes. */
-int pthread_mutex_timedlock(pthread_mutex_t *mutex,
-        const struct timespec *abstime);
+/**
+ * @brief           Not implemented, yet.
+ * @details         Will cause a linktime error ...
+ * @param[in]       mutex     The unused mutex.
+ * @param[in]       abstime   The used absolute time.
+ * @return          Well ... you'll get a link time error, so nothing will be returned.
+ */
+int pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime);
 
-/* Unlock a mutex.  */
+/**
+ * @brief           Unlock a mutex.
+ * @details         It is possible to unlock a mutex that you don't hold.
+ *                  It is possible to unlock a mutex that is not held at all.
+ *                  The mutex can still be locked afterwards if there were threads queuing for this mutex.
+ * @param[in]       mutex   Mutex to unlock, must be initialized.
+ * @returns         `-1` iff you managed to supply `NULL`.
+ *                  `0` otherwise.
+ */
 int pthread_mutex_unlock(pthread_mutex_t *mutex);
 
-/* Get the priority ceiling of MUTEX.  */
-int pthread_mutex_getprioceiling(const pthread_mutex_t *mutex,
-        int *prioceiling);
+/**
+ * @brief           Not implemented, yet.
+ * @details         Will cause a linktime error ...
+ * @param[in]       mutex         The unused mutex.
+ * @param[out]      prioceiling   Unused.
+ * @return          Well ... you'll get a link time error, so nothing will be returned.
+ */
+int pthread_mutex_getprioceiling(const pthread_mutex_t *mutex, int *prioceiling);
 
-/* Set the priority ceiling of MUTEX to PRIOCEILING, return old
- priority ceiling value in *OLD_CEILING.  */
-int pthread_mutex_setprioceiling(pthread_mutex_t *mutex, int prioceiling,
-        int *old_ceiling);
-
-/* Functions for handling mutex attributes.  */
-
-/* Initialize mutex attribute object ATTR with default attributes
- (kind is PTHREAD_MUTEX_TIMED_NP).  */
-int pthread_mutexattr_init(pthread_mutexattr_t *attr);
-
-/* Destroy mutex attribute object ATTR.  */
-int pthread_mutexattr_destroy(pthread_mutexattr_t *attr);
-
-/* Get the process-shared flag of the mutex attribute ATTR.  */
-int pthread_mutexattr_getpshared(const pthread_mutexattr_t *attr,
-        int *pshared);
-
-/* Set the process-shared flag of the mutex attribute ATTR.  */
-int pthread_mutexattr_setpshared(pthread_mutexattr_t *attr, int pshared);
-
-/* Return in *KIND the mutex kind attribute in *ATTR.  */
-int pthread_mutexattr_gettype(const pthread_mutexattr_t *attr, int *kind);
-
-/* Set the mutex kind attribute in *ATTR to KIND (either PTHREAD_MUTEX_NORMAL,
- PTHREAD_MUTEX_RECURSIVE, PTHREAD_MUTEX_ERRORCHECK, or
- PTHREAD_MUTEX_DEFAULT).  */
-int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int kind);
-
-/* Return in *PROTOCOL the mutex protocol attribute in *ATTR.  */
-int pthread_mutexattr_getprotocol(const pthread_mutexattr_t *attr,
-        int *protocol);
-
-/* Set the mutex protocol attribute in *ATTR to PROTOCOL (either
- PTHREAD_PRIO_NONE, PTHREAD_PRIO_INHERIT, or PTHREAD_PRIO_PROTECT).  */
-int pthread_mutexattr_setprotocol(pthread_mutexattr_t *attr, int protocol);
-
-/* Return in *PRIOCEILING the mutex prioceiling attribute in *ATTR.  */
-int pthread_mutexattr_getprioceiling(const pthread_mutexattr_t *attr,
-        int *prioceiling);
-
-/* Set the mutex prioceiling attribute in *ATTR to PRIOCEILING.  */
-int pthread_mutexattr_setprioceiling(pthread_mutexattr_t *attr, int prioceiling);
-
-/* Get the robustness flag of the mutex attribute ATTR.  */
-int pthread_mutexattr_getrobust(const pthread_mutexattr_t *attr,
-        int *robustness);
-
-/* Set the robustness flag of the mutex attribute ATTR.  */
-int pthread_mutexattr_setrobust(pthread_mutexattr_t *attr, int robustness);
+/**
+ * @brief           Not implemented, yet.
+ * @details         Will cause a linktime error ...
+ * @param[in,out]   mutex         The unused mutex.
+ * @param[in]       prioceiling   Unused.
+ * @param[out]      old_ceiling   Unused.
+ * @return          Well ... you'll get a link time error, so nothing will be returned.
+ */
+int pthread_mutex_setprioceiling(pthread_mutex_t *mutex, int prioceiling, int *old_ceiling);

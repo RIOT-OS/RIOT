@@ -1,19 +1,21 @@
+/*
+ * POSIX compatible implementation of barriers.
+ *
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
 /**
-* POSIX compatible implementation of barriers.
-*
-* Copyright (C) 2014 Freie Universität Berlin
-*
-* This file subject to the terms and conditions of the GNU Lesser General
-* Public License. See the file LICENSE in the top level directory for more
-* details.
-*
-* @ingroup posix
-* @{
-* @file
-* @brief Implementation of the pthread barrier attributes.
-* @author René Kijewski <kijewski@inf.fu-berlin.de>
-* @}
-*/
+ * @ingroup pthread
+ * @{
+ * @file
+ * @brief Attributes for synchronization barriers.
+ * @author René Kijewski <kijewski@inf.fu-berlin.de>
+ * @}
+ */
 
 #include "pthread.h"
 
