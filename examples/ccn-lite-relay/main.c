@@ -44,7 +44,7 @@ void set_address_handler(uint16_t a)
     msg_t mesg;
     transceiver_command_t tcmd;
 
-    tcmd.transceivers = transceiver_ids;
+    tcmd.transceivers = TRANSCEIVER;
     tcmd.data = &a;
     mesg.content.ptr = (char *) &tcmd;
 

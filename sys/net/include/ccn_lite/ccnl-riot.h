@@ -38,13 +38,7 @@
 
 #include "transceiver.h"
 
-#ifdef MODULE_CC110X_NG
-#  include "cc110x_ng.h"
-#  define transceiver_ids (TRANSCEIVER_CC1100 | TRANSCEIVER_NONE)
-#else
-#  include "nativenet.h"
-#  define transceiver_ids (TRANSCEIVER_NATIVE | TRANSCEIVER_NONE)
-#endif
+#define TRANSCEIVER TRANSCEIVER_DEFAULT
 
 #define CCNL_RIOT_EVENT_NUMBER_OFFSET (1 << 8)
 typedef enum ccnl_riot_event {
