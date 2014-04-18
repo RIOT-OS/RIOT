@@ -21,8 +21,6 @@ ifeq ($(strip $(GIT_VERSION)),)
 endif
 export CFLAGS += -DVERSION=\"$(GIT_VERSION)\"
 
-.PHONY: clean
-
 $(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ)
 	$(AD)$(AR) -rc $(BINDIR)$(MODULE).a $(OBJ) $(ASMOBJ)
 
@@ -44,7 +42,3 @@ $(BINDIR)$(MODULE)/%.o: %.s
 $(BINDIR)$(MODULE)/%.o: %.S
 	@mkdir -p $(BINDIR)$(MODULE)
 	$(AD)$(CC) -c $(CFLAGS) $*.S -o $(BINDIR)$(MODULE)/$*.o
-
-# remove compilation products
-clean::
-	$(AD)rm -f $(BINDIR)$(MODULE).a $(OBJ) $(DEP) $(ASMOBJ)
