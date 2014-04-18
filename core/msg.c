@@ -133,7 +133,7 @@ int msg_send_to_self(msg_t *m)
 {
     unsigned int state = disableIRQ();
 
-    int res = queue_msg(active_thread, m);
+    int res = queue_msg((tcb_t *) active_thread, m);
 
     restoreIRQ(state);
     return res;
