@@ -744,7 +744,7 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
 
         case TRANSCEIVER_MC1322X:
             maca_pkt->length = p->length;
-            memcpy(maca_pkt->data, p->data, p->length);
+            memcpy(maca_pkt->data, &p->frame, p->length);
             maca_set_tx_packet(maca_pkt);
             res = 1;
             break;

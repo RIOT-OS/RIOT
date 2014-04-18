@@ -29,15 +29,16 @@ export FFLAGS = -t $(PORT) -f $(HEXFILE) -c 'bbmc -l redbee-econotag reset'
 export OFLAGS = -O binary --gap-fill=0xff
 
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/ -I$(RIOTBOARD)/$(BOARD)/include/
+export INCLUDES += -I$(RIOTCPU)/$(CPU)/maca/include
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/drivers/include
 
-# un-comment once https://github.com/RIOT-OS/RIOT/issues/676 is fixed
-#ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-#	ifeq (,$(filter mc1322x,$(USEMODULE)))
-#		USEMODULE += mc1322x
-#	endif
-#	ifeq (,$(filter transceiver,$(USEMODULE)))
-#		USEMODULE += transceiver
-#	endif
-#endif
+ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
+	ifeq (,$(filter mc1322x,$(USEMODULE)))
+		USEMODULE += mc1322x
+	endif
+	ifeq (,$(filter transceiver,$(USEMODULE)))
+		USEMODULE += transceiver
+	endif
+endif
 
 export UNDEF += $(BINDIR)cpu/startup.o

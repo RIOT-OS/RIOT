@@ -1,5 +1,7 @@
-INCLUDES = -I$(RIOTBASE)/cpu/mc1322x/include -I$(RIOTBASE)/cpu/mc1322x/maca/include -I$(RIOTBOARDS)/redbee-econotag/drivers/include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/include \
+			-I$(RIOTCPU)/$(CPU)/maca/include \
+			-I$(RIOTBOARDS)/redbee-econotag/drivers/include
 
-MODULE =mc1322x
+MODULE = mc1322x
 
 include $(RIOTBASE)/Makefile.base
