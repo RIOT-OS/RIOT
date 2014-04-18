@@ -82,7 +82,7 @@ BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${PROJECT}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
-.PHONY: all clean flash doc term
+.PHONY: all clean flash doc term buildsize buildsizes
 
 ## make script for your application. Build RIOT-base here!
 all: $(BINDIR)$(PROJECT).a
@@ -199,3 +199,29 @@ buildtest:
 	if [ "$${BUILDTESTFAILED}" = "1" ]; then \
 		exit 1; \
 	fi
+
+buildsize:
+	@$(SIZE) -dB $(BINDIR)$(PROJECT).elf
+
+buildsizes: SHELL=bash
+buildsizes:
+	@if [[ -z "$(BOARD_WHITELIST)" ]]; then \
+		BOARDS=$$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); \
+	else \
+		BOARDS="$(BOARD_WHITELIST)"; \
+	fi; \
+	for BOARD in $(BOARD_BLACKLIST); do \
+		BOARDS=$$(sed -e "s/ $${BOARD} / /" <<< " $${BOARDS} "); \
+	done; \
+	\
+	echo -e "   text\t   data\t    bss\t    dec\tboard"; \
+	for BOARD in $${BOARDS}; do \
+		echo "$$(env -i \
+			HOME=$${HOME} \
+			PATH=$${PATH} \
+			BOARD=$${BOARD} \
+			RIOTBASE=$${RIOTBASE} \
+			RIOTBOARD=$${RIOTBOARD} \
+			RIOTCPU=$${RIOTCPU} \
+			$(MAKE) buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${BOARD}"; \
+	done;
