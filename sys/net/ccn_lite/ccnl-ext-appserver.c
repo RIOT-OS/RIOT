@@ -31,8 +31,6 @@
 #include "ccnl-pdu.h"
 #include "ccnx.h"
 
-static volatile int halt_flag;
-
 /** The size of the message queue between router daemon and transceiver AND clients */
 #define APPSERVER_MSG_BUFFER_SIZE (64)
 
@@ -127,7 +125,7 @@ static void riot_ccnl_appserver_ioloop(void)
     msg_t in;
     riot_ccnl_msg_t *m;
 
-    while (!halt_flag) {
+    while (1) {
         DEBUGMSG(1, "appserver: waiting for incomming msg\n");
         msg_receive(&in);
 
