@@ -47,7 +47,6 @@ USEMODULE += shell_commands
 USEMODULE += posix
 USEMODULE += ps
 USEMODULE += random
-USEMODULE += transceiver
 USEMODULE += defaulttransceiver
 USEMODULE += rtc
 USEMODULE += crypto_sha256
