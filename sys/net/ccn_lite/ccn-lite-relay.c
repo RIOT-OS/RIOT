@@ -52,9 +52,7 @@
 /** message buffer */
 msg_t msg_buffer_relay[RELAY_MSG_BUFFER_SIZE];
 
-// ----------------------------------------------------------------------
-
-struct ccnl_relay_s theRelay;
+struct ccnl_relay_s *theRelay = NULL;
 
 struct timeval *
 ccnl_run_events(void)
@@ -266,35 +264,35 @@ void ccnl_populate_cache(struct ccnl_relay_s *ccnl, unsigned char *buf, int data
     }
 }
 
-void handle_populate_cache(void)
+void handle_populate_cache(struct ccnl_relay_s *ccnl)
 {
     DEBUGMSG(1, "ccnl_populate_cache with: text_txt_ccnb\n");
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_0, (int) text_txt_ccnb_0_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_1, (int) text_txt_ccnb_1_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_2, (int) text_txt_ccnb_2_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_3, (int) text_txt_ccnb_3_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_4, (int) text_txt_ccnb_4_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_5, (int) text_txt_ccnb_5_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_6, (int) text_txt_ccnb_6_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_7, (int) text_txt_ccnb_7_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_8, (int) text_txt_ccnb_8_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_9, (int) text_txt_ccnb_9_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_10, (int) text_txt_ccnb_10_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_11, (int) text_txt_ccnb_11_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_12, (int) text_txt_ccnb_12_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_13, (int) text_txt_ccnb_13_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_14, (int) text_txt_ccnb_14_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_15, (int) text_txt_ccnb_15_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_16, (int) text_txt_ccnb_16_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_17, (int) text_txt_ccnb_17_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_18, (int) text_txt_ccnb_18_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_19, (int) text_txt_ccnb_19_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_20, (int) text_txt_ccnb_20_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_21, (int) text_txt_ccnb_21_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_22, (int) text_txt_ccnb_22_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_23, (int) text_txt_ccnb_23_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_24, (int) text_txt_ccnb_24_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_25, (int) text_txt_ccnb_25_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_0, (int) text_txt_ccnb_0_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_1, (int) text_txt_ccnb_1_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_2, (int) text_txt_ccnb_2_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_3, (int) text_txt_ccnb_3_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_4, (int) text_txt_ccnb_4_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_5, (int) text_txt_ccnb_5_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_6, (int) text_txt_ccnb_6_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_7, (int) text_txt_ccnb_7_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_8, (int) text_txt_ccnb_8_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_9, (int) text_txt_ccnb_9_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_10, (int) text_txt_ccnb_10_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_11, (int) text_txt_ccnb_11_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_12, (int) text_txt_ccnb_12_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_13, (int) text_txt_ccnb_13_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_14, (int) text_txt_ccnb_14_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_15, (int) text_txt_ccnb_15_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_16, (int) text_txt_ccnb_16_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_17, (int) text_txt_ccnb_17_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_18, (int) text_txt_ccnb_18_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_19, (int) text_txt_ccnb_19_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_20, (int) text_txt_ccnb_20_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_21, (int) text_txt_ccnb_21_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_22, (int) text_txt_ccnb_22_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_23, (int) text_txt_ccnb_23_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_24, (int) text_txt_ccnb_24_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_25, (int) text_txt_ccnb_25_len);
 }
 
 #endif
@@ -323,7 +321,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 
         msg_receive(&in);
 
-        mutex_lock(&theRelay.global_lock);
+        mutex_lock(&ccnl->global_lock);
         switch (in.type) {
             case PKT_PENDING:
                 /* msg from transceiver */
@@ -365,7 +363,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
                 DEBUGMSG(1, "\tNumb:\t%" PRIu32 "\n", in.content.value);
 
-                handle_populate_cache();
+                handle_populate_cache(ccnl);
                 break;
 #endif
             case (CCNL_RIOT_PRINT_STAT):
@@ -384,7 +382,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                 DEBUGMSG(1, "\tdropping it...\n");
                 break;
         }
-        mutex_unlock(&theRelay.global_lock);
+        mutex_unlock(&ccnl->global_lock);
     }
 
     return 0;
@@ -397,39 +395,42 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
  */
 void ccnl_riot_relay_start(int max_cache_entries, int fib_threshold_prefix, int fib_threshold_aggregate)
 {
-    ccnl_get_timeval(&theRelay.startup_time);
-    theRelay.riot_pid = sched_active_pid;
-    mutex_init(&theRelay.global_lock);
+    theRelay = calloc(1, sizeof(struct ccnl_relay_s));
+    ccnl_get_timeval(&theRelay->startup_time);
+    theRelay->riot_pid = sched_active_pid;
+    mutex_init(&theRelay->global_lock);
 
-    DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", theRelay.startup_time.tv_sec, theRelay.startup_time.tv_usec);
+    DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", theRelay->startup_time.tv_sec, theRelay->startup_time.tv_usec);
     DEBUGMSG(1, "  compile time: %s %s\n", __DATE__, __TIME__);
     DEBUGMSG(1, "  max_cache_entries: %d\n", max_cache_entries);
     DEBUGMSG(1, "  threshold_prefix: %d\n", fib_threshold_prefix);
     DEBUGMSG(1, "  threshold_aggregate: %d\n", fib_threshold_aggregate);
 
-    ccnl_relay_config(&theRelay, max_cache_entries, fib_threshold_prefix, fib_threshold_aggregate);
+    ccnl_relay_config(theRelay, max_cache_entries, fib_threshold_prefix, fib_threshold_aggregate);
 
-    theRelay.riot_helper_pid = riot_start_helper_thread();
+    theRelay->riot_helper_pid = riot_start_helper_thread();
 
-    ccnl_io_loop(&theRelay);
+    ccnl_io_loop(theRelay);
     DEBUGMSG(1, "ioloop stopped\n");
 
     while (eventqueue) {
         ccnl_rem_timer(eventqueue);
     }
 
-    ccnl_core_cleanup(&theRelay);
+    ccnl_core_cleanup(theRelay);
+
+    ccnl_free(theRelay);
 }
 
 void ccnl_riot_relay_helper_start(void)
 {
     unsigned long us = CCNL_CHECK_RETRANSMIT_USEC;
-    while (!theRelay.halt_flag) {
+    while (!theRelay->halt_flag) {
         vtimer_usleep(us);
 
-        mutex_lock(&theRelay.global_lock);
+        mutex_lock(&theRelay->global_lock);
         ccnl_run_events();
-        mutex_unlock(&theRelay.global_lock);
+        mutex_unlock(&theRelay->global_lock);
     }
 }
 
