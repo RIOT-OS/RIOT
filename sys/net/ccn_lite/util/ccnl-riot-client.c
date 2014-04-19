@@ -109,6 +109,7 @@ int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
         free_3ptr_list(buf, nonce, ppkd);
         ccnl_free(rmsg_reply);
 
+        DEBUGMSG(1, "contentlen=%d CCNL_RIOT_CHUNK_SIZE=%d\n", contlen, CCNL_RIOT_CHUNK_SIZE);
         if (contlen < CCNL_RIOT_CHUNK_SIZE || CCNL_RIOT_CHUNK_SIZE < contlen) {
             /* last chunk */
             break;
