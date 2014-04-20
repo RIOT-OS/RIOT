@@ -41,7 +41,6 @@ BOARD_BLACKLIST := chronos mbed_lpc1768 msb-430 msb-430h redbee-econotag \
 
 # Modules to include:
 
-USEMODULE += config
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += posix
