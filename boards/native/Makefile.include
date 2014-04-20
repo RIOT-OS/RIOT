@@ -10,10 +10,10 @@ export ELF = $(BINDIR)$(PROJECT).elf
 # toolchain:
 export PREFIX =
 export CC ?= $(PREFIX)gcc
-export AR = $(PREFIX)ar
-export AS = $(PREFIX)as
-export LINK = $(PREFIX)gcc
-export SIZE = $(PREFIX)size
+export AR ?= $(PREFIX)ar
+export AS ?= $(PREFIX)as
+export LINK ?= $(PREFIX)gcc
+export SIZE ?= $(PREFIX)size
 export OBJCOPY = true
 
 export DEBUGGER = gdb
