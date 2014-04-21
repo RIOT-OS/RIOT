@@ -162,7 +162,10 @@ void usage_exit()
 
     real_printf(" [-d] [-e|-E] [-o]\n");
 
+    real_printf(" help: %s -h\n", _progname);
+
     real_printf("\nOptions:\n\
+-h      help\n\
 -d      daemonize\n\
 -e      redirect stderr to file\n\
 -E      do not redirect stderr (i.e. leave sterr unchanged despite socket/daemon io)\n\
@@ -203,7 +206,13 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 #endif
 
 #ifdef MODULE_NATIVENET
-    if (argc < 2) {
+    if (
+            (argc < 2)
+            || (
+                (strcmp("-h", argv[argp]) == 0)
+                || (strcmp("--help", argv[argp]) == 0)
+               )
+       ) {
         usage_exit();
     }
     argp++;
@@ -211,7 +220,10 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 
     for (; argp < argc; argp++) {
         char *arg = argv[argp];
-        if (strcmp("-d", arg) == 0) {
+        if ((strcmp("-h", arg) == 0) || (strcmp("--help", arg) == 0)) {
+            usage_exit();
+        }
+        else if (strcmp("-d", arg) == 0) {
             daemonize();
             if (strcmp(stdiotype, "stdio") == 0) {
                 stdiotype = "null";
