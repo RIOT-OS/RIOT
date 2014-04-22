@@ -75,6 +75,7 @@ all: $(BINDIR)$(PROJECT).a
 	@echo "Building application $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
 	"$(MAKE)" -C $(RIOTBASE)
+ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
 	$(AD)$(LINK) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
@@ -82,6 +83,7 @@ else
 endif
 	$(AD)$(SIZE) $(ELFFILE)
 	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
+endif
 
 # string array of all names of c files in dir
 SRC = $(wildcard *.c)
