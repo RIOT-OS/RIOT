@@ -42,6 +42,8 @@ const shell_command_t shell_commands[] = {
     {NULL, NULL, NULL}
 };
 
+static char shell_buffer[UART0_BUFSIZE];
+
 int main(void)
 {
     puts("RPL router v"APP_VERSION);
@@ -51,7 +53,7 @@ int main(void)
     net_if_set_src_address_mode(0, NET_IF_TRANS_ADDR_M_SHORT);
 
     shell_t shell;
-    shell_init(&shell, shell_commands, UART0_BUFSIZE, uart0_readc, uart0_putc);
+    shell_init(&shell, shell_commands, shell_buffer, sizeof (shell_buffer), uart0_readc, uart0_putc);
 
     shell_run(&shell);
     return 0;

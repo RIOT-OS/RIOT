@@ -300,6 +300,8 @@ static const shell_command_t sc[] = {
     { NULL, NULL, NULL }
 };
 
+static char shell_buffer[UART0_BUFSIZE];
+
 void riot_ccn_runner(void)
 {
     if (msg_init_queue(msg_buffer_shell, SHELL_MSG_BUFFER_SIZE) != 0) {
@@ -310,7 +312,7 @@ void riot_ccn_runner(void)
     puts("posix open");
     posix_open(uart0_handler_pid, 0);
     puts("shell init");
-    shell_init(&shell, sc, UART0_BUFSIZE, uart0_readc, uart0_putc);
+    shell_init(&shell, sc, shell_buffer, sizeof (shell_buffer), uart0_readc, uart0_putc);
     puts("shell run");
     shell_run(&shell);
 }

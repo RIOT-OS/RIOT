@@ -72,9 +72,10 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
+static char shell_buffer[SHELL_BUFSIZE];
+
 int main(void)
 {
-
     printf("test_shell.\n");
 
     board_uart0_init();
@@ -83,14 +84,13 @@ int main(void)
 
     /* define own shell commands */
     shell_t shell;
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, shell_readc,
-               shell_putchar);
+    shell_init(&shell, shell_commands, shell_buffer, sizeof (shell_buffer), shell_readc, shell_putchar);
     shell_run(&shell);
 
     /* or use only system shell commands */
     /*
     shell_t sys_shell;
-    shell_init(&sys_shell, NULL, SHELL_BUFSIZE, shell_readc, shell_putchar);
+    shell_init(&sys_shell, NULL, shell_buffer, sizeof (shell_buffer), shell_readc, shell_putchar);
     shell_run(&sys_shell);
     */
 

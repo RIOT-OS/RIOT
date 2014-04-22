@@ -116,6 +116,7 @@ static void shell_putchar(int c)
 
 int main(void)
 {
+    char shell_buffer[UART0_BUFSIZE];
     shell_t shell;
     (void) posix_open(uart0_handler_pid, 0);
 
@@ -129,7 +130,7 @@ int main(void)
 
     (void) puts("Welcome to RIOT!");
 
-    shell_init(&shell, NULL, UART0_BUFSIZE, shell_readc, shell_putchar);
+    shell_init(&shell, NULL, shell_buffer, sizeof (shell_buffer), shell_readc, shell_putchar);
 
     shell_run(&shell);
     return 0;
