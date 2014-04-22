@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -29,10 +29,10 @@
 
 int main(void)
 {
-    printf("when the race condition is hit, hwtimer will wait a very very long time...\n");
+    puts("This is just a functionality test for hwtimer_spin.");
 
     while (1) {
-        for (unsigned long i = 256; i; i = i >> 1) {
+        for (unsigned long i = 6; i > 0; i--) {
             printf("wait %lu\n", i);
             hwtimer_wait(i);
         }
