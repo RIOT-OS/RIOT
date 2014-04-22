@@ -264,14 +264,4 @@ shell_run_result_t shell_run(shell_t *shell)
     return res;
 }
 
-void shell_init(shell_t *shell, const shell_command_t *shell_commands,
-                char *buffer, unsigned buffer_size, int(*readchar)(void), void(*put_char)(int))
-{
-    shell->command_list = shell_commands;
-    shell->buffer = buffer;
-    shell->buffer_size = buffer_size;
-    shell->readchar = readchar;
-    shell->put_char = put_char;
-}
-
 /** @} */
