@@ -1,16 +1,10 @@
-/******************************************************************************
- * Copyright 2009, Freie Universitaet Berlin (FUB). All rights reserved.
- *
- * These sources were developed at the Freie Universitaet Berlin, Computer Systems
- * and Telematics group (http://cst.mi.fu-berlin.de).
- * ----------------------------------------------------------------------------
- * This file is part of RIOT.
+/*
+ * Copyright (C) 2009-2013 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
-*******************************************************************************/
+ */
 
 /**
  * @defgroup    sys_shell Shell
@@ -20,16 +14,43 @@
 
 #ifndef __SHELL_H
 #define __SHELL_H
+
 #include <stdint.h>
 
+#include "attributes.h"
+
+/**
+ * @brief           Protype of a shell callback handler.
+ * @details         The functions supplied to shell_init() must use this signature.
+ *                  The argument list is terminated with a NULL, i.e ``argv[argc] == NULL`.
+ *                  ``argv[0]`` is the function name.
+ *
+ *                  Escape sequences are removed before the function is called.
+ *
+ *                  The called function may edit `argv` and the contained strings,
+ *                  but it must be taken care of not to leave the boundaries of the array.
+ *                  This functionality can be used by getopt() or a similar function.
+ * @param[in]       argc   Number of arguments supplied to the function invocation.
+ * @param[in]       argv   The supplied argument list.
+ */
 typedef void (*shell_command_handler_t)(int argc, char **argv);
 
+/**
+ * @brief           A single command in the list of the supported commands.
+ * @details         The list of commands is NULL terminated,
+ *                  i.e. the last element must be ``{ NULL, NULL, NULL }``.
+ */
 typedef struct shell_command_t {
-    char *name;
-    char *desc;
-    shell_command_handler_t handler;
+    char *name;     /**< Name of the function */
+    char *desc;     /**< Description to print in the "help" command. */
+    shell_command_handler_t handler; /**< The callback function. */
 } shell_command_t;
 
+/**
+ * @brief           The internal state of a shell session.
+ * @details         Use shell_init() to initialize the datum,
+ *                  and shell_run() to run the REPL session.
+ */
 typedef struct shell_t {
     const shell_command_t *command_list;
     uint16_t shell_buffer_size;
@@ -38,22 +59,29 @@ typedef struct shell_t {
 } shell_t;
 
 /**
- * @brief Initialize a shell object
- * @param shell Pointer to preallocated shell object
- * @param shell_commands Pointer to shell command structure. See test_shell application for example.
- * @param shell_buffer_size The size of the shell buffer.
- * @param read_char Pointer to input device read function. Should return exactly one byte or block.
- * @param put_char Pointer to output funtion. currently unused, shell code will use printf.
+ * @brief           Initialize a shell session state.
+ * @param[out]      shell               The datum to initialize.
+ * @param[in]       shell_commands      Null-terminated list of commands to understand.
+ *                                      Supply `NULL` to only feature the default commands.
+ * @param           shell_buffer_size   The backing buffer for the command line.
+ *                                      Allocated on the stack!
+ * @param           read_char           A blocking function that reads one 8-bit character at a time.
+ *                                      The valid code range is [0;255].
+ *                                      A value of `< 0` denotes a read error.
+ * @param           put_char            Function used to print back the last read character.
+ *                                      Only valid unsigned chars in [0;255] will be supplied.
  */
-void shell_init(shell_t *shell,  /*@null@*/ const shell_command_t *shell_commands,
-                uint16_t shell_buffer_size, int(*read_char)(void), void (*put_char)(int));
+void shell_init(shell_t *shell,
+                const shell_command_t *shell_commands,
+                uint16_t shell_buffer_size,
+                int (*read_char)(void),
+                void (*put_char)(int));
 
 /**
- * @brief Endless loop that waits for command and executes handler.
+ * @brief           Start the shell session.
+ * @param[in]       shell   The session that was previously initialized with shell_init().
+ * @returns         This function does not return.
  */
-void shell_run(shell_t *shell);
-
-
-void shell_auto_init(shell_t *shell);
+void shell_run(shell_t *shell) NORETURN;
 
 #endif /* __SHELL_H */
