@@ -25,6 +25,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
+#include "ccnl-core.h"
+#include "ccnl-platform.h"
 
 #include "rtc.h"
 
@@ -33,9 +37,6 @@ timevaldelta(struct timeval *a, struct timeval *b)
 {
     return 1000000 * (a->tv_sec - b->tv_sec) + a->tv_usec - b->tv_usec;
 }
-
-#include "ccnl-ext-debug.c"
-#include "ccnl-platform.h"
 
 // ----------------------------------------------------------------------
 
