@@ -66,6 +66,8 @@ endif
 
 all: # do not override first target
 
+all-debug: all
+
 all-gprof: all
 
 all-valgrind: all
