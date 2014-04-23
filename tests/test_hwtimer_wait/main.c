@@ -29,10 +29,11 @@
 
 int main(void)
 {
-    puts("This is just a functionality test for hwtimer_spin.");
+    puts("This is a regression test for a race condition in hwtimer_wait.");
+    puts("When the race condition is hit, the timer will wait for a very very long time...");
 
     while (1) {
-        for (unsigned long i = 6; i > 0; i--) {
+        for (unsigned long i = 256; i; i = i >> 1) {
             printf("wait %lu\n", i);
             hwtimer_wait(i);
         }
