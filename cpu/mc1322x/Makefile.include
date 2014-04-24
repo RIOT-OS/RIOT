@@ -1,4 +1,5 @@
-INCLUDES += -I$(RIOTBASE)/cpu/mc1322x/include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/include
+INCLUDES += -I$(RIOTCPU)/$(CPU)/maca/include
 
 include $(RIOTCPU)/arm_common/Makefile.include
 

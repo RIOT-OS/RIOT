@@ -51,8 +51,14 @@
 #include "nativenet.h"
 #define TEXT_SIZE           NATIVE_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_NATIVE
-#endif
 
+#elif defined( MODULE_MC1322X )
+#include "mc1322x.h"
+#include "maca.h"
+#include "maca_packet.h"
+#define TEXT_SIZE           MACA_MAX_PAYLOAD_SIZE
+#define _TC_TYPE            TRANSCEIVER_MC1322X
+#endif
 
 /* checked for type safety */
 void _transceiver_get_set_address_handler(int argc, char **argv)

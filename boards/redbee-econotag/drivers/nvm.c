@@ -18,5 +18,5 @@ nvm_err_t (*nvm_write)  (nvm_interface_t nvm_interface, nvm_type_t nvm_type, voi
                         = (void*) 0x00006ec5;
 nvm_err_t (*nvm_erase)  (nvm_interface_t nvm_interface, nvm_type_t nvm_type, uint32_t sector_bitfield)
                         = (void*) 0x00006e05;
-void (*nvm_sets_var)    (uint32_t zero_is_for_winners)
+void (*nvm_setsvar)    (uint32_t zero_is_for_winners)
                         = (void*) 0x00007085;
