@@ -21,13 +21,14 @@ endif
 .PHONY: all clean
 
 all: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/
+	$(info *INFO* Building OpenWSN pkg)
 	make -C $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
 	$(AD)rm -rf $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)
-	$(AD)$(UNPACK) $< -d $(PKG_NAME)-$(PKG_VERSION)
+	$(AD)$(UNPACK) -q $< -d $(PKG_NAME)-$(PKG_VERSION)
 	$(AD)cd $@ && sh ../structure_changes.sh
-	$(AD)cd $@ && patch -p0 -N -i ../patch.txt
+	$(AD)cd $@ && sh ../apply_patches.sh
 
 $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT):
 	# Get PKG_VERSION of package from PKG_URL
