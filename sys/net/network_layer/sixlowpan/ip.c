@@ -438,6 +438,11 @@ void ipv6_process(void)
                                         nce->lladdr_len,
                                         (uint8_t *)ipv6_get_buf_send(),
                                         packet_length);
+            } else {
+                /* XXX: this is wrong, but until ND does not work correctly,
+                 *      this is the only way (aka the old way)*/
+                uint16_t raddr = dest->uint16[7];
+                sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *)ipv6_get_buf_send(), packet_length);
             }
         }
 
