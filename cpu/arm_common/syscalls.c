@@ -268,15 +268,6 @@ int _getpid(void)
     return active_thread->pid;
 }
 /*---------------------------------------------------------------------------*/
-int _kill_r(struct _reent *r, int pid, int sig)
-{
-    (void) pid;
-    (void) sig;
-    /* not implemented */
-    r->_errno = ESRCH;      // no such process
-    return -1;
-}
-/*---------------------------------------------------------------------------*/
 int _gettimeofday(struct timeval *tp, void *restrict tzp) {
     (void) tzp;
 #if defined MODULE_RTC
@@ -291,3 +282,4 @@ int _gettimeofday(struct timeval *tp, void *restrict tzp) {
 
 void _init(void) {}
 void _fini(void) {}
+void _kill(void) {}
