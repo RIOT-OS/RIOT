@@ -55,13 +55,12 @@ void sched_set_status(tcb_t *process, unsigned int status);
 
 /**
  * @brief   Compare thread priorities and yield() (or set
- *          sched_context_switch_request if in_isr) when other_prio is higher
- *          (has a lower value) than current_prio
+ *          sched_context_switch_request if inISR()) when other_prio is higher
+ *          (has a lower value) than the current thread's priority
  *
- * @param[in]   current_prio    The priority of the current thread
  * @param[in]   other_prio      The priority of the target thread
  */
-void sched_switch(uint16_t current_prio, uint16_t other_prio);
+void sched_switch(uint16_t other_prio);
 
 /**
  * @brief   Call context switching at thread exit

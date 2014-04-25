@@ -315,6 +315,6 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
     mutex_unlock(&rwlock->mutex);
 
     /* yield if a woken up thread had a higher priority */
-    sched_switch(sched_active_thread->priority, prio);
+    sched_switch(prio);
     return 0;
 }
