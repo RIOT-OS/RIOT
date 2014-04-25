@@ -1,4 +1,5 @@
 #include "rpl_structs.h"
+#include "rpl_config.h"
 
 /*
  * Disallow links with greater than 4 expected
