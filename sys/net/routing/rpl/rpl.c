@@ -209,7 +209,7 @@ uint8_t rpl_init(int if_id)
 
     /* INSERT NEW OBJECTIVE FUNCTIONS HERE */
     objective_functions[0] = rpl_get_of0();
-    /* objective_functions[1] = rpl_get_of_ETX() */
+    objective_functions[1] = rpl_get_of_mrhof();
 
     sixlowpan_lowpan_init_interface(if_id);
     /* need link local prefix to query _our_ corresponding address  */

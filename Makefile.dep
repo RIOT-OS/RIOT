@@ -34,6 +34,14 @@ ifneq (,$(filter sixlowborder,$(USEMODULE)))
     endif
 endif
 
+ifneq (,$(filter rpl,$(USEMODULE)))
+    USEMODULE += routing
+endif
+
+ifneq (,$(filter routing,$(USEMODULE)))
+    USEMODULE += sixlowpan
+endif
+
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
     ifeq (,$(filter ieee802154,$(USEMODULE)))
         USEMODULE += ieee802154
