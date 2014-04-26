@@ -41,16 +41,15 @@
 #define STATUS_RECEIVE_BLOCKED  3               /**< waiting for a message              */
 #define STATUS_SEND_BLOCKED     4               /**< waiting for message to be delivered*/
 #define STATUS_REPLY_BLOCKED    5               /**< waiting for a message response     */
-#define STATUS_TIMER_WAITING    6               /**< waiting for a timer to fire        */
 /** @} */
 
 /**
  * @brief These have to be on a run queue.
  * @{*/
-#define STATUS_ON_RUNQUEUE      7               /**< to check if on run queue 
+#define STATUS_ON_RUNQUEUE      STATUS_RUNNING  /**< to check if on run queue:
                                                  `st >= STATUS_ON_RUNQUEUE`             */
-#define STATUS_RUNNING          7               /**< currently running                  */
-#define STATUS_PENDING          8               /**< waiting to be scheduled to run     */
+#define STATUS_RUNNING          6               /**< currently running                  */
+#define STATUS_PENDING          7               /**< waiting to be scheduled to run     */
 /** @} */
 /** @} */
 
