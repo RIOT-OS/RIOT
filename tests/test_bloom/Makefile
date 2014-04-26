@@ -1,11 +1,16 @@
 export PROJECT = test_bloom
 include ../Makefile.tests_common
 
-ifneq (,$(filter msb-430,$(BOARD)))
-	include $(RIOTBASE)/Makefile.unsupported
-elifneq (,$(filter msb-430h,$(BOARD)))
-	include $(RIOTBASE)/Makefile.unsupported
-endif
+BOARD_BLACKLIST := chronos mbed_lpc1768 msb-430 msb-430h redbee-econotag \
+                   telosb wsn430-v1_3b wsn430-v1_4
+# chronos: not enough RAM
+# mbed_lpc1768: not enough RAM
+# msb-430: not enough RAM
+# msb-430h: not enough RAM
+# redbee-econotag: not enough RAM
+# telosb: not enough RAM
+# wsn430-v1_3b: not enough RAM
+# wsn430-v1_4: not enough RAM
 
 USEMODULE += hashes
 USEMODULE += bloom
