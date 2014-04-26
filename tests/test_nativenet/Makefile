@@ -1,6 +1,8 @@
 export PROJECT = test_nativenet
 include ../Makefile.tests_common
 
+BOARD_WHITELIST := native
+
 ifeq (,$(filter native,$(BOARD)))
 include $(RIOTBASE)/Makefile.unsupported
 else
