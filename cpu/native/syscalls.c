@@ -163,6 +163,9 @@ ssize_t _native_write(int fd, const void *buf, size_t count)
     return r;
 }
 
+#if defined(__FreeBSD__)
+#undef putchar
+#endif
 int putchar(int c) {
     _native_write(STDOUT_FILENO, &c, 1);
     return 0;

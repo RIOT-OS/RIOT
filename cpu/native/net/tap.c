@@ -31,6 +31,13 @@
 #undef _POSIX_C_SOURCE
 #include <ifaddrs.h>
 #include <net/if_dl.h>
+
+#elif defined(__FreeBSD__)
+#include <sys/socket.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <net/if_dl.h>
+
 #else
 #include <net/if.h>
 #include <linux/if_tun.h>
@@ -232,6 +239,9 @@ int tap_init(char *name)
 #ifdef __MACH__ /* OSX */
     char clonedev[255] = "/dev/"; /* XXX bad size */
     strncpy(clonedev+5, name, 250);
+#elif defined(__FreeBSD__)
+    char clonedev[255] = "/dev/"; /* XXX bad size */
+    strncpy(clonedev+5, name, 250);
 #else /* Linux */
     struct ifreq ifr;
     const char *clonedev = "/dev/net/tun";
@@ -242,7 +252,7 @@ int tap_init(char *name)
         err(EXIT_FAILURE, "open(%s)", clonedev);
     }
 
-#ifdef __MACH__ /* OSX */
+#if (defined(__MACH__) || defined(__FreeBSD__)) /* OSX/FreeBSD */
     struct ifaddrs* iflist;
     if (getifaddrs(&iflist) == 0) {
         for (struct ifaddrs *cur = iflist; cur; cur = cur->ifa_next) {
