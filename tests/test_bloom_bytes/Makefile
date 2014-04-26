@@ -1,9 +1,14 @@
 export PROJECT = test_bloom
 include ../Makefile.tests_common
 
-ifneq (,$(filter msb-430,$(BOARD)))
-include $(RIOTBASE)/Makefile.unsupported
-else
+BOARD_BLACKLIST :=  msb-430 msb-430h \
+                   telosb wsn430-v1_3b wsn430-v1_4
+# chronos: https://github.com/RIOT-OS/RIOT/issues/1061
+# msb-430: https://github.com/RIOT-OS/RIOT/issues/1061
+# msb-430h: https://github.com/RIOT-OS/RIOT/issues/1061
+# telosb: https://github.com/RIOT-OS/RIOT/issues/1061
+# wsn430-v1_3b: https://github.com/RIOT-OS/RIOT/issues/1061
+# wsn430-v1_4: https://github.com/RIOT-OS/RIOT/issues/1061
 
 USEMODULE += hashes
 USEMODULE += bloom
@@ -12,4 +17,3 @@ USEMODULE += random
 DISABLE_MODULE += auto_init
 
 include $(RIOTBASE)/Makefile.include
-endif
