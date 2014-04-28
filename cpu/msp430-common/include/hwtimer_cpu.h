@@ -17,23 +17,34 @@ See the file LICENSE in the top level directory for more details.
 
 #include "cpu.h"
 
-#ifdef __MSP430_HAS_TA2__
-#define HWTIMER_MAXTIMERS 2
-#endif
-#ifdef __MSP430_HAS_TA3__
-#define HWTIMER_MAXTIMERS 3
-#endif
-#ifdef __MSP430_HAS_T0A5__
-#define HWTIMER_MAXTIMERS 5
+#if defined (__MSP430_HAS_TA2__)
+#define TIMER_A_MAXCOMP  1
+#elif defined (__MSP430_HAS_TA3__)
+#define TIMER_A_MAXCOMP  2
+#elif defined (__MSP430_HAS_T0A5__)
+#define TIMER_A_MAXCOMP  4
+#else
+#define TIMER_A_MAXCOMP  0
 #endif
 
+#define HWTIMER_MAXTIMERS  (TIMER_A_MAXCOMP)
 
 #ifndef HWTIMER_MAXTIMERS
 #warning "HWTIMER_MAXTIMERS UNSET!"
-#define HWTIMER_MAXTIMERS 0
+#define HWTIMER_MAXTIMERS  0
 #endif
 
+typedef struct {
+    enum {
+        TIMER_A,
+        TIMER_A0,
+        TIMER_B,
+    } base_timer;
+    uint8_t ccr_num;
+    volatile uint16_t target_round;
+} msp430_timer_t;
+
 #define HWTIMER_SPEED  (F_RC_OSCILLATOR)
-#define HWTIMER_MAXTICKS (0xFFFFFFFF)
+#define HWTIMER_MAXTICKS  (0xFFFF7FFF)
 
 #endif // __HWTIMER_CPU_H
