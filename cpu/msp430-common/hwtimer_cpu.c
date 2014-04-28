@@ -34,6 +34,9 @@
 
 void (*int_handler)(int);
 extern void timerA_init(void);
+#ifndef CC430
+extern void timerB_init(void);
+#endif
 
 extern volatile msp430_timer_t msp430_timer[HWTIMER_MAXTIMERS];
 
@@ -90,7 +93,7 @@ static volatile unsigned int *get_comparator_reg_for_msp430_timer(int index)
 #else
   /* ... while other MSP430 MCUs have "TimerA", "TimerB".
          Cheers for TI and its consistency! */
-  #define TIMER_VAL_REG (TAR)
+  #define TIMER_VAL_REG (TBR)
 #endif
 
 /* hardware-dependent functions */
@@ -141,6 +144,9 @@ unsigned long hwtimer_arch_now(void)
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
 {
     (void) fcpu;
+#ifndef CC430
+    timerB_init();
+#endif
     timerA_init();
     int_handler = handler;
 }

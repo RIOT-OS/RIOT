@@ -42,7 +42,15 @@ extern "C" {
 #define TIMER_A_MAXCOMP  0
 #endif
 
-#define HWTIMER_MAXTIMERS  (TIMER_A_MAXCOMP)
+#if defined (__MSP430_HAS_TB3__)
+#define TIMER_B_MAXCOMP  3
+#elif defined (__MSP430_HAS_TB7__)
+#define TIMER_B_MAXCOMP  7
+#else
+#define TIMER_B_MAXCOMP  0
+#endif
+
+#define HWTIMER_MAXTIMERS  (TIMER_A_MAXCOMP + TIMER_B_MAXCOMP)
 
 #ifndef HWTIMER_MAXTIMERS
 #warning "HWTIMER_MAXTIMERS UNSET!"
