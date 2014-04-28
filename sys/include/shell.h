@@ -41,8 +41,8 @@ typedef void (*shell_command_handler_t)(int argc, char **argv);
  *                  i.e. the last element must be ``{ NULL, NULL, NULL }``.
  */
 typedef struct shell_command_t {
-    char *name;     /**< Name of the function */
-    char *desc;     /**< Description to print in the "help" command. */
+    const char *name; /**< Name of the function */
+    const char *desc; /**< Description to print in the "help" command. */
     shell_command_handler_t handler; /**< The callback function. */
 } shell_command_t;
 
