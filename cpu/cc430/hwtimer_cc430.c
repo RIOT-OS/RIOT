@@ -32,6 +32,8 @@
 extern void (*int_handler)(int);
 extern void timer_unset(short timer);
 
+msp430_timer_t msp430_timer[HWTIMER_MAXTIMERS];
+
 void timerA_init(void)
 {
     volatile unsigned int *ccr = &TA0CCR0;

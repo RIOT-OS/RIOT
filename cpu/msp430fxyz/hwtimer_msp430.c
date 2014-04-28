@@ -24,46 +24,55 @@
 #include "hwtimer.h"
 #include "arch/hwtimer_arch.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 extern void (*int_handler)(int);
 extern void timer_unset(short timer);
 
+msp430_timer_t msp430_timer[HWTIMER_MAXTIMERS];
+
+#define CCRA_NUM_TO_INDEX(ccr)   (ccr)
+
 void timerA_init(void)
 {
-
     TACTL = TASSEL_1 + TACLR;                /* Clear the timer counter, set ACLK */
-    TACTL &= ~TAIFG;                         /* Clear the IFG */
-    TACTL &= ~TAIE;                          /* Disable TAIE (overflow IRQ) */
+    TACTL &= ~(TAIFG);                       /* Clear the IFG */
+    TACTL &= ~(TAIE);                        /* Disable TAIE (overflow IRQ) */
 
-    for (int i = 0; i < HWTIMER_MAXTIMERS; i++) {
+    for (uint8_t i = 0; i < TIMER_A_MAXCOMP; i++) {
         volatile unsigned int *ccr = &TACCR0 + (i);
         volatile unsigned int *ctl = &TACCTL0 + (i);
         *ccr = 0;
         *ctl &= ~(CCIFG);
         *ctl &= ~(CCIE);
+
+        /* intialize the corresponding msp430_timer struct */
+        short index = CCRA_NUM_TO_INDEX(i);
+        msp430_timer[index].base_timer = TIMER_A;
+        msp430_timer[index].ccr_num = i;
     }
 
     TACTL |= MC_2;
 }
 
-interrupt(TIMERA0_VECTOR) __attribute__((naked)) timer_isr_ccr0(void)
+interrupt(TIMERA0_VECTOR) __attribute__((naked)) timerA_isr_ccr0(void)
 {
     __enter_isr();
 
-    timer_unset(0);
-    int_handler(0);
+    short timer = CCRA_NUM_TO_INDEX(0);
+    timer_unset(timer);
+    int_handler(timer);
 
     __exit_isr();
 }
 
-interrupt(TIMERA1_VECTOR) __attribute__((naked)) timer_isr(void)
+interrupt(TIMERA1_VECTOR) __attribute__((naked)) timerA_isr(void)
 {
     __enter_isr();
 
     /* determine which CCR has been hit, and fire the appropriate callback */
-    short timer = TAIV >> 1;
+    short timer = CCRA_NUM_TO_INDEX(TAIV >> 1);
     timer_unset(timer);
     int_handler(timer);
 
