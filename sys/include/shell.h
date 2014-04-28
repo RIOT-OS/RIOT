@@ -52,10 +52,10 @@ typedef struct shell_command_t {
  *                  and shell_run() to run the REPL session.
  */
 typedef struct shell_t {
-    const shell_command_t *command_list;
-    uint16_t shell_buffer_size;
-    int (*readchar)(void);
-    void (*put_char)(int);
+    const shell_command_t *command_list; /**< The commandlist supplied to shell_init(). */
+    uint16_t shell_buffer_size;          /**< The maximum line length supplied to shell_init(). */
+    int (*readchar)(void);               /**< The read function supplied to shell_init(). */
+    void (*put_char)(int);               /**< The write function supplied to shell_init(). */
 } shell_t;
 
 /**
