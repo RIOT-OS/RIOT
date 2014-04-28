@@ -1,7 +1,7 @@
 export PROJECT = test_bloom
 include ../Makefile.tests_common
 
-BOARD_BLACKLIST :=  msb-430 msb-430h \
+BOARD_BLACKLIST := chronos msb-430 msb-430h \
                    telosb wsn430-v1_3b wsn430-v1_4
 # chronos: https://github.com/RIOT-OS/RIOT/issues/1061
 # msb-430: https://github.com/RIOT-OS/RIOT/issues/1061
