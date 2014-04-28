@@ -49,18 +49,6 @@ typedef struct vtimer_t {
 void vtimer_now(timex_t *out);
 
 /**
- * @brief Get the current time in seconds and microseconds since system start
- * @param[in] tp    Uptime will be stored in the timeval structure pointed to by tp
- */
-void vtimer_gettimeofday(struct timeval *tp);
-
-/**
- * @brief   Returns the current time in broken down format
- * @param[out]  localt      Pointer to structure to receive time
- */
-void vtimer_get_localtime(struct tm *localt);
-
-/**
  * @brief   Initializes the vtimer subsystem. To be called once at system initialization. Will be initialized by auto_init.
  *
  * @return  always 0
