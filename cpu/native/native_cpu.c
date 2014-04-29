@@ -150,7 +150,7 @@ void isr_cpu_switch_context_exit(void)
 void cpu_switch_context_exit(void)
 {
 #ifdef NATIVE_AUTO_EXIT
-    if (sched_num_threads <= 1) {
+    if (sched_num_threads == 0) {
         DEBUG("cpu_switch_context_exit(): last task has ended. exiting.\n");
         exit(EXIT_SUCCESS);
     }

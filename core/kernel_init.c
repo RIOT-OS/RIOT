@@ -80,7 +80,7 @@ void kernel_init(void)
 
     hwtimer_init();
 
-    if (thread_create(idle_stack, sizeof(idle_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, idle_name) < 0) {
+    if (thread_create(idle_stack, sizeof(idle_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST | DAEMON_THREAD, idle_thread, idle_name) < 0) {
         printf("kernel_init(): error creating idle task.\n");
     }
 

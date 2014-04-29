@@ -201,7 +201,9 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     cib_init(&(cb->msg_queue), 0);
     cb->msg_array = NULL;
 
-    sched_num_threads++;
+    if (!(flags & DAEMON_THREAD)) {
+        sched_num_threads++;
+    }
 
     DEBUG("Created thread %s. PID: %u. Priority: %u.\n", name, cb->pid, priority);
 
