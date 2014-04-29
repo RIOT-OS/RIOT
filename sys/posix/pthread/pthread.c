@@ -169,37 +169,37 @@ void pthread_exit(void *retval)
 
     if (self_id == 0) {
         DEBUG("ERROR called pthread_self() returned 0 in \"%s\"!\n", __func__);
-        sched_task_exit();
-        return;
     }
+    else {
+        pthread_thread_t *self = pthread_sched_threads[self_id-1];
 
-    pthread_thread_t *self = pthread_sched_threads[self_id-1];
+        while (self->cleanup_top) {
+            __pthread_cleanup_datum_t *ct = self->cleanup_top;
+            self->cleanup_top = ct->__next;
 
-    while (self->cleanup_top) {
-        __pthread_cleanup_datum_t *ct = self->cleanup_top;
-        self->cleanup_top = ct->__next;
+            ct->__routine(ct->__arg);
+        }
 
-        ct->__routine(ct->__arg);
-    }
+        self->thread_pid = -1;
+        DEBUG("pthread_exit(%p), self == %p\n", retval, (void *) self);
+        if (self->status != PTS_DETACHED) {
+            self->returnval = retval;
+            self->status = PTS_ZOMBIE;
 
-    self->thread_pid = -1;
-    DEBUG("pthread_exit(%p), self == %p\n", retval, (void *) self);
-    if (self->status != PTS_DETACHED) {
-        self->returnval = retval;
-        self->status = PTS_ZOMBIE;
+            if (self->joining_thread) {
+                /* our thread got an other thread waiting for us */
+                thread_wakeup(self->joining_thread);
+            }
+        }
 
-        if (self->joining_thread) {
-            /* our thread got an other thread waiting for us */
-            thread_wakeup(self->joining_thread);
+        dINT();
+        if (self->stack) {
+            msg_t m;
+            m.content.ptr = self->stack;
+            msg_send_int(&m, pthread_reaper_pid);
         }
     }
 
-    dINT();
-    if (self->stack) {
-        msg_t m;
-        m.content.ptr = self->stack;
-        msg_send_int(&m, pthread_reaper_pid);
-    }
     sched_task_exit();
 }
 
