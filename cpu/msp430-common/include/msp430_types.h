@@ -19,4 +19,7 @@ struct timeval {
     time_t tv_usec;
 };
 
+/* TODO: remove once msp430 libc supports clockid_t */
+typedef int clockid_t;
+
 #endif /* MSP430_TYPES_H */
