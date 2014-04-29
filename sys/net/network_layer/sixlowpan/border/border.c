@@ -131,10 +131,10 @@ int sixlowpan_lowpan_border_init(int if_id)
 
     serial_reader_pid = thread_create(
                             serial_reader_stack, READER_STACK_SIZE,
-                            PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                            PRIORITY_MAIN - 1, CREATE_STACKTEST | DAEMON_THREAD,
                             serial_reader_f, "serial_reader");
     ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
-                                   PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                   PRIORITY_MAIN - 1, CREATE_STACKTEST | DAEMON_THREAD,
                                    border_process_lowpan,
                                    "border_process_lowpan");
 

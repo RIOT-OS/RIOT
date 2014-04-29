@@ -57,7 +57,7 @@ void board_uart0_init(void)
                   uart0_thread_stack,
                   sizeof(uart0_thread_stack),
                   PRIORITY_MAIN - 1,
-                  CREATE_STACKTEST | CREATE_SLEEPING,
+                  CREATE_STACKTEST | CREATE_SLEEPING | DAEMON_THREAD,
                   uart0_loop,
                   "uart0"
               );
