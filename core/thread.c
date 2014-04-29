@@ -183,6 +183,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     cb->stack_size = total_stacksize;
 
     cb->priority = priority;
+    cb->flags = flags;
     cb->status = 0;
 
     cb->rq_entry.data = (unsigned int) cb;
