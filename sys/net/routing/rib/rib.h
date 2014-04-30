@@ -81,15 +81,6 @@ C (cache entry)
 
 #define ROUTING_METRIC_ID_DEFAULT (0xFF)
 
-// mutex for exclusive operations on the list
-mutex_t mtx_table;
-
-// default set value for a maximum number of entries persisting in the routing table
-size_t max_entries;
-
-// the current number of entries in the routing table
-size_t current_entries;
-
 typedef struct metric_t {
     struct metric_t *next;
     uint32_t       origin_protocol_id;
@@ -106,24 +97,12 @@ typedef struct rib_t {
     metric_t       *metric;
 } rib_t;
 
-// pointer to the starting entry of the routing table
-rib_t    *routing_table;
-
-// pointer to quickly access the default gateway
-rib_t    *default_gateway;
-
-// the current next hop is stored here;
-ipv6_addr_t     current_next_hop;
-
 typedef struct routing_handler_t {
     struct routing_handler_t *next;
     uint32_t         protocol_id;
     metric_t   *supported_metric_id;
     rib_t *(* choose_nexthop)(rib_t **aCandidates, size_t candidatesSize);
 } routing_handler_t;
-
-// pointer to the starting registered routing protocol
-routing_handler_t   *routing_protocols_registered;
 
 
 /**
@@ -228,7 +207,6 @@ void find_longest_common_prefix(ipv6_addr_t *dst_net_addr_in, rib_t **aRIBentrie
  */
 int set_metric_values(metric_t *metric_query_in_out, metric_t *metric_target);
 
-
 /**
  * @brief creates a list of 'count' empty metrics
  *
@@ -237,7 +215,6 @@ int set_metric_values(metric_t *metric_query_in_out, metric_t *metric_target);
  * @return pointer to the starting metric
  */
 metric_t *create_empty_metrics(size_t count);
-
 
 /**
  * @brief removes all entries and frees the used memory from the given starting entry

@@ -2,6 +2,28 @@
 #include <stdio.h>
 
 
+// mutex for exclusive operations on the list
+mutex_t mtx_table;
+
+// default set value for a maximum number of entries persisting in the routing table
+size_t max_entries;
+
+// the current number of entries in the routing table
+size_t current_entries;
+
+// pointer to the starting entry of the routing table
+rib_t    *routing_table;
+
+// pointer to quickly access the default gateway
+rib_t    *default_gateway;
+
+// the current next hop is stored here;
+ipv6_addr_t     current_next_hop;
+
+// pointer to the starting registered routing protocol
+routing_handler_t   *routing_protocols_registered;
+
+
 void route_register_protocol(routing_handler_t *protocol)
 {
     mutex_lock(&mtx_table);
