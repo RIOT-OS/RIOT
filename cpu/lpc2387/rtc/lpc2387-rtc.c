@@ -232,6 +232,8 @@ rtc_get_localtime(struct tm *localt)
 /*---------------------------------------------------------------------------*/
 void gettimeofday_r(struct _reent *r, struct timeval *ptimeval, struct timezone *ptimezone)
 {
+    (void) ptimezone; /* unused */
+
     r->_errno = 0;
 
     if (ptimeval != NULL) {
