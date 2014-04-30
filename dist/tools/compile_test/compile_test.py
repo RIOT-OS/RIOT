@@ -19,11 +19,11 @@
 
 from __future__ import print_function
 
-from itertools import groupby, ifilter, imap
+from itertools import groupby
 from os import devnull, environ, listdir
 from os.path import abspath, dirname, isdir, join
 from subprocess import PIPE, Popen
-from sys import exit
+from sys import exit, stdout
 
 riotbase = environ.get('RIOTBASE') or abspath(join(dirname(abspath(__file__)), '../' * 3))
 
@@ -39,25 +39,39 @@ for folder in ('examples', 'tests'):
         if not isdir(join(riotbase, folder, application)):
             continue
 
-        print('\tBuilding application: \033[1;34m{}\033[0m'.format(application))
+        stdout.write('\tBuilding application: \033[1;34m{}\033[0m '.format(application))
+        stdout.flush()
         try:
             subprocess = Popen(('make', 'buildtest'),
+                               bufsize=1,
+                               stdin=null,
                                stdout=PIPE,
                                stderr=null,
                                cwd=join(riotbase, folder, application))
-            lines = imap(str.rstrip, subprocess.stdout)
-            lines = ifilter(bool, lines)
-            lines = imap(lambda s: s.split(' .. '), lines)
-            lines = ifilter(lambda t: len(t) == 2, lines)
-            lines = imap(lambda (board, outcome): (outcome, board[len('Building for '):]), lines)
+
+            def lines(readline, prefix):
+                while 1:
+                    result = readline()
+                    if not result:
+                        break
+                    elif not result.startswith(prefix):
+                        continue
+
+                    result = result[len(prefix):].rstrip().split(' .. ')[::-1]
+                    if len(result) == 2:
+                        stdout.write('.')
+                        stdout.flush()
+                        yield result
+
+            lines = lines(subprocess.stdout.readline, 'Building for ')
             lines = groupby(sorted(lines), lambda (outcome, board): outcome)
             for group, results in lines:
-                print('\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board in results))))
+                print('\n\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board in results))))
 
             returncode = subprocess.wait()
             (failed if returncode else success).append(application)
         except Exception, e:
-            print('\t\tException: {}'.format(e))
+            print('\n\t\tException: {}'.format(e))
             exceptions.append(application)
         finally:
             try:
