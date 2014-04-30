@@ -165,7 +165,6 @@ void route_add(ipv6_addr_t *dst_net_addr, ipv6_addr_t *gw_net_addr, int *iface_i
  *
  * @param   dst_net_addr pointer to the address to be deleted
  * @param   iface_id pointer to the transceiver interface identifier
- * @param   metric pointer to the metric(s) used for this routing entry
  *
  */
 void route_del(ipv6_addr_t *dst_net_addr, int *iface_id);
