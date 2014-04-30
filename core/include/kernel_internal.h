@@ -20,6 +20,8 @@
 #ifndef KERNEL_INTERNAL_H_
 #define KERNEL_INTERNAL_H_
 
+#include "attributes.h"
+
 /**
  * @brief   Initializes scheduler and creates main and idle task
  */
@@ -44,7 +46,7 @@ char *thread_stack_init(void  (*task_func)(void), void *stack_start, int stack_s
 /**
  * @brief  Removes thread from scheduler and set status to #STATUS_STOPPED
  */
-void sched_task_exit(void);
+NORETURN void sched_task_exit(void);
 
 /**
  * @brief   Prints human readable, ps-like thread information for debugging purposes
