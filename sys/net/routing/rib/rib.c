@@ -27,12 +27,19 @@ routing_handler_t   *routing_protocols_registered;
 void route_register_protocol(routing_handler_t *protocol)
 {
     mutex_lock(&mtx_table);
+    if (protocol == NULL)
+    {
+        puts("[error] invalid parameter for protocol!");
+        mutex_unlock(&mtx_table);
+        return;
+    }
     routing_handler_t *root = routing_protocols_registered;
 
     if (routing_protocols_registered == NULL) {
         routing_protocols_registered = (routing_handler_t *) malloc(sizeof(routing_handler_t));
         routing_protocols_registered->next = NULL;
         root = routing_protocols_registered;
+        *root = *protocol;
     }
     else {
         while (root != NULL) {
@@ -106,6 +113,7 @@ void route_add(ipv6_addr_t *dst_net_addr, ipv6_addr_t *gw_net_addr, int *iface_i
 
     if (dst_net_addr == NULL && gw_net_addr == NULL) {
         puts("[error] invalid parameter for destination and gateway!");
+        mutex_unlock(&mtx_table);
         return;
     }
 
@@ -150,9 +158,13 @@ void route_add(ipv6_addr_t *dst_net_addr, ipv6_addr_t *gw_net_addr, int *iface_i
 
     if (metric != NULL) {
         root->metric = (metric_t *)malloc(sizeof(metric_t));
+        *root->metric = *metric;
+    }
+    else {
+        // we have no metric
+        root->metric = metric;
     }
 
-    *root->metric = *metric;
     root->next_hop = (gw_net_addr == NULL) ? (*dst_net_addr) : (*gw_net_addr);
 
     // the default gateway should be set
@@ -233,7 +245,12 @@ void route_del(ipv6_addr_t *dst_net_addr, int *iface_id)
 void route_get_default_gateway(ipv6_addr_t *default_gw_net_addr_out, int *iface_id_out)
 {
     mutex_lock(&mtx_table);
-    *default_gw_net_addr_out = default_gateway->destination;
+    if (default_gateway == NULL) {
+       default_gw_net_addr_out = NULL;
+    }
+    else {
+        *default_gw_net_addr_out = default_gateway->destination;
+    }
     *iface_id_out = (default_gateway == NULL) ? -1 : (default_gateway->iface_id);
     mutex_unlock(&mtx_table);
 }
@@ -262,10 +279,12 @@ int route_handle_candidates(ipv6_addr_t *dst_net_addr_in, ipv6_addr_t *next_hop_
         // so the default_gateway entry is the only candidate
         if (default_gateway == NULL) {
             // anyway if there is no default gateway no routing is possible for the destination
+            mutex_unlock(&mtx_table);
             return ROUTING_RET_NO_ROUTE_FOUND;
         }
 
         *next_hop_out = default_gateway->next_hop;
+        mutex_unlock(&mtx_table);
         return ROUTING_RET_ONLY_DEFAULT_GATEWAY;
     }
 
@@ -500,4 +519,17 @@ void print_metric_t(metric_t *pMet)
     printf("next:    %p\n", (void *)pMet->next);
     printf("met_id:  %d\n", pMet->met_id);
     printf("met_val: %d\n", pMet->met_val);
+}
+
+void print_routing_handler_t(routing_handler_t *protocol)
+{
+    if (protocol == NULL) {
+        puts("protocol is null");
+        return;
+    }
+
+    printf("next:    %p\n", (void *)protocol->next);
+    printf("prot_id:  %d\n", protocol->protocol_id);
+    print_metric_t(protocol->supported_metric_id);
+    printf("choose_nexthop:    %p\n", (void *)protocol->choose_nexthop);
 }

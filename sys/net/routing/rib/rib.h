@@ -227,7 +227,7 @@ void prune_metrics(metric_t *starting_entry);
 void print_table();
 void print_rib_t(rib_t *pRib);
 void print_metric_t(metric_t *pMet);
-
+void print_routing_handler_t(routing_handler_t *protocol);
 
 /** @} */
 #endif /* __RIB_H */
