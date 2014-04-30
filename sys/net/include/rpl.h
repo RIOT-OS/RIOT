@@ -34,6 +34,7 @@
 #include <transceiver.h>
 #include "ipv6.h"
 #include "rpl/rpl_dodag.h"
+#include "rpl/rpl_of_manager.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,7 +47,6 @@ extern "C" {
 #define RPL_PROCESS_STACKSIZE KERNEL_CONF_STACKSIZE_DEFAULT
 
 /* global variables */
-extern rpl_of_t *rpl_objective_functions[NUMBER_IMPLEMENTED_OFS];
 extern rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
 extern kernel_pid_t rpl_process_pid;
 
@@ -74,18 +74,6 @@ extern uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
  *
  */
 uint8_t rpl_init(int if_id);
-
-/**
- * @brief Get entry point for default objective function.
- *
- * This function is obsolete in rpl.h and will be moved shortly.
- *
- * @param[in] ocp               Objective code point for desired objective function
- *
- * @return Implementation of objective function
- *
- * */
-rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp);
 
 /**
  * @brief Initialization of RPL-root.

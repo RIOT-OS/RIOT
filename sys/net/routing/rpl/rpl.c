@@ -47,7 +47,6 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #include "debug.h"
 
 /* global variables */
-rpl_of_t *rpl_objective_functions[NUMBER_IMPLEMENTED_OFS];
 rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
 kernel_pid_t rpl_process_pid = KERNEL_PID_UNDEF;
 mutex_t rpl_recv_mutex = MUTEX_INIT;
@@ -58,18 +57,6 @@ uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
 
 /* IPv6 message buffer */
 ipv6_hdr_t *ipv6_buf;
-
-/* find implemented OF via objective code point */
-rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp)
-{
-    for (uint16_t i = 0; i < NUMBER_IMPLEMENTED_OFS; i++) {
-        if (ocp == rpl_objective_functions[i]->ocp) {
-            return rpl_objective_functions[i];
-        }
-    }
-
-    return NULL;
-}
 
 uint8_t rpl_init(int if_id)
 {
@@ -82,10 +69,6 @@ uint8_t rpl_init(int if_id)
                                     PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                     rpl_process, NULL, "rpl_process");
 
-    /* INSERT NEW OBJECTIVE FUNCTIONS HERE */
-    rpl_objective_functions[0] = rpl_get_of0();
-    rpl_objective_functions[1] = rpl_get_of_mrhof();
-
     sixlowpan_lowpan_init_interface(if_id);
     /* need link local prefix to query _our_ corresponding address  */
     ipv6_addr_t my_address;
@@ -94,13 +77,8 @@ uint8_t rpl_init(int if_id)
     ipv6_net_if_get_best_src_addr(&my_address, &ll_address);
     ipv6_register_rpl_handler(rpl_process_pid);
 
-    /* initialize ETX-calculation if needed */
-    if (RPL_DEFAULT_OCP == 1) {
-        DEBUGF("INIT ETX BEACONING\n");
-        etx_init_beaconing(&my_address);
-    }
-
-    rpl_init_mode(&my_address);
+    /* initialize objective function manager */
+    rpl_of_manager_init(&my_address);
 
     return SIXLOWERROR_SUCCESS;
 }
