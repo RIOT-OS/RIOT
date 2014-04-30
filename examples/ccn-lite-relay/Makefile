@@ -44,7 +44,6 @@ BOARD_BLACKLIST := chronos mbed_lpc1768 msb-430 msb-430h redbee-econotag \
 USEMODULE += config
 USEMODULE += posix
 
-USEMODULE += transceiver
 USEMODULE += defaulttransceiver
 USEMODULE += rtc
 USEMODULE += crypto_sha256
