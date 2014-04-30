@@ -33,7 +33,9 @@
 
 /**
  * @def CONST
- * @brief A function declared as *CONST* is not allowed to read global memory
+ * @brief A function declared as *CONST* is #PURE and also not allowed to
+ *        examine global memory. I.e. a *CONST* function cannot even
+ *        dereference a pointer parameter.
  */
 #ifdef __GNUC__
 #define CONST  __attribute__((const))
