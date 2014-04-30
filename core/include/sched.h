@@ -108,10 +108,10 @@ extern clist_node_t *runqueues[SCHED_PRIO_LEVELS];
  *  Scheduler statistics
  */
 typedef struct {
-    unsigned int laststart; /*< Time stamp of the last time this thread was
-                                scheduled to run */
-    unsigned int schedules; /*< How often the thread was scheduled to run */
-    unsigned long runtime_ticks;   /*< The total runtime of this thread in ticks */
+    unsigned int laststart;         /**< Time stamp of the last time this thread was
+                                         scheduled to run */
+    unsigned int schedules;         /**< How often the thread was scheduled to run */
+    unsigned long runtime_ticks;    /**< The total runtime of this thread in ticks */
 } schedstat;
 
 /**
