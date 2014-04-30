@@ -21,27 +21,6 @@
 #ifndef BITARITHM_H_
 #define BITARITHM_H_
 
-/** @def BS
- * @brief Sets a bitmask
- * @param[in] val   The value to which the bitmask will be applied
- * @param[in] bit   The bitmask to be set
- *
- * @return The applied bitmask
- */
-#define BS(val, bit)        ((val) & (bit))
-
-/**
- * @def BS_COND
- * @brief Conditional setting of a bitmask
- *
- * @param[in] condition     The condition to be checked
- * @param[in] target        The value to which the bitmask will be applied
- * @param[in] mask          The bitmask to be set
- *
- * @return The applied bitmask if *condition* is true
- */
-#define BS_COND(condition, target, mask)        (target) ^= ( (-(condition) ^ (target)) & (mask) )
-
 /**
  * @def SETBIT
  * @brief Sets a bitbitmask for a bitfield
