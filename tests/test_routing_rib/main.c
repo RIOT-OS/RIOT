@@ -42,8 +42,7 @@ void ipv6_addr_init(ipv6_addr_t *out, uint16_t addr0, uint16_t addr1,
 
 void print_ipv6_addr(ipv6_addr_t *in)
 {
-    if (in == NULL)
-    {
+    if (in == NULL) {
         puts("no address!");
     }
     for (int i = 0; i < 8; ++i) {
@@ -63,8 +62,8 @@ rib_t *choose_nexthop(rib_t **aCandidates, size_t candidatesSize)
     return aCandidates[0];
 }
 
- int main(void)
- {
+int main(void)
+{
     route_init(MAX_ROUTE_ENTRIES);
 
     routing_handler_t stProtocol;
@@ -80,7 +79,6 @@ rib_t *choose_nexthop(rib_t **aCandidates, size_t candidatesSize)
     print_routing_handler_t(&stProtocol);
     route_register_protocol(&stProtocol);
 
-
     ipv6_addr_t ipDefaultGateway;
     ipv6_addr_init(&ipDefaultGateway, 0xfe80, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007);
     route_add(NULL, &ipDefaultGateway, NULL, NULL);
@@ -88,6 +86,7 @@ rib_t *choose_nexthop(rib_t **aCandidates, size_t candidatesSize)
     int nIface = 0;
     ipv6_addr_t dG;
     route_get_default_gateway(&dG, &nIface);
+    
     puts("\n-= default Gateway: =-");
     for (int i = 0; i < 8; ++i) {
         printf("%0X:", (dG.uint16[i]));
@@ -110,7 +109,6 @@ rib_t *choose_nexthop(rib_t **aCandidates, size_t candidatesSize)
 
     puts("\n-= nexthop is: =-");
     print_ipv6_addr(pNext);
-
 
     prune_metrics(stProtocol.supported_metric_id);
     route_remove_protocol(1);
