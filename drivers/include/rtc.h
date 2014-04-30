@@ -25,11 +25,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #define RTC_SECOND 10001U
 
 #include <time.h>
-
-/* TODO: remove once msp430 libc supports struct timeval */
-#ifndef MSP430
 #include <sys/time.h>
-#endif
 
 /**
  * @brief Initializes the RTC for calendar mode
