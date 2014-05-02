@@ -28,7 +28,7 @@ volatile int busy, i, k;
 
 void busy_thread(void)
 {
-    int j;
+    int j = 0;
     puts("busy_thread starting");
 
     i = 0;
