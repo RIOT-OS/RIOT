@@ -55,6 +55,8 @@ static uint32_t iap(uint32_t code, uint32_t p1, uint32_t p2, uint32_t p3, uint32
  *****************************************************************************/
 uint8_t	flashrom_write(uint8_t *dst, char *src, size_t size)
 {
+    (void) size; /* unused */
+
     char err;
     unsigned intstate;
     uint8_t sec;

@@ -237,7 +237,7 @@ static void start_transmission(unsigned char blks)
     for (n = 0; n < N_BUF; n++) {
         LinkList[n][0] = (unsigned long)DmaBuff[n];
         LinkList[n][1] = (unsigned long)&MCI_FIFO;
-        LinkList[n][2] = (n == blks - 1) ? 0 : (unsigned long)LinkList[(n + 1) % N_BUF];
+        LinkList[n][2] = (n == (unsigned int) (blks - 1)) ? 0 : (unsigned long)LinkList[(n + 1) % N_BUF];
         LinkList[n][3] = dma_ctrl;
     }
 
@@ -324,10 +324,10 @@ static void power_on(void)
 
     /* Register interrupt handlers for MCI,DMA event */
     //RegisterIrq(MCI_INT, Isr_MCI, PRI_LOWEST-1);
-    install_irq(MCI_INT, (void *)Isr_MCI, 5);
+    install_irq(MCI_INT, Isr_MCI, 5);
 
     //RegisterIrq(GPDMA_INT, Isr_GPDMA, PRI_LOWEST-1);
-    install_irq(GPDMA_INT, (void *)Isr_GPDMA, 5);
+    install_irq(GPDMA_INT, Isr_GPDMA, 5);
 
 
     /* Power-on (VCC is always tied to the socket on this board) */
