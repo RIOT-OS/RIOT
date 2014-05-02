@@ -42,7 +42,7 @@ void run(void)
     printf("I am alive (%d)\n", me);
     msg_t arg;
     err = msg_receive(&arg);
-    printf("Thread %d has arg %d\n", me, arg.content.value);
+    printf("Thread %d has arg %" PRIu32 "\n", me, arg.content.value);
 
     err = mutex_lock(&mtx);
 
@@ -73,7 +73,7 @@ int main(void)
         printf("[!!!] mutex_init failed with %d\n", err);
     }
 
-    printf("Problem: %" PRIu32 "\n", PROBLEM);
+    printf("Problem: %d\n", PROBLEM);
 
     msg_t args[PROBLEM];
 
@@ -97,10 +97,10 @@ int main(void)
     for (int i = 0; i < PROBLEM; ++i) {
         msg_t msg;
         msg_receive(&msg);
-        printf("Reveiced message %d from thread %d\n", i, msg.content.value);
+        printf("Reveiced message %d from thread %" PRIu32 "\n", i, msg.content.value);
     }
 
-    printf("Factorial: %" PRIu32 "\n", storage);
+    printf("Factorial: %d\n", storage);
 
     if (storage != 479001600) {
         puts("[!!!] Error, expected: 12!= 479001600.");
