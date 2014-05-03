@@ -26,6 +26,13 @@ void ringbuffer_init(ringbuffer_t *restrict rb, char *buffer, unsigned bufsize)
     rb->avail = 0;
 }
 
+/**
+ * @brief           Add an element to the end of the ringbuffer.
+ * @details         This helper function does not check the pre-requirements for adding,
+ *                  i.e. the caller has to ensure that ringbuffer_full() is false.
+ * @param[in,out]   rb   Ringbuffer to operate on.
+ * @param[in]       c    Element to add.
+ */
 static void add_tail(ringbuffer_t *restrict rb, char c)
 {
     unsigned pos = rb->start + rb->avail++;
@@ -35,6 +42,13 @@ static void add_tail(ringbuffer_t *restrict rb, char c)
     rb->buf[pos] = c;
 }
 
+/**
+ * @brief           Remove an element from the start of the ringbuffer.
+ * @details         This helper function does not check the pre-requirements for reading,
+ *                  i.e. the caller has to ensure that ringbuffer_empty() is false.
+ * @param[in,out]   rb   Ringbuffer to operate on.
+ * @returns         The removed element.
+ */
 static char get_head(ringbuffer_t *restrict rb)
 {
     char result = rb->buf[rb->start];
