@@ -44,19 +44,26 @@ static char get_head(ringbuffer_t *restrict rb)
     return result;
 }
 
-void ringbuffer_add(ringbuffer_t *restrict rb, const char *buf, unsigned n)
+unsigned ringbuffer_add(ringbuffer_t *restrict rb, const char *buf, unsigned n)
 {
-    for (unsigned i = 0; i < n; i++) {
-        ringbuffer_add_one(rb, buf[i]);
+    unsigned i;
+    for (i = 0; i < n; i++) {
+        if (ringbuffer_full(rb)) {
+            break;
+        }
+        add_tail(rb, buf[i]);
     }
+    return i;
 }
 
-void ringbuffer_add_one(ringbuffer_t *restrict rb, char c)
+int ringbuffer_add_one(ringbuffer_t *restrict rb, char c)
 {
+    int result = -1;
     if (ringbuffer_full(rb)) {
-        get_head(rb);
+        result = (unsigned char) get_head(rb);
     }
     add_tail(rb, c);
+    return result;
 }
 
 int ringbuffer_get_one(ringbuffer_t *restrict rb)
