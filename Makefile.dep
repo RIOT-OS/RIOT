@@ -1,37 +1,21 @@
 ifneq (,$(filter libcoap,$(USEPKG)))
-	ifeq (,$(filter pnet,$(USEMODULE)))
-		USEMODULE += pnet
-	endif
+	USEMODULE += pnet
 endif
 
 ifneq (,$(filter pnet,$(USEMODULE)))
-	ifeq (,$(filter posix,$(USEMODULE)))
-		USEMODULE += posix
-	endif
-	ifeq (,$(filter destiny,$(USEMODULE)))
-		USEMODULE += destiny
-	endif
-	ifeq (,$(filter net_help,$(USEMODULE)))
-		USEMODULE += net_help
-	endif
+	USEMODULE += posix
+	USEMODULE += destiny
+	USEMODULE += net_help
 endif
 
 ifneq (,$(filter destiny,$(USEMODULE)))
-    ifeq (,$(filter sixlowpan,$(USEMODULE)))
-        USEMODULE += sixlowpan
-    endif
-    ifeq (,$(filter net_help,$(USEMODULE)))
-        USEMODULE += net_help
-    endif
-    ifeq (,$(filter vtimer,$(USEMODULE)))
-        USEMODULE += vtimer
-    endif
+    USEMODULE += sixlowpan
+    USEMODULE += net_help
+    USEMODULE += vtimer
 endif
 
 ifneq (,$(filter sixlowborder,$(USEMODULE)))
-    ifeq (,$(filter sixlowpan,$(USEMODULE)))
-        USEMODULE += sixlowpan
-    endif
+    USEMODULE += sixlowpan
 endif
 
 ifneq (,$(filter rpl,$(USEMODULE)))
@@ -43,94 +27,52 @@ ifneq (,$(filter routing,$(USEMODULE)))
 endif
 
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
-    ifeq (,$(filter ieee802154,$(USEMODULE)))
-        USEMODULE += ieee802154
-    endif
-    ifeq (,$(filter net_help,$(USEMODULE)))
-        USEMODULE += net_help
-    endif
-    ifeq (,$(filter net_if,$(USEMODULE)))
-        USEMODULE += net_if
-    endif
-    ifeq (,$(filter posix, $(USEMODULE)))
-        USEMODULE += posix
-    endif
-    ifeq (,$(filter vtimer, $(USEMODULE)))
-        USEMODULE += vtimer
-    endif
+    USEMODULE += ieee802154
+    USEMODULE += net_help
+    USEMODULE += net_if
+    USEMODULE += posix
+    USEMODULE += vtimer
 endif
 
 ifneq (,$(filter posix,$(USEMODULE)))
-	ifeq (,$(filter uart0,$(USEMODULE)))
-		USEMODULE += uart0
-	endif
-	ifeq (,$(filter timex,$(USEMODULE)))
-		USEMODULE += timex
-	endif
-	ifeq (,$(filter vtimer,$(USEMODULE)))
-		USEMODULE += vtimer
-	endif
+	USEMODULE += uart0
+	USEMODULE += timex
+	USEMODULE += vtimer
 endif
 
 ifneq (,$(filter uart0,$(USEMODULE)))
-	ifeq (,$(filter lib,$(USEMODULE)))
-		USEMODULE += lib
-	endif
-	ifeq (,$(filter posix,$(USEMODULE)))
-		USEMODULE += posix
-	endif
+	USEMODULE += lib
+	USEMODULE += posix
 endif
 
 ifneq (,$(filter cc110x%,$(USEMODULE)))
-	ifeq (,$(filter protocol_multiplex,$(USEMODULE)))
-		USEMODULE += protocol_multiplex
-	endif
-	ifeq (,$(filter vtimer,$(USEMODULE)))
-		USEMODULE += vtimer
-	endif
+	USEMODULE += protocol_multiplex
+	USEMODULE += vtimer
 endif
 
 ifneq (,$(filter cc110x_ng,$(USEMODULE)))
-	ifeq (,$(filter transceiver,$(USEMODULE)))
-		USEMODULE += transceiver
-	endif
+	USEMODULE += transceiver
 endif
 
 ifneq (,$(filter cc2420,$(USEMODULE)))
-	ifeq (,$(filter transceiver,$(USEMODULE)))
-		USEMODULE += transceiver
-	endif
-	ifeq (,$(filter ieee802154,$(USEMODULE)))
-		USEMODULE += ieee802154
-	endif
+	USEMODULE += transceiver
+	USEMODULE += ieee802154
 endif
 
 ifneq (,$(filter at86rf231,$(USEMODULE)))
-	ifeq (,$(filter transceiver,$(USEMODULE)))
-		USEMODULE += transceiver
-	endif
-	ifeq (,$(filter ieee802154,$(USEMODULE)))
-		USEMODULE += ieee802154
-	endif
-	ifeq (,$(filter vtimer,$(USEMODULE)))
-		USEMODULE += vtimer
-	endif
+	USEMODULE += transceiver
+	USEMODULE += ieee802154
+	USEMODULE += vtimer
 endif
 
 ifneq (,$(filter vtimer,$(USEMODULE)))
-	ifeq (,$(filter timex,$(USEMODULE)))
-		USEMODULE += timex
-	endif
+	USEMODULE += timex
 endif
 
 ifneq (,$(filter net_if,$(USEMODULE)))
-	ifeq (,$(filter transceiver,$(USEMODULE)))
-		USEMODULE += transceiver
-	endif
+	USEMODULE += transceiver
 endif
 
 ifneq (,$(filter shell_commands,$(USEMODULE)))
-	ifneq (,$(filter net_if,$(USEMODULE)))
-		USEMODULE += net_help
-	endif
+	USEMODULE += net_help
 endif

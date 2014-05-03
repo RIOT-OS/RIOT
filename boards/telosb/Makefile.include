@@ -26,12 +26,8 @@ export INCLUDES += -I$(RIOTCPU)/msp430-common/include -I$(RIOTBOARD)/$(BOARD)/in
 export OFLAGS = -O ihex
 
 ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-	ifeq (,$(filter cc2240,$(USEMODULE)))
-		USEMODULE += cc2420
-	endif
-	ifeq (,$(filter transceiver,$(USEMODULE)))
-		USEMODULE += transceiver
-	endif
+	USEMODULE += cc2420
+	USEMODULE += transceiver
 endif
 
 export UNDEF += $(BINDIR)msp430_common/startup.o

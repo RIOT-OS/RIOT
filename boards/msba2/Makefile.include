@@ -1,12 +1,8 @@
 export INCLUDES += -I$(RIOTBOARD)/msba2/include
 
 ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-	ifeq (,$(filter cc110x_ng,$(USEMODULE)))
-		USEMODULE += cc110x_ng
-	endif
-	ifeq (,$(filter transceiver,$(USEMODULE)))
-		USEMODULE += transceiver
-	endif
+	USEMODULE += cc110x_ng
+	USEMODULE += transceiver
 endif
 
 include $(RIOTBOARD)/msba2-common/Makefile.include
