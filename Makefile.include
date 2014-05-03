@@ -115,10 +115,9 @@ $(RIOTBASE)/pkg/%/Makefile.include::
 -include $(OBJ:.o=.d)
 
 $(BINDIR)$(PROJECT)/%.o: %.c $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
-	@mkdir -p ${BINDIR}
 	@echo; echo "Compiling.... $*.c"; echo
-	@test -d $(BINDIR)$(PROJECT) || mkdir -p $(BINDIR)$(PROJECT)
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$(PROJECT)/$*.o
+	$(AD)mkdir -p "$(dir $@)"
+	$(ADD)$(CC) $(CFLAGS) $(INCLUDES) -c "$<" -o "$@"
 
 $(USEPKG:%=${BINDIR}%.a)::
 	@mkdir -p ${BINDIR}
