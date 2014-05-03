@@ -75,3 +75,19 @@ int ringbuffer_get(ringbuffer_t *rb, char *buf, int n)
 
     return count;
 }
+
+int ringbuffer_peek_one(ringbuffer_t *rb)
+{
+    unsigned end = rb->end, start = rb->start, avail = rb->avail;
+    int result = ringbuffer_get_one(rb);
+    rb->end = end, rb->start = start, rb->avail = avail;
+    return result;
+}
+
+int ringbuffer_peek(ringbuffer_t *rb, char *buf, unsigned n)
+{
+    unsigned end = rb->end, start = rb->start, avail = rb->avail;
+    int result = ringbuffer_get(rb, buf, n);
+    rb->end = end, rb->start = start, rb->avail = avail;
+    return result;
+}
