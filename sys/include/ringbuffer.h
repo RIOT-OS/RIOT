@@ -12,6 +12,7 @@
  * @{
  * @file   ringbuffer.h
  * @author Kaspar Schleiser <kaspar@schleiser.de>
+ * @author René Kijewski <rene.kijewski@fu-berlin.de>
  * @}
  */
 
@@ -31,5 +32,18 @@ void ringbuffer_add_one(ringbuffer_t *rb, char c);
 void ringbuffer_add(ringbuffer_t *rb, char *buf, int n);
 int ringbuffer_get_one(ringbuffer_t *rb);
 int ringbuffer_get(ringbuffer_t *rb, char *buf, int n);
+
+static inline int ringbuffer_empty(ringbuffer_t *rb)
+{
+    return rb->avail == 0;
+}
+
+static inline int ringbuffer_full(ringbuffer_t *rb)
+{
+    return rb->avail == rb->size;
+}
+
+int ringbuffer_peek_one(ringbuffer_t *rb);
+int ringbuffer_peek(ringbuffer_t *rb, char *buf, unsigned n);
 
 #endif /* __RINGBUFFER_H */
