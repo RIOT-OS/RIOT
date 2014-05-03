@@ -21,10 +21,9 @@
 
 typedef struct ringbuffer {
     char *buf;
-    unsigned int        start;
-    unsigned int        end;
-    unsigned int        size;
-    unsigned int        avail;
+    unsigned int size;
+    unsigned int start;
+    unsigned int avail;
 } ringbuffer_t;
 
 void ringbuffer_init(ringbuffer_t *restrict rb, char *buffer, unsigned bufsize);
