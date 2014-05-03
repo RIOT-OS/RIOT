@@ -12,6 +12,7 @@
  * @{
  * @file   ringbuffer.c
  * @author Kaspar Schleiser <kaspar@schleiser.de>
+ * @author René Kijewski <rene.kijewski@fu-berlin.de>
  * @}
  */
 
@@ -20,10 +21,27 @@
 void ringbuffer_init(ringbuffer_t *restrict rb, char *buffer, unsigned bufsize)
 {
     rb->buf = buffer;
-    rb->start = 0;
-    rb->end = 0;
     rb->size = bufsize;
+    rb->start = 0;
     rb->avail = 0;
+}
+
+static void add_tail(ringbuffer_t *restrict rb, char c)
+{
+    unsigned pos = rb->start + rb->avail++;
+    if (pos >= rb->size) {
+        pos -= rb->size;
+    }
+    rb->buf[pos] = c;
+}
+
+static char get_head(ringbuffer_t *restrict rb)
+{
+    char result = rb->buf[rb->start];
+    if ((--rb->avail == 0) || (++rb->start == rb->size)) {
+        rb->start = 0;
+    }
+    return result;
 }
 
 void ringbuffer_add(ringbuffer_t *restrict rb, const char *buf, unsigned n)
@@ -35,45 +53,32 @@ void ringbuffer_add(ringbuffer_t *restrict rb, const char *buf, unsigned n)
 
 void ringbuffer_add_one(ringbuffer_t *restrict rb, char c)
 {
-    if (rb->avail == rb->size) {
-        ringbuffer_get_one(rb);
+    if (ringbuffer_full(rb)) {
+        get_head(rb);
     }
-
-    rb->buf[rb->end++] = c;
-
-    if (rb->end >= rb->size) {
-        rb->end = 0;
-    }
-
-    rb->avail++;
+    add_tail(rb, c);
 }
 
 int ringbuffer_get_one(ringbuffer_t *restrict rb)
 {
-    if (rb->avail == 0) {
+    if (!ringbuffer_empty(rb)) {
+        return (unsigned char) get_head(rb);
+    }
+    else {
         return -1;
     }
-
-    rb->avail--;
-
-    int c = (char)rb->buf[rb->start++];
-
-    if (rb->start >= rb->size) {
-        rb->start = 0;
-    }
-
-    return c;
 }
 
 unsigned ringbuffer_get(ringbuffer_t *restrict rb, char *buf, unsigned n)
 {
-    unsigned count = 0;
-
-    while (rb->avail && (count < n)) {
-        buf[count++] = ringbuffer_get_one(rb);
+    if (n > rb->avail) {
+        n = rb->avail;
     }
 
-    return count;
+    for (unsigned i = 0; i < n; ++i) {
+        buf[i] = get_head(rb);
+    }
+    return n;
 }
 
 int ringbuffer_peek_one(const ringbuffer_t *restrict rb_)
