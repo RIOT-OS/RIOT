@@ -113,7 +113,7 @@ void chardev_loop(ringbuffer_t *rb)
             int state = disableIRQ();
             int nbytes = min(r->nbytes, rb->avail);
             DEBUG("uart0_thread [%i]: sending %i bytes received from %i to pid %i\n", pid, nbytes, m.sender_pid, reader_pid);
-            rb_get_elements(rb, r->buffer, nbytes);
+            ringbuffer_get(rb, r->buffer, nbytes);
             r->nbytes = nbytes;
 
             m.sender_pid = reader_pid;

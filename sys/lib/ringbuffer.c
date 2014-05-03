@@ -39,17 +39,17 @@ void ringbuffer_init(ringbuffer_t *rb, char *buffer, unsigned int bufsize)
     rb->avail = 0;
 }
 
-void rb_add_elements(ringbuffer_t *rb, char *buf, int n)
+void ringbuffer_add(ringbuffer_t *rb, char *buf, int n)
 {
     for (int i = 0; i < n; i++) {
-        rb_add_element(rb, buf[i]);
+        ringbuffer_add_one(rb, buf[i]);
     }
 }
 
-void rb_add_element(ringbuffer_t *rb, char c)
+void ringbuffer_add_one(ringbuffer_t *rb, char c)
 {
     if (rb->avail == rb->size) {
-        rb_get_element(rb);
+        ringbuffer_get_one(rb);
     }
 
     rb->buf[rb->end++] = c;
@@ -61,7 +61,7 @@ void rb_add_element(ringbuffer_t *rb, char c)
     rb->avail++;
 }
 
-int rb_get_element(ringbuffer_t *rb)
+int ringbuffer_get_one(ringbuffer_t *rb)
 {
     if (rb->avail == 0) {
         return -1;
@@ -78,12 +78,12 @@ int rb_get_element(ringbuffer_t *rb)
     return c;
 }
 
-int rb_get_elements(ringbuffer_t *rb, char *buf, int n)
+int ringbuffer_get(ringbuffer_t *rb, char *buf, int n)
 {
     int count = 0;
 
     while (rb->avail && (count < n)) {
-        buf[count++] = rb_get_element(rb);
+        buf[count++] = ringbuffer_get_one(rb);
     }
 
     return count;
@@ -95,51 +95,51 @@ int main(int argc, char *argv[] ){
     char buffer[5];
     ringbuffer_init(&r, buffer, sizeof(buffer));
 
-    rb_add_element(&r, 1);
-    rb_add_element(&r, 2);
-    rb_add_element(&r, 3);
-    rb_add_element(&r, 4);
-    rb_add_element(&r, 5);
-    rb_add_element(&r, 6);
-    rb_add_element(&r, 7);
-    rb_add_element(&r, 8);
-    rb_add_element(&r, 9);
-    rb_add_element(&r, 10);
+    ringbuffer_add_one(&r, 1);
+    ringbuffer_add_one(&r, 2);
+    ringbuffer_add_one(&r, 3);
+    ringbuffer_add_one(&r, 4);
+    ringbuffer_add_one(&r, 5);
+    ringbuffer_add_one(&r, 6);
+    ringbuffer_add_one(&r, 7);
+    ringbuffer_add_one(&r, 8);
+    ringbuffer_add_one(&r, 9);
+    ringbuffer_add_one(&r, 10);
 
     int c;
     while ( r.avail ) {
-        c = rb_get_element(&r);
+        c = ringbuffer_get_one(&r);
         if (c == -1) break;
         printf("c=%i\n", (int)c);
     }
 
-    rb_add_element(&r, 1);
-    rb_add_element(&r, 2);
-    rb_add_element(&r, 3);
-    rb_add_element(&r, 4);
-    rb_add_element(&r, 5);
+    ringbuffer_add_one(&r, 1);
+    ringbuffer_add_one(&r, 2);
+    ringbuffer_add_one(&r, 3);
+    ringbuffer_add_one(&r, 4);
+    ringbuffer_add_one(&r, 5);
 
     char buffer2[10];
 
-    int n = rb_get_elements(&r, buffer2, sizeof(buffer2));
+    int n = ringbuffer_get(&r, buffer2, sizeof(buffer2));
 
     for (int i = 0; i < n; i++) {
         printf("%i\n", buffer2[i]);
     }
 
-    rb_add_element(&r, 1);
-    rb_add_element(&r, 2);
-    rb_add_element(&r, 3);
-    rb_add_element(&r, 4);
-    rb_add_element(&r, 5);
-    rb_add_element(&r, 6);
-    rb_add_element(&r, 7);
-    rb_add_element(&r, 8);
-    rb_add_element(&r, 9);
-    rb_add_element(&r, 10);
+    ringbuffer_add_one(&r, 1);
+    ringbuffer_add_one(&r, 2);
+    ringbuffer_add_one(&r, 3);
+    ringbuffer_add_one(&r, 4);
+    ringbuffer_add_one(&r, 5);
+    ringbuffer_add_one(&r, 6);
+    ringbuffer_add_one(&r, 7);
+    ringbuffer_add_one(&r, 8);
+    ringbuffer_add_one(&r, 9);
+    ringbuffer_add_one(&r, 10);
 
     while ( r.avail ) {
-        c = rb_get_element(&r);
+        c = ringbuffer_get_one(&r);
         if (c == -1) break;
         printf("c=%i\n", (int)c);
     }

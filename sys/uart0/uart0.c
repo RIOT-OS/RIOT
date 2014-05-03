@@ -68,7 +68,7 @@ void board_uart0_init(void)
 
 void uart0_handle_incoming(int c)
 {
-    rb_add_element(&uart0_ringbuffer, c);
+    ringbuffer_add_one(&uart0_ringbuffer, c);
 }
 
 void uart0_notify_thread(void)

@@ -27,9 +27,9 @@ typedef struct ringbuffer {
 } ringbuffer_t;
 
 void ringbuffer_init(ringbuffer_t *rb, char *buffer, unsigned int bufsize);
-void rb_add_element(ringbuffer_t *rb, char c);
-void rb_add_elements(ringbuffer_t *rb, char *buf, int n);
-int rb_get_element(ringbuffer_t *rb);
-int rb_get_elements(ringbuffer_t *rb, char *buf, int n);
+void ringbuffer_add_one(ringbuffer_t *rb, char c);
+void ringbuffer_add(ringbuffer_t *rb, char *buf, int n);
+int ringbuffer_get_one(ringbuffer_t *rb);
+int ringbuffer_get(ringbuffer_t *rb, char *buf, int n);
 
 #endif /* __RINGBUFFER_H */
