@@ -55,8 +55,8 @@
 #include "sixlowpan.h"
 #endif
 
-#ifdef MODULE_DESTINY
-#include "destiny.h"
+#ifdef MODULE_UDP
+#include "tl_socket.h"
 #endif
 
 #ifdef MODULE_NET_IF
@@ -182,9 +182,13 @@ void auto_init(void)
     extern void profiling_init(void);
     profiling_init();
 #endif
-#ifdef MODULE_DESTINY
-    DEBUG("Auto init transport layer [destiny] module.\n");
-    destiny_init_transport_layer();
+#ifdef MODULE_UDP
+    DEBUG("Auto init transport layer [udp] module.\n");
+    udp_init();
+#endif
+#ifdef MODULE_TCP
+    DEBUG("Auto init transport layer [tcp] module.\n");
+    tcp_init();
 #endif
 
     main();

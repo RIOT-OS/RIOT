@@ -1,21 +1,21 @@
 /**
- * Destiny types header
+ * Transport layer socket types
  *
- * Copyright (C) 2013  INRIA.
+ * Copyright (C) 2014  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
  *
- * @ingroup destiny
+ * @ingroup tl_socket
  * @{
  * @file
- * @brief   Destiny types
+ * @brief   Transport layer socket types
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef DESTINY_TYPES_H_
-#define DESTINY_TYPES_H_
+#ifndef TL_SOCKET_TYPES_H_
+#define TL_SOCKET_TYPES_H_
 #include <stdint.h>
 
 /**
@@ -72,4 +72,4 @@ typedef struct __attribute__((packed)) {
  * @}
  */
 
-#endif /* DESTINY_TYPES_H_ */
+#endif /* TL_SOCKET_TYPES_H_ */

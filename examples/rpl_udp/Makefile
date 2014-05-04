@@ -55,6 +55,6 @@ USEMODULE += ps
 USEMODULE += vtimer
 USEMODULE += defaulttransceiver
 USEMODULE += rpl
-USEMODULE += destiny
+USEMODULE += udp 
 
 include $(RIOTBASE)/Makefile.include

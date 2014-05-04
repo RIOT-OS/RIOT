@@ -43,7 +43,7 @@
 #include "icmp.h"
 
 #include "ieee802154_frame.h"
-#include "destiny/in.h"
+#include "tl_socket/in.h"
 #include "net_help.h"
 
 #define ENABLE_DEBUG    (0)

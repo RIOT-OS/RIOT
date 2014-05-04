@@ -1,7 +1,7 @@
 /**
- * destiny/in.h - Constants defined by the internet system, per RFC 790,
- *                September 1981, and numerous additions, inspired by
- *                netinet/in.h definitions.
+ * tl_socket/in.h - Constants defined by the internet system, per RFC 790,
+ *                  September 1981, and numerous additions, inspired by
+ *                  netinet/in.h definitions.
  * @{
  * @file
  * @brief   IP next header constants
@@ -18,8 +18,8 @@
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef DESTINY_IN_H
-#define DESTINY_IN_H
+#ifndef SOCKET_IN_H
+#define SOCKET_IN_H
 
 /*
  * Protocols (RFC 1700) TODO: may be deleted due to some double definition
@@ -141,4 +141,4 @@
 
 #define IN_LOOPBACKNET         	(127)             ///< official!
 
-#endif /* DESTINY_IN_H */
+#endif /* SOCKET_IN_H */
