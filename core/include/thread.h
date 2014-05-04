@@ -37,18 +37,23 @@
  * @brief Creates a new thread.
  *
  * @param   stack Lowest address of preallocated stack space
- * @param   stacksize
- * @param   flags Options:
- * YIELD: force context switch.
- * CREATE_SLEEPING: set new thread to sleeping state, thread must be woken up manually.
- * CREATE_STACKTEST: initialize stack with values needed for stack overflow testing.
+ * @param   stacksize ``sizeof (stack)``
+ * @param   flags Extra options, use bitwise-or to supply multiple flags:
+ *                * CREATE_WOUT_YIELD: do not call thread_yield() after creating the new thread,
+ *                                     even if its priority is higher than the current thread.
+ *                * CREATE_SLEEPING: set new thread to sleeping state, thread must be woken up manually.
+ *                * CREATE_STACKTEST: initialize stack with values needed for stack overflow testing.
  *
- * @param priority Priority of newly created thread. Lower number means higher
- * priority. 0 means highest possible priority. Lowest priority is
- * PRIORITY_IDLE-1, usually 30.
+ * @param priority Priority of newly created thread:
+ *                 * Lower number means higher priority.
+ *                 * 0 means highest possible priority. Lowest priority is `PRIORITY_IDLE-1 == 14`.
+ *                 * Use ``PRIORITY_LEAST``, ``PRIORITY_LOW``, ``PRIORITY_MAIN``, ``PRIORITY_HIGH`` or ``PRIORITY_HIGHEST``.
+ *                   You can finetune the priority with ``PRIORITY_UP`` and ``PRIORITY_DOWN``,
+ *                   e.g. ``PRIORITY_MAIN + PRIORITY_UP`` has a higher priority than ``PRIORITY_MAIN``,
+ *                   but is lower than ``PRIORITY_HIGH + PRIORITY_DOWN``.
  *
- * @return  returns <0 on error, pid of newly created task else.
-*/
+ * @return  `<0` on error, `pid` of the newly created task otherwise.
+ */
 int thread_create(char *stack, int stacksize, char priority, int flags, void (*function) (void), const char *name);
 
 /**

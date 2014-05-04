@@ -26,13 +26,21 @@
 #include "bitarithm.h"
 #include "tcb.h"
 
-#define MAXTHREADS 32
-
-#if ARCH_32_BIT
-#define SCHED_PRIO_LEVELS 32
-#else
-#define SCHED_PRIO_LEVELS 16
+#ifndef MAXTHREADS
+#   define MAXTHREADS 32
 #endif
+
+#define SCHED_PRIO_LEVELS 16
+#define PRIORITY_IDLE     15
+
+#define PRIORITY_LEAST    13
+#define PRIORITY_LOW      10
+#define PRIORITY_MAIN     7
+#define PRIORITY_HIGH     4
+#define PRIORITY_HIGHEST  1
+
+#define PRIORITY_UP       (-1)
+#define PRIORITY_DOWN     (+1)
 
 /**
  * @brief   Triggers the scheduler to schedule the next task
