@@ -39,7 +39,6 @@ inline int thread_getpid()
 
 int thread_getlastpid()
 {
-    extern int last_pid;
     return last_pid;
 }
 
