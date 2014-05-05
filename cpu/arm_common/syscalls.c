@@ -276,18 +276,6 @@ int _kill_r(struct _reent *r, int pid, int sig)
     r->_errno = ESRCH;      // no such process
     return -1;
 }
-/*---------------------------------------------------------------------------*/
-int _gettimeofday(struct timeval *tp, void *restrict tzp) {
-    (void) tzp;
-#if defined MODULE_RTC
-    rtc_time(tp);
-#elif defined MODULE_VTIMER
-    vtimer_gettimeofday(tp);
-#else
-#warning gettimeofday syscall is not implemented without vtimer or rtc module
-#endif
-    return 0;
-}
 
 void _init(void) {}
 void _fini(void) {}
