@@ -25,92 +25,99 @@
 /**
  * @brief Definition of available GPIO devices. Each device is managing exactly one pin.
  */
-#ifdef GPIO_NUMOF
 typedef enum {
 #ifdef GPIO_0_EN
-    GPIO_0 = 0,             ///< GPIO device 0
+    GPIO_0 = 0,             /**< GPIO device 0 */
 #endif
 #ifdef GPIO_1_EN
-    GPIO_1,                 ///< GPIO device 1
+    GPIO_1,                 /**< GPIO device 1 */
 #endif
 #ifdef GPIO_2_EN
-    GPIO_2,                 ///< GPIO device 2
+    GPIO_2,                 /**< GPIO device 2 */
 #endif
 #ifdef GPIO_3_EN
-    GPIO_3,                 ///< GPIO device 3
+    GPIO_3,                 /**< GPIO device 3 */
 #endif
 #ifdef GPIO_4_EN
-    GPIO_4,                 ///< GPIO device 4
+    GPIO_4,                 /**< GPIO device 4 */
 #endif
 #ifdef GPIO_5_EN
-    GPIO_5,                 ///< GPIO device 5
+    GPIO_5,                 /**< GPIO device 5 */
 #endif
 #ifdef GPIO_6_EN
-    GPIO_6,                 ///< GPIO device 6
+    GPIO_6,                 /**< GPIO device 6 */
 #endif
 #ifdef GPIO_7_EN
-    GPIO_7,                 ///< GPIO device 7
+    GPIO_7,                 /**< GPIO device 7 */
 #endif
 #ifdef GPIO_8_EN
-    GPIO_8,                 ///< GPIO device 8
+    GPIO_8,                 /**< GPIO device 8 */
 #endif
 #ifdef GPIO_9_EN
-    GPIO_9,                 ///< GPIO device 9
+    GPIO_9,                 /**< GPIO device 9 */
 #endif
 #ifdef GPIO_10_EN
-    GPIO_10,                ///< GPIO device 10
+    GPIO_10,                /**< GPIO device 10 */
 #endif
 #ifdef GPIO_11_EN
-    GPIO_11,                ///< GPIO device 11
+    GPIO_11,                /**< GPIO device 11 */
 #endif
 #ifdef GPIO_12_EN
-    GPIO_12,                ///< GPIO device 12
+    GPIO_12,                /**< GPIO device 12 */
 #endif
 #ifdef GPIO_13_EN
-    GPIO_13,                ///< GPIO device 13
+    GPIO_13,                /**< GPIO device 13 */
 #endif
 #ifdef GPIO_14_EN
-    GPIO_14,                ///< GPIO device 14
+    GPIO_14,                /**< GPIO device 14 */
 #endif
 #ifdef GPIO_15_EN
-    GPIO_15                 ///< GPIO device 15
+    GPIO_15,                /**< GPIO device 15 */
 #endif
+    GPIO_UNDEFINED = -1     /**< fall-back device */
 } gpio_t;
-#endif
 
 /**
  * @brief Definition of pull-up/pull-down modes
  */
 typedef enum {
-    GPIO_PULLDOWN,          ///< enable internal pull-down resistor
-    GPIO_PULLUP,            ///< enable internal pull-up resistor
-    GPIO_NOPULL             ///< do not use internal pull resistors
+    GPIO_NOPULL = 0,        /**< do not use internal pull resistors */
+    GPIO_PULLUP = 1,        /**< enable internal pull-up resistor */
+    GPIO_PULLDOWN = 2       /**< enable internal pull-down resistor */
 } gpio_pp_t;
 
 /**
  * @brief Definition of possible active flanks for external interrupt mode
  */
 typedef enum {
-    GPIO_FALLING,           ///< emit interrupt on falling flank
-    GPIO_RISING,            ///< emit interrupt on rising flank
-    GPIO_BOTH               ///< emit interrupt on both flanks
+    GPIO_FALLING = 0,       /**< emit interrupt on falling flank */
+    GPIO_RISING = 1,        /**< emit interrupt on rising flank */
+    GPIO_BOTH = 2           /**< emit interrupt on both flanks */
 } gpio_flank_t;
 
 /**
  * @brief Initialize GPIO pin as output pin
  * 
- * @param dev       the GPIO pin to set as output
- * @param pullup    define if pull resistors should be used
+ * @param[in] dev       the GPIO pin to set as output
+ * @param[in] pullup    define if pull resistors should be used
+ * 
+ * @return              0 on success
+ * @return              -1 on undefined device given
+ * @return              -2 on pull-up mode unavailable
  */
-void gpio_init_out(gpio_t dev, gpio_pp_t pullup);
+int gpio_init_out(gpio_t dev, gpio_pp_t pullup);
 
 /**
  * @brief Initialize a GPIO pin in input mode
  * 
- * @param dev       the GPIO pin to use as input
- * @param pullup    define if pull resistors should be used
+ * @param[in] dev       the GPIO pin to use as input
+ * @param[in] pullup    define if pull resistors should be used
+ * 
+ * @return              0 on success
+ * @return              -1 on undefined device given
+ * @return              -2 on pull-up mode unavailable
  */
-void gpio_init_in(gpio_t dev, gpio_pp_t pullup);
+int gpio_init_in(gpio_t dev, gpio_pp_t pullup);
 
 /**
  * @brief Initialize a GPIO pin for external interrupt usage
@@ -120,49 +127,70 @@ void gpio_init_in(gpio_t dev, gpio_pp_t pullup);
  * 
  * The interrupt is activated automatically after the initialization.
  * 
- * @param dev       the GPIO pin to initialize
- * @param pullup    define if pull resistors should be enabled
- * @param flank     define the active flank(s)
- * @param cb        register the callback that is called in interrupt context
+ * @param[in] dev       the GPIO pin to initialize
+ * @param[in] pullup    define if pull resistors should be enabled
+ * @param[in] flank     define the active flank(s)
+ * @param[in] cb        register the callback that is called in interrupt context
+ * 
+ * @return              0 on success
+ * @return              -1 on undefined device given
+ * @return              -2 on pull-up mode unavailable
+ * @return              -3 on active flank unavailable
  */
-void gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(void));
+int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(void));
 
 /**
  * @brief Get the current value of the given GPIO pin
  * 
- * @param dev       the GPIO pin to read
+ * @param[in] dev       the GPIO pin to read
  * @return          the current value, 0 for LOW, != 0 for HIGH
+ * 
+ * @return              0 when pin is LOW
+ * @return              greater 0 for HIGH
+ * @return              -1 on undefined device given
  */
 int gpio_read(gpio_t dev);
 
 /**
  * @brief Set the given GPIO pin to HIGH
  * 
- * @param dev       the GPIO pin to set
+ * @param[in] dev       the GPIO pin to set
+ * 
+ * @return              0 on success
+ * @return              -1 on undefined device given
  */
-void gpio_set(gpio_t dev);
+int gpio_set(gpio_t dev);
 
 /**
  * @brief Set the given GPIO pin to LOW
  * 
- * @param dev       the GPIO pin to clear
+ * @param[in] dev       the GPIO pin to clear
+ * 
+ * @return              0 on success
+ * @return              -1 on undefined device given
  */
-void gpio_clear(gpio_t dev);
+int gpio_clear(gpio_t dev);
 
 /**
  * @brief Toggle the value of the given GPIO pin
  * 
- * @param dev       the GPIO pin to toggle
+ * @param[in] dev       the GPIO pin to toggle
+ * 
+ * @return              0 on success
+ * @return              -1 on undefined device given
  */
-void gpio_toggle(gpio_t dev);
+int gpio_toggle(gpio_t dev);
 
 /**
  * @brief Set the given GPIO pin to the given value
  * 
- * @param dev       the GPIO pin to set
- * @param value     value to set the pin to, 0 for LOW, HIGH otherwise
+ * @param[in] dev       the GPIO pin to set
+ * @param[in] value     value to set the pin to, 0 for LOW, HIGH otherwise
+ * 
+ * @return              0 on success
+ * @return              -1 on undefined device given
  */
-void gpio_write(gpio_t dev, int value);
+int gpio_write(gpio_t dev, int value);
 
 #endif /* __GPIO_H */
 /** @} */
