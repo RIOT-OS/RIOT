@@ -1,4 +1,4 @@
-export APPLICATION = test_thread_msg
+APPLICATION = test_thread_msg
 include ../Makefile.tests_common
 
 DISABLE_MODULE += auto_init

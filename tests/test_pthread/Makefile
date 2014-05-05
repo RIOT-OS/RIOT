@@ -1,4 +1,4 @@
-export APPLICATION = test_pthread
+APPLICATION = test_pthread
 include ../Makefile.tests_common
 
 USEMODULE += posix

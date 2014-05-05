@@ -1,4 +1,4 @@
-export APPLICATION = test_bloom
+APPLICATION = test_bloom
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_RAM := chronos mbed_lpc1768 msb-430 msb-430h redbee-econotag \
