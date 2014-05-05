@@ -37,11 +37,11 @@ void thread1(void)
         msg_t msg, reply;
 
         msg_receive(&msg);
-        printf("T1 recv: %d (i=%d)\n", msg.content.value, i);
+        printf("T1 recv: %" PRIu32 "(i=%d)\n", msg.content.value, i);
 
         msg.content.value = i;
         msg_send_receive(&msg, &reply, p2);
-        printf("T1 got reply: %d (i=%d)\n", reply.content.value, i);
+        printf("T1 got reply: %" PRIu32 " (i=%d)\n", reply.content.value, i);
     }
 
     puts("THREAD 1 end\n");
@@ -55,7 +55,7 @@ void thread2(void)
         msg_t msg, reply;
 
         msg_receive(&msg);
-        printf("T2 got %d (i=%d)\n", msg.content.value, i);
+        printf("T2 got %" PRIu32 " (i=%d)\n", msg.content.value, i);
         reply.content.value = msg.content.value;
         msg_reply(&msg, &reply);
     }
