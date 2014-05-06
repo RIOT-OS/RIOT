@@ -21,16 +21,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <inttypes.h>
-
-/* mspgcc bug : PRIxxx macros not defined before mid-2011 versions */
-/**
- * @brief   Macro for printing 32 bit format specifier
- * @def     PRIu32
- */
-#ifndef PRIu32
-#define PRIu32 "lu"
-#endif
 
 /**
  * data type for queue nodes
