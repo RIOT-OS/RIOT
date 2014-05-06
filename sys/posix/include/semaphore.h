@@ -10,7 +10,7 @@
 
 typedef struct sem {
     volatile unsigned int value;
-    queue_node_t queue;
+    queue_t queue;
 } sem_t;
 
 /**

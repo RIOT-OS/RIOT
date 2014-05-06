@@ -39,14 +39,14 @@ typedef struct mutex_t {
      *          by the user.**
      * @internal
      */
-    queue_node_t queue;
+    queue_t queue;
 } mutex_t;
 
 /**
  * @brief Static initializer for mutex_t.
  * @details This initializer is preferrable to mutex_init().
  */
-#define MUTEX_INIT { 0, QUEUE_NODE_INIT }
+#define MUTEX_INIT { 0, QUEUE_INIT }
 
 /**
  * @brief Initializes a mutex object.

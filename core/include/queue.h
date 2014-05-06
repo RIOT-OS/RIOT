@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 /**
- * data type for queue nodes
+ * data type for priority queue nodes
  */
 typedef struct queue_node_t {
     struct queue_node_t *next;  /**< next queue node */
@@ -32,9 +32,21 @@ typedef struct queue_node_t {
 } queue_node_t;
 
 /**
+ * data type for priority queues
+ */
+typedef struct queue {
+    queue_node_t *first;        /**< first queue node */
+} queue_t;
+
+/**
  * @brief Static initializer for queue_node_t.
  */
 #define QUEUE_NODE_INIT { NULL, 0, 0 }
+
+/**
+ * @brief Static initializer for queue_t.
+ */
+#define QUEUE_INIT { NULL }
 
 /**
  * @brief remove the queue's head
@@ -43,7 +55,7 @@ typedef struct queue_node_t {
  *
  * @return              the old head
  */
-queue_node_t *queue_remove_head(queue_node_t *root);
+queue_node_t *queue_remove_head(queue_t *root);
 
 /**
  * @brief insert `new_obj` into `root` based on its priority
@@ -54,7 +66,7 @@ queue_node_t *queue_remove_head(queue_node_t *root);
  * @param[in,out]   root    the queue's root
  * @param[in]       new_obj the object to prepend
  */
-void queue_priority_add(queue_node_t *root, queue_node_t *new_obj);
+void queue_priority_add(queue_t *root, queue_node_t *new_obj);
 
 /**
  * @brief remove `node` from `root`
@@ -62,11 +74,11 @@ void queue_priority_add(queue_node_t *root, queue_node_t *new_obj);
  * @param[in,out]   root    the queue's root
  * @param[in]       node    the node to remove
  */
-void queue_remove(queue_node_t *root, queue_node_t *node);
+void queue_remove(queue_t *root, queue_node_t *node);
 
 #if ENABLE_DEBUG
-void queue_print(queue_node_t *node);
-void queue_print_node(queue_node_t *node);
+void queue_print(queue_t *root);
+void queue_print_node(queue_t *root);
 #endif
 
 /** @} */

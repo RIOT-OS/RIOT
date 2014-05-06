@@ -187,9 +187,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void *(*
 
     cb->wait_data = NULL;
 
-    cb->msg_waiters.data = 0;
-    cb->msg_waiters.priority = 0;
-    cb->msg_waiters.next = NULL;
+    cb->msg_waiters.first = NULL;
 
     cib_init(&(cb->msg_queue), 0);
     cb->msg_array = NULL;
