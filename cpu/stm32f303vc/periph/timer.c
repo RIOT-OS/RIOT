@@ -7,28 +7,23 @@
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     cpu_stm32f303vg
  * @{
- * 
+ *
  * @file        timer.c
  * @brief       Low-level timer driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * 
+ *
  * @}
  */
 
 #include <stdlib.h>
 
-#include "stm32f30x.h"
-#include "stm32f30x_rcc.h"
-#include "stm32f30x_tim.h"
-
-#include "periph/timer.h"
-#include "periph_conf.h"
-
 #include "board.h"
 #include "cpu.h"
+#include "periph/timer.h"
+#include "periph_conf.h"
 
 
 static inline void irq_handler(tim_t timer, TIM_TypeDef *dev);

@@ -7,20 +7,16 @@
  */
 
 /**
- * @ingroup     driver_periph
+ * @ingroup     cpu_stm32f303vg
  * @{
- * 
+ *
  * @file        uart.c
  * @brief       Low-level UART driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * 
+ *
  * @}
  */
-
-#include "stm32f30x_rcc.h"
-#include "stm32f30x_gpio.h"
-#include "stm32f30x_usart.h"
 
 #include "periph/uart.h"
 #include "periph_conf.h"
@@ -38,7 +34,7 @@ typedef struct {
 
 /**
  * @brief Unified interrupt handler for all UART devices
- * 
+ *
  * @param uartnum       the number of the UART that triggered the ISR
  * @param uart          the UART device that triggered the ISR
  */

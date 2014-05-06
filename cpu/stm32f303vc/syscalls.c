@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -31,8 +31,8 @@
 #include "thread.h"
 #include "kernel.h"
 #include "irq.h"
+#include "cpu.h"
 #include "periph/uart.h"
-#include "stm32f30x.h"
 #include "ringbuffer.h"
 
 /**
@@ -60,10 +60,10 @@ void _fini(void)
 
 /**
  * @brief Exit a program without cleaning up files
- * 
+ *
  * If your system doesn't provide this, it is best to avoid linking with subroutines that
  * require it (exit, system).
- * 
+ *
  * @param n     the exit code, 0 for all OK, >0 for not OK
  */
 void _exit(int n)
@@ -75,14 +75,14 @@ void _exit(int n)
 
 /**
  * @brief Allocate memory from the heap.
- * 
+ *
  * The current heap implementation is very rudimentary, it is only able to allocate
  * memory. But it does not
  * - check if the returned address is valid (no check if the memory very exists)
  * - have any means to free memory again
- * 
+ *
  * TODO: check if the requested memory is really available
- * 
+ *
  * @return [description]
  */
 caddr_t _sbrk_r(struct _reent *r, size_t incr)
@@ -96,7 +96,7 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
 
 /**
  * @brief Get the process-ID of the current thread
- * 
+ *
  * @return      the process ID of the current thread
  */
 int _getpid(void)
@@ -106,11 +106,11 @@ int _getpid(void)
 
 /**
  * @brief Send a signal to a given thread
- * 
+ *
  * @param r     TODO
  * @param pid   TODO
  * @param sig   TODO
- * 
+ *
  * @return      TODO
  */
 int _kill_r(struct _reent *r, int pid, int sig)
@@ -121,11 +121,11 @@ int _kill_r(struct _reent *r, int pid, int sig)
 
 /**
  * @brief Open a file
- * 
+ *
  * @param r     TODO
  * @param name  TODO
  * @param mode  TODO
- * 
+ *
  * @return      TODO
  */
 int _open_r(struct _reent *r, const char *name, int mode)
@@ -136,19 +136,19 @@ int _open_r(struct _reent *r, const char *name, int mode)
 
 /**
  * @brief Read from a file
- * 
+ *
  * All input is read from UART_0. The function will block until a byte is actually read.
- * 
- * Note: the read function does not buffer - data will be lost if the function is not 
+ *
+ * Note: the read function does not buffer - data will be lost if the function is not
  * called fast enough.
- * 
+ *
  * TODO: implement more sophisticated read call.
- * 
+ *
  * @param r     TODO
  * @param fd    TODO
  * @param buffer TODO
  * @param int   TODO
- * 
+ *
  * @return      TODO
  */
 int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
@@ -162,17 +162,17 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 
 /**
  * @brief Write characters to a file
- * 
+ *
  * All output is currently directed to UART_0, independent of the given file descriptor.
  * The write call will further block until the byte is actually written to the UART.
- * 
+ *
  * TODO: implement more sophisticated write call.
- * 
+ *
  * @param r     TODO
  * @param fd    TODO
  * @param data  TODO
  * @param int   TODO
- * 
+ *
  * @return      TODO
  */
 int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
@@ -186,10 +186,10 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 
 /**
  * @brief Close a file
- * 
+ *
  * @param r     TODO
  * @param fd    TODO
- * 
+ *
  * @return      TODO
  */
 int _close_r(struct _reent *r, int fd)
@@ -200,12 +200,12 @@ int _close_r(struct _reent *r, int fd)
 
 /**
  * @brief Set position in a file
- * 
+ *
  * @param r     TODO
  * @param fd    TODO
  * @param pos   TODO
  * @param dir   TODO
- * 
+ *
  * @return      TODO
  */
 _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int dir)
@@ -216,11 +216,11 @@ _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int dir)
 
 /**
  * @brief Status of an open file
- * 
+ *
  * @param r     TODO
  * @param fd    TODO
  * @param stat  TODO
- * 
+ *
  * @return      TODO
  */
 int _fstat_r(struct _reent *r, int fd, struct stat * st)
@@ -231,11 +231,11 @@ int _fstat_r(struct _reent *r, int fd, struct stat * st)
 
 /**
  * @brief Status of a file (by name)
- * 
+ *
  * @param r     TODO
  * @param name  TODO
  * @param stat  TODO
- * 
+ *
  * @return      TODO
  */
 int _stat_r(struct _reent *r, char *name, struct stat *st)
@@ -246,10 +246,10 @@ int _stat_r(struct _reent *r, char *name, struct stat *st)
 
 /**
  * @brief Query whether output stream is a terminal
- * 
+ *
  * @param r     TODO
  * @param fd    TODO
- * 
+ *
  * @return      TODO
  */
 int _isatty_r(struct _reent *r, int fd)
@@ -265,10 +265,10 @@ int _isatty_r(struct _reent *r, int fd)
 
 /**
  * @brief  Remove a file's directory entry
- * 
+ *
  * @param r     TODO
  * @param path  TODO
- * 
+ *
  * @return      TODO
  */
 int _unlink_r(struct _reent *r, char* path)

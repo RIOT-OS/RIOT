@@ -7,12 +7,12 @@
  */
 
 /**
- * @ingroup         stm32f303vc
+ * @ingroup         cpu_stm32f303vg
  * @{
- * 
+ *
  * @file            hwtimer_cpu.h
  * @brief           CPU specific hwtimer configuration options
- * 
+ *
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 

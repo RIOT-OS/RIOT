@@ -7,22 +7,24 @@
  */
 
 /**
- * @ingroup         stm32f303vc
+ * @ingroup         cpu_stm32f303vg
  * @{
- * 
+ *
  * @file            cpu-conf.h
  * @brief           Implementation specific CPU configuration options
- * 
+ *
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>
  */
 
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
+#include "stm32f30x.h"
+
 
 /**
  * @brief Kernel configuration
- * 
+ *
  * TODO: measure and adjust for the cortex-m4
  */
 #define KERNEL_CONF_STACKSIZE_PRINTF    (2500)

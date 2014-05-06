@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -22,7 +22,7 @@
 
 
 /**
- * memory markers as defined in the linker script 
+ * memory markers as defined in the linker script
  */
 extern uint32_t _sfixed;
 extern uint32_t _efixed;
@@ -44,7 +44,7 @@ extern void __libc_init_array(void);
 
 /**
  * @brief This function is the entry point after a system reset
- * 
+ *
  * After a system reset, the following steps are necessary and carried out:
  * 1. load data section from flash to ram
  * 2. overwrite uninitialized data section (BSS) with zeros
@@ -61,7 +61,7 @@ void reset_handler(void)
     for (dst = &_srelocate; dst < &_erelocate; ) {
         *(dst++) = *(src++);
     }
-    
+
     /* default bss section to zero */
     for (dst = &_szero; dst < &_ezero; ) {
         *(dst++) = 0;
