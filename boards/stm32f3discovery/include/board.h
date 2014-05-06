@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -21,7 +21,7 @@
 #ifndef __BOARD_H
 #define __BOARD_H
 
-#include "stm32f30x.h"
+#include "cpu.h"
 
 /**
  * Define the nominal CPU core clock in this board
@@ -38,7 +38,7 @@
 
 /**
  * @name Example: configure connected NRF24L01+ (radio) device
- * 
+ *
  * This is just an example on how to bind (externally or internally) connected
  * devices to the CPUs peripherals.
  * @{

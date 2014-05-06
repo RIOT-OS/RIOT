@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -44,10 +44,10 @@ void board_init(void)
 
 /**
  * @brief Initialize the boards on-board LEDs (LD3 - LD10)
- * 
+ *
  * The LED initialization is hard-coded in this function. As the LEDs are soldered
  * onto the board they are fixed to their CPU pins.
- * 
+ *
  * The LEDs are connected to the following pins:
  * - LD3: PE9
  * - LD4: PE8
