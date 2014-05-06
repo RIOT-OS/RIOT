@@ -46,46 +46,12 @@ queue_node_t *queue_remove_head(queue_node_t *root)
     return head;
 }
 
-void queue_add_tail(queue_node_t *node, queue_node_t *new_obj)
-{
-    while (node->next != NULL) {
-        node = node->next;
-    }
-
-    node->next = new_obj;
-    new_obj->next = NULL;
-}
-
-void queue_add_head(queue_node_t *root, queue_node_t *new_obj)
-{
-    new_obj->next = root->next;
-    root->next = new_obj;
-}
-
 void queue_priority_add(queue_node_t *root, queue_node_t *new_obj)
 {
     queue_node_t *node = root;
 
     while (node->next != NULL) {
         if (node->next->priority > new_obj->priority) {
-            new_obj->next = node->next;
-            node->next = new_obj;
-            return;
-        }
-
-        node = node->next;
-    }
-
-    node->next = new_obj;
-    new_obj->next = NULL;
-}
-
-void queue_priority_add_generic(queue_node_t *root, queue_node_t *new_obj, int (*cmp)(queue_node_t *, queue_node_t *))
-{
-    queue_node_t *node = root;
-
-    while (node->next != NULL) {
-        if (cmp(node->next, new_obj) < 0) {
             new_obj->next = node->next;
             node->next = new_obj;
             return;

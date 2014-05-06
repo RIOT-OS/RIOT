@@ -37,23 +37,6 @@ typedef struct queue_node_t {
 #define QUEUE_NODE_INIT { NULL, 0, 0 }
 
 /**
- * @brief attach `new_obj` to the tail of the queue (identified
- * `root`)
- *
- * @param[in,out]   root    the queue's root
- * @param[in]       new_obj the object to append
- */
-void queue_add_tail(queue_node_t *root, queue_node_t *new_obj);
-
-/**
- * @brief attach `new_obj` to `root` at the beginning
- *
- * @param[in,out]   root    the queue's root
- * @param[in]       new_obj the object to prepend
- */
-void queue_add_head(queue_node_t *root, queue_node_t *new_obj);
-
-/**
  * @brief remove the queue's head
  *
  * @param[out]  root    the queue's root
@@ -72,18 +55,6 @@ queue_node_t *queue_remove_head(queue_node_t *root);
  * @param[in]       new_obj the object to prepend
  */
 void queue_priority_add(queue_node_t *root, queue_node_t *new_obj);
-
-/**
- * @brief insert `new_obj` into `root` based on an arbitrary priority
- *
- * @details
- * The new object will be appended after objects with the same priority.
- *
- * @param[in,out]   root    the queue's root
- * @param[in]       new_obj the object to prepend
- * @param[in]       cmp     a comparator function used to determine the priority
- */
-void queue_priority_add_generic(queue_node_t *root, queue_node_t *new_obj, int(*cmp)(queue_node_t *, queue_node_t *)) ;
 
 /**
  * @brief remove `node` from `root`
