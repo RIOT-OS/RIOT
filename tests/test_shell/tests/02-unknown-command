@@ -1,10 +1,15 @@
 #!/usr/bin/expect
 
-set timeout 2
-
 spawn make term
 
-sleep 1
+set timeout 5
+expect {
+    "test_shell" {}
+    timeout { exit 1 }
+}
+
+set timeout 1
+
 send "\n"
 send "\n"
 expect {
@@ -14,7 +19,12 @@ expect {
 
 send "some_definately_unknown_command\n"
 expect {
-    "shell: command not found." {}
+    "shell: command not found:" {
+        expect {
+            "some_definately_unknown_command" {}
+            timeout { exit 1 }
+        }
+    }
     timeout { exit 1 }
 }
 
