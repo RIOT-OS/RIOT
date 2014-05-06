@@ -17,7 +17,6 @@
  * @}
  */
 
-#include <stddef.h>
 #include <inttypes.h>
 #include <stdio.h>
 
@@ -115,42 +114,3 @@ void queue_print_node(queue_node_t *node)
     printf("Data: %u Priority: %" PRIu32 " Next: %u\n", (unsigned int)node->data, node->priority, (unsigned int)node->next);
 }
 #endif
-
-/*
-int main() {
-    queue_node_t root, a, b, c,d;
-
-    memset(&d, '\0', sizeof(queue_node_t));
-    memset(&a, '\0', sizeof(queue_node_t));
-    memset(&b, '\0', sizeof(queue_node_t));
-    memset(&c, '\0', sizeof(queue_node_t));
-
-    root.data = 0;
-    root.next = NULL;
-
-    a.data = 1;
-    a.priority = 1;
-    b.data = 2;
-    b.priority = 2;
-    c.data = 0;
-    c.priority = 5;
-    d.data = 4;
-    d.priority = 4;
-
-    queue_add_tail(&root, &a);
-    queue_add_tail(&root, &b);
-    queue_add_tail(&root, &c);
-    queue_add_tail(&root, &d);
-
-    queue_print(&root);
-
-    queue_remove(&root, &c);
-
-    queue_print(&root);
-
-    queue_priority_add(&root, &c);
-
-    queue_print(&root);
-
-    return 0;
-}*/
