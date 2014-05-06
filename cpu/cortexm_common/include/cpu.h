@@ -22,6 +22,8 @@
 #ifndef __CORTEXM_COMMON_H
 #define __CORTEXM_COMMON_H
 
+#include "cpu_conf.h"
+
 /**
  * @brief Macro has to be called in the beginning of each ISR
  */
