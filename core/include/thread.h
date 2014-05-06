@@ -19,7 +19,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-
 #ifndef __THREAD_H
 #define __THREAD_H
 

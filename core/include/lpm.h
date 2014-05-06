@@ -52,4 +52,3 @@ enum lpm_mode lpm_get(void);
 
 #endif /* LPM_H_ */
 /** @} */
-
