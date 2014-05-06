@@ -1,4 +1,4 @@
 
 MODULE = periph
 
-include $(MAKEBASE)/Makefile.base
+include $(RIOTBASE)/Makefile.base

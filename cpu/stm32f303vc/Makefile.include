@@ -11,7 +11,7 @@ export CORTEX_COMMON = $(RIOTCPU)/cortexm_common
 # define the ST standard peripheral library and the specific CPU
 export STM_LIB_BASE = $(RIOTBASE)/pkg/stm32f3_stdperiph_lib/
 
-# add the type of MCU used to the compiler flags 
+# add the type of MCU used to the compiler flags
 # (see stmlib/Libraries/CMSIS/Device/ST/STM32F30x/Include/stm32f30x.h for available types)
 export CFLAGS += -DUSE_STDPERIPH_DRIVER -DSTM32F30X
 
@@ -23,8 +23,9 @@ export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 # include the lib (for ringbuffer use) TODO remove this
 export INCLUDES += -I$(RIOTBASE)/sys/lib
 
-# add the CPU specific system calls implementations for the linker
-export UNDEF += $(BINDIR)syscalls.o
+# add the CPU specific system calls and startup code for the linker
+export UNDEF += $(BINDIR)cpu/syscalls.o
+export UNDEF += $(BINDIR)cpu/startup.o
 
 # export the bsp to be linked into the final binary
 # TODO: this is only temporary, the CPU Makefile needs to be changed so the bsp objects are packed into cpu.a
