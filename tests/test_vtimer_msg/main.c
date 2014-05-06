@@ -37,8 +37,8 @@ struct timer_msg {
 
 timex_t now;
 
-struct timer_msg msg_a = { .timer = {0}, .interval = { .seconds = 2, .microseconds = 0}, .msg = "Hello World" };
-struct timer_msg msg_b = { .timer = {0}, .interval = { .seconds = 5, .microseconds = 0}, .msg = "This is a Test" };
+struct timer_msg msg_a = { .interval = { .seconds = 2, .microseconds = 0}, .msg = "Hello World" };
+struct timer_msg msg_b = { .interval = { .seconds = 5, .microseconds = 0}, .msg = "This is a Test" };
 
 void timer_thread(void)
 {
