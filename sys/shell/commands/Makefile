@@ -25,6 +25,9 @@ endif
 ifneq (,$(filter ps,$(USEMODULE)))
 	SRC += sc_ps.c
 endif
+ifneq (,$(filter rpl,$(USEMODULE)))
+	SRC += sc_rpl.c
+endif
 ifneq (,$(filter rtc,$(USEMODULE)))
 	SRC += sc_rtc.c
 endif

@@ -104,6 +104,10 @@ extern void _transceiver_set_ignore_handler(int argc, char **argv);
 extern void _net_if_ifconfig(int argc, char **argv);
 #endif
 
+#ifdef MODULE_RPL
+extern void _rpl_route_handler(int argc, char **argv);
+#endif
+
 #ifdef MODULE_MCI
 extern void _get_sectorsize(int argc, char **argv);
 extern void _get_blocksize(int argc, char **argv);
@@ -171,6 +175,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_NET_IF
     {"ifconfig", "Configures a network interface", _net_if_ifconfig},
+#endif
+#ifdef MODULE_RPL
+    {"route", "Shows the routing table", _rpl_route_handler},
 #endif
 #ifdef MODULE_MCI
     {DISK_READ_SECTOR_CMD, "Reads the specified sector of inserted memory card", _read_sector},
