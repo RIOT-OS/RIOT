@@ -31,6 +31,15 @@ typedef struct ringbuffer {
 } ringbuffer_t;
 
 /**
+ * @def          RINGBUFFER_INIT(BUF)
+ * @brief        Initialize a ringbuffer.
+ * @details      This macro is meant for static ringbuffers.
+ * @param[in]    BUF   Buffer to use for the ringbuffer. The size is deduced through `sizeof (BUF)`.
+ * @returns      The static initializer.
+ */
+#define RINGBUFFER_INIT(BUF) { (BUF), sizeof (BUF), 0, 0 }
+
+/**
  * @brief        Initialize a ringbuffer.
  * @param[out]   rb        Datum to initialize.
  * @param[in]    buffer    Buffer to use by rb.
