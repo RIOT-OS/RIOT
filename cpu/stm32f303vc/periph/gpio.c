@@ -28,33 +28,36 @@ typedef struct {
 } gpio_state_t;
 
 static inline void irq_handler(gpio_t dev);
-static void init(gpio_t dev, gpio_pp_t pushpull, GPIO_InitTypeDef *config);
+static int init(gpio_t dev, gpio_pp_t pullup, GPIO_InitTypeDef *config);
 
 static gpio_state_t config[GPIO_NUMOF];
 
 
-void gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
+int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
 {
     config[dev].read = &GPIO_ReadOutputDataBit;
     GPIO_InitTypeDef gpio_conf;
     gpio_conf.GPIO_Mode = GPIO_Mode_OUT;
-    init(dev, pushpull, &gpio_conf);
+    return init(dev, pullup, &gpio_conf);
 }
 
-void gpio_init_in(gpio_t dev, gpio_pp_t pushpull)
+int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
 {
     config[dev].read = &GPIO_ReadInputDataBit;
     GPIO_InitTypeDef gpio_conf;
     gpio_conf.GPIO_Mode = GPIO_Mode_IN;
-    init(dev, pushpull, &gpio_conf);
+    return init(dev, pullup, &gpio_conf);
 }
 
-void gpio_init_int(gpio_t dev, gpio_pp_t pushpull, gpio_flank_t flank, void (*cb)(void))
+int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(void))
 {
     // set callback
     config[dev].cb = cb;
 
-    gpio_init_in(dev, pushpull);
+    int res = gpio_init_in(dev, pullup);
+    if (res < 0) {
+        return res;
+    }
 
     EXTI_InitTypeDef exti;
     NVIC_InitTypeDef nvic;
@@ -161,17 +164,22 @@ void gpio_init_int(gpio_t dev, gpio_pp_t pushpull, gpio_flank_t flank, void (*cb
             exti.EXTI_Line = GPIO_15_LINE;
             nvic.NVIC_IRQChannel = GPIO_15_IRQ;
             break;
+        case GPIO_UNDEFINED:
+        default:
+            return -1;
     }
 
     EXTI_Init(&exti);
     NVIC_Init(&nvic);
+
+    return 0;
 }
 
-static void init(gpio_t dev, gpio_pp_t pushpull, GPIO_InitTypeDef *config)
+static int init(gpio_t dev, gpio_pp_t pullup, GPIO_InitTypeDef *config)
 {
     config->GPIO_Speed = GPIO_Speed_50MHz;
     config->GPIO_OType = GPIO_OType_PP;
-    switch (pushpull) {
+    switch (pullup) {
         case GPIO_PULLDOWN:
             config->GPIO_PuPd = GPIO_PuPd_DOWN;
             break;
@@ -263,7 +271,11 @@ static void init(gpio_t dev, gpio_pp_t pushpull, GPIO_InitTypeDef *config)
             config->GPIO_Pin = GPIO_15_PIN;
             GPIO_Init(GPIO_15_PORT, config);
             break;
+        case GPIO_UNDEFINED:
+        default:
+            return -1;
     }
+    return 0;
 }
 
 int gpio_read(gpio_t dev)
@@ -301,11 +313,13 @@ int gpio_read(gpio_t dev)
             return (int)config[dev].read(GPIO_14_PORT, GPIO_14_PIN);
         case GPIO_15:
             return (int)config[dev].read(GPIO_15_PORT, GPIO_15_PIN);
+        case GPIO_UNDEFINED:
+        default:
+            return -1;
     }
-    return -1;
 }
 
-void gpio_set(gpio_t dev)
+int gpio_set(gpio_t dev)
 {
     switch (dev) {
         case GPIO_0:
@@ -356,10 +370,14 @@ void gpio_set(gpio_t dev)
         case GPIO_15:
             GPIO_SetBits(GPIO_15_PORT, GPIO_15_PIN);
             break;
+        case GPIO_UNDEFINED:
+        default:
+            return -1;
     }
+    return 0;
 }
 
-void gpio_clear(gpio_t dev)
+int gpio_clear(gpio_t dev)
 {
     switch (dev) {
         case GPIO_0:
@@ -410,25 +428,30 @@ void gpio_clear(gpio_t dev)
         case GPIO_15:
             GPIO_ResetBits(GPIO_15_PORT, GPIO_15_PIN);
             break;
+        case GPIO_UNDEFINED:
+        default:
+            return -1;
     }
+
+    return 0;
 }
 
 
-void gpio_toggle(gpio_t dev)
+int gpio_toggle(gpio_t dev)
 {
     if (gpio_read(dev)) {
-        gpio_clear(dev);
+        return gpio_clear(dev);
     } else {
-        gpio_set(dev);
+        return gpio_set(dev);
     }
 }
 
-void gpio_write(gpio_t dev, int value)
+int gpio_write(gpio_t dev, int value)
 {
     if (value) {
-        gpio_set(dev);
+        return gpio_set(dev);
     } else {
-        gpio_clear(dev);
+        return gpio_clear(dev);
     }
 }
 
