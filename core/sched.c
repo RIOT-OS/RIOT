@@ -22,11 +22,13 @@
  */
 
 #include <stdint.h>
+ 
 #include "sched.h"
 #include "kernel.h"
 #include "kernel_internal.h"
 #include "clist.h"
 #include "bitarithm.h"
+#include "irq.h"
 #include "thread.h"
 #include "irq.h"
 
@@ -191,7 +193,7 @@ void sched_task_exit(void)
 {
     DEBUG("sched_task_exit(): ending task %s...\n", active_thread->name);
 
-    dINT();
+    disableIRQ();  /* former 'dINT()' */
     sched_threads[active_thread->pid] = NULL;
     num_tasks--;
 

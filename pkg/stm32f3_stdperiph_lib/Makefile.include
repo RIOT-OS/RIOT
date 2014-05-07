@@ -1,0 +1,14 @@
+
+# path to the stm32f0 std periphial library
+export STM_LIB_NAME = stm32f3_stdperiph_lib
+export STM_LIB_SRCDIR = $(STM_LIB_BASE)lib/Libraries/STM32F30x_StdPeriph_Driver/src/
+
+# add stm std periph library include paths to the global includes list
+INCLUDES += -I$(STM_LIB_BASE)lib/Libraries/CMSIS/Include
+INCLUDES += -I$(STM_LIB_BASE)lib/Libraries/CMSIS/Device/ST/STM32F30x/Include
+INCLUDES += -I$(STM_LIB_BASE)lib/Libraries/STM32F30x_StdPeriph_Driver/inc
+INCLUDES += -I$(STM_LIB_BASE)lib/Project/STM32F30x_StdPeriph_Templates
+export INCLUDES
+
+# tell the build system to include the library-build
+export USEMODULE += $(STM_LIB_NAME)

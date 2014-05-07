@@ -23,17 +23,7 @@
 #ifndef LPM_H_
 #define LPM_H_
 
-/**
- * @brief   Available power modes
- */
-enum lpm_mode {
-    LPM_ON,             ///< MCU is active
-    LPM_IDLE,           ///< MCU is idle
-    LPM_SLEEP,          ///< MCU in sleep mode
-    LPM_POWERDOWN,      ///< MCU is powered down
-    LPM_OFF,            ///< MCU is off
-    LPM_UNKNOWN = -1    ///< status unknown/unavailable
-};
+#include "arch/lpm_arch.h"
 
 /**
  * @brief   Initialization of power management (including clock setup)
@@ -60,6 +50,5 @@ void lpm_end_awake(void);
  */
 enum lpm_mode lpm_get(void);
 
-
-/** @} */
 #endif /* LPM_H_ */
+/** @} */

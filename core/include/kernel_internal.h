@@ -51,15 +51,5 @@ void sched_task_exit(void);
  */
 void thread_print_stack(void);
 
-/**
- * @brief       Reboot the system
- *
- * @param mode  The argument is ignored and only used for conformity
- *              with existing reboot implementations for now.
- *
- * @return      This call never returns when successful. -1 is returned otherwise.
- */
-int reboot_arch(int mode);
-
 /** @} */
 #endif /* KERNEL_INTERNAL_H_ */

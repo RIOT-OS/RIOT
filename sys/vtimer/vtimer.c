@@ -346,14 +346,13 @@ int vtimer_sleep(timex_t time)
 
 int vtimer_remove(vtimer_t *t)
 {
+    unsigned int irq_state = disableIRQ();
+
     queue_remove(&shortterm_queue_root, (queue_node_t *)t);
     queue_remove(&longterm_queue_root, (queue_node_t *)t);
-
     update_shortterm();
 
-    if (!inISR()) {
-        eINT();
-    }
+    restoreIRQ(irq_state);
 
     return 0;
 }
