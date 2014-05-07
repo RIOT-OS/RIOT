@@ -1143,9 +1143,12 @@ ccnl_forward_remove(struct ccnl_relay_s *ccnl, struct ccnl_forward_s *fwd)
     return fwd2;
 }
 
-bool ccnl_is_timeouted(struct timeval *now, struct timeval *last_used, time_t timeout_s, time_t timeout_us)
+bool ccnl_is_timeouted(struct timeval *now, struct timeval *last_used, uint32_t timeout_s, uint32_t timeout_us)
 {
-    struct timeval abs_timeout = { last_used->tv_sec + timeout_s, last_used->tv_usec + timeout_us };
+
+    timex_t time = timex_set(timeout_s, timeout_us);
+    timex_normalize(&time);
+    struct timeval abs_timeout = { last_used->tv_sec + time.seconds, last_used->tv_usec + time.microseconds };
     return timevaldelta(now, &abs_timeout) > 0;
 }
 
