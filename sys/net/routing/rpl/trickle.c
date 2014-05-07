@@ -217,7 +217,7 @@ void dao_delay_over(void)
     }
 }
 
-void dao_ack_received()
+void dao_ack_received(void)
 {
     ack_received = true;
     long_delay_dao();

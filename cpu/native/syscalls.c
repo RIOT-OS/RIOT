@@ -55,7 +55,7 @@ void (*real_free)(void *ptr);
 void* (*real_calloc)(size_t nmemb, size_t size);
 void* (*real_realloc)(void *ptr, size_t size);
 
-void _native_syscall_enter()
+void _native_syscall_enter(void)
 {
     _native_in_syscall++;
 #if LOCAL_DEBUG
@@ -63,7 +63,7 @@ void _native_syscall_enter()
 #endif
 }
 
-void _native_syscall_leave()
+void _native_syscall_leave(void)
 {
 #if LOCAL_DEBUG
     real_write(STDERR_FILENO, "< _native_in_syscall\n", 21);

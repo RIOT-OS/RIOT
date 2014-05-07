@@ -57,7 +57,7 @@ static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
 schedstat pidlist[MAXTHREADS];
 #endif
 
-void sched_run()
+void sched_run(void)
 {
     sched_context_switch_request = 0;
 

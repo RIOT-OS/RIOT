@@ -153,7 +153,7 @@ cc1100_statistic_t cc1100_statistic;
 //					Initialization of physical layer
 /*---------------------------------------------------------------------------*/
 
-void cc1100_phy_init()
+void cc1100_phy_init(void)
 {
     int i;
 

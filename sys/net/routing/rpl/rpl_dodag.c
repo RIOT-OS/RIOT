@@ -65,7 +65,7 @@ rpl_instance_t *rpl_get_instance(uint8_t instanceid)
     return NULL;
 }
 
-rpl_instance_t *rpl_get_my_instance()
+rpl_instance_t *rpl_get_my_instance(void)
 {
     for (int i = 0; i < RPL_MAX_INSTANCES; i++) {
         if (instances[i].joined) {
@@ -115,7 +115,7 @@ rpl_dodag_t *rpl_get_dodag(ipv6_addr_t *id)
 
     return NULL;
 }
-rpl_dodag_t *rpl_get_my_dodag()
+rpl_dodag_t *rpl_get_my_dodag(void)
 {
     for (int i = 0; i < RPL_MAX_DODAGS; i++) {
         if (dodags[i].joined) {
@@ -416,7 +416,7 @@ void rpl_local_repair(void)
 
 }
 
-ipv6_addr_t *rpl_get_my_preferred_parent()
+ipv6_addr_t *rpl_get_my_preferred_parent(void)
 {
     rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 

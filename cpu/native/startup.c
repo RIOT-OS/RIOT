@@ -134,7 +134,7 @@ void _native_log_stderr(char *stderrtype)
     }
 }
 
-void daemonize()
+void daemonize(void)
 {
     pid_t pid;
 
@@ -148,7 +148,7 @@ void daemonize()
     }
 }
 
-void usage_exit()
+void usage_exit(void)
 {
     real_printf("usage: %s", _progname);
 

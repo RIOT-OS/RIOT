@@ -20,7 +20,7 @@ volatile int __inISR = 0;
 
 char __isr_stack[MSP430_ISR_STACK_SIZE];
 
-void thread_yield()
+void thread_yield(void)
 {
     __save_context();
 
@@ -84,7 +84,7 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stack_si
     return (char *) stackptr;
 }
 
-int inISR()
+int inISR(void)
 {
     return __inISR;
 }

@@ -63,7 +63,7 @@ void nativenet_init(int transceiver_pid)
     _native_net_tpid = transceiver_pid;
 }
 
-void nativenet_powerdown()
+void nativenet_powerdown(void)
 {
     return;
 }
@@ -80,7 +80,7 @@ int16_t nativenet_set_channel(uint8_t channel)
     return _native_net_chan;
 }
 
-int16_t nativenet_get_channel()
+int16_t nativenet_get_channel(void)
 {
     return _native_net_chan;
 }
@@ -91,7 +91,7 @@ uint16_t nativenet_set_pan(uint16_t pan)
     return _native_net_pan;
 }
 
-uint16_t nativenet_get_pan()
+uint16_t nativenet_get_pan(void)
 {
     return _native_net_pan;
 }
@@ -103,7 +103,7 @@ radio_address_t nativenet_set_address(radio_address_t address)
     return _native_net_addr;
 }
 
-radio_address_t nativenet_get_address()
+radio_address_t nativenet_get_address(void)
 {
     DEBUG("nativenet_get_address -> address = %d\n", _native_net_addr);
     return _native_net_addr;
@@ -131,7 +131,7 @@ int8_t nativenet_send(radio_packet_t *packet)
     return send_buf(packet);
 }
 
-void nativenet_switch_to_rx()
+void nativenet_switch_to_rx(void)
 {
     return;
 }

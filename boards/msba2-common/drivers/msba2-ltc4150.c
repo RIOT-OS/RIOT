@@ -60,7 +60,7 @@ void __attribute__((__no_instrument_function__)) ltc4150_sync_blocking(void)
     while (!(FIO0PIN & BIT4)) {};
 }
 
-void __attribute__((__no_instrument_function__)) ltc4150_arch_init()
+void __attribute__((__no_instrument_function__)) ltc4150_arch_init(void)
 {
     FIO0DIR |= BIT5;
     FIO0SET = BIT5;

@@ -32,12 +32,12 @@
 #include "hwtimer.h"
 #include "sched.h"
 
-inline int thread_getpid()
+inline int thread_getpid(void)
 {
     return active_thread->pid;
 }
 
-int thread_getlastpid()
+int thread_getlastpid(void)
 {
     return last_pid;
 }
@@ -60,7 +60,7 @@ const char *thread_getname(int pid)
     return sched_threads[pid]->name;
 }
 
-void thread_sleep()
+void thread_sleep(void)
 {
     if (inISR()) {
         return;
