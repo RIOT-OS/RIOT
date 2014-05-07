@@ -158,13 +158,13 @@ int border_add_addr(const char *ip_addr);
  *          router.
  * @return  This border router's current version.
  */
-uint16_t get_abro_version();
+uint16_t get_abro_version(void);
 
 /**
  * @brief   Increments and updates the version for ABROs send by this
  *          router.
  * @return  This border router's new ABRO version.
  */
-uint16_t get_next_abro_version();
+uint16_t get_next_abro_version(void);
 
 #endif /* SIXLOWDRIVER_H*/
