@@ -56,6 +56,18 @@
 #define PURE
 #endif
 
+/**
+ * @def       UNREACHABLE()
+ * @brief     Tell the compiler that this line of code cannot be reached.
+ * @details   Most useful in junction with #NORETURN.
+ *            Use this if the compiler cannot tell that e.g.
+ *            an assembler instruction causes a longjmp, or a write causes a reboot.
+ */
+#if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ >= 5)
+#define UNREACHABLE() __builtin_unreachable()
+#else
+#define UNREACHABLE() do { /* nothing */ } while (1)
+#endif
+
 #endif /* ATTRIBUTES_H_ */
 /** @} */
-
