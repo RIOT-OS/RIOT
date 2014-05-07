@@ -21,3 +21,11 @@ ifeq ($(shell LANG=C $(CC) -fno-delete-null-pointer-checks -E - 2>&1 1>/dev/null
 CFLAGS += -fno-delete-null-pointer-checks
 endif
 endif
+
+# Fast-out on old style function definitions.
+# They cause unreadable error compiler errors on missing semicolons.
+# Worse yet they hide errors by accepting wildcard argument types.
+ifeq ($(shell $(CC) -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+# duplicated parameters don't hurt
+CFLAGS += -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition
+endif
