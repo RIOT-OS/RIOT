@@ -90,7 +90,7 @@ void riot_send_nack(uint16_t to)
     msg_send(&m, to, 0);
 }
 
-char *riot_ccnl_event_to_string(ccnl_riot_event_t event)
+char *riot_ccnl_event_to_string(int event)
 {
     switch (event) {
         case PKT_PENDING:
