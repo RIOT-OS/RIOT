@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2013, Freie Universitaet Berlin (FUB). All rights reserved.
+ * Copyright 2014, Freie Universitaet Berlin (FUB). All rights reserved.
  *
  * These sources were developed at the Freie Universitaet Berlin, Computer Systems
 and Telematics group (http://cst.mi.fu-berlin.de).
@@ -20,9 +20,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Milan Babel <babel@inf.fu-berlin.de>
- * @version     $Revision: 1775 $
- *
- * @note    	$Id: arch_cc110x.h 1775 2010-01-26 09:37:03Z hillebra $
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */
 
 #include <stdint.h>
@@ -38,23 +36,31 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 uint8_t cc2420_txrx(uint8_t c);
 
 /**
- * @brief Gets the status of the sfd pin.
+ * @brief Gets the status of the FIFOP pin.
  *
- * @return Status of the sfd pin.
+ * @return Status of the FIFOP pin.
+ *
+ */
+uint8_t cc2420_get_fifop(void);
+
+/**
+ * @brief Gets the status of the SFD pin.
+ *
+ * @return Status of the SFD pin.
  *
  */
 uint8_t cc2420_get_sfd(void);
 
 /**
- * @brief Gets the status of the cca pin
+ * @brief Gets the status of the CCA pin
  *
- * @return Status of the cca pin.
+ * @return Status of the CCA pin.
  *
  */
 uint8_t cc2420_get_cca(void);
 
 /**
- * @brief Does a hardware reset of the cc2420.
+ * @brief Does a hardware reset of the CC2420.
  *
  */
 void cc2420_reset(void);
@@ -66,13 +72,13 @@ void cc2420_reset(void);
 void cc2420_spi_init(void);
 
 /**
- * @brief Selects the cc2420 on the spi bus.
+ * @brief Selects the CC2420 on the spi bus.
  *
  */
 void cc2420_spi_select(void);
 
 /**
- * @brief Unselects the cc2420 on the spi bus.
+ * @brief Unselects the CC2420 on the spi bus.
  *
  */
 void cc2420_spi_unselect(void);
