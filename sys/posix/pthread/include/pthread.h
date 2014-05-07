@@ -23,5 +23,6 @@
 #include "pthread_once.h"
 #include "pthread_scheduling.h"
 #include "pthread_cancellation.h"
+#include "pthread_cond.h"
 
 #endif	/* pthread.h */

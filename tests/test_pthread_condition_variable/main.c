@@ -19,9 +19,8 @@
  */
 
 #include <stdio.h>
-#include "pthread_cond.h"
+#include "pthread.h"
 #include "thread.h"
-#include "mutex.h"
 
 static mutex_t mutex;
 static struct pthread_cond_t cv;
