@@ -30,23 +30,8 @@ ifneq (,$(filter ccn_lite_client,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
 
-ifneq (,$(filter crypto_3des,$(USEMODULE)))
+ifneq (,$(filter crypto,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/include/crypto
-endif
-ifneq (,$(filter crypto_aes,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/include/crypto
-endif
-ifneq (,$(filter crypto_rc5,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/include/crypto
-endif
-ifneq (,$(filter crypto_sha256,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/include/crypto
-endif
-ifneq (,$(filter crypto_skipjack,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/include/crypto
-endif
-ifneq (,$(filter crypto_twofish,$(USEMODULE)))
-    USEMODULE_INCLUDES += $(RIOTBASE)/sys/include/crypto
 endif
 
 ifneq (,$(filter posix,$(USEMODULE)))

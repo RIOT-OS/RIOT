@@ -1,3 +1,3 @@
-MODULE = crypto_twofish
+MODULE = crypto
 
 include $(RIOTBASE)/Makefile.base
