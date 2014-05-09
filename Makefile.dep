@@ -40,10 +40,6 @@ ifneq (,$(filter posix,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
 
-ifneq (,$(filter packetbuf,$(USEMODULE)))
-	USEMODULE += lib
-endif
-
 ifneq (,$(filter uart0,$(USEMODULE)))
 	USEMODULE += lib
 	USEMODULE += posix

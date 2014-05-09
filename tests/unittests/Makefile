@@ -3,6 +3,8 @@ include ../Makefile.tests_common
 
 USEMODULE += embunit
 
+DISABLE_MODULE += auto_init
+
 INCLUDES += -I$(RIOTBASE)/tests/unittests/embunit
 
 ifeq ($(OUTPUT),XML)
