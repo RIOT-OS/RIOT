@@ -74,8 +74,6 @@ int reboot_arch(int mode)
     }
 
     errx(EXIT_FAILURE, "reboot: this should not have been reached");
-
-    return -1;
 }
 
 /**
