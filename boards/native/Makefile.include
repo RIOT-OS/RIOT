@@ -30,7 +30,8 @@ ifeq ($(shell uname -m),amd64)
 export CFLAGS += -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
 endif
 endif
-export LINKFLAGS += -m32 -gc
+
+export LINKFLAGS += -m32
 ifeq ($(shell uname -s),FreeBSD)
 ifeq ($(shell uname -m),amd64)
 export LINKFLAGS += -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
@@ -39,6 +40,7 @@ export LINKFLAGS += -L $(BINDIR)
 else
 export LINKFLAGS += -ldl
 endif
+
 export ASFLAGS =
 export DEBUGGER_FLAGS = $(ELF)
 term-memcheck: export VALGRIND_FLAGS ?= --track-origins=yes
