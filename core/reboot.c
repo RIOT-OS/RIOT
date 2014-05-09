@@ -19,7 +19,7 @@
  */
 
 #include "kernel.h"
-#include "kernel_internal.h"
+#include "arch/reboot_arch.h"
 
 int reboot(int mode)
 {
