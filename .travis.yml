@@ -19,6 +19,7 @@ install:
 
 script:
     - ./dist/tools/compile_test/compile_test.py
+    - make -C ./tests/unittests term
 
 notifications:
     email: false
