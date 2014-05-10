@@ -73,9 +73,7 @@ int reboot_arch(int mode)
         err(EXIT_FAILURE, "reboot: execve");
     }
 
-    errx(EXIT_FAILURE, "reboot: this should not habe been reached");
-
-    return -1;
+    errx(EXIT_FAILURE, "reboot: this should not have been reached");
 }
 
 /**
