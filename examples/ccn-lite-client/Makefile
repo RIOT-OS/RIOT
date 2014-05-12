@@ -28,7 +28,7 @@ export RIOTBASE ?= $(CURDIR)/../..
 export QUIET ?= 1
 
 BOARD_BLACKLIST := chronos mbed_lpc1768 msb-430 msb-430h redbee-econotag \
-                   telosb wsn430-v1_3b wsn430-v1_4 pttu
+                   telosb wsn430-v1_3b wsn430-v1_4 pttu arduino-due
 # chronos: not enough RAM
 # mbed_lpc1768: see https://github.com/RIOT-OS/RIOT/issues/675
 # msb-430: see https://github.com/RIOT-OS/RIOT/issues/658
