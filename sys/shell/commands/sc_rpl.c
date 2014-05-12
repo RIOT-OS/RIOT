@@ -47,7 +47,7 @@ void _rpl_route_handler(int argc, char **argv)
         }
     }
     puts("--------------------------------------------------------------------");
-    printf(" %d routing table entries\n", c);
+    printf(" %u routing table entries\n", c);
 
     puts("$");
 }

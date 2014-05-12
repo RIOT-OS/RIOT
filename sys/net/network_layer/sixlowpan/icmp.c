@@ -270,7 +270,7 @@ void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, 
 
 #ifdef DEBUG_ENABLED
     char addr_str[IPV6_MAX_ADDR_STR_LEN];
-    printf("INFO: send echo request (id = %04x, seq = %d, data_len = %d) to: %s\n",
+    printf("INFO: send echo request (id = %04x, seq = %d, data_len = %zu) to: %s\n",
            id, seq, data_len, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                    &ipv6_buf->destaddr));
 #endif
@@ -309,7 +309,7 @@ void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, ui
 
 #ifdef DEBUG_ENABLED
     char addr_str[IPV6_MAX_ADDR_STR_LEN];
-    printf("INFO: send echo reply (id = %04x, seq = %d, data_len = %d) to: %s\n",
+    printf("INFO: send echo reply (id = %04x, seq = %d, data_len = %zu) to: %s\n",
            id, seq, data_len, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                    &ipv6_buf->destaddr));
 #endif
@@ -386,7 +386,7 @@ void recv_echo_req(void)
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_buf->srcaddr));
     printf("\n");
-    printf("id = 0x%04x, seq = %d, data_len = %d\n", NTOHS(echo_buf->id),
+    printf("id = 0x%04x, seq = %d, data_len = %zu\n", NTOHS(echo_buf->id),
            NTOHS(echo_buf->seq), data_len);
 
     for (size_t i = 0; i < data_len; i++) {
@@ -415,7 +415,7 @@ void recv_echo_repl(void)
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_buf->srcaddr));
     printf("\n");
-    printf("id = 0x%04x, seq = %d, data_len = %d\n", NTOHS(echo_buf->id),
+    printf("id = 0x%04x, seq = %d, data_len = %zu\n", NTOHS(echo_buf->id),
            NTOHS(echo_buf->seq), data_len);
 
     for (size_t i = 0; i < data_len; i++) {

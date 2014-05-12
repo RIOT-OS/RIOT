@@ -27,7 +27,7 @@ void _id_handler(int argc, char **argv)
     }
     else {
         long newid = atoi(argv[1]);
-        printf("Setting new id %lu\n", newid);
+        printf("Setting new id %ld\n", newid);
         sysconfig.id = newid;
 
         if (!config_save()) {

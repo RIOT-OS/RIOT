@@ -73,7 +73,7 @@ extern uintptr_t __heap3_max;       ///< maximum for end of heap memory space
 /*-----------------------------------------------------------------------------------*/
 void __assert_func(const char *file, int line, const char *func, const char *failedexpr)
 {
-    printf("#!assertion %s failed\n\t%s() in %s:%u\n", failedexpr, func, file, line);
+    printf("#!assertion %s failed\n\t%s() in %s:%d\n", failedexpr, func, file, line);
     _exit(3);
 }
 /*-----------------------------------------------------------------------------------*/
