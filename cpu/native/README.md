@@ -1,25 +1,25 @@
-VALGRIND SUPPORT
+Valgrind Support
 ================
 
 Rebuild your application using the all-valgrind target like this:
 
     make -B clean all-valgrind
 
-That way native will tell valgrind about RIOTs stacks and prevent
-valgrind from reporting lots of false positives.
-The debug information flag "-g" is not strictly necessary, but passing
-it allows valgrind to tell you precisely which code triggered the error.
+That way native will tell Valgrind about RIOT's stacks and prevent
+Valgrind from reporting lots of false positives.
+The debug information flag `-g` is not strictly necessary, but passing
+it allows Valgrind to tell you precisely which code triggered the error.
 
 To run your application run:
 
-    make valgrind
+    make term-valgrind
 
-All this does is run your application under valgrind.
-Now valgrind will print some information whenever it detects an
+All this does is run your application under Valgrind.
+Now Valgrind will print some information whenever it detects an
 invalid memory access.
 
 In order to debug the program when this occurs you can pass the
---db-attach parameter to valgrind. E.g:
+--db-attach parameter to Valgrind. E.g:
 
     valgrind --db-attach=yes ./bin/native/default.elf tap0
 
@@ -33,19 +33,19 @@ As root call:
     echo 0 > /proc/sys/kernel/yama/ptrace_scope
 
 
-NETWORK SUPPORT
+Network Support
 ===============
 
-If you compile RIOT for the native cpu and include the native_net
+If you compile RIOT for the native cpu and include the `native_net`
 module, you need to specify a network interface like this:
 
-    ./bin/native/default.elf tap0
+    make term PORT=tap0
 
 
-SETTING UP A TAP NETWORK
+Setting Up A Tap Network
 ========================
 
-There is a shellscript in RIOT/cpu/native called tapsetup.sh which you
+There is a shellscript in RIOT/cpu/native called `tapsetup.sh` which you
 can use to create a network of tap interfaces.
 
 Usage:
@@ -58,20 +58,26 @@ To delete the bridge and all tap interfaces:
     ./tapsetup.sh delete
 
 
-OSX TAP NETWORKING
+OSX Tap Networking
 ==================
 
 For tun/tap networking in OSX you will need:
 http://tuntaposx.sourceforge.net/
 
-For OSX there is a seperate script called tapsetup-osx.sh.
+For OSX there is a separate script called `tapsetup-osx.sh`.
 Run it, (it instructs you to start the RIOT instances).
-In contrast to linux you will need to run 'tapsetup-osx.sh delete'
-after killing your instances and rerun 'tapsetup-osx.sh create' before
+In contrast to Linux you will need to run `tapsetup-osx.sh delete`
+after killing your instances and rerun `tapsetup-osx.sh create` before
 restarting.
 
 
-DAEMONIZATION
+FreeBSD Tap Networking
+======================
+
+For FreeBSD there is a separate script called `tapsetup-freebsd.sh`.
+
+
+Daemonization
 =============
 
 You can daemonize a riot process. This is useful for larger networks.
@@ -79,60 +85,83 @@ Valgrind will fork along with the riot process and dump its output in
 the terminal.
 
 Usage:
+
     ./bin/native/default.elf -d
 
-Use uart redirection if you want to use a shell or get stderr/stdout
+Use UART redirection if you want to use a shell or get stderr/stdout
 output with/from a daemonized process.
 
 
-UART REDIRECTION
+UART Redirection
 ================
 
-You can redirect the processes stdin/stdout/stderr by specifying
-options.
+You can redirect the processes' stdin/stdout/stderr by specifying
+one or more options from below.
 
-Usage:
+UNIX socket
+-----------
+
 To redirect stdio to a UNIX socket run:
+
     ./bin/native/default.elf -u -d
     RIOT pid: 18663
 
 Attach this UNIX socket:
+
     nc -U /tmp/riot.tty.18663
 
+TCP socket
+----------
 To redirect stdio to a TCP socket:
+
     ./bin/native/default.elf -t 4711 -d
     RIOT pid: 18663
 
 Attach this TCP socket:
+
     nc localhost 4711
 
 Stop the process:
+
     kill 18663
 
+File for stderr
+---------------
 To redirect stderr to a file:
+
     ./bin/native/default.elf -d -e
     RIOT pid: 18663
 
 Read from it:
+
     tail -f /tmp/riot.stderr.18663
 
+File for stdout
+---------------
 To redirect stdout to a file:
+
     ./bin/native/default.elf -d -o
     RIOT pid: 18663
 
 Read from it:
+
     tail -f /tmp/riot.stdout.18663
 
+
+Notes
+-----
 The stdout redirection only writes to file while no socket connection
 is established.
 
-Socket redirection is only available when the uart module has been
+Socket redirection is only available when the UART module has been
 compiled in.
 
-COMPILE TIME OPTIONS
+
+Compile Time Options
 ====================
 
 Compile with
+
     CFLAGS=-DNATIVE_AUTO_EXIT make
 
 to exit the riot core after the last thread has exited.
