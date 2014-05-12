@@ -87,7 +87,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 INPUT                  = ../../core ../../cpu ../../boards ../../sys src/ ../../drivers
 INPUT_ENCODING         = UTF-8
-FILE_PATTERNS          = *.txt *.c *.h
+FILE_PATTERNS          = *.txt *.h
 RECURSIVE              = YES
 EXCLUDE                =
 EXCLUDE_SYMLINKS       = NO
