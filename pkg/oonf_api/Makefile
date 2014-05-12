@@ -25,6 +25,7 @@ $(CURDIR)/$(PKG_NAME)/Makefile: $(CURDIR)/$(PKG_NAME)
 	$(foreach patch,$(shell ls [0-9][0-9][0-9][0-9]*.patch),cd "$<" && git am "../$(patch)" || { git am --abort; exit 1; };)
 
 $(CURDIR)/$(PKG_NAME):
+	test -d oonf_api || \
 	git clone $(PKG_URL) $@ && \
 		cd $@ && git reset --hard $(PKG_VERSION)
 
