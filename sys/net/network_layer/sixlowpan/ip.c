@@ -84,7 +84,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
                 nce->lladdr_len,
                 (uint8_t *)packet,
                 length) < 0) {
-            /* XXX: this is wrong, but until ND does not work correctly,
+            /* XXX: this is wrong, but until ND does work correctly,
              *      this is the only way (aka the old way)*/
             uint16_t raddr = NTOHS(packet->destaddr.uint16[7]);
             sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *)packet, length);
@@ -117,7 +117,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
         if (nce == NULL || sixlowpan_lowpan_sendto(nce->if_id, &nce->lladdr,
                 nce->lladdr_len,
                 (uint8_t *)packet, length) < 0) {
-            /* XXX: this is wrong, but until ND does not work correctly,
+            /* XXX: this is wrong, but until ND does work correctly,
              *      this is the only way (aka the old way)*/
             uint16_t raddr = dest->uint16[7];
             sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *)packet, length);
@@ -439,7 +439,7 @@ void ipv6_process(void)
                                         (uint8_t *)ipv6_get_buf_send(),
                                         packet_length);
             } else {
-                /* XXX: this is wrong, but until ND does not work correctly,
+                /* XXX: this is wrong, but until ND does work correctly,
                  *      this is the only way (aka the old way)*/
                 uint16_t raddr = dest->uint16[7];
                 sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *)ipv6_get_buf_send(), packet_length);
