@@ -58,6 +58,7 @@ extern void* (*real_malloc)(size_t size);
 extern void (*real_free)(void *ptr);
 extern void* (*real_calloc)(size_t nmemb, size_t size);
 extern void* (*real_realloc)(void *ptr, size_t size);
+extern int (*real_getpid)(void);
 
 /**
  * data structures

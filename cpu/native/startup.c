@@ -38,6 +38,7 @@
 #include "tap.h"
 
 int (*real_printf)(const char *format, ...);
+int (*real_getpid)(void);
 int _native_null_in_pipe[2];
 int _native_null_out_file;
 const char *_progname;
@@ -191,10 +192,11 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     *(void **)(&real_realloc) = dlsym(RTLD_NEXT, "realloc");
     *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");
     *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
+    *(void **)(&real_getpid) = dlsym(RTLD_NEXT, "getpid");
 
     _native_argv = argv;
     _progname = argv[0];
-    _native_pid = getpid();
+    _native_pid = real_getpid();
 
     int argp = 1;
     char *stderrtype = "stdio";

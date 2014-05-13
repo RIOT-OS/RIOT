@@ -314,6 +314,12 @@ void errx(int eval, const char *fmt, ...)
     verrx(eval, fmt, argp);
 }
 
+int getpid()
+{
+    warnx("not implemented");
+    return -1;
+}
+
 #ifdef MODULE_VTIMER
 int _gettimeofday(struct timeval *tp, void *restrict tzp) {
     (void) tzp;
