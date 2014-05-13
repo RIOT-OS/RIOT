@@ -31,10 +31,11 @@ int main(void)
 {
     puts("This is just a functionality test for hwtimer_spin.");
 
-    while (1) {
+    for (unsigned long r = 10000; r > 0; r--) {
         for (unsigned long i = 6; i > 0; i--) {
-            printf("wait %lu\n", i);
             hwtimer_wait(i);
         }
     }
+    puts("success");
+    return 0;
 }

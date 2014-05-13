@@ -32,10 +32,11 @@ int main(void)
     puts("This is a regression test for a race condition in hwtimer_wait.");
     puts("When the race condition is hit, the timer will wait for a very very long time...");
 
-    while (1) {
+    for (unsigned long r = 10000; r > 0; r--) {
         for (unsigned long i = 256; i; i = i >> 1) {
-            printf("wait %lu\n", i);
             hwtimer_wait(i);
         }
     }
+    puts("success");
+    return 0;
 }
