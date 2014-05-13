@@ -25,6 +25,7 @@
 #include "nativenet.h"
 #include "nativenet_internal.h"
 #endif
+#include "native_internal.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -36,12 +37,10 @@ void config_load(void)
 {
     DEBUG("config_load()\n");
 
-    int pid = getpid();
-
-    sysconfig.id = pid;
+    sysconfig.id = _native_pid;
 
 #ifdef MODULE_NATIVENET
-    _native_net_addr = pid;
+    _native_net_addr = _native_pid;
 #endif
 
     return;
