@@ -9,21 +9,22 @@
 /**
  * @addtogroup  posix
  * @{
- */
-
-/**
- * @file    unistd.h
- * @brief   standard symbolic constants and types
+ *
+ * @file        side_unistd.h
+ * @brief       Auxilary header to extend <unistd.h>
+ *
  * @see     <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/unistd.h.html">
  *              The Open Group Base Specifications Issue 7, <unistd.h>
  *          </a>
  *
- * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef _UNISTD_H
-#define _UNISTD_H
+
+#ifndef __SIDE_UNISTD_H_
+#define __SIDE_UNISTD_H_
 
 #include <stdint.h>
+#include <unistd.h>
 
 #include "timex.h"
 #include "vtimer.h"
@@ -49,7 +50,9 @@
  * @return  Upon successful completion, 0 shall be returned; otherwise, -1
  *          shall be returned and errno set to indicate the error.
  */
+#ifndef BOARD_NATIVE
 int close(int fildes);
+#endif
 
 #ifndef __USECONDS_T_TYPE
 typedef unsigned long __USECONDS_T_TYPE;
@@ -94,7 +97,5 @@ int usleep(useconds_t useconds);
  */
 unsigned int sleep(unsigned int seconds);
 
-/**
- * @}
- */
-#endif /* _UNISTD_H */
+#endif /* __SIDE_SIGNAL_H_ */
+/** @} */
