@@ -2,8 +2,9 @@
  * nvm.c - non-volatile memory implementations
  * Copyright (C) 2013 Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *
- * This source code is licensed under the GNU General Public License,
- * Version 3.  See the file LICENSE for more details.
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
  *
  * This file is part of RIOT.
  */
