@@ -1,5 +1,5 @@
 # name of your application
-PROJECT = test_pthread_barrier
+APPLICATION = test_pthread_barrier
 include ../Makefile.tests_common
 
 ## Modules to include.

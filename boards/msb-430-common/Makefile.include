@@ -14,7 +14,7 @@ export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export LINKFLAGS = -mmcu=$(MCU) -lgcc
 TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
-export HEXFILE = $(BINDIR)$(PROJECT).hex
+export HEXFILE = $(BINDIR)$(APPLICATION).hex
 
 export FLASHER ?= mspdebug
 export PORT ?= /dev/ttyUSB0

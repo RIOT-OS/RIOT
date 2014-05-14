@@ -1,4 +1,4 @@
-export PROJECT = test_sha256
+export APPLICATION = test_sha256
 include ../Makefile.tests_common
 
 USEMODULE += crypto

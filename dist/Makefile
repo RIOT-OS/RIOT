@@ -7,7 +7,7 @@
 ####
 
 # Set the name of your application:
-export PROJECT = foobar
+export APPLICATION = foobar
 
 # If no BOARD is found in the environment, use this default:
 export BOARD ?= native

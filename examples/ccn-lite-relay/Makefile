@@ -1,5 +1,5 @@
 # name of your application
-export PROJECT = ccn-lite-relay
+export APPLICATION = ccn-lite-relay
 
 # If no BOARD is found in the environment, use this default:
 export BOARD ?= native

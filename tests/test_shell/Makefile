@@ -1,4 +1,4 @@
-export PROJECT = test_shell
+export APPLICATION = test_shell
 include ../Makefile.tests_common
 
 USEMODULE += shell

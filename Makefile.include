@@ -59,37 +59,37 @@ include $(RIOTBASE)/Makefile.cflags
 
 # your binaries to link
 BASELIBS += $(BINDIR)$(BOARD)_base.a
-BASELIBS += $(BINDIR)${PROJECT}.a
+BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
 .PHONY: all clean flash doc term objsize buildsize buildsizes buildsizes-diff
 
 ## make script for your application. Build RIOT-base here!
-all: $(BINDIR)$(PROJECT).a
-	@echo "Building application $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
+all: $(BINDIR)$(APPLICATION).a
+	@echo "Building application $(APPLICATION) for $(BOARD) w/ MCU $(MCU)."
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
 	"$(MAKE)" -C $(RIOTBASE)
 ifeq ($(BUILDOSXNATIVE),1)
-	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
+	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(APPLICATION).elf $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
-	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(PROJECT).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS)
+	$(AD)$(LINK) $(UNDEF) -o $(BINDIR)$(APPLICATION).elf -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(APPLICATION).map $(LINKFLAGS)
 endif
-	$(AD)$(SIZE) $(BINDIR)$(PROJECT).elf
-	$(AD)$(OBJCOPY) $(OFLAGS) $(BINDIR)$(PROJECT).elf $(BINDIR)$(PROJECT).hex
+	$(AD)$(SIZE) $(BINDIR)$(APPLICATION).elf
+	$(AD)$(OBJCOPY) $(OFLAGS) $(BINDIR)$(APPLICATION).elf $(BINDIR)$(APPLICATION).hex
 
 ## your make rules
 ## Only basic example - modify it for larger applications!!
-#$(BINDIR)/$(PROJECT).a: $(BINDIR)/$(PROJECT).o
-#	$(AR) -rc $(BINDIR)/project.a $(BINDIR)/$(PROJECT).o
+#$(BINDIR)/$(APPLICATION).a: $(BINDIR)/$(APPLICATION).o
+#	$(AR) -rc $(BINDIR)/project.a $(BINDIR)/$(APPLICATION).o
 
 # string array of all names of c files in dir
 SRC = $(wildcard *.c)
 
 # string array of all names replaced .c with .o
-OBJ = $(SRC:%.c=${BINDIR}${PROJECT}/%.o)
+OBJ = $(SRC:%.c=${BINDIR}${APPLICATION}/%.o)
 
-$(BINDIR)$(PROJECT).a: $(OBJ)
-	$(AD)$(AR) -rc $(BINDIR)$(PROJECT).a $(OBJ)
+$(BINDIR)$(APPLICATION).a: $(OBJ)
+	$(AD)$(AR) -rc $(BINDIR)$(APPLICATION).a $(OBJ)
 
 # add extra include paths for packages in $(USEMODULE)
 export USEMODULE_INCLUDES =
@@ -112,11 +112,11 @@ $(RIOTBASE)/pkg/%/Makefile.include::
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
 
-$(BINDIR)$(PROJECT)/%.o: %.c $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
+$(BINDIR)$(APPLICATION)/%.o: %.c $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
 	@mkdir -p ${BINDIR}
 	@echo; echo "Compiling.... $*.c"; echo
-	@test -d $(BINDIR)$(PROJECT) || mkdir -p $(BINDIR)$(PROJECT)
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$(PROJECT)/$*.o
+	@test -d $(BINDIR)$(APPLICATION) || mkdir -p $(BINDIR)$(APPLICATION)
+	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$(APPLICATION)/$*.o
 
 $(USEPKG:%=${BINDIR}%.a)::
 	@mkdir -p ${BINDIR}
