@@ -10,28 +10,28 @@ an incrementing number back to the main thread.
 
 The correct output should look like this:
 ```
-kernel_init(): This is RIOT! (Version: xxx)
+This is RIOT! (Version: xxx)
 kernel_init(): jumping into first task...
-Hello world!
-second_thread starting.
-2nd: got msg from 1
-Got msg with content 2
-2nd: got msg from 1
-Got msg with content 3
-2nd: got msg from 1
-Got msg with content 4
-2nd: got msg from 1
-Got msg with content 5
-2nd: got msg from 1
-Got msg with content 6
-2nd: got msg from 1
-Got msg with content 7
-2nd: got msg from 1
-Got msg with content 8
-2nd: got msg from 1
-Got msg with content 9
-2nd: got msg from 1
-Got msg with content 10
-2nd: got msg from 1
+Starting IPC Ping-pong example...
+1st thread started, pid: 1
+2nd thread started, pid: 2
+2nd: Got msg from 1
+1st: Got msg with content 2
+2nd: Got msg from 1
+1st: Got msg with content 3
+2nd: Got msg from 1
+1st: Got msg with content 4
+2nd: Got msg from 1
+1st: Got msg with content 5
+2nd: Got msg from 1
+1st: Got msg with content 6
+2nd: Got msg from 1
+1st: Got msg with content 7
+2nd: Got msg from 1
+1st: Got msg with content 8
+2nd: Got msg from 1
+1st: Got msg with content 9
+2nd: Got msg from 1
+1st: Got msg with content 10
 [...]
 ```
