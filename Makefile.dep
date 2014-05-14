@@ -76,3 +76,7 @@ endif
 ifneq (,$(filter shell_commands,$(USEMODULE)))
 	USEMODULE += net_help
 endif
+
+ifneq (,$(filter ccn_lite,$(USEMODULE)))
+	USEMODULE += crypto
+endif

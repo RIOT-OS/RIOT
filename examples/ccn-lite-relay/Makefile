@@ -45,7 +45,6 @@ USEMODULE += posix
 
 USEMODULE += defaulttransceiver
 USEMODULE += rtc
-USEMODULE += crypto_sha256
 USEMODULE += ccn_lite
 
 include $(RIOTBASE)/Makefile.include
