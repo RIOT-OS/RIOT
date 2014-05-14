@@ -18,7 +18,13 @@
  */
 #ifndef __TESTS_CORE_H_
 #define __TESTS_CORE_H_
-#include "embUnit/embUnit.h"
+
+#include "../unittests.h"
+
+/**
+ * @brief   The entry point of this test suite.
+ */
+void tests_core(void);
 
 /**
  * @brief   Generates tests atomic.h
