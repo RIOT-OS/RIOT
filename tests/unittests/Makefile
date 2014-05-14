@@ -16,6 +16,21 @@ else ifeq ($(OUTPUT),COMPILER)
 	USEMODULE += embunit_textui
 endif
 
-.PHONY : all clean core
+ifeq (, $(filter tests-%, $(MAKECMDGOALS)))
+    UNIT_TESTS := $(shell find -mindepth 1 -maxdepth 1 -type d -name 'tests-*' -printf '%f ')
+else
+    UNIT_TESTS := $(filter tests-%, $(MAKECMDGOALS))
+endif
 
 include $(RIOTBASE)/Makefile.include
+
+UNITTEST_LIBS := $(UNIT_TESTS:%=$(BINDIR)%.a)
+
+all: $(UNITTEST_LIBS)
+$(UNIT_TESTS): all
+
+$(UNITTEST_LIBS): $(BINDIR)%.a:
+	"$(MAKE)" -C $(CURDIR)/$*
+
+CFLAGS += $(shell echo $(UNIT_TESTS:tests-%=-DTEST_%_ENABLED) | tr a-z A-Z)
+BASELIBS += $(UNITTEST_LIBS)
