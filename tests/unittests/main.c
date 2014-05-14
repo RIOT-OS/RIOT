@@ -7,8 +7,17 @@
  */
 
 #include "unittests.h"
+#include "map.h"
 
 #include "lpm.h"
+
+#define UNCURRY(FUN, ARGS) FUN(ARGS)
+#define RUN_TEST_SUITES(...) MAP(RUN_TEST_SUITE, __VA_ARGS__)
+#define RUN_TEST_SUITE(TEST_SUITE) \
+    do { \
+        extern void tests_##TEST_SUITE(void); \
+        tests_##TEST_SUITE(); \
+    } while (0);
 
 int main(void)
 {
@@ -17,13 +26,9 @@ int main(void)
 #endif
 
     TESTS_START();
-
-    /* put test TEST_RUN() calls here: */
-    /*     #ifdef TEST_xxx_ENABLED
-     *         tests_xxx();
-     *     #endif
-     */
-
+#ifndef NO_TEST_SUITES
+    UNCURRY(RUN_TEST_SUITES, TEST_SUITES)
+#endif
     TESTS_END();
 
 #if defined (BOARD_NATIVE) && !defined (OUTPUT)

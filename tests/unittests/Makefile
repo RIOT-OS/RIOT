@@ -32,5 +32,15 @@ $(UNIT_TESTS): all
 $(UNITTEST_LIBS): $(BINDIR)%.a:
 	"$(MAKE)" -C $(CURDIR)/$*
 
-CFLAGS += $(shell echo $(UNIT_TESTS:tests-%=-DTEST_%_ENABLED) | tr a-z A-Z)
+charEMPTY :=
+charSPACE := $(charEMPTY) $(charEMPTY)
+charCOMMA := ,
+
+ifeq (, $(UNIT_TESTS))
+    CFLAGS += -DNO_TEST_SUITES
+    $(warning There was no test suite specified!)
+else
+    CFLAGS += -DTEST_SUITES='$(subst $(charSPACE),$(charCOMMA),$(UNIT_TESTS:tests-%=%))'
+endif
+
 BASELIBS += $(UNITTEST_LIBS)
