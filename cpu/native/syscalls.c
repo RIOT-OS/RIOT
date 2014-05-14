@@ -314,7 +314,7 @@ void errx(int eval, const char *fmt, ...)
     verrx(eval, fmt, argp);
 }
 
-int getpid()
+int getpid(void)
 {
     warnx("not implemented");
     return -1;
