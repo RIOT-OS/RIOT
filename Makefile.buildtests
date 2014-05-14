@@ -31,6 +31,47 @@ endif
         info-buildsizes-diff info-build info-boards-supported \
         info-features-missing info-boards-features-missing
 
+# Make buildtests more pedantic by supplying "-Wall -Wexta -Werror" by default.
+# This can be disabled through "make W_ALL=0 W_EXTRA=0 W_ERROR=0", resp.,
+# or with "make W_NONE=1", which disables every extra flag.
+# With "make PEDANTIC=1 PEDANTIC_ERRORS=1" you can make the buildtest even more pedantic.
+
+ifeq (, $(filter buildtest, $(MAKECMDGOALS)))
+    W_NONE ?= 1
+else
+    W_NONE ?= 0
+endif
+
+ifeq (1, $(W_NONE))
+    W_ALL ?= 0
+    W_EXTRA ?= 0
+    W_ERROR ?= 0
+else
+    W_ALL ?= 1
+    W_EXTRA ?= 1
+    W_ERROR ?= 1
+endif
+PEDANTIC ?= 0
+PEDANTIC_ERRORS ?= 0
+
+ifneq (0, $(W_ALL))
+    W_FLAGS += -Wall
+endif
+ifneq (0, $(W_EXTRA))
+    W_FLAGS += -Wextra
+endif
+ifneq (0, $(W_ERROR))
+    W_FLAGS += -Werror
+endif
+ifneq (0, $(PEDANTIC))
+    W_FLAGS += -pedantic
+endif
+ifneq (0, $(PEDANTIC_ERRORS))
+    W_FLAGS += -pedantic-errors
+endif
+
+all: CFLAGS+=${W_FLAGS}
+
 ifeq ($(BUILD_IN_DOCKER),1)
 buildtest: ..in-docker-container
 else
@@ -54,6 +95,7 @@ buildtest:
 					BINDIRBASE=$${BINDIRBASE} \
 					RIOTNOLINK=$${RIOTNOLINK} \
 					RIOT_VERSION=$${RIOT_VERSION} \
+					W_FLAGS="${W_FLAGS}" \
 					$(MAKE) -j$(NPROC) 2>&1 >/dev/null) ; \
 			if [ "$${?}" = "0" ]; then \
 				${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
