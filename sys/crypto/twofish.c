@@ -520,17 +520,11 @@ int twofish_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
 static int twofish_set_key(twofish_context_t *ctx, uint8_t *key, uint8_t keylen)
 {
     int i, j, k;
-
-    /* Temporaries for CALC_K. */
-    uint32_t x, y;
-
+    
     /* The S vector used to key the S-boxes, split up into individual bytes.
      * 128-bit keys use only sa through sh; 256-bit use all of them. */
     uint8_t sa = 0, sb = 0, sc = 0, sd = 0, se = 0, sf = 0, sg = 0, sh = 0;
     uint8_t si = 0, sj = 0, sk = 0, sl = 0, sm = 0, sn = 0, so = 0, sp = 0;
-
-    /* Temporary for CALC_S. */
-    uint8_t tmp;
 
     /* Check key length. */
     if (((keylen - 16) | 16) != 16) {
@@ -671,9 +665,6 @@ int twofish_encrypt(cipher_context_t *context, uint8_t *in, uint8_t *out)
     /* The four 32-bit chunks of the text. */
     uint32_t a, b, c, d;
 
-    /* Temporaries used by the round function. */
-    uint32_t x, y;
-
     /* Input whitening and packing. */
     INPACK(0, a, 0);
     INPACK(1, b, 1);
@@ -723,9 +714,6 @@ int twofish_decrypt(cipher_context_t *context, uint8_t *in, uint8_t *out)
 
     /* The four 32-bit chunks of the text. */
     uint32_t a, b, c, d;
-
-    /* Temporaries used by the round function. */
-    uint32_t x, y;
 
     /* Input whitening and packing. */
     INPACK(0, c, 4);
