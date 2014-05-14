@@ -1,0 +1,31 @@
+# Test if the input language was specified externally.
+# Otherwise test if the compiler unterstands the "-std=gnu99" flag, and use it if so.
+# Otherwise test if the compiler unterstands the "-std=c99" flag, and use it if so.
+ifeq ($(filter -std=%,$(CFLAGS)),)
+ifeq ($(shell $(CC) -std=gnu99 -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+CFLAGS += -std=gnu99
+else
+ifeq ($(shell $(CC) -std=c99 -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+CFLAGS += -std=c99
+endif
+endif
+endif
+
+# Add `-fno-delete-null-pointer-checks` flag iff the compiler supports it.
+# GCC removes moves tests whether `x == NULL`, if previously `x` or even `x->y` was accessed.
+# 0x0 might be a sane memory location for embedded systems, so the test must not be removed.
+# Right now clang does not use the *delete-null-pointer* optimization, and does not understand the parameter.
+# Related issues: #628, #664.
+ifeq ($(shell $(CC) -fno-delete-null-pointer-checks -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+ifeq ($(shell LANG=C $(CC) -fno-delete-null-pointer-checks -E - 2>&1 1>/dev/null </dev/null | grep warning: | grep -- -fno-delete-null-pointer-checks),)
+CFLAGS += -fno-delete-null-pointer-checks
+endif
+endif
+
+# Fast-out on old style function definitions.
+# They cause unreadable error compiler errors on missing semicolons.
+# Worse yet they hide errors by accepting wildcard argument types.
+ifeq ($(shell $(CC) -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+# duplicated parameters don't hurt
+CFLAGS += -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition
+endif

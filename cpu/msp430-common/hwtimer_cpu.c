@@ -77,7 +77,7 @@ void timer_unset(short timer)
     *ptr = 0;
 }
 
-unsigned long hwtimer_arch_now()
+unsigned long hwtimer_arch_now(void)
 {
     return ((uint32_t)timer_round << 16) + TIMER_VAL_REG;
 }

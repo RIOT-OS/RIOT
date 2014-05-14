@@ -22,7 +22,7 @@
 #include "irq.h"
 #include "cpu.h"
 
-unsigned int disableIRQ()
+unsigned int disableIRQ(void)
 {
     unsigned int state;
     __asm__("mov.w r2,%0" : "=r"(state));
@@ -35,7 +35,7 @@ unsigned int disableIRQ()
     return state;
 }
 
-unsigned int enableIRQ()
+unsigned int enableIRQ(void)
 {
     unsigned int state;
     __asm__("mov.w r2,%0" : "=r"(state));

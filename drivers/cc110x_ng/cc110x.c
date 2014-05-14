@@ -121,7 +121,7 @@ uint8_t cc110x_get_buffer_pos(void)
     return (rx_buffer_next - 1);
 }
 
-radio_address_t cc110x_get_address()
+radio_address_t cc110x_get_address(void)
 {
     return radio_address;
 }

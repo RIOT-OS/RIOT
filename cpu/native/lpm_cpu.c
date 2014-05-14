@@ -43,7 +43,7 @@ void lpm_init(void)
     return;
 }
 
-void _native_lpm_sleep()
+void _native_lpm_sleep(void)
 {
 #ifdef MODULE_UART0
     int nfds;

@@ -287,7 +287,7 @@ void vtimer_get_localtime(struct tm *localt)
     // TODO: fill the other fields
 }
 
-int vtimer_init()
+int vtimer_init(void)
 {
     DEBUG("vtimer_init().\n");
     int state = disableIRQ();

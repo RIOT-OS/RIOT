@@ -105,7 +105,7 @@ void print_sigmasks(void)
     }
 }
 
-void native_print_signals()
+void native_print_signals(void)
 {
     sigset_t p, q;
     puts("native signals:\n");
@@ -253,7 +253,7 @@ int _native_popsig(void)
  * call signal handlers,
  * restore user context
  */
-void native_irq_handler()
+void native_irq_handler(void)
 {
     int sig;
 

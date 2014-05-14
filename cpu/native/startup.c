@@ -136,7 +136,7 @@ void _native_log_stderr(char *stderrtype)
     }
 }
 
-void daemonize()
+void daemonize(void)
 {
     if ((_native_pid = fork()) == -1) {
         err(EXIT_FAILURE, "daemonize: fork");
@@ -148,7 +148,7 @@ void daemonize()
     }
 }
 
-void usage_exit()
+void usage_exit(void)
 {
     real_printf("usage: %s", _progname);
 

@@ -233,7 +233,7 @@ void msp430_init_dco(void)
 #endif
 }
 
-void board_init()
+void board_init(void)
 {
     msp430_cpu_init();
     msb_ports_init();

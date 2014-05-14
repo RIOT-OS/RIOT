@@ -179,7 +179,7 @@ void schedule_timer(void)
  *
  * set new system timer, call timer interrupt handler
  */
-void hwtimer_isr_timer()
+void hwtimer_isr_timer(void)
 {
     DEBUG("hwtimer_isr_timer()\n");
 
@@ -297,7 +297,7 @@ unsigned long hwtimer_arch_now(void)
  * Called once on process creation in order to mimic the behaviour a
  * regular hardware timer.
  */
-void native_hwtimer_pre_init()
+void native_hwtimer_pre_init(void)
 {
     /* initialize time delta */
     time_null = 0;

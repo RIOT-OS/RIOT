@@ -138,7 +138,7 @@ int init_tcp_socket(char *tcpport)
     return s;
 }
 
-int init_unix_socket()
+int init_unix_socket(void)
 {
     int s;
     struct sockaddr_un sa;
@@ -161,7 +161,7 @@ int init_unix_socket()
     return s;
 }
 
-void handle_uart_in()
+void handle_uart_in(void)
 {
     char buf[42];
     int nread;
@@ -198,7 +198,7 @@ void handle_uart_in()
     thread_yield();
 }
 
-void handle_uart_sock()
+void handle_uart_sock(void)
 {
     int s;
     socklen_t t;
@@ -226,7 +226,7 @@ void handle_uart_sock()
 }
 
 #ifdef MODULE_UART0
-void _native_handle_uart0_input()
+void _native_handle_uart0_input(void)
 {
     if (FD_ISSET(STDIN_FILENO, &_native_rfds)) {
         handle_uart_in();

@@ -1542,7 +1542,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
     packet_length = IPV6_HDR_LEN + ipv6_buf->length;
 }
 
-uint8_t lowpan_context_len()
+uint8_t lowpan_context_len(void)
 {
     return context_len;
 }
@@ -1596,7 +1596,7 @@ lowpan_context_t *lowpan_context_update(uint8_t num, const ipv6_addr_t *prefix,
     return context;
 }
 
-lowpan_context_t *lowpan_context_get()
+lowpan_context_t *lowpan_context_get(void)
 {
     return contexts;
 }

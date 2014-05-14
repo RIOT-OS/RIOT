@@ -41,13 +41,13 @@
  */
 void native_cpu_init(void);
 void native_interrupt_init(void);
-extern void native_hwtimer_pre_init();
+extern void native_hwtimer_pre_init(void);
 
-void native_irq_handler();
+void native_irq_handler(void);
 extern void _native_sig_leave_tramp(void);
 
-void _native_syscall_leave();
-void _native_syscall_enter();
+void _native_syscall_leave(void);
+void _native_syscall_enter(void);
 
 /**
  * external functions regularly wrapped in native for direct use

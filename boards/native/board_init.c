@@ -21,7 +21,7 @@
  * Nothing to initialize at the moment.
  * Turns the red LED on and the green LED off.
  */
-void board_init()
+void board_init(void)
 {
     LED_GREEN_OFF;
     LED_RED_ON;

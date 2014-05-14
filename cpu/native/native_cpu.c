@@ -147,7 +147,7 @@ void isr_cpu_switch_context_exit(void)
     errx(EXIT_FAILURE, "2 this should have never been reached!!");
 }
 
-void cpu_switch_context_exit()
+void cpu_switch_context_exit(void)
 {
 #ifdef NATIVE_AUTO_EXIT
     if (num_tasks <= 1) {
@@ -174,7 +174,7 @@ void cpu_switch_context_exit()
     errx(EXIT_FAILURE, "3 this should have never been reached!!");
 }
 
-void isr_thread_yield()
+void isr_thread_yield(void)
 {
     DEBUG("isr_thread_yield()\n");
 
@@ -189,7 +189,7 @@ void isr_thread_yield()
     }
 }
 
-void thread_yield()
+void thread_yield(void)
 {
     ucontext_t *ctx = (ucontext_t *)(active_thread->sp);
     if (_native_in_isr == 0) {
@@ -209,7 +209,7 @@ void thread_yield()
     }
 }
 
-void native_cpu_init()
+void native_cpu_init(void)
 {
     if (getcontext(&end_context) == -1) {
         err(EXIT_FAILURE, "end_context(): getcontext()");
