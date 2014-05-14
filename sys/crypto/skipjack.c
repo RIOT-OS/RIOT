@@ -345,7 +345,7 @@ int skipjack_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
 }
 
 
-uint8_t skipjack_get_preferred_block_size()
+uint8_t skipjack_get_preferred_block_size(void)
 {
     return BLOCK_SIZE;
 }

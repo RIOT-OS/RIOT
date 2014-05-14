@@ -1457,7 +1457,7 @@ int aes_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
     return 1;
 }
 
-uint8_t aes_get_preferred_block_size()
+uint8_t aes_get_preferred_block_size(void)
 {
     return AES_BLOCK_SIZE;
 }

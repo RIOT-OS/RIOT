@@ -350,7 +350,7 @@ int tripledes_decrypt(cipher_context_t *context, uint8_t *crypt, uint8_t *plain)
     return 1;
 }
 
-uint8_t tripledes_get_preferred_block_size()
+uint8_t tripledes_get_preferred_block_size(void)
 {
     return THREEDES_BLOCK_SIZE;
 }
