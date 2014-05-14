@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -76,7 +84,7 @@ int readpacket(uint8_t *packet_buf, size_t size)
             if (esc) {
                 esc = 0;
 
-                switch(byte) {
+                switch (byte) {
                     case (END_ESC): {
                         *line_buf_ptr++ = END;
                         continue;
@@ -117,7 +125,7 @@ int writepacket(uint8_t *packet_buf, size_t size)
     }
 
     while ((byte_ptr - packet_buf) < size) {
-        switch(*byte_ptr) {
+        switch (*byte_ptr) {
             case (END): {
                 *byte_ptr = END_ESC;
                 *tmp_ptr = ESC;
@@ -150,7 +158,7 @@ int writepacket(uint8_t *packet_buf, size_t size)
 
 void demultiplex(const border_packet_t *packet, int len)
 {
-    switch(packet->type) {
+    switch (packet->type) {
         case (BORDER_PACKET_RAW_TYPE): {
             printf("\033[00;33m[via serial interface] %s\033[00m\n",
                    ((unsigned char *)packet) + sizeof(border_packet_t)
@@ -161,7 +169,7 @@ void demultiplex(const border_packet_t *packet, int len)
         case (BORDER_PACKET_L3_TYPE): {
             border_l3_header_t *l3_header_buf = (border_l3_header_t *)packet;
 
-            switch(l3_header_buf->ethertype) {
+            switch (l3_header_buf->ethertype) {
                 case (ETHERTYPE_IPV6): {
                     printf("INFO: IPv6-Packet %d received\n", l3_header_buf->seq_num);
                     struct ip6_hdr *ip6_buf = (struct ip6_hdr *)(((unsigned char *)packet) + sizeof(border_l3_header_t));
@@ -180,7 +188,7 @@ void demultiplex(const border_packet_t *packet, int len)
         case (BORDER_PACKET_CONF_TYPE): {
             border_conf_header_t *conf_header_buf = (border_conf_header_t *)packet;
 
-            switch(conf_header_buf->conftype) {
+            switch (conf_header_buf->conftype) {
                 case (BORDER_CONF_SYNACK): {
                     printf("INFO: SYNACK-Packet %d received\n", conf_header_buf->seq_num);
                     signal_connection_established();

@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdint.h>
@@ -142,8 +150,8 @@ void flowcontrol_deliver_from_tty(const border_packet_t *packet, int len)
         slot = &slwin_stat.recv_win[packet->seq_num % BORDER_RWS];
 
         if (!in_window(packet->seq_num,
-                      slwin_stat.next_exp,
-                      slwin_stat.next_exp + BORDER_RWS - 1)) {
+                       slwin_stat.next_exp,
+                       slwin_stat.next_exp + BORDER_RWS - 1)) {
             return;
         }
 
