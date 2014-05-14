@@ -1,5 +1,5 @@
 # name of your application
-export PROJECT = rpl_udp
+export APPLICATION = rpl_udp
 
 # If no BOARD is found in the environment, use this default:
 export BOARD ?= native

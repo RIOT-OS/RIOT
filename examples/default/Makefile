@@ -1,5 +1,5 @@
 # name of your application
-export PROJECT = default
+export APPLICATION = default
 
 # If no BOARD is found in the environment, use this default:
 export BOARD ?= native

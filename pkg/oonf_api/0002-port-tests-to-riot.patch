@@ -38,7 +38,7 @@ index 0000000..c286ad3
 +####
 +
 +# name of your project
-+export PROJECT = %TESTNAME%
++export APPLICATION = %TESTNAME%
 +
 +# for easy switching of boards
 +ifeq ($(strip $(BOARD)),)
@@ -59,12 +59,12 @@ index 0000000..c286ad3
 +
 +USEMODULE += net_help
 +USEMODULE += oonf_cunit
-+ifneq (,$(findstring regex,$(PROJECT)))
++ifneq (,$(findstring regex,$(APPLICATION)))
 +	USEMODULE += oonf_regex
 +endif
 +USEMODULE += oonf_common
 +
-+ifneq (,$(findstring daemonize,$(PROJECT)))
++ifneq (,$(findstring daemonize,$(APPLICATION)))
 +	error daemonize is not supported on RIOT
 +endif
 +
@@ -142,7 +142,7 @@ index 0000000..8a0452d
 +####
 +
 +# name of your project
-+export PROJECT = %TESTNAME%
++export APPLICATION = %TESTNAME%
 +
 +# for easy switching of boards
 +ifeq ($(strip $(BOARD)),)

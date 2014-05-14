@@ -1,4 +1,4 @@
-export PROJECT = test_condition_variable
+export APPLICATION = test_condition_variable
 include ../Makefile.tests_common
 
 USEMODULE += posix

@@ -1,4 +1,4 @@
-export PROJECT = test_posix_semaphore
+export APPLICATION = test_posix_semaphore
 include ../Makefile.tests_common
 
 BOARD_BLACKLIST := mbed_lpc1768 redbee-econotag chronos

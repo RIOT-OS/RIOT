@@ -1,5 +1,5 @@
 # name of your application
-export PROJECT = ccn-lite-client
+export APPLICATION = ccn-lite-client
 
 # If no BOARD is found in the environment, use this default:
 export BOARD ?= native

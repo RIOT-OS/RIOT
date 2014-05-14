@@ -1,4 +1,4 @@
-export PROJECT = test_disable_module
+export APPLICATION = test_disable_module
 include ../Makefile.tests_common
 
 DISABLE_MODULE += auto_init

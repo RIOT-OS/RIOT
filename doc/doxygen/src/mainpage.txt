@@ -70,12 +70,12 @@
  * RIOT uses GNU make as build system. The simplest way to compile and link a
  * application (application or library) with RIOT, is to set up a Makefile providing
  * at least the following variables:
- *  * PROJECT
+ *  * APPLICATION
  *  * BOARD
  *  * RIOTBASE
  *
  * and an instruction to include the `Makefile.include`, located in RIOT's root
- * directory. `PROJECT` should contain the (unique) name of your application, `BOARD`
+ * directory. `APPLICATION` should contain the (unique) name of your application, `BOARD`
  * specifies the platform the application should be built for by default, and
  * `RIOTBASE` specifies the path to your copy of the RIOT repository (note, that
  * you may want to use `$(CURDIR)` here, to give a relative path). You can use Make's

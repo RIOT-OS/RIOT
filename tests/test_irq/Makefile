@@ -1,4 +1,4 @@
-PROJECT = test_irq
+APPLICATION = test_irq
 include ../Makefile.tests_common
 
 USEMODULE += auto_init
