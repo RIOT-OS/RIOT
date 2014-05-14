@@ -4,9 +4,10 @@ IPC Pingpong!
 This example is to illustrate the usage of RIOTs IPC messaging system.
 
 The application starts a second thread (in addition to the main thread) and sends messages between
-these two threads. The main thread call `thread_send_receive()` in an endless loop. The second
+these two threads. The main thread calls `thread_send_receive()` in an endless loop. The second
 thread receives the message, prints `2nd: got msg from x` to stdout and sends a reply message with
-an incrementing number back to the main thread.
+an incrementing number back to the main thread. The main thread then prints the number it received
+from the 2nd thread.
 
 The correct output should look like this:
 ```
