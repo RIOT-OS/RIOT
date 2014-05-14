@@ -753,7 +753,7 @@ int twofish_decrypt(cipher_context_t *context, uint8_t *in, uint8_t *out)
     return 1;
 }
 
-uint8_t twofish_get_preferred_block_size()
+uint8_t twofish_get_preferred_block_size(void)
 {
     return TWOFISH_BLOCK_SIZE;
 }

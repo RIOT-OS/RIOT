@@ -186,7 +186,7 @@ int rc5_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
  *         cipher operates with multiple block sizes, this will pick one
  *         particular size (deterministically).
  */
-uint8_t rc5_get_preferred_block_size()
+uint8_t rc5_get_preferred_block_size(void)
 {
     return BLOCK_SIZE;
 }
