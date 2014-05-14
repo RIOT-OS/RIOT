@@ -1,0 +1,150 @@
+ifneq (, $(filter buildtest, $(MAKECMDGOALS)))
+  ifeq (, $(strip $(NPROC)))
+    # Linux (utility program)
+    NPROC := $(shell nproc 2>/dev/null)
+
+    ifeq (, $(strip $(NPROC)))
+      # Linux (generic)
+      NPROC := $(shell grep -c ^processor /proc/cpuinfo 2>/dev/null)
+    endif
+    ifeq (, $(strip $(NPROC)))
+      # BSD (at least FreeBSD and Mac OSX)
+      NPROC := $(shell sysctl -n hw.ncpu 2>/dev/null)
+    endif
+    ifeq (, $(strip $(NPROC)))
+      # Fallback
+      NPROC := 1
+    endif
+
+    NPROC := $(shell echo $$(($(NPROC) + 1)))
+  endif
+endif
+
+buildtest:
+	@if [ -z "$${JENKINS_URL}" ] && tput colors 2>&1 > /dev/null; then \
+		GREEN='\033[1;32m'; RED='\033[1;31m'; RESET='\033[0m'; \
+		ECHO='/bin/echo -e'; \
+	else \
+		GREEN=''; RED=''; RESET=''; \
+		ECHO='/bin/echo'; \
+	fi; \
+	\
+	if [ -z "$(BOARD_WHITELIST)" ]; then \
+		BOARDS=$$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); \
+	else \
+		BOARDS="$(BOARD_WHITELIST)"; \
+	fi; \
+	\
+	for BOARD in $(BOARD_BLACKLIST); do \
+		echo "Ignoring $${BOARD} (blacklisted)"; \
+		BOARDS=$$(echo \ $${BOARDS}\  | sed -e 's/ '$${BOARD}' / /'); \
+	done; \
+	\
+	rm -rf "$$BINDIRBASE"; \
+	for BOARD in $${BOARDS}; do \
+		$${ECHO} -n "Building for $${BOARD} .. "; \
+		LOG=$$(env -i \
+			HOME=$${HOME} \
+			PATH=$${PATH} \
+			BOARD=$${BOARD} \
+			RIOTBASE=$${RIOTBASE} \
+			RIOTBOARD=$${RIOTBOARD} \
+			RIOTCPU=$${RIOTCPU} \
+			BINDIRBASE=$${BINDIRBASE} \
+			$(MAKE) -j$(NPROC) 2>&1 >/dev/null) ; \
+		if [ "$${?}" = "0" ]; then \
+			$${ECHO} "$${GREEN}success$${RESET}"; \
+		else \
+			$${ECHO} "$${RED}failed$${RESET}"; \
+			echo "$${LOG}" | grep -v -E '^make(\[[[:digit:]]])?:'; \
+			BUILDTESTFAILED=1; \
+		fi; \
+	done; \
+	if [ "$${BUILDTESTFAILED}" = "1" ]; then \
+		exit 1; \
+	fi
+
+objsize:
+	@case "${SORTROW}" in \
+		text) SORTROW=1 ;; \
+		data) SORTROW=2 ;; \
+		bss) SORTROW=3 ;; \
+		dec) SORTROW=4 ;; \
+		"") SORTROW=4 ;; \
+		*) echo "Usage: $(MAKE) objsize SORTROW=[text|data|bss|dec]" ; return ;; \
+	esac; \
+	echo '   text\t   data\t    bss\t    dec\t    hex\tfilename'; \
+	$(SIZE) -dB $(BASELIBS) | \
+		tail -n+2 | \
+		sed -e 's#$(BINDIR)##' | \
+		sort -rnk$${SORTROW}
+
+buildsize:
+	@$(SIZE) -dB $(BINDIR)$(PROJECT).elf
+
+buildsizes: SHELL=bash
+buildsizes:
+	@if [[ -z "$(BOARD_WHITELIST)" ]]; then \
+		BOARDS=$$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); \
+	else \
+		BOARDS="$(BOARD_WHITELIST)"; \
+	fi; \
+	for BOARD in $(BOARD_BLACKLIST); do \
+		BOARDS=$$(sed -e "s/ $${BOARD} / /" <<< " $${BOARDS} "); \
+	done; \
+	\
+	echo -e "   text\t   data\t    bss\t    dec\tboard"; \
+	for BOARD in $${BOARDS}; do \
+		echo "$$(env -i \
+			HOME=$${HOME} \
+			PATH=$${PATH} \
+			BOARD=$${BOARD} \
+			RIOTBASE=$${RIOTBASE} \
+			RIOTBOARD=$${RIOTBOARD} \
+			RIOTCPU=$${RIOTCPU} \
+			BINDIRBASE=$${BINDIRBASE} \
+			$(MAKE) buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${BOARD}"; \
+	done;
+
+buildsizes-diff: SHELL=bash
+buildsizes-diff:
+	@if [[ -z "$(BOARD_WHITELIST)" ]]; then \
+		BOARDS=$$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); \
+	else \
+		BOARDS="$(BOARD_WHITELIST)"; \
+	fi; \
+	for BOARD in $(BOARD_BLACKLIST); do \
+		BOARDS=$$(sed -e "s/ $${BOARD} / /" <<< " $${BOARDS} "); \
+	done; \
+	\
+	GREEN='\033[1;32m'; RED='\033[1;31m'; RESET='\033[0m'; \
+	\
+	echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
+	for BOARD in $$(tr ' ' '\n' <<< $${BOARDS} | sort); do \
+		for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
+			env -i \
+				HOME=$${HOME} \
+				PATH=$${PATH} \
+				BOARD=$${BOARD} \
+				RIOTBASE=$${RIOTBASE} \
+				RIOTBOARD=$${RIOTBOARD} \
+				RIOTCPU=$${RIOTCPU} \
+				BINDIRBASE=$${BINDIRBASE} \
+				$(MAKE) buildsize 2>/dev/null | tail -n-1 | cut -f-4; \
+		done | \
+		while read -a OLD && read -a NEW; do \
+			for I in 0 1 2 3; do \
+				if [[ -n "$${NEW[I]}" && -n "$${OLD[I]}" ]]; then \
+					DIFF=$$(($${NEW[I]} - $${OLD[I]})); \
+					if [[ "$${DIFF}" -gt 0 ]]; then echo -ne "$${RED}"; fi; \
+					if [[ "$${DIFF}" -lt 0 ]]; then echo -ne "$${GREEN}"; fi; \
+				else \
+					DIFF="$${RED}ERR"; \
+				fi; \
+				echo -ne "$${DIFF}\t$${RESET}"; \
+			done; \
+			echo "$${BOARD}"; \
+			for I in 0 1 2 3; do echo -ne "$${OLD[I]-$${RED}ERR$${RESET}}\t"; done; echo -e "$${OLDBIN}"; \
+			for I in 0 1 2 3; do echo -ne "$${NEW[I]-$${RED}ERR$${RESET}}\t"; done; echo -e "$${NEWBIN}\n"; \
+		done; \
+	done;
