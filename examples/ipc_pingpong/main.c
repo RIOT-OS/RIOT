@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -14,6 +14,7 @@
  * @brief       IPC pingpong application
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -26,12 +27,12 @@
 
 void second_thread(void)
 {
-    printf("second_thread starting.\n");
+    printf("2nd thread started, pid: %i\n", thread_getpid());
     msg_t m;
 
     while (1) {
         msg_receive(&m);
-        printf("2nd: got msg from %i\n", m.sender_pid);
+        printf("2nd: Got msg from %i\n", m.sender_pid);
         m.content.value++;
         msg_reply(&m, &m);
     }
@@ -41,7 +42,8 @@ char second_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 int main(void)
 {
-    printf("Hello world!\n");
+    printf("Starting IPC Ping-pong example...\n");
+    printf("1st thread started, pid: %i\n", thread_getpid());
 
     msg_t m;
 
@@ -53,6 +55,6 @@ int main(void)
 
     while (1) {
         msg_send_receive(&m, &m, pid);
-        printf("Got msg with content %u\n", m.content.value);
+        printf("1st: Got msg with content %u\n", (unsigned int)m.content.value);
     }
 }
