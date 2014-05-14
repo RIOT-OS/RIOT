@@ -18,10 +18,10 @@
 #include "ieee802154_frame.h"
 #include "msg.h"
 #include "mutex.h"
-#include "net_help.h"
 #include "transceiver.h"
 
 #include "net_if.h"
+#include "net_help.h"
 
 #define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG

@@ -25,7 +25,6 @@
 #include "vtimer.h"
 #include "mutex.h"
 #include "msg.h"
-#include "net_help.h"
 #include "net_if.h"
 #include "sixlowpan/mac.h"
 

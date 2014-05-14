@@ -25,8 +25,8 @@
 #include <stdint.h>
 
 #include "inet_ntop.h"
-#include "net_help.h"
 #include "net_if.h"
+#include "net_help.h"
 #include "sixlowpan/types.h"
 
 /**
