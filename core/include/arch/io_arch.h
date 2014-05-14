@@ -21,8 +21,8 @@
 
 /**
  * @brief Define mapping between kernel internal and arch interfaces
- * 
- * This mapping is done for compatibility of existing platforms, 
+ *
+ * This mapping is done for compatibility of existing platforms,
  * new platforms should always use the *_arch_* interfaces.
  * @{
  */
@@ -39,7 +39,7 @@
  *
  * @param[in] data      the data that is to be written
  * @param[in] count     the number of bytes to write
- * 
+ *
  * @return              the number of bytes that were actually written
  */
 int io_arch_puts(char *data, int count);

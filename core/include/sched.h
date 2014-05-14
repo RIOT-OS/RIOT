@@ -40,7 +40,7 @@
 #endif
 
 /**
- * @brief   Triggers the scheduler to schedule the next thread 
+ * @brief   Triggers the scheduler to schedule the next thread
  */
 void sched_run(void);
 

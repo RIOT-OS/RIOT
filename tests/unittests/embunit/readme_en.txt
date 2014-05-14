@@ -15,7 +15,7 @@ to const area.
 1.Release Contetns
     [embUnit]
     +- COPYING          : Copyright Notice
-    +- makefile         : 
+    +- makefile         :
     +- readme.txt       : japanese
     +- readme_en.txt    : this file
     +- [embUnit]        : Embedded Unit Source

@@ -37,7 +37,7 @@ void sub_thread(void)
     printf("THREAD %s (pid:%i) start\n", thread_getname(pid), pid);
 
     msg_t msg;
-    
+
     msg.content.ptr = (char*)thread_getname(pid);
 
     msg_send(&msg, 1, 1);

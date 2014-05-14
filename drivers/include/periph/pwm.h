@@ -24,7 +24,7 @@
 
 /**
  * @brief Definition of available PWM devices
- * 
+ *
  * To this point a maximum of four PWM device is available.
  */
 typedef enum {
@@ -55,16 +55,16 @@ typedef enum {
 
 /**
  * @brief Initialize a PWM device
- * 
+ *
  * The PWM module is based on virtual PWM devices, which can have one or more channels.
  * The PWM devices can be configured to run with a given frequency and resolution, which
  * are always identical for the complete device, hence for every channel on a device.
- * 
+ *
  * The desired frequency and resolution may not be possible on a given device when chosen
  * too large. In this case the PWM driver will always keep the resolution and decrease the
  * frequency if needed. To verify the correct settings compare the returned value which
  * is the actually set frequency.
- * 
+ *
  * @param dev           PWM channel to initialize
  * @param mode          PWM mode, left, right or center aligned
  * @param frequency     the PWM frequency in Hz
@@ -76,10 +76,10 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
 
 /**
  * @brief Set the duty-cycle for a given channel of the given PWM device
- * 
+ *
  * The duty-cycle is set in relation to the chosen resolution of the given device. If
  * value > resolution, value is set to resolution.
- * 
+ *
  * @param dev           the PWM device to set
  * @param channel       the channel of the given device to set
  * @param value         the desired duty-cycle to set
@@ -89,14 +89,14 @@ int pwm_set(pwm_t dev, int channel, unsigned int value);
 
 /**
  * @brief Start PWM generation on the given device
- * 
+ *
  * @param dev           device to start
  */
 void pwm_start(pwm_t dev);
 
 /**
  * @brief Stop PWM generation on the given device
- * 
+ *
  * @param dev           device to stop
  */
 void pwm_stop(pwm_t dev);

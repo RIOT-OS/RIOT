@@ -24,7 +24,7 @@
 
 /**
  * @brief Definition available ADC devices
- * 
+ *
  * Each ADC device is based on a hardware ADC which can have one or more
  * multiplexed channels.
  */
@@ -46,7 +46,7 @@ typedef enum {
 
 /**
  * @brief Initialization of a given ADC device
- * 
+ *
  * The ADC will be initialized in synchronous, blocking mode, so no callbacks for finished
  * conversions are required as conversions are presumed to be very fast (somewhere in the
  * range of some us).
@@ -61,9 +61,9 @@ int adc_init(adc_t dev, int precision);
 
 /**
  * @brief Start a new conversion by using the given channel.
- * 
+ *
  * If a conversion on any channel on the given ADC core is in progress, it is aborted.
- * 
+ *
  * @param[in] dev           the ADC device to use for the conversion
  * @param[in] channel       the channel to convert from
  *
@@ -73,11 +73,11 @@ int adc_sample(adc_t dev, int channel);
 
 /**
  * @brief Helper function to map a converted value to the given integer range.
- * 
+ *
  * This function is useful for converting sampled ADC values into their physical representation.
- * 
+ *
  * The min value is asserted to be smaller than the max value.
- * 
+ *
  * @param[in] dev           the ADC device to read the precision value from (as input interval)
  * @param[in] value         the value to map
  * @param[in] min           the lower bound of the target interval
@@ -89,9 +89,9 @@ int adc_map(adc_t dev, int value, int min, int max);
 
 /**
  * @brief Helper function to map a converted value to the given float range
- * 
+ *
  * @see adc_map
- * 
+ *
  * @param[in] dev           the ADC device to read the precision value from (as input interval)
  * @param[in] value         the value to map
  * @param[in] min           the lower bound of the target interval

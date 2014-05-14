@@ -9,7 +9,7 @@
 /**
  * @ingroup	    core_arch
  * @{
- * 
+ *
  * @file        hwtimer_arch.h
  * @brief       The kernel's hardware timer abstraction interface
  *
@@ -27,7 +27,7 @@
 
 /**
  * @brief Initialize architecture dependent kernel timer support
- * 
+ *
  * @brief[in] handler   callback that is called when timer offset is reached
  * @brief[in] fcpu      the core CPU-frequency for tick interval calculation
  */
@@ -54,14 +54,14 @@ void hwtimer_arch_set(unsigned long offset, short timer);
 
 /**
  * @brief Unset the kernel timer with the given timer ID
- * 
+ *
  * @param[in] timer     the channel to unset
  */
 void hwtimer_arch_unset(short timer);
 
 /**
  * @brief Get the current tick count of the default hardware timer
- * 
+ *
  * @return              the current value of the hwtimer
  */
 unsigned long hwtimer_arch_now(void);

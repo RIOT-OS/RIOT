@@ -9,12 +9,12 @@
 /**
  * @ingroup     driver_periph
  * @{
- * 
+ *
  * @file        timer.c
  * @brief       Low-level timer driver implementation for the SAM3X8E CPU
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * 
+ *
  * @}
  */
 
@@ -40,10 +40,10 @@ timer_conf_t config[TIMER_NUMOF];
 
 /**
  * @brief Setup the given timer
- * 
+ *
  * The SAM3X8E has 3 timers. Each timer has 3 independent channels.
  * RIOT uses the timers in WAVE mode with the following clock chaining:
- * 
+ *
  * ----------                ----------
  * |        |                |        |-> IRQ-compareA
  * | TCx[2] | ---- TIOA2 --->| TCx[0] |-> IRQ-compareB
@@ -107,11 +107,11 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
      * - reload on TC_CV == TC_RC
      * - let TIOA2 signal be toggled when TC_CV == TC_RC
      */
-    tim->TC_CHANNEL[2].TC_CMR = TC_CMR_TCCLKS_TIMER_CLOCK1 | TC_CMR_WAVE 
+    tim->TC_CHANNEL[2].TC_CMR = TC_CMR_TCCLKS_TIMER_CLOCK1 | TC_CMR_WAVE
                               | TC_CMR_WAVSEL_UP_RC | TC_CMR_ACPC_TOGGLE;
 
     /* configure the frequency of channel 2 to 1us * ticks_per_us
-     * 
+     *
      * note: as channels 0 and 1 are only incremented on rising edges of TIOA2 line and
      * channel 2 toggles this line on each timer tick, the actual frequency driving ch0/1
      * is f_ch2 / 2 --> f_ch0/1 = (MCK / 2 / 2 / 1000000) * ticks_per_us.
@@ -400,11 +400,11 @@ void TIMER_0_ISR1(void)
     if (status & TC_SR_CPAS) {
         TIMER_0_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPAS;
         config[TIMER_0].cb(0);
-    } 
+    }
     else if (status & TC_SR_CPBS) {
         TIMER_0_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPBS;
         config[TIMER_0].cb(1);
-    } 
+    }
     else if (status & TC_SR_CPCS) {
         TIMER_0_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPCS;
         config[TIMER_0].cb(2);
@@ -420,11 +420,11 @@ void TIMER_0_ISR2(void)
     if (status & TC_SR_CPAS) {
         TIMER_0_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPAS;
         config[TIMER_0].cb(3);
-    } 
+    }
     else if (status & TC_SR_CPBS) {
         TIMER_0_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPBS;
         config[TIMER_0].cb(4);
-    } 
+    }
     else if (status & TC_SR_CPCS) {
         TIMER_0_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPCS;
         config[TIMER_0].cb(5);
@@ -443,11 +443,11 @@ void TIMER_1_ISR1(void)
     if (status & TC_SR_CPAS) {
         TIMER_1_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPAS;
         config[TIMER_1].cb(0);
-    } 
+    }
     if (status & TC_SR_CPBS) {
         TIMER_1_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPBS;
         config[TIMER_1].cb(1);
-    } 
+    }
     if (status & TC_SR_CPCS) {
         TIMER_1_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPCS;
         config[TIMER_1].cb(2);
@@ -463,11 +463,11 @@ void TIMER_1_ISR2(void)
     if (status & TC_SR_CPAS) {
         TIMER_1_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPAS;
         config[TIMER_1].cb(3);
-    } 
+    }
     if (status & TC_SR_CPBS) {
         TIMER_1_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPBS;
         config[TIMER_1].cb(4);
-    } 
+    }
     if (status & TC_SR_CPCS) {
         TIMER_1_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPCS;
         config[TIMER_1].cb(5);
@@ -486,11 +486,11 @@ void TIMER_2_ISR1(void)
     if (status & TC_SR_CPAS) {
         TIMER_2_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPAS;
         config[TIMER_2].cb(0);
-    } 
+    }
     else if (status & TC_SR_CPBS) {
         TIMER_2_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPBS;
         config[TIMER_2].cb(1);
-    } 
+    }
     else if (status & TC_SR_CPCS) {
         TIMER_2_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPCS;
         config[TIMER_2].cb(2);
@@ -506,11 +506,11 @@ void TIMER_2_ISR2(void)
     if (status & TC_SR_CPAS) {
         TIMER_2_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPAS;
         config[TIMER_2].cb(3);
-    } 
+    }
     else if (status & TC_SR_CPBS) {
         TIMER_2_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPBS;
         config[TIMER_2].cb(4);
-    } 
+    }
     else if (status & TC_SR_CPCS) {
         TIMER_2_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPCS;
         config[TIMER_2].cb(5);

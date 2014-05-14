@@ -9,12 +9,12 @@
 /**
  * @ingroup     driver_periph
  * @{
- * 
+ *
  * @file        gpio.c
  * @brief       Low-level GPIO driver implementation
  *
  * @author      Hauke Petersen <mail@haukepetersen.de>
- * 
+ *
  * @}
  */
 

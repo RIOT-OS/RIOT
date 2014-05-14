@@ -24,8 +24,8 @@
 
 /**
  * @name Define mapping between kernel internal and arch interfaces
- * 
- * This mapping is done for compatibility of existing platforms, 
+ *
+ * This mapping is done for compatibility of existing platforms,
  * new platforms should always use the *_arch_* interfaces.
  * @{
  */
@@ -39,7 +39,7 @@
 
 /**
  * @brief Globally enable maskable interrupt sources
- * 
+ *
  * @return              the IRQ state after enabling interrupts
  */
 unsigned int irq_arch_eneable(void);

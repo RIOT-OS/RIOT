@@ -16,10 +16,10 @@ typedef struct __pthread_cleanup_datum
 {
     /** Cleanup handler to call next. */
     struct __pthread_cleanup_datum *__next;
-    
+
     /** Cleanup routine to call. */
     void (*__routine)(void *arg);
-    
+
     /** Argument to supply. */
     void *__arg;
 } __pthread_cleanup_datum_t;

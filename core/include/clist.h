@@ -49,7 +49,7 @@ void clist_remove(clist_node_t **list, clist_node_t *node);
 
 /**
  * @brief Advances the circle list.
- * 
+ *
  * The result of this function is will be a list with
  * nodes shifted by one. So second list entry will be
  * first, first is last.

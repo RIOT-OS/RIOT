@@ -22,7 +22,7 @@
  */
 
 #include <stdint.h>
- 
+
 #include "sched.h"
 #include "kernel.h"
 #include "kernel_internal.h"
