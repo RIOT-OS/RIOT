@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
 
 #include "at86rf231.h"
 #include "at86rf231_arch.h"
