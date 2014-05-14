@@ -151,7 +151,7 @@ void _native_handle_tap_input(void)
 #ifdef __MACH__
 void sigio_child()
 {
-    pid_t parent = getpid();
+    pid_t parent = _native_pid;
 
     if ((sigio_child_pid = fork()) == -1) {
         err(EXIT_FAILURE, "sigio_child: fork");
@@ -315,7 +315,7 @@ int tap_init(char *name)
     sigio_child();
 #else
     /* configure fds to send signals on io */
-    if (fcntl(_native_tap_fd, F_SETOWN, getpid()) == -1) {
+    if (fcntl(_native_tap_fd, F_SETOWN, _native_pid) == -1) {
         err(EXIT_FAILURE, "tap_init(): fcntl(F_SETOWN)");
     }
 

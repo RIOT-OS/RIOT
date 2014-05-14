@@ -58,6 +58,7 @@ extern void* (*real_malloc)(size_t size);
 extern void (*real_free)(void *ptr);
 extern void* (*real_calloc)(size_t nmemb, size_t size);
 extern void* (*real_realloc)(void *ptr, size_t size);
+extern int (*real_getpid)(void);
 
 /**
  * data structures
@@ -77,6 +78,7 @@ extern ucontext_t *_native_cur_ctx, *_native_isr_ctx;
 
 extern const char *_progname;
 extern char **_native_argv;
+extern pid_t _native_pid;
 
 #ifdef MODULE_UART0
 #include <sys/select.h>
