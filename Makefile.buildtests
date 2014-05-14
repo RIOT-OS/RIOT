@@ -18,6 +18,7 @@ buildtest:
 		BOARDS=$$(echo \ $${BOARDS}\  | sed -e 's/ '$${BOARD}' / /'); \
 	done; \
 	\
+	rm -rf "$$BINDIRBASE"; \
 	for BOARD in $${BOARDS}; do \
 		$${ECHO} -n "Building for $${BOARD} .. "; \
 		LOG=$$(env -i \
@@ -28,7 +29,7 @@ buildtest:
 			RIOTBOARD=$${RIOTBOARD} \
 			RIOTCPU=$${RIOTCPU} \
 			BINDIRBASE=$${BINDIRBASE} \
-			$(MAKE) -B clean all 2>&1 >/dev/null) ; \
+			$(MAKE) 2>&1 >/dev/null) ; \
 		if [ "$${?}" = "0" ]; then \
 			$${ECHO} "$${GREEN}success$${RESET}"; \
 		else \
