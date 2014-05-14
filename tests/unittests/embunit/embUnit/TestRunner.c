@@ -41,6 +41,7 @@
 
 static TestResult result_;
 static Test* root_;
+int TestRunnerHadErrors;
 
 static void TestRunner_startTest(TestListner* self,Test* test)
 {
@@ -73,6 +74,8 @@ static void TestRunner_addFailure(TestListner* self,Test* test,char* msg,int lin
 	}
 	stdimpl_print(msg);
 	stdimpl_print("\n");
+
+	TestRunnerHadErrors = 1;
 }
 
 static const TestListnerImplement TestRunnerImplement = {
@@ -107,6 +110,8 @@ void TestRunner_end(void)
 		stdimpl_itoa(result_.failureCount, buf, 10);
 		stdimpl_print(buf);
 		stdimpl_print("\n");
+
+		TestRunnerHadErrors = 1;
 	} else {
 		stdimpl_print("\nOK (");
 		stdimpl_itoa(result_.runCount, buf, 10);

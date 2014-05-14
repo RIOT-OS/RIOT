@@ -58,6 +58,11 @@ int main(void)
     /* put test TEST_RUN() calls here */
     TESTS_END();
 
+#if defined (BOARD_NATIVE) && !defined (OUTPUT)
+    void _exit(int);
+    _exit(TestRunnerHadErrors);
+#endif
+
     lpm_set(LPM_POWERDOWN);
 
     return 0;

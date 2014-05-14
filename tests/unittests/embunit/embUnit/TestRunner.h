@@ -43,6 +43,8 @@ void TestRunner_start(void);
 void TestRunner_runTest(Test* test);
 void TestRunner_end(void);
 
+extern int TestRunnerHadErrors;
+
 #ifdef	__cplusplus
 }
 #endif
