@@ -58,7 +58,7 @@ static int test_time(int code)
     time_value++;
 
     if (time_value > 10000000) {
-        printf("CC1100 SPI alarm: %u!\n", code);
+        printf("CC1100 SPI alarm: %d!\n", code);
         time_value = 0;
         return 1;
     }

@@ -641,7 +641,7 @@ static void download_main(int event)
                             break;
                         }
 
-                        snprintf(buf, sizeof(buf), "W %d %d\r\n", chip->ram_addr, chip->chunk_size);
+                        snprintf(buf, sizeof(buf), "W %u %d\r\n", chip->ram_addr, chip->chunk_size);
                         xmit_cmd(buf, 4);
                         return;
 
@@ -721,7 +721,7 @@ static void download_main(int event)
             case XMIT_CKSUM:
                 switch (event) {
                     case BEGIN:
-                        snprintf(buf, sizeof(buf), "%d\r\n", cksum);
+                        snprintf(buf, sizeof(buf), "%u\r\n", cksum);
                         xmit_cmd(buf, 3);
                         return;
 
@@ -795,7 +795,7 @@ static void download_main(int event)
                     case BEGIN:
                         printf("write, ");
                         fflush(stdout);
-                        snprintf(buf, sizeof(buf), "C %d %d %d\r\n",
+                        snprintf(buf, sizeof(buf), "C %d %u %d\r\n",
                                  chip->layout[sector].address + sector_offset,
                                  chip->ram_addr, chip->chunk_size);
                         xmit_cmd(buf, 5);
@@ -856,7 +856,7 @@ static void download_main(int event)
                         // bootloader again.  Intead, we need to download a tiny ARM
                         // program that reconfigures the hardware and then jumps to zero.
                         //snprintf(buf, sizeof(buf), "G %d A\r\n", 0);
-                        snprintf(buf, sizeof(buf), "W %d %d\r\n", chip->ram_addr, chip->bootprog[0] * 4);
+                        snprintf(buf, sizeof(buf), "W %u %d\r\n", chip->ram_addr, chip->bootprog[0] * 4);
                         xmit_cmd(buf, 4);
                         return;
 
@@ -938,7 +938,7 @@ static void download_main(int event)
             case BOOT_XMIT_CKSUM:
                 switch (event) {
                     case BEGIN:
-                        snprintf(buf, sizeof(buf), "%d\r\n", cksum);
+                        snprintf(buf, sizeof(buf), "%u\r\n", cksum);
                         //printf("send: %s", buf);
                         xmit_cmd(buf, 3);
                         return;
@@ -980,7 +980,7 @@ static void download_main(int event)
                 switch (event) {
                     case BEGIN:
                         printf("jumping now!\r\n");
-                        snprintf(buf, sizeof(buf), "G %d A\r\n", chip->ram_addr);
+                        snprintf(buf, sizeof(buf), "G %u A\r\n", chip->ram_addr);
                         xmit_cmd(buf, 4);
                         return;
 

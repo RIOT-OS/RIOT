@@ -67,7 +67,7 @@ void thread_print_all(void)
             stacksz -= thread_measure_stack_free(p->stack_start);
             printf("\t%3u | %-21s| %-8s %.1s | %3i | %5i (%5i) %p"
 #if SCHEDSTATISTICS
-                   " | %6.3f%% |  %8u"
+                   " | %6.3f%% |  %8d"
 #endif
                    "\n",
                    p->pid, p->name, sname, queued, p->priority, p->stack_size, stacksz, p->stack_start

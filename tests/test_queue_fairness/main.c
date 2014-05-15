@@ -71,7 +71,7 @@ int main(void)
         int cur_iteration = (int) m.type;
         char *child = (char *) m.content.ptr;
 
-        printf("Received message from %s, iteration %u / %u: %s\n",
+        printf("Received message from %s, iteration %d / %u: %s\n",
                child, cur_iteration, NUM_ITERATIONS,
                cur_iteration >= last_iteration ? "okay" : "ERROR");
 

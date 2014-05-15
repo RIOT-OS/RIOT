@@ -106,6 +106,6 @@ void print_failed(void)
 
 void init_payload(void)
 {
-    pipa = malloc(sizeof(pipa));
+    pipa = malloc(sizeof(*pipa));
     pipa->payload = NULL;
 }
