@@ -42,7 +42,7 @@ do
         riot_tree:add(f_length, buf(0, 2))
         riot_tree:add(f_dst, buf(2, 2))
         riot_tree:add(f_src, buf(4, 2))
-        riot_tree:add(f_pad, buf(packet_len + 6))
+        --riot_tree:add(f_pad, buf(packet_len + 6))
 
         next_dis:call(buf(6, packet_len):tvb(), pkt, root)
 
