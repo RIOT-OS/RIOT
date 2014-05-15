@@ -18,9 +18,9 @@
 #include "sched.h"
 #include "cpu.h"
 #include "irq.h"
+#include "kernel_internal.h"
 
-extern void sched_task_exit(void);
-void sched_task_return(void);
+NORETURN void sched_task_return(void);
 
 unsigned int atomic_set_return(unsigned int* p, unsigned int uiVal) {
 	//unsigned int cspr = disableIRQ();		//crashes
@@ -32,7 +32,7 @@ unsigned int atomic_set_return(unsigned int* p, unsigned int uiVal) {
 	return uiOldVal;
 }
 
-void cpu_switch_context_exit(void){
+NORETURN void cpu_switch_context_exit(void){
     sched_run();
     sched_task_return();
 }
@@ -78,7 +78,7 @@ void ctx_switch(void)
 	sched_task_return();
 }
 /* call scheduler so active_thread points to the next task */
-void sched_task_return(void)
+NORETURN void sched_task_return(void)
 {
 	/* load pdc->stackpointer in r0 */
 	asm("ldr     r0, =active_thread"); /* r0 = &active_thread */
@@ -89,6 +89,8 @@ void sched_task_return(void)
 	asm(" pop		{r0-r3,r12,lr}"); /* simulate register restor from stack */
 //	asm("pop 		{r4}"); /*foo*/
 	asm("pop		{pc}");
+
+    UNREACHABLE();
 }
 /*
  * cortex m4 knows stacks and handles register backups
@@ -109,7 +111,7 @@ void sched_task_return(void)
  *
  *
  */
-char * thread_stack_init(void * task_func, void * stack_start, int stack_size ) {
+char * thread_stack_init(void (*task_func)(void), void * stack_start, int stack_size ) {
 	unsigned int * stk;
 	stk = (unsigned int *) (stack_start + stack_size);
 

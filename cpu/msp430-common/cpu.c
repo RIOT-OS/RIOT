@@ -32,12 +32,14 @@ void thread_yield(void)
     __restore_context();
 }
 
-void cpu_switch_context_exit(void)
+NORETURN void cpu_switch_context_exit(void)
 {
     active_thread = sched_threads[0];
     sched_run();
 
     __restore_context();
+
+    UNREACHABLE();
 }
 
 /**
