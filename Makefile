@@ -9,7 +9,10 @@ ifneq (,$(filter embunit_textui,$(USEMODULE)))
 endif
 
 
-.PHONY: all clean doc
+.PHONY: all clean doc noapplication
+
+noapplication:
+	$(error "You have to build against an application, e.g. make -C examples/default")
 
 all:
 	mkdir -p $(BINDIR)
