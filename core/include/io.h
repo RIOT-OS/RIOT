@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -22,6 +22,12 @@
 #ifndef IO_H
 #define IO_H
 
+/**
+ * @brief   Firmware putstring implementation
+ *
+ * @param[in] data  charachters to be written
+ * @param[in] count number of charachters to be written
+ */
 int fw_puts(char *data, int count);
 
 /** @} */

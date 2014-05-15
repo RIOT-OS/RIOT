@@ -17,6 +17,7 @@
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @}
  */
 
 #ifndef HWTIMER_ARCH_H_
@@ -25,40 +26,52 @@
 #include <stdint.h>
 
 /**
- * Initialize architecture dependent kernel timer support.
+ * @brief Initialize architecture dependent kernel timer support.
+ *
+ * @param[in] handler   callback function for the interrupt handler
+ * @param[in] fcpu      cpu frequency
  */
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu);
 
 /**
- * Enable interrupts of hardware timers.
+ * @brief Enable interrupts of hardware timers.
  */
 void hwtimer_arch_enable_interrupt(void);
 
 /**
- * Disable interrupts of hardware timers.
+ * @brief Disable interrupts of hardware timers.
  */
 void hwtimer_arch_disable_interrupt(void);
 
 /**
- * Set a kernel timer to raise an interrupt after ::offset kernel timer ticks
- * from now.
+ * @brief Set a kernel timer to raise an interrupt after `offset` kernel timer
+ * ticks from now.
+ *
+ * @param[in] offset    number of ticks
+ * @param[in] timer     hardware timer identifier
  */
 void hwtimer_arch_set(unsigned long offset, short timer);
 
 /**
- * Set a kernel timer to raise an interrupt at specified system time.
+ * @brief Set a kernel timer to raise an interrupt at specified system time.
+ *
+ * @param[in] value     system time
+ * @param[in] timer     hardware timer identifier
  */
 void hwtimer_arch_set_absolute(unsigned long value, short timer);
 
 /**
- * Unset the kernel timer with the given timer ID.
+ * @brief Unset the kernel timer with the given timer ID.
+ *
+ * @param[in] timer     hardware timer identifier
  */
 void hwtimer_arch_unset(short timer);
 
 /**
  * Get the current tick count of the default hardware timer.
+ *
+ * @return  The current tick count of the hardware timer
  */
 unsigned long hwtimer_arch_now(void);
 
-/** @} */
 #endif /* HWTIMER_ARCH_H_ */

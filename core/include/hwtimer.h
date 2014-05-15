@@ -17,8 +17,8 @@
  * interrupt context and must use the shortest possible execution time (e.g.
  * set a flag and trigger a worker thread).
  *
- * <b>The hardware timer must not be used within applications</b>, use \ref vtimer
- * instead.
+ * <b>The hardware timer should not be used (until you know what
+ * you're doing)<b>, use \ref sys_vtimer instead.
  *
  * @{
  *
@@ -38,15 +38,15 @@
 #include "hwtimer_cpu.h"
 
 /**
- * @def    HWTIMER_SPEED
- * @brief    Number of kernel timer ticks per second
+ * @brief   Number of kernel timer ticks per second
+ * @def     HWTIMER_SPEED
  */
 #ifndef HWTIMER_SPEED
 #warning "HWTIMER_SPEED undefined. Set HWTIMER_SPEED to number of ticks per second for the current architecture."
 #endif
 
 /**
- * @brief   Convert microseconds to kernel timer ticks
+ * @brief       Convert microseconds to kernel timer ticks
  * @param[in]   us number of microseconds
  * @return      kernel timer ticks
  */
@@ -60,22 +60,24 @@
 #define HWTIMER_TICKS_TO_US(ticks)        ((ticks) * (1000000L/HWTIMER_SPEED))
 
 /**
- * @def    HWTIMER_MAXTICKS
- * @brief    Maximum hwtimer tick count (before overflow)
+ * @brief   Maximum hwtimer tick count (before overflow)
+ * @def     HWTIMER_MAXTICKS
  */
 #ifndef HWTIMER_MAXTICKS
 #warning "HWTIMER_MAXTICKS undefined. Set HWTIMER_MAXTICKS to maximum number of ticks countable on the current architecture."
 #endif
 
 /**
- * @brief    microseconds before hwtimer overflow
+ * @brief   microseconds before hwtimer overflow
  */
 #define HWTIMER_OVERFLOW_MICROS()        (1000000L / HWTIMER_SPEED * HWTIMER_MAXTICKS)
 
-typedef uint32_t timer_tick_t;
+typedef uint32_t timer_tick_t; /**< data type for hwtimer ticks */
 
+/**
+ * @brief   initialize the hwtimer module
+ */
 void hwtimer_init(void);
-void hwtimer_init_comp(uint32_t fcpu);
 
 /**
  * @brief   Get the hardware time
@@ -85,51 +87,54 @@ unsigned long hwtimer_now(void);
 
 /**
  * @brief Set a kernel timer
- * @param[in]    offset        Offset until callback invocation in timer ticks
- * @param[in]    callback    Callback function
- * @param[in]    ptr            Argument to callback function
- * @return        timer id
+ * @param[in]   offset      Offset until callback invocation in timer ticks
+ * @param[in]   callback    Callback function
+ * @param[in]   ptr         Argument to callback function
+ * @return      timer id
  */
 int hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr);
 
 /**
  * @brief Set a kernel timer
- * @param[in]    absolute    Absolute timer counter value for invocation of handler
- * @param[in]    callback    Callback function
- * @param[in]    ptr            Argument to callback function
- * @return        timer id
+ * @param[in]   absolute    Absolute timer counter value for invocation of handler
+ * @param[in]   callback    Callback function
+ * @param[in]   ptr         Argument to callback function
+ * @return      timer id
  */
 int hwtimer_set_absolute(unsigned long absolute, void (*callback)(void*), void *ptr);
 
 /**
  * @brief Remove a kernel timer
- * @param[in]    t            Id of timer to remove
- * @retval    1 on success
+ * @param[in]   t   Id of timer to remove
+ * @return      1 on success
  */
 int hwtimer_remove(int t);
 
 /**
- * @brief    Delay current thread
- * @param[in]    ticks        Number of kernel ticks to delay
+ * @brief        Delay current thread
+ * @param[in]    ticks  Number of kernel ticks to delay
  */
 void hwtimer_wait(unsigned long ticks);
 
 /**
- * @brief    Delay current thread, spinning. Use only in interrupts for VERY short delays!
- * @param[in]    ticks        Number of kernel ticks to delay
+ * @brief   determine if the hwtimer module is initialized
+ * @return  1 if the hwtimer module is initialized
  */
-void hwtimer_spin(unsigned long ticks);
-
 int hwtimer_active(void);
 
-/** @} */
-
-/* internal */
 /**
- * @brief    TODO
- * @internal
+ * @brief       initialize hwtimer module data structures and hardware
+ *
+ * @param[in]   fcpu        cpu frequency
  */
-void hwtimer_cpu_init(void (*handler)(int), uint32_t fcpu);
+void hwtimer_init_comp(uint32_t fcpu);
+
+/**
+ * @brief       Delay current thread, spinning. Use only in interrupts for VERY short delays!
+ *
+ * @param[in]   ticks        Number of kernel ticks to delay
+ */
+void hwtimer_spin(unsigned long ticks);
 
 /** @} */
 #endif /* __HWTIMER_H */
