@@ -1,10 +1,11 @@
 /**
  * Native uart0 implementation
  *
- * Copyright (C) 2013 Ludwig Ortmann
+ * Copyright (C) 2014 Ludwig Ortmann
  *
- * This file is subject to the terms and conditions of the LGPLv2. See
- * the file LICENSE in the top level directory for more details.
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
  *
  * @ingroup native_board
  * @{
