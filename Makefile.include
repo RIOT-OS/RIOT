@@ -1,3 +1,6 @@
+# Provide a shallow sanity check. You cannot call `make` in the root directory.
+export __RIOTBUILD_FLAG := RIOT
+
 # set undefined variables
 RIOTBASE ?= $(shell dirname "$(lastword $(MAKEFILE_LIST))")
 export RIOTBASE := $(abspath $(RIOTBASE))

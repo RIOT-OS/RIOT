@@ -1,3 +1,7 @@
+ifeq (, $(__RIOTBUILD_FLAG))
+    $(error You cannot build a module on its own. Use "make" in your application's directory instead.)
+endif
+
 ASMSRC = $(wildcard *.s)
 ASSMSRC = $(wildcard *.S)
 ASMOBJ = $(ASMSRC:%.s=$(BINDIR)$(MODULE)/%.o)
