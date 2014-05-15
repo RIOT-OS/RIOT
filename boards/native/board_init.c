@@ -1,7 +1,7 @@
 /**
  * Native Board board_init implementation
  *
- * Copyright (C) 2014 Ludwig Ortmann
+ * Copyright (C) 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more

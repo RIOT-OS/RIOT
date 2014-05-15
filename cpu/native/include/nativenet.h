@@ -8,7 +8,7 @@
  * The effect of calls like nativenet_set_channel depend on the
  * network layer.
  *
- * Copyright (C) 2013 Ludwig Ortmann
+ * Copyright (C) 2013 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
