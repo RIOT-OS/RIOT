@@ -1,6 +1,6 @@
 export PROJECT = test_net_if
 
-BOARD_BLACKLIST = mbed_lpc1768 arduino-due
+BOARD_BLACKLIST = mbed_lpc1768 arduino-due udoo
 
 include ../Makefile.tests_common
 
