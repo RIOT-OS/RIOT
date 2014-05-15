@@ -1,10 +1,11 @@
-  /*
-   * uart0.c - Implementation of the uart.
-   * Copyright (C) 2013 Milan Babel <babel@inf.fu-berlin.de>
-   *
-   * This source code is licensed under the GNU General Public License,
-   * Version 3.  See the file LICENSE for more details.
-   */
+/*
+ * uart0.c - Implementation of the uart.
+ * Copyright (C) 2013 Milan Babel <babel@inf.fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
 
 #include <stdio.h>
 #include "board.h"
