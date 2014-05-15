@@ -18,8 +18,7 @@ __native_sig_leave_tramp:
     popal
     popfl
 
-    popl __native_saved_eip
-    jmp *-4(%esp)
+    ret
 #else
 .extern $_native_saved_eip
 .extern $_native_isr_ctx
@@ -44,6 +43,5 @@ _native_sig_leave_tramp:
     popal
     popfl
 
-    popl _native_saved_eip
-    jmp *-4(%esp)
+    ret
 #endif
