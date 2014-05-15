@@ -82,8 +82,8 @@ OBJ = $(SRC:%.c=${BINDIR}${PROJECT}/%.o)
 
 $(BINDIR)$(PROJECT).elf: $(BINDIR)$(PROJECT).a
 	@echo "Building application $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
-	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
-	"$(MAKE)" -C $(RIOTBASE)
+	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD) all
+	"$(MAKE)" -C $(RIOTBASE) all
 ifeq ($(BUILDOSXNATIVE),1)
 	$(AD)$(LINK) $(UNDEF) -o $@ $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
