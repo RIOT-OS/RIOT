@@ -89,6 +89,9 @@ endif
 ifneq (,$(filter quad_math,$(USEMODULE)))
     DIRS += quad_math
 endif
+ifneq (,$(filter oneway_malloc,$(USEMODULE)))
+    DIRS += oneway-malloc
+endif
 
 all: $(BINDIR)$(MODULE).a
 	@for i in $(DIRS) ; do "$(MAKE)" -C $$i || exit 1; done ;
