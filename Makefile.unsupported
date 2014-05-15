@@ -1,7 +1,0 @@
-.PHONY: all clean
-
-all:
-	$(error Project $(PROJECT) currently not supported for $(BOARD))
-
-clean:
-	@true
