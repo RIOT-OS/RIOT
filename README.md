@@ -64,7 +64,7 @@ In the `examples` directory you can find some example applications. The `default
 For example, you can use it to the test the native networking by running two instances: `make term PORT=tap0` and `make term PORT=tap1`. Now configure two different addresses for both RIOT instances by typing `addr 1` and `addr 2` respectively and send a text message from one "node" to another by typing `txtsnd 2 hello` on the first "node".
 
 ## CONTRIBUTE
-1. Check if your code follows the https://github.com/RIOT-OS/RIOT/wiki/Coding-conventions. If the code does not comply these style rules, your code will not be merged.
+1. Check if your code follows the [coding conventions](https://github.com/RIOT-OS/RIOT/wiki/Coding-conventions). If the code does not comply these style rules, your code will not be merged.
 
 2. Create a new branch in your own fork for every new feature or fix. Then create the pull request from this branch, once you completed your task (feature or fix). Every commit in this branch will be added to the pull request.
 
