@@ -92,7 +92,7 @@ void *get_in_addr(struct sockaddr *sa)
 int init_tcp_socket(char *tcpport)
 {
     struct addrinfo hints, *info, *p;
-    int i, s;
+    int i, s = -1;
     if (tcpport == NULL) {
         tcpport = UART_TCPPORT;
     }
