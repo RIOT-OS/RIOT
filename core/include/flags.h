@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -19,10 +19,16 @@
 #ifndef _FLAGS_H
 #define _FLAGS_H
 
-#define CREATE_SLEEPING     (1)
-#define AUTO_FREE           (2)
-#define CREATE_WOUT_YIELD   (4)
-#define CREATE_STACKTEST    (8)
-
+/**
+ * @name Optional flags for controlling a threads initial state.
+ * @{
+ */
+#define CREATE_SLEEPING     (1)     /**< set the new thread to sleeping */
+#define AUTO_FREE           (2)     /**< currently not implemented */
+#define CREATE_WOUT_YIELD   (4)     /**< do not automatically call thread_yield() after creation */
+#define CREATE_STACKTEST    (8)     /**< write markers into the thread's stack to measure stack
+                                         usage (for debugging) */
 /** @} */
-#endif // _FLAGS_H
+
+#endif /* _FLAGS_H */
+/** @} */
