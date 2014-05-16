@@ -75,7 +75,7 @@ int cipher_get_block_size(cipher_t* cipher)
 }
 
 
-void cipher_print_supported_ciphers()
+void cipher_print_supported_ciphers(void)
 {
     printf("Not yet implemented!\n");
 }

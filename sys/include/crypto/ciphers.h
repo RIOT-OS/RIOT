@@ -210,6 +210,6 @@ int cipher_get_block_size(cipher_t* cipher);
 /**
  * @brief prints all supported ciphers on stdout
  */
-void cipher_print_supported_ciphers();
+void cipher_print_supported_ciphers(void);
 
 #endif /* __CCRYPTO_CIPHERS_H_*/
