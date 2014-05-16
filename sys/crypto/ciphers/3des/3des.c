@@ -36,20 +36,19 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "crypto/3des.h"
-#include "crypto/ciphers.h"
+#include "crypto/ciphers/3des.h"
 
 /*************** GLOBALS ******************/
 /**
  * @brief Interface to the 3DES cipher
  */
-block_cipher_interface_t tripledes_interface = {
-    "3DES",
+cipher_interface_t tripledes_interface = {
+    BLOCK_SIZE,
+    24,
     tripledes_init,
     tripledes_encrypt,
     tripledes_decrypt,
-    tripledes_setup_key,
-    tripledes_get_preferred_block_size
+    tripledes_set_key,
 };
 
 /**
@@ -246,8 +245,8 @@ static const uint32_t SP8[64] = {
 };
 
 
-int tripledes_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
-                  uint8_t *key)
+int tripledes_init(cipher_context_t *context, uint8_t blockSize, uint8_t* key,
+        uint8_t keySize)
 {
     uint8_t i;
 
@@ -274,11 +273,10 @@ int tripledes_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize
     return 1;
 }
 
-int tripledes_setup_key(cipher_context_t *context, uint8_t *key,
+int tripledes_set_key(cipher_context_t *context, uint8_t *key,
                                 uint8_t keysize) //To change !!!
 {
-    return tripledes_init(context, tripledes_get_preferred_block_size(),
-                         keysize, key);
+    return tripledes_init(context, THREEDES_BLOCK_SIZE, keysize, key);
 }
 
 int tripledes_encrypt(cipher_context_t *context, uint8_t *plain, uint8_t *crypt)
@@ -348,11 +346,6 @@ int tripledes_decrypt(cipher_context_t *context, uint8_t *crypt, uint8_t *plain)
 
     free(key);
     return 1;
-}
-
-uint8_t tripledes_get_preferred_block_size(void)
-{
-    return THREEDES_BLOCK_SIZE;
 }
 
 static void cookey(const uint32_t *raw1, uint32_t *keyout)

@@ -40,8 +40,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "crypto/ciphers.h"
-#include "crypto/skipjack.h"
+#include "crypto/ciphers/skipjack.h"
 
 
 /**
@@ -52,13 +51,13 @@
 /**
  * @brief Interface to the skipjack cipher
  */
-block_cipher_interface_t skipjack_interface = {
-    "SkipJack",
+cipher_interface_t skipjack_interface = {
+    BLOCK_SIZE,
+    10,
     skipjack_init,
     skipjack_encrypt,
     skipjack_decrypt,
-    skipjack_setup_key,
-    skipjack_get_preferred_block_size
+    skipjack_set_key
 };
 
 // F-BOX
@@ -93,15 +92,15 @@ static const uint8_t SJ_F[] /*__attribute__((C))*/ = {
 };
 
 
-int skipjack_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
-                  uint8_t *key)
+int skipjack_init(cipher_context_t *context, uint8_t blockSize, uint8_t *key,
+        uint8_t keySize)
 {
     // 8 byte blocks only
     if (blockSize != BLOCK_SIZE) {
         return 0;
     }
 
-    return skipjack_setup_key(context, key, keySize);
+    return skipjack_set_key(context, key, keySize);
 }
 
 /**
@@ -322,7 +321,7 @@ int skipjack_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
 }
 
 
-int skipjack_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
+int skipjack_set_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
 {
     int i = 0;
     uint8_t *skey = ((skipjack_context_t *)context->context)->skey;
@@ -342,10 +341,4 @@ int skipjack_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
     }
 
     return 1;
-}
-
-
-uint8_t skipjack_get_preferred_block_size(void)
-{
-    return BLOCK_SIZE;
 }

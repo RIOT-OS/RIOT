@@ -73,8 +73,8 @@ typedef struct {
 *           unsuccessful if the key size or blockSize are not valid for the
 *           given cipher implementation.
 */
-int rc5_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
-             uint8_t *key);
+int rc5_init(cipher_context_t *context, uint8_t blockSize, uint8_t *key,
+        uint8_t keySize);
 
 /**
  * @brief   Encrypts a single block (of blockSize) using the passed context.
@@ -134,7 +134,7 @@ uint8_t rc5_get_preferred_block_size(void);
  * Interface to access the functions
  *
  */
-extern block_cipher_interface_t rc5_interface;
+extern cipher_interface_t rc5_interface;
 
 /** @} */
 #endif /* RC5_H_ */
