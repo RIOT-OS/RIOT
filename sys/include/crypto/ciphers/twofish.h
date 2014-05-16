@@ -220,7 +220,8 @@ typedef struct {
  * @return  Whether initialization was successful. The command may be
  *         unsuccessful if the key size or blockSize are not valid.
  */
-int twofish_init(cipher_context_t *context, uint8_t block_size, uint8_t key_size, uint8_t *key);
+int twofish_init(cipher_context_t *context, uint8_t block_size, uint8_t *key,
+        uint8_t key_size);
 
 /**
  * @brief   Sets up the context to use the passed key for usage with TwoFish
@@ -275,7 +276,7 @@ uint8_t twofish_get_preferred_block_size(void);
  * Interface to access the functions
  *
  */
-extern block_cipher_interface_t twofish_interface;
+extern cipher_interface_t twofish_interface;
 
 /** @} */
 #endif /* TWOFISH_H_ */

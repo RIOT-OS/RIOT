@@ -83,8 +83,8 @@ static const uint32_t bigbyte[24] = {
  *
  * @return  0 if blocksize doesn't match else 1
  */
-int tripledes_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
-                   uint8_t *key);
+int tripledes_init(cipher_context_t *context, uint8_t blockSize, uint8_t *key,
+        uint8_t keySize);
 
 /**
  * @brief   updates the used key for this context after initialization has
@@ -145,7 +145,7 @@ uint8_t tripledes_get_preferred_block_size(void);
  * Interface to access the functions
  *
  */
-extern block_cipher_interface_t tripledes_interface;
+extern cipher_interface_t tripledes_interface;
 
 /** @} */
 #endif /* THREEDES_H_ */
