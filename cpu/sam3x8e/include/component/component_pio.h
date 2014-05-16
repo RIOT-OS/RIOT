@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Parallel Input/Output Controller */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_PIO Parallel Input/Output Controller */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_PIO Parallel Input/Output Controller */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

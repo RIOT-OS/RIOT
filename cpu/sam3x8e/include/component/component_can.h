@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Controller Area Network */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_CAN Controller Area Network */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_CAN Controller Area Network */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

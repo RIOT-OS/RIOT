@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Digital-to-Analog Converter Controller */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_DACC Digital-to-Analog Converter Controller */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_DACC Digital-to-Analog Converter Controller */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

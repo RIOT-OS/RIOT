@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Analog-to-digital Converter */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_ADC Analog-to-digital Converter */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_ADC Analog-to-digital Converter */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

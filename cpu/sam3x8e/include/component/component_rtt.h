@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Real-time Timer */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_RTT Real-time Timer */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_RTT Real-time Timer */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

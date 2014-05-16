@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR High Speed MultiMedia Card Interface */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_HSMCI High Speed MultiMedia Card Interface */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_HSMCI High Speed MultiMedia Card Interface */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

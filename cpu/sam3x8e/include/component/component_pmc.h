@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Power Management Controller */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_PMC Power Management Controller */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_PMC Power Management Controller */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
