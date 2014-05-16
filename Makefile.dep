@@ -78,5 +78,5 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ccn_lite,$(USEMODULE)))
-	USEMODULE += crypto
+	USEMODULE += crypto_hashes_sha256
 endif
