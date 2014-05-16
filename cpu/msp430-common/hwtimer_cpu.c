@@ -1,13 +1,25 @@
-/******************************************************************************
-Copyright (C) 2013, Freie Universitaet Berlin (FUB). All rights reserved.
+/*
+ * Copyright (C) 2014 Freie Universitaet Berlin (FUB) and INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
 
-These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
--------------------------------------------------------------------------------
-This file is subject to the terms and conditions of the GNU Lesser
-General Public License v2.1. See the file LICENSE in the top level
-directory for more details.
-*******************************************************************************/
+/**
+ * @ingroup cpu
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       msp430 hardware timer driver generic functions
+ *
+ * @author      Freie Universitaet Berlin, Computer Systems and Telematics group
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
+ *
+ */
 
 #include <stdint.h>
 
@@ -22,7 +34,11 @@ directory for more details.
 
 void (*int_handler)(int);
 extern void timerA_init(void);
+#ifndef CC430
 extern volatile msp430_timer_t msp430_timer[HWTIMER_MAXTIMERS];
+#else
+extern volatile uint16_t overflow_interrupt[HWTIMER_MAXTIMERS];
+#endif
 extern volatile uint16_t timer_round;
 
 /*
@@ -33,52 +49,42 @@ extern volatile uint16_t timer_round;
 static volatile unsigned int *get_control_reg_for_msp430_timer(int index)
 {
     volatile unsigned int *ptr = NULL;
-    switch (msp430_timer[index].base_timer) {
 #ifndef CC430
+    switch (msp430_timer[index].base_timer) {
     case TIMER_A:
         ptr = &TACCTL0;
         break;
-#endif
-#ifdef CC430
-    case TIMER_A0:
-        ptr = &TA0CCTL0;
-        break;
-#endif
-#ifndef CC430
     case TIMER_B:
         ptr = &TBCCTL0;
         break;
-#endif
     default:
         core_panic(0x0, "Wrong timer kind for MSP430");
     }
     ptr += msp430_timer[index].ccr_num;
+#else
+    ptr = &TA0CCTL0;
+#endif
     return ptr;
 }
 
 static volatile unsigned int *get_comparator_reg_for_msp430_timer(int index)
 {
     volatile unsigned int *ptr = NULL;
-    switch (msp430_timer[index].base_timer) {
 #ifndef CC430
+    switch (msp430_timer[index].base_timer) {
     case TIMER_A:
         ptr = &TACCR0;
         break;
-#endif
-#ifdef CC430
-    case TIMER_A0:
-        ptr = &TA0CCR0;
-        break;
-#endif
-#ifndef CC430
     case TIMER_B:
         ptr = &TBCCR0;
         break;
-#endif
     default:
         core_panic(0x0, "Wrong timer kind for MSP430");
     }
     ptr += msp430_timer[index].ccr_num;
+#else
+    ptr = &TA0CCR0;
+#endif
     return ptr;
 }
 
@@ -114,8 +120,13 @@ static void timer_set_nostart(uint32_t value, short timer)
     if (value <= hwtimer_arch_now()) {
         value = hwtimer_arch_now() + 2;
     }
+#ifndef CC430
     msp430_timer[timer].target_round = (uint16_t)(value >> 15);
     *ptr = (value & 0x7FFF);
+#else
+    overflow_interrupt[timer] = (uint16_t)(value >> 16);
+    *ptr = (value & 0xFFFF);
+#endif
 }
 
 static void timer_set(uint32_t value, short timer)

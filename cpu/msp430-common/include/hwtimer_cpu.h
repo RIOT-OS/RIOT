@@ -1,14 +1,25 @@
-/******************************************************************************
-Copyright (C) 2013, Freie Universitaet Berlin (FUB). All rights reserved.
+/*
+ * Copyright (C) 2014 Freie Universitaet Berlin (FUB) and INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
 
-These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
--------------------------------------------------------------------------------
-This file is part of RIOT.
+/**
+ * @ingroup cpu
+ * @{
+ */
 
-This file is subject to the terms and conditions of the LGPLv2.
-See the file LICENSE in the top level directory for more details.
-*******************************************************************************/
+/**
+ * @file
+ * @brief       msp430 hardware timer driver definitions
+ *
+ * @author      Freie Universitaet Berlin, Computer Systems and Telematics group
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
+ *
+ */
 
 #ifndef __HWTIMER_CPU_H
 #define __HWTIMER_CPU_H
@@ -22,7 +33,7 @@ See the file LICENSE in the top level directory for more details.
 #elif defined (__MSP430_HAS_TA3__)
 #define TIMER_A_MAXCOMP  2
 #elif defined (__MSP430_HAS_T0A5__)
-#define TIMER_A_MAXCOMP  4
+#define TIMER_A_MAXCOMP  5
 #else
 #define TIMER_A_MAXCOMP  0
 #endif
@@ -45,6 +56,11 @@ typedef struct {
 } msp430_timer_t;
 
 #define HWTIMER_SPEED  (F_RC_OSCILLATOR)
+
+#ifndef CC430
 #define HWTIMER_MAXTICKS  (0xFFFF7FFF)
+#else
+#define HWTIMER_MAXTICKS  (0xFFFFFFFF)
+#endif
 
 #endif // __HWTIMER_CPU_H
