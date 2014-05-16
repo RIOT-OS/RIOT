@@ -67,10 +67,21 @@ BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
 .PHONY: all clean flash doc term objsize buildsize buildsizes buildsizes-diff
 
+export ELFFILE ?= $(BINDIR)$(PROJECT).elf
+export HEXFILE ?= $(ELFFILE:.elf=.hex)
+
 ## make script for your application. Build RIOT-base here!
-all: $(BINDIR)$(PROJECT).elf
-	$(AD)$(SIZE) $(BINDIR)$(PROJECT).elf
-	$(AD)$(OBJCOPY) $(OFLAGS) $(BINDIR)$(PROJECT).elf $(BINDIR)$(PROJECT).hex
+all: $(BINDIR)$(PROJECT).a
+	@echo "Building application $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
+	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
+	"$(MAKE)" -C $(RIOTBASE)
+ifeq ($(BUILDOSXNATIVE),1)
+	$(AD)$(LINK) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
+else
+	$(AD)$(LINK) $(UNDEF) -o $(ELFFILE) -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS)
+endif
+	$(AD)$(SIZE) $(ELFFILE)
+	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
 
 ## your make rules
 ## Only basic example - modify it for larger applications!!
@@ -82,16 +93,6 @@ SRC = $(wildcard *.c)
 
 # string array of all names replaced .c with .o
 OBJ = $(SRC:%.c=${BINDIR}${PROJECT}/%.o)
-
-$(BINDIR)$(PROJECT).elf: $(BINDIR)$(PROJECT).a
-	@echo "Building application $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
-	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
-	"$(MAKE)" -C $(RIOTBASE)
-ifeq ($(BUILDOSXNATIVE),1)
-	$(AD)$(LINK) $(UNDEF) -o $@ $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
-else
-	$(AD)$(LINK) $(UNDEF) -o $@ -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS)
-endif
 
 $(BINDIR)$(PROJECT).a: $(OBJ)
 	$(AD)$(AR) -rc $(BINDIR)$(PROJECT).a $(OBJ)
@@ -120,7 +121,7 @@ $(RIOTBASE)/pkg/%/Makefile.include::
 $(BINDIR)$(PROJECT)/%.o: %.c $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
 	@echo; echo "Compiling.... $*.c"; echo
 	$(AD)mkdir -p "$(dir $@)"
-	$(ADD)$(CC) $(CFLAGS) $(INCLUDES) -c "$<" -o "$@"
+	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c "$<" -o "$@"
 
 $(USEPKG:%=${BINDIR}%.a)::
 	@mkdir -p ${BINDIR}
