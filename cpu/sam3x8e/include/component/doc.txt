@@ -1,0 +1,5 @@
+/**
+ * @defgroup    cpu_sam3x8e_components SAM3XA Components
+ * @brief       SAM3XA Components
+ * @ingroup     cpu_sam3x8e
+ */

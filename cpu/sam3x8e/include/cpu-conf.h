@@ -7,9 +7,6 @@
  */
 
 /**
- * @defgroup        cpu_sam3x8e Atmel SAM3X8E
- * @ingroup         cpu
- * @brief           Implementation of Atmel's SAM3X8E Cortex-M3 MCU
  * @{
  *
  * @file            cpu-conf.h

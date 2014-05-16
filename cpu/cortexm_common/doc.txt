@@ -1,0 +1,40 @@
+/**
+ * @defgroup    cortexm Cortex-M
+ * @brief       ARM Cortex-M specific code
+ * @ingroup     cpu
+ */
+
+/**
+ * @defgroup    CMSIS_Core_FunctionInterface
+ * @ingroup     cortexm
+ */
+
+/**
+ * @defgroup    CMSIS_core_register
+ * @ingroup     cortexm
+ */
+
+/**
+ * @defgroup    CMSIS_glob_defs
+ * @ingroup     cortexm
+ */
+
+/**
+ * @defgroup    CMSIS_MISRA_Exceptions
+ * @ingroup     cortexm
+ */
+
+/**
+ * @defgroup    CMSIS_core_definitions
+ * @ingroup     cortexm
+ */
+
+/**
+ * @defgroup    CMSIS_SIMD_intrinsics
+ * @ingroup     cortexm
+ */
+
+/**
+ * @defgroup    CMSIS_Core_InstructionInterface
+ * @ingroup     cortexm
+ */
