@@ -21,6 +21,7 @@
 #include <stdio.h>
 
 #include "hwtimer.h"
+#include "thread.h"
 
 #define BASE_DELAY (1000UL * 1000UL)
 #define DELTA_DELAY (1000UL * 1000UL)
@@ -70,5 +71,6 @@ int main(void)
     hwtimer_wait(HWTIMER_TICKS(1000UL * 1000UL));
 
     puts("hwtimer set.");
+    thread_sleep();
     return 0;
 }
