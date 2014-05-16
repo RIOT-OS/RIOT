@@ -26,7 +26,7 @@ include $(RIOTBASE)/Makefile.include
 
 UNITTEST_LIBS := $(UNIT_TESTS:%=$(BINDIR)%.a)
 
-all: $(UNITTEST_LIBS)
+$(BINDIR)$(PROJECT).elf: $(BINDIR)$(PROJECT).a $(UNITTEST_LIBS)
 $(UNIT_TESTS): all
 
 $(UNITTEST_LIBS): $(BINDIR)%.a:
