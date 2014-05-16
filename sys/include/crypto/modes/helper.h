@@ -47,9 +47,9 @@ static inline void block_inc_ctr(uint8_t block[16], uint8_t L)
  */
 static inline int equals(uint8_t *a, uint8_t *b, size_t len) {
   int result = 1;
-  while (len--) {
-    result &= (*a++ == *b++);
-  }
+  while (len-- && (result &=*a++ == *b++))
+    ;
+
   return result;
 }
 
