@@ -32,7 +32,7 @@
 #define __CORE_CM3_H_GENERIC
 
 
-/** \mainpage CMSIS Cortex-M3
+/** CMSIS Cortex-M3
 
   This documentation describes the CMSIS Cortex-M Core Peripheral Access Layer.
   It consists of:

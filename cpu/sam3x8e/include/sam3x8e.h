@@ -30,7 +30,7 @@
 #ifndef _SAM3X8E_
 #define _SAM3X8E_
 
-/** \addtogroup SAM3X8E_definitions SAM3X8E definitions
+/** \addtogroup cpu_sam3x8e_definitions SAM3X8E definitions
   This file defines all structures and symbols for SAM3X8E:
     - registers and bitfields
     - peripheral base address
