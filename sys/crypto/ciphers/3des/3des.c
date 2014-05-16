@@ -43,7 +43,7 @@
  * @brief Interface to the 3DES cipher
  */
 cipher_interface_t tripledes_interface = {
-    BLOCK_SIZE,
+    THREEDES_BLOCK_SIZE,
     24,
     tripledes_init,
     tripledes_encrypt,
@@ -276,7 +276,7 @@ int tripledes_init(cipher_context_t *context, uint8_t blockSize, uint8_t* key,
 int tripledes_set_key(cipher_context_t *context, uint8_t *key,
                                 uint8_t keysize) //To change !!!
 {
-    return tripledes_init(context, THREEDES_BLOCK_SIZE, keysize, key);
+    return tripledes_init(context, THREEDES_BLOCK_SIZE, key, keysize);
 }
 
 int tripledes_encrypt(cipher_context_t *context, uint8_t *plain, uint8_t *crypt)

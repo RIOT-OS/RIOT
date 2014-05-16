@@ -233,7 +233,7 @@ int twofish_init(cipher_context_t *context, uint8_t block_size, uint8_t *key,
  *
  * @return SUCCESS
  */
-int twofish_setup_key(cipher_context_t *context, uint8_t *key, uint8_t key_size);
+int twofish_set_key(cipher_context_t *context, uint8_t *key, uint8_t key_size);
 
 /**
  * @brief   Encrypts a single block (of blockSize) using the passed context.
@@ -260,17 +260,6 @@ int twofish_encrypt(cipher_context_t *context, uint8_t *in, uint8_t *out);
  *          include not calling init()
  */
 int twofish_decrypt(cipher_context_t *context, uint8_t *in, uint8_t *out);
-
-/**
- * @brief   Returns the preferred block size that this cipher operates with.
- *          It is always safe to call this function before the init() call has
- *          been made.
- *
- * @return  the preferred block size for this cipher. In the case where the
- *          cipher operates with multiple block sizes, this will pick one
- *          particular size (deterministically).
- */
-uint8_t twofish_get_preferred_block_size(void);
 
 /**
  * Interface to access the functions

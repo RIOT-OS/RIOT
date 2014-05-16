@@ -30,7 +30,7 @@
 
 
 //prototype
-static int twofish_set_key(twofish_context_t *ctx, uint8_t *key, uint8_t keylen);
+static int twofish_setup_key(twofish_context_t *ctx, uint8_t *key, uint8_t keylen);
 
 // twofish interface
 cipher_interface_t twofish_interface = {
@@ -501,7 +501,7 @@ int twofish_init(cipher_context_t *context, uint8_t blockSize, uint8_t *key,
 
 int twofish_set_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
 {
-    return twofish_init(context, TWOFISH_BLOCK_SIZE, keysize, key);
+    return twofish_init(context, TWOFISH_BLOCK_SIZE, key, keysize);
 }
 
 /**
@@ -515,7 +515,7 @@ int twofish_set_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
  *
  * @return  -1 if invalid key-length, 0 otherwise
  */
-static int twofish_set_key(twofish_context_t *ctx, uint8_t *key, uint8_t keylen)
+static int twofish_setup_key(twofish_context_t *ctx, uint8_t *key, uint8_t keylen)
 {
     int i, j, k;
 
@@ -657,7 +657,7 @@ int twofish_encrypt(cipher_context_t *context, uint8_t *in, uint8_t *out)
         return -1;
     }
 
-    res = twofish_set_key(ctx, context->context, TWOFISH_KEY_SIZE);
+    res = twofish_setup_key(ctx, context->context, TWOFISH_KEY_SIZE);
 
     if (res < 0) {
         printf("%-40s: [ERROR] twofish_setKey failed with Code %i\r\n",
@@ -710,7 +710,7 @@ int twofish_decrypt(cipher_context_t *context, uint8_t *in, uint8_t *out)
         return -1;
     }
 
-    res = twofish_set_key(ctx, context->context, TWOFISH_KEY_SIZE);
+    res = twofish_setup_key(ctx, context->context, TWOFISH_KEY_SIZE);
 
     if (res < 0) {
         printf("%-40s: [ERROR] twofish_setKey failed with Code %i\r\n",

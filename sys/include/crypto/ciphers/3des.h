@@ -96,7 +96,7 @@ int tripledes_init(cipher_context_t *context, uint8_t blockSize, uint8_t *key,
  *
  * @return  0 if initialized blocksize is wrong, 1 else
  */
-int tripledes_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
+int tripledes_set_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
 
 /**
  * @brief   encrypts one plain-block and saves the result in crypt.
@@ -135,11 +135,6 @@ int tripledes_encrypt(cipher_context_t *context, uint8_t *plain, uint8_t *crypt)
  *           1 if decryption was successful
  */
 int tripledes_decrypt(cipher_context_t *context, uint8_t *crypt, uint8_t *plain);
-
-/**
- * @brief returns the blocksize of the 3DES algorithm
- */
-uint8_t tripledes_get_preferred_block_size(void);
 
 /**
  * Interface to access the functions

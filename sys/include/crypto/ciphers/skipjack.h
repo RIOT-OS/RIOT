@@ -146,18 +146,7 @@ int skipjack_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
  *
  * @return SUCCESS
  */
-int skipjack_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
-
-/**
- * @brief   Returns the preferred block size that this cipher operates with.
- *          It is always safe to call this function before the init() call has
- *          been made.
- *
- * @return  the preferred block size for this cipher. In the case where the
- *          cipher operates with multiple block sizes, this will pick one
- *          particular size (deterministically).
- */
-uint8_t skipjack_get_preferred_block_size(void);
+int skipjack_set_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
 
 
 /**
