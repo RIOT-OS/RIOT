@@ -23,6 +23,7 @@
 #include <stdio.h>
 
 #include "crash.h"
+#include "native_internal.h"
 
 /* "public" variables holding the crash data (look for them in your debugger) */
 char panic_str[80];
