@@ -119,7 +119,7 @@ int rc5_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
  *
  * @return  SUCCESS
  */
-int rc5_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
+int rc5_set_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
 
 /**
  * @brief   Returns the preferred block size that this cipher operates with.

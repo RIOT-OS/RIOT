@@ -2,21 +2,41 @@
 #include <stdio.h>
 #include "crypto/ciphers.h"
 
+#ifdef MODULE_CRYPTO_CIPHERS_RC5
+extern cipher_interface_t rc5_interface;
+#endif
+
+#ifdef MODULE_CRYPTO_CIPHERS_3DES
+extern cipher_interface_t tripledes_interface;
+#endif
+
+#ifdef MODULE_CRYPTO_CIPHERS_AES
+extern cipher_interface_t aes_interface;
+#endif
+
+#ifdef MODULE_CRYPTO_CIPHERS_TWOFISH
+extern cipher_interface_t twofish_interface;
+#endif
+
+#ifdef MODULE_CRYPTO_CIPHERS_SKIPJACK
+extern cipher_interface_t skipjack_interface;
+#endif
+
 const cipher_entry_t cipher_list[]= {
 #ifdef MODULE_CRYPTO_CIPHERS_RC5
-    {"RC5-32/12", CIPHER_RC5, &rs5_interface, 32},
+    {"RC5-32/12", CIPHER_RC5, &rc5_interface, 32},
 #endif
 #ifdef MODULE_CRYPTO_CIPHERS_3DES
-    {"3DES", CIPHER_3DES, &tipledes_interface, 8},
+    {"3DES", CIPHER_3DES, &tripledes_interface, 8},
 #endif
 #ifdef MODULE_CRYPTO_CIPHERS_AES
     {"AES-128", CIPHER_AES_128, &aes_interface, 16},
 #endif
 #ifdef MODULE_CRYPTO_CIPHERS_TWOFISH
-    {"TWOFISH", CIPHER_AES_128, &twofish_interface, 16},
+    {"TWOFISH", CIPHER_TWOFISH, &twofish_interface, 16},
 #endif
 #ifdef MODULE_CRYPTO_CIPHERS_SKIPJACK
-    {"SKIPJACK", CIPHER_AES_128, &skipjack_interface, 8},
+    {"SKIPJACK", CIPHER_SKIPJACK, &skipjack_interface, 8},
 #endif
     {NULL, CIPHER_UNKNOWN, NULL, 0}
 };

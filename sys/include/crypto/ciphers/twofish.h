@@ -233,7 +233,7 @@ int twofish_init(cipher_context_t *context, uint8_t block_size, uint8_t *key,
  *
  * @return SUCCESS
  */
-int twofish_setup_key(cipher_context_t *context, uint8_t *key, uint8_t key_size);
+int twofish_set_key(cipher_context_t *context, uint8_t *key, uint8_t key_size);
 
 /**
  * @brief   Encrypts a single block (of blockSize) using the passed context.

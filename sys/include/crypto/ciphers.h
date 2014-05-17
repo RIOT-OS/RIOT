@@ -104,27 +104,6 @@ typedef enum {
 } cipher_id_t;
 
 
-#ifdef MODULE_CRYPTO_CIPHERS_RC5
-extern cipher_interface_t rc5_interface;
-#endif
-
-#ifdef MODULE_CRYPTO_CIPHERS_3DES
-extern cipher_interface_t treedes_interface;
-#endif
-
-#ifdef MODULE_CRYPTO_CIPHERS_AES
-extern cipher_interface_t aes_interface;
-#endif
-
-#ifdef MODULE_CRYPTO_CIPHERS_TWOFISH
-extern cipher_interface_t twofish_interface;
-#endif
-
-#ifdef MODULE_CRYPTO_CIPHERS_SKIPJACK
-extern cipher_interface_t skipjack_interface;
-#endif
-
-
 /**
  * @brief   cipher entry
  */

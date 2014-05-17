@@ -146,7 +146,7 @@ int skipjack_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
  *
  * @return SUCCESS
  */
-int skipjack_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
+int skipjack_set_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
 
 /**
  * @brief   Returns the preferred block size that this cipher operates with.
