@@ -1,6 +1,13 @@
 /**
  * @ingroup pthread
+ * @{
+ * @file
+ * @brief   Synchronization barriers.
+ * @note    Do not include this header file directly, but pthread.h.
  */
+
+#ifndef __SYS__POSIX__PTHREAD_BARRIER__H
+#define __SYS__POSIX__PTHREAD_BARRIER__H
 
 #include "mutex.h"
 
@@ -112,3 +119,9 @@ int pthread_barrierattr_getpshared(const pthread_barrierattr_t *attr, int *pshar
  * @returns   0, the invocation cannot fail
  */
 int pthread_barrierattr_setpshared(pthread_barrierattr_t *attr, int pshared);
+
+#endif
+
+/**
+ * @}
+ */

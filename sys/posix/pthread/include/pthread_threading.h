@@ -1,6 +1,13 @@
 /**
  * @ingroup pthread
+ * @{
+ * @file
+ * @brief   Thread creation features.
+ * @note    Do not include this header file directly, but pthread.h.
  */
+
+#ifndef __SYS__POSIX__PTHREAD_THREADING__H
+#define __SYS__POSIX__PTHREAD_THREADING__H
 
 #include "attributes.h"
 
@@ -83,3 +90,9 @@ static inline int pthread_equal(pthread_t thread1, pthread_t thread2)
 {
     return thread1 == thread2;
 }
+
+#endif
+
+/**
+ * @}
+ */

@@ -1,6 +1,14 @@
 /**
  * @ingroup pthread
+ * @{
+ * @file
+ * @brief   Thread cancellation features.
+ * @note    None of these functions are implemented, yet.
+ * @note    Do not include this header file directly, but pthread.h.
  */
+
+#ifndef __SYS__POSIX__PTHREAD_CANCELLCATION__H
+#define __SYS__POSIX__PTHREAD_CANCELLCATION__H
 
 #define PTHREAD_CANCEL_DISABLE 0
 #define PTHREAD_CANCEL_ENABLE  1
@@ -41,3 +49,9 @@ int pthread_cancel(pthread_t th);
  * @details      If pthread_cancel() called before, the current thread exits with with the code #PTHREAD_CANCELED.
  */
 void pthread_testcancel(void);
+
+#endif
+
+/**
+ * @}
+ */

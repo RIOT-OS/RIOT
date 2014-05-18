@@ -1,6 +1,13 @@
 /**
  * @ingroup pthread
+ * @{
+ * @file
+ * @brief   Implementation of a fair, POSIX conforming reader/writer lock.
+ * @note    Do not include this header file directly, but pthread.h.
  */
+
+#ifndef __SYS__POSIX__PTHREAD_RWLOCK__H
+#define __SYS__POSIX__PTHREAD_RWLOCK__H
 
 #include "queue.h"
 #include "tcb.h"
@@ -153,3 +160,9 @@ bool __pthread_rwlock_blocked_readingly(const pthread_rwlock_t *rwlock);
  * @returns          `false` if locking for writing is possible without blocking.
  */
 bool __pthread_rwlock_blocked_writingly(const pthread_rwlock_t *rwlock);
+
+#endif
+
+/**
+ * @}
+ */

@@ -2,10 +2,12 @@
  * @ingroup pthread
  * @{
  * @file
- * @brief Cleanup primitives for pthread threads.
- * @author René Kijewski <kijewski@inf.fu-berlin.de>
- * @}
+ * @brief   Cleanup primitives for pthread threads.
+ * @note    Do not include this header file directly, but pthread.h.
  */
+
+#ifndef __SYS__POSIX__PTHREAD_CLEANUP__H
+#define __SYS__POSIX__PTHREAD_CLEANUP__H
 
 /**
  * @brief   Internal structure for pthread_cleanup_push()
@@ -76,3 +78,9 @@ void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute);
         } while (0); \
         __pthread_cleanup_pop(&____datum__, ____execute__); \
     } while (0)
+
+#endif
+
+/**
+ * @}
+ */
