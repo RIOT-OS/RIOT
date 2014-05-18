@@ -65,7 +65,7 @@ BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${PROJECT}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
-.PHONY: all clean flash doc term objsize buildsize buildsizes buildsizes-diff
+.PHONY: all clean flash doc term objsize buildsize buildsizes buildsizes-diff buildinfo
 
 export ELFFILE ?= $(BINDIR)$(PROJECT).elf
 export HEXFILE ?= $(ELFFILE:.elf=.hex)
