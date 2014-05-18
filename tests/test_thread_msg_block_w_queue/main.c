@@ -50,7 +50,7 @@ void thread1(void)
 int main(void)
 {
     msg_t msg;
-    p_main = thread_pid;
+    p_main = sched_active_pid;
 
     msg_t msg_q[1];
     msg_init_queue(msg_q, 1);

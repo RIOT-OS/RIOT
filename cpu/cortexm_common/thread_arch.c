@@ -143,8 +143,8 @@ void enter_thread_mode(void)
     __set_CONTROL(mode.w);
 
     /* load pdc->stackpointer in r0 */
-    asm("ldr    r0, =active_thread" );      /* r0 = &active_thread */
-    asm("ldr    r0, [r0]"           );      /* r0 = *r0 = active_thread */
+    asm("ldr    r0, =sched_active_thread" );      /* r0 = &sched_active_thread */
+    asm("ldr    r0, [r0]"           );      /* r0 = *r0 = sched_active_thread */
     asm("ldr    sp, [r0]"           );      /* sp = r0  restore stack pointer*/
     asm("pop    {r4}"               );      /* skip exception return */
     asm("pop    {r4-r11}"           );
@@ -189,14 +189,14 @@ __attribute__((always_inline)) static __INLINE void context_save(void)
     asm("stmdb  r0!,{r4-r11}"       );      /* save regs */
     asm("stmdb  r0!,{lr}"           );      /* exception return value */
 /*  asm("vstmdb sp!, {s16-s31}"     ); */   /* TODO save FPU registers if needed */
-    asm("ldr    r1, =active_thread" );      /* load address of current tcb */
+    asm("ldr    r1, =sched_active_thread" );      /* load address of current tcb */
     asm("ldr    r1, [r1]"           );      /* dereference pdc */
     asm("str    r0, [r1]"           );      /* write r0 to pdc->sp means current threads stack pointer */
 }
 
 __attribute__((always_inline)) static __INLINE void context_restore(void)
 {
-    asm("ldr    r0, =active_thread" );      /* load address of current TCB */
+    asm("ldr    r0, =sched_active_thread" );      /* load address of current TCB */
     asm("ldr    r0, [r0]"           );      /* dereference TCB */
     asm("ldr    r1, [r0]"           );      /* load tcb->sp to register 1 */
     asm("ldmia  r1!, {r0}"          );      /* restore exception return value from stack */

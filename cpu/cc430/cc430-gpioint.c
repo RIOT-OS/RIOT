@@ -68,7 +68,7 @@ bool gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback)
 
     if ((port >= PORTINT_MIN) && (port <= PORTINT_MAX)) {
         /* set the callback function */
-        base = number_of_highest_bit(bitmask);
+        base = bitarithm_msb(bitmask);
 
         if (base >= 0) {
             cb[port - PORTINT_MIN][base] = callback;

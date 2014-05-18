@@ -142,7 +142,7 @@ int thread_getlastpid(void);
  *
  * Only works if the thread was created with the flag CREATE_STACKTEST.
  *
- * @param[in] stack the stack you want to measure. try `active_thread->stack_start`
+ * @param[in] stack the stack you want to measure. try `sched_active_thread->stack_start`
  *
  * @return          the amount of unused space of the thread's stack
  */

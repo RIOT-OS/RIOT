@@ -89,7 +89,7 @@ void save_context(void)
     asm("push   {LR}");
     /* save exception return value */
 
-    asm("ldr     r1, =active_thread");
+    asm("ldr     r1, =sched_active_thread");
     /* load address of currend pdc */
     asm("ldr     r1, [r1]");
     /* deref pdc */
@@ -99,7 +99,7 @@ void save_context(void)
 
 void restore_context(void)
 {
-    asm("ldr     r0, =active_thread");
+    asm("ldr     r0, =sched_active_thread");
     /* load address of currend pdc */
     asm("ldr     r0, [r0]");
     /* deref pdc */

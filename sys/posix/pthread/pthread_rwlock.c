@@ -81,7 +81,7 @@ bool __pthread_rwlock_blocked_readingly(const pthread_rwlock_t *rwlock)
     }
 
     queue_node_t *qnode = rwlock->queue.next;
-    if (qnode->priority > active_thread->priority) {
+    if (qnode->priority > sched_active_thread->priority) {
         /* the waiting thread has a lower priority */
         return false;
     }
@@ -122,11 +122,11 @@ static int pthread_rwlock_lock(pthread_rwlock_t *rwlock,
         /* queue for the lock */
         __pthread_rwlock_waiter_node_t waiting_node = {
             .is_writer = is_writer,
-            .thread = (tcb_t *) active_thread,
+            .thread = (tcb_t *) sched_active_thread,
             .qnode = {
                 .next = NULL,
                 .data = (uintptr_t) &waiting_node,
-                .priority = active_thread->priority,
+                .priority = sched_active_thread->priority,
             },
             .continue_ = false,
         };
@@ -200,7 +200,7 @@ static int pthread_rwlock_timedlock(pthread_rwlock_t *rwlock,
         timex_t reltime = timex_sub(then, now);
 
         vtimer_t timer;
-        vtimer_set_wakeup(&timer, reltime, active_thread->pid);
+        vtimer_set_wakeup(&timer, reltime, sched_active_thread->pid);
         int result = pthread_rwlock_lock(rwlock, is_blocked, is_writer, incr_when_held, true);
         if (result != ETIMEDOUT) {
             vtimer_remove(&timer);
@@ -315,6 +315,6 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
     mutex_unlock(&rwlock->mutex);
 
     /* yield if a woken up thread had a higher priority */
-    sched_switch(active_thread->priority, prio);
+    sched_switch(sched_active_thread->priority, prio);
     return 0;
 }

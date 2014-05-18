@@ -94,7 +94,7 @@
  *
  * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
  */
-unsigned number_of_highest_bit(unsigned v);
+unsigned bitarithm_msb(unsigned v);
 
 /**
  * @brief   Returns the number of the lowest '1' bit in a value
@@ -104,7 +104,7 @@ unsigned number_of_highest_bit(unsigned v);
  *
  * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
  */
-unsigned number_of_lowest_bit(register unsigned v);
+unsigned bitarithm_lsb(register unsigned v);
 
 /**
  * @brief   Returns the number of bits set in a value
@@ -113,7 +113,7 @@ unsigned number_of_lowest_bit(register unsigned v);
  *
  * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
  */
-unsigned number_of_bits_set(unsigned v);
+unsigned bitarithm_bits_set(unsigned v);
 
 #endif /* BITARITHM_H_ */
 /** @} */

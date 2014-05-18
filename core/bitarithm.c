@@ -21,8 +21,7 @@
 
 #include <stdio.h>
 
-unsigned
-number_of_highest_bit(unsigned v)
+unsigned bitarithm_msb(unsigned v)
 {
     register unsigned r; // result of log2(v) will go here
 
@@ -45,8 +44,7 @@ number_of_highest_bit(unsigned v)
     return r;
 }
 /*---------------------------------------------------------------------------*/
-unsigned
-number_of_lowest_bit(register unsigned v)
+unsigned bitarithm_lsb(register unsigned v)
 {
     register unsigned r = 0;
 
@@ -58,8 +56,7 @@ number_of_lowest_bit(register unsigned v)
     return r;
 }
 /*---------------------------------------------------------------------------*/
-unsigned
-number_of_bits_set(unsigned v)
+unsigned bitarithm_bits_set(unsigned v)
 {
     unsigned c; // c accumulates the total bits set in v
 

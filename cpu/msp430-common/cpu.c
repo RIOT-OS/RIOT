@@ -25,7 +25,7 @@ void thread_yield(void)
     __save_context();
 
     dINT();
-    /* have active_thread point to the next thread */
+    /* have sched_active_thread point to the next thread */
     sched_run();
     eINT();
 
@@ -34,7 +34,7 @@ void thread_yield(void)
 
 NORETURN void cpu_switch_context_exit(void)
 {
-    active_thread = sched_threads[0];
+    sched_active_thread = sched_threads[0];
     sched_run();
 
     __restore_context();

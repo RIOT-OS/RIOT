@@ -46,7 +46,7 @@
 #endif
 #include "debug.h"
 
-extern volatile tcb_t *active_thread;
+extern volatile tcb_t *sched_active_thread;
 
 ssize_t (*real_read)(int fd, void *buf, size_t count);
 ssize_t (*real_write)(int fd, const void *buf, size_t count);
@@ -74,12 +74,12 @@ void _native_syscall_leave(void)
             && (_native_in_isr == 0)
             && (_native_in_syscall == 0)
             && (native_interrupts_enabled == 1)
-            && (active_thread != NULL)
+            && (sched_active_thread != NULL)
        )
     {
         _native_in_isr = 1;
         dINT();
-        _native_cur_ctx = (ucontext_t *)active_thread->sp;
+        _native_cur_ctx = (ucontext_t *)sched_active_thread->sp;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
         native_isr_context.uc_stack.ss_flags = 0;

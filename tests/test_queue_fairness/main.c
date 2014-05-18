@@ -37,22 +37,22 @@ static int parent_pid;
 
 static void child_fun(void)
 {
-    printf("Start of %s.\n", active_thread->name);
+    printf("Start of %s.\n", sched_active_thread->name);
 
     for (int i = 0; i < NUM_ITERATIONS; ++i) {
         msg_t m;
         m.type = i + 1;
-        m.content.ptr = (void *) active_thread->name;
+        m.content.ptr = (void *) sched_active_thread->name;
         msg_send(&m, parent_pid, true);
     }
 
-    printf("End of %s.\n", active_thread->name);
+    printf("End of %s.\n", sched_active_thread->name);
 }
 
 int main(void)
 {
     puts("Start.");
-    parent_pid = thread_pid;
+    parent_pid = sched_active_pid;
 
     for (int i = 0; i < NUM_CHILDREN; ++i) {
         snprintf(names[i], sizeof (names[i]), "child%2u", i + 1);

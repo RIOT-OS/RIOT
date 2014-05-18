@@ -57,12 +57,12 @@ inline void __save_context_isr(void)
     __asm__("push r5");
     __asm__("push r4");
 
-    __asm__("mov.w r1,%0" : "=r"(active_thread->sp));
+    __asm__("mov.w r1,%0" : "=r"(sched_active_thread->sp));
 }
 
 inline void __restore_context_isr(void)
 {
-    __asm__("mov.w %0,r1" : : "m"(active_thread->sp));
+    __asm__("mov.w %0,r1" : : "m"(sched_active_thread->sp));
 
     __asm__("pop r4");
     __asm__("pop r5");
