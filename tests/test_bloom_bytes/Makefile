@@ -1,4 +1,4 @@
-export PROJECT = test_bloom
+export PROJECT = test_bloom_bytes
 include ../Makefile.tests_common
 
 BOARD_BLACKLIST := chronos msb-430 msb-430h \
