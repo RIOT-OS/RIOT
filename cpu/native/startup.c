@@ -251,7 +251,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 #ifdef MODULE_UART0
         else if (strcmp("-t", arg) == 0) {
             stdiotype = "tcp";
-            if (argp+1 < argc) {
+            if (argp + 1 < argc) {
                 ioparam = argv[++argp];
             }
             else {
