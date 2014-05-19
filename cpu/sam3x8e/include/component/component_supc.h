@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Supply Controller */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_SUPC Supply Controller */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_SUPC Supply Controller */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

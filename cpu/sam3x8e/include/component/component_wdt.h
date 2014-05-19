@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Watchdog Timer */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_WDT Watchdog Timer */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_WDT Watchdog Timer */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR AHB Bus Matrix */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_MATRIX AHB Bus Matrix */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_MATRIX AHB Bus Matrix */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

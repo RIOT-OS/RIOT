@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Reset Controller */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_RSTC Reset Controller */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_RSTC Reset Controller */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

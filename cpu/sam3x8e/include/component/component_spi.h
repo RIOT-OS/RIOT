@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Serial Peripheral Interface */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_SPI Serial Peripheral Interface */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_SPI Serial Peripheral Interface */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR DMA Controller */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_DMAC DMA Controller */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_DMAC DMA Controller */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

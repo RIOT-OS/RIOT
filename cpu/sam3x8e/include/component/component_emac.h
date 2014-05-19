@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Ethernet MAC 10/100 */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_EMAC Ethernet MAC 10/100 */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_EMAC Ethernet MAC 10/100 */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

@@ -11,8 +11,8 @@
 #define _Z1_BOARD_H
 
 /**
- * @defgroup    board_z1
- * @ingroup     board_z1
+ * @defgroup    board_z1 Zolertia Z1
+ * @ingroup     boards
  *
 <h2>Components</h2>
 \li MSP430F2617

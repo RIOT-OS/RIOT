@@ -33,7 +33,8 @@
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR True Random Number Generator */
 /* ============================================================================= */
-/** \addtogroup SAM3XA_TRNG True Random Number Generator */
+/** \ingroup SAM3X8E_cmsis */
+/** \defgroup SAM3XA_TRNG True Random Number Generator */
 /*@{*/
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
