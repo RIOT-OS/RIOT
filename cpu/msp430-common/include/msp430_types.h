@@ -2,6 +2,23 @@
 #define MSP430_TYPES_H
 
 #include <sys/_types.h>
+#include <errno.h>
+
+#ifndef EINVAL
+/**
+ * @brief defines EINVAL if MSP430 toolchain is too old to provide it itself
+ *        via errno.h
+ */
+#define EINVAL  (28)
+#endif
+
+#ifndef EOVERFLOW
+/**
+ * @brief defines EOVERFLOW if MSP430 toolchain is too old to provide it itself
+ *        via errno.h
+ */
+#define EOVERFLOW   (65)
+#endif
 
 /** defining signed type for size_t */
 typedef _ssize_t ssize_t;
