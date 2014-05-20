@@ -1,6 +1,13 @@
 /**
  * @ingroup pthread
+ * @{
+ * @file
+ * @brief   Mutual exclusion.
+ * @note    Do not include this header file directly, but pthread.h.
  */
+
+#ifndef __SYS__POSIX__PTHREAD_MUTEX__H
+#define __SYS__POSIX__PTHREAD_MUTEX__H
 
 #include <time.h>
 
@@ -89,3 +96,9 @@ int pthread_mutex_getprioceiling(const pthread_mutex_t *mutex, int *prioceiling)
  * @return          Well ... you'll get a link time error, so nothing will be returned.
  */
 int pthread_mutex_setprioceiling(pthread_mutex_t *mutex, int prioceiling, int *old_ceiling);
+
+#endif
+
+/**
+ * @}
+ */

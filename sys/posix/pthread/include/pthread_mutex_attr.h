@@ -1,3 +1,14 @@
+/**
+ * @ingroup pthread
+ * @{
+ * @file
+ * @brief   Attributes for pthread mutexes.
+ * @note    Do not include this header file directly, but pthread.h.
+ */
+
+#ifndef __SYS__POSIX__PTHREAD_MUTEX_ATTR__H
+#define __SYS__POSIX__PTHREAD_MUTEX_ATTR__H
+
 #include <errno.h>
 
 /**
@@ -14,18 +25,18 @@
  * @brief           A mutex that fails with `EDEADLK` if recursive locking was detected.
  * @note            Not implemented, yet.
  */
+/**
+ * @def             PTHREAD_MUTEX_DEFAULT
+ * @brief           The default mutex kind for RIOT.
+ * @note            Not implemented, yet.
+ */
 #define PTHREAD_MUTEX_NORMAL     0
 #define PTHREAD_MUTEX_RECURSIVE  1
 #define PTHREAD_MUTEX_ERRORCHECK 2
 #define PTHREAD_MUTEX_DEFAULT    PTHREAD_MUTEX_NORMAL
 
 /**
- * @def             PTHREAD_MUTEX_DEFAULT
- * @brief           The default mutex kind for RIOT.
- * @note            Not implemented, yet.
- */
-/**
- * @def             PTHREAD_MUTEX_DEFAULT
+ * @def             PTHREAD_PRIO_NONE
  * @brief           No priority inheritance.
  * @details         Prone to inversed priorities.
  *                  The default mutex protocol.
@@ -187,3 +198,9 @@ int pthread_mutexattr_getrobust(const pthread_mutexattr_t *attr, int *robustness
  *                  `EINVAL` if `attr == NULL`.
  */
 int pthread_mutexattr_setrobust(pthread_mutexattr_t *attr, int robustness);
+
+#endif
+
+/**
+ * @}
+ */

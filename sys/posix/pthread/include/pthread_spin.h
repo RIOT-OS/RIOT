@@ -1,6 +1,16 @@
 /**
  * @ingroup pthread
+ * @{
+ * @file
+ * @brief   Spin locks.
+ * @note    Do not include this header file directly, but pthread.h.
+ * @warning Spinlocks should be avoided.
+ *          They will burn away the battery needlessly, and may not work because RIOT is tickless.
+ *          Use disableIRQ() and restoreIRQ() for shortterm locks instead.
  */
+
+#ifndef __SYS__POSIX__PTHREAD_SPIN__H
+#define __SYS__POSIX__PTHREAD_SPIN__H
 
 #include <errno.h>
 
@@ -62,3 +72,9 @@ int pthread_spin_trylock(pthread_spinlock_t *lock);
  *                  `EINVAL` if `lock == NULL`.
  */
 int pthread_spin_unlock(pthread_spinlock_t *lock);
+
+#endif
+
+/**
+ * @}
+ */

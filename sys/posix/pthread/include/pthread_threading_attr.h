@@ -1,6 +1,13 @@
 /**
  * @ingroup pthread
+ * @{
+ * @file
+ * @brief   Thread creation features (attributes).
+ * @note    Do not include this header file directly, but pthread.h.
  */
+
+#ifndef __SYS__POSIX__PTHREAD_THREADING_ATTR__H
+#define __SYS__POSIX__PTHREAD_THREADING_ATTR__H
 
 /**
  * @brief     An attribute set to supply to pthread_create()
@@ -181,3 +188,9 @@ int pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize);
  * @return          0, this invocation cannot fail.
  */
 int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);
+
+#endif
+
+/**
+ * @}
+ */

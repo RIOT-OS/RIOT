@@ -1,6 +1,13 @@
 /**
  * @ingroup pthread
+ * @{
+ * @file
+ * @brief   Implementation of a fair, POSIX conforming reader/writer lock (attribute set).
+ * @note    Do not include this header file directly, but pthread.h.
  */
+
+#ifndef __SYS__POSIX__PTHREAD_RWLOCK_ATTR__H
+#define __SYS__POSIX__PTHREAD_RWLOCK_ATTR__H
 
 #include <errno.h>
 
@@ -56,3 +63,9 @@ int pthread_rwlockattr_getpshared(const pthread_rwlockattr_t *attr, int *pshared
  *                  `EINVAL` if `attr == NULL` or a wrong value for `pshared` was supplied.
  */
 int pthread_rwlockattr_setpshared(pthread_rwlockattr_t *attr, int pshared);
+
+#endif
+
+/**
+ * @}
+ */

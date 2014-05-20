@@ -7,19 +7,15 @@
  */
 
 /**
- * @defgroup
- * @brief
- * @ingroup     sys
+ * @ingroup pthread
  * @{
- *
- * @file        condition_variable.h
+ * @file
  * @brief       RIOT POSIX condition variable API
- *
  * @author      Martin Landsmann <martin.landsmann@haw-hamburg.de>
  */
 
-#ifndef _CONDITION_VARIABLE_H
-#define _CONDITION_VARIABLE_H
+#ifndef __SYS__POSIX__PTHREAD_COND__H
+#define __SYS__POSIX__PTHREAD_COND__H
 
 #include <time.h>
 #include "mutex.h"
