@@ -146,6 +146,9 @@ void daemonize(void)
         real_printf("RIOT pid: %d\n", _native_pid);
         exit(EXIT_SUCCESS);
     }
+    else {
+        _native_pid = real_getpid();
+    }
 }
 
 void usage_exit(void)
