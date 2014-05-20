@@ -18,7 +18,6 @@
  * @}
  */
 
-#include <errno.h>
 #include <stdio.h>
 
 #include "thread.h"
@@ -134,7 +133,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     tcb_t *cb = (tcb_t *) tcb_address;
 
     if (priority >= SCHED_PRIO_LEVELS) {
-        return -EINVAL;
+        return -1;
     }
 
     if (flags & CREATE_STACKTEST) {
@@ -175,7 +174,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
             eINT();
         }
 
-        return -EOVERFLOW;
+        return -1;
     }
 
     cb->sp = thread_stack_init(function, stack, stacksize);
