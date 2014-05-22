@@ -4,6 +4,16 @@
  * A generic CMSIS include header, pulling in LPC1768 specifics
  */
 
+/**
+ * @defgroup CMSIS
+ * @ingroup cpu
+ * @{
+ *
+ * @file        cmsis.h
+ * @brief       CMSIS interface pulling in LPC1768 specifics
+ */
+
+
 #ifndef MBED_CMSIS_H
 #define MBED_CMSIS_H
 
@@ -11,3 +21,4 @@
 #include "cmsis_nvic.h"
 
 #endif
+/** @} */

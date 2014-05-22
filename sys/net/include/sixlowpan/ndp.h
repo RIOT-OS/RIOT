@@ -7,7 +7,9 @@
  */
 
 /**
+ * @addtogroup  net_sixlowpan_ndp
  * @ingroup     net_sixlowpan
+ * @brief       Neighbor discovery protocol for 6LoWPAN and IPv6
  * @{
  *
  * @file        sixlowpan/ndp.h
@@ -30,13 +32,13 @@
 
 #define NDP_6LOWPAN_CONTEXT_MAX         (16)
 
-#define NDP_OPT_SLLAO_TYPE                 	(1)
-#define NDP_OPT_TLLAO_TYPE                 	(2)
-#define NDP_OPT_PI_VLIFETIME_INFINITE      	(0xffffffff)
-#define NDP_OPT_PI_PLIFETIME_INFINITE      	(0xffffffff)
-#define NDP_OPT_ARO_STATE_SUCCESS          	(0)
-#define NDP_OPT_ARO_STATE_DUP_ADDR         	(1)
-#define NDP_OPT_ARO_STATE_NBR_CACHE_FULL   	(2)
+#define NDP_OPT_SLLAO_TYPE                  (1)
+#define NDP_OPT_TLLAO_TYPE                  (2)
+#define NDP_OPT_PI_VLIFETIME_INFINITE       (0xffffffff)
+#define NDP_OPT_PI_PLIFETIME_INFINITE       (0xffffffff)
+#define NDP_OPT_ARO_STATE_SUCCESS           (0)
+#define NDP_OPT_ARO_STATE_DUP_ADDR          (1)
+#define NDP_OPT_ARO_STATE_NBR_CACHE_FULL    (2)
 
 /**
  * @brief   Neighbor cache entry state according to

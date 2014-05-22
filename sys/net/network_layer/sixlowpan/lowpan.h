@@ -7,12 +7,7 @@
  */
 
 /**
- * @defgroup    net_sixlowpan 6LoWPAN
- * @ingroup     net
- * @brief       RIOTs 6LowPAN implementation
- * @{
- *
- * @file        lowpan.h
+ * @file        network_layer/sixlowpan/lowpan.h
  * @brief       6lowpan header
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -53,5 +48,4 @@ lowpan_context_t *lowpan_context_update(uint8_t num,
 lowpan_context_t *lowpan_context_get(void);
 lowpan_context_t *lowpan_context_num_lookup(uint8_t num);
 
-/** @} */
 #endif  /* _SIXLOWPAN_LOWPAN_H */

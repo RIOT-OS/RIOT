@@ -7,7 +7,9 @@
  */
 
 /**
+ * @defgroup    net_sixlowpan_types Type definitions and data structs for 6LoWPAN and IPv6
  * @ingroup     net_sixlowpan
+ * @brief       Structs, constants, and enums for 6LoWPAN and IPv6 related functions
  * @{
  *
  * @file        sixlowpan/types.h

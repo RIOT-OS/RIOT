@@ -7,10 +7,13 @@
  */
 
 /**
+ * @addtogroup    net_sixlowpan_ndp Neighbor discovery
  * @ingroup     net_sixlowpan
+ * @brief       Internet Control Message Protocol version 6
+ *
  * @{
  *
- * @file        sixlowpan/icmp.h
+ * @file        include/sixlowpan/icmp.h
  * @brief       6LoWPAN ICMP related header
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -243,5 +246,5 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst,
  * @return The internet checksum of the given ICMPv6 packet.
  */
 uint16_t icmpv6_csum(ipv6_hdr_t *ipv6_buf, icmpv6_hdr_t *icmpv6_buf);
-/** @} */
 #endif /* SIXLOWPAN_ICMP_H */
+/** @} */
