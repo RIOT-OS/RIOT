@@ -96,7 +96,7 @@ int cc2420_get_gio1(void)
     return CC2420_GIO1;
 }
 
-int cc2420_get_fifop(void)
+uint8_t cc2420_get_fifop(void)
 {
     return CC2420_FIFOP;
 }
