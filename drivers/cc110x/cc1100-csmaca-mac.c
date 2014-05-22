@@ -67,6 +67,7 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
     uint16_t max_window_size;
     uint16_t difs;
     uint16_t slottime;
+    int res;
 
     switch(priority) {
         case PRIORITY_ALARM:
@@ -194,8 +195,7 @@ cycle:
             cc1100_phy_mutex_unlock();
             cc1100_go_after_tx();			/* Go from RX to default mode */
             return RADIO_CS_TIMEOUT;		/* Return immediately */
-#endif
-#ifdef CSMACA_MAC_AGGRESSIVE_MODE
+#else
             goto send;						/* Send anyway */
 #endif
         }
@@ -233,7 +233,7 @@ cycle:
 #ifdef CSMACA_MAC_AGGRESSIVE_MODE
 send:
 #endif
-    int res = cc1100_send(address, protocol, priority, payload, payload_len);
+    res = cc1100_send(address, protocol, priority, payload, payload_len);
 
     if (res < 0) {
         collision_count++;
