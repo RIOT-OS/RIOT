@@ -1,8 +1,9 @@
 /**
  * Copyright (C) 2014 INRIA
  *
- * This source code is licensed under the GNU Lesser General Public License,
- * Version 2.  See the file LICENSE for more details.
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
  */
 
 /**
@@ -25,12 +26,21 @@
  * @brief Callback function type for receiving incoming packets
  *        from 802.15.4 radio transceiver.
  *
- * @param[in] buf Pointer to the buffer containing the incoming
- *                802.15.4 packet's raw data.
- * @param[in] len Length (in bytes) of the incoming packet's raw data.
- *
+ * @param[in] buf  Pointer to the buffer containing the incoming
+ *                 802.15.4 packet's raw data.
+ * @param[in] len  Length (in bytes) of the incoming packet's raw data.
+ * @param[in] rssi Value of the Receive Signal Strength Indicator (RSSI)
+ *                 for the incoming packet.
+ * @param[in] lqi  Value of the Link Quality Indicator (LQI)
+ *                 for the incoming packet.
+ * @param[in] crc_ok @c true if incoming packet's checksum (CRC) is valid;
+ *                   @c false otherwise (corrupted packet).
  */
-typedef void (* receive_802154_packet_callback_t)(void *buf, unsigned int len);
+typedef void (* receive_802154_packet_callback_t)(void *buf,
+                                                  unsigned int len,
+                                                  int8_t rssi,
+                                                  uint8_t lqi,
+                                                  bool crc_ok);
 
 /**
  * @brief Kind of packet to prepare/configure for transmission.
@@ -68,6 +78,12 @@ typedef enum {
 
     /** Transmission failed because of collision on radio medium */
     RADIO_TX_COLLISION,
+
+    /** Wrong parameter given to TX-related functions */
+    RADIO_TX_INVALID_PARAM,
+
+    /** Too much given data to be included in a single packet */
+    RADIO_TX_PACKET_TOO_LONG,
 
     /** Transmission supposedly failed since no ACK packet
         has been received as response */
@@ -109,6 +125,11 @@ typedef union {
  */
 typedef struct {
     /**
+     * @brief Initialize the radio transceiver (call before first use).
+     */
+    void (* init)(void);
+
+    /**
      * @brief Turn radio transceiver on.
      *
      * @return @c true if radio transceiver was actually started;
@@ -149,13 +170,15 @@ typedef struct {
      *                and transceiver configuration.
      * @param[in] len Length (in bytes) of the outgoing packet payload.
      *
-     * @return @c true if the transceiver TX buffer was loaded correctly;
-     *         @c false otherwise (transceiver error).
+     * @return The outcome of this packet's transmission.
+     *         @see radio_tx_status_t
      */
-    bool (* load_tx)(ieee802154_packet_kind_t kind,
-                     ieee802154_node_addr_t dest, bool use_long_addr,
-                     bool wants_ack,
-                     void *buf, unsigned int len);
+    radio_tx_status_t (* load_tx)(ieee802154_packet_kind_t kind,
+                                  ieee802154_node_addr_t dest,
+                                  bool use_long_addr,
+                                  bool wants_ack,
+                                  void *buf,
+                                  unsigned int len);
 
     /**
      * @brief Transmit the data loaded into the transceiver TX buffer.
@@ -189,10 +212,12 @@ typedef struct {
      * @return The outcome of this packet's transmission.
      *         @see radio_tx_status_t
      */
-    radio_tx_status_t (* send)(ieee802154_packet_kind_t,
-                               ieee802154_node_addr_t dest, bool use_long_addr,
+    radio_tx_status_t (* send)(ieee802154_packet_kind_t kind,
+                               ieee802154_node_addr_t dest,
+                               bool use_long_addr,
                                bool wants_ack,
-                               void *buf, unsigned int len);
+                               void *buf,
+                               unsigned int len);
 
     /**
      * @brief Define the function to be called back the radio transceiver
