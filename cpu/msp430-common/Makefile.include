@@ -1,1 +1,3 @@
 INCLUDES += -I$(RIOTBASE)/cpu/msp430-common/include/
+
+DEFAULT_MODULE += oneway_malloc
