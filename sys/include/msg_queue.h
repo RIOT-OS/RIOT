@@ -8,6 +8,8 @@
 #include "msg.h"
 #include "ringbuffer.h"
 
+#define MSG_PULSE_QUEUE_SIZE (sizeof(msg_hdr_t)+sizeof(msg_pulse_t))
+
 typedef struct msg_queue {
     ringbuffer_t rb;
     int          maxsize;
