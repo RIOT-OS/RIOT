@@ -200,9 +200,8 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     cb->msg_waiters.first = NULL;
 
-#if 0
-    cib_init(&(cb->msg_queue), 0);
-    cb->msg_array = NULL;
+#ifdef MODULE_MSG_QUEUE
+    cb->msg_queue = NULL;
 #endif
 
     sched_num_threads++;
@@ -232,3 +231,20 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     return pid;
 }
+
+#ifdef MODULE_MSG_QUEUE
+int thread_set_msg_queue(int pid, msg_queue_t* msg_queue) {
+    int res = 0;
+    int state = disableIRQ();
+
+    tcb_t* tcb = (tcb_t*) sched_threads[pid];
+    if (tcb) {
+        tcb->msg_queue = msg_queue;
+        res = 1;
+    }
+
+    restoreIRQ(state);
+
+    return res;
+}
+#endif
