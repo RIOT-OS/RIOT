@@ -60,7 +60,7 @@ endif
 # Feature test default CFLAGS and LINKFLAGS for the set compiled.
 include $(RIOTBASE)/Makefile.cflags
 
-# your binaries to link
+# the binaries to link
 BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${PROJECT}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
@@ -70,7 +70,7 @@ BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 export ELFFILE ?= $(BINDIR)$(PROJECT).elf
 export HEXFILE ?= $(ELFFILE:.elf=.hex)
 
-## make script for your application. Build RIOT-base here!
+## make script for the application
 all: $(BINDIR)$(PROJECT).a
 	@echo "Building application $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
@@ -82,11 +82,6 @@ else
 endif
 	$(AD)$(SIZE) $(ELFFILE)
 	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
-
-## your make rules
-## Only basic example - modify it for larger applications!!
-#$(BINDIR)/$(PROJECT).a: $(BINDIR)/$(PROJECT).o
-#	$(AR) -rc $(BINDIR)/project.a $(BINDIR)/$(PROJECT).o
 
 # string array of all names of c files in dir
 SRC = $(wildcard *.c)
