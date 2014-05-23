@@ -28,6 +28,7 @@
 #include "transceiver.h"
 #include "nativenet.h"
 #include "msg.h"
+#include "msg_queue.h"
 #include "thread.h"
 
 #define SENDER_ADDR         (1)
@@ -38,11 +39,12 @@
 #define SECOND              (1000 * 1000)
 #define SENDING_DELAY       (10 * 1000)
 
-#define RCV_BUFFER_SIZE     (64)
+#define RCV_BUFFER_SIZE     (64*(sizeof(msg_pulse_t)+sizeof(msg_hdr_t)))
 #define RADIO_STACK_SIZE    (KERNEL_CONF_STACKSIZE_DEFAULT)
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
-msg_t msg_q[RCV_BUFFER_SIZE];
+msg_queue_t radio_msg_queue;
+char queue_buf[RCV_BUFFER_SIZE];
 uint8_t snd_buffer[NATIVE_MAX_DATA_LENGTH];
 uint8_t receiving = 1;
 unsigned int last_seq = 0, missed_cnt = 0;
@@ -52,16 +54,17 @@ void *radio(void *arg)
 {
     (void) arg;
 
-    msg_t m;
+    msg_pulse_t m;
     radio_packet_t *p;
     unsigned int tmp = 0, cur_seq = 0;
 
-    msg_init_queue(msg_q, RCV_BUFFER_SIZE);
+    msg_queue_init(&radio_msg_queue, queue_buf, RCV_BUFFER_SIZE, 0);
+    thread_set_msg_queue(thread_pid, &radio_msg_queue);
 
     puts("Start receiving");
 
     while (receiving) {
-        msg_receive(&m);
+        msg_receive_pulse(&m);
 
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t *) m.content.ptr;
@@ -101,7 +104,7 @@ void *radio(void *arg)
 void sender(void)
 {
     unsigned int i = 0;
-    msg_t mesg;
+    msg_pulse_t mesg;
     transceiver_command_t tcmd;
     radio_packet_t p;
 
@@ -122,7 +125,7 @@ void sender(void)
         snd_buffer[1] = i & 0x00FF;
         p.data = snd_buffer;
         i++;
-        msg_send(&mesg, transceiver_pid, 1);
+        msg_send_pulse(&mesg, transceiver_pid);
         hwtimer_wait(HWTIMER_TICKS(SENDING_DELAY));
     }
 }
@@ -130,7 +133,7 @@ void sender(void)
 int main(void)
 {
     int16_t a;
-    msg_t mesg;
+    msg_pulse_t mesg;
     transceiver_command_t tcmd;
 
     printf("\n\tmain(): initializing transceiver\n");
@@ -161,7 +164,7 @@ int main(void)
     mesg.type = SET_ADDRESS;
 
     printf("[nativenet] trying to set address %" PRIi16 "\n", a);
-    msg_send_receive(&mesg, &mesg, transceiver_pid);
+    msg_send_receive_pulse(&mesg, &mesg, transceiver_pid);
 
 #ifdef SENDER
     hwtimer_wait(HWTIMER_TICKS(SECOND));
