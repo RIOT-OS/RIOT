@@ -100,5 +100,11 @@ endif
 ifneq (,$(filter pipe,$(USEMODULE)))
     DIRS += pipe
 endif
+ifneq (,$(filter msg_queue,$(USEMODULE)))
+    DIRS += msg_queue
+endif
+
+all: $(BINDIR)$(MODULE).a
+	@for i in $(DIRS) ; do "$(MAKE)" -C $$i || exit 1; done ;
 
 include $(RIOTBASE)/Makefile.base
