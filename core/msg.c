@@ -91,7 +91,7 @@ static int _msg_send_receive(unsigned int target_pid, char *sbuf, uint16_t ssize
 
     tcb_t *target = (tcb_t*) sched_threads[target_pid];
 
-    if (active_thread->pid == target_pid) {
+    if (sched_active_thread->pid == target_pid) {
         return -1;
     }
 
@@ -103,11 +103,11 @@ static int _msg_send_receive(unsigned int target_pid, char *sbuf, uint16_t ssize
 
     int state = disableIRQ();
 
-    DEBUG("msg_send() %s:%i: (%d:\"%s\") Sending from %i to %i. block=%i src->state=%i target->state=%i\n", __FILE__, __LINE__, thread_pid, active_thread->name, thread_pid, target_pid, block, active_thread->status, target->status);
-    DEBUG("msg_send() %s:%i: %s sbuf=%x ssize=%d rbuf=%x rsize=%d\n", __FILE__, __LINE__, active_thread->name, (unsigned int)sbuf, ssize, (unsigned int)rbuf, rsize);
+    DEBUG("msg_send() %s:%i: (%d:\"%s\") Sending from %i to %i. block=%i src->state=%i target->state=%i\n", __FILE__, __LINE__, sched_active_pid, sched_active_thread->name, sched_active_pid, target_pid, block, sched_active_thread->status, target->status);
+    DEBUG("msg_send() %s:%i: %s sbuf=%x ssize=%d rbuf=%x rsize=%d\n", __FILE__, __LINE__, sched_active_thread->name, (unsigned int)sbuf, ssize, (unsigned int)rbuf, rsize);
 
-    msg_hdr_t m = { .sender_pid=thread_pid, .size=ssize, .payload=sbuf, .rbuf=rbuf, .rsize=rsize, .flags=flags };
-    active_thread->wait_data = (void*) &m;
+    msg_hdr_t m = { .sender_pid=sched_active_pid, .size=ssize, .payload=sbuf, .rbuf=rbuf, .rsize=rsize, .flags=flags };
+    sched_active_thread->wait_data = (void*) &m;
 
     if (target->status != STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send() %s:%i: Target %i is not RECEIVE_BLOCKED.\n", __FILE__, __LINE__, target_pid);
@@ -116,7 +116,7 @@ static int _msg_send_receive(unsigned int target_pid, char *sbuf, uint16_t ssize
         if (target->msg_queue) {
             if ((res = msg_queue_add(target->msg_queue, &m))) {
                 if (flags & MSG_REPLY_EXPECTED) {
-                    sched_set_status((tcb_t*) active_thread, STATUS_REPLY_BLOCKED);
+                    sched_set_status((tcb_t*) sched_active_thread, STATUS_REPLY_BLOCKED);
                 }
                 restoreIRQ(state);
                 thread_yield();
@@ -126,7 +126,7 @@ static int _msg_send_receive(unsigned int target_pid, char *sbuf, uint16_t ssize
 #endif
 
         if (!block) {
-            DEBUG("msg_send: %s: Receiver not waiting, block=%u\n", active_thread->name, block);
+            DEBUG("msg_send: %s: Receiver not waiting, block=%u\n", sched_active_thread->name, block);
             restoreIRQ(state);
             return -1;
         }
@@ -151,18 +151,18 @@ static int _msg_send_receive(unsigned int target_pid, char *sbuf, uint16_t ssize
 
         sched_set_status((tcb_t*) sched_active_thread, newstatus);
 
-        DEBUG("msg_send: %s: Back from %s block.\n", active_thread->name,
+        DEBUG("msg_send: %s: Back from %s block.\n", sched_active_thread->name,
                 (newstatus == STATUS_SEND_BLOCKED ? "send" : "receive"));
     }
     else {
-        DEBUG("msg_send: %s: Direct msg copy from %i to %i.\n", active_thread->name, thread_getpid(), target_pid);
+        DEBUG("msg_send: %s: Direct msg copy from %i to %i.\n", sched_active_thread->name, thread_getpid(), target_pid);
 
         res = msg_direct_copy(&m, (msg_hdr_t*) target->wait_data);
 
         sched_set_status(target, STATUS_PENDING);
 
         if (flags & MSG_REPLY_EXPECTED) {
-            sched_set_status((tcb_t*) active_thread, STATUS_REPLY_BLOCKED);
+            sched_set_status((tcb_t*) sched_active_thread, STATUS_REPLY_BLOCKED);
         }
     }
 
@@ -173,13 +173,13 @@ static int _msg_send_receive(unsigned int target_pid, char *sbuf, uint16_t ssize
 }
 
 int msg_reply(unsigned int target_pid, char *buf, uint16_t size) {
-    DEBUG("msg_reply: %s: Replying to=%d buf=%x size=%d.\n", active_thread->name, target_pid, (unsigned int)buf, size);
+    DEBUG("msg_reply: %s: Replying to=%d buf=%x size=%d.\n", sched_active_thread->name, target_pid, (unsigned int)buf, size);
 
     tcb_t *target = (tcb_t*) sched_threads[target_pid];
 
     int res = 0;
 
-    if (active_thread->pid == target_pid) {
+    if (sched_active_thread->pid == target_pid) {
         return -1;
     }
 
@@ -189,8 +189,8 @@ int msg_reply(unsigned int target_pid, char *buf, uint16_t size) {
         target_hdr->payload = target_hdr->rbuf;
         target_hdr->size = target_hdr->rsize;
 
-        DEBUG("msg_reply: %s: target buf=%x size=%d.\n", active_thread->name, (unsigned int)target_hdr->payload, target_hdr->size);
-        msg_hdr_t m = { .payload=buf, .size=size, .sender_pid=active_thread->pid };
+        DEBUG("msg_reply: %s: target buf=%x size=%d.\n", sched_active_thread->name, (unsigned int)target_hdr->payload, target_hdr->size);
+        msg_hdr_t m = { .payload=buf, .size=size, .sender_pid=sched_active_thread->pid };
 
         res = msg_direct_copy(&m, target_hdr);
 
@@ -249,17 +249,17 @@ int msg_try_receive(char* buf, uint16_t size, msg_hdr_t *hdr) {
 
 static int _msg_receive(char* buf, uint16_t size, msg_hdr_t *hdr, uint16_t flags)
 {
-    DEBUG("_msg_receive(): %s: buf=%x size=%d\n", active_thread->name, (unsigned int)buf, size);
+    DEBUG("_msg_receive(): %s: buf=%x size=%d\n", sched_active_thread->name, (unsigned int)buf, size);
 
     int res = 0;
     int state = disableIRQ();
 
-    tcb_t *me = (tcb_t*) sched_threads[thread_pid];
+    tcb_t *me = (tcb_t*) sched_threads[sched_active_pid];
     msg_hdr_t m = { .payload=buf, .size=size, .flags=flags };
 
 #ifdef MODULE_MSG_QUEUE
-    if (active_thread->msg_queue) {
-        res = msg_queue_get(active_thread->msg_queue, &m);
+    if (sched_active_thread->msg_queue) {
+        res = msg_queue_get(sched_active_thread->msg_queue, &m);
         if (res) {
             restoreIRQ(state);
             return res;
@@ -273,7 +273,7 @@ static int _msg_receive(char* buf, uint16_t size, msg_hdr_t *hdr, uint16_t flags
 
     if (node == NULL) {
         if (flags & MSG_BLOCK) {
-            DEBUG("_msg_receive(): %s: No thread in waiting list. Going Blocked.\n", active_thread->name);
+            DEBUG("_msg_receive(): %s: No thread in waiting list. Going Blocked.\n", sched_active_thread->name);
 
             sched_set_status(me, STATUS_RECEIVE_BLOCKED);
 
@@ -286,12 +286,12 @@ static int _msg_receive(char* buf, uint16_t size, msg_hdr_t *hdr, uint16_t flags
             res = m.size;
         }
         else {
-            DEBUG("_msg_receive: %s: No thread in waiting list. Called without flags & MSG_BLOCK.\n", active_thread->name);
+            DEBUG("_msg_receive: %s: No thread in waiting list. Called without flags & MSG_BLOCK.\n", sched_active_thread->name);
             restoreIRQ(state);
         }
     }
     else {
-        DEBUG("_msg_receive: %s: Waking up waiting thread.\n", active_thread->name);
+        DEBUG("_msg_receive: %s: Waking up waiting thread.\n", sched_active_thread->name);
         tcb_t *sender = (tcb_t*) node->data;
 
         /* copy msg */
@@ -336,7 +336,7 @@ int msg_send_receive_pulse(msg_pulse_t *m, msg_pulse_t *reply, unsigned int targ
 
 int msg_reply_pulse(msg_pulse_t *m, msg_pulse_t *reply)
 {
-    DEBUG("msg_reply_pulse: %s: Replying from %d to %d.\n", active_thread->name, active_thread->pid, m->sender_pid);
+    DEBUG("msg_reply_pulse: %s: Replying from %d to %d.\n", sched_active_thread->name, sched_active_thread->pid, m->sender_pid);
     return msg_reply(m->sender_pid, (char*)reply, sizeof(msg_pulse_t));
 }
 
