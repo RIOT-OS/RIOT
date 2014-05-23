@@ -9,6 +9,7 @@
 #include "ringbuffer.h"
 
 #define MSG_PULSE_QUEUE_SIZE (sizeof(msg_hdr_t)+sizeof(msg_pulse_t))
+#define MSG_QUEUE_SPACE(N) (N*MSG_PULSE_QUEUE_SIZE + sizeof(msg_queue_t))
 
 typedef struct msg_queue {
     ringbuffer_t rb;
@@ -16,6 +17,7 @@ typedef struct msg_queue {
 } msg_queue_t;
 
 int msg_queue_init(msg_queue_t *queue, char *buf, int size, int maxsize);
+int thread_msg_queue_init(char *buf, int size, int maxsize);
 int msg_queue_add(msg_queue_t *queue, msg_hdr_t *src);
 int msg_queue_get(msg_queue_t *queue, msg_hdr_t *dest);
 

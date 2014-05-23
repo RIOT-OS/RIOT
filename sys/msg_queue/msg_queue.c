@@ -22,12 +22,24 @@
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
+#include "thread.h"
 
 int msg_queue_init(msg_queue_t *queue, char *buf, int size, int maxsize) {
     DEBUG("%s:l%d: initializing msg queue (buf=%x, size=%d, maxsize=%d)\n",
             __FILE__, __LINE__, (unsigned int) buf, size, maxsize);
     ringbuffer_init(&queue->rb, buf, size);
     queue->maxsize = maxsize;
+
+    return 0;
+}
+
+int thread_msg_queue_init(char *buf, int size, int maxsize) {
+    msg_queue_t *queue = (msg_queue_t *) buf;
+    buf += sizeof(msg_queue_t);
+    size -= sizeof(msg_queue_t);
+
+    msg_queue_init(queue, buf, size, maxsize);
+    thread_set_msg_queue(thread_pid, queue);
 
     return 0;
 }
