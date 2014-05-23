@@ -107,6 +107,11 @@ USEMODULE_INCLUDES_ = $(shell echo $(USEMODULE_INCLUDES) | tr ' ' '\n' | awk '!a
 
 INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 
+# The `clean` needs to be serialized before everything else.
+ifneq (, $(filter clean, $(MAKECMDGOALS)))
+    $(OBJ) $(BASELIBS) $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include): clean
+endif
+
 # include Makefile.includes for packages in $(USEPKG)
 $(RIOTBASE)/pkg/%/Makefile.include::
 	$(AD)"$(MAKE)" -C $(RIOTBASE)/pkg/$* Makefile.include
