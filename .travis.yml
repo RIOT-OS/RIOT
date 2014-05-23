@@ -20,6 +20,7 @@ install:
 script:
     - ./dist/tools/compile_test/compile_test.py
     - make -C ./tests/unittests term
+    - ! git grep -lI '\s\+$' | grep -v "patch.txt"
 
 notifications:
     email: false
