@@ -200,8 +200,10 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     cb->msg_waiters.first = NULL;
 
+#if 0
     cib_init(&(cb->msg_queue), 0);
     cb->msg_array = NULL;
+#endif
 
     sched_num_threads++;
 

@@ -23,8 +23,10 @@
 #include <stdint.h>
 #include "priority_queue.h"
 #include "clist.h"
-#include "cib.h"
-#include "msg.h"
+
+#ifdef MODULE_MSG_QUEUE
+#include "msg_queue.h"
+#endif
 
 /**
  * @brief Thread status list
@@ -67,8 +69,9 @@ typedef struct tcb_t {
     void *wait_data;            /**< holding messages               */
     priority_queue_t msg_waiters;   /**< threads waiting on message     */
 
-    cib_t msg_queue;            /**< message queue                  */
-    msg_t *msg_array;           /**< memory holding messages        */
+#ifdef MODULE_MSG_QUEUE
+    msg_queue_t *msg_queue;     /**< ptr to thread's msg queue      */
+#endif
 
     const char *name;           /**< thread's name                  */
     char *stack_start;          /**< thread's stack start address   */
