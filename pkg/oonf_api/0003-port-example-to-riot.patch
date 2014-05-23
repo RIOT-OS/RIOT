@@ -25,7 +25,7 @@ index 0000000..42f9a55
 +####
 +
 +# name of your project
-+export PROJECT := $(shell basename $(CURDIR))
++export APPLICATION := $(shell basename $(CURDIR))
 +
 +# for easy switching of boards
 +ifeq ($(strip $(BOARD)),)

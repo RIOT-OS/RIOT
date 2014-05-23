@@ -1,4 +1,4 @@
-export PROJECT = unittests
+export APPLICATION = unittests
 include ../Makefile.tests_common
 
 USEMODULE += embunit

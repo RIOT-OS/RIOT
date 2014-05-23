@@ -1,4 +1,4 @@
-PROJECT = test_nativenet
+APPLICATION = test_nativenet
 include ../Makefile.tests_common
 
 BOARD_WHITELIST := native
@@ -12,5 +12,5 @@ FORCE:
 	touch main.c
 
 sender: CFLAGS += -DSENDER
-sender: PROJECT = test_nativenet_sender
+sender: APPLICATION = test_nativenet_sender
 sender: FORCE all

@@ -19,7 +19,7 @@ LINKFLAGS = -gdwarf-2 -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T$(RIOTBASE)
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
-export HEXFILE = $(BINDIR)$(PROJECT).hex
+export HEXFILE = $(BINDIR)$(APPLICATION).hex
 export FFLAGS = $(PORT) $(HEXFILE)
 include $(RIOTBOARD)/msba2-common/Makefile.dep
 

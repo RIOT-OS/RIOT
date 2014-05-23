@@ -3,5 +3,5 @@ include $(RIOTBOARD)/x86-multiboot-common/Makefile.include
 CFLAGS += -march=i686 -mtune=i686
 CFLAGS += -I$(RIOTBOARD)/qemu-i386/include
 
-TERMPROG = qemu-system-i386 -m 512m -serial stdio -nographic -monitor /dev/null -kernel $(BINDIR)/$(PROJECT).hex
+TERMPROG = qemu-system-i386 -m 512m -serial stdio -nographic -monitor /dev/null -kernel $(BINDIR)/$(APPLICATION).hex
 FLASHER = true
