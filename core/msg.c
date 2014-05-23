@@ -212,12 +212,12 @@ static int _msg_send_int(unsigned int target_pid, char *buf, uint16_t size, uint
     tcb_t *target = (tcb_t *) sched_threads[target_pid];
 
     int res = 0;
+    msg_hdr_t src = { .sender_pid = 0, .size = size, .payload = buf, .flags = flags };
 
     if (target->status == STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send_int_raw: Direct msg copy from %i to %i.\n", thread_getpid(), target_pid);
 
         msg_hdr_t *dest = target->wait_data;
-        msg_hdr_t src = { .sender_pid = 0, .size = size, .payload = buf, .flags = flags };
 
         res = msg_direct_copy(&src, dest);
 
@@ -227,6 +227,13 @@ static int _msg_send_int(unsigned int target_pid, char *buf, uint16_t size, uint
         return res;
     }
     else {
+#ifdef MODULE_MSG_QUEUE
+        if (target->msg_queue) {
+            if ((res = msg_queue_add(target->msg_queue, &src))) {
+                return res;
+            }
+        }
+#endif
         DEBUG("msg_send_int_raw: Receiver not waiting.\n");
         return -1;
     }
