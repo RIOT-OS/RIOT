@@ -27,7 +27,7 @@ and the mailinglist (subscription via web site)
 /**
  * @defgroup    boards_msb430 MSB-430
  * @ingroup     boards
- * @brief       Support for the msb-430 board
+ * @brief       Support for the ScatterWeb MSB-430 board
  *
  * <h2>Compontents</h2>
  * \li MSP430
