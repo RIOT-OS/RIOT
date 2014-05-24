@@ -125,7 +125,7 @@ $(BINDIR)$(PROJECT)/%.o: %.c $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
 	$(AD)mkdir -p "$(dir $@)"
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c "$<" -o "$@"
 
-$(USEPKG:%=${BINDIR}%.a)::
+$(USEPKG:%=${BINDIR}%.a):
 	@mkdir -p ${BINDIR}
 	"$(MAKE)" -C $(RIOTBASE)/pkg/$(patsubst ${BINDIR}%.a,%,$@)
 
