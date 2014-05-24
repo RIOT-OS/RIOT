@@ -9,10 +9,6 @@ DISABLE_MODULE += auto_init
 
 CFLAGS += -DNATIVE_AUTO_EXIT
 
-# these boards provide too little RAM for the example to run
-BOARD_BLACKLIST += chronos
-BOARD_BLACKLIST += mbed_lpc1768
-BOARD_BLACKLIST += msb-430
-BOARD_BLACKLIST += msb-430h
+BOARD_INSUFFICIENT_RAM += chronos mbed_lpc1768 msb-430 msb-430h
 
 include $(RIOTBASE)/Makefile.include
