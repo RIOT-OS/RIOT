@@ -1,8 +1,4 @@
-/**
- * Native CPU interface
- *
- * The native CPU uses system calls to simulate hardware access.
- *
+/*
  * Copyright (C) 2013 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
@@ -12,7 +8,9 @@
 
 /**
  * @ingroup arch
- * @defgroup    native_cpu  Native CPU
+ * @defgroup    native_cpu  Native
+ * @brief       Native CPU specific code
+ * @details     The native CPU uses system calls to simulate hardware access.
  * @ingroup     cpu
  * @brief       CPU abstraction for the native port
  * @{

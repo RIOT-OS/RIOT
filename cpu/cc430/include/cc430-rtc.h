@@ -16,7 +16,6 @@ See the file LICENSE in the top level directory for more details.
 #include "time.h"
 
 /**
- * @defgroup    cc430_rtc   CC430 Real Time Clock
  * @ingroup     cc430
  */
 

@@ -10,7 +10,8 @@
 #define __ARM_COMMON_H
 
 /**
- * @defgroup    arm_common      ARM CPU common
+ * @defgroup    arm_common ARM CPU common
+ * @brief       Common implementations and headers for ARM based micro-controllers
  * @ingroup     cpu
  * @{
  */

@@ -3,6 +3,7 @@
 
 /**
  * @defgroup    lpc1768 NXP LPC1768
+ * @brief       NXP LPC1768 specific code
  * @ingroup		cpu
  * @{
  */
