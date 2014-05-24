@@ -15,7 +15,7 @@
 /**
  * @defgroup        drivers_cc110x CC110x
  * @ingroup         drivers
- * @brief           Texas Instruments CC110x driver
+ * @brief           Driver for Texas Instruments CC110x (including CMSA/CA MAC)
  *
  * <h3>Quick links</h3>
  * \li \ref cc1100_packet_layer0_t      MAC packet format

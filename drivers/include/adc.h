@@ -1,7 +1,7 @@
 /**
  * @defgroup    drivers_adc ADC
  * @ingroup     drivers
- * @brief       Generic ADC driver
+ * @brief       Generic interface for ADC drivers
  * @{
  *
  * @file        adc.h
