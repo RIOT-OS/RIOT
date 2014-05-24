@@ -1,16 +1,10 @@
-/******************************************************************************
- * Copyright 2008-2009, Freie Universitaet Berlin (FUB). All rights reserved.
+/*
+ * Copyright (C) 2008-2009, 2014 Freie Universität Berlin
  *
- * These sources were developed at the Freie Universitaet Berlin, Computer Systems
- * and Telematics group (http://cst.mi.fu-berlin.de).
- * -------------------------------------------------------------------------------
- * This file is part of RIOT.
-
  * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License. See the file LICENSE in the top level directory for more
- * details.
- *
-*******************************************************************************/
+ * Public License v2.1. See the file LICENSE in the top level directory for
+ * more details.
+ */
 
 #ifndef __ARM_COMMON_H
 #define __ARM_COMMON_H
