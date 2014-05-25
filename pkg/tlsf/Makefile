@@ -15,7 +15,7 @@ ifeq (, $(UNZIP))
   endif
 endif
 
-.PHONY: all clean patch reset
+.PHONY: all clean distclean
 
 all: $(BINDIR)$(PKG_NAME).a
 
