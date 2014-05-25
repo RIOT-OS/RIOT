@@ -10,11 +10,11 @@
 /**
  * @defgroup    boards_avsextrem Avsextrem
  * @ingroup     boards
- * @brief       Boards specific drivers and configuration for the Avsextrem board
+ * @brief       Support for the Avsextrem board
  * @{
  *
  * @file        board.h
- * @brief       avsextrem board configuration
+ * @brief       Boards specific drivers and configuration for the Avsextrem board
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will

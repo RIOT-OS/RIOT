@@ -6,6 +6,7 @@
 
 /**
  * @defgroup CMSIS
+ * @brief    Cortex Microcontroller Software Interface Standard
  * @ingroup cpu
  * @{
  *

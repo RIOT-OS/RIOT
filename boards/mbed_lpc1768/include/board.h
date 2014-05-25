@@ -7,6 +7,7 @@
  *
  * @defgroup    mbed_lpc1768 mbed NXP LPC1768 development kit
  * @ingroup		boards
+ * @brief       Support for the mbed NXP LPC1768 board.
  * @{
  */
 

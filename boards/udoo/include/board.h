@@ -9,7 +9,7 @@
 /**
  * @defgroup    board_udoo UDOO
  * @ingroup     boards
- * @brief       Board specific files for the UDOO board.
+ * @brief       Support for the UDOO board.
  * @{
  *
  * @file        board.h

@@ -9,7 +9,7 @@
 
 /**
  * @defgroup    drivers_cc110x_ng CC110x_ng
- * @brief       Next generation version of the TI CC110x driver
+ * @brief       Driver for Texas Instruments CC110x (without MAC protocol)
  * @ingroup     drivers
  * @{
  *
