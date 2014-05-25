@@ -87,7 +87,7 @@ class SerCmd(cmd.Cmd):
 
         time.sleep(1)
         for cmd in self.init_cmd:
-            self.log.debug("WRITE ----->>>>>> '" + cmd + "'\n")
+            self.logger.debug("WRITE ----->>>>>> '" + cmd + "'\n")
             self.ser.write(cmd + "\n")
 
         # start serial->console thread
@@ -151,6 +151,13 @@ class SerCmd(cmd.Cmd):
             for r in self.ignores:
                 self.config.set("ignores", "ignore%i" % i, r.pattern)
                 i += 1
+        if len(self.init_cmd):
+            if not self.config.has_section("init_cmd"):
+                self.config.add_section("init_cmd")
+            i = 0
+            for ic in self.init_cmd:
+                self.config.set("init_cmd", "init_cmd%i" % i, ic)
+                i += 1
 
         with open(self.configdir + os.path.sep + self.configfile, 'wb') as config_fd:
             self.config.write(config_fd)
@@ -208,6 +215,9 @@ class SerCmd(cmd.Cmd):
     def do_PYTERM_unjson(self, line):
         if not self.aliases.pop(line, None):
             sys.stderr.write("JSON regex with ID %s not found" % line)
+
+    def do_PYTERM_init(self, line):
+        self.init_cmd.append(line.strip())
 
     def load_config(self):
         self.config = configparser.SafeConfigParser()
