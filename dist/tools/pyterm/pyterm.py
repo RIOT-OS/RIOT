@@ -11,19 +11,31 @@ from twisted.internet.protocol import Protocol, ReconnectingClientFactory
 import cmd, serial, sys, threading, readline, time, logging, os, argparse, re, codecs, signal
 
 ### set some default options
+import platform
+defaulthostname = platform.node()
+
 defaultport     = "/dev/ttyUSB0"
 defaultbaud     = 115200
 defaultdir      = os.environ['HOME'] + os.path.sep + '.pyterm'
-defaultfile     = "pyterm.conf"
+defaultfile     = "pyterm-" + defaulthostname + ".conf"
+defaultrunname  = "default-run"
 
 class SerCmd(cmd.Cmd):
 
-    def __init__(self, port=None, baudrate=None, confdir=None, conffile=None):
+    def __init__(self, port=None, baudrate=None, confdir=None, conffile=None, host=None, run_name=None):
         cmd.Cmd.__init__(self)
         self.port = port
         self.baudrate = baudrate
         self.configdir = confdir
         self.configfile = conffile
+        self.host = host
+        self.run_name = run_name
+
+        if not self.host:
+            self.host = defaulthostname
+
+	if not self.run_name:
+            self.run_name = defaultrunname
 
         if not os.path.exists(self.configdir):
             os.makedirs(self.configdir)
@@ -32,6 +44,7 @@ class SerCmd(cmd.Cmd):
         self.filters = []
         self.ignores = []
         self.json_regs = dict()
+        self.init_cmd = []
         self.load_config()
 
         try:
@@ -42,10 +55,15 @@ class SerCmd(cmd.Cmd):
         ### create Logging object
         my_millis = "{:.4f}".format(time.time())
         date_str = '{}.{}'.format(time.strftime('%Y%m%d-%H:%M:%S'), my_millis[-4:])
+        self.startup = date_str
         # create formatter
         fmt_str = '%(asctime)s - %(levelname)s # %(message)s'
         formatter = logging.Formatter(fmt_str)
-        logging.basicConfig(filename=self.configdir + os.path.sep + date_str + '.log', level=logging.DEBUG, format=fmt_str)
+
+        directory = self.configdir + os.path.sep + self.host
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        logging.basicConfig(filename=directory + os.path.sep + self.run_name + '.log', level=logging.DEBUG, format=fmt_str)
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)
 
@@ -66,6 +84,11 @@ class SerCmd(cmd.Cmd):
         self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, dsrdtr=0, rtscts=0)
         self.ser.setDTR(0)
         self.ser.setRTS(0)
+
+        time.sleep(1)
+        for cmd in self.init_cmd:
+            self.log.debug("WRITE ----->>>>>> '" + cmd + "'\n")
+            self.ser.write(cmd + "\n")
 
         # start serial->console thread
         receiver_thread = threading.Thread(target=self.reader)
@@ -204,6 +227,9 @@ class SerCmd(cmd.Cmd):
             if sec == "aliases":
                 for opt in self.config.options(sec):
                     self.aliases[opt] = self.config.get(sec, opt)
+            if sec == "init_cmd":
+                for opt in self.config.options(sec):
+                    self.init_cmd.append(self.config.get(sec, opt))
             else:
                 for opt in self.config.options(sec):
                     if opt not in self.__dict__:
@@ -309,9 +335,13 @@ if __name__ == "__main__":
             help="Connect via TCP to this server to send output as JSON")
     parser.add_argument("-P", "--tcp_port", type=int,
             help="Port at the JSON server")
+    parser.add_argument("-H", "--host",
+            help="Hostname of this maschine")
+    parser.add_argument("-rn", "--run-name",
+            help="Run name, used for logfile")
     args = parser.parse_args()
 
-    myshell = SerCmd(args.port, args.baudrate, args.directory, args.config)
+    myshell = SerCmd(args.port, args.baudrate, args.directory, args.config, args.host, args.run_name)
     myshell.prompt = ''
 
     if args.server and args.tcp_port:
