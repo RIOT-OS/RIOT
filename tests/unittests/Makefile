@@ -22,6 +22,9 @@ else
     UNIT_TESTS := $(filter tests-%, $(MAKECMDGOALS))
 endif
 
+# Pull in `Makefile.include`s from the test suites:
+-include $(UNIT_TESTS:%=$(RIOTBASE)/tests/unittests/%/Makefile.include)
+
 include $(RIOTBASE)/Makefile.include
 
 UNITTEST_LIBS := $(UNIT_TESTS:%=$(BINDIR)%.a)
