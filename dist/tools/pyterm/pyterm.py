@@ -246,10 +246,23 @@ class SerCmd(cmd.Cmd):
                         self.__dict__[opt] = self.config.get(sec, opt)
 
     def reader(self):
-        sr = codecs.getreader("UTF-8")(self.ser, errors='replace')
+        """Serial or TCP reader.
+        """
         output = ""
         while (1):
-            c = sr.read(1)
+            try:
+                sr = codecs.getreader("UTF-8")(self.ser, errors='replace')
+                c = sr.read(1)
+            except (serial.SerialException, ValueError) as se:
+                sys.stderr.write("Serial port disconnected, waiting to get reconnected...\n")
+                self.ser.close()
+                time.sleep(1)
+                if os.path.exists(self.port):
+                    sys.stderr.write("Try to reconnect to %s again...\n" % (self.port))
+                    self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, dsrdtr=0, rtscts=0)
+                    self.ser.setDTR(0)
+                    self.ser.setRTS(0)
+                continue
             if c == '\n' or c == '\r':
                 ignored = False
                 if (len(self.ignores)):
