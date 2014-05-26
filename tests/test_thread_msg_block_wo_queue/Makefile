@@ -1,4 +1,4 @@
-export PROJECT = test_thread_msg_block_wo_queue
+export APPLICATION = test_thread_msg_block_wo_queue
 include ../Makefile.tests_common
 
 DISABLE_MODULE += auto_init

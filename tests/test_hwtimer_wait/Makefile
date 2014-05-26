@@ -1,4 +1,4 @@
-export PROJECT = test_hwtimer_wait
+export APPLICATION = test_hwtimer_wait
 include ../Makefile.tests_common
 
 DISABLE_MODULE += auto_init

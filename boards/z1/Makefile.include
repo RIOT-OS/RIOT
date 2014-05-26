@@ -19,7 +19,7 @@ export FLASHER = goodfet.bsl
 ifeq ($(strip $(PORT)),)
     export PORT = /dev/ttyUSB0
 endif
-export HEXFILE = $(BINDIR)$(PROJECT).hex
+export HEXFILE = $(BINDIR)$(APPLICATION).hex
 export FFLAGS = --z1 -I -c $(PORT) -r -e -p $(HEXFILE)
 export OFLAGS = -O ihex
 

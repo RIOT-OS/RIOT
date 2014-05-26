@@ -24,7 +24,7 @@ LINKFLAGS = -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T$(RIOTBASE)/cpu/$(CPU
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
-export HEXFILE = $(BINDIR)/$(PROJECT).hex
+export HEXFILE = $(BINDIR)/$(APPLICATION).hex
 export FFLAGS = -t $(PORT) -f $(HEXFILE) -c 'bbmc -l redbee-econotag reset'
 export OFLAGS = -O binary --gap-fill=0xff
 

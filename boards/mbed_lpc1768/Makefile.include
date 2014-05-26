@@ -17,10 +17,10 @@ LINKFLAGS = -mcpu=cortex-m3 -mthumb -Wl,--gc-sections,--cref -lc -lgcc -lnosys -
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
-export HEXFILE = $(BINDIR)$(PROJECT).hex
+export HEXFILE = $(BINDIR)$(APPLICATION).hex
 export FFLAGS = $(HEXFILE)
 
-export ELFFILE = bin/$(PROJECT).elf
+export ELFFILE = bin/$(APPLICATION).elf
 export DEBUGGER_FLAGS = $(ELFFILE)
 
 export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/ -I$(RIOTCPU)/$(CPU)/include

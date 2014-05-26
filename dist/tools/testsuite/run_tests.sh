@@ -9,7 +9,7 @@ flash() {
 
 run_tests() {
     TESTDIR=projects/${1}/tests
-    flash ${PROJECT} || return
+    flash ${APPLICATION} || return
     for tst in `ls ${TESTDIR}/`; do
         echo "Project \"${1}\": Running test ${tst}..."
         $TESTDIR/$tst || (
@@ -24,17 +24,17 @@ echo "Running tests..."
 echo
 
 for i in projects/*; do
-    export PROJECT=`basename $i`
-    if [ -d projects/${PROJECT}/tests ]; then
+    export APPLICATION=`basename $i`
+    if [ -d projects/${APPLICATION}/tests ]; then
         {
-            echo "Testing project ${PROJECT}..."
+            echo "Testing project ${APPLICATION}..."
             PORT="`sh ${TOOLROOT}/tools/lock_board.sh`"
             FLASHUTIL_SHELL="sh -c"
 
             echo "Using Target connecting to ${PORT}."
 
             export PORT FLASHUTIL_SHELL
-            run_tests ${PROJECT}
+            run_tests ${APPLICATION}
 
             sh ${TOOLROOT}/tools/unlock_board.sh ${PORT}
         } 2>&1

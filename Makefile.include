@@ -62,24 +62,24 @@ include $(RIOTBASE)/Makefile.cflags
 
 # the binaries to link
 BASELIBS += $(BINDIR)$(BOARD)_base.a
-BASELIBS += $(BINDIR)${PROJECT}.a
+BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
 .PHONY: all clean flash doc term objsize buildsize buildsizes buildsizes-diff
 
-export ELFFILE ?= $(BINDIR)$(PROJECT).elf
+export ELFFILE ?= $(BINDIR)$(APPLICATION).elf
 export HEXFILE ?= $(ELFFILE:.elf=.hex)
 
-## make script for the application
-all: $(BINDIR)$(PROJECT).a
-	@echo "Building application $(PROJECT) for $(BOARD) w/ MCU $(MCU)."
+## make script for your application. Build RIOT-base here!
+all: $(BINDIR)$(APPLICATION).a
+	@echo "Building application $(APPLICATION) for $(BOARD) w/ MCU $(MCU)."
 	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
 	"$(MAKE)" -C $(RIOTBASE)
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
 	$(AD)$(LINK) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
-	$(AD)$(LINK) $(UNDEF) -o $(ELFFILE) -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(PROJECT).map $(LINKFLAGS)
+	$(AD)$(LINK) $(UNDEF) -o $(ELFFILE) -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(APPLICATION).map $(LINKFLAGS)
 endif
 	$(AD)$(SIZE) $(ELFFILE)
 	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
@@ -89,10 +89,10 @@ endif
 SRC = $(wildcard *.c)
 
 # string array of all names replaced .c with .o
-OBJ = $(SRC:%.c=${BINDIR}${PROJECT}/%.o)
+OBJ = $(SRC:%.c=${BINDIR}${APPLICATION}/%.o)
 
-$(BINDIR)$(PROJECT).a: $(OBJ)
-	$(AD)$(AR) -rc $(BINDIR)$(PROJECT).a $(OBJ)
+$(BINDIR)$(APPLICATION).a: $(OBJ)
+	$(AD)$(AR) -rc $(BINDIR)$(APPLICATION).a $(OBJ)
 
 # add extra include paths for packages in $(USEMODULE)
 export USEMODULE_INCLUDES =
@@ -120,7 +120,7 @@ $(RIOTBASE)/pkg/%/Makefile.include::
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
 
-$(BINDIR)$(PROJECT)/%.o: %.c $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
+$(BINDIR)$(APPLICATION)/%.o: %.c $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
 	@echo; echo "Compiling.... $*.c"; echo
 	$(AD)mkdir -p "$(dir $@)"
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c "$<" -o "$@"

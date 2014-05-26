@@ -5,7 +5,7 @@ export NATIVEINCLUDES += -I$(RIOTBASE)/core/include/
 export NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 
 export CPU = native
-export ELF = $(BINDIR)$(PROJECT).elf
+export ELF = $(BINDIR)$(APPLICATION).elf
 
 # toolchain:
 export PREFIX =

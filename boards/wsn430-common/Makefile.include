@@ -17,7 +17,7 @@ export FLASHER = mspdebug
 ifeq ($(strip $(PORT)),)
     export PORT = /dev/ttyUSB0
 endif
-export HEXFILE = $(BINDIR)$(PROJECT).hex
+export HEXFILE = $(BINDIR)$(APPLICATION).hex
 export FFLAGS = -d $(PORT) -j uif "prog $(HEXFILE)"
 
 export INCLUDES += -I$(RIOTBOARD)/wsn430-common/include

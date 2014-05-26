@@ -84,7 +84,7 @@ objsize:
 		sort -rnk$${SORTROW}
 
 buildsize:
-	@$(SIZE) -dB $(BINDIR)$(PROJECT).elf
+	@$(SIZE) -dB $(BINDIR)$(APPLICATION).elf
 
 buildsizes: SHELL=bash
 buildsizes:
