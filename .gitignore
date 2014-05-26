@@ -11,3 +11,4 @@ cachegrind.out*
 .project
 .cproject
 .settings
+/toolchain

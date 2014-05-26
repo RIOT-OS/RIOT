@@ -52,7 +52,11 @@
  */
 int close(int fildes);
 
-typedef uint32_t useconds_t;
+#ifndef __USECONDS_T_TYPE
+typedef unsigned long __USECONDS_T_TYPE;
+#endif
+typedef __USECONDS_T_TYPE __useconds_t;
+typedef __useconds_t useconds_t;
 
 /**
  * @brief the caller will sleep for given amount of micro seconds

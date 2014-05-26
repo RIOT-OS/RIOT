@@ -1,0 +1,14 @@
+#!/bin/bash
+
+args=($@)
+
+for ((i = 0; i < ${#args[@]}; ++i))
+do
+    if [[ "${args[i]}" == '-lm' ]]
+    then
+        unset args[i]
+        break
+    fi
+done
+
+exec "${args[@]}"
