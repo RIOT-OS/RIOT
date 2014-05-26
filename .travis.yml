@@ -1,7 +1,8 @@
 language: c
 
 before_install:
-    - sudo apt-get install emdebian-archive-keyring
+    - sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32
+    - sudo apt-get install -q emdebian-archive-keyring
     - echo 'deb http://www.emdebian.org/debian wheezy main' | sudo tee /etc/apt/sources.list.d/emdebian.list > /dev/null
 
     - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty           main restricted universe multiverse' | sudo tee    /etc/apt/sources.list.d/trusty.list > /dev/null
@@ -9,16 +10,13 @@ before_install:
     - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-security  main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
     - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-updates   main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
     - sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
-    - sudo apt-get update
+    - sudo apt-get update -qq
 
 install:
-    - sudo apt-get install build-essential
-    - sudo apt-get install gcc-multilib
-    - sudo apt-get install gcc-arm-none-eabi
-    - sudo apt-get install gcc-msp430
+    - sudo apt-get install -q build-essential gcc-multilib gcc-arm-none-eabi gcc-msp430 python3
 
 script:
-    - ./dist/tools/compile_test/compile_test.py
+    - ./dist/tools/compile_test/concurrent_compile_test.py 8
     - make -C ./tests/unittests term
 
 notifications:

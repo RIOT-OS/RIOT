@@ -25,8 +25,6 @@ from os.path import abspath, dirname, isfile, join
 from subprocess import CalledProcessError, check_call, PIPE, Popen
 from sys import exit, stdout
 
-riotbase = environ.get('RIOTBASE') or abspath(join(dirname(abspath(__file__)), '../' * 3))
-
 null = open(devnull, 'w', 0)
 
 success = []
@@ -58,46 +56,51 @@ def get_lines(readline, prefix):
             stdout.flush()
             yield result
 
-for folder in ('examples', 'tests'):
-    print('Building all applications in: \033[1;34m{}\033[0m'.format(folder))
+def main(riotbase):
+    for folder in ('examples', 'tests'):
+        print('Building all applications in: \033[1;34m{}\033[0m'.format(folder))
 
-    applications = listdir(join(riotbase, folder))
-    applications = filter(lambda app: is_tracked(join(riotbase, folder, app)), applications)
-    applications = sorted(applications)
+        applications = listdir(join(riotbase, folder))
+        applications = filter(lambda app: is_tracked(join(riotbase, folder, app)), applications)
+        applications = sorted(applications)
 
-    for nth, application in enumerate(applications, 1):
-        stdout.write('\tBuilding application: \033[1;34m{}\033[0m ({}/{}) '.format(application, nth, len(applications)))
-        stdout.flush()
-        try:
-            subprocess = Popen(('make', 'buildtest'),
-                               bufsize=1, stdin=null, stdout=PIPE, stderr=null,
-                               cwd=join(riotbase, folder, application))
-
-            lines = get_lines(subprocess.stdout.readline, 'Building for ')
-            lines = groupby(sorted(lines), lambda (outcome, board): outcome)
-            for group, results in lines:
-                print('\n\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board in results))))
-
-            returncode = subprocess.wait()
-            (failed if returncode else success).append(application)
-        except Exception, e:
-            print('\n\t\tException: {}'.format(e))
-            exceptions.append(application)
-        finally:
+        for nth, application in enumerate(applications, 1):
+            stdout.write('\tBuilding application: \033[1;34m{}\033[0m ({}/{}) '.format(application, nth, len(applications)))
+            stdout.flush()
             try:
-                subprocess.kill()
-            except:
-                pass
+                subprocess = Popen(('make', 'buildtest'),
+                                   bufsize=1, stdin=null, stdout=PIPE, stderr=null,
+                                   cwd=join(riotbase, folder, application))
 
-print('Outcome:')
-for color, group in (('2', 'success'), ('1', 'failed'), ('4', 'exceptions')):
-    applications = locals()[group]
-    if applications:
-        print('\t\033[1;3{}m{}\033[0m: {}'.format(color, group, ', '.join(applications)))
+                lines = get_lines(subprocess.stdout.readline, 'Building for ')
+                lines = groupby(sorted(lines), lambda (outcome, board): outcome)
+                for group, results in lines:
+                    print('\n\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board in results))))
 
-if exceptions:
-    exit(2)
-elif failed:
-    exit(1)
-else:
-    exit(0)
+                returncode = subprocess.wait()
+                (failed if returncode else success).append(application)
+            except Exception, e:
+                print('\n\t\tException: {}'.format(e))
+                exceptions.append(application)
+            finally:
+                try:
+                    subprocess.kill()
+                except:
+                    pass
+
+    print('Outcome:')
+    for color, group in (('2', 'success'), ('1', 'failed'), ('4', 'exceptions')):
+        applications = locals()[group]
+        if applications:
+            print('\t\033[1;3{}m{}\033[0m: {}'.format(color, group, ', '.join(applications)))
+
+    if exceptions:
+        return 2
+    elif failed:
+        return 1
+    else:
+        return 0
+
+if __name__ == '__main__':
+    riotbase = environ.get('RIOTBASE') or abspath(join(dirname(abspath(__file__)), '../' * 3))
+    exit(main(riotbase))
