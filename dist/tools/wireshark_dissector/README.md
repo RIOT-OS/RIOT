@@ -16,7 +16,7 @@ sudo usermod -a -G wireshark $USER
 
 ## Configuration
 Depending on what you want to send over the native TAP you might want to change
-the next header dissector. Currently we have included the dissectors for 
+the next header dissector. Currently we have included the dissectors for
 IEEE 802.15.4 and 6LoWPAN into the script file, but anything is thinkable.
 Refer to the wireshark manual to get the protocol names, e.g.:
 

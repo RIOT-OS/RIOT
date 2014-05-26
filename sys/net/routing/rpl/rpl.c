@@ -874,7 +874,7 @@ void recv_rpl_dao(void)
 
                 len += rpl_opt_transit_buf->length + 2;
                 /* route lifetime seconds = (DAO lifetime) * (Unit Lifetime) */
-                DEBUG("%s, %d: Adding routing information: Target: %s, Source: %s, Lifetime: %u\n", 
+                DEBUG("%s, %d: Adding routing information: Target: %s, Source: %s, Lifetime: %u\n",
                         __FILE__, __LINE__,
                         ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->srcaddr),
                         ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->srcaddr),

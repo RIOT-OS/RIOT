@@ -13,7 +13,7 @@ do
     local f_dst = ProtoField.uint16("RIOT.dst", "Destination", base.DEC, nil)
     local f_src = ProtoField.uint16("RIOT.src", "Source", base.DEC, nil)
     local f_pad = ProtoField.bytes("RIOT.pad", "Padding")
-    
+
     p_riot.fields = { f_length, f_dst, f_src }
 
     local data_dis = Dissector.get("data")
@@ -23,7 +23,7 @@ do
     function riot_dissector(buf, pkt, root)
         local buf_len = buf:len()
         local riot_tree = root:add(p_riot, buf)
-        
+
         if buf_len < 6 then return false end
 
         local packet_len = buf(0,2):uint()
@@ -43,10 +43,10 @@ do
         riot_tree:add(f_dst, buf(2, 2))
         riot_tree:add(f_src, buf(4, 2))
         riot_tree:add(f_pad, buf(packet_len + 6))
-        
+
         next_dis:call(buf(6, packet_len):tvb(), pkt, root)
 
-        return true        
+        return true
     end
 
     function p_riot.dissector(buf, pkt, root)
@@ -58,6 +58,6 @@ do
     local eth_encap_table = DissectorTable.get("ethertype")
 
     --handle ethernet type 0x1234
-    
+
     eth_encap_table:add(0x1234, p_riot)
 end

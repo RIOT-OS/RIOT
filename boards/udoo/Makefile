@@ -3,7 +3,7 @@
 MODULE = $(BOARD)_base
 
 # add a list of board specific subdirectories that should also be build
-DIRS = 
+DIRS =
 
 .PHONY: all clean
 

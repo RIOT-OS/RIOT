@@ -1,4 +1,4 @@
-This application is a showcase of the Content Centric Networking (CCN) capabilities in RIOT. 
+This application is a showcase of the Content Centric Networking (CCN) capabilities in RIOT.
 
 The example consists in two parts: clients and relays.
 

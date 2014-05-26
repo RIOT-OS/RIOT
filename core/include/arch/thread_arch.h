@@ -23,8 +23,8 @@
 /**
  * @name Define the mapping between the architecture independent interfaces
  *       and the kernel internal interfaces
- * 
- * This mapping is done for compatibility of existing platforms, 
+ *
+ * This mapping is done for compatibility of existing platforms,
  * new platforms should always use the *_arch_* interfaces.
  * @{
  */

@@ -217,7 +217,7 @@ void cc2420_spi_init(void)
      * - MCU pin (GPIO port) initialisation is done in board.c,
      *   function z1_ports_init().
      */
- 
+
     /* Keep peripheral in reset state during configuration */
     UCB0CTL1 = UCSWRST;
 
@@ -228,7 +228,7 @@ void cc2420_spi_init(void)
 
     UCB0CTL0 |= UCCKPH;  /* Data captured on rising edge, changed on falling */
     UCB0CTL0 &= ~UCCKPL; /* SPI data lines are active-high/inactive-low */
-    
+
     /* Ignore clockrate argument for now, just use clock source/2 */
     UCB0BR0   = 0x02;  /* Ensure baud rate <= SMCLK/2 */
     UCB0BR1   = 0x00;

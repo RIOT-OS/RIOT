@@ -276,7 +276,7 @@ export PATH=$PATH:${PREFIX}/bin
 download() {
     echo
     echo "Downloading TAR files."
- 
+
     download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/binutils binutils-${BINUTILS_VER}.tar.bz2 ${BINUTILS_MD5} &&
     download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/gcc/gcc-${GCC_VER} gcc-${GCC_VER}.tar.bz2 ${GCC_MD5} &&
     download_file ftp://ftp.cs.tu-berlin.de/pub/gnu/gdb gdb-${GDB_VER}.tar.bz2 ${GDB_MD5} &&

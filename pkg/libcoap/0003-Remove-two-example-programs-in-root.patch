@@ -73,7 +73,7 @@ index e4b2fe5..0000000
 -void
 -init_coap() {
 -  coap_address_t listen_addr;
--  
+-
 -  coap_address_init(&listen_addr);
 -  listen_addr.port = UIP_HTONS(COAP_DEFAULT_PORT);
 -
@@ -91,13 +91,13 @@ index e4b2fe5..0000000
 -
 -#ifdef WITH_CONTIKI
 -  printf("tentative address: [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
--	 listen_addr.addr.u8[0], listen_addr.addr.u8[1], 
--	 listen_addr.addr.u8[2], listen_addr.addr.u8[3], 
--	 listen_addr.addr.u8[4], listen_addr.addr.u8[5], 
--	 listen_addr.addr.u8[6], listen_addr.addr.u8[7], 
--	 listen_addr.addr.u8[8], listen_addr.addr.u8[9], 
--	 listen_addr.addr.u8[10], listen_addr.addr.u8[11], 
--	 listen_addr.addr.u8[12], listen_addr.addr.u8[13], 
+-	 listen_addr.addr.u8[0], listen_addr.addr.u8[1],
+-	 listen_addr.addr.u8[2], listen_addr.addr.u8[3],
+-	 listen_addr.addr.u8[4], listen_addr.addr.u8[5],
+-	 listen_addr.addr.u8[6], listen_addr.addr.u8[7],
+-	 listen_addr.addr.u8[8], listen_addr.addr.u8[9],
+-	 listen_addr.addr.u8[10], listen_addr.addr.u8[11],
+-	 listen_addr.addr.u8[12], listen_addr.addr.u8[13],
 -	 listen_addr.addr.u8[14], listen_addr.addr.u8[15] ,
 -	 uip_ntohs(listen_addr.port));
 -#endif
@@ -111,8 +111,8 @@ index e4b2fe5..0000000
 -}
 -
 -void
--message_handler(struct coap_context_t  *ctx, 
--		const coap_address_t *remote, 
+-message_handler(struct coap_context_t  *ctx,
+-		const coap_address_t *remote,
 -		coap_pdu_t *sent,
 -		coap_pdu_t *received,
 -		const coap_tid_t id) {
@@ -149,10 +149,10 @@ index e4b2fe5..0000000
 -  uip_ip6addr(&dst.addr, 0xaaaa, 0, 0, 0, 0x206, 0x98ff, 0xfe00, 0x232);
 -  /* uip_ip6addr(&dst.addr, 0xfe80, 0, 0, 0, 0x206, 0x98ff, 0xfe00, 0x232); */
 -
--  request = coap_pdu_init(COAP_MESSAGE_CON, COAP_REQUEST_GET, 
--			  coap_new_message_id(coap_context), 
+-  request = coap_pdu_init(COAP_MESSAGE_CON, COAP_REQUEST_GET,
+-			  coap_new_message_id(coap_context),
 -			  COAP_MAX_PDU_SIZE);
--  
+-
 -  coap_split_uri((unsigned char *)resource, strlen(resource), &uri);
 -
 -  if (uri.port != COAP_DEFAULT_PORT) {
@@ -173,10 +173,10 @@ index e4b2fe5..0000000
 -    res = coap_split_path(uri.path.s, uri.path.length, buf, &buflen);
 -
 -    while (res--) {
--      coap_add_option(request, COAP_OPTION_URI_PATH, 
+-      coap_add_option(request, COAP_OPTION_URI_PATH,
 -		      COAP_OPT_LENGTH(buf), COAP_OPT_VALUE(buf));
 -
--      buf += COAP_OPT_SIZE(buf);      
+-      buf += COAP_OPT_SIZE(buf);
 -    }
 -  }
 -
@@ -259,7 +259,7 @@ index 5dcdfcd..0000000
 -void
 -init_coap() {
 -  coap_address_t listen_addr;
--  
+-
 -  coap_address_init(&listen_addr);
 -  listen_addr.port = UIP_HTONS(COAP_DEFAULT_PORT);
 -
@@ -277,13 +277,13 @@ index 5dcdfcd..0000000
 -
 -#ifdef WITH_CONTIKI
 -  printf("tentative address: [%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x]:%d\r\n",
--	 listen_addr.addr.u8[0], listen_addr.addr.u8[1], 
--	 listen_addr.addr.u8[2], listen_addr.addr.u8[3], 
--	 listen_addr.addr.u8[4], listen_addr.addr.u8[5], 
--	 listen_addr.addr.u8[6], listen_addr.addr.u8[7], 
--	 listen_addr.addr.u8[8], listen_addr.addr.u8[9], 
--	 listen_addr.addr.u8[10], listen_addr.addr.u8[11], 
--	 listen_addr.addr.u8[12], listen_addr.addr.u8[13], 
+-	 listen_addr.addr.u8[0], listen_addr.addr.u8[1],
+-	 listen_addr.addr.u8[2], listen_addr.addr.u8[3],
+-	 listen_addr.addr.u8[4], listen_addr.addr.u8[5],
+-	 listen_addr.addr.u8[6], listen_addr.addr.u8[7],
+-	 listen_addr.addr.u8[8], listen_addr.addr.u8[9],
+-	 listen_addr.addr.u8[10], listen_addr.addr.u8[11],
+-	 listen_addr.addr.u8[12], listen_addr.addr.u8[13],
 -	 listen_addr.addr.u8[14], listen_addr.addr.u8[15] ,
 -	 uip_ntohs(listen_addr.port));
 -#endif
@@ -301,9 +301,9 @@ index 5dcdfcd..0000000
 -# define min(a,b) ((a) < (b) ? (a) : (b))
 -#endif
 -
--void 
--hnd_get_time(coap_context_t  *ctx, struct coap_resource_t *resource, 
--	     coap_address_t *peer, coap_pdu_t *request, str *token, 
+-void
+-hnd_get_time(coap_context_t  *ctx, struct coap_resource_t *resource,
+-	     coap_address_t *peer, coap_pdu_t *request, str *token,
 -	     coap_pdu_t *response) {
 -  coap_opt_iterator_t opt_iter;
 -  unsigned char buf[2];
@@ -318,10 +318,10 @@ index 5dcdfcd..0000000
 -
 -  coap_add_option(response, COAP_OPTION_MAXAGE,
 -		  coap_encode_var_bytes(buf, 0x01), buf);
--  
+-
 -  /* Check if subscription was requested. */
--  if (request && 
--      coap_check_option(request, COAP_OPTION_SUBSCRIPTION, &opt_iter) && 
+-  if (request &&
+-      coap_check_option(request, COAP_OPTION_SUBSCRIPTION, &opt_iter) &&
 -      coap_add_observer(resource, peer, token)) {
 -
 -    /* add a new observe value */
@@ -341,9 +341,9 @@ index 5dcdfcd..0000000
 -  /* calculate current time */
 -  coap_ticks(&t);
 -  now = my_clock_base + (t / COAP_TICKS_PER_SECOND);
--    
+-
 -  /* output ticks */
--  response->length += snprintf((char *)response->data, 
+-  response->length += snprintf((char *)response->data,
 -			       response->max_size - response->length,
 -			       "%u", (unsigned int)now);
 -}
@@ -427,6 +427,6 @@ index 5dcdfcd..0000000
 -  PROCESS_END();
 -}
 -/*---------------------------------------------------------------------------*/
--- 
+--
 1.8.3.2
 

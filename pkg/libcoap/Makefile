@@ -35,7 +35,7 @@ clean::
 		$(MAKE) patch || true
 
 
-distclean:: 
+distclean::
 	rm -rf "$(PKG_DIR)"
 
 Makefile.include:

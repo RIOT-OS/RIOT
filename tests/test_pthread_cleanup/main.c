@@ -61,7 +61,7 @@ static void *run(void *unused) {
 
 int main(void) {
     puts("Start.");
-    
+
     pthread_t th_id;
     pthread_create(&th_id, NULL, run, NULL);
 
