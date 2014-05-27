@@ -76,6 +76,9 @@ typedef enum {
         before @c transmit() ) */
     RADIO_TX_UNDERFLOW,
 
+    /** Transmission cannot start because radio medium is already busy */
+    RADIO_TX_MEDIUM_BUSY,
+
     /** Transmission failed because of collision on radio medium */
     RADIO_TX_COLLISION,
 
