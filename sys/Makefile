@@ -4,6 +4,9 @@ endif
 ifneq (,$(filter config,$(USEMODULE)))
     DIRS += config
 endif
+ifneq (,$(filter fs,$(USEMODULE)))
+    DIRS += fs
+endif
 ifneq (,$(filter lib,$(USEMODULE)))
     DIRS += lib
 endif
@@ -21,6 +24,9 @@ ifneq (,$(filter pnet,$(USEMODULE)))
 endif
 ifneq (,$(filter pthread,$(USEMODULE)))
     DIRS += posix/pthread
+endif
+ifneq (,$(filter scfs,$(USEMODULE)))
+    DIRS += fs/scfs
 endif
 ifneq (,$(filter shell,$(USEMODULE)))
     DIRS += shell
