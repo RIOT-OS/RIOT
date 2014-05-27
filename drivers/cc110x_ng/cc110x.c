@@ -312,7 +312,15 @@ void cc110x_switch_to_pwd(void)
 }
 
 /*---------------------------------------------------------------------------*/
-int16_t cc110x_set_channel(uint8_t channr)
+/*
+ * @brief Sets the radio channel
+ *
+ * @param[in] channr   The channel to be set
+ *
+ * @return The radio channel AFTER calling the set command, -1 on error
+ */
+
+int32_t cc110x_set_channel(uint8_t channr)
 {
     uint8_t state = cc110x_read_status(CC1100_MARCSTATE) & MARC_STATE;
 
@@ -322,7 +330,7 @@ int16_t cc110x_set_channel(uint8_t channr)
 
     write_register(CC1100_CHANNR, channr * 10);
     radio_channel = channr;
-    return radio_channel;
+    return (int32_t) radio_channel;
 }
 
 #ifdef MODULE_CONFIG
