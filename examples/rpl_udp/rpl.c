@@ -40,7 +40,7 @@ radio_address_t id;
 
 uint8_t is_root = 0;
 
-void rpl_udp_init(int argc, char **argv)
+int rpl_udp_init(int argc, char **argv)
 {
     transceiver_command_t tcmd;
     msg_t m;
@@ -51,7 +51,7 @@ void rpl_udp_init(int argc, char **argv)
         printf("\tr\tinitialize as root\n");
         printf("\tn\tinitialize as node router\n");
         printf("\th\tinitialize as non-routing node (host-mode)\n");
-        return;
+        return 1;
     }
 
     char command = argv[1][0];
@@ -63,7 +63,7 @@ void rpl_udp_init(int argc, char **argv)
 #if (defined(MODULE_CC110X) || defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC110X_LEGACY_CSMA))
         if (!id || (id > 255)) {
             printf("ERROR: address not a valid 8 bit integer\n");
-            return;
+            return 1;
         }
 #endif
 
@@ -76,6 +76,7 @@ void rpl_udp_init(int argc, char **argv)
 
             if (state != SIXLOWERROR_SUCCESS) {
                 printf("Error initializing RPL\n");
+                return 1;
             }
             else {
                 puts("6LoWPAN and RPL initialized.");
@@ -109,7 +110,7 @@ void rpl_udp_init(int argc, char **argv)
     }
     else {
         printf("ERROR: Unknown command '%c'\n", command);
-        return;
+        return 1;
     }
 
     /* add global address */
@@ -135,9 +136,11 @@ void rpl_udp_init(int argc, char **argv)
 
     puts("Transport layer initialized");
     /* start transceiver watchdog */
+
+    return 0;
 }
 
-void rpl_udp_dodag(int argc, char **argv)
+int rpl_udp_dodag(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -148,7 +151,7 @@ void rpl_udp_dodag(int argc, char **argv)
     if (mydodag == NULL) {
         printf("Not part of a dodag\n");
         printf("---------------------------\n");
-        return;
+        return 1;
     }
 
     printf("Part of Dodag:\n");
@@ -163,4 +166,6 @@ void rpl_udp_dodag(int argc, char **argv)
     }
 
     printf("---------------------------\n");
+
+    return 0;
 }

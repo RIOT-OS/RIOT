@@ -28,26 +28,32 @@
 
 #define SHELL_BUFSIZE   (UART0_BUFSIZE)
 
-static void print_teststart(int argc, char **argv)
+static int print_teststart(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
     printf("[TEST_START]\n");
+
+    return 0;
 }
 
-static void print_testend(int argc, char **argv)
+static int print_testend(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
     printf("[TEST_END]\n");
+
+    return 0;
 }
 
-static void print_echo(int argc, char **argv)
+static int print_echo(int argc, char **argv)
 {
     for (int i = 0; i < argc; ++i) {
         printf("“%s” ", argv[i]);
     }
     puts("");
+
+    return 0;
 }
 
 static int shell_readc(void)

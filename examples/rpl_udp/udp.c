@@ -41,7 +41,7 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 static void *init_udp_server(void *);
 
 /* UDP server thread */
-void udp_server(int argc, char **argv)
+int udp_server(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -53,6 +53,8 @@ void udp_server(int argc, char **argv)
                                                        NULL,
                                                        "init_udp_server");
     printf("UDP SERVER ON PORT %d (THREAD PID: %" PRIkernel_pid ")\n", HTONS(SERVER_PORT), udp_server_thread_pid);
+
+    return 0;
 }
 
 static void *init_udp_server(void *arg)
@@ -93,9 +95,9 @@ static void *init_udp_server(void *arg)
 }
 
 /* UDP send command */
-void udp_send(int argc, char **argv)
+int udp_send(int argc, char **argv)
 {
-    int sock;
+    int sock, res;
     sockaddr6_t sa;
     ipv6_addr_t ipaddr;
     int bytes_sent;
@@ -104,7 +106,7 @@ void udp_send(int argc, char **argv)
 
     if (argc != 3) {
         printf("usage: send <addr> <text>\n");
-        return;
+        return 1;
     }
 
     address = atoi(argv[1]);
@@ -116,7 +118,7 @@ void udp_send(int argc, char **argv)
 
     if (-1 == sock) {
         printf("Error Creating Socket!");
-        return;
+        return 1;
     }
 
     memset(&sa, 0, sizeof(sa));
@@ -138,12 +140,16 @@ void udp_send(int argc, char **argv)
 
     if (bytes_sent < 0) {
         printf("Error sending packet!\n");
+        res = 1;
     }
     else {
         printf("Successful deliverd %i bytes over UDP to %s to 6LoWPAN\n",
                bytes_sent, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                                             &ipaddr));
+        res = 0;
     }
 
     socket_base_close(sock);
+
+    return res;
 }
