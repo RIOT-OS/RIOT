@@ -915,7 +915,14 @@ radio_address_t maca_get_address ( void ) {
     return MACA->MAC16ADDR;
 }
 
-uint16_t maca_set_pan(uint16_t pan)
+/*
+ * @brief Sets the pan for the device
+ *
+ * @param pan   The PAN to be set
+ *
+ * @return The pan AFTER calling the set command.
+ */
+int32_t maca_set_pan(uint16_t pan)
 {
     safe_irq_disable(INT_NUM_MACA);
 
