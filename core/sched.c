@@ -189,15 +189,32 @@ void sched_switch(uint16_t current_prio, uint16_t other_prio)
     }
 }
 
+void sched_task_kill(int pid)
+{
+    tcb_t* sched_kill_thread;
+
+    if (!sched_threads[pid]) {
+        DEBUG("sched_task_kill(): %i: no process found\n", pid);
+    }
+    else {
+        sched_kill_thread = (tcb_t*) sched_threads[pid];
+
+        DEBUG("sched_task_kill(): killing task %s...\n", sched_kill_thread->name);
+
+        sched_threads[sched_kill_thread->pid] = NULL;
+        sched_num_threads--;
+
+        sched_set_status((tcb_t *) sched_kill_thread, STATUS_STOPPED);
+    }
+}
+
 NORETURN void sched_task_exit(void)
 {
     DEBUG("sched_task_exit(): ending task %s...\n", sched_active_thread->name);
 
     dINT();
-    sched_threads[sched_active_thread->pid] = NULL;
-    sched_num_threads--;
 
-    sched_set_status((tcb_t *)sched_active_thread,  STATUS_STOPPED);
+    sched_task_kill(sched_active_thread->pid);
 
     sched_active_thread = NULL;
     cpu_switch_context_exit();
