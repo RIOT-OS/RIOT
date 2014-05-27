@@ -37,11 +37,11 @@ void at86rf231_rx_handler(void);
 
 int16_t at86rf231_send(at86rf231_packet_t *packet);
 
-uint8_t at86rf231_set_channel(uint8_t channel);
-uint8_t at86rf231_get_channel(void);
+int32_t at86rf231_set_channel(uint8_t channel);
+int32_t at86rf231_get_channel(void);
 
-uint16_t at86rf231_set_pan(uint16_t pan);
-uint16_t at86rf231_get_pan(void);
+int32_t at86rf231_set_pan(uint16_t pan);
+int32_t at86rf231_get_pan(void);
 
 radio_address_t at86rf231_set_address(radio_address_t address);
 radio_address_t at86rf231_get_address(void);
