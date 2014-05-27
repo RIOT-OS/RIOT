@@ -157,7 +157,12 @@ uint8_t at86rf231_set_channel(uint8_t channel)
     return radio_channel;
 }
 
-uint8_t at86rf231_get_channel(void)
+/*
+ * @brief Get the radio channel of the device
+ *
+ * @return The current radio channel of the device.
+ */
+int32_t at86rf231_get_channel(void)
 {
     return radio_channel;
 }
