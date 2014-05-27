@@ -688,6 +688,14 @@ uint8_t cc1100_get_channel(void)
     return radio_channel;
 }
 
+/*
+ * @brief Sets the radio channel
+ *
+ * @param[in] channr   The channel to be set
+ *
+ * @return The radio channel AFTER calling the set command, -1 on error
+ */
+
 int32_t cc1100_set_channel(uint8_t channr)
 {
     if (channr > MAX_CHANNR) {
