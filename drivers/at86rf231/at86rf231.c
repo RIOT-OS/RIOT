@@ -133,7 +133,14 @@ uint64_t at86rf231_get_address_long(void)
     return radio_address_long;
 }
 
-uint16_t at86rf231_set_pan(uint16_t pan)
+/*
+ * @brief Sets the pan for the device
+ *
+ * @param pan   The PAN to be set
+ *
+ * @return The pan AFTER calling the set command, -1 on error
+ */
+int32_t at86rf231_set_pan(uint16_t pan)
 {
     radio_pan = pan;
 
