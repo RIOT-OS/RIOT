@@ -937,7 +937,12 @@ int32_t maca_set_pan(uint16_t pan)
     return MACA->MACPANIDbits.PANID;
 }
 
-uint16_t maca_get_pan(void)
+/*
+ * @brief Get the pan for the  device
+ *
+ * @return The current pan of the transceiver.
+ */
+int32_t maca_get_pan(void)
 {
     return MACA->MACPANIDbits.PANID;
 }
