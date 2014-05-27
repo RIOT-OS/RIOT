@@ -122,14 +122,25 @@ uint16_t cc2420_get_channel(void)
     return ((cc2420_read_reg(CC2420_REG_FSCTRL) - 357) / 5) + 11;
 }
 
+/*
+ * @brief Set the address of the device
+ *
+ * @param[in] address   Address to set
+ *
+ * @return  The radio address of the device
+ */
 radio_address_t cc2420_set_address(radio_address_t addr)
 {
     uint8_t buf[2];
+
     buf[0] = (uint8_t)(addr & 0xFF);
     buf[1] = (uint8_t)(addr >> 8);
+
     cc2420_write_ram(CC2420_RAM_SHORTADR, buf, 2);
     cc2420_set_address_long(0xFFFF & addr);
-    return addr;
+
+    cc2420_read_ram(CC2420_RAM_SHORTADR, buf, 2);
+    return ((0x00ff & buf[0])<<8) | (0x00ff & buf[0]);
 }
 
 uint64_t cc2420_set_address_long(uint64_t addr)
