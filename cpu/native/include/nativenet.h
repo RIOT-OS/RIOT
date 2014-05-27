@@ -107,14 +107,14 @@ uint64_t nativenet_get_address_long(void);
  * @param channel the channel
  * @return the channel
  */
-int16_t nativenet_set_channel(uint8_t channel);
+int32_t nativenet_set_channel(uint8_t channel);
 
 /**
  * Get transceiver channel
  *
  * @return the channel
  */
-int16_t nativenet_get_channel(void);
+int32_t nativenet_get_channel(void);
 
 /**
  * Set transceiver pan
@@ -122,14 +122,14 @@ int16_t nativenet_get_channel(void);
  * @param channel the pan
  * @return the pan
  */
-uint16_t nativenet_set_pan(uint16_t pan);
+int32_t nativenet_set_pan(uint16_t pan);
 
 /**
  * Get transceiver pan
  *
  * @return the pan
  */
-uint16_t nativenet_get_pan(void);
+int32_t nativenet_get_pan(void);
 
 /**
  * Enable transceiver rx mode
