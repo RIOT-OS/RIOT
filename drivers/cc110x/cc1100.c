@@ -106,9 +106,9 @@ static int8_t pa_table_dBm[] = {			///< Values of the PATABLE in dBm
 //					Main radio data structures
 /*---------------------------------------------------------------------------*/
 
-volatile cc1100_flags rflags;		///< Radio control flags
-static uint8_t radio_address;		///< Radio address
-static uint8_t radio_channel;		///< Radio channel number
+volatile cc1100_flags rflags;               ///< Radio control flags
+static radio_address_t radio_address;       ///< Radio address
+static uint8_t radio_channel;               ///< Radio channel number
 
 const radio_t radio_cc1100 = {		///< Radio driver API
     "CC1100",
@@ -859,20 +859,20 @@ radio_address_t cc1100_get_address(void)
     return radio_address;
 }
 
-bool cc1100_set_address(radio_address_t address)
+radio_address_t cc1100_set_address(radio_address_t address)
 {
     if (address < MIN_UID || address > MAX_UID) {
-        return false;
+        return radio_address;
     }
 
-    uint8_t id = (uint8_t) address;
+    uint8_t id = (uint8_t) (0x00ff & address);
 
     if (radio_state != RADIO_UNKNOWN) {
         write_register(CC1100_ADDR, id);
     }
 
-    radio_address = id;
-    return true;
+    radio_address = (uint16_t) id;
+    return radio_address;
 }
 
 static int
