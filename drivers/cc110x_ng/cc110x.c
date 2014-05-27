@@ -129,16 +129,16 @@ radio_address_t cc110x_get_address(void)
 radio_address_t cc110x_set_address(radio_address_t address)
 {
     if ((address < MIN_UID) || (address > MAX_UID)) {
-        return 0;
+        return radio_address;
     }
 
-    uint8_t id = (uint8_t) address;
+    uint8_t id = (uint8_t) (0x00ff & address);
 
     if (radio_state != RADIO_UNKNOWN) {
         write_register(CC1100_ADDR, id);
     }
 
-    radio_address = id;
+    radio_address = (uint16_t) id;
     return radio_address;
 }
 
