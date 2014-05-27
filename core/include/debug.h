@@ -28,10 +28,10 @@
 /**
  * @name Print debug information if the calling thread stack is large enough
  *
- * Use this macro the same as printf. When DEVHELP is defined inside an
- * implementation file, all usages of *DEBUG_PRINTF* will print the given
- * information to std-out. If DEVHELP is not set, all occurrences of
- * *DEBUG_PRINTF* will be ignored.
+ * Use this macro the same as `printf`. When `DEVELHELP` is defined inside an
+ * implementation file, all usages of `DEBUG_PRINT` will print the given
+ * information to std-out after verifying the stack is big enough. If `DEVELHELP`
+ * is not set, this check is not performed. (CPU exception may occur)
  *
  * @{
  */
