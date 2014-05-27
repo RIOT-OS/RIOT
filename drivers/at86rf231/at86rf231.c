@@ -15,7 +15,7 @@
 
 static uint16_t radio_pan;
 static uint8_t  radio_channel;
-static uint16_t radio_address;
+static radio_address_t radio_address;
 static uint64_t radio_address_long;
 
 void at86rf231_init(int tpid)
@@ -90,6 +90,13 @@ void at86rf231_rx_irq(void)
     at86rf231_rx_handler();
 }
 
+/*
+ * @brief Set the address of the device
+ *
+ * @param[in] address   Address to set
+ *
+ * @return  The radio address of the device
+ */
 radio_address_t at86rf231_set_address(radio_address_t address)
 {
     radio_address = address;
