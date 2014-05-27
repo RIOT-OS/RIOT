@@ -126,6 +126,13 @@ radio_address_t cc110x_get_address(void)
     return radio_address;
 }
 
+/*
+ * @brief Set the address of the device
+ *
+ * @param[in] address   Address to set
+ *
+ * @return  The radio address of the device
+ */
 radio_address_t cc110x_set_address(radio_address_t address)
 {
     if ((address < MIN_UID) || (address > MAX_UID)) {
