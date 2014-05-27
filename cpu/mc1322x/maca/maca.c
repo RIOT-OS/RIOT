@@ -868,7 +868,14 @@ const uint32_t VCODivF[16] = {
 #define ADDR_CHAN3 (ADDR_CHAN1+16)
 #define ADDR_CHAN4 (ADDR_CHAN1+48)
 
-void maca_set_channel ( uint8_t chan ) {
+/*
+ * @brief Sets the radio channel
+ *
+ * @param[in] channel   The channel to be set
+ *
+ * @return The radio channel AFTER calling the set command, -1 on error
+ */
+int32_t maca_set_channel ( uint8_t chan ) {
     volatile uint32_t tmp;
     safe_irq_disable ( INT_NUM_MACA );
 
@@ -896,6 +903,7 @@ void maca_set_channel ( uint8_t chan ) {
     if ( ITC->NIPENDbits.MACA ) {
         ITC->INTFRCbits.MACA = 1;
     }
+    return chan;
 }
 
 /*
