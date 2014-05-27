@@ -907,6 +907,19 @@ int32_t maca_set_channel ( uint8_t chan ) {
 }
 
 /*
+ * @brief Get the radio channel of the device
+ *
+ * @return The current radio channel of the device, -1 on error.
+ *
+ * @note: this function is not implemented yet since retrieving
+ *        the channel is not trivial.
+ */
+int32_t maca_get_channel(void)
+{
+    return -1;
+}
+
+/*
  * @brief Set the address of the device
  *
  * @param[in] address   Address to set
