@@ -688,16 +688,15 @@ uint8_t cc1100_get_channel(void)
     return radio_channel;
 }
 
-bool
-cc1100_set_channel(uint8_t channr)
+int32_t cc1100_set_channel(uint8_t channr)
 {
     if (channr > MAX_CHANNR) {
-        return false;
+        return -1;
     }
 
     write_register(CC1100_CHANNR, channr * 10);
     radio_channel = channr;
-    return true;
+    return radio_channel;
 }
 
 bool
