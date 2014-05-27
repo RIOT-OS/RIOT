@@ -185,7 +185,14 @@ uint64_t cc2420_get_address_long(void)
     return addr;
 }
 
-uint16_t cc2420_set_pan(uint16_t pan)
+/*
+ * @brief Sets the pan for the device
+ *
+ * @param pan   The PAN to be set
+ *
+ * @return The pan AFTER calling the set command, -1 on error
+ */
+int32_t cc2420_set_pan(uint16_t pan)
 {
     uint8_t buf[2];
     buf[0] = (uint8_t)(pan & 0xFF);
