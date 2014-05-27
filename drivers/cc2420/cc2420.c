@@ -99,7 +99,14 @@ void cc2420_set_monitor(uint8_t mode)
     cc2420_write_reg(CC2420_REG_MDMCTRL0, reg);
 }
 
-int16_t cc2420_set_channel(uint16_t chan)
+/*
+ * @brief Sets the radio channel
+ *
+ * @param[in] chan   The channel to be set
+ *
+ * @return The radio channel AFTER calling the set command, -1 on error
+ */
+int32_t cc2420_set_channel(uint8_t chan)
 {
     uint16_t freq;
 
@@ -113,7 +120,8 @@ int16_t cc2420_set_channel(uint16_t chan)
      */
     freq = 357 + (5 * (chan - 11));
     cc2420_write_reg(CC2420_REG_FSCTRL, freq);
-    return (int32_t)chan;
+
+    return (int32_t) cc2420_get_channel();
 }
 
 uint16_t cc2420_get_channel(void)
