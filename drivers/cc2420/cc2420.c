@@ -201,7 +201,12 @@ int32_t cc2420_set_pan(uint16_t pan)
     return pan;
 }
 
-uint16_t cc2420_get_pan(void)
+/*
+ * @brief Get the pan for the  device
+ *
+ * @return The current pan of the transceiver, -1 on error
+ */
+int32_t cc2420_get_pan(void)
 {
     uint16_t pan;
     cc2420_read_ram(CC2420_RAM_PANID, (uint8_t *)&pan, sizeof(pan));
