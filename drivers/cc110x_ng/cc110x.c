@@ -354,7 +354,12 @@ int16_t cc110x_set_config_channel(uint8_t channr)
 }
 #endif
 
-int16_t cc110x_get_channel(void)
+/*
+ * @brief Get the radio channel of the device
+ *
+ * @return The current radio channel of the device.
+ */
+int32_t cc110x_get_channel(void)
 {
     return radio_channel;
 }
