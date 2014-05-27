@@ -193,6 +193,8 @@ void sched_task_kill(int pid)
 {
     tcb_t* sched_kill_thread;
 
+    disableIRQ();
+
     if (!sched_threads[pid]) {
         DEBUG("sched_task_kill(): %i: no process found\n", pid);
     }
@@ -205,6 +207,14 @@ void sched_task_kill(int pid)
         sched_num_threads--;
 
         sched_set_status((tcb_t *) sched_kill_thread, STATUS_STOPPED);
+
+        if (pid == sched_active_thread->pid) {
+            sched_active_thread = NULL;
+            cpu_switch_context_exit();
+        }
+        else {
+            restoreIRQ();
+        }
     }
 }
 
@@ -216,6 +226,4 @@ NORETURN void sched_task_exit(void)
 
     sched_task_kill(sched_active_thread->pid);
 
-    sched_active_thread = NULL;
-    cpu_switch_context_exit();
 }
