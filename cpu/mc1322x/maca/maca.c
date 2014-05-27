@@ -898,6 +898,13 @@ void maca_set_channel ( uint8_t chan ) {
     }
 }
 
+/*
+ * @brief Set the address of the device
+ *
+ * @param[in] address   Address to set
+ *
+ * @return  The radio address of the device
+ */
 radio_address_t maca_set_address (radio_address_t addr) {
     safe_irq_disable ( INT_NUM_MACA );
 
