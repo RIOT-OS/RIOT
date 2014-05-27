@@ -124,10 +124,15 @@ int32_t cc2420_set_channel(uint8_t chan)
     return (int32_t) cc2420_get_channel();
 }
 
-uint16_t cc2420_get_channel(void)
+/*
+ * @brief Get the radio channel of the device
+ *
+ * @return The current radio channel of the device.
+ */
+int32_t cc2420_get_channel(void)
 {
     /* undo calculation from cc2420_set_channel() */
-    return ((cc2420_read_reg(CC2420_REG_FSCTRL) - 357) / 5) + 11;
+    return (int32_t)((cc2420_read_reg(CC2420_REG_FSCTRL) - 357) / 5) + 11;
 }
 
 /*
