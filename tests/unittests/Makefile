@@ -32,7 +32,9 @@ UNITTEST_LIBS := $(UNIT_TESTS:%=$(BINDIR)%.a)
 all: $(UNITTEST_LIBS)
 $(UNIT_TESTS): all
 
-$(UNITTEST_LIBS): $(BINDIR)%.a:
+.FORCE:
+
+$(UNITTEST_LIBS): $(BINDIR)%.a: .FORCE
 	"$(MAKE)" -C $(CURDIR)/$*
 
 charEMPTY :=
