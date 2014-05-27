@@ -131,7 +131,7 @@ void cc110x_wakeup_from_rx(void);
 void cc110x_switch_to_pwd(void);
 
 void cc110x_disable_interrupts(void);
-int32_t cc110x_set_config_channel(uint8_t channr);
+int16_t cc110x_set_config_channel(uint8_t channr);
 int32_t cc110x_set_channel(uint8_t channr);
 int32_t cc110x_get_channel(void);
 
