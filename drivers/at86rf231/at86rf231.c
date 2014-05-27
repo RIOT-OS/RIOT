@@ -150,7 +150,12 @@ int32_t at86rf231_set_pan(uint16_t pan)
     return radio_pan;
 }
 
-uint16_t at86rf231_get_pan(void)
+/*
+ * @brief Get the pan for the  device
+ *
+ * @return The current pan of the transceiver.
+ */
+int32_t at86rf231_get_pan(void)
 {
     return radio_pan;
 }
