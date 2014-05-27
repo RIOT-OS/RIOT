@@ -134,14 +134,14 @@ void cc2420_switch_to_rx(void);
  *
  * @return The tuned channel after calling, or -1 on error.
  */
-int16_t cc2420_set_channel(uint16_t chan);
+int32_t cc2420_set_channel(uint8_t chan);
 
 /**
  * @brief Get the channel of the cc2420.
  *
  * @return The tuned channel.
  */
-uint16_t cc2420_get_channel(void);
+int32_t cc2420_get_channel(void);
 
 /**
  * @brief Sets the short address of the cc2420.
@@ -184,7 +184,7 @@ uint64_t cc2420_get_address_long(void);
  *
  * @return The set pan ID after calling.
  */
-uint16_t cc2420_set_pan(uint16_t pan);
+int32_t cc2420_set_pan(uint16_t pan);
 
 /**
  * @brief Gets the current IEEE long address of the cc2420.
@@ -192,7 +192,7 @@ uint16_t cc2420_set_pan(uint16_t pan);
  * @return The current IEEE long address.
  *
  */
-uint16_t cc2420_get_pan(void);
+int32_t cc2420_get_pan(void);
 
 
 /**
