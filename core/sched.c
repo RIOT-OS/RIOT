@@ -208,7 +208,7 @@ void sched_task_kill(int pid)
 
         sched_set_status((tcb_t *) sched_kill_thread, STATUS_STOPPED);
 
-        if (pid == sched_active_thread->pid) {
+        if (pid == sched_active_pid) {
             sched_active_thread = NULL;
             cpu_switch_context_exit();
         }
@@ -222,6 +222,6 @@ NORETURN void sched_task_exit(void)
 
     dINT();
 
-    sched_task_kill(sched_active_thread->pid);
+    sched_task_kill(sched_active_pid);
 
 }
