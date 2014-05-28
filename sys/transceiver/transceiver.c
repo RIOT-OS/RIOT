@@ -868,12 +868,12 @@ static int32_t get_channel(transceiver_type_t t)
 
 /*------------------------------------------------------------------------------------*/
 /*
- * @brief Sets the pan for the CC2420 transceiver device
+ * @brief Sets the PAN for any transceiver device
  *
  * @param t         The transceiver device
- * @param channel   The channel to be set
+ * @param pan       The PAN to be set
  *
- * @return The pan AFTER calling the set command, -1 on error
+ * @return The PAN AFTER calling the set command, -1 on error
  */
 static int32_t set_pan(transceiver_type_t t, void *pan)
 {
@@ -909,7 +909,7 @@ static int32_t set_pan(transceiver_type_t t, void *pan)
 }
 
 /*
- * @brief Get the pan for the cc2420 transceiver device
+ * @brief Get the pan of any transceiver device
  *
  * @param t     The transceiver device
  *
