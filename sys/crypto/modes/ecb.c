@@ -1,3 +1,23 @@
+/*
+* Copyright (C) 2014 Freie Universität Berlin
+*
+* This file is subject to the terms and conditions of the GNU Lesser General
+* Public License. See the file LICENSE in the top level directory for more
+* details.
+*/
+
+/**
+* @ingroup     sys_crypto_modes
+* @{
+*
+* @file
+* @brief       Crypto mode - electronic code book
+*
+* @author      Nico von Geyso <nico.geyso@fu-berlin.de>
+*
+* @}
+*/
+
 #include "crypto/modes/ecb.h"
 
 int cipher_encrypt_ecb(cipher_t* cipher, uint8_t* input,

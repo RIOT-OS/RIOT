@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     examples
+ * @{
+ *
+ * @file
+ * @brief       UDP Shell application
+ *
+ * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
+ *
+ * @}
+ */
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

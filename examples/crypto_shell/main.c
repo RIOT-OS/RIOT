@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       AES shell example application
+ * @brief       UDP Shell application
  *
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  *
