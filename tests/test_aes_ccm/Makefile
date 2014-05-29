@@ -1,0 +1,18 @@
+export PROJECT = test_aes
+include ../Makefile.tests_common
+
+BOARD_INSUFFICIENT_RAM := chronos msb-430h redbee-econotag \
+                          telosb wsn430-v1_3b wsn430-v1_4 z1
+BOARD_BLACKLIST := arduino-due mbed_lpc1768 msb-430 pttu udoo qemu-i386
+# mbed_lpc1768: see https://github.com/RIOT-OS/RIOT/issues/675
+# msb-430: see https://github.com/RIOT-OS/RIOT/issues/658
+# pttu: see https://github.com/RIOT-OS/RIOT/issues/659
+# qemu-i386: no tranceiver, yet
+
+USEMODULE += crypto_ciphers_aes
+USEMODULE += crypto_ciphers
+USEMODULE += crypto_modes
+
+DISABLE_MODULE += auto_init
+
+include $(RIOTBASE)/Makefile.include

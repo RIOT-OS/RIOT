@@ -105,8 +105,8 @@ typedef struct {
  * @return  Whether initialization was successful. The command may be
  *          unsuccessful if the key size or blockSize are not valid.
  */
-int skipjack_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
-                  uint8_t *key);
+int skipjack_init(cipher_context_t *context, uint8_t blockSize, uint8_t *key,
+                uint8_t keySize);
 
 /**
  * @brief   Encrypts a single block (of blockSize) using the passed context.
@@ -146,7 +146,7 @@ int skipjack_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
  *
  * @return SUCCESS
  */
-int skipjack_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
+int skipjack_set_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
 
 /**
  * @brief   Returns the preferred block size that this cipher operates with.
@@ -164,7 +164,7 @@ uint8_t skipjack_get_preferred_block_size(void);
  * Interface to access the functions
  *
  */
-extern block_cipher_interface_t skipjack_interface;
+extern cipher_interface_t skipjack_interface;
 
 /** @} */
 #endif /* SKIPJACK_H_ */

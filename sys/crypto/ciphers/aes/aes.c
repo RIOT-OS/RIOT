@@ -33,19 +33,18 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "crypto/aes.h"
-#include "crypto/ciphers.h"
+#include "crypto/ciphers/aes.h"
 
 /**
  * Interface to the aes cipher
  */
-block_cipher_interface_t aes_interface = {
-    "AES",
-    aes_init,
-    aes_encrypt,
-    aes_decrypt,
-    aes_setup_key,
-    aes_get_preferred_block_size
+cipher_interface_t aes_interface = {
+     AES_BLOCK_SIZE,
+     20,
+     aes_init,
+     aes_encrypt,
+     aes_decrypt,
+     aes_set_key
 };
 
 static const u32 Te0[256] = {
@@ -719,8 +718,8 @@ static const u32 rcon[] = {
 };
 
 
-int aes_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
-             uint8_t *key)
+int aes_init(cipher_context_t *context, uint8_t blockSize, uint8_t *key, 
+          uint8_t keySize)
 {
     //printf("%-40s: Entry\r\n", __FUNCTION__);
     // 16 byte blocks only
@@ -747,9 +746,9 @@ int aes_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
     return 1;
 }
 
-int aes_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
+int aes_set_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
 {
-    return aes_init(context, aes_get_preferred_block_size(), keysize, key);
+    return aes_init(context, AES_BLOCK_SIZE, key, keysize);
 }
 
 /**
@@ -1455,11 +1454,6 @@ int aes_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
         rk[3];
     PUTU32(plainBlock + 12, s3);
     return 1;
-}
-
-uint8_t aes_get_preferred_block_size(void)
-{
-    return AES_BLOCK_SIZE;
 }
 
 #endif /* AES_ASM */

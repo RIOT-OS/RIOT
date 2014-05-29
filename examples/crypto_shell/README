@@ -1,0 +1,44 @@
+AES Shell
+=========
+
+This snippet is a tiny aes shell to encrypt and decrypt aes blocks. It should be
+a starting point for using AES in RIOT.
+
+Output
+------
+
+  $ make && make term
+  /home/***/RIOT/examples/aes/bin/native/aes.elf 
+  RIOT native uart0 initialized.
+  RIOT native interrupts/signals initialized.
+  LED_GREEN_OFF
+  LED_RED_ON
+  RIOT native board initialized.
+  RIOT native hardware initialization complete.
+
+  kernel_init(): This is RIOT! (Version: 2014.01-703-g3a7f)
+  kernel_init(): jumping into first task...
+  UART0 thread started.
+  uart0_init() [OK]
+  native rtc initialized
+  Native LTC4150 initialized.
+
+  AES Shell
+  > encrypt aes ccm foo "Lorem ipsum dolor sit amet, consetetur sadipscing elitr" 
+  encrypt aes ccm foo "Lorem ipsum dolor sit amet, consetetur sadipscing elitr"
+
+  75 66 d6 80 75 f3 10 9d a5 8a ff 27 9a 9d 36 a8 1f 80 3a d9 da 3 b1 53 ac b3 2f c1 ae 1d 56 6b fd 31 ab 30 d4 8 8c 4a 6 f4 8b 40 eb c6 a8 14 6c 3b 3 d8 1d 88 d8 29 5 3e 86 97 53 79 4a 
+
+
+  > decrypt aes ccm foo "75 66 d6 80 75 f3 10 9d a5 8a ff 27 9a 9d 36 a8 1f 80 3a d9 da 3 b1 53 ac b3 2f c1 ae 1d 56 6b fd 31 ab 30 d4 8 8c 4a 6 f4 8b 40 eb c6 a8 14 6c 3b 3 d8 1d 88 d8 29 5 3e 86 97 53 79 4a"
+  decrypt aes ccm foo "75 66 d6 80 75 f3 10 9d a5 8a ff 27 9a 9d 36 a8 1f 80 3a d9 da 3 b1 53 ac b3 2f c1 ae 1d 56 6b fd 31 ab 30 d4 8 8c 4a 6 f4 8b 40 eb c6 a8 14 6c 3b 3 d8 1d 88 d8 29 5 3e 86 97 53 79 4a"
+  Lorem ipsum dolor sit amet, consetetur sadipscing elitr
+
+
+  > encrypt twofish cbc foo "0123456789ABCDEF"
+  encrypt twofish cbc foo "0123456789ABCDEF"
+
+  30 e6 f1 91 f6 3 9d 0 4d 23 47 a6 54 91 35 5c 
+  > decrypt twofish cbc foo "30 e6 f1 91 f6 3 9d 0 4d 23 47 a6 54 91 35 5c"
+  decrypt twofish cbc foo "30 e6 f1 91 f6 3 9d 0 4d 23 47 a6 54 91 35 5c"
+  0123456789ABCDEF

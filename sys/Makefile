@@ -71,8 +71,29 @@ endif
 ifneq (,$(filter bloom,$(USEMODULE)))
     DIRS += bloom
 endif
-ifneq (,$(filter crypto,$(USEMODULE)))
-    DIRS += crypto
+ifneq (,$(filter crypto_ciphers,$(USEMODULE)))
+    DIRS += crypto/ciphers
+endif
+ifneq (,$(filter crypto_ciphers_3des,$(USEMODULE)))
+    DIRS += crypto/ciphers/3des
+endif
+ifneq (,$(filter crypto_ciphers_aes,$(USEMODULE)))
+    DIRS += crypto/ciphers/aes
+endif
+ifneq (,$(filter crypto_ciphers_rc5,$(USEMODULE)))
+    DIRS += crypto/ciphers/rc5
+endif
+ifneq (,$(filter crypto_hashes_sha256,$(USEMODULE)))
+    DIRS += crypto/hashes/sha256
+endif
+ifneq (,$(filter crypto_ciphers_skipjack,$(USEMODULE)))
+    DIRS += crypto/ciphers/skipjack
+endif
+ifneq (,$(filter crypto_ciphers_twofish,$(USEMODULE)))
+    DIRS += crypto/ciphers/twofish
+endif
+ifneq (,$(filter crypto_modes,$(USEMODULE)))
+    DIRS += crypto/modes
 endif
 ifneq (,$(filter random,$(USEMODULE)))
     DIRS += random
