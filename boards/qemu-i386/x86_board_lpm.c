@@ -21,23 +21,27 @@
  * @{
  *
  * @file
- * @brief       Placeholder if someone uses x86-multiboot as a board.
+ * @brief       Low-power mode emulation for qemu-i386.
  *
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  *
  * @}
  */
 
-#include <lpm.h>
+#include "lpm.h"
+#include "x86_reboot.h"
 
 void lpm_init(void)
 {
-    // void
+    /* void */
 }
 
 enum lpm_mode lpm_set(enum lpm_mode target)
 {
     if (target != LPM_ON) {
+        if (target == LPM_POWERDOWN) {
+            x86_shutdown();
+        }
         asm volatile ("hlt");
     }
     return LPM_UNKNOWN;
@@ -45,15 +49,15 @@ enum lpm_mode lpm_set(enum lpm_mode target)
 
 void lpm_awake(void)
 {
-    // void
+    /* void */
 }
 
 void lpm_begin_awake(void)
 {
-    // void
+    /* void */
 }
 
 void lpm_end_awake(void)
 {
-    // void
+    /* void */
 }
