@@ -2,7 +2,7 @@
  * @ingroup  tests
  * @{
  * @file
- * @brief    Test the `struct tm` helpers in "tm.h" of the module "timex".
+ * @brief    Utility for the `struct tm` helpers in "tm.h" of the module "timex".
  * @author   René Kijewski <rene.kijewski@fu-berlin.de>
  * @}
  */
