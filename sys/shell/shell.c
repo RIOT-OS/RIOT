@@ -210,32 +210,36 @@ static void handle_input_line(shell_t *shell, char *line)
 static int readline(shell_t *shell, char *buf, size_t size)
 {
     char *line_buf_ptr = buf;
-    int c;
 
     while (1) {
         if ((line_buf_ptr - buf) >= ((int) size) - 1) {
             return -1;
         }
 
-        c = shell->readchar();
+        int c = shell->readchar();
         if (c < 0) {
             return 1;
         }
-        shell->put_char(c);
 
         /* We allow Unix linebreaks (\n), DOS linebreaks (\r\n), and Mac linebreaks (\r). */
         /* QEMU transmits only a single '\r' == 13 on hitting enter ("-serial stdio"). */
-        /* DOS newlines are handled like hitting enter twice, but handle_input_line() ignores empty lines. */
-        if (c == 10 || c == 13) {
+        /* DOS newlines are handled like hitting enter twice, but empty lines are ignored. */
+        if (c == '\r' || c == '\n') {
+            if (line_buf_ptr == buf) {
+                /* The line is empty. */
+                continue;
+            }
+
             *line_buf_ptr = '\0';
+            shell->put_char('\r');
+            shell->put_char('\n');
             return 0;
         }
         else {
             *line_buf_ptr++ = c;
+            shell->put_char(c);
         }
     }
-
-    return 1;
 }
 
 static inline void print_prompt(shell_t *shell)
