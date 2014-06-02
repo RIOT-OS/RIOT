@@ -60,8 +60,8 @@ void shell_send(int argc, char **argv)
         return;
     }
     
-    // neighbour discovery protocol buggy in RIOT, so we need to add
-    // neighbours manually.
+    /* neighbour discovery protocol buggy in RIOT, so we need to add
+       neighbours manually. */
     if (!ndp_neighbor_cache_search(&dest)) {
         ndp_neighbor_cache_add(IF_ID, &dest, &(dest.uint16[7]), 2, 0,
                                NDP_NCE_STATUS_REACHABLE,
@@ -90,7 +90,8 @@ void shell_send(int argc, char **argv)
                len, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &dest));
     }
 
-    //close(sock);
+    /* missing not exposed close() function
+     close(sock) */;
 }
 
 
@@ -112,7 +113,8 @@ void init_udp_server(void)
     status = bind(sock, (struct sockaddr *)&sa, sizeof(sa));
     if (-1 == status) {
         printf("Error bind failed!\n");
-        //close(sock);
+        /* missing not exposed close() function
+         close(sock) */;
     }
     while (1) {
         recsize = recvfrom(sock, (void *)buffer_main, UDP_BUFFER_SIZE, 0,
@@ -125,7 +127,8 @@ void init_udp_server(void)
         printf("UDP packet received, payload: %s\n", buffer_main);
     }
 
-    //close(sock);
+    /* missing not exposed close() function
+     close(sock) */;
 }
 
 
@@ -143,7 +146,7 @@ int main(void)
     int udp_server_thread_pid;
     shell_t shell;
 
-    // configure link-local address
+    /* configure link-local address */
     ipv6_addr_set_link_local_prefix(&ipaddr);
 
     if (!ipv6_addr_set_by_eui64(&ipaddr, IF_ID, &ipaddr)) {
@@ -158,14 +161,14 @@ int main(void)
         return 0;
     }
 
-    // Start UDP Server
+    /* Start UDP Server */
     udp_server_thread_pid = thread_create(udp_server_stack_buffer,
             KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN, CREATE_STACKTEST,
             init_udp_server, "init_udp_server");
     printf("UDP SERVER ON PORT %d (THREAD PID: %d)\n", HTONS(SERVER_PORT),
             udp_server_thread_pid);
 
-    // Print configured IPv6-Addresses
+    /* Print configured IPv6-Addresses */
     printf("Already configured IPv6-Addresses:\n");
     while (net_if_iter_addresses(0, &addr_ptr)) {
         if (inet_ntop(AF_INET6, addr_ptr->addr_data, addr_str,
@@ -174,7 +177,7 @@ int main(void)
         }
     }
 
-    // start shell
+    /* start shell */
     posix_open(uart0_handler_pid, 0);
     shell_init(&shell, shell_commands, UART0_BUFSIZE, uart0_readc, uart0_putc);
     shell_run(&shell);
