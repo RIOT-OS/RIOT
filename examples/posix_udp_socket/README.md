@@ -1,5 +1,5 @@
-UDP Client/Server
-================
+POSIX UDP Client/Server
+=======================
 
 This is a basic example how to use UDP as server or client in RIOT. You can send
 and receive data through UDP.

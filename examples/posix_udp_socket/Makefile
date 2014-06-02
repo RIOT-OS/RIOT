@@ -1,5 +1,5 @@
 # name of your application
-export APPLICATION = udp-sockets
+export APPLICATION = posix-udp-socket
 
 # If no BOARD is found in the environment, use this default:
 export BOARD ?= native

@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       UDP Server/Client
+ * @brief       Posix UDP Server/Client example
  *
  * @author      Jonatan Zint <j.zint@fu-berlin.de>
  * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
