@@ -61,7 +61,8 @@ int accept(int socket, struct sockaddr *restrict address,
         return -1;
     }
 
-    return res;
+    return fd_new(res, flagless_recv, flagless_send,
+                  destiny_socket_close);
 }
 
 int bind(int socket, const struct sockaddr *address, socklen_t address_len)
