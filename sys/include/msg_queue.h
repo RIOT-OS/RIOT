@@ -16,9 +16,11 @@ typedef struct msg_queue {
     int          maxsize;
 } msg_queue_t;
 
+struct msg_hdr;
+
 int msg_queue_init(msg_queue_t *queue, char *buf, int size, int maxsize);
 int thread_msg_queue_init(char *buf, int size, int maxsize);
-int msg_queue_add(msg_queue_t *queue, msg_hdr_t *src);
-int msg_queue_get(msg_queue_t *queue, msg_hdr_t *dest);
+int msg_queue_add(msg_queue_t *queue, struct msg_hdr *src);
+int msg_queue_get(msg_queue_t *queue, struct msg_hdr *dest);
 
 #endif /* __MSG_QUEUE_H */
