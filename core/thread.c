@@ -90,62 +90,62 @@ int thread_wakeup(kernel_pid_t pid)
 }
 
 #ifdef DEVELHELP
-int thread_measure_stack_free(char *stack)
+uintptr_t thread_measure_stack_free(char *stack)
 {
-    unsigned int *stackp = (unsigned int *)stack;
+    uintptr_t *stackp = (uintptr_t *)stack;
 
     /* assume that the comparison fails before or after end of stack */
     /* assume that the stack grows "downwards" */
-    while (*stackp == (unsigned int)stackp) {
+    while (*stackp == (uintptr_t) stackp) {
         stackp++;
     }
 
-    int space_free = (unsigned int)stackp - (unsigned int)stack;
+    uintptr_t space_free = (uintptr_t) stackp - (uintptr_t) stack;
     return space_free;
 }
 #endif
 
 kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags, void *(*function)(void *arg), void *arg, const char *name)
 {
-    /* allocate our thread control block at the top of our stackspace */
-#ifdef DEVELHELP
-    int total_stacksize = stacksize;
-#endif
-    stacksize -= sizeof(tcb_t);
-
-    /* align tcb address on 32bit boundary */
-    unsigned int tcb_address = (unsigned int) stack + stacksize;
-
-    if (tcb_address & 1) {
-        tcb_address--;
-        stacksize--;
-    }
-
-    if (tcb_address & 2) {
-        tcb_address -= 2;
-        stacksize -= 2;
-    }
-
-    tcb_t *cb = (tcb_t *) tcb_address;
-
     if (priority >= SCHED_PRIO_LEVELS) {
         return -EINVAL;
     }
 
 #ifdef DEVELHELP
+    int total_stacksize = stacksize;
+#endif
+
+    /* align the stack on a 16/32bit boundary */
+    uintptr_t misalignment = (uintptr_t) stack % ALIGN_OF(void *);
+    if (misalignment) {
+        misalignment = ALIGN_OF(void *) - misalignment;
+        stack += misalignment;
+        stacksize -= misalignment;
+    }
+
+    /* make room for the thread control block */
+    stacksize -= sizeof(tcb_t);
+
+    /* round down the stacksize to a multiple of tcb_t alignments (usually 16/32bit) */
+    stacksize -= stacksize % ALIGN_OF(tcb_t);
+
+    /* allocate our thread control block at the top of our stackspace */
+    tcb_t *cb = (tcb_t *) (stack + stacksize);
+
+#ifdef DEVELHELP
     if (flags & CREATE_STACKTEST) {
         /* assign each int of the stack the value of it's address */
-        unsigned int *stackmax = (unsigned int *)((char *)stack + stacksize);
-        unsigned int *stackp = (unsigned int *)stack;
+        uintptr_t *stackmax = (uintptr_t *) (stack + stacksize);
+        uintptr_t *stackp = (uintptr_t *) stack;
 
         while (stackp < stackmax) {
-            *stackp = (unsigned int)stackp;
+            *stackp = (uintptr_t) stackp;
             stackp++;
         }
     }
     else {
         /* create stack guard */
-        *stack = (unsigned int)stack;
+        *stack = (uintptr_t) stack;
     }
 #endif
 
