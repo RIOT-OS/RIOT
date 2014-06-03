@@ -68,19 +68,23 @@ int msg_queue_get(msg_queue_t *queue, msg_hdr_t *dest) {
     msg_hdr_t hdr;
     int res = 0;
     if (ringbuffer_get(&queue->rb, (char*) &hdr, sizeof(msg_hdr_t))) {
-    DEBUG("%s:l%d: unqueueing msg. dest->sender_pid=%d dest->payload=%x dest->size=%d\n",
-            __FILE__, __LINE__, dest->sender_pid, (unsigned int)dest->payload, dest->size);
+    DEBUG("%s:l%d: unqueueing msg. dest->node=%x dest->payload=%x dest->size=%d\n",
+            __FILE__, __LINE__, (unsigned int)dest->node, (unsigned int)dest->payload, dest->size);
         res = (hdr.size < dest->size) ? hdr.size : dest->size;
 
-        dest->sender_pid = hdr.sender_pid;
+        dest->node = hdr.node;
         dest->flags = hdr.flags;
-
+        DEBUG("%s:l%d %i \n", __FILE__, __LINE__, res);
         ringbuffer_get(&queue->rb, dest->payload, res);
+        DEBUG("%s:l%d\n", __FILE__, __LINE__);
         int leftover = hdr.size - res;
         if (leftover > 0) {
+        DEBUG("%s:l%d\n", __FILE__, __LINE__);
             ringbuffer_remove(&queue->rb, leftover);
+        DEBUG("%s:l%d\n", __FILE__, __LINE__);
         }
     }
+        DEBUG("%s:l%d\n", __FILE__, __LINE__);
 
     return res;
 }

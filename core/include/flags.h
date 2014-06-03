@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014 Kaspar Schleiser
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -28,6 +29,7 @@
 #define CREATE_WOUT_YIELD   (4)     /**< do not automatically call thread_yield() after creation */
 #define CREATE_STACKTEST    (8)     /**< write markers into the thread's stack to measure stack
                                          usage (for debugging) */
+#define CREATE_NOMSG        (16)    /**< Create thread without messaging capabilities */
 /** @} */
 
 #endif /* _FLAGS_H */

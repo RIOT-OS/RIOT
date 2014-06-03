@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2014 Kaspar Schleiser
  *
  * This file subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -34,6 +35,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "kernel_types.h"
+#include "queue.h"
 
 #define MESSAGE_PROCESS_NOT_WAITING 0
 #define MESSAGE_SENT                1
@@ -50,6 +52,23 @@
 /** @} */
 
 /**
+ * @brief Describes a message node object
+ *
+ * These messages nodes are used as messaging endpoints
+ * by the messaging API.
+ *
+ */
+typedef struct msg_node {
+    struct tcb   *owner;         /**< thread that owns this message node   */
+    void         *wait_data;     /**< holding current receive data         */
+    queue_node_t msg_waiters;    /**< threads waiting to send to this node */
+
+#ifdef MODULE_MSG_QUEUE
+    struct msg_queue *msg_queue; /**< ptr to this node's msg queue         */
+#endif
+} msg_node_t;
+
+/**
  * @brief Describes a message header object that contains auxillary message data
  *
  * Pass a pointer to msg_hdr_t to msg_receive to get extra message info.
@@ -57,14 +76,14 @@
  * This is also used internally my RIOT's msg subsystem.
  */
 typedef struct msg_hdr {
-    unsigned int sender_pid;    /**< PID of thread that sent the msg */
-    char         *payload;      /**< Pointer to message send buffer (same as supplied to
-                                     msg_send()) */
-    uint16_t     size;          /**< Receive buffer size. */
-    uint16_t     flags;         /**< Bitfield to hold several flags */
-    char         *rbuf;         /**< Pointer to receive message buffer (same as supplied to
-                                     msg_receive()) */
-    uint16_t     rsize;         /**< size of rbuf */
+    struct msg_node *node;         /**< Reference to sender message node */
+    char            *payload;      /**< Pointer to message send buffer (same as supplied to
+                                        msg_send()) */
+    uint16_t        size;          /**< Receive buffer size. */
+    uint16_t        flags;         /**< Bitfield to hold several flags */
+    char            *rbuf;         /**< Pointer to receive message buffer (same as supplied to
+                                        msg_receive()) */
+    uint16_t        rsize;         /**< size of rbuf */
 } msg_hdr_t;
 
 /**
@@ -84,14 +103,14 @@ typedef struct msg_hdr {
  * The amount of data is the minimum of @c size and the target thread's message
  * buffer as supplied to msg_(try)receive.
  *
- * @param  target_pid PID of target thread
+ * @param  target reference to target message node
  * @param  buf Pointer to buffer that should be sent
  * @param  size Size of buffer (must be >= sizeof(msg_pulse_t))
  *
  * @return >0 amount of data that was actually sent.
- * @return -1 on error (invalid PID)
+ * @return -1 on error (invalid target node)
  */
-int msg_send(unsigned int target_pid, char *buf, uint16_t size);
+int msg_send(msg_node_t *target, char *buf, uint16_t size);
 
 /**
  * @brief Send a message. (non-blocking)
@@ -107,7 +126,7 @@ int msg_send(unsigned int target_pid, char *buf, uint16_t size);
  * @return 0 if receiver is not waiting or has a full message queue
  * @return -1 on error (invalid PID)
  */
-int msg_try_send(unsigned int target_pid, char *buf, uint16_t size);
+int msg_try_send(msg_node_t *target, char *buf, uint16_t size);
 
 /**
  * @brief Send a message from interrupt context. (non-blocking)
@@ -123,7 +142,7 @@ int msg_try_send(unsigned int target_pid, char *buf, uint16_t size);
  * @return 0 if receiver is not waiting or has a full message queue
  * @return -1 on error (invalid PID)
  */
-int msg_send_int(unsigned int target_pid, char *buf, uint16_t size);
+int msg_send_int(msg_node_t *target, char *buf, uint16_t size);
 
 /**
  * @brief Receive a message. (blocking)

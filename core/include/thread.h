@@ -169,5 +169,7 @@ int thread_measure_stack_free(char *stack);
 int thread_set_msg_queue(int pid, msg_queue_t* msg_queue);
 #endif
 
+msg_node_t *thread_get_msg_node(int pid);
+
 /* @} */
 #endif /* __THREAD_H */
