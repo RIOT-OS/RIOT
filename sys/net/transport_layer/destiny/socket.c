@@ -1194,6 +1194,10 @@ socket_internal_t *get_waiting_connection_socket(int socket,
     for (i = 1; i < MAX_SOCKETS + 1; i++) {
         current_socket = get_socket(i);
 
+        if (!current_socket) {
+            continue;
+        }
+
         /* Connection establishment ACK, Check for 4 touple and state */
         if ((ipv6_header != NULL) && (tcp_header != NULL)) {
             if (is_four_touple(current_socket, ipv6_header, tcp_header) &&
