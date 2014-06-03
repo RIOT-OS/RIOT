@@ -52,10 +52,8 @@ void *timer_thread(void *arg)
     /* we need a queue if the second message arrives while the first is still processed */
     /* without a queue, the message would get lost */
     /* because of the way this timer works, there can be max 1 queued message */
-    msg_queue_t msg_queue;
-    char queue_buf[64];
-    msg_queue_init(&msg_queue, queue_buf, sizeof(queue_buf), 0);
-    thread_set_msg_queue(thread_pid, &msg_queue);
+    char queue_buf[MSG_QUEUE_SPACE(1)];
+    thread_msg_queue_init(queue_buf, sizeof(queue_buf), 0);
 
     while (1) {
         msg_pulse_t m;
