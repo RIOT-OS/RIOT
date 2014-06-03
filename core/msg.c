@@ -70,6 +70,9 @@ int msg_try_send(msg_node_t *target, char *buf, uint16_t size) {
     return _msg_send(target, buf, size, 0);
 }
 
+int msg_send_receive(msg_node_t *target, char *sbuf, uint16_t ssize, char *rbuf, uint16_t rsize) {
+    return _msg_send_receive(target, sbuf, ssize, rbuf, rsize, MSG_REPLY_EXPECTED | MSG_BLOCK);
+}
 
 static int _msg_send(msg_node_t *target, char *buf, uint16_t size, uint16_t flags) {
     return _msg_send_receive(target, buf, size, NULL, 0, flags);

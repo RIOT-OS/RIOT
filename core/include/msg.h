@@ -186,6 +186,29 @@ int msg_receive(char *buf, uint16_t size, msg_hdr_t *hdr);
 int msg_try_receive(char *buf, uint16_t size, msg_hdr_t *hdr);
 
 /**
+ * @brief Send a message, expect reply. (blocking)
+ *
+ * This function send a message and then sets the calling thread to
+ * RECEIVE_BLOCKED state, waiting for a reply.
+ * If the target retrieves msg_hdr, the flag MSG_EXPECTS_REPLY will be set.
+ * Otherwise msg_send_receive behaves like a pair of msg_send/msg_receive calls,
+ * but should be more efficient as one context switch can be saved.
+ *
+ * A message send with msg_send_receive *must* be replied to by msg_reply.
+ *
+ * @param  target target messaging node
+ * @param  sbuf Pointer to buffer that should be sent
+ * @param  ssize Size of send buffer (must be >= sizeof(msg_pulse_t))
+ * @param  rbuf Pointer to buffer where the reply should be stored
+ * @param  rsize Size of receive buffer (must be >= sizeof(msg_pulse_t))
+ *
+ * @return >0 amount of data that was actually received
+ * @return -1 on error
+ */
+int msg_send_receive(msg_node_t *target, char *sbuf, uint16_t ssize, char *rbuf, uint16_t rsize);
+int msg_reply(msg_node_t *target, char *buf, uint16_t size);
+
+/**
  * @brief Describes a message pulse object which can be sent between threads.
  *
  * User can set type and one of content.ptr and content.value. (content is a union)
