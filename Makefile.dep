@@ -30,6 +30,7 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
 	USEMODULE += ieee802154
 	USEMODULE += net_help
 	USEMODULE += net_if
+	USEMODULE += packetbuf
 	USEMODULE += posix
 	USEMODULE += vtimer
 endif

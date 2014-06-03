@@ -142,6 +142,7 @@ uint8_t context_len = 0;
 uint16_t local_address = 0;
 
 int lowpan_init(int as_border);
+void lowpan_context_auto_remove(void);
 uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
                              ipv6_hdr_t *ipv6_buf_extra, uint8_t *ptr);
 void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
@@ -367,6 +368,7 @@ static void *lowpan_transfer(void *arg)
     uint8_t gotosleep;
 
     while (1) {
+
         gotosleep = 1;
         mutex_lock(&fifo_mutex);
         current_buf = packet_fifo;
@@ -1788,15 +1790,7 @@ int sixlowpan_lowpan_init(void)
     /* init mac-layer and radio transceiver */
     sixlowpan_mac_init();
 
-    if (!ip_process_pid) {
-        ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
-                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                       ipv6_process, NULL, "ip_process");
-    }
-
-    if (ip_process_pid < 0) {
-        return 0;
-    }
+    ipv6_init(NULL);
 
     nbr_cache_auto_rem();
 

@@ -83,6 +83,8 @@
  */
 #define IPV6_PACKET_RECEIVED        (UPPER_LAYER_2)
 
+int ipv6_init(void);
+
 /**
  * @brief   Get IPv6 send/receive buffer.
  *
