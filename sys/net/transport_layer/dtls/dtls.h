@@ -25,6 +25,8 @@ typedef uint8_t uint24_t[3];
 typedef uint8_t uint48_t[6];
 
 
+#define DTLS_MAX_RECORD_LENGTH 16384  /* 2^14 */
+
 /**
  * TLS structs
  */
@@ -33,6 +35,8 @@ typedef struct tls_protocol_version_st {
     uint8_t major;
     uint8_t minor;
 } tls_protocol_version_t;
+
+#define DTLS_VERSION_1_2 {254, 253}
 
 typedef enum {
   change_cipher_spec = 20,
@@ -113,6 +117,7 @@ typedef struct tls_generic_block_cipher_st {
 
 typedef uint8_t tls_cipher_suite_t[2];
 
+// TLS 1.2
 #define TLS_RSA_EXPORT_WITH_RC4_40_MD5        {0x00,0x03} /* [RFC4346] */
 #define TLS_RSA_WITH_RC4_128_MD5              {0x00,0x04} /* [RFC5246] */
 #define TLS_RSA_WITH_RC4_128_SHA              {0x00,0x05} /* [RFC5246] */
@@ -132,6 +137,29 @@ typedef uint8_t tls_cipher_suite_t[2];
 #define TLS_ECDH_anon_WITH_RC4_128_SHA        {0xC0,0x16} /* [RFC4492] */
 #define TLS_ECDHE_PSK_WITH_RC4_128_SHA        {0xC0,0x33} /* [RFC5489] */
 
+// PSK - RFC4279
+#define TLS_PSK_WITH_RC4_128_SHA              {0x00,0x8A}
+#define TLS_PSK_WITH_3DES_EDE_CBC_SHA         {0x00,0x8B}
+#define TLS_PSK_WITH_AES_128_CBC_SHA          {0x00,0x8C}
+#define TLS_PSK_WITH_AES_256_CBC_SHA          {0x00,0x8D}
+#define TLS_DHE_PSK_WITH_RC4_128_SHA          {0x00,0x8E}
+#define TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA     {0x00,0x8F}
+#define TLS_DHE_PSK_WITH_AES_128_CBC_SHA      {0x00,0x90}
+#define TLS_DHE_PSK_WITH_AES_256_CBC_SHA      {0x00,0x91}
+#define TLS_RSA_PSK_WITH_RC4_128_SHA          {0x00,0x92}
+#define TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA     {0x00,0x93}
+#define TLS_RSA_PSK_WITH_AES_128_CBC_SHA      {0x00,0x94}
+#define TLS_RSA_PSK_WITH_AES_256_CBC_SHA      {0x00,0x95}
+
+// PSK based AES-CCM - RFC 6655
+#define TLS_PSK_WITH_AES_128_CCM              {0xC0,0xA4}
+#define TLS_PSK_WITH_AES_256_CCM              {0xC0,0xA5}
+#define TLS_DHE_PSK_WITH_AES_128_CCM          {0xC0,0xA6}
+#define TLS_DHE_PSK_WITH_AES_256_CCM          {0xC0,0xA7}
+#define TLS_PSK_WITH_AES_128_CCM_8            {0xC0,0xA8}
+#define TLS_PSK_WITH_AES_256_CCM_8            {0xC0,0xA9}
+#define TLS_PSK_DHE_WITH_AES_128_CCM_8        {0xC0,0xAA}
+#define TLS_PSK_DHE_WITH_AES_256_CCM_8        {0xC0,0xAB}
 
 /**
  * RECORD Layer 
@@ -172,6 +200,16 @@ typedef struct dtls_handshake_st {
   uint24_t fragment_length;
   void *body;
 } dtls_handshake_t;
+
+
+/**
+ * RIOT internal DTLS structures
+ */
+typedef struct dtls_connection_st {
+  dtls_handshake_t state;
+  tls_connection_end_t type;
+  int socket;
+} dtls_connection_t;
 
 #endif
 /**
