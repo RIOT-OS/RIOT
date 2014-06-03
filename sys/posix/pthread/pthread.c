@@ -67,6 +67,7 @@ typedef struct pthread_thread {
     char *stack;
 
     __pthread_cleanup_datum_t *cleanup_top;
+    void **keys;
 } pthread_thread_t;
 
 static pthread_thread_t *volatile pthread_sched_threads[MAXTHREADS];
@@ -76,12 +77,78 @@ static volatile int pthread_reaper_pid = -1;
 
 static char pthread_reaper_stack[PTHREAD_REAPER_STACKSIZE];
 
+static int pthread_key_count = 0;
+static struct pthread_key *first_key, *last_key;
+
+void **PURE __pthread_keys(void)
+{
+    pthread_t self_id = pthread_self();
+    if (self_id == 0) {
+        DEBUG("ERROR called pthread_self() returned 0 in \"%s\"!\n", __func__);
+        return NULL;
+    }
+
+    pthread_thread_t *self = pthread_sched_threads[self_id - 1];
+    return self->keys;
+}
+
+static void pthread_keys_exit(void *keys_)
+{
+    void **keys = keys_;
+
+    struct pthread_key *k;
+    int i;
+    for (k = first_key, i = 0; k; k = k->next, ++i) {
+        unsigned old_state = disableIRQ();
+        void *tmp = keys[i];
+        keys[i] = NULL;
+        restoreIRQ(old_state);
+
+        if (tmp && k->destructor) {
+            k->destructor(tmp);
+        }
+    }
+}
+
+int pthread_key_create(pthread_key_t *key, void (*destructor)(void*))
+{
+    (*key)->index = pthread_key_count++;
+    (*key)->destructor = destructor;
+    (*key)->next = NULL;
+
+    if (last_key) {
+        last_key->next = *key;
+    }
+    else {
+        first_key = *key;
+    }
+    last_key = *key;
+
+    return 0;
+}
+
+int pthread_key_delete(const pthread_key_t key)
+{
+    (void) key;
+    DEBUG("pthread_key_delete() is not supported.\n");
+    return -1;
+}
+
 static void pthread_start_routine(void)
 {
     pthread_t self = pthread_self();
 
     pthread_thread_t *pt = pthread_sched_threads[self-1];
-    void *retval = pt->start_routine(pt->arg);
+
+    void *keys[pthread_key_count];
+    memset(keys, 0, sizeof (keys));
+    pt->keys = keys;
+
+    void *retval;
+    pthread_cleanup_push(pthread_keys_exit, keys);
+    retval = pt->start_routine(pt->arg);
+    pthread_cleanup_pop(1);
+
     pthread_exit(retval);
 }
 
