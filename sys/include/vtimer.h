@@ -56,6 +56,8 @@ void vtimer_gettimeofday(struct timeval *tp);
 
 /**
  * @brief   Returns the current time in broken down format
+ * @details This function only fills the fields `tm_sec`, `tm_min` and `tm_hour`.
+ *          Use tm_fill_derived_values() to fill the other fields.
  * @param[out]  localt      Pointer to structure to receive time
  */
 void vtimer_get_localtime(struct tm *localt);
@@ -105,7 +107,6 @@ int vtimer_set_wakeup(vtimer_t *t, timex_t interval, kernel_pid_t pid);
  * @return      0 on success, < 0 on error
  */
 int vtimer_remove(vtimer_t *t);
-
 
 /**
  * @brief   receive a message but return in case of timeout time is passed by without a new message
