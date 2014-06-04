@@ -185,29 +185,21 @@ static int pthread_rwlock_timedlock(pthread_rwlock_t *rwlock,
                                     int incr_when_held,
                                     const struct timespec *abstime)
 {
-    timex_t now, then;
-
+    timex_t then;
     then.seconds = abstime->tv_sec;
     then.microseconds = abstime->tv_nsec / 1000u;
-    timex_normalize(&then);
 
-    vtimer_now(&now);
+    int spurious = 1;
+    vtimer_t timer;
 
-    if (timex_cmp(then, now) <= 0) {
-        return ETIMEDOUT;
+    vtimer_set_wakeup(&timer, then, VTIMER_ABSOLUTE, sched_active_thread->pid, &spurious);
+    int result = pthread_rwlock_lock(rwlock, is_blocked, is_writer, incr_when_held, true);
+
+    if (spurious) {
+        vtimer_remove(&timer);
     }
-    else {
-        timex_t reltime = timex_sub(then, now);
 
-        vtimer_t timer;
-        vtimer_set_wakeup(&timer, reltime, sched_active_thread->pid);
-        int result = pthread_rwlock_lock(rwlock, is_blocked, is_writer, incr_when_held, true);
-        if (result != ETIMEDOUT) {
-            vtimer_remove(&timer);
-        }
-
-        return result;
-    }
+    return result;
 }
 
 int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)

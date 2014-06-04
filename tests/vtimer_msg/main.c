@@ -64,7 +64,7 @@ void *timer_thread(void *arg)
                tmsg->interval.microseconds,
                tmsg->msg);
 
-        if (vtimer_set_msg(&tmsg->timer, tmsg->interval, thread_getpid(), tmsg) != 0) {
+        if (vtimer_set_msg(&tmsg->timer, tmsg->interval, VTIMER_RELATIVE, thread_getpid(), tmsg) != 0) {
             puts("something went wrong");
         }
         else {
@@ -121,7 +121,7 @@ int main(void)
     timex_t sleep = timex_set(1, 0);
 
     while (1) {
-        vtimer_sleep(sleep);
+        vtimer_sleep(sleep, VTIMER_RELATIVE);
         msg_send(&m, pid2, 0);
     }
 }
