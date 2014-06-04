@@ -114,7 +114,7 @@ static int update_shortterm(void)
     return 0;
 }
 
-void vtimer_callback_tick(vtimer_t *timer)
+static void vtimer_callback_tick(vtimer_t *timer)
 {
     (void) timer;
 
@@ -193,7 +193,7 @@ void vtimer_callback(void *ptr)
     update_shortterm();
 }
 
-void normalize_to_tick(timex_t *time)
+static void normalize_to_tick(timex_t *time)
 {
     DEBUG("Normalizing: %" PRIu32 " %" PRIu32 "\n", time->seconds, time->microseconds);
     uint32_t seconds_tmp = time->seconds % SECONDS_PER_TICK;
@@ -267,7 +267,8 @@ void vtimer_now(timex_t *out)
     out->microseconds = us % us_per_s;
 }
 
-void vtimer_gettimeofday(struct timeval *tp) {
+void vtimer_gettimeofday(struct timeval *tp)
+{
     timex_t now;
     vtimer_now(&now);
 
@@ -283,8 +284,6 @@ void vtimer_get_localtime(struct tm *localt)
     localt->tm_sec = now.seconds % 60;
     localt->tm_min = (now.seconds / 60) % 60;
     localt->tm_hour = (now.seconds / 60 / 60) % 24;
-
-    // TODO: fill the other fields
 }
 
 int vtimer_init(void)
@@ -377,7 +376,8 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, void *ptr)
     return 0;
 }
 
-int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout) {
+int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout)
+{
     msg_t timeout_message;
     timeout_message.type = MSG_TIMER;
     timeout_message.content.ptr = (char *) &timeout_message;
@@ -397,11 +397,13 @@ int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout) {
 
 #if ENABLE_DEBUG
 
-void vtimer_print_short_queue(){
+void vtimer_print_short_queue(void)
+{
     priority_queue_print(&shortterm_priority_queue_root);
 }
 
-void vtimer_print_long_queue(){
+void vtimer_print_long_queue(void)
+{
     priority_queue_print(&longterm_priority_queue_root);
 }
 
