@@ -117,7 +117,7 @@ typedef struct {
 /**
  *  Thread statistics table
  */
-extern schedstat pidlist[MAXTHREADS];
+extern schedstat sched_pidlist[MAXTHREADS];
 
 /**
  *  @brief  Register a callback that will be called on every scheduler run
