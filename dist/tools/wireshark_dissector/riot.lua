@@ -14,7 +14,7 @@ do
     local f_src = ProtoField.uint16("RIOT.src", "Source", base.DEC, nil)
     local f_pad = ProtoField.bytes("RIOT.pad", "Padding")
 
-    p_riot.fields = { f_length, f_dst, f_src }
+    p_riot.fields = { f_length, f_dst, f_src, f_pad }
 
     local data_dis = Dissector.get("data")
     -- local next_dis = Dissector.get("6lowpan")   -- for 6LoWPAN
