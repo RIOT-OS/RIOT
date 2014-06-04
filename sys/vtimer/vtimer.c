@@ -172,14 +172,15 @@ void vtimer_callback(void *ptr)
         msg_send_int(&msg, timer->pid);
     }
     else if (timer->action == (void (*)(void *)) thread_wakeup){
-        timer->action(timer->arg);
+        *(int *) timer->arg = 1;
+        thread_wakeup(timer->pid);
     }
     else if (timer->action == vtimer_tick) {
         vtimer_tick(NULL);
     }
     else if (timer->action == (void (*)(void *)) mutex_unlock) {
         mutex_t *mutex = (mutex_t *) timer->arg;
-        timer->action(mutex);
+        mutex_unlock(mutex);
     }
     else {
         DEBUG("Timer was poisoned.\n");
@@ -242,7 +243,6 @@ static int vtimer_set(vtimer_t *timer)
         DEBUG("vtimer_set(): setting short_term\n");
 
         if (set_shortterm(timer)) {
-
             /* delay update of next shortterm timer if we
             * are called from within vtimer_callback. */
 
@@ -251,7 +251,6 @@ static int vtimer_set(vtimer_t *timer)
             }
         }
     }
-
 
     restoreIRQ(state);
 
@@ -312,11 +311,17 @@ int vtimer_init(void)
 
 int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid)
 {
+    int activated_by_vtimer;
+    return vtimer_set_wakeup2(t, interval, pid, &activated_by_vtimer);
+}
+
+int vtimer_set_wakeup2(vtimer_t *t, timex_t interval, int pid, int *activated_by_vtimer)
+{
     int ret;
     t->action = (void(*)(void *)) thread_wakeup;
-    t->arg = (void *) pid;
+    t->arg = activated_by_vtimer;
     t->absolute = interval;
-    t->pid = 0;
+    t->pid = pid;
     ret = vtimer_set(t);
     return ret;
 }

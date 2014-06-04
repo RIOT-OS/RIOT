@@ -100,6 +100,15 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr);
 int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid);
 
 /**
+ * @brief   set a vtimer with wakeup event
+ * @param[in]   t           pointer to preinitialised vtimer_t
+ * @param[in]   pid         process id
+ * @param[out]  activated_by_vtimer   1 if the vtimer woke up this thread, unchanged otherwise
+ * @return      0 on success, < 0 on error
+ */
+int vtimer_set_wakeup2(vtimer_t *t, timex_t interval, int pid, int *activated_by_vtimer);
+
+/**
  * @brief   remove a vtimer
  * @param[in]   t           pointer to preinitialised vtimer_t
  * @return      0 on success, < 0 on error
