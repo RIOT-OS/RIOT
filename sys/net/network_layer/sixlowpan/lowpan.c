@@ -1645,7 +1645,7 @@ static void *lowpan_context_auto_remove(void *arg)
     int8_t to_remove_size;
 
     while (1) {
-        vtimer_sleep(minute);
+        vtimer_sleep(minute, VTIMER_RELATIVE);
         to_remove_size = 0;
         mutex_lock(&lowpan_context_mutex);
 
