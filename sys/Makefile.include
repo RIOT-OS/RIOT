@@ -15,6 +15,10 @@ endif
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
+ifneq (,$(filter rib,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/routing/rib
+endif
 ifneq (,$(filter rpl,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/routing/rpl
