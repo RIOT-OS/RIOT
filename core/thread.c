@@ -86,7 +86,7 @@ int thread_wakeup(int pid)
         sched_set_status(other_thread, STATUS_RUNNING);
 
         restoreIRQ(old_state);
-        sched_switch(sched_active_thread->priority, other_thread->priority);
+        sched_switch(other_thread->priority);
 
         return 1;
     }

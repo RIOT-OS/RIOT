@@ -44,6 +44,7 @@ int _native_null_out_file;
 const char *_progname;
 char **_native_argv;
 pid_t _native_pid;
+const char *_native_unix_socket_path = NULL;
 
 /**
  * initialize _native_null_in_pipe to allow for reading from stdin
@@ -160,7 +161,7 @@ void usage_exit(void)
 #endif
 
 #ifdef MODULE_UART0
-    real_printf(" [-t <port>|-u]");
+    real_printf(" [-t <port>|-u [path]]");
 #endif
 
     real_printf(" [-d] [-e|-E] [-o]\n");
@@ -177,6 +178,7 @@ void usage_exit(void)
 #ifdef MODULE_UART0
     real_printf("\
 -u      redirect stdio to UNIX socket\n\
+        if no path is given /tmp/riot.tty.PID is used\n\
 -t      redirect stdio to TCP socket\n");
 #endif
 
@@ -251,7 +253,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 #ifdef MODULE_UART0
         else if (strcmp("-t", arg) == 0) {
             stdiotype = "tcp";
-            if (argp+1 < argc) {
+            if (argp + 1 < argc) {
                 ioparam = argv[++argp];
             }
             else {
@@ -271,6 +273,11 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
             }
             if (strcmp(stderrtype, "stdio") == 0) {
                 stderrtype = "null";
+            }
+
+            /* parse optional path */
+            if ((argp + 1 < argc) && (argv[argp + 1][0] != '-')) {
+                _native_unix_socket_path = argv[++argp];
             }
         }
 #endif

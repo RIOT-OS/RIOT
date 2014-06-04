@@ -79,6 +79,7 @@ extern ucontext_t *_native_cur_ctx, *_native_isr_ctx;
 extern const char *_progname;
 extern char **_native_argv;
 extern pid_t _native_pid;
+extern const char *_native_unix_socket_path;
 
 #ifdef MODULE_UART0
 #include <sys/select.h>
