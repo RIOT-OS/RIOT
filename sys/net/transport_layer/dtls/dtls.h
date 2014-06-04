@@ -209,6 +209,8 @@ typedef struct dtls_connection_st {
   dtls_handshake_t state;
   tls_connection_end_t type;
   int socket;
+  uint16_t epoch;
+  uint48_t sequence_number;
 } dtls_connection_t;
 
 #endif
