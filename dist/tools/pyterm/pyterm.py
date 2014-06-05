@@ -34,7 +34,7 @@ class SerCmd(cmd.Cmd):
         if not self.host:
             self.host = defaulthostname
 
-	if not self.run_name:
+        if not self.run_name:
             self.run_name = defaultrunname
 
         if not os.path.exists(self.configdir):
