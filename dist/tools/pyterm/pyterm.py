@@ -120,7 +120,7 @@ class SerCmd(cmd.Cmd):
         self.ser.setDTR(0)
 
     def do_PYTERM_exit(self, line, unused=None):
-        print("Exiting Pyterm")
+        self.logger.info("Exiting Pyterm")
         readline.write_history_file()
         if reactor.running:
             reactor.callFromThread(reactor.stop)
@@ -169,7 +169,7 @@ class SerCmd(cmd.Cmd):
 
         with open(self.configdir + os.path.sep + self.configfile, 'wb') as config_fd:
             self.config.write(config_fd)
-            print("Config saved")
+            self.logger.info("Config saved")
 
     def do_PYTERM_show_config(self, line):
         for key in self.__dict__:
@@ -178,7 +178,7 @@ class SerCmd(cmd.Cmd):
     def do_PYTERM_alias(self, line):
         if line.endswith("list"):
             for alias in self.aliases:
-                print("{} = {}".format(alias, self.aliases[alias]))
+                self.logger.info("{} = {}".format(alias, self.aliases[alias]))
             return
         if not line.count("="):
             sys.stderr.write("Usage: /alias <ALIAS> = <CMD>\n")
@@ -214,7 +214,7 @@ class SerCmd(cmd.Cmd):
     def do_PYTERM_unignore(self, line):
         for r in self.ignores:
             if (r.pattern == line.strip()):
-                print("Remove ignore for %s" % r.pattern)
+                self.logger.info("Remove ignore for %s" % r.pattern)
                 self.ignores.remove(r)
                 return
         sys.stderr.write("Ignore for %s not found\n" % line.strip())
@@ -225,7 +225,7 @@ class SerCmd(cmd.Cmd):
     def do_PYTERM_unfilter(self, line):
         for r in self.filters:
             if (r.pattern == line.strip()):
-                print("Remove filter for %s" % r.pattern)
+                self.logger.info("Remove filter for %s" % r.pattern)
                 self.filters.remove(r)
                 return
         sys.stderr.write("Filter for %s not found\n" % line.strip())
@@ -253,7 +253,7 @@ class SerCmd(cmd.Cmd):
                     self.ignores.append(re.compile(self.config.get(sec, opt)))
             if sec == "json_regs":
                 for opt in self.config.options(sec):
-                    print("add json regex for %s" % self.config.get(sec, opt))
+                    self.logger.info("add json regex for %s" % self.config.get(sec, opt))
                     self.json_regs[opt] = re.compile(self.config.get(sec, opt))
             if sec == "aliases":
                 for opt in self.config.options(sec):
@@ -331,11 +331,11 @@ class SerCmd(cmd.Cmd):
                 sr = codecs.getreader("UTF-8")(self.ser, errors='replace')
                 c = sr.read(1)
             except (serial.SerialException, ValueError) as se:
-                sys.stderr.write("Serial port disconnected, waiting to get reconnected...\n")
+                self.logger.warn("Serial port disconnected, waiting to get reconnected...")
                 self.ser.close()
                 time.sleep(1)
                 if os.path.exists(self.port):
-                    sys.stderr.write("Try to reconnect to %s again...\n" % (self.port))
+                    self.logger.warn("Try to reconnect to %s again..." % (self.port))
                     self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, dsrdtr=0, rtscts=0)
                     self.ser.setDTR(0)
                     self.ser.setRTS(0)
