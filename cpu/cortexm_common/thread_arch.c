@@ -41,8 +41,8 @@
 
 
 static void context_save(void);
-static void context_restore(void);
-static void enter_thread_mode(void);
+static void context_restore(void) NORETURN;
+static void enter_thread_mode(void) NORETURN;
 
 /**
  * Cortex-M knows stacks and handles register backups, so use different stack frame layout
@@ -133,7 +133,7 @@ void thread_arch_start_threading(void)
 /**
  * @brief Set the MCU into Thread-Mode and load the initial task from the stack and run it
  */
-void enter_thread_mode(void)
+void NORETURN enter_thread_mode(void)
 {
     /* switch to user mode use PSP instead of MSP in ISR Mode*/
     CONTROL_Type mode;
@@ -152,6 +152,8 @@ void enter_thread_mode(void)
     asm("pop    {r4}"               );      /* get PC */
     asm("pop    {r5}"               );      /* discard the xPSR entry */
     asm("mov    pc, r4"             );      /* load PC */
+
+    UNREACHABLE();
 }
 
 void thread_arch_yield(void)
@@ -206,4 +208,6 @@ __attribute__((always_inline)) static __INLINE void context_restore(void)
     asm("bx     r0"                 );      /* load exception return value to PC causes end of exception*/
 
     /* {r0-r3,r12,LR,PC,xPSR} are restored automatically on exception return */
+
+    UNREACHABLE();
 }
