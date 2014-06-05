@@ -31,7 +31,7 @@
 #define MAXCOUNT 20
 #define MAXDIFF 500
 
-char timer_stack[KERNEL_CONF_STACKSIZE_PRINTF];
+char timer_stack[KERNEL_CONF_STACKSIZE_PRINTF*4];
 
 struct timer_msg {
     vtimer_t timer;
@@ -43,9 +43,10 @@ struct timer_msg {
 
 timex_t now;
 
-struct timer_msg msg_a = { .interval = { .seconds = 2, .microseconds = 0}, .msg = "T1", .start={0}, .count=0 };
-struct timer_msg msg_b = { .interval = { .seconds = 3, .microseconds = 0}, .msg = "T2", .start={0}, .count=0 };
-struct timer_msg msg_c = { .interval = { .seconds = 5, .microseconds = 0}, .msg = "T3", .start={0}, .count=0 };
+struct timer_msg timer_msgs[] = { { .interval = { .seconds = 1, .microseconds = 0}, .msg = "T1", .start={0}, .count=0 },
+                                  { .interval = { .seconds = 3, .microseconds = 0}, .msg = "T2", .start={0}, .count=0 },
+                                  { .interval = { .seconds = 5, .microseconds = 0}, .msg = "T3", .start={0}, .count=0 },
+};
 
 void timer_thread(void)
 {
@@ -104,17 +105,11 @@ int main(void)
                   timer_thread,
                   "timer");
 
-    puts("sending 1st msg");
-    m.content.ptr = (char *) &msg_a;
-    msg_send(&m, pid, false);
-
-    puts("sending 2nd msg");
-    m.content.ptr = (char *) &msg_b;
-    msg_send(&m, pid, false);
-    
-    puts("sending 3nd msg");
-    m.content.ptr = (char *) &msg_c;
-    msg_send(&m, pid, false);
+    for (unsigned i = 0; i < sizeof(timer_msgs)/sizeof(struct timer_msg); i++) {
+        printf("Sending timer msg %d...\n", i);
+        m.content.ptr = (char *) &timer_msgs[i];
+        msg_send(&m, pid, false);
+    }
 
     return 0;
 }
