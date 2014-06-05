@@ -41,6 +41,7 @@ class SerCmd(cmd.Cmd):
             os.makedirs(self.configdir)
 
         self.aliases = dict()
+        self.triggers = dict()
         self.filters = []
         self.ignores = []
         self.json_regs = dict()
@@ -134,6 +135,11 @@ class SerCmd(cmd.Cmd):
                 self.config.add_section("aliases")
             for alias in self.aliases:
                 self.config.set("aliases", alias, self.aliases[alias])
+        if len(self.triggers):
+            if not self.config.has_section("triggers"):
+                self.config.add_section("triggers")
+            for trigger in self.triggers:
+                self.config.set("triggers", trigger.pattern, self.triggers[trigger])
         if len(self.json_regs):
             if not self.config.has_section("json_regs"):
                 self.config.add_section("json_regs")
@@ -189,6 +195,19 @@ class SerCmd(cmd.Cmd):
                 return self.aliases[alias] + tok[len(alias):]
         return tok
 
+    def do_PYTERM_trigger(self, line):
+        if not line.count("="):
+            sys.stderr.write("Usage: /trigger <regex> = <CMD>\n")
+            return
+        trigger = line.split('=')[0].strip()
+        action = line.split('=')[1].strip()
+        self.logger.info("adding action %s for trigger %s" % (action, trigger))
+        self.triggers[re.compile(trigger)] = action
+
+    def do_PYTERM_rmtrigger(self, line):
+        if not self.triggers.pop(line, None):
+            sys.stderr.write("Trigger not found")
+
     def do_PYTERM_ignore(self, line):
         self.ignores.append(re.compile(line.strip()))
 
@@ -239,6 +258,9 @@ class SerCmd(cmd.Cmd):
             if sec == "aliases":
                 for opt in self.config.options(sec):
                     self.aliases[opt] = self.config.get(sec, opt)
+            if sec == "triggers":
+                for opt in self.config.options(sec):
+                    self.triggers[re.compile(opt)] = self.config.get(sec, opt)
             if sec == "init_cmd":
                 for opt in self.config.options(sec):
                     self.init_cmd.append(self.config.get(sec, opt))
@@ -249,6 +271,13 @@ class SerCmd(cmd.Cmd):
 
     def process_line(self, line):
         self.logger.info(line)
+        # check if line matches a trigger and fire the command(s)
+        for trigger in self.triggers:
+            self.logger.debug("comparing input %s to trigger %s" % (line, trigger.pattern))
+            m = trigger.search(line)
+            if m:
+                self.onecmd(self.precmd(self.triggers[trigger]))
+
         # ckecking if the line should be sent as JSON object to a tcp server
         if (len(self.json_regs)) and self.factory and self.factory.myproto:
             for j in self.json_regs:
