@@ -190,7 +190,7 @@ void sched_switch(uint16_t other_prio)
     }
 }
 
-NORETURN void sched_task_exit(void)
+NORETURN NAKED void sched_task_exit(void)
 {
     DEBUG("sched_task_exit(): ending task %s...\n", sched_active_thread->name);
 

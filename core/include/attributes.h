@@ -32,6 +32,17 @@
 #endif
 
 /**
+ * @def NAKED
+ * @brief The *NAKED* keyword tells the compiler not to save any registers before
+ *        executing the function.
+ */
+#ifdef __GNUC__
+#define NAKED  __attribute__((naked))
+#else
+#define NAKED
+#endif
+
+/**
  * @def CONST
  * @brief A function declared as *CONST* is #PURE and also not allowed to
  *        examine global memory. I.e. a *CONST* function cannot even
