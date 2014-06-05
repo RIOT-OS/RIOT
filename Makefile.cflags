@@ -29,3 +29,45 @@ ifeq ($(shell $(CC) -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-de
 # duplicated parameters don't hurt
 CFLAGS += -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition
 endif
+
+# Feature test `sizeof(int)` and `sizeof(void*)`.
+# Provide the results as `SIZEOF_INT` and `SIZEOF_PTR` in preprocessor statements.
+all:
+
+${BINDIR}constants.var: SHELL=bash
+${BINDIR}constants.var:
+	@mkdir -p ${@D}
+	@TEMPDIR=$$(mktemp -d) || exit 1; \
+	RESULT=0; \
+	\
+	for (( i=1; i<=8; i*=2 )); do \
+		echo "typedef int test[sizeof (void *) == $${i} ? +1 : -1];" > "$${TEMPDIR}/test.c"; \
+		$${CC} $${CFLAGS} $${INCLUDES} -c "$${TEMPDIR}/test.c" -o "$${TEMPDIR}/test.o" 2>/dev/null; \
+		if [[ $$? == 0 ]]; then \
+			SIZEOF_PTR=$${i}; \
+			break; \
+		fi; \
+	done; \
+	if [[ -z "$${SIZEOF_PTR}" ]]; then \
+		echo 'The sizeof(void*) could not be determinded.'; \
+		RESULT=1; \
+	fi; \
+	\
+	for (( i=1; i<=8; i*=2 )); do \
+		echo "typedef int test[sizeof (int) == $${i} ? +1 : -1];" > "$${TEMPDIR}/test.c"; \
+		$${CC} $${CFLAGS} $${INCLUDES} -c "$${TEMPDIR}/test.c" -o "$${TEMPDIR}/test.o" 2>/dev/null; \
+		if [[ $$? == 0 ]]; then \
+			SIZEOF_INT=$${i}; \
+			break; \
+		fi; \
+	done; \
+	if [[ -z "$${SIZEOF_INT}" ]]; then \
+		echo 'The sizeof(int) could not be determinded.'; \
+		RESULT=1; \
+	fi; \
+	\
+	[[ $${RESULT} == 0 ]] && echo "CFLAGS += -DSIZEOF_PTR=$${SIZEOF_PTR} -DSIZEOF_INT=$${SIZEOF_INT}" > $@; \
+	rm -rf "$${TEMPDIR}"; \
+	exit $${RESULT}
+
+-include ${BINDIR}constants.var
