@@ -247,6 +247,52 @@ class SerCmd(cmd.Cmd):
                     if opt not in self.__dict__:
                         self.__dict__[opt] = self.config.get(sec, opt)
 
+    def process_line(self, line):
+        self.logger.info(line)
+        # ckecking if the line should be sent as JSON object to a tcp server
+        if (len(self.json_regs)) and self.factory and self.factory.myproto:
+            for j in self.json_regs:
+                m = self.json_regs[j].search(line)
+                if m:
+                    try:
+                        json_obj = '{"jid":%d, ' % int(j)
+                    except ValueError:
+                        sys.stderr.write("Invalid JID: %s\n" % j)
+                        break
+                    json_obj += '"raw":"%s", ' % line
+                    json_obj += '"date":%s, ' % int(time.time()*1000)
+                    for g in m.groupdict():
+                        try:
+                            json_obj += '"%s":%d, ' % (g, int(m.groupdict()[g]))
+                        except ValueError:
+                            json_obj += '"%s":"%s", ' % (g, m.groupdict()[g])
+
+                    # eliminate the superfluous last ", "
+                    json_obj = json_obj[:-2]
+
+                    json_obj += "}"
+                    self.factory.myproto.sendMessage(json_obj)
+
+    def handle_line(self, line):
+        # First check if line should be ignored
+        ignored = False
+        if (len(self.ignores)):
+            for i in self.ignores:
+                if i.search(line):
+                    ignored = True
+                    break
+        # now check if filter rules should be applied
+        if (len(self.filters)):
+            for r in self.filters:
+                if r.search(line):
+                    if not ignored:
+                        self.process_line(line)
+        # if neither nor applies print the line
+        else:
+            if not ignored:
+                self.process_line(line)
+
+
     def reader(self):
         """Serial or TCP reader.
         """
@@ -266,44 +312,7 @@ class SerCmd(cmd.Cmd):
                     self.ser.setRTS(0)
                 continue
             if c == '\n' or c == '\r':
-                ignored = False
-                if (len(self.ignores)):
-                    for i in self.ignores:
-                        if i.search(output):
-                            ignored = True
-                            break
-                if (len(self.filters)):
-                    for r in self.filters:
-                        if r.search(output):
-                            if not ignored:
-                                self.logger.info(output)
-                else:
-                    if not ignored:
-                        self.logger.info(output)
-
-                if (len(self.json_regs)) and self.factory and self.factory.myproto:
-                    for j in self.json_regs:
-                        m = self.json_regs[j].search(output)
-                        if m:
-                            try:
-                                json_obj = '{"jid":%d, ' % int(j)
-                            except ValueError:
-                                sys.stderr.write("Invalid JID: %s\n" % j)
-                                break
-                            json_obj += '"raw":"%s", ' % output
-                            json_obj += '"date":%s, ' % int(time.time()*1000)
-                            for g in m.groupdict():
-                                try:
-                                    json_obj += '"%s":%d, ' % (g, int(m.groupdict()[g]))
-                                except ValueError:
-                                    json_obj += '"%s":"%s", ' % (g, m.groupdict()[g])
-
-                            # eliminate the superfluous last ", "
-                            json_obj = json_obj[:-2]
-
-                            json_obj += "}"
-                            self.factory.myproto.sendMessage(json_obj)
-
+                self.handle_line(output)
                 output = ""
             else:
                 output += c
