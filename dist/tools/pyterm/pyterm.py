@@ -184,7 +184,7 @@ class SerCmd(cmd.Cmd):
             sys.stderr.write("Usage: /alias <ALIAS> = <CMD>\n")
             return
         alias = line.split('=')[0].strip()
-        command = line.split('=')[1].strip()
+        command = line[line.index('=')+1:].strip()
         self.logger.info("adding command %s for alias %s" % (command, alias))
         self.aliases[alias] = command
 
@@ -203,7 +203,7 @@ class SerCmd(cmd.Cmd):
             sys.stderr.write("Usage: /trigger <regex> = <CMD>\n")
             return
         trigger = line.split('=')[0].strip()
-        action = line.split('=')[1].strip()
+        action = line[line.index('=')+1:].strip()
         self.logger.info("adding action %s for trigger %s" % (action, trigger))
         self.triggers[re.compile(trigger)] = action
 
