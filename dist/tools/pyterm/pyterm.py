@@ -88,7 +88,7 @@ class SerCmd(cmd.Cmd):
         time.sleep(1)
         for cmd in self.init_cmd:
             self.logger.debug("WRITE ----->>>>>> '" + cmd + "'\n")
-            self.ser.write(cmd + "\n")
+            self.onecmd(self.precmd(cmd))
 
         # start serial->console thread
         receiver_thread = threading.Thread(target=self.reader)
@@ -96,11 +96,13 @@ class SerCmd(cmd.Cmd):
         receiver_thread.start()
 
     def precmd(self, line):
+        self.logger.debug("processing line #%s#" % line)
         if (line.startswith("/")):
                 return "PYTERM_" + line[1:]
         return line
 
     def default(self, line):
+        self.logger.debug("%s is no pyterm command, sending to default out" % line)
         for tok in line.split(';'):
             tok = self.get_alias(tok)
             self.ser.write((tok.strip() + "\n").encode("utf-8"))
