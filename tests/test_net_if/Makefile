@@ -1,7 +1,8 @@
 APPLICATION = test_net_if
 
-BOARD_BLACKLIST = mbed_lpc1768 arduino-due udoo qemu-i386
-# qemu-i386: no tranceiver, yet
+BOARD_BLACKLIST = mbed_lpc1768 arduino-due udoo qemu-i386 stm32f0discovery
+# qemu-i386:        no transceiver, yet
+# stm32f0discovery: no transceiver, yet
 
 include ../Makefile.tests_common
 
