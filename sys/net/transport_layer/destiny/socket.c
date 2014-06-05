@@ -796,7 +796,7 @@ int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags)
             current_tcp_socket->tcp_control.send_wnd -= sent_bytes;
 
             if (send_tcp(current_int_tcp_socket, current_tcp_packet,
-                         temp_ipv6_header, 0, sent_bytes) != 1) {
+                         temp_ipv6_header, 0, sent_bytes) < 0) {
                 /* Error while sending tcp data */
                 current_tcp_socket->tcp_control.send_nxt -= sent_bytes;
                 current_tcp_socket->tcp_control.send_wnd += sent_bytes;
