@@ -28,8 +28,8 @@
 #include "thread.h"
 #include "msg.h"
 
-#define MAXCOUNT 20
-#define MAXDIFF 500
+#define MAXCOUNT 100
+#define MAXDIFF 10000
 
 char timer_stack[KERNEL_CONF_STACKSIZE_PRINTF*4];
 
@@ -43,9 +43,12 @@ struct timer_msg {
 
 timex_t now;
 
-struct timer_msg timer_msgs[] = { { .interval = { .seconds = 1, .microseconds = 0}, .msg = "T1", .start={0}, .count=0 },
-                                  { .interval = { .seconds = 3, .microseconds = 0}, .msg = "T2", .start={0}, .count=0 },
-                                  { .interval = { .seconds = 5, .microseconds = 0}, .msg = "T3", .start={0}, .count=0 },
+struct timer_msg timer_msgs[] = { { .interval = { .seconds = 0, .microseconds = 100000}, .msg = "T1", .start={0}, .count=0 },
+                                  { .interval = { .seconds = 0, .microseconds = 200000}, .msg = "T2", .start={0}, .count=0 },
+                                  { .interval = { .seconds = 0, .microseconds = 300000}, .msg = "T3", .start={0}, .count=0 },
+                                  { .interval = { .seconds = 0, .microseconds = 500000}, .msg = "T4", .start={0}, .count=0 },
+                                  { .interval = { .seconds = 0, .microseconds = 700000}, .msg = "T5", .start={0}, .count=0 },
+                                  { .interval = { .seconds = 1, .microseconds = 100000}, .msg = "T6", .start={0}, .count=0 },
 };
 
 void timer_thread(void)
