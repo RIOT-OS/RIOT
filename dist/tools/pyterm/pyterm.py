@@ -8,7 +8,7 @@ except ImportError:
 
 from twisted.internet import reactor
 from twisted.internet.protocol import Protocol, ReconnectingClientFactory
-import cmd, serial, sys, threading, readline, time, logging, os, argparse, re, codecs, signal
+import cmd, serial, socket, sys, threading, readline, time, logging, os, argparse, re, codecs, signal
 
 ### set some default options
 import platform
@@ -22,10 +22,11 @@ defaultrunname  = "default-run"
 
 class SerCmd(cmd.Cmd):
 
-    def __init__(self, port=None, baudrate=None, confdir=None, conffile=None, host=None, run_name=None):
+    def __init__(self, port=None, baudrate=None, tcp_serial=None, confdir=None, conffile=None, host=None, run_name=None):
         cmd.Cmd.__init__(self)
         self.port = port
         self.baudrate = baudrate
+        self.tcp_serial = tcp_serial
         self.configdir = confdir
         self.configfile = conffile
         self.host = host
@@ -79,12 +80,35 @@ class SerCmd(cmd.Cmd):
 
 
     def preloop(self):
-        if not self.port:
+        if not self.port and not self.tcp_serial:
             sys.stderr.write("No port specified, using default (%s)!\n" % (defaultport))
             self.port = defaultport
-        self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, dsrdtr=0, rtscts=0)
-        self.ser.setDTR(0)
-        self.ser.setRTS(0)
+        if self.tcp_serial:
+            self.logger.info("Connect to localhost:%s" % self.tcp_serial)
+            for res in socket.getaddrinfo('localhost', self.tcp_serial, socket.AF_UNSPEC, socket.SOCK_STREAM):
+                af, socktype, proto, canonname, sa = res
+                try:
+                    s = fdsocket(af, socktype, proto)
+                except socket.error as msg:
+                    s = None
+                    continue
+                try:
+                    s.connect(sa)
+                except socket.error as msg:
+                    s.close()
+                    s = None
+                    continue
+                break
+            if s:
+                self.ser = s
+            else:
+                self.logger.error("Something went wrong connecting to localhost:%s" % self.tcp_serial)
+                sys.exit(1)
+        elif self.port:
+            self.logger.info("Connect to serial port %s" % self.port)
+            self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, dsrdtr=0, rtscts=0)
+            self.ser.setDTR(0)
+            self.ser.setRTS(0)
 
         time.sleep(1)
         for cmd in self.init_cmd:
@@ -124,6 +148,8 @@ class SerCmd(cmd.Cmd):
         readline.write_history_file()
         if reactor.running:
             reactor.callFromThread(reactor.stop)
+        if self.tcp_serial:
+            self.ser.close()
         return True
 
     def do_PYTERM_save(self, line):
@@ -382,12 +408,21 @@ class PytermClientFactory(ReconnectingClientFactory):
 def __stop_reactor(signum, stackframe):
     sys.stderr.write("Ctrl-C is disabled, type '/exit' instead\n")
 
+class fdsocket(socket.socket):
+    def read(self, bufsize):
+        return self.recv(bufsize)
+
+    def write(self, string):
+        return self.sendall(string)
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Pyterm - The Python terminal program")
     parser.add_argument("-p", "--port",
             help="Specifies the serial port to use, default is %s" % defaultport,
             default=defaultport)
+    parser.add_argument("-ts", "--tcp-serial",
+            help="Connect to a TCP port instead of a serial port")
     parser.add_argument("-b", "--baudrate",
             help="Specifies baudrate for the serial port, default is %s" % defaultbaud,
             default=defaultbaud)
@@ -407,7 +442,7 @@ if __name__ == "__main__":
             help="Run name, used for logfile")
     args = parser.parse_args()
 
-    myshell = SerCmd(args.port, args.baudrate, args.directory, args.config, args.host, args.run_name)
+    myshell = SerCmd(args.port, args.baudrate, args.tcp_serial,  args.directory, args.config, args.host, args.run_name)
     myshell.prompt = ''
 
     if args.server and args.tcp_port:
