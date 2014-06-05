@@ -183,7 +183,10 @@ class SerCmd(cmd.Cmd):
         if not line.count("="):
             sys.stderr.write("Usage: /alias <ALIAS> = <CMD>\n")
             return
-        self.aliases[line.split('=')[0].strip()] = line.split('=')[1].strip()
+        alias = line.split('=')[0].strip()
+        command = line.split('=')[1].strip()
+        self.logger.info("adding command %s for alias %s" % (command, alias))
+        self.aliases[alias] = command
 
     def do_PYTERM_rmalias(self, line):
         if not self.aliases.pop(line, None):
