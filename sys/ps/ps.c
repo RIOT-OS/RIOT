@@ -41,9 +41,15 @@ void thread_print_all(void)
 {
     const char queued_name[] = {'_', 'Q'};
     int i;
-    int overall_stacksz = 0;
+#ifdef DEVELHELP
+    int overall_stacksz = 0, overall_used = 0;
+#endif
 
-    printf("\tpid | %-21s| %-9sQ | pri | stack ( used) location"
+    printf("\tpid | %-21s| %-9sQ | pri | "
+#ifdef DEVELHELP
+           "stack ( used) "
+#endif
+           "location"
 #if SCHEDSTATISTICS
            "  | runtime | switches"
 #endif
@@ -57,19 +63,30 @@ void thread_print_all(void)
             int state = p->status;                                                 /* copy state */
             const char *sname = state_names[state];                                /* get state name */
             const char *queued = &queued_name[(int)(state >= STATUS_ON_RUNQUEUE)]; /* get queued flag */
+#ifdef DEVELHELP
             int stacksz = p->stack_size;                                           /* get stack size */
-#if SCHEDSTATISTICS
-            int runtime_ticks = sched_pidlist[i].runtime_ticks / (hwtimer_now()/1000UL + 1);
-            int switches = sched_pidlist[i].schedules;
-#endif
             overall_stacksz += stacksz;
             stacksz -= thread_measure_stack_free(p->stack_start);
-            printf("\t%3" PRIkernel_pid " | %-21s| %-8s %.1s | %3i | %5i (%5i) %p"
+            overall_used += stacksz;
+#endif
 #if SCHEDSTATISTICS
-                   " | %4d/1k |  %8d"
+            double runtime_ticks =  sched_pidlist[i].runtime_ticks / (double) hwtimer_now() * 100;
+            int switches = sched_pidlist[i].schedules;
+#endif
+            printf("\t%3u | %-21s| %-8s %.1s | %3i | "
+#ifdef DEVELHELP
+                   "%5i (%5i) "
+#endif
+                   "%p"
+#if SCHEDSTATISTICS
+                   " | %6.3f%% |  %8d"
 #endif
                    "\n",
-                   p->pid, p->name, sname, queued, p->priority, p->stack_size, stacksz, p->stack_start
+                   p->pid, p->name, sname, queued, p->priority,
+#ifdef DEVELHELP
+                   p->stack_size, stacksz,
+#endif
+                   p->stack_start
 #if SCHEDSTATISTICS
                    , runtime_ticks, switches
 #endif
@@ -77,5 +94,8 @@ void thread_print_all(void)
         }
     }
 
-    printf("\t%5s %-21s|%13s%6s %5i\n", "|", "SUM", "|", "|", overall_stacksz);
+#ifdef DEVELHELP
+    printf("\t%5s %-21s|%13s%6s %5i (%5i)\n", "|", "SUM", "|", "|",
+           overall_stacksz, overall_used);
+#endif
 }

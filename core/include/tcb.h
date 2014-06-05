@@ -72,7 +72,10 @@ typedef struct tcb_t {
 
     const char *name;           /**< thread's name                  */
     char *stack_start;          /**< thread's stack start address   */
+
+#ifdef DEVELHELP
     int stack_size;             /**< thread's stack size            */
+#endif
 } tcb_t;
 
 #endif /* TCB_H_ */

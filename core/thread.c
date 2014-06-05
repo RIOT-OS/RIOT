@@ -109,7 +109,9 @@ int thread_measure_stack_free(char *stack)
 kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags, void *(*function)(void *arg), void *arg, const char *name)
 {
     /* allocate our thread control block at the top of our stackspace */
+#ifdef DEVELHELP
     int total_stacksize = stacksize;
+#endif
     stacksize -= sizeof(tcb_t);
 
     /* align tcb address on 32bit boundary */
@@ -174,7 +176,10 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     cb->sp = thread_stack_init(function, arg, stack, stacksize);
     cb->stack_start = stack;
+
+#ifdef DEVELHELP
     cb->stack_size = total_stacksize;
+#endif
 
     cb->priority = priority;
     cb->status = 0;
