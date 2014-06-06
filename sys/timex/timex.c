@@ -39,15 +39,11 @@ timex_t timex_add(const timex_t a, const timex_t b)
     result.seconds = a.seconds + b.seconds;
     result.microseconds = a.microseconds + b.microseconds;
 
-    if (result.microseconds < a.microseconds) {
-        result.seconds++;
-    }
-
-    /*    if (result.microseconds > SEC_IN_USEC) {
+    if (result.microseconds > SEC_IN_USEC) {
             result.microseconds -= SEC_IN_USEC;
             result.seconds++;
-        }
-    */
+    }
+
     return result;
 }
 
@@ -120,6 +116,11 @@ int timex_cmp(const timex_t a, const timex_t b)
 uint64_t timex_uint64(const timex_t a)
 {
     return (uint64_t) a.seconds * SEC_IN_USEC + a.microseconds;
+}
+
+timex_t timex_from_uint64(const uint64_t timestamp)
+{
+    return timex_set(timestamp / SEC_IN_USEC, timestamp % SEC_IN_USEC);
 }
 
 void timex_print(const timex_t t)
