@@ -38,10 +38,10 @@ void config_load(void)
 {
     DEBUG("config_load()\n");
 
-    sysconfig.id = _native_pid;
+    sysconfig.id = _native_id;
 
 #ifdef MODULE_NATIVENET
-    _native_net_addr = _native_pid;
+    _native_net_addr = _native_id;
 #endif
 
     return;
