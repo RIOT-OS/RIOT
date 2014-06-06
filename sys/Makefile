@@ -74,6 +74,9 @@ endif
 ifneq (,$(filter crypto,$(USEMODULE)))
     DIRS += crypto
 endif
+ifneq (,$(filter gtimer,$(USEMODULE)))
+    DIRS += gtimer
+endif
 ifneq (,$(filter random,$(USEMODULE)))
     DIRS += random
 endif
