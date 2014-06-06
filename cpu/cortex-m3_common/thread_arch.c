@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_cortexm_common
+ * @ingroup     cpu_cortex-m3
  * @{
  *
  * @file        thread_arch.c
@@ -18,6 +18,8 @@
  *
  * @}
  */
+
+#include <stdint.h>
 
 #include "arch/thread_arch.h"
 #include "sched.h"
@@ -45,14 +47,7 @@ static void context_restore(void) NORETURN;
 static void enter_thread_mode(void) NORETURN;
 
 /**
- * Cortex-M knows stacks and handles register backups, so use different stack frame layout
- *
- * TODO: How to handle different Cortex-Ms? Code is so far valid for M3 and M4 without FPU
- *
- * Layout with storage of floating point registers (applicable for Cortex-M4):
- * ------------------------------------------------------------------------------------------------------------------------------------
- * | R0 | R1 | R2 | R3 | LR | PC | xPSR | S0 | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9 | S10 | S11 | S12 | S13 | S14 | S15 | FPSCR |
- * ------------------------------------------------------------------------------------------------------------------------------------
+ * Cortex-M3 knows stacks and handles register backups, so use different stack frame layout
  *
  * Layout without floating point registers:
  * --------------------------------------
@@ -62,42 +57,28 @@ static void enter_thread_mode(void) NORETURN;
  */
 char *thread_arch_stack_init(void  (*task_func)(void), void *stack_start, int stack_size)
 {
-    unsigned int *stk;
-    stk = (unsigned int *)(stack_start + stack_size);
+    uint32_t *stk;
+    stk = (uint32_t *)(stack_start + stack_size);
 
     /* marker */
     stk--;
-    *stk = STACK_MARKER;
-
-    /* TODO: fix FPU handling for Cortex-M4 */
-    /*
-    stk--;
-    *stk = (unsigned int) 0;
-    */
-
-    /* S0 - S15 */
-    /*
-    for (int i = 15; i >= 0; i--) {
-        stk--;
-        *stk = i;
-    }
-    */
+    *stk = (uint32_t)STACK_MARKER;
 
     /* FIXME xPSR */
     stk--;
-    *stk = (unsigned int) 0x01000200;
+    *stk = (uint32_t)0x01000200;
 
     /* program counter */
     stk--;
-    *stk = (unsigned int) task_func;
+    *stk = (uint32_t)task_func;
 
     /* link register, jumped to when thread exits */
     stk--;
-    *stk = (unsigned int) sched_task_exit;
+    *stk = (uint32_t)sched_task_exit;
 
     /* r12 */
     stk--;
-    *stk = (unsigned int) 0;
+    *stk = (uint32_t) 0;
 
     /* r0 - r3 */
     for (int i = 3; i >= 0; i--) {
@@ -113,7 +94,7 @@ char *thread_arch_stack_init(void  (*task_func)(void), void *stack_start, int st
 
     /* lr means exception return code  */
     stk--;
-    *stk = EXCEPT_RET_TASK_MODE; /* return to task-mode main stack pointer */
+    *stk = (uint32_t)EXCEPT_RET_TASK_MODE; /* return to task-mode main stack pointer */
 
     return (char*) stk;
 }
