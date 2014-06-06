@@ -44,6 +44,7 @@ int _native_null_out_file;
 const char *_progname;
 char **_native_argv;
 pid_t _native_pid;
+pid_t _native_id;
 const char *_native_unix_socket_path = NULL;
 
 /**
@@ -164,12 +165,13 @@ void usage_exit(void)
     real_printf(" [-t <port>|-u [path]]");
 #endif
 
-    real_printf(" [-d] [-e|-E] [-o]\n");
+    real_printf(" [-i <id>] [-d] [-e|-E] [-o]\n");
 
     real_printf(" help: %s -h\n", _progname);
 
     real_printf("\nOptions:\n\
 -h      help\n\
+-i      specify instance id (set by config module)\n\
 -d      daemonize\n\
 -e      redirect stderr to file\n\
 -E      do not redirect stderr (i.e. leave sterr unchanged despite socket/daemon io)\n\
@@ -203,6 +205,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     _progname = argv[0];
     _native_pid = real_getpid();
 
+    /* will possibly be overridden via option below: */
+    _native_id = _native_pid;
+
     int argp = 1;
     char *stderrtype = "stdio";
     char *stdouttype = "stdio";
@@ -228,6 +233,15 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
         char *arg = argv[argp];
         if ((strcmp("-h", arg) == 0) || (strcmp("--help", arg) == 0)) {
             usage_exit();
+        }
+        else if (strcmp("-i", arg) == 0) {
+            if (argp + 1 < argc) {
+                argp++;
+            }
+            else {
+                usage_exit();
+            }
+            _native_id = atol(argv[argp]);
         }
         else if (strcmp("-d", arg) == 0) {
             daemonize();

@@ -42,7 +42,10 @@ do
         riot_tree:add(f_length, buf(0, 2))
         riot_tree:add(f_dst, buf(2, 2))
         riot_tree:add(f_src, buf(4, 2))
-        riot_tree:add(f_pad, buf(packet_len + 6))
+
+        -- to show the padding for small packets uncomment the
+        -- following line and append "f_pad" to p_riot.fields above.
+        -- riot_tree:add(f_pad, buf(packet_len + 6))
 
         next_dis:call(buf(6, packet_len):tvb(), pkt, root)
 

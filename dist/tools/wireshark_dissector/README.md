@@ -1,5 +1,5 @@
-# RIOT native wireshark dissector
-This allows wireshark to parse packets sent over TAP by RIOT's native.
+# RIOT nativenet wireshark dissector
+This allows wireshark to parse packets sent over TAP by RIOT's native port.
 
 ## Installation
 Just copy the script ``riot.lua`` to ``$HOME/.wireshark/plugins`` and restart
