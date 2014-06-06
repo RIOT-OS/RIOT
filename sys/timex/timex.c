@@ -14,6 +14,7 @@
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @author Oliver Hahm <oliver.hahm@inria.fr>
  * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
+ * @author Daniel Jentsch <d.jentsch@fu-berlin.de>
  *
  */
 
@@ -82,8 +83,13 @@ timex_t timex_sub(const timex_t a, const timex_t b)
 #endif
 
     timex_t result;
-    result.seconds = a.seconds - b.seconds;
-    result.microseconds = a.microseconds - b.microseconds;
+    if (a.microseconds >= b.microseconds) {
+          result.seconds = a.seconds - b.seconds;
+          result.microseconds = a.microseconds - b.microseconds;
+    } else {
+          result.seconds = a.seconds - b.seconds - 1;
+          result.microseconds = a.microseconds + SEC_IN_USEC - b.microseconds;
+    }
 
     return result;
 }
