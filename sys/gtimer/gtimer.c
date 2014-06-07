@@ -22,6 +22,9 @@
 #include "mutex.h"
 #include "vtimer.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 gtimer_timeval_t last;
 mutex_t gtimer_mutex;
 
@@ -59,7 +62,7 @@ void gtimer_init(void) {
 	mutex_init(&gtimer_mutex);
 	last.local = timex_uint64(now);
 	last.global = timex_uint64(now);
-	last.rate = 0.0f;
+	last.rate = 0;
 	puts("gtimer initialized\n");
 }
 
@@ -76,7 +79,7 @@ void gtimer_sync_set_global_offset(uint64_t global_offset) {
 	mutex_unlock(&gtimer_mutex);
 }
 
-void gtimer_sync_set_relative_rate(float rate) {
+void gtimer_sync_set_relative_rate(uint32_t rate) {
 	mutex_lock(&gtimer_mutex);
 	_gtimer_refresh_last_local();
 	last.rate = rate;
@@ -92,8 +95,9 @@ static void _gtimer_now(gtimer_timeval_t *out) {
 	timex_t temp;
 	LOCAL_NOW(temp);
 	now = timex_uint64(temp);
+	DEBUG("clockrate multiply: %"PRIu64 "\n", GTIMER_CLOCKRATE_MULTIPLY((now - last.local), last.rate));
 	out->global = last.global
-			+ ((now - last.local) * last.rate + (now - last.local));
+			+ (GTIMER_CLOCKRATE_MULTIPLY((now - last.local), last.rate) + (now - last.local));
 	out->local = now;
 }
 

@@ -71,6 +71,7 @@ endif
 
 ifneq (,$(filter gtimer,$(USEMODULE)))
 	USEMODULE += vtimer
+	USEMODULE += timex
 endif
 
 ifneq (,$(filter net_if,$(USEMODULE)))

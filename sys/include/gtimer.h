@@ -25,10 +25,13 @@
 #include <vtimer.h>
 #include <stdint.h>
 
+// faster than float but the result is rounded towards zero
+#define GTIMER_CLOCKRATE_MULTIPLY(DIVISOR, CLOCKRATE) (DIVISOR*CLOCKRATE)/1000000
+
 typedef struct {
 	uint64_t local;
 	uint64_t global;
-	float rate;
+	uint32_t rate;
 } gtimer_timeval_t;
 
 /**
@@ -55,7 +58,7 @@ void gtimer_sync_now(gtimer_timeval_t *out);
  *
  * Should only be used by a time synchronization protocol.
  */
-void gtimer_sync_set_relative_rate(float rate);
+void gtimer_sync_set_relative_rate(uint32_t rate);
 
 /**
  * @brief Adds a offset.
