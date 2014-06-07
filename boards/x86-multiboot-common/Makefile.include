@@ -55,12 +55,18 @@ export OFLAGS = -O binary
 LINKFLAGS += -m32 -nostdlib -nostdinc -nostartfiles -nodefaultlibs \
              --prefix=$(NEWLIB_BASE) \
              -Wl,-rpath,$(NEWLIB_BASE)/lib \
-             -T $(RIOTBASE)/boards/x86-multiboot-common/linker.ld
+             -T$(RIOTBASE)/boards/x86-multiboot-common/linker.ld
 UNDEF += $(BINDIR)x86-multiboot-common_base/startup.o
-
-#CFLAGS += -ffunction-sections -fdata-sections
-#LINKFLAGS += -Wl,--gc-sections
-#CFLAGS += -Wall -Wextra -Werror -pedantic -pedantic-errors \
 
 BASELIBS += $(NEWLIB_BASE)/lib/libc.a \
             $(NEWLIB_BASE)/lib/libm.a
+
+all:
+
+all-debug: export CFLAGS += -ggdb3 -O0
+all-debug: all
+
+ifeq (, $(filter all-debug, $(MAKECMDGOALS)))
+  CFLAGS += -Os -ffunction-sections -fdata-sections
+  LINKFLAGS += -Wl,--gc-sections
+endif

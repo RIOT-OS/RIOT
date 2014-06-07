@@ -11,9 +11,6 @@ DEBUGGER = $(TERMPROG)
 
 all:
 
-all-debug: export CFLAGS += -ggdb3 -O0
-all-debug: all
-
 debug-kdbg: DEBUGGER_FLAGS="kdbg -r :1234 -- $(ELFFILE)"
 debug-kdbg: debug
 
@@ -26,4 +23,4 @@ debug-tui: debug
 debug-gdb: debug
 DEBUGGER_FLAGS = "x-terminal-emulator -e gdb -ex 'target remote :1234' --args $(ELFFILE)"
 
-debug: 
+debug:

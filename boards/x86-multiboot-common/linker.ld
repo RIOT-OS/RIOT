@@ -34,7 +34,7 @@ SECTIONS
        Next we'll put the .text section. */
     ._multiboot_header :
     {
-        *(._multiboot_header)
+        KEEP(*(._multiboot_header))
     }
 
     .note.gnu.build-id :
