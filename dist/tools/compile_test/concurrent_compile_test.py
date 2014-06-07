@@ -26,9 +26,6 @@ from sys import argv, exit, stdout
 
 null = open(devnull, 'wb', 0)
 
-success = []
-failed = []
-
 def is_tracked(application_folder):
     if not isfile(join(application_folder, 'Makefile')):
         return False
@@ -59,8 +56,7 @@ def get_lines(application, readline, prefix):
 
 def format_line(group_results):
     group, results = group_results
-    return '\t\t{}: {}'.format(group,
-                                 ', '.join(sorted(board for outcome, board in results)))
+    return '\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board in results)))
 
 def compile_app(riotbase, folder, application):
     try:
@@ -82,27 +78,49 @@ def compile_app(riotbase, folder, application):
             pass
 
 def main(riotbase, concurrent_apps):
-    for folder in ('examples', 'tests'):
-        print('Compiling {}:'.format(folder))
-        applications = listdir(join(riotbase, folder))
-        applications = filter(lambda app: is_tracked(join(riotbase, folder, app)), applications)
-        applications = sorted(applications)
-        compiler = lambda application: compile_app(riotbase, folder, application)
-        with ThreadPoolExecutor(max_workers=concurrent_apps) as executor:
+    exit_code = 0
+
+    only_board = environ.get('ONLY_BOARD')
+
+    with ThreadPoolExecutor(max_workers=concurrent_apps) as executor:
+        for folder in ('examples', 'tests'):
+            success = []
+            failed = []
+
+            stdout.write('Compiling {}{}: '.format(folder, ' for \033[1;34m{}\033[0m'.format(only_board) if only_board else ''))
+            stdout.flush()
+
+            applications = listdir(join(riotbase, folder))
+            applications = filter(lambda app: is_tracked(join(riotbase, folder, app)), applications)
+            applications = sorted(applications)
+
+            compiler = lambda application: compile_app(riotbase, folder, application)
             for application, result in zip(applications, executor.map(compiler, applications)):
                 if result[0] == 'exception':
-                    print(result)
+                    print('Exception:', result)
                     raise result[1]
                 (failed if result[0] else success).append((application, result[1]))
-        print()
+            print()
 
-    for color, applications, text in ((2, success, 'success'), (1, failed, 'failure')):
-        if applications:
-            print('Outcome \033[1;3{}m{}\033[0m:'.format(color, text))
-            for application, lines in applications:
-                print('\t\033[1;3{}m{}\033[0m:\n{}'.format(color, application, lines))
+            for color, applications, text in ((2, success, 'Success'), (1, failed, 'Failure')):
+                if applications:
+                    if not only_board:
+                        print('Outcome \033[1;3{}m{}\033[0m:'.format(color, text))
+                        for application, lines in applications:
+                            print('\t\033[1;3{}m{}\033[0m:\n{}'.format(color, application, lines))
+                    else:
+                        apps = ', '.join(application for application, lines in applications if lines)
+                        print('\033[1;3{}m{}\033[0m:\n\t{}'.format(color, text, apps))
 
-    return 1 if failed else 0
+                        apps = ', '.join(application for application, lines in applications if not lines)
+                        if apps:
+                            print('\033[1;3{}m{}\033[0m:\n\t{}'.format(4, 'Skipped', apps))
+            print()
+
+            if failed:
+                exit_code = 1
+
+    return exit_code
 
 if __name__ == '__main__':
     if len(argv) != 2:
