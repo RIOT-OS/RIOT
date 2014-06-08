@@ -468,9 +468,8 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
 
     set_tcp_packet(current_tcp_packet, current_tcp_socket->local_address.sin6_port,
                    current_tcp_socket->foreign_address.sin6_port,
-                   (flags == TCP_ACK ? current_tcp_socket->tcp_control.send_una - 1 :
-                    current_tcp_socket->tcp_control.send_una),
-                   current_tcp_socket->tcp_control.rcv_nxt, header_length, flags,
+                   current_tcp_socket->tcp_control.send_una,
+                   (IS_TCP_ACK(flags) ? current_tcp_socket->tcp_control.rcv_nxt : 0x00), header_length, flags,
                    current_tcp_socket->tcp_control.rcv_wnd, 0, 0);
 
     /* Fill IPv6 Header */
@@ -573,7 +572,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 #endif
 
     set_tcp_cb(&current_tcp_socket->tcp_control, 0, DESTINY_SOCKET_STATIC_WINDOW,
-               current_tcp_socket->tcp_control.send_iss,
+               current_tcp_socket->tcp_control.send_iss + 1,
                current_tcp_socket->tcp_control.send_iss, 0);
 
     /* Remember current time */
@@ -615,7 +614,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     tcp_hdr_t *tcp_header = ((tcp_hdr_t *)(msg_from_server.content.ptr));
 
     /* Check for consistency */
-    if (tcp_header->ack_nr != current_tcp_socket->tcp_control.send_nxt + 1) {
+    if (tcp_header->ack_nr != current_tcp_socket->tcp_control.send_nxt) {
         printf("TCP packets not consistent!\n");
     }
 
@@ -633,11 +632,9 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     current_tcp_socket->tcp_control.rcv_irs = tcp_header->seq_nr;
     set_tcp_cb(&current_tcp_socket->tcp_control, tcp_header->seq_nr + 1,
                current_tcp_socket->tcp_control.rcv_wnd,
-               current_tcp_socket->tcp_control.send_una,
-               current_tcp_socket->tcp_control.send_una,
+               current_tcp_socket->tcp_control.send_una + 1,
+               tcp_header->ack_nr,
                tcp_header->window);
-    current_tcp_socket->tcp_control.send_una++;
-    current_tcp_socket->tcp_control.send_nxt++;
 
     msg_from_server.type = UNDEFINED;
 
@@ -1269,13 +1266,13 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
     tcp_header = ((tcp_hdr_t *)(msg_recv_client_ack.content.ptr));
 
     /* Check for consistency */
-    if (tcp_header->ack_nr != current_queued_socket->tcp_control.send_nxt + 1) {
+    if (tcp_header->ack_nr != current_queued_socket->tcp_control.send_nxt) {
         printf("TCP packets not consistent!\n");
     }
 
     /* Got ack, connection established, refresh local and foreign tcp socket
      * status */
-    set_tcp_cb(&current_queued_socket->tcp_control, tcp_header->seq_nr + 1,
+    set_tcp_cb(&current_queued_socket->tcp_control, tcp_header->seq_nr,
                current_queued_socket->tcp_control.rcv_wnd, tcp_header->ack_nr,
                tcp_header->ack_nr, tcp_header->window);
 
@@ -1378,7 +1375,7 @@ socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
     current_queued_socket->socket_values.tcp_control.state = TCP_SYN_RCVD;
     set_tcp_cb(&current_queued_socket->socket_values.tcp_control,
                tcp_header->seq_nr + 1, DESTINY_SOCKET_STATIC_WINDOW,
-               current_queued_socket->socket_values.tcp_control.send_iss,
+               current_queued_socket->socket_values.tcp_control.send_iss + 1,
                current_queued_socket->socket_values.tcp_control.send_iss,
                tcp_header->window);
 
