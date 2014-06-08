@@ -126,7 +126,7 @@ void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
     printf("IPv6 Dest: %s\n",
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_header->destaddr));
-    printf("TCP Length: %x\n", ipv6_header->length - TCP_HDR_LEN);
+    printf("TCP Length: %x\n", NTOHS(ipv6_header->length) - TCP_HDR_LEN);
     printf("Source Port: %x, Dest. Port: %x\n",
            NTOHS(tcp_header->src_port), NTOHS(tcp_header->dst_port));
     printf("Source Port: %u, Dest. Port: %u\n",
@@ -478,7 +478,7 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
            &current_tcp_socket->foreign_address.sin6_addr, 16);
     memcpy(&(temp_ipv6_header->srcaddr),
            &current_tcp_socket->local_address.sin6_addr, 16);
-    temp_ipv6_header->length = header_length * 4 + payload_length;
+    temp_ipv6_header->length = HTONS(header_length * 4 + payload_length);
 
     current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
 
