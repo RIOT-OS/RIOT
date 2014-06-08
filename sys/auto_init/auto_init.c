@@ -64,6 +64,10 @@
 #include "transceiver.h"
 #endif
 
+#ifdef MODULE_GTIMER
+#include "gtimer.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -87,6 +91,10 @@ void auto_init(void)
     DEBUG("Auto init uart0 module.\n");
     board_uart0_init();
 #endif
+#ifdef MODULE_GTIMER
+    DEBUG("Auto init gtimer module.\n");
+    gtimer_init();
+#endif 
 #ifdef MODULE_RTC
     DEBUG("Auto init rtc module.\n");
     rtc_init();
