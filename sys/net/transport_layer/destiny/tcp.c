@@ -73,7 +73,7 @@ void printArrayRange_tcp(uint8_t *udp_header, uint16_t len)
 uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header)
 {
     uint16_t sum;
-    uint16_t len = ipv6_header->length;
+    uint16_t len = NTOHS(ipv6_header->length);
 
     sum = len + IPPROTO_TCP;
     sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
@@ -87,7 +87,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
     (void) tcp_header;
 
     msg_t m_send_tcp, m_recv_tcp;
-    uint8_t tcp_payload_len = ipv6_header->length - TCP_HDR_LEN;
+    uint8_t tcp_payload_len = NTOHS(ipv6_header->length) - TCP_HDR_LEN;
     uint8_t acknowledged_bytes = 0;
 
     if (tcp_payload_len > tcp_socket->socket_values.tcp_control.rcv_wnd) {
@@ -270,7 +270,7 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                                 socket_internal_t *tcp_socket, uint8_t *payload)
 {
-    uint8_t tcp_payload_len = ipv6_header->length - TCP_HDR_LEN, read_bytes = 0;
+    uint8_t tcp_payload_len = NTOHS(ipv6_header->length) - TCP_HDR_LEN, read_bytes = 0;
     socket_t *current_tcp_socket = &tcp_socket->socket_values;
     uint8_t send_buffer[BUFFER_SIZE];
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
@@ -394,7 +394,7 @@ void tcp_packet_handler(void)
             printf("Wrong checksum (%x) or no corresponding socket found!\n",
                    chksum);
             printArrayRange(((uint8_t *)ipv6_header), IPV6_HDR_LEN +
-                            ipv6_header->length, "Incoming");
+                            NTOHS(ipv6_header->length), "Incoming");
             print_tcp_status(INC_PACKET, ipv6_header, tcp_header,
                              &tcp_socket->socket_values);
         }
