@@ -42,7 +42,7 @@
  *
  * @return              the IRQ state after enabling interrupts
  */
-unsigned int irq_arch_eneable(void);
+unsigned int irq_arch_enable(void);
 
 /**
  * @brief Globally disable all maskable interrupt sources
