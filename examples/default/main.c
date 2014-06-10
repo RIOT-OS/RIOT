@@ -114,9 +114,10 @@ static void shell_putchar(int c)
     (void) putchar(c);
 }
 
+static char shell_buffer[UART0_BUFSIZE];
+
 int main(void)
 {
-    char shell_buffer[UART0_BUFSIZE];
     shell_t shell;
     (void) posix_open(uart0_handler_pid, 0);
 
