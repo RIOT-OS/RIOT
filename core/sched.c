@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <errno.h>
 #include <stdint.h>
 
 #include "sched.h"
@@ -180,4 +181,64 @@ NORETURN void sched_task_exit(void)
 
     sched_active_thread = NULL;
     cpu_switch_context_exit();
+}
+
+int sched_set_priority(tcb_t *process, char priority)
+{
+    int result;
+
+#ifdef DEVELHELP
+    if ((priority < 0) || (priority >= SCHED_PRIO_LEVELS)) {
+        printf("ERROR sched_set_priority: invalid argument for the new priority level %i\n", (int) priority);
+    }
+    if (!process) {
+        puts("ERROR sched_set_priority: process==NULL");
+    }
+#endif
+
+    unsigned old_state = disableIRQ();
+
+    int on_runqueue = (process->status >= STATUS_ON_RUNQUEUE);
+
+    if (!on_runqueue && (process->status != STATUS_SLEEPING)) {
+        /* If the thread is blocked, then its runlevel is cached in a queue_node_t. */
+        /* Updating the priority would not change the position. */
+        result = -EPERM;
+    }
+    else {
+        result = process->priority;
+
+        if (result != priority) {
+            process->priority = priority;
+
+            if (on_runqueue) {
+                /* remove the thread from the old runqueue */
+                clist_remove(&sched_runqueues[result], &process->rq_entry);
+                if (!sched_runqueues[result]) {
+                    runqueue_bitcache &= ~(1 << result);
+                }
+
+                /* and insert it into the new runqueue */
+                clist_add(&sched_runqueues[(unsigned) priority], &process->rq_entry);
+                runqueue_bitcache |= (1 << priority);
+            }
+        }
+    }
+
+    restoreIRQ(old_state);
+
+    if (on_runqueue) {
+        /* (Maybe) yield if the priority of the current thread was decreased,
+         * or if the priority of another thread was raised. */
+        if (sched_active_thread == process) {
+            if (result < priority) {
+                thread_yield();
+            }
+        }
+        else if (result > priority) {
+            sched_switch(priority);
+        }
+    }
+
+    return result;
 }

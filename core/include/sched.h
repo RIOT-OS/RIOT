@@ -153,6 +153,17 @@ extern volatile kernel_pid_t sched_active_pid;
  */
 extern clist_node_t *runqueues[SCHED_PRIO_LEVELS];
 
+/**
+ * @brief       Change the priority of a thread.
+ * @details     The priority of a thread can only be changed if it is a running or sleeping thread.
+ *              The priority of a blocked thread cannot be changed, since the priority gets cached in a queue_node_t.
+ * @param[in]   process    The thread.
+ * @param[in]   priority   The new thread priority. Compare thread_create().
+ * @returns     @arg On success the old priority get returned.
+ *              @arg `-EPERM` if the thread is blocked.
+ */
+int sched_set_priority(tcb_t *process, char priority);
+
 #if SCHEDSTATISTICS
 /**
  *  Scheduler statistics
@@ -176,7 +187,7 @@ extern schedstat sched_pidlist[KERNEL_PID_LAST + 1];
  */
 void sched_register_cb(void (*callback)(uint32_t, uint32_t));
 
-#endif
+#endif /* SCHEDSTATISTICS */
 
-#endif // _SCHEDULER_H
+#endif /* _SCHEDULER_H */
 /** @} */
