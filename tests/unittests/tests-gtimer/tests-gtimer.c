@@ -17,15 +17,11 @@
 
 #include "tests-gtimer.h"
 
-#define EPSILON (1000) // epsilon should be high enough for platforms without a FPU
-#define OFFSET (100000)
-#define RATE (50)
+#define TEST_GTIMER_EPSILON (1000) // epsilon should be high enough for platforms without a FPU
+#define TEST_GTIMER_OFFSET (100000)
+#define TEST_GTIMER_RATE (0.000050)
 
-timex_t gtimer_init_now;
-
-static void set_up(void) {
-
-}
+static timex_t _gtimer_init_now;
 
 static void test_local_now_nearly_equal_vtimer(void)
 {
@@ -41,7 +37,7 @@ static void test_local_now_nearly_equal_vtimer(void)
 	time_gtimer = timex_uint64(now_gtimer);
 	DEBUG("time_vtimer %"PRIu64 " time_gtimer %"PRIu64 "\n", time_vtimer, time_gtimer);
 	// check if gtimer is within EPSILON us of vtimer
-	TEST_ASSERT((time_gtimer - time_vtimer) < EPSILON);
+	TEST_ASSERT((time_gtimer - time_vtimer) < TEST_GTIMER_EPSILON);
 }
 
 static void test_gtimer_sync_set_global_offset(void)
@@ -50,13 +46,13 @@ static void test_gtimer_sync_set_global_offset(void)
 	uint64_t time_gtimer;
 	uint64_t time_vtimer;
 
-	gtimer_sync_set_global_offset(OFFSET);
+	gtimer_sync_set_global_offset(TEST_GTIMER_OFFSET);
 	gtimer_now(&now_gtimer);
 
-	time_vtimer = timex_uint64(gtimer_init_now);
+	time_vtimer = timex_uint64(_gtimer_init_now);
 	time_gtimer = timex_uint64(now_gtimer);
 	// check if gtimer + OFFSET is within EPSILON us of vtimer
-	TEST_ASSERT((time_gtimer - (time_vtimer + OFFSET)) < EPSILON);
+	TEST_ASSERT((time_gtimer - (time_vtimer + TEST_GTIMER_OFFSET)) < TEST_GTIMER_EPSILON);
 }
 
 static void test_gtimer_sync_set_relative_rate(void)
@@ -65,21 +61,21 @@ static void test_gtimer_sync_set_relative_rate(void)
 	uint64_t time_gtimer;
 	uint64_t time_vtimer;
 
-	gtimer_sync_set_relative_rate(RATE);
-	vtimer_usleep(OFFSET);
+	gtimer_sync_set_relative_rate(TEST_GTIMER_RATE);
+	vtimer_usleep(TEST_GTIMER_OFFSET);
 	gtimer_now(&now_gtimer);
 
-	time_vtimer = timex_uint64(gtimer_init_now);
+	time_vtimer = timex_uint64(_gtimer_init_now);
 	time_gtimer = timex_uint64(now_gtimer);
 	DEBUG("time_gtimer: %"PRIu64 " timer_vtimer %"PRIu64 " GTIMER_CLOCKRATE_MULTIPLY(OFFSET,RATE)) %" PRIu32 " OFFSET %"PRIu32 "\n"
-			, time_gtimer, time_vtimer, (GTIMER_CLOCKRATE_MULTIPLY(OFFSET,RATE)), OFFSET);
+			, time_gtimer, time_vtimer, TEST_GTIMER_OFFSET * TEST_GTIMER_RATE, TEST_GTIMER_OFFSET);
 	// check if gtimer + OFFSET + OFFSET * RATE is within EPSILON us of vtimer
-	TEST_ASSERT((time_gtimer - (time_vtimer + OFFSET + OFFSET + (GTIMER_CLOCKRATE_MULTIPLY(OFFSET,RATE)))) < EPSILON);
+	TEST_ASSERT((time_gtimer - (time_vtimer + TEST_GTIMER_OFFSET + TEST_GTIMER_OFFSET + (TEST_GTIMER_OFFSET * TEST_GTIMER_RATE))) < TEST_GTIMER_EPSILON);
 }
 
 Test *tests_gtimer_tests(void)
 {
-	vtimer_now(&gtimer_init_now);
+	vtimer_now(&_gtimer_init_now);
 	gtimer_init();
 
 	EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -88,7 +84,7 @@ Test *tests_gtimer_tests(void)
 		new_TestFixture(test_gtimer_sync_set_relative_rate),
 };
 
-	EMB_UNIT_TESTCALLER(gtimer_tests, set_up, NULL, fixtures);
+	EMB_UNIT_TESTCALLER(gtimer_tests, NULL, NULL, fixtures);
 
 	return (Test *)&gtimer_tests;
 }

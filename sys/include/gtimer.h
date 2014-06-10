@@ -1,14 +1,11 @@
 /**
  * Declarations for the global virtual clock
  *
- * Copyright (C) 2013  Freie Universität Berlin.
+ * Copyright (C) 2014  Philipp Rosenkranz, Daniel Jentsch
  *
  * This file subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
  * details.
- *
- * If compiled with the GTIMER_TEST flag, the time doesn't progress on it's on,
- * but must be set by gtimer_set_local.
  *
  * @ingroup sys
  * @{
@@ -18,20 +15,17 @@
  * @author  Daniel Jentsch <d.jentsch@fu-berlin.de>
  * @}
  */
-#ifndef GTIMER_H
-#define GTIMER_H
+#ifndef __GTIMER_H
+#define __GTIMER_H
 
 #include <timex.h>
 #include <vtimer.h>
 #include <stdint.h>
 
-// faster than float but the result is rounded towards zero
-#define GTIMER_CLOCKRATE_MULTIPLY(DIVISOR, CLOCKRATE) (DIVISOR*CLOCKRATE)/1000000
-
 typedef struct {
 	uint64_t local;
 	uint64_t global;
-	uint32_t rate;
+	float rate;
 } gtimer_timeval_t;
 
 /**
@@ -58,7 +52,7 @@ void gtimer_sync_now(gtimer_timeval_t *out);
  *
  * Should only be used by a time synchronization protocol.
  */
-void gtimer_sync_set_relative_rate(uint32_t rate);
+void gtimer_sync_set_relative_rate(float rate);
 
 /**
  * @brief Adds a offset.
@@ -81,4 +75,4 @@ float gtimer_sync_get_relative_rate(void);
 void gtimer_sync_set_local(timex_t new_now);
 #endif
 
-#endif /* GTIMER_H */
+#endif /* __GTIMER_H */

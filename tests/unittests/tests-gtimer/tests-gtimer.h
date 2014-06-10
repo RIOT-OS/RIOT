@@ -13,11 +13,10 @@
  * @file        tests-gtimer.h
  * @brief       Unittests for the ``gtimer`` module
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
  */
-#ifndef __TESTS_CORE_H_
-#define __TESTS_CORE_H_
+#ifndef __TESTS_GTIMER_H_
+#define __TESTS_GTIMER_H_
 
 #include "../unittests.h"
 
@@ -33,5 +32,5 @@ void tests_gtimer(void);
  */
 Test *tests_gtimer_tests(void);
 
-#endif /* __TESTS_CORE_H_ */
+#endif /* __TESTS_GTIMER_H_ */
 /** @} */
