@@ -144,15 +144,15 @@ void etx_init_beaconing(ipv6_addr_t *address)
     etx_send_buf[0] = ETX_PKT_OPTVAL;
 
     etx_beacon_pid = thread_create(etx_beacon_buf, ETX_BEACON_STACKSIZE,
-                                   PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                   PRIORITY_MAIN - 1, CREATE_STACKTEST | DAEMON_THREAD,
                                    etx_beacon, "etx_beacon");
 
     etx_radio_pid = thread_create(etx_radio_buf, ETX_RADIO_STACKSIZE,
-                                  PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                  PRIORITY_MAIN - 1, CREATE_STACKTEST | DAEMON_THREAD,
                                   etx_radio, "etx_radio");
 
     etx_clock_pid = thread_create(etx_clock_buf, ETX_CLOCK_STACKSIZE,
-                                  PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                  PRIORITY_MAIN - 1, CREATE_STACKTEST | DAEMON_THREAD,
                                   etx_clock, "etx_clock");
     //register at transceiver
     transceiver_register(TRANSCEIVER_CC1100, etx_radio_pid);

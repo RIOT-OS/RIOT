@@ -182,7 +182,7 @@ void transceiver_init(transceiver_type_t t)
 /* Start the transceiver thread */
 int transceiver_start(void)
 {
-    transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN - 3, CREATE_STACKTEST, run, "Transceiver");
+    transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN - 3, CREATE_STACKTEST | DAEMON_THREAD, run, "Transceiver");
 
     if (transceiver_pid < 0) {
         puts("Error creating transceiver thread");

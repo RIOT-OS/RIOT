@@ -69,13 +69,10 @@ void sched_run(void)
         }
 
 #ifdef SCHED_TEST_STACK
-
         if (*((unsigned int *)my_active_thread->stack_start) != (unsigned int) my_active_thread->stack_start) {
             printf("scheduler(): stack overflow detected, task=%s pid=%u\n", my_active_thread->name, my_active_thread->pid);
         }
-
 #endif
-
     }
 
 #ifdef SCHEDSTATISTICS
@@ -84,31 +81,23 @@ void sched_run(void)
     if (my_active_thread && (sched_pidlist[my_active_thread->pid].laststart)) {
         sched_pidlist[my_active_thread->pid].runtime_ticks += time - sched_pidlist[my_active_thread->pid].laststart;
     }
-
 #endif
 
     DEBUG("\nscheduler: previous task: %s\n", (my_active_thread == NULL) ? "none" : my_active_thread->name);
 
-    if (sched_num_threads == 0) {
-        DEBUG("scheduler: no tasks left.\n");
-
-        while (!sched_num_threads) {
-            /* loop until a new task arrives */
-            ;
-        }
-
-        DEBUG("scheduler: new task created.\n");
-    }
-
     my_active_thread = NULL;
-
     while (!my_active_thread) {
+        /* The bitmask in runqueue_bitcache is never empty,
+         * since the threading should not be started before at least the idle thread was started.
+         */
+
         int nextrq = bitarithm_lsb(runqueue_bitcache);
         clist_node_t next = *(sched_runqueues[nextrq]);
         DEBUG("scheduler: first in queue: %s\n", ((tcb_t *)next.data)->name);
         clist_advance(&(sched_runqueues[nextrq]));
         my_active_thread = (tcb_t *)next.data;
         sched_active_pid = (volatile int) my_active_thread->pid;
+
 #if SCHEDSTATISTICS
         sched_pidlist[my_active_thread->pid].laststart = time;
         sched_pidlist[my_active_thread->pid].schedules++;
@@ -117,12 +106,11 @@ void sched_run(void)
             thread_last_pid = my_active_thread->pid;
         }
 #endif
-#ifdef MODULE_NSS
 
+#ifdef MODULE_NSS
         if (sched_active_thread && sched_active_thread->pid != thread_last_pid) {
             thread_last_pid = sched_active_thread->pid;
         }
-
 #endif
     }
 
@@ -196,9 +184,11 @@ NORETURN void sched_task_exit(void)
 
     dINT();
     sched_threads[sched_active_thread->pid] = NULL;
-    sched_num_threads--;
+    if (!(sched_active_thread->flags & DAEMON_THREAD)) {
+        sched_num_threads--;
+    }
 
-    sched_set_status((tcb_t *)sched_active_thread,  STATUS_STOPPED);
+    sched_set_status((tcb_t *)sched_active_thread, STATUS_STOPPED);
 
     sched_active_thread = NULL;
     cpu_switch_context_exit();

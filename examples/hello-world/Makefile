@@ -10,4 +10,6 @@ export RIOTBASE ?= $(CURDIR)/../..
 # Change this to 0 show compiler invocation lines by default:
 export QUIET ?= 1
 
+CFLAGS += -DNATIVE_AUTO_EXIT
+
 include $(RIOTBASE)/Makefile.include

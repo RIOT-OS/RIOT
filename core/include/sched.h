@@ -84,7 +84,7 @@ extern volatile tcb_t *sched_threads[MAXTHREADS];
 extern volatile tcb_t *sched_active_thread;
 
 /**
- *  Number of running (non-terminated) threads
+ *  Number of running (non-terminated) threads, excluding DAEMON_THREAD threads.
  */
 extern volatile int sched_num_threads;
 

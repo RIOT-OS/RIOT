@@ -178,7 +178,7 @@ void cc1100_phy_init(void)
     mutex_init(&cc1100_mutex);
 
     /* Allocate event numbers and start cc1100 event process */
-    cc1100_event_handler_pid = thread_create(event_handler_stack, sizeof(event_handler_stack), PRIORITY_CC1100, CREATE_STACKTEST,
+    cc1100_event_handler_pid = thread_create(event_handler_stack, sizeof(event_handler_stack), PRIORITY_CC1100, CREATE_STACKTEST | DAEMON_THREAD,
                                cc1100_event_handler_function, cc1100_event_handler_name);
 
     /* Active watchdog for the first time */

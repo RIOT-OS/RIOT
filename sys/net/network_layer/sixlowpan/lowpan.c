@@ -1790,7 +1790,7 @@ int sixlowpan_lowpan_init(void)
 
     if (!ip_process_pid) {
         ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
-                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                       PRIORITY_MAIN - 1, CREATE_STACKTEST | DAEMON_THREAD,
                                        ipv6_process, "ip_process");
     }
 
@@ -1801,7 +1801,7 @@ int sixlowpan_lowpan_init(void)
     nbr_cache_auto_rem();
 
     contexts_rem_pid = thread_create(con_buf, CON_STACKSIZE,
-                                     PRIORITY_MAIN + 1, CREATE_STACKTEST,
+                                     PRIORITY_MAIN + 1, CREATE_STACKTEST | DAEMON_THREAD,
                                      lowpan_context_auto_remove, "lowpan_context_rem");
 
     if (contexts_rem_pid < 0) {
@@ -1809,7 +1809,7 @@ int sixlowpan_lowpan_init(void)
     }
 
     transfer_pid = thread_create(lowpan_transfer_buf, LOWPAN_TRANSFER_BUF_STACKSIZE,
-                                 PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                 PRIORITY_MAIN - 1, CREATE_STACKTEST | DAEMON_THREAD,
                                  lowpan_transfer, "lowpan_transfer");
 
     if (transfer_pid < 0) {

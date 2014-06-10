@@ -204,7 +204,7 @@ uint8_t rpl_init(int if_id)
     rpl_clear_routing_table();
     init_trickle();
     rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
-                                    PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                    PRIORITY_MAIN - 1, CREATE_STACKTEST | DAEMON_THREAD,
                                     rpl_process, "rpl_process");
 
     /* INSERT NEW OBJECTIVE FUNCTIONS HERE */

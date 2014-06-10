@@ -61,7 +61,8 @@ typedef struct tcb_t {
     uint16_t status;            /**< thread's status                */
 
     uint16_t pid;               /**< thread's process id            */
-    uint16_t priority;          /**< thread's priority              */
+    uint8_t priority;           /**< thread's priority              */
+    uint8_t flags;              /**< thread's creations flags       */
 
     clist_node_t rq_entry;      /**< run queue entry                */
 

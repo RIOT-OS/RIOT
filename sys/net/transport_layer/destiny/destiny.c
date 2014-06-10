@@ -43,7 +43,7 @@ int destiny_init_transport_layer(void)
 
     /* UDP */
     int udp_thread_pid = thread_create(udp_stack_buffer, UDP_STACK_SIZE,
-                                       PRIORITY_MAIN, CREATE_STACKTEST,
+                                       PRIORITY_MAIN, CREATE_STACKTEST | DAEMON_THREAD,
                                        udp_packet_handler, "udp_packet_handler");
 
     if (udp_thread_pid < 0) {
@@ -73,7 +73,7 @@ int destiny_init_transport_layer(void)
     ipv6_register_next_header_handler(IPV6_PROTO_NUM_TCP, tcp_thread_pid);
 
     if (thread_create(tcp_timer_stack, TCP_TIMER_STACKSIZE, PRIORITY_MAIN + 1,
-                      CREATE_STACKTEST, tcp_general_timer, "tcp_general_timer") < 0) {
+                      CREATE_STACKTEST | DAEMON_THREAD, tcp_general_timer, "tcp_general_timer") < 0) {
         return -1;
     }
 
