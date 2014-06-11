@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_cortexm_common
+ * @ingroup     cpu_cortex-m3
  * @{
  *
  * @file        irq_arch.c

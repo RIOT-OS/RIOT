@@ -3,10 +3,10 @@
 export CFLAGS += -DCOREIF_NG=1
 
 # tell the build system that the CPU depends on the Cortex-M common files
-export USEMODULE += cortexm_common
+export USEMODULE += cortex-m3_common
 
 # define path to cortex-m common module, which is needed for this CPU
-export CORTEX_COMMON = $(RIOTCPU)/cortexm_common/
+export CORTEX_COMMON = $(RIOTCPU)/cortex-m3_common/
 
 # define the linker script to use for this CPU
 export LINKERSCRIPT = $(RIOTCPU)/$(CPU)/sam3x8e_linkerscript.ld

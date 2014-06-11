@@ -7,11 +7,11 @@
  */
 
 /**
- * @addtogroup  cpu_cortexm
+ * @addtogroup  cpu_cortex-m3
  * @{
  *
  * @file        cpu.h
- * @brief       Basic definitions for the Cortex-M common module
+ * @brief       Basic definitions for the Cortex-M3 common module
  *
  * When ever you want to do something hardware related, that is accessing MCUs registers directly,
  * just include this file. It will then make sure that the MCU specific headers are included.
@@ -36,12 +36,12 @@
 /**
  * @brief Macro has to be called in the beginning of each ISR
  */
-#define ISR_ENTER()         asm("push {LR}")
+#define ISR_ENTER()     asm("push {LR}")
 
 /**
  * @brief Macro has to be called on each exit of an ISR
  */
-#define ISR_EXIT()          asm("pop {r0}"); asm("bx r0")
+#define ISR_EXIT()      asm("pop {r0} \n bx r0")
 
 /**
  * @brief Initialization of the CPU
