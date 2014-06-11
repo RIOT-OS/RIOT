@@ -91,5 +91,8 @@ endif
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
     DIRS += oneway-malloc
 endif
+ifneq (,$(filter color,$(USEMODULE)))
+    DIRS += color
+endif
 
 include $(RIOTBASE)/Makefile.base
