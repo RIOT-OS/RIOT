@@ -1,10 +1,10 @@
-@
-@ Copyright (C) 2014 Freie Universität Berlin
-@
-@ This file is subject to the terms and conditions of the GNU Lesser General
-@ Public License. See the file LICENSE in the top level directory for more
-@ details.
-@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
 
 @-----------------------------------------------------------@
 @ Fast Block Copy (declared in diskio.h)
