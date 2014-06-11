@@ -166,7 +166,7 @@ int main(void)
             udp_server_thread_pid);
 
     /* Print configured IPv6-Addresses */
-    printf("Already configured IPv6-Addresses:\n");
+    printf("Already configured IPv6 addresses:\n");
     while (net_if_iter_addresses(0, &addr_ptr)) {
         if (inet_ntop(AF_INET6, addr_ptr->addr_data, addr_str,
                       IPV6_MAX_ADDR_STR_LEN)) {
