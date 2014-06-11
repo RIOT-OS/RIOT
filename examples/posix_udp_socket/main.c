@@ -115,7 +115,7 @@ void shell_cmd_send(int argc, char **argv)
     memcpy(&sa.sin6_addr, &dest, 16);
     sa.sin6_port = HTONS(SERVER_PORT);
 
-    len = sendto(sock, argv[2],strlen(argv[2]) + 1, 0, (struct sockaddr*) &sa,
+    len = sendto(sock, argv[2],strlen(argv[2]), 0, (struct sockaddr*) &sa,
                    sizeof sa);
     if (len < 0) {
         printf("Error sending packet!\n");
@@ -132,7 +132,7 @@ void init_udp_server(void)
 {
     sockaddr6_t sa;
     char buffer_main[UDP_BUFFER_SIZE];
-    int32_t recsize;
+    int recsize;
     uint32_t fromlen;
     int sock, status;
 
@@ -156,7 +156,8 @@ void init_udp_server(void)
             printf("ERROR: recsize < 0!\n");
         }
 
-        printf("UDP packet received, payload: %s\n", buffer_main);
+        printf("UDP packet received, payload: '%s' size: %d\n", buffer_main,
+                recsize);
     }
 
     close(sock);
