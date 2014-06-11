@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     cpu_cortex-m3
+ * @ingroup     cpu_cortexm4_common
  * @{
  *
- * @file        thread_arch.c
+ * @file
  * @brief       Implementation of the kernel's architecture dependent thread interface
  *
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
@@ -25,6 +25,7 @@
 #include "arch/thread_arch.h"
 #include "thread.h"
 #include "sched.h"
+#include "thread.h"
 #include "irq.h"
 #include "cpu.h"
 #include "kernel_internal.h"
@@ -46,7 +47,14 @@ static void context_save(void);
 static void context_restore(void) NORETURN;
 
 /**
- * Cortex-M3 knows stacks and handles register backups, so use different stack frame layout
+ * Cortex-M knows stacks and handles register backups, so use different stack frame layout
+ *
+ * TODO: How to handle different Cortex-Ms? Code is so far valid for M3 and M4 without FPU
+ *
+ * Layout with storage of floating point registers (applicable for Cortex-M4):
+ * ------------------------------------------------------------------------------------------------------------------------------------
+ * | R0 | R1 | R2 | R3 | LR | PC | xPSR | S0 | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9 | S10 | S11 | S12 | S13 | S14 | S15 | FPSCR |
+ * ------------------------------------------------------------------------------------------------------------------------------------
  *
  * Layout without floating point registers:
  * --------------------------------------
@@ -61,23 +69,37 @@ char *thread_arch_stack_init(void *(*task_func)(void *), void *arg, void *stack_
 
     /* marker */
     stk--;
-    *stk = (uint32_t)STACK_MARKER;
+    *stk = STACK_MARKER;
+
+    /* TODO: fix FPU handling for Cortex-M4 */
+    /*
+    stk--;
+    *stk = (unsigned int) 0;
+    */
+
+    /* S0 - S15 */
+    /*
+    for (int i = 15; i >= 0; i--) {
+        stk--;
+        *stk = i;
+    }
+    */
 
     /* FIXME xPSR */
     stk--;
-    *stk = (uint32_t)0x01000200;
+    *stk = (unsigned int) 0x01000200;
 
     /* program counter */
     stk--;
-    *stk = (uint32_t)task_func;
+    *stk = (unsigned int) task_func;
 
     /* link register, jumped to when thread exits */
     stk--;
-    *stk = (uint32_t)sched_task_exit;
+    *stk = (unsigned int) sched_task_exit;
 
     /* r12 */
     stk--;
-    *stk = (uint32_t) 0;
+    *stk = (unsigned int) 0;
 
     /* r1 - r3 */
     for (int i = 3; i >= 1; i--) {

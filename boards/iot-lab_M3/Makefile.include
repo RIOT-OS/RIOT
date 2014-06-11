@@ -1,0 +1,50 @@
+## the cpu to build for
+export CPU = stm32f1
+export CPU_MODEL = stm32f103re
+
+# set the default port
+export PORT ?= /dev/ttyUSB2
+
+# define tools used for building the project
+export PREFIX = arm-none-eabi-
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
+export AS = $(PREFIX)as
+export LINK = $(PREFIX)gcc
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
+export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+
+# define build specific options
+export CPU_USAGE = -mcpu=cortex-m3
+export FPU_USAGE =
+export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
+export CFLAGS += -flto -ffunction-sections -fdata-sections -fno-builtin
+export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
+export LINKFLAGS += -ggdb -g3 -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles
+# $(LINKERSCRIPT) is specified in cpu/Makefile.include
+export LINKFLAGS += -T$(LINKERSCRIPT)
+export OFLAGS = -O ihex
+export FFLAGS = $(BINDIR)/$(APPLICATION).hex
+export DEBUGGER_FLAGS = $(BINDIR)/$(APPLICATION).elf
+
+# use the nano-specs of the NewLib when available
+ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+export LINKFLAGS += -specs=nano.specs -lc -lnosys
+endif
+
+# export board specific includes to the global includes-listing
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/
+
+
+
+# TODO -> move this to the appropriate Makefile.dep!!!
+ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
+	USEMODULE += at86rf231
+	USEMODULE += transceiver
+endif
+
+# TODO -> is this needed?
+TERM = miniterm.py -b 115200

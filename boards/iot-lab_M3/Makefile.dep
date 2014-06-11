@@ -1,0 +1,3 @@
+ifneq (,$(findstring at86rf231,$(USEMODULE)))
+		USEMODULE += at86rf231
+endif

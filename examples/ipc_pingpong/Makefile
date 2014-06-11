@@ -16,3 +16,6 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
+
+reset:
+	$(RIOTBOARD)/$(BOARD)/dist/reset.sh
