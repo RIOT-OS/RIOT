@@ -90,8 +90,7 @@ void shell_send(int argc, char **argv)
                len, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &dest));
     }
 
-    /* missing not exposed close() function
-     close(sock) */;
+    close(sock);
 }
 
 
@@ -113,8 +112,7 @@ void init_udp_server(void)
     status = bind(sock, (struct sockaddr *)&sa, sizeof(sa));
     if (-1 == status) {
         printf("Error bind failed!\n");
-        /* missing not exposed close() function
-         close(sock) */;
+        close(sock);
     }
     while (1) {
         recsize = recvfrom(sock, (void *)buffer_main, UDP_BUFFER_SIZE, 0,
@@ -127,8 +125,7 @@ void init_udp_server(void)
         printf("UDP packet received, payload: %s\n", buffer_main);
     }
 
-    /* missing not exposed close() function
-     close(sock) */;
+    close(sock);
 }
 
 
