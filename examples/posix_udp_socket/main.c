@@ -156,8 +156,8 @@ void init_udp_server(void)
             printf("ERROR: recsize < 0!\n");
         }
 
-        printf("UDP packet received, payload: '%s' size: %d\n", buffer_main,
-                recsize);
+        printf("UDP packet received, payload: '%.*s' size: %d\n",
+                recsize, buffer_main, recsize);
     }
 
     close(sock);
