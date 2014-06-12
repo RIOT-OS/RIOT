@@ -1,5 +1,5 @@
 # name of your application
-PROJECT = shell
+APPLICATION = shell
 
 # If no BOARD is found in the environment, use this default:
 export BOARD ?= native
