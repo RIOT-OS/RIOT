@@ -53,3 +53,7 @@ void uart0_putc(int c)
 {
     putchar(c);
 }
+
+#ifdef MODULE_UART0_GETCHAR
+int getchar(void) __attribute__((alias("uart0_readc")));
+#endif
