@@ -45,14 +45,6 @@ typedef enum {
 } spi_t;
 
 /**
- * @brief Define the SPI mode, master or slave
- */
-typedef enum {
-    SPI_MODE_MASTER = 0,        /**< configure SPI as master */
-    SPI_MODE_SLAVE              /**< configure SPI as slave */
-}
-
-/**
  * @brief The SPI mode is defined by the four possible combinations of clock polarity and
  *        clock phase.
  */
@@ -60,15 +52,18 @@ typedef enum {
     SPI_CONF_FIRST_RISING = 0,  /**< first data bit is transacted on the first rising SCK edge */
     SPI_CONF_SECOND_RISING,     /**< first data bit is transacted on the second rising SCK edge */
     SPI_CONF_FIRST_FALLING,     /**< first data bit is transacted on the first falling SCK edge */
-    SPI_CONF_SECOND_RISING      /**< first data bit is transacted on the second falling SCK edge */
+    SPI_CONF_SECOND_FALLING     /**< first data bit is transacted on the second falling SCK edge */
 } spi_conf_t;
 
 
 /**
- * @brief Initialize a given SPI device
+ * @brief Initialize the given SPI device to work in master mode
+ *
+ * In master mode the SPI device is configured to control the SPI bus. This means the device
+ * will start and end all communication on the bus and control the CLK line. For transferring
+ * data on the bus the below defined transfer functions should be used.
  *
  * @param[in] dev       SPI device to initialize
- * @param[in] mode      Configure SPI as master or slave
  * @param[in] conf      Mode of clock phase and clock polarity
  * @param[in] speed     SPI bus speed in Hz
  *
@@ -76,7 +71,26 @@ typedef enum {
  * @return              -1 on undefined SPI device
  * @return              -2 on unavailable speed value
  */
-int spi_init(spi_t dev, spi_mode_t mode, spi_conf_t conf, uint32_t speed);
+int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed);
+
+/**
+ * @brief Initialize the given SPI device to work in slave mode
+ *
+ * In slave mode the SPI device is purely reacting to the bus. Transaction will be started and
+ * ended by a connected SPI master. When a byte is received, the callback is called in interrupt
+ * context with this byte as argument. The return byte of the callback is transferred to the
+ * master in the next transmission cycle. This interface enables easy implementation of a register
+ * based access paradigm for the SPI slave.
+ *
+ * @param[in] dev       The SPI device to initialize as SPI slave
+ * @param[in] conf      Mode of clock phase and polarity
+ * @param[in] cb        callback on received byte
+ *
+ * @return              0 on success
+ * @return              -1 on undefined SPI device
+ * @return              -2 on unavailable speed value
+ */
+int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char));
 
 /**
  * @brief Transfer one byte on the given SPI bus
@@ -104,10 +118,10 @@ int spi_transfer_byte(spi_t dev, char out, char *in);
 int spi_transfer_bytes(spi_t dev, char *out, char *in, int length);
 
 /**
- * @brief Transfer on byte to/from a given register address
+ * @brief Transfer one byte to/from a given register address
  *
  * This function is a shortcut function for easier handling of register based SPI devices. As
- * many SPI devices us a register based addressing scheme, this function is a convenient short-
+ * many SPI devices use a register based addressing scheme, this function is a convenient short-
  * cut for interfacing with such devices.
  *
  * @param[in] dev       SPI device to use
@@ -124,7 +138,7 @@ int spi_transfer_reg(spi_t dev, uint8_t reg, char *out, char *in);
  * @brief Transfer a number of bytes from/to a given register address
  *
  * This function is a shortcut function for easier handling of register based SPI devices. As
- * many SPI devices us a register based addressing scheme, this function is a convenient short-
+ * many SPI devices use a register based addressing scheme, this function is a convenient short-
  * cut for interfacing with such devices.
  *
  * @param[in] dev       SPI device to use
