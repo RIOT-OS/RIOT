@@ -6,22 +6,6 @@
 #include "record.h"
 
 
-#define ASSIGN_UINT32_TO_UINT24(src, dest)  \
-  do { \
-    uint8_t *ptr = (uint8_t*) &(dest); \
-    *ptr = src & 0xFF; ++ptr; \
-    *ptr = (src >>  8) & 0xFF; ++ptr;\
-    *ptr = (src >> 16) & 0xFF; ++ptr;\
-  } while (0)
-
-#define ASSIGN_UINT64_TO_UINT48(src, dest)  \
-  do { \
-    uint16_t *ptr = (uint16_t*) &(dest); \
-    *ptr = src & 0xFFFF; ++ptr; \
-    *ptr = (src >> 16) & 0xFFFF; ++ptr;\
-    *ptr = (src >> 32) & 0xFFFF; ++ptr;\
-  } while (0)
-
 
 int dtls_record_init(dtls_record_t *record, tls_content_type_t type,
    uint16_t epoch, uint64_t sequence_number, uint8_t *fragment, size_t size)
