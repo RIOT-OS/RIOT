@@ -54,6 +54,8 @@ void* (*real_malloc)(size_t size);
 void (*real_free)(void *ptr);
 void* (*real_calloc)(size_t nmemb, size_t size);
 void* (*real_realloc)(void *ptr, size_t size);
+int (*real_pipe)(int[2]);
+int (*real_close)(int);
 
 void _native_syscall_enter(void)
 {

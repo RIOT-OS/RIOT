@@ -287,7 +287,7 @@ int tap_init(char *name)
     if (ioctl(_native_tap_fd, SIOCGIFHWADDR, &ifr) == -1) {
         _native_in_syscall++;
         warn("ioctl SIOCGIFHWADDR");
-        if (close(_native_tap_fd) == -1) {
+        if (real_close(_native_tap_fd) == -1) {
             warn("close");
         }
         exit(EXIT_FAILURE);
