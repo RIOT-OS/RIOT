@@ -20,9 +20,23 @@
  */
 
 #include <stdio.h>
+#include "../../sys/net/transport_layer/dtls/dtls.h"
+#include "../../sys/net/transport_layer/dtls/record.h"
 
 int main(void)
 {
+    uint8_t data[] = {1,2,3,4,5,6,7,8};
+    int result;
+    dtls_connection_t conn = {0};
+
     puts("Hello World!");
+
+    uint64_t sequence = 255<<8;
+    uint16_t epoch = 99;
+    result = dtls_record_stream(&conn, TLS_CONTENT_TYPE_APPLICATION_DATA,
+               data, 8);
+
+    printf("result: %d\n", result);
+
     return 0;
 }
