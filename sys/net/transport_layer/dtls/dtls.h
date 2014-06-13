@@ -21,57 +21,64 @@
 /**
  * basic stdint types
  */
-typedef uint8_t uint24_t[3];
-typedef uint8_t uint48_t[6];
+typedef union __attribute__((packed)) {
+    uint8_t uint8[3];
+} uint24_t;
 
+typedef union __attribute__((packed)) {
+    uint8_t uint8[6];
+    uint24_t uint24[2];
+} uint48_t;
 
-#define DTLS_MAX_RECORD_LENGTH 16384  /* 2^14 */
 
 /**
  * TLS structs
  */
 
-typedef struct tls_protocol_version_st {
+typedef struct __attribute__((packed)) {
     uint8_t major;
     uint8_t minor;
 } tls_protocol_version_t;
 
-#define DTLS_VERSION_1_2 {254, 253}
 
-typedef enum {
-  change_cipher_spec = 20,
-  alert = 21,
-  handshake = 22,
-  application_data = 23
+#define DTLS_VERSION_1_2_MAJOR 254
+#define DTLS_VERSION_1_2_MINOR 253
+#define DTLS_VERSION_INT 65277
+
+typedef enum __attribute__((packed)) {
+  TLS_CONTENT_TYPE_CHANGE_CIPHER_SPEC = 20,
+  TLS_CONTENT_TYPE_ALERT = 21,
+  TLS_CONTENT_TYPE_HANDSHAKE = 22,
+  TLS_CONTENT_TYPE_APPLICATION_DATA = 23
 } tls_content_type_t;
 
-typedef enum {
+typedef enum __attribute__((packed)) {
   TLS_COMPRESSION_NULL = 0
 } tls_compression_method_t;
 
-typedef enum {
+typedef enum __attribute__((packed)) {
   TLS_CONNECTION_SERVER,
   TLS_CONNECTION_CLIENT
 } tls_connection_end_t;
 
-typedef enum {
+typedef enum __attribute__((packed)) {
   TLS_PRF_SHA_256
 } tls_prf_algorithm_t;
 
-typedef enum {
+typedef enum __attribute__((packed)) {
   TLS_BULK_CIPHER_NULL,
   TLS_BULK_CIPHER_RC4,
   TLS_BULK_CIPHER_3DES,
   TLS_BULK_CIPHER_AES
 } tls_bulk_cipher_alghorithm_t;
 
-typedef enum {
-//  TLS_CIPHER_STREAM,
+typedef enum __attribute__((packed)) {
+  TLS_CIPHER_STREAM,
   TLS_CIPHER_BLOCK,
-//  TLS_CIPHER_AEAD
+  TLS_CIPHER_AEAD
 } tls_cipher_type;
 
-typedef enum {
+typedef enum __attribute__((packed)) {
   TLS_MAC_ALG_NULL, 
   TLS_MAC_ALG_HMAC_MD5,
   TLS_MAC_ALG_SHA1,
@@ -80,7 +87,7 @@ typedef enum {
   TLS_MAC_ALG_HMAC_SHA512
 } tls_mac_algorithm;
 
-typedef struct tls_security_parameters_st {
+typedef struct __attribute__((packed)) tls_security_parameters_st {
   tls_connection_end_t entity;
   tls_prf_algorithm_t  prf_algorithm;
   tls_bulk_cipher_alghorithm_t bulk_cipher_algorithm;
@@ -98,14 +105,14 @@ typedef struct tls_security_parameters_st {
   uint8_t server_random[32];
 } tls_security_parameters_t;
 
-typedef struct tls_block_ciphered_st {
+typedef struct __attribute__((packed)) tls_block_ciphered_st {
   uint8_t *content; /* size: TLSCompressed.length */
   uint8_t *mac; /* size: SecurityParameters.mac_length */
   uint8_t *padding; /* size : GenericBlockCipher.padding_length */
   uint8_t padding_length;
 } tls_block_ciphered_t;
 
-typedef struct tls_generic_block_cipher_st {
+typedef struct __attribute__((packed)) tls_generic_block_cipher_st {
   uint8_t *iv; /* size: SecurityParameters.record_iv_length */
   tls_block_ciphered_t block_ciphered;
 } tls_generic_block_cipher_t;
@@ -162,23 +169,10 @@ typedef uint8_t tls_cipher_suite_t[2];
 #define TLS_PSK_DHE_WITH_AES_256_CCM_8        {0xC0,0xAB}
 
 /**
- * RECORD Layer 
- */
-
-typedef struct dtls_record_st {
-  tls_content_type_t type;
-  tls_protocol_version_t version;
-  uint16_t epoch;
-  uint48_t sequence_number;
-  uint16_t length;
-  void *body;
-}
-
-/**
  * Handshake Protocol
  */
 
-typedef enum {
+typedef enum __attribute__((packed)) {
   DTLS_HANDSHAKE_HELLO_REQUEST = 0,
   DTLS_HANDSHAKE_CLIENT_HELLO = 1,
   DTLS_HANDSHAKE_SERVER_HELLO = 2,
@@ -192,7 +186,7 @@ typedef enum {
   DTLS_HANDSHAKE_FINISHED = 20,
 } dtls_handshake_type_t;
 
-typedef struct dtls_handshake_st {
+typedef struct __attribute__((packed)) dtls_handshake_st {
   dtls_handshake_type_t msg_type;
   uint24_t length;
   uint16_t message_seq;
@@ -205,12 +199,12 @@ typedef struct dtls_handshake_st {
 /**
  * RIOT internal DTLS structures
  */
-typedef struct dtls_connection_st {
+typedef struct __attribute__((packed)) dtls_connection_st {
   dtls_handshake_t state;
   tls_connection_end_t type;
   int socket;
   uint16_t epoch;
-  uint48_t sequence_number;
+  uint64_t sequence_number;  // is 48bit but we use 64bit for math operations
 } dtls_connection_t;
 
 #endif
