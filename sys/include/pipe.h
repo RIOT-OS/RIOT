@@ -51,6 +51,7 @@ typedef struct riot_pipe
     tcb_t *read_blocked;  /**< A thread that wants to write to this full pipe. */
     tcb_t *write_blocked; /**< A thread that wants to read from this empty pipe. */
     void (*free)(void *); /**< Function to call by pipe_free(). Used like `pipe->free(pipe)`. */
+    int close_count;      /**< The pipe gets closed when both side were closed. */
 } pipe_t;
 
 /**
@@ -68,7 +69,7 @@ void pipe_init(pipe_t *pipe, ringbuffer_t *rb, void (*free)(void *));
  * @param[in]    RB   The static ringbuffer to use.
  * @returns      The static initializer.
  */
-#define PIPE_INIT(RB) { &(RB), NULL, NULL, NULL }
+#define PIPE_INIT(RB) { &(RB), NULL, NULL, NULL, 0 }
 
 /**
  * @brief        Read from a pipe.
@@ -116,6 +117,18 @@ pipe_t *pipe_malloc(unsigned size);
  */
 void pipe_free(pipe_t *rp);
 
-/** @} */
+#ifdef MODULE_POSIX
+/**
+ *
+ */
+int pipe_open(int filedes[2], pipe_t *pipe);
+
+/**
+ *
+ */
+int pipe_open_dual(pipe_t *pipe);
+#endif /* MODULE_POSIX */
 
 #endif
+
+/** @} */

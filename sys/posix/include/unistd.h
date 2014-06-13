@@ -132,6 +132,12 @@ int usleep(useconds_t useconds);
 unsigned int sleep(unsigned int seconds);
 
 /**
+ *
+ */
+int pipe(int filedes[2]);
+
+#endif /* _UNISTD_H */
+
+/**
  * @}
  */
-#endif /* _UNISTD_H */
