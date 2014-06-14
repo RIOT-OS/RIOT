@@ -48,7 +48,7 @@ void set_socket_address(sockaddr6_t *sockaddr, sa_family_t sin6_family,
                         ipv6_addr_t *sin6_addr);
 void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port,
                     uint32_t seq_nr, uint32_t ack_nr,
-                    uint8_t dataOffset_reserved, uint8_t reserved_flags,
+                    uint8_t data_offset, uint8_t reserved_flags,
                     uint16_t window, uint16_t checksum, uint16_t urg_pointer);
 
 void printf_tcp_context(tcp_hc_context_t *current_tcp_context)
@@ -390,19 +390,21 @@ void set_socket_address(sockaddr6_t *sockaddr, uint8_t sin6_family,
 }
 
 void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port,
-                    uint32_t seq_nr, uint32_t ack_nr, uint8_t dataOffset_reserved,
+                    uint32_t seq_nr, uint32_t ack_nr, uint8_t data_offset,
                     uint8_t reserved_flags, uint16_t window, uint16_t checksum,
                     uint16_t urg_pointer)
 {
-    tcp_hdr->ack_nr					= ack_nr;
-    tcp_hdr->checksum				= checksum;
-    tcp_hdr->dataOffset_reserved	= dataOffset_reserved;
-    tcp_hdr->dst_port				= dst_port;
-    tcp_hdr->reserved_flags			= reserved_flags;
-    tcp_hdr->seq_nr					= seq_nr;
-    tcp_hdr->src_port				= src_port;
-    tcp_hdr->urg_pointer			= urg_pointer;
-    tcp_hdr->window					= window;
+    tcp_hdr->ack_nr         = ack_nr;
+    tcp_hdr->checksum       = checksum;
+    tcp_hdr->data_offset    = data_offset;
+    tcp_hdr->dst_port       = dst_port;
+    tcp_hdr->reserved_flags = reserved_flags;
+    tcp_hdr->reserved       = 0;
+    tcp_hdr->flag_ns        = 0;
+    tcp_hdr->seq_nr         = seq_nr;
+    tcp_hdr->src_port       = src_port;
+    tcp_hdr->urg_pointer    = urg_pointer;
+    tcp_hdr->window         = window;
 }
 
 /* Check for consistent ACK and SEQ number */
@@ -428,7 +430,7 @@ int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header)
 
 void switch_tcp_packet_byte_order(tcp_hdr_t *current_tcp_packet)
 {
-    if (current_tcp_packet->dataOffset_reserved * 4 > TCP_HDR_LEN) {
+    if (current_tcp_packet->data_offset * 4 > TCP_HDR_LEN) {
         if (*(((uint8_t *)current_tcp_packet) + TCP_HDR_LEN) == TCP_MSS_OPTION) {
             uint8_t *packet_pointer = (uint8_t *)current_tcp_packet;
             packet_pointer += (TCP_HDR_LEN + 2);
@@ -621,7 +623,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 
     /* Got SYN ACK from Server */
     /* Refresh foreign TCP socket information */
-    if ((tcp_header->dataOffset_reserved * 4 > TCP_HDR_LEN) &&
+    if ((tcp_header->data_offset * 4 > TCP_HDR_LEN) &&
         (*(((uint8_t *)tcp_header) + TCP_HDR_LEN) == TCP_MSS_OPTION)) {
         current_tcp_socket->tcp_control.mss =
             *((uint16_t *)(((uint8_t *)tcp_header) + TCP_HDR_LEN + 2));
@@ -1360,7 +1362,7 @@ socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
                        &ipv6_header->destaddr);
 
     /* Foreign TCP information */
-    if ((tcp_header->dataOffset_reserved * 4 > TCP_HDR_LEN) &&
+    if ((tcp_header->data_offset * 4 > TCP_HDR_LEN) &&
         (*(((uint8_t *)tcp_header) + TCP_HDR_LEN) == TCP_MSS_OPTION)) {
         current_queued_socket->socket_values.tcp_control.mss =
             *((uint16_t *)(((uint8_t *)tcp_header) + TCP_HDR_LEN + 2));

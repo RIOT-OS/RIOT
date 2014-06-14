@@ -48,7 +48,7 @@ void printTCPHeader(tcp_hdr_t *tcp_header)
     printf("\nBEGIN: TCP HEADER\n");
     printf("ack_nr: %" PRIu32 "\n", tcp_header->ack_nr);
     printf("checksum: %i\n", tcp_header->checksum);
-    printf("dataOffset_reserved: %i\n", tcp_header->dataOffset_reserved);
+    printf("data_offset: %i\n", tcp_header->data_offset);
     printf("dst_port: %i\n", tcp_header->dst_port);
     printf("reserved_flags: %i\n", tcp_header->reserved_flags);
     printf("seq_nr: %" PRIu32 "\n", tcp_header->seq_nr);
@@ -331,15 +331,14 @@ void tcp_packet_handler(void)
 #endif
         chksum = tcp_csum(ipv6_header, tcp_header);
 
-        payload = (uint8_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN +
-                              tcp_header->dataOffset_reserved * 4);
+        payload = (uint8_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN + tcp_header->data_offset * 4);
 
         if ((chksum == 0xffff) && (tcp_socket != NULL)) {
 #ifdef TCP_HC
             update_tcp_hc_context(true, tcp_socket, tcp_header);
 #endif
             /* Remove reserved bits from tcp flags field */
-            uint8_t tcp_flags = tcp_header->reserved_flags & REMOVE_RESERVED;
+            uint8_t tcp_flags = tcp_header->reserved_flags;
 
             switch (tcp_flags) {
                 case TCP_ACK: {
