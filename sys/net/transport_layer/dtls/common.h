@@ -13,24 +13,20 @@
  * @author  Nico von Geyso <nico.geyso@fu-berlin.com>
  */
 
-#ifndef DTLS_PROTOCOLS_RECORD_H_
-#define DTLS_PROTOCOLS_RECORD_H_
+#ifndef DTLS_COMMON_H_
+#define DTLS_COMMON_H_
 
-#define ASSIGN_UINT32_TO_UINT24(src, dest)  \
-  do { \
-    uint8_t *ptr = (uint8_t*) &(dest); \
-    *ptr = src & 0xFF; ++ptr; \
-    *ptr = (src >>  8) & 0xFF; ++ptr;\
-    *ptr = (src >> 16) & 0xFF; ++ptr;\
-  } while (0)
+/**
+ * basic stdint types
+ */
 
-#define ASSIGN_UINT64_TO_UINT48(src, dest)  \
-  do { \
-    uint16_t *ptr = (uint16_t*) &(dest); \
-    *ptr = src & 0xFFFF; ++ptr; \
-    *ptr = (src >> 16) & 0xFFFF; ++ptr;\
-    *ptr = (src >> 32) & 0xFFFF; ++ptr;\
-  } while (0)
+typedef struct __attribute__((packed)) {
+    uint32_t uint32:24;
+} uint24_t;
+
+typedef struct __attribute__((packed)) {
+    uint64_t uint64:48;
+} uint48_t;
 
 #endif
 /**

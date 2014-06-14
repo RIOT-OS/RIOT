@@ -17,18 +17,8 @@
 #define DTLS_H_
 
 #include <stdint.h>
-
-/**
- * basic stdint types
- */
-typedef union __attribute__((packed)) {
-    uint8_t uint8[3];
-} uint24_t;
-
-typedef union __attribute__((packed)) {
-    uint8_t uint8[6];
-    uint24_t uint24[2];
-} uint48_t;
+#include <sys/socket.h>
+#include "common.h"
 
 
 /**
@@ -41,8 +31,8 @@ typedef struct __attribute__((packed)) {
 } tls_protocol_version_t;
 
 
-#define DTLS_VERSION_1_2_MAJOR 254
-#define DTLS_VERSION_1_2_MINOR 253
+#define DTLS_VERSION_MAJOR 254
+#define DTLS_VERSION_MINOR 253
 #define DTLS_VERSION_INT 65277
 
 typedef enum __attribute__((packed)) {
@@ -124,49 +114,17 @@ typedef struct __attribute__((packed)) tls_generic_block_cipher_st {
 
 typedef uint8_t tls_cipher_suite_t[2];
 
-// TLS 1.2
-#define TLS_RSA_EXPORT_WITH_RC4_40_MD5        {0x00,0x03} /* [RFC4346] */
-#define TLS_RSA_WITH_RC4_128_MD5              {0x00,0x04} /* [RFC5246] */
-#define TLS_RSA_WITH_RC4_128_SHA              {0x00,0x05} /* [RFC5246] */
-#define TLS_DH_anon_EXPORT_WITH_RC4_40_MD5    {0x00,0x17} /* [RFC4346] */
-#define TLS_DH_anon_WITH_RC4_128_MD5          {0x00,0x18} /* [RFC5246] */
-#define TLS_KRB5_WITH_RC4_128_SHA             {0x00,0x20} /* [RFC2712] */
-#define TLS_KRB5_WITH_RC4_128_MD5             {0x00,0x24} /* [RFC2712] */
-#define TLS_KRB5_EXPORT_WITH_RC4_40_SHA       {0x00,0x28} /* [RFC2712] */
-#define TLS_KRB5_EXPORT_WITH_RC4_40_MD5       {0x00,0x2B} /* [RFC2712] */
-#define TLS_PSK_WITH_RC4_128_SHA              {0x00,0x8A} /* [RFC4279] */
-#define TLS_DHE_PSK_WITH_RC4_128_SHA          {0x00,0x8E} /* [RFC4279] */
-#define TLS_RSA_PSK_WITH_RC4_128_SHA          {0x00,0x92} /* [RFC4279] */
-#define TLS_ECDH_ECDSA_WITH_RC4_128_SHA       {0xC0,0x02} /* [RFC4492] */
-#define TLS_ECDHE_ECDSA_WITH_RC4_128_SHA      {0xC0,0x07} /* [RFC4492] */
-#define TLS_ECDH_RSA_WITH_RC4_128_SHA         {0xC0,0x0C} /* [RFC4492] */
-#define TLS_ECDHE_RSA_WITH_RC4_128_SHA        {0xC0,0x11} /* [RFC4492] */
-#define TLS_ECDH_anon_WITH_RC4_128_SHA        {0xC0,0x16} /* [RFC4492] */
-#define TLS_ECDHE_PSK_WITH_RC4_128_SHA        {0xC0,0x33} /* [RFC5489] */
-
 // PSK - RFC4279
 #define TLS_PSK_WITH_RC4_128_SHA              {0x00,0x8A}
 #define TLS_PSK_WITH_3DES_EDE_CBC_SHA         {0x00,0x8B}
 #define TLS_PSK_WITH_AES_128_CBC_SHA          {0x00,0x8C}
 #define TLS_PSK_WITH_AES_256_CBC_SHA          {0x00,0x8D}
-#define TLS_DHE_PSK_WITH_RC4_128_SHA          {0x00,0x8E}
-#define TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA     {0x00,0x8F}
-#define TLS_DHE_PSK_WITH_AES_128_CBC_SHA      {0x00,0x90}
-#define TLS_DHE_PSK_WITH_AES_256_CBC_SHA      {0x00,0x91}
-#define TLS_RSA_PSK_WITH_RC4_128_SHA          {0x00,0x92}
-#define TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA     {0x00,0x93}
-#define TLS_RSA_PSK_WITH_AES_128_CBC_SHA      {0x00,0x94}
-#define TLS_RSA_PSK_WITH_AES_256_CBC_SHA      {0x00,0x95}
 
 // PSK based AES-CCM - RFC 6655
 #define TLS_PSK_WITH_AES_128_CCM              {0xC0,0xA4}
 #define TLS_PSK_WITH_AES_256_CCM              {0xC0,0xA5}
-#define TLS_DHE_PSK_WITH_AES_128_CCM          {0xC0,0xA6}
-#define TLS_DHE_PSK_WITH_AES_256_CCM          {0xC0,0xA7}
 #define TLS_PSK_WITH_AES_128_CCM_8            {0xC0,0xA8}
 #define TLS_PSK_WITH_AES_256_CCM_8            {0xC0,0xA9}
-#define TLS_PSK_DHE_WITH_AES_128_CCM_8        {0xC0,0xAA}
-#define TLS_PSK_DHE_WITH_AES_256_CCM_8        {0xC0,0xAB}
 
 /**
  * Handshake Protocol
@@ -200,12 +158,15 @@ typedef struct __attribute__((packed)) dtls_handshake_st {
  * RIOT internal DTLS structures
  */
 typedef struct __attribute__((packed)) dtls_connection_st {
-  dtls_handshake_t state;
+  dtls_handshake_type_t state;
   tls_connection_end_t type;
   int socket;
+  sockaddr6_t socket_addr;
   uint16_t epoch;
   uint64_t sequence_number;  // is 48bit but we use 64bit for math operations
 } dtls_connection_t;
+
+#define DTLS_CONNECTION_INIT {0,0,-1,{0},0,0}
 
 #endif
 /**

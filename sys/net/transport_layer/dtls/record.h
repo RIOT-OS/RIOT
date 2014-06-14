@@ -13,14 +13,18 @@
  * @author  Nico von Geyso <nico.geyso@fu-berlin.com>
  */
 
-#ifndef DTLS_PROTOCOLS_RECORD_H_
-#define DTLS_PROTOCOLS_RECORD_H_
+#ifndef DTLS_RECORD_H_
+#define DTLS_RECORD_H_
 
 #include "dtls.h"
 
 #define DTLS_RECORD_MAX_SIZE 16384  /* 2^14 */
 #define TLS_PLAINTEXT_MAX_SIZE 16384
-#define DTLS_RECORD_HEADER_SIZE 12 /* in bytes */
+#define DTLS_RECORD_HEADER_SIZE 13 /* in bytes */
+
+#define DTLS_RECORD_ERR_LENGTH -3
+#define DTLS_RECORD_ERR_SEQUENCE -4
+
 
 typedef struct __attribute__((packed)) {
   tls_content_type_t type;
@@ -28,17 +32,30 @@ typedef struct __attribute__((packed)) {
   uint16_t epoch;
   uint48_t sequence_number;
   uint16_t length;
+} dtls_record_header_t;
+
+#define DTLS_RECORD_HEADER_INIT {0,{0},0,{0},0}
+
+typedef struct __attribute__((packed)) {
+  dtls_record_header_t header;
   uint8_t *fragment;
 } dtls_record_t;
 
 
-int dtls_record_fragment_init(dtls_record_t *record, tls_content_type_t type,
-   uint16_t epoch, uint64_t sequence_number, uint8_t *payload, size_t size);
+int dtls_record_read(dtls_record_t *record, uint8_t* input, size_t size);
 
-int dtls_record_compress(dtls_record_t *fragment, tls_compression_method_t meth);
+int dtls_record_write(uint8_t* buffer, tls_content_type_t type,
+      dtls_connection_t* conn, uint8_t *fragment, size_t size);
 
-int dtls_record_stream(dtls_connection_t *conn, tls_content_type_t type, 
+int dtls_send_raw(dtls_connection_t* conn, uint8_t* data, size_t size);
+
+int dtls_record_send(dtls_connection_t *conn, tls_content_type_t type, 
     uint8_t* input, size_t size);
+
+int dtls_record_stream_send(dtls_connection_t *conn, tls_content_type_t type, 
+    uint8_t* input, size_t size);
+
+void dtls_record_print(uint8_t *data);
 
 #endif
 /**

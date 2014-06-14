@@ -11,5 +11,13 @@ export RIOTBASE ?= $(CURDIR)/../..
 export QUIET ?= 1
 
 USEMODULE += dtls
+USEMODULE += posix
+USEMODULE += pnet
+USEMODULE += ps
+USEMODULE += vtimer
+USEMODULE += defaulttransceiver
+USEMODULE += sixlowpan
+USEMODULE += config
+USEMODULE += destiny
 
 include $(RIOTBASE)/Makefile.include
