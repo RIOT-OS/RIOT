@@ -784,14 +784,17 @@ void ipv6_register_rpl_handler(int pid)
 
 uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t proto)
 {
-    uint16_t sum = 0;
-    DEBUG("Calculate checksum over src: %s, dst: %s, len: %04X, buf: %p, proto: %u\n",
+#if ENABLE_DEBUG
+    char addr_str[IN6ADDRSZ];
+    printf("Calculate checksum over src: %s, dst: %s, len: %04X, buf: %p, proto: %u\n",
           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                            &ipv6_header->srcaddr),
           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                            &ipv6_header->destaddr),
           len, buf, proto);
-    sum = len + proto;
+#endif
+
+    uint16_t sum = len + proto;
     sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
     sum = csum(sum, buf, len);
     return (sum == 0) ? 0xffff : HTONS(sum);
