@@ -1,5 +1,5 @@
 # name of your application
-export APPLICATION = dtls
+export APPLICATION = dtls_playground
 
 # If no BOARD is found in the environment, use this default:
 export BOARD ?= native
@@ -10,6 +10,8 @@ export RIOTBASE ?= $(CURDIR)/../..
 # Change this to 0 show compiler invocation lines by default:
 export QUIET ?= 1
 
+USEMODULE += shell
+USEMODULE += shell_commands
 USEMODULE += dtls
 USEMODULE += posix
 USEMODULE += pnet

@@ -26,7 +26,7 @@ int dtls_record_read(dtls_record_t *record, uint8_t* input, size_t size)
 }
 
 
-int dtls_record_listen_raw(dtls_connection_t *conn, void *buffer,
+int dtls_record_receive_raw(dtls_connection_t *conn, void *buffer,
         size_t buffer_size)
 {
     uint32_t len = sizeof(conn->socket_addr);
@@ -46,7 +46,7 @@ int dtls_record_listen(dtls_connection_t *conn, int (*cb)(dtls_record_t*))
 
     while (1)
     {
-        recv_size = dtls_record_listen_raw(conn, buffer, 32);
+        recv_size = dtls_record_receive_raw(conn, buffer, 32);
         if (recv_size < 0) {
             printf("ERROR: recsize < 0!\n");
         }
