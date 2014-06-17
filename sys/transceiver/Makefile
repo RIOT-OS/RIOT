@@ -1,5 +1,3 @@
-MODULE =transceiver
-
 ifneq (,$(filter cc2420,$(USEMODULE)))
 	INCLUDES += -I$(RIOTBASE)/sys/net/include
 endif

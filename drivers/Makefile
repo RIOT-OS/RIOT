@@ -1,5 +1,3 @@
-MODULE = drivers
-
 DIRS=
 ifneq (,$(filter powermon,$(USEMODULE)))
     DIRS += powermon

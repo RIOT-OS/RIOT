@@ -1,5 +1,3 @@
-MODULE =cc110x_ng
-
 DIRS =
 ifneq (,$(filter msb-430h,$(BOARD)))
 	DIRS += spi
