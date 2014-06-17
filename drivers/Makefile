@@ -1,4 +1,3 @@
-DIRS=
 ifneq (,$(filter powermon,$(USEMODULE)))
     DIRS += powermon
 endif
@@ -32,8 +31,5 @@ endif
 ifneq (,$(filter lm75a,$(USEMODULE)))
     DIRS += lm75a
 endif
-
-all:
-	@for i in $(DIRS) ; do "$(MAKE)" -C $$i || exit 1; done ;
 
 include $(RIOTBASE)/Makefile.base

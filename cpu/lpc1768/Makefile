@@ -7,8 +7,6 @@ CC_SYMBOLS = -DTARGET_LPC1769 -DTOOLCHAIN_GCC_ARM -DNDEBUG -D__CORTEX_M3
 LD_FLAGS = -mcpu=cortex-m3 -mthumb -Wl,--gc-sections,-Map=$(APPLICATION).map,--cref --specs=nano.specs
 LD_SYS_LIBS = -lc -lgcc -lnosys
 
-all: $(BINDIR)$(MODULE).a
-
 include $(RIOTBASE)/Makefile.base
 
 # This is needed for NXP Cortex M devices

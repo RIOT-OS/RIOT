@@ -1,15 +1,11 @@
 MODULE = cpu
 
-DIRS =
 ifneq (,$(filter rtc,$(USEMODULE)))
 	DIRS += rtc
 endif
 ifneq (,$(filter nativenet,$(USEMODULE)))
 	DIRS += net
 endif
-
-all: $(BINDIR)$(MODULE).a
-	@for i in $(DIRS) ; do "$(MAKE)" -C $$i || exit 1; done ;
 
 include $(RIOTBASE)/Makefile.base
 

@@ -4,6 +4,12 @@ endif
 
 MODULE ?= $(shell basename $(CURDIR))
 
+all: $(BINDIR)$(MODULE).a
+	@for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done;
+
+clean::
+	@for i in $(DIRS); do $(MAKE) -C $$i clean; done;
+
 ASMSRC = $(wildcard *.s)
 ASSMSRC = $(wildcard *.S)
 ASMOBJ = $(ASMSRC:%.s=$(BINDIR)$(MODULE)/%.o)
