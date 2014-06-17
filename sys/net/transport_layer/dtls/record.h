@@ -21,9 +21,16 @@
 #define DTLS_RECORD_MAX_SIZE 16384  /* 2^14 */
 #define TLS_PLAINTEXT_MAX_SIZE 16384
 #define DTLS_RECORD_HEADER_SIZE 13 /* in bytes */
+#define DTLS_LISTEN_BUFFER_SIZE 32
 
+#define DTLS_RECORD_ERR_INIT -2
 #define DTLS_RECORD_ERR_LENGTH -3
 #define DTLS_RECORD_ERR_SEQUENCE -4
+#define DTLS_RECORD_ERR_SEND -5 
+#define DTLS_RECORD_ERR_ENCRYPT -6
+#define DTLS_RECORD_ERR_DECRYPT -7
+#define DTLS_RECORD_ERR_COMPRESSION -8
+#define DTLS_RECORD_ERR_DECOMPRESSION -9
 
 
 typedef struct __attribute__((packed)) {
@@ -34,15 +41,14 @@ typedef struct __attribute__((packed)) {
   uint16_t length;
 } dtls_record_header_t;
 
-#define DTLS_RECORD_HEADER_INIT {0,{0},0,{0},0}
+#define DTLS_RECORD_HEADER_INIT {0,DTLS_VERSION,0,{0},0}
 
 typedef struct __attribute__((packed)) {
   dtls_record_header_t header;
   uint8_t *fragment;
 } dtls_record_t;
 
-
-int dtls_record_read(dtls_record_t *record, uint8_t* input, size_t size);
+typedef int (*dtls_record_cb_t)(dtls_connection_t *conn, dtls_record_t*);
 
 int dtls_record_write(uint8_t* buffer, tls_content_type_t type,
       dtls_connection_t* conn, uint8_t *fragment, size_t size);

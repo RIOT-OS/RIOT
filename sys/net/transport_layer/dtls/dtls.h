@@ -21,6 +21,9 @@
 #include "common.h"
 
 
+#define DTLS_OK 0
+
+
 /**
  * TLS structs
  */
@@ -33,7 +36,7 @@ typedef struct __attribute__((packed)) {
 
 #define DTLS_VERSION_MAJOR 254
 #define DTLS_VERSION_MINOR 253
-#define DTLS_VERSION_INT 65277
+#define DTLS_VERSION {254,253}
 
 typedef enum __attribute__((packed)) {
   TLS_CONTENT_TYPE_CHANGE_CIPHER_SPEC = 20,

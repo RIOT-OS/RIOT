@@ -22,6 +22,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/socket.h>
+#include "kernel.h"
+#include "thread.h"
 #include "posix_io.h"
 #include "shell.h"
 #include "board_uart0.h"
@@ -31,32 +33,49 @@
 #include "inet_pton.h"
 #include "../../sys/net/transport_layer/dtls/dtls.h"
 #include "../../sys/net/transport_layer/dtls/record.h"
+#include "utils.h"
 
 #define IF_ID   (0)
+#define SERVER_PORT 8443
+#define UDP_BUFFER_SIZE     (128)
 
-size_t hexstrlen(char* str)
+char udp_server_stack_buffer[KERNEL_CONF_STACKSIZE_MAIN];
+
+void init_udp_server(void)
 {
-    size_t size = 1;
-    do {
-        if (*str == ' ')
-            size++;
-    } while (*(str++));
+    dtls_connection_t conn = DTLS_CONNECTION_INIT;
+    char buffer[UDP_BUFFER_SIZE];
+    int status, recv_size;
 
-    return size;
+
+    conn.socket  = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+    memset(&conn.socket_addr, 0, sizeof(conn.socket_addr));
+    conn.socket_addr.sin6_family = AF_INET;
+    conn.socket_addr.sin6_port = HTONS(SERVER_PORT);
+
+    status = bind(conn.socket, (struct sockaddr *)&conn.socket_addr, sizeof(conn.socket_addr));
+    if (-1 == status) {
+        printf("Error bind failed!\n");
+        close(conn.socket);
+    }
+
+    while (1) {
+        recv_size = dtls_record_receive_raw(&conn, buffer, UDP_BUFFER_SIZE);
+        if (recv_size < 0) {
+            printf("ERROR: recsize < 0!\n");
+        }
+
+        dtls_record_print(buffer);
+    }
+
+    close(conn.socket);
 }
 
-
-int hex2bin(uint8_t* buffer, char* str)
-{
-    int size = hexstrlen(str);
-    for (int i=0; i < size; ++i)
-        buffer[i] = strtol(str, &str, 16);
-    return size;
-}
 
 
 void shell_cmd_init(int argc, char **argv)
 {
+    int udp_server_thread_pid;
     ipv6_addr_t ipaddr;
     net_if_addr_t *addr_ptr = NULL;
     char addr_str[IPV6_MAX_ADDR_STR_LEN];
@@ -84,11 +103,17 @@ void shell_cmd_init(int argc, char **argv)
     while (net_if_iter_addresses(0, &addr_ptr)) {
         if (inet_ntop(AF_INET6, addr_ptr->addr_data, addr_str,
                       IPV6_MAX_ADDR_STR_LEN)) {
-            printf("\t%s/%d\n", addr_str, addr_ptr->addr_len);
+            printf("\t%s / %d\n", addr_str, addr_ptr->addr_len);
         }
     }
-}
 
+    /* Start UDP Server */
+    udp_server_thread_pid = thread_create(udp_server_stack_buffer,
+            KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN, CREATE_STACKTEST,
+            init_udp_server, "init_udp_server");
+    printf("\nUDP SERVER ON PORT %d (THREAD PID: %d)\n\n", SERVER_PORT,
+            udp_server_thread_pid);
+}
 
 void shell_cmd_send(int argc, char **argv)
 {
@@ -126,7 +151,7 @@ void shell_cmd_send(int argc, char **argv)
     memset(&conn.socket_addr, 0, sizeof(conn.socket_addr));
     conn.socket_addr.sin6_family = AF_INET;
     memcpy(&conn.socket_addr.sin6_addr, &dest, 16);
-    conn.socket_addr.sin6_port = HTONS(8443);
+    conn.socket_addr.sin6_port = HTONS(SERVER_PORT);
 
 
     size = hex2bin(data, argv[2]);
