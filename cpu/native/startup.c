@@ -54,8 +54,7 @@ const char *_native_unix_socket_path = NULL;
  */
 void _native_null_in(char *stdiotype)
 {
-
-    if (pipe(_native_null_in_pipe) == -1) {
+    if (real_pipe(_native_null_in_pipe) == -1) {
         err(1, "_native_null_in(): pipe()");
     }
 
@@ -200,6 +199,8 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");
     *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
     *(void **)(&real_getpid) = dlsym(RTLD_NEXT, "getpid");
+    *(void **)(&real_pipe) = dlsym(RTLD_NEXT, "pipe");
+    *(void **)(&real_close) = dlsym(RTLD_NEXT, "close");
 
     _native_argv = argv;
     _progname = argv[0];
