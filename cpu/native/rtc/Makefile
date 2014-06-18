@@ -1,5 +1,3 @@
-MODULE =rtc
-
 include $(RIOTBASE)/Makefile.base
 
 $(BINDIR)$(MODULE)/%.o: %.c
