@@ -42,6 +42,11 @@ buildtest:
 	\
 	rm -rf "$$BINDIRBASE"; \
 	for BOARD in $${BOARDS}; do \
+		if [ -n "${ONLY_BOARD}" -a "${ONLY_BOARD}" != "$${BOARD}" ]; then \
+			echo "Ignoring $${BOARD} (skipped)"; \
+			continue; \
+		fi; \
+		\
 		RIOTNOLINK=$$(case ' $(BOARD_INSUFFICIENT_RAM) ' in *" $${BOARD} "*) echo 1; esac); \
 		$${ECHO} -n "Building for $${BOARD} "; \
 		[ -n "$${RIOTNOLINK}" ] && $${ECHO} -n "(no linking) "; \

@@ -1,25 +1,108 @@
 language: c
 
-before_install:
-    - sudo apt-get install emdebian-archive-keyring
-    - echo 'deb http://www.emdebian.org/debian wheezy main' | sudo tee /etc/apt/sources.list.d/emdebian.list > /dev/null
+os:
+    - linux
+    - osx
 
-    - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty           main restricted universe multiverse' | sudo tee    /etc/apt/sources.list.d/trusty.list > /dev/null
-    - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
-    - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-security  main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
-    - echo 'deb http://us.archive.ubuntu.com/ubuntu trusty-updates   main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list.d/trusty.list > /dev/null
-    - sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
-    - sudo apt-get update
+matrix:
+    fast_finish: true
+
+    exclude:
+        - os: linux
+        - os: osx
+
+    include:
+        - os: linux
+          env: BOARD=native RUN_UNITTEST=1
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=native RUN_UNITTEST=1
+          compiler: clang
+
+#       - os: osx
+#         env: BOARD=native RUN_UNITTEST=1
+#         compiler: gcc
+
+#       - os: osx
+#         env: BOARD=native RUN_UNITTEST=1
+#         compiler: clang
+
+        - os: linux
+          env: BOARD=arduino-due INSTALL=gcc-arm-none-eabi
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=avsextrem INSTALL=gcc-arm-none-eabi
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=chronos INSTALL=gcc-msp430
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=mbed_lpc1768 INSTALL=gcc-arm-none-eabi
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=msb-430 INSTALL=gcc-msp430
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=msb-430h INSTALL=gcc-msp430
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=msba2 INSTALL=gcc-arm-none-eabi
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=pttu INSTALL=gcc-arm-none-eabi
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=qemu-i386
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=redbee-econotag INSTALL=gcc-arm-none-eabi
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=telosb INSTALL=gcc-msp430
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=udoo INSTALL=gcc-arm-none-eabi
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=wsn430-v1_3b INSTALL=gcc-msp430
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=wsn430-v1_4 INSTALL=gcc-msp430
+          compiler: gcc
+
+        - os: linux
+          env: BOARD=z1 INSTALL=gcc-msp430
+          compiler: gcc
+
+before_install:
+    - test "${TRAVIS_OS_NAME}" = osx || sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32
+    - test "${TRAVIS_OS_NAME}" = osx || echo 'deb http://us.archive.ubuntu.com/ubuntu trusty main universe' | sudo tee /etc/apt/sources.list.d/trusty.list > /dev/null
+    - test "${TRAVIS_OS_NAME}" = osx || sudo apt-get update -q
+
+    - test "${TRAVIS_OS_NAME}" = linux || brew update
 
 install:
-    - sudo apt-get install build-essential
-    - sudo apt-get install gcc-multilib
-    - sudo apt-get install gcc-arm-none-eabi
-    - sudo apt-get install gcc-msp430
+    - test "${TRAVIS_OS_NAME}" = osx || sudo apt-get install -q build-essential gcc-multilib python3 ${INSTALL}
+
+    - test "${TRAVIS_OS_NAME}" = linux || brew install python3
 
 script:
-    - ./dist/tools/compile_test/compile_test.py
-    - make -C ./tests/unittests term
+    - ONLY_BOARD="${BOARD}" ./dist/tools/compile_test/concurrent_compile_test.py 20
+    - test -z "${RUN_UNITTEST}" || make -C ./tests/unittests term
 
 notifications:
     email: false

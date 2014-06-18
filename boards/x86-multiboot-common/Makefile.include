@@ -18,7 +18,13 @@ ifeq (, $(NEWLIB_BASE))
       endif
     endif
 
-    $(shell cd $(RIOTBASE) && $(DOWNLOAD_TO_STDOUT) "$(NEWLIB_PRECOMPILED)" | tar xj)
+    $(shell EXTRACT_DIR=$$(mktemp -d) \
+         && cd $${EXTRACT_DIR} \
+         && $(DOWNLOAD_TO_STDOUT) "$(NEWLIB_PRECOMPILED)" | tar xj \
+         && mkdir -p $(RIOTBASE)/toolchain \
+         && mv -n $${EXTRACT_DIR}/toolchain/x86 $(RIOTBASE)/toolchain/x86 \
+         && rm -rf $${EXTRACT_DIR} \
+    )
   endif
 endif
 
