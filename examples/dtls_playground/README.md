@@ -77,7 +77,7 @@ On the other RIOT instance you should see the following:
 ```
 > dtls_record_decrypt() not yet implemented
 dtls_record_decompress() not yet implemented
-GOT DATA
+GOT DATA from fe80::ff:fe00:23f5
 	0: 254 (FE)
 	1: 255 (FF)
 	2: 207 (CF)
