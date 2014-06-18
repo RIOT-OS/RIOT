@@ -160,6 +160,7 @@ splhigh_(void)
     int sr;
     asmv("mov r2, %0" : "=r"(sr));
     asmv("bic %0, r2" : : "i"(GIE));
+    asmv("nop");
     return sr & GIE;        /* Ignore other sr bits. */
 }
 /*---------------------------------------------------------------------------*/
@@ -171,6 +172,7 @@ splx_(int sr)
 {
     /* If GIE was set, restore it. */
     asmv("bis %0, r2" : : "r"(sr));
+    asmv("nop");
 }
 /*---------------------------------------------------------------------------*/
 
