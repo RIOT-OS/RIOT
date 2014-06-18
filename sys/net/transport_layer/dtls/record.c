@@ -5,10 +5,8 @@
 #include <inttypes.h>
 #include "ringbuffer.h"
 #include "sys/socket.h"
+#include "dtls.h"
 #include "record.h"
-#include "common.h"
-
-
 
 
 int dtls_fragment_encrypt(dtls_connection_t *conn, uint8_t* data, size_t size)
@@ -60,7 +58,7 @@ int dtls_fragment_decompress(dtls_connection_t *conn, uint8_t* data, size_t size
 
 int dtls_record_read(dtls_record_t *record, dtls_connection_t *conn, ringbuffer_t* rb)
 {
-    size_t len;
+    int len;
 
     // Copy Header
     if (rb->avail < DTLS_RECORD_HEADER_SIZE)
@@ -97,38 +95,27 @@ int dtls_record_receive_raw(dtls_connection_t *conn, void *buffer,
 }
 
 
-int dtls_record_listen(dtls_connection_t *conn, dtls_record_cb_t cb)
+int dtls_record_receive(dtls_connection_t *conn, ringbuffer_t *rb, dtls_record_t *record)
 {
-    uint8_t buffer[DTLS_RECORD_HEADER_SIZE];
-    ringbuffer_t rb;
+    uint8_t buffer[DTLS_RECORD_LISTEN_BUFFER_SIZE];
     int recv_size, size;
-    dtls_record_t record = {DTLS_RECORD_HEADER_INIT, buffer};
 
     if (conn->socket < 0)
       return -1;
 
-    ringbuffer_init(&rb, buffer, DTLS_LISTEN_BUFFER_SIZE);
-
-    while (1)
-    {
-        recv_size = dtls_record_receive_raw(conn, buffer, DTLS_LISTEN_BUFFER_SIZE);
-        if (recv_size < 0) {
-            printf("ERROR: recsize < 0!\n");
-        }
-
-        ringbuffer_add(&rb, buffer, recv_size);
-
-        size = dtls_record_read(&record, conn, &rb);
-        if (size < 0)
-            continue;
-
-        if(cb(conn, &record) < 0)
-            return 0;
+    recv_size = dtls_record_receive_raw(conn, buffer, DTLS_RECORD_LISTEN_BUFFER_SIZE);
+    if (recv_size < 0) {
+        printf("ERROR: recsize < 0!\n");
     }
+
+    ringbuffer_add(rb, buffer, recv_size);
+    size = dtls_record_read(record, conn, rb);
+
+    return size;
 }
 
 
-int dtls_record_init(uint8_t* buffer, tls_content_type_t type,
+int dtls_record_write(uint8_t* buffer, tls_content_type_t type,
       dtls_connection_t* conn, uint8_t *fragment, size_t size)
 {
     dtls_record_header_t *header = (dtls_record_header_t*) buffer;
@@ -167,7 +154,7 @@ int dtls_record_send(dtls_connection_t *conn, tls_content_type_t type,
     int len;
 
     // DTLSPlaintext - Setup Header and copy data
-    if (dtls_record_init(buffer, type, conn, data, size) < 0)
+    if (dtls_record_write(buffer, type, conn, data, size) < 0)
         return DTLS_RECORD_ERR_INIT;
 
     // DTLSCompressed - Compression
@@ -183,7 +170,6 @@ int dtls_record_send(dtls_connection_t *conn, tls_content_type_t type,
     if (dtls_send_raw(conn, buffer, len+DTLS_RECORD_HEADER_SIZE) < 0)
         return DTLS_RECORD_ERR_SEND;
 
-    dtls_record_print(buffer);
     printf("TLS RECORD LAYER: Sent %d Bytes\n\n", len);
 
     ++conn->sequence_number;
@@ -213,20 +199,17 @@ int dtls_record_stream_send(dtls_connection_t *conn, tls_content_type_t type,
 }
 
 
-void dtls_record_print(uint8_t *data)
+void dtls_record_print(dtls_record_t *record)
 {
-    dtls_record_header_t *header = (dtls_record_header_t*) data;
-    size_t size = header->length + DTLS_RECORD_HEADER_SIZE;
-
     printf("TLS RECORD PACKET\n");
     printf("\tHeader:\n");
-    printf("\t\tType: %d\n", header->type);
-    printf("\t\tVersion: %d %d\n", header->version.major, header->version.minor);
-    printf("\t\tEpoch: %d\n", header->epoch);
-    printf("\t\tSequence: %d\n", header->sequence_number.uint64);
-    printf("\t\tLength: %d\n", header->length);
+    printf("\t\tType: %d\n", record->header.type);
+    printf("\t\tVersion: %d %d\n", record->header.version.major, record->header.version.minor);
+    printf("\t\tEpoch: %d\n", record->header.epoch);
+    printf("\t\tSequence: %d\n", record->header.sequence_number.uint64);
+    printf("\t\tLength: %d\n", record->header.length);
     printf("\tFragment:\n");
 
-    for (uint32_t i=DTLS_RECORD_HEADER_SIZE; i < size; ++i)
-        printf("\t\t%d: %d (%X)\n", i, data[i], data[i]);
+    for (uint32_t i=0; i < record->header.length; ++i)
+        printf("\t\t%d: %d (%X)\n", i, record->fragment[i], record->fragment[i]);
 }

@@ -18,10 +18,21 @@
 
 #include <stdint.h>
 #include <sys/socket.h>
-#include "common.h"
 
 
 #define DTLS_OK 0
+
+/**
+ * basic stdint types
+ */
+
+typedef struct __attribute__((packed)) {
+    uint32_t uint32:24;
+} uint24_t;
+
+typedef struct __attribute__((packed)) {
+    uint64_t uint64:48;
+} uint48_t;
 
 
 /**
@@ -169,7 +180,14 @@ typedef struct __attribute__((packed)) dtls_connection_st {
   uint64_t sequence_number;  // is 48bit but we use 64bit for math operations
 } dtls_connection_t;
 
+
+typedef int (*dtls_listen_cb_t)(dtls_connection_t *conn, uint8_t *data, size_t size);
+
 #define DTLS_CONNECTION_INIT {0,0,-1,{0},0,0}
+
+int dtls_connect(dtls_connection_t *conn, char *addr, uint32_t port);
+int dtls_listen(uint32_t port, dtls_listen_cb_t cb);
+int dtls_close(dtls_connection_t *conn);
 
 #endif
 /**

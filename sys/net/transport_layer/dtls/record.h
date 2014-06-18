@@ -21,7 +21,7 @@
 #define DTLS_RECORD_MAX_SIZE 16384  /* 2^14 */
 #define TLS_PLAINTEXT_MAX_SIZE 16384
 #define DTLS_RECORD_HEADER_SIZE 13 /* in bytes */
-#define DTLS_LISTEN_BUFFER_SIZE 32
+#define DTLS_RECORD_LISTEN_BUFFER_SIZE 32
 
 #define DTLS_RECORD_ERR_INIT -2
 #define DTLS_RECORD_ERR_LENGTH -3
@@ -60,8 +60,6 @@ int dtls_record_send(dtls_connection_t *conn, tls_content_type_t type,
 
 int dtls_record_stream_send(dtls_connection_t *conn, tls_content_type_t type, 
     uint8_t* input, size_t size);
-
-void dtls_record_print(uint8_t *data);
 
 #endif
 /**
