@@ -35,17 +35,18 @@
 
 #define IF_ID   (0)
 #define SERVER_PORT 8443
-#define BUFFER_SIZE     (128)
 
-char server_stack_buffer[KERNEL_CONF_STACKSIZE_MAIN];
-
+static char server_stack_buffer[KERNEL_CONF_STACKSIZE_MAIN];
+static char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 int listen_callback(dtls_connection_t *conn, uint8_t *data, size_t size)
 {
-    (void) conn;
-    (void) data;
+    // ip address
+    inet_ntop(AF_INET6, &conn->socket_addr.sin6_addr, addr_str,
+            IPV6_MAX_ADDR_STR_LEN);
+    printf("GOT DATA from %s\n", addr_str);
 
-    printf("GOT DATA\n");
+    // data
     for (size_t i=0; i < size; ++i)
         printf("\t%d: %d (%X)\n", i, data[i], data[i]);
 
@@ -64,7 +65,6 @@ void shell_cmd_init(int argc, char **argv)
     int server_thread_pid;
     ipv6_addr_t ipaddr;
     net_if_addr_t *addr_ptr = NULL;
-    char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
     (void) argc;
     (void) argv;
@@ -105,7 +105,7 @@ void shell_cmd_init(int argc, char **argv)
 void shell_cmd_send(int argc, char **argv)
 {
     dtls_connection_t conn = DTLS_CONNECTION_INIT;
-    uint8_t buffer[BUFFER_SIZE];
+    uint8_t buffer[32];
     int size;
 
 
