@@ -1,22 +1,22 @@
 /*
-* Copyright (C) 2014 Hamburg University of Applied Sciences
-*
-* This file is subject to the terms and conditions of the GNU Lesser General
-* Public License. See the file LICENSE in the top level directory for more
-* details.
-*/
+ * Copyright (C) 2014 Hamburg University of Applied Sciences
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
 
 /**
-* @ingroup tests
-* @{
-*
-* @file
-* @brief riot thread test application
-*
-* @author Raphael Hiesgen <raphael.hiesgen@haw-hamburg.de>
-*
-* @}
-*/
+ * @ingroup tests
+ * @{
+ *
+ * @file
+ * @brief riot thread test application
+ *
+ * @author Raphael Hiesgen <raphael.hiesgen@haw-hamburg.de>
+ *
+ * @}
+ */
 
 #include <stdio.h>
 #include <inttypes.h>

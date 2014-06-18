@@ -1,22 +1,22 @@
 /*
-* Copyright (C) 2014 Freie Universität Berlin
-*
-* This file is subject to the terms and conditions of the GNU Lesser General
-* Public License. See the file LICENSE in the top level directory for more
-* details.
-*/
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
 
 /**
-* @ingroup tests
-* @{
-*
-* @file
-* @brief pthread_barrier test
-*
-* @author René Kijewski <rene.kijewski@fu-berlin.de>
-*
-* @}
-*/
+ * @ingroup tests
+ * @{
+ *
+ * @file
+ * @brief pthread_barrier test
+ *
+ * @author René Kijewski <rene.kijewski@fu-berlin.de>
+ *
+ * @}
+ */
 
 #include <stdio.h>
 

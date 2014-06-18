@@ -6,7 +6,8 @@
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
- * details. */
+ * details.
+ */
 
 /**
  * @ingroup     board_z1
