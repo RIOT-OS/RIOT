@@ -154,7 +154,7 @@ buildsizes-diff:
 	done;
 
 buildinfo:
-	@echo 'PROJECT: $(PROJECT)'
+	@echo 'APPLICATION: $(APPLICATION)'
 	@echo 'BOARD:   $(BOARD)'
 	@echo 'CPU:     $(CPU)'
 	@echo 'MCU:     $(MCU)'
