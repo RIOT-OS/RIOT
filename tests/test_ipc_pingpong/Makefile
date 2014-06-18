@@ -1,4 +1,4 @@
-PROJECT = test_ipc_pingpong
+APPLICATION = test_ipc_pingpong
 include ../Makefile.tests_common
 
 DISABLE_MODULE += auto_init
