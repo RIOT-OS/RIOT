@@ -8,7 +8,7 @@ ED = $(USEMODULE:%=-DMODULE_%)
 ED += $(USEPKG:%=-DMODULE_%)
 EXTDEFINES = $(shell echo $(sort $(ED))|tr 'a-z' 'A-Z')
 REALMODULES = $(filter-out $(PSEUDOMODULES), $(sort $(USEMODULE)))
-export BASELIBS = $(REALMODULES:%=$(BINDIR)%.a)
+export BASELIBS += $(REALMODULES:%=$(BINDIR)%.a)
 
 CFLAGS += $(EXTDEFINES)
 

@@ -87,7 +87,7 @@ export HEXFILE ?= $(ELFFILE:.elf=.hex)
 
 ## make script for your application. Build RIOT-base here!
 all: ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
-	"$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
+	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
 	$(AD)$(LINK) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
