@@ -153,7 +153,7 @@ void sigio_child()
 {
     pid_t parent = _native_pid;
 
-    if ((sigio_child_pid = fork()) == -1) {
+    if ((sigio_child_pid = real_fork()) == -1) {
         err(EXIT_FAILURE, "sigio_child: fork");
     }
 
