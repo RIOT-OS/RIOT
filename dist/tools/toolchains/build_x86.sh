@@ -19,9 +19,8 @@ NEWLIB_CONFIGURE_FLAGS=(
     --enable-multilib
 
     --enable-target-optspace
-    --enable-lto
     --disable-newlib-supplied-syscalls
-    --enable-newlib-reent-small
+    --disable-newlib-reent-small
     --enable-newlib-io-long-long
     --enable-newlib-io-float
     --enable-newlib-io-pos-args
@@ -48,6 +47,9 @@ newlib/libc/stdlib/mallocr.c
 3400,3404d
 3357,3370d
 3278,3355d
+2129c
+#if defined (DEFINE_MALLOC) && !defined (MALLOC_PROVIDED)
+.
 1764,1898d
 388d
 384,386d
@@ -56,15 +58,33 @@ newlib/libc/stdlib/mallocr.c
 newlib/libc/stdlib/mlock.c
 '63,64d
 1d'
+
+newlib/libc/include/stdio.h
+'681,683d
+658,668d
+616,645c
+int _EXFUN(__sputc_r, (struct _reent *, int, FILE *));
+.'
+
+newlib/libc/stdio/putc.c
+"91a
+int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
+    if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\\n'))
+        return (*_p->_p++ = _c);
+    else
+        return (__swbuf_r(_ptr, _c, _p));
+}
+
+."
 )
 NEWLIB_TARGET_CFLAGS=(
     -DREENTRANT_SYSCALLS_PROVIDED
     -DMALLOC_PROVIDED
     -DSIGNAL_PROVIDED
+    -DPREFER_SIZE_OVER_SPEED
 
     -ggdb3
     -Os
-    -flto
     -fomit-frame-pointer
     -ffunction-sections
     -fdata-sections
@@ -83,7 +103,6 @@ GCC_CONFIGURE_FLAGS=(
     --enable-multilib
     --enable-languages="c,c++"
     --with-newlib
-    #--enable-lto
     --disable-libssp
     --with-headers=${BUILDDIR}/newlib-${NEWLIB_VER}/newlib/libc/include
     --enable-obsolete
@@ -98,7 +117,6 @@ BINUTILS_CONFIGURE_FLAGS=(
 
     --enable-interwork
     --enable-multilib
-    #--enable-lto
     --disable-nls
 )
 
@@ -194,9 +212,16 @@ build_newlib() {
     [[ -e .newlib_built ]] && return
 
     rm -rf newlib-build && mkdir -p newlib-build && cd newlib-build &&
-    CFLAGS="${CFLAGS} -DREENTRANT_SYSCALLS_PROVIDED -DMALLOC_PROVIDED" \
-    ../newlib-${NEWLIB_VER}/configure "${NEWLIB_CONFIGURE_FLAGS[@]}"
-    make ${MAKE_THREADS} TARGET_CFLAGS="${NEWLIB_TARGET_CFLAGS[*]}" all &&
+
+    CFLAGS="${NEWLIB_TARGET_CFLAGS[*]}" \
+    CXXFLAGS="${NEWLIB_TARGET_CFLAGS[*]}" \
+    CFLAGS_FOR_TARGET="${NEWLIB_TARGET_CFLAGS[*]}" \
+    CXXFLAGS_FOR_TARGET="${NEWLIB_TARGET_CFLAGS[*]}" \
+    ../newlib-${NEWLIB_VER}/configure "${NEWLIB_CONFIGURE_FLAGS[@]}" &&
+    sed -i ./Makefile -e '/C\(XX\)\?FLAGS_FOR_TARGET = -g /d' &&
+
+    make ${MAKE_THREADS} all &&
+
     make install &&
 
     cd ${BUILDDIR} &&
