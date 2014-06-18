@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup  core_util
+ * @ingroup     cortex-m3_common
  * @{
  *
  * @file        crash.c
