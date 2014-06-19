@@ -3,6 +3,7 @@ ifeq (, $(__RIOTBUILD_FLAG))
 endif
 
 unexport DIRS
+DIRS := $(abspath ${DIRS})
 
 MODULE ?= $(shell basename $(CURDIR))
 
@@ -43,7 +44,7 @@ $(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ) ${DIRS:%=ALL--%}
 # compile and generate dependency info
 $(BINDIR)$(MODULE)/%.o: %.c
 	@mkdir -p $(BINDIR)$(MODULE)
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $(BINDIR)$(MODULE)/$*.o $*.c
+	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $(BINDIR)$(MODULE)/$*.o $(abspath $*.c)
 
 $(BINDIR)$(MODULE)/%.o: %.s
 	@mkdir -p $(BINDIR)$(MODULE)
@@ -51,4 +52,4 @@ $(BINDIR)$(MODULE)/%.o: %.s
 
 $(BINDIR)$(MODULE)/%.o: %.S
 	@mkdir -p $(BINDIR)$(MODULE)
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $(BINDIR)$(MODULE)/$*.o $*.S
+	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $(BINDIR)$(MODULE)/$*.o $(abspath $*.S)
