@@ -82,7 +82,7 @@ enum lpm_mode lpm_set(enum lpm_mode target)
     case LPM_OFF:
         /* MCU totally down (LPM4), only RESET or NMI can resume execution */
         __bis_status_register(CPUOFF | OSCOFF | SCG0 | SCG1);
-                              /* all blocks off */
+                               /* all blocks off */
         break;
     default:
         printf("ERROR: trying to set an invalid low-power mode!\n");

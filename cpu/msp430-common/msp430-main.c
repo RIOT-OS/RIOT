@@ -170,6 +170,7 @@ splhigh_(void)
 void
 splx_(int sr)
 {
+    sr &= GIE;
     /* If GIE was set, restore it. */
     asmv("bis %0, r2" : : "r"(sr));
     asmv("nop");
