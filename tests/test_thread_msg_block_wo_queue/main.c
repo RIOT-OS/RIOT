@@ -59,4 +59,5 @@ int main(void)
     msg_receive(&msg);
 
     printf("MAIN THREAD %u ALIVE!\n", p_main);
+    return 0;
 }

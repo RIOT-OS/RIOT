@@ -82,4 +82,5 @@ int main(void)
     p3 = thread_create(t3_stack, KERNEL_CONF_STACKSIZE_PRINTF, PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST, thread3, "nr3");
     puts("THREADS CREATED\n");
+    return 0;
 }

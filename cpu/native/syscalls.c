@@ -60,6 +60,7 @@ int (*real_fork)(void);
 int (*real_dup2)(int, int);
 int (*real_unlink)(const char *);
 int (*real_execve)(const char *, char *const[], char *const[]);
+int (*real_pause)(void);
 
 void _native_syscall_enter(void)
 {

@@ -1144,6 +1144,8 @@ void recv_nbr_sol(void)
                             }
                         }
                     }
+
+                    (void) aro_state;
                 }
 
                 break;

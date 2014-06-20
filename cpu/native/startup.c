@@ -205,6 +205,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     *(void **)(&real_dup2) = dlsym(RTLD_NEXT, "dup2");
     *(void **)(&real_unlink) = dlsym(RTLD_NEXT, "unlink");
     *(void **)(&real_execve) = dlsym(RTLD_NEXT, "execve");
+    *(void **)(&real_pause) = dlsym(RTLD_NEXT, "pause");
 
     _native_argv = argv;
     _progname = argv[0];
