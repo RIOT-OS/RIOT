@@ -11,6 +11,7 @@ TMP="${CHECKROOT}/.tmp"
 ROOT=$(git rev-parse --show-toplevel)
 LICENSES=$(ls "${LICENSEDIR}")
 EXIT_CODE=0
+BRANCH="${1}"
 
 # reset output dir
 rm -fr "${OUTPUT}"
@@ -19,8 +20,15 @@ for LICENSE in ${LICENSES}; do
     echo -n '' > "${OUTPUT}/${LICENSE}"
 done
 
+# select files to check
+if [ -z "${BRANCH}" ]; then
+    FILES="$(git ls-tree -r --full-tree --name-only HEAD | grep -E '\.[sSc]$')"
+else
+    FILES="$(git diff --diff-filter=ACMR --name-only ${BRANCH} | grep -E '\.[sSc]$')"
+fi
+
 # categorize files
-for FILE in $(git ls-tree -r --full-tree --name-only HEAD | grep -E '\.[sSc]$'); do
+for FILE in ${FILES}; do
     FAIL=1
     head -100 "${ROOT}/${FILE}" | sed -e 's/[\/\*\t]/ /g' -e 's/$/ /' | tr -d '\r\n' | sed -e 's/  */ /g' > "${TMP}"
     for LICENSE in ${LICENSES}; do
@@ -32,6 +40,7 @@ for FILE in $(git ls-tree -r --full-tree --name-only HEAD | grep -E '\.[sSc]$');
     done
     if [ ${FAIL} = 1 ]; then
         echo "${FILE}" >> "${UNKNOWN}"
+        echo "file has an unknown license header: '${FILE}'"
         EXIT_CODE=1
     fi
 done

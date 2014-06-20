@@ -16,10 +16,12 @@ install:
     - sudo apt-get install gcc-multilib
     - sudo apt-get install gcc-arm-none-eabi
     - sudo apt-get install gcc-msp430
+    - sudo apt-get install pcregrep libpcre3
 
 script:
     - ./dist/tools/compile_test/compile_test.py
     - make -C ./tests/unittests term
+    - ./dist/tools/licenses/check.sh master
 
 notifications:
     email: false
