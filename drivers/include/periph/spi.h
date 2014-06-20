@@ -14,7 +14,9 @@
  * @file
  * @brief       Low-level SPI peripheral driver interface definitions
  *
- * TODO: optimize interface for master AND slave usage, interface is focused on master mode so far...
+ * The current design of this interface targets implementations that use the SPI in blocking mode.
+ *
+ * TODO: add means for asynchronous SPI usage
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
@@ -90,7 +92,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed);
  * @return              -1 on undefined SPI device
  * @return              -2 on unavailable speed value
  */
-int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char));
+int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(unsigned int seq, char data));
 
 /**
  * @brief Transfer one byte on the given SPI bus
@@ -115,7 +117,7 @@ int spi_transfer_byte(spi_t dev, char out, char *in);
  * @return              Number of bytes that were transfered
  * @return              -1 on error
  */
-int spi_transfer_bytes(spi_t dev, char *out, char *in, int length);
+int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length);
 
 /**
  * @brief Transfer one byte to/from a given register address
@@ -150,7 +152,7 @@ int spi_transfer_reg(spi_t dev, uint8_t reg, char *out, char *in);
  * @return              Number of bytes that were transfered
  * @return              -1 on error
  */
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, int length);
+int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length);
 
 /**
  * @brief Power on the given SPI device
@@ -171,3 +173,6 @@ int spi_poweron(spi_t dev);
  * @return              -1 on undefined device
  */
 int spi_poweroff(spi_t dev);
+
+#endif /* __SPI_H */
+/** @} */
