@@ -22,6 +22,8 @@
 #define TCB_H_
 
 #include <stdint.h>
+#include <sys/types.h>
+
 #include "queue.h"
 #include "clist.h"
 #include "cib.h"
@@ -53,6 +55,10 @@
 /** @} */
 /** @} */
 
+#ifdef MODULE_POSIX
+struct fd;
+#endif
+
 /**
  * @brief @c tcb_t holds thread's context data.
  */
@@ -74,6 +80,10 @@ typedef struct tcb_t {
     const char *name;           /**< thread's name                  */
     char *stack_start;          /**< thread's stack start address   */
     int stack_size;             /**< thread's stack size            */
+
+#ifdef MODULE_POSIX
+    const struct fd *stdio;
+#endif
 } tcb_t;
 
 #endif /* TCB_H_ */

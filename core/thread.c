@@ -200,6 +200,11 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
     cib_init(&(cb->msg_queue), 0);
     cb->msg_array = NULL;
 
+
+#ifdef MODULE_POSIX
+    cb->stdio = sched_active_thread ? sched_active_thread->stdio : NULL;
+#endif
+
     sched_num_threads++;
 
     DEBUG("Created thread %s. PID: %u. Priority: %u.\n", name, cb->pid, priority);

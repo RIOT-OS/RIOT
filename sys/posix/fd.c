@@ -44,9 +44,16 @@
 
 static fd_t fd_table[FD_MAX - FD_TABLE_OFFSET];
 
-static ssize_t stdio_write(int fd, const void *buf_, size_t n)
+ssize_t default_read(int fd, void *buf, size_t n)
 {
     (void) fd;
+    return uart0_read(buf, n);
+}
+
+ssize_t default_write(int fd, const void *buf_, size_t n)
+{
+    (void) fd;
+
 #if defined (CPU_X86)
     return x86_uart_write(buf_, n);
 #elif defined (CPU_NATIVE)
@@ -76,6 +83,9 @@ static ssize_t stdio_write(int fd, const void *buf_, size_t n)
     return wrote;
 #endif
 }
+
+ssize_t (*fd_default_read)(int fd, void *buf, size_t n) = default_read;
+ssize_t (*fd_default_write)(int fd, const void *buf, size_t n) = default_write;
 
 int fd_new(int internal_fd, const fd_ops_t *internal_ops)
 {
@@ -109,7 +119,12 @@ static fd_t *fd_get(int fd)
 ssize_t read(int fildes, void *buf, size_t n)
 {
     if (fildes == STDIN_FILENO) {
-        return uart0_read(buf, n);
+        const fd_t *stdio = sched_active_thread->stdio;
+        if (stdio && stdio->ops->read) {
+            return stdio->ops->read(stdio->fd, buf, n);
+        }
+
+        return fd_default_read(fildes, buf, n);
     }
 
     fd_t *fd_obj = fd_get(fildes);
@@ -129,7 +144,12 @@ ssize_t read(int fildes, void *buf, size_t n)
 ssize_t write(int fildes, const void *buf, size_t n)
 {
     if ((fildes == STDOUT_FILENO) || (fildes == STDERR_FILENO)) {
-        return stdio_write(fildes, buf, n);
+        const fd_t *stdio = sched_active_thread->stdio;
+        if (stdio && stdio->ops->write) {
+            return stdio->ops->write(stdio->fd, buf, n);
+        }
+
+        return fd_default_write(fildes, buf, n);
     }
 
     fd_t *fd_obj = fd_get(fildes);

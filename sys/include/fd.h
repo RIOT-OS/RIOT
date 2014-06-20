@@ -60,4 +60,14 @@ typedef struct fd {
  */
 int fd_new(int internal_fd, const fd_ops_t *internal_ops);
 
+/**
+ * TODO
+ */
+extern ssize_t (*fd_default_read)(int fd, void *buf, size_t n);
+
+/**
+ * TODO
+ */
+extern ssize_t (*fd_default_write)(int fd, const void *buf, size_t n);
+
 #endif /* FD_H */
