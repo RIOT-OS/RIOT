@@ -103,8 +103,6 @@ void init_transceiver(void)
 
 int main(void)
 {
-    shell_t shell;
-
 #ifdef MODULE_LTC4150
     ltc4150_start();
 #endif
@@ -115,8 +113,6 @@ int main(void)
 
     (void) puts("Welcome to RIOT!");
 
-    shell_init(&shell, NULL, UART0_BUFSIZE, uart0_readc, uart0_putc);
-
-    shell_run(&shell);
+    shell_run(NULL, UART0_BUFSIZE);
     return 0;
 }

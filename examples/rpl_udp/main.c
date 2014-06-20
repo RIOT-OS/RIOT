@@ -48,9 +48,6 @@ int main(void)
     /* start shell */
     net_if_set_src_address_mode(0, NET_IF_TRANS_ADDR_M_SHORT);
 
-    shell_t shell;
-    shell_init(&shell, shell_commands, UART0_BUFSIZE, uart0_readc, uart0_putc);
-
-    shell_run(&shell);
+    shell_run(shell_commands, UART0_BUFSIZE);
     return 0;
 }

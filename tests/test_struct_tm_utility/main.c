@@ -109,11 +109,8 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    shell_t shell;
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, uart0_readc, uart0_putc);
-
     puts("`struct tm` utility shell.");
-    shell_run(&shell);
+    shell_run(shell_commands, SHELL_BUFSIZE);
 
     return 0;
 }

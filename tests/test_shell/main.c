@@ -61,17 +61,9 @@ int main(void)
 {
     puts("test_shell.");
 
-    /* define own shell commands */
-    shell_t shell;
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, uart0_readc, uart0_putc);
-    shell_run(&shell);
-
-    /* or use only system shell commands */
-    /*
-    shell_t sys_shell;
-    shell_init(&sys_shell, NULL, SHELL_BUFSIZE, shell_readc, shell_putchar);
-    shell_run(&sys_shell);
-    */
+    /* define own shell commands, or use only system shell commands */
+    shell_run(shell_commands, SHELL_BUFSIZE);
+    /* shell_run(NULL, SHELL_BUFSIZE); */
 
     return 0;
 }
