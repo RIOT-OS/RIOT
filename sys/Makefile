@@ -91,5 +91,8 @@ endif
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
     DIRS += oneway-malloc
 endif
+ifneq (,$(filter pipe,$(USEMODULE)))
+    DIRS += pipe
+endif
 
 include $(RIOTBASE)/Makefile.base

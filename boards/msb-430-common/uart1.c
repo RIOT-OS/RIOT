@@ -67,10 +67,9 @@ interrupt(USART1RX_VECTOR) usart0irq(void)
         c = U1RXBUF;
     }
 #ifdef MODULE_UART0
-    else if (uart0_handler_pid) {
+    else {
         c = U1RXBUF;
-        uart0_handle_incoming(c);
-        uart0_notify_thread();
+        uart0_handle_incoming(&c, 1);
     }
 #endif
 }

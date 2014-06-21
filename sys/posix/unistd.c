@@ -18,25 +18,6 @@
 #include "fd.h"
 #include "unistd.h"
 
-int close(int fildes)
-{
-    fd_t *fd_obj = fd_get(fildes);
-
-    if (!fd_obj) {
-        errno = EBADF;
-        return -1;
-    }
-
-    if (fd_obj->close(fd_obj->fd) < 0) {
-        errno = EIO;    // EINTR may not occur since RIOT has no signals yet.
-        return -1;
-    }
-
-    fd_destroy(fd_obj->fd);
-
-    return 0;
-}
-
 int usleep(useconds_t useconds)
 {
     timex_t time = timex_set(0, useconds);

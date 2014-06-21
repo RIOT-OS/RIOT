@@ -19,15 +19,21 @@
 
 #include "sys/socket.h"
 
-int flagless_send(int fd, const void *buf, size_t len)
+static ssize_t socket_write(int fd, const void *buf, size_t len)
 {
-    return (int)destiny_socket_send(fd, buf, (uint32_t)len, 0);
+    return (ssize_t) destiny_socket_send(fd, buf, (uint32_t) len, 0);
 }
 
-int flagless_recv(int fd, void *buf, size_t len)
+static ssize_t socket_read(int fd, void *buf, size_t len)
 {
-    return (int)destiny_socket_recv(fd, buf, (uint32_t)len, 0);
+    return (ssize_t) destiny_socket_recv(fd, buf, (uint32_t) len, 0);
 }
+
+static const fd_ops_t socket_fd_ops = {
+    .read = socket_read,
+    .write = socket_write,
+    .close = destiny_socket_close,
+};
 
 int socket(int domain, int type, int protocol)
 {
@@ -38,10 +44,8 @@ int socket(int domain, int type, int protocol)
         return -1;
     }
 
-    return fd_new(internal_socket, flagless_recv, flagless_send,
-                  destiny_socket_close);
+    return fd_new(internal_socket, &socket_fd_ops);
 }
-
 
 #define sock_func_wrapper(func, sockfd, ...) \
     ((fd_get(sockfd)) ? \
@@ -61,8 +65,7 @@ int accept(int socket, struct sockaddr *restrict address,
         return -1;
     }
 
-    return fd_new(res, flagless_recv, flagless_send,
-                  destiny_socket_close);
+    return fd_new(res, &socket_fd_ops);
 }
 
 int bind(int socket, const struct sockaddr *address, socklen_t address_len)

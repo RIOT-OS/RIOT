@@ -34,6 +34,10 @@
 #include "sched.h"
 #include "x86_uart.h"
 
+#ifdef MODULE_UART0
+#   include "board_uart0.h"
+#endif
+
 #include <signal.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -44,17 +48,6 @@ void _exit(int status)
     sched_task_exit();
     UNREACHABLE();
 }
-
-#ifndef MODULE_POSIX
-/* Already defined in /sys/posix/unistd.c */
-
-int close(int fildes)
-{
-    /* TODO */
-    (void) fildes;
-    return -1;
-}
-#endif
 
 pid_t getpid(void)
 {
@@ -93,6 +86,15 @@ off_t lseek(int fildes, off_t offset, int whence)
     return (off_t) -1;
 }
 
+#ifndef MODULE_POSIX
+/* Already defined in /sys/posix/unistd.c */
+
+int close(int fildes)
+{
+    (void) fildes;
+    return -1;
+}
+
 ssize_t read(int fildes, void *buf, size_t nbyte)
 {
     if (nbyte == 0) {
@@ -104,13 +106,13 @@ ssize_t read(int fildes, void *buf, size_t nbyte)
         return -1;
     }
     else if (fildes == STDIN_FILENO) {
+#ifdef MODULE_UART0
+        return uart0_read(buf, nbyte);
+#else
         return x86_uart_read(buf, nbyte);
+#endif
     }
 
-    /* TODO: find appropriate FILE */
-    (void) fildes;
-    (void) buf;
-    (void) nbyte;
     return -1;
 }
 
@@ -128,10 +130,7 @@ ssize_t write(int fildes, const void *buf, size_t nbyte)
         return x86_uart_write(buf, nbyte);
     }
 
-    /* TODO: find appropriate FILE */
-    (void) fildes;
-    (void) buf;
-    (void) nbyte;
     return -1;
 }
 
+#endif /* ifndef MODULE_POSIX */
