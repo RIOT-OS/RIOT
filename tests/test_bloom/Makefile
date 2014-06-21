@@ -7,7 +7,7 @@ BOARD_INSUFFICIENT_RAM := chronos mbed_lpc1768 msb-430 msb-430h redbee-econotag 
 USEMODULE += hashes
 USEMODULE += bloom
 
-PROJDEPS = $(BINDIR)projdeps/sets.h
+APPDEPS = $(BINDIR)projdeps/sets.h
 
 INCLUDES += -I$(BINDIR)projdeps
 
