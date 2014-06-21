@@ -120,7 +120,7 @@ $(RIOTBASE)/pkg/%/Makefile.include::
 # pull in dependency info for *existing* .o files
 -include $(OBJ:.o=.d)
 
-$(BINDIR)$(APPLICATION)/%.o: %.c $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
+$(BINDIR)$(APPLICATION)/%.o: %.c $(APPDEPS) $(USEPKG:%=${BINDIR}%.a)
 	@echo; echo "Compiling.... $*.c"; echo
 	$(AD)mkdir -p "$(dir $@)"
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c "$<" -o "$@"
