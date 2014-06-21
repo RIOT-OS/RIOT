@@ -60,6 +60,19 @@ endif
 # Feature test default CFLAGS and LINKFLAGS for the set compiled.
 include $(RIOTBASE)/Makefile.cflags
 
+# make the RIOT version available to the program
+GIT_STRING := $(shell git describe --always --abbrev=4 --dirty=-`hostname`)
+GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+ifeq ($(strip $(GIT_BRANCH)),master)
+	GIT_VERSION = $(GIT_STRING)
+else
+	GIT_VERSION = $(shell echo $(GIT_STRING) $(GIT_BRANCH) | sed 's/ /-/')
+endif
+ifeq ($(strip $(GIT_VERSION)),)
+	GIT_VERSION := "UNKNOWN"
+endif
+export CFLAGS += -DVERSION=\"$(GIT_VERSION)\"
+
 # the binaries to link
 BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${APPLICATION}.a
