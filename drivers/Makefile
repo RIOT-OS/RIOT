@@ -31,5 +31,8 @@ endif
 ifneq (,$(filter lm75a,$(USEMODULE)))
     DIRS += lm75a
 endif
+ifneq (,$(filter rgbled,$(USEMODULE)))
+    DIRS += rgbled
+endif
 
 include $(RIOTBASE)/Makefile.base
