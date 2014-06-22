@@ -19,23 +19,23 @@
 
 extern cipher_interface_t null_interface;
 
-#ifdef MODULE_CRYPTO_CIPHERS_RC5
+#ifdef MODULE_RC5
 extern cipher_interface_t rc5_interface;
 #endif
 
-#ifdef MODULE_CRYPTO_CIPHERS_3DES
+#ifdef MODULE_3DES
 extern cipher_interface_t tripledes_interface;
 #endif
 
-#ifdef MODULE_CRYPTO_CIPHERS_AES
+#ifdef MODULE_AES
 extern cipher_interface_t aes_interface;
 #endif
 
-#ifdef MODULE_CRYPTO_CIPHERS_TWOFISH
+#ifdef MODULE_TWOFISH
 extern cipher_interface_t twofish_interface;
 #endif
 
-#ifdef MODULE_CRYPTO_CIPHERS_SKIPJACK
+#ifdef MODULE_SKIPJACK
 extern cipher_interface_t skipjack_interface;
 #endif
 
@@ -44,16 +44,16 @@ const cipher_entry_t cipher_list[]= {
 #ifdef MODULE_RC5
     {"RC5-32/12", CIPHER_RC5, &rc5_interface, 32},
 #endif
-#ifdef MODULE_CRYPTO_CIPHERS_3DES
+#ifdef MODULE_3DES
     {"3DES", CIPHER_3DES, &tripledes_interface, 8},
 #endif
-#ifdef MODULE_CRYPTO_CIPHERS_AES
+#ifdef MODULE_AES
     {"AES-128", CIPHER_AES_128, &aes_interface, 16},
 #endif
-#ifdef MODULE_CRYPTO_CIPHERS_TWOFISH
+#ifdef MODULE_TWOFISH
     {"TWOFISH", CIPHER_TWOFISH, &twofish_interface, 16},
 #endif
-#ifdef MODULE_CRYPTO_CIPHERS_SKIPJACK
+#ifdef MODULE_SKIPJACK
     {"SKIPJACK", CIPHER_SKIPJACK, &skipjack_interface, 8},
 #endif
     {NULL, CIPHER_UNKNOWN, NULL, 0}

@@ -51,15 +51,15 @@
  * identity     needs 1  byte                             <br>
  */
 typedef struct {
-#if defined(MODULE_CRYPTO_CIPHERS_RC5)
+#if defined(MODULE_RC5)
     uint8_t context[104];             // supports RC5 and lower
-#elif defined(MODULE_CRYPTO_CIPHERS_3DES)
+#elif defined(MODULE_3DES)
     uint8_t context[24];              // supports ThreeDES and lower
-#elif defined(MODULE_CRYPTO_CIPHERS_AES)
+#elif defined(MODULE_AES)
     uint8_t context[CIPHERS_KEYSIZE]; // supports AES and lower
-#elif defined(MODULE_CRYPTO_CIPHERS_TWOFISH)
+#elif defined(MODULE_TWOFISH)
     uint8_t context[CIPHERS_KEYSIZE]; // supports TwoFish and lower
-#elif defined(MODULE_CRYPTO_CIPHERS_SKIPJACK)
+#elif defined(MODULE_SKIPJACK)
     uint8_t context[20];              // supports SkipJack and lower
 #else
     uint8_t context[1];               // supports null cipher
@@ -89,19 +89,19 @@ typedef struct cipher_interface_st {
 typedef enum {
     CIPHER_UNKNOWN,
     CIPHER_NULL,
-#ifdef MODULE_CRYPTO_CIPHERS_RC5
+#ifdef MODULE_RC5
     CIPHER_RC5,
 #endif
-#ifdef MODULE_CRYPTO_CIPHERS_3DES
+#ifdef MODULE_3DES
     CIPHER_3DES,
 #endif
-#ifdef MODULE_CRYPTO_CIPHERS_AES
+#ifdef MODULE_AES
     CIPHER_AES_128,
 #endif
-#ifdef MODULE_CRYPTO_CIPHERS_TWOFISH
+#ifdef MODULE_TWOFISH
     CIPHER_TWOFISH,
 #endif
-#ifdef MODULE_CRYPTO_CIPHERS_SKIPJACK
+#ifdef MODULE_SKIPJACK
     CIPHER_SKIPJACK
 #endif
 } cipher_id_t;

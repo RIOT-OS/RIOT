@@ -1,3 +1,3 @@
-MODULE = crypto_ciphers_3des
+MODULE = 3des
 
 include $(RIOTBASE)/Makefile.base

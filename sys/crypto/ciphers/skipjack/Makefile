@@ -1,3 +1,3 @@
-MODULE = crypto_ciphers_skipjack
+MODULE = skipjack
 
 include $(RIOTBASE)/Makefile.base

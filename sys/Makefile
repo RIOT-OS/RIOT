@@ -70,26 +70,26 @@ endif
 ifneq (,$(filter bloom,$(USEMODULE)))
     DIRS += bloom
 endif
-ifneq (,$(filter crypto_ciphers,$(USEMODULE)))
-    DIRS += crypto/ciphers
-endif
-ifneq (,$(filter crypto_ciphers_3des,$(USEMODULE)))
+ifneq (,$(filter 3des,$(USEMODULE)))
     DIRS += crypto/ciphers/3des
 endif
-ifneq (,$(filter crypto_ciphers_aes,$(USEMODULE)))
+ifneq (,$(filter aes,$(USEMODULE)))
     DIRS += crypto/ciphers/aes
 endif
-ifneq (,$(filter crypto_ciphers_rc5,$(USEMODULE)))
+ifneq (,$(filter rc5,$(USEMODULE)))
     DIRS += crypto/ciphers/rc5
 endif
-ifneq (,$(filter crypto_hashes_sha256,$(USEMODULE)))
+ifneq (,$(filter sha256,$(USEMODULE)))
     DIRS += crypto/hashes/sha256
 endif
-ifneq (,$(filter crypto_ciphers_skipjack,$(USEMODULE)))
+ifneq (,$(filter skipjack,$(USEMODULE)))
     DIRS += crypto/ciphers/skipjack
 endif
-ifneq (,$(filter crypto_ciphers_twofish,$(USEMODULE)))
+ifneq (,$(filter twofish,$(USEMODULE)))
     DIRS += crypto/ciphers/twofish
+endif
+ifneq (,$(filter crypto_ciphers,$(USEMODULE)))
+    DIRS += crypto/ciphers
 endif
 ifneq (,$(filter crypto_modes,$(USEMODULE)))
     DIRS += crypto/modes
