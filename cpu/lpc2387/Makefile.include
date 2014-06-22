@@ -3,4 +3,4 @@ INCLUDES += -I$(RIOTCPU)/lpc2387/include
 include $(RIOTCPU)/arm_common/Makefile.include
 include $(RIOTCPU)/lpc_common/Makefile.include
 
-export USEMODULE += arm_common lpc_common
+export USEMODULE += arm_common lpc_common periph
