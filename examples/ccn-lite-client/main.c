@@ -25,7 +25,6 @@
 
 #include "msg.h"
 #include "thread.h"
-#include "posix_io.h"
 #include "shell.h"
 #include "board_uart0.h"
 #include "transceiver.h"
@@ -56,8 +55,6 @@ int shell_max_cache_entries, shell_threshold_prefix, shell_threshold_aggregate;
 
 #define SHELL_MSG_BUFFER_SIZE (64)
 msg_t msg_buffer_shell[SHELL_MSG_BUFFER_SIZE];
-
-shell_t shell;
 
 unsigned char big_buf[3 * 1024];
 char small_buf[PAYLOAD_SIZE];
@@ -307,12 +304,8 @@ void riot_ccn_runner(void)
         return;
     }
 
-    puts("posix open");
-    posix_open(uart0_handler_pid, 0);
-    puts("shell init");
-    shell_init(&shell, sc, UART0_BUFSIZE, uart0_readc, uart0_putc);
     puts("shell run");
-    shell_run(&shell);
+    shell_run(sc, UART0_BUFSIZE);
 }
 
 int main(void)

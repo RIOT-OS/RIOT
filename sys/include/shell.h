@@ -47,41 +47,13 @@ typedef struct shell_command_t {
 } shell_command_t;
 
 /**
- * @brief           The internal state of a shell session.
- * @details         Use shell_init() to initialize the datum,
- *                  and shell_run() to run the REPL session.
- */
-typedef struct shell_t {
-    const shell_command_t *command_list; /**< The commandlist supplied to shell_init(). */
-    uint16_t shell_buffer_size;          /**< The maximum line length supplied to shell_init(). */
-    int (*readchar)(void);               /**< The read function supplied to shell_init(). */
-    void (*put_char)(int);               /**< The write function supplied to shell_init(). */
-} shell_t;
-
-/**
- * @brief           Initialize a shell session state.
- * @param[out]      shell               The datum to initialize.
+ * @brief           Start the shell session.
  * @param[in]       shell_commands      Null-terminated list of commands to understand.
  *                                      Supply `NULL` to only feature the default commands.
  * @param           shell_buffer_size   The backing buffer for the command line.
  *                                      Allocated on the stack!
- * @param           read_char           A blocking function that reads one 8-bit character at a time.
- *                                      The valid code range is [0;255].
- *                                      A value of `< 0` denotes a read error.
- * @param           put_char            Function used to print back the last read character.
- *                                      Only valid unsigned chars in [0;255] will be supplied.
- */
-void shell_init(shell_t *shell,
-                const shell_command_t *shell_commands,
-                uint16_t shell_buffer_size,
-                int (*read_char)(void),
-                void (*put_char)(int));
-
-/**
- * @brief           Start the shell session.
- * @param[in]       shell   The session that was previously initialized with shell_init().
  * @returns         This function does not return.
  */
-void shell_run(shell_t *shell) NORETURN;
+void shell_run(const shell_command_t *shell_commands, uint16_t shell_buffer_size) NORETURN;
 
 #endif /* __SHELL_H */

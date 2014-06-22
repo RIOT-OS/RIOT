@@ -32,14 +32,14 @@ static void print_teststart(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
-    printf("[TEST_START]\n");
+    puts("[TEST_START]");
 }
 
 static void print_testend(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
-    printf("[TEST_END]\n");
+    puts("[TEST_END]");
 }
 
 static void print_echo(int argc, char **argv)
@@ -48,21 +48,6 @@ static void print_echo(int argc, char **argv)
         printf("“%s” ", argv[i]);
     }
     puts("");
-}
-
-static int shell_readc(void)
-{
-    char c;
-    int result = posix_read(uart0_handler_pid, &c, 1);
-    if (result != 1) {
-        return -1;
-    }
-    return (unsigned char) c;
-}
-
-static void shell_putchar(int c)
-{
-    putchar(c);
 }
 
 static const shell_command_t shell_commands[] = {
@@ -74,25 +59,11 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
+    puts("test_shell.");
 
-    printf("test_shell.\n");
-
-    board_uart0_init();
-
-    posix_open(uart0_handler_pid, 0);
-
-    /* define own shell commands */
-    shell_t shell;
-    shell_init(&shell, shell_commands, SHELL_BUFSIZE, shell_readc,
-               shell_putchar);
-    shell_run(&shell);
-
-    /* or use only system shell commands */
-    /*
-    shell_t sys_shell;
-    shell_init(&sys_shell, NULL, SHELL_BUFSIZE, shell_readc, shell_putchar);
-    shell_run(&sys_shell);
-    */
+    /* define own shell commands, or use only system shell commands */
+    shell_run(shell_commands, SHELL_BUFSIZE);
+    /* shell_run(NULL, SHELL_BUFSIZE); */
 
     return 0;
 }

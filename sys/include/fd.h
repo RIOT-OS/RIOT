@@ -25,66 +25,49 @@
 #include <sys/types.h>
 #include "cpu.h"
 
-/**
- * File descriptor table.
- */
-typedef struct {
-    /** private status of this fd_t */
-    int __active;
-
-    /** the internal filedescriptor */
-    int fd;
-
+typedef struct fd_ops {
     /**
-     * Read *n* into *buf* from *fd*.  Return the
+     * Read *n* into *buf* from *fd*. Return the
      * number read, -1 for errors or 0 for EOF.
      */
     ssize_t (*read)(int fd, void *buf, size_t n);
 
-    /** Write *n* bytes of *buf* to *fd*.  Return the number written, or -1. */
+    /** Write *n* bytes of *buf* to *fd*. Return the number written, or -1. */
     ssize_t (*write)(int fd, const void *buf, size_t n);
 
     /** Close the file descriptor *fd*. */
     int (*close)(int fd);
+} fd_ops_t;
+
+/**
+ * File descriptor table.
+ */
+typedef struct fd {
+    /** the functions of this filedescriptor */
+    const fd_ops_t *ops;
+
+    /** the internal filedescriptor */
+    int fd;
 } fd_t;
 
 /**
- * @brief   Initializes file descriptors
+ * @brief Creates a new file descriptor.
  *
- * @return  maximum number of available file descriptors.
+ * @param[in] internal_fd RIOT-internal identifier for the new FD.
+ * @param[in] internal_ops Function to operate on the new FD.
+ *
+ * @return 0 on success, -1 otherwise. *errno* is set accordingly.
  */
-int fd_init(void);
+int fd_new(int internal_fd, const fd_ops_t *internal_ops);
 
 /**
- * @brief   Creates a new file descriptor.
- *
- * @param[in] internal_fd       RIOT-internal identifier for the new FD.
- * @param[in] internal_read     Function to read from new FD.
- * @param[in] internal_write    Function to write into new FD.
- * @param[in] internal_close    Function to close new FD.
- *
- * @return  0 on success, -1 otherwise. *errno* is set accordingly.
+ * TODO
  */
-int fd_new(int internal_fd, ssize_t (*internal_read)(int, void *, size_t),
-           ssize_t (*internal_write)(int, const void *, size_t),
-           int (*internal_close)(int));
+extern ssize_t (*fd_default_read)(int fd, void *buf, size_t n);
 
 /**
- * @brief   Gets the file descriptor table entry associated with file
- *          descriptor *fd*.
- *
- * @param[in] fd    A POSIX-like file descriptor.
- *
- * @return  The file descriptor table entry associated with file descriptor
-            *fd* or NULL if there is non.
+ * TODO
  */
-fd_t *fd_get(int fd);
-
-/**
- * @brief   Removes file descriptor table entry associated with *fd* from table.
- *
- * @param[in] fd    A POSIX-like file descriptor.
- */
-void fd_destroy(int fd);
+extern ssize_t (*fd_default_write)(int fd, const void *buf, size_t n);
 
 #endif /* FD_H */

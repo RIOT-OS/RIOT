@@ -108,10 +108,9 @@ static void com_handler(uint8_t irq_num)
                 asm volatile ("pause");
             }
             do {
-                uint8_t c = inb(UART_PORT + RBR);
-                uart0_handle_incoming(c);
+                char c = inb(UART_PORT + RBR);
+                uart0_handle_incoming(&c, 1);
             } while (!is_input_empty());
-            uart0_notify_thread();
             break;
         }
         case IIR_INT_TH:

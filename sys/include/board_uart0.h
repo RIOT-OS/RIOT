@@ -12,16 +12,22 @@
 #ifndef __BOARD_UART0_H
 #define __BOARD_UART0_H
 
-#include "cpu-conf.h"   /* To give user access to UART0_BUFSIZE */
+#include <sys/types.h>
 
-extern int uart0_handler_pid;
+#include "cpu.h"
+#include "cpu-conf.h"
 
-void board_uart0_init(void);
-void uart0_handle_incoming(int c);
-void uart0_notify_thread(void);
+#ifndef UART0_BUFSIZE
+#   define UART0_BUFSIZE (128)
+#endif
 
+size_t uart0_handle_incoming(const char *buf, size_t n);
+
+ssize_t uart0_read(char *buf, size_t n);
 int uart0_readc(void);
+
 void uart0_putc(int c);
 
-/** @} */
 #endif /* __BOARD_UART0_H */
+
+/** @} */

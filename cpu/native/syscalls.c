@@ -147,6 +147,15 @@ void *realloc(void *ptr, size_t size)
     return r;
 }
 
+static inline ssize_t stdio_write(int fd, const void *buf, size_t n)
+{
+#ifdef MODULE_POSIX
+    return write(fd, buf, n);
+#else
+    return _native_write(fd, buf, n);
+#endif
+}
+
 ssize_t _native_read(int fd, void *buf, size_t count)
 {
     ssize_t r;
@@ -173,14 +182,14 @@ ssize_t _native_write(int fd, const void *buf, size_t count)
 #undef putchar
 #endif
 int putchar(int c) {
-    _native_write(STDOUT_FILENO, &c, 1);
+    stdio_write(STDOUT_FILENO, &c, 1);
     return 0;
 }
 
 int puts(const char *s)
 {
     int r;
-    r = _native_write(STDOUT_FILENO, (char*)s, strlen(s));
+    r = stdio_write(STDOUT_FILENO, (char*)s, strlen(s));
     putchar('\n');
     return r;
 }
@@ -221,7 +230,7 @@ int printf(const char *format, ...)
     if ((m = make_message(format, argp)) == NULL) {
         err(EXIT_FAILURE, "malloc");
     }
-    r = _native_write(STDOUT_FILENO, m, strlen(m));
+    r = stdio_write(STDOUT_FILENO, m, strlen(m));
     va_end(argp);
     free(m);
 
@@ -237,7 +246,7 @@ int vprintf(const char *format, va_list argp)
     if ((m = make_message(format, argp)) == NULL) {
         err(EXIT_FAILURE, "malloc");
     }
-    r = _native_write(STDOUT_FILENO, m, strlen(m));
+    r = stdio_write(STDOUT_FILENO, m, strlen(m));
     free(m);
 
     return r;
