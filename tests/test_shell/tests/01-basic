@@ -1,10 +1,15 @@
 #!/usr/bin/expect
 
-set timeout 5
-
 spawn make term
 
-sleep 1
+set timeout 5
+expect {
+    "test_shell" {}
+    timeout { exit 1 }
+}
+
+set timeout 1
+
 send "\n"
 send "\n"
 expect {
