@@ -53,7 +53,8 @@ typedef struct shell_command_t {
  */
 typedef struct shell_t {
     const shell_command_t *command_list; /**< The commandlist supplied to shell_init(). */
-    uint16_t shell_buffer_size;          /**< The maximum line length supplied to shell_init(). */
+    char *buffer;                        /**< The line buffer supplied to shell_init(). */
+    uint16_t buffer_size;                /**< The maximum line length supplied to shell_init(). */
     int (*readchar)(void);               /**< The read function supplied to shell_init(). */
     void (*put_char)(int);               /**< The write function supplied to shell_init(). */
 } shell_t;
@@ -63,25 +64,42 @@ typedef struct shell_t {
  * @param[out]      shell               The datum to initialize.
  * @param[in]       shell_commands      Null-terminated list of commands to understand.
  *                                      Supply `NULL` to only feature the default commands.
- * @param           shell_buffer_size   The backing buffer for the command line.
- *                                      Allocated on the stack!
+ * @param           buffer              The backing buffer for the command line.
+ * @param           buffer_size         The size of shell_buffer.
  * @param           read_char           A blocking function that reads one 8-bit character at a time.
  *                                      The valid code range is [0;255].
  *                                      A value of `< 0` denotes a read error.
  * @param           put_char            Function used to print back the last read character.
  *                                      Only valid unsigned chars in [0;255] will be supplied.
  */
-void shell_init(shell_t *shell,
-                const shell_command_t *shell_commands,
-                uint16_t shell_buffer_size,
-                int (*read_char)(void),
-                void (*put_char)(int));
+static inline void shell_init(shell_t *shell,
+                              const shell_command_t *shell_commands,
+                              char *buffer,
+                              unsigned buffer_size,
+                              int (*read_char)(void),
+                              void (*put_char)(int))
+{
+    shell->command_list = shell_commands;
+    shell->buffer = buffer;
+    shell->buffer_size = buffer_size;
+    shell->readchar = read_char;
+    shell->put_char = put_char;
+}
+
+/**
+ * @brief           The result of shell_run().
+ */
+typedef enum shell_run_result {
+    SHELL_EXIT       = 0x01, /**< The user used the command "exit" to close the shell. */
+    SHELL_READ_ERROR = 0x02, /**< shell_t::readchar returned an error. */
+    SHELL_CTRL_C     = 0x03, /**< The user pressed CTRL+C, CTRL+D, CTRL+Z, or CTRL+\. */
+} shell_run_result_t;
 
 /**
  * @brief           Start the shell session.
  * @param[in]       shell   The session that was previously initialized with shell_init().
- * @returns         This function does not return.
+ * @returns         See shell_run_result.
  */
-void shell_run(shell_t *shell) NORETURN;
+shell_run_result_t shell_run(shell_t *shell);
 
 #endif /* __SHELL_H */

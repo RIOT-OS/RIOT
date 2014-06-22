@@ -89,13 +89,11 @@ static void print_help(const shell_command_t *command_list)
     }
 }
 
-static void handle_input_line(shell_t *shell, char *line)
+static int handle_input_line(shell_t *shell)
 {
-    static const char *INCORRECT_QUOTING = "shell: incorrect quoting";
-
     /* first we need to calculate the number of arguments */
     unsigned argc = 0;
-    char *pos = line;
+    char *pos = shell->buffer;
     int contains_esc_seq = 0;
     while (1) {
         if ((unsigned char) *pos > ' ') {
@@ -106,23 +104,20 @@ static void handle_input_line(shell_t *shell, char *line)
                 do {
                     ++pos;
                     if (!*pos) {
-                        puts(INCORRECT_QUOTING);
-                        return;
+                        return -1;
                     }
                     else if (*pos == '\\') {
                         /* skip over the next character */
                         ++contains_esc_seq;
                         ++pos;
                         if (!*pos) {
-                            puts(INCORRECT_QUOTING);
-                            return;
+                            return -1;
                         }
                         continue;
                     }
                 } while (*pos != quote_char);
                 if ((unsigned char) pos[1] > ' ') {
-                    puts(INCORRECT_QUOTING);
-                    return;
+                    return -1;
                 }
             }
             else {
@@ -133,14 +128,12 @@ static void handle_input_line(shell_t *shell, char *line)
                         ++contains_esc_seq;
                         ++pos;
                         if (!*pos) {
-                            puts(INCORRECT_QUOTING);
-                            return;
+                            return -1;
                         }
                     }
                     ++pos;
                     if (*pos == '"') {
-                        puts(INCORRECT_QUOTING);
-                        return;
+                        return -1;
                     }
                 } while ((unsigned char) *pos > ' ');
             }
@@ -159,13 +152,13 @@ static void handle_input_line(shell_t *shell, char *line)
         }
     }
     if (!argc) {
-        return;
+        return 0;
     }
 
     /* then we fill the argv array */
     char *argv[argc + 1];
     argv[argc] = NULL;
-    pos = line;
+    pos = shell->buffer;
     for (unsigned i = 0; i < argc; ++i) {
         while (!*pos) {
             ++pos;
@@ -201,74 +194,74 @@ static void handle_input_line(shell_t *shell, char *line)
         if (strcmp("help", argv[0]) == 0) {
             print_help(shell->command_list);
         }
+        else if (strcmp("quit", argv[0]) == 0) {
+            return SHELL_EXIT;
+        }
         else {
             puts("shell: command not found.");
         }
     }
+
+    return 0;
 }
 
-static int readline(shell_t *shell, char *buf, size_t size)
+static int readline(shell_t *shell)
 {
-    char *line_buf_ptr = buf;
-    int c;
-
+    unsigned index = 0;
     while (1) {
-        if ((line_buf_ptr - buf) >= ((int) size) - 1) {
+        if (index + 1 >= shell->buffer_size) {
+            puts("shell: command line to long.");
             return -1;
         }
 
-        c = shell->readchar();
+        int c = shell->readchar();
         if (c < 0) {
-            return 1;
+            return SHELL_READ_ERROR;
         }
-        shell->put_char(c);
+        else if (c >= 32) {
+            /* do not print control characters */
+            shell->put_char(c);
+        }
+        else if ((c == 0x03) || (c == 0x04) || (c == 0x1a) || (c == 0x1c)) {
+            /* handle CTRL+C, CTRL+D, CTRL+Z, and CTRL+\, resp. */
+            return SHELL_CTRL_C;
+        }
 
         /* We allow Unix linebreaks (\n), DOS linebreaks (\r\n), and Mac linebreaks (\r). */
         /* QEMU transmits only a single '\r' == 13 on hitting enter ("-serial stdio"). */
         /* DOS newlines are handled like hitting enter twice, but handle_input_line() ignores empty lines. */
         if (c == 10 || c == 13) {
-            *line_buf_ptr = '\0';
+            shell->buffer[index] = '\0';
+            shell->put_char('\r');
+            shell->put_char('\n');
             return 0;
         }
         else {
-            *line_buf_ptr++ = c;
+            shell->buffer[index++] = c;
         }
     }
-
-    return 1;
 }
 
-static inline void print_prompt(shell_t *shell)
+shell_run_result_t shell_run(shell_t *shell)
 {
-    shell->put_char('>');
-    shell->put_char(' ');
-    return;
-}
-
-void shell_run(shell_t *shell)
-{
-    char line_buf[shell->shell_buffer_size];
-
-    print_prompt(shell);
-
-    while (1) {
-        int res = readline(shell, line_buf, sizeof(line_buf));
-
-        if (!res) {
-            handle_input_line(shell, line_buf);
-        }
-
-        print_prompt(shell);
+    for (const char *c = "Type \"quit\" to close the current shell.\r\n"; *c; ++c) {
+        shell->put_char((unsigned char) *c);
     }
-}
 
-void shell_init(shell_t *shell, const shell_command_t *shell_commands,
-                uint16_t shell_buffer_size, int(*readchar)(void), void(*put_char)(int))
-{
-    shell->command_list = shell_commands;
-    shell->shell_buffer_size = shell_buffer_size;
-    shell->readchar = readchar;
-    shell->put_char = put_char;
+    int res;
+    do {
+        shell->put_char('>');
+        shell->put_char(' ');
+
+        res = readline(shell);
+        if (res == 0) {
+            res = handle_input_line(shell);
+            if (res < 0) {
+                puts("shell: incorrect quoting");
+            }
+        }
+    } while (res <= 0);
+    return res;
 }
 
 /** @} */
