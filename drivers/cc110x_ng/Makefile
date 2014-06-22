@@ -1,11 +1,6 @@
-ifneq (,$(filter msb-430h,$(BOARD)))
-	DIRS += spi
-endif
-ifneq (,$(filter msba2,$(BOARD)))
-	DIRS += spi
-endif
-ifneq (,$(filter wsn430-v1_3b,$(BOARD)))
-	DIRS += spi
+DIRS = spi
+ifneq (,$(filter chronos,$(BOARD)))
+	DIRS =
 endif
 
 include $(RIOTBASE)/Makefile.base
