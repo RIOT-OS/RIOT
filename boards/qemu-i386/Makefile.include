@@ -3,5 +3,24 @@ include $(RIOTBOARD)/x86-multiboot-common/Makefile.include
 CFLAGS += -march=i686 -mtune=i686
 CFLAGS += -I$(RIOTBOARD)/qemu-i386/include
 
-TERMPROG = qemu-system-i386 -m 512m -serial stdio -nographic -monitor /dev/null -kernel $(BINDIR)/$(APPLICATION).hex
+TERMPROG = exec $(RIOTBOARD)/qemu-i386/dist/term.py "qemu-system-i386 -m 512m" $(BINDIRBASE) $(HEXFILE)
+
 FLASHER = true
+
+DEBUGGER = $(TERMPROG)
+
+all:
+
+debug-kdbg: DEBUGGER_FLAGS="kdbg -r :1234 -- $(ELFFILE)"
+debug-kdbg: debug
+
+debug-ddd: DEBUGGER_FLAGS="ddd --eval-command='target remote :1234' $(ELFFILE)"
+debug-ddd: debug
+
+debug-tui: DEBUGGER_FLAGS="x-terminal-emulator -e gdb -ex 'target remote :1234' -tui --args $(ELFFILE)"
+debug-tui: debug
+
+debug-gdb: debug
+DEBUGGER_FLAGS = "x-terminal-emulator -e gdb -ex 'target remote :1234' --args $(ELFFILE)"
+
+debug:
