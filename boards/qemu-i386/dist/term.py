@@ -16,12 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import atexit
 import os
 import readline
 import socket
 import signal
 import subprocess
 import sys
+import termios
 import threading
 
 from datetime import datetime
@@ -121,4 +123,7 @@ def main(QEMU, BINDIRBASE, HEXFILE, DEBUGGER=None):
 
 if __name__ == '__main__':
     print("Type 'exit' to exit.")
+
+    atexit.register(termios.tcsetattr, 0, termios.TCSAFLUSH, termios.tcgetattr(0))
+
     sys.exit(main(*sys.argv[1:]))
