@@ -25,27 +25,18 @@ endif
 # Pull in `Makefile.include`s from the test suites:
 -include $(UNIT_TESTS:%=$(RIOTBASE)/tests/unittests/%/Makefile.include)
 
+DIRS += $(UNIT_TESTS)
+BASELIBS += $(UNIT_TESTS:%=$(BINDIR)%.a)
+
 include $(RIOTBASE)/Makefile.include
 
-UNITTEST_LIBS := $(UNIT_TESTS:%=$(BINDIR)%.a)
-
-all: $(UNITTEST_LIBS)
 $(UNIT_TESTS): all
 
-.FORCE:
-
-$(UNITTEST_LIBS): $(BINDIR)%.a: .FORCE
-	"$(MAKE)" -C $(CURDIR)/$*
-
-charEMPTY :=
-charSPACE := $(charEMPTY) $(charEMPTY)
 charCOMMA := ,
 
 ifeq (, $(UNIT_TESTS))
     CFLAGS += -DNO_TEST_SUITES
     $(warning There was no test suite specified!)
 else
-    CFLAGS += -DTEST_SUITES='$(subst $(charSPACE),$(charCOMMA),$(UNIT_TESTS:tests-%=%))'
+    CFLAGS += -DTEST_SUITES='$(subst $() $(),$(charCOMMA),$(UNIT_TESTS:tests-%=%))'
 endif
-
-BASELIBS += $(UNITTEST_LIBS)

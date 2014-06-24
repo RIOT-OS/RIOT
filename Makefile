@@ -1,30 +1,10 @@
-ifeq (, $(__RIOTBUILD_FLAG))
-  all: welcome
+.all:
+
+.PHONY: all doc docclean welcome
+
+all: welcome
 	@echo ""
 	@exit 1
-else
-  all:
-	mkdir -p $(BINDIR)
-	@for i in $(DIRS) ; do "$(MAKE)" -C $$i || exit 1; done ;
-endif
-
-DIRS = $(RIOTCPU)/$(CPU) core drivers sys
-
-ifneq (,$(filter embunit,$(USEMODULE)))
-	DIRS += tests/unittests/embunit/embUnit
-endif
-
-ifneq (,$(filter embunit_textui,$(USEMODULE)))
-	DIRS += tests/unittests/embunit/textui
-endif
-
-.PHONY: all clean doc docclean welcome
-
-clean:
-	@for i in $(DIRS) ; do "$(MAKE)" -C $$i clean || exit 1; done ;
-	-@if [ -d $(BINDIR) ] ; \
-	then rm -rf $(BINDIR) ; \
-	fi
 
 doc:
 	"$(MAKE)" -BC doc/doxygen

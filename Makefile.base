@@ -2,13 +2,25 @@ ifeq (, $(__RIOTBUILD_FLAG))
     $(error You cannot build a module on its own. Use "make" in your application's directory instead.)
 endif
 
+unexport DIRS
+DIRS := $(abspath ${DIRS})
+
 MODULE ?= $(shell basename $(CURDIR))
 
-all: $(BINDIR)$(MODULE).a
-	@for i in $(DIRS); do $(MAKE) -C $$i || exit 1; done;
+.PHONY: all ${DIRS:%=ALL--%} ${DIRS:%=CLEAN--%}
 
-clean::
-	@for i in $(DIRS); do $(MAKE) -C $$i clean; done;
+all: $(BINDIR)$(MODULE).a ..nothing
+
+..nothing:
+	@:
+
+clean:: ${DIRS:%=CLEAN--%}
+
+${DIRS:%=ALL--%}:
+	"$(MAKE)" -C ${@:ALL--%=%}
+
+${DIRS:%=CLEAN--%}:
+	"$(MAKE)" -C ${@:CLEAN--%=%} clean
 
 ASMSRC = $(wildcard *.s)
 ASSMSRC = $(wildcard *.S)
@@ -21,19 +33,18 @@ endif
 OBJ = $(SRC:%.c=$(BINDIR)$(MODULE)/%.o)
 DEP = $(SRC:%.c=$(BINDIR)$(MODULE)/%.d)
 
-$(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ)
+$(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ) ${DIRS:%=ALL--%}
+	@mkdir -p $(BINDIR)$(MODULE)
 	$(AD)$(AR) -rc $(BINDIR)$(MODULE).a $(OBJ) $(ASMOBJ)
 
 # pull in dependency info for *existing* .o files
+# deleted header files will be silently ignored
 -include $(OBJ:.o=.d)
 
-# compile and generate dependency info,
-# prepend path to dependency info file
+# compile and generate dependency info
 $(BINDIR)$(MODULE)/%.o: %.c
 	@mkdir -p $(BINDIR)$(MODULE)
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c $*.c -o $(BINDIR)$(MODULE)/$*.o
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MM $*.c |\
-		sed -e "1s|^|$(BINDIR)$(MODULE)/|" > $(BINDIR)$(MODULE)/$*.d
+	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $(BINDIR)$(MODULE)/$*.o $(abspath $*.c)
 
 $(BINDIR)$(MODULE)/%.o: %.s
 	@mkdir -p $(BINDIR)$(MODULE)
@@ -41,4 +52,4 @@ $(BINDIR)$(MODULE)/%.o: %.s
 
 $(BINDIR)$(MODULE)/%.o: %.S
 	@mkdir -p $(BINDIR)$(MODULE)
-	$(AD)$(CC) -c $(CFLAGS) $*.S -o $(BINDIR)$(MODULE)/$*.o
+	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $(BINDIR)$(MODULE)/$*.o $(abspath $*.S)

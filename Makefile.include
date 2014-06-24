@@ -1,4 +1,4 @@
-# Provide a shallow sanity check. You cannot call `make` in the root directory.
+# Provide a shallow sanity check. You cannot call `make` in a module directory.
 export __RIOTBUILD_FLAG := RIOT
 
 # set undefined variables
@@ -33,12 +33,14 @@ CPUDEF = $(shell echo $(CPU)|tr 'a-z' 'A-Z'|tr '-' '_')
 CFLAGS += -DBOARD_$(BB) -DCPU_$(CPUDEF)
 
 export CFLAGS
+export APPLICATION
 
 export BINDIRBASE ?= $(CURDIR)/bin
 export BINDIR ?= $(abspath $(BINDIRBASE)/$(BOARD))/
 
 ifeq ($(QUIET),1)
 	AD=@
+	MAKEFLAGS += --no-print-directory
 else
 	AD=
 endif
@@ -84,10 +86,8 @@ export ELFFILE ?= $(BINDIR)$(APPLICATION).elf
 export HEXFILE ?= $(ELFFILE:.elf=.hex)
 
 ## make script for your application. Build RIOT-base here!
-all: $(BINDIR)$(APPLICATION).a
-	@echo "Building application $(APPLICATION) for $(BOARD) w/ MCU $(MCU)."
-	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
-	"$(MAKE)" -C $(RIOTBASE)
+all: ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
+	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
 	$(AD)$(LINK) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
@@ -98,14 +98,8 @@ endif
 	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
 endif
 
-# string array of all names of c files in dir
-SRC = $(wildcard *.c)
-
-# string array of all names replaced .c with .o
-OBJ = $(SRC:%.c=${BINDIR}${APPLICATION}/%.o)
-
-$(BINDIR)$(APPLICATION).a: $(OBJ)
-	$(AD)$(AR) -rc $(BINDIR)$(APPLICATION).a $(OBJ)
+..build-message:
+	@echo "Building application $(APPLICATION) for $(BOARD) w/ MCU $(MCU)."
 
 # add extra include paths for packages in $(USEMODULE)
 export USEMODULE_INCLUDES =
@@ -119,7 +113,7 @@ INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    $(OBJ) $(BASELIBS) $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include): clean
+    all $(BASELIBS) $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include): clean
 endif
 
 # include Makefile.includes for packages in $(USEPKG)
@@ -129,14 +123,6 @@ $(RIOTBASE)/pkg/%/Makefile.include::
 .PHONY: $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include)
 
 -include $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include)
-
-# pull in dependency info for *existing* .o files
--include $(OBJ:.o=.d)
-
-$(BINDIR)$(APPLICATION)/%.o: %.c $(APPDEPS) $(USEPKG:%=${BINDIR}%.a)
-	@echo; echo "Compiling.... $*.c"; echo
-	$(AD)mkdir -p "$(dir $@)"
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c "$<" -o "$@"
 
 $(USEPKG:%=${BINDIR}%.a):
 	@mkdir -p ${BINDIR}
