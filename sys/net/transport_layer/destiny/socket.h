@@ -85,7 +85,7 @@ void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
                       tcp_hdr_t *tcp_header, socket_t *tcp_socket);
 void set_tcp_cb(tcp_cb_t *tcp_control, uint32_t rcv_nxt, uint16_t rcv_wnd,
                 uint32_t send_nxt, uint32_t send_una, uint16_t send_wnd);
-int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header);
+int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header, uint8_t tcp_payload_len);
 void switch_tcp_packet_byte_order(tcp_hdr_t *current_tcp_packet);
 int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
              ipv6_hdr_t *temp_ipv6_header, uint8_t flags,

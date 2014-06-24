@@ -408,9 +408,9 @@ void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port,
 }
 
 /* Check for consistent ACK and SEQ number */
-int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header)
+int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header, uint8_t tcp_payload_len)
 {
-    if (IS_TCP_ACK(tcp_header->reserved_flags)) {
+    if (tcp_payload_len == 0) {
         if (tcp_header->ack_nr > (current_tcp_socket->tcp_control.send_nxt)) {
             /* ACK of not yet sent byte, discard */
             return ACK_NO_TOO_BIG;
@@ -798,7 +798,7 @@ int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags)
             current_tcp_socket->tcp_control.send_wnd -= sent_bytes;
 
             if (send_tcp(current_int_tcp_socket, current_tcp_packet,
-                         temp_ipv6_header, 0, sent_bytes) < 0) {
+                         temp_ipv6_header, TCP_ACK, sent_bytes) < 0) {
                 /* Error while sending tcp data */
                 current_tcp_socket->tcp_control.send_nxt -= sent_bytes;
                 current_tcp_socket->tcp_control.send_wnd += sent_bytes;
@@ -1065,7 +1065,6 @@ int destiny_socket_close(int s)
             current_socket->send_pid = thread_getpid();
 
             /* Refresh local TCP socket information */
-            current_socket->socket_values.tcp_control.send_una++;
             current_socket->socket_values.tcp_control.state = TCP_FIN_WAIT_1;
 #ifdef TCP_HC
             current_socket->socket_values.tcp_control.tcp_context.hc_type =
@@ -1073,7 +1072,7 @@ int destiny_socket_close(int s)
 #endif
 
             send_tcp(current_socket, current_tcp_packet, temp_ipv6_header,
-                     TCP_FIN, 0);
+                     TCP_FIN_ACK, 0);
             msg_receive(&m_recv);
             close_socket(current_socket);
             return 1;
