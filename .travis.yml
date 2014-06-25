@@ -18,6 +18,7 @@ install:
     - sudo apt-get install gcc-msp430
     - sudo apt-get install pcregrep libpcre3
     - sudo apt-get install qemu-system-x86 python3
+    - sudo apt-get install g++-multilib
 
 script:
     - ./dist/tools/compile_test/compile_test.py
