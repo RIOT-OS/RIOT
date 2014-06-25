@@ -90,14 +90,19 @@ BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 export ELFFILE ?= $(BINDIR)$(APPLICATION).elf
 export HEXFILE ?= $(ELFFILE:.elf=.hex)
 
+# variables used to complie and link c++
+export CPPMIX ?= $(if $(wildcard *.cpp),1,)
+export CXXUWFLAGS
+export CXXEXFLAGS
+
 ## make script for your application. Build RIOT-base here!
 all: ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
 	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
-	$(AD)$(LINK) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
+	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
 else
-	$(AD)$(LINK) $(UNDEF) -o $(ELFFILE) -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(APPLICATION).map $(LINKFLAGS)
+	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(APPLICATION).map $(LINKFLAGS)
 endif
 	$(AD)$(SIZE) $(ELFFILE)
 	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)

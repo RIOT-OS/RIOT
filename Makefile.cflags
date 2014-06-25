@@ -29,3 +29,6 @@ ifeq ($(shell $(CC) -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-de
 # duplicated parameters don't hurt
 CFLAGS += -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition
 endif
+
+# Unwanted flags for c++
+CXXUWFLAGS += -std=gnu99 -std=c99 -Wstrict-prototypes -Wold-style-definition

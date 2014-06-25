@@ -10,6 +10,7 @@ export ELF = $(BINDIR)$(APPLICATION).elf
 # toolchain:
 export PREFIX =
 export CC ?= $(PREFIX)gcc
+export CXX ?= $(PREFIX)g++
 export AR ?= $(PREFIX)ar
 export AS ?= $(PREFIX)as
 export LINK ?= $(PREFIX)gcc
@@ -30,6 +31,10 @@ ifeq ($(shell uname -m),amd64)
 export CFLAGS += -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
 endif
 endif
+
+# unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
+export CXXUWFLAGS +=
+export CXXEXFLAGS +=
 
 export LINKFLAGS += -m32
 ifeq ($(shell uname -s),FreeBSD)
