@@ -30,8 +30,19 @@ ASMOBJ += $(ASSMSRC:%.S=$(BINDIR)$(MODULE)/%.o)
 ifeq ($(strip $(SRC)),)
 	SRC = $(wildcard *.c)
 endif
-OBJ = $(SRC:%.c=$(BINDIR)$(MODULE)/%.o)
+
+ifeq ($(strip $(SRCXX)),)
+	SRCXX = $(wildcard *.cpp)
+endif
+
+OBJC = $(SRC:%.c=$(BINDIR)$(MODULE)/%.o)
+OBJCXX = $(SRCXX:%.cpp=$(BINDIR)$(MODULE)/%.o)
+
+OBJ = $(OBJC)
+OBJ += $(OBJCXX)
+
 DEP = $(SRC:%.c=$(BINDIR)$(MODULE)/%.d)
+DEP += $(SRCXX:%.cpp=$(BINDIR)$(MODULE)/%.d)
 
 $(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ) ${DIRS:%=ALL--%}
 	@mkdir -p $(BINDIR)$(MODULE)
@@ -45,6 +56,10 @@ $(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ) ${DIRS:%=ALL--%}
 $(BINDIR)$(MODULE)/%.o: %.c
 	@mkdir -p $(BINDIR)$(MODULE)
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $(BINDIR)$(MODULE)/$*.o $(abspath $*.c)
+
+$(BINDIR)$(MODULE)/%.o: %.cpp
+	@mkdir -p $(BINDIR)$(MODULE)
+	$(AD)$(CXX) $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS) $(INCLUDES) -MD -MP -c -o $(BINDIR)$(MODULE)/$*.o $(abspath $*.cpp)
 
 $(BINDIR)$(MODULE)/%.o: %.s
 	@mkdir -p $(BINDIR)$(MODULE)
