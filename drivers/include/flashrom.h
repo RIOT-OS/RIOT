@@ -32,7 +32,7 @@ uint8_t             flashrom_erase(uint8_t *addr);
  *
  * @return          1 on success, 0 otherwise
  */
-uint8_t             flashrom_write(uint8_t *dst, char *src, size_t size);
+uint8_t             flashrom_write(uint8_t *dst, const uint8_t *src, size_t size);
 
 /** @} */
 #endif /* FLASHROM_H */
