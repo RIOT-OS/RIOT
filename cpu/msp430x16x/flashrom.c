@@ -54,7 +54,7 @@ void flashrom_write(uint8_t *dst, uint8_t *src, size_t size)
 
     for (i = size; i > 0; i--) {
         FCTL1 = FWKEY | WRT;
-        *dst = *src;                /* program Flash word */
+        *(dst++) = *(src++);                /* program Flash word */
 
         while (!(FCTL3 & WAIT)) {
             nop();
