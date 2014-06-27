@@ -58,10 +58,10 @@ class SerCmd(cmd.Cmd):
     def default(self, line):
         for tok in line.split(';'):
             tok = self.get_alias(tok)
-            self.ser.write(tok.strip() + "\n")
+            self.ser.write((tok.strip() + "\n").encode("utf-8"))
 
     def do_help(self, line):
-        self.ser.write("help\n")
+        self.ser.write("help\n".encode("utf-8"))
 
     def complete_date(self, text, line, begidx, endidm):
         date = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -130,7 +130,7 @@ class SerCmd(cmd.Cmd):
 def reader(ser, logger):
     output = ""
     while (1):
-        c = ser.read(1)
+        c = ser.read(1).decode("utf-8")
         if c == '\n' or c == '\r':
             logger.info(output)
             output = ""
