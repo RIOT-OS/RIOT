@@ -41,9 +41,6 @@
 
 #define RIOT_CCN_APPSERVER (1)
 #define RIOT_CCN_TESTS (0)
-#define CCNL_DEFAULT_MAX_CACHE_ENTRIES  0   // means: no content caching
-#define CCNL_DEFAULT_THRESHOLD_PREFIX   1
-#define CCNL_DEFAULT_THRESHOLD_AGGREGATE 2
 
 char relay_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
@@ -51,8 +48,6 @@ char relay_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char appserver_stack[KERNEL_CONF_STACKSIZE_MAIN];
 #endif
 int relay_pid, appserver_pid;
-
-int shell_max_cache_entries, shell_threshold_prefix, shell_threshold_aggregate;
 
 #define SHELL_MSG_BUFFER_SIZE (64)
 msg_t msg_buffer_shell[SHELL_MSG_BUFFER_SIZE];
@@ -63,11 +58,9 @@ unsigned char big_buf[3 * 1024];
 char small_buf[PAYLOAD_SIZE];
 
 #if RIOT_CCN_APPSERVER
-static void *appserver_thread(void *arg)
+static void appserver_thread(void)
 {
-    (void) arg;
     ccnl_riot_appserver_start(relay_pid);
-    return NULL;
 }
 
 static void riot_ccn_appserver(int argc, char **argv)
@@ -135,39 +128,59 @@ static void riot_ccn_register_prefix(int argc, char **argv)
     puts("done");
 }
 
-static void *relay_thread(void *arg)
+static void riot_ccn_relay_config(int argc, char **argv)
 {
-    (void) arg;
-    ccnl_riot_relay_start(shell_max_cache_entries, shell_threshold_prefix, shell_threshold_aggregate);
-    return NULL;
-}
-
-static void riot_ccn_relay_start(int argc, char **argv)
-{
-    if (relay_pid) {
-        /* already running */
+    if (!relay_pid) {
+        puts("ccnl stack not running");
         return;
     }
 
     if (argc < 2) {
-        shell_max_cache_entries = CCNL_DEFAULT_MAX_CACHE_ENTRIES;
-    }
-    else {
-        shell_max_cache_entries = atoi(argv[1]);
+        printf("%s: <max_cache_entries>\n", argv[0]);
+        return;
     }
 
-    if (argc < 3) {
-        shell_threshold_prefix = CCNL_DEFAULT_THRESHOLD_PREFIX;
-    }
-    else {
-        shell_threshold_prefix = atoi(argv[2]);
+    msg_t m;
+    m.content.value = atoi(argv[1]);
+    m.type = CCNL_RIOT_CONFIG_CACHE;
+    msg_send(&m, relay_pid, 1);
+}
+
+static void riot_ccn_transceiver_start(int relay_pid)
+{
+    transceiver_init(TRANSCEIVER);
+    int transceiver_pid = transceiver_start();
+    DEBUG("transceiver on thread_id %d...\n", transceiver_pid);
+
+    /* register for transceiver events */
+    uint8_t reg = transceiver_register(TRANSCEIVER, relay_pid);
+    if (reg != 1) {
+        DEBUG("transceiver register failed\n");
     }
 
-    if (argc < 4) {
-        shell_threshold_aggregate = CCNL_DEFAULT_THRESHOLD_AGGREGATE;
+    /* set channel to CCNL_CHAN */
+    msg_t mesg;
+    transceiver_command_t tcmd;
+    int32_t c = CCNL_DEFAULT_CHANNEL;
+    tcmd.transceivers = TRANSCEIVER;
+    tcmd.data = &c;
+    mesg.content.ptr = (char *) &tcmd;
+    mesg.type = SET_CHANNEL;
+    msg_send_receive(&mesg, &mesg, transceiver_pid);
+    if (c == -1) {
+        puts("[transceiver] Error setting/getting channel");
     }
     else {
-        shell_threshold_aggregate = atoi(argv[3]);
+        printf("[transceiver] Got channel: %" PRIi32 "\n", c);
+    }
+}
+
+static void riot_ccn_relay_start(void)
+{
+    if (relay_pid) {
+        DEBUG("ccn-lite relay on thread_id %d...please stop it first!\n", relay_pid);
+        /* already running */
+        return;
     }
 
     relay_pid = thread_create(
@@ -175,6 +188,8 @@ static void riot_ccn_relay_start(int argc, char **argv)
             PRIORITY_MAIN - 2, CREATE_STACKTEST,
             relay_thread, NULL, "relay");
     DEBUG("ccn-lite relay on thread_id %d...\n", relay_pid);
+
+    riot_ccn_transceiver_start(relay_pid);
 }
 
 static void riot_ccn_relay_stop(int argc, char **argv)
@@ -294,12 +309,12 @@ static void riot_ccn_stat(int argc, char **argv)
 }
 
 static const shell_command_t sc[] = {
-    { "ccn", "starts ccn relay", riot_ccn_relay_start },
     { "haltccn", "stops ccn relay", riot_ccn_relay_stop },
     { "interest", "express an interest", riot_ccn_express_interest },
     { "populate", "populate the cache of the relay with data", riot_ccn_populate },
     { "prefix", "registers a prefix to a face", riot_ccn_register_prefix },
     { "stat", "prints out forwarding statistics", riot_ccn_stat },
+    { "config", "changes the runtime config of the ccn lite relay", riot_ccn_relay_config },
 #if RIOT_CCN_APPSERVER
     { "appserver", "starts an application server to reply to interests", riot_ccn_appserver },
 #endif
@@ -310,27 +325,24 @@ static const shell_command_t sc[] = {
     { NULL, NULL, NULL }
 };
 
-void riot_ccn_runner(void)
-{
-    if (msg_init_queue(msg_buffer_shell, SHELL_MSG_BUFFER_SIZE) != 0) {
-        DEBUG("msg init queue failed...abording\n");
-        return;
-    }
-
-    puts("posix open");
-    posix_open(uart0_handler_pid, 0);
-    puts("shell init");
-    shell_init(&shell, sc, UART0_BUFSIZE, uart0_readc, uart0_putc);
-    puts("shell run");
-    shell_run(&shell);
-}
-
 int main(void)
 {
     puts("CCN!");
 
+    if (msg_init_queue(msg_buffer_shell, SHELL_MSG_BUFFER_SIZE) != 0) {
+        DEBUG("msg init queue failed...abording\n");
+        return -1;
+    }
+
+    riot_ccn_relay_start();
+
     puts("starting shell...");
-    riot_ccn_runner();
+    puts("  posix open");
+    posix_open(uart0_handler_pid, 0);
+    puts("  shell init");
+    shell_init(&shell, sc, UART0_BUFSIZE, uart0_readc, uart0_putc);
+    puts("  shell run");
+    shell_run(&shell);
 
     return 0;
 }

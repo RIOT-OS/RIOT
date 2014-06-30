@@ -93,23 +93,12 @@ ccnl_run_events(void)
 
 int ccnl_open_riotmsgdev(void)
 {
-    /*
-     * nothing to do here, msg system just needs a buffer, and this is
-     * generated staticly
-     */
-    return RIOT_MSG_DEV; /* sock id */
+    return RIOT_MSG_DEV;
 }
 
 int ccnl_open_riottransdev(void)
 {
-
-    transceiver_init(TRANSCEIVER);
-    transceiver_start();
-
-    /** register for transceiver events */
-    transceiver_register(TRANSCEIVER, thread_getpid());
-
-    return RIOT_TRANS_DEV; /* sock id */
+    return RIOT_TRANS_DEV;
 }
 
 void ccnl_ll_TX(struct ccnl_relay_s *ccnl, struct ccnl_if_s *ifc,
@@ -372,6 +361,11 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                     ccnl_face_print_stat(f);
                 }
                 break;
+            case (CCNL_RIOT_CONFIG_CACHE):
+                /* cmd to configure the size of the cache at runtime */
+                ccnl->max_cache_entries = in.content.value;
+                DEBUGMSG(1, "max_cache_entries set to %d\n", ccnl->max_cache_entries);
+                break;
             case (ENOBUFFER):
                 /* transceiver has not enough buffer to store incoming packets, one packet is dropped  */
                 DEBUGMSG(1, "transceiver: one packet is dropped because buffers are full\n");
@@ -393,7 +387,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
  * @param pointer to count transceiver pids
  *
  */
-void ccnl_riot_relay_start(int max_cache_entries, int fib_threshold_prefix, int fib_threshold_aggregate)
+void ccnl_riot_relay_start(void)
 {
     theRelay = calloc(1, sizeof(struct ccnl_relay_s));
     ccnl_get_timeval(&theRelay->startup_time);
@@ -402,11 +396,11 @@ void ccnl_riot_relay_start(int max_cache_entries, int fib_threshold_prefix, int 
 
     DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", theRelay->startup_time.tv_sec, theRelay->startup_time.tv_usec);
     DEBUGMSG(1, "  compile time: %s %s\n", __DATE__, __TIME__);
-    DEBUGMSG(1, "  max_cache_entries: %d\n", max_cache_entries);
-    DEBUGMSG(1, "  threshold_prefix: %d\n", fib_threshold_prefix);
-    DEBUGMSG(1, "  threshold_aggregate: %d\n", fib_threshold_aggregate);
+    DEBUGMSG(1, "  max_cache_entries: %d\n", CCNL_DEFAULT_MAX_CACHE_ENTRIES);
+    DEBUGMSG(1, "  threshold_prefix: %d\n", CCNL_DEFAULT_THRESHOLD_PREFIX);
+    DEBUGMSG(1, "  threshold_aggregate: %d\n", CCNL_DEFAULT_THRESHOLD_AGGREGATE);
 
-    ccnl_relay_config(theRelay, max_cache_entries, fib_threshold_prefix, fib_threshold_aggregate);
+    ccnl_relay_config(theRelay, CCNL_DEFAULT_MAX_CACHE_ENTRIES, CCNL_DEFAULT_THRESHOLD_PREFIX, CCNL_DEFAULT_THRESHOLD_AGGREGATE);
 
     theRelay->riot_helper_pid = riot_start_helper_thread();
 

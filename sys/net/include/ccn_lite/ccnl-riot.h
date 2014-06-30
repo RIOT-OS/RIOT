@@ -40,13 +40,19 @@
 
 #define TRANSCEIVER TRANSCEIVER_DEFAULT
 
+#define CCNL_DEFAULT_CHANNEL 6
+#define CCNL_DEFAULT_MAX_CACHE_ENTRIES  0   /* 0: no content caching, cache is disabled */
+#define CCNL_DEFAULT_THRESHOLD_PREFIX   1
+#define CCNL_DEFAULT_THRESHOLD_AGGREGATE 2
+
 #define CCNL_RIOT_EVENT_NUMBER_OFFSET (1 << 8)
 #define CCNL_RIOT_MSG                 (CCNL_RIOT_EVENT_NUMBER_OFFSET + 0)
 #define CCNL_RIOT_HALT                (CCNL_RIOT_EVENT_NUMBER_OFFSET + 1)
 #define CCNL_RIOT_POPULATE            (CCNL_RIOT_EVENT_NUMBER_OFFSET + 2)
 #define CCNL_RIOT_PRINT_STAT          (CCNL_RIOT_EVENT_NUMBER_OFFSET + 3)
 #define CCNL_RIOT_NACK                (CCNL_RIOT_EVENT_NUMBER_OFFSET + 4)
-#define CCNL_RIOT_RESERVED            (CCNL_RIOT_EVENT_NUMBER_OFFSET + 5)
+#define CCNL_RIOT_CONFIG_CACHE        (CCNL_RIOT_EVENT_NUMBER_OFFSET + 5)
+#define CCNL_RIOT_RESERVED            (CCNL_RIOT_EVENT_NUMBER_OFFSET + 6)
 
 #define CCNL_HEADER_SIZE (40)
 
@@ -66,11 +72,8 @@
  *
  * @note  to stop the relay send msg "RIOT_HALT" to this thread
  *
- * @param max_cache_entries number of slots in the CS
- * @param fib_threshold_prefix conservative value how long a common prefix is (elemnts from behind)
- * @param fib_threshold_aggregate optimistic value how long a common prefix is (elemnts from front)
  */
-void ccnl_riot_relay_start(int max_cache_entries, int fib_threshold_prefix, int fib_threshold_aggregate);
+void ccnl_riot_relay_start(void);
 
 /**
  * @brief  starts an appication server, which can repy to ccn interests
