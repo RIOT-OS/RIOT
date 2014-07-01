@@ -60,14 +60,14 @@ void thread_print_all(void)
             const char *queued = &queued_name[(int)(state >= STATUS_ON_RUNQUEUE)]; // get queued flag
             int stacksz = p->stack_size;                                           // get stack size
 #if SCHEDSTATISTICS
-            double runtime_ticks =  sched_pidlist[i].runtime_ticks / (double) hwtimer_now() * 100;
+            int runtime_ticks = sched_pidlist[i].runtime_ticks / (hwtimer_now()/1000UL + 1);
             int switches = sched_pidlist[i].schedules;
 #endif
             overall_stacksz += stacksz;
             stacksz -= thread_measure_stack_free(p->stack_start);
             printf("\t%3u | %-21s| %-8s %.1s | %3i | %5i (%5i) %p"
 #if SCHEDSTATISTICS
-                   " | %6.3f%% |  %8d"
+                   " | %4d/1k |  %8d"
 #endif
                    "\n",
                    p->pid, p->name, sname, queued, p->priority, p->stack_size, stacksz, p->stack_start
