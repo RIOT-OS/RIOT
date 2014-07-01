@@ -46,6 +46,8 @@ export AR ?= $(PREFIX)ar
 export AS ?= $(PREFIX)as
 export RANLIB ?= $(PREFIX)ranlib
 export LINK ?= $(RIOTBASE)/boards/x86-multiboot-common/dist/link $(PREFIX)gcc
+# Tell gcc to pass linker-options to ld:
+export LINKFLAGPREFIX = -Wl,
 export SIZE ?= $(PREFIX)size
 export OBJCOPY ?= $(PREFIX)objcopy
 

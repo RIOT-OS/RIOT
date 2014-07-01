@@ -14,6 +14,8 @@ export CXX ?= $(PREFIX)g++
 export AR ?= $(PREFIX)ar
 export AS ?= $(PREFIX)as
 export LINK ?= $(PREFIX)gcc
+# Tell gcc to pass linker-options to ld:
+export LINKFLAGPREFIX = -Wl,
 export SIZE ?= $(PREFIX)size
 export OBJCOPY = true
 

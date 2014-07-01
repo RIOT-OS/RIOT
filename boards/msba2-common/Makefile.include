@@ -10,6 +10,8 @@ export CFLAGS += -O2 -Wall -Wstrict-prototypes -mcpu=arm7tdmi-s -gdwarf-2
 export ASFLAGS = -gdwarf-2 -mcpu=arm7tdmi-s
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
+# Tell gcc to pass linker-options to ld:
+export LINKFLAGPREFIX = -Wl,
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 FLASHER = lpc2k_pgm

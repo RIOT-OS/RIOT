@@ -9,6 +9,8 @@ export CFLAGS += -DUSE_STDPERIPH_DRIVER -ggdb -g3 -O0 -Wall -Wstrict-prototypes 
 export ASFLAGS = -ggdb -g3 -mcpu=cortex-m3 $(FPU_USAGE) -mlittle-endian
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
+# Tell gcc to pass linker-options to ld:
+export LINKFLAGPREFIX = -Wl,
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 #LINKFLAGS =  -g3 -ggdb -mcpu=cortex-m3 $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles -T$(RIOTCPU)/$(CPU)/LPC1768.ld

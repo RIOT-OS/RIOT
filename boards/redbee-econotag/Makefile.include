@@ -15,6 +15,8 @@ $(warning TODO add -mthumb)
 export AFLAGS = -Wa,-gstabs $(CFLAGS)
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
+# Tell gcc to pass linker-options to ld:
+export LINKFLAGPREFIX = -Wl,
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 FLASHER = mc1322x-load.pl
