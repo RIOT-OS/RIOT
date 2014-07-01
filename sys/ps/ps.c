@@ -39,7 +39,6 @@ const char *state_names[] = {
  */
 void thread_print_all(void)
 {
-    extern unsigned long hwtimer_now(void);
     const char queued_name[] = {'_', 'Q'};
     int i;
     int overall_stacksz = 0;
@@ -55,10 +54,10 @@ void thread_print_all(void)
         tcb_t *p = (tcb_t *)sched_threads[i];
 
         if (p != NULL) {
-            int state = p->status;                                                 // copy state
-            const char *sname = state_names[state];                                // get state name
-            const char *queued = &queued_name[(int)(state >= STATUS_ON_RUNQUEUE)]; // get queued flag
-            int stacksz = p->stack_size;                                           // get stack size
+            int state = p->status;                                                 /* copy state */
+            const char *sname = state_names[state];                                /* get state name */
+            const char *queued = &queued_name[(int)(state >= STATUS_ON_RUNQUEUE)]; /* get queued flag */
+            int stacksz = p->stack_size;                                           /* get stack size */
 #if SCHEDSTATISTICS
             int runtime_ticks = sched_pidlist[i].runtime_ticks / (hwtimer_now()/1000UL + 1);
             int switches = sched_pidlist[i].schedules;
