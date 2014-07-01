@@ -11,11 +11,11 @@
 
 int dtls_fragment_encrypt(dtls_connection_t *conn, uint8_t* data, size_t size)
 {
-    (void) conn;
-    (void) data;
+    uint8_t foo[12], block_size;
     (void) size;
 
-    printf("dtls_record_encrypt() not yet implemented\n");
+    //block_size = cipher_get_block_size(&conn->block_size);
+    cipher_encrypt_ecb(&conn->cipher, data, 8, foo);
 
     return size;
 }
@@ -23,11 +23,9 @@ int dtls_fragment_encrypt(dtls_connection_t *conn, uint8_t* data, size_t size)
 
 int dtls_fragment_decrypt(dtls_connection_t *conn, uint8_t* data, size_t size)
 {
-    (void) conn;
-    (void) data;
     (void) size;
 
-    printf("dtls_record_decrypt() not yet implemented\n");
+    cipher_decrypt_ecb(&conn->cipher, data, 8, data);
 
     return size;
 }

@@ -133,6 +133,9 @@ typedef struct {
     cipher_context_t context;
 } cipher_t;
 
+extern cipher_interface_t null_interface;
+#define CIPHER_NULL_INIT {&null_interface, {0}}
+
 
 /**
  * @brief Initialize new cipher state

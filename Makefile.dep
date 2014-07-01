@@ -84,3 +84,8 @@ endif
 ifneq (,$(filter rgbled,$(USEMODULE)))
 	USEMODULE += color
 endif
+
+ifneq (,$(filter dtls,$(USEMODULE)))
+	USEMODULE += crypto_ciphers
+	USEMODULE += crypto_modes
+endif

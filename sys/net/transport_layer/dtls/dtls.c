@@ -17,6 +17,7 @@
 #include "ringbuffer.h"
 #include "record.h"
 #include "dtls.h"
+#include "crypto/ciphers.h"
 
 #define DTLS_LISTEN_BUFFER_SIZE 32
 
@@ -28,6 +29,8 @@ int dtls_listen(uint32_t port, dtls_listen_cb_t cb)
     char buffer[DTLS_LISTEN_BUFFER_SIZE];
     uint8_t *fragment[DTLS_LISTEN_BUFFER_SIZE];
     dtls_record_t record = {{0},fragment};
+
+    status = cipher_init(&conn.cipher, CIPHER_NULL, NULL, 0);
 
     conn.socket  = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
     memset(&conn.socket_addr, 0, sizeof(conn.socket_addr));
@@ -79,6 +82,7 @@ int dtls_connect(dtls_connection_t *conn, char *addr, uint32_t port)
     memcpy(&conn->socket_addr.sin6_addr, &ipv6_addr, 16);
     conn->socket_addr.sin6_port = HTONS(port);
 
+    cipher_init(&conn->cipher, CIPHER_NULL, NULL, 8);
 
     // TODO: add missing handshake HERE
 

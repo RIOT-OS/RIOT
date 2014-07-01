@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #include <sys/socket.h>
+#include "crypto/ciphers.h"
 
 
 #define DTLS_OK 0
@@ -178,12 +179,13 @@ typedef struct __attribute__((packed)) dtls_connection_st {
   sockaddr6_t socket_addr;
   uint16_t epoch;
   uint64_t sequence_number;  // is 48bit but we use 64bit for math operations
+  cipher_t cipher;
 } dtls_connection_t;
 
 
 typedef int (*dtls_listen_cb_t)(dtls_connection_t *conn, uint8_t *data, size_t size);
 
-#define DTLS_CONNECTION_INIT {0,0,-1,{0},0,0}
+#define DTLS_CONNECTION_INIT {0,0,-1,{0},0,0, CIPHER_NULL_INIT}
 
 int dtls_connect(dtls_connection_t *conn, char *addr, uint32_t port);
 int dtls_listen(uint32_t port, dtls_listen_cb_t cb);

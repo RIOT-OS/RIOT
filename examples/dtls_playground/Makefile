@@ -12,7 +12,6 @@ export QUIET ?= 1
 
 USEMODULE += shell
 USEMODULE += shell_commands
-USEMODULE += dtls
 USEMODULE += posix
 USEMODULE += pnet
 USEMODULE += ps
@@ -21,5 +20,7 @@ USEMODULE += defaulttransceiver
 USEMODULE += sixlowpan
 USEMODULE += config
 USEMODULE += destiny
+USEMODULE += dtls
+USEMODULE += crypto_modes
 
 include $(RIOTBASE)/Makefile.include

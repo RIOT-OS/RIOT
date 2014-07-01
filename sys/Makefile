@@ -115,5 +115,8 @@ endif
 ifneq (,$(filter color,$(USEMODULE)))
     DIRS += color
 endif
+ifneq (,$(filter dtls,$(USEMODULE)))
+    DIRS += net/transport_layer/dtls
+endif
 
 include $(RIOTBASE)/Makefile.base
