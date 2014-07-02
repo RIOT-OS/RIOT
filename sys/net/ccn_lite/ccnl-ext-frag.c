@@ -708,6 +708,8 @@ Bail:
 
 #else /* USE_FRAG */
 
+#define CCNL_NO_FRAG_DUMMY
+
 static int dummy __attribute__((unused));
 
 #endif
