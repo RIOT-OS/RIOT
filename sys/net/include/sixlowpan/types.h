@@ -71,6 +71,21 @@ typedef struct __attribute__((packed)) {
 } ipv6_hdr_t;
 
 /**
+ * @brief   Data type to represent an IPv6 source routing header for RPL
+ *
+ * @see [RFC 6554](http://tools.ietf.org/html/rfc6554)
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t nextheader;             /**< type of next header in this packet. */
+    uint8_t hdrextlen;              /**< length of header in 8-octet units. */
+    uint8_t routing_type;           /**< identify srh-variant. */
+    uint8_t segments_left;          /**< remaining route segments before reaching destination. */
+    unsigned int cmpri:4, cmpre:4;  /**< 4+4 bit, expressing prefix octets from each/last segment. */
+    unsigned long pad:4;            /**< number of octets used for padding after adresses. */
+    unsigned long reserved:20;      /**< reserved. Set to 0. */
+} ipv6_srh_t;
+
+/**
  * @brief   Data type to represent an ICMPv6 packet header.
  *
  * @see <a href="http://tools.ietf.org/html/rfc4443">
