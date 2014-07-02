@@ -95,6 +95,7 @@ export CPPMIX ?= $(if $(wildcard *.cpp),1,)
 export CXXUWFLAGS
 export CXXEXFLAGS
 
+LINKFLAGPREFIX ?= -Wl,
 ## make script for your application. Build RIOT-base here!
 all: ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
 	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
