@@ -65,6 +65,7 @@ extern int (*real_fork)(void);
 extern int (*real_dup2)(int, int);
 extern int (*real_unlink)(const char *);
 extern int (*real_execve)(const char *, char *const[], char *const[]);
+extern int (*real_pause)(void);
 
 /**
  * data structures

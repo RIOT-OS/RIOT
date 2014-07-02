@@ -80,7 +80,7 @@ void _native_lpm_sleep(void)
     /* otherwise select was interrupted because of a signal, continue below */
 #else
     _native_in_syscall++; // no switching here
-    pause();
+    real_pause();
     _native_in_syscall--;
 #endif
 

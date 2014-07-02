@@ -55,9 +55,9 @@ typedef struct __attribute__((packed)) {
     uint16_t    dst_port;               ///< destination port
     uint32_t    seq_nr;                 ///< sequence number
     uint32_t    ack_nr;                 ///< acknowledgement number
-    uint8_t     flag_ns         :1;     ///< ECN-nonce concealment protection (since RFC 3540).
-    uint8_t     reserved        :3;     ///< for future use - set to zero
-    uint8_t     data_offset     :4;
+    unsigned    flag_ns         :1;     ///< ECN-nonce concealment protection (since RFC 3540).
+    unsigned    reserved        :3;     ///< for future use - set to zero
+    unsigned    data_offset     :4;
     uint8_t     reserved_flags;         ///< TODO: break this down into another bitfield: flag_fin, flag_syn, etc
     uint16_t    window;                 ///< receiver window
     /**
