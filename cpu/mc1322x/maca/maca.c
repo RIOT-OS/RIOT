@@ -868,7 +868,14 @@ const uint32_t VCODivF[16] = {
 #define ADDR_CHAN3 (ADDR_CHAN1+16)
 #define ADDR_CHAN4 (ADDR_CHAN1+48)
 
-void maca_set_channel ( uint8_t chan ) {
+/*
+ * @brief Sets the radio channel
+ *
+ * @param[in] channel   The channel to be set
+ *
+ * @return The radio channel AFTER calling the set command, -1 on error
+ */
+int32_t maca_set_channel ( uint8_t chan ) {
     volatile uint32_t tmp;
     safe_irq_disable ( INT_NUM_MACA );
 
@@ -896,8 +903,29 @@ void maca_set_channel ( uint8_t chan ) {
     if ( ITC->NIPENDbits.MACA ) {
         ITC->INTFRCbits.MACA = 1;
     }
+    return chan;
 }
 
+/*
+ * @brief Get the radio channel of the device
+ *
+ * @return The current radio channel of the device, -1 on error.
+ *
+ * @note: this function is not implemented yet since retrieving
+ *        the channel is not trivial.
+ */
+int32_t maca_get_channel(void)
+{
+    return -1;
+}
+
+/*
+ * @brief Set the address of the device
+ *
+ * @param[in] address   Address to set
+ *
+ * @return  The radio address of the device
+ */
 radio_address_t maca_set_address (radio_address_t addr) {
     safe_irq_disable ( INT_NUM_MACA );
 
@@ -915,7 +943,14 @@ radio_address_t maca_get_address ( void ) {
     return MACA->MAC16ADDR;
 }
 
-uint16_t maca_set_pan(uint16_t pan)
+/*
+ * @brief Sets the pan for the device
+ *
+ * @param pan   The PAN to be set
+ *
+ * @return The pan AFTER calling the set command.
+ */
+int32_t maca_set_pan(uint16_t pan)
 {
     safe_irq_disable(INT_NUM_MACA);
 
@@ -930,7 +965,12 @@ uint16_t maca_set_pan(uint16_t pan)
     return MACA->MACPANIDbits.PANID;
 }
 
-uint16_t maca_get_pan(void)
+/*
+ * @brief Get the pan for the  device
+ *
+ * @return The current pan of the transceiver.
+ */
+int32_t maca_get_pan(void)
 {
     return MACA->MACPANIDbits.PANID;
 }

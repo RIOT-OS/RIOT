@@ -111,14 +111,14 @@ radio_address_t cc1100_get_address(void);
  *
  * @return	true if address could be set; false otherwise.
  */
-bool cc1100_set_address(radio_address_t address);
+radio_address_t cc1100_set_address(radio_address_t address);
 
 /**
  * @brief	Get the current channel number.
  *
  * @return	The current channel number used.
  */
-uint8_t cc1100_get_channel(void);
+int32_t cc1100_get_channel(void);
 
 /**
  * @brief	Set the channel to use.
@@ -127,7 +127,7 @@ uint8_t cc1100_get_channel(void);
  *
  * @return	true if channel could be set; false otherwise.
  */
-bool cc1100_set_channel(uint8_t channr);
+int32_t cc1100_set_channel(uint8_t channr);
 
 /**
  * @brief	Set current output power in dBm.

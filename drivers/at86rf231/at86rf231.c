@@ -15,7 +15,7 @@
 
 static uint16_t radio_pan;
 static uint8_t  radio_channel;
-static uint16_t radio_address;
+static radio_address_t radio_address;
 static uint64_t radio_address_long;
 
 void at86rf231_init(int tpid)
@@ -90,6 +90,13 @@ void at86rf231_rx_irq(void)
     at86rf231_rx_handler();
 }
 
+/*
+ * @brief Set the address of the device
+ *
+ * @param[in] address   Address to set
+ *
+ * @return  The radio address of the device
+ */
 radio_address_t at86rf231_set_address(radio_address_t address)
 {
     radio_address = address;
@@ -126,7 +133,14 @@ uint64_t at86rf231_get_address_long(void)
     return radio_address_long;
 }
 
-uint16_t at86rf231_set_pan(uint16_t pan)
+/*
+ * @brief Sets the pan for the device
+ *
+ * @param pan   The PAN to be set
+ *
+ * @return The pan AFTER calling the set command, -1 on error
+ */
+int32_t at86rf231_set_pan(uint16_t pan)
 {
     radio_pan = pan;
 
@@ -136,19 +150,31 @@ uint16_t at86rf231_set_pan(uint16_t pan)
     return radio_pan;
 }
 
-uint16_t at86rf231_get_pan(void)
+/*
+ * @brief Get the pan for the  device
+ *
+ * @return The current pan of the transceiver.
+ */
+int32_t at86rf231_get_pan(void)
 {
     return radio_pan;
 }
 
-uint8_t at86rf231_set_channel(uint8_t channel)
+/*
+ * @brief Sets the radio channel
+ *
+ * @param[in] channel   The channel to be set
+ *
+ * @return The radio channel AFTER calling the set command, -1 on error
+ */
+int32_t at86rf231_set_channel(uint8_t channel)
 {
     uint8_t cca_state;
     radio_channel = channel;
 
     if (channel < RF86RF231_MIN_CHANNEL ||
         channel > RF86RF231_MAX_CHANNEL) {
-        radio_channel = RF86RF231_MAX_CHANNEL;
+        return -1;
     }
 
     cca_state = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA) & ~AT86RF231_PHY_CC_CCA_MASK__CHANNEL;
@@ -157,7 +183,12 @@ uint8_t at86rf231_set_channel(uint8_t channel)
     return radio_channel;
 }
 
-uint8_t at86rf231_get_channel(void)
+/*
+ * @brief Get the radio channel of the device
+ *
+ * @return The current radio channel of the device.
+ */
+int32_t at86rf231_get_channel(void)
 {
     return radio_channel;
 }

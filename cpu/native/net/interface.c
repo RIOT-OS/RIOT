@@ -74,24 +74,24 @@ void nativenet_set_monitor(uint8_t mode)
     _native_net_monitor = mode;
 }
 
-int16_t nativenet_set_channel(uint8_t channel)
+int32_t nativenet_set_channel(uint8_t channel)
 {
     _native_net_chan = channel;
     return _native_net_chan;
 }
 
-int16_t nativenet_get_channel(void)
+int32_t nativenet_get_channel(void)
 {
     return _native_net_chan;
 }
 
-uint16_t nativenet_set_pan(uint16_t pan)
+int32_t nativenet_set_pan(uint16_t pan)
 {
     _native_net_pan = pan;
     return _native_net_pan;
 }
 
-uint16_t nativenet_get_pan(void)
+int32_t nativenet_get_pan(void)
 {
     return _native_net_pan;
 }

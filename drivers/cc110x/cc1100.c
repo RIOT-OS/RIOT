@@ -106,9 +106,9 @@ static int8_t pa_table_dBm[] = {			///< Values of the PATABLE in dBm
 //					Main radio data structures
 /*---------------------------------------------------------------------------*/
 
-volatile cc1100_flags rflags;		///< Radio control flags
-static uint8_t radio_address;		///< Radio address
-static uint8_t radio_channel;		///< Radio channel number
+volatile cc1100_flags rflags;               ///< Radio control flags
+static radio_address_t radio_address;       ///< Radio address
+static uint8_t radio_channel;               ///< Radio channel number
 
 const radio_t radio_cc1100 = {		///< Radio driver API
     "CC1100",
@@ -683,21 +683,33 @@ char *cc1100_get_output_power(char *buf)
     return buf;
 }
 
-uint8_t cc1100_get_channel(void)
+/*
+ * @brief Get the radio channel of the device
+ *
+ * @return The current radio channel of the device.
+ */
+int32_t cc1100_get_channel(void)
 {
     return radio_channel;
 }
 
-bool
-cc1100_set_channel(uint8_t channr)
+/*
+ * @brief Sets the radio channel
+ *
+ * @param[in] channr   The channel to be set
+ *
+ * @return The radio channel AFTER calling the set command, -1 on error
+ */
+
+int32_t cc1100_set_channel(uint8_t channr)
 {
     if (channr > MAX_CHANNR) {
-        return false;
+        return -1;
     }
 
     write_register(CC1100_CHANNR, channr * 10);
     radio_channel = channr;
-    return true;
+    return radio_channel;
 }
 
 bool
@@ -860,20 +872,27 @@ radio_address_t cc1100_get_address(void)
     return radio_address;
 }
 
-bool cc1100_set_address(radio_address_t address)
+/*
+ * @brief Set the address of device
+ *
+ * @param[in] address   Radio address to set
+ *
+ * @return  The new radio address of the device
+ */
+radio_address_t cc1100_set_address(radio_address_t address)
 {
     if (address < MIN_UID || address > MAX_UID) {
-        return false;
+        return radio_address;
     }
 
-    uint8_t id = (uint8_t) address;
+    uint8_t id = (uint8_t) (0x00ff & address);
 
     if (radio_state != RADIO_UNKNOWN) {
         write_register(CC1100_ADDR, id);
     }
 
-    radio_address = id;
-    return true;
+    radio_address = (uint16_t) id;
+    return radio_address;
 }
 
 static int

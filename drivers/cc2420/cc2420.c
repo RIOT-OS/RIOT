@@ -99,7 +99,14 @@ void cc2420_set_monitor(uint8_t mode)
     cc2420_write_reg(CC2420_REG_MDMCTRL0, reg);
 }
 
-int16_t cc2420_set_channel(uint16_t chan)
+/*
+ * @brief Sets the radio channel
+ *
+ * @param[in] chan   The channel to be set
+ *
+ * @return The radio channel AFTER calling the set command, -1 on error
+ */
+int32_t cc2420_set_channel(uint8_t chan)
 {
     uint16_t freq;
 
@@ -113,23 +120,40 @@ int16_t cc2420_set_channel(uint16_t chan)
      */
     freq = 357 + (5 * (chan - 11));
     cc2420_write_reg(CC2420_REG_FSCTRL, freq);
-    return (int32_t)chan;
+
+    return (int32_t) cc2420_get_channel();
 }
 
-uint16_t cc2420_get_channel(void)
+/*
+ * @brief Get the radio channel of the device
+ *
+ * @return The current radio channel of the device.
+ */
+int32_t cc2420_get_channel(void)
 {
     /* undo calculation from cc2420_set_channel() */
-    return ((cc2420_read_reg(CC2420_REG_FSCTRL) - 357) / 5) + 11;
+    return (int32_t)((cc2420_read_reg(CC2420_REG_FSCTRL) - 357) / 5) + 11;
 }
 
+/*
+ * @brief Set the address of the device
+ *
+ * @param[in] address   Address to set
+ *
+ * @return  The radio address of the device
+ */
 radio_address_t cc2420_set_address(radio_address_t addr)
 {
     uint8_t buf[2];
+
     buf[0] = (uint8_t)(addr & 0xFF);
     buf[1] = (uint8_t)(addr >> 8);
+
     cc2420_write_ram(CC2420_RAM_SHORTADR, buf, 2);
     cc2420_set_address_long(0xFFFF & addr);
-    return addr;
+
+    cc2420_read_ram(CC2420_RAM_SHORTADR, buf, 2);
+    return ((0x00ff & buf[0])<<8) | (0x00ff & buf[0]);
 }
 
 uint64_t cc2420_set_address_long(uint64_t addr)
@@ -161,7 +185,14 @@ uint64_t cc2420_get_address_long(void)
     return addr;
 }
 
-uint16_t cc2420_set_pan(uint16_t pan)
+/*
+ * @brief Sets the pan for the device
+ *
+ * @param pan   The PAN to be set
+ *
+ * @return The pan AFTER calling the set command, -1 on error
+ */
+int32_t cc2420_set_pan(uint16_t pan)
 {
     uint8_t buf[2];
     buf[0] = (uint8_t)(pan & 0xFF);
@@ -170,7 +201,12 @@ uint16_t cc2420_set_pan(uint16_t pan)
     return pan;
 }
 
-uint16_t cc2420_get_pan(void)
+/*
+ * @brief Get the pan for the  device
+ *
+ * @return The current pan of the transceiver, -1 on error
+ */
+int32_t cc2420_get_pan(void)
 {
     uint16_t pan;
     cc2420_read_ram(CC2420_RAM_PANID, (uint8_t *)&pan, sizeof(pan));

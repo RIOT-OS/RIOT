@@ -30,11 +30,12 @@ void maca_check ( void );
 
 /* functions to configure MACA */
 void maca_set_power ( uint8_t power );
-void maca_set_channel ( uint8_t channel );
+int32_t maca_set_channel ( uint8_t channel );
 radio_address_t maca_set_address (radio_address_t addr );
 radio_address_t maca_get_address ( void );
-uint16_t maca_set_pan(uint16_t pan);
-uint16_t maca_get_pan(void);
+int32_t maca_set_pan(uint16_t pan);
+int32_t maca_get_pan(void);
+int32_t maca_get_channel(void);
 
 /* get Link Quality Indicator */
 extern uint8_t (*get_lqi) ( void );
