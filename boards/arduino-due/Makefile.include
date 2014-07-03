@@ -12,7 +12,7 @@ export OBJCOPY = $(PREFIX)objcopy
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
 
 #define the flash-tool and default port depending on the host operating system
-OS = $(shell uname)
+OS := $(shell uname)
 ifeq ($(OS),Linux)
   PORT ?= /dev/ttyACM0
   FLASHER = stty -F $(PORT) raw ispeed 1200 ospeed 1200 cs8 -cstopb ignpar eol 255 eof 255; $(RIOTBOARD)/$(BOARD)/dist/bossac
@@ -21,16 +21,16 @@ else ifeq ($(OS),Darwin)
   FLASHER = stty -f $(PORT) raw ispeed 1200 ospeed 1200 cs8 -cstopb ignpar eol 255 eof 255; $(RIOTBOARD)/$(BOARD)/dist/bossac_osx
 else
   $(info CAUTION: No flash tool for your host system found!)
-  # TODO: fix for building under windows
+  # TODO: add support for windows as host platform
 endif
 export FLASHER
 export PORT
 
 # define build specific options
 export CPU_USAGE = -mcpu=cortex-m3
-export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
-export CFLAGS += -flto -ffunction-sections -fdata-sections -fno-builtin
-export ASFLAGS += -ggdb -g3 -mcpu=cortex-m4 $(FPU_USAGE) -mlittle-endian
+export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
+export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
+export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
 export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles
 # linkerscript specified in cpu/Makefile.include
 export LINKFLAGS += -T$(LINKERSCRIPT)
