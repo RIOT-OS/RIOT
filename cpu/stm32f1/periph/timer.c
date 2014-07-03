@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     cpu_stm32f0
+ * @ingroup     cpu_stm32f1
  * @{
  *
- * @file
+ * @file        timer.c
  * @brief       Low-level timer driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -26,6 +26,8 @@
 #include "periph_conf.h"
 #include "periph/timer.h"
 
+#include "thread.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -39,9 +41,7 @@ typedef struct {
 /**
  * Timer state memory
  */
-timer_conf_t config[TIMER_NUMOF];
-
-
+static timer_conf_t config[TIMER_NUMOF];
 
 int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 {
@@ -124,6 +124,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
             timer->CCR1 = value;
             timer->SR &= ~TIM_SR_CC1IF;
             timer->DIER |= TIM_DIER_CC1IE;
+            DEBUG("Timer 1 set to %x\n", value);
             break;
         case 1:
             timer->CCR2 = value;
@@ -315,6 +316,11 @@ __attribute__ ((naked)) void TIMER_1_ISR(void)
 
 static inline void irq_handler(tim_t timer, TIM_TypeDef *dev)
 {
+    if (dev->SR & TIM_SR_UIF) {
+        DEBUG("Overflow.\n");
+        dev->SR &= ~(TIM_SR_UIF|TIM_SR_CC1IF|TIM_SR_CC2IF|TIM_SR_CC3IF|TIM_SR_CC4IF);
+        return;
+    }
     if (dev->SR & TIM_SR_CC1IF) {
         DEBUG("1\n");
         dev->DIER &= ~TIM_DIER_CC1IE;
@@ -327,6 +333,7 @@ static inline void irq_handler(tim_t timer, TIM_TypeDef *dev)
         dev->DIER &= ~TIM_DIER_CC2IE;
         dev->SR &= ~TIM_SR_CC2IF;
         config[timer].cb(1);
+        DEBUG("-2\n");
     }
     else if (dev->SR & TIM_SR_CC3IF) {
         DEBUG("3\n");
@@ -341,5 +348,9 @@ static inline void irq_handler(tim_t timer, TIM_TypeDef *dev)
         dev->SR &= ~TIM_SR_CC4IF;
         config[timer].cb(3);
         DEBUG("-4\n");
+    }
+
+    if (sched_context_switch_request) {
+        thread_yield();
     }
 }

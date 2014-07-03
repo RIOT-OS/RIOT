@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       CMSIS system header definitions for the Cortex-M0
+ * @brief       CMSIS system header definitions for the Cortex-M3
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */

@@ -11,7 +11,7 @@
  * @ingroup     cpu_stm32f1
  * @{
  *
- * @file
+ * @file        cpu.c
  * @brief       Implementation of the kernel cpu functions
  *
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>

@@ -31,13 +31,13 @@
  * TODO: measure and adjust for the cortex-m3
  * @{
  */
-#define KERNEL_CONF_STACKSIZE_PRINTF    (2500)
+#define KERNEL_CONF_STACKSIZE_PRINTF    (1024)
 
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   (2500)
+#define KERNEL_CONF_STACKSIZE_DEFAULT   (1024)
 #endif
 
-#define KERNEL_CONF_STACKSIZE_IDLE      (512)
+#define KERNEL_CONF_STACKSIZE_IDLE      (256)
 /** @} */
 
 /**
@@ -68,6 +68,8 @@ typedef enum {
 } panic_t;
 
 void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale);
+
+#define TRANSCEIVER_BUFFER_SIZE (3)
 
 #endif /* __CPU_CONF_H */
 /** @} */

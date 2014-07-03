@@ -1,19 +1,36 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     board_iot-lab_M3
+ * @{
+ *
+ * @file        at86rf231_driver.c
+ * @brief       Board specific implementations for the at86rf231 radio driver
+ *
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ *
+ * @}
+ */
+
 #include <stdio.h>
-#include <stddef.h>
 
 #include "cpu.h"
 #include "sched.h"
 #include "vtimer.h"
 
+#include "arch/thread_arch.h"
 #include "periph/gpio.h"
+#include "spi.h"
 #include "periph_conf.h"
-#include "board.h"
 
 #include "at86rf231.h"
 #include "at86rf231_spi.h"
-#include "at86rf231_spi1.h"
-
-extern volatile unsigned int sched_context_switch_request;
 
 /*
 SPI1
@@ -29,25 +46,25 @@ GPIO
   SLEEP : PA2 : control sleep, tx & rx state
 */
 
-inline static void RESET_CLR(void)
+static inline void RESET_CLR(void)
 {
-    GPIOC->BRR = 1 << 1;
+    SPI_0_RESET_PORT->BRR = (1 << SPI_0_RESET_PIN);
 }
-inline static void RESET_SET(void)
+static inline void RESET_SET(void)
 {
-    GPIOC->BSRR = 1 << 1;
+    SPI_0_RESET_PORT->BSRR = (1 << SPI_0_RESET_PIN);
 }
-inline static void CSn_SET(void)
+static inline void CSn_SET(void)
 {
-    GPIOA->BSRR = 1 << 4;
+    SPI_0_CS_PORT->BSRR = (1 << SPI_0_CS_PIN);
 }
-inline static void CSn_CLR(void)
+static inline void CSn_CLR(void)
 {
-    GPIOA->BRR = 1 << 4;
+    SPI_0_CS_PORT->BRR = (1 << SPI_0_CS_PIN);
 }
-inline static void SLEEP_CLR(void)
+static inline void SLEEP_CLR(void)
 {
-    GPIOA->BRR = 1 << 2;
+    SPI_0_SLEEP_PORT->BRR = (1 << SPI_0_SLEEP_PIN);
 }
 
 uint8_t at86rf231_get_status(void)
@@ -57,82 +74,46 @@ uint8_t at86rf231_get_status(void)
 }
 
 
-extern void at86rf231_rx_irq(void);
-static
-void enable_exti_interrupt(void)
+static void enable_exti_interrupt(void)
 {
-    // EXTI_InitTypeDef   EXTI_InitStructure;
-
-    // EXTI_InitStructure.EXTI_Line = EXTI_Line4;
-    // EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-    // EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-    // EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-    // EXTI_Init(&EXTI_InitStructure);
-    gpio_init_int(GPIO_6, GPIO_NOPULL, GPIO_RISING, at86rf231_rx_irq);
-}
-static
-void disable_exti_interrupt(void)
-{
-    // EXTI_InitTypeDef   EXTI_InitStructure;
-
-    // EXTI_InitStructure.EXTI_Line = EXTI_Line4;
-    // EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-    // EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-    // EXTI_InitStructure.EXTI_LineCmd = DISABLE;
-    // EXTI_Init(&EXTI_InitStructure);
-#warning not implemented yet
+    gpio_irq_enable(SPI_0_IRQ0_GPIO);
 }
 
+static void disable_exti_interrupt(void)
+{
+    gpio_irq_disable(SPI_0_IRQ0_GPIO);
+}
 
 void at86rf231_gpio_spi_interrupts_init(void)
 {
-    /* SPI1 init */
-    at86rf231_spi1_init();
+    /* set up GPIO pins */
+    /* SCLK and MOSI*/
+    GPIOA->CRL &= ~(0xf << (5 * 4));
+    GPIOA->CRL |= (0xb << (5 * 4));
+    GPIOA->CRL &= ~(0xf << (7 * 4));
+    GPIOA->CRL |= (0xb << (7 * 4));
+    /* MISO */
+    gpio_init_in(SPI_0_MISO_GPIO, GPIO_NOPULL);
 
-    /* IRQ0 : PC4, INPUT and IRQ */
-    // RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+    /* SPI init */
+    spi_init_master(SPI_0, SPI_CONF_FIRST_RISING, 4500000);
 
-    // GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
-    // GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    // GPIO_Init(GPIOC, &GPIO_InitStructure);
-    gpio_init_in(GPIO_4, GPIO_NOPULL);
+    spi_poweron(SPI_0);
 
-    /* Enable AFIO clock */
-    // RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    /* IRQ0 */
+    gpio_init_in(SPI_0_IRQ0_GPIO, GPIO_NOPULL);
+    gpio_init_int(SPI_0_IRQ0_GPIO, GPIO_NOPULL, GPIO_RISING, at86rf231_rx_irq);
 
     /* Connect EXTI4 Line to PC4 pin */
-    // GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource4);
-
-    /* Configure EXTI4 line */
     enable_exti_interrupt();
 
-    /* Enable and set EXTI4 Interrupt to the lowest priority */
-    // NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;
-    // NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x01;
-    // NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-    // NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    // NVIC_Init(&NVIC_InitStructure);
-
-    /* Init GPIOs */
-
-    /* CS & SLEEP */
-    // RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-
-    // GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_4;
-    // GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    // GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-    // GPIO_Init(GPIOA, &GPIO_InitStructure);
-    gpio_init_out(GPIO_2, GPIO_NOPULL);
-    gpio_init_out(GPIO_4, GPIO_NOPULL);
-
+    /* CS */
+    gpio_init_out(SPI_0_CS_GPIO, GPIO_NOPULL);
+    /* SLEEP */
+    gpio_init_out(SPI_0_SLEEP_GPIO, GPIO_NOPULL);
     /* RESET */
-    // RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+    gpio_init_out(SPI_0_RESET_GPIO, GPIO_NOPULL);
 
-    // GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
-    // GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    // GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-    // GPIO_Init(GPIOC, &GPIO_InitStructure);
-    gpio_init_out(GPIO_1, GPIO_NOPULL);
 }
 
 void at86rf231_reset(void)
@@ -165,17 +146,18 @@ void at86rf231_reset(void)
         vtimer_usleep(10);
 
         if (!--max_wait) {
-            printf("at86rf231 : ERROR : could not enter TRX_OFF mode");
+            printf("at86rf231 : ERROR : could not enter TRX_OFF mode\n");
             break;
         }
-    }
-    while ((status & AT86RF231_TRX_STATUS_MASK__TRX_STATUS) != AT86RF231_TRX_STATUS__TRX_OFF);
+    } while ((status & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
+             != AT86RF231_TRX_STATUS__TRX_OFF);
 }
 
 void at86rf231_spi_select(void)
 {
     CSn_CLR();
 }
+
 void at86rf231_spi_unselect(void)
 {
     CSn_SET();
@@ -185,28 +167,8 @@ void at86rf231_enable_interrupts(void)
 {
     enable_exti_interrupt();
 }
+
 void at86rf231_disable_interrupts(void)
 {
     disable_exti_interrupt();
 }
-
-// extern void at86rf231_rx_irq(void);
-// __attribute__((naked))
-// void EXTI4_IRQHandler(void)
-// {
-//     save_context();
-
-//     if (EXTI_GetITStatus(EXTI_Line4) != RESET) {
-//         /* IRQ_3 (TRX_END), read Frame Buffer */
-//         EXTI_ClearITPendingBit(EXTI_Line4);
-
-//         at86rf231_rx_irq();
-
-//         if (sched_context_switch_request) {
-//             /* scheduler */
-//             thread_yield();
-//         }
-//     }
-
-//     restore_context();
-// }

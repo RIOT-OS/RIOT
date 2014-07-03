@@ -1,4 +1,4 @@
-/**
+/*
  * at86rf231.c - Implementation of at86rf231 functions.
  * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
  *
@@ -9,6 +9,18 @@
 
 #include "kernel_types.h"
 #include "transceiver.h"
+
+/**
+ * @ingroup     drivers_at86rf231
+ * @{
+ *
+ * @file        at86rf231.c
+ * @brief       Driver implementation for at86rf231 chip
+ *
+ * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ *
+ * @}
+ */
 
 #include "at86rf231.h"
 #include "at86rf231_arch.h"
@@ -82,7 +94,7 @@ void at86rf231_switch_to_rx(void)
         vtimer_usleep(10);
 
         if (!--max_wait) {
-            printf("at86rf231 : ERROR : could not enter RX_ON mode");
+            printf("at86rf231 : ERROR : could not enter RX_ON mode\n");
             break;
         }
     }

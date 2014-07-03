@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License. See the file LICENSE in the top level directory for more
+ * Public License v2.1. See the file LICENSE in the top level directory for more
  * details.
  */
 
@@ -11,7 +11,7 @@
  * @{
  *
  * @file        syscalls.c
- * @brief       NewLib system calls implementations for SAM3X8E
+ * @brief       NewLib system calls implementations for stm32f1
  *
  * @author      Michael Baar <michael.baar@fu-berlin.de>
  * @author      Stefan Pfeiffer <pfeiffer@inf.fu-berlin.de>

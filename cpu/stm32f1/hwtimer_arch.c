@@ -10,7 +10,7 @@
  * @ingroup     cpu_stm32f1
  * @{
  *
- * @file
+ * @file        hwtimer_arch.c
  * @brief       Implementation of the kernels hwtimer interface
  *
  * The hardware timer implementation uses the Coretex build-in system timer as backend.
@@ -20,7 +20,7 @@
  * @}
  */
 
-#include "hwtimer_arch.h"
+#include "arch/hwtimer_arch.h"
 #include "thread.h"
 #include "board.h"
 #include "periph/timer.h"
@@ -72,5 +72,4 @@ unsigned long hwtimer_arch_now(void)
 void irq_handler(int channel)
 {
     timeout_handler((short)channel);
-    thread_yield();
 }
