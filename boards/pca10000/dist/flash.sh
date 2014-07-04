@@ -1,16 +1,16 @@
 #!/bin/bash
 
-RIOTBASE=$1
-APPLICATION=$2
-BOARD=$3
-APPLICATION=$4
+BINDIR=$1
+RIOTBASE=$2
+APPLICATION=$3
+BOARD=$4
 
-echo "device nrf51822" > $RIOTBASE/boards/$BOARD/dist/burn.seg
-echo "speed 1000" >> $RIOTBASE/boards/$BOARD/dist/burn.seg
-echo "w4 4001e504 1" >> $RIOTBASE/boards/$BOARD/dist/burn.seg
-echo "loadbin $RIOTBASE/examples/$APPLICATION/bin/$BOARD/$APPLICATION.bin 0" >> $RIOTBASE/boards/$BOARD/dist/burn.seg
-echo "r" >> $RIOTBASE/boards/$BOARD/dist/burn.seg
-echo "g" >> $RIOTBASE/boards/$BOARD/dist/burn.seg
-echo "exit" >> $RIOTBASE/boards/$BOARD/dist/burn.seg
-echo "" >> $RIOTBASE/boards/$BOARD/dist/burn.seg
-JLinkExe < $RIOTBASE/boards/$BOARD/dist/burn.seg
+echo "device nrf51822" > $BINDIR/burn.seg
+echo "speed 1000" >> $BINDIR/burn.seg
+echo "w4 4001e504 1" >> $BINDIR/burn.seg
+echo "loadbin $RIOTBASE/examples/$APPLICATION/bin/$BOARD/$APPLICATION.bin 0" >> $BINDIR/burn.seg
+echo "r" >> $BINDIR/burn.seg
+echo "g" >> $BINDIR/burn.seg
+echo "exit" >> $BINDIR/burn.seg
+echo "" >> $BINDIR/burn.seg
+JLinkExe < $BINDIR/burn.seg
