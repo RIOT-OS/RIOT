@@ -7,6 +7,8 @@ export CC = $(PREFIX)gcc
 export AR = $(PREFIX)ar
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
+# Tell gcc to pass linker-options to ld:
+export LINKFLAGPREFIX = -Wl,
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py

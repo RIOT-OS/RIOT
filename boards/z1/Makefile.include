@@ -11,6 +11,8 @@ export CFLAGS += -std=c99 -Wstrict-prototypes -gdwarf-2 -Os -Wall -mmcu=$(MCU)
 export ASFLAGS += -mmcu=$(MCU) --defsym $(MCU)=1 --gdwarf-2
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
+# Tell gcc to pass linker-options to ld:
+export LINKFLAGPREFIX = -Wl,
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export LINKFLAGS = -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
