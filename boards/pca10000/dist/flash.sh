@@ -5,6 +5,7 @@ RIOTBASE=$2
 APPLICATION=$3
 BOARD=$4
 
+echo "log /dev/null" > $BINDIR/burn.seg
 echo "device nrf51822" > $BINDIR/burn.seg
 echo "speed 1000" >> $BINDIR/burn.seg
 echo "w4 4001e504 1" >> $BINDIR/burn.seg
