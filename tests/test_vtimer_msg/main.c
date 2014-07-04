@@ -26,8 +26,8 @@
 #include "thread.h"
 #include "msg.h"
 
-char timer_stack[KERNEL_CONF_STACKSIZE_PRINTF];
-char timer_stack_local[KERNEL_CONF_STACKSIZE_PRINTF];
+char timer_stack[KERNEL_CONF_STACKSIZE_MAIN];
+char timer_stack_local[KERNEL_CONF_STACKSIZE_MAIN];
 
 struct timer_msg {
     vtimer_t timer;
