@@ -35,7 +35,7 @@
 #include <stdbool.h>
 #include "nrf51.h"
 #include "nrf51_bitfields.h"
-#include "system_nrf51.h"
+//#include "system_nrf51.h"
 
 /*lint ++flb "Enter library region" */
 

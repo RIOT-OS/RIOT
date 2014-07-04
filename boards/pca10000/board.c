@@ -23,7 +23,7 @@
 #include "board.h"
 #include "cpu.h"
 #include "nrf51.h"
-#include "nrf_delay.h"
+//#include "nrf_delay.h"
 //#include "nrf51_bitfields.h"
 #include "periph/uart.h"
 
@@ -50,7 +50,6 @@ void printInt2(int i){
 
 void board_init(void)
 {
-    char charUART = '\0';
     int i = 0;
     /* initialize core clocks via STM-lib given function */
     SystemInit();
