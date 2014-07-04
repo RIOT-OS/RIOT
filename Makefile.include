@@ -95,14 +95,17 @@ export CPPMIX ?= $(if $(wildcard *.cpp),1,)
 export CXXUWFLAGS
 export CXXEXFLAGS
 
+# We assume $(LINK) to be gcc-like. Use `LINKFLAGPREFIX :=` for ld-like linker options.
+LINKFLAGPREFIX ?= -Wl,
+
 ## make script for your application. Build RIOT-base here!
 all: ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
 	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
-	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
+	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
-	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(APPLICATION).map $(LINKFLAGS)
+	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)$(APPLICATION).map $(LINKFLAGS)
 endif
 	$(AD)$(SIZE) $(ELFFILE)
 	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
