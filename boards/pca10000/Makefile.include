@@ -1,0 +1,34 @@
+
+# define the cpu used by the stm32f3-discovery board
+export CPU = nrf51822qfaa
+
+export PORT ?= /dev/ttyACM0
+
+# define tools used for building the project
+export PREFIX = arm-none-eabi-
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
+export AS = $(PREFIX)as
+export LINK = $(PREFIX)gcc
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
+export FLASHER = JLinkExe < /tmp/burn.seg
+
+# define build specific options
+export CPU_USAGE = -mcpu=cortex-m0
+#-Os optimized for size
+export CFLAGS = -ggdb -g3 -std=gnu99 -O0 -Wall -Wstrict-prototypes $(CPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
+export CFLAGS += -DREENTRANT_SYSCALLS_PROVIDED
+#export CFLAGS += -flto -ffunction-sections -fdata-sections -fno-builtin  # addiontal compiler flags to optimize compiling for newlib-nano
+export ASFLAGS = -ggdb -g3 -mcpu=cortex-m4 $(FPU_USAGE) -mlittle-endian
+export LINKFLAGS = -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles
+export LINKFLAGS += -T$(LINKERSCRIPT)                                   # linkerscript specified in cpu/Makefile.include
+#export LINKFLAGS += -specs=nano.specs -lc -lnosys                       # additional linker flags to enable newlib-nano
+export OFLAGS = -O binary
+#export FFLAGS = -device nrf51822_xxAA -if swd -speed 1000
+#export FFLAGS ?=  x
+
+
+# export board specific includes to the global includes-listing
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
