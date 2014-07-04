@@ -112,19 +112,19 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate) {
 		// UART_0_PORT->PIO_ABSR &= ~UART_0_PINS;
 		/** @snippet [Configure UART RX and TX pin] */
 
-		NRF_UART0->PSELTXD = TX_PIN_NUMBER;
-		NRF_UART0->PSELRXD = RX_PIN_NUMBER;
+		UART_0_DEV->PSELTXD = TX_PIN_NUMBER;
+		UART_0_DEV->PSELRXD = RX_PIN_NUMBER;
 
-		//NRF_UART0->PSELCTS = CTS_PIN_NUMBER;
-		//NRF_UART0->PSELRTS = RTS_PIN_NUMBER;
-		NRF_UART0->CONFIG = (UART_CONFIG_HWFC_Enabled << UART_CONFIG_HWFC_Pos);
+		//UART_0_DEV->PSELCTS = CTS_PIN_NUMBER;
+		//UART_0_DEV->PSELRTS = RTS_PIN_NUMBER;
+		UART_0_DEV->CONFIG = (UART_CONFIG_HWFC_Enabled << UART_CONFIG_HWFC_Pos);
 
-		NRF_UART0->BAUDRATE = (baudrate_real << UART_BAUDRATE_BAUDRATE_Pos);
-		NRF_UART0->ENABLE = (UART_ENABLE_ENABLE_Enabled
+		UART_0_DEV->BAUDRATE = (baudrate_real << UART_BAUDRATE_BAUDRATE_Pos);
+		UART_0_DEV->ENABLE = (UART_ENABLE_ENABLE_Enabled
 				<< UART_ENABLE_ENABLE_Pos);
-		NRF_UART0->TASKS_STARTTX = 1;
-		NRF_UART0->TASKS_STARTRX = 1;
-		NRF_UART0->EVENTS_RXDRDY = 0;
+		UART_0_DEV->TASKS_STARTTX = 1;
+		UART_0_DEV->TASKS_STARTRX = 1;
+		UART_0_DEV->EVENTS_RXDRDY = 0;
 
 		break;
 #endif
@@ -147,8 +147,8 @@ void uart_tx_end(uart_t uart) {
 int uart_write(uart_t uart, char data) {
 	switch (uart) {
 	case UART_0:
-		NRF_UART0->TXD = (uint8_t) data;
-		NRF_UART0->EVENTS_TXDRDY = 0;
+		UART_0_DEV->TXD = (uint8_t) data;
+		UART_0_DEV->EVENTS_TXDRDY = 0;
 		break;
 	case UART_UNDEFINED:
 		return -1;
@@ -159,12 +159,12 @@ int uart_write(uart_t uart, char data) {
 int uart_read_blocking(uart_t uart, char *data) {
 	switch (uart) {
 	case UART_0:
-		while (NRF_UART0->EVENTS_RXDRDY != 1) {
+		while (UART_0_DEV->EVENTS_RXDRDY != 1) {
 			// Wait for RXD data to be received
 		}
 
-		*data = (char) NRF_UART0->RXD;
-		NRF_UART0->EVENTS_RXDRDY = 0;
+		*data = (char) UART_0_DEV->RXD;
+		UART_0_DEV->EVENTS_RXDRDY = 0;
 
 		break;
 	case UART_UNDEFINED:
@@ -182,13 +182,13 @@ int uart_write_blocking(uart_t uart, char data) {
 	 }*/
 	switch (uart) {
 	case UART_0:
-		NRF_UART0->TXD = (uint8_t) data;
+		UART_0_DEV->TXD = (uint8_t) data;
 
-		while (NRF_UART0->EVENTS_TXDRDY != 1) {
+		while (UART_0_DEV->EVENTS_TXDRDY != 1) {
 			// Wait for TXD data to be sent
 		}
 
-		NRF_UART0->EVENTS_TXDRDY = 0;
+		UART_0_DEV->EVENTS_TXDRDY = 0;
 
 		break;
 	case UART_UNDEFINED:

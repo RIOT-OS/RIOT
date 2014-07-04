@@ -81,29 +81,29 @@
 #define UART_CLK            14000000
 
 /* UART 0 device configuration */
-#define UART_0_DEV          USART1
-#define UART_0_CLKEN()      RCC->APB2ENR |= RCC_APB2ENR_USART1EN
-#define UART_0_IRQ          USART1_IRQn
-#define UART_0_ISR          isr_usart1
-/* UART 0 pin configuration */
-#define UART_0_PORT         GPIOB
-#define UART_0_PINS         (GPIO_Pin_6 | GPIO_Pin_7)
-#define UART_0_PORT_CLKEN() RCC->AHBENR |= RCC_AHBENR_GPIOBEN
-#define UART_0_RX_PIN       3
-#define UART_0_TX_PIN       2
-#define UART_0_AF           1
-
-/* UART 1 device configuration */
-#define UART_1_DEV          USART2
-#define UART_1_CLKEN()      RCC->APB1ENR |= RCC_APB1ENR_USART2EN
-#define UART_1_IRQ          USART2_IRQn
-#define UART_1_ISR          isr_usart2
-/* UART 1 pin configuration */
-#define UART_1_PORT         GPIOA
-#define UART_1_PORT_CLKEN() RCC->AHBENR |= RCC_AHBENR_GPIOAEN
-#define UART_1_RX_PIN       3
-#define UART_1_TX_PIN       2
-#define UART_1_AF           1
+#define UART_0_DEV          NRF_UART0
+//#define UART_0_CLKEN()      RCC->APB2ENR |= RCC_APB2ENR_USART1EN
+//#define UART_0_IRQ          USART1_IRQn
+//#define UART_0_ISR          isr_usart1
+///* UART 0 pin configuration */
+//#define UART_0_PORT         GPIOB
+//#define UART_0_PINS         (GPIO_Pin_6 | GPIO_Pin_7)
+//#define UART_0_PORT_CLKEN() RCC->AHBENR |= RCC_AHBENR_GPIOBEN
+//#define UART_0_RX_PIN       3
+//#define UART_0_TX_PIN       2
+//#define UART_0_AF           1
+//
+///* UART 1 device configuration */
+//#define UART_1_DEV          USART2
+//#define UART_1_CLKEN()      RCC->APB1ENR |= RCC_APB1ENR_USART2EN
+//#define UART_1_IRQ          USART2_IRQn
+//#define UART_1_ISR          isr_usart2
+///* UART 1 pin configuration */
+//#define UART_1_PORT         GPIOA
+//#define UART_1_PORT_CLKEN() RCC->AHBENR |= RCC_AHBENR_GPIOAEN
+//#define UART_1_RX_PIN       3
+//#define UART_1_TX_PIN       2
+//#define UART_1_AF           1
 
 
 /**
