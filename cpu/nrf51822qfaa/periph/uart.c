@@ -25,8 +25,7 @@
 #include "periph/uart.h"
 #include "nrf51.h"
 #include "board.h"
-#include "pca10000.h"
-#include "nrf_gpio.h"
+//#include "nrf_gpio.h"
 #include "nrf51_bitfields.h"
 
 
@@ -41,7 +40,7 @@ typedef struct {
 /**
  * @brief Allocate memory to store the callback functions.
  */
-static uart_conf_t config[UART_NUMOF];
+//static uart_conf_t config[UART_NUMOF];
 
 int uart_init(uart_t uart, uint32_t baudrate, void (*rx_cb)(char),
 		void (*tx_cb)(void)) { //Manual: nrf51822.pdf page 144
@@ -112,11 +111,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate) {
 		// UART_0_PORT->PIO_PDR = UART_0_PINS;
 		// UART_0_PORT->PIO_ABSR &= ~UART_0_PINS;
 		/** @snippet [Configure UART RX and TX pin] */
-		nrf_gpio_cfg_output(RTS_PIN_NUMBER);
-		nrf_gpio_cfg_input(CTS_PIN_NUMBER, NRF_GPIO_PIN_NOPULL);
-
-		nrf_gpio_cfg_output(RTS_PIN_NUMBER);
-		nrf_gpio_cfg_input(CTS_PIN_NUMBER, NRF_GPIO_PIN_NOPULL);
 
 		NRF_UART0->PSELTXD = TX_PIN_NUMBER;
 		NRF_UART0->PSELRXD = RX_PIN_NUMBER;

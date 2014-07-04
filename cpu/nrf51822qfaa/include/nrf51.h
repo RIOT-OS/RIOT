@@ -117,7 +117,6 @@ typedef enum {
 /** @} */ /* End of group Configuration_of_CMSIS */
 
 #include <core_cm0.h>                               /*!< Cortex-M0 processor and core peripherals                              */
-#include "system_nrf51.h"                           /*!< nRF51 System                                                          */
 
 
 /* ================================================================================ */
