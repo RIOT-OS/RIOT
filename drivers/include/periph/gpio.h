@@ -140,24 +140,24 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup);
 int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(void));
 
 /**
- * @brief Enable the GPIO pin's interrupt if configured as external interrupt source.
- *
- * @param[in] dev       the GPIO pin to enable the interrupt for
- *
- * @return              0 on success
- * @return              -1 on undefined device given
- */
-int gpio_int_disable(gpio_t dev);
-
-/**
  * @brief Disable the GPIO pin's interrupt if configured as external interrupt source.
  *
  * @param[in] dev       the GPIO pin to disable the interrupt for
  *
- * @return              0 on success
- * @return              -1 on undefined device given
+ * @return              the previous interrupt state, 0 or 1
+ * @return              -1 if undefined device is given
  */
-int gpio_int_enable(gpio_t dev);
+int gpio_irq_enable(gpio_t dev);
+
+/**
+ * @brief Enable the GPIO pin's interrupt if configured as external interrupt source.
+ *
+ * @param[in] dev       the GPIO pin to enable the interrupt for
+ *
+ * @return              the previous interrupt state, 0 or 1
+ * @return              -1 if undefined device is given
+ */
+int gpio_irq_disable(gpio_t dev);
 
 /**
  * @brief Get the current value of the given GPIO pin
