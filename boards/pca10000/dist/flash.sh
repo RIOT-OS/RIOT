@@ -15,3 +15,4 @@ echo "g" >> $BINDIR/burn.seg
 echo "exit" >> $BINDIR/burn.seg
 echo "" >> $BINDIR/burn.seg
 JLinkExe < $BINDIR/burn.seg
+rm JLink.log
