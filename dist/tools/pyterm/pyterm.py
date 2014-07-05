@@ -130,7 +130,7 @@ class SerCmd(cmd.Cmd):
 def reader(ser, logger):
     output = ""
     while (1):
-        c = ser.read(1).decode("utf-8")
+        c = ser.read(1).decode("utf-8", errors='replace')
         if c == '\n' or c == '\r':
             logger.info(output)
             output = ""
