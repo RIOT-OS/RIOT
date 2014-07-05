@@ -70,7 +70,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
         return -1;
     }
 
-    dINT();
+    unsigned int state = disableIRQ();
 
     DEBUG("msg_send() %s:%i: Sending from %i to %i. block=%i src->state=%i target->state=%i\n", __FILE__, __LINE__, sched_active_pid, target_pid, block, sched_active_thread->status, target->status);
 
@@ -78,8 +78,8 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
         DEBUG("msg_send() %s:%i: Target %i is not RECEIVE_BLOCKED.\n", __FILE__, __LINE__, target_pid);
         if (target->msg_array && queue_msg(target, m)) {
             DEBUG("msg_send() %s:%i: Target %i has a msg_queue. Queueing message.\n", __FILE__, __LINE__, target_pid);
-            eINT();
-            if (sched_active_thread->status == STATUS_REPLY_BLOCKED) {
+            restoreIRQ(state);
+            if (sched_thread->status == STATUS_REPLY_BLOCKED) {
                 thread_yield();
             }
             return 1;
@@ -87,7 +87,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
 
         if (!block) {
             DEBUG("msg_send: %s: Receiver not waiting, block=%u\n", sched_active_thread->name, block);
-            eINT();
+            restoreIRQ(state);
             return 0;
         }
 
@@ -123,7 +123,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
         sched_set_status(target, STATUS_PENDING);
     }
 
-    eINT();
+    restoreIRQ(state);
     thread_yield();
 
     return 1;
@@ -176,7 +176,7 @@ int msg_send_receive(msg_t *m, msg_t *reply, unsigned int target_pid)
 
 int msg_reply(msg_t *m, msg_t *reply)
 {
-    int state = disableIRQ();
+    unsigned int state = disableIRQ();
 
     tcb_t *target = (tcb_t*) sched_threads[m->sender_pid];
 
@@ -230,7 +230,8 @@ int msg_receive(msg_t *m)
 
 static int _msg_receive(msg_t *m, int block)
 {
-    dINT();
+    unsigned int state = disableIRQ();
+
     DEBUG("_msg_receive: %s: _msg_receive.\n", sched_active_thread->name);
 
     tcb_t *me = (tcb_t*) sched_threads[sched_active_pid];
@@ -263,10 +264,12 @@ static int _msg_receive(msg_t *m, int block)
             DEBUG("_msg_receive(): %s: No msg in queue. Going blocked.\n", sched_active_thread->name);
             sched_set_status(me, STATUS_RECEIVE_BLOCKED);
 
-            eINT();
+            restoreIRQ(state);
             thread_yield();
 
             /* sender copied message */
+        } else {
+            restoreIRQ(state);
         }
 
         return 1;
@@ -292,7 +295,7 @@ static int _msg_receive(msg_t *m, int block)
             sched_set_status(sender, STATUS_PENDING);
         }
 
-        eINT();
+        restoreIRQ(state);
         return 1;
     }
 }
