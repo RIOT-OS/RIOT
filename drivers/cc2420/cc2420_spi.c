@@ -48,8 +48,8 @@ uint8_t cc2420_strobe(uint8_t c) {
 }
 
 /* ram */
-uint16_t cc2420_read_ram(uint16_t addr, uint8_t* buffer, uint16_t len) {
-    uint16_t i;
+radio_packet_length_t cc2420_read_ram(uint16_t addr, uint8_t* buffer, radio_packet_length_t len) {
+    radio_packet_length_t i;
     unsigned int cpsr = disableIRQ();
     cc2420_spi_select();
     cc2420_txrx(CC2420_RAM_ACCESS | (addr & 0x7F));
@@ -62,8 +62,8 @@ uint16_t cc2420_read_ram(uint16_t addr, uint8_t* buffer, uint16_t len) {
     return i;
 }
 
-uint16_t cc2420_write_ram(uint16_t addr, uint8_t* buffer, uint16_t len) {
-    uint16_t i;
+radio_packet_length_t cc2420_write_ram(uint16_t addr, uint8_t* buffer, radio_packet_length_t len) {
+    radio_packet_length_t i;
     unsigned int cpsr = disableIRQ();
     cc2420_spi_select();
     cc2420_txrx(CC2420_RAM_ACCESS | (addr & 0x7F));
@@ -78,8 +78,8 @@ uint16_t cc2420_write_ram(uint16_t addr, uint8_t* buffer, uint16_t len) {
 
 /* fifo */
 
-uint16_t cc2420_write_fifo(uint8_t* data, uint16_t data_length) {
-    uint16_t i;
+radio_packet_length_t cc2420_write_fifo(uint8_t* data, radio_packet_length_t data_length) {
+    radio_packet_length_t i;
     unsigned int cpsr = disableIRQ();
     cc2420_spi_select();
     cc2420_txrx(CC2420_REG_TXFIFO | CC2420_WRITE_ACCESS);
@@ -91,8 +91,8 @@ uint16_t cc2420_write_fifo(uint8_t* data, uint16_t data_length) {
     return i;
 }
 
-uint16_t cc2420_read_fifo(uint8_t* data, uint16_t data_length) {
-    uint16_t i;
+radio_packet_length_t cc2420_read_fifo(uint8_t* data, radio_packet_length_t data_length) {
+    radio_packet_length_t i;
     unsigned int cpsr = disableIRQ();
     cc2420_spi_select();
     cc2420_txrx(CC2420_REG_RXFIFO | CC2420_READ_ACCESS);
