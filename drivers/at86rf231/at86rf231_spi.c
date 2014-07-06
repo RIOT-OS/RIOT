@@ -44,7 +44,7 @@ uint8_t at86rf231_reg_read(uint8_t addr)
     return value;
 }
 
-void at86rf231_read_fifo(uint8_t *data, uint8_t length)
+void at86rf231_read_fifo(uint8_t *data, radio_packet_length_t length)
 {
     // Start the SPI transfer
     at86rf231_spi_select();
@@ -58,7 +58,7 @@ void at86rf231_read_fifo(uint8_t *data, uint8_t length)
     at86rf231_spi_unselect();
 }
 
-void at86rf231_write_fifo(const uint8_t *data, uint8_t length)
+void at86rf231_write_fifo(const uint8_t *data, radio_packet_length_t length)
 {
     // Start the SPI transfer
     at86rf231_spi_select();

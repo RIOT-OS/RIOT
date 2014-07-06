@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "board.h"
 #include "radio/types.h"
 
 #include "ieee802154_frame.h"
@@ -19,7 +20,7 @@
 typedef struct __attribute__((packed))
 {
     /* @{ */
-    uint8_t length;                   /** < the length of the frame of the frame including fcs*/
+    uint8_t length;             /** < the length of the frame of the frame including fcs*/
     ieee802154_frame_t frame;   /** < the ieee802154 frame */
     int8_t rssi;                /** < the rssi value */
     uint8_t crc;                /** < 1 if crc was successfull, 0 otherwise */
