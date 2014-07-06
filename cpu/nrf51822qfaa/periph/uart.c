@@ -25,7 +25,6 @@
 #include "periph/uart.h"
 #include "nrf51.h"
 #include "board.h"
-//#include "nrf_gpio.h"
 #include "nrf51_bitfields.h"
 
 
@@ -120,8 +119,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate) {
 		UART_0_DEV->CONFIG = (UART_CONFIG_HWFC_Enabled << UART_CONFIG_HWFC_Pos);
 
 		UART_0_DEV->BAUDRATE = (baudrate_real << UART_BAUDRATE_BAUDRATE_Pos);
-		UART_0_DEV->ENABLE = (UART_ENABLE_ENABLE_Enabled
-				<< UART_ENABLE_ENABLE_Pos);
+		UART_0_DEV->ENABLE = (UART_ENABLE_ENABLE_Enabled<< UART_ENABLE_ENABLE_Pos);
 		UART_0_DEV->TASKS_STARTTX = 1;
 		UART_0_DEV->TASKS_STARTRX = 1;
 		UART_0_DEV->EVENTS_RXDRDY = 0;

@@ -67,6 +67,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 #if TIMER_0_EN
     case (TIMER_0):
         p_timer = TIMER_0_DEV;
+        p_timer->BITMODE = TIMER_BITMODE_BITMODE_32Bit;    //32 Bit Mode
         NVIC_SetPriority(TIMER_0_IRQ, TIMER_IRQ_PRIO);
         NVIC_EnableIRQ(TIMER_0_IRQ);
         break;
@@ -75,6 +76,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 #if TIMER_1_EN
     case (TIMER_1):
         p_timer = TIMER_1_DEV;
+    	p_timer->BITMODE = TIMER_BITMODE_BITMODE_16Bit;    //16 Bit Mode
         NVIC_SetPriority(TIMER_1_IRQ, TIMER_IRQ_PRIO);
         NVIC_EnableIRQ(TIMER_1_IRQ);
         break;
@@ -83,6 +85,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 #if TIMER_2_EN
     case (TIMER_2):
         p_timer = NRF_TIMER2;
+    	p_timer->BITMODE = TIMER_BITMODE_BITMODE_16Bit;    //16 Bit Mode
         NVIC_SetPriority(TIMER2_IRQn, 1);
         NVIC_EnableIRQ(TIMER2_IRQn);
         break;
@@ -98,7 +101,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 
     p_timer->TASKS_STOP = 1;
 
-    p_timer->BITMODE = TIMER_BITMODE_BITMODE_32Bit;    //32 Bit Mode
+
     p_timer->MODE    = TIMER_MODE_MODE_Timer;       // Set the timer in Timer Mode.
     p_timer->TASKS_CLEAR    = 1;                    // clear the task first to be usable for later.
 

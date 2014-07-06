@@ -267,7 +267,9 @@
 /**
  * @brief GPIO configuration
  */
-#define GPIO_NUMOF          12
+
+#define GPIO_DEV            NRF_GPIO
+#define GPIO_NUMOF          16
 #define GPIO_0_EN           1
 #define GPIO_1_EN           1
 #define GPIO_2_EN           1
@@ -280,6 +282,10 @@
 #define GPIO_9_EN           1
 #define GPIO_10_EN          1
 #define GPIO_11_EN          1
+#define GPIO_12_EN          1
+#define GPIO_13_EN          1
+#define GPIO_14_EN          1
+#define GPIO_15_EN          1
 #define GPIO_IRQ_PRIO       1
 
 /* IRQ config */
