@@ -31,7 +31,7 @@
 #define MAXCOUNT 100
 #define MAXDIFF 10000
 
-char timer_stack[KERNEL_CONF_STACKSIZE_PRINTF*4];
+char timer_stack[KERNEL_CONF_STACKSIZE_MAIN*4];
 
 struct timer_msg {
     vtimer_t timer;
