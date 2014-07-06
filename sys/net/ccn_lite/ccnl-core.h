@@ -107,6 +107,7 @@ struct ccnl_relay_s {
     int riot_pid;
     int riot_helper_pid;
     mutex_t global_lock;
+    mutex_t stop_lock;
 };
 
 struct ccnl_buf_s {

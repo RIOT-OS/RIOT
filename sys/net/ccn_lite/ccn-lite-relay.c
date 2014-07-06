@@ -413,19 +413,23 @@ void ccnl_riot_relay_start(void)
 
     ccnl_core_cleanup(theRelay);
 
+    mutex_lock(&theRelay->stop_lock);
     ccnl_free(theRelay);
 }
 
 void ccnl_riot_relay_helper_start(void)
 {
     unsigned long us = CCNL_CHECK_RETRANSMIT_USEC;
+    mutex_lock(&theRelay->stop_lock);
     while (!theRelay->halt_flag) {
-        vtimer_usleep(us);
-
         mutex_lock(&theRelay->global_lock);
         ccnl_run_events();
         mutex_unlock(&theRelay->global_lock);
+
+        vtimer_usleep(us);
     }
+
+    mutex_unlock(&theRelay->stop_lock);
 }
 
 // eof
