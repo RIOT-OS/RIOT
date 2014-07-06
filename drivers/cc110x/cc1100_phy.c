@@ -507,7 +507,7 @@ static bool send_burst(cc1100_packet_layer0_t *packet, uint8_t retries, uint8_t 
     return true;
 }
 
-int cc1100_send(radio_address_t addr, protocol_t protocol, int priority, char *payload, int payload_len)
+int cc1100_send(radio_address_t addr, protocol_t protocol, int priority, char *payload, radio_packet_length_t payload_len)
 {
     (void) priority;
 
