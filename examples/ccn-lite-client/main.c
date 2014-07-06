@@ -42,10 +42,10 @@
 #define RIOT_CCN_APPSERVER (1)
 #define RIOT_CCN_TESTS (0)
 
-char relay_stack[KERNEL_CONF_STACKSIZE_MAIN];
+char relay_stack[KERNEL_CONF_STACKSIZE_PRINTF];
 
 #if RIOT_CCN_APPSERVER
-char appserver_stack[KERNEL_CONF_STACKSIZE_MAIN];
+char appserver_stack[KERNEL_CONF_STACKSIZE_PRINTF];
 #endif
 int relay_pid, appserver_pid;
 
