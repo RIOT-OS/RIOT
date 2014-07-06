@@ -88,7 +88,7 @@ void *radio(void *arg)
 
 void init_transceiver(void)
 {
-    int radio_pid = thread_create(
+    kernel_pid_t radio_pid = thread_create(
                         radio_stack_buffer,
                         sizeof(radio_stack_buffer),
                         PRIORITY_MAIN - 2,

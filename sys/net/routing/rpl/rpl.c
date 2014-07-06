@@ -49,7 +49,7 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 /* global variables */
 rpl_of_t *rpl_objective_functions[NUMBER_IMPLEMENTED_OFS];
 rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
-unsigned int rpl_process_pid;
+kernel_pid_t rpl_process_pid;
 mutex_t rpl_recv_mutex = MUTEX_INIT;
 mutex_t rpl_send_mutex = MUTEX_INIT;
 msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];

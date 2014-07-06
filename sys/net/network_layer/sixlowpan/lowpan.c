@@ -123,10 +123,10 @@ uint8_t comp_buf[512];
 uint8_t first_frag = 0;
 mutex_t fifo_mutex = MUTEX_INIT;
 
-int ip_process_pid = 0;
-int nd_nbr_cache_rem_pid = 0;
-int contexts_rem_pid = 0;
-int transfer_pid = 0;
+kernel_pid_t ip_process_pid = KERNEL_PID_NULL;
+kernel_pid_t nd_nbr_cache_rem_pid = KERNEL_PID_NULL;
+kernel_pid_t contexts_rem_pid = KERNEL_PID_NULL;
+kernel_pid_t transfer_pid = KERNEL_PID_NULL;
 
 mutex_t lowpan_context_mutex = MUTEX_INIT;
 
@@ -763,7 +763,7 @@ void add_fifo_packet(lowpan_reas_buf_t *current_packet)
 }
 
 /* Register an upper layer thread */
-uint8_t sixlowpan_lowpan_register(int pid)
+uint8_t sixlowpan_lowpan_register(kernel_pid_t pid)
 {
     uint8_t i;
 

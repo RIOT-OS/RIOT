@@ -26,6 +26,7 @@
 #include "radio/radio.h"
 #include "radio/types.h"
 #include "cc110x-config.h"
+#include "kernel_types.h"
 
 #define CC1100_MAX_DATA_LENGTH (58)
 
@@ -115,9 +116,9 @@ extern volatile uint8_t rx_buffer_next;     ///< Next packet in RX queue
 extern volatile uint8_t radio_state;        ///< Radio state
 extern cc110x_statistic_t cc110x_statistic;
 
-extern int transceiver_pid;                 ///< the transceiver thread pid
+extern kernel_pid_t transceiver_pid;               ///< the transceiver thread pid
 
-void cc110x_init(int transceiver_pid);
+void cc110x_init(kernel_pid_t transceiver_pid);
 
 void cc110x_rx_handler(void);
 

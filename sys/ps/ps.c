@@ -64,7 +64,7 @@ void thread_print_all(void)
 #endif
             overall_stacksz += stacksz;
             stacksz -= thread_measure_stack_free(p->stack_start);
-            printf("\t%3u | %-21s| %-8s %.1s | %3i | %5i (%5i) %p"
+            printf("\t%3" PRIkernel_pid " | %-21s| %-8s %.1s | %3i | %5i (%5i) %p"
 #if SCHEDSTATISTICS
                    " | %4d/1k |  %8d"
 #endif

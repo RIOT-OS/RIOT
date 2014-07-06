@@ -113,7 +113,7 @@ static void measure_nop_nop_nops_per_tick(void)
         ts_per_nop_nop_nop += counting_end - counting_start;
     }
     x86_rtc_set_periodic_callback(NULL);
-    x86_rtc_set_periodic(RTC_REG_A_HZ_OFF, 0, -1, false);
+    x86_rtc_set_periodic(RTC_REG_A_HZ_OFF, 0, KERNEL_PID_NULL, false);
 
     /* instructions_per_second = nop_nop_nops_per_second * ts_per_nop_nop_nop: */
     instructions_per_second = nop_nop_nops_per_tick * TICK_HZ_VAL * ts_per_nop_nop_nop / nop_nop_nops_per_tick / NNN_TICK_ITERATIONS;
@@ -150,7 +150,7 @@ static void init_bases(void)
            ts_base);
 
     x86_rtc_set_periodic_callback(NULL);
-    x86_rtc_set_periodic(RTC_REG_A_HZ_OFF, 0, -1, false);
+    x86_rtc_set_periodic(RTC_REG_A_HZ_OFF, 0, KERNEL_PID_NULL, false);
 }
 
 void x86_init_hwtimer(void)
@@ -231,17 +231,17 @@ static void stop_alarms(void)
 
     if (rtc_alarm_ie) {
         rtc_alarm_ie = 0;
-        x86_rtc_set_alarm(NULL, 0, -1u, false);
+        x86_rtc_set_alarm(NULL, 0, KERNEL_PID_NULL, false);
     }
 
     if (rtc_update_ie) {
         rtc_update_ie = 0;
-        x86_rtc_set_update(0, -1u, false);
+        x86_rtc_set_update(0, KERNEL_PID_NULL, false);
     }
 
     if (rtc_periodic_ie) {
         rtc_periodic_ie = 0;
-        x86_rtc_set_periodic(RTC_REG_A_HZ_OFF, 0, -1u, false);
+        x86_rtc_set_periodic(RTC_REG_A_HZ_OFF, 0, KERNEL_PID_NULL, false);
     }
 }
 

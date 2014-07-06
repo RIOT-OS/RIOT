@@ -219,7 +219,7 @@ void _exit(int n)
     while(1);
 }
 /*---------------------------------------------------------------------------*/
-int _getpid(void)
+pid_t _getpid(void)
 {
     return sched_active_thread->pid;
 }

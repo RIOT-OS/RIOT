@@ -11,6 +11,7 @@
 #ifndef TRANSCEIVER_H
 #define TRANSCEIVER_H
 
+#include "kernel_types.h"
 #include "radio/types.h"
 
 /* supported transceivers *
@@ -190,7 +191,7 @@ enum transceiver_msg_type_t {
  */
 typedef struct {
     transceiver_type_t transceivers;   ///< the tranceivers the thread is registered for
-    int pid;                ///< the thread's pid
+    kernel_pid_t pid;                  ///< the thread's pid
 } registered_t;
 
 typedef struct {
@@ -199,7 +200,7 @@ typedef struct {
 } transceiver_command_t;
 
 /* The transceiver thread's pid */
-extern int transceiver_pid;
+extern kernel_pid_t transceiver_pid;
 
 /** An array of ignored link layer addresses */
 extern radio_address_t transceiver_ignored_addr[TRANSCEIVER_MAX_IGNORED_ADDR];
@@ -216,7 +217,7 @@ void transceiver_init(transceiver_type_t transceivers);
  *
  * @return              The transceiver thread's pid
  */
-int transceiver_start(void);
+kernel_pid_t transceiver_start(void);
 
 /**
  * @brief register a thread for events from certain transceivers
@@ -226,7 +227,7 @@ int transceiver_start(void);
  *
  * @return              1 on success, 0 otherwise
  */
-uint8_t transceiver_register(transceiver_type_t transceivers, int pid);
+uint8_t transceiver_register(transceiver_type_t transceivers, kernel_pid_t pid);
 
 /**
  * @brief unregister a thread for events from certain transceivers
@@ -236,7 +237,7 @@ uint8_t transceiver_register(transceiver_type_t transceivers, int pid);
  *
  * @return              1 on success, 0 otherwise
  */
-uint8_t transceiver_unregister(transceiver_type_t transceivers, int pid);
+uint8_t transceiver_unregister(transceiver_type_t transceivers, kernel_pid_t pid);
 
 #endif /* TRANSCEIVER_H */
 /** @} */

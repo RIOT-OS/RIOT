@@ -45,7 +45,7 @@
 
 /* extern variables */
 extern uint8_t ipv6_ext_hdr_len;
-extern int ip_process_pid;
+extern kernel_pid_t ip_process_pid;
 
 /* base header lengths */
 #define LL_HDR_LEN                  (0x4)

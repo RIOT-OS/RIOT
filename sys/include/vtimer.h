@@ -39,7 +39,7 @@ typedef struct vtimer_t {
     timex_t absolute;
     void (*action)(struct vtimer_t *timer);
     void *arg;
-    unsigned int pid;
+    kernel_pid_t pid;
 } vtimer_t;
 
 /**
@@ -89,7 +89,7 @@ int vtimer_sleep(timex_t time);
  * @param[in]   ptr         message value
  * @return      0 on success, < 0 on error
  */
-int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr);
+int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, void *ptr);
 
 /**
  * @brief   set a vtimer with wakeup event
@@ -97,7 +97,7 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr);
  * @param[in]   pid         process id
  * @return      0 on success, < 0 on error
  */
-int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid);
+int vtimer_set_wakeup(vtimer_t *t, timex_t interval, kernel_pid_t pid);
 
 /**
  * @brief   remove a vtimer

@@ -44,7 +44,7 @@ void *timer_thread(void *arg)
 {
     (void) arg;
 
-    printf("This is thread %d\n", thread_getpid());
+    printf("This is thread %" PRIkernel_pid "\n", thread_getpid());
 
     /* we need a queue if the second message arrives while the first is still processed */
     /* without a queue, the message would get lost */
@@ -77,7 +77,7 @@ void *timer_thread_local(void *arg)
 {
     (void) arg;
 
-    printf("This is thread %d\n", thread_getpid());
+    printf("This is thread %" PRIkernel_pid "\n", thread_getpid());
 
     while (1) {
         msg_t m;
@@ -92,7 +92,7 @@ void *timer_thread_local(void *arg)
 int main(void)
 {
     msg_t m;
-    int pid = thread_create(
+    kernel_pid_t pid = thread_create(
                   timer_stack,
                   sizeof(timer_stack),
                   PRIORITY_MAIN - 1,
@@ -109,7 +109,7 @@ int main(void)
     m.content.ptr = (char *) &msg_b;
     msg_send(&m, pid, false);
 
-    int pid2 = thread_create(
+    kernel_pid_t pid2 = thread_create(
                    timer_stack_local,
                    sizeof(timer_stack_local),
                    PRIORITY_MAIN - 1,

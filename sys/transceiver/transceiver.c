@@ -88,7 +88,7 @@ msg_t msg_buffer[TRANSCEIVER_MSG_BUFFER_SIZE];
 
 uint32_t response; ///< response bytes for messages to upper layer threads
 
-int transceiver_pid = -1; ///< the transceiver thread's pid
+kernel_pid_t transceiver_pid = KERNEL_PID_NULL; ///< the transceiver thread's pid
 
 static volatile uint8_t rx_buffer_pos = 0;
 static volatile uint8_t transceiver_buffer_pos = 0;
@@ -165,7 +165,7 @@ void transceiver_init(transceiver_type_t t)
 
     for (i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
         reg[i].transceivers = TRANSCEIVER_NONE;
-        reg[i].pid          = 0;
+        reg[i].pid          = KERNEL_PID_NULL;
     }
 
     /* check if a non defined bit is set */
@@ -178,7 +178,7 @@ void transceiver_init(transceiver_type_t t)
 }
 
 /* Start the transceiver thread */
-int transceiver_start(void)
+kernel_pid_t transceiver_start(void)
 {
     transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN - 3, CREATE_STACKTEST, run, NULL, "Transceiver");
 
@@ -231,7 +231,7 @@ int transceiver_start(void)
 }
 
 /* Register an upper layer thread */
-uint8_t transceiver_register(transceiver_type_t t, int pid)
+uint8_t transceiver_register(transceiver_type_t t, kernel_pid_t pid)
 {
     int result = 0;
     int state = disableIRQ();
@@ -250,7 +250,7 @@ uint8_t transceiver_register(transceiver_type_t t, int pid)
 }
 
 /* Unregister an upper layer thread */
-uint8_t transceiver_unregister(transceiver_type_t t, int pid)
+uint8_t transceiver_unregister(transceiver_type_t t, kernel_pid_t pid)
 {
     int result = 0;
     int state = disableIRQ();
@@ -499,7 +499,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
     while (reg[i].transceivers != TRANSCEIVER_NONE) {
         if (reg[i].transceivers & t) {
             m.content.ptr = (char *) &(transceiver_buffer[transceiver_buffer_pos]);
-            DEBUG("transceiver: Notify thread %i\n", reg[i].pid);
+            DEBUG("transceiver: Notify thread %" PRIkernel_pid "\n", reg[i].pid);
 
             if (msg_send(&m, reg[i].pid, false) && (m.type != ENOBUFFER)) {
                 transceiver_buffer[transceiver_buffer_pos].processing++;

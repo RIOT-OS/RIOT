@@ -340,7 +340,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 
             case (CCNL_RIOT_HALT):
                 /* cmd to stop the relay */
-                DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
+                DEBUGMSG(1, "\tSrc:\t%" PRIkernel_pid "\n", in.sender_pid);
                 DEBUGMSG(1, "\tNumb:\t%" PRIu32 "\n", in.content.value);
 
                 ccnl->halt_flag = 1;
@@ -349,7 +349,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 #if RIOT_CCNL_POPULATE
             case (CCNL_RIOT_POPULATE):
                 /* cmd to polulate the cache */
-                DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
+                DEBUGMSG(1, "\tSrc:\t%" PRIkernel_pid "\n", in.sender_pid);
                 DEBUGMSG(1, "\tNumb:\t%" PRIu32 "\n", in.content.value);
 
                 handle_populate_cache(ccnl);
@@ -372,7 +372,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                 break;
             default:
                 DEBUGMSG(1, "%s Packet waiting\n", riot_ccnl_event_to_string(in.type));
-                DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
+                DEBUGMSG(1, "\tSrc:\t%" PRIkernel_pid "\n", in.sender_pid);
                 DEBUGMSG(1, "\tdropping it...\n");
                 break;
         }

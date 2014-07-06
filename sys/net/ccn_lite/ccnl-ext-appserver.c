@@ -37,10 +37,10 @@
 /** message buffer */
 msg_t msg_buffer_appserver[APPSERVER_MSG_BUFFER_SIZE];
 
-int relay_pid;
+kernel_pid_t relay_pid;
 char prefix[] = "/riot/appserver/";
 
-static int appserver_sent_content(uint8_t *buf, int len, uint16_t from)
+static int appserver_sent_content(uint8_t *buf, int len, kernel_pid_t from)
 {
     static riot_ccnl_msg_t rmsg;
     rmsg.payload = buf;
@@ -50,8 +50,8 @@ static int appserver_sent_content(uint8_t *buf, int len, uint16_t from)
     msg_t m;
     m.type = CCNL_RIOT_MSG;
     m.content.ptr = (char *) &rmsg;
-    uint16_t dest_pid = from;
-    DEBUGMSG(1, "sending msg to pid=%u\n", dest_pid);
+    kernel_pid_t dest_pid = from;
+    DEBUGMSG(1, "sending msg to pid=%" PRIkernel_pid "\n", dest_pid);
     int ret = msg_send(&m, dest_pid, 1);
     DEBUGMSG(1, "msg_reply returned: %d\n", ret);
     return ret;
@@ -132,7 +132,7 @@ static void riot_ccnl_appserver_ioloop(void)
         switch (in.type) {
             case (CCNL_RIOT_MSG):
                 m = (riot_ccnl_msg_t *) in.content.ptr;
-                DEBUGMSG(1, "new msg: size=%" PRIu16 " sender_pid=%" PRIu16 "\n",
+                DEBUGMSG(1, "new msg: size=%" PRIu16 " sender_pid=%" PRIkernel_pid "\n",
                          m->size, in.sender_pid);
                 appserver_handle_interest(m->payload, m->size, in.sender_pid);
 
@@ -151,7 +151,7 @@ static void riot_ccnl_appserver_ioloop(void)
 static void riot_ccnl_appserver_register(void)
 {
     char faceid[10];
-    snprintf(faceid, sizeof(faceid), "%d", thread_getpid());
+    snprintf(faceid, sizeof(faceid), "%" PRIkernel_pid, thread_getpid());
     char *type = "newMSGface";
 
     unsigned char *mgnt_pkg = malloc(256);
@@ -168,7 +168,7 @@ static void riot_ccnl_appserver_register(void)
 
 void *ccnl_riot_appserver_start(void *arg)
 {
-    int _relay_pid = (int) arg;
+	kernel_pid_t _relay_pid = (kernel_pid_t) arg;
     relay_pid = _relay_pid;
     riot_ccnl_appserver_register();
     riot_ccnl_appserver_ioloop();

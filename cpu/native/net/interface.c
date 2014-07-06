@@ -53,9 +53,9 @@ uint64_t _native_net_addr_long;
 /* nativenet.h **********************************************************/
 /************************************************************************/
 
-void nativenet_init(int transceiver_pid)
+void nativenet_init(kernel_pid_t transceiver_pid)
 {
-    DEBUG("nativenet_init(transceiver_pid=%d)\n", transceiver_pid);
+    DEBUG("nativenet_init(transceiver_pid=%" PRIkernel_pid ")\n", transceiver_pid);
     rx_buffer_next = 0;
     _native_net_pan = 0;
     _native_net_chan = 0;

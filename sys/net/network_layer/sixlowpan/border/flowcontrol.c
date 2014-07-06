@@ -32,7 +32,7 @@ static int set_timeout(vtimer_t *timeout, timex_t val, void *args);
 static void sending_slot(void);
 
 char sending_slot_stack[SENDING_SLOT_STACK_SIZE];
-unsigned int sending_slot_pid;
+kernel_pid_t sending_slot_pid;
 
 flowcontrol_stat_t slwin_stat;
 sem_t connection_established;

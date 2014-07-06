@@ -29,14 +29,14 @@ char t1_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char t3_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
-uint16_t p1, p2, p3;
+kernel_pid_t p1, p2, p3;
 
 void *sub_thread(void *arg)
 {
     (void) arg;
 
-    int pid = thread_getpid();
-    printf("THREAD %s (pid:%i) start\n", thread_getname(pid), pid);
+    kernel_pid_t pid = thread_getpid();
+    printf("THREAD %s (pid:%" PRIkernel_pid ") start\n", thread_getname(pid), pid);
 
     msg_t msg;
 
@@ -44,7 +44,7 @@ void *sub_thread(void *arg)
 
     msg_send(&msg, 1, 1);
 
-    printf("THREAD %s (pid:%i) end.\n", thread_getname(pid), pid);
+    printf("THREAD %s (pid:%" PRIkernel_pid ") end.\n", thread_getname(pid), pid);
 
     return NULL;
 }
@@ -67,7 +67,7 @@ int main(void)
     puts("THREADS CREATED\n");
     for(int i = 0; i < 3; i++) {
         msg_receive(&msg);
-        printf("Got msg from pid %i: \"%s\"\n", msg.sender_pid, msg.content.ptr);
+        printf("Got msg from pid %" PRIkernel_pid ": \"%s\"\n", msg.sender_pid, msg.content.ptr);
     }
 
     return 0;

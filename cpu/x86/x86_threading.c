@@ -51,7 +51,7 @@ static ucontext_t end_context;
 
 bool x86_in_isr = true;
 
-static long fpu_owner = -1;
+static kernel_pid_t fpu_owner = KERNEL_PID_NULL;
 
 //static ucontext_t *cur_ctx, *isr_ctx;
 
@@ -188,7 +188,7 @@ static void fpu_used_interrupt(uint8_t intr_num, struct x86_pushad *orig_ctx, un
         return;
     }
 
-    if (fpu_owner != -1) {
+    if (fpu_owner != KERNEL_PID_NULL) {
         ucontext_t *ctx_owner = (ucontext_t *) sched_threads[fpu_owner]->sp;
         asm volatile ("fxsave (%0)" :: "r"(&fpu_data));
         ctx_owner->__fxsave = fpu_data;
@@ -205,7 +205,7 @@ static void x86_thread_exit(void)
 {
     dINT();
     if (fpu_owner == sched_active_pid) {
-        fpu_owner = -1;
+        fpu_owner = KERNEL_PID_NULL;
     }
     sched_task_exit();
 }

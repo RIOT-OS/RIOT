@@ -60,9 +60,9 @@ static uint8_t etx_send_buf[ETX_BUF_SIZE];
 static uint8_t etx_rec_buf[ETX_BUF_SIZE];
 
 //PIDs
-int etx_beacon_pid = 0;
-int etx_radio_pid = 0;
-int etx_clock_pid = 0;
+kernel_pid_t etx_beacon_pid = KERNEL_PID_NULL;
+kernel_pid_t etx_radio_pid = KERNEL_PID_NULL;
+kernel_pid_t etx_clock_pid = KERNEL_PID_NULL;
 
 //Message queue for radio
 static msg_t msg_que[ETX_RCV_QUEUE_SIZE];

@@ -26,6 +26,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 
 #include <time.h>
 #include <sys/time.h>
+#include "kernel_types.h"
 
 /**
  * @brief Initializes the RTC for calendar mode
@@ -60,7 +61,7 @@ void rtc_get_localtime(struct tm *localt);
  */
 time_t rtc_time(struct timeval *time);
 
-extern int rtc_second_pid;
+extern kernel_pid_t rtc_second_pid;
 
 /** @} */
 #endif

@@ -67,7 +67,7 @@ static int fd_get_next_free(void)
 
 int fd_new(int internal_fd, ssize_t (*internal_read)(int, void *, size_t),
            ssize_t (*internal_write)(int, const void *, size_t),
-           int (*internal_close)(int))
+           int (*internal_close)(kernel_pid_t))
 {
     int fd = fd_get_next_free();
 

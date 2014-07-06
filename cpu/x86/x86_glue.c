@@ -58,7 +58,7 @@ int close(int fildes)
 
 pid_t getpid(void)
 {
-    return sched_active_pid;
+    return (pid_t) sched_active_pid;
 }
 
 int fstat(int fildes, struct stat *buf)

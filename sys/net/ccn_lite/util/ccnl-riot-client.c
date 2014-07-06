@@ -32,7 +32,7 @@
 
 msg_t mesg, rep;
 
-int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
+int ccnl_riot_client_get(kernel_pid_t relay_pid, char *name, char *reply_buf)
 {
     char *prefix[CCNL_MAX_NAME_COMP];
     char *cp = strtok(name, "/");
@@ -60,7 +60,7 @@ int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
         }
         unsigned int interest_nonce = genrand_uint32();
         int interest_len = mkInterest(prefix, &interest_nonce, interest_pkg);
-        DEBUGMSG(1, "relay_pid=%u interest_len=%d\n", relay_pid, interest_len);
+        DEBUGMSG(1, "relay_pid=%" PRIkernel_pid " interest_len=%d\n", relay_pid, interest_len);
 
         riot_ccnl_msg_t rmsg;
         rmsg.payload = interest_pkg;
@@ -85,7 +85,7 @@ int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
 
         unsigned char *data = rmsg_reply->payload;
         int datalen = (int) rmsg_reply->size;
-        DEBUGMSG(1, "%d bytes left; msg from=%u\n", datalen, rep.sender_pid);
+        DEBUGMSG(1, "%d bytes left; msg from=%" PRIkernel_pid "\n", datalen, rep.sender_pid);
 
         int scope = 3, aok = 3, minsfx = 0, maxsfx = CCNL_MAX_NAME_COMP,
             contlen = 0;
@@ -119,7 +119,7 @@ int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf)
     return content_len;
 }
 
-int ccnl_riot_client_new_face(unsigned int relay_pid, char *type, char *faceid,
+int ccnl_riot_client_new_face(kernel_pid_t relay_pid, char *type, char *faceid,
                   unsigned char *reply_buf)
 {
     DEBUGMSG(1, "riot_new_face: mkNewFaceRquest\n");
@@ -148,7 +148,7 @@ int ccnl_riot_client_new_face(unsigned int relay_pid, char *type, char *faceid,
     return size;
 }
 
-int ccnl_riot_client_register_prefix(unsigned int relay_pid, char *prefix, char *faceid,
+int ccnl_riot_client_register_prefix(kernel_pid_t relay_pid, char *prefix, char *faceid,
                          unsigned char *reply_buf)
 {
     DEBUGMSG(1, "riot_register_prefix: mkPrefixregRequest\n");
@@ -178,7 +178,7 @@ int ccnl_riot_client_register_prefix(unsigned int relay_pid, char *prefix, char 
     return size;
 }
 
-int ccnl_riot_client_publish(unsigned int relay_pid, char *prefix, char *faceid, char *type, unsigned char *reply_buf)
+int ccnl_riot_client_publish(kernel_pid_t relay_pid, char *prefix, char *faceid, char *type, unsigned char *reply_buf)
 {
     ccnl_riot_client_new_face(relay_pid, type, faceid, reply_buf);
     int content_len = ccnl_riot_client_register_prefix(relay_pid, prefix, faceid, reply_buf);

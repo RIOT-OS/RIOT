@@ -47,7 +47,7 @@ char relay_stack[KERNEL_CONF_STACKSIZE_MAIN];
 #if RIOT_CCN_APPSERVER
 char appserver_stack[KERNEL_CONF_STACKSIZE_MAIN];
 #endif
-int relay_pid, appserver_pid;
+kernel_pid_t relay_pid, appserver_pid;
 
 #define SHELL_MSG_BUFFER_SIZE (64)
 msg_t msg_buffer_shell[SHELL_MSG_BUFFER_SIZE];
@@ -73,7 +73,7 @@ static void riot_ccn_appserver(int argc, char **argv)
             appserver_stack, sizeof(appserver_stack),
             PRIORITY_MAIN - 1, CREATE_STACKTEST,
             ccnl_riot_appserver_start, (void *) relay_pid, "appserver");
-    DEBUG("ccn-lite appserver on thread_id %d...\n", appserver_pid);
+    DEBUG("ccn-lite appserver on thread_id %" PRIkernel_pid "...\n", appserver_pid);
 }
 #endif
 
@@ -183,7 +183,7 @@ static void riot_ccn_relay_start(void)
             relay_stack, sizeof(relay_stack),
             PRIORITY_MAIN - 2, CREATE_STACKTEST,
             ccnl_riot_relay_start, NULL, "relay");
-    DEBUG("ccn-lite relay on thread_id %d...\n", relay_pid);
+    DEBUG("ccn-lite relay on thread_id %" PRIkernel_pid "...\n", relay_pid);
 
     riot_ccn_transceiver_start(relay_pid);
 }

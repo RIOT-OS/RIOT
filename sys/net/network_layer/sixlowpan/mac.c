@@ -319,10 +319,11 @@ int sixlowpan_mac_send_ieee802154_frame(int if_id,
     }
 }
 
-int sixlowpan_mac_init(void)
+kernel_pid_t sixlowpan_mac_init(void)
 {
-    int recv_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE,
-                                 PRIORITY_MAIN - 2, CREATE_STACKTEST, recv_ieee802154_frame, NULL, "radio");
+    kernel_pid_t recv_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE,
+                                          PRIORITY_MAIN - 2, CREATE_STACKTEST,
+                                          recv_ieee802154_frame, NULL, "radio");
     int if_id = -1;
 
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
