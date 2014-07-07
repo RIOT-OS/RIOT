@@ -13,6 +13,9 @@ export APPLICATION = olsr_node
 export BOARD ?= native
 export RIOTBASE ?= $(CURDIR)/../..
 
+# other toolchains lack assert.h used by oonf_api
+BOARD_WHITELIST := avsextrem msba2 native
+
 USEPKG += oonf_api
 
 export CFLAGS = -DRIOT -DENABLE_NAME
