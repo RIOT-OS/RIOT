@@ -357,10 +357,109 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
 
 int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(void))
 {
-    /* save callback */
-   config[dev].cb = cb;
 
-    //TODO
+	//Löse Interrupt aus, bei Erkennung der Flanke
+
+	   int res;
+	    uint32_t pin = 50;
+
+	    /* configure pin as input */
+	    res = gpio_init_in(dev, pullup);
+	    if (res < 0) {
+	        return res;
+	    }
+
+
+	    switch (dev) {
+	#ifdef GPIO_0_EN
+	        case GPIO_0:
+	            pin = GPIO_0_PIN;
+	            //GPIO_0_EXTI_CFG();
+//	            NVIC_SetPriority(GPIO_0_IRQ, GPIO_IRQ_PRIO);
+//	            NVIC_EnableIRQ(GPIO_0_IRQ);
+
+	            break;
+	#endif
+	#ifdef GPIO_1_EN
+	        case GPIO_1:
+	            pin = GPIO_1_PIN;
+	            break;
+	#endif
+	#ifdef GPIO_2_EN
+	        case GPIO_2:
+	            pin = GPIO_2_PIN;
+	            break;
+	#endif
+	#ifdef GPIO_3_EN
+	        case GPIO_3:
+	            pin = GPIO_3_PIN;
+	            break;
+	#endif
+	#ifdef GPIO_4_EN
+	        case GPIO_4:
+	            pin = GPIO_4_PIN;
+	            break;
+	#endif
+	#ifdef GPIO_5_EN
+	        case GPIO_5:
+	            pin = GPIO_5_PIN;
+	            break;
+	#endif
+	#ifdef GPIO_6_EN
+	        case GPIO_6:
+	            pin = GPIO_6_PIN;
+	            break;
+	#endif
+	#ifdef GPIO_7_EN
+	        case GPIO_7:
+	            pin = GPIO_7_PIN;
+	            break;
+	#endif
+	#ifdef GPIO_8_EN
+	        case GPIO_8:
+	            pin = GPIO_8_PIN;
+	            break;
+	#endif
+	#ifdef GPIO_9_EN
+	        case GPIO_9:
+	            pin = GPIO_9_PIN;
+	            break;
+	#endif
+	#ifdef GPIO_10_EN
+	        case GPIO_10:
+	            pin = GPIO_10_PIN;
+	            break;
+	#endif
+	#ifdef GPIO_11_EN
+	        case GPIO_11:
+	            pin = GPIO_11_PIN;
+	            break;
+	#endif
+	        case GPIO_UNDEFINED:
+	        default:
+	            return -1;
+	    }
+
+
+	    if(pin == 50){
+	    	return -1;
+	    }
+
+
+	   NVIC_SetPriority(GPIOTE_IRQn, GPIO_IRQ_PRIO);
+	   NVIC_EnableIRQ(GPIOTE_IRQn);
+	    /* save callback */
+	   config[dev].cb = cb;
+
+	    gpio_init_in(pin,pullup);
+	    GPIO_IRQ_DEV->CONFIG[0] =  (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos)
+	                           | (pin << GPIOTE_CONFIG_PSEL_Pos)
+	                           | (GPIOTE_CONFIG_MODE_Event << GPIOTE_CONFIG_MODE_Pos);
+
+	    GPIO_IRQ_DEV->INTENSET  = GPIOTE_INTENSET_IN0_Set << GPIOTE_INTENSET_IN0_Pos;
+
+
+
     return 1;
 }
 
@@ -654,3 +753,34 @@ int gpio_write(gpio_t dev, int value)
         return gpio_clear(dev);
     }
 }
+
+
+__attribute__((naked)) void EXTI0_0_IRQn(void)
+{
+    ISR_ENTER();
+	    // Event causing the interrupt must be cleared.
+	    if ((GPIO_IRQ_DEV->EVENTS_IN[0] == 1) &&
+	        (GPIO_IRQ_DEV->INTENSET & GPIOTE_INTENSET_IN0_Msk))
+	    {
+	    	GPIO_IRQ_DEV->EVENTS_IN[0] = 0;
+	    }
+
+	    config[GPIO_IRQ_0].cb();
+	    ISR_EXIT();
+}
+
+__attribute__((naked)) void EXTI0_1_IRQn(void)
+{
+    ISR_ENTER();
+	    // Event causing the interrupt must be cleared.
+	    if ((GPIO_IRQ_DEV->EVENTS_IN[0] == 1) &&
+	        (GPIO_IRQ_DEV->INTENSET & GPIOTE_INTENSET_IN0_Msk))
+	    {
+	    	GPIO_IRQ_DEV->EVENTS_IN[0] = 0;
+	    }
+
+	    config[GPIO_IRQ_1].cb();
+	    ISR_EXIT();
+}
+
+
