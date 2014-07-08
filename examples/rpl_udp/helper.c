@@ -98,6 +98,8 @@ void rpl_udp_monitor(void)
             if (ipv6_buf->nextheader == IPV6_PROTO_NUM_ICMPV6) {
                 DEBUG("\t ICMP type: %02X ", icmp_type);
                 DEBUG("\t ICMP code: %02X ", icmp_code);
+                (void) icmp_type;
+                (void) icmp_code;
             }
 
             printf("\n");

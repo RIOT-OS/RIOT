@@ -19,6 +19,7 @@
 #ifndef __THREAD_ARCH_H
 #define __THREAD_ARCH_H
 
+#include "attributes.h"
 
 /**
  * @name Define the mapping between the architecture independent interfaces
@@ -56,7 +57,7 @@ void thread_arch_stack_print(void);
 /**
  * @brief Start threading by loading a threads initial information from the stack
  */
-void thread_arch_start_threading(void);
+void thread_arch_start_threading(void) NORETURN;
 
 /**
  * @brief Pause the current thread and schedule the next pending, if available

@@ -51,21 +51,22 @@ typedef struct __attribute__((packed)) {
  * @see <a href="http://tools.ietf.org/html/rfc793">RFC 793</a>
  */
 typedef struct __attribute__((packed)) {
-    uint16_t 	src_port;               ///< source port
-    uint16_t 	dst_port;               ///< destination port
-    uint32_t 	seq_nr;                 ///< sequence number
-    uint32_t 	ack_nr;                 ///< acknowledgement number
-    uint8_t 	dataOffset_reserved;    ///< 4 MSBs data offsets,
-                                       ///< 4 LSBs reserved (must be zero)
-    uint8_t 	reserved_flags;         ///< MSB reserved, rest flags
-    uint16_t 	window;                 ///< receiver window
+    uint16_t    src_port;               ///< source port
+    uint16_t    dst_port;               ///< destination port
+    uint32_t    seq_nr;                 ///< sequence number
+    uint32_t    ack_nr;                 ///< acknowledgement number
+    unsigned    flag_ns         :1;     ///< ECN-nonce concealment protection (since RFC 3540).
+    unsigned    reserved        :3;     ///< for future use - set to zero
+    unsigned    data_offset     :4;
+    uint8_t     reserved_flags;         ///< TODO: break this down into another bitfield: flag_fin, flag_syn, etc
+    uint16_t    window;                 ///< receiver window
     /**
      * internet checksum
      *
      * @see <a href="http://tools.ietf.org/html/rfc1071">RFC 1071</a>
      */
-    uint16_t	checksum;
-    uint16_t	urg_pointer;            ///< urgent pointer
+    uint16_t    checksum;
+    uint16_t    urg_pointer;            ///< urgent pointer
 } tcp_hdr_t;
 
 /**

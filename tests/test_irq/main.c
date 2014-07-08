@@ -23,7 +23,7 @@
 #include "hwtimer.h"
 #include "thread.h"
 
-char busy_stack[KERNEL_CONF_STACKSIZE_PRINTF];
+char busy_stack[KERNEL_CONF_STACKSIZE_MAIN];
 volatile int busy, i, k;
 
 void busy_thread(void)
@@ -49,7 +49,7 @@ int main(void)
 {
     busy = 1;
     k = 23;
-    thread_create(busy_stack, KERNEL_CONF_STACKSIZE_PRINTF,
+    thread_create(busy_stack, KERNEL_CONF_STACKSIZE_MAIN,
                   PRIORITY_MAIN + 1, CREATE_WOUT_YIELD, busy_thread,
                   "busy_thread");
     puts("busy_thread created");

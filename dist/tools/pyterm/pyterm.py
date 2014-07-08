@@ -1,7 +1,12 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import cmd, serial, sys, threading, readline, time, ConfigParser, logging, os
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
+
+import cmd, serial, sys, threading, readline, time, logging, os
 
 pytermdir     = os.environ['HOME'] + os.path.sep + '.pyterm'
 
@@ -18,8 +23,8 @@ class SerCmd(cmd.Cmd):
             pass
 
                 ### create Logging object
-        my_millis = ("%.4f" % time.time())
-        date_str = '%s.%s' % (time.strftime('%Y%m%d-%H:%M:%S'), my_millis[-4:])
+        my_millis = "{:.4f}".format(time.time())
+        date_str = '{}.{}'.format(time.strftime('%Y%m%d-%H:%M:%S'), my_millis[-4:])
         # create formatter
         fmt_str = '%(asctime)s - %(levelname)s # %(message)s'
         formatter = logging.Formatter(fmt_str)
@@ -53,14 +58,14 @@ class SerCmd(cmd.Cmd):
     def default(self, line):
         for tok in line.split(';'):
             tok = self.get_alias(tok)
-            self.ser.write(tok.strip() + "\n")
+            self.ser.write((tok.strip() + "\n").encode("utf-8"))
 
     def do_help(self, line):
-        self.ser.write("help\n")
+        self.ser.write("help\n".encode("utf-8"))
 
     def complete_date(self, text, line, begidx, endidm):
         date = time.strftime("%Y-%m-%d %H:%M:%S")
-        return ["%s" % date]
+        return ["{}".format(date)]
 
     def do_reset(self, line):
         self.ser.setDTR(1)
@@ -80,7 +85,7 @@ class SerCmd(cmd.Cmd):
             for alias in self.aliases:
                 self.config.set("aliases", alias, self.aliases[alias])
 
-        with open(path.expanduser('~/.pyterm'), 'wb') as config_fd:
+        with open(os.path.expanduser('~/.pyterm'), 'wb') as config_fd:
             self.config.write(config_fd)
             print("Config saved")
 
@@ -91,7 +96,7 @@ class SerCmd(cmd.Cmd):
     def do_alias(self, line):
         if line.endswith("list"):
             for alias in self.aliases:
-                print("%s = %s" % (alias, self.aliases[alias]))
+                print("{} = {}".format(alias, self.aliases[alias]))
             return
         if not line.count("="):
             sys.stderr.write("Usage: alias <ALIAS> = <CMD>\n")
@@ -109,7 +114,7 @@ class SerCmd(cmd.Cmd):
         return tok
 
     def load_config(self):
-        self.config = ConfigParser.SafeConfigParser()
+        self.config = configparser.SafeConfigParser()
         self.config.read([pytermdir + os.path.sep + 'pyterm.conf'])
 
         for sec in self.config.sections():
@@ -118,14 +123,14 @@ class SerCmd(cmd.Cmd):
                     self.aliases[opt] = self.config.get(sec, opt)
             else:
                 for opt in self.config.options(sec):
-                    if not self.__dict__.has_key(opt):
+                    if opt not in self.__dict__:
                         self.__dict__[opt] = self.config.get(sec, opt)
 
 
 def reader(ser, logger):
     output = ""
     while (1):
-        c = ser.read(1)
+        c = ser.read(1).decode("utf-8")
         if c == '\n' or c == '\r':
             logger.info(output)
             output = ""

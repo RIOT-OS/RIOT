@@ -312,7 +312,17 @@ void _transceiver_set_ignore_handler(int argc, char **argv)
         puts("Transceiver not initialized");
         return;
     }
-    else if (argc != 2) {
+    else if (argc < 2) {
+        printf("[transceiver] Ignored link layer addresses: ");
+        for (uint8_t i = 0; i < TRANSCEIVER_MAX_IGNORED_ADDR; i++) {
+            if (transceiver_ignored_addr[i]) {
+                printf("%" PRIu16 " ", transceiver_ignored_addr[i]);
+            }
+        }
+        puts("");
+        return;
+    }
+    else if (argc > 2) {
         printf("Usage:\n%s <address>\n", argv[0]);
         return;
     }

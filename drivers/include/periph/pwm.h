@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the LGPLv2 License.
- * See the file LICENSE in the top level directory for more details.
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
 
 /**
@@ -10,7 +11,7 @@
  * @brief       Low-level PWM peripheral driver
  * @{
  *
- * @file        pwm.h
+ * @file
  * @brief       Low-level PWM peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -52,7 +53,6 @@ typedef enum {
     PWM_CENTER          /*< use center aligned PWM */
 } pwm_mode_t;
 
-
 /**
  * @brief Initialize a PWM device
  *
@@ -65,12 +65,14 @@ typedef enum {
  * frequency if needed. To verify the correct settings compare the returned value which
  * is the actually set frequency.
  *
- * @param dev           PWM channel to initialize
- * @param mode          PWM mode, left, right or center aligned
- * @param frequency     the PWM frequency in Hz
- * @param resolution    the PWM resolution
- * @return              0 on success, -1 if requested mode and/or frequency and resolution
- *                      not applicable
+ * @param[in] dev           PWM channel to initialize
+ * @param[in] mode          PWM mode, left, right or center aligned
+ * @param[in] frequency     the PWM frequency in Hz
+ * @param[in] resolution    the PWM resolution
+ *
+ * @return                  0 on success
+ * @return                  -1 on invalid device
+ * @return                  -2 on requested mode and/or frequency and resolution not applicable
  */
 int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int resolution);
 
@@ -80,27 +82,35 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
  * The duty-cycle is set in relation to the chosen resolution of the given device. If
  * value > resolution, value is set to resolution.
  *
- * @param dev           the PWM device to set
- * @param channel       the channel of the given device to set
- * @param value         the desired duty-cycle to set
- * @return              0 on success, -1 on invalid device or channel
+ * @param[in] dev           the PWM device to set
+ * @param[in] channel       the channel of the given device to set
+ * @param[in] value         the desired duty-cycle to set
+ *
+ * @return                  0 on success
+ * @return                  -1 on invalid device
+ * @return                  -2 on invalid channel
  */
 int pwm_set(pwm_t dev, int channel, unsigned int value);
 
 /**
  * @brief Start PWM generation on the given device
  *
- * @param dev           device to start
+ * @param[in] dev           device to start
+ *
+ * @return                  0 on success
+ * @return                  -1 if invalid device given
  */
-void pwm_start(pwm_t dev);
+int pwm_start(pwm_t dev);
 
 /**
  * @brief Stop PWM generation on the given device
  *
- * @param dev           device to stop
+ * @param[in] dev           device to stop
+ *
+ * @return                  0 on success
+ * @return                  -1 if invalid device given
  */
-void pwm_stop(pwm_t dev);
-
+int pwm_stop(pwm_t dev);
 
 #endif /* __PWM_H */
 /** @} */

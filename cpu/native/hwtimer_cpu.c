@@ -134,7 +134,14 @@ void schedule_timer(void)
     }
     if (next_timer == -1) {
         DEBUG("schedule_timer(): no valid timer found - nothing to schedule\n");
-        // TODO: unset timer
+        struct itimerval null_timer;
+        null_timer.it_interval.tv_sec = 0;
+        null_timer.it_interval.tv_usec = 0;
+        null_timer.it_value.tv_sec = 0;
+        null_timer.it_value.tv_usec = 0;
+        if (setitimer(ITIMER_REAL, &null_timer, NULL) == -1) {
+            err(EXIT_FAILURE, "schedule_timer: setitimer");
+        }
         return;
     }
 

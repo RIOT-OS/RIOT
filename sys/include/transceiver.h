@@ -119,6 +119,9 @@
  * of two */
 #define TRANSCEIVER_MSG_BUFFER_SIZE     (32)
 
+/** The maximum number of ignored addresses */
+#define TRANSCEIVER_MAX_IGNORED_ADDR     (10)
+
 /**
  * @brief All supported transceivers
  */
@@ -197,6 +200,9 @@ typedef struct {
 
 /* The transceiver thread's pid */
 extern int transceiver_pid;
+
+/** An array of ignored link layer addresses */
+extern radio_address_t transceiver_ignored_addr[TRANSCEIVER_MAX_IGNORED_ADDR];
 
 /**
  * @brief Initializes the transceiver module for certain transceiver types

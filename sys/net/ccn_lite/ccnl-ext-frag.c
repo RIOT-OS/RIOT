@@ -707,5 +707,8 @@ Bail:
     return -1;
 }
 
-#endif // USE_FRAG
-// eof
+#else // USE_FRAG
+
+static int dummy __attribute__((unused));
+
+#endif

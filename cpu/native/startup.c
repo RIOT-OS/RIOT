@@ -54,8 +54,7 @@ const char *_native_unix_socket_path = NULL;
  */
 void _native_null_in(char *stdiotype)
 {
-
-    if (pipe(_native_null_in_pipe) == -1) {
+    if (real_pipe(_native_null_in_pipe) == -1) {
         err(1, "_native_null_in(): pipe()");
     }
 
@@ -63,7 +62,7 @@ void _native_null_in(char *stdiotype)
         return;
     }
 
-    if (dup2(_native_null_in_pipe[0], STDIN_FILENO) == -1) {
+    if (real_dup2(_native_null_in_pipe[0], STDIN_FILENO) == -1) {
         err(EXIT_FAILURE, "_native_null_in: dup2(STDIN_FILENO)");
     }
 }
@@ -98,7 +97,7 @@ void _native_log_stdout(char *stdouttype)
         errx(EXIT_FAILURE, "_native_log_stdout: unknown log type");
     }
 
-    if (dup2(stdout_outfile, STDOUT_FILENO) == -1) {
+    if (real_dup2(stdout_outfile, STDOUT_FILENO) == -1) {
         err(EXIT_FAILURE, "_native_log_stdout: dup2(STDOUT_FILENO)");
     }
     _native_null_out_file = stdout_outfile;
@@ -133,14 +132,14 @@ void _native_log_stderr(char *stderrtype)
         errx(EXIT_FAILURE, "_native_log_stderr: unknown log type");
     }
 
-    if (dup2(stderr_outfile, STDERR_FILENO) == -1) {
+    if (real_dup2(stderr_outfile, STDERR_FILENO) == -1) {
         err(EXIT_FAILURE, "_native_log_stderr: dup2(STDERR_FILENO)");
     }
 }
 
 void daemonize(void)
 {
-    if ((_native_pid = fork()) == -1) {
+    if ((_native_pid = real_fork()) == -1) {
         err(EXIT_FAILURE, "daemonize: fork");
     }
 
@@ -200,6 +199,13 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");
     *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
     *(void **)(&real_getpid) = dlsym(RTLD_NEXT, "getpid");
+    *(void **)(&real_pipe) = dlsym(RTLD_NEXT, "pipe");
+    *(void **)(&real_close) = dlsym(RTLD_NEXT, "close");
+    *(void **)(&real_fork) = dlsym(RTLD_NEXT, "fork");
+    *(void **)(&real_dup2) = dlsym(RTLD_NEXT, "dup2");
+    *(void **)(&real_unlink) = dlsym(RTLD_NEXT, "unlink");
+    *(void **)(&real_execve) = dlsym(RTLD_NEXT, "execve");
+    *(void **)(&real_pause) = dlsym(RTLD_NEXT, "pause");
 
     _native_argv = argv;
     _progname = argv[0];

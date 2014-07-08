@@ -16,10 +16,17 @@ install:
     - sudo apt-get install gcc-multilib
     - sudo apt-get install gcc-arm-none-eabi
     - sudo apt-get install gcc-msp430
+    - sudo apt-get install pcregrep libpcre3
+    - sudo apt-get install qemu-system-x86 python3
+    - sudo apt-get install g++-multilib
+    - git config --global user.email "travis@example.com"
+    - git config --global user.name "Travis CI"
 
 script:
     - ./dist/tools/compile_test/compile_test.py
-    - make -C ./tests/unittests term
+    - make -C ./tests/unittests test BOARD=native
+    - make -C ./tests/unittests test BOARD=qemu-i386
+    - ./dist/tools/licenses/check.sh master
 
 notifications:
     email: false

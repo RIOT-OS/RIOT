@@ -64,7 +64,7 @@
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 #undef TRANSCEIVER_STACK_SIZE
-#define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_PRINTF)
+#define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_MAIN)
 #endif
 #include "debug.h"
 
@@ -142,9 +142,7 @@ static void switch_to_rx(transceiver_type_t t);
 #ifdef DBG_IGNORE
 static int16_t ignore_add(transceiver_type_t transceiver, void *address);
 
-#define MAX_IGNORED_ADDR     (10)
-
-radio_address_t ignored_addr[MAX_IGNORED_ADDR];
+radio_address_t transceiver_ignored_addr[TRANSCEIVER_MAX_IGNORED_ADDR];
 #endif
 
 /*------------------------------------------------------------------------------------*/
@@ -162,7 +160,7 @@ void transceiver_init(transceiver_type_t t)
     memset(transceiver_buffer, 0, sizeof(transceiver_buffer));
     memset(data_buffer, 0, TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE);
 #ifdef DBG_IGNORE
-    memset(ignored_addr, 0, MAX_IGNORED_ADDR * sizeof(radio_address_t));
+    memset(transceiver_ignored_addr, 0, sizeof(transceiver_ignored_addr));
 #endif
 
     for (i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
@@ -463,10 +461,10 @@ static void receive_packet(uint16_t type, uint8_t pos)
 
 #ifdef DBG_IGNORE
 
-        for (uint8_t i = 0; (i < MAX_IGNORED_ADDR) && (ignored_addr[i]); i++) {
-            DEBUG("check if source (%u) is ignored -> %u\n", transceiver_buffer[transceiver_buffer_pos].src, ignored_addr[i]);
+        for (uint8_t i = 0; (i < TRANSCEIVER_MAX_IGNORED_ADDR) && (transceiver_ignored_addr[i]); i++) {
+            DEBUG("check if source (%u) is ignored -> %u\n", transceiver_buffer[transceiver_buffer_pos].src, transceiver_ignored_addr[i]);
 
-            if (transceiver_buffer[transceiver_buffer_pos].src == ignored_addr[i]) {
+            if (transceiver_buffer[transceiver_buffer_pos].src == transceiver_ignored_addr[i]) {
                 DEBUG("ignored packet from %" PRIu16 "\n", transceiver_buffer[transceiver_buffer_pos].src);
                 return;
             }
@@ -532,6 +530,7 @@ void receive_cc1100_packet(radio_packet_t *trans_p)
     eINT();
 
     trans_p->data = (uint8_t *) &(data_buffer[transceiver_buffer_pos * CC1100_MAX_DATA_LENGTH]);
+    DEBUG("transceiver: Packet %p (%p) was from %hu to %hu, size: %u\n", trans_p, trans_p->data, trans_p->src, trans_p->dst, trans_p->length);
 }
 #endif
 
@@ -698,6 +697,11 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
 #else
     radio_packet_t *p = (radio_packet_t *)pkt;
     DEBUG("transceiver: Send packet to %" PRIu16 "\n", p->dst);
+    for (size_t i = 0; i < p->length; i++) {
+        DEBUG("%02x ", p->data[i]);
+    }
+
+    DEBUG("\n");
 #endif
 
 #ifdef MODULE_CC110X_NG
@@ -727,7 +731,7 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
             memcpy(cc1100_pkt, p->data, p->length);
 
             res = cc1100_send_csmaca(p->dst, 4, 0, (char *) cc1100_pkt, p->length);
-            DEBUG("transceiver: snd_ret (%u) = %i\n", p->length, snd_ret);
+            DEBUG("transceiver: snd_ret (%u) = %i\n", p->length, res);
 #else
             puts("Unknown transceiver");
 #endif
@@ -1215,9 +1219,9 @@ static int16_t ignore_add(transceiver_type_t transceiver, void *address)
     (void) transceiver;
     radio_address_t addr = *((radio_address_t *)address);
 
-    for (uint8_t i = 0; i < MAX_IGNORED_ADDR; i++) {
-        if (ignored_addr[i] == 0) {
-            ignored_addr[i] = addr;
+    for (uint8_t i = 0; i < TRANSCEIVER_MAX_IGNORED_ADDR; i++) {
+        if (transceiver_ignored_addr[i] == 0) {
+            transceiver_ignored_addr[i] = addr;
             DEBUG("addr %u will be ignored (%u)\n", addr, i);
             return i;
         }

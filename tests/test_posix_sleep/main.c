@@ -40,4 +40,5 @@ int main(void)
     }
 
     puts("done");
+    return 0;
 }

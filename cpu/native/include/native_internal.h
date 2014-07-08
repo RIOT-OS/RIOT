@@ -59,6 +59,13 @@ extern void (*real_free)(void *ptr);
 extern void* (*real_calloc)(size_t nmemb, size_t size);
 extern void* (*real_realloc)(void *ptr, size_t size);
 extern int (*real_getpid)(void);
+extern int (*real_pipe)(int[2]);
+extern int (*real_close)(int);
+extern int (*real_fork)(void);
+extern int (*real_dup2)(int, int);
+extern int (*real_unlink)(const char *);
+extern int (*real_execve)(const char *, char *const[], char *const[]);
+extern int (*real_pause)(void);
 
 /**
  * data structures

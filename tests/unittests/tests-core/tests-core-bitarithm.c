@@ -157,6 +157,13 @@ static void test_bitarithm_msb_random(void)
                                                            dice roll ;-) */
 }
 
+static void test_bitarithm_msb_all(void)
+{
+    for (unsigned shift = 0; shift < sizeof (unsigned) * 8 - 1; ++shift) {
+        TEST_ASSERT_EQUAL_INT(shift, bitarithm_msb(1 << shift));
+    }
+}
+
 static void test_bitarithm_lsb_one(void)
 {
     TEST_ASSERT_EQUAL_INT(0, bitarithm_lsb(1));
@@ -164,13 +171,21 @@ static void test_bitarithm_lsb_one(void)
 
 static void test_bitarithm_lsb_limit(void)
 {
-    TEST_ASSERT_EQUAL_INT(0, bitarithm_lsb(UINT_MAX));
+    unsigned shift = sizeof (unsigned) * 8 - 1;
+    TEST_ASSERT_EQUAL_INT(shift, bitarithm_lsb(1u << shift));
 }
 
 static void test_bitarithm_lsb_random(void)
 {
     TEST_ASSERT_EQUAL_INT(3, bitarithm_lsb(8)); /* randomized by fair
                                                           dice roll ;-) */
+}
+
+static void test_bitarithm_lsb_all(void)
+{
+    for (unsigned shift = 0; shift < sizeof (unsigned) * 8 - 1; ++shift) {
+        TEST_ASSERT_EQUAL_INT(shift, bitarithm_lsb(1u << shift));
+    }
 }
 
 static void test_bitarithm_bits_set_null(void)
@@ -205,6 +220,7 @@ Test *tests_core_bitarithm_tests(void)
         new_TestFixture(test_SETBIT_null_one),
         new_TestFixture(test_SETBIT_one_null),
         new_TestFixture(test_SETBIT_one_random),
+
         new_TestFixture(test_CLRBIT_null_null),
         new_TestFixture(test_CLRBIT_null_limit),
         new_TestFixture(test_CLRBIT_limit_null),
@@ -212,12 +228,17 @@ Test *tests_core_bitarithm_tests(void)
         new_TestFixture(test_CLRBIT_null_one),
         new_TestFixture(test_CLRBIT_one_null),
         new_TestFixture(test_CLRBIT_one_random),
+
         new_TestFixture(test_bitarithm_msb_one),
         new_TestFixture(test_bitarithm_msb_limit),
         new_TestFixture(test_bitarithm_msb_random),
+        new_TestFixture(test_bitarithm_msb_all),
+
         new_TestFixture(test_bitarithm_lsb_one),
         new_TestFixture(test_bitarithm_lsb_limit),
         new_TestFixture(test_bitarithm_lsb_random),
+        new_TestFixture(test_bitarithm_lsb_all),
+
         new_TestFixture(test_bitarithm_bits_set_null),
         new_TestFixture(test_bitarithm_bits_set_one),
         new_TestFixture(test_bitarithm_bits_set_limit),

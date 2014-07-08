@@ -97,6 +97,12 @@ int getsockopt(int socket, int level, int option_name,
                void *restrict option_value, socklen_t *restrict option_len)
 {
     // TODO
+    (void) socket;
+    (void) level;
+    (void) option_name;
+    (void) option_value;
+    (void) option_len;
+
     return -1;
 }
 
@@ -180,6 +186,12 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
                socklen_t option_len)
 {
     // TODO
+    (void) socket;
+    (void) level;
+    (void) option_name;
+    (void) option_value;
+    (void) option_len;
+
     return -1;
 }
 

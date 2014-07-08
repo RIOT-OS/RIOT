@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# This wrapper takes the arguments: <ar> <operation> <archive> <files...>
+# <ar> can be any ar implementation.
+# <operations>, <archive> and <files...> are the normal arguments to <ar>.
+#
+# OS X's ar implementation has the problem, that it refuses to create empty archives.
+# This wrapper will copy a provided empty .a file to <archive> if it was told to.
+
+# If <operations> contains "r", and there are no <files...> given.
+if [ "${2#*r}" != "$2" ] && [ "$#" -eq 3 ]; then
+    # If <archive> exists, do nothing, otherwise copy an empty archive.
+    [ -e "$3" ] || cp "${0%ar-wrapper}/empty.a" "$3"
+else
+    # Otherwise act like this wrapper was not present.
+    "$@"
+fi
+
+# Return the exit code of the last invocation ("[", "cp", or <ar>).
+exit $?

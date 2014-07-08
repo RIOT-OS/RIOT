@@ -19,10 +19,10 @@
 #define RPL_CONFIG_H_INCLUDED
 
 /*  Default values */
-#define NO_DOWNWARD_ROUTES  0x00
-#define NON_STORING_MODE    0x01
-#define STORING_MODE_NO_MC  0x02
-#define STORING_MODE_MC     0x03
+#define RPL_NO_DOWNWARD_ROUTES  0x00
+#define RPL_NON_STORING_MODE    0x01
+#define RPL_STORING_MODE_NO_MC  0x02
+#define RPL_STORING_MODE_MC     0x03
 
 /* ICMP type */
 #define RPL_SEQUENCE_WINDOW         16
@@ -92,7 +92,7 @@ static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A,uint8_t B)
 
 /*  RPL Constants and Variables */
 
-#define RPL_DEFAULT_MOP STORING_MODE_NO_MC
+#define RPL_DEFAULT_MOP RPL_STORING_MODE_NO_MC
 #define BASE_RANK 0
 #define INFINITE_RANK 0xFFFF
 #define RPL_DEFAULT_INSTANCE 0

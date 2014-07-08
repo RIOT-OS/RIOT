@@ -11,7 +11,4 @@ ifneq (,$(filter mc1322x,$(USEMODULE)))
 	DIRS += maca
 endif
 
-all: $(BINDIR)$(MODULE).a
-	@for i in $(DIRS) ; do "$(MAKE)" -C $$i || exit 1; done ;
-
 include $(RIOTBASE)/Makefile.base

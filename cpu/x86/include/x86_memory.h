@@ -107,6 +107,10 @@ typedef uint64_t pae_page_table_t[512] __attribute__((aligned(0x1000)));
 #define PT_XD    (1ull << 63) /**< 1 = no execute */
 #define PT_ADDR_MASK (((1ull << 48) - 1) & ~((1ull << 12) - 1))
 
+#ifdef DEBUG_READ_BEFORE_WRITE
+#   define PT_HEAP_BIT PT_USR9
+#endif
+
 #define PF_EC_P (1u << 0) /**< 1 = page protection violation; 0 = page not present */
 #define PF_EC_W (1u << 1) /**< 1 = accessed writingly; 0 = readingly */
 #define PF_EC_U (1u << 2) /**< 1 = ring 3 */
