@@ -90,7 +90,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
 
         /* Move tcp packet 3 bytes to add padding and Context ID */
         memmove(current_tcp_packet + 3, current_tcp_packet,
-                ((((tcp_hdr_t *)current_tcp_packet)->dataOffset_reserved) * 4) +
+                ((((tcp_hdr_t *)current_tcp_packet)->data_offset) * 4) +
                 payload_length);
 
         /* 1 padding byte with value 0x01 to introduce full header TCP_HC
@@ -102,7 +102,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         memcpy(current_tcp_packet + 1, &current_context, 2);
 
         /* Return correct header length (+3) */
-        packet_size = ((((tcp_hdr_t *)(current_tcp_packet + 3))->dataOffset_reserved) * 4) + 3 +
+        packet_size = ((((tcp_hdr_t *)(current_tcp_packet + 3))->data_offset) * 4) + 3 +
                       payload_length;
 
         /* Update the tcp context fields */
@@ -616,7 +616,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
                &current_socket->socket_values.foreign_address.sin6_port, 2);
 
         /* Ordinary TCP header length */
-        full_tcp_header.dataOffset_reserved = TCP_HDR_LEN / 4;
+        full_tcp_header.data_offset = TCP_HDR_LEN / 4;
 
         /* Move payload to end of tcp header */
         memmove(((uint8_t *)temp_ipv6_header) + IPV6_HDR_LEN + TCP_HDR_LEN,

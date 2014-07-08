@@ -80,3 +80,7 @@ endif
 ifneq (,$(filter ccn_lite,$(USEMODULE)))
 	USEMODULE += crypto
 endif
+
+ifneq (,$(filter rgbled,$(USEMODULE)))
+	USEMODULE += color
+endif

@@ -56,6 +56,13 @@ int timex_isnormalized(timex_t *time);
 uint64_t timex_uint64(const timex_t a);
 
 /**
+ * @brief Converts a uint64_t of microseconds to a timex_t
+ *
+ * @return a timex representation of an uint64 timestamp.
+ */
+timex_t timex_from_uint64(const uint64_t timestamp);
+
+/**
  * @brief Prints a timex_t
  */
 void timex_print(const timex_t t);

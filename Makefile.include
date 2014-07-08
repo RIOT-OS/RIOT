@@ -1,4 +1,4 @@
-# Provide a shallow sanity check. You cannot call `make` in the root directory.
+# Provide a shallow sanity check. You cannot call `make` in a module directory.
 export __RIOTBUILD_FLAG := RIOT
 
 # set undefined variables
@@ -33,12 +33,14 @@ CPUDEF = $(shell echo $(CPU)|tr 'a-z' 'A-Z'|tr '-' '_')
 CFLAGS += -DBOARD_$(BB) -DCPU_$(CPUDEF)
 
 export CFLAGS
+export APPLICATION
 
 export BINDIRBASE ?= $(CURDIR)/bin
 export BINDIR ?= $(abspath $(BINDIRBASE)/$(BOARD))/
 
 ifeq ($(QUIET),1)
 	AD=@
+	MAKEFLAGS += --no-print-directory
 else
 	AD=
 endif
@@ -52,6 +54,11 @@ include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 include $(RIOTBASE)/Makefile.dep
 
+# OSX fails to create empty archives. Provide a wrapper to catch that error.
+ifneq (0, $(shell mkdir -p $(BINDIR); $(AR) -rc $(BINDIR)empty-archive.a 2> /dev/null; echo $$?))
+	AR := $(RIOTBASE)/dist/ar-wrapper $(AR)
+endif
+
 # Test if there where dependencies against a module in DISABLE_MODULE.
 ifneq (, $(filter $(DISABLE_MODULE), $(USEMODULE)))
 $(error "Required modules were disabled using DISABLE_MODULE: $(sort $(filter $(DISABLE_MODULE), $(USEMODULE)))")
@@ -60,39 +67,52 @@ endif
 # Feature test default CFLAGS and LINKFLAGS for the set compiled.
 include $(RIOTBASE)/Makefile.cflags
 
+# make the RIOT version available to the program
+GIT_STRING := $(shell git describe --always --abbrev=4 --dirty=-`hostname`)
+GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+ifeq ($(strip $(GIT_BRANCH)),master)
+	GIT_VERSION = $(GIT_STRING)
+else
+	GIT_VERSION = $(shell echo $(GIT_STRING) $(GIT_BRANCH) | sed 's/ /-/')
+endif
+ifeq ($(strip $(GIT_VERSION)),)
+	GIT_VERSION := "UNKNOWN"
+endif
+export CFLAGS += -DVERSION=\"$(GIT_VERSION)\"
+
 # the binaries to link
 BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
-.PHONY: all clean flash doc term objsize buildsize buildsizes buildsizes-diff
+.PHONY: all clean flash doc term objsize buildsize buildsizes buildsizes-diff buildinfo
 
 export ELFFILE ?= $(BINDIR)$(APPLICATION).elf
 export HEXFILE ?= $(ELFFILE:.elf=.hex)
 
+# variables used to complie and link c++
+export CPPMIX ?= $(if $(wildcard *.cpp),1,)
+export CXXUWFLAGS
+export CXXEXFLAGS
+
+# We assume $(LINK) to be gcc-like. Use `LINKFLAGPREFIX :=` for ld-like linker options.
+LINKFLAGPREFIX ?= -Wl,
+
 ## make script for your application. Build RIOT-base here!
-all: $(BINDIR)$(APPLICATION).a
-	@echo "Building application $(APPLICATION) for $(BOARD) w/ MCU $(MCU)."
-	"$(MAKE)" -C $(RIOTBOARD)/$(BOARD)
-	"$(MAKE)" -C $(RIOTBASE)
+all: ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
+	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
 ifeq (,$(RIOTNOLINK))
 ifeq ($(BUILDOSXNATIVE),1)
-	$(AD)$(LINK) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) -Wl,-no_pie
+	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
-	$(AD)$(LINK) $(UNDEF) -o $(ELFFILE) -Wl,--start-group $(BASELIBS) -lm -Wl,--end-group  -Wl,-Map=$(BINDIR)$(APPLICATION).map $(LINKFLAGS)
+	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)$(APPLICATION).map $(LINKFLAGS)
 endif
 	$(AD)$(SIZE) $(ELFFILE)
 	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
 endif
 
-# string array of all names of c files in dir
-SRC = $(wildcard *.c)
-
-# string array of all names replaced .c with .o
-OBJ = $(SRC:%.c=${BINDIR}${APPLICATION}/%.o)
-
-$(BINDIR)$(APPLICATION).a: $(OBJ)
-	$(AD)$(AR) -rc $(BINDIR)$(APPLICATION).a $(OBJ)
+..build-message:
+	@echo "Building application $(APPLICATION) for $(BOARD) w/ MCU $(MCU)."
 
 # add extra include paths for packages in $(USEMODULE)
 export USEMODULE_INCLUDES =
@@ -106,7 +126,7 @@ INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
 
 # The `clean` needs to be serialized before everything else.
 ifneq (, $(filter clean, $(MAKECMDGOALS)))
-    $(OBJ) $(BASELIBS) $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include): clean
+    all $(BASELIBS) $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include): clean
 endif
 
 # include Makefile.includes for packages in $(USEPKG)
@@ -116,14 +136,6 @@ $(RIOTBASE)/pkg/%/Makefile.include::
 .PHONY: $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include)
 
 -include $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include)
-
-# pull in dependency info for *existing* .o files
--include $(OBJ:.o=.d)
-
-$(BINDIR)$(APPLICATION)/%.o: %.c $(PROJDEPS) $(USEPKG:%=${BINDIR}%.a)
-	@echo; echo "Compiling.... $*.c"; echo
-	$(AD)mkdir -p "$(dir $@)"
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -c "$<" -o "$@"
 
 $(USEPKG:%=${BINDIR}%.a):
 	@mkdir -p ${BINDIR}

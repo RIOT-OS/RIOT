@@ -503,7 +503,7 @@ void native_interrupt_init(void)
 
     _native_in_syscall = 0;
 
-    if (pipe(_sig_pipefd) == -1) {
+    if (real_pipe(_sig_pipefd) == -1) {
         err(EXIT_FAILURE, "native_interrupt_init(): pipe()");
     }
 

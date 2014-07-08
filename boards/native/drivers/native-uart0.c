@@ -149,8 +149,14 @@ int init_unix_socket(void)
     }
 
     sa.sun_family = AF_UNIX;
-    snprintf(sa.sun_path, sizeof(sa.sun_path), "/tmp/riot.tty.%d", _native_pid);
-    unlink(sa.sun_path); /* remove stale socket */
+
+    if (_native_unix_socket_path != NULL) {
+        snprintf(sa.sun_path, sizeof(sa.sun_path), "%s", _native_unix_socket_path);
+    }
+    else {
+        snprintf(sa.sun_path, sizeof(sa.sun_path), "/tmp/riot.tty.%d", _native_pid);
+    }
+    real_unlink(sa.sun_path); /* remove stale socket */
     if (bind(s, (struct sockaddr *)&sa, SUN_LEN(&sa)) == -1) {
         err(EXIT_FAILURE, "init_unix_socket: bind");
     }
@@ -177,11 +183,11 @@ void handle_uart_in(void)
         /* end of file / socket closed */
         if (_native_uart_conn != 0) {
             if (_native_null_out_file != -1) {
-                if (dup2(_native_null_out_file, STDOUT_FILENO) == -1) {
+                if (real_dup2(_native_null_out_file, STDOUT_FILENO) == -1) {
                     err(EXIT_FAILURE, "handle_uart_in: dup2(STDOUT_FILENO)");
                 }
             }
-            if (dup2(_native_null_in_pipe[0], STDIN_FILENO) == -1) {
+            if (real_dup2(_native_null_in_pipe[0], STDIN_FILENO) == -1) {
                 err(EXIT_FAILURE, "handle_uart_in: dup2(STDIN_FILENO)");
             }
             _native_uart_conn = 0;
@@ -215,10 +221,10 @@ void handle_uart_sock(void)
         warnx("handle_uart_sock: successfully accepted socket");
     }
 
-    if (dup2(s, STDOUT_FILENO) == -1) {
+    if (real_dup2(s, STDOUT_FILENO) == -1) {
         err(EXIT_FAILURE, "handle_uart_sock: dup2()");
     }
-    if (dup2(s, STDIN_FILENO) == -1) {
+    if (real_dup2(s, STDIN_FILENO) == -1) {
         err(EXIT_FAILURE, "handle_uart_sock: dup2()");
     }
     _native_syscall_leave();

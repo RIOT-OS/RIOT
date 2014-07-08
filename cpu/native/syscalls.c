@@ -54,6 +54,13 @@ void* (*real_malloc)(size_t size);
 void (*real_free)(void *ptr);
 void* (*real_calloc)(size_t nmemb, size_t size);
 void* (*real_realloc)(void *ptr, size_t size);
+int (*real_pipe)(int[2]);
+int (*real_close)(int);
+int (*real_fork)(void);
+int (*real_dup2)(int, int);
+int (*real_unlink)(const char *);
+int (*real_execve)(const char *, char *const[], char *const[]);
+int (*real_pause)(void);
 
 void _native_syscall_enter(void)
 {

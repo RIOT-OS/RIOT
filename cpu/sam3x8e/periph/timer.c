@@ -129,6 +129,11 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
+    return timer_set_absolute(dev, channel, timer_read(dev) + timeout);
+}
+
+int timer_set_absolute(tim_t dev, int channel, unsigned int value)
+{
     Tc *tim;
 
     /* get timer base register address */
@@ -156,32 +161,33 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
     /* set timeout value */
     switch (channel) {
         case 0:
-            tim->TC_CHANNEL[0].TC_RA = tim->TC_CHANNEL[0].TC_CV + timeout;
+            tim->TC_CHANNEL[0].TC_RA = value;
             tim->TC_CHANNEL[0].TC_IER = TC_IER_CPAS;
             break;
         case 1:
-            tim->TC_CHANNEL[0].TC_RB = tim->TC_CHANNEL[0].TC_CV + timeout;
+            tim->TC_CHANNEL[0].TC_RB = value;
             tim->TC_CHANNEL[0].TC_IER = TC_IER_CPBS;
             break;
         case 2:
-            tim->TC_CHANNEL[0].TC_RC = tim->TC_CHANNEL[0].TC_CV + timeout;
+            tim->TC_CHANNEL[0].TC_RC = value;
             tim->TC_CHANNEL[0].TC_IER = TC_IER_CPCS;
             break;
         case 3:
-            tim->TC_CHANNEL[1].TC_RA = tim->TC_CHANNEL[1].TC_CV + timeout;
+            tim->TC_CHANNEL[1].TC_RA = value;
             tim->TC_CHANNEL[1].TC_IER = TC_IER_CPAS;
             break;
         case 4:
-            tim->TC_CHANNEL[1].TC_RB = tim->TC_CHANNEL[1].TC_CV + timeout;
+            tim->TC_CHANNEL[1].TC_RB = value;
             tim->TC_CHANNEL[1].TC_IER = TC_IER_CPBS;
             break;
         case 5:
-            tim->TC_CHANNEL[1].TC_RC = tim->TC_CHANNEL[1].TC_CV + timeout;
+            tim->TC_CHANNEL[1].TC_RC = value;
             tim->TC_CHANNEL[1].TC_IER = TC_IER_CPCS;
             break;
         default:
             return -1;
     }
+
     return 1;
 }
 

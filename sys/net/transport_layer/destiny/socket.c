@@ -48,7 +48,7 @@ void set_socket_address(sockaddr6_t *sockaddr, sa_family_t sin6_family,
                         ipv6_addr_t *sin6_addr);
 void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port,
                     uint32_t seq_nr, uint32_t ack_nr,
-                    uint8_t dataOffset_reserved, uint8_t reserved_flags,
+                    uint8_t data_offset, uint8_t reserved_flags,
                     uint16_t window, uint16_t checksum, uint16_t urg_pointer);
 
 void printf_tcp_context(tcp_hc_context_t *current_tcp_context)
@@ -126,7 +126,7 @@ void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
     printf("IPv6 Dest: %s\n",
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_header->destaddr));
-    printf("TCP Length: %x\n", ipv6_header->length - TCP_HDR_LEN);
+    printf("TCP Length: %x\n", NTOHS(ipv6_header->length) - TCP_HDR_LEN);
     printf("Source Port: %x, Dest. Port: %x\n",
            NTOHS(tcp_header->src_port), NTOHS(tcp_header->dst_port));
     printf("Source Port: %u, Dest. Port: %u\n",
@@ -390,25 +390,27 @@ void set_socket_address(sockaddr6_t *sockaddr, uint8_t sin6_family,
 }
 
 void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port,
-                    uint32_t seq_nr, uint32_t ack_nr, uint8_t dataOffset_reserved,
+                    uint32_t seq_nr, uint32_t ack_nr, uint8_t data_offset,
                     uint8_t reserved_flags, uint16_t window, uint16_t checksum,
                     uint16_t urg_pointer)
 {
-    tcp_hdr->ack_nr					= ack_nr;
-    tcp_hdr->checksum				= checksum;
-    tcp_hdr->dataOffset_reserved	= dataOffset_reserved;
-    tcp_hdr->dst_port				= dst_port;
-    tcp_hdr->reserved_flags			= reserved_flags;
-    tcp_hdr->seq_nr					= seq_nr;
-    tcp_hdr->src_port				= src_port;
-    tcp_hdr->urg_pointer			= urg_pointer;
-    tcp_hdr->window					= window;
+    tcp_hdr->ack_nr         = ack_nr;
+    tcp_hdr->checksum       = checksum;
+    tcp_hdr->data_offset    = data_offset;
+    tcp_hdr->dst_port       = dst_port;
+    tcp_hdr->reserved_flags = reserved_flags;
+    tcp_hdr->reserved       = 0;
+    tcp_hdr->flag_ns        = 0;
+    tcp_hdr->seq_nr         = seq_nr;
+    tcp_hdr->src_port       = src_port;
+    tcp_hdr->urg_pointer    = urg_pointer;
+    tcp_hdr->window         = window;
 }
 
 /* Check for consistent ACK and SEQ number */
-int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header)
+int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header, uint8_t tcp_payload_len)
 {
-    if (IS_TCP_ACK(tcp_header->reserved_flags)) {
+    if (tcp_payload_len == 0) {
         if (tcp_header->ack_nr > (current_tcp_socket->tcp_control.send_nxt)) {
             /* ACK of not yet sent byte, discard */
             return ACK_NO_TOO_BIG;
@@ -428,7 +430,7 @@ int check_tcp_consistency(socket_t *current_tcp_socket, tcp_hdr_t *tcp_header)
 
 void switch_tcp_packet_byte_order(tcp_hdr_t *current_tcp_packet)
 {
-    if (current_tcp_packet->dataOffset_reserved * 4 > TCP_HDR_LEN) {
+    if (current_tcp_packet->data_offset * 4 > TCP_HDR_LEN) {
         if (*(((uint8_t *)current_tcp_packet) + TCP_HDR_LEN) == TCP_MSS_OPTION) {
             uint8_t *packet_pointer = (uint8_t *)current_tcp_packet;
             packet_pointer += (TCP_HDR_LEN + 2);
@@ -468,9 +470,8 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
 
     set_tcp_packet(current_tcp_packet, current_tcp_socket->local_address.sin6_port,
                    current_tcp_socket->foreign_address.sin6_port,
-                   (flags == TCP_ACK ? current_tcp_socket->tcp_control.send_una - 1 :
-                    current_tcp_socket->tcp_control.send_una),
-                   current_tcp_socket->tcp_control.rcv_nxt, header_length, flags,
+                   current_tcp_socket->tcp_control.send_una,
+                   (IS_TCP_ACK(flags) ? current_tcp_socket->tcp_control.rcv_nxt : 0x00), header_length, flags,
                    current_tcp_socket->tcp_control.rcv_wnd, 0, 0);
 
     /* Fill IPv6 Header */
@@ -478,7 +479,7 @@ int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
            &current_tcp_socket->foreign_address.sin6_addr, 16);
     memcpy(&(temp_ipv6_header->srcaddr),
            &current_tcp_socket->local_address.sin6_addr, 16);
-    temp_ipv6_header->length = header_length * 4 + payload_length;
+    temp_ipv6_header->length = HTONS(header_length * 4 + payload_length);
 
     current_tcp_packet->checksum = ~tcp_csum(temp_ipv6_header, current_tcp_packet);
 
@@ -573,7 +574,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 #endif
 
     set_tcp_cb(&current_tcp_socket->tcp_control, 0, DESTINY_SOCKET_STATIC_WINDOW,
-               current_tcp_socket->tcp_control.send_iss,
+               current_tcp_socket->tcp_control.send_iss + 1,
                current_tcp_socket->tcp_control.send_iss, 0);
 
     /* Remember current time */
@@ -615,13 +616,13 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     tcp_hdr_t *tcp_header = ((tcp_hdr_t *)(msg_from_server.content.ptr));
 
     /* Check for consistency */
-    if (tcp_header->ack_nr != current_tcp_socket->tcp_control.send_nxt + 1) {
+    if (tcp_header->ack_nr != current_tcp_socket->tcp_control.send_nxt) {
         printf("TCP packets not consistent!\n");
     }
 
     /* Got SYN ACK from Server */
     /* Refresh foreign TCP socket information */
-    if ((tcp_header->dataOffset_reserved * 4 > TCP_HDR_LEN) &&
+    if ((tcp_header->data_offset * 4 > TCP_HDR_LEN) &&
         (*(((uint8_t *)tcp_header) + TCP_HDR_LEN) == TCP_MSS_OPTION)) {
         current_tcp_socket->tcp_control.mss =
             *((uint16_t *)(((uint8_t *)tcp_header) + TCP_HDR_LEN + 2));
@@ -633,11 +634,9 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     current_tcp_socket->tcp_control.rcv_irs = tcp_header->seq_nr;
     set_tcp_cb(&current_tcp_socket->tcp_control, tcp_header->seq_nr + 1,
                current_tcp_socket->tcp_control.rcv_wnd,
-               current_tcp_socket->tcp_control.send_una,
-               current_tcp_socket->tcp_control.send_una,
+               current_tcp_socket->tcp_control.send_una + 1,
+               tcp_header->ack_nr,
                tcp_header->window);
-    current_tcp_socket->tcp_control.send_una++;
-    current_tcp_socket->tcp_control.send_nxt++;
 
     msg_from_server.type = UNDEFINED;
 
@@ -796,7 +795,7 @@ int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags)
             current_tcp_socket->tcp_control.send_wnd -= sent_bytes;
 
             if (send_tcp(current_int_tcp_socket, current_tcp_packet,
-                         temp_ipv6_header, 0, sent_bytes) != 1) {
+                         temp_ipv6_header, TCP_ACK, sent_bytes) < 0) {
                 /* Error while sending tcp data */
                 current_tcp_socket->tcp_control.send_nxt -= sent_bytes;
                 current_tcp_socket->tcp_control.send_wnd += sent_bytes;
@@ -1063,7 +1062,6 @@ int destiny_socket_close(int s)
             current_socket->send_pid = thread_getpid();
 
             /* Refresh local TCP socket information */
-            current_socket->socket_values.tcp_control.send_una++;
             current_socket->socket_values.tcp_control.state = TCP_FIN_WAIT_1;
 #ifdef TCP_HC
             current_socket->socket_values.tcp_control.tcp_context.hc_type =
@@ -1071,7 +1069,7 @@ int destiny_socket_close(int s)
 #endif
 
             send_tcp(current_socket, current_tcp_packet, temp_ipv6_header,
-                     TCP_FIN, 0);
+                     TCP_FIN_ACK, 0);
             msg_receive(&m_recv);
             close_socket(current_socket);
             return 1;
@@ -1194,6 +1192,10 @@ socket_internal_t *get_waiting_connection_socket(int socket,
     for (i = 1; i < MAX_SOCKETS + 1; i++) {
         current_socket = get_socket(i);
 
+        if (!current_socket) {
+            continue;
+        }
+
         /* Connection establishment ACK, Check for 4 touple and state */
         if ((ipv6_header != NULL) && (tcp_header != NULL)) {
             if (is_four_touple(current_socket, ipv6_header, tcp_header) &&
@@ -1265,13 +1267,13 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
     tcp_header = ((tcp_hdr_t *)(msg_recv_client_ack.content.ptr));
 
     /* Check for consistency */
-    if (tcp_header->ack_nr != current_queued_socket->tcp_control.send_nxt + 1) {
+    if (tcp_header->ack_nr != current_queued_socket->tcp_control.send_nxt) {
         printf("TCP packets not consistent!\n");
     }
 
     /* Got ack, connection established, refresh local and foreign tcp socket
      * status */
-    set_tcp_cb(&current_queued_socket->tcp_control, tcp_header->seq_nr + 1,
+    set_tcp_cb(&current_queued_socket->tcp_control, tcp_header->seq_nr,
                current_queued_socket->tcp_control.rcv_wnd, tcp_header->ack_nr,
                tcp_header->ack_nr, tcp_header->window);
 
@@ -1356,7 +1358,7 @@ socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
                        &ipv6_header->destaddr);
 
     /* Foreign TCP information */
-    if ((tcp_header->dataOffset_reserved * 4 > TCP_HDR_LEN) &&
+    if ((tcp_header->data_offset * 4 > TCP_HDR_LEN) &&
         (*(((uint8_t *)tcp_header) + TCP_HDR_LEN) == TCP_MSS_OPTION)) {
         current_queued_socket->socket_values.tcp_control.mss =
             *((uint16_t *)(((uint8_t *)tcp_header) + TCP_HDR_LEN + 2));
@@ -1374,7 +1376,7 @@ socket_internal_t *new_tcp_queued_socket(ipv6_hdr_t *ipv6_header,
     current_queued_socket->socket_values.tcp_control.state = TCP_SYN_RCVD;
     set_tcp_cb(&current_queued_socket->socket_values.tcp_control,
                tcp_header->seq_nr + 1, DESTINY_SOCKET_STATIC_WINDOW,
-               current_queued_socket->socket_values.tcp_control.send_iss,
+               current_queued_socket->socket_values.tcp_control.send_iss + 1,
                current_queued_socket->socket_values.tcp_control.send_iss,
                tcp_header->window);
 

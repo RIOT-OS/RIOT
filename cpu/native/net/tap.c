@@ -153,7 +153,7 @@ void sigio_child()
 {
     pid_t parent = _native_pid;
 
-    if ((sigio_child_pid = fork()) == -1) {
+    if ((sigio_child_pid = real_fork()) == -1) {
         err(EXIT_FAILURE, "sigio_child: fork");
     }
 
@@ -287,7 +287,7 @@ int tap_init(char *name)
     if (ioctl(_native_tap_fd, SIOCGIFHWADDR, &ifr) == -1) {
         _native_in_syscall++;
         warn("ioctl SIOCGIFHWADDR");
-        if (close(_native_tap_fd) == -1) {
+        if (real_close(_native_tap_fd) == -1) {
             warn("close");
         }
         exit(EXIT_FAILURE);

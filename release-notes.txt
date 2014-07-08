@@ -1,0 +1,415 @@
+RIOT-2014.05 - Release Notes
+============================
+RIOT is a real-time multi-threading operating system that supports a range of
+devices that are typically found in the Internet of Things: from 16-bit
+microcontrollers to light-weight 32-bit processors.
+
+RIOT is based on the following design principles: energy-efficiency, real-time
+capabilities, small memory footprint, modularity, and uniform API access,
+independent of the underlying hardware (this API offers partial POSIX
+compliance).
+
+New features
+============
+Core
+----
++ introduced explicit core/cpu interface through a set of header files
++ added reboot and panic functions
++ added a node name to the sysconfig struct
++ added the ability to send a message to the current thread's message queue
+
+Supported platforms
+-------------------
+Additional support for the following boards:
++ Arduino Due
++ UDOO board
++ X86 via qemu
++ Zolertia Z1
+
+Network stack
+-------------
++ added net_if as abstraction layer between transceiver module and L3 protocol
++ added support for auto initializing of the 6LoWPAN network stack
++ added support for RFC5444 via oonf_api (from OLSR.org)
++ added a Wireshark dissector for nativenet packets
++ introduced low-level radio driver interface
++ added a default transceiver for all boards
++ common IEEE 802.15.4 radio driver API definition
++ added standard way to query CCA (Clear Channel Assessment) status
++ enabled nonces in interests for CCN-lite (Content Centric Networking)
++ added a route shell command
+
+System libraries
+----------------
++ added quad-precision math library (quad_math)
+
+Automated Testing
+-----------------
++ added Travis CI based build tests
++ added support for a Jenkins CI server
++ added a unittest framework (based on embunit)
++ added unittests for most core functions
+
+POSIX compliance
+----------------
++ pthread support including
+    + dynamic memory pool and cleanup handlers
+    + mutexes
+    + condition variable implementation
+    + reader/writer lock
+    + pthread_barrier_* functions
+
+Native
+------
++ added a valgrind and cachegrind targets
++ added profiling support
+
+Changes
+=======
+Core
+----
+* initialize hwtimer automatically
+* optimized thread status field usage
+* moved oneway_malloc to sys
+* prefixed API functions correctly
+
+Network stack
+-------------
+* major refactoring and decoupling
+* refactor use of vtimer
+* fixed forwarding
+* added IoT-LAB M3 Open Node support and dropped TelosB support temporarily for OpenWSN
+* moved ETX beaconing to a module on its own
+* various byte order and other bug fixes
+
+Drivers
+-------
+* added low-level driver interface for unified CPU peripheral abstraction for
+  GPIO, ADC, PWM, Timer and UART
+* handle race conditions preventing timers to be set correctly on MSP430 MCUs
+* several CC2420 fixes
+
+System libraries
+----------------
+* auto_init is used by default
+* changed function prototype for shell handlers
+
+Other
+-----
+* cleaned up Makefile system and simplified binary directory
+* improved documentation for core and sys
+* build system uses PKG dependency
+* build system sets include paths automatically
+* black and white lists for applications and tests
+* add stacksize checker for DEBUG macro
+* styling corrections
+* fixed license boiler plates
+* set lpc2k_pgm return value correctly
+* various bug fixes and cleanups
+
+Fixed Issues from the last release
+==================================
+#45: bit field order in the fcf may be wrong
+    The CC2420 FIFO expects the IEEE802.15.4 FCF field in reversed bit order.
+    With this release the byte order is now handled by the net_if module and
+    all device specific handling is done by the driver.
+#82: Setting STATUS_REPLY_BLOCKED thread to STATUS_PENDING though it is not
+     handled yet
+    In some rare cases the status of a thread might falsely change to
+    STATUS_PENDING instead of STATUS_REPLY_BLOCKED.
+#455: sha256 is broken on MSP430
+    Fixed.
+#498: native is segfaulting at startup
+    Fixed by several PRs (#501, #583, and #588).
+#505: native on FreeBSD is broken
+    Fixed by PR #1022.
+
+Known Issues
+============
+network related issues
+----------------------
+#21: Deal with stdin in bordermultiplex.c
+    Not all supported platforms provide a stdin in the current release.
+    However, the implementation of the 6LoWPAN border router won't work
+    without stdin.
+#861: neighbor discovery for 6LoWPAN not working
+    Duplicate address detection according to RFC 6775 is also missing.
+
+native related issues
+---------------------
+#495: native not float safe
+    When the FPU is used when an asynchronous context switch occurs, either the
+    stack gets corrupted or a floating point exception occurs.
+#499: native is segfaulting on heavy network usage
+    Sending more than 100 packets per second causes a SEGFAULT in RIOT native.
+#534: native debugging on osx fails
+    Using valgrind or gdb with a nativenet target in OSX leads to "the network"
+    being stuck (gdb) or the whole process being stuck (valgrind).
+#715: test_hwtimer_wait fails on native
+    The problem appears to be lost signals and depends on the CPU speed.
+#787: reboot not working with open file descriptors on native
+    If for example a tap device is in use, the reboot command fails.
+#862: sometimes the tap bridge does not work in native
+    Sometimes (rather suddenly) packages are not received by a TAP and won't be
+    received even if I reconfigure the bridge.
+#1127: Random build fails on OSX
+    Building for native on OSX often fails - Workaround: build using  -B  flag,
+    e.g.:  make -B clean all
+
+other platform related issues
+-----------------------------
+#426: Interrupt handling on MSP430 is buggy
+    UART and timer handling is currently unstable on MSP430 based platforms
+#1232: x86 doesn't build on OS X with clang
+    Current version of the x86 port doesn't build for OS X with clang.
+
+For all issues and open pull requests please check the RIOT issue tracker:
+https://github.com/RIOT-OS/RIOT/issues
+
+More information
+================
+http://www.riot-os.org
+
+Mailing lists
+-------------
+* RIOT OS kernel developers list
+ * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+* RIOT OS users list
+ * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+* RIOT commits
+ * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+* Github notifications
+ * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+License
+=======
+* All sources and binaries that have been developed at Freie Universität Berlin
+  and most of the other code are licensed under the GNU Lesser General Public
+  License version 2 as published by the Free Software Foundation.
+* Some external sources, especially files developed by SICS are published under
+  a separate license.
+
+All code files contain licensing information.
+
+
+RIOT-2014.01 - Release Notes
+============================
+RIOT is a real-time multi-threading operating system that supports a range of
+devices that are typically found in the Internet of Things: from 16-bit
+microcontrollers to light-weight 32-bit processors.
+
+RIOT is based on the following design principles: energy-efficiency, real-time
+capabilities, small memory footprint, modularity, and uniform API access,
+independent of the underlying hardware (this API offers partial POSIX
+compliance).
+
+New features
+============
+Core
+----
++ msg_receive() with timeout
++ LPM support for MSP430 based platforms
++ introduced a version string
+
+Supported platforms
+-------------------
+Additional support for the following boards:
++ TelosB
++ mbed LPC1768
+
+Sensor drivers
+---------------
++ drivers for the LM75A Digital temperature sensor and thermal watchdog
++ SRF02 and SRF08 ultrasonic range finders
+
+Native port
+-----------
++ implemented UART via I/O redirection or TCP and UNIX socket
+
+System libraries
+----------------
++ Mersenne twister pseudorandom number generator
++ crypto libraries
+  + 3des
+  + aes
+  + rc5
+  + skipjack
+  + twofish
++ BSD-like package system for easy integration of external libraries
+
+Network stack
+-------------
++ port of CCN lite
++ POSIX socket wrapper
++ integration of libcoap
++ integration of OpenWSN
+
+Further Changes
+===============
+* boards and projects repositories have been integrated and are now part of
+  the RIOT repository itself
+* full refactoring of the network stack and introducing a substructure
+  according to the modules' functionalities
+* cleaned up Makefile system and simplified binary directory
+* more documentation
+* various bug fixes and cleanups
+
+Fixed Issues from the last release
+==================================
+#45: bit field order in the fcf may be wrong
+    The CC2420 FIFO expects the IEEE802.15.4 FCF field in reversed bit order.
+    With this release the byte order is now handled by the net_if module and
+    all device specific handling is done by the driver.
+#82: Setting STATUS_REPLY_BLOCKED thread to STATUS_PENDING though it is not
+     handled yet
+    Pull Request #569 fixed this bug by checking for STATUS_REPLY_BLOCKED in
+    msg_receive().
+#455: sha256 is broken on MSP430
+    The problem was caused
+
+Known Issues
+============
+#21: Deal with stdin in bordermultiplex.c
+    Not all supported platforms provide a stdin in the current release.
+    However, the implementation of the 6LoWPAN border router won't work
+    without stdin.
+#426: Interrupt handling on MSP430 is buggy
+    UART and timer handling is still unstable on MSP430 based platforms.
+#495: native not float safe
+    When the FPU is used when an asynchronous context switch occurs, either the
+    stack gets corrupted or a floating point exception occurs.
+#498: native is segfaulting at startup
+    In some cases (about 5-10%) a RIOT native process crashes with a SEGFAULT
+    at startup.
+#499: native is segfaulting on heavy network usage
+    Sending more than 100 packets per second causes a SEGFAULT in RIOT native.
+#505: native on FreeBSD is broken
+    Due to different parameter handling in FreeBSD, native is currently not
+    working there.
+
+For all issues and open pull requests please check the RIOT issue tracker:
+https://github.com/RIOT-OS/RIOT/issues
+
+Release 2013.08
+===============
+Kernel
+------
+- Microkernel with a powerful messaging system
+- Multi-Threading with low overhead
+- an energy-efficient, real-time capable scheduler
+- small memory footprint
+
+Userspace
+---------
+- 6LoWPAN according to RFC 4944, RFC 6282, and RFC 6775
+- TCP and UDP
+- RPL according to RFC 6550 and RFC 6719
+- High resolution and long-term timers
+- POSIX IO and BSD socket API
+- Bloom filter
+- SHA256
+
+Hardware Support
+----------------
+- various ARM and MSP430 MCUs
+    * ARM7 NXP LPC2387
+    * TI MSP430F1612
+    * TI CC430F6137
+    * ARM7 Freescale MC13224v (preliminary)
+    * ARM Cortex-M4 STM32f407vgt6 (preliminary)
+    * ARM Cortex-M3 STM32f103rey6 (preliminary)
+- radio drivers
+    * TI CC1100 and CC1101
+    * TI CC2420
+    * Atmel AT86RF231
+- sensor drivers
+    * Sensirion SHT11
+    * Linear Technology LT4150
+
+
+More information
+================
+http://www.riot-os.org
+
+Mailing lists
+-------------
+* RIOT OS kernel developers list
+ * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+* RIOT OS users list
+ * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+* RIOT commits
+ * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+* Github notifications
+ * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+License
+=======
+* All sources and binaries that have been developed at Freie Universität Berlin are
+  licensed under the GNU Lesser General Public License version 2 as published by the
+  Free Software Foundation.
+* Some external sources, especially files developed by SICS are published under
+  a separate license.
+
+All code files contain licensing information.
+
+Release 2013.08
+===============
+Kernel
+------
+- Microkernel with a powerful messaging system
+- Multi-Threading with low overhead
+- an energy-efficient, real-time capable scheduler
+- small memory footprint
+
+Userspace
+---------
+- 6LoWPAN according to RFC 4944, RFC 6282, and RFC 6775
+- TCP and UDP
+- RPL according to RFC 6550 and RFC 6719
+- High resolution and long-term timers
+- POSIX IO and BSD socket API
+- Bloom filter
+- SHA256
+
+Hardware Support
+----------------
+- various ARM and MSP430 MCUs
+    * ARM7 NXP LPC2387
+    * TI MSP430F1612
+    * TI CC430F6137
+    * ARM7 Freescale MC13224v (preliminary)
+    * ARM Cortex-M4 STM32f407vgt6 (preliminary)
+    * ARM Cortex-M3 STM32f103rey6 (preliminary)
+- radio drivers
+    * TI CC1100 and CC1101
+    * TI CC2420
+    * Atmel AT86RF231
+- sensor drivers
+    * Sensirion SHT11
+    * Linear Technology LT4150
+
+
+More information
+================
+http://www.riot-os.org
+
+Mailing lists
+-------------
+* RIOT OS kernel developers list
+ * devel@riot-os.org (http://lists.riot-os.org/mailman/listinfo/devel)
+* RIOT OS users list
+ * users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)
+* RIOT commits
+ * commits@riot-os.org (http://lists.riot-os.org/mailman/listinfo/commits)
+* Github notifications
+ * notifications@riot-os.org  (http://lists.riot-os.org/mailman/listinfo/notifications)
+
+License
+=======
+* All sources and binaries that have been developed at Freie Universität Berlin are
+  licensed under the GNU Lesser General Public License version 2 as published by the
+  Free Software Foundation.
+* Some external sources, especially files developed by SICS are published under
+  a separate license.
+
+All code files contain licensing information.

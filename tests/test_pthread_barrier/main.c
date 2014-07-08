@@ -43,7 +43,7 @@ static void *run(void *id_)
         pthread_barrier_wait(&barrier);
 
         uint32_t timeout_us = genrand_uint32() % 2500000;
-        printf("Child %i sleeps for % 8" PRIu32 " µs.\n", id, timeout_us);
+        printf("Child %i sleeps for %8" PRIu32 " µs.\n", id, timeout_us);
         vtimer_usleep(timeout_us);
     }
 

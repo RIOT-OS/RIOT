@@ -105,6 +105,7 @@ int msg_send_to_self(msg_t *m);
  *
  * @return 1, if sending was successful
  * @return 0, if receiver is not waiting and ``block == 0``
+ * @return -1, on error (invalid PID)
  */
 int msg_send_int(msg_t *m, unsigned int target_pid);
 

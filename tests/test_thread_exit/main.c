@@ -86,4 +86,5 @@ int main(void)
     }
 
     puts("main: exiting");
+    return 0;
 }

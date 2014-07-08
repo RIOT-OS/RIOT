@@ -18,6 +18,9 @@
 #include "cc2420.h"
 #include "cc2420_arch.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 #define CC2420_RESETn_PIN   0x80
 #define CC2420_VREGEN_PIN   0x01
 
@@ -99,6 +102,11 @@ int cc2420_get_gdo2(void)
 uint8_t cc2420_get_sfd(void)
 {
     return CC2420_SFD;
+}
+
+uint8_t cc2420_get_fifop(void)
+{
+    return CC2420_GDO2;
 }
 
 uint8_t cc2420_get_cca(void)
@@ -199,24 +207,25 @@ void cc2420_spi_init(void)
 }
 
 /*
- * CC1100 receive interrupt
+ * CC2420 receive interrupt
  */
 interrupt (PORT1_VECTOR) __attribute__ ((naked)) cc2420_isr(void){
     __enter_isr();
      /* Check IFG */
     if ((P1IFG & CC2420_GDO2_PIN) != 0) {
-        puts("rx interrupt");
+        DEBUG("rx interrupt");
         P1IFG &= ~CC2420_GDO2_PIN;
         cc2420_rx_irq();
     }
     else if ((P1IFG & CC2420_GDO0_PIN) != 0) {
-        cc2420_rxoverflow_irq();
-        puts("[CC2420] rxfifo overflow");
-        //P1IE &= ~CC2420_GDO0_PIN;                // Disable interrupt for GDO0
-        P1IFG &= ~CC2420_GDO0_PIN;                // Clear IFG for GDO0
+        if (cc2420_get_gdo2()) {
+            cc2420_rxoverflow_irq();
+            DEBUG("[CC2420] rxfifo overflow");
+        }
+        P1IFG &= ~CC2420_GDO0_PIN;                /* Clear IFG for GDO0 */
     }
     else if ((P1IFG & CC2420_SFD_PIN) != 0) {
-        puts("sfd interrupt");
+        DEBUG("sfd interrupt");
         P1IFG &= ~CC2420_SFD_PIN;
         cc2420_switch_to_rx();
     }

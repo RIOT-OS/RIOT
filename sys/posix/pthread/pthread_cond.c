@@ -157,7 +157,7 @@ int pthread_cond_signal(struct pthread_cond_t *cond)
     restoreIRQ(old_state);
 
     if (other_prio >= 0) {
-        sched_switch(sched_active_thread->priority, other_prio);
+        sched_switch(other_prio);
     }
 
     return 0;
@@ -191,7 +191,7 @@ int pthread_cond_broadcast(struct pthread_cond_t *cond)
     restoreIRQ(old_state);
 
     if (other_prio >= 0) {
-        sched_switch(sched_active_thread->priority, other_prio);
+        sched_switch(other_prio);
     }
 
     return 0;

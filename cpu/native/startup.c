@@ -44,6 +44,8 @@ int _native_null_out_file;
 const char *_progname;
 char **_native_argv;
 pid_t _native_pid;
+pid_t _native_id;
+const char *_native_unix_socket_path = NULL;
 
 /**
  * initialize _native_null_in_pipe to allow for reading from stdin
@@ -52,8 +54,7 @@ pid_t _native_pid;
  */
 void _native_null_in(char *stdiotype)
 {
-
-    if (pipe(_native_null_in_pipe) == -1) {
+    if (real_pipe(_native_null_in_pipe) == -1) {
         err(1, "_native_null_in(): pipe()");
     }
 
@@ -61,7 +62,7 @@ void _native_null_in(char *stdiotype)
         return;
     }
 
-    if (dup2(_native_null_in_pipe[0], STDIN_FILENO) == -1) {
+    if (real_dup2(_native_null_in_pipe[0], STDIN_FILENO) == -1) {
         err(EXIT_FAILURE, "_native_null_in: dup2(STDIN_FILENO)");
     }
 }
@@ -96,7 +97,7 @@ void _native_log_stdout(char *stdouttype)
         errx(EXIT_FAILURE, "_native_log_stdout: unknown log type");
     }
 
-    if (dup2(stdout_outfile, STDOUT_FILENO) == -1) {
+    if (real_dup2(stdout_outfile, STDOUT_FILENO) == -1) {
         err(EXIT_FAILURE, "_native_log_stdout: dup2(STDOUT_FILENO)");
     }
     _native_null_out_file = stdout_outfile;
@@ -131,14 +132,14 @@ void _native_log_stderr(char *stderrtype)
         errx(EXIT_FAILURE, "_native_log_stderr: unknown log type");
     }
 
-    if (dup2(stderr_outfile, STDERR_FILENO) == -1) {
+    if (real_dup2(stderr_outfile, STDERR_FILENO) == -1) {
         err(EXIT_FAILURE, "_native_log_stderr: dup2(STDERR_FILENO)");
     }
 }
 
 void daemonize(void)
 {
-    if ((_native_pid = fork()) == -1) {
+    if ((_native_pid = real_fork()) == -1) {
         err(EXIT_FAILURE, "daemonize: fork");
     }
 
@@ -160,15 +161,16 @@ void usage_exit(void)
 #endif
 
 #ifdef MODULE_UART0
-    real_printf(" [-t <port>|-u]");
+    real_printf(" [-t <port>|-u [path]]");
 #endif
 
-    real_printf(" [-d] [-e|-E] [-o]\n");
+    real_printf(" [-i <id>] [-d] [-e|-E] [-o]\n");
 
     real_printf(" help: %s -h\n", _progname);
 
     real_printf("\nOptions:\n\
 -h      help\n\
+-i      specify instance id (set by config module)\n\
 -d      daemonize\n\
 -e      redirect stderr to file\n\
 -E      do not redirect stderr (i.e. leave sterr unchanged despite socket/daemon io)\n\
@@ -177,6 +179,7 @@ void usage_exit(void)
 #ifdef MODULE_UART0
     real_printf("\
 -u      redirect stdio to UNIX socket\n\
+        if no path is given /tmp/riot.tty.PID is used\n\
 -t      redirect stdio to TCP socket\n");
 #endif
 
@@ -196,10 +199,20 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");
     *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
     *(void **)(&real_getpid) = dlsym(RTLD_NEXT, "getpid");
+    *(void **)(&real_pipe) = dlsym(RTLD_NEXT, "pipe");
+    *(void **)(&real_close) = dlsym(RTLD_NEXT, "close");
+    *(void **)(&real_fork) = dlsym(RTLD_NEXT, "fork");
+    *(void **)(&real_dup2) = dlsym(RTLD_NEXT, "dup2");
+    *(void **)(&real_unlink) = dlsym(RTLD_NEXT, "unlink");
+    *(void **)(&real_execve) = dlsym(RTLD_NEXT, "execve");
+    *(void **)(&real_pause) = dlsym(RTLD_NEXT, "pause");
 
     _native_argv = argv;
     _progname = argv[0];
     _native_pid = real_getpid();
+
+    /* will possibly be overridden via option below: */
+    _native_id = _native_pid;
 
     int argp = 1;
     char *stderrtype = "stdio";
@@ -227,6 +240,15 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
         if ((strcmp("-h", arg) == 0) || (strcmp("--help", arg) == 0)) {
             usage_exit();
         }
+        else if (strcmp("-i", arg) == 0) {
+            if (argp + 1 < argc) {
+                argp++;
+            }
+            else {
+                usage_exit();
+            }
+            _native_id = atol(argv[argp]);
+        }
         else if (strcmp("-d", arg) == 0) {
             daemonize();
             if (strcmp(stdiotype, "stdio") == 0) {
@@ -251,7 +273,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
 #ifdef MODULE_UART0
         else if (strcmp("-t", arg) == 0) {
             stdiotype = "tcp";
-            if (argp+1 < argc) {
+            if (argp + 1 < argc) {
                 ioparam = argv[++argp];
             }
             else {
@@ -271,6 +293,11 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
             }
             if (strcmp(stderrtype, "stdio") == 0) {
                 stderrtype = "null";
+            }
+
+            /* parse optional path */
+            if ((argp + 1 < argc) && (argv[argp + 1][0] != '-')) {
+                _native_unix_socket_path = argv[++argp];
             }
         }
 #endif

@@ -58,19 +58,21 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
         return msg_send_int(m, target_pid);
     }
 
+    if (sched_active_pid == target_pid) {
+        return msg_send_to_self(m);
+    }
+
+    dINT();
+
     tcb_t *target = (tcb_t*) sched_threads[target_pid];
 
     m->sender_pid = sched_active_pid;
 
-    if (m->sender_pid == target_pid) {
-        return msg_send_to_self(m);
-    }
-
     if (target == NULL) {
+        DEBUG("msg_send(): target thread does not exist\n");
+        eINT();
         return -1;
     }
-
-    dINT();
 
     DEBUG("msg_send() %s:%i: Sending from %i to %i. block=%i src->state=%i target->state=%i\n", __FILE__, __LINE__, sched_active_pid, target_pid, block, sched_active_thread->status, target->status);
 
@@ -142,6 +144,11 @@ int msg_send_to_self(msg_t *m)
 int msg_send_int(msg_t *m, unsigned int target_pid)
 {
     tcb_t *target = (tcb_t *) sched_threads[target_pid];
+
+    if (target == NULL) {
+        DEBUG("msg_send_int(): target thread does not exist\n");
+        return -1;
+    }
 
     if (target->status == STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send_int: Direct msg copy from %i to %i.\n", thread_getpid(), target_pid);
@@ -243,6 +250,7 @@ static int _msg_receive(msg_t *m, int block)
 
     /* no message, fail */
     if ((!block) && (queue_index == -1)) {
+        eINT();
         return -1;
     }
 
@@ -267,6 +275,9 @@ static int _msg_receive(msg_t *m, int block)
             thread_yield();
 
             /* sender copied message */
+        }
+        else {
+            eINT();
         }
 
         return 1;
@@ -295,6 +306,8 @@ static int _msg_receive(msg_t *m, int block)
         eINT();
         return 1;
     }
+
+    DEBUG("This should have never been reached!\n");
 }
 
 int msg_init_queue(msg_t *array, int num)

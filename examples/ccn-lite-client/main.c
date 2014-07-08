@@ -45,10 +45,10 @@
 #define CCNL_DEFAULT_THRESHOLD_PREFIX   1
 #define CCNL_DEFAULT_THRESHOLD_AGGREGATE 2
 
-char relay_stack[KERNEL_CONF_STACKSIZE_PRINTF];
+char relay_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 #if RIOT_CCN_APPSERVER
-char appserver_stack[KERNEL_CONF_STACKSIZE_PRINTF];
+char appserver_stack[KERNEL_CONF_STACKSIZE_MAIN];
 #endif
 int relay_pid, appserver_pid;
 
@@ -78,7 +78,7 @@ static void riot_ccn_appserver(int argc, char **argv)
         return;
     }
 
-    appserver_pid = thread_create(appserver_stack, KERNEL_CONF_STACKSIZE_PRINTF, PRIORITY_MAIN - 1, CREATE_STACKTEST, appserver_thread, "appserver");
+    appserver_pid = thread_create(appserver_stack, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN - 1, CREATE_STACKTEST, appserver_thread, "appserver");
     DEBUG("ccn-lite appserver on thread_id %d...\n", appserver_pid);
 }
 #endif
@@ -163,7 +163,7 @@ static void riot_ccn_relay_start(int argc, char **argv)
         shell_threshold_aggregate = atoi(argv[3]);
     }
 
-    relay_pid = thread_create(relay_stack, KERNEL_CONF_STACKSIZE_PRINTF, PRIORITY_MAIN - 2, CREATE_STACKTEST, relay_thread, "relay");
+    relay_pid = thread_create(relay_stack, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN - 2, CREATE_STACKTEST, relay_thread, "relay");
     DEBUG("ccn-lite relay on thread_id %d...\n", relay_pid);
 }
 

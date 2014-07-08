@@ -59,6 +59,13 @@ extern void (*real_free)(void *ptr);
 extern void* (*real_calloc)(size_t nmemb, size_t size);
 extern void* (*real_realloc)(void *ptr, size_t size);
 extern int (*real_getpid)(void);
+extern int (*real_pipe)(int[2]);
+extern int (*real_close)(int);
+extern int (*real_fork)(void);
+extern int (*real_dup2)(int, int);
+extern int (*real_unlink)(const char *);
+extern int (*real_execve)(const char *, char *const[], char *const[]);
+extern int (*real_pause)(void);
 
 /**
  * data structures
@@ -79,6 +86,8 @@ extern ucontext_t *_native_cur_ctx, *_native_isr_ctx;
 extern const char *_progname;
 extern char **_native_argv;
 extern pid_t _native_pid;
+extern pid_t _native_id;
+extern const char *_native_unix_socket_path;
 
 #ifdef MODULE_UART0
 #include <sys/select.h>

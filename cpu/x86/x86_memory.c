@@ -46,7 +46,12 @@
 #define PT_CR3_BITS  (0)
 #define PT_PDPT_BITS (PT_P)
 #define PT_PD_BITS  (PT_P | PT_RW | PT_US)
-#define PT_HEAP_BITS (PT_P | PT_RW | PT_US | pt_xd)
+
+#ifndef DEBUG_READ_BEFORE_WRITE
+#   define PT_HEAP_BITS (PT_P | PT_RW | PT_US | pt_xd)
+#else
+#   define PT_HEAP_BITS (PT_HEAP_BIT | PT_RW | PT_US | pt_xd)
+#endif
 
 static uint64_t pt_xd = PT_XD;
 
@@ -330,12 +335,41 @@ static void pagefault_handler(uint8_t intr_num, struct x86_pushad *orig_ctx, uns
             x86_hlt();
     }
 
+#ifdef DEBUG_READ_BEFORE_WRITE
+    uint32_t virtual_addr = cr2_read();
+    uint64_t pte = x86_get_pte(virtual_addr);
+#endif
+
     if (error_code & PF_EC_I) {
         puts("Page fault while fetching instruction.");
         x86_print_registers(orig_ctx, error_code);
         puts("Halting.");
         x86_hlt();
     }
+#ifdef DEBUG_READ_BEFORE_WRITE
+    else if ((pte != NO_PTE) && !(pte & PT_P) && (pte & PT_HEAP_BIT)) {
+        /* mark as present */
+        TEMP_PAGE.indices[(virtual_addr >> 12) % 512] |= PT_P;
+        asm volatile ("invlpg (%0)" :: "r"(virtual_addr));
+
+        /* initialize for easier debugging */
+        uint32_t *p = (uint32_t *) (virtual_addr & ~0xfff);
+        for (unsigned i = 0; i < 0x1000 / 4; ++i) {
+            const union {
+                char str_value[4];
+                uint32_t int_value;
+            } debug_init = { .str_value = "RIOT" };
+            *p++ = debug_init.int_value;
+        }
+
+        /* print a warning if the page was read before written */
+        if (!(error_code & PF_EC_W)) {
+            unsigned long *sp = (void *) orig_ctx->sp; /* ip, cs, flags */
+            printf("DEBUG: Read before write on heap address 0x%08x (physical: 0x%016llx) at 0x%08x.\n",
+                   virtual_addr, pte & PT_ADDR_MASK, sp[0]);
+        }
+    }
+#endif
     else if (error_code & PF_EC_P) {
         printf("Page fault: access violation while %s present page.\n", error_code & PF_EC_W ? "writing to" : "reading from");
         x86_print_registers(orig_ctx, error_code);
@@ -362,8 +396,8 @@ void x86_init_memory(void)
     check_requirements();
 
     init_pagetable();
-    init_free_pages();
     init_pagefault_handler();
+    init_free_pages();
 
     puts("Virtual memory initialized");
 }

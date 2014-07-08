@@ -7,11 +7,14 @@ BOARD_INSUFFICIENT_RAM := chronos mbed_lpc1768 msb-430 msb-430h redbee-econotag 
 USEMODULE += hashes
 USEMODULE += bloom
 
-export PROJDEPS = sets.h
+APPDEPS = $(BINDIR)projdeps/sets.h
+
+INCLUDES += -I$(BINDIR)projdeps
 
 DISABLE_MODULE += auto_init
 
 include $(RIOTBASE)/Makefile.include
 
-sets.h: generate_sets.py words.txt.gz
-	./generate_sets.py 10000 20
+$(BINDIR)projdeps/sets.h: generate_sets.py words.txt.gz
+	mkdir -p ${@D}
+	./generate_sets.py words.txt.gz $@

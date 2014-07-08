@@ -1,4 +1,3 @@
-MODULE = sys
 ifneq (,$(filter auto_init,$(USEMODULE)))
     DIRS += auto_init
 endif
@@ -92,8 +91,8 @@ endif
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
     DIRS += oneway-malloc
 endif
-
-all: $(BINDIR)$(MODULE).a
-	@for i in $(DIRS) ; do "$(MAKE)" -C $$i || exit 1; done ;
+ifneq (,$(filter color,$(USEMODULE)))
+    DIRS += color
+endif
 
 include $(RIOTBASE)/Makefile.base

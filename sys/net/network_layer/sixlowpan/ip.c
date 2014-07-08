@@ -105,6 +105,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
             return -1;
         }
 
+        DEBUG("Trying to find the next hop for %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &packet->destaddr));
         ipv6_addr_t *dest = ip_get_next_hop(&packet->destaddr);
 
         if (dest == NULL) {
@@ -402,11 +403,13 @@ void ipv6_process(void)
                 }
 
                 default:
+                    DEBUG("INFO: Unknown next header\n");
                     break;
             }
         }
         /* destination is foreign address */
         else {
+            DEBUG("That's not for me, destination is %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &ipv6_buf->destaddr));
             packet_length = IPV6_HDR_LEN + NTOHS(ipv6_buf->length);
             ndp_neighbor_cache_t *nce;
 

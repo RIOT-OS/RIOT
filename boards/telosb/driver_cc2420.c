@@ -96,7 +96,7 @@ int cc2420_get_gio1(void)
     return CC2420_GIO1;
 }
 
-int cc2420_get_fifop(void)
+uint8_t cc2420_get_fifop(void)
 {
     return CC2420_FIFOP;
 }
@@ -209,7 +209,7 @@ void cc2420_spi_init(void)
 }
 
 /*
- * CC1100 receive interrupt
+ * CC2420 receive interrupt
  */
 interrupt (PORT1_VECTOR) __attribute__ ((naked)) cc2420_isr(void)
 {
