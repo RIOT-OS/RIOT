@@ -172,7 +172,7 @@ radio_tx_status_t cc2420_transmit_tx_buf(void)
     cc2420_switch_to_rx();
 
     /* check for underflow error flag */
-    if (st & 0x20) {
+    if (st & CC2420_STATUS_TX_UNDERFLOW) {
         return RADIO_TX_UNDERFLOW;
     }
 
@@ -203,12 +203,12 @@ radio_tx_status_t cc2420_do_send(ieee802154_packet_kind_t kind,
                                  void *buf,
                                  unsigned int len)
 {
-    bool ok = cc2420_load_tx_buf(kind, dest,
-                                 use_long_addr,
-                                 wants_ack,
-                                 buf, len);
-    if (!ok) {
-        return RADIO_TX_ERROR;
+    radio_tx_status_t st = cc2420_load_tx_buf(kind, dest,
+                                              use_long_addr,
+                                              wants_ack,
+                                              buf, len);
+    if (st != RADIO_TX_OK) {
+        return st;
     }
     return cc2420_transmit_tx_buf();
 }
