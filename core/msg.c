@@ -58,14 +58,15 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
         return msg_send_int(m, target_pid);
     }
 
-    m->sender_pid = sched_active_pid;
-    if (m->sender_pid == target_pid) {
+    if ((unsigned int)sched_active_pid == target_pid) {
         return msg_send_to_self(m);
     }
 
     dINT();
 
     tcb_t *target = (tcb_t*) sched_threads[target_pid];
+
+    m->sender_pid = sched_active_pid;
 
     if (target == NULL) {
         DEBUG("msg_send(): target thread does not exist\n");
@@ -134,6 +135,7 @@ int msg_send_to_self(msg_t *m)
 {
     unsigned int state = disableIRQ();
 
+    m->sender_pid = sched_active_pid;
     int res = queue_msg((tcb_t *) sched_active_thread, m);
 
     restoreIRQ(state);
