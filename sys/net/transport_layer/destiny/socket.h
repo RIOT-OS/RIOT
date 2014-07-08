@@ -59,7 +59,7 @@ typedef struct __attribute__((packed)) {
     sockaddr6_t			foreign_address;
 } socket_t;
 
-typedef struct __attribute__((packed)) {
+typedef struct {
     uint8_t				socket_id;
     uint8_t				recv_pid;
     uint8_t				send_pid;
