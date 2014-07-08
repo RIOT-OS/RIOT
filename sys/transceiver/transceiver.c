@@ -251,6 +251,25 @@ uint8_t transceiver_register(transceiver_type_t t, int pid)
     }
 }
 
+/* Unregister an upper layer thread */
+uint8_t transceiver_unregister(transceiver_type_t t, int pid)
+{
+    uint8_t i;
+
+    /* find pid in unregistered threads or first unused space */
+    for (i = 0; ((i < TRANSCEIVER_MAX_REGISTERED) &&
+                 (reg[i].pid != pid) &&
+                 (reg[i].transceivers != TRANSCEIVER_NONE)); i++);
+
+    if (i >= TRANSCEIVER_MAX_REGISTERED) {
+        return 0;
+    }
+    else if (reg[i].pid == pid) {
+        reg[i].transceivers ^= t;
+    }
+    return 1;
+}
+
 /*------------------------------------------------------------------------------------*/
 /*                                Internal functions                                  */
 /*------------------------------------------------------------------------------------*/
