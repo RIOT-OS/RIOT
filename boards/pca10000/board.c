@@ -46,6 +46,10 @@ void printInt2(int i){
     printf("timer2: channel: %d\n",i);
 }
 
+void redoff(int i)  {
+	LED_RED_OFF;
+}
+
 
 
 void board_init(void)
@@ -71,21 +75,27 @@ void board_init(void)
     }
 
 
-    LED_GREEN_ON;
+    LED_GREEN_OFF;
     LED_RED_ON;
-    LED_BLUE_ON;
+    LED_BLUE_OFF;
 
     //LED_BLUE_OFF;
+    /*LED_BLUE_OFF;
     LED_GREEN_OFF;
     //LED_RED_OFF;
+    gpio_init_out(GPIO_0, GPIO_NOPULL);
+    gpio_set(GPIO_0);
+    gpio_init_out(GPIO_1, GPIO_NOPULL);
+    gpio_set(GPIO_1);*/
+//    GPIO_DEV->OUTSET = (1UL << 1);
 
     i = 0;
 
 
     //timer_init(TIMER_0, 1, printInt0);
-//    timer_init(TIMER_0, 1, printInt0);
+timer_init(TIMER_0, 1, redoff);
 //
-//    timer_set(TIMER_0,0,2*1000*1000);
+    timer_set(TIMER_0,0,2*1000*1000);
 //    timer_set(TIMER_0,1,4*1000*1000);
 //    timer_set(TIMER_0,2,6*1000*1000);
 
@@ -96,7 +106,7 @@ void board_init(void)
 //    timer_set(TIMER_1,2,12*1000*1000);
 
 
-
+while(1) {}
 
 
     /* blink stuff */
