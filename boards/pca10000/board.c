@@ -69,9 +69,16 @@ void board_init(void)
         uart_write_blocking(0, outputchar);
         outputchar = output[i++];
     }
-    LED_BLUE_OFF;
-    LED_GREEN_OFF;
+
+
+    LED_GREEN_ON;
     LED_RED_ON;
+    LED_BLUE_ON;
+
+    //LED_BLUE_OFF;
+    LED_GREEN_OFF;
+    //LED_RED_OFF;
+
     i = 0;
 
 

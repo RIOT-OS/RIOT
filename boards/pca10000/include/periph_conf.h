@@ -380,5 +380,5 @@
 #define GPIO_11_EXTI_CFG()   SYSCFG->EXTICR[3] |= SYSCFG_EXTICR4_EXTI15_PC
 #define GPIO_11_IRQ         EXTI0_11_IRQn
 
-
+#define RADIO_CONF          NRF_RADIO
 #endif /* __PERIPH_CONF_H */

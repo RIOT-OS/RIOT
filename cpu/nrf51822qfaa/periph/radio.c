@@ -109,8 +109,8 @@ void sendPacket(uint8_t addr, char* msg)
 	  while(1)
 	  {
 		char charUart = '0';
-	    uart_read_blocking(0, charUart);
-	    uart_write(0,charUart);
+	    uart_read_blocking(0, &charUart);
+	    uart_write_blocking(0,charUart);
 	    // Place the read character in the payload, enable the radio and
 	    // send the packet:
 	    packet[0] = charUart;
@@ -176,5 +176,4 @@ void radioConfig(void)
 	    NRF_RADIO->CRCPOLY = 0x107UL;       // CRC poly: x^8+x^2^x^1+1
 	  }
 
-	  nrf_delay_ms(3);
 }
