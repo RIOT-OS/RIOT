@@ -104,6 +104,11 @@ uint8_t cc2420_get_sfd(void)
     return CC2420_SFD;
 }
 
+uint8_t cc2420_get_fifop(void)
+{
+    return CC2420_GDO2;
+}
+
 uint8_t cc2420_get_cca(void)
 {
     uint8_t status;
