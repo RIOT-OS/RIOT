@@ -58,7 +58,7 @@ int msg_send(msg_t *m, unsigned int target_pid, bool block)
         return msg_send_int(m, target_pid);
     }
 
-    if (sched_active_pid == target_pid) {
+    if (m->sender_pid == target_pid) {
         return msg_send_to_self(m);
     }
 
