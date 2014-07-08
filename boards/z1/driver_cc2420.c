@@ -32,6 +32,7 @@
 
 #include "cc2420.h"
 #include "cc2420_arch.h"
+#include "cc2420_spi.h"
 
 #define ENABLE_DEBUG    (1)
 #include "debug.h"
@@ -128,7 +129,11 @@ uint8_t cc2420_get_cca(void)
     uint8_t status;
     long count = 0;
     do {
+        unsigned int sr = disableIRQ();
+        cc2420_spi_select();
         status = cc2420_txrx(NOBYTE);
+        cc2420_spi_unselect();
+        restoreIRQ(sr);
         count++;
         if (count >= MAX_RSSI_WAIT) {
             core_panic(0x2420, "cc2420_get_cca(): RSSI never valid!");
