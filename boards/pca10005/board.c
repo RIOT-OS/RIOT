@@ -46,10 +46,6 @@ void printInt2(int i){
     printf("timer2: channel: %d\n",i);
 }
 
-void redoff(int i)  {
-	LED_RED_OFF;
-}
-
 
 
 void board_init(void)
@@ -74,11 +70,11 @@ void board_init(void)
         outputchar = output[i++];
     }
 
-
-    LED_GREEN_OFF;
+/*
+    LED_GREEN_ON;
     LED_RED_ON;
-    LED_BLUE_OFF;
-
+    LED_BLUE_ON;
+*/
     //LED_BLUE_OFF;
     /*LED_BLUE_OFF;
     LED_GREEN_OFF;
@@ -93,9 +89,9 @@ void board_init(void)
 
 
     //timer_init(TIMER_0, 1, printInt0);
-timer_init(TIMER_0, 1, redoff);
+//    timer_init(TIMER_0, 1, printInt0);
 //
-    timer_set(TIMER_0,0,2*1000*1000);
+//    timer_set(TIMER_0,0,2*1000*1000);
 //    timer_set(TIMER_0,1,4*1000*1000);
 //    timer_set(TIMER_0,2,6*1000*1000);
 
