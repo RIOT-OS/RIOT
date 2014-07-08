@@ -24,7 +24,7 @@
 #include "nrf51_bitfields.h"
 
 #define gpio NRF_GPIO
-
+uint8_t gptioIRQarray[4];
 typedef struct {
     void (*cb)(void);
 } gpio_state_t;
@@ -465,85 +465,183 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(v
 
 int gpio_read(gpio_t dev)
 {
+
+	//TODO auch für output
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:
-        	return  ((GPIO_DEV->IN >> GPIO_0) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_0_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_0_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_0_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_0_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_1_EN
         case GPIO_1:
-        	return  ((GPIO_DEV->IN >> GPIO_1) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_1_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_1_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_1_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_1_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_2_EN
         case GPIO_2:
-        	return  ((GPIO_DEV->IN >> GPIO_2) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_2_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_2_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_2_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_2_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_3_EN
         case GPIO_3:
-        	return  ((GPIO_DEV->IN >> GPIO_3) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_3_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_3_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_3_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_3_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_4_EN
         case GPIO_4:
-        	return  ((GPIO_DEV->IN >> GPIO_4) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_4_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_4_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_4_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_4_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_5_EN
         case GPIO_5:
-        	return  ((GPIO_DEV->IN >> GPIO_5) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_5_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_5_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_5_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_5_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_6_EN
         case GPIO_6:
-        	return  ((GPIO_DEV->IN >> GPIO_6) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_6_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_6_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_6_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_6_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_7_EN
         case GPIO_7:
-        	return  ((GPIO_DEV->IN >> GPIO_7) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_7_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_7_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_7_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_7_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_8_EN
         case GPIO_8:
-        	return  ((GPIO_DEV->IN >> GPIO_8) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_8_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_8_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_8_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_8_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_9_EN
         case GPIO_9:
-        	return  ((GPIO_DEV->IN >> GPIO_9) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_9_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_9_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_9_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_9_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_10_EN
         case GPIO_10:
-        	return  ((GPIO_DEV->IN >> GPIO_10) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_10_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_10_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_10_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_10_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_11_EN
         case GPIO_11:
-        	return  ((GPIO_DEV->IN >> GPIO_11) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_11_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_11_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_11_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_11_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_12_EN
         case GPIO_12:
-        	return  ((GPIO_DEV->IN >> GPIO_12) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_12_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_12_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_12_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_12_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_13_EN
         case GPIO_13:
-        	return  ((GPIO_DEV->IN >> GPIO_13) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_13_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_13_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_13_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_13_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_14_EN
         case GPIO_14:
-        	return  ((GPIO_DEV->IN >> GPIO_14) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_14_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_14_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_14_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_14_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 #if GPIO_15_EN
         case GPIO_15:
-        	return  ((GPIO_DEV->IN >> GPIO_15) & 1UL);
+        	if (GPIO_DEV->IN >> GPIO_15_PIN){
+        		return  ((GPIO_DEV->IN >> GPIO_15_PIN) & 1UL);
+        	} else if (GPIO_DEV->OUT  >> GPIO_15_PIN){
+        		return  ((GPIO_DEV->OUT >> GPIO_15_PIN) & 1UL);
+        	} else {
+        		return -1;
+        	}
             break;
 #endif
 
@@ -558,82 +656,82 @@ int gpio_set(gpio_t dev)
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_0);
+        	GPIO_DEV->OUTSET = (GPIO_0_PIN);
             break;
 #endif
 #if GPIO_1_EN
         case GPIO_1:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_1);
+        	GPIO_DEV->OUTSET = (GPIO_1_PIN);
             break;
 #endif
 #if GPIO_2_EN
         case GPIO_2:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_2);
+        	GPIO_DEV->OUTSET = (GPIO_2_PIN);
             break;
 #endif
 #if GPIO_3_EN
         case GPIO_3:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_3);
+        	GPIO_DEV->OUTSET = (GPIO_3_PIN);
             break;
 #endif
 #if GPIO_4_EN
         case GPIO_4:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_4);
+        	GPIO_DEV->OUTSET = (GPIO_4_PIN);
             break;
 #endif
 #if GPIO_5_EN
         case GPIO_5:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_5);
+        	GPIO_DEV->OUTSET = (GPIO_5_PIN);
             break;
 #endif
 #if GPIO_6_EN
         case GPIO_6:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_6);
+        	GPIO_DEV->OUTSET = (GPIO_6_PIN);
             break;
 #endif
 #if GPIO_7_EN
         case GPIO_7:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_7);
+        	GPIO_DEV->OUTSET = (GPIO_7_PIN);
             break;
 #endif
 #if GPIO_8_EN
         case GPIO_8:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_8);
+        	GPIO_DEV->OUTSET = (GPIO_8_PIN);
             break;
 #endif
 #if GPIO_9_EN
         case GPIO_9:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_9);
+        	GPIO_DEV->OUTSET = (GPIO_9_PIN);
             break;
 #endif
 #if GPIO_10_EN
         case GPIO_10:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_10);
+        	GPIO_DEV->OUTSET = (GPIO_10_PIN);
             break;
 #endif
 #if GPIO_11_EN
         case GPIO_11:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_11);
+        	GPIO_DEV->OUTSET = (GPIO_11_PIN);
             break;
 #endif
 #if GPIO_12_EN
         case GPIO_12:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_12);
+        	GPIO_DEV->OUTSET = (GPIO_12_PIN);
             break;
 #endif
 #if GPIO_13_EN
         case GPIO_13:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_13);
+        	GPIO_DEV->OUTSET = (GPIO_13_PIN);
             break;
 #endif
 #if GPIO_14_EN
         case GPIO_14:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_14);
+        	GPIO_DEV->OUTSET = (GPIO_14_PIN);
             break;
 #endif
 #if GPIO_15_EN
         case GPIO_15:
-        	GPIO_DEV->OUTSET = (1UL << GPIO_15);
+        	GPIO_DEV->OUTSET = (GPIO_15_PIN);
             break;
 #endif
 
@@ -649,82 +747,82 @@ int gpio_clear(gpio_t dev)
        switch (dev) {
     #if GPIO_0_EN
             case GPIO_0:
-                GPIO_DEV->OUTCLR = (1UL << GPIO_0);
+                GPIO_DEV->OUTCLR = (GPIO_0_PIN);
                 break;
     #endif
     #if GPIO_1_EN
             case GPIO_1:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_1);
+            	GPIO_DEV->OUTCLR = (GPIO_1_PIN);
                 break;
     #endif
     #if GPIO_2_EN
             case GPIO_2:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_2);
+            	GPIO_DEV->OUTCLR = (GPIO_2_PIN);
                 break;
     #endif
     #if GPIO_3_EN
             case GPIO_3:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_3);
+            	GPIO_DEV->OUTCLR = (GPIO_3_PIN);
                 break;
     #endif
     #if GPIO_4_EN
             case GPIO_4:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_4);
+            	GPIO_DEV->OUTCLR = (GPIO_4_PIN);
                 break;
     #endif
     #if GPIO_5_EN
             case GPIO_5:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_5);
+            	GPIO_DEV->OUTCLR = (GPIO_5_PIN);
                 break;
     #endif
     #if GPIO_6_EN
             case GPIO_6:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_6);
+            	GPIO_DEV->OUTCLR = (GPIO_6_PIN);
                 break;
     #endif
     #if GPIO_7_EN
             case GPIO_7:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_7);
+            	GPIO_DEV->OUTCLR = (GPIO_7_PIN);
                 break;
     #endif
     #if GPIO_8_EN
             case GPIO_8:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_8);
+            	GPIO_DEV->OUTCLR = (GPIO_8_PIN);
                 break;
     #endif
     #if GPIO_9_EN
             case GPIO_9:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_9);
+            	GPIO_DEV->OUTCLR = (GPIO_9_PIN);
                 break;
     #endif
     #if GPIO_10_EN
             case GPIO_10:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_10);
+            	GPIO_DEV->OUTCLR = (GPIO_10_PIN);
                 break;
     #endif
     #if GPIO_11_EN
             case GPIO_11:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_11);
+            	GPIO_DEV->OUTCLR = (GPIO_11_PIN);
                 break;
     #endif
     #if GPIO_12_EN
             case GPIO_12:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_12);
+            	GPIO_DEV->OUTCLR = (GPIO_12_PIN);
                 break;
     #endif
     #if GPIO_13_EN
             case GPIO_13:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_13);
+            	GPIO_DEV->OUTCLR = (GPIO_13_PIN);
                 break;
     #endif
     #if GPIO_14_EN
             case GPIO_14:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_14);
+            	GPIO_DEV->OUTCLR = (GPIO_14_PIN);
                 break;
     #endif
     #if GPIO_15_EN
             case GPIO_15:
-            	GPIO_DEV->OUTCLR = (1UL << GPIO_15);
+            	GPIO_DEV->OUTCLR = (GPIO_15_PIN);
                 break;
     #endif
 
