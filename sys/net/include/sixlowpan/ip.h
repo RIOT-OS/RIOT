@@ -66,6 +66,12 @@ extern "C" {
 #define IPV6_PROTO_NUM_UDP          (17)
 
 /**
+* @brief  Next header value for source routing
+* @see <a href="http://tools.ietf.org/html/rfc5095#section-1">
+ */
+#define IPV6_PROTO_NUM_SRH          (43)
+
+/**
  * @brief   L4 protocol number for ICMPv6.
  */
 #define IPV6_PROTO_NUM_ICMPV6       (58)
@@ -103,6 +109,7 @@ ipv6_hdr_t *ipv6_get_buf(void);
  * @param[in] next_header       Next header ID of payload.
  * @param[in] payload           Payload of the packet.
  * @param[in] payload_length    Length of payload.
+ * @param[in] next_hop          Optional next_hop. May be NULL if not provided at call.
  *
  * @return  payload_length : on success
  *          -1             : if no route to the given dest could be obtained
@@ -111,7 +118,7 @@ ipv6_hdr_t *ipv6_get_buf(void);
  *                           is going to try to find a route
  */
 int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
-                const uint8_t *payload, uint16_t payload_length);
+                const uint8_t *payload, uint16_t payload_length, ipv6_addr_t *next_hop);
 
 /**
  * @brief   Send an IPv6 packet defined by its header.
@@ -119,6 +126,8 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
  * @param[in] packet            Pointer to an prepared IPv6 packet header.
  *                              The payload is expected directly after the
  *                              packet.
+ * @param[in] next_hop          Optional next-hop address. If NULL, than the function tries
+ *                              to find it by methods of the active routing protocol.
  *
  * @return  length of payload : on success
  *          -1                : if no route to the given dest could be obtained
@@ -126,7 +135,7 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
  *                              In case of reactive routing: routing is going
  *                              to try to find a route
  */
-int ipv6_send_packet(ipv6_hdr_t *packet);
+int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop);
 
 /**
  * @brief   Determines if node is a router.
@@ -530,6 +539,14 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest);
  * @param   next_hop    function that returns the next hop to reach dest
  */
 void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t *dest));
+
+/**
+ * @brief   Registers a function that decides if a node in a RPL-network is actually the
+ *          root and therefore a source routing header should be integrated.
+ *          Only used in RPL non-storing mode by now.
+ *
+ */
+void ipv6_iface_set_srh_indicator(uint8_t (*srh_indi)(void));
 
 /**
  * @brief Calculates the IPv6 upper-layer checksum.

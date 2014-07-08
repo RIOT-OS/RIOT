@@ -1,16 +1,20 @@
-/**
- * OF MRHOF implementation
- *
+/*
  * Copyright (C) 2013 Stephan Arndt <arndtste@zedat.fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup rpl
+ */
+
+/**
+ * @ingroup     rpl
  * @{
- * @file
- * @author  Stephan Arndt <arndtste@zedat.fu-berlin.de>
+ * @file        of_mrhof.c
+ * @brief       Objective Function MRHOF.
+ *
+ * Implementation of Objective Function MRHOF.
+ *
+ * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @}
  */
 

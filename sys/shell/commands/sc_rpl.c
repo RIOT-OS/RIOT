@@ -35,7 +35,7 @@ void _rpl_route_handler(int argc, char **argv)
     printf(" %-3s  %-18s  %-18s  %s\n", "#", "target", "next hop", "lifetime");
     puts("--------------------------------------------------------------------");
 
-    for (int i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
+    for (int i = 0; i < rpl_max_routing_entries; i++) {
         if (rtable[i].used) {
             c++;
             printf(" %03d: %-18s  ", i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,

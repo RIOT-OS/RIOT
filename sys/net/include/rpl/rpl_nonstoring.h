@@ -1,18 +1,17 @@
 /*
- * Copyright (C) 2014 Freie Universität Berlin
+ * Copyright (C) 2013, 2014  INRIA.
  *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
  */
 
 /**
- * @ingroup     net
- * @brief       Routing Protocol for Low power and Lossy Networks
+ * @ingroup     rpl
  * @{
  *
- * @file        rpl_mode.h
- * @brief       RPL storing-mode header
+ * @file        rpl_nonstoring.h
+ * @brief       RPL non-storing-mode header
  *
  * Header which includes all mode related RPL-functions. All functions are mandatory for any
  * RPL-mode. Describes receiving and sending of all RPL-related messages and special initialization behavior.
@@ -21,8 +20,8 @@
  * @author      Fabian Brandt <fabianbr@zedat.fu-berlin.de>
  */
 
-#ifndef __RPL_SM_H
-#define __RPL_SM_H
+#ifndef RPL_NONSTORING_H_
+#define RPL_NONSTORING_H_
 
 #include "rpl_structs.h"
 #include "rpl_config.h"
@@ -53,16 +52,6 @@ void rpl_init_root_mode(void);
 void rpl_init_mode(ipv6_addr_t *my_ipv6_address);
 
 /**
- * @brief Sends a DIO-message to a given destination
- *
- * This function sends a DIO message to a given destination. This is triggered by the trickle-timer.
- *
- * @param[in] destination           IPv6-address of the destination of the DIO. Should be a direct neighbor or multicast address.
- *
- */
-void rpl_send_DIO_mode(ipv6_addr_t *destination);
-
-/**
  * @brief Returns whether a node is root or not
  *
  * This function initializes all basic RPL mode resources. For this mode this includes only acquiring the own
@@ -73,6 +62,16 @@ void rpl_send_DIO_mode(ipv6_addr_t *destination);
  *
  */
 uint8_t rpl_is_root_mode(void);
+
+/**
+ * @brief Sends a DIO-message to a given destination
+ *
+ * This function sends a DIO message to a given destination. This is triggered by the trickle-timer.
+ *
+ * @param[in] destination           IPv6-address of the destination of the DIO. Should be a direct neighbor or multicast address.
+ *
+ */
+void rpl_send_DIO_mode(ipv6_addr_t *destination);
 
 /**
  * @brief Sends a DAO-message to a given destination
@@ -149,7 +148,7 @@ void rpl_recv_dao_ack_mode(void);
  *
  * @param[in] destination           IPv6-address of the destination of the message.
  * @param[in] payload               Payload of the message.
- * @param[in] len                   Length of the message
+ * @param[in] p_len                   Length of the message
  * @param[in] next_header           Index to next header in message.
  *
  */
@@ -159,5 +158,5 @@ void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_
 }
 #endif
 
-#endif /* __RPL_SM_H */
+#endif /* RPL_NONSTORING_H_ */
 /** @} */
