@@ -241,7 +241,7 @@ uint8_t transceiver_register(transceiver_type_t t, int pid)
                  (reg[i].transceivers != TRANSCEIVER_NONE)); i++);
 
     if (i >= TRANSCEIVER_MAX_REGISTERED) {
-        return ENOMEM;
+        return 0;
     }
     else {
         reg[i].transceivers |= t;
