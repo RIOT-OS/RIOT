@@ -24,6 +24,7 @@
 #include "periph/uart.h"
 #include "board.h"
 #include "nrf51_bitfields.h"
+#include "periph/gpio.h"
 
 //#include "radio.h"
 
@@ -37,27 +38,86 @@
 
 static uint8_t packet[4];  ///< Packet to transmit
 char* receivePacket(void);
-void sendPacket(uint8_t addr, char* msg);
-void radioConfig(void);
+void sendPacket(uint8_t addr, char msg);
+void radioConfig(short me);
 char* msg;
 int i = 0;
+
+
+/* These are set to zero as Shockburst packets don't have corresponding fields. */
+#define PACKET_S1_FIELD_SIZE             (0UL)  /**< Packet S1 field size in bits. */
+#define PACKET_S0_FIELD_SIZE             (0UL)  /**< Packet S0 field size in bits. */
+#define PACKET_LENGTH_FIELD_SIZE         (0UL)  /**< Packet length field size in bits. */
+
+/**
+ * @brief Function for swapping/mirroring bits in a byte.
+ *
+ *@verbatim
+ * output_bit_7 = input_bit_0
+ * output_bit_6 = input_bit_1
+ *           :
+ * output_bit_0 = input_bit_7
+ *@endverbatim
+ *
+ * @param[in] inp is the input byte to be swapped.
+ *
+ * @return
+ * Returns the swapped/mirrored input byte.
+ */
+static uint32_t swap_bits(uint32_t inp);
+
+/**
+ * @brief Function for swapping bits in a 32 bit word for each byte individually.
+ *
+ * The bits are swapped as follows:
+ * @verbatim
+ * output[31:24] = input[24:31]
+ * output[23:16] = input[16:23]
+ * output[15:8]  = input[8:15]
+ * output[7:0]   = input[0:7]
+ * @endverbatim
+ * @param[in] input is the input word to be swapped.
+ *
+ * @return
+ * Returns the swapped input byte.
+ */
+static uint32_t bytewise_bitswap(uint32_t inp);
+
+static uint32_t swap_bits(uint32_t inp)
+{
+    uint32_t i;
+    uint32_t retval = 0;
+
+    inp = (inp & 0x000000FFUL);
+
+    for(i = 0; i < 8; i++)
+    {
+        retval |= ((inp >> i) & 0x01) << (7 - i);
+    }
+
+    return retval;
+}
+
+
+static uint32_t bytewise_bitswap(uint32_t inp)
+{
+      return (swap_bits(inp >> 24) << 24)
+           | (swap_bits(inp >> 16) << 16)
+           | (swap_bits(inp >> 8) << 8)
+           | (swap_bits(inp));
+}
 
 
 char* receivePacket(void)
 {
 
-	    char* output = "Received Chars:\r\n";
-	    char outputchar = output[i++];
-		while ( outputchar != '\0')
-		{
-			uart_write_blocking(0, outputchar);
-			outputchar = output[i++];
-		}
-		i = 0;
-
+	static uint8_t volatile packet[4];
+	short boolvar = 0;
 
 	  while(1)
 	  {
+		  gpio_set(GPIO_6);
+		NRF_RADIO->PACKETPTR = (uint32_t) packet;
 	    NRF_RADIO->EVENTS_READY = 0U;
 	    // Enable radio and wait for ready
 	    NRF_RADIO->TASKS_RXEN = 1U;
@@ -67,23 +127,37 @@ char* receivePacket(void)
 	    NRF_RADIO->EVENTS_END = 0U;
 	    // Start listening and wait for address received event
 	    NRF_RADIO->TASKS_START = 1U;
+
+		  gpio_set(GPIO_1);
 	    // Wait for end of packet
 	    while(NRF_RADIO->EVENTS_END == 0U)
 	    {
-	    }
+	    	gpio_toggle(GPIO_6);
+        	delay(1*1000*1000);
+	    };
+
+		  gpio_clear(GPIO_1);
 	    // Write received data to LED0 and LED1 on CRC match
 	    if (NRF_RADIO->CRCSTATUS == 1U)
 	    {
-	    	//UART Output
-	    	if(packet[0] != 0){
-	    		uart_write(0, packet[0]);
-	    	}
+	    	msg = packet;
+	    	boolvar = 1;
 	    }
 	    NRF_RADIO->EVENTS_DISABLED = 0U;
 	    // Disable radio
 	    NRF_RADIO->TASKS_DISABLE = 1U;
 	    while(NRF_RADIO->EVENTS_DISABLED == 0U)
 	    {
+	    }
+
+	        	gpio_clear(GPIO_6);
+	        	delay(1*1000*1000);
+
+	    if(boolvar) break;
+
+	    for( int i = 0; i < 10;i++)  {
+			gpio_toggle(GPIO_6);
+			delay(0.3*1000*1000);
 	    }
 	  }
 	return msg;
@@ -91,39 +165,34 @@ char* receivePacket(void)
 }
 
 
-void sendPacket(uint8_t addr, char* msg)
+void sendPacket(uint8_t addr, char msg)
 {
-
-    char* output = "Enter the Char to Send:\r\n";
-    char outputchar = output[i++];
-	while ( outputchar != '\0')
-	{
-		uart_write_blocking(0, outputchar);
-		outputchar = output[i++];
-	}
-	i = 0;
+	LED_GREEN_OFF;
 
 	  // Set payload pointer
 	  NRF_RADIO->PACKETPTR = (uint32_t)packet;
 
-	  while(1)
-	  {
-		char charUart = '0';
-	    uart_read_blocking(0, &charUart);
-	    uart_write_blocking(0,charUart);
+
 	    // Place the read character in the payload, enable the radio and
 	    // send the packet:
-	    packet[0] = charUart;
+	    packet[0] = msg;
 	    NRF_RADIO->EVENTS_READY = 0U;
 	    NRF_RADIO->TASKS_TXEN = 1;
 	    while (NRF_RADIO->EVENTS_READY == 0U)
 	    {
-	    	//wait
+	    	delay(5*100*1000);
+	    	LED_RED_ON;
+	    	delay(5*100*1000);
+	    	LED_RED_OFF;
 	    }
-	    NRF_RADIO->TASKS_START = 1U;
 	    NRF_RADIO->EVENTS_END = 0U;
+	    NRF_RADIO->TASKS_START = 1U;
 	    while(NRF_RADIO->EVENTS_END == 0U)
 	    {
+	    	delay(5*100*1000);
+	    	LED_BLUE_ON;
+	    	delay(5*100*1000);
+	    	LED_BLUE_OFF;
 	    }
 	    NRF_RADIO->EVENTS_DISABLED = 0U;
 	    // Disable radio
@@ -131,25 +200,58 @@ void sendPacket(uint8_t addr, char* msg)
 	    while(NRF_RADIO->EVENTS_DISABLED == 0U)
 	    {
 	    }
-	  }
 
+LED_GREEN_ON;
 }
 
 
-void radioConfig(void)
+void radioConfig(short me)
 {
+	NRF_RADIO->POWER = 0;
+	delay(5*100*1000);
+	NRF_RADIO->POWER = 1;
+
+	 /* Start 16 MHz crystal oscillator */
+	  NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
+	  NRF_CLOCK->TASKS_HFCLKSTART = 1;
+
+	  /* Wait for the external oscillator to start up */
+	  while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0)
+	  {
+	  }
+
 	  // Radio config
-	  NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_0dBm << RADIO_TXPOWER_TXPOWER_Pos);
+	  if(me != 1) NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_0dBm << RADIO_TXPOWER_TXPOWER_Pos);
 	  NRF_RADIO->FREQUENCY = 7UL;                // Frequency bin 7, 2407MHz
 	  NRF_RADIO->MODE = (RADIO_MODE_MODE_Nrf_2Mbit << RADIO_MODE_MODE_Pos);
 
 	  // Radio address config
-	  NRF_RADIO->PREFIX0 = 0xC4C3C2E7UL;  // Prefix byte of addresses 3 to 0
+	  /*NRF_RADIO->PREFIX0 = 0xC4C3C2E7UL;  // Prefix byte of addresses 3 to 0
 	  NRF_RADIO->PREFIX1 = 0xC5C6C7C8UL;  // Prefix byte of addresses 7 to 4
-	  NRF_RADIO->BASE0   = 0xE7E7E7E7UL;  // Base address for prefix 0
-	  NRF_RADIO->BASE1   = 0x00C2C2C2UL;  // Base address for prefix 1-7
-	  NRF_RADIO->TXADDRESS = 0x00UL;      // Set device address 0 to use when transmitting
-	  NRF_RADIO->RXADDRESSES = 0x01UL;    // Enable device address 0 to use which receiving
+	 */
+	  // Radio address config
+	      NRF_RADIO->PREFIX0 =
+	          ((uint32_t)swap_bits(0xC3) << 24) // Prefix byte of address 3 converted to nRF24L series format
+	        | ((uint32_t)swap_bits(0xC2) << 16) // Prefix byte of address 2 converted to nRF24L series format
+	        | ((uint32_t)swap_bits(0xC1) << 8)  // Prefix byte of address 1 converted to nRF24L series format
+	        | ((uint32_t)swap_bits(0xC0) << 0); // Prefix byte of address 0 converted to nRF24L series format
+
+	      NRF_RADIO->PREFIX1 =
+	          ((uint32_t)swap_bits(0xC7) << 24) // Prefix byte of address 7 converted to nRF24L series format
+	        | ((uint32_t)swap_bits(0xC6) << 16) // Prefix byte of address 6 converted to nRF24L series format
+	        | ((uint32_t)swap_bits(0xC4) << 0); // Prefix byte of address 4 converted to nRF24L series format
+
+	  NRF_RADIO->BASE0       = bytewise_bitswap(0x01234567UL);  // Base address for prefix 0 converted to nRF24L series format
+	  NRF_RADIO->BASE1       = bytewise_bitswap(0x89ABCDEFUL);  // Base address for prefix 1-7 converted to nRF24L series format
+
+	  if(me == 1)  {
+		  NRF_RADIO->TXADDRESS = 0x01UL;      // Set device address 0 to use when transmitting
+		  NRF_RADIO->RXADDRESSES = 0x00UL;    // Enable device address 0 to use which receiving
+	  }
+	  else  {
+		  NRF_RADIO->TXADDRESS = 0x00UL;      // Set device address 0 to use when transmitting
+		  NRF_RADIO->RXADDRESSES = 0x01UL;    // Enable device address 0 to use which receiving
+	  }
 
 	  // Packet configuration
 	  NRF_RADIO->PCNF0 = (PACKET0_S1_SIZE << RADIO_PCNF0_S1LEN_Pos) |
@@ -177,3 +279,5 @@ void radioConfig(void)
 	  }
 
 }
+
+

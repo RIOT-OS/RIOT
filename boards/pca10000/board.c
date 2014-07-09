@@ -106,7 +106,16 @@ timer_init(TIMER_0, 1, redoff);
 //    timer_set(TIMER_1,2,12*1000*1000);
 
 
-while(1) {}
+	radioConfig(0);
+	char msg = 'Q';
+while(1) {
+
+	// sending all the time some message
+
+	sendPacket(1, msg);
+
+	delay(3*1000*1000);
+}
 
 
     /* blink stuff */

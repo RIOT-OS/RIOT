@@ -76,13 +76,42 @@ void board_init(void)
     LED_BLUE_ON;
 */
     //LED_BLUE_OFF;
-    /*LED_BLUE_OFF;
-    LED_GREEN_OFF;
+    //LED_BLUE_OFF;
+    //LED_GREEN_OFF;
     //LED_RED_OFF;
-    gpio_init_out(GPIO_0, GPIO_NOPULL);
-    gpio_set(GPIO_0);
+    gpio_init_out(GPIO_6, GPIO_NOPULL);
+    gpio_init_out(GPIO_7, GPIO_NOPULL);
     gpio_init_out(GPIO_1, GPIO_NOPULL);
-    gpio_set(GPIO_1);*/
+    //gpio_set(GPIO_6);
+
+    radioConfig(1);
+    char* msg = "Hallo";
+
+    if(strcmp(msg, "Hallo") == 0)  {
+    	gpio_set(GPIO_6);
+    	delay(2*1000*1000);
+    	gpio_clear(GPIO_6);
+    }
+
+
+	delay(2*1000*1000);
+
+    msg = receivePacket();
+
+
+    if(strcmp(msg, "Hallo") != 0)  {
+    	gpio_set(GPIO_6);
+    	delay(2*1000*1000);
+    	gpio_clear(GPIO_6);
+    }
+    else  {
+    	gpio_set(GPIO_7);
+    	delay(2*1000*1000);
+    	gpio_clear(GPIO_7);
+    }
+
+    //gpio_init_out(GPIO_0, GPIO_NOPULL);
+    //gpio_set(GPIO_0);
 //    GPIO_DEV->OUTSET = (1UL << 1);
 
     i = 0;
@@ -169,7 +198,7 @@ while(1) {}
 
 void delay(uint32_t microseconds){
     /* perform busy-waiting for specified number of microseconds  */
-    uint32_t cycles = microseconds * 2; // factor has been found by measure
+    uint32_t cycles = microseconds; // factor has been found by measure
     for (int i = 0; i < cycles; i++) {
         asm("nop");
     }
