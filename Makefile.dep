@@ -3,21 +3,11 @@ ifneq (,$(filter libcoap,$(USEPKG)))
 endif
 
 ifneq (,$(filter olsr2,$(USEMODULE)))
-	ifeq (,$(filter vtimer,$(USEMODULE)))
-		USEMODULE += vtimer
-	endif
-	ifeq (,$(filter destiny,$(USEMODULE)))
-		USEMODULE += destiny
-	endif
-	ifeq (,$(filter sixlowpan,$(USEMODULE)))
-		USEMODULE += sixlowpan
-	endif
-	ifeq (,$(filter oonf_common,$(USEMODULE)))
-		USEMODULE += oonf_common
-	endif
-	ifeq (,$(filter oonf_rfc5444,$(USEMODULE)))
-		USEMODULE += oonf_rfc5444
-	endif
+	USEMODULE += vtimer
+	USEMODULE += destiny
+	USEMODULE += sixlowpan
+	USEMODULE += oonf_common
+	USEMODULE += oonf_rfc5444
 endif
 
 ifneq (,$(filter pnet,$(USEMODULE)))
