@@ -76,7 +76,7 @@ static struct rfc5444_writer_tlvtype _olsr_addrtlvs[] = {
 /* add TLVs to HELLO message */
 static void
 _cb_add_nhdp_message_TLVs(struct rfc5444_writer *wr) {
-	uint8_t time_encoded = rfc5444_timetlv_encode(HELLO_REFRESH_INTERVAL);
+	uint8_t time_encoded = rfc5444_timetlv_encode(OLSR2_HELLO_REFRESH_INTERVAL_SECONDS);
 	rfc5444_writer_add_messagetlv(wr, RFC5444_MSGTLV_VALIDITY_TIME, 0, &time_encoded, sizeof(time_encoded));
 
 #ifdef ENABLE_NAME
@@ -149,7 +149,7 @@ _cb_add_nhdp_addresses(struct rfc5444_writer *wr) {
 /* add TLVs to TC message */
 static void
 _cb_add_olsr_message_TLVs(struct rfc5444_writer *wr) {
-	uint8_t time_encoded = rfc5444_timetlv_encode(TC_REFRESH_INTERVAL);
+	uint8_t time_encoded = rfc5444_timetlv_encode(OLSR2_TC_REFRESH_INTERVAL_SECONDS);
 	rfc5444_writer_add_messagetlv(wr, RFC5444_MSGTLV_VALIDITY_TIME, 0, &time_encoded, sizeof(time_encoded));
 
 #ifdef ENABLE_NAME
@@ -219,7 +219,7 @@ _cb_add_tc_message_header(struct rfc5444_writer *wr, struct rfc5444_writer_messa
 	rfc5444_writer_set_msg_seqno(wr, message, seq_no++);
 	rfc5444_writer_set_msg_originator(wr, message, netaddr_get_binptr(get_local_addr()));
 
-	message->hoplimit = TC_HOP_LIMIT;
+	message->hoplimit = OLSR2_TC_HOP_LIMIT;
 }
 
 /* reader has already decided whether to forward or not, just say ok to that */
