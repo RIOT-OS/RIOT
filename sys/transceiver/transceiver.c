@@ -233,41 +233,37 @@ int transceiver_start(void)
 /* Register an upper layer thread */
 uint8_t transceiver_register(transceiver_type_t t, int pid)
 {
-    uint8_t i;
-
-    /* find pid in registered threads or first unused space */
-    for (i = 0; ((i < TRANSCEIVER_MAX_REGISTERED) &&
-                 (reg[i].pid != pid) &&
-                 (reg[i].transceivers != TRANSCEIVER_NONE)); i++);
-
-    if (i >= TRANSCEIVER_MAX_REGISTERED) {
-        return 0;
+    int result = 0;
+    int state = disableIRQ();
+    for (uint8_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
+        if ((reg[i].pid == pid) || (reg[i].transceivers == TRANSCEIVER_NONE)) {
+            reg[i].transceivers |= t;
+            reg[i].pid = pid;
+            DEBUG("transceiver: Thread %i registered for %i\n", reg[i].pid, reg[i].transceivers);
+            restoreIRQ(state);
+            result = 1;
+            break;
+        }
     }
-    else {
-        reg[i].transceivers |= t;
-        reg[i].pid         = pid;
-        DEBUG("transceiver: Thread %i registered for %i\n", reg[i].pid, reg[i].transceivers);
-        return 1;
-    }
+    restoreIRQ(state);
+    return result;
 }
 
 /* Unregister an upper layer thread */
 uint8_t transceiver_unregister(transceiver_type_t t, int pid)
 {
-    uint8_t i;
-
-    /* find pid in unregistered threads or first unused space */
-    for (i = 0; ((i < TRANSCEIVER_MAX_REGISTERED) &&
-                 (reg[i].pid != pid) &&
-                 (reg[i].transceivers != TRANSCEIVER_NONE)); i++);
-
-    if (i >= TRANSCEIVER_MAX_REGISTERED) {
-        return 0;
+    int result = 0;
+    int state = disableIRQ();
+    for (uint8_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; ++i) {
+        if (reg[i].pid == pid) {
+            reg[i].transceivers &= ~t;
+            restoreIRQ(state);
+            result = 1;
+            break;
+        }
     }
-    else if (reg[i].pid == pid) {
-        reg[i].transceivers ^= t;
-    }
-    return 1;
+    restoreIRQ(state);
+    return result;
 }
 
 /*------------------------------------------------------------------------------------*/
