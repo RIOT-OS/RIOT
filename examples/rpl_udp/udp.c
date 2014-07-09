@@ -39,7 +39,7 @@
 char udp_server_stack_buffer[KERNEL_CONF_STACKSIZE_MAIN];
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
-void init_udp_server(void);
+static void *init_udp_server(void *);
 
 /* UDP server thread */
 void udp_server(int argc, char **argv)
@@ -50,12 +50,14 @@ void udp_server(int argc, char **argv)
     int udp_server_thread_pid = thread_create(
             udp_server_stack_buffer, sizeof(udp_server_stack_buffer),
             PRIORITY_MAIN, CREATE_STACKTEST,
-            init_udp_server, "init_udp_server");
+            init_udp_server, NULL, "init_udp_server");
     printf("UDP SERVER ON PORT %d (THREAD PID: %d)\n", HTONS(SERVER_PORT), udp_server_thread_pid);
 }
 
-void init_udp_server(void)
+static void *init_udp_server(void *arg)
 {
+    (void) arg;
+
     sockaddr6_t sa;
     char buffer_main[UDP_BUFFER_SIZE];
     int32_t recsize;
@@ -86,6 +88,8 @@ void init_udp_server(void)
     }
 
     destiny_socket_close(sock);
+
+    return NULL;
 }
 
 /* UDP send command */

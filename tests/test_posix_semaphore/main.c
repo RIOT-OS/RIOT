@@ -31,8 +31,9 @@ char test2_thread_stack[SEMAPHORE_TEST_THREADS][KERNEL_CONF_STACKSIZE_MAIN];
 
 sem_t s;
 
-static void test1_second_thread(void)
+static void *test1_second_thread(void *arg)
 {
+    (void) arg;
     puts("second: sem_trywait");
 
     if (sem_trywait(&s) == 0) {
@@ -50,6 +51,7 @@ static void test1_second_thread(void)
     puts("second: sem was posted");
 
     puts("second: end");
+    return NULL;
 }
 
 static void test1(void)
@@ -63,7 +65,7 @@ static void test1(void)
     puts("first: thread create");
     int pid = thread_create(test1_thread_stack, sizeof(test1_thread_stack),
                             PRIORITY_MAIN - 1, CREATE_STACKTEST | CREATE_WOUT_YIELD,
-                            test1_second_thread, "second");
+                            test1_second_thread, NULL, "second");
 
     if (pid < 0) {
         puts("first: thread create failed");
@@ -113,10 +115,12 @@ static void test1(void)
     puts("first: end");
 }
 
-static void priority_sema_thread(void)
+static void *priority_sema_thread(void *arg)
 {
+    (void) arg;
     sem_wait(&s);
     printf("Thread '%s' woke up.\n", thread_getname(thread_getpid()));
+    return NULL;
 }
 
 char names[SEMAPHORE_TEST_THREADS][16];
@@ -135,7 +139,7 @@ void test2(void)
         printf("first: thread create: %d\n", priority);
         int pid = thread_create(test2_thread_stack[i],
                                 sizeof(test2_thread_stack[i]), priority, CREATE_STACKTEST,
-                                priority_sema_thread, names[i]);
+                                priority_sema_thread, NULL, names[i]);
 
         if (pid < 0) {
             puts("first: thread create failed");

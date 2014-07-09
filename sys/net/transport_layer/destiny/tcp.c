@@ -306,8 +306,10 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
     }
 }
 
-void tcp_packet_handler(void)
+void *tcp_packet_handler(void *arg)
 {
+    (void) arg;
+
     msg_t m_recv_ip, m_send_ip;
     ipv6_hdr_t *ipv6_header;
     tcp_hdr_t *tcp_header;

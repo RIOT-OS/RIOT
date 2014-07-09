@@ -206,8 +206,10 @@ static bool timer_unlink(unsigned i)
     return do_yield;
 }
 
-static void hwtimer_tick_handler(void)
+static void *hwtimer_tick_handler(void *arg)
 {
+    (void) arg;
+
     msg_t msg_array[2];
     msg_init_queue(msg_array, sizeof (msg_array) / sizeof (*msg_array));
     while (1) {
@@ -218,6 +220,8 @@ static void hwtimer_tick_handler(void)
         set_next_alarm(true);
         eINT();
     }
+
+    return NULL;
 }
 
 static void stop_alarms(void)
@@ -394,6 +398,7 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
                                 1,
                                 CREATE_STACKTEST,
                                 hwtimer_tick_handler,
+                                NULL,
                                 "x86-hwtimer");
     hwtimer_ie = true;
 }

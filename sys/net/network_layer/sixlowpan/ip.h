@@ -93,7 +93,7 @@ uint8_t *get_payload_buf_send(uint8_t ext_len);
 
 int icmpv6_demultiplex(const icmpv6_hdr_t *hdr);
 int ipv6_init_as_router(void);
-void ipv6_process(void);
+void *ipv6_process(void *);
 ipv6_net_if_hit_t *ipv6_net_if_addr_prefix_eq(ipv6_net_if_hit_t *hit, ipv6_addr_t *addr);
 ipv6_net_if_hit_t *ipv6_net_if_addr_match(ipv6_net_if_hit_t *hit, const ipv6_addr_t *addr);
 uint32_t get_remaining_time(timex_t *t);

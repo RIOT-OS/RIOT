@@ -140,8 +140,10 @@ void inc_global_variables(void)
 #endif
 }
 
-void tcp_general_timer(void)
+void *tcp_general_timer(void *arg)
 {
+    (void) arg;
+
     vtimer_t tcp_vtimer;
     timex_t interval = timex_set(0, TCP_TIMER_RESOLUTION);
 

@@ -48,8 +48,10 @@
 char radio_stack_buffer[RADIO_STACK_SIZE];
 msg_t msg_q[RCV_BUFFER_SIZE];
 
-void radio(void)
+void *radio(void *arg)
 {
+    (void) arg;
+
     msg_t m;
     radio_packet_t *p;
     radio_packet_length_t i;
@@ -92,6 +94,7 @@ void init_transceiver(void)
                         PRIORITY_MAIN - 2,
                         CREATE_STACKTEST,
                         radio,
+                        NULL,
                         "radio");
 
     uint16_t transceivers = TRANSCEIVER_DEFAULT;

@@ -331,8 +331,10 @@ int is_our_address(ipv6_addr_t *addr)
     return 0;
 }
 
-void ipv6_process(void)
+void *ipv6_process(void *arg)
 {
+    (void) arg;
+
     msg_t m_recv_lowpan, m_send_lowpan;
     msg_t m_recv, m_send;
     uint8_t i;

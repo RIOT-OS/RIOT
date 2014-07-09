@@ -28,10 +28,10 @@
 #include "debug.h"
 
 /* thread stacks */
-char timer_over_buf[TRICKLE_TIMER_STACKSIZE];
-char interval_over_buf[TRICKLE_INTERVAL_STACKSIZE];
-char dao_delay_over_buf[DAO_DELAY_STACKSIZE];
-char routing_table_buf[RT_STACKSIZE];
+static char timer_over_buf[TRICKLE_TIMER_STACKSIZE];
+static char interval_over_buf[TRICKLE_INTERVAL_STACKSIZE];
+static char dao_delay_over_buf[DAO_DELAY_STACKSIZE];
+static char routing_table_buf[RT_STACKSIZE];
 
 int timer_over_pid;
 int interval_over_pid;
@@ -55,6 +55,11 @@ timex_t t_time;
 timex_t I_time;
 timex_t dao_time;
 timex_t rt_time;
+
+static void *trickle_timer_over(void *arg);
+static void *trickle_interval_over(void *arg);
+static void *dao_delay_over(void *arg);
+static void *rt_timer_over(void *arg);
 
 void reset_trickletimer(void)
 {
@@ -80,17 +85,17 @@ void init_trickle(void)
     dao_counter = 0;
     timer_over_pid = thread_create(timer_over_buf, TRICKLE_TIMER_STACKSIZE,
                                    PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                   trickle_timer_over, "trickle_timer_over");
+                                   trickle_timer_over, NULL, "trickle_timer_over");
 
     interval_over_pid = thread_create(interval_over_buf, TRICKLE_INTERVAL_STACKSIZE,
                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                      trickle_interval_over, "trickle_interval_over");
+                                      trickle_interval_over, NULL, "trickle_interval_over");
     dao_delay_over_pid = thread_create(dao_delay_over_buf, DAO_DELAY_STACKSIZE,
                                        PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                       dao_delay_over, "dao_delay_over");
+                                       dao_delay_over, NULL, "dao_delay_over");
     rt_timer_over_pid = thread_create(routing_table_buf, RT_STACKSIZE,
                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                      rt_timer_over, "rt_timer_over");
+                                      rt_timer_over, NULL, "rt_timer_over");
 }
 
 void start_trickle(uint8_t DIOIntMin, uint8_t DIOIntDoubl,
@@ -121,8 +126,10 @@ void trickle_increment_counter(void)
     c++;
 }
 
-void trickle_timer_over(void)
+static void *trickle_timer_over(void *arg)
 {
+    (void) arg;
+
     ipv6_addr_t mcast;
     ipv6_addr_set_all_nodes_addr(&mcast);
 
@@ -134,10 +141,14 @@ void trickle_timer_over(void)
             send_DIO(&mcast);
         }
     }
+
+    return NULL;
 }
 
-void trickle_interval_over(void)
+static void *trickle_interval_over(void *arg)
 {
+    (void) arg;
+
     while (1) {
         thread_sleep();
         I = I * 2;
@@ -178,6 +189,7 @@ void trickle_interval_over(void)
         }
     }
 
+    return NULL;
 }
 
 void delay_dao(void)
@@ -199,8 +211,9 @@ void long_delay_dao(void)
     vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
 }
 
-void dao_delay_over(void)
+static void *dao_delay_over(void *arg)
 {
+    (void) arg;
     while (1) {
         thread_sleep();
 
@@ -215,6 +228,7 @@ void dao_delay_over(void)
             long_delay_dao();
         }
     }
+    return NULL;
 }
 
 void dao_ack_received(void)
@@ -223,8 +237,10 @@ void dao_ack_received(void)
     long_delay_dao();
 }
 
-void rt_timer_over(void)
+static void *rt_timer_over(void *arg)
 {
+    (void) arg;
+
     rpl_routing_entry_t *rt;
 
     while (1) {
@@ -259,4 +275,6 @@ void rt_timer_over(void)
         /* Wake up every second */
         vtimer_usleep(1000000);
     }
+
+    return NULL;
 }

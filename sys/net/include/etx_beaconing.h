@@ -81,11 +81,8 @@ typedef struct etx_neighbor_t {
 
 //prototypes
 void etx_init_beaconing(ipv6_addr_t *address);
-void etx_beacon(void);
-void etx_clock(void);
 double etx_get_metric(ipv6_addr_t *address);
 void etx_update(etx_neighbor_t *neighbor);
-void etx_radio(void);
 
 #define ETX_PKT_OPT         (0)     //Position of Option-Type-Byte
 #define ETX_PKT_OPTVAL      (0x20)  //Non-standard way of saying this is an ETX-Packet.

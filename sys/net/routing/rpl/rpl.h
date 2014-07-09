@@ -188,8 +188,10 @@ void recv_rpl_DAO_ACK(void);
  * sending and receiving RPL-based messages. Both are necessary because of parallel access from different
  * layers/modules of RIOT. May change with future structure changes.
  *
+ * @param arg ignored
+ * @returns nothing
  */
-void rpl_process(void);
+void *rpl_process(void *arg);
 
 /**
  * @brief Returns next hop from routing table.

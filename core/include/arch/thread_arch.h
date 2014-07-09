@@ -42,12 +42,13 @@
  * @brief Initialize a thread's stack
  *
  * @param[in] task_func     pointer to the thread's code
+ * @param[in] arg           argument to task_func
  * @param[in] stack_start   pointer to the start address of the thread
  * @param[in] stack_size    the maximum size of the stack
  *
  * @return                  pointer to the new top of the stack
  */
-char *thread_arch_stack_init(void  (*task_func)(void), void *stack_start, int stack_size);
+char *thread_arch_stack_init(void *(*function)(void *arg), void *arg, void *stack_start, int stack_size);
 
 /**
  * @brief Print the current stack to stdout

@@ -29,8 +29,10 @@ char t1_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 uint16_t p1, p_main;
 
-void thread1(void)
+void *thread1(void *arg)
 {
+    (void) arg;
+
     printf("THREAD %u start\n", p1);
 
     msg_t msg, reply;
@@ -45,6 +47,8 @@ void thread1(void)
     printf("pointer: %s\n", reply.content.ptr);
 
     printf("THREAD %u SHOULD BE BLOCKING :(\n", p1);
+
+    return NULL;
 }
 
 int main(void)
@@ -53,7 +57,8 @@ int main(void)
     p_main = sched_active_pid;
 
     p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST, thread1, "nr1");
+                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                       thread1, NULL, "nr1");
 
     /* step 3: receive a msg */
     msg_receive(&msg);

@@ -155,7 +155,7 @@ void cpu_switch_context_exit(void)
     __builtin_unreachable();
 }
 
-char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksize)
+char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stacksize)
 {
     DEBUG("thread_stack_init()\n");
 
@@ -169,7 +169,7 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stacksiz
     p->uc_stack.ss_size = stacksize;
     p->uc_link = &end_context;
     p->uc_context.flags |= X86_IF;
-    makecontext(p, task_func, 0);
+    makecontext(p, (makecontext_fun_t) task_func, 1, arg);
 
     return (char *) p;
 }

@@ -35,8 +35,9 @@ static char names[NUM_CHILDREN][8];
 
 static int parent_pid;
 
-static void child_fun(void)
+static void *child_fun(void *arg)
 {
+    (void) arg;
     printf("Start of %s.\n", sched_active_thread->name);
 
     for (int i = 0; i < NUM_ITERATIONS; ++i) {
@@ -47,6 +48,7 @@ static void child_fun(void)
     }
 
     printf("End of %s.\n", sched_active_thread->name);
+    return NULL;
 }
 
 int main(void)
@@ -61,6 +63,7 @@ int main(void)
                                 PRIORITY_MAIN + 1,
                                 CREATE_WOUT_YIELD | CREATE_STACKTEST,
                                 child_fun,
+                                NULL,
                                 names[i]);
     }
 

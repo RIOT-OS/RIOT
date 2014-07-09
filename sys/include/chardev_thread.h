@@ -11,5 +11,6 @@
 #include "ringbuffer.h"
 
 void chardev_loop(ringbuffer_t *rb);
+void *chardev_thread_entry(void *rb_);
 
 #endif /* __CHARDEV_THREAD_H */

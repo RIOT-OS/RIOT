@@ -64,8 +64,9 @@ static void do_sleep(int factor)
     vtimer_usleep(timeout_us);
 }
 
-static void writer(void)
+static void *writer(void *arg)
 {
+    (void) arg;
     /* PRINTF("%s", "start"); */
     for (int i = 0; i < NUM_ITERATIONS; ++i) {
         pthread_rwlock_wrlock(&rwlock);
@@ -76,10 +77,12 @@ static void writer(void)
         do_sleep(2);
     }
     /* PRINTF("%s", "done"); */
+    return NULL;
 }
 
-static void reader(void)
+static void *reader(void *arg)
 {
+    (void) arg;
     /* PRINTF("%s", "start"); */
     for (int i = 0; i < NUM_ITERATIONS; ++i) {
         pthread_rwlock_rdlock(&rwlock);
@@ -90,6 +93,7 @@ static void reader(void)
         do_sleep(1);
     }
     /* PRINTF("%s", "done"); */
+    return NULL;
 }
 
 int main(void)
@@ -100,7 +104,7 @@ int main(void)
 
     for (unsigned i = 0; i < NUM_CHILDREN; ++i) {
         int prio;
-        void (*fun)(void);
+        void *(*fun)(void *);
         const char *name;
 
         if (i < NUM_READERS) {
@@ -124,7 +128,9 @@ int main(void)
             name = "writer";
         }
 
-        thread_create(stacks[i], sizeof(stacks[i]), prio, CREATE_WOUT_YIELD | CREATE_STACKTEST, fun, name);
+        thread_create(stacks[i], sizeof(stacks[i]),
+                      prio, CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                      fun, NULL, name);
     }
 
     puts("Main done.");

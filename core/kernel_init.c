@@ -46,9 +46,22 @@
 volatile int lpm_prevent_sleep = 0;
 
 extern int main(void);
-
-static void idle_thread(void)
+static void *main_trampoline(void *arg)
 {
+    (void) arg;
+
+#ifdef MODULE_AUTO_INIT
+    auto_init();
+#endif
+
+    main();
+    return NULL;
+}
+
+static void *idle_thread(void *arg)
+{
+    (void) arg;
+
     while (1) {
         if (lpm_prevent_sleep) {
             lpm_set(LPM_IDLE);
@@ -59,6 +72,8 @@ static void idle_thread(void)
             /* lpm_set(LPM_POWERDOWN); */
         }
     }
+
+    return NULL;
 }
 
 const char *main_name = "main";
@@ -67,12 +82,6 @@ const char *idle_name = "idle";
 static char main_stack[KERNEL_CONF_STACKSIZE_MAIN];
 static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
 
-#ifdef MODULE_AUTO_INIT
-#define MAIN_FUNC auto_init
-#else
-#define MAIN_FUNC ((void (*) (void))  main)
-#endif
-
 void kernel_init(void)
 {
     dINT();
@@ -80,11 +89,11 @@ void kernel_init(void)
 
     hwtimer_init();
 
-    if (thread_create(idle_stack, sizeof(idle_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, idle_name) < 0) {
+    if (thread_create(idle_stack, sizeof(idle_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, NULL, idle_name) < 0) {
         printf("kernel_init(): error creating idle task.\n");
     }
 
-    if (thread_create(main_stack, sizeof(main_stack), PRIORITY_MAIN, CREATE_WOUT_YIELD | CREATE_STACKTEST, MAIN_FUNC, main_name) < 0) {
+    if (thread_create(main_stack, sizeof(main_stack), PRIORITY_MAIN, CREATE_WOUT_YIELD | CREATE_STACKTEST, main_trampoline, NULL, main_name) < 0) {
         printf("kernel_init(): error creating main task.\n");
     }
 
