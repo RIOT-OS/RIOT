@@ -235,7 +235,7 @@ uint8_t transceiver_register(transceiver_type_t t, int pid)
 {
     int result = 0;
     int state = disableIRQ();
-    for (uint8_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
+    for (size_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
         if ((reg[i].pid == pid) || (reg[i].transceivers == TRANSCEIVER_NONE)) {
             reg[i].transceivers |= t;
             reg[i].pid = pid;
@@ -254,7 +254,7 @@ uint8_t transceiver_unregister(transceiver_type_t t, int pid)
 {
     int result = 0;
     int state = disableIRQ();
-    for (uint8_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; ++i) {
+    for (size_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; ++i) {
         if (reg[i].pid == pid) {
             reg[i].transceivers &= ~t;
             restoreIRQ(state);
@@ -480,7 +480,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
 
 #ifdef DBG_IGNORE
 
-        for (uint8_t i = 0; (i < TRANSCEIVER_MAX_IGNORED_ADDR) && (transceiver_ignored_addr[i]); i++) {
+        for (size_t i = 0; (i < TRANSCEIVER_MAX_IGNORED_ADDR) && (transceiver_ignored_addr[i]); i++) {
             DEBUG("check if source (%u) is ignored -> %u\n", transceiver_buffer[transceiver_buffer_pos].src, transceiver_ignored_addr[i]);
 
             if (transceiver_buffer[transceiver_buffer_pos].src == transceiver_ignored_addr[i]) {
@@ -1238,7 +1238,7 @@ static int16_t ignore_add(transceiver_type_t transceiver, void *address)
     (void) transceiver;
     radio_address_t addr = *((radio_address_t *)address);
 
-    for (uint8_t i = 0; i < TRANSCEIVER_MAX_IGNORED_ADDR; i++) {
+    for (size_t i = 0; i < TRANSCEIVER_MAX_IGNORED_ADDR; i++) {
         if (transceiver_ignored_addr[i] == 0) {
             transceiver_ignored_addr[i] = addr;
             DEBUG("addr %u will be ignored (%u)\n", addr, i);
