@@ -1,13 +1,3 @@
-####
-#### Sample Makefile for building apps with the RIOT OS
-####
-#### The Sample Filesystem Layout is:
-#### /this makefile
-#### ../../RIOT 
-#### ../../boards   for board definitions (if you have one or more)
-#### 
-
-# name of your application
 export APPLICATION = olsr_node
 
 export BOARD ?= native
@@ -20,8 +10,7 @@ USEPKG += oonf_api
 
 export CFLAGS = -DRIOT -DENABLE_NAME
 
-## Modules to include. 
-
+# Modules to include. 
 USEMODULE += rtc
 USEMODULE += uart0
 USEMODULE += posix
@@ -33,6 +22,7 @@ USEMODULE += config
 USEMODULE += olsr2
 USEMODULE += defaulttransceiver
 
+# on native, use PID as node ID
 ifeq ($(BOARD),native)
 	export CFLAGS += -DUSE_PID
 endif
