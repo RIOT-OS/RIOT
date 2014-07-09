@@ -19,7 +19,7 @@
 
 #include <inttypes.h>
 
-#include "hwtimer_arch.h"
+#include "arch/hwtimer_arch.h"
 
 #define ENABLE_DEBUG (1)
 #include "debug.h"

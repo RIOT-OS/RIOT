@@ -36,7 +36,7 @@
 
 #include "hwtimer.h"
 #include "hwtimer_cpu.h"
-#include "hwtimer_arch.h"
+#include "arch/hwtimer_arch.h"
 
 /*---------------------------------------------------------------------------*/
 

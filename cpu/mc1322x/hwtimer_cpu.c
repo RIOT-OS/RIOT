@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include "mc1322x.h"
 #include "cpu.h"
-#include "hwtimer_arch.h"
+#include "arch/hwtimer_arch.h"
 #include "irq.h"
 
 #include <stdio.h>

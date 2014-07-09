@@ -21,7 +21,7 @@
 #include "cpu.h"
 #include "bitarithm.h"
 #include "hwtimer_cpu.h"
-#include "hwtimer_arch.h"
+#include "arch/hwtimer_arch.h"
 #include "irq.h"
 
 #define VULP(x) ((volatile unsigned long*) (x))
