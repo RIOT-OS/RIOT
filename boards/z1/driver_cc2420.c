@@ -168,7 +168,7 @@ uint8_t cc2420_txrx(uint8_t data)
         if (count >= MAX_SPI_WAIT) {
             core_panic(0x2420, "cc2420_txrx(): couldn't send byte!");
         }
-    } while(!(UCB0STAT & UCBUSY));
+    } while (UCB0STAT & UCBUSY);
     /* Read the byte that CC2420 has (normally, during TX) returned */
     count = 0;
     do {
@@ -176,7 +176,7 @@ uint8_t cc2420_txrx(uint8_t data)
         if (count >= MAX_SPI_WAIT) {
             core_panic(0x2420, "cc2420_txrx(): couldn't receive byte!");
         }
-    } while(!(IFG2 & UCB0RXIFG));
+    } while (!(IFG2 & UCB0RXIFG));
     /* Return received byte */
     return UCB0RXBUF;
 }
