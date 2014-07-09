@@ -105,8 +105,8 @@ void udp_send(int argc, char **argv)
 
     address = atoi(argv[1]);
 
-    strncpy(text, argv[2], sizeof (text));
-    text[sizeof (text) - 1] = 0;
+    strncpy(text, argv[2], sizeof(text));
+    text[sizeof(text) - 1] = 0;
 
     sock = destiny_socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -115,7 +115,7 @@ void udp_send(int argc, char **argv)
         return;
     }
 
-    memset(&sa, 0, sizeof sa);
+    memset(&sa, 0, sizeof(sa));
 
     ipv6_addr_init(&ipaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, (uint16_t)address);
 
@@ -125,7 +125,7 @@ void udp_send(int argc, char **argv)
 
     bytes_sent = destiny_socket_sendto(sock, (char *)text,
                                        strlen(text) + 1, 0, &sa,
-                                       sizeof sa);
+                                       sizeof(sa));
 
     if (bytes_sent < 0) {
         printf("Error sending packet!\n");

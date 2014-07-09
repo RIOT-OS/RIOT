@@ -55,9 +55,9 @@ int main(void)
     parent_pid = sched_active_pid;
 
     for (int i = 0; i < NUM_CHILDREN; ++i) {
-        snprintf(names[i], sizeof (names[i]), "child%2u", i + 1);
+        snprintf(names[i], sizeof(names[i]), "child%2u", i + 1);
         pids[i] = thread_create(stacks[i],
-                                sizeof (stacks[i]),
+                                sizeof(stacks[i]),
                                 PRIORITY_MAIN + 1,
                                 CREATE_WOUT_YIELD | CREATE_STACKTEST,
                                 child_fun,
