@@ -80,14 +80,6 @@ int thread_create(char *stack,
                   void *(*function)(void *arg),
                   void *arg,
                   const char *name);
-
-int thread_create_arg(char *stack,
-                      int stacksize,
-                      char priority,
-                      int flags,
-                      void *(*function)(void *arg),
-                      void *arg,
-                      const char *name);
 /**
  * @brief Returns the status of a process
  *
