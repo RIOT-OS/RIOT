@@ -1,7 +1,7 @@
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
 
-/* RFC5498 */
+/* The well-known UDP port for MANET as defined in RFC 5498 */
 #define MANET_PORT	269
 
 /* in seconds */
@@ -15,7 +15,7 @@
 #define HYST_LOW	0.3
 #define HYST_HIGH	0.8
 
-/* 1s */
+/* in µs */
 #define MAX_JITTER	1000000
 
 #define FLOODING_MPR_SELECTOR 1
