@@ -15,7 +15,7 @@ void print_topology_set(void);
 
 #ifdef ENABLE_NAME
 /**
- * @brief	get the IP address of a MANET router from it's hostname
+ * @brief	get the IP address of a MANET router from its hostname
  */
 ipv6_addr_t* get_ip_by_name(char* name);
 #endif
