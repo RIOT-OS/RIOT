@@ -172,11 +172,11 @@ static bool _route_expired(struct olsr_node* node, struct netaddr* last_addr) {
 static void _update_link_quality(struct nhdp_node* node) {
 	TRACE_FUN("%s", netaddr_to_str_s(&nbuf[0], h1_super(node)->addr));
 	if (_route_expired(h1_super(node), get_local_addr()))
-		node->link_quality = node->link_quality * (1 - HYST_SCALING);
+		node->link_quality = node->link_quality * (1 - OLSR2_HYST_SCALING);
 	else
-		node->link_quality = node->link_quality * (1 - HYST_SCALING) + HYST_SCALING;
+		node->link_quality = node->link_quality * (1 - OLSR2_HYST_SCALING) + OLSR2_HYST_SCALING;
 
-	if (!h1_super(node)->pending && node->link_quality < HYST_LOW) {
+	if (!h1_super(node)->pending && node->link_quality < OLSR2_HYST_LOW) {
 		h1_super(node)->pending = 1;
 		h1_super(node)->lost = LOST_ITER_MAX;
 
@@ -191,7 +191,7 @@ static void _update_link_quality(struct nhdp_node* node) {
 		_update_children(h1_super(node)->addr, NULL);
 	}
 
-	if (h1_super(node)->pending && node->link_quality > HYST_HIGH) {
+	if (h1_super(node)->pending && node->link_quality > OLSR2_HYST_HIGH) {
 		h1_super(node)->pending = 0;
 		h1_super(node)->lost = 0;
 
@@ -210,7 +210,7 @@ bool remove_expired(struct olsr_node* node) {
 	char skipped;
 	struct alt_route *route, *prev;
 	simple_list_for_each_safe(node->other_routes, route, prev, skipped) {
-		if (_now - route->expires < HOLD_TIME)
+		if (_now - route->expires < OLSR2_HOLD_TIME_SECONDS)
 			continue;
 
 		DEBUG("alternative route to %s (%s) via %s expired, removing it",
@@ -219,7 +219,7 @@ bool remove_expired(struct olsr_node* node) {
 		simple_list_for_each_remove(&node->other_routes, route, prev);
 	}
 
-	if (_now - node->expires > HOLD_TIME) {
+	if (_now - node->expires > OLSR2_HOLD_TIME_SECONDS) {
 
 		DEBUG("%s (%s) expired",
 			node->name, netaddr_to_str_s(&nbuf[0], node->addr));

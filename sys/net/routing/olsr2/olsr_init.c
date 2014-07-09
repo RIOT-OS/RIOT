@@ -45,8 +45,8 @@ struct timer_msg {
 	void (*func) (void);
 };
 
-static struct timer_msg msg_hello = { .timer = {0}, .interval = { .seconds = HELLO_REFRESH_INTERVAL - 1, .microseconds = 0}, .func = writer_send_hello };
-static struct timer_msg msg_tc = { .timer = {0}, .interval = { .seconds = TC_REFRESH_INTERVAL - 1, .microseconds = 0}, .func = writer_send_tc };
+static struct timer_msg msg_hello = { .timer = {0}, .interval = { .seconds = OLSR2_HELLO_REFRESH_INTERVAL_SECONDS - 1, .microseconds = 0}, .func = writer_send_hello };
+static struct timer_msg msg_tc = { .timer = {0}, .interval = { .seconds = OLSR2_TC_REFRESH_INTERVAL_SECONDS - 1, .microseconds = 0}, .func = writer_send_tc };
 
 static int sock;
 static sockaddr6_t sa_bcast;
@@ -124,7 +124,7 @@ static void olsr_sender_thread(void) {
 		mutex_unlock(&olsr_data);
 
 		/* add jitter */
-		tmsg->interval.microseconds = genrand_uint32() % MAX_JITTER;
+		tmsg->interval.microseconds = genrand_uint32() % OLSR2_MAX_JITTER_US;
 
 		if (vtimer_set_msg(&tmsg->timer, tmsg->interval, thread_getpid(), tmsg) != 0)
 			DEBUG("vtimer_set_msg failed, stopped sending");
