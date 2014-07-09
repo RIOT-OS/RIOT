@@ -23,9 +23,7 @@
 #include <flags.h>
 #include <kernel.h>
 
-#define STACK_SIZE  (KERNEL_CONF_STACKSIZE_DEFAULT + KERNEL_CONF_STACKSIZE_MAIN)
-
-char t2_stack[STACK_SIZE];
+char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 void second_thread(void)
 {

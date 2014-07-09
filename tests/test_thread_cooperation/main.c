@@ -25,7 +25,6 @@
 #include <kernel.h>
 #include <mutex.h>
 
-#define STACK_SIZE (KERNEL_CONF_STACKSIZE_MAIN)
 #define PROBLEM 12
 
 mutex_t mtx;
@@ -33,7 +32,7 @@ mutex_t mtx;
 volatile int storage = 1;
 int main_id;
 int ths[PROBLEM];
-char stacks[PROBLEM][STACK_SIZE];
+char stacks[PROBLEM][KERNEL_CONF_STACKSIZE_MAIN];
 
 void run(void)
 {
