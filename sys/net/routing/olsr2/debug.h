@@ -1,5 +1,5 @@
-#ifndef DEBUG_H_
-#define DEBUG_H_
+#ifndef OLSR2_DEBUG_H_
+#define OLSR2_DEBUG_H_
 
 #ifdef ENABLE_DEBUG_OLSR
 #ifndef RIOT
