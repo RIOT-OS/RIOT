@@ -79,7 +79,7 @@ int main(void)
 
     for (int i = 0; i < PROBLEM; ++i) {
         printf("Creating thread with arg %d\n", (i + 1));
-        ths[i] = thread_create(stacks[i], STACK_SIZE, PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST, run, "thread");
+        ths[i] = thread_create(stacks[i], sizeof(stacks[i]), PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST, run, "thread");
 
         if (ths[i] < 0)  {
             printf("[!!!] Creating thread failed with %d\n", err);
