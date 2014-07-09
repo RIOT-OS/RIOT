@@ -43,7 +43,7 @@ int main(void)
     mutex_init(&mutex);
 
     thread_create(stack,
-                  KERNEL_CONF_STACKSIZE_MAIN,
+                  sizeof(stack),
                   PRIORITY_MAIN - 1,
                   CREATE_WOUT_YIELD | CREATE_STACKTEST,
                   second_thread,

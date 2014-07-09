@@ -56,7 +56,7 @@ void timer_thread(void)
     printf("This is thread %d\n", thread_getpid());
 
     msg_t msgq[16];
-    msg_init_queue(msgq, sizeof msgq);
+    msg_init_queue(msgq, sizeof(msgq));
 
     while (1) {
         msg_t m;
@@ -102,7 +102,7 @@ int main(void)
     msg_t m;
     int pid = thread_create(
                   timer_stack,
-                  sizeof timer_stack,
+                  sizeof(timer_stack),
                   PRIORITY_MAIN - 1,
                   CREATE_STACKTEST,
                   timer_thread,

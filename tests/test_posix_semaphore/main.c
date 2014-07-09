@@ -61,7 +61,7 @@ static void test1(void)
     }
 
     puts("first: thread create");
-    int pid = thread_create(test1_thread_stack, KERNEL_CONF_STACKSIZE_MAIN,
+    int pid = thread_create(test1_thread_stack, sizeof(test1_thread_stack),
                             PRIORITY_MAIN - 1, CREATE_STACKTEST | CREATE_WOUT_YIELD,
                             test1_second_thread, "second");
 
@@ -134,7 +134,7 @@ void test2(void)
         snprintf(names[i], sizeof(names[i]), "priority %d", priority);
         printf("first: thread create: %d\n", priority);
         int pid = thread_create(test2_thread_stack[i],
-                                KERNEL_CONF_STACKSIZE_MAIN, priority, CREATE_STACKTEST,
+                                sizeof(test2_thread_stack[i]), priority, CREATE_STACKTEST,
                                 priority_sema_thread, names[i]);
 
         if (pid < 0) {

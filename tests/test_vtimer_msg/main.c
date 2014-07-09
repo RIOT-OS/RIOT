@@ -48,7 +48,7 @@ void timer_thread(void)
     /* without a queue, the message would get lost */
     /* because of the way this timer works, there can be max 1 queued message */
     msg_t msgq[1];
-    msg_init_queue(msgq, sizeof msgq);
+    msg_init_queue(msgq, sizeof(msgq));
 
     while (1) {
         msg_t m;
@@ -90,7 +90,7 @@ int main(void)
     msg_t m;
     int pid = thread_create(
                   timer_stack,
-                  sizeof timer_stack,
+                  sizeof(timer_stack),
                   PRIORITY_MAIN - 1,
                   CREATE_STACKTEST,
                   timer_thread,
@@ -106,7 +106,7 @@ int main(void)
 
     int pid2 = thread_create(
                    timer_stack_local,
-                   sizeof timer_stack_local,
+                   sizeof(timer_stack_local),
                    PRIORITY_MAIN - 1,
                    CREATE_STACKTEST,
                    timer_thread_local,

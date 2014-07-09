@@ -50,11 +50,11 @@ int main(void)
 {
     msg_t msg;
 
-    p1 = thread_create(t1_stack, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN - 1,
+    p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST, sub_thread, "nr1");
-    p2 = thread_create(t2_stack, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN - 1,
+    p2 = thread_create(t2_stack, sizeof(t2_stack), PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST, sub_thread, "nr2");
-    p3 = thread_create(t3_stack, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN - 1,
+    p3 = thread_create(t3_stack, sizeof(t3_stack), PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST, sub_thread, "nr3");
 
     puts("THREADS CREATED\n");

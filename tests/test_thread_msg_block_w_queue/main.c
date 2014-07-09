@@ -55,7 +55,7 @@ int main(void)
     msg_t msg_q[1];
     msg_init_queue(msg_q, 1);
 
-    p1 = thread_create(t1_stack, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN - 1,
+    p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST, thread1, "nr1");
 
     /* step 3: receive a msg */

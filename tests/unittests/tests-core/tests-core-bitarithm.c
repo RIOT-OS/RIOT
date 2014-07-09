@@ -159,7 +159,7 @@ static void test_bitarithm_msb_random(void)
 
 static void test_bitarithm_msb_all(void)
 {
-    for (unsigned shift = 0; shift < sizeof (unsigned) * 8 - 1; ++shift) {
+    for (unsigned shift = 0; shift < sizeof(unsigned) * 8 - 1; ++shift) {
         TEST_ASSERT_EQUAL_INT(shift, bitarithm_msb(1 << shift));
     }
 }
@@ -171,7 +171,7 @@ static void test_bitarithm_lsb_one(void)
 
 static void test_bitarithm_lsb_limit(void)
 {
-    unsigned shift = sizeof (unsigned) * 8 - 1;
+    unsigned shift = sizeof(unsigned) * 8 - 1;
     TEST_ASSERT_EQUAL_INT(shift, bitarithm_lsb(1u << shift));
 }
 
@@ -183,7 +183,7 @@ static void test_bitarithm_lsb_random(void)
 
 static void test_bitarithm_lsb_all(void)
 {
-    for (unsigned shift = 0; shift < sizeof (unsigned) * 8 - 1; ++shift) {
+    for (unsigned shift = 0; shift < sizeof(unsigned) * 8 - 1; ++shift) {
         TEST_ASSERT_EQUAL_INT(shift, bitarithm_lsb(1u << shift));
     }
 }

@@ -124,7 +124,7 @@ int main(void)
             name = "writer";
         }
 
-        thread_create(stacks[i], sizeof (stacks[i]), prio, CREATE_WOUT_YIELD | CREATE_STACKTEST, fun, name);
+        thread_create(stacks[i], sizeof(stacks[i]), prio, CREATE_WOUT_YIELD | CREATE_STACKTEST, fun, name);
     }
 
     puts("Main done.");
