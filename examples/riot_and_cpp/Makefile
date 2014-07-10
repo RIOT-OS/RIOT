@@ -1,16 +1,16 @@
 # name of your application
-export APPLICATION = riot_and_cpp
+APPLICATION = riot_and_cpp
 
 # If no BOARD is found in the environment, use this default:
-export BOARD ?= native
+BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
-export RIOTBASE ?= $(CURDIR)/../..
+RIOTBASE ?= $(CURDIR)/../..
 
 # Uncomment these lines if you want to use platform support from external
 # repositories:
-#export RIOTCPU ?= $(CURDIR)/../../../thirdparty_cpu
-#export RIOTBOARD ?= $(CURDIR)/../../../thirdparty_boards
+#RIOTCPU ?= $(CURDIR)/../../../thirdparty_cpu
+#RIOTBOARD ?= $(CURDIR)/../../../thirdparty_boards
 
 # Uncomment this to enable scheduler statistics for ps:
 #CFLAGS += -DSCHEDSTATISTICS
@@ -25,7 +25,7 @@ export RIOTBASE ?= $(CURDIR)/../..
 #CFLAGS += -DDEVELHELP
 
 # Change this to 0 show compiler invocation lines by default:
-export QUIET ?= 1
+QUIET ?= 1
 
 # Blacklist boards
 BOARD_BLACKLIST := arduino-due avsextrem chronos mbed_lpc1768 msb-430h msba2 redbee-econotag telosb wsn430-v1_3b wsn430-v1_4 msb-430 pttu udoo qemu-i386 z1

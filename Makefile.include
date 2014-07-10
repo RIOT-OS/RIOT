@@ -3,13 +3,13 @@ export __RIOTBUILD_FLAG := RIOT
 
 # set undefined variables
 RIOTBASE ?= $(shell dirname "$(lastword $(MAKEFILE_LIST))")
-export RIOTBASE := $(abspath $(RIOTBASE))
+RIOTBASE := $(abspath $(RIOTBASE))
 
 RIOTCPU ?= $(RIOTBASE)/cpu
-export RIOTCPU := $(abspath $(RIOTCPU))
+RIOTCPU := $(abspath $(RIOTCPU))
 
 RIOTBOARD ?= $(RIOTBASE)/boards
-export RIOTBOARD := $(abspath $(RIOTBOARD))
+RIOTBOARD := $(abspath $(RIOTBOARD))
 
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
@@ -32,11 +32,8 @@ BB = $(shell echo $(BOARD)|tr 'a-z' 'A-Z'|tr '-' '_')
 CPUDEF = $(shell echo $(CPU)|tr 'a-z' 'A-Z'|tr '-' '_')
 CFLAGS += -DBOARD_$(BB) -DCPU_$(CPUDEF)
 
-export CFLAGS
-export APPLICATION
-
-export BINDIRBASE ?= $(CURDIR)/bin
-export BINDIR ?= $(abspath $(BINDIRBASE)/$(BOARD))/
+BINDIRBASE ?= $(CURDIR)/bin
+BINDIR ?= $(abspath $(BINDIRBASE)/$(BOARD))/
 
 ifeq ($(QUIET),1)
 	AD=@
@@ -44,7 +41,6 @@ ifeq ($(QUIET),1)
 else
 	AD=
 endif
-export AD
 
 BOARD := $(strip $(BOARD))
 
@@ -87,13 +83,11 @@ BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
 .PHONY: all clean flash doc term objsize buildsize buildsizes buildsizes-diff buildinfo
 
-export ELFFILE ?= $(BINDIR)$(APPLICATION).elf
-export HEXFILE ?= $(ELFFILE:.elf=.hex)
+ELFFILE ?= $(BINDIR)$(APPLICATION).elf
+HEXFILE ?= $(ELFFILE:.elf=.hex)
 
 # variables used to complie and link c++
-export CPPMIX ?= $(if $(wildcard *.cpp),1,)
-export CXXUWFLAGS
-export CXXEXFLAGS
+CPPMIX ?= $(if $(wildcard *.cpp),1,)
 
 # We assume $(LINK) to be gcc-like. Use `LINKFLAGPREFIX :=` for ld-like linker options.
 LINKFLAGPREFIX ?= -Wl,
@@ -159,3 +153,6 @@ debug:
 
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests
+
+# Export variables used throughout the whole make system:
+include $(RIOTBASE)/Makefile.vars
