@@ -62,7 +62,7 @@ void thread_sleep(void)
     }
 
     dINT();
-    sched_set_status((tcb_t *)sched_active_thread, STATUS_SLEEPING);
+    sched_set_status((thread_t *)sched_active_thread, STATUS_SLEEPING);
     eINT();
     thread_yield();
 }
@@ -73,7 +73,7 @@ int thread_wakeup(int pid)
 
     int old_state = disableIRQ();
 
-    tcb_t *other_thread = (tcb_t *) sched_threads[pid];
+    thread_t *other_thread = (thread_t *) sched_threads[pid];
     if (other_thread && other_thread->status == STATUS_SLEEPING) {
         DEBUG("thread_wakeup: Thread is sleeping.\n");
 
@@ -111,7 +111,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void *(*
     while (0) {
         /* We assume that the thread control block can be placed on the same
          * alignment as a pointer. Fail at compile time if this assumption is wrong. */
-        typedef int TCB_ALIGNMENT_CHECK[ALIGN_OF(void *) == ALIGN_OF(tcb_t) ? +1 : -1];
+        typedef int TCB_ALIGNMENT_CHECK[ALIGN_OF(void *) == ALIGN_OF(thread_t) ? +1 : -1];
         TCB_ALIGNMENT_CHECK tcb_alignment_check;
         (void) tcb_alignment_check;
     }
@@ -131,13 +131,13 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void *(*
     }
 
     /* make room for the thread control block */
-    stacksize -= sizeof(tcb_t);
+    stacksize -= sizeof(thread_t);
 
     /* round down the stacksize to a multiple of 2/4 */
     stacksize -= stacksize % ALIGN_OF(void *);
 
     /* allocate our thread control block at the top of our stackspace */
-    tcb_t *cb = (tcb_t *) (stack + stacksize);
+    thread_t *cb = (thread_t *) (stack + stacksize);
 
     if (flags & CREATE_STACKTEST) {
         /* assign each int of the stack the value of it's address */

@@ -89,7 +89,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
             ++count;
 
             next->cont = 1;
-            sched_set_status((tcb_t *) sched_threads[next->pid], STATUS_PENDING);
+            sched_set_status((thread_t *) sched_threads[next->pid], STATUS_PENDING);
         }
         barrier->next = NULL;
         barrier->count = count;

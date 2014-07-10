@@ -45,7 +45,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-extern volatile tcb_t *sched_active_thread;
+extern volatile thread_t *sched_active_thread;
 
 volatile int native_interrupts_enabled;
 volatile int _native_in_isr;
@@ -91,14 +91,11 @@ void print_thread_sigmask(ucontext_t *cp)
 
 void print_sigmasks(void)
 {
-    ucontext_t *p;
-    //tcb_t *cb = NULL;
-
     for (int i = 0; i < MAXTHREADS; i++) {
         if (sched_threads[i] != NULL) {
             printf("%s:\n", sched_threads[i]->name);
             //print_thread_sigmask(sched_threads[i]->sp);
-            p = (ucontext_t *)(sched_threads[i]->stack_start);
+            ucontext_t *p = (ucontext_t *)(sched_threads[i]->stack_start);
             print_thread_sigmask(p);
             puts("");
         }
