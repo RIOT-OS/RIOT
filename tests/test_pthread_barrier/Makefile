@@ -3,7 +3,7 @@ APPLICATION = test_pthread_barrier
 include ../Makefile.tests_common
 
 # exclude boards with insufficient RAM
-BOARD_INSUFFICIENT_RAM :=  stm32f0discovery
+BOARD_INSUFFICIENT_RAM :=  stm32f0discovery chronos
 
 ## Modules to include.
 USEMODULE += pthread

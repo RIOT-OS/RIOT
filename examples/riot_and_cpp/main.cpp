@@ -25,6 +25,7 @@
  * all included headers defining c functions, i.e. all RIOT functions, must be marked as extern "C"
  */
 extern "C" {
+#include "kernel.h"
 #include "thread.h"
 
 #include "c_functions.h"
@@ -37,7 +38,8 @@ extern "C" {
 using namespace std;
 
 /* thread's stack */
-char threadA_stack [KERNEL_CONF_STACKSIZE_MAIN];
+char threadA_stack[KERNEL_CONF_STACKSIZE_MAIN];
+thread_t threadA;
 
 /* thread's function */
 void *threadA_func(void *arg);
@@ -49,7 +51,7 @@ int main()
     printf("\n");
 
     /* create thread A */
-    thread_create(threadA_stack, sizeof(threadA_stack), 0, CREATE_WOUT_YIELD, threadA_func, NULL, "thread A");
+    thread_create(&threadA, threadA_stack, sizeof(threadA_stack), 0, CREATE_WOUT_YIELD, threadA_func, NULL, "thread A");
 
     printf("******** Hello, you're in thread %s ********\n", thread_getname(thread_getpid()));
     printf("We'll test C++ class and methods here!\n");

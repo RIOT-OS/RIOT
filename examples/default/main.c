@@ -46,6 +46,7 @@
 #ifdef MODULE_TRANSCEIVER
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
+thread_t radio_thread;
 msg_t msg_q[RCV_BUFFER_SIZE];
 
 void *radio(void *arg)
@@ -89,6 +90,7 @@ void *radio(void *arg)
 void init_transceiver(void)
 {
     int radio_pid = thread_create(
+                        &radio_thread,
                         radio_stack_buffer,
                         sizeof(radio_stack_buffer),
                         PRIORITY_MAIN - 2,

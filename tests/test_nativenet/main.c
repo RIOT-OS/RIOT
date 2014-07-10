@@ -41,6 +41,7 @@
 #define RCV_BUFFER_SIZE     (64)
 #define RADIO_STACK_SIZE    (KERNEL_CONF_STACKSIZE_DEFAULT)
 
+thread_t radio_thread;
 char radio_stack_buffer[RADIO_STACK_SIZE];
 msg_t msg_q[RCV_BUFFER_SIZE];
 uint8_t snd_buffer[NATIVE_MAX_DATA_LENGTH];
@@ -96,6 +97,8 @@ void *radio(void *arg)
             puts("Unknown packet received");
         }
     }
+
+    return NULL;
 }
 
 void sender(void)
@@ -144,10 +147,9 @@ int main(void)
 
 #ifndef SENDER
     printf("\n\tmain(): starting radio thread\n");
-    radio_pid = thread_create(
-            radio_stack_buffer, sizeof(radio_stack_buffer),
-            PRIORITY_MAIN - 2, CREATE_STACKTEST,
-            radio, NULL, "radio");
+    radio_pid = thread_create(&radio_thread, radio_stack_buffer, sizeof(radio_stack_buffer),
+                              PRIORITY_MAIN - 2, CREATE_STACKTEST,
+                              radio, NULL, "radio");
     transceiver_register(TRANSCEIVER_NATIVE, radio_pid);
 #endif
 

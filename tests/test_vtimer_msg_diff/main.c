@@ -31,6 +31,7 @@
 #define MAXCOUNT 100
 #define MAXDIFF 10000
 
+thread_t timer_thread;
 char timer_stack[KERNEL_CONF_STACKSIZE_MAIN*4];
 
 struct timer_msg {
@@ -51,7 +52,7 @@ struct timer_msg timer_msgs[] = { { .interval = { .seconds = 0, .microseconds = 
                                   { .interval = { .seconds = 1, .microseconds = 100000}, .msg = "T6", .start={0}, .count=0 },
 };
 
-void *timer_thread(void *arg)
+void *timer_thread_run(void *arg)
 {
     (void) arg;
     printf("This is thread %d\n", thread_getpid());
@@ -102,20 +103,16 @@ void *timer_thread(void *arg)
 
 int main(void)
 {
-    msg_t m;
-    int pid = thread_create(
-                  timer_stack,
-                  sizeof(timer_stack),
-                  PRIORITY_MAIN - 1,
-                  CREATE_STACKTEST,
-                  timer_thread,
-                  NULL,
-                  "timer");
+    thread_create(&timer_thread, timer_stack, sizeof(timer_stack),
+                  PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                  timer_thread_run, NULL, "timer");
 
     for (unsigned i = 0; i < sizeof(timer_msgs)/sizeof(struct timer_msg); i++) {
-        printf("Sending timer msg %u...\n", i);
+        printf("Sending timer msg %d...\n", i);
+
+        msg_t m;
         m.content.ptr = (char *) &timer_msgs[i];
-        msg_send(&m, pid, false);
+        msg_send(&m, timer_thread.pid, false);
     }
 
     return 0;

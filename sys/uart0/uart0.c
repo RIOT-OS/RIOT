@@ -43,12 +43,14 @@ int uart0_handler_pid;
 
 static char buffer[UART0_BUFSIZE];
 
+static thread_t uart0_thread;
 static char uart0_thread_stack[UART0_STACKSIZE];
 
 void board_uart0_init(void)
 {
     ringbuffer_init(&uart0_ringbuffer, buffer, UART0_BUFSIZE);
     int pid = thread_create(
+                  &uart0_thread,
                   uart0_thread_stack,
                   sizeof(uart0_thread_stack),
                   PRIORITY_MAIN - 1,

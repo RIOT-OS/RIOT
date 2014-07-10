@@ -98,6 +98,7 @@ static void *reader(void *arg)
 int main(void)
 {
     static char stacks[NUM_CHILDREN][KERNEL_CONF_STACKSIZE_MAIN];
+    static thread_t threads[NUM_CHILDREN];
 
     puts("Main start.");
 
@@ -127,7 +128,7 @@ int main(void)
             name = "writer";
         }
 
-        thread_create(stacks[i], sizeof(stacks[i]),
+        thread_create(&threads[i], stacks[i], sizeof(stacks[i]),
                       prio, CREATE_WOUT_YIELD | CREATE_STACKTEST,
                       fun, NULL, name);
     }

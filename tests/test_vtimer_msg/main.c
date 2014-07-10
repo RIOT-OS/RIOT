@@ -28,6 +28,8 @@
 
 char timer_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char timer_stack_local[KERNEL_CONF_STACKSIZE_MAIN];
+thread_t timer_thread;
+thread_t timer_thread_local;
 
 struct timer_msg {
     vtimer_t timer;
@@ -40,7 +42,7 @@ timex_t now;
 struct timer_msg msg_a = { .interval = { .seconds = 2, .microseconds = 0}, .msg = "Hello World" };
 struct timer_msg msg_b = { .interval = { .seconds = 5, .microseconds = 0}, .msg = "This is a Test" };
 
-void *timer_thread(void *arg)
+void *timer_thread_run(void *arg)
 {
     (void) arg;
 
@@ -73,7 +75,7 @@ void *timer_thread(void *arg)
     }
 }
 
-void *timer_thread_local(void *arg)
+void *timer_thread_local_run(void *arg)
 {
     (void) arg;
 
@@ -93,11 +95,12 @@ int main(void)
 {
     msg_t m;
     int pid = thread_create(
+                  &timer_thread,
                   timer_stack,
                   sizeof(timer_stack),
                   PRIORITY_MAIN - 1,
                   CREATE_STACKTEST,
-                  timer_thread,
+                  timer_thread_run,
                   NULL,
                   "timer");
 
@@ -110,11 +113,12 @@ int main(void)
     msg_send(&m, pid, false);
 
     int pid2 = thread_create(
+                   &timer_thread_local,
                    timer_stack_local,
                    sizeof(timer_stack_local),
                    PRIORITY_MAIN - 1,
                    CREATE_STACKTEST,
-                   timer_thread_local,
+                   timer_thread_local_run,
                    NULL,
                    "timer local");
 

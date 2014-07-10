@@ -61,6 +61,11 @@ static void *trickle_interval_over(void *arg);
 static void *dao_delay_over(void *arg);
 static void *rt_timer_over(void *arg);
 
+static thread_t trickle_timer_over_thread;
+static thread_t trickle_interval_over_thread;
+static thread_t dao_delay_over_thread;
+static thread_t rt_timer_over_thread;
+
 void reset_trickletimer(void)
 {
     I = Imin;
@@ -83,17 +88,17 @@ void init_trickle(void)
     /* Create threads */
     ack_received = true;
     dao_counter = 0;
-    timer_over_pid = thread_create(timer_over_buf, TRICKLE_TIMER_STACKSIZE,
+    timer_over_pid = thread_create(&trickle_timer_over_thread, timer_over_buf, TRICKLE_TIMER_STACKSIZE,
                                    PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                    trickle_timer_over, NULL, "trickle_timer_over");
 
-    interval_over_pid = thread_create(interval_over_buf, TRICKLE_INTERVAL_STACKSIZE,
+    interval_over_pid = thread_create(&trickle_interval_over_thread,  interval_over_buf, TRICKLE_INTERVAL_STACKSIZE,
                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                       trickle_interval_over, NULL, "trickle_interval_over");
-    dao_delay_over_pid = thread_create(dao_delay_over_buf, DAO_DELAY_STACKSIZE,
+    dao_delay_over_pid = thread_create(&dao_delay_over_thread, dao_delay_over_buf, DAO_DELAY_STACKSIZE,
                                        PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                        dao_delay_over, NULL, "dao_delay_over");
-    rt_timer_over_pid = thread_create(routing_table_buf, RT_STACKSIZE,
+    rt_timer_over_pid = thread_create(&rt_timer_over_thread, routing_table_buf, RT_STACKSIZE,
                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                       rt_timer_over, NULL, "rt_timer_over");
 }

@@ -29,6 +29,7 @@
 
 #define LIMIT 1000
 
+static thread_t threads[3];
 static char stacks[3][KERNEL_CONF_STACKSIZE_MAIN];
 static int pids[3];
 
@@ -108,13 +109,13 @@ int main(void)
 {
     puts("Main thread start.");
 
-    pids[0] = thread_create(stacks[0], sizeof(stacks[0]),
+    pids[0] = thread_create(&threads[0], stacks[0], sizeof(stacks[0]),
                             PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST,
                             first_thread, NULL, "1st");
-    pids[1] = thread_create(stacks[1], sizeof(stacks[1]),
+    pids[1] = thread_create(&threads[1], stacks[1], sizeof(stacks[1]),
                             PRIORITY_MAIN - 2, CREATE_WOUT_YIELD | CREATE_STACKTEST,
                             second_thread, NULL, "2nd");
-    pids[2] = thread_create(stacks[2], sizeof(stacks[2]),
+    pids[2] = thread_create(&threads[3], stacks[2], sizeof(stacks[2]),
                             PRIORITY_MAIN - 3, CREATE_WOUT_YIELD | CREATE_STACKTEST,
                             third_thread, NULL, "3nd");
 

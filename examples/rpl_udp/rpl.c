@@ -35,6 +35,7 @@
 
 #define TRANSCEIVER TRANSCEIVER_DEFAULT
 
+static thread_t monitor_thread;
 char monitor_stack_buffer[MONITOR_STACK_SIZE];
 radio_address_t id;
 ipv6_addr_t std_addr;
@@ -88,7 +89,7 @@ void rpl_udp_init(int argc, char **argv)
 
         DEBUGF("Start monitor\n");
         int monitor_pid = thread_create(
-                monitor_stack_buffer, sizeof(monitor_stack_buffer),
+                &monitor_thread, monitor_stack_buffer, sizeof(monitor_stack_buffer),
                 PRIORITY_MAIN - 2, CREATE_STACKTEST,
                 rpl_udp_monitor, NULL, "monitor");
         DEBUGF("Register at transceiver %02X\n", TRANSCEIVER);

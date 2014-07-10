@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <errno.h>
+
 #include "tcb.h"
 #include "kernel.h"
 #include "kernel_internal.h"
@@ -82,6 +83,9 @@ const char *idle_name = "idle";
 static char main_stack[KERNEL_CONF_STACKSIZE_MAIN];
 static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
 
+thread_t kernel_main_thread;
+thread_t kernel_idle_thread;
+
 void kernel_init(void)
 {
     dINT();
@@ -89,11 +93,13 @@ void kernel_init(void)
 
     hwtimer_init();
 
-    if (thread_create(idle_stack, sizeof(idle_stack), PRIORITY_IDLE, CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, NULL, idle_name) < 0) {
+    if (thread_create(&kernel_idle_thread, idle_stack, sizeof(idle_stack), PRIORITY_IDLE,
+                      CREATE_WOUT_YIELD | CREATE_STACKTEST, idle_thread, NULL, idle_name) < 0) {
         printf("kernel_init(): error creating idle task.\n");
     }
 
-    if (thread_create(main_stack, sizeof(main_stack), PRIORITY_MAIN, CREATE_WOUT_YIELD | CREATE_STACKTEST, main_trampoline, NULL, main_name) < 0) {
+    if (thread_create(&kernel_main_thread, main_stack, sizeof(main_stack), PRIORITY_MAIN,
+                      CREATE_WOUT_YIELD | CREATE_STACKTEST, main_trampoline, NULL, main_name) < 0) {
         printf("kernel_init(): error creating main task.\n");
     }
 

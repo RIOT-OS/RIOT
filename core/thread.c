@@ -106,16 +106,9 @@ uintptr_t thread_measure_stack_free(char *stack)
     return space_free;
 }
 
-int thread_create(char *stack, int stacksize, char priority, int flags, void *(*function)(void *arg), void *arg, const char *name)
+int thread_create(thread_t *cb, char *stack, int stacksize, char priority, int flags,
+                  void *(*function)(void *arg), void *arg, const char *name)
 {
-    while (0) {
-        /* We assume that the thread control block can be placed on the same
-         * alignment as a pointer. Fail at compile time if this assumption is wrong. */
-        typedef int TCB_ALIGNMENT_CHECK[ALIGN_OF(void *) == ALIGN_OF(thread_t) ? +1 : -1];
-        TCB_ALIGNMENT_CHECK tcb_alignment_check;
-        (void) tcb_alignment_check;
-    }
-
     if (priority >= SCHED_PRIO_LEVELS) {
         return -EINVAL;
     }
@@ -130,14 +123,8 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void *(*
         stacksize -= misalignment;
     }
 
-    /* make room for the thread control block */
-    stacksize -= sizeof(thread_t);
-
     /* round down the stacksize to a multiple of 2/4 */
     stacksize -= stacksize % ALIGN_OF(void *);
-
-    /* allocate our thread control block at the top of our stackspace */
-    thread_t *cb = (thread_t *) (stack + stacksize);
 
     if (flags & CREATE_STACKTEST) {
         /* assign each int of the stack the value of it's address */

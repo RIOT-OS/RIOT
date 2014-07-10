@@ -22,20 +22,20 @@
 #include "thread.h"
 
 char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
+thread_t t2;
 
 void *second_thread(void *arg)
 {
-    (void) arg;
-    puts("second thread\n");
+    puts("Second thread says:");
+    puts((const char *) arg);
     return NULL;
 }
 
 int main(void)
 {
-    (void) thread_create(
-            t2_stack, sizeof(t2_stack),
-            PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST,
-            second_thread, NULL, "nr2");
-    puts("first thread\n");
+    thread_create(&t2, t2_stack, sizeof(t2_stack),
+                  PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                  second_thread, "Hello!", "nr2");
+    puts("First thread finished.");
     return 0;
 }
