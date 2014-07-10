@@ -32,7 +32,7 @@
 #include "x86_hwtimer.h"
 #include "x86_rtc.h"
 #include "x86_threading.h"
-#include "hwtimer_arch.h"
+#include "arch/hwtimer_arch.h"
 #include "irq.h"
 #include "thread.h"
 

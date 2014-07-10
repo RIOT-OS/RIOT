@@ -20,7 +20,7 @@
  * @}
  */
 
-#include "hwtimer_arch.h"
+#include "arch/hwtimer_arch.h"
 #include "board.h"
 #include "periph/timer.h"
 #include "thread.h"
