@@ -85,7 +85,7 @@ static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
 void kernel_init(void)
 {
     dINT();
-    printf("kernel_init(): This is RIOT! (Version: %s)\n", VERSION);
+    printf("kernel_init(): This is RIOT! (Version: %s)\n", RIOT_VERSION);
 
     hwtimer_init();
 
