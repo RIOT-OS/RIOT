@@ -28,9 +28,11 @@ int dtls_listen(uint32_t port, dtls_listen_cb_t cb)
     ringbuffer_t rb;
     char buffer[DTLS_LISTEN_BUFFER_SIZE];
     uint8_t *fragment[DTLS_LISTEN_BUFFER_SIZE];
-    dtls_record_t record = {{0},fragment};
+    dtls_record_header_t header = DTLS_RECORD_HEADER_INIT;
+    dtls_record_t record = {&header,fragment};
 
-    status = cipher_init(&conn.cipher, CIPHER_NULL, NULL, 0);
+    //status = cipher_init(&conn.cipher, CIPHER_NULL, NULL, 0);
+    status = cipher_init(&conn.cipher, CIPHER_AES_128, (uint8_t*) "asd", 3);
 
     conn.socket  = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
     memset(&conn.socket_addr, 0, sizeof(conn.socket_addr));
@@ -56,7 +58,7 @@ int dtls_listen(uint32_t port, dtls_listen_cb_t cb)
         // if (conn->state == unknown)
         //   do handshake (like verify if record contains CLIENT_HELLO
 
-        if (cb(&conn, record.fragment, record.header.length) == 1)
+        if (cb(&conn, record.fragment, record.header->length) == 1)
             break;
     }
 
@@ -82,7 +84,8 @@ int dtls_connect(dtls_connection_t *conn, char *addr, uint32_t port)
     memcpy(&conn->socket_addr.sin6_addr, &ipv6_addr, 16);
     conn->socket_addr.sin6_port = HTONS(port);
 
-    cipher_init(&conn->cipher, CIPHER_NULL, NULL, 8);
+    //cipher_init(&conn->cipher, CIPHER_NULL, NULL, 0);
+    cipher_init(&conn->cipher, CIPHER_AES_128, "asd", 3);
 
     // TODO: add missing handshake HERE
 

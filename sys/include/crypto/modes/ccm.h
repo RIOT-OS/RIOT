@@ -24,9 +24,9 @@
 
 #define CCM_ERR_INVALID_NONCE_LENGTH -2
 #define CCM_ERR_INVALID_CBC_MAC -3
-#define CCM_ERR_INVALID_DATA_LENGTH -3
-#define CCM_ERR_INVALID_LENGTH_ENCODING -4
-#define CCM_ERR_INVALID_MAC_LENGTH -5
+#define CCM_ERR_INVALID_DATA_LENGTH -4
+#define CCM_ERR_INVALID_LENGTH_ENCODING -5
+#define CCM_ERR_INVALID_MAC_LENGTH -6
 
 /**
  * @brief Encrypt and authenticate data of arbitrary length in ccm mode.

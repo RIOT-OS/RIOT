@@ -44,11 +44,13 @@ int listen_callback(dtls_connection_t *conn, uint8_t *data, size_t size)
     // ip address
     inet_ntop(AF_INET6, &conn->socket_addr.sin6_addr, addr_str,
             IPV6_MAX_ADDR_STR_LEN);
-    printf("GOT DATA from %s\n", addr_str);
+    printf("%s - ", addr_str);
 
     // data
     for (size_t i=0; i < size; ++i)
-        printf("\t%d: %d (%X)\n", i, data[i], data[i]);
+        printf("%X ", data[i]);
+
+    printf("\n\n");
 
     return 0;
 }

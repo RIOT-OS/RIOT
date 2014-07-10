@@ -44,14 +44,11 @@ typedef struct __attribute__((packed)) {
 #define DTLS_RECORD_HEADER_INIT {0,DTLS_VERSION,0,{0},0}
 
 typedef struct __attribute__((packed)) {
-  dtls_record_header_t header;
+  dtls_record_header_t *header;
   uint8_t *fragment;
 } dtls_record_t;
 
 typedef int (*dtls_record_cb_t)(dtls_connection_t *conn, dtls_record_t*);
-
-int dtls_record_write(uint8_t* buffer, tls_content_type_t type,
-      dtls_connection_t* conn, uint8_t *fragment, size_t size);
 
 int dtls_send_raw(dtls_connection_t* conn, uint8_t* data, size_t size);
 

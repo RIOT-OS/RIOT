@@ -47,7 +47,7 @@ int null_init(cipher_context_t *context, uint8_t block_size, uint8_t *key,
 
     ctx->size = block_size;
 
-    return 0;
+    return 1;
 }
 
 
@@ -58,9 +58,9 @@ int null_encrypt(cipher_context_t *context, uint8_t *in, uint8_t *out)
     if (context == NULL || in == NULL || out == NULL)
         return -1;
 
-    memcpy(in, out, ctx->size);
+    memcpy(in, out, NULL_BLOCK_SIZE);
 
-    return 0;
+    return 1;
 }
 
 
@@ -71,5 +71,5 @@ int null_set_key(cipher_context_t *context, uint8_t *key, uint8_t key_size)
     if ( key_size > NULL_KEY_SIZE || key != NULL)
         return -1;
 
-    return 0;
+    return 1;
 }

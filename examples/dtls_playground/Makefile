@@ -21,6 +21,8 @@ USEMODULE += sixlowpan
 USEMODULE += config
 USEMODULE += destiny
 USEMODULE += dtls
+USEMODULE += aes
+USEMODULE += crypto_ciphers
 USEMODULE += crypto_modes
 
 include $(RIOTBASE)/Makefile.include
