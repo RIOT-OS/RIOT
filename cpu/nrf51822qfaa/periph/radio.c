@@ -26,7 +26,7 @@
 #include "nrf51_bitfields.h"
 #include "periph/gpio.h"
 
-//#include "radio.h"
+#include "radio.h"
 
 
 #define PACKET0_S1_SIZE                  (0UL)  //!< S1 size in bits
@@ -37,10 +37,8 @@
 #define PACKET1_PAYLOAD_SIZE             (1UL)  //!< payload size in bytes
 
 static uint8_t packet[4];  ///< Packet to transmit
-char* receivePacket(void);
-void sendPacket(uint8_t addr, char msg);
-void radioConfig(short me);
-char* msg;
+
+char msg;
 int i = 0;
 
 
@@ -108,41 +106,62 @@ static uint32_t bytewise_bitswap(uint32_t inp)
 }
 
 
-char* receivePacket(void)
+char receivePacket(void)
 {
 
-	static uint8_t volatile packet[4];
+	static uint8_t packet[4];
 	short boolvar = 0;
 
 	  while(1)
 	  {
-		  gpio_set(GPIO_6);
+
 		NRF_RADIO->PACKETPTR = (uint32_t) packet;
 	    NRF_RADIO->EVENTS_READY = 0U;
 	    // Enable radio and wait for ready
 	    NRF_RADIO->TASKS_RXEN = 1U;
+	    gpio_set(GPIO_1);
+	    gpio_clear(GPIO_6);
 	    while(NRF_RADIO->EVENTS_READY == 0U)
 	    {
 	    }
+	    delay(500000);
+	    gpio_clear(GPIO_1);
+	    gpio_clear(GPIO_6);
+
 	    NRF_RADIO->EVENTS_END = 0U;
 	    // Start listening and wait for address received event
 	    NRF_RADIO->TASKS_START = 1U;
 
-		  gpio_set(GPIO_1);
+
+	    gpio_clear(GPIO_1);
+	    gpio_set(GPIO_6);
 	    // Wait for end of packet
 	    while(NRF_RADIO->EVENTS_END == 0U)
 	    {
 	    	gpio_toggle(GPIO_6);
         	delay(1*1000*1000);
-	    };
-
-		  gpio_clear(GPIO_1);
-	    // Write received data to LED0 and LED1 on CRC match
-	    if (NRF_RADIO->CRCSTATUS == 1U)
-	    {
-	    	msg = packet;
-	    	boolvar = 1;
 	    }
+	    delay(500000);
+	    gpio_clear(GPIO_1);
+	    gpio_clear(GPIO_6);
+
+
+	    delay(2000000);
+
+
+	    // Write received data to LED0 and LED1 on CRC match
+//	    if (NRF_RADIO->CRCSTATUS == 1U)
+//	    {
+
+		    gpio_set(GPIO_1);
+		    gpio_set(GPIO_6);
+	    	msg = (char)packet[1];
+	    	boolvar = 1;
+	    	delay(1000000);
+//	    }
+
+	    gpio_clear(GPIO_1);
+	    gpio_clear(GPIO_6);
 	    NRF_RADIO->EVENTS_DISABLED = 0U;
 	    // Disable radio
 	    NRF_RADIO->TASKS_DISABLE = 1U;
@@ -150,14 +169,17 @@ char* receivePacket(void)
 	    {
 	    }
 
-	        	gpio_clear(GPIO_6);
 	        	delay(1*1000*1000);
 
 	    if(boolvar) break;
 
 	    for( int i = 0; i < 10;i++)  {
 			gpio_toggle(GPIO_6);
-			delay(0.3*1000*1000);
+			delay(500*1000);
+	    }
+	    for( int i = 0; i < 10;i++)  {
+			gpio_toggle(GPIO_1);
+			delay(500*1000);
 	    }
 	  }
 	return msg;
@@ -167,17 +189,23 @@ char* receivePacket(void)
 
 void sendPacket(uint8_t addr, char msg)
 {
+
 	LED_GREEN_OFF;
 
 	  // Set payload pointer
-	  NRF_RADIO->PACKETPTR = (uint32_t)packet;
+	  NRF_RADIO->PACKETPTR = *packet;
+	  //NRF_RADIO->PACKETPTR = (uint32_t)packet;
 
 
 	    // Place the read character in the payload, enable the radio and
 	    // send the packet:
-	    packet[0] = msg;
+
+	    packet[0] = 1;
+	    packet[1] = 'Q';
 	    NRF_RADIO->EVENTS_READY = 0U;
+
 	    NRF_RADIO->TASKS_TXEN = 1;
+	    printf("task txen\n");
 	    while (NRF_RADIO->EVENTS_READY == 0U)
 	    {
 	    	delay(5*100*1000);
@@ -185,6 +213,8 @@ void sendPacket(uint8_t addr, char msg)
 	    	delay(5*100*1000);
 	    	LED_RED_OFF;
 	    }
+	    printf("ready\n");
+
 	    NRF_RADIO->EVENTS_END = 0U;
 	    NRF_RADIO->TASKS_START = 1U;
 	    while(NRF_RADIO->EVENTS_END == 0U)
@@ -194,12 +224,15 @@ void sendPacket(uint8_t addr, char msg)
 	    	delay(5*100*1000);
 	    	LED_BLUE_OFF;
 	    }
-	    NRF_RADIO->EVENTS_DISABLED = 0U;
+	    printf("packet sent\n");
 	    // Disable radio
+
+	    NRF_RADIO->EVENTS_DISABLED = 0U;
 	    NRF_RADIO->TASKS_DISABLE = 1U;
 	    while(NRF_RADIO->EVENTS_DISABLED == 0U)
 	    {
 	    }
+	    printf("disabled\n");
 
 LED_GREEN_ON;
 }
@@ -207,23 +240,26 @@ LED_GREEN_ON;
 
 void radioConfig(short me)
 {
-	NRF_RADIO->POWER = 0;
-	delay(5*100*1000);
-	NRF_RADIO->POWER = 1;
 
-	 /* Start 16 MHz crystal oscillator */
-	  NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
-	  NRF_CLOCK->TASKS_HFCLKSTART = 1;
-
-	  /* Wait for the external oscillator to start up */
-	  while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0)
-	  {
-	  }
+//	 /* Start 16 MHz crystal oscillator */
+//	  NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
+//	  NRF_CLOCK->TASKS_HFCLKSTART = 1;
+//
+//	  /* Wait for the external oscillator to start up */
+//	  while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0)
+//	  {
+//	  }
 
 	  // Radio config
-	  if(me != 1) NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_0dBm << RADIO_TXPOWER_TXPOWER_Pos);
+	  if(me != 1)  {
+		  NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_0dBm << RADIO_TXPOWER_TXPOWER_Pos);
+		  //NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk;
+	  }
+	  else  {
+		 // NRF_RADIO->SHORTS = (RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_DISABLE_Msk);
+	  }
 	  NRF_RADIO->FREQUENCY = 7UL;                // Frequency bin 7, 2407MHz
-	  NRF_RADIO->MODE = (RADIO_MODE_MODE_Nrf_2Mbit << RADIO_MODE_MODE_Pos);
+	  NRF_RADIO->MODE = (RADIO_MODE_MODE_Ble_1Mbit << RADIO_MODE_MODE_Pos);
 
 	  // Radio address config
 	  /*NRF_RADIO->PREFIX0 = 0xC4C3C2E7UL;  // Prefix byte of addresses 3 to 0
@@ -244,14 +280,10 @@ void radioConfig(short me)
 	  NRF_RADIO->BASE0       = bytewise_bitswap(0x01234567UL);  // Base address for prefix 0 converted to nRF24L series format
 	  NRF_RADIO->BASE1       = bytewise_bitswap(0x89ABCDEFUL);  // Base address for prefix 1-7 converted to nRF24L series format
 
-	  if(me == 1)  {
+
 		  NRF_RADIO->TXADDRESS = 0x01UL;      // Set device address 0 to use when transmitting
-		  NRF_RADIO->RXADDRESSES = 0x00UL;    // Enable device address 0 to use which receiving
-	  }
-	  else  {
-		  NRF_RADIO->TXADDRESS = 0x00UL;      // Set device address 0 to use when transmitting
-		  NRF_RADIO->RXADDRESSES = 0x01UL;    // Enable device address 0 to use which receiving
-	  }
+		  NRF_RADIO->RXADDRESSES = 0x0UL | (0x1UL) | (0x1UL << 1) | (0x1UL << 2) | (0x1UL << 3) | (0x1UL << 4) | (0x1UL << 5) | (0x1UL << 6) | (0x1UL << 7);    // Enable device address 0 to use which receiving
+		  printf("rxaddresses %i\n", NRF_RADIO->RXADDRESSES);
 
 	  // Packet configuration
 	  NRF_RADIO->PCNF0 = (PACKET0_S1_SIZE << RADIO_PCNF0_S1LEN_Pos) |
@@ -266,17 +298,18 @@ void radioConfig(short me)
 	                      (PACKET1_PAYLOAD_SIZE << RADIO_PCNF1_MAXLEN_Pos); //lint !e845 "The right argument to operator '|' is certain to be 0"
 
 	  // CRC Config
-	  NRF_RADIO->CRCCNF = (RADIO_CRCCNF_LEN_Two << RADIO_CRCCNF_LEN_Pos); // Number of checksum bits
-	  if ((NRF_RADIO->CRCCNF & RADIO_CRCCNF_LEN_Msk) == (RADIO_CRCCNF_LEN_Two << RADIO_CRCCNF_LEN_Pos))
-	  {
-	    NRF_RADIO->CRCINIT = 0xFFFFUL;      // Initial value
-	    NRF_RADIO->CRCPOLY = 0x11021UL;     // CRC poly: x^16+x^12^x^5+1
-	  }
-	  else if ((NRF_RADIO->CRCCNF & RADIO_CRCCNF_LEN_Msk) == (RADIO_CRCCNF_LEN_One << RADIO_CRCCNF_LEN_Pos))
-	  {
-	    NRF_RADIO->CRCINIT = 0xFFUL;        // Initial value
-	    NRF_RADIO->CRCPOLY = 0x107UL;       // CRC poly: x^8+x^2^x^1+1
-	  }
+//	  NRF_RADIO->CRCCNF = (RADIO_CRCCNF_LEN_Two << RADIO_CRCCNF_LEN_Pos); // Number of checksum bits
+//	  if ((NRF_RADIO->CRCCNF & RADIO_CRCCNF_LEN_Msk) == (RADIO_CRCCNF_LEN_Two << RADIO_CRCCNF_LEN_Pos))
+//	  {
+//	    NRF_RADIO->CRCINIT = 0xFFFFUL;      // Initial value
+//	    NRF_RADIO->CRCPOLY = 0x11021UL;     // CRC poly: x^16+x^12^x^5+1
+//	  }
+//	  else if ((NRF_RADIO->CRCCNF & RADIO_CRCCNF_LEN_Msk) == (RADIO_CRCCNF_LEN_One << RADIO_CRCCNF_LEN_Pos))
+//	  {
+//	    NRF_RADIO->CRCINIT = 0xFFUL;        // Initial value
+//	    NRF_RADIO->CRCPOLY = 0x107UL;       // CRC poly: x^8+x^2^x^1+1
+//	  }
+
 
 }
 

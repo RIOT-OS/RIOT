@@ -31,7 +31,7 @@
 //#include "thread.h"
 #include "periph/gpio.h"
 
-//#include "radio.h"
+#include "radio.h"
 
 extern void SystemInit(void);
 void leds_init(void);
@@ -76,7 +76,7 @@ void board_init(void)
 
 
     LED_GREEN_OFF;
-    LED_RED_ON;
+    LED_RED_OFF;
     LED_BLUE_OFF;
 
     //LED_BLUE_OFF;
@@ -114,7 +114,7 @@ while(1) {
 
 	sendPacket(1, msg);
 
-	delay(3*1000*1000);
+	delay(100*1000);
 }
 
 

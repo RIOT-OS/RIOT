@@ -19,6 +19,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include "periph/timer.h"
 #include "board.h"
 #include "cpu.h"
@@ -31,7 +32,7 @@
 //#include "thread.h"
 #include "periph/gpio.h"
 
-//#include "radio.h"
+#include "radio.h"
 
 extern void SystemInit(void);
 void leds_init(void);
@@ -85,9 +86,9 @@ void board_init(void)
     //gpio_set(GPIO_6);
 
     radioConfig(1);
-    char* msg = "Hallo";
+    char msg = 'H';
 
-    if(strcmp(msg, "Hallo") == 0)  {
+    if(msg == 'H')  {
     	gpio_set(GPIO_6);
     	delay(2*1000*1000);
     	gpio_clear(GPIO_6);
@@ -99,7 +100,7 @@ void board_init(void)
     msg = receivePacket();
 
 
-    if(strcmp(msg, "Hallo") != 0)  {
+    if(msg == 'H')  {
     	gpio_set(GPIO_6);
     	delay(2*1000*1000);
     	gpio_clear(GPIO_6);
