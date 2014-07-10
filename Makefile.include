@@ -65,16 +65,17 @@ include $(RIOTBASE)/Makefile.cflags
 
 # make the RIOT version available to the program
 GIT_STRING := $(shell git describe --always --abbrev=4 --dirty=-`hostname`)
-GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
-ifeq ($(strip $(GIT_BRANCH)),master)
-	GIT_VERSION = $(GIT_STRING)
+ifneq (,$(GIT_STRING))
+  GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+  ifeq ($(strip $(GIT_BRANCH)),master)
+    RIOT_VERSION := $(GIT_STRING)
+  else
+    RIOT_VERSION := $(GIT_STRING)-$(GIT_BRANCH)
+  endif
 else
-	GIT_VERSION = $(shell echo $(GIT_STRING) $(GIT_BRANCH) | sed 's/ /-/')
+  RIOT_VERSION := UNKNOWN
 endif
-ifeq ($(strip $(GIT_VERSION)),)
-	GIT_VERSION := "UNKNOWN"
-endif
-export CFLAGS += -DVERSION=\"$(GIT_VERSION)\"
+export CFLAGS += -DRIOT_VERSION='"$(RIOT_VERSION)"'
 
 # the binaries to link
 BASELIBS += $(BINDIR)$(BOARD)_base.a
