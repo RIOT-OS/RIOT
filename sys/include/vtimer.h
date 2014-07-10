@@ -37,7 +37,7 @@
 typedef struct vtimer_t {
     queue_node_t queue_entry;
     timex_t absolute;
-    void(*action)(void *);
+    void (*action)(struct vtimer_t *timer);
     void *arg;
     unsigned int pid;
 } vtimer_t;
