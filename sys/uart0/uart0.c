@@ -45,11 +45,6 @@ static char buffer[UART0_BUFSIZE];
 
 static char uart0_thread_stack[UART0_STACKSIZE];
 
-static void uart0_loop(void)
-{
-    chardev_loop(&uart0_ringbuffer);
-}
-
 void board_uart0_init(void)
 {
     ringbuffer_init(&uart0_ringbuffer, buffer, UART0_BUFSIZE);
@@ -58,7 +53,8 @@ void board_uart0_init(void)
                   sizeof(uart0_thread_stack),
                   PRIORITY_MAIN - 1,
                   CREATE_STACKTEST | CREATE_SLEEPING,
-                  uart0_loop,
+                  chardev_thread_entry,
+                  &uart0_ringbuffer,
                   "uart0"
               );
     uart0_handler_pid = pid;

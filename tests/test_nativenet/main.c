@@ -48,8 +48,10 @@ uint8_t receiving = 1;
 unsigned int last_seq = 0, missed_cnt = 0;
 int first = -1;
 
-void radio(void)
+void *radio(void *arg)
 {
+    (void) arg;
+
     msg_t m;
     radio_packet_t *p;
     unsigned int tmp = 0, cur_seq = 0;
@@ -142,7 +144,10 @@ int main(void)
 
 #ifndef SENDER
     printf("\n\tmain(): starting radio thread\n");
-    radio_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE, PRIORITY_MAIN - 2, CREATE_STACKTEST, radio, "radio");
+    radio_pid = thread_create(
+            radio_stack_buffer, sizeof(radio_stack_buffer),
+            PRIORITY_MAIN - 2, CREATE_STACKTEST,
+            radio, NULL, "radio");
     transceiver_register(TRANSCEIVER_NATIVE, radio_pid);
 #endif
 

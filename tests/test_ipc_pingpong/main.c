@@ -33,8 +33,10 @@
 static char stacks[3][KERNEL_CONF_STACKSIZE_MAIN];
 static int pids[3];
 
-static void first_thread(void)
+static void *first_thread(void *arg)
 {
+    (void) arg;
+
     puts("1st starting.");
     for (unsigned i = 0; i < LIMIT; ++i) {
         msg_t m;
@@ -44,14 +46,18 @@ static void first_thread(void)
         DEBUG("%u: Got msg with content %i\n", i, m.content.value);
         if (m.content.value != i + 1) {
             puts("ERROR. 1st");
-            return;
+            return NULL;
         }
     }
     puts("1st done.");
+
+    return NULL;
 }
 
-static void second_thread(void)
+static void *second_thread(void *arg)
 {
+    (void) arg;
+
     puts("2nd starting.");
     while (1) {
         msg_t m1;
@@ -63,7 +69,7 @@ static void second_thread(void)
         msg_send_receive(&m2, &m2, pids[2]);
         if (m2.content.value != m1.content.value) {
             puts("ERROR. 2nd");
-            return;
+            return NULL;
         }
 
         ++m1.content.value;
@@ -73,10 +79,14 @@ static void second_thread(void)
         }
     }
     puts("2nd done.");
+
+    return NULL;
 }
 
-static void third_thread(void)
+static void *third_thread(void *arg)
 {
+    (void) arg;
+
     puts("3rd starting.");
     while (1) {
         msg_t m;
@@ -91,21 +101,23 @@ static void third_thread(void)
         }
     }
     puts("3rd done.");
+
+    return NULL;
 }
 
 int main(void)
 {
     puts("Main thread start.");
 
-    pids[0] = thread_create(stacks[0], sizeof (stacks[0]),
+    pids[0] = thread_create(stacks[0], sizeof(stacks[0]),
                             PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                            first_thread, "1st");
-    pids[1] = thread_create(stacks[1], sizeof (stacks[1]),
+                            first_thread, NULL, "1st");
+    pids[1] = thread_create(stacks[1], sizeof(stacks[1]),
                             PRIORITY_MAIN - 2, CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                            second_thread, "2nd");
-    pids[2] = thread_create(stacks[2], sizeof (stacks[2]),
+                            second_thread, NULL, "2nd");
+    pids[2] = thread_create(stacks[2], sizeof(stacks[2]),
                             PRIORITY_MAIN - 3, CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                            third_thread, "3nd");
+                            third_thread, NULL, "3nd");
 
     puts("Main thread done.");
     return 0;

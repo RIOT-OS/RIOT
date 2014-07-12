@@ -88,7 +88,7 @@ static vtimer_t cc1100_watch_dog;
 static timex_t cc1100_watch_dog_period;
 
 static uint16_t cc1100_event_handler_pid;
-static void cc1100_event_handler_function(void);
+static void *cc1100_event_handler_function(void *);
 
 static char event_handler_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
@@ -179,7 +179,7 @@ void cc1100_phy_init(void)
 
     /* Allocate event numbers and start cc1100 event process */
     cc1100_event_handler_pid = thread_create(event_handler_stack, sizeof(event_handler_stack), PRIORITY_CC1100, CREATE_STACKTEST,
-                               cc1100_event_handler_function, cc1100_event_handler_name);
+                               cc1100_event_handler_function, NULL, cc1100_event_handler_name);
 
     /* Active watchdog for the first time */
     if (radio_mode == CC1100_MODE_CONSTANT_RX) {
@@ -622,8 +622,10 @@ int cc1100_set_packet_handler(protocol_t protocol, packet_handler_t handler)
     return pm_set_handler(&handler_table, protocol, handler);
 }
 
-static void cc1100_event_handler_function(void)
+static void *cc1100_event_handler_function(void *arg)
 {
+    (void) arg;
+
     msg_t m;
 
     while (1) {
@@ -693,6 +695,8 @@ static void cc1100_event_handler_function(void)
 
         eINT();
     }
+
+    return NULL;
 }
 
 /*---------------------------------------------------------------------------*/

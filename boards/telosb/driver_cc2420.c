@@ -17,6 +17,7 @@
 
 #include "cc2420.h"
 #include "cc2420_arch.h"
+#include "cc2420_spi.h"
 
 #define ENABLE_DEBUG    (1)
 #include "debug.h"
@@ -96,7 +97,7 @@ int cc2420_get_gio1(void)
     return CC2420_GIO1;
 }
 
-int cc2420_get_fifop(void)
+uint8_t cc2420_get_fifop(void)
 {
     return CC2420_FIFOP;
 }
@@ -106,14 +107,21 @@ uint8_t cc2420_get_sfd(void)
     return CC2420_SFD;
 }
 
+#define MAX_RSSI_WAIT 1000
+
 uint8_t cc2420_get_cca(void)
 {
     uint8_t status;
-    long c = 0;
+    long count = 0;
     do {
+        unsigned int sr = disableIRQ();
+        cc2420_spi_select();
         status = cc2420_txrx(NOBYTE);
-        if (c++ == 1000000) {
-            core_panic(0x2420, "cc2420_get_cca() alarm");
+        cc2420_spi_unselect();
+        restoreIRQ(sr);
+        count++;
+        if (count >= MAX_RSSI_WAIT) {
+            core_panic(0x2420, "cc2420_get_cca(): RSSI never valid!");
         }
     } while (!(status & CC2420_STATUS_RSSI_VALID));
     return CC2420_GIO1;

@@ -1,4 +1,4 @@
-export APPLICATION = test_bloom_bytes
+APPLICATION = test_bloom_bytes
 include ../Makefile.tests_common
 
 USEMODULE += hashes

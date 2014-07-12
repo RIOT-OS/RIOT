@@ -53,8 +53,10 @@ void rpl_udp_set_id(int argc, char **argv)
     printf("Set node ID to %u\n", id);
 }
 
-void rpl_udp_monitor(void)
+void *rpl_udp_monitor(void *arg)
 {
+    (void) arg;
+
     msg_t m;
     radio_packet_t *p;
     ipv6_hdr_t *ipv6_buf;
@@ -111,6 +113,8 @@ void rpl_udp_monitor(void)
             printf("Unknown packet received, type %04X\n", m.type);
         }
     }
+
+    return NULL;
 }
 
 transceiver_command_t tcmd;

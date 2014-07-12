@@ -39,7 +39,7 @@
 char udp_server_stack_buffer[KERNEL_CONF_STACKSIZE_MAIN];
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
-void init_udp_server(void);
+static void *init_udp_server(void *);
 
 /* UDP server thread */
 void udp_server(int argc, char **argv)
@@ -47,12 +47,17 @@ void udp_server(int argc, char **argv)
     (void) argc;
     (void) argv;
 
-    int udp_server_thread_pid = thread_create(udp_server_stack_buffer, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN, CREATE_STACKTEST, init_udp_server, "init_udp_server");
+    int udp_server_thread_pid = thread_create(
+            udp_server_stack_buffer, sizeof(udp_server_stack_buffer),
+            PRIORITY_MAIN, CREATE_STACKTEST,
+            init_udp_server, NULL, "init_udp_server");
     printf("UDP SERVER ON PORT %d (THREAD PID: %d)\n", HTONS(SERVER_PORT), udp_server_thread_pid);
 }
 
-void init_udp_server(void)
+static void *init_udp_server(void *arg)
 {
+    (void) arg;
+
     sockaddr6_t sa;
     char buffer_main[UDP_BUFFER_SIZE];
     int32_t recsize;
@@ -83,6 +88,8 @@ void init_udp_server(void)
     }
 
     destiny_socket_close(sock);
+
+    return NULL;
 }
 
 /* UDP send command */
@@ -102,8 +109,8 @@ void udp_send(int argc, char **argv)
 
     address = atoi(argv[1]);
 
-    strncpy(text, argv[2], sizeof (text));
-    text[sizeof (text) - 1] = 0;
+    strncpy(text, argv[2], sizeof(text));
+    text[sizeof(text) - 1] = 0;
 
     sock = destiny_socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -112,7 +119,7 @@ void udp_send(int argc, char **argv)
         return;
     }
 
-    memset(&sa, 0, sizeof sa);
+    memset(&sa, 0, sizeof(sa));
 
     ipv6_addr_init(&ipaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, (uint16_t)address);
 
@@ -122,7 +129,7 @@ void udp_send(int argc, char **argv)
 
     bytes_sent = destiny_socket_sendto(sock, (char *)text,
                                        strlen(text) + 1, 0, &sa,
-                                       sizeof sa);
+                                       sizeof(sa));
 
     if (bytes_sent < 0) {
         printf("Error sending packet!\n");

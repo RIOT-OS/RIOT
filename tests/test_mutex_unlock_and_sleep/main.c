@@ -26,14 +26,16 @@ static mutex_t mutex;
 static volatile int indicator, count;
 
 static char stack[KERNEL_CONF_STACKSIZE_MAIN];
-static void second_thread(void)
+static void *second_thread(void *arg)
 {
+    (void) arg;
     while (1) {
         mutex_lock(&mutex);
         thread_wakeup(1);
         indicator--;
         mutex_unlock_and_sleep(&mutex);
     }
+    return NULL;
 }
 
 int main(void)
@@ -43,10 +45,11 @@ int main(void)
     mutex_init(&mutex);
 
     thread_create(stack,
-                  KERNEL_CONF_STACKSIZE_MAIN,
+                  sizeof(stack),
                   PRIORITY_MAIN - 1,
                   CREATE_WOUT_YIELD | CREATE_STACKTEST,
                   second_thread,
+                  NULL,
                   "second_thread");
 
     while (1) {

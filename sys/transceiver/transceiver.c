@@ -106,7 +106,7 @@ char transceiver_stack[TRANSCEIVER_STACK_SIZE];
 
 /*------------------------------------------------------------------------------------*/
 /* function prototypes */
-static void run(void);
+static void *run(void *arg);
 static void receive_packet(uint16_t type, uint8_t pos);
 #ifdef MODULE_CC110X_NG
 static void receive_cc110x_packet(radio_packet_t *trans_p);
@@ -180,7 +180,7 @@ void transceiver_init(transceiver_type_t t)
 /* Start the transceiver thread */
 int transceiver_start(void)
 {
-    transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN - 3, CREATE_STACKTEST, run, "Transceiver");
+    transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN - 3, CREATE_STACKTEST, run, NULL, "Transceiver");
 
     if (transceiver_pid < 0) {
         puts("Error creating transceiver thread");
@@ -233,22 +233,37 @@ int transceiver_start(void)
 /* Register an upper layer thread */
 uint8_t transceiver_register(transceiver_type_t t, int pid)
 {
-    uint8_t i;
-
-    /* find pid in registered threads or first unused space */
-    for (i = 0; ((i < TRANSCEIVER_MAX_REGISTERED) &&
-                 (reg[i].pid != pid) &&
-                 (reg[i].transceivers != TRANSCEIVER_NONE)); i++);
-
-    if (i >= TRANSCEIVER_MAX_REGISTERED) {
-        return ENOMEM;
+    int result = 0;
+    int state = disableIRQ();
+    for (size_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
+        if ((reg[i].pid == pid) || (reg[i].transceivers == TRANSCEIVER_NONE)) {
+            reg[i].transceivers |= t;
+            reg[i].pid = pid;
+            DEBUG("transceiver: Thread %i registered for %i\n", reg[i].pid, reg[i].transceivers);
+            restoreIRQ(state);
+            result = 1;
+            break;
+        }
     }
-    else {
-        reg[i].transceivers |= t;
-        reg[i].pid         = pid;
-        DEBUG("transceiver: Thread %i registered for %i\n", reg[i].pid, reg[i].transceivers);
-        return 1;
+    restoreIRQ(state);
+    return result;
+}
+
+/* Unregister an upper layer thread */
+uint8_t transceiver_unregister(transceiver_type_t t, int pid)
+{
+    int result = 0;
+    int state = disableIRQ();
+    for (size_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; ++i) {
+        if (reg[i].pid == pid) {
+            reg[i].transceivers &= ~t;
+            restoreIRQ(state);
+            result = 1;
+            break;
+        }
     }
+    restoreIRQ(state);
+    return result;
 }
 
 /*------------------------------------------------------------------------------------*/
@@ -259,8 +274,10 @@ uint8_t transceiver_register(transceiver_type_t t, int pid)
  * @brief The main thread run, receiving and processing messages in an infinite
  * loop
  */
-void run(void)
+static void *run(void *arg)
 {
+    (void) arg;
+
     msg_t m;
     transceiver_command_t *cmd;
 
@@ -340,8 +357,8 @@ void run(void)
                 *((int32_t *) cmd->data) = set_pan(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;
-#ifdef DBG_IGNORE
 
+#ifdef DBG_IGNORE
             case DBG_IGN:
                 *((int16_t *) cmd->data) = ignore_add(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
@@ -353,6 +370,8 @@ void run(void)
                 break;
         }
     }
+
+    return NULL;
 }
 
 /*------------------------------------------------------------------------------------*/
@@ -461,7 +480,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
 
 #ifdef DBG_IGNORE
 
-        for (uint8_t i = 0; (i < TRANSCEIVER_MAX_IGNORED_ADDR) && (transceiver_ignored_addr[i]); i++) {
+        for (size_t i = 0; (i < TRANSCEIVER_MAX_IGNORED_ADDR) && (transceiver_ignored_addr[i]); i++) {
             DEBUG("check if source (%u) is ignored -> %u\n", transceiver_buffer[transceiver_buffer_pos].src, transceiver_ignored_addr[i]);
 
             if (transceiver_buffer[transceiver_buffer_pos].src == transceiver_ignored_addr[i]) {
@@ -1219,7 +1238,7 @@ static int16_t ignore_add(transceiver_type_t transceiver, void *address)
     (void) transceiver;
     radio_address_t addr = *((radio_address_t *)address);
 
-    for (uint8_t i = 0; i < TRANSCEIVER_MAX_IGNORED_ADDR; i++) {
+    for (size_t i = 0; i < TRANSCEIVER_MAX_IGNORED_ADDR; i++) {
         if (transceiver_ignored_addr[i] == 0) {
             transceiver_ignored_addr[i] = addr;
             DEBUG("addr %u will be ignored (%u)\n", addr, i);

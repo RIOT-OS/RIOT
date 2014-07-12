@@ -1,4 +1,4 @@
-export APPLICATION = test_thread_cooperation
+APPLICATION = test_thread_cooperation
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_RAM := chronos msb-430 msb-430h mbed_lpc1768 redbee-econotag

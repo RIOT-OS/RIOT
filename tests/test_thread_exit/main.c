@@ -27,20 +27,25 @@
 char second_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char third_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
-void fourth_thread(void)
+void *fourth_thread(void *arg)
 {
+    (void) arg;
     puts("4th: starting");
     puts("4th: exiting");
+    return NULL;
 }
 
-void third_thread(void)
+void *third_thread(void *arg)
 {
+    (void) arg;
     puts("3rd: starting");
     puts("3rd: exiting");
+    return NULL;
 }
 
-void second_thread(void)
+void *second_thread(void *arg)
 {
+    (void) arg;
     puts("2nd: starting");
 
     if ((thread_create(
@@ -49,6 +54,7 @@ void second_thread(void)
              PRIORITY_MAIN - 2,
              CREATE_STACKTEST,
              third_thread,
+             NULL,
              "nr3")
         ) == -1) {
         puts("2nd: Error creating 3rd thread.");
@@ -62,12 +68,14 @@ void second_thread(void)
              PRIORITY_MAIN - 1,
              CREATE_WOUT_YIELD | CREATE_STACKTEST,
              fourth_thread,
+             NULL,
              "nr4")
         ) == -1) {
         puts("2nd: Error creating 4rd thread.");
     }
 
     puts("2nd: exiting");
+    return NULL;
 }
 
 int main(void)
@@ -80,6 +88,7 @@ int main(void)
              PRIORITY_MAIN - 1,
              CREATE_WOUT_YIELD | CREATE_STACKTEST,
              second_thread,
+             NULL,
              "nr2")
         ) == -1) {
         puts("main: Error creating 3rd thread.");

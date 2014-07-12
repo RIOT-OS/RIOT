@@ -70,7 +70,7 @@ def main(QEMU, BINDIRBASE, HEXFILE, DEBUGGER=None):
     result = 1
     try:
         sock = socket.socket()
-        sock.settimeout(5)
+        sock.settimeout(60)
         sock.bind(('', 0))
         sock.listen(1)
         host, port = sock.getsockname()

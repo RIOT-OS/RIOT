@@ -47,6 +47,10 @@ static uint8_t etx_count_packet_tx(etx_neighbor_t *candidate);
 static void etx_set_packets_received(void);
 static bool etx_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2);
 
+static void *etx_beacon(void *);
+static void *etx_clock(void *);
+static void *etx_radio(void *);
+
 //Buffer
 static char etx_beacon_buf[ETX_BEACON_STACKSIZE];
 static char etx_radio_buf[ETX_RADIO_STACKSIZE];
@@ -145,22 +149,24 @@ void etx_init_beaconing(ipv6_addr_t *address)
 
     etx_beacon_pid = thread_create(etx_beacon_buf, ETX_BEACON_STACKSIZE,
                                    PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                   etx_beacon, "etx_beacon");
+                                   etx_beacon, NULL, "etx_beacon");
 
     etx_radio_pid = thread_create(etx_radio_buf, ETX_RADIO_STACKSIZE,
                                   PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                  etx_radio, "etx_radio");
+                                  etx_radio, NULL, "etx_radio");
 
     etx_clock_pid = thread_create(etx_clock_buf, ETX_CLOCK_STACKSIZE,
                                   PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                  etx_clock, "etx_clock");
+                                  etx_clock, NULL, "etx_clock");
     //register at transceiver
     transceiver_register(TRANSCEIVER_CC1100, etx_radio_pid);
     puts("...[DONE]");
 }
 
-void etx_beacon(void)
+static void *etx_beacon(void *arg)
 {
+    (void) arg;
+
     /*
      * Sends a message every ETX_INTERVAL +/- a jitter-value (default is 10%) .
      * A correcting variable is needed to stay at a base interval of
@@ -207,6 +213,8 @@ void etx_beacon(void)
 
         mutex_unlock(&etx_mutex);
     }
+
+    return NULL;
 }
 
 etx_neighbor_t *etx_find_candidate(ipv6_addr_t *address)
@@ -225,8 +233,10 @@ etx_neighbor_t *etx_find_candidate(ipv6_addr_t *address)
     return NULL ;
 }
 
-void etx_clock(void)
+static void *etx_clock(void *arg)
 {
+    (void) arg;
+
     /*
      * Manages the etx_beacon thread to wake up every full second +- jitter
      */
@@ -256,6 +266,8 @@ void etx_clock(void)
         jittercorrection = (ETX_MAX_JITTER) - jitter;
         jitter = (uint8_t)(rand() % ETX_JITTER_MOD);
     }
+
+    return NULL;
 }
 
 double etx_get_metric(ipv6_addr_t *address)
@@ -377,8 +389,10 @@ void etx_handle_beacon(ipv6_addr_t *candidate_address)
     etx_update(candidate);
 }
 
-void etx_radio(void)
+static void *etx_radio(void *arg)
 {
+    (void) arg;
+
     msg_t m;
     radio_packet_t *p;
 
@@ -423,6 +437,8 @@ void etx_radio(void)
             //packet is not for me, whatever
         }
     }
+
+    return NULL;
 }
 
 void etx_update(etx_neighbor_t *candidate)

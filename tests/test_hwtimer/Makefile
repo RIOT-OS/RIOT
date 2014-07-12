@@ -1,4 +1,4 @@
-export APPLICATION = test_hwtimer
+APPLICATION = test_hwtimer
 include ../Makefile.tests_common
 
 DISABLE_MODULE += auto_init

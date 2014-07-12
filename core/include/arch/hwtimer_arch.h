@@ -13,10 +13,9 @@
  * @file        hwtimer_arch.h
  * @brief       The kernel's hardware timer abstraction interface
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
- * @author      Kaspar Schleiser <kaspar.schleiser@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
@@ -28,8 +27,8 @@
 /**
  * @brief Initialize architecture dependent kernel timer support
  *
- * @brief[in] handler   callback that is called when timer offset is reached
- * @brief[in] fcpu      the core CPU-frequency for tick interval calculation
+ * @param[in] handler   callback that is called when timer offset is reached
+ * @param[in] fcpu      the core CPU-frequency for tick interval calculation
  */
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu);
 
@@ -51,6 +50,14 @@ void hwtimer_arch_disable_interrupt(void);
  * @param[in] timer     the channel to set
  */
 void hwtimer_arch_set(unsigned long offset, short timer);
+
+/**
+ * @brief Set a kernel timer to raise an interrupt at specified system time.
+ *
+ * @param[in] value     absolute timer tick value to set a timer channel to
+ * @param[in] timer     the channel to set
+ */
+void hwtimer_arch_set_absolute(unsigned long value, short timer);
 
 /**
  * @brief Unset the kernel timer with the given timer ID

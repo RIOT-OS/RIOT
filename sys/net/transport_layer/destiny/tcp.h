@@ -80,7 +80,7 @@ enum tcp_codes {
 #define SET_TCP_FIN(a)          (a) = TCP_FIN
 #define SET_TCP_FIN_ACK(a)      (a) = TCP_FIN_ACK
 
-#define TCP_STACK_SIZE          (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define TCP_STACK_SIZE          (KERNEL_CONF_STACKSIZE_MAIN)
 
 typedef struct __attribute__((packed)) tcp_mms_o_t {
     uint8_t     kind;
@@ -96,7 +96,7 @@ extern uint8_t             global_context_counter;
 extern mutex_t             global_sequence_counter_mutex;
 extern uint32_t            global_sequence_counter;
 
-void tcp_packet_handler(void);
+void *tcp_packet_handler(void *);
 uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
 void printTCPHeader(tcp_hdr_t *tcp_header);
 void printArrayRange_tcp(uint8_t *udp_header, uint16_t len);

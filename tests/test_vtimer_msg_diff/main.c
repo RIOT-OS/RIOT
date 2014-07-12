@@ -51,12 +51,13 @@ struct timer_msg timer_msgs[] = { { .interval = { .seconds = 0, .microseconds = 
                                   { .interval = { .seconds = 1, .microseconds = 100000}, .msg = "T6", .start={0}, .count=0 },
 };
 
-void timer_thread(void)
+void *timer_thread(void *arg)
 {
+    (void) arg;
     printf("This is thread %d\n", thread_getpid());
 
     msg_t msgq[16];
-    msg_init_queue(msgq, sizeof msgq);
+    msg_init_queue(msgq, sizeof(msgq));
 
     while (1) {
         msg_t m;
@@ -95,6 +96,8 @@ void timer_thread(void)
             break;
         }
     }
+
+    return NULL;
 }
 
 int main(void)
@@ -102,10 +105,11 @@ int main(void)
     msg_t m;
     int pid = thread_create(
                   timer_stack,
-                  sizeof timer_stack,
+                  sizeof(timer_stack),
                   PRIORITY_MAIN - 1,
                   CREATE_STACKTEST,
                   timer_thread,
+                  NULL,
                   "timer");
 
     for (unsigned i = 0; i < sizeof(timer_msgs)/sizeof(struct timer_msg); i++) {

@@ -87,7 +87,10 @@ void rpl_udp_init(int argc, char **argv)
         }
 
         DEBUGF("Start monitor\n");
-        int monitor_pid = thread_create(monitor_stack_buffer, MONITOR_STACK_SIZE, PRIORITY_MAIN - 2, CREATE_STACKTEST, rpl_udp_monitor, "monitor");
+        int monitor_pid = thread_create(
+                monitor_stack_buffer, sizeof(monitor_stack_buffer),
+                PRIORITY_MAIN - 2, CREATE_STACKTEST,
+                rpl_udp_monitor, NULL, "monitor");
         DEBUGF("Register at transceiver %02X\n", TRANSCEIVER);
         transceiver_register(TRANSCEIVER, monitor_pid);
         ipv6_register_packet_handler(monitor_pid);

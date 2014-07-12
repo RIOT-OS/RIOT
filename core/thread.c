@@ -112,7 +112,7 @@ int thread_measure_stack_free(char *stack)
     return space_free;
 }
 
-int thread_create(char *stack, int stacksize, char priority, int flags, void (*function)(void), const char *name)
+int thread_create(char *stack, int stacksize, char priority, int flags, void *(*function)(void *arg), void *arg, const char *name)
 {
     /* allocate our thread control block at the top of our stackspace */
     int total_stacksize = stacksize;
@@ -178,7 +178,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void (*f
         return -EOVERFLOW;
     }
 
-    cb->sp = thread_stack_init(function, stack, stacksize);
+    cb->sp = thread_stack_init(function, arg, stack, stacksize);
     cb->stack_start = stack;
     cb->stack_size = total_stacksize;
 

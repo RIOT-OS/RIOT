@@ -228,5 +228,15 @@ int transceiver_start(void);
  */
 uint8_t transceiver_register(transceiver_type_t transceivers, int pid);
 
+/**
+ * @brief unregister a thread for events from certain transceivers
+ *
+ * @param transceivers  The transceiver types to register for
+ * @param pid           The pid of the thread to register
+ *
+ * @return              1 on success, 0 otherwise
+ */
+uint8_t transceiver_unregister(transceiver_type_t transceivers, int pid);
+
 #endif /* TRANSCEIVER_H */
 /** @} */

@@ -45,8 +45,10 @@ uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
     return (sum == 0) ? 0xffff : HTONS(sum);
 }
 
-void udp_packet_handler(void)
+void *udp_packet_handler(void *arg)
 {
+    (void) arg;
+
     msg_t m_recv_ip, m_send_ip, m_recv_udp, m_send_udp;
     ipv6_hdr_t *ipv6_header;
     udp_hdr_t *udp_header;

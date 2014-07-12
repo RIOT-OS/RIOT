@@ -29,8 +29,9 @@ char t3_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 uint16_t p1, p2, p3;
 
-void thread1(void)
+void *thread1(void *arg)
 {
+    (void) arg;
     puts("THREAD 1 start\n");
 
     for (int i = 0; i < 3; ++i) {
@@ -45,10 +46,12 @@ void thread1(void)
     }
 
     puts("THREAD 1 end\n");
+    return NULL;
 }
 
-void thread2(void)
+void *thread2(void *arg)
 {
+    (void) arg;
     puts("THREAD 2\n");
 
     for (int i = 0;; ++i) {
@@ -59,10 +62,13 @@ void thread2(void)
         reply.content.value = msg.content.value;
         msg_reply(&msg, &reply);
     }
+
+    return NULL;
 }
 
-void thread3(void)
+void *thread3(void *arg)
 {
+    (void) arg;
     puts("THREAD 3\n");
 
     for (int i = 0;; ++i) {
@@ -71,16 +77,20 @@ void thread3(void)
         printf("T3 i=%d\n", i);
         msg_send(&msg, p1, 1);
     }
+    return NULL;
 }
 
 int main(void)
 {
-    p1 = thread_create(t1_stack, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST, thread1, "nr1");
-    p2 = thread_create(t2_stack, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST, thread2, "nr2");
-    p3 = thread_create(t3_stack, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST, thread3, "nr3");
+    p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
+                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                       thread1, NULL, "nr1");
+    p2 = thread_create(t2_stack, sizeof(t2_stack), PRIORITY_MAIN - 1,
+                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                       thread2, NULL, "nr2");
+    p3 = thread_create(t3_stack, sizeof(t3_stack), PRIORITY_MAIN - 1,
+                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                       thread3, NULL, "nr3");
     puts("THREADS CREATED\n");
     return 0;
 }

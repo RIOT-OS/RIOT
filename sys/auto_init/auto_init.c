@@ -75,8 +75,6 @@
 #define CONF_PAN_ID     (0xabcd)
 #endif
 
-extern int main(void);
-
 void auto_init(void)
 {
 #ifdef MODULE_VTIMER
@@ -186,6 +184,4 @@ void auto_init(void)
     DEBUG("Auto init transport layer [destiny] module.\n");
     destiny_init_transport_layer();
 #endif
-
-    main();
 }

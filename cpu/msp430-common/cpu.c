@@ -53,7 +53,7 @@ __attribute__((section (".fini9"))) void __main_epilogue(void) { __asm__("ret");
 //----------------------------------------------------------------------------
 // Processor specific routine - here for MSP
 //----------------------------------------------------------------------------
-char *thread_stack_init(void (*task_func)(void), void *stack_start, int stack_size)
+char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size)
 {
     unsigned short stk = (unsigned short)(stack_start + stack_size);
 
@@ -75,13 +75,15 @@ char *thread_stack_init(void (*task_func)(void), void *stack_start, int stack_si
     *stackptr = GIE;
     --stackptr;
 
+    /* set argument to task_func */
+    *stackptr = (unsigned short) arg;
+    --stackptr;
+
     /* Space for registers. */
-    for (unsigned int i = 15; i > 4; i--) {
+    for (unsigned int i = 14; i > 4; i--) {
         *stackptr = i;
         --stackptr;
     }
-
-    //stackptr -= 11;
 
     return (char *) stackptr;
 }

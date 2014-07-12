@@ -42,7 +42,7 @@
 ! #include "board_ow.h"
   #include "debugpins.h"
 ! #include "leds_ow.h"
-! #include "hwtimer_arch.h"
+! #include "arch/hwtimer_arch.h"
 ! #include "thread.h"
 
 ! #define ENABLE_DEBUG (0)

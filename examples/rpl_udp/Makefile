@@ -1,16 +1,16 @@
 # name of your application
-export APPLICATION = rpl_udp
+APPLICATION = rpl_udp
 
 # If no BOARD is found in the environment, use this default:
-export BOARD ?= native
+BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
-export RIOTBASE ?= $(CURDIR)/../..
+RIOTBASE ?= $(CURDIR)/../..
 
 # Uncomment these lines if you want to use platform support from external
 # repositories:
-#export RIOTCPU ?= $(CURDIR)/../../RIOT/thirdparty_cpu
-#export RIOTBOARD ?= $(CURDIR)/../../RIOT/thirdparty_boards
+#RIOTCPU ?= $(CURDIR)/../../RIOT/thirdparty_cpu
+#RIOTBOARD ?= $(CURDIR)/../../RIOT/thirdparty_boards
 
 # Uncomment this to enable scheduler statistics for ps:
 #CFLAGS += -DSCHEDSTATISTICS
@@ -25,7 +25,7 @@ export RIOTBASE ?= $(CURDIR)/../..
 #CFLAGS += -DDEVELHELP
 
 # Change this to 0 show compiler invocation lines by default:
-export QUIET ?= 1
+QUIET ?= 1
 
 # get rid of the mandatory RPL warning
 ifeq ($(shell $(CC) -Wno-cpp -E - 2>/dev/null >/dev/null dev/null ; echo $$?),0)

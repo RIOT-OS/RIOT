@@ -63,8 +63,10 @@ static inline void mac_frame_short_to_eui64(net_if_eui64_t *eui64,
     eui64->uint8[7] = frame_short[0];
 }
 
-void recv_ieee802154_frame(void)
+static void *recv_ieee802154_frame(void *arg)
 {
+    (void) arg;
+
     msg_t m;
 #if (defined(MODULE_AT86RF231) | \
      defined(MODULE_CC2420) | \
@@ -164,6 +166,8 @@ void recv_ieee802154_frame(void)
             DEBUG("Unknown packet received");
         }
     }
+
+    return NULL;
 }
 
 void set_ieee802154_fcf_values(ieee802154_frame_t *frame, uint8_t dest_mode,
@@ -317,7 +321,7 @@ int sixlowpan_mac_send_ieee802154_frame(int if_id,
 int sixlowpan_mac_init(void)
 {
     int recv_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE,
-                                 PRIORITY_MAIN - 2, CREATE_STACKTEST, recv_ieee802154_frame , "radio");
+                                 PRIORITY_MAIN - 2, CREATE_STACKTEST, recv_ieee802154_frame, NULL, "radio");
     int if_id = -1;
 
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {

@@ -23,18 +23,21 @@
 #include <flags.h>
 #include <kernel.h>
 
-#define STACK_SIZE  (KERNEL_CONF_STACKSIZE_DEFAULT + KERNEL_CONF_STACKSIZE_MAIN)
+char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
-char t2_stack[STACK_SIZE];
-
-void second_thread(void)
+void *second_thread(void *arg)
 {
+    (void) arg;
     puts("second thread\n");
+    return NULL;
 }
 
 int main(void)
 {
-    (void) thread_create(t2_stack, STACK_SIZE, PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST, second_thread, "nr2");
+    (void) thread_create(
+            t2_stack, sizeof(t2_stack),
+            PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST,
+            second_thread, NULL, "nr2");
     puts("first thread\n");
     return 0;
 }

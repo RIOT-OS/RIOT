@@ -142,7 +142,6 @@ uint8_t context_len = 0;
 uint16_t local_address = 0;
 
 int lowpan_init(int as_border);
-void lowpan_context_auto_remove(void);
 uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
                              ipv6_hdr_t *ipv6_buf_extra, uint8_t *ptr);
 void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
@@ -358,15 +357,16 @@ void sixlowpan_lowpan_print_fifo_buffers(void)
 }
 #endif
 
-void lowpan_transfer(void)
+static void *lowpan_transfer(void *arg)
 {
+    (void) arg;
+
     msg_t m_recv, m_send;
     ipv6_hdr_t *ipv6_buf;
     lowpan_reas_buf_t *current_buf;
     uint8_t gotosleep;
 
     while (1) {
-
         gotosleep = 1;
         mutex_lock(&fifo_mutex);
         current_buf = packet_fifo;
@@ -419,6 +419,8 @@ void lowpan_transfer(void)
             thread_sleep();
         }
     }
+
+    return NULL;
 }
 
 uint8_t ll_get_addr_match(net_if_eui64_t *src, net_if_eui64_t *dst)
@@ -1633,8 +1635,10 @@ lowpan_context_t *lowpan_context_num_lookup(uint8_t num)
     return NULL;
 }
 
-void lowpan_context_auto_remove(void)
+static void *lowpan_context_auto_remove(void *arg)
 {
+    (void) arg;
+
     timex_t minute = timex_set(60, 0);
     int i;
     int8_t to_remove[NDP_6LOWPAN_CONTEXT_MAX];
@@ -1657,6 +1661,8 @@ void lowpan_context_auto_remove(void)
 
         mutex_unlock(&lowpan_context_mutex);
     }
+
+    return NULL;
 }
 
 void init_reas_bufs(lowpan_reas_buf_t *buf)
@@ -1791,7 +1797,7 @@ int sixlowpan_lowpan_init(void)
     if (!ip_process_pid) {
         ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
                                        PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                       ipv6_process, "ip_process");
+                                       ipv6_process, NULL, "ip_process");
     }
 
     if (ip_process_pid < 0) {
@@ -1802,7 +1808,7 @@ int sixlowpan_lowpan_init(void)
 
     contexts_rem_pid = thread_create(con_buf, CON_STACKSIZE,
                                      PRIORITY_MAIN + 1, CREATE_STACKTEST,
-                                     lowpan_context_auto_remove, "lowpan_context_rem");
+                                     lowpan_context_auto_remove, NULL, "lowpan_context_rem");
 
     if (contexts_rem_pid < 0) {
         return 0;
@@ -1810,7 +1816,7 @@ int sixlowpan_lowpan_init(void)
 
     transfer_pid = thread_create(lowpan_transfer_buf, LOWPAN_TRANSFER_BUF_STACKSIZE,
                                  PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                 lowpan_transfer, "lowpan_transfer");
+                                 lowpan_transfer, NULL, "lowpan_transfer");
 
     if (transfer_pid < 0) {
         return 0;

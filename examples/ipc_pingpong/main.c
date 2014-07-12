@@ -25,8 +25,10 @@
 #include "msg.h"
 #include "kernel.h"
 
-void second_thread(void)
+void *second_thread(void *arg)
 {
+    (void) arg;
+
     printf("2nd thread started, pid: %i\n", thread_getpid());
     msg_t m;
 
@@ -36,6 +38,8 @@ void second_thread(void)
         m.content.value++;
         msg_reply(&m, &m);
     }
+
+    return NULL;
 }
 
 char second_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
@@ -49,7 +53,7 @@ int main(void)
 
     int pid = thread_create(second_thread_stack, sizeof(second_thread_stack),
                             PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                            second_thread, "pong");
+                            second_thread, NULL, "pong");
 
     m.content.value = 1;
 

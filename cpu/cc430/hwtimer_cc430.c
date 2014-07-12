@@ -22,7 +22,7 @@
 
 #include "cpu.h"
 #include "hwtimer.h"
-#include "hwtimer_arch.h"
+#include "arch/hwtimer_arch.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
