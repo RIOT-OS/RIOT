@@ -95,21 +95,9 @@ void board_init(void)
     }
 
 
-	delay(2*1000*1000);
-
-    msg = receivePacket();
+	delay(1*1000*1000);
 
 
-    if(msg == 'H')  {
-    	gpio_set(GPIO_6);
-    	delay(2*1000*1000);
-    	gpio_clear(GPIO_6);
-    }
-    else  {
-    	gpio_set(GPIO_7);
-    	delay(2*1000*1000);
-    	gpio_clear(GPIO_7);
-    }
 
     //gpio_init_out(GPIO_0, GPIO_NOPULL);
     //gpio_set(GPIO_0);
@@ -132,7 +120,23 @@ void board_init(void)
 //    timer_set(TIMER_1,2,12*1000*1000);
 
 
-while(1) {}
+while(1) {
+
+    msg = receivePacket();
+
+
+    if(msg == 'H')  {
+    	gpio_set(GPIO_6);
+    	delay(1*1000*1000);
+    	gpio_clear(GPIO_6);
+    }
+    else  {
+    	gpio_set(GPIO_7);
+    	delay(1*1000*1000);
+    	gpio_clear(GPIO_7);
+    }
+
+}
 
 
     /* blink stuff */
