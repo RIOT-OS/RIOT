@@ -17,8 +17,6 @@
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
- *
- * TODO: setup dependency from SCHEDSTATISTICS to MODULE_HWTIMER
  */
 
 #include <stdint.h>
@@ -114,13 +112,13 @@ void sched_run(void)
     DEBUG("scheduler: next task: %s\n", my_active_thread->name);
 
     if (my_active_thread != sched_active_thread) {
-        if (sched_active_thread != NULL) {  /* TODO: necessary? */
-            if (sched_active_thread->status ==  STATUS_RUNNING) {
-                sched_active_thread->status =  STATUS_PENDING ;
+        if (sched_active_thread != NULL) {
+            if (sched_active_thread->status == STATUS_RUNNING) {
+                sched_active_thread->status = STATUS_PENDING;
             }
         }
 
-        sched_set_status((tcb_t *)my_active_thread,  STATUS_RUNNING);
+        sched_set_status((tcb_t *)my_active_thread, STATUS_RUNNING);
     }
 
     sched_active_thread = (volatile tcb_t *) my_active_thread;
