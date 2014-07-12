@@ -37,12 +37,6 @@ inline int thread_getpid(void)
     return sched_active_thread->pid;
 }
 
-int thread_getlastpid(void)
-{
-    extern int thread_last_pid;
-    return thread_last_pid;
-}
-
 int thread_getstatus(int pid)
 {
     if (sched_threads[pid] == NULL) {

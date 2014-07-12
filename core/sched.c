@@ -45,7 +45,6 @@ volatile tcb_t *sched_threads[MAXTHREADS];
 volatile tcb_t *sched_active_thread;
 
 volatile int sched_active_pid = -1;
-volatile int thread_last_pid = -1;
 
 clist_node_t *sched_runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;
@@ -104,11 +103,6 @@ void sched_run(void)
     }
 #endif
 
-#ifdef MODULE_NSS
-    if (sched_active_thread && (my_next_pid != thread_last_pid)) {
-        thread_last_pid = sched_active_pid;
-    }
-#endif
     sched_active_pid = my_next_pid;
 
     DEBUG("scheduler: next task: %s\n", my_active_thread->name);
