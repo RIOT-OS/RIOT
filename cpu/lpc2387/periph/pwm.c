@@ -33,6 +33,8 @@
  */
 int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int resolution)
 {
+    (void) mode; /* unused */
+
     switch (dev) {
 #if PWM_0_EN
         case PWM_0:
