@@ -77,10 +77,15 @@ int dtls_record_read(dtls_record_t *record, dtls_connection_t *conn)
 int dtls_record_receive_raw(dtls_connection_t *conn, void *buffer,
         size_t buffer_size)
 {
-    uint32_t len = sizeof(conn->socket_addr);
+    int len;
+    uint32_t size = sizeof(conn->socket_addr);
 
-    return recvfrom(conn->socket, (void *)buffer, buffer_size, 0,
-               (struct sockaddr *)&conn->socket_addr, &len);
+    memset(&conn->socket_addr, 0, sizeof(conn->socket_addr));
+    len = recvfrom(conn->socket, (void *)buffer, buffer_size, 0,
+               (struct sockaddr *)&conn->socket_addr, &size);
+    
+    --conn->socket_addr.sin6_port; /* Workaround for Socket PORT BUG */
+    return len;
 }
 
 
@@ -90,8 +95,10 @@ int dtls_record_receive(dtls_connection_t *conn, dtls_record_t *record)
     int recv_size, size;
     char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
-    if (conn->socket < 0)
-      return -1;
+    if (conn->socket < 0) {
+        printf("Socket not initialized!\n");
+        return -1;
+    }
 
     recv_size = dtls_record_receive_raw(conn, buffer, DTLS_RECORD_BUFFER_SIZE);
     if (recv_size < 0) {

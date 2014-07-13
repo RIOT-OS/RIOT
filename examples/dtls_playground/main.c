@@ -36,7 +36,7 @@
 #define IF_ID   (0)
 #define SERVER_PORT 8443
 
-static char server_stack_buffer[KERNEL_CONF_STACKSIZE_MAIN];
+static char stack_buffer[KERNEL_CONF_STACKSIZE_MAIN];
 static char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 int listen_callback(dtls_connection_t *conn, uint8_t *data, size_t size)
@@ -103,7 +103,7 @@ void shell_cmd_server(int argc, char **argv)
     (void) argv;
 
     /* Start DTLS Server */
-    server_thread_pid = thread_create(server_stack_buffer,
+    server_thread_pid = thread_create(stack_buffer,
             KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN, CREATE_STACKTEST,
             init_dtls_listen, "init_dtls_listen");
     printf("\nDTLS SERVER ON PORT %d (THREAD PID: %d)\n\n", SERVER_PORT,
@@ -117,20 +117,24 @@ void shell_cmd_send(int argc, char **argv)
     uint8_t buffer[32];
     int size;
 
+    (void) argc;
+    (void) argv;
+
     if (argc < 2) {
         printf("Usage: send <ipv6address> <data>\n");
         return;
     }
 
     if (dtls_connect(&conn, argv[1], SERVER_PORT) < 0) {
-        printf("Could not open socket\n");
+        printf("DTLS Connect failed\n");
         return;
     }
 
     size = hex2bin(buffer, argv[2]);
-    if (dtls_send(&conn, buffer, size) < 0)
+    if (dtls_send(&conn, argv, size) < 0)
         printf("Error sending packet!\n");
 
+    printf("Closing connection!\n");
     dtls_close(&conn);
 }
 

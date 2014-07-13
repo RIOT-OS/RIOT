@@ -121,7 +121,7 @@ int dtls_handshake_verify(dtls_connection_t *conn, dtls_record_t *record,
     {
       state = dtls_handshake_verify_state(conn, expected, record);
       if (state < 0) {
-        printf("Handshake failed!");
+        printf("Handshake failed!\n");
         return -1;
       }
 
@@ -151,7 +151,6 @@ int dtls_handshake_start(dtls_connection_t *conn, dtls_record_t *record)
 
   err = dtls_handshake_verify(conn, record, DTLS_HANDSHAKE_HELLO_VERIFY_REQUEST);
   if (err < 0) {
-    printf("Handshake error\n");
     return -1;
   }
 

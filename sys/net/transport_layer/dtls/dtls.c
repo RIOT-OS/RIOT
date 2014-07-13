@@ -20,6 +20,8 @@
 #include "dtls.h"
 #include "crypto/ciphers.h"
 
+sockaddr6_t g_socket_addr;
+
 int dtls_listen(uint32_t port, dtls_listen_cb_t cb)
 {
     dtls_connection_t conn = DTLS_CONNECTION_INIT;
@@ -28,15 +30,15 @@ int dtls_listen(uint32_t port, dtls_listen_cb_t cb)
     uint8_t *fragment[DTLS_BUFFER_SIZE];
     dtls_record_header_t header = DTLS_RECORD_HEADER_INIT;
     dtls_record_t record = {&header,fragment};
-    sockaddr6_t socket_addr;
 
     conn.socket  = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-    memset(&socket_addr, 0, sizeof(socket_addr));
-    socket_addr.sin6_family = AF_INET;
-    socket_addr.sin6_port = HTONS(port);
+    memset(&g_socket_addr, 0, sizeof(g_socket_addr));
+    g_socket_addr.sin6_family = AF_INET;
+    g_socket_addr.sin6_port = HTONS(port);
+//    conn.socket_addr.sin6_port = HTONS(port);
 
-    status = bind(conn.socket, (struct sockaddr *)&socket_addr,
-                  sizeof(socket_addr));
+    status = bind(conn.socket, (struct sockaddr *)&g_socket_addr,
+                  sizeof(g_socket_addr));
     if (status < 0)
     {
         printf("Socket error : %s\n", strerror(errno));
@@ -71,6 +73,7 @@ int dtls_connect(dtls_connection_t *conn, char *addr, uint32_t port)
 {
     ipv6_addr_t ipv6_addr;
     char buffer[DTLS_BUFFER_SIZE];
+    int status;
     uint8_t *fragment[DTLS_BUFFER_SIZE];
     dtls_record_header_t header = DTLS_RECORD_HEADER_INIT;
     dtls_record_t record = {&header,fragment};
@@ -82,10 +85,24 @@ int dtls_connect(dtls_connection_t *conn, char *addr, uint32_t port)
     if (-1 == conn->socket)
         return -1;
 
+
     memset(&conn->socket_addr, 0, sizeof(conn->socket_addr));
-    conn->socket_addr.sin6_family = AF_INET;
     memcpy(&conn->socket_addr.sin6_addr, &ipv6_addr, 16);
+    conn->socket_addr.sin6_family = AF_INET;
     conn->socket_addr.sin6_port = HTONS(port);
+
+    memset(&g_socket_addr, 0, sizeof(g_socket_addr));
+    g_socket_addr.sin6_family = AF_INET;
+    g_socket_addr.sin6_port = HTONS(port);
+
+    status = bind(conn->socket, (struct sockaddr *)&g_socket_addr,
+                  sizeof(g_socket_addr));
+    if (status < 0)
+    {
+        printf("Socket error : %s\n", strerror(errno));
+        close(conn->socket);
+        return -1;
+    }
 
     /** NDP BUG WORKAROUND START**/
     if (!ndp_neighbor_cache_search(&ipv6_addr)) {
