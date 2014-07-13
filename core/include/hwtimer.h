@@ -35,6 +35,7 @@
 
 #include <stdint.h>
 #include "hwtimer_cpu.h"
+#include "board.h"
 
 /**
  * @brief   Number of kernel timer ticks per second
@@ -42,6 +43,18 @@
  */
 #ifndef HWTIMER_SPEED
 #warning "HWTIMER_SPEED undefined. Set HWTIMER_SPEED to number of ticks per second for the current architecture."
+#endif
+
+/**
+ * @brief       Upper bound for hwtimer_spin
+ * @verbatim    Barrier below which hwtimer_spin is called instead of
+ *              setting a timer and yielding the thread
+ * @def         HWTIMER_SPIN_BARRIER
+ */
+#ifndef HWTIMER_SPIN_BARRIER
+#warning "HWTIMER_SPIN_BARRIER undefined, using default. Set HWTIMER_SPIN_BARRIER to the \
+number of ticks below which hwtimer_spin should be used for the current board."
+#define HWTIMER_SPIN_BARRIER (6)
 #endif
 
 /**

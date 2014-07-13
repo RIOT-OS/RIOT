@@ -347,11 +347,10 @@ int vtimer_sleep(timex_t time)
     /**
      * Use spin lock for short periods.
      * Assumes that hardware timer ticks are shorter than a second.
-     * Decision based on hwtimer_wait implementation.
      */
     if (time.seconds == 0) {
         unsigned long ticks = HWTIMER_TICKS(time.microseconds);
-        if (ticks <= 6) {
+        if (ticks <= HWTIMER_SPIN_BARRIER) {
             hwtimer_spin(ticks);
             return 0;
         }
