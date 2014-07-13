@@ -94,11 +94,6 @@ extern volatile int sched_num_threads;
 extern volatile int sched_active_pid;
 
 /**
- *  Process ID of the thread that was active before the current one
- */
-extern volatile int last_pid;
-
-/**
  * List of runqueues per priority level
  */
 extern clist_node_t *runqueues[SCHED_PRIO_LEVELS];

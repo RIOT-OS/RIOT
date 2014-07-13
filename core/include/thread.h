@@ -132,13 +132,6 @@ int thread_wakeup(int pid);
 int thread_getpid(void);
 
 /**
- * @brief Returns the process ID of the thread running before the current one
- *
- * @return          obviously you are not a golfer.
- */
-int thread_getlastpid(void);
-
-/**
  * @brief Measures the stack usage of a stack
  *
  * Only works if the thread was created with the flag CREATE_STACKTEST.
