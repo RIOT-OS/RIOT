@@ -88,4 +88,6 @@ endif
 ifneq (,$(filter dtls,$(USEMODULE)))
 	USEMODULE += crypto_ciphers
 	USEMODULE += crypto_modes
+	USEMODULE += random
+	USEMODULE += sha256
 endif

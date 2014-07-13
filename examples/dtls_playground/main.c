@@ -64,7 +64,6 @@ void init_dtls_listen(void)
 
 void shell_cmd_init(int argc, char **argv)
 {
-    int server_thread_pid;
     ipv6_addr_t ipaddr;
     net_if_addr_t *addr_ptr = NULL;
 
@@ -94,6 +93,14 @@ void shell_cmd_init(int argc, char **argv)
             printf("\t%s / %d\n", addr_str, addr_ptr->addr_len);
         }
     }
+}
+
+void shell_cmd_server(int argc, char **argv)
+{
+    int server_thread_pid;
+
+    (void) argc;
+    (void) argv;
 
     /* Start DTLS Server */
     server_thread_pid = thread_create(server_stack_buffer,
@@ -110,16 +117,18 @@ void shell_cmd_send(int argc, char **argv)
     uint8_t buffer[32];
     int size;
 
-
     if (argc < 2) {
         printf("Usage: send <ipv6address> <data>\n");
         return;
     }
 
-    dtls_connect(&conn, argv[1], SERVER_PORT);
+    if (dtls_connect(&conn, argv[1], SERVER_PORT) < 0) {
+        printf("Could not open socket\n");
+        return;
+    }
+
     size = hex2bin(buffer, argv[2]);
-    if (dtls_record_stream_send(&conn, TLS_CONTENT_TYPE_APPLICATION_DATA,
-              buffer, size) < 0)
+    if (dtls_send(&conn, buffer, size) < 0)
         printf("Error sending packet!\n");
 
     dtls_close(&conn);
@@ -129,6 +138,7 @@ void shell_cmd_send(int argc, char **argv)
 const shell_command_t shell_commands[] = {
     {"init", "configure link-local addresses", shell_cmd_init},
     {"send", "record layer", shell_cmd_send},
+    {"server", "record layer", shell_cmd_server},
     {NULL, NULL, NULL}
 };
 

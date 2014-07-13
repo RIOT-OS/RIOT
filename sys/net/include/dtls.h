@@ -19,9 +19,11 @@
 #include <stdint.h>
 #include <sys/socket.h>
 #include "crypto/ciphers.h"
-
+#include "ringbuffer.h"
 
 #define DTLS_OK 0
+
+#define DTLS_BUFFER_SIZE 64
 
 /**
  * basic stdint types
@@ -130,16 +132,25 @@ typedef struct __attribute__((packed)) tls_generic_block_cipher_st {
 typedef uint8_t tls_cipher_suite_t[2];
 
 // PSK - RFC4279
-#define TLS_PSK_WITH_RC4_128_SHA              {0x00,0x8A}
-#define TLS_PSK_WITH_3DES_EDE_CBC_SHA         {0x00,0x8B}
-#define TLS_PSK_WITH_AES_128_CBC_SHA          {0x00,0x8C}
-#define TLS_PSK_WITH_AES_256_CBC_SHA          {0x00,0x8D}
+//#define TLS_PSK_WITH_RC4_128_SHA              {0x00,0x8A}
+//#define TLS_PSK_WITH_3DES_EDE_CBC_SHA         {0x00,0x8B}
+//#define TLS_PSK_WITH_AES_128_CBC_SHA          {0x00,0x8C}
+//#define TLS_PSK_WITH_AES_256_CBC_SHA          {0x00,0x8D}
 
 // PSK based AES-CCM - RFC 6655
 #define TLS_PSK_WITH_AES_128_CCM              {0xC0,0xA4}
-#define TLS_PSK_WITH_AES_256_CCM              {0xC0,0xA5}
+//#define TLS_PSK_WITH_AES_256_CCM              {0xC0,0xA5}
 #define TLS_PSK_WITH_AES_128_CCM_8            {0xC0,0xA8}
-#define TLS_PSK_WITH_AES_256_CCM_8            {0xC0,0xA9}
+//#define TLS_PSK_WITH_AES_256_CCM_8            {0xC0,0xA9}
+
+static tls_cipher_suite_t dtls_cipher_suites[] = {
+  TLS_PSK_WITH_AES_128_CCM,
+  TLS_PSK_WITH_AES_128_CCM_8
+};
+
+static tls_compression_method_t dtls_compression_methods[] = {
+  TLS_COMPRESSION_NULL
+};
 
 /**
  * Handshake Protocol
@@ -159,15 +170,11 @@ typedef enum __attribute__((packed)) {
   DTLS_HANDSHAKE_FINISHED = 20,
 } dtls_handshake_type_t;
 
-typedef struct __attribute__((packed)) dtls_handshake_st {
-  dtls_handshake_type_t msg_type;
-  uint24_t length;
-  uint16_t message_seq;
-  uint24_t fragment_offset;
-  uint24_t fragment_length;
-  void *body;
-} dtls_handshake_t;
 
+typedef struct dtls_random_st{
+  uint32_t gmt_unix_time;
+  uint8_t random_bytes[28];
+} dtls_random_t;
 
 /**
  * RIOT internal DTLS structures
@@ -180,6 +187,10 @@ typedef struct __attribute__((packed)) dtls_connection_st {
   uint16_t epoch;
   uint64_t sequence_number;  // is 48bit but we use 64bit for math operations
   cipher_t cipher;
+  uint8_t client_random[28];
+  tls_cipher_suite_t cipher_suite;
+  tls_compression_method_t compression;
+  ringbuffer_t buffer;
 } dtls_connection_t;
 
 

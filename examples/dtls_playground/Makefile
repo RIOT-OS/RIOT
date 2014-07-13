@@ -10,6 +10,8 @@ export RIOTBASE ?= $(CURDIR)/../..
 # Change this to 0 show compiler invocation lines by default:
 export QUIET ?= 1
 
+export CFLAGS += -DDEVELHELP -g
+
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += posix

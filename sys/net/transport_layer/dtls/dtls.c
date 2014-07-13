@@ -13,50 +13,49 @@
 
 #include <unistd.h>
 #include <sys/socket.h>
+#include <errno.h>
 #include "inet_pton.h"
 #include "ringbuffer.h"
 #include "record.h"
 #include "dtls.h"
 #include "crypto/ciphers.h"
 
-#define DTLS_LISTEN_BUFFER_SIZE 32
-
 int dtls_listen(uint32_t port, dtls_listen_cb_t cb)
 {
     dtls_connection_t conn = DTLS_CONNECTION_INIT;
     int status;
-    ringbuffer_t rb;
-    char buffer[DTLS_LISTEN_BUFFER_SIZE];
-    uint8_t *fragment[DTLS_LISTEN_BUFFER_SIZE];
+    char buffer[DTLS_BUFFER_SIZE];
+    uint8_t *fragment[DTLS_BUFFER_SIZE];
     dtls_record_header_t header = DTLS_RECORD_HEADER_INIT;
     dtls_record_t record = {&header,fragment};
-
-    //status = cipher_init(&conn.cipher, CIPHER_NULL, NULL, 0);
-    status = cipher_init(&conn.cipher, CIPHER_AES_128, (uint8_t*) "asd", 3);
+    sockaddr6_t socket_addr;
 
     conn.socket  = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-    memset(&conn.socket_addr, 0, sizeof(conn.socket_addr));
-    conn.socket_addr.sin6_family = AF_INET;
-    conn.socket_addr.sin6_port = HTONS(port);
+    memset(&socket_addr, 0, sizeof(socket_addr));
+    socket_addr.sin6_family = AF_INET;
+    socket_addr.sin6_port = HTONS(port);
 
-    status = bind(conn.socket, (struct sockaddr *)&conn.socket_addr,
-                  sizeof(conn.socket_addr));
-    if (-1 == status)
+    status = bind(conn.socket, (struct sockaddr *)&socket_addr,
+                  sizeof(socket_addr));
+    if (status < 0)
     {
+        printf("Socket error : %s\n", strerror(errno));
         close(conn.socket);
         return -1;
     }
 
-    ringbuffer_init(&rb, buffer, 32);
+    cipher_init(&conn.cipher, CIPHER_NULL, NULL, 0);
+    ringbuffer_init(&conn.buffer, buffer, DTLS_BUFFER_SIZE);
+
+    if (dtls_handshake_verify(&conn, &record, DTLS_HANDSHAKE_CLIENT_HELLO) < 0)
+        return -1;
+
+    //status = cipher_init(&conn.cipher, CIPHER_AES_128, (uint8_t*) "asd", 3);
 
     while (1)
     {
-        if (dtls_record_receive(&conn, &rb, &record) < 0)
+        if (dtls_record_receive(&conn, &record) < 0)
             continue;
-
-        // TODO: add missing handshake HERE
-        // if (conn->state == unknown)
-        //   do handshake (like verify if record contains CLIENT_HELLO
 
         if (cb(&conn, record.fragment, record.header->length) == 1)
             break;
@@ -71,6 +70,10 @@ int dtls_listen(uint32_t port, dtls_listen_cb_t cb)
 int dtls_connect(dtls_connection_t *conn, char *addr, uint32_t port)
 {
     ipv6_addr_t ipv6_addr;
+    char buffer[DTLS_BUFFER_SIZE];
+    uint8_t *fragment[DTLS_BUFFER_SIZE];
+    dtls_record_header_t header = DTLS_RECORD_HEADER_INIT;
+    dtls_record_t record = {&header,fragment};
 
     if (!inet_pton(AF_INET6, addr, &ipv6_addr))
         return -1;
@@ -84,12 +87,33 @@ int dtls_connect(dtls_connection_t *conn, char *addr, uint32_t port)
     memcpy(&conn->socket_addr.sin6_addr, &ipv6_addr, 16);
     conn->socket_addr.sin6_port = HTONS(port);
 
-    //cipher_init(&conn->cipher, CIPHER_NULL, NULL, 0);
-    cipher_init(&conn->cipher, CIPHER_AES_128, "asd", 3);
+    /** NDP BUG WORKAROUND START**/
+    if (!ndp_neighbor_cache_search(&ipv6_addr)) {
+        ndp_neighbor_cache_add(0, &ipv6_addr, &(ipv6_addr.uint16[7]), 2, 0,
+                           NDP_NCE_STATUS_REACHABLE,
+                           NDP_NCE_TYPE_TENTATIVE,
+                           0xffff);
+    }
+    /** NDP BUG WORKAROUND END **/
 
-    // TODO: add missing handshake HERE
+    cipher_init(&conn->cipher, CIPHER_NULL, NULL, 0);
+    ringbuffer_init(&conn->buffer, buffer, DTLS_BUFFER_SIZE);
+
+    if( dtls_handshake_start(conn, &record) < 0)
+        return -1;
+
+    //cipher_init(&conn->cipher, CIPHER_AES_128, "asd", 3);
 
     return 0;
+}
+
+
+int dtls_send(dtls_connection_t *conn, uint8_t *data, size_t size)
+{
+    /* TODO: check state, was there a successful handshake? is conn intialized?*/
+
+    return dtls_record_stream_send(conn, TLS_CONTENT_TYPE_APPLICATION_DATA,
+              buffer, size);
 }
 
 

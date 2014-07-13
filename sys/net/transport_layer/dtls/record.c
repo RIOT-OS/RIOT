@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+#include "inet_pton.h"
 #include "ringbuffer.h"
 #include "sys/socket.h"
 #include "dtls.h"
@@ -27,7 +28,7 @@ int dtls_fragment_compress(dtls_connection_t *conn, dtls_record_t* record)
     (void) conn;
     (void) record;
 
-    printf("dtls_record_compress() not yet implemented\n");
+    //printf("dtls_record_compress() not yet implemented\n");
 
     return record->header->length;
 }
@@ -37,25 +38,25 @@ int dtls_fragment_decompress(dtls_connection_t *conn, dtls_record_t* record)
     (void) conn;
     (void) record;
 
-    printf("dtls_record_decompress() not yet implemented\n");
+    //printf("dtls_record_decompress() not yet implemented\n");
 
     return record->header->length;
 }
 
 
-int dtls_record_read(dtls_record_t *record, dtls_connection_t *conn, ringbuffer_t* rb)
+int dtls_record_read(dtls_record_t *record, dtls_connection_t *conn)
 {
     int len;
 
     // Copy Header
-    if (rb->avail < DTLS_RECORD_HEADER_SIZE)
+    if (conn->buffer.avail < DTLS_RECORD_HEADER_SIZE)
       return -1;
-    ringbuffer_get(rb, (char*) record->header, DTLS_RECORD_HEADER_SIZE);
+    ringbuffer_get(&conn->buffer, (char*) record->header, DTLS_RECORD_HEADER_SIZE);
 
     // Copy payload - TODO: check max length
-    if (record->header->length < rb->avail)
+    if (record->header->length < conn->buffer.avail)
       return -1;
-    ringbuffer_get(rb, (char*) record->fragment, record->header->length);
+    ringbuffer_get(&conn->buffer, (char*) record->fragment, record->header->length);
 
     // DTLCompressed - Decryption and MAC verification
     len = dtls_fragment_decrypt(conn, record);
@@ -83,33 +84,40 @@ int dtls_record_receive_raw(dtls_connection_t *conn, void *buffer,
 }
 
 
-int dtls_record_receive(dtls_connection_t *conn, ringbuffer_t *rb, dtls_record_t *record)
+int dtls_record_receive(dtls_connection_t *conn, dtls_record_t *record)
 {
-    uint8_t buffer[DTLS_RECORD_LISTEN_BUFFER_SIZE];
+    uint8_t buffer[DTLS_RECORD_BUFFER_SIZE];
     int recv_size, size;
+    char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
     if (conn->socket < 0)
       return -1;
 
-    recv_size = dtls_record_receive_raw(conn, buffer, DTLS_RECORD_LISTEN_BUFFER_SIZE);
+    recv_size = dtls_record_receive_raw(conn, buffer, DTLS_RECORD_BUFFER_SIZE);
     if (recv_size < 0) {
         printf("ERROR: recsize < 0!\n");
     }
 
-    printf("TLS RECORD LAYER: receive %d Bytes\n\t", recv_size);
-    for (uint8_t i=0; i < recv_size; ++i)
-        printf("%X ", buffer[i]);
-    printf("\n\n");
+    /** NDP BUG WORKAROUND START**/
+    inet_ntop(AF_INET6, &conn->socket_addr.sin6_addr, addr_str,
+            IPV6_MAX_ADDR_STR_LEN);
+    ipv6_addr_t dest;
+    inet_pton(AF_INET6, addr_str, &dest);
+    printf("record - %d Bytes received from %s\n", recv_size, addr_str);
+    if (!ndp_neighbor_cache_search(&dest)) {
+        ndp_neighbor_cache_add(0, &dest, &(dest.uint16[7]), 2, 0,
+                           NDP_NCE_STATUS_REACHABLE,
+                           NDP_NCE_TYPE_TENTATIVE,
+                           0xffff);
+    }
+    /** NDP BUG WORKAROUND END **/
 
-
-    ringbuffer_add(rb, buffer, recv_size);
-    size = dtls_record_read(record, conn, rb);
-
-    return size;
+    ringbuffer_add(&conn->buffer, buffer, recv_size);
+    return dtls_record_read(record, conn);
 }
 
 
-int dtls_record_write(dtls_connection_t *conn, dtls_record_t* record,
+int dtls_record_init(dtls_connection_t *conn, dtls_record_t* record,
                       tls_content_type_t type, uint8_t *data, size_t size)
 {
     if (size > DTLS_RECORD_MAX_SIZE)
@@ -142,14 +150,15 @@ int dtls_record_send(dtls_connection_t *conn, tls_content_type_t type,
     uint8_t* data, size_t size)
 {
     dtls_record_t record;
-    uint8_t buffer[32] = {0};
+    uint8_t buffer[DTLS_RECORD_BUFFER_SIZE] = {0};
     int len;
+    char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
     record.header = (dtls_record_header_t*) buffer;
     record.fragment = buffer + DTLS_RECORD_HEADER_SIZE;
 
     // DTLSPlaintext - Setup Header and copy data
-    if (dtls_record_write(conn, &record, type, data, size) < 0)
+    if (dtls_record_init(conn, &record, type, data, size) < 0)
         return DTLS_RECORD_ERR_INIT;
 
     // DTLSCompressed - Compression
@@ -162,14 +171,18 @@ int dtls_record_send(dtls_connection_t *conn, tls_content_type_t type,
     if (len < 0)
         return DTLS_RECORD_ERR_ENCRYPT;
 
-    len += DTLS_RECORD_HEADER_SIZE;
-    if (dtls_send_raw(conn, buffer, len) < 0)
-        return DTLS_RECORD_ERR_SEND;
+    inet_ntop(AF_INET6, &conn->socket_addr.sin6_addr, addr_str,
+            IPV6_MAX_ADDR_STR_LEN);
 
-    printf("TLS RECORD LAYER: Sent %d Bytes\n\t", len);
-    for (uint8_t i=0; i < len; ++i)
-        printf("%X ", buffer[i]);
-    printf("\n\n");
+    len += DTLS_RECORD_HEADER_SIZE;
+    int err = dtls_send_raw(conn, buffer, len);
+    if (err < 0) {
+        return DTLS_RECORD_ERR_SEND;
+    }
+
+    inet_ntop(AF_INET6, &conn->socket_addr.sin6_addr, addr_str,
+            IPV6_MAX_ADDR_STR_LEN);
+    printf("record - %d Bytes sent to %s\n", len, addr_str);
 
     ++conn->sequence_number;
 
