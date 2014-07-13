@@ -1,0 +1,8 @@
+OLDDIR = common
+
+CURDIR = $(OLDDIR)
+include filesystem/Makefile
+CURDIR = $(OLDDIR)
+include usb_stack/Makefile
+CURDIR = $(OLDDIR)
+

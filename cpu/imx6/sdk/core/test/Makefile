@@ -1,0 +1,1 @@
+MODULE = libsdk-core-tests
