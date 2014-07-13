@@ -60,7 +60,7 @@
 #define TAP_BUFFER_LENGTH (ETHER_MAX_LEN)
 int _native_marshall_ethernet(uint8_t *framebuf, radio_packet_t *packet);
 
-int _native_tap_fd;
+int _native_tap_fd = -1;
 unsigned char _native_tap_mac[ETHER_ADDR_LEN];
 
 #ifdef __MACH__
