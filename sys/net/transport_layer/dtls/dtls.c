@@ -52,8 +52,6 @@ int dtls_listen(uint32_t port, dtls_listen_cb_t cb)
     if (dtls_handshake_verify(&conn, &record, DTLS_HANDSHAKE_CLIENT_HELLO) < 0)
         return -1;
 
-    //status = cipher_init(&conn.cipher, CIPHER_AES_128, (uint8_t*) "asd", 3);
-
     while (1)
     {
         if (dtls_record_receive(&conn, &record) < 0)

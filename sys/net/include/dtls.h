@@ -23,7 +23,7 @@
 
 #define DTLS_OK 0
 
-#define DTLS_BUFFER_SIZE 64
+#define DTLS_BUFFER_SIZE 128
 
 /**
  * basic stdint types
@@ -157,15 +157,15 @@ static tls_compression_method_t dtls_compression_methods[] = {
  */
 
 typedef enum __attribute__((packed)) {
-  DTLS_HANDSHAKE_HELLO_REQUEST = 0,
+  //DTLS_HANDSHAKE_HELLO_REQUEST = 0,
   DTLS_HANDSHAKE_CLIENT_HELLO = 1,
   DTLS_HANDSHAKE_SERVER_HELLO = 2,
   DTLS_HANDSHAKE_HELLO_VERIFY_REQUEST = 3,
-  DTLS_HANDSHAKE_CERTIFICATE = 11,
+  //DTLS_HANDSHAKE_CERTIFICATE = 11,
   DTLS_HANDSHAKE_SERVER_KEY_EXCHANGE = 12,
-  DTLS_HANDSHAKE_CERTIFICATE_REQUEST = 13,
+  //DTLS_HANDSHAKE_CERTIFICATE_REQUEST = 13,
   DTLS_HANDSHAKE_SERVER_HELLO_DONE = 14,
-  DTLS_HANDSHAKE_CERTIFICATE_VERIFY = 15,
+  //DTLS_HANDSHAKE_CERTIFICATE_VERIFY = 15,
   DTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE = 16,
   DTLS_HANDSHAKE_FINISHED = 20,
 } dtls_handshake_type_t;
@@ -191,12 +191,14 @@ typedef struct __attribute__((packed)) dtls_connection_st {
   tls_cipher_suite_t cipher_suite;
   tls_compression_method_t compression;
   ringbuffer_t buffer;
+  uint8_t cookie[8];
+  uint8_t cookie_len;
 } dtls_connection_t;
 
 
 typedef int (*dtls_listen_cb_t)(dtls_connection_t *conn, uint8_t *data, size_t size);
 
-#define DTLS_CONNECTION_INIT {0,0,-1,{0},0,0, CIPHER_NULL_INIT}
+#define DTLS_CONNECTION_INIT {0,0,-1,{0},0,0,CIPHER_NULL_INIT,{0},{0},0,{0},{0},0}
 
 int dtls_connect(dtls_connection_t *conn, char *addr, uint32_t port);
 int dtls_listen(uint32_t port, dtls_listen_cb_t cb);

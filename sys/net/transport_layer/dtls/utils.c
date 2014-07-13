@@ -83,4 +83,7 @@ int dtls_cookie_init(dtls_connection_t *conn, uint8_t *data, size_t size,
   sha256_final(hash, &sha256);
 
   memcpy(data, hash, size);
+
+  memcpy(conn->cookie, hash, size);
+  conn->cookie_len = size;
 }

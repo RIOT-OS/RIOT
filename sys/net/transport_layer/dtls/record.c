@@ -110,7 +110,7 @@ int dtls_record_receive(dtls_connection_t *conn, dtls_record_t *record)
             IPV6_MAX_ADDR_STR_LEN);
     ipv6_addr_t dest;
     inet_pton(AF_INET6, addr_str, &dest);
-    printf("record - %d Bytes received from %s\n", recv_size, addr_str);
+    //printf("record - %d Bytes received from %s\n", recv_size, addr_str);
     if (!ndp_neighbor_cache_search(&dest)) {
         ndp_neighbor_cache_add(0, &dest, &(dest.uint16[7]), 2, 0,
                            NDP_NCE_STATUS_REACHABLE,
@@ -157,7 +157,7 @@ int dtls_record_send(dtls_connection_t *conn, tls_content_type_t type,
     uint8_t* data, size_t size)
 {
     dtls_record_t record;
-    uint8_t buffer[DTLS_RECORD_BUFFER_SIZE] = {0};
+    uint8_t buffer[DTLS_BUFFER_SIZE] = {0};
     int len;
     char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
@@ -189,7 +189,7 @@ int dtls_record_send(dtls_connection_t *conn, tls_content_type_t type,
 
     inet_ntop(AF_INET6, &conn->socket_addr.sin6_addr, addr_str,
             IPV6_MAX_ADDR_STR_LEN);
-    printf("record - %d Bytes sent to %s\n", len, addr_str);
+    //printf("record - %d Bytes sent to %s\n", len, addr_str);
 
     ++conn->sequence_number;
 
