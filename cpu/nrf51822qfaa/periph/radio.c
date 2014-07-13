@@ -108,6 +108,7 @@ static uint32_t bytewise_bitswap(uint32_t inp)
 
 char receivePacket(void)
 {
+	LED_GREEN_OFF;
 
 	static uint8_t packet[4];
 	short boolvar = 0;
@@ -128,32 +129,43 @@ char receivePacket(void)
 	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 	    while(NRF_RADIO->EVENTS_READY == 0U)
 	    {
+	    	printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+	    	delay(5*100*1000);
+	    	LED_RED_ON;
+	    	delay(5*100*1000);
+	    	LED_RED_OFF;
 	    }
-	    delay(500000);
-	    gpio_clear(GPIO_1);
-	    gpio_clear(GPIO_6);
+	   // delay(500000);
+	    //gpio_clear(GPIO_1);
+	    //gpio_clear(GPIO_6);
 	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 
 	    NRF_RADIO->EVENTS_END = 0U;
 	    // Start listening and wait for address received event
 	    NRF_RADIO->TASKS_START = 1U;
 
-	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
-	    gpio_clear(GPIO_1);
-	    gpio_set(GPIO_6);
+
+	    //gpio_clear(GPIO_1);
+	    //gpio_set(GPIO_6);
 	    // Wait for end of packet
 	    while(NRF_RADIO->EVENTS_END == 0U)
 	    {
-	    	gpio_toggle(GPIO_6);
+	    	printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+	    	gpio_set(GPIO_6);
+	    	LED_BLUE_ON;
+	    	gpio_clear(GPIO_1);
+	    	//gpio_toggle(GPIO_6);
         	delay(1*1000*1000);
-        	printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+        	LED_BLUE_OFF;
 	    }
-	    delay(500000);
+	    //delay(500000);
 	    gpio_clear(GPIO_1);
 	    gpio_clear(GPIO_6);
+	    LED_BLUE_OFF;
+	    LED_RED_OFF;
 	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 
-	    delay(2000000);
+	   // delay(2000000);
 
 
 	    // Write received data to LED0 and LED1 on CRC match
@@ -162,14 +174,17 @@ char receivePacket(void)
 	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 		    gpio_set(GPIO_1);
 		    gpio_set(GPIO_6);
+		    LED_BLUE_ON;
+		    LED_GREEN_ON;
 	    	msg = (char)packet[1];
 	    	boolvar = 1;
-	    	delay(1000000);
+	    	//delay(1000000);
 	    }
-
+	    LED_BLUE_OFF;
+	    LED_GREEN_OFF;
 	    gpio_clear(GPIO_1);
 	    gpio_clear(GPIO_6);
-	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+	    //printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 	    NRF_RADIO->EVENTS_DISABLED = 0U;
 	    // Disable radio
 	    NRF_RADIO->TASKS_DISABLE = 1U;
@@ -178,20 +193,22 @@ char receivePacket(void)
 	    {
 	    }
 
-	        	delay(1*1000*1000);
+	        	//delay(1*1000*1000);
 
 	    if(boolvar) break;
 
-	    for( int i = 0; i < 10;i++)  {
-			gpio_toggle(GPIO_6);
-			delay(500*1000);
-	    }
-	    for( int i = 0; i < 10;i++)  {
-			gpio_toggle(GPIO_1);
-			delay(500*1000);
-	    }
+//	    for( int i = 0; i < 10;i++)  {
+//			gpio_toggle(GPIO_6);
+//			//delay(500*1000);
+//	    }
+//	    for( int i = 0; i < 10;i++)  {
+//			gpio_toggle(GPIO_1);
+//			//delay(500*1000);
+//	    }
 	  }
 	  printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+	  printf("PACKET RECEIVED: %c ------------------------------\n", msg);
+	  LED_GREEN_ON;
 	return msg;
 
 }
@@ -216,15 +233,21 @@ void sendPacket(uint8_t addr, char msg)
 	    NRF_RADIO->EVENTS_READY = 0U;
 
 	    NRF_RADIO->TASKS_TXEN = 1U;
+	    gpio_set(GPIO_1);
+	    gpio_clear(GPIO_6);
 	    printf("task txen\n");
-	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+
 	    while (NRF_RADIO->EVENTS_READY == 0U)
 	    {
+	    	printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 	    	delay(5*100*1000);
 	    	LED_RED_ON;
+	    	 gpio_set(GPIO_1);
 	    	delay(5*100*1000);
 	    	LED_RED_OFF;
+	    	 gpio_clear(GPIO_1);
 	    }
+	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 	    printf("ready\n");
 
 	    NRF_RADIO->EVENTS_END = 0U;
@@ -234,8 +257,11 @@ void sendPacket(uint8_t addr, char msg)
 	    	printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 	    	delay(5*100*1000);
 	    	LED_BLUE_ON;
+	    	gpio_set(GPIO_6);
 	    	delay(5*100*1000);
 	    	LED_BLUE_OFF;
+	    	gpio_clear(GPIO_1);
+
 	    }
 	    printf("packet sent\n");
 	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
@@ -245,11 +271,14 @@ void sendPacket(uint8_t addr, char msg)
 	    NRF_RADIO->TASKS_DISABLE = 1U;
 	    while(NRF_RADIO->EVENTS_DISABLED == 0U)
 	    {
+	    	printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 	    }
-	    printf("disabled\n");
 	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+	    printf("disabled\n");
 
-LED_GREEN_ON;
+	    gpio_clear(GPIO_1);
+	    gpio_clear(GPIO_6);
+	    LED_GREEN_ON;
 }
 
 
