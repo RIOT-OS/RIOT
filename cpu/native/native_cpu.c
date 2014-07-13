@@ -48,6 +48,9 @@
 
 #include "cpu.h"
 #include "cpu-conf.h"
+#ifdef MODULE_NATIVENET
+#include "tap.h"
+#endif
 
 #include "native_internal.h"
 
@@ -68,6 +71,14 @@ int reboot_arch(int mode)
     (void) mode;
 
     printf("\n\n\t\t!! REBOOT !!\n\n");
+#ifdef MODULE_UART0
+    /* TODO: close stdio fds */
+#endif
+#ifdef MODULE_NATIVENET
+    if (_native_tap_fd != -1) {
+        real_close(_native_tap_fd);
+    }
+#endif
 
     if (real_execve(_native_argv[0], _native_argv, NULL) == -1) {
         err(EXIT_FAILURE, "reboot: execve");
