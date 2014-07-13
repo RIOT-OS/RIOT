@@ -1,0 +1,24 @@
+#!/usr/bin/instantfpc
+
+{$mode objfpc}
+
+uses SysUtils;
+
+label fail_;
+var tmpstr: String; tmpsearch: TSearchRec;
+begin
+	tmpstr := ParamStr(1);
+	if DirectoryExists(ParamStr(1)) then
+	begin
+		if tmpstr[Length(tmpstr)] <> DirectorySeparator then
+			tmpstr := tmpstr + DirectorySeparator;
+		if (not DirectoryExists(tmpstr + 'board')) or (not DirectoryExists(tmpstr + 'sdk')) then
+			goto fail_;
+		writeln(tmpstr);
+	end
+	else goto fail_;
+	halt(0);
+fail_:
+	writeln(stderr, '"' + ParamStr(1) + '" must be the directory containing both "board"- and "sdk"-folders plus "IoMuxDesign.xml"!');
+	halt(1);
+end.

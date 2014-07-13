@@ -1,0 +1,12 @@
+#!/bin/bash
+
+YO="$(./testoutputpath "$1")"
+
+for FILE in $(find "${YO}board" -name "*_iomux_config.c")
+do
+	sed 's/#include "io.h"/#include "sdkio.h"/' "${FILE}" > "../sdk/$(basename ${FILE})"
+done
+
+sed 's/()$/(void)/' $(find "${YO}board" -name "iomux_config.c") > ../sdk/iomux_config.c
+cp "${YO}IoMuxDesign.xml" .
+cp $(find "${YO}sdk" -name "regs*.h") ../include/registers/

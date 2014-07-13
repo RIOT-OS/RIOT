@@ -1,0 +1,4 @@
+## the cpu to build for
+export CPU = imx6
+
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

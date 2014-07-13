@@ -1,0 +1,1290 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PinMuxDesign xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <ToolVersion>IOMux Tool (IOMux.exe) version 3.4.0.3</ToolVersion>
+  <Chip>i.MX6SDL</Chip>
+  <Package>BGA</Package>
+  <Board>RIoTboard</Board>
+  <BoardRevision />
+  <Version />
+  <Company>FU Berlin</Company>
+  <Contact />
+  <ContactEmail />
+  <Copyright>/*
+ * Copyright (C) 2012, [Your Company Here] All Rights Reserved.
+ * IT IS EXPECTED THAT THIS TEXT BE REPLACED WITH THE BOARD SOFTWARE
+ * PROVIDER'S COPYRIGHT INFORMATION. THIS TEXT WILL BE DISPLAYED AT 
+ * THE TOP OF ALL SOURCE FILES GENERATED FOR THIS BOARD DESIGN.
+*/
+</Copyright>
+  <Description />
+  <SignalDesign Name="CCM_CLKO1" NativeInstance="ccm" Instance="ccm" InstanceAlias="ccm" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.CSI0_HSYNC" mode="CSI0_HSYNC_ALT3" ball="P4" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_CSI0_HSYNC" Address="0x020E0090" Value="0x00000003" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_CSI0_HSYNC" Address="0x020E03A4" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="CCM_CLKO2" NativeInstance="ccm" Instance="ccm" InstanceAlias="ccm" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.GPIO03" mode="GPIO03_ALT4" ball="R7" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_GPIO03" Address="0x020E0228" Value="0x00000004" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_GPIO03" Address="0x020E05F8" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="CCM_PMIC_READY" NativeInstance="ccm" Instance="ccm" InstanceAlias="ccm" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.EIM_EB0" mode="EIM_EB0_ALT4" ball="K21" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_EIM_EB0" Address="0x020E01C4" Value="0x00000004" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_EIM_EB0" Address="0x020E0594" Value="0x0000B0B1" />
+    <Register Name="IOMUXC_CCM_PMIC_READY_SELECT_INPUT" Address="0x020E07D4" Value="0x00000000" />
+  </SignalDesign>
+  <SignalDesign Name="CCM_REF_EN_B" NativeInstance="ccm" Instance="ccm" InstanceAlias="ccm" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.GPIO09" mode="GPIO09_ALT3" ball="T2" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_GPIO09" Address="0x020E0240" Value="0x00000003" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_GPIO09" Address="0x020E0610" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="EPIT1_OUT" NativeInstance="epit1" Instance="epit1" InstanceAlias="epit1" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.EIM_DATA19" mode="EIM_DATA19_ALT6" ball="G21" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_EIM_DATA19" Address="0x020E0150" Value="0x00000006" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_EIM_DATA19" Address="0x020E0520" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="EPIT2_OUT" NativeInstance="epit2" Instance="epit2" InstanceAlias="epit2" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.EIM_DATA20" mode="EIM_DATA20_ALT6" ball="G20" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_EIM_DATA20" Address="0x020E0154" Value="0x00000006" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_EIM_DATA20" Address="0x020E0524" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="GPIO3_IO28" NativeInstance="gpio3" Instance="gpio3" InstanceAlias="gpio3" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.EIM_DATA28" mode="EIM_DATA28_ALT5" ball="G23" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_EIM_DATA28" Address="0x020E0174" Value="0x00000005" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_EIM_DATA28" Address="0x020E0544" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="GPIO5_IO02" NativeInstance="gpio5" Instance="gpio5" InstanceAlias="gpio5" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.EIM_ADDR25" mode="EIM_ADDR25_ALT5" ball="H19" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_EIM_ADDR25" Address="0x020E0134" Value="0x00000005" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_EIM_ADDR25" Address="0x020E0504" Value="0x0000B0B1" />
+  </SignalDesign>
+  <SignalDesign Name="GPIO5_IO27" NativeInstance="gpio5" Instance="gpio5" InstanceAlias="gpio5" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.CSI0_DATA09" mode="CSI0_DATA09_ALT5" ball="N5" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_CSI0_DATA09" Address="0x020E0088" Value="0x00000005" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_CSI0_DATA09" Address="0x020E039C" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="GPT_CLKIN" NativeInstance="gpt" Instance="gpt" InstanceAlias="gpt" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.SD1_CLK" mode="SD1_CLK_ALT3" ball="D20" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_SD1_CLK" Address="0x020E02DC" Value="0x00000003" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_SD1_CLK" Address="0x020E06C4" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="GPT_COMPARE1" NativeInstance="gpt" Instance="gpt" InstanceAlias="gpt" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.SD1_CMD" mode="SD1_CMD_ALT3" ball="B21" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_SD1_CMD" Address="0x020E02E0" Value="0x00000003" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_SD1_CMD" Address="0x020E06C8" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="GPT_COMPARE2" NativeInstance="gpt" Instance="gpt" InstanceAlias="gpt" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.SD1_DATA2" mode="SD1_DATA2_ALT2" ball="E19" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_SD1_DATA2" Address="0x020E02EC" Value="0x00000002" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_SD1_DATA2" Address="0x020E06D4" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="GPT_COMPARE3" NativeInstance="gpt" Instance="gpt" InstanceAlias="gpt" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.SD1_DATA3" mode="SD1_DATA3_ALT2" ball="F18" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_SD1_DATA3" Address="0x020E02F0" Value="0x00000002" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_SD1_DATA3" Address="0x020E06D8" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="HDMI_TX_CEC_LINE" NativeInstance="hdmi" Instance="hdmi" InstanceAlias="hdmi" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.KEY_ROW2" mode="KEY_ROW2_ALT6" ball="W4" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_KEY_ROW2" Address="0x020E0260" Value="0x00000006" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_KEY_ROW2" Address="0x020E0648" Value="0x0001B0B0" />
+    <Register Name="IOMUXC_HDMI_ICECIN_SELECT_INPUT" Address="0x020E085C" Value="0x00000000" />
+  </SignalDesign>
+  <SignalDesign Name="HDMI_TX_DDC_SCL" NativeInstance="hdmi" Instance="hdmi" InstanceAlias="hdmi" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.EIM_EB2" mode="EIM_EB2_ALT4" ball="E22" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_EIM_EB2" Address="0x020E01CC" Value="0x00000004" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_EIM_EB2" Address="0x020E059C" Value="0x0001B0B0" />
+    <Register Name="IOMUXC_HDMI_II2C_CLKIN_SELECT_INPUT" Address="0x020E0860" Value="0x00000000" />
+  </SignalDesign>
+  <SignalDesign Name="HDMI_TX_DDC_SDA" NativeInstance="hdmi" Instance="hdmi" InstanceAlias="hdmi" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.EIM_DATA16" mode="EIM_DATA16_ALT4" ball="C25" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_EIM_DATA16" Address="0x020E0144" Value="0x00000004" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_EIM_DATA16" Address="0x020E0514" Value="0x0001B0B0" />
+    <Register Name="IOMUXC_HDMI_II2C_DATAIN_SELECT_INPUT" Address="0x020E0864" Value="0x00000000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR00" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR00" mode="" ball="AC14" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR00" Address="0x020E0424" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR01" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR01" mode="" ball="AB14" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR01" Address="0x020E0428" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR02" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR02" mode="" ball="AA14" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR02" Address="0x020E0444" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR03" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR03" mode="" ball="Y14" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR03" Address="0x020E0448" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR04" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR04" mode="" ball="W14" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR04" Address="0x020E044C" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR05" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR05" mode="" ball="AE13" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR05" Address="0x020E0450" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR06" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR06" mode="" ball="AC13" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR06" Address="0x020E0454" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR07" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR07" mode="" ball="Y13" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR07" Address="0x020E0458" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR08" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR08" mode="" ball="AB13" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR08" Address="0x020E045C" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR09" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR09" mode="" ball="AE12" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR09" Address="0x020E0460" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR10" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR10" mode="" ball="AA15" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR10" Address="0x020E042C" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR11" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR11" mode="" ball="AC12" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR11" Address="0x020E0430" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR12" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR12" mode="" ball="AD12" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR12" Address="0x020E0434" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR13" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR13" mode="" ball="AC17" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR13" Address="0x020E0438" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR14" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR14" mode="" ball="AA12" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR14" Address="0x020E043C" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ADDR15" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ADDR15" mode="" ball="Y12" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ADDR15" Address="0x020E0440" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_CAS" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_CAS" mode="" ball="AE16" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_CAS" Address="0x020E0464" Value="0x00008030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_CS0" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_CS0" mode="" ball="Y16" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_CS0" Address="0x020E0468" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_CTLDS" Address="0x020E076C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_CS1" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_CS1" mode="" ball="AD17" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_CS1" Address="0x020E046C" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_CTLDS" Address="0x020E076C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA00" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA00" mode="" ball="AD2" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B0DS" Address="0x020E0764" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA01" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA01" mode="" ball="AE2" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B0DS" Address="0x020E0764" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA02" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA02" mode="" ball="AC4" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B0DS" Address="0x020E0764" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA03" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA03" mode="" ball="AA5" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B0DS" Address="0x020E0764" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA04" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA04" mode="" ball="AC1" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B0DS" Address="0x020E0764" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA05" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA05" mode="" ball="AD1" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B0DS" Address="0x020E0764" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA06" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA06" mode="" ball="AB4" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B0DS" Address="0x020E0764" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA07" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA07" mode="" ball="AE4" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B0DS" Address="0x020E0764" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA08" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA08" mode="" ball="AD5" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B1DS" Address="0x020E0770" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA09" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA09" mode="" ball="AE5" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B1DS" Address="0x020E0770" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA10" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA10" mode="" ball="AA6" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B1DS" Address="0x020E0770" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA11" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA11" mode="" ball="AE7" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B1DS" Address="0x020E0770" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA12" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA12" mode="" ball="AB5" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B1DS" Address="0x020E0770" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA13" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA13" mode="" ball="AC5" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B1DS" Address="0x020E0770" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA14" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA14" mode="" ball="AB6" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B1DS" Address="0x020E0770" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA15" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA15" mode="" ball="AC7" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B1DS" Address="0x020E0770" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA16" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA16" mode="" ball="AB7" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B2DS" Address="0x020E0778" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA17" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA17" mode="" ball="AA8" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B2DS" Address="0x020E0778" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA18" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA18" mode="" ball="AB9" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B2DS" Address="0x020E0778" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA19" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA19" mode="" ball="Y9" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B2DS" Address="0x020E0778" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA20" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA20" mode="" ball="Y7" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B2DS" Address="0x020E0778" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA21" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA21" mode="" ball="Y8" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B2DS" Address="0x020E0778" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA22" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA22" mode="" ball="AC8" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B2DS" Address="0x020E0778" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA23" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA23" mode="" ball="AA9" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B2DS" Address="0x020E0778" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA24" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA24" mode="" ball="AE9" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B3DS" Address="0x020E077C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA25" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA25" mode="" ball="Y10" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B3DS" Address="0x020E077C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA26" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA26" mode="" ball="AE11" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B3DS" Address="0x020E077C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA27" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA27" mode="" ball="AB11" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B3DS" Address="0x020E077C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA28" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA28" mode="" ball="AC9" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B3DS" Address="0x020E077C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA29" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA29" mode="" ball="AD9" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B3DS" Address="0x020E077C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA30" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA30" mode="" ball="AD11" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B3DS" Address="0x020E077C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA31" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA31" mode="" ball="AC11" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B3DS" Address="0x020E077C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA32" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA32" mode="" ball="AA17" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B4DS" Address="0x020E0780" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA33" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA33" mode="" ball="AA18" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B4DS" Address="0x020E0780" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA34" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA34" mode="" ball="AC18" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B4DS" Address="0x020E0780" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA35" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA35" mode="" ball="AE19" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B4DS" Address="0x020E0780" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA36" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA36" mode="" ball="Y17" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B4DS" Address="0x020E0780" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA37" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA37" mode="" ball="Y18" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B4DS" Address="0x020E0780" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA38" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA38" mode="" ball="AB19" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B4DS" Address="0x020E0780" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA39" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA39" mode="" ball="AC19" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B4DS" Address="0x020E0780" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA40" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA40" mode="" ball="Y19" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B5DS" Address="0x020E0784" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA41" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA41" mode="" ball="AB20" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B5DS" Address="0x020E0784" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA42" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA42" mode="" ball="AB21" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B5DS" Address="0x020E0784" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA43" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA43" mode="" ball="AD21" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B5DS" Address="0x020E0784" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA44" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA44" mode="" ball="Y20" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B5DS" Address="0x020E0784" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA45" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA45" mode="" ball="AA20" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B5DS" Address="0x020E0784" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA46" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA46" mode="" ball="AE21" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B5DS" Address="0x020E0784" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA47" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA47" mode="" ball="AC21" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B5DS" Address="0x020E0784" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA48" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA48" mode="" ball="AC22" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B6DS" Address="0x020E078C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA49" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA49" mode="" ball="AE22" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B6DS" Address="0x020E078C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA50" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA50" mode="" ball="AE24" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B6DS" Address="0x020E078C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA51" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA51" mode="" ball="AC24" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B6DS" Address="0x020E078C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA52" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA52" mode="" ball="AB22" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B6DS" Address="0x020E078C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA53" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA53" mode="" ball="AC23" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B6DS" Address="0x020E078C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA54" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA54" mode="" ball="AD25" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B6DS" Address="0x020E078C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA55" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA55" mode="" ball="AC25" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B6DS" Address="0x020E078C" Value="0x00000030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA56" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA56" mode="" ball="AB25" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B7DS" Address="0x020E0748" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA57" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA57" mode="" ball="AA21" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B7DS" Address="0x020E0748" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA58" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA58" mode="" ball="Y25" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B7DS" Address="0x020E0748" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA59" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA59" mode="" ball="Y22" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B7DS" Address="0x020E0748" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA60" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA60" mode="" ball="AB23" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B7DS" Address="0x020E0748" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA61" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA61" mode="" ball="AA23" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B7DS" Address="0x020E0748" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA62" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA62" mode="" ball="Y23" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B7DS" Address="0x020E0748" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DATA63" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DATA63" mode="" ball="W25" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_B7DS" Address="0x020E0748" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE" Address="0x020E0760" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DQM0" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DQM0" mode="" ball="AC3" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_DQM0" Address="0x020E0470" Value="0x00008030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DQM1" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DQM1" mode="" ball="AC6" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_DQM1" Address="0x020E0474" Value="0x00008030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DQM2" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DQM2" mode="" ball="AB8" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_DQM2" Address="0x020E0478" Value="0x00008030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DQM3" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DQM3" mode="" ball="AE10" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_DQM3" Address="0x020E047C" Value="0x00008030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DQM4" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DQM4" mode="" ball="AB18" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_DQM4" Address="0x020E0480" Value="0x00008030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DQM5" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DQM5" mode="" ball="AC20" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_DQM5" Address="0x020E0484" Value="0x00008030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DQM6" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DQM6" mode="" ball="AD24" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_DQM6" Address="0x020E0488" Value="0x00008030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_DQM7" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_DQM7" mode="" ball="Y21" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_DQM7" Address="0x020E048C" Value="0x00008030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ODT0" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ODT0" mode="" ball="AC16" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ODT0" Address="0x020E04B4" Value="0x00003030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_ODT1" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_ODT1" mode="" ball="AB17" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_ODT1" Address="0x020E04B8" Value="0x00003030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_RAS" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_RAS" mode="" ball="AB15" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_RAS" Address="0x020E0490" Value="0x00008030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_RESET" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_RESET" mode="" ball="Y6" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_RESET" Address="0x020E0494" Value="0x00083030" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDBA0" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDBA0" mode="" ball="AC15" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDBA0" Address="0x020E0498" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDBA1" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDBA1" mode="" ball="Y15" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDBA1" Address="0x020E049C" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_ADDDS" Address="0x020E074C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDBA2" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDBA2" mode="" ball="AB12" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDBA2" Address="0x020E04A0" Value="0x0000B000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_CTLDS" Address="0x020E076C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDCKE0" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDCKE0" mode="" ball="Y11" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDCKE0" Address="0x020E04A4" Value="0x00003000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_CTLDS" Address="0x020E076C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDCKE1" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDCKE1" mode="" ball="AA11" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDCKE1" Address="0x020E04A8" Value="0x00003000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_CTLDS" Address="0x020E076C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDCLK0_P" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDCLK0_P" mode="" ball="AD15" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDCLK0_P" Address="0x020E04AC" Value="0x00008030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDCLK1_P" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDCLK1_P" mode="" ball="AD14" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDCLK1_P" Address="0x020E04B0" Value="0x00008030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDQS0_P" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDQS0_P" mode="" ball="AE3" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDQS0_P" Address="0x020E04BC" Value="0x00002030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE_CTL" Address="0x020E0750" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDQS1_P" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDQS1_P" mode="" ball="AD6" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDQS1_P" Address="0x020E04C0" Value="0x00002030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE_CTL" Address="0x020E0750" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDQS2_P" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDQS2_P" mode="" ball="AD8" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDQS2_P" Address="0x020E04C4" Value="0x00002030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE_CTL" Address="0x020E0750" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDQS3_P" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDQS3_P" mode="" ball="AC10" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDQS3_P" Address="0x020E04C8" Value="0x00002030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE_CTL" Address="0x020E0750" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDQS4_P" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDQS4_P" mode="" ball="AD18" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDQS4_P" Address="0x020E04CC" Value="0x00002030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE_CTL" Address="0x020E0750" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDQS5_P" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDQS5_P" mode="" ball="AD20" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDQS5_P" Address="0x020E04D0" Value="0x00002030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE_CTL" Address="0x020E0750" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDQS6_P" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDQS6_P" mode="" ball="AD23" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDQS6_P" Address="0x020E04D4" Value="0x00002030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE_CTL" Address="0x020E0750" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDQS7_P" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDQS7_P" mode="" ball="AA25" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDQS7_P" Address="0x020E04D8" Value="0x00002030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRMODE_CTL" Address="0x020E0750" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRHYS" Address="0x020E075C" Value="0x00000000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="DRAM_SDWE" NativeInstance="mmdc" Instance="mmdc" InstanceAlias="mmdc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DRAM_SDWE" mode="" ball="AB16" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DRAM_SDWE" Address="0x020E04DC" Value="0x00008000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPKE" Address="0x020E0754" Value="0x00001000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDRPK" Address="0x020E0758" Value="0x00002000" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_CTLDS" Address="0x020E076C" Value="0x00000030" />
+    <Register Name="IOMUXC_SW_PAD_CTL_GRP_DDR_TYPE" Address="0x020E0774" Value="0x00080000" />
+  </SignalDesign>
+  <SignalDesign Name="PWM1_OUT" NativeInstance="pwm1" Instance="pwm1" InstanceAlias="pwm1" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DISP0_DATA08" mode="DISP0_DATA08_ALT2" ball="R22" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_DISP0_DATA08" Address="0x020E0108" Value="0x00000002" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DISP0_DATA08" Address="0x020E041C" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="PWM2_OUT" NativeInstance="pwm2" Instance="pwm2" InstanceAlias="pwm2" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.DISP0_DATA09" mode="DISP0_DATA09_ALT2" ball="T25" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_DISP0_DATA09" Address="0x020E010C" Value="0x00000002" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_DISP0_DATA09" Address="0x020E0420" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="JTAG_DE_B" NativeInstance="sjc" Instance="sjc" InstanceAlias="sjc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.GPIO16" mode="GPIO16_ALT7" ball="R2" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_GPIO16" Address="0x020E0214" Value="0x00000007" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_GPIO16" Address="0x020E05E4" Value="0x0001B0B0" />
+  </SignalDesign>
+  <SignalDesign Name="JTAG_MOD" NativeInstance="sjc" Instance="sjc" InstanceAlias="sjc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.JTAG_MOD" mode="" ball="H6" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_JTAG_MOD" Address="0x020E0614" Value="0x0000B060" />
+  </SignalDesign>
+  <SignalDesign Name="JTAG_TCK" NativeInstance="sjc" Instance="sjc" InstanceAlias="sjc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.JTAG_TCK" mode="" ball="H5" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_JTAG_TCK" Address="0x020E0618" Value="0x00007060" />
+  </SignalDesign>
+  <SignalDesign Name="JTAG_TDI" NativeInstance="sjc" Instance="sjc" InstanceAlias="sjc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.JTAG_TDI" mode="" ball="G5" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_JTAG_TDI" Address="0x020E061C" Value="0x00007060" />
+  </SignalDesign>
+  <SignalDesign Name="JTAG_TDO" NativeInstance="sjc" Instance="sjc" InstanceAlias="sjc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.JTAG_TDO" mode="" ball="G6" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_JTAG_TDO" Address="0x020E0620" Value="0x000090B1" />
+  </SignalDesign>
+  <SignalDesign Name="JTAG_TMS" NativeInstance="sjc" Instance="sjc" InstanceAlias="sjc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.JTAG_TMS" mode="" ball="C3" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_JTAG_TMS" Address="0x020E0624" Value="0x00007060" />
+  </SignalDesign>
+  <SignalDesign Name="JTAG_TRSTB" NativeInstance="sjc" Instance="sjc" InstanceAlias="sjc" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.JTAG_TRSTB" mode="" ball="C2" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_JTAG_TRSTB" Address="0x020E0628" Value="0x00007060" />
+  </SignalDesign>
+  <SignalDesign Name="UART1_RX_DATA" NativeInstance="uart1" Instance="uart1" InstanceAlias="uart1" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.CSI0_DATA11" mode="CSI0_DATA11_ALT3" ball="M3" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_CSI0_DATA11" Address="0x020E0050" Value="0x00000003" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_CSI0_DATA11" Address="0x020E0364" Value="0x0001B0B0" />
+    <Register Name="IOMUXC_UART1_UART_RX_DATA_SELECT_INPUT" Address="0x020E08FC" Value="0x00000000" />
+  </SignalDesign>
+  <SignalDesign Name="UART1_TX_DATA" NativeInstance="uart1" Instance="uart1" InstanceAlias="uart1" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.CSI0_DATA10" mode="CSI0_DATA10_ALT3" ball="M1" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_CSI0_DATA10" Address="0x020E004C" Value="0x00000003" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_CSI0_DATA10" Address="0x020E0360" Value="0x0001B0B0" />
+    <Register Name="IOMUXC_UART1_UART_RX_DATA_SELECT_INPUT" Address="0x020E08FC" Value="0x00000000" />
+  </SignalDesign>
+  <SignalDesign Name="UART2_RX_DATA" NativeInstance="uart2" Instance="uart2" InstanceAlias="uart2" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.EIM_DATA27" mode="EIM_DATA27_ALT4" ball="E25" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_EIM_DATA27" Address="0x020E0170" Value="0x00000004" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_EIM_DATA27" Address="0x020E0540" Value="0x0001B0B0" />
+    <Register Name="IOMUXC_UART2_UART_RX_DATA_SELECT_INPUT" Address="0x020E0904" Value="0x00000000" />
+  </SignalDesign>
+  <SignalDesign Name="UART2_TX_DATA" NativeInstance="uart2" Instance="uart2" InstanceAlias="uart2" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.EIM_DATA26" mode="EIM_DATA26_ALT4" ball="E24" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_EIM_DATA26" Address="0x020E016C" Value="0x00000004" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_EIM_DATA26" Address="0x020E053C" Value="0x0001B0B0" />
+    <Register Name="IOMUXC_UART2_UART_RX_DATA_SELECT_INPUT" Address="0x020E0904" Value="0x00000000" />
+  </SignalDesign>
+  <SignalDesign Name="UART3_RX_DATA" NativeInstance="uart3" Instance="uart3" InstanceAlias="uart3" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.EIM_DATA25" mode="EIM_DATA25_ALT2" ball="G22" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_EIM_DATA25" Address="0x020E0168" Value="0x00000002" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_EIM_DATA25" Address="0x020E0538" Value="0x0001B0B0" />
+    <Register Name="IOMUXC_UART3_UART_RX_DATA_SELECT_INPUT" Address="0x020E090C" Value="0x00000000" />
+  </SignalDesign>
+  <SignalDesign Name="UART3_TX_DATA" NativeInstance="uart3" Instance="uart3" InstanceAlias="uart3" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.EIM_DATA24" mode="EIM_DATA24_ALT2" ball="F22" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_EIM_DATA24" Address="0x020E0164" Value="0x00000002" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_EIM_DATA24" Address="0x020E0534" Value="0x0001B0B0" />
+    <Register Name="IOMUXC_UART3_UART_RX_DATA_SELECT_INPUT" Address="0x020E090C" Value="0x00000000" />
+  </SignalDesign>
+  <SignalDesign Name="UART4_RX_DATA" NativeInstance="uart4" Instance="uart4" InstanceAlias="uart4" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.CSI0_DATA13" mode="CSI0_DATA13_ALT3" ball="L1" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_CSI0_DATA13" Address="0x020E0058" Value="0x00000003" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_CSI0_DATA13" Address="0x020E036C" Value="0x0001B0B0" />
+    <Register Name="IOMUXC_UART4_UART_RX_DATA_SELECT_INPUT" Address="0x020E0914" Value="0x00000000" />
+  </SignalDesign>
+  <SignalDesign Name="UART4_TX_DATA" NativeInstance="uart4" Instance="uart4" InstanceAlias="uart4" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.CSI0_DATA12" mode="CSI0_DATA12_ALT3" ball="M2" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_CSI0_DATA12" Address="0x020E0054" Value="0x00000003" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_CSI0_DATA12" Address="0x020E0368" Value="0x0001B0B0" />
+    <Register Name="IOMUXC_UART4_UART_RX_DATA_SELECT_INPUT" Address="0x020E0914" Value="0x00000000" />
+  </SignalDesign>
+  <SignalDesign Name="UART5_RX_DATA" NativeInstance="uart5" Instance="uart5" InstanceAlias="uart5" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.CSI0_DATA15" mode="CSI0_DATA15_ALT3" ball="M5" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_CSI0_DATA15" Address="0x020E0060" Value="0x00000003" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_CSI0_DATA15" Address="0x020E0374" Value="0x0001B0B0" />
+    <Register Name="IOMUXC_UART5_UART_RX_DATA_SELECT_INPUT" Address="0x020E091C" Value="0x00000000" />
+  </SignalDesign>
+  <SignalDesign Name="UART5_TX_DATA" NativeInstance="uart5" Instance="uart5" InstanceAlias="uart5" IsChecked="true">
+    <Comment />
+    <Routing padNet="padNet.CSI0_DATA14" mode="CSI0_DATA14_ALT3" ball="M4" />
+    <Register Name="IOMUXC_SW_MUX_CTL_PAD_CSI0_DATA14" Address="0x020E005C" Value="0x00000003" />
+    <Register Name="IOMUXC_SW_PAD_CTL_PAD_CSI0_DATA14" Address="0x020E0370" Value="0x0001B0B0" />
+    <Register Name="IOMUXC_UART5_UART_RX_DATA_SELECT_INPUT" Address="0x020E091C" Value="0x00000000" />
+  </SignalDesign>
+  <VoltageSetting Name="CSI_REXT" Voltage="0" />
+  <VoltageSetting Name="DSI_REXT" Voltage="0" />
+  <VoltageSetting Name="HDMI_VPH" Voltage="0" />
+  <VoltageSetting Name="NVCC_CSI" Voltage="0" />
+  <VoltageSetting Name="NVCC_DRAM" Voltage="0" />
+  <VoltageSetting Name="NVCC_EIM0" Voltage="0" />
+  <VoltageSetting Name="NVCC_EIM1" Voltage="0" />
+  <VoltageSetting Name="NVCC_EIM2" Voltage="0" />
+  <VoltageSetting Name="NVCC_ENET" Voltage="0" />
+  <VoltageSetting Name="NVCC_GPIO" Voltage="0" />
+  <VoltageSetting Name="NVCC_JTAG" Voltage="0" />
+  <VoltageSetting Name="NVCC_LCD" Voltage="0" />
+  <VoltageSetting Name="NVCC_LVDS_2P5" Voltage="0" />
+  <VoltageSetting Name="NVCC_MIPI" Voltage="0" />
+  <VoltageSetting Name="NVCC_NAND" Voltage="0" />
+  <VoltageSetting Name="NVCC_PLL" Voltage="0" />
+  <VoltageSetting Name="NVCC_RGMII" Voltage="0" />
+  <VoltageSetting Name="NVCC_SD1" Voltage="0" />
+  <VoltageSetting Name="NVCC_SD2" Voltage="0" />
+  <VoltageSetting Name="NVCC_SD3" Voltage="0" />
+  <VoltageSetting Name="PCIE_VPH" Voltage="0" />
+  <VoltageSetting Name="VDD_HIGH_CAP" Voltage="0" />
+  <VoltageSetting Name="VDD_SNVS_CAP" Voltage="0" />
+  <VoltageSetting Name="VDD_SNVS_IN" Voltage="0" />
+  <VoltageSetting Name="VDD_USB_CAP" Voltage="0" />
+</PinMuxDesign>

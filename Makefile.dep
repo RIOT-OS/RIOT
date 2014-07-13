@@ -2,6 +2,13 @@ ifneq (,$(filter libcoap,$(USEPKG)))
 	USEMODULE += pnet
 endif
 
+
+ifneq (,$(filter riotboard,$(BOARD)))
+	ifeq (,$(filter riotboard_basesdk,$(USEMODULE)))
+	USEMODULE += riotboard_basesdk
+	endif
+endif
+
 ifneq (,$(filter imx6,$(CPU)))
 	ifeq (,$(filter libsdk-drivers-uart,$(USEMODULE)))
 		USEMODULE += libsdk-drivers-uart
