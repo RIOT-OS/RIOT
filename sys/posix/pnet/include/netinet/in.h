@@ -125,12 +125,12 @@ extern const struct sockaddr_in6 in6addr_loopback;
 /**
  * IPv4 local host address.
  */
-#define INADDR_ANY          {(in_addr_t)0x00000000}
+#define INADDR_ANY          ((in_addr_t)0x00000000)
 
 /**
  * IPv4 broadcast address.
  */
-#define INADDR_BROADCAST    {(in_addr_t)0xffffffff}
+#define INADDR_BROADCAST    ((in_addr_t)0xffffffff)
 
 /**
  * Multicast hop limit option name for getsockopt() or setsockopt()
