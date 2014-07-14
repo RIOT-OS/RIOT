@@ -9,29 +9,29 @@ ifneq (,$(filter pnet,$(USEMODULE)))
 endif
 
 ifneq (,$(filter destiny,$(USEMODULE)))
-    USEMODULE += sixlowpan
-    USEMODULE += net_help
-    USEMODULE += vtimer
+	USEMODULE += sixlowpan
+	USEMODULE += net_help
+	USEMODULE += vtimer
 endif
 
 ifneq (,$(filter sixlowborder,$(USEMODULE)))
-    USEMODULE += sixlowpan
+	USEMODULE += sixlowpan
 endif
 
 ifneq (,$(filter rpl,$(USEMODULE)))
-    USEMODULE += routing
+	USEMODULE += routing
 endif
 
 ifneq (,$(filter routing,$(USEMODULE)))
-    USEMODULE += sixlowpan
+	USEMODULE += sixlowpan
 endif
 
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
-    USEMODULE += ieee802154
-    USEMODULE += net_help
-    USEMODULE += net_if
-    USEMODULE += posix
-    USEMODULE += vtimer
+	USEMODULE += ieee802154
+	USEMODULE += net_help
+	USEMODULE += net_if
+	USEMODULE += posix
+	USEMODULE += vtimer
 endif
 
 ifneq (,$(filter posix,$(USEMODULE)))
@@ -71,7 +71,7 @@ endif
 
 ifneq (,$(filter net_if,$(USEMODULE)))
 	USEMODULE += transceiver
-    USEMODULE += net_help
+	USEMODULE += net_help
 endif
 
 ifneq (,$(filter ccn_lite,$(USEMODULE)))
