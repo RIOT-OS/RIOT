@@ -38,6 +38,7 @@
 
 static char stack_buffer[KERNEL_CONF_STACKSIZE_MAIN];
 static char addr_str[IPV6_MAX_ADDR_STR_LEN];
+static dtls_connection_t conn = DTLS_CONNECTION_INIT;
 
 int listen_callback(dtls_connection_t *conn, uint8_t *data, size_t size)
 {
@@ -110,18 +111,13 @@ void shell_cmd_server(int argc, char **argv)
             server_thread_pid);
 }
 
-
-void shell_cmd_send(int argc, char **argv)
+void shell_cmd_connect(int argc, char **argv)
 {
-    dtls_connection_t conn = DTLS_CONNECTION_INIT;
-    uint8_t buffer[32];
-    int size;
-
     (void) argc;
     (void) argv;
 
-    if (argc < 2) {
-        printf("Usage: send <ipv6address> <data>\n");
+    if (argc < 1) {
+        printf("Usage: connect <ipv6address>\n");
         return;
     }
 
@@ -129,10 +125,30 @@ void shell_cmd_send(int argc, char **argv)
         printf("DTLS Connect failed\n");
         return;
     }
+}
 
-    size = hex2bin(buffer, argv[2]);
-    if (dtls_send(&conn, argv, size) < 0)
+void shell_cmd_send(int argc, char **argv)
+{
+    uint8_t buffer[32];
+    int size;
+
+    (void) argc;
+
+    if (argc < 1) {
+        printf("Usage: send <data>\n");
+        return;
+    }
+
+    size = hex2bin(buffer, argv[1]);
+    if (dtls_send(&conn, buffer, size) < 0)
         printf("Error sending packet!\n");
+}
+
+
+void shell_cmd_close(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
 
     printf("Closing connection!\n");
     dtls_close(&conn);
@@ -143,6 +159,8 @@ const shell_command_t shell_commands[] = {
     {"init", "configure link-local addresses", shell_cmd_init},
     {"send", "record layer", shell_cmd_send},
     {"server", "record layer", shell_cmd_server},
+    {"connect", "record layer", shell_cmd_connect},
+    {"close", "record layer", shell_cmd_close},
     {NULL, NULL, NULL}
 };
 

@@ -41,7 +41,6 @@ int dtls_listen(uint32_t port, dtls_listen_cb_t cb)
                   sizeof(g_socket_addr));
     if (status < 0)
     {
-        printf("Socket error : %s\n", strerror(errno));
         close(conn.socket);
         return -1;
     }
@@ -117,8 +116,6 @@ int dtls_connect(dtls_connection_t *conn, char *addr, uint32_t port)
     if( dtls_handshake_start(conn, &record) < 0)
         return -1;
 
-    //cipher_init(&conn->cipher, CIPHER_AES_128, "asd", 3);
-
     return 0;
 }
 
@@ -128,7 +125,7 @@ int dtls_send(dtls_connection_t *conn, uint8_t *data, size_t size)
     /* TODO: check state, was there a successful handshake? is conn intialized?*/
 
     return dtls_record_stream_send(conn, TLS_CONTENT_TYPE_APPLICATION_DATA,
-              buffer, size);
+              data, size);
 }
 
 

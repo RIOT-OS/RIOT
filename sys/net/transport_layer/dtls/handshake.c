@@ -188,6 +188,13 @@ int dtls_handshake_finished_verify(dtls_connection_t* conn,
   return 0;
 }
 
+int dtls_handshake_client_key_exchange_init(dtls_connection_t *conn,
+                                            uint8_t *data, uint8_t *hint,
+                                            size_t hint_size)
+{
+  memcpy(data, hint, hint_size);  
+  return hint_size;
+}
 
 int dtls_handshake_server_key_exchange_init(dtls_connection_t *conn,
                                             uint8_t *data, uint8_t *hint,
@@ -306,7 +313,7 @@ int dtls_handshake_verify_state(dtls_connection_t *conn,
       }
       printf("Handshake - ServerHelloDone received\n");
 
-      size = dtls_handshake_client_hello_init(conn, record->fragment,
+      size = dtls_handshake_client_key_exchange_init(conn, record->fragment,
                                               conn->cookie, conn->cookie_len);
       if (dtls_record_send(conn, TLS_CONTENT_TYPE_HANDSHAKE,
                              record->fragment, size) < 0) {
@@ -326,6 +333,14 @@ int dtls_handshake_verify_state(dtls_connection_t *conn,
       }
       printf("Handshake - Finished sent\n");
 
+      if (dtls_record_receive(conn, record) < 0 &&
+          dtls_handshake_finished_verify(conn, record->fragment,
+                                              record->header->length) < 0)
+      {
+        return -1;
+      }
+      printf("Handshake - Finished received\n");
+
       state_next = DTLS_HANDSHAKE_FINISHED;
       break;
 
@@ -338,17 +353,18 @@ int dtls_handshake_verify_state(dtls_connection_t *conn,
       }
       printf("Handshake - ClientKeyExchange received\n");
 
+      if (dtls_record_receive(conn, record) < 0 &&
+          dtls_handshake_finished_verify(conn, record->fragment,
+                                              record->header->length) < 0)
+      {
+        return -1;
+      }
+      printf("Handshake - Finished received\n");
+
       if (dtls_change_cipher(conn) < 0) {
         return -1;
       }
       printf("ChangeCipher - encrypting now every packet\n");
-
-      size = dtls_handshake_finished_init(conn, record->fragment);
-      if (dtls_record_send(conn, TLS_CONTENT_TYPE_HANDSHAKE, record->fragment,
-                           size) < 0) { 
-        return -1;
-      }
-      printf("Handshake - Finished sent\n");
 
       state_next = DTLS_HANDSHAKE_FINISHED;
       break;
