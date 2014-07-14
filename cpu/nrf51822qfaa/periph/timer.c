@@ -76,7 +76,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 #if TIMER_1_EN
     case (TIMER_1):
         p_timer = TIMER_1_DEV;
-    	p_timer->BITMODE = TIMER_BITMODE_BITMODE_16Bit;    //16 Bit Mode
+        p_timer->BITMODE = TIMER_BITMODE_BITMODE_16Bit;    //16 Bit Mode
         NVIC_SetPriority(TIMER_1_IRQ, TIMER_IRQ_PRIO);
         NVIC_EnableIRQ(TIMER_1_IRQ);
         break;
@@ -85,7 +85,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 #if TIMER_2_EN
     case (TIMER_2):
         p_timer = NRF_TIMER2;
-    	p_timer->BITMODE = TIMER_BITMODE_BITMODE_16Bit;    //16 Bit Mode
+        p_timer->BITMODE = TIMER_BITMODE_BITMODE_16Bit;    //16 Bit Mode
         NVIC_SetPriority(TIMER2_IRQn, 1);
         NVIC_EnableIRQ(TIMER2_IRQn);
         break;
@@ -133,7 +133,6 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     p_timer->SHORTS = (TIMER_SHORTS_COMPARE3_CLEAR_Enabled << TIMER_SHORTS_COMPARE3_CLEAR_Pos);
     p_timer->TASKS_START = 1;
 
-
     return 1;
 }
 
@@ -163,8 +162,6 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 #endif
     case TIMER_UNDEFINED:
         break;
-
-
     }
 
     /* set timeout value */
@@ -176,7 +173,6 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
             p_timer->CC[0] = (uint32_t) offset+timeout;
             p_timer->INTENSET |= TIMER_INTENSET_COMPARE0_Msk;
             //p_timer->INTENSET = (TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos);
-
             break;
         case 1:
             p_timer->CC[1] = (uint32_t) offset+timeout;
@@ -190,7 +186,6 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
             break;
         case 3:
             return 0;
-
         default:
             return 0;
     }
@@ -200,7 +195,6 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 int timer_clear(tim_t dev, int channel)
 {
     volatile NRF_TIMER_Type * p_timer;
-
     /* get timer base register address */
     switch (dev) {
 
@@ -404,11 +398,9 @@ __attribute__((naked)) void TIMER_1_ISR(void)
     ISR_ENTER();
     for(int i = 0; i < TIMER_1_CHANNELS; i++){
         if(TIMER_1_DEV->EVENTS_COMPARE[i] == 1){
-
 //            NRF_TIMER1->CC[i] = 0;
             TIMER_1_DEV->EVENTS_COMPARE[i] = 0;
             TIMER_1_DEV->INTENCLR = (1 << (16 + i));
-
             config[TIMER_1].cb(i);
         }
     }
@@ -422,10 +414,8 @@ __attribute__((naked)) void TIMER_2_ISR(void)
     ISR_ENTER();
     for(int i = 0; i < TIMER_2_CHANNELS; i++){
         if(TIMER_2_DEV->EVENTS_COMPARE[i] == 1){
-
             TIMER_2_DEV->CC[i] = 0;
             TIMER_2_DEV->EVENTS_COMPARE[i] = 0;
-
             config[TIMER_2].cb(i);
         }
     }

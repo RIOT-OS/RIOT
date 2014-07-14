@@ -19,6 +19,8 @@
  */
 
 #include <stdio.h>
+
+#include "vtimer.h"
 #include "periph/timer.h"
 #include "board.h"
 #include "cpu.h"
@@ -35,22 +37,6 @@
 
 extern void SystemInit(void);
 void leds_init(void);
-
-void printInt0(int i){
-    printf("timer0: channel: %d\n",i);
-}
-void printInt1(int i){
-    printf("timer1: channel: %d\n",i);
-}
-void printInt2(int i){
-    printf("timer2: channel: %d\n",i);
-}
-
-void redoff(int i)  {
-	LED_RED_OFF;
-}
-
-
 
 void board_init(void)
 {
@@ -73,45 +59,9 @@ void board_init(void)
         uart_write_blocking(0, outputchar);
         outputchar = output[i++];
     }
-    gpio_init_out(GPIO_6, GPIO_NOPULL);
-    gpio_init_out(GPIO_7, GPIO_NOPULL);
-    gpio_init_out(GPIO_1, GPIO_NOPULL);
-
-
-    gpio_set(GPIO_1);
-
-    delay(1*1000*1000);
-
-    i = 0;
-
-
-
-
-
-	radioConfig(0);
-	char msg = 'Q';
-while(1) {
-
-	// sending all the time some message
-
-	sendPacket(1, msg);
-
-	delay(100*1000);
 }
 
 
-
-}
-
-
-void delay(uint32_t microseconds){
-    /* perform busy-waiting for specified number of microseconds  */
-    uint32_t cycles = microseconds * 2; // factor has been found by measure
-    for (int i = 0; i < cycles; i++) {
-        asm("nop");
-    }
-
-}
 
 /**
  * @brief Initialize the boards on-board RGB LED
