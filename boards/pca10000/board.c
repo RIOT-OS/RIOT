@@ -7,32 +7,25 @@
  */
 
 /**
- * @ingroup     board_stm32f0discovery
+ * @ingroup     board_pca10000
  * @{
  *
  * @file        board.c
- * @brief       Board specific implementations for the STM32F0Discovery evaluation board
+ * @brief       Board specific implementations for the nRF51822 evaluation board pca10000
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
+ * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>
  *
  * @}
  */
 
 #include <stdio.h>
-
-#include "vtimer.h"
 #include "periph/timer.h"
 #include "board.h"
 #include "cpu.h"
 #include "nrf51.h"
-//#include "nrf_delay.h"
-//#include "nrf51_bitfields.h"
 #include "periph/uart.h"
-
-//#include "hwtimer_arch.h"
-//#include "thread.h"
 #include "periph/gpio.h"
-
 #include "radio.h"
 
 extern void SystemInit(void);
@@ -40,7 +33,6 @@ void leds_init(void);
 
 void board_init(void)
 {
-    int i = 0;
     /* initialize core clocks via STM-lib given function */
     SystemInit();
 
@@ -52,16 +44,7 @@ void board_init(void)
 
     /*initialize UART */
     uart_init_blocking(0, 115200);
-    char* output = "Hello User!\r\n";
-    char outputchar = output[i++];
-    while ( outputchar != '\0')
-    {
-        uart_write_blocking(0, outputchar);
-        outputchar = output[i++];
-    }
 }
-
-
 
 /**
  * @brief Initialize the boards on-board RGB LED
@@ -76,8 +59,8 @@ void board_init(void)
 void leds_init(void)
 {
     /* set LED pins to function as output */
-    NRF_GPIO->DIRSET = (LED_RED_PIN | LED_GREEN_PIN | LED_BLUE_PIN);
+    GPIO_DEV->DIRSET = (LED_RED_PIN | LED_GREEN_PIN | LED_BLUE_PIN);
 
     /* turn all LEDs off */
-    NRF_GPIO->OUTCLR = (LED_RED_PIN | LED_GREEN_PIN | LED_BLUE_PIN);
+    GPIO_DEV->OUTCLR = (LED_RED_PIN | LED_GREEN_PIN | LED_BLUE_PIN);
 }

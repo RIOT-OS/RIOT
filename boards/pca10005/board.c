@@ -7,13 +7,14 @@
  */
 
 /**
- * @ingroup     board_stm32f0discovery
+ * @ingroup     board_pca10005
  * @{
  *
  * @file        board.c
- * @brief       Board specific implementations for the STM32F0Discovery evaluation board
+ * @brief       Board specific implementations for the nRF51822 evaluation board pca10005
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
+ * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>
  *
  * @}
  */
@@ -24,14 +25,8 @@
 #include "board.h"
 #include "cpu.h"
 #include "nrf51.h"
-//#include "nrf_delay.h"
-//#include "nrf51_bitfields.h"
 #include "periph/uart.h"
-
-//#include "hwtimer_arch.h"
-//#include "thread.h"
 #include "periph/gpio.h"
-
 #include "radio.h"
 
 extern void SystemInit(void);
@@ -39,119 +34,18 @@ void leds_init(void);
 
 void board_init(void)
 {
-    int i = 0;
     /* initialize core clocks via STM-lib given function */
     SystemInit();
 
     /* initialize the CPU */
     cpu_init();
 
-    /* initialize the boards LEDs */
-    leds_init();
-
-    /*initialize UART */
+    /**
+     * initialize UART
+     * please see periph_conf.h for UART pins!
+     **/
     gpio_init_in(GPIO_9, GPIO_NOPULL);
     gpio_init_out(GPIO_11, GPIO_NOPULL);
 
     uart_init_blocking(0, 115200);
-    char* output = "Hello User!\r\n";
-    char outputchar = output[i++];
-    while ( outputchar != '\0')
-    {
-        uart_write_blocking(0, outputchar);
-        outputchar = output[i++];
-    }
-
-/*
-    LED_GREEN_ON;
-    LED_RED_ON;
-    LED_BLUE_ON;
-*/
-    //LED_BLUE_OFF;
-    //LED_BLUE_OFF;
-    //LED_GREEN_OFF;
-    //LED_RED_OFF;
-
-
-    /* blink stuff */
-
-/*    while (1) {
-
-
-        while(uart_read_blocking(0,&charUART))  {
-                uart_write_blocking(0, charUART);
-        }
-
-
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_RED_OFF;
-        LED_GREEN_OFF;
-        LED_BLUE_OFF;
-        uart_write_blocking(0, 'O');
-
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_RED_ON;
-        uart_write_blocking(0, 'R');
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_RED_OFF;
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_GREEN_ON;
-        uart_write_blocking(0, 'G');
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_GREEN_OFF;
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_BLUE_ON;
-        uart_write_blocking(0, 'B');
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_RED_OFF;
-        LED_GREEN_OFF;
-        LED_BLUE_OFF;
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_GREEN_ON;
-        LED_BLUE_ON;
-        LED_RED_ON;
-        uart_write_blocking(0, 'A');
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-
-    } */
-}
-
-
-
-
-/**
- * @brief Initialize the boards on-board RGB LED
- *
- * The LED initialization is hard-coded in this function.
- *
- * The LED channels are connected to the following pins:
- * - RED:   21
- * - GREEN: 22
- * - BLUE:  23
- */
-void leds_init(void)
-{
-    /* set LED pins to function as output */
-    NRF_GPIO->DIRSET = (LED_RED_PIN | LED_GREEN_PIN | LED_BLUE_PIN);
-
-    /* turn all LEDs off */
-    NRF_GPIO->OUTCLR = (LED_RED_PIN | LED_GREEN_PIN | LED_BLUE_PIN);
 }

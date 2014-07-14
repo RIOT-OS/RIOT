@@ -7,13 +7,14 @@
  */
 
 /**
- * @ingroup     board_stm32f0discovery
+ * @ingroup     board_pca10000
  * @{
  *
  * @file        periph_conf.h
- * @brief       Peripheral MCU configuration for the STM32F3discovery board
+ * @brief       Peripheral MCU configuration for the nRF51822 board pca10000
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
+ * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>
  */
 
 #ifndef __PERIPH_CONF_H
@@ -25,6 +26,7 @@
  */
 #define TIMER_NUMOF         (1U)
 #define TIMER_0_EN          1
+/* timers 1 and 2 are not supported yet */
 #define TIMER_1_EN          0
 #define TIMER_2_EN          0
 #define TIMER_IRQ_PRIO      1
@@ -36,40 +38,19 @@
 #define TIMER_0_ISR         isr_timer0
 #define TIMER_0_IRQ         TIMER0_IRQn
 
-
+/* Timer 1 configuration */
 #define TIMER_1_DEV         NRF_TIMER1
 #define TIMER_1_CHANNELS    3
 #define TIMER_1_MAX_VALUE   (0xffffffff)
 #define TIMER_1_ISR         isr_timer1
 #define TIMER_1_IRQ         TIMER1_IRQn
 
-
+/* Timer 2 configuration */
 #define TIMER_2_DEV         NRF_TIMER2
 #define TIMER_2_CHANNELS    3
 #define TIMER_2_MAX_VALUE   (0xffffffff)
 #define TIMER_2_ISR         isr_timer2
 #define TIMER_2_IRQ         TIMER2_IRQn
-
-///* Timer 1 configuration */
-//#define TIMER_1_DEV         TIMx
-//#define TIMER_1_CHANNELS    4
-//#define TIMER_1_PRESCALER   (47U)
-//#define TIMER_1_MAX_VALUE   (0xffffffff)
-//#define TIMER_1_CLKEN()     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN
-//#define TIMER_1_ISR         isr_tim2
-//#define TIMER_1_IRQ_CHAN    TIM2_IRQn
-//#define TIMER_1_IRQ_PRIO    1
-
-/* Timer 1 configuration */
-//#define TIMER_1_DEV         TIMx                                                        /* TODO */
-//#define TIMER_1_CHANNELS
-//#define TIMER_1_PRESCALER   (47U)
-//#define TIMER_1_MAX_VALUE   (0xffff)
-//#define TIMER_1_CLKEN()
-//#define TIMER_1_ISR
-//#define TIMER_1_IRQCHAN
-//#define TIMER_1_IRQ_PRIO
-
 
 /**
  * @brief UART configuration
@@ -82,29 +63,6 @@
 
 /* UART 0 device configuration */
 #define UART_0_DEV          NRF_UART0
-//#define UART_0_CLKEN()      RCC->APB2ENR |= RCC_APB2ENR_USART1EN
-//#define UART_0_IRQ          USART1_IRQn
-//#define UART_0_ISR          isr_usart1
-///* UART 0 pin configuration */
-//#define UART_0_PORT         GPIOB
-//#define UART_0_PINS         (GPIO_Pin_6 | GPIO_Pin_7)
-//#define UART_0_PORT_CLKEN() RCC->AHBENR |= RCC_AHBENR_GPIOBEN
-//#define UART_0_RX_PIN       3
-//#define UART_0_TX_PIN       2
-//#define UART_0_AF           1
-//
-///* UART 1 device configuration */
-//#define UART_1_DEV          USART2
-//#define UART_1_CLKEN()      RCC->APB1ENR |= RCC_APB1ENR_USART2EN
-//#define UART_1_IRQ          USART2_IRQn
-//#define UART_1_ISR          isr_usart2
-///* UART 1 pin configuration */
-//#define UART_1_PORT         GPIOA
-//#define UART_1_PORT_CLKEN() RCC->AHBENR |= RCC_AHBENR_GPIOAEN
-//#define UART_1_RX_PIN       3
-//#define UART_1_TX_PIN       2
-//#define UART_1_AF           1
-
 
 /**
  * @brief ADC configuration

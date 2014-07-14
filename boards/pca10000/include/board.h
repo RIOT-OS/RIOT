@@ -7,15 +7,16 @@
  */
 
 /**
- * @defgroup    board_stm32f0discovery STM32F0Discovery
+ * @defgroup    board_pca10000
  * @ingroup     boards
- * @brief       Board specific files for the STM32F0Discovery board.
+ * @brief       Board specific files for the nRF51822 board pca10000.
  * @{
  *
  * @file        board.h
- * @brief       Board specific definitions for the STM32F0Discovery evaluation board.
+ * @brief       Board specific definitions for the nRF51822 evaluation board pca10000.
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
+ * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>
  */
 
 #ifndef __BOARD_H
@@ -43,6 +44,9 @@
 #define LED_BLUE_PIN        (1 << 23)
 /** @} */
 
+/**
+ * @name Provice specific pin numbers
+ */
 #define RX_PIN_NUMBER  11
 #define TX_PIN_NUMBER  9
 #define CTS_PIN_NUMBER 10
@@ -53,24 +57,21 @@
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED_RED_ON          NRF_GPIO->OUTCLR = LED_RED_PIN
-#define LED_RED_OFF         NRF_GPIO->OUTSET = LED_RED_PIN
-#define LED_RED_TOGGLE      NRF_GPIO->OUT ^= LED_RED_PIN
-#define LED_GREEN_ON        NRF_GPIO->OUTCLR = LED_GREEN_PIN
-#define LED_GREEN_OFF       NRF_GPIO->OUTSET = LED_GREEN_PIN
-#define LED_GREEN_TOGGLE    NRF_GPIO->OUT ^= LED_GREEN_PIN
-#define LED_BLUE_ON        NRF_GPIO->OUTCLR = LED_BLUE_PIN
-#define LED_BLUE_OFF        NRF_GPIO->OUTSET = LED_BLUE_PIN
-#define LED_BLUE_TOGGLE     NRF_GPIO->OUT ^= LED_BLUE_PIN
+#define LED_RED_ON          GPIO_DEV->OUTCLR = LED_RED_PIN
+#define LED_RED_OFF         GPIO_DEV->OUTSET = LED_RED_PIN
+#define LED_RED_TOGGLE      GPIO_DEV->OUT ^= LED_RED_PIN
+#define LED_GREEN_ON        GPIO_DEV->OUTCLR = LED_GREEN_PIN
+#define LED_GREEN_OFF       GPIO_DEV->OUTSET = LED_GREEN_PIN
+#define LED_GREEN_TOGGLE    GPIO_DEV->OUT ^= LED_GREEN_PIN
+#define LED_BLUE_ON         GPIO_DEV->OUTCLR = LED_BLUE_PIN
+#define LED_BLUE_OFF        GPIO_DEV->OUTSET = LED_BLUE_PIN
+#define LED_BLUE_TOGGLE     GPIO_DEV->OUT ^= LED_BLUE_PIN
 
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
-
-void delay(uint32_t microseconds);
-
 
 #endif /** __BOARD_H */
 /** @} */

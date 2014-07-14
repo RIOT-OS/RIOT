@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# This flash script dynamically generates a file with a set of commands which 
+# have to be handed to the flashing script of SEGGER (JLinkExe).
+# After that, JLinkExe will be executed with that set of commands to flash the
+# latest .bin file to the board.
+
+# @author Timo Ziegler <timo.ziegler@fu-berlin.de>
+
 BINDIR=$1
 RIOTBASE=$2
 APPLICATION=$3
