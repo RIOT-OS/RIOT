@@ -1,0 +1,180 @@
+diff --git a/scapy/layers/dot15d4.py b/scapy/layers/dot15d4.py
+index 7c148ab..a999820 100644
+--- a/scapy/layers/dot15d4.py
++++ b/scapy/layers/dot15d4.py
+@@ -386,14 +386,16 @@ class Dot15d4Data(Packet):
+     name = "802.15.4 Data"
+     fields_desc = [
+                     XLEShortField("dest_panid", 0xFFFF),
+-                    dot15d4AddressField("dest_addr", 0xFFFF, length_of="fcf_destaddrmode"),
+-                    ConditionalField(XLEShortField("src_panid", 0x0), \
+-                                        lambda pkt:util_srcpanid_present(pkt)),
+-                    ConditionalField(dot15d4AddressField("src_addr", None, length_of="fcf_srcaddrmode"), \
+-                                        lambda pkt:pkt.underlayer.getfieldval("fcf_srcaddrmode") != 0),
+-                    # Security field present if fcf_security == True
+-                    ConditionalField(PacketField("aux_sec_header", Dot15d4AuxSecurityHeader(), Dot15d4AuxSecurityHeader),
+-                                        lambda pkt:pkt.underlayer.getfieldval("fcf_security") == True),
++                    XLEShortField("dest_addr", 0xFFFF),
++                    XLEShortField("src_addr", 0xFFF)
++                    # dot15d4AddressField("dest_addr", 0xFFFF, length_of="fcf_destaddrmode"),
++                    # ConditionalField(XLEShortField("src_panid", 0x0), \
++                    #                     lambda pkt:util_srcpanid_present(pkt)),
++                    # ConditionalField(dot15d4AddressField("src_addr", None, length_of="fcf_srcaddrmode"), \
++                    #                     lambda pkt:pkt.underlayer.getfieldval("fcf_srcaddrmode") != 0),
++                    # # Security field present if fcf_security == True
++                    # ConditionalField(PacketField("aux_sec_header", Dot15d4AuxSecurityHeader(), Dot15d4AuxSecurityHeader),
++                    #                     lambda pkt:pkt.underlayer.getfieldval("fcf_security") == True),
+                     ]
+     def mysummary(self):
+         return self.sprintf("802.15.4 Data ( %Dot15d4Data.src_panid%:%Dot15d4Data.src_addr% -> %Dot15d4Data.dest_panid%:%Dot15d4Data.dest_addr% )")
+diff --git a/scapy/layers/sixlowpan.py b/scapy/layers/sixlowpan.py
+index 8296724..4b3a6d6 100644
+--- a/scapy/layers/sixlowpan.py
++++ b/scapy/layers/sixlowpan.py
+@@ -209,8 +209,8 @@ class LoWPANFragmentationFirst(Packet):
+         XShortField("datagramTag", 0x0),
+     ]
+     
+-    def guess_payload_class(self, payload):
+-        return LoWPAN_IPHC
++    # def guess_payload_class(self, payload):
++    #     return LoWPAN_IPHC
+ 
+ class LoWPANFragmentationSubsequent(Packet):
+     name = "6LoWPAN Subsequent Fragmentation Packet"
+@@ -420,14 +420,13 @@ class LoWPAN_IPHC(Packet):
+             packet.hlim = 255
+         #TODO: Payload length can be inferred from lower layers from either the
+         #6LoWPAN Fragmentation header or the IEEE802.15.4 header
+-        
+         packet.src = self.decompressSourceAddr(packet)
+         packet.dst = self.decompressDestinyAddr(packet)
+-        
++
+         if self.nh == 1:
+             # The Next Header field is compressed and the next header is
+             # encoded using LOWPAN_NHC
+-            
++
+             udp = UDP()
+             if self.header_compression & 0x4 == 0x0:
+                 udp.chksum = self.udpChecksum
+@@ -454,7 +453,7 @@ class LoWPAN_IPHC(Packet):
+         else:
+             packet.payload = data
+             data = str(packet)
+-        
++
+         return Packet.post_dissect(self, data)
+         
+     def decompressDestinyAddr(self, packet):
+@@ -490,14 +489,16 @@ class LoWPAN_IPHC(Packet):
+                     elif underlayer.underlayer.fcf_destaddrmode == 2:
+                         tmp_ip = LINK_LOCAL_PREFIX[0:8] + \
+                             "\x00\x00\x00\xff\xfe\x00" + \
+-                            struct.pack(">Q", underlayer.dest_addr)
++                            struct.pack(">B", underlayer.dest_addr)
+                 else:
+                     payload = packet.payload
+                     #Most of the times, it's necessary the IEEE 802.15.4 data to extract this address
+                     raise Exception('Unimplemented: IP Header is contained into IEEE 802.15.4 frame, in this case it\'s not available.')
+         elif self.m == 1 and self.dac == 0:
+             if self.dam == 0:
+-                raise Exception("unimplemented")
++                # If M=1 and DAC=0 then DAM=00 means:
++                # 128 bits.  The full address is carried in-line.
++                pass
+             elif self.dam == 1:
+                 tmp_ip = "\xff" + tmp_ip[16 - destiny_addr_mode(self)] + \
+                     "\x00"*9 + tmp_ip[-5:]
+@@ -512,7 +513,6 @@ class LoWPAN_IPHC(Packet):
+             else: #all the others values
+                 raise Exception("Reserved value by specification.")
+                 
+-        
+         self.destinyAddr = socket.inet_ntop(socket.AF_INET6, tmp_ip)
+         return self.destinyAddr
+     
+@@ -571,13 +571,11 @@ class LoWPAN_IPHC(Packet):
+         self.destinyAddr = socket.inet_ntop(socket.AF_INET6, tmp_ip)
+     
+     def decompressSourceAddr(self, packet):
+-        #print "decompressSourceAddr"
+         try:
+             tmp_ip = socket.inet_pton(socket.AF_INET6, self.sourceAddr)
+         except socket.error, e:
+             tmp_ip = "\x00"*16
+         
+-        
+         if self.sac == 0:
+             if self.sam == 0x0:
+                 pass
+@@ -599,7 +597,7 @@ class LoWPAN_IPHC(Packet):
+                     elif underlayer.underlayer.fcf_srcaddrmode == 2:
+                         tmp_ip = LINK_LOCAL_PREFIX[0:8] + \
+                             "\x00\x00\x00\xff\xfe\x00" + \
+-                            struct.pack(">Q", underlayer.src_addr)
++                            struct.pack(">H", underlayer.src_addr)
+                 else:
+                     payload = packet.payload
+                     #Most of the times, it's necessary the IEEE 802.15.4 data to extract this address
+@@ -615,7 +613,8 @@ class LoWPAN_IPHC(Packet):
+                 tmp_ip = LINK_LOCAL_PREFIX[0:8] + "\x00"*8 #TODO: CONTEXT ID
+             else:
+                 raise Exception('Unimplemented')
+-        
++
++        assert len(tmp_ip) == 16
+         self.sourceAddr = socket.inet_ntop(socket.AF_INET6, tmp_ip)
+         return self.sourceAddr
+     
+@@ -704,6 +703,7 @@ class SixLoWPAN(Packet):
+         elif ord(payload[0]) >> 6 == 0x01:
+             return LoWPAN_IPHC
+         else:
++            return LoWPAN_IPHC
+             return payload
+ 
+ #fragmentate IPv6 or any other packet
+@@ -729,18 +729,18 @@ def fragmentate(packet, datagram_tag):
+ 
+     return new_packet
+ 
+-#def defragmentate(packet_list):
+-#    payload = ""
+-#    for p in packet_list:
+-#        if type(p.payload) == LoWPANFragmentationFirst:
+-#            #print type(p.payload.payload)
+-#            payload = str(SixLoWPAN(p.payload.payload))
+-#        elif type(p.payload) == LoWPANFragmentationSubsequent:
+-#            print str(p.payload)
+-#            payload.payload += str(p.payload.payload)
+-#        else:
+-#            raise Exception
+-#    return SixLoWPAN(payload)
++def defragmentate(packet_list):
++   payload = ""
++   for p in packet_list:
++       if type(p.payload) == LoWPANFragmentationFirst:
++           #print type(p.payload.payload)
++           payload = str(SixLoWPAN(p.payload.payload))
++       elif type(p.payload) == LoWPANFragmentationSubsequent:
++           print str(p.payload)
++           payload.payload += str(p.payload.payload)
++       else:
++           raise Exception
++   return SixLoWPAN(payload)
+     
+ 
+ 
+@@ -756,8 +756,8 @@ bind_layers( LoWPANMesh,        LoWPANFragmentationSubsequent,      )
+ #bind_layers( LoWPANMesh,        LoWPANBroadcast,                    )
+ #bind_layers( LoWPANBroadcast,   LoWPANFragmentationFirst,           )
+ #bind_layers( LoWPANBroadcast,   LoWPANFragmentationSubsequent,      )
+-bind_layers( LoWPANFragmentationFirst, LoWPAN_IPHC, )
+-bind_layers( LoWPANFragmentationSubsequent, LoWPAN_IPHC             )
++#bind_layers( LoWPANFragmentationFirst, LoWPAN_IPHC, )
++#bind_layers( LoWPANFragmentationSubsequent, LoWPAN_IPHC             )
+ 
+ 
+ bind_layers( Dot15d4Data,         SixLoWPAN,             )
