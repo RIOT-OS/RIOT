@@ -45,6 +45,10 @@ ifneq (,$(filter uart0,$(USEMODULE)))
 	USEMODULE += posix
 endif
 
+ifneq (,$(filter cbor,$(USEMODULE)))
+	USEMODULE += net_help
+endif
+
 ifneq (,$(filter cc110x%,$(USEMODULE)))
 	USEMODULE += protocol_multiplex
 	USEMODULE += vtimer
