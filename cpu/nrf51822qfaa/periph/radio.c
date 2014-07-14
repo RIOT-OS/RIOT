@@ -47,6 +47,71 @@ int i = 0;
 #define PACKET_S0_FIELD_SIZE             (0UL)  /**< Packet S0 field size in bits. */
 #define PACKET_LENGTH_FIELD_SIZE         (0UL)  /**< Packet length field size in bits. */
 
+#define LED_NONE 0
+#define LED_RED 1
+#define LED_GREEN 2
+#define LED_BLUE 3
+#define LED_PURPLE 4
+#define LED_CYAN 5
+#define LED_YELLOW 6
+#define LED_WHITE 7
+
+void led(int color)
+{
+	switch(color)
+	{
+	case LED_NONE:
+		LED_RED_OFF;
+		LED_GREEN_OFF;
+		LED_BLUE_OFF;
+		break;
+	case LED_RED:
+		led(LED_NONE);
+		LED_RED_ON;
+		LED_GREEN_OFF;
+		LED_BLUE_OFF;
+		break;
+	case LED_GREEN:
+		led(LED_NONE);
+		LED_RED_OFF;
+		LED_GREEN_ON;
+		LED_BLUE_OFF;
+		break;
+	case LED_BLUE:
+		led(LED_NONE);
+		LED_RED_OFF;
+		LED_GREEN_OFF;
+		LED_BLUE_ON;
+		break;
+	case LED_PURPLE:
+		led(LED_NONE);
+		LED_RED_ON;
+		LED_GREEN_OFF;
+		LED_BLUE_ON;
+		break;
+	case LED_CYAN:
+		led(LED_NONE);
+		LED_RED_OFF;
+		LED_GREEN_ON;
+		LED_BLUE_ON;
+		break;
+	case LED_YELLOW:
+		led(LED_NONE);
+		LED_RED_ON;
+		LED_GREEN_ON;
+		LED_BLUE_OFF;
+		break;
+	case LED_WHITE:
+	default:
+		led(LED_NONE);
+		LED_RED_ON;
+		LED_GREEN_ON;
+		LED_BLUE_ON;
+		break;
+	}
+}
+
+
 /**
  * @brief Function for swapping/mirroring bits in a byte.
  *
@@ -108,7 +173,14 @@ static uint32_t bytewise_bitswap(uint32_t inp)
 
 char receivePacket(void)
 {
-	LED_GREEN_OFF;
+
+	//status 0: led 1 led 2 off || LED_RED_ON --> radio disabled
+	//status 2: led 1 on led 2 off || LED_PURPLE_ON --> Radio is in RXIDLE state
+	//status 3: led 1 off led 2 on || LED_YELLOW_ON --> Radio is in the RX state
+	//status 4: led 1 on led 2 on || LED_GREEN_ON --> Radio is in the RXDISABLE state --> msg received
+
+
+
 
 	static uint8_t packet[4];
 	short boolvar = 0;
@@ -120,95 +192,97 @@ char receivePacket(void)
 
 	  while(1)
 	  {
+		//Radio disabled state 0
+		    gpio_clear(GPIO_1);
+		    gpio_clear(GPIO_6);
+
+		    led(LED_RED);
+		    delay(1000000);
 
 	    NRF_RADIO->EVENTS_READY = 0U;
 	    // Enable radio and wait for ready
 	    NRF_RADIO->TASKS_RXEN = 1U;
-	    gpio_set(GPIO_1);
-	    gpio_clear(GPIO_6);
-	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+
+	    //printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 	    while(NRF_RADIO->EVENTS_READY == 0U)
 	    {
-	    	printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
-	    	delay(5*100*1000);
-	    	LED_RED_ON;
-	    	delay(5*100*1000);
-	    	LED_RED_OFF;
+	    	//printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+
 	    }
+
+	    //RXIDLE-State 2
+	    led(LED_PURPLE);
+	    gpio_set(GPIO_1);
+	    gpio_clear(GPIO_6);
+
 	   // delay(500000);
-	    //gpio_clear(GPIO_1);
-	    //gpio_clear(GPIO_6);
-	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+
+	   // printf( "radio state ready: %i\n", (int)(NRF_RADIO->STATE ));
 
 	    NRF_RADIO->EVENTS_END = 0U;
 	    // Start listening and wait for address received event
 	    NRF_RADIO->TASKS_START = 1U;
 
 
-	    //gpio_clear(GPIO_1);
-	    //gpio_set(GPIO_6);
+	    //Radio is in RX-State 3
+	    gpio_clear(GPIO_1);
+	    gpio_set(GPIO_6);
+	    led(LED_YELLOW);
+
 	    // Wait for end of packet
 	    while(NRF_RADIO->EVENTS_END == 0U)
 	    {
-	    	printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
-	    	gpio_set(GPIO_6);
-	    	LED_BLUE_ON;
-	    	gpio_clear(GPIO_1);
-	    	//gpio_toggle(GPIO_6);
-        	delay(1*1000*1000);
-        	LED_BLUE_OFF;
+	    	//Radio is still in RX-State 3
+
+	    	//printf( "radio state rx: %i\n", (int)(NRF_RADIO->STATE ));
+        	//delay(1*1000*1000);
 	    }
 	    //delay(500000);
-	    gpio_clear(GPIO_1);
-	    gpio_clear(GPIO_6);
-	    LED_BLUE_OFF;
-	    LED_RED_OFF;
-	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+
+	    //printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 
 	   // delay(2000000);
 
+	    msg = (char)packet[1];
 
 	    // Write received data to LED0 and LED1 on CRC match
 	    if (NRF_RADIO->CRCSTATUS == 1U)
 	    {
-	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
-		    gpio_set(GPIO_1);
-		    gpio_set(GPIO_6);
-		    LED_BLUE_ON;
-		    LED_GREEN_ON;
+	    //printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+
 	    	msg = (char)packet[1];
 	    	boolvar = 1;
 	    	//delay(1000000);
 	    }
-	    LED_BLUE_OFF;
-	    LED_GREEN_OFF;
-	    gpio_clear(GPIO_1);
-	    gpio_clear(GPIO_6);
+
+	    //Radio is in RXDISABLE Mode
+	    gpio_set(GPIO_1);
+	    gpio_set(GPIO_6);
+	    led(LED_GREEN);
+
+	    delay(1*1000*1000);
+
+
+
 	    //printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 	    NRF_RADIO->EVENTS_DISABLED = 0U;
 	    // Disable radio
 	    NRF_RADIO->TASKS_DISABLE = 1U;
-	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+	    //printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 	    while(NRF_RADIO->EVENTS_DISABLED == 0U)
 	    {
 	    }
 
-	        	//delay(1*1000*1000);
 
 	    if(boolvar) break;
 
-//	    for( int i = 0; i < 10;i++)  {
-//			gpio_toggle(GPIO_6);
-//			//delay(500*1000);
-//	    }
-//	    for( int i = 0; i < 10;i++)  {
-//			gpio_toggle(GPIO_1);
-//			//delay(500*1000);
-//	    }
 	  }
-	  printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+	  //printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 	  printf("PACKET RECEIVED: %c ------------------------------\n", msg);
-	  LED_GREEN_ON;
+
+	  led(LED_NONE);
+	  gpio_clear(GPIO_1);
+	  gpio_clear(GPIO_6);
 	return msg;
 
 }
@@ -217,13 +291,20 @@ char receivePacket(void)
 void sendPacket(uint8_t addr, char msg)
 {
 
-	LED_GREEN_OFF;
+	//status 0: led 1 led 2 off || LED_RED_ON --> radio disabled
+	//status 10: led 1 on led 2 off || LED_YELLOW_ON --> Radio is in the TXIDLE state
+	//status 11: led 1 on led 2 on || LED_GREEN_ON --> Radio is in the TX state
+
+	led(LED_RED);
+	gpio_clear(GPIO_1);
+	gpio_clear(GPIO_6);
 
 	  // Set payload pointer
 	  //NRF_RADIO->PACKETPTR = *packet;
 	  //NRF_RADIO->PACKETPTR = (uint32_t)packet;
 	  NRF_RADIO->PACKETPTR = (uint32_t) &packet[0];
 	  printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+	  delay(5*100*1000);
 
 	    // Place the read character in the payload, enable the radio and
 	    // send the packet:
@@ -233,36 +314,44 @@ void sendPacket(uint8_t addr, char msg)
 	    NRF_RADIO->EVENTS_READY = 0U;
 
 	    NRF_RADIO->TASKS_TXEN = 1U;
-	    gpio_set(GPIO_1);
-	    gpio_clear(GPIO_6);
+
+
+
 	    printf("task txen\n");
 
 	    while (NRF_RADIO->EVENTS_READY == 0U)
 	    {
 	    	printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
-	    	delay(5*100*1000);
-	    	LED_RED_ON;
-	    	 gpio_set(GPIO_1);
-	    	delay(5*100*1000);
-	    	LED_RED_OFF;
-	    	 gpio_clear(GPIO_1);
+
 	    }
 	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 	    printf("ready\n");
 
 	    NRF_RADIO->EVENTS_END = 0U;
 	    NRF_RADIO->TASKS_START = 1U;
+
+	    //RADIO state 10
+	    gpio_set(GPIO_1);
+	    gpio_clear(GPIO_6);
+	    led(LED_YELLOW);
+
 	    while(NRF_RADIO->EVENTS_END == 0U)
 	    {
-	    	printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+//	    	printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
+//	    	delay(5*100*1000);
+//	    	LED_BLUE_ON;
+//	    	gpio_set(GPIO_6);
 	    	delay(5*100*1000);
-	    	LED_BLUE_ON;
-	    	gpio_set(GPIO_6);
-	    	delay(5*100*1000);
-	    	LED_BLUE_OFF;
-	    	gpio_clear(GPIO_1);
+//	    	LED_BLUE_OFF;
+//	    	gpio_clear(GPIO_1);
 
 	    }
+	    //RADIO state 11
+	    gpio_set(GPIO_1);
+	    gpio_set(GPIO_6);
+	    led(LED_GREEN);
+    	delay(5*100*1000);
+
 	    printf("packet sent\n");
 	    printf( "radio state: %i\n", (int)(NRF_RADIO->STATE ));
 	    // Disable radio
@@ -278,7 +367,7 @@ void sendPacket(uint8_t addr, char msg)
 
 	    gpio_clear(GPIO_1);
 	    gpio_clear(GPIO_6);
-	    LED_GREEN_ON;
+	    led(LED_NONE);
 }
 
 
@@ -360,7 +449,7 @@ void radioConfig(short me)
 	  // Radio config
 	  NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_0dBm << RADIO_TXPOWER_TXPOWER_Pos);
 	  NRF_RADIO->FREQUENCY = 7UL;                // Frequency bin 7, 2407MHz
-	  NRF_RADIO->MODE = (RADIO_MODE_MODE_Nrf_2Mbit << RADIO_MODE_MODE_Pos);
+	  NRF_RADIO->MODE = (RADIO_MODE_MODE_Ble_1Mbit << RADIO_MODE_MODE_Pos);
 
 	  // Radio address config
 	  NRF_RADIO->PREFIX0 = 0xC4C3C2E7UL;  // Prefix byte of addresses 3 to 0

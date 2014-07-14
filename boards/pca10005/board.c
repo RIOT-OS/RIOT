@@ -88,13 +88,14 @@ void board_init(void)
     radioConfig(1);
     char msg = 'H';
 
-    if(msg == 'H')  {
-    	gpio_set(GPIO_6);
-    	delay(2*1000*1000);
-    	gpio_clear(GPIO_6);
-    }
+//    if(msg == 'H')  {
+//    	gpio_set(GPIO_6);
+//    	delay(2*1000*1000);
+//    	gpio_clear(GPIO_6);
+//    }
 
 
+    gpio_set(GPIO_6);
 	delay(1*1000*1000);
 
 
@@ -125,16 +126,16 @@ while(1) {
     msg = receivePacket();
 
 
-    if(msg == 'H')  {
-    	gpio_set(GPIO_6);
-    	delay(1*1000*1000);
-    	gpio_clear(GPIO_6);
-    }
-    else  {
-    	gpio_set(GPIO_7);
-    	delay(1*1000*1000);
-    	gpio_clear(GPIO_7);
-    }
+//    if(msg == 'H')  {
+//    	gpio_set(GPIO_6);
+//    	delay(1*1000*1000);
+//    	gpio_clear(GPIO_6);
+//    }
+//    else  {
+//    	gpio_set(GPIO_7);
+//    	delay(1*1000*1000);
+//    	gpio_clear(GPIO_7);
+//    }
 
 }
 

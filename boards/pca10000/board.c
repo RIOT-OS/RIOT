@@ -73,37 +73,19 @@ void board_init(void)
         uart_write_blocking(0, outputchar);
         outputchar = output[i++];
     }
-
-
-    LED_GREEN_OFF;
-    LED_RED_OFF;
-    LED_BLUE_OFF;
-
-    //LED_BLUE_OFF;
-    /*LED_BLUE_OFF;
-    LED_GREEN_OFF;
-    //LED_RED_OFF;
-    gpio_init_out(GPIO_0, GPIO_NOPULL);
-    gpio_set(GPIO_0);
+    gpio_init_out(GPIO_6, GPIO_NOPULL);
+    gpio_init_out(GPIO_7, GPIO_NOPULL);
     gpio_init_out(GPIO_1, GPIO_NOPULL);
-    gpio_set(GPIO_1);*/
-//    GPIO_DEV->OUTSET = (1UL << 1);
+
+
+    gpio_set(GPIO_1);
+
+    delay(1*1000*1000);
 
     i = 0;
 
 
-    //timer_init(TIMER_0, 1, printInt0);
-timer_init(TIMER_0, 1, redoff);
-//
-    timer_set(TIMER_0,0,2*1000*1000);
-//    timer_set(TIMER_0,1,4*1000*1000);
-//    timer_set(TIMER_0,2,6*1000*1000);
 
-
-
-//    timer_set(TIMER_1,0,10*1000*1000);
-//    timer_set(TIMER_1,1,11*1000*1000);
-//    timer_set(TIMER_1,2,12*1000*1000);
 
 
 	radioConfig(0);
@@ -118,65 +100,7 @@ while(1) {
 }
 
 
-    /* blink stuff */
 
-/*    while (1) {
-
-
-        while(uart_read_blocking(0,&charUART))  {
-                uart_write_blocking(0, charUART);
-        }
-
-
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_RED_OFF;
-        LED_GREEN_OFF;
-        LED_BLUE_OFF;
-        uart_write_blocking(0, 'O');
-
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_RED_ON;
-        uart_write_blocking(0, 'R');
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_RED_OFF;
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_GREEN_ON;
-        uart_write_blocking(0, 'G');
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_GREEN_OFF;
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_BLUE_ON;
-        uart_write_blocking(0, 'B');
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_RED_OFF;
-        LED_GREEN_OFF;
-        LED_BLUE_OFF;
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-        LED_GREEN_ON;
-        LED_BLUE_ON;
-        LED_RED_ON;
-        uart_write_blocking(0, 'A');
-        for (int i = 0; i < 1000000; i++) {
-            asm("nop");
-        }
-
-    } */
 }
 
 
