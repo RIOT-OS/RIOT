@@ -627,6 +627,7 @@ void _net_if_ifconfig_list(int if_id)
             puts("\n");
         }
 
+#ifdef MODULE_SIXLOWPAN
         if (addr_ptr->addr_protocol & NET_IF_L3P_IPV6) {
             char addr_str[IPV6_MAX_ADDR_STR_LEN];
             printf("            inet6 addr: ");
@@ -660,6 +661,7 @@ void _net_if_ifconfig_list(int if_id)
                 printf("error in conversion\n");
             }
         }
+#endif
     }
 
     puts("");
