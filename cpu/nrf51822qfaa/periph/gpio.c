@@ -12,7 +12,8 @@
  * @file        gpio.c
  * @brief       Low-level GPIO driver implementation
  *
- * @author      Hauke Petersen <mail@haukepetersen.de>
+ * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
+ * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>
  *
  * @}
  */
@@ -23,8 +24,17 @@
 #include "nrf51.h"
 #include "nrf51_bitfields.h"
 
-#define gpio NRF_GPIO
-uint8_t gptioIRQarray[4];
+#define GPIO_PIN_CNF_IN (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)\
+                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)\
+                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)\
+                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)\
+                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos)
+
+#define GPIO_PIN_CNF_OUT (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)\
+                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)\
+                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)\
+                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos)
+
 typedef struct {
     void (*cb)(void);
 } gpio_state_t;
@@ -37,147 +47,82 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
 #if GPIO_0_EN
         case GPIO_0:
 
-            //nrf_gpio_cfg_output(GPIO_0);
-            GPIO_DEV->PIN_CNF[GPIO_0] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_0] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_1_EN
         case GPIO_1:
-            GPIO_DEV->PIN_CNF[GPIO_1] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_1] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_2_EN
         case GPIO_2:
-            GPIO_DEV->PIN_CNF[GPIO_2] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_2] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_3_EN
         case GPIO_3:
-            GPIO_DEV->PIN_CNF[GPIO_3] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_3] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_4_EN
         case GPIO_4:
-            GPIO_DEV->PIN_CNF[GPIO_4] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_4] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_5_EN
         case GPIO_5:
-            GPIO_DEV->PIN_CNF[GPIO_5] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_5] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_6_EN
         case GPIO_6:
-            GPIO_DEV->PIN_CNF[GPIO_6] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_6] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_7_EN
         case GPIO_7:
-            GPIO_DEV->PIN_CNF[GPIO_7] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_7] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_8_EN
         case GPIO_8:
-            GPIO_DEV->PIN_CNF[GPIO_8] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_8] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_9_EN
         case GPIO_9:
-            GPIO_DEV->PIN_CNF[GPIO_9] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_9] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_10_EN
         case GPIO_10:
-            GPIO_DEV->PIN_CNF[GPIO_10] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_10] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_11_EN
         case GPIO_11:
-            GPIO_DEV->PIN_CNF[GPIO_11] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_11] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_12_EN
         case GPIO_12:
-            GPIO_DEV->PIN_CNF[GPIO_12] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_12] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_13_EN
         case GPIO_13:
-            GPIO_DEV->PIN_CNF[GPIO_13] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_13] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_14_EN
         case GPIO_14:
-            GPIO_DEV->PIN_CNF[GPIO_14] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_14] = GPIO_PIN_CNF_IN;
             break;
 #endif
 #if GPIO_15_EN
         case GPIO_15:
-            GPIO_DEV->PIN_CNF[GPIO_15] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                    | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                    | (GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
-                                                    | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                    | (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[GPIO_15] = GPIO_PIN_CNF_IN;
             break;
 #endif
 
@@ -207,130 +152,82 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_1_EN
         case GPIO_1:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_2_EN
         case GPIO_2:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_3_EN
         case GPIO_3:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_4_EN
         case GPIO_4:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_5_EN
         case GPIO_5:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_6_EN
         case GPIO_6:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_7_EN
         case GPIO_7:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_8_EN
         case GPIO_8:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_9_EN
         case GPIO_9:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_10_EN
         case GPIO_10:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_11_EN
         case GPIO_11:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_12_EN
         case GPIO_12:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_13_EN
         case GPIO_13:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_14_EN
         case GPIO_14:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 #if GPIO_15_EN
         case GPIO_15:
-            GPIO_DEV->PIN_CNF[dev] = (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
-                                                   | (GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
-                                                   | (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
-                                                   | (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos);
+            GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
 
@@ -374,10 +271,6 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(v
     #ifdef GPIO_0_EN
             case GPIO_0:
                 pin = GPIO_0_PIN;
-                //GPIO_0_EXTI_CFG();
-//                NVIC_SetPriority(GPIO_0_IRQ, GPIO_IRQ_PRIO);
-//                NVIC_EnableIRQ(GPIO_0_IRQ);
-
                 break;
     #endif
     #ifdef GPIO_1_EN
@@ -880,5 +773,3 @@ __attribute__((naked)) void EXTI0_1_IRQn(void)
         config[GPIO_IRQ_1].cb();
         ISR_EXIT();
 }
-
-

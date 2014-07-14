@@ -57,6 +57,8 @@ int i = 0;
 #define LED_YELLOW 6
 #define LED_WHITE 7
 
+void delay(uint32_t microseconds);
+
 void led(int color)
 {
     switch(color)
@@ -180,15 +182,10 @@ char receivePacket(void)
     //status 3: led 1 off led 2 on || LED_YELLOW_ON --> Radio is in the RX state
     //status 4: led 1 on led 2 on || LED_GREEN_ON --> Radio is in the RXDISABLE state --> msg received
 
-
-
-
     static uint8_t packet[4];
     short boolvar = 0;
 
     // Set payload pointer
-    //NRF_RADIO->PACKETPTR = *packet;
-    //NRF_RADIO->PACKETPTR = (uint32_t)packet;
     NRF_RADIO->PACKETPTR = (uint32_t) &packet[0];
 
       while(1)
@@ -372,7 +369,7 @@ void sendPacket(uint8_t addr, char msg)
 }
 
 
-void radioConfig(short me)
+void radioConfig(void)
 {
 
 //     /* Start 16 MHz crystal oscillator */
@@ -487,5 +484,3 @@ void radioConfig(short me)
 
 
 }
-
-

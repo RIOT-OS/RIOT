@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup         stm32f051r8
+ * @ingroup         cpu_nrf51822qfaa
  * @{
  * 
  * @file            hwtimer_cpu.h

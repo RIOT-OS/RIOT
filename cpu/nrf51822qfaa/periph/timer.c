@@ -13,7 +13,8 @@
  * @file        timer.c
  * @brief       Low-level timer driver implementation
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
+ * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>
  *
  * @}
  */
@@ -47,27 +48,14 @@ timer_conf_t config[TIMER_NUMOF];
 int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 {
 
-    NRF_TIMER_Type *p_timer;
-
-/*
-    // Start 16 MHz crystal oscillator.
-    NRF_CLOCK->EVENTS_HFCLKSTARTED  = 0;
-    NRF_CLOCK->TASKS_HFCLKSTART     = 1;
-
-    // Wait for the external oscillator to start up.
-    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0)
-    {
-        // Do nothing.
-    }
-
-*/
+    NRF_TIMER_Type *timer;
 
     switch (dev) {
 
 #if TIMER_0_EN
     case (TIMER_0):
-        p_timer = TIMER_0_DEV;
-        p_timer->BITMODE = TIMER_BITMODE_BITMODE_32Bit;    //32 Bit Mode
+        timer = TIMER_0_DEV;
+        timer->BITMODE = TIMER_BITMODE_BITMODE_32Bit;    //32 Bit Mode
         NVIC_SetPriority(TIMER_0_IRQ, TIMER_IRQ_PRIO);
         NVIC_EnableIRQ(TIMER_0_IRQ);
         break;
@@ -75,8 +63,8 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 
 #if TIMER_1_EN
     case (TIMER_1):
-        p_timer = TIMER_1_DEV;
-        p_timer->BITMODE = TIMER_BITMODE_BITMODE_16Bit;    //16 Bit Mode
+        timer = TIMER_1_DEV;
+        timer->BITMODE = TIMER_BITMODE_BITMODE_16Bit;    //16 Bit Mode
         NVIC_SetPriority(TIMER_1_IRQ, TIMER_IRQ_PRIO);
         NVIC_EnableIRQ(TIMER_1_IRQ);
         break;
@@ -84,8 +72,8 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 
 #if TIMER_2_EN
     case (TIMER_2):
-        p_timer = NRF_TIMER2;
-        p_timer->BITMODE = TIMER_BITMODE_BITMODE_16Bit;    //16 Bit Mode
+        timer = NRF_TIMER2;
+        timer->BITMODE = TIMER_BITMODE_BITMODE_16Bit;    //16 Bit Mode
         NVIC_SetPriority(TIMER2_IRQn, 1);
         NVIC_EnableIRQ(TIMER2_IRQn);
         break;
@@ -99,65 +87,64 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     /* save callback */
     config[dev].cb = callback;
 
-    p_timer->TASKS_STOP = 1;
+    timer->TASKS_STOP = 1;
 
-
-    p_timer->MODE    = TIMER_MODE_MODE_Timer;       // Set the timer in Timer Mode.
-    p_timer->TASKS_CLEAR    = 1;                    // clear the task first to be usable for later.
+    timer->MODE    = TIMER_MODE_MODE_Timer;       // Set the timer in Timer Mode.
+    timer->TASKS_CLEAR    = 1;                    // clear the task first to be usable for later.
 
     switch (ticks_per_us) {
         case 1:
-            p_timer->PRESCALER = 4;
+            timer->PRESCALER = 4;
             break;
         case 2:
-            p_timer->PRESCALER = 5;
+            timer->PRESCALER = 5;
             break;
         case 4:
-            p_timer->PRESCALER = 6;
+            timer->PRESCALER = 6;
             break;
         case 8:
-            p_timer->PRESCALER = 7;
+            timer->PRESCALER = 7;
             break;
         case 16:
-            p_timer->PRESCALER = 8;
+            timer->PRESCALER = 8;
             break;
 
         default:
-            p_timer->PRESCALER = 1;
+            timer->PRESCALER = 1;
             break;
     }
-    //p_timer->INTENSET = TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos;
-    p_timer->SHORTS = (TIMER_SHORTS_COMPARE0_CLEAR_Enabled << TIMER_SHORTS_COMPARE0_CLEAR_Pos);
-    p_timer->SHORTS = (TIMER_SHORTS_COMPARE1_CLEAR_Enabled << TIMER_SHORTS_COMPARE1_CLEAR_Pos);
-    p_timer->SHORTS = (TIMER_SHORTS_COMPARE2_CLEAR_Enabled << TIMER_SHORTS_COMPARE2_CLEAR_Pos);
-    p_timer->SHORTS = (TIMER_SHORTS_COMPARE3_CLEAR_Enabled << TIMER_SHORTS_COMPARE3_CLEAR_Pos);
-    p_timer->TASKS_START = 1;
+    //timer->INTENSET = TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos;
+    timer->SHORTS = (TIMER_SHORTS_COMPARE0_CLEAR_Enabled << TIMER_SHORTS_COMPARE0_CLEAR_Pos);
+    timer->SHORTS = (TIMER_SHORTS_COMPARE1_CLEAR_Enabled << TIMER_SHORTS_COMPARE1_CLEAR_Pos);
+    timer->SHORTS = (TIMER_SHORTS_COMPARE2_CLEAR_Enabled << TIMER_SHORTS_COMPARE2_CLEAR_Pos);
+    timer->SHORTS = (TIMER_SHORTS_COMPARE3_CLEAR_Enabled << TIMER_SHORTS_COMPARE3_CLEAR_Pos);
+    timer->TASKS_START = 1;
 
     return 1;
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
-    volatile NRF_TIMER_Type * p_timer;
+    volatile NRF_TIMER_Type * timer;
 
     /* get timer base register address */
     switch (dev) {
 
 #if TIMER_0_EN
     case (TIMER_0):
-        p_timer = TIMER_0_DEV;
+        timer = TIMER_0_DEV;
         break;
 #endif
 
 #if TIMER_1_EN
     case (TIMER_1):
-        p_timer = TIMER_1_DEV;
+        timer = TIMER_1_DEV;
         break;
 #endif
 
 #if TIMER_2_EN
     case (TIMER_2):
-        p_timer = TIMER_2_DEV;
+        timer = TIMER_2_DEV;
         break;
 #endif
     case TIMER_UNDEFINED:
@@ -165,27 +152,22 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
     }
 
     /* set timeout value */
-
     uint32_t offset = timer_read(dev);
 
     switch (channel) {
         case 0:
-            p_timer->CC[0] = (uint32_t) offset+timeout;
-            p_timer->INTENSET |= TIMER_INTENSET_COMPARE0_Msk;
-            //p_timer->INTENSET = (TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos);
+            timer->CC[0] = (uint32_t) offset+timeout;
+            timer->INTENSET |= TIMER_INTENSET_COMPARE0_Msk;
             break;
         case 1:
-            p_timer->CC[1] = (uint32_t) offset+timeout;
-            p_timer->INTENSET |= TIMER_INTENSET_COMPARE1_Msk;
-            //p_timer->INTENSET = (TIMER_INTENSET_COMPARE1_Enabled << TIMER_INTENSET_COMPARE1_Pos);
+            timer->CC[1] = (uint32_t) offset+timeout;
+            timer->INTENSET |= TIMER_INTENSET_COMPARE1_Msk;
             break;
         case 2:
-            p_timer->CC[2] = (uint32_t) offset+timeout;
-            p_timer->INTENSET |= TIMER_INTENSET_COMPARE2_Msk;
-            //p_timer->INTENSET = (TIMER_INTENSET_COMPARE2_Enabled << TIMER_INTENSET_COMPARE2_Pos);
+            timer->CC[2] = (uint32_t) offset+timeout;
+            timer->INTENSET |= TIMER_INTENSET_COMPARE2_Msk;
             break;
         case 3:
-            return 0;
         default:
             return 0;
     }
@@ -194,25 +176,26 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 
 int timer_clear(tim_t dev, int channel)
 {
-    volatile NRF_TIMER_Type * p_timer;
+    volatile NRF_TIMER_Type * timer;
+
     /* get timer base register address */
     switch (dev) {
 
 #if TIMER_0_EN
     case (TIMER_0):
-        p_timer = TIMER_0_DEV;
+        timer = TIMER_0_DEV;
         break;
 #endif
 
 #if TIMER_1_EN
     case (TIMER_1):
-        p_timer = TIMER_1_DEV;
+        timer = TIMER_1_DEV;
         break;
 #endif
 
 #if TIMER_2_EN
     case (TIMER_2):
-        p_timer = TIMER_2_DEV;
+        timer = TIMER_2_DEV;
         break;
 #endif
     case TIMER_UNDEFINED:
@@ -220,25 +203,24 @@ int timer_clear(tim_t dev, int channel)
 
     }
 
-    p_timer->TASKS_CLEAR = 1;
+    timer->TASKS_CLEAR = 1;
 
     /* set timeout value */
-
     switch (channel) {
         case 0:
-            p_timer->CC[0] = 0;
+            timer->CC[0] = 0;
 
             break;
         case 1:
-            p_timer->CC[1] = 0;
+            timer->CC[1] = 0;
 
             break;
         case 2:
-            p_timer->CC[2] = 0;
+            timer->CC[2] = 0;
 
             break;
         case 3:
-            p_timer->CC[3] = 0;
+            timer->CC[3] = 0;
 
             break;
         default:

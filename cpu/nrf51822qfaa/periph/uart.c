@@ -13,13 +13,13 @@
  * @file        uart.c
  * @brief       Low-level UART driver implementation
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
+ * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>
  *
  * @}
  */
 
 #include <math.h>
-
 #include "cpu.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
@@ -39,8 +39,6 @@ typedef struct {
 /**
  * @brief Allocate memory to store the callback functions.
  */
-//static uart_conf_t config[UART_NUMOF];
-
 int uart_init(uart_t uart, uint32_t baudrate, void (*rx_cb)(char),
         void (*tx_cb)(void)) { //Manual: nrf51822.pdf page 144
 
@@ -101,21 +99,19 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate) {
     case 921600:
         baudrate_real = UART_BAUDRATE_BAUDRATE_Baud921600;
         break;
-
+    default:
+        return -1;
     }
+
     switch (uart) {
 #if UART_0_EN
     case UART_0:
-        /* configure PINS */
-        // UART_0_PORT->PIO_PDR = UART_0_PINS;
-        // UART_0_PORT->PIO_ABSR &= ~UART_0_PINS;
         /** @snippet [Configure UART RX and TX pin] */
-
         UART_0_DEV->PSELTXD = TX_PIN_NUMBER;
         UART_0_DEV->PSELRXD = RX_PIN_NUMBER;
-
         //UART_0_DEV->PSELCTS = CTS_PIN_NUMBER;
         //UART_0_DEV->PSELRTS = RTS_PIN_NUMBER;
+
         UART_0_DEV->CONFIG = (UART_CONFIG_HWFC_Enabled << UART_CONFIG_HWFC_Pos);
 
         UART_0_DEV->BAUDRATE = (baudrate_real << UART_BAUDRATE_BAUDRATE_Pos);
@@ -123,7 +119,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate) {
         UART_0_DEV->TASKS_STARTTX = 1;
         UART_0_DEV->TASKS_STARTRX = 1;
         UART_0_DEV->EVENTS_RXDRDY = 0;
-
         break;
 #endif
     case UART_UNDEFINED:
@@ -172,12 +167,13 @@ int uart_read_blocking(uart_t uart, char *data) {
 }
 
 int uart_write_blocking(uart_t uart, char data) {
-    //Using:
+    // Wrapper to write a string could be as below:
     /* while (ch != '\0')
      {
      uart_write_blocking(uart, ch);
      ch = data[i++];
      }*/
+
     switch (uart) {
     case UART_0:
         UART_0_DEV->TXD = (uint8_t) data;
@@ -187,7 +183,6 @@ int uart_write_blocking(uart_t uart, char data) {
         }
 
         UART_0_DEV->EVENTS_TXDRDY = 0;
-
         break;
     case UART_UNDEFINED:
         return -1;
@@ -195,4 +190,3 @@ int uart_write_blocking(uart_t uart, char data) {
     return 1;
 
 }
-

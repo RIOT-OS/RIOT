@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_stm32f051r8
+ * @ingroup     cpu_nrf51822qfaa
  * @{
  *
  * @file        syscalls.c
- * @brief       NewLib system calls implementations for STM32F303VC
+ * @brief       NewLib system calls implementations for nRF51822
  *
  * @author      Michael Baar <michael.baar@fu-berlin.de>
  * @author      Stefan Pfeiffer <pfeiffer@inf.fu-berlin.de>
