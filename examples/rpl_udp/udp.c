@@ -24,7 +24,6 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "kernel.h"
 #include "thread.h"
 
 #include "destiny/socket.h"

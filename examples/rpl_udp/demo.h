@@ -1,8 +1,6 @@
 #ifndef DEMO_H
 #define DEMO_H
 
-#include "kernel.h"
-
 #define APP_VERSION "1.1"
 
 #define RADIO_CHANNEL   (10)

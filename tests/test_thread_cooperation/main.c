@@ -20,10 +20,9 @@
 
 #include <stdio.h>
 #include <inttypes.h>
-#include <thread.h>
-#include <flags.h>
-#include <kernel.h>
-#include <mutex.h>
+
+#include "thread.h"
+#include "mutex.h"
 
 #define PROBLEM 12
 

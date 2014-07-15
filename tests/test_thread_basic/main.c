@@ -19,9 +19,7 @@
  */
 
 #include <stdio.h>
-#include <thread.h>
-#include <flags.h>
-#include <kernel.h>
+#include "thread.h"
 
 char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
 

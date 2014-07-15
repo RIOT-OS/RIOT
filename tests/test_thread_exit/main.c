@@ -21,8 +21,6 @@
 #include <stdio.h>
 
 #include "thread.h"
-#include "flags.h"
-#include "kernel.h"
 
 char second_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char third_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];

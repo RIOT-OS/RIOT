@@ -31,7 +31,6 @@
 #include <pthread.h>
 #include <stdio.h>
 
-#include "kernel.h"
 #include "random.h"
 #include "sched.h"
 #include "thread.h"
