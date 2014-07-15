@@ -18,11 +18,13 @@ const fs_op_table_t fs_op_table[1];
 static fs_table_t *fs_search_entry(const char *path)
 {
     fs_table_t *tmp = NULL;
+    size_t tmp_len = 0;
 
     for (int i = 0; i < FS_TABLE_SIZE; i++) {
-        if (!strncmp(fs_table[i].mount_point, padg,
-                     strlen(fs_table[i].mount_point))) {
+        if (fs_table[i].mp_len >= tmp_len &&
+            strncmp(fs_table[i].mount_point, path, fs_table[i].mp_len) == 0) {
             tmp = &(fs_table[i]);
+            tmp_len = fs_table[i].mp_len;
         }
     }
 
