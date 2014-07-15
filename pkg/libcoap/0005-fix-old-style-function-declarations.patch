@@ -1,0 +1,116 @@
+From e6d36f466b2c1568cb4cfc3a3f1f9348e71db037 Mon Sep 17 00:00:00 2001
+From: Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+Date: Tue, 15 Jul 2014 17:06:51 +0200
+Subject: [PATCH] fix old-style function declarations
+
+---
+ async.c | 2 +-
+ debug.c | 2 +-
+ debug.h | 2 +-
+ net.c   | 4 ++--
+ net.h   | 2 +-
+ pdu.c   | 2 +-
+ pdu.h   | 2 +-
+ 7 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/async.c b/async.c
+index 976bf63..21ab642 100644
+--- a/async.c
++++ b/async.c
+@@ -97,5 +97,5 @@ coap_free_async(coap_async_state_t *s) {
+ }
+ 
+ #else
+-void does_not_exist();	/* make some compilers happy */
++void does_not_exist(void);	/* make some compilers happy */
+ #endif /* WITHOUT_ASYNC */
+diff --git a/debug.c b/debug.c
+index bff3f11..241a803 100644
+--- a/debug.c
++++ b/debug.c
+@@ -38,7 +38,7 @@
+ static coap_log_t maxlog = LOG_WARNING;	/* default maximum log level */
+ 
+ coap_log_t 
+-coap_get_log_level() {
++coap_get_log_level(void) {
+   return maxlog;
+ }
+ 
+diff --git a/debug.h b/debug.h
+index dde660d..b4dae5d 100644
+--- a/debug.h
++++ b/debug.h
+@@ -30,7 +30,7 @@ typedef enum { LOG_EMERG=0, LOG_ALERT, LOG_CRIT, LOG_WARNING,
+ #endif
+ 
+ /** Returns the current log level. */
+-coap_log_t coap_get_log_level();
++coap_log_t coap_get_log_level(void);
+ 
+ /** Sets the log level to the specified value. */
+ void coap_set_log_level(coap_log_t level);
+diff --git a/net.c b/net.c
+index 83097d1..035619c 100644
+--- a/net.c
++++ b/net.c
+@@ -54,7 +54,7 @@
+ time_t clock_offset;
+ 
+ static inline coap_queue_t *
+-coap_malloc_node() {
++coap_malloc_node(void) {
+   return (coap_queue_t *)coap_malloc(sizeof(coap_queue_t));
+ }
+ 
+@@ -238,7 +238,7 @@ coap_delete_all(coap_queue_t *queue) {
+ }
+ 
+ coap_queue_t *
+-coap_new_node() {
++coap_new_node(void) {
+   coap_queue_t *node;
+   node = coap_malloc_node();
+ 
+diff --git a/net.h b/net.h
+index 59c7d59..38bc09a 100644
+--- a/net.h
++++ b/net.h
+@@ -72,7 +72,7 @@ int coap_delete_node(coap_queue_t *node);
+ void coap_delete_all(coap_queue_t *queue);
+ 
+ /** Creates a new node suitable for adding to the CoAP sendqueue. */
+-coap_queue_t *coap_new_node();
++coap_queue_t *coap_new_node(void);
+ 
+ struct coap_resource_t;
+ struct coap_context_t;
+diff --git a/pdu.c b/pdu.c
+index 04ef9c6..e3c9720 100644
+--- a/pdu.c
++++ b/pdu.c
+@@ -123,7 +123,7 @@ coap_pdu_init(unsigned char type, unsigned char code,
+ }
+ 
+ coap_pdu_t *
+-coap_new_pdu() {
++coap_new_pdu(void) {
+   coap_pdu_t *pdu;
+   
+ #ifndef WITH_CONTIKI
+diff --git a/pdu.h b/pdu.h
+index a891086..5bf2164 100644
+--- a/pdu.h
++++ b/pdu.h
+@@ -274,7 +274,7 @@ void coap_pdu_clear(coap_pdu_t *pdu, size_t size);
+  * @deprecated This function allocates the maximum storage for each
+  * PDU. Use coap_pdu_init() instead. 
+  */
+-coap_pdu_t *coap_new_pdu();
++coap_pdu_t *coap_new_pdu(void);
+ 
+ void coap_delete_pdu(coap_pdu_t *);
+ 
+-- 
+2.0.1
+
