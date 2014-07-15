@@ -28,6 +28,8 @@
 #include "periph/gpio.h"
 #include "radio.h"
 
+void delay(uint32_t microseconds);
+
 /**
  * This example assumes that on GPIO pins 1 and 6 are LEDs connected.
  * This is just necessary to check the current status of a board without using the UART.
