@@ -42,9 +42,6 @@ int main(void)
     gpio_init_out(GPIO_6, GPIO_NOPULL); 
     gpio_init_out(GPIO_1, GPIO_NOPULL);
 
-    gpio_set(GPIO_1);
-    LED_RED_ON;
-
     radioConfig();
     char msg = 'Q';
     while(1) {
@@ -56,13 +53,4 @@ int main(void)
         delay(100*1000);
     }
     return 0;
-}
-
-void delay(uint32_t microseconds){
-    /* perform busy-waiting for specified number of microseconds  */
-    uint32_t cycles = microseconds ;
-    for (int i = 0; i < cycles; i++) {
-        asm("nop");
-    }
-
 }

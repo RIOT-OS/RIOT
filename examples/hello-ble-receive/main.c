@@ -40,9 +40,6 @@ int main(void)
     gpio_init_out(GPIO_6, GPIO_NOPULL);
     gpio_init_out(GPIO_1, GPIO_NOPULL);
 
-    gpio_set(GPIO_1);
-    LED_RED_ON;
-
     radioConfig();
 
 	while(1) {
