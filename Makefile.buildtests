@@ -179,6 +179,10 @@ info-build:
 	@echo ''
 	@echo 'DEBUGGER:       $(DEBUGGER)'
 	@echo 'DEBUGGER_FLAGS: $(DEBUGGER_FLAGS)'
+	@echo
+	@echo 'DOWNLOAD_TO_FILE:   $(DOWNLOAD_TO_FILE)'
+	@echo 'DOWNLOAD_TO_STDOUT: $(DOWNLOAD_TO_STDOUT)'
+	@echo 'UNZIP_HERE:         $(UNZIP_HERE)'
 	@echo ''
 	@echo 'DEBUGSERVER:       $(DEBUGSERVER)'
 	@echo 'DEBUGSERVER_FLAGS: $(DEBUGSERVER_FLAGS)'
