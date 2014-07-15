@@ -484,3 +484,14 @@ void radioConfig(void)
 
 
 }
+
+
+
+void delay(uint32_t microseconds){
+    /* perform busy-waiting for specified number of microseconds  */
+    uint32_t cycles = microseconds ;
+    for (int i = 0; i < cycles; i++) {
+        asm("nop");
+    }
+
+}
