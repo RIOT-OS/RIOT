@@ -119,7 +119,7 @@ int timer_clear(tim_t dev, int channel)
 {
 
     switch (dev) {
-#if TIMER_0_DIS
+#if TIMER_0_EN
 
         case TIMER_0:
             switch (channel) {
@@ -144,7 +144,7 @@ int timer_clear(tim_t dev, int channel)
 
             break;
 #endif
-#if TIMER_1_DIS
+#if TIMER_1_EN
 
         case TIMER_1:
             switch (channel) {
@@ -170,7 +170,7 @@ int timer_clear(tim_t dev, int channel)
 
             break;
 #endif
-#if TIMER_2_DIS
+#if TIMER_2_EN
 
         case TIMER_2:
             switch (channel) {
