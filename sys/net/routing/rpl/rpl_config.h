@@ -30,6 +30,10 @@
 #define ICMP_CODE_DIO               0x01
 #define ICMP_CODE_DAO               0x02
 #define ICMP_CODE_DAO_ACK           0x03
+#define ICMP_CODE_P2P_DRO           0x04
+/* REMOVE ASAP, this is not the proper value */
+#define ICMP_CODE_P2P_DIO           0x05
+
 /* packet base lengths */
 #define DIO_BASE_LEN                24
 #define DIS_BASE_LEN                2
@@ -43,6 +47,7 @@
 #define RPL_OPT_SOLICITED_INFO_LEN  19
 #define RPL_OPT_TARGET_LEN          18
 #define RPL_OPT_TRANSIT_LEN         4
+#define RPL_OPT_P2P_RDO_BASE_LEN    36
 
 /* message options */
 #define RPL_OPT_PAD1                 0
@@ -55,6 +60,7 @@
 #define RPL_OPT_SOLICITED_INFO       7
 #define RPL_OPT_PREFIX_INFO          8
 #define RPL_OPT_TARGET_DESC          9
+#define RPL_OPT_RDO                  10     
 
 /* Counters */
 #define RPL_COUNTER_MAX                 255

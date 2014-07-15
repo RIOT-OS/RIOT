@@ -48,6 +48,11 @@ void rpl_udp_ignore(int argc, char **argv);
 /* monitoring thread */
 void rpl_udp_monitor(void);
 
+/* initiates p2p route discovery, TODO ASAP */
+void init_p2p_mode(int argc, char **argv);
+void start_p2p(int argc, char **argv);
+void send_p2p(int argc, char **argv);
+
 extern radio_address_t id;
 extern ipv6_addr_t std_addr;
 extern char addr_str[IPV6_MAX_ADDR_STR_LEN];

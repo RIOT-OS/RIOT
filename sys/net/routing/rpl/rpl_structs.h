@@ -22,6 +22,61 @@
 #define RPL_STRUCTS_H_INCLUDED
 /* Modes of Operation */
 
+/* P2P-DIO (RFC6997 section 6.1) */
+struct __attribute__((packed)) rpl_p2p_dio_t {
+    uint8_t rpl_instanceid;
+    uint8_t version_number;
+    uint16_t rank;
+    uint8_t g_mop_prf;
+    uint8_t dtsn;
+    uint8_t flags;
+    uint8_t reserved;
+    ipv6_addr_t dodagid;
+};
+
+/* RDO Option (RFC 6997) */
+/* so far absolutely NOT compliant with the spec, just playing */
+typedef struct __attribute__((packed)) {
+	uint8_t type;
+	uint8_t length;
+    uint8_t source_id;
+    uint8_t target_id;
+    ipv6_addr_t source_addr;
+    ipv6_addr_t target_addr;
+    ipv6_addr_t address[10];
+} rpl_opt_rdo_t;
+
+/* DODAG Configuration-Option (RFC 6550 Fig. 24) */
+typedef struct __attribute__((packed)) {
+    uint8_t type;
+    uint8_t length;
+    uint8_t flags_a_pcs;
+    uint8_t DIOIntDoubl;
+    uint8_t DIOIntMin;
+    uint8_t DIORedun;
+    uint16_t MaxRankIncrease;
+    uint16_t MinHopRankIncrease;
+    uint16_t ocp;
+    uint8_t reserved;
+    uint8_t default_lifetime;
+    uint16_t lifetime_unit;
+} rpl_opt_dodag_conf_t;
+
+/* RDO Option (RFC 6997 Fig. 1) */
+//typedef struct __attribute__((packed)) {
+//	uint8_t type;
+//   uint8_t length;
+//    uint8_t reply : 1;
+//    uint8_t hop_by_hop : 1;
+//    uint8_t num_routes : 2;
+//    uint8_t compr : 4;
+//    uint8_t lifetime : 2; /* 0x00: 1 second, 0x01: 4 seconds, 0x02: 16 seconds, 0x03: 64 seconds */
+//    uint8_t max_rank : 6;
+//    ipv6_addr_t target_addr;
+//   ipv6_addr_t address[]; /* This is a vector of IPv6 addresses representing a complete route so far in the forward direction */  
+//} rpl_opt_rdo_t;
+
+
 /* DIO Base Object (RFC 6550 Fig. 14) */
 struct __attribute__((packed)) rpl_dio_t {
     uint8_t rpl_instanceid;
@@ -31,6 +86,17 @@ struct __attribute__((packed)) rpl_dio_t {
     uint8_t dtsn;
     uint8_t flags;
     uint8_t reserved;
+    ipv6_addr_t dodagid;
+};
+
+/* P2P-DRO (RFC 6997 Fig. 2) */
+struct __attribute__((packed)) rpl_p2p_dro_t {
+    uint8_t rpl_instanceid;
+    uint8_t version_number;
+    uint16_t stop : 1;
+    uint16_t ack_rqd : 1;
+    uint16_t seq : 2;
+    uint16_t reserved : 12;
     ipv6_addr_t dodagid;
 };
 
@@ -66,22 +132,6 @@ typedef struct __attribute__((packed)) {
     uint8_t type;
     uint8_t length;
 } rpl_opt_t;
-
-/* DODAG Configuration-Option (RFC 6550 Fig. 24) */
-typedef struct __attribute__((packed)) {
-    uint8_t type;
-    uint8_t length;
-    uint8_t flags_a_pcs;
-    uint8_t DIOIntDoubl;
-    uint8_t DIOIntMin;
-    uint8_t DIORedun;
-    uint16_t MaxRankIncrease;
-    uint16_t MinHopRankIncrease;
-    uint16_t ocp;
-    uint8_t reserved;
-    uint8_t default_lifetime;
-    uint16_t lifetime_unit;
-} rpl_opt_dodag_conf_t;
 
 /* RPL Solicited Information Option (RFC 6550 Fig. 28) */
 typedef struct __attribute__((packed)) {

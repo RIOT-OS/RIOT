@@ -39,6 +39,9 @@ const shell_command_t shell_commands[] = {
     {"server", "Starts a UDP server", udp_server},
     {"send", "Send a UDP datagram", udp_send},
     {"ign", "ignore node", rpl_udp_ignore},
+    {"in", "Initiates p2p mode", init_p2p_mode},
+    {"st", "Starts p2p route discovery", start_p2p},
+    {"send_p2p", "Sends a p2p mode DIO", send_p2p},
     {NULL, NULL, NULL}
 };
 

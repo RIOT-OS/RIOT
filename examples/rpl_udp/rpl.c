@@ -30,7 +30,7 @@
 #include "demo.h"
 #include "transceiver.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 #define TRANSCEIVER TRANSCEIVER_DEFAULT
@@ -224,4 +224,100 @@ void rpl_udp_dodag(int argc, char **argv)
     }
 
     printf("---------------------------\n");
+}
+
+// TODO, remove asap, does more or less what set_id and rpl_udp_init() performs
+void init_p2p_mode(int argc, char **argv)
+{
+	transceiver_command_t tcmd;
+    msg_t m;
+    uint8_t chan = RADIO_CHANNEL;
+
+    /* setting the id */
+    if (argc != 2) {
+        printf("usage: p2p <addr>\n");
+        printf("\taddress must be an 8 bit integer\n");
+        printf("\n\t(Current address is %u)\n", id);
+        return;
+    }
+    
+	// implement setting a node
+
+    id = atoi(argv[1]);
+    printf("Set node ID to %u\n", id);
+	set_id(id);
+	
+
+    uint8_t state;
+
+	printf("INFO: Initialize on address %d\n", id);
+
+	if (!id || (id > 255)) {
+		printf("ERROR: address not a valid 8 bit integer\n");
+		return;
+	}
+
+	DEBUGF("Setting HW address to %u\n", id);
+	net_if_set_hardware_address(0, id);
+
+	DEBUGF("Initializing RPL for interface 0\n");
+	state = rpl_init(0);
+
+	if (state != SIXLOWERROR_SUCCESS) {
+		printf("Error initializing RPL\n");
+	}
+	else {
+		puts("6LoWPAN and RPL initialized.");
+	}
+
+	DEBUGF("Start monitor\n");
+	int monitor_pid = thread_create(monitor_stack_buffer, MONITOR_STACK_SIZE, PRIORITY_MAIN - 2, CREATE_STACKTEST, rpl_udp_monitor, "monitor");
+	DEBUGF("Register at transceiver %02X\n", TRANSCEIVER);
+	transceiver_register(TRANSCEIVER, monitor_pid);
+	ipv6_register_packet_handler(monitor_pid);
+	//sixlowpan_lowpan_register(monitor_pid);
+
+    /* TODO: check if this works as intended */
+    ipv6_addr_t prefix, tmp;
+    ipv6_addr_init(&std_addr, 0xABCD, 0xEF12, 0, 0, 0x1034, 0x00FF, 0xFE00, id);
+    ipv6_addr_init_prefix(&prefix, &std_addr, 64);
+    ndp_add_prefix_info(0, &prefix, 64, NDP_OPT_PI_VLIFETIME_INFINITE,
+                        NDP_OPT_PI_PLIFETIME_INFINITE, 1,
+                        ICMPV6_NDP_OPT_PI_FLAG_AUTONOM);
+    ipv6_init_as_router();
+    /* add global address */
+    ipv6_addr_set_by_eui64(&tmp, 0, &std_addr);
+    ipv6_net_if_add_addr(0, &tmp, NDP_ADDR_STATE_PREFERRED, 0, 0, 0);
+
+    /* set channel to 10 */
+    tcmd.transceivers = TRANSCEIVER;
+    tcmd.data = &chan;
+    m.type = SET_CHANNEL;
+    m.content.ptr = (void *) &tcmd;
+
+    msg_send_receive(&m, &m, transceiver_pid);
+    printf("Channel set to %u\n", RADIO_CHANNEL);
+
+    puts("Destiny initialized");
+    /* start transceiver watchdog */
+}
+
+void start_p2p(int argc, char **argv)
+{
+	if (argc != 2) {
+        printf("usage: start_p2p <target_id>\n");
+        return;
+    }
+    
+    start_P2P_route_discovery(atoi(argv[1]));
+}
+
+void send_p2p(int argc, char **argv)
+{
+	if (argc != 2) {
+        printf("usage: send_p2p <target_id>\n");
+        return;
+    }
+    
+    send_P2P_DIO(atoi(argv[1]));
 }
