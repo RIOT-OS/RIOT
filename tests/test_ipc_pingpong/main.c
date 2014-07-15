@@ -23,7 +23,6 @@
 
 #include "thread.h"
 #include "msg.h"
-#include "kernel.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"

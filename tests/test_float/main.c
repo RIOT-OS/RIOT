@@ -19,8 +19,9 @@
  */
 
 #include <stdio.h>
-#include <board.h>
 #include <math.h>
+
+#include "board.h"
 
 int main(void)
 {

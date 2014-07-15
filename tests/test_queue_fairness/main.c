@@ -17,8 +17,6 @@
 
 #include <stdio.h>
 
-#include "flags.h"
-#include "kernel.h"
 #include "msg.h"
 #include "sched.h"
 #include "thread.h"

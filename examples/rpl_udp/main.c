@@ -26,7 +26,6 @@
 #include "shell_commands.h"
 #include "board_uart0.h"
 #include "destiny.h"
-#include "kernel.h"
 
 #include "demo.h"
 

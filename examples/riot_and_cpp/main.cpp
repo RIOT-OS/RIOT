@@ -25,7 +25,6 @@
  * all included headers defining c functions, i.e. all RIOT functions, must be marked as extern "C"
  */
 extern "C" {
-#include "kernel.h"
 #include "thread.h"
 
 #include "c_functions.h"

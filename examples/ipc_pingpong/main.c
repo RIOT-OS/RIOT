@@ -23,7 +23,6 @@
 
 #include "thread.h"
 #include "msg.h"
-#include "kernel.h"
 
 void *second_thread(void *arg)
 {
