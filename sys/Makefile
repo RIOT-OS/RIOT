@@ -88,6 +88,9 @@ endif
 ifneq (,$(filter quad_math,$(USEMODULE)))
     DIRS += quad_math
 endif
+ifneq (,$(filter elfloader,$(USEMODULE)))
+    DIRS += elfloader
+endif
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
     DIRS += oneway-malloc
 endif

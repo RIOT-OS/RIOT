@@ -1,0 +1,14 @@
+#!/bin/sh
+
+#echo \#ifndef __SYMBOLS_H__ > symbols.h
+#echo \#define __SYMBOLS_H__ >> symbols.h
+#echo \#include '"symbols-def.h"' >> symbols.h
+#echo "extern const struct symbols symbols[0];" >> symbols.h
+#echo \#endif >> symbols.h
+
+echo \#include '"symbols.h"' > symbols.c
+echo "const int symbols_nelts = 0;" >> symbols.c
+echo "" >> symbols.c
+echo "const struct symbols symbols[0] = {" >> symbols.c
+echo "{(void *)0, 0} };" >> symbols.c
+
