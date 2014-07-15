@@ -61,7 +61,17 @@ int i = 0;
 #define LED_YELLOW 6
 #define LED_WHITE 7
 
+void delay(uint32_t microseconds){
+    /* perform busy-waiting for specified number of microseconds  */
+    uint32_t cycles = microseconds ;
+    for (int i = 0; i < cycles; i++) {
+        asm("nop");
+    }
+
+}
+
 void led(int color) {
+#if ONBOARD_LED
   switch (color) {
   case LED_NONE:
     LED_RED_OFF;
@@ -112,6 +122,7 @@ void led(int color) {
     LED_BLUE_ON;
     break;
   }
+#endif
 }
 
 /**
@@ -142,6 +153,7 @@ char receivePacket(void) {
     //Radio disabled state 0
     gpio_clear(GPIO_1);
     gpio_clear(GPIO_6);
+
 
     led(LED_RED);
     delay(1000000);

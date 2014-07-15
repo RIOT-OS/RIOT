@@ -39,6 +39,7 @@
  * @name LED pin definitions
  * @{
  */
+#define ONBOARD_LED         1
 #define LED_RED_PIN         (1 << 21)
 #define LED_GREEN_PIN       (1 << 22)
 #define LED_BLUE_PIN        (1 << 23)
