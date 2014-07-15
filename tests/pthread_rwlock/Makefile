@@ -1,6 +1,9 @@
 APPLICATION = pthread_rwlock
 include ../Makefile.tests_common
 
+BOARD_BLACKLIST := arduino-mega2560
+# arduino-mega2560: unknown type name: clockid_t
+
 USEMODULE += pthread
 USEMODULE += vtimer
 USEMODULE += random

@@ -30,7 +30,7 @@ QUIET ?= 1
 # Blacklist boards
 BOARD_BLACKLIST := arduino-due avsextrem chronos mbed_lpc1768 msb-430h msba2 redbee-econotag \
                    telosb wsn430-v1_3b wsn430-v1_4 msb-430 pttu udoo qemu-i386 z1 stm32f0discovery \
-                   stm32f3discovery stm32f4discovery pca10000 pca10005 iot-lab_M3
+                   stm32f3discovery stm32f4discovery pca10000 pca10005 iot-lab_M3 arduino-mega2560
 
 # This example only works with native for now.
 # msb430-based boards: msp430-g++ is not provided in mspgcc.
@@ -42,6 +42,7 @@ BOARD_BLACKLIST := arduino-due avsextrem chronos mbed_lpc1768 msb-430h msba2 red
 # pca10000:         g++ does not support some used flags (e.g. -mthumb...)
 # pca10005:         g++ does not support some used flags (e.g. -mthumb...)
 # iot-lab_M3: g++ does not support some used flags (e.g. -mthumb...)
+# arduino-mega2560: cstdio header missing from avr-libc
 # others: untested.
 
 # If you want to add some extra flags when compile c++ files, add these flags

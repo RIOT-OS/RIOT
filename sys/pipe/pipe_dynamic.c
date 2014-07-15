@@ -25,7 +25,11 @@
  * @}
  */
 
+#if defined(MCU_ATMEGA2560)
+#include <stdlib.h>
+#else
 #include <malloc.h>
+#endif
 
 #include "pipe.h"
 
