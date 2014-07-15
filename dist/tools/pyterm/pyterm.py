@@ -6,7 +6,7 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
-import cmd, serial, sys, threading, readline, time, logging, os
+import cmd, serial, sys, threading, readline, time, logging, os, codecs
 
 pytermdir     = os.environ['HOME'] + os.path.sep + '.pyterm'
 
@@ -128,9 +128,10 @@ class SerCmd(cmd.Cmd):
 
 
 def reader(ser, logger):
+    sr = codecs.getreader("UTF-8")(ser, errors='replace')
     output = ""
     while (1):
-        c = ser.read(1).decode("utf-8")
+        c = sr.read(1)
         if c == '\n' or c == '\r':
             logger.info(output)
             output = ""
