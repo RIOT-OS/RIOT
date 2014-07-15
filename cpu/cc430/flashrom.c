@@ -34,9 +34,10 @@ uint8_t flashrom_erase(uint8_t *addr)
     return 0;
 }
 /*---------------------------------------------------------------------------*/
-void flashrom_write(uint8_t *dst, uint8_t *src, size_t size)
+uint8_t flashrom_write(uint8_t *dst, const uint8_t *src, size_t size)
 {
     // TODO implement this function
+    return 0;
 }
 
 /*---------------------------------------------------------------------------*/
