@@ -48,6 +48,7 @@ typedef enum {
  */
 typedef struct {
     char mount_point[FS_MOUNT_POINT_LEN];   /**< mount point of the filesystem */
+    size_t mp_len;                          /**< length of mount point name */
     int device;                             /**< device the filesystem is on */
     fs_type_t type;                         /**< type of the filesystem */
 } fs_table_t;

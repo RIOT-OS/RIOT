@@ -44,6 +44,12 @@ int fs_mount(const char *mount_point, int device, fs_type_t type)
     }
 
     strncpy(fs_table[i].mount_point, mount_point, FS_MOUNT_POINT_LEN);
+    fs_table[i].mp_len = strlen(mount_point);
+
+    if (fs_table[i].mp_len < 0 || fs_table[i].mp_len > FS_MOUNT_POINT_LEN) {
+        fs_table[i].mp_len = FS_MOUNT_POINT_LEN;
+    }
+
     fs_table[i].device = device;
     fs_table[i].type = type;
 
