@@ -28,13 +28,15 @@ RIOTBASE ?= $(CURDIR)/../..
 QUIET ?= 1
 
 # Blacklist boards
-BOARD_BLACKLIST := arduino-due avsextrem chronos mbed_lpc1768 msb-430h msba2 redbee-econotag telosb wsn430-v1_3b wsn430-v1_4 msb-430 pttu udoo qemu-i386 z1 \
-	 			   stm32f0discovery
+BOARD_BLACKLIST := arduino-due avsextrem chronos mbed_lpc1768 msb-430h msba2 redbee-econotag \
+                   telosb wsn430-v1_3b wsn430-v1_4 msb-430 pttu udoo qemu-i386 z1 stm32f0discovery \
+                   stm32f4discovery
 # This example only works with native for now.
 # msb430-based boards: msp430-g++ is not provided in mspgcc.
 # (People who want use c++ can build c++ compiler from source, or get binaries from Energia http://energia.nu/)
 # msba2: some changes should be applied to successfully compile c++. (_kill_r, _kill, __dso_handle)
 # stm32f0discovery: g++ does not support some used flags (e.g. -mthumb...)
+# stm32f4discovery: g++ does not support some used flags (e.g. -mthumb...)
 # others: untested.
 
 # If you want to add some extra flags when compile c++ files, add these flags
