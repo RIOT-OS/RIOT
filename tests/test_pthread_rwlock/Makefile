@@ -9,6 +9,6 @@ DISABLE_MODULE += auto_init
 
 CFLAGS += -DNATIVE_AUTO_EXIT
 
-BOARD_INSUFFICIENT_RAM += chronos mbed_lpc1768 msb-430 msb-430h
+BOARD_INSUFFICIENT_RAM += chronos mbed_lpc1768 msb-430 msb-430h stm32f0discovery
 
 include $(RIOTBASE)/Makefile.include

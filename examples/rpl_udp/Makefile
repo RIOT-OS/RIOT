@@ -35,11 +35,12 @@ ifeq ($(shell $(CC) -Wno-cpp -E - 2>/dev/null >/dev/null dev/null ; echo $$?),0)
 endif
 
 BOARD_INSUFFICIENT_RAM := chronos msb-430h redbee-econotag telosb wsn430-v1_3b wsn430-v1_4 z1
-BOARD_BLACKLIST := arduino-due mbed_lpc1768 msb-430 pttu udoo qemu-i386
-# mbed_lpc1768: see https://github.com/RIOT-OS/RIOT/issues/675
-# msb-430: see https://github.com/RIOT-OS/RIOT/issues/658
-# pttu: see https://github.com/RIOT-OS/RIOT/issues/659
-# qemu-i386: no tranceiver, yet
+BOARD_BLACKLIST := arduino-due mbed_lpc1768 msb-430 pttu udoo qemu-i386 stm32f0discovery
+# mbed_lpc1768:     see https://github.com/RIOT-OS/RIOT/issues/675
+# msb-430:          see https://github.com/RIOT-OS/RIOT/issues/658
+# pttu:             see https://github.com/RIOT-OS/RIOT/issues/659
+# qemu-i386:        no transceiver, yet
+# stm32f0discovery: no transceiver, yet
 
 # Modules to include:
 
