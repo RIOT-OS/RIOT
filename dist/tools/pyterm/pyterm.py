@@ -5,9 +5,17 @@ try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
+try:
+    from twisted.internet import reactor
+    from twisted.internet.protocol import Protocol, ReconnectingClientFactory
+except ImportError:
+    class Protocol():
+        def __init__(self):
+            pass
+    class ReconnectingClientFactory():
+        def __init__(self):
+            pass
 
-from twisted.internet import reactor
-from twisted.internet.protocol import Protocol, ReconnectingClientFactory
 import cmd, serial, socket, sys, threading, readline, time, logging, os, argparse, re, codecs, signal
 
 ### set some default options
