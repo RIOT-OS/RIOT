@@ -5,18 +5,23 @@ try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
+
+
+import cmd, serial, socket, sys, threading, readline, time, logging, os, argparse, re, codecs, signal
+
+### import twisted if available, define dummy classes otherwise
 try:
     from twisted.internet import reactor
     from twisted.internet.protocol import Protocol, ReconnectingClientFactory
 except ImportError:
+    logging.getLogger("").warn("Twisted not available, please install it if you want to use pyterm's JSON capabilities")
+
     class Protocol():
         def __init__(self):
             pass
     class ReconnectingClientFactory():
         def __init__(self):
             pass
-
-import cmd, serial, socket, sys, threading, readline, time, logging, os, argparse, re, codecs, signal
 
 ### set some default options
 import platform
