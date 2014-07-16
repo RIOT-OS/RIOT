@@ -56,6 +56,7 @@
 #include "mc1322x.h"
 #include "maca.h"
 #include "maca_packet.h"
+#include "ieee802154_frame.h"
 #define TEXT_SIZE           MACA_MAX_PAYLOAD_SIZE
 #define _TC_TYPE            TRANSCEIVER_MC1322X
 #endif
@@ -220,7 +221,11 @@ void _transceiver_send_handler(int argc, char **argv)
         return;
     }
 
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+    ieee802154_packet_t p;
+#else
     radio_packet_t p;
+#endif
 
     transceiver_command_t tcmd;
     tcmd.transceivers = _TC_TYPE;
@@ -230,15 +235,27 @@ void _transceiver_send_handler(int argc, char **argv)
     memset(text_msg, 0, TEXT_SIZE);
     strcpy(text_msg, argv[2]);
 
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+    p.frame.payload = (uint8_t*) text_msg;
+    p.frame.payload_len = strlen(text_msg) + 1;
+    p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
+    memset(p.frame.dest_addr, 0, sizeof(p.frame.dest_addr));
+    p.frame.dest_addr[7] = atoi(argv[1]);
+#else
     p.data = (uint8_t *) text_msg;
     p.length = strlen(text_msg) + 1;
     p.dst = atoi(argv[1]);
+#endif
 
     msg_t mesg;
     mesg.type = SND_PKT;
     mesg.content.ptr = (char *) &tcmd;
 
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+    printf("[transceiver] Sending packet of length %" PRIu16 " to %" PRIu16 ": %s\n", p.frame.payload_len, p.frame.dest_addr[7], (char*) p.frame.payload);
+#else
     printf("[transceiver] Sending packet of length %" PRIu16 " to %" PRIu16 ": %s\n", p.length, p.dst, (char*) p.data);
+#endif
     msg_send_receive(&mesg, &mesg, transceiver_pid);
     int8_t response = mesg.content.value;
     printf("[transceiver] Packet sent: %" PRIi8 "\n", response);
