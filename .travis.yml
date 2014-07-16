@@ -24,6 +24,7 @@ install:
     - sudo apt-get install qemu-system-x86 python3
     - sudo apt-get install g++-multilib
     - sudo apt-get install gcc-avr binutils-avr avr-libc
+    - sudo apt-get install cppcheck
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
 
@@ -39,6 +40,10 @@ script:
     - make -C ./tests/unittests test BOARD=native
     - make -C ./tests/unittests test BOARD=qemu-i386
     - ./dist/tools/licenses/check.sh master
+# TODO:
+#   Remove the --error-exitcode=0` when all warnings of cppcheck have been
+#   taken care of in master.
+    - ./dist/tools/cppcheck/check.sh master --error-exitcode=0
 
 notifications:
     email: false
