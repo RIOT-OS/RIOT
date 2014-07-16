@@ -10,6 +10,65 @@
  * @defgroup    core_sched Scheduler
  * @ingroup     core
  * @brief       The RIOT scheduler
+ * @details
+ *
+ * RIOT features a tickless, preemptive, priority based scheduler.
+ * Context switches can occur either preemptively (i.e. on interrupts),
+ * voluntarily, or when a blocking operation (like `msg_receive()`) is
+ * executed.
+ * Being tickless means it does not have a timer that fires
+ * periodically in order to emulate concurrent execution by switching
+ * threads continuously.
+ *
+ * ## Priorities:
+ *
+ * Every thread is given a priority on creation. The priority values
+ * are "order" or "nice" values, i.e. a higher value means a lower
+ * priority.
+ *
+ * ### Example:
+ *
+ * Given threads with priorities A=6, B=1, and C=3, B has the highest
+ * priority.
+ * 
+ * A higher priority means that the scheduler will run this thread
+ * whenever it becomes runnable instead of a thread with a lower
+ * priority.
+ * In case of equal priorities, the threads are scheduled in a
+ * semi-cooperative fashion. That means that unless an interrupt
+ * happens, threads with the same priority will only switch due to
+ * voluntary or implicit context switches.
+ *
+ * ## Interrupts:
+ *
+ * When an interrupt occurs, e.g. because a timer fired or a network
+ * packet was received, the active context is saved and an interrupt
+ * service routine (ISR) that handles the interrupt is executed in
+ * another context.
+ * When the ISR is finished, the `::sched_context_switch_request` flag
+ * can be checked. In case it is set, the `sched_run()` function is
+ * called to determine the next active thread. (In the special case
+ * that the ISR knows that it can not enable a thread switch, this
+ * check can of course be omitted.)
+ * If the flag is not set, the original context is being restored and
+ * the thread resumes immediately.
+ *
+ * ## Voluntary Context Switches:
+ *
+ * There are two function calls that can lead to a voluntary context
+ * switch: `thread_yield()` and `thread_sleep()`.
+ * While the latter disables (think blocks) the thread until it is
+ * woken (think unblocked) again via `thread_wakeup()`, the former only
+ * leads to a context switch in case there is another runnable thread
+ * with at least the same priority.
+ *
+ * ## Implicit Context Switches:
+ *
+ * Some functions that unblock another thread, e.g. `msg_send()` or
+ * `mutex_unlock()`, can cause a thread switch, if the target had a
+ * higher priority.
+ *
+ *
  * @{
  *
  * @file        sched.h
