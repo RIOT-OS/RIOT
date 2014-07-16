@@ -1,7 +1,7 @@
 /**
  * virtual timer
  *
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2013, 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -323,6 +323,19 @@ int vtimer_usleep(uint32_t usecs)
 
 int vtimer_sleep(timex_t time)
 {
+    /**
+     * Use spin lock for short periods.
+     * Assumes that hardware timer ticks are shorter than a second.
+     * Decision based on hwtimer_wait implementation.
+     */
+    if (time.seconds == 0) {
+        unsigned long ticks = HWTIMER_TICKS(time.microseconds);
+        if (ticks <= 6) {
+            hwtimer_spin(ticks);
+            return 0;
+        }
+    }
+
     int ret;
     vtimer_t t;
     mutex_t mutex;
