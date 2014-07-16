@@ -148,33 +148,40 @@
  * @name PWM configuration
  * @{
  */
-#define PWM_NUMOF           (0U)                                                /* TODO !!!!!!! */
-#define PWM_0_EN            0
-#define PWM_1_EN            0
+#define PWM_NUMOF           (2U)
+#define PWM_0_EN            1
+#define PWM_1_EN            1
+#define PWM_MAX_CHANNELS    4
 
 /* PWM 0 device configuration */
 #define PWM_0_DEV           TIM1
 #define PWM_0_CHANNELS      4
+#define PWM_0_CLK           (168000000U)
+#define PWM_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_TIM1EN)
+#define PWM_0_CLKDIS()      (RCC->APB2ENR &= ~RCC_APB2ENR_TIM1EN)
 /* PWM 0 pin configuration */
-#define PWM_0_PORT
-#define PWM_0_PINS
-#define PWM_0_PORT_CLKEN()
-#define PWM_0_CH1_AFCFG()
-#define PWM_0_CH2_AFCFG()
-#define PWM_0_CH3_AFCFG()
-#define PWM_0_CH4_AFCFG()
+#define PWM_0_PORT          GPIOE
+#define PWM_0_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN)
+#define PWM_0_PIN_CH0       9
+#define PWM_0_PIN_CH1       11
+#define PWM_0_PIN_CH2       13
+#define PWM_0_PIN_CH3       14
+#define PWM_0_PIN_AF        1
 
 /* PWM 1 device configuration */
 #define PWM_1_DEV           TIM3
-#define PWM_1_CHANNELS      4
+#define PWM_1_CHANNELS      3
+#define PWM_1_CLK           (84000000U)
+#define PWM_1_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_TIM3EN)
+#define PWM_1_CLKDIS()      (RCC->APB1ENR &= ~RCC_APB1ENR_TIM3EN)
 /* PWM 1 pin configuration */
-#define PWM_1_PORT
-#define PWM_1_PINS
-#define PWM_1_PORT_CLKEN()
-#define PWM_1_CH1_AFCFG()
-#define PWM_1_CH2_AFCFG()
-#define PWM_1_CH3_AFCFG()
-#define PWM_1_CH4_AFCFG()
+#define PWM_1_PORT          GPIOB
+#define PWM_1_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define PWM_1_PIN_CH0       4
+#define PWM_1_PIN_CH1       5
+#define PWM_1_PIN_CH2       0
+#define PWM_1_PIN_CH3       1
+#define PWM_1_PIN_AF        2
 /** @} */
 
 
