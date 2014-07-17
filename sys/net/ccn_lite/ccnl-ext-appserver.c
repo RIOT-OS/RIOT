@@ -168,7 +168,7 @@ static void riot_ccnl_appserver_register(void)
 
 void *ccnl_riot_appserver_start(void *arg)
 {
-	kernel_pid_t _relay_pid = (kernel_pid_t) arg;
+    kernel_pid_t _relay_pid = *((kernel_pid_t*) arg);
     relay_pid = _relay_pid;
     riot_ccnl_appserver_register();
     riot_ccnl_appserver_ioloop();
