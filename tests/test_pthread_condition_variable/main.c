@@ -22,7 +22,7 @@
 #include "pthread.h"
 #include "thread.h"
 
-static mutex_t mutex;
+static mutex_t mutex = MUTEX_INIT;
 static struct pthread_cond_t cv;
 static volatile int is_finished;
 static volatile long count;
@@ -55,7 +55,6 @@ int main(void)
     count = 0;
     is_finished = 0;
     expected_value = 1000*1000;
-    mutex_init(&mutex);
     pthread_cond_init(&cv, NULL);
 
     int pid = thread_create(stack,

@@ -121,14 +121,14 @@ uint8_t frag_size;
 uint8_t reas_buf[512];
 uint8_t comp_buf[512];
 uint8_t first_frag = 0;
-mutex_t fifo_mutex;
+mutex_t fifo_mutex = MUTEX_INIT;
 
 int ip_process_pid = 0;
 int nd_nbr_cache_rem_pid = 0;
 int contexts_rem_pid = 0;
 int transfer_pid = 0;
 
-mutex_t lowpan_context_mutex;
+mutex_t lowpan_context_mutex = MUTEX_INIT;
 
 /* registered upper layer threads */
 int sixlowpan_reg[SIXLOWPAN_MAX_REGISTERED];
@@ -1787,12 +1787,6 @@ int sixlowpan_lowpan_init(void)
 
     /* init mac-layer and radio transceiver */
     sixlowpan_mac_init();
-
-    /* init lowpan context mutex */
-    mutex_init(&lowpan_context_mutex);
-
-    /* init packet_fifo mutex */
-    mutex_init(&fifo_mutex);
 
     if (!ip_process_pid) {
         ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,

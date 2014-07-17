@@ -85,7 +85,7 @@ static void transmission_start(void);
 static inline void clk_signal(void);
 
 /* mutex for exclusive measurement operation */
-mutex_t sht11_mutex;
+mutex_t sht11_mutex = MUTEX_INIT;
 
 /*---------------------------------------------------------------------------*/
 static inline void clk_signal(void)
@@ -266,7 +266,6 @@ static uint8_t measure(uint8_t *p_value, uint8_t *p_checksum, uint8_t mode)
 void sht11_init(void)
 {
     sht11_temperature_offset = 0;
-    mutex_init(&sht11_mutex);
     SHT11_INIT;
     hwtimer_wait(11 * HWTIMER_TICKS(1000));
 }
