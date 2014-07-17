@@ -176,9 +176,7 @@ class SerCmd(cmd.Cmd):
         # otherwise go for the serial port
         elif self.port:
             self.logger.info("Connect to serial port %s" % self.port)
-            self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, dsrdtr=0, rtscts=0)
-            self.ser.setDTR(0)
-            self.ser.setRTS(0)
+            self.serial_connect()
 
         # wait until connection is established and fire startup commands to the node
         time.sleep(1)
@@ -478,6 +476,11 @@ class SerCmd(cmd.Cmd):
                 self.process_line(line)
 
 
+    def serial_connect(self):
+        self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, dsrdtr=0, rtscts=0)
+        self.ser.setDTR(0)
+        self.ser.setRTS(0)
+
     def reader(self):
         """Serial or TCP reader.
         """
@@ -494,9 +497,7 @@ class SerCmd(cmd.Cmd):
                 time.sleep(1)
                 if os.path.exists(self.port):
                     self.logger.warn("Try to reconnect to %s again..." % (self.port))
-                    self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, dsrdtr=0, rtscts=0)
-                    self.ser.setDTR(0)
-                    self.ser.setRTS(0)
+                    self.serial_connect()
                 continue
             if c == '\n' or c == '\r':
                 self.handle_line(output)
