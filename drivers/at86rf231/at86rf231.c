@@ -18,6 +18,7 @@
  * @brief       Driver implementation for at86rf231 chip
  *
  * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *
  * @}
  */
@@ -33,6 +34,8 @@ static uint16_t radio_pan;
 static uint8_t  radio_channel;
 static uint16_t radio_address;
 static uint64_t radio_address_long;
+
+uint8_t  driver_state;
 
 void at86rf231_init(kernel_pid_t tpid)
 {
@@ -103,7 +106,18 @@ void at86rf231_switch_to_rx(void)
 
 void at86rf231_rx_irq(void)
 {
-    at86rf231_rx_handler();
+    /* check if we are in sending state */
+    if (driver_state == AT_DRIVER_STATE_SENDING) {
+        /* Read IRQ to clear it */
+        at86rf231_reg_read(AT86RF231_REG__IRQ_STATUS);
+        /* clear internal state */
+        driver_state = AT_DRIVER_STATE_DEFAULT;
+        return;
+    }
+    else {
+        /* handle receive */
+        at86rf231_rx_handler();
+    }
 }
 
 radio_address_t at86rf231_set_address(radio_address_t address)
