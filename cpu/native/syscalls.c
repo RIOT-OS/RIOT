@@ -50,7 +50,9 @@ extern volatile tcb_t *sched_active_thread;
 
 ssize_t (*real_read)(int fd, void *buf, size_t count);
 ssize_t (*real_write)(int fd, const void *buf, size_t count);
+size_t (*real_fread)(void *ptr, size_t size, size_t nmemb, FILE *stream);
 void* (*real_malloc)(size_t size);
+void (*real_clearerr)(FILE *stream);
 void (*real_free)(void *ptr);
 void* (*real_calloc)(size_t nmemb, size_t size);
 void* (*real_realloc)(void *ptr, size_t size);
@@ -60,7 +62,10 @@ int (*real_fork)(void);
 int (*real_dup2)(int, int);
 int (*real_unlink)(const char *);
 int (*real_execve)(const char *, char *const[], char *const[]);
+int (*real_feof)(FILE *stream);
+int (*real_ferror)(FILE *stream);
 int (*real_pause)(void);
+FILE* (*real_fopen)(const char *path, const char *mode);
 
 void _native_syscall_enter(void)
 {

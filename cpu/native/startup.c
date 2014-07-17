@@ -161,7 +161,7 @@ void usage_exit(void)
 #endif
 
 #ifdef MODULE_UART0
-    real_printf(" [-t <port>|-u [path]]");
+    real_printf(" [-t <port>|-u [path]] [-r]");
 #endif
 
     real_printf(" [-i <id>] [-d] [-e|-E] [-o]\n");
@@ -175,7 +175,9 @@ void usage_exit(void)
     real_printf("\
 -t <port>   redirect stdio to TCP socket listening on <port>\n\
 -u <path>   redirect stdio to UNIX socket (<path> if given,\n\
-            /tmp/riot.tty.PID otherwise)\n");
+            /tmp/riot.tty.PID otherwise)\n\
+-r          replay missed output when (re-)attaching to socket\n\
+            (implies -o)\n");
 #endif
     real_printf("\
 -i <id>     specify instance id (set by config module)\n\
@@ -209,6 +211,11 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     *(void **)(&real_unlink) = dlsym(RTLD_NEXT, "unlink");
     *(void **)(&real_execve) = dlsym(RTLD_NEXT, "execve");
     *(void **)(&real_pause) = dlsym(RTLD_NEXT, "pause");
+    *(void **)(&real_fopen) = dlsym(RTLD_NEXT, "fopen");
+    *(void **)(&real_fread) = dlsym(RTLD_NEXT, "fread");
+    *(void **)(&real_feof) = dlsym(RTLD_NEXT, "feof");
+    *(void **)(&real_ferror) = dlsym(RTLD_NEXT, "ferror");
+    *(void **)(&real_clearerr) = dlsym(RTLD_NEXT, "clearerr");
 
     _native_argv = argv;
     _progname = argv[0];
@@ -223,6 +230,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     char *stdiotype = "stdio";
 #ifdef MODULE_UART0
     char *ioparam = NULL;
+    int replay = 0;
 #endif
 
 #ifdef MODULE_NATIVENET
@@ -274,6 +282,10 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
             stdouttype = "file";
         }
 #ifdef MODULE_UART0
+        else if (strcmp("-r", arg) == 0) {
+            stdouttype = "file";
+            replay = 1;
+        }
         else if (strcmp("-t", arg) == 0) {
             stdiotype = "tcp";
             if (argp + 1 < argc) {
@@ -314,7 +326,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     _native_null_in(stdiotype);
 
 #ifdef MODULE_UART0
-    _native_init_uart0(stdiotype, ioparam);
+    _native_init_uart0(stdiotype, ioparam, replay);
 #endif
 
     native_hwtimer_pre_init();
