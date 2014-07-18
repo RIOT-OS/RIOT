@@ -180,7 +180,7 @@ void handle_uart_in(void)
 
     nread = _native_read(STDIN_FILENO, buf, sizeof(buf));
     if (nread == -1) {
-        err(1, "handle_uart_in(): read()");
+        err(EXIT_FAILURE, "handle_uart_in(): read()");
     }
     else if (nread == 0) {
         /* end of file / socket closed */
@@ -200,7 +200,7 @@ void handle_uart_in(void)
             errx(EXIT_FAILURE, "handle_uart_in: unhandled situation!");
         }
     }
-    for(int pos = 0; pos < nread; pos++) {
+    for (int pos = 0; pos < nread; pos++) {
         uart0_handle_incoming(buf[pos]);
     }
     uart0_notify_thread();

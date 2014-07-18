@@ -37,8 +37,6 @@
 #include "native_internal.h"
 #include "tap.h"
 
-int (*real_printf)(const char *format, ...);
-int (*real_getpid)(void);
 int _native_null_in_pipe[2];
 int _native_null_out_file;
 const char *_progname;
@@ -55,7 +53,7 @@ const char *_native_unix_socket_path = NULL;
 void _native_null_in(char *stdiotype)
 {
     if (real_pipe(_native_null_in_pipe) == -1) {
-        err(1, "_native_null_in(): pipe()");
+        err(EXIT_FAILURE, "_native_null_in(): pipe()");
     }
 
     if (strcmp(stdiotype, "stdio") == 0) {
@@ -196,26 +194,7 @@ The order of command line arguments matters.\n");
 
 __attribute__((constructor)) static void startup(int argc, char **argv)
 {
-    /* get system read/write/printf */
-    *(void **)(&real_read) = dlsym(RTLD_NEXT, "read");
-    *(void **)(&real_write) = dlsym(RTLD_NEXT, "write");
-    *(void **)(&real_malloc) = dlsym(RTLD_NEXT, "malloc");
-    *(void **)(&real_realloc) = dlsym(RTLD_NEXT, "realloc");
-    *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");
-    *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
-    *(void **)(&real_getpid) = dlsym(RTLD_NEXT, "getpid");
-    *(void **)(&real_pipe) = dlsym(RTLD_NEXT, "pipe");
-    *(void **)(&real_close) = dlsym(RTLD_NEXT, "close");
-    *(void **)(&real_fork) = dlsym(RTLD_NEXT, "fork");
-    *(void **)(&real_dup2) = dlsym(RTLD_NEXT, "dup2");
-    *(void **)(&real_unlink) = dlsym(RTLD_NEXT, "unlink");
-    *(void **)(&real_execve) = dlsym(RTLD_NEXT, "execve");
-    *(void **)(&real_pause) = dlsym(RTLD_NEXT, "pause");
-    *(void **)(&real_fopen) = dlsym(RTLD_NEXT, "fopen");
-    *(void **)(&real_fread) = dlsym(RTLD_NEXT, "fread");
-    *(void **)(&real_feof) = dlsym(RTLD_NEXT, "feof");
-    *(void **)(&real_ferror) = dlsym(RTLD_NEXT, "ferror");
-    *(void **)(&real_clearerr) = dlsym(RTLD_NEXT, "clearerr");
+    _native_init_syscalls();
 
     _native_argv = argv;
     _progname = argv[0];
