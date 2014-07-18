@@ -61,6 +61,9 @@ defaultfile     = "pyterm-" + defaulthostname + ".conf"
 ### logging subfolder
 defaultrunname  = "default-run"
 
+### default logging prefix format string
+default_fmt_str = '%(asctime)s - %(levelname)s # %(message)s'
+
 class SerCmd(cmd.Cmd):
     """Main class for pyterm based on Python's Cmd class.
 
@@ -108,6 +111,9 @@ class SerCmd(cmd.Cmd):
         self.json_regs = dict()
         self.init_cmd = []
         self.load_config()
+        self.fmt_str = None
+        if not self.fmt_str:
+            self.fmt_str = default_fmt_str
 
         # check for a history file
         try:
@@ -120,14 +126,13 @@ class SerCmd(cmd.Cmd):
         date_str = '{}.{}'.format(time.strftime('%Y%m%d-%H:%M:%S'), my_millis[-4:])
         self.startup = date_str
         # create formatter
-        fmt_str = '%(asctime)s - %(levelname)s # %(message)s'
-        formatter = logging.Formatter(fmt_str)
+        formatter = logging.Formatter(self.fmt_str)
 
         directory = self.configdir + os.path.sep + self.host
         if not os.path.exists(directory):
             os.makedirs(directory)
         logging.basicConfig(filename=directory + os.path.sep + self.run_name + '.log', \
-                            level=logging.DEBUG, format=fmt_str)
+                            level=logging.DEBUG, format=self.fmt_str)
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)
 
