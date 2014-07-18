@@ -33,6 +33,10 @@
 #include "hwtimer.h"
 #endif
 
+#ifdef MODULE_MULTITASKING
+#include "multitasking.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -117,6 +121,10 @@ void sched_run(void)
     }
 
     sched_active_thread = (volatile tcb_t *) my_active_thread;
+
+#ifdef MODULE_MULTITASKING
+    multitasking_sched_ran();
+#endif
 
     DEBUG("scheduler: done.\n");
 }

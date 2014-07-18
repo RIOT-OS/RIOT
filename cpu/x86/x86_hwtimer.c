@@ -270,7 +270,7 @@ static bool set_next_alarm(bool may_call)
                   timer_i, us_future, may_call);
             if (!may_call) {
                 msg_t m;
-                msg_send_int(&m, hwtimer_pid);
+                msg_send_int(&m, x86_hwtimer_pid);
                 return true;
             }
             else {
@@ -317,7 +317,7 @@ static bool set_next_alarm(bool may_call)
 
             rtc_alarm_ie = false;
             stop_alarms();
-            x86_rtc_set_alarm(&rtc_now, 0, hwtimer_pid, true);
+            x86_rtc_set_alarm(&rtc_now, 0, x86_hwtimer_pid, true);
             rtc_alarm_ie = true;
         }
         else if (us_future > 1 * US_PER_SECOND) {
@@ -325,7 +325,7 @@ static bool set_next_alarm(bool may_call)
 
             rtc_update_ie = false;
             stop_alarms();
-            x86_rtc_set_update(0, hwtimer_pid, true);
+            x86_rtc_set_update(0, x86_hwtimer_pid, true);
             rtc_update_ie = true;
         }
         else {
@@ -376,7 +376,7 @@ static bool set_next_alarm(bool may_call)
 
                 rtc_periodic_ie = false;
                 stop_alarms();
-                x86_rtc_set_periodic(hz, 0, hwtimer_pid, true);
+                x86_rtc_set_periodic(hz, 0, x86_hwtimer_pid, true);
                 rtc_periodic_ie = hz;
             }
         }
@@ -393,7 +393,7 @@ void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
     (void) fcpu;
 
     hwtimer_callback = handler;
-    hwtimer_pid = thread_create(hwtimer_stack,
+    x86_hwtimer_pid = thread_create(hwtimer_stack,
                                 sizeof (hwtimer_stack),
                                 1,
                                 CREATE_STACKTEST,

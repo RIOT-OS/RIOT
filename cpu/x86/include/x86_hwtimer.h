@@ -29,6 +29,8 @@
 #ifndef CPU__X86__HWTIMER__H__
 #define CPU__X86__HWTIMER__H__
 
+extern int x86_hwtimer_pid;
+
 /**
  * @brief   Do timestamping to enable the use of the hwtimer module.
  *
