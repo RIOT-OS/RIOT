@@ -10,7 +10,7 @@
  * @brief       Low-level timer peripheral driver
  * @{
  *
- * @file        timer.h
+ * @file        periph/timer.h
  * @brief       Low-level timer peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

@@ -10,7 +10,7 @@
  * @brief       Low-level ADC peripheral driver
  * @{
  *
- * @file        adc.h
+ * @file        periph/adc.h
  * @brief       Low-level ADC peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

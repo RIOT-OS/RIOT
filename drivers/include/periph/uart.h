@@ -10,7 +10,7 @@
  * @brief       Low-level UART peripheral driver
  * @{
  *
- * @file        uart.h
+ * @file        periph/uart.h
  * @brief       Low-level UART peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
