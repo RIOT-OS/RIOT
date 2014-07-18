@@ -22,6 +22,9 @@ endif
 ifneq (,$(filter nomac,$(USEMODULE)))
     DIRS += net/link_layer/nomac
 endif
+ifneq (,$(filter slip,$(USEMODULE)))
+    DIRS += net/link_layer/slip
+endif
 ifneq (,$(filter transport_layer,$(USEMODULE)))
 	USEMODULE += udp
 	USEMODULE += tcp

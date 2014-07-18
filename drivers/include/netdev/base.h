@@ -82,6 +82,7 @@ typedef enum {
      * @detail  Sends frames as defined by cc110x_packet_t.
      */
     NETDEV_PROTO_CC110X         = 0x0008,
+    NETDEV_PROTO_SLIP           = 0x0009,   /**< Serial line IP. */
 } netdev_proto_t;
 
 /**
@@ -192,7 +193,7 @@ typedef int (*netdev_rcv_data_cb_t)(netdev_t *dev, void *src, size_t src_len,
 /**
  * @brief   Network device API definition.
  *
- * @details This is a set of functions that must be implemented by any driver
+ * @details  This is a set of functions that must be implemented by any driver
  *           for a network device.
  */
 typedef struct {
@@ -328,7 +329,7 @@ typedef struct {
      *
      * @param[in] dev           the network device that fired the event.
      * @param[in] event_type    Event type. Values are free to choose for the
-     *                          driver. Must be given in the @ref msg_t::value
+     *                          driver. Must be given in the @ref msg_t::content::value
      *                          of the received message
      */
     void (*event)(netdev_t *dev, uint32_t event_type);
