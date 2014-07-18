@@ -548,7 +548,12 @@ class fdsocket(socket.socket):
         return self.recv(bufsize)
 
     def write(self, string):
-        return self.sendall(string)
+        try:
+            return self.sendall(string)
+        except socket.error as e:
+            logging.getLogger("").warn("Error in TCP connection (%s), closing down" % str(e))
+            self.close()
+            sys.exit(0)
 
 if __name__ == "__main__":
 
