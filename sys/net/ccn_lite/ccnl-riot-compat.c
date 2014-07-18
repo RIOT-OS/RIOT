@@ -29,7 +29,7 @@
 #include "ccnl-pdu.h"
 #include "ccnl-riot-compat.h"
 
-#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#if defined (MODULE_AT86RF231) || defined(MODULE_CC2420) || defined(MODULE_MC1322X)
 ieee802154_packet_t p;
 #else
 radio_packet_t p;
