@@ -10,7 +10,7 @@
  * @brief       Low-level GPIO peripheral driver
  * @{
  *
- * @file        gpio.h
+ * @file        periph/gpio.h
  * @brief       Low-level GPIO peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
