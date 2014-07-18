@@ -93,11 +93,13 @@ void riot_send_nack(uint16_t to)
     msg_send(&m, to, 0);
 }
 
-void ccnl_riot_relay_helper_start(void);
+void *ccnl_riot_relay_helper_start(void *);
 
 int riot_start_helper_thread(void)
 {
-    return thread_create(relay_helper_stack, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN - 2, CREATE_STACKTEST, ccnl_riot_relay_helper_start, "relay-helper");
+    return thread_create(relay_helper_stack, sizeof(relay_helper_stack),
+                         PRIORITY_MAIN - 2, CREATE_STACKTEST,
+                         ccnl_riot_relay_helper_start, NULL, "relay-helper");
 }
 
 char *riot_ccnl_event_to_string(int event)

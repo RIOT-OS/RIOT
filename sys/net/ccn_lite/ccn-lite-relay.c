@@ -387,8 +387,10 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
  * @param pointer to count transceiver pids
  *
  */
-void ccnl_riot_relay_start(void)
+void *ccnl_riot_relay_start(void *arg)
 {
+    (void) arg;
+
     theRelay = calloc(1, sizeof(struct ccnl_relay_s));
     ccnl_get_timeval(&theRelay->startup_time);
     theRelay->riot_pid = sched_active_pid;
@@ -415,10 +417,12 @@ void ccnl_riot_relay_start(void)
 
     mutex_lock(&theRelay->stop_lock);
     ccnl_free(theRelay);
+    return NULL;
 }
 
-void ccnl_riot_relay_helper_start(void)
+void *ccnl_riot_relay_helper_start(void *arg)
 {
+    (void) arg;
     unsigned long us = CCNL_CHECK_RETRANSMIT_USEC;
     mutex_lock(&theRelay->stop_lock);
     while (!theRelay->halt_flag) {
@@ -430,6 +434,7 @@ void ccnl_riot_relay_helper_start(void)
     }
 
     mutex_unlock(&theRelay->stop_lock);
+    return NULL;
 }
 
 // eof

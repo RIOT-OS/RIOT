@@ -166,12 +166,14 @@ static void riot_ccnl_appserver_register(void)
     free(mgnt_pkg);
 }
 
-void ccnl_riot_appserver_start(int _relay_pid)
+void *ccnl_riot_appserver_start(void *arg)
 {
+	int _relay_pid = (int) arg;
     relay_pid = _relay_pid;
     riot_ccnl_appserver_register();
     riot_ccnl_appserver_ioloop();
     DEBUGMSG(1, "appserver terminated\n");
+    return NULL;
 }
 
 #endif

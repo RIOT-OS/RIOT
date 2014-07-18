@@ -75,11 +75,11 @@ int main(void)
 
     relay_pid = thread_getpid();
 
-    thread_create(t2_stack, KERNEL_CONF_STACKSIZE_MAIN, PRIORITY_MAIN + 1,
+    thread_create(t2_stack, sizeof(t2_stack), PRIORITY_MAIN + 1,
                   CREATE_STACKTEST, second_thread, NULL, "helper thread");
 
     printf("starting ccn-lite relay...\n");
-    ccnl_riot_relay_start();
+    ccnl_riot_relay_start(NULL);
 
     return 0;
 }

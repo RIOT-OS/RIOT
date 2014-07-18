@@ -73,14 +73,14 @@
  * @note  to stop the relay send msg "RIOT_HALT" to this thread
  *
  */
-void ccnl_riot_relay_start(void);
+void *ccnl_riot_relay_start(void *arg);
 
 /**
  * @brief  starts an appication server, which can repy to ccn interests
  *
- * @param relay_pid the pid of the relay
+ * @param arg the pid of the relay
  */
-void ccnl_riot_appserver_start(int relay_pid);
+void *ccnl_riot_appserver_start(void *arg);
 
 /**
  * @}
