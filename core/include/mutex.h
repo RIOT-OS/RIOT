@@ -50,7 +50,7 @@ typedef struct mutex_t {
  *
  * @return  Always returns 1, always succeeds.
  */
-int mutex_init(struct mutex_t *mutex);
+int mutex_init(mutex_t *mutex);
 
 
 /**
@@ -62,32 +62,28 @@ int mutex_init(struct mutex_t *mutex);
  * @return 1 if mutex was unlocked, now it is locked.
  * @return 0 if the mutex was locked.
  */
-int mutex_trylock(struct mutex_t *mutex);
+int mutex_trylock(mutex_t *mutex);
 
 /**
- * @brief Tries to get a mutex, blocking.
+ * @brief Locks a mutex, blocking.
  *
- * @param[in] mutex Mutex object to lock. Has to be initialized first. Must not
- *                  be NULL.
- *
- * @return 1 getting the mutex was successful
- * @return <1 there was an error.
+ * @param[in] mutex Mutex object to lock. Has to be initialized first. Must not be NULL.
  */
-int mutex_lock(struct mutex_t *mutex);
+void mutex_lock(mutex_t *mutex);
 
 /**
  * @brief Unlocks the mutex.
  *
  * @param[in] mutex Mutex object to unlock, must not be NULL.
  */
-void mutex_unlock(struct mutex_t *mutex);
+void mutex_unlock(mutex_t *mutex);
 
 /**
  * @brief Unlocks the mutex and sends the current thread to sleep
  *
  * @param[in] mutex Mutex object to unlock, must not be NULL.
  */
-void mutex_unlock_and_sleep(struct mutex_t *mutex);
+void mutex_unlock_and_sleep(mutex_t *mutex);
 
 #endif /* __MUTEX_H_ */
 /** @} */
