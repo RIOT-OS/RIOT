@@ -30,7 +30,7 @@
 #define CCNL_CONTENT_TIMEOUT_USEC       0
 
 #define CCNL_NONCE_TIMEOUT_SEC          0
-#define CCNL_NONCE_TIMEOUT_USEC         (50 * 1000)
+#define CCNL_NONCE_TIMEOUT_USEC         (3 * (CCNL_CHECK_RETRANSMIT_USEC))
 
 #define CCNL_MAX_CONTENT_SERVED_STAT    10
 
@@ -47,7 +47,7 @@
 #define CCNL_CHECK_TIMEOUT_USEC         0
 
 #define CCNL_CHECK_RETRANSMIT_SEC       0
-#define CCNL_CHECK_RETRANSMIT_USEC      (100 * 1000)
+#define CCNL_CHECK_RETRANSMIT_USEC      (300 * 1000)
 
 #define CCNL_MAX_NAME_COMP              16
 #define CCNL_MAX_IF_QLEN                64

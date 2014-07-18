@@ -1143,9 +1143,11 @@ ccnl_forward_remove(struct ccnl_relay_s *ccnl, struct ccnl_forward_s *fwd)
     return fwd2;
 }
 
-bool ccnl_is_timeouted(struct timeval *now, struct timeval *last_used, time_t timeout_s, time_t timeout_us)
+bool ccnl_is_timed_out(struct timeval *now, struct timeval *last_used, uint32_t timeout_s, uint32_t timeout_us)
 {
-    struct timeval abs_timeout = { last_used->tv_sec + timeout_s, last_used->tv_usec + timeout_us };
+    timex_t time = timex_set(timeout_s, timeout_us);
+    timex_normalize(&time);
+    struct timeval abs_timeout = { last_used->tv_sec + time.seconds, last_used->tv_usec + time.microseconds };
     return timevaldelta(now, &abs_timeout) > 0;
 }
 
@@ -1188,7 +1190,7 @@ void ccnl_do_nonce_timeout(void *ptr, void *dummy)
     //DEBUGMSG(99, "ccnl_do_nonce_timeout: %lu:%lu\n", now.tv_sec, now.tv_usec);
 
     for (struct ccnl_nonce_s *n = relay->nonces; n;) {
-        if (ccnl_is_timeouted(&now, &n->created, CCNL_NONCE_TIMEOUT_SEC, CCNL_NONCE_TIMEOUT_USEC)) {
+        if (ccnl_is_timed_out(&now, &n->created, CCNL_NONCE_TIMEOUT_SEC, CCNL_NONCE_TIMEOUT_USEC)) {
             n = ccnl_nonce_remove(relay, n);
         } else {
             n = n->next;
@@ -1211,7 +1213,7 @@ void ccnl_do_ageing(void *ptr, void *dummy)
     //DEBUGMSG(999, "ccnl_do_ageing %ld:%ld\n", now.tv_sec, now.tv_usec);
 
     while (i) {
-        if (ccnl_is_timeouted(&now, &i->last_used, CCNL_INTEREST_TIMEOUT_SEC,
+        if (ccnl_is_timed_out(&now, &i->last_used, CCNL_INTEREST_TIMEOUT_SEC,
                 CCNL_INTEREST_TIMEOUT_USEC)) {
             if (i->from->ifndx == RIOT_MSG_IDX) {
                 /* this interest was requested by an app from this node */
@@ -1226,7 +1228,7 @@ void ccnl_do_ageing(void *ptr, void *dummy)
     }
 
     while (c) {
-        if (ccnl_is_timeouted(&now, &c->last_used, CCNL_CONTENT_TIMEOUT_SEC, CCNL_CONTENT_TIMEOUT_USEC)
+        if (ccnl_is_timed_out(&now, &c->last_used, CCNL_CONTENT_TIMEOUT_SEC, CCNL_CONTENT_TIMEOUT_USEC)
             && !(c->flags & CCNL_CONTENT_FLAGS_STATIC)) {
             c = ccnl_content_remove(relay, c);
         }
@@ -1237,7 +1239,7 @@ void ccnl_do_ageing(void *ptr, void *dummy)
 
     while (f) {
         if (!(f->flags & CCNL_FACE_FLAGS_STATIC)
-            && ccnl_is_timeouted(&now, &f->last_used, CCNL_FACE_TIMEOUT_SEC, CCNL_FACE_TIMEOUT_USEC)) {
+            && ccnl_is_timed_out(&now, &f->last_used, CCNL_FACE_TIMEOUT_SEC, CCNL_FACE_TIMEOUT_USEC)) {
             f = ccnl_face_remove(relay, f);
         }
         else {
@@ -1248,7 +1250,7 @@ void ccnl_do_ageing(void *ptr, void *dummy)
     struct ccnl_forward_s *fwd = relay->fib;
     while (fwd) {
         if (!(fwd->flags & CCNL_FORWARD_FLAGS_STATIC)
-            && ccnl_is_timeouted(&now, &fwd->last_used, CCNL_FWD_TIMEOUT_SEC, CCNL_FWD_TIMEOUT_USEC)) {
+            && ccnl_is_timed_out(&now, &fwd->last_used, CCNL_FWD_TIMEOUT_SEC, CCNL_FWD_TIMEOUT_USEC)) {
             fwd = ccnl_forward_remove(relay, fwd);
         }
         else {
