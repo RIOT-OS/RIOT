@@ -44,14 +44,22 @@ typedef struct mutex_t {
 } mutex_t;
 
 /**
- * @brief Initializes a mutex object.
- *
- * @param[out] mutex    pre-allocated mutex structure, must not be NULL.
- *
- * @return  Always returns 1, always succeeds.
+ * @brief Static initializer for mutex_t.
+ * @details This initializer is preferrable to mutex_init().
  */
-int mutex_init(mutex_t *mutex);
+#define MUTEX_INIT { 0, QUEUE_NODE_INIT }
 
+/**
+ * @brief Initializes a mutex object.
+ * @details For intialization of variables use MUTEX_INIT instead.
+ *          Only use the function call for dynamically allocated mutexes.
+ * @param[out] mutex    pre-allocated mutex structure, must not be NULL.
+ */
+static inline void mutex_init(mutex_t *mutex)
+{
+    mutex_t empty_mutex = MUTEX_INIT;
+    *mutex = empty_mutex;
+}
 
 /**
  * @brief Tries to get a mutex, non-blocking.

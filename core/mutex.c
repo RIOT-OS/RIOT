@@ -35,15 +35,6 @@
 
 static void mutex_wait(struct mutex_t *mutex);
 
-void mutex_init(struct mutex_t *mutex)
-{
-    mutex->val = 0;
-
-    mutex->queue.priority = 0;
-    mutex->queue.data = 0;
-    mutex->queue.next = NULL;
-}
-
 int mutex_trylock(struct mutex_t *mutex)
 {
     DEBUG("%s: trylocking to get mutex. val: %u\n", sched_active_thread->name, mutex->val);
