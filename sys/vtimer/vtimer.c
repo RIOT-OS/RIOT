@@ -177,13 +177,18 @@ void vtimer_callback(void *ptr)
     /* get the vtimer that fired */
     vtimer_t *timer = (vtimer_t *)queue_remove_head(&shortterm_queue_root);
 
+    if (timer) {
 #if ENABLE_DEBUG
-    vtimer_print(timer);
+        vtimer_print(timer);
 #endif
-    DEBUG("vtimer_callback(): Shooting %" PRIu32 ".\n", timer->absolute.microseconds);
+        DEBUG("vtimer_callback(): Shooting %" PRIu32 ".\n", timer->absolute.microseconds);
 
-    /* shoot timer */
-    timer->action(timer);
+        /* shoot timer */
+        timer->action(timer);
+    }
+    else {
+        DEBUG("vtimer_callback(): spurious call.\n");
+    }
 
     in_callback = false;
     update_shortterm();
