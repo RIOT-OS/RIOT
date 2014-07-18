@@ -30,7 +30,7 @@
 #include "ccnl-core.h"
 #include "ccnl-platform.h"
 
-#include "rtc.h"
+#include "vtimer.h"
 
 long
 timevaldelta(struct timeval *a, struct timeval *b)
@@ -45,8 +45,12 @@ struct ccnl_timer_s *eventqueue;
 void
 ccnl_get_timeval(struct timeval *tv)
 {
-    //gettimeofday(tv, NULL);
-    rtc_time(tv);
+    timex_t now;
+
+    vtimer_now(&now);
+
+    tv->tv_sec = now.seconds;
+    tv->tv_usec = now.microseconds;
 }
 
 void *

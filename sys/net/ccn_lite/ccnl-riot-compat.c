@@ -22,6 +22,7 @@
 #include <inttypes.h>
 
 #include "msg.h"
+#include "thread.h"
 
 #include "ccnl.h"
 #include "ccnl-core.h"
@@ -31,6 +32,8 @@
 radio_packet_t p;
 transceiver_command_t tcmd;
 msg_t mesg, rep;
+
+char relay_helper_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 int riot_send_transceiver(uint8_t *buf, uint16_t size, uint16_t to)
 {
@@ -90,6 +93,15 @@ void riot_send_nack(uint16_t to)
     msg_send(&m, to, 0);
 }
 
+void *ccnl_riot_relay_helper_start(void *);
+
+int riot_start_helper_thread(void)
+{
+    return thread_create(relay_helper_stack, sizeof(relay_helper_stack),
+                         PRIORITY_MAIN - 2, CREATE_STACKTEST,
+                         ccnl_riot_relay_helper_start, NULL, "relay-helper");
+}
+
 char *riot_ccnl_event_to_string(int event)
 {
     switch (event) {
@@ -104,9 +116,6 @@ char *riot_ccnl_event_to_string(int event)
 
         case CCNL_RIOT_POPULATE:
             return "RIOT_POPULATE";
-
-        case CCNL_RIOT_TIMEOUT:
-            return "CCNL_RIOT_TIMEOUT";
 
         case CCNL_RIOT_PRINT_STAT:
             return "CCNL_RIOT_PRINT_STAT";

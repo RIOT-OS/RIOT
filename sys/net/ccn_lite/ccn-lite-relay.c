@@ -41,7 +41,7 @@
 #include "msg.h"
 #include "thread.h"
 #include "transceiver.h"
-#include "hwtimer.h"
+#include "vtimer.h"
 
 #include "ccnl-riot-compat.h"
 #include "ccn_lite/test_data/text.txt.ccnb.h"
@@ -52,9 +52,7 @@
 /** message buffer */
 msg_t msg_buffer_relay[RELAY_MSG_BUFFER_SIZE];
 
-// ----------------------------------------------------------------------
-
-struct ccnl_relay_s theRelay;
+struct ccnl_relay_s *theRelay = NULL;
 
 struct timeval *
 ccnl_run_events(void)
@@ -95,23 +93,12 @@ ccnl_run_events(void)
 
 int ccnl_open_riotmsgdev(void)
 {
-    /*
-     * nothing to do here, msg system just needs a buffer, and this is
-     * generated staticly
-     */
-    return RIOT_MSG_DEV; /* sock id */
+    return RIOT_MSG_DEV;
 }
 
 int ccnl_open_riottransdev(void)
 {
-
-    transceiver_init(TRANSCEIVER);
-    transceiver_start();
-
-    /** register for transceiver events */
-    transceiver_register(TRANSCEIVER, thread_getpid());
-
-    return RIOT_TRANS_DEV; /* sock id */
+    return RIOT_TRANS_DEV;
 }
 
 void ccnl_ll_TX(struct ccnl_relay_s *ccnl, struct ccnl_if_s *ifc,
@@ -266,49 +253,40 @@ void ccnl_populate_cache(struct ccnl_relay_s *ccnl, unsigned char *buf, int data
     }
 }
 
-void handle_populate_cache(void)
+void handle_populate_cache(struct ccnl_relay_s *ccnl)
 {
     DEBUGMSG(1, "ccnl_populate_cache with: text_txt_ccnb\n");
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_0, (int) text_txt_ccnb_0_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_1, (int) text_txt_ccnb_1_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_2, (int) text_txt_ccnb_2_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_3, (int) text_txt_ccnb_3_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_4, (int) text_txt_ccnb_4_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_5, (int) text_txt_ccnb_5_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_6, (int) text_txt_ccnb_6_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_7, (int) text_txt_ccnb_7_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_8, (int) text_txt_ccnb_8_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_9, (int) text_txt_ccnb_9_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_10, (int) text_txt_ccnb_10_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_11, (int) text_txt_ccnb_11_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_12, (int) text_txt_ccnb_12_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_13, (int) text_txt_ccnb_13_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_14, (int) text_txt_ccnb_14_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_15, (int) text_txt_ccnb_15_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_16, (int) text_txt_ccnb_16_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_17, (int) text_txt_ccnb_17_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_18, (int) text_txt_ccnb_18_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_19, (int) text_txt_ccnb_19_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_20, (int) text_txt_ccnb_20_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_21, (int) text_txt_ccnb_21_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_22, (int) text_txt_ccnb_22_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_23, (int) text_txt_ccnb_23_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_24, (int) text_txt_ccnb_24_len);
-    ccnl_populate_cache(&theRelay, (unsigned char *) text_txt_ccnb_25, (int) text_txt_ccnb_25_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_0, (int) text_txt_ccnb_0_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_1, (int) text_txt_ccnb_1_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_2, (int) text_txt_ccnb_2_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_3, (int) text_txt_ccnb_3_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_4, (int) text_txt_ccnb_4_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_5, (int) text_txt_ccnb_5_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_6, (int) text_txt_ccnb_6_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_7, (int) text_txt_ccnb_7_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_8, (int) text_txt_ccnb_8_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_9, (int) text_txt_ccnb_9_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_10, (int) text_txt_ccnb_10_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_11, (int) text_txt_ccnb_11_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_12, (int) text_txt_ccnb_12_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_13, (int) text_txt_ccnb_13_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_14, (int) text_txt_ccnb_14_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_15, (int) text_txt_ccnb_15_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_16, (int) text_txt_ccnb_16_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_17, (int) text_txt_ccnb_17_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_18, (int) text_txt_ccnb_18_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_19, (int) text_txt_ccnb_19_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_20, (int) text_txt_ccnb_20_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_21, (int) text_txt_ccnb_21_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_22, (int) text_txt_ccnb_22_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_23, (int) text_txt_ccnb_23_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_24, (int) text_txt_ccnb_24_len);
+    ccnl_populate_cache(ccnl, (unsigned char *) text_txt_ccnb_25, (int) text_txt_ccnb_25_len);
 }
 
 #endif
 
 // ----------------------------------------------------------------------
-
-void ccnl_timeout_callback(void *ptr)
-{
-    struct ccnl_relay_s *ccnl = ptr;
-
-    msg_t ccnl_timeout_msg;
-    ccnl_timeout_msg.type = CCNL_RIOT_TIMEOUT;
-    msg_send(&ccnl_timeout_msg, ccnl->riot_pid, false);
-}
 
 int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 {
@@ -327,25 +305,15 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
     msg_t in;
     radio_packet_t *p;
     riot_ccnl_msg_t *m;
-    struct timeval *timeout;
-    unsigned long us = CCNL_CHECK_RETRANSMIT_USEC;
-    int hwtimer_id;
 
     while (!ccnl->halt_flag) {
-        hwtimer_id = hwtimer_set(HWTIMER_TICKS(us), ccnl_timeout_callback, ccnl);
-        if (hwtimer_id == -1) {
-            puts("NO MORE TIMERS!");
-        }
-        else {
-            //DEBUGMSG(1, "hwtimer_id is %d\n", hwtimer_id);
-        }
-        msg_receive(&in);
-        //DEBUGMSG(1, "%s Packet waiting, us was %lu\n", riot_ccnl_event_to_string(in.type), us);
 
+        msg_receive(&in);
+
+        mutex_lock(&ccnl->global_lock);
         switch (in.type) {
             case PKT_PENDING:
                 /* msg from transceiver */
-                hwtimer_remove(hwtimer_id);
                 p = (radio_packet_t *) in.content.ptr;
                 DEBUGMSG(1, "\tLength:\t%u\n", p->length);
                 DEBUGMSG(1, "\tSrc:\t%u\n", p->src);
@@ -362,7 +330,6 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 
             case (CCNL_RIOT_MSG):
                 /* msg from device local client */
-                hwtimer_remove(hwtimer_id);
                 m = (riot_ccnl_msg_t *) in.content.ptr;
                 DEBUGMSG(1, "\tLength:\t%u\n", m->size);
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
@@ -373,7 +340,6 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 
             case (CCNL_RIOT_HALT):
                 /* cmd to stop the relay */
-                hwtimer_remove(hwtimer_id);
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
                 DEBUGMSG(1, "\tNumb:\t%" PRIu32 "\n", in.content.value);
 
@@ -383,37 +349,34 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 #if RIOT_CCNL_POPULATE
             case (CCNL_RIOT_POPULATE):
                 /* cmd to polulate the cache */
-                hwtimer_remove(hwtimer_id);
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
                 DEBUGMSG(1, "\tNumb:\t%" PRIu32 "\n", in.content.value);
 
-                handle_populate_cache();
+                handle_populate_cache(ccnl);
                 break;
 #endif
             case (CCNL_RIOT_PRINT_STAT):
                 /* cmd to print face statistics */
-                hwtimer_remove(hwtimer_id);
                 for (struct ccnl_face_s *f = ccnl->faces; f; f = f->next) {
                     ccnl_face_print_stat(f);
                 }
                 break;
-            case (CCNL_RIOT_TIMEOUT):
-                /* ccn timeout from hwtimer, run pending events */
-                timeout = ccnl_run_events();
-                us = timeout->tv_sec * 1000 * 1000 + timeout->tv_usec;
+            case (CCNL_RIOT_CONFIG_CACHE):
+                /* cmd to configure the size of the cache at runtime */
+                ccnl->max_cache_entries = in.content.value;
+                DEBUGMSG(1, "max_cache_entries set to %d\n", ccnl->max_cache_entries);
                 break;
             case (ENOBUFFER):
                 /* transceiver has not enough buffer to store incoming packets, one packet is dropped  */
-                hwtimer_remove(hwtimer_id);
                 DEBUGMSG(1, "transceiver: one packet is dropped because buffers are full\n");
                 break;
             default:
-                hwtimer_remove(hwtimer_id);
                 DEBUGMSG(1, "%s Packet waiting\n", riot_ccnl_event_to_string(in.type));
                 DEBUGMSG(1, "\tSrc:\t%u\n", in.sender_pid);
                 DEBUGMSG(1, "\tdropping it...\n");
                 break;
         }
+        mutex_unlock(&ccnl->global_lock);
     }
 
     return 0;
@@ -424,27 +387,54 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
  * @param pointer to count transceiver pids
  *
  */
-void ccnl_riot_relay_start(int max_cache_entries, int fib_threshold_prefix, int fib_threshold_aggregate)
+void *ccnl_riot_relay_start(void *arg)
 {
-    ccnl_get_timeval(&theRelay.startup_time);
-    theRelay.riot_pid = sched_active_pid;
+    (void) arg;
 
-    DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", theRelay.startup_time.tv_sec, theRelay.startup_time.tv_usec);
+    theRelay = calloc(1, sizeof(struct ccnl_relay_s));
+    ccnl_get_timeval(&theRelay->startup_time);
+    theRelay->riot_pid = sched_active_pid;
+    mutex_init(&theRelay->global_lock);
+
+    DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", theRelay->startup_time.tv_sec, theRelay->startup_time.tv_usec);
     DEBUGMSG(1, "  compile time: %s %s\n", __DATE__, __TIME__);
-    DEBUGMSG(1, "  max_cache_entries: %d\n", max_cache_entries);
-    DEBUGMSG(1, "  threshold_prefix: %d\n", fib_threshold_prefix);
-    DEBUGMSG(1, "  threshold_aggregate: %d\n", fib_threshold_aggregate);
+    DEBUGMSG(1, "  max_cache_entries: %d\n", CCNL_DEFAULT_MAX_CACHE_ENTRIES);
+    DEBUGMSG(1, "  threshold_prefix: %d\n", CCNL_DEFAULT_THRESHOLD_PREFIX);
+    DEBUGMSG(1, "  threshold_aggregate: %d\n", CCNL_DEFAULT_THRESHOLD_AGGREGATE);
 
-    ccnl_relay_config(&theRelay, max_cache_entries, fib_threshold_prefix, fib_threshold_aggregate);
+    ccnl_relay_config(theRelay, CCNL_DEFAULT_MAX_CACHE_ENTRIES, CCNL_DEFAULT_THRESHOLD_PREFIX, CCNL_DEFAULT_THRESHOLD_AGGREGATE);
 
-    ccnl_io_loop(&theRelay);
+    theRelay->riot_helper_pid = riot_start_helper_thread();
+
+    ccnl_io_loop(theRelay);
     DEBUGMSG(1, "ioloop stopped\n");
 
     while (eventqueue) {
         ccnl_rem_timer(eventqueue);
     }
 
-    ccnl_core_cleanup(&theRelay);
+    ccnl_core_cleanup(theRelay);
+
+    mutex_lock(&theRelay->stop_lock);
+    ccnl_free(theRelay);
+    return NULL;
+}
+
+void *ccnl_riot_relay_helper_start(void *arg)
+{
+    (void) arg;
+    unsigned long us = CCNL_CHECK_RETRANSMIT_USEC;
+    mutex_lock(&theRelay->stop_lock);
+    while (!theRelay->halt_flag) {
+        mutex_lock(&theRelay->global_lock);
+        ccnl_run_events();
+        mutex_unlock(&theRelay->global_lock);
+
+        vtimer_usleep(us);
+    }
+
+    mutex_unlock(&theRelay->stop_lock);
+    return NULL;
 }
 
 // eof
