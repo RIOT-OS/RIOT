@@ -67,6 +67,10 @@
 #include "tcp.h"
 #endif
 
+#ifdef MODULE_BASIC_MAC
+#include "basic_mac.h"
+#endif
+
 #ifdef MODULE_NET_IF
 #include "cpu-conf.h"
 #include "cpu.h"
@@ -244,6 +248,10 @@ void auto_init(void)
 #ifdef MODULE_L2_PING
     DEBUG("Auto init net_if module.\n");
     l2_ping_init();
+#endif
+#ifdef MODULE_BASIC_MAC
+    DEBUG("Auto init basic_mac module.\n");
+    basic_mac_init_module();
 #endif
 #ifdef MODULE_NET_IF
     DEBUG("Auto init net_if module.\n");
