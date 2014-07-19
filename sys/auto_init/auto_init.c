@@ -67,6 +67,10 @@
 #include "tcp.h"
 #endif
 
+#ifdef MODULE_NOMAC
+#include "nomac.h"
+#endif
+
 #ifdef MODULE_NET_IF
 #include "cpu-conf.h"
 #include "cpu.h"
@@ -240,6 +244,10 @@ void auto_init(void)
 #ifdef MODULE_L2_PING
     DEBUG("Auto init net_if module.\n");
     l2_ping_init();
+#endif
+#ifdef MODULE_NOMAC
+    DEBUG("Auto init nomac module.\n");
+    nomac_init_module();
 #endif
 #ifdef MODULE_NET_IF
     DEBUG("Auto init net_if module.\n");
