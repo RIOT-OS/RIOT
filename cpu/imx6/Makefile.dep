@@ -1,0 +1,9 @@
+ifeq (,$(filter IMX6_PERIPH,$(USEMODULE)))
+  USEMODULE += IMX6_PERIPH
+endif
+ifeq (,$(filter IMX6_CORE,$(USEMODULE)))
+  USEMODULE += IMX6_CORE
+endif
+ifeq (,$(filter IMX6_VARIANT,$(USEMODULE)))
+  USEMODULE += IMX6_VARIANT
+endif
