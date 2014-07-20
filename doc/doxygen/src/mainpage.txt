@@ -152,7 +152,7 @@
  * is a default size for any typical thread, _not_ using printf.
  * `KERNEL_CONF_STACKSIZE_PRINTF` defines additional stack space needed if the
  * thread needs to call printf (which requires additional memory when using
- * newlib. `KERNEL_CONF_STACKSIZE_MAIN` is the stack size for the main thread
+ * newlib). `KERNEL_CONF_STACKSIZE_MAIN` is the stack size for the main thread
  * and probably a good size for your application. (Note, that on most
  * non-newlib dependent platforms this will probably equal
  * `KERNEL_CONF_STACKSIZE_DEFAULT`.
