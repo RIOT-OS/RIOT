@@ -172,6 +172,7 @@ extern "C" {
 #define TRANSCEIVER_MC1322X     (0x08)      /**< MC1322X transceivers */
 #define TRANSCEIVER_NATIVE      (0x10)      /**< NATIVE transceivers */
 #define TRANSCEIVER_AT86RF231   (0x20)      /**< AT86RF231 transceivers */
+#define TRANSCEIVER_NETAPI      (0x30)      /**< netapi compatible L* layers */
 /**
  * @}
  */
@@ -188,6 +189,10 @@ typedef uint64_t transceiver_eui64_t;
 
 /**
  * @brief Message types for transceiver interface
+ *
+ * @note    **ATTENTION:** Packages received from a netapi layer are neither
+ *          of type radio_packet_t nor ieee802154_packet_t as they normally are
+ *          (depending on the radio), but netapi_pkt_t!
  */
 enum transceiver_msg_type_t {
     /* Message types for driver <-> transceiver communication */

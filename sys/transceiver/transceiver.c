@@ -28,6 +28,8 @@
 #include "radio/types.h"
 
 #include "transceiver.h"
+#include "pktbuf.h"
+#include "netapi.h"
 
 /* supported transceivers */
 #ifdef MODULE_CC110X
@@ -62,6 +64,10 @@
 #ifdef MODULE_AT86RF231
 #include "at86rf231.h"
 #include "ieee802154_frame.h"
+#endif
+
+#ifdef HAS_NETAPI_PID
+#include "nomac.h"
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -129,6 +135,20 @@ void receive_mc1322x_packet(ieee802154_packet_t *trans_p);
 #endif
 #ifdef MODULE_AT86RF231
 void receive_at86rf231_packet(ieee802154_packet_t *trans_p);
+#endif
+#ifdef HAS_NETAPI_PID
+void receive_netapi_packet(netapi_pkt_t *pkt);
+static int32_t get_netapi_channel(void);
+static int32_t set_netapi_channel(uint16_t c);
+static radio_address_t get_netapi_address(void);
+static radio_address_t set_netapi_address(radio_address_t c);
+static transceiver_eui64_t get_netapi_long_addr(void);
+static transceiver_eui64_t set_netapi_long_addr(transceiver_eui64_t c);
+static int32_t get_netapi_pan(void);
+static int32_t set_netapi_pan(uint16_t c);
+#ifndef MODULE_NETAPI
+static int _transceiver_bn_send_command(unsigned int tid, netapi_cmd_t *cmd);
+#endif
 #endif
 static int8_t send_packet(transceiver_type_t t, void *pkt);
 static int32_t get_channel(transceiver_type_t t);
@@ -233,6 +253,27 @@ kernel_pid_t transceiver_start(void)
     }
 
 #endif
+
+#ifdef HAS_NETAPI_PID
+    else if (transceivers & TRANSCEIVER_NETAPI) {
+#ifdef MODULE_NETAPI
+        netapi_register(netapi_pid, transceiver_pid, 0);
+#else   /* MODULE_NETAPI */
+        int status;
+        netapi_reg_t reg;
+
+        reg.type = NETAPI_CMD_REG;
+        reg.reg_pid = transceiver_pid;
+
+        if ((status = _transceiver_bn_send_command(netapi_pid,
+                      (netapi_cmd_t *)(&reg))) < 0) {
+            return status;
+        }
+
+#endif  /* MODULE_NETAPI */
+    }
+
+#endif  /* HAS_NETAPI_PID */
     return transceiver_pid;
 }
 
@@ -295,6 +336,19 @@ static void *run(void *arg)
         DEBUG("transceiver: Transceiver: Message received, type: %02X\n", m.type);
 
         switch (m.type) {
+#ifdef HAS_NETAPI_PID
+
+            case NETAPI_MSG_TYPE: {
+                netapi_pkt_t *pkt = (netapi_pkt_t *)cmd;
+
+                if (pkt->type == NETAPI_CMD_RCV) {
+                    receive_netapi_packet((netapi_pkt_t *)cmd);
+                    break;
+                }
+            }
+
+#endif
+
             case RCV_PKT_CC1020:
             case RCV_PKT_CC1100:
             case RCV_PKT_CC2420:
@@ -710,6 +764,336 @@ void receive_at86rf231_packet(ieee802154_packet_t *trans_p)
     DEBUG("Content: %s\n", trans_p->frame.payload);
 }
 #endif
+
+#ifdef HAS_NETAPI_PID
+void receive_netapi_packet(netapi_pkt_t *rcv)
+{
+    uint8_t i = 0;
+    transceiver_type_t t = TRANSCEIVER_NETAPI;
+    msg_t m;
+
+    DEBUG("Packet received\n");
+
+    /* search first free position in transceiver buffer */
+    for (i = 0; (i < TRANSCEIVER_BUFFER_SIZE)
+         && (transceiver_buffer[transceiver_buffer_pos].processing); i++) {
+        if (++transceiver_buffer_pos == TRANSCEIVER_BUFFER_SIZE) {
+            transceiver_buffer_pos = 0;
+        }
+    }
+
+    /* no buffer left */
+    if (i >= TRANSCEIVER_BUFFER_SIZE) {
+        /* inform upper layers of lost packet */
+        m.type = ENOBUFFER;
+        m.content.value = t;
+    }
+
+    /* copy packet and handle it */
+    else {
+        m.type = PKT_PENDING;
+
+#ifdef DBG_IGNORE
+
+        for (size_t i = 0; (i < TRANSCEIVER_MAX_IGNORED_ADDR) && (transceiver_ignored_addr[i]); i++) {
+            DEBUG("check if source (%u) is ignored -> %u\n", *((radio_addr_t *)rcv->src),
+                  transceiver_ignored_addr[i]);
+
+            if (memcpy(rcv->src, transceiver_ignored_addr[i],
+                       (rcv->src_len < sizeof(radio_address_t)) ? rcv->src_len : sizeof(radio_address_t))) {
+                DEBUG("ignored packet from %" PRIu16 "\n", transceiver_buffer[transceiver_buffer_pos].src);
+                return;
+            }
+        }
+
+#endif
+    }
+
+    /* finally notify waiting upper layers
+     * this is done non-blocking, so packets can get lost */
+    i = 0;
+
+    while (reg[i].transceivers != TRANSCEIVER_NONE) {
+        if (reg[i].transceivers & t) {
+            m.content.ptr = (char *)rcv;
+            DEBUG("transceiver: Notify thread %i\n", reg[i].pid);
+
+            if (msg_send(&m, reg[i].pid) && (m.type != ENOBUFFER)) {
+                transceiver_buffer[transceiver_buffer_pos].processing++;
+            }
+        }
+
+        i++;
+    }
+}
+
+#ifndef MODULE_NETAPI
+static int get_set_netapi_option(netapi_cmd_type_t type,
+                                 netapi_conf_type_t param, void *value,
+                                 size_t value_len)
+{
+    netapi_conf_t conf;
+
+    conf.type = type;
+    conf.param = param;
+    conf.data = value;
+    conf.data_len = value_len;
+
+    return _transceiver_bn_send_command(netapi_pid,
+                                        (netapi_cmd_t *)&conf);
+}
+#endif
+
+static int32_t get_netapi_channel(void)
+{
+    uint16_t c;
+    int res;
+
+#ifdef MODULE_NETAPI
+
+    res = netapi_get_option(netapi_pid, NETAPI_CONF_CARRIER, &c,
+                            sizeof(c));
+#else
+
+    res = get_set_netapi_option(NETAPI_CMD_GET, NETAPI_CONF_CARRIER,
+                                &c, sizeof(c));
+
+#endif  /* MODULE_NETAPI */
+
+    if (res >= 0) {
+        switch (res) {
+            case 1:
+                return (int32_t)(*((uint8_t *)&c));
+
+            case 2:
+                return (int32_t)(*((uint16_t *)&c));
+
+            default:
+                break;
+        }
+    }
+
+    return -1;
+}
+
+static int32_t set_netapi_channel(uint16_t c)
+{
+#ifdef MODULE_NETAPI
+
+    if (netapi_set_option(netapi_pid, NETAPI_CONF_CARRIER, &c,
+                          sizeof(c)) < 0) {
+        return -1;
+    }
+    else {
+        return (int32_t)c;
+    }
+
+#else
+
+    if (get_set_netapi_option(NETAPI_CMD_SET, NETAPI_CONF_CARRIER, &c,
+                              sizeof(c)) < 0) {
+        return -1;
+    }
+    else {
+        return (int32_t)c;
+    }
+
+#endif  /* MODULE_NETAPI */
+}
+
+static radio_address_t get_netapi_address(void)
+{
+    radio_address_t c;
+    int res;
+
+#ifdef MODULE_NETAPI
+
+    res = netapi_get_option(netapi_pid, NETAPI_CONF_ADDRESS, &c,
+                            sizeof(c));
+#else
+
+    res = get_set_netapi_option(NETAPI_CMD_GET, NETAPI_CONF_ADDRESS,
+                                &c, sizeof(c));
+
+#endif  /* MODULE_NETAPI */
+
+    if (res >= 0) {
+        switch (res) {
+            case 1:
+                return (radio_address_t)(*((uint8_t *)(&c)));
+
+            case 2:
+                return (radio_address_t)(*((uint16_t *)(&c)));
+
+            default:
+                break;
+        }
+    }
+
+    return (radio_address_t)UINT16_MAX;
+}
+
+static radio_address_t set_netapi_address(radio_address_t c)
+{
+#ifdef MODULE_NETAPI
+
+    if (netapi_set_option(netapi_pid, NETAPI_CONF_ADDRESS, &c,
+                          sizeof(c)) < 0) {
+        return (radio_address_t)UINT16_MAX;
+    }
+    else {
+        return (radio_address_t)c;
+    }
+
+#else
+
+    if (get_set_netapi_option(NETAPI_CMD_SET, NETAPI_CONF_ADDRESS, &c,
+                              sizeof(c)) < 0) {
+        return (radio_address_t)UINT16_MAX;
+    }
+    else {
+        return (radio_address_t)c;
+    }
+
+#endif  /* MODULE_NETAPI */
+}
+
+static transceiver_eui64_t get_netapi_long_addr(void)
+{
+    transceiver_eui64_t c;
+    int res;
+
+#ifdef MODULE_NETAPI
+
+    res = netapi_get_option(netapi_pid,
+                            (netapi_conf_type_t)NOMAC_ADDRESS2, &c,
+                            sizeof(c));
+#else
+
+    res = get_set_netapi_option(NETAPI_CMD_GET,
+                                (netapi_conf_type_t)NOMAC_ADDRESS2,
+                                &c, sizeof(c));
+
+#endif  /* MODULE_NETAPI */
+
+    if (res >= 0) {
+        switch (res) {
+            case 1:
+                return (transceiver_eui64_t)(*((uint8_t *)(&c)));
+
+            case 2:
+                return (transceiver_eui64_t)(*((uint16_t *)(&c)));
+
+            case 4:
+                return (transceiver_eui64_t)(*((uint32_t *)(&c)));
+
+            case 8:
+                return (transceiver_eui64_t)(*((uint64_t *)(&c)));
+
+            default:
+                if (res < 8) {
+                    transceiver_eui64_t address;
+                    uint8_t *ptr = (uint8_t *)(&address);
+
+                    memset(ptr, 0, sizeof(transceiver_eui64_t) - res);
+                    memcpy(&(ptr[sizeof(transceiver_eui64_t) - res]),
+                           &c, res);
+
+                    return address;
+                }
+
+                break;
+        }
+    }
+
+    return (transceiver_eui64_t)UINT64_MAX;
+}
+
+static transceiver_eui64_t set_netapi_long_addr(transceiver_eui64_t c)
+{
+#ifdef MODULE_NETAPI
+
+    if (netapi_set_option(netapi_pid,
+                          (netapi_conf_type_t)NOMAC_ADDRESS2, &c,
+                          sizeof(c)) < 0) {
+        return (transceiver_eui64_t)UINT64_MAX;
+    }
+    else {
+        return (transceiver_eui64_t)c;
+    }
+
+#else
+
+    if (get_set_netapi_option(NETAPI_CMD_SET,
+                              (netapi_conf_type_t)NOMAC_ADDRESS2, &c,
+                              sizeof(c)) < 0) {
+        return (transceiver_eui64_t)UINT64_MAX;
+    }
+    else {
+        return (transceiver_eui64_t)c;
+    }
+
+#endif  /* MODULE_NETAPI */
+}
+
+static int32_t get_netapi_pan(void)
+{
+    uint16_t c;
+    int res;
+
+#ifdef MODULE_NETAPI
+
+    res = netapi_get_option(netapi_pid, NETAPI_CONF_SUBNETS, &c,
+                            sizeof(c));
+#else
+
+    res = get_set_netapi_option(NETAPI_CMD_GET, NETAPI_CONF_SUBNETS,
+                                &c, sizeof(c));
+
+#endif  /* MODULE_NETAPI */
+
+    if (res >= 0) {
+        switch (res) {
+            case 1:
+                return (int32_t)(*((uint8_t *)(&c)));
+
+            case 2:
+                return (int32_t)(*((uint16_t *)(&c)));
+
+            default:
+                break;
+        }
+    }
+
+    return -1;
+}
+
+static int32_t set_netapi_pan(uint16_t c)
+{
+#ifdef MODULE_NETAPI
+
+    if (netapi_set_option(netapi_pid, NETAPI_CONF_SUBNETS, &c,
+                          sizeof(c)) < 0) {
+        return -1;
+    }
+    else {
+        return (int32_t)c;
+    }
+
+#else
+
+    if (get_set_netapi_option(NETAPI_CMD_SET, NETAPI_CONF_SUBNETS, &c,
+                              sizeof(c)) < 0) {
+        return -1;
+    }
+    else {
+        return (int32_t)c;
+    }
+
+#endif  /* MODULE_NETAPI */
+}
+
+#endif
 /*------------------------------------------------------------------------------------*/
 /*
  * @brief Sends a radio packet to the receiver
@@ -737,6 +1121,7 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
 #else
     radio_packet_t *p = (radio_packet_t *)pkt;
     DEBUG("transceiver: Send packet to %" PRIu16 "\n", p->dst);
+
     for (size_t i = 0; i < p->length; i++) {
         DEBUG("%02x ", p->data[i]);
     }
@@ -807,6 +1192,86 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
             res = at86rf231_send(&at86rf231_pkt);
             break;
 #endif
+#ifdef HAS_NETAPI_PID
+
+        case TRANSCEIVER_NETAPI: {
+#ifdef MODULE_NETAPI
+
+            pkt_t *pkt = NULL;
+
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+
+            pkt = pktbuf_insert(p->frame.payload, p->frame.payload_len);
+
+            if (p->frame.fcf.dest_addr_m == IEEE_802154_SHORT_ADDR_M) {
+                if ((res = (int8_t)netapi_send_packet(netapi_pid,
+                                                      (void *) p->frame.dest_addr, 2,
+                                                      pkt)) < 0) {
+                    res = -1;
+                }
+            }
+            else if (p->frame.fcf.dest_addr_m == IEEE_802154_LONG_ADDR_M) {
+                if ((res = (int8_t)netapi_send_packet(netapi_pid,
+                                                      (void *) p->frame.dest_addr, 8,
+                                                      pkt)) < 0) {
+                    res = -1;
+                }
+            }
+            else {
+                res = -1;
+            }
+
+#else /* no IEEE 802.15.4 radio */
+
+            pkt = pktbuf_insert(p->data, p->length);
+
+            if ((res = (int8_t)netapi_send_packet(netapi_pid,
+                                                   (void *) &(p->dst), sizeof(p->dst),
+                                                   pkt)) < 0) {
+                res = -1;
+            }
+
+#endif /* IEEE 802.15.4 radio */
+
+            pkt_release(pkt);
+
+#else  /* MODULE_NETAPI */
+            netapi_pkt_t snd;
+
+            snd.type = NETAPI_CMD_SND;
+
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+            snd.dest = p->frame.dest_addr;
+
+            if (p->frame.fcf.dest_addr_m == IEEE_802154_SHORT_ADDR_M) {
+                snd.dest_len = 2;
+            }
+            else if (p->frame.fcf.dest_addr_m == IEEE_802154_LONG_ADDR_M) {
+                snd.dest_len = 8;
+            }
+            else {
+                return -1;
+            }
+
+            snd.pkt = pktbuf_insert(p->frame.payload, p->frame.payload_len);
+#else /* no IEEE 802.15.4 radio */
+            snd.dest = &(p->dst);
+            snd.dest_len = sizeof(p->dst);
+            snd.pkt = pktbuf_insert(p->data, p->length);
+#endif /* IEEE 802.15.4 radio */
+
+            if ((res = (int8_t)_transceiver_bn_send_command(netapi_pid,
+                       (netapi_cmd_t *)(&snd))) < 0) {
+                res = -1;
+            }
+
+            pktbuf_release(snd.pkt);
+
+#endif /* MODULE_NETAPI */
+        };
+
+        break;
+#endif /* HAS_NETAPI_PID */
 
         default:
             puts("Unknown transceiver");
@@ -861,6 +1326,11 @@ static int32_t set_channel(transceiver_type_t t, void *channel)
         case TRANSCEIVER_AT86RF231:
             return at86rf231_set_channel(c);
 #endif
+#ifdef HAS_NETAPI_PID
+
+        case TRANSCEIVER_NETAPI:
+            return set_netapi_channel(c);
+#endif  /* HAS_NETAPI_PID */
 
         default:
             return -1;
@@ -906,6 +1376,11 @@ static int32_t get_channel(transceiver_type_t t)
         case TRANSCEIVER_AT86RF231:
             return at86rf231_get_channel();
 #endif
+#ifdef HAS_NETAPI_PID
+
+        case TRANSCEIVER_NETAPI:
+            return get_netapi_channel();
+#endif  /* HAS_NETAPI_PID */
 
         default:
             return -1;
@@ -946,6 +1421,12 @@ static int32_t set_pan(transceiver_type_t t, void *pan)
         case TRANSCEIVER_MC1322X:
             return maca_set_pan(c);
 #endif
+#ifdef HAS_NETAPI_PID
+
+        case TRANSCEIVER_NETAPI:
+            return set_netapi_pan(c);
+
+#endif  /* HAS_NETAPI_PID */
 
         default:
             /* get rid of compiler warning about unused variable */
@@ -984,6 +1465,12 @@ static int32_t get_pan(transceiver_type_t t)
         case TRANSCEIVER_MC1322X:
             return maca_get_pan();
 #endif
+#ifdef HAS_NETAPI_PID
+
+        case TRANSCEIVER_NETAPI:
+            return get_netapi_pan();
+
+#endif  /* HAS_NETAPI_PID */
 
         default:
             return -1;
@@ -1030,6 +1517,12 @@ static radio_address_t get_address(transceiver_type_t t)
         case TRANSCEIVER_AT86RF231:
             return at86rf231_get_address();
 #endif
+#ifdef HAS_NETAPI_PID
+
+        case TRANSCEIVER_NETAPI:
+            return get_netapi_address();
+
+#endif  /* HAS_NETAPI_PID */
 
         default:
             return 0; /* XXX see TODO above */
@@ -1081,6 +1574,12 @@ static radio_address_t set_address(transceiver_type_t t, void *address)
         case TRANSCEIVER_AT86RF231:
             return at86rf231_set_address(addr);
 #endif
+#ifdef HAS_NETAPI_PID
+
+        case TRANSCEIVER_NETAPI:
+            return set_netapi_address(addr);
+
+#endif  /* HAS_NETAPI_PID */
 
         default:
             return 0; /* XXX see TODO above */
@@ -1107,6 +1606,12 @@ static transceiver_eui64_t get_long_addr(transceiver_type_t t)
         case TRANSCEIVER_AT86RF231:
             return at86rf231_get_address_long();
 #endif
+#ifdef HAS_NETAPI_PID
+
+        case TRANSCEIVER_NETAPI:
+            return get_netapi_long_addr();
+
+#endif  /* MODULE_NETAPI */
 
         default:
             return 0;
@@ -1135,6 +1640,11 @@ static transceiver_eui64_t set_long_addr(transceiver_type_t t, void *address)
 
         case TRANSCEIVER_AT86RF231:
             return at86rf231_set_address_long(addr);
+#endif
+#ifdef HAS_NETAPI_PID
+
+        case TRANSCEIVER_NETAPI:
+            return set_netapi_long_addr((transceiver_eui64_t)addr);
 #endif
 
         default:
@@ -1273,4 +1783,33 @@ static int16_t ignore_add(transceiver_type_t transceiver, void *address)
 
     return -1;
 }
+#endif
+
+#ifndef MODULE_NETAPI
+#ifdef HAS_NETAPI_PID
+static int _transceiver_bn_send_command(unsigned int tid, netapi_cmd_t *cmd)
+{
+    msg_t msg_cmd, msg_ack;
+    netapi_ack_t ack;
+
+    msg_cmd.type = NETAPI_MSG_TYPE;
+    msg_cmd.content.ptr = (char *)cmd;
+
+    cmd->ack = &ack;
+
+    msg_send_receive(&msg_cmd, &msg_ack, tid);
+
+    DEBUG("msg_ack.content.ptr = %p and &ack = %p must be equal.",
+          msg_ack.content.ptr, &ack);
+
+    if (msg_ack.content.ptr != (char *)(&ack) ||
+        msg_ack.type != NETAPI_MSG_TYPE ||
+        ack.type != NETAPI_CMD_ACK ||
+        ack.orig != cmd->type) {
+        return -ENOMSG;
+    }
+
+    return ack.result;
+}
+#endif
 #endif
