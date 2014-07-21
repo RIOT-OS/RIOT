@@ -25,7 +25,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "crypto/rc5.h"
+#include "crypto/ciphers/rc5.h"
 #include "crypto/ciphers.h"
 
 /**

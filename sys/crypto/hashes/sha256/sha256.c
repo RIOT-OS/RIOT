@@ -43,7 +43,7 @@
 
 #include <string.h>
 
-#include "crypto/sha256.h"
+#include "crypto/hashes/sha256.h"
 #include "board.h"
 
 #ifdef __BIG_ENDIAN__

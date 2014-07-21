@@ -41,7 +41,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "crypto/ciphers.h"
-#include "crypto/skipjack.h"
+#include "crypto/ciphers/skipjack.h"
 
 
 /**

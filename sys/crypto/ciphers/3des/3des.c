@@ -36,7 +36,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "crypto/3des.h"
+#include "crypto/ciphers/3des.h"
 #include "crypto/ciphers.h"
 
 /*************** GLOBALS ******************/

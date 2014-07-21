@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin, Computer Systems & Telematics
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This source code is licensed under the LGPLv2 license,
  * See the file LICENSE for more details.
@@ -10,29 +10,19 @@
  * @{
  *
  * @file        ciphers.h
- * @brief       Headers for the packet encryption class. They are used to encrypt single packets.
+ * @brief       Basic header for all encryption algorithms.
  *
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics
  * @author      Nicolai Schmittberger <nicolai.schmittberger@fu-berlin.de>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @author      Mark Essien <markessien@gmail.com>
+ * @author      Nico von Geyso <nico.geyso@fu-berlin.de>
  */
 
-#ifndef __CIPHERS_H_
-#define __CIPHERS_H_
+#ifndef __CRYPTO_CIPHERS_H_
+#define __CRYPTO_CIPHERS_H_
 
-/* Shared header file for all cipher algorithms */
-
-/* Set the algorithms that should be compiled in here. When these defines
- * are set, then packets will be compiled 5 times.
- *
- * */
-#define AES
-// #define RC5
-// #define THREEDES
-// #define AES
-// #define TWOFISH
-// #define SKIPJACK
+#include "kernel.h"
 
 /// the length of keys in bytes
 #define PARSEC_MAX_BLOCK_CIPHERS  5
@@ -49,16 +39,16 @@
  * identity     needs 1  byte                             <br>
  */
 typedef struct {
-#if defined(RC5)
-    uint8_t context[104];             // supports RC5 and lower
-#elif defined(THREEDES)
-    uint8_t context[24];              // supports ThreeDES and lower
-#elif defined(AES)
-    uint8_t context[CIPHERS_KEYSIZE]; // supports AES and lower
-#elif defined(TWOFISH)
-    uint8_t context[CIPHERS_KEYSIZE]; // supports TwoFish and lower
-#elif defined(SKIPJACK)
-    uint8_t context[20];              // supports SkipJack and lower
+#if defined(MODULE_RC5)
+    uint8_t context[104];             /* supports RC5 and lower       */
+#elif defined(MODULE_3DES)
+    uint8_t context[24];              /* supports TripleDES and lower */
+#elif defined(MODULE_AES)
+    uint8_t context[CIPHERS_KEYSIZE]; /* supports AES and lower       */
+#elif defined(MODULE_TWOFISH)
+    uint8_t context[CIPHERS_KEYSIZE]; /* supports TwoFish and lower   */
+#elif defined(MODULE_SKIPJACK)
+    uint8_t context[20];              /* supports SkipJack and lower  */
 #endif
 } cipher_context_t;
 
@@ -85,38 +75,6 @@ typedef struct {
     uint8_t (*BlockCipherInfo_getPreferredBlockSize)(void);
 } block_cipher_interface_t;
 
-
-typedef struct CipherModeContext {
-    cipher_context_t cc;            // CipherContext for the cipher-operations
-    uint8_t context[24];         // context for the block-cipher-modes'
-                                 // internal functions
-    //CBCModeContext* context;
-} CipherModeContext;
-
-
-/**
- * @brief       struct for an archive of all available ciphers
- * @struct      BlockCipher_Archive_t CipherManager.h "ciphers/CipherManager.h"
- * @typedef     BlockCipher_Archive_t
- */
-typedef struct {
-        // the number of available ciphers
-    uint8_t NoCiphers;
-    // the ciphers in form or BlockCipherInterface_ts
-    block_cipher_interface_t ciphers[PARSEC_MAX_BLOCK_CIPHERS];
-} block_cipher_archive_t;
-
-typedef struct {
-        // cipher_context_t for the cipher-operations
-    cipher_context_t cc;
-#if defined(AES) || defined (TWOFISH)
-    // supports 16-Byte blocksize
-    uint8_t context[20];
-#else
-    // supports 8-Byte blocksize
-    uint8_t context[12];
-#endif
-} cipher_mac_context_t;
 
 /** @} */
 #endif /* __CIPHERS_H_ */
