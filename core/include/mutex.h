@@ -22,6 +22,10 @@
 #ifndef __MUTEX_H_
 #define __MUTEX_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "queue.h"
 
 /**
@@ -88,6 +92,10 @@ void mutex_unlock(struct mutex_t *mutex);
  * @param[in] mutex Mutex object to unlock, must not be NULL.
  */
 void mutex_unlock_and_sleep(struct mutex_t *mutex);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __MUTEX_H_ */
 /** @} */

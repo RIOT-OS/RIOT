@@ -23,6 +23,11 @@
 #ifndef __HASHES_H
 #define __HASHES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include <stddef.h>
 #include <inttypes.h>
 
@@ -155,6 +160,10 @@ uint32_t rotating_hash(const uint8_t *buf, size_t len);
  * @return 32 bit sized hash
  */
 uint32_t one_at_a_time_hash(const uint8_t *buf, size_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __HASHES_H */

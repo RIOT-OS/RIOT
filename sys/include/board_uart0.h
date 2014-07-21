@@ -12,6 +12,10 @@
 #ifndef __BOARD_UART0_H
 #define __BOARD_UART0_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif 
+
 #include "cpu-conf.h"   /* To give user access to UART0_BUFSIZE */
 
 extern int uart0_handler_pid;
@@ -22,6 +26,11 @@ void uart0_notify_thread(void);
 
 int uart0_readc(void);
 void uart0_putc(int c);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __BOARD_UART0_H */

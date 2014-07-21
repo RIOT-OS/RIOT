@@ -22,6 +22,11 @@
 #ifndef __DEBUG_H
 #define __DEBUG_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif 
+
 #include <stdio.h>
 #include "sched.h"
 
@@ -81,5 +86,10 @@
 #endif
 /** @} */
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* __DEBUG_H */
 /** @} */
+

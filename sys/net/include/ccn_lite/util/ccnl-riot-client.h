@@ -27,6 +27,12 @@
 #ifndef CCNL_RIOT_CLIENT_H
 #define CCNL_RIOT_CLIENT_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /**
  * @brief  high level function to fetch a file (all chunks of a file)
  *
@@ -102,6 +108,11 @@ int ccnl_riot_client_new_face(unsigned int relay_pid, char *type, char *faceid,
  */
 int ccnl_riot_client_register_prefix(unsigned int relay_pid, char *prefix,
         char *faceid, unsigned char *reply_buf);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @}

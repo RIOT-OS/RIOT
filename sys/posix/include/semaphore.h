@@ -1,6 +1,10 @@
 #ifndef _SEMAPHORE_H
 #define _SEMAPHORE_H	1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <time.h>
 
 /** Value returned if `sem_open' failed.  */
@@ -97,5 +101,9 @@ int sem_post(sem_t *sem);
  * @param sval place whre value goes to
  */
 int sem_getvalue(sem_t *sem, int *sval);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* semaphore.h */

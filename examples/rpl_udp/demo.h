@@ -1,6 +1,12 @@
 #ifndef DEMO_H
 #define DEMO_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "kernel.h"
 
 #define APP_VERSION "1.1"
@@ -51,4 +57,9 @@ void *rpl_udp_monitor(void *arg);
 extern radio_address_t id;
 extern ipv6_addr_t std_addr;
 extern char addr_str[IPV6_MAX_ADDR_STR_LEN];
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* DEMO_H */

@@ -18,6 +18,10 @@
 #ifndef __VTIMER_H
 #define __VTIMER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <time.h>
 #include <sys/time.h>
 
@@ -132,6 +136,10 @@ void vtimer_print_short_queue(void);
  */
 void vtimer_print_long_queue(void);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 /** @} */

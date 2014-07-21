@@ -22,6 +22,11 @@
 #ifndef _NET_IF_H
 #define _NET_IF_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -497,6 +502,11 @@ int32_t net_if_get_pan_id(int if_id);
  * @return  the PAN ID on success, -1 on failure.
  */
 int32_t net_if_set_pan_id(int if_id, uint16_t pan_id);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @}

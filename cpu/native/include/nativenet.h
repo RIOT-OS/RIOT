@@ -25,6 +25,10 @@
 #ifndef NATIVENET_H
 #define NATIVENET_H
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 #include <net/ethernet.h>
 
 #define RX_BUF_SIZE (10)
@@ -135,5 +139,10 @@ uint16_t nativenet_get_pan(void);
  * Enable transceiver rx mode
  */
 void nativenet_switch_to_rx(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 /** @} */
 #endif /* NATIVENET_H */

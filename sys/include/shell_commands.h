@@ -1,6 +1,12 @@
 #ifndef __SHELL_COMMANDS_H
 #define __SHELL_COMMANDS_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "shell.h"
 
 #define DISK_GET_SECTOR_SIZE    "dget_ssize"
@@ -10,5 +16,9 @@
 #define DISK_READ_BYTES_CMD     "dread"
 
 extern const shell_command_t _shell_command_list[];
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __SHELL_COMMANDS_H */

@@ -22,6 +22,11 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #ifndef RTC_H
 #define RTC_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define RTC_SECOND 10001U
 
 #include <time.h>
@@ -62,5 +67,8 @@ time_t rtc_time(struct timeval *time);
 
 extern int rtc_second_pid;
 
+#ifdef __cplusplus
+}
+#endif
 /** @} */
 #endif

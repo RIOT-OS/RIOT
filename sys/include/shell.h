@@ -15,6 +15,11 @@
 #ifndef __SHELL_H
 #define __SHELL_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 #include "attributes.h"
@@ -83,5 +88,9 @@ void shell_init(shell_t *shell,
  * @returns         This function does not return.
  */
 void shell_run(shell_t *shell) NORETURN;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __SHELL_H */

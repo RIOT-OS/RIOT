@@ -1,4 +1,4 @@
-/**
++/**
  * @addtogroup  sys_timex
  * @{
  * @brief       Utility library for `struct tm`.
@@ -6,6 +6,10 @@
 
 #ifndef __SYS__TIMEX__TM__H
 #define __SYS__TIMEX__TM__H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <time.h>
 #include <sys/time.h>
@@ -99,5 +103,10 @@ int tm_is_valid_date(int year, int mon, int mday) CONST;
  * @returns         0 iff the time is invalid.
  */
 int tm_is_valid_time(int hour, int min, int sec) CONST;
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

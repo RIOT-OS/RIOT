@@ -34,6 +34,10 @@
 #ifndef RIOT_CCN_COMPAT_H_
 #define RIOT_CCN_COMPAT_H_
 
+#ifdef __cplusplus
+extern "C"  {
+#endif
+
 #include <inttypes.h>
 
 #include "transceiver.h"
@@ -79,6 +83,11 @@ void ccnl_riot_relay_start(int max_cache_entries, int fib_threshold_prefix, int 
  * @param relay_pid the pid of the relay
  */
 void ccnl_riot_appserver_start(int relay_pid);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @}

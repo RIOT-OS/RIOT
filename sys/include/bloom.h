@@ -116,6 +116,10 @@
 #ifndef _BLOOM_FILTER_H
 #define _BLOOM_FILTER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -207,6 +211,10 @@ void bloom_add(struct bloom_t *bloom, const uint8_t *buf, size_t len);
  *
  */
 bool bloom_check(struct bloom_t *bloom, const uint8_t *buf, size_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* _BLOOM_FILTER_H */

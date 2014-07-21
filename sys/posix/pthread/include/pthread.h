@@ -12,6 +12,10 @@
 #ifndef __SYS__POSIX__PTHREAD__H
 #define __SYS__POSIX__PTHREAD__H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <time.h>
 
 #include "kernel.h"
@@ -31,6 +35,10 @@
 #include "pthread_scheduling.h"
 #include "pthread_cancellation.h"
 #include "pthread_cond.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

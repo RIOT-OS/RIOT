@@ -7,6 +7,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef PRNG_FLOAT
 #  define PRNG_FLOAT (0)
 #endif
@@ -62,5 +66,9 @@ double genrand_real_exclusive(void);
  * @return a random number on [0,1) with 53-bit resolution
  */
 double genrand_res53(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PRNG_FLOAT */

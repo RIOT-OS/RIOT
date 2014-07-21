@@ -33,6 +33,12 @@
 #ifndef DESTINY_H
 #define DESTINY_H
 
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "destiny/in.h"
 #include "destiny/socket.h"
 #include "destiny/types.h"
@@ -43,5 +49,9 @@
  * @return 0 on success, other else.
  */
 int destiny_init_transport_layer(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* DESTINY_H */

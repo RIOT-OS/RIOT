@@ -11,6 +11,11 @@
 #ifndef TRANSCEIVER_H
 #define TRANSCEIVER_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "radio/types.h"
 
 /* supported transceivers *
@@ -237,6 +242,11 @@ uint8_t transceiver_register(transceiver_type_t transceivers, int pid);
  * @return              1 on success, 0 otherwise
  */
 uint8_t transceiver_unregister(transceiver_type_t transceivers, int pid);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TRANSCEIVER_H */
 /** @} */

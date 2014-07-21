@@ -23,6 +23,11 @@
 #define __THREAD_H
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "kernel.h"
 #include "tcb.h"
 #include "arch/thread_arch.h"
@@ -141,6 +146,11 @@ int thread_getpid(void);
  * @return          the amount of unused space of the thread's stack
  */
 int thread_measure_stack_free(char *stack);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 /* @} */
 #endif /* __THREAD_H */

@@ -12,6 +12,10 @@
 #ifndef __NET_HELP_H
 #define __NET_HELP_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <string.h>
 #include <stdint.h>
 
@@ -41,6 +45,10 @@
 
 uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len);
 void printArrayRange(uint8_t *array, uint16_t len, char *str);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __NET_HELP_H */
