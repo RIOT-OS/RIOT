@@ -74,8 +74,8 @@ typedef struct {
  *
  * @return  0 if blocksize doesn't match else 1
  */
-int aes_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
-             uint8_t *key);
+int aes_init(cipher_context_t* context, uint8_t blockSize, uint8_t* key,
+             uint8_t keySize);
 
 /**
  * @brief   updates the used key for this context after initialization has
@@ -88,7 +88,7 @@ int aes_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
  *
  * @return  0 if initialized blocksize is wrong, 1 else
  */
-int aes_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
+int aes_set_key(cipher_context_t* context, uint8_t* key, uint8_t keysize);
 
 /**
  * @brief   encrypts one plainBlock-block and saves the result in cipherblock.
@@ -105,8 +105,8 @@ int aes_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
  *
  * @return  1 or result of aes_set_encrypt_key if it failed
  */
-int aes_encrypt(cipher_context_t *context, uint8_t *plain_block,
-                uint8_t *cipher_block);
+int aes_encrypt(cipher_context_t* context, uint8_t* plain_block,
+                uint8_t* cipher_block);
 
 /**
  * @brief   decrypts one cipher-block and saves the plain-block in plainBlock.
@@ -123,19 +123,14 @@ int aes_encrypt(cipher_context_t *context, uint8_t *plain_block,
  *
  * @return  1 or result of ::aes_set_decrypt_key if it failed
  */
-int aes_decrypt(cipher_context_t *context, uint8_t *cipher_block,
-                uint8_t *plain_block);
-
-/**
- * @brief returns the blocksize of the AES algorithm
- */
-uint8_t aes_get_preferred_block_size(void);
+int aes_decrypt(cipher_context_t* context, uint8_t* cipher_block,
+                uint8_t* plain_block);
 
 /**
   * Interface to access the functions
   *
   */
-extern block_cipher_interface_t aes_inerface;
+extern cipher_interface_t aes_inerface;
 
 /** @} */
 #endif /* AES_H */

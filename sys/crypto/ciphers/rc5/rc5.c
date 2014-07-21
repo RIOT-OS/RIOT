@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "crypto/ciphers/rc5.h"
-#include "crypto/ciphers.h"
 
 /**
  * Define a fixed blocksize of 8 bytes
@@ -36,17 +35,18 @@
 /**
  * @brief Interface to the rc5 cipher
  */
-block_cipher_interface_t rc5_interface = {
-	"RC5",
+cipher_interface_t rc5_interface = {
+	BLOCK_SIZE,
+	CIPHERS_MAX_KEY_SIZE,
 	rc5_init,
 	rc5_encrypt,
 	rc5_decrypt,
-	rc5_setup_key,
-	rc5_get_preferred_block_size
+	rc5_set_key
 };
 
 
-int rc5_init(cipher_context_t* context, uint8_t blockSize, uint8_t keySize, uint8_t* key)
+int rc5_init(cipher_context_t* context, uint8_t blockSize, uint8_t* key,
+             uint8_t keySize)
 {
 	(void)keySize;
 	// 8 byte blocks only
@@ -54,7 +54,7 @@ int rc5_init(cipher_context_t* context, uint8_t blockSize, uint8_t keySize, uint
 		return 0;
 	}
 
-	return rc5_setup_key(context, key, 0);
+	return rc5_set_key(context, key, 0);
 }
 
 
@@ -124,7 +124,7 @@ int rc5_decrypt(cipher_context_t* context, uint8_t* cipherBlock,
 	return 1;
 }
 
-int rc5_setup_key(cipher_context_t* context, uint8_t* key, uint8_t keysize)
+int rc5_set_key(cipher_context_t* context, uint8_t* key, uint8_t keysize)
 {
 	(void)keysize;
 	uint32_t* L, l, A, B, *S, k;
@@ -176,17 +176,4 @@ int rc5_setup_key(cipher_context_t* context, uint8_t* key, uint8_t keysize)
 	}
 
 	return 1;
-}
-
-/**
- * Returns the preferred block size that this cipher operates with. It is
- * always safe to call this function before the init() call has been made.
- *
- * @return the preferred block size for this cipher. In the case where the
- *         cipher operates with multiple block sizes, this will pick one
- *         particular size (deterministically).
- */
-uint8_t rc5_get_preferred_block_size(void)
-{
-	return BLOCK_SIZE;
 }

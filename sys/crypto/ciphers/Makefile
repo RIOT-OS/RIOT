@@ -1,3 +1,3 @@
-MODULE = crypto_ciphers
+MODULE = ciphers
 
 include $(RIOTBASE)/Makefile.base

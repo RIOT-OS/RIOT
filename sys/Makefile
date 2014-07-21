@@ -88,6 +88,9 @@ endif
 ifneq (,$(filter twofish,$(USEMODULE)))
     DIRS += crypto/ciphers/twofish
 endif
+ifneq (,$(filter ciphers,$(USEMODULE)))
+    DIRS += crypto/ciphers
+endif
 ifneq (,$(filter random,$(USEMODULE)))
     DIRS += random
 endif
