@@ -49,8 +49,8 @@ typedef uint8_t u8;
 
 
 struct aes_key_st {
-    uint32_t rd_key[4 * (AES_MAXNR + 1)];
-    int rounds;
+	uint32_t rd_key[4 * (AES_MAXNR + 1)];
+	int rounds;
 };
 
 typedef struct aes_key_st AES_KEY;
@@ -59,7 +59,7 @@ typedef struct aes_key_st AES_KEY;
  * @brief the cipher_context_t-struct adapted for AES
  */
 typedef struct {
-    uint32_t context[(4 * (AES_MAXNR + 1)) + 1];
+	uint32_t context[(4 * (AES_MAXNR + 1)) + 1];
 } aes_context_t;
 
 /**

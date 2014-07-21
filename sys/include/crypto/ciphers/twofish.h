@@ -201,7 +201,7 @@
  * Note that k[i] corresponds to what the Twofish paper calls K[i+8].
  */
 typedef struct {
-    uint32_t s[4][256], w[8], k[32];
+	uint32_t s[4][256], w[8], k[32];
 } twofish_context_t;
 
 

@@ -56,7 +56,7 @@
  * @brief the cipher_context_t adapted for RC5
  */
 typedef struct {
-    uint32_t skey [2 * (RC5_ROUNDS + 1)];
+	uint32_t skey [2 * (RC5_ROUNDS + 1)];
 } rc5_context_t;
 
 /**
