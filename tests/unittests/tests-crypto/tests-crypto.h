@@ -36,6 +36,7 @@ static inline int compare(uint8_t a[16], uint8_t b[16], uint8_t len)
 
 Test* tests_crypto_aes_tests(void);
 Test* tests_crypto_3des_tests(void);
+Test* tests_crypto_twofish_tests(void);
 
 #endif /* __TESTS_CRYPTO_H_ */
 /** @} */
