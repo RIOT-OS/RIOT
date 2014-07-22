@@ -3,10 +3,10 @@ PKG_URL     = http://example.com/downloads # source url of the package e.g. a gi
 PKG_VERSION = v1.2.3                       # version of the package to use e.g. a git commit/ref
 PKG_EXT     = zip                          # extension of this package
 
-.PHONY: all clean patch reset
+.PHONY: all clean patch distclean
 
 all: patch
-	make -C $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)
+	$(MAKE) -C $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 patch: $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/Makefile
 	# Dependancy might be changed accordingly though we think the Makefile
@@ -30,7 +30,7 @@ $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT):
 clean::
 	# Reset package to checkout state.
 	rm -rf $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION) && \
-		make $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/Makefile
+		$(MAKE) $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION)/Makefile
 
-clean::
+distclean::
 	rm -rf $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION) $(CURDIR)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
