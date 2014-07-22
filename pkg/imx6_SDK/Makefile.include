@@ -1,0 +1,1 @@
+export IMX6_SDK_PATH="$(RIOTBASE)/pkg/imx6_SDK"
