@@ -25,12 +25,16 @@
 #include "kernel.h"
 
 #define CIPHERS_MAX_KEY_SIZE 20
+#define CIPHER_MAX_BLOCK_SIZE 16
 
 /**
  * error codes
  */
 #define CIPHER_ERR_UNSUPPORTED_CIHPER -2
-#define CIPHER_ERR_INVALID_KEY_SIZE -3
+#define CIPHER_ERR_INVALID_KEY_SIZE   -3
+#define CIPHER_ERR_INVALID_LENGTH     -4
+#define CIPHER_ERR_ENC_FAILED         -5
+#define CIPHER_ERR_DEC_FAILED         -6
 
 /**
  * @brief   the context for cipher-operations

@@ -54,6 +54,10 @@ ifneq (,$(filter sha256,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/include/crypto
 endif
 
+ifneq (,$(filter cipher_modes,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/include/crypto/modes
+endif
+
 ifneq (,$(filter posix,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif

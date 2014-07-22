@@ -91,6 +91,9 @@ endif
 ifneq (,$(filter ciphers,$(USEMODULE)))
     DIRS += crypto/ciphers
 endif
+ifneq (,$(filter cipher_modes,$(USEMODULE)))
+    DIRS += crypto/modes
+endif
 ifneq (,$(filter random,$(USEMODULE)))
     DIRS += random
 endif
