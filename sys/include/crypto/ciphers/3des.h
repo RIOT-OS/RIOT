@@ -6,7 +6,9 @@
  */
 
 /**
+ * @defgroup    sys_crypto_ciphers ciphers
  * @ingroup     sys_crypto
+ * @brief       collection of different block ciphers
  * @{
  *
  * @file        3des.h
@@ -29,7 +31,7 @@
 #define THREEDES_H_
 
 #define THREEDES_BLOCK_SIZE    8
-#define THREEDES_KEY_SIZE      PARSEC_KEYSIZE
+#define THREEDES_MAX_KEY_SIZE 24
 
 #define ROLc(x, y) \
         ((((unsigned long) (x) << (unsigned long) ((y) & 31)) | \
@@ -63,12 +65,12 @@
 static const uint32_t bytebit[8] = {0200, 0100, 040, 020, 010, 04, 02, 01};
 
 static const uint32_t bigbyte[24] = {
-    0x800000UL,  0x400000UL,  0x200000UL,  0x100000UL,
-    0x80000UL,   0x40000UL,   0x20000UL,   0x10000UL,
-    0x8000UL,    0x4000UL,    0x2000UL,    0x1000UL,
-    0x800UL,     0x400UL,     0x200UL,     0x100UL,
-    0x80UL,      0x40UL,      0x20UL,      0x10UL,
-    0x8UL,       0x4UL,       0x2UL,       0x1L
+	0x800000UL,  0x400000UL,  0x200000UL,  0x100000UL,
+	0x80000UL,   0x40000UL,   0x20000UL,   0x10000UL,
+	0x8000UL,    0x4000UL,    0x2000UL,    0x1000UL,
+	0x800UL,     0x400UL,     0x200UL,     0x100UL,
+	0x80UL,      0x40UL,      0x20UL,      0x10UL,
+	0x8UL,       0x4UL,       0x2UL,       0x1L
 };
 /**
  * @brief   initializes the 3DES Cipher-algorithm with the passed
@@ -83,8 +85,8 @@ static const uint32_t bigbyte[24] = {
  *
  * @return  0 if blocksize doesn't match else 1
  */
-int tripledes_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize,
-                   uint8_t *key);
+int tripledes_init(cipher_context_t* context, uint8_t blockSize, uint8_t* key,
+                   uint8_t keySize);
 
 /**
  * @brief   updates the used key for this context after initialization has
@@ -96,7 +98,7 @@ int tripledes_init(cipher_context_t *context, uint8_t blockSize, uint8_t keySize
  *
  * @return  0 if initialized blocksize is wrong, 1 else
  */
-int tripledes_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize);
+int tripledes_set_key(cipher_context_t* context, uint8_t* key, uint8_t keysize);
 
 /**
  * @brief   encrypts one plain-block and saves the result in crypt.
@@ -115,7 +117,7 @@ int tripledes_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize
  *                      -2 if the key could not be setup correctly
  *                       1 if encryption was successful
  */
-int tripledes_encrypt(cipher_context_t *context, uint8_t *plain, uint8_t *crypt);
+int tripledes_encrypt(cipher_context_t* context, uint8_t* plain, uint8_t* crypt);
 
 /**
  * @brief  decrypts one cipher-block and saves the plain-block in plain.
@@ -134,18 +136,13 @@ int tripledes_encrypt(cipher_context_t *context, uint8_t *plain, uint8_t *crypt)
  *          -2 if the key could not be setup correctly
  *           1 if decryption was successful
  */
-int tripledes_decrypt(cipher_context_t *context, uint8_t *crypt, uint8_t *plain);
-
-/**
- * @brief returns the blocksize of the 3DES algorithm
- */
-uint8_t tripledes_get_preferred_block_size(void);
+int tripledes_decrypt(cipher_context_t* context, uint8_t* crypt, uint8_t* plain);
 
 /**
  * Interface to access the functions
  *
  */
-extern block_cipher_interface_t tripledes_interface;
+extern cipher_interface_t tripledes_interface;
 
 /** @} */
 #endif /* THREEDES_H_ */

@@ -75,7 +75,7 @@ ifneq (,$(filter net_if,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ccn_lite,$(USEMODULE)))
-	USEMODULE += crypto
+	USEMODULE += sha256
 endif
 
 ifneq (,$(filter rgbled,$(USEMODULE)))

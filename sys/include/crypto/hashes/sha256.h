@@ -29,13 +29,9 @@
 
 
 /**
- * @defgroup    sys_sha256 SHA264
- * @ingroup     sys
- * @brief       SHA264 hash generator
- */
-
-/**
+ * @defgroup    sys_crypto_hashes hashes
  * @ingroup     sys_crypto
+ * @brief       SHA256 hash generator
  * @{
  *
  * @file        sha256.h
@@ -54,9 +50,9 @@
 #define SHA256_DIGEST_LENGTH 32
 
 typedef struct {
-    uint32_t state[8];
-    uint32_t count[2];
-    unsigned char buf[64];
+	uint32_t state[8];
+	uint32_t count[2];
+	unsigned char buf[64];
 } sha256_context_t;
 
 /**
@@ -64,7 +60,7 @@ typedef struct {
  *
  * @param ctx  sha256_context_t handle to init
  */
-void sha256_init(sha256_context_t *ctx);
+void sha256_init(sha256_context_t* ctx);
 
 /**
  * @brief Add bytes into the hash
@@ -73,7 +69,7 @@ void sha256_init(sha256_context_t *ctx);
  * @param in   pointer to the input buffer
  * @param len  length of the buffer
  */
-void sha256_update(sha256_context_t *ctx, const void *in, size_t len);
+void sha256_update(sha256_context_t* ctx, const void* in, size_t len);
 
 /**
  * @brief SHA-256 finalization.  Pads the input data, exports the hash value,
@@ -82,7 +78,7 @@ void sha256_update(sha256_context_t *ctx, const void *in, size_t len);
  * @param digest resulting digest, this is the hash of all the bytes
  * @param ctx    sha256_context_t handle to use
  */
-void sha256_final(unsigned char digest[32], sha256_context_t *ctx);
+void sha256_final(unsigned char digest[32], sha256_context_t* ctx);
 
 /**
  * @brief A wrapper function to simplify the generation of a hash, this is
@@ -94,7 +90,7 @@ void sha256_final(unsigned char digest[32], sha256_context_t *ctx);
  *           SHA256_DIGEST_LENGTH
  *           if md == NULL, one static buffer is used
  */
-unsigned char *sha256(const unsigned char *d, size_t n, unsigned char *md);
+unsigned char* sha256(const unsigned char* d, size_t n, unsigned char* md);
 
 /** @} */
 #endif /* _SHA256_H_ */

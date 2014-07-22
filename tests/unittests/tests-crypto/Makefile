@@ -1,0 +1,10 @@
+MODULE = tests-crypto
+
+# calloc does not exist in these devices, see issue #1061
+BOARD_BLACKLIST := chronos msb-430 msb-430h \
+                   telosb wsn430-v1_3b wsn430-v1_4 z1 \
+                   arduino-due mbed_lpc1768 redbee-econotag udoo
+
+
+
+include $(RIOTBASE)/Makefile.base
