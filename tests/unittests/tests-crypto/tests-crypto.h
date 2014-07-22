@@ -40,6 +40,7 @@ Test* tests_crypto_twofish_tests(void);
 Test* tests_crypto_cipher_tests(void);
 Test* tests_crypto_modes_ccm_tests(void);
 Test* tests_crypto_modes_ecb_tests(void);
+Test* tests_crypto_modes_cbc_tests(void);
 
 #endif /* __TESTS_CRYPTO_H_ */
 /** @} */

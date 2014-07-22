@@ -16,5 +16,6 @@ void tests_crypto(void)
 	TESTS_RUN(tests_crypto_cipher_tests());
 	TESTS_RUN(tests_crypto_modes_ccm_tests());
 	TESTS_RUN(tests_crypto_modes_ecb_tests());
+	TESTS_RUN(tests_crypto_modes_cbc_tests());
 }
 
