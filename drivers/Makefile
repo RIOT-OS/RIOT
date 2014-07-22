@@ -34,5 +34,8 @@ endif
 ifneq (,$(filter rgbled,$(USEMODULE)))
     DIRS += rgbled
 endif
+ifneq (,$(filter servo,$(USEMODULE)))
+    DIRS += servo
+endif
 
 include $(RIOTBASE)/Makefile.base
