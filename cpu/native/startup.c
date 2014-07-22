@@ -169,19 +169,22 @@ void usage_exit(void)
     real_printf(" help: %s -h\n", _progname);
 
     real_printf("\nOptions:\n\
--h      help\n\
--i      specify instance id (set by config module)\n\
--d      daemonize\n\
--e      redirect stderr to file\n\
--E      do not redirect stderr (i.e. leave sterr unchanged despite socket/daemon io)\n\
--o      redirect stdout to file when not attached to socket\n");
+-h          help\n");
 
 #ifdef MODULE_UART0
     real_printf("\
--u      redirect stdio to UNIX socket\n\
-        if no path is given /tmp/riot.tty.PID is used\n\
--t      redirect stdio to TCP socket\n");
+-t <port>   redirect stdio to TCP socket listening on <port>\n\
+-u <path>   redirect stdio to UNIX socket (<path> if given,\n\
+            /tmp/riot.tty.PID otherwise)\n");
 #endif
+    real_printf("\
+-i <id>     specify instance id (set by config module)\n\
+-d          daemonize\n\
+-e          redirect stderr to file\n\
+-E          do not redirect stderr (i.e. leave sterr unchanged despite\n\
+            daemon/socket io)\n\
+-o          redirect stdout to file (/tmp/riot.stdout.PID) when not attached\n\
+            to socket\n");
 
     real_printf("\n\
 The order of command line arguments matters.\n");
