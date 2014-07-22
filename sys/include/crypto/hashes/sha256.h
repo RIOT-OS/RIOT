@@ -29,13 +29,9 @@
 
 
 /**
- * @defgroup    sys_sha256 SHA264
- * @ingroup     sys
- * @brief       SHA264 hash generator
- */
-
-/**
+ * @defgroup    sys_crypto_hashes hashes
  * @ingroup     sys_crypto
+ * @brief       SHA256 hash generator
  * @{
  *
  * @file        sha256.h

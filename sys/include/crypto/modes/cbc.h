@@ -6,7 +6,9 @@
  */
 
 /**
+ * @defgroup    sys_crypto_modes modes
  * @ingroup     sys_crypto
+ * @brief       collection of different block ciphers operation modes
  * @{
  *
  * @file        cbc.h

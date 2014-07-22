@@ -10,7 +10,7 @@
  * @{
  *
  * @file        ciphers.h
- * @brief       Basic header for all encryption algorithms.
+ * @brief       generic API for block ciphers
  *
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics
  * @author      Nicolai Schmittberger <nicolai.schmittberger@fu-berlin.de>

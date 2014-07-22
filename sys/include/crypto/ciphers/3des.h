@@ -6,7 +6,9 @@
  */
 
 /**
+ * @defgroup    sys_crypto_ciphers ciphers
  * @ingroup     sys_crypto
+ * @brief       collection of different block ciphers
  * @{
  *
  * @file        3des.h

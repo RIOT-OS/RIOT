@@ -6,6 +6,7 @@
  */
 
 /**
+ * @defgroup    sys_crypto_modes modes
  * @ingroup     sys_crypto
  * @{
  *
