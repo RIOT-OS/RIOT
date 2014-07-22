@@ -131,9 +131,9 @@ $(RIOTBASE)/pkg/%/Makefile.include::
 	$(AD)"$(MAKE)" -C $(RIOTBASE)/pkg/$* Makefile.include
 
 .PHONY: $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include)
-
 -include $(USEPKG:%=$(RIOTBASE)/pkg/%/Makefile.include)
 
+.PHONY: $(USEPKG:%=${BINDIR}%.a)
 $(USEPKG:%=${BINDIR}%.a):
 	@mkdir -p ${BINDIR}
 	"$(MAKE)" -C $(RIOTBASE)/pkg/$(patsubst ${BINDIR}%.a,%,$@)
