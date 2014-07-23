@@ -46,7 +46,6 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:
-
             GPIO_DEV->PIN_CNF[GPIO_0] = GPIO_PIN_CNF_IN;
             break;
 #endif
@@ -125,7 +124,6 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
             GPIO_DEV->PIN_CNF[GPIO_15] = GPIO_PIN_CNF_IN;
             break;
 #endif
-
         case GPIO_UNDEFINED:
         default:
             return -1;
@@ -134,7 +132,6 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
         case GPIO_PULLDOWN:
             GPIO_DEV->PIN_CNF[dev] |=  (GPIO_PIN_CNF_PULL_Pulldown << GPIO_PIN_CNF_PULL_Pos);
             break;
-            //return -2;
         case GPIO_PULLUP:
             GPIO_DEV->PIN_CNF[dev] |=  (GPIO_PIN_CNF_PULL_Pullup << GPIO_PIN_CNF_PULL_Pos);
             break;
@@ -230,18 +227,16 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
             GPIO_DEV->PIN_CNF[dev] = GPIO_PIN_CNF_OUT;
             break;
 #endif
-
      case GPIO_UNDEFINED:
         default:
             return -1;
     }
-    //configure dev as input and pullup as state
 
+    /* configure dev as input and pullup as state */    
     switch (pullup) {
         case GPIO_PULLDOWN:
             GPIO_DEV->PIN_CNF[dev] |=  (GPIO_PIN_CNF_PULL_Pulldown << GPIO_PIN_CNF_PULL_Pos);
             break;
-            //return -2;
         case GPIO_PULLUP:
             GPIO_DEV->PIN_CNF[dev] |=  (GPIO_PIN_CNF_PULL_Pullup << GPIO_PIN_CNF_PULL_Pos);
             break;
@@ -255,111 +250,103 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
 int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(void))
 {
 
-    //Löse Interrupt aus, bei Erkennung der Flanke
+    /* triggering interrupt by edge */
 
-       int res;
-        uint32_t pin = 50;
+    int res;
+    uint32_t pin = 50;
 
-        /* configure pin as input */
-        res = gpio_init_in(dev, pullup);
-        if (res < 0) {
-            return res;
-        }
-
-
-        switch (dev) {
-    #ifdef GPIO_0_EN
-            case GPIO_0:
-                pin = GPIO_0_PIN;
-                break;
-    #endif
-    #ifdef GPIO_1_EN
-            case GPIO_1:
-                pin = GPIO_1_PIN;
-                break;
-    #endif
-    #ifdef GPIO_2_EN
-            case GPIO_2:
-                pin = GPIO_2_PIN;
-                break;
-    #endif
-    #ifdef GPIO_3_EN
-            case GPIO_3:
-                pin = GPIO_3_PIN;
-                break;
-    #endif
-    #ifdef GPIO_4_EN
-            case GPIO_4:
-                pin = GPIO_4_PIN;
-                break;
-    #endif
-    #ifdef GPIO_5_EN
-            case GPIO_5:
-                pin = GPIO_5_PIN;
-                break;
-    #endif
-    #ifdef GPIO_6_EN
-            case GPIO_6:
-                pin = GPIO_6_PIN;
-                break;
-    #endif
-    #ifdef GPIO_7_EN
-            case GPIO_7:
-                pin = GPIO_7_PIN;
-                break;
-    #endif
-    #ifdef GPIO_8_EN
-            case GPIO_8:
-                pin = GPIO_8_PIN;
-                break;
-    #endif
-    #ifdef GPIO_9_EN
-            case GPIO_9:
-                pin = GPIO_9_PIN;
-                break;
-    #endif
-    #ifdef GPIO_10_EN
-            case GPIO_10:
-                pin = GPIO_10_PIN;
-                break;
-    #endif
-    #ifdef GPIO_11_EN
-            case GPIO_11:
-                pin = GPIO_11_PIN;
-                break;
-    #endif
-            case GPIO_UNDEFINED:
-            default:
-                return -1;
-        }
+    /* configure pin as input */
+    res = gpio_init_in(dev, pullup);
+    if (res < 0) {
+        return res;
+    }
 
 
-        if(pin == 50){
+    switch (dev) {
+#ifdef GPIO_0_EN
+        case GPIO_0:
+            pin = GPIO_0_PIN;
+            break;
+#endif
+#ifdef GPIO_1_EN
+        case GPIO_1:
+            pin = GPIO_1_PIN;
+            break;
+#endif
+#ifdef GPIO_2_EN
+        case GPIO_2:
+        pin = GPIO_2_PIN;
+            break;
+#endif
+#ifdef GPIO_3_EN
+        case GPIO_3:
+            pin = GPIO_3_PIN;
+            break;
+#endif
+#ifdef GPIO_4_EN
+        case GPIO_4:
+            pin = GPIO_4_PIN;
+            break;
+#endif
+#ifdef GPIO_5_EN
+        case GPIO_5:
+            pin = GPIO_5_PIN;
+            break;
+#endif
+#ifdef GPIO_6_EN
+        case GPIO_6:
+            pin = GPIO_6_PIN;
+            break;
+#endif
+#ifdef GPIO_7_EN
+        case GPIO_7:
+            pin = GPIO_7_PIN;
+            break;
+#endif
+#ifdef GPIO_8_EN
+        case GPIO_8:
+            pin = GPIO_8_PIN;
+            break;
+#endif
+#ifdef GPIO_9_EN
+        case GPIO_9:
+            pin = GPIO_9_PIN;
+            break;
+#endif
+#ifdef GPIO_10_EN
+        case GPIO_10:
+            pin = GPIO_10_PIN;
+            break;
+#endif
+#ifdef GPIO_11_EN
+        case GPIO_11:
+            pin = GPIO_11_PIN;
+            break;
+#endif
+        case GPIO_UNDEFINED:
+        default:
             return -1;
-        }
+    }
 
+   NVIC_SetPriority(GPIOTE_IRQn, GPIO_IRQ_PRIO);
+   NVIC_EnableIRQ(GPIOTE_IRQn);
+    /* save callback */
+   config[dev].cb = cb;
 
-       NVIC_SetPriority(GPIOTE_IRQn, GPIO_IRQ_PRIO);
-       NVIC_EnableIRQ(GPIOTE_IRQn);
-        /* save callback */
-       config[dev].cb = cb;
+    gpio_init_in(pin,pullup);
+    GPIO_IRQ_DEV->CONFIG[0] =  (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos)
+                           | (pin << GPIOTE_CONFIG_PSEL_Pos)
+                           | (GPIOTE_CONFIG_MODE_Event << GPIOTE_CONFIG_MODE_Pos);
 
-        gpio_init_in(pin,pullup);
-        GPIO_IRQ_DEV->CONFIG[0] =  (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos)
-                               | (pin << GPIOTE_CONFIG_PSEL_Pos)
-                               | (GPIOTE_CONFIG_MODE_Event << GPIOTE_CONFIG_MODE_Pos);
+    GPIO_IRQ_DEV->INTENSET  = GPIOTE_INTENSET_IN0_Set << GPIOTE_INTENSET_IN0_Pos;
 
-        GPIO_IRQ_DEV->INTENSET  = GPIOTE_INTENSET_IN0_Set << GPIOTE_INTENSET_IN0_Pos;
-
-
-
-    return 1;
+    return 0;
 }
 
 int gpio_read(gpio_t dev)
 {
 
-    //TODO auch für output
+    /* TODO: also implement this read function for pins who are configured as output */
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:
@@ -632,7 +619,7 @@ int gpio_set(gpio_t dev)
         default:
             return -1;
     }
-    return 1;
+    return 0;
 }
 
 int gpio_clear(gpio_t dev)
@@ -723,7 +710,7 @@ int gpio_clear(gpio_t dev)
             default:
                 return -1;
         }
-    return 1;
+    return 0;
 }
 
 

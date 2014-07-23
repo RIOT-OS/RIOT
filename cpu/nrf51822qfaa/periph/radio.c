@@ -309,7 +309,7 @@ void radioConfig(void) {
   // Radio config
   NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_0dBm
       << RADIO_TXPOWER_TXPOWER_Pos);
-  NRF_RADIO->FREQUENCY = 2UL;                // Frequency bin 7, 2407MHz
+  NRF_RADIO->FREQUENCY = 7UL;                // Frequency bin 7, 2407MHz
   NRF_RADIO->MODE = (RADIO_MODE_MODE_Ble_1Mbit << RADIO_MODE_MODE_Pos);
 
   // Radio address config

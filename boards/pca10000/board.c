@@ -20,15 +20,12 @@
  */
 
 #include <stdio.h>
-#include "periph/timer.h"
 #include "board.h"
 #include "cpu.h"
 #include "nrf51.h"
 #include "periph/uart.h"
-#include "periph/gpio.h"
-#include "radio.h"
+#include "cmsis_system.h"
 
-extern void SystemInit(void);
 void leds_init(void);
 
 void board_init(void)

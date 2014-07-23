@@ -1,5 +1,5 @@
 
-# define the cpu used by the stm32f3-discovery board
+# define the cpu used by the nRF51822 board pca10000
 export CPU = nrf51822qfaa
 
 export PORT ?= /dev/ttyACM0

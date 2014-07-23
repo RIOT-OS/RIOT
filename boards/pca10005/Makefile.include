@@ -1,5 +1,5 @@
 
-# define the cpu used by the stm32f3-discovery board
+# define the cpu used by the nRF51822 board pca10005
 export CPU = nrf51822qfaa
 
 export PORT ?= /dev/ttyACM0
@@ -13,7 +13,7 @@ export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
-export FLASHER = $(RIOTBASE)/boards/pca10000/dist/flash.sh $(BINDIR) $(RIOTBASE) $(APPLICATION) $(BOARD)
+export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh $(BINDIR) $(RIOTBASE) $(APPLICATION) $(BOARD)
 export HEXFILE = $(ELFFILE:.elf=.bin)
 
 # define build specific options

@@ -35,12 +35,12 @@
 #include <stdbool.h>
 #include "nrf51.h"
 #include "nrf51_bitfields.h"
-//#include "system_nrf51.h"
+#include "board.h"
 
 /*lint ++flb "Enter library region" */
 
 
-#define __SYSTEM_CLOCK      (16000000UL)     /*!< nRF51 devices use a fixed System Clock Frequency of 16MHz */
+#define __SYSTEM_CLOCK      (F_CPU)     /*!< nRF51 devices use a fixed System Clock Frequency of 16MHz */
 
 static bool is_manual_peripheral_setup_needed(void);
 static bool is_disabled_in_debug_needed(void);

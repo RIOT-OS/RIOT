@@ -21,20 +21,16 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "periph/timer.h"
 #include "board.h"
 #include "cpu.h"
 #include "nrf51.h"
 #include "periph/uart.h"
 #include "periph/gpio.h"
-#include "radio.h"
-
-extern void SystemInit(void);
-void leds_init(void);
+#include "cmsis_system.h"
 
 void board_init(void)
 {
-    /* initialize core clocks via STM-lib given function */
+    /* initialize core clocks via nRF51822 given function */
     SystemInit();
 
     /* initialize the CPU */

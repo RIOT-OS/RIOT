@@ -42,10 +42,10 @@ int main(void)
 
     radioConfig();
 
-	while(1) {
+	//while(1) {
 		char msg = receivePacket();
         printf("message received: %c", msg);
-	}
+	//}
 
     return 0;
 }
