@@ -24,7 +24,7 @@
 #include "net_help.h"
 #endif
 
-#include "debug.h"
+#include "olsr_debug.h"
 #include "nhdp.h"
 #include "olsr.h"
 #include "reader.h"

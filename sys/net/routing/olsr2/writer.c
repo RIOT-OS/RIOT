@@ -30,7 +30,7 @@
 #include "writer.h"
 #include "nhdp.h"
 #include "olsr.h"
-#include "debug.h"
+#include "olsr_debug.h"
 #include "routing.h"
 
 uint8_t msg_buffer[256];

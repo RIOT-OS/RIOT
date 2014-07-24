@@ -15,7 +15,7 @@
 
 #include "node.h"
 #include "list.h"
-#include "debug.h"
+#include "olsr_debug.h"
 
 #include "common/netaddr.h"
 #include "rfc5444/rfc5444.h"
