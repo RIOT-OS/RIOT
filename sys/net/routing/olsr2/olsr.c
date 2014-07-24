@@ -332,8 +332,8 @@ bool is_known_msg(struct netaddr* addr, uint16_t seq_no, uint8_t vtime) {
 	uint16_t tmp = node->seq_no;
 	/*	S1 > S2 AND S1 - S2 < MAXVALUE/2 OR
 		S2 > S1 AND S2 - S1 > MAXVALUE/2	*/
-	if ((seq_no > tmp && seq_no - tmp < (1 << 15)) ||
-		(seq_no < tmp && tmp - seq_no > (1 << 15)) ) {
+	if (((seq_no > tmp) && (seq_no - tmp < (1 << 15))) ||
+		((seq_no < tmp) && (tmp - seq_no > (1 << 15))) ) {
 		node->seq_no = seq_no;
 		return false;
 	}
