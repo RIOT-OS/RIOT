@@ -23,7 +23,7 @@
 
 #include "util.h"
 #include "node.h"
-#include "debug.h"
+#include "olsr_debug.h"
 
 const char* netaddr_to_str_s(struct netaddr_str* dst, const struct netaddr* src) {
 	return src ? netaddr_to_string(dst, src) : NULL;

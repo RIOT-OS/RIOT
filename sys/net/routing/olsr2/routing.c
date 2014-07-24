@@ -16,7 +16,7 @@
 
 #include "olsr.h"
 #include "list.h"
-#include "debug.h"
+#include "olsr_debug.h"
 #include "util.h"
 #include "routing.h"
 #include "constants.h"

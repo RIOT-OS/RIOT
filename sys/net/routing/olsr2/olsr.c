@@ -23,7 +23,7 @@
 
 #include "olsr.h"
 #include "util.h"
-#include "debug.h"
+#include "olsr_debug.h"
 #include "routing.h"
 #include "constants.h"
 #include "list.h"

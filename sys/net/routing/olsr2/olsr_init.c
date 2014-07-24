@@ -33,7 +33,7 @@
 #include "rfc5444/rfc5444_writer.h"
 
 #include "constants.h"
-#include "debug.h"
+#include "olsr_debug.h"
 #include "node.h"
 #include "olsr.h"
 #include "reader.h"
