@@ -148,7 +148,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length);
  * @return              Number of bytes that were transfered
  * @return              -1 on error
  */
-int spi_transfer_reg(spi_t dev, uint8_t reg, char *out, char *in);
+int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in);
 
 /**
  * @brief Transfer a number of bytes from/to a given register address
