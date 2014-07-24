@@ -64,7 +64,8 @@ static bool spurious_irq(uint8_t irq_num)
         return (inb(PIC_MASTER + PIC_COMMAND) & (1 << irq_num)) == 0;
     }
 
-    return false; // TODO: does not work
+    return false;
+#if 0 /* TODO: does not work */
     irq_num -= 8;
     outb(PIC_SLAVE + PIC_COMMAND, PIC_READ_ISR);
     if (inb(PIC_SLAVE + PIC_COMMAND) & (1 << irq_num)) {
@@ -72,6 +73,7 @@ static bool spurious_irq(uint8_t irq_num)
         return true;
     }
     return false;
+#endif
 }
 
 static void pic_interrupt_entry(uint8_t intr_num, struct x86_pushad *orig_ctx, unsigned long error_code)
