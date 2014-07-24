@@ -40,6 +40,7 @@
  */
 #define STDIO               UART_0
 #define STDIO_BAUDRATE      (115200U)
+#define STDIO_BUFSIZE       (64U)
 /** @} */
 
 /**
