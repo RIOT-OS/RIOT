@@ -72,6 +72,12 @@ ifneq (,$(filter gtimer,$(USEMODULE)))
     USEMODULE += timex
 endif
 
+ifneq (,$(filter gtsp,$(USEMODULE)))
+    USEMODULE += sixlowpan
+    USEMODULE += ieee802154
+    USEMODULE += gtimer
+endif
+
 ifneq (,$(filter net_if,$(USEMODULE)))
 	USEMODULE += transceiver
 	USEMODULE += net_help
