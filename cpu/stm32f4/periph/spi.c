@@ -40,14 +40,14 @@ static char cb_delay = 0xb8;
 int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed){
 
 	GPIO_TypeDef *port;
-	SPI_TypeDef *SPI_port;
+	SPI_TypeDef *spi_port;
 
 
     switch (dev) {
 #if SPI_0_EN
         case SPI_0:
 			port = SPI_0_PORT; /* = GPIOA */
-			SPI_port = SPI_0_DEV;
+			spi_port = SPI_0_DEV;
             /************************* GPIO-Init *************************/
 
 			/* Set GPIOs to AF mode */
@@ -96,7 +96,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed){
 #if SPI_1_EN
         case SPI_1:
         	port = SPI_1_PORT;
-            SPI_port = SPI_1_DEV;
+            spi_port = SPI_1_DEV;
             /************************* GPIO-Init *************************/
 
 			/* Set GPIOs to AF mode */
@@ -148,17 +148,17 @@ int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed){
 
     /************************* SPI-Init *************************/
 
-	    SPI_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);/* Activate the SPI mode (Reset I2SMOD bit in I2SCFGR register) */
+	    spi_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);/* Activate the SPI mode (Reset I2SMOD bit in I2SCFGR register) */
 
-	    SPI_port->CR1 = 0;
-	    SPI_port->CR2 = 0;
+	    spi_port->CR1 = 0;
+	    spi_port->CR2 = 0;
 
-		SPI_port->CR2 |=  (SPI_CR2_SSOE); /* 1: enable master = disable multimaster */
+		spi_port->CR2 |=  (SPI_CR2_SSOE); /* 1: enable master = disable multimaster */
 
-		SPI_port->CR1 |=  (SPI_CR1_SPE);/* SPI enable */
-	    SPI_port->CR1 |=  (speed << 3); /* Define serial clock baud rate. 001 leads to f_PCLK/4 */
-		SPI_port->CR1 |=  (SPI_CR1_MSTR); /* 1: master configuration */
-		SPI_port->CR1 |=  (conf);
+		spi_port->CR1 |=  (SPI_CR1_SPE);/* SPI enable */
+	    spi_port->CR1 |=  (speed << 3); /* Define serial clock baud rate. 001 leads to f_PCLK/4 */
+		spi_port->CR1 |=  (SPI_CR1_MSTR); /* 1: master configuration */
+		spi_port->CR1 |=  (conf);
 
 	return 0;
 }
@@ -168,14 +168,14 @@ int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed){
 
 int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(unsigned int seq, char data)){
 
-	SPI_TypeDef *SPI_port;
+	SPI_TypeDef *spi_port;
 	GPIO_TypeDef *port;
 
     switch (dev) {
 #if SPI_0_EN
         case SPI_0:
 			port = SPI_0_PORT;
-			SPI_port = SPI_0_DEV;
+			spi_port = SPI_0_DEV;
 			NVIC_SetPriority(SPI_0_IRQ_HANDLER, SPI_0_IRQ_PRIO); /* set SPI interrupt priority */
 			NVIC_EnableIRQ(SPI_0_IRQ_HANDLER); /* set SPI interrupt priority */
 
@@ -239,7 +239,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(unsigned int seq, char
 #if SPI_1_EN
         case SPI_1:
         	port = SPI_1_PORT;
-            SPI_port = SPI_1_DEV;
+            spi_port = SPI_1_DEV;
 			NVIC_SetPriority(SPI_1_IRQ_HANDLER, SPI_1_IRQ_PRIO);
 			NVIC_EnableIRQ(SPI_1_IRQ_HANDLER);
 
@@ -306,16 +306,16 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(unsigned int seq, char
     }
 
     /************************* SPI-Init *************************/
-    		SPI_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);
+    		spi_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);
 
-			SPI_port->CR1 = 0;
-			SPI_port->CR2 = 0;
+			spi_port->CR1 = 0;
+			spi_port->CR2 = 0;
 
 			/* enable RXNEIE flag to enable rx buffer not empty interrupt */
-			SPI_port->CR2 |= (SPI_CR2_RXNEIE); /*1:not masked */
+			spi_port->CR2 |= (SPI_CR2_RXNEIE); /*1:not masked */
 
-			SPI_port->CR1 |=  (SPI_CR1_SPE);/* SPI enable */
-			SPI_port->CR1 |=  (conf);
+			spi_port->CR1 |=  (SPI_CR1_SPE);/* SPI enable */
+			spi_port->CR1 |=  (conf);
 
     /* set callback */
     config[dev].cb = cb;
@@ -328,17 +328,17 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(unsigned int seq, char
 int spi_transfer_byte(spi_t dev, char out, char *in){
 
 
-    SPI_TypeDef *SPI_port;
+    SPI_TypeDef *spi_port;
 
     switch (dev) {
 #if SPI_0_EN
         case SPI_0:
-            SPI_port = SPI_0_DEV;
+            spi_port = SPI_0_DEV;
             break;
 #endif
 #if SPI_1_EN
         case SPI_1:
-            SPI_port = SPI_1_DEV;
+            spi_port = SPI_1_DEV;
             break;
 #endif
 
@@ -347,13 +347,13 @@ int spi_transfer_byte(spi_t dev, char out, char *in){
     }
 
 
-	while( !(SPI_port->SR & SPI_SR_TXE));
-	SPI_port->DR = out;
+	while( !(spi_port->SR & SPI_SR_TXE));
+	spi_port->DR = out;
 
 
 
-	while( !(SPI_port->SR & SPI_SR_RXNE) );
-	*in = SPI_port->DR;
+	while( !(spi_port->SR & SPI_SR_RXNE) );
+	*in = spi_port->DR;
 
 	return 1;
 }
@@ -437,19 +437,19 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
 
 int spi_poweron(spi_t dev){
 
-	SPI_TypeDef *SPI_port;
+	SPI_TypeDef *spi_port;
 
 switch (dev) {
 #if SPI_0_EN
         case SPI_0:
-            SPI_port = SPI_0_DEV;
+            spi_port = SPI_0_DEV;
             SPI_0_PORT_CLKEN(); /* Enable peripheral clock for GPIO port A */
             SPI_0_CLKEN(); /* Enable peripheral clock for SPI1 */
             break;
 #endif
 #if SPI_1_EN
         case SPI_1:
-            SPI_port = SPI_1_DEV;
+            spi_port = SPI_1_DEV;
             SPI_1_PORT_CLKEN();
             SPI_1_CLKEN();
             break;
@@ -468,7 +468,7 @@ switch (dev) {
 
 int spi_poweroff(spi_t dev){
 
-	SPI_TypeDef *SPI_port;
+	SPI_TypeDef *spi_port;
 
 switch (dev) {
 #if SPI_0_EN
@@ -502,28 +502,28 @@ static inline void irq_handler(spi_t dev)
 
 	char cb = 0;
 	unsigned int seq = 0;
-	SPI_TypeDef *SPI_port;
+	SPI_TypeDef *spi_port;
 
 switch (dev) {
 #if SPI_0_EN
 		case SPI_0:
-			SPI_port = SPI_0_DEV;
+			spi_port = SPI_0_DEV;
 			break;
 #endif
 #if SPI_1_EN
 		case SPI_1:
-			SPI_port = SPI_1_DEV;
+			spi_port = SPI_1_DEV;
 			break;
 #endif
         case SPI_UNDEFINED:
         	break;
     }
 
-		while( !(SPI_port->SR & SPI_SR_TXE));
-		SPI_port->DR = cb_delay;
+		while( !(spi_port->SR & SPI_SR_TXE));
+		spi_port->DR = cb_delay;
 
-		while( !(SPI_port->SR & SPI_SR_RXNE) );
-		cb = SPI_port->DR;
+		while( !(spi_port->SR & SPI_SR_RXNE) );
+		cb = spi_port->DR;
 
 	    config[dev].cb(seq, cb);
 	    /* return byte of callback is transferred to master in next transmission cycle */
