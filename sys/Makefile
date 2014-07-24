@@ -83,6 +83,18 @@ endif
 ifneq (,$(filter ieee802154,$(USEMODULE)))
     DIRS += net/link_layer/ieee802154
 endif
+ifneq (,$(filter gtsp,$(USEMODULE)))
+    DIRS += net/clocksync/gtsp
+endif
+ifneq (,$(filter ftsp,$(USEMODULE)))
+    DIRS += net/clocksync/ftsp
+endif
+ifneq (,$(filter pulsesync,$(USEMODULE)))
+    DIRS += net/clocksync/pulsesync
+endif
+ifneq (,$(filter clocksync_eval,$(USEMODULE)))
+    DIRS += net/clocksync/clocksync_eval
+endif
 ifneq (,$(filter bloom,$(USEMODULE)))
     DIRS += bloom
 endif

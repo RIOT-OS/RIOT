@@ -40,6 +40,9 @@ endif
 ifneq (,$(filter random,$(USEMODULE)))
 	SRC += sc_mersenne.c
 endif
+ifneq (,$(filter gtsp,$(USEMODULE)))
+	SRC += sc_gtsp.c
+endif
 ifeq ($(CPU),x86)
 	SRC += sc_x86_lspci.c
 endif

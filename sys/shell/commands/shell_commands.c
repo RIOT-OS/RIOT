@@ -125,6 +125,10 @@ extern void _mersenne_init(int argc, char **argv);
 extern void _mersenne_get(int argc, char **argv);
 #endif
 
+#ifdef MODULE_GTSP
+extern void _gtsp(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -193,6 +197,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_RANDOM
     { "mersenne_init", "initializes the PRNG", _mersenne_init },
     { "mersenne_get", "returns 32 bit of pseudo randomness", _mersenne_get },
+#endif
+#ifdef MODULE_GTSP
+    { "gtsp", "Controls the GTSP clock sync protocol", _gtsp },
 #endif
 #ifdef CPU_X86
     {"lspci", "Lists PCI devices", _x86_lspci},

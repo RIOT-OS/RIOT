@@ -10,6 +10,18 @@ endif
 ifneq (,$(filter udp,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
+ifneq (,$(filter clocksync_eval,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/clocksync/common
+endif
+ifneq (,$(filter gtsp,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/clocksync/common
+endif
+ifneq (,$(filter ftsp,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/clocksync/common
+endif
+ifneq (,$(filter pulsesync,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/clocksync/common
+endif
 ifneq (,$(filter net_help,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x

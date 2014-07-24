@@ -29,6 +29,7 @@
 #include "radio/radio.h"
 #include "net_if.h"
 #include "sixlowpan/mac.h"
+#include "sixlowpan/dispatch_values.h"
 
 #include "ip.h"
 #include "icmp.h"
@@ -154,9 +155,12 @@ static void *recv_ieee802154_frame(void *arg)
                 continue;
             }
 
-            /* deliver packet to network(6lowpan)-layer */
-            lowpan_read(frame.payload, length, &src, &dst);
-            /* TODO: get interface ID somehow */
+            uint8_t dispatch_header = frame.payload[0];
+            if((dispatch_header >> 6) & VALID_LOWPAN_DISPATCH_HEADER) {
+                /* deliver packet to network(6lowpan)-layer */
+                lowpan_read(frame.payload, length, &src, &dst);
+                /* TODO: get interface ID somehow */
+            }
 
             p->processing--;
         }
