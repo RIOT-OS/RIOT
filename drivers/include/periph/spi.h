@@ -57,6 +57,19 @@ typedef enum {
     SPI_CONF_SECOND_FALLING     /**< first data bit is transacted on the second falling SCK edge */
 } spi_conf_t;
 
+/**
+ * @brief Define a set of pre-defined SPI clock speeds.
+ *
+ * The actual speed of the bus can vary to some extend, as the combination of CPU clock and
+ * available prescale values on certain platforms may not make the exact values possible.
+ */
+typedef enum {
+    SPI_SPEED_100KHZ = 0,       /**< drive the SPI bus with 100KHz */
+    SPI_SPEED_400KHZ,           /**< drive the SPI bus with 400KHz */
+    SPI_SPEED_1MHZ,             /**< drive the SPI bus with 1MHz */
+    SPI_SPEED_5MHZ,             /**< drive the SPI bus with 5MHz */
+    SPI_SPEED_10MHZ             /**< drive the SPI bus with 10MHz */
+} spi_speed_t;
 
 /**
  * @brief Initialize the given SPI device to work in master mode
@@ -67,13 +80,13 @@ typedef enum {
  *
  * @param[in] dev       SPI device to initialize
  * @param[in] conf      Mode of clock phase and clock polarity
- * @param[in] speed     SPI bus speed in Hz
+ * @param[in] speed     desired clock speed for driving the SPI bus
  *
  * @return              0 on success
  * @return              -1 on undefined SPI device
  * @return              -2 on unavailable speed value
  */
-int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed);
+int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed);
 
 /**
  * @brief Initialize the given SPI device to work in slave mode
