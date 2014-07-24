@@ -26,6 +26,8 @@
 
 #include "periph_conf.h"
 
+/* add guard for the case that no SPI device is defined */
+#if SPI_NUMOF
 
 /**
  * @brief Definition available SPI devices
@@ -43,7 +45,6 @@ typedef enum {
 #if SPI_3_EN
     SPI_3,              /**< SPI device 3 */
 #endif
-    SPI_UNDEFINED
 } spi_t;
 
 /**
@@ -175,7 +176,7 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
  * @return              0 on success
  * @return              -1 on undefined device
  */
-int spi_poweron(spi_t dev);
+void spi_poweron(spi_t dev);
 
 /**
  * @brief Power off the given SPI device
@@ -185,7 +186,9 @@ int spi_poweron(spi_t dev);
  * @return              0 on success
  * @return              -1 on undefined device
  */
-int spi_poweroff(spi_t dev);
+void spi_poweroff(spi_t dev);
+
+#endif /* SPI_NUMOF */
 
 #endif /* __SPI_H */
 /** @} */
