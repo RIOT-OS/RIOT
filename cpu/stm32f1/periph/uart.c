@@ -29,6 +29,10 @@
 #include "sched.h"
 #include "thread.h"
 
+#ifdef MODULE_UART0
+#include "board_uart0.h"
+#endif
+
 
 /**
  * @brief Each UART device has to store two callbacks.
@@ -300,14 +304,26 @@ static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
 {
     if (dev->SR & USART_SR_RXNE) {
         char data = (char)dev->DR;
+#ifdef MODULE_UART0
+        if (uart0_handler_pid) {
+            uart0_handle_incoming(data);
+
+            uart0_notify_thread();
+        }
+#else
         config[uartnum].rx_cb(data);
+#endif
     }
     else if (dev->SR & USART_SR_ORE) {
         /* ORE is cleared by reading SR and DR sequentially */
         dev->DR;
     }
     else if (dev->SR & USART_SR_TXE) {
+#ifdef MODULE_UART0
+        dev->SR &= ~(USART_SR_TXE);
+#else
         config[uartnum].tx_cb();
+#endif
     }
 
     if (sched_context_switch_request) {

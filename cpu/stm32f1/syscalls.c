@@ -45,7 +45,11 @@ caddr_t heap_top = (caddr_t)&_end + 4;
  */
 void _init(void)
 {
+#ifdef MODULE_UART0
+    uart_init(UART_0, 115200, NULL, NULL);
+#else
     uart_init_blocking(UART_0, 115200);
+#endif
 }
 
 /**
