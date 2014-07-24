@@ -34,6 +34,9 @@
 #include "board.h"
 #include "periph/uart.h"
 
+#ifdef MODULE_UART0
+#include "board_uart0.h"
+#endif
 
 /**
  * manage the heap
@@ -41,12 +44,44 @@
 extern uint32_t _end;                       /* address of last used memory cell */
 caddr_t heap_top = (caddr_t)&_end + 4;
 
+#ifndef MODULE_UART0
+/**
+ * @brief use mutex for waiting on incoming UART chars
+ */
+static mutex_t uart_rx_mutex;
+static char rx_buf_mem[STDIO_BUFSIZE];
+static ringbuffer_t rx_buf;
+#endif
+
+/**
+ * @brief Receive a new character from the UART and put it into the receive buffer
+ */
+void rx_cb(void *arg, char data)
+{
+#ifndef MODULE_UART0
+    (void)arg;
+
+    ringbuffer_add_one(&rx_buf, data);
+    mutex_unlock(&uart_rx_mutex);
+#else
+    if (uart0_handler_pid) {
+        uart0_handle_incoming(data);
+
+        uart0_notify_thread();
+    }
+#endif
+}
+
 /**
  * @brief Initialize NewLib, called by __libc_init_array() from the startup script
  */
 void _init(void)
 {
-    uart_init_blocking(STDIO, 115200);
+#ifndef MODULE_UART0
+    mutex_init(&uart_rx_mutex);
+    ringbuffer_init(&rx_buf, rx_buf_mem, STDIO_BUFSIZE);
+#endif
+    uart_init(STDIO, STDIO_BAUDRATE, rx_cb, 0, 0);
 }
 
 /**
@@ -152,11 +187,15 @@ int _open_r(struct _reent *r, const char *name, int mode)
  */
 int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 {
-    char c;
-    char *buff = (char*)buffer;
-    uart_read_blocking(STDIO, &c);
-    buff[0] = c;
-    return 1;
+#ifndef MODULE_UART0
+    while (rx_buf.avail == 0) {
+        mutex_lock(&uart_rx_mutex);
+    }
+    return ringbuffer_get(&rx_buf, (char*)buffer, rx_buf.avail);
+#else
+    r->_errno = ENODEV;
+    return -1;
+#endif
 }
 
 /**
