@@ -22,6 +22,8 @@
 #include "cpu.h"
 #include "periph/spi.h"
 #include "periph_conf.h"
+#include "thread.h"
+#include "sched.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
@@ -29,19 +31,22 @@
 /* guard file in case no SPI device is defined */
 #if SPI_NUMOF
 
+/* this value will be send in return of the first transfered byte when in slave mode */
+#define RESET_VALUE     (0x77)
+
 /**
  * @brief unified interrupt handler to be shared between SPI devices
  *
  * @param[in] spi       Pointer to the devices base register
  * @param[in] dev       The device that triggered the interrupt
  */
-static inline void irq_handler(SPI_TypeDev *spi, spi_t dev);
+static inline void irq_handler(SPI_TypeDef *spi, spi_t dev);
 
 /**
  * @brief structure that defines the state for an SPI device
  */
 typedef struct {
-    char (*cb)(unsigned int seq, char data);
+    char (*cb)(char data);
 } spi_state_t;
 
 /**
@@ -52,9 +57,9 @@ static spi_state_t spi_config[SPI_NUMOF];
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
-    SPI_TypeDef *spi;
-    GPIO_TypeDef *port;
-    int pins[3];        /* 3 pins: sck, miso, mosi */
+    SPI_TypeDef *spi = 0;
+    GPIO_TypeDef *port = 0;
+    int pin[3];        /* 3 pins: sck, miso, mosi */
     int af;
 
     /* power on the SPI device */
@@ -89,9 +94,9 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     for (int i = 0; i < 3; i++) {
         port->MODER &= ~(3 << (pin[i] * 2));
         port->MODER |= (2 << (pin[i] * 2));
-        int hl = (pins[i] < 8) ? 0 : 1;
-        port->AFR[hl] &= (0xf << ((pins[i] - (hl * 8)) * 4));
-        port->AFR[hl] |= (af << ((pins[i] - (hl * 8)) * 4));
+        int hl = (pin[i] < 8) ? 0 : 1;
+        port->AFR[hl] &= (0xf << ((pin[i] - (hl * 8)) * 4));
+        port->AFR[hl] |= (af << ((pin[i] - (hl * 8)) * 4));
     }
 
     /* reset SPI configuration registers */
@@ -132,11 +137,11 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     return 0;
 }
 
-int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(unsigned int seq, char data))
+int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
 {
-    SPI_TypeDef *spi;
-    GPIO_TypeDef *port;
-    int pins[3];        /* 3 pins: sck, miso, mosi */
+    SPI_TypeDef *spi = 0;
+    GPIO_TypeDef *port = 0;
+    int pin[3];        /* 3 pins: sck, miso, mosi */
     int af;
 
     /* enable the SPI modules clock */
@@ -178,9 +183,9 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(unsigned int seq, char
     for (int i = 0; i < 3; i++) {
         port->MODER &= ~(3 << (pin[i] * 2));
         port->MODER |= (2 << (pin[i] * 2));
-        int hl = (pins[i] < 8) ? 0 : 1;
-        port->AFR[hl] &= (0xf << ((pins[i] - (hl * 8)) * 4));
-        port->AFR[hl] |= (af << ((pins[i] - (hl * 8)) * 4));
+        int hl = (pin[i] < 8) ? 0 : 1;
+        port->AFR[hl] &= (0xf << ((pin[i] - (hl * 8)) * 4));
+        port->AFR[hl] |= (af << ((pin[i] - (hl * 8)) * 4));
     }
 
     /* reset SPI configuration registers */
@@ -206,7 +211,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(unsigned int seq, char
 int spi_transfer_byte(spi_t dev, char out, char *in)
 {
     char tmp;
-    SPI_TypeDef *spi;
+    SPI_TypeDef *spi = 0;
 
     switch (dev) {
 #if SPI_0_EN
@@ -263,25 +268,32 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
 {
     spi_transfer_byte(dev, reg, 0);
-    spi_transfer_byte(dev, out, in);
+    return spi_transfer_byte(dev, out, in);
 }
 
-/* ###################################### Transfer RegisterS ###################################### */
-
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length){
-
-    int trans_ret;
-    char ret_status;
-
-    trans_ret = spi_transfer_byte(dev, reg, &ret_status);
-
-/* TODO */
-
-
-    return trans_ret;
+int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length)
+{
+    spi_transfer_byte(dev, reg, 0);
+    return spi_transfer_bytes(dev, out, in, length);
 }
 
-int spi_poweron(spi_t dev)
+void spi_transmission_begin(spi_t dev, char reset_val)
+{
+    switch (dev) {
+#if SPI_0_EN
+        case SPI_0:
+            SPI_0_DEV->DR = reset_val;
+            break;
+#endif
+#if SPI_1_EN
+        case SPI_1:
+            SPI_1_DEV->DR = reset_val;
+            break;
+#endif
+    }
+}
+
+void spi_poweron(spi_t dev)
 {
     switch (dev) {
 #if SPI_0_EN
@@ -316,59 +328,42 @@ void spi_poweroff(spi_t dev)
 }
 
 
-/* ###################################### IRQ ###################################### */
-
-static inline void irq_handler(spi_t dev)
+static inline void irq_handler(SPI_TypeDef *spi, spi_t dev)
 {
+    char data;
 
-    char cb = 0;
-    unsigned int seq = 0;
-    SPI_TypeDef *spi;
-
-switch (dev) {
-#if SPI_0_EN
-        case SPI_0:
-            spi = SPI_0_DEV;
-            break;
-#endif
-#if SPI_1_EN
-        case SPI_1:
-            spi = SPI_1_DEV;
-            break;
-#endif
-        case SPI_UNDEFINED:
-            break;
+    /* call owner when new byte was receive (asserts SPI is in slave mode) */
+    if (spi->SR & SPI_SR_RXNE) {
+        /* read received byte from data register */
+        data = spi->DR;
+        /* call callback for receiving the answer of the received byte */
+        data = spi_config[dev].cb(data);
+        /* set answer byte to be transferred next */
+        spi->DR = data;
     }
 
-        while( !(spi->SR & SPI_SR_TXE));
-        spi->DR = cb_delay;
-
-        while( !(spi->SR & SPI_SR_RXNE) );
-        cb = spi->DR;
-
-        config[dev].cb(seq, cb);
-        /* return byte of callback is transferred to master in next transmission cycle */
-        cb_delay = cb;
+    /* see if a thread with higher priority wants to run now */
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
 }
 
-
-__attribute__((naked))
-void isr_spi1(void)
+#if SPI_0_EN
+__attribute__((naked)) void SPI_0_ISR(void)
 {
     ISR_ENTER();
-    /* Interrupt is cleared by reading operation in irq_handler */
-    irq_handler(SPI_0);
+    irq_handler(SPI_0_DEV, SPI_0);
     ISR_EXIT();
 }
-__attribute__((naked))
-void isr_spi2(void)
+#endif
+
+#if SPI_1_EN
+__attribute__((naked)) void SPI_1_ISR(void)
 {
     ISR_ENTER();
-    irq_handler(SPI_1);
+    irq_handler(SPI_0_DEV, SPI_1);
     ISR_EXIT();
 }
-
-
-
+#endif
 
 #endif /* SPI_NUMOF */

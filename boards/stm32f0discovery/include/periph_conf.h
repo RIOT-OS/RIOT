@@ -141,8 +141,8 @@
 
 /* SPI 0 device config */
 #define SPI_0_DEV           SPI1
-#define SPI_0_CLKEN()       (RCC->RCC_APB2ENR |= RCC_APB2ENR_SPI1EN)
-#define SPI_0_CLKDIS()      (RCC->RCC_APB2ENR &= ~(RCC_APB2ENR_SPI1EN))
+#define SPI_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
+#define SPI_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_SPI1EN))
 #define SPI_0_IRQ           SPI1_IRQn
 #define SPI_0_IRQ_HANDLER   isr_spi1
 /* SPI 1 pin configuration */
@@ -155,8 +155,8 @@
 
 /* SPI 1 device config */
 #define SPI_1_DEV           SPI2
-#define SPI_1_CLKEN()       (RCC->RCC_APB1ENR |= RCC_APB1ENR_SPI2EN)
-#define SPI_1_CLKDIS()      (RCC->RCC_APB1ENR &= ~(RCC_APB1ENR_SPI2EN))
+#define SPI_1_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_SPI2EN)
+#define SPI_1_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_SPI2EN))
 #define SPI_1_IRQ           SPI2_IRQn
 #define SPI_1_IRQ_HANDLER   isr_spi1
 /* SPI 1 pin configuration */
