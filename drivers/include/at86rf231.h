@@ -31,7 +31,7 @@ typedef struct __attribute__((packed))
 }
 at86rf231_packet_t;
 
-extern int transceiver_pid;
+extern volatile kernel_pid_t transceiver_pid;
 
 #define AT_DRIVER_STATE_DEFAULT     (0)
 #define AT_DRIVER_STATE_SENDING     (1)

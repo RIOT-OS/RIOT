@@ -38,8 +38,9 @@
  * @brief Each UART device has to store two callbacks.
  */
 typedef struct {
-    void (*rx_cb)(char);
-    void (*tx_cb)(void);
+    uart_rx_cb_t rx_cb;
+    uart_tx_cb_t tx_cb;
+    void *arg;
 } uart_conf_t;
 
 
@@ -58,7 +59,7 @@ static inline void irq_handler(uart_t uartnum, USART_TypeDef *uart);
 static uart_conf_t config[UART_NUMOF];
 
 
-int uart_init(uart_t uart, uint32_t baudrate, void (*rx_cb)(char), void (*tx_cb)(void))
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
     int res;
 
@@ -84,7 +85,6 @@ int uart_init(uart_t uart, uint32_t baudrate, void (*rx_cb)(char), void (*tx_cb)
             UART_1_DEV->CR1 |= USART_CR1_RXNEIE;
             break;
 #endif
-        case UART_UNDEFINED:
         default:
             return -2;
     }
@@ -131,7 +131,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             UART_1_PORT_CLKEN();
             break;
 #endif
-        case UART_UNDEFINED:
         default:
             return -2;
     }
@@ -180,7 +179,6 @@ void uart_tx_begin(uart_t uart)
             UART_1_DEV->CR1 |= USART_CR1_TXEIE;
             break;
 #endif
-        case UART_UNDEFINED:
             break;
     }
 }
@@ -198,7 +196,6 @@ void uart_tx_end(uart_t uart)
             UART_1_DEV->CR1 &= ~USART_CR1_TXEIE;
             break;
 #endif
-        case UART_UNDEFINED:
             break;
     }
 }
@@ -218,7 +215,6 @@ int uart_write(uart_t uart, char data)
             dev = UART_1_DEV;
             break;
 #endif
-        case UART_UNDEFINED:
         default:
             return -1;
     }
@@ -245,7 +241,6 @@ int uart_read_blocking(uart_t uart, char *data)
             dev = UART_1_DEV;
             break;
 #endif
-        case UART_UNDEFINED:
         default:
             return -1;
     }
@@ -271,7 +266,6 @@ int uart_write_blocking(uart_t uart, char data)
             dev = UART_1_DEV;
             break;
 #endif
-        case UART_UNDEFINED:
         default:
             return -1;
     }
