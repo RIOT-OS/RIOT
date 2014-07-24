@@ -29,9 +29,9 @@
 #include "vtimer.h"
 #include "shell.h"
 #include "shell_commands.h"
-#include "stm32f4xx.h"
+#include "stm32f407xx.h"
 
-#define USE_SPI_0_MASTER		0
+#define USE_SPI_0_MASTER		1
 
 #define SHELL_BUFFER_SIZE       128
 #define BUF_SEND_LEN 			10

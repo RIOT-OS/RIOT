@@ -27,7 +27,7 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
-#include "stm32f4xx.h"
+#include "stm32f407xx.h"
 
 typedef struct {
     char (*cb)(unsigned int seq, char data);
