@@ -35,21 +35,22 @@ char _t_buf[9];
 	printf(("[%d, %s] %s(" fmt ")\n"), debug_ticks, _t_buf, __FUNCTION__, ##__VA_ARGS__);				\
 	}
 
-static inline void print_trace(void) {
-	void *array[10];
-	size_t size;
-	char **strings;
-	size_t i;
+static inline void print_trace(void)
+{
+    void *array[10];
+    size_t size;
+    char **strings;
+    size_t i;
 
-	size = backtrace(array, 10);
-	strings = backtrace_symbols(array, size);
+    size = backtrace(array, 10);
+    strings = backtrace_symbols(array, size);
 
-	printf("Obtained %zd stack frames.\n", size);
+    printf("Obtained %zd stack frames.\n", size);
 
-	for (i = 0; i < size; i++)
-		printf ("%s\n", strings[i]);
+    for (i = 0; i < size; i++)
+        printf ("%s\n", strings[i]);
 
-	free(strings);
+    free(strings);
 }
 
 #endif /* not RIOT */

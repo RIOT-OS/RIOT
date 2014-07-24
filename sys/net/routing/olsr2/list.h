@@ -48,13 +48,13 @@ struct simple_list_elem;
  */
 #define simple_list_set_head(head, node)	__simple_list_add_head((struct simple_list_elem**) head, node)
 
- /**
- * @brief	allocates memory for a new list entry and appends it at the end of the list.
- *
- * @param	head pointer to pointer to the first list element
- * @param	head 	pointer to the list
- * @return	the new list entry, NULL if no new list entry could be allocated
- */
+/**
+* @brief	allocates memory for a new list entry and appends it at the end of the list.
+*
+* @param	head pointer to pointer to the first list element
+* @param	head 	pointer to the list
+* @return	the new list entry, NULL if no new list entry could be allocated
+*/
 #define simple_list_add_tail(head)	__simple_list_add_tail((struct simple_list_elem**) (head), calloc(1, sizeof **(head)))
 
 /**
@@ -66,62 +66,62 @@ struct simple_list_elem;
  */
 #define simple_list_set_tail(head, node)	__simple_list_add_tail((struct simple_list_elem**) (head), (node))
 
- /**
- * @brief	allocates memory for a new list entry and adds it before an existing entry.
- *			The new entry is added before the existing element where old_entry->value > value
- *			If no such entry could be found, the new entry will be added at the end of the list
- *
- * @param	head 	pointer to the list
- * @param	value	value to compare list entries
- *					has to be the same name as the element in the list entry structure that is be used for comparison
- * @return	pointer to the new element, NULL if no new list element could be allocated
- */
+/**
+* @brief	allocates memory for a new list entry and adds it before an existing entry.
+*			The new entry is added before the existing element where old_entry->value > value
+*			If no such entry could be found, the new entry will be added at the end of the list
+*
+* @param	head 	pointer to the list
+* @param	value	value to compare list entries
+*					has to be the same name as the element in the list entry structure that is be used for comparison
+* @return	pointer to the new element, NULL if no new list element could be allocated
+*/
 #define simple_list_add_before(head, value) *(head) == 0 ? simple_list_add_head((head)) : \
 	__simple_list_add_before((struct simple_list_elem**) (head), calloc(1, sizeof **(head)), value, (void*) &(*(head))->value - (void*) *(head))
 
- /**
- * @brief	adds an preallocated list element before an existing one.
- *			The new entry is added before the existing element where old_entry->value > value
- *			If no such entry could be found, the new entry will be added at the end of the list *
- * @param	head 	pointer to the list
- * @param	value	value to compare list entries
- *					has to be the same name as the element in the list entry structure that is be used for comparison
- * @param	node	preallocated list element
- * @return	the new list entry (node)
- */
+/**
+* @brief	adds an preallocated list element before an existing one.
+*			The new entry is added before the existing element where old_entry->value > value
+*			If no such entry could be found, the new entry will be added at the end of the list *
+* @param	head 	pointer to the list
+* @param	value	value to compare list entries
+*					has to be the same name as the element in the list entry structure that is be used for comparison
+* @param	node	preallocated list element
+* @return	the new list entry (node)
+*/
 #define simple_list_set_before(head, node, value) *(head) == 0 ? simple_list_set_head((head), (node)) : \
 	__simple_list_add_before((struct simple_list_elem**) (head), (node), (value), (void*) &(*(head))->value - (void*) *(head))
 
- /**
- * @brief	searches for a list element by simple comparison of a struct value
- *
- * @param	head 	pointer to the list
- * @param	value	the member value of a list entry that is to be found
- *					has to be the same name as the value in the list element struct
- * @return	pointer the list entry if found, otherwise NULL
- */
+/**
+* @brief	searches for a list element by simple comparison of a struct value
+*
+* @param	head 	pointer to the list
+* @param	value	the member value of a list entry that is to be found
+*					has to be the same name as the value in the list element struct
+* @return	pointer the list entry if found, otherwise NULL
+*/
 #define simple_list_find(head, value)	(head) == 0 ? NULL : \
 	__simple_list_find((struct simple_list_elem*) (head), (value), (void*) &((head)->value) - (void*) (head), 0)
 
- /**
- * @brief	searches for a list element by comparing a buffer in the list element struct
- *
- * @param	head 	pointer to the list
- * @param	value	pointer to the buffer that is to be found in the list
- *					has to be the same name as the value in the list element struct
- * @return	pointer the list entry if found, otherwise NULL
- */
+/**
+* @brief	searches for a list element by comparing a buffer in the list element struct
+*
+* @param	head 	pointer to the list
+* @param	value	pointer to the buffer that is to be found in the list
+*					has to be the same name as the value in the list element struct
+* @return	pointer the list entry if found, otherwise NULL
+*/
 #define simple_list_find_memcmp(head, value)	(head) == 0 ? NULL : \
 	__simple_list_find((struct simple_list_elem*) (head), (value), (void*) &((head)->value) - (void*) (head), sizeof(*(value)))
 
- /**
- * @brief	searches for a list element by applying a comparator function to each list entry
- *
- * @param	head 	pointer to the list
- * @param	value	input to the comparator function
- * @param	comperator	a function that takes (value, node) and returns 0 if they match
- * @return	pointer	the list entry if found, otherwise NULL
- */
+/**
+* @brief	searches for a list element by applying a comparator function to each list entry
+*
+* @param	head 	pointer to the list
+* @param	value	input to the comparator function
+* @param	comperator	a function that takes (value, node) and returns 0 if they match
+* @return	pointer	the list entry if found, otherwise NULL
+*/
 #define simple_list_find_cmp(head, value, comperator)	(head) == 0 ? NULL : \
 	__simple_list_find_cmp((struct simple_list_elem*) (head), (value), (void*) &((head)->value) - (void*) (head), (comperator))
 
@@ -166,8 +166,8 @@ struct simple_list_elem;
  *
  * @param	head 	pointer to the list
  * @param	node	to the current entry (loop variable)
- * @param	prev 	internal variable, pointer to previous list entry - do not modify 
- * @param	skipped	internal variable, integer - do not modify 
+ * @param	prev 	internal variable, pointer to previous list entry - do not modify
+ * @param	skipped	internal variable, integer - do not modify
  */
 #define simple_list_for_each_safe(head, node, prev, skipped)	\
 		for ((skipped) = 0, (prev) = 0, (node) = (head);\

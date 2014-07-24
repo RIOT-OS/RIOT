@@ -4,8 +4,8 @@
 #include "common/netaddr.h"
 
 struct netaddr_rc {
-	struct netaddr super;
-	uint8_t _refs;
+    struct netaddr super;
+    uint8_t _refs;
 };
 
 const char* netaddr_to_str_s(struct netaddr_str* dst, const struct netaddr* src);
