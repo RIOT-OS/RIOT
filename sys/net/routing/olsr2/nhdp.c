@@ -45,7 +45,7 @@ static struct olsr_node* _node_replace(struct olsr_node* old_n) {
 	return new_n;
 }
 
-struct olsr_node* add_neighbor(struct netaddr* addr, metric_t metric, uint8_t vtime, char* name) {
+struct olsr_node* olsr2_add_neighbor(struct netaddr* addr, metric_t metric, uint8_t vtime, char* name) {
 	struct olsr_node* n = get_node(addr);
 
 	if (n == NULL) {

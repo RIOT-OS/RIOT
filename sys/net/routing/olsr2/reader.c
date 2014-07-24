@@ -125,10 +125,10 @@ _cb_nhdp_blocktlv_packet_okay(struct rfc5444_reader_tlvblock_context *cont __att
 
 	DEBUG("\tmetric: %d", metric);
 
-	current_node = add_neighbor(current_src, metric, vtime, name);
+	current_node = olsr2_add_neighbor(current_src, metric, vtime, name);
 
 	if (current_node == NULL) {
-		puts("ERROR: add_neighbor failed - out of memory");
+		puts("ERROR: olsr2_add_neighbor failed - out of memory");
 		return RFC5444_DROP_PACKET;
 	}
 
