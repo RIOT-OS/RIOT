@@ -70,6 +70,9 @@ endif
 ifneq (,$(filter ieee802154,$(USEMODULE)))
     DIRS += net/link_layer/ieee802154
 endif
+ifneq (,$(filter gtsp,$(USEMODULE)))
+    DIRS += net/clocksync/gtsp
+endif
 ifneq (,$(filter bloom,$(USEMODULE)))
     DIRS += bloom
 endif
