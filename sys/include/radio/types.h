@@ -30,8 +30,12 @@
 #include "board.h"
 #include "timex.h"
 
-typedef uint8_t protocol_t;         ///< Packet protocol type
-typedef uint16_t radio_address_t;   ///< Radio layer address type
+#ifdef MODULE_GTIMER
+#include "gtimer.h"
+#endif
+
+typedef uint8_t protocol_t;			///< Packet protocol type
+typedef uint16_t radio_address_t;	///< Radio layer address type
 
 #define NUM_PRIORITY_LEVELS 3       ///< Number of packet transmission priorities
 
@@ -71,7 +75,11 @@ typedef struct __attribute__((packed))
     uint16_t dst;           ///< Radio destination address
     uint8_t rssi;           ///< Radio Signal Strength Indication
     uint8_t lqi;            ///< Link Quality Indicator
+#ifdef MODULE_GTIMER
+    gtimer_timeval_t toa;   ///< Time of Arrival (local, global and rate)
+#else
     timex_t toa;            ///< Time of Arrival
+#endif
     radio_packet_length_t length;         ///< Length of payload
     uint8_t *data;          ///< Payload
 }

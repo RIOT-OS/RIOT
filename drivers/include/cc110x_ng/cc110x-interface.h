@@ -46,7 +46,7 @@
 
 #define PACKET_LENGTH               (0x3E)      ///< Packet length = 62 Bytes.
 #define CC1100_SYNC_WORD_TX_TIME   (90000)      // loop count (max. timeout ~ 15 ms) to wait for
-                                                // sync word to be transmitted (GDO2 from low to high)
+// sync word to be transmitted (GDO2 from low to high)
 /**
  * @name    Defines used as state values for state machine
  * @{
@@ -101,6 +101,9 @@ cc110x_packet_t;
 typedef struct {
     uint8_t rssi;
     uint8_t lqi;
+#ifdef MODULE_GTIMER
+    gtimer_timeval_t toa;
+#endif
     cc110x_packet_t packet;
 } rx_buffer_t;
 

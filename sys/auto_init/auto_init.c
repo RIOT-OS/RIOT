@@ -47,6 +47,10 @@
 #include "vtimer.h"
 #endif
 
+#ifdef MODULE_GTIMER
+#include "gtimer.h"
+#endif
+
 #ifdef MODULE_RTC
 #include "rtc.h"
 #endif
@@ -201,6 +205,10 @@ void auto_init(void)
     DEBUG("Auto init rtc module.\n");
     rtc_init();
     rtc_enable();
+#endif
+#ifdef MODULE_GTIMER
+    DEBUG("Auto init gtimer module.\n");
+    gtimer_init();
 #endif
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");
