@@ -18,11 +18,6 @@
  * @}
  */
 
-
-#include <stdlib.h>
- #include <stdio.h>
-#include <stdint.h>
-
 #include "cpu.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
@@ -105,7 +100,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed){
             /************************* GPIO-Init *************************/
 
 			/* Set GPIOs to AF mode */
-			port->MODER &= ~(2 << (2 * SPI_1_SCK_GPIO));
+            port->MODER &= ~(2 << (2 * SPI_1_SCK_GPIO));
 			port->MODER |=  (2 << (2 * SPI_1_SCK_GPIO));
 			port->MODER &= ~(2 << (2 * SPI_1_MISO_GPIO));
 			port->MODER |=  (2 << (2 * SPI_1_MISO_GPIO));
@@ -113,7 +108,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed){
 			port->MODER |=  (2 << (2 * SPI_1_MOSI_GPIO));
 
 			/* Set speed */
-			port->OSPEEDR &= ~(3 << (2 * SPI_1_SCK_GPIO));
+            port->OSPEEDR &= ~(3 << (2 * SPI_1_SCK_GPIO));
 			port->OSPEEDR |=  (3 << (2 * SPI_1_SCK_GPIO));
 			port->OSPEEDR &= ~(3 << (2 * SPI_1_MISO_GPIO));
 			port->OSPEEDR |=  (3 << (2 * SPI_1_MISO_GPIO));
@@ -121,7 +116,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed){
 			port->OSPEEDR |=  (3 << (2 * SPI_1_MOSI_GPIO));
 
 			/* Set to push-pull configuration */
-			port->OTYPER &= ~(1 << SPI_1_SCK_GPIO);
+            port->OTYPER &= ~(1 << SPI_1_SCK_GPIO);
 			port->OTYPER |=  (0 << SPI_1_SCK_GPIO);
 			port->OTYPER &= ~(1 << SPI_1_MISO_GPIO);
 			port->OTYPER |=  (0 << SPI_1_MISO_GPIO);
@@ -129,12 +124,10 @@ int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed){
 			port->OTYPER |=  (0 << SPI_1_MOSI_GPIO);
 
 			/* Configure push-pull resistors */
-			port->PUPDR &= ~(3 << (2 * SPI_1_SCK_GPIO));
+            port->PUPDR &= ~(3 << (2 * SPI_1_SCK_GPIO));
 			port->PUPDR |=  (0 << (2 * SPI_1_SCK_GPIO));
-
 			port->PUPDR &= ~(3 << (2 * SPI_1_MISO_GPIO));
 			port->PUPDR |=  (0 << (2 * SPI_1_MISO_GPIO));
-
 			port->PUPDR &= ~(3 << (2 * SPI_1_MOSI_GPIO));
 			port->PUPDR |=  (0 << (2 * SPI_1_MOSI_GPIO));
 
@@ -155,30 +148,18 @@ int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed){
 
     /************************* SPI-Init *************************/
 
-				SPI_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);/* Activate the SPI mode (Reset I2SMOD bit in I2SCFGR register) */
-    			SPI_port->CR1 &= ~(SPI_CR1_BIDIMODE); /* 0: 2-line bidirectional data mode */
-    			SPI_port->CR1 &= ~(SPI_CR1_BIDIOE); /* just relevant if BIDIMODE ist unidirect */
-    			SPI_port->CR1 &= ~(SPI_CR1_CRCEN); /* 0: disable CRC */
-    			SPI_port->CR1 &= ~(SPI_CR1_CRCNEXT); /* 0: no CRC phase */
-    			SPI_port->CR1 &= ~(SPI_CR1_DFF); /* 0: 8bit datamode */
-    			SPI_port->CR1 &= ~(SPI_CR1_RXONLY); /* 0: full duplex mode */
+	    SPI_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);/* Activate the SPI mode (Reset I2SMOD bit in I2SCFGR register) */
 
-    			SPI_port->CR1 &= ~(SPI_CR1_SSM);/* 0: software slave management disabled */
+	    SPI_port->CR1 = 0;
+	    SPI_port->CR2 = 0;
 
-    			SPI_port->CR2 &= ~(SPI_CR2_SSOE);	/* 0: enable multimaster */
-    			SPI_port->CR2 |=  (SPI_CR2_SSOE); /* 1: enable master = disable multimaster */
+		SPI_port->CR2 |=  (SPI_CR2_SSOE); /* 1: enable master = disable multimaster */
 
-    			SPI_port->CR1 &= ~(SPI_CR1_LSBFIRST); /* 0: MSB first */
-    			SPI_port->CR1 &= ~(SPI_CR1_BR);
-    			SPI_port->CR1 |=  (speed << 3); /* Define serial clock baud rate. 001 leads to f_PCLK/4 */
-    			SPI_port->CR1 &= ~(SPI_CR1_MSTR);
-    			SPI_port->CR1 |=  (SPI_CR1_MSTR); /* 1: master configuration */
+		SPI_port->CR1 |=  (SPI_CR1_SPE);/* SPI enable */
+	    SPI_port->CR1 |=  (speed << 3); /* Define serial clock baud rate. 001 leads to f_PCLK/4 */
+		SPI_port->CR1 |=  (SPI_CR1_MSTR); /* 1: master configuration */
+		SPI_port->CR1 |=  (conf);
 
-    			/* select motorola frame format to use CPHA and CPOL (TI protocol doesn't allow this) */
-    			SPI_port->CR2 &= ~(1 << 4); /* "FRF" bit does not exist in stm32f4xx.h */
-    			SPI_port->CR1 &= ~(conf);	/* no shift because CPOL&CPHA are at first position of CR1-reguster */
-    			SPI_port->CR1 |=  (conf);
-	
 	return 0;
 }
 
@@ -326,26 +307,15 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(unsigned int seq, char
 
     /************************* SPI-Init *************************/
     		SPI_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);
-			SPI_port->CR1 &= ~(SPI_CR1_BIDIMODE);
-			SPI_port->CR1 &= ~(SPI_CR1_BIDIOE);
-			SPI_port->CR1 &= ~(SPI_CR1_CRCEN);
-			SPI_port->CR1 &= ~(SPI_CR1_CRCNEXT);
-			SPI_port->CR1 &= ~(SPI_CR1_DFF);
-			SPI_port->CR1 &= ~(SPI_CR1_RXONLY);
 
-			SPI_port->CR1 &= ~(SPI_CR1_SSM);  /* 1: Software slave management disabled */
-			SPI_port->CR2 &= ~(SPI_CR2_SSOE);	/* 0: nss pin as input at slave */
-
-			SPI_port->CR1 &= ~(SPI_CR1_LSBFIRST);
-			SPI_port->CR1 &= ~(SPI_CR1_BR);
-			SPI_port->CR1 &= ~(SPI_CR1_MSTR); /* 0: slave configuration */
-
-			SPI_port->CR2 &= ~(1 << 4);
-			SPI_port->CR1 &= ~(conf);
-			SPI_port->CR1 |=  (conf);
+			SPI_port->CR1 = 0;
+			SPI_port->CR2 = 0;
 
 			/* enable RXNEIE flag to enable rx buffer not empty interrupt */
 			SPI_port->CR2 |= (SPI_CR2_RXNEIE); /*1:not masked */
+
+			SPI_port->CR1 |=  (SPI_CR1_SPE);/* SPI enable */
+			SPI_port->CR1 |=  (conf);
 
     /* set callback */
     config[dev].cb = cb;
@@ -489,8 +459,6 @@ switch (dev) {
         default:
             return -1;
     }
-	
-	SPI_port->CR1 |=  (SPI_CR1_SPE);/* SPI enable */
 
 	return 0;
 }
@@ -505,12 +473,16 @@ int spi_poweroff(spi_t dev){
 switch (dev) {
 #if SPI_0_EN
         case SPI_0:
-            SPI_port = SPI_0_DEV;
+        	while( SPI_0_DEV->SR & SPI_SR_BSY );/* wait until no more busy */
+        	SPI_0_CLKDIS();
+        	SPI_0_PORT_CLKDIS();
             break;
 #endif
 #if SPI_1_EN
         case SPI_1:
-            SPI_port = SPI_1_DEV;
+        	while( SPI_1_DEV->SR & SPI_SR_BSY );/* wait until no more busy */
+        	SPI_1_CLKDIS();
+        	SPI_1_PORT_CLKDIS();
             break;
 #endif
 
@@ -518,11 +490,6 @@ switch (dev) {
         default:
             return -1;
     }
-
-	while( SPI_port->SR & SPI_SR_BSY );/* wait until no more busy */
-	SPI_port->CR1 &=  ~(SPI_CR1_SPE);/* SPI dis */
-	SPI_0_CLKDIS();
-	SPI_1_CLKDIS();
 
 	return 0;
 }

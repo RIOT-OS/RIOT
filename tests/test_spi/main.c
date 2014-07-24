@@ -117,17 +117,18 @@ void cmd_init_master(int argc, char **argv)
     spi_init_master(SPI_1, SPI_CONF_FIRST_RISING, speed);
 #endif
 
-    int cr1_reg, cr2_reg;
+    int cr1_reg, cr2_reg, i2cfgr;
 
 #if USE_SPI_0_MASTER
     cr1_reg = (SPI_0_DEV->CR1);
     cr2_reg = (SPI_0_DEV->CR2);
+    i2cfgr  = SPI_0_DEV->I2SCFGR;
 #else
     cr1_reg = (SPI_1_DEV->CR1);
     cr2_reg = (SPI_1_DEV->CR2);
 #endif
 
-    printf("CR1 Register Master: %x\nCR2 Register Master: %x\n", cr1_reg, cr2_reg);
+    printf("CR1 Register Master: %x\nCR2 Register Master: %x\n i2cfgr Register Master: %x\n", cr1_reg, cr2_reg, i2cfgr);
 
 }
 
