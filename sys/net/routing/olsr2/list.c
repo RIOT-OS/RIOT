@@ -6,6 +6,11 @@
  * details.
  */
 
+ /**
+ * @file	list.c
+ * @author	Benjamin Valentin <benpicco@zedat.fu-berlin.de>
+ */
+
 #include <stdlib.h>
 #include <string.h>
 
