@@ -23,6 +23,8 @@
 #include "periph/pwm.h"
 #include "periph_conf.h"
 
+/* guard file in case no PWM device is defined */
+#if PWM_NUMOF
 
 #define PCPWM1      BIT6
 
@@ -47,7 +49,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
                           (PWM_0_FUNC << PWM_0_CH2_PIN * 2);
 
             /* power on PWM1 */
-            PCONP |= BIT6;
+            pwm_poweron(dev);
 
             /* select PWM1 clock */
             PCLKSEL0 &= ~(BIT13);
@@ -78,9 +80,6 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
             PWM1LER = BIT0 | (1 << PWM_0_CH0) | (1 << PWM_0_CH1) | (1 << PWM_0_CH2);
             break;
 #endif
-        case PWM_UNDEFINED:
-        default:
-            return -1;
     }
 
     return 0;
@@ -110,42 +109,53 @@ int pwm_set(pwm_t dev, int channel, unsigned int value)
             }
             break;
 #endif
-        case PWM_UNDEFINED:
-        default:
-            return -1;
     }
 
     return 0;
 }
 
-int pwm_start(pwm_t dev)
+void pwm_start(pwm_t dev)
 {
     switch (dev) {
 #if PWM_0_EN
         case PWM_0:
-            PCONP |= PCPWM1;        /* enable PWM1 device */
+            PWM1TCR |= BIT0;
             break;
 #endif
-        case PWM_UNDEFINED:
-        default:
-            return -1;
     }
-
-    return 0;
 }
 
-int pwm_stop(pwm_t dev)
+void pwm_stop(pwm_t dev)
 {
     switch (dev) {
 #if PWM_0_EN
         case PWM_0:
-            PCONP &= ~PCPWM1;       /* disable PWM1 device */
+            PWM1TCR &= ~(BIT0);
             break;
 #endif
-        case PWM_UNDEFINED:
-        default:
-            return -1;
     }
-
-    return 0;
 }
+
+void pwm_poweron(pwm_t dev)
+{
+    switch (dev) {
+#if PWM_0_EN
+        case PWM_0:
+            PCONP |= PCPWM1;
+            break;
+#endif
+    }
+}
+
+void pwm_poweroff(pwm_t dev)
+{
+    switch (dev) {
+#if PWM_0_EN
+        case PWM_0:
+            PCONP &= ~(PCPWM1);
+            break;
+#endif
+    }
+}
+
+#endif /* PWM_NUMOF */
