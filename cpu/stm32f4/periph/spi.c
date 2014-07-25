@@ -39,8 +39,42 @@ static char cb_delay = 0xb8;
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed){
 
-	GPIO_TypeDef *port;
-	SPI_TypeDef *spi_port;
+	uint8_t speed_devider;
+
+	GPIO_TypeDef *port = 0;
+	SPI_TypeDef *spi_port = 0;
+
+	switch (speed){
+	    case 0: speed_devider = 7; // makes 656 kHz
+	            break;
+
+	    case 1: speed_devider = 7; // makes 656 kHz
+                break;
+
+	    case 2: speed_devider = 6; // makes 1.3 MHz
+                break;
+
+	    case 3: speed_devider = 5; // makes 2.6 MHz
+                break;
+
+	    case 4: speed_devider = 4; // makes 5.3 MHz
+                break;
+
+/*	    case 5: speed_devider = 3; // makes 11 MHz
+                break;
+
+	    case 6: speed_devider = 2; // makes 21 MHz
+                break;
+
+	    case 7: speed_devider = 1; // makes 42 MHz
+                break;
+
+        case 8: speed_devider = 0; // makes 84 MHz
+                break;
+
+*/
+	    default: speed_devider = 7;
+	}
 
 
     switch (dev) {
@@ -143,7 +177,9 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed){
 
             return -1;
     }
-
+        if (spi_port == 0) {
+            return -1;
+        }
     /************************* SPI-Init *************************/
 
 	    spi_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);/* Activate the SPI mode (Reset I2SMOD bit in I2SCFGR register) */
@@ -154,7 +190,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed){
 		spi_port->CR2 |=  (SPI_CR2_SSOE); /* 1: enable master = disable multimaster */
 
 		spi_port->CR1 |=  (SPI_CR1_SPE);/* SPI enable */
-	    spi_port->CR1 |=  (speed << 3); /* Define serial clock baud rate. 001 leads to f_PCLK/4 */
+	    spi_port->CR1 |=  (speed_devider << 3); /* Define serial clock baud rate. 001 leads to f_PCLK/4 */
 		spi_port->CR1 |=  (SPI_CR1_MSTR); /* 1: master configuration */
 		spi_port->CR1 |=  (conf);
 
@@ -166,8 +202,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed){
 
 int spi_init_slave( spi_t dev, spi_conf_t conf, char (*cb)(char data) ){
 
-	SPI_TypeDef *spi_port;
-	GPIO_TypeDef *port;
+	SPI_TypeDef *spi_port = 0;
+	GPIO_TypeDef *port = 0;
 
     switch (dev) {
 #if SPI_0_EN
@@ -301,6 +337,10 @@ int spi_init_slave( spi_t dev, spi_conf_t conf, char (*cb)(char data) ){
             return -1;
     }
 
+    if (spi_port == 0) {
+        return -1;
+    }
+
     /************************* SPI-Init *************************/
     		spi_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);
 
@@ -324,7 +364,7 @@ int spi_init_slave( spi_t dev, spi_conf_t conf, char (*cb)(char data) ){
 int spi_transfer_byte(spi_t dev, char out, char *in){
 
 
-    SPI_TypeDef *spi_port;
+    SPI_TypeDef *spi_port = 0;
 
     switch (dev) {
 #if SPI_0_EN
@@ -342,6 +382,9 @@ int spi_transfer_byte(spi_t dev, char out, char *in){
             return -1;
     }
 
+    if (spi_port == 0) {
+        return -1;
+    }
 
 	while( !(spi_port->SR & SPI_SR_TXE));
 	spi_port->DR = out;
@@ -483,7 +526,7 @@ static inline void irq_handler(spi_t dev)
 {
 
 	char cb = 0;
-	SPI_TypeDef *spi_port;
+	SPI_TypeDef *spi_port = 0;
 
 switch (dev) {
 #if SPI_0_EN
@@ -497,6 +540,7 @@ switch (dev) {
 			break;
 #endif
     }
+
 
 		while( !(spi_port->SR & SPI_SR_TXE));
 		spi_port->DR = cb_delay;

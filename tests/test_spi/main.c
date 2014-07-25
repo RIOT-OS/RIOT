@@ -111,9 +111,9 @@ void cmd_init_master(int argc, char **argv)
 #endif
 
 #if USE_SPI_0_MASTER
-    spi_init_master(SPI_0, SPI_CONF_FIRST_RISING, SPI_SPEED_1MHZ);
+    spi_init_master(SPI_0, SPI_CONF_FIRST_RISING, SPI_SPEED_400KHZ);
 #else
-    spi_init_master(SPI_1, SPI_CONF_FIRST_RISING, SPI_SPEED_1MHZ);
+    spi_init_master(SPI_1, SPI_CONF_FIRST_RISING, SPI_SPEED_400KHZ);
 #endif
 
     int cr1_reg, cr2_reg, i2cfgr;
