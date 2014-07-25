@@ -27,6 +27,9 @@
 #include "periph_conf.h"
 
 
+/* add guard for the case that no SPI device is defined */
+#if SPI_NUMOF
+
 /**
  * @brief Definition available SPI devices
  */
@@ -43,7 +46,6 @@ typedef enum {
 #if SPI_3_EN
     SPI_3,              /**< SPI device 3 */
 #endif
-    SPI_UNDEFINED
 } spi_t;
 
 /**
@@ -83,8 +85,8 @@ typedef enum {
  * @param[in] speed     desired clock speed for driving the SPI bus
  *
  * @return              0 on success
- * @return              -1 on undefined SPI device
- * @return              -2 on unavailable speed value
+ * @return              -1 on unavailable speed value
+ * @return              -2 on other errors
  */
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed);
 
@@ -99,13 +101,12 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed);
  *
  * @param[in] dev       The SPI device to initialize as SPI slave
  * @param[in] conf      Mode of clock phase and polarity
- * @param[in] cb        callback on received byte
+ * @param[in] cb        callback called every time a byte was received
  *
  * @return              0 on success
- * @return              -1 on undefined SPI device
- * @return              -2 on unavailable speed value
+ * @return              -1 on error
  */
-int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(unsigned int seq, char data));
+int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data));
 
 /**
  * @brief Transfer one byte on the given SPI bus
@@ -147,7 +148,8 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length);
  * @return              Number of bytes that were transfered
  * @return              -1 on error
  */
-int spi_transfer_reg(spi_t dev, uint8_t reg, char *out, char *in);
+
+int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in);
 
 /**
  * @brief Transfer a number of bytes from/to a given register address
@@ -168,24 +170,28 @@ int spi_transfer_reg(spi_t dev, uint8_t reg, char *out, char *in);
 int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length);
 
 /**
+ * @brief Tell the SPI driver that a new transaction was started. Call only when SPI in slave mode!
+ *
+ * @param[in] dev       SPI device that is active
+ * @param[in] reset_val The byte that is send to the master as first byte
+ */
+void spi_transmission_begin(spi_t dev, char reset_val);
+
+/**
  * @brief Power on the given SPI device
  *
  * @param[in] dev       SPI device to power on
- *
- * @return              0 on success
- * @return              -1 on undefined device
  */
-int spi_poweron(spi_t dev);
+void spi_poweron(spi_t dev);
 
 /**
  * @brief Power off the given SPI device
  *
  * @param[in] dev       SPI device to power off
- *
- * @return              0 on success
- * @return              -1 on undefined device
  */
-int spi_poweroff(spi_t dev);
+void spi_poweroff(spi_t dev);
+
+#endif /* SPI_NUMOF */
 
 #endif /* __SPI_H */
 /** @} */

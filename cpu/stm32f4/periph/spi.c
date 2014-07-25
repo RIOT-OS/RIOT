@@ -25,7 +25,7 @@
 #include "stm32f407xx.h"
 
 typedef struct {
-    char (*cb)(unsigned int seq, char data);
+    char (*cb)(char data);
 } spi_state_t;
 
 static inline void irq_handler(spi_t dev);
@@ -37,7 +37,7 @@ static char cb_delay = 0xb8;
 
 /* ###################################### Init Master ###################################### */
 
-int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed){
+int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed){
 
 	GPIO_TypeDef *port;
 	SPI_TypeDef *spi_port;
@@ -141,8 +141,6 @@ int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed){
             break;
 #endif
 
-        case SPI_UNDEFINED:
-        default:
             return -1;
     }
 
@@ -166,7 +164,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed){
 
 /* ###################################### Init Slave ###################################### */
 
-int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(unsigned int seq, char data)){
+int spi_init_slave( spi_t dev, spi_conf_t conf, char (*cb)(char data) ){
 
 	SPI_TypeDef *spi_port;
 	GPIO_TypeDef *port;
@@ -300,8 +298,6 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(unsigned int seq, char
             break;
 #endif
 
-        case SPI_UNDEFINED:
-        default:
             return -1;
     }
 
@@ -395,7 +391,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length){
 
 /* ###################################### Transfer Register ###################################### */
 
-int spi_transfer_reg(spi_t dev, uint8_t reg, char *out, char *in){
+int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in){
 
 	int trans_ret, trans_bytes = 0;
 	char ret_status;
@@ -407,7 +403,7 @@ int spi_transfer_reg(spi_t dev, uint8_t reg, char *out, char *in){
 				return -1;
 			}
 
-	trans_ret = spi_transfer_byte(dev, *out, in);
+	trans_ret = spi_transfer_byte(dev, out, in);
 
 	if(trans_ret < 0)
 			{
@@ -435,40 +431,31 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
 
 /* ###################################### SPI PowerOFF ###################################### */
 
-int spi_poweron(spi_t dev){
+void spi_poweron(spi_t dev){
 
-	SPI_TypeDef *spi_port;
 
 switch (dev) {
 #if SPI_0_EN
         case SPI_0:
-            spi_port = SPI_0_DEV;
             SPI_0_PORT_CLKEN(); /* Enable peripheral clock for GPIO port A */
             SPI_0_CLKEN(); /* Enable peripheral clock for SPI1 */
             break;
 #endif
 #if SPI_1_EN
         case SPI_1:
-            spi_port = SPI_1_DEV;
             SPI_1_PORT_CLKEN();
             SPI_1_CLKEN();
             break;
 #endif
 
-        case SPI_UNDEFINED:
-        default:
-            return -1;
     }
-
-	return 0;
 }
 
 
 /* ###################################### SPI PowerOFF ###################################### */
 
-int spi_poweroff(spi_t dev){
+void spi_poweroff(spi_t dev){
 
-	SPI_TypeDef *spi_port;
 
 switch (dev) {
 #if SPI_0_EN
@@ -486,12 +473,7 @@ switch (dev) {
             break;
 #endif
 
-        case SPI_UNDEFINED:
-        default:
-            return -1;
     }
-
-	return 0;
 }
 
 
@@ -501,7 +483,6 @@ static inline void irq_handler(spi_t dev)
 {
 
 	char cb = 0;
-	unsigned int seq = 0;
 	SPI_TypeDef *spi_port;
 
 switch (dev) {
@@ -515,8 +496,6 @@ switch (dev) {
 			spi_port = SPI_1_DEV;
 			break;
 #endif
-        case SPI_UNDEFINED:
-        	break;
     }
 
 		while( !(spi_port->SR & SPI_SR_TXE));
@@ -525,7 +504,7 @@ switch (dev) {
 		while( !(spi_port->SR & SPI_SR_RXNE) );
 		cb = spi_port->DR;
 
-	    config[dev].cb(seq, cb);
+	    config[dev].cb(cb);
 	    /* return byte of callback is transferred to master in next transmission cycle */
 	    cb_delay = cb;
 }

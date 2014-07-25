@@ -49,7 +49,7 @@ static void cmd_clearbuf(int argc, char **argv);
 char test_buf[BUF_SEND_LEN] = {0};
 char buf_count = 0;
 
-char test_irq(unsigned int seq, char data)
+char test_irq(char data)
 {
     test_buf[buf_count] = data;
     buf_count++;
@@ -110,11 +110,10 @@ void cmd_init_master(int argc, char **argv)
     spi_poweron(SPI_1);
 #endif
 
-    uint32_t speed = 7;	/* this is the divider not the freq.!*/
 #if USE_SPI_0_MASTER
-    spi_init_master(SPI_0, SPI_CONF_FIRST_RISING, speed);
+    spi_init_master(SPI_0, SPI_CONF_FIRST_RISING, SPI_SPEED_1MHZ);
 #else
-    spi_init_master(SPI_1, SPI_CONF_FIRST_RISING, speed);
+    spi_init_master(SPI_1, SPI_CONF_FIRST_RISING, SPI_SPEED_1MHZ);
 #endif
 
     int cr1_reg, cr2_reg, i2cfgr;
