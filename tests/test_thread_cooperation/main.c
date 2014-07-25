@@ -37,25 +37,20 @@ void *run(void *arg)
 {
     (void) arg;
 
-    int err;
     int me = thread_getpid();
     printf("I am alive (%d)\n", me);
     msg_t m;
-    err = msg_receive(&m);
+    msg_receive(&m);
     printf("Thread %d has arg %" PRIu32 "\n", me, m.content.value);
 
-    err = mutex_lock(&mtx);
-
-    if (err < 1) {
-        printf("[!!!] mutex_lock failed with %d\n", err);
-    }
+    mutex_lock(&mtx);
 
     storage *= m.content.value;
     mutex_unlock(&mtx);
 
     msg_t final;
     final.content.value = me;
-    err = msg_send(&final, main_id, 1);
+    int err = msg_send(&final, main_id, 1);
 
     if (err < 0) {
         printf("[!!!] Failed to send message from %d to main\n", me);
@@ -66,14 +61,9 @@ void *run(void *arg)
 
 int main(void)
 {
-    int err;
     main_id = thread_getpid();
 
-    err = mutex_init(&mtx);
-
-    if (err < 1) {
-        printf("[!!!] mutex_init failed with %d\n", err);
-    }
+    mutex_init(&mtx);
 
     printf("Problem: %d\n", PROBLEM);
 
@@ -86,12 +76,12 @@ int main(void)
                                run, NULL, "thread");
 
         if (ths[i] < 0)  {
-            printf("[!!!] Creating thread failed with %d\n", err);
+            printf("[!!!] Creating thread failed.\n");
         }
         else {
             args[i].content.value = i + 1;
-            err = msg_send(&args[i], ths[i], 1);
 
+            int err = msg_send(&args[i], ths[i], 1);
             if (err < 0) {
                 printf("[!!!] Sending message to thread %d failed\n", ths[i]);
             }

@@ -42,11 +42,9 @@ char* TestSuite_name(TestSuite* self)
 
 void TestSuite_run(TestSuite* self,TestResult* result)
 {
-	int i;
-	Test* test;
 	if (self->tests) {
-		for (i=0; i<self->numberOfTests; i++) {
-			test = self->tests[i];
+		for (int i = 0; i < self->numberOfTests; i++) {
+			Test* test = self->tests[i];
 			Test_run(test, result);
 		}
 	}
@@ -55,11 +53,9 @@ void TestSuite_run(TestSuite* self,TestResult* result)
 int TestSuite_countTestCases(TestSuite* self)
 {
 	int count = 0;
-	int i;
-	Test* test;
 	if (self->tests) {
-		for (i=0; i<self->numberOfTests; i++) {
-			test = self->tests[i];
+		for (int i = 0; i < self->numberOfTests; i++) {
+			Test* test = self->tests[i];
 			count += Test_countTestCases(test);
 		}
 	}

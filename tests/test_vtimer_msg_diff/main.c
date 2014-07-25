@@ -113,7 +113,7 @@ int main(void)
                   "timer");
 
     for (unsigned i = 0; i < sizeof(timer_msgs)/sizeof(struct timer_msg); i++) {
-        printf("Sending timer msg %d...\n", i);
+        printf("Sending timer msg %u...\n", i);
         m.content.ptr = (char *) &timer_msgs[i];
         msg_send(&m, pid, false);
     }
