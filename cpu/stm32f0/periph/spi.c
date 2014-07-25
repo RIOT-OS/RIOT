@@ -20,12 +20,13 @@
  */
 
 #include "cpu.h"
+#include "board.h"
 #include "periph/spi.h"
 #include "periph_conf.h"
 #include "thread.h"
 #include "sched.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 /* guard file in case no SPI device is defined */
@@ -104,9 +105,6 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     spi->CR2 = 0;
     spi->I2SCFGR = 0;       /* this makes sure SPI mode is selected */
 
-    /* set data-size to 8-bit */
-    spi->CR2 |= (7 << 8);
-
     /* configure bus clock speed */
     switch (speed) {
         case SPI_SPEED_100KHZ:
@@ -130,6 +128,15 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 
     /* select master mode */
     spi->CR1 |= SPI_CR1_MSTR;
+
+    /* the NSS (chip select) is managed purely by software */
+    spi->CR1 |= SPI_CR1_SSM | SPI_CR1_SSI;
+
+    /* set data-size to 8-bit */
+    spi->CR2 |= (7 << 8);
+
+    /* set FIFO threshold to set RXNE when 8 bit are received */
+    spi->CR2 |= SPI_CR2_FRXTH;
 
     /* enable the SPI device */
     spi->CR1 |= SPI_CR1_SPE;
@@ -179,6 +186,15 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
     /* set callback */
     spi_config[dev].cb = cb;
 
+    /* test callback */
+    char foo = spi_config[dev].cb(' ');
+    printf("SPI: cb-test ' ': %c\n", foo);
+
+    foo = spi_config[dev].cb(0x1f);
+    printf("SPI: cb-test '0x1f': %c\n", foo);
+    foo = spi_config[dev].cb(0);
+    printf("SPI: cb-test '0': %c\n", foo);
+
     /* configure pins for their correct alternate function */
     for (int i = 0; i < 3; i++) {
         port->MODER &= ~(3 << (pin[i] * 2));
@@ -193,14 +209,17 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
     spi->CR2 = 0;
     spi->I2SCFGR = 0;       /* this makes sure SPI mode is selected */
 
-    /* set data-size to 8-bit */
-    spi->CR2 |= (7 << 8);
-
     /* select clock polarity and clock phase */
     spi->CR1 |= conf;
 
-    /* enable interrupt for arriving data: 'receive register no empty' */
-    spi->CR2 |= SPI_CR2_RXNEIE;
+    /* set data-size to 8-bit */
+    spi->CR2 |= (7 << 8);
+
+    /* set FIFO threshold to set RXNE when 8 bit are received */
+    spi->CR2 |= SPI_CR2_FRXTH;
+
+    /* enable interrupt for arriving data: 'receive register no empty' and errors */
+    spi->CR2 |= SPI_CR2_RXNEIE | SPI_CR2_ERRIE;
 
     /* enable the SPI device */
     spi->CR1 |= SPI_CR1_SPE;
@@ -212,6 +231,8 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 {
     char tmp;
     SPI_TypeDef *spi = 0;
+
+    DEBUG("Will tranfer char |%c|\n", out);
 
     switch (dev) {
 #if SPI_0_EN
@@ -226,15 +247,23 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 #endif
     }
 
-    /* wait for an eventually previous byte to be readily transferred */
-    while(!(spi->SR & SPI_SR_TXE));
 
+    DEBUG("Write data into DR\n");
     /* put next byte into the output register */
     spi->DR = out;
 
-    /* wait until the current byte was successfully transferred */
-    while( !(spi->SR & SPI_SR_RXNE) );
+    DEBUG("Wait while TXE is not set\n");
+    /* wait for an eventually previous byte to be readily transferred */
+    while(!(spi->SR & SPI_SR_TXE));
 
+    DEBUG("Wait while RXNE is not set\n");
+    /* wait until the current byte was successfully transferred */
+    //while(!(spi->SR & SPI_SR_RXNE) );
+
+    DEBUG("Wait until device is not busy anymore\n");
+    while (spi->SR & SPI_SR_BSY);
+
+    DEBUG("Read DR\n");
     /* read response byte to reset flags */
     tmp = spi->DR;
 
@@ -251,10 +280,13 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     char res;
 
     for (int i = 0; i < length; i++) {
+        DEBUG("Ready for byte %i\n", i);
         if (out) {
+            DEBUG("Send out with real data\n");
             spi_transfer_byte(dev, out[i], &res);
         }
         else {
+            DEBUG("Send byte with zero data\n");
             spi_transfer_byte(dev, 0, &res);
         }
         if (in) {
@@ -291,6 +323,7 @@ void spi_transmission_begin(spi_t dev, char reset_val)
             break;
 #endif
     }
+    DEBUG("SPI: transmisison begins, first char is |%c|\n", reset_val);
 }
 
 void spi_poweron(spi_t dev)
@@ -331,6 +364,7 @@ void spi_poweroff(spi_t dev)
 static inline void irq_handler(SPI_TypeDef *spi, spi_t dev)
 {
     char data;
+    LD3_TOGGLE;
 
     /* call owner when new byte was receive (asserts SPI is in slave mode) */
     if (spi->SR & SPI_SR_RXNE) {
@@ -340,6 +374,14 @@ static inline void irq_handler(SPI_TypeDef *spi, spi_t dev)
         data = spi_config[dev].cb(data);
         /* set answer byte to be transferred next */
         spi->DR = data;
+    }
+    else {
+        while (1) {
+            for (int i = 0; i < 2000000; i++) {
+                asm("nop");
+            }
+            LD4_TOGGLE;
+        }
     }
 
     /* see if a thread with higher priority wants to run now */
