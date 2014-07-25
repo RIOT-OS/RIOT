@@ -521,25 +521,16 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length){
 
 int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in){
 
-	int trans_ret, trans_bytes = 0;
-	char ret_status;
+	char ret_status; /* many devices give back status at first transmission */
+	int trans_ret;
 
 	trans_ret = spi_transfer_byte(dev, reg, &ret_status);
 
-	if(trans_ret < 0)
-			{
-				return -1;
-			}
+	if (trans_ret < 0) {
+	    return -1;
+	}
+	return spi_transfer_byte(dev, out, in);
 
-	trans_ret = spi_transfer_byte(dev, out, in);
-
-	if(trans_ret < 0)
-			{
-				return -1;
-			}
-	trans_bytes++;
-
-	return trans_bytes;
 }
 
 /* ###################################### Transfer RegisterS ###################################### */
