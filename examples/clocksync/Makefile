@@ -32,12 +32,10 @@ export QUIET ?= 1
 # Modules to include:
 
 USEMODULE += posix
-USEMODULE += gtsp
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
-USEMODULE += gtimer
-USEMODULE += sixlowpan
+USEMODULE += defaulttransceiver
 USEMODULE += auto_init
 
 ifneq (,$(filter msb-430,$(BOARD)))
@@ -50,29 +48,21 @@ ifneq (,$(filter msba2,$(BOARD)))
 	USEMODULE += mci
 	USEMODULE += config
 	USEMODULE += random
-	USEMODULE += cc110x_ng
-	USEMODULE += transceiver
+	USEMODULE += gtsp
 endif
 ifneq (,$(filter avsextrem,$(BOARD)))
 	USEMODULE += rtc
 	USEMODULE += config
 	USEMODULE += random
-	USEMODULE += transceiver
-	USEMODULE += cc110x_ng
-endif
-ifneq (,$(filter avsextrem,$(BOARD)))
-	USEMODULE += rtc
-	USEMODULE += config
-	USEMODULE += random
-	USEMODULE += cc110x_ng
+	USEMODULE += gtsp
 endif
 ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += ltc4150
 	USEMODULE += rtc
 	USEMODULE += config
 	USEMODULE += nativenet
-	USEMODULE += transceiver
 	USEMODULE += random
+	USEMODULE += gtsp
 endif
 
 include $(RIOTBASE)/Makefile.include

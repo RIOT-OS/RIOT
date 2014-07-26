@@ -27,19 +27,16 @@
 #include "sixlowpan/mac.h"
 #include "random.h"
 #include "x64toa.h"
+#include "transceiver.h"
 
 #include "clocksync/gtsp.h"
 #include "gtimer.h"
 #include "sixlowpan/dispatch_values.h"
 
 #ifdef MODULE_CC110X_NG
-#include "cc110x_ng.h"
-#define _TC_TYPE            TRANSCEIVER_CC1100
 #define GTSP_CALIBRATION_OFFSET ((uint32_t) 2300)
 
 #elif MODULE_NATIVENET
-#include "nativenet.h"
-#define _TC_TYPE            TRANSCEIVER_NATIVE
 #define GTSP_CALIBRATION_OFFSET ((uint32_t) 1500)
 
 #else
@@ -441,7 +438,7 @@ static uint16_t _gtsp_get_trans_addr(void)
         return 1;
     }
 
-    tcmd.transceivers = _TC_TYPE;
+    tcmd.transceivers = TRANSCEIVER_DEFAULT;
     tcmd.data = &a;
     mesg.content.ptr = (char *) &tcmd;
     mesg.type = GET_ADDRESS;

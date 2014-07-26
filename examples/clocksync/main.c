@@ -26,7 +26,6 @@
 #include "shell.h"
 #include "shell_commands.h"
 #include "board_uart0.h"
-#include "transceiver.h"
 
 static int shell_readc(void) {
 	char c = 0;
