@@ -1,5 +1,5 @@
 # name of your application
-export APPLICATION = timesync
+export APPLICATION = clocksync
 
 # If no BOARD is found in the environment, use this default:
 export BOARD ?= native
@@ -23,8 +23,6 @@ export RIOTBASE ?= $(CURDIR)/../..
 # which is not needed in a production environment but helps in the
 # development process:
 #CFLAGS += -DDEVELHELP
-
-#CFLAGS += -DGTSP_ENABLE_TRIGGER
 
 export LINKFLAGS += -lm
 
