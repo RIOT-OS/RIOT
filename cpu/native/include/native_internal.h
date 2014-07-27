@@ -13,6 +13,7 @@
 #define _NATIVE_INTERNAL_H
 
 #include <signal.h>
+#include <stdio.h>
 /* enable signal handler register access on different platforms
  * check here for more:
  * http://sourceforge.net/p/predef/wiki/OperatingSystems/
@@ -48,24 +49,31 @@ extern void _native_sig_leave_tramp(void);
 
 void _native_syscall_leave(void);
 void _native_syscall_enter(void);
+void _native_init_syscalls(void);
 
 /**
  * external functions regularly wrapped in native for direct use
  */
 extern ssize_t (*real_read)(int fd, void *buf, size_t count);
 extern ssize_t (*real_write)(int fd, const void *buf, size_t count);
-extern void* (*real_malloc)(size_t size);
+extern size_t (*real_fread)(void *ptr, size_t size, size_t nmemb, FILE *stream);
+extern void (*real_clearerr)(FILE *stream);
 extern void (*real_free)(void *ptr);
 extern void* (*real_calloc)(size_t nmemb, size_t size);
+extern void* (*real_malloc)(size_t size);
 extern void* (*real_realloc)(void *ptr, size_t size);
-extern int (*real_getpid)(void);
-extern int (*real_pipe)(int[2]);
 extern int (*real_close)(int);
-extern int (*real_fork)(void);
 extern int (*real_dup2)(int, int);
-extern int (*real_unlink)(const char *);
 extern int (*real_execve)(const char *, char *const[], char *const[]);
+extern int (*real_feof)(FILE *stream);
+extern int (*real_ferror)(FILE *stream);
+extern int (*real_fork)(void);
+extern int (*real_getpid)(void);
 extern int (*real_pause)(void);
+extern int (*real_pipe)(int[2]);
+extern int (*real_printf)(const char *format, ...);
+extern int (*real_unlink)(const char *);
+extern FILE* (*real_fopen)(const char *path, const char *mode);
 
 /**
  * data structures

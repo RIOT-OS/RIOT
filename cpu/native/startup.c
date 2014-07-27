@@ -37,8 +37,6 @@
 #include "native_internal.h"
 #include "tap.h"
 
-int (*real_printf)(const char *format, ...);
-int (*real_getpid)(void);
 int _native_null_in_pipe[2];
 int _native_null_out_file;
 const char *_progname;
@@ -55,7 +53,7 @@ const char *_native_unix_socket_path = NULL;
 void _native_null_in(char *stdiotype)
 {
     if (real_pipe(_native_null_in_pipe) == -1) {
-        err(1, "_native_null_in(): pipe()");
+        err(EXIT_FAILURE, "_native_null_in(): pipe()");
     }
 
     if (strcmp(stdiotype, "stdio") == 0) {
@@ -161,7 +159,7 @@ void usage_exit(void)
 #endif
 
 #ifdef MODULE_UART0
-    real_printf(" [-t <port>|-u [path]]");
+    real_printf(" [-t <port>|-u [path]] [-r]");
 #endif
 
     real_printf(" [-i <id>] [-d] [-e|-E] [-o]\n");
@@ -175,7 +173,9 @@ void usage_exit(void)
     real_printf("\
 -t <port>   redirect stdio to TCP socket listening on <port>\n\
 -u <path>   redirect stdio to UNIX socket (<path> if given,\n\
-            /tmp/riot.tty.PID otherwise)\n");
+            /tmp/riot.tty.PID otherwise)\n\
+-r          replay missed output when (re-)attaching to socket\n\
+            (implies -o)\n");
 #endif
     real_printf("\
 -i <id>     specify instance id (set by config module)\n\
@@ -194,21 +194,7 @@ The order of command line arguments matters.\n");
 
 __attribute__((constructor)) static void startup(int argc, char **argv)
 {
-    /* get system read/write/printf */
-    *(void **)(&real_read) = dlsym(RTLD_NEXT, "read");
-    *(void **)(&real_write) = dlsym(RTLD_NEXT, "write");
-    *(void **)(&real_malloc) = dlsym(RTLD_NEXT, "malloc");
-    *(void **)(&real_realloc) = dlsym(RTLD_NEXT, "realloc");
-    *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");
-    *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
-    *(void **)(&real_getpid) = dlsym(RTLD_NEXT, "getpid");
-    *(void **)(&real_pipe) = dlsym(RTLD_NEXT, "pipe");
-    *(void **)(&real_close) = dlsym(RTLD_NEXT, "close");
-    *(void **)(&real_fork) = dlsym(RTLD_NEXT, "fork");
-    *(void **)(&real_dup2) = dlsym(RTLD_NEXT, "dup2");
-    *(void **)(&real_unlink) = dlsym(RTLD_NEXT, "unlink");
-    *(void **)(&real_execve) = dlsym(RTLD_NEXT, "execve");
-    *(void **)(&real_pause) = dlsym(RTLD_NEXT, "pause");
+    _native_init_syscalls();
 
     _native_argv = argv;
     _progname = argv[0];
@@ -223,6 +209,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     char *stdiotype = "stdio";
 #ifdef MODULE_UART0
     char *ioparam = NULL;
+    int replay = 0;
 #endif
 
 #ifdef MODULE_NATIVENET
@@ -274,6 +261,10 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
             stdouttype = "file";
         }
 #ifdef MODULE_UART0
+        else if (strcmp("-r", arg) == 0) {
+            stdouttype = "file";
+            replay = 1;
+        }
         else if (strcmp("-t", arg) == 0) {
             stdiotype = "tcp";
             if (argp + 1 < argc) {
@@ -314,7 +305,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     _native_null_in(stdiotype);
 
 #ifdef MODULE_UART0
-    _native_init_uart0(stdiotype, ioparam);
+    _native_init_uart0(stdiotype, ioparam, replay);
 #endif
 
     native_hwtimer_pre_init();

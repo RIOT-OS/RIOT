@@ -7,7 +7,7 @@ void _native_handle_uart0_input(void);
  * @param stdiotype: "stdio", "tcp", "udp" io redirection
  * @param ioparam: a string containing a port number if stdiotype is tcp
  */
-void _native_init_uart0(char *stdiotype, char *ioparam);
+void _native_init_uart0(char *stdiotype, char *ioparam, int replay);
 int _native_set_uart_fds(void);
 #endif
 
