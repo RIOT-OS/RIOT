@@ -188,15 +188,15 @@ int puts(const char *s)
 
 char *make_message(const char *format, va_list argp)
 {
-    int n;
     int size = 100;
     char *message, *temp;
 
-    if ((message = malloc(size)) == NULL)
+    if ((message = malloc(size)) == NULL) {
         return NULL;
+    }
 
     while (1) {
-        n = vsnprintf(message, size, format, argp);
+        int n = vsnprintf(message, size, format, argp);
         if (n < 0)
             return NULL;
         if (n < size)
