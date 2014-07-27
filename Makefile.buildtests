@@ -55,6 +55,7 @@ buildtest:
 			RIOTCPU=$${RIOTCPU} \
 			BINDIRBASE=$${BINDIRBASE} \
 			RIOTNOLINK=$${RIOTNOLINK} \
+			RIOT_VERSION=$${RIOT_VERSION} \
 			$(MAKE) -j$(NPROC) 2>&1 >/dev/null) ; \
 		if [ "$${?}" = "0" ]; then \
 			$${ECHO} "$${GREEN}success$${RESET}"; \
