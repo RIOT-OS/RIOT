@@ -29,12 +29,16 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+/* guard file in case no UART device was specified */
+#if UART_NUMOF
+
 /**
  * @brief Each UART device has to store two callbacks.
  */
 typedef struct {
-    void (*rx_cb)(char);
-    void (*tx_cb)(void);
+    uart_rx_cb_t rx_cb;
+    uart_tx_cb_t tx_cb;
+    void *arg;
 } uart_conf_t;
 
 /**
@@ -42,7 +46,7 @@ typedef struct {
  *
  * TODO: this function needs to be implemented
  */
-int uart_init(uart_t uart, uint32_t baudrate, void (*rx_cb)(char), void (*tx_cb)(void))
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
 
     int res;
@@ -141,9 +145,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             UART_0_DEV->TASKS_STARTRX = 1;
             break;
 #endif
-        case UART_UNDEFINED:
-            return -2;
-            break;
     }
 
     DEBUG("UART INITIALIZATION complete\n");
@@ -167,8 +168,6 @@ int uart_write(uart_t uart, char data)
         case UART_0:
             UART_0_DEV->TXD = (uint8_t)data;
             break;
-        case UART_UNDEFINED:
-            return -1;
     }
 
     return 1;
@@ -188,8 +187,6 @@ int uart_read_blocking(uart_t uart, char *data)
             DEBUG("Reading data\n");
             *data = (char)(UART_0_DEV->RXD & 0xff);
             break;
-        case UART_UNDEFINED:
-            return -1;
     }
 
     return 1;
@@ -206,9 +203,9 @@ int uart_write_blocking(uart_t uart, char data)
             /* reset ready flag */
             UART_0_DEV->EVENTS_TXDRDY = 0;
             break;
-        case UART_UNDEFINED:
-            return -1;
     }
 
     return 1;
 }
+
+#endif /* UART_NUMOF */

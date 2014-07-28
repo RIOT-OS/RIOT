@@ -53,8 +53,10 @@ static ringbuffer_t rx_buf;
 /**
  * @brief Receive a new character from the UART and put it into the receive buffer
  */
-void rx_cb(char data)
+void rx_cb(void *arg, char data)
 {
+    (void)arg;
+
     ringbuffer_add_one(&rx_buf, data);
     mutex_unlock(&uart_rx_mutex);
 }
@@ -66,7 +68,7 @@ void _init(void)
 {
     mutex_init(&uart_rx_mutex);
     ringbuffer_init(&rx_buf, rx_buf_mem, STDIO_BUFSIZE);
-    uart_init(STDIO, STDIO_BAUDRATE, rx_cb, 0);
+    uart_init(STDIO, STDIO_BAUDRATE, rx_cb, 0, 0);
 }
 
 /**

@@ -36,6 +36,14 @@
 #define HW_TIMER            TIMER_0
 
 /**
+ * @name Define UART device and baudrate for stdio
+ * @{
+ */
+#define STDIO               UART_0
+#define STDIO_BAUDRATE      (115200U)
+/** @} */
+
+/**
  * @name LED pin definitions
  * @{
  */

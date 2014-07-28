@@ -73,6 +73,7 @@
 /* UART 0 device configuration */
 #define UART_0_DEV          USART1
 #define UART_0_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_USART1EN)
+#define UART_0_CLKDIS()     (RCC->APB2ENR &= (~RCC_APB2ENR_USART1EN))
 #define UART_0_IRQ          USART1_IRQn
 #define UART_0_ISR          isr_usart1
 /* UART 0 pin configuration */
@@ -85,6 +86,7 @@
 /* UART 1 device configuration */
 #define UART_1_DEV          USART2
 #define UART_1_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART2EN)
+#define UART_1_CLKDIS()     (RCC->APB1ENR &= (~RCC_APB1ENR_USART2EN))
 #define UART_1_IRQ          USART2_IRQn
 #define UART_1_ISR          isr_usart2
 /* UART 1 pin configuration */
