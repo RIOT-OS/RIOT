@@ -100,57 +100,35 @@
  * @name ADC configuration
  * @{
  */
-#define ADC_NUMOF           (0U)
-#define ADC_0_EN            0
-#define ADC_1_EN            0
+#define ADC_NUMOF           (1U)
+#define ADC_0_EN            1
+#define ADC_MAX_CHANNELS    6
 
 /* ADC 0 configuration */
-#define ADC_0_DEV           ADC1                                                        /* TODO */
-#define ADC_0_SAMPLE_TIMER
+#define ADC_0_DEV           ADC1
+#define ADC_0_CHANNELS      6
+#define ADC_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_ADCEN)
+#define ADC_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_ADCEN))
+#define ADC_0_PORT          GPIOC
+#define ADC_0_PORT_CLKEN()  (RCC->AHBENR |= RCC_AHBENR_GPIOCEN)
 /* ADC 0 channel 0 pin config */
-#define ADC_0_C0_PORT
-#define ADC_0_C0_PIN
-#define ADC_0_C0_CLKEN()
-#define ADC_0_C0_AFCFG()
+#define ADC_0_CH0           10
+#define ADC_0_CH0_PIN       0
 /* ADC 0 channel 1 pin config */
-#define ADC_0_C1_PORT
-#define ADC_0_C1_PIN
-#define ADC_0_C1_CLKEN()
-#define ADC_0_C1_AFCFG()
+#define ADC_0_CH1           11
+#define ADC_0_CH1_PIN       1
 /* ADC 0 channel 2 pin config */
-#define ADC_0_C2_PORT
-#define ADC_0_C2_PIN
-#define ADC_0_C2_CLKEN()
-#define ADC_0_C2_AFCFG()
+#define ADC_0_CH2           12
+#define ADC_0_CH2_PIN       2
 /* ADC 0 channel 3 pin config */
-#define ADC_0_C3_PORT
-#define ADC_0_C3_PIN
-#define ADC_0_C3_CLKEN()
-#define ADC_0_C3_AFCFG()
-
-/* ADC 0 configuration */
-#define ADC_1_DEV           ADC2                                                        /* TODO */
-#define ADC_1_SAMPLE_TIMER
-/* ADC 0 channel 0 pin config */
-#define ADC_1_C0_PORT
-#define ADC_1_C0_PIN
-#define ADC_1_C0_CLKEN()
-#define ADC_1_C0_AFCFG()
-/* ADC 0 channel 1 pin config */
-#define ADC_1_C1_PORT
-#define ADC_1_C1_PIN
-#define ADC_1_C1_CLKEN()
-#define ADC_1_C1_AFCFG()
-/* ADC 0 channel 2 pin config */
-#define ADC_1_C2_PORT
-#define ADC_1_C2_PIN
-#define ADC_1_C2_CLKEN()
-#define ADC_1_C2_AFCFG()
-/* ADC 0 channel 3 pin config */
-#define ADC_1_C3_PORT
-#define ADC_1_C3_PIN
-#define ADC_1_C3_CLKEN()
-#define ADC_1_C3_AFCFG()
+#define ADC_0_CH3           13
+#define ADC_0_CH3_PIN       3
+/* ADC 0 channel 4 pin config */
+#define ADC_0_CH4           14
+#define ADC_0_CH4_PIN       4
+/* ADC 0 channel 5 pin config */
+#define ADC_0_CH5           15
+#define ADC_0_CH5_PIN       5
 /** @} */
 
 
