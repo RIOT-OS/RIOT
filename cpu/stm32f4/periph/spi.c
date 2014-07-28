@@ -35,8 +35,6 @@ static spi_state_t config[SPI_NUMOF];
 static char cb_delay = 0xb8;
 
 
-/* ###################################### Init Master ###################################### */
-
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed){
 
 	uint8_t speed_devider;
@@ -82,8 +80,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed){
         case SPI_0:
 			port = SPI_0_PORT; /* = GPIOA */
 			spi_port = SPI_0_DEV;
-            /************************* GPIO-Init *************************/
 
+            /***************** GPIO-Init *****************/
 			/* Set GPIOs to AF mode */
 			port->MODER &= ~(2 << (2 * SPI_0_SCK_GPIO));
 			port->MODER |=  (2 << (2 * SPI_0_SCK_GPIO));
@@ -215,8 +213,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed){
         if (spi_port == 0) {
             return -1;
         }
-    /************************* SPI-Init *************************/
 
+        /**************** SPI-Init *****************/
 	    spi_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);/* Activate the SPI mode (Reset I2SMOD bit in I2SCFGR register) */
 
 	    spi_port->CR1 = 0;
@@ -233,7 +231,6 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed){
 }
 
 
-/* ###################################### Init Slave ###################################### */
 
 int spi_init_slave( spi_t dev, spi_conf_t conf, char (*cb)(char data) ){
 
@@ -261,8 +258,7 @@ int spi_init_slave( spi_t dev, spi_conf_t conf, char (*cb)(char data) ){
             EXTI->FTSR |=  (1 << 4); // 1: falling trigger enabled
 
 
-            /************************* GPIO-Init *************************/
-
+            /***************** GPIO-Init *****************/
 			/* Set GPIOs to AF mode (not especially input or output) */
 			port->MODER &= ~(2 << (2 * SPI_0_NSS_GPIO));
 			port->MODER |=  (2 << (2 * SPI_0_NSS_GPIO));
@@ -351,8 +347,7 @@ int spi_init_slave( spi_t dev, spi_conf_t conf, char (*cb)(char data) ){
 			NVIC_EnableIRQ(SPI_1_IRQ_HANDLER);
 
 
-            /************************* GPIO-Init *************************/
-
+            /***************** GPIO-Init *****************/
 			/* Set GPIOs to AF mode (not especially input or output) */
 			port->MODER &= ~(2 << (2 * SPI_1_NSS_GPIO));
 			port->MODER |=  (2 << (2 * SPI_1_NSS_GPIO));
@@ -439,7 +434,7 @@ int spi_init_slave( spi_t dev, spi_conf_t conf, char (*cb)(char data) ){
         return -1;
     }
 
-    /************************* SPI-Init *************************/
+            /***************** SPI-Init *****************/
     		spi_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);
 
 			spi_port->CR1 = 0;
@@ -457,7 +452,6 @@ int spi_init_slave( spi_t dev, spi_conf_t conf, char (*cb)(char data) ){
 	return 0;
 }
 
-/* ###################################### Transfer Byte ###################################### */
 
 int spi_transfer_byte(spi_t dev, char out, char *in){
 
@@ -496,9 +490,6 @@ int spi_transfer_byte(spi_t dev, char out, char *in){
 }
 
 
-
-/* ###################################### Transfer ByteS ###################################### */
-
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length){
 
 	int i, trans_ret, trans_bytes = 0;
@@ -530,7 +521,6 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length){
 	return trans_bytes++;
 }
 
-/* ###################################### Transfer Register ###################################### */
 
 int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in){
 
@@ -546,7 +536,6 @@ int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in){
 
 }
 
-/* ###################################### Transfer RegisterS ###################################### */
 
 int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length){
 
@@ -561,7 +550,6 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
 	return trans_ret;
 }
 
-/* ###################################### SPI PowerOFF ###################################### */
 
 void spi_poweron(spi_t dev){
 
@@ -583,8 +571,6 @@ switch (dev) {
     }
 }
 
-
-/* ###################################### SPI PowerOFF ###################################### */
 
 void spi_poweroff(spi_t dev){
 
@@ -608,8 +594,6 @@ switch (dev) {
     }
 }
 
-
-/* ###################################### IRQ ###################################### */
 
 static inline void irq_handler(spi_t dev)
 {
