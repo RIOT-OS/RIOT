@@ -245,8 +245,20 @@ int spi_init_slave( spi_t dev, spi_conf_t conf, char (*cb)(char data) ){
         case SPI_0:
 			port = SPI_0_PORT;
 			spi_port = SPI_0_DEV;
-			NVIC_SetPriority(SPI_0_IRQ_HANDLER, SPI_0_IRQ_PRIO); /* set SPI interrupt priority */
-			NVIC_EnableIRQ(SPI_0_IRQ_HANDLER); /* set SPI interrupt priority */
+			//NVIC_SetPriority(SPI_0_IRQ_HANDLER, SPI_0_IRQ_PRIO); /* set SPI interrupt priority */
+			//NVIC_EnableIRQ(SPI_0_IRQ_HANDLER); /* set SPI interrupt priority */
+
+            NVIC_SetPriority(EXTI4_IRQn, SPI_0_IRQ_PRIO);
+            NVIC_EnableIRQ(EXTI4_IRQn);
+
+            // connect PA4 to interrupt. EXTICR[1] (so the second) for pins 4..7, ~0xf = 0000 for PA pin
+            SYSCFG->EXTICR[1] &= ~(0xf); // this should be in periph_cong.h!!!!!!!!!!!!!!!!!!!!!
+
+            EXTI->IMR |= (1 << 4);// 1: interrupt request grom line 4 not masked
+
+            // configure the active edges (here both) : maybe later via flags or so
+            EXTI->RTSR &= ~(1 << 4); // 1: rising trigger disabled
+            EXTI->FTSR |=  (1 << 4); // 1: falling trigger enabled
 
 
             /************************* GPIO-Init *************************/
@@ -337,6 +349,7 @@ int spi_init_slave( spi_t dev, spi_conf_t conf, char (*cb)(char data) ){
             spi_port = SPI_1_DEV;
 			NVIC_SetPriority(SPI_1_IRQ_HANDLER, SPI_1_IRQ_PRIO);
 			NVIC_EnableIRQ(SPI_1_IRQ_HANDLER);
+
 
             /************************* GPIO-Init *************************/
 
@@ -636,7 +649,7 @@ void isr_spi1(void)
 	ISR_ENTER();
 	/* Interrupt is cleared by reading operation in irq_handler */
 	irq_handler(SPI_0);
-    ISR_EXIT();
+
 }
 __attribute__((naked))
 void isr_spi2(void)
@@ -646,4 +659,13 @@ void isr_spi2(void)
     ISR_EXIT();
 }
 
-
+__attribute__((naked))
+void isr_exti4(void)
+{
+    ISR_ENTER();
+    if (EXTI->PR & EXTI_PR_PR4) {// for interrupt by gpio flanks
+        EXTI->PR |= EXTI_PR_PR4;
+        irq_handler(SPI_0);
+    }
+    ISR_EXIT();
+}
