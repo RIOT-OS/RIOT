@@ -23,6 +23,8 @@
 
 #include "periph_conf.h"
 
+/* guard file in case no UART device was specified */
+#if UART_NUMOF
 
 /**
  * @brief Definition of available UART devices
@@ -32,20 +34,36 @@
  */
 typedef enum {
 #if UART_0_EN
-    UART_0 = 0,         /*< UART channel 0 */
+    UART_0 = 0,             /**< UART channel 0 */
 #endif
 #if UART_1_EN
-    UART_1,             /*< UART channel 1 */
+    UART_1,                 /**< UART channel 1 */
 #endif
 #if UART_2_EN
-    UART_2,             /*< UART channel 2 */
+    UART_2,                 /**< UART channel 2 */
 #endif
 #if UART_3_EN
-    UART_3,             /*< UART channel 3 */
+    UART_3,                 /**< UART channel 3 */
 #endif
-    UART_UNDEFINED      /*< fall-back value */
 } uart_t;
 
+/**
+ * @brief Signature for receive interrupt callback
+ *
+ * @param[in] arg           optional argument to put the callback in the right context
+ * @param[in] data          the byte that was received
+ */
+typedef void(*uart_rx_cb_t)(void *arg, char data);
+
+/**
+ * @brief Signature for the transmit complete interrupt callback
+ *
+ * @param[in] arg           optional argument to put the callback in the right context
+ *
+ * @return                  1 if more data is to be send
+ * @return                  0 if no more data is to be send
+ */
+typedef int(*uart_tx_cb_t)(void *arg);
 
 /**
  * @brief Initialize a given UART device
@@ -62,10 +80,13 @@ typedef enum {
  *                          in interrupt context
  * @param[in] tx_cb         transmit callback is called when done with sending a byte
  *                          (TX buffer gets empty)
+ * @param[in] arg           optional argument passed to the callback functions
  *
- * @return                  0 on success, -1 for invalid baud-rate, -2 for all other errors
+ * @return                  0 on success
+ * @return                  -1 for invalid baud-rate
+ * @return                  -2 for all other errors
  */
-int uart_init(uart_t uart, uint32_t baudrate, void (*rx_cb)(char), void (*tx_cb)(void));
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg);
 
 /**
  * @brief Initialize an UART device for (conventional) blocking usage
@@ -91,13 +112,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate);
  * @param[in] uart          UART device that will start a transmission
  */
 void uart_tx_begin(uart_t uart);
-
-/**
- * @brief End a transmission, on most platforms this will disable the TX interrupt
- *
- * @param[in] uart          the UART device that is finished with transmitting stuff
- */
-void uart_tx_end(uart_t uart);
 
 /**
  * @brief Write a byte into the UART's send register
@@ -139,6 +153,21 @@ int uart_read_blocking(uart_t uart, char *data);
  */
 int uart_write_blocking(uart_t uart, char data);
 
+/**
+ * @brief Power on the given UART device
+ *
+ * @param[in] uart          the UART device to power on
+ */
+void uart_poweron(uart_t uart);
+
+/**
+ * @brief Power off the given UART device
+ *
+ * @param[in] uart          the UART device to power off
+ */
+void uart_poweroff(uart_t uart);
+
+#endif /* UART_NUMOF */
 
 #endif /* __PERIPH_UART_H */
 /** @} */
