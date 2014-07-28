@@ -94,5 +94,8 @@ endif
 ifneq (,$(filter color,$(USEMODULE)))
     DIRS += color
 endif
+ifneq (,$(filter pipe,$(USEMODULE)))
+    DIRS += pipe
+endif
 
 include $(RIOTBASE)/Makefile.base
