@@ -688,7 +688,7 @@ void isr_exti3(void)
     ISR_EXIT();
 }
 
-#if ~SPI_0_EN
+#if !SPI_0_EN
 __attribute__((naked))
 void isr_exti4(void)
 {

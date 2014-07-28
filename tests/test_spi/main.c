@@ -42,6 +42,7 @@ static void cmd_init_start_slave(int argc, char **argv);
 static void cmd_init_master(int argc, char **argv);
 static void cmd_send_master_byte(int argc, char **argv);
 static void cmd_send_master_bytes(int argc, char **argv);
+static void cmd_send_master_8x1_byte(int argc, char **argv);
 static void cmd_test_nrf(int argc, char **argv);
 static void cmd_prxbuf(int argc, char **argv);
 static void cmd_clearbuf(int argc, char **argv);
@@ -65,6 +66,7 @@ static const shell_command_t shell_commands[] = {
     { "im", "init master", cmd_init_master },
     { "smb", "send master byte", cmd_send_master_byte },
     { "smbs", "send master bytes", cmd_send_master_bytes },
+    { "smb81", "send master 8x1 bytes", cmd_send_master_8x1_byte },
     { "nrf", "test nrf", cmd_test_nrf },
     { "prxbuf", "print rx buffer from cb function", cmd_prxbuf },
     { "clearbuf", "clear rx buffer from cb function", cmd_clearbuf },
@@ -140,22 +142,19 @@ void cmd_send_master_byte(int argc, char **argv)
     (void) argc;
     (void) argv;
 
-    puts("Send Master 8 x 1 Byte\n");
+    puts("Send Master 1 Byte\n");
 
     char data_return, data_send = 1;
 
-    for (int i = 0; i < 8; i++) {
-        gpio_clear(GPIO_7);
+    gpio_clear(GPIO_7);
 
 #if USE_SPI_0_MASTER
-        spi_transfer_byte(SPI_0, data_send, &data_return);
+    spi_transfer_byte(SPI_0, data_send, &data_return);
 #else
-        spi_transfer_byte(SPI_1, data_send, &data_return);
+    spi_transfer_byte(SPI_1, data_send, &data_return);
 #endif
-        gpio_set(GPIO_7);
-        printf("One Byte transferred: %x, received: %x\n", data_send, data_return);
-        data_send++;
-    }
+    gpio_set(GPIO_7);
+    printf("One Byte transferred: %x, received: %x\n", data_send, data_return);
 }
 
 /**
@@ -184,6 +183,33 @@ void cmd_send_master_bytes(int argc, char **argv)
 
     for (int i = 0; i < BUF_SEND_LEN; i++) {
         printf("Send %d : %x\n Reveice %d: %x\n", i, buf_send[i], i, buf_return[i]);
+    }
+}
+
+/**
+ * @send master one 8 x 1 byte
+ */
+void cmd_send_master_8x1_byte(int argc, char **argv)
+{
+
+    (void) argc;
+    (void) argv;
+
+    puts("Send Master 8 x 1 Byte\n");
+
+    char data_return, data_send = 1;
+
+    for (int i = 0; i < 8; i++) {
+        gpio_clear(GPIO_7);
+
+#if USE_SPI_0_MASTER
+        spi_transfer_byte(SPI_0, data_send, &data_return);
+#else
+        spi_transfer_byte(SPI_1, data_send, &data_return);
+#endif
+        gpio_set(GPIO_7);
+        printf("One Byte transferred: %x, received: %x\n", data_send, data_return);
+        data_send++;
     }
 }
 
