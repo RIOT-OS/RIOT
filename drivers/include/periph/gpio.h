@@ -21,6 +21,8 @@
 
 #include "periph_conf.h"
 
+/* guard file in case no GPIO devices are defined */
+#if GPIO_NUMOF
 
 /**
  * @brief Definition of available GPIO devices. Each device is managing exactly one pin.
@@ -74,7 +76,6 @@ typedef enum {
 #ifdef GPIO_15_EN
     GPIO_15,                /**< GPIO device 15 */
 #endif
-    GPIO_UNDEFINED = -1     /**< fall-back device */
 } gpio_t;
 
 /**
@@ -96,14 +97,20 @@ typedef enum {
 } gpio_flank_t;
 
 /**
+ * @brief Signature for function called from interrupt context after an external event
+ *
+ * @param[in] arg       optional context for the callback
+ */
+typedef void (*gpio_cb_t)(void *arg);
+
+/**
  * @brief Initialize GPIO pin as output pin
  *
  * @param[in] dev       the GPIO pin to set as output
  * @param[in] pullup    define if pull resistors should be used
  *
  * @return              0 on success
- * @return              -1 on undefined device given
- * @return              -2 on pull-up mode unavailable
+ * @return              -1 on pull-up mode unavailable
  */
 int gpio_init_out(gpio_t dev, gpio_pp_t pullup);
 
@@ -114,8 +121,7 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup);
  * @param[in] pullup    define if pull resistors should be used
  *
  * @return              0 on success
- * @return              -1 on undefined device given
- * @return              -2 on pull-up mode unavailable
+ * @return              -1 on pull-up mode unavailable
  */
 int gpio_init_in(gpio_t dev, gpio_pp_t pullup);
 
@@ -131,43 +137,36 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup);
  * @param[in] pullup    define if pull resistors should be enabled
  * @param[in] flank     define the active flank(s)
  * @param[in] cb        register the callback that is called in interrupt context
+ * @param[in] arg       optional argument passed to the callback
  *
  * @return              0 on success
- * @return              -1 on undefined device given
- * @return              -2 on pull-up mode unavailable
- * @return              -3 on active flank unavailable
+ * @return              -1 on pull-up mode unavailable
+ * @return              -2 on active flank unavailable
  */
-int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(void));
-
-/**
- * @brief Disable the GPIO pin's interrupt if configured as external interrupt source.
- *
- * @param[in] dev       the GPIO pin to disable the interrupt for
- *
- * @return              the previous interrupt state, 0 or 1
- * @return              -1 if undefined device is given
- */
-int gpio_irq_enable(gpio_t dev);
+int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg);
 
 /**
  * @brief Enable the GPIO pin's interrupt if configured as external interrupt source.
  *
  * @param[in] dev       the GPIO pin to enable the interrupt for
- *
- * @return              the previous interrupt state, 0 or 1
- * @return              -1 if undefined device is given
  */
-int gpio_irq_disable(gpio_t dev);
+void gpio_irq_enable(gpio_t dev);
+
+/**
+ * @brief Disable the GPIO pin's interrupt if configured as external interrupt source.
+ *
+ * @param[in] dev       the GPIO pin to disable the interrupt for
+ */
+void gpio_irq_disable(gpio_t dev);
 
 /**
  * @brief Get the current value of the given GPIO pin
  *
  * @param[in] dev       the GPIO pin to read
- * @return          the current value, 0 for LOW, != 0 for HIGH
+ * @return              the current value, 0 for LOW, != 0 for HIGH
  *
  * @return              0 when pin is LOW
  * @return              greater 0 for HIGH
- * @return              -1 on undefined device given
  */
 int gpio_read(gpio_t dev);
 
@@ -175,42 +174,32 @@ int gpio_read(gpio_t dev);
  * @brief Set the given GPIO pin to HIGH
  *
  * @param[in] dev       the GPIO pin to set
- *
- * @return              0 on success
- * @return              -1 on undefined device given
  */
-int gpio_set(gpio_t dev);
+void gpio_set(gpio_t dev);
 
 /**
  * @brief Set the given GPIO pin to LOW
  *
  * @param[in] dev       the GPIO pin to clear
- *
- * @return              0 on success
- * @return              -1 on undefined device given
  */
-int gpio_clear(gpio_t dev);
+void gpio_clear(gpio_t dev);
 
 /**
  * @brief Toggle the value of the given GPIO pin
  *
  * @param[in] dev       the GPIO pin to toggle
- *
- * @return              0 on success
- * @return              -1 on undefined device given
  */
-int gpio_toggle(gpio_t dev);
+void gpio_toggle(gpio_t dev);
 
 /**
  * @brief Set the given GPIO pin to the given value
  *
  * @param[in] dev       the GPIO pin to set
  * @param[in] value     value to set the pin to, 0 for LOW, HIGH otherwise
- *
- * @return              0 on success
- * @return              -1 on undefined device given
  */
-int gpio_write(gpio_t dev, int value);
+void gpio_write(gpio_t dev, int value);
+
+#endif /* GPIO_NUMOF */
 
 #endif /* __GPIO_H */
 /** @} */
