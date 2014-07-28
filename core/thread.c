@@ -62,7 +62,7 @@ void thread_sleep(void)
     }
 
     dINT();
-    sched_set_status((tcb_t *)sched_active_thread, STATUS_SLEEPING);
+    sched_set_status((thread_t *)sched_active_thread, STATUS_SLEEPING);
     eINT();
     thread_yield();
 }
@@ -73,7 +73,7 @@ int thread_wakeup(int pid)
 
     int old_state = disableIRQ();
 
-    tcb_t *other_thread = (tcb_t *) sched_threads[pid];
+    thread_t *other_thread = (thread_t *) sched_threads[pid];
     if (other_thread && other_thread->status == STATUS_SLEEPING) {
         DEBUG("thread_wakeup: Thread is sleeping.\n");
 
@@ -92,58 +92,53 @@ int thread_wakeup(int pid)
     }
 }
 
-int thread_measure_stack_free(char *stack)
+uintptr_t thread_measure_stack_free(char *stack)
 {
     unsigned int *stackp = (unsigned int *)stack;
 
     /* assume that the comparison fails before or after end of stack */
     /* assume that the stack grows "downwards" */
-    while (*stackp == (unsigned int)stackp) {
+    while (*stackp == (uintptr_t) stackp) {
         stackp++;
     }
 
-    int space_free = (unsigned int)stackp - (unsigned int)stack;
+    uintptr_t space_free = (uintptr_t) stackp - (uintptr_t) stack;
     return space_free;
 }
 
-int thread_create(char *stack, int stacksize, char priority, int flags, void *(*function)(void *arg), void *arg, const char *name)
+int thread_create(thread_t *cb, char *stack, int stacksize, char priority, int flags,
+                  void *(*function)(void *arg), void *arg, const char *name)
 {
-    /* allocate our thread control block at the top of our stackspace */
-    int total_stacksize = stacksize;
-    stacksize -= sizeof(tcb_t);
-
-    /* align tcb address on 32bit boundary */
-    unsigned int tcb_address = (unsigned int) stack + stacksize;
-
-    if (tcb_address & 1) {
-        tcb_address--;
-        stacksize--;
-    }
-
-    if (tcb_address & 2) {
-        tcb_address -= 2;
-        stacksize -= 2;
-    }
-
-    tcb_t *cb = (tcb_t *) tcb_address;
-
     if (priority >= SCHED_PRIO_LEVELS) {
         return -EINVAL;
     }
 
+    int total_stacksize = stacksize;
+
+    /* align the stack on a 16/32bit boundary */
+    uintptr_t misalignment = (uintptr_t) stack % ALIGN_OF(void *);
+    if (misalignment) {
+        misalignment = ALIGN_OF(void *) - misalignment;
+        stack += misalignment;
+        stacksize -= misalignment;
+    }
+
+    /* round down the stacksize to a multiple of 2/4 */
+    stacksize -= stacksize % ALIGN_OF(void *);
+
     if (flags & CREATE_STACKTEST) {
         /* assign each int of the stack the value of it's address */
-        unsigned int *stackmax = (unsigned int *)((char *)stack + stacksize);
-        unsigned int *stackp = (unsigned int *)stack;
+        uintptr_t *stackmax = (uintptr_t *) (stack + stacksize);
+        uintptr_t *stackp = (uintptr_t *) stack;
 
         while (stackp < stackmax) {
-            *stackp = (unsigned int)stackp;
+            *stackp = (uintptr_t) stackp;
             stackp++;
         }
     }
     else {
         /* create stack guard */
-        *stack = (unsigned int)stack;
+        *stack = (uintptr_t) stack;
     }
 
     if (!inISR()) {

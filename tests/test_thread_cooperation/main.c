@@ -30,7 +30,7 @@ mutex_t mtx;
 
 volatile int storage = 1;
 int main_id;
-int ths[PROBLEM];
+thread_t threads[PROBLEM];
 char stacks[PROBLEM][KERNEL_CONF_STACKSIZE_MAIN];
 
 void *run(void *arg)
@@ -71,19 +71,19 @@ int main(void)
 
     for (int i = 0; i < PROBLEM; ++i) {
         printf("Creating thread with arg %d\n", (i + 1));
-        ths[i] = thread_create(stacks[i], sizeof(stacks[i]),
-                               PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                               run, NULL, "thread");
+        int err = thread_create(&threads[i], stacks[i], sizeof(stacks[i]),
+                                PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                                run, NULL, "thread");
 
-        if (ths[i] < 0)  {
-            printf("[!!!] Creating thread failed.\n");
+        if (err < 0)  {
+            printf("[!!!] Creating thread failed with %d\n", err);
         }
         else {
             args[i].content.value = i + 1;
+            err = msg_send(&args[i], threads[i].pid, 1);
 
-            int err = msg_send(&args[i], ths[i], 1);
             if (err < 0) {
-                printf("[!!!] Sending message to thread %d failed\n", ths[i]);
+                printf("[!!!] Sending message to thread %d failed\n", threads[i].pid);
             }
         }
     }

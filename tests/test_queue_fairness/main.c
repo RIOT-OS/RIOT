@@ -28,7 +28,7 @@
 #define NUM_ITERATIONS (10)
 
 static char stacks[NUM_CHILDREN][STACK_SIZE];
-static int pids[NUM_CHILDREN];
+static thread_t threads[NUM_CHILDREN];
 static char names[NUM_CHILDREN][8];
 
 static int parent_pid;
@@ -56,13 +56,9 @@ int main(void)
 
     for (int i = 0; i < NUM_CHILDREN; ++i) {
         snprintf(names[i], sizeof(names[i]), "child%2u", i + 1);
-        pids[i] = thread_create(stacks[i],
-                                sizeof(stacks[i]),
-                                PRIORITY_MAIN + 1,
-                                CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                                child_fun,
-                                NULL,
-                                names[i]);
+        thread_create(&threads[i], stacks[i], sizeof(stacks[i]),
+                      PRIORITY_MAIN + 1, CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                      child_fun, NULL, names[i]);
     }
 
     int last_iteration = 0;

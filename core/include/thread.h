@@ -62,6 +62,7 @@
  *  - CREATE_STACKTEST      write markers into the thread's stack to measure the stack's memory
  *                          usage (for debugging and profiling purposes)
  *
+ * @param[in,out] cb    the thread control block to use
  * @param[out] stack    start address of the preallocated stack memory
  * @param[in] stacksize the size of the thread's stack in bytes
  * @param[in] priority  priority of the new thread, lower mean higher priority
@@ -73,7 +74,8 @@
  * @return              value ``<0`` on error
  * @return              pid of newly created task, otherwise
 */
-int thread_create(char *stack,
+int thread_create(thread_t *cb,
+                  char *stack,
                   int stacksize,
                   char priority,
                   int flags,
@@ -140,7 +142,7 @@ int thread_getpid(void);
  *
  * @return          the amount of unused space of the thread's stack
  */
-int thread_measure_stack_free(char *stack);
+uintptr_t thread_measure_stack_free(char *stack);
 
 /* @} */
 #endif /* __THREAD_H */

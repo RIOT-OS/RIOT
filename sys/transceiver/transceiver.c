@@ -102,6 +102,7 @@ uint8_t cc1100_pkt[CC1100_MAX_DATA_LENGTH];
 
 
 /* transceiver stack */
+thread_t transceiver_thread;
 char transceiver_stack[TRANSCEIVER_STACK_SIZE];
 
 /*------------------------------------------------------------------------------------*/
@@ -180,7 +181,8 @@ void transceiver_init(transceiver_type_t t)
 /* Start the transceiver thread */
 int transceiver_start(void)
 {
-    transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN - 3, CREATE_STACKTEST, run, NULL, "Transceiver");
+    transceiver_pid = thread_create(&transceiver_thread, transceiver_stack, TRANSCEIVER_STACK_SIZE,
+                                    PRIORITY_MAIN - 3, CREATE_STACKTEST, run, NULL, "Transceiver");
 
     if (transceiver_pid < 0) {
         puts("Error creating transceiver thread");

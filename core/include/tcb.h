@@ -54,9 +54,9 @@
 /** @} */
 
 /**
- * @brief @c tcb_t holds thread's context data.
+ * @brief `thread_t` holds thread's context data, the thread control block.
  */
-typedef struct tcb_t {
+typedef struct thread {
     char *sp;                   /**< thread's stack pointer         */
     uint16_t status;            /**< thread's status                */
 
@@ -74,7 +74,7 @@ typedef struct tcb_t {
     const char *name;           /**< thread's name                  */
     char *stack_start;          /**< thread's stack start address   */
     int stack_size;             /**< thread's stack size            */
-} tcb_t;
+} thread_t;
 
 #endif /* TCB_H_ */
 /** @} */

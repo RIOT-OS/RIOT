@@ -27,6 +27,7 @@
 #include "cpu-conf.h"
 #include "irq.h"
 #include "kernel_internal.h"
+#include "kernel_macros.h"
 #include "msg.h"
 #include "mutex.h"
 #include "queue.h"
@@ -54,7 +55,8 @@ enum pthread_thread_status {
 };
 
 typedef struct pthread_thread {
-    int thread_pid;
+    thread_t tcb;
+    pthread_t pid;
 
     enum pthread_thread_status status;
     int joining_thread;
@@ -62,7 +64,6 @@ typedef struct pthread_thread {
     bool should_cancel;
 
     void *(*start_routine)(void *);
-    void *arg;
 
     char *stack;
 
@@ -74,18 +75,19 @@ static struct mutex_t pthread_mutex;
 
 static volatile int pthread_reaper_pid = -1;
 
+static thread_t pthread_reaper_thread;
 static char pthread_reaper_stack[PTHREAD_REAPER_STACKSIZE];
 
-static void *pthread_start_routine(void *pt_)
+static void *pthread_start_routine(void *arg)
 {
-    pthread_thread_t *pt = pt_;
-    void *retval = pt->start_routine(pt->arg);
+    pthread_thread_t *pt = container_of((thread_t *) sched_active_thread, pthread_thread_t, tcb);
+    void *retval = pt->start_routine(arg);
     pthread_exit(retval);
 }
 
 static int insert(pthread_thread_t *pt)
 {
-    int result = -1;
+    int result = 0;
     mutex_lock(&pthread_mutex);
     for (int i = 0; i < MAXTHREADS; i++){
         if (!pthread_sched_threads[i]) {
@@ -116,16 +118,15 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
 {
     pthread_thread_t *pt = calloc(1, sizeof(pthread_thread_t));
 
-    int pthread_pid = insert(pt);
-    if (pthread_pid < 0) {
+    pt->pid = insert(pt);
+    if (!pt->pid) {
         free(pt);
         return -1;
     }
-    *newthread = pthread_pid;
+    *newthread = pt->pid;
 
     pt->status = attr && attr->detached ? PTS_DETACHED : PTS_RUNNING;
     pt->start_routine = start_routine;
-    pt->arg = arg;
 
     bool autofree = attr == NULL || attr->ss_sp == NULL || attr->ss_size == 0;
     size_t stack_size = attr && attr->ss_size > 0 ? attr->ss_size : PTHREAD_STACKSIZE;
@@ -136,7 +137,8 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
         mutex_lock(&pthread_mutex);
         if (pthread_reaper_pid < 0) {
             /* volatile pid to overcome problems with double checking */
-            volatile int pid = thread_create(pthread_reaper_stack,
+            volatile int pid = thread_create(&pthread_reaper_thread,
+                                             pthread_reaper_stack,
                                              PTHREAD_REAPER_STACKSIZE,
                                              0,
                                              CREATE_STACKTEST,
@@ -148,17 +150,12 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
         mutex_unlock(&pthread_mutex);
     }
 
-    pt->thread_pid = thread_create(stack,
-                                   stack_size,
-                                   PRIORITY_MAIN,
-                                   CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                                   pthread_start_routine,
-                                   pt,
-                                   "pthread");
-    if (pt->thread_pid < 0) {
+    if (thread_create(&pt->tcb, stack, stack_size,
+                      PRIORITY_MAIN, CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                      pthread_start_routine, arg, "pthread") < 0) {
+        pthread_sched_threads[pt->pid - 1] = NULL;
         free(pt->stack);
         free(pt);
-        pthread_sched_threads[pthread_pid-1] = NULL;
         return -1;
     }
 
@@ -184,7 +181,6 @@ void pthread_exit(void *retval)
             ct->__routine(ct->__arg);
         }
 
-        self->thread_pid = -1;
         DEBUG("pthread_exit(%p), self == %p\n", retval, (void *) self);
         if (self->status != PTS_DETACHED) {
             self->returnval = retval;
@@ -267,17 +263,8 @@ int pthread_detach(pthread_t th)
 
 pthread_t pthread_self(void)
 {
-    pthread_t result = 0;
-    mutex_lock(&pthread_mutex);
-    int pid = sched_active_pid; /* sched_active_pid is volatile */
-    for (int i = 0; i < MAXTHREADS; i++) {
-        if (pthread_sched_threads[i] && pthread_sched_threads[i]->thread_pid == pid) {
-            result = i+1;
-            break;
-        }
-    }
-    mutex_unlock(&pthread_mutex);
-    return result;
+    pthread_thread_t *pt = container_of((thread_t *) sched_active_thread, pthread_thread_t, tcb);
+    return pt->pid;
 }
 
 int pthread_cancel(pthread_t th)

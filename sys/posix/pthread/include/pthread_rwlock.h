@@ -50,7 +50,7 @@ typedef struct pthread_rwlock
 typedef struct __pthread_rwlock_waiter_node
 {
     bool is_writer; /**< `false`: reader; `true`: writer */
-    tcb_t *thread; /**< waiting thread */
+    thread_t *thread; /**< waiting thread */
     queue_node_t qnode; /**< Node to store in `pthread_rwlock_t::queue`. */
     bool continue_; /**< This is not a spurious wakeup. */
 } __pthread_rwlock_waiter_node_t;

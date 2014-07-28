@@ -146,7 +146,7 @@ int pthread_cond_signal(struct pthread_cond_t *cond)
     queue_node_t *head = queue_remove_head(&(cond->queue));
     int other_prio = -1;
     if (head != NULL) {
-        tcb_t *other_thread = (tcb_t *) sched_threads[head->data];
+        thread_t *other_thread = (thread_t *) sched_threads[head->data];
         if (other_thread) {
             other_prio = other_thread->priority;
             sched_set_status(other_thread, STATUS_PENDING);
@@ -180,7 +180,7 @@ int pthread_cond_broadcast(struct pthread_cond_t *cond)
             break;
         }
 
-        tcb_t *other_thread = (tcb_t *) sched_threads[head->data];
+        thread_t *other_thread = (thread_t *) sched_threads[head->data];
         if (other_thread) {
             other_prio = max_prio(other_prio, other_thread->priority);
             sched_set_status(other_thread, STATUS_PENDING);

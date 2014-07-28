@@ -51,7 +51,7 @@ void sched_run(void);
  *                          targeted process
  * @param[in]   status      The new status of this thread
  */
-void sched_set_status(tcb_t *process, unsigned int status);
+void sched_set_status(thread_t *process, unsigned int status);
 
 /**
  * @brief   Compare thread priorities and yield() (or set
@@ -76,12 +76,12 @@ extern volatile unsigned int sched_context_switch_request;
 /**
  *  Thread table
  */
-extern volatile tcb_t *sched_threads[MAXTHREADS];
+extern volatile thread_t *sched_threads[MAXTHREADS];
 
 /**
  *  Currently active thread
  */
-extern volatile tcb_t *sched_active_thread;
+extern volatile thread_t *sched_active_thread;
 
 /**
  *  Number of running (non-terminated) threads

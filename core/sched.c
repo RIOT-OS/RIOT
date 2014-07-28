@@ -41,8 +41,8 @@ volatile int sched_num_threads = 0;
 
 volatile unsigned int sched_context_switch_request;
 
-volatile tcb_t *sched_threads[MAXTHREADS];
-volatile tcb_t *sched_active_thread;
+volatile thread_t *sched_threads[MAXTHREADS];
+volatile thread_t *sched_active_thread;
 
 volatile int sched_active_pid = -1;
 
@@ -62,7 +62,7 @@ void sched_run(void)
     unsigned long time = hwtimer_now();
 #endif
 
-    tcb_t *my_active_thread = (tcb_t *)sched_active_thread;
+    thread_t *my_active_thread = (thread_t *)sched_active_thread;
 
     if (my_active_thread) {
         if (my_active_thread->status == STATUS_RUNNING) {
@@ -89,9 +89,9 @@ void sched_run(void)
      */
     int nextrq = bitarithm_lsb(runqueue_bitcache);
     clist_node_t next = *(sched_runqueues[nextrq]);
-    DEBUG("scheduler: first in queue: %s\n", ((tcb_t *)next.data)->name);
+    DEBUG("scheduler: first in queue: %s\n", ((thread_t *)next.data)->name);
     clist_advance(&(sched_runqueues[nextrq]));
-    my_active_thread = (tcb_t *)next.data;
+    my_active_thread = (thread_t *)next.data;
 
     int my_next_pid = my_active_thread->pid;
 
@@ -114,10 +114,10 @@ void sched_run(void)
             }
         }
 
-        sched_set_status((tcb_t *)my_active_thread, STATUS_RUNNING);
+        sched_set_status((thread_t *)my_active_thread, STATUS_RUNNING);
     }
 
-    sched_active_thread = (volatile tcb_t *) my_active_thread;
+    sched_active_thread = (volatile thread_t *) my_active_thread;
 
     DEBUG("scheduler: done.\n");
 }
@@ -129,7 +129,7 @@ void sched_register_cb(void (*callback)(uint32_t, uint32_t))
 }
 #endif
 
-void sched_set_status(tcb_t *process, unsigned int status)
+void sched_set_status(thread_t *process, unsigned int status)
 {
     if (status >= STATUS_ON_RUNQUEUE) {
         if (!(process->status >= STATUS_ON_RUNQUEUE)) {
@@ -177,7 +177,7 @@ NORETURN void sched_task_exit(void)
     sched_threads[sched_active_thread->pid] = NULL;
     sched_num_threads--;
 
-    sched_set_status((tcb_t *)sched_active_thread, STATUS_STOPPED);
+    sched_set_status((thread_t *)sched_active_thread, STATUS_STOPPED);
 
     sched_active_thread = NULL;
     cpu_switch_context_exit();

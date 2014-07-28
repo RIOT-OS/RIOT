@@ -34,6 +34,7 @@
 int relay_pid;
 
 char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
+thread_t t2;
 
 void set_address_handler(uint16_t a)
 {
@@ -75,7 +76,7 @@ int main(void)
 
     relay_pid = thread_getpid();
 
-    thread_create(t2_stack, sizeof(t2_stack), PRIORITY_MAIN + 1,
+    thread_create(&t2, t2_stack, sizeof(t2_stack), PRIORITY_MAIN + 1,
                   CREATE_STACKTEST, second_thread, NULL, "helper thread");
 
     printf("starting ccn-lite relay...\n");

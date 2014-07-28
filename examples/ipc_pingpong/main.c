@@ -24,7 +24,7 @@
 #include "thread.h"
 #include "msg.h"
 
-void *second_thread(void *arg)
+void *second_thread_run(void *arg)
 {
     (void) arg;
 
@@ -42,6 +42,7 @@ void *second_thread(void *arg)
 }
 
 char second_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
+thread_t second_thread;
 
 int main(void)
 {
@@ -50,9 +51,9 @@ int main(void)
 
     msg_t m;
 
-    int pid = thread_create(second_thread_stack, sizeof(second_thread_stack),
+    int pid = thread_create(&second_thread, second_thread_stack, sizeof(second_thread_stack),
                             PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                            second_thread, NULL, "pong");
+                            second_thread_run, NULL, "pong");
 
     m.content.value = 1;
 

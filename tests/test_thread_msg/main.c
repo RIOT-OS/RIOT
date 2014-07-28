@@ -23,11 +23,10 @@
 #include "thread.h"
 #include "msg.h"
 
+thread_t t1, t2, t3;
 char t1_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char t3_stack[KERNEL_CONF_STACKSIZE_MAIN];
-
-uint16_t p1, p2, p3;
 
 void *thread1(void *arg)
 {
@@ -41,7 +40,7 @@ void *thread1(void *arg)
         printf("T1 recv: %" PRIu32 "(i=%d)\n", msg.content.value, i);
 
         msg.content.value = i;
-        msg_send_receive(&msg, &reply, p2);
+        msg_send_receive(&msg, &reply, t2.pid);
         printf("T1 got reply: %" PRIu32 " (i=%d)\n", reply.content.value, i);
     }
 
@@ -54,7 +53,7 @@ void *thread2(void *arg)
     (void) arg;
     puts("THREAD 2\n");
 
-    for (int i = 0;; ++i) {
+    for (int i = 0; /* for ever */; ++i) {
         msg_t msg, reply;
 
         msg_receive(&msg);
@@ -71,26 +70,26 @@ void *thread3(void *arg)
     (void) arg;
     puts("THREAD 3\n");
 
-    for (int i = 0;; ++i) {
+    for (int i = 0; /* for ever */; ++i) {
         msg_t msg;
         msg.content.value = i;
         printf("T3 i=%d\n", i);
-        msg_send(&msg, p1, 1);
+        msg_send(&msg, t1.pid, 1);
     }
     return NULL;
 }
 
 int main(void)
 {
-    p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                       thread1, NULL, "nr1");
-    p2 = thread_create(t2_stack, sizeof(t2_stack), PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                       thread2, NULL, "nr2");
-    p3 = thread_create(t3_stack, sizeof(t3_stack), PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                       thread3, NULL, "nr3");
+    thread_create(&t1, t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
+                  CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                  thread1, NULL, "nr1");
+    thread_create(&t2, t2_stack, sizeof(t2_stack), PRIORITY_MAIN - 1,
+                  CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                  thread2, NULL, "nr2");
+    thread_create(&t3, t3_stack, sizeof(t3_stack), PRIORITY_MAIN - 1,
+                  CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                  thread3, NULL, "nr3");
     puts("THREADS CREATED\n");
     return 0;
 }

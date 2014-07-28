@@ -48,6 +48,7 @@
 
 #define DEFAULT_IEEE_802154_PAN_ID  (0x1234)
 
+static thread_t radio_thread;
 char radio_stack_buffer[RADIO_STACK_SIZE];
 msg_t msg_q[RADIO_RCV_BUF_SIZE];
 
@@ -320,7 +321,7 @@ int sixlowpan_mac_send_ieee802154_frame(int if_id,
 
 int sixlowpan_mac_init(void)
 {
-    int recv_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE,
+    int recv_pid = thread_create(&radio_thread, radio_stack_buffer, RADIO_STACK_SIZE,
                                  PRIORITY_MAIN - 2, CREATE_STACKTEST, recv_ieee802154_frame, NULL, "radio");
     int if_id = -1;
 

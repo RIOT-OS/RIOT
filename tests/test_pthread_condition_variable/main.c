@@ -27,6 +27,7 @@ static struct pthread_cond_t cv;
 static volatile int is_finished;
 static volatile long count;
 static volatile long expected_value;
+static thread_t second_thread;
 static char stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 /**
@@ -34,7 +35,7 @@ static char stack[KERNEL_CONF_STACKSIZE_MAIN];
  *          Then it signals one waiting thread to check the condition and it goes to sleep again
  *          If is_finished is set to 1 second_thread ends
  */
-static void *second_thread(void *arg)
+static void *second_thread_run(void *arg)
 {
     (void) arg;
     while (1) {
@@ -58,17 +59,13 @@ int main(void)
     mutex_init(&mutex);
     pthread_cond_init(&cv, NULL);
 
-    int pid = thread_create(stack,
-                            sizeof(stack),
-                            PRIORITY_MAIN - 1,
-                            CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                            second_thread,
-                            NULL,
-                            "second_thread");
+    thread_create(&second_thread, stack, sizeof(stack),
+                  PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST,
+                  second_thread_run, NULL, "second_thread");
 
     while (1) {
         mutex_lock(&mutex);
-        thread_wakeup(pid);
+        thread_wakeup(second_thread.pid);
         count++;
 
         if ((count % 100000) == 0) {

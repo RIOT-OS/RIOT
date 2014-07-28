@@ -31,8 +31,11 @@
 
 char tcp_stack_buffer[TCP_STACK_SIZE];
 char udp_stack_buffer[UDP_STACK_SIZE];
-
 char tcp_timer_stack[TCP_TIMER_STACKSIZE];
+
+static thread_t tcp_thread;
+static thread_t udp_thread;
+static thread_t tcp_timer_thread;
 
 int destiny_init_transport_layer(void)
 {
@@ -42,7 +45,7 @@ int destiny_init_transport_layer(void)
     memset(sockets, 0, MAX_SOCKETS * sizeof(socket_internal_t));
 
     /* UDP */
-    int udp_thread_pid = thread_create(udp_stack_buffer, UDP_STACK_SIZE,
+    int udp_thread_pid = thread_create(&udp_thread, udp_stack_buffer, UDP_STACK_SIZE,
                                        PRIORITY_MAIN, CREATE_STACKTEST,
                                        udp_packet_handler, NULL, "udp_packet_handler");
 
@@ -62,7 +65,7 @@ int destiny_init_transport_layer(void)
 #endif
     global_sequence_counter = rand();
 
-    int tcp_thread_pid = thread_create(tcp_stack_buffer, TCP_STACK_SIZE,
+    int tcp_thread_pid = thread_create(&tcp_thread, tcp_stack_buffer, TCP_STACK_SIZE,
                                        PRIORITY_MAIN, CREATE_STACKTEST,
                                        tcp_packet_handler, NULL, "tcp_packet_handler");
 
@@ -72,7 +75,7 @@ int destiny_init_transport_layer(void)
 
     ipv6_register_next_header_handler(IPV6_PROTO_NUM_TCP, tcp_thread_pid);
 
-    if (thread_create(tcp_timer_stack, TCP_TIMER_STACKSIZE, PRIORITY_MAIN + 1,
+    if (thread_create(&tcp_timer_thread, tcp_timer_stack, TCP_TIMER_STACKSIZE, PRIORITY_MAIN + 1,
                       CREATE_STACKTEST, tcp_general_timer, NULL, "tcp_general_timer") < 0) {
         return -1;
     }

@@ -51,7 +51,7 @@ void thread_print_all(void)
            , "name", "state");
 
     for (i = 0; i < MAXTHREADS; i++) {
-        tcb_t *p = (tcb_t *)sched_threads[i];
+        thread_t *p = (thread_t *) sched_threads[i];
 
         if (p != NULL) {
             int state = p->status;                                                 /* copy state */

@@ -124,6 +124,16 @@ extern volatile int lpm_prevent_sleep;
  */
 extern config_t sysconfig;
 
+/**
+ * @bried The thread control block of the main thread.
+ */
+extern thread_t kernel_main_thread;
+
+/**
+ * @bried The thread control block of the idle thread.
+ */
+extern thread_t kernel_idle_thread;
+
 /* ------------------------------------------------------------------------- */
 
 /**

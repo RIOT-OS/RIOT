@@ -51,6 +51,10 @@ static void *etx_beacon(void *);
 static void *etx_clock(void *);
 static void *etx_radio(void *);
 
+static thread_t etx_beacon_thread;
+static thread_t etx_clock_thread;
+static thread_t etx_radio_thread;
+
 //Buffer
 static char etx_beacon_buf[ETX_BEACON_STACKSIZE];
 static char etx_radio_buf[ETX_RADIO_STACKSIZE];
@@ -147,15 +151,15 @@ void etx_init_beaconing(ipv6_addr_t *address)
     puts("ETX BEACON INIT");
     etx_send_buf[0] = ETX_PKT_OPTVAL;
 
-    etx_beacon_pid = thread_create(etx_beacon_buf, ETX_BEACON_STACKSIZE,
+    etx_beacon_pid = thread_create(&etx_beacon_thread, etx_beacon_buf, ETX_BEACON_STACKSIZE,
                                    PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                    etx_beacon, NULL, "etx_beacon");
 
-    etx_radio_pid = thread_create(etx_radio_buf, ETX_RADIO_STACKSIZE,
+    etx_radio_pid = thread_create(&etx_radio_thread, etx_radio_buf, ETX_RADIO_STACKSIZE,
                                   PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                   etx_radio, NULL, "etx_radio");
 
-    etx_clock_pid = thread_create(etx_clock_buf, ETX_CLOCK_STACKSIZE,
+    etx_clock_pid = thread_create(&etx_clock_thread, etx_clock_buf, ETX_CLOCK_STACKSIZE,
                                   PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                   etx_clock, NULL, "etx_clock");
     //register at transceiver
