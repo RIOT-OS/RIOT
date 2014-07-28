@@ -142,10 +142,9 @@ void cmd_send_master_byte(int argc, char **argv)
 
     puts("Send Master 8 x 1 Byte\n");
 
-    int i;
     char data_return, data_send = 1;
 
-    for (i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++) {
         gpio_clear(GPIO_7);
 
 #if USE_SPI_0_MASTER
@@ -170,8 +169,6 @@ void cmd_send_master_bytes(int argc, char **argv)
 
     puts("Send Master multiple Bytes\n");
 
-    int i;
-
     char buf_send[BUF_SEND_LEN] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1,};
     char buf_return[BUF_SEND_LEN];
 
@@ -185,7 +182,7 @@ void cmd_send_master_bytes(int argc, char **argv)
 
     gpio_set(GPIO_7);
 
-    for (i = 0; i < BUF_SEND_LEN; i++) {
+    for (int i = 0; i < BUF_SEND_LEN; i++) {
         printf("Send %d : %x\n Reveice %d: %x\n", i, buf_send[i], i, buf_return[i]);
     }
 }
@@ -265,9 +262,7 @@ void cmd_prxbuf(int argc, char **argv)
 
     buf_count = 0;
 
-    int i;
-
-    for (i = 0; i < BUF_SEND_LEN; i++) {
+    for (int i = 0; i < BUF_SEND_LEN; i++) {
         printf("Sequence buffer: %x \n", test_buf[i]);
     }
 }
