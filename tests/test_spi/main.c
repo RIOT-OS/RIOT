@@ -31,10 +31,10 @@
 #include "shell_commands.h"
 #include "stm32f407xx.h"
 
-#define USE_SPI_0_MASTER		1
+#define USE_SPI_0_MASTER         1
 
-#define SHELL_BUFFER_SIZE       128
-#define BUF_SEND_LEN 			10
+#define SHELL_BUFFER_SIZE        128
+#define BUF_SEND_LEN             10
 
 static int shell_read(void);
 static void shell_write(int);
@@ -162,7 +162,6 @@ void cmd_send_master_byte(int argc, char **argv)
 /**
  * @send master multiple byte
  */
-
 void cmd_send_master_bytes(int argc, char **argv)
 {
 
@@ -194,7 +193,6 @@ void cmd_send_master_bytes(int argc, char **argv)
 /**
  * @test nrf
  */
-
 void cmd_test_nrf(int argc, char **argv)
 {
 
@@ -203,18 +201,18 @@ void cmd_test_nrf(int argc, char **argv)
 
     puts("Test call nrf24l01+\n");
     /*
-    #define R_REGISTER		0x00
-    #define W_REGISTER		0x20
-    #define NOP				0xFF
+    #define R_REGISTER      0x00
+    #define W_REGISTER      0x20
+    #define NOP             0xFF
 
-    #define REGISTER_MASK	0x1F
-    #define	CONFIG_PWR_UP	0x02
-    #define	CONFIG_PRIM_RX	0x01
-    #define	CONFIG_CRCO		0x04
+    #define REGISTER_MASK   0x1F
+    #define	CONFIG_PWR_UP   0x02
+    #define	CONFIG_PRIM_RX  0x01
+    #define	CONFIG_CRCO     0x04
 
-    #define CONFIG      	0x00
+    #define CONFIG          0x00
 
-    #define DUMMY			0xAA
+    #define DUMMY           0xAA
 
     char data_return, data_send;
 
@@ -257,7 +255,6 @@ void cmd_test_nrf(int argc, char **argv)
 /**
  * @print buffer written in cb function
  */
-
 void cmd_prxbuf(int argc, char **argv)
 {
 
@@ -278,7 +275,6 @@ void cmd_prxbuf(int argc, char **argv)
 /**
  * @clear buffer written in cb function
  */
-
 void cmd_clearbuf(int argc, char **argv)
 {
 
@@ -289,13 +285,10 @@ void cmd_clearbuf(int argc, char **argv)
 
     buf_count = 0;
 
-    int i;
-
-    for (i = 0; i < BUF_SEND_LEN; i++) {
+    for (int i = 0; i < BUF_SEND_LEN; i++) {
         test_buf[i] =  0;
     }
 }
-
 
 /**
  * @brief proxy for reading a char from std-in and passing it to the shell
