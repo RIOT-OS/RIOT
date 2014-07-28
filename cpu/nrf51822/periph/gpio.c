@@ -29,8 +29,13 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
+/* guard file in case no GPIO device is defined */
+#if GPIO_NUMOF
+
 typedef struct {
-    void (*cb)(void);
+    gpio_t dev;
+    gpio_cb_t cb;
+    void *arg;
 } gpio_state_t;
 
 static gpio_state_t gpio_config;
@@ -126,10 +131,9 @@ static inline int get_pin(gpio_t dev)
             return GPIO_15_PIN;
             break;
 #endif
-        case GPIO_UNDEFINED:
-        default:
-            return -1;
     }
+
+    return -1;
 }
 
 int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
@@ -148,7 +152,7 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
     /* set pull register configuration */
     switch (pullup) {
         case GPIO_NOPULL:
-            break;
+            return -1;
         case GPIO_PULLUP:
             NRF_GPIO->PIN_CNF[dev] |= (GPIO_PIN_CNF_PULL_Pullup << GPIO_PIN_CNF_PULL_Pos);
             break;
@@ -176,7 +180,7 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
     /* set pull register configuration */
     switch (pullup) {
         case GPIO_NOPULL:
-            break;
+            return -1;
         case GPIO_PULLUP:
             NRF_GPIO->PIN_CNF[dev] |= (GPIO_PIN_CNF_PULL_Pullup << GPIO_PIN_CNF_PULL_Pos);
             break;
@@ -188,7 +192,7 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
     return 0;
 }
 
-int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(void))
+int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
     int res;
     uint32_t pin;
@@ -207,7 +211,9 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(v
     NVIC_EnableIRQ(GPIOTE_IRQn);
 
     /* save callback */
+    gpio_config.dev = dev;
     gpio_config.cb = cb;
+    gpio_config.arg = arg;
 
     /* reset GPIOTE configuration register to EVENT mode*/
     NRF_GPIOTE->CONFIG[0] = GPIOTE_CONFIG_MODE_Event;
@@ -234,18 +240,18 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(v
     return 0;
 }
 
-int gpio_irq_enable(gpio_t dev)
+void gpio_irq_enable(gpio_t dev)
 {
-    NRF_GPIOTE->INTENSET |= GPIOTE_INTENSET_IN0_Msk;
-
-    return 0;
+    if (gpio_config.dev == dev) {
+        NRF_GPIOTE->INTENSET |= GPIOTE_INTENSET_IN0_Msk;
+    }
 }
 
-int gpio_irq_disable(gpio_t dev)
+void gpio_irq_disable(gpio_t dev)
 {
-    NRF_GPIOTE->INTENCLR |= GPIOTE_INTENSET_IN0_Msk;
-
-    return 0;
+    if (gpio_config.dev == dev) {
+        NRF_GPIOTE->INTENCLR |= GPIOTE_INTENSET_IN0_Msk;
+    }
 }
 
 int gpio_read(gpio_t dev)
@@ -272,48 +278,42 @@ int gpio_read(gpio_t dev)
         res = 1;
     }
 
-    return -1;
+    return res;
 }
 
-int gpio_set(gpio_t dev)
+void gpio_set(gpio_t dev)
 {
     int pin = get_pin(dev);
     if (pin < 0) {
-        return pin;
+        return;
     }
-
     NRF_GPIO->OUTSET = (1 << pin);
-
-    return 0;
 }
 
-int gpio_clear(gpio_t dev)
+void gpio_clear(gpio_t dev)
 {
     int pin = get_pin(dev);
     if (pin < 0) {
-        return pin;
+        return;
     }
-
     NRF_GPIO->OUTCLR = (1 << pin);
-
-    return 0;
 }
 
-int gpio_toggle(gpio_t dev)
+void gpio_toggle(gpio_t dev)
 {
     if (gpio_read(dev)) {
-        return gpio_clear(dev);
+        gpio_clear(dev);
     } else {
-        return gpio_set(dev);
+        gpio_set(dev);
     }
 }
 
-int gpio_write(gpio_t dev, int value)
+void gpio_write(gpio_t dev, int value)
 {
     if (value) {
-        return gpio_set(dev);
+        gpio_set(dev);
     } else {
-        return gpio_clear(dev);
+        gpio_clear(dev);
     }
 }
 
@@ -323,10 +323,12 @@ __attribute__((naked)) void isr_gpiote(void)
     if (NRF_GPIOTE->EVENTS_IN[0] == 1)
     {
         NRF_GPIOTE->EVENTS_IN[0] = 0;
-        gpio_config.cb();
+        gpio_config.cb(gpio_config.arg);
     }
     if (sched_context_switch_request) {
         thread_yield();
     }
     ISR_EXIT();
 }
+
+#endif /* GPIO_NUMOF */
