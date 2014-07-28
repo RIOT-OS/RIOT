@@ -550,6 +550,29 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
 	return trans_ret;
 }
 
+void spi_transmission_begin(spi_t dev, char reset_val){
+
+    SPI_TypeDef *spi_port = 0;
+
+    switch (dev) {
+#if SPI_0_EN
+        case SPI_0:
+            spi_port = SPI_0_DEV;
+            break;
+#endif
+#if SPI_1_EN
+        case SPI_1:
+            spi_port = SPI_1_DEV;
+            break;
+#endif
+
+    }
+
+    while( !(spi_port->SR & SPI_SR_TXE));
+    spi_port->DR = reset_val;
+
+}
+
 
 void spi_poweron(spi_t dev){
 
@@ -643,6 +666,7 @@ void isr_spi2(void)
     ISR_EXIT();
 }
 
+#if SPI_0_EN
 __attribute__((naked))
 void isr_exti4(void)
 {
@@ -653,3 +677,4 @@ void isr_exti4(void)
     }
     ISR_EXIT();
 }
+#endif
