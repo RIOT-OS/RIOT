@@ -54,7 +54,6 @@ char test_irq(char data)
 {
     test_buf[buf_count] = data;
     buf_count++;
-    /* printf("my_cool_uebergabeparameter_was: %x\n", data); */
     return data;
 }
 
