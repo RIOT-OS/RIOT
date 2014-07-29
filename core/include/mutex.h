@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2013, 2014 Freie Universität Berlin
  *
  * This file subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -15,7 +15,6 @@
  * @file        mutex.h
  * @brief       RIOT synchronization API
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
@@ -30,15 +29,15 @@
 typedef struct mutex_t {
     /* fields are managed by mutex functions, don't touch */
     /**
-     * @internal
      * @brief   The value of the mutex; 0 if unlocked, 1 if locked. **Must
      *          never be changed by the user.**
+     * @internal
      */
     unsigned int val;
     /**
-     * @internal
      * @brief   The process waiting queue of the mutex. **Must never be changed
      *          by the user.**
+     * @internal
      */
     queue_node_t queue;
 } mutex_t;
