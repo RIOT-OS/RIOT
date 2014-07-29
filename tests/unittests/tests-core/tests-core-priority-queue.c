@@ -15,13 +15,15 @@
 
 #define Q_LEN (4)
 
-static priority_queue_t q;
+static priority_queue_t q = PRIORITY_QUEUE_INIT;
 static priority_queue_node_t qe[Q_LEN];
 
 static void set_up(void)
 {
-    q.first = NULL;
-    memset(qe, 0, sizeof(qe));
+    priority_queue_init(&q);
+    for (unsigned i = 0; i < sizeof(qe)/sizeof(priority_queue_node_t); ++i) {
+        priority_queue_node_init(&(qe[i]));
+    }
 }
 
 static void test_priority_queue_remove_head_empty(void)

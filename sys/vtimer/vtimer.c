@@ -49,8 +49,8 @@ static int vtimer_set(vtimer_t *timer);
 static int set_longterm(vtimer_t *timer);
 static int set_shortterm(vtimer_t *timer);
 
-static priority_queue_t longterm_priority_queue_root;
-static priority_queue_t shortterm_priority_queue_root;
+static priority_queue_t longterm_priority_queue_root = PRIORITY_QUEUE_INIT;
+static priority_queue_t shortterm_priority_queue_root = PRIORITY_QUEUE_INIT;
 
 static vtimer_t longterm_tick_timer;
 static uint32_t longterm_tick_start;

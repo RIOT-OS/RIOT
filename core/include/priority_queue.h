@@ -44,9 +44,38 @@ typedef struct queue {
 #define PRIORITY_QUEUE_NODE_INIT { NULL, 0, 0 }
 
 /**
+ * @brief   Initialize a priority queue node object.
+ * @details For initialization of variables use PRIORITY_QUEUE_NODE_INIT
+ *          instead. Only use this function for dynamically allocated
+ *          priority queue nodes.
+ * @param[out] priority_queue_node
+ *          pre-allocated priority_queue_node_t object, must not be NULL.
+ */
+static inline void priority_queue_node_init(
+        priority_queue_node_t *priority_queue_node)
+{
+    priority_queue_node_t qn = PRIORITY_QUEUE_NODE_INIT;
+    *priority_queue_node = qn;
+}
+
+/**
  * @brief Static initializer for priority_queue_t.
  */
 #define PRIORITY_QUEUE_INIT { NULL }
+
+/**
+ * @brief   Initialize a priority queue object.
+ * @details For initialization of variables use PRIORITY_QUEUE_INIT
+ *          instead. Only use this function for dynamically allocated
+ *          priority queues.
+ * @param[out] priority_queue
+ *          pre-allocated priority_queue_t object, must not be NULL.
+ */
+static inline void priority_queue_init(priority_queue_t *priority_queue)
+{
+    priority_queue_t q = PRIORITY_QUEUE_INIT;
+    *priority_queue = q;
+}
 
 /**
  * @brief remove the priority queue's head
