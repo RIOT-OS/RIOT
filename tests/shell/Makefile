@@ -9,3 +9,7 @@ USEMODULE += uart0
 DISABLE_MODULE += auto_init
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	$(CURDIR)/tests/01-basic
+	$(CURDIR)/tests/02-inputlength-regression

@@ -7,3 +7,6 @@ BOARD_BLACKLIST := arduino-mega2560
 USEMODULE += pthread
 
 include $(RIOTBASE)/Makefile.include
+
+test:
+	$(CURDIR)/tests/01-test
