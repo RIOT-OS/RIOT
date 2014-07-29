@@ -50,8 +50,8 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 rpl_of_t *rpl_objective_functions[NUMBER_IMPLEMENTED_OFS];
 rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
 unsigned int rpl_process_pid;
-mutex_t rpl_recv_mutex;
-mutex_t rpl_send_mutex;
+mutex_t rpl_recv_mutex = MUTEX_INIT;
+mutex_t rpl_send_mutex = MUTEX_INIT;
 msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
@@ -73,8 +73,6 @@ rpl_of_t *rpl_get_of_for_ocp(uint16_t ocp)
 
 uint8_t rpl_init(int if_id)
 {
-    mutex_init(&rpl_send_mutex);
-    mutex_init(&rpl_recv_mutex);
     rpl_instances_init();
 
     /* initialize routing table */

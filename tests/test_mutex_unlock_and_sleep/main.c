@@ -22,7 +22,7 @@
 #include "thread.h"
 #include "mutex.h"
 
-static mutex_t mutex;
+static mutex_t mutex = MUTEX_INIT;
 static volatile int indicator, count;
 
 static char stack[KERNEL_CONF_STACKSIZE_MAIN];
@@ -42,7 +42,6 @@ int main(void)
 {
     indicator = 0;
     count = 0;
-    mutex_init(&mutex);
 
     thread_create(stack,
                   sizeof(stack),

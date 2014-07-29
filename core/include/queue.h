@@ -20,6 +20,7 @@
 #ifndef __QUEUE_H
 #define __QUEUE_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <inttypes.h>
 
@@ -40,6 +41,11 @@ typedef struct queue_node_t {
     unsigned int data;          /**< queue node data */
     uint32_t priority;          /**< queue node priority */
 } queue_node_t;
+
+/**
+ * @brief Static initializer for queue_node_t.
+ */
+#define QUEUE_NODE_INIT { NULL, 0, 0 }
 
 /**
  * @brief attach `new_obj` to the tail of the queue (identified

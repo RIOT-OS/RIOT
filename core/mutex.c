@@ -35,24 +35,13 @@
 
 static void mutex_wait(struct mutex_t *mutex);
 
-int mutex_init(struct mutex_t *mutex)
-{
-    mutex->val = 0;
-
-    mutex->queue.priority = 0;
-    mutex->queue.data = 0;
-    mutex->queue.next = NULL;
-
-    return 1;
-}
-
 int mutex_trylock(struct mutex_t *mutex)
 {
     DEBUG("%s: trylocking to get mutex. val: %u\n", sched_active_thread->name, mutex->val);
     return (atomic_set_return(&mutex->val, 1) == 0);
 }
 
-int mutex_lock(struct mutex_t *mutex)
+void mutex_lock(struct mutex_t *mutex)
 {
     DEBUG("%s: trying to get mutex. val: %u\n", sched_active_thread->name, mutex->val);
 
@@ -60,8 +49,6 @@ int mutex_lock(struct mutex_t *mutex)
         /* mutex was locked. */
         mutex_wait(mutex);
     }
-
-    return 1;
 }
 
 static void mutex_wait(struct mutex_t *mutex)

@@ -98,7 +98,7 @@ static etx_neighbor_t candidates[ETX_MAX_CANDIDATE_NEIGHBORS];
  * In this time, no packet may be handled, otherwise it could assume values
  * from the last round to count for this round.
  */
-mutex_t etx_mutex;
+mutex_t etx_mutex = MUTEX_INIT;
 //Transceiver command for sending ETX probes
 transceiver_command_t tcmd;
 
@@ -141,7 +141,6 @@ void etx_show_candidates(void)
 
 void etx_init_beaconing(ipv6_addr_t *address)
 {
-    mutex_init(&etx_mutex);
     own_address = address;
     //set code
     puts("ETX BEACON INIT");

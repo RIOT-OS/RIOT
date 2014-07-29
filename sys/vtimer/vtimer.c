@@ -343,8 +343,7 @@ int vtimer_sleep(timex_t time)
 
     int ret;
     vtimer_t t;
-    mutex_t mutex;
-    mutex_init(&mutex);
+    mutex_t mutex = MUTEX_INIT;
     mutex_lock(&mutex);
 
     t.action = vtimer_callback_unlock;

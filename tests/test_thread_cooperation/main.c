@@ -26,7 +26,7 @@
 
 #define PROBLEM 12
 
-mutex_t mtx;
+mutex_t mtx = MUTEX_INIT;
 
 volatile int storage = 1;
 int main_id;
@@ -62,8 +62,6 @@ void *run(void *arg)
 int main(void)
 {
     main_id = thread_getpid();
-
-    mutex_init(&mtx);
 
     printf("Problem: %d\n", PROBLEM);
 
