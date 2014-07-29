@@ -17,7 +17,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * @ingroup		dev_cc110x
  * @brief		ScatterWeb MSB-A2 mac-layer
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 2128 $

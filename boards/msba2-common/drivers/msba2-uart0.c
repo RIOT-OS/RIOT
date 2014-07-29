@@ -9,8 +9,8 @@
 /*
  * debug_uart.c: provides initial serial debug output
  *
- * Copyright (C) 2008, 2009  Kaspar Schleiser <kaspar@schleiser.de>
- *                           Heiko Will <hwill@inf.fu-berlin.de>
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
+ * @author Heiko Will <hwill@inf.fu-berlin.de>
  */
 #include <stdlib.h>
 #include <string.h>
@@ -25,7 +25,6 @@
  * @file
  * @ingroup     lpc2387
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @version     $Revision$
  *
  * @note    $Id$

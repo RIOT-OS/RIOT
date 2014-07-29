@@ -13,7 +13,6 @@
  * @file        tcb.h
  * @brief       Thread context block definition
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */

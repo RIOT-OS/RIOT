@@ -13,7 +13,6 @@
  * @file        tests-lib.h
  * @brief       Unittests for the ``lib`` sysmodule
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 #ifndef __TESTS_CORE_H_

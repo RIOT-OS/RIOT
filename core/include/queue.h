@@ -13,7 +13,6 @@
  * @file        queue.h
  * @brief       A simple queue implementation
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 

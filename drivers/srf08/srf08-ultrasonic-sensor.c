@@ -13,7 +13,6 @@
  * @internal
  * @brief       Driver for the SRF08 ultrasonic ranger using the i2c interface.
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3857 $
  *

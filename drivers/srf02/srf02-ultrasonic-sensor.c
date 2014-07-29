@@ -14,7 +14,6 @@
  *              The connection between the MCU and the SRF08 is based on the
  *              i2c-interface.
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3856 $
  *

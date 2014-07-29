@@ -15,7 +15,6 @@
  *
  * #define ENABLE_DEBUG, include this and then use DEBUG as printf you can toggle.
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 

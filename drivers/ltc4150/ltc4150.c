@@ -21,7 +21,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * @file
  * @brief       LTC4150 Coulomb Counter
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */

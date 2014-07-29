@@ -18,7 +18,6 @@
  *              The Open Group Base Specifications Issue 7, <arpa/inet.h>
  *          </a>
  *
- * @author  Freie Universität Berlin
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef ARPA_INET_H

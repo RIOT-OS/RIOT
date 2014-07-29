@@ -15,7 +15,6 @@
  * @file    fd.h
  * @brief   Unifies diverse identifiers of RIOT to POSIX like file descriptors.
  *
- * @author  Freie Universität Berlin
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  */

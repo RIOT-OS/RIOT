@@ -17,7 +17,6 @@
  * @file
  * @brief		Common network stack types (of all layers).
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @version     $Revision: 2061 $

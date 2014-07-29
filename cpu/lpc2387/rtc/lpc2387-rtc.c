@@ -15,7 +15,6 @@ See the file LICENSE in the top level directory for more details.
  * @ingroup		lpc2387_rtc
  * @brief		LPC2387 Real-Time-Clock
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Michael Baar <michael.baar@fu-berlin.de>
  * @version     $Revision: 2005 $
  *

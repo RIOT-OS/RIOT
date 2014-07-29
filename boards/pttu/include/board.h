@@ -7,7 +7,6 @@
  * @file        board.h
  * @brief       Basic definitions for the PTTU board
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 

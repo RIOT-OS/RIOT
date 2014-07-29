@@ -13,7 +13,6 @@
  * @ingroup     arm_common
  * @brief       LPC2387 Newlib gettimeofday() system call glue
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Michael Baar <michael.baar@fu-berlin.de>
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */

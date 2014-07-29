@@ -19,7 +19,6 @@
  * @file        board.h
  * @brief       Basic definitions for the Senslab WSN430 v1.4 board
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @author      Milan Babel <babel@inf.fu-berlin.de>
  */
 

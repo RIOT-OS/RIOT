@@ -27,7 +27,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * @file
  * @brief       GPIO IRQ Multiplexer interface
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Michael Baar <michael.baar@fu-berlin.de>
  */
 

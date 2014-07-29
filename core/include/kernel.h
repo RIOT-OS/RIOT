@@ -16,7 +16,6 @@
  *              A reboot() function is also provided
  *              (and used by core_panic() when needed).
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 

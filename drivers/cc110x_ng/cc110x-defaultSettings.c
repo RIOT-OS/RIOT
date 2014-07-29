@@ -13,7 +13,6 @@
  * @file
  * @brief   TI Chipcon CC110x default settings
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      INRIA
  * @author    Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author    Heiko Will <hwill@inf.fu-berlin.de>

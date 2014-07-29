@@ -11,7 +11,6 @@
  * @ingroup		LPC2387
  * @brief		CC1100 LPC2387 dependend functions
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @version     $Revision: 1781 $
