@@ -42,18 +42,21 @@
  * @def     HWTIMER_SPEED
  */
 #ifndef HWTIMER_SPEED
-#warning "HWTIMER_SPEED undefined. Set HWTIMER_SPEED to number of ticks per second for the current architecture."
+#warning "HWTIMER_SPEED undefined. Set HWTIMER_SPEED to the number of ticks \
+per second for the current architecture."
 #endif
 
 /**
  * @brief       Upper bound for hwtimer_spin
+ *
  * @verbatim    Barrier below which hwtimer_spin is called instead of
- *              setting a timer and yielding the thread
+ *              setting a timer and yielding the thread.
+ *
+ *              Boards should override this.
+ *
  * @def         HWTIMER_SPIN_BARRIER
  */
 #ifndef HWTIMER_SPIN_BARRIER
-#warning "HWTIMER_SPIN_BARRIER undefined, using default. Set HWTIMER_SPIN_BARRIER to the \
-number of ticks below which hwtimer_spin should be used for the current board."
 #define HWTIMER_SPIN_BARRIER (6)
 #endif
 
@@ -62,27 +65,28 @@ number of ticks below which hwtimer_spin should be used for the current board."
  * @param[in]   us number of microseconds
  * @return      kernel timer ticks
  */
-#define HWTIMER_TICKS(us)        ((us) / (1000000L / HWTIMER_SPEED))
+#define HWTIMER_TICKS(us) ((us) / (1000000L / HWTIMER_SPEED))
 
 /**
  * @brief       Convert ticks to microseconds
  * @param[in]   ticks   number of ticks
  * @return      microseconds
  */
-#define HWTIMER_TICKS_TO_US(ticks)        ((ticks) * (1000000L/HWTIMER_SPEED))
+#define HWTIMER_TICKS_TO_US(ticks) ((ticks) * (1000000L/HWTIMER_SPEED))
 
 /**
  * @brief   Maximum hwtimer tick count (before overflow)
  * @def     HWTIMER_MAXTICKS
  */
 #ifndef HWTIMER_MAXTICKS
-#warning "HWTIMER_MAXTICKS undefined. Set HWTIMER_MAXTICKS to maximum number of ticks countable on the current architecture."
+#warning "HWTIMER_MAXTICKS undefined. Set HWTIMER_MAXTICKS to the maximum \
+number of ticks countable on the current architecture."
 #endif
 
 /**
  * @brief   microseconds before hwtimer overflow
  */
-#define HWTIMER_OVERFLOW_MICROS()        (1000000L / HWTIMER_SPEED * HWTIMER_MAXTICKS)
+#define HWTIMER_OVERFLOW_MICROS() (1000000L / HWTIMER_SPEED * HWTIMER_MAXTICKS)
 
 typedef uint32_t timer_tick_t; /**< data type for hwtimer ticks */
 
@@ -108,12 +112,14 @@ int hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr);
 
 /**
  * @brief Set a kernel timer
- * @param[in]   absolute    Absolute timer counter value for invocation of handler
+ * @param[in]   absolute    Absolute timer counter value for invocation
+ *                          of handler
  * @param[in]   callback    Callback function
  * @param[in]   ptr         Argument to callback function
  * @return      timer id
  */
-int hwtimer_set_absolute(unsigned long absolute, void (*callback)(void*), void *ptr);
+int hwtimer_set_absolute(unsigned long absolute,
+        void (*callback)(void*), void *ptr);
 
 /**
  * @brief Remove a kernel timer
@@ -142,7 +148,8 @@ int hwtimer_active(void);
 void hwtimer_init_comp(uint32_t fcpu);
 
 /**
- * @brief       Delay current thread, spinning. Use only in interrupts for VERY short delays!
+ * @brief       Delay current thread, spinning. Use only in interrupts for
+ *              VERY short delays!
  *
  * @param[in]   ticks        Number of kernel ticks to delay
  */
