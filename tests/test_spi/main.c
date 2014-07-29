@@ -32,6 +32,7 @@
 #include "stm32f407xx.h"
 
 #define USE_SPI_0_MASTER         1
+#define USE_SPI_0_SLAVE          1
 
 #define SHELL_BUFFER_SIZE        128
 #define BUF_SEND_LEN             10
@@ -77,19 +78,29 @@ static const shell_command_t shell_commands[] = {
  */
 void cmd_init_start_slave(int argc, char **argv)
 {
-    puts("Init start Slave\n");
+    printf("Init Slave USE_SPI_0_SLAVE: %i\n", USE_SPI_0_SLAVE);
 
     (void) argc;
     (void) argv;
 
+
+    int cr1_reg, cr2_reg;
+
+#if USE_SPI_0_SLAVE
     spi_poweron(SPI_0);
     spi_init_slave(SPI_0, SPI_CONF_FIRST_RISING, test_irq);
 
-    int cr1_reg, cr2_reg;
     cr1_reg = (SPI_0_DEV->CR1);
     cr2_reg = (SPI_0_DEV->CR2);
-    printf("CR1 Register Slave: %x\nCR2 Register Slave: %x\n", cr1_reg, cr2_reg);
+#else
+    spi_poweron(SPI_1);
+    spi_init_slave(SPI_1, SPI_CONF_FIRST_RISING, test_irq);
 
+    cr1_reg = (SPI_1_DEV->CR1);
+    cr2_reg = (SPI_1_DEV->CR2);
+#endif
+
+    printf("CR1 Register Slave: %x\nCR2 Register Slave: %x\n", cr1_reg, cr2_reg);
 }
 
 /**
@@ -102,34 +113,28 @@ void cmd_init_master(int argc, char **argv)
     (void) argc;
     (void) argv;
 
+    int cr1_reg, cr2_reg, i2cfgr;
+
     gpio_init_out(GPIO_7, GPIO_NOPULL); /* GPIO_7 is mapped to pin PD6 */
     gpio_set(GPIO_7);
 
 #if USE_SPI_0_MASTER
     spi_poweron(SPI_0);
-#else
-    spi_poweron(SPI_1);
-#endif
-
-#if USE_SPI_0_MASTER
     spi_init_master(SPI_0, SPI_CONF_FIRST_RISING, SPI_SPEED_400KHZ);
-#else
-    spi_init_master(SPI_1, SPI_CONF_FIRST_RISING, SPI_SPEED_400KHZ);
-#endif
 
-    int cr1_reg, cr2_reg, i2cfgr;
-
-#if USE_SPI_0_MASTER
     cr1_reg = (SPI_0_DEV->CR1);
     cr2_reg = (SPI_0_DEV->CR2);
-    i2cfgr  = SPI_0_DEV->I2SCFGR;
+    i2cfgr  =  SPI_0_DEV->I2SCFGR;
 #else
+    spi_poweron(SPI_1);
+    spi_init_master(SPI_1, SPI_CONF_FIRST_RISING, SPI_SPEED_400KHZ);
+
     cr1_reg = (SPI_1_DEV->CR1);
     cr2_reg = (SPI_1_DEV->CR2);
+    i2cfgr  =  SPI_1_DEV->I2SCFGR;
 #endif
 
     printf("CR1 Register Master: %x\nCR2 Register Master: %x\n i2cfgr Register Master: %x\n", cr1_reg, cr2_reg, i2cfgr);
-
 }
 
 /**
@@ -223,18 +228,18 @@ void cmd_test_nrf(int argc, char **argv)
 
     puts("Test call nrf24l01+\n");
 
-    #define R_REGISTER      0x00
-    #define W_REGISTER      0x20
-    #define NOP             0xFF
+#define R_REGISTER      0x00
+#define W_REGISTER      0x20
+#define NOP             0xFF
 
-    #define REGISTER_MASK   0x1F
-    #define	CONFIG_PWR_UP   0x02
-    #define	CONFIG_PRIM_RX  0x01
-    #define	CONFIG_CRCO     0x04
+#define REGISTER_MASK   0x1F
+#define	CONFIG_PWR_UP   0x02
+#define	CONFIG_PRIM_RX  0x01
+#define	CONFIG_CRCO     0x04
 
-    #define CONFIG          0x00
+#define CONFIG          0x00
 
-    #define DUMMY           0xAA
+#define DUMMY           0xAA
 
     char data_return;
 

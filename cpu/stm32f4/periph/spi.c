@@ -17,7 +17,7 @@
  *
  * @}
  */
-
+#include <stdio.h>
 #include "cpu.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
@@ -51,15 +51,19 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         case 0:
             speed_devider = 7; // makes 656 kHz
             break;
+
         case 1:
             speed_devider = 7; // makes 656 kHz
             break;
+
         case 2:
             speed_devider = 6; // makes 1.3 MHz
             break;
+
         case 3:
             speed_devider = 5; // makes 2.6 MHz
             break;
+
         case 4:
             speed_devider = 4; // makes 5.3 MHz
             break;
@@ -80,6 +84,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 
     switch (dev) {
 #if SPI_0_EN
+
         case SPI_0:
             port = SPI_0_PORT; /* = GPIOA */
             spi_port = SPI_0_DEV;
@@ -148,6 +153,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 #endif
 
 #if SPI_1_EN
+
         case SPI_1:
             port = SPI_1_PORT;
             spi_port = SPI_1_DEV;
@@ -245,6 +251,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
 
     switch (dev) {
 #if SPI_0_EN
+
         case SPI_0:
             port = SPI_0_PORT;
             spi_port = SPI_0_DEV;
@@ -253,15 +260,12 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
 
             NVIC_SetPriority(EXTI4_IRQn, SPI_0_IRQ_PRIO);
             NVIC_EnableIRQ(EXTI4_IRQn);
-
-            // connect PA4 to interrupt. EXTICR[1] (so the second) for pins 4..7, ~0xf = 0000 for PA pin
-            SYSCFG->EXTICR[1] &= ~(0xf); // this should be in periph_cong.h!!!!!!!!!!!!!!!!!!!!!
-
-            EXTI->IMR |= (1 << 4);// 1: interrupt request grom line 4 not masked
-
-            // configure the active edges (here both) : maybe later via flags or so
-            EXTI->RTSR &= ~(1 << 4); // 1: rising trigger disabled
-            EXTI->FTSR |= (1 << 4);  // 1: falling trigger enabled
+            /* connect PA4 to interrupt. EXTICR[1] (so the second) for pins 4..7, ~0xf = 0000 for PA pin */
+            SYSCFG->EXTICR[1] &= ~(0xf);
+            EXTI->IMR |= (1 << SPI_0_NSS_GPIO);/* 1: interrupt request from line 4 not masked */
+            /* configure the active edges */
+            EXTI->RTSR &= ~(1 << SPI_0_NSS_GPIO); /* 1: rising trigger disabled */
+            EXTI->FTSR |= (1 << SPI_0_NSS_GPIO);  /* 1: falling trigger enabled */
 
 
             /***************** GPIO-Init *****************/
@@ -347,11 +351,21 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
 #endif
 
 #if SPI_1_EN
+
         case SPI_1:
             port = SPI_1_PORT;
             spi_port = SPI_1_DEV;
             NVIC_SetPriority(SPI_1_IRQ_HANDLER, SPI_1_IRQ_PRIO);
             NVIC_EnableIRQ(SPI_1_IRQ_HANDLER);
+
+            NVIC_SetPriority(EXTI15_10_IRQn, SPI_1_IRQ_PRIO);
+            NVIC_EnableIRQ(EXTI15_10_IRQn);
+            SYSCFG->EXTICR[3] &= ~(0xf);
+            SYSCFG->EXTICR[3] |= 1;
+            EXTI->IMR |= (1 << SPI_1_NSS_GPIO);/* 1: interrupt request from line 4 not masked */
+            /* configure the active edges */
+            EXTI->RTSR &= ~(1 << SPI_1_NSS_GPIO); /* 1: rising trigger disabled */
+            EXTI->FTSR |= (1 << SPI_1_NSS_GPIO);  /* 1: falling trigger enabled */
 
 
             /***************** GPIO-Init *****************/
@@ -466,12 +480,14 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 
     switch (dev) {
 #if SPI_0_EN
+
         case SPI_0:
             spi_port = SPI_0_DEV;
             break;
 #endif
 
 #if SPI_1_EN
+
         case SPI_1:
             spi_port = SPI_1_DEV;
             break;
@@ -486,9 +502,11 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     }
 
     while (!(spi_port->SR & SPI_SR_TXE));
+
     spi_port->DR = out;
 
     while (!(spi_port->SR & SPI_SR_RXNE));
+
     *in = spi_port->DR;
 
     return 1;
@@ -518,6 +536,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
         if (in) {
             in[i] = in_temp;
         }
+
         trans_bytes++;
     }
 
@@ -559,18 +578,21 @@ void spi_transmission_begin(spi_t dev, char reset_val)
 
     switch (dev) {
 #if SPI_0_EN
+
         case SPI_0:
             spi_port = SPI_0_DEV;
             break;
 #endif
 
 #if SPI_1_EN
+
         case SPI_1:
             spi_port = SPI_1_DEV;
             break;
 #endif
 
     }
+
     spi_port->DR = reset_val;
 }
 
@@ -580,6 +602,7 @@ void spi_poweron(spi_t dev)
 
     switch (dev) {
 #if SPI_0_EN
+
         case SPI_0:
             SPI_0_PORT_CLKEN(); /* Enable peripheral clock for GPIO port A */
             SPI_0_CLKEN(); /* Enable peripheral clock for SPI1 */
@@ -587,6 +610,7 @@ void spi_poweron(spi_t dev)
 #endif
 
 #if SPI_1_EN
+
         case SPI_1:
             SPI_1_PORT_CLKEN();
             SPI_1_CLKEN();
@@ -601,6 +625,7 @@ void spi_poweroff(spi_t dev)
 {
     switch (dev) {
 #if SPI_0_EN
+
         case SPI_0:
             while (SPI_0_DEV->SR & SPI_SR_BSY); /* wait until no more busy */
 
@@ -610,6 +635,7 @@ void spi_poweroff(spi_t dev)
 #endif
 
 #if SPI_1_EN
+
         case SPI_1:
             while (SPI_1_DEV->SR & SPI_SR_BSY); /* wait until no more busy */
 
@@ -624,7 +650,7 @@ void spi_poweroff(spi_t dev)
 
 static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev)
 {
-
+    printf("irq_handler_transfer");
     char data = 0;
 
     if (spi->SR & SPI_SR_RXNE) {
@@ -635,22 +661,22 @@ static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev)
 
     }
     else {
-            while (1) {
-                for (int i = 0; i < 2000000; i++) {
-                    asm("nop");
-                }
+        while (1) {
+            for (int i = 0; i < 2000000; i++) {
+                asm("nop");
             }
-        }
-
-        /* see if a thread with higher priority wants to run now */
-        if (sched_context_switch_request) {
-            thread_yield();
         }
     }
 
+    /* see if a thread with higher priority wants to run now */
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
+}
+
 static inline void irq_handler_begin(spi_t dev)
 {
-
+    printf("irq_handler_begin");
     spi_transmission_begin(dev, byte_begin);
 }
 
@@ -676,9 +702,24 @@ void isr_exti4(void)
 {
     ISR_ENTER();
 
-    if (EXTI->PR & EXTI_PR_PR4) {// for interrupt by gpio flanks
+    if (EXTI->PR & EXTI_PR_PR4) {/* for interrupt by gpio flanks */
         EXTI->PR |= EXTI_PR_PR4;
         irq_handler_begin(SPI_0);
+    }
+
+    ISR_EXIT();
+}
+#endif
+
+#if SPI_1_EN
+__attribute__((naked))
+void isr_exti15_10(void)
+{
+    ISR_ENTER();
+
+    if (EXTI->PR & EXTI_PR_PR12) {/* for interrupt by gpio flanks */
+        EXTI->PR |= EXTI_PR_PR12;
+        irq_handler_begin(SPI_1);
     }
 
     ISR_EXIT();
