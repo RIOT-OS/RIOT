@@ -286,67 +286,67 @@ int gpio_read(gpio_t dev)
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:
-            return GPIO_0_DEV->PIO_PDSR & GPIO_0_PIN;
+            return GPIO_0_DEV->PIO_ODSR & GPIO_0_PIN;
 #endif
 #if GPIO_1_EN
         case GPIO_1:
-            return GPIO_1_DEV->PIO_PDSR & GPIO_1_PIN;
+            return GPIO_1_DEV->PIO_ODSR & GPIO_1_PIN;
 #endif
 #if GPIO_2_EN
         case GPIO_2:
-            return GPIO_2_DEV->PIO_PDSR & GPIO_2_PIN;
+            return GPIO_2_DEV->PIO_ODSR & GPIO_2_PIN;
 #endif
 #if GPIO_3_EN
         case GPIO_3:
-            return GPIO_3_DEV->PIO_PDSR & GPIO_3_PIN;
+            return GPIO_3_DEV->PIO_ODSR & GPIO_3_PIN;
 #endif
 #if GPIO_4_EN
         case GPIO_4:
-            return GPIO_4_DEV->PIO_PDSR & GPIO_4_PIN;
+            return GPIO_4_DEV->PIO_ODSR & GPIO_4_PIN;
 #endif
 #if GPIO_5_EN
         case GPIO_5:
-            return GPIO_5_DEV->PIO_PDSR & GPIO_5_PIN;
+            return GPIO_5_DEV->PIO_ODSR & GPIO_5_PIN;
 #endif
 #if GPIO_6_EN
         case GPIO_6:
-            return GPIO_6_DEV->PIO_PDSR & GPIO_6_PIN;
+            return GPIO_6_DEV->PIO_ODSR & GPIO_6_PIN;
 #endif
 #if GPIO_7_EN
         case GPIO_7:
-            return GPIO_7_DEV->PIO_PDSR & GPIO_7_PIN;
+            return GPIO_7_DEV->PIO_ODSR & GPIO_7_PIN;
 #endif
 #if GPIO_8_EN
         case GPIO_8:
-            return GPIO_8_DEV->PIO_PDSR & GPIO_8_PIN;
+            return GPIO_8_DEV->PIO_ODSR & GPIO_8_PIN;
 #endif
 #if GPIO_9_EN
         case GPIO_9:
-            return GPIO_9_DEV->PIO_PDSR & GPIO_9_PIN;
+            return GPIO_9_DEV->PIO_ODSR & GPIO_9_PIN;
 #endif
 #if GPIO_10_EN
         case GPIO_10:
-            return GPIO_10_DEV->PIO_PDSR & GPIO_10_PIN;
+            return GPIO_10_DEV->PIO_ODSR & GPIO_10_PIN;
 #endif
 #if GPIO_11_EN
         case GPIO_11:
-            return GPIO_11_DEV->PIO_PDSR & GPIO_11_PIN;
+            return GPIO_11_DEV->PIO_ODSR & GPIO_11_PIN;
 #endif
 #if GPIO_12_EN
         case GPIO_12:
-            return GPIO_12_DEV->PIO_PDSR & GPIO_12_PIN;
+            return GPIO_12_DEV->PIO_ODSR & GPIO_12_PIN;
 #endif
 #if GPIO_13_EN
         case GPIO_13:
-            return GPIO_13_DEV->PIO_PDSR & GPIO_13_PIN;
+            return GPIO_13_DEV->PIO_ODSR & GPIO_13_PIN;
 #endif
 #if GPIO_14_EN
         case GPIO_14:
-            return GPIO_14_DEV->PIO_PDSR & GPIO_14_PIN;
+            return GPIO_14_DEV->PIO_ODSR & GPIO_14_PIN;
 #endif
 #if GPIO_15_EN
         case GPIO_15:
-            return GPIO_15_DEV->PIO_PDSR & GPIO_15_PIN;
+            return GPIO_15_DEV->PIO_ODSR & GPIO_15_PIN;
 #endif
         case GPIO_UNDEFINED:
         default:
