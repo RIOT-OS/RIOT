@@ -580,7 +580,6 @@ void spi_transmission_begin(spi_t dev, char reset_val)
 {
 
     SPI_TypeDef *spi_port = 0;
-    char placeholder;
 
     switch (dev) {
 #if SPI_0_EN
@@ -597,13 +596,7 @@ void spi_transmission_begin(spi_t dev, char reset_val)
 #endif
 
     }
-
-    //while ( !(spi_port->SR & SPI_SR_TXE));
     spi_port->DR = reset_val;
-
-    /*while ( !(spi_port->SR & SPI_SR_RXNE) );
-     placeholder = spi_port->DR;*/
-
 }
 
 

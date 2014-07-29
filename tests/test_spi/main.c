@@ -223,7 +223,7 @@ void cmd_test_nrf(int argc, char **argv)
     (void) argv;
 
     puts("Test call nrf24l01+\n");
-    /*
+
     #define R_REGISTER      0x00
     #define W_REGISTER      0x20
     #define NOP             0xFF
@@ -237,41 +237,44 @@ void cmd_test_nrf(int argc, char **argv)
 
     #define DUMMY           0xAA
 
-    char data_return, data_send;
+    char data_return;
 
-    	// Try to get status register while command NOP
-    	spi_transfer_byte(SPI_0, NOP, &data_return);
-    	gpio_set(GPIO_7);
-    	printf("NOP returned: %x\n", data_return);
+    // Try to get status register while command NOP
+    gpio_clear(GPIO_7);
+    spi_transfer_byte(SPI_0, NOP, &data_return);
+    gpio_set(GPIO_7);
+    printf("NOP returned: %x\n", data_return);
 
-
-    	// Try to write to CONFIG register to set power up
-    	gpio_clear(GPIO_7);
-    	spi_transfer_reg(SPI_0, (W_REGISTER | (REGISTER_MASK & CONFIG)), CONFIG_CRCO, &data_return);
-    	gpio_set(GPIO_7);
-    	printf("wrote to config register. answer should be random: %x\n", data_return);
-
-
-    	// Try to read out CONFIG register
-    	gpio_clear(GPIO_7);
-    	spi_transfer_reg(SPI_0, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
-    	gpio_set(GPIO_7);
-    	printf("read out config register. answer: %x\n", data_return);
+    // Try to read out CONFIG register
+    gpio_clear(GPIO_7);
+    spi_transfer_reg(SPI_0, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
+    gpio_set(GPIO_7);
+    printf("read out config register before write access. answer: %x\n", data_return);
 
 
-    	// Try to clear CONF reg again
-    	gpio_clear(GPIO_7);
-    	spi_transfer_reg(SPI_0, (W_REGISTER | (REGISTER_MASK & CONFIG)), CONFIG_CRCO, &data_return);
-    	gpio_set(GPIO_7);
-    	printf("after clear config register. answer should be random: %x\n", data_return);
+    // Try to write 1 to CONFIG register to set power up
+    gpio_clear(GPIO_7);
+    spi_transfer_reg(SPI_0, (W_REGISTER | (REGISTER_MASK & CONFIG)), CONFIG_CRCO, &data_return);
+    gpio_set(GPIO_7);
 
 
-    	// Try to read out CONFIG register
-    	gpio_clear(GPIO_7);
-    	spi_transfer_reg(SPI_0, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
-    	gpio_set(GPIO_7);
-    	printf("read out config register ater clear. answer: %x\n", data_return);
-    */
+    // Try to read out CONFIG register
+    gpio_clear(GPIO_7);
+    spi_transfer_reg(SPI_0, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
+    gpio_set(GPIO_7);
+    printf("read out config register after write access 1. answer: %x\n", data_return);
+
+    // Try to write to CONFIG register to set power up
+    gpio_clear(GPIO_7);
+    spi_transfer_reg(SPI_0, (W_REGISTER | (REGISTER_MASK & CONFIG)), (char)~NOP, &data_return);
+    gpio_set(GPIO_7);
+
+    // Try to read out CONFIG register
+    gpio_clear(GPIO_7);
+    spi_transfer_reg(SPI_0, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
+    gpio_set(GPIO_7);
+    printf("read out config register after write access 0. answer: %x\n", data_return);
+
 }
 
 
