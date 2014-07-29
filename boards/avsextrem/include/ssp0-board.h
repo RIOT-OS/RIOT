@@ -12,7 +12,6 @@
  * @internal
  * @brief       SPI interface definitions for the LPC2387
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Marco Ziegert <ziegert@inf.fu-berlin.de>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3854 $

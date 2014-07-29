@@ -16,7 +16,6 @@
  * @file
  * @brief		LTC4150 MSB-A2 specific implemetation
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @author		Heiko Will
  * @author		Michael Baar
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

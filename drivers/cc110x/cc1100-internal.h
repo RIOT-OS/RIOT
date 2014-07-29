@@ -25,7 +25,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * @internal
  * @brief		TI Chipcon CC110x internal hardware constants
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 1231 $

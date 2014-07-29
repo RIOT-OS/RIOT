@@ -13,7 +13,6 @@
  * @file        bitarithm.h
  * @brief       Helper functions for bit arithmetic
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
  */

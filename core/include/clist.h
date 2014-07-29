@@ -13,7 +13,6 @@
  * @file        clist.h
  * @brief       Circular linked list
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 

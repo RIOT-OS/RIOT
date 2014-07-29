@@ -12,7 +12,6 @@
  * @internal
  * @brief   Show the heap state for the LPC2387 on the command shell.
  *
- * @author  Freie Universität Berlin, Computer Systems & Telematics
  * @author  Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  *
  * @note    $Id: sc_heap.c 3855 2013-09-05 12:40:11 kasmi $

@@ -110,7 +110,6 @@
  * @brief       Bloom filter API
  *
  * @author Christian Mehlis <mehlis@inf.fu-berlin.de>
- * @author Freie Universität Berlin, Computer Systems & Telematics
  */
 
 #ifndef _BLOOM_FILTER_H

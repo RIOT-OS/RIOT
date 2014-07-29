@@ -12,7 +12,6 @@
  * @file
  * @brief       avsextrem board initialization
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Michael Baar

@@ -23,7 +23,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * @file
  * @brief		SHT11 Device Driver
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @version     $Revision: 2396 $
  *
  * @note		$Id: sht11.c 2396 2010-07-06 15:12:35Z ziegert $

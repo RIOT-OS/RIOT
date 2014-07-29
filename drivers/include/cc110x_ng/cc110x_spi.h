@@ -19,7 +19,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * @file
  * @brief       TI Chipcon CC1100 SPI driver
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  */

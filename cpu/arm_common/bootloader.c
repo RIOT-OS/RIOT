@@ -21,7 +21,6 @@
  * @internal
  * @brief       ARM bootloader
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Michael Baar <michael.baar@fu-berlin.de>
  * @version     $Revision$

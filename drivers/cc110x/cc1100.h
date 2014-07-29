@@ -25,7 +25,6 @@
  * @file
  * @brief       TI Chipcon CC110x radio driver
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  */

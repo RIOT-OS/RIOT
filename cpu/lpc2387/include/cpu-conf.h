@@ -24,7 +24,6 @@ See the file LICENSE in the top level directory for more details.
  * @file
  * @brief		LPC2387 CPUconfiguration
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		baar
  * @version     $Revision$
  *

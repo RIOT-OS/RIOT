@@ -13,7 +13,6 @@
  * @file        tests-core.h
  * @brief       Unittests for the ``core`` module
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef __TESTS_CORE_H_

@@ -12,7 +12,6 @@
  * @file        posix_io.h
  * @brief       POSIX-like IO
  *
- * @author      Freie Universität Berlin
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
  * @author      Oliver Hahm <oleg@hobbykeller.org>

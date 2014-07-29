@@ -15,7 +15,6 @@ See the file LICENSE in the top level directory for more details.
  * @ingroup		lpc2387_adc
  * @brief		LPC2387 ADC
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @version     $Revision: 3250 $
  *

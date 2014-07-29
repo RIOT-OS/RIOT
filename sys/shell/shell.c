@@ -22,7 +22,6 @@
  *              name of a handler, the handler will be called with the whole
  *              command line as parameter.
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */

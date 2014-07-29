@@ -22,7 +22,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * @internal
  * @brief		TI Chipcon CC110x physical radio driver
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 1285 $

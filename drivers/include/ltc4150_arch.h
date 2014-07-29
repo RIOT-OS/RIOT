@@ -24,7 +24,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * @file        ltc4150_arch.h
  * @brief       LTC4150 Coulomb Counter
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will
  */
 

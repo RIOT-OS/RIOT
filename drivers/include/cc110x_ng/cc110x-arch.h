@@ -19,7 +19,6 @@
  * @file        cc110x-arch.h
  * @brief       CC1100 architecture dependent functions
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  */
 

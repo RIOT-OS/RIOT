@@ -25,7 +25,6 @@
  * @file        msg.h
  * @brief       Messaging API for inter process communication
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
  */

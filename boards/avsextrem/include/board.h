@@ -16,7 +16,6 @@
  * @file        board.h
  * @brief       Boards specific drivers and configuration for the Avsextrem board
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will
  * @author      Zakaria Kasmi
  */
