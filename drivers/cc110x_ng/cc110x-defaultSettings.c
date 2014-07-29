@@ -13,10 +13,9 @@
  * @file
  * @brief   TI Chipcon CC110x default settings
  *
- * @author      INRIA
  * @author    Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author    Heiko Will <hwill@inf.fu-berlin.de>
- * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author    Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
 
