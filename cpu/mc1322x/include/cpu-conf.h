@@ -22,7 +22,7 @@
  * @file
  * @brief		MC1322X CPUconfiguration
  *
- * @author		Oleg Hahm
+ * @author		Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 /**
