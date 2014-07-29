@@ -43,6 +43,14 @@
 #endif /* NETDEV_DEFAULT */
 #endif /* MODULE_CC110X */
 
+#ifdef MODULE_CC2420
+#include "cc2420.h"
+
+#ifndef NETDEV_DEFAULT
+#define NETDEV_DEFAULT  ((netdev_t *)(&cc2420_netdev))
+#endif /* NETDEV_DEFAULT */
+#endif /* MODULE_CC2420 */
+
 #ifdef MODULE_NATIVENET
 #include "nativenet.h"
 

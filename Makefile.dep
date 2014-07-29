@@ -81,7 +81,7 @@ ifneq (,$(filter cc110x_legacy,$(USEMODULE)))
 endif
 
 ifneq (,$(filter cc2420,$(USEMODULE)))
-	USEMODULE += transceiver
+	USEMODULE += netdev_802154
 	USEMODULE += ieee802154
 endif
 

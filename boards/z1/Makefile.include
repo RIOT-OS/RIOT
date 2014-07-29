@@ -26,12 +26,10 @@ export TERMFLAGS += -p "$(PORT)"
 export INCLUDES += -I $(RIOTCPU)/msp430-common/include -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/drivers/cc2420/include -I$(RIOTBASE)/sys/net/include
 
 ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-	ifeq (,$(filter cc2240,$(USEMODULE)))
-		USEMODULE += cc2420
-	endif
-	ifeq (,$(filter transceiver,$(USEMODULE)))
-		USEMODULE += transceiver
-	endif
+    USEMODULE += cc2420
+    ifeq (,$(filter netdev_base,$(USEMODULE)))
+        USEMODULE += transceiver
+    endif
 endif
 
 export UNDEF += $(BINDIR)msp430_common/startup.o
