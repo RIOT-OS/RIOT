@@ -1,0 +1,3 @@
+USEMODULE += packetbuf
+
+INCLUDES += -I$(RIOTBASE)/sys/net/include

@@ -23,6 +23,7 @@
 #include <errno.h>
 
 #include "vtimer.h"
+#include "packetbuf.h"
 #include "mutex.h"
 #include "msg.h"
 #include "net_if.h"
@@ -41,17 +42,23 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
+#define IP_BUFFER_SIZE              2 * (LL_HDR_LEN + IPV6_MTU)
+
 #define IP_PKT_RECV_BUF_SIZE        (64)
 #define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)
 #define IPV6_NET_IF_ADDR_BUFFER_LEN (NET_IF_MAX * IPV6_NET_IF_ADDR_LIST_LEN)
 
-uint8_t ip_send_buffer[BUFFER_SIZE];
-uint8_t buffer[BUFFER_SIZE];
+static char ip_send_data_buf[IP_BUFFER_SIZE];
+static char ip_recv_data_buf[IP_BUFFER_SIZE];
+
+packetbuf_t ip_send_buffer, ip_recv_buffer;
+
 msg_t ip_msg_queue[IP_PKT_RECV_BUF_SIZE];
 ipv6_hdr_t *ipv6_buf;
 icmpv6_hdr_t *icmp_buf;
 uint8_t *nextheader;
 
+int ip_process_pid = 0;
 int udp_packet_handler_pid = 0;
 int tcp_packet_handler_pid = 0;
 int rpl_process_pid = 0;
@@ -128,9 +135,18 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
     }
 }
 
-ipv6_hdr_t *ipv6_get_buf_send(void)
+ipv6_hdr_t *_ipv6_get_buffer(packetbuf_t *packetbuf)
 {
-    return ((ipv6_hdr_t *) &ip_send_buffer[LL_HDR_LEN]);
+    void *buf;
+    size_t size;
+
+    size = packetbuf_get(packetbuf, buf);
+
+    if (size < LL_HDR_LEN) {
+        return NULL;
+    }
+
+    return (ipv6_hdr_t *)(buf[LL_HDR_LEN]);
 }
 
 uint8_t *get_payload_buf_send(uint8_t ext_len)
@@ -138,9 +154,14 @@ uint8_t *get_payload_buf_send(uint8_t ext_len)
     return &(ip_send_buffer[LLHDR_IPV6HDR_LEN + ext_len]);
 }
 
-ipv6_hdr_t *ipv6_get_buf(void)
+ipv6_hdr_t *ipv6_get_send_buf(void)
 {
-    return ((ipv6_hdr_t *) &buffer[LL_HDR_LEN]);
+    return _ipv6_get_buffer(&ip_send_buffer);
+}
+
+ipv6_hdr_t *ipv6_get_recv_buf(void)
+{
+    return _ipv6_get_buffer(&ip_recv_buffer);
 }
 
 icmpv6_hdr_t *get_icmpv6_buf(uint8_t ext_len)
@@ -715,6 +736,29 @@ void set_remaining_time(timex_t *t, uint32_t time)
     timex_t now;
     vtimer_now(&now);
     *t = timex_add(now, tmp);
+}
+
+int ipv6_init(void)
+{
+    if (!packetbuf_init(&ip_send_buffer, ip_send_data_buf, IP_BUFFER_SIZE)) {
+        return 0;
+    }
+
+    if (!packetbuf_init(&ip_recv_buffer, ip_recv_data_buf, IP_BUFFER_SIZE)) {
+        return 0;
+    }
+
+    if (!ip_process_pid) {
+        ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
+                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                       ipv6_process, "ip_process");
+    }
+
+    if (ip_process_pid < 0) {
+        return 0;
+    }
+
+    return 1;
 }
 
 int ipv6_init_as_router(void)

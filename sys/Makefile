@@ -49,6 +49,9 @@ endif
 ifneq (,$(filter net_help,$(USEMODULE)))
     DIRS += net/crosslayer/net_help
 endif
+ifneq (,$(filter packetbuf,$(USEMODULE)))
+    DIRS += net/crosslayer/packetbuf
+endif
 ifneq (,$(filter protocol_multiplex,$(USEMODULE)))
     DIRS += net/link_layer/protocol-multiplex
 endif
