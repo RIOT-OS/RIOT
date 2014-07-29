@@ -1,0 +1,85 @@
+/*
+ * Copyright (C) 2013, 2014 Freie Universität Berlin
+ *
+ * This file subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @addtogroup  core_util
+ * @{
+ *
+ * @file        priority_queue.h
+ * @brief       A simple priority queue
+ *
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ */
+
+#ifndef __QUEUE_H
+#define __QUEUE_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+/**
+ * data type for priority queue nodes
+ */
+typedef struct priority_queue_node_t {
+    struct priority_queue_node_t *next; /**< next queue node */
+    unsigned int data;                  /**< queue node data */
+    uint32_t priority;                  /**< queue node priority */
+} priority_queue_node_t;
+
+/**
+ * data type for priority queues
+ */
+typedef struct queue {
+    priority_queue_node_t *first;        /**< first queue node */
+} priority_queue_t;
+
+/**
+ * @brief Static initializer for priority_queue_node_t.
+ */
+#define PRIORITY_QUEUE_NODE_INIT { NULL, 0, 0 }
+
+/**
+ * @brief Static initializer for priority_queue_t.
+ */
+#define PRIORITY_QUEUE_INIT { NULL }
+
+/**
+ * @brief remove the priority queue's head
+ *
+ * @param[out]  root    the queue's root
+ *
+ * @return              the old head
+ */
+priority_queue_node_t *priority_queue_remove_head(priority_queue_t *root);
+
+/**
+ * @brief insert `new_obj` into `root` based on its priority
+ *
+ * @details
+ * The new object will be appended after objects with the same priority.
+ *
+ * @param[in,out]   root    the queue's root
+ * @param[in]       new_obj the object to prepend
+ */
+void priority_queue_add(priority_queue_t *root, priority_queue_node_t *new_obj);
+
+/**
+ * @brief remove `node` from `root`
+ *
+ * @param[in,out]   root    the priority queue's root
+ * @param[in]       node    the node to remove
+ */
+void priority_queue_remove(priority_queue_t *root, priority_queue_node_t *node);
+
+#if ENABLE_DEBUG
+void priority_queue_print(priority_queue_t *root);
+void priority_queue_print_node(priority_queue_t *root);
+#endif
+
+/** @} */
+#endif /* __QUEUE_H */

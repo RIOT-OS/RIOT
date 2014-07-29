@@ -15,5 +15,5 @@ void tests_core(void)
     TESTS_RUN(tests_core_cib_tests());
     TESTS_RUN(tests_core_clist_tests());
     TESTS_RUN(tests_core_lifo_tests());
-    TESTS_RUN(tests_core_queue_tests());
+    TESTS_RUN(tests_core_priority_queue_tests());
 }

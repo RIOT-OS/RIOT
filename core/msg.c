@@ -25,7 +25,7 @@
 #include "kernel.h"
 #include "sched.h"
 #include "msg.h"
-#include "queue.h"
+#include "priority_queue.h"
 #include "tcb.h"
 #include "irq.h"
 #include "cib.h"
@@ -93,13 +93,13 @@ int msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
         }
 
         DEBUG("msg_send: %s: send_blocked.\n", sched_active_thread->name);
-        queue_node_t n;
+        priority_queue_node_t n;
         n.priority = sched_active_thread->priority;
         n.data = (unsigned int) sched_active_thread;
         n.next = NULL;
         DEBUG("msg_send: %s: Adding node to msg_waiters:\n", sched_active_thread->name);
 
-        queue_priority_add(&(target->msg_waiters), &n);
+        priority_queue_add(&(target->msg_waiters), &n);
 
         sched_active_thread->wait_data = (void*) m;
 
@@ -262,7 +262,7 @@ static int _msg_receive(msg_t *m, int block)
         me->wait_data = (void *) m;
     }
 
-    queue_node_t *node = queue_remove_head(&(me->msg_waiters));
+    priority_queue_node_t *node = priority_queue_remove_head(&(me->msg_waiters));
 
     if (node == NULL) {
         DEBUG("_msg_receive: %s: _msg_receive(): No thread in waiting list.\n", sched_active_thread->name);

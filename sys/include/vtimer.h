@@ -21,7 +21,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "queue.h"
+#include "priority_queue.h"
 #include "timex.h"
 #include "msg.h"
 
@@ -35,7 +35,7 @@
  * \hideinitializer
  */
 typedef struct vtimer_t {
-    queue_node_t queue_entry;
+    priority_queue_node_t priority_queue_entry;
     timex_t absolute;
     void (*action)(struct vtimer_t *timer);
     void *arg;

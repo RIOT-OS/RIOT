@@ -21,7 +21,7 @@
 #define TCB_H_
 
 #include <stdint.h>
-#include "queue.h"
+#include "priority_queue.h"
 #include "clist.h"
 #include "cib.h"
 #include "msg.h"
@@ -65,7 +65,7 @@ typedef struct tcb_t {
     clist_node_t rq_entry;      /**< run queue entry                */
 
     void *wait_data;            /**< holding messages               */
-    queue_t msg_waiters;        /**< threads waiting on message     */
+    priority_queue_t msg_waiters;   /**< threads waiting on message     */
 
     cib_t msg_queue;            /**< message queue                  */
     msg_t *msg_array;           /**< memory holding messages        */

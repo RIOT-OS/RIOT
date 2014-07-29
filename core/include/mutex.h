@@ -21,7 +21,7 @@
 #ifndef __MUTEX_H_
 #define __MUTEX_H_
 
-#include "queue.h"
+#include "priority_queue.h"
 
 /**
  * @brief Mutex structure. Must never be modified by the user.
@@ -39,14 +39,14 @@ typedef struct mutex_t {
      *          by the user.**
      * @internal
      */
-    queue_t queue;
+    priority_queue_t queue;
 } mutex_t;
 
 /**
  * @brief Static initializer for mutex_t.
  * @details This initializer is preferable to mutex_init().
  */
-#define MUTEX_INIT { 0, QUEUE_INIT }
+#define MUTEX_INIT { 0, PRIORITY_QUEUE_INIT }
 
 /**
  * @brief Initializes a mutex object.

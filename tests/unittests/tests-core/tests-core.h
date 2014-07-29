@@ -61,11 +61,11 @@ Test *tests_core_clist_tests(void);
 Test *tests_core_lifo_tests(void);
 
 /**
- * @brief   Generates tests queue.h
+ * @brief   Generates tests priority_queue.h
  *
  * @return  embUnit tests if successful, NULL if not.
  */
-Test *tests_core_queue_tests(void);
+Test *tests_core_priority_queue_tests(void);
 
 #endif /* __TESTS_CORE_H_ */
 /** @} */

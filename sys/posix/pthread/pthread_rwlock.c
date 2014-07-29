@@ -80,7 +80,7 @@ bool __pthread_rwlock_blocked_readingly(const pthread_rwlock_t *rwlock)
         return false;
     }
 
-    queue_node_t *qnode = rwlock->queue.first;
+    priority_queue_node_t *qnode = rwlock->queue.first;
     if (qnode->priority > sched_active_thread->priority) {
         /* the waiting thread has a lower priority */
         return false;
@@ -130,7 +130,7 @@ static int pthread_rwlock_lock(pthread_rwlock_t *rwlock,
             },
             .continue_ = false,
         };
-        queue_priority_add(&rwlock->queue, &waiting_node.qnode);
+        priority_queue_add(&rwlock->queue, &waiting_node.qnode);
 
         while (1) {
             /* wait to be unlocked, so this thread can try to acquire the lock again */
@@ -146,7 +146,7 @@ static int pthread_rwlock_lock(pthread_rwlock_t *rwlock,
             else if (allow_spurious) {
                 DEBUG("Thread %" PRIkernel_pid ": pthread_rwlock_%s(): is_writer=%u, allow_spurious=%u %s\n",
                       thread_pid, "lock", is_writer, allow_spurious, "is timed out");
-                queue_remove(&rwlock->queue, &waiting_node.qnode);
+                priority_queue_remove(&rwlock->queue, &waiting_node.qnode);
                 mutex_unlock(&rwlock->mutex);
                 return ETIMEDOUT;
             }
@@ -272,7 +272,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
     }
 
     /* wake up the next thread */
-    queue_node_t *qnode = queue_remove_head(&rwlock->queue);
+    priority_queue_node_t *qnode = priority_queue_remove_head(&rwlock->queue);
     __pthread_rwlock_waiter_node_t *waiting_node = (__pthread_rwlock_waiter_node_t *) qnode->data;
     waiting_node->continue_ = true;
     uint16_t prio = qnode->priority;
@@ -302,7 +302,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
                   thread_pid, "unlock", "reader", waiting_node->thread->pid);
 
             /* wake up this reader */
-            qnode = queue_remove_head(&rwlock->queue);
+            qnode = priority_queue_remove_head(&rwlock->queue);
             if (qnode->priority < prio) {
                 prio = qnode->priority;
             }
