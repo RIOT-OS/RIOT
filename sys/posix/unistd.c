@@ -14,9 +14,12 @@
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
 #include <errno.h>
+#include <unistd.h>
 
 #include "fd.h"
-#include "unistd.h"
+
+#include "timex.h"
+#include "vtimer.h"
 
 int close(int fildes)
 {
