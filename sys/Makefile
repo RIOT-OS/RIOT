@@ -40,6 +40,9 @@ endif
 ifneq (,$(filter vtimer,$(USEMODULE)))
     DIRS += vtimer
 endif
+ifneq (,$(filter gtimer,$(USEMODULE)))
+    DIRS += gtimer
+endif
 ifneq (,$(filter net_if,$(USEMODULE)))
     DIRS += net/link_layer/net_if
 endif
@@ -66,6 +69,9 @@ ifneq (,$(filter routing,$(USEMODULE)))
 endif
 ifneq (,$(filter ieee802154,$(USEMODULE)))
     DIRS += net/link_layer/ieee802154
+endif
+ifneq (,$(filter gtsp,$(USEMODULE)))
+    DIRS += net/clocksync/gtsp
 endif
 ifneq (,$(filter bloom,$(USEMODULE)))
     DIRS += bloom
