@@ -32,6 +32,10 @@
 #include "clocksync/ftsp.h"
 #define REFRESHTIMESTAMP ftsp_driver_timestamp
 #endif
+#ifdef MODULE_PULSESYNC
+#include "clocksync/pulsesync.h"
+#define REFRESHTIMESTAMP pulsesync_driver_timestamp
+#endif
 
 int8_t cc110x_send(cc110x_packet_t *packet)
 {
