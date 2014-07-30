@@ -29,6 +29,7 @@
 #include "radio/radio.h"
 #include "net_if.h"
 #include "sixlowpan/mac.h"
+#include "sixlowpan/dispatch_values.h"
 
 #include "ip.h"
 #include "icmp.h"
@@ -41,6 +42,13 @@
 #define DEBUG_ENABLED
 #endif
 #include "debug.h"
+
+#ifdef MODULE_GTSP
+#include "clocksync/gtsp.h"
+#endif
+#ifdef MODULE_FTSP
+#include "clocksync/ftsp.h"
+#endif
 
 #define RADIO_STACK_SIZE            (KERNEL_CONF_STACKSIZE_MAIN)
 #define RADIO_RCV_BUF_SIZE          (64)
@@ -152,11 +160,26 @@ static void *recv_ieee802154_frame(void *arg)
                 DEBUG("Unknown IEEE 802.15.4 destination address mode.\n");
                 continue;
             }
-
-            /* deliver packet to network(6lowpan)-layer */
-            lowpan_read(frame.payload, length, &src, &dst);
-            /* TODO: get interface ID somehow */
-
+            uint8_t dispatch_header = frame.payload[0];
+            if((dispatch_header >> 6) & VALID_LOWPAN_DISPATCH_HEADER) {
+                /* deliver packet to network(6lowpan)-layer */
+                lowpan_read(frame.payload, length, &src, &dst);
+                /* TODO: get interface ID somehow */
+            }
+#ifdef MODULE_GTSP
+            else if(dispatch_header == GTSP_PROTOCOL_DISPATCH) {
+                DEBUG("gtsp packet received");
+                gtimer_timeval_t gtimer_toa = p->toa;
+                gtsp_mac_read(frame.payload, p->src, &gtimer_toa);
+            }
+#endif
+#ifdef MODULE_FTSP
+            else if(dispatch_header == FTSP_PROTOCOL_DISPATCH) {
+                DEBUG("ftsp packet received");
+                gtimer_timeval_t gtimer_toa = p->toa;
+                ftsp_mac_read(frame.payload, p->src, &gtimer_toa);
+            }
+#endif
             p->processing--;
         }
         else if (m.type == ENOBUFFER) {

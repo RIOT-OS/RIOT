@@ -23,6 +23,16 @@
 
 #include "irq.h"
 
+#undef REFRESHTIMESTAMP
+#ifdef MODULE_GTSP
+#include "clocksync/gtsp.h"
+#define REFRESHTIMESTAMP gtsp_driver_timestamp
+#endif
+#ifdef MODULE_FTSP
+#include "clocksync/ftsp.h"
+#define REFRESHTIMESTAMP ftsp_driver_timestamp
+#endif
+
 int8_t cc110x_send(cc110x_packet_t *packet)
 {
     volatile uint32_t abort_count;
@@ -55,6 +65,9 @@ int8_t cc110x_send(cc110x_packet_t *packet)
     cc110x_strobe(CC1100_SIDLE);
     /* Flush TX FIFO to be sure it is empty */
     cc110x_strobe(CC1100_SFTX);
+#ifdef REFRESHTIMESTAMP
+    REFRESHTIMESTAMP(packet->data, packet->length - CC1100_HEADER_LENGTH);
+#endif
     /* Write packet into TX FIFO */
     cc110x_writeburst_reg(CC1100_TXFIFO, (char *) packet, size);
     /* Switch to TX mode */

@@ -99,6 +99,9 @@ cc110x_packet_t;
 typedef struct {
     uint8_t rssi;
     uint8_t lqi;
+#ifdef MODULE_GTIMER
+    gtimer_timeval_t toa;
+#endif
     cc110x_packet_t packet;
 } rx_buffer_t;
 
