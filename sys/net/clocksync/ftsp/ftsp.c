@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014  Philipp Rosenkranz.
+ * Copyright (C) 2014  Philipp Rosenkranz, Daniel Jentsch.
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -25,21 +25,23 @@
 #include "mutex.h"
 #include "ieee802154_frame.h"
 #include "sixlowpan/mac.h"
+#include "sixlowpan/dispatch_values.h"
 #include "random.h"
+#include "transceiver.h"
 
 #include "clocksync/ftsp.h"
 #include "gtimer.h"
-#include "nalp_protocols.h"
-#include "generic_ringbuffer.h"
-#include "x64toa.h"
+//#include "x64toa.h"
 
 #ifdef MODULE_CC110X_NG
-#include "cc110x_ng.h"
-#define _TC_TYPE            TRANSCEIVER_CC1100
+#define FTSP_CALIBRATION_OFFSET ((uint32_t) 2300)
 
 #elif MODULE_NATIVENET
-#include "nativenet.h"
-#define _TC_TYPE            TRANSCEIVER_NATIVE
+#define FTSP_CALIBRATION_OFFSET ((uint32_t) 1500)
+
+#else
+#warning "Transceiver not supported by FTSP!"
+#define FTSP_CALIBRATION_OFFSET ((uint32_t) 0) // unknown delay
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -48,25 +50,29 @@
 #endif
 #include <debug.h>
 
+// Protocol parameters
+#define FTSP_PREFERRED_ROOT (1) // node with id==1 will become root
+#define FTSP_BEACON_INTERVAL (5 * 1000 * 1000) // in us
+
+
 #define FTSP_BEACON_STACK_SIZE (KERNEL_CONF_STACKSIZE_PRINTF_FLOAT)
 #define FTSP_CYCLIC_STACK_SIZE (KERNEL_CONF_STACKSIZE_PRINTF_FLOAT)
 #define FTSP_BEACON_BUFFER_SIZE (64)
 
-#define FTSP_PREFERRED_ROOT (1) // node with id==1 will become root if possible
-//#define FTSP_ROOT_TIMEOUT (UINT32_MAX)
-#define FTSP_BEACON_INTERVAL (5 * 1000 * 1000) // in ms
-static void _ftsp_beacon_thread(void);
-static void _ftsp_cyclic_driver_thread(void);
-static void _ftsp_send_beacon(void);
+// threads
+static void *beacon_thread(void *arg);
+static void *cyclic_driver_thread(void *arg);
 
-static int _ftsp_beacon_pid = 0;
-static int _ftsp_clock_pid = 0;
-static uint32_t _ftsp_beacon_interval = FTSP_BEACON_INTERVAL;
-static uint32_t _ftsp_prop_time = 0;
-static bool _ftsp_pause = true;
+static void send_beacon(void);
 
-static uint16_t _ftsp_root_id = UINT16_MAX;
-static uint16_t _ftsp_id = 0;
+static int beacon_pid = 0;
+static int cyclic_driver_pid = 0;
+static uint32_t beacon_interval = FTSP_BEACON_INTERVAL;
+static uint32_t transmission_delay = FTSP_CALIBRATION_OFFSET;
+static bool pause_protocol = true;
+
+static uint16_t root_id = UINT16_MAX;
+static uint16_t node_id = 0;
 
 char ftsp_beacon_stack[FTSP_BEACON_STACK_SIZE];
 char ftsp_cyclic_stack[FTSP_CYCLIC_STACK_SIZE];
@@ -85,9 +91,11 @@ static void clear_table(void);
 static void add_new_entry(ftsp_beacon_t *beacon, gtimer_timeval_t *toa);
 static void calculate_conversion(void);
 static uint16_t get_transceiver_addr(void);
+/*
 #ifdef DEBUG_ENABLED
 static void print_beacon(ftsp_beacon_t *beacon);
 #endif
+*/
 
 mutex_t ftsp_mutex;
 
@@ -102,13 +110,13 @@ void ftsp_init(void)
     heart_beats = 0;
     num_errors = 0;
 
-    _ftsp_beacon_pid = thread_create(ftsp_beacon_stack, FTSP_BEACON_STACK_SIZE,
-    PRIORITY_MAIN - 2, CREATE_STACKTEST, _ftsp_beacon_thread, "ftsp_beacon");
+    beacon_pid = thread_create(ftsp_beacon_stack, FTSP_BEACON_STACK_SIZE,
+    PRIORITY_MAIN - 2, CREATE_STACKTEST, beacon_thread, NULL, "ftsp_beacon");
 
     puts("FTSP initialized");
 }
 
-static void _ftsp_beacon_thread(void)
+static void *beacon_thread(void *arg)
 {
     while (1)
     {
@@ -116,41 +124,43 @@ static void _ftsp_beacon_thread(void)
         DEBUG("_ftsp_beacon_thread locking mutex\n");
         mutex_lock(&ftsp_mutex);
         memset(ftsp_beacon_buffer, 0, sizeof(ftsp_beacon_t));
-        if (!_ftsp_pause)
+        if (!pause_protocol)
         {
-            _ftsp_send_beacon();
+            send_beacon();
         }
         mutex_unlock(&ftsp_mutex);
         DEBUG("_ftsp_beacon_thread: mutex unlocked\n");
     }
+    return NULL;
 }
 
-static void _ftsp_cyclic_driver_thread(void)
+static void *cyclic_driver_thread(void *arg)
 {
-    genrand_init((uint32_t) _ftsp_id);
+    genrand_init((uint32_t) node_id);
     uint32_t random_wait = (100 + genrand_uint32() % FTSP_BEACON_INTERVAL);
     vtimer_usleep(random_wait);
 
     while (1)
     {
-        vtimer_usleep(_ftsp_beacon_interval);
-        if (!_ftsp_pause)
+        vtimer_usleep(beacon_interval);
+        if (!pause_protocol)
         {
             DEBUG("_ftsp_cyclic_driver_thread: waking sending thread up");
-            thread_wakeup(_ftsp_beacon_pid);
+            thread_wakeup(beacon_pid);
         }
     }
+    return NULL;
 }
 
-static void _ftsp_send_beacon(void)
+static void send_beacon(void)
 {
     DEBUG("_ftsp_send_beacon\n");
     gtimer_timeval_t now;
     ftsp_beacon_t *ftsp_beacon = (ftsp_beacon_t *) ftsp_beacon_buffer;
     gtimer_sync_now(&now);
-    if ((_ftsp_root_id != 0xFFFF))
+    if ((root_id != 0xFFFF))
     {
-        if (_ftsp_root_id == _ftsp_id)
+        if (root_id == node_id)
         {
             if ((long) (now.local - local_average) >= 0x20000000)
             {
@@ -170,7 +180,7 @@ static void _ftsp_send_beacon(void)
         //          }
         //      }
 
-        if ((num_entries < FTSP_ENTRY_SEND_LIMIT) && (_ftsp_root_id != _ftsp_id))
+        if ((num_entries < FTSP_ENTRY_SEND_LIMIT) && (root_id != node_id))
         {
             ++heart_beats;
         }
@@ -178,22 +188,24 @@ static void _ftsp_send_beacon(void)
         {
             gtimer_sync_now(&now);
             ftsp_beacon->dispatch_marker = FTSP_PROTOCOL_DISPATCH;
-            ftsp_beacon->id = _ftsp_id;
+            ftsp_beacon->id = node_id;
             // TODO: do we need to add the transmission delay to the offset?
             ftsp_beacon->offset = (int64_t) now.global - (int64_t) now.local;
-            ftsp_beacon->local = now.local + _ftsp_prop_time;
+            ftsp_beacon->local = now.local + transmission_delay;
             ftsp_beacon->relative_rate = now.rate;
-            ftsp_beacon->root = _ftsp_root_id;
+            ftsp_beacon->root = root_id;
             ftsp_beacon->seq_number = seq_num;
 #ifdef DEBUG_ENABLED
+            /*
             print_beacon(ftsp_beacon);
+            */
 #endif
             sixlowpan_mac_send_ieee802154_frame(0, NULL, 8, ftsp_beacon_buffer,
                     sizeof(ftsp_beacon_t), 1);
 
             ++heart_beats;
 
-            if (_ftsp_root_id == _ftsp_id)
+            if (root_id == node_id)
                 ++seq_num;
         }
     }
@@ -203,7 +215,7 @@ void ftsp_mac_read(uint8_t *frame_payload, uint16_t src, gtimer_timeval_t *toa)
 {
     DEBUG("ftsp_mac_read");
     mutex_lock(&ftsp_mutex);
-    if (_ftsp_pause)
+    if (pause_protocol)
     {
         mutex_unlock(&ftsp_mutex);
         return;
@@ -211,15 +223,15 @@ void ftsp_mac_read(uint8_t *frame_payload, uint16_t src, gtimer_timeval_t *toa)
 
     ftsp_beacon_t *beacon = (ftsp_beacon_t *) frame_payload;
 
-    if ((beacon->root < _ftsp_root_id)
-            && !((heart_beats < FTSP_IGNORE_ROOT_MSG) && (_ftsp_root_id == _ftsp_id)))
+    if ((beacon->root < root_id)
+            && !((heart_beats < FTSP_IGNORE_ROOT_MSG) && (root_id == node_id)))
     {
-        _ftsp_root_id = beacon->root;
+        root_id = beacon->root;
         seq_num = beacon->seq_number;
     }
     else
     {
-        if ((_ftsp_root_id == beacon->root)
+        if ((root_id == beacon->root)
                 && ((int8_t) (beacon->seq_number - seq_num) > 0))
         {
             seq_num = beacon->seq_number;
@@ -233,7 +245,7 @@ void ftsp_mac_read(uint8_t *frame_payload, uint16_t src, gtimer_timeval_t *toa)
         }
     }
 
-    if (_ftsp_root_id < _ftsp_id)
+    if (root_id < node_id)
         heart_beats = 0;
 
     add_new_entry(beacon, toa);
@@ -260,31 +272,31 @@ void ftsp_mac_read(uint8_t *frame_payload, uint16_t src, gtimer_timeval_t *toa)
 
 void ftsp_set_beacon_delay(uint32_t delay_in_sec)
 {
-    _ftsp_beacon_interval = delay_in_sec * 1000 * 1000;
+    beacon_interval = delay_in_sec * 1000 * 1000;
 }
 
 void ftsp_set_prop_time(uint32_t us)
 {
-    _ftsp_prop_time = us;
+    transmission_delay = us;
 }
 
 void ftsp_pause(void)
 {
-    _ftsp_pause = true;
+    pause_protocol = true;
     DEBUG("FTSP disabled");
 }
 
 void ftsp_resume(void)
 {
-    _ftsp_id = get_transceiver_addr();
-    if (_ftsp_id == FTSP_PREFERRED_ROOT)
+    node_id = get_transceiver_addr();
+    if (node_id == FTSP_PREFERRED_ROOT)
     {
         //_ftsp_root_timeout = 0;
-        _ftsp_root_id = _ftsp_id;
+        root_id = node_id;
     }
     else
     {
-        _ftsp_root_id = 0xFFFF;
+        root_id = 0xFFFF;
     }
     skew = 0.0;
     local_average = 0;
@@ -293,13 +305,13 @@ void ftsp_resume(void)
     heart_beats = 0;
     num_errors = 0;
 
-    _ftsp_pause = false;
-    if (_ftsp_clock_pid == 0)
+    pause_protocol = false;
+    if (cyclic_driver_pid == 0)
     {
-        _ftsp_clock_pid = thread_create(ftsp_cyclic_stack,
+        cyclic_driver_pid = thread_create(ftsp_cyclic_stack,
         FTSP_CYCLIC_STACK_SIZE,
         PRIORITY_MAIN - 2,
-        CREATE_STACKTEST, _ftsp_cyclic_driver_thread, "ftsp_cyclic_driver");
+        CREATE_STACKTEST, cyclic_driver_thread, NULL, "ftsp_cyclic_driver");
     }
 
     DEBUG("FTSP enabled");
@@ -316,7 +328,7 @@ void ftsp_driver_timestamp(uint8_t *ieee802154_frame, uint8_t frame_length)
                 frame_length);
         ftsp_beacon_t *beacon = (ftsp_beacon_t *) frame.payload;
         gtimer_sync_now(&now);
-        beacon->local = now.local + _ftsp_prop_time;
+        beacon->local = now.local + transmission_delay;
         beacon->offset = (int64_t) now.global - (int64_t) now.local;
         beacon->relative_rate = now.rate;
         memcpy(ieee802154_frame + hdrlen, beacon, sizeof(ftsp_beacon_t));
@@ -326,7 +338,7 @@ void ftsp_driver_timestamp(uint8_t *ieee802154_frame, uint8_t frame_length)
 
 int ftsp_is_synced(void)
 {
-    if ((num_entries >= FTSP_ENTRY_VALID_LIMIT) || (_ftsp_root_id == _ftsp_id))
+    if ((num_entries >= FTSP_ENTRY_VALID_LIMIT) || (root_id == node_id))
         return FTSP_OK;
     else
         return FTSP_ERR;
@@ -396,10 +408,12 @@ static void add_new_entry(ftsp_beacon_t *beacon, gtimer_timeval_t *toa)
     time_error = (int64_t) (beacon->local + beacon->offset - toa->global);
     if (ftsp_is_synced() == FTSP_OK)
     {
+        /*
 #ifdef DEBUG_ENABLED
         char buf[60];
         DEBUG("FTSP synced, error %s\n", l2s(time_error, X64LL_SIGNED, buf));
 #endif
+    */
         if ((time_error > FTSP_ENTRY_THROWOUT_LIMIT)
                 || (-time_error > FTSP_ENTRY_THROWOUT_LIMIT))
         {
@@ -459,6 +473,7 @@ static void clear_table(void)
 }
 
 #ifdef DEBUG_ENABLED
+/*
 static void print_beacon(ftsp_beacon_t *beacon)
 {
     char buf[66];
@@ -471,7 +486,9 @@ static void print_beacon(ftsp_beacon_t *beacon)
     printf("\t relative_rate: %"PRId32"\n----\n",
             (int32_t) (beacon->relative_rate * 1000 * 1000 * 1000));
 }
+*/
 #endif /* DEBUG_ENABLED */
+
 
 static uint16_t get_transceiver_addr(void)
 {
@@ -485,7 +502,7 @@ static uint16_t get_transceiver_addr(void)
         return 1;
     }
 
-    tcmd.transceivers = _TC_TYPE;
+    tcmd.transceivers = TRANSCEIVER_DEFAULT;
     tcmd.data = &a;
     mesg.content.ptr = (char *) &tcmd;
     mesg.type = GET_ADDRESS;

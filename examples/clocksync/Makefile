@@ -56,7 +56,7 @@ ifneq (,$(filter avsextrem,$(BOARD)))
 	USEMODULE += rtc
 	USEMODULE += config
 	USEMODULE += random
-	USEMODULE += gtsp
+	USEMODULE += ftsp
 endif
 ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += ltc4150
