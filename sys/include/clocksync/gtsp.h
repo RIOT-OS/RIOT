@@ -12,7 +12,7 @@
  * @defgroup gtsp    GTSP - Gradient Time Synchronisation Protocol.
  * @ingroup  net
  * @brief    The Gradient Clock Synchronization Protocol is a decentralized clock
- *           synchronization protocol which tries to synchronizes not only the
+ *           synchronization protocol which tries to synchronize not only the
  *           clock values but also the clock rate of all nodes in a network.
  * @see      <a href="http://www.disco.ethz.ch/publications/ipsn09.pdf">
  *              Sommer et.al.: Gradient Clock Synchronization in Wireless Sensor Networks
@@ -21,6 +21,7 @@
  * @file     gtsp.h
  * @brief    Declarations for the Gradient Clock Synchronization Protocol.
  * @author   Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
+ * @author   Daniel Jentsch <d.jentsch@fu-berlin.de>
  * @}
  */
 #ifndef __GTSP_H
@@ -85,7 +86,7 @@ void gtsp_resume(void);
 void gtsp_mac_read(uint8_t *frame_payload, uint16_t src, gtimer_timeval_t *toa);
 
 /**
- * @brief Refreshes the timestamp in a frame.
+ * @brief Refreshes the timestamp in a ieee802.15.4 frame.
  * This function is executed shortly before transmitting a packet.
  * The function should only be executed by a transceiver driver.
  */

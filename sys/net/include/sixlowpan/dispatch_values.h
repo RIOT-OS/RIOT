@@ -1,7 +1,7 @@
-#ifndef NALP_PROTOCOLS_H_
-#define NALP_PROTOCOLS_H_
+#ifndef __DISPATCH_VALUES_H
+#define __DISPATCH_VALUES_H
 
-// identifies a sixlowpan packet
+// identifies a valid sixlowpan packet (mask for the MSB)
 #define VALID_LOWPAN_DISPATCH_HEADER (0x3)
 
 // identifies a clocksync evaluation beacon
@@ -20,4 +20,4 @@
 #define PULSESYNC_PROTOCOL_DISPATCH (0x23)
 
 
-#endif /* NALP_PROTOCOLS_H_ */
+#endif /* __DISPATCH_VALUES_H */
