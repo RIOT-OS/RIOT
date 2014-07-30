@@ -38,25 +38,24 @@ USEMODULE += ps
 USEMODULE += defaulttransceiver
 USEMODULE += auto_init
 USEMODULE += sixlowpan
-USEMODULE += gtsp
 
 ifneq (,$(filter msb-430,$(BOARD)))
 	USEMODULE += sht11
 endif
 ifneq (,$(filter msba2,$(BOARD)))
-	#USEMODULE += sht11
-	#USEMODULE += ltc4150
+	USEMODULE += sht11
+	USEMODULE += ltc4150
 	USEMODULE += rtc
-	#USEMODULE += mci
+	USEMODULE += mci
 	USEMODULE += config
 	USEMODULE += random
-	USEMODULE += gtsp
+	USEMODULE += ftsp
 endif
 ifneq (,$(filter avsextrem,$(BOARD)))
 	USEMODULE += rtc
 	USEMODULE += config
 	USEMODULE += random
-	USEMODULE += gtsp
+	USEMODULE += ftsp
 endif
 ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += ltc4150
@@ -64,7 +63,7 @@ ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += config
 	USEMODULE += nativenet
 	USEMODULE += random
-	USEMODULE += gtsp
+	USEMODULE += ftsp
 endif
 
 include $(RIOTBASE)/Makefile.include
