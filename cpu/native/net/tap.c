@@ -149,7 +149,7 @@ void _native_handle_tap_input(void)
 }
 
 #ifdef __MACH__
-void sigio_child()
+void sigio_child(void)
 {
     pid_t parent = _native_pid;
 

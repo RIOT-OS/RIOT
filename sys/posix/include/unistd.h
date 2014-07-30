@@ -52,9 +52,13 @@
 int close(int fildes);
 
 #ifndef __USECONDS_T_TYPE
+#ifndef __MACH__
 typedef unsigned long __USECONDS_T_TYPE;
-#endif
 typedef __USECONDS_T_TYPE __useconds_t;
+#else
+typedef __darwin_useconds_t __useconds_t;
+#endif
+#endif
 typedef __useconds_t useconds_t;
 
 /**
