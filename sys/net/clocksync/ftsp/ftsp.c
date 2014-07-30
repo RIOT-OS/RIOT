@@ -118,6 +118,7 @@ void ftsp_init(void)
 
 static void *beacon_thread(void *arg)
 {
+    (void) arg;
     while (1)
     {
         thread_sleep();
@@ -136,6 +137,7 @@ static void *beacon_thread(void *arg)
 
 static void *cyclic_driver_thread(void *arg)
 {
+    (void) arg;
     genrand_init((uint32_t) node_id);
     uint32_t random_wait = (100 + genrand_uint32() % FTSP_BEACON_INTERVAL);
     vtimer_usleep(random_wait);
@@ -213,6 +215,7 @@ static void send_beacon(void)
 
 void ftsp_mac_read(uint8_t *frame_payload, uint16_t src, gtimer_timeval_t *toa)
 {
+    (void) src;
     DEBUG("ftsp_mac_read");
     mutex_lock(&ftsp_mutex);
     if (pause_protocol)
