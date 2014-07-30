@@ -46,6 +46,9 @@ endif
 ifneq (,$(filter ftsp,$(USEMODULE)))
 	SRC += sc_ftsp.c
 endif
+ifneq (,$(filter pulsesync,$(USEMODULE)))
+	SRC += sc_pulsesync.c
+endif
 ifeq ($(CPU),x86)
 	SRC += sc_x86_lspci.c
 endif

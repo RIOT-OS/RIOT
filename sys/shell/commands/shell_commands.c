@@ -133,6 +133,10 @@ extern void _gtsp(int argc, char **argv);
 extern void _ftsp(int argc, char **argv);
 #endif
 
+#ifdef MODULE_PULSESYNC
+extern void _pulsesync(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -207,6 +211,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_FTSP
     { "ftsp", "Controls the FTSP clock sync protocol", _ftsp },
+#endif
+#ifdef MODULE_PULSESYNC
+    { "pulsesync", "Controls the PulseSync clock sync protocol", _pulsesync },
 #endif
 #ifdef CPU_X86
     {"lspci", "Lists PCI devices", _x86_lspci},
