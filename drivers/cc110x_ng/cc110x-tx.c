@@ -28,6 +28,10 @@
 #include "clocksync/gtsp.h"
 #define REFRESHTIMESTAMP gtsp_driver_timestamp
 #endif
+#ifdef MODULE_FTSP
+#include "clocksync/ftsp.h"
+#define REFRESHTIMESTAMP ftsp_driver_timestamp
+#endif
 
 int8_t cc110x_send(cc110x_packet_t *packet)
 {

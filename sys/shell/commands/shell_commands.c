@@ -129,6 +129,10 @@ extern void _mersenne_get(int argc, char **argv);
 extern void _gtsp(int argc, char **argv);
 #endif
 
+#ifdef MODULE_FTSP
+extern void _ftsp(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -200,6 +204,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_GTSP
     { "gtsp", "Controls the GTSP clock sync protocol", _gtsp },
+#endif
+#ifdef MODULE_FTSP
+    { "ftsp", "Controls the FTSP clock sync protocol", _ftsp },
 #endif
 #ifdef CPU_X86
     {"lspci", "Lists PCI devices", _x86_lspci},
