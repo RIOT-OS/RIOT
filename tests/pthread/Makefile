@@ -1,4 +1,4 @@
-APPLICATION = test_pthread
+APPLICATION = pthread
 include ../Makefile.tests_common
 
 USEMODULE += posix

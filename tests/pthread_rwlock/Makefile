@@ -1,4 +1,4 @@
-APPLICATION = test_pthread_rwlock
+APPLICATION = pthread_rwlock
 include ../Makefile.tests_common
 
 USEMODULE += pthread

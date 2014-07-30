@@ -1,4 +1,4 @@
-APPLICATION = test_condition_variable
+APPLICATION = condition_variable
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_RAM := stm32f0discovery

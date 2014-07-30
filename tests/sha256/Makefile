@@ -1,4 +1,4 @@
-APPLICATION = test_sha256
+APPLICATION = sha256
 include ../Makefile.tests_common
 
 USEMODULE += crypto

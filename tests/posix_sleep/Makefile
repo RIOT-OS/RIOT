@@ -1,4 +1,4 @@
-APPLICATION = test_posix_sleep
+APPLICATION = posix_sleep
 include ../Makefile.tests_common
 
 USEMODULE += posix

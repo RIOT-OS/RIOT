@@ -1,4 +1,4 @@
-APPLICATION = test_thread_msg
+APPLICATION = thread_msg
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_RAM := stm32f0discovery

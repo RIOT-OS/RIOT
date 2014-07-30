@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = test_pthread_barrier
+APPLICATION = pthread_barrier
 include ../Makefile.tests_common
 
 # exclude boards with insufficient RAM

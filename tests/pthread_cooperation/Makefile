@@ -1,4 +1,4 @@
-APPLICATION = test_pthread_cooperation
+APPLICATION = pthread_cooperation
 include ../Makefile.tests_common
 
 USEMODULE += posix

@@ -1,4 +1,4 @@
-APPLICATION = test_struct_tm_utility
+APPLICATION = struct_tm_utility
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_RAM := stm32f0discovery

@@ -1,4 +1,4 @@
-APPLICATION = test_pthread_cleanup
+APPLICATION = pthread_cleanup
 include ../Makefile.tests_common
 
 USEMODULE += pthread

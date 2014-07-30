@@ -1,4 +1,4 @@
-APPLICATION = test_disable_module
+APPLICATION = disable_module
 include ../Makefile.tests_common
 
 DISABLE_MODULE += auto_init
