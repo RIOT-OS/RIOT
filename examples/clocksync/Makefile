@@ -49,7 +49,7 @@ ifneq (,$(filter msba2,$(BOARD)))
 	USEMODULE += mci
 	USEMODULE += config
 	USEMODULE += random
-	USEMODULE += ftsp
+	USEMODULE += pulsesync
 endif
 ifneq (,$(filter avsextrem,$(BOARD)))
 	USEMODULE += rtc
@@ -63,7 +63,7 @@ ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += config
 	USEMODULE += nativenet
 	USEMODULE += random
-	USEMODULE += ftsp
+	USEMODULE += pulsesync
 endif
 
 include $(RIOTBASE)/Makefile.include
