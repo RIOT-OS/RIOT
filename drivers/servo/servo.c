@@ -39,7 +39,7 @@ int servo_set(servo_t *dev, unsigned int pos)
     if (pos > dev->max) {
         pos = dev->max;
     }
-    else (pos < dev->min) {
+    else if (pos < dev->min) {
         pos = dev->min;
     }
     return pwm_set(dev->device, dev->channel, pos);
