@@ -13,19 +13,19 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 *******************************************************************************/
 
 /**
- * @defgroup	sht11 SHT11
- * @ingroup		drivers
- * @brief		Driver for the Sensirion SHT11 humidity and temperature sensor
+ * @defgroup    sht11 SHT11
+ * @ingroup     drivers
+ * @brief       Driver for the Sensirion SHT11 humidity and temperature sensor
  * @{
  */
 
 /**
  * @file
- * @brief		SHT11 Device Driver
+ * @brief       SHT11 Device Driver
  *
  * @version     $Revision: 2396 $
  *
- * @note		$Id: sht11.c 2396 2010-07-06 15:12:35Z ziegert $
+ * @note        $Id: sht11.c 2396 2010-07-06 15:12:35Z ziegert $
  */
 
 #include <stdio.h>

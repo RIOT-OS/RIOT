@@ -14,14 +14,14 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 
 /**
  * @file
- * @ingroup		dev_cc110x
- * @brief		ScatterWeb MSB-A2 mac-layer
+ * @ingroup     dev_cc110x
+ * @brief       ScatterWeb MSB-A2 mac-layer
  *
- * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
- * @author		Heiko Will <hwill@inf.fu-berlin.de>
+ * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
+ * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 2128 $
  *
- * @note    	$Id: cc1100-csmaca-mac.c 2128 2010-05-12 12:07:59Z hillebra $
+ * @note        $Id: cc1100-csmaca-mac.c 2128 2010-05-12 12:07:59Z hillebra $
  */
 
 #include <stdio.h>
@@ -139,16 +139,16 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
         min_window_size *= 4;
     }
 
-    uint16_t windowSize = min_window_size;		/* Start with window size of PRIO_XXX_MIN_WINDOW_SIZE */
-    uint16_t backoff = 0;						/* Backoff between 1 and windowSize */
-    uint32_t total;								/* Holds the total wait time before send try */
-    uint32_t cs_timeout;						/* Current carrier sense timeout value */
+    uint16_t windowSize = min_window_size;      /* Start with window size of PRIO_XXX_MIN_WINDOW_SIZE */
+    uint16_t backoff = 0;                       /* Backoff between 1 and windowSize */
+    uint32_t total;                             /* Holds the total wait time before send try */
+    uint32_t cs_timeout;                        /* Current carrier sense timeout value */
 
     if (protocol == 0) {
-        return RADIO_INVALID_PARAM;				/* Not allowed, protocol id must be greater zero */
+        return RADIO_INVALID_PARAM;             /* Not allowed, protocol id must be greater zero */
     }
 
-    cc1100_phy_mutex_lock();					/* Lock radio for exclusive access */
+    cc1100_phy_mutex_lock();                    /* Lock radio for exclusive access */
 
     /* Get carrier sense timeout based on overall error rate till now */
     send_csmaca_calls++;
@@ -164,7 +164,7 @@ int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priorit
         cs_timeout = CARRIER_SENSE_TIMEOUT_MIN;
     }
 
-    cc1100_cs_init();							/* Initialize carrier sensing */
+    cc1100_cs_init();                           /* Initialize carrier sensing */
 
 window:
 
@@ -172,36 +172,36 @@ window:
         goto cycle;    /* If backoff was 0 */
     }
 
-    windowSize *= 2;						/* ...double the current window size */
+    windowSize *= 2;                        /* ...double the current window size */
 
     if (windowSize > max_window_size) {
-        windowSize = max_window_size;		/* This is the maximum size allowed */
+        windowSize = max_window_size;       /* This is the maximum size allowed */
     }
 
-    backoff = rand() % windowSize;			/* ...and choose new backoff */
+    backoff = rand() % windowSize;          /* ...and choose new backoff */
 
     backoff += (uint16_t) 1;
 cycle:
-    cs_timeout_flag = 0;					/* Carrier sense timeout flag */
-    cs_hwtimer_id = hwtimer_set(cs_timeout,	/* Set hwtimer to set CS timeout flag */
+    cs_timeout_flag = 0;                    /* Carrier sense timeout flag */
+    cs_hwtimer_id = hwtimer_set(cs_timeout, /* Set hwtimer to set CS timeout flag */
                                 cs_timeout_cb, NULL);
 
-    while (cc1100_cs_read()) {			/* Wait until air is free */
+    while (cc1100_cs_read()) {          /* Wait until air is free */
         if (cs_timeout_flag) {
             send_csmaca_calls_cs_timeout++;
 #ifndef CSMACA_MAC_AGGRESSIVE_MODE
             cc1100_phy_mutex_unlock();
-            cc1100_go_after_tx();			/* Go from RX to default mode */
-            return RADIO_CS_TIMEOUT;		/* Return immediately */
+            cc1100_go_after_tx();           /* Go from RX to default mode */
+            return RADIO_CS_TIMEOUT;        /* Return immediately */
 #endif
 #ifdef CSMACA_MAC_AGGRESSIVE_MODE
-            goto send;						/* Send anyway */
+            goto send;                      /* Send anyway */
 #endif
         }
     }
 
-    hwtimer_remove(cs_hwtimer_id);			/* Remove hwtimer */
-    cc1100_cs_write_cca(1);					/* Air is free now */
+    hwtimer_remove(cs_hwtimer_id);          /* Remove hwtimer */
+    cc1100_cs_write_cca(1);                 /* Air is free now */
     cc1100_cs_set_enabled(true);
 
     if (cc1100_cs_read()) {
@@ -213,18 +213,18 @@ cycle:
         backoff--;    /* Decrement backoff counter */
     }
 
-    total = slottime;						/* Calculate total wait time */
-    total *= (uint32_t)backoff;				/* Slot vector set */
-    total += difs;							/* ...and standard DIFS wait time */
-    cs_timeout_flag = 0;					/* Carrier sense timeout flag */
-    cs_hwtimer_id = hwtimer_set(total,		/* Set hwtimer to set CS timeout flag */
+    total = slottime;                       /* Calculate total wait time */
+    total *= (uint32_t)backoff;             /* Slot vector set */
+    total += difs;                          /* ...and standard DIFS wait time */
+    cs_timeout_flag = 0;                    /* Carrier sense timeout flag */
+    cs_hwtimer_id = hwtimer_set(total,      /* Set hwtimer to set CS timeout flag */
                                 cs_timeout_cb, NULL);
 
     while (!cs_timeout_flag
-          || !cc1100_cs_read_cca()) {	/* Wait until timeout is finished */
-        if (cc1100_cs_read_cca() == 0) {	/* Is the air still free? */
+          || !cc1100_cs_read_cca()) {   /* Wait until timeout is finished */
+        if (cc1100_cs_read_cca() == 0) {    /* Is the air still free? */
             hwtimer_remove(cs_hwtimer_id);
-            goto window;					/* No. Go back to new wait period. */
+            goto window;                    /* No. Go back to new wait period. */
         }
     }
 
