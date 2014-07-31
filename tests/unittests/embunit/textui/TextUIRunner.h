@@ -32,8 +32,8 @@
  *
  * $Id: TextUIRunner.h,v 1.3 2003/09/06 13:28:27 arms22 Exp $
  */
-#ifndef	__TEXTUIRUNNER_H__
-#define	__TEXTUIRUNNER_H__
+#ifndef __TEXTUIRUNNER_H__
+#define __TEXTUIRUNNER_H__
 
 #include "Outputter.h"
 

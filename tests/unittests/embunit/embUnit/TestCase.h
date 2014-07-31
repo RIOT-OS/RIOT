@@ -32,29 +32,29 @@
  *
  * $Id: TestCase.h,v 1.7 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef	__TESTCASE_H__
-#define	__TESTCASE_H__
+#ifndef __TESTCASE_H__
+#define __TESTCASE_H__
 
-typedef struct __TestCase	TestCase;
-typedef struct __TestCase*	TestCaseRef;/*compatible embUnit1.0*/
+typedef struct __TestCase   TestCase;
+typedef struct __TestCase*  TestCaseRef;/*compatible embUnit1.0*/
 
 struct __TestCase {
-	TestImplement* isa;
-	char *name;
-	void(*setUp)(void);
-	void(*tearDown)(void);
-	void(*runTest)(void);
+    TestImplement* isa;
+    char *name;
+    void(*setUp)(void);
+    void(*tearDown)(void);
+    void(*runTest)(void);
 };
 
 extern const TestImplement TestCaseImplement;
 
 #define new_TestCase(name,setUp,tearDown,runTest)\
-	{\
-		(TestImplement*)&TestCaseImplement,\
-		name,\
-		setUp,\
-		tearDown,\
-		runTest,\
-	}
+    {\
+        (TestImplement*)&TestCaseImplement,\
+        name,\
+        setUp,\
+        tearDown,\
+        runTest,\
+    }
 
 #endif/*__TESTCASE_H__*/

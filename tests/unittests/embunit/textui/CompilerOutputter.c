@@ -64,7 +64,7 @@ static void CompilerOutputter_printFailure(OutputterRef self,TestRef test,char *
 {
     (void)self;
     (void)runCount;
-	fprintf(stdout,"%s %d: %s: %s\n", file, line, Test_name(test), msg);
+    fprintf(stdout,"%s %d: %s: %s\n", file, line, Test_name(test), msg);
 }
 
 static void CompilerOutputter_printStatistics(OutputterRef self,TestResultRef result)
@@ -74,19 +74,19 @@ static void CompilerOutputter_printStatistics(OutputterRef self,TestResultRef re
 }
 
 static const OutputterImplement CompilerOutputterImplement = {
-	(OutputterPrintHeaderFunction)		CompilerOutputter_printHeader,
-	(OutputterPrintStartTestFunction)	CompilerOutputter_printStartTest,
-	(OutputterPrintEndTestFunction)		CompilerOutputter_printEndTest,
-	(OutputterPrintSuccessfulFunction)	CompilerOutputter_printSuccessful,
-	(OutputterPrintFailureFunction)		CompilerOutputter_printFailure,
-	(OutputterPrintStatisticsFunction)	CompilerOutputter_printStatistics,
+    (OutputterPrintHeaderFunction)      CompilerOutputter_printHeader,
+    (OutputterPrintStartTestFunction)   CompilerOutputter_printStartTest,
+    (OutputterPrintEndTestFunction)     CompilerOutputter_printEndTest,
+    (OutputterPrintSuccessfulFunction)  CompilerOutputter_printSuccessful,
+    (OutputterPrintFailureFunction)     CompilerOutputter_printFailure,
+    (OutputterPrintStatisticsFunction)  CompilerOutputter_printStatistics,
 };
 
 static const Outputter CompilerOutputter = {
-	(OutputterImplementRef)&CompilerOutputterImplement,
+    (OutputterImplementRef)&CompilerOutputterImplement,
 };
 
 OutputterRef CompilerOutputter_outputter(void)
 {
-	return (OutputterRef)&CompilerOutputter;
+    return (OutputterRef)&CompilerOutputter;
 }

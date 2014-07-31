@@ -32,25 +32,25 @@
  *
  * $Id: RepeatedTest.h,v 1.7 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef	__REPEATEDTEST_H__
-#define	__REPEATEDTEST_H__
+#ifndef __REPEATEDTEST_H__
+#define __REPEATEDTEST_H__
 
-typedef struct __RepeatedTest	RepeatedTest;
-typedef struct __RepeatedTest*	RepeatedTestRef;	/*downward compatible*/
+typedef struct __RepeatedTest   RepeatedTest;
+typedef struct __RepeatedTest*  RepeatedTestRef;    /*downward compatible*/
 
 struct __RepeatedTest {
-	TestImplement* isa;
-	Test* test;
-	int timesRepeat;
+    TestImplement* isa;
+    Test* test;
+    int timesRepeat;
 };
 
 extern const TestImplement RepeatedTestImplement;
 
-#define	new_RepeatedTest(test,tmrp)\
-	{\
-		(TestImplement*)&RepeatedTestImplement,\
-		(Test*)test,\
-		tmrp,\
-	}
+#define new_RepeatedTest(test,tmrp)\
+    {\
+        (TestImplement*)&RepeatedTestImplement,\
+        (Test*)test,\
+        tmrp,\
+    }
 
 #endif/*__REPEATEDTEST_H__*/

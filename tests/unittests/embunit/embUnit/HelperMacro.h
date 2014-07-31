@@ -32,28 +32,28 @@
  *
  * $Id: HelperMacro.h,v 1.3 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef	__HELPERMACRO_H__
-#define	__HELPERMACRO_H__
+#ifndef __HELPERMACRO_H__
+#define __HELPERMACRO_H__
 
 #define EMB_UNIT_TESTCASE(ca,sup,tdw,run) \
-	static const TestCase	ca = new_TestCase(#ca,sup,tdw,run)
+    static const TestCase   ca = new_TestCase(#ca,sup,tdw,run)
 
 #define EMB_UNIT_TESTSUITE(su,array) \
-	static const TestSuite	su = new_TestSuite(#su,(Test**)array,sizeof(array)/sizeof(array[0]))
+    static const TestSuite  su = new_TestSuite(#su,(Test**)array,sizeof(array)/sizeof(array[0]))
 
 #define EMB_UNIT_TESTREFS(tests) \
-	static Test* const tests[] =
+    static Test* const tests[] =
 
 #define EMB_UNIT_ADD_TESTREF(testref) \
-				(Test*)	testref
+                (Test*) testref
 
 #define EMB_UNIT_TESTCALLER(caller,sup,tdw,fixtures) \
-	static const TestCaller caller = new_TestCaller(#caller,sup,tdw,sizeof(fixtures)/sizeof(fixtures[0]),(TestFixture*)fixtures)
+    static const TestCaller caller = new_TestCaller(#caller,sup,tdw,sizeof(fixtures)/sizeof(fixtures[0]),(TestFixture*)fixtures)
 
 #define EMB_UNIT_TESTFIXTURES(fixtures) \
-	static const TestFixture	fixtures[] =
+    static const TestFixture    fixtures[] =
 
 #define EMB_UNIT_REPEATEDTEST(repeater,test,tmrp) \
-	static const RepeatedTest	repeater = new_RepeatedTest(test,tmrp)
+    static const RepeatedTest   repeater = new_RepeatedTest(test,tmrp)
 
 #endif/*__HELPERMACRO_H__*/

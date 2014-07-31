@@ -32,27 +32,27 @@
  *
  * $Id: TestSuite.h,v 1.7 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef	__TESTSUITE_H__
-#define	__TESTSUITE_H__
+#ifndef __TESTSUITE_H__
+#define __TESTSUITE_H__
 
-typedef struct __TestSuite	TestSuite;
-typedef struct __TestSuite*	TestSuiteRef;/*downward compatible*/
+typedef struct __TestSuite  TestSuite;
+typedef struct __TestSuite* TestSuiteRef;/*downward compatible*/
 
 struct __TestSuite {
-	TestImplement* isa;
-	char *name;
-	int numberOfTests;
-	Test** tests;
+    TestImplement* isa;
+    char *name;
+    int numberOfTests;
+    Test** tests;
 };
 
 extern const TestImplement TestSuiteImplement;
 
 #define new_TestSuite(name,tests,numberOfTests)\
-	{\
-		(TestImplement*)&TestSuiteImplement,\
-		name,\
-		numberOfTests,\
-		tests,\
-	}
+    {\
+        (TestImplement*)&TestSuiteImplement,\
+        name,\
+        numberOfTests,\
+        tests,\
+    }
 
 #endif/*__TESTSUITE_H__*/

@@ -41,43 +41,43 @@ static TestCase* self_;
 
 char* TestCase_name(TestCase* self)
 {
-	return self->name;
+    return self->name;
 }
 
 void TestCase_run(TestCase* self,TestResult* result)
 {
-	TestResult_startTest(result, (Test*)self);
-	if (self->setUp) {
-		self->setUp();
-	}
-	if (self->runTest) {
-		TestResult* wr =result_;	/*push*/
-		TestCase* ws = self_;	/*push*/
-		result_ = result;
-		self_ = self;
-		self->runTest();
-		result_ = wr;	/*pop*/
-		self_ = ws;	/*pop*/
-	}
-	if (self->tearDown) {
-		self->tearDown();
-	}
-	TestResult_endTest(result, (Test*)self);
+    TestResult_startTest(result, (Test*)self);
+    if (self->setUp) {
+        self->setUp();
+    }
+    if (self->runTest) {
+        TestResult* wr =result_;    /*push*/
+        TestCase* ws = self_;   /*push*/
+        result_ = result;
+        self_ = self;
+        self->runTest();
+        result_ = wr;   /*pop*/
+        self_ = ws; /*pop*/
+    }
+    if (self->tearDown) {
+        self->tearDown();
+    }
+    TestResult_endTest(result, (Test*)self);
 }
 
 int TestCase_countTestCases(TestCase* self)
 {
     (void)self;
-	return 1;
+    return 1;
 }
 
 const TestImplement TestCaseImplement = {
-	(TestNameFunction)			TestCase_name,
-	(TestRunFunction)			TestCase_run,
-	(TestCountTestCasesFunction)TestCase_countTestCases,
+    (TestNameFunction)          TestCase_name,
+    (TestRunFunction)           TestCase_run,
+    (TestCountTestCasesFunction)TestCase_countTestCases,
 };
 
 void addFailure(const char *msg, long line, const char *file)
 {
-	TestResult_addFailure(result_, (Test*)self_, (char*)msg, line, (char*)file);
+    TestResult_addFailure(result_, (Test*)self_, (char*)msg, line, (char*)file);
 }

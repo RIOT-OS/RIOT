@@ -32,15 +32,15 @@
  *
  * $Id: stdImpl.h,v 1.4 2004/02/10 16:15:25 arms22 Exp $
  */
-#ifndef	__STDIMPL_H__
-#define	__STDIMPL_H__
+#ifndef __STDIMPL_H__
+#define __STDIMPL_H__
 
-#ifdef	__cplusplus
+#ifdef  __cplusplus
 extern "C" {
 #endif
 
 #ifndef NULL
-#define	NULL	0
+#define NULL    0
 #endif
 
 char* stdimpl_strcpy(char *s1, const char *s2);
@@ -50,7 +50,7 @@ int stdimpl_strlen(const char *str);
 int stdimpl_strcmp(const char *s1, const char *s2);
 char* stdimpl_itoa(int v,char *string,int r);
 
-#ifdef	__cplusplus
+#ifdef  __cplusplus
 }
 #endif
 

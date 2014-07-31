@@ -32,8 +32,8 @@
  *
  * $Id: TextOutputter.h,v 1.2 2003/09/06 13:28:27 arms22 Exp $
  */
-#ifndef	__TEXTOUTPUTTER_H__
-#define	__TEXTOUTPUTTER_H__
+#ifndef __TEXTOUTPUTTER_H__
+#define __TEXTOUTPUTTER_H__
 
 #include "Outputter.h"
 

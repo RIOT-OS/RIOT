@@ -32,40 +32,40 @@
  *
  * $Id: AssertImpl.h,v 1.6 2003/09/16 11:09:53 arms22 Exp $
  */
-#ifndef	__ASSERTIMPL_H__
-#define	__ASSERTIMPL_H__
+#ifndef __ASSERTIMPL_H__
+#define __ASSERTIMPL_H__
 
-#ifdef	__cplusplus
+#ifdef  __cplusplus
 extern "C" {
 #endif
 
-void addFailure(const char *msg, long line, const char *file);	/*TestCase.c*/
+void addFailure(const char *msg, long line, const char *file);  /*TestCase.c*/
 
 void assertImplementationInt(int expected,int actual, long line, const char *file);
 void assertImplementationCStr(const char *expected,const char *actual, long line, const char *file);
 
 #define TEST_ASSERT_EQUAL_STRING(expected,actual)\
-	if (expected && actual && (stdimpl_strcmp(expected,actual)==0)) {} else {assertImplementationCStr(expected,actual,__LINE__,__FILE__);return;}
+    if (expected && actual && (stdimpl_strcmp(expected,actual)==0)) {} else {assertImplementationCStr(expected,actual,__LINE__,__FILE__);return;}
 
 #define TEST_ASSERT_EQUAL_INT(expected,actual)\
-	if (expected == actual) {} else {assertImplementationInt(expected,actual,__LINE__,__FILE__);return;}
+    if (expected == actual) {} else {assertImplementationInt(expected,actual,__LINE__,__FILE__);return;}
 
 #define TEST_ASSERT_NULL(pointer)\
-	TEST_ASSERT_MESSAGE(pointer == NULL,#pointer " was not null.")
+    TEST_ASSERT_MESSAGE(pointer == NULL,#pointer " was not null.")
 
 #define TEST_ASSERT_NOT_NULL(pointer)\
-	TEST_ASSERT_MESSAGE(pointer != NULL,#pointer " was null.")
+    TEST_ASSERT_MESSAGE(pointer != NULL,#pointer " was null.")
 
 #define TEST_ASSERT_MESSAGE(condition, message)\
-	if (condition) {} else {TEST_FAIL(message);}
+    if (condition) {} else {TEST_FAIL(message);}
 
 #define TEST_ASSERT(condition)\
-	if (condition) {} else {TEST_FAIL(#condition);}
+    if (condition) {} else {TEST_FAIL(#condition);}
 
 #define TEST_FAIL(message)\
-	if (0) {} else {addFailure(message,__LINE__,__FILE__);return;}
+    if (0) {} else {addFailure(message,__LINE__,__FILE__);return;}
 
-#ifdef	__cplusplus
+#ifdef  __cplusplus
 }
 #endif
 

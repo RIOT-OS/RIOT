@@ -32,8 +32,8 @@
  *
  * $Id: CompilerOutputter.h,v 1.2 2003/09/06 13:28:27 arms22 Exp $
  */
-#ifndef	__COMPILEROUTPUTTER_H__
-#define	__COMPILEROUTPUTTER_H__
+#ifndef __COMPILEROUTPUTTER_H__
+#define __COMPILEROUTPUTTER_H__
 
 #include "Outputter.h"
 
