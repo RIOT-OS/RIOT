@@ -19,9 +19,9 @@ You should have received a copy of the GNU General Public License along with
 this program.  If not, see http://www.gnu.org/licenses/ .
 --------------------------------------------------------------------------------
 For further information and questions please use the web site
-	http://scatterweb.mi.fu-berlin.de
+    http://scatterweb.mi.fu-berlin.de
 and the mailinglist (subscription via web site)
-	scatterweb@lists.spline.inf.fu-berlin.de
+    scatterweb@lists.spline.inf.fu-berlin.de
 *******************************************************************************/
 
 /**
@@ -61,13 +61,13 @@ and the mailinglist (subscription via web site)
 /* LEDs ports MSB430 */
 #define LEDS_PxDIR P5DIR
 #define LEDS_PxOUT P5OUT
-#define LEDS_CONF_RED		0x80
-#define LEDS_CONF_GREEN		0x00
-#define LEDS_CONF_YELLOW	0x00
+#define LEDS_CONF_RED       0x80
+#define LEDS_CONF_GREEN     0x00
+#define LEDS_CONF_YELLOW    0x00
 
-#define LED_RED_ON      LEDS_PxOUT &=~LEDS_CONF_RED
-#define LED_RED_OFF     LEDS_PxOUT |= LEDS_CONF_RED
-#define LED_RED_TOGGLE     LEDS_PxOUT ^= LEDS_CONF_RED
+#define LED_RED_ON          LEDS_PxOUT &=~LEDS_CONF_RED
+#define LED_RED_OFF         LEDS_PxOUT |= LEDS_CONF_RED
+#define LED_RED_TOGGLE      LEDS_PxOUT ^= LEDS_CONF_RED
 
 #include "board-conf.h"
 

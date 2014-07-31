@@ -72,7 +72,7 @@ typedef struct {
      * in Float-mode
      */
     uint8_t countRange;
-    uint8_t range;	    //current range
+    uint8_t range;      //current range
 } settingsSMB380;
 
 settingsSMB380 settings;
@@ -204,7 +204,7 @@ uint8_t SMB380_init(uint8_t (*func)(int16_t *))
         smb380function = smb380emptyfunction;
     }
 
-    //smb380function = SMB380_HystereseFunctionSample;	//placeholder
+    //smb380function = SMB380_HystereseFunctionSample;  //placeholder
 
     SMB380_softReset();
     hwtimer_wait(HWTIMER_TICKS(100000));
@@ -266,12 +266,12 @@ static void SMB380_extIntHandler(void)
 
     writeRingBuff(accInt);
 
-    //	printf("SMB380 acc x,y,z: [%i|%i|%i|%2.3f]\r\n", accInt[0], accInt[1],
+    //  printf("SMB380 acc x,y,z: [%i|%i|%i|%2.3f]\r\n", accInt[0], accInt[1],
     //         accInt[2], acc[3]);
-    //	printf("SMB380 acc x,y,z: [%2.3f|%2.3f|%2.3f|%2.3f]\r\n\n\n", acc[0],
+    //  printf("SMB380 acc x,y,z: [%2.3f|%2.3f|%2.3f|%2.3f]\r\n\n\n", acc[0],
     //         acc[1], acc[2], acc[3]);
-    //	printf("Nach Interrupt Reset:\n");
-    //	SMB380_ShowMemory();
+    //  printf("Nach Interrupt Reset:\n");
+    //  SMB380_ShowMemory();
 }
 
 void SMB380_setSampleRate(uint16_t rate)
@@ -397,7 +397,7 @@ uint8_t readRingBuff(int16_t *value)
 //TODO: more read-pointer
 uint8_t writeRingBuff(int16_t *value)
 {
-    if (smb380_mode == SMB380_FALSEALERT)	{
+    if (smb380_mode == SMB380_FALSEALERT)   {
         smb380_mode = SMB380_THRESHOLD;
         return 0;
     }
@@ -578,7 +578,7 @@ int16_t SMB380_getTemperature(void)
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_TEMP, 0, SMB380_READ_REGISTER);
 
-    //	t = (SMB380_ssp_read() & 0xFF) / 2.0 + SMB380_TEMP_OFFSET;
+    //  t = (SMB380_ssp_read() & 0xFF) / 2.0 + SMB380_TEMP_OFFSET;
     t = (SMB380_ssp_read() & 0xFF);
     t = (t >> 1) + SMB380_TEMP_OFFSET;
     SMB380_Unprepare();
@@ -848,7 +848,7 @@ void SMB380_Selftest_1(void)
     uReg &= ~SMB380_CONTROL1_SELF_TEST_1_MASK;
     uReg |= 0x01 << 3;
     SMB380_ssp_write(SMB380_CONTROL1, uReg, SMB380_WRITE_REGISTER);
-    //	SSP0Init();
+    //  SSP0Init();
     SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);

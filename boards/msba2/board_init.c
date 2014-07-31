@@ -18,7 +18,7 @@
  * @author      Heiko Will
  * @author      Kaspar Schleiser
  * @author      Michael Baar <baar@inf.fu-berlin.de>
- * @author		Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
+ * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  *
  * @note        $Id$
  */

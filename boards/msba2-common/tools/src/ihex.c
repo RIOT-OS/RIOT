@@ -54,9 +54,9 @@ static int parse_hex_line(char *line);
 
 
 /****************************************************************/
-/*								*/
-/*		      Read Intel Hex File			*/
-/*								*/
+/*                              */
+/*            Read Intel Hex File           */
+/*                              */
 /****************************************************************/
 
 
@@ -212,7 +212,7 @@ parse_hex_line(char *line)
             //printf("ext addr = %08X\n", extended_addr);
         }
 
-        return 1;	// non-data line
+        return 1;   // non-data line
     }
 
     byte_count += len;

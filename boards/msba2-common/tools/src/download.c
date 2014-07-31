@@ -77,37 +77,37 @@ char *file_name = "";
 char *crystal = "16";
 
 /****************************************************************/
-/*								*/
-/*		     Main Download Section			*/
-/*								*/
+/*                              */
+/*           Main Download Section          */
+/*                              */
 /****************************************************************/
 
 // possible states
-#define SYNC_1			1
-#define SYNC_2			2
-#define SYNC_3			3
-#define CHIP_ID			4
-#define UNLOCK			5
-#define BLANK_CHECK_SECTOR	6
-#define ERASE_PREPARE		7
-#define ERASE_SECTOR		8
-#define DOWNLOAD_CODE		9
-#define XMIT_DATA		10
-#define XMIT_CKSUM		11
-#define WRITE_PREPARE		12
-#define WRITE_SECTOR		13
-#define BOOT_HARD		14
-#define BOOT_SOFT		15
-#define BOOT_XMIT_DATA		16
-#define BOOT_XMIT_CKSUM		17
-#define BOOT_RUN_CODE		18
+#define SYNC_1              1
+#define SYNC_2              2
+#define SYNC_3              3
+#define CHIP_ID             4
+#define UNLOCK              5
+#define BLANK_CHECK_SECTOR  6
+#define ERASE_PREPARE       7
+#define ERASE_SECTOR        8
+#define DOWNLOAD_CODE       9
+#define XMIT_DATA           10
+#define XMIT_CKSUM          11
+#define WRITE_PREPARE       12
+#define WRITE_SECTOR        13
+#define BOOT_HARD           14
+#define BOOT_SOFT           15
+#define BOOT_XMIT_DATA      16
+#define BOOT_XMIT_CKSUM     17
+#define BOOT_RUN_CODE       18
 
 
 // possible input values for "event"
-#define BEGIN 1
-#define RESPONSE 2
-#define TIMEOUT 3
-#define RETRY 4
+#define BEGIN       1
+#define RESPONSE    2
+#define TIMEOUT     3
+#define RETRY       4
 
 
 
@@ -253,9 +253,9 @@ static void download_main(int event)
     int n;
     static unsigned int cksum;
     static int retry = 0;
-    static int sector;		// current sector we're doing
+    static int sector;      // current sector we're doing
     static int sector_offset;
-    static struct chip_info_struct *chip;	// which chip
+    static struct chip_info_struct *chip;   // which chip
     static int current_addr, num_to_xmit, linecount;
 
 
@@ -834,16 +834,16 @@ static void download_main(int event)
 
 
             case BOOT_HARD:
-                //	if (chip->bootprog) {
-                //		state = BOOT_SOFT;
-                //		break;
-                //	}
-                //	else {
+                //  if (chip->bootprog) {
+                //      state = BOOT_SOFT;
+                //      break;
+                //  }
+                //  else {
                 printf("Booting (hardware reset)...\r\n\r\n");
                 hard_reset_to_user_code();
                 done_program(0);
                 return;
-                //	}
+                //  }
 
             case BOOT_SOFT:
                 switch (event) {
@@ -1038,9 +1038,9 @@ void download_cancel(const char *mesg)
 
 
 /****************************************************************/
-/*								*/
-/*		Transmit Commands to Bootloader			*/
-/*								*/
+/*                              */
+/*      Transmit Commands to Bootloader         */
+/*                              */
 /****************************************************************/
 
 
@@ -1079,9 +1079,9 @@ static void xmit_cmd(const char *cmd, int max_time)
 
 
 /****************************************************************/
-/*								*/
-/*		Handlers that respond to input			*/
-/*								*/
+/*                              */
+/*      Handlers that respond to input          */
+/*                              */
 /****************************************************************/
 
 

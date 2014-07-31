@@ -30,35 +30,35 @@
 /*---------------------------------------------------------------------------*/
 void init_clks1(void)
 {
-	// Disconnect PLL
-	PLLCON &= ~0x0002;
-	pllfeed();
-	while (PLLSTAT & BIT25);			// wait until PLL is disconnected before disabling - deadlock otherwise
+    // Disconnect PLL
+    PLLCON &= ~0x0002;
+    pllfeed();
+    while (PLLSTAT & BIT25);            // wait until PLL is disconnected before disabling - deadlock otherwise
 
-	// Disable PLL
-	PLLCON &= ~0x0001;
-	pllfeed();
-	while (PLLSTAT & BIT24);			// wait until PLL is disabled
+    // Disable PLL
+    PLLCON &= ~0x0001;
+    pllfeed();
+    while (PLLSTAT & BIT24);            // wait until PLL is disabled
 
-	SCS |= 0x20;						// Enable main OSC
-	while( !(SCS & 0x40) );				// Wait until main OSC is usable
+    SCS |= 0x20;                        // Enable main OSC
+    while( !(SCS & 0x40) );             // Wait until main OSC is usable
 
-	/* select main OSC, 16MHz, as the PLL clock source */
-	CLKSRCSEL = 0x0001;
+    /* select main OSC, 16MHz, as the PLL clock source */
+    CLKSRCSEL = 0x0001;
 
-	// Setting Multiplier and Divider values
-  	PLLCFG = 0x0008;					// M=9 N=1 Fcco = 288 MHz
-  	pllfeed();
+    // Setting Multiplier and Divider values
+    PLLCFG = 0x0008;                    // M=9 N=1 Fcco = 288 MHz
+    pllfeed();
 
-	// Enabling the PLL */
-	PLLCON = 0x0001;
-	pllfeed();
+    // Enabling the PLL */
+    PLLCON = 0x0001;
+    pllfeed();
 
-	/* Set clock divider to 4 (value+1) */
-	CCLKCFG = CL_CPU_DIV - 1;			// Fcpu = 72 MHz
+    /* Set clock divider to 4 (value+1) */
+    CCLKCFG = CL_CPU_DIV - 1;           // Fcpu = 72 MHz
 
 #if USE_USB
-	USBCLKCFG = USBCLKDivValue;		/* usbclk = 288 MHz/6 = 48 MHz */
+    USBCLKCFG = USBCLKDivValue;     /* usbclk = 288 MHz/6 = 48 MHz */
 #endif
 }
 

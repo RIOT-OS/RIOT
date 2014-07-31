@@ -18,7 +18,7 @@
  * @author      Heiko Will
  * @author      Kaspar Schleiser
  * @author      Michael Baar <baar@inf.fu-berlin.de>
- * @author 		Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
+ * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @note        $Id$
  */
 #include <string.h>
@@ -28,10 +28,10 @@
 #include "cpu.h"
 #include "config.h"
 
-#define PCRTC         BIT9
-#define CL_CPU_DIV    4
+#define PCRTC           BIT9
+#define CL_CPU_DIV      4
 
-#define WD_INTERVAL    10      ///< number of seconds before WD triggers
+#define WD_INTERVAL     10      ///< number of seconds before WD triggers
 
 /*---------------------------------------------------------------------------*/
 /**

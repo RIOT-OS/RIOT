@@ -6,7 +6,7 @@
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  *
  * @defgroup    mbed_lpc1768 mbed NXP LPC1768 development kit
- * @ingroup		boards
+ * @ingroup     boards
  * @brief       Support for the mbed NXP LPC1768 board.
  * @{
  */
@@ -22,8 +22,8 @@
 #define PIN_LED3 (BIT21)
 #define PIN_LED4 (BIT23)
 
-#define LED_ON(led_nr)  (LPC_GPIO1->FIOSET = PIN_LED##led_nr)
-#define LED_OFF(led_nr)  (LPC_GPIO1->FIOCLR = PIN_LED##led_nr)
+#define LED_ON(led_nr)      (LPC_GPIO1->FIOSET = PIN_LED##led_nr)
+#define LED_OFF(led_nr)     (LPC_GPIO1->FIOCLR = PIN_LED##led_nr)
 #define LED_TOGGLE(led_nr)  (LPC_GPIO1->FIOPIN ^= PIN_LED##led_nr)
 
 typedef uint8_t radio_packet_length_t;
