@@ -482,7 +482,8 @@ class SerCmd(cmd.Cmd):
 
 
     def serial_connect(self):
-        self.ser = serial.Serial(port=self.port, baudrate=self.baudrate, dsrdtr=0, rtscts=0)
+        self.ser = serial.Serial(port=self.port, dsrdtr=0, rtscts=0)
+        self.ser.baudrate = self.baudrate
         self.ser.setDTR(0)
         self.ser.setRTS(0)
 
