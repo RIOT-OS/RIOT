@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup	    core_arch
+ * @ingroup     core_arch
  * @{
  *
  * @file        hwtimer_arch.h
