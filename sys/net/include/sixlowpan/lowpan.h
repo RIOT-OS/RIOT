@@ -37,7 +37,7 @@
  *          RFC 4944, section 5.1
  *      </a>
  */
-#define SIXLOWPAN_IPV6_DISPATCH   	(0x41)
+#define SIXLOWPAN_IPV6_DISPATCH     (0x41)
 
 /**
  * @brief   6LoWPAN dispatch value for IPv6 header compression (part of
@@ -46,7 +46,7 @@
  *          RFC 4944, section 3.1.1
  *      </a>
  */
-#define SIXLOWPAN_IPHC1_DISPATCH   	(0x60)
+#define SIXLOWPAN_IPHC1_DISPATCH    (0x60)
 
 /**
  * @brief   Flag for Flow Label elision (part of first byte of
@@ -55,7 +55,7 @@
  *          RFC 6282, section 3.1.1
  *      </a>
  */
-#define SIXLOWPAN_IPHC1_FL_C       	(0x10)
+#define SIXLOWPAN_IPHC1_FL_C        (0x10)
 
 /**
  * @brief   Flag for Traffic Class elision (part of first byte of
@@ -64,7 +64,7 @@
  *          RFC 6282, section 3.1.1
  *      </a>
  */
-#define SIXLOWPAN_IPHC1_TC_C       	(0x08)
+#define SIXLOWPAN_IPHC1_TC_C        (0x08)
 
 /**
  * @brief   Flag for Next Header Compression (part of first byte of
@@ -73,7 +73,7 @@
  *          RFC 6282, section 3.1.1
  *      </a>
  */
-#define SIXLOWPAN_IPHC1_NH         	(0x04)
+#define SIXLOWPAN_IPHC1_NH          (0x04)
 
 /**
  * @brief   Flag for Context Identifier Extention (part of second byte
@@ -82,7 +82,7 @@
  *          RFC 6282, section 3.1.1
  *      </a>
  */
-#define SIXLOWPAN_IPHC2_CID        	(0x80)
+#define SIXLOWPAN_IPHC2_CID         (0x80)
 
 /**
  * @brief   Flag for Source Address Compression (part of second byte
@@ -91,7 +91,7 @@
  *          RFC 6282, section 3.1.1
  *      </a>
  */
-#define SIXLOWPAN_IPHC2_SAC        	(0x40)
+#define SIXLOWPAN_IPHC2_SAC         (0x40)
 
 /**
  * @brief   Bits for Source Address Mode (part of second byte of
@@ -100,7 +100,7 @@
  *          RFC 6282, section 3.1.1
  *      </a>
  */
-#define SIXLOWPAN_IPHC2_SAM        	(0x30)
+#define SIXLOWPAN_IPHC2_SAM         (0x30)
 
 /**
  * @brief   Flag for Destination Address Compression (part of second
@@ -109,7 +109,7 @@
  *          RFC 6282, section 3.1.1
  *      </a>
  */
-#define SIXLOWPAN_IPHC2_DAC        	(0x04)
+#define SIXLOWPAN_IPHC2_DAC         (0x04)
 
 /**
  * @brief   Bits for Destination Address Mode (part of second byte of
@@ -118,7 +118,7 @@
  *          RFC 6282, section 3.1.1
  *      </a>
  */
-#define SIXLOWPAN_IPHC2_DAM        	(0x03)
+#define SIXLOWPAN_IPHC2_DAM         (0x03)
 
 /**
  * @brief   Flag for Multicast Compression (part of second byte of
@@ -127,7 +127,7 @@
  *          RFC 6282, section 3.1.1
  *      </a>
  */
-#define SIXLOWPAN_IPHC2_M          	(0x08)
+#define SIXLOWPAN_IPHC2_M           (0x08)
 
 
 /**
@@ -150,12 +150,12 @@
 /**
  * 6LoWPAN fragmentation header length (first fragment)
  */
-#define SIXLOWPAN_FRAG1_HDR_LEN  	(4)
+#define SIXLOWPAN_FRAG1_HDR_LEN     (4)
 
 /**
  * 6LoWPAN fragmentation header length (subsequent fragment)
  */
-#define SIXLOWPAN_FRAGN_HDR_LEN    	(5)
+#define SIXLOWPAN_FRAGN_HDR_LEN     (5)
 
 /**
  * @brief message type for notification

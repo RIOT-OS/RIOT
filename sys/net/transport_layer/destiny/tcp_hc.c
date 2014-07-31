@@ -142,7 +142,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         tcp_hc_header |= 0xD000;
 
         /*----------------------------------*/
-        /*|		Sequence number handling   |*/
+        /*|     Sequence number handling   |*/
         /*----------------------------------*/
         if (full_tcp_header.seq_nr == tcp_context->seq_snd) {
             /* Nothing to do, Seq = (0|0) */
@@ -185,7 +185,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         }
 
         /*----------------------------------*/
-        /*|	Acknowledgment number handling |*/
+        /*| Acknowledgment number handling |*/
         /*----------------------------------*/
         if ((IS_TCP_ACK(full_tcp_header.reserved_flags) &&
              (tcp_cb->tcp_context.ack_snd == full_tcp_header.ack_nr))) {
@@ -235,7 +235,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         }
 
         /*----------------------------------*/
-        /*|			Window handling 	   |*/
+        /*|         Window handling        |*/
         /*----------------------------------*/
         if (full_tcp_header.window == tcp_context->wnd_snd) {
             /* Nothing to do, Wnd = (0|0) */
@@ -335,7 +335,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         tcp_hc_header |= 0x9000;
 
         /*----------------------------------*/
-        /*|		Sequence number handling   |*/
+        /*|     Sequence number handling   |*/
         /*----------------------------------*/
         /* Sending uncompressed sequence number */
         /* Seq = (1|1) */
@@ -348,7 +348,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         packet_size += 4;
 
         /*----------------------------------*/
-        /*|	Acknowledgment number handling |*/
+        /*| Acknowledgment number handling |*/
         /*----------------------------------*/
         /* Ack = (1|1) */
         tcp_hc_header |= 0x0300;
@@ -360,7 +360,7 @@ uint16_t compress_tcp_packet(socket_internal_t *current_socket,
         packet_size += 4;
 
         /*----------------------------------*/
-        /*|			Window handling 	   |*/
+        /*|         Window handling        |*/
         /*----------------------------------*/
         /* Wnd = (1|1) */
         tcp_hc_header |= 0x00C0;
@@ -485,7 +485,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
             &current_socket->socket_values.tcp_control.tcp_context;
 
         /*----------------------------------*/
-        /*|		Sequence number handling   |*/
+        /*|     Sequence number handling   |*/
         /*----------------------------------*/
         if (!BITSET(tcp_hc_header, 11) && !BITSET(tcp_hc_header, 10)) {
             /* Seq = (0|0), sequence number didn't change, copy old value */
@@ -520,7 +520,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
         }
 
         /*----------------------------------*/
-        /*|	Acknowledgment number handling |*/
+        /*| Acknowledgment number handling |*/
         /*----------------------------------*/
         if (!BITSET(tcp_hc_header, 9) && !BITSET(tcp_hc_header, 8)) {
             /* Ack = (0|0), acknowledgment number didn't change, copy old value */
@@ -560,7 +560,7 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
         }
 
         /*----------------------------------*/
-        /*|			Window handling 	   |*/
+        /*|         Window handling        |*/
         /*----------------------------------*/
         if (!BITSET(tcp_hc_header, 7) && !BITSET(tcp_hc_header, 6)) {
             /* Wnd = (0|0), copy old value */

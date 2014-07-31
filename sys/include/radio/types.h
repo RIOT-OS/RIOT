@@ -15,13 +15,13 @@
 
 /**
  * @file
- * @brief		Common network stack types (of all layers).
+ * @brief       Common network stack types (of all layers).
  *
- * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
+ * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @version     $Revision: 2061 $
  *
- * @note		$Id: common-types.h 2061 2010-04-01 12:13:22Z hillebra $
+ * @note        $Id: common-types.h 2061 2010-04-01 12:13:22Z hillebra $
  */
 
 #include <stdint.h>
@@ -30,13 +30,13 @@
 #include "board.h"
 #include "timex.h"
 
-typedef uint8_t protocol_t;			///< Packet protocol type
-typedef uint16_t radio_address_t;	///< Radio layer address type
+typedef uint8_t protocol_t;         ///< Packet protocol type
+typedef uint16_t radio_address_t;   ///< Radio layer address type
 
-#define NUM_PRIORITY_LEVELS	3		///< Number of packet transmission priorities
+#define NUM_PRIORITY_LEVELS 3       ///< Number of packet transmission priorities
 
 /**
- * @brief	Packet transmission priorities of various layers.
+ * @brief   Packet transmission priorities of various layers.
  */
 enum transmission_priorities {
     PRIORITY_ALARM   = 0,
@@ -50,14 +50,14 @@ enum transmission_priorities {
  * all layers. Each layers fills in additional information.
  */
 typedef struct __attribute__((packed)) packet_info_t {
-    uint16_t source;			///< Net layer: source
-    uint16_t destination;		///< Net layer: destination
-    radio_address_t phy_src;	///< Radio layer: source
-    uint8_t rssi;				///< Radio layer: RSSI
-    uint8_t lqi;				///< Radio layer: LQI
-    uint8_t ttl;				///< Net layer: TTL
-    uint8_t tos;				///< Net layer: TOS
-    bool promiscuous;			///< Radio layer: whether network interface is in promiscuous mode
+    uint16_t source;            ///< Net layer: source
+    uint16_t destination;       ///< Net layer: destination
+    radio_address_t phy_src;    ///< Radio layer: source
+    uint8_t rssi;               ///< Radio layer: RSSI
+    uint8_t lqi;                ///< Radio layer: LQI
+    uint8_t ttl;                ///< Net layer: TTL
+    uint8_t tos;                ///< Net layer: TOS
+    bool promiscuous;           ///< Radio layer: whether network interface is in promiscuous mode
 } packet_info_t;
 
 
@@ -80,9 +80,9 @@ radio_packet_t;
 
 /**
  * Packet handler (receive function) of all layers.
- * @param [in/out]	payload			Pointer to packet payload data
- * @param [in]		payload_size	Size of the packet payload data in bytes
- * @param [in/out]	packet_info		Cross-layer meta data
+ * @param [in/out]  payload         Pointer to packet payload data
+ * @param [in]      payload_size    Size of the packet payload data in bytes
+ * @param [in/out]  packet_info     Cross-layer meta data
  */
 typedef void (*packet_handler_t)(void *payload, int payload_size, packet_info_t *packet_info);
 
@@ -90,10 +90,10 @@ typedef void (*packet_handler_t)(void *payload, int payload_size, packet_info_t 
  * Packet monitor of all layers. Normally there can be one packet
  * monitor per layer (if any). The payload must not be changed!
  *
- * @param	payload			Pointer to packet payload data
- * @param	payload_size	Size of the packet payload data in bytes
- * @param	protocol		Protocol type of the packet payload data
- * @param	packet_info		Cross-layer meta data
+ * @param   payload         Pointer to packet payload data
+ * @param   payload_size    Size of the packet payload data in bytes
+ * @param   protocol        Protocol type of the packet payload data
+ * @param   packet_info     Cross-layer meta data
  */
 typedef void (*packet_monitor_t)(void *payload, int payload_size, protocol_t protocol, packet_info_t *packet_info);
 

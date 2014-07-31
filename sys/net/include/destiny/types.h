@@ -26,7 +26,7 @@
 /**
  * TCP packet header length
  */
-#define TCP_HDR_LEN	20
+#define TCP_HDR_LEN 20
 
 /**
  * UDP packet header

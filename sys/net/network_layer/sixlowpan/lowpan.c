@@ -59,7 +59,7 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #define SIXLOWPAN_MAX_REGISTERED        (4)
 
 #define LOWPAN_REAS_BUF_TIMEOUT         (15 * 1000 * 1000)
-/* TODO: Set back to 3 * 1000 *	(1000) */
+/* TODO: Set back to 3 * 1000 * (1000) */
 
 #define IPV6_LL_ADDR_LEN                (8)
 
@@ -1149,13 +1149,13 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
 
     /*uint8_t *ptr;
     if (ipv6_buf->nextheader == IPV6_PROTO_NUM_TCP)
-    	{
-    	ptr = get_payload_buf_send(ipv6_ext_hdr_len);
-    	}
+        {
+        ptr = get_payload_buf_send(ipv6_ext_hdr_len);
+        }
     else
-    	{
-    	ptr = get_payload_buf(ipv6_ext_hdr_len);
-    	}
+        {
+        ptr = get_payload_buf(ipv6_ext_hdr_len);
+        }
     */
     memcpy(&ipv6_hdr_fields[hdr_pos], &ptr[IPV6_HDR_LEN], NTOHS(ipv6_buf->length));
 

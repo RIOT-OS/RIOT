@@ -38,61 +38,61 @@
 #endif
 #include "debug.h"
 
-#define LLHDR_ICMPV6HDR_LEN         (LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)
-#define ND_HOPLIMIT                 (0xFF)
+#define LLHDR_ICMPV6HDR_LEN             (LL_HDR_LEN + IPV6_HDR_LEN + ICMPV6_HDR_LEN)
+#define ND_HOPLIMIT                     (0xFF)
 
 /* parameter problem [rfc4443] */
-#define PARA_PROB_LEN                  	(8)
+#define PARA_PROB_LEN                   (8)
 /* echo request */
 #define ECHO_REQ_LEN                    (4)
 /* echo reply */
 #define ECHO_REPL_LEN                   (4)
 /* router solicitation */
-#define RTR_SOL_LEN                    	(4)
-#define RTR_SOL_INTERVAL               	(4)
-#define RTR_SOL_MAX                    	(3)
+#define RTR_SOL_LEN                     (4)
+#define RTR_SOL_INTERVAL                (4)
+#define RTR_SOL_MAX                     (3)
 /* router advertisment */
-#define RTR_ADV_MAX                    	(3)
-#define RTR_ADV_MAX_INTERVAL           	(600)
-#define RTR_ADV_LEN                    	(12)
+#define RTR_ADV_MAX                     (3)
+#define RTR_ADV_MAX_INTERVAL            (600)
+#define RTR_ADV_LEN                     (12)
 /* neighbour solicitation */
-#define NBR_SOL_LEN                    	(20)
+#define NBR_SOL_LEN                     (20)
 /* neighbour advertisement */
-#define NBR_ADV_LEN                    	(20)
+#define NBR_ADV_LEN                     (20)
 /* stllao option rfc4861 4.6.1 */
-#define OPT_STLLAO_MIN_LEN             	(8)
-#define OPT_STLLAO_MAX_LEN             	(16)
+#define OPT_STLLAO_MIN_LEN              (8)
+#define OPT_STLLAO_MAX_LEN              (16)
 /* prefix info option rfc 4.6.2 */
-#define OPT_PI_LIST_LEN                	(5) //TODO: initalwert suchen
-#define OPT_PI_TYPE                    	(3)
-#define OPT_PI_LEN                     	(4)
-#define OPT_PI_HDR_LEN                 	(32)
+#define OPT_PI_LIST_LEN                 (5) //TODO: initalwert suchen
+#define OPT_PI_TYPE                     (3)
+#define OPT_PI_LEN                      (4)
+#define OPT_PI_HDR_LEN                  (32)
 /* mtu option rfc4861 4.6.4 */
-#define OPT_MTU_TYPE                   	(5)
-#define OPT_MTU_LEN                    	(1)
-#define OPT_MTU_HDR_LEN                	(8)
+#define OPT_MTU_TYPE                    (5)
+#define OPT_MTU_LEN                     (1)
+#define OPT_MTU_HDR_LEN                 (8)
 /* aro - address registration option rfc6775 4.1 */
-#define OPT_ARO_TYPE                   	(33)
-#define OPT_ARO_LEN                    	(2)
-#define OPT_ARO_HDR_LEN                	(16)
-#define OPT_ARO_LTIME                  	(300) /* TODO: geeigneten wert finden */
+#define OPT_ARO_TYPE                    (33)
+#define OPT_ARO_LEN                     (2)
+#define OPT_ARO_HDR_LEN                 (16)
+#define OPT_ARO_LTIME                   (300) /* TODO: geeigneten wert finden */
 /* 6lowpan context option */
-#define OPT_6CO_TYPE                   	(34)
-#define OPT_6CO_MIN_LEN                	(2)
-#define OPT_6CO_MAX_LEN                	(3)
-#define OPT_6CO_HDR_LEN                	(8)
-#define OPT_6CO_LTIME                  	(5)   /* TODO geeigneten Wert finden */
+#define OPT_6CO_TYPE                    (34)
+#define OPT_6CO_MIN_LEN                 (2)
+#define OPT_6CO_MAX_LEN                 (3)
+#define OPT_6CO_HDR_LEN                 (8)
+#define OPT_6CO_LTIME                   (5)   /* TODO geeigneten Wert finden */
 /* authoritative border router option */
-#define OPT_ABRO_TYPE                  	(35)
-#define OPT_ABRO_LEN                   	(3)
-#define OPT_ABRO_HDR_LEN               	(24)
+#define OPT_ABRO_TYPE                   (35)
+#define OPT_ABRO_LEN                    (3)
+#define OPT_ABRO_HDR_LEN                (24)
 /* authoritive border router cache size */
-#define ABR_CACHE_SIZE                 	(2)
+#define ABR_CACHE_SIZE                  (2)
 /* neighbor cache size */
-#define NBR_CACHE_SIZE                 	(8)
-#define NBR_CACHE_LTIME_TEN            	(20)
+#define NBR_CACHE_SIZE                  (8)
+#define NBR_CACHE_LTIME_TEN             (20)
 /* default router list size */
-#define DEF_RTR_LST_SIZE                   	(3) /* geeigneten wert finden */
+#define DEF_RTR_LST_SIZE                    (3) /* geeigneten wert finden */
 
 #define PREFIX_BUF_LEN                  (NET_IF_MAX * OPT_PI_LIST_LEN)
 

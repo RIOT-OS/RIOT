@@ -24,13 +24,13 @@
 
 /* int
  * inet_pton4(src, dst)
- *	like inet_aton() but without all the hexadecimal and shorthand.
+ *  like inet_aton() but without all the hexadecimal and shorthand.
  * return:
- *	1 if `src' is a valid dotted quad, else 0.
+ *  1 if `src' is a valid dotted quad, else 0.
  * notice:
- *	does not touch `dst' unless it's returning 1.
+ *  does not touch `dst' unless it's returning 1.
  * author:
- *	Paul Vixie, 1996.
+ *  Paul Vixie, 1996.
  */
 static int inet_pton4(const char *src, unsigned char *dst)
 {
@@ -85,16 +85,16 @@ static int inet_pton4(const char *src, unsigned char *dst)
 
 /* int
  * inet_pton6(src, dst)
- *	convert presentation level address to network order binary form.
+ *  convert presentation level address to network order binary form.
  * return:
- *	1 if `src' is a valid [RFC1884 2.2] address, else 0.
+ *  1 if `src' is a valid [RFC1884 2.2] address, else 0.
  * notice:
- *	(1) does not touch `dst' unless it's returning 1.
- *	(2) :: in a full address is silently ignored.
+ *  (1) does not touch `dst' unless it's returning 1.
+ *  (2) :: in a full address is silently ignored.
  * credit:
- *	inspired by Mark Andrews.
+ *  inspired by Mark Andrews.
  * author:
- *	Paul Vixie, 1996.
+ *  Paul Vixie, 1996.
  */
 static int inet_pton6(const char *src, unsigned char *dst)
 {
@@ -165,7 +165,7 @@ static int inet_pton6(const char *src, unsigned char *dst)
            inet_pton4(curtok, tp) > 0) {
             tp += INADDRSZ;
             saw_xdigit = 0;
-            break;	/* '\0' was seen by inet_pton4(). */
+            break;  /* '\0' was seen by inet_pton4(). */
         }
 
         return (0);
@@ -206,14 +206,14 @@ static int inet_pton6(const char *src, unsigned char *dst)
 
 /* int
  * inet_pton(af, src, dst)
- *	convert from presentation format (which usually means ASCII printable)
- *	to network format (which is usually some kind of binary format).
+ *  convert from presentation format (which usually means ASCII printable)
+ *  to network format (which is usually some kind of binary format).
  * return:
- *	1 if the address was valid for the specified address family
- *	0 if the address wasn't valid (`dst' is untouched in this case)
- *	-1 if some other error occurred (`dst' is untouched in this case, too)
+ *  1 if the address was valid for the specified address family
+ *  0 if the address wasn't valid (`dst' is untouched in this case)
+ *  -1 if some other error occurred (`dst' is untouched in this case, too)
  * author:
- *	Paul Vixie, 1996.
+ *  Paul Vixie, 1996.
  */
 int inet_pton(int af, const char *src, void *dst)
 {

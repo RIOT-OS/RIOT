@@ -100,13 +100,13 @@ ccnl_prefix_clone(struct ccnl_prefix_s *p)
 
 #define extractStr(VAR,DTAG) \
     if (typ == CCN_TT_DTAG && num == DTAG) { \
-	char *s; unsigned char *valptr; int vallen; \
-	if (consume(typ, num, &buf, &buflen, &valptr, &vallen) < 0) goto Bail; \
-	s = ccnl_malloc(vallen+1); if (!s) goto Bail; \
-	memcpy(s, valptr, vallen); s[vallen] = '\0'; \
-	ccnl_free(VAR); \
-	VAR = (unsigned char*) s; \
-	continue; \
+    char *s; unsigned char *valptr; int vallen; \
+    if (consume(typ, num, &buf, &buflen, &valptr, &vallen) < 0) goto Bail; \
+    s = ccnl_malloc(vallen+1); if (!s) goto Bail; \
+    memcpy(s, valptr, vallen); s[vallen] = '\0'; \
+    ccnl_free(VAR); \
+    VAR = (unsigned char*) s; \
+    continue; \
     } do {} while(0)
 
 void
@@ -200,7 +200,7 @@ ccnl_mgmt_newface(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
         extractStr(proto, CCN_DTAG_IPPROTO);
         extractStr(host, CCN_DTAG_HOST);
         extractStr(port, CCN_DTAG_PORT);
-        //	extractStr(frag, CCNL_DTAG_FRAG);
+        //  extractStr(frag, CCNL_DTAG_FRAG);
         extractStr(flags, CCNL_DTAG_FACEFLAGS);
 
         if (consume(typ, num, &buf, &buflen, 0, 0) < 0) {
@@ -245,7 +245,7 @@ ccnl_mgmt_newface(struct ccnl_relay_s *ccnl, struct ccnl_buf_s *orig,
     if (f) {
         int flagval = flags ?
                       strtol((const char *)flags, NULL, 0) : CCNL_FACE_FLAGS_STATIC;
-        //	DEBUGMSG(1, "  flags=%s %d\n", flags, flagval);
+        //  DEBUGMSG(1, "  flags=%s %d\n", flags, flagval);
         DEBUGMSG(99, "  adding a new face (id=%d) worked!\n", f->faceid);
         f->flags = flagval &
                    (CCNL_FACE_FLAGS_STATIC | CCNL_FACE_FLAGS_REFLECT);

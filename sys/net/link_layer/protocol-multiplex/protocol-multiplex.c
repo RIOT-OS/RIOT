@@ -13,21 +13,21 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 *******************************************************************************/
 
 /**
- * @addtogroup	net_mmstack
+ * @addtogroup  net_mmstack
  * @{
  */
 
 /**
  * @file
  * @internal
- * @brief		Protocol handler multiplexing
+ * @brief       Protocol handler multiplexing
  *
- * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
- * @author		Heiko Will <hwill@inf.fu-berlin.de>
- * @author		Michael Baar <baar@inf.fu-berlin.de>
+ * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
+ * @author      Heiko Will <hwill@inf.fu-berlin.de>
+ * @author      Michael Baar <baar@inf.fu-berlin.de>
  * @version     $Revision: 1938 $
  *
- * @note		$Id: protocol-multiplex.c 1938 2010-03-02 12:14:29Z baar $
+ * @note        $Id: protocol-multiplex.c 1938 2010-03-02 12:14:29Z baar $
  */
 
 #include <stddef.h>

@@ -1,5 +1,5 @@
 #ifndef _SEMAPHORE_H
-#define _SEMAPHORE_H	1
+#define _SEMAPHORE_H    1
 
 #include <time.h>
 
@@ -98,4 +98,4 @@ int sem_post(sem_t *sem);
  */
 int sem_getvalue(sem_t *sem, int *sval);
 
-#endif	/* semaphore.h */
+#endif  /* semaphore.h */

@@ -31,15 +31,15 @@
 #define CMP_MATCH   1 // used to match interest and content
 #define CMP_LONGEST 2 // used to lookup the FIB
 
-#define CCNL_FACE_FLAGS_STATIC	1
-#define CCNL_FACE_FLAGS_REFLECT	2
-#define CCNL_FACE_FLAGS_SERVED	4
-#define CCNL_FACE_FLAGS_FWDALLI	8 // forward all interests, also known ones
+#define CCNL_FACE_FLAGS_STATIC  1
+#define CCNL_FACE_FLAGS_REFLECT 2
+#define CCNL_FACE_FLAGS_SERVED  4
+#define CCNL_FACE_FLAGS_FWDALLI 8 // forward all interests, also known ones
 #define CCNL_FACE_FLAGS_BROADCAST  16
 
-#define CCNL_FRAG_NONE		0
-#define CCNL_FRAG_SEQUENCED2012	1
-#define CCNL_FRAG_CCNx2013	2
+#define CCNL_FRAG_NONE      0
+#define CCNL_FRAG_SEQUENCED2012 1
+#define CCNL_FRAG_CCNx2013  2
 
 #define CCNL_CONTENT_FLAGS_STATIC  0x01
 #define CCNL_CONTENT_FLAGS_STALE   0x02
@@ -90,10 +90,10 @@ struct ccnl_relay_s {
     struct ccnl_interest_s *pit;
     struct ccnl_content_s *contents; //, *contentsend;
     struct ccnl_nonce_s *nonces;
-    int contentcnt;		// number of cached items
-    int max_cache_entries;	// -1: unlimited
+    int contentcnt;     // number of cached items
+    int max_cache_entries;  // -1: unlimited
     struct ccnl_if_s ifs[CCNL_MAX_INTERFACES];
-    int ifcount;		// number of active interfaces
+    int ifcount;        // number of active interfaces
     char halt_flag;
     struct ccnl_sched_s *(*defaultFaceScheduler)(struct ccnl_relay_s *,
             void(*cts_done)(void *, void *));
@@ -184,8 +184,8 @@ struct ccnl_interest_s {
     struct ccnl_pendint_s *pending; // linked list of faces wanting that content
     struct ccnl_prefix_s *prefix;
     int minsuffix, maxsuffix;
-    struct ccnl_buf_s *ppkd;	   // publisher public key digest
-    struct ccnl_buf_s *pkt;	   // full datagram
+    struct ccnl_buf_s *ppkd;       // publisher public key digest
+    struct ccnl_buf_s *pkt;    // full datagram
     struct timeval last_used;
     int retries;
     struct ccnl_forward_s *forwarded_over;
