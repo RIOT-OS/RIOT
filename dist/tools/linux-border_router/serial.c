@@ -189,7 +189,7 @@ static void report_open_error(const char *filename, int err)
     }
 
     /* printf("%s is owned by: user %s, group %s\r\n",
-    	filename, file_uname, file_gname); */
+        filename, file_uname, file_gname); */
 
     perm = info.st_mode;
 
