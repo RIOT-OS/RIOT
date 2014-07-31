@@ -467,8 +467,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     }
 
     /* clean interrupt status register */
-    uint32_t tmp = port->PIO_ISR;
-    (void)tmp;
+    port->PIO_ISR;
 
     /* enable the interrupt for the given channel */
     port->PIO_IER = pin;
