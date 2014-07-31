@@ -72,6 +72,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
     uint16_t length = IPV6_HDR_LEN + NTOHS(packet->length);
     ndp_neighbor_cache_t *nce;
 
+    DEBUGF("Got a packet to send to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &packet->destaddr));
     ipv6_net_if_get_best_src_addr(&packet->srcaddr, &packet->destaddr);
 
     if (!ipv6_addr_is_multicast(&packet->destaddr) &&
@@ -313,6 +314,7 @@ int is_our_address(ipv6_addr_t *addr)
     uint8_t prefix, suffix;
     int if_id = -1;
 
+    DEBUGF("Is this my addres: %s?\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
         net_if_ext = ipv6_net_if_get_ext(if_id);
         myaddr = NULL;
@@ -321,6 +323,7 @@ int is_our_address(ipv6_addr_t *addr)
 
         while ((myaddr = (ipv6_net_if_addr_t *)net_if_iter_addresses(if_id,
                          (net_if_addr_t **) &myaddr)) != NULL) {
+            DEBUGF("\tCompare with: %s?\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, (ipv6_addr_t*) myaddr->addr_data));
             if ((ipv6_get_addr_match(myaddr->addr_data, addr) >= net_if_ext->prefix) &&
                 (memcmp(&addr->uint8[prefix], &myaddr->addr_data->uint8[prefix], suffix) == 0)) {
                 return 1;
