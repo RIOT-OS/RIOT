@@ -19,7 +19,6 @@
 #ifndef __PERIPH_CONF_H
 #define __PERIPH_CONF_H
 
-
 /**
  * @name Timer peripheral configuration
  * @{
@@ -51,6 +50,7 @@
 #define TIMER_2_ISR2        isr_tc7
 /** @} */
 
+
 /**
  * @name UART configuration
  * @{
@@ -69,185 +69,20 @@
 /* UART 0 pin configuration */
 #define UART_0_PORT         PIOA
 #define UART_0_PINS         (PIO_PA8 | PIO_PA9)
-#define UART_0_PORT_CLKEN() RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE)
-#define UART_0_RX_AFCFG()   (GPIO_PinAFConfig(UART_0_PORT, GPIO_PinSource6, GPIO_AF_0))
-#define UART_0_TX_AFCFG()   (GPIO_PinAFConfig(UART_0_PORT, GPIO_PinSource7, GPIO_AF_0))
 
 /* UART 1 device configuration */
-#define UART_1_DEV          USART2
-#define UART_1_CLKEN()      RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART2, ENABLE)
-#define UART_1_IRQ          USART2_IRQn
-#define UART_1_ISR          isr_usart2
+#define UART_1_DEV
+#define UART_1_IRQ
+#define UART_1_ISR
 /* UART 1 pin configuration */
-#define UART_1_PORT         GPIOA
-#define UART_1_PINS         (GPIO_Pin_2 | GPIO_Pin_3)
-#define UART_1_PORT_CLKEN() RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE)
-#define UART_1_RX_AFCFG()   GPIO_PinAFConfig(UART_1_PORT, GPIO_PinSource2, GPIO_AF_1)
-#define UART_1_TX_AFCFG()   GPIO_PinAFConfig(UART_1_PORT, GPIO_PinSource3, GPIO_AF_1)
+#define UART_1_PORT
+#define UART_1_PINS
 /** @} */
 
 
 /**
- * @brief ADC configuration
- */
-#define ADC_NUMOF           (0U)
-#define ADC_0_EN            0
-#define ADC_1_EN            0
-
-/* ADC 0 configuration */
-#define ADC_0_DEV           ADC1                                                    /* TODO */
-#define ADC_0_SAMPLE_TIMER
-/* ADC 0 channel 0 pin config */
-#define ADC_0_C0_PORT
-#define ADC_0_C0_PIN
-#define ADC_0_C0_CLKEN()
-#define ADC_0_C0_AFCFG()
-/* ADC 0 channel 1 pin config */
-#define ADC_0_C1_PORT
-#define ADC_0_C1_PIN
-#define ADC_0_C1_CLKEN()
-#define ADC_0_C1_AFCFG()
-/* ADC 0 channel 2 pin config */
-#define ADC_0_C2_PORT
-#define ADC_0_C2_PIN
-#define ADC_0_C2_CLKEN()
-#define ADC_0_C2_AFCFG()
-/* ADC 0 channel 3 pin config */
-#define ADC_0_C3_PORT
-#define ADC_0_C3_PIN
-#define ADC_0_C3_CLKEN()
-#define ADC_0_C3_AFCFG()
-
-/* ADC 0 configuration */
-#define ADC_1_DEV           ADC2                                                    /* TODO */
-#define ADC_1_SAMPLE_TIMER
-/* ADC 0 channel 0 pin config */
-#define ADC_1_C0_PORT
-#define ADC_1_C0_PIN
-#define ADC_1_C0_CLKEN()
-#define ADC_1_C0_AFCFG()
-/* ADC 0 channel 1 pin config */
-#define ADC_1_C1_PORT
-#define ADC_1_C1_PIN
-#define ADC_1_C1_CLKEN()
-#define ADC_1_C1_AFCFG()
-/* ADC 0 channel 2 pin config */
-#define ADC_1_C2_PORT
-#define ADC_1_C2_PIN
-#define ADC_1_C2_CLKEN()
-#define ADC_1_C2_AFCFG()
-/* ADC 0 channel 3 pin config */
-#define ADC_1_C3_PORT
-#define ADC_1_C3_PIN
-#define ADC_1_C3_CLKEN()
-#define ADC_1_C3_AFCFG()
-
-
-/**
- * @brief PWM configuration
- */
-#define PWM_NUMOF           (0U)                                                    /* TODO */
-#define PWM_0_EN            0
-#define PWM_1_EN            0
-
-/* PWM 0 device configuration */
-#define PWM_0_DEV           TIM1
-#define PWM_0_CHANNELS      4
-/* PWM 0 pin configuration */
-#define PWM_0_PORT
-#define PWM_0_PINS
-#define PWM_0_PORT_CLKEN()
-#define PWM_0_CH1_AFCFG()
-#define PWM_0_CH2_AFCFG()
-#define PWM_0_CH3_AFCFG()
-#define PWM_0_CH4_AFCFG()
-
-/* PWM 1 device configuration */
-#define PWM_1_DEV           TIM3
-#define PWM_1_CHANNELS      4
-/* PWM 1 pin configuration */
-#define PWM_1_PORT
-#define PWM_1_PINS
-#define PWM_1_PORT_CLKEN()
-#define PWM_1_CH1_AFCFG()
-#define PWM_1_CH2_AFCFG()
-#define PWM_1_CH3_AFCFG()
-#define PWM_1_CH4_AFCFG()
-
-
-
-/**
- * @brief SPI configuration
- */
-#define SPI_NUMOF           (0U)                                                    /* TODO */
-#define SPI_0_EN            0
-#define SPI_1_EN            0
-
-/* SPI 0 device config */
-#define SPI_0_DEV           SPI1
-#define SPI_0_CLKEN()
-#define SPI_0_IRQ           SPI1_IRQn
-#define SPI_0_IRQ_HANDLER
-#define SPI_0_IRQ_PRIO      1
-/* SPI 1 pin configuration */
-#define SPI_0_PORT
-#define SPI_0_PINS          ()
-#define SPI_1_PORT_CLKEN()
-#define SPI_1_SCK_AFCFG()
-#define SPI_1_MISO_AFCFG()
-#define SPI_1_MOSI_AFCFG()
-
-/* SPI 1 device config */
-#define SPI_1_DEV           SPI2
-#define SPI_1_CLKEN()
-#define SPI_1_IRQ           SPI2_IRQn
-#define SPI_1_IRQ_HANDLER
-#define SPI_1_IRQ_PRIO      1
-/* SPI 1 pin configuration */
-#define SPI_1_PORT
-#define SPI_1_PINS          ()
-#define SPI_1_PORT_CLKEN()
-#define SPI_1_SCK_AFCFG()
-#define SPI_1_MISO_AFCFG()
-#define SPI_1_MOSI_AFCFG()
-
-
-/**
- * @brief I2C configuration
- */
-#define I2C_NUMOF           (0U)                                                    /* TODO */
-#define I2C_0_EN            0
-#define I2C_0_EN            0
-
-/* SPI 0 device configuration */
-#define I2C_0_DEV           I2C1
-#define I2C_0_CLKEN()
-#define I2C_0_ISR           isr_i2c1
-#define I2C_0_IRQ           I2C1_IRQn
-#define I2C_0_IRQ_PRIO      1
-/* SPI 0 pin configuration */
-#define I2C_0_PORT          GPIOB
-#define I2C_0_PINS          (GPIO_Pin_6 | GPIO_Pin_7)
-#define I2C_0_PORT_CLKEN()
-#define I2C_0_SCL_AFCFG()
-#define I2C_0_SDA_AFCFG()
-
-/* SPI 1 device configuration */
-#define I2C_1_DEV           I2C2
-#define I2C_1_CLKEN()
-#define I2C_1_ISR           isr_i2c2
-#define I2C_1_IRQ           I2C2_IRQn
-#define I2C_1_IRQ_PRIO      1
-/* SPI 1 pin configuration */
-#define I2C_1_PORT          GPIOF
-#define I2C_1_PINS          (GPIO_Pin_0 | GPIO_Pin_1)
-#define I2C_1_PORT_CLKEN()
-#define I2C_1_SCL_AFCFG()
-#define I2C_1_SDA_AFCFG()
-
-
-/**
- * @brief GPIO configuration
+ * @name GPIO configuration
+ * @{
  */
 #define GPIO_NUMOF          (15U)
 #define GPIO_0_EN           1
@@ -266,24 +101,6 @@
 #define GPIO_13_EN          1
 #define GPIO_14_EN          1
 #define GPIO_15_EN          1
-
-/* IRQ config */
-/* #define GPIO_IRQ_0          GPIO_0 */
-/* #define GPIO_IRQ_1          GPIO_1 */
-/* #define GPIO_IRQ_2          // not configured */
-/* #define GPIO_IRQ_3          // not configured */
-/* #define GPIO_IRQ_4          GPIO_2 */
-/* #define GPIO_IRQ_5          GPIO_3 */
-/* #define GPIO_IRQ_6          GPIO_4 */
-/* #define GPIO_IRQ_7          GPIO_5 */
-/* #define GPIO_IRQ_8          // not configured */
-/* #define GPIO_IRQ_9          // not configured */
-/* #define GPIO_IRQ_10         GPIO_6 */
-/* #define GPIO_IRQ_11         GPIO_7 */
-/* #define GPIO_IRQ_12         GPIO_8 */
-/* #define GPIO_IRQ_13         GPIO_9 */
-/* #define GPIO_IRQ_14         GPIO_10 */
-/* #define GPIO_IRQ_15         GPIO_11 */
 
 /* GPIO channel 0 config */
 #define GPIO_0_DEV          PIOA
@@ -333,5 +150,7 @@
 /* GPIO channel 15 config */
 #define GPIO_15_DEV         PIOB
 #define GPIO_15_PIN         PIO_PB14
+/** @} */
 
 #endif /* __PERIPH_CONF_H */
+/** @} */

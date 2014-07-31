@@ -10,7 +10,7 @@
  * @brief       Low-level ADC peripheral driver
  * @{
  *
- * @file        periph/adc.h
+ * @file
  * @brief       Low-level ADC peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -21,6 +21,8 @@
 
 #include "periph_conf.h"
 
+/* guard file in case no ADC device is defined */
+#if ADC_NUMOF
 
 /**
  * @brief Definition available ADC devices
@@ -30,19 +32,30 @@
  */
 typedef enum {
 #if ADC_0_EN
-    ADC_0,              /*< ADC device 0 */
+    ADC_0 = 0,              /**< ADC device 0 */
 #endif
 #if ADC_1_EN
-    ADC_1,              /*< ADC device 1 */
+    ADC_1,                  /**< ADC device 1 */
 #endif
 #if ADC_2_EN
-    ADC_2,               /*< ADC device 2 */
+    ADC_2,                  /**< ADC device 2 */
 #endif
 #if ADC_3_EN
-    ADC_3,               /*< ADC device 3 */
+    ADC_3,                  /**< ADC device 3 */
 #endif
-    ADC_UNDEFINED
 } adc_t;
+
+/**
+ * @brief Possible ADC precision settings
+ */
+typedef enum {
+    ADC_RES_6BIT = 0,       /**< ADC precision: 6 bit */
+    ADC_RES_8BIT,           /**< ADC precision: 8 bit */
+    ADC_RES_10BIT,          /**< ADC precision: 10 bit */
+    ADC_RES_12BIT,          /**< ADC precision: 12 bit */
+    ADC_RES_14BIT,          /**< ADC precision: 14 bit */
+    ADC_RES_16BIT,          /**< ADC precision: 16 bit */
+} adc_precision_t;
 
 /**
  * @brief Initialization of a given ADC device
@@ -52,12 +65,12 @@ typedef enum {
  * range of some us).
  *
  * @param[in] dev           the device to initialize
- * @param[in] precision     the conversion precision in bits, will LSBs will be stuffed if
- *                          precision > max precision of hardware
+ * @param[in] precision     the precision to use for conversion
  *
- * @return                  1 on success, -1 on error
+ * @return                  0 on success
+ * @return                  -1 on precision not available
  */
-int adc_init(adc_t dev, int precision);
+int adc_init(adc_t dev, adc_precision_t precision);
 
 /**
  * @brief Start a new conversion by using the given channel.
@@ -67,9 +80,24 @@ int adc_init(adc_t dev, int precision);
  * @param[in] dev           the ADC device to use for the conversion
  * @param[in] channel       the channel to convert from
  *
- * @return                  the converted value with the defined precision, -1 on error
+ * @return                  the converted value
+ * @return                  -1 on invalid channel
  */
 int adc_sample(adc_t dev, int channel);
+
+/**
+ * @brief Enable the power for the given ADC device
+ *
+ * @param[in] dev           the ADC device to power up
+ */
+void adc_poweron(adc_t dev);
+
+/**
+ * @brief Disable the power for the given ADC device
+ *
+ * @param[in] dev           the ADC device to power down
+ */
+void adc_poweroff(adc_t dev);
 
 /**
  * @brief Helper function to map a converted value to the given integer range.
@@ -100,6 +128,8 @@ int adc_map(adc_t dev, int value, int min, int max);
  * @return                  the mapped value
  */
 float adc_mapf(adc_t dev, int value, float min, float max);
+
+#endif /* ADC_NUMOF */
 
 #endif /* __ADC_H */
 /** @} */

@@ -7,7 +7,6 @@
  * @files       msba2-common.h
  * @brief       MSB-A2 Common Board Definitions
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 #ifndef __MSBA2_COMMON_H

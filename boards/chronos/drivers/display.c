@@ -1,4 +1,4 @@
-/* *************************************************************************************************
+/**
  *
  *  Copyright (C) 2009 Texas Instruments Incorporated - http://www.ti.com/
  *
@@ -31,9 +31,7 @@
  *    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  *    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * *************************************************************************************************
- * Basic display functions.
- * ************************************************************************************************/
+ */
 
 /**
  * @ingroup chronos
@@ -42,40 +40,28 @@
 
 /**
  * @file
- * @brief       eZ430-chronos display driver
+ * @brief   eZ430-chronos display driver
  *
- * @author      Oliver Hahm <oliver.hahm@inria.fr>
- * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
- * @author      mikoff
+ * @author  Oliver Hahm <oliver.hahm@inria.fr>
+ * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  mikoff
  *
- */
-/* *************************************************************************************************
- * Include section
  */
 
-/* system */
 #include <string.h>
-
-/* driver */
 #include <cc430f6137.h>
 
 #include "display.h"
 
-
-/**************************************************************************************************
- * Prototypes section */
 void write_lcd_mem(uint8_t *lcdmem, uint8_t bits, uint8_t bitmask, uint8_t state);
 void clear_line(uint8_t line);
 void display_symbol(uint8_t symbol, uint8_t mode);
 
-/* *************************************************************************************************
- * Global Variable section */
-
-/* Display flags */
+/** Display flags */
 volatile s_display_flags_t display;
 
-/* Global return string for itoa function */
+/** Global return string for itoa function */
 char itoa_str[8];
 
 void lcd_init(void)
@@ -83,7 +69,7 @@ void lcd_init(void)
     /* Clear entire display memory */
     LCDBMEMCTL |= LCDCLRBM + LCDCLRM;
 
-    /* LCD_FREQ = ACLK/16/8 = 256Hz  */
+    /* LCD_FREQ = ACLK/16/8 = 256Hz */
     /* Frame frequency = 256Hz/4 = 64Hz, LCD mux 4, LCD on */
     LCDBCTL0 = (LCDDIV0 + LCDDIV1 + LCDDIV2 + LCDDIV3) | (LCDPRE0 + LCDPRE1) | LCD4MUX | LCDON;
 
@@ -95,8 +81,8 @@ void lcd_init(void)
     P5DIR |= (BIT5 | BIT6 | BIT7);
 
     /* Activate LCD output */
-    LCDBPCTL0 = 0xFFFF;                         /* Select LCD segments S0-S15 */
-    LCDBPCTL1 = 0x00FF;                         /* Select LCD segments S16-S22 */
+    LCDBPCTL0 = 0xFFFF; /* Select LCD segments S0-S15 */
+    LCDBPCTL1 = 0x00FF; /* Select LCD segments S16-S22 */
 
 #ifdef USE_LCD_CHARGE_PUMP
     /* Charge pump voltage generated internally, internal bias (V2-V4) generation */
@@ -127,7 +113,7 @@ void clear_line(uint8_t line)
         display_symbol(LCD_SEG_L1_COL, SEG_OFF);
     }
     /* line == LINE2 */
-    else  {
+    else {
         display_symbol(LCD_SEG_L2_DP, SEG_OFF);
         display_symbol(LCD_SEG_L2_COL1, SEG_OFF);
         display_symbol(LCD_SEG_L2_COL0, SEG_OFF);
@@ -149,12 +135,12 @@ void write_lcd_mem(uint8_t *lcdmem, uint8_t bits, uint8_t bitmask, uint8_t state
     }
     else if (state == SEG_ON_BLINK_ON) {
         /* Clear visible / blink segments before writing */
-        *lcdmem         = (uint8_t)(*lcdmem & ~bitmask);
-        *(lcdmem + 0x20)    = (uint8_t)(*(lcdmem + 0x20) & ~bitmask);
+        *lcdmem = (uint8_t)(*lcdmem & ~bitmask);
+        *(lcdmem + 0x20) = (uint8_t)(*(lcdmem + 0x20) & ~bitmask);
 
         /* Set visible / blink segments */
-        *lcdmem         = (uint8_t)(*lcdmem | bits);
-        *(lcdmem + 0x20)    = (uint8_t)(*(lcdmem + 0x20) | bits);
+        *lcdmem = (uint8_t)(*lcdmem | bits);
+        *(lcdmem + 0x20) = (uint8_t)(*(lcdmem + 0x20) | bits);
     }
     else if (state == SEG_ON_BLINK_OFF) {
         /* Clear visible segments before writing */
@@ -164,27 +150,26 @@ void write_lcd_mem(uint8_t *lcdmem, uint8_t bits, uint8_t bitmask, uint8_t state
         *lcdmem = (uint8_t)(*lcdmem | bits);
 
         /* Clear blink segments */
-        *(lcdmem + 0x20)    = (uint8_t)(*(lcdmem + 0x20) & ~bitmask);
+        *(lcdmem + 0x20) = (uint8_t)(*(lcdmem + 0x20) & ~bitmask);
     }
     else if (state == SEG_OFF_BLINK_OFF) {
         /* Clear segments */
         *lcdmem = (uint8_t)(*lcdmem & ~bitmask);
 
         /* Clear blink segments */
-        *(lcdmem + 0x20)    = (uint8_t)(*(lcdmem + 0x20) & ~bitmask);
+        *(lcdmem + 0x20) = (uint8_t)(*(lcdmem + 0x20) & ~bitmask);
     }
 }
 
 char *itoa(uint32_t n, uint8_t digits, uint8_t blanks)
 {
-    uint8_t i;
     uint8_t digits1 = digits;
 
     /* Preset result string */
     memcpy(itoa_str, "0000000", 7);
 
     /* Return empty string if number of digits is invalid (valid range for digits: 1-7) */
-    if ((digits == 0) || (digits > 7))  {
+    if ((digits == 0) || (digits > 7)) {
         return (itoa_str);
     }
 
@@ -193,7 +178,7 @@ char *itoa(uint32_t n, uint8_t digits, uint8_t blanks)
         if (digits >= 3) {
             memcpy(itoa_str + (digits - 3), itoa_conversion_table[n], 3);
         }
-        /* digits == 1 || 2   */
+        /* digits == 1 || 2 */
         else {
             memcpy(itoa_str, itoa_conversion_table[n] + (3 - digits), digits);
         }
@@ -209,9 +194,8 @@ char *itoa(uint32_t n, uint8_t digits, uint8_t blanks)
     }
 
     /* Remove specified number of leading '0', always keep last one */
-    i = 0;
-
-    while ((itoa_str[i] == '0') && (i < digits1 - 1))   {
+    uint8_t i = 0;
+    while ((i < digits1 - 1) && (itoa_str[i] == '0')) {
         if (blanks > 0) {
             /* Convert only specified number of leading '0' */
             itoa_str[i] = ' ';
@@ -236,38 +220,32 @@ void display_value1(uint8_t segments, uint32_t value, uint8_t digits, uint8_t bl
 
 void display_symbol(uint8_t symbol, uint8_t mode)
 {
-    uint8_t *lcdmem;
-    uint8_t bits;
-    uint8_t bitmask;
-
     if (symbol <= LCD_SEG_L2_DP) {
         /* Get LCD memory address for symbol from table */
-        lcdmem  = (uint8_t *)segments_lcdmem[symbol];
+        uint8_t *lcdmem = (uint8_t *)segments_lcdmem[symbol];
 
         /* Get bits for symbol from table */
-        bits    = segments_bitmask[symbol];
+        uint8_t bits = segments_bitmask[symbol];
 
         /* Bitmask for symbols equals bits */
-        bitmask = bits;
+        uint8_t bitmask = bits;
 
-        /* Write LCD memory      */
+        /* Write LCD memory */
         write_lcd_mem(lcdmem, bits, bitmask, mode);
     }
 }
 
 void display_char(uint8_t segment, char chr, uint8_t mode)
 {
-    uint8_t *lcdmem;            /* Pointer to LCD memory */
-    uint8_t bitmask;            /* Bitmask for character */
-    uint8_t bits, bits1;        /* Bits to write */
-
     /* Write to single 7-segment character */
     if ((segment >= LCD_SEG_L1_3) && (segment <= LCD_SEG_L2_DP)) {
+        uint8_t bits, bits1; /* Bits to write */
+
         /* Get LCD memory address for segment from table */
-        lcdmem = (uint8_t *)segments_lcdmem[segment];
+        uint8_t *lcdmem = (uint8_t *)segments_lcdmem[segment];
 
         /* Get bitmask for character from table */
-        bitmask = segments_bitmask[segment];
+        uint8_t bitmask = segments_bitmask[segment];
 
         /* Get bits from font set */
         if ((chr >= 0x30) && (chr <= 0x5A)) {
@@ -298,19 +276,18 @@ void display_char(uint8_t segment, char chr, uint8_t mode)
             }
         }
 
-        /* Physically write to LCD memory        */
+        /* Physically write to LCD memory */
         write_lcd_mem(lcdmem, bits, bitmask, mode);
     }
 }
 
 void display_chars(uint8_t segments, char *str, uint8_t mode)
 {
-    uint8_t i;
-    uint8_t length = 0;         /* Write length */
-    uint8_t char_start = 0;         /* Starting point for consecutive write */
+    uint8_t length = 0; /* Write length */
+    uint8_t char_start = 0; /* Starting point for consecutive write */
 
     switch (segments) {
-            /* LINE1 */
+        /* LINE1 */
         case LCD_SEG_L1_3_0:
             length = 4;
             char_start = LCD_SEG_L1_3;
@@ -336,7 +313,7 @@ void display_chars(uint8_t segments, char *str, uint8_t mode)
             char_start = LCD_SEG_L1_3;
             break;
 
-            /* LINE2 */
+        /* LINE2 */
         case LCD_SEG_L2_5_0:
             length = 6;
             char_start = LCD_SEG_L2_5;
@@ -384,7 +361,7 @@ void display_chars(uint8_t segments, char *str, uint8_t mode)
     }
 
     /* Write to consecutive digits */
-    for (i = 0; i < length; i++) {
+    for (uint8_t i = 0; i < length; i++) {
         /* Use single character routine to write display memory */
         display_char(char_start + i, *(str + i), mode);
     }
@@ -425,9 +402,7 @@ void set_blink_rate(uint8_t bits)
 void display_all_off(void)
 {
     uint8_t *lcdptr = (uint8_t *)0x0A20;
-    uint8_t i;
-
-    for (i = 1; i <= 12; i++) {
+    for (uint8_t i = 1; i <= 12; i++) {
         *lcdptr = 0x00;
         lcdptr++;
     }

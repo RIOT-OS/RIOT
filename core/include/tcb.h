@@ -13,7 +13,6 @@
  * @file        tcb.h
  * @brief       Thread context block definition
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
@@ -66,7 +65,7 @@ typedef struct tcb_t {
     clist_node_t rq_entry;      /**< run queue entry                */
 
     void *wait_data;            /**< holding messages               */
-    queue_node_t msg_waiters;   /**< threads waiting on message     */
+    queue_t msg_waiters;        /**< threads waiting on message     */
 
     cib_t msg_queue;            /**< message queue                  */
     msg_t *msg_array;           /**< memory holding messages        */

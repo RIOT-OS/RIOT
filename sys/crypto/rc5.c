@@ -12,7 +12,6 @@
  * @file        rc5.c
  * @brief       implementation of the RC5 cipher-algorithm
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Nicolai Schmittberger <nicolai.schmittberger@fu-berlin.de>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @author      Naveen Sastry

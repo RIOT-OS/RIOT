@@ -14,7 +14,6 @@
  * @brief       SMB380 acceleration sensor driver for the LPC2387 on the
  *              AVSEXTREM board.
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Marco Ziegert <ziegert@inf.fu-berlin.de>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @version     $Revision: 3854 $

@@ -16,7 +16,6 @@
  *
  * @file        net_if.h
  * @brief       Types and functions for network interfaces
- * @author      Freie Universität Berlin
  * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef _NET_IF_H

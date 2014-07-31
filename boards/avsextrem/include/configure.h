@@ -11,7 +11,6 @@
  * @file
  * @brief       definitions for the avsextrem board configuration
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      baar
  * @author      Zakaria Kasmi
  * @version     $Revision: 1127 $

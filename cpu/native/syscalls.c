@@ -50,17 +50,24 @@ extern volatile tcb_t *sched_active_thread;
 
 ssize_t (*real_read)(int fd, void *buf, size_t count);
 ssize_t (*real_write)(int fd, const void *buf, size_t count);
-void* (*real_malloc)(size_t size);
+size_t (*real_fread)(void *ptr, size_t size, size_t nmemb, FILE *stream);
+void (*real_clearerr)(FILE *stream);
 void (*real_free)(void *ptr);
+void* (*real_malloc)(size_t size);
 void* (*real_calloc)(size_t nmemb, size_t size);
 void* (*real_realloc)(void *ptr, size_t size);
+int (*real_printf)(const char *format, ...);
+int (*real_getpid)(void);
 int (*real_pipe)(int[2]);
 int (*real_close)(int);
-int (*real_fork)(void);
 int (*real_dup2)(int, int);
-int (*real_unlink)(const char *);
 int (*real_execve)(const char *, char *const[], char *const[]);
+int (*real_fork)(void);
+int (*real_feof)(FILE *stream);
+int (*real_ferror)(FILE *stream);
 int (*real_pause)(void);
+int (*real_unlink)(const char *);
+FILE* (*real_fopen)(const char *path, const char *mode);
 
 void _native_syscall_enter(void)
 {
@@ -188,15 +195,15 @@ int puts(const char *s)
 
 char *make_message(const char *format, va_list argp)
 {
-    int n;
     int size = 100;
     char *message, *temp;
 
-    if ((message = malloc(size)) == NULL)
+    if ((message = malloc(size)) == NULL) {
         return NULL;
+    }
 
     while (1) {
-        n = vsnprintf(message, size, format, argp);
+        int n = vsnprintf(message, size, format, argp);
         if (n < 0)
             return NULL;
         if (n < size)
@@ -334,3 +341,29 @@ int _gettimeofday(struct timeval *tp, void *restrict tzp) {
     return 0;
 }
 #endif
+
+/**
+ * set up native internal syscall symbols
+ */
+void _native_init_syscalls(void)
+{
+    *(void **)(&real_read) = dlsym(RTLD_NEXT, "read");
+    *(void **)(&real_write) = dlsym(RTLD_NEXT, "write");
+    *(void **)(&real_malloc) = dlsym(RTLD_NEXT, "malloc");
+    *(void **)(&real_realloc) = dlsym(RTLD_NEXT, "realloc");
+    *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");
+    *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
+    *(void **)(&real_getpid) = dlsym(RTLD_NEXT, "getpid");
+    *(void **)(&real_pipe) = dlsym(RTLD_NEXT, "pipe");
+    *(void **)(&real_close) = dlsym(RTLD_NEXT, "close");
+    *(void **)(&real_fork) = dlsym(RTLD_NEXT, "fork");
+    *(void **)(&real_dup2) = dlsym(RTLD_NEXT, "dup2");
+    *(void **)(&real_unlink) = dlsym(RTLD_NEXT, "unlink");
+    *(void **)(&real_execve) = dlsym(RTLD_NEXT, "execve");
+    *(void **)(&real_pause) = dlsym(RTLD_NEXT, "pause");
+    *(void **)(&real_fopen) = dlsym(RTLD_NEXT, "fopen");
+    *(void **)(&real_fread) = dlsym(RTLD_NEXT, "fread");
+    *(void **)(&real_feof) = dlsym(RTLD_NEXT, "feof");
+    *(void **)(&real_ferror) = dlsym(RTLD_NEXT, "ferror");
+    *(void **)(&real_clearerr) = dlsym(RTLD_NEXT, "clearerr");
+}

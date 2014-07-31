@@ -384,7 +384,7 @@ static void *run(void *arg)
  */
 static void receive_packet(uint16_t type, uint8_t pos)
 {
-    uint8_t i = 0;
+    size_t i = 0;
     transceiver_type_t t;
     rx_buffer_pos = pos;
     msg_t m;
@@ -480,10 +480,10 @@ static void receive_packet(uint16_t type, uint8_t pos)
 
 #ifdef DBG_IGNORE
 
-        for (size_t i = 0; (i < TRANSCEIVER_MAX_IGNORED_ADDR) && (transceiver_ignored_addr[i]); i++) {
-            DEBUG("check if source (%u) is ignored -> %u\n", transceiver_buffer[transceiver_buffer_pos].src, transceiver_ignored_addr[i]);
+        for (size_t j = 0; (j < TRANSCEIVER_MAX_IGNORED_ADDR) && (transceiver_ignored_addr[j]); j++) {
+            DEBUG("check if source (%u) is ignored -> %u\n", transceiver_buffer[transceiver_buffer_pos].src, transceiver_ignored_addr[j]);
 
-            if (transceiver_buffer[transceiver_buffer_pos].src == transceiver_ignored_addr[i]) {
+            if (transceiver_buffer[transceiver_buffer_pos].src == transceiver_ignored_addr[j]) {
                 DEBUG("ignored packet from %" PRIu16 "\n", transceiver_buffer[transceiver_buffer_pos].src);
                 return;
             }

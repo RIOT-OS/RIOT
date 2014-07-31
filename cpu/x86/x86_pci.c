@@ -218,6 +218,7 @@ static void pci_find_function(unsigned bus, unsigned dev, unsigned fun)
     printf("  %02x:%02x.%x \"%s\": \"%s\" (%s: %s, rev: %02hhx)\n",
            bus, dev, fun, vendor_name, device_name, baseclass_name, subclass_name, class.revision_id);
 
+    /* cppcheck-suppress memleakOnRealloc */
     known_pci_devices = realloc(known_pci_devices, sizeof (*known_pci_devices) * (num_known_pci_devices + 1));
     struct x86_known_pci_device *d = calloc(1, sizeof *d);
     known_pci_devices[num_known_pci_devices] = d;

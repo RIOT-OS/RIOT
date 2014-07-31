@@ -64,16 +64,18 @@ endif
 include $(RIOTBASE)/Makefile.cflags
 
 # make the RIOT version available to the program
-GIT_STRING := $(shell git describe --always --abbrev=4 --dirty=-`hostname`)
-ifneq (,$(GIT_STRING))
-  GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
-  ifeq ($(strip $(GIT_BRANCH)),master)
-    RIOT_VERSION := $(GIT_STRING)
+ifeq ($(origin RIOT_VERSION), undefined)
+  GIT_STRING := $(shell git describe --always --abbrev=4 --dirty=-`hostname` 2> /dev/null)
+  ifneq (,$(GIT_STRING))
+    GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+    ifeq ($(strip $(GIT_BRANCH)),master)
+      RIOT_VERSION := $(GIT_STRING)
+    else
+      RIOT_VERSION := $(GIT_STRING)-$(GIT_BRANCH)
+    endif
   else
-    RIOT_VERSION := $(GIT_STRING)-$(GIT_BRANCH)
+    RIOT_VERSION := UNKNOWN (builddir: $(RIOTBASE))
   endif
-else
-  RIOT_VERSION := UNKNOWN
 endif
 export CFLAGS += -DRIOT_VERSION='"$(RIOT_VERSION)"'
 

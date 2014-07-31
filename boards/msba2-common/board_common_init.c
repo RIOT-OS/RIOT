@@ -15,7 +15,6 @@
  * @file
  * @brief       MSB-A2 board initialization
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project
  * @author      Heiko Will
  * @author      Kaspar Schleiser
  * @author      Michael Baar <baar@inf.fu-berlin.de>

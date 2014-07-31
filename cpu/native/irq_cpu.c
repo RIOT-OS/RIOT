@@ -255,13 +255,10 @@ int _native_popsig(void)
  */
 void native_irq_handler(void)
 {
-    int sig;
-
     DEBUG("\n\n\t\tnative_irq_handler\n\n");
 
     while (_native_sigpend > 0) {
-
-        sig = _native_popsig();
+        int sig = _native_popsig();
         _native_sigpend--;
 
         if (native_irq_handlers[sig].func != NULL) {

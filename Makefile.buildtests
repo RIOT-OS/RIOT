@@ -55,6 +55,7 @@ buildtest:
 			RIOTCPU=$${RIOTCPU} \
 			BINDIRBASE=$${BINDIRBASE} \
 			RIOTNOLINK=$${RIOTNOLINK} \
+			RIOT_VERSION=$${RIOT_VERSION} \
 			$(MAKE) -j$(NPROC) 2>&1 >/dev/null) ; \
 		if [ "$${?}" = "0" ]; then \
 			$${ECHO} "$${GREEN}success$${RESET}"; \
@@ -93,8 +94,8 @@ buildsizes:
 	else \
 		BOARDS="$(BOARD_WHITELIST)"; \
 	fi; \
-	for BOARD in $(BOARD_BLACKLIST); do \
-		BOARDS=$$(sed -e "s/ $${BOARD} / /" <<< " $${BOARDS} "); \
+	for BOARD in $(BOARD_BLACKLIST) $(BOARD_INSUFFICIENT_RAM); do \
+		BOARDS=$$(echo \ $${BOARDS}\  | sed -e 's/ '$${BOARD}' / /'); \
 	done; \
 	\
 	echo -e "   text\t   data\t    bss\t    dec\tboard"; \
@@ -117,8 +118,8 @@ buildsizes-diff:
 	else \
 		BOARDS="$(BOARD_WHITELIST)"; \
 	fi; \
-	for BOARD in $(BOARD_BLACKLIST); do \
-		BOARDS=$$(sed -e "s/ $${BOARD} / /" <<< " $${BOARDS} "); \
+	for BOARD in $(BOARD_BLACKLIST) $(BOARD_INSUFFICIENT_RAM); do \
+		BOARDS=$$(echo \ $${BOARDS}\  | sed -e 's/ '$${BOARD}' / /'); \
 	done; \
 	\
 	GREEN='\033[1;32m'; RED='\033[1;31m'; RESET='\033[0m'; \

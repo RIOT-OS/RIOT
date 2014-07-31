@@ -14,7 +14,6 @@
  * @file        cc110x-reg.h
  * @brief       Access to CC110X registers
  *
- * @author      INRIA
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 

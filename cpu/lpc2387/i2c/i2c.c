@@ -17,7 +17,6 @@
  *              user does not declare a handler, an appropriate interrupt is
  *              automatically registered for the specific i2c interface.
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @author      Marco Ziegert <ziegert@inf.fu-berlin.de>
  * @author      Benjamin Aschenbrenner

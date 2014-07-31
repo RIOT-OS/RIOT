@@ -14,7 +14,6 @@
  * @ingroup     arm_common
  * @brief       LPC2387 NewLib system calls implementation
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Michael Baar <michael.baar@fu-berlin.de>
  *
  */

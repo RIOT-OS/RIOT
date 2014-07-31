@@ -15,7 +15,6 @@
  * @file        io.h
  * @brief       Prototypes for system io functions
  *
- * @author      INRIA
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 

@@ -45,6 +45,9 @@
 int _native_uart_sock;
 int _native_uart_conn;
 
+int _native_replay_enabled;
+FILE *_native_replay_buffer;
+
 fd_set _native_uart_rfds;
 
 /* uart API */
@@ -177,7 +180,7 @@ void handle_uart_in(void)
 
     nread = _native_read(STDIN_FILENO, buf, sizeof(buf));
     if (nread == -1) {
-        err(1, "handle_uart_in(): read()");
+        err(EXIT_FAILURE, "handle_uart_in(): read()");
     }
     else if (nread == 0) {
         /* end of file / socket closed */
@@ -197,7 +200,7 @@ void handle_uart_in(void)
             errx(EXIT_FAILURE, "handle_uart_in: unhandled situation!");
         }
     }
-    for(int pos = 0; pos < nread; pos++) {
+    for (int pos = 0; pos < nread; pos++) {
         uart0_handle_incoming(buf[pos]);
     }
     uart0_notify_thread();
@@ -227,6 +230,34 @@ void handle_uart_sock(void)
     if (real_dup2(s, STDIN_FILENO) == -1) {
         err(EXIT_FAILURE, "handle_uart_sock: dup2()");
     }
+
+    /* play back log from last position */
+    if (_native_replay_enabled) {
+        warnx("handle_uart_sock: replaying buffer");
+        size_t nread;
+        char buf[200];
+        while ((nread = real_fread(buf, 1, sizeof(buf), _native_replay_buffer)) != 0) {
+            int nwritten;
+            int pos = 0;
+            while ((nwritten = real_write(STDOUT_FILENO, &buf[pos], nread)) != -1) {
+                nread -= nwritten;
+                pos += nwritten;
+                if (nread == 0) {
+                    break;
+                }
+            }
+            if (nwritten == -1) {
+                err(EXIT_FAILURE, "handle_uart_sock: write");
+            }
+        }
+        if (real_feof(_native_replay_buffer) != 0) {
+            real_clearerr(_native_replay_buffer);
+        }
+        else if (real_ferror(_native_replay_buffer) != 0) {
+            err(EXIT_FAILURE, "handle_uart_sock(): fread()");
+        }
+    }
+
     _native_syscall_leave();
 
     _native_uart_conn = s;
@@ -260,8 +291,18 @@ int _native_set_uart_fds(void)
 }
 #endif
 
-void _native_init_uart0(char *stdiotype, char *ioparam)
+void _native_init_uart0(char *stdiotype, char *ioparam, int replay)
 {
+    _native_replay_enabled = replay;
+
+    if (_native_replay_enabled) {
+        char stdout_logname[255];
+        snprintf(stdout_logname, sizeof(stdout_logname), "/tmp/riot.stdout.%d", _native_pid);
+        if ((_native_replay_buffer = real_fopen(stdout_logname, "r+")) == NULL) {
+            err(EXIT_FAILURE, "_native_init_uart0: fdopen(_native_null_out_file)");
+        }
+    }
+
     if (strcmp(stdiotype, "tcp") == 0) {
         _native_uart_sock = init_tcp_socket(ioparam);
     }

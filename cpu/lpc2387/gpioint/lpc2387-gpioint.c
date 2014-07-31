@@ -19,7 +19,6 @@ See the file LICENSE in the top level directory for more details.
  * @file
  * @brief       LPC2387 GPIO Interrupt Multiplexer implementation
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Michael Baar <michael.baar@fu-berlin.de>
  * @version     $Revision: 1508 $
  *

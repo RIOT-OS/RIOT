@@ -16,7 +16,6 @@
  *          wants to measure by calling testing_start() to start the
  *          measuring and testing_stop() to end it.
  *
- * @author  Freie Universität Berlin, Computer Systems & Telemetics
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  */
 

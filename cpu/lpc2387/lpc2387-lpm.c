@@ -21,7 +21,6 @@ See the file LICENSE in the top level directory for more details.
  * @brief		LPC2387 Low-Power management
  * @ingroup		lpc2387
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author 		Heiko Will
  * @version     $Revision$
  *

@@ -13,7 +13,6 @@
  * @file        kernel_internal.h
  * @brief       prototypes for kernel internal functions
  *
- * @author      INRIA
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 

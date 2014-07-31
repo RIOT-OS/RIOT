@@ -26,7 +26,6 @@
  * @file
  * @brief
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		baar
  * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @version     $Revision: 1961 $

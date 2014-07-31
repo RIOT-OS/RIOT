@@ -15,7 +15,6 @@
  * @file        sched.h
  * @brief       Scheduler API definion
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 

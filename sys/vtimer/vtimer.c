@@ -50,8 +50,8 @@ static int vtimer_set(vtimer_t *timer);
 static int set_longterm(vtimer_t *timer);
 static int set_shortterm(vtimer_t *timer);
 
-static queue_node_t longterm_queue_root;
-static queue_node_t shortterm_queue_root;
+static queue_t longterm_queue_root;
+static queue_t shortterm_queue_root;
 
 static vtimer_t longterm_tick_timer;
 static uint32_t longterm_tick_start;
@@ -71,14 +71,14 @@ static int set_longterm(vtimer_t *timer)
 
 static int update_shortterm(void)
 {
-    if (shortterm_queue_root.next == NULL) {
+    if (shortterm_queue_root.first == NULL) {
         /* there is no vtimer to schedule, queue is empty */
         DEBUG("update_shortterm: shortterm_queue_root.next == NULL - dont know what to do here\n");
         return 0;
     }
     if (hwtimer_id != -1) {
         /* there is a running hwtimer for us */
-        if (hwtimer_next_absolute != shortterm_queue_root.next->priority) {
+        if (hwtimer_next_absolute != shortterm_queue_root.first->priority) {
             /* the next timer in the vtimer queue is not the next hwtimer */
             /* we have to remove the running hwtimer (and schedule a new one) */
             hwtimer_remove(hwtimer_id);
@@ -90,7 +90,7 @@ static int update_shortterm(void)
     }
 
     /* short term part of the next vtimer */
-    hwtimer_next_absolute = shortterm_queue_root.next->priority;
+    hwtimer_next_absolute = shortterm_queue_root.first->priority;
 
     uint32_t next = hwtimer_next_absolute;
 
@@ -98,7 +98,7 @@ static int update_shortterm(void)
     uint32_t now = HWTIMER_TICKS_TO_US(hwtimer_now());
 
     /* make sure the longterm_tick_timer does not get truncated */
-    if (((vtimer_t *) shortterm_queue_root.next)->action != vtimer_callback_tick) {
+    if (((vtimer_t *) shortterm_queue_root.first)->action != vtimer_callback_tick) {
         /* the next vtimer to schedule is the long term tick */
         /* it has a shortterm offset of longterm_tick_start */
         next += longterm_tick_start;
@@ -126,11 +126,11 @@ void vtimer_callback_tick(vtimer_t *timer)
     longterm_tick_timer.absolute.microseconds += MICROSECONDS_PER_TICK;
     set_shortterm(&longterm_tick_timer);
 
-    while (longterm_queue_root.next) {
-        vtimer_t *timer = (vtimer_t *) longterm_queue_root.next;
+    while (longterm_queue_root.first) {
+        vtimer_t *timer = (vtimer_t *) longterm_queue_root.first;
 
         if (timer->absolute.seconds == seconds) {
-            timer = (vtimer_t *) queue_remove_head(&longterm_queue_root);
+            queue_remove_head(&longterm_queue_root);
             set_shortterm(timer);
         }
         else {
@@ -343,8 +343,7 @@ int vtimer_sleep(timex_t time)
 
     int ret;
     vtimer_t t;
-    mutex_t mutex;
-    mutex_init(&mutex);
+    mutex_t mutex = MUTEX_INIT;
     mutex_lock(&mutex);
 
     t.action = vtimer_callback_unlock;

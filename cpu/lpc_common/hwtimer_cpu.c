@@ -11,7 +11,6 @@
  * @internal
  * @brief       ARM kernel timer CPU dependent functions implementation
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

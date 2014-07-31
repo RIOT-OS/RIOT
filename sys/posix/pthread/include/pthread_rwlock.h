@@ -36,7 +36,7 @@ typedef struct pthread_rwlock
     /**
      * @brief     Queue of waiting threads.
      */
-    queue_node_t queue;
+    queue_t queue;
 
     /**
      * @brief     Provides mutual exclusion on reading and writing on the structure.

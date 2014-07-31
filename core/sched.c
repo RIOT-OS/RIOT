@@ -13,7 +13,6 @@
  * @file        sched.c
  * @brief       Scheduler implementation
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}

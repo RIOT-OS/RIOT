@@ -13,7 +13,6 @@
  * @file        attributes.h
  * @brief       Compiler attributes/pragmas configuration
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  */
 

@@ -35,24 +35,13 @@
 
 static void mutex_wait(struct mutex_t *mutex);
 
-int mutex_init(struct mutex_t *mutex)
-{
-    mutex->val = 0;
-
-    mutex->queue.priority = 0;
-    mutex->queue.data = 0;
-    mutex->queue.next = NULL;
-
-    return 1;
-}
-
 int mutex_trylock(struct mutex_t *mutex)
 {
     DEBUG("%s: trylocking to get mutex. val: %u\n", sched_active_thread->name, mutex->val);
     return (atomic_set_return(&mutex->val, 1) == 0);
 }
 
-int mutex_lock(struct mutex_t *mutex)
+void mutex_lock(struct mutex_t *mutex)
 {
     DEBUG("%s: trying to get mutex. val: %u\n", sched_active_thread->name, mutex->val);
 
@@ -60,8 +49,6 @@ int mutex_lock(struct mutex_t *mutex)
         /* mutex was locked. */
         mutex_wait(mutex);
     }
-
-    return 1;
 }
 
 static void mutex_wait(struct mutex_t *mutex)
@@ -101,8 +88,8 @@ void mutex_unlock(struct mutex_t *mutex)
     int irqstate = disableIRQ();
 
     if (mutex->val != 0) {
-        if (mutex->queue.next) {
-            queue_node_t *next = queue_remove_head(&(mutex->queue));
+        queue_node_t *next = queue_remove_head(&(mutex->queue));
+        if (next) {
             tcb_t *process = (tcb_t *) next->data;
             DEBUG("%s: waking up waiter.\n", process->name);
             sched_set_status(process, STATUS_PENDING);
@@ -123,8 +110,8 @@ void mutex_unlock_and_sleep(struct mutex_t *mutex)
     int irqstate = disableIRQ();
 
     if (mutex->val != 0) {
-        if (mutex->queue.next) {
-            queue_node_t *next = queue_remove_head(&(mutex->queue));
+        queue_node_t *next = queue_remove_head(&(mutex->queue));
+        if (next) {
             tcb_t *process = (tcb_t *) next->data;
             DEBUG("%s: waking up waiter.\n", process->name);
             sched_set_status(process, STATUS_PENDING);

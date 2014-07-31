@@ -13,7 +13,6 @@
  * @file        unittests.h
  * @brief       Common header file for unittests
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 

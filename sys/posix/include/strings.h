@@ -17,7 +17,6 @@
  *              The Open Group Base Specifications Issue 7, <strings.h>
  *          </a>
  *
- * @author  Freie Universität Berlin
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef STRINGS_H

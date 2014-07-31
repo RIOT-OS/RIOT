@@ -365,7 +365,7 @@ static void pagefault_handler(uint8_t intr_num, struct x86_pushad *orig_ctx, uns
         /* print a warning if the page was read before written */
         if (!(error_code & PF_EC_W)) {
             unsigned long *sp = (void *) orig_ctx->sp; /* ip, cs, flags */
-            printf("DEBUG: Read before write on heap address 0x%08x (physical: 0x%016llx) at 0x%08x.\n",
+            printf("DEBUG: Read before write on heap address 0x%08x (physical: 0x%016llx) at 0x%08lx.\n",
                    virtual_addr, pte & PT_ADDR_MASK, sp[0]);
         }
     }

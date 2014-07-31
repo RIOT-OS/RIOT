@@ -15,7 +15,6 @@
  * @file        thread.h
  * @brief       Threading API
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 

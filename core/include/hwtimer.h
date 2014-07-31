@@ -25,7 +25,6 @@
  * @file        hwtimer.h
  * @brief       HW-timer abstraction
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Heiko Will
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Michael Baar

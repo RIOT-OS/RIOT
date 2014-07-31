@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freie Universität Berlin
+ * Copyright (C) 2013, 2014 Freie Universität Berlin
  *
  * This file subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -15,7 +15,6 @@
  * @file        mutex.h
  * @brief       RIOT synchronization API
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 
@@ -30,28 +29,36 @@
 typedef struct mutex_t {
     /* fields are managed by mutex functions, don't touch */
     /**
-     * @internal
      * @brief   The value of the mutex; 0 if unlocked, 1 if locked. **Must
      *          never be changed by the user.**
+     * @internal
      */
     unsigned int val;
     /**
-     * @internal
      * @brief   The process waiting queue of the mutex. **Must never be changed
      *          by the user.**
+     * @internal
      */
-    queue_node_t queue;
+    queue_t queue;
 } mutex_t;
 
 /**
- * @brief Initializes a mutex object.
- *
- * @param[out] mutex    pre-allocated mutex structure, must not be NULL.
- *
- * @return  Always returns 1, always succeeds.
+ * @brief Static initializer for mutex_t.
+ * @details This initializer is preferrable to mutex_init().
  */
-int mutex_init(struct mutex_t *mutex);
+#define MUTEX_INIT { 0, QUEUE_INIT }
 
+/**
+ * @brief Initializes a mutex object.
+ * @details For intialization of variables use MUTEX_INIT instead.
+ *          Only use the function call for dynamically allocated mutexes.
+ * @param[out] mutex    pre-allocated mutex structure, must not be NULL.
+ */
+static inline void mutex_init(mutex_t *mutex)
+{
+    mutex_t empty_mutex = MUTEX_INIT;
+    *mutex = empty_mutex;
+}
 
 /**
  * @brief Tries to get a mutex, non-blocking.
@@ -62,32 +69,28 @@ int mutex_init(struct mutex_t *mutex);
  * @return 1 if mutex was unlocked, now it is locked.
  * @return 0 if the mutex was locked.
  */
-int mutex_trylock(struct mutex_t *mutex);
+int mutex_trylock(mutex_t *mutex);
 
 /**
- * @brief Tries to get a mutex, blocking.
+ * @brief Locks a mutex, blocking.
  *
- * @param[in] mutex Mutex object to lock. Has to be initialized first. Must not
- *                  be NULL.
- *
- * @return 1 getting the mutex was successful
- * @return <1 there was an error.
+ * @param[in] mutex Mutex object to lock. Has to be initialized first. Must not be NULL.
  */
-int mutex_lock(struct mutex_t *mutex);
+void mutex_lock(mutex_t *mutex);
 
 /**
  * @brief Unlocks the mutex.
  *
  * @param[in] mutex Mutex object to unlock, must not be NULL.
  */
-void mutex_unlock(struct mutex_t *mutex);
+void mutex_unlock(mutex_t *mutex);
 
 /**
  * @brief Unlocks the mutex and sends the current thread to sleep
  *
  * @param[in] mutex Mutex object to unlock, must not be NULL.
  */
-void mutex_unlock_and_sleep(struct mutex_t *mutex);
+void mutex_unlock_and_sleep(mutex_t *mutex);
 
 #endif /* __MUTEX_H_ */
 /** @} */

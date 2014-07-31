@@ -102,3 +102,7 @@ endif
 ifneq (,$(filter rgbled,$(USEMODULE)))
 	USEMODULE += color
 endif
+
+ifneq (,$(filter pipe,$(USEMODULE)))
+	USEMODULE += lib
+endif

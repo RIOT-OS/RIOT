@@ -22,7 +22,6 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * @internal
  * @brief		TI Chipcon CC110x physical radio driver
  *
- * @author      Freie Universität Berlin, Computer Systems & Telematics
  * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @author		Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
@@ -82,7 +81,7 @@ static packet_monitor_t packet_monitor;
 static handler_entry_t handlers[MAX_PACKET_HANDLERS];
 static const pm_table_t handler_table;
 static const char *cc1100_event_handler_name = "cc1100_event_handler";
-static mutex_t cc1100_mutex;
+static mutex_t cc1100_mutex = MUTEX_INIT;
 volatile int cc1100_mutex_pid;
 static vtimer_t cc1100_watch_dog;
 static timex_t cc1100_watch_dog_period;
@@ -175,7 +174,6 @@ void cc1100_phy_init(void)
 
     /* Initialize mutex */
     cc1100_mutex_pid = -1;
-    mutex_init(&cc1100_mutex);
 
     /* Allocate event numbers and start cc1100 event process */
     cc1100_event_handler_pid = thread_create(event_handler_stack, sizeof(event_handler_stack), PRIORITY_CC1100, CREATE_STACKTEST,
