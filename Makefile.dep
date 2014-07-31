@@ -85,3 +85,7 @@ endif
 ifneq (,$(filter pipe,$(USEMODULE)))
 	USEMODULE += lib
 endif
+
+ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
+	USEPKG += libfixmath
+endif
