@@ -128,8 +128,8 @@ typedef struct
   __IO uint32_t CCLKCFG;
   __IO uint32_t USBCLKCFG;
   __IO uint32_t CLKSRCSEL;
-  __IO uint32_t	CANSLEEPCLR;
-  __IO uint32_t	CANWAKEFLAGS;
+  __IO uint32_t CANSLEEPCLR;
+  __IO uint32_t CANWAKEFLAGS;
        uint32_t RESERVED4[10];
   __IO uint32_t EXTINT;                 /* External Interrupts                */
        uint32_t RESERVED5;

@@ -18,13 +18,13 @@ See the file LICENSE in the top level directory for more details.
 
 /**
  * @file
- * @brief		LPC2387 Low-Power management
- * @ingroup		lpc2387
+ * @brief       LPC2387 Low-Power management
+ * @ingroup     lpc2387
  *
- * @author 		Heiko Will
+ * @author      Heiko Will
  * @version     $Revision$
  *
- * @note    	$Id$
+ * @note        $Id$
  */
 
 #include <stdio.h>
@@ -52,14 +52,14 @@ void lpm_init(void)
 
 void lpm_begin_awake(void)
 {
-    if (lpm >= LPM_SLEEP) {									// wake up from deep sleep
+    if (lpm >= LPM_SLEEP) {                                 // wake up from deep sleep
         init_clks1();
     }
 }
 
 void lpm_end_awake(void)
 {
-    if (lpm >= LPM_SLEEP) {									// wake up from deep sleep
+    if (lpm >= LPM_SLEEP) {                                 // wake up from deep sleep
         init_clks2();
     }
 
@@ -72,7 +72,7 @@ void lpm_awake(void)
     unsigned long usec = RTC_CTC;
 #endif
 
-    if (lpm >= LPM_SLEEP) {									// wake up from deep sleep
+    if (lpm >= LPM_SLEEP) {                                 // wake up from deep sleep
         /* benchmark */
         init_clks1();
         init_clks2();
@@ -109,7 +109,7 @@ enum lpm_mode lpm_set(enum lpm_mode target)
 
     DEBUG("# LPM power down %u -> %u", lpm, target);
 
-    PCON |= target_flags;										// set target power mode
+    PCON |= target_flags;                                       // set target power mode
     return last_lpm;
 }
 /*---------------------------------------------------------------------------*/

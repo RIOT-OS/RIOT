@@ -45,7 +45,7 @@ void asm_turn_off(void)
  * \param data A 128 bit block to encrypt/decrypt. Holds the encrypted/decrypted
  *             data when finished \sa asm_data_t
  * \param ctr Structure holding the counter for the encryption/decrpytion. The user
- *			  is responsible to provide a decend counter function. \sa asm_ctr_t
+ *            is responsible to provide a decend counter function. \sa asm_ctr_t
  */
 void asm_ctr_encryption_blocking(asm_keys_t *keys, asm_data_t *data, asm_ctr_t *ctr)
 {
@@ -80,9 +80,9 @@ void asm_ctr_encryption_blocking(asm_keys_t *keys, asm_data_t *data, asm_ctr_t *
 
 /**
  * Usage of the MAC functions.
- * 1. Initialize with the keys. 			( asm_cbc_mac_init(keys)   )
+ * 1. Initialize with the keys.             ( asm_cbc_mac_init(keys)   )
  * 2. Update for each 128 bit block of data ( asm_cbc_mac_update(data) )
- * 3. Finish and read the computed data 	( asm_cbc_mac_finish(data) )
+ * 3. Finish and read the computed data     ( asm_cbc_mac_finish(data) )
  */
 
 /**
@@ -145,9 +145,9 @@ void asm_ctr_cbc_mac_init(asm_keys_t *keys)
 /**
  * Updates a MAC stream and encrypts data.
  * \param data Structure holding 128 bits of data to use in MAC stream and to encrypt.
- 			   Holds the encrypted data when finished. \sa asm_data_t
+               Holds the encrypted data when finished. \sa asm_data_t
  * \param ctr  Structure holding the counter for the encryption/decrpytion. The user
- *			   is responsible to provide a decend counter function. \sa asm_ctr_t
+ *             is responsible to provide a decend counter function. \sa asm_ctr_t
  */
 void asm_ctr_cbc_mac_update(asm_data_t *data, asm_ctr_t *ctr)
 {

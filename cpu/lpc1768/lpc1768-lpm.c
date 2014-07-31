@@ -24,13 +24,13 @@ static enum lpm_mode lpm;
 
 // TODO
 enum lpm_mode lpm_set(enum lpm_mode target) {
-	enum lpm_mode last_lpm = lpm;
+    enum lpm_mode last_lpm = lpm;
 
-	lpm = target;
+    lpm = target;
 
-	return last_lpm;
+    return last_lpm;
 }
 
 void lpm_awake(void) {
-	lpm = LPM_ON;
+    lpm = LPM_ON;
 }

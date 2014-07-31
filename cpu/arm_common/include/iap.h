@@ -4,13 +4,13 @@
 #include <stdint.h>
 
 /* IAP-Commands  */
-#define	PREPARE_SECTOR_FOR_WRITE_OPERATION	(50)
-#define	COPY_RAM_TO_FLASH					(51)
-#define	ERASE_SECTOR						(52)
-#define	BLANK_CHECK_SECTOR					(53)
-#define READ_PART_ID						(54)
-#define	READ_BOOT_CODE_VERSION				(55)
-#define COMPARE								(56)
+#define PREPARE_SECTOR_FOR_WRITE_OPERATION  (50)
+#define COPY_RAM_TO_FLASH                   (51)
+#define ERASE_SECTOR                        (52)
+#define BLANK_CHECK_SECTOR                  (53)
+#define READ_PART_ID                        (54)
+#define READ_BOOT_CODE_VERSION              (55)
+#define COMPARE                             (56)
 
 /* IAP status codes */
 #define CMD_SUCCESS                                 (0)
@@ -32,16 +32,16 @@
 #define IAP_LOCATION    (0x7FFFFFF1)
 
 /* PLL */
-#define PLLCON_PLLE		(0x01)		///< PLL Enable
-#define PLLCON_PLLD		(0x00)		///< PLL Disable
-#define PLLCON_PLLC		(0x03)		///< PLL Connect
-#define PLLSTAT_PLOCK	(0x0400)	//</ PLL Lock Status
+#define PLLCON_PLLE     (0x01)      ///< PLL Enable
+#define PLLCON_PLLD     (0x00)      ///< PLL Disable
+#define PLLCON_PLLC     (0x03)      ///< PLL Connect
+#define PLLSTAT_PLOCK   (0x0400)    //</ PLL Lock Status
 
 /*
  * @brief:  Converts 'addr' to sector number
  * @note:   Sector table (Users Manual P. 610)
  *
- * @param addr	    Flash address
+ * @param addr      Flash address
  *
  * @return  Sector number. 0xFF on error
  */
