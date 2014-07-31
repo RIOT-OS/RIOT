@@ -78,6 +78,7 @@ endif
 endif
 
 # set the tap interface for term/valgrind
+ifneq (,$(findstring term, $(MAKECMDGOALS)))
 ifneq (,$(filter nativenet,$(USEMODULE)))
 export PORT = $(shell ../../cpu/native/tools/tapdep.sh)
 ifeq (,$(PORT))
@@ -85,6 +86,7 @@ $(error automatic tap setup failed)
 endif
 else
 export PORT =
+endif
 endif
 
 all: # do not override first target
