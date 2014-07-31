@@ -28,22 +28,22 @@ See the file LICENSE in the top level directory for more details.
  */
 
 /**
- * @brief	Mask for RTC alarms
- * @see		::rtc_set_alarm
+ * @brief   Mask for RTC alarms
+ * @see     ::rtc_set_alarm
  */
 typedef enum {
-    RTC_ALARM_DISABLED = 0x00,		///< Alarm disables
-    RTC_ALARM_MIN	   = 0x01,    	///< Alarm mask for Minutes
-    RTC_ALARM_HOUR     = 0x02, 	    ///< Alarm mask for Hours
-    RTC_ALARM_DOW	   = 0x04, 	    ///< Alarm mask for Day of Week
+    RTC_ALARM_DISABLED = 0x00,      ///< Alarm disables
+    RTC_ALARM_MIN      = 0x01,      ///< Alarm mask for Minutes
+    RTC_ALARM_HOUR     = 0x02,      ///< Alarm mask for Hours
+    RTC_ALARM_DOW      = 0x04,      ///< Alarm mask for Day of Week
     RTC_ALARM_DOM      = 0x08       ///< Alarm mask for Day of Month
 } rtc_alarm_mask_t;
 
 /**
- * @brief	Sets the alarm
+ * @brief   Sets the alarm
  * @internal
- * @param[in]	localt	Alarm time
- * @param[in]	mask	Sets the registers to poll for the alarm
+ * @param[in]   localt  Alarm time
+ * @param[in]   mask    Sets the registers to poll for the alarm
  *
  * To disable the alarm set mask to RTC_ALARM_DISABLED.
  *

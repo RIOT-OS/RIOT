@@ -12,10 +12,10 @@ See the file LICENSE in the top level directory for more details.
 *******************************************************************************/
 
 /**
- * @ingroup		cc430
+ * @ingroup     cc430
  * @file        cc430-gpioint.c
- * @brief		CC430 GPIO Interrupt Multiplexer implementation
- * @author		Oliver Hahm <oliver.hahm@inria.fr>
+ * @brief       CC430 GPIO Interrupt Multiplexer implementation
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #include <stdlib.h>

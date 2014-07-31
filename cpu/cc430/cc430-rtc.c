@@ -14,8 +14,8 @@ See the file LICENSE in the top level directory for more details.
 /**
  * @ingroup rtc
  * @file        cc430-rtc.c
- * @brief		CC430 real time clock implementation
- * @author		Oliver Hahm <oliver.hahm@inria.fr>
+ * @brief       CC430 real time clock implementation
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
 #include <string.h>
@@ -62,10 +62,10 @@ void rtc_set_localtime(struct tm *localt)
 
 /*---------------------------------------------------------------------------
 void rtc_set(time_t time) {
-	struct tm* localt;
-	localt = localtime(&time);						// convert seconds to broken-down time
-	rtc_set_localtime(localt);
-	epoch = time - localt->tm_sec - localt->tm_min * 60;
+    struct tm* localt;
+    localt = localtime(&time);                      // convert seconds to broken-down time
+    rtc_set_localtime(localt);
+    epoch = time - localt->tm_sec - localt->tm_min * 60;
 }
 */
 
@@ -75,7 +75,7 @@ time_t rtc_time(void) {
     struct tm t;
     rtc_get_localtime(&t);
     sec = mktime(&t);
-	return sec;
+    return sec;
 }
 */
 /*---------------------------------------------------------------------------*/

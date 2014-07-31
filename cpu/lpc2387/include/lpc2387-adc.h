@@ -14,44 +14,44 @@ See the file LICENSE in the top level directory for more details.
 #define LPC2387ADC_H_
 
 /**
- * @defgroup	lpc2387_adc		LPC2387 ADC
- * @ingroup		lpc2387
+ * @defgroup    lpc2387_adc     LPC2387 ADC
+ * @ingroup     lpc2387
  *
  * @{
  */
 
 /**
  * @file
- * @brief		LPC2387 ADC
+ * @brief       LPC2387 ADC
  *
- * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
+ * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @version     $Revision: 3249 $
  *
- * @note    	$Id: lpc2387-adc.h 3249 2011-03-11 09:44:46Z schmittb $
+ * @note        $Id: lpc2387-adc.h 3249 2011-03-11 09:44:46Z schmittb $
  */
 
 #include <stdint.h>
 
-#define ADC_NUM 				 (6)
-#define ADC_OFFSET			  (0x10)
-#define ADC_INDEX				 (4)
+#define ADC_NUM                  (6)
+#define ADC_OFFSET            (0x10)
+#define ADC_INDEX                (4)
 
-#define ADC_DONE		(0x80000000)
-#define ADC_OVERRUN		(0x40000000)
+#define ADC_DONE        (0x80000000)
+#define ADC_OVERRUN     (0x40000000)
 
 /**
- * @brief	Initialize ADC.
+ * @brief   Initialize ADC.
  */
 void adc_init(void);
 void adc_init_1(void);
 void adc_init_2(void);
 
 /**
- * @brief	Read ADC value of selected channel.
+ * @brief   Read ADC value of selected channel.
  *
  * Valid channel numbers are from 0 to 2.
  *
- * @return	ADC value of selected channel.
+ * @return  ADC value of selected channel.
  */
 uint16_t adc_read(uint8_t channel);
 
