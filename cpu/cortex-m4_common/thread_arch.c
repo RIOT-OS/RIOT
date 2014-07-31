@@ -141,13 +141,6 @@ void thread_arch_stack_print(void)
 
 __attribute__((naked)) void NORETURN thread_arch_start_threading(void)
 {
-    /* switch to user mode use PSP instead of MSP in ISR Mode*/
-    CONTROL_Type mode;
-    mode.w = __get_CONTROL();
-    mode.b.SPSEL = 1; /* select PSP */
-    mode.b.nPRIV = 0; /* privilege */
-    __set_CONTROL(mode.w);
-
     /* enable IRQs to make sure the SVC interrupt is reachable */
     enableIRQ();
 

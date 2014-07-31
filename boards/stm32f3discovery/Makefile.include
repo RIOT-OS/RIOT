@@ -1,0 +1,47 @@
+# define the cpu used by the stm32f3-discovery board
+export CPU = stm32f3
+export CPU_MODEL = stm32f303vc
+
+#define the default port depending on the host OS
+OS := $(shell uname)
+ifeq ($(OS),Linux)
+  PORT ?= /dev/ttyUSB0
+else ifeq ($(OS),Darwin)
+  PORT ?= $(shell ls -1 /dev/tty.SLAB_USBtoUART* | head -n 1)
+else
+  $(info CAUTION: No flash tool for your host system found!)
+  # TODO: add support for windows as host platform
+endif
+export PORT
+
+# define tools used for building the project
+export PREFIX = arm-none-eabi-
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
+export AS = $(PREFIX)as
+export LINK = $(PREFIX)gcc
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
+export FLASHER = st-flash
+export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+
+# define build specific options
+CPU_USAGE = -mcpu=cortex-m4
+FPU_USAGE = -mfloat-abi=hard -mfpu=fpv4-sp-d16
+export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
+export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
+export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
+export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles
+export LINKFLAGS += -T$(LINKERSCRIPT)
+export OFLAGS = -O binary
+export FFLAGS = write bin/$(BOARD)/$(APPLICATION).hex 0x8000000
+export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(BINDIR)/$(APPLICATION).elf
+
+# use newLib nano-specs if available
+ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+export LINKFLAGS += -specs=nano.specs -lc -lnosys
+endif
+
+# export board specific includes to the global includes-listing
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
