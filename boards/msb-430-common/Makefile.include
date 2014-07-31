@@ -22,6 +22,7 @@ export FFLAGS += -j $(PROGRAMMER)
 ifeq ($(strip $(PROGRAMMER)),uif)
 	export FFLAGS += -d $(PORT)
 endif
+export TERMFLAGS += -p
 
 export FFLAGS += "prog $(HEXFILE)"
 
