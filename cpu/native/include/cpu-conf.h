@@ -57,6 +57,9 @@
 /* for nativenet */
 #define NATIVE_ETH_PROTO 0x1234
 
+/**
+ * @brief   length of CPU ID for @ref cpu_id_get() in @ref periph/cpuid.h
+ */
 #define CPUID_ID_LEN                    (4)
 
 #endif /* CPUCONF_H_ */
