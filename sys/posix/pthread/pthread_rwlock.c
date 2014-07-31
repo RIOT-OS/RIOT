@@ -75,12 +75,12 @@ bool __pthread_rwlock_blocked_readingly(const pthread_rwlock_t *rwlock)
 
     /* Determine if there is a writer waiting to get this lock who has a higher or the same priority: */
 
-    if (rwlock->queue.next == NULL) {
+    if (rwlock->queue.first == NULL) {
         /* no waiting thread */
         return false;
     }
 
-    queue_node_t *qnode = rwlock->queue.next;
+    queue_node_t *qnode = rwlock->queue.first;
     if (qnode->priority > sched_active_thread->priority) {
         /* the waiting thread has a lower priority */
         return false;
@@ -264,7 +264,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
         rwlock->readers = 0;
     }
 
-    if (rwlock->readers != 0 || rwlock->queue.next == NULL) {
+    if (rwlock->readers != 0 || rwlock->queue.first == NULL) {
         /* this thread was not the last reader, or no one is waiting to aquire the lock */
         DEBUG("Thread %u: pthread_rwlock_%s(): no one is waiting\n", thread_pid, "unlock");
         mutex_unlock(&rwlock->mutex);
@@ -289,8 +289,8 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
         ++rwlock->readers;
 
         /* wake up further readers */
-        while (rwlock->queue.next) {
-            waiting_node = (__pthread_rwlock_waiter_node_t *) rwlock->queue.next->data;
+        while (rwlock->queue.first) {
+            waiting_node = (__pthread_rwlock_waiter_node_t *) rwlock->queue.first->data;
             if (waiting_node->is_writer) {
                 /* Not to be unfair to writers, we don't try to wake up readers that came after the first writer. */
                 DEBUG("Thread %u: pthread_rwlock_%s(): continuing readers blocked by writer %u\n",

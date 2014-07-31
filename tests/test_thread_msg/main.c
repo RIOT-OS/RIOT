@@ -19,6 +19,7 @@
  */
 
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "thread.h"
 #include "msg.h"

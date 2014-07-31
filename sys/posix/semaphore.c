@@ -39,16 +39,14 @@ int sem_init(sem_t *sem, int pshared, unsigned int value)
     sem->value = value;
 
     /* waiters for the mutex */
-    sem->queue.priority = 0;
-    sem->queue.data = 0;
-    sem->queue.next = NULL;
+    sem->queue.first = NULL;
 
     return 0;
 }
 
 int sem_destroy(sem_t *sem)
 {
-    if (sem->queue.next) {
+    if (sem->queue.first) {
         DEBUG("%s: tried to destroy active semaphore.\n", sched_active_thread->name);
         return -1;
     }

@@ -88,8 +88,8 @@ void mutex_unlock(struct mutex_t *mutex)
     int irqstate = disableIRQ();
 
     if (mutex->val != 0) {
-        if (mutex->queue.next) {
-            queue_node_t *next = queue_remove_head(&(mutex->queue));
+        queue_node_t *next = queue_remove_head(&(mutex->queue));
+        if (next) {
             tcb_t *process = (tcb_t *) next->data;
             DEBUG("%s: waking up waiter.\n", process->name);
             sched_set_status(process, STATUS_PENDING);
@@ -110,8 +110,8 @@ void mutex_unlock_and_sleep(struct mutex_t *mutex)
     int irqstate = disableIRQ();
 
     if (mutex->val != 0) {
-        if (mutex->queue.next) {
-            queue_node_t *next = queue_remove_head(&(mutex->queue));
+        queue_node_t *next = queue_remove_head(&(mutex->queue));
+        if (next) {
             tcb_t *process = (tcb_t *) next->data;
             DEBUG("%s: waking up waiter.\n", process->name);
             sched_set_status(process, STATUS_PENDING);
