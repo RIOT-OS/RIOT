@@ -1,11 +1,11 @@
 /*
-* board_init.c - initialization of the AVSEXTREM-BOARD.
-* Copyright (C) 2013 Heiko Will <hwill@inf.fu-berlin.de>
-*
-* This source code is licensed under the LGPLv2 license,
-* See the file LICENSE for more details.
-*
-*/
+ * board_init.c - initialization of the AVSEXTREM-BOARD.
+ * Copyright (C) 2013 Heiko Will <hwill@inf.fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
 
 
 /**
