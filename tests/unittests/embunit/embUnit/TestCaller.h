@@ -32,41 +32,41 @@
  *
  * $Id: TestCaller.h,v 1.7 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef	__TESTCALLER_H__
-#define	__TESTCALLER_H__
+#ifndef __TESTCALLER_H__
+#define __TESTCALLER_H__
 
-typedef struct __TestFixture	TestFixture;
-typedef struct __TestFixture*	TestFixtureRef;/*downward compatible*/
+typedef struct __TestFixture    TestFixture;
+typedef struct __TestFixture*   TestFixtureRef;/*downward compatible*/
 
 struct __TestFixture {
-	char *name;
-	void(*test)(void);
+    char *name;
+    void(*test)(void);
 };
 
 #define new_TestFixture(test) { #test, test }
 
-typedef struct __TestCaller		TestCaller;
-typedef struct __TestCaller*	TestCallerRef;/*downward compatible*/
+typedef struct __TestCaller     TestCaller;
+typedef struct __TestCaller*    TestCallerRef;/*downward compatible*/
 
 struct __TestCaller {
-	TestImplement* isa;
-	char *name;
-	void(*setUp)(void);
-	void(*tearDown)(void);
-	int numberOfFixtuers;
-	TestFixture	*fixtuers;
+    TestImplement* isa;
+    char *name;
+    void(*setUp)(void);
+    void(*tearDown)(void);
+    int numberOfFixtuers;
+    TestFixture *fixtuers;
 };
 
 extern const TestImplement TestCallerImplement;
 
 #define new_TestCaller(name,sup,tdw,numberOfFixtuers,fixtuers)\
-	{\
-		(TestImplement*)&TestCallerImplement,\
-		name,\
-		sup,\
-		tdw,\
-		numberOfFixtuers,\
-		fixtuers,\
-	}
+    {\
+        (TestImplement*)&TestCallerImplement,\
+        name,\
+        sup,\
+        tdw,\
+        numberOfFixtuers,\
+        fixtuers,\
+    }
 
 #endif/*__TESTCALLER_H__*/

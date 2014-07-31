@@ -37,25 +37,25 @@
 
 char* RepeatedTest_name(RepeatedTest* self)
 {
-	return Test_name(self->test);
+    return Test_name(self->test);
 }
 
 void RepeatedTest_run(RepeatedTest* self,TestResult* result)
 {
-	int i;
-	Test* test = self->test;
-	for (i=0; i<self->timesRepeat; i++) {
-		Test_run(test, result);
-	}
+    int i;
+    Test* test = self->test;
+    for (i=0; i<self->timesRepeat; i++) {
+        Test_run(test, result);
+    }
 }
 
 int RepeatedTest_countTestCases(RepeatedTest* self)
 {
-	return Test_countTestCases(self->test) * self->timesRepeat;
+    return Test_countTestCases(self->test) * self->timesRepeat;
 }
 
 const TestImplement RepeatedTestImplement = {
-	(TestNameFunction)			RepeatedTest_name,
-	(TestRunFunction)			RepeatedTest_run,
-	(TestCountTestCasesFunction)RepeatedTest_countTestCases,
+    (TestNameFunction)          RepeatedTest_name,
+    (TestRunFunction)           RepeatedTest_run,
+    (TestCountTestCasesFunction)RepeatedTest_countTestCases,
 };

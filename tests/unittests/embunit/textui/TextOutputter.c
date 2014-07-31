@@ -43,7 +43,7 @@ static void TextOutputter_printHeader(OutputterRef self)
 static void TextOutputter_printStartTest(OutputterRef self,TestRef test)
 {
     (void)self;
-	fprintf(stdout,"- %s\n",Test_name(test));
+    fprintf(stdout,"- %s\n",Test_name(test));
 }
 
 static void TextOutputter_printEndTest(OutputterRef self,TestRef test)
@@ -55,39 +55,39 @@ static void TextOutputter_printEndTest(OutputterRef self,TestRef test)
 static void TextOutputter_printSuccessful(OutputterRef self,TestRef test,int runCount)
 {
     (void)self;
-	fprintf(stdout,"%d) OK %s\n", runCount, Test_name(test));
+    fprintf(stdout,"%d) OK %s\n", runCount, Test_name(test));
 }
 
 static void TextOutputter_printFailure(OutputterRef self,TestRef test,char *msg,int line,char *file,int runCount)
 {
     (void)self;
-	fprintf(stdout,"%d) NG %s (%s %d) %s\n", runCount, Test_name(test), file, line, msg);
+    fprintf(stdout,"%d) NG %s (%s %d) %s\n", runCount, Test_name(test), file, line, msg);
 }
 
 static void TextOutputter_printStatistics(OutputterRef self,TestResultRef result)
 {
     (void)self;
-	if (result->failureCount) {
-		fprintf(stdout,"\nrun %d failures %d\n",result->runCount,result->failureCount);
-	} else {
-		fprintf(stdout,"\nOK (%d tests)\n",result->runCount);
-	}
+    if (result->failureCount) {
+        fprintf(stdout,"\nrun %d failures %d\n",result->runCount,result->failureCount);
+    } else {
+        fprintf(stdout,"\nOK (%d tests)\n",result->runCount);
+    }
 }
 
 static const OutputterImplement TextOutputterImplement = {
-	(OutputterPrintHeaderFunction)		TextOutputter_printHeader,
-	(OutputterPrintStartTestFunction)	TextOutputter_printStartTest,
-	(OutputterPrintEndTestFunction)		TextOutputter_printEndTest,
-	(OutputterPrintSuccessfulFunction)	TextOutputter_printSuccessful,
-	(OutputterPrintFailureFunction)		TextOutputter_printFailure,
-	(OutputterPrintStatisticsFunction)	TextOutputter_printStatistics,
+    (OutputterPrintHeaderFunction)      TextOutputter_printHeader,
+    (OutputterPrintStartTestFunction)   TextOutputter_printStartTest,
+    (OutputterPrintEndTestFunction)     TextOutputter_printEndTest,
+    (OutputterPrintSuccessfulFunction)  TextOutputter_printSuccessful,
+    (OutputterPrintFailureFunction)     TextOutputter_printFailure,
+    (OutputterPrintStatisticsFunction)  TextOutputter_printStatistics,
 };
 
 static const Outputter TextOutputter = {
-	(OutputterImplementRef)&TextOutputterImplement,
+    (OutputterImplementRef)&TextOutputterImplement,
 };
 
 OutputterRef TextOutputter_outputter(void)
 {
-	return (OutputterRef)&TextOutputter;
+    return (OutputterRef)&TextOutputter;
 }

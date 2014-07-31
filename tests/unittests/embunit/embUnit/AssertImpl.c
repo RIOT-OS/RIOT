@@ -38,63 +38,63 @@
 
 void assertImplementationInt(int expected,int actual, long line, const char *file)
 {
-	char buffer[32];	/*"exp -2147483647 was -2147483647"*/
-	char numbuf[12];	/*32bit int decimal maximum column is 11 (-2147483647~2147483647)*/
+    char buffer[32];    /*"exp -2147483647 was -2147483647"*/
+    char numbuf[12];    /*32bit int decimal maximum column is 11 (-2147483647~2147483647)*/
 
-	stdimpl_strcpy(buffer, "exp ");
+    stdimpl_strcpy(buffer, "exp ");
 
-	{	stdimpl_itoa(expected, numbuf, 10);
-		stdimpl_strncat(buffer, numbuf, 11);	}
+    {   stdimpl_itoa(expected, numbuf, 10);
+        stdimpl_strncat(buffer, numbuf, 11);    }
 
-	stdimpl_strcat(buffer, " was ");
+    stdimpl_strcat(buffer, " was ");
 
-	{	stdimpl_itoa(actual, numbuf, 10);
-		stdimpl_strncat(buffer, numbuf, 11);	}
+    {   stdimpl_itoa(actual, numbuf, 10);
+        stdimpl_strncat(buffer, numbuf, 11);    }
 
-	addFailure(buffer, line, file);
+    addFailure(buffer, line, file);
 }
 
 void assertImplementationCStr(const char *expected,const char *actual, long line, const char *file)
 {
-	char buffer[ASSERT_STRING_BUFFER_MAX];
-	#define exp_act_limit ((ASSERT_STRING_BUFFER_MAX-11-1)/2)/*	"exp'' was''" = 11 byte	*/
-	int el;
-	int al;
+    char buffer[ASSERT_STRING_BUFFER_MAX];
+    #define exp_act_limit ((ASSERT_STRING_BUFFER_MAX-11-1)/2)/* "exp'' was''" = 11 byte */
+    int el;
+    int al;
 
-	if (expected) {
-		el = stdimpl_strlen(expected);
-	} else {
-		el = 4;
-		expected = "null";
-	}
+    if (expected) {
+        el = stdimpl_strlen(expected);
+    } else {
+        el = 4;
+        expected = "null";
+    }
 
-	if (actual) {
-		al = stdimpl_strlen(actual);
-	} else {
-		al = 4;
-		actual = "null";
-	}
-	if (el > exp_act_limit) {
-		if (al > exp_act_limit) {
-			al = exp_act_limit;
-			el = exp_act_limit;
-		} else {
-			int w = exp_act_limit + (exp_act_limit - al);
-			if (el > w) {
-				el = w;
-			}
-		}
-	} else {
-		int w = exp_act_limit + (exp_act_limit - el);
-		if (al > w) {
-			al = w;
-		}
-	}
-	stdimpl_strcpy(buffer, "exp \"");
-	stdimpl_strncat(buffer, expected, el);
-	stdimpl_strcat(buffer, "\" was \"");
-	stdimpl_strncat(buffer, actual, al);
-	stdimpl_strcat(buffer, "\"");
+    if (actual) {
+        al = stdimpl_strlen(actual);
+    } else {
+        al = 4;
+        actual = "null";
+    }
+    if (el > exp_act_limit) {
+        if (al > exp_act_limit) {
+            al = exp_act_limit;
+            el = exp_act_limit;
+        } else {
+            int w = exp_act_limit + (exp_act_limit - al);
+            if (el > w) {
+                el = w;
+            }
+        }
+    } else {
+        int w = exp_act_limit + (exp_act_limit - el);
+        if (al > w) {
+            al = w;
+        }
+    }
+    stdimpl_strcpy(buffer, "exp \"");
+    stdimpl_strncat(buffer, expected, el);
+    stdimpl_strcat(buffer, "\" was \"");
+    stdimpl_strncat(buffer, actual, al);
+    stdimpl_strcat(buffer, "\"");
 
-	addFailure(buffer, line, file);
+    addFailure(buffer, line, file);
 }

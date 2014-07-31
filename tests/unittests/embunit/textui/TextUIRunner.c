@@ -35,7 +35,7 @@
 #include "TextOutputter.h"
 #include "TextUIRunner.h"
 
-/*	Private
+/*  Private
  */
 static TestResult result_;
 static OutputterRef outputterRef_ = 0;
@@ -45,63 +45,63 @@ static void TextUIRunner_startTest(TestListnerRef self,TestRef test)
 {
     (void)self;
     (void)test;
-	wasfailure_ = 0;
+    wasfailure_ = 0;
 }
 
 static void TextUIRunner_endTest(TestListnerRef self,TestRef test)
 {
     (void)self;
-	if (!wasfailure_)
-		Outputter_printSuccessful(outputterRef_,test,result_.runCount);
+    if (!wasfailure_)
+        Outputter_printSuccessful(outputterRef_,test,result_.runCount);
 }
 
 static void TextUIRunner_addFailure(TestListnerRef self,TestRef test,char *msg,int line,char *file)
 {
     (void)self;
-	wasfailure_ = 1;
-	Outputter_printFailure(outputterRef_,test,msg,line,file,result_.runCount);
+    wasfailure_ = 1;
+    Outputter_printFailure(outputterRef_,test,msg,line,file,result_.runCount);
 }
 
 static const TestListnerImplement TextUIRunnerImplement = {
-	(TestListnerStartTestCallBack)	TextUIRunner_startTest,
-	(TestListnerEndTestCallBack)	TextUIRunner_endTest,
-	(TestListnerAddFailureCallBack)	TextUIRunner_addFailure,
+    (TestListnerStartTestCallBack)  TextUIRunner_startTest,
+    (TestListnerEndTestCallBack)    TextUIRunner_endTest,
+    (TestListnerAddFailureCallBack) TextUIRunner_addFailure,
 };
 
 static const TestListner testuirunner_ = {
-	(TestListnerImplement*)&TextUIRunnerImplement,
+    (TestListnerImplement*)&TextUIRunnerImplement,
 };
 
-/*	Public
+/*  Public
  */
 void TextUIRunner_setOutputter(OutputterRef outputter)
 {
-	outputterRef_ = outputter;
+    outputterRef_ = outputter;
 }
 
 void TextUIRunner_startWithOutputter(OutputterRef outputter)
 {
-	TestResult_init(&result_, (TestListnerRef)&testuirunner_);
-	TextUIRunner_setOutputter(outputter);
-	Outputter_printHeader(outputter);
+    TestResult_init(&result_, (TestListnerRef)&testuirunner_);
+    TextUIRunner_setOutputter(outputter);
+    Outputter_printHeader(outputter);
 
 }
 
 void TextUIRunner_start(void)
 {
-	if (!outputterRef_)
-		outputterRef_ = TextOutputter_outputter();
-	TextUIRunner_startWithOutputter(outputterRef_);
+    if (!outputterRef_)
+        outputterRef_ = TextOutputter_outputter();
+    TextUIRunner_startWithOutputter(outputterRef_);
 }
 
 void TextUIRunner_runTest(TestRef test)
 {
-	Outputter_printStartTest(outputterRef_,test);
-	Test_run(test, &result_);
-	Outputter_printEndTest(outputterRef_,test);
+    Outputter_printStartTest(outputterRef_,test);
+    Test_run(test, &result_);
+    Outputter_printEndTest(outputterRef_,test);
 }
 
 void TextUIRunner_end(void)
 {
-	Outputter_printStatistics(outputterRef_,&result_);
+    Outputter_printStatistics(outputterRef_,&result_);
 }

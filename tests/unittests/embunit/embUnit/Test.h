@@ -32,34 +32,34 @@
  *
  * $Id: Test.h,v 1.4 2004/02/10 16:19:29 arms22 Exp $
  */
-#ifndef	__TEST_H__
-#define	__TEST_H__
+#ifndef __TEST_H__
+#define __TEST_H__
 
-typedef struct __TestResult		TestResult;
-typedef struct __TestResult*	TestResultRef;/*downward compatible*/
+typedef struct __TestResult     TestResult;
+typedef struct __TestResult*    TestResultRef;/*downward compatible*/
 
-typedef struct __TestImplement	TestImplement;
-typedef struct __TestImplement*	TestImplementRef;/*downward compatible*/
+typedef struct __TestImplement  TestImplement;
+typedef struct __TestImplement* TestImplementRef;/*downward compatible*/
 
 typedef char*(*TestNameFunction)(void*);
 typedef void(*TestRunFunction)(void*,TestResult*);
 typedef int(*TestCountTestCasesFunction)(void*);
 
 struct __TestImplement {
-	TestNameFunction name;
-	TestRunFunction run;
-	TestCountTestCasesFunction countTestCases;
+    TestNameFunction name;
+    TestRunFunction run;
+    TestCountTestCasesFunction countTestCases;
 };
 
-typedef struct __Test	Test;
-typedef struct __Test*	TestRef;/*downward compatible*/
+typedef struct __Test   Test;
+typedef struct __Test*  TestRef;/*downward compatible*/
 
 struct __Test {
-	TestImplement* isa;
+    TestImplement* isa;
 };
 
-#define Test_name(s)			((Test*)s)->isa->name(s)
-#define Test_run(s,r)			((Test*)s)->isa->run(s,r)
-#define Test_countTestCases(s)	((Test*)s)->isa->countTestCases(s)
+#define Test_name(s)            ((Test*)s)->isa->name(s)
+#define Test_run(s,r)           ((Test*)s)->isa->run(s,r)
+#define Test_countTestCases(s)  ((Test*)s)->isa->countTestCases(s)
 
 #endif/*__TEST_H__*/

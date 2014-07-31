@@ -37,33 +37,33 @@
 
 char* TestSuite_name(TestSuite* self)
 {
-	return self->name;
+    return self->name;
 }
 
 void TestSuite_run(TestSuite* self,TestResult* result)
 {
-	if (self->tests) {
-		for (int i = 0; i < self->numberOfTests; i++) {
-			Test* test = self->tests[i];
-			Test_run(test, result);
-		}
-	}
+    if (self->tests) {
+        for (int i = 0; i < self->numberOfTests; i++) {
+            Test* test = self->tests[i];
+            Test_run(test, result);
+        }
+    }
 }
 
 int TestSuite_countTestCases(TestSuite* self)
 {
-	int count = 0;
-	if (self->tests) {
-		for (int i = 0; i < self->numberOfTests; i++) {
-			Test* test = self->tests[i];
-			count += Test_countTestCases(test);
-		}
-	}
-	return count;
+    int count = 0;
+    if (self->tests) {
+        for (int i = 0; i < self->numberOfTests; i++) {
+            Test* test = self->tests[i];
+            count += Test_countTestCases(test);
+        }
+    }
+    return count;
 }
 
 const TestImplement TestSuiteImplement = {
-	(TestNameFunction)			TestSuite_name,
-	(TestRunFunction)			TestSuite_run,
-	(TestCountTestCasesFunction)TestSuite_countTestCases,
+    (TestNameFunction)          TestSuite_name,
+    (TestRunFunction)           TestSuite_run,
+    (TestCountTestCasesFunction)TestSuite_countTestCases,
 };
