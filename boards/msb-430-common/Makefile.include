@@ -13,7 +13,7 @@ export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export LINKFLAGS = -mmcu=$(MCU) -lgcc
-TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
+TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
 
 export FLASHER ?= mspdebug
 export PORT ?= /dev/ttyUSB0
