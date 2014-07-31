@@ -96,12 +96,12 @@ void erase(struct ftdi_context *ftdic, const struct layout *l);
 void usage(void);
 
 #define std_layout(x)                        \
-	.interface = interface(x),           \
-        .dir = dir(x),	                     \
-	.reset_release = reset_release(x),   \
-	.reset_set = reset_set(x),	     \
-	.vref2_normal = vref2_normal(x),     \
-	.vref2_erase = vref2_erase(x),
+    .interface = interface(x),           \
+        .dir = dir(x),                       \
+    .reset_release = reset_release(x),   \
+    .reset_set = reset_set(x),       \
+    .vref2_normal = vref2_normal(x),     \
+    .vref2_erase = vref2_erase(x),
 
 static struct layout layouts[] = {
     {

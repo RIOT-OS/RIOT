@@ -7,17 +7,17 @@
  */
 
 /**
- * @ingroup		msba2
- * @ingroup		ltc4150
+ * @ingroup     msba2
+ * @ingroup     ltc4150
  * @{
  */
 
 /**
  * @file
- * @brief		LTC4150 MSB-A2 specific implemetation
+ * @brief       LTC4150 MSB-A2 specific implemetation
  *
- * @author		Heiko Will
- * @author		Michael Baar
+ * @author      Heiko Will
+ * @author      Michael Baar
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
 

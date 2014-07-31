@@ -25,9 +25,9 @@
 
 #define F_CPU   (24000000)              ///< CPU target speed in Hz
 
-#define CTUNE 		0xb
-#define IBIAS 		0x1f
-#define FTUNE		0x7
+#define CTUNE       0xb
+#define IBIAS       0x1f
+#define FTUNE       0x7
 
 typedef uint8_t radio_packet_length_t;
 

@@ -124,7 +124,7 @@ cs_low:
     // has stabilized and the crystal is running)
 loop:
 
-    //	asm volatile ("nop");
+    //  asm volatile ("nop");
     if (CC1100_GDO1) {
         abort_count++;
 
@@ -137,7 +137,7 @@ loop:
             }
 
             CC1100_CS_HIGH;
-            goto cs_low;		// try again
+            goto cs_low;        // try again
         }
 
         goto loop;
@@ -216,100 +216,100 @@ void cc110x_spi_init(void)
 // //  void spiInitTrx(void)
 // //
 // //  DESCRIPTION:
-// //		This function puts the cc110x into spi mode. You have to call this bevore every spi transaction.
+// //       This function puts the cc110x into spi mode. You have to call this bevore every spi transaction.
 // //
 // //-------------------------------------------------------------------------------------------------------
 //
 //
 // void drivercc110x_spiwriteburstreg(uint8_t addr, unsigned char *buffer, uint8_t count)
 // {
-// 	uint8_t i;
-// 	long c;
-// 	drivercc110x_spiinittrx();
-// 	drivercc110x_trxspi(addr | CC1100_WRITE_BURST);
-// 	for (i = 0; i < count; i++)
-// 	{
-// 		c = 0;
-// 		IFG1 &= ~UTXIFG0;
-// 		IFG1 &= ~URXIFG0;
-// 		TXBUF0 = buffer[i];
-// 		/* Wait for TX to finish */
-// 		while(!(IFG1 & UTXIFG0))
-// 		{
-// 			if (c++ == 1000000)
-// 				alarm();
-// 		}
-// 	}
-// 	/* Wait for Byte received */
-// 	c = 0;
-// 	while(!(IFG1 & URXIFG0))
-// 	{
-// 		if (c++ == 1000000)
-// 			alarm();
-// 	}
-// 	CC1100_CS_HIGH;
+//  uint8_t i;
+//  long c;
+//  drivercc110x_spiinittrx();
+//  drivercc110x_trxspi(addr | CC1100_WRITE_BURST);
+//  for (i = 0; i < count; i++)
+//  {
+//      c = 0;
+//      IFG1 &= ~UTXIFG0;
+//      IFG1 &= ~URXIFG0;
+//      TXBUF0 = buffer[i];
+//      /* Wait for TX to finish */
+//      while(!(IFG1 & UTXIFG0))
+//      {
+//          if (c++ == 1000000)
+//              alarm();
+//      }
+//  }
+//  /* Wait for Byte received */
+//  c = 0;
+//  while(!(IFG1 & URXIFG0))
+//  {
+//      if (c++ == 1000000)
+//          alarm();
+//  }
+//  CC1100_CS_HIGH;
 // }
 //
 // void drivercc110x_spireadburstreg(uint8_t addr, char *buffer, uint8_t count)
 // {
-// 	uint8_t i;
-// 	drivercc110x_spiinittrx();
-// 	drivercc110x_trxspi(addr | CC1100_READ_BURST);
-// 	for (i = 0; i < count; i++)
-// 	{
-// 		long c = 0;
-// 		IFG1 &= ~UTXIFG0;
-// 		IFG1 &= ~URXIFG0;
-// 		TXBUF0 = NOBYTE;
-// 		while(!(IFG1 & UTXIFG0))
-// 		{
-// 			if (c++ == 1000000)
-// 				alarm();
-// 		}
-// 		/* Wait for Byte received */
-// 		c = 0;
-// 		while(!(IFG1 & URXIFG0))
-// 		{
-// 			if (c++ == 1000000)
-// 				alarm();
-// 		}
-// 		buffer[i] = RXBUF0;
-// 	}
-// 	CC1100_CS_HIGH;
+//  uint8_t i;
+//  drivercc110x_spiinittrx();
+//  drivercc110x_trxspi(addr | CC1100_READ_BURST);
+//  for (i = 0; i < count; i++)
+//  {
+//      long c = 0;
+//      IFG1 &= ~UTXIFG0;
+//      IFG1 &= ~URXIFG0;
+//      TXBUF0 = NOBYTE;
+//      while(!(IFG1 & UTXIFG0))
+//      {
+//          if (c++ == 1000000)
+//              alarm();
+//      }
+//      /* Wait for Byte received */
+//      c = 0;
+//      while(!(IFG1 & URXIFG0))
+//      {
+//          if (c++ == 1000000)
+//              alarm();
+//      }
+//      buffer[i] = RXBUF0;
+//  }
+//  CC1100_CS_HIGH;
 // }
 //
 // void drivercc110x_load(callback_t cs_cb,callback_t paket_cb)
 // {
-// 	_paket_cb = paket_cb;
-// 	_cs_cb = cs_cb;
-// 	spi0_init(0);
+//  _paket_cb = paket_cb;
+//  _cs_cb = cs_cb;
+//  spi0_init(0);
 // }
 //
 // void drivercc110x_aftersend(void)
 // {
 //     CLEAR(P2IFG, 0x01);
-// 	SET(P2IE, 0x01); /* Enable interrupts on port 2 pin 0 */
-// 	CLEAR(P4OUT, 0x08); /* Turn off Sending Led*/
+//  SET(P2IE, 0x01); /* Enable interrupts on port 2 pin 0 */
+//  CLEAR(P4OUT, 0x08); /* Turn off Sending Led*/
 // }
 //
 // void drivercc110x_initinterrupts(void)
 // {
-// 	_DINT(); /* Disable all interrupts */
-// 	P2SEL = 0x00; /* must be <> 1 to use interrupts */
-// 	SET(P2IES, 0x01); /* Enables external interrupt on low edge (for GDO2) */
-// 	SET(P2IE, 0x01); /* Enable interrupt */
+//  _DINT(); /* Disable all interrupts */
+//  P2SEL = 0x00; /* must be <> 1 to use interrupts */
+//  SET(P2IES, 0x01); /* Enables external interrupt on low edge (for GDO2) */
+//  SET(P2IE, 0x01); /* Enable interrupt */
 //     CLEAR(P2IFG, 0x01); /* Clears the interrupt flag */
-// 	CLEAR(P2IE, 0x02); /* Disable interrupt for GDO0 */
-// 	CLEAR(P2IFG, 0x02); /* Clear IFG for GDO0 */
-// 	_EINT(); /* Enable all interrupts */
+//  CLEAR(P2IE, 0x02); /* Disable interrupt for GDO0 */
+//  CLEAR(P2IFG, 0x02); /* Clear IFG for GDO0 */
+//  _EINT(); /* Enable all interrupts */
 // }
 //
 // void drivercc110x_beforesend(void)
 // {
-// 	/* Turn on Led while sending paket for debug reasons */
-// 	SET(P4OUT, 0x08);
-// 	/* Disable interrupts on port 2 pin 0 */
-// 	CLEAR(P2IE, 0x01);
+//  /* Turn on Led while sending paket for debug reasons */
+//  SET(P4OUT, 0x08);
+//  /* Disable interrupts on port 2 pin 0 */
+//  CLEAR(P2IE, 0x01);
 // }
 //
 //
@@ -325,7 +325,7 @@ void cc110x_spi_init(void)
 interrupt(PORT2_VECTOR) __attribute__((naked)) cc110x_isr(void)
 {
     __enter_isr();
-    //	if (system_state.POWERDOWN) SPI_INIT; /* Initialize SPI after wakeup */
+    //  if (system_state.POWERDOWN) SPI_INIT; /* Initialize SPI after wakeup */
     /* Check IFG */
     if ((P2IFG & 0x01) != 0) {
         P2IFG &= ~0x01;
@@ -333,15 +333,15 @@ interrupt(PORT2_VECTOR) __attribute__((naked)) cc110x_isr(void)
     }
     else if ((P2IFG & 0x02) != 0) {
         cc110x_gdo0_irq();
-        P2IE &= ~0x02;	            // Disable interrupt for GDO0
-        P2IFG &= ~0x02;	            // Clear IFG for GDO0
+        P2IE &= ~0x02;              // Disable interrupt for GDO0
+        P2IFG &= ~0x02;             // Clear IFG for GDO0
     }
     else {
         puts("cc110x_isr(): unexpected IFG!");
         /* Should not occur - only Port 2 Pin 0 interrupts are enabled */
-        //		CLEAR(P2IFG, 0xFF);	/* Clear all flags */
+        //      CLEAR(P2IFG, 0xFF); /* Clear all flags */
     }
 
-    //	if (system_state.POWERDOWN != 0) END_LPM3;
+    //  if (system_state.POWERDOWN != 0) END_LPM3;
     __exit_isr();
 }

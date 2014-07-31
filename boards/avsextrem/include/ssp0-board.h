@@ -23,82 +23,82 @@
 
 #include "stdint.h"
 
-#define DMA_ENABLED		0
+#define DMA_ENABLED     0
 
 /*
  * if USE_CS is zero, set SSEL as GPIO that you have total control of the
  * sequence
  **/
-#define USE_CS			0
+#define USE_CS          0
 
 /*
  * if 1, use driver for onboard BMA180, otherwise for external BMA180 utilizing
  * Nanopan Connector
  **/
-#define BMA180_ONBOARD		1
+#define BMA180_ONBOARD      1
 
-#define SMB380_ACC		0
-#define NANOPAN			1
-#define NORDIC			2
-#define BMA180_EXTERN		3
-#define BMA180_INTERN		4
-#define L3G_EXTERN		5
-#define L3G_INTERN		6
-#define ACAMDMS			7
+#define SMB380_ACC          0
+#define NANOPAN             1
+#define NORDIC              2
+#define BMA180_EXTERN       3
+#define BMA180_INTERN       4
+#define L3G_EXTERN          5
+#define L3G_INTERN          6
+#define ACAMDMS             7
 
 /* SPI read and write buffer size */
-#define BUFSIZE			256
-#define FIFOSIZE		8
+#define BUFSIZE         256
+#define FIFOSIZE        8
 
 /* SSP select pin */
-#define SSP0_SEL		1 << 21	//P1.21	SMB380
+#define SSP0_SEL        1 << 21 //P1.21 SMB380
 
-#define SSP0_SELN		1 << 16 //P0.16 Nanotron
+#define SSP0_SELN       1 << 16 //P0.16 Nanotron
 
 /* SSP1 external interrupt Pin (SMB380 specific) */
-#define SMB380_INT1		1 << 1	//P0.1
-#define BMA180_INT1		1 << 8	//P2.8
+#define SMB380_INT1     1 << 1  //P0.1
+#define BMA180_INT1     1 << 8  //P2.8
 
 
 
 /* SSP1 CR0 register */
-#define SSPCR0_DSS		1 << 0
-#define SSPCR0_FRF		1 << 4
-#define SSPCR0_SPO		1 << 6
-#define SSPCR0_SPH		1 << 7
-#define SSPCR0_SCR		1 << 8
+#define SSPCR0_DSS      1 << 0
+#define SSPCR0_FRF      1 << 4
+#define SSPCR0_SPO      1 << 6
+#define SSPCR0_SPH      1 << 7
+#define SSPCR0_SCR      1 << 8
 
 /* SSP1 CR1 register */
-#define SSPCR1_LBM		1 << 0
-#define SSPCR1_SSE		1 << 1
-#define SSPCR1_MS		1 << 2
-#define SSPCR1_SOD		1 << 3
+#define SSPCR1_LBM      1 << 0
+#define SSPCR1_SSE      1 << 1
+#define SSPCR1_MS       1 << 2
+#define SSPCR1_SOD      1 << 3
 
 /* SSP1 Interrupt Mask Set/Clear register */
-#define SSPIMSC_RORIM		1 << 0
-#define SSPIMSC_RTIM		1 << 1
-#define SSPIMSC_RXIM		1 << 2
-#define SSPIMSC_TXIM		1 << 3
+#define SSPIMSC_RORIM       1 << 0
+#define SSPIMSC_RTIM        1 << 1
+#define SSPIMSC_RXIM        1 << 2
+#define SSPIMSC_TXIM        1 << 3
 
 /* SSP1 Interrupt Status register */
-#define SSPRIS_RORRIS		1 << 0
-#define SSPRIS_RTRIS		1 << 1
-#define SSPRIS_RXRIS		1 << 2
-#define SSPRIS_TXRIS		1 << 3
+#define SSPRIS_RORRIS       1 << 0
+#define SSPRIS_RTRIS        1 << 1
+#define SSPRIS_RXRIS        1 << 2
+#define SSPRIS_TXRIS        1 << 3
 
 /* SSP1 Masked Interrupt register */
-#define SSPMIS_RORMIS		1 << 0
-#define SSPMIS_RTMIS		1 << 1
-#define SSPMIS_RXMIS		1 << 2
-#define SSPMIS_TXMIS		1 << 3
+#define SSPMIS_RORMIS       1 << 0
+#define SSPMIS_RTMIS        1 << 1
+#define SSPMIS_RXMIS        1 << 2
+#define SSPMIS_TXMIS        1 << 3
 
 /* SSP1 Interrupt clear register */
-#define SSPICR_RORIC		1 << 0
-#define SSPICR_RTIC		1 << 1
+#define SSPICR_RORIC        1 << 0
+#define SSPICR_RTIC         1 << 1
 
-#define SSP1_INTERRUPT_MODE	0
-#define SMB380_EXTINT_MODE  	1
-#define BMA180_EXTINT_MODE  	1
+#define SSP1_INTERRUPT_MODE     0
+#define SMB380_EXTINT_MODE      1
+#define BMA180_EXTINT_MODE      1
 
 uint32_t SSP0Init(void);
 uint8_t SSP0Prepare(uint8_t chip, uint8_t datasize, uint8_t cpol, uint8_t cpha,

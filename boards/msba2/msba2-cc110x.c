@@ -8,14 +8,14 @@
 
 /**
  * @file
- * @ingroup		LPC2387
- * @brief		CC1100 LPC2387 dependend functions
+ * @ingroup     LPC2387
+ * @brief       CC1100 LPC2387 dependend functions
  *
- * @author		Heiko Will <hwill@inf.fu-berlin.de>
- * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
+ * @author      Heiko Will <hwill@inf.fu-berlin.de>
+ * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
  * @version     $Revision: 1781 $
  *
- * @note    	$Id: msba2-cc110x.c 1781 2010-01-26 13:39:36Z hillebra $
+ * @note        $Id: msba2-cc110x.c 1781 2010-01-26 13:39:36Z hillebra $
  */
 
 #include <stdio.h>
@@ -29,16 +29,16 @@
 
 #include "gpioint.h"
 
-#define CC1100_GDO0         (FIO0PIN & BIT27)	// read serial I/O (GDO0)
-#define CC1100_GDO1         (FIO1PIN & BIT23)	// read serial I/O (GDO1)
-#define CC1100_GDO2         (FIO0PIN & BIT28)	// read serial I/O (GDO2)
+#define CC1100_GDO0         (FIO0PIN & BIT27)   // read serial I/O (GDO0)
+#define CC1100_GDO1         (FIO1PIN & BIT23)   // read serial I/O (GDO1)
+#define CC1100_GDO2         (FIO0PIN & BIT28)   // read serial I/O (GDO2)
 
-#define SPI_TX_EMPTY				(SSP0SR & SSPSR_TFE)
-#define SPI_BUSY					(SSP0SR & SSPSR_BSY)
-#define SPI_RX_AVAIL				(SSP0SR & SSPSR_RNE)
+#define SPI_TX_EMPTY                (SSP0SR & SSPSR_TFE)
+#define SPI_BUSY                    (SSP0SR & SSPSR_BSY)
+#define SPI_RX_AVAIL                (SSP0SR & SSPSR_RNE)
 
-#define CC1100_GDO1_LOW_RETRY		 (100)		// max. retries for GDO1 to go low
-#define CC1100_GDO1_LOW_COUNT		(2700)		// loop count (timeout ~ 500 us) to wait
+#define CC1100_GDO1_LOW_RETRY        (100)      // max. retries for GDO1 to go low
+#define CC1100_GDO1_LOW_COUNT       (2700)      // loop count (timeout ~ 500 us) to wait
 // for GDO1 to go low when CS low
 
 //#define DEBUG
@@ -67,17 +67,17 @@ static int test_time(int code)
 
 int cc110x_get_gdo0(void)
 {
-    return 	CC1100_GDO0;
+    return  CC1100_GDO0;
 }
 
 int cc110x_get_gdo1(void)
 {
-    return 	CC1100_GDO1;
+    return  CC1100_GDO1;
 }
 
 int cc110x_get_gdo2(void)
 {
-    return 	CC1100_GDO2;
+    return  CC1100_GDO2;
 }
 
 void cc110x_spi_init(void)
@@ -87,12 +87,12 @@ void cc110x_spi_init(void)
     FIO1SET = BIT21;
 
     // Power
-    PCONP |= PCSSP0;								// Enable power for SSP0 (default is on)
+    PCONP |= PCSSP0;                                // Enable power for SSP0 (default is on)
 
     // PIN Setup
-    PINSEL3 |= BIT8 + BIT9; 						// Set CLK function to SPI
-    PINSEL3 |= BIT14 + BIT15;						// Set MISO function to SPI
-    PINSEL3 |= BIT16 + BIT17; 						// Set MOSI function to SPI
+    PINSEL3 |= BIT8 + BIT9;                         // Set CLK function to SPI
+    PINSEL3 |= BIT14 + BIT15;                       // Set MISO function to SPI
+    PINSEL3 |= BIT16 + BIT17;                       // Set MOSI function to SPI
 
     // Interface Setup
     SSP0CR0 = 7;
@@ -101,17 +101,17 @@ void cc110x_spi_init(void)
     uint32_t pclksel;
     uint32_t cpsr;
     lpc2387_pclk_scale(F_CPU / 1000, 6000, &pclksel, &cpsr);
-    PCLKSEL1 &= ~(BIT10 | BIT11);						// CCLK to PCLK divider
+    PCLKSEL1 &= ~(BIT10 | BIT11);                       // CCLK to PCLK divider
     PCLKSEL1 |= pclksel << 10;
     SSP0CPSR = cpsr;
 
     // Enable
-    SSP0CR1 |= BIT1; 								// SSP-Enable
+    SSP0CR1 |= BIT1;                                // SSP-Enable
     int dummy;
 
     // Clear RxFIFO:
-    while (SPI_RX_AVAIL) {						// while RNE (Receive FIFO Not Empty)...
-        dummy = SSP0DR;							// read data
+    while (SPI_RX_AVAIL) {                      // while RNE (Receive FIFO Not Empty)...
+        dummy = SSP0DR;                         // read data
     }
 
     /* to suppress unused-but-set-variable */
@@ -189,8 +189,8 @@ loop:
                 goto final;
             }
 
-            FIO1SET = BIT21;	// CS to high
-            goto cs_low;		// try again
+            FIO1SET = BIT21;    // CS to high
+            goto cs_low;        // try again
         }
 
         goto loop;
@@ -198,7 +198,7 @@ loop:
 
 final:
     // Switch to SPI mode
-    PINSEL3 |= (BIT14 + BIT15);	// Set MISO function to SPI
+    PINSEL3 |= (BIT14 + BIT15); // Set MISO function to SPI
 }
 
 void

@@ -123,10 +123,10 @@ interrupt(USCIAB0RX_VECTOR) __attribute__ ((naked)) usart1irq(void)
         c = UCA0RXBUF;
 #ifdef MODULE_UART0
     } else if (uart0_handler_pid) {
-    	/* All went well -> let's signal the reception to adequate callbacks */
-    	c = UCA0RXBUF;
-    	uart0_handle_incoming(c);
-    	uart0_notify_thread();
+        /* All went well -> let's signal the reception to adequate callbacks */
+        c = UCA0RXBUF;
+        uart0_handle_incoming(c);
+        uart0_notify_thread();
 #endif
     }
 
