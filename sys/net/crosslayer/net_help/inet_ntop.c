@@ -22,14 +22,14 @@
 
 /* const char *
  * inet_ntop4(src, dst, size)
- *	format an IPv4 address, more or less like inet_ntoa()
+ *  format an IPv4 address, more or less like inet_ntoa()
  * return:
- *	`dst' (as a const)
+ *  `dst' (as a const)
  * notes:
- *	(1) uses no statics
- *	(2) takes a u_char* not an in_addr as input
+ *  (1) uses no statics
+ *  (2) takes a u_char* not an in_addr as input
  * author:
- *	Paul Vixie, 1996.
+ *  Paul Vixie, 1996.
  */
 static const char *inet_ntop4(const unsigned char *src, char *dst, size_t size)
 {
@@ -67,9 +67,9 @@ static const char *inet_ntop4(const unsigned char *src, char *dst, size_t size)
 
 /* const char *
  * inet_ntop6(src, dst, size)
- *	convert IPv6 binary address into presentation (printable) format
+ *  convert IPv6 binary address into presentation (printable) format
  * author:
- *	Paul Vixie, 1996.
+ *  Paul Vixie, 1996.
  */
 static const char *inet_ntop6(const unsigned char *src, char *dst, size_t size)
 {
@@ -91,8 +91,8 @@ static const char *inet_ntop6(const unsigned char *src, char *dst, size_t size)
 
     /*
      * Preprocess:
-     *	Copy the input (bytewise) array into a wordwise array.
-     *	Find the longest run of 0x00's in src[] for :: shorthanding.
+     *  Copy the input (bytewise) array into a wordwise array.
+     *  Find the longest run of 0x00's in src[] for :: shorthanding.
      */
     next_src = src;
     src_end = src + IN6ADDRSZ;
@@ -191,11 +191,11 @@ static const char *inet_ntop6(const unsigned char *src, char *dst, size_t size)
 
 /* char *
  * inet_ntop(af, src, dst, size)
- *	convert a network format address to presentation format.
+ *  convert a network format address to presentation format.
  * return:
- *	pointer to presentation format address (`dst'), or NULL (see errno).
+ *  pointer to presentation format address (`dst'), or NULL (see errno).
  * author:
- *	Paul Vixie, 1996.
+ *  Paul Vixie, 1996.
  */
 const char *inet_ntop(int af, const void *src, char *dst, size_t size)
 {

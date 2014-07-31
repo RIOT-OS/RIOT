@@ -290,7 +290,7 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                    current_tcp_socket->tcp_control.send_wnd);
 
         /* Send packet */
-        //			block_continue_thread();
+        //          block_continue_thread();
 #ifdef TCP_HC
         current_tcp_socket->tcp_control.tcp_context.hc_type = COMPRESSED_HEADER;
 #endif
@@ -298,7 +298,7 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
     }
     /* ACK packet probably got lost */
     else {
-        //			block_continue_thread();
+        //          block_continue_thread();
 #ifdef TCP_HC
         current_tcp_socket->tcp_control.tcp_context.hc_type = FULL_HEADER;
 #endif

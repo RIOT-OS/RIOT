@@ -25,11 +25,11 @@
 
 #ifdef CPU_NATIVE
 /* Ignore Linux definitions in native */
-#define _BITS_SOCKADDR_H	1
-#define	__SOCKADDR_COMMON(sa_prefix) \
+#define _BITS_SOCKADDR_H    1
+#define __SOCKADDR_COMMON(sa_prefix) \
   sa_family_t sa_prefix##family
 
-#define __SOCKADDR_COMMON_SIZE	(sizeof (unsigned short int))
+#define __SOCKADDR_COMMON_SIZE  (sizeof (unsigned short int))
 #endif
 
 #include <sys/types.h>

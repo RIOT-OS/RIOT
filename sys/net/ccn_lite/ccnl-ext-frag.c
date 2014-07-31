@@ -494,10 +494,10 @@ void ccnl_frag_RX_serialfragment(RX_datagram callback,
 /* ---------------------------------------------------------------------- */
 
 #define getNumField(var,len,flag,rem) \
-	DEBUGMSG(19, "  parsing " rem "\n"); \
-	if (unmkBinaryInt(data, datalen, &var, &len) != 0) \
-	    goto Bail; \
-	s.HAS |= flag
+    DEBUGMSG(19, "  parsing " rem "\n"); \
+    if (unmkBinaryInt(data, datalen, &var, &len) != 0) \
+        goto Bail; \
+    s.HAS |= flag
 #define HAS_FLAGS  0x01
 #define HAS_OSEQ   0x02
 #define HAS_OLOS   0x04
@@ -522,7 +522,7 @@ int ccnl_frag_RX_frag2012(RX_datagram callback, struct ccnl_relay_s *relay,
                 case CCN_DTAG_CONTENT:
                     DEBUGMSG(18, "  frag content\n");
 
-                    //		if (s.content) /* error: more than one content entry */
+                    //      if (s.content) /* error: more than one content entry */
                     if (consume(typ, num, data, datalen, &s.content, &s.contlen)
                         < 0) {
                         goto Bail;
@@ -624,7 +624,7 @@ int ccnl_frag_RX_CCNx2013(RX_datagram callback, struct ccnl_relay_s *relay,
 
                 case CCN_DTAG_CONTENT:
 
-                    //		if (frag) /* error: more than one content entry */
+                    //      if (frag) /* error: more than one content entry */
                     if (consume(typ, num, data, datalen, &s.content, &s.contlen)
                         < 0) {
                         goto Bail;

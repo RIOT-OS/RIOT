@@ -43,15 +43,15 @@ struct ccnl_buf_s *ccnl_frag_getnext(struct ccnl_frag_s *e,
 
 /*
 struct ccnl_buf_s* ccnl_frag_handle_fragment(struct ccnl_relay_s *r,
-		struct ccnl_face_s *f, unsigned char *data, int datalen);
+        struct ccnl_face_s *f, unsigned char *data, int datalen);
 */
 
 void ccnl_frag_destroy(struct ccnl_frag_s *e);
 
 /*
 struct ccnl_buf_s* ccnl_frag_fragment(struct ccnl_relay_s *ccnl,
-					struct ccnl_frag_s *frag,
-					struct ccnl_buf_s *buf);
+                    struct ccnl_frag_s *frag,
+                    struct ccnl_buf_s *buf);
 */
 
 typedef int (RX_datagram)(struct ccnl_relay_s *, struct ccnl_face_s *,
@@ -88,8 +88,8 @@ ccnl_prefix_clone_strip(struct ccnl_prefix_s *p, int strip);
 
 // ----------------------------------------------------------------------
 
-# define ccnl_sched_CTS_done(S,C,L)	do{}while(0)
-# define ccnl_sched_destroy(S)		do{}while(0)
+# define ccnl_sched_CTS_done(S,C,L) do{}while(0)
+# define ccnl_sched_destroy(S)      do{}while(0)
 
 char *ccnl_prefix_to_path(struct ccnl_prefix_s *pr);
 

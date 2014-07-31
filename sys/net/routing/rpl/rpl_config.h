@@ -64,22 +64,22 @@
 
 static inline uint8_t RPL_COUNTER_INCREMENT(uint8_t counter)
 {
-	return (counter > RPL_COUNTER_LOWER_REGION ? (counter == RPL_COUNTER_MAX ? counter=0 : ++counter) : (counter == RPL_COUNTER_LOWER_REGION ? counter=0 : ++counter));
+    return (counter > RPL_COUNTER_LOWER_REGION ? (counter == RPL_COUNTER_MAX ? counter=0 : ++counter) : (counter == RPL_COUNTER_LOWER_REGION ? counter=0 : ++counter));
 }
 
 static inline bool RPL_COUNTER_IS_INIT(uint8_t counter)
 {
-	return (counter > RPL_COUNTER_LOWER_REGION);
+    return (counter > RPL_COUNTER_LOWER_REGION);
 }
 
 static inline bool RPL_COUNTER_GREATER_THAN_LOCAL(uint8_t A,uint8_t B)
 {
-	return (((A<B) && (RPL_COUNTER_LOWER_REGION + 1 - B + A < RPL_COUNTER_SEQ_WINDOW)) || ((A > B) && (A-B < RPL_COUNTER_SEQ_WINDOW)));
+    return (((A<B) && (RPL_COUNTER_LOWER_REGION + 1 - B + A < RPL_COUNTER_SEQ_WINDOW)) || ((A > B) && (A-B < RPL_COUNTER_SEQ_WINDOW)));
 }
 
 static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A,uint8_t B)
 {
-	return ((A>RPL_COUNTER_LOWER_REGION) ? ((B > RPL_COUNTER_LOWER_REGION ) ? RPL_COUNTER_GREATER_THAN_LOCAL(A,B) : 0): (( B>RPL_COUNTER_LOWER_REGION ) ? 1: RPL_COUNTER_GREATER_THAN_LOCAL(A,B)));
+    return ((A>RPL_COUNTER_LOWER_REGION) ? ((B > RPL_COUNTER_LOWER_REGION ) ? RPL_COUNTER_GREATER_THAN_LOCAL(A,B) : 0): (( B>RPL_COUNTER_LOWER_REGION ) ? 1: RPL_COUNTER_GREATER_THAN_LOCAL(A,B)));
 }
 
 /* Node Status */
