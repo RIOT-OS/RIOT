@@ -13,21 +13,21 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 *******************************************************************************/
 
 /**
- * @ingroup		dev_cc110x
+ * @ingroup     dev_cc110x
  * @{
  */
 
 /**
  * @file
  * @internal
- * @brief		TI Chipcon CC110x physical radio driver
+ * @brief       TI Chipcon CC110x physical radio driver
  *
- * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
- * @author		Heiko Will <hwill@inf.fu-berlin.de>
+ * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
+ * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @version     $Revision: 2130 $
  *
- * @note		$Id: cc1100_phy.c 2130 2010-05-12 13:19:07Z hillebra $
+ * @note        $Id: cc1100_phy.c 2130 2010-05-12 13:19:07Z hillebra $
  */
 #include <stdio.h>
 #include <string.h>
@@ -52,12 +52,12 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 
 #define MSG_POLL 12346
 
-#define FLAGS_IDENTIFICATION			 (0x01)	///< Bit mask for reading the identification out of the flags field
-#define R_FLAGS_PROTOCOL(x)		((x & 0x0E)>>1) ///< Macro for reading the protocol out of the flags field
-#define W_FLAGS_PROTOCOL(x)		((x<<1) & 0x0E) ///< Macro for writing the protocol in the flags field
+#define FLAGS_IDENTIFICATION             (0x01) ///< Bit mask for reading the identification out of the flags field
+#define R_FLAGS_PROTOCOL(x)     ((x & 0x0E)>>1) ///< Macro for reading the protocol out of the flags field
+#define W_FLAGS_PROTOCOL(x)     ((x<<1) & 0x0E) ///< Macro for writing the protocol in the flags field
 
 /*---------------------------------------------------------------------------*/
-/* 					RX/TX buffer data structures */
+/*                  RX/TX buffer data structures */
 /*---------------------------------------------------------------------------*/
 
 typedef struct {
@@ -65,18 +65,18 @@ typedef struct {
     packet_info_t info;
 } rx_buffer_t;
 
-#define RX_BUFF_SIZE 	(10)					///< Size of RX queue
-static volatile uint8_t rx_buffer_head;			///< RX queue head
-static volatile uint8_t rx_buffer_tail;			///< RX queue tail
-static volatile uint8_t rx_buffer_size;			///< RX queue size
-static rx_buffer_t rx_buffer[RX_BUFF_SIZE];		///< RX buffer
-static cc1100_packet_layer0_t tx_buffer;		///< TX buffer (for one packet)
+#define RX_BUFF_SIZE    (10)                    ///< Size of RX queue
+static volatile uint8_t rx_buffer_head;         ///< RX queue head
+static volatile uint8_t rx_buffer_tail;         ///< RX queue tail
+static volatile uint8_t rx_buffer_size;         ///< RX queue size
+static rx_buffer_t rx_buffer[RX_BUFF_SIZE];     ///< RX buffer
+static cc1100_packet_layer0_t tx_buffer;        ///< TX buffer (for one packet)
 
 /*---------------------------------------------------------------------------*/
-/* 				Process/Event management data structures */
+/*              Process/Event management data structures */
 /*---------------------------------------------------------------------------*/
 
-#define MAX_PACKET_HANDLERS		(5)
+#define MAX_PACKET_HANDLERS     (5)
 static packet_monitor_t packet_monitor;
 static handler_entry_t handlers[MAX_PACKET_HANDLERS];
 static const pm_table_t handler_table;
@@ -92,19 +92,19 @@ static void *cc1100_event_handler_function(void *);
 static char event_handler_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 /*---------------------------------------------------------------------------*/
-/* 				Sequence number buffer management data structures */
+/*              Sequence number buffer management data structures */
 /*---------------------------------------------------------------------------*/
 
 /**
  * @name Sequence Buffer
  * @{
  */
-#define MAX_SEQ_BUFFER_SIZE   (20) 	///< Maximum size of the sequence number buffer
+#define MAX_SEQ_BUFFER_SIZE   (20)  ///< Maximum size of the sequence number buffer
 
 typedef struct {
-    uint64_t m_ticks;			///< 64-bit timestamp
-    uint8_t source;				///< Source address
-    uint8_t identification;		///< Identification (1-bit)
+    uint64_t m_ticks;           ///< 64-bit timestamp
+    uint8_t source;             ///< Source address
+    uint8_t identification;     ///< Identification (1-bit)
 } seq_buffer_entry_t;
 
 //* Sequence number buffer for this layer */
@@ -114,42 +114,42 @@ static seq_buffer_entry_t seq_buffer[MAX_SEQ_BUFFER_SIZE];
 static uint8_t seq_buffer_pos = 0;
 
 /**
- * @brief	Last sequence number this node has seen
+ * @brief   Last sequence number this node has seen
  *
- * @note	(phySrc + flags.identification) - for speedup in ISR.
+ * @note    (phySrc + flags.identification) - for speedup in ISR.
  */
 static volatile uint16_t last_seq_num = 0;
 
 /** @} */
 
 /*---------------------------------------------------------------------------*/
-//					WOR configuration data structures
+//                  WOR configuration data structures
 /*---------------------------------------------------------------------------*/
 
-#define EVENT0_MAX 			(60493)	///< Maximum RX polling interval in milliseconds
-#define WOR_RES_SWITCH		 (1891)	///< Switching point value in milliseconds between
-									///< WOR_RES = 0 and WOR_RES = 1
-#define DUTY_CYCLE_SIZE		    (7)	///< Length of duty cycle array
+#define EVENT0_MAX          (60493) ///< Maximum RX polling interval in milliseconds
+#define WOR_RES_SWITCH       (1891) ///< Switching point value in milliseconds between
+                                    ///< WOR_RES = 0 and WOR_RES = 1
+#define DUTY_CYCLE_SIZE         (7) ///< Length of duty cycle array
 
-cc1100_wor_config_t cc1100_wor_config;	///< CC1100 WOR configuration
+cc1100_wor_config_t cc1100_wor_config;  ///< CC1100 WOR configuration
 
-uint16_t cc1100_burst_count;			///< Burst count, number of packets in a burst transfer
-uint8_t cc1100_retransmission_count_uc;	///< Number of retransmissions for unicast
-uint8_t cc1100_retransmission_count_bc;	///< Number of retransmissions for broadcast
+uint16_t cc1100_burst_count;            ///< Burst count, number of packets in a burst transfer
+uint8_t cc1100_retransmission_count_uc; ///< Number of retransmissions for unicast
+uint8_t cc1100_retransmission_count_bc; ///< Number of retransmissions for broadcast
 
-static const double duty_cycle[2][DUTY_CYCLE_SIZE] = {	///< Duty cycle values from AN047
+static const double duty_cycle[2][DUTY_CYCLE_SIZE] = {  ///< Duty cycle values from AN047
     {12.5, 6.25, 3.125, 1.563, 0.781, 0.391, 0.195},
     {1.95, 0.9765, 0.4883, 0.2441, 0.1221, 0.061035, 0.030518}
 };
 
 /*---------------------------------------------------------------------------*/
-//					Data structures for statistic
+//                  Data structures for statistic
 /*---------------------------------------------------------------------------*/
 
 cc1100_statistic_t cc1100_statistic;
 
 /*---------------------------------------------------------------------------*/
-//					Initialization of physical layer
+//                  Initialization of physical layer
 /*---------------------------------------------------------------------------*/
 
 void cc1100_phy_init(void)
@@ -190,7 +190,7 @@ void cc1100_phy_init(void)
 }
 
 /*---------------------------------------------------------------------------*/
-/* 							CC1100 mutual exclusion */
+/*                          CC1100 mutual exclusion */
 /*---------------------------------------------------------------------------*/
 
 void cc1100_phy_mutex_lock(void)
@@ -208,7 +208,7 @@ void cc1100_phy_mutex_unlock(void)
 }
 
 /*---------------------------------------------------------------------------*/
-//					Statistical functions
+//                  Statistical functions
 /*---------------------------------------------------------------------------*/
 
 void cc1100_reset_statistic(void)
@@ -271,7 +271,7 @@ void cc1100_print_config(void)
 }
 
 /*---------------------------------------------------------------------------*/
-//					Change of RX polling interval (T_EVENT0)
+//                  Change of RX polling interval (T_EVENT0)
 /*---------------------------------------------------------------------------*/
 
 inline uint16_t iround(double d)
@@ -355,7 +355,7 @@ int cc1100_phy_calc_wor_settings(uint16_t millis)
 }
 
 /*---------------------------------------------------------------------------*/
-//					Sequence number buffer management
+//                  Sequence number buffer management
 /*---------------------------------------------------------------------------*/
 
 static bool contains_seq_entry(uint8_t src, uint8_t id)
@@ -415,26 +415,26 @@ static void add_seq_entry(uint8_t src, uint8_t id)
 }
 
 /*---------------------------------------------------------------------------*/
-/* 				CC1100 physical layer send functions */
+/*              CC1100 physical layer send functions */
 /*---------------------------------------------------------------------------*/
 
 static void send_link_level_ack(uint8_t dest)
 {
-    uint8_t oldState = radio_state;				/* Save old state */
-    cc1100_packet_layer0_t ack;					/* Local packet, don't overwrite */
+    uint8_t oldState = radio_state;             /* Save old state */
+    cc1100_packet_layer0_t ack;                 /* Local packet, don't overwrite */
 
-    radio_state = RADIO_SEND_ACK;				/* Set state to "Sending ACK" */
-    cc1100_spi_write_reg(CC1100_MCSM0, 0x08);	/* Turn off FS-Autocal */
-    cc1100_spi_write_reg(CC1100_MCSM1, 0x00);	/* TX_OFFMODE = IDLE */
-    ack.length = 3;								/* possible packet in txBuffer!*/
+    radio_state = RADIO_SEND_ACK;               /* Set state to "Sending ACK" */
+    cc1100_spi_write_reg(CC1100_MCSM0, 0x08);   /* Turn off FS-Autocal */
+    cc1100_spi_write_reg(CC1100_MCSM1, 0x00);   /* TX_OFFMODE = IDLE */
+    ack.length = 3;                             /* possible packet in txBuffer!*/
     ack.address = dest;
     ack.phy_src = rflags.RSSI;
     ack.flags = (LAYER_1_PROTOCOL_LL_ACK << 1);
-    cc1100_send_raw((uint8_t *)&ack,				/* IDLE -> TX (88.4 us) */
+    cc1100_send_raw((uint8_t *)&ack,                /* IDLE -> TX (88.4 us) */
                     ack.length + 1);
-    cc1100_spi_write_reg(CC1100_MCSM0, 0x18);	/* Turn on FS-Autocal */
-    cc1100_spi_write_reg(CC1100_MCSM1, 0x03);	/* TX_OFFMODE = RX */
-    radio_state = oldState;						/* Restore state */
+    cc1100_spi_write_reg(CC1100_MCSM0, 0x18);   /* Turn on FS-Autocal */
+    cc1100_spi_write_reg(CC1100_MCSM1, 0x03);   /* TX_OFFMODE = RX */
+    radio_state = oldState;                     /* Restore state */
     cc1100_statistic.acks_send++;
 }
 
@@ -452,7 +452,7 @@ static bool send_burst(cc1100_packet_layer0_t *packet, uint8_t retries, uint8_t 
          */
         extern unsigned long hwtimer_now(void);
         timer_tick_t t = hwtimer_now() + RTIMER_TICKS(T_PACKET_INTERVAL);
-        cc1100_send_raw((uint8_t *)packet, packet->length + 1);	/* RX -> TX (9.6 us) */
+        cc1100_send_raw((uint8_t *)packet, packet->length + 1); /* RX -> TX (9.6 us) */
 
         cc1100_statistic.raw_packets_out++;
 
@@ -555,25 +555,25 @@ int cc1100_send(radio_address_t addr, protocol_t protocol, int priority, char *p
     retries = (address == CC1100_BROADCAST_ADDRESS) ?
               cc1100_retransmission_count_bc : cc1100_retransmission_count_uc;
 
-    memset(tx_buffer.data, 0, MAX_DATA_LENGTH);			/* Clean data */
+    memset(tx_buffer.data, 0, MAX_DATA_LENGTH);         /* Clean data */
 
     /* TODO: If packets are shorter than max packet size, WOR interval is too long.
      *       This must be solved in some way. */
-    tx_buffer.length = 3 + payload_len;				/* 3 bytes (A&PS&F) + data length */
-    tx_buffer.address = address;						/* Copy destination address */
-    tx_buffer.flags = 0x00;								/* Set clean state */
-    tx_buffer.flags = W_FLAGS_PROTOCOL(protocol);		/* Copy protocol identifier */
-    tx_buffer.phy_src = (uint8_t) cc1100_get_address();	/* Copy sender address */
+    tx_buffer.length = 3 + payload_len;             /* 3 bytes (A&PS&F) + data length */
+    tx_buffer.address = address;                        /* Copy destination address */
+    tx_buffer.flags = 0x00;                             /* Set clean state */
+    tx_buffer.flags = W_FLAGS_PROTOCOL(protocol);       /* Copy protocol identifier */
+    tx_buffer.phy_src = (uint8_t) cc1100_get_address(); /* Copy sender address */
 
     /* Set identification number of packet */
-    tx_buffer.flags |= rflags.SEQ;						/* Set flags.identification (bit 0) */
-    rflags.SEQ = !rflags.SEQ;							/* Toggle value of layer 0 sequence number bit */
+    tx_buffer.flags |= rflags.SEQ;                      /* Set flags.identification (bit 0) */
+    rflags.SEQ = !rflags.SEQ;                           /* Toggle value of layer 0 sequence number bit */
 
-    memcpy(tx_buffer.data, payload, payload_len);		/* Copy data */
+    memcpy(tx_buffer.data, payload, payload_len);       /* Copy data */
 
     /* Send the packet */
-    cc1100_spi_write_reg(CC1100_MCSM0, 0x08);			/* Turn off FS-Autocal */
-    result = send_burst(&tx_buffer, retries, 0);		/* Send raw burst */
+    cc1100_spi_write_reg(CC1100_MCSM0, 0x08);           /* Turn off FS-Autocal */
+    result = send_burst(&tx_buffer, retries, 0);        /* Send raw burst */
     return_code = result ? payload_len : RADIO_OP_FAILED;
 
     /* Collect statistics */
@@ -602,7 +602,7 @@ final:
 }
 
 /*---------------------------------------------------------------------------*/
-/* 							RX Event Handler */
+/*                          RX Event Handler */
 /*---------------------------------------------------------------------------*/
 
 bool cc1100_set_packet_monitor(packet_monitor_t monitor)
@@ -698,7 +698,7 @@ static void *cc1100_event_handler_function(void *arg)
 }
 
 /*---------------------------------------------------------------------------*/
-/* 							CC1100 packet (RX) ISR */
+/*                          CC1100 packet (RX) ISR */
 /*---------------------------------------------------------------------------*/
 
 void cc1100_phy_rx_handler(void)
@@ -835,8 +835,8 @@ void cc1100_phy_rx_handler(void)
         /* Valid packet. After a wake-up, the radio should be in IDLE.
          * So put CC1100 to RX for WOR_TIMEOUT (have to manually put
          * the radio back to sleep/WOR).*/
-        cc1100_spi_write_reg(CC1100_MCSM0, 0x08);	/* Turn off FS-Autocal */
-        cc1100_spi_write_reg(CC1100_MCSM2, 0x07);	/* Configure RX_TIME (until end of packet) */
+        cc1100_spi_write_reg(CC1100_MCSM0, 0x08);   /* Turn off FS-Autocal */
+        cc1100_spi_write_reg(CC1100_MCSM2, 0x07);   /* Configure RX_TIME (until end of packet) */
 
         if (radio_mode == CC1100_MODE_CONSTANT_RX) {
             cc1100_spi_strobe(CC1100_SRX);
@@ -864,9 +864,9 @@ void cc1100_phy_rx_handler(void)
         rflags.TOF = 0;
 
         /* CRC false or RX buffer full -> clear RX FIFO in both cases */
-        last_seq_num = 0;					/* Reset for correct burst detection */
-        cc1100_spi_strobe(CC1100_SIDLE);	/* Switch to IDLE (should already be)... */
-        cc1100_spi_strobe(CC1100_SFRX);		/* ...for flushing the RX FIFO */
+        last_seq_num = 0;                   /* Reset for correct burst detection */
+        cc1100_spi_strobe(CC1100_SIDLE);    /* Switch to IDLE (should already be)... */
+        cc1100_spi_strobe(CC1100_SFRX);     /* ...for flushing the RX FIFO */
 
         /* If packet interrupted this nodes send call,
          * don't change anything after this point. */

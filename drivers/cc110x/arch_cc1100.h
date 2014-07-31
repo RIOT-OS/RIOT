@@ -14,13 +14,13 @@
 
 /**
  * @file
- * @ingroup		LPC2387
- * @brief		CC1100 LPC2387 dependend functions
+ * @ingroup     LPC2387
+ * @brief       CC1100 LPC2387 dependend functions
  *
- * @author		Heiko Will <hwill@inf.fu-berlin.de>
+ * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 1775 $
  *
- * @note    	$Id: arch_cc1100.h 1775 2010-01-26 09:37:03Z hillebra $
+ * @note        $Id: arch_cc1100.h 1775 2010-01-26 09:37:03Z hillebra $
  */
 
 #include <stdint.h>

@@ -39,17 +39,17 @@ FCS contain a hardware generated CRC sum with the polynom x^16+x^12+x^5+1
 When receiving a package FCS will be checked by hardware, the first FCS byte will be replaced by RSSI,
 followed by a CRC OK bit and the unsigned 7 bit correlation value.
 FCF:
-		Bit | Meaning
-		--------------------
-		0-2	| Frame Type
-		  3 | Security Enabled
-		  4 | Frame Pending
-		  5 | Acknowledge request
-		  6 | PAN ID Compression Field
-		7-9 | Reserved
-	  10-11 | Destination addressing mode
-	  12-13 | Reserved
-	  14-15 | Source addressing mode
+        Bit | Meaning
+        --------------------
+        0-2 | Frame Type
+          3 | Security Enabled
+          4 | Frame Pending
+          5 | Acknowledge request
+          6 | PAN ID Compression Field
+        7-9 | Reserved
+      10-11 | Destination addressing mode
+      12-13 | Reserved
+      14-15 | Source addressing mode
 
 For the cc2420 bit 0 is the most right bit and bit 15 is the most left bit.
 But the 2 FCF bytes have to be transmitted littel endian (byte 15 to 8 first than 7 to 0)
@@ -97,8 +97,8 @@ Frame type value:
  *  Structure to represent a cc2420 packet.
  */
 typedef struct __attribute__ ((packed)) {
-	/* @{ */
-    uint8_t length;  			/** < the length of the frame of the frame including fcs*/
+    /* @{ */
+    uint8_t length;             /** < the length of the frame of the frame including fcs*/
     ieee802154_frame_t frame;   /** < the ieee802154 frame */
     int8_t rssi;                /** < the rssi value */
     uint8_t lqi;                /** < the link quality indicator */

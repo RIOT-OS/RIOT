@@ -16,33 +16,33 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 #define CC1100_INTERNAL_H
 
 /**
- * @ingroup		dev_cc110x
+ * @ingroup     dev_cc110x
  * @{
  */
 
 /**
  * @file
  * @internal
- * @brief		TI Chipcon CC110x internal hardware constants
+ * @brief       TI Chipcon CC110x internal hardware constants
  *
- * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
- * @author		Heiko Will <hwill@inf.fu-berlin.de>
+ * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
+ * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 1231 $
  *
- * @note		$Id: cc1100-internal.h 1231 2009-08-20 08:31:32Z baar $
+ * @note        $Id: cc1100-internal.h 1231 2009-08-20 08:31:32Z baar $
  */
 
-#define FIXED_PKTLEN		(0x00)		///< Fixed length packets, length configured in PKTLEN register.
-#define	VARIABLE_PKTLEN		(0x01)		///< Variable length packets, packet length configured by the first
-										///< byte after synch word.
+#define FIXED_PKTLEN        (0x00)      ///< Fixed length packets, length configured in PKTLEN register.
+#define VARIABLE_PKTLEN     (0x01)      ///< Variable length packets, packet length configured by the first
+                                        ///< byte after synch word.
 
 /**
- * @name	Bitmasks for reading out status register values
+ * @name    Bitmasks for reading out status register values
  * @{
  */
 
 /**
- * @brief	Bitmask (=10000000) for reading CRC_OK.
+ * @brief   Bitmask (=10000000) for reading CRC_OK.
  *
  * If CRC_OK == 1: CRC for received data OK (or CRC disabled).
  * If CRC_OK == 0: CRC error in received data.
@@ -53,42 +53,42 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  *
  * The Link Quality Indicator estimates how easily a received signal can be demodulated.
  */
-#define LQI_EST				(0x7F)
-#define I_RSSI              (0x00)		///< Index 0 contains RSSI information (from optionally appended packet status bytes).
-#define I_LQI               (0x01)		///< Index 1 contains LQI & CRC_OK information (from optionally appended packet status bytes).
-#define MARC_STATE			(0x1F)		///< Bitmask (=00011111) for reading MARC_STATE in MARCSTATE status register.
-#define CS					(0x40)		///< Bitmask (=01000000) for reading CS (Carrier Sense) in PKTSTATUS status register.
-#define PQT_REACHED			(0x20)		///< Bitmask (=00100000) for reading PQT_REACHED (Preamble Quality reached) in PKTSTATUS status register.
-#define CCA					(0x10)		///< Bitmask (=00010000) for reading CCA (clear channel assessment) in PKTSTATUS status register.
-#define SFD					(0x08)		///< Bitmask (=00001000) for reading SFD (Sync word found) in PKTSTATUS status register.
-#define GDO2				(0x04)		///< Bitmask (=00000100) for reading GDO2 (current value on GDO2 pin) in PKTSTATUS status register.
-#define GDO1				(0x02)		///< Bitmask (=00000010) for reading GDO1 (current value on GDO1 pin) in PKTSTATUS status register.
-#define GDO0				(0x01)		///< Bitmask (=00000001) for reading GDO0 (current value on GDO0 pin) in PKTSTATUS status register.
-#define TXFIFO_UNDERFLOW	(0x80)		///< Bitmask (=10000000) for reading TXFIFO_UNDERFLOW in TXBYTES status register.
-#define BYTES_IN_TXFIFO		(0x7F)		///< Bitmask (=01111111) for reading NUM_TXBYTES in TXBYTES status register.
-#define RXFIFO_OVERFLOW		(0x80)		///< Bitmask (=10000000) for reading RXFIFO_OVERFLOW in RXBYTES status register.
-#define BYTES_IN_RXFIFO     (0x7F)		///< Bitmask (=01111111) for reading NUM_RXBYTES in RXBYTES status register.
+#define LQI_EST             (0x7F)
+#define I_RSSI              (0x00)      ///< Index 0 contains RSSI information (from optionally appended packet status bytes).
+#define I_LQI               (0x01)      ///< Index 1 contains LQI & CRC_OK information (from optionally appended packet status bytes).
+#define MARC_STATE          (0x1F)      ///< Bitmask (=00011111) for reading MARC_STATE in MARCSTATE status register.
+#define CS                  (0x40)      ///< Bitmask (=01000000) for reading CS (Carrier Sense) in PKTSTATUS status register.
+#define PQT_REACHED         (0x20)      ///< Bitmask (=00100000) for reading PQT_REACHED (Preamble Quality reached) in PKTSTATUS status register.
+#define CCA                 (0x10)      ///< Bitmask (=00010000) for reading CCA (clear channel assessment) in PKTSTATUS status register.
+#define SFD                 (0x08)      ///< Bitmask (=00001000) for reading SFD (Sync word found) in PKTSTATUS status register.
+#define GDO2                (0x04)      ///< Bitmask (=00000100) for reading GDO2 (current value on GDO2 pin) in PKTSTATUS status register.
+#define GDO1                (0x02)      ///< Bitmask (=00000010) for reading GDO1 (current value on GDO1 pin) in PKTSTATUS status register.
+#define GDO0                (0x01)      ///< Bitmask (=00000001) for reading GDO0 (current value on GDO0 pin) in PKTSTATUS status register.
+#define TXFIFO_UNDERFLOW    (0x80)      ///< Bitmask (=10000000) for reading TXFIFO_UNDERFLOW in TXBYTES status register.
+#define BYTES_IN_TXFIFO     (0x7F)      ///< Bitmask (=01111111) for reading NUM_TXBYTES in TXBYTES status register.
+#define RXFIFO_OVERFLOW     (0x80)      ///< Bitmask (=10000000) for reading RXFIFO_OVERFLOW in RXBYTES status register.
+#define BYTES_IN_RXFIFO     (0x7F)      ///< Bitmask (=01111111) for reading NUM_RXBYTES in RXBYTES status register.
 /** @} */
 
 /**
- * @name	Bitmasks for reading out configuration register values
+ * @name    Bitmasks for reading out configuration register values
  * @{
  */
-#define PKT_LENGTH_CONFIG	(0x03)		///< Bitmask (=00000011) for reading LENGTH_CONFIG in PKTCTRL0 configuration register.
+#define PKT_LENGTH_CONFIG   (0x03)      ///< Bitmask (=00000011) for reading LENGTH_CONFIG in PKTCTRL0 configuration register.
 /** @} */
 
 /**
- * @name	Definitions to support burst/single access
+ * @name    Definitions to support burst/single access
  * @{
  */
-#define CC1100_WRITE_BURST	(0x40) ///< Offset for burst write.
-#define CC1100_READ_SINGLE	(0x80) ///< Offset for read single byte.
-#define CC1100_READ_BURST	(0xC0) ///< Offset for read burst.
-#define CC1100_NOBYTE		(0x00) ///< No command (for reading).
+#define CC1100_WRITE_BURST  (0x40) ///< Offset for burst write.
+#define CC1100_READ_SINGLE  (0x80) ///< Offset for read single byte.
+#define CC1100_READ_BURST   (0xC0) ///< Offset for read burst.
+#define CC1100_NOBYTE       (0x00) ///< No command (for reading).
 /** @} */
 
 /**
- * @name	Configuration Registers (47x)
+ * @name    Configuration Registers (47x)
  * @{
  */
 #define CC1100_IOCFG2       (0x00)      ///< GDO2 output pin configuration
@@ -141,12 +141,12 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 /** @} */
 
 /**
- * @name	Strobe commands (14x)
+ * @name    Strobe commands (14x)
  * @{
  */
-#define CC1100_SRES         (0x30)		///< Reset chip.
+#define CC1100_SRES         (0x30)      ///< Reset chip.
 /**
- * @brief	Enable and calibrate frequency synthesizer (if MCSM0.FS_AUTOCAL=1).
+ * @brief   Enable and calibrate frequency synthesizer (if MCSM0.FS_AUTOCAL=1).
  *
  * If in RX/TX: Go to a wait state where only the synthesizer is running (for quick RX / TX turnaround).
  */
@@ -170,35 +170,35 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 /** @} */
 
 /**
- * @name	Status registers (12x)
+ * @name    Status registers (12x)
  * @{
  */
-#define CC1100_PARTNUM      (0x30)		///< Part number of CC1100.
-#define CC1100_VERSION      (0x31)		///< Current version number.
-#define CC1100_FREQEST      (0x32)		///< Frequency Offset Estimate.
-#define CC1100_LQI          (0x33)		///< Demodulator estimate for Link Quality.
-#define CC1100_RSSI         (0x34)		///< Received signal strength indication.
-#define CC1100_MARCSTATE    (0x35)		///< Control state machine state.
-#define CC1100_WORTIME1     (0x36)		///< High byte of WOR timer.
-#define CC1100_WORTIME0     (0x37)		///< Low byte of WOR timer.
-#define CC1100_PKTSTATUS    (0x38)		///< Current GDOx status and packet status.
-#define CC1100_VCO_VC_DAC   (0x39)		///< Current setting from PLL calibration module.
-#define CC1100_TXBYTES      (0x3A)		///< Underflow and number of bytes in the TX FIFO.
-#define CC1100_RXBYTES      (0x3B)		///< Overflow and number of bytes in the RX FIFO.
+#define CC1100_PARTNUM      (0x30)      ///< Part number of CC1100.
+#define CC1100_VERSION      (0x31)      ///< Current version number.
+#define CC1100_FREQEST      (0x32)      ///< Frequency Offset Estimate.
+#define CC1100_LQI          (0x33)      ///< Demodulator estimate for Link Quality.
+#define CC1100_RSSI         (0x34)      ///< Received signal strength indication.
+#define CC1100_MARCSTATE    (0x35)      ///< Control state machine state.
+#define CC1100_WORTIME1     (0x36)      ///< High byte of WOR timer.
+#define CC1100_WORTIME0     (0x37)      ///< Low byte of WOR timer.
+#define CC1100_PKTSTATUS    (0x38)      ///< Current GDOx status and packet status.
+#define CC1100_VCO_VC_DAC   (0x39)      ///< Current setting from PLL calibration module.
+#define CC1100_TXBYTES      (0x3A)      ///< Underflow and number of bytes in the TX FIFO.
+#define CC1100_RXBYTES      (0x3B)      ///< Overflow and number of bytes in the RX FIFO.
 /** @} */
 
 /**
- * @name	Multi byte registers
+ * @name    Multi byte registers
  * @{
  */
 /**
- * @brief	Register for eight user selected output power settings.
+ * @brief   Register for eight user selected output power settings.
  *
  * 3-bit FREND0.PA_POWER value selects the PATABLE entry to use.
  */
 #define CC1100_PATABLE      (0x3E)
-#define CC1100_TXFIFO       (0x3F)		///< TX FIFO: Write operations write to the TX FIFO (SB: +0x00; BURST: +0x40)
-#define CC1100_RXFIFO       (0x3F)		///< RX FIFO: Read operations read from the RX FIFO (SB: +0x80; BURST: +0xC0)
+#define CC1100_TXFIFO       (0x3F)      ///< TX FIFO: Write operations write to the TX FIFO (SB: +0x00; BURST: +0x40)
+#define CC1100_RXFIFO       (0x3F)      ///< RX FIFO: Read operations read from the RX FIFO (SB: +0x80; BURST: +0xC0)
 
 /** @} */
 

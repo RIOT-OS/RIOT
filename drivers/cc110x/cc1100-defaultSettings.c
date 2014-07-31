@@ -13,19 +13,19 @@ and Telematics group (http://cst.mi.fu-berlin.de).
 *******************************************************************************/
 
 /**
- * @ingroup		dev_cc110x
+ * @ingroup     dev_cc110x
  * @{
  */
 
 /**
  * @file
- * @brief		TI Chipcon CC110x default settings
+ * @brief       TI Chipcon CC110x default settings
  *
- * @author		Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
- * @author		Heiko Will <hwill@inf.fu-berlin.de>
+ * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>
+ * @author      Heiko Will <hwill@inf.fu-berlin.de>
  * @version     $Revision: 2058 $
  *
- * @note		$Id: cc1100-defaultSettings.c 2058 2010-03-31 08:59:31Z hillebra $
+ * @note        $Id: cc1100-defaultSettings.c 2058 2010-03-31 08:59:31Z hillebra $
  */
 
 #include "cc1100-defaultSettings.h"
@@ -38,7 +38,7 @@ and Telematics group (http://cst.mi.fu-berlin.de).
  * -----------------------------------------
  *              0 |      0 | 869.525
  *              1 |     10 | 871.61
- *              2 |     20 | 873.58			~ seems to be bad (hang-ups with this channel)
+ *              2 |     20 | 873.58         ~ seems to be bad (hang-ups with this channel)
  *              3 |     30 | 875.61
  *              4 |     40 | 877.58
  *              5 |     50 | 879.61
@@ -71,9 +71,9 @@ char cc1100_conf[] = {
     0x0F, /* FIFOTHR */
     0x9B, /* SYNC1 */
     0xAD, /* SYNC0 */
-    0x3D, /* PKTLEN 		(maximum value of packet length byte = 61) */
+    0x3D, /* PKTLEN         (maximum value of packet length byte = 61) */
     0x06, /* PKTCTRL1 */
-    0x45, /* PKTCTRL0 	(variable packet length) */
+    0x45, /* PKTCTRL0   (variable packet length) */
     0xFF, /* ADDR */
     CC1100_DEFAULT_CHANNR * 10, /* CHANNR */
     0x0B, /* FSCTRL1 */
