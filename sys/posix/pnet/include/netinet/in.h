@@ -27,7 +27,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include "ipv6.h"
-#include "destiny/socket.h"
+#include "socket_base/socket.h"
 
 /**
  * IPv4 socket address type.

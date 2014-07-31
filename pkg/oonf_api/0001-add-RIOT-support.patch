@@ -359,7 +359,7 @@ index 78fd5b4..cfba7a9 100644
  #endif
 
 +#ifdef RIOT
-+#include "destiny/socket.h"
++#include "transport_layer/socket.h"
 +#define INET_ADDRSTRLEN		(16)
 +#define INET6_ADDRSTRLEN	(48)
 +#endif
@@ -466,7 +466,7 @@ index 4b3e04d..6b52f72 100644
  #include <stdio.h>
  #include <stdlib.h>
 +#ifdef RIOT
-+#include "destiny/socket.h"
++#include "transport_layer/socket.h"
 +#include "inet_ntop.h"
 +#else
  #include <sys/socket.h>

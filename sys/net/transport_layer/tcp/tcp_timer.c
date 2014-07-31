@@ -1,5 +1,5 @@
 /**
- * Destiny TCP timer implementation
+ * TCP timer implementation
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup destiny
+ * @ingroup transport_layer
  * @{
  * @file    tcp_timer.c
  * @brief   TCP timer
@@ -23,11 +23,10 @@
 #include "thread.h"
 #include "vtimer.h"
 
-#include "destiny.h"
-
 #include "msg_help.h"
 #include "socket.h"
 
+#include "tcp.h"
 #include "tcp_timer.h"
 
 void handle_synchro_timeout(socket_internal_t *current_socket)
@@ -41,7 +40,7 @@ void handle_synchro_timeout(socket_internal_t *current_socket)
         if ((current_socket->socket_values.tcp_control.no_of_retries == 0) &&
             (timex_uint64(timex_sub(now, current_socket->socket_values.tcp_control.last_packet_time)) > TCP_SYN_INITIAL_TIMEOUT)) {
             current_socket->socket_values.tcp_control.no_of_retries++;
-            net_msg_send(&send, current_socket->recv_pid, 0, TCP_RETRY);
+            socket_base_net_msg_send(&send, current_socket->recv_pid, 0, TCP_RETRY);
         }
         else if ((current_socket->socket_values.tcp_control.no_of_retries > 0) &&
                  (timex_uint64(timex_sub(now, current_socket->socket_values.tcp_control.last_packet_time)) >
@@ -51,10 +50,10 @@ void handle_synchro_timeout(socket_internal_t *current_socket)
 
             if (current_socket->socket_values.tcp_control.no_of_retries >
                 TCP_MAX_SYN_RETRIES) {
-                net_msg_send(&send, current_socket->recv_pid, 0, TCP_TIMEOUT);
+                socket_base_net_msg_send(&send, current_socket->recv_pid, 0, TCP_TIMEOUT);
             }
             else {
-                net_msg_send(&send, current_socket->recv_pid, 0, TCP_RETRY);
+                socket_base_net_msg_send(&send, current_socket->recv_pid, 0, TCP_RETRY);
             }
         }
     }
@@ -83,12 +82,12 @@ void handle_established(socket_internal_t *current_socket)
         vtimer_now(&now);
 
         if (current_timeout > TCP_ACK_MAX_TIMEOUT) {
-            net_msg_send(&send, current_socket->send_pid, 0, TCP_TIMEOUT);
+            socket_base_net_msg_send(&send, current_socket->send_pid, 0, TCP_TIMEOUT);
         }
         else if (timex_uint64(timex_sub(now, current_socket->socket_values.tcp_control.last_packet_time)) >
                  current_timeout) {
             current_socket->socket_values.tcp_control.no_of_retries++;
-            net_msg_send(&send, current_socket->send_pid, 0, TCP_RETRY);
+            socket_base_net_msg_send(&send, current_socket->send_pid, 0, TCP_RETRY);
         }
     }
 }
@@ -99,9 +98,9 @@ void check_sockets(void)
     uint8_t i = 1;
 
     while (i < MAX_SOCKETS + 1) {
-        current_socket = get_socket(i);
+        current_socket = socket_base_get_socket(i);
 
-        if (is_tcp_socket(i)) {
+        if (tcp_socket_compliancy(i)) {
             switch (current_socket->socket_values.tcp_control.state) {
                 case TCP_ESTABLISHED: {
                     handle_established(current_socket);

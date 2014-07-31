@@ -36,7 +36,7 @@
 
 #include "cpu.h"
 
-#include "destiny/socket.h"
+#include "socket_base/socket.h"
 
 /**
  * @brief   Used to define the socket address.
@@ -449,10 +449,10 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
  *
  * @param[in] domain    Specifies the communications domain in which a socket
  *                      is to be created. Valid values are prefixed with ``AF_`
- *                      and defined in @ref destiny/socket.h.
+ *                      and defined in @ref transport_layer/socket.h.
  * @param[in] type      Specifies the type of socket to be created. Valued
  *                      values are prefixed with ``SOCK_`` and defined in
- *                      @ref destiny/socket.h.
+ *                      @ref transport_layer/socket.h.
  * @param[in] protocol  Specifies a particular protocol to be used with the
  *                      socket. Specifying a protocol of 0 causes socket() to
  *                      use an unspecified default protocol appropriate for
