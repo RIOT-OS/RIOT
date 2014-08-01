@@ -31,8 +31,25 @@
 #include "shell_commands.h"
 #include "stm32f407xx.h"
 
-#define USE_SPI_0_MASTER         1
-#define USE_SPI_0_SLAVE          1
+#define USE_SPI_MASTER              0
+#if USE_SPI_MASTER == 0
+    #define TESTPORT_MASTER  SPI_0
+    #define TESTDEV_MASTER   SPI_0_DEV
+#elif USE_SPI_MASTER == 1
+    #define TESTPORT_MASTER  SPI_1
+    #define TESTDEV_MASTER   SPI_1_DEV
+#endif
+
+#define USE_SPI_SLAVE              0
+#if USE_SPI_SLAVE == 0
+    #define TESTPORT_SLAVE  SPI_0
+    #define TESTDEV_SLAVE   SPI_0_DEV
+#elif USE_SPI_SLAVE == 1
+    #define TESTPORT_SLAVE  SPI_1
+    #define TESTDEV_SLAVE   SPI_1_DEV
+#endif
+
+
 
 #define SHELL_BUFFER_SIZE        128
 #define BUF_SEND_LEN             10
@@ -55,6 +72,9 @@ char test_irq(char data)
 {
     test_buf[buf_count] = data;
     buf_count++;
+    if (buf_count == 9) {
+        buf_count = 0;
+    }
     return data;
 }
 
@@ -78,27 +98,18 @@ static const shell_command_t shell_commands[] = {
  */
 void cmd_init_start_slave(int argc, char **argv)
 {
-    printf("Init Slave USE_SPI_0_SLAVE: %i\n", USE_SPI_0_SLAVE);
+    printf("Init Slave USE_SPI_SLAVE: %i\n", USE_SPI_SLAVE);
 
     (void) argc;
     (void) argv;
 
-
     int cr1_reg, cr2_reg;
 
-#if USE_SPI_0_SLAVE
-    spi_poweron(SPI_0);
-    spi_init_slave(SPI_0, SPI_CONF_FIRST_RISING, test_irq);
+    spi_poweron(TESTPORT_SLAVE);
+    spi_init_slave(TESTPORT_SLAVE, SPI_CONF_FIRST_RISING, test_irq);
 
-    cr1_reg = (SPI_0_DEV->CR1);
-    cr2_reg = (SPI_0_DEV->CR2);
-#else
-    spi_poweron(SPI_1);
-    spi_init_slave(SPI_1, SPI_CONF_FIRST_RISING, test_irq);
-
-    cr1_reg = (SPI_1_DEV->CR1);
-    cr2_reg = (SPI_1_DEV->CR2);
-#endif
+    cr1_reg = (TESTDEV_SLAVE->CR1);
+    cr2_reg = (TESTDEV_SLAVE->CR2);
 
     printf("CR1 Register Slave: %x\nCR2 Register Slave: %x\n", cr1_reg, cr2_reg);
 }
@@ -108,7 +119,7 @@ void cmd_init_start_slave(int argc, char **argv)
  */
 void cmd_init_master(int argc, char **argv)
 {
-    printf("Init Master USE_SPI_0_MASTER: %i\n", USE_SPI_0_MASTER);
+    printf("Init Master USE_SPI_MASTER: %i\n", USE_SPI_MASTER);
 
     (void) argc;
     (void) argv;
@@ -118,21 +129,12 @@ void cmd_init_master(int argc, char **argv)
     gpio_init_out(GPIO_7, GPIO_NOPULL); /* GPIO_7 is mapped to pin PD6 */
     gpio_set(GPIO_7);
 
-#if USE_SPI_0_MASTER
-    spi_poweron(SPI_0);
-    spi_init_master(SPI_0, SPI_CONF_FIRST_RISING, SPI_SPEED_400KHZ);
+    spi_poweron(TESTPORT_MASTER);
+    spi_init_master(TESTPORT_MASTER, SPI_CONF_FIRST_RISING, SPI_SPEED_400KHZ);
 
-    cr1_reg = (SPI_0_DEV->CR1);
-    cr2_reg = (SPI_0_DEV->CR2);
-    i2cfgr  =  SPI_0_DEV->I2SCFGR;
-#else
-    spi_poweron(SPI_1);
-    spi_init_master(SPI_1, SPI_CONF_FIRST_RISING, SPI_SPEED_400KHZ);
-
-    cr1_reg = (SPI_1_DEV->CR1);
-    cr2_reg = (SPI_1_DEV->CR2);
-    i2cfgr  =  SPI_1_DEV->I2SCFGR;
-#endif
+    cr1_reg = (TESTDEV_MASTER->CR1);
+    cr2_reg = (TESTDEV_MASTER->CR2);
+    i2cfgr  =  TESTDEV_MASTER->I2SCFGR;
 
     printf("CR1 Register Master: %x\nCR2 Register Master: %x\n i2cfgr Register Master: %x\n", cr1_reg, cr2_reg, i2cfgr);
 }
@@ -148,15 +150,12 @@ void cmd_send_master_byte(int argc, char **argv)
 
     puts("Send Master 1 Byte\n");
 
-    char data_return, data_send = 1;
+    char data_return, data_send = 0x99;
 
     gpio_clear(GPIO_7);
 
-#if USE_SPI_0_MASTER
-    spi_transfer_byte(SPI_0, data_send, &data_return);
-#else
-    spi_transfer_byte(SPI_1, data_send, &data_return);
-#endif
+    spi_transfer_byte(TESTPORT_MASTER, data_send, &data_return);
+
     gpio_set(GPIO_7);
     printf("One Byte transferred: %x, received: %x\n", data_send, data_return);
 }
@@ -177,11 +176,7 @@ void cmd_send_master_bytes(int argc, char **argv)
 
     gpio_clear(GPIO_7);
 
-#if USE_SPI_0_MASTER
-    spi_transfer_bytes(SPI_0, buf_send, buf_return, BUF_SEND_LEN);
-#else
-    spi_transfer_bytes(SPI_1, buf_send, buf_return, BUF_SEND_LEN);
-#endif
+    spi_transfer_bytes(TESTPORT_MASTER, buf_send, buf_return, BUF_SEND_LEN);
 
     gpio_set(GPIO_7);
 
@@ -201,18 +196,19 @@ void cmd_send_master_8x1_byte(int argc, char **argv)
 
     puts("Send Master 8 x 1 Byte\n");
 
-    char data_return, data_send = 1;
+    char data_return = 0, data_send = 1;
 
     for (int i = 0; i < 8; i++) {
         gpio_clear(GPIO_7);
 
-#if USE_SPI_0_MASTER
-        spi_transfer_byte(SPI_0, data_send, &data_return);
-#else
-        spi_transfer_byte(SPI_1, data_send, &data_return);
-#endif
+        spi_transfer_byte(TESTPORT_MASTER, data_send, &data_return);
+
         gpio_set(GPIO_7);
         printf("One Byte transferred: %x, received: %x\n", data_send, data_return);
+/*
+        timex_t sleep = timex_set(1, 0);
+        vtimer_sleep(sleep);
+*/
         data_send++;
     }
 }
@@ -245,37 +241,37 @@ void cmd_test_nrf(int argc, char **argv)
 
     // Try to get status register while command NOP
     gpio_clear(GPIO_7);
-    spi_transfer_byte(SPI_0, NOP, &data_return);
+    spi_transfer_byte(TESTPORT_MASTER, NOP, &data_return);
     gpio_set(GPIO_7);
     printf("NOP returned: %x\n", data_return);
 
     // Try to read out CONFIG register
     gpio_clear(GPIO_7);
-    spi_transfer_reg(SPI_0, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
+    spi_transfer_reg(TESTPORT_MASTER, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
     gpio_set(GPIO_7);
     printf("read out config register before write access. answer: %x\n", data_return);
 
 
     // Try to write 1 to CONFIG register to set power up
     gpio_clear(GPIO_7);
-    spi_transfer_reg(SPI_0, (W_REGISTER | (REGISTER_MASK & CONFIG)), CONFIG_CRCO, &data_return);
+    spi_transfer_reg(TESTPORT_MASTER, (W_REGISTER | (REGISTER_MASK & CONFIG)), CONFIG_CRCO, &data_return);
     gpio_set(GPIO_7);
 
 
     // Try to read out CONFIG register
     gpio_clear(GPIO_7);
-    spi_transfer_reg(SPI_0, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
+    spi_transfer_reg(TESTPORT_MASTER, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
     gpio_set(GPIO_7);
     printf("read out config register after write access 1. answer: %x\n", data_return);
 
     // Try to write to CONFIG register to set power up
     gpio_clear(GPIO_7);
-    spi_transfer_reg(SPI_0, (W_REGISTER | (REGISTER_MASK & CONFIG)), (char)~NOP, &data_return);
+    spi_transfer_reg(TESTPORT_MASTER, (W_REGISTER | (REGISTER_MASK & CONFIG)), (char)~NOP, &data_return);
     gpio_set(GPIO_7);
 
     // Try to read out CONFIG register
     gpio_clear(GPIO_7);
-    spi_transfer_reg(SPI_0, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
+    spi_transfer_reg(TESTPORT_MASTER, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
     gpio_set(GPIO_7);
     printf("read out config register after write access 0. answer: %x\n", data_return);
 

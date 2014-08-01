@@ -26,6 +26,11 @@
 #include "sched.h"
 #include "stm32f407xx.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
+#define with_gpio_stuff    1
+
 
 typedef struct {
     char(*cb)(char data);
@@ -81,7 +86,6 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             speed_devider = 7;
     }
 
-
     switch (dev) {
 #if SPI_0_EN
 
@@ -97,6 +101,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             port->MODER |= (2 << (2 * SPI_0_MISO_GPIO));
             port->MODER &= ~(2 << (2 * SPI_0_MOSI_GPIO));
             port->MODER |= (2 << (2 * SPI_0_MOSI_GPIO));
+
+#if with_gpio_stuff
 
             /* Set speed */
             port->OSPEEDR &= ~(3 << (2 * SPI_0_SCK_GPIO));
@@ -117,12 +123,12 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             /* Configure push-pull resistors */
             port->PUPDR &= ~(3 << (2 * SPI_0_SCK_GPIO));
             port->PUPDR |= (0 << (2 * SPI_0_SCK_GPIO));
-
             port->PUPDR &= ~(3 << (2 * SPI_0_MISO_GPIO));
             port->PUPDR |= (0 << (2 * SPI_0_MISO_GPIO));
-
             port->PUPDR &= ~(3 << (2 * SPI_0_MOSI_GPIO));
             port->PUPDR |= (0 << (2 * SPI_0_MOSI_GPIO));
+
+#endif
 
             /* Configure GPIOs to SPI0 (static) */
 #if (SPI_0_SCK_GPIO < 8)
@@ -167,6 +173,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             port->MODER &= ~(2 << (2 * SPI_1_MOSI_GPIO));
             port->MODER |= (2 << (2 * SPI_1_MOSI_GPIO));
 
+#if with_gpio_stuff
+
             /* Set speed */
             port->OSPEEDR &= ~(3 << (2 * SPI_1_SCK_GPIO));
             port->OSPEEDR |= (3 << (2 * SPI_1_SCK_GPIO));
@@ -190,8 +198,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             port->PUPDR |= (0 << (2 * SPI_1_MISO_GPIO));
             port->PUPDR &= ~(3 << (2 * SPI_1_MOSI_GPIO));
             port->PUPDR |= (0 << (2 * SPI_1_MOSI_GPIO));
+#endif
 
-            /* Configure GPIOs to SPI1 (static) */
 #if (SPI_1_SCK_GPIO < 8)
             port->AFR[0] &= ~(5 << (4 * SPI_1_SCK_GPIO));
             port->AFR[0] |= (5 << (4 * SPI_1_SCK_GPIO));
@@ -260,6 +268,9 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
 
             NVIC_SetPriority(EXTI4_IRQn, SPI_0_IRQ_PRIO);
             NVIC_EnableIRQ(EXTI4_IRQn);
+
+            /* enable the SYSCFG clock */
+            RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
             /* connect PA4 to interrupt. EXTICR[1] (so the second) for pins 4..7, ~0xf = 0000 for PA pin */
             SYSCFG->EXTICR[1] &= ~(0xf);
             EXTI->IMR |= (1 << SPI_0_NSS_GPIO);/* 1: interrupt request from line 4 not masked */
@@ -278,6 +289,8 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             port->MODER |= (2 << (2 * SPI_0_MISO_GPIO));
             port->MODER &= ~(2 << (2 * SPI_0_MOSI_GPIO));
             port->MODER |= (2 << (2 * SPI_0_MOSI_GPIO));
+
+#if with_gpio_stuff
 
             /* Set speed */
             port->OSPEEDR &= ~(3 << (2 * SPI_0_NSS_GPIO));
@@ -302,18 +315,14 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             /* Configure push-pull resistors */
             port->PUPDR &= ~(3 << (2 * SPI_0_NSS_GPIO));
             port->PUPDR |= (0 << (2 * SPI_0_NSS_GPIO));
-
             port->PUPDR &= ~(3 << (2 * SPI_0_SCK_GPIO));
             port->PUPDR |= (0 << (2 * SPI_0_SCK_GPIO));
-
             port->PUPDR &= ~(3 << (2 * SPI_0_MISO_GPIO));
             port->PUPDR |= (0 << (2 * SPI_0_MISO_GPIO));
-
             port->PUPDR &= ~(3 << (2 * SPI_0_MOSI_GPIO));
             port->PUPDR |= (0 << (2 * SPI_0_MOSI_GPIO));
+#endif
 
-
-            /* Configure GPIOs to SPI0 (static) */
 #if (SPI_0_NSS_GPIO < 8)
             port->AFR[0] &= ~(5 << (4 * SPI_0_NSS_GPIO));
             port->AFR[0] |= (5 << (4 * SPI_0_NSS_GPIO));
@@ -360,12 +369,12 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
 
             NVIC_SetPriority(EXTI15_10_IRQn, SPI_1_IRQ_PRIO);
             NVIC_EnableIRQ(EXTI15_10_IRQn);
-            SYSCFG->EXTICR[3] &= ~(0xf);
-            SYSCFG->EXTICR[3] |= 1;
-            EXTI->IMR |= (1 << SPI_1_NSS_GPIO);/* 1: interrupt request from line 4 not masked */
-            /* configure the active edges */
-            EXTI->RTSR &= ~(1 << SPI_1_NSS_GPIO); /* 1: rising trigger disabled */
-            EXTI->FTSR |= (1 << SPI_1_NSS_GPIO);  /* 1: falling trigger enabled */
+
+            RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+            SYSCFG->EXTICR[3] = (1);
+            EXTI->IMR |= (1 << SPI_1_NSS_GPIO);
+            EXTI->RTSR &= ~(1 << SPI_1_NSS_GPIO);
+            EXTI->FTSR |= (1 << SPI_1_NSS_GPIO);
 
 
             /***************** GPIO-Init *****************/
@@ -378,6 +387,8 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             port->MODER |= (2 << (2 * SPI_1_MISO_GPIO));
             port->MODER &= ~(2 << (2 * SPI_1_MOSI_GPIO));
             port->MODER |= (2 << (2 * SPI_1_MOSI_GPIO));
+
+#if with_gpio_stuff
 
             /* Set speed */
             port->OSPEEDR &= ~(3 << (2 * SPI_1_NSS_GPIO));
@@ -402,17 +413,14 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             /* Configure push-pull resistors */
             port->PUPDR &= ~(3 << (2 * SPI_1_NSS_GPIO));
             port->PUPDR |= (0 << (2 * SPI_1_NSS_GPIO));
-
             port->PUPDR &= ~(3 << (2 * SPI_1_SCK_GPIO));
             port->PUPDR |= (0 << (2 * SPI_1_SCK_GPIO));
-
             port->PUPDR &= ~(3 << (2 * SPI_1_MISO_GPIO));
             port->PUPDR |= (0 << (2 * SPI_1_MISO_GPIO));
-
             port->PUPDR &= ~(3 << (2 * SPI_1_MOSI_GPIO));
             port->PUPDR |= (0 << (2 * SPI_1_MOSI_GPIO));
+#endif
 
-            /* Configure GPIOs to SPI1 (static) */
 #if (SPI_1_NSS_GPIO < 8)
             port->AFR[0] &= ~(5 << (4 * SPI_1_NSS_GPIO));
             port->AFR[0] |= (5 << (4 * SPI_1_NSS_GPIO));
@@ -447,7 +455,6 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
 #endif
             break;
 #endif
-
             return -1;
     }
 
@@ -591,8 +598,14 @@ void spi_transmission_begin(spi_t dev, char reset_val)
             break;
 #endif
 
-    }
+#if SPI_2_EN
 
+        case SPI_2:
+            spi_port = SPI_2_DEV;
+            break;
+#endif
+
+    }
     spi_port->DR = reset_val;
 }
 
@@ -605,7 +618,7 @@ void spi_poweron(spi_t dev)
 
         case SPI_0:
             SPI_0_PORT_CLKEN(); /* Enable peripheral clock for GPIO port A */
-            SPI_0_CLKEN(); /* Enable peripheral clock for SPI1 */
+            SPI_0_CLKEN();      /* Enable peripheral clock for SPI1 */
             break;
 #endif
 
@@ -627,8 +640,7 @@ void spi_poweroff(spi_t dev)
 #if SPI_0_EN
 
         case SPI_0:
-            while (SPI_0_DEV->SR & SPI_SR_BSY); /* wait until no more busy */
-
+            while (SPI_0_DEV->SR & SPI_SR_BSY);
             SPI_0_CLKDIS();
             SPI_0_PORT_CLKDIS();
             break;
@@ -637,8 +649,7 @@ void spi_poweroff(spi_t dev)
 #if SPI_1_EN
 
         case SPI_1:
-            while (SPI_1_DEV->SR & SPI_SR_BSY); /* wait until no more busy */
-
+            while (SPI_1_DEV->SR & SPI_SR_BSY);
             SPI_1_CLKDIS();
             SPI_1_PORT_CLKDIS();
             break;
@@ -650,7 +661,6 @@ void spi_poweroff(spi_t dev)
 
 static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev)
 {
-    printf("irq_handler_transfer");
     char data = 0;
 
     if (spi->SR & SPI_SR_RXNE) {
@@ -676,7 +686,6 @@ static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev)
 
 static inline void irq_handler_begin(spi_t dev)
 {
-    printf("irq_handler_begin");
     spi_transmission_begin(dev, byte_begin);
 }
 
@@ -684,9 +693,8 @@ __attribute__((naked))
 void isr_spi1(void)
 {
     ISR_ENTER();
-    /* Interrupt is cleared by reading operation in irq_handler */
     irq_handler_transfer(SPI_0_DEV, SPI_0);
-
+    ISR_EXIT();
 }
 __attribute__((naked))
 void isr_spi2(void)
@@ -702,7 +710,7 @@ void isr_exti4(void)
 {
     ISR_ENTER();
 
-    if (EXTI->PR & EXTI_PR_PR4) {/* for interrupt by gpio flanks */
+    if (EXTI->PR & EXTI_PR_PR4) {
         EXTI->PR |= EXTI_PR_PR4;
         irq_handler_begin(SPI_0);
     }
@@ -716,12 +724,10 @@ __attribute__((naked))
 void isr_exti15_10(void)
 {
     ISR_ENTER();
-
-    if (EXTI->PR & EXTI_PR_PR12) {/* for interrupt by gpio flanks */
+    if (EXTI->PR & EXTI_PR_PR12) {
         EXTI->PR |= EXTI_PR_PR12;
         irq_handler_begin(SPI_1);
     }
-
     ISR_EXIT();
 }
 #endif
