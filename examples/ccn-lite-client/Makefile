@@ -19,10 +19,10 @@ RIOTBASE ?= $(CURDIR)/../..
 # with the target all-valgrind instead of all:
 # make -B clean all-valgrind
 
-# Uncomment this to enable code in RIOT that does safety checking
+# Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
-#CFLAGS += -DDEVELHELP
+CFLAGS += -DDEVELHELP
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
