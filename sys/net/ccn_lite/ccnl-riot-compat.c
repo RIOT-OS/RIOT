@@ -24,6 +24,8 @@
 #include "msg.h"
 #include "thread.h"
 
+#include "ieee802154_frame.h"
+
 #include "ccnl.h"
 #include "ccnl-core.h"
 #include "ccnl-pdu.h"

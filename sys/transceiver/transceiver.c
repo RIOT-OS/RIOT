@@ -121,6 +121,9 @@ static void receive_cc2420_packet(ieee802154_packet_t *trans_p);
 #ifdef MODULE_NATIVENET
 static void receive_nativenet_packet(radio_packet_t *trans_p);
 #endif
+#ifdef MODULE_MC1322X
+void receive_mc1322x_packet(ieee802154_packet_t *trans_p);
+#endif
 #ifdef MODULE_AT86RF231
 void receive_at86rf231_packet(ieee802154_packet_t *trans_p);
 #endif
@@ -610,7 +613,7 @@ void receive_cc2420_packet(ieee802154_packet_t *trans_p)
 #endif
 
 #ifdef MODULE_MC1322X
-void receive_mc1322x_packet(radio_packet_t *trans_p)
+void receive_mc1322x_packet(ieee802154_packet_t *trans_p)
 {
     maca_packet_t *maca_pkt;
     dINT();
@@ -621,7 +624,7 @@ void receive_mc1322x_packet(radio_packet_t *trans_p)
     maca_free_packet(maca_pkt);
     eINT();
 
-    trans_p->data = (uint8_t *) &(data_buffer[transceiver_buffer_pos * MACA_MAX_PAYLOAD_SIZE]);
+    trans_p->frame.payload = (uint8_t *) &(data_buffer[transceiver_buffer_pos * MACA_MAX_PAYLOAD_SIZE]);
 }
 #endif
 
