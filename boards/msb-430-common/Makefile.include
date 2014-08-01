@@ -13,7 +13,7 @@ export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export LINKFLAGS = -mmcu=$(MCU) -lgcc
-TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
+TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
 
 export FLASHER ?= mspdebug
 export PORT ?= /dev/ttyUSB0
@@ -22,6 +22,7 @@ export FFLAGS += -j $(PROGRAMMER)
 ifeq ($(strip $(PROGRAMMER)),uif)
 	export FFLAGS += -d $(PORT)
 endif
+export TERMFLAGS += -p
 
 export FFLAGS += "prog $(HEXFILE)"
 

@@ -14,12 +14,13 @@ export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export LINKFLAGS = -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
-export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm.py
+export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
 export FLASHER = goodfet.bsl
 ifeq ($(strip $(PORT)),)
     export PORT = /dev/ttyUSB0
 endif
 export FFLAGS = --telosb -c $(PORT) -r -e -I -p $(HEXFILE)
+export TERMFLAGS += -p
 
 export INCLUDES += -I$(RIOTCPU)/msp430-common/include -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/drivers/cc2420/include -I$(RIOTBASE)/sys/net/include
 export OFLAGS = -O ihex

@@ -12,4 +12,4 @@ setup(name="pyterm",
       author_email="ohahm@fu-berlin.de",
       url="http://riot-os.org/",
       install_requires=["pyserial"],
-      scripts=["pyterm.py"])
+      scripts=["pyterm"])
