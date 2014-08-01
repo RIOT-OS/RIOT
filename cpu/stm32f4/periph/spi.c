@@ -606,6 +606,7 @@ void spi_transmission_begin(spi_t dev, char reset_val)
 #endif
 
     }
+
     spi_port->DR = reset_val;
 }
 
@@ -641,6 +642,7 @@ void spi_poweroff(spi_t dev)
 
         case SPI_0:
             while (SPI_0_DEV->SR & SPI_SR_BSY);
+
             SPI_0_CLKDIS();
             SPI_0_PORT_CLKDIS();
             break;
@@ -650,6 +652,7 @@ void spi_poweroff(spi_t dev)
 
         case SPI_1:
             while (SPI_1_DEV->SR & SPI_SR_BSY);
+
             SPI_1_CLKDIS();
             SPI_1_PORT_CLKDIS();
             break;
@@ -724,10 +727,12 @@ __attribute__((naked))
 void isr_exti15_10(void)
 {
     ISR_ENTER();
+
     if (EXTI->PR & EXTI_PR_PR12) {
         EXTI->PR |= EXTI_PR_PR12;
         irq_handler_begin(SPI_1);
     }
+
     ISR_EXIT();
 }
 #endif

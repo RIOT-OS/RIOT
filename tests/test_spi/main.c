@@ -33,20 +33,20 @@
 
 #define USE_SPI_MASTER              0
 #if USE_SPI_MASTER == 0
-    #define TESTPORT_MASTER  SPI_0
-    #define TESTDEV_MASTER   SPI_0_DEV
+#define TESTPORT_MASTER  SPI_0
+#define TESTDEV_MASTER   SPI_0_DEV
 #elif USE_SPI_MASTER == 1
-    #define TESTPORT_MASTER  SPI_1
-    #define TESTDEV_MASTER   SPI_1_DEV
+#define TESTPORT_MASTER  SPI_1
+#define TESTDEV_MASTER   SPI_1_DEV
 #endif
 
 #define USE_SPI_SLAVE              0
 #if USE_SPI_SLAVE == 0
-    #define TESTPORT_SLAVE  SPI_0
-    #define TESTDEV_SLAVE   SPI_0_DEV
+#define TESTPORT_SLAVE  SPI_0
+#define TESTDEV_SLAVE   SPI_0_DEV
 #elif USE_SPI_SLAVE == 1
-    #define TESTPORT_SLAVE  SPI_1
-    #define TESTDEV_SLAVE   SPI_1_DEV
+#define TESTPORT_SLAVE  SPI_1
+#define TESTDEV_SLAVE   SPI_1_DEV
 #endif
 
 
@@ -72,9 +72,11 @@ char test_irq(char data)
 {
     test_buf[buf_count] = data;
     buf_count++;
+
     if (buf_count == 9) {
         buf_count = 0;
     }
+
     return data;
 }
 
@@ -205,10 +207,10 @@ void cmd_send_master_8x1_byte(int argc, char **argv)
 
         gpio_set(GPIO_7);
         printf("One Byte transferred: %x, received: %x\n", data_send, data_return);
-/*
-        timex_t sleep = timex_set(1, 0);
-        vtimer_sleep(sleep);
-*/
+        /*
+                timex_t sleep = timex_set(1, 0);
+                vtimer_sleep(sleep);
+        */
         data_send++;
     }
 }
