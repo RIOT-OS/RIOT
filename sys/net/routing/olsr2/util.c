@@ -21,6 +21,7 @@
 #include <unistd.h>
 #endif
 
+#include "constants.h"
 #include "util.h"
 #include "node.h"
 #include "olsr_debug.h"
@@ -92,7 +93,7 @@ time_t time_now(void)
 void sleep_s(int secs)
 {
 #ifdef RIOT
-    vtimer_usleep(secs * 1000000);
+    vtimer_usleep(secs * SECOND);
 #else
     // process wakes up when a package arrives
     // go back to sleep to prevent flooding
