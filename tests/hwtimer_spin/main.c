@@ -19,20 +19,16 @@
  */
 
 #include <stdio.h>
-#include <limits.h>
-#include <stdlib.h>
 
-#include "board_uart0.h"
-#include "posix_io.h"
 #include "hwtimer.h"
-#include "thread.h"
+#include "board.h"
 
 int main(void)
 {
     puts("This is just a functionality test for hwtimer_spin.");
 
     for (unsigned long r = 10000; r > 0; r--) {
-        for (unsigned long i = 6; i > 0; i--) {
+        for (unsigned long i = HWTIMER_SPIN_BARRIER; i > 0; i--) {
             hwtimer_wait(i);
         }
     }
