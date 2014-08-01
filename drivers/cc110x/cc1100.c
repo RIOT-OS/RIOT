@@ -165,7 +165,7 @@ void cc110x_gdo2_irq(void)
 //      of RX FIFO (don't call when in WOR mode)
 /*---------------------------------------------------------------------------*/
 
-static bool spi_receive_packet_variable(uint8_t *rxBuffer, uint8_t length)
+static bool spi_receive_packet_variable(uint8_t *rxBuffer, radio_packet_length_t length)
 {
     /* Needed here for statistics */
     extern cc1100_statistic_t cc1100_statistic;
@@ -215,7 +215,7 @@ static bool spi_receive_packet_variable(uint8_t *rxBuffer, uint8_t length)
     }
 }
 
-bool cc1100_spi_receive_packet(uint8_t *rxBuffer, uint8_t length)
+bool cc1100_spi_receive_packet(uint8_t *rxBuffer, radio_packet_length_t length)
 {
     uint8_t pkt_len_cfg = cc1100_spi_read_reg(CC1100_PKTCTRL0) & PKT_LENGTH_CONFIG;
 

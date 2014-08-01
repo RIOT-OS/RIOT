@@ -63,6 +63,7 @@ Notes:
     for each new packet and kept for packet retransmissions.
  */
 typedef struct __attribute__((packed)) cc1100_packet_layer0_t {
+    radio_packet_length_t length;   ///< Length of the packet (without length byte)
     uint8_t length;                 ///< Length of the packet (without length byte)
     uint8_t address;                ///< Destination address
     uint8_t phy_src;                ///< Source address (physical source)

@@ -176,7 +176,7 @@ int cc1100_set_packet_handler(protocol_t protocol, packet_handler_t handler);
  *
  * @return  A negative value if operation failed; if operation succeeded (ACK received) the number of transmitted bytes.
  */
-int cc1100_send(radio_address_t addr, protocol_t protocol, int priority, char *payload, int payload_len);
+int cc1100_send(radio_address_t addr, protocol_t protocol, int priority, char *payload, radio_packet_length_t payload_len);
 
 /**
  * @brief   Send data to given destination address with acknowledgment and CSMA/CA.
@@ -191,7 +191,7 @@ int cc1100_send(radio_address_t addr, protocol_t protocol, int priority, char *p
  *
  * @return  A negative value if operation failed; if operation succeeded (ACK received) else the number of transmitted bytes.
  */
-int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priority, char *payload, int payload_len);
+int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priority, char *payload, radio_packet_length_t payload_len);
 
 /**
  * @brief   Print current radio configuration.

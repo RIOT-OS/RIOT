@@ -89,10 +89,10 @@ Notes:
  */
 typedef struct __attribute__((packed))
 {
-    uint8_t length;                 ///< Length of the packet (without length byte)
-    uint8_t address;                ///< Destination address
-    uint8_t phy_src;                ///< Source address (physical source)
-    uint8_t flags;                  ///< Flags
+    uint8_t length;                         ///< Length of the packet (without length byte)
+    uint8_t address;                        ///< Destination address
+    uint8_t phy_src;                        ///< Source address (physical source)
+    uint8_t flags;                          ///< Flags
     uint8_t data[CC1100_MAX_DATA_LENGTH];   ///< Data (high layer protocol)
 }
 cc110x_packet_t;

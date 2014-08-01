@@ -19,6 +19,7 @@
 #define CC2420_SPI_H
 
 #include <stdio.h>
+#include "board.h"
 
 /**
  * @brief Writes a byte to the cc2420 register.
@@ -56,7 +57,7 @@ uint8_t cc2420_strobe(uint8_t c);
  *
  * @return The number of bytes read.
  */
-uint16_t cc2420_read_ram(uint16_t addr, uint8_t* buffer, uint16_t len);
+radio_packet_length_t cc2420_read_ram(uint16_t addr, uint8_t* buffer, radio_packet_length_t len);
 
 /**
  * @brief Writes multiple bytes to the cc2420 ram.
@@ -67,7 +68,7 @@ uint16_t cc2420_read_ram(uint16_t addr, uint8_t* buffer, uint16_t len);
  *
  * @return The number of bytes written.
  */
-uint16_t cc2420_write_ram(uint16_t addr, uint8_t* buffer, uint16_t len);
+radio_packet_length_t cc2420_write_ram(uint16_t addr, uint8_t* buffer, radio_packet_length_t len);
 
 /**
  * @brief Writes multiple bytes to the cc2420 fifo.
@@ -77,7 +78,7 @@ uint16_t cc2420_write_ram(uint16_t addr, uint8_t* buffer, uint16_t len);
  *
  * @return The number of bytes written.
  */
-uint16_t cc2420_write_fifo(uint8_t* data, uint16_t data_length);
+radio_packet_length_t cc2420_write_fifo(uint8_t* data, radio_packet_length_t data_length);
 
 /**
  * @brief Reads multiple bytes from the cc2420 fifo.
@@ -87,6 +88,6 @@ uint16_t cc2420_write_fifo(uint8_t* data, uint16_t data_length);
  *
  * @return The number of bytes read.
  */
-uint16_t cc2420_read_fifo(uint8_t* data, uint16_t data_length);
+radio_packet_length_t cc2420_read_fifo(uint8_t* data, radio_packet_length_t data_length);
 
 #endif

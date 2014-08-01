@@ -60,7 +60,7 @@ static void cs_timeout_cb(void *ptr)
 }
 
 /*---------------------------------------------------------------------------*/
-int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priority, char *payload, int payload_len)
+int cc1100_send_csmaca(radio_address_t address, protocol_t protocol, int priority, char *payload, radio_packet_length_t payload_len)
 {
     uint16_t min_window_size;
     uint16_t max_window_size;
