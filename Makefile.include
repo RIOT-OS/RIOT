@@ -11,10 +11,6 @@ RIOTCPU := $(abspath $(RIOTCPU))
 RIOTBOARD ?= $(RIOTBASE)/boards
 RIOTBOARD := $(abspath $(RIOTBOARD))
 
-ifeq ($(strip $(MCU)),)
-	MCU = $(CPU)
-endif
-
 ifeq (,$(filter buildtest,$(MAKECMDGOALS)))
 	ifneq (,$(BOARD_WHITELIST))
 		ifeq (,$(filter $(BOARD),$(BOARD_WHITELIST)))
@@ -26,11 +22,6 @@ $(error This application only runs on following boards: $(BOARD_WHITELIST))
 $(error This application does not run on following boards: $(BOARD_BLACKLIST))
 	endif
 endif
-
-# if you want to publish the board into the sources as an uppercase #define
-BB = $(shell echo $(BOARD)|tr 'a-z' 'A-Z'|tr '-' '_')
-CPUDEF = $(shell echo $(CPU)|tr 'a-z' 'A-Z'|tr '-' '_')
-CFLAGS += -DBOARD_$(BB) -DCPU_$(CPUDEF)
 
 BINDIRBASE ?= $(CURDIR)/bin
 BINDIR ?= $(abspath $(BINDIRBASE)/$(BOARD))/
@@ -49,6 +40,18 @@ include $(RIOTBASE)/Makefile.modules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 include $(RIOTBASE)/Makefile.dep
+
+ifeq ($(strip $(MCU)),)
+	MCU = $(CPU)
+endif
+
+# if you want to publish the board into the sources as an uppercase #define
+BOARDDEF := $(shell echo $(BOARD) | tr 'a-z' 'A-Z' | tr '-' '_')
+CPUDEF := $(shell echo $(CPU) | tr 'a-z' 'A-Z' | tr '-' '_')
+MCUDEF := $(shell echo $(MCU) | tr 'a-z' 'A-Z' | tr '-' '_')
+CFLAGS += -DBOARD_$(BOARDDEF)='"$(BOARD)"' -DRIOT_BOARD=BOARD_$(BOARDDEF)
+CFLAGS += -DCPU_$(CPUDEF)='"$(CPU)"' -DRIOT_CPU=CPU_$(CPUDEF)
+CFLAGS += -DMCU_$(MCUDEF)='"$(MCU)"' -DRIOT_MCU=MCU_$(MCUDEF)
 
 # OSX fails to create empty archives. Provide a wrapper to catch that error.
 ifneq (0, $(shell mkdir -p $(BINDIR); $(AR) -rc $(BINDIR)empty-archive.a 2> /dev/null; echo $$?))
