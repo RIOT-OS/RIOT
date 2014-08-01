@@ -32,6 +32,8 @@ static inline void busy_wait(void);
  */
 uint8_t flashrom_erase(uint8_t *addr)
 {
+    (void) addr;
+
     return 0;
 }
 
@@ -40,6 +42,10 @@ uint8_t flashrom_erase(uint8_t *addr)
  */
 uint8_t flashrom_write(uint8_t *dst, const uint8_t *src, size_t size)
 {
+    (void) dst;
+    (void) src;
+    (void) size;
+
     return 0;
 }
 
@@ -56,6 +62,7 @@ static uint8_t prepare(void)
  */
 void finish(uint8_t istate)
 {
+    (void) istate;
 }
 
 static inline void busy_wait(void)

@@ -14,12 +14,11 @@
 
 void uart2_isr(void)
 {
-    uint32_t i = 0;
-
     if (UART2->USTATbits.RXRDY == 1) {
 #ifdef MODULE_UART0
 
         if (uart0_handler_pid) {
+            uint32_t i = 0;
             while (UART2->RXCON != 0) {
                 uart0_handle_incoming(UART2->DATA);
 
