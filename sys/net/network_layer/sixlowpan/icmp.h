@@ -44,7 +44,7 @@ enum option_types_t {
     OPT_DAC,
 };
 
-extern int nd_nbr_cache_rem_pid;
+extern kernel_pid_t nd_nbr_cache_rem_pid;
 
 
 void recv_echo_req(void);

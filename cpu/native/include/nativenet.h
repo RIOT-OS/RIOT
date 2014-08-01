@@ -27,6 +27,8 @@
 
 #include <net/ethernet.h>
 
+#include "kernel_types.h"
+
 #define RX_BUF_SIZE (10)
 #define TRANSCEIVER_BUFFER_SIZE (3)
 
@@ -46,7 +48,7 @@
  *
  * @param transceiver_pid the pid of the transceiver thread
  */
-void nativenet_init(int transceiver_pid);
+void nativenet_init(kernel_pid_t transceiver_pid);
 
 /**
  * Shutdown transceiver

@@ -28,10 +28,10 @@
 #define NUM_ITERATIONS (10)
 
 static char stacks[NUM_CHILDREN][STACK_SIZE];
-static int pids[NUM_CHILDREN];
+static kernel_pid_t pids[NUM_CHILDREN];
 static char names[NUM_CHILDREN][8];
 
-static int parent_pid;
+static kernel_pid_t parent_pid;
 
 static void *child_fun(void *arg)
 {

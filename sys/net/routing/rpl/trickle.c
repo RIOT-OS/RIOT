@@ -33,10 +33,10 @@ static char interval_over_buf[TRICKLE_INTERVAL_STACKSIZE];
 static char dao_delay_over_buf[DAO_DELAY_STACKSIZE];
 static char routing_table_buf[RT_STACKSIZE];
 
-int timer_over_pid;
-int interval_over_pid;
-int dao_delay_over_pid;
-int rt_timer_over_pid;
+kernel_pid_t timer_over_pid;
+kernel_pid_t interval_over_pid;
+kernel_pid_t dao_delay_over_pid;
+kernel_pid_t rt_timer_over_pid;
 
 bool ack_received;
 uint8_t dao_counter;

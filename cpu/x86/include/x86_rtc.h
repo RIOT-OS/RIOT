@@ -136,7 +136,7 @@ typedef void (*x86_rtc_callback_t)(uint8_t reg_c);
  * @brief       Set an RTC alarm.
  * @param[in]   when            Time when the RTC you raise an interrupt. The date part is ignored.
  * @param       msg_content     The value for msg_t::content.value.
- * @param       target_pid      The process which shall receive the message, `-1u` to disable.
+ * @param       target_pid      The process which shall receive the message, `KERNEL_PID_NULL` to disable.
  * @param       allow_replace   Whether it is allowed to overwrite an existing alarm.
  *
  * The value of msg_t::type will be `reg_c | (RTC_REG_B_INT_UPDATE << 8)`,
@@ -145,13 +145,13 @@ typedef void (*x86_rtc_callback_t)(uint8_t reg_c);
  * You should not call this function directly.
  * You should use hwtimer -- or better yet -- vtimer instead.
  */
-bool x86_rtc_set_alarm(const x86_rtc_data_t *when, uint32_t msg_content, unsigned int target_pid, bool allow_replace);
+bool x86_rtc_set_alarm(const x86_rtc_data_t *when, uint32_t msg_content, kernel_pid_t target_pid, bool allow_replace);
 
 /**
  * @brief   Set up periodic interrupts
  * @param   hz              How often a second the interrupt should fire, e.g. RTC_REG_A_HZ_8192.
  * @param   msg_content     The value for msg_t::content.value.
- * @param   target_pid      The process which shall receive the message, `-1u` to disable.
+ * @param   target_pid      The process which shall receive the message, `KERNEL_PID_NULL` to disable.
  * @param   allow_replace   Whether it is allowed to overwrite an existing alarm.
  *
  * The value of msg_t::type will be `reg_c | (RTC_REG_B_INT_PERIODIC << 8)`,
@@ -160,12 +160,12 @@ bool x86_rtc_set_alarm(const x86_rtc_data_t *when, uint32_t msg_content, unsigne
  * You should not call this function directly.
  * You should use hwtimer -- or better yet -- vtimer instead.
  */
-bool x86_rtc_set_periodic(uint8_t hz, uint32_t msg_content, unsigned int target_pid, bool allow_replace);
+bool x86_rtc_set_periodic(uint8_t hz, uint32_t msg_content, kernel_pid_t target_pid, bool allow_replace);
 
 /**
  * @brief   Set up secondly interrupts.
  * @param   msg_content     The value for msg_t::content.value.
- * @param   target_pid      The process which shall receive the message, `-1u` to disable.
+ * @param   target_pid      The process which shall receive the message, `KERNEL_PID_NULL` to disable.
  * @param   allow_replace   Whether it is allowed to overwrite an existing alarm.
  *
  * The value of msg_t::type will be `reg_c | (RTC_REG_B_INT_UPDATE << 8)`,
@@ -174,7 +174,7 @@ bool x86_rtc_set_periodic(uint8_t hz, uint32_t msg_content, unsigned int target_
  * You should not call this function directly.
  * You should use hwtimer -- or better yet -- vtimer instead.
  */
-bool x86_rtc_set_update(uint32_t msg_content, unsigned int target_pid, bool allow_replace);
+bool x86_rtc_set_update(uint32_t msg_content, kernel_pid_t target_pid, bool allow_replace);
 
 /**
  * @brief   Set custom alarm interrupt handler.

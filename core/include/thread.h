@@ -72,7 +72,7 @@
  * @return              value ``<0`` on error
  * @return              pid of newly created task, otherwise
 */
-int thread_create(char *stack,
+kernel_pid_t thread_create(char *stack,
                   int stacksize,
                   char priority,
                   int flags,
@@ -87,7 +87,7 @@ int thread_create(char *stack,
  * @return          status of the thread
  * @return          `STATUS_NOT_FOUND` if pid is unknown
  */
-int thread_getstatus(int pid);
+int thread_getstatus(kernel_pid_t pid);
 
 /**
  * @brief Returns the name of a process
@@ -97,7 +97,7 @@ int thread_getstatus(int pid);
  * @return          the threads name
  * @return          `NULL` if pid is unknown
  */
-const char *thread_getname(int pid);
+const char *thread_getname(kernel_pid_t pid);
 
 /**
  * @brief Puts the current thread into sleep mode. Has to be woken up externally.
@@ -120,7 +120,7 @@ void thread_yield(void);
  * @return          `1` on success
  * @return          `STATUS_NOT_FOUND` if pid is unknown or not sleeping
  */
-int thread_wakeup(int pid);
+int thread_wakeup(kernel_pid_t pid);
 
 
 /**
@@ -128,7 +128,7 @@ int thread_wakeup(int pid);
  *
  * @return          obviously you are not a golfer.
  */
-int thread_getpid(void);
+kernel_pid_t thread_getpid(void);
 
 /**
  * @brief Measures the stack usage of a stack

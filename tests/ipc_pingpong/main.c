@@ -30,7 +30,7 @@
 #define LIMIT 1000
 
 static char stacks[3][KERNEL_CONF_STACKSIZE_MAIN];
-static int pids[3];
+static kernel_pid_t pids[3];
 
 static void *first_thread(void *arg)
 {
@@ -61,7 +61,7 @@ static void *second_thread(void *arg)
     while (1) {
         msg_t m1;
         msg_receive(&m1);
-        DEBUG("2nd: got msg from %i: %i\n", m1.sender_pid, m1.content.value);
+        DEBUG("2nd: got msg from %" PRIkernel_pid ": %i\n", m1.sender_pid, m1.content.value);
 
         msg_t m2;
         m2.content.value = m1.content.value + 1;
@@ -90,7 +90,7 @@ static void *third_thread(void *arg)
     while (1) {
         msg_t m;
         msg_receive(&m);
-        DEBUG("3rd: got msg from %i: %i\n", m.sender_pid, m.content.value);
+        DEBUG("3rd: got msg from %" PRIkernel_pid ": %i\n", m.sender_pid, m.content.value);
 
         --m.content.value;
         msg_reply(&m, &m);

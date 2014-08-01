@@ -153,7 +153,7 @@ uint8_t ipv6_get_default_hop_limit(void);
  * @return  0 on success, ENOMEN if maximum number of registrable
  *          threads is exceeded.
  */
-uint8_t ipv6_register_packet_handler(int pid);
+uint8_t ipv6_register_packet_handler(kernel_pid_t pid);
 
 /**
  * @brief   Registers a handler thread for L4 protocol.
@@ -161,14 +161,14 @@ uint8_t ipv6_register_packet_handler(int pid);
  * @param[in] next_header   Next header ID of the L4 protocol.
  * @param[in] pid           PID of the handler thread
  */
-void ipv6_register_next_header_handler(uint8_t next_header, int pid);
+void ipv6_register_next_header_handler(uint8_t next_header, kernel_pid_t pid);
 
 /**
  * @brief   Registers a handler thread for RPL options
  *
  * @param[in] pid   PID of the handler thread.
  */
-void ipv6_register_rpl_handler(int pid);
+void ipv6_register_rpl_handler(kernel_pid_t pid);
 
 /**
  * @brief   Sets the first 64 bit of *ipv6_addr* to link local prefix.

@@ -36,6 +36,7 @@
 #endif
 #endif // BSD/Linux
 
+#include "kernel_types.h"
 
 /**
  * internal functions

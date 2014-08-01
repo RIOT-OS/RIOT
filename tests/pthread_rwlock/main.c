@@ -54,7 +54,7 @@ static pthread_rwlock_t rwlock;
 static volatile unsigned counter;
 
 #define PRINTF(FMT, ...) \
-    printf("%c%u (prio=%u): " FMT "\n", sched_active_thread->name[0], sched_active_pid, sched_active_thread->priority, __VA_ARGS__)
+    printf("%c%" PRIkernel_pid " (prio=%u): " FMT "\n", sched_active_thread->name[0], sched_active_pid, sched_active_thread->priority, __VA_ARGS__)
 
 static void do_sleep(int factor)
 {

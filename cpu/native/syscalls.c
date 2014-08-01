@@ -34,6 +34,7 @@
 #include <sys/time.h>
 #endif
 
+#include "kernel.h"
 #include "cpu.h"
 #include "irq.h"
 #include "vtimer.h"

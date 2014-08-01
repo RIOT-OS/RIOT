@@ -122,7 +122,7 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                            socket_internal_t *tcp_socket)
 {
     msg_t m_recv_tcp, m_send_tcp;
-    uint8_t target_pid;
+    kernel_pid_t target_pid;
 
     if (tcp_socket->socket_values.tcp_control.state == TCP_LAST_ACK) {
         target_pid = tcp_socket->recv_pid;

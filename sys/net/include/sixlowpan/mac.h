@@ -56,7 +56,7 @@ int sixlowpan_mac_send_ieee802154_frame(int if_id, const void *dest,
  *
  * @return  PID of the MAC receiver thread.
  */
-int sixlowpan_mac_init(void);
+kernel_pid_t sixlowpan_mac_init(void);
 
 /** @} */
 #endif /* SIXLOWPAN_MAC_H */

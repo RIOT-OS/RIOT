@@ -84,7 +84,7 @@ static void mutex_wait(struct mutex_t *mutex)
 
 void mutex_unlock(struct mutex_t *mutex)
 {
-    DEBUG("%s: unlocking mutex. val: %u pid: %u\n", sched_active_thread->name, mutex->val, sched_active_pid);
+    DEBUG("%s: unlocking mutex. val: %u pid: %" PRIkernel_pid "\n", sched_active_thread->name, mutex->val, sched_active_pid);
     int irqstate = disableIRQ();
 
     if (mutex->val != 0) {
@@ -106,7 +106,7 @@ void mutex_unlock(struct mutex_t *mutex)
 
 void mutex_unlock_and_sleep(struct mutex_t *mutex)
 {
-    DEBUG("%s: unlocking mutex. val: %u pid: %u, and taking a nap\n", sched_active_thread->name, mutex->val, sched_active_pid);
+    DEBUG("%s: unlocking mutex. val: %u pid: %" PRIkernel_pid ", and taking a nap\n", sched_active_thread->name, mutex->val, sched_active_pid);
     int irqstate = disableIRQ();
 
     if (mutex->val != 0) {

@@ -27,13 +27,13 @@
 
 char t1_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
-uint16_t p1, p_main;
+kernel_pid_t p1, p_main;
 
 void *thread1(void *arg)
 {
     (void) arg;
 
-    printf("THREAD %u start\n", p1);
+    printf("THREAD %" PRIkernel_pid " start\n", p1);
 
     msg_t msg, reply;
     memset(&msg, 1, sizeof(msg_t));
@@ -43,10 +43,10 @@ void *thread1(void *arg)
 
     /* step 2: send message, turning its status into STATUS_REPLY_BLOCKED */
     msg_send_receive(&msg, &reply, p_main);
-    printf("received: %u, %u \n", reply.sender_pid, reply.type);
+    printf("received: %" PRIkernel_pid ", %u \n", reply.sender_pid, reply.type);
     printf("pointer: %s\n", reply.content.ptr);
 
-    printf("THREAD %u SHOULD BE BLOCKING :(\n", p1);
+    printf("THREAD %" PRIkernel_pid " SHOULD BE BLOCKING :(\n", p1);
 
     return NULL;
 }
@@ -66,6 +66,6 @@ int main(void)
     /* step 3: receive a msg */
     msg_receive(&msg);
 
-    printf("MAIN THREAD %u ALIVE!\n", p_main);
+    printf("MAIN THREAD %" PRIkernel_pid " ALIVE!\n", p_main);
     return 0;
 }

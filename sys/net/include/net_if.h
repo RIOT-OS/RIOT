@@ -369,7 +369,7 @@ int net_if_send_packet_broadcast(net_if_trans_addr_m_t preferred_dest_mode,
  *
  * @return              1 on success, 0 otherwise
  */
-int net_if_register(int if_id, int pid);
+int net_if_register(int if_id, kernel_pid_t pid);
 
 /**
  * Returns the EUI-64 of the transeivers attached to this interface. This can

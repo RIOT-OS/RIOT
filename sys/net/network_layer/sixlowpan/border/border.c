@@ -44,7 +44,7 @@
 #define READER_STACK_SIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
 
 char serial_reader_stack[READER_STACK_SIZE];
-uint16_t serial_reader_pid;
+kernel_pid_t serial_reader_pid;
 
 uint8_t serial_out_buf[BORDER_BUFFER_SIZE];
 uint8_t serial_in_buf[BORDER_BUFFER_SIZE];
@@ -69,14 +69,14 @@ uint8_t *get_serial_in_buffer(int offset)
     return &(serial_in_buf[offset]);
 }
 
-uint16_t border_get_serial_reader()
+kernel_pid_t border_get_serial_reader()
 {
     return serial_reader_pid;
 }
 
 void serial_reader_f(void)
 {
-    int main_pid = 0;
+    kernel_pid_t main_pid = KERNEL_PID_NULL;
     int bytes;
     msg_t m;
     border_packet_t *uart_buf;

@@ -236,7 +236,7 @@ bool is_tcp_socket(int s)
     }
 }
 
-int bind_udp_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
+int bind_udp_socket(int s, sockaddr6_t *name, int namelen, kernel_pid_t pid)
 {
     int i;
 
@@ -256,7 +256,7 @@ int bind_udp_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
     return 0;
 }
 
-int bind_tcp_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid)
+int bind_tcp_socket(int s, sockaddr6_t *name, int namelen, kernel_pid_t pid)
 {
     int i;
 
@@ -676,7 +676,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 
     current_tcp_socket->tcp_control.state = TCP_ESTABLISHED;
 
-    current_int_tcp_socket->recv_pid = 255;
+    current_int_tcp_socket->recv_pid = KERNEL_PID_NULL;
 
     destiny_socket_print_sockets();
     return 0;
@@ -1217,7 +1217,7 @@ socket_internal_t *get_waiting_connection_socket(int socket,
 }
 
 int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
-                              socket_internal_t *server_socket, uint8_t pid)
+                              socket_internal_t *server_socket, kernel_pid_t pid)
 {
     (void) pid;
 
@@ -1293,8 +1293,8 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
      * the TCP ACK packet */
     msg_reply(&msg_recv_client_ack, &msg_send_client_ack);
 
-    /* Reset PID to an unlikely value */
-    current_queued_int_socket->recv_pid = 255;
+    /* Reset PID to an invalid value */
+    current_queued_int_socket->recv_pid = KERNEL_PID_NULL;
 
     /* Waiting for Clients ACK waiting period to time out */
     vtimer_usleep(TCP_SYN_INITIAL_TIMEOUT / 2);

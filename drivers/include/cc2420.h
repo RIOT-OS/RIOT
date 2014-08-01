@@ -80,6 +80,7 @@ Frame type value:
 
 #include <stdbool.h>
 
+#include "kernel_types.h"
 #include "ieee802154_frame.h"
 #include "cc2420_settings.h"
 
@@ -106,8 +107,6 @@ typedef struct __attribute__ ((packed)) {
     /* @} */
 } cc2420_packet_t;
 
-extern int transceiver_pid;
-
 /**
  * @brief Initialize the CC2420 transceiver.
  */
@@ -119,7 +118,7 @@ void cc2420_initialize(void);
  * @param[in] tpid The PID of the transceiver thread.
  */
 
-void cc2420_init(int tpid);
+void cc2420_init(kernel_pid_t tpid);
 
 /**
  * @brief Turn CC2420 on.
@@ -362,7 +361,7 @@ int16_t cc2420_send(cc2420_packet_t *packet);
 /**
  * The PID of the transceiver thread.
  */
-extern int transceiver_pid;
+extern kernel_pid_t transceiver_pid;
 
 /*
  * RX Packet Buffer, read from the transceiver, filled by the cc2420_rx_handler.

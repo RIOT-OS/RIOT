@@ -90,7 +90,7 @@ extern volatile int sched_num_threads;
 /**
  *  Process ID of active thread
  */
-extern volatile int sched_active_pid;
+extern volatile kernel_pid_t sched_active_pid;
 
 /**
  * List of runqueues per priority level

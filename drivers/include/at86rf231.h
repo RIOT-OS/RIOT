@@ -28,9 +28,9 @@ typedef struct __attribute__((packed))
 }
 at86rf231_packet_t;
 
-extern int transceiver_pid;
+extern kernel_pid_t transceiver_pid;
 
-void at86rf231_init(int tpid);
+void at86rf231_init(kernel_pid_t tpid);
 //void at86rf231_reset(void);
 void at86rf231_rx(void);
 void at86rf231_rx_handler(void);

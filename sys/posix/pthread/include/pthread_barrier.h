@@ -32,7 +32,7 @@
 typedef struct pthread_barrier_waiting_node
 {
     struct pthread_barrier_waiting_node *next; /**< The next waiting thread. */
-    int pid; /**< The current thread to wake up. */
+    kernel_pid_t pid; /**< The current thread to wake up. */
     volatile int cont; /**< 0 = spurious wake up, 1 = wake up */
 } pthread_barrier_waiting_node_t;
 

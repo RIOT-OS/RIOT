@@ -29,15 +29,15 @@
 mutex_t mtx = MUTEX_INIT;
 
 volatile int storage = 1;
-int main_id;
-int ths[PROBLEM];
+kernel_pid_t main_id;
+kernel_pid_t ths[PROBLEM];
 char stacks[PROBLEM][KERNEL_CONF_STACKSIZE_MAIN];
 
 void *run(void *arg)
 {
     (void) arg;
 
-    int me = thread_getpid();
+    kernel_pid_t me = thread_getpid();
     printf("I am alive (%d)\n", me);
     msg_t m;
     msg_receive(&m);

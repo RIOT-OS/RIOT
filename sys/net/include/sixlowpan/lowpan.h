@@ -279,7 +279,7 @@ void sixlowpan_lowpan_bootstrapping(void);
  * @return  1 on success, ENOMEM if maximum number of registrable
  *          threads is exceeded.
  */
-uint8_t sixlowpan_lowpan_register(int pid);
+uint8_t sixlowpan_lowpan_register(kernel_pid_t pid);
 
 #if ENABLE_DEBUG
 /**

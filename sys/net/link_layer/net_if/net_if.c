@@ -394,7 +394,7 @@ int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
     return (response > payload_len) ? (int)payload_len : (int)response;
 }
 
-int net_if_register(int if_id, int pid)
+int net_if_register(int if_id, kernel_pid_t pid)
 {
     if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Register thread: No interface initialized with ID %d.\n", if_id);

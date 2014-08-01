@@ -32,12 +32,12 @@
 #include "hwtimer.h"
 #include "sched.h"
 
-inline int thread_getpid(void)
+inline kernel_pid_t thread_getpid(void)
 {
     return sched_active_thread->pid;
 }
 
-int thread_getstatus(int pid)
+int thread_getstatus(kernel_pid_t pid)
 {
     if (sched_threads[pid] == NULL) {
         return STATUS_NOT_FOUND;
@@ -46,7 +46,7 @@ int thread_getstatus(int pid)
     return sched_threads[pid]->status;
 }
 
-const char *thread_getname(int pid)
+const char *thread_getname(kernel_pid_t pid)
 {
     if (sched_threads[pid] == NULL) {
         return NULL;
@@ -67,9 +67,9 @@ void thread_sleep(void)
     thread_yield();
 }
 
-int thread_wakeup(int pid)
+int thread_wakeup(kernel_pid_t pid)
 {
-    DEBUG("thread_wakeup: Trying to wakeup PID %i...\n", pid);
+    DEBUG("thread_wakeup: Trying to wakeup PID %" PRIkernel_pid "...\n", pid);
 
     int old_state = disableIRQ();
 
@@ -106,7 +106,7 @@ int thread_measure_stack_free(char *stack)
     return space_free;
 }
 
-int thread_create(char *stack, int stacksize, char priority, int flags, void *(*function)(void *arg), void *arg, const char *name)
+kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags, void *(*function)(void *arg), void *arg, const char *name)
 {
     /* allocate our thread control block at the top of our stackspace */
     int total_stacksize = stacksize;
@@ -150,7 +150,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void *(*
         dINT();
     }
 
-    int pid = 0;
+    kernel_pid_t pid = 0;
 
     while (pid < MAXTHREADS) {
         if (sched_threads[pid] == NULL) {
@@ -194,7 +194,7 @@ int thread_create(char *stack, int stacksize, char priority, int flags, void *(*
 
     sched_num_threads++;
 
-    DEBUG("Created thread %s. PID: %u. Priority: %u.\n", name, cb->pid, priority);
+    DEBUG("Created thread %s. PID: %" PRIkernel_pid ". Priority: %u.\n", name, cb->pid, priority);
 
     if (flags & CREATE_SLEEPING) {
         sched_set_status(cb, STATUS_SLEEPING);

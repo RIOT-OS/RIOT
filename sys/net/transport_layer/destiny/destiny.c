@@ -42,7 +42,7 @@ int destiny_init_transport_layer(void)
     memset(sockets, 0, MAX_SOCKETS * sizeof(socket_internal_t));
 
     /* UDP */
-    int udp_thread_pid = thread_create(udp_stack_buffer, UDP_STACK_SIZE,
+    kernel_pid_t udp_thread_pid = thread_create(udp_stack_buffer, UDP_STACK_SIZE,
                                        PRIORITY_MAIN, CREATE_STACKTEST,
                                        udp_packet_handler, NULL, "udp_packet_handler");
 
@@ -62,7 +62,7 @@ int destiny_init_transport_layer(void)
 #endif
     global_sequence_counter = rand();
 
-    int tcp_thread_pid = thread_create(tcp_stack_buffer, TCP_STACK_SIZE,
+    kernel_pid_t tcp_thread_pid = thread_create(tcp_stack_buffer, TCP_STACK_SIZE,
                                        PRIORITY_MAIN, CREATE_STACKTEST,
                                        tcp_packet_handler, NULL, "tcp_packet_handler");
 

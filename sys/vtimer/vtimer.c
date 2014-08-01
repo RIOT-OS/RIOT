@@ -311,7 +311,7 @@ int vtimer_init(void)
     return 0;
 }
 
-int vtimer_set_wakeup(vtimer_t *t, timex_t interval, int pid)
+int vtimer_set_wakeup(vtimer_t *t, timex_t interval, kernel_pid_t pid)
 {
     t->action = vtimer_callback_wakeup;
     t->arg = NULL;
@@ -368,7 +368,7 @@ int vtimer_remove(vtimer_t *t)
     return 0;
 }
 
-int vtimer_set_msg(vtimer_t *t, timex_t interval, unsigned int pid, void *ptr)
+int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, void *ptr)
 {
     t->action = vtimer_callback_msg;
     t->arg = ptr;
@@ -411,7 +411,7 @@ void vtimer_print(vtimer_t *t)
     printf("Seconds: %" PRIu32 " - Microseconds: %" PRIu32 "\n \
             action: %p\n \
             arg: %p\n \
-            pid: %u\n",
+            pid: %" PRIkernel_pid "\n",
            t->absolute.seconds, t->absolute.microseconds,
            t->action,
            t->arg,

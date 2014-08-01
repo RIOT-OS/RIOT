@@ -97,9 +97,9 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
  *
  * @return      the process ID of the current thread
  */
-int _getpid(void)
+pid_t _getpid(void)
 {
-    return sched_active_thread->pid;
+    return (pid_t) sched_active_thread->pid;
 }
 
 /**
@@ -111,7 +111,7 @@ int _getpid(void)
  *
  * @return      TODO
  */
-int _kill_r(struct _reent *r, int pid, int sig)
+int _kill_r(struct _reent *r, pid_t pid, int sig)
 {
     r->_errno = ESRCH;                      /* not implemented yet */
     return -1;

@@ -38,7 +38,7 @@
  *
  * @return the length of the reply message stored in reply_buf
  */
-int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf);
+int ccnl_riot_client_get(kernel_pid_t relay_pid, char *name, char *reply_buf);
 
 /**
  * @brief   high level function to publish a name, e.g. "/riot/test"
@@ -62,7 +62,7 @@ int ccnl_riot_client_get(unsigned int relay_pid, char *name, char *reply_buf);
  *
  * @return the length of the reply message stored in reply_buf
  */
-int ccnl_riot_client_publish(unsigned int relay_pid, char *prefix, char *faceid,
+int ccnl_riot_client_publish(kernel_pid_t relay_pid, char *prefix, char *faceid,
         char *type, unsigned char *reply_buf);
 
 /**
@@ -81,7 +81,7 @@ int ccnl_riot_client_publish(unsigned int relay_pid, char *prefix, char *faceid,
  *
  * @return the length of the reply message stored in reply_buf
  */
-int ccnl_riot_client_new_face(unsigned int relay_pid, char *type, char *faceid,
+int ccnl_riot_client_new_face(kernel_pid_t relay_pid, char *type, char *faceid,
         unsigned char *reply_buf);
 
 /**
@@ -100,7 +100,7 @@ int ccnl_riot_client_new_face(unsigned int relay_pid, char *type, char *faceid,
  *
  * @return the length of the reply message stored in reply_buf
  */
-int ccnl_riot_client_register_prefix(unsigned int relay_pid, char *prefix,
+int ccnl_riot_client_register_prefix(kernel_pid_t relay_pid, char *prefix,
         char *faceid, unsigned char *reply_buf);
 
 /**

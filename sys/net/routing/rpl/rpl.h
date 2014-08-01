@@ -44,7 +44,7 @@
 /* global variables */
 extern rpl_of_t *rpl_objective_functions[NUMBER_IMPLEMENTED_OFS];
 extern rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
-extern unsigned int rpl_process_pid;
+extern kernel_pid_t rpl_process_pid;
 
 /* needed for receiving messages with ICMP-code 155. Received via IPC from ipv6.c */
 extern mutex_t rpl_recv_mutex;

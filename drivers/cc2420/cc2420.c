@@ -74,7 +74,7 @@ void cc2420_initialize(void)
     cc2420_switch_to_rx();
 }
 
-void cc2420_init(int tpid)
+void cc2420_init(kernel_pid_t tpid)
 {
     transceiver_pid = tpid;
     cc2420_initialize();

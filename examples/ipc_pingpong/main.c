@@ -28,12 +28,12 @@ void *second_thread(void *arg)
 {
     (void) arg;
 
-    printf("2nd thread started, pid: %i\n", thread_getpid());
+    printf("2nd thread started, pid: %" PRIkernel_pid "\n", thread_getpid());
     msg_t m;
 
     while (1) {
         msg_receive(&m);
-        printf("2nd: Got msg from %i\n", m.sender_pid);
+        printf("2nd: Got msg from %" PRIkernel_pid "\n", m.sender_pid);
         m.content.value++;
         msg_reply(&m, &m);
     }
@@ -46,11 +46,11 @@ char second_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
 int main(void)
 {
     printf("Starting IPC Ping-pong example...\n");
-    printf("1st thread started, pid: %i\n", thread_getpid());
+    printf("1st thread started, pid: %" PRIkernel_pid "\n", thread_getpid());
 
     msg_t m;
 
-    int pid = thread_create(second_thread_stack, sizeof(second_thread_stack),
+    kernel_pid_t pid = thread_create(second_thread_stack, sizeof(second_thread_stack),
                             PRIORITY_MAIN - 1, CREATE_STACKTEST,
                             second_thread, NULL, "pong");
 

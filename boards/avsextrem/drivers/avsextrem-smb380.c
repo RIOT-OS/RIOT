@@ -44,7 +44,7 @@
 #include "lpc2387.h"
 
 
-uint8_t simple_pid;
+kernel_pid_t simple_pid;
 int16_t simple_buffer[4];
 
 volatile int16_t *ringBuff_X = NULL;

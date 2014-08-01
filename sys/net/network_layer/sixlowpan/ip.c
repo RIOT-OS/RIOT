@@ -52,9 +52,9 @@ ipv6_hdr_t *ipv6_buf;
 icmpv6_hdr_t *icmp_buf;
 uint8_t *nextheader;
 
-int udp_packet_handler_pid = 0;
-int tcp_packet_handler_pid = 0;
-int rpl_process_pid = 0;
+kernel_pid_t udp_packet_handler_pid = KERNEL_PID_NULL;
+kernel_pid_t tcp_packet_handler_pid = KERNEL_PID_NULL;
+kernel_pid_t rpl_process_pid = KERNEL_PID_NULL;
 ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t *) = 0;
 
 static ipv6_net_if_ext_t ipv6_net_if_ext[NET_IF_MAX];
@@ -193,7 +193,7 @@ uint8_t ipv6_get_default_hop_limit(void)
 }
 
 /* Register an upper layer thread */
-uint8_t ipv6_register_packet_handler(int pid)
+uint8_t ipv6_register_packet_handler(kernel_pid_t pid)
 {
     uint8_t i;
 
@@ -259,7 +259,7 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
         case (ICMPV6_TYPE_RPL_CONTROL): {
             DEBUG("INFO: packet type: RPL message\n");
 
-            if (rpl_process_pid != 0) {
+            if (rpl_process_pid != KERNEL_PID_NULL) {
                 msg_t m_send;
                 m_send.content.ptr = (char *) &hdr->code;
                 msg_send(&m_send, rpl_process_pid, 1);
@@ -379,7 +379,7 @@ void *ipv6_process(void *arg)
                 }
 
                 case (IPV6_PROTO_NUM_TCP): {
-                    if (tcp_packet_handler_pid != 0) {
+                    if (tcp_packet_handler_pid != KERNEL_PID_NULL) {
                         m_send.content.ptr = (char *) ipv6_buf;
                         msg_send_receive(&m_send, &m_recv, tcp_packet_handler_pid);
                     }
@@ -391,7 +391,7 @@ void *ipv6_process(void *arg)
                 }
 
                 case (IPV6_PROTO_NUM_UDP): {
-                    if (udp_packet_handler_pid != 0) {
+                    if (udp_packet_handler_pid != KERNEL_PID_NULL) {
                         m_send.content.ptr = (char *) ipv6_buf;
                         msg_send_receive(&m_send, &m_recv, udp_packet_handler_pid);
                     }
@@ -752,17 +752,17 @@ uint8_t ipv6_is_router(void)
     return 0;
 }
 
-void set_tcp_packet_handler_pid(int pid)
+void set_tcp_packet_handler_pid(kernel_pid_t pid)
 {
     tcp_packet_handler_pid = pid;
 }
 
-void set_udp_packet_handler_pid(int pid)
+void set_udp_packet_handler_pid(kernel_pid_t pid)
 {
     udp_packet_handler_pid = pid;
 }
 
-void ipv6_register_next_header_handler(uint8_t next_header, int pid)
+void ipv6_register_next_header_handler(uint8_t next_header, kernel_pid_t pid)
 {
     switch (next_header) {
         case (IPV6_PROTO_NUM_TCP):
@@ -785,7 +785,7 @@ void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t *dest)
     ip_get_next_hop = next_hop;
 }
 
-void ipv6_register_rpl_handler(int pid)
+void ipv6_register_rpl_handler(kernel_pid_t pid)
 {
     rpl_process_pid = pid;
 }

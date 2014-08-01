@@ -47,13 +47,13 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
      * to be woken up. Once the value reaches zero, everyone gets woken up. */
 
     mutex_lock(&barrier->mutex);
-    DEBUG("%s: hit a synchronization barrier. pid=%u\n",
+    DEBUG("%s: hit a synchronization barrier. pid=%" PRIkernel_pid"\n",
           sched_active_thread->name, sched_active_thread->pid);
 
     if (--barrier->count > 0) {
         /* need to wait for further threads */
 
-        DEBUG("%s: waiting for %u threads. pid=%u\n",
+        DEBUG("%s: waiting for %u threads. pid=%" PRIkernel_pid "\n",
               sched_active_thread->name, barrier->count, sched_active_thread->pid);
 
         pthread_barrier_waiting_node_t node;
@@ -79,7 +79,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
     else {
         /* all threads have arrived, wake everybody up */
 
-        DEBUG("%s: waking every other thread up. pid=%u\n",
+        DEBUG("%s: waking every other thread up. pid=%" PRIkernel_pid "\n",
               sched_active_thread->name, sched_active_thread->pid);
 
         int count = 1; /* Count number of woken up threads.
