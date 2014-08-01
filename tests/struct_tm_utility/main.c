@@ -26,6 +26,8 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
 #include "shell.h"
 #include "posix_io.h"
@@ -44,10 +46,18 @@ static const char DAY_NAMES[7][3] = {
 };
 static const char BOOL_NAMES[2][3] = { "NO", "YES" };
 
+bool proper_atoi(const char *a, int *i)
+{
+    char *end;
+    *i = strtol(a, &end, 0);
+    return (a != end) && (*end == '\0');
+}
+
+
 static void cmd_days_in(int argc, char **argv)
 {
     int mon;
-    if ((argc != 2) || (sscanf(argv[1], "%d", &mon) != 1) || (mon < 1) || (mon > 12)) {
+    if ((argc != 2) || (proper_atoi(argv[1], &mon) != 1) || (mon < 1) || (mon > 12)) {
         printf("Usage: %s <Month[1..12]>\n", argv[0]);
     }
     else {
@@ -59,7 +69,7 @@ static void cmd_days_in(int argc, char **argv)
 static void cmd_leap_year(int argc, char **argv)
 {
     int year;
-    if ((argc != 2) || (sscanf(argv[1], "%d", &year) != 1)) {
+    if ((argc != 2) || (proper_atoi(argv[1], &year) != 1)) {
         printf("Usage: %s <Year>\n", argv[0]);
     }
     else {
@@ -71,7 +81,7 @@ static void cmd_leap_year(int argc, char **argv)
 static void cmd_doomsday(int argc, char **argv)
 {
     int year;
-    if ((argc != 2) || (sscanf(argv[1], "%d", &year) != 1)) {
+    if ((argc != 2) || (proper_atoi(argv[1], &year) != 1)) {
         printf("Usage: %s <Year>\n", argv[0]);
     }
     else {
@@ -83,9 +93,9 @@ static void cmd_doomsday(int argc, char **argv)
 static void cmd_day(int argc, char **argv)
 {
     int year, mon, day;
-    if ((argc != 4) || (sscanf(argv[1], "%d", &year) != 1)
-                    || (sscanf(argv[2], "%d", &mon) != 1)
-                    || (sscanf(argv[3], "%d", &day) != 1)) {
+    if ((argc != 4) || (proper_atoi(argv[1], &year) != 1)
+                    || (proper_atoi(argv[2], &mon) != 1)
+                    || (proper_atoi(argv[3], &day) != 1)) {
         printf("Usage: %s <Year> <Month[1..12]> <Day[1..31]>\n", argv[0]);
     }
     else {
