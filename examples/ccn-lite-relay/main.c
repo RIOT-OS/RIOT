@@ -31,7 +31,7 @@
 // ccn
 #include "ccn_lite/ccnl-riot.h"
 
-kernel_pid_t relay_pid = KERNEL_PID_UNDEF;
+static kernel_pid_t _relay_pid = KERNEL_PID_UNDEF;
 
 char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
@@ -58,7 +58,7 @@ void populate_cache(void)
     msg_t m;
     m.content.value = 0;
     m.type = CCNL_RIOT_POPULATE;
-    msg_send(&m, relay_pid, 1);
+    msg_send(&m, _relay_pid, 1);
 }
 
 void *second_thread(void *arg)
@@ -73,7 +73,7 @@ int main(void)
 {
     printf("CCN!\n");
 
-    relay_pid = thread_getpid();
+    _relay_pid = thread_getpid();
 
     thread_create(t2_stack, sizeof(t2_stack), PRIORITY_MAIN + 1,
                   CREATE_STACKTEST, second_thread, NULL, "helper thread");

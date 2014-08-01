@@ -47,7 +47,7 @@ char relay_stack[KERNEL_CONF_STACKSIZE_MAIN];
 #if RIOT_CCN_APPSERVER
 char appserver_stack[KERNEL_CONF_STACKSIZE_MAIN];
 #endif
-kernel_pid_t relay_pid = KERNEL_PID_UNDEF, appserver_pid = KERNEL_PID_UNDEF;
+static volatile kernel_pid_t _relay_pid = KERNEL_PID_UNDEF, _appserver_pid = KERNEL_PID_UNDEF;
 
 #define SHELL_MSG_BUFFER_SIZE (64)
 msg_t msg_buffer_shell[SHELL_MSG_BUFFER_SIZE];
@@ -64,16 +64,16 @@ static void riot_ccn_appserver(int argc, char **argv)
     (void) argc; /* the function takes no arguments */
     (void) argv;
 
-    if (appserver_pid != KERNEL_PID_UNDEF) {
+    if (_appserver_pid != KERNEL_PID_UNDEF) {
         /* already running */
         return;
     }
 
-    appserver_pid = thread_create(
+    _appserver_pid = thread_create(
             appserver_stack, sizeof(appserver_stack),
             PRIORITY_MAIN - 1, CREATE_STACKTEST,
-            ccnl_riot_appserver_start, (void *) relay_pid, "appserver");
-    DEBUG("ccn-lite appserver on thread_id %" PRIkernel_pid "...\n", appserver_pid);
+            ccnl_riot_appserver_start, (void *) _relay_pid, "appserver");
+    DEBUG("ccn-lite appserver on thread_id %" PRIkernel_pid "...\n", _appserver_pid);
 }
 #endif
 
@@ -90,7 +90,7 @@ static void riot_ccn_express_interest(int argc, char **argv)
 
     DEBUG("in='%s'\n", small_buf);
 
-    int content_len = ccnl_riot_client_get(relay_pid, small_buf, (char *) big_buf); // small_buf=name to request
+    int content_len = ccnl_riot_client_get(_relay_pid, small_buf, (char *) big_buf); // small_buf=name to request
 
     if (content_len == 0) {
         puts("riot_get returned 0 bytes...aborting!");
@@ -117,7 +117,7 @@ static void riot_ccn_register_prefix(int argc, char **argv)
     char *type = argv[2];
     char *faceid = argv[3]; // 0=trans;1=msg
 
-    int content_len = ccnl_riot_client_publish(relay_pid, small_buf, faceid, type, big_buf);
+    int content_len = ccnl_riot_client_publish(_relay_pid, small_buf, faceid, type, big_buf);
 
     DEBUG("shell received: '%s'\n", big_buf);
     DEBUG("received %d bytes.\n", content_len);
@@ -126,7 +126,7 @@ static void riot_ccn_register_prefix(int argc, char **argv)
 
 static void riot_ccn_relay_config(int argc, char **argv)
 {
-    if (relay_pid == KERNEL_PID_UNDEF) {
+    if (_relay_pid == KERNEL_PID_UNDEF) {
         puts("ccnl stack not running");
         return;
     }
@@ -139,17 +139,17 @@ static void riot_ccn_relay_config(int argc, char **argv)
     msg_t m;
     m.content.value = atoi(argv[1]);
     m.type = CCNL_RIOT_CONFIG_CACHE;
-    msg_send(&m, relay_pid, 1);
+    msg_send(&m, _relay_pid, 1);
 }
 
-static void riot_ccn_transceiver_start(int relay_pid)
+static void riot_ccn_transceiver_start(int _relay_pid)
 {
     transceiver_init(TRANSCEIVER);
     int transceiver_pid = transceiver_start();
     DEBUG("transceiver on thread_id %d...\n", transceiver_pid);
 
     /* register for transceiver events */
-    uint8_t reg = transceiver_register(TRANSCEIVER, relay_pid);
+    uint8_t reg = transceiver_register(TRANSCEIVER, _relay_pid);
     if (reg != 1) {
         DEBUG("transceiver register failed\n");
     }
@@ -173,19 +173,19 @@ static void riot_ccn_transceiver_start(int relay_pid)
 
 static void riot_ccn_relay_start(void)
 {
-    if (relay_pid != KERNEL_PID_UNDEF) {
-        DEBUG("ccn-lite relay on thread_id %d...please stop it first!\n", relay_pid);
+    if (_relay_pid != KERNEL_PID_UNDEF) {
+        DEBUG("ccn-lite relay on thread_id %d...please stop it first!\n", _relay_pid);
         /* already running */
         return;
     }
 
-    relay_pid = thread_create(
+    _relay_pid = thread_create(
             relay_stack, sizeof(relay_stack),
             PRIORITY_MAIN - 2, CREATE_STACKTEST,
             ccnl_riot_relay_start, NULL, "relay");
-    DEBUG("ccn-lite relay on thread_id %" PRIkernel_pid "...\n", relay_pid);
+    DEBUG("ccn-lite relay on thread_id %" PRIkernel_pid "...\n", _relay_pid);
 
-    riot_ccn_transceiver_start(relay_pid);
+    riot_ccn_transceiver_start(_relay_pid);
 }
 
 static void riot_ccn_relay_stop(int argc, char **argv)
@@ -196,10 +196,10 @@ static void riot_ccn_relay_stop(int argc, char **argv)
     msg_t m;
     m.content.value = 0;
     m.type = CCNL_RIOT_HALT;
-    msg_send(&m, relay_pid, 1);
+    msg_send(&m, _relay_pid, 1);
 
     /* mark relay as not running */
-    relay_pid = 0;
+    _relay_pid = 0;
 }
 
 #if RIOT_CCN_TESTS
@@ -241,7 +241,7 @@ static void riot_ccn_pit_test(int argc, char **argv)
         m.content.ptr = (char *) &rmsg;
         m.type = CCNL_RIOT_MSG;
 
-        msg_send(&m, relay_pid, 1);
+        msg_send(&m, _relay_pid, 1);
 
         if ((segment % 50) == 0) {
             vtimer_now(&now);
@@ -260,7 +260,7 @@ static void riot_ccn_fib_test(int argc, char **argv)
     char type[] = "newTRANSface";
     char faceid[] = "42";
 
-    riot_new_face(relay_pid, type, faceid, big_buf);
+    riot_new_face(_relay_pid, type, faceid, big_buf);
 
     timex_t now;
     int i = -1;
@@ -268,7 +268,7 @@ static void riot_ccn_fib_test(int argc, char **argv)
     do {
         i++;
         snprintf(small_buf, sizeof(small_buf), "/riot/test/fib/%d/", i);
-        riot_register_prefix(relay_pid, small_buf, faceid, big_buf);
+        riot_register_prefix(_relay_pid, small_buf, faceid, big_buf);
 
         if (i % 50 == 0) {
             vtimer_now(&now);
@@ -290,7 +290,7 @@ static void riot_ccn_populate(int argc, char **argv)
     msg_t m;
     m.content.value = 0;
     m.type = CCNL_RIOT_POPULATE;
-    msg_send(&m, relay_pid, 1);
+    msg_send(&m, _relay_pid, 1);
 }
 
 static void riot_ccn_stat(int argc, char **argv)
@@ -301,7 +301,7 @@ static void riot_ccn_stat(int argc, char **argv)
     msg_t m;
     m.content.value = 0;
     m.type = CCNL_RIOT_PRINT_STAT;
-    msg_send(&m, relay_pid, 1);
+    msg_send(&m, _relay_pid, 1);
 }
 
 static const shell_command_t sc[] = {
