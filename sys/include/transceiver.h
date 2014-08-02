@@ -200,7 +200,7 @@ typedef struct {
 } transceiver_command_t;
 
 /* The transceiver thread's pid */
-extern kernel_pid_t transceiver_pid;
+extern volatile kernel_pid_t transceiver_pid;
 
 /** An array of ignored link layer addresses */
 extern radio_address_t transceiver_ignored_addr[TRANSCEIVER_MAX_IGNORED_ADDR];
