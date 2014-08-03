@@ -6,6 +6,7 @@ ifneq (,$(filter olsr2,$(USEMODULE)))
 	USEMODULE += vtimer
 	USEMODULE += destiny
 	USEMODULE += sixlowpan
+	USEMODULE += slist
 	USEMODULE += oonf_common
 	USEMODULE += oonf_rfc5444
 endif

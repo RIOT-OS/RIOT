@@ -26,7 +26,7 @@
 #include "olsr_debug.h"
 #include "routing.h"
 #include "constants.h"
-#include "list.h"
+#include <slist.h>
 
 static struct olsr_node *_new_olsr_node(struct netaddr *addr,
                                         uint8_t distance, metric_t metric, uint8_t vtime, char *name)

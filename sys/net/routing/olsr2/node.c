@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 #include "node.h"
-#include "list.h"
+#include <slist.h>
 #include "olsr_debug.h"
 
 #include "common/netaddr.h"
