@@ -190,7 +190,7 @@ void olsr_init(void)
 
     /* enable receive */
     sock = destiny_socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-    thread_create(receive_thread_stack, sizeof receive_thread_stack, PRIORITY_MAIN - 1, CREATE_STACKTEST, olsr_receiver_thread, "olsr_rec");
+    thread_create(receive_thread_stack, sizeof receive_thread_stack, PRIORITY_MAIN - 1, CREATE_STACKTEST, olsr_receiver_thread, NULL, "olsr_rec");
 
     /* set get_local_addr() */
     get_local_addr()->_type = AF_INET6;
@@ -203,7 +203,7 @@ void olsr_init(void)
     DEBUG("This is node %s with IP %s", local_name, netaddr_to_str_s(&nbuf[0], get_local_addr()));
 
     /* enable sending */
-    int pid = thread_create(sender_thread_stack, sizeof sender_thread_stack, PRIORITY_MAIN - 1, CREATE_STACKTEST, olsr_sender_thread, "olsr_snd");
+    int pid = thread_create(sender_thread_stack, sizeof sender_thread_stack, PRIORITY_MAIN - 1, CREATE_STACKTEST, olsr_sender_thread, NULL, "olsr_snd");
 
     msg_t m;
     DEBUG("setting up HELLO timer");
