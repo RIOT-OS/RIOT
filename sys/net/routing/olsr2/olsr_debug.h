@@ -1,3 +1,16 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup olsr2
+ * @{
+ * @author  Benjamin Valentin <benpicco@zedat.fu-berlin.de>
+ * @}
+ */
+
 #ifndef OLSR2_DEBUG_H_
 #define OLSR2_DEBUG_H_
 
