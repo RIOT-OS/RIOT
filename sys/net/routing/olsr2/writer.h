@@ -1,5 +1,18 @@
-#ifndef WRITER_H_
-#define WRITER_H_
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ *
+ * @ingroup olsr2
+ * @{
+ * @author  Benjamin Valentin <benpicco@zedat.fu-berlin.de>
+ * @}
+ */
+
+#ifndef OLSR2_WRITER_H_
+#define OLSR2_WRITER_H_
 
 #include "common/common_types.h"
 #include "rfc5444/rfc5444_writer.h"
@@ -16,4 +29,4 @@ void writer_send_hello(void);
 void writer_send_tc(void);
 void writer_cleanup(void);
 
-#endif /* WRITER_H_ */
+#endif /* OLSR2_WRITER_H_ */
