@@ -94,7 +94,7 @@ _cb_add_nhdp_message_TLVs(struct rfc5444_writer *wr)
 static void
 _cb_add_nhdp_addresses(struct rfc5444_writer *wr)
 {
-    struct olsr_node* node, *safe;
+    struct olsr_node *node, *safe;
     int value;
     uint8_t mpr;
     send_tc_messages = false;
@@ -103,33 +103,41 @@ _cb_add_nhdp_addresses(struct rfc5444_writer *wr)
     avl_for_each_element_safe(get_olsr_head(), node, node, safe) {
 
         /* if the node was just removed entirely from the database, continue */
-        if (remove_expired(node))
+        if (remove_expired(node)) {
             continue;
+        }
 
-        if (node->type != NODE_TYPE_NHDP && !node->lost)
+        if (node->type != NODE_TYPE_NHDP && !node->lost) {
             continue;
+        }
 
-        if (node->pending && !node->lost)
+        if (node->pending && !node->lost) {
             continue;
+        }
 
-        if (!node->pending && h1_deriv(node)->mpr_slctr_route)
+        if (!node->pending && h1_deriv(node)->mpr_slctr_route) {
             send_tc_messages = true;
+        }
 
         struct rfc5444_writer_address *address = rfc5444_writer_add_address(wr,
                 _nhdp_message_content_provider.creator, node->addr, false);
 
         mpr = 0;
-        if (h1_deriv(node)->mpr_neigh_flood > 0)
-            mpr |= RFC5444_MPR_FLOODING;
 
-        if (h1_deriv(node)->mpr_neigh_route > 0)
+        if (h1_deriv(node)->mpr_neigh_flood > 0) {
+            mpr |= RFC5444_MPR_FLOODING;
+        }
+
+        if (h1_deriv(node)->mpr_neigh_route > 0) {
             mpr |= RFC5444_MPR_ROUTING;
+        }
 
         if (mpr > 0)
             rfc5444_writer_add_addrtlv(wr, address, &_nhdp_addrtlvs[IDX_ADDRTLV_MPR],
                                        &mpr, sizeof mpr, false);
 
         metric_t link_metric = get_link_metric(node, get_local_addr());
+
         if (link_metric > RFC5444_METRIC_MIN) {
             uint16_t mtrc = rfc5444_metric_encode(link_metric);
             rfc5444_writer_add_addrtlv(wr, address, &_nhdp_addrtlvs[IDX_ADDRTLV_METRIC],
@@ -142,13 +150,17 @@ _cb_add_nhdp_addresses(struct rfc5444_writer *wr)
             rfc5444_writer_add_addrtlv(wr, address, &_nhdp_addrtlvs[IDX_ADDRTLV_LINK_STATUS],
                                        &value, sizeof value, false);
 
-            if (!send_tc_messages)
+            if (!send_tc_messages) {
                 node->lost--;
+            }
         }
+
 #ifdef ENABLE_NAME
+
         if (node->name)
             rfc5444_writer_add_addrtlv(wr, address, &_nhdp_addrtlvs[IDX_ADDRTLV_NODE_NAME],
                                        node->name, strlen(node->name) + 1, false);
+
 #endif
     }
 }
@@ -169,25 +181,30 @@ _cb_add_olsr_message_TLVs(struct rfc5444_writer *wr)
 static void
 _cb_add_olsr_addresses(struct rfc5444_writer *wr)
 {
-    struct olsr_node* node;
+    struct olsr_node *node;
     int value;
 
     /* add all neighbors */
     avl_for_each_element(get_olsr_head(), node, node) {
-        if (h1_deriv(node) == NULL)
+        if (h1_deriv(node) == NULL) {
             continue;
+        }
 
-        if (!h1_deriv(node)->mpr_slctr_route)
+        if (!h1_deriv(node)->mpr_slctr_route) {
             continue;
+        }
 
         /* don't advertise neighbors routed over another hop */
-        if (node->distance != 1 && !node->lost)
+        if (node->distance != 1 && !node->lost) {
             continue;
+        }
 
-        if (node->pending && !node->lost)
+        if (node->pending && !node->lost) {
             continue;
+        }
 
         struct rfc5444_writer_address *address __attribute__((unused));
+
         address = rfc5444_writer_add_address(wr, _olsr_message_content_provider.creator, node->addr, false);
 
         if (node->link_metric > RFC5444_METRIC_MIN) {
@@ -206,9 +223,11 @@ _cb_add_olsr_addresses(struct rfc5444_writer *wr)
         }
 
 #ifdef ENABLE_NAME
+
         if (node->name)
             rfc5444_writer_add_addrtlv(wr, address, &_olsr_addrtlvs[IDX_ADDRTLV_NODE_NAME],
                                        node->name, strlen(node->name) + 1, false);
+
 #endif
     }
 }
@@ -289,8 +308,9 @@ void writer_send_hello(void)
 
 void writer_send_tc(void)
 {
-    if (!send_tc_messages)
+    if (!send_tc_messages) {
         return;
+    }
 
     DEBUG("[TC]");
 

@@ -47,8 +47,9 @@ static inline void print_trace(void)
 
     printf("Obtained %zd stack frames.\n", size);
 
-    for (i = 0; i < size; i++)
-        printf ("%s\n", strings[i]);
+    for (i = 0; i < size; i++) {
+        printf("%s\n", strings[i]);
+    }
 
     free(strings);
 }

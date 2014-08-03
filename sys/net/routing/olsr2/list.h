@@ -192,12 +192,12 @@ struct simple_list_elem;
 	(node) = (prev) ? (prev) : *(head);	\
 	} while (0)
 
-void* __simple_list_add_head(struct simple_list_elem** head, void* mem);
-void* __simple_list_add_tail(struct simple_list_elem** head, void* mem);
-void* __simple_list_add_before(struct simple_list_elem** head, void* mem, int needle, int offset);
-void* __simple_list_find(struct simple_list_elem* head, void* needle, int offset, size_t size);
-void* __simple_list_find_cmp(struct simple_list_elem* head, void* needle, int offset, int compare(void*, void*));
-void* __simple_list_remove(struct simple_list_elem** head, struct simple_list_elem* node, int keep);
-void  __simple_list_clear(struct simple_list_elem** head);
+void *__simple_list_add_head(struct simple_list_elem **head, void *mem);
+void *__simple_list_add_tail(struct simple_list_elem **head, void *mem);
+void *__simple_list_add_before(struct simple_list_elem **head, void *mem, int needle, int offset);
+void *__simple_list_find(struct simple_list_elem *head, void *needle, int offset, size_t size);
+void *__simple_list_find_cmp(struct simple_list_elem *head, void *needle, int offset, int compare(void *, void *));
+void *__simple_list_remove(struct simple_list_elem **head, struct simple_list_elem *node, int keep);
+void  __simple_list_clear(struct simple_list_elem **head);
 
 #endif /* SIMPLE_LIST_H_ */

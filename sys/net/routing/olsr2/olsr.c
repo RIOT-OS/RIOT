@@ -28,14 +28,15 @@
 #include "constants.h"
 #include "list.h"
 
-static struct olsr_node* _new_olsr_node(struct netaddr* addr,
-                                        uint8_t distance, metric_t metric, uint8_t vtime, char* name)
+static struct olsr_node *_new_olsr_node(struct netaddr *addr,
+                                        uint8_t distance, metric_t metric, uint8_t vtime, char *name)
 {
 
-    struct olsr_node* n = calloc(1, sizeof(struct olsr_node));
+    struct olsr_node *n = calloc(1, sizeof(struct olsr_node));
 
-    if (n == NULL)
+    if (n == NULL) {
         return NULL;
+    }
 
     n->addr = netaddr_dup(addr);
 
@@ -50,23 +51,29 @@ static struct olsr_node* _new_olsr_node(struct netaddr* addr,
     n->link_metric = metric;
     n->expires = time_now() + vtime;
 #ifdef ENABLE_NAME
-    if (name)
+
+    if (name) {
         n->name = strdup(name);
+    }
+
 #endif
 
     avl_insert(get_olsr_head(), &n->node);
     return n;
 }
 
-static void _get_new_flood_mpr(struct netaddr* old_flood_mpr)
+static void _get_new_flood_mpr(struct netaddr *old_flood_mpr)
 {
     TRACE_FUN("%s", netaddr_to_str_s(&nbuf[0], old_flood_mpr));
     struct olsr_node *node;
     avl_for_each_element(get_olsr_head(), node, node) {
-        if (node->distance != 2)
+        if (node->distance != 2) {
             continue;
-        if (node->flood_mpr != NULL && netaddr_cmp(old_flood_mpr, node->flood_mpr) != 0)
+        }
+
+        if (node->flood_mpr != NULL && netaddr_cmp(old_flood_mpr, node->flood_mpr) != 0) {
             continue;
+        }
 
         DEBUG("chosing new flood MPR for %s (%s)", netaddr_to_str_s(&nbuf[0], node->addr), node->name);
 
@@ -74,10 +81,14 @@ static void _get_new_flood_mpr(struct netaddr* old_flood_mpr)
         struct alt_route *route;
         simple_list_for_each(node->other_routes, route) {
             mpr_b = h1_deriv(get_node(route->last_addr));
-            if (mpr_b == NULL || h1_super(mpr_b)->pending)
+
+            if (mpr_b == NULL || h1_super(mpr_b)->pending) {
                 continue;
-            if (mpr_a == NULL || h1_super(mpr_a)->pending || mpr_a->flood_neighbors < mpr_b->flood_neighbors)
+            }
+
+            if (mpr_a == NULL || h1_super(mpr_a)->pending || mpr_a->flood_neighbors < mpr_b->flood_neighbors) {
                 mpr_a = mpr_b;
+            }
         }
 
         if (mpr_a != NULL) {
@@ -85,8 +96,10 @@ static void _get_new_flood_mpr(struct netaddr* old_flood_mpr)
 
             netaddr_switch(&node->flood_mpr, h1_super(mpr_a)->addr);
             DEBUG("[%s] setting flood MPR to %s", __FUNCTION__, netaddr_to_str_s(&nbuf[0], node->flood_mpr));
-        } else
+        }
+        else {
             node->flood_mpr = netaddr_free(node->flood_mpr);
+        }
 
         DEBUG("\tnew flood MPR: %s", netaddr_to_str_s(&nbuf[0], node->flood_mpr));
     }
@@ -96,7 +109,7 @@ static void _get_new_flood_mpr(struct netaddr* old_flood_mpr)
  * find a new route for nodes that use last_addr as their default route
  * if lost_node_addr is not null, all reference to it will be removed (aka lost node)
  */
-static void _update_children(struct netaddr* last_addr, struct netaddr* lost_node_addr)
+static void _update_children(struct netaddr *last_addr, struct netaddr *lost_node_addr)
 {
     TRACE_FUN("%s, %s", netaddr_to_str_s(&nbuf[0], last_addr),
               netaddr_to_str_s(&nbuf[1], lost_node_addr));
@@ -106,16 +119,20 @@ static void _update_children(struct netaddr* last_addr, struct netaddr* lost_nod
 
         if (lost_node_addr != NULL) {
             remove_other_route(node, lost_node_addr);
-            if (node->flood_mpr != NULL && netaddr_cmp(lost_node_addr, node->flood_mpr) == 0)
+
+            if (node->flood_mpr != NULL && netaddr_cmp(lost_node_addr, node->flood_mpr) == 0) {
                 node->flood_mpr = netaddr_free(node->flood_mpr);
+            }
         }
 
         if (node->last_addr != NULL && netaddr_cmp(node->last_addr, last_addr) == 0) {
 
-            if (lost_node_addr != NULL)
+            if (lost_node_addr != NULL) {
                 remove_default_node(node);
-            else
+            }
+            else {
                 push_default_route(node);
+            }
 
             add_free_node(node);
 
@@ -124,7 +141,7 @@ static void _update_children(struct netaddr* last_addr, struct netaddr* lost_nod
     }
 }
 
-static void _olsr_node_expired(struct olsr_node* node)
+static void _olsr_node_expired(struct olsr_node *node)
 {
     TRACE_FUN();
 
@@ -136,7 +153,7 @@ static void _olsr_node_expired(struct olsr_node* node)
     // 1-hop neighbors will become normal olsr_nodes here, should we care? (possible waste of memory)
 }
 
-static void _remove_olsr_node(struct olsr_node* node)
+static void _remove_olsr_node(struct olsr_node *node)
 {
     TRACE_FUN();
 
@@ -157,43 +174,53 @@ static void _remove_olsr_node(struct olsr_node* node)
     _update_children(node->addr, node->addr);
 
 #ifdef ENABLE_NAME
-    if (node->name)
+
+    if (node->name) {
         free(node->name);
+    }
+
 #endif
     netaddr_free(node->addr);
     free(node);
 }
 
-static bool _route_expired(struct olsr_node* node, struct netaddr* last_addr)
+static bool _route_expired(struct olsr_node *node, struct netaddr *last_addr)
 {
-    if (node->last_addr != NULL && netaddr_cmp(node->last_addr, last_addr) == 0)
+    if (node->last_addr != NULL && netaddr_cmp(node->last_addr, last_addr) == 0) {
         return time_now() > node->expires;
+    }
 
-    if (node->other_routes == NULL)
+    if (node->other_routes == NULL) {
         return true;
+    }
 
-    struct alt_route* route = simple_list_find_memcmp(node->other_routes, last_addr);
+    struct alt_route *route = simple_list_find_memcmp(node->other_routes, last_addr);
 
-    if (route == NULL)
+    if (route == NULL) {
         return true;
+    }
 
     return time_now() > route->expires;
 }
 
-static void _update_link_quality(struct nhdp_node* node)
+static void _update_link_quality(struct nhdp_node *node)
 {
     TRACE_FUN("%s", netaddr_to_str_s(&nbuf[0], h1_super(node)->addr));
-    if (_route_expired(h1_super(node), get_local_addr()))
+
+    if (_route_expired(h1_super(node), get_local_addr())) {
         node->link_quality = node->link_quality * (1 - OLSR2_HYST_SCALING);
-    else
+    }
+    else {
         node->link_quality = node->link_quality * (1 - OLSR2_HYST_SCALING) + OLSR2_HYST_SCALING;
+    }
 
     if (!h1_super(node)->pending && node->link_quality < OLSR2_HYST_LOW) {
         h1_super(node)->pending = 1;
         h1_super(node)->lost = LOST_ITER_MAX;
 
-        if (node->mpr_neigh_flood > 0)
+        if (node->mpr_neigh_flood > 0) {
             _get_new_flood_mpr(h1_super(node)->addr);
+        }
 
         node->mpr_neigh_flood = 0;
         node->mpr_neigh_route = 0;
@@ -213,18 +240,20 @@ static void _update_link_quality(struct nhdp_node* node)
     }
 }
 
-bool remove_expired(struct olsr_node* node)
+bool remove_expired(struct olsr_node *node)
 {
     time_t _now = time_now();
 
-    if (node->type == NODE_TYPE_NHDP)
+    if (node->type == NODE_TYPE_NHDP) {
         _update_link_quality(h1_deriv(node));
+    }
 
     char skipped;
     struct alt_route *route, *prev;
     simple_list_for_each_safe(node->other_routes, route, prev, skipped) {
-        if (_now - route->expires < OLSR2_HOLD_TIME_SECONDS)
+        if (_now - route->expires < OLSR2_HOLD_TIME_SECONDS) {
             continue;
+        }
 
         DEBUG("alternative route to %s (%s) via %s expired, removing it",
               node->name, netaddr_to_str_s(&nbuf[0], node->addr),
@@ -240,34 +269,40 @@ bool remove_expired(struct olsr_node* node)
         if (node->other_routes == NULL) {
             _remove_olsr_node(node);
             return true;
-        } else
+        }
+        else {
             _olsr_node_expired(node);
+        }
     }
 
     return false;
 }
 
-void route_expired(struct olsr_node* node, struct netaddr* last_addr)
+void route_expired(struct olsr_node *node, struct netaddr *last_addr)
 {
     DEBUG("%s (%s) over %s expired",
           node->name, netaddr_to_str_s(&nbuf[0], node->addr),
           netaddr_to_str_s(&nbuf[1], last_addr));
 
-    if (node->last_addr != NULL && netaddr_cmp(node->last_addr, last_addr) == 0)
+    if (node->last_addr != NULL && netaddr_cmp(node->last_addr, last_addr) == 0) {
         _olsr_node_expired(node);
-    else
+    }
+    else {
         remove_other_route(node, last_addr);
+    }
 
-    if (node->last_addr == NULL && node->other_routes == NULL)
+    if (node->last_addr == NULL && node->other_routes == NULL) {
         _remove_olsr_node(node);
+    }
 }
 
-void add_olsr_node(struct netaddr* addr, struct netaddr* last_addr, uint8_t vtime, uint8_t distance, metric_t metric, char* name)
+void add_olsr_node(struct netaddr *addr, struct netaddr *last_addr, uint8_t vtime, uint8_t distance, metric_t metric, char *name)
 {
-    struct olsr_node* n = get_node(addr);
+    struct olsr_node *n = get_node(addr);
 
-    if (n == NULL)
+    if (n == NULL) {
         n = _new_olsr_node(addr, distance, metric, vtime, name);
+    }
 
     if (n == NULL) {
         puts("ERROR: add_olsr_node failed - out of memory");
@@ -277,8 +312,11 @@ void add_olsr_node(struct netaddr* addr, struct netaddr* last_addr, uint8_t vtim
     /* we have added a new node */
     if (n->last_addr == NULL) {
 #ifdef ENABLE_NAME
-        if (n->name == NULL && name != NULL)
+
+        if (n->name == NULL && name != NULL) {
             n->name = strdup(name);
+        }
+
 #endif
         add_other_route(n, last_addr, distance, metric, vtime);
         add_free_node(n);
@@ -286,14 +324,14 @@ void add_olsr_node(struct netaddr* addr, struct netaddr* last_addr, uint8_t vtim
         return;
     }
 
-    struct olsr_node* new_lh = get_node(last_addr);
+    struct olsr_node *new_lh = get_node(last_addr);
 
     /* minimize MPR count */
     if (new_lh->type == NODE_TYPE_NHDP) {
 
         /* see if a better flooding MPR is availiable */
         if (n->flood_mpr != NULL && netaddr_cmp(n->flood_mpr, last_addr) != 0) {
-            struct nhdp_node* old_flood_mpr = h1_deriv(get_node(n->flood_mpr));
+            struct nhdp_node *old_flood_mpr = h1_deriv(get_node(n->flood_mpr));
 
             if (old_flood_mpr != NULL && h1_deriv(new_lh)->flood_neighbors > old_flood_mpr->flood_neighbors) {
                 DEBUG("switching flooding MPR (%s -> %s)", h1_super(old_flood_mpr)->name, new_lh->name);
@@ -305,7 +343,7 @@ void add_olsr_node(struct netaddr* addr, struct netaddr* last_addr, uint8_t vtim
 
         /* see if a better routing MPR is availiable */
         if (new_lh->path_metric + metric == n->path_metric && netaddr_cmp(last_addr, n->last_addr) != 0) {
-            struct nhdp_node* cur_mpr = h1_deriv(get_node(n->next_addr));
+            struct nhdp_node *cur_mpr = h1_deriv(get_node(n->next_addr));
 
             /* see if the new route is better, that means uses a neighbor that is alreay
                used for reaching (more) 2-hop neighbors. */
@@ -336,9 +374,10 @@ void add_olsr_node(struct netaddr* addr, struct netaddr* last_addr, uint8_t vtim
     add_free_node(n);
 }
 
-bool is_known_msg(struct netaddr* addr, uint16_t seq_no, uint8_t vtime)
+bool is_known_msg(struct netaddr *addr, uint16_t seq_no, uint8_t vtime)
 {
-    struct olsr_node* node = get_node(addr);
+    struct olsr_node *node = get_node(addr);
+
     if (!node) {
         node = _new_olsr_node(addr, 255, RFC5444_METRIC_INFINITE, vtime, NULL);
         node->seq_no = seq_no;
@@ -346,10 +385,11 @@ bool is_known_msg(struct netaddr* addr, uint16_t seq_no, uint8_t vtime)
     }
 
     uint16_t tmp = node->seq_no;
+
     /*	S1 > S2 AND S1 - S2 < MAXVALUE/2 OR
     	S2 > S1 AND S2 - S1 > MAXVALUE/2	*/
     if (((seq_no > tmp) && (seq_no - tmp < (1 << 15))) ||
-        ((seq_no < tmp) && (tmp - seq_no > (1 << 15))) ) {
+        ((seq_no < tmp) && (tmp - seq_no > (1 << 15)))) {
         node->seq_no = seq_no;
         return false;
     }
@@ -363,7 +403,7 @@ void print_routing_graph(void)
     puts("\n----BEGIN ROUTING GRAPH----\n");
     puts("subgraph routing {");
     puts("\tedge [ color = red ]");
-    struct olsr_node* node, *tmp;
+    struct olsr_node *node, *tmp;
     avl_for_each_element(get_olsr_head(), node, node) {
         if (node->addr != NULL && node->last_addr != NULL) {
             tmp = get_node(node->last_addr);
@@ -407,8 +447,8 @@ void print_topology_set(void)
     struct netaddr_str nbuf[3];
 #endif
 
-    struct alt_route* route;
-    struct olsr_node* node;
+    struct alt_route *route;
+    struct olsr_node *node;
 
     puts("");
     puts("---[ Topology Set ]--");
@@ -431,6 +471,7 @@ void print_topology_set(void)
                netaddr_to_str_s(&nbuf[2], node->next_addr),
                node->link_metric,
                node->expires - time_now());
+
         if (node->type == NODE_TYPE_NHDP) {
             printf("%s %.2f ",
                    node->pending ? "pending" : "",
@@ -443,11 +484,14 @@ void print_topology_set(void)
                    h1_deriv(node)->mpr_slctr_route ? "R" : " "
                   );
         }
-        if (node->flood_mpr != NULL)
+
+        if (node->flood_mpr != NULL) {
             printf(" flood: %s", netaddr_to_str_s(&nbuf[0], node->flood_mpr));
+        }
+
         puts("");
 
-        simple_list_for_each (node->other_routes, route) {
+        simple_list_for_each(node->other_routes, route) {
             printf("\t\t\t=> %s (%d); %ld s\n",
                    netaddr_to_str_s(&nbuf[0], route->last_addr),
                    route->link_metric,

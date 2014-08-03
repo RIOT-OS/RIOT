@@ -47,7 +47,7 @@ static char sender_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
 struct timer_msg {
     vtimer_t timer;
     timex_t interval;
-    void (*func) (void);
+    void (*func)(void);
 };
 
 static struct timer_msg msg_hello = { .timer = {0}, .interval = { .seconds = OLSR2_HELLO_REFRESH_INTERVAL_SECONDS - 1, .microseconds = 0}, .func = writer_send_hello };
@@ -59,16 +59,18 @@ static mutex_t olsr_data;
 
 #if defined(BOARD_NATIVE) && defined(ENABLE_NAME)
 static char _name[5];
-static char* gen_name(char* dest, const size_t len)
+static char *gen_name(char *dest, const size_t len)
 {
-    for (int i = 0; i < len - 1; ++i)
-        dest[i] = 'A' +  (genrand_uint32() % ('Z' - 'A'));
+    for (int i = 0; i < len - 1; ++i) {
+        dest[i] = 'A' + (genrand_uint32() % ('Z' - 'A'));
+    }
+
     dest[len - 1] = '\0';
     return dest;
 }
 #endif
 
-static void write_packet(struct rfc5444_writer *wr __attribute__ ((unused)),
+static void write_packet(struct rfc5444_writer *wr __attribute__((unused)),
                          struct rfc5444_writer_target *iface __attribute__((unused)),
                          void *buffer, size_t length)
 {
@@ -126,7 +128,7 @@ static void olsr_sender_thread(void)
     while (1) {
         msg_t m;
         msg_receive(&m);
-        struct timer_msg* tmsg = (struct timer_msg*) m.content.ptr;
+        struct timer_msg *tmsg = (struct timer_msg *) m.content.ptr;
 
         mutex_lock(&olsr_data);
         tmsg->func();
@@ -135,27 +137,31 @@ static void olsr_sender_thread(void)
         /* add jitter */
         tmsg->interval.microseconds = genrand_uint32() % OLSR2_MAX_JITTER_US;
 
-        if (vtimer_set_msg(&tmsg->timer, tmsg->interval, thread_getpid(), tmsg) != 0)
+        if (vtimer_set_msg(&tmsg->timer, tmsg->interval, thread_getpid(), tmsg) != 0) {
             DEBUG("vtimer_set_msg failed, stopped sending");
+        }
     }
 }
 
-static ipv6_addr_t* get_next_hop(ipv6_addr_t* dest)
+static ipv6_addr_t *get_next_hop(ipv6_addr_t *dest)
 {
-    struct olsr_node* node = get_node((struct netaddr*) dest); // get_node will only look at the first few bytes
-    if (node == NULL)
-        return NULL;
+    struct olsr_node *node = get_node((struct netaddr *) dest); // get_node will only look at the first few bytes
 
-    return (ipv6_addr_t*) node->next_addr;
+    if (node == NULL) {
+        return NULL;
+    }
+
+    return (ipv6_addr_t *) node->next_addr;
 }
 
 #ifdef ENABLE_NAME
-ipv6_addr_t* get_ip_by_name(char* name)
+ipv6_addr_t *get_ip_by_name(char *name)
 {
     struct olsr_node *node;
     avl_for_each_element(get_olsr_head(), node, node) {
-        if (node->name != NULL && strcmp(node->name, name) == 0)
-            return (ipv6_addr_t*) node->addr;
+        if (node->name != NULL && strcmp(node->name, name) == 0) {
+            return (ipv6_addr_t *) node->addr;
+        }
     }
 
     return NULL;
@@ -184,12 +190,12 @@ void olsr_init(void)
 
     /* enable receive */
     sock = destiny_socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-    thread_create(receive_thread_stack, sizeof receive_thread_stack, PRIORITY_MAIN-1, CREATE_STACKTEST, olsr_receiver_thread, "olsr_rec");
+    thread_create(receive_thread_stack, sizeof receive_thread_stack, PRIORITY_MAIN - 1, CREATE_STACKTEST, olsr_receiver_thread, "olsr_rec");
 
     /* set get_local_addr() */
     get_local_addr()->_type = AF_INET6;
     get_local_addr()->_prefix_len = 128;
-    ipv6_net_if_get_best_src_addr((ipv6_addr_t*) get_local_addr(), &sa_bcast.sin6_addr);
+    ipv6_net_if_get_best_src_addr((ipv6_addr_t *) get_local_addr(), &sa_bcast.sin6_addr);
 
     /* register olsr for routing */
     ipv6_iface_set_routing_provider(get_next_hop);
@@ -197,16 +203,16 @@ void olsr_init(void)
     DEBUG("This is node %s with IP %s", local_name, netaddr_to_str_s(&nbuf[0], get_local_addr()));
 
     /* enable sending */
-    int pid = thread_create(sender_thread_stack, sizeof sender_thread_stack, PRIORITY_MAIN-1, CREATE_STACKTEST, olsr_sender_thread, "olsr_snd");
+    int pid = thread_create(sender_thread_stack, sizeof sender_thread_stack, PRIORITY_MAIN - 1, CREATE_STACKTEST, olsr_sender_thread, "olsr_snd");
 
     msg_t m;
     DEBUG("setting up HELLO timer");
-    m.content.ptr = (char*) &msg_hello;
+    m.content.ptr = (char *) &msg_hello;
     msg_send(&m, pid, false);
 
     sleep_s(1);
     DEBUG("setting up TC timer");
-    m.content.ptr = (char*) &msg_tc;
+    m.content.ptr = (char *) &msg_tc;
     msg_send(&m, pid, false);
 }
 
