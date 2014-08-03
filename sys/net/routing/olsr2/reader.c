@@ -33,8 +33,8 @@
 #include "routing.h"
 
 static struct rfc5444_reader reader;
-static struct netaddr* current_src;
-static struct olsr_node* current_node; // only set by _cb_nhdp_blocktlv_packet_okay
+static struct netaddr *current_src;
+static struct olsr_node *current_node; // only set by _cb_nhdp_blocktlv_packet_okay
 
 /* ughh… these variables are needed in the addr callback, but read in the packet callback */
 static uint8_t vtime;
@@ -115,18 +115,21 @@ _cb_nhdp_blocktlv_packet_okay(struct rfc5444_reader_tlvblock_context *cont __att
 {
     DEBUG("received HELLO message:");
 
-    if (netaddr_cmp(get_local_addr(), current_src) == 0)
+    if (netaddr_cmp(get_local_addr(), current_src) == 0) {
         return RFC5444_DROP_PACKET;
+    }
 
     /* VTIME is defined as mandatory */
     vtime = rfc5444_timetlv_decode(*_nhdp_message_tlvs[IDX_TLV_VTIME].tlv->single_value);
 
-    char* name = NULL;
+    char *name = NULL;
 #ifdef ENABLE_NAME
+
     if (_nhdp_message_tlvs[IDX_TLV_NODE_NAME].tlv) {
-        name = (char*) _nhdp_message_tlvs[IDX_TLV_NODE_NAME].tlv->single_value;
+        name = (char *) _nhdp_message_tlvs[IDX_TLV_NODE_NAME].tlv->single_value;
         DEBUG("\tfrom: %s (%s)", name, netaddr_to_str_s(&nbuf[0], current_src));
     }
+
 #endif
 
     DEBUG("\tmetric: %d", metric);
@@ -142,8 +145,9 @@ _cb_nhdp_blocktlv_packet_okay(struct rfc5444_reader_tlvblock_context *cont __att
     h1_deriv(current_node)->mpr_slctr_route = 0;
     h1_deriv(current_node)->mpr_slctr_flood = 0;
 
-    if (current_node->pending)
+    if (current_node->pending) {
         return RFC5444_DROP_PACKET;
+    }
 
     return RFC5444_OKAY;
 }
@@ -152,35 +156,40 @@ _cb_nhdp_blocktlv_packet_okay(struct rfc5444_reader_tlvblock_context *cont __att
 static enum rfc5444_result
 _cb_nhdp_blocktlv_address_okay(struct rfc5444_reader_tlvblock_context *cont)
 {
-    struct rfc5444_reader_tlvblock_entry* tlv;
+    struct rfc5444_reader_tlvblock_entry *tlv;
     metric_t link_metric = RFC5444_METRIC_MIN;
 
-    char* name = NULL;
+    char *name = NULL;
 #ifdef ENABLE_NAME
+
     if ((tlv = _nhdp_address_tlvs[IDX_ADDRTLV_NODE_NAME].tlv)) {
-        name = (char*) tlv->single_value;
+        name = (char *) tlv->single_value;
         DEBUG("\t2-hop neighbor: %s (%s)", name, netaddr_to_str_s(&nbuf[0], &cont->addr));
     }
+
 #endif
 
     if ((tlv = _nhdp_address_tlvs[IDX_ADDRTLV_METRIC].tlv)) {
-        link_metric = rfc5444_metric_decode(*((uint16_t*) tlv->single_value));
+        link_metric = rfc5444_metric_decode(*((uint16_t *) tlv->single_value));
         DEBUG("\t\tmetric: %d", link_metric);
     }
 
     if ((tlv = _nhdp_address_tlvs[IDX_ADDRTLV_LINK_STATUS].tlv)) {
-        switch (* (char*) tlv->single_value) {
-            struct olsr_node* lost;
-        case RFC5444_LINKSTATUS_LOST:
-            lost = get_node(&cont->addr);
-            DEBUG("\t\texpired node reported, removing it (HELLO)%s", lost ? "" : " [not found]");
+        switch (* (char *) tlv->single_value) {
+                struct olsr_node *lost;
 
-            if (lost != NULL)
-                route_expired(lost, current_node->addr);
+            case RFC5444_LINKSTATUS_LOST:
+                lost = get_node(&cont->addr);
+                DEBUG("\t\texpired node reported, removing it (HELLO)%s", lost ? "" : " [not found]");
 
-            return RFC5444_DROP_ADDRESS;
-        default:
-            DEBUG("\t\tunknown LINKSTATUS = %d", * (char*) tlv->single_value);
+                if (lost != NULL) {
+                    route_expired(lost, current_node->addr);
+                }
+
+                return RFC5444_DROP_ADDRESS;
+
+            default:
+                DEBUG("\t\tunknown LINKSTATUS = %d", * (char *) tlv->single_value);
         }
     }
 
@@ -195,8 +204,10 @@ _cb_nhdp_blocktlv_address_okay(struct rfc5444_reader_tlvblock_context *cont)
             DEBUG("\tflood: %d, route: %d", h1_deriv(current_node)->mpr_slctr_flood, h1_deriv(current_node)->mpr_slctr_route);
         }
 
-    } else
+    }
+    else {
         add_olsr_node(&cont->addr, current_src, vtime, 2, link_metric, name);
+    }
 
     return RFC5444_OKAY;
 }
@@ -207,25 +218,31 @@ _cb_olsr_blocktlv_packet_okay(struct rfc5444_reader_tlvblock_context *cont)
 {
     DEBUG("received TC message:");
 
-    if (!cont->has_origaddr)
+    if (!cont->has_origaddr) {
         return RFC5444_DROP_PACKET;
+    }
 
-    if (!cont->has_seqno)
+    if (!cont->has_seqno) {
         return RFC5444_DROP_PACKET;
+    }
 
-    if (!cont->has_hopcount || !cont->has_hoplimit)
+    if (!cont->has_hopcount || !cont->has_hoplimit) {
         return RFC5444_DROP_PACKET;
+    }
 
-    if (!netaddr_cmp(get_local_addr(), current_src))
+    if (!netaddr_cmp(get_local_addr(), current_src)) {
         return RFC5444_DROP_PACKET;
+    }
 
-    if (!netaddr_cmp(get_local_addr(), &cont->orig_addr))
+    if (!netaddr_cmp(get_local_addr(), &cont->orig_addr)) {
         return RFC5444_DROP_PACKET;
+    }
 
     vtime = rfc5444_timetlv_decode(*_olsr_message_tlvs[IDX_TLV_VTIME].tlv->single_value);
 
-    if (is_known_msg(&cont->orig_addr, cont->seqno, vtime))
+    if (is_known_msg(&cont->orig_addr, cont->seqno, vtime)) {
         return RFC5444_DROP_PACKET;
+    }
 
     DEBUG("\tfrom: %s", netaddr_to_str_s(&nbuf[0], &cont->orig_addr));
     DEBUG("\tsender: %s", netaddr_to_str_s(&nbuf[0], current_src));
@@ -242,43 +259,51 @@ _cb_olsr_blocktlv_packet_okay(struct rfc5444_reader_tlvblock_context *cont)
 static enum rfc5444_result
 _cb_olsr_blocktlv_address_okay(struct rfc5444_reader_tlvblock_context *cont)
 {
-    struct rfc5444_reader_tlvblock_entry* tlv __attribute__((unused));
+    struct rfc5444_reader_tlvblock_entry *tlv __attribute__((unused));
     metric_t link_metric = RFC5444_METRIC_MIN;
-    char* name = NULL;
+    char *name = NULL;
 
-    if (netaddr_cmp(get_local_addr(), &cont->addr) == 0)
+    if (netaddr_cmp(get_local_addr(), &cont->addr) == 0) {
         return RFC5444_DROP_ADDRESS;
+    }
 
 #ifdef ENABLE_NAME
+
     if ((tlv = _olsr_address_tlvs[IDX_ADDRTLV_NODE_NAME].tlv)) {
-        name = (char*) tlv->single_value;
+        name = (char *) tlv->single_value;
         DEBUG("\tannounces: %s (%s)", name, netaddr_to_str_s(&nbuf[0], &cont->addr));
     }
+
 #endif
 
     if ((tlv = _olsr_address_tlvs[IDX_ADDRTLV_LINK_STATUS].tlv)) {
-        switch (* (char*) tlv->single_value) {
-            struct olsr_node* lost;
-        case RFC5444_LINKSTATUS_LOST:
-            lost = get_node(&cont->addr);
-            DEBUG("\texpired node reported, removing it (TC)%s", lost ? "" : " [not found]");
+        switch (* (char *) tlv->single_value) {
+                struct olsr_node *lost;
 
-            if (lost != NULL)
-                route_expired(lost, &cont->orig_addr);
+            case RFC5444_LINKSTATUS_LOST:
+                lost = get_node(&cont->addr);
+                DEBUG("\texpired node reported, removing it (TC)%s", lost ? "" : " [not found]");
 
-            /* emergency flood */
-            struct nhdp_node* node = h1_deriv(get_node(current_src));
-            if (node != NULL)
-                node->mpr_slctr_flood = 1;
+                if (lost != NULL) {
+                    route_expired(lost, &cont->orig_addr);
+                }
 
-            return RFC5444_DROP_ADDRESS;
-        default:
-            DEBUG("\tunknown LINKSTATUS = %d", * (char*) tlv->single_value);
+                /* emergency flood */
+                struct nhdp_node *node = h1_deriv(get_node(current_src));
+
+                if (node != NULL) {
+                    node->mpr_slctr_flood = 1;
+                }
+
+                return RFC5444_DROP_ADDRESS;
+
+            default:
+                DEBUG("\tunknown LINKSTATUS = %d", * (char *) tlv->single_value);
         }
     }
 
     if ((tlv = _olsr_address_tlvs[IDX_ADDRTLV_METRIC].tlv)) {
-        link_metric = rfc5444_metric_decode(*((uint16_t*) tlv->single_value));
+        link_metric = rfc5444_metric_decode(*((uint16_t *) tlv->single_value));
         DEBUG("\t\tmetric: %d", link_metric);
     }
 
@@ -301,17 +326,20 @@ static void
 _cb_olsr_forward_message(struct rfc5444_reader_tlvblock_context *context __attribute__((unused)),
                          uint8_t *buffer, size_t length)
 {
-    struct olsr_node* node = get_node(current_src);
+    struct olsr_node *node = get_node(current_src);
 
     /* only forward if node selected us as flooding MPR */
-    if (node == NULL || h1_deriv(node)->mpr_slctr_flood == 0)
+    if (node == NULL || h1_deriv(node)->mpr_slctr_flood == 0) {
         return;
+    }
 
     if (RFC5444_OKAY == rfc5444_writer_forward_msg(&writer, buffer, length)) {
         DEBUG("\tforwarding");
         rfc5444_writer_flush(&writer, &interface, true);
-    } else
+    }
+    else {
         DEBUG("\tfailed forwarding package");
+    }
 }
 
 /**
@@ -335,7 +363,7 @@ void reader_init(void)
 /**
  * Inject a package into the RFC5444 reader
  */
-int reader_handle_packet(void* buffer, size_t length, struct netaddr* src, uint8_t metric_in)
+int reader_handle_packet(void *buffer, size_t length, struct netaddr *src, uint8_t metric_in)
 {
     current_src = src;
     metric = metric_in;

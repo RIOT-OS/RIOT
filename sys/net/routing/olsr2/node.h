@@ -8,7 +8,7 @@
 #include "olsr_debug.h"
 
 #ifdef ENABLE_NAME
-extern char* local_name;
+extern char *local_name;
 #endif
 
 /* if a connection is lost, the loss will be reported LOST_ITER_MAX times in HELLO and TC messages. */
@@ -23,9 +23,9 @@ typedef uint32_t metric_t;
 
 /* simple list to store alternative routes */
 struct alt_route {
-    struct alt_route* next;
+    struct alt_route *next;
 
-    struct netaddr* last_addr;
+    struct netaddr *last_addr;
     metric_t link_metric;
     time_t expires;
 };
@@ -33,24 +33,24 @@ struct alt_route {
 struct olsr_node {
     struct avl_node node;		/* for routing table Information Base */
 
-    struct netaddr* addr;		/* node address */
-    struct netaddr* next_addr;	/* neighbor addr to send packets to for this node*/
-    struct netaddr* last_addr;	/* node that announced this node */
-    struct alt_route* other_routes; /* other possible last_addrs */
+    struct netaddr *addr;		/* node address */
+    struct netaddr *next_addr;	/* neighbor addr to send packets to for this node*/
+    struct netaddr *last_addr;	/* node that announced this node */
+    struct alt_route *other_routes; /* other possible last_addrs */
 
     time_t expires;				/* time when this tuple is invalid */
     uint16_t seq_no;			/* last seq_no from last_addr */
     uint8_t distance;			/* hops between us and the node */
     metric_t link_metric;
     metric_t path_metric;
-    struct netaddr* flood_mpr;	/* flooding MPR to broadcast to this node (used for couting mpr_neigh_flood), 2-hop only */
+    struct netaddr *flood_mpr;	/* flooding MPR to broadcast to this node (used for couting mpr_neigh_flood), 2-hop only */
 
     uint8_t type		: 1;	/* node type */
     uint8_t pending		: 1;	/* whether the link can already be used - only 1-hop */
     uint8_t lost		: 4;	/* [4 bit] if set, the node will be annouced as lost - only 1-hop */
 
 #ifdef ENABLE_NAME
-    char* name;					/* node name from graph.gv */
+    char *name;					/* node name from graph.gv */
 #endif
 };
 
@@ -74,32 +74,34 @@ struct nhdp_node {
     float link_quality;
 };
 
-static inline struct olsr_node* h1_super(struct nhdp_node* n)
+static inline struct olsr_node *h1_super(struct nhdp_node *n)
 {
-    return (struct olsr_node*) n;
+    return (struct olsr_node *) n;
 }
-static inline struct nhdp_node* h1_deriv(struct olsr_node* n)
+static inline struct nhdp_node *h1_deriv(struct olsr_node *n)
 {
-    if (n == NULL)
+    if (n == NULL) {
         return 0;
+    }
 
-    if (n->type != NODE_TYPE_NHDP)
+    if (n->type != NODE_TYPE_NHDP) {
         return 0;
+    }
 
-    return (struct nhdp_node*) n;
+    return (struct nhdp_node *) n;
 }
 
 void node_init(void);
-struct netaddr* get_local_addr(void);
-struct avl_tree* get_olsr_head(void);
-int olsr_node_cmp(struct olsr_node* a, struct olsr_node* b);
-struct olsr_node* get_node(struct netaddr* addr);
-metric_t get_link_metric(struct olsr_node* node, struct netaddr* last_addr);
+struct netaddr *get_local_addr(void);
+struct avl_tree *get_olsr_head(void);
+int olsr_node_cmp(struct olsr_node *a, struct olsr_node *b);
+struct olsr_node *get_node(struct netaddr *addr);
+metric_t get_link_metric(struct olsr_node *node, struct netaddr *last_addr);
 
-void add_other_route(struct olsr_node* node, struct netaddr* last_addr, uint8_t distance, metric_t metric, uint8_t vtime);
-void remove_other_route(struct olsr_node* node, struct netaddr* last_addr);
-void remove_default_node(struct olsr_node* node);
-void push_default_route(struct olsr_node* node);
-void pop_other_route(struct olsr_node* node, struct netaddr* last_addr);
+void add_other_route(struct olsr_node *node, struct netaddr *last_addr, uint8_t distance, metric_t metric, uint8_t vtime);
+void remove_other_route(struct olsr_node *node, struct netaddr *last_addr);
+void remove_default_node(struct olsr_node *node);
+void push_default_route(struct olsr_node *node);
+void pop_other_route(struct olsr_node *node, struct netaddr *last_addr);
 
 #endif /* NODE_H_ */

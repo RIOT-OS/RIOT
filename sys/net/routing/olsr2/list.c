@@ -17,16 +17,17 @@
 #include "list.h"
 
 struct simple_list_elem {
-    struct simple_list_elem* next;
+    struct simple_list_elem *next;
 };
 
-void* __simple_list_add_tail(struct simple_list_elem** head, void* mem)
+void *__simple_list_add_tail(struct simple_list_elem **head, void *mem)
 {
-    struct simple_list_elem* _head = *head;
+    struct simple_list_elem *_head = *head;
 
     /* check out-of-memory condition */
-    if (mem == NULL)
+    if (mem == NULL) {
         return NULL;
+    }
 
     if (!_head) {
         *head = mem;
@@ -41,13 +42,14 @@ void* __simple_list_add_tail(struct simple_list_elem** head, void* mem)
     return _head;
 }
 
-void* __simple_list_add_head(struct simple_list_elem** head, void* mem)
+void *__simple_list_add_head(struct simple_list_elem **head, void *mem)
 {
-    struct simple_list_elem* _head = *head;
+    struct simple_list_elem *_head = *head;
 
     /* check out-of-memory condition */
-    if (mem == NULL)
+    if (mem == NULL) {
         return NULL;
+    }
 
     *head = mem;
     (*head)->next = _head;
@@ -55,22 +57,24 @@ void* __simple_list_add_head(struct simple_list_elem** head, void* mem)
     return *head;
 }
 
-void* __simple_list_add_before(struct simple_list_elem** head, void* mem, int needle, int offset)
+void *__simple_list_add_before(struct simple_list_elem **head, void *mem, int needle, int offset)
 {
-    struct simple_list_elem* _head = *head;
-    struct simple_list_elem* prev = 0;
+    struct simple_list_elem *_head = *head;
+    struct simple_list_elem *prev = 0;
 
     /* check out-of-memory condition */
-    if (mem == NULL)
+    if (mem == NULL) {
         return NULL;
+    }
 
     if (!_head) {
         *head = mem;
         return *head;
     }
 
-    while(_head) {
-        int* buff = (void*) _head + offset;
+    while (_head) {
+        int *buff = (void *) _head + offset;
+
         if (*buff > needle) {
             if (prev) {
                 prev->next = mem;
@@ -83,6 +87,7 @@ void* __simple_list_add_before(struct simple_list_elem** head, void* mem, int ne
             *head = prev;
             return prev;
         }
+
         prev = _head;
         _head = _head->next;
     }
@@ -91,28 +96,18 @@ void* __simple_list_add_before(struct simple_list_elem** head, void* mem, int ne
     return _head;
 }
 
-void* __simple_list_find(struct simple_list_elem* head, void* needle, int offset, size_t size)
+void *__simple_list_find(struct simple_list_elem *head, void *needle, int offset, size_t size)
 {
     while (head) {
-        void** buff = (void*) head + offset;
+        void **buff = (void *) head + offset;
 
-        if (size == 0 && *buff == needle)
+        if (size == 0 && *buff == needle) {
             return head;
-        if (size > 0 && memcmp(*buff, needle, size) == 0)
+        }
+
+        if (size > 0 && memcmp(*buff, needle, size) == 0) {
             return head;
-        head = head->next;
-    }
-
-    return 0;
-}
-
-void* __simple_list_find_cmp(struct simple_list_elem* head, void* needle, int offset, int compare(void*, void*))
-{
-    while (head) {
-        void** buff = (void*) head + offset;
-
-        if (compare(*buff, needle) == 0)
-            return head;
+        }
 
         head = head->next;
     }
@@ -120,10 +115,25 @@ void* __simple_list_find_cmp(struct simple_list_elem* head, void* needle, int of
     return 0;
 }
 
-void* __simple_list_remove(struct simple_list_elem** head, struct simple_list_elem* node, int keep)
+void *__simple_list_find_cmp(struct simple_list_elem *head, void *needle, int offset, int compare(void *, void *))
 {
-    struct simple_list_elem* _head = *head;
-    struct simple_list_elem* prev = 0;
+    while (head) {
+        void **buff = (void *) head + offset;
+
+        if (compare(*buff, needle) == 0) {
+            return head;
+        }
+
+        head = head->next;
+    }
+
+    return 0;
+}
+
+void *__simple_list_remove(struct simple_list_elem **head, struct simple_list_elem *node, int keep)
+{
+    struct simple_list_elem *_head = *head;
+    struct simple_list_elem *prev = 0;
 
     while (_head && _head != node) {
         prev = _head;
@@ -131,23 +141,27 @@ void* __simple_list_remove(struct simple_list_elem** head, struct simple_list_el
     }
 
     /* not found */
-    if (_head != node)
+    if (_head != node) {
         return NULL;
+    }
 
     /* remove head */
-    if (!prev)
+    if (!prev) {
         *head = _head->next;
-    else
+    }
+    else {
         prev->next = node->next;
+    }
 
-    if (keep)
+    if (keep) {
         return node;
+    }
 
     free(node);
-    return (void*) 1;
+    return (void *) 1;
 }
 
-void __simple_list_clear(struct simple_list_elem** head)
+void __simple_list_clear(struct simple_list_elem **head)
 {
     struct simple_list_elem *tmp, *_head = *head;
 

@@ -8,13 +8,13 @@ struct netaddr_rc {
     uint8_t _refs;
 };
 
-const char* netaddr_to_str_s(struct netaddr_str* dst, const struct netaddr* src);
+const char *netaddr_to_str_s(struct netaddr_str *dst, const struct netaddr *src);
 
-struct netaddr* netaddr_dup(struct netaddr* addr);
-struct netaddr* netaddr_use(struct netaddr* addr);
-struct netaddr* netaddr_reuse(struct netaddr* addr);
-struct netaddr* netaddr_free(struct netaddr* addr);
-void netaddr_switch(struct netaddr** old_addr, struct netaddr* new_addr);
+struct netaddr *netaddr_dup(struct netaddr *addr);
+struct netaddr *netaddr_use(struct netaddr *addr);
+struct netaddr *netaddr_reuse(struct netaddr *addr);
+struct netaddr *netaddr_free(struct netaddr *addr);
+void netaddr_switch(struct netaddr **old_addr, struct netaddr *new_addr);
 
 time_t time_now(void);
 void sleep_s(int secs);
