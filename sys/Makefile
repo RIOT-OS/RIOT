@@ -37,6 +37,9 @@ endif
 ifneq (,$(filter shell_commands,$(USEMODULE)))
     DIRS += shell/commands
 endif
+ifneq (,$(filter slist,$(USEMODULE)))
+    DIRS += slist
+endif
 ifneq (,$(filter timex,$(USEMODULE)))
     DIRS += timex
 endif
