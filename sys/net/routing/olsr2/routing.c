@@ -15,7 +15,7 @@
 #include <stdio.h>
 
 #include "olsr.h"
-#include "list.h"
+#include <slist.h>
 #include "olsr_debug.h"
 #include "util.h"
 #include "routing.h"
