@@ -90,8 +90,12 @@ void isr_nmi(void)
 
 void isr_hard_fault(void)
 {
-    LED_RED_ON;
-    while (1) {asm ("nop");}
+    while (1) {
+        for (int i = 0; i < 500000; i++) {
+            asm("nop");
+        }
+        LED_RED_TOGGLE;
+    }
 }
 
 /* Cortex-M specific interrupt vectors */

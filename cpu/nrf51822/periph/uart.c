@@ -15,6 +15,7 @@
  *
  * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
  * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
@@ -117,11 +118,18 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     switch (uart) {
 #if UART_0_EN
         case UART_0:
+            /* power on UART device */
+            UART_0_DEV->POWER = 1;
+
             /* reset configuration registers */
             UART_0_DEV->CONFIG = 0;
 
             /* select baudrate */
             UART_0_DEV->BAUDRATE = baudrate_real;
+
+            /* configure RX/TX pin modes */
+            NRF_GPIO->DIRSET = (1 << UART_0_PIN_TX);
+            NRF_GPIO->DIRCLR = (1 << UART_0_PIN_RX);
 
             /* configure UART pins to use */
             UART_0_DEV->PSELTXD = UART_0_PIN_TX;
@@ -129,6 +137,10 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 
             /* enable hw-flow control if defined */
 #if UART_0_HWFLOWCTRL
+            /* set pin mode for RTS and CTS pins */
+            NRF_GPIO->DIRSET = (1 << UART_0_PIN_RTS);
+            NRF_GPIO->DIRSET = (1 << UART_0_PIN_CTS);
+            /* configure RTS and CTS pins to use */
             UART_0_DEV->PSELRTS = UART_0_PIN_RTS;
             UART_0_DEV->PSELCTS = UART_0_PIN_CTS;
             UART_0_DEV->CONFIG |= 1;        /* enable HW flow control */
@@ -146,8 +158,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             break;
 #endif
     }
-
-    DEBUG("UART INITIALIZATION complete\n");
 
     return 0;
 }
@@ -206,6 +216,32 @@ int uart_write_blocking(uart_t uart, char data)
     }
 
     return 1;
+}
+
+void uart_poweron(uart_t uart)
+{
+    switch (uart) {
+#if UART_0_EN
+        case UART_0:
+            UART_0_DEV->POWER = 1;
+            break;
+#endif
+        default:
+            return;
+    }
+}
+
+void uart_poweroff(uart_t uart)
+{
+    switch (uart) {
+#if UART_0_EN
+        case UART_0:
+            UART_0_DEV->POWER = 0;
+            break;
+#endif
+        default:
+            return;
+    }
 }
 
 #endif /* UART_NUMOF */

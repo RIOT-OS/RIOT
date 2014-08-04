@@ -29,10 +29,10 @@
  * TODO: measure and adjust for the cortex-m0
  * @{
  */
-#define KERNEL_CONF_STACKSIZE_PRINTF    (1024)
+#define KERNEL_CONF_STACKSIZE_PRINTF    (524)
 
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   (1024)
+#define KERNEL_CONF_STACKSIZE_DEFAULT   (524)
 #endif
 
 #define KERNEL_CONF_STACKSIZE_IDLE      (256)
