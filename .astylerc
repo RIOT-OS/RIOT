@@ -11,3 +11,4 @@
 --break-closing-brackets
 --add-brackets
 --align-pointer=name
+--max-code-length=100
