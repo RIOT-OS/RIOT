@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 INRIA
+ * Copyright (C) 2013, 2014 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -106,7 +106,7 @@ void rpl_udp_init(int argc, char **argv)
 
     /* TODO: check if this works as intended */
     ipv6_addr_t prefix, tmp;
-    ipv6_addr_init(&std_addr, 0xABCD, 0xEF12, 0, 0, 0x1034, 0x00FF, 0xFE00, id);
+    ipv6_addr_init(&std_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, id);
     ipv6_addr_init_prefix(&prefix, &std_addr, 64);
     ndp_add_prefix_info(0, &prefix, 64, NDP_OPT_PI_VLIFETIME_INFINITE,
                         NDP_OPT_PI_PLIFETIME_INFINITE, 1,
@@ -127,81 +127,6 @@ void rpl_udp_init(int argc, char **argv)
 
     puts("Destiny initialized");
     /* start transceiver watchdog */
-}
-
-void rpl_udp_loop(int argc, char **argv)
-{
-    (void) argc;
-    (void) argv;
-
-    rpl_routing_entry_t *rtable;
-
-    rtable = rpl_get_routing_table();
-    rpl_dodag_t *mydodag = rpl_get_my_dodag();
-
-    if (mydodag == NULL) {
-        return;
-    }
-
-    printf("---------------------------\n");
-    printf("OUTPUT\n");
-    printf("my rank: %d\n", mydodag->my_rank);
-
-    if (!is_root) {
-        printf("my preferred parent:\n");
-        printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                                        (&mydodag->my_preferred_parent->addr)));
-        printf("parent lifetime: %d\n", mydodag->my_preferred_parent->lifetime);
-    }
-
-    printf("---------------------------$\n");
-
-    for (int i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        if (rtable[i].used) {
-            printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                                            (&rtable[i].address)));
-            puts("next hop");
-            printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                                            (&rtable[i].next_hop)));
-            printf("entry %d lifetime %d\n", i, rtable[i].lifetime);
-
-            if (!rpl_equal_id(&rtable[i].address, &rtable[i].next_hop)) {
-                puts("multi-hop");
-            }
-
-            printf("---------------------------$\n");
-        }
-    }
-
-    printf("########################\n");
-}
-
-void rpl_udp_table(int argc, char **argv)
-{
-    (void) argc;
-    (void) argv;
-
-    rpl_routing_entry_t *rtable;
-    rtable = rpl_get_routing_table();
-    printf("---------------------------\n");
-    printf("OUTPUT\n");
-    printf("---------------------------\n");
-
-    for (int i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        if (rtable[i].used) {
-            printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                                            (&rtable[i].address)));
-            printf("entry %d lifetime %d\n", i, rtable[i].lifetime);
-
-            if (!rpl_equal_id(&rtable[i].address, &rtable[i].next_hop)) {
-                puts("multi-hop");
-            }
-
-            printf("--------------\n");
-        }
-    }
-
-    printf("$\n");
 }
 
 void rpl_udp_dodag(int argc, char **argv)

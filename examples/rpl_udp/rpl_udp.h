@@ -1,7 +1,7 @@
 #ifndef RPL_UDP_H
 #define RPL_UDP_H
 
-#define APP_VERSION "1.1"
+#define APP_VERSION "1.2"
 
 #define RADIO_CHANNEL   (10)
 
@@ -10,43 +10,85 @@
 
 /* RPL shell command handlers */
 /**
- * @brief   Shell command to initializes RPL and Destiny
+ * @brief   Shell command to initializes RPL and UDP
+ *
+ * @details Usage: init <r|n>
+ *                 `init r` will initialize the node as a RPL root node,
+ *                 `init n` as a RPL node.
+ *
+ * @param[in] argc  Argument count
+ * @param[in] argv  Arguments
  */
 void rpl_udp_init(int argc, char **argv);
 
 /**
  * @brief   Shell command to set node's ID
+ *
+ * @details Usage: set <ID>
+ *          Set the node address
+ *
+ * @param[in] argc  Argument count
+ * @param[in] argv  Arguments
  */
 void rpl_udp_set_id(int argc, char **argv);
 
 /**
- * @brief   Loops through the routing table
- */
-void rpl_udp_loop(int argc, char **argv);
-
-/**
- * @brief   Shows the routing table
- */
-void rpl_udp_table(int argc, char **argv);
-
-/**
  * @brief   Shows the dodag
+ *
+ * @details No parameters required
+ *
+ * @param[in] argc  Argument count
+ * @param[in] argv  Arguments
  */
 void rpl_udp_dodag(int argc, char **argv);
 
-/* UDP shell command handlers */
+/**
+ * @brief Command handler to start a UDP server
+ *
+ * @details No parameters required
+ *
+ * @param[in] argc  Argument count
+ * @param[in] argv  Arguments
+ */
 void udp_server(int argc, char **argv);
+
+/**
+ * @brief Sends a UDP datagram
+ *
+ * @details Usage: send <ID> <TEXT>
+ *          Sends TEXT to the node with IP address:
+ *          fe80::ff:fe00:<ID>
+ *
+ * @param[in] argc  Argument count
+ * @param[in] argv  Arguments
+ */
 void udp_send(int argc, char **argv);
 
-/* helper command handlers */
-void rpl_udp_ip(int argc, char **argv);
-
+/**
+ * @brief Ignore a certain node
+ *
+ * @details Usage: ignore <ID>
+ *          Ignore the node with IP address:
+ *          fe80::ff:fe00:<ID>
+ *
+ * @param[in] argc  Argument count
+ * @param[in] argv  Arguments
+ */
 void rpl_udp_ignore(int argc, char **argv);
 
-/* monitoring thread */
+/**
+ * @brief monitoring thread start function
+ *
+ * @param arg Unused
+ */
 void *rpl_udp_monitor(void *arg);
 
+/** @brief The nodes radio address */
 extern radio_address_t id;
+
+/** @brief The node's default IP address */
 extern ipv6_addr_t std_addr;
+
+/** @brief Char array for IP address printing */
 extern char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif /* RPL_UDP_H */
