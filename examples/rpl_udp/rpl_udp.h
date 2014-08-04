@@ -1,5 +1,5 @@
-#ifndef DEMO_H
-#define DEMO_H
+#ifndef RPL_UDP_H
+#define RPL_UDP_H
 
 #define APP_VERSION "1.1"
 
@@ -49,4 +49,4 @@ void *rpl_udp_monitor(void *arg);
 extern radio_address_t id;
 extern ipv6_addr_t std_addr;
 extern char addr_str[IPV6_MAX_ADDR_STR_LEN];
-#endif /* DEMO_H */
+#endif /* RPL_UDP_H */

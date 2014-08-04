@@ -27,7 +27,7 @@
 #include "destiny.h"
 #include "rpl.h"
 #include "rpl_dodag.h"
-#include "demo.h"
+#include "rpl_udp.h"
 #include "transceiver.h"
 
 #define ENABLE_DEBUG    (0)

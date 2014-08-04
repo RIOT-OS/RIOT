@@ -27,7 +27,7 @@
 #include "board_uart0.h"
 #include "destiny.h"
 
-#include "demo.h"
+#include "rpl_udp.h"
 
 const shell_command_t shell_commands[] = {
     {"init", "Initialize network", rpl_udp_init},

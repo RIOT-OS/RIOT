@@ -30,7 +30,7 @@
 
 #include "net_help.h"
 
-#include "demo.h"
+#include "rpl_udp.h"
 
 #define UDP_BUFFER_SIZE     (128)
 #define SERVER_PORT     (0xFF01)
