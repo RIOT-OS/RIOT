@@ -193,4 +193,11 @@ buildinfo:
 	@echo 'DEBUGGER:       $(DEBUGGER)'
 	@echo 'DEBUGGER_FLAGS: $(DEBUGGER_FLAGS)'
 	@echo ''
+	@echo 'DEBUGSERVER:       $(DEBUGSERVER)'
+	@echo 'DEBUGSERVER_FLAGS: $(DEBUGSERVER_FLAGS)'
+	@echo ''
+	@echo 'RESET:       $(RESET)'
+	@echo 'RESET_FLAGS: $(RESET_FLAGS)'
+	@echo ''
 	@echo -e 'MAKEFILE_LIST:$(patsubst %, \n\t%, $(abspath $(MAKEFILE_LIST)))'
+
