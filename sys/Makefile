@@ -1,6 +1,9 @@
 ifneq (,$(filter auto_init,$(USEMODULE)))
     DIRS += auto_init
 endif
+ifneq (,$(filter cbor,$(USEMODULE)))
+    DIRS += cbor
+endif
 ifneq (,$(filter config,$(USEMODULE)))
     DIRS += config
 endif

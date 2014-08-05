@@ -1,6 +1,8 @@
 APPLICATION = unittests
 include ../Makefile.tests_common
 
+BOARD_INSUFFICIENT_RAM := chronos redbee-econotag stm32f0discovery
+
 USEMODULE += embunit
 
 INCLUDES += -I$(RIOTBASE)/tests/unittests/embunit
