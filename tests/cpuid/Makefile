@@ -1,4 +1,4 @@
-export APPLICATION = test_cpu_id
+export APPLICATION = cpu_id
 include ../Makefile.tests_common
 
 BOARD_WHITELIST := native
