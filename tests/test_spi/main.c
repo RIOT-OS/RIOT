@@ -13,7 +13,7 @@
  * @file
  * @brief SPI test application
  *
- * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author      Maxime Blanloeil <maxime.blanloeil@phelma.grenoble-inp.fr>
  *
  * @}
  */
@@ -40,7 +40,7 @@ static void cmd_init_start_slave(int argc, char **argv);
 static void cmd_init_master(int argc, char **argv);
 static void cmd_send_master_byte(int argc, char **argv);
 static void cmd_send_master_bytes(int argc, char **argv);
-//static void cmd_test_nrf(int argc, char **argv);
+/*static void cmd_test_nrf(int argc, char **argv);*/
 static void cmd_prxbuf(int argc, char **argv);
 static void cmd_clearbuf(int argc, char **argv);
 
@@ -51,8 +51,7 @@ char test_irq(char c)
 {
     test_buf[buf_count] = c;
     buf_count++;
-    //printf("my_cool_uebergabeparameter_was: %d\n", c);
-    return 6;
+    return;
 }
 
 /**
@@ -63,7 +62,7 @@ static const shell_command_t shell_commands[] = {
     { "im", "init master", cmd_init_master },
     { "smb", "send master byte", cmd_send_master_byte },
     { "smbs", "send master bytes", cmd_send_master_bytes },
-    //{ "nrf", "test nrf", cmd_test_nrf },
+    /*{ "nrf", "test nrf", cmd_test_nrf },*/
     { "prxbuf", "print rx buffer from cb function", cmd_prxbuf },
     { "clearbuf", "clear rx buffer from cb function", cmd_clearbuf },
     { NULL, NULL, NULL }
@@ -82,7 +81,7 @@ void cmd_init_start_slave(int argc, char **argv)
     spi_poweron(SPI_0);
     spi_init_slave(SPI_0, SPI_CONF_FIRST_RISING, test_irq);
 
-    int mr, sr, imr, csr;
+    unsigned int mr, sr, imr, csr;
     mr = SPI_0_DEV->SPI_MR;
     sr = SPI_0_DEV->SPI_SR;
     imr = SPI_0_DEV->SPI_IMR;
@@ -107,7 +106,7 @@ void cmd_init_master(int argc, char **argv)
     uint32_t speed = 255;	/* this is the divider not the freq.! */
     spi_init_master(SPI_0, SPI_CONF_FIRST_RISING, speed);
 
-    uint32_t mr, sr, imr, csr;
+    unsigned int mr, sr, imr, csr;
     mr = SPI_0_DEV->SPI_MR;
     sr = SPI_0_DEV->SPI_SR;
     imr = SPI_0_DEV->SPI_IMR;
@@ -176,7 +175,7 @@ void cmd_test_nrf(int argc, char **argv) {
 	(void) argv;
 
 	puts("Test call nrf24l01+\n");
-/*
+
 #define R_REGISTER		0x00
 #define W_REGISTER		0x20
 #define NOP				0xFF
@@ -232,11 +231,9 @@ char data_return, data_send;
 	spi_transfer_reg(SPI_0, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
 	gpio_set(GPIO_7);
 	printf("read out config register ater clear. answer: %x\n", data_return);
-*/
 
-/*
 }
-
+*/
 
 /**
  * @print buffer written in cb function
