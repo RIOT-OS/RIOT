@@ -358,11 +358,6 @@ radio_tx_status_t cc2420_do_send(ieee802154_packet_kind_t kind,
  */
 int16_t cc2420_send(cc2420_packet_t *packet);
 
-/**
- * The PID of the transceiver thread.
- */
-extern kernel_pid_t transceiver_pid;
-
 /*
  * RX Packet Buffer, read from the transceiver, filled by the cc2420_rx_handler.
  */
