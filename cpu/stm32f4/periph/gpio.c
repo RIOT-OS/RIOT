@@ -688,6 +688,7 @@ void isr_exti3(void)
     ISR_EXIT();
 }
 
+#if !SPI_0_EN
 __attribute__((naked))
 void isr_exti4(void)
 {
@@ -698,6 +699,7 @@ void isr_exti4(void)
     }
     ISR_EXIT();
 }
+#endif
 
 __attribute__((naked))
 void isr_exti9_5(void)
@@ -726,6 +728,7 @@ void isr_exti9_5(void)
     ISR_EXIT();
 }
 
+#if !SPI_0_EN
 __attribute__((naked))
 void isr_exti15_10(void)
 {
@@ -756,3 +759,5 @@ void isr_exti15_10(void)
     }
     ISR_EXIT();
 }
+#endif
+
