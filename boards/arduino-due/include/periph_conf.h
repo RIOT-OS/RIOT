@@ -88,13 +88,13 @@
 
 /* SPI 0 device config */
 #define SPI_0_DEV           SPI0
-#define SPI_0_CLKEN()       PMC->PMC_PCER0 |= (1 << ID_SPI0);
-#define SPI_0_CLKDIS()      PMC->PMC_PCER0 &= ~(1 << ID_SPI0);
+#define SPI_0_CLKEN()       (PMC->PMC_PCER0 |= (1 << ID_SPI0));
+#define SPI_0_CLKDIS()      (PMC->PMC_PCER0 &= ~(1 << ID_SPI0));
 #define SPI_0_IRQ           SPI0_IRQn
 #define SPI_0_IRQ_PRIO      1
 /* SPI 0 pin configuration */
 #define SPI_0_PORT          PIOA
-#define SPI_0_PORT_CLKEN()  PMC->PMC_PCER0 |= (1 << ID_PIOA);
+#define SPI_0_PORT_CLKEN()  (PMC->PMC_PCER0 |= (1 << ID_PIOA));
 #define SPI_0_MISO_PIN      PIO_PA25A_SPI0_MISO
 #define SPI_0_MOSI_PIN      PIO_PA26A_SPI0_MOSI
 #define SPI_0_SCK_PIN       PIO_PA27A_SPI0_SPCK
