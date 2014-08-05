@@ -36,7 +36,7 @@
 
       static char byte_begin = 0xab;
 
-      int spi_poweron(spi_t dev){
+      void spi_poweron(spi_t dev){
 
           switch (dev) {
       #if SPI_0_EN
@@ -52,10 +52,10 @@
       #endif
 
           }
-          return 1;
+          return;
       }
 
-      int spi_poweroff(spi_t dev){
+      void spi_poweroff(spi_t dev){
 
       switch (dev) {
       #if SPI_0_EN
@@ -73,10 +73,10 @@
 
           }
 
-          return 1;
+          return ;
       }
 
-      int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed){
+      int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed){
 
       	Pio *port = 0;
       	Spi *spi_port = 0;
@@ -339,7 +339,7 @@
       }
 
 
-  int spi_transfer_bytes(spi_t dev, char *out, char *in, int length)
+  int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
   {
 
       int i, trans_ret, trans_bytes = 0;
@@ -449,17 +449,7 @@
   }
   #endif
 
-  __attribute__((naked)) void isr_pioa(void)
-{
-    ISR_ENTER();
-    uint32_t status = PIOA->PIO_ISR;
-#ifdef SPI_0_NSS_PIN
-    if (status & SPI_0_NSS_PIN) {
-         irq_handler_begin(SPI_0_DEV);
-    }
-#endif
-    ISR_EXIT();
-}
+
 
 
 
