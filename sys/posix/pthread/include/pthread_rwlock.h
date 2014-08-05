@@ -9,7 +9,7 @@
 #ifndef __SYS__POSIX__PTHREAD_RWLOCK__H
 #define __SYS__POSIX__PTHREAD_RWLOCK__H
 
-#include "queue.h"
+#include "priority_queue.h"
 #include "tcb.h"
 
 #include <errno.h>
@@ -36,7 +36,7 @@ typedef struct pthread_rwlock
     /**
      * @brief     Queue of waiting threads.
      */
-    queue_t queue;
+    priority_queue_t queue;
 
     /**
      * @brief     Provides mutual exclusion on reading and writing on the structure.
@@ -51,7 +51,7 @@ typedef struct __pthread_rwlock_waiter_node
 {
     bool is_writer; /**< `false`: reader; `true`: writer */
     tcb_t *thread; /**< waiting thread */
-    queue_node_t qnode; /**< Node to store in `pthread_rwlock_t::queue`. */
+    priority_queue_node_t qnode; /**< Node to store in `pthread_rwlock_t::queue`. */
     bool continue_; /**< This is not a spurious wakeup. */
 } __pthread_rwlock_waiter_node_t;
 

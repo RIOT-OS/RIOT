@@ -6,11 +6,11 @@
 /** Value returned if `sem_open' failed.  */
 #define SEM_FAILED      ((sem_t *) 0)
 
-#include "queue.h"
+#include "priority_queue.h"
 
 typedef struct sem {
     volatile unsigned int value;
-    queue_t queue;
+    priority_queue_t queue;
 } sem_t;
 
 /**

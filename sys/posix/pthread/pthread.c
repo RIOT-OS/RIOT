@@ -29,7 +29,7 @@
 #include "kernel_internal.h"
 #include "msg.h"
 #include "mutex.h"
-#include "queue.h"
+#include "priority_queue.h"
 #include "thread.h"
 #include "sched.h"
 

@@ -77,7 +77,7 @@ static void sem_thread_blocked(sem_t *sem)
     /* I'm going blocked */
     sched_set_status((tcb_t*) sched_active_thread, STATUS_MUTEX_BLOCKED);
 
-    queue_node_t n;
+    priority_queue_node_t n;
     n.priority = (uint32_t) sched_active_thread->priority;
     n.data = (size_t) sched_active_thread;
     n.next = NULL;
@@ -86,7 +86,7 @@ static void sem_thread_blocked(sem_t *sem)
           sched_active_thread->name, n.priority);
 
     /* add myself to the waiters queue */
-    queue_priority_add(&sem->queue, &n);
+    priority_queue_add(&sem->queue, &n);
 
     /* scheduler should schedule an other thread, that unlocks the
      * mutex in the future, when this happens I get scheduled again
@@ -142,7 +142,7 @@ int sem_post(sem_t *sem)
     int old_state = disableIRQ();
     ++sem->value;
 
-    queue_node_t *next = queue_remove_head(&sem->queue);
+    priority_queue_node_t *next = priority_queue_remove_head(&sem->queue);
     if (next) {
         tcb_t *next_process = (tcb_t*) next->data;
         DEBUG("%s: waking up %s\n", sched_active_thread->name, next_process->name);

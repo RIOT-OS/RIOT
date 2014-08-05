@@ -33,7 +33,7 @@ typedef struct pthread_condattr_t {
 
 typedef struct pthread_cond_t {
     /* fields are managed by cv functions, don't touch */
-    queue_t queue; /**< Threads currently waiting to be signaled. */
+    priority_queue_t queue; /**< Threads currently waiting to be signaled. */
 } pthread_cond_t;
 
 /**
