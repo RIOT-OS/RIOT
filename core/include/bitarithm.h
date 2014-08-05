@@ -22,7 +22,7 @@
 
 /**
  * @def SETBIT
- * @brief Sets a bitbitmask for a bitfield
+ * @brief Sets a bitmask for a bitfield
  *
  * @param[in] val   The bitfield
  * @param[in] bit   Specifies the bits to be set

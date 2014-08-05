@@ -44,13 +44,13 @@ typedef struct mutex_t {
 
 /**
  * @brief Static initializer for mutex_t.
- * @details This initializer is preferrable to mutex_init().
+ * @details This initializer is preferable to mutex_init().
  */
 #define MUTEX_INIT { 0, QUEUE_INIT }
 
 /**
  * @brief Initializes a mutex object.
- * @details For intialization of variables use MUTEX_INIT instead.
+ * @details For initialization of variables use MUTEX_INIT instead.
  *          Only use the function call for dynamically allocated mutexes.
  * @param[out] mutex    pre-allocated mutex structure, must not be NULL.
  */

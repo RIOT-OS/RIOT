@@ -96,7 +96,7 @@ int msg_send_to_self(msg_t *m);
 /**
  * @brief Send message from interrupt.
  *
- * Will be automatically chosen instead of ``msg_sennd()`` if called from an
+ * Will be automatically chosen instead of ``msg_send()`` if called from an
  * interrupt/ISR.
  *
  * @param[in] m             Pointer to preallocated ``msg_t`` structure, must
@@ -172,7 +172,7 @@ int msg_reply(msg_t *m, msg_t *reply);
  *
  * @param[in] array Pointer to preallocated array of ``msg_t`` structures, must
  *                  not be NULL.
- * @param[in] num   Number of ``msg_t`` structurs in array.
+ * @param[in] num   Number of ``msg_t`` structures in array.
  *                  **MUST BE POWER OF TWO!**
  *
  * @return 0, if successful
