@@ -28,7 +28,6 @@
 #include "cpu.h"
 #include "kernel_internal.h"
 
-
 /**
  * @name noticeable marker marking the beginning of a stack segment
  *
@@ -67,7 +66,7 @@ char *thread_arch_stack_init(void *(*task_func)(void *),
                              int stack_size)
 {
     uint32_t *stk;
-    stk = (uint32_t *)((uint32_t *)stack_start + stack_size);
+    stk = (uint32_t *)((uint32_t)stack_start + stack_size);
 
     /* marker */
     stk--;
