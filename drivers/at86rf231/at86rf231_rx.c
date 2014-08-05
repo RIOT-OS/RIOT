@@ -10,6 +10,7 @@
 #include "at86rf231_arch.h"
 #include "at86rf231_spi.h"
 
+#include "kernel_types.h"
 #include "transceiver.h"
 #include "msg.h"
 
@@ -60,7 +61,7 @@ void at86rf231_rx_handler(void)
 #endif
 
         /* notify transceiver thread if any */
-        if (transceiver_pid) {
+        if (transceiver_pid > KERNEL_PID_NULL) {
             msg_t m;
             m.type = (uint16_t) RCV_PKT_AT86RF231;
             m.content.value = rx_buffer_next;

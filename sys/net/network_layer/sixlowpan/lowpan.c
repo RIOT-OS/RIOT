@@ -1788,7 +1788,7 @@ int sixlowpan_lowpan_init(void)
     /* init mac-layer and radio transceiver */
     sixlowpan_mac_init();
 
-    if (!ip_process_pid) {
+    if (ip_process_pid == KERNEL_PID_NULL) {
         ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
                                        PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                        ipv6_process, NULL, "ip_process");
