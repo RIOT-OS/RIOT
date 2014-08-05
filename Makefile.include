@@ -157,6 +157,12 @@ doc:
 debug:
 	$(DEBUGGER) $(DEBUGGER_FLAGS)
 
+debug-server:
+	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
+
+reset:
+	$(RESET) $(RESET_FLAGS)
+
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests
 

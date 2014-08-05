@@ -25,6 +25,7 @@ export OBJCOPY = $(PREFIX)objcopy
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
 export FLASHER = st-flash
 export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+export DEBUGSERVER = st-util
 
 # define build specific options
 CPU_USAGE = -mcpu=cortex-m0

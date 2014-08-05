@@ -18,13 +18,17 @@ TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
 export FLASHER ?= mspdebug
 export PORT ?= /dev/ttyUSB0
 export PROGRAMMER ?= olimex
-export FFLAGS += -j $(PROGRAMMER)
+export MSPDEBUGFLAGS += -j $(PROGRAMMER)
 ifeq ($(strip $(PROGRAMMER)),uif)
-	export FFLAGS += -d $(PORT)
+	export MSPDEBUGFLAGS += -d $(PORT)
 endif
+export DEBUGSERVER = $(FLASHER)
+export DEBUGSERVER_FLAGS = $(MSPDEBUGFLAGS) gdb
+export DEBUGGER = $(PREFIX)gdb
+export DEBUGGER_FLAGS = --tui --ex="target remote localhost:2000" --ex "monitor reset halt" --ex load -ex "monitor reset halt"  $(ELFFILE)
 export TERMFLAGS += -p
 
-export FFLAGS += "prog $(HEXFILE)"
+export FFLAGS = $(MSPDEBUGFLAGS) "prog $(HEXFILE)"
 
 export USEMODULE += msp430_common
 export INCLUDES += -I$(RIOTCPU)/msp430-common/include/ -I$(RIOTBOARD)/msb-430-common/include -I$(RIOTBOARD)/msb-430-common/drivers/include
