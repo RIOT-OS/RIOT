@@ -130,6 +130,7 @@ int thread_wakeup(kernel_pid_t pid);
  */
 kernel_pid_t thread_getpid(void);
 
+#ifdef DEVELHELP
 /**
  * @brief Measures the stack usage of a stack
  *
@@ -140,6 +141,7 @@ kernel_pid_t thread_getpid(void);
  * @return          the amount of unused space of the thread's stack
  */
 int thread_measure_stack_free(char *stack);
+#endif
 
 /* @} */
 #endif /* __THREAD_H */

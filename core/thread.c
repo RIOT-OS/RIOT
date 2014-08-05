@@ -92,6 +92,7 @@ int thread_wakeup(kernel_pid_t pid)
     }
 }
 
+#ifdef DEVELHELP
 int thread_measure_stack_free(char *stack)
 {
     unsigned int *stackp = (unsigned int *)stack;
@@ -105,11 +106,14 @@ int thread_measure_stack_free(char *stack)
     int space_free = (unsigned int)stackp - (unsigned int)stack;
     return space_free;
 }
+#endif
 
 kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags, void *(*function)(void *arg), void *arg, const char *name)
 {
     /* allocate our thread control block at the top of our stackspace */
+#ifdef DEVELHELP
     int total_stacksize = stacksize;
+#endif
     stacksize -= sizeof(tcb_t);
 
     /* align tcb address on 32bit boundary */
@@ -131,6 +135,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
         return -EINVAL;
     }
 
+#ifdef DEVELHELP
     if (flags & CREATE_STACKTEST) {
         /* assign each int of the stack the value of it's address */
         unsigned int *stackmax = (unsigned int *)((char *)stack + stacksize);
@@ -145,6 +150,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
         /* create stack guard */
         *stack = (unsigned int)stack;
     }
+#endif
 
     if (!inISR()) {
         dINT();
@@ -174,7 +180,10 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     cb->sp = thread_stack_init(function, arg, stack, stacksize);
     cb->stack_start = stack;
+
+#ifdef DEVELHELP
     cb->stack_size = total_stacksize;
+#endif
 
     cb->priority = priority;
     cb->status = 0;
