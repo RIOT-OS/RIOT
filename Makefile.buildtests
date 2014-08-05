@@ -22,10 +22,10 @@ endif
 
 buildtest:
 	@if [ -z "$${JENKINS_URL}" ] && tput colors 2>&1 > /dev/null; then \
-		GREEN='\033[1;32m'; RED='\033[1;31m'; RESET='\033[0m'; \
+		GREEN='\033[1;32m'; RED='\033[1;31m'; PURPLE='\033[1;35m'; RESET='\033[0m'; \
 		ECHO='/bin/echo -e'; \
 	else \
-		GREEN=''; RED=''; RESET=''; \
+		GREEN=''; RED=''; PURPLE=''; RESET=''; \
 		ECHO='/bin/echo'; \
 	fi; \
 	\
@@ -40,34 +40,39 @@ buildtest:
 		BOARDS=$$(echo \ $${BOARDS}\  | sed -e 's/ '$${BOARD}' / /'); \
 	done; \
 	\
+	BUILDTESTOK=true; \
 	rm -rf "$$BINDIRBASE"; \
 	for BOARD in $${BOARDS}; do \
 		RIOTNOLINK=$$(case ' $(BOARD_INSUFFICIENT_RAM) ' in *" $${BOARD} "*) echo 1; esac); \
 		$${ECHO} -n "Building for $${BOARD} "; \
 		[ -n "$${RIOTNOLINK}" ] && $${ECHO} -n "(no linking) "; \
-		$${ECHO} -n ".. "; \
-		LOG=$$(env -i \
-			HOME=$${HOME} \
-			PATH=$${PATH} \
-			BOARD=$${BOARD} \
-			RIOTBASE=$${RIOTBASE} \
-			RIOTBOARD=$${RIOTBOARD} \
-			RIOTCPU=$${RIOTCPU} \
-			BINDIRBASE=$${BINDIRBASE} \
-			RIOTNOLINK=$${RIOTNOLINK} \
-			RIOT_VERSION=$${RIOT_VERSION} \
-			$(MAKE) -j$(NPROC) 2>&1 >/dev/null) ; \
-		if [ "$${?}" = "0" ]; then \
-			$${ECHO} "$${GREEN}success$${RESET}"; \
-		else \
-			$${ECHO} "$${RED}failed$${RESET}"; \
-			echo "$${LOG}" | grep -v -E '^make(\[[[:digit:]]])?:'; \
-			BUILDTESTFAILED=1; \
-		fi; \
+		for NTH_TRY in 1 2; do \
+			$${ECHO} -n ".. "; \
+			LOG=$$(env -i \
+					HOME=$${HOME} \
+					PATH=$${PATH} \
+					BOARD=$${BOARD} \
+					RIOTBASE=$${RIOTBASE} \
+					RIOTBOARD=$${RIOTBOARD} \
+					RIOTCPU=$${RIOTCPU} \
+					BINDIRBASE=$${BINDIRBASE} \
+					RIOTNOLINK=$${RIOTNOLINK} \
+					RIOT_VERSION=$${RIOT_VERSION} \
+					$(MAKE) -j$(NPROC) 2>&1 >/dev/null) ; \
+			if [ "$${?}" = "0" ]; then \
+				$${ECHO} "$${GREEN}success$${RESET}"; \
+			elif [ -n "$${RIOT_DO_RETRY}" ] && $${BUILDTESTOK} && [ $${NTH_TRY} = 1 ]; then \
+				$${ECHO} -n "$${PURPLE}retrying$${RESET} "; \
+				continue; \
+			else \
+				$${ECHO} "$${RED}failed$${RESET}"; \
+				echo "$${LOG}" | grep -v -E '^make(\[[[:digit:]]])?:'; \
+				BUILDTESTOK=false; \
+			fi; \
+			break; \
+		done; \
 	done; \
-	if [ "$${BUILDTESTFAILED}" = "1" ]; then \
-		exit 1; \
-	fi
+	$${BUILDTESTOK}
 
 objsize:
 	@case "${SORTROW}" in \
