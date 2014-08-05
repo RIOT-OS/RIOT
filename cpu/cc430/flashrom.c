@@ -16,7 +16,6 @@
  * @brief       cc430 flashrom driver
  *
  * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
- *
  */
 
 #include <stddef.h>
@@ -28,32 +27,44 @@ static uint8_t prepare(void);
 static void finish(uint8_t istate);
 static inline void busy_wait(void);
 
-/*---------------------------------------------------------------------------*/
+/**
+ * @TODO implement this function
+ */
 uint8_t flashrom_erase(uint8_t *addr)
 {
-    // TODO implement this function
+    (void) addr;
+
     return 0;
 }
-/*---------------------------------------------------------------------------*/
+
+/**
+ * @TODO implement this function
+ */
 uint8_t flashrom_write(uint8_t *dst, const uint8_t *src, size_t size)
 {
-    // TODO implement this function
+    (void) dst;
+    (void) src;
+    (void) size;
+
     return 0;
 }
 
-/*---------------------------------------------------------------------------*/
+/**
+ * @TODO implement this function
+ */
 static uint8_t prepare(void)
 {
-    // TODO implement this function
-
     return 0;
 }
-/*---------------------------------------------------------------------------*/
+
+/**
+ * @TODO implement this function
+ */
 void finish(uint8_t istate)
 {
-    // TODO implement this function
+    (void) istate;
 }
-/*---------------------------------------------------------------------------*/
+
 static inline void busy_wait(void)
 {
     /* Wait for BUSY = 0, not needed unless run from RAM */

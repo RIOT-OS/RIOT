@@ -38,6 +38,7 @@ int _gettimeofday(struct timeval *tp, void *restrict tzp)
 #elif defined MODULE_VTIMER
     vtimer_gettimeofday(tp);
 #else
+    (void) tp;
     __gettimeofday_syscall_is_not_implemented_without_vtimer_or_rtc_module();
 #endif
 
