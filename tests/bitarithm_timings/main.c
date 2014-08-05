@@ -57,14 +57,17 @@ static void run_test(const char *name, unsigned (*test)(unsigned))
             i = 1;
         }
 
-        volatile unsigned r;
         for (unsigned j = 0; j < PER_ITERATION; ++j) {
+            volatile unsigned r;
             r = test(i);
+            (void) r;
             r = test(-1u - i);
+            (void) r;
             r = test(~i);
+            (void) r;
             r = test(~(-1u - i));
+            (void) r;
         }
-        (void) r;
 
         ++count;
     } while (done == 0);
