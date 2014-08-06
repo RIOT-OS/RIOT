@@ -31,7 +31,7 @@ static char stacks[NUM_CHILDREN][STACK_SIZE];
 static kernel_pid_t pids[NUM_CHILDREN];
 static char names[NUM_CHILDREN][8];
 
-static kernel_pid_t parent_pid;
+static kernel_pid_t parent_pid = KERNEL_PID_UNDEF;
 
 static void *child_fun(void *arg)
 {

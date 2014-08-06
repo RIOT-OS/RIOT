@@ -128,7 +128,7 @@ void UART0_IRQHandler(void)
         case UIIR_CTI_INT:                // Character Timeout Indicator
         case UIIR_RDA_INT:                // Receive Data Available
 #ifdef MODULE_UART0
-            if (uart0_handler_pid) {
+            if (uart0_handler_pid != KERNEL_PID_UNDEF) {
                 do {
                     int c = U0RBR;
                     uart0_handle_incoming(c);

@@ -47,7 +47,7 @@ char relay_stack[KERNEL_CONF_STACKSIZE_MAIN];
 #if RIOT_CCN_APPSERVER
 char appserver_stack[KERNEL_CONF_STACKSIZE_MAIN];
 #endif
-kernel_pid_t relay_pid, appserver_pid;
+kernel_pid_t relay_pid = KERNEL_PID_UNDEF, appserver_pid = KERNEL_PID_UNDEF;
 
 #define SHELL_MSG_BUFFER_SIZE (64)
 msg_t msg_buffer_shell[SHELL_MSG_BUFFER_SIZE];
@@ -64,7 +64,7 @@ static void riot_ccn_appserver(int argc, char **argv)
     (void) argc; /* the function takes no arguments */
     (void) argv;
 
-    if (appserver_pid) {
+    if (appserver_pid != KERNEL_PID_UNDEF) {
         /* already running */
         return;
     }
@@ -126,7 +126,7 @@ static void riot_ccn_register_prefix(int argc, char **argv)
 
 static void riot_ccn_relay_config(int argc, char **argv)
 {
-    if (!relay_pid) {
+    if (relay_pid == KERNEL_PID_UNDEF) {
         puts("ccnl stack not running");
         return;
     }
@@ -173,7 +173,7 @@ static void riot_ccn_transceiver_start(int relay_pid)
 
 static void riot_ccn_relay_start(void)
 {
-    if (relay_pid) {
+    if (relay_pid != KERNEL_PID_UNDEF) {
         DEBUG("ccn-lite relay on thread_id %d...please stop it first!\n", relay_pid);
         /* already running */
         return;

@@ -27,7 +27,7 @@
 
 char t1_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
-kernel_pid_t p1, p_main;
+kernel_pid_t p1 = KERNEL_PID_UNDEF, p_main = KERNEL_PID_UNDEF;
 
 void *thread1(void *arg)
 {

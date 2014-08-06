@@ -54,7 +54,7 @@ enum pthread_thread_status {
 };
 
 typedef struct pthread_thread {
-    kernel_pid_t thread_pid;
+    kernel_pid_t thread_pid = KERNEL_PID_UNDEF;
 
     enum pthread_thread_status status;
     int joining_thread;
@@ -132,9 +132,9 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
     void *stack = autofree ? malloc(stack_size) : attr->ss_sp;
     pt->stack = autofree ? stack : NULL;
 
-    if (autofree && pthread_reaper_pid < 0) {
+    if (autofree && pthread_reaper_pid != KERNEL_PID_UNDEF) {
         mutex_lock(&pthread_mutex);
-        if (pthread_reaper_pid < 0) {
+        if (pthread_reaper_pid != KERNEL_PID_UNDEF) {
             /* volatile pid to overcome problems with double checking */
             volatile kernel_pid_t pid = thread_create(pthread_reaper_stack,
                                              PTHREAD_REAPER_STACKSIZE,

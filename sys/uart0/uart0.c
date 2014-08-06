@@ -39,7 +39,7 @@
 #define UART0_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT)
 
 ringbuffer_t uart0_ringbuffer;
-kernel_pid_t uart0_handler_pid;
+kernel_pid_t uart0_handler_pid = KERNEL_PID_UNDEF;
 
 static char buffer[UART0_BUFSIZE];
 

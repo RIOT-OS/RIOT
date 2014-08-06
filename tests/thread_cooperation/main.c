@@ -29,7 +29,7 @@
 mutex_t mtx = MUTEX_INIT;
 
 volatile int storage = 1;
-kernel_pid_t main_id;
+kernel_pid_t main_id = KERNEL_PID_UNDEF;
 kernel_pid_t ths[PROBLEM];
 char stacks[PROBLEM][KERNEL_CONF_STACKSIZE_MAIN];
 

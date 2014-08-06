@@ -31,7 +31,7 @@
 // ccn
 #include "ccn_lite/ccnl-riot.h"
 
-kernel_pid_t relay_pid;
+kernel_pid_t relay_pid = KERNEL_PID_UNDEF;
 
 char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
 

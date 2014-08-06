@@ -54,7 +54,7 @@ interrupt(USART0RX_VECTOR) usart0irq(void) {
         dummy = U0RXBUF;
     }
 #ifdef MODULE_UART0
-    else if (uart0_handler_pid) {
+    else if (uart0_handler_pid != KERNEL_PID_UNDEF) {
                 dummy = U0RXBUF;
                 uart0_handle_incoming(dummy);
                 uart0_notify_thread();

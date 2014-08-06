@@ -122,7 +122,7 @@ interrupt(USCIAB0RX_VECTOR) __attribute__ ((naked)) usart1irq(void)
         /* Clear error flags by forcing a dummy read. */
         c = UCA0RXBUF;
 #ifdef MODULE_UART0
-    } else if (uart0_handler_pid) {
+    } else if (uart0_handler_pid != KERNEL_PID_UNDEF) {
         /* All went well -> let's signal the reception to adequate callbacks */
         c = UCA0RXBUF;
         uart0_handle_incoming(c);

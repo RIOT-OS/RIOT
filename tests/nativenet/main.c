@@ -130,7 +130,7 @@ void sender(void)
 int main(void)
 {
 #ifndef SENDER
-    kernel_pid_t radio_pid;
+    kernel_pid_t radio_pid = KERNEL_PID_UNDEF;
 #endif
     int16_t a;
     msg_t mesg;

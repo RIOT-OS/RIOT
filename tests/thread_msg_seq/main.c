@@ -29,7 +29,7 @@ char t1_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char t3_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
-kernel_pid_t p1, p2, p3;
+kernel_pid_t p1 = KERNEL_PID_UNDEF, p2 = KERNEL_PID_UNDEF, p3 = KERNEL_PID_UNDEF;
 
 void *sub_thread(void *arg)
 {
