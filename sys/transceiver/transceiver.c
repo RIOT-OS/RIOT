@@ -88,7 +88,7 @@ msg_t msg_buffer[TRANSCEIVER_MSG_BUFFER_SIZE];
 
 uint32_t response; ///< response bytes for messages to upper layer threads
 
-volatile kernel_pid_t transceiver_pid = KERNEL_PID_NULL; ///< the transceiver thread's pid
+volatile kernel_pid_t transceiver_pid = KERNEL_PID_UNDEF; ///< the transceiver thread's pid
 
 static volatile uint8_t rx_buffer_pos = 0;
 static volatile uint8_t transceiver_buffer_pos = 0;
@@ -165,7 +165,7 @@ void transceiver_init(transceiver_type_t t)
 
     for (i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
         reg[i].transceivers = TRANSCEIVER_NONE;
-        reg[i].pid          = KERNEL_PID_NULL;
+        reg[i].pid          = KERNEL_PID_UNDEF;
     }
 
     /* check if a non defined bit is set */

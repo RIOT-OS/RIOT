@@ -42,11 +42,11 @@
 static bool valid;
 
 static int32_t alarm_msg_content, periodic_msg_content, update_msg_content;
-static unsigned alarm_pid = KERNEL_PID_NULL, periodic_pid = KERNEL_PID_NULL, update_pid = KERNEL_PID_NULL;
+static unsigned alarm_pid = KERNEL_PID_UNDEF, periodic_pid = KERNEL_PID_NULL, update_pid = KERNEL_PID_NULL;
 
 static void alarm_callback_default(uint8_t reg_c)
 {
-    if (alarm_pid != KERNEL_PID_NULL) {
+    if (alarm_pid != KERNEL_PID_UNDEF) {
         msg_t m;
         m.type = reg_c | (RTC_REG_B_INT_ALARM << 8);
         m.content.value = alarm_msg_content;
@@ -56,7 +56,7 @@ static void alarm_callback_default(uint8_t reg_c)
 
 static void periodic_callback_default(uint8_t reg_c)
 {
-    if (periodic_pid != KERNEL_PID_NULL) {
+    if (periodic_pid != KERNEL_PID_UNDEF) {
         msg_t m;
         m.type = reg_c | (RTC_REG_B_INT_PERIODIC << 8);
         m.content.value = periodic_msg_content;
@@ -66,7 +66,7 @@ static void periodic_callback_default(uint8_t reg_c)
 
 static void update_callback_default(uint8_t reg_c)
 {
-    if (update_pid != KERNEL_PID_NULL) {
+    if (update_pid != KERNEL_PID_UNDEF) {
         msg_t m;
         m.type = reg_c | (RTC_REG_B_INT_UPDATE << 8);
         m.content.value = update_msg_content;
@@ -206,15 +206,15 @@ bool x86_rtc_set_alarm(const x86_rtc_data_t *when, uint32_t msg_content, kernel_
 
     unsigned old_status = disableIRQ();
     bool result;
-    if (target_pid == KERNEL_PID_NULL) {
+    if (target_pid == KERNEL_PID_UNDEF) {
         result = true;
-        alarm_pid = KERNEL_PID_NULL;
+        alarm_pid = KERNEL_PID_UNDEF;
 
         uint8_t b = x86_cmos_read(RTC_REG_B);
         x86_cmos_write(RTC_REG_B, b & ~RTC_REG_B_INT_ALARM);
     }
     else {
-        result = allow_replace || alarm_pid == KERNEL_PID_NULL;
+        result = allow_replace || alarm_pid == KERNEL_PID_UNDEF;
         if (result) {
             alarm_msg_content = msg_content;
             alarm_pid = target_pid;
@@ -246,16 +246,16 @@ bool x86_rtc_set_periodic(uint8_t hz, uint32_t msg_content, kernel_pid_t target_
 
     unsigned old_status = disableIRQ();
     bool result;
-    if (target_pid == KERNEL_PID_NULL || hz == RTC_REG_A_HZ_OFF) {
+    if (target_pid == KERNEL_PID_UNDEF || hz == RTC_REG_A_HZ_OFF) {
         result = true;
-        periodic_pid = KERNEL_PID_NULL;
+        periodic_pid = KERNEL_PID_UNDEF;
 
         uint8_t old_divider = x86_cmos_read(RTC_REG_A) & ~RTC_REG_A_HZ_MASK;
         x86_cmos_write(RTC_REG_A, old_divider | RTC_REG_A_HZ_OFF);
         x86_cmos_write(RTC_REG_B, x86_cmos_read(RTC_REG_B) & ~RTC_REG_B_INT_PERIODIC);
     }
     else {
-        result = allow_replace || periodic_pid == KERNEL_PID_NULL;
+        result = allow_replace || periodic_pid == KERNEL_PID_UNDEF;
         if (result) {
             periodic_msg_content = msg_content;
             periodic_pid = target_pid;
@@ -278,14 +278,14 @@ bool x86_rtc_set_update(uint32_t msg_content, kernel_pid_t target_pid, bool allo
 
     unsigned old_status = disableIRQ();
     bool result;
-    if (target_pid == KERNEL_PID_NULL) {
+    if (target_pid == KERNEL_PID_UNDEF) {
         result = true;
-        update_pid = KERNEL_PID_NULL;
+        update_pid = KERNEL_PID_UNDEF;
 
         x86_cmos_write(RTC_REG_B, x86_cmos_read(RTC_REG_B) & ~RTC_REG_B_INT_UPDATE);
     }
     else {
-        result = allow_replace || update_pid == KERNEL_PID_NULL;
+        result = allow_replace || update_pid == KERNEL_PID_UNDEF;
         if (result) {
             update_msg_content = msg_content;
             update_pid = target_pid;

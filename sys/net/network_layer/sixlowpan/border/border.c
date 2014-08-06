@@ -76,7 +76,7 @@ kernel_pid_t border_get_serial_reader()
 
 void serial_reader_f(void)
 {
-    kernel_pid_t main_pid = KERNEL_PID_NULL;
+    kernel_pid_t main_pid = KERNEL_PID_UNDEF;
     int bytes;
     msg_t m;
     border_packet_t *uart_buf;

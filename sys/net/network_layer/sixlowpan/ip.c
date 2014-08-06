@@ -52,9 +52,9 @@ ipv6_hdr_t *ipv6_buf;
 icmpv6_hdr_t *icmp_buf;
 uint8_t *nextheader;
 
-kernel_pid_t udp_packet_handler_pid = KERNEL_PID_NULL;
-kernel_pid_t tcp_packet_handler_pid = KERNEL_PID_NULL;
-kernel_pid_t rpl_process_pid = KERNEL_PID_NULL;
+kernel_pid_t udp_packet_handler_pid = KERNEL_PID_UNDEF;
+kernel_pid_t tcp_packet_handler_pid = KERNEL_PID_UNDEF;
+kernel_pid_t rpl_process_pid = KERNEL_PID_UNDEF;
 ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t *) = 0;
 
 static ipv6_net_if_ext_t ipv6_net_if_ext[NET_IF_MAX];
@@ -259,7 +259,7 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
         case (ICMPV6_TYPE_RPL_CONTROL): {
             DEBUG("INFO: packet type: RPL message\n");
 
-            if (rpl_process_pid != KERNEL_PID_NULL) {
+            if (rpl_process_pid != KERNEL_PID_UNDEF) {
                 msg_t m_send;
                 m_send.content.ptr = (char *) &hdr->code;
                 msg_send(&m_send, rpl_process_pid, 1);
@@ -379,7 +379,7 @@ void *ipv6_process(void *arg)
                 }
 
                 case (IPV6_PROTO_NUM_TCP): {
-                    if (tcp_packet_handler_pid != KERNEL_PID_NULL) {
+                    if (tcp_packet_handler_pid != KERNEL_PID_UNDEF) {
                         m_send.content.ptr = (char *) ipv6_buf;
                         msg_send_receive(&m_send, &m_recv, tcp_packet_handler_pid);
                     }
@@ -391,7 +391,7 @@ void *ipv6_process(void *arg)
                 }
 
                 case (IPV6_PROTO_NUM_UDP): {
-                    if (udp_packet_handler_pid != KERNEL_PID_NULL) {
+                    if (udp_packet_handler_pid != KERNEL_PID_UNDEF) {
                         m_send.content.ptr = (char *) ipv6_buf;
                         msg_send_receive(&m_send, &m_recv, udp_packet_handler_pid);
                     }

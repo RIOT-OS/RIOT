@@ -123,10 +123,10 @@ uint8_t comp_buf[512];
 uint8_t first_frag = 0;
 mutex_t fifo_mutex = MUTEX_INIT;
 
-kernel_pid_t ip_process_pid = KERNEL_PID_NULL;
-kernel_pid_t nd_nbr_cache_rem_pid = KERNEL_PID_NULL;
-kernel_pid_t contexts_rem_pid = KERNEL_PID_NULL;
-kernel_pid_t transfer_pid = KERNEL_PID_NULL;
+kernel_pid_t ip_process_pid = KERNEL_PID_UNDEF;
+kernel_pid_t nd_nbr_cache_rem_pid = KERNEL_PID_UNDEF;
+kernel_pid_t contexts_rem_pid = KERNEL_PID_UNDEF;
+kernel_pid_t transfer_pid = KERNEL_PID_UNDEF;
 
 mutex_t lowpan_context_mutex = MUTEX_INIT;
 
@@ -1788,7 +1788,7 @@ int sixlowpan_lowpan_init(void)
     /* init mac-layer and radio transceiver */
     sixlowpan_mac_init();
 
-    if (ip_process_pid == KERNEL_PID_NULL) {
+    if (ip_process_pid == KERNEL_PID_UNDEF) {
         ip_process_pid = thread_create(ip_process_buf, IP_PROCESS_STACKSIZE,
                                        PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                        ipv6_process, NULL, "ip_process");

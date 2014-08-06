@@ -5,10 +5,10 @@
 #include <inttypes.h>
 
 /**
- * @def KERNEL_PID_NULL
+ * @def KERNEL_PID_UNDEF
  * @brief Identifier to detect an invalid PID
  */
-#define KERNEL_PID_NULL -1
+#define KERNEL_PID_UNDEF -1
 
 /**
  * Macro for printing formatter

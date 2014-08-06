@@ -72,7 +72,7 @@ typedef struct pthread_thread {
 static pthread_thread_t *volatile pthread_sched_threads[MAXTHREADS];
 static struct mutex_t pthread_mutex;
 
-static volatile int pthread_reaper_pid = KERNEL_PID_NULL;
+static volatile int pthread_reaper_pid = KERNEL_PID_UNDEF;
 
 static char pthread_reaper_stack[PTHREAD_REAPER_STACKSIZE];
 
@@ -184,7 +184,7 @@ void pthread_exit(void *retval)
             ct->__routine(ct->__arg);
         }
 
-        self->thread_pid = KERNEL_PID_NULL;
+        self->thread_pid = KERNEL_PID_UNDEF;
         DEBUG("pthread_exit(%p), self == %p\n", retval, (void *) self);
         if (self->status != PTS_DETACHED) {
             self->returnval = retval;
