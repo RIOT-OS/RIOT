@@ -80,9 +80,11 @@ void _native_handle_tap_input(void)
 
     nread = real_read(_native_tap_fd, &frame, sizeof(union eth_frame));
     DEBUG("_native_handle_tap_input - read %d bytes\n", nread);
+
     if (nread > 0) {
         if (ntohs(frame.field.header.ether_type) == NATIVE_ETH_PROTO) {
             nread = nread - ETHER_HDR_LEN;
+
             if ((nread - 1) <= 0) {
                 DEBUG("_native_handle_tap_input: no payload\n");
             }
@@ -93,16 +95,18 @@ void _native_handle_tap_input(void)
                 p.dst = ntohs(frame.field.payload.nn_header.dst);
                 p.rssi = 0;
                 p.lqi = 0;
-                p.toa.seconds = HWTIMER_TICKS_TO_US(t)/1000000;
-                p.toa.microseconds = HWTIMER_TICKS_TO_US(t)%1000000;
+                p.toa.seconds = HWTIMER_TICKS_TO_US(t) / 1000000;
+                p.toa.microseconds = HWTIMER_TICKS_TO_US(t) % 1000000;
                 /* XXX: check overflow */
                 p.length = ntohs(frame.field.payload.nn_header.length);
                 p.data = frame.field.payload.data;
+
                 if (p.length > (nread - sizeof(struct nativenet_header))) {
                     warnx("_native_handle_tap_input: packet with malicious length field received, discarding");
                 }
                 else {
-                    DEBUG("_native_handle_tap_input: received packet of length %" PRIu16 " for %" PRIu16 " from %" PRIu16 "\n", p.length, p.dst, p.src);
+                    DEBUG("_native_handle_tap_input: received packet of length %" PRIu16 " for %" PRIu16 " from %"
+                          PRIu16 "\n", p.length, p.dst, p.src);
                     _nativenet_handle_packet(&p);
                 }
             }
@@ -119,10 +123,11 @@ void _native_handle_tap_input(void)
         FD_SET(_native_tap_fd, &rfds);
 
         _native_in_syscall++; // no switching here
-        if (select(_native_tap_fd +1, &rfds, NULL, NULL, &t) == 1) {
+
+        if (select(_native_tap_fd + 1, &rfds, NULL, NULL, &t) == 1) {
             int sig = SIGIO;
             extern int _sig_pipefd[2];
-            extern ssize_t (*real_write)(int fd, const void *buf, size_t count);
+            extern ssize_t (*real_write)(int fd, const void * buf, size_t count);
             real_write(_sig_pipefd[1], &sig, sizeof(int));
             _native_sigpend++;
             DEBUG("_native_handle_tap_input: sigpend++\n");
@@ -133,10 +138,11 @@ void _native_handle_tap_input(void)
             kill(sigio_child_pid, SIGCONT);
 #endif
         }
+
         _native_in_syscall--;
     }
     else if (nread == -1) {
-        if ((errno == EAGAIN ) || (errno == EWOULDBLOCK)) {
+        if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
             //warn("read");
         }
         else {
@@ -166,16 +172,19 @@ void sigio_child(void)
      * available */
 
     fd_set rfds;
+
     while (1) {
         FD_ZERO(&rfds);
         FD_SET(_native_tap_fd, &rfds);
-        if (select(_native_tap_fd +1, &rfds, NULL, NULL, NULL) == 1) {
+
+        if (select(_native_tap_fd + 1, &rfds, NULL, NULL, NULL) == 1) {
             kill(parent, SIGIO);
         }
         else {
             kill(parent, SIGKILL);
             err(EXIT_FAILURE, "osx_sigio_child: select");
         }
+
         pause();
     }
 }
@@ -187,7 +196,7 @@ int _native_marshall_ethernet(uint8_t *framebuf, radio_packet_t *packet)
     union eth_frame *f;
     unsigned char addr[ETHER_ADDR_LEN];
 
-    f = (union eth_frame*)framebuf;
+    f = (union eth_frame *)framebuf;
     addr[0] = addr[1] = addr[2] = addr[3] = addr[4] = addr[5] = 0xFF;
 
     memcpy(f->field.header.ether_dhost, addr, ETHER_ADDR_LEN);
@@ -206,7 +215,7 @@ int _native_marshall_ethernet(uint8_t *framebuf, radio_packet_t *packet)
      * Linux does this on its own, but it doesn't hurt to do it here.
      * As of now only tuntaposx needs this. */
     if (data_len < ETHERMIN) {
-        DEBUG("padding data! (%d -> ", data_len);
+        DEBUG("padding data!(%d -> ", data_len);
         data_len = ETHERMIN;
         DEBUG("%d)\n", data_len);
     }
@@ -221,15 +230,17 @@ int8_t send_buf(radio_packet_t *packet)
 
     memset(buf, 0, sizeof(buf));
 
-    DEBUG("send_buf:  Sending packet of length %" PRIu16 " from %" PRIu16 " to %" PRIu16 "\n", packet->length, packet->src, packet->dst);
+    DEBUG("send_buf:  Sending packet of length %" PRIu16 " from %" PRIu16 " to %" PRIu16 "\n",
+          packet->length, packet->src, packet->dst);
     to_send = _native_marshall_ethernet(buf, packet);
 
     DEBUG("send_buf: trying to send %d bytes\n", to_send);
 
-    if ((nsent = _native_write(_native_tap_fd, buf, to_send)) == -1) {;
+    if ((nsent = _native_write(_native_tap_fd, buf, to_send)) == -1) {
         warn("write");
         return -1;
     }
+
     return (nsent > INT8_MAX ? INT8_MAX : nsent);
 }
 
@@ -238,10 +249,10 @@ int tap_init(char *name)
 
 #ifdef __MACH__ /* OSX */
     char clonedev[255] = "/dev/"; /* XXX bad size */
-    strncpy(clonedev+5, name, 250);
+    strncpy(clonedev + 5, name, 250);
 #elif defined(__FreeBSD__)
     char clonedev[255] = "/dev/"; /* XXX bad size */
-    strncpy(clonedev+5, name, 250);
+    strncpy(clonedev + 5, name, 250);
 #else /* Linux */
     struct ifreq ifr;
     const char *clonedev = "/dev/net/tun";
@@ -253,11 +264,12 @@ int tap_init(char *name)
     }
 
 #if (defined(__MACH__) || defined(__FreeBSD__)) /* OSX/FreeBSD */
-    struct ifaddrs* iflist;
+    struct ifaddrs *iflist;
+
     if (getifaddrs(&iflist) == 0) {
         for (struct ifaddrs *cur = iflist; cur; cur = cur->ifa_next) {
             if ((cur->ifa_addr->sa_family == AF_LINK) && (strcmp(cur->ifa_name, name) == 0) && cur->ifa_addr) {
-                struct sockaddr_dl* sdl = (struct sockaddr_dl*)cur->ifa_addr;
+                struct sockaddr_dl *sdl = (struct sockaddr_dl *)cur->ifa_addr;
                 memcpy(_native_tap_mac, LLADDR(sdl), sdl->sdl_alen);
                 break;
             }
@@ -265,6 +277,7 @@ int tap_init(char *name)
 
         freeifaddrs(iflist);
     }
+
 #else /* Linux */
     memset(&ifr, 0, sizeof(ifr));
     ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
@@ -282,21 +295,26 @@ int tap_init(char *name)
 
 
     /* get MAC address */
-    memset (&ifr, 0, sizeof (ifr));
-    snprintf (ifr.ifr_name, sizeof (ifr.ifr_name), "%s", name);
+    memset(&ifr, 0, sizeof(ifr));
+    snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", name);
+
     if (ioctl(_native_tap_fd, SIOCGIFHWADDR, &ifr) == -1) {
         _native_in_syscall++;
         warn("ioctl SIOCGIFHWADDR");
+
         if (real_close(_native_tap_fd) == -1) {
             warn("close");
         }
+
         exit(EXIT_FAILURE);
     }
+
     memcpy(_native_tap_mac, ifr.ifr_hwaddr.sa_data, ETHER_ADDR_LEN);
 #endif
-    DEBUG("_native_tap_mac: %02x:%02x:%02x:%02x:%02x:%02x\n", _native_tap_mac[0], _native_tap_mac[1], _native_tap_mac[2], _native_tap_mac[3], _native_tap_mac[4], _native_tap_mac[5]);
+    DEBUG("_native_tap_mac: %02x:%02x:%02x:%02x:%02x:%02x\n", _native_tap_mac[0], _native_tap_mac[1],
+          _native_tap_mac[2], _native_tap_mac[3], _native_tap_mac[4], _native_tap_mac[5]);
 
-    unsigned char *eui_64 = (unsigned char*)&_native_net_addr_long;
+    unsigned char *eui_64 = (unsigned char *)&_native_net_addr_long;
     eui_64[0] = _native_tap_mac[0];
     eui_64[1] = _native_tap_mac[1];
     eui_64[2] = _native_tap_mac[2];
@@ -314,15 +332,17 @@ int tap_init(char *name)
      * check http://sourceforge.net/p/tuntaposx/bugs/17/ */
     sigio_child();
 #else
+
     /* configure fds to send signals on io */
     if (fcntl(_native_tap_fd, F_SETOWN, _native_pid) == -1) {
         err(EXIT_FAILURE, "tap_init(): fcntl(F_SETOWN)");
     }
 
     /* set file access mode to nonblocking */
-    if (fcntl(_native_tap_fd, F_SETFL, O_NONBLOCK|O_ASYNC) == -1) {
+    if (fcntl(_native_tap_fd, F_SETFL, O_NONBLOCK | O_ASYNC) == -1) {
         err(EXIT_FAILURE, "tap_init(): fcntl(F_SETFL)");
     }
+
 #endif /* not OSX */
 
     DEBUG("RIOT native tap initialized.\n");

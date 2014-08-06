@@ -126,7 +126,8 @@ uint64_t nativenet_set_address_long(uint64_t address)
 int8_t nativenet_send(radio_packet_t *packet)
 {
     packet->src = _native_net_addr;
-    DEBUG("nativenet_send:  Sending packet of length %" PRIu16 " from %" PRIu16 " to %" PRIu16 "\n", packet->length, packet->src, packet->dst);
+    DEBUG("nativenet_send:  Sending packet of length %" PRIu16 " from %" PRIu16 " to %" PRIu16 "\n",
+          packet->length, packet->src, packet->dst);
 
     return send_buf(packet);
 }
@@ -200,7 +201,8 @@ void _nativenet_handle_packet(radio_packet_t *packet)
     DEBUG("\n\t\trx_buffer_next: %i\n\n", rx_buffer_next);
     memcpy(&_nativenet_rx_buffer[rx_buffer_next].data, packet->data, packet->length);
     memcpy(&_nativenet_rx_buffer[rx_buffer_next].packet, packet, sizeof(radio_packet_t));
-    _nativenet_rx_buffer[rx_buffer_next].packet.data = (uint8_t *) &_nativenet_rx_buffer[rx_buffer_next].data;
+    _nativenet_rx_buffer[rx_buffer_next].packet.data = (uint8_t *)
+            &_nativenet_rx_buffer[rx_buffer_next].data;
 
     /* notify transceiver thread if any */
     if (_native_net_tpid != KERNEL_PID_UNDEF) {
