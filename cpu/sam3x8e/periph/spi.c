@@ -18,11 +18,14 @@
  * @}
  */
 
+
 #include "cpu.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 #include "periph/spi.h"
 #include "sam3x8e.h"
+
+#if SPI_NUMOF
 
 typedef struct {
     char(*cb)(char data);
@@ -47,13 +50,6 @@ void spi_poweron(spi_t dev)
             SPI_0_PORT_CLKEN();/* Enable peripheral clock for PIOA */
             break;
 #endif
-#if SPI_1_EN
-
-        case SPI_1:
-            SPI_1_CLKEN();
-            break;
-#endif
-
     }
 
     return;
@@ -71,15 +67,6 @@ void spi_poweroff(spi_t dev)
             SPI_0_CLKDIS();
             break;
 #endif
-#if SPI_1_EN
-
-        case SPI_1:
-            while (!(SPI_1_DEV->SPI_SR & SPI_SR_SPIENS)); /* wait until no more busy */
-
-            SPI_1_CLKDIS();
-            break;
-#endif
-
     }
 
     return;
@@ -344,12 +331,6 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
             spi_port = SPI_0_DEV;
             break;
 #endif
-#if SPI_1_EN
-
-        case SPI_1:
-            spi_port = SPI_1_DEV;
-            break;
-#endif
     }
 
     while (!(spi_port->SPI_SR & SPI_SR_TDRE));
@@ -408,13 +389,6 @@ void spi_transmission_begin(spi_t dev, char reset_val)
             break;
 #endif
 
-#if SPI_1_EN
-
-        case SPI_1:
-            spi_port = SPI_1_DEV;
-            break;
-#endif
-
     }
 
     spi_port->SPI_TDR = SPI_TDR_TD(reset_val);
@@ -432,12 +406,7 @@ static inline void irq_handler(spi_t dev)
         case SPI_0:
             spi_port = SPI_0_DEV;
             break;
-#endif
-#if SPI_1_EN
 
-        case SPI_1:
-            spi_port = SPI_1_DEV;
-            break;
 #endif
     }
 
@@ -484,8 +453,7 @@ __attribute__((naked)) void isr_pioa(void)
 }
 #endif
 
-
-
+#endif
 
 
 
