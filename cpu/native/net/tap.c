@@ -127,7 +127,7 @@ void _native_handle_tap_input(void)
         if (select(_native_tap_fd + 1, &rfds, NULL, NULL, &t) == 1) {
             int sig = SIGIO;
             extern int _sig_pipefd[2];
-            extern ssize_t (*real_write)(int fd, const void * buf, size_t count);
+            extern ssize_t (*real_write)(int fd, const void *buf, size_t count);
             real_write(_sig_pipefd[1], &sig, sizeof(int));
             _native_sigpend++;
             DEBUG("_native_handle_tap_input: sigpend++\n");
@@ -215,7 +215,7 @@ int _native_marshall_ethernet(uint8_t *framebuf, radio_packet_t *packet)
      * Linux does this on its own, but it doesn't hurt to do it here.
      * As of now only tuntaposx needs this. */
     if (data_len < ETHERMIN) {
-        DEBUG("padding data!(%d -> ", data_len);
+        DEBUG("padding data! (%d -> ", data_len);
         data_len = ETHERMIN;
         DEBUG("%d)\n", data_len);
     }
@@ -314,7 +314,7 @@ int tap_init(char *name)
     DEBUG("_native_tap_mac: %02x:%02x:%02x:%02x:%02x:%02x\n", _native_tap_mac[0], _native_tap_mac[1],
           _native_tap_mac[2], _native_tap_mac[3], _native_tap_mac[4], _native_tap_mac[5]);
 
-    unsigned char *eui_64 = (unsigned char *)&_native_net_addr_long;
+    unsigned char *eui_64 = (unsigned char *)(&(_nativenet_default_dev_more._long_addr));
     eui_64[0] = _native_tap_mac[0];
     eui_64[1] = _native_tap_mac[1];
     eui_64[2] = _native_tap_mac[2];
@@ -338,7 +338,7 @@ int tap_init(char *name)
         err(EXIT_FAILURE, "tap_init(): fcntl(F_SETOWN)");
     }
 
-    /* set file access mode to nonblocking */
+    /* set file access mode to non-blocking */
     if (fcntl(_native_tap_fd, F_SETFL, O_NONBLOCK | O_ASYNC) == -1) {
         err(EXIT_FAILURE, "tap_init(): fcntl(F_SETFL)");
     }

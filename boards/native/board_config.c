@@ -41,7 +41,7 @@ void config_load(void)
     sysconfig.id = _native_id;
 
 #ifdef MODULE_NATIVENET
-    _native_net_addr = _native_id;
+    _nativenet_default_dev_more._radio_addr = _native_id;
 #endif
 
     return;

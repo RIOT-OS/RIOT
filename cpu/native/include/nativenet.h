@@ -28,9 +28,16 @@
 #include <net/ethernet.h>
 
 #include "kernel_types.h"
+#include "netdev/base.h"
 
 #define RX_BUF_SIZE (10)
 #define TRANSCEIVER_BUFFER_SIZE (3)
+
+/**
+ * @brief   Number of registrable netdev_rcv_data_cb_t callbacks per nativenet
+ *          device
+ */
+#define NATIVENET_DEV_CB_MAX  (128)
 
 #ifndef NATIVE_MAX_DATA_LENGTH
 #include "tap.h"
@@ -44,7 +51,17 @@
 #endif /* NATIVE_MAX_DATA_LENGTH */
 
 /**
- * Initialize transceiver
+ * @brief   Implementation of netdev_driver_t for nativenet
+ */
+extern const netdev_driver_t nativenet_driver;
+
+/**
+ * @brief   Default @netdev API device
+ */
+extern netdev_t nativenet_default_dev;
+
+/**
+ * Initialize @ref sys_transceiver and @ref nativenet_default_dev
  *
  * @param transceiver_pid the pid of the transceiver thread
  */
