@@ -122,7 +122,12 @@ void udp_send(int argc, char **argv)
 
     memset(&sa, 0, sizeof(sa));
 
-    ipv6_addr_init(&ipaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, (uint16_t)address);
+    if (address) {
+        ipv6_addr_init(&ipaddr, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x00ff, 0xfe00, (uint16_t)address);
+    }
+    else {
+        ipv6_addr_set_all_nodes_addr(&ipaddr);
+    }
 
     sa.sin6_family = AF_INET;
     memcpy(&sa.sin6_addr, &ipaddr, 16);
