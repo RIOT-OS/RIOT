@@ -44,7 +44,7 @@ else
 endif
 
 test: SHELL=bash
-test:
+test: all
 	@exec 5>&1 && \
 	LOG=$$("$(MAKE)" -s term | tee >(cat - >&5)) && \
 	grep 'OK ([1-9][0-9]* tests)' <<< $${LOG} > /dev/null
