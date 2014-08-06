@@ -65,8 +65,3 @@ all:
 
 all-debug: export CFLAGS += -ggdb3 -O0
 all-debug: all
-
-ifeq (, $(filter all-debug, $(MAKECMDGOALS)))
-  CFLAGS += -Os -ffunction-sections -fdata-sections
-  LINKFLAGS += -Wl,--gc-sections
-endif
