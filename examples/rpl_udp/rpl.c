@@ -26,7 +26,7 @@
 #include "sixlowpan.h"
 #include "destiny.h"
 #include "rpl.h"
-#include "rpl_dodag.h"
+#include "rpl/rpl_dodag.h"
 #include "rpl_udp.h"
 #include "transceiver.h"
 

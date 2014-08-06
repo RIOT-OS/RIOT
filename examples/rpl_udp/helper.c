@@ -25,7 +25,7 @@
 #include "sixlowpan/ip.h"
 #include "transceiver.h"
 #include "ieee802154_frame.h"
-#include "rpl_structs.h"
+#include "rpl/rpl_structs.h"
 
 #include "rpl_udp.h"
 
