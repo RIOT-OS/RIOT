@@ -182,7 +182,7 @@ kernel_pid_t transceiver_start(void)
 {
     transceiver_pid = thread_create(transceiver_stack, TRANSCEIVER_STACK_SIZE, PRIORITY_MAIN - 3, CREATE_STACKTEST, run, NULL, "Transceiver");
 
-    if (transceiver_pid < 0) {
+    if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Error creating transceiver thread");
     }
 

@@ -68,7 +68,7 @@ void _transceiver_get_set_address_handler(int argc, char **argv)
     transceiver_command_t tcmd;
     radio_address_t a;
 
-    if (transceiver_pid < 0) {
+    if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
         return;
     }
@@ -147,7 +147,7 @@ void _transceiver_get_set_long_addr_handler(int argc, char **argv)
     transceiver_command_t tcmd;
     transceiver_eui64_t a;
 
-    if (transceiver_pid < 0) {
+    if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
         return;
     }
@@ -183,7 +183,7 @@ void _transceiver_get_set_channel_handler(int argc, char **argv)
     transceiver_command_t tcmd;
     int32_t c;
 
-    if (transceiver_pid < 0) {
+    if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
         return;
     }
@@ -212,7 +212,7 @@ void _transceiver_get_set_channel_handler(int argc, char **argv)
 
 void _transceiver_send_handler(int argc, char **argv)
 {
-    if (transceiver_pid < 0) {
+    if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
         return;
     }
@@ -264,7 +264,7 @@ void _transceiver_send_handler(int argc, char **argv)
 /* checked for type safety */
 void _transceiver_monitor_handler(int argc, char **argv)
 {
-    if (transceiver_pid < 0) {
+    if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
         return;
     }
@@ -290,7 +290,7 @@ void _transceiver_monitor_handler(int argc, char **argv)
 /* checked for type safety */
 void _transceiver_get_set_pan_handler(int argc, char **argv)
 {
-    if (transceiver_pid < 0) {
+    if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
         return;
     }
@@ -325,7 +325,7 @@ void _transceiver_get_set_pan_handler(int argc, char **argv)
 void _transceiver_set_ignore_handler(int argc, char **argv)
 {
 
-    if (transceiver_pid < 0) {
+    if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not initialized");
         return;
     }

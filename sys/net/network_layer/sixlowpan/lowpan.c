@@ -1794,7 +1794,7 @@ int sixlowpan_lowpan_init(void)
                                        ipv6_process, NULL, "ip_process");
     }
 
-    if (ip_process_pid < 0) {
+    if (ip_process_pid == KERNEL_PID_UNDEF) {
         return 0;
     }
 
@@ -1804,7 +1804,7 @@ int sixlowpan_lowpan_init(void)
                                      PRIORITY_MAIN + 1, CREATE_STACKTEST,
                                      lowpan_context_auto_remove, NULL, "lowpan_context_rem");
 
-    if (contexts_rem_pid < 0) {
+    if (contexts_rem_pid == KERNEL_PID_UNDEF) {
         return 0;
     }
 
@@ -1812,7 +1812,7 @@ int sixlowpan_lowpan_init(void)
                                  PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                  lowpan_transfer, NULL, "lowpan_transfer");
 
-    if (transfer_pid < 0) {
+    if (transfer_pid == KERNEL_PID_UNDEF) {
         return 0;
     }
 

@@ -117,7 +117,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
     pthread_thread_t *pt = calloc(1, sizeof(pthread_thread_t));
 
     kernel_pid_t pthread_pid = insert(pt);
-    if (pthread_pid < 0) {
+    if (pthread_pid == KERNEL_PID_UNDEF) {
         free(pt);
         return -1;
     }
@@ -155,7 +155,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
                                    pthread_start_routine,
                                    pt,
                                    "pthread");
-    if (pt->thread_pid < 0) {
+    if (pt->thread_pid == KERNEL_PID_UNDEF) {
         free(pt->stack);
         free(pt);
         pthread_sched_threads[pthread_pid-1] = NULL;

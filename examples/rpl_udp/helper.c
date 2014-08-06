@@ -123,7 +123,7 @@ void rpl_udp_ignore(int argc, char **argv)
 {
     uint16_t a;
 
-    if (transceiver_pid < 0) {
+    if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not runnning.");
         return;
     }

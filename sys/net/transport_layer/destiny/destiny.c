@@ -46,7 +46,7 @@ int destiny_init_transport_layer(void)
                                        PRIORITY_MAIN, CREATE_STACKTEST,
                                        udp_packet_handler, NULL, "udp_packet_handler");
 
-    if (udp_thread_pid < 0) {
+    if (udp_thread_pid == KERNEL_PID_UNDEF) {
         return -1;
     }
 
@@ -66,7 +66,7 @@ int destiny_init_transport_layer(void)
                                        PRIORITY_MAIN, CREATE_STACKTEST,
                                        tcp_packet_handler, NULL, "tcp_packet_handler");
 
-    if (tcp_thread_pid < 0) {
+    if (tcp_thread_pid == KERNEL_PID_UNDEF) {
         return -1;
     }
 

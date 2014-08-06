@@ -78,7 +78,7 @@ void cc2420_rx_handler(void)
 #endif
 
         /* notify transceiver thread if any */
-        if (transceiver_pid > KERNEL_PID_UNDEF) {
+        if (transceiver_pid != KERNEL_PID_UNDEF) {
             msg_t m;
             m.type = (uint16_t) RCV_PKT_CC2420;
             m.content.value = rx_buffer_next;
