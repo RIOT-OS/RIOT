@@ -53,10 +53,10 @@ def get_lines(readline, prefix):
             continue
 
         result = result[len(prefix):].rstrip().split(' .. ')[::-1]
-        if len(result) == 2:
+        if (len(result) == 2) or (len(result) == 3 and 'retrying' in result[1]):
             stdout.write('.')
             stdout.flush()
-            yield result
+            yield (' .. '.join(result[:-1]), result[-1])
 
 for folder in ('examples', 'tests'):
     print('Building all applications in: \033[1;34m{}\033[0m'.format(folder))
@@ -65,21 +65,31 @@ for folder in ('examples', 'tests'):
     applications = filter(lambda app: is_tracked(join(riotbase, folder, app)), applications)
     applications = sorted(applications)
 
+    subprocess_env = environ.copy()
+    subprocess_env['RIOT_DO_RETRY'] = '1'
+
     for nth, application in enumerate(applications, 1):
         stdout.write('\tBuilding application: \033[1;34m{}\033[0m ({}/{}) '.format(application, nth, len(applications)))
         stdout.flush()
         try:
             subprocess = Popen(('make', 'buildtest'),
                                bufsize=1, stdin=null, stdout=PIPE, stderr=null,
-                               cwd=join(riotbase, folder, application))
+                               cwd=join(riotbase, folder, application),
+                               env=subprocess_env)
 
             lines = get_lines(subprocess.stdout.readline, 'Building for ')
             lines = groupby(sorted(lines), lambda (outcome, board): outcome)
+
+            print()
             for group, results in lines:
-                print('\n\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board in results))))
+                print('\t\t{}: {}'.format(group, ', '.join(sorted(board for outcome, board in results))))
 
             returncode = subprocess.wait()
-            (failed if returncode else success).append(application)
+            if returncode == 0:
+                success.append(application)
+            else:
+                failed.append(application)
+                subprocess_env.pop('RIOT_DO_RETRY', None)
         except Exception, e:
             print('\n\t\tException: {}'.format(e))
             exceptions.append(application)
