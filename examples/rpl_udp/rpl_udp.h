@@ -86,9 +86,6 @@ void *rpl_udp_monitor(void *arg);
 /** @brief The nodes radio address */
 extern radio_address_t id;
 
-/** @brief The node's default IP address */
-extern ipv6_addr_t std_addr;
-
 /** @brief Char array for IP address printing */
 extern char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif /* RPL_UDP_H */

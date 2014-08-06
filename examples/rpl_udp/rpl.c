@@ -37,7 +37,6 @@
 
 char monitor_stack_buffer[MONITOR_STACK_SIZE];
 radio_address_t id;
-ipv6_addr_t std_addr;
 
 uint8_t is_root = 0;
 
@@ -104,17 +103,15 @@ void rpl_udp_init(int argc, char **argv)
         return;
     }
 
-    /* TODO: check if this works as intended */
-    ipv6_addr_t prefix, tmp;
-    ipv6_addr_init(&std_addr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, id);
-    ipv6_addr_init_prefix(&prefix, &std_addr, 64);
-    ndp_add_prefix_info(0, &prefix, 64, NDP_OPT_PI_VLIFETIME_INFINITE,
-                        NDP_OPT_PI_PLIFETIME_INFINITE, 1,
-                        ICMPV6_NDP_OPT_PI_FLAG_AUTONOM);
-    ipv6_init_as_router();
     /* add global address */
-    ipv6_addr_set_by_eui64(&tmp, 0, &std_addr);
+    ipv6_addr_t tmp;
+    /* initialize prefix */
+    ipv6_addr_init(&tmp, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, id);
+    /* set host suffix */
+    ipv6_addr_set_by_eui64(&tmp, 0, &tmp);
     ipv6_net_if_add_addr(0, &tmp, NDP_ADDR_STATE_PREFERRED, 0, 0, 0);
+
+    ipv6_init_as_router();
 
     /* set channel to 10 */
     tcmd.transceivers = TRANSCEIVER;
