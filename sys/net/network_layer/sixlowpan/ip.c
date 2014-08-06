@@ -54,7 +54,7 @@ uint8_t *nextheader;
 
 kernel_pid_t udp_packet_handler_pid = KERNEL_PID_UNDEF;
 kernel_pid_t tcp_packet_handler_pid = KERNEL_PID_UNDEF;
-kernel_pid_t rpl_process_pid = KERNEL_PID_UNDEF;
+static volatile  kernel_pid_t _rpl_process_pid = KERNEL_PID_UNDEF;
 ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t *) = 0;
 
 static ipv6_net_if_ext_t ipv6_net_if_ext[NET_IF_MAX];
@@ -259,10 +259,10 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
         case (ICMPV6_TYPE_RPL_CONTROL): {
             DEBUG("INFO: packet type: RPL message\n");
 
-            if (rpl_process_pid != KERNEL_PID_UNDEF) {
+            if (_rpl_process_pid != KERNEL_PID_UNDEF) {
                 msg_t m_send;
                 m_send.content.ptr = (char *) &hdr->code;
-                msg_send(&m_send, rpl_process_pid, 1);
+                msg_send(&m_send, _rpl_process_pid, 1);
             }
             else {
                 DEBUG("INFO: no RPL handler registered\n");
@@ -787,7 +787,7 @@ void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t *dest)
 
 void ipv6_register_rpl_handler(kernel_pid_t pid)
 {
-    rpl_process_pid = pid;
+    _rpl_process_pid = pid;
 }
 
 uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t proto)

@@ -54,7 +54,7 @@ enum pthread_thread_status {
 };
 
 typedef struct pthread_thread {
-    kernel_pid_t thread_pid = KERNEL_PID_UNDEF;
+    kernel_pid_t thread_pid;
 
     enum pthread_thread_status status;
     int joining_thread;
