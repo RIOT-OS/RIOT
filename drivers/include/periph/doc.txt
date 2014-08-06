@@ -6,8 +6,8 @@
  */
 
 /**
- * @defgroup    driver_periph
- * @ingroup     driver
+ * @defgroup    driver_periph   Peripheral drivers
+ * @ingroup     drivers
  * @brief       Low-level peripheral drivers
  *
  * The module contains the low-level peripheral driver layer. It consists of a set
