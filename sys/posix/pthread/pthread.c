@@ -57,7 +57,7 @@ typedef struct pthread_thread {
     kernel_pid_t thread_pid;
 
     enum pthread_thread_status status;
-    int joining_thread;
+    kernel_pid_t joining_thread;
     void *returnval;
     bool should_cancel;
 
@@ -72,7 +72,7 @@ typedef struct pthread_thread {
 static pthread_thread_t *volatile pthread_sched_threads[MAXTHREADS];
 static struct mutex_t pthread_mutex;
 
-static volatile int pthread_reaper_pid = KERNEL_PID_UNDEF;
+static volatile kernel_pid_t pthread_reaper_pid = KERNEL_PID_UNDEF;
 
 static char pthread_reaper_stack[PTHREAD_REAPER_STACKSIZE];
 

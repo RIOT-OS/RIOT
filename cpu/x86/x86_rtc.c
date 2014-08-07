@@ -42,7 +42,7 @@
 static bool valid;
 
 static int32_t alarm_msg_content, periodic_msg_content, update_msg_content;
-static unsigned alarm_pid = KERNEL_PID_UNDEF, periodic_pid = KERNEL_PID_UNDEF, update_pid = KERNEL_PID_UNDEF;
+static kernel_pid_t alarm_pid = KERNEL_PID_UNDEF, periodic_pid = KERNEL_PID_UNDEF, update_pid = KERNEL_PID_UNDEF;
 
 static void alarm_callback_default(uint8_t reg_c)
 {

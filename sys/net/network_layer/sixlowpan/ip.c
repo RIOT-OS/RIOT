@@ -65,7 +65,7 @@ static uint8_t ipv6_net_if_addr_buffer_count = 0;
 static uint8_t default_hop_limit = MULTIHOP_HOPLIMIT;
 
 /* registered upper layer threads */
-int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
+kernel_pid_t sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
 int ipv6_send_packet(ipv6_hdr_t *packet)
 {

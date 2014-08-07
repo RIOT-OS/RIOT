@@ -131,7 +131,7 @@ kernel_pid_t transfer_pid = KERNEL_PID_UNDEF;
 mutex_t lowpan_context_mutex = MUTEX_INIT;
 
 /* registered upper layer threads */
-int sixlowpan_reg[SIXLOWPAN_MAX_REGISTERED];
+kernel_pid_t sixlowpan_reg[SIXLOWPAN_MAX_REGISTERED];
 static sixlowpan_lowpan_frame_t current_frame;
 
 char ip_process_buf[IP_PROCESS_STACKSIZE];

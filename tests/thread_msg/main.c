@@ -28,7 +28,7 @@ char t1_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char t3_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
-uint16_t p1, p2, p3;
+kernel_pid_t p1, p2, p3;
 
 void *thread1(void *arg)
 {

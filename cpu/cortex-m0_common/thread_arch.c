@@ -122,7 +122,7 @@ void thread_arch_stack_print(void)
     int count = 0;
     uint32_t *sp = (uint32_t *)sched_active_thread->sp;
 
-    printf("printing the current stack of thread %u\n", thread_getpid());
+    printf("printing the current stack of thread %" PRIkernel_pid "\n", thread_getpid());
     printf("  address:      data:\n");
 
     do {

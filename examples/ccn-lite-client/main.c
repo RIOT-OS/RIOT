@@ -142,7 +142,7 @@ static void riot_ccn_relay_config(int argc, char **argv)
     msg_send(&m, _relay_pid, 1);
 }
 
-static void riot_ccn_transceiver_start(int _relay_pid)
+static void riot_ccn_transceiver_start(kernel_pid_t _relay_pid)
 {
     transceiver_init(TRANSCEIVER);
     int transceiver_pid = transceiver_start();

@@ -58,7 +58,7 @@ extern kernel_pid_t ip_process_pid;
 extern uint8_t buffer[BUFFER_SIZE];
 extern char ip_process_buf[IP_PROCESS_STACKSIZE];
 
-extern int sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
+extern kernel_pid_t sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
 typedef struct __attribute__((packed)) {
     struct net_if_addr_t *addr_next;

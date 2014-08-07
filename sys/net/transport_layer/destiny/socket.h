@@ -61,8 +61,8 @@ typedef struct __attribute__((packed)) {
 
 typedef struct {
     uint8_t             socket_id;
-    uint8_t             recv_pid;
-    uint8_t             send_pid;
+    kernel_pid_t        recv_pid;
+    kernel_pid_t        send_pid;
     uint8_t             tcp_input_buffer_end;
     mutex_t             tcp_buffer_mutex;
     socket_t            socket_values;

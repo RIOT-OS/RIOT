@@ -33,7 +33,7 @@ static char stack_get[KERNEL_CONF_STACKSIZE_DEFAULT];
 static char rb_buf[BUF_SIZE];
 static ringbuffer_t rb = RINGBUFFER_INIT(rb_buf);
 static mutex_t mutex;
-static unsigned pid_add, pid_get;
+static kernel_pid_t pid_add, pid_get;
 
 static void assert_avail(unsigned assumed)
 {
