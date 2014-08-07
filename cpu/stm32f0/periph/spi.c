@@ -32,9 +32,6 @@
 /* guard file in case no SPI device is defined */
 #if SPI_NUMOF
 
-/* this value will be send in return of the first transfered byte when in slave mode */
-#define RESET_VALUE     (0x77)
-
 /**
  * @brief unified interrupt handler to be shared between SPI devices
  *
