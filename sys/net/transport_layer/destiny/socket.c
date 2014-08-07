@@ -676,7 +676,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 
     current_tcp_socket->tcp_control.state = TCP_ESTABLISHED;
 
-    current_int_tcp_socket->recv_pid = KERNEL_PID_NULL;
+    current_int_tcp_socket->recv_pid = KERNEL_PID_UNDEF;
 
     destiny_socket_print_sockets();
     return 0;
@@ -1294,7 +1294,7 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
     msg_reply(&msg_recv_client_ack, &msg_send_client_ack);
 
     /* Reset PID to an invalid value */
-    current_queued_int_socket->recv_pid = KERNEL_PID_NULL;
+    current_queued_int_socket->recv_pid = KERNEL_PID_UNDEF;
 
     /* Waiting for Clients ACK waiting period to time out */
     vtimer_usleep(TCP_SYN_INITIAL_TIMEOUT / 2);

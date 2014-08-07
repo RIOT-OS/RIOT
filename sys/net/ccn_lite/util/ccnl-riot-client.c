@@ -30,8 +30,6 @@
 #include "ccn-lite-ctrl.h"
 #include "ccnl-pdu.h"
 
-msg_t mesg, rep;
-
 int ccnl_riot_client_get(kernel_pid_t relay_pid, char *name, char *reply_buf)
 {
     char *prefix[CCNL_MAX_NAME_COMP];

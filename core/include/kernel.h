@@ -68,12 +68,6 @@
 
 /* ------------------------------------------------------------------------- */
 /**
- * @def PID_NULL
- * @brief Identifier to detect an invalid PID
- */
-#define KERNEL_PID_NULL -1
-
-/**
  * @def PRIORITY_MIN
  * @brief Least priority a thread can have
  */

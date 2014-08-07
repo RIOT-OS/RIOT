@@ -26,7 +26,7 @@ directory for more details.
 //static volatile time_t epoch;
 static struct tm time_to_set;
 static int set_time = 0;
-kernel_pid_t rtc_second_pid = 0;
+kernel_pid_t rtc_second_pid = KERNEL_PID_UNDEF;
 
 /*---------------------------------------------------------------------------*/
 void rtc_init(void)
@@ -195,7 +195,7 @@ interrupt(RTC_VECTOR) __attribute__((naked)) rtc_isr(void)
             RTCYEARH = (time_to_set.tm_year + 1900) >> 0x08;
         }
 
-        if (rtc_second_pid) {
+        if (rtc_second_pid != KERNEL_PID_UNDEF) {
             static msg_t m;
             m.type = RTC_SECOND;
             msg_send_int(&m, rtc_second_pid);

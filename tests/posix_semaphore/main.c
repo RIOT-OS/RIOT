@@ -71,7 +71,7 @@ static void test1(void)
                                      NULL,
                                      "second");
 
-    if (pid < 0) {
+    if (pid == KERNEL_PID_UNDEF) {
         puts("first: thread create failed");
     }
 
@@ -149,7 +149,7 @@ void test2(void)
                                          NULL,
                                          names[i]);
 
-        if (pid < 0) {
+        if (pid == KERNEL_PID_UNDEF) {
             puts("first: thread create failed");
         }
 

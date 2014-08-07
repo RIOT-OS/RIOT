@@ -5,6 +5,12 @@
 #include <inttypes.h>
 
 /**
+ * @def KERNEL_PID_UNDEF
+ * @brief Identifier to detect an invalid PID
+ */
+#define KERNEL_PID_UNDEF -1
+
+/**
  * Macro for printing formatter
  */
 #define PRIkernel_pid PRIi16

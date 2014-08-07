@@ -57,7 +57,7 @@ typedef struct pthread_thread {
     kernel_pid_t thread_pid;
 
     enum pthread_thread_status status;
-    int joining_thread;
+    kernel_pid_t joining_thread;
     void *returnval;
     bool should_cancel;
 
@@ -72,7 +72,7 @@ typedef struct pthread_thread {
 static pthread_thread_t *volatile pthread_sched_threads[MAXTHREADS];
 static struct mutex_t pthread_mutex;
 
-static volatile int pthread_reaper_pid = KERNEL_PID_NULL;
+static volatile kernel_pid_t pthread_reaper_pid = KERNEL_PID_UNDEF;
 
 static char pthread_reaper_stack[PTHREAD_REAPER_STACKSIZE];
 
@@ -117,7 +117,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
     pthread_thread_t *pt = calloc(1, sizeof(pthread_thread_t));
 
     kernel_pid_t pthread_pid = insert(pt);
-    if (pthread_pid < 0) {
+    if (pthread_pid == KERNEL_PID_UNDEF) {
         free(pt);
         return -1;
     }
@@ -132,9 +132,9 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
     void *stack = autofree ? malloc(stack_size) : attr->ss_sp;
     pt->stack = autofree ? stack : NULL;
 
-    if (autofree && pthread_reaper_pid < 0) {
+    if (autofree && pthread_reaper_pid != KERNEL_PID_UNDEF) {
         mutex_lock(&pthread_mutex);
-        if (pthread_reaper_pid < 0) {
+        if (pthread_reaper_pid != KERNEL_PID_UNDEF) {
             /* volatile pid to overcome problems with double checking */
             volatile kernel_pid_t pid = thread_create(pthread_reaper_stack,
                                              PTHREAD_REAPER_STACKSIZE,
@@ -155,7 +155,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
                                    pthread_start_routine,
                                    pt,
                                    "pthread");
-    if (pt->thread_pid < 0) {
+    if (pt->thread_pid == KERNEL_PID_UNDEF) {
         free(pt->stack);
         free(pt);
         pthread_sched_threads[pthread_pid-1] = NULL;
@@ -184,7 +184,7 @@ void pthread_exit(void *retval)
             ct->__routine(ct->__arg);
         }
 
-        self->thread_pid = KERNEL_PID_NULL;
+        self->thread_pid = KERNEL_PID_UNDEF;
         DEBUG("pthread_exit(%p), self == %p\n", retval, (void *) self);
         if (self->status != PTS_DETACHED) {
             self->returnval = retval;

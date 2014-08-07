@@ -45,7 +45,7 @@ static volatile uint8_t rx_buffer_next;
 uint8_t _native_net_chan;
 uint16_t _native_net_pan;
 uint8_t _native_net_monitor;
-static int _native_net_tpid;
+static kernel_pid_t _native_net_tpid = KERNEL_PID_UNDEF;
 radio_address_t _native_net_addr;
 uint64_t _native_net_addr_long;
 
@@ -203,7 +203,7 @@ void _nativenet_handle_packet(radio_packet_t *packet)
     _nativenet_rx_buffer[rx_buffer_next].packet.data = (uint8_t *) &_nativenet_rx_buffer[rx_buffer_next].data;
 
     /* notify transceiver thread if any */
-    if (_native_net_tpid) {
+    if (_native_net_tpid != KERNEL_PID_UNDEF) {
         DEBUG("_nativenet_handle_packet: notifying transceiver thread!\n");
         msg_t m;
         m.type = (uint16_t) RCV_PKT_NATIVE;

@@ -173,7 +173,7 @@ void cc1100_phy_init(void)
     memset(seq_buffer, 0, sizeof(seq_buffer_entry_t) * MAX_SEQ_BUFFER_SIZE);
 
     /* Initialize mutex */
-    cc1100_mutex_pid = KERNEL_PID_NULL;
+    cc1100_mutex_pid = KERNEL_PID_UNDEF;
 
     /* Allocate event numbers and start cc1100 event process */
     cc1100_event_handler_pid = thread_create(event_handler_stack, sizeof(event_handler_stack), PRIORITY_CC1100, CREATE_STACKTEST,
@@ -203,7 +203,7 @@ void cc1100_phy_mutex_lock(void)
 
 void cc1100_phy_mutex_unlock(void)
 {
-    cc1100_mutex_pid = KERNEL_PID_NULL;
+    cc1100_mutex_pid = KERNEL_PID_UNDEF;
     mutex_unlock(&cc1100_mutex);
 }
 

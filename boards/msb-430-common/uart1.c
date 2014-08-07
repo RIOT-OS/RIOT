@@ -68,7 +68,7 @@ interrupt(USART1RX_VECTOR) usart0irq(void)
         (void) c;
     }
 #ifdef MODULE_UART0
-    else if (uart0_handler_pid) {
+    else if (uart0_handler_pid != KERNEL_PID_UNDEF) {
         volatile int c = U1RXBUF;
         uart0_handle_incoming(c);
         uart0_notify_thread();

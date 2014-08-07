@@ -95,7 +95,7 @@ void riot_send_nack(uint16_t to)
 
 void *ccnl_riot_relay_helper_start(void *);
 
-int riot_start_helper_thread(void)
+kernel_pid_t riot_start_helper_thread(void)
 {
     return thread_create(relay_helper_stack, sizeof(relay_helper_stack),
                          PRIORITY_MAIN - 2, CREATE_STACKTEST,

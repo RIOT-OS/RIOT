@@ -47,7 +47,7 @@ void chardev_loop(ringbuffer_t *rb)
 
     kernel_pid_t pid = thread_getpid();
 
-    kernel_pid_t reader_pid = KERNEL_PID_NULL;
+    kernel_pid_t reader_pid = KERNEL_PID_UNDEF;
     struct posix_iop_t *r = NULL;
 
     puts("UART0 thread started.");
@@ -61,7 +61,7 @@ void chardev_loop(ringbuffer_t *rb)
             switch(m.type) {
                 case OPEN:
                     DEBUG("OPEN\n");
-                    if (reader_pid == KERNEL_PID_NULL) {
+                    if (reader_pid == KERNEL_PID_UNDEF) {
                         reader_pid = m.sender_pid;
                         /* no error */
                         m.content.value = 0;
@@ -90,7 +90,7 @@ void chardev_loop(ringbuffer_t *rb)
                     DEBUG("CLOSE\n");
                     if (m.sender_pid == reader_pid) {
                         DEBUG("uart0_thread: closing file from %" PRIkernel_pid "\n", reader_pid);
-                        reader_pid = KERNEL_PID_NULL;
+                        reader_pid = KERNEL_PID_UNDEF;
                         r = NULL;
                         m.content.value = 0;
                     }

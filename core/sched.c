@@ -43,7 +43,7 @@ volatile unsigned int sched_context_switch_request;
 volatile tcb_t *sched_threads[MAXTHREADS];
 volatile tcb_t *sched_active_thread;
 
-volatile kernel_pid_t sched_active_pid = KERNEL_PID_NULL;
+volatile kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
 
 clist_node_t *sched_runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;

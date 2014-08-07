@@ -44,7 +44,7 @@
 #define READER_STACK_SIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
 
 char serial_reader_stack[READER_STACK_SIZE];
-kernel_pid_t serial_reader_pid;
+kernel_pid_t serial_reader_pid = KERNEL_PID_UNDEF;
 
 uint8_t serial_out_buf[BORDER_BUFFER_SIZE];
 uint8_t serial_in_buf[BORDER_BUFFER_SIZE];
@@ -76,7 +76,7 @@ kernel_pid_t border_get_serial_reader()
 
 void serial_reader_f(void)
 {
-    kernel_pid_t main_pid = KERNEL_PID_NULL;
+    kernel_pid_t main_pid;
     int bytes;
     msg_t m;
     border_packet_t *uart_buf;
@@ -138,7 +138,7 @@ int sixlowpan_lowpan_border_init(int if_id)
                                    border_process_lowpan,
                                    "border_process_lowpan");
 
-    if (ip_process_pid < 0) {
+    if (ip_process_pid != KERNEL_PID_UNDEF) {
         return 0;
     }
 

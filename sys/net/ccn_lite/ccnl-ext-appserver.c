@@ -37,7 +37,7 @@
 /** message buffer */
 msg_t msg_buffer_appserver[APPSERVER_MSG_BUFFER_SIZE];
 
-kernel_pid_t relay_pid;
+kernel_pid_t relay_pid = KERNEL_PID_UNDEF;
 char prefix[] = "/riot/appserver/";
 
 static int appserver_sent_content(uint8_t *buf, int len, kernel_pid_t from)

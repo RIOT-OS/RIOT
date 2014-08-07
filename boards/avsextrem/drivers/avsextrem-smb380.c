@@ -44,7 +44,7 @@
 #include "lpc2387.h"
 
 
-kernel_pid_t simple_pid;
+kernel_pid_t simple_pid = KERNEL_PID_UNDEF;
 int16_t simple_buffer[4];
 
 volatile int16_t *ringBuff_X = NULL;
@@ -52,7 +52,7 @@ volatile int16_t *ringBuff_Y = NULL;
 volatile int16_t *ringBuff_Z = NULL;
 volatile int16_t *ringBuff_T = NULL;
 uint16_t readPointerPos[SMB380_RING_BUFF_MAX_THREADS];
-u_char PointerList[SMB380_RING_BUFF_MAX_THREADS];
+kernel_pid_t PointerList[SMB380_RING_BUFF_MAX_THREADS];
 static msg_t wakeupmessage;
 
 /*
