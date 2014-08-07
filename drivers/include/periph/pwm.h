@@ -22,6 +22,8 @@
 
 #include "periph_conf.h"
 
+/* ignore file in case no PWM devices are defined */
+#if PWM_NUMOF
 
 /**
  * @brief Definition of available PWM devices
@@ -41,7 +43,6 @@ typedef enum {
 #if PWM_3_EN
     PWM_3,              /*< 4th PWM device */
 #endif
-    PWM_UNDEFINED
 } pwm_t;
 
 /**
@@ -71,8 +72,8 @@ typedef enum {
  * @param[in] resolution    the PWM resolution
  *
  * @return                  0 on success
- * @return                  -1 on invalid device
- * @return                  -2 on requested mode and/or frequency and resolution not applicable
+ * @return                  -1 on mode not applicable
+ * @return                  -2 on frequency and resolution not applicable
  */
 int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int resolution);
 
@@ -87,8 +88,7 @@ int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int re
  * @param[in] value         the desired duty-cycle to set
  *
  * @return                  0 on success
- * @return                  -1 on invalid device
- * @return                  -2 on invalid channel
+ * @return                  -1 on invalid channel
  */
 int pwm_set(pwm_t dev, int channel, unsigned int value);
 
@@ -96,21 +96,37 @@ int pwm_set(pwm_t dev, int channel, unsigned int value);
  * @brief Start PWM generation on the given device
  *
  * @param[in] dev           device to start
- *
- * @return                  0 on success
- * @return                  -1 if invalid device given
  */
-int pwm_start(pwm_t dev);
+void pwm_start(pwm_t dev);
 
 /**
  * @brief Stop PWM generation on the given device
  *
  * @param[in] dev           device to stop
- *
- * @return                  0 on success
- * @return                  -1 if invalid device given
  */
-int pwm_stop(pwm_t dev);
+void pwm_stop(pwm_t dev);
+
+/**
+ * @brief Power on the PWM device
+ *
+ * The PWM deice is powered on. It is dependent on the implementing platform,
+ * if the previously set configuration is still available after power on.
+ *
+ * @param[in] dev           device to power on
+ */
+void pwm_poweron(pwm_t dev);
+
+/**
+ * @brief Power off the given PWM device
+ *
+ * The given PWM is completely powered off. On most platform this means, that
+ * the clock for the PWM device is disabled.
+ *
+ * @param[in] dev           device to power off
+ */
+void pwm_poweroff(pwm_t dev);
+
+#endif /* PWM_NUMOF */
 
 #endif /* __PWM_H */
 /** @} */

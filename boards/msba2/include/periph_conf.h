@@ -28,6 +28,7 @@
 #define PWM_0_EN            (1)
 
 /* PWM_0 device configuration */
+#define PWM_0_CHANNELS      (3)
 #define PWM_0_CH0           (3)
 #define PWM_0_CH0_MR        PWM1MR3
 #define PWM_0_CH1           (4)
