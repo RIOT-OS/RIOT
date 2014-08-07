@@ -129,9 +129,6 @@ void sender(void)
 
 int main(void)
 {
-#ifndef SENDER
-    kernel_pid_t radio_pid = KERNEL_PID_UNDEF;
-#endif
     int16_t a;
     msg_t mesg;
     transceiver_command_t tcmd;
@@ -144,7 +141,7 @@ int main(void)
 
 #ifndef SENDER
     printf("\n\tmain(): starting radio thread\n");
-    radio_pid = thread_create(
+    kernel_pid_t radio_pid = thread_create(
             radio_stack_buffer, sizeof(radio_stack_buffer),
             PRIORITY_MAIN - 2, CREATE_STACKTEST,
             radio, NULL, "radio");
