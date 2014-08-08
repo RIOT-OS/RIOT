@@ -32,6 +32,8 @@ install:
             binutils-avr \
             avr-libc \
             cppcheck \
+			expect \
+			python-pexpect \
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
 
@@ -59,6 +61,7 @@ script:
     - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
 
     - ./dist/tools/compile_test/compile_test.py
+    - make -C ./tests/ full-test BOARD=native
 
 notifications:
     email: false
