@@ -22,8 +22,6 @@
 #define __BOARD_H
 
 #include "cpu.h"
-#include "cpu-conf.h"
-
 
 /**
  * Define the nominal CPU core clock in this board
@@ -34,6 +32,15 @@
  * Assign the hardware timer
  */
 #define HW_TIMER            TIMER_0
+
+/**
+ * @name Assign the UART interface to be used for stdio
+ * @{
+ */
+#define STDIO               UART_0
+#define STDIO_BAUDRATE      (115200U)
+#define STDIO_RX_BUFSIZE    (64U)
+/** @} */
 
 /**
  * @name LED pin definitions
@@ -60,12 +67,10 @@
 #define LED_RED_TOGGLE      /* not available */
 /** @} */
 
-
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
-
 
 #endif /** __BOARD_H */
 /** @} */

@@ -22,6 +22,8 @@
 
 #include "cpu.h"
 #include "board.h"
+#include "sched.h"
+#include "thread.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
 
@@ -305,5 +307,8 @@ static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
     }
     else if (dev->ISR & USART_ISR_TXE) {
         config[uartnum].tx_cb();
+    }
+    if (sched_context_switch_request) {
+        thread_yield();
     }
 }
