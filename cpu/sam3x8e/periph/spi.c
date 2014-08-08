@@ -20,6 +20,8 @@
 
 
 #include "cpu.h"
+#include "sched.h"
+#include "thread.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 #include "periph/spi.h"
@@ -31,11 +33,10 @@ typedef struct {
     char(*cb)(char data);
 } spi_state_t;
 
-static inline void irq_handler(spi_t dev);
+static inline void irq_handler_transfer(spi_t dev);
+static inline void irq_handler_begin(spi_t dev);
 
 static spi_state_t config[SPI_NUMOF];
-
-static char cb_delay = 0xb8;
 
 static char byte_begin = 0xab;
 
@@ -64,7 +65,10 @@ void spi_poweroff(spi_t dev)
         case SPI_0:
             while (!(SPI_0_DEV->SPI_SR & SPI_SR_SPIENS)); /* wait until no more busy */
 
-            SPI_0_CLKDIS();
+            SPI_0_CLKDIS();/* Disable peripheral clock for SPI0 */
+            SPI_0_PORT_CLKEN();/* Disable peripheral clock for PIOA */
+            NVIC_DisableIRQ(SPI_0_IRQ);
+            NVIC_DisableIRQ(SPI_0_PORT_IRQ);
             break;
 #endif
     }
@@ -88,11 +92,6 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             /* For details on the following operations, please read the SAM3X documentation
             provided by Atmel on http://www.atmel.com/Images/doc11057.pdf. PIO description is given from
             the page 641 to the page 696 */
-            /* Output mode */
-            /* port->PIO_OER |= SPI_0_MISO_PIN;
-             port->PIO_OER |= SPI_0_MOSI_PIN;
-             port->PIO_OER |= SPI_0_SCK_PIN;
-             port->PIO_OER |= SPI_0_NSS_PIN;*/
 
             /* Push-pull configuration */
             port->PIO_MDER &= ~SPI_0_MISO_PIN;
@@ -144,10 +143,6 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             port->PIO_ABSR &= ~SPI_0_MOSI_PIN;
             port->PIO_ABSR &= ~SPI_0_SCK_PIN;
             port->PIO_ABSR &= ~SPI_0_NSS_PIN;
-            /* Chip Select Register */
-            spi_port->SPI_CSR[0] = 0;
-            spi_port->SPI_CSR[0] |= SPI_CSR_SCBR(speed);
-            spi_port->SPI_CSR[0] |= SPI_CSR_DLYBCT(0x3);
 
             switch (conf) {
                 case SPI_CONF_FIRST_RISING:
@@ -171,6 +166,13 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
                     break;
 
             }
+
+            /* Chip Select Register */
+            spi_port->SPI_CSR[0] = 0;
+            spi_port->SPI_CSR[0] |= SPI_CSR_SCBR(speed);
+            spi_port->SPI_CSR[0] |= SPI_CSR_BITS_8_BIT;
+            spi_port->SPI_CSR[0] |= SPI_CSR_DLYBCT(0x10); /* This delay permits to keep the CS signal
+                                                             active with consecutive transmissions */
 
 #endif
             break;
@@ -211,12 +213,13 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             NVIC_SetPriority(SPI_0_IRQ, SPI_0_IRQ_PRIO);
             NVIC_EnableIRQ(SPI_0_IRQ);
 
+            NVIC_SetPriority(SPI_0_PORT_IRQ, SPI_0_PORT_IRQ_PRIO);
+            NVIC_EnableIRQ(SPI_0_PORT_IRQ);
+
             /************************* PIO-Init *************************/
             /* For details on the following operations, please read the SAM3X documentation
             provided by Atmel on http://www.atmel.com/Images/doc11057.pdf. PIO description is given from
             the page 641 to the page 696 */
-            /* Output mode */
-            port->PIO_OER |= SPI_0_MISO_PIN;
 
             /* Push-pull configuration */
             port->PIO_MDER &= ~SPI_0_MISO_PIN;
@@ -273,8 +276,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             port->PIO_ABSR &= ~SPI_0_SCK_PIN;
             port->PIO_ABSR &= ~SPI_0_NSS_PIN;
 
-            /* Chip Select Register */
-            spi_port->SPI_CSR[0] = 0;
+
 
             switch (conf) {
                 case SPI_CONF_FIRST_RISING:
@@ -298,6 +300,9 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
                     break;
 
             }
+
+            /* Chip Select Register */
+            spi_port->SPI_CSR[0] = 0;
 
 #endif
             break;
@@ -331,6 +336,10 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
             spi_port = SPI_0_DEV;
             break;
 #endif
+    }
+
+    if (spi_port == 0) {
+        return -1;
     }
 
     while (!(spi_port->SPI_SR & SPI_SR_TDRE));
@@ -394,10 +403,9 @@ void spi_transmission_begin(spi_t dev, char reset_val)
     spi_port->SPI_TDR = SPI_TDR_TD(reset_val);
 }
 
-static inline void irq_handler(spi_t dev)
+static inline void irq_handler_transfer(spi_t dev)
 {
 
-    char cb = 0;
     Spi *spi_port = 0;
 
     switch (dev) {
@@ -410,22 +418,32 @@ static inline void irq_handler(spi_t dev)
 #endif
     }
 
-    while (!(spi_port->SPI_SR & SPI_SR_TDRE));
+    char data = 0;
 
-    spi_port->SPI_TDR = cb_delay;
+    if (spi_port->SPI_SR & SPI_SR_RDRF) {
 
-    while (!(spi_port->SPI_SR & SPI_SR_RDRF));
+        data = spi_port->SPI_RDR & SPI_RDR_RD_Msk;
+        data = config[dev].cb(data);
+        spi_port->SPI_TDR = data;
 
-    cb = spi_port->SPI_RDR & SPI_RDR_RD_Msk;
+    }
+    else {
+        while (1) {
+            for (int i = 0; i < 2000000; i++) {
+                asm("nop");
+            }
+        }
+    }
 
-    config[dev].cb(cb);
-    /* return byte of callback is transferred to master in next transmission cycle */
-    cb_delay = cb;
+    /* see if a thread with higher priority wants to run now */
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
+
 }
 
 static inline void irq_handler_begin(spi_t dev)
 {
-    printf("irq_handler_begin");
     spi_transmission_begin(dev, byte_begin);
 }
 
@@ -433,10 +451,8 @@ static inline void irq_handler_begin(spi_t dev)
 __attribute__((naked))
 void isr_spi0(void)
 {
-
     ISR_ENTER();
-    printf("csr: %x\n", SPI_0_DEV->SPI_CSR[0]);
-    irq_handler(SPI_0);
+    irq_handler_transfer(SPI_0);
     ISR_EXIT();
 }
 
