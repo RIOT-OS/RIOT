@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 University of Applied Sciences
+ * Copyright (C) 2014 Hamburg University of Applied Sciences
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License. See the file LICENSE in the top level directory for more
@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup tests
+ * @ingroup     tests
  * @{
  *
  * @file
- * @brief SPI test application
+ * @brief       SPI test application
  *
  * @author      Maxime Blanloeil <maxime.blanloeil@phelma.grenoble-inp.fr>
  *
@@ -20,19 +20,17 @@
 
 #include <stdio.h>
 #include <board.h>
-#include <time.h>
 
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 #include "thread.h"
-#include "vtimer.h"
 #include "shell.h"
 #include "shell_commands.h"
 #include "sam3x8e.h"
 
 #define SHELL_BUFFER_SIZE       128
-#define BUF_SEND_LEN 			8
+#define BUF_SEND_LEN 			10
 
 static int shell_read(void);
 static void shell_write(int);
@@ -40,18 +38,24 @@ static void cmd_init_start_slave(int argc, char **argv);
 static void cmd_init_master(int argc, char **argv);
 static void cmd_send_master_byte(int argc, char **argv);
 static void cmd_send_master_bytes(int argc, char **argv);
-/*static void cmd_test_nrf(int argc, char **argv);*/
+static void cmd_send_master_8x1_byte(int argc, char **argv);
 static void cmd_prxbuf(int argc, char **argv);
 static void cmd_clearbuf(int argc, char **argv);
 
 char test_buf[BUF_SEND_LEN] = {0};
 char buf_count = 0;
 
-char test_irq(char c)
+char test_irq(char data)
 {
-    test_buf[buf_count] = c;
-    buf_count++;
-    return;
+    if (buf_count < BUF_SEND_LEN) {
+        test_buf[buf_count] = data;
+        buf_count++;
+    }
+    else {
+        buf_count = 0;
+    }
+
+    return data;
 }
 
 /**
@@ -62,7 +66,7 @@ static const shell_command_t shell_commands[] = {
     { "im", "init master", cmd_init_master },
     { "smb", "send master byte", cmd_send_master_byte },
     { "smbs", "send master bytes", cmd_send_master_bytes },
-    /*{ "nrf", "test nrf", cmd_test_nrf },*/
+    { "smb81", "send master 8x1 bytes", cmd_send_master_8x1_byte },
     { "prxbuf", "print rx buffer from cb function", cmd_prxbuf },
     { "clearbuf", "clear rx buffer from cb function", cmd_clearbuf },
     { NULL, NULL, NULL }
@@ -81,14 +85,6 @@ void cmd_init_start_slave(int argc, char **argv)
     spi_poweron(SPI_0);
     spi_init_slave(SPI_0, SPI_CONF_FIRST_RISING, test_irq);
 
-    unsigned int mr, sr, imr, csr;
-    mr = SPI_0_DEV->SPI_MR;
-    sr = SPI_0_DEV->SPI_SR;
-    imr = SPI_0_DEV->SPI_IMR;
-    csr = SPI_0_DEV->SPI_CSR[0];
-
-    printf("mr: %x\n sr: %x\n imr: %x\n csr: %x\n", mr, sr, imr, csr);
-
 }
 
 /**
@@ -102,17 +98,9 @@ void cmd_init_master(int argc, char **argv)
     (void) argv;
 
     spi_poweron(SPI_0);
-
     uint32_t speed = 255;	/* this is the divider not the freq.! */
     spi_init_master(SPI_0, SPI_CONF_FIRST_RISING, speed);
 
-    unsigned int mr, sr, imr, csr;
-    mr = SPI_0_DEV->SPI_MR;
-    sr = SPI_0_DEV->SPI_SR;
-    imr = SPI_0_DEV->SPI_IMR;
-    csr = SPI_0_DEV->SPI_CSR[0];
-
-    printf("mr: %x\n sr: %x\n imr: %x\n csr: %x\n", mr, sr, imr, csr);
 }
 
 /**
@@ -124,121 +112,60 @@ void cmd_send_master_byte(int argc, char **argv)
     (void) argc;
     (void) argv;
 
-    puts("Send Master 8 x 1 Byte\n");
+    puts("Send Master 1 Byte\n");
 
-    int i;
-    char data_return, data_send = 0x0;
+    char data_return, data_send = 90;
 
-    for (i = 0; i < 8; i++) {
-        spi_transfer_byte(SPI_0, data_send, &data_return);
-        printf("sent : %x\n", data_send);
-        printf("receive: %x\n", data_return);
-        data_send++;
-    }
+    spi_transfer_byte(SPI_0, data_send, &data_return);
+
+    printf("One Byte transferred: %x, received: %x\n", data_send, data_return);
+
 }
 
 /**
  * @send master multiple byte
  */
-
 void cmd_send_master_bytes(int argc, char **argv)
 {
 
     (void) argc;
     (void) argv;
-    vtimer_init();
-    puts("Send Master multiple Bytes\n");
 
-    int i, trans_bytes;
+    puts("Send Master multiple Bytes\n");
 
     char buf_send[BUF_SEND_LEN] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
     char buf_return[BUF_SEND_LEN];
 
+    spi_transfer_bytes(SPI_0, buf_send, buf_return, BUF_SEND_LEN);
 
-    trans_bytes = spi_transfer_bytes(SPI_0, buf_send, buf_return, BUF_SEND_LEN);
-
-    printf("trans_bytes: %x\n", trans_bytes);
-
-    for (i = 0; i < BUF_SEND_LEN; i++) {
-
-        printf("send %d : %x\n reveice %d: %x\n", i, buf_send[i], i, buf_return[i]);
+    for (int i = 0; i < BUF_SEND_LEN; i++) {
+        printf("Send %d : %x\n Reveice %d: %x\n", i, buf_send[i], i, buf_return[i]);
     }
 }
 
 /**
- * @test nrf
+ * @send master one 8 x 1 byte
  */
-/*
-void cmd_test_nrf(int argc, char **argv) {
+void cmd_send_master_8x1_byte(int argc, char **argv)
+{
 
-	(void) argc;
-	(void) argv;
+    (void) argc;
+    (void) argv;
 
-	puts("Test call nrf24l01+\n");
+    puts("Send Master 8 x 1 Byte\n");
 
-#define R_REGISTER		0x00
-#define W_REGISTER		0x20
-#define NOP				0xFF
+    char data_return = 0, data_send = 1;
 
-#define REGISTER_MASK	0x1F
-#define	CONFIG_PWR_UP	0x02
-#define	CONFIG_PRIM_RX	0x01
-#define	CONFIG_CRCO		0x04
-
-#define CONFIG      	0x00
-
-#define DUMMY			0xAA
-
-char data_return, data_send;
-
-	gpio_init_out(GPIO_7, GPIO_NOPULL); // GPIO_7 is mapped to pin PD6 -> see attached spreadsheet
-	gpio_set(GPIO_7);
-
-
-	// Try to get status register while command NOP
-	gpio_clear(GPIO_7);
-	spi_transfer_byte(SPI_0, NOP, &data_return);
-	gpio_set(GPIO_7);
-	printf("NOP returned: %x\n", data_return);
-
-	data_send = CONFIG_CRCO;
-
-	// Try to write to CONFIG register to set power up
-	gpio_clear(GPIO_7);
-	spi_transfer_reg(SPI_0, (W_REGISTER | (REGISTER_MASK & CONFIG)), data_send, &data_return);
-	gpio_set(GPIO_7);
-	printf("wrote to config register. answer should be random: %x\n", data_return);
-
-
-	// Try to read out CONFIG register
-	gpio_clear(GPIO_7);
-	spi_transfer_reg(SPI_0, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
-	gpio_set(GPIO_7);
-	printf("read out config register. answer: %x\n", data_return);
-
-
-	data_send = CONFIG_CRCO;
-
-	// Try to clear CONF reg again
-	gpio_clear(GPIO_7);
-	spi_transfer_reg(SPI_0, (W_REGISTER | (REGISTER_MASK & CONFIG)), data_send, &data_return);
-	gpio_set(GPIO_7);
-	printf("after clear config register. answer should be random: %x\n", data_return);
-
-
-	// Try to read out CONFIG register
-	gpio_clear(GPIO_7);
-	spi_transfer_reg(SPI_0, (R_REGISTER | (REGISTER_MASK & CONFIG)), DUMMY, &data_return);
-	gpio_set(GPIO_7);
-	printf("read out config register ater clear. answer: %x\n", data_return);
-
+    for (int i = 0; i < 8; i++) {
+        spi_transfer_byte(SPI_0, data_send, &data_return);
+        printf("One Byte transferred: %x, received: %x\n", data_send, data_return);
+        data_send++;
+    }
 }
-*/
 
 /**
  * @print buffer written in cb function
  */
-
 void cmd_prxbuf(int argc, char **argv)
 {
 
@@ -259,7 +186,6 @@ void cmd_prxbuf(int argc, char **argv)
 /**
  * @clear buffer written in cb function
  */
-
 void cmd_clearbuf(int argc, char **argv)
 {
 
