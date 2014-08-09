@@ -141,6 +141,14 @@ $(USEPKG:%=${BINDIR}%.a):
 	@mkdir -p ${BINDIR}
 	"$(MAKE)" -C $(RIOTBASE)/pkg/$(patsubst ${BINDIR}%.a,%,$@)
 
+info-boards-supported: BOARDS=$(shell find $(RIOTBASE)/boards/* -maxdepth 0 -type d \! -name *-common)
+info-boards-supported:
+ifneq (,$(BOARD_WHITELIST))
+	@echo "$(filter $(BOARD_WHITELIST), $(foreach _board, $(BOARDS), $(shell echo "$(_board)" | xargs basename)))"
+else
+	@echo "$(filter-out $(BOARD_INSUFFICIENT_RAM), $(filter-out $(BOARD_BLACKLIST), $(foreach _board, $(BOARDS), $(shell echo "$(_board)" | xargs basename))))"
+endif
+
 clean:
 	@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i clean || exit 1; done
 	rm -rf $(BINDIR) $(CLEANFILES)
