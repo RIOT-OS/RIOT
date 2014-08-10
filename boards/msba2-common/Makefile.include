@@ -20,7 +20,7 @@ ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
 export FFLAGS = $(PORT) $(HEXFILE)
-export TERMFLAGS += -p
+export TERMFLAGS += -p "$(PORT)"
 include $(RIOTBOARD)/msba2-common/Makefile.dep
 
 export INCLUDES += -I$(RIOTBOARD)/msba2-common/include -I$(RIOTBOARD)/msba2-common/drivers/include

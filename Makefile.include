@@ -193,7 +193,7 @@ flash: all
 	$(FLASHER) $(FFLAGS)
 
 term:
-	$(TERMPROG) $(TERMFLAGS) $(PORT)
+	$(TERMPROG) $(TERMFLAGS)
 
 doc:
 	make -BC $(RIOTBASE) doc

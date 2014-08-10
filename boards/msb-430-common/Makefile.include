@@ -26,7 +26,7 @@ export DEBUGSERVER = $(FLASHER)
 export DEBUGSERVER_FLAGS = $(MSPDEBUGFLAGS) gdb
 export DEBUGGER = $(PREFIX)gdb
 export DEBUGGER_FLAGS = --tui --ex="target remote localhost:2000" --ex "monitor reset halt" --ex load -ex "monitor reset halt"  $(ELFFILE)
-export TERMFLAGS += -p
+export TERMFLAGS += -p "$(PORT)"
 
 export FFLAGS = $(MSPDEBUGFLAGS) "prog $(HEXFILE)"
 
