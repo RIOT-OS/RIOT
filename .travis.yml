@@ -22,7 +22,13 @@ install:
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
 
+    - git remote add riot https://github.com/RIOT-OS/RIOT.git
+    - git fetch riot master
+    - git log -1 --pretty=format:%H riot/master
+
 script:
+    - git rebase riot/master || git rebase --abort
+
     - ./dist/tools/compile_test/compile_test.py
     - make -C ./tests/unittests test BOARD=native
     - make -C ./tests/unittests test BOARD=qemu-i386
