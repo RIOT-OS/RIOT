@@ -81,7 +81,7 @@ info-objsize:
 		bss) SORTROW=3 ;; \
 		dec) SORTROW=4 ;; \
 		"") SORTROW=4 ;; \
-		*) echo "Usage: $(MAKE) objsize SORTROW=[text|data|bss|dec]" ; return ;; \
+		*) echo "Usage: $(MAKE) info-objsize SORTROW=[text|data|bss|dec]" ; return ;; \
 	esac; \
 	echo '   text\t   data\t    bss\t    dec\t    hex\tfilename'; \
 	$(SIZE) -dB $(BASELIBS) | \
@@ -89,11 +89,11 @@ info-objsize:
 		sed -e 's#$(BINDIR)##' | \
 		sort -rnk$${SORTROW}
 
-buildsize:
+info-buildsize:
 	@$(SIZE) -dB $(BINDIR)$(APPLICATION).elf
 
-buildsizes: SHELL=bash
-buildsizes:
+info-buildsizes: SHELL=bash
+info-buildsizes:
 	@if [[ -z "$(BOARD_WHITELIST)" ]]; then \
 		BOARDS=$$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); \
 	else \
@@ -113,11 +113,11 @@ buildsizes:
 			RIOTBOARD=$${RIOTBOARD} \
 			RIOTCPU=$${RIOTCPU} \
 			BINDIRBASE=$${BINDIRBASE} \
-			$(MAKE) buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${BOARD}"; \
+			$(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${BOARD}"; \
 	done;
 
-buildsizes-diff: SHELL=bash
-buildsizes-diff:
+info-buildsizes-diff: SHELL=bash
+info-buildsizes-diff:
 	@if [[ -z "$(BOARD_WHITELIST)" ]]; then \
 		BOARDS=$$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); \
 	else \
@@ -140,7 +140,7 @@ buildsizes-diff:
 				RIOTBOARD=$${RIOTBOARD} \
 				RIOTCPU=$${RIOTCPU} \
 				BINDIRBASE=$${BINDIRBASE} \
-				$(MAKE) buildsize 2>/dev/null | tail -n-1 | cut -f-4; \
+				$(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4; \
 		done | \
 		while read -a OLD && read -a NEW; do \
 			for I in 0 1 2 3; do \

@@ -87,7 +87,8 @@ BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
-.PHONY: all clean flash doc term objsize buildsize buildsizes buildsizes-diff buildinfo
+.PHONY: all clean flash doc term info-objsize info-buildsize info-buildsizes \
+        info-buildsizes-diff info-build
 
 ELFFILE ?= $(BINDIR)$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
