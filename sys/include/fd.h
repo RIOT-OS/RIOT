@@ -33,7 +33,7 @@ typedef struct {
     int __active;
 
     /** the internal filedescriptor */
-    kernel_pid_t fd;
+    int fd;
 
     /**
      * Read *n* into *buf* from *fd*.  Return the
@@ -45,7 +45,7 @@ typedef struct {
     ssize_t (*write)(int fd, const void *buf, size_t n);
 
     /** Close the file descriptor *fd*. */
-    int (*close)(kernel_pid_t fd);
+    int (*close)(int fd);
 } fd_t;
 
 /**
@@ -67,7 +67,7 @@ int fd_init(void);
  */
 int fd_new(int internal_fd, ssize_t (*internal_read)(int, void *, size_t),
            ssize_t (*internal_write)(int, const void *, size_t),
-           int (*internal_close)(kernel_pid_t));
+           int (*internal_close)(int));
 
 /**
  * @brief   Gets the file descriptor table entry associated with file

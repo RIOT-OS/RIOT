@@ -41,7 +41,7 @@ int fd_init(void)
     posix_open(uart0_handler_pid, 0);
     fd_t fd = {
         .__active = 1,
-        .fd = uart0_handler_pid,
+        .fd = (int)uart0_handler_pid,
         .read = (ssize_t ( *)(int, void *, size_t))posix_read,
         .write = (ssize_t ( *)(int, const void *, size_t))posix_write,
         .close = posix_close
@@ -67,7 +67,7 @@ static int fd_get_next_free(void)
 
 int fd_new(int internal_fd, ssize_t (*internal_read)(int, void *, size_t),
            ssize_t (*internal_write)(int, const void *, size_t),
-           int (*internal_close)(kernel_pid_t))
+           int (*internal_close)(int))
 {
     int fd = fd_get_next_free();
 

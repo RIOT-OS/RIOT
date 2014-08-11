@@ -45,22 +45,22 @@ static int _posix_fileop_data(kernel_pid_t pid, int op, char *buffer, int nbytes
     return r.nbytes;
 }
 
-int posix_open(kernel_pid_t pid, int flags)
+int posix_open(int pid, int flags)
 {
-    return _posix_fileop(pid, OPEN, flags);
+    return _posix_fileop((kernel_pid_t) pid, OPEN, flags);
 }
 
-int posix_close(kernel_pid_t pid)
+int posix_close(int pid)
 {
-    return _posix_fileop(pid, CLOSE, 0);
+    return _posix_fileop((kernel_pid_t) pid, CLOSE, 0);
 }
 
-int posix_read(kernel_pid_t pid, char *buffer, int bufsize)
+int posix_read(int pid, char *buffer, int bufsize)
 {
-    return _posix_fileop_data(pid, READ, buffer, bufsize);
+    return _posix_fileop_data((kernel_pid_t) pid, READ, buffer, bufsize);
 }
 
-int posix_write(kernel_pid_t pid, char *buffer, int bufsize)
+int posix_write(int pid, char *buffer, int bufsize)
 {
-    return _posix_fileop_data(pid, WRITE, buffer, bufsize);
+    return _posix_fileop_data((kernel_pid_t) pid, WRITE, buffer, bufsize);
 }
