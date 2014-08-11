@@ -130,12 +130,11 @@ static uint16_t lm75A_get_register_value(uint8_t i2c_interface,
         uint8_t reg_addr,
         uint8_t reg_size)
 {
-    bool status = false;
     uint8_t rx_buff[reg_size];
 
     i2c_clear_buffer(rx_buff, sizeof(rx_buff));
     if ((reg_size > 0) && (reg_size < 3)) {
-        status = i2c_read(i2c_interface, LM75A_ADDR, reg_addr, rx_buff, sizeof(rx_buff));
+        bool status = i2c_read(i2c_interface, LM75A_ADDR, reg_addr, rx_buff, sizeof(rx_buff));
         if (!status) { //Slave is not ready
             puts(
                 "[lm75a_tempSensorI2C/lm75A_getConfigReg]: Slave is not\

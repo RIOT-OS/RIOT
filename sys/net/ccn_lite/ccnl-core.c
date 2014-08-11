@@ -652,12 +652,11 @@ void ccnl_face_CTS_done(void *ptr, int cnt, int len)
 
 void ccnl_face_CTS(struct ccnl_relay_s *ccnl, struct ccnl_face_s *f)
 {
-    struct ccnl_buf_s *buf;
     DEBUGMSG(99, "ccnl_face_CTS face=%p sched=%p\n", (void *) f,
              (void *) f->sched);
 
     if (!f->frag || f->frag->protocol == CCNL_FRAG_NONE) {
-        buf = ccnl_face_dequeue(ccnl, f);
+        struct ccnl_buf_s *buf = ccnl_face_dequeue(ccnl, f);
 
         if (buf)
             ccnl_interface_enqueue(ccnl_face_CTS_done, f, ccnl,

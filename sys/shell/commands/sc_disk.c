@@ -24,12 +24,10 @@
 
 static inline uint8_t sector_read(unsigned char *read_buf, unsigned long sector, unsigned long length, unsigned long offset)
 {
-    unsigned long i;
-
     if (MCI_read(read_buf, sector, 1) == RES_OK) {
         printf("[disk] Read sector %lu (%lu):\n", sector, offset);
 
-        for (i = offset + 1; i <= offset + length; i++) {
+        for (unsigned long i = offset + 1; i <= offset + length; i++) {
             printf(" %u", read_buf[i - 1]);
 
             if (!(i % 16)) {
@@ -88,11 +86,11 @@ void _get_sectorcount(int argc, char **argv)
 
 void _read_sector(int argc, char **argv)
 {
-    unsigned long sectornr, scount;
-    unsigned short ssize;
-
     if (argc == 2) {
-        sectornr = atol(argv[1]);
+        unsigned long scount;
+        unsigned short ssize;
+
+        unsigned long sectornr = atol(argv[1]);
 
         if ((MCI_ioctl(GET_SECTOR_COUNT, &scount) == RES_OK) && (MCI_ioctl(GET_SECTOR_SIZE, &ssize) == RES_OK)) {
             unsigned char read_buf[ssize];

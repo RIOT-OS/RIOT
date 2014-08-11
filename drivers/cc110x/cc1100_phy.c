@@ -632,10 +632,8 @@ static void *cc1100_event_handler_function(void *arg)
         }
 
         if (m.type == MSG_TIMER) {
-            uint8_t state;
-
             if (radio_mode == CC1100_MODE_CONSTANT_RX) {
-                state = cc1100_spi_read_status(CC1100_MARCSTATE) & MARC_STATE;
+                uint8_t state = cc1100_spi_read_status(CC1100_MARCSTATE) & MARC_STATE;
 
                 if ((state < 13 || state > 15) && radio_state == RADIO_RX && !rflags.TX) {
                     cc1100_statistic.watch_dog_resets++;
