@@ -80,6 +80,7 @@
 /* UART 0 device configuration */
 #define UART_0_DEV          USART2
 #define UART_0_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART2EN)
+#define UART_0_CLKDIS()     (RCC->APB1ENR &= ~(RCC_APB1ENR_USART2EN))
 #define UART_0_CLK          (42000000)          /* UART clock runs with 42MHz (F_CPU / 4) */
 #define UART_0_IRQ_CHAN     USART2_IRQn
 #define UART_0_ISR          isr_usart2
@@ -93,6 +94,7 @@
 /* UART 1 device configuration */
 #define UART_1_DEV          USART3
 #define UART_1_CLKEN()      (RCC->APB1ENR |= RCC_APB1ENR_USART3EN)
+#define UART_1_CLKDIS()     (RCC->APB1ENR &= ~(RCC_APB1ENR_USART3EN))
 #define UART_1_CLK          (42000000)          /* UART clock runs with 42MHz (F_CPU / 4) */
 #define UART_1_IRQ_CHAN     USART3_IRQn
 #define UART_1_ISR          isr_usart3

@@ -24,13 +24,16 @@
 #include "periph_conf.h"
 #include "periph/uart.h"
 
+/* guard file in case no UART device was specified */
+#if UART_NUMOF
 
 /**
  * @brief Each UART device has to store two callbacks.
  */
 typedef struct {
-    void (*rx_cb)(char);
-    void (*tx_cb)(void);
+    uart_rx_cb_t rx_cb;
+    uart_tx_cb_t tx_cb;
+    void *arg;
 } uart_conf_t;
 
 /**
@@ -44,9 +47,9 @@ static inline void irq_handler(uart_t uartnum, USART_TypeDef *uart);
 /**
  * @brief Allocate memory to store the callback functions.
  */
-static uart_conf_t config[UART_NUMOF];
+static uart_conf_t uart_config[UART_NUMOF];
 
-int uart_init(uart_t uart, uint32_t baudrate, void (*rx_cb)(char), void (*tx_cb)(void))
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
     /* do basic initialization */
     int res = uart_init_blocking(uart, baudrate);
@@ -55,8 +58,10 @@ int uart_init(uart_t uart, uint32_t baudrate, void (*rx_cb)(char), void (*tx_cb)
     }
 
     /* remember callback addresses */
-    config[uart].rx_cb = rx_cb;
-    config[uart].tx_cb = tx_cb;
+    uart_config[uart].rx_cb = rx_cb;
+    uart_config[uart].tx_cb = tx_cb;
+    uart_config[uart].arg = arg;
+
 
     /* enable receive interrupt */
     switch (uart) {
@@ -81,10 +86,6 @@ int uart_init(uart_t uart, uint32_t baudrate, void (*rx_cb)(char), void (*tx_cb)
             UART_2_DEV->CR1 |= USART_CR1_RXNEIE;
             break;
 #endif
-        case UART_UNDEFINED:
-        default:
-            return -2;
-            break;
     }
 
     return 0;
@@ -92,12 +93,12 @@ int uart_init(uart_t uart, uint32_t baudrate, void (*rx_cb)(char), void (*tx_cb)
 
 int uart_init_blocking(uart_t uart, uint32_t baudrate)
 {
-    USART_TypeDef *dev;
-    GPIO_TypeDef *port;
-    uint32_t tx_pin;
-    uint32_t rx_pin;
-    uint8_t af;
-    float clk;
+    USART_TypeDef *dev = 0;
+    GPIO_TypeDef *port = 0;
+    uint32_t tx_pin = 0;
+    uint32_t rx_pin = 0;
+    uint8_t af = 0;
+    float clk = 0;
     float divider;
     uint16_t mantissa;
     uint8_t fraction;
@@ -139,12 +140,9 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             UART_2_PORT_CLKEN();
             break;
 #endif
-        case UART_UNDEFINED:
-        default:
-            return -1;
     }
 
-    /* configure RX and TX pins, set pin to use alternative function mode */
+    /* uart_configure RX and TX pins, set pin to use alternative function mode */
     port->MODER &= ~(3 << (rx_pin * 2) | 3 << (tx_pin * 2));
     port->MODER |= 2 << (rx_pin * 2) | 2 << (tx_pin * 2);
     /* and assign alternative function */
@@ -165,7 +163,7 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
         port->AFR[1] |= af << ((tx_pin - 8) * 4);
     }
 
-    /* configure UART to mode 8N1 with given baudrate */
+    /* uart_configure UART to mode 8N1 with given baudrate */
     divider = clk / (16 * baudrate);
     mantissa = (uint16_t)divider;
     fraction = (uint8_t)((divider - mantissa) * 16);
@@ -198,39 +196,12 @@ void uart_tx_begin(uart_t uart)
             UART_2_DEV->CR1 |= USART_CR1_TXEIE;
             break;
 #endif
-        case UART_UNDEFINED:
-        default:
-            break;
-    }
-}
-
-void uart_tx_end(uart_t uart)
-{
-    switch (uart) {
-#if UART_0_EN
-        case UART_0:
-            UART_0_DEV->CR1 &= ~USART_CR1_TXEIE;
-            break;
-#endif
-#if UART_1_EN
-        case UART_1:
-            UART_1_DEV->CR1 &= ~USART_CR1_TXEIE;
-            break;
-#endif
-#if UART_2_EN
-        case UART_2:
-            UART_2_DEV->CR1 &= ~USART_CR1_TXEIE;
-            break;
-#endif
-        case UART_UNDEFINED:
-        default:
-            break;
     }
 }
 
 int uart_write(uart_t uart, char data)
 {
-    USART_TypeDef *dev;
+    USART_TypeDef *dev = 0;
 
     switch (uart) {
 #if UART_0_EN
@@ -248,10 +219,6 @@ int uart_write(uart_t uart, char data)
             dev = UART_2_DEV;
             break;
 #endif
-        case UART_UNDEFINED:
-        default:
-            return -2;
-            break;
     }
 
     if (dev->ISR & USART_ISR_TXE) {
@@ -263,7 +230,7 @@ int uart_write(uart_t uart, char data)
 
 int uart_read_blocking(uart_t uart, char *data)
 {
-    USART_TypeDef *dev;
+    USART_TypeDef *dev = 0;
 
     switch (uart) {
 #if UART_0_EN
@@ -281,10 +248,6 @@ int uart_read_blocking(uart_t uart, char *data)
             dev = UART_2_DEV;
             break;
 #endif
-        case UART_UNDEFINED:
-        default:
-            return -2;
-            break;
     }
 
     while (!(dev->ISR & USART_ISR_RXNE));
@@ -295,7 +258,7 @@ int uart_read_blocking(uart_t uart, char *data)
 
 int uart_write_blocking(uart_t uart, char data)
 {
-    USART_TypeDef *dev;
+    USART_TypeDef *dev = 0;
 
     switch (uart) {
 #if UART_0_EN
@@ -313,10 +276,6 @@ int uart_write_blocking(uart_t uart, char data)
             dev = UART_2_DEV;
             break;
 #endif
-        case UART_UNDEFINED:
-        default:
-            return -2;
-            break;
     }
 
     while (!(dev->ISR & USART_ISR_TXE));
@@ -356,12 +315,16 @@ static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
 {
     if (dev->ISR & USART_ISR_RXNE) {
         char data = (char)dev->RDR;
-        config[uartnum].rx_cb(data);
+        uart_config[uartnum].rx_cb(uart_config[uartnum].arg, data);
     }
     else if (dev->ISR & USART_ISR_TXE) {
-        config[uartnum].tx_cb();
+        if (uart_config[uartnum].tx_cb(uart_config[uartnum].arg) == 0) {
+            dev->CR1 &= ~(USART_CR1_TXEIE);
+        }
     }
     if (sched_context_switch_request) {
         thread_yield();
     }
 }
+
+#endif /* UART_NUMOF */

@@ -28,6 +28,7 @@
 #include <sys/unistd.h>
 #include <stdint.h>
 
+#include "board.h"
 #include "thread.h"
 #include "kernel.h"
 #include "irq.h"
@@ -45,7 +46,7 @@ caddr_t heap_top = (caddr_t)&_end + 4;
  */
 void _init(void)
 {
-    uart_init_blocking(UART_0, 115200);
+    uart_init_blocking(STDIO, STDIO_BAUDRATE);
 }
 
 /**

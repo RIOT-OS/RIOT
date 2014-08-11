@@ -24,25 +24,25 @@
 #include "periph/uart.h"
 #include "periph_conf.h"
 
+/* guard file in case no UART device was specified */
+#if UART_NUMOF
 
 /**
  * @brief Each UART device has to store two callbacks.
  */
 typedef struct {
-    void (*rx_cb)(char);
-    void (*tx_cb)(void);
+    uart_rx_cb_t rx_cb;
+    uart_tx_cb_t tx_cb;
+    void *arg;
 } uart_conf_t;
 
 /**
  * @brief Allocate memory to store the callback functions.
  */
-static uart_conf_t config[UART_NUMOF];
+static uart_conf_t uart_config[UART_NUMOF];
 
 
-
-
-
-int uart_init(uart_t uart, uint32_t baudrate, void (*rx_cb)(char), void (*tx_cb)(void))
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
     /* initialize basic functionality */
     int res = uart_init_blocking(uart, baudrate);
@@ -51,16 +51,15 @@ int uart_init(uart_t uart, uint32_t baudrate, void (*rx_cb)(char), void (*tx_cb)
     }
 
     /* register callbacks */
-    config[uart].rx_cb = rx_cb;
-    config[uart].tx_cb = tx_cb;
+    uart_config[uart].rx_cb = rx_cb;
+    uart_config[uart].tx_cb = tx_cb;
+    uart_config[uart].arg = arg;
 
     /* configure interrupts and enable RX interrupt */
     switch (uart) {
         case UART_0:
             UART_0_DEV->UART_IER = UART_IER_RXRDY;
         break;
-        case UART_UNDEFINED:
-            return -2;
     }
     return 0;
 }
@@ -83,9 +82,6 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             UART_0_DEV->UART_CR = UART_CR_RXEN | UART_CR_TXEN | UART_CR_RSTSTA;
             break;
 #endif
-        case UART_UNDEFINED:
-            return -2;
-            break;
     }
     return 0;
 }
@@ -106,8 +102,6 @@ int uart_write(uart_t uart, char data)
         case UART_0:
             UART_0_DEV->UART_THR = data;
             break;
-        case UART_UNDEFINED:
-            return -1;
     }
     return 1;
 }
@@ -119,8 +113,6 @@ int uart_read_blocking(uart_t uart, char *data)
             while (!(UART_0_DEV->UART_SR & UART_SR_RXRDY));
             *data = (char)UART_0_DEV->UART_RHR;
             break;
-        case UART_UNDEFINED:
-            return -1;
     }
     return 1;
 }
@@ -132,8 +124,18 @@ int uart_write_blocking(uart_t uart, char data)
             while (!(UART_0_DEV->UART_SR & UART_SR_TXRDY));
             UART_0_DEV->UART_THR = data;
             break;
-        case UART_UNDEFINED:
-            return -1;
     }
     return 1;
 }
+
+void uart_poweron(uart_t uart)
+{
+
+}
+
+void uart_poweroff(uart_t uart)
+{
+
+}
+
+#endif /* UART_NUMOF */
