@@ -74,7 +74,7 @@ buildtest:
 	done; \
 	$${BUILDTESTOK}
 
-objsize:
+info-objsize:
 	@case "${SORTROW}" in \
 		text) SORTROW=1 ;; \
 		data) SORTROW=2 ;; \
@@ -159,7 +159,7 @@ buildsizes-diff:
 		done; \
 	done;
 
-buildinfo:
+info-build:
 	@echo 'APPLICATION: $(APPLICATION)'
 	@echo 'BOARD:   $(BOARD)'
 	@echo 'CPU:     $(CPU)'
