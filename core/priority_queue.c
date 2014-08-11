@@ -69,11 +69,11 @@ void priority_queue_add(priority_queue_t *root, priority_queue_node_t *new_obj)
 }
 
 #if ENABLE_DEBUG
-void priority_queue_print(priority_queue_t *node)
+void priority_queue_print(priority_queue_t *root)
 {
     printf("queue:\n");
 
-    for (priority_queue_node_t *node = node->first; node; node = node->next) {
+    for (priority_queue_node_t *node = root->first; node; node = node->next) {
         printf("Data: %u Priority: %lu\n", node->data, (unsigned long) node->priority);
     }
 }
