@@ -281,7 +281,7 @@ int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
  *
  * @return 0 on success, -1 otherwise.
  */
-int destiny_socket_close(int s);
+int destiny_socket_close(kernel_pid_t s);
 
 /**
  * Assigns an IPv6 address *addr* to the socket *s*. Roughly identical to

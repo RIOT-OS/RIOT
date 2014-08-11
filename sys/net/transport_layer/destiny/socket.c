@@ -1036,7 +1036,7 @@ int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
     }
 }
 
-int destiny_socket_close(int s)
+int destiny_socket_close(kernel_pid_t s)
 {
     socket_internal_t *current_socket = get_socket(s);
 
