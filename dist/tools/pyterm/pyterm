@@ -403,10 +403,24 @@ class SerCmd(cmd.Cmd):
             sys.stderr.write("JSON regex with ID %s not found" % line)
 
     def do_PYTERM_init(self, line):
-        """Pyterm command: Add an startup command. (Only useful in
+        """Pyterm command: Add a startup command. (Only useful in
         addition with /save).
         """
         self.init_cmd.append(line.strip())
+
+    def do_PYTERM_timer(self, line):
+        """Pyterm command: Scheduler a timer."""
+        line = line.strip()
+        argv = line.partition(' ')
+        if (len(argv[2]) == 0):
+            sys.stderr.write("Usage: /timer <interval> <command>\n")
+            return
+
+        interval = int(argv[0])
+        cmd = argv[2]
+        self.logger.info("Schedule %s to fire after %i seconds" % (cmd, interval))
+        t = threading.Timer(interval, self.timer_handler, (cmd,))
+        t.start()
 
     def load_config(self):
         """Internal function to laod configuration from file.
@@ -444,6 +458,16 @@ class SerCmd(cmd.Cmd):
                 for opt in self.config.options(sec):
                     if opt not in self.__dict__:
                         self.__dict__[opt] = self.config.get(sec, opt)
+
+    def timer_handler(self, line):
+        """Handles a scheduled timer event.
+
+        Args:
+            line (str): the command line to be executed, when the timer
+                        fires.
+        """
+        self.logger.debug("Firing timer with %s" % line)
+        self.onecmd(self.precmd(line + '\n'))
 
     def process_line(self, line):
         """Processes a valid line from node that should be printed and
