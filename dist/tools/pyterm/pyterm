@@ -126,9 +126,8 @@ class SerCmd(cmd.Cmd):
             pass
 
         ### create Logging object
-        my_millis = "{:.4f}".format(time.time())
-        date_str = '{}.{}'.format(time.strftime('%Y%m%d-%H:%M:%S'),
-                                  my_millis[-4:])
+        my_millis = "%.4f" % (time.time())
+        date_str = '%s.%s' % (time.strftime('%Y%m%d-%H:%M:%S'), my_millis[-4:])
         self.startup = date_str
         # create formatter
         formatter = logging.Formatter(self.fmt_str)
@@ -234,7 +233,7 @@ class SerCmd(cmd.Cmd):
         """Auto completion for date string.
         """
         date = time.strftime("%Y-%m-%d %H:%M:%S")
-        return ["{}".format(date)]
+        return ["%s" % (date)]
 
     def do_PYTERM_reset(self, line):
         """Pyterm command: Send a reset to the node.
@@ -317,8 +316,7 @@ class SerCmd(cmd.Cmd):
         """
         if line.endswith("list"):
             for alias in self.aliases:
-                self.logger.info("{} = {}".format(alias,
-                                 self.aliases[alias]))
+                self.logger.info("%s = %s" % (alias, self.aliases[alias]))
             return
         if not line.count("="):
             sys.stderr.write("Usage: /alias <ALIAS> = <CMD>\n")
