@@ -137,7 +137,8 @@ int skipjack_encrypt(cipher_context_t *context, uint8_t *plainBlock,
 
     // prologue 10 pushs = 20 cycles
     /*register*/ uint8_t counter = 1;
-    /*register*/ uint8_t *skey  = ((skipjack_context_t *)context->context)->skey;
+    skipjack_context_t *skipjack_context = (skipjack_context_t *)context->context;
+    /*register*/ uint8_t *skey  = skipjack_context->skey;
     /*register*/ uint16_t w1, w2, w3, w4, tmp;
     /*register*/ uint8_t bLeft, bRight;
 
@@ -172,7 +173,7 @@ int skipjack_encrypt(cipher_context_t *context, uint8_t *plainBlock,
         RULE_A(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
     }
 
-    skey = ((skipjack_context_t *)context->context)->skey;
+    skey = skipjack_context->skey;
 
     while (counter < 9) { // 3x
         RULE_A(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
@@ -182,13 +183,13 @@ int skipjack_encrypt(cipher_context_t *context, uint8_t *plainBlock,
         RULE_B(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
     }
 
-    skey = ((skipjack_context_t *)context->context)->skey;
+    skey = skipjack_context->skey;
 
     while (counter < 16) { // 5x
         RULE_B(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
     }
 
-    skey = ((skipjack_context_t *)context->context)->skey;
+    skey = skipjack_context->skey;
     // 1x
     RULE_B(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
 
@@ -196,7 +197,7 @@ int skipjack_encrypt(cipher_context_t *context, uint8_t *plainBlock,
         RULE_A(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
     }
 
-    skey = ((skipjack_context_t *)context->context)->skey;
+    skey = skipjack_context->skey;
 
     while (counter < 25) { // 4x
         RULE_A(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
@@ -204,13 +205,13 @@ int skipjack_encrypt(cipher_context_t *context, uint8_t *plainBlock,
 
     // 1x
     RULE_B(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
-    skey = ((skipjack_context_t *)context->context)->skey;
+    skey = skipjack_context->skey;
 
     while (counter < 31) { // 5x
         RULE_B(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
     }
 
-    skey = ((skipjack_context_t *)context->context)->skey;
+    skey = skipjack_context->skey;
 
     while (counter < 33) { // 2x
         RULE_B(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
@@ -233,7 +234,8 @@ int skipjack_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
                      uint8_t *plainBlock)
 {
     /*register*/ uint8_t counter = 32;
-    /*register*/ uint8_t *skey  = ((skipjack_context_t *)context->context)->skey + 4;
+    skipjack_context_t *skipjack_context = (skipjack_context_t *)context->context;
+    /*register*/ uint8_t *skey  = skipjack_context->skey + 4;
     /*register*/ uint16_t w1, w2, w3, w4, tmp;
     /*register*/ uint8_t bLeft, bRight;
 
@@ -267,13 +269,13 @@ int skipjack_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
         RULE_B_INV(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
     }
 
-    skey  = ((skipjack_context_t *)context->context)->skey + 16;
+    skey  = skipjack_context->skey + 16;
 
     while (counter > 25) { //5x
         RULE_B_INV(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
     }
 
-    skey  = ((skipjack_context_t *)context->context)->skey + 16;
+    skey  = skipjack_context->skey + 16;
     //1x
     RULE_B_INV(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
 
@@ -281,7 +283,7 @@ int skipjack_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
         RULE_A_INV(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
     }
 
-    skey  = ((skipjack_context_t *)context->context)->skey + 16;
+    skey  = skipjack_context->skey + 16;
 
     while (counter > 16) { //4x
         RULE_A_INV(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
@@ -289,13 +291,13 @@ int skipjack_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
 
     //1x
     RULE_B_INV(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
-    skey  = ((skipjack_context_t *)context->context)->skey + 16;
+    skey  = skipjack_context->skey + 16;
 
     while (counter > 10) { //5x
         RULE_B_INV(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
     }
 
-    skey  = ((skipjack_context_t *)context->context)->skey + 16;
+    skey  = skipjack_context->skey + 16;
 
     while (counter > 8) { // 2x
         RULE_B_INV(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
@@ -305,7 +307,7 @@ int skipjack_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
         RULE_A_INV(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
     }
 
-    skey  = ((skipjack_context_t *)context->context)->skey + 16;
+    skey  = skipjack_context->skey + 16;
 
     while (counter > 0) { // 5x
         RULE_A_INV(skey, w1, w2, w3, w4, counter, tmp, bLeft, bRight);
@@ -326,7 +328,8 @@ int skipjack_decrypt(cipher_context_t *context, uint8_t *cipherBlock,
 int skipjack_setup_key(cipher_context_t *context, uint8_t *key, uint8_t keysize)
 {
     int i = 0;
-    uint8_t *skey = ((skipjack_context_t *)context->context)->skey;
+    skipjack_context_t *skipjack_context = (skipjack_context_t *)context->context;
+    uint8_t *skey = skipjack_context->skey;
 
     // for keys which are smaller than 160 bits, concatenate until they reach
     // 160 bits in size. Note that key expansion is just concatenation.
