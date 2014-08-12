@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "kernel_types.h"
+
 #include "board.h"
 #include "radio/types.h"
 
@@ -28,8 +30,6 @@ typedef struct __attribute__((packed))
     /* @} */
 }
 at86rf231_packet_t;
-
-extern kernel_pid_t transceiver_pid;
 
 void at86rf231_init(kernel_pid_t tpid);
 //void at86rf231_reset(void);
