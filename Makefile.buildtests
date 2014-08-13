@@ -139,6 +139,10 @@ info-buildsizes-diff:
 
 info-build:
 	@echo 'APPLICATION: $(APPLICATION)'
+	@echo ''
+	@echo 'supported boards:'
+	@$(foreach board,$(BOARDS),echo ' * $(board)';)
+	@echo ''
 	@echo 'BOARD:   $(BOARD)'
 	@echo 'CPU:     $(CPU)'
 	@echo 'MCU:     $(MCU)'
