@@ -47,8 +47,8 @@ DEP += $(SRCXX:%.cpp=$(BINDIR)$(MODULE)/%.d)
 $(BINDIR)$(MODULE)/:
 	$(AD)mkdir -p $@
 
-$(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ) ${DIRS:%=ALL--%} $(BINDIR)$(MODULE)/
-	$(AD)$(AR) -rc $(BINDIR)$(MODULE).a $(OBJ) $(ASMOBJ)
+$(BINDIR)$(MODULE).a: $(OBJ) ${DIRS:%=ALL--%} $(BINDIR)$(MODULE)/
+	$(AD)$(AR) -rcs $@ $(OBJ)
 
 CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 
