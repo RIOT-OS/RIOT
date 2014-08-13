@@ -15,7 +15,7 @@
 /**
  * Canonical identifier for an invalid PID.
  */
-#define KERNEL_PID_UNDEF -1
+#define KERNEL_PID_UNDEF 0
 
 /**
  * The first valid PID (inclusive).
