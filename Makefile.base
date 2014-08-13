@@ -50,19 +50,22 @@ $(BINDIR)$(MODULE)/:
 $(BINDIR)$(MODULE).a: $(OBJ) $(ASMOBJ) ${DIRS:%=ALL--%} $(BINDIR)$(MODULE)/
 	$(AD)$(AR) -rc $(BINDIR)$(MODULE).a $(OBJ) $(ASMOBJ)
 
+CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
+
+# compile and generate dependency info
+
+$(BINDIR)$(MODULE)/%.o: %.c $(BINDIR)$(MODULE)/
+	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
+
+$(BINDIR)$(MODULE)/%.o: %.cpp $(BINDIR)$(MODULE)/
+	$(AD)$(CXX) $(CXXFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
+
+$(BINDIR)$(MODULE)/%.o: %.s $(BINDIR)$(MODULE)/
+	$(AD)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
+
+$(BINDIR)$(MODULE)/%.o: %.S $(BINDIR)$(MODULE)/
+	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
+
 # pull in dependency info for *existing* .o files
 # deleted header files will be silently ignored
 -include $(OBJ:.o=.d)
-
-# compile and generate dependency info
-$(BINDIR)$(MODULE)/%.o: %.c $(BINDIR)$(MODULE)/
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $(BINDIR)$(MODULE)/$*.o $(abspath $*.c)
-
-$(BINDIR)$(MODULE)/%.o: %.cpp $(BINDIR)$(MODULE)/
-	$(AD)$(CXX) $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS) $(INCLUDES) -MD -MP -c -o $(BINDIR)$(MODULE)/$*.o $(abspath $*.cpp)
-
-$(BINDIR)$(MODULE)/%.o: %.s $(BINDIR)$(MODULE)/
-	$(AD)$(AS) $(ASFLAGS) $*.s -o $(BINDIR)$(MODULE)/$*.o
-
-$(BINDIR)$(MODULE)/%.o: %.S $(BINDIR)$(MODULE)/
-	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $(BINDIR)$(MODULE)/$*.o $(abspath $*.S)
