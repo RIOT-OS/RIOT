@@ -20,6 +20,13 @@ ifneq (, $(filter buildtest, $(MAKECMDGOALS)))
   endif
 endif
 
+BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name *-common -printf '%f ')
+$(warning $(BOARDS))
+BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
+$(warning $(BOARDS))
+BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
+$(warning $(BOARDS))
+
 buildtest:
 	@if [ -z "$${JENKINS_URL}" ] && tput colors 2>&1 > /dev/null; then \
 		GREEN='\033[1;32m'; RED='\033[1;31m'; PURPLE='\033[1;35m'; RESET='\033[0m'; \
@@ -29,20 +36,9 @@ buildtest:
 		ECHO='/bin/echo'; \
 	fi; \
 	\
-	if [ -z "$(BOARD_WHITELIST)" ]; then \
-		BOARDS=$$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); \
-	else \
-		BOARDS="$(BOARD_WHITELIST)"; \
-	fi; \
-	\
-	for BOARD in $(BOARD_BLACKLIST); do \
-		echo "Ignoring $${BOARD} (blacklisted)"; \
-		BOARDS=$$(echo \ $${BOARDS}\  | sed -e 's/ '$${BOARD}' / /'); \
-	done; \
-	\
 	BUILDTESTOK=true; \
 	rm -rf "$$BINDIRBASE"; \
-	for BOARD in $${BOARDS}; do \
+	for BOARD in $(BOARDS); do \
 		RIOTNOLINK=$$(case ' $(BOARD_INSUFFICIENT_RAM) ' in *" $${BOARD} "*) echo 1; esac); \
 		$${ECHO} -n "Building for $${BOARD} "; \
 		[ -n "$${RIOTNOLINK}" ] && $${ECHO} -n "(no linking) "; \
@@ -94,17 +90,8 @@ info-buildsize:
 
 info-buildsizes: SHELL=bash
 info-buildsizes:
-	@if [[ -z "$(BOARD_WHITELIST)" ]]; then \
-		BOARDS=$$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); \
-	else \
-		BOARDS="$(BOARD_WHITELIST)"; \
-	fi; \
-	for BOARD in $(BOARD_BLACKLIST) $(BOARD_INSUFFICIENT_RAM); do \
-		BOARDS=$$(echo \ $${BOARDS}\  | sed -e 's/ '$${BOARD}' / /'); \
-	done; \
-	\
 	echo -e "   text\t   data\t    bss\t    dec\tboard"; \
-	for BOARD in $${BOARDS}; do \
+	for BOARD in $(BOARDS); do \
 		echo "$$(env -i \
 			HOME=$${HOME} \
 			PATH=$${PATH} \
@@ -118,19 +105,10 @@ info-buildsizes:
 
 info-buildsizes-diff: SHELL=bash
 info-buildsizes-diff:
-	@if [[ -z "$(BOARD_WHITELIST)" ]]; then \
-		BOARDS=$$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); \
-	else \
-		BOARDS="$(BOARD_WHITELIST)"; \
-	fi; \
-	for BOARD in $(BOARD_BLACKLIST) $(BOARD_INSUFFICIENT_RAM); do \
-		BOARDS=$$(echo \ $${BOARDS}\  | sed -e 's/ '$${BOARD}' / /'); \
-	done; \
-	\
-	GREEN='\033[1;32m'; RED='\033[1;31m'; RESET='\033[0m'; \
+	@GREEN='\033[1;32m'; RED='\033[1;31m'; RESET='\033[0m'; \
 	\
 	echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
-	for BOARD in $$(tr ' ' '\n' <<< $${BOARDS} | sort); do \
+	for BOARD in $(BOARDS); do \
 		for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
 			env -i \
 				HOME=$${HOME} \
@@ -206,7 +184,6 @@ info-build:
 	@echo ''
 	@echo -e 'MAKEFILE_LIST:$(patsubst %, \n\t%, $(abspath $(MAKEFILE_LIST)))'
 
-info-boards-supported: BOARDS=$(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name *-common -printf '%f ')
 info-boards-supported:
 ifneq (,$(BOARD_WHITELIST))
 	@echo "$(filter $(BOARD_WHITELIST), $(BOARDS))"
