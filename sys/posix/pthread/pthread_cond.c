@@ -98,7 +98,7 @@ int pthread_cond_wait(struct pthread_cond_t *cond, struct mutex_t *mutex)
 {
     priority_queue_node_t n;
     n.priority = sched_active_thread->priority;
-    n.data = sched_active_thread->pid;
+    n.data = sched_active_pid;
     n.next = NULL;
 
     /* the signaling thread may not hold the mutex, the queue is not thread safe */
@@ -130,7 +130,7 @@ int pthread_cond_timedwait(struct pthread_cond_t *cond, struct mutex_t *mutex, c
     reltime = timex_sub(then, now);
 
     vtimer_t timer;
-    vtimer_set_wakeup(&timer, reltime, sched_active_thread->pid);
+    vtimer_set_wakeup(&timer, reltime, sched_active_pid);
     int result = pthread_cond_wait(cond, mutex);
     vtimer_remove(&timer);
 

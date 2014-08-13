@@ -100,7 +100,7 @@ caddr_t _sbrk_r(struct _reent *r, size_t incr)
  */
 pid_t _getpid(void)
 {
-    return (pid_t) sched_active_thread->pid;
+    return (pid_t) sched_active_pid;
 }
 
 /**

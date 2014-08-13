@@ -173,7 +173,7 @@ uint8_t SMB380_init_simple(uint16_t samplerate, uint8_t bandwidth, uint8_t
 {
     SSP0Init();
     interruptTicksSMB380 = 0;
-    simple_pid = sched_active_thread->pid;
+    simple_pid = sched_active_pid;
     gpioint_set(0, BIT1, GPIOINT_RISING_EDGE, &SMB380_simple_interrupthandler);
     SMB380_softReset();
     hwtimer_wait(HWTIMER_TICKS(100000));
@@ -305,7 +305,7 @@ uint8_t getRingReadPointerforCurrentThread(void)
 {
     uint8_t pointerNo = 0;
 
-    while ((PointerList[pointerNo] != sched_active_thread->pid) &&
+    while ((PointerList[pointerNo] != sched_active_pid) &&
            (pointerNo < SMB380_RING_BUFF_MAX_THREADS)) {
         pointerNo++;
     }
@@ -327,7 +327,7 @@ uint8_t initRingReadPointerforCurrentThread(void)
         return 0;
     }
     else {
-        PointerList[pointerNo] = sched_active_thread->pid;
+        PointerList[pointerNo] = sched_active_pid;
         readPointerPos[pointerNo] = settings.writePointerPos;
         return 1;
     }

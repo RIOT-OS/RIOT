@@ -200,7 +200,7 @@ static int pthread_rwlock_timedlock(pthread_rwlock_t *rwlock,
         timex_t reltime = timex_sub(then, now);
 
         vtimer_t timer;
-        vtimer_set_wakeup(&timer, reltime, sched_active_thread->pid);
+        vtimer_set_wakeup(&timer, reltime, sched_active_pid);
         int result = pthread_rwlock_lock(rwlock, is_blocked, is_writer, incr_when_held, true);
         if (result != ETIMEDOUT) {
             vtimer_remove(&timer);
