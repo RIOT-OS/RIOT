@@ -53,16 +53,16 @@ CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 
 # compile and generate dependency info
 
-$(BINDIR)$(MODULE)/%.o: %.c $(BINDIR)$(MODULE)/
+$(OBJC): $(BINDIR)$(MODULE)/%.o: %.c $(BINDIR)$(MODULE)/
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
-$(BINDIR)$(MODULE)/%.o: %.cpp $(BINDIR)$(MODULE)/
+$(OBJCXX): $(BINDIR)$(MODULE)/%.o: %.cpp $(BINDIR)$(MODULE)/
 	$(AD)$(CXX) $(CXXFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
-$(BINDIR)$(MODULE)/%.o: %.s $(BINDIR)$(MODULE)/
+$(ASMOBJ): $(BINDIR)$(MODULE)/%.o: %.s $(BINDIR)$(MODULE)/
 	$(AD)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
-$(BINDIR)$(MODULE)/%.o: %.S $(BINDIR)$(MODULE)/
+$(ASSMOBJ): $(BINDIR)$(MODULE)/%.o: %.S $(BINDIR)$(MODULE)/
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 # pull in dependency info for *existing* .o files
