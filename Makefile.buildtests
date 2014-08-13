@@ -24,6 +24,9 @@ BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name *-common -pri
 BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
 BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
 
+.PHONY: buildtest info-objsize info-buildsize info-buildsizes \
+        info-buildsizes-diff info-build info-boards-supported
+
 buildtest:
 	@if [ -z "$${JENKINS_URL}" ] && tput colors 2>&1 > /dev/null; then \
 		GREEN='\033[1;32m'; RED='\033[1;31m'; PURPLE='\033[1;35m'; RESET='\033[0m'; \
