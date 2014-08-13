@@ -39,7 +39,7 @@ inline kernel_pid_t thread_getpid(void)
 
 volatile tcb_t *thread_get(kernel_pid_t pid)
 {
-    if ((pid != KERNEL_PID_UNDEF) && (0 <= pid) && (pid < MAXTHREADS)) {
+    if ((pid != KERNEL_PID_UNDEF) && (KERNEL_PID_FIRST <= pid) && (pid <= KERNEL_PID_LAST)) {
         return sched_threads[pid];
     }
     return NULL;
@@ -158,19 +158,14 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
         dINT();
     }
 
-    kernel_pid_t pid = 0;
-
-    while (pid < MAXTHREADS) {
-        if (sched_threads[pid] == NULL) {
-            sched_threads[pid] = cb;
-            cb->pid = pid;
+    kernel_pid_t pid = KERNEL_PID_UNDEF;
+    for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; ++i) {
+        if (sched_threads[i] == NULL) {
+            pid = i;
             break;
         }
-
-        pid++;
     }
-
-    if (pid == MAXTHREADS) {
+    if (pid == KERNEL_PID_UNDEF) {
         DEBUG("thread_create(): too many threads!\n");
 
         if (!inISR()) {
@@ -180,6 +175,9 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
         return -EOVERFLOW;
     }
 
+    sched_threads[pid] = cb;
+
+    cb->pid = pid;
     cb->sp = thread_stack_init(function, arg, stack, stacksize);
     cb->stack_start = stack;
 

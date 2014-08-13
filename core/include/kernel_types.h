@@ -5,10 +5,27 @@
 #include <inttypes.h>
 
 /**
- * @def KERNEL_PID_UNDEF
- * @brief Identifier to detect an invalid PID
+ * @def MAXTHREADS
+ * @brief The maximum number of threads to be scheduled
+ */
+#ifndef MAXTHREADS
+#define MAXTHREADS 32
+#endif
+
+/**
+ * Canonical identifier for an invalid PID.
  */
 #define KERNEL_PID_UNDEF -1
+
+/**
+ * The first valid PID (inclusive).
+ */
+#define KERNEL_PID_FIRST (KERNEL_PID_UNDEF + 1)
+
+/**
+ * The last valid PID (inclusive).
+ */
+#define KERNEL_PID_LAST (KERNEL_PID_FIRST + MAXTHREADS - 1)
 
 /**
  * Macro for printing formatter
@@ -16,8 +33,7 @@
 #define PRIkernel_pid PRIi16
 
 /**
- * @brief Unique process identifier
- *
+ * Unique process identifier
  */
 typedef int16_t kernel_pid_t;
 

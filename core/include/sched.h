@@ -84,8 +84,7 @@
 #include "bitarithm.h"
 #include "tcb.h"
 #include "attributes.h"
-
-#define MAXTHREADS 32 /**< the maximum number of threads to be scheduled */
+#include "kernel_types.h"
 
 /**
  * @def SCHED_PRIO_LEVELS
