@@ -21,11 +21,8 @@ ifneq (, $(filter buildtest, $(MAKECMDGOALS)))
 endif
 
 BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name *-common -printf '%f ')
-$(warning $(BOARDS))
 BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
-$(warning $(BOARDS))
 BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
-$(warning $(BOARDS))
 
 buildtest:
 	@if [ -z "$${JENKINS_URL}" ] && tput colors 2>&1 > /dev/null; then \
