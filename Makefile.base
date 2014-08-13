@@ -22,27 +22,26 @@ ${DIRS:%=ALL--%}:
 ${DIRS:%=CLEAN--%}:
 	"$(MAKE)" -C ${@:CLEAN--%=%} clean
 
-ASMSRC = $(wildcard *.s)
-ASSMSRC = $(wildcard *.S)
-ASMOBJ = $(ASMSRC:%.s=$(BINDIR)$(MODULE)/%.o)
-ASMOBJ += $(ASSMSRC:%.S=$(BINDIR)$(MODULE)/%.o)
-
 ifeq ($(strip $(SRC)),)
-	SRC = $(wildcard *.c)
+    SRC := $(wildcard *.c)
 endif
-
 ifeq ($(strip $(SRCXX)),)
-	SRCXX = $(wildcard *.cpp)
+    SRCXX := $(wildcard *.cpp)
+endif
+ifeq ($(strip $(ASMSRC)),)
+    ASMSRC := $(wildcard *.s)
+endif
+ifeq ($(strip $(ASSMSRC)),)
+    ASSMSRC := $(wildcard *.S)
 endif
 
-OBJC = $(SRC:%.c=$(BINDIR)$(MODULE)/%.o)
-OBJCXX = $(SRCXX:%.cpp=$(BINDIR)$(MODULE)/%.o)
+OBJC    := $(SRC:%.c=$(BINDIR)$(MODULE)/%.o)
+OBJCXX  := $(SRCXX:%.cpp=$(BINDIR)$(MODULE)/%.o)
+ASMOBJ  := $(ASMSRC:%.s=$(BINDIR)$(MODULE)/%.o)
+ASSMOBJ := $(ASSMSRC:%.S=$(BINDIR)$(MODULE)/%.o)
 
-OBJ = $(OBJC)
-OBJ += $(OBJCXX)
-
-DEP = $(SRC:%.c=$(BINDIR)$(MODULE)/%.d)
-DEP += $(SRCXX:%.cpp=$(BINDIR)$(MODULE)/%.d)
+OBJ := $(OBJC) $(OBJCXX) $(ASMOBJ) $(ASSMOBJ)
+DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
 
 $(BINDIR)$(MODULE)/:
 	$(AD)mkdir -p $@
@@ -68,4 +67,4 @@ $(BINDIR)$(MODULE)/%.o: %.S $(BINDIR)$(MODULE)/
 
 # pull in dependency info for *existing* .o files
 # deleted header files will be silently ignored
--include $(OBJ:.o=.d)
+-include $(DEP)
