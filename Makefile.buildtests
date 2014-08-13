@@ -185,8 +185,4 @@ info-build:
 	@echo -e 'MAKEFILE_LIST:$(patsubst %, \n\t%, $(abspath $(MAKEFILE_LIST)))'
 
 info-boards-supported:
-ifneq (,$(BOARD_WHITELIST))
-	@echo "$(filter $(BOARD_WHITELIST), $(BOARDS))"
-else
-	@echo "$(filter-out $(BOARD_INSUFFICIENT_RAM) $(BOARD_BLACKLIST), $(BOARDS))"
-endif
+	@echo "$(BOARDS)"
