@@ -15,7 +15,7 @@ export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export LINKFLAGS = -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
-export FLASHER = goodfet.bsl
+export FLASHER = $(RIOTBASE)/dist/tools/goodfet/goodfet.bsl
 ifeq ($(strip $(PORT)),)
     export PORT = /dev/ttyUSB0
 endif
