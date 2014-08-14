@@ -20,6 +20,13 @@ ifneq (, $(filter buildtest, $(MAKECMDGOALS)))
   endif
 endif
 
+BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name *-common -printf '%f ')
+BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
+BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
+
+.PHONY: buildtest info-objsize info-buildsize info-buildsizes \
+        info-buildsizes-diff info-build info-boards-supported
+
 buildtest:
 	@if [ -z "$${JENKINS_URL}" ] && tput colors 2>&1 > /dev/null; then \
 		GREEN='\033[1;32m'; RED='\033[1;31m'; PURPLE='\033[1;35m'; RESET='\033[0m'; \
@@ -29,20 +36,9 @@ buildtest:
 		ECHO='/bin/echo'; \
 	fi; \
 	\
-	if [ -z "$(BOARD_WHITELIST)" ]; then \
-		BOARDS=$$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); \
-	else \
-		BOARDS="$(BOARD_WHITELIST)"; \
-	fi; \
-	\
-	for BOARD in $(BOARD_BLACKLIST); do \
-		echo "Ignoring $${BOARD} (blacklisted)"; \
-		BOARDS=$$(echo \ $${BOARDS}\  | sed -e 's/ '$${BOARD}' / /'); \
-	done; \
-	\
 	BUILDTESTOK=true; \
 	rm -rf "$$BINDIRBASE"; \
-	for BOARD in $${BOARDS}; do \
+	for BOARD in $(BOARDS); do \
 		RIOTNOLINK=$$(case ' $(BOARD_INSUFFICIENT_RAM) ' in *" $${BOARD} "*) echo 1; esac); \
 		$${ECHO} -n "Building for $${BOARD} "; \
 		[ -n "$${RIOTNOLINK}" ] && $${ECHO} -n "(no linking) "; \
@@ -74,14 +70,14 @@ buildtest:
 	done; \
 	$${BUILDTESTOK}
 
-objsize:
+info-objsize:
 	@case "${SORTROW}" in \
 		text) SORTROW=1 ;; \
 		data) SORTROW=2 ;; \
 		bss) SORTROW=3 ;; \
 		dec) SORTROW=4 ;; \
 		"") SORTROW=4 ;; \
-		*) echo "Usage: $(MAKE) objsize SORTROW=[text|data|bss|dec]" ; return ;; \
+		*) echo "Usage: $(MAKE) info-objsize SORTROW=[text|data|bss|dec]" ; return ;; \
 	esac; \
 	echo '   text\t   data\t    bss\t    dec\t    hex\tfilename'; \
 	$(SIZE) -dB $(BASELIBS) | \
@@ -89,22 +85,13 @@ objsize:
 		sed -e 's#$(BINDIR)##' | \
 		sort -rnk$${SORTROW}
 
-buildsize:
+info-buildsize:
 	@$(SIZE) -dB $(BINDIR)$(APPLICATION).elf
 
-buildsizes: SHELL=bash
-buildsizes:
-	@if [[ -z "$(BOARD_WHITELIST)" ]]; then \
-		BOARDS=$$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); \
-	else \
-		BOARDS="$(BOARD_WHITELIST)"; \
-	fi; \
-	for BOARD in $(BOARD_BLACKLIST) $(BOARD_INSUFFICIENT_RAM); do \
-		BOARDS=$$(echo \ $${BOARDS}\  | sed -e 's/ '$${BOARD}' / /'); \
-	done; \
-	\
+info-buildsizes: SHELL=bash
+info-buildsizes:
 	echo -e "   text\t   data\t    bss\t    dec\tboard"; \
-	for BOARD in $${BOARDS}; do \
+	for BOARD in $(BOARDS); do \
 		echo "$$(env -i \
 			HOME=$${HOME} \
 			PATH=$${PATH} \
@@ -113,24 +100,15 @@ buildsizes:
 			RIOTBOARD=$${RIOTBOARD} \
 			RIOTCPU=$${RIOTCPU} \
 			BINDIRBASE=$${BINDIRBASE} \
-			$(MAKE) buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${BOARD}"; \
+			$(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4)" "$${BOARD}"; \
 	done;
 
-buildsizes-diff: SHELL=bash
-buildsizes-diff:
-	@if [[ -z "$(BOARD_WHITELIST)" ]]; then \
-		BOARDS=$$(find $(RIOTBOARD) -mindepth 1 -maxdepth 1 -type d \! -name \*-common -printf '%f\n' ); \
-	else \
-		BOARDS="$(BOARD_WHITELIST)"; \
-	fi; \
-	for BOARD in $(BOARD_BLACKLIST) $(BOARD_INSUFFICIENT_RAM); do \
-		BOARDS=$$(echo \ $${BOARDS}\  | sed -e 's/ '$${BOARD}' / /'); \
-	done; \
-	\
-	GREEN='\033[1;32m'; RED='\033[1;31m'; RESET='\033[0m'; \
+info-buildsizes-diff: SHELL=bash
+info-buildsizes-diff:
+	@GREEN='\033[1;32m'; RED='\033[1;31m'; RESET='\033[0m'; \
 	\
 	echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
-	for BOARD in $$(tr ' ' '\n' <<< $${BOARDS} | sort); do \
+	for BOARD in $(BOARDS); do \
 		for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
 			env -i \
 				HOME=$${HOME} \
@@ -140,7 +118,7 @@ buildsizes-diff:
 				RIOTBOARD=$${RIOTBOARD} \
 				RIOTCPU=$${RIOTCPU} \
 				BINDIRBASE=$${BINDIRBASE} \
-				$(MAKE) buildsize 2>/dev/null | tail -n-1 | cut -f-4; \
+				$(MAKE) info-buildsize 2>/dev/null | tail -n-1 | cut -f-4; \
 		done | \
 		while read -a OLD && read -a NEW; do \
 			for I in 0 1 2 3; do \
@@ -159,8 +137,12 @@ buildsizes-diff:
 		done; \
 	done;
 
-buildinfo:
+info-build:
 	@echo 'APPLICATION: $(APPLICATION)'
+	@echo ''
+	@echo 'supported boards:'
+	@$(foreach board,$(BOARDS),echo ' * $(board)';)
+	@echo ''
 	@echo 'BOARD:   $(BOARD)'
 	@echo 'CPU:     $(CPU)'
 	@echo 'MCU:     $(MCU)'
@@ -206,3 +188,5 @@ buildinfo:
 	@echo ''
 	@echo -e 'MAKEFILE_LIST:$(patsubst %, \n\t%, $(abspath $(MAKEFILE_LIST)))'
 
+info-boards-supported:
+	@echo "$(BOARDS)"
