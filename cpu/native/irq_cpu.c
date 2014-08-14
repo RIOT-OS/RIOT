@@ -45,8 +45,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-extern volatile tcb_t *sched_active_thread;
-
 volatile int native_interrupts_enabled;
 volatile int _native_in_isr;
 volatile int _native_in_syscall;
