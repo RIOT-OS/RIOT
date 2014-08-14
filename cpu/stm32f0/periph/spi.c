@@ -26,7 +26,7 @@
 #include "thread.h"
 #include "sched.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 /* guard file in case no SPI device is defined */
@@ -122,22 +122,16 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 
     /* select clock polarity and clock phase */
     spi->CR1 |= conf;
-
     /* select master mode */
     spi->CR1 |= SPI_CR1_MSTR;
-
     /* the NSS (chip select) is managed purely by software */
     spi->CR1 |= SPI_CR1_SSM | SPI_CR1_SSI;
-
     /* set data-size to 8-bit */
-    spi->CR2 |= (7 << 8);
-
+    spi->CR2 |= (0x7 << 8);
     /* set FIFO threshold to set RXNE when 8 bit are received */
     spi->CR2 |= SPI_CR2_FRXTH;
-
     /* enable the SPI device */
     spi->CR1 |= SPI_CR1_SPE;
-
     return 0;
 }
 
@@ -173,7 +167,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
             pin[1] = SPI_1_PIN_MISO;
             pin[2] = SPI_1_PIN_MOSI;
             af = SPI_1_PIN_AF;
-            SPI_0_PORT_CLKEN();
+            SPI_1_PORT_CLKEN();
             NVIC_SetPriority(SPI_1_IRQ, SPI_IRQ_PRIO);
             NVIC_EnableIRQ(SPI_1_IRQ);
             break;
@@ -182,15 +176,6 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
 
     /* set callback */
     spi_config[dev].cb = cb;
-
-    /* test callback */
-    char foo = spi_config[dev].cb(' ');
-    printf("SPI: cb-test ' ': %c\n", foo);
-
-    foo = spi_config[dev].cb(0x1f);
-    printf("SPI: cb-test '0x1f': %c\n", foo);
-    foo = spi_config[dev].cb(0);
-    printf("SPI: cb-test '0': %c\n", foo);
 
     /* configure pins for their correct alternate function */
     for (int i = 0; i < 3; i++) {
@@ -208,19 +193,16 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
 
     /* select clock polarity and clock phase */
     spi->CR1 |= conf;
-
+    /* the NSS (chip select) is managed by software and NSS is low (slave enabled) */
+    spi->CR1 |= SPI_CR1_SSM;
     /* set data-size to 8-bit */
-    spi->CR2 |= (7 << 8);
-
+    spi->CR2 |= (0x7 << 8);
     /* set FIFO threshold to set RXNE when 8 bit are received */
     spi->CR2 |= SPI_CR2_FRXTH;
-
     /* enable interrupt for arriving data: 'receive register no empty' and errors */
     spi->CR2 |= SPI_CR2_RXNEIE | SPI_CR2_ERRIE;
-
     /* enable the SPI device */
     spi->CR1 |= SPI_CR1_SPE;
-
     return 0;
 }
 
@@ -228,8 +210,6 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 {
     char tmp;
     SPI_TypeDef *spi = 0;
-
-    DEBUG("Will tranfer char |%c|\n", out);
 
     switch (dev) {
 #if SPI_0_EN
@@ -244,26 +224,14 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 #endif
     }
 
-
-    DEBUG("Write data into DR\n");
-    /* put next byte into the output register */
-    spi->DR = out;
-
-    DEBUG("Wait while TXE is not set\n");
     /* wait for an eventually previous byte to be readily transferred */
     while(!(spi->SR & SPI_SR_TXE));
-
-    DEBUG("Wait while RXNE is not set\n");
+    /* put next byte into the output register */
+    *((volatile uint8_t *)(&spi->DR)) = (uint8_t)out;
     /* wait until the current byte was successfully transferred */
-    //while(!(spi->SR & SPI_SR_RXNE) );
-
-    DEBUG("Wait until device is not busy anymore\n");
-    while (spi->SR & SPI_SR_BSY);
-
-    DEBUG("Read DR\n");
+    while(!(spi->SR & SPI_SR_RXNE) );
     /* read response byte to reset flags */
-    tmp = spi->DR;
-
+    tmp = *((volatile uint8_t *)(&spi->DR));
     /* 'return' response byte if wished for */
     if (in) {
         *in = tmp;
@@ -279,7 +247,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     for (int i = 0; i < length; i++) {
         DEBUG("Ready for byte %i\n", i);
         if (out) {
-            DEBUG("Send out with real data\n");
+            DEBUG("Send out with real data: %c\n", out[i]);
             spi_transfer_byte(dev, out[i], &res);
         }
         else {
@@ -287,6 +255,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
             spi_transfer_byte(dev, 0, &res);
         }
         if (in) {
+            DEBUG("Got byte: %c\n", res);
             in[i] = res;
         }
     }
@@ -311,16 +280,15 @@ void spi_transmission_begin(spi_t dev, char reset_val)
     switch (dev) {
 #if SPI_0_EN
         case SPI_0:
-            SPI_0_DEV->DR = reset_val;
+            *((volatile uint8_t *)(&SPI_0_DEV->DR)) = (uint8_t)reset_val;
             break;
 #endif
 #if SPI_1_EN
         case SPI_1:
-            SPI_1_DEV->DR = reset_val;
+            *((volatile uint8_t *)(&SPI_1_DEV->DR)) = (uint8_t)reset_val;
             break;
 #endif
     }
-    DEBUG("SPI: transmisison begins, first char is |%c|\n", reset_val);
 }
 
 void spi_poweron(spi_t dev)
@@ -361,27 +329,16 @@ void spi_poweroff(spi_t dev)
 static inline void irq_handler(SPI_TypeDef *spi, spi_t dev)
 {
     char data;
-    LD3_TOGGLE;
 
     /* call owner when new byte was receive (asserts SPI is in slave mode) */
     if (spi->SR & SPI_SR_RXNE) {
         /* read received byte from data register */
-        data = spi->DR;
+        data = *((volatile uint8_t *)(&spi->DR));
         /* call callback for receiving the answer of the received byte */
-        data = spi_config[dev].cb(data);
+        //data = spi_config[dev].cb(data);
         /* set answer byte to be transferred next */
-        spi->DR = data;
+        *((volatile uint8_t *)(&spi->DR)) = (uint8_t)data;
     }
-    else {
-        while (1) {
-            for (int i = 0; i < 2000000; i++) {
-                asm("nop");
-            }
-            LD4_TOGGLE;
-        }
-    }
-
-    /* see if a thread with higher priority wants to run now */
     if (sched_context_switch_request) {
         thread_yield();
     }
@@ -391,7 +348,9 @@ static inline void irq_handler(SPI_TypeDef *spi, spi_t dev)
 __attribute__((naked)) void SPI_0_ISR(void)
 {
     ISR_ENTER();
+    LD4_TOGGLE;
     irq_handler(SPI_0_DEV, SPI_0);
+    LD4_TOGGLE;
     ISR_EXIT();
 }
 #endif
@@ -400,7 +359,7 @@ __attribute__((naked)) void SPI_0_ISR(void)
 __attribute__((naked)) void SPI_1_ISR(void)
 {
     ISR_ENTER();
-    irq_handler(SPI_0_DEV, SPI_1);
+    irq_handler(SPI_1_DEV, SPI_1);
     ISR_EXIT();
 }
 #endif

@@ -144,7 +144,7 @@
 #define SPI_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
 #define SPI_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_SPI1EN))
 #define SPI_0_IRQ           SPI1_IRQn
-#define SPI_0_IRQ_HANDLER   isr_spi1
+#define SPI_0_ISR           isr_spi1
 /* SPI 1 pin configuration */
 #define SPI_0_PORT          GPIOA
 #define SPI_0_PORT_CLKEN()  (RCC->AHBENR |= RCC_AHBENR_GPIOAEN)
@@ -158,7 +158,7 @@
 #define SPI_1_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_SPI2EN)
 #define SPI_1_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_SPI2EN))
 #define SPI_1_IRQ           SPI2_IRQn
-#define SPI_1_IRQ_HANDLER   isr_spi1
+#define SPI_1_ISR           isr_spi2
 /* SPI 1 pin configuration */
 #define SPI_1_PORT          GPIOB
 #define SPI_1_PORT_CLKEN()  (RCC->AHBENR |= RCC_AHBENR_GPIOBEN)
