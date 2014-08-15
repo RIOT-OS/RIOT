@@ -184,7 +184,7 @@ void cc1100_phy_init(void)
         cc1100_watch_dog_period = timex_set(CC1100_WATCHDOG_PERIOD, 0);
 
         if (timex_cmp(cc1100_watch_dog_period, timex_set(0, 0)) != 0) {
-            vtimer_set_msg(&cc1100_watch_dog, cc1100_watch_dog_period, cc1100_event_handler_pid, NULL);
+            vtimer_set_msg(&cc1100_watch_dog, cc1100_watch_dog_period, VTIMER_RELATIVE, cc1100_event_handler_pid, NULL);
         }
     }
 }
@@ -684,7 +684,7 @@ static void *cc1100_event_handler_function(void *arg)
 
         if (rx_buffer_size == 0) {
             if (timex_uint64(cc1100_watch_dog_period) != 0) {
-                vtimer_set_msg(&cc1100_watch_dog, cc1100_watch_dog_period,
+                vtimer_set_msg(&cc1100_watch_dog, cc1100_watch_dog_period, VTIMER_RELATIVE,
                                cc1100_event_handler_pid, NULL);
             }
 

@@ -19,14 +19,14 @@
  * @}
  */
 
+#include <errno.h>
+
 #include "pthread_cond.h"
 #include "thread.h"
 #include "vtimer.h"
 #include "sched.h"
 #include "irq.h"
 #include "debug.h"
-
-struct vtimer_t timer;
 
 int pthread_cond_condattr_destroy(struct pthread_condattr_t *attr)
 {
@@ -122,19 +122,22 @@ int pthread_cond_wait(struct pthread_cond_t *cond, struct mutex_t *mutex)
 
 int pthread_cond_timedwait(struct pthread_cond_t *cond, struct mutex_t *mutex, const struct timespec *abstime)
 {
-    timex_t now, then, reltime;
-
-    vtimer_now(&now);
+    timex_t then;
     then.seconds = abstime->tv_sec;
     then.microseconds = abstime->tv_nsec / 1000u;
-    reltime = timex_sub(then, now);
 
+    int spurious = 1;
     vtimer_t timer;
-    vtimer_set_wakeup(&timer, reltime, sched_active_thread->pid);
-    int result = pthread_cond_wait(cond, mutex);
-    vtimer_remove(&timer);
 
-    return result;
+    vtimer_set_wakeup(&timer, then, VTIMER_ABSOLUTE, sched_active_thread->pid, &spurious);
+    pthread_cond_wait(cond, mutex);
+
+    if (spurious) {
+        vtimer_remove(&timer);
+        return ETIMEDOUT;
+    }
+
+    return 0;
 }
 
 int pthread_cond_signal(struct pthread_cond_t *cond)
