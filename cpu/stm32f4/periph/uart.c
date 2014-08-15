@@ -14,6 +14,7 @@
  * @brief       Low-level UART driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Fabian Nack <nack@inf.fu-berlin.de>
  *
  * @}
  */
@@ -78,6 +79,13 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
             UART_1_DEV->CR1 |= USART_CR1_RXNEIE;
             break;
 #endif
+#if UART_2_EN
+        case UART_2:
+            NVIC_SetPriority(UART_2_IRQ_CHAN, UART_IRQ_PRIO);
+            NVIC_EnableIRQ(UART_2_IRQ_CHAN);
+            UART_2_DEV->CR1 |= USART_CR1_RXNEIE;
+            break;
+#endif
     }
 
     return 0;
@@ -120,7 +128,23 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
             UART_1_PORT_CLKEN();
             break;
 #endif
+#if UART_2_EN
+        case UART_2:
+            dev = UART_2_DEV;
+            port = UART_2_PORT;
+            clk = UART_2_CLK;
+            tx_pin = UART_2_TX_PIN;
+            rx_pin = UART_2_RX_PIN;
+            af = UART_2_AF;
+            UART_2_CLKEN();
+            UART_2_PORT_CLKEN();
+            break;
+#endif
     }
+
+    /* configure pp mode with no pull for RX and TX pins */
+    port->OTYPER &= ~(1 << rx_pin | 1 << tx_pin);
+    port->PUPDR &= ~(3 << (rx_pin * 2) | 3 << (tx_pin * 2));
 
     /* configure RX and TX pins, set pin to use alternative function mode */
     port->MODER &= ~(3 << (rx_pin * 2) | 3 << (tx_pin * 2));
@@ -170,6 +194,11 @@ void uart_tx_begin(uart_t uart)
             UART_1_DEV->CR1 |= USART_CR1_TXEIE;
             break;
 #endif
+#if UART_2_EN
+        case UART_2:
+            UART_2_DEV->CR1 |= USART_CR1_TXEIE;
+            break;
+#endif
     }
 }
 
@@ -186,6 +215,11 @@ int uart_write(uart_t uart, char data)
 #if UART_1_EN
         case UART_1:
             dev = UART_1_DEV;
+            break;
+#endif
+#if UART_2_EN
+        case UART_2:
+            dev = UART_2_DEV;
             break;
 #endif
     }
@@ -212,6 +246,11 @@ int uart_read_blocking(uart_t uart, char *data)
             dev = UART_1_DEV;
             break;
 #endif
+#if UART_2_EN
+        case UART_2:
+            dev = UART_2_DEV;
+            break;
+#endif
     }
 
     while (!(dev->SR & USART_SR_RXNE));
@@ -235,6 +274,11 @@ int uart_write_blocking(uart_t uart, char data)
             dev = UART_1_DEV;
             break;
 #endif
+#if UART_2_EN
+        case UART_2:
+            dev = UART_2_DEV;
+            break;
+#endif
     }
 
     while (!(dev->SR & USART_SR_TXE));
@@ -256,6 +300,11 @@ void uart_poweron(uart_t uart)
             UART_1_CLKEN();
             break;
 #endif
+#if UART_2_EN
+        case UART_2:
+            UART_2_CLKEN();
+            break;
+#endif
     }
 }
 
@@ -270,6 +319,11 @@ void uart_poweroff(uart_t uart)
 #if UART_1_EN
         case UART_1:
             UART_1_CLKDIS();
+            break;
+#endif
+#if UART_2_EN
+        case UART_2:
+            UART_2_CLKDIS();
             break;
 #endif
     }
@@ -289,6 +343,15 @@ __attribute__((naked)) void UART_1_ISR(void)
 {
     ISR_ENTER();
     irq_handler(UART_1, UART_1_DEV);
+    ISR_EXIT();
+}
+#endif
+
+#if UART_2_EN
+__attribute__((naked)) void UART_2_ISR(void)
+{
+    ISR_ENTER();
+    irq_handler(UART_2, UART_2_DEV);
     ISR_EXIT();
 }
 #endif
