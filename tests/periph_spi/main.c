@@ -29,6 +29,9 @@
 #include "periph/spi.h"
 #include "periph/gpio.h"
 
+/* only compile this test if at least one SPI device is defined */
+#if SPI_NUMOF
+
 #define SHELL_BUFSIZE       (128U)
 
 enum {
@@ -268,3 +271,13 @@ int main(void)
 
     return 0;
 }
+
+#else
+
+int main(void)
+{
+    puts("RIOT low-level SPI driver test");
+    puts("There is no SPI device defined for your platform");
+}
+
+#endif /* SPI_NUMOF */
