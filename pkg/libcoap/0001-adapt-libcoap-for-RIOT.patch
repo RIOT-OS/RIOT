@@ -1,0 +1,461 @@
+From 0c77ee658a0a3338ad0727fd430f1cfb155480cd Mon Sep 17 00:00:00 2001
+From: Sebastian Sontberg <sebastian@sontberg.de>
+Date: Thu, 18 Dec 2014 02:53:50 +0100
+Subject: [PATCH 1/4] adapt libcoap for RIOT
+
+---
+ address.h      |  34 ++++++++++-
+ coap_io.h      |   6 ++
+ coap_io_riot.c | 179 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ debug.c        |  15 +++++
+ debug.h        |   3 +-
+ net.c          |  46 ++++++++++++++-
+ net.h          |  13 ++++-
+ 7 files changed, 289 insertions(+), 7 deletions(-)
+ create mode 100644 coap_io_riot.c
+
+diff --git a/address.h b/address.h
+index f418634..d7ac123 100644
+--- a/address.h
++++ b/address.h
+@@ -77,7 +77,7 @@ typedef struct coap_address_t {
+ 
+ #define _coap_is_mcast_impl(Address) uip_is_addr_mcast(&((Address)->addr))
+ #endif /* WITH_CONTIKI */
+-#ifdef WITH_POSIX
++#if defined(WITH_POSIX) && !defined(WITH_RIOT)
+ 
+ /** multi-purpose address abstraction */
+ typedef struct coap_address_t {
+@@ -143,7 +143,32 @@ case  AF_INET6:
+   }
+  return 0;
+ }
+-#endif /* WITH_POSIX */
++#endif /* WITH_POSIX && !WITH_RIOT */
++#ifdef WITH_RIOT
++#include "sixlowpan/ip.h"
++#include "socket_base/socket.h"
++
++/* RIOT implementation uses ipv6 addresses only */
++typedef sockaddr6_t coap_address_t;
++
++static inline int
++_coap_address_equals_impl(const coap_address_t *a,
++			  const coap_address_t *b) {
++    /* only check relevant parts: port & ipv6 */
++    return (a->sin6_port == b->sin6_port) &&
++        ipv6_addr_is_equal(&a->sin6_addr, &b->sin6_addr);
++}
++
++static inline int
++_coap_address_isany_impl(const coap_address_t *a) {
++    return ipv6_addr_is_unspecified(&a->sin6_addr);
++}
++
++static inline int
++_coap_is_mcast_impl(const coap_address_t *a) {
++    return ipv6_addr_is_multicast(&a->sin6_addr);
++}
++#endif /* WITH_RIOT */
+ 
+ /** 
+  * Resets the given coap_address_t object @p addr to its default
+@@ -156,10 +181,13 @@ static inline void
+ coap_address_init(coap_address_t *addr) {
+   assert(addr);
+   memset(addr, 0, sizeof(coap_address_t));
+-#ifndef WITH_LWIP
++#if !defined(WITH_LWIP) && !defined(WITH_RIOT)
+   /* lwip has constandt address sizes and doesn't need the .size part */
+   addr->size = sizeof(addr->addr);
+ #endif
++#ifdef WITH_RIOT
++  addr->sin6_family = AF_INET6;
++#endif
+ }
+ 
+ /**
+diff --git a/coap_io.h b/coap_io.h
+index 6883f0e..64744af 100644
+--- a/coap_io.h
++++ b/coap_io.h
+@@ -96,7 +96,13 @@ ssize_t coap_network_send(struct coap_context_t *context,
+  * @return The number of bytes received on success, or a value less than zero 
+  *        on error.
+  */
++#ifdef WITH_SOCKET_BASE_TIMEOUT
++#include "vtimer.h"
++ssize_t coap_network_read(coap_endpoint_t *ep, coap_packet_t **packet, timex_t* timeout);
++#else
+ ssize_t coap_network_read(coap_endpoint_t *ep, coap_packet_t **packet);
++#endif /* WITH_SOCKET_BASE_TIMEOUT */
++
+ 
+ #ifndef coap_mcast_interface
+ # define coap_mcast_interface(Local) 0
+diff --git a/coap_io_riot.c b/coap_io_riot.c
+new file mode 100644
+index 0000000..174b623
+--- /dev/null
++++ b/coap_io_riot.c
+@@ -0,0 +1,179 @@
++#include "config.h"
++
++#include <stdio.h>
++#include <unistd.h>
++#include <errno.h>
++
++#include "debug.h"
++#include "mem.h"
++#include "coap_io.h"
++
++#include "sixlowpan/ip.h"
++#include "socket_base/socket.h"
++
++static inline struct coap_endpoint_t *
++coap_malloc_posix_endpoint(void) {
++  return (struct coap_endpoint_t *)coap_malloc(sizeof(struct coap_endpoint_t));
++}
++
++static inline void
++coap_free_posix_endpoint(struct coap_endpoint_t *ep) {
++  coap_free(ep);
++}
++
++coap_endpoint_t *coap_new_endpoint(const coap_address_t *addr, int flags) {
++  int sockfd = socket_base_socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
++
++  struct coap_endpoint_t *ep;
++
++  if (sockfd < 0) {
++    coap_log(LOG_WARNING, "coap_new_endpoint: socket");
++    return NULL;
++  }
++
++  if (socket_base_bind(sockfd, (coap_address_t*)addr, 16) < 0) {
++    coap_log(LOG_WARNING, "coap_new_endpoint: bind");
++    socket_base_close(sockfd);
++    return NULL;
++  }
++
++  ep = coap_malloc_posix_endpoint();
++  if (!ep) {
++    coap_log(LOG_WARNING, "coap_new_endpoint: malloc");
++    close(sockfd);
++    return NULL;
++  }
++
++  memset(ep, 0, sizeof(struct coap_endpoint_t));
++  ep->handle = sockfd;
++  ep->flags = flags;
++  memcpy(&ep->addr, addr, sizeof(coap_address_t));
++
++#ifndef NDEBUG
++  if (LOG_DEBUG <= coap_get_log_level()) {
++#ifndef INET6_ADDRSTRLEN
++#define INET6_ADDRSTRLEN 40
++#endif
++    unsigned char addr_str[INET6_ADDRSTRLEN+8];
++
++    if (coap_print_addr(addr, addr_str, INET6_ADDRSTRLEN+8)) {
++      debug("created %sendpoint %s\n",
++            ep->flags & COAP_ENDPOINT_DTLS ? "DTLS " : "",
++            addr_str);
++    }
++    socket_base_print_sockets();
++  }
++#endif /* NDEBUG */
++
++  return (coap_endpoint_t *)ep;
++}
++
++void
++coap_free_endpoint(coap_endpoint_t *ep) {
++  if(ep) {
++    if (ep->handle >= 0)
++      close(ep->handle);
++    coap_free_posix_endpoint((struct coap_endpoint_t *)ep);
++  }
++}
++
++#ifdef __GNUC__
++#define UNUSED_PARAM __attribute__ ((unused))
++#else /* not a GCC */
++#define UNUSED_PARAM
++#endif /* GCC */
++
++ssize_t
++coap_network_send(struct coap_context_t *context UNUSED_PARAM,
++                  const coap_endpoint_t *local_interface,
++                  const coap_address_t *dst,
++                  unsigned char *data,
++                  size_t datalen)
++{
++    struct coap_endpoint_t *ep =
++        (struct coap_endpoint_t *)local_interface;
++
++    assert(local_interface);
++
++    return socket_base_sendto(ep->handle,
++                                 (void*)data,
++                                 datalen,
++                                 0,
++                                 (coap_address_t*)dst,
++                                 16);
++}
++
++static coap_packet_t *coap_malloc_packet(void) {
++    coap_packet_t *packet;
++    const size_t need = sizeof(coap_packet_t) + COAP_MAX_PDU_SIZE;
++
++    packet = (coap_packet_t *)coap_malloc(need);
++    if (packet) {
++        memset(packet, 0, need);
++    }
++    return packet;
++}
++
++void coap_free_packet(coap_packet_t *packet) {
++    coap_free(packet);
++}
++
++static inline size_t coap_get_max_packetlength(const coap_packet_t *packet UNUSED_PARAM) {
++  return COAP_MAX_PDU_SIZE;
++}
++
++#ifdef WITH_SOCKET_BASE_TIMEOUT
++ssize_t coap_network_read(coap_endpoint_t *ep, coap_packet_t **packet, timex_t* timeout) {
++#else
++ssize_t coap_network_read(coap_endpoint_t *ep, coap_packet_t **packet) {
++#endif /* WITH_SOCKET_BASE_TIMEOUT */
++
++    ssize_t len = -1;
++    socklen_t from_len = 0;
++
++    assert(ep);
++    assert(packet);
++
++    *packet = coap_malloc_packet();
++
++    if (!*packet) {
++        warn("coap_network_read: insufficient memory, drop packet\n");
++        return -1;
++    }
++
++    coap_address_init(&(*packet)->dst); /* the local interface address */
++    coap_address_init(&(*packet)->src); /* the remote peer */
++
++#ifdef WITH_SOCKET_BASE_TIMEOUT
++    if (timeout) {
++        len = socket_base_recvfrom_timeout(ep->handle,
++                                              &(*packet)->payload,
++                                              COAP_MAX_PDU_SIZE,
++                                              0,
++                                              &(*packet)->src,
++                                              &from_len,
++                                              timeout);
++    } else {
++#endif /* WITH_SOCKET_BASE_TIMEOUT */
++        len = socket_base_recvfrom(ep->handle,
++                                      &(*packet)->payload,
++                                      COAP_MAX_PDU_SIZE,
++                                      0,
++                                      &(*packet)->src,
++                                      &from_len);
++#ifdef WITH_SOCKET_BASE_TIMEOUT
++    }
++#endif /* WITH_SOCKET_BASE_TIMEOUT */
++
++    if (len < 0) {
++        coap_free_packet(*packet);
++        *packet = NULL;
++    } else {
++        assert(from_len == sizeof(coap_address_t));
++        (*packet)->length = len;
++        (*packet)->ifindex = 0;
++        memcpy(&(*packet)->dst, &ep->addr, sizeof(coap_address_t));
++    }
++
++    return len;
++}
+diff --git a/debug.c b/debug.c
+index 77f15d0..085a655 100644
+--- a/debug.c
++++ b/debug.c
+@@ -28,6 +28,10 @@
+ #include "debug.h"
+ #include "net.h"
+ 
++#ifdef WITH_RIOT
++#include "socket_base/socket.h"
++#endif
++
+ #ifdef WITH_CONTIKI
+ # ifndef DEBUG
+ #  define DEBUG DEBUG_PRINT
+@@ -144,6 +148,16 @@ print_readable( const unsigned char *data, unsigned int len,
+ #define min(a,b) ((a) < (b) ? (a) : (b))
+ #endif
+ 
++#ifdef WITH_RIOT
++size_t
++coap_print_addr(const coap_address_t *addr, unsigned char *buf, size_t len) {
++    if (!ipv6_addr_to_str((char*)buf, len, (ipv6_addr_t*)&addr->sin6_addr)) {
++        return 0;
++    } else {
++        return IPV6_MAX_ADDR_STR_LEN;
++    }
++}
++#else
+ size_t
+ coap_print_addr(const struct coap_address_t *addr, unsigned char *buf, size_t len) {
+ #ifdef HAVE_ARPA_INET_H
+@@ -233,6 +247,7 @@ coap_print_addr(const struct coap_address_t *addr, unsigned char *buf, size_t le
+   return 0;
+ #endif
+ }
++#endif /* WITH_RIOT */
+ 
+ #ifdef WITH_CONTIKI
+ # define fprintf(fd, ...) PRINTF(__VA_ARGS__)
+diff --git a/debug.h b/debug.h
+index 377dbe3..1cf7e13 100644
+--- a/debug.h
++++ b/debug.h
+@@ -10,6 +10,7 @@
+ #define _COAP_DEBUG_H_
+ 
+ #include "config.h"
++#include "address.h"
+ 
+ #ifndef COAP_DEBUG_FD
+ #define COAP_DEBUG_FD stdout
+@@ -64,7 +65,7 @@ void coap_log_impl(coap_log_t level, const char *format, ...);
+ void coap_show_pdu(const coap_pdu_t *);
+ 
+ struct coap_address_t;
+-size_t coap_print_addr(const struct coap_address_t *, unsigned char *, size_t);
++size_t coap_print_addr(const coap_address_t *, unsigned char *, size_t);
+ 
+ #else
+ 
+diff --git a/net.c b/net.c
+index f2bff66..56d8d15 100644
+--- a/net.c
++++ b/net.c
+@@ -490,7 +490,7 @@ coap_transaction_id(const coap_address_t *peer, const coap_pdu_t *pdu,
+ 
+   /* Compare the transport address. */
+ 
+-#ifdef WITH_POSIX
++#if defined(WITH_POSIX) && !defined(WITH_RIOT)
+   switch (peer->addr.sa.sa_family) {
+   case AF_INET:
+     coap_hash((const unsigned char *)&peer->addr.sin.sin_port,
+@@ -507,7 +507,10 @@ coap_transaction_id(const coap_address_t *peer, const coap_pdu_t *pdu,
+   default:
+     return;
+   }
+-#endif
++#endif  /* WITH_POSIX && !WITH_RIOT */
++#ifdef WITH_RIOT
++  coap_hash((const unsigned char*)&peer, sizeof(coap_address_t), h);
++#endif  /* WITH_RIOT */
+ #if defined(WITH_LWIP) || defined(WITH_CONTIKI)
+     /* FIXME: with lwip, we can do better */
+     coap_hash((const unsigned char *)&peer->port, sizeof(peer->port), h);
+@@ -807,6 +810,43 @@ check_opt_size(coap_opt_t *opt, unsigned char *maxpos) {
+ 
+ void coap_dispatch(coap_context_t *context, coap_queue_t *rcvd);
+ 
++#ifdef WITH_RIOT
++#include "vtimer.h"
++
++int coap_try_read(coap_context_t *ctx, timex_t* timeout) {
++    ssize_t nbytes = -1;
++    coap_packet_t *packet;
++    coap_address_t src;
++    int result = -1;
++
++    coap_address_init(&src);
++
++    /* this is a blocking call when timeout == NULL,
++       e.g when coap_try_read() was called by coap_read() */
++#ifdef WITH_SOCKET_BASE_TIMEOUT
++    nbytes = coap_network_read(ctx->endpoint, &packet, timeout);
++#else
++    nbytes = coap_network_read(ctx->endpoint, &packet);
++#endif  /* WITH_SOCKET_BASE_TIMEOUT */
++
++    if (nbytes < 0) {
++        if (!timeout) warn("coap_read: recvfrom");
++    } else {
++        if (coap_address_isany(&ctx->endpoint->addr) ||
++            coap_address_equals(&packet->dst, &ctx->endpoint->addr)) {
++            result = coap_handle_message(ctx, ctx->endpoint, packet);
++        } else {
++            coap_log(LOG_DEBUG, "packet received on wrong interface, dropped\n");
++        }
++    }
++    coap_free_packet(packet);
++    return result;
++}
++
++int coap_read(coap_context_t *ctx) {
++    return coap_try_read(ctx, NULL);
++}
++#else  /* WITH_RIOT */
+ int
+ coap_read( coap_context_t *ctx ) {
+ #if defined(WITH_LWIP) || defined(WITH_CONTIKI)
+@@ -877,6 +917,7 @@ coap_read( coap_context_t *ctx ) {
+ 
+   return result;
+ }
++#endif  /* WITH_RIOT */
+ 
+ int
+ coap_handle_message(coap_context_t *ctx,
+@@ -1419,6 +1460,7 @@ handle_request(coap_context_t *context, coap_queue_t *node) {
+ 			     ? COAP_MESSAGE_ACK
+ 			     : COAP_MESSAGE_NON,
+ 			     0, node->pdu->hdr->id, COAP_MAX_PDU_SIZE);
++
+     
+     /* Implementation detail: coap_add_token() immediately returns 0
+        if response == NULL */
+diff --git a/net.h b/net.h
+index 74958f2..310b90d 100644
+--- a/net.h
++++ b/net.h
+@@ -198,7 +198,8 @@ coap_context_t *coap_new_context(const coap_address_t *listen_addr);
+ static inline unsigned short 
+ coap_new_message_id(coap_context_t *context) {
+ #ifndef WITH_CONTIKI
+-  return htons(++(context->message_id));
++  context->message_id++;
++  return htons(context->message_id);
+ #else /* WITH_CONTIKI */
+   return uip_htons(++context->message_id);
+ #endif
+@@ -352,6 +353,16 @@ coap_tid_t coap_retransmit(coap_context_t *context, coap_queue_t *node);
+  */
+ int coap_read(coap_context_t *context);
+ 
++#ifdef WITH_SOCKET_BASE_TIMEOUT
++/**
++ * Reads data from the network with timeout and tries to parse as CoAP
++ * PDU. On success, 0 is returned and a new node with the parsed PDU
++ * is added to the receive queue in the specified context object.
++ */
++#include "vtimer.h"
++int coap_try_read(coap_context_t *ctx, timex_t* timeout);
++#endif  /* WITH_SOCKET_BASE_TIMEOUT */
++
+ /**
+  * Parses and interprets a CoAP message with context @p ctx. This function
+  * returns @c 0 if the message was handled, or a value less than zero on
+-- 
+1.9.3
+

@@ -1,12 +1,12 @@
-From e53472f0a5f15d2459bf9a9ef40d2b302bb80f8b Mon Sep 17 00:00:00 2001
-From: Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
-Date: Tue, 15 Jul 2014 16:57:07 +0200
-Subject: [PATCH 3/4] Remove two example programs in root
+From 23dca7d26001de97c94d8635532bb88b9382daf9 Mon Sep 17 00:00:00 2001
+From: Sebastian Sontberg <sebastian@sontberg.de>
+Date: Thu, 18 Dec 2014 02:54:26 +0100
+Subject: [PATCH 2/4] remove contiki example programs
 
 ---
- coap-observer.c | 185 -----------------------------------------------
- coap-server.c   | 220 --------------------------------------------------------
- 2 files changed, 405 deletions(-)
+ coap-observer.c | 185 ---------------------------------------------------
+ coap-server.c   | 200 --------------------------------------------------------
+ 2 files changed, 385 deletions(-)
  delete mode 100644 coap-observer.c
  delete mode 100644 coap-server.c
 
@@ -203,10 +203,10 @@ index e4b2fe5..0000000
 -/*---------------------------------------------------------------------------*/
 diff --git a/coap-server.c b/coap-server.c
 deleted file mode 100644
-index 5dcdfcd..0000000
+index 5fa6485..0000000
 --- a/coap-server.c
 +++ /dev/null
-@@ -1,220 +0,0 @@
+@@ -1,200 +0,0 @@
 -/* coap-server.c -- Example CoAP server using Contiki and libcoap
 - *
 - * Copyright (C) 2011 Olaf Bergmann <bergmann@tzi.org>
@@ -240,7 +240,7 @@ index 5dcdfcd..0000000
 - */
 -
 -#include "config.h"
--#include "net/uip-debug.h"
+-#include "net/ip/uip-debug.h"
 -
 -#include <string.h>
 -
@@ -305,7 +305,6 @@ index 5dcdfcd..0000000
 -hnd_get_time(coap_context_t  *ctx, struct coap_resource_t *resource, 
 -	     coap_address_t *peer, coap_pdu_t *request, str *token, 
 -	     coap_pdu_t *response) {
--  coap_opt_iterator_t opt_iter;
 -  unsigned char buf[2];
 -  coap_tick_t now;
 -  coap_tick_t t;
@@ -313,31 +312,12 @@ index 5dcdfcd..0000000
 -  /* if my_clock_base was deleted, we pretend to have no such resource */
 -  response->hdr->code = COAP_RESPONSE_CODE(205),
 -
--  coap_add_option(response, COAP_OPTION_CONTENT_TYPE,
+-  coap_add_option(response, COAP_OPTION_CONTENT_FORMAT,
 -		  coap_encode_var_bytes(buf, COAP_MEDIATYPE_TEXT_PLAIN), buf);
 -
 -  coap_add_option(response, COAP_OPTION_MAXAGE,
 -		  coap_encode_var_bytes(buf, 0x01), buf);
 -  
--  /* Check if subscription was requested. */
--  if (request && 
--      coap_check_option(request, COAP_OPTION_SUBSCRIPTION, &opt_iter) && 
--      coap_add_observer(resource, peer, token)) {
--
--    /* add a new observe value */
--    coap_add_option(response, COAP_OPTION_SUBSCRIPTION,
--		    coap_encode_var_bytes(buf, ctx->observe), buf);
--
--    if (token->length)
--      coap_add_option(response, COAP_OPTION_TOKEN, token->length, token->s);
--  } else {
--    coap_add_option(response, COAP_OPTION_SUBSCRIPTION,
--		    coap_encode_var_bytes(buf, ctx->observe), buf);
--
--    if (token->length)
--      coap_add_option(response, COAP_OPTION_TOKEN, token->length, token->s);
--  }
--
 -  /* calculate current time */
 -  coap_ticks(&t);
 -  now = my_clock_base + (t / COAP_TICKS_PER_SECOND);
@@ -428,5 +408,5 @@ index 5dcdfcd..0000000
 -}
 -/*---------------------------------------------------------------------------*/
 -- 
-2.0.1
+1.9.3
 

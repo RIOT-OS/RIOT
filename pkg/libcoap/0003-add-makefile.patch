@@ -1,0 +1,24 @@
+From b6c25eba62b6f3fceb1942ea41c904aca3af5d90 Mon Sep 17 00:00:00 2001
+From: Sebastian Sontberg <sebastian@sontberg.de>
+Date: Thu, 18 Dec 2014 02:54:41 +0100
+Subject: [PATCH 3/4] add makefile
+
+---
+ Makefile | 5 +++++
+ 1 file changed, 5 insertions(+)
+ create mode 100644 Makefile
+
+diff --git a/Makefile b/Makefile
+new file mode 100644
+index 0000000..1645531
+--- /dev/null
++++ b/Makefile
+@@ -0,0 +1,5 @@
++MODULE:=$(shell basename $(CURDIR))
++INCLUDES += -I$(RIOTBASE) -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/net/destiny/include -I$(RIOTBASE)/sys/net/sixlowpan/include/ -I$(RIOTBASE)/sys/net/ieee802154/include -I$(RIOTBASE)/sys/net/net_help
++CFLAGS += -DWITH_POSIX -DWITH_RIOT
++
++include $(RIOTBASE)/Makefile.base
+-- 
+1.9.3
+

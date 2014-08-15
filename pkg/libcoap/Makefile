@@ -1,15 +1,10 @@
 PKG_NAME=libcoap
-PKG_URL=http://git.code.sf.net/p/libcoap/code
-PKG_VERSION=ef41ce5d02d64cec0751882ae8fd95f6c32bc018
+PKG_URL=git://git.code.sf.net/p/libcoap/code
+PKG_VERSION=d48ab449fd05801e574e4966023589ed7dac500b
 PKG_DIR=$(CURDIR)/$(PKG_NAME)
 
 ifneq ($(RIOTBOARD),)
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
-endif
-
-ifneq ($(RIOTBASE),)
-INCLUDES += -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/sys/net/include \
-			-I$(RIOTBASE)/sys/posix/include -I$(RIOTBASE)/sys/posix/pnet/include
 endif
 
 .PHONY: all clean patch reset
