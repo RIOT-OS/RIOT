@@ -1,0 +1,6 @@
+h
+r
+erase
+loadbin BINARY, 0x00000000
+verifybin BINARY, 0x00000000
+qc
