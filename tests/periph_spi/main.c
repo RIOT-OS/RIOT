@@ -130,8 +130,10 @@ void print_bytes(char* title, char* chars, int length)
     printf("\n\n");
 }
 
-void slave_on_cs(void)
+void slave_on_cs(void *arg)
 {
+    (void)arg;
+
     LD3_ON;
     spi_transmission_begin(spi_dev, 'F');
     state = 0;
@@ -197,7 +199,7 @@ void cmd_init_slave(int argc, char **argv)
     if (res < 0) {
         printf("spi_init_slave: error initializing SPI_%i device (code: %i)\n", spi_dev, res);
     }
-    res = gpio_init_int(spi_cs, GPIO_NOPULL, GPIO_FALLING, slave_on_cs);
+    res = gpio_init_int(spi_cs, GPIO_NOPULL, GPIO_FALLING, slave_on_cs, 0);
     if (res < 0){
         printf("gpio_init_int: error initializing GPIO_%i as CS line (code %i)\n", spi_cs, res);
     }
