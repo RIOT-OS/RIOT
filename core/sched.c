@@ -168,16 +168,35 @@ void sched_switch(uint16_t other_prio)
     }
 }
 
+void sched_task_kill(int pid)
+{
+    unsigned int state = disableIRQ();
+
+    tcb_t* sched_kill_thread = (tcb_t*) sched_threads[pid];
+
+    if (sched_kill_thread == NULL) {
+        DEBUG("sched_task_kill(): %i: no process found\n", pid);
+    }
+    else {
+        DEBUG("sched_task_kill(): killing task %s...\n", sched_kill_thread->name);
+
+        sched_threads[sched_kill_thread->pid] = NULL;
+        sched_num_threads--;
+
+        sched_set_status(sched_kill_thread, STATUS_STOPPED);
+
+        if (pid == sched_active_pid) {
+            sched_active_thread = NULL;
+            cpu_switch_context_exit();
+        }
+    }
+    restoreIRQ(state);
+}
+
 NORETURN void sched_task_exit(void)
 {
     DEBUG("sched_task_exit(): ending task %s...\n", sched_active_thread->name);
 
-    dINT();
-    sched_threads[sched_active_thread->pid] = NULL;
-    sched_num_threads--;
+    sched_task_kill(sched_active_pid);
 
-    sched_set_status((tcb_t *)sched_active_thread, STATUS_STOPPED);
-
-    sched_active_thread = NULL;
-    cpu_switch_context_exit();
 }
