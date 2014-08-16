@@ -248,8 +248,12 @@ class SerCmd(cmd.Cmd):
         # save history file
         readline.write_history_file()
         # shut down twisted if running
-        if reactor.running:
-            reactor.callFromThread(reactor.stop)
+        try:
+            if reactor.running:
+                reactor.callFromThread(reactor.stop)
+        except NameError:
+            pass
+
         if self.tcp_serial:
             self.ser.close()
         return True
