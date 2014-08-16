@@ -37,22 +37,24 @@ inline kernel_pid_t thread_getpid(void)
     return sched_active_thread->pid;
 }
 
+volatile tcb_t *thread_get(kernel_pid_t pid)
+{
+    if ((pid != KERNEL_PID_UNDEF) && (0 <= pid) && (pid < MAXTHREADS)) {
+        return sched_threads[pid];
+    }
+    return NULL;
+}
+
 int thread_getstatus(kernel_pid_t pid)
 {
-    if (sched_threads[pid] == NULL) {
-        return STATUS_NOT_FOUND;
-    }
-
-    return sched_threads[pid]->status;
+    volatile tcb_t *t = thread_get(pid);
+    return t ? t->status : STATUS_NOT_FOUND;
 }
 
 const char *thread_getname(kernel_pid_t pid)
 {
-    if (sched_threads[pid] == NULL) {
-        return NULL;
-    }
-
-    return sched_threads[pid]->name;
+    volatile tcb_t *t = thread_get(pid);
+    return t ? t->name : NULL;
 }
 
 void thread_sleep(void)
