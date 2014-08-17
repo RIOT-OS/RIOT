@@ -12,12 +12,23 @@
 
 //#include "arch/irq_arch.h"
 
+extern uint32_t __bss_start__;
+extern uint32_t __bss_end__;
+
 extern uint32_t _end;                       /* address of last used memory cell */
 void *heap_top = (void *) &_end + 4;
 
 // Initialisation function
 void _init(void)
 {
+    int *addr;
+
+    //Clear bss
+    for (uint32_t i = &__bss_start__; i < &__bss_end__; i++) {
+        addr = i;
+        *addr = NULL;
+    }
+
     // Set up UART
     uart_init_blocking(STDIO, 115200);
 
