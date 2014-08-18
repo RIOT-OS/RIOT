@@ -161,7 +161,7 @@ int spi_transfer_bytes(spi_t spi, char *out, char *in, unsigned int length)
         }
     }
 
-
+    return 0;
 }
 
 //Convert speeds to integers
