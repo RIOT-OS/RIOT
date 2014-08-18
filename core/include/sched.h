@@ -91,9 +91,7 @@
  * @def SCHED_PRIO_LEVELS
  * @brief The number of thread priority levels
  */
-#if ARCH_32_BIT
-#define SCHED_PRIO_LEVELS 32
-#else
+#ifndef SCHED_PRIO_LEVELS
 #define SCHED_PRIO_LEVELS 16
 #endif
 
