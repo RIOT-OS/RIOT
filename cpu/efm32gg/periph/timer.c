@@ -13,7 +13,7 @@
  * @file
  * @brief       Low-level timer driver implementation
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Ryan Kurte
  *
  * @}
  */

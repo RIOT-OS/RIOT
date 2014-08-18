@@ -116,9 +116,20 @@
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF           (0U)                                                        /* TODO */
+#define SPI_NUMOF           (1U)                                                        /* TODO */
 #define SPI_0_EN            0
-#define SPI_1_EN            0
+#define SPI_1_EN            1
 
+/* SPI 0 device configuration */
+#define SPI_1_DEV          USART0
+#define SPI_1_CLKEN()      CMU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_USART0
+/* SPIE 0 pin configuration */
+#define SPI_1_PORT         gpioPortC
+#define SPI_1_PORT_CLKEN() CMU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_GPIO
+#define SPI_1_CLK_PIN       1
+#define SPI_1_CS_PIN        1
+#define SPI_1_MOSI_PIN      1
+#define SPI_1_MISO_PIN      0
+#define SPI_1_ROUTE        USART_ROUTE_LOCATION_LOC5
 
 #endif /* __PERIPH_CONF_H */

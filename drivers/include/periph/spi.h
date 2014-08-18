@@ -52,10 +52,10 @@ typedef enum {
  *        clock phase.
  */
 typedef enum {
-    SPI_CONF_FIRST_RISING = 0,  /**< first data bit is transacted on the first rising SCK edge */
-    SPI_CONF_SECOND_RISING,     /**< first data bit is transacted on the second rising SCK edge */
-    SPI_CONF_FIRST_FALLING,     /**< first data bit is transacted on the first falling SCK edge */
-    SPI_CONF_SECOND_FALLING     /**< first data bit is transacted on the second falling SCK edge */
+    SPI_CONF_IDLE_LOW_RISING = 0,  /**< first data bit is transacted on the first rising SCK edge */
+    SPI_CONF_IDLE_LOW_FALLING,     /**< first data bit is transacted on the second rising SCK edge */
+    SPI_CONF_IDLE_HIGH_RISING,     /**< first data bit is transacted on the first falling SCK edge */
+    SPI_CONF_IDLE_HIGH_FALLING    /**< first data bit is transacted on the second falling SCK edge */
 } spi_conf_t;
 
 /**
