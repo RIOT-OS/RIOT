@@ -2,26 +2,11 @@
 export CFLAGS += -DCOREIF_NG=1
 
 # tell the build system that the CPU depends on the Cortex-M common files
-export USEMODULE += cortex-m3_common
-
+export USEMODULE += efm32_common
 # define path to cortex-m common module, which is needed for this CPU
-export CORTEX_COMMON = $(RIOTCPU)/cortex-m3_common/
+export EFM32_COMMON = $(RIOTCPU)/efm32_common/
 
-#export the CPU model
-MODEL = $(shell echo $(CPU_MODEL)|tr 'a-z' 'A-Z')
-export CFLAGS += -DCPU_MODEL_$(MODEL)
-
-CPU_UPPER = $(shell echo $(CPU)|tr 'a-z' 'A-Z')
-
-# define the linker script to use for this CPU. The CPU_MODEL variable is defined in the
-# board's Makefile.include. This enables multiple STMF0 controllers with different memory to
-# use the same code-base.
-export LINKERSCRIPT = $(RIOTCPU)/$(CPU)/Device/SiliconLabs/$(CPU_UPPER)/Source/GCC/$(CPU).ld
-
-# include CPU specific includes
-export INCLUDES += -I$(RIOTCPU)/$(CPU)/CMSIS/Include
-export INCLUDES += -I$(RIOTCPU)/$(CPU)/Device/SiliconLabs/$(CPU_UPPER)/Include
-export INCLUDES += -I$(RIOTCPU)/$(CPU)/emlib/inc
+# include CPU family specific includes
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 
 export INCLUDES += -I$(RIOTBASE)/core/include
@@ -32,8 +17,5 @@ export INCLUDES += -I$(RIOTBASE)/sys/include
 export UNDEF += $(BINDIR)cpu/syscalls.o
 export UNDEF += $(BINDIR)cpu/startup_$(CPU).o
 
-# export the peripheral drivers to be linked into the final binary
-export USEMODULE += periph drivers emlib
-
 # CPU depends on the cortex-m common module, so include it
-include $(CORTEX_COMMON)Makefile.include
+include $(EFM32_COMMON)Makefile.include
