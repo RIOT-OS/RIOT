@@ -141,14 +141,14 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, int length)
 
 int spi_transfer_reg(spi_t dev, uint8_t reg, char *out, char *in)
 {
-    /* TODO */
-    return -1;
+    spi_transfer_byte(dev, reg, NULL);
+    return spi_transfer_byte(dev, *out, in);
 }
 
 int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, int length)
 {
-    /* TODO */
-    return -1;
+    spi_transfer_byte(dev, reg, NULL);
+    return spi_transfer_bytes(dev, out, in, length);
 }
 
 int spi_poweron(spi_t dev)
