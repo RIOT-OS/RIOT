@@ -52,9 +52,9 @@
 /** @} */
 
 /**
- * @name Macro for reading CPU_ID
+ * @name Length for reading CPU_ID
  */
-#define GET_CPU_ID(id)          memcpy(&id, (void *)(0x1ffff7e8), CPU_ID_LEN)
+#define CPU_ID_LEN                      (12)
 
 /**
  * @name Definition of different panic modes

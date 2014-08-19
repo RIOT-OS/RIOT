@@ -26,7 +26,7 @@
 
 #include "arch/thread_arch.h"
 #include "periph/gpio.h"
-#include "spi.h"
+#include "periph/spi.h"
 #include "periph_conf.h"
 
 #include "at86rf231.h"
@@ -105,7 +105,7 @@ void at86rf231_gpio_spi_interrupts_init(void)
     gpio_init_in(SPI_0_MISO_GPIO, GPIO_NOPULL);
 
     /* SPI init */
-    spi_init_master(SPI_0, SPI_CONF_FIRST_RISING, 4500000);
+    spi_init_master(SPI_0, SPI_CONF_FIRST_RISING, SPI_SPEED_5MHZ);
 
     spi_poweron(SPI_0);
 

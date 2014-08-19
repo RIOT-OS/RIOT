@@ -179,7 +179,6 @@ void uart_tx_begin(uart_t uart)
             UART_1_DEV->CR1 |= USART_CR1_TXEIE;
             break;
 #endif
-            break;
     }
 }
 
@@ -196,7 +195,6 @@ void uart_tx_end(uart_t uart)
             UART_1_DEV->CR1 &= ~USART_CR1_TXEIE;
             break;
 #endif
-            break;
     }
 }
 
