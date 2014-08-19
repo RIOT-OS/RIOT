@@ -237,7 +237,7 @@
 /**
  * @brief SPI configuration
  */
-#define SPI_NUM_OF      1
+#define SPI_NUMOF       1
 #define SPI_0_EN        1
 
 #define SPI_0_DEV       SPI1

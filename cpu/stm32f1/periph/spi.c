@@ -20,7 +20,7 @@
 
 #include "stm32f10x.h"
 #include "periph/gpio.h"
-#include "spi.h"
+#include "periph/spi.h"
 #include "periph_conf.h"
 #include "board.h"
 
@@ -28,7 +28,7 @@
 #include "debug.h"
 
 /* TODO: parse and use conf and speed parameter */
-int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed)
+int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
     SPI_TypeDef *SPIx;
 
@@ -39,7 +39,6 @@ int spi_init_master(spi_t dev, spi_conf_t conf, uint32_t speed)
             SPI_0_CLKEN();
             break;
 #endif
-        case SPI_UNDEFINED:
         default:
             return -1;
     }
@@ -84,32 +83,32 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
             SPI_dev = SPI_0_DEV;
             break;
 #endif
-        case SPI_UNDEFINED:
         default:
             return -1;
     }
 
     while ((SPI_dev->SR & SPI_SR_TXE) == RESET);
     SPI_dev->DR = out;
-    transfered += (out) ? 1 : 0;
+    transfered++;
 
     while ((SPI_dev->SR & SPI_SR_RXNE) == RESET);
     if (in != NULL) {
         *in = SPI_dev->DR;
-        transfered += (*in) ? 1 : 0;
+        transfered++;
     }
     else {
         SPI_dev->DR;
     }
 
-    while ((SPI_dev->SR & 0x80) == 1);
+    /* SPI busy */
+    while ((SPI_dev->SR & 0x80));
 
     DEBUG("\nout: %x in: %x transfered: %x\n", out, *in, transfered);
 
     return transfered;
 }
 
-int spi_transfer_bytes(spi_t dev, char *out, char *in, int length)
+int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
     int transfered = 0;
     int ret = 0;
@@ -139,19 +138,19 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, int length)
     return transfered;
 }
 
-int spi_transfer_reg(spi_t dev, uint8_t reg, char *out, char *in)
+int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
 {
     spi_transfer_byte(dev, reg, NULL);
-    return spi_transfer_byte(dev, *out, in);
+    return spi_transfer_byte(dev, out, in);
 }
 
-int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, int length)
+int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int length)
 {
     spi_transfer_byte(dev, reg, NULL);
     return spi_transfer_bytes(dev, out, in, length);
 }
 
-int spi_poweron(spi_t dev)
+void spi_poweron(spi_t dev)
 {
     switch(dev) {
 #ifdef SPI_0_EN
@@ -160,14 +159,10 @@ int spi_poweron(spi_t dev)
             SPI_0_DEV->CR1 |= 0x0040;   /* turn SPI peripheral on */
             break;
 #endif
-        case SPI_UNDEFINED:
-        default:
-            return -1;
     }
-    return 0;
 }
 
-int spi_poweroff(spi_t dev)
+void spi_poweroff(spi_t dev)
 {
     switch(dev) {
 #ifdef SPI_0_EN
@@ -176,9 +171,5 @@ int spi_poweroff(spi_t dev)
             SPI_0_DEV->CR1 &= ~(0x0040);   /* turn SPI peripheral off */
             break;
 #endif
-        case SPI_UNDEFINED:
-        default:
-            return -1;
     }
-    return 0;
 }

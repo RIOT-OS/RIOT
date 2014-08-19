@@ -110,6 +110,8 @@ void at86rf231_rx_irq(void)
     if (driver_state == AT_DRIVER_STATE_SENDING) {
         /* Read IRQ to clear it */
         at86rf231_reg_read(AT86RF231_REG__IRQ_STATUS);
+        /* tx done, listen again */
+        at86rf231_switch_to_rx();
         /* clear internal state */
         driver_state = AT_DRIVER_STATE_DEFAULT;
         return;

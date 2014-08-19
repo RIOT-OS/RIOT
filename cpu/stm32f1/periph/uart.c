@@ -305,7 +305,7 @@ static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
             uart0_notify_thread();
         }
 #else
-        config[uartnum].rx_cb(data);
+        config[uartnum].rx_cb(config[uartnum].arg, data);
 #endif
     }
     else if (dev->SR & USART_SR_ORE) {
@@ -316,7 +316,7 @@ static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
 #ifdef MODULE_UART0
         dev->SR &= ~(USART_SR_TXE);
 #else
-        config[uartnum].tx_cb();
+        config[uartnum].tx_cb(config[uartnum].arg);
 #endif
     }
 
