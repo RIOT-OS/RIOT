@@ -275,7 +275,11 @@
 #define SPI_CPOL_LOW                (0x0000)
 #define SPI_CPHA_1_EDGE             (0x0000)
 #define SPI_NSS_SOFT                (0x0200)
+#define SPI_BR_PRESCALER_8          (0x0010)
 #define SPI_BR_PRESCALER_16         (0x0018)
+#define SPI_BR_PRESCALER_64         (0x0028)
+#define SPI_BR_PRESCALER_128        (0x0030)
+#define SPI_BR_PRESCALER_256        (0x0038)
 #define SPI_1ST_BIT_MSB             (0x0000)
 
 #endif /* __PERIPH_CONF_H */

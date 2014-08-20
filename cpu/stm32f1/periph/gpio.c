@@ -822,87 +822,85 @@ void gpio_set(gpio_t dev)
     switch (dev) {
 #ifdef GPIO_0_EN
         case GPIO_0:
-            GPIO_0_PORT->ODR |= (1 << GPIO_0_PIN);
+            GPIO_0_PORT->BSRR = (1 << GPIO_0_PIN);
             break;
 #endif
 #ifdef GPIO_1_EN
         case GPIO_1:
-            GPIO_1_PORT->ODR |= (1 << GPIO_1_PIN);
+            GPIO_1_PORT->BSRR = (1 << GPIO_1_PIN);
             break;
 #endif
 #ifdef GPIO_2_EN
         case GPIO_2:
-            GPIO_2_PORT->ODR |= (1 << GPIO_2_PIN);
+            GPIO_2_PORT->BSRR = (1 << GPIO_2_PIN);
             break;
 #endif
 #ifdef GPIO_3_EN
         case GPIO_3:
-            GPIO_3_PORT->ODR |= (1 << GPIO_3_PIN);
+            GPIO_3_PORT->BSRR = (1 << GPIO_3_PIN);
             break;
 #endif
 #ifdef GPIO_4_EN
         case GPIO_4:
-            GPIO_4_PORT->ODR |= (1 << GPIO_4_PIN);
+            GPIO_4_PORT->BSRR = (1 << GPIO_4_PIN);
             break;
 #endif
 #ifdef GPIO_5_EN
         case GPIO_5:
-            GPIO_5_PORT->ODR |= (1 << GPIO_5_PIN);
+            GPIO_5_PORT->BSRR = (1 << GPIO_5_PIN);
             break;
 #endif
 #ifdef GPIO_6_EN
         case GPIO_6:
-            GPIO_6_PORT->ODR |= (1 << GPIO_6_PIN);
+            GPIO_6_PORT->BSRR = (1 << GPIO_6_PIN);
             break;
 #endif
 #ifdef GPIO_7_EN
         case GPIO_7:
-            GPIO_7_PORT->ODR |= (1 << GPIO_7_PIN);
+            GPIO_7_PORT->BSRR = (1 << GPIO_7_PIN);
             break;
 #endif
 #ifdef GPIO_8_EN
         case GPIO_8:
-            GPIO_8_PORT->ODR |= (1 << GPIO_8_PIN);
+            GPIO_8_PORT->BSRR = (1 << GPIO_8_PIN);
             break;
 #endif
 #ifdef GPIO_9_EN
         case GPIO_9:
-            GPIO_9_PORT->ODR |= (1 << GPIO_9_PIN);
+            GPIO_9_PORT->BSRR = (1 << GPIO_9_PIN);
             break;
 #endif
 #ifdef GPIO_10_EN
         case GPIO_10:
-            GPIO_10_PORT->ODR |= (1 << GPIO_10_PIN);
+            GPIO_10_PORT->BSRR = (1 << GPIO_10_PIN);
             break;
 #endif
 #ifdef GPIO_11_EN
         case GPIO_11:
-            GPIO_11_PORT->ODR |= (1 << GPIO_11_PIN);
+            GPIO_11_PORT->BSRR = (1 << GPIO_11_PIN);
             break;
 #endif
 #ifdef GPIO_12_EN
         case GPIO_12:
-            GPIO_12_PORT->ODR |= (1 << GPIO_12_PIN);
+            GPIO_12_PORT->BSRR = (1 << GPIO_12_PIN);
             break;
 #endif
 #ifdef GPIO_13_EN
         case GPIO_13:
-            GPIO_13_PORT->ODR |= (1 << GPIO_13_PIN);
+            GPIO_13_PORT->BSRR = (1 << GPIO_13_PIN);
             break;
 #endif
 #ifdef GPIO_14_EN
         case GPIO_14:
-            GPIO_14_PORT->ODR |= (1 << GPIO_14_PIN);
+            GPIO_14_PORT->BSRR = (1 << GPIO_14_PIN);
             break;
 #endif
 #ifdef GPIO_15_EN
         case GPIO_15:
-            GPIO_15_PORT->ODR |= (1 << GPIO_15_PIN);
+            GPIO_15_PORT->BSRR = (1 << GPIO_15_PIN);
             break;
 #endif
     }
-
-    return;
 }
 
 void gpio_clear(gpio_t dev)
@@ -910,87 +908,85 @@ void gpio_clear(gpio_t dev)
     switch (dev) {
 #ifdef GPIO_0_EN
         case GPIO_0:
-            GPIO_0_PORT->ODR &= ~(1 << GPIO_0_PIN);
+            GPIO_0_PORT->BRR = (1 << GPIO_0_PIN);
             break;
 #endif
 #ifdef GPIO_1_EN
         case GPIO_1:
-            GPIO_1_PORT->ODR &= ~(1 << GPIO_1_PIN);
+            GPIO_1_PORT->BRR = (1 << GPIO_1_PIN);
             break;
 #endif
 #ifdef GPIO_2_EN
         case GPIO_2:
-            GPIO_2_PORT->ODR &= ~(1 << GPIO_2_PIN);
+            GPIO_2_PORT->BRR = (1 << GPIO_2_PIN);
             break;
 #endif
 #ifdef GPIO_3_EN
         case GPIO_3:
-            GPIO_3_PORT->ODR &= ~(1 << GPIO_3_PIN);
+            GPIO_3_PORT->BRR = (1 << GPIO_3_PIN);
             break;
 #endif
 #ifdef GPIO_4_EN
         case GPIO_4:
-            GPIO_4_PORT->ODR &= ~(1 << GPIO_4_PIN);
+            GPIO_4_PORT->BRR = (1 << GPIO_4_PIN);
             break;
 #endif
 #ifdef GPIO_5_EN
         case GPIO_5:
-            GPIO_5_PORT->ODR &= ~(1 << GPIO_5_PIN);
+            GPIO_5_PORT->BRR = (1 << GPIO_5_PIN);
             break;
 #endif
 #ifdef GPIO_6_EN
         case GPIO_6:
-            GPIO_6_PORT->ODR &= ~(1 << GPIO_6_PIN);
+            GPIO_6_PORT->BRR = (1 << GPIO_6_PIN);
             break;
 #endif
 #ifdef GPIO_7_EN
         case GPIO_7:
-            GPIO_7_PORT->ODR &= ~(1 << GPIO_7_PIN);
+            GPIO_7_PORT->BRR = (1 << GPIO_7_PIN);
             break;
 #endif
 #ifdef GPIO_8_EN
         case GPIO_8:
-            GPIO_8_PORT->ODR &= ~(1 << GPIO_8_PIN);
+            GPIO_8_PORT->BRR = (1 << GPIO_8_PIN);
             break;
 #endif
 #ifdef GPIO_9_EN
         case GPIO_9:
-            GPIO_9_PORT->ODR &= ~(1 << GPIO_9_PIN);
+            GPIO_9_PORT->BRR = (1 << GPIO_9_PIN);
             break;
 #endif
 #ifdef GPIO_10_EN
         case GPIO_10:
-            GPIO_10_PORT->ODR &= ~(1 << GPIO_10_PIN);
+            GPIO_10_PORT->BRR = (1 << GPIO_10_PIN);
             break;
 #endif
 #ifdef GPIO_11_EN
         case GPIO_11:
-            GPIO_11_PORT->ODR &= ~(1 << GPIO_11_PIN);
+            GPIO_11_PORT->BRR = (1 << GPIO_11_PIN);
             break;
 #endif
 #ifdef GPIO_12_EN
         case GPIO_12:
-            GPIO_12_PORT->ODR &= ~(1 << GPIO_12_PIN);
+            GPIO_12_PORT->BRR = (1 << GPIO_12_PIN);
             break;
 #endif
 #ifdef GPIO_13_EN
         case GPIO_13:
-            GPIO_13_PORT->ODR &= ~(1 << GPIO_13_PIN);
+            GPIO_13_PORT->BRR = (1 << GPIO_13_PIN);
             break;
 #endif
 #ifdef GPIO_14_EN
         case GPIO_14:
-            GPIO_14_PORT->ODR &= ~(1 << GPIO_14_PIN);
+            GPIO_14_PORT->BRR = (1 << GPIO_14_PIN);
             break;
 #endif
 #ifdef GPIO_15_EN
         case GPIO_15:
-            GPIO_15_PORT->ODR &= ~(1 << GPIO_15_PIN);
+            GPIO_15_PORT->BRR = (1 << GPIO_15_PIN);
             break;
 #endif
     }
-
-    return;
 }
 
 

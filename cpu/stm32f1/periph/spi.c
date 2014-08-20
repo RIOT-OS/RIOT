@@ -27,10 +27,10 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/* TODO: parse and use conf and speed parameter */
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
     SPI_TypeDef *SPIx;
+    uint16_t br_div = 0;
 
     switch(dev) {
 #ifdef SPI_0_EN
@@ -43,20 +43,32 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             return -1;
     }
 
+    switch(speed) {
+        case SPI_SPEED_10MHZ:
+            br_div = SPI_BR_PRESCALER_8;      /* actual speed: 9MHz   */
+            break;
+        case SPI_SPEED_5MHZ:
+            br_div = SPI_BR_PRESCALER_16;     /* actual speed: 4.5MHz */
+            break;
+        case SPI_SPEED_1MHZ:
+            br_div = SPI_BR_PRESCALER_64;     /* actual speed: 1.1MHz */
+            break;
+        case SPI_SPEED_400KHZ:
+            br_div = SPI_BR_PRESCALER_128;    /* actual speed: 500kHz */
+            break;
+        case SPI_SPEED_100KHZ:
+            br_div = SPI_BR_PRESCALER_256;    /* actual speed: 200kHz */
+    }
+
     /* set up SPI */
-    uint16_t tmp = SPIx->CR1;
-    tmp &= 0x3040;  /* reset value */
+    SPIx->CR1 = SPI_2_LINES_FULL_DUPLEX \
+                | SPI_MASTER_MODE \
+                | SPI_DATA_SIZE_8B \
+                | (conf & 0x3) \
+                | SPI_NSS_SOFT \
+                | br_div \
+                | SPI_1ST_BIT_MSB;
 
-    tmp |= SPI_2_LINES_FULL_DUPLEX;
-    tmp |= SPI_MASTER_MODE;
-    tmp |= SPI_DATA_SIZE_8B;
-    tmp |= SPI_CPOL_LOW;
-    tmp |= SPI_CPHA_1_EDGE;
-    tmp |= SPI_NSS_SOFT;
-    tmp |= SPI_BR_PRESCALER_16;
-    tmp |= SPI_1ST_BIT_MSB;
-
-    SPIx->CR1 = tmp;
     SPIx->I2SCFGR &= 0xF7FF;     /* select SPI mode */
 
     SPIx->CRCPR = 0x7;           /* reset CRC polynomial */

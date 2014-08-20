@@ -55,32 +55,32 @@ uint8_t at86rf231_get_status(void)
 
 void at86rf231_spi_select(void)
 {
-    SPI_0_CS_PORT->BRR = (1 << SPI_0_CS_PIN);
+    gpio_clear(SPI_0_CS_GPIO);
 }
 
 void at86rf231_spi_unselect(void)
 {
-    SPI_0_CS_PORT->BSRR = (1 << SPI_0_CS_PIN);
+    gpio_set(SPI_0_CS_GPIO);
 }
 
 void at86rf231_slp_set(void)
 {
-    SPI_0_SLEEP_PORT->BSRR = (1 << SPI_0_SLEEP_PIN);
+    gpio_set(SPI_0_SLEEP_GPIO);
 }
 
 void at86rf231_slp_clear(void)
 {
-    SPI_0_SLEEP_PORT->BRR = (1 << SPI_0_SLEEP_PIN);
+    gpio_clear(SPI_0_SLEEP_GPIO);
 }
 
 void at86rf231_rst_set(void)
 {
-    SPI_0_RESET_PORT->BRR = (1 << SPI_0_RESET_PIN);
+    gpio_clear(SPI_0_RESET_GPIO);
 }
 
 void at86rf231_rst_clear(void)
 {
-    SPI_0_RESET_PORT->BSRR = (1 << SPI_0_RESET_PIN);
+    gpio_set(SPI_0_RESET_GPIO);
 }
 
 void at86rf231_enable_interrupts(void)
