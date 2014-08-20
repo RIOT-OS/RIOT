@@ -46,31 +46,27 @@ void cpu_init(void)
 static void clock_init(void)
 {
     // Enable high speed crystal
-    CMU->OSCENCMD |= CMU_OSCENCMD_HFXOEN;
+    //CMU->OSCENCMD |= CMU_OSCENCMD_HFXOEN;
 
     // Wait for high speed crystal to stabilise
-    while (!(CMU->STATUS & CMU_STATUS_HFXORDY)) {
-        ;
-    }
+    //while (!(CMU->STATUS & CMU_STATUS_HFXORDY)) {
+    //    ;
+    //}
 
     // Set high speed crystal as core clock with divisor of 2
-    CMU->CMD |= CMU_CMD_HFCLKSEL_HFXO;
-    CMU->CTRL |= (1 << 14);
+    //CMU->CMD |= CMU_CMD_HFCLKSEL_HFXO;
+    //CMU->CTRL |= (1 << 14);
 
     // Wait for clock switch
-    while ((CMU->STATUS & CMU_STATUS_HFRCOSEL)) {
-        ;
-    }
+    //while ((CMU->STATUS & CMU_STATUS_HFRCOSEL)) {
+    //    ;
+    //}
 
     // Disable high speed oscillator
-    CMU->OSCENCMD |= CMU_OSCENCMD_HFRCODIS;
-
-    // Enable peripheral clocks
-    // TODO: Move this to relevant driver module
-    CMU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_GPIO | CMU_HFPERCLKEN0_USART0 | CMU_HFPERCLKEN0_USART1 | CMU_HFPERCLKEN0_TIMER0 | CMU_HFPERCLKEN0_TIMER1;
+    //CMU->OSCENCMD |= CMU_OSCENCMD_HFRCODIS;
 
     // Enable low energy interface (for watchdog)
-    CMU->HFCORECLKEN0 |= CMU_HFCORECLKEN0_LE;
+    //CMU->HFCORECLKEN0 |= CMU_HFCORECLKEN0_LE;
 }
 
 //Replacement start function

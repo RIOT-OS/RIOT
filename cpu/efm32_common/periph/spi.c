@@ -29,6 +29,8 @@
 #include "em_usart.h"
 #include "em_gpio.h"
 
+#if SPI_NUMOF
+
 static uint32_t speed_to_baud(spi_speed_t speed);
 static uint32_t conf_to_cpol(spi_conf_t conf);
 
@@ -218,3 +220,5 @@ static uint32_t conf_to_cpol(spi_conf_t conf)
 
     return cpol;
 }
+
+#endif

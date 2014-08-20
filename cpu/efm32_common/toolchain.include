@@ -1,7 +1,7 @@
 # define build specific options
-CPU_USAGE = -mcpu=cortex-m3
+
 FPU_USAGE = 
-COMMON_FLAGS = -std=gnu99 -Wall -Wextra -O0 -g -gdwarf-2 -mcpu=cortex-m3 -march=armv7-m -mthumb -fno-builtin 
+COMMON_FLAGS = -std=gnu99 -Wall -Wextra -O0 $(CPU_USAGE) -g -gdwarf-2 -march=armv7-m -mthumb -fno-builtin 
 COMMON_FLAGS += -ffunction-sections -fdata-sections -fomit-frame-pointer $(DEBUG_FLAGS) -D$(CPU_MODEL)
 export INCLUDES =  -Iinclude -ICMSIS/Include -IDevice/SiliconLabs/$(CPU_FAMILY)/Include -Iemlib/inc -Iriot
 

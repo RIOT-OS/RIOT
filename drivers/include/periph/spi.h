@@ -45,6 +45,7 @@ typedef enum {
 #if SPI_3_EN
     SPI_3,              /**< SPI device 3 */
 #endif
+    SPI_NONE = -1
 } spi_t;
 
 /**

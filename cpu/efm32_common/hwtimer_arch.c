@@ -16,6 +16,7 @@
  * The hardware timer implementation uses the Cortex build-in system timer as back-end.
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Ryan Kurte <ryankurte@users.noreply.github.com>
  *
  * @}
  */
