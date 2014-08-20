@@ -982,7 +982,7 @@ int32_t destiny_socket_recvfrom(int s, void *buf, uint32_t len, int flags,
         memcpy(&from->sin6_addr, &ipv6_header->srcaddr, 16);
         from->sin6_family = AF_INET6;
         from->sin6_flowinfo = 0;
-        from->sin6_port = NTOHS(udp_header->src_port);
+        from->sin6_port = udp_header->src_port;
         *fromlen = sizeof(sockaddr6_t);
 
         msg_reply(&m_recv, &m_send);
