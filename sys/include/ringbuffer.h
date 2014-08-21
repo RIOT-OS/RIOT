@@ -130,4 +130,14 @@ unsigned ringbuffer_peek(const ringbuffer_t *restrict rb, char *buf, unsigned n)
  */
 unsigned ringbuffer_remove(ringbuffer_t *restrict rb, unsigned n);
 
+/**
+ * @brief           Return number of bytes that can be added.
+ * @param[in,out]   rb    Ringbuffer to operate on.
+ * @returns         Amount of free space
+ */
+static inline unsigned int ringbuffer_get_free(const ringbuffer_t *restrict rb)
+{
+    return rb->size - rb->avail;
+}
+
 #endif /* __RINGBUFFER_H */
