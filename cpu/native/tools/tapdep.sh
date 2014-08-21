@@ -4,7 +4,7 @@
 # Linux functions
 ######################################################################
 
-Linux_default_bridge () {
+Linux_bridge_default () {
     echo tapbr0
 }
 
@@ -22,7 +22,7 @@ Linux_bridge_create () {
     sudo ip link set ${BRIDGE} up || exit 1
 }
 
-Linux_define_port () {
+Linux_port_define () {
     # try to find an existing unused interface ..
     for IF in $(ls /sys/class/net/${BRIDGE}/brif/); do
         if [ "$(cat /sys/class/net/${BRIDGE}/brif/${IF}/state)" = 0 ]; then
@@ -37,7 +37,7 @@ Linux_define_port () {
     fi
 }
 
-Linux_create_port () {
+Linux_port_create () {
     sudo ip tuntap add dev ${PORT} mode tap user ${USER} || exit 1
     sudo -s sh -c "echo 1 > /proc/sys/net/ipv6/conf/${PORT}/disable_ipv6" || exit 1
     sudo brctl addif ${BRIDGE} ${PORT} || exit 1
@@ -58,6 +58,20 @@ Linux_port_exists () {
 
 Darwin_default_bridge () {
     echo bridge1234
+}
+
+Darwin_bridge_create () {
+    sudo ifconfig ${BRIDGE} create || exit 1
+    echo "upping ${BRIDGE}"
+    sudo ifconfig ${BRIDGE} up || exit 1
+}
+
+Darwin_port_create () {
+    sudo chown ${USER} /dev/${PORT} || exit 1
+    echo "start RIOT instance for ${PORT} now and hit enter"
+    read
+    sudo ifconfig ${BRIDGE} addm ${PORT} || exit 1
+    sudo ifconfig ${PORT} up
 }
 
 ##
@@ -92,11 +106,11 @@ if ! ${OS}_bridge_exists; then
 fi
 
 if [ -z "${PORT}" ]; then
-    ${OS}_define_port
+    ${OS}_port_define
 fi
 
 if ! ${OS}_port_exists; then
-    ${OS}_create_port
+    ${OS}_port_create
 fi
 
 echo ${PORT}
