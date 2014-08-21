@@ -30,6 +30,7 @@
 #include "shell.h"
 #include "shell_commands.h"
 #include "board_uart0.h"
+#include "msg.h"
 
 #ifdef MODULE_LTC4150
 #include "ltc4150.h"
@@ -46,20 +47,21 @@
 #ifdef MODULE_TRANSCEIVER
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
-msg_t msg_q[RCV_BUFFER_SIZE];
+
+static char queue_buf[MSG_QUEUE_SPACE(RCV_BUFFER_SIZE)];
 
 void *radio(void *arg)
 {
     (void) arg;
 
-    msg_t m;
+    msg_pulse_t m;
     radio_packet_t *p;
     radio_packet_length_t i;
 
-    msg_init_queue(msg_q, RCV_BUFFER_SIZE);
+    thread_msg_queue_init(queue_buf, sizeof(queue_buf), 0);
 
     while (1) {
-        msg_receive(&m);
+        msg_receive_pulse(&m);
 
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t *) m.content.ptr;

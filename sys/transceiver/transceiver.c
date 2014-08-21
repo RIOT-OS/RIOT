@@ -85,8 +85,7 @@ radio_packet_t transceiver_buffer[TRANSCEIVER_BUFFER_SIZE];
 uint8_t data_buffer[TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE];
 
 /* message buffer */
-msg_queue_t msg_queue;
-char msg_queue_buffer[(TRANSCEIVER_MSG_BUFFER_SIZE*MSG_PULSE_QUEUE_SIZE)];
+static char msg_queue_buffer[(TRANSCEIVER_MSG_BUFFER_SIZE*MSG_PULSE_QUEUE_SIZE)];
 
 uint32_t response; ///< response bytes for messages to upper layer threads
 
@@ -283,8 +282,7 @@ static void *run(void *arg)
     msg_pulse_t m;
     transceiver_command_t *cmd;
 
-    msg_queue_init(&msg_queue, msg_queue_buffer, sizeof(msg_queue_buffer), 0);
-    thread_set_msg_queue(thread_pid, &msg_queue);
+    thread_msg_queue_init(msg_queue_buffer, sizeof(msg_queue_buffer), 0);
 
     while (1) {
         DEBUG("transceiver: Waiting for next message\n");

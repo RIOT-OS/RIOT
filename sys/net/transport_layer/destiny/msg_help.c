@@ -23,7 +23,7 @@
 
 void block_continue_thread(void)
 {
-    //  msg_t recv_m;
+    //  msg_pulse_t recv_m;
     //  recv_m.type = TCP_NOT_DEFINED;
     //  while (recv_m.type != TCP_CONTINUE)
     //      {
@@ -31,27 +31,32 @@ void block_continue_thread(void)
     //      }
 }
 
-int net_msg_receive(msg_t *m)
+int net_msg_receive(msg_pulse_t *m)
 {
-    return msg_receive(m);
+    return msg_receive_pulse(m);
 }
 
-int net_msg_reply(msg_t *m, msg_t *reply, uint16_t message)
+int net_msg_reply(msg_pulse_t *m, msg_pulse_t *reply, uint16_t message)
 {
     reply->type = message;
-    return msg_reply(m, reply);
+    return msg_reply_pulse(m, reply);
 }
 
-int net_msg_send(msg_t *m, kernel_pid_t pid, bool block, uint16_t message)
+int net_msg_send(msg_pulse_t *m, kernel_pid_t pid, bool block, uint16_t message)
 {
     m->type = message;
-    return msg_send(m, pid, block);
+    if (block) {
+        return msg_send_pulse(m, pid);
+    }
+    else {
+        return msg_try_send_pulse(m, pid);
+    }
 }
 
-int net_msg_send_recv(msg_t *m, msg_t *reply, kernel_pid_t pid, uint16_t message)
+int net_msg_send_recv(msg_pulse_t *m, msg_pulse_t *reply, kernel_pid_t pid, uint16_t message)
 {
     m->type = message;
-    return msg_send_receive(m, reply, pid);;
+    return msg_send_receive_pulse(m, reply, pid);;
 }
 
 /**

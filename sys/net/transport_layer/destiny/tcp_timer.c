@@ -32,7 +32,7 @@
 
 void handle_synchro_timeout(socket_internal_t *current_socket)
 {
-    msg_t send;
+    msg_pulse_t send;
 
     if (thread_getstatus(current_socket->recv_pid) == STATUS_RECEIVE_BLOCKED) {
         timex_t now;
@@ -62,7 +62,7 @@ void handle_synchro_timeout(socket_internal_t *current_socket)
 
 void handle_established(socket_internal_t *current_socket)
 {
-    msg_t send;
+    msg_pulse_t send;
     double current_timeout = current_socket->socket_values.tcp_control.rto;
 
     if (current_timeout < SECOND) {

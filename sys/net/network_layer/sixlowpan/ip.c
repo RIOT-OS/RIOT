@@ -25,6 +25,7 @@
 #include "vtimer.h"
 #include "mutex.h"
 #include "msg.h"
+#include "msg_queue.h"
 #include "net_if.h"
 #include "sixlowpan/mac.h"
 
@@ -47,7 +48,7 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 uint8_t ip_send_buffer[BUFFER_SIZE];
 uint8_t buffer[BUFFER_SIZE];
-msg_t ip_msg_queue[IP_PKT_RECV_BUF_SIZE];
+static char queue_buf[MSG_QUEUE_SPACE(IP_PKT_RECV_BUF_SIZE)];
 ipv6_hdr_t *ipv6_buf;
 icmpv6_hdr_t *icmp_buf;
 uint8_t *nextheader;
@@ -260,9 +261,9 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
             DEBUG("INFO: packet type: RPL message\n");
 
             if (_rpl_process_pid != KERNEL_PID_UNDEF) {
-                msg_t m_send;
+                msg_pulse_t m_send;
                 m_send.content.ptr = (char *) &hdr->code;
-                msg_send(&m_send, _rpl_process_pid, 1);
+                msg_send_pulse(&m_send, _rpl_process_pid);
             }
             else {
                 DEBUG("INFO: no RPL handler registered\n");
@@ -338,15 +339,15 @@ void *ipv6_process(void *arg)
 {
     (void) arg;
 
-    msg_t m_recv_lowpan, m_send_lowpan;
-    msg_t m_recv, m_send;
+    msg_pulse_t m_recv_lowpan, m_send_lowpan;
+    msg_pulse_t m_recv, m_send;
     uint8_t i;
     uint16_t packet_length;
 
-    msg_init_queue(ip_msg_queue, IP_PKT_RECV_BUF_SIZE);
+    thread_msg_queue_init(queue_buf, sizeof(queue_buf), 0);
 
     while (1) {
-        msg_receive(&m_recv_lowpan);
+        msg_receive_pulse(&m_recv_lowpan);
 
         ipv6_buf = (ipv6_hdr_t *)m_recv_lowpan.content.ptr;
 
@@ -355,10 +356,10 @@ void *ipv6_process(void *arg)
 
         for (i = 0; i < SIXLOWIP_MAX_REGISTERED; i++) {
             if (sixlowip_reg[i]) {
-                msg_t m_send;
+                msg_pulse_t m_send;
                 m_send.type = IPV6_PACKET_RECEIVED;
                 m_send.content.ptr = (char *) ipv6_buf;
-                msg_send(&m_send, sixlowip_reg[i], 1);
+                msg_send_pulse(&m_send, sixlowip_reg[i]);
             }
         }
 
@@ -381,7 +382,7 @@ void *ipv6_process(void *arg)
                 case (IPV6_PROTO_NUM_TCP): {
                     if (tcp_packet_handler_pid != KERNEL_PID_UNDEF) {
                         m_send.content.ptr = (char *) ipv6_buf;
-                        msg_send_receive(&m_send, &m_recv, tcp_packet_handler_pid);
+                        msg_send_receive_pulse(&m_send, &m_recv, tcp_packet_handler_pid);
                     }
                     else {
                         DEBUG("INFO: No TCP handler registered.\n");
@@ -393,7 +394,7 @@ void *ipv6_process(void *arg)
                 case (IPV6_PROTO_NUM_UDP): {
                     if (udp_packet_handler_pid != KERNEL_PID_UNDEF) {
                         m_send.content.ptr = (char *) ipv6_buf;
-                        msg_send_receive(&m_send, &m_recv, udp_packet_handler_pid);
+                        msg_send_receive_pulse(&m_send, &m_recv, udp_packet_handler_pid);
                     }
                     else {
                         DEBUG("INFO: No UDP handler registered.\n");
@@ -430,7 +431,7 @@ void *ipv6_process(void *arg)
             if ((dest == NULL) || ((--ipv6_buf->hoplimit) == 0)) {
                 DEBUG("!!! Packet not for me, routing handler is set, but I "\
                       " have no idea where to send or the hop limit is exceeded.\n");
-                msg_reply(&m_recv_lowpan, &m_send_lowpan);
+                msg_reply_pulse(&m_recv_lowpan, &m_send_lowpan);
                 continue;
             }
 
@@ -453,7 +454,7 @@ void *ipv6_process(void *arg)
             }
         }
 
-        msg_reply(&m_recv_lowpan, &m_send_lowpan);
+        msg_reply_pulse(&m_recv_lowpan, &m_send_lowpan);
     }
 }
 

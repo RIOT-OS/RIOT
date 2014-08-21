@@ -86,7 +86,7 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 {
     (void) tcp_header;
 
-    msg_t m_send_tcp, m_recv_tcp;
+    msg_pulse_t m_send_tcp, m_recv_tcp;
     uint8_t tcp_payload_len = NTOHS(ipv6_header->length) - TCP_HDR_LEN;
     uint8_t acknowledged_bytes = 0;
 
@@ -121,18 +121,18 @@ uint8_t handle_payload(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                            socket_internal_t *tcp_socket)
 {
-    msg_t m_recv_tcp, m_send_tcp;
+    msg_pulse_t m_recv_tcp, m_send_tcp;
     kernel_pid_t target_pid = KERNEL_PID_UNDEF;
 
     if (tcp_socket->socket_values.tcp_control.state == TCP_LAST_ACK) {
         target_pid = tcp_socket->recv_pid;
         close_socket(tcp_socket);
-        msg_send(&m_send_tcp, target_pid, 0);
+        msg_try_send_pulse(&m_send_tcp, target_pid);
         return;
     }
     else if (tcp_socket->socket_values.tcp_control.state == TCP_CLOSING) {
-        msg_send(&m_send_tcp, tcp_socket->recv_pid, 0);
-        msg_send(&m_send_tcp, tcp_socket->send_pid, 0);
+        msg_try_send_pulse(&m_send_tcp, tcp_socket->recv_pid);
+        msg_try_send_pulse(&m_send_tcp, tcp_socket->send_pid);
         return;
     }
     else if (get_waiting_connection_socket(tcp_socket->socket_id, ipv6_header,
@@ -165,7 +165,7 @@ void handle_tcp_rst_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 void handle_tcp_syn_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
                            socket_internal_t *tcp_socket)
 {
-    msg_t m_send_tcp;
+    msg_pulse_t m_send_tcp;
 
     if (tcp_socket->socket_values.tcp_control.state == TCP_LISTEN) {
         socket_internal_t *new_socket = new_tcp_queued_socket(ipv6_header,
@@ -196,7 +196,7 @@ void handle_tcp_syn_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 {
     (void) ipv6_header;
 
-    msg_t m_send_tcp;
+    msg_pulse_t m_send_tcp;
 
     if (tcp_socket->socket_values.tcp_control.state == TCP_SYN_SENT) {
         m_send_tcp.content.ptr = (char *) tcp_header;
@@ -212,7 +212,7 @@ void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 {
     (void) ipv6_header;
 
-    msg_t m_send;
+    msg_pulse_t m_send;
     socket_t *current_tcp_socket = &tcp_socket->socket_values;
     uint8_t send_buffer[BUFFER_SIZE];
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
@@ -245,7 +245,7 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 {
     (void) ipv6_header;
 
-    msg_t m_send;
+    msg_pulse_t m_send;
     socket_t *current_tcp_socket = &tcp_socket->socket_values;
     uint8_t send_buffer[BUFFER_SIZE];
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
@@ -263,8 +263,8 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 
     send_tcp(tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
 
-    msg_send(&m_send, tcp_socket->send_pid, 0);
-    msg_send(&m_send, tcp_socket->recv_pid, 0);
+    msg_try_send_pulse(&m_send, tcp_socket->send_pid);
+    msg_try_send_pulse(&m_send, tcp_socket->recv_pid);
 }
 
 void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
@@ -310,7 +310,7 @@ void *tcp_packet_handler(void *arg)
 {
     (void) arg;
 
-    msg_t m_recv_ip, m_send_ip;
+    msg_pulse_t m_recv_ip, m_send_ip;
     ipv6_hdr_t *ipv6_header;
     tcp_hdr_t *tcp_header;
     uint8_t *payload;
@@ -318,7 +318,7 @@ void *tcp_packet_handler(void *arg)
     uint16_t chksum;
 
     while (1) {
-        msg_receive(&m_recv_ip);
+        msg_receive_pulse(&m_recv_ip);
 
         ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
         tcp_header = ((tcp_hdr_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
@@ -407,6 +407,6 @@ void *tcp_packet_handler(void *arg)
                              &tcp_socket->socket_values);
         }
 
-        msg_reply(&m_recv_ip, &m_send_ip);
+        msg_reply_pulse(&m_recv_ip, &m_send_ip);
     }
 }
