@@ -343,6 +343,8 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
         break;
     }
 
+    gpio_irq_enable(dev);
+
     return 0;
 }
 
@@ -825,9 +827,7 @@ void gpio_write(gpio_t dev, int value)
 static inline void gpio_irq_handler(gpio_t dev)
 {
     gpio_config[dev].cb(gpio_config[dev].arg);
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    
 }
 
 
@@ -840,23 +840,37 @@ void GPIO_EVEN_IRQHandler(void)
     /* Get all even interrupts. */
     iflags = GPIO_IntGetEnabled() & 0x00005555;
 
-    if (GPIO->IF & (1 << GPIO_IRQ_0)) {
-        GPIO->IFC = (1 << GPIO_IRQ_0);
+    printf("even 0x%.8x\n", iflags);
+
+    /* Call IRQ handlers */
+#ifdef GPIO_0_EN
+    if (iflags & (1 << GPIO_IRQ_0)) {
+        //GPIO->IFC = (1 << GPIO_IRQ_0);
+        printf("GPIO_0 int\n");
         gpio_irq_handler(GPIO_0);
-    } else if (GPIO->IF & (1 << GPIO_IRQ_1)) {
-        GPIO->IFC = (1 << GPIO_IRQ_0);
-        gpio_irq_handler(GPIO_1);
-#ifdef GPIO_2
-    } else if (GPIO->IF & (1 << GPIO_IRQ_1)) {
-        GPIO->IFC = (1 << GPIO_IRQ_0);
-        gpio_irq_handler(GPIO_2);
     }
-#else
+#endif
+#ifdef GPIO_1_EN
+    if (iflags & (1 << GPIO_IRQ_1)) {
+        //GPIO->IFC = (1 << GPIO_IRQ_1);
+        printf("GPIO_1 int\n");
+        gpio_irq_handler(GPIO_1);
+    }
+#endif
+#ifdef GPIO_2_EN
+    if (iflags & (1 << GPIO_IRQ_2)) {
+        //GPIO->IFC = (1 << GPIO_IRQ_2);
+        printf("GPIO_2 int\n");
+        gpio_irq_handler(GPIO_2);
     }
 #endif
 
     /* Clean only even interrupts. */
     GPIO_IntClear(iflags);
+
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
 
     ISR_EXIT();
 }
@@ -871,8 +885,37 @@ void GPIO_ODD_IRQHandler(void)
     /* Get all odd interrupts. */
     iflags = GPIO_IntGetEnabled() & 0x0000AAAA;
 
+    printf("odd 0x%.8x\n", iflags);
+
+    /* Call IRQ handlers */
+#ifdef GPIO_0_EN
+    if (iflags & (1 << GPIO_IRQ_0)) {
+        //GPIO->IFC = (1 << GPIO_IRQ_0);
+        printf("GPIO_0 int\n");
+        gpio_irq_handler(GPIO_0);
+    }
+#endif
+#ifdef GPIO_1_EN
+    if (iflags & (1 << GPIO_IRQ_1)) {
+        //GPIO->IFC = (1 << GPIO_IRQ_1);
+        printf("GPIO_1 int\n");
+        gpio_irq_handler(GPIO_1);
+    }
+#endif
+#ifdef GPIO_2_EN
+    if (iflags & (1 << GPIO_IRQ_2)) {
+        //GPIO->IFC = (1 << GPIO_IRQ_2);
+        printf("GPIO_2 int\n");
+        gpio_irq_handler(GPIO_2);
+    }
+#endif
+
     /* Clean only even interrupts. */
     GPIO_IntClear(iflags);
+
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
 
     ISR_EXIT();
 }
