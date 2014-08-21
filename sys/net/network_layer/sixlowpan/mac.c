@@ -49,7 +49,7 @@
 #define DEFAULT_IEEE_802154_PAN_ID  (0x1234)
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
-msg_t msg_q[RADIO_RCV_BUF_SIZE];
+static char queue_buf[MSG_QUEUE_SPACE(RADIO_RCV_BUF_SIZE)];
 
 uint8_t lowpan_mac_buf[PAYLOAD_SIZE];
 static uint8_t macdsn;
@@ -67,7 +67,7 @@ static void *recv_ieee802154_frame(void *arg)
 {
     (void) arg;
 
-    msg_t m;
+    msg_pulse_t m;
 #if (defined(MODULE_AT86RF231) | \
      defined(MODULE_CC2420) | \
      defined(MODULE_MC1322X))
@@ -80,10 +80,10 @@ static void *recv_ieee802154_frame(void *arg)
     ieee802154_frame_t frame;
     net_if_eui64_t src, dst;
 
-    msg_init_queue(msg_q, RADIO_RCV_BUF_SIZE);
+    thread_msg_queue_init(queue_buf, sizeof(queue_buf), 0);
 
     while (1) {
-        msg_receive(&m);
+        msg_receive_pulse(&m);
 
         if (m.type == PKT_PENDING) {
 #if (defined(MODULE_AT86RF231) | \

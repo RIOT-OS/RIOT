@@ -57,5 +57,6 @@ USEMODULE += vtimer
 USEMODULE += defaulttransceiver
 USEMODULE += rpl
 USEMODULE += destiny
+USEMODULE += msg_queue
 
 include $(RIOTBASE)/Makefile.include

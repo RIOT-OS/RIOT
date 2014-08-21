@@ -100,5 +100,8 @@ endif
 ifneq (,$(filter pipe,$(USEMODULE)))
     DIRS += pipe
 endif
+ifneq (,$(filter msg_queue,$(USEMODULE)))
+    DIRS += msg_queue
+endif
 
 include $(RIOTBASE)/Makefile.base

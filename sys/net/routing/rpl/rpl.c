@@ -22,6 +22,7 @@
 #include "mutex.h"
 
 #include "msg.h"
+#include "msg_queue.h"
 #include "rpl.h"
 #include "etx_beaconing.h"
 #include "of0.h"
@@ -52,7 +53,7 @@ rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
 kernel_pid_t rpl_process_pid = KERNEL_PID_UNDEF;
 mutex_t rpl_recv_mutex = MUTEX_INIT;
 mutex_t rpl_send_mutex = MUTEX_INIT;
-msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
+static char queue_buf[MSG_QUEUE_SPACE(RPL_PKT_RECV_BUF_SIZE)];
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
 
@@ -114,11 +115,11 @@ void *rpl_process(void *arg)
 {
     (void) arg;
 
-    msg_t m_recv;
-    msg_init_queue(rpl_msg_queue, RPL_PKT_RECV_BUF_SIZE);
+    msg_pulse_t m_recv;
+    thread_msg_queue_init(queue_buf, sizeof(queue_buf), 0);
 
     while (1) {
-        msg_receive(&m_recv);
+        msg_receive_pulse(&m_recv);
         mutex_lock(&rpl_recv_mutex);
         uint8_t *code;
         code = ((uint8_t *)m_recv.content.ptr);

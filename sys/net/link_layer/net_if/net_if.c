@@ -258,14 +258,14 @@ uint32_t net_if_transceiver_get_set_handler(int if_id, uint16_t op_type,
 {
     DEBUG("net_if_transceiver_get_set_handler: if_id = %d, op_type = %d, data = %p\n",
           if_id, op_type, data);
-    msg_t msg;
+    msg_pulse_t msg;
     transceiver_command_t tcmd;
 
     tcmd.transceivers = interfaces[if_id].transceivers;
     tcmd.data = (char *)data;
     msg.content.ptr = (char *)&tcmd;
     msg.type = op_type;
-    msg_send_receive(&msg, &msg, transceiver_pid);
+    msg_send_receive_pulse(&msg, &msg, transceiver_pid);
 
     return msg.content.value;
 }

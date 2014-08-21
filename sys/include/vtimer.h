@@ -109,11 +109,11 @@ int vtimer_remove(vtimer_t *t);
 
 /**
  * @brief   receive a message but return in case of timeout time is passed by without a new message
- * @param[out]   m           pointer to a msg_t which will be filled in case of no timeout
+ * @param[out]   m           pointer to a msg_pulse_t which will be filled in case of no timeout
  * @param[in]    timeout     timex_t containing the relative time to fire the timeout
  * @return       < 0 on error, other value otherwise
  */
-int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout);
+int vtimer_msg_receive_timeout(msg_pulse_t *m, timex_t timeout);
 
 #if ENABLE_DEBUG
 

@@ -156,5 +156,23 @@ static inline kernel_pid_t thread_getpid(void)
 int thread_measure_stack_free(char *stack);
 #endif
 
+#ifdef MODULE_MSG_QUEUE
+/**
+ * @brief Sets / changes a thread's message queue.
+ *
+ * The msg_queue object must have been initialized before
+ * using msg_queue_init().
+ *
+ * @param[in] pid   the PID of the thread to change
+ *
+ * @return          `1` on success
+ * @return          `STATUS_NOT_FOUND` if pid is unknown or not sleeping
+ */
+#include "msg_queue.h"
+int thread_set_msg_queue(int pid, msg_queue_t* msg_queue);
+#endif
+
+msg_node_t *thread_get_msg_node(int pid);
+
 /* @} */
 #endif /* __THREAD_H */

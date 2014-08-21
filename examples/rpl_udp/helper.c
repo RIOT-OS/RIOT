@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "msg.h"
+#include "msg_queue.h"
 #include "sixlowpan/ip.h"
 #include "transceiver.h"
 #include "ieee802154_frame.h"
@@ -37,7 +38,7 @@
 
 extern uint8_t ipv6_ext_hdr_len;
 
-msg_t msg_q[RCV_BUFFER_SIZE];
+static char queue_buf[MSG_QUEUE_SPACE(RCV_BUFFER_SIZE)];
 
 void rpl_udp_set_id(int argc, char **argv)
 {
@@ -57,16 +58,16 @@ void *rpl_udp_monitor(void *arg)
 {
     (void) arg;
 
-    msg_t m;
+    msg_pulse_t m;
     radio_packet_t *p;
     ipv6_hdr_t *ipv6_buf;
     uint8_t icmp_type, icmp_code;
     icmpv6_hdr_t *icmpv6_buf = NULL;
 
-    msg_init_queue(msg_q, RCV_BUFFER_SIZE);
+    thread_msg_queue_init(queue_buf, sizeof(queue_buf), 0);
 
     while (1) {
-        msg_receive(&m);
+        msg_receive_pulse(&m);
 
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t *) m.content.ptr;
@@ -128,7 +129,7 @@ void rpl_udp_ignore(int argc, char **argv)
         return;
     }
 
-    msg_t mesg;
+    msg_pulse_t mesg;
     mesg.type = DBG_IGN;
     mesg.content.ptr = (char *) &tcmd;
 
@@ -138,7 +139,7 @@ void rpl_udp_ignore(int argc, char **argv)
     if (argc == 2) {
         a = atoi(argv[1]);
         printf("sending to transceiver (%" PRIkernel_pid "): %u\n", transceiver_pid, (*(uint8_t *)tcmd.data));
-        msg_send(&mesg, transceiver_pid, 1);
+        msg_send_pulse(&mesg, transceiver_pid);
     }
     else {
         printf("Usage: %s <addr>\n", argv[0]);

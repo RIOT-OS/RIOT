@@ -102,6 +102,18 @@ unsigned ringbuffer_get(ringbuffer_t *restrict rb, char *buf, unsigned n)
     return n;
 }
 
+unsigned ringbuffer_remove(ringbuffer_t *restrict rb, unsigned n)
+{
+    if (n > rb->avail) {
+        n = rb->avail;
+    }
+
+    for (unsigned i = 0; i < n; ++i) {
+        get_head(rb);
+    }
+    return n;
+}
+
 int ringbuffer_peek_one(const ringbuffer_t *restrict rb_)
 {
     ringbuffer_t rb = *rb_;

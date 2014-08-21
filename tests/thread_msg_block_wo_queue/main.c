@@ -24,6 +24,7 @@
 
 #include "thread.h"
 #include "msg.h"
+#include "msg_queue.h"
 
 char t1_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
@@ -35,15 +36,15 @@ void *thread1(void *arg)
 
     printf("THREAD %u start\n", p1);
 
-    msg_t msg, reply;
-    memset(&msg, 1, sizeof(msg_t));
+    msg_pulse_t msg, reply;
+    memset(&msg, 1, sizeof(msg_pulse_t));
 
     /* step 1: send asynchonously */
-    msg_send(&msg, p_main, 0);
+    msg_try_send_pulse(&msg, p_main);
 
     /* step 2: send message, turning its status into STATUS_REPLY_BLOCKED */
-    msg_send_receive(&msg, &reply, p_main);
-    printf("received: %" PRIkernel_pid ", %u \n", reply.sender_pid, reply.type);
+    msg_send_receive_pulse(&msg, &reply, p_main);
+    printf("received: %u, %u \n", reply.sender_pid, reply.type);
     printf("pointer: %s\n", reply.content.ptr);
 
     printf("THREAD %" PRIkernel_pid " SHOULD BE BLOCKING :(\n", p1);
@@ -51,17 +52,23 @@ void *thread1(void *arg)
     return NULL;
 }
 
+char queue_buf[4096];
+
 int main(void)
 {
-    msg_t msg;
+    msg_pulse_t msg;
     p_main = sched_active_pid;
 
-    p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
-                       CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                       thread1, NULL, "nr1");
+    msg_queue_t msg_queue;
+
+    msg_queue_init(&msg_queue, queue_buf, sizeof(queue_buf), 0);
+    thread_set_msg_queue(sched_active_pid, &msg_queue);
+
+    p1 = thread_create(t1_stack, KERNEL_CONF_STACKSIZE_PRINTF, PRIORITY_MAIN - 1,
+                       CREATE_WOUT_YIELD | CREATE_STACKTEST, thread1, "nr1");
 
     /* step 3: receive a msg */
-    msg_receive(&msg);
+    msg_receive_pulse(&msg);
 
     printf("MAIN THREAD %" PRIkernel_pid " ALIVE!\n", p_main);
     return 0;

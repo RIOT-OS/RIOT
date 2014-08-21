@@ -5,6 +5,7 @@ BOARD_WHITELIST := native
 
 USEMODULE += nativenet
 USEMODULE += transceiver
+USEMODULE += msg_queue lib
 
 include $(RIOTBASE)/Makefile.include
 

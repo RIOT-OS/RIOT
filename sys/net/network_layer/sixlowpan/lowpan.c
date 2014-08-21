@@ -361,7 +361,7 @@ static void *lowpan_transfer(void *arg)
 {
     (void) arg;
 
-    msg_t m_recv, m_send;
+    msg_pulse_t m_recv, m_send;
     ipv6_hdr_t *ipv6_buf;
     lowpan_reas_buf_t *current_buf;
     uint8_t gotosleep;
@@ -381,7 +381,7 @@ static void *lowpan_transfer(void *arg)
                 memcpy(ipv6_buf, (current_buf->packet) + 1, current_buf->packet_size - 1);
                 m_send.content.ptr = (char *)ipv6_buf;
                 packet_length = current_buf->packet_size - 1;
-                msg_send_receive(&m_send, &m_recv, ip_process_pid);
+                msg_send_receive_pulse(&m_send, &m_recv, ip_process_pid);
             }
             else if (((current_buf->packet[0] & 0xf0) == IPV6_VER) &&
                      (iphc_status == LOWPAN_IPHC_DISABLE)) {
@@ -389,7 +389,7 @@ static void *lowpan_transfer(void *arg)
                 memcpy(ipv6_buf, (current_buf->packet), current_buf->packet_size);
                 m_send.content.ptr = (char *)ipv6_buf;
                 packet_length = current_buf->packet_size;
-                msg_send_receive(&m_send, &m_recv, ip_process_pid);
+                msg_send_receive_pulse(&m_send, &m_recv, ip_process_pid);
             }
             else if (((current_buf->packet[0] & 0xe0) == SIXLOWPAN_IPHC1_DISPATCH) &&
                      (iphc_status == LOWPAN_IPHC_ENABLE)) {
@@ -402,7 +402,7 @@ static void *lowpan_transfer(void *arg)
 
                 ipv6_buf = ipv6_get_buf();
                 m_send.content.ptr = (char *) ipv6_buf;
-                msg_send_receive(&m_send, &m_recv, ip_process_pid);
+                msg_send_receive_pulse(&m_send, &m_recv, ip_process_pid);
             }
             else {
                 DEBUG("ERROR: packet with unknown dispatch 0x%02x received\n",
@@ -795,12 +795,12 @@ void lowpan_read(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
 
     for (i = 0; i < SIXLOWPAN_MAX_REGISTERED; i++) {
         if (sixlowpan_reg[i]) {
-            msg_t m_send;
+            msg_pulse_t m_send;
             m_send.type = LOWPAN_FRAME_RECEIVED;;
             current_frame.length = length;
             current_frame.data = data;
             m_send.content.ptr = (char *) &current_frame;
-            msg_send(&m_send, sixlowpan_reg[i], 1);
+            msg_send_pulse(&m_send, sixlowpan_reg[i]);
         }
     }
 

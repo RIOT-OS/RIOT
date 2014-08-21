@@ -20,6 +20,7 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "thread.h"
 #include "kernel.h"
@@ -31,6 +32,7 @@
 #include "bitarithm.h"
 #include "hwtimer.h"
 #include "sched.h"
+#include "msg.h"
 
 volatile tcb_t *thread_get(kernel_pid_t pid)
 {
@@ -128,6 +130,13 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     tcb_t *cb = (tcb_t *) tcb_address;
 
+    /* allocate messaging node if needed */
+    if (! (flags & CREATE_NOMSG)) {
+        stacksize -= sizeof(msg_node_t);
+        cb->msg_node = (msg_node_t*) ((unsigned int) stack + stacksize);
+        memset(cb->msg_node, '\0', sizeof(msg_node_t));
+    }
+
     if (priority >= SCHED_PRIO_LEVELS) {
         return -EINVAL;
     }
@@ -190,12 +199,9 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     cb->name = name;
 
-    cb->wait_data = NULL;
-
-    cb->msg_waiters.first = NULL;
-
-    cib_init(&(cb->msg_queue), 0);
-    cb->msg_array = NULL;
+    if (cb->msg_node) {
+        cb->msg_node->owner = (struct tcb*) cb;
+    }
 
     sched_num_threads++;
 
@@ -224,3 +230,30 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     return pid;
 }
+
+#ifdef MODULE_MSG_QUEUE
+int thread_set_msg_queue(int pid, msg_queue_t* msg_queue) {
+    int res = 0;
+    int state = disableIRQ();
+
+    tcb_t* tcb = (tcb_t*) sched_threads[pid];
+    if (tcb->msg_node) {
+        tcb->msg_node->msg_queue = msg_queue;
+        res = 1;
+    }
+
+    restoreIRQ(state);
+
+    return res;
+}
+#endif
+
+msg_node_t *thread_get_msg_node(int pid)
+{
+    if (sched_threads[pid] == NULL) {
+        return NULL;
+    }
+
+    return sched_threads[pid]->msg_node;
+}
+

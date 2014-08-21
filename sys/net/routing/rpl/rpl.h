@@ -52,7 +52,6 @@ extern mutex_t rpl_recv_mutex;
 /* needed for sending RPL-messages */
 extern mutex_t rpl_send_mutex;
 
-extern msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 extern char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 extern uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
 

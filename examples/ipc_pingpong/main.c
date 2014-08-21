@@ -27,15 +27,14 @@
 void *second_thread(void *arg)
 {
     (void) arg;
-
-    printf("2nd thread started, pid: %" PRIkernel_pid "\n", thread_getpid());
-    msg_t m;
+    printf("2nd thread started, pid: %i\n", thread_getpid());
+    msg_pulse_t m;
 
     while (1) {
-        msg_receive(&m);
-        printf("2nd: Got msg from %" PRIkernel_pid "\n", m.sender_pid);
+        msg_receive_pulse(&m);
+        printf("2nd: Got msg from %i\n", m.sender_pid);
         m.content.value++;
-        msg_reply(&m, &m);
+        msg_reply_pulse(&m, &m);
     }
 
     return NULL;
@@ -48,7 +47,7 @@ int main(void)
     printf("Starting IPC Ping-pong example...\n");
     printf("1st thread started, pid: %" PRIkernel_pid "\n", thread_getpid());
 
-    msg_t m;
+    msg_pulse_t m;
 
     kernel_pid_t pid = thread_create(second_thread_stack, sizeof(second_thread_stack),
                             PRIORITY_MAIN - 1, CREATE_STACKTEST,
@@ -57,7 +56,7 @@ int main(void)
     m.content.value = 1;
 
     while (1) {
-        msg_send_receive(&m, &m, pid);
+        msg_send_receive_pulse(&m, &m, pid);
         printf("1st: Got msg with content %u\n", (unsigned int)m.content.value);
     }
 }
