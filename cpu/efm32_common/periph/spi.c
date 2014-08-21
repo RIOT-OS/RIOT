@@ -34,6 +34,9 @@
 static uint32_t speed_to_baud(spi_speed_t speed);
 static uint32_t conf_to_cpol(spi_conf_t conf);
 
+//SPI configuration storage
+static spi_state_t spi_config[SPI_NUMOF];
+
 int spi_init_master(spi_t spi, spi_conf_t conf, spi_speed_t speed)
 {
     USART_TypeDef *dev;
