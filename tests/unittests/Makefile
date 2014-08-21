@@ -24,6 +24,8 @@ else
     UNIT_TESTS := $(filter tests-%, $(MAKECMDGOALS))
 endif
 
+DISABLE_MODULE += auto_init
+
 # Pull in `Makefile.include`s from the test suites:
 -include $(UNIT_TESTS:%=$(RIOTBASE)/tests/unittests/%/Makefile.include)
 
