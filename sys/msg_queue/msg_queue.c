@@ -39,7 +39,7 @@ int thread_msg_queue_init(char *buf, int size, int maxsize) {
     size -= sizeof(msg_queue_t);
 
     msg_queue_init(queue, buf, size, maxsize);
-    thread_set_msg_queue(thread_pid, queue);
+    thread_set_msg_queue(thread_getpid(), queue);
 
     return 0;
 }
