@@ -35,7 +35,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "kernel_types.h"
-#include "queue.h"
+#include "priority_queue.h"
 
 #define MESSAGE_PROCESS_NOT_WAITING 0
 #define MESSAGE_SENT                1
@@ -59,9 +59,9 @@
  *
  */
 typedef struct msg_node {
-    struct tcb   *owner;         /**< thread that owns this message node   */
-    void         *wait_data;     /**< holding current receive data         */
-    queue_node_t msg_waiters;    /**< threads waiting to send to this node */
+    struct tcb   *owner;          /**< thread that owns this message node   */
+    void         *wait_data;      /**< holding current receive data         */
+    priority_queue_t msg_waiters; /**< threads waiting to send to this node */
 
 #ifdef MODULE_MSG_QUEUE
     struct msg_queue *msg_queue; /**< ptr to this node's msg queue         */
