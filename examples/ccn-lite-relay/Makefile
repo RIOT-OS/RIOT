@@ -45,7 +45,6 @@ BOARD_BLACKLIST := arduino-due mbed_lpc1768 msb-430 pttu udoo qemu-i386 \
 USEMODULE += posix
 
 USEMODULE += defaulttransceiver
-USEMODULE += rtc
 USEMODULE += ccn_lite
 
 include $(RIOTBASE)/Makefile.include
