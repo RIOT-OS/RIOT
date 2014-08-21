@@ -3,7 +3,7 @@
 DEFBRIDGE="tapbr0"
 DEFTAPBASE="tap"
 
-if [ "$(ps -p ${PPID} -o comm=)" = "sudo" -o "$(ps -p ${PPID} -o comm=)" = "su" ]; then
+if [ ${EUID} -eq 0 -o "$(ps -p ${PPID} -o comm=)" = "sudo" -o "$(ps -p ${PPID} -o comm=)" = "su" ]; then
     echo "Error: ${0} must not be run as root"
     exit 1
 fi
