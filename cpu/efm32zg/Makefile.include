@@ -1,8 +1,8 @@
 # this CPU implementation is using the new core/CPU interface
 export CFLAGS += -DCOREIF_NG=1
 
-export CPU_FAMILY = EFM32GG
-export CPU_FLAGS = -mcpu=cortex-m3
+export CPU_FAMILY = EMF32ZG
+export CPU_FLAGS = -mcpu=cortex-m0plus -Wl,-no_unaligned_access
 
 # tell the build system that the CPU depends on the Cortex-M common files
 export USEMODULE += efm32_common

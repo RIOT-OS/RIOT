@@ -1,0 +1,65 @@
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+MODULE	Makefile	/^MODULE = $(BOARD)_base$/;"	m
+board_init	board.c	/^void board_init(void)$/;"	f
+leds_init	board.c	/^static void leds_init(void)$/;"	f	file:
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+BOARD_H	include/board.h	4;"	d
+F_CPU	include/board.h	9;"	d
+HW_TIMER	include/board.h	14;"	d
+LED_0_PIN	include/board.h	27;"	d
+LED_0_PORT	include/board.h	26;"	d
+LED_1_PIN	include/board.h	29;"	d
+LED_1_PORT	include/board.h	28;"	d
+LED_GREEN_OFF	include/board.h	38;"	d
+LED_GREEN_ON	include/board.h	37;"	d
+LED_GREEN_TOGGLE	include/board.h	39;"	d
+LED_RED_OFF	include/board.h	41;"	d
+LED_RED_ON	include/board.h	40;"	d
+LED_RED_TOGGLE	include/board.h	42;"	d
+STDIO	include/board.h	19;"	d
+ADC_0_EN	include/periph_conf.h	102;"	d
+ADC_MAX_CHANNELS	include/periph_conf.h	103;"	d
+ADC_NUMOF	include/periph_conf.h	101;"	d
+CLOCK_CORECLOCK	include/periph_conf.h	44;"	d
+ISR_ENTER	include/periph_conf.h	30;"	d
+ISR_EXIT	include/periph_conf.h	35;"	d
+PWM_0_EN	include/periph_conf.h	112;"	d
+PWM_1_EN	include/periph_conf.h	113;"	d
+PWM_NUMOF	include/periph_conf.h	111;"	d
+SPI_0_EN	include/periph_conf.h	120;"	d
+SPI_1_EN	include/periph_conf.h	121;"	d
+SPI_NUMOF	include/periph_conf.h	119;"	d
+TIMER_0_CHANNELS	include/periph_conf.h	56;"	d
+TIMER_0_DEV	include/periph_conf.h	55;"	d
+TIMER_0_EN	include/periph_conf.h	51;"	d
+TIMER_0_IRQ_PRIO	include/periph_conf.h	62;"	d
+TIMER_0_ISR	include/periph_conf.h	60;"	d
+TIMER_0_MAX_VALUE	include/periph_conf.h	58;"	d
+TIMER_0_PRESCALER	include/periph_conf.h	57;"	d
+TIMER_1_CHANNELS	include/periph_conf.h	66;"	d
+TIMER_1_DEV	include/periph_conf.h	65;"	d
+TIMER_1_EN	include/periph_conf.h	52;"	d
+TIMER_1_IRQ_PRIO	include/periph_conf.h	72;"	d
+TIMER_1_ISR	include/periph_conf.h	70;"	d
+TIMER_1_MAX_VALUE	include/periph_conf.h	68;"	d
+TIMER_1_PRESCALER	include/periph_conf.h	67;"	d
+TIMER_NUMOF	include/periph_conf.h	50;"	d
+UART_0_CLKEN	include/periph_conf.h	84;"	d
+UART_0_DEV	include/periph_conf.h	83;"	d
+UART_0_EN	include/periph_conf.h	79;"	d
+UART_0_PORT	include/periph_conf.h	90;"	d
+UART_0_PORT_CLKEN	include/periph_conf.h	91;"	d
+UART_0_ROUTE	include/periph_conf.h	94;"	d
+UART_0_RX_IRQ	include/periph_conf.h	85;"	d
+UART_0_RX_ISR	include/periph_conf.h	87;"	d
+UART_0_RX_PIN	include/periph_conf.h	92;"	d
+UART_0_TX_IRQ	include/periph_conf.h	86;"	d
+UART_0_TX_ISR	include/periph_conf.h	88;"	d
+UART_0_TX_PIN	include/periph_conf.h	93;"	d
+UART_IRQ_PRIO	include/periph_conf.h	80;"	d
+UART_NUMOF	include/periph_conf.h	78;"	d
+__PERIPH_CONF_H	include/periph_conf.h	20;"	d

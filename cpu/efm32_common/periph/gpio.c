@@ -29,10 +29,11 @@
 
 #define GPIO_CLKEN()    CMU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_GPIO
 
+#if GPIO_NUMOF
+
 static inline void gpio_irq_handler(gpio_t dev);
 
 /* guard file in case no GPIO devices are defined */
-#if GPIO_NUMOF
 
 typedef struct {
     gpio_cb_t cb;
@@ -49,73 +50,73 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
     GPIO_CLKEN();
 
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
     case GPIO_0:
         port = GPIO_0_PORT;
         pin = GPIO_0_PIN;
         break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
     case GPIO_1:
         port = GPIO_1_PORT;
         pin = GPIO_1_PIN;
         break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
     case GPIO_2:
         port = GPIO_2_PORT;
         pin = GPIO_2_PIN;
         break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
     case GPIO_3:
         port = GPIO_3_PORT;
         pin = GPIO_3_PIN;
         break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
     case GPIO_4:
         port = GPIO_4_PORT;
         pin = GPIO_4_PIN;
         break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
     case GPIO_5:
         port = GPIO_5_PORT;
         pin = GPIO_5_PIN;
         break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
     case GPIO_6:
         port = GPIO_6_PORT;
         pin = GPIO_6_PIN;
         break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
     case GPIO_7:
         port = GPIO_7_PORT;
         pin = GPIO_7_PIN;
         break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
     case GPIO_8:
         port = GPIO_8_PORT;
         pin = GPIO_8_PIN;
         break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
     case GPIO_9:
         port = GPIO_9_PORT;
         pin = GPIO_9_PIN;
         break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
     case GPIO_10:
         port = GPIO_10_PORT;
         pin = GPIO_10_PIN;
         break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
     case GPIO_11:
         port = GPIO_11_PORT;
         pin = GPIO_11_PIN;
@@ -137,73 +138,73 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
     GPIO_CLKEN();
 
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
     case GPIO_0:
         port = GPIO_0_PORT;
         pin = GPIO_0_PIN;
         break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
     case GPIO_1:
         port = GPIO_1_PORT;
         pin = GPIO_1_PIN;
         break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
     case GPIO_2:
         port = GPIO_2_PORT;
         pin = GPIO_2_PIN;
         break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
     case GPIO_3:
         port = GPIO_3_PORT;
         pin = GPIO_3_PIN;
         break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
     case GPIO_4:
         port = GPIO_4_PORT;
         pin = GPIO_4_PIN;
         break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
     case GPIO_5:
         port = GPIO_5_PORT;
         pin = GPIO_5_PIN;
         break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
     case GPIO_6:
         port = GPIO_6_PORT;
         pin = GPIO_6_PIN;
         break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
     case GPIO_7:
         port = GPIO_7_PORT;
         pin = GPIO_7_PIN;
         break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
     case GPIO_8:
         port = GPIO_8_PORT;
         pin = GPIO_8_PIN;
         break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
     case GPIO_9:
         port = GPIO_9_PORT;
         pin = GPIO_9_PIN;
         break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
     case GPIO_10:
         port = GPIO_10_PORT;
         pin = GPIO_10_PIN;
         break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
     case GPIO_11:
         port = GPIO_11_PORT;
         pin = GPIO_11_PIN;
@@ -252,73 +253,73 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 
     /* read pin number, set EXIT channel and enable global interrupt for EXTI channel */
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
     case GPIO_0:
         pin = GPIO_0_PIN;
         port = GPIO_0_PORT;
         break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
     case GPIO_1:
         pin = GPIO_1_PIN;
         port = GPIO_1_PORT;
         break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
     case GPIO_2:
         pin = GPIO_2_PIN;
         port = GPIO_2_PORT;
         break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
     case GPIO_3:
         pin = GPIO_3_PIN;
         port = GPIO_3_PORT;
         break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
     case GPIO_4:
         pin = GPIO_4_PIN;
         port = GPIO_4_PORT;
         break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
     case GPIO_5:
         pin = GPIO_5_PIN;
         port = GPIO_5_PORT;
         break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
     case GPIO_6:
         pin = GPIO_6_PIN;
         port = GPIO_6_PORT;
         break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
     case GPIO_7:
         pin = GPIO_7_PIN;
         port = GPIO_7_PORT;
         break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
     case GPIO_8:
         pin = GPIO_8_PIN;
         port = GPIO_8_PORT;
         break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
     case GPIO_9:
         pin = GPIO_9_PIN;
         port = GPIO_9_PORT;
         break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
     case GPIO_10:
         pin = GPIO_10_PIN;
         port = GPIO_10_PORT;
         break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
     case GPIO_11:
         pin = GPIO_11_PIN;
         port = GPIO_11_PORT;
@@ -351,62 +352,62 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 void gpio_irq_enable(gpio_t dev)
 {
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
     case GPIO_0:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_0_PIN, 1);
         break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
     case GPIO_1:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_1_PIN, 1);
         break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
     case GPIO_2:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_2_PIN, 1);
         break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
     case GPIO_3:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_3_PIN, 1);
         break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
     case GPIO_4:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_4_PIN, 1);
         break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
     case GPIO_5:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_5_PIN, 1);
         break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
     case GPIO_6:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_6_PIN, 1);
         break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
     case GPIO_7:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_7_PIN, 1);
         break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
     case GPIO_8:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_8_PIN, 1);
         break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
     case GPIO_9:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_9_PIN, 1);
         break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
     case GPIO_10:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_10_PIN , 1);
         break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
     case GPIO_11:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_11_PIN, 1);
         break;
@@ -417,62 +418,62 @@ void gpio_irq_enable(gpio_t dev)
 void gpio_irq_disable(gpio_t dev)
 {
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
     case GPIO_0:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_0_PIN, 0);
         break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
     case GPIO_1:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_1_PIN, 0);
         break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
     case GPIO_2:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_2_PIN, 0);
         break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
     case GPIO_3:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_3_PIN, 0);
         break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
     case GPIO_4:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_4_PIN, 0);
         break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
     case GPIO_5:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_5_PIN, 0);
         break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
     case GPIO_6:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_6_PIN, 0);
         break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
     case GPIO_7:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_7_PIN, 0);
         break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
     case GPIO_8:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_8_PIN, 0);
         break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
     case GPIO_9:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_9_PIN, 0);
         break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
     case GPIO_10:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_10_PIN , 0);
         break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
     case GPIO_11:
         BITBAND_Peripheral(&(GPIO->IEN), GPIO_11_PIN, 0);
         break;
@@ -486,73 +487,73 @@ int gpio_read(gpio_t dev)
     uint32_t pin = 0;
 
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
     case GPIO_0:
         port = GPIO_0_PORT;
         pin = GPIO_0_PIN;
         break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
     case GPIO_1:
         port = GPIO_1_PORT;
         pin = GPIO_1_PIN;
         break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
     case GPIO_2:
         port = GPIO_2_PORT;
         pin = GPIO_2_PIN;
         break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
     case GPIO_3:
         port = GPIO_3_PORT;
         pin = GPIO_3_PIN;
         break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
     case GPIO_4:
         port = GPIO_4_PORT;
         pin = GPIO_4_PIN;
         break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
     case GPIO_5:
         port = GPIO_5_PORT;
         pin = GPIO_5_PIN;
         break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
     case GPIO_6:
         port = GPIO_6_PORT;
         pin = GPIO_6_PIN;
         break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
     case GPIO_7:
         port = GPIO_7_PORT;
         pin = GPIO_7_PIN;
         break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
     case GPIO_8:
         port = GPIO_8_PORT;
         pin = GPIO_8_PIN;
         break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
     case GPIO_9:
         port = GPIO_9_PORT;
         pin = GPIO_9_PIN;
         break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
     case GPIO_10:
         port = GPIO_10_PORT;
         pin = GPIO_10_PIN;
         break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
     case GPIO_11:
         port = GPIO_11_PORT;
         pin = GPIO_11_PIN;
@@ -573,73 +574,73 @@ void gpio_set(gpio_t dev)
     uint32_t pin = 0;
 
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
     case GPIO_0:
         port = GPIO_0_PORT;
         pin = GPIO_0_PIN;
         break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
     case GPIO_1:
         port = GPIO_1_PORT;
         pin = GPIO_1_PIN;
         break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
     case GPIO_2:
         port = GPIO_2_PORT;
         pin = GPIO_2_PIN;
         break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
     case GPIO_3:
         port = GPIO_3_PORT;
         pin = GPIO_3_PIN;
         break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
     case GPIO_4:
         port = GPIO_4_PORT;
         pin = GPIO_4_PIN;
         break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
     case GPIO_5:
         port = GPIO_5_PORT;
         pin = GPIO_5_PIN;
         break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
     case GPIO_6:
         port = GPIO_6_PORT;
         pin = GPIO_6_PIN;
         break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
     case GPIO_7:
         port = GPIO_7_PORT;
         pin = GPIO_7_PIN;
         break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
     case GPIO_8:
         port = GPIO_8_PORT;
         pin = GPIO_8_PIN;
         break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
     case GPIO_9:
         port = GPIO_9_PORT;
         pin = GPIO_9_PIN;
         break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
     case GPIO_10:
         port = GPIO_10_PORT;
         pin = GPIO_10_PIN;
         break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
     case GPIO_11:
         port = GPIO_11_PORT;
         pin = GPIO_11_PIN;
@@ -656,73 +657,73 @@ void gpio_clear(gpio_t dev)
     uint32_t pin = 0;
 
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
     case GPIO_0:
         port = GPIO_0_PORT;
         pin = GPIO_0_PIN;
         break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
     case GPIO_1:
         port = GPIO_1_PORT;
         pin = GPIO_1_PIN;
         break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
     case GPIO_2:
         port = GPIO_2_PORT;
         pin = GPIO_2_PIN;
         break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
     case GPIO_3:
         port = GPIO_3_PORT;
         pin = GPIO_3_PIN;
         break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
     case GPIO_4:
         port = GPIO_4_PORT;
         pin = GPIO_4_PIN;
         break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
     case GPIO_5:
         port = GPIO_5_PORT;
         pin = GPIO_5_PIN;
         break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
     case GPIO_6:
         port = GPIO_6_PORT;
         pin = GPIO_6_PIN;
         break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
     case GPIO_7:
         port = GPIO_7_PORT;
         pin = GPIO_7_PIN;
         break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
     case GPIO_8:
         port = GPIO_8_PORT;
         pin = GPIO_8_PIN;
         break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
     case GPIO_9:
         port = GPIO_9_PORT;
         pin = GPIO_9_PIN;
         break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
     case GPIO_10:
         port = GPIO_10_PORT;
         pin = GPIO_10_PIN;
         break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
     case GPIO_11:
         port = GPIO_11_PORT;
         pin = GPIO_11_PIN;
@@ -739,73 +740,73 @@ void gpio_toggle(gpio_t dev)
     uint32_t pin = 0;
 
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
     case GPIO_0:
         port = GPIO_0_PORT;
         pin = GPIO_0_PIN;
         break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
     case GPIO_1:
         port = GPIO_1_PORT;
         pin = GPIO_1_PIN;
         break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
     case GPIO_2:
         port = GPIO_2_PORT;
         pin = GPIO_2_PIN;
         break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
     case GPIO_3:
         port = GPIO_3_PORT;
         pin = GPIO_3_PIN;
         break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
     case GPIO_4:
         port = GPIO_4_PORT;
         pin = GPIO_4_PIN;
         break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
     case GPIO_5:
         port = GPIO_5_PORT;
         pin = GPIO_5_PIN;
         break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
     case GPIO_6:
         port = GPIO_6_PORT;
         pin = GPIO_6_PIN;
         break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
     case GPIO_7:
         port = GPIO_7_PORT;
         pin = GPIO_7_PIN;
         break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
     case GPIO_8:
         port = GPIO_8_PORT;
         pin = GPIO_8_PIN;
         break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
     case GPIO_9:
         port = GPIO_9_PORT;
         pin = GPIO_9_PIN;
         break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
     case GPIO_10:
         port = GPIO_10_PORT;
         pin = GPIO_10_PIN;
         break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
     case GPIO_11:
         port = GPIO_11_PORT;
         pin = GPIO_11_PIN;
@@ -843,21 +844,21 @@ void GPIO_EVEN_IRQHandler(void)
     printf("even 0x%.8x\n", iflags);
 
     /* Call IRQ handlers */
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
     if (iflags & (1 << GPIO_IRQ_0)) {
         //GPIO->IFC = (1 << GPIO_IRQ_0);
         printf("GPIO_0 int\n");
         gpio_irq_handler(GPIO_0);
     }
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
     if (iflags & (1 << GPIO_IRQ_1)) {
         //GPIO->IFC = (1 << GPIO_IRQ_1);
         printf("GPIO_1 int\n");
         gpio_irq_handler(GPIO_1);
     }
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
     if (iflags & (1 << GPIO_IRQ_2)) {
         //GPIO->IFC = (1 << GPIO_IRQ_2);
         printf("GPIO_2 int\n");
@@ -888,21 +889,21 @@ void GPIO_ODD_IRQHandler(void)
     printf("odd 0x%.8x\n", iflags);
 
     /* Call IRQ handlers */
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
     if (iflags & (1 << GPIO_IRQ_0)) {
         //GPIO->IFC = (1 << GPIO_IRQ_0);
         printf("GPIO_0 int\n");
         gpio_irq_handler(GPIO_0);
     }
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
     if (iflags & (1 << GPIO_IRQ_1)) {
         //GPIO->IFC = (1 << GPIO_IRQ_1);
         printf("GPIO_1 int\n");
         gpio_irq_handler(GPIO_1);
     }
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
     if (iflags & (1 << GPIO_IRQ_2)) {
         //GPIO->IFC = (1 << GPIO_IRQ_2);
         printf("GPIO_2 int\n");

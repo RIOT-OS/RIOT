@@ -1,7 +1,9 @@
-# define build specific options
+# Toolchain arguments
+# Requires CPU_MODEL to be set to the full CPU name (ie. EFM32GG990F1024)
+# Requires CPU_FLAGS to be set on a for each processor family (ie. -mcpu=cortex-m3)
 
 FPU_USAGE = 
-COMMON_FLAGS = -std=gnu99 -Wall -Wextra -O0 $(CPU_TYPE) -g -gdwarf-2 -march=armv7-m -mthumb -fno-builtin 
+COMMON_FLAGS = -std=gnu99 -Wall -Wextra -O0 $(CPU_FLAGS) -g -gdwarf-2 -march=armv7-m -mthumb -fno-builtin 
 COMMON_FLAGS += -ffunction-sections -fdata-sections -fomit-frame-pointer $(DEBUG_FLAGS) -D$(CPU_MODEL)
 export INCLUDES +=  -Iinclude -ICMSIS/Include -IDevice/SiliconLabs/$(CPU_FAMILY)/Include -Iemlib/inc -Iriot
 
@@ -10,9 +12,6 @@ export ASFLAGS = $(COMMON_FLAGS) -x assembler-with-cpp -DLOOP_ADDR=0x8000
 export LINKFLAGS = $(COMMON_FLAGS) -Xlinker -T$(LINKERSCRIPT) -lc -lm -lgcc -lnosys -Wl,-Map=$(PROJECT_NAME).map 
 export LINKFLAGS += -Wl,--gc-sections --specs=nosys.specs -nostartfiles
 export OFLAGS = -O binary
-export FFLAGS = $(CPU_MODEL) bin/$(BOARD)/$(APPLICATION) 0x0000000
-export DEBUGGER_FLAGS = $(CPU_MODEL) bin/$(BOARD)/$(APPLICATION) $(RIOTBOARD)/$(BOARD)/dist/gdb.conf
-export TERMFLAGS = -pF
 
 # use newLib nano-specs if available
 ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
