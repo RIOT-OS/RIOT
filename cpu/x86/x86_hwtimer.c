@@ -91,7 +91,7 @@ static void flip_periodic_interrupt_called(uint8_t reg_c)
 static void measure_nop_nop_nops_per_tick(void)
 {
     x86_rtc_set_periodic_callback(flip_periodic_interrupt_called);
-    x86_rtc_set_periodic(TICK_HZ_REG_A, 0, 0, true);
+    x86_rtc_set_periodic(TICK_HZ_REG_A, 0, KERNEL_PID_FIRST, true);
     for (unsigned i = 0; i < NNN_TICK_ITERATIONS; ++i) {
         periodic_interrupt_called = false;
 
@@ -132,7 +132,7 @@ static void update_cb(uint8_t reg_c)
 static void init_bases(void)
 {
     x86_rtc_set_periodic_callback(update_cb);
-    x86_rtc_set_periodic(RTC_REG_A_HZ_2, 0, 0, true);
+    x86_rtc_set_periodic(RTC_REG_A_HZ_2, 0, KERNEL_PID_FIRST, true);
 
     eINT();
     periodic_interrupt_called = false;

@@ -84,8 +84,7 @@
 #include "bitarithm.h"
 #include "tcb.h"
 #include "attributes.h"
-
-#define MAXTHREADS 32 /**< the maximum number of threads to be scheduled */
+#include "kernel_types.h"
 
 /**
  * @def SCHED_PRIO_LEVELS
@@ -132,7 +131,7 @@ extern volatile unsigned int sched_context_switch_request;
 /**
  *  Thread table
  */
-extern volatile tcb_t *sched_threads[MAXTHREADS];
+extern volatile tcb_t *sched_threads[KERNEL_PID_LAST + 1];
 
 /**
  *  Currently active thread
@@ -168,7 +167,7 @@ typedef struct {
 /**
  *  Thread statistics table
  */
-extern schedstat sched_pidlist[MAXTHREADS];
+extern schedstat sched_pidlist[KERNEL_PID_LAST + 1];
 
 /**
  *  @brief  Register a callback that will be called on every scheduler run

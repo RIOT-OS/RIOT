@@ -40,7 +40,7 @@ volatile int sched_num_threads = 0;
 
 volatile unsigned int sched_context_switch_request;
 
-volatile tcb_t *sched_threads[MAXTHREADS];
+volatile tcb_t *sched_threads[KERNEL_PID_LAST + 1];
 volatile tcb_t *sched_active_thread;
 
 volatile kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
@@ -50,7 +50,7 @@ static uint32_t runqueue_bitcache = 0;
 
 #if SCHEDSTATISTICS
 static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
-schedstat sched_pidlist[MAXTHREADS];
+schedstat sched_pidlist[KERNEL_PID_LAST + 1];
 #endif
 
 void sched_run(void)
