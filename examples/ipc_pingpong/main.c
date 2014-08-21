@@ -26,6 +26,7 @@
 
 void *second_thread(void *arg)
 {
+    (void) arg;
     printf("2nd thread started, pid: %i\n", thread_getpid());
     msg_pulse_t m;
 
