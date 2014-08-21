@@ -28,8 +28,10 @@
 
 #define NUM_MSGS 3
 
-void second_thread(void)
+void *second_thread(void *arg)
 {
+    (void)arg;
+
     printf("2nd thread started, pid: %i\n", thread_getpid());
     msg_hdr_t hdr;
 
@@ -43,6 +45,8 @@ void second_thread(void)
     }
 
     printf("2nd: Exiting.\n");
+
+    return NULL;
 }
 
 char second_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
@@ -57,7 +61,7 @@ int main(void)
 
     int pid = thread_create(second_thread_stack, sizeof(second_thread_stack),
                             PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                            second_thread, "pong");
+                            second_thread, NULL, "pong");
 
     printf("1st: Sending %i messages.\n", NUM_MSGS+1);
 
