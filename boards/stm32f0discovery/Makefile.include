@@ -39,7 +39,7 @@ export LINKFLAGS += -T$(LINKERSCRIPT)
 export OFLAGS = -O binary
 export FFLAGS = write bin/$(BOARD)/$(APPLICATION).hex 0x08000000
 export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/gdb.conf bin/$(BOARD)/$(APPLICATION).elf
-export TERMFLAGS += -p
+export TERMFLAGS += -p "$(PORT)"
 
 # use the nano-specs of the NewLib when available
 ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)

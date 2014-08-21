@@ -21,7 +21,7 @@ ifeq ($(strip $(PORT)),)
 endif
 export FFLAGS = --z1 -I -c $(PORT) -r -e -p $(HEXFILE)
 export OFLAGS = -O ihex
-export TERMFLAGS += -p
+export TERMFLAGS += -p "$(PORT)"
 
 export INCLUDES += -I $(RIOTCPU)/msp430-common/include -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/drivers/cc2420/include -I$(RIOTBASE)/sys/net/include
 
