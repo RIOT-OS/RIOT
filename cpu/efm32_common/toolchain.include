@@ -1,11 +1,11 @@
 # define build specific options
 
 FPU_USAGE = 
-COMMON_FLAGS = -std=gnu99 -Wall -Wextra -O0 $(CPU_USAGE) -g -gdwarf-2 -march=armv7-m -mthumb -fno-builtin 
+COMMON_FLAGS = -std=gnu99 -Wall -Wextra -O0 $(CPU_TYPE) -g -gdwarf-2 -march=armv7-m -mthumb -fno-builtin 
 COMMON_FLAGS += -ffunction-sections -fdata-sections -fomit-frame-pointer $(DEBUG_FLAGS) -D$(CPU_MODEL)
-export INCLUDES =  -Iinclude -ICMSIS/Include -IDevice/SiliconLabs/$(CPU_FAMILY)/Include -Iemlib/inc -Iriot
+export INCLUDES +=  -Iinclude -ICMSIS/Include -IDevice/SiliconLabs/$(CPU_FAMILY)/Include -Iemlib/inc -Iriot
 
-export CFLAGS = $(COMMON_FLAGS) -mfix-cortex-m3-ldrd --specs=nano.specs -DDEBUG_EFM $(DEPFLAGS)
+export CFLAGS += $(COMMON_FLAGS) -mfix-cortex-m3-ldrd --specs=nano.specs -DDEBUG_EFM $(DEPFLAGS)
 export ASFLAGS = $(COMMON_FLAGS) -x assembler-with-cpp -DLOOP_ADDR=0x8000
 export LINKFLAGS = $(COMMON_FLAGS) -Xlinker -T$(LINKERSCRIPT) -lc -lm -lgcc -lnosys -Wl,-Map=$(PROJECT_NAME).map 
 export LINKFLAGS += -Wl,--gc-sections --specs=nosys.specs -nostartfiles

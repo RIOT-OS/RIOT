@@ -54,7 +54,7 @@
 /* Timer 0 configuration */
 #define TIMER_0_DEV         TIMER0
 #define TIMER_0_CHANNELS    3
-#define TIMER_0_PRESCALER   (timerPrescale8)
+#define TIMER_0_PRESCALER   (timerPrescale32)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
 //#define TIMER_0_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
 #define TIMER_0_ISR         TIMER0_IRQHandler
@@ -64,7 +64,7 @@
 /* Timer 0 configuration */
 #define TIMER_1_DEV         TIMER1
 #define TIMER_1_CHANNELS    3
-#define TIMER_1_PRESCALER   (timerPrescale8)
+#define TIMER_1_PRESCALER   (timerPrescale32)
 #define TIMER_1_MAX_VALUE   (0xffffffff)
 //#define TIMER_1_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
 #define TIMER_1_ISR         TIMER1_IRQHandler
