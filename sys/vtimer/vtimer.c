@@ -180,24 +180,10 @@ void vtimer_callback(void *ptr)
 #if ENABLE_DEBUG
         vtimer_print(timer);
 #endif
-    DEBUG("vtimer_callback(): Shooting %" PRIu32 ".\n", timer->absolute.microseconds);
+        DEBUG("vtimer_callback(): Shooting %" PRIu32 ".\n", timer->absolute.microseconds);
 
-    /* shoot timer */
-    if (timer->action == (void (*)(void *)) msg_send_pulse_int) {
-        msg_pulse_t msg;
-        msg.type = MSG_TIMER;
-        msg.content.value = (unsigned int) timer->arg;
-        msg_send_pulse_int(&msg, timer->pid);
-    }
-    else if (timer->action == (void (*)(void *)) thread_wakeup){
-        timer->action(timer->arg);
-    }
-    else if (timer->action == vtimer_tick) {
-        vtimer_tick(NULL);
-    }
-    else if (timer->action == (void (*)(void *)) mutex_unlock) {
-        mutex_t *mutex = (mutex_t *) timer->arg;
-        timer->action(mutex);
+        /* shoot timer */
+        timer->action(timer);
     }
     else {
         DEBUG("vtimer_callback(): spurious call.\n");
@@ -383,7 +369,7 @@ int vtimer_remove(vtimer_t *t)
 
 int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, void *ptr)
 {
-    t->action = (void(*)(void *)) msg_send_pulse_int;
+    t->action = vtimer_callback_msg;
     t->arg = ptr;
     t->absolute = interval;
     t->pid = pid;
@@ -391,14 +377,14 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, void *ptr)
     return 0;
 }
 
-int vtimer_msg_receive_timeout(msg_pulse_t *m, timex_t timeout) {
-    msg_pulse_t timeout_message;
+int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout) {
+    msg_t timeout_message;
     timeout_message.type = MSG_TIMER;
     timeout_message.content.ptr = (char *) &timeout_message;
 
     vtimer_t t;
     vtimer_set_msg(&t, timeout, sched_active_pid, &timeout_message);
-    msg_receive_pulse(m);
+    msg_receive(m);
     if (m->type == MSG_TIMER && m->content.ptr == (char *) &timeout_message) {
         /* we hit the timeout */
         return -1;
