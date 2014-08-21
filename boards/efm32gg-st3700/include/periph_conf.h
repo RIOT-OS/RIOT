@@ -132,4 +132,44 @@
 #define SPI_1_CS_PIN        3
 #define SPI_1_ROUTE         USART_ROUTE_LOCATION_LOC1
 
+/**
+ * @name GPIO configuration
+ * @{
+ */
+#define GPIO_NUMOF          (2U)
+#define GPIO_0_EN           1
+#define GPIO_1_EN           1
+//#define GPIO_2_EN           0
+//#define GPIO_3_EN           0
+#define GPIO_IRQ_PRIO       1
+
+/* IRQ config */
+#define GPIO_IRQ_0          2
+#define GPIO_IRQ_1          3
+#define GPIO_IRQ_2          0
+#define GPIO_IRQ_3          0
+#define GPIO_IRQ_4          0
+#define GPIO_IRQ_5          0
+
+/* GPIO channel 0 config */
+#define GPIO_0_PORT         gpioPortE	/* User button 0 */
+#define GPIO_0_PIN          2
+//#define GPIO_0_CLKEN()      MU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_GPIO
+//#define GPIO_0_EXTI_CFG()   (SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI0_PA)
+//#define GPIO_0_IRQ          EXTI0_1_IRQn
+/* GPIO channel 1 config */
+
+#define GPIO_1_PORT         gpioPortE	/* User button 1 */
+#define GPIO_1_PIN          3
+//#define GPIO_1_CLKEN()      MU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_GPIO
+//#define GPIO_1_EXTI_CFG()   (SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI1_PA)
+//#define GPIO_1_IRQ          EXTI0_1_IRQn
+/* GPIO channel 2 config */
+
+//#define GPIO_2_PORT         gpioPortE
+//#define GPIO_2_PIN          4
+//#define GPIO_2_CLKEN()      MU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_GPIO
+//#define GPIO_2_EXTI_CFG()   (SYSCFG->EXTICR[1] |= SYSCFG_EXTICR2_EXTI4_PF)
+//#define GPIO_2_IRQ          EXTI4_15_IRQn
+
 #endif /* __PERIPH_CONF_H */

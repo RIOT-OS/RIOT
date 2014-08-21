@@ -13,7 +13,7 @@
  * @file
  * @brief       Low-level UART driver implementation
  *
- * @author      Ryan Kurte <ryankurte@users.noreply.github.com>
+ * @author      Ryan Kurte <ryankurte@gmail.com>
  *
  * @}
  */

@@ -13,7 +13,7 @@
  * @file
  * @brief       Low-level SPI driver implementation
  *
- * @author      Ryan Kurte <ryankurte@users.noreply.github.com>
+ * @author      Ryan Kurte <ryankurte@gmail.com>
  *
  * @}
  */
@@ -35,7 +35,8 @@ static uint32_t speed_to_baud(spi_speed_t speed);
 static uint32_t conf_to_cpol(spi_conf_t conf);
 
 //SPI configuration storage
-static spi_state_t spi_config[SPI_NUMOF];
+//static spi_state_t spi_config[SPI_NUMOF];
+//TODO: add configuration for async mode
 
 int spi_init_master(spi_t spi, spi_conf_t conf, spi_speed_t speed)
 {
