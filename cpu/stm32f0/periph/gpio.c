@@ -19,19 +19,25 @@
  */
 
 #include "cpu.h"
+#include "sched.h"
+#include "thread.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
+/* guard file in case no GPIO devices are defined */
+#if GPIO_NUMOF
+
 typedef struct {
-    void (*cb)(void);
+    gpio_cb_t cb;
+    void *arg;
 } gpio_state_t;
 
-static gpio_state_t config[GPIO_NUMOF];
+static gpio_state_t gpio_config[GPIO_NUMOF];
 
 int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
 {
-    GPIO_TypeDef *port;
-    uint32_t pin;
+    GPIO_TypeDef *port = 0;
+    uint32_t pin = 0;
 
     switch (dev) {
 #ifdef GPIO_0_EN
@@ -118,9 +124,6 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
             pin = GPIO_11_PIN;
             break;
 #endif
-        case GPIO_UNDEFINED:
-        default:
-            return -1;
     }
 
     port->MODER &= ~(2 << (2 * pin));           /* set pin to output mode */
@@ -136,8 +139,8 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
 
 int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
 {
-    GPIO_TypeDef *port;
-    uint32_t pin;
+    GPIO_TypeDef *port = 0;
+    uint32_t pin = 0;
 
     switch (dev) {
 #ifdef GPIO_0_EN
@@ -224,9 +227,6 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
             pin = GPIO_11_PIN;
             break;
 #endif
-        case GPIO_UNDEFINED:
-        default:
-            return -1;
     }
 
     port->MODER &= ~(3 << (2 * pin));           /* configure pin as input */
@@ -236,10 +236,10 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
     return 0; /* everything alright here */
 }
 
-int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(void))
+int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
     int res;
-    uint32_t pin;
+    uint32_t pin = 0;
 
     /* configure pin as input */
     res = gpio_init_in(dev, pullup);
@@ -353,13 +353,11 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(v
             NVIC_EnableIRQ(GPIO_11_IRQ);
             break;
 #endif
-        case GPIO_UNDEFINED:
-        default:
-            return -1;
     }
 
     /* set callback */
-    config[dev].cb = cb;
+    gpio_config[dev].cb = cb;
+    gpio_config[dev].arg = arg;
 
     /* configure the event that triggers an interrupt */
     switch (flank) {
@@ -377,16 +375,150 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, void (*cb)(v
             break;
     }
 
+    /* clear any pending requests */
+    EXTI->PR = (1 << pin);
     /* unmask the pins interrupt channel */
     EXTI->IMR |= (1 << pin);
 
     return 0;
 }
 
+void gpio_irq_enable(gpio_t dev)
+{
+    switch (dev) {
+#ifdef GPIO_0_EN
+        case GPIO_0:
+            EXTI->IMR |= (1 << GPIO_0_PIN);
+            break;
+#endif
+#ifdef GPIO_1_EN
+        case GPIO_1:
+            EXTI->IMR |= (1 << GPIO_1_PIN);
+            break;
+#endif
+#ifdef GPIO_2_EN
+        case GPIO_2:
+            EXTI->IMR |= (1 << GPIO_2_PIN);
+            break;
+#endif
+#ifdef GPIO_3_EN
+        case GPIO_3:
+            EXTI->IMR |= (1 << GPIO_3_PIN);
+            break;
+#endif
+#ifdef GPIO_4_EN
+        case GPIO_4:
+            EXTI->IMR |= (1 << GPIO_4_PIN);
+            break;
+#endif
+#ifdef GPIO_5_EN
+        case GPIO_5:
+            EXTI->IMR |= (1 << GPIO_5_PIN);
+            break;
+#endif
+#ifdef GPIO_6_EN
+        case GPIO_6:
+            EXTI->IMR |= (1 << GPIO_6_PIN);
+            break;
+#endif
+#ifdef GPIO_7_EN
+        case GPIO_7:
+            EXTI->IMR |= (1 << GPIO_7_PIN);
+            break;
+#endif
+#ifdef GPIO_8_EN
+        case GPIO_8:
+            EXTI->IMR |= (1 << GPIO_8_PIN);
+            break;
+#endif
+#ifdef GPIO_9_EN
+        case GPIO_9:
+            EXTI->IMR |= (1 << GPIO_9_PIN);
+            break;
+#endif
+#ifdef GPIO_10_EN
+        case GPIO_10:
+            EXTI->IMR |= (1 << GPIO_10_PIN);
+            break;
+#endif
+#ifdef GPIO_11_EN
+        case GPIO_11:
+            EXTI->IMR |= (1 << GPIO_11_PIN);
+            break;
+#endif
+    }
+}
+
+void gpio_irq_disable(gpio_t dev)
+{
+    switch (dev) {
+#ifdef GPIO_0_EN
+        case GPIO_0:
+            EXTI->IMR &= ~(1 << GPIO_0_PIN);
+            break;
+#endif
+#ifdef GPIO_1_EN
+        case GPIO_1:
+            EXTI->IMR &= ~(1 << GPIO_1_PIN);
+            break;
+#endif
+#ifdef GPIO_2_EN
+        case GPIO_2:
+            EXTI->IMR &= ~(1 << GPIO_2_PIN);
+            break;
+#endif
+#ifdef GPIO_3_EN
+        case GPIO_3:
+            EXTI->IMR &= ~(1 << GPIO_3_PIN);
+            break;
+#endif
+#ifdef GPIO_4_EN
+        case GPIO_4:
+            EXTI->IMR &= ~(1 << GPIO_4_PIN);
+            break;
+#endif
+#ifdef GPIO_5_EN
+        case GPIO_5:
+            EXTI->IMR &= ~(1 << GPIO_5_PIN);
+            break;
+#endif
+#ifdef GPIO_6_EN
+        case GPIO_6:
+            EXTI->IMR &= ~(1 << GPIO_6_PIN);
+            break;
+#endif
+#ifdef GPIO_7_EN
+        case GPIO_7:
+            EXTI->IMR &= ~(1 << GPIO_7_PIN);
+            break;
+#endif
+#ifdef GPIO_8_EN
+        case GPIO_8:
+            EXTI->IMR &= ~(1 << GPIO_8_PIN);
+            break;
+#endif
+#ifdef GPIO_9_EN
+        case GPIO_9:
+            EXTI->IMR &= ~(1 << GPIO_9_PIN);
+            break;
+#endif
+#ifdef GPIO_10_EN
+        case GPIO_10:
+            EXTI->IMR &= ~(1 << GPIO_10_PIN);
+            break;
+#endif
+#ifdef GPIO_11_EN
+        case GPIO_11:
+            EXTI->IMR &= ~(1 << GPIO_11_PIN);
+            break;
+#endif
+    }
+}
+
 int gpio_read(gpio_t dev)
 {
-    GPIO_TypeDef *port;
-    uint32_t pin;
+    GPIO_TypeDef *port = 0;
+    uint32_t pin = 0;
 
     switch (dev) {
 #ifdef GPIO_0_EN
@@ -461,9 +593,6 @@ int gpio_read(gpio_t dev)
             pin = GPIO_11_PIN;
             break;
 #endif
-        case GPIO_UNDEFINED:
-        default:
-            return -1;
     }
 
     if (port->MODER & (1 << (pin * 2))) {       /* if configured as output */
@@ -473,7 +602,7 @@ int gpio_read(gpio_t dev)
     }
 }
 
-int gpio_set(gpio_t dev)
+void gpio_set(gpio_t dev)
 {
     switch (dev) {
 #ifdef GPIO_0_EN
@@ -536,15 +665,10 @@ int gpio_set(gpio_t dev)
             GPIO_11_PORT->ODR |= (1 << GPIO_11_PIN);
             break;
 #endif
-        case GPIO_UNDEFINED:
-        default:
-            return -1;
     }
-
-    return 0;
 }
 
-int gpio_clear(gpio_t dev)
+void gpio_clear(gpio_t dev)
 {
     switch (dev) {
 #ifdef GPIO_0_EN
@@ -607,29 +731,24 @@ int gpio_clear(gpio_t dev)
             GPIO_11_PORT->ODR &= ~(1 << GPIO_11_PIN);
             break;
 #endif
-        case GPIO_UNDEFINED:
-        default:
-            return -1;
     }
-
-    return 0;
 }
 
-int gpio_toggle(gpio_t dev)
+void gpio_toggle(gpio_t dev)
 {
     if (gpio_read(dev)) {
-        return gpio_clear(dev);
+        gpio_clear(dev);
     } else {
-        return gpio_set(dev);
+        gpio_set(dev);
     }
 }
 
-int gpio_write(gpio_t dev, int value)
+void gpio_write(gpio_t dev, int value)
 {
     if (value) {
-        return gpio_set(dev);
+        gpio_set(dev);
     } else {
-        return gpio_clear(dev);
+        gpio_clear(dev);
     }
 }
 
@@ -638,11 +757,14 @@ __attribute__((naked)) void isr_exti0_1(void)
     ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR0) {
         EXTI->PR |= EXTI_PR_PR0;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_0].cb();
+        gpio_config[GPIO_IRQ_0].cb(gpio_config[GPIO_IRQ_0].arg);
     }
     else if (EXTI->PR & EXTI_PR_PR1) {
         EXTI->PR |= EXTI_PR_PR1;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_1].cb();
+        gpio_config[GPIO_IRQ_1].cb(gpio_config[GPIO_IRQ_1].arg);
+    }
+    if (sched_context_switch_request) {
+        thread_yield();
     }
     ISR_EXIT();
 }
@@ -652,11 +774,14 @@ __attribute__((naked)) void isr_exti2_3(void)
     ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR2) {
         EXTI->PR |= EXTI_PR_PR2;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_2].cb();
+        gpio_config[GPIO_IRQ_2].cb(gpio_config[GPIO_IRQ_2].arg);
     }
     else if (EXTI->PR & EXTI_PR_PR3) {
         EXTI->PR |= EXTI_PR_PR3;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_3].cb();
+        gpio_config[GPIO_IRQ_3].cb(gpio_config[GPIO_IRQ_3].arg);
+    }
+    if (sched_context_switch_request) {
+        thread_yield();
     }
     ISR_EXIT();
 }
@@ -666,51 +791,56 @@ __attribute__((naked)) void isr_exti4_15(void)
     ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR4) {
         EXTI->PR |= EXTI_PR_PR4;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_4].cb();
+        gpio_config[GPIO_IRQ_4].cb(gpio_config[GPIO_IRQ_4].arg);
     }
     else if (EXTI->PR & EXTI_PR_PR5) {
         EXTI->PR |= EXTI_PR_PR5;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_5].cb();
+        gpio_config[GPIO_IRQ_5].cb(gpio_config[GPIO_IRQ_5].arg);
     }
     else if (EXTI->PR & EXTI_PR_PR6) {
         EXTI->PR |= EXTI_PR_PR6;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_6].cb();
+        gpio_config[GPIO_IRQ_6].cb(gpio_config[GPIO_IRQ_6].arg);
     }
     else if (EXTI->PR & EXTI_PR_PR7) {
         EXTI->PR |= EXTI_PR_PR7;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_7].cb();
+        gpio_config[GPIO_IRQ_7].cb(gpio_config[GPIO_IRQ_7].arg);
     }
     else if (EXTI->PR & EXTI_PR_PR8) {
         EXTI->PR |= EXTI_PR_PR8;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_8].cb();
+        gpio_config[GPIO_IRQ_8].cb(gpio_config[GPIO_IRQ_8].arg);
     }
     else if (EXTI->PR & EXTI_PR_PR9) {
         EXTI->PR |= EXTI_PR_PR9;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_9].cb();
+        gpio_config[GPIO_IRQ_9].cb(gpio_config[GPIO_IRQ_9].arg);
     }
     else if (EXTI->PR & EXTI_PR_PR10) {
         EXTI->PR |= EXTI_PR_PR10;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_10].cb();
+        gpio_config[GPIO_IRQ_10].cb(gpio_config[GPIO_IRQ_10].arg);
     }
     else if (EXTI->PR & EXTI_PR_PR11) {
         EXTI->PR |= EXTI_PR_PR11;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_11].cb();
+        gpio_config[GPIO_IRQ_11].cb(gpio_config[GPIO_IRQ_11].arg);
     }
     else if (EXTI->PR & EXTI_PR_PR12) {
         EXTI->PR |= EXTI_PR_PR12;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_12].cb();
+        gpio_config[GPIO_IRQ_12].cb(gpio_config[GPIO_IRQ_12].arg);
     }
     else if (EXTI->PR & EXTI_PR_PR13) {
         EXTI->PR |= EXTI_PR_PR13;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_13].cb();
+        gpio_config[GPIO_IRQ_13].cb(gpio_config[GPIO_IRQ_13].arg);
     }
     else if (EXTI->PR & EXTI_PR_PR14) {
         EXTI->PR |= EXTI_PR_PR14;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_14].cb();
+        gpio_config[GPIO_IRQ_14].cb(gpio_config[GPIO_IRQ_14].arg);
     }
     else if (EXTI->PR & EXTI_PR_PR15) {
         EXTI->PR |= EXTI_PR_PR15;        /* clear status bit by writing a 1 to it */
-        config[GPIO_IRQ_15].cb();
+        gpio_config[GPIO_IRQ_15].cb(gpio_config[GPIO_IRQ_15].arg);
+    }
+    if (sched_context_switch_request) {
+        thread_yield();
     }
     ISR_EXIT();
 }
+
+#endif /* GPIO_NUMOF */

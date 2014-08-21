@@ -34,7 +34,6 @@
 #define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_1
 /** @} */
 
-
 /**
  * @brief Timer configuration
  * @{
@@ -52,7 +51,6 @@
 #define TIMER_0_ISR         isr_tim2
 #define TIMER_0_IRQ_CHAN    TIM2_IRQn
 /** @} */
-
 
 /**
  * @brief UART configuration
@@ -103,7 +101,6 @@
 #define UART_2_RX_PIN       9
 #define UART_2_AF           7
 /** @} */
-
 
 /**
  * @brief GPIO configuration
