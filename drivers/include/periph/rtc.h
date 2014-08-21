@@ -68,12 +68,13 @@ int rtc_get_time(struct tm *time);
  *
  * @param[in] time          The value to trigger an alarm when hit.
  * @param[in] cb            Callback executed when alarm is hit.
+ * @param[in] arg           Argument passed to callback when alarm is hit.
  *
  * @return  0 for success
  * @return -2 invalid `time` parameter
  * @return -1 other errors
  */
-int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb);
+int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg);
 
 /**
  * @brief Gets the current alarm setting
