@@ -12,3 +12,5 @@ cachegrind.out*
 .cproject
 .settings
 /toolchain
+*.tags
+*.tags_sorted_by_file
