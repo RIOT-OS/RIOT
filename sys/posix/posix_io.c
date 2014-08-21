@@ -23,10 +23,10 @@
 
 static int _posix_fileop(kernel_pid_t pid, int op, int flags)
 {
-    msg_t m;
+    msg_pulse_t m;
     m.type = op;
     m.content.value = flags;
-    msg_send_receive(&m, &m, pid);
+    msg_send_receive_pulse(&m, &m, pid);
     return m.content.value;
 }
 
@@ -36,11 +36,11 @@ static int _posix_fileop_data(kernel_pid_t pid, int op, char *buffer, int nbytes
     r.nbytes = nbytes;
     r.buffer = buffer;
 
-    msg_t m;
+    msg_pulse_t m;
     m.type = op;
     m.content.ptr = (char *) &r;
 
-    msg_send_receive(&m, &m, pid);
+    msg_send_receive_pulse(&m, &m, pid);
 
     return r.nbytes;
 }
