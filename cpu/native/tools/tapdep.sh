@@ -1,31 +1,12 @@
 #!/bin/sh
 
-DEFBRIDGE="tapbr0"
-DEFTAPBASE="tap"
-
-# make sure this is not called as root
-if [ ${EUID} -eq 0 -o "$(ps -p ${PPID} -o comm=)" = "sudo" -o "$(ps -p ${PPID} -o comm=)" = "su" ]; then
-    echo "Error: ${0} must not be run as root"
-    exit 1
-fi
-if [ -z "${USER}" ]; then
-    echo 'need to export $USER'
-    exit 1
-fi
-
-# set defaults
-if [ -z "${BRIDGE}" ]; then
-    BRIDGE="${DEFBRIDGE}"
-fi
-if [ -z "${TAPBASE}" ]; then
-    TAPBASE="${DEFTAPBASE}"
-fi
-
-OS=$(uname -s)
-
-###
+######################################################################
 # Linux functions
-##
+######################################################################
+
+Linux_default_bridge () {
+    echo tapbr0
+}
 
 Linux_bridge_exists () {
     if [ -e /sys/class/net/${BRIDGE} ]; then
@@ -71,9 +52,40 @@ Linux_port_exists () {
     fi
 }
 
-###
+######################################################################
 # OSX functions
+######################################################################
+
+Darwin_default_bridge () {
+    echo bridge1234
+}
+
 ##
+# THE SCRIPT
+##
+
+OS=$(uname -s)
+
+DEFBRIDGE=$(${OS}_default_bridge)
+DEFTAPBASE="tap"
+
+# make sure this is not called as root
+if [ ${EUID} -eq 0 -o "$(ps -p ${PPID} -o comm=)" = "sudo" -o "$(ps -p ${PPID} -o comm=)" = "su" ]; then
+    echo "Error: ${0} must not be run as root"
+    exit 1
+fi
+if [ -z "${USER}" ]; then
+    echo 'need to export $USER'
+    exit 1
+fi
+
+# set defaults
+if [ -z "${BRIDGE}" ]; then
+    BRIDGE="${DEFBRIDGE}"
+fi
+if [ -z "${TAPBASE}" ]; then
+    TAPBASE="${DEFTAPBASE}"
+fi
 
 if ! ${OS}_bridge_exists; then
     ${OS}_bridge_create
