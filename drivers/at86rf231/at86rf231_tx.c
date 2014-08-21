@@ -10,7 +10,11 @@
 #include "at86rf231_arch.h"
 #include "at86rf231_spi.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 static void at86rf231_xmit(uint8_t *data, radio_packet_length_t length);
+
 static void at86rf231_gen_pkt(uint8_t *buf, at86rf231_packet_t *packet);
 
 static uint8_t sequenz_nr;
@@ -87,11 +91,17 @@ static void at86rf231_xmit(uint8_t *data, radio_packet_length_t length)
     }
     while ((status & AT86RF231_TRX_STATUS_MASK__TRX_STATUS) != AT86RF231_TRX_STATUS__PLL_ON);
 
+    /* radio driver state: sending */
+    /* will be freed in at86rf231_rx_irq when TRX_END interrupt occurs */
+    driver_state = AT_DRIVER_STATE_SENDING;
+
     // copy the packet to the radio FIFO
     at86rf231_write_fifo(data, length);
+    DEBUG("Wrote to FIFO\n");
 
     // Start TX
     at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__TX_START);
+    DEBUG("Started TX\n");
 }
 
 /**
