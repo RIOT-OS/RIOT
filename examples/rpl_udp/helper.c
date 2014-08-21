@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 INRIA
+ * Copyright (C) 2013, 2014 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -25,9 +25,9 @@
 #include "sixlowpan/ip.h"
 #include "transceiver.h"
 #include "ieee802154_frame.h"
-#include "rpl_structs.h"
+#include "rpl/rpl_structs.h"
 
-#include "demo.h"
+#include "rpl_udp.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"

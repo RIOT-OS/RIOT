@@ -256,7 +256,11 @@ int sixlowpan_mac_prepare_ieee802144_frame(
     ieee802154_frame_init(frame, (uint8_t *)&lowpan_mac_buf);
     memcpy(&lowpan_mac_buf[hdrlen], frame->payload, frame->payload_len);
     /* set FCS */
+#ifdef MODULE_CC110X_NG
+    fcs = (uint16_t *)&lowpan_mac_buf[frame->payload_len + hdrlen+1];
+#else
     fcs = (uint16_t *)&lowpan_mac_buf[frame->payload_len + hdrlen];
+#endif
     *fcs = ieee802154_frame_get_fcs(lowpan_mac_buf, frame->payload_len + hdrlen);
     DEBUG("IEEE802.15.4 frame - FCF: %02X %02X DPID: %02X SPID: %02X DSN: %02X\n",
           lowpan_mac_buf[0], lowpan_mac_buf[1], frame->dest_pan_id,
@@ -281,7 +285,7 @@ int sixlowpan_mac_send_data(int if_id,
                                            payload, (size_t)payload_len);
         }
         else if (dest_len == 2) {
-            return net_if_send_packet(if_id, NTOHS(*((uint16_t *)dest)),
+            return net_if_send_packet(if_id, NTOHS((*((net_if_eui64_t*)dest)).uint16[0]),
                                       payload, (size_t)payload_len);
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 INRIA
+ * Copyright (C) 2013, 2014 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -30,7 +30,7 @@
 
 #include "net_help.h"
 
-#include "demo.h"
+#include "rpl_udp.h"
 
 #define UDP_BUFFER_SIZE     (128)
 #define SERVER_PORT     (0xFF01)
@@ -122,7 +122,12 @@ void udp_send(int argc, char **argv)
 
     memset(&sa, 0, sizeof(sa));
 
-    ipv6_addr_init(&ipaddr, 0xabcd, 0x0, 0x0, 0x0, 0x3612, 0x00ff, 0xfe00, (uint16_t)address);
+    if (address) {
+        ipv6_addr_init(&ipaddr, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x00ff, 0xfe00, (uint16_t)address);
+    }
+    else {
+        ipv6_addr_set_all_nodes_addr(&ipaddr);
+    }
 
     sa.sin6_family = AF_INET;
     memcpy(&sa.sin6_addr, &ipaddr, 16);

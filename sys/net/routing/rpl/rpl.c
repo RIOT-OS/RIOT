@@ -33,9 +33,9 @@
 
 /* You can only run Storing Mode by now. Other unsupported modes lead to default (Storing Mode) */
 #if RPL_DEFAULT_MOP == RPL_STORING_MODE_NO_MC
-#include "rpl_storing.h"
+#include "rpl/rpl_storing.h"
 #else
-#include "rpl_storing.h"
+#include "rpl/rpl_storing.h"
 #endif
 
 #define ENABLE_DEBUG (0)

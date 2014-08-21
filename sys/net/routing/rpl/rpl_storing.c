@@ -15,7 +15,7 @@
  * @}
  */
 
-#include "rpl_storing.h"
+#include "rpl/rpl_storing.h"
 #include "msg.h"
 #include "trickle.h"
 
