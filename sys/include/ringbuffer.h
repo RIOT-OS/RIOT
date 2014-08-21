@@ -128,6 +128,6 @@ unsigned ringbuffer_peek(const ringbuffer_t *restrict rb, char *buf, unsigned n)
  * @param[in]       n     Read at most n elements.
  * @returns         Number of elements actually removed.
  */
-unsigned ringbuffer_remove(ringbuffer_t *restrict rb, unsigned n)
+unsigned ringbuffer_remove(ringbuffer_t *restrict rb, unsigned n);
 
 #endif /* __RINGBUFFER_H */
