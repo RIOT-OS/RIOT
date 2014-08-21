@@ -32,11 +32,6 @@
 #include "hwtimer.h"
 #include "sched.h"
 
-inline kernel_pid_t thread_getpid(void)
-{
-    return sched_active_thread->pid;
-}
-
 volatile tcb_t *thread_get(kernel_pid_t pid)
 {
     if ((pid != KERNEL_PID_UNDEF) && (0 <= pid) && (pid < MAXTHREADS)) {

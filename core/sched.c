@@ -173,7 +173,7 @@ NORETURN void sched_task_exit(void)
     DEBUG("sched_task_exit(): ending task %s...\n", sched_active_thread->name);
 
     dINT();
-    sched_threads[sched_active_thread->pid] = NULL;
+    sched_threads[sched_active_pid] = NULL;
     sched_num_threads--;
 
     sched_set_status((tcb_t *)sched_active_thread, STATUS_STOPPED);

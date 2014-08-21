@@ -138,7 +138,10 @@ int thread_wakeup(kernel_pid_t pid);
  *
  * @return          obviously you are not a golfer.
  */
-kernel_pid_t thread_getpid(void);
+static inline kernel_pid_t thread_getpid(void)
+{
+    return sched_active_pid;
+}
 
 #ifdef DEVELHELP
 /**
