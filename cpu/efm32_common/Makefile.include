@@ -1,12 +1,6 @@
 # this CPU implementation is using the new core/CPU interface
 export CFLAGS += -DCOREIF_NG=1
 
-# tell the build system that the CPU depends on the Cortex-M common files
-export USEMODULE += cortex-m3_common
-
-# define path to cortex-m common module, which is needed for this CPU
-export CORTEX_COMMON = $(RIOTCPU)/cortex-m3_common/
-
 #export the CPU model
 MODEL = $(shell echo $(CPU_MODEL)|tr 'a-z' 'A-Z')
 export CFLAGS += -DCPU_MODEL_$(MODEL)
@@ -31,6 +25,3 @@ export INCLUDES += -I$(RIOTBASE)/sys/include
 
 # export the peripheral drivers to be linked into the final binary
 export USEMODULE += periph drivers emlib
-
-# CPU depends on the cortex-m common module, so include it
-include $(CORTEX_COMMON)Makefile.include

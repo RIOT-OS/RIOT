@@ -4,6 +4,11 @@ export CFLAGS += -DCOREIF_NG=1
 export CPU_FAMILY = EFM32GG
 export CPU_FLAGS = -mcpu=cortex-m3
 
+# tell the build system that the CPU depends on the EFM32 common files
+export USEMODULE += cortex-m3_common
+# define path to cortex-m common module, which is needed for this CPU
+export CORTEX_COMMON = $(RIOTCPU)/cortex-m3_common/
+
 # tell the build system that the CPU depends on the Cortex-M common files
 export USEMODULE += efm32_common
 # define path to cortex-m common module, which is needed for this CPU
@@ -20,5 +25,7 @@ export INCLUDES += -I$(RIOTBASE)/sys/include
 export UNDEF += $(BINDIR)cpu/syscalls.o
 export UNDEF += $(BINDIR)cpu/startup_$(CPU).o
 
-# CPU depends on the cortex-m common module, so include it
+# CPU depends on the efm32 common module, so include it
 include $(EFM32_COMMON)Makefile.include
+# CPU depends on the cortex-m common module, so include it
+include $(CORTEX_COMMON)Makefile.include
