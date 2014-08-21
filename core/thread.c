@@ -185,7 +185,6 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     cb->priority = priority;
     cb->status = 0;
 
-    cb->rq_entry.data = (unsigned int) cb;
     cb->rq_entry.next = NULL;
     cb->rq_entry.prev = NULL;
 
