@@ -69,6 +69,10 @@ ifneq (,$(filter at86rf231,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
 
+ifneq (,$(filter multitasking,$(USEMODULE)))
+	USEMODULE += vtimer
+endif
+
 ifneq (,$(filter vtimer,$(USEMODULE)))
 	USEMODULE += timex
 endif

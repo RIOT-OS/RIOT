@@ -144,16 +144,10 @@ void *tcp_general_timer(void *arg)
 {
     (void) arg;
 
-    vtimer_t tcp_vtimer;
-    timex_t interval = timex_set(0, TCP_TIMER_RESOLUTION);
-
     while (1) {
         inc_global_variables();
         check_sockets();
 
-        vtimer_set_wakeup(&tcp_vtimer, interval, thread_getpid());
-        thread_sleep();
-
-        vtimer_remove(&tcp_vtimer);
+        vtimer_usleep(TCP_TIMER_RESOLUTION);
     }
 }

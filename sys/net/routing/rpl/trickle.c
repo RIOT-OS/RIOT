@@ -73,8 +73,8 @@ void reset_trickletimer(void)
     timex_normalize(&I_time);
     vtimer_remove(&trickle_t_timer);
     vtimer_remove(&trickle_I_timer);
-    vtimer_set_wakeup(&trickle_t_timer, t_time, timer_over_pid);
-    vtimer_set_wakeup(&trickle_I_timer, I_time, interval_over_pid);
+    vtimer_set_wakeup(&trickle_t_timer, t_time, VTIMER_RELATIVE, timer_over_pid, NULL);
+    vtimer_set_wakeup(&trickle_I_timer, I_time, VTIMER_RELATIVE, interval_over_pid, NULL);
 
 }
 
@@ -116,8 +116,8 @@ void start_trickle(uint8_t DIOIntMin, uint8_t DIOIntDoubl,
     timex_normalize(&I_time);
     vtimer_remove(&trickle_t_timer);
     vtimer_remove(&trickle_I_timer);
-    vtimer_set_wakeup(&trickle_t_timer, t_time, timer_over_pid);
-    vtimer_set_wakeup(&trickle_I_timer, I_time, interval_over_pid);
+    vtimer_set_wakeup(&trickle_t_timer, t_time, VTIMER_RELATIVE, timer_over_pid, NULL);
+    vtimer_set_wakeup(&trickle_I_timer, I_time, VTIMER_RELATIVE, interval_over_pid, NULL);
 }
 
 void trickle_increment_counter(void)
@@ -178,13 +178,13 @@ static void *trickle_interval_over(void *arg)
 
         vtimer_remove(&trickle_t_timer);
 
-        if (vtimer_set_wakeup(&trickle_t_timer, t_time, timer_over_pid) != 0) {
+        if (vtimer_set_wakeup(&trickle_t_timer, t_time, VTIMER_RELATIVE, timer_over_pid, NULL) != 0) {
             puts("[ERROR] setting Wakeup");
         }
 
         vtimer_remove(&trickle_I_timer);
 
-        if (vtimer_set_wakeup(&trickle_I_timer, I_time, interval_over_pid) != 0) {
+        if (vtimer_set_wakeup(&trickle_I_timer, I_time, VTIMER_RELATIVE, interval_over_pid, NULL) != 0) {
             puts("[ERROR] setting Wakeup");
         }
     }
@@ -198,7 +198,7 @@ void delay_dao(void)
     dao_counter = 0;
     ack_received = false;
     vtimer_remove(&dao_timer);
-    vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
+    vtimer_set_wakeup(&dao_timer, dao_time, VTIMER_RELATIVE, dao_delay_over_pid, NULL);
 }
 
 /* This function is used for regular update of the routes. The Timer can be overwritten, as the normal delay_dao function gets called */
@@ -208,7 +208,7 @@ void long_delay_dao(void)
     dao_counter = 0;
     ack_received = false;
     vtimer_remove(&dao_timer);
-    vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
+    vtimer_set_wakeup(&dao_timer, dao_time, VTIMER_RELATIVE, dao_delay_over_pid, NULL);
 }
 
 static void *dao_delay_over(void *arg)
@@ -222,7 +222,7 @@ static void *dao_delay_over(void *arg)
             send_DAO(NULL, 0, true, 0);
             dao_time = timex_set(DEFAULT_WAIT_FOR_DAO_ACK, 0);
             vtimer_remove(&dao_timer);
-            vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
+            vtimer_set_wakeup(&dao_timer, dao_time, VTIMER_RELATIVE, dao_delay_over_pid, NULL);
         }
         else if (ack_received == false) {
             long_delay_dao();

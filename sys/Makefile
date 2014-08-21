@@ -100,5 +100,8 @@ endif
 ifneq (,$(filter pipe,$(USEMODULE)))
     DIRS += pipe
 endif
+ifneq (,$(filter multitasking,$(USEMODULE)))
+    DIRS += multitasking
+endif
 
 include $(RIOTBASE)/Makefile.base
