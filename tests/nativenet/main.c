@@ -43,8 +43,7 @@
 #define RADIO_STACK_SIZE    (KERNEL_CONF_STACKSIZE_DEFAULT)
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
-msg_queue_t radio_msg_queue;
-char queue_buf[RCV_BUFFER_SIZE];
+static char msg_queue_buf[RCV_BUFFER_SIZE];
 uint8_t snd_buffer[NATIVE_MAX_DATA_LENGTH];
 uint8_t receiving = 1;
 unsigned int last_seq = 0, missed_cnt = 0;
@@ -58,8 +57,7 @@ void *radio(void *arg)
     radio_packet_t *p;
     unsigned int tmp = 0, cur_seq = 0;
 
-    msg_queue_init(&radio_msg_queue, queue_buf, RCV_BUFFER_SIZE, 0);
-    thread_set_msg_queue(thread_pid, &radio_msg_queue);
+    thread_msg_queue_init(msg_queue_buf, sizeof(msg_queue_buf), 0);
 
     puts("Start receiving");
 
@@ -99,6 +97,8 @@ void *radio(void *arg)
             puts("Unknown packet received");
         }
     }
+
+    return NULL;
 }
 
 void sender(void)
