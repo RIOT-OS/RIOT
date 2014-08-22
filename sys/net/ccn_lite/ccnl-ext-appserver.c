@@ -160,6 +160,7 @@ static void riot_ccnl_appserver_register(void)
         return;
     }
     int content_len = ccnl_riot_client_publish(relay_pid, prefix, faceid, type, mgnt_pkg);
+    (void) content_len;
     DEBUG("received %d bytes.\n", content_len);
     DEBUG("appserver received: '%s'\n", mgnt_pkg);
 

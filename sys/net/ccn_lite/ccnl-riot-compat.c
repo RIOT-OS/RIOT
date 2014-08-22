@@ -24,12 +24,19 @@
 #include "msg.h"
 #include "thread.h"
 
+#include "ieee802154_frame.h"
+
 #include "ccnl.h"
 #include "ccnl-core.h"
 #include "ccnl-pdu.h"
 #include "ccnl-riot-compat.h"
 
+#if defined (MODULE_AT86RF231) || defined(MODULE_CC2420) || defined(MODULE_MC1322X)
+ieee802154_packet_t p;
+#else
 radio_packet_t p;
+#endif
+
 transceiver_command_t tcmd;
 msg_t mesg, rep;
 
@@ -45,9 +52,17 @@ int riot_send_transceiver(uint8_t *buf, uint16_t size, uint16_t to)
         return 0;
     }
 
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+    p.frame.payload_len = size;
+    p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
+    memset(p.frame.dest_addr, 0, sizeof(p.frame.dest_addr));
+    memcpy(&(p.frame.dest_addr[6]), &to, sizeof(uint16_t));
+    p.frame.payload = buf;
+#else
     p.length = size;
     p.dst = (to == RIOT_BROADCAST) ? 0 : to;
     p.data = buf;
+#endif
 
     tcmd.transceivers = TRANSCEIVER;
     tcmd.data = &p;

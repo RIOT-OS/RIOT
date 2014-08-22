@@ -355,12 +355,14 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                 handle_populate_cache(ccnl);
                 break;
 #endif
+#if ENABLE_DEBUG
             case (CCNL_RIOT_PRINT_STAT):
                 /* cmd to print face statistics */
                 for (struct ccnl_face_s *f = ccnl->faces; f; f = f->next) {
                     ccnl_face_print_stat(f);
                 }
                 break;
+#endif
             case (CCNL_RIOT_CONFIG_CACHE):
                 /* cmd to configure the size of the cache at runtime */
                 ccnl->max_cache_entries = in.content.value;
