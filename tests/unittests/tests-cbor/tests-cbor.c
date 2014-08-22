@@ -540,6 +540,7 @@ static void test_date_time(void)
     val.tm_hour = 15;
     val.tm_min = 0;
     val.tm_sec = 0;
+    val.tm_isdst = -1;
     mktime(&val);
     TEST_ASSERT(cbor_serialize_date_time(&stream, &val));
     CBOR_CHECK_SERIALIZED(stream, data, sizeof(data));
