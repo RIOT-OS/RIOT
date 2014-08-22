@@ -2,7 +2,7 @@
 export CFLAGS += -DCOREIF_NG=1
 
 export CPU_FAMILY = EMF32ZG
-export CPU_FLAGS = -mcpu=cortex-m0plus -Wl,-no_unaligned_access
+export CPU_FLAGS = -mcpu=cortex-m0plus
 
 # tell the build system that the CPU depends on the EFM32 common files
 export USEMODULE += cortex-m0_common
@@ -20,6 +20,8 @@ export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 export INCLUDES += -I$(RIOTBASE)/core/include
 export INCLUDES += -I$(RIOTBASE)/drivers/include
 export INCLUDES += -I$(RIOTBASE)/sys/include
+
+#export LINKFLAGS += -Wl,-no_unaligned_access
 
 # add the CPU specific system calls implementations for the linker
 export UNDEF += $(BINDIR)cpu/syscalls.o

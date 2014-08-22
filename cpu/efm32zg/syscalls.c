@@ -21,12 +21,12 @@ void *heap_top = (void *) &_end + 4;
 // Initialisation function
 void _init(void)
 {
-    int *addr;
+    __packed uint32_t *addr;
 
     //Clear bss
-    for (uint32_t i = &__bss_start__; i < &__bss_end__; i++) {
+    for (uint32_t i = &__bss_start__; i < &__bss_end__; i+=sizeof(uint32_t)) {
         addr = i;
-        *addr = NULL;
+        *addr = 0x00000000;
     }
 
     // Set up UART
