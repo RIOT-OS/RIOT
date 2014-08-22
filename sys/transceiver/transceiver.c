@@ -154,7 +154,7 @@ void transceiver_init(transceiver_type_t t)
 {
     uint8_t i;
 
-    if (transceiver_pid >= 0) {
+    if (transceiver_pid != KERNEL_PID_UNDEF) {
         /* do not re-initialize an already running transceiver */
         return;
     }
