@@ -15,11 +15,11 @@
  *
  * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
  * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef __PERIPH_CONF_H
 #define __PERIPH_CONF_H
-
 
 /**
  * @name Timer configuration
@@ -53,6 +53,20 @@
 #define TIMER_2_IRQ         TIMER2_IRQn
 /** @} */
 
+/**
+ * @name Real time counter configuration
+ * @{
+ */
+#define RTT_NUMOF           (1U)
+#define RTT_IRQ_PRIO        1
+
+#define RTT_DEV             NRF_RTC0
+#define RTT_IRQ             RTC0_IRQn
+#define RTT_ISR             isr_rtc0
+#define RTT_MAX_VALUE       (0xffffff)
+#define RTT_FREQUENCY       (10)            /* in Hz */
+#define RTT_PRESCALER       (3275U)         /* run with 10 Hz */
+/** @} */
 
 /**
  * @name UART configuration
