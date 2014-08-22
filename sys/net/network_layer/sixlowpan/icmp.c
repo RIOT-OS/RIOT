@@ -1523,7 +1523,10 @@ int ndp_addr_is_on_link(ipv6_addr_t *dest_addr)
     int if_id = -1;
 
     if ((nce = ndp_neighbor_cache_search(dest_addr))) {
+#ifdef DEBUG_ENABLED
+        char addr_str[IPV6_MAX_ADDR_STR_LEN];
         DEBUG("INFO: %s is in nbr cache\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest_addr));
+#endif
         return 1;
     }
 
