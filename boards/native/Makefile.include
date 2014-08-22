@@ -48,7 +48,10 @@ endif
 
 export ASFLAGS =
 export DEBUGGER_FLAGS = $(ELF)
-term-memcheck: export VALGRIND_FLAGS ?= --track-origins=yes
+term-valgrind: export VALGRIND_FLAGS ?= \
+	--track-origins=yes \
+	--fullpath-after=$(RIOTBASE)/ \
+	--read-var-info=yes
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
 term-gprof: export TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELF)
 all-valgrind: export CFLAGS += -DHAVE_VALGRIND_H -g
