@@ -24,8 +24,11 @@ export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
-# flags:
+# basic cflags:
 export CFLAGS += -Wall -Wextra -pedantic -m32
+ifneq (,$(filter -DDEVELHELP,$(CFLAGS)))
+export CFLAGS += -fstack-protector-all
+endif
 ifeq ($(shell uname -s),FreeBSD)
 ifeq ($(shell uname -m),amd64)
 export CFLAGS += -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
