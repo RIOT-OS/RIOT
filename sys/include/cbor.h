@@ -3,9 +3,9 @@
  * Copyright (C) 2014 Kevin Funk <kfunk@kde.org>
  * Copyright (C) 2014 Jana Cavojska <jana.cavojska9@gmail.com>
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
