@@ -307,7 +307,17 @@ uint8_t ipv6_get_addr_match(const ipv6_addr_t *src,
     return val;
 }
 
-int is_our_address(ipv6_addr_t *addr)
+/**
+ * @brief Check if the given IPv6 address is assigned to any configured
+ *        interface
+ *
+ * @param[in] addr  The IPv6 address to check
+ *
+ * @return 1    If *addr* is assigned to at least one interface
+ * @return 0    If *addr* is not assigned to any interface
+ * @return -1   If no IPv6 address is configured to any interface
+ */
+static int is_our_address(ipv6_addr_t *addr)
 {
     ipv6_net_if_ext_t *net_if_ext;
     ipv6_net_if_addr_t *myaddr;
