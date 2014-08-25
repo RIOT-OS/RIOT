@@ -70,6 +70,13 @@
 #define UART_0_PIN_TX       9
 /** @} */
 
+/**
+ * @name Random Number Generator configuration
+ * @{
+ */
+#define RANDOM_NUMOF        (1U)
+/** @} */
+
 
 /**
  * @name GPIO configuration
