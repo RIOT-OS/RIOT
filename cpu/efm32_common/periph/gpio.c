@@ -27,7 +27,7 @@
 
 #include "em_gpio.h"
 
-#define GPIO_CLKEN()    CMU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_GPIO
+#define GPIO_CLKEN()     CMU_ClockEnable(cmuClock_GPIO, true)
 
 #if GPIO_NUMOF
 
@@ -841,27 +841,22 @@ void GPIO_EVEN_IRQHandler(void)
     /* Get all even interrupts. */
     iflags = GPIO_IntGetEnabled() & 0x00005555;
 
-    printf("even 0x%.8x\n", iflags);
-
     /* Call IRQ handlers */
 #if GPIO_0_EN
     if (iflags & (1 << GPIO_IRQ_0)) {
         //GPIO->IFC = (1 << GPIO_IRQ_0);
-        printf("GPIO_0 int\n");
         gpio_irq_handler(GPIO_0);
     }
 #endif
 #if GPIO_1_EN
     if (iflags & (1 << GPIO_IRQ_1)) {
         //GPIO->IFC = (1 << GPIO_IRQ_1);
-        printf("GPIO_1 int\n");
         gpio_irq_handler(GPIO_1);
     }
 #endif
 #if GPIO_2_EN
     if (iflags & (1 << GPIO_IRQ_2)) {
         //GPIO->IFC = (1 << GPIO_IRQ_2);
-        printf("GPIO_2 int\n");
         gpio_irq_handler(GPIO_2);
     }
 #endif
@@ -886,27 +881,22 @@ void GPIO_ODD_IRQHandler(void)
     /* Get all odd interrupts. */
     iflags = GPIO_IntGetEnabled() & 0x0000AAAA;
 
-    printf("odd 0x%.8x\n", iflags);
-
     /* Call IRQ handlers */
 #if GPIO_0_EN
     if (iflags & (1 << GPIO_IRQ_0)) {
         //GPIO->IFC = (1 << GPIO_IRQ_0);
-        printf("GPIO_0 int\n");
         gpio_irq_handler(GPIO_0);
     }
 #endif
 #if GPIO_1_EN
     if (iflags & (1 << GPIO_IRQ_1)) {
         //GPIO->IFC = (1 << GPIO_IRQ_1);
-        printf("GPIO_1 int\n");
         gpio_irq_handler(GPIO_1);
     }
 #endif
 #if GPIO_2_EN
     if (iflags & (1 << GPIO_IRQ_2)) {
         //GPIO->IFC = (1 << GPIO_IRQ_2);
-        printf("GPIO_2 int\n");
         gpio_irq_handler(GPIO_2);
     }
 #endif

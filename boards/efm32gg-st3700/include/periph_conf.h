@@ -22,6 +22,7 @@
 #include "em_device.h"
 #include "em_timer.h"
 #include "em_usart.h"
+#include "em_cmu.h"
 
 /******     From cortex-m3_common/cpu.h for RIOT compatibility      ******/
 /**
@@ -56,7 +57,7 @@
 #define TIMER_0_CHANNELS    3
 #define TIMER_0_PRESCALER   (timerPrescale32)
 #define TIMER_0_MAX_VALUE   (0xffffffff)
-//#define TIMER_0_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
+#define TIMER_0_CLKEN()     CMU_ClockEnable(cmuClock_TIMER0, true)
 #define TIMER_0_ISR         TIMER0_IRQHandler
 //#define TIMER_0_IRQ_CHAN    TIM2_IRQn
 #define TIMER_0_IRQ_PRIO    1
@@ -66,7 +67,7 @@
 #define TIMER_1_CHANNELS    3
 #define TIMER_1_PRESCALER   (timerPrescale32)
 #define TIMER_1_MAX_VALUE   (0xffffffff)
-//#define TIMER_1_CLKEN()     (RCC->APB1ENR |= RCC_APB1ENR_TIM2EN)
+#define TIMER_1_CLKEN()     CMU_ClockEnable(cmuClock_TIMER1, true)
 #define TIMER_1_ISR         TIMER1_IRQHandler
 //#define TIMER_0_IRQ_CHAN    TIM2_IRQn
 #define TIMER_1_IRQ_PRIO    1
@@ -81,14 +82,14 @@
 
 /* UART 0 device configuration */
 #define UART_0_DEV          USART0
-#define UART_0_CLKEN()      CMU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_USART0
+#define UART_0_CLKEN()      CMU_ClockEnable(cmuClock_USART0, true)
 #define UART_0_RX_IRQ       USART0_RX_IRQn
 #define UART_0_TX_IRQ       USART0_TX_IRQn
 #define UART_0_RX_ISR       UART0_RX_IRQHandler
 #define UART_0_TX_ISR       UART0_TX_IRQHandler
 /* UART 0 pin configuration */
 #define UART_0_PORT         gpioPortC
-#define UART_0_PORT_CLKEN() CMU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_GPIO
+#define UART_0_PORT_CLKEN() CMU_ClockEnable(cmuClock_GPIO, true)
 #define UART_0_RX_PIN       1
 #define UART_0_TX_PIN       0
 #define UART_0_ROUTE        USART_ROUTE_LOCATION_LOC5

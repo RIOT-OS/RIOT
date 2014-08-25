@@ -25,6 +25,12 @@
 #include "em_chip.h"
 #include "em_int.h"
 
+extern void board_init(void);
+extern void __libc_init_array(void);
+extern void kernel_init(void);
+extern void isr_svc(void);
+extern void isr_pendsv(void);
+
 static void clock_init(void);
 
 /**

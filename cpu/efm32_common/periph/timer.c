@@ -20,14 +20,18 @@
 
 #include <stdlib.h>
 
-//#include "cpu.h"
-//#include "board.h"
-//#include "periph_conf.h"
+#include "cpu.h"
+#include "board.h"
+#include "periph_conf.h"
+#include "thread.h"
 #include "periph/timer.h"
 
 #include "em_timer.h"
 
-static inline void irq_handler(tim_t dev, TIMER_TypeDef *timer);
+#define ENABLE_DEBUG    (1)
+#include "debug.h"
+
+static inline void timer_irq_handler(tim_t dev, TIMER_TypeDef *timer);
 
 typedef struct {
     void (*cb)(int);
@@ -63,6 +67,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
         //Do timer0 specific init
         timer = TIMER0;
         timer_init.prescale = TIMER_0_PRESCALER;
+        TIMER_0_CLKEN();
         break;
 #endif
 #ifdef TIMER_1_EN
@@ -70,11 +75,14 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
         //Do timer1 specific init
         timer = TIMER1;
         timer_init.prescale = TIMER_1_PRESCALER;
+        TIMER_1_CLKEN();
         break;
 #endif
     default:
         return -1;
     }
+
+    DEBUG("timer_init(): timer %d\n", dev);
 
     // Set timeout value
     TIMER_TopSet(timer, TIMER_0_MAX_VALUE);
@@ -96,6 +104,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 //Set an interrupt on the specified channel n ticks from now
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
+    DEBUG("timer_set(): timer %d channel %d timeout %u\n", dev, channel, timeout);
     int now = timer_read(dev);
     return timer_set_absolute(dev, channel, now + timeout - 1);
 }
@@ -134,6 +143,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
     // Check channel no is valid
     if (TIMER_CH_VALID(channel)) {
+        DEBUG("timer_set_absolute(): timer %d channel %d time %u\n", dev, channel, value);
 
         //Set up compare channel
         TIMER_CompareSet(timer, channel, value);
@@ -157,6 +167,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
         return 0;
 
     } else {
+        DEBUG("timer_set_absolute(): invalid channel\n");
         return -2;
     }
 }
@@ -180,6 +191,8 @@ int timer_clear(tim_t dev, int channel)
     default:
         return -1;
     }
+
+    DEBUG("timer_clear(): timer %d channel %d\n", dev, channel);
 
     //TODO: Enable timer channel event clearing
     //TODO: Clear interrupt flags following deactivation
@@ -207,6 +220,7 @@ int timer_clear(tim_t dev, int channel)
 unsigned int timer_read(tim_t dev)
 {
     TIMER_TypeDef *timer;
+    unsigned int timer_val;
 
     switch (dev) {
 #if TIMER_0_EN
@@ -224,7 +238,10 @@ unsigned int timer_read(tim_t dev)
     }
 
     //Fetch timer count
-    return timer->CNT;
+    timer_val = timer->CNT;
+    DEBUG("timer_read(): value %d\n", timer_val);
+
+    return timer_val;
 }
 
 //Start the timer
@@ -246,6 +263,8 @@ void timer_start(tim_t dev)
     default:
         return;
     }
+
+    DEBUG("timer_start(): timer %d\n", dev);
 
     // Start timer
     timer->CMD = TIMER_CMD_START;
@@ -271,6 +290,8 @@ void timer_stop(tim_t dev)
         return;
     }
 
+    DEBUG("timer_stop(): timer %d\n", dev);
+
     // Stop timer
     timer->CMD = TIMER_CMD_STOP;
 }
@@ -278,6 +299,8 @@ void timer_stop(tim_t dev)
 //Enable timer interrupts
 void timer_irq_enable(tim_t dev)
 {
+    DEBUG("timer_irq_enable(): timer %d\n", dev);
+
     switch (dev) {
 #if TIMER_0_EN
     case TIMER_0:
@@ -297,6 +320,8 @@ void timer_irq_enable(tim_t dev)
 //Disable timer interrupts
 void timer_irq_disable(tim_t dev)
 {
+    DEBUG("timer_irq_disable(): timer %d\n", dev);
+
     switch (dev) {
 #if TIMER_0_EN
     case TIMER_0:
@@ -316,6 +341,8 @@ void timer_irq_disable(tim_t dev)
 //Reset the timer
 void timer_reset(tim_t dev)
 {
+    DEBUG("timer_reset(): timer %d\n", dev);
+
     TIMER_TypeDef *timer;
     switch (dev) {
 #if TIMER_0_EN
@@ -340,7 +367,10 @@ void timer_reset(tim_t dev)
 __attribute__ ((naked)) void TIMER_0_ISR(void)
 {
     ISR_ENTER();
-    irq_handler(TIMER_0, TIMER_0_DEV);
+    timer_irq_handler(TIMER_0, TIMER_0_DEV);
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
     ISR_EXIT();
 }
 #endif
@@ -349,13 +379,18 @@ __attribute__ ((naked)) void TIMER_0_ISR(void)
 __attribute__ ((naked)) void TIMER_1_ISR(void)
 {
     ISR_ENTER();
-    irq_handler(TIMER_1, TIMER_1_DEV);
+    timer_irq_handler(TIMER_1, TIMER_1_DEV);
+    if (sched_context_switch_request) {
+        thread_yield();
+    }
     ISR_EXIT();
 }
 #endif
 
-static inline void irq_handler(tim_t dev, TIMER_TypeDef *timer)
+static inline void timer_irq_handler(tim_t dev, TIMER_TypeDef *timer)
 {
+    DEBUG("timer irq_handler(): timer %d\n", dev);
+
     //Check each channel
     if (timer->IF & TIMER_IF_CC0) {
         //Disable interrupt

@@ -31,7 +31,7 @@
 #include "irq.h"
 #include "board.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 #include "hwtimer.h"
