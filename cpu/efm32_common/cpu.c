@@ -87,20 +87,3 @@ void _start(void)
     kernel_init();
 }
 
-
-
-//Service interrupt handler
-//TODO: Replace name in threads.c with a CPU specific definition
-//OR modify startup assembly
-__attribute__((naked)) void SVC_Handler(void)
-{
-    isr_svc();
-}
-
-//Service pending interrupt handler
-//TODO: Replace name in threads.c with a CPU specific definition
-//OR modify startup assembly
-__attribute__((naked)) void PendSV_Handler(void)
-{
-    isr_pendsv();
-}

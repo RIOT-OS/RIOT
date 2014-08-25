@@ -166,7 +166,7 @@ __attribute__((always_inline)) static __INLINE void context_restore(void)
  * @brief The svc is used for running the scheduler and scheduling a new task during start-up or
  *        after a thread has exited
  */
-__attribute__((naked)) void isr_svc(void)
+__attribute__((naked)) void SVC_ISR(void)
 {
     sched_run();
     context_restore();
@@ -175,7 +175,7 @@ __attribute__((naked)) void isr_svc(void)
 /**
  * @brief All task switching activity is carried out int the pendSV interrupt
  */
-__attribute__((naked)) void isr_pendsv(void)
+__attribute__((naked)) void PEND_SV_ISR(void)
 {
     context_save();
     sched_run();

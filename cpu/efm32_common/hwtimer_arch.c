@@ -26,7 +26,7 @@
 #include "board.h"
 #include "thread.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 void irq_handler(int channel);

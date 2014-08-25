@@ -25,6 +25,14 @@
 #include "em_device.h"
 
 /**
+ * @name Threading configuration
+ * 
+ */
+
+#define SVC_ISR			SVC_Handler
+#define PEND_SV_ISR 	PendSV_Handler
+
+/**
  * @name Kernel configuration
  *
  * The absolute minimum stack size is 140 byte (68 byte for the tcb + 72 byte

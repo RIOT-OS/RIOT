@@ -28,7 +28,7 @@
 
 #include "em_timer.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 static inline void timer_irq_handler(tim_t dev, TIMER_TypeDef *timer);
@@ -368,9 +368,9 @@ __attribute__ ((naked)) void TIMER_0_ISR(void)
 {
     ISR_ENTER();
     timer_irq_handler(TIMER_0, TIMER_0_DEV);
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    //if (sched_context_switch_request) {
+    //    thread_yield();
+    //}
     ISR_EXIT();
 }
 #endif
@@ -380,9 +380,9 @@ __attribute__ ((naked)) void TIMER_1_ISR(void)
 {
     ISR_ENTER();
     timer_irq_handler(TIMER_1, TIMER_1_DEV);
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
+    //if (sched_context_switch_request) {
+    //    thread_yield();
+    //}
     ISR_EXIT();
 }
 #endif
@@ -398,20 +398,35 @@ static inline void timer_irq_handler(tim_t dev, TIMER_TypeDef *timer)
         //Clear the flag
         timer->IFC |= TIMER_IFC_CC0;
         //Call bound callback function
-        config[dev].cb(0);
+        if(config[dev].cb != NULL) {
+           config[dev].cb(0); 
+        } else {
+            printf("timer irq not bound\n");
+        }
+        
     } else if (timer->IF & TIMER_IF_CC1) {
         //Disable interrupt
         timer->IEN &= ~TIMER_IEN_CC1;
         //Clear the flag
         timer->IFC |= TIMER_IFC_CC1;
         //Call bound callback function
-        config[dev].cb(1);
+        if(config[dev].cb != NULL) {
+           config[dev].cb(1); 
+        } else {
+            printf("timer irq not bound\n");
+        }
+
     } else if (timer->IF & TIMER_IF_CC2) {
         //Disable interrupt
         timer->IEN &= ~TIMER_IEN_CC2;
         //Clear the flag
         timer->IFC |= TIMER_IFC_CC2;
         //Call bound callback function
-        config[dev].cb(2);
+        if(config[dev].cb != NULL) {
+           config[dev].cb(2); 
+        } else {
+            printf("timer irq not bound\n");
+        }
+
     }
 }
