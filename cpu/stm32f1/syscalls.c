@@ -35,6 +35,7 @@
 #include "ringbuffer.h"
 #include "irq.h"
 #include "periph/uart.h"
+#include "board.h"
 
 #ifdef MODULE_UART0
 #include "board_uart0.h"
@@ -244,7 +245,7 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 {
     char *c = (char*)data;
     for (int i = 0; i < count; i++) {
-        uart_write_blocking(UART_0, c[i]);
+        uart_write_blocking(STDIO, c[i]);
     }
     return count;
 }
