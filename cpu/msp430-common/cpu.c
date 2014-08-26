@@ -22,11 +22,11 @@ char __isr_stack[MSP430_ISR_STACK_SIZE];
    of its execution, in inlined __restore_context() sub-function */
 __attribute__((naked)) void thread_yield(void)
 {
-    __save_context();
-
     /* disable IRQ, remembering if they are
        to be reactivated after context switch */
     unsigned int irqen = disableIRQ();
+
+    __save_context();
 
     /* have sched_active_thread point to the next thread */
     sched_run();
