@@ -12,13 +12,13 @@
 
 #include "tests-core.h"
 
-#define TEST_LIFO_LEN   2
+#define TEST_LIFO_MAX_ELEM   2
 
-int lifo[TEST_LIFO_LEN];
+int lifo[TEST_LIFO_MAX_ELEM + 1];
 
 static void set_up(void)
 {
-    lifo_init(lifo, TEST_LIFO_LEN);
+    lifo_init(lifo, TEST_LIFO_MAX_ELEM);
 }
 
 static void test_lifo_empty(void)
