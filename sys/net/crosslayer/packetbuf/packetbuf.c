@@ -66,6 +66,7 @@ void *_packetbuf_add(void (*add_to_queue)(queue_node_t *, queue_node_t *),
         buf->allocated += packet_len;
     }
     node->priority = 0;
+    node->processing = 1;
 
     add_to_queue((queue_node_t *)&buf->queue, (queue_node_t *)node);
 
@@ -123,6 +124,7 @@ size_t packetbuf_remove(packetbuf_t *buf, void *packet_data)
     }
 
     mutex_lock(&(buf->mutex));
+
     if (!(buf->queue.next)) {
         errno = ENODATA;
         mutex_unlock(&(buf->mutex));
@@ -133,49 +135,20 @@ size_t packetbuf_remove(packetbuf_t *buf, void *packet_data)
 
     packet_len = packet->packet_len;
     memcpy(packet_data, packet->packet_data, packet_len);
-
+    packet->processing = 0;
     mutex_unlock(&(buf->mutex));
 
     return packet_len;
 }
 
-void *packetbuf_move_right(packetbuf_t *buf, void *packet, size_t offset)
+void packetbuf_garbagecollect(packetbuf_t *buf)
 {
-    packetbuf_queue_t *ptr = &buf->queue;
-    int found = 0;
-
-    if (!offset) {
-        return packet;
-    }
-
-    if (!buf || !packet) {
-        errno = EINVAL;
-        return 0;
-    }
-
-    mutex_lock(&(buf->mutex));
-    while ((ptr = ptr->next)) {
-        if (ptr->packet_data == packet) {
-            found = 1;
-            break;
+    packetbuf_queue_t *packet = NULL, *prev = &(buf->queue);
+    while ((packet = packetbuf_iter(buf, packet))) {
+        if (packet.processing == 0) {
+            prev->next = packet->next;
         }
+
+        prev = packet;
     }
-
-    if (!found) {
-        errno = EADDRNOTAVAIL;
-        mutex_unlock(&(buf->mutex));
-        return NULL;
-    }
-
-    if (ptr->packet_len < offset) {
-        errno = EINVAL;
-        mutex_unlock(&(buf->mutex));
-        return NULL;
-    }
-
-    ptr->packet_data = (void *)(((char *)ptr->packet_data) + offset);
-    ptr->packet_len -= offset;
-    mutex_unlock(&(buf->mutex));
-
-    return ptr->packet_data;
 }

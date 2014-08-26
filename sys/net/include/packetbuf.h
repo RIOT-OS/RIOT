@@ -42,6 +42,8 @@ typedef struct packetbuf_queue_t {
      * @internal
      */
     uint32_t priority;
+    volatile uint8_t processing;    /**< internal processing state, if 0
+                                         this packet is allowed to be removed */
     size_t packet_len;              /**< length of the packet in byte */
 } packetbuf_queue_t;
 
@@ -50,12 +52,12 @@ typedef struct packetbuf_queue_t {
  *
  * @implements queue_node_t
  */
-typedef struct packetbuf_t {
+typedef struct {
     char *buffer;                       /**< buffer store packets and metadata
                                              in */
     size_t buflen;                      /**< available space in buffer */
     size_t allocated;                   /**< allocated space in buffer */
-    packetbuf_queue_t queue;            /**< packet queue */
+    queue_node_t queue;                 /**< packet queue */
     mutex_t mutex;                      /**< the packet buffer's mutex */
 } packetbuf_t;
 
@@ -153,18 +155,22 @@ size_t packetbuf_get(packetbuf_t *buf, void **packet_data);
 size_t packetbuf_remove(packetbuf_t *buf, void *packet_data);
 
 /**
- * @brief   Moves pointer a packet up.
+ * @brief   Iterates through items in the packet queue of the buffer.
  *
- * @param[in] buf           The packet buffer
- * @param[in] packet        The packet you want to change
- * @param[in] offset        The number of bytes you want to move the beginning
- *                          of the head of the packet to the right.
+ * @param[in] buf   The packet buffer
+ * @param[in] prev  The previous packet before the desired in the queue
  *
- * @return The new pointer pointing to the packet on success.
- *         if *offset* is 0, *packet* is just returned without any checks.
- * @return NULL, on failure, the according errno will be set.
- *         EINVAL: *offset* to big for given packet's size or *buf* or *packet*
- *                 is NULL,
- *         EADDRNOTAVAIL: Address is not stored in the packet buffer.
+ * @return  the next packet after *prev*
  */
-void *packetbuf_move_right(packetbuf_t *buf, void *packet, size_t offset);
+static inline packetbuf_queue_t *packetbuf_iter(packetbuf_t *buf,
+                                                packetbuf_queue_t *prev)
+{
+    return (packetbuf_queue_t *)((prev == NULL) ? buf->queue.next : prev->next);
+}
+
+/**
+ * @brief   Removes all packets in *buf* where *prossecing* is 0
+ *
+ * @param[in] buf   The packet buffer
+ */
+void packetbuf_garbagecollect(packetbuf_t *buf);
