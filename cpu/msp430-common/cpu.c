@@ -17,7 +17,10 @@ volatile int __inISR = 0;
 
 char __isr_stack[MSP430_ISR_STACK_SIZE];
 
-void thread_yield(void)
+/* we must prevent the compiler to generate a prologue or an epilogue
+   for thread_yield(), since we rely on RETI instruction at the end
+   of its execution, in inlined __restore_context() sub-function */
+__attribute__((naked)) void thread_yield(void)
 {
     __save_context();
 
@@ -29,6 +32,8 @@ void thread_yield(void)
     sched_run();
 
     __restore_context(irqen);
+
+    UNREACHABLE();
 }
 
 NORETURN void cpu_switch_context_exit(void)
