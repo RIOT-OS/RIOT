@@ -7,6 +7,7 @@
  */
 
 #include "cpu.h"
+#include "irq.h"
 #include "kernel.h"
 #include "kernel_internal.h"
 #include "sched.h"
@@ -20,12 +21,14 @@ void thread_yield(void)
 {
     __save_context();
 
-    dINT();
+    /* disable IRQ, remembering if they are
+       to be reactivated after context switch */
+    unsigned int irqen = disableIRQ();
+
     /* have sched_active_thread point to the next thread */
     sched_run();
-    eINT();
 
-    __restore_context();
+    __restore_context(irqen);
 }
 
 NORETURN void cpu_switch_context_exit(void)
@@ -33,7 +36,7 @@ NORETURN void cpu_switch_context_exit(void)
     sched_active_thread = sched_threads[0];
     sched_run();
 
-    __restore_context();
+    __restore_context(GIE);
 
     UNREACHABLE();
 }
