@@ -31,8 +31,11 @@
 
 extern void (*int_handler)(int);
 extern void timer_unset(short timer);
-extern volatile uint16_t overflow_interrupt[HWTIMER_MAXTIMERS+1];
-extern volatile uint16_t timer_round;
+
+volatile uint16_t overflow_interrupt[HWTIMER_MAXTIMERS];
+volatile uint16_t timer_round;
+
+#define CCRA0_NUM_TO_INDEX(ccr)  ((ccr) - 1)
 
 void timerA_init(void)
 {
@@ -61,6 +64,8 @@ interrupt(TIMER0_A0_VECTOR) __attribute__((naked)) timer0_a0_isr(void)
         int_handler(0);
     }
 
+    DEBUG("TimerA0 overflow\n");
+
     __exit_isr();
 }
 
@@ -70,9 +75,9 @@ interrupt(TIMER0_A1_VECTOR) __attribute__((naked)) timer0_a1_5_isr(void)
 
     short taiv_reg = TA0IV;
     if (taiv_reg == 0x0E) {
-        /* TAIV = 0x0E means overflow */
-        DEBUG("Overflow\n");
+        /* TAIV == 0x0E means overflow */
         timer_round++;
+        DEBUG("Overflow\n");
     }
     else {
         short timer = taiv_reg >> 1;

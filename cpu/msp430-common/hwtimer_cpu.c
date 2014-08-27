@@ -1,17 +1,30 @@
-/******************************************************************************
-Copyright (C) 2013, Freie Universitaet Berlin (FUB). All rights reserved.
+/*
+ * Copyright (C) 2014 Freie Universitaet Berlin (FUB) and INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License. See the file LICENSE in the top level directory for more
+ * details.
+ */
 
-These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
--------------------------------------------------------------------------------
-This file is subject to the terms and conditions of the GNU Lesser
-General Public License v2.1. See the file LICENSE in the top level
-directory for more details.
-*******************************************************************************/
+/**
+ * @ingroup cpu
+ * @{
+ */
+
+/**
+ * @file
+ * @brief       msp430 hardware timer driver generic functions
+ *
+ * @author      Freie Universitaet Berlin, Computer Systems and Telematics group
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Kévin Roussel <Kevin.Roussel@inria.fr>
+ *
+ */
 
 #include <stdint.h>
 
 #include "cpu.h"
+#include "crash.h"
 #include "hwtimer.h"
 #include "arch/hwtimer_arch.h"
 
@@ -21,45 +34,99 @@ directory for more details.
 
 void (*int_handler)(int);
 extern void timerA_init(void);
-volatile uint16_t overflow_interrupt[HWTIMER_MAXTIMERS+1];
-volatile uint16_t timer_round;
+#ifndef CC430
+extern volatile msp430_timer_t msp430_timer[HWTIMER_MAXTIMERS];
+#else
+extern volatile uint16_t overflow_interrupt[HWTIMER_MAXTIMERS];
+#endif
+extern volatile uint16_t timer_round;
+
+/*
+ * the 3 following functions handle the diversity of timers
+ *  we can encounter in the various MCUs in the MSP430 family
+ */
+
+static volatile unsigned int *get_control_reg_for_msp430_timer(int index)
+{
+    volatile unsigned int *ptr = NULL;
+#ifndef CC430
+    switch (msp430_timer[index].base_timer) {
+    case TIMER_A:
+        ptr = &TACCTL0;
+        break;
+    case TIMER_B:
+        ptr = &TBCCTL0;
+        break;
+    default:
+        core_panic(0x0, "Wrong timer kind for MSP430");
+    }
+    ptr += msp430_timer[index].ccr_num;
+#else
+    ptr = &TA0CCTL0;
+#endif
+    return ptr;
+}
+
+static volatile unsigned int *get_comparator_reg_for_msp430_timer(int index)
+{
+    volatile unsigned int *ptr = NULL;
+#ifndef CC430
+    switch (msp430_timer[index].base_timer) {
+    case TIMER_A:
+        ptr = &TACCR0;
+        break;
+    case TIMER_B:
+        ptr = &TBCCR0;
+        break;
+    default:
+        core_panic(0x0, "Wrong timer kind for MSP430");
+    }
+    ptr += msp430_timer[index].ccr_num;
+#else
+    ptr = &TA0CCR0;
+#endif
+    return ptr;
+}
 
 #ifdef CC430
   /* CC430 have "TimerA0", "TimerA1" and so on... */
-  #define CNT_CTRL_BASE_REG  (TA0CCTL0)
-  #define CNT_COMP_BASE_REG  (TA0CCR0)
-  #define TIMER_VAL_REG      (TA0R)
+  #define TIMER_VAL_REG (TA0R)
 #else
   /* ... while other MSP430 MCUs have "TimerA", "TimerB".
-     Cheers for TI and its consistency! */
-  #define CNT_CTRL_BASE_REG  (TACCTL0)
-  #define CNT_COMP_BASE_REG  (TACCR0)
-  #define TIMER_VAL_REG      (TAR)
+         Cheers for TI and its consistency! */
+  #define TIMER_VAL_REG (TAR)
 #endif
+
+/* hardware-dependent functions */
 
 static void timer_disable_interrupt(short timer)
 {
-    volatile unsigned int *ptr = &CNT_CTRL_BASE_REG + (timer);
+    volatile unsigned int *ptr = get_control_reg_for_msp430_timer(timer);
     *ptr &= ~(CCIFG);
     *ptr &= ~(CCIE);
 }
 
 static void timer_enable_interrupt(short timer)
 {
-    volatile unsigned int *ptr = &CNT_CTRL_BASE_REG + (timer);
+    volatile unsigned int *ptr = get_control_reg_for_msp430_timer(timer);
     *ptr |= CCIE;
     *ptr &= ~(CCIFG);
 }
 
 static void timer_set_nostart(uint32_t value, short timer)
 {
-    volatile unsigned int *ptr = &CNT_COMP_BASE_REG + (timer);
+    volatile unsigned int *ptr = get_comparator_reg_for_msp430_timer(timer);
     /* ensure we won't set the timer to a "past" tick */
     if (value <= hwtimer_arch_now()) {
         value = hwtimer_arch_now() + 2;
     }
+#ifndef CC430
+    msp430_timer[timer].target_round = (uint16_t)(value >> 15);
+    *ptr = (value & 0x7FFF);
+#else
     overflow_interrupt[timer] = (uint16_t)(value >> 16);
     *ptr = (value & 0xFFFF);
+#endif
 }
 
 static void timer_set(uint32_t value, short timer)
@@ -71,7 +138,7 @@ static void timer_set(uint32_t value, short timer)
 
 void timer_unset(short timer)
 {
-    volatile unsigned int *ptr = &CNT_COMP_BASE_REG + (timer);
+    volatile unsigned int *ptr = get_comparator_reg_for_msp430_timer(timer);
     timer_disable_interrupt(timer);
     *ptr = 0;
 }
