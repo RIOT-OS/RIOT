@@ -18,8 +18,6 @@
 
 void (*int_handler)(int);
 extern void timerA_init(void);
-volatile uint16_t overflow_interrupt[HWTIMER_MAXTIMERS+1];
-volatile uint16_t timer_round;
 
 #ifdef CC430
   /* CC430 have "TimerA0", "TimerA1" and so on... */
@@ -55,7 +53,6 @@ static void timer_set_nostart(uint32_t value, short timer)
     if (value <= hwtimer_arch_now()) {
         value = hwtimer_arch_now() + 2;
     }
-    overflow_interrupt[timer] = (uint16_t)(value >> 16);
     *ptr = (value & 0xFFFF);
 }
 
@@ -75,7 +72,7 @@ void timer_unset(short timer)
 
 unsigned long hwtimer_arch_now(void)
 {
-    return ((uint32_t)timer_round << 16) + TIMER_VAL_REG;
+    return (TIMER_VAL_REG & 0xffff);
 }
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
