@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Automatically enable/disable ENABLE_DEBUG based on CBOR_NO_PRINT
+/* Automatically enable/disable ENABLE_DEBUG based on CBOR_NO_PRINT */
 #ifndef CBOR_NO_PRINT
 #define ENABLE_DEBUG 1
 #include "debug.h"
@@ -933,8 +933,8 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
             unsigned char tag = CBOR_ADDITIONAL_INFO(stream, offset);
 
             switch (tag) {
-                    // Non-native builds likely don't have support for ctime (hence disable it there)
-                    // TODO: Better check for availability of ctime functions?
+                    /* Non-native builds likely don't have support for ctime (hence disable it there)
+                     * TODO: Better check for availability of ctime functions? */
 #ifndef CBOR_NO_CTIME
                 case CBOR_DATETIME_STRING_FOLLOWS: {
                     char buf[64];
@@ -978,8 +978,8 @@ static size_t cbor_stream_decode_at(cbor_stream_t *stream, size_t offset, int in
         }
     }
 
-    // if we end up here, we weren't able to parse the current byte
-    // let's just skip this (and the next one as well if required)
+    /* if we end up here, we weren't able to parse the current byte
+     * let's just skip this (and the next one as well if required) */
     return cbor_stream_decode_skip(stream, offset);
 
 #undef DESERIALIZE_AND_PRINT
