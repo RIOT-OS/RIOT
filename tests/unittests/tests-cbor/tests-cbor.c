@@ -47,11 +47,11 @@ static void my_cbor_print(const cbor_stream_t *stream)
         printf("  Expected data    : "); my_cbor_print(&tmp); printf("\n"); \
         TEST_FAIL("Test failed"); \
     } \
-} while(0)
+} while (0)
 
 #define CBOR_CHECK_DESERIALIZED(expected_value, actual_value, comparator_function) do { \
     TEST_ASSERT(comparator_function(expected_value, actual_value)); \
-} while(0)
+} while (0)
 
 /* Macro for checking PODs (int, float, ...) */
 #define CBOR_CHECK(type, function_suffix, stream, input, expected_value, comparator) do { \
@@ -63,7 +63,7 @@ static void my_cbor_print(const cbor_stream_t *stream)
     cbor_stream_t tmp = {data, sizeof(data), sizeof(data)}; \
     TEST_ASSERT(cbor_deserialize_##function_suffix(&tmp, 0, &buffer)); \
     CBOR_CHECK_DESERIALIZED(input, buffer, comparator); \
-} while(0)
+} while (0)
 
 #define HEX_LITERAL(...) {__VA_ARGS__}
 
