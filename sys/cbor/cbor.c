@@ -694,6 +694,8 @@ size_t cbor_deserialize_date_time(const cbor_stream_t *stream, size_t offset, st
         return 0;
     }
 
+    val->tm_isdst = -1; /* not set by strptime(), undefined in CBOR */
+
     if (mktime(val) == -1) {
         return 0;
     }
