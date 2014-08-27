@@ -22,6 +22,7 @@ install:
     - sudo apt-get install pcregrep libpcre3
     - sudo apt-get install qemu-system-x86 python3
     - sudo apt-get install g++-multilib
+    - sudo apt-get install gcc-avr binutils-avr avr-libc
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
 

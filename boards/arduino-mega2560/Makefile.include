@@ -1,0 +1,43 @@
+
+# define the cpu used by the arduino mega2560 board
+export CPU = atmega2560
+
+# define tools used for building the project
+export PREFIX = avr-
+export CC = $(PREFIX)gcc
+export CXX = $(PREFIX)c++
+export AR = $(PREFIX)ar
+export AS = $(PREFIX)as
+export LINK = $(PREFIX)gcc
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
+export TERMFLAGS = -b 38400 -p $(PORT)
+
+#define the flash-tool and default port depending on the host operating system
+OS = $(shell uname)
+ifeq ($(OS),Linux)
+  PORT ?= /dev/ttyACM0
+  FLASHER = avrdude
+#else ifeq ($(OS),Darwin)
+#  PORT ?=
+#  FLASHER =
+else
+  $(info CAUTION: No flash tool for your host system found!)
+  # TODO: fix for building under windows/MacOS
+endif
+export FLASHER
+export PORT
+
+# define build specific options
+export CPU_USAGE = -mmcu=atmega2560
+export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE)
+export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE)
+export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -static -lgcc -e reset_handler
+# linkerscript specified in cpu/Makefile.include
+#export LINKFLAGS += -T$(LINKERSCRIPT)
+export OFLAGS += -j .text -j .data -O ihex
+export FFLAGS += -p m2560 -c stk500v2 -P $(PORT) -b 115200 -F -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex
+
+# export board specific includes to the global includes-listing
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
