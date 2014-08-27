@@ -372,7 +372,7 @@ static void test_array(void)
         TEST_ASSERT_EQUAL_INT(1, i);
         char buffer[1024];
         offset += cbor_deserialize_byte_string(&stream, offset, buffer, sizeof(buffer));
-        TEST_ASSERT_EQUAL_STRING("a", buffer);
+        TEST_ASSERT_EQUAL_STRING("a", &(buffer[0]));
     }
 }
 
@@ -436,11 +436,11 @@ static void test_map(void)
         offset += cbor_deserialize_int(&stream, offset, &key);
         TEST_ASSERT_EQUAL_INT(1, key);
         offset += cbor_deserialize_byte_string(&stream, offset, value, sizeof(value));
-        TEST_ASSERT_EQUAL_STRING("1", value);
+        TEST_ASSERT_EQUAL_STRING("1", &(value[0]));
         offset += cbor_deserialize_int(&stream, offset, &key);
         TEST_ASSERT_EQUAL_INT(2, key);
         offset += cbor_deserialize_byte_string(&stream, offset, value, sizeof(value));
-        TEST_ASSERT_EQUAL_STRING("2", value);
+        TEST_ASSERT_EQUAL_STRING("2", &(value[0]));
     }
 }
 
