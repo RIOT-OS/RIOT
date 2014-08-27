@@ -726,7 +726,7 @@ void test_stream_decode(void)
     cbor_serialize_date_time_epoch(&stream, rawtime);
 #endif /* CBOR_NO_CTIME */
 
-    // decoder should skip the tag and print 'unsupported' here
+    /* decoder should skip the tag and print 'unsupported' here */
     cbor_write_tag(&stream, 2);
     cbor_serialize_byte_string(&stream, "1");
 #endif /* CBOR_NO_SEMANTIC_TAGGING */
