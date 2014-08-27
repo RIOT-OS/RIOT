@@ -34,6 +34,7 @@ static void my_cbor_print(const cbor_stream_t *stream)
 #ifndef CBOR_NO_PRINT
     cbor_stream_print(stream);
 #else
+    (void)stream;
     printf("<no print support>");
 #endif
 }
