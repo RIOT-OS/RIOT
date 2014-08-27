@@ -49,5 +49,10 @@
 #endif
 /** @} */
 
+/**
+ * @name Length in bytes for reading CPU_ID
+ */
+#define CPUID_ID_LEN                    (8)
+
 #endif /* __CPU_CONF_H */
 /** @} */
