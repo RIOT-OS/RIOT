@@ -45,7 +45,21 @@ int spi_init_master(spi_t spi, spi_conf_t conf, spi_speed_t speed)
     uint32_t mosi_pin, miso_pin, clk_pin, cs_pin, route;
 
     //Default configuration
-    USART_InitSync_TypeDef spi_init = USART_INITSYNC_DEFAULT;
+    //USART_InitSync_TypeDef spi_init = USART_INITSYNC_DEFAULT;
+
+    USART_InitSync_TypeDef spi_init = {
+        .enable         = usartEnable,
+        .refFreq        = 0,
+        .baudrate       = 1000000,
+        .databits       = usartDatabits8,
+        .master         = true,
+        .msbf           = true,
+        .clockMode      = usartClockMode2,
+        .prsRxEnable    = false,
+        .prsRxCh        = usartPrsRxCh0,
+        .autoTx         = false,
+    };
+
     spi_init.baudrate = speed_to_baud(speed);
     spi_init.clockMode = conf_to_cpol(conf);
 
@@ -93,10 +107,8 @@ int spi_init_master(spi_t spi, spi_conf_t conf, spi_speed_t speed)
     USART_InitSync(dev, &spi_init);
 
     // Set route
-    dev->ROUTE |= USART_ROUTE_RXPEN | USART_ROUTE_TXPEN | route;
-
-    // Enable TX and RX
-    USART_Enable(dev, usartEnable);
+    dev->ROUTE = USART_ROUTE_CLKPEN | USART_ROUTE_RXPEN | USART_ROUTE_TXPEN | route;
+    dev->CTRL &= ~(USART_CTRL_AUTOCS);
 
     return 0;
 }
@@ -126,6 +138,9 @@ int spi_transfer_byte(spi_t spi, char out, char *in)
         return -1;
     }
 
+    // Enable TX and RX
+    USART_Enable(dev, usartEnable);
+
     GPIO_PinOutClear(port, pin);
 
     //Send and receive
@@ -137,6 +152,9 @@ int spi_transfer_byte(spi_t spi, char out, char *in)
     }
 
     GPIO_PinOutSet(port, pin);
+    
+    //Disable TX and RX
+    USART_Enable(dev, usartDisable);
 
     return 0;
 }
@@ -166,6 +184,10 @@ int spi_transfer_bytes(spi_t spi, char *out, char *in, unsigned int length)
         return -1;
     }
 
+    // Enable TX and RX
+    USART_Enable(dev, usartEnable);
+
+    //Assert CS (low)
     GPIO_PinOutClear(port, pin);
 
     //Send and receive
@@ -185,7 +207,11 @@ int spi_transfer_bytes(spi_t spi, char *out, char *in, unsigned int length)
         }
     }
 
+    //Deassert CS (high)
     GPIO_PinOutSet(port, pin);
+
+    //Disable TX and RX
+    USART_Enable(dev, usartDisable);
 
     return 0;
 }

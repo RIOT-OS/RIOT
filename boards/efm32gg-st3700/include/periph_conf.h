@@ -123,13 +123,13 @@
 
 /* SPI 0 device configuration */
 #define SPI_1_DEV           USART1
-#define SPI_1_CLKEN()       CMU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_USART1
+#define SPI_1_CLKEN()       CMU_ClockEnable(cmuClock_USART1, true);
 /* SPIE 0 pin configuration */
 #define SPI_1_PORT          gpioPortD
-#define SPI_1_PORT_CLKEN()  CMU->HFPERCLKEN0 |= CMU_HFPERCLKEN0_GPIO
-#define SPI_1_CLK_PIN       2
+#define SPI_1_PORT_CLKEN()  CMU_ClockEnable(cmuClock_GPIO, true)
 #define SPI_1_MOSI_PIN      0
 #define SPI_1_MISO_PIN      1
+#define SPI_1_CLK_PIN       2
 #define SPI_1_CS_PIN        3
 #define SPI_1_ROUTE         USART_ROUTE_LOCATION_LOC1
 
@@ -163,13 +163,13 @@
 
 /* GPIO channel 2 config */
 #define GPIO_2_PORT         gpioPortB
-#define GPIO_2_PIN          9
+#define GPIO_2_PIN          11
 
-/* GPIO channel 2 config */
+/* GPIO channel 3 config */
 #define GPIO_3_PORT         gpioPortB
 #define GPIO_3_PIN          12
 
-///* GPIO channel 2 config */
+///* GPIO channel 4 config */
 #define GPIO_4_PORT         gpioPortD
 #define GPIO_4_PIN          15
 
