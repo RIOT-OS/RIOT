@@ -27,6 +27,9 @@
 
 #include "em_gpio.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 #define GPIO_CLKEN()     CMU_ClockEnable(cmuClock_GPIO, true)
 
 #if GPIO_NUMOF
@@ -827,7 +830,12 @@ void gpio_write(gpio_t dev, int value)
 
 static inline void gpio_irq_handler(gpio_t dev)
 {
-    gpio_config[dev].cb(gpio_config[dev].arg);
+    if(gpio_config[dev].cb != NULL) {
+        gpio_config[dev].cb(gpio_config[dev].arg);
+    } else {
+        DEBUG("gpio_irq_callback(): handler not bound\n");
+    }
+    
     
 }
 
