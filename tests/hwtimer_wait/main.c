@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "board_uart0.h"
 #include "posix_io.h"
@@ -30,13 +31,24 @@
 int main(void)
 {
     puts("This is a regression test for a race condition in hwtimer_wait.");
-    puts("When the race condition is hit, the timer will wait for a very very long time...");
+    puts("When the race condition is hit, the timer will wait for a very very long time.");
 
-    for (unsigned long r = 10000; r > 0; r--) {
-        for (unsigned long i = 256; i; i = i >> 1) {
+    int iterations = 10000;
+    int start_duration = 256;
+
+    long duration = iterations * (
+            /* geometric series */
+            (1 - pow(2,(log2(start_duration) + 1)))
+            / (1 - 2)
+            );
+    printf("The test should take about %li sec.\n", (HWTIMER_TICKS_TO_US(duration)/1000000));
+
+    for (unsigned long r = iterations; r > 0; r--) {
+        for (unsigned long i = start_duration; i; i = i >> 1) {
             hwtimer_wait(i);
         }
     }
     puts("success");
+
     return 0;
 }
