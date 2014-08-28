@@ -104,21 +104,29 @@ int spi_init_master(spi_t spi, spi_conf_t conf, spi_speed_t speed)
 int spi_transfer_byte(spi_t spi, char out, char *in)
 {
     USART_TypeDef *dev;
+    GPIO_Port_TypeDef port;
+    int pin;
 
     switch (spi) {
 #if SPI_0_EN
     case SPI_0:
         dev = SPI_0_DEV;
+        port = SPI_0_PORT;
+        pin = SPI_0_CS_PIN;
         break;
 #endif
 #if SPI_1_EN
     case SPI_1:
         dev = SPI_1_DEV;
+        port = SPI_1_PORT;
+        pin = SPI_1_CS_PIN;
         break;
 #endif
     default:
         return -1;
     }
+
+    GPIO_PinOutClear(port, pin);
 
     //Send and receive
     if (in != NULL) {
@@ -128,27 +136,37 @@ int spi_transfer_byte(spi_t spi, char out, char *in)
         USART_SpiTransfer(dev, out);
     }
 
+    GPIO_PinOutSet(port, pin);
+
     return 0;
 }
 
 int spi_transfer_bytes(spi_t spi, char *out, char *in, unsigned int length)
 {
     USART_TypeDef *dev;
+    GPIO_Port_TypeDef port;
+    int pin;
 
     switch (spi) {
 #if SPI_0_EN
     case SPI_0:
         dev = SPI_0_DEV;
+        port = SPI_0_PORT;
+        pin = SPI_0_CS_PIN;
         break;
 #endif
 #if SPI_1_EN
     case SPI_1:
         dev = SPI_1_DEV;
+        port = SPI_1_PORT;
+        pin = SPI_1_CS_PIN;
         break;
 #endif
     default:
         return -1;
     }
+
+    GPIO_PinOutClear(port, pin);
 
     //Send and receive
     if ((in != NULL) && (out != NULL)) {
@@ -166,6 +184,8 @@ int spi_transfer_bytes(spi_t spi, char *out, char *in, unsigned int length)
             USART_SpiTransfer(dev, out[i]);
         }
     }
+
+    GPIO_PinOutSet(port, pin);
 
     return 0;
 }

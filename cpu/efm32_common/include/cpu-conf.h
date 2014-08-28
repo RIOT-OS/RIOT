@@ -47,7 +47,8 @@
 #define KERNEL_CONF_STACKSIZE_DEFAULT   (1024)
 #endif
 
-#define KERNEL_CONF_STACKSIZE_IDLE      (192)
+//#define KERNEL_CONF_STACKSIZE_IDLE      (192)
+#define KERNEL_CONF_STACKSIZE_IDLE      (512)
 /** @} */
 
 #endif /* __CPU_CONF_H */
