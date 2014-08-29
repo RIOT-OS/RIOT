@@ -25,7 +25,10 @@ export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
 # basic cflags:
-export CFLAGS += -Wall -Wextra -pedantic -m32
+export CFLAGS += -Wall -Wextra -pedantic
+ifeq ($(shell uname -m),x86_64)
+export CFLAGS += -m32
+endif
 ifneq (,$(filter -DDEVELHELP,$(CFLAGS)))
 export CFLAGS += -fstack-protector-all
 endif
@@ -39,7 +42,9 @@ endif
 export CXXUWFLAGS +=
 export CXXEXFLAGS +=
 
+ifeq ($(shell uname -m),x86_64)
 export LINKFLAGS += -m32
+endif
 ifeq ($(shell uname -s),FreeBSD)
 ifeq ($(shell uname -m),amd64)
 export LINKFLAGS += -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32

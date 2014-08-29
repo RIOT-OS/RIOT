@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2013, 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * Copyright (C) 2014 Thomas Eichinger <thomas.eichinger1@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -27,6 +28,47 @@ __native_sig_leave_tramp:
     popfl
 
     ret
+#elif __arm__
+.extern _native_saved_eip
+.extern _native_isr_ctx
+.extern _native_cur_ctx
+.extern _native_in_isr
+
+.globl _native_sig_leave_tramp
+_native_sig_leave_tramp:
+    /* save _native_saved_eip and registers */
+    stmdb   sp!, {r0}
+    ldr     r0, =_native_saved_eip
+    ldr     r0, [r0]
+    stmdb   sp!, {r0-r12}
+    stmdb   sp!, {lr}
+
+    /* exchange r0 and _native_saved_eip */
+    ldr     r0, [sp,#56]
+    ldr     r1, [sp,#4 ]
+    str     r0, [sp,#4 ]
+    str     r1, [sp,#56]
+
+    /* call swapcontext ( _native_cur_ctx, _native_isr_ctx ) */
+    ldr     r2, =_native_cur_ctx
+    ldr     r0, [r2]
+    ldr     r2, =_native_isr_ctx
+    ldr     r1, [r2]
+    bl      swapcontext
+
+    /* reeanble interrupts */
+    bl      eINT
+
+    /* _native_in_isr = 0 */
+    eor     r0, r0, r0
+    ldr     r2, =_native_in_isr
+    str     r0, [r2]
+
+    /* restore registers, jump to (saved) _native_saved_eip */
+    ldmia   sp!, {lr}
+    ldmia   sp!, {r0-r12}
+    ldmia   sp!, {pc}
+
 #else
 .extern $_native_saved_eip
 .extern $_native_isr_ctx
