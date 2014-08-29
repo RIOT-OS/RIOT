@@ -68,7 +68,7 @@ void hwtimer_spin(unsigned long ticks)
 
     unsigned long start = hwtimer_arch_now();
     /* compute destination time, possibly resulting in an overflow */
-    unsigned long stop = start + ticks;
+    unsigned long stop = ((start + ticks) & HWTIMER_MAXTICKS);
 
     /*
      * If there is an overflow (that is: stop time is inferior to start),
