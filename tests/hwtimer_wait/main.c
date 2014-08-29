@@ -34,12 +34,18 @@ int main(void)
     puts("When the race condition is hit, the timer will wait for a very very long time.");
 
     int iterations = 10000;
+    /* `#define I_CHANGED_START_DURATION 1` or update the constant if
+     * you change start_duration */
     int start_duration = 256;
 
     long duration = iterations * (
             /* geometric series */
+#if I_CHANGED_START_DURATION
             (1 - pow(2,(log2(start_duration) + 1)))
             / (1 - 2)
+#else
+            511.0
+#endif
             );
     printf("The test should take about %li sec.\n", (HWTIMER_TICKS_TO_US(duration)/1000000));
 
