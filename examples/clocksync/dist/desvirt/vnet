@@ -1,0 +1,460 @@
+#!/usr/bin/env python2
+
+import os
+import signal
+import string
+import sys
+import time
+import subprocess
+import atexit
+import shlex
+import logging
+
+try:
+    import libvirt
+except:
+    print "libvirt not found, you won't be able to work with qemu"
+import pickle
+from optparse import OptionParser
+
+from desvirt import *
+
+from desvirt.xmltopology import XMLTopology
+
+"""
+Global variables
+"""
+in_testbed = False
+
+topo = None
+macs = None
+taps = None
+pids = None
+
+# if nodes of type 'meshrouter' are defined, we need libvirt
+need_libvirt = False
+
+management_net = vnet.VirtualNet('meshnet0', create=False)
+
+lib_dir = ".desvirt/lib"
+config_dir = ".desvirt"
+
+logger = logging.getLogger("")
+
+class Topology():
+    def __init__(self, name):     
+        self.name = name
+        self.nodes = {}
+        self.nets = {}
+
+def netHandler(name, desc):
+    global topo
+    global options
+    global logger
+    logger.debug("netHandler: New network %s." % name)
+    net = lossnet.LossyNet(name,  create=options.start)
+    net.managed = True
+    topo.nets[name] = net
+    return net
+
+def nicHandler(name, net=None, node=None, mac=None):
+    global topo
+    global options
+    global taps
+    global macs
+    logger.debug("nicHandler: %s:%s, net: %s" % (node.name, name, net.name))
+   
+    if not mac:
+        try:
+            mac = macs[node.name][name]
+            logger.debug("Using persistent mac addr %s." % mac)
+        except NameError:
+            pass
+        except KeyError:
+            pass
+    
+    tap = None
+    logger.debug("looking for nics for node %s" % node.name)
+    if node.name in taps:
+        if name in taps[node.name]:
+            tap = taps[node.name][name]
+            logger.debug("found a nic")
+
+    nic = vif.VirtualInterface(macaddr=mac,nicname=name,node=node,net=net,create=options.start, tap=tap)
+
+    if options.define:
+        macs[node.name][name] = nic.macaddr
+
+    if options.start:
+        logger.debug("add nic for node %s as %s" % (node.name, nic.nicname))
+        taps[node.name][nic.nicname] = nic
+    else:
+        logger.debug("check if %s is in taps" % node.name)
+        if node.name in taps:
+            if nic.nicname in taps[node.name]:
+                nic.tap = taps[node.name][nic.nicname].tap
+
+    return nic
+
+def nodeHandler(name, nodeType, elf_file=None):
+    global topo
+    global taps
+    global management_net
+    global logger
+    global need_libvirt
+    global pids
+
+    logger.debug("nodeHandler: %s of type %s" % (name, nodeType))
+    logger.debug("looking in %s" % str(taps))
+    if not name in taps:
+        taps[name] = {}
+    
+    if not name in macs:
+        macs[name] = {}
+
+    node = vm.VM(name, nodeType, binary=elf_file, vmgroup_name=topo.name)
+
+    if nodeType == "meshrouter":
+        need_libvirt = True
+        # add eth0, bridged to management interface
+        logger.debug("add meshrouter with managment interface")
+        eth0 = nicHandler('eth0', net=management_net, node=node)
+        node.nics.append(eth0)
+        taps[name]['eth0'] = eth0
+
+    topo.nodes[name] = node
+
+    return node
+
+def linkHandler(from_node, from_if, to_node, to_if, channel, rate, loss, delay, uni_directional):
+    global options
+    global topo
+    global taps
+    logger.debug("linkHandler: from: %s:%s to: %s:%s loss: %s delay: %s uni_directional: %s" % (from_node, from_if, to_node, to_if, loss, delay, uni_directional))
+
+    if not options.start:
+        return
+
+    from_tap = taps[from_node][from_if]
+    to_tap = taps[to_node][to_if]
+
+    if to_tap.net.name == from_tap.net.name:
+        net = to_tap.net
+        loss_percent = float(loss) * 100
+        net.add_link(from_tap.tap, to_tap.tap, packet_loss=loss_percent, delay=float(delay))
+        if not uni_directional:
+            net.add_link(to_tap.tap, from_tap.tap, packet_loss=loss_percent, delay=float(delay))
+
+def usage():
+    print("Usage: start_vnet <topology.xml>")
+
+def main():
+    global options
+    global logger
+    conn = None
+    parser = OptionParser()
+    parser.add_option("-d", "--define",
+                        action="store_true", 
+                        dest = "define",
+                        default = False,
+                        help = "set up persistent configuration")
+    parser.add_option("-s", "--start",
+                        action="store_true", 
+                        dest = "start",
+                        default = False,
+                        help = "set up virtual network, start all virtual machines")
+    parser.add_option("-q", "--stop",
+                        action="store_true", 
+                        dest = "stop",
+                        default = False,
+                        help = "stop virtual network, shut down all virtual machines")
+    parser.add_option("-u", "--undefine",
+                        action="store_true", 
+                        dest = "undefine",
+                        default = False,
+                        help = "remove persistent configuration")
+    parser.add_option("-n", "--name",
+                        action="store",
+                        type="string",
+                        dest = "topology_name")
+    parser.add_option("-l", "--list-defined",
+                        action="store_true", 
+                        dest = "list_defined",
+                        default = False,
+                        help = "list all defined networks")
+    parser.add_option("-v", "--verbose",
+                        action="store_true",
+                        dest = "loglevel",
+                        default = False,
+                        help = "increase verbosity")
+
+    (options, args) = parser.parse_args()
+
+    # list defined vnets and exit
+    if options.list_defined:
+        list_defined()
+        sys.exit(0)
+
+    # some sanity checks
+    if options.define:
+        if options.undefine:
+            print("Error: specify only one of \"--define\" and \"--undefine\".")
+            sys.exit(1)
+        if options.stop:
+            print("Error: Cannot define and stop.")
+            sys.exit(1)
+
+    if not options.topology_name:
+            print("Error: No topology name supplied.")
+            sys.exit(1)
+   
+    # configure verbosity
+    if options.loglevel:
+        fmt_str = "%(module)-15s(%(funcName)-15s): %(message)s"
+        logging.basicConfig(level=logging.DEBUG, format=fmt_str)
+    else:
+        fmt_str = "%(module)-15s: %(message)s"
+        logging.basicConfig(level=logging.INFO, format=fmt_str)
+
+    xmlfile = "%s/%s.xml" % (config_dir, options.topology_name)
+    base = options.topology_name
+
+    global topo
+    topo = Topology(base)
+
+    # check for existence of vnet
+    lockfile = "%s/%s.lock" % (lib_dir,base)
+    locked = check_lockfile(lockfile)
+
+    if not locked:
+        if not options.define:
+            logger.error("Network %s is not defined." % topo.name)
+            sys.exit(1)
+    else:
+        if options.define:
+            logger.error("Lockfile %s exists, network is already defined." % (lockfile))
+            sys.exit(1)
+        elif options.start and locked == "running":
+            logger.error("Network already running.")
+            sys.exit(1)
+        elif options.stop and locked != "running":
+            logger.error("Network not running.")
+            sys.exit(1)
+        elif options.undefine and locked == "running" and not options.stop:
+            logger.error("Cannot undefine running network.")
+            sys.exit(1)
+
+    # load information about MAC addresses, tap interfaces and PIDs from file
+    global macs
+    macs = load_statefile("%s/%s.macs" % (lib_dir,base))
+    if not macs:
+        macs = {}
+
+    global taps
+    if options.stop or options.undefine:
+        taps = load_statefile("%s/%s.taps" % (lib_dir,base))
+    if not taps:
+        taps = {}
+
+    global pids
+    if options.stop or options.undefine:
+        pids = load_statefile("%s/%s.pids" % (lib_dir,base))
+    if not pids:
+        pids = {}
+
+    # parse XML file
+    xmltopo = XMLTopology(xmlfile)
+    xmltopo.logger = logger
+    xmltopo.nodeHandler = nodeHandler
+    xmltopo.nicHandler = nicHandler
+    xmltopo.netHandler = netHandler
+    xmltopo.linkHandler = linkHandler
+    
+    xmltopo.parse()
+
+    logger.info("Network Name: %s" % topo.name)
+    
+    if options.define:
+        create_lockfile(lockfile, content="stopped")
+
+        logger.info("Setting up virtual topology %s..." % topo.name)
+        if in_testbed:
+            register_hostnames(topo.name, topo.nodes)
+
+    if options.start:
+        create_lockfile(lockfile, content="running")
+        if need_libvirt:
+            myconn = libvirt.open('qemu:///system')
+        for (name, node) in list(topo.nodes.items()):
+            if node.getType() == "meshrouer":
+                node.define(conn=myconn)
+            else:
+                node.define()
+            node.start()
+            logger.debug("Start VM with PID: %d" % node.vm_instance.pid)
+            if (node and node.vm_instance.pid):
+                logger.debug("Started VM with PID: %d" % node.vm_instance.pid)
+                pids[node.name] = node.vm_instance.pid
+
+    
+    if options.stop:
+        create_lockfile(lockfile, content="stopped")
+        
+        logger.info("Shutting down bridge and links...") 
+        for (name, net) in list(topo.nets.items()):
+            net.delete()
+        if need_libvirt:
+            conn = libvirt.open('qemu:///system')
+        
+        logger.info("Shutting down nodes...")
+        for (name, node) in list(topo.nodes.items()):
+            node.lookup(conn)
+            logger.debug("stopping node %s %s" % (name, str(node.vm_instance)))
+            try:
+                node.vm_instance.pid = pids[name]
+            except AttributeError:
+                logger.warn("%s with %s  has no PID" % (name, elf_file))
+            node.stop()
+            node.undefine(conn)
+    
+        # delay tap deletion by one second, otherwise they are still busy
+        time.sleep(1)
+        for (name, node) in list(topo.nodes.items()):
+            logger.debug("deleting nics from node %s" % (node.name))
+            for nic in node.nics:
+                nic.delete()
+        
+        os.remove("%s/%s.taps" % (lib_dir,base))
+        os.remove("%s/%s.pids" % (lib_dir,base))
+
+        logger.info("Network stopped.")
+
+    if options.undefine:
+        logger.info("Undefining network...")
+        if in_testbed:
+            unregister_hostnames(topo.name)
+        os.remove(lockfile)
+        logger.info("Done.")
+
+    if options.define:
+        save_statefile("%s/%s.macs" % (lib_dir,base), macs)
+
+    if options.start:
+        save_statefile("%s/%s.taps" % (lib_dir,base), taps)
+        save_statefile("%s/%s.pids" % (lib_dir,base), pids)
+
+def load_statefile(filename):
+    content = None
+    try:
+        statefile = open(filename, 'rb')
+        content = pickle.load(statefile)
+        statefile.close()
+        logger.info("Loaded statefile %s." % filename)
+    except IOError:
+        logger.warn("No statefile found: %s." % filename)
+    finally:
+        return content
+
+def taps_dict():
+    global topo
+    taps = {}
+    for (name, node) in list(topo.nodes.items()):
+        node_taps = {}
+        for nic in node.nics:
+            if nic.tap:
+                node_taps[nic.nicname] = nic.tap
+        if len(node_taps):
+            taps[node.fullname] = node_taps
+
+    return taps
+
+def macs_dict():
+    global topo
+    macs = {}
+    
+    for (name, node) in list(topo.nodes.items()):
+        node_macs = {}
+        for nic in node.nics:
+            if nic.macaddr:
+                node_macs[nic.nicname] = nic.macaddr
+
+        if len(node_macs):
+            macs[node.name] = node_macs
+
+    return macs
+
+def save_statefile(filename, content):
+    statefile = open(filename, 'wb')
+    pickle.dump(content, statefile)
+    statefile.close()
+
+def register_hostnames(network_name, nodes):
+    logger.info("Registering hostnames...")
+    netcfg = "%s.netcfg" % network_name
+    netcfg_file = open(netcfg, 'wb')
+
+    for (key, node) in list(nodes.items()):
+        netcfg_file.write("%s %s %s\n" % (node.nics[0].macaddr, node.fullname, node.nics[1].macaddr))
+
+    netcfg_file.close()
+
+    retcode = subprocess.call(shlex.split(("scp -i /home/virt/.ssh/id_rsa %s vmnet@uhu:/testbed/tftpboot/hostnames/" % netcfg).encode('utf-8')))
+
+    if retcode != 0:
+        logger.warn("Error registering hostnames!")
+    else:
+        retcode = update_hostnames()
+        if retcode != 0:
+            logger.warn("Error registering hostnames!")
+    
+def unregister_hostnames(network_name):
+
+    status = subprocess.call(shlex.split("ssh -q -q -oBatchMode=yes -i /home/virt/.ssh/id_rsa vmnet@uhu sudo /testbed/bin/unregister_vnet %s" % (network_name).encode('utf-8')))
+
+    return status
+
+def update_hostnames():
+    return subprocess.call(shlex.split("ssh -q -q -oBatchMode=yes -i /home/virt/.ssh/id_rsa vmnet@uhu sudo /testbed/bin/register_vnet".encode('utf-8')))
+
+
+def check_lockfile(filename):
+    try:
+        state = True
+        f = open(filename, 'r')
+        for line in f:
+            state = line.rstrip()
+            break
+
+        f.close()
+        return state
+    except:
+        return False
+
+def create_lockfile(filename, content=None):
+    try:
+        f = open(filename, 'w')
+        if content:
+            f.write(content)
+        f.close()
+        return
+    except:
+        logger.error("Error: cannot create lockfile %s!" % filename)
+        sys.exit(1)
+
+def list_defined():
+    global lib_dir
+    files = os.listdir(lib_dir.encode('utf-8'))
+    if len(files):
+        print(("%-20s State" % ("Network Name")))
+        print("----------------------------")
+    for name in files:
+        if name.endswith('.lock'):
+            with open("%s/%s" % (lib_dir, name)) as f:
+                for line in f:
+                    state = line.rstrip()
+                    print(("%-20s %s" % (name[:-5],state)))
+                    break
+
+if __name__ == '__main__':
+    main()
+

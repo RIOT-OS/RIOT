@@ -49,6 +49,9 @@ endif
 ifneq (,$(filter pulsesync,$(USEMODULE)))
 	SRC += sc_pulsesync.c
 endif
+ifneq (,$(filter clocksync_eval,$(USEMODULE)))
+	SRC += sc_clocksync_eval.c
+endif
 ifeq ($(CPU),x86)
 	SRC += sc_x86_lspci.c
 endif

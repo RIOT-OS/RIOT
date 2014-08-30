@@ -1,0 +1,237 @@
+#!/usr/bin/env python2
+
+import os
+import xml.dom.minidom, math
+from optparse import OptionParser
+
+"""
+Create the basic XML document
+"""
+def create_basic_xml(identifier, desc, node_desc, radio_nic):
+    
+    dom_impl = xml.dom.minidom.getDOMImplementation()
+    xmldoc = dom_impl.createDocument(None, "topology", None)
+    top_element = xmldoc.documentElement
+    top_element.setAttribute("version", "1")
+
+    net_elem = xmldoc.createElement("net")
+    net_elem.setAttribute("name", identifier)
+    net_elem.setAttribute("description", desc)
+
+    node_types          = xmldoc.createElement("nodeTypes")
+
+    type_mesh_router    = xmldoc.createElement("nodeType")
+    type_mesh_router.setAttribute("name", node_desc)
+
+    node_interfaces     = xmldoc.createElement("interfaces")
+
+    wlan_interface      = xmldoc.createElement("interface")
+    wlan_interface.setAttribute("name", radio_nic[0])
+    wlan_interface.setAttribute("type", radio_nic[1])
+
+    top_element.appendChild(net_elem)
+    net_elem.appendChild(node_types)
+    node_types.appendChild(type_mesh_router)
+    type_mesh_router.appendChild(node_interfaces)
+    node_interfaces.appendChild(wlan_interface)
+
+    return xmldoc
+
+"""
+Create all nodes for XML document
+"""
+def create_nodes(xmldoc, topo_size, node_desc, binary, row_cnt=0, line_cnt=0):
+    node_names = []
+    net_elem = xmldoc.getElementsByTagName("net")[0]
+
+    all_nodes = xmldoc.createElement("nodes")
+    net_elem.appendChild(all_nodes)
+
+    ### create a grid
+    if (row_cnt > 0) and (line_cnt > 0):
+        for i in range(0, row_cnt):
+            for j in range(1, line_cnt+1):
+               node_names.append("%c%i" % (chr(97 + i), j))
+    
+    ### create any other topology
+    else:
+        for i in range(topo_size):
+            node_names.append(str(i))
+
+    for name in node_names:
+        node = xmldoc.createElement("node")
+        node.setAttribute("name", name)
+        node.setAttribute("type", node_desc)
+        node.setAttribute("binary", binary)
+        all_nodes.appendChild(node)
+
+"""
+Create all the links
+"""
+def create_links(xmldoc, topo_size, topo_type, loss_rates, radio_nic, row_cnt=0, line_cnt=0):
+    net_elem = xmldoc.getElementsByTagName("net")[0]
+
+    all_links = xmldoc.createElement("links")
+    net_elem.appendChild(all_links)
+
+    end_node = 0
+    ### topology is a ring or linear
+    if topo_type == "ring":
+        end_node = topo_size
+    elif topo_type == "line":
+        end_node = (topo_size-1)
+
+    if end_node > 0:
+        for i in range(end_node):
+            link = xmldoc.createElement("link")
+            link.setAttribute("from_node", str(i))
+            link.setAttribute("from_if", radio_nic[0])
+            link.setAttribute("to_node", str((i+1)%topo_size))
+            link.setAttribute("to_if", radio_nic[0])
+            link.setAttribute("loss", str(loss_rates['default']))
+            link.setAttribute("broadcast_loss", str(loss_rates['bcast']))
+            link.setAttribute("uni", "false")
+            all_links.appendChild(link)
+
+    ### topology is a grid
+    if topo_type == "grid":
+        for i in range(row_cnt):
+            for j in range(1,line_cnt+1):
+                ### right neighbor, down neighbor, two diagonal neighbors
+                neighbors = [(0, 1), (1, 0), (1, 1), (-1, 1)]
+
+                ### first row (a_)
+                if (i == 0):
+                    neighbors = [(0, 1), (1, 0), (1, 1)]
+                ### last_row
+                if (i == (row_cnt-1)):
+                    neighbors = [(0, 1), (-1, 1)]
+                ### last line
+                if j == (line_cnt):
+                    neighbors = [(1, 0)]
+                ### last row and last line has already all links
+                if (i == (row_cnt-1)) and (j == line_cnt):
+                    neighbors = []
+
+                for n in neighbors:
+
+                    link = xmldoc.createElement("link")
+                    link.setAttribute("from_if", radio_nic[0])
+                    link.setAttribute("to_if", radio_nic[0])
+                    link.setAttribute("broadcast_loss", str(loss_rates['bcast']))
+                    link.setAttribute("uni", "false")
+                    link.setAttribute("from_node", "%c%i" % (chr(97+i), j))
+                   
+                    row_offset = n[0]
+                    line_offset = n[1]
+                    
+                    link.setAttribute("to_node", "%c%i" % (chr(97+i+row_offset), (j+line_offset)))
+                    ### diagonal link
+                    if (row_offset != 0) and (line_offset != 0):
+                        link.setAttribute("loss", str(loss_rates['high']))
+                    ### default
+                    else:
+                        link.setAttribute("loss", str(loss_rates['default']))
+                    
+                    all_links.appendChild(link)
+
+"""
+main function
+"""
+if __name__ == "__main__":
+    parser = OptionParser()
+    parser.add_option("-s", "--size",
+                        type = "int",
+                        dest = "topo_size",
+                        default = 4,
+                        help = "the size of the network")
+    parser.add_option("-t", "--type",
+                        choices = ["grid", "ring", "line"],
+                        dest = "topo_type",
+                        default = "grid",
+                        help = "select type of topology")
+    parser.add_option("-f", "--file",
+                        type = "string",
+                        dest = "xmlfilename",
+                        help = "write xml output to FILE")
+    parser.add_option("-d", "--description",
+                        type = "string",
+                        help = "a short description of the network")
+    parser.add_option("-l", "--loss-rate",
+                        type = "float",
+                        default = 0,
+                        dest = "def_loss_rate",
+                        help = "set the (default) loss rate for a unicast link in percent")
+    parser.add_option("-g", "--high-loss-rate",
+                        type = "float",
+                        default = 0,
+                        dest = "high_loss_rate",
+                        help = "set the loss rate for a diagonal unicast link (only meaningfull for grid topologies) in percent")
+    parser.add_option("-b", "--bcast-loss-rate",
+                        type = "float",
+                        default = 0,
+                        dest = "bcast_loss_rate",
+                        help = "set the loss rate for a broadcast link in percent")
+    parser.add_option("-n", "--node-type",
+                        type = "string",
+                        default = "meshrouter",
+                        dest = "node_desc",
+                        help = "defines the node type (meshrouter or riot_native)")
+    parser.add_option("-r", "--radio-interface",
+                        type = "string",
+                        default = "wlan",
+                        dest = "radio_nic",
+                        help = "the name and type of the radio interface (wlan or ieee802154)")
+    parser.add_option("-e", "--binary-file",
+                        type = "string",
+                        default = "",
+                        dest = "binary",
+                        help = "the binary file for RIOT native")
+    (options, args) = parser.parse_args()
+
+    topo_type   = options.topo_type
+    topo_size   = options.topo_size
+    xmlfilename = options.xmlfilename
+    desc        = options.description
+    node_desc   = options.node_desc
+    if options.radio_nic == "wlan":
+        radio_nic   = ("wlan0", "802.11bg")
+    else:
+        radio_nic   = ("cc2420", "802.15.4")
+
+    loss_rates = dict()
+    loss_rates['default'] = options.def_loss_rate * 0.01
+    loss_rates['high'] = options.high_loss_rate * 0.01
+    loss_rates['bcast'] = options.bcast_loss_rate * 0.01
+
+    row_cnt = line_cnt = 0
+
+    if topo_type == "grid":
+        row_cnt  = int(math.sqrt(topo_size))
+        line_cnt = int(topo_size / row_cnt)
+        topo_size = row_cnt * line_cnt
+
+    if not xmlfilename:
+        if topo_type == "grid":
+            xmlfilename = "%s%ix%i" % (topo_type, line_cnt, row_cnt)
+        else:
+            xmlfilename = "%s%i" % (topo_type, topo_size)
+
+    if not desc:
+        if topo_type == "grid":
+            geom = "%ix%i" % (line_cnt, row_cnt)
+        else:
+            geom = ""
+        desc = "%i nodes in a regular %s %s" % (topo_size, geom, topo_type)
+
+    ### create the xml document
+    identifier = os.path.basename(xmlfilename)
+    xmldoc = create_basic_xml(identifier, desc, node_desc, radio_nic)
+    create_nodes(xmldoc, topo_size, node_desc, options.binary, row_cnt, line_cnt)
+    create_links(xmldoc, topo_size, topo_type, loss_rates, radio_nic, row_cnt, line_cnt)
+
+    ### write xml to file
+    filename = ".desvirt/" + xmlfilename + ".xml"
+    fd = open(filename, 'w')
+    xmldoc.writexml(fd, addindent="    ", newl="\n", encoding="UTF-8")
+    print("created: " + filename)

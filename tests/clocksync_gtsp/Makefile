@@ -2,6 +2,7 @@ APPLICATION = clocksync_gtsp
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_RAM := chronos msb-430h redbee-econotag telosb wsn430-v1_3b wsn430-v1_4 z1
+BOARD_WHITELIST := avsextrem chronos msb-430h msba2 native wsn430-v1_3b
 BOARD_BLACKLIST := arduino-due mbed_lpc1768 msb-430 udoo qemu-i386 stm32f0discovery \
                    stm32f3discovery stm32f4discovery pca10000 pca10005 pttu redbee-econotag \
                    telosb wsn430-v1_4 z1 iot-lab_M3 arduino-mega2560
