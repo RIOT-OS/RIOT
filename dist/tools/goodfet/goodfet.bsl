@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 # Serial Bootstrap Loader software for the MSP430 embedded proccessor.
 #
 # (C) 2001-2003 Chris Liechti <cliechti@gmx.net>

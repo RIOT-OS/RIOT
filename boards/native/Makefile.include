@@ -24,8 +24,11 @@ export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
-# flags:
+# basic cflags:
 export CFLAGS += -Wall -Wextra -pedantic -m32
+ifneq (,$(filter -DDEVELHELP,$(CFLAGS)))
+export CFLAGS += -fstack-protector-all
+endif
 ifeq ($(shell uname -s),FreeBSD)
 ifeq ($(shell uname -m),amd64)
 export CFLAGS += -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
@@ -48,7 +51,10 @@ endif
 
 export ASFLAGS =
 export DEBUGGER_FLAGS = $(ELF)
-term-memcheck: export VALGRIND_FLAGS ?= --track-origins=yes
+term-valgrind: export VALGRIND_FLAGS ?= \
+	--track-origins=yes \
+	--fullpath-after=$(RIOTBASE)/ \
+	--read-var-info=yes
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
 term-gprof: export TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELF)
 all-valgrind: export CFLAGS += -DHAVE_VALGRIND_H -g
@@ -82,6 +88,10 @@ ifneq (,$(filter nativenet,$(USEMODULE)))
 	export PORT ?= tap0
 else
 	export PORT =
+endif
+
+ifeq (,$(filter $(PORT),$(TERMFLAGS)))
+    export TERMFLAGS += $(PORT)
 endif
 
 all: # do not override first target

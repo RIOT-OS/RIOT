@@ -31,10 +31,24 @@ typedef struct __attribute__((packed))
 }
 at86rf231_packet_t;
 
+extern volatile kernel_pid_t transceiver_pid;
+
+#define AT_DRIVER_STATE_DEFAULT     (0)
+#define AT_DRIVER_STATE_SENDING     (1)
+
+/**
+ * @brief To keep state inside of at86rf231 driver
+ * @details This variable is used to determine if a TRX_END IRQ from
+ *          the radio transceiver has to be interpreted as end of
+ *          sending or reception.
+ */
+extern uint8_t driver_state;
+
 void at86rf231_init(kernel_pid_t tpid);
 //void at86rf231_reset(void);
 void at86rf231_rx(void);
 void at86rf231_rx_handler(void);
+void at86rf231_rx_irq(void);
 
 int16_t at86rf231_send(at86rf231_packet_t *packet);
 

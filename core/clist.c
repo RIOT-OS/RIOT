@@ -62,16 +62,19 @@ void clist_remove(clist_node_t **list, clist_node_t *node)
 
 void clist_print(clist_node_t *clist)
 {
-    clist_node_t *start = clist;
+    clist_node_t *start = clist, *node = start;
+    if (!start) {
+        return;
+    }
 
-    while (clist != NULL) {
-        printf("list entry: %u prev=%u next=%u\n", clist->data, clist->prev->data, clist->next->data);
+    do {
+        printf("list entry: %p: prev=%p next=%p\n", clist, clist->prev, clist->next);
         clist = clist->next;
 
         if (clist == start) {
             break;
         }
-    }
+    } while (node != start);
 }
 
 #endif

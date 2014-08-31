@@ -37,7 +37,6 @@
 #define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_5WS
 /** @} */
 
-
 /**
  * @name Timer configuration
  * @{
@@ -65,7 +64,6 @@
 #define TIMER_1_ISR         isr_tim5
 #define TIMER_1_IRQ_CHAN    TIM5_IRQn
 /** @} */
-
 
 /**
  * @name UART configuration
@@ -106,7 +104,6 @@
 #define UART_1_AF           7
 /** @} */
 
-
 /**
  * @name ADC configuration
  * @{
@@ -144,7 +141,6 @@
 #define ADC_1_CH1           12
 #define ADC_1_CH1_PIN       2
 /** @} */
-
 
 /**
  * @name PWM configuration
@@ -186,6 +182,12 @@
 #define PWM_1_PIN_AF        2
 /** @} */
 
+/**
+ * @name Random Number Generator configuration
+ * @{
+ */
+#define RANDOM_NUMOF        (1U)
+/** @} */
 
 /**
  * @name SPI configuration
@@ -259,7 +261,6 @@
 #define I2C_1_SCL_AFCFG()
 #define I2C_1_SDA_AFCFG()
 /** @} */
-
 
 /**
  * @name GPIO configuration

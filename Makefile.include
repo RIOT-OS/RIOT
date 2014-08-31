@@ -35,6 +35,50 @@ endif
 
 BOARD := $(strip $(BOARD))
 
+# provide common external programs for `Makefile.include`s
+
+ifeq (,$(AXEL))
+  ifeq (0,$(shell which axel 2>&1 > /dev/null ; echo $$?))
+    AXEL := $(shell which axel)
+  endif
+endif
+ifeq (,$(WGET))
+  ifeq (0,$(shell which wget 2>&1 > /dev/null ; echo $$?))
+    WGET := $(shell which wget)
+  endif
+endif
+ifeq (,$(CURL))
+  ifeq (0,$(shell which curl 2>&1 > /dev/null ; echo $$?))
+    CURL := $(shell which curl)
+  endif
+endif
+ifeq (,$(WGET)$(CURL))
+  $(error Neither wget nor curl is installed!)
+endif
+
+ifeq (,$(DOWNLOAD_TO_STDOUT))
+  DOWNLOAD_TO_STDOUT := $(if $(CURL),$(CURL) -s,$(WGET) -q -O-)
+endif
+ifeq (,$(DOWNLOAD_TO_FILE))
+  ifneq (,$(AXEL))
+    DOWNLOAD_TO_FILE := $(AXEL) -n 4 -q -a -o
+  else
+    DOWNLOAD_TO_FILE := $(if $(WGET),$(WGET) -nv -c -O,$(CURL) -s -o)
+  endif
+endif
+
+ifeq (,$(UNZIP_HERE))
+  ifeq (0,$(shell which unzip 2>&1 > /dev/null ; echo $$?))
+    UNZIP_HERE := $(shell which unzip) -q
+  else
+    ifeq (0,$(shell which 7z 2>&1 > /dev/null ; echo $$?))
+      UNZIP_HERE := $(shell which 7z) x -bd
+    else
+      $(error Neither unzip nor 7z is installed.)
+    endif
+  endif
+endif
+
 # mandatory includes!
 include $(RIOTBASE)/Makefile.modules
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
@@ -149,7 +193,7 @@ flash: all
 	$(FLASHER) $(FFLAGS)
 
 term:
-	$(TERMPROG) $(TERMFLAGS) $(PORT)
+	$(TERMPROG) $(TERMFLAGS)
 
 doc:
 	make -BC $(RIOTBASE) doc

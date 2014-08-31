@@ -21,6 +21,7 @@
 #include "hwtimer.h"
 #include "sched.h"
 #include "tcb.h"
+#include "kernel_types.h"
 
 /* list of states copied from tcb.h */
 const char *state_names[] = {
@@ -40,7 +41,6 @@ const char *state_names[] = {
 void thread_print_all(void)
 {
     const char queued_name[] = {'_', 'Q'};
-    int i;
 #ifdef DEVELHELP
     int overall_stacksz = 0, overall_used = 0;
 #endif
@@ -56,7 +56,7 @@ void thread_print_all(void)
            "\n"
            , "name", "state");
 
-    for (i = 0; i < MAXTHREADS; i++) {
+    for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
         tcb_t *p = (tcb_t *)sched_threads[i];
 
         if (p != NULL) {

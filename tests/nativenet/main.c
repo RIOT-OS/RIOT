@@ -96,6 +96,8 @@ void *radio(void *arg)
             puts("Unknown packet received");
         }
     }
+
+    return NULL;
 }
 
 void sender(void)

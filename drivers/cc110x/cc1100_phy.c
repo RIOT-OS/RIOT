@@ -1,16 +1,10 @@
-/******************************************************************************
+/*
  * Copyright 2008, Freie Universitaet Berlin (FUB). All rights reserved.
- *
- * These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
- * ----------------------------------------------------------------------------
- *  This file is part of RIOT.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
-*******************************************************************************/
+ */
 
 /**
  * @ingroup     dev_cc110x
@@ -195,9 +189,9 @@ void cc1100_phy_init(void)
 
 void cc1100_phy_mutex_lock(void)
 {
-    if (sched_active_thread->pid != cc1100_mutex_pid) {
+    if (sched_active_pid != cc1100_mutex_pid) {
         mutex_lock(&cc1100_mutex);
-        cc1100_mutex_pid = sched_active_thread->pid;
+        cc1100_mutex_pid = sched_active_pid;
     }
 }
 

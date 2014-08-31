@@ -14,3 +14,6 @@ FORCE:
 sender: CFLAGS += -DSENDER
 sender: APPLICATION = nativenet_sender
 sender: FORCE all
+
+test:
+	./tests/01-tests.py

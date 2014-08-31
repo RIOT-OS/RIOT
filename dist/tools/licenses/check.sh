@@ -22,9 +22,9 @@ done
 
 # select files to check
 if [ -z "${BRANCH}" ]; then
-    FILES="$(git ls-tree -r --full-tree --name-only HEAD | grep -E '\.[sSc]$')"
+    FILES="$(git ls-tree -r --full-tree --name-only HEAD | grep -E '\.([sSch]|cpp)$')"
 else
-    FILES="$(git diff --diff-filter=ACMR --name-only ${BRANCH} | grep -E '\.[sSc]$')"
+    FILES="$(git diff --diff-filter=ACMR --name-only ${BRANCH} | grep -E '\.([sSchp]|cpp)$')"
 fi
 
 # categorize files

@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
  *
- * This file subject to the terms and conditions of the GNU Lesser General
- * Public License. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -138,7 +138,10 @@ int thread_wakeup(kernel_pid_t pid);
  *
  * @return          obviously you are not a golfer.
  */
-kernel_pid_t thread_getpid(void);
+static inline kernel_pid_t thread_getpid(void)
+{
+    return sched_active_pid;
+}
 
 #ifdef DEVELHELP
 /**

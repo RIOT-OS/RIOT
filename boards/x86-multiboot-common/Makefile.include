@@ -1,25 +1,15 @@
 ifeq (, $(NEWLIB_BASE))
   NEWLIB_BASE := $(RIOTBASE)/toolchain/x86/i586-none-elf
+endif
 
-  ifneq (0, $(shell test -e "$(NEWLIB_BASE)/lib/libc.a" && echo $$?))
-    NEWLIB_PRECOMPILED_NAME := i586-newlib_2.1.0_tlsf-1254.tar.bz2
-    NEWLIB_PRECOMPILED := http://download.riot-os.org/$(NEWLIB_PRECOMPILED_NAME)
+ifneq (0, $(shell test -e "$(NEWLIB_BASE)/lib/libc.a" && echo $$?))
+  NEWLIB_PRECOMPILED_NAME := i586-newlib_2.1.0_tlsf-1254.tar.bz2
+  NEWLIB_PRECOMPILED := http://download.riot-os.org/$(NEWLIB_PRECOMPILED_NAME)
 
-    $(warning "Precompiled newlib is missing in $(NEWLIB_BASE)")
-    $(warning "Downloading from $(NEWLIB_PRECOMPILED)")
+  $(warning Precompiled newlib is missing in $(NEWLIB_BASE))
+  $(warning Downloading from $(NEWLIB_PRECOMPILED))
 
-    ifeq (0, $(shell which wget 2>&1 > /dev/null ; echo $$?))
-      DOWNLOAD_TO_STDOUT := $(shell which wget) -qO-
-    else
-      ifeq (0, $(shell which curl 2>&1 > /dev/null ; echo $$?))
-        DOWNLOAD_TO_STDOUT := $(shell which curl) -s
-      else
-        $(error "Neither wget nor curl is installed!")
-      endif
-    endif
-
-    $(shell cd $(RIOTBASE) && $(DOWNLOAD_TO_STDOUT) "$(NEWLIB_PRECOMPILED)" | tar xj)
-  endif
+  $(shell cd $(RIOTBASE) && $(DOWNLOAD_TO_STDOUT) "$(NEWLIB_PRECOMPILED)" | tar xj)
 endif
 
 ifeq (,$(BUILD_INCLUDE_BASE))

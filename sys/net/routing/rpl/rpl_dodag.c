@@ -19,7 +19,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "rpl_dodag.h"
+#include "rpl/rpl_dodag.h"
 #include "trickle.h"
 #include "rpl.h"
 

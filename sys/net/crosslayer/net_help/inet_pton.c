@@ -18,6 +18,10 @@
 #include <string.h>
 #include <stdint.h>
 
+#if defined(MCU_ATMEGA2560)
+#include <sys/types.h>
+#endif
+
 #include "kernel.h"
 
 #include "inet_pton.h"

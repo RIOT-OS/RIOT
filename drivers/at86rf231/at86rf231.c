@@ -1,4 +1,4 @@
-/**
+/*
  * at86rf231.c - Implementation of at86rf231 functions.
  * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
  *
@@ -9,6 +9,19 @@
 
 #include "kernel_types.h"
 #include "transceiver.h"
+
+/**
+ * @ingroup     drivers_at86rf231
+ * @{
+ *
+ * @file        at86rf231.c
+ * @brief       Driver implementation for at86rf231 chip
+ *
+ * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ *
+ * @}
+ */
 
 #include "at86rf231.h"
 #include "at86rf231_arch.h"
@@ -21,6 +34,8 @@ static uint16_t radio_pan;
 static uint8_t  radio_channel;
 static uint16_t radio_address;
 static uint64_t radio_address_long;
+
+uint8_t  driver_state;
 
 void at86rf231_init(kernel_pid_t tpid)
 {
@@ -82,7 +97,7 @@ void at86rf231_switch_to_rx(void)
         vtimer_usleep(10);
 
         if (!--max_wait) {
-            printf("at86rf231 : ERROR : could not enter RX_ON mode");
+            printf("at86rf231 : ERROR : could not enter RX_ON mode\n");
             break;
         }
     }
@@ -91,7 +106,20 @@ void at86rf231_switch_to_rx(void)
 
 void at86rf231_rx_irq(void)
 {
-    at86rf231_rx_handler();
+    /* check if we are in sending state */
+    if (driver_state == AT_DRIVER_STATE_SENDING) {
+        /* Read IRQ to clear it */
+        at86rf231_reg_read(AT86RF231_REG__IRQ_STATUS);
+        /* tx done, listen again */
+        at86rf231_switch_to_rx();
+        /* clear internal state */
+        driver_state = AT_DRIVER_STATE_DEFAULT;
+        return;
+    }
+    else {
+        /* handle receive */
+        at86rf231_rx_handler();
+    }
 }
 
 radio_address_t at86rf231_set_address(radio_address_t address)

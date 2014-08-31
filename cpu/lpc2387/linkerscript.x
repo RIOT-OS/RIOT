@@ -1,13 +1,9 @@
-/******************************************************************************
-Copyright 2013, Freie Universitaet Berlin (FUB). All rights reserved.
-
-These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
--------------------------------------------------------------------------------
-This file is part of RIOT.
-
- * This source code is licensed under the GNU Lesser General Public License,
- * Version 2.  See the file LICENSE for more details.
+/*
+ * Copyright 2013, Freie Universitaet Berlin (FUB). All rights reserved.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /* specify the LPC2387 memory areas (see LPC2387 datasheet page 15)  */

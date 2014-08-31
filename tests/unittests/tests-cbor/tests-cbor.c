@@ -34,6 +34,7 @@ static void my_cbor_print(const cbor_stream_t *stream)
 #ifndef CBOR_NO_PRINT
     cbor_stream_print(stream);
 #else
+    (void)stream;
     printf("<no print support>");
 #endif
 }
@@ -46,11 +47,11 @@ static void my_cbor_print(const cbor_stream_t *stream)
         printf("  Expected data    : "); my_cbor_print(&tmp); printf("\n"); \
         TEST_FAIL("Test failed"); \
     } \
-} while(0)
+} while (0)
 
 #define CBOR_CHECK_DESERIALIZED(expected_value, actual_value, comparator_function) do { \
     TEST_ASSERT(comparator_function(expected_value, actual_value)); \
-} while(0)
+} while (0)
 
 /* Macro for checking PODs (int, float, ...) */
 #define CBOR_CHECK(type, function_suffix, stream, input, expected_value, comparator) do { \
@@ -62,7 +63,7 @@ static void my_cbor_print(const cbor_stream_t *stream)
     cbor_stream_t tmp = {data, sizeof(data), sizeof(data)}; \
     TEST_ASSERT(cbor_deserialize_##function_suffix(&tmp, 0, &buffer)); \
     CBOR_CHECK_DESERIALIZED(input, buffer, comparator); \
-} while(0)
+} while (0)
 
 #define HEX_LITERAL(...) {__VA_ARGS__}
 
@@ -372,7 +373,7 @@ static void test_array(void)
         TEST_ASSERT_EQUAL_INT(1, i);
         char buffer[1024];
         offset += cbor_deserialize_byte_string(&stream, offset, buffer, sizeof(buffer));
-        TEST_ASSERT_EQUAL_STRING("a", buffer);
+        TEST_ASSERT_EQUAL_STRING("a", &(buffer[0]));
     }
 }
 
@@ -436,11 +437,11 @@ static void test_map(void)
         offset += cbor_deserialize_int(&stream, offset, &key);
         TEST_ASSERT_EQUAL_INT(1, key);
         offset += cbor_deserialize_byte_string(&stream, offset, value, sizeof(value));
-        TEST_ASSERT_EQUAL_STRING("1", value);
+        TEST_ASSERT_EQUAL_STRING("1", &(value[0]));
         offset += cbor_deserialize_int(&stream, offset, &key);
         TEST_ASSERT_EQUAL_INT(2, key);
         offset += cbor_deserialize_byte_string(&stream, offset, value, sizeof(value));
-        TEST_ASSERT_EQUAL_STRING("2", value);
+        TEST_ASSERT_EQUAL_STRING("2", &(value[0]));
     }
 }
 
@@ -540,6 +541,7 @@ static void test_date_time(void)
     val.tm_hour = 15;
     val.tm_min = 0;
     val.tm_sec = 0;
+    val.tm_isdst = -1;
     mktime(&val);
     TEST_ASSERT(cbor_serialize_date_time(&stream, &val));
     CBOR_CHECK_SERIALIZED(stream, data, sizeof(data));
@@ -726,7 +728,7 @@ void test_stream_decode(void)
     cbor_serialize_date_time_epoch(&stream, rawtime);
 #endif /* CBOR_NO_CTIME */
 
-    // decoder should skip the tag and print 'unsupported' here
+    /* decoder should skip the tag and print 'unsupported' here */
     cbor_write_tag(&stream, 2);
     cbor_serialize_byte_string(&stream, "1");
 #endif /* CBOR_NO_SEMANTIC_TAGGING */

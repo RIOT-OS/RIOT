@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin
  *
- * This file is subject to the terms and conditions of the GNU Lesser General
- * Public License. See the file LICENSE in the top level directory for more
- * details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -84,16 +84,13 @@
 #include "bitarithm.h"
 #include "tcb.h"
 #include "attributes.h"
-
-#define MAXTHREADS 32 /**< the maximum number of threads to be scheduled */
+#include "kernel_types.h"
 
 /**
  * @def SCHED_PRIO_LEVELS
  * @brief The number of thread priority levels
  */
-#if ARCH_32_BIT
-#define SCHED_PRIO_LEVELS 32
-#else
+#ifndef SCHED_PRIO_LEVELS
 #define SCHED_PRIO_LEVELS 16
 #endif
 
@@ -134,7 +131,7 @@ extern volatile unsigned int sched_context_switch_request;
 /**
  *  Thread table
  */
-extern volatile tcb_t *sched_threads[MAXTHREADS];
+extern volatile tcb_t *sched_threads[KERNEL_PID_LAST + 1];
 
 /**
  *  Currently active thread
@@ -170,7 +167,7 @@ typedef struct {
 /**
  *  Thread statistics table
  */
-extern schedstat sched_pidlist[MAXTHREADS];
+extern schedstat sched_pidlist[KERNEL_PID_LAST + 1];
 
 /**
  *  @brief  Register a callback that will be called on every scheduler run

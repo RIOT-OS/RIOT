@@ -15,13 +15,13 @@ export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export LINKFLAGS = -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
-export FLASHER = goodfet.bsl
+export FLASHER = $(RIOTBASE)/dist/tools/goodfet/goodfet.bsl
 ifeq ($(strip $(PORT)),)
     export PORT = /dev/ttyUSB0
 endif
 export FFLAGS = --z1 -I -c $(PORT) -r -e -p $(HEXFILE)
 export OFLAGS = -O ihex
-export TERMFLAGS += -p
+export TERMFLAGS += -p "$(PORT)"
 
 export INCLUDES += -I $(RIOTCPU)/msp430-common/include -I$(RIOTBOARD)/$(BOARD)/include -I$(RIOTBASE)/drivers/cc2420/include -I$(RIOTBASE)/sys/net/include
 
@@ -35,4 +35,3 @@ ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
 endif
 
 export UNDEF += $(BINDIR)msp430_common/startup.o
-

@@ -16,7 +16,7 @@
 
 #define TEST_CLIST_LEN    (8)
 
-clist_node_t tests_clist_buf[TEST_CLIST_LEN];
+static clist_node_t tests_clist_buf[TEST_CLIST_LEN];
 
 static void set_up(void)
 {
@@ -27,12 +27,9 @@ static void test_clist_add_one(void)
 {
     clist_node_t *list = NULL, *elem = &(tests_clist_buf[0]);
 
-    elem->data = 4435;
-
     clist_add(&list, elem);
 
     TEST_ASSERT_NOT_NULL(list);
-    TEST_ASSERT_EQUAL_INT(4435, list->data);
     TEST_ASSERT(list->next == list);
 }
 
@@ -42,13 +39,10 @@ static void test_clist_add_two(void)
 
     test_clist_add_one();
 
-    elem->data = 56345;
-
     clist_add(&list, elem);
 
     TEST_ASSERT_NOT_NULL(list);
     TEST_ASSERT(list->next == elem);
-    TEST_ASSERT_EQUAL_INT(56345, list->next->data);
     TEST_ASSERT(list->next->next == list);
 }
 

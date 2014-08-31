@@ -1,4 +1,4 @@
-ifneq (, $(filter buildtest, $(MAKECMDGOALS)))
+ifneq (, $(filter buildtest info-concurrency, $(MAKECMDGOALS)))
   ifeq (, $(strip $(NPROC)))
     # Linux (utility program)
     NPROC := $(shell nproc 2>/dev/null)
@@ -17,6 +17,13 @@ ifneq (, $(filter buildtest, $(MAKECMDGOALS)))
     endif
 
     NPROC := $(shell echo $$(($(NPROC) + 1)))
+
+    ifneq (, $(NPROC_MAX))
+      NPROC := $(shell if [ ${NPROC} -gt $(NPROC_MAX) ]; then echo $(NPROC_MAX); else echo ${NPROC}; fi)
+    endif
+    ifneq (, $(NPROC_MIN))
+      NPROC := $(shell if [ ${NPROC} -lt $(NPROC_MIN) ]; then echo $(NPROC_MIN); else echo ${NPROC}; fi)
+    endif
   endif
 endif
 
@@ -179,6 +186,10 @@ info-build:
 	@echo ''
 	@echo 'DEBUGGER:       $(DEBUGGER)'
 	@echo 'DEBUGGER_FLAGS: $(DEBUGGER_FLAGS)'
+	@echo
+	@echo 'DOWNLOAD_TO_FILE:   $(DOWNLOAD_TO_FILE)'
+	@echo 'DOWNLOAD_TO_STDOUT: $(DOWNLOAD_TO_STDOUT)'
+	@echo 'UNZIP_HERE:         $(UNZIP_HERE)'
 	@echo ''
 	@echo 'DEBUGSERVER:       $(DEBUGSERVER)'
 	@echo 'DEBUGSERVER_FLAGS: $(DEBUGSERVER_FLAGS)'
@@ -190,3 +201,6 @@ info-build:
 
 info-boards-supported:
 	@echo "$(BOARDS)"
+
+info-concurrency:
+	@echo "$(NPROC)"

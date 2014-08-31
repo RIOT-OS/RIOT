@@ -40,7 +40,7 @@ volatile int sched_num_threads = 0;
 
 volatile unsigned int sched_context_switch_request;
 
-volatile tcb_t *sched_threads[MAXTHREADS];
+volatile tcb_t *sched_threads[KERNEL_PID_LAST + 1];
 volatile tcb_t *sched_active_thread;
 
 volatile kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
@@ -50,7 +50,7 @@ static uint32_t runqueue_bitcache = 0;
 
 #if SCHEDSTATISTICS
 static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
-schedstat sched_pidlist[MAXTHREADS];
+schedstat sched_pidlist[KERNEL_PID_LAST + 1];
 #endif
 
 void sched_run(void)
@@ -87,10 +87,10 @@ void sched_run(void)
      * since the threading should not be started before at least the idle thread was started.
      */
     int nextrq = bitarithm_lsb(runqueue_bitcache);
-    clist_node_t next = *(sched_runqueues[nextrq]);
-    DEBUG("scheduler: first in queue: %s\n", ((tcb_t *)next.data)->name);
+    my_active_thread = clist_get_container(sched_runqueues[nextrq], tcb_t, rq_entry);
     clist_advance(&(sched_runqueues[nextrq]));
-    my_active_thread = (tcb_t *)next.data;
+    DEBUG("scheduler: first in queue: %s\n", my_active_thread->name);
+    sched_active_pid = (volatile int) my_active_thread->pid;
 
     kernel_pid_t my_next_pid = my_active_thread->pid;
 
@@ -173,7 +173,7 @@ NORETURN void sched_task_exit(void)
     DEBUG("sched_task_exit(): ending task %s...\n", sched_active_thread->name);
 
     dINT();
-    sched_threads[sched_active_thread->pid] = NULL;
+    sched_threads[sched_active_pid] = NULL;
     sched_num_threads--;
 
     sched_set_status((tcb_t *)sched_active_thread, STATUS_STOPPED);

@@ -1,13 +1,10 @@
-/******************************************************************************
-Copyright 2008-2010, Freie Universitaet Berlin (FUB). All rights reserved.
-
-These sources were developed at the Freie Universitaet Berlin, Computer Systems
-and Telematics group (http://cst.mi.fu-berlin.de).
--------------------------------------------------------------------------------
-This file is subject to the terms and conditions of the GNU Lesser
-General Public License v2.1. See the file LICENSE in the top level
-directory for more details.
-*******************************************************************************/
+/*
+ * Copyright 2008-2010, Freie Universitaet Berlin (FUB). All rights reserved.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
 
 /**
  * @file

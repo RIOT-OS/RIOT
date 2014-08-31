@@ -24,6 +24,8 @@ else
     UNIT_TESTS := $(filter tests-%, $(MAKECMDGOALS))
 endif
 
+DISABLE_MODULE += auto_init
+
 # Pull in `Makefile.include`s from the test suites:
 -include $(UNIT_TESTS:%=$(RIOTBASE)/tests/unittests/%/Makefile.include)
 
@@ -32,7 +34,14 @@ BASELIBS += $(UNIT_TESTS:%=$(BINDIR)%.a)
 
 include $(RIOTBASE)/Makefile.include
 
-$(UNIT_TESTS): all
+.PHONY: FORCE $(UNIT_TESTS)
+
+FORCE:
+	touch $(CURDIR)/main.c
+
+all: FORCE
+
+$(UNIT_TESTS): FORCE all
 
 charCOMMA := ,
 

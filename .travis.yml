@@ -1,5 +1,8 @@
 language: c
 
+env:
+    - NPROC_MAX=8
+
 before_install:
     - sudo apt-get install emdebian-archive-keyring
     - echo 'deb http://www.emdebian.org/debian wheezy main' | sudo tee /etc/apt/sources.list.d/emdebian.list > /dev/null
@@ -19,6 +22,7 @@ install:
     - sudo apt-get install pcregrep libpcre3
     - sudo apt-get install qemu-system-x86 python3
     - sudo apt-get install g++-multilib
+    - sudo apt-get install gcc-avr binutils-avr avr-libc
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
 
@@ -27,6 +31,7 @@ install:
     - git log -1 --pretty=format:%H riot/master
 
 script:
+    - make -s -C ./examples/default info-concurrency
     - git rebase riot/master || git rebase --abort
 
     - ./dist/tools/compile_test/compile_test.py
