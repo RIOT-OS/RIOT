@@ -128,7 +128,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     if (out != NULL) {
         DEBUG("out*: %p out: %x length: %x\n", out, *out, length);
         while (length--) {
-            ret += spi_transfer_byte(dev, *(out)++, 0);
+            ret = spi_transfer_byte(dev, *(out)++, 0);
             if (ret <  0) {
                 return ret;
             }
@@ -137,7 +137,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     }
     if (in != NULL) {
         while (length--) {
-            ret += spi_transfer_byte(dev, 0, in++);
+            ret = spi_transfer_byte(dev, 0, in++);
             if (ret <  0) {
                 return ret;
             }
