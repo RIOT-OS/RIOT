@@ -54,7 +54,7 @@ int spi_init_master(spi_t spi, spi_conf_t conf, spi_speed_t speed)
         .databits       = usartDatabits8,
         .master         = true,
         .msbf           = true,
-        .clockMode      = usartClockMode2,
+        .clockMode      = usartClockMode0,
         .prsRxEnable    = false,
         .prsRxCh        = usartPrsRxCh0,
         .autoTx         = false,
