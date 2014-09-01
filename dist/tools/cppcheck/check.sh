@@ -21,5 +21,5 @@ fi
 
 cppcheck --std=c99 --enable=style --force \
     --error-exitcode=2 --inline-suppr --quiet -j 8 \
-    --template "{file}({line}): {severity} ({id}): {message}" \
+    --template "{file}:{line}: {severity} ({id}): {message}" \
     ${@} ${FILES}
