@@ -17,7 +17,7 @@ export OBJDUMP = $(PREFIX)objdump
 
 export FFLAGS = $(CPU_MODEL) bin/$(BOARD)/$(APPLICATION) 0x0000000
 export DEBUGGER_FLAGS = $(CPU_MODEL) bin/$(BOARD)/$(APPLICATION) $(RIOTBOARD)/$(BOARD)/dist/gdb.conf
-export TERMFLAGS = -pF
+export TERMFLAGS = -p /dev/ttyUSB0
 
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm -b 115200
 export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
