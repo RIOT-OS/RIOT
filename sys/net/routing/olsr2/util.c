@@ -21,10 +21,14 @@
 #include <unistd.h>
 #endif
 
+#ifdef ENABLE_DEBUG
+struct netaddr_str nbuf[1];
+#endif
+
 #include "constants.h"
 #include "util.h"
 #include "node.h"
-#include "olsr_debug.h"
+#include "debug.h"
 
 const char *netaddr_to_str_s(struct netaddr_str *dst, const struct netaddr *src)
 {

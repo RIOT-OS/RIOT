@@ -20,11 +20,15 @@
 #include "rfc5444/rfc5444_iana.h"
 #include "rfc5444/rfc5444_reader.h"
 
+#ifdef ENABLE_DEBUG
+struct netaddr_str nbuf[1];
+#endif
+
 #ifdef RIOT
 #include "net_help.h"
 #endif
 
-#include "olsr_debug.h"
+#include "debug.h"
 #include "nhdp.h"
 #include "olsr.h"
 #include "reader.h"

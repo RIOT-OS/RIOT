@@ -15,12 +15,16 @@
 
 #include "nhdp.h"
 #include "util.h"
-#include "olsr_debug.h"
+#include "debug.h"
 #include "node.h"
 #include "routing.h"
 #include "constants.h"
 
 #include "common/avl.h"
+
+#ifdef ENABLE_DEBUG
+struct netaddr_str nbuf[1];
+#endif
 
 static struct olsr_node *_node_replace(struct olsr_node *old_n)
 {
@@ -103,32 +107,3 @@ struct olsr_node *olsr2_add_neighbor(struct netaddr *addr, metric_t metric, uint
 
     return n;
 }
-
-#ifdef ENABLE_DEBUG_OLSR
-void print_neighbors(void)
-{
-    struct olsr_node *node;
-
-    DEBUG("1-hop neighbors:");
-    avl_for_each_element(get_olsr_head(), node, node) {
-        if (node->distance == 1 && node->type == NODE_TYPE_NHDP)
-            DEBUG("\tneighbor: %s (%s) (mpr for [%d|%d] nodes)",
-                  node->name,
-                  netaddr_to_str_s(&nbuf[0], node->addr),
-                  h1_deriv(node)->mpr_neigh_flood,
-                  h1_deriv(node)->mpr_neigh_route);
-    }
-
-    DEBUG("2-hop neighbors:");
-    avl_for_each_element(get_olsr_head(), node, node) {
-        if (node->distance == 2)
-            DEBUG("\t%s (%s) -> %s -> %s (%s)",
-                  node->name, netaddr_to_str_s(&nbuf[0], node->addr),
-                  netaddr_to_str_s(&nbuf[1], node->next_addr),
-                  local_name,
-                  netaddr_to_str_s(&nbuf[2], get_local_addr()));
-    }
-}
-#else
-void print_neighbors(void) {}
-#endif

@@ -18,7 +18,6 @@
 #include "common/netaddr.h"
 
 #include "util.h"
-#include "olsr_debug.h"
 
 #ifdef ENABLE_NAME
 extern char *local_name;

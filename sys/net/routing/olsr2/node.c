@@ -15,7 +15,7 @@
 
 #include "node.h"
 #include <slist.h>
-#include "olsr_debug.h"
+#include "debug.h"
 
 #include "common/netaddr.h"
 #include "rfc5444/rfc5444.h"
@@ -23,13 +23,17 @@
 static struct netaddr_rc local_addr;
 static struct avl_tree olsr_head;
 
+#ifdef ENABLE_DEBUG
+struct netaddr_str nbuf[2];
+#endif
+
 #ifdef ENABLE_NAME
 char *local_name;
 #endif
 
 static void _decrease_mpr_neigh(struct olsr_node *node)
 {
-    TRACE_FUN("%s (%s)", netaddr_to_str_s(&nbuf[0], node->addr), node->name);
+    DEBUGF("%s (%s)", netaddr_to_str_s(&nbuf[0], node->addr), node->name);
 
     /* only consider 2-hop nieghbors (only 2-hop neighbors have flood_mpr set) */
     if (node->flood_mpr == NULL) {
@@ -216,7 +220,7 @@ void pop_other_route(struct olsr_node *node, struct netaddr *last_addr)
 
 void remove_other_route(struct olsr_node *node, struct netaddr *last_addr)
 {
-    TRACE_FUN("%s (%s), %s", netaddr_to_str_s(&nbuf[0], node->addr), node->name,
+    DEBUGF("%s (%s), %s", netaddr_to_str_s(&nbuf[0], node->addr), node->name,
               netaddr_to_str_s(&nbuf[1], last_addr));
 
     char skipped;
