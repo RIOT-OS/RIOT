@@ -83,7 +83,7 @@ void fill_routing_table(void)
     struct free_node *fn;
     bool noop = false;	/* when in an iteration there was nothing removed from free nodes */
 
-    while (head && !noop) {
+    while (head != NULL && !noop) {
         noop = true;	/* if no nodes could be removed in an iteration, abort */
         struct free_node *prev;
         char skipped;
