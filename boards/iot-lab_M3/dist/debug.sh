@@ -17,9 +17,12 @@ openocd -f "${BIN_FOLDER}/${BOARD}_jtag.cfg" \
     -c "reset halt" \
     -l /dev/null &
 
+# save pid to terminate afterwards
+OCD_PID=$?
+
 # needed for openocd to set up
 sleep 5
 
 arm-none-eabi-gdb -tui --command=${1} ${2}
 
-killall openocd
+kill ${OCD_PID}
