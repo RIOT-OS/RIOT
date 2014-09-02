@@ -57,7 +57,7 @@ void *__simple_list_add_head(struct simple_list_elem **head, void *mem)
     return *head;
 }
 
-void *__simple_list_add_before(struct simple_list_elem **head, void *mem, int needle, int offset)
+void *__simple_list_add_before(struct simple_list_elem **head, void *mem, int needle, size_t offset)
 {
     struct simple_list_elem *_head = *head;
     struct simple_list_elem *prev = 0;
@@ -73,7 +73,7 @@ void *__simple_list_add_before(struct simple_list_elem **head, void *mem, int ne
     }
 
     while (_head != NULL) {
-        int *buff = (void *) _head + offset;
+        int *buff = (void *) ((char *) _head + offset);
 
         if (*buff > needle) {
             if (prev != NULL) {
@@ -96,10 +96,10 @@ void *__simple_list_add_before(struct simple_list_elem **head, void *mem, int ne
     return _head;
 }
 
-void *__simple_list_find(struct simple_list_elem *head, void *needle, int offset, size_t size)
+void *__simple_list_find(struct simple_list_elem *head, void *needle, size_t offset, size_t size)
 {
     while (head != NULL) {
-        void **buff = (void *) head + offset;
+        void **buff = (void *) ((char *) head + offset);
 
         if (size == 0 && *buff == needle) {
             return head;
@@ -115,10 +115,10 @@ void *__simple_list_find(struct simple_list_elem *head, void *needle, int offset
     return 0;
 }
 
-void *__simple_list_find_cmp(struct simple_list_elem *head, void *needle, int offset, int compare(void *, void *))
+void *__simple_list_find_cmp(struct simple_list_elem *head, void *needle, size_t offset, int compare(void *, void *))
 {
     while (head != NULL) {
-        void **buff = (void *) head + offset;
+        void **buff = (void *) ((char *) head + offset);
 
         if (compare(*buff, needle) == 0) {
             return head;

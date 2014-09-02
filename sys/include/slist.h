@@ -76,8 +76,8 @@ struct simple_list_elem;
 *					has to be the same name as the element in the list entry structure that is be used for comparison
 * @return	pointer to the new element, NULL if no new list element could be allocated
 */
-#define simple_list_add_before(head, value) *(head) == 0 ? simple_list_add_head((head)) : \
-	__simple_list_add_before((struct simple_list_elem**) (head), calloc(1, sizeof **(head)), value, (void*) &(*(head))->value - (void*) *(head))
+#define simple_list_add_before(head, value) *(head) == NULL ? simple_list_add_head((head)) : \
+	__simple_list_add_before((struct simple_list_elem**) (head), calloc(1, sizeof **(head)), (value), (char*) &(*(head))->value - (char*) *(head))
 
 /**
 * @brief	adds an preallocated list element before an existing one.
@@ -89,8 +89,8 @@ struct simple_list_elem;
 * @param	node	preallocated list element
 * @return	the new list entry (node)
 */
-#define simple_list_set_before(head, node, value) *(head) == 0 ? simple_list_set_head((head), (node)) : \
-	__simple_list_add_before((struct simple_list_elem**) (head), (node), (value), (void*) &(*(head))->value - (void*) *(head))
+#define simple_list_set_before(head, node, value) *(head) == NULL ? simple_list_set_head((head), (node)) : \
+	__simple_list_add_before((struct simple_list_elem**) (head), (node), (value), (char*) &(*(head))->value - (char*) *(head))
 
 /**
 * @brief	searches for a list element by simple comparison of a struct value
@@ -100,8 +100,8 @@ struct simple_list_elem;
 *					has to be the same name as the value in the list element struct
 * @return	pointer the list entry if found, otherwise NULL
 */
-#define simple_list_find(head, value)	(head) == 0 ? NULL : \
-	__simple_list_find((struct simple_list_elem*) (head), (value), (void*) &((head)->value) - (void*) (head), 0)
+#define simple_list_find(head, value)	(head) == NULL ? NULL : \
+	__simple_list_find((struct simple_list_elem*) (head), (value), (char*) &((head)->value) - (char*) (head), 0)
 
 /**
 * @brief	searches for a list element by comparing a buffer in the list element struct
@@ -111,8 +111,8 @@ struct simple_list_elem;
 *					has to be the same name as the value in the list element struct
 * @return	pointer the list entry if found, otherwise NULL
 */
-#define simple_list_find_memcmp(head, value)	(head) == 0 ? NULL : \
-	__simple_list_find((struct simple_list_elem*) (head), (value), (void*) &((head)->value) - (void*) (head), sizeof(*(value)))
+#define simple_list_find_memcmp(head, value)	(head) == NULL ? NULL : \
+	__simple_list_find((struct simple_list_elem*) (head), (value), (char*) &((head)->value) - (char*) (head), sizeof(*(value)))
 
 /**
 * @brief	searches for a list element by applying a comparator function to each list entry
@@ -122,8 +122,8 @@ struct simple_list_elem;
 * @param	comperator	a function that takes (value, node) and returns 0 if they match
 * @return	pointer	the list entry if found, otherwise NULL
 */
-#define simple_list_find_cmp(head, value, comperator)	(head) == 0 ? NULL : \
-	__simple_list_find_cmp((struct simple_list_elem*) (head), (value), (void*) &((head)->value) - (void*) (head), (comperator))
+#define simple_list_find_cmp(head, value, comperator)	(head) == NULL ? NULL : \
+	__simple_list_find_cmp((struct simple_list_elem*) (head), (value), (char*) &((head)->value) - (char*) (head), (comperator))
 
 /**
  * @brief	removes an entry from the list and frees it's memory
@@ -170,7 +170,7 @@ struct simple_list_elem;
  * @param	skipped	internal variable, integer - do not modify
  */
 #define simple_list_for_each_safe(head, node, prev, skipped) \
-        for ((skipped) = 0, (prev) = 0, (node) = (head);     \
+        for ((skipped) = 0, (prev) = NULL, (node) = (head);  \
             (node);                                          \
             (prev) = ((skipped) ? (prev) : (node)),          \
             (node) = ((skipped) ? (node) : (node)->next), (skipped) = 0)
@@ -195,9 +195,9 @@ struct simple_list_elem;
 
 void *__simple_list_add_head(struct simple_list_elem **head, void *mem);
 void *__simple_list_add_tail(struct simple_list_elem **head, void *mem);
-void *__simple_list_add_before(struct simple_list_elem **head, void *mem, int needle, int offset);
-void *__simple_list_find(struct simple_list_elem *head, void *needle, int offset, size_t size);
-void *__simple_list_find_cmp(struct simple_list_elem *head, void *needle, int offset, int compare(void *, void *));
+void *__simple_list_add_before(struct simple_list_elem **head, void *mem, int needle, size_t offset);
+void *__simple_list_find(struct simple_list_elem *head, void *needle, size_t offset, size_t size);
+void *__simple_list_find_cmp(struct simple_list_elem *head, void *needle, size_t offset, int compare(void *, void *));
 void *__simple_list_remove(struct simple_list_elem **head, struct simple_list_elem *node, int keep);
 void  __simple_list_clear(struct simple_list_elem **head);
 
