@@ -29,12 +29,12 @@ void *__simple_list_add_tail(struct simple_list_elem **head, void *mem)
         return NULL;
     }
 
-    if (!_head) {
+    if (_head == NULL) {
         *head = mem;
         return *head;
     }
 
-    while (_head->next) {
+    while (_head->next != NULL) {
         _head = _head->next;
     }
 
@@ -67,16 +67,16 @@ void *__simple_list_add_before(struct simple_list_elem **head, void *mem, int ne
         return NULL;
     }
 
-    if (!_head) {
+    if (_head == NULL) {
         *head = mem;
         return *head;
     }
 
-    while (_head) {
+    while (_head != NULL) {
         int *buff = (void *) _head + offset;
 
         if (*buff > needle) {
-            if (prev) {
+            if (prev != NULL) {
                 prev->next = mem;
                 prev->next->next = _head;
                 return prev->next;
@@ -98,7 +98,7 @@ void *__simple_list_add_before(struct simple_list_elem **head, void *mem, int ne
 
 void *__simple_list_find(struct simple_list_elem *head, void *needle, int offset, size_t size)
 {
-    while (head) {
+    while (head != NULL) {
         void **buff = (void *) head + offset;
 
         if (size == 0 && *buff == needle) {
@@ -117,7 +117,7 @@ void *__simple_list_find(struct simple_list_elem *head, void *needle, int offset
 
 void *__simple_list_find_cmp(struct simple_list_elem *head, void *needle, int offset, int compare(void *, void *))
 {
-    while (head) {
+    while (head != NULL) {
         void **buff = (void *) head + offset;
 
         if (compare(*buff, needle) == 0) {
@@ -135,7 +135,7 @@ void *__simple_list_remove(struct simple_list_elem **head, struct simple_list_el
     struct simple_list_elem *_head = *head;
     struct simple_list_elem *prev = 0;
 
-    while (_head && _head != node) {
+    while (_head != NULL && _head != node) {
         prev = _head;
         _head = _head->next;
     }
@@ -146,7 +146,7 @@ void *__simple_list_remove(struct simple_list_elem **head, struct simple_list_el
     }
 
     /* remove head */
-    if (!prev) {
+    if (prev == NULL) {
         *head = _head->next;
     }
     else {
