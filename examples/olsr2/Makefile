@@ -22,12 +22,9 @@ USEMODULE += config
 USEMODULE += olsr2
 USEMODULE += defaulttransceiver
 
-# on native, use PID as node ID
-ifeq ($(BOARD),native)
-	export CFLAGS += -DUSE_PID
-endif
-ifeq ($(BOARD),msba2)
-	export CFLAGS += -DENABLE_LEDS
+# on msba2 and avsextrem cpuid_get is not implemented
+ifneq (,$(filter $(BOARD), msba2 avsextrem))
+	export CFLAGS += -DENABLE_LEDS -DHAVE_NO_CPUID
 endif
 
 include $(RIOTBASE)/Makefile.include

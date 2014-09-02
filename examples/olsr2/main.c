@@ -26,19 +26,23 @@
 
 #define IF_ID (0)
 
-#if defined(USE_PID)
-#include <unistd.h>
-#include <sys/types.h>
-static uint16_t get_node_id(void) {
-	return getpid();
-}
-#else
+#ifdef HAVE_NO_CPUID
 #include <config.h>
 
-static uint16_t get_node_id(void) {
+static uint32_t get_node_id(void) {
 	return sysconfig.id;
 }
-#endif
+
+#else /* CPU ID availiable */
+#include "cpu-conf.h"
+
+static uint32_t get_node_id(void) {
+	uint32_t cpuid = 0;
+	cpuid_get(&cpuid);
+	return cpuid;
+}
+
+#endif /* get_node_id */
 
 #ifdef ENABLE_NAME
 
