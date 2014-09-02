@@ -33,13 +33,17 @@
 #include "rfc5444/rfc5444_writer.h"
 
 #include "constants.h"
-#include "olsr_debug.h"
+#include "debug.h"
 #include "node.h"
 #include "olsr.h"
 #include "reader.h"
 #include "writer.h"
 
 #include <olsr2/olsr2.h>
+
+#ifdef ENABLE_DEBUG
+struct netaddr_str nbuf[1];
+#endif
 
 static char receive_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
 static char sender_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];

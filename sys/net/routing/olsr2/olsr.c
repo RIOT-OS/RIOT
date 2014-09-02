@@ -23,10 +23,14 @@
 
 #include "olsr.h"
 #include "util.h"
-#include "olsr_debug.h"
+#include "debug.h"
 #include "routing.h"
 #include "constants.h"
 #include <slist.h>
+
+#ifdef ENABLE_DEBUG
+struct netaddr_str nbuf[3];
+#endif
 
 static struct olsr_node *_new_olsr_node(struct netaddr *addr,
                                         uint8_t distance, metric_t metric, uint8_t vtime, char *name)
@@ -64,7 +68,7 @@ static struct olsr_node *_new_olsr_node(struct netaddr *addr,
 
 static void _get_new_flood_mpr(struct netaddr *old_flood_mpr)
 {
-    TRACE_FUN("%s", netaddr_to_str_s(&nbuf[0], old_flood_mpr));
+    DEBUGF("%s", netaddr_to_str_s(&nbuf[0], old_flood_mpr));
     struct olsr_node *node;
     avl_for_each_element(get_olsr_head(), node, node) {
         if (node->distance != 2) {
@@ -111,7 +115,7 @@ static void _get_new_flood_mpr(struct netaddr *old_flood_mpr)
  */
 static void _update_children(struct netaddr *last_addr, struct netaddr *lost_node_addr)
 {
-    TRACE_FUN("%s, %s", netaddr_to_str_s(&nbuf[0], last_addr),
+    DEBUGF("%s, %s", netaddr_to_str_s(&nbuf[0], last_addr),
               netaddr_to_str_s(&nbuf[1], lost_node_addr));
 
     struct olsr_node *node;
@@ -143,7 +147,7 @@ static void _update_children(struct netaddr *last_addr, struct netaddr *lost_nod
 
 static void _olsr_node_expired(struct olsr_node *node)
 {
-    TRACE_FUN();
+    DEBUGF();
 
     remove_default_node(node);
     _update_children(node->addr, NULL);
@@ -155,7 +159,7 @@ static void _olsr_node_expired(struct olsr_node *node)
 
 static void _remove_olsr_node(struct olsr_node *node)
 {
-    TRACE_FUN();
+    DEBUGF();
 
     avl_remove(get_olsr_head(), &node->node);
     remove_free_node(node);
@@ -205,7 +209,7 @@ static bool _route_expired(struct olsr_node *node, struct netaddr *last_addr)
 
 static void _update_link_quality(struct nhdp_node *node)
 {
-    TRACE_FUN("%s", netaddr_to_str_s(&nbuf[0], h1_super(node)->addr));
+    DEBUGF("%s", netaddr_to_str_s(&nbuf[0], h1_super(node)->addr));
 
     if (_route_expired(h1_super(node), get_local_addr())) {
         node->link_quality = node->link_quality * (1 - OLSR2_HYST_SCALING);
@@ -443,10 +447,9 @@ void print_routing_graph(void) {}
 
 void print_topology_set(void)
 {
-#ifndef ENABLE_DEBUG_OLSR
-    struct netaddr_str nbuf[3];
+#ifndef ENABLE_DEBUG
+	struct netaddr_str nbuf[3];
 #endif
-
     struct alt_route *route;
     struct olsr_node *node;
 

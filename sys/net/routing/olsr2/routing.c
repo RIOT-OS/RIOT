@@ -14,9 +14,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifdef ENABLE_DEBUG
+struct netaddr_str nbuf[3];
+#endif
+
 #include "olsr.h"
 #include <slist.h>
-#include "olsr_debug.h"
+#include "debug.h"
 #include "util.h"
 #include "routing.h"
 #include "constants.h"
