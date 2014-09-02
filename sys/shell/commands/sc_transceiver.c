@@ -239,8 +239,9 @@ void _transceiver_send_handler(int argc, char **argv)
     p.frame.payload = (uint8_t*) text_msg;
     p.frame.payload_len = strlen(text_msg) + 1;
     p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
+    p.frame.fcf.src_addr_m = IEEE_802154_SHORT_ADDR_M;
     memset(p.frame.dest_addr, 0, sizeof(p.frame.dest_addr));
-    p.frame.dest_addr[7] = atoi(argv[1]);
+    p.frame.dest_addr[0] = atoi(argv[1]);
 #else
     p.data = (uint8_t *) text_msg;
     p.length = strlen(text_msg) + 1;

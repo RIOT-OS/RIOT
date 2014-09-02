@@ -60,7 +60,7 @@
 #include "ieee802154_frame.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 #undef TRANSCEIVER_STACK_SIZE
