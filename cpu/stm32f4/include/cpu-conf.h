@@ -23,6 +23,8 @@
 
 #ifdef CPU_MODEL_STM32F407VG
 #include "stm32f407xx.h"
+#elif defined CPU_MODEL_STM32F415RG
+#include "stm32f415xx.h"
 #endif
 
 /**
