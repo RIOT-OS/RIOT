@@ -37,6 +37,7 @@
 #include "thread.h"
 
 static int _msg_receive(blip_t *m, int block);
+static int _blip_send(blip_t *m, kernel_pid_t target_pid, bool block);
 
 
 static int queue_msg(tcb_t *target, blip_t *m)
@@ -51,7 +52,15 @@ static int queue_msg(tcb_t *target, blip_t *m)
     return 0;
 }
 
-int blip_send(blip_t *m, kernel_pid_t target_pid, bool block)
+int blip_send(blip_t *m, kernel_pid_t target_pid) {
+    return _blip_send(m, target_pid, true);
+}
+
+int blip_try_send(blip_t *m, kernel_pid_t target_pid) {
+    return _blip_send(m, target_pid, false);
+}
+
+static int _blip_send(blip_t *m, kernel_pid_t target_pid, bool block)
 {
     if (inISR()) {
         return blip_send_int(m, target_pid);

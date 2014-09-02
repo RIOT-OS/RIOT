@@ -56,7 +56,7 @@ typedef struct msg {
 
 
 /**
- * @brief Send a message.
+ * @brief Send a message. (blocking)
  *
  * This function sends a message to another thread. The ``blip_t`` structure has
  * to be allocated (e.g. on the stack) before calling the function and can be
@@ -66,8 +66,25 @@ typedef struct msg {
  * @param[in] m             Pointer to preallocated ``blip_t`` structure, must
  *                          not be NULL.
  * @param[in] target_pid    PID of target thread
- * @param[in] block         If not 0 and receiver is not receive-blocked,
- *                          function will block. If not, function returns.
+ *
+ * @return 1, if sending was successful (message delivered directly or to a
+ *         queue)
+ * @return 0, if called from ISR and receiver is not waiting or has a full message queue
+ * @return -1, on error (invalid PID)
+ */
+int blip_send(blip_t *m, kernel_pid_t target_pid);
+
+
+/**
+ * @brief Send a message. (non-blocking)
+ *
+ * This function sends a message to another thread. The ``blip_t`` structure has
+ * to be allocated (e.g. on the stack) before calling the function and can be
+ * freed afterwards. This function will never block.
+ *
+ * @param[in] m             Pointer to preallocated ``blip_t`` structure, must
+ *                          not be NULL.
+ * @param[in] target_pid    PID of target thread
  *
  * @return 1, if sending was successful (message delivered directly or to a
  *         queue)
@@ -75,7 +92,7 @@ typedef struct msg {
  *         ``block == 0``
  * @return -1, on error (invalid PID)
  */
-int blip_send(blip_t *m, kernel_pid_t target_pid, bool block);
+int blip_try_send(blip_t *m, kernel_pid_t target_pid);
 
 
 /**
