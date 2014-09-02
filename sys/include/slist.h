@@ -169,11 +169,11 @@ struct simple_list_elem;
  * @param	prev 	internal variable, pointer to previous list entry - do not modify
  * @param	skipped	internal variable, integer - do not modify
  */
-#define simple_list_for_each_safe(head, node, prev, skipped)	\
-		for ((skipped) = 0, (prev) = 0, (node) = (head);\
-			(node);					\
-			(prev) = ((skipped) ? (prev) : (node)),	\
-			(node) = ((skipped) ? (node) : (node)->next), (skipped) = 0)
+#define simple_list_for_each_safe(head, node, prev, skipped) \
+        for ((skipped) = 0, (prev) = 0, (node) = (head);     \
+            (node);                                          \
+            (prev) = ((skipped) ? (prev) : (node)),          \
+            (node) = ((skipped) ? (node) : (node)->next), (skipped) = 0)
 
 /**
  * @brief	removes an element in a simple_list_for_each_safe context
@@ -182,15 +182,16 @@ struct simple_list_elem;
  * @param	node 	pointer to the current entry (loop variable)
  * @param	prev 	internal variable, provided by simple_list_for_each_safe
  */
-#define simple_list_for_each_remove(head, node, prev)	do {	\
-	if (!prev) {				\
-		(skipped) = 1;			\
-		*(head) = (*(head))->next;	\
-	} else					\
-		(prev)->next = (node)->next;	\
-	free(node);				\
-	(node) = (prev) ? (prev) : *(head);	\
-	} while (0)
+#define simple_list_for_each_remove(head, node, prev)	do { \
+    if (!prev) {                        \
+        (skipped) = 1;                  \
+        *(head) = (*(head))->next;      \
+    } else {                            \
+        (prev)->next = (node)->next;    \
+    }                                   \
+    free(node);                         \
+    (node) = (prev) ? (prev) : *(head); \
+    } while (0)
 
 void *__simple_list_add_head(struct simple_list_elem **head, void *mem);
 void *__simple_list_add_tail(struct simple_list_elem **head, void *mem);

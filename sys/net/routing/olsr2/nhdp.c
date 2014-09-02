@@ -39,7 +39,7 @@ static struct olsr_node *_node_replace(struct olsr_node *old_n)
     bool _free_node = remove_free_node(old_n);
 
     memcpy(new_n, old_n, sizeof(struct olsr_node));
-    memset(&new_n->node, 0, sizeof(new_n->node));	// just to be sure
+    memset(&new_n->node, 0, sizeof(new_n->node));
 
     new_n->type = NODE_TYPE_NHDP;
     new_n->node.key = new_n->addr;
@@ -81,6 +81,7 @@ struct olsr_node *olsr2_add_neighbor(struct netaddr *addr, metric_t metric, uint
         n->link_metric = metric;
         h1_deriv(n)->link_quality = OLSR2_HYST_SCALING;
         n->pending = 1;
+
 #ifdef ENABLE_NAME
 
         if (name != NULL) {
