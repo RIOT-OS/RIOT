@@ -205,10 +205,10 @@ void _nativenet_handle_packet(radio_packet_t *packet)
     /* notify transceiver thread if any */
     if (_native_net_tpid != KERNEL_PID_UNDEF) {
         DEBUG("_nativenet_handle_packet: notifying transceiver thread!\n");
-        msg_t m;
+        blip_t m;
         m.type = (uint16_t) RCV_PKT_NATIVE;
         m.content.value = rx_buffer_next;
-        msg_send_int(&m, _native_net_tpid);
+        blip_send_int(&m, _native_net_tpid);
     }
     else {
         DEBUG("_nativenet_handle_packet: no one to notify =(\n");

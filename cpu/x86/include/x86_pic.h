@@ -118,7 +118,7 @@ void x86_init_pic(void);
  * @param   irq_num   IRQ line in question.
  *
  * This callback is called out of the interrupt handler (inISR() == true).
- * Lengthy operations should be handled in a dedicated thread; use msg_send_int().
+ * Lengthy operations should be handled in a dedicated thread; use blip_send_int().
  * You must no enable interrupt inside the handler.
  */
 typedef void (*x86_irq_handler_t)(uint8_t irq_num);

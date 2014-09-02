@@ -36,13 +36,13 @@ void *thread1(void *arg)
     puts("THREAD 1 start\n");
 
     for (int i = 0; i < 3; ++i) {
-        msg_t msg, reply;
+        blip_t msg, reply;
 
-        msg_receive(&msg);
+        blip_receive(&msg);
         printf("T1 recv: %" PRIu32 "(i=%d)\n", msg.content.value, i);
 
         msg.content.value = i;
-        msg_send_receive(&msg, &reply, p2);
+        blip_send_receive(&msg, &reply, p2);
         printf("T1 got reply: %" PRIu32 " (i=%d)\n", reply.content.value, i);
     }
 
@@ -56,12 +56,12 @@ void *thread2(void *arg)
     puts("THREAD 2\n");
 
     for (int i = 0;; ++i) {
-        msg_t msg, reply;
+        blip_t msg, reply;
 
-        msg_receive(&msg);
+        blip_receive(&msg);
         printf("T2 got %" PRIu32 " (i=%d)\n", msg.content.value, i);
         reply.content.value = msg.content.value;
-        msg_reply(&msg, &reply);
+        blip_reply(&msg, &reply);
     }
 
     return NULL;
@@ -73,10 +73,10 @@ void *thread3(void *arg)
     puts("THREAD 3\n");
 
     for (int i = 0;; ++i) {
-        msg_t msg;
+        blip_t msg;
         msg.content.value = i;
         printf("T3 i=%d\n", i);
-        msg_send(&msg, p1, 1);
+        blip_send(&msg, p1, 1);
     }
     return NULL;
 }

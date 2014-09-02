@@ -38,9 +38,9 @@ static void *first_thread(void *arg)
 
     puts("1st starting.");
     for (unsigned i = 0; i < LIMIT; ++i) {
-        msg_t m;
+        blip_t m;
         m.content.value = i;
-        msg_send_receive(&m, &m, pids[1]);
+        blip_send_receive(&m, &m, pids[1]);
 
         DEBUG("%u: Got msg with content %i\n", i, m.content.value);
         if (m.content.value != i + 1) {
@@ -59,20 +59,20 @@ static void *second_thread(void *arg)
 
     puts("2nd starting.");
     while (1) {
-        msg_t m1;
-        msg_receive(&m1);
+        blip_t m1;
+        blip_receive(&m1);
         DEBUG("2nd: got msg from %" PRIkernel_pid ": %i\n", m1.sender_pid, m1.content.value);
 
-        msg_t m2;
+        blip_t m2;
         m2.content.value = m1.content.value + 1;
-        msg_send_receive(&m2, &m2, pids[2]);
+        blip_send_receive(&m2, &m2, pids[2]);
         if (m2.content.value != m1.content.value) {
             puts("ERROR. 2nd");
             return NULL;
         }
 
         ++m1.content.value;
-        msg_reply(&m1, &m1);
+        blip_reply(&m1, &m1);
         if (m1.content.value == LIMIT) {
             break;
         }
@@ -88,12 +88,12 @@ static void *third_thread(void *arg)
 
     puts("3rd starting.");
     while (1) {
-        msg_t m;
-        msg_receive(&m);
+        blip_t m;
+        blip_receive(&m);
         DEBUG("3rd: got msg from %" PRIkernel_pid ": %i\n", m.sender_pid, m.content.value);
 
         --m.content.value;
-        msg_reply(&m, &m);
+        blip_reply(&m, &m);
 
         if (m.content.value == LIMIT - 1) {
             break;

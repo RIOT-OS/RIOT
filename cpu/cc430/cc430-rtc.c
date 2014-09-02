@@ -193,9 +193,9 @@ interrupt(RTC_VECTOR) __attribute__((naked)) rtc_isr(void)
         }
 
         if (rtc_second_pid != KERNEL_PID_UNDEF) {
-            static msg_t m;
+            static blip_t m;
             m.type = RTC_SECOND;
-            msg_send_int(&m, rtc_second_pid);
+            blip_send_int(&m, rtc_second_pid);
         }
     }
     /* RTC alarm */

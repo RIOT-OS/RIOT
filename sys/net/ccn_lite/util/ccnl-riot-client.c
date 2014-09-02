@@ -64,14 +64,14 @@ int ccnl_riot_client_get(kernel_pid_t relay_pid, char *name, char *reply_buf)
         rmsg.payload = interest_pkg;
         rmsg.size = interest_len;
 
-        msg_t m, rep;
+        blip_t m, rep;
         m.content.ptr = (char *) &rmsg;
         m.type = CCNL_RIOT_MSG;
-        msg_send(&m, relay_pid, 1);
+        blip_send(&m, relay_pid, 1);
 
         /* ######################################################################### */
 
-        msg_receive(&rep);
+        blip_receive(&rep);
         free(interest_pkg);
         if (rep.type == CCNL_RIOT_NACK) {
             /* network stack was not able to fetch this chunk */
@@ -127,15 +127,15 @@ int ccnl_riot_client_new_face(kernel_pid_t relay_pid, char *type, char *faceid,
     rmsg.payload = reply_buf;
     rmsg.size = len;
 
-    msg_t m, rep;
+    blip_t m, rep;
     m.content.ptr = (char *) &rmsg;
     m.type = CCNL_RIOT_MSG;
     DEBUGMSG(1, "  sending face req to relay\n");
-    msg_send(&m, relay_pid, 1);
+    blip_send(&m, relay_pid, 1);
 
     /* ######################################################################### */
 
-    msg_receive(&rep);
+    blip_receive(&rep);
     DEBUGMSG(1, "  received reply from relay\n");
     riot_ccnl_msg_t *rmsg_reply = (riot_ccnl_msg_t *) rep.content.ptr;
     memcpy(reply_buf, rmsg_reply->payload, rmsg_reply->size);
@@ -156,15 +156,15 @@ int ccnl_riot_client_register_prefix(kernel_pid_t relay_pid, char *prefix, char 
     rmsg.payload = reply_buf;
     rmsg.size = len;
 
-    msg_t m, rep;
+    blip_t m, rep;
     m.content.ptr = (char *) &rmsg;
     m.type = CCNL_RIOT_MSG;
     DEBUGMSG(1, "  sending prefix req to relay\n");
-    msg_send(&m, relay_pid, 1);
+    blip_send(&m, relay_pid, 1);
 
     /* ######################################################################### */
 
-    msg_receive(&rep);
+    blip_receive(&rep);
     DEBUGMSG(1, "  received reply from relay\n");
     riot_ccnl_msg_t *rmsg_reply = (riot_ccnl_msg_t *) rep.content.ptr;
     memcpy(reply_buf, rmsg_reply->payload, rmsg_reply->size);

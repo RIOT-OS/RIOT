@@ -35,7 +35,7 @@
 #define APPSERVER_MSG_BUFFER_SIZE (64)
 
 /** message buffer */
-msg_t msg_buffer_appserver[APPSERVER_MSG_BUFFER_SIZE];
+blip_t msg_buffer_appserver[APPSERVER_MSG_BUFFER_SIZE];
 
 kernel_pid_t relay_pid = KERNEL_PID_UNDEF;
 char prefix[] = "/riot/appserver/";
@@ -47,12 +47,12 @@ static int appserver_sent_content(uint8_t *buf, int len, kernel_pid_t from)
     rmsg.size = len;
     DEBUGMSG(1, "datalen=%d\n", rmsg.size);
 
-    msg_t m;
+    blip_t m;
     m.type = CCNL_RIOT_MSG;
     m.content.ptr = (char *) &rmsg;
     kernel_pid_t dest_pid = from;
     DEBUGMSG(1, "sending msg to pid=%" PRIkernel_pid "\n", dest_pid);
-    int ret = msg_send(&m, dest_pid, 1);
+    int ret = blip_send(&m, dest_pid, 1);
     DEBUGMSG(1, "msg_reply returned: %d\n", ret);
     return ret;
 }
@@ -122,12 +122,12 @@ static void riot_ccnl_appserver_ioloop(void)
         DEBUGMSG(1, "msg init queue failed...abording\n");
     }
 
-    msg_t in;
+    blip_t in;
     riot_ccnl_msg_t *m;
 
     while (1) {
         DEBUGMSG(1, "appserver: waiting for incomming msg\n");
-        msg_receive(&in);
+        blip_receive(&in);
 
         switch (in.type) {
             case (CCNL_RIOT_MSG):

@@ -43,7 +43,7 @@ static int min(int a, int b)
 
 void chardev_loop(ringbuffer_t *rb)
 {
-    msg_t m;
+    blip_t m;
 
     kernel_pid_t pid = thread_getpid();
 
@@ -53,7 +53,7 @@ void chardev_loop(ringbuffer_t *rb)
     puts("UART0 thread started.");
 
     while (1) {
-        msg_receive(&m);
+        blip_receive(&m);
 
         if (m.sender_pid != pid) {
             DEBUG("Receiving message from another thread: ");
@@ -70,7 +70,7 @@ void chardev_loop(ringbuffer_t *rb)
                         m.content.value = -EBUSY;
                     }
 
-                    msg_reply(&m, &m);
+                    blip_reply(&m, &m);
                     break;
 
                 case READ:
@@ -78,7 +78,7 @@ void chardev_loop(ringbuffer_t *rb)
                     if (m.sender_pid != reader_pid) {
                         m.content.value = -EINVAL;
                         r = NULL;
-                        msg_reply(&m, &m);
+                        blip_reply(&m, &m);
                     }
                     else {
                         r = (struct posix_iop_t *)(void*)m.content.ptr;
@@ -98,13 +98,13 @@ void chardev_loop(ringbuffer_t *rb)
                         m.content.value = -EINVAL;
                     }
 
-                    msg_reply(&m, &m);
+                    blip_reply(&m, &m);
                     break;
 
                 default:
                     DEBUG("UNKNOWN\n");
                     m.content.value = -EINVAL;
-                    msg_reply(&m, &m);
+                    blip_reply(&m, &m);
             }
         }
 
@@ -120,7 +120,7 @@ void chardev_loop(ringbuffer_t *rb)
             m.type = OPEN;
             m.content.ptr = (char *)r;
 
-            msg_reply(&m, &m);
+            blip_reply(&m, &m);
 
             r = NULL;
             restoreIRQ(state);

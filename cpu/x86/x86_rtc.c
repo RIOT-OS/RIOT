@@ -47,30 +47,30 @@ static kernel_pid_t alarm_pid = KERNEL_PID_UNDEF, periodic_pid = KERNEL_PID_UNDE
 static void alarm_callback_default(uint8_t reg_c)
 {
     if (alarm_pid != KERNEL_PID_UNDEF) {
-        msg_t m;
+        blip_t m;
         m.type = reg_c | (RTC_REG_B_INT_ALARM << 8);
         m.content.value = alarm_msg_content;
-        msg_send_int(&m, alarm_pid);
+        blip_send_int(&m, alarm_pid);
     }
 }
 
 static void periodic_callback_default(uint8_t reg_c)
 {
     if (periodic_pid != KERNEL_PID_UNDEF) {
-        msg_t m;
+        blip_t m;
         m.type = reg_c | (RTC_REG_B_INT_PERIODIC << 8);
         m.content.value = periodic_msg_content;
-        msg_send_int(&m, periodic_pid);
+        blip_send_int(&m, periodic_pid);
     }
 }
 
 static void update_callback_default(uint8_t reg_c)
 {
     if (update_pid != KERNEL_PID_UNDEF) {
-        msg_t m;
+        blip_t m;
         m.type = reg_c | (RTC_REG_B_INT_UPDATE << 8);
         m.content.value = update_msg_content;
-        msg_send_int(&m, update_pid);
+        blip_send_int(&m, update_pid);
     }
 }
 

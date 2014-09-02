@@ -56,12 +56,12 @@ void *timer_thread(void *arg)
     (void) arg;
     printf("This is thread %" PRIkernel_pid "\n", thread_getpid());
 
-    msg_t msgq[16];
+    blip_t msgq[16];
     msg_init_queue(msgq, sizeof(msgq));
 
     while (1) {
-        msg_t m;
-        msg_receive(&m);
+        blip_t m;
+        blip_receive(&m);
         struct timer_msg *tmsg = (struct timer_msg *) m.content.ptr;
 
         vtimer_now(&now);
@@ -102,7 +102,7 @@ void *timer_thread(void *arg)
 
 int main(void)
 {
-    msg_t m;
+    blip_t m;
     kernel_pid_t pid = thread_create(
                   timer_stack,
                   sizeof(timer_stack),
@@ -115,7 +115,7 @@ int main(void)
     for (unsigned i = 0; i < sizeof(timer_msgs)/sizeof(struct timer_msg); i++) {
         printf("Sending timer msg %u...\n", i);
         m.content.ptr = (char *) &timer_msgs[i];
-        msg_send(&m, pid, false);
+        blip_send(&m, pid, false);
     }
 
     return 0;

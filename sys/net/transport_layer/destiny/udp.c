@@ -32,7 +32,7 @@
 
 #include "udp.h"
 
-msg_t udp_msg_queue[UDP_PKT_RECV_BUF_SIZE];
+blip_t udp_msg_queue[UDP_PKT_RECV_BUF_SIZE];
 
 uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
 {
@@ -49,7 +49,7 @@ void *udp_packet_handler(void *arg)
 {
     (void) arg;
 
-    msg_t m_recv_ip, m_send_ip, m_recv_udp, m_send_udp;
+    blip_t m_recv_ip, m_send_ip, m_recv_udp, m_send_udp;
     ipv6_hdr_t *ipv6_header;
     udp_hdr_t *udp_header;
     socket_internal_t *udp_socket = NULL;
@@ -58,7 +58,7 @@ void *udp_packet_handler(void *arg)
     msg_init_queue(udp_msg_queue, UDP_PKT_RECV_BUF_SIZE);
 
     while (1) {
-        msg_receive(&m_recv_ip);
+        blip_receive(&m_recv_ip);
         ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
         udp_header = ((udp_hdr_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
 
@@ -69,7 +69,7 @@ void *udp_packet_handler(void *arg)
 
             if (udp_socket != NULL) {
                 m_send_udp.content.ptr = (char *)ipv6_header;
-                msg_send_receive(&m_send_udp, &m_recv_udp, udp_socket->recv_pid);
+                blip_send_receive(&m_send_udp, &m_recv_udp, udp_socket->recv_pid);
             }
             else {
                 printf("Dropped UDP Message because no thread ID was found for delivery!\n");
@@ -79,6 +79,6 @@ void *udp_packet_handler(void *arg)
             printf("Wrong checksum (%x)!\n", chksum);
         }
 
-        msg_reply(&m_recv_ip, &m_send_ip);
+        blip_reply(&m_recv_ip, &m_send_ip);
     }
 }

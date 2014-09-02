@@ -46,20 +46,20 @@
 #ifdef MODULE_TRANSCEIVER
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
-msg_t msg_q[RCV_BUFFER_SIZE];
+blip_t msg_q[RCV_BUFFER_SIZE];
 
 void *radio(void *arg)
 {
     (void) arg;
 
-    msg_t m;
+    blip_t m;
     radio_packet_t *p;
     radio_packet_length_t i;
 
     msg_init_queue(msg_q, RCV_BUFFER_SIZE);
 
     while (1) {
-        msg_receive(&m);
+        blip_receive(&m);
 
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t *) m.content.ptr;

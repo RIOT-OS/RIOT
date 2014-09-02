@@ -35,14 +35,14 @@ void *thread1(void *arg)
 
     printf("THREAD %" PRIkernel_pid " start\n", p1);
 
-    msg_t msg, reply;
-    memset(&msg, 1, sizeof(msg_t));
+    blip_t msg, reply;
+    memset(&msg, 1, sizeof(blip_t));
 
     /* step 1: send asynchonously */
-    msg_send(&msg, p_main, 0);
+    blip_send(&msg, p_main, 0);
 
     /* step 2: send message, turning its status into STATUS_REPLY_BLOCKED */
-    msg_send_receive(&msg, &reply, p_main);
+    blip_send_receive(&msg, &reply, p_main);
     printf("received: %" PRIkernel_pid ", %u \n", reply.sender_pid, reply.type);
     printf("pointer: %s\n", reply.content.ptr);
 
@@ -53,10 +53,10 @@ void *thread1(void *arg)
 
 int main(void)
 {
-    msg_t msg;
+    blip_t msg;
     p_main = sched_active_pid;
 
-    msg_t msg_q[1];
+    blip_t msg_q[1];
     msg_init_queue(msg_q, 1);
 
     p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
@@ -64,7 +64,7 @@ int main(void)
                        thread1, NULL, "nr1");
 
     /* step 3: receive a msg */
-    msg_receive(&msg);
+    blip_receive(&msg);
 
     printf("MAIN THREAD %" PRIkernel_pid " ALIVE!\n", p_main);
     return 0;
