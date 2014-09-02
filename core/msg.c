@@ -187,7 +187,7 @@ int blip_send_receive(blip_t *m, blip_t *reply, kernel_pid_t target_pid)
 
     /* msg_send blocks until reply received */
 
-    return blip_send(m, target_pid, true);
+    return blip_send(m, target_pid);
 }
 
 int blip_reply(blip_t *m, blip_t *reply)

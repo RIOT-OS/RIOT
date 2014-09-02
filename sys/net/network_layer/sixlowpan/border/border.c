@@ -114,7 +114,7 @@ void serial_reader_f(void)
 
                 if (conf_packet->conftype == BORDER_CONF_SYN) {
                     m.content.ptr = (char *)conf_packet;
-                    blip_send(&m, main_pid, 1);
+                    blip_send(&m, main_pid);
                     continue;
                 }
             }

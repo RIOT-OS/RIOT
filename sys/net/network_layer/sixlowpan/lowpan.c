@@ -800,7 +800,7 @@ void lowpan_read(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
             current_frame.length = length;
             current_frame.data = data;
             m_send.content.ptr = (char *) &current_frame;
-            blip_send(&m_send, sixlowpan_reg[i], 1);
+            blip_send(&m_send, sixlowpan_reg[i]);
         }
     }
 

@@ -103,11 +103,11 @@ int main(void)
 
     puts("sending 1st msg");
     m.content.ptr = (char *) &msg_a;
-    blip_send(&m, pid, false);
+    blip_try_send(&m, pid);
 
     puts("sending 2nd msg");
     m.content.ptr = (char *) &msg_b;
-    blip_send(&m, pid, false);
+    blip_try_send(&m, pid);
 
     kernel_pid_t pid2 = thread_create(
                    timer_stack_local,
@@ -122,6 +122,6 @@ int main(void)
 
     while (1) {
         vtimer_sleep(sleep);
-        blip_send(&m, pid2, 0);
+        blip_try_send(&m, pid2);
     }
 }

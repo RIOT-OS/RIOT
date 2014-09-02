@@ -139,7 +139,7 @@ static void riot_ccn_relay_config(int argc, char **argv)
     blip_t m;
     m.content.value = atoi(argv[1]);
     m.type = CCNL_RIOT_CONFIG_CACHE;
-    blip_send(&m, _relay_pid, 1);
+    blip_send(&m, _relay_pid);
 }
 
 static void riot_ccn_transceiver_start(kernel_pid_t _relay_pid)
@@ -196,7 +196,7 @@ static void riot_ccn_relay_stop(int argc, char **argv)
     blip_t m;
     m.content.value = 0;
     m.type = CCNL_RIOT_HALT;
-    blip_send(&m, _relay_pid, 1);
+    blip_send(&m, _relay_pid);
 
     /* mark relay as not running */
     _relay_pid = 0;
@@ -241,7 +241,7 @@ static void riot_ccn_pit_test(int argc, char **argv)
         m.content.ptr = (char *) &rmsg;
         m.type = CCNL_RIOT_MSG;
 
-        blip_send(&m, _relay_pid, 1);
+        blip_send(&m, _relay_pid);
 
         if ((segment % 50) == 0) {
             vtimer_now(&now);
@@ -290,7 +290,7 @@ static void riot_ccn_populate(int argc, char **argv)
     blip_t m;
     m.content.value = 0;
     m.type = CCNL_RIOT_POPULATE;
-    blip_send(&m, _relay_pid, 1);
+    blip_send(&m, _relay_pid);
 }
 
 static void riot_ccn_stat(int argc, char **argv)
@@ -301,7 +301,7 @@ static void riot_ccn_stat(int argc, char **argv)
     blip_t m;
     m.content.value = 0;
     m.type = CCNL_RIOT_PRINT_STAT;
-    blip_send(&m, _relay_pid, 1);
+    blip_send(&m, _relay_pid);
 }
 
 static const shell_command_t sc[] = {

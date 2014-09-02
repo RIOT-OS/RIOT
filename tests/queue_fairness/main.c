@@ -42,7 +42,7 @@ static void *child_fun(void *arg)
         blip_t m;
         m.type = i + 1;
         m.content.ptr = (void *) sched_active_thread->name;
-        blip_send(&m, parent_pid, true);
+        blip_send(&m, parent_pid);
     }
 
     printf("End of %s.\n", sched_active_thread->name);

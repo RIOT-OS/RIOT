@@ -58,7 +58,7 @@ void populate_cache(void)
     blip_t m;
     m.content.value = 0;
     m.type = CCNL_RIOT_POPULATE;
-    blip_send(&m, _relay_pid, 1);
+    blip_send(&m, _relay_pid);
 }
 
 void *second_thread(void *arg)

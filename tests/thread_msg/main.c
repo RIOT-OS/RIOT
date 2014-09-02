@@ -76,7 +76,7 @@ void *thread3(void *arg)
         blip_t msg;
         msg.content.value = i;
         printf("T3 i=%d\n", i);
-        blip_send(&msg, p1, 1);
+        blip_send(&msg, p1);
     }
     return NULL;
 }

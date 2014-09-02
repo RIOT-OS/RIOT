@@ -262,7 +262,7 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
             if (_rpl_process_pid != KERNEL_PID_UNDEF) {
                 blip_t m_send;
                 m_send.content.ptr = (char *) &hdr->code;
-                blip_send(&m_send, _rpl_process_pid, 1);
+                blip_send(&m_send, _rpl_process_pid);
             }
             else {
                 DEBUG("INFO: no RPL handler registered\n");
@@ -374,7 +374,7 @@ void *ipv6_process(void *arg)
                 blip_t m_send;
                 m_send.type = IPV6_PACKET_RECEIVED;
                 m_send.content.ptr = (char *) ipv6_buf;
-                blip_send(&m_send, sixlowip_reg[i], 1);
+                blip_send(&m_send, sixlowip_reg[i]);
             }
         }
 

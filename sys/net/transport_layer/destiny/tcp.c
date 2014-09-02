@@ -127,12 +127,12 @@ void handle_tcp_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
     if (tcp_socket->socket_values.tcp_control.state == TCP_LAST_ACK) {
         target_pid = tcp_socket->recv_pid;
         close_socket(tcp_socket);
-        blip_send(&m_send_tcp, target_pid, 0);
+        blip_try_send(&m_send_tcp, target_pid);
         return;
     }
     else if (tcp_socket->socket_values.tcp_control.state == TCP_CLOSING) {
-        blip_send(&m_send_tcp, tcp_socket->recv_pid, 0);
-        blip_send(&m_send_tcp, tcp_socket->send_pid, 0);
+        blip_try_send(&m_send_tcp, tcp_socket->recv_pid);
+        blip_try_send(&m_send_tcp, tcp_socket->send_pid);
         return;
     }
     else if (get_waiting_connection_socket(tcp_socket->socket_id, ipv6_header,
@@ -263,8 +263,8 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 
     send_tcp(tcp_socket, current_tcp_packet, temp_ipv6_header, TCP_ACK, 0);
 
-    blip_send(&m_send, tcp_socket->send_pid, 0);
-    blip_send(&m_send, tcp_socket->recv_pid, 0);
+    blip_try_send(&m_send, tcp_socket->send_pid);
+    blip_try_send(&m_send, tcp_socket->recv_pid);
 }
 
 void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,

@@ -43,7 +43,7 @@ ipv6_addr_t init_threeway_handshake(void)
     border_syn_packet_t *syn;
     blip_t m;
     m.content.ptr = NULL;
-    blip_send(&m, border_get_serial_reader(), 1);
+    blip_send(&m, border_get_serial_reader());
     blip_receive(&m);
 
     syn = (border_syn_packet_t *)m.content.ptr;

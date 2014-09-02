@@ -50,7 +50,7 @@ void *run(void *arg)
 
     blip_t final;
     final.content.value = me;
-    int err = blip_send(&final, main_id, 1);
+    int err = blip_send(&final, main_id);
 
     if (err < 0) {
         printf("[!!!] Failed to send message from %d to main\n", me);
@@ -79,7 +79,7 @@ int main(void)
         else {
             args[i].content.value = i + 1;
 
-            int err = blip_send(&args[i], ths[i], 1);
+            int err = blip_send(&args[i], ths[i]);
             if (err < 0) {
                 printf("[!!!] Sending message to thread %d failed\n", ths[i]);
             }

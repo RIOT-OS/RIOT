@@ -504,7 +504,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
             m.content.ptr = (char *) &(transceiver_buffer[transceiver_buffer_pos]);
             DEBUG("transceiver: Notify thread %" PRIkernel_pid "\n", reg[i].pid);
 
-            if (blip_send(&m, reg[i].pid, false) && (m.type != ENOBUFFER)) {
+            if (blip_try_send(&m, reg[i].pid) && (m.type != ENOBUFFER)) {
                 transceiver_buffer[transceiver_buffer_pos].processing++;
             }
         }

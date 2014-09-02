@@ -124,7 +124,7 @@ void sender(void)
         snd_buffer[1] = i & 0x00FF;
         p.data = snd_buffer;
         i++;
-        blip_send(&mesg, transceiver_pid, 1);
+        blip_send(&mesg, transceiver_pid);
         hwtimer_wait(HWTIMER_TICKS(SENDING_DELAY));
     }
 }

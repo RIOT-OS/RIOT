@@ -45,7 +45,11 @@ int net_msg_reply(blip_t *m, blip_t *reply, uint16_t message)
 int net_msg_send(blip_t *m, kernel_pid_t pid, bool block, uint16_t message)
 {
     m->type = message;
-    return blip_send(m, pid, block);
+    if (block) {
+        return blip_send(m, pid);
+    } else {
+        return blip_try_send(m, pid);
+    }
 }
 
 int net_msg_send_recv(blip_t *m, blip_t *reply, kernel_pid_t pid, uint16_t message)
