@@ -76,14 +76,14 @@ struct simple_list_elem;
 *					has to be the same name as the element in the list entry structure that is be used for comparison
 * @return	pointer to the new element, NULL if no new list element could be allocated
 */
-#define simple_list_add_before(head, value)                                     \
+#define simple_list_add_before(head, value)                                    (\
     *(head) == NULL ?                                                           \
         simple_list_add_head((head))                                            \
     :                                                                           \
         __simple_list_add_before((struct simple_list_elem**) (head),            \
                                  calloc(1, sizeof **(head)),                    \
                                  (value),                                       \
-                                 (char*) &(*(head))->value - (char*) *(head))   \
+                                 (char*) &(*(head))->value - (char*) *(head))  )
 
 /**
 * @brief	adds an preallocated list element before an existing one.
@@ -95,14 +95,14 @@ struct simple_list_elem;
 * @param	node	preallocated list element
 * @return	the new list entry (node)
 */
-#define simple_list_set_before(head, node, value)                               \
+#define simple_list_set_before(head, node, value)                              (\
     *(head) == NULL ?                                                           \
         __simple_list_add_before((head))                                        \
     :                                                                           \
         __simple_list_add_before((struct simple_list_elem**) (head),            \
                                  (node),                                        \
                                  (value),                                       \
-                                 (char*) &(*(head))->value - (char*) *(head))                                                                         \
+                                 (char*) &(*(head))->value - (char*) *(head))  )
 
 /**
 * @brief	searches for a list element by simple comparison of a struct value
@@ -112,14 +112,14 @@ struct simple_list_elem;
 *					has to be the same name as the value in the list element struct
 * @return	pointer the list entry if found, otherwise NULL
 */
-#define simple_list_find(head, value)                                           \
+#define simple_list_find(head, value)                                          (\
     (head) == NULL ?                                                            \
         NULL                                                                    \
     :                                                                           \
         __simple_list_find( (struct simple_list_elem*) (head),                  \
                             (value),                                            \
                             (char*) &((head)->value) - (char*) (head),          \
-                            (0))                                                \
+                            (0))                                               )
 
 /**
 * @brief	searches for a list element by comparing a buffer in the list element struct
@@ -129,14 +129,14 @@ struct simple_list_elem;
 *					has to be the same name as the value in the list element struct
 * @return	pointer the list entry if found, otherwise NULL
 */
-#define simple_list_find_memcmp(head, value)                                    \
+#define simple_list_find_memcmp(head, value)                                   (\
     (head) == NULL ?                                                            \
         NULL                                                                    \
     :                                                                           \
         __simple_list_find( (struct simple_list_elem*) (head),                  \
                             (value),                                            \
                             (char*) &((head)->value) - (char*) (head),          \
-                            sizeof(*(value)))
+                            sizeof(*(value)))                                  )
 
 /**
 * @brief	searches for a list element by applying a comparator function to each list entry
@@ -146,15 +146,14 @@ struct simple_list_elem;
 * @param	comperator	a function that takes (value, node) and returns 0 if they match
 * @return	pointer	the list entry if found, otherwise NULL
 */
-#define simple_list_find_cmp(head, value, comperator)                           \
+#define simple_list_find_cmp(head, value, comperator)                          (\
     (head) == NULL ?                                                            \
         NULL                                                                    \
     :                                                                           \
         __simple_list_find_cmp( (struct simple_list_elem*) (head),              \
                                 (value),                                        \
                                 (char*) &((head)->value) - (char*) (head),      \
-                                (comperator))
-
+                                (comperator))                                  )
 /**
  * @brief	removes an entry from the list and frees it's memory
  *
