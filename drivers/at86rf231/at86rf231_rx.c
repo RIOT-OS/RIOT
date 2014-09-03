@@ -28,7 +28,7 @@
 
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
-#define DEBUG_ENABLED
+#define DEBUG_ENABLED (1)
 #endif
 #include "debug.h"
 

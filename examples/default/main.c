@@ -35,6 +35,10 @@
 #include "ltc4150.h"
 #endif
 
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+#include "ieee802154_frame.h"
+#endif
+
 #ifdef MODULE_TRANSCEIVER
 #include "transceiver.h"
 #endif
@@ -53,8 +57,13 @@ void *radio(void *arg)
     (void) arg;
 
     msg_t m;
+
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+    ieee802154_packet_t *p;
+#else
     radio_packet_t *p;
     radio_packet_length_t i;
+#endif
 
     msg_init_queue(msg_q, RCV_BUFFER_SIZE);
 
@@ -62,7 +71,22 @@ void *radio(void *arg)
         msg_receive(&m);
 
         if (m.type == PKT_PENDING) {
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+            p = (ieee802154_packet_t*) m.content.ptr;
+            printf("Got radio packet:\n");
+            printf("\tLength:\t%u\n", p->length);
+            printf("\tSrc:\t%u\n", p->frame.src_addr[0]);
+            printf("\tDst:\t%u\n", p->frame.dest_addr[0]);
+            printf("\tLQI:\t%u\n", p->lqi);
+            printf("\tRSSI:\t%u\n", p->rssi);
+
+            printf("Payload Length:%u\n", p->frame.payload_len);
+            printf("Payload:%s\n", p->frame.payload);
+
+            p->processing--;
+#else
             p = (radio_packet_t *) m.content.ptr;
+
             printf("Got radio packet:\n");
             printf("\tLength:\t%u\n", p->length);
             printf("\tSrc:\t%u\n", p->src);
@@ -76,6 +100,8 @@ void *radio(void *arg)
 
             p->processing--;
             puts("\n");
+#endif
+
         }
         else if (m.type == ENOBUFFER) {
             puts("Transceiver buffer full");
