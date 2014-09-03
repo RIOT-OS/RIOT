@@ -23,7 +23,43 @@
 
 static void cc2420_gen_pkt(uint8_t *buf, cc2420_packet_t *packet);
 static uint8_t sequence_nr;
-static bool wait_for_ack;
+static volatile bool wait_for_ack;
+static volatile bool got_ack;
+
+/* the two checksum bytes are NOT transmitted to this layer */
+#define ACK_LENGTH  3
+/* that delay should be enough, neither too short nor too long */
+#define CC2420_ACK_WAIT_DELAY_uS   1000
+
+/* CC2420 internal driver function for getting the current RX callback */
+extern receive_802154_packet_callback_t cc2420_get_recv_callback(void);
+
+
+/*
+ * an internal RX callback we temporarily set after packet transmission,
+ * in order to detect the corresponding ACK sent back from destination
+ */
+static void cc2420_ack_cb(void *buf,
+                          unsigned int len,
+                          int8_t rssi,
+                          uint8_t lqi,
+                          bool crc_ok)
+{
+    if (len < ACK_LENGTH) {
+        return;
+    }
+    /* try to read a returning ACK packet */
+    uint8_t *ackbuf = (uint8_t *)buf;
+    if (ackbuf[0] == 0x02) {
+        /* ack packet in buffer */
+        if (ackbuf[2] == (sequence_nr - 1)) {
+            /* correct sequence number */
+            got_ack = true;
+            DEBUG("got ack!\n");
+        }
+    }
+}
+
 
 radio_tx_status_t cc2420_load_tx_buf(ieee802154_packet_kind_t kind,
                                      ieee802154_node_addr_t dest,
@@ -34,8 +70,10 @@ radio_tx_status_t cc2420_load_tx_buf(ieee802154_packet_kind_t kind,
 {
     uint8_t hdr[24];
 
-    /* FCS : frame version 0, we don't manage security,
-       nor batchs of packets */
+    /*
+     * FCS : frame version 0, we don't manage security,
+     * nor batchs of packets
+     */
     switch (kind) {
     case PACKET_KIND_BEACON:
         hdr[0] = 0x00;
@@ -129,11 +167,9 @@ radio_tx_status_t cc2420_load_tx_buf(ieee802154_packet_kind_t kind,
     cc2420_write_fifo(hdr, idx);
     cc2420_write_fifo(buf, len);
 
+    /* if we've come here, everything's fine */
     return RADIO_TX_OK;
 }
-
-#define CC2420_ACK_WAIT_DELAY_uS   1000
-#define ACK_LENGTH  5
 
 radio_tx_status_t cc2420_transmit_tx_buf(void)
 {
@@ -155,8 +191,10 @@ radio_tx_status_t cc2420_transmit_tx_buf(void)
         abort_count++;
 
         if (abort_count > CC2420_SYNC_WORD_TX_TIME) {
-            /* Abort waiting. CC2420 maybe in wrong mode
-               e.g. sending preambles for always */
+            /*
+             * Abort waiting. CC2420 maybe in wrong mode
+             * e.g. sending preambles for always
+             */
             puts("[CC2420 TX] fatal error: could not send packet\n");
             return RADIO_TX_ERROR;
         }
@@ -169,7 +207,13 @@ radio_tx_status_t cc2420_transmit_tx_buf(void)
     do {
         st = cc2420_status_byte();
     } while (cc2420_get_sfd() != 0);
-    cc2420_switch_to_rx();
+    /*
+     * no need to switch to RX: the CC2420 transceiver
+     * does it automatically after TX end; asking it
+     * to do it a second time will actually slow down
+     * its return to active medium listening, and can
+     * make it miss ACKs returned for TXed packets!
+     */
 
     /* check for underflow error flag */
     if (st & CC2420_STATUS_TX_UNDERFLOW) {
@@ -180,20 +224,19 @@ radio_tx_status_t cc2420_transmit_tx_buf(void)
     if (!wait_for_ack) {
         return RADIO_TX_OK;
     }
+    got_ack = false;
+
+    /* temporarily "hijack" RX callback to read any incoming ACK packet */
+    receive_802154_packet_callback_t old_cb = cc2420_get_recv_callback();
+    cc2420_set_recv_callback(cc2420_ack_cb);
 
     /* delay for the peer to answer our packet */
-    //TODO design a more robust method?
     hwtimer_wait(HWTIMER_TICKS(CC2420_ACK_WAIT_DELAY_uS));
-    /* try to read a returning ACK packet */
-    if (cc2420_get_fifop()) {
-        uint8_t ackbuf[ACK_LENGTH];
-        /* a packet has arrived, read the arrived data */
-        cc2420_read_fifo(ackbuf, ACK_LENGTH);
-        if (ackbuf[0] == 0x02  /* ack packet in buffer */
-             && (ackbuf[2] == sequence_nr - 1)) /* correct sequence number */
-            return RADIO_TX_OK;
-    }
-    return RADIO_TX_NOACK;
+    /* restore the correct RX callback */
+    cc2420_set_recv_callback(old_cb);
+
+    /* did our internal callback receive the wanted ACK? */
+    return (got_ack ? RADIO_TX_OK : RADIO_TX_NOACK);
 }
 
 radio_tx_status_t cc2420_do_send(ieee802154_packet_kind_t kind,
