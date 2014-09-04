@@ -253,7 +253,7 @@ void _transceiver_send_handler(int argc, char **argv)
     mesg.content.ptr = (char *) &tcmd;
 
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-    printf("[transceiver] Sending packet of length %" PRIu16 " to %" PRIu16 ": %s\n", p.frame.payload_len, p.frame.dest_addr[7], (char*) p.frame.payload);
+    printf("[transceiver] Sending packet of length %" PRIu16 " to %" PRIu16 ": %s\n", p.frame.payload_len, p.frame.dest_addr[1], (char*) p.frame.payload);
 #else
     printf("[transceiver] Sending packet of length %" PRIu16 " to %" PRIu16 ": %s\n", p.length, p.dst, (char*) p.data);
 #endif
