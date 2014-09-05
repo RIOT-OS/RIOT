@@ -5,6 +5,8 @@ BOARD_INSUFFICIENT_RAM := chronos redbee-econotag stm32f0discovery
 
 USEMODULE += embunit
 
+DISABLE_MODULE += auto_init
+
 INCLUDES += -I$(RIOTBASE)/tests/unittests/embunit
 
 ifeq ($(OUTPUT),XML)
