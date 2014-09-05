@@ -24,9 +24,9 @@ void _init(void)
     int *addr;
 
     //Clear bss
-    for (uint32_t i = &__bss_start__; i < &__bss_end__; i++) {
-        addr = i;
-        *addr = NULL;
+    for (uint32_t i = (uint32_t)&__bss_start__; i < (uint32_t)&__bss_end__; i++) {
+        addr = (int*)i;
+        *addr = (int)NULL;
     }
 
     // Set up UART
