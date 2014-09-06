@@ -11,11 +11,11 @@ you can further modify its behavior.
 Check all files changed in the current branch against the branch named
 'master':
 
-    ./dist/tool/cppcheck/check.sh master
+    ./dist/tools/cppcheck/check.sh master
 
 Check all files but ignore warnings about unused struct members:
 
-    ./dist/tool/cppcheck/check.sh --suppress=unusedStructMember
+    ./dist/tools/cppcheck/check.sh --suppress=unusedStructMember
 
 Check all files changed in the current branch against the branch named
 'master', ignoring warnings about unused struct members:
