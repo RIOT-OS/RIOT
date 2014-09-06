@@ -24,7 +24,7 @@
 #include "thread.h"
 
 #define BASE_DELAY (1000UL * 1000UL)
-#define DELTA_DELAY (1000UL * 1000UL)
+#define DELTA_DELAY (10UL * 1000UL)
 #define MSGLEN 12 // == strlen("callback %2i")
 char msg[MSGLEN * HWTIMER_MAXTIMERS]; // == [callback  1\0callback  2\0...]
 
@@ -40,7 +40,7 @@ int main(void)
     puts("");
     puts("  Timers should print \"callback x\" once when they run out.");
     printf("  The order for x is 1, n-1, n-2, ..., 2 where n is the number of available hardware timers (%u on this platform).\n", HWTIMER_MAXTIMERS);
-    puts("  One timer should fire every second until all timers have run out.");
+    puts("  In 1 second, one timer should fire every second/100 until all timers have run out.");
     puts("  Additionally the message \"hwtimer set.\" should be printed once 1 second from now.");
     puts("");
     puts("Setting timers:");
@@ -68,7 +68,7 @@ int main(void)
     puts("All timers set.");
     puts("");
 
-    hwtimer_wait(HWTIMER_TICKS(1000UL * 1000UL));
+    hwtimer_wait(HWTIMER_TICKS(BASE_DELAY));
 
     puts("hwtimer set.");
     thread_sleep();
