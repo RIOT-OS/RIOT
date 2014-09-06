@@ -22,6 +22,7 @@ typedef struct timex_t {
 } timex_t;
 
 /* a+b */
+/* cppcheck-suppress passedByValue */
 timex_t timex_add(const timex_t a, const timex_t b);
 
 /* a-b*/
