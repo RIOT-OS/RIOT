@@ -28,6 +28,8 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
+/* \cond DOXYGEN_BLACKLIST */
+
 /* $Id$ */
 
 #ifndef __ERRNO_H_
@@ -144,4 +146,5 @@ extern int errno;
 #define EINVAL 22 /* Invalid argument */
 #define EOVERFLOW 75 /* Value too large for defined data type */
 
+/* \endcond */
 #endif
