@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2013 INRIA
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief Hwtimer test application
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  *
  * @}
  */
