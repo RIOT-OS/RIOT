@@ -170,7 +170,7 @@
 #define GPIO_3_PIN          12
 
 ///* GPIO channel 4 config */
-#define GPIO_4_PORT         gpioPortD
+#define GPIO_4_PORT         gpioPortB
 #define GPIO_4_PIN          15
 
 #endif /* __PERIPH_CONF_H */
