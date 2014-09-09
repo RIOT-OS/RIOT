@@ -3,7 +3,7 @@ export CPU = samr21xxxA
 export CPU_MODEL = samr21g18a
 
 # set the default port
-export PORT ?= /dev/ttyUSB0
+export PORT ?= /dev/ttyACM0
 
 # define tools used for building the project
 export PREFIX = arm-none-eabi-
