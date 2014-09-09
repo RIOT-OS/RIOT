@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2013, Freie Universitaet Berlin (FUB). All rights reserved.
-
+ * Copyright (C) 2014, Freie Universitaet Berlin (FUB) & INRIA.
+ * All rights reserved.
+ *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
@@ -17,13 +18,17 @@ volatile int __inISR = 0;
 
 char __isr_stack[MSP430_ISR_STACK_SIZE];
 
-/* we must prevent the compiler to generate a prologue or an epilogue
-   for thread_yield(), since we rely on RETI instruction at the end
-   of its execution, in inlined __restore_context() sub-function */
+/*
+ * we must prevent the compiler to generate a prologue or an epilogue
+ * for thread_yield(), since we rely on the RETI instruction at the end
+ * of its execution, in the inlined __restore_context() sub-function
+ */
 __attribute__((naked)) void thread_yield(void)
 {
-    /* disable IRQ, remembering if they are
-       to be reactivated after context switch */
+    /*
+     * disable IRQ, remembering if they are
+     * to be reactivated after context switch
+     */
     unsigned int irqen = disableIRQ();
 
     __save_context();

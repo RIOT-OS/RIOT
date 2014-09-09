@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2013, Freie Universitaet Berlin (FUB). All rights reserved.
+ * Copyright (C) 2014, Freie Universitaet Berlin (FUB) & INRIA.
+ * All rights reserved.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -103,10 +104,12 @@ inline void __restore_context(unsigned int irqen)
 {
     __restore_context_isr();
 
-    /* we want to enable if appropriate IRQs *just after*
-       quitting the interrupt handler; to that end,
-       we change the GIE bit in the value to be restored
-       in R2 (a.k.a. SR) by the next RETI instruction */
+    /*
+     * we want to enable appropriate IRQs *just after*
+     * quitting the interrupt handler; to that end,
+     * we change the GIE bit in the value to be restored
+     * in R2 (a.k.a. SR) by the next RETI instruction
+     */
     if (irqen) {
         __asm__("bis.w #8, 0(r1)");
     } else {
