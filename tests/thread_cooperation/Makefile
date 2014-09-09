@@ -7,4 +7,3 @@ BOARD_INSUFFICIENT_RAM := chronos msb-430 msb-430h mbed_lpc1768 redbee-econotag 
 DISABLE_MODULE += auto_init
 
 include $(RIOTBASE)/Makefile.include
-
