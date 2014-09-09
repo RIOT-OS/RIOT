@@ -1,0 +1,29 @@
+# define the cpu used by the efm32gg-st3700 board
+export CPU = efm32g
+export CPU_MODEL = EFM32G890F128
+
+#define the default port depending on the host OS
+PORT ?= -p /dev/ttyUSB0
+
+# define tools used for building the project
+export PREFIX = arm-none-eabi-
+export CC = $(PREFIX)gcc
+export AR = $(PREFIX)ar
+export AS = $(PREFIX)g++
+export LINK = $(PREFIX)g++
+export SIZE = $(PREFIX)size
+export OBJCOPY = $(PREFIX)objcopy
+export OBJDUMP = $(PREFIX)objdump
+
+export FFLAGS = $(CPU_MODEL) bin/$(BOARD)/$(APPLICATION) 0x0000000
+export DEBUGGER_FLAGS = $(CPU_MODEL) bin/$(BOARD)/$(APPLICATION) $(RIOTBOARD)/$(BOARD)/dist/gdb.conf
+export TERMFLAGS = -p /dev/ttyUSB0
+
+export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm -b 115200
+export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+export DEBUGSERVER = JLinkGDBServer
+
+# export board specific includes to the global includes-listing
+include $(RIOTCPU)/efm32_common/toolchain.include
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

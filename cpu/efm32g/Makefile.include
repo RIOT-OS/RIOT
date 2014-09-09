@@ -1,7 +1,7 @@
 # this CPU implementation is using the new core/CPU interface
 export CFLAGS += -DCOREIF_NG=1
 
-export CPU_FAMILY = EFM32G
+export CPU_FAMILY = EFM32GG
 export CPU_FLAGS = -mcpu=cortex-m3
 
 # tell the build system that the CPU depends on the EFM32 common files
@@ -29,4 +29,3 @@ export UNDEF += $(BINDIR)cpu/startup_$(CPU).o
 include $(EFM32_COMMON)Makefile.include
 # CPU depends on the cortex-m common module, so include it
 include $(CORTEX_COMMON)Makefile.include
-

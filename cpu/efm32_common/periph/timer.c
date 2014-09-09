@@ -50,15 +50,17 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
         .debugRun   = false,
         .prescale   = timerPrescale1,
         .clkSel     = timerClkSelHFPerClk,
-        .count2x    = false,
-        .ati        = false,
         .fallAction = timerInputActionNone,
         .riseAction = timerInputActionNone,
         .mode       = timerModeUp,
         .dmaClrAct  = false,
         .quadModeX4 = 4,
         .oneShot    = false,
-        .sync       = false
+        .sync       = false,
+#if 0
+        .count2x    = false,
+        .ati        = false
+#endif
     };
 
     switch (dev) {
@@ -398,20 +400,20 @@ static inline void timer_irq_handler(tim_t dev, TIMER_TypeDef *timer)
         //Clear the flag
         timer->IFC |= TIMER_IFC_CC0;
         //Call bound callback function
-        if(config[dev].cb != NULL) {
-           config[dev].cb(0); 
+        if (config[dev].cb != NULL) {
+            config[dev].cb(0);
         } else {
             printf("timer irq not bound\n");
         }
-        
+
     } else if (timer->IF & TIMER_IF_CC1) {
         //Disable interrupt
         timer->IEN &= ~TIMER_IEN_CC1;
         //Clear the flag
         timer->IFC |= TIMER_IFC_CC1;
         //Call bound callback function
-        if(config[dev].cb != NULL) {
-           config[dev].cb(1); 
+        if (config[dev].cb != NULL) {
+            config[dev].cb(1);
         } else {
             printf("timer irq not bound\n");
         }
@@ -422,8 +424,8 @@ static inline void timer_irq_handler(tim_t dev, TIMER_TypeDef *timer)
         //Clear the flag
         timer->IFC |= TIMER_IFC_CC2;
         //Call bound callback function
-        if(config[dev].cb != NULL) {
-           config[dev].cb(2); 
+        if (config[dev].cb != NULL) {
+            config[dev].cb(2);
         } else {
             printf("timer irq not bound\n");
         }

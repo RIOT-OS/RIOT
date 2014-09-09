@@ -55,9 +55,11 @@ int spi_init_master(spi_t spi, spi_conf_t conf, spi_speed_t speed)
         .master         = true,
         .msbf           = true,
         .clockMode      = usartClockMode0,
+#if 0
         .prsRxEnable    = false,
         .prsRxCh        = usartPrsRxCh0,
         .autoTx         = false,
+#endif
     };
 
     spi_init.baudrate = speed_to_baud(speed);
@@ -146,13 +148,13 @@ int spi_transfer_byte(spi_t spi, char out, char *in)
     //Send and receive
     if (in != NULL) {
         (*in) = USART_SpiTransfer(dev, out);
-    //Send only
+        //Send only
     } else {
         USART_SpiTransfer(dev, out);
     }
 
     GPIO_PinOutSet(port, pin);
-    
+
     //Disable TX and RX
     USART_Enable(dev, usartDisable);
 
@@ -195,12 +197,12 @@ int spi_transfer_bytes(spi_t spi, char *out, char *in, unsigned int length)
         for (unsigned int i = 0; i < length; i++) {
             in[i] = USART_SpiTransfer(dev, out[i]);
         }
-    //Send only
+        //Send only
     } else if (in != NULL) {
         for (unsigned int i = 0; i < length; i++) {
             in[i] = USART_SpiTransfer(dev, 0xFF);
         }
-    //Receive only
+        //Receive only
     } else if (out != NULL) {
         for (unsigned int i = 0; i < length; i++) {
             USART_SpiTransfer(dev, out[i]);

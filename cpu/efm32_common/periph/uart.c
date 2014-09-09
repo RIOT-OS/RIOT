@@ -299,7 +299,7 @@ static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
 {
     if (dev->IF & USART_IF_RXDATAV) {
         char data = (char)USART_RxDataGet(dev);
-        config[uartnum].rx_cb(data, config[uartnum].arg);
+        config[uartnum].rx_cb(config[uartnum].arg, data);
 
     } else if (dev->IF & USART_IF_TXC) {
         config[uartnum].tx_cb(config[uartnum].arg);

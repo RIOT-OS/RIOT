@@ -24,9 +24,9 @@ void _init(void)
     int *addr;
 
     //Clear bss
-    for (uint32_t i = &__bss_start__; i < &__bss_end__; i++) {
-        addr = i;
-        *addr = NULL;
+    for (uint32_t i = (uint32_t)&__bss_start__; i < (uint32_t)&__bss_end__; i++) {
+        addr = (int*)i;
+        *addr = (int)NULL;
     }
 
     // Set up UART
@@ -63,7 +63,7 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 {
     char *c = (char *)data;
-    for (int i = 0; i < count; i++) {
+    for (unsigned int i = 0; i < count; i++) {
         uart_write_blocking(STDIO, c[i]);
     }
     return count;
