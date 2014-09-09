@@ -51,14 +51,6 @@ void board_init(void)
  */
 void led_init(void)
 {
-    // /* enable PIO control of pin PD27 */
-    // LED_PORT->PIO_PER = LED_PIN;
-    // /* set pin as output */
-    // LED_PORT->PIO_OER = LED_PIN;
-    // /* enable direct write access to the LED pin */
-    // LED_PORT->PIO_OWER = LED_PIN;
-    // /* disable pull-up */
-    // LED_PORT->PIO_PUDR = LED_PIN;
-    // /* clear pin */
-    // LED_PORT->PIO_CODR = LED_PIN;
+    LED_PORT.DIRSET.reg = LED_PIN;
+    LED_PORT.OUTCLR.reg = LED_PIN;
 }
