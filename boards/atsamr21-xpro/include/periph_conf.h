@@ -90,72 +90,58 @@
  * @name GPIO configuration
  * @{
  */
-#define GPIO_NUMOF          (0U)
+#define GPIO_NUMOF          (3U)
 #define GPIO_0_EN           1
 #define GPIO_1_EN           1
 #define GPIO_2_EN           1
-#define GPIO_3_EN           1
-#define GPIO_4_EN           1
-#define GPIO_5_EN           1
-#define GPIO_6_EN           1
-#define GPIO_7_EN           1
-#define GPIO_8_EN           1
-#define GPIO_9_EN           1
-#define GPIO_10_EN          1
-#define GPIO_11_EN          1
-#define GPIO_12_EN          1
-#define GPIO_13_EN          1
-#define GPIO_14_EN          1
-#define GPIO_15_EN          1
+#define GPIO_3_EN           0
+#define GPIO_4_EN           0
+#define GPIO_5_EN           0
+#define GPIO_6_EN           0
+#define GPIO_7_EN           0
+#define GPIO_8_EN           0
+#define GPIO_9_EN           0
+#define GPIO_10_EN          0
+#define GPIO_11_EN          0
+#define GPIO_12_EN          0
+#define GPIO_13_EN          0
+#define GPIO_14_EN          0
+#define GPIO_15_EN          0
 
+//These GPIO ports are chosen as to not conflict with other functionallity
+//May have to implement more
 /* GPIO channel 0 config */
-#define GPIO_0_DEV          PIOA
-#define GPIO_0_PIN          PIO_PA14
+#define GPIO_0_PIN          PIN_PA13 //EXT1 PIN5
 /* GPIO channel 1 config */
-#define GPIO_1_DEV          PIOD
-#define GPIO_1_PIN          PIO_PD0
+#define GPIO_1_PIN          PIN_PA28 //EXT1 PIN6, and USER_BUTTON
 /* GPIO channel 2 config */
-#define GPIO_2_DEV          PIOD
-#define GPIO_2_PIN          PIO_PD2
+#define GPIO_2_PIN          PIN_PA15 //EXT3 PIN5
 /* GPIO channel 3 config */
-#define GPIO_3_DEV          PIOD
-#define GPIO_3_PIN          PIO_PD6
+#define GPIO_3_PIN          
 /* GPIO channel 4 config */
-#define GPIO_4_DEV          PIOA
-#define GPIO_4_PIN          PIO_PA7
+#define GPIO_4_PIN          
 /* GPIO channel 5 config */
-#define GPIO_5_DEV          PIOC
-#define GPIO_5_PIN          PIO_PC1
+#define GPIO_5_PIN          
 /* GPIO channel 6 config */
-#define GPIO_6_DEV          PIOC
-#define GPIO_6_PIN          PIO_PC3
+#define GPIO_6_PIN          
 /* GPIO channel 7 config */
-#define GPIO_7_DEV          PIOC
-#define GPIO_7_PIN          PIO_PC5
-/* GPIO channel 8 config */
-#define GPIO_8_DEV          PIOC
-#define GPIO_8_PIN          PIO_PC7
-/* GPIO channel 9 config */
-#define GPIO_9_DEV          PIOC
-#define GPIO_9_PIN          PIO_PC9
-/* GPIO channel 10 config */
-#define GPIO_10_DEV         PIOA
-#define GPIO_10_PIN         PIO_PA20
+#define GPIO_7_PIN          
+/* GPIO channel 8 config */        
+#define GPIO_8_PIN          
+/* GPIO channel 9 config */ 
+#define GPIO_9_PIN          
+/* GPIO channel 10 config */ 
+#define GPIO_10_PIN         
 /* GPIO channel 11 config */
-#define GPIO_11_DEV         PIOC
-#define GPIO_11_PIN         PIO_PC18
+#define GPIO_11_PIN         
 /* GPIO channel 12 config */
-#define GPIO_12_DEV         PIOC
-#define GPIO_12_PIN         PIO_PC16
+#define GPIO_12_PIN         
 /* GPIO channel 13 config */
-#define GPIO_13_DEV         PIOC
-#define GPIO_13_PIN         PIO_PC14
+#define GPIO_13_PIN         
 /* GPIO channel 14 config */
-#define GPIO_14_DEV         PIOC
-#define GPIO_14_PIN         PIO_PC12
+#define GPIO_14_PIN         
 /* GPIO channel 15 config */
-#define GPIO_15_DEV         PIOB
-#define GPIO_15_PIN         PIO_PB14
+#define GPIO_15_PIN         
 /** @} */
 
 #endif /* __PERIPH_CONF_H */
