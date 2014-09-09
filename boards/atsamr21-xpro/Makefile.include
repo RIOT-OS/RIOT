@@ -1,5 +1,9 @@
 # define the cpu used by the arduino due board
 export CPU = samr21xxxA
+export CPU_MODEL = samr21g18a
+
+# set the default port
+export PORT ?= /dev/ttyUSB0
 
 # define tools used for building the project
 export PREFIX = arm-none-eabi-
@@ -9,22 +13,8 @@ export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
-export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
-
-#define the flash-tool and default port depending on the host operating system
-OS := $(shell uname)
-ifeq ($(OS),Linux)
-  PORT ?= /dev/ttyACM0
-  FLASHER = stty -F $(PORT) raw ispeed 1200 ospeed 1200 cs8 -cstopb ignpar eol 255 eof 255; $(RIOTBOARD)/$(BOARD)/dist/bossac
-else ifeq ($(OS),Darwin)
-  PORT ?= $(shell ls -1 /dev/tty.usbmodem* | head -n 1)
-  FLASHER = stty -f $(PORT) raw ispeed 1200 ospeed 1200 cs8 -cstopb ignpar eol 255 eof 255; $(RIOTBOARD)/$(BOARD)/dist/bossac_osx
-else
-  $(info CAUTION: No flash tool for your host system found!)
-  # TODO: add support for windows as host platform
-endif
-export FLASHER
-export PORT
+export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm -p
+export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
 
 # define build specific options
 export CPU_USAGE = -mcpu=cortex-m0
@@ -36,7 +26,7 @@ export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endi
 # linkerscript specified in cpu/Makefile.include
 export LINKFLAGS += -T$(LINKERSCRIPT)
 export OFLAGS += -O binary
-export FFLAGS += -R -e -w -v -b bin/$(BOARD)/$(APPLICATION).hex
+export FFLAGS += $(HEXFILE)
 export TERMFLAGS += -p "$(PORT)"
 
 # use the nano-specs of the NewLib when available
