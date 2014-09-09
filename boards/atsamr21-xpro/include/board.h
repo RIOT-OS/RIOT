@@ -26,7 +26,7 @@
 /**
  * Define the nominal CPU core clock in this board
  */
-#define F_CPU               (84000000UL)
+#define F_CPU               (1000000UL)
 
 /**
  * Assign the hardware timer
@@ -45,17 +45,17 @@
  * @name LED pin definitions
  * @{
  */
-#define LED_PORT            PIOB
-#define LED_PIN             PIO_PB27
+#define LED_PORT            PORT->Group[0]
+#define LED_PIN             PORT_PA19
 /** @} */
 
 /**
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED_ON              (LED_PORT->PIO_ODSR |= LED_PIN)
-#define LED_OFF             (LED_PORT->PIO_ODSR &= ~LED_PIN)
-#define LED_TOGGLE          (LED_PORT->PIO_ODSR ^= LED_PIN)
+#define LED_ON              (LED_PORT.OUTSET.reg = LED_PIN)
+#define LED_OFF             (LED_PORT.OUTCLR.reg = LED_PIN)
+#define LED_TOGGLE          (LED_PORT.OUTTGL.reg = LED_PIN)
 
 /* for compatability to other boards */
 #define LED_GREEN_ON        /* not available */
