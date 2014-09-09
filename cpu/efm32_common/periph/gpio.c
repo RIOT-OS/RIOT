@@ -127,7 +127,8 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
 #endif
     }
 
-    //TODO: Implement pullup
+    //TODO: Pullup on output doesn't make sense?
+
     GPIO_PinModeSet(port, pin, gpioModePushPull, 1);
 
     return 0; /* all OK */

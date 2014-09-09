@@ -104,7 +104,6 @@
 #define ADC_MAX_CHANNELS    0
 
 
-
 /**
  * @name PWM configuration
  * @{
@@ -162,15 +161,15 @@
 #define GPIO_1_PIN          10
 
 /* GPIO channel 2 config */
-#define GPIO_2_PORT         gpioPortB
+#define GPIO_2_PORT         gpioPortB	/* SPI CTS */
 #define GPIO_2_PIN          11
 
 /* GPIO channel 3 config */
-#define GPIO_3_PORT         gpioPortB
+#define GPIO_3_PORT         gpioPortB	/* SPI IRQ */
 #define GPIO_3_PIN          12
 
 ///* GPIO channel 4 config */
-#define GPIO_4_PORT         gpioPortB
+#define GPIO_4_PORT         gpioPortB	/* SPI PWR */
 #define GPIO_4_PIN          15
 
 #endif /* __PERIPH_CONF_H */
