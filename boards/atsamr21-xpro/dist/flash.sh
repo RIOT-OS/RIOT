@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 openocd -f "${RIOTBOARD}/${BOARD}/dist/atmel_samr21_xpro.cfg" \
     -c "init" \
