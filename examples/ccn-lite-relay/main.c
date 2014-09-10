@@ -37,7 +37,7 @@ char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 void set_address_handler(uint16_t a)
 {
-    msg_t mesg;
+    blip_t mesg;
     transceiver_command_t tcmd;
 
     tcmd.transceivers = TRANSCEIVER;
@@ -49,16 +49,16 @@ void set_address_handler(uint16_t a)
 
     printf("transceiver_pid=%" PRIkernel_pid"\n", transceiver_pid);
 
-    msg_send_receive(&mesg, &mesg, transceiver_pid);
+    blip_send_receive(&mesg, &mesg, transceiver_pid);
     printf("got address: %" PRIu16 "\n", a);
 }
 
 void populate_cache(void)
 {
-    msg_t m;
+    blip_t m;
     m.content.value = 0;
     m.type = CCNL_RIOT_POPULATE;
-    msg_send(&m, _relay_pid, 1);
+    blip_send(&m, _relay_pid);
 }
 
 void *second_thread(void *arg)

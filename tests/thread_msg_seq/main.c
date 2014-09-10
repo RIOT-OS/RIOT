@@ -38,11 +38,11 @@ void *sub_thread(void *arg)
     kernel_pid_t pid = thread_getpid();
     printf("THREAD %s (pid:%" PRIkernel_pid ") start\n", thread_getname(pid), pid);
 
-    msg_t msg;
+    blip_t msg;
 
     msg.content.ptr = (char*)thread_getname(pid);
 
-    msg_send(&msg, 1, 1);
+    blip_send(&msg, 1);
 
     printf("THREAD %s (pid:%" PRIkernel_pid ") end.\n", thread_getname(pid), pid);
 
@@ -52,7 +52,7 @@ void *sub_thread(void *arg)
 
 int main(void)
 {
-    msg_t msg;
+    blip_t msg;
 
     p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST,
@@ -66,7 +66,7 @@ int main(void)
 
     puts("THREADS CREATED\n");
     for(int i = 0; i < 3; i++) {
-        msg_receive(&msg);
+        blip_receive(&msg);
         printf("Got msg from pid %" PRIkernel_pid ": \"%s\"\n", msg.sender_pid, msg.content.ptr);
     }
 

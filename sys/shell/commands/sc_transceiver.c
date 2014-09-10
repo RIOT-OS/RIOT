@@ -64,7 +64,7 @@
 /* checked for type safety */
 void _transceiver_get_set_address_handler(int argc, char **argv)
 {
-    msg_t mesg;
+    blip_t mesg;
     transceiver_command_t tcmd;
     radio_address_t a;
 
@@ -86,7 +86,7 @@ void _transceiver_get_set_address_handler(int argc, char **argv)
         mesg.type = GET_ADDRESS;
     }
 
-    msg_send_receive(&mesg, &mesg, transceiver_pid);
+    blip_send_receive(&mesg, &mesg, transceiver_pid);
     printf("[transceiver] got address: %" PRIu16 "\n", a);
 }
 
@@ -143,7 +143,7 @@ uint64_t _str_to_eui64(const char *eui64_str)
 /* checked for type safety */
 void _transceiver_get_set_long_addr_handler(int argc, char **argv)
 {
-    msg_t mesg;
+    blip_t mesg;
     transceiver_command_t tcmd;
     transceiver_eui64_t a;
 
@@ -171,7 +171,7 @@ void _transceiver_get_set_long_addr_handler(int argc, char **argv)
         mesg.type = GET_LONG_ADDR;
     }
 
-    msg_send_receive(&mesg, &mesg, transceiver_pid);
+    blip_send_receive(&mesg, &mesg, transceiver_pid);
     printf("[transceiver] got EUI-64: %016"PRIx64"\n", a);
 }
 
@@ -179,7 +179,7 @@ void _transceiver_get_set_long_addr_handler(int argc, char **argv)
 /* checked for type safety */
 void _transceiver_get_set_channel_handler(int argc, char **argv)
 {
-    msg_t mesg;
+    blip_t mesg;
     transceiver_command_t tcmd;
     int32_t c;
 
@@ -201,7 +201,7 @@ void _transceiver_get_set_channel_handler(int argc, char **argv)
         mesg.type = GET_CHANNEL;
     }
 
-    msg_send_receive(&mesg, &mesg, transceiver_pid);
+    blip_send_receive(&mesg, &mesg, transceiver_pid);
     if (c == -1) {
         puts("[transceiver] Error setting/getting channel");
     }
@@ -247,7 +247,7 @@ void _transceiver_send_handler(int argc, char **argv)
     p.dst = atoi(argv[1]);
 #endif
 
-    msg_t mesg;
+    blip_t mesg;
     mesg.type = SND_PKT;
     mesg.content.ptr = (char *) &tcmd;
 
@@ -256,7 +256,7 @@ void _transceiver_send_handler(int argc, char **argv)
 #else
     printf("[transceiver] Sending packet of length %" PRIu16 " to %" PRIu16 ": %s\n", p.length, p.dst, (char*) p.data);
 #endif
-    msg_send_receive(&mesg, &mesg, transceiver_pid);
+    blip_send_receive(&mesg, &mesg, transceiver_pid);
     int8_t response = mesg.content.value;
     printf("[transceiver] Packet sent: %" PRIi8 "\n", response);
 }
@@ -280,11 +280,11 @@ void _transceiver_monitor_handler(int argc, char **argv)
     tcmd.transceivers = _TC_TYPE;
     tcmd.data = &m;
 
-    msg_t mesg;
+    blip_t mesg;
     mesg.content.ptr = (char *) &tcmd;
     mesg.type = SET_MONITOR;
 
-    msg_send(&mesg, transceiver_pid, 1);
+    blip_send(&mesg, transceiver_pid);
 }
 
 /* checked for type safety */
@@ -301,7 +301,7 @@ void _transceiver_get_set_pan_handler(int argc, char **argv)
     tcmd.transceivers = _TC_TYPE;
     tcmd.data = &p;
 
-    msg_t mesg;
+    blip_t mesg;
     mesg.content.ptr = (char*) &tcmd;
     if (argc > 1) {
         p = atoi(argv[1]);
@@ -311,7 +311,7 @@ void _transceiver_get_set_pan_handler(int argc, char **argv)
     else {
         mesg.type = GET_PAN;
     }
-    msg_send_receive(&mesg, &mesg, transceiver_pid);
+    blip_send_receive(&mesg, &mesg, transceiver_pid);
     if (p == -1) {
         puts("[transceiver] Error setting/getting pan");
     }
@@ -350,13 +350,13 @@ void _transceiver_set_ignore_handler(int argc, char **argv)
     tcmd.transceivers = _TC_TYPE;
     tcmd.data = &a;
 
-    msg_t mesg;
+    blip_t mesg;
     mesg.content.ptr = (char*) &tcmd;
 
     a = atoi(argv[1]);
     printf("[transceiver] trying to add address %" PRIu16 " to the ignore list \n", a);
     mesg.type = DBG_IGN;
-    msg_send_receive(&mesg, &mesg, transceiver_pid);
+    blip_send_receive(&mesg, &mesg, transceiver_pid);
 
     int16_t response = a;
     if (response == -1) {

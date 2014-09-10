@@ -38,7 +38,7 @@ radio_packet_t p;
 #endif
 
 transceiver_command_t tcmd;
-msg_t mesg, rep;
+blip_t mesg, rep;
 
 char relay_helper_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
@@ -69,7 +69,7 @@ int riot_send_transceiver(uint8_t *buf, uint16_t size, uint16_t to)
 
     mesg.type = SND_PKT;
     mesg.content.ptr = (char *) &tcmd;
-    msg_send_receive(&mesg, &rep, transceiver_pid);
+    blip_send_receive(&mesg, &rep, transceiver_pid);
 
     return size;
 }
@@ -91,21 +91,21 @@ int riot_send_msg(uint8_t *buf, uint16_t size, uint16_t to)
 
     memcpy(rmsg->payload, buf, size);
 
-    msg_t m;
+    blip_t m;
     m.type = CCNL_RIOT_MSG;
     m.content.ptr = (char *) rmsg;
     DEBUGMSG(1, "sending msg to pid=%" PRIkernel_pid "\n", to);
-    msg_send(&m, to, 1);
+    blip_send(&m, to);
 
     return size;
 }
 
 void riot_send_nack(uint16_t to)
 {
-    msg_t m;
+    blip_t m;
     m.type = CCNL_RIOT_NACK;
     DEBUGMSG(1, "sending NACK msg to pid=%" PRIkernel_pid"\n", to);
-    msg_send(&m, to, 0);
+    blip_try_send(&m, to);
 }
 
 void *ccnl_riot_relay_helper_start(void *);

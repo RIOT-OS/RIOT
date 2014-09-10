@@ -43,7 +43,7 @@ uint8_t is_root = 0;
 void rpl_udp_init(int argc, char **argv)
 {
     transceiver_command_t tcmd;
-    msg_t m;
+    blip_t m;
     uint8_t chan = RADIO_CHANNEL;
 
     if (argc != 2) {
@@ -119,7 +119,7 @@ void rpl_udp_init(int argc, char **argv)
     m.type = SET_CHANNEL;
     m.content.ptr = (void *) &tcmd;
 
-    msg_send_receive(&m, &m, transceiver_pid);
+    blip_send_receive(&m, &m, transceiver_pid);
     printf("Channel set to %u\n", RADIO_CHANNEL);
 
     puts("Destiny initialized");

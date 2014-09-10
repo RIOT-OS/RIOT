@@ -157,10 +157,10 @@ void vtimer_callback_tick(vtimer_t *timer)
 
 static void vtimer_callback_msg(vtimer_t *timer)
 {
-    msg_t msg;
+    blip_t msg;
     msg.type = MSG_TIMER;
     msg.content.value = (unsigned int) timer->arg;
-    msg_send_int(&msg, timer->pid);
+    blip_send_int(&msg, timer->pid);
 }
 
 static void vtimer_callback_wakeup(vtimer_t *timer)
@@ -394,14 +394,14 @@ int vtimer_set_msg(vtimer_t *t, timex_t interval, kernel_pid_t pid, void *ptr)
     return 0;
 }
 
-int vtimer_msg_receive_timeout(msg_t *m, timex_t timeout) {
-    msg_t timeout_message;
+int vtimer_msg_receive_timeout(blip_t *m, timex_t timeout) {
+    blip_t timeout_message;
     timeout_message.type = MSG_TIMER;
     timeout_message.content.ptr = (char *) &timeout_message;
 
     vtimer_t t;
     vtimer_set_msg(&t, timeout, sched_active_pid, &timeout_message);
-    msg_receive(m);
+    blip_receive(m);
     if (m->type == MSG_TIMER && m->content.ptr == (char *) &timeout_message) {
         /* we hit the timeout */
         return -1;

@@ -78,12 +78,12 @@ void serial_reader_f(void)
 {
     kernel_pid_t main_pid;
     int bytes;
-    msg_t m;
+    blip_t m;
     border_packet_t *uart_buf;
 
     posix_open(uart0_handler_pid, 0);
 
-    msg_receive(&m);
+    blip_receive(&m);
     main_pid = m.sender_pid;
 
     while (1) {
@@ -114,7 +114,7 @@ void serial_reader_f(void)
 
                 if (conf_packet->conftype == BORDER_CONF_SYN) {
                     m.content.ptr = (char *)conf_packet;
-                    msg_send(&m, main_pid, 1);
+                    blip_send(&m, main_pid);
                     continue;
                 }
             }
@@ -170,11 +170,11 @@ int sixlowpan_lowpan_border_init(int if_id)
 
 void border_process_lowpan(void)
 {
-    msg_t m;
+    blip_t m;
     ipv6_hdr_t *ipv6_buf;
 
     while (1) {
-        msg_receive(&m);
+        blip_receive(&m);
         ipv6_buf = (ipv6_hdr_t *)m.content.ptr;
 
         if (ipv6_buf->nextheader == IPV6_PROTO_NUM_ICMPV6) {

@@ -39,8 +39,8 @@ void *run(void *arg)
 
     kernel_pid_t me = thread_getpid();
     printf("I am alive (%d)\n", me);
-    msg_t m;
-    msg_receive(&m);
+    blip_t m;
+    blip_receive(&m);
     printf("Thread %d has arg %" PRIu32 "\n", me, m.content.value);
 
     mutex_lock(&mtx);
@@ -48,9 +48,9 @@ void *run(void *arg)
     storage *= m.content.value;
     mutex_unlock(&mtx);
 
-    msg_t final;
+    blip_t final;
     final.content.value = me;
-    int err = msg_send(&final, main_id, 1);
+    int err = blip_send(&final, main_id);
 
     if (err < 0) {
         printf("[!!!] Failed to send message from %d to main\n", me);
@@ -65,7 +65,7 @@ int main(void)
 
     printf("Problem: %d\n", PROBLEM);
 
-    msg_t args[PROBLEM];
+    blip_t args[PROBLEM];
 
     for (int i = 0; i < PROBLEM; ++i) {
         printf("Creating thread with arg %d\n", (i + 1));
@@ -79,7 +79,7 @@ int main(void)
         else {
             args[i].content.value = i + 1;
 
-            int err = msg_send(&args[i], ths[i], 1);
+            int err = blip_send(&args[i], ths[i]);
             if (err < 0) {
                 printf("[!!!] Sending message to thread %d failed\n", ths[i]);
             }
@@ -87,8 +87,8 @@ int main(void)
     }
 
     for (int i = 0; i < PROBLEM; ++i) {
-        msg_t msg;
-        msg_receive(&msg);
+        blip_t msg;
+        blip_receive(&msg);
         printf("Reveiced message %d from thread %" PRIu32 "\n", i, msg.content.value);
     }
 

@@ -37,7 +37,7 @@
 
 extern uint8_t ipv6_ext_hdr_len;
 
-msg_t msg_q[RCV_BUFFER_SIZE];
+blip_t msg_q[RCV_BUFFER_SIZE];
 
 void rpl_udp_set_id(int argc, char **argv)
 {
@@ -57,7 +57,7 @@ void *rpl_udp_monitor(void *arg)
 {
     (void) arg;
 
-    msg_t m;
+    blip_t m;
     radio_packet_t *p;
     ipv6_hdr_t *ipv6_buf;
     uint8_t icmp_type, icmp_code;
@@ -66,7 +66,7 @@ void *rpl_udp_monitor(void *arg)
     msg_init_queue(msg_q, RCV_BUFFER_SIZE);
 
     while (1) {
-        msg_receive(&m);
+        blip_receive(&m);
 
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t *) m.content.ptr;
@@ -128,7 +128,7 @@ void rpl_udp_ignore(int argc, char **argv)
         return;
     }
 
-    msg_t mesg;
+    blip_t mesg;
     mesg.type = DBG_IGN;
     mesg.content.ptr = (char *) &tcmd;
 
@@ -138,7 +138,7 @@ void rpl_udp_ignore(int argc, char **argv)
     if (argc == 2) {
         a = atoi(argv[1]);
         printf("sending to transceiver (%" PRIkernel_pid "): %u\n", transceiver_pid, (*(uint8_t *)tcmd.data));
-        msg_send(&mesg, transceiver_pid, 1);
+        blip_send(&mesg, transceiver_pid);
     }
     else {
         printf("Usage: %s <addr>\n", argv[0]);

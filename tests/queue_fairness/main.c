@@ -39,10 +39,10 @@ static void *child_fun(void *arg)
     printf("Start of %s.\n", sched_active_thread->name);
 
     for (int i = 0; i < NUM_ITERATIONS; ++i) {
-        msg_t m;
+        blip_t m;
         m.type = i + 1;
         m.content.ptr = (void *) sched_active_thread->name;
-        msg_send(&m, parent_pid, true);
+        blip_send(&m, parent_pid);
     }
 
     printf("End of %s.\n", sched_active_thread->name);
@@ -67,8 +67,8 @@ int main(void)
 
     int last_iteration = 0;
     for (int i = 0; i < NUM_ITERATIONS * NUM_CHILDREN; ++i) {
-        msg_t m;
-        msg_receive(&m);
+        blip_t m;
+        blip_receive(&m);
         int cur_iteration = (int) m.type;
         char *child = (char *) m.content.ptr;
 

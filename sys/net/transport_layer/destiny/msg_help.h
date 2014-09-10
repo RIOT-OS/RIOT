@@ -35,10 +35,10 @@
 #define RETURNNOW                       4000
 
 void block_continue_thread(void);
-int net_msg_receive(msg_t *m);
-int net_msg_reply(msg_t *m, msg_t *reply, uint16_t message);
-int net_msg_send(msg_t *m, kernel_pid_t pid, bool block, uint16_t message);
-int net_msg_send_recv(msg_t *m, msg_t *reply, kernel_pid_t pid, uint16_t message);
+int net_msg_receive(blip_t *m);
+int net_msg_reply(blip_t *m, blip_t *reply, uint16_t message);
+int net_msg_send(blip_t *m, kernel_pid_t pid, bool block, uint16_t message);
+int net_msg_send_recv(blip_t *m, blip_t *reply, kernel_pid_t pid, uint16_t message);
 
 #endif /* MSG_HELP_H_ */
 /**

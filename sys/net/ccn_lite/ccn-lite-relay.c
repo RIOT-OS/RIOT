@@ -50,7 +50,7 @@
 #define RELAY_MSG_BUFFER_SIZE (64)
 
 /** message buffer */
-msg_t msg_buffer_relay[RELAY_MSG_BUFFER_SIZE];
+blip_t msg_buffer_relay[RELAY_MSG_BUFFER_SIZE];
 
 struct ccnl_relay_s *theRelay = NULL;
 
@@ -302,13 +302,13 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
         return -1;
     }
 
-    msg_t in;
+    blip_t in;
     radio_packet_t *p;
     riot_ccnl_msg_t *m;
 
     while (!ccnl->halt_flag) {
 
-        msg_receive(&in);
+        blip_receive(&in);
 
         mutex_lock(&ccnl->global_lock);
         switch (in.type) {

@@ -14,7 +14,7 @@
  * There are two ways to use the IPC Messaging system of RIOT. The default is
  * synchronous messaging. In this manner, messages are either dropped when the
  * receiver is not waiting and the message was sent non-blocking, or will be
- * delivered immediately when the receiver calls msg_receive(msg_t* m). To use
+ * delivered immediately when the receiver calls blip_receive(msg_t* m). To use
  * asynchronous messaging any thread can create its own queue by calling
  * msg_init_queue(msg_t* array, int num). Messages sent to a thread with a non
  * full message queue are never dropped * and the sending never blocks. Threads
@@ -52,22 +52,39 @@ typedef struct msg {
         char     *ptr;          /**< Pointer content field. */
         uint32_t value;         /**< Value content field. */
     } content;                  /**< Content of the message. */
-} msg_t;
+} blip_t;
 
 
 /**
- * @brief Send a message.
+ * @brief Send a message. (blocking)
  *
- * This function sends a message to another thread. The ``msg_t`` structure has
+ * This function sends a message to another thread. The ``blip_t`` structure has
  * to be allocated (e.g. on the stack) before calling the function and can be
  * freed afterwards. If called from an interrupt, this function will never
  * block.
  *
- * @param[in] m             Pointer to preallocated ``msg_t`` structure, must
+ * @param[in] m             Pointer to preallocated ``blip_t`` structure, must
  *                          not be NULL.
  * @param[in] target_pid    PID of target thread
- * @param[in] block         If not 0 and receiver is not receive-blocked,
- *                          function will block. If not, function returns.
+ *
+ * @return 1, if sending was successful (message delivered directly or to a
+ *         queue)
+ * @return 0, if called from ISR and receiver is not waiting or has a full message queue
+ * @return -1, on error (invalid PID)
+ */
+int blip_send(blip_t *m, kernel_pid_t target_pid);
+
+
+/**
+ * @brief Send a message. (non-blocking)
+ *
+ * This function sends a message to another thread. The ``blip_t`` structure has
+ * to be allocated (e.g. on the stack) before calling the function and can be
+ * freed afterwards. This function will never block.
+ *
+ * @param[in] m             Pointer to preallocated ``blip_t`` structure, must
+ *                          not be NULL.
+ * @param[in] target_pid    PID of target thread
  *
  * @return 1, if sending was successful (message delivered directly or to a
  *         queue)
@@ -75,7 +92,7 @@ typedef struct msg {
  *         ``block == 0``
  * @return -1, on error (invalid PID)
  */
-int msg_send(msg_t *m, kernel_pid_t target_pid, bool block);
+int blip_try_send(blip_t *m, kernel_pid_t target_pid);
 
 
 /**
@@ -91,7 +108,7 @@ int msg_send(msg_t *m, kernel_pid_t target_pid, bool block);
  * @return 1 if sending was successful
  * @return 0 if the thread's message queue is full (or inexistent)
  */
-int msg_send_to_self(msg_t *m);
+int msg_send_to_self(blip_t *m);
 
 /**
  * @brief Send message from interrupt.
@@ -99,7 +116,7 @@ int msg_send_to_self(msg_t *m);
  * Will be automatically chosen instead of ``msg_send()`` if called from an
  * interrupt/ISR.
  *
- * @param[in] m             Pointer to preallocated ``msg_t`` structure, must
+ * @param[in] m             Pointer to preallocated ``blip_t`` structure, must
  *                          not be NULL.
  * @param[in] target_pid    PID of target thread.
  *
@@ -107,7 +124,7 @@ int msg_send_to_self(msg_t *m);
  * @return 0, if receiver is not waiting and ``block == 0``
  * @return -1, on error (invalid PID)
  */
-int msg_send_int(msg_t *m, kernel_pid_t target_pid);
+int blip_send_int(blip_t *m, kernel_pid_t target_pid);
 
 
 /**
@@ -115,25 +132,25 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid);
  *
  * This function blocks until a message was received.
  *
- * @param[out] m    Pointer to preallocated ``msg_t`` structure, must not be
+ * @param[out] m    Pointer to preallocated ``blip_t`` structure, must not be
  *                  NULL.
  *
  * @return  1, Function always succeeds or blocks forever.
  */
-int msg_receive(msg_t *m);
+int blip_receive(blip_t *m);
 
 /**
  * @brief Try to receive a message.
  *
  * This function does not block if no message can be received.
  *
- * @param[out] m    Pointer to preallocated ``msg_t`` structure, must not be
+ * @param[out] m    Pointer to preallocated ``blip_t`` structure, must not be
  *                  NULL.
  *
  * @return  1, if a message was received
  * @return  -1, otherwise.
  */
-int msg_try_receive(msg_t *m);
+int blip_try_receive(blip_t *m);
 
 /**
  * @brief Send a message, block until reply received.
@@ -142,8 +159,8 @@ int msg_try_receive(msg_t *m);
  * has sent a reply which is then stored in *reply*.
  *
  * @note    CAUTION! Use this function only when receiver is already waiting.
- *          If not use simple msg_send()
- * @param[in] m             Pointer to preallocated ``msg_t`` structure with
+ *          If not use simple blip_send()
+ * @param[in] m             Pointer to preallocated ``blip_t`` structure with
  *                          the message to send, must not be NULL.
  * @param[out] reply        Pointer to preallocated msg. Reply will be written
  *                          here, must not be NULL.
@@ -151,12 +168,12 @@ int msg_try_receive(msg_t *m);
  *
  * @return  1, if successful.
  */
-int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid);
+int blip_send_receive(blip_t *m, blip_t *reply, kernel_pid_t target_pid);
 
 /**
  * @brief Replies to a message.
  *
- * Sender must have sent the message with msg_send_receive().
+ * Sender must have sent the message with blip_send_receive().
  *
  * @param[in] m         message to reply to, must not be NULL.
  * @param[out] reply    message that target will get as reply, must not be
@@ -165,20 +182,20 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid);
  * @return 1, if successful
  * @return 0, on error
  */
-int msg_reply(msg_t *m, msg_t *reply);
+int blip_reply(blip_t *m, blip_t *reply);
 
 /**
  * @brief Initialize the current thread's message queue.
  *
- * @param[in] array Pointer to preallocated array of ``msg_t`` structures, must
+ * @param[in] array Pointer to preallocated array of ``blip_t`` structures, must
  *                  not be NULL.
- * @param[in] num   Number of ``msg_t`` structures in array.
+ * @param[in] num   Number of ``blip_t`` structures in array.
  *                  **MUST BE POWER OF TWO!**
  *
  * @return 0, if successful
  * @return -1, on error
  */
-int msg_init_queue(msg_t *array, int num);
+int msg_init_queue(blip_t *array, int num);
 
 #endif /* __MSG_H_ */
 /** @} */

@@ -103,8 +103,8 @@ static void *pthread_reaper(void *arg)
     (void) arg;
 
     while (1) {
-        msg_t m;
-        msg_receive(&m);
+        blip_t m;
+        blip_receive(&m);
         DEBUG("pthread_reaper(): free(%p)\n", m.content.ptr);
         free(m.content.ptr);
     }
@@ -198,9 +198,9 @@ void pthread_exit(void *retval)
 
         dINT();
         if (self->stack) {
-            msg_t m;
+            blip_t m;
             m.content.ptr = self->stack;
-            msg_send_int(&m, pthread_reaper_pid);
+            blip_send_int(&m, pthread_reaper_pid);
         }
     }
 

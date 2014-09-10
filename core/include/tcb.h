@@ -68,7 +68,7 @@ typedef struct tcb_t {
     priority_queue_t msg_waiters;   /**< threads waiting on message     */
 
     cib_t msg_queue;            /**< message queue                  */
-    msg_t *msg_array;           /**< memory holding messages        */
+    blip_t *msg_array;           /**< memory holding messages        */
 
     const char *name;           /**< thread's name                  */
     char *stack_start;          /**< thread's stack start address   */

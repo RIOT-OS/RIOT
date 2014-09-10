@@ -525,7 +525,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     ipv6_addr_t src_addr;
     socket_internal_t *current_int_tcp_socket;
     socket_t *current_tcp_socket;
-    msg_t msg_from_server;
+    blip_t msg_from_server;
     uint8_t send_buffer[BUFFER_SIZE];
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
@@ -591,7 +591,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
                  TCP_SYN, 0);
 
         /* wait for SYN ACK or RETRY */
-        msg_receive(&msg_from_server);
+        blip_receive(&msg_from_server);
 
         if (msg_from_server.type == TCP_TIMEOUT) {
 #ifdef TCP_HC
@@ -657,7 +657,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
         send_tcp(current_int_tcp_socket, current_tcp_packet, temp_ipv6_header,
                  TCP_ACK, 0);
 
-        msg_receive(&msg_from_server);
+        blip_receive(&msg_from_server);
 #ifdef TCP_HC
 
         if (msg_from_server.type == TCP_SYN_ACK) {
@@ -718,7 +718,7 @@ int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags)
     (void) flags;
 
     /* Variables */
-    msg_t recv_msg;
+    blip_t recv_msg;
     int32_t sent_bytes = 0;
     uint32_t total_sent_bytes = 0;
     socket_internal_t *current_int_tcp_socket;
@@ -921,7 +921,7 @@ int32_t destiny_socket_recv(int s, void *buf, uint32_t len, int flags)
 
     /* Variables */
     uint8_t read_bytes;
-    msg_t m_recv, m_send;
+    blip_t m_recv, m_send;
     socket_internal_t *current_int_tcp_socket;
 
     /* Check if socket exists */
@@ -939,7 +939,7 @@ int32_t destiny_socket_recv(int s, void *buf, uint32_t len, int flags)
         return read_from_socket(current_int_tcp_socket, buf, len);
     }
 
-    msg_receive(&m_recv);
+    blip_receive(&m_recv);
 
     if ((exists_socket(s)) && (current_int_tcp_socket->tcp_input_buffer_end > 0)) {
         read_bytes = read_from_socket(current_int_tcp_socket, buf, len);
@@ -950,7 +950,7 @@ int32_t destiny_socket_recv(int s, void *buf, uint32_t len, int flags)
     /* Received FIN */
     if (m_recv.type == CLOSE_CONN) {
         /* Sent FIN_ACK, wait for ACK */
-        msg_receive(&m_recv);
+        blip_receive(&m_recv);
         /* Received ACK, return with closed socket!*/
         return -1;
     }
@@ -965,13 +965,13 @@ int32_t destiny_socket_recvfrom(int s, void *buf, uint32_t len, int flags,
     (void) flags;
 
     if (isUDPSocket(s)) {
-        msg_t m_recv, m_send;
+        blip_t m_recv, m_send;
         ipv6_hdr_t *ipv6_header;
         udp_hdr_t *udp_header;
         uint8_t *payload;
         get_socket(s)->recv_pid = thread_getpid();
 
-        msg_receive(&m_recv);
+        blip_receive(&m_recv);
 
         ipv6_header = ((ipv6_hdr_t *)m_recv.content.ptr);
         udp_header = ((udp_hdr_t *)(m_recv.content.ptr + IPV6_HDR_LEN));
@@ -985,7 +985,7 @@ int32_t destiny_socket_recvfrom(int s, void *buf, uint32_t len, int flags,
         from->sin6_port = NTOHS(udp_header->src_port);
         *fromlen = sizeof(sockaddr6_t);
 
-        msg_reply(&m_recv, &m_send);
+        blip_reply(&m_recv, &m_send);
         return NTOHS(udp_header->length) - UDP_HDR_LEN;
     }
     else if (is_tcp_socket(s)) {
@@ -1043,7 +1043,7 @@ int destiny_socket_close(int s)
     if (current_socket != NULL) {
         if (is_tcp_socket(s)) {
             /* Variables */
-            msg_t m_recv;
+            blip_t m_recv;
             uint8_t send_buffer[BUFFER_SIZE];
             ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
             tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
@@ -1070,7 +1070,7 @@ int destiny_socket_close(int s)
 
             send_tcp(current_socket, current_tcp_packet, temp_ipv6_header,
                      TCP_FIN_ACK, 0);
-            msg_receive(&m_recv);
+            blip_receive(&m_recv);
             close_socket(current_socket);
             return 1;
         }
@@ -1221,7 +1221,7 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
 {
     (void) pid;
 
-    msg_t msg_recv_client_ack, msg_send_client_ack;
+    blip_t msg_recv_client_ack, msg_send_client_ack;
     socket_t *current_queued_socket = &current_queued_int_socket->socket_values;
     uint8_t send_buffer[BUFFER_SIZE];
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
@@ -1251,7 +1251,7 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
                  TCP_SYN_ACK, 0);
 
         /* wait for ACK from Client */
-        msg_receive(&msg_recv_client_ack);
+        blip_receive(&msg_recv_client_ack);
 
         if (msg_recv_client_ack.type == TCP_TIMEOUT) {
             /* Set status of internal socket back to TCP_LISTEN */
@@ -1291,7 +1291,7 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
 
     /* send a reply to the TCP handler after processing every information from
      * the TCP ACK packet */
-    msg_reply(&msg_recv_client_ack, &msg_send_client_ack);
+    blip_reply(&msg_recv_client_ack, &msg_send_client_ack);
 
     /* Reset PID to an invalid value */
     current_queued_int_socket->recv_pid = KERNEL_PID_UNDEF;
@@ -1321,11 +1321,11 @@ int destiny_socket_accept(int s, sockaddr6_t *addr, uint32_t *addrlen)
         }
         else {
             /* No waiting connections, waiting for message from TCP Layer */
-            msg_t msg_recv_client_syn;
+            blip_t msg_recv_client_syn;
             msg_recv_client_syn.type = UNDEFINED;
 
             while (msg_recv_client_syn.type != TCP_SYN) {
-                msg_receive(&msg_recv_client_syn);
+                blip_receive(&msg_recv_client_syn);
             }
 
             current_queued_socket = get_waiting_connection_socket(s, NULL, NULL);

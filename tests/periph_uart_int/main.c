@@ -57,11 +57,11 @@ static ringbuffer_t tx_buf;
 
 void rx(void *ptr, char data)
 {
-    msg_t msg;
+    blip_t msg;
 
     ringbuffer_add_one(&rx_buf, data);
     if (data == '\n') {
-        msg_send(&msg, main_pid, 1);
+        blip_send(&msg, main_pid);
     }
 }
 
@@ -97,7 +97,7 @@ int main(void)
 {
     char buf[128];
     int res;
-    msg_t msg;
+    blip_t msg;
 
     main_pid = thread_getpid();
 
@@ -121,7 +121,7 @@ int main(void)
                   0, uart_thread, 0, "uart");
 
     while (1) {
-        msg_receive(&msg);
+        blip_receive(&msg);
 
         printf("RECEIVED INPUT: ");
         res = ringbuffer_get(&rx_buf, buf, rx_buf.avail);

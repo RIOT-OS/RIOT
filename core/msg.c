@@ -36,10 +36,11 @@
 #include "debug.h"
 #include "thread.h"
 
-static int _msg_receive(msg_t *m, int block);
+static int _msg_receive(blip_t *m, int block);
+static int _blip_send(blip_t *m, kernel_pid_t target_pid, bool block);
 
 
-static int queue_msg(tcb_t *target, msg_t *m)
+static int queue_msg(tcb_t *target, blip_t *m)
 {
     int n = cib_put(&(target->msg_queue));
 
@@ -51,10 +52,18 @@ static int queue_msg(tcb_t *target, msg_t *m)
     return 0;
 }
 
-int msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
+int blip_send(blip_t *m, kernel_pid_t target_pid) {
+    return _blip_send(m, target_pid, true);
+}
+
+int blip_try_send(blip_t *m, kernel_pid_t target_pid) {
+    return _blip_send(m, target_pid, false);
+}
+
+static int _blip_send(blip_t *m, kernel_pid_t target_pid, bool block)
 {
     if (inISR()) {
-        return msg_send_int(m, target_pid);
+        return blip_send_int(m, target_pid);
     }
 
     if (sched_active_pid == target_pid) {
@@ -119,7 +128,7 @@ int msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
     else {
         DEBUG("msg_send: %s: Direct msg copy from %" PRIkernel_pid " to %" PRIkernel_pid ".\n", sched_active_thread->name, thread_getpid(), target_pid);
         /* copy msg to target */
-        msg_t *target_message = (msg_t*) target->wait_data;
+        blip_t *target_message = (blip_t*) target->wait_data;
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
     }
@@ -130,7 +139,7 @@ int msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
     return 1;
 }
 
-int msg_send_to_self(msg_t *m)
+int msg_send_to_self(blip_t *m)
 {
     unsigned int state = disableIRQ();
 
@@ -141,7 +150,7 @@ int msg_send_to_self(msg_t *m)
     return res;
 }
 
-int msg_send_int(msg_t *m, kernel_pid_t target_pid)
+int blip_send_int(blip_t *m, kernel_pid_t target_pid)
 {
     tcb_t *target = (tcb_t *) sched_threads[target_pid];
 
@@ -156,7 +165,7 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
         m->sender_pid = target_pid;
 
         /* copy msg to target */
-        msg_t *target_message = (msg_t*) target->wait_data;
+        blip_t *target_message = (blip_t*) target->wait_data;
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
 
@@ -169,7 +178,7 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
     }
 }
 
-int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
+int blip_send_receive(blip_t *m, blip_t *reply, kernel_pid_t target_pid)
 {
     dINT();
     tcb_t *me = (tcb_t*) sched_threads[sched_active_pid];
@@ -178,10 +187,10 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
 
     /* msg_send blocks until reply received */
 
-    return msg_send(m, target_pid, true);
+    return blip_send(m, target_pid);
 }
 
-int msg_reply(msg_t *m, msg_t *reply)
+int blip_reply(blip_t *m, blip_t *reply)
 {
     int state = disableIRQ();
 
@@ -200,7 +209,7 @@ int msg_reply(msg_t *m, msg_t *reply)
 
     DEBUG("msg_reply(): %s: Direct msg copy.\n", sched_active_thread->name);
     /* copy msg to target */
-    msg_t *target_message = (msg_t*) target->wait_data;
+    blip_t *target_message = (blip_t*) target->wait_data;
     *target_message = *reply;
     sched_set_status(target, STATUS_PENDING);
     restoreIRQ(state);
@@ -209,7 +218,7 @@ int msg_reply(msg_t *m, msg_t *reply)
     return 1;
 }
 
-int msg_reply_int(msg_t *m, msg_t *reply)
+int msg_reply_int(blip_t *m, blip_t *reply)
 {
     tcb_t *target = (tcb_t*) sched_threads[m->sender_pid];
 
@@ -218,24 +227,24 @@ int msg_reply_int(msg_t *m, msg_t *reply)
         return -1;
     }
 
-    msg_t *target_message = (msg_t*) target->wait_data;
+    blip_t *target_message = (blip_t*) target->wait_data;
     *target_message = *reply;
     sched_set_status(target, STATUS_PENDING);
     sched_context_switch_request = 1;
     return 1;
 }
 
-int msg_try_receive(msg_t *m)
+int blip_try_receive(blip_t *m)
 {
     return _msg_receive(m, 0);
 }
 
-int msg_receive(msg_t *m)
+int blip_receive(blip_t *m)
 {
     return _msg_receive(m, 1);
 }
 
-static int _msg_receive(msg_t *m, int block)
+static int _msg_receive(blip_t *m, int block)
 {
     dINT();
     DEBUG("_msg_receive: %s: _msg_receive.\n", sched_active_thread->name);
@@ -294,7 +303,7 @@ static int _msg_receive(msg_t *m, int block)
         }
 
         /* copy msg */
-        msg_t *sender_msg = (msg_t*) sender->wait_data;
+        blip_t *sender_msg = (blip_t*) sender->wait_data;
         *m = *sender_msg;
 
         /* remove sender from queue */
@@ -310,7 +319,7 @@ static int _msg_receive(msg_t *m, int block)
     DEBUG("This should have never been reached!\n");
 }
 
-int msg_init_queue(msg_t *array, int num)
+int msg_init_queue(blip_t *array, int num)
 {
     /* check if num is a power of two by comparing to its complement */
     if (num && (num & (num - 1)) == 0) {

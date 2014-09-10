@@ -618,7 +618,7 @@ static void *cc1100_event_handler_function(void *arg)
 {
     (void) arg;
 
-    msg_t m;
+    blip_t m;
 
     while (1) {
         if (timex_uint64(cc1100_watch_dog_period) != 0) {
@@ -682,7 +682,7 @@ static void *cc1100_event_handler_function(void *arg)
                                cc1100_event_handler_pid, NULL);
             }
 
-            msg_receive(&m);
+            blip_receive(&m);
         }
 
         eINT();
@@ -697,7 +697,7 @@ static void *cc1100_event_handler_function(void *arg)
 
 void cc1100_phy_rx_handler(void)
 {
-    msg_t m;
+    blip_t m;
     m.type = MSG_POLL;
     bool dup = false;
     bool res = false;
@@ -797,7 +797,7 @@ void cc1100_phy_rx_handler(void)
                  * Receiver process could already be running (triggered by previous message),
                  * so function would return 0 and assume the receiver is not waiting but indeed
                  * all is working fine.*/
-                msg_send_int(&m, cc1100_event_handler_pid);
+                blip_send_int(&m, cc1100_event_handler_pid);
                 cc1100_statistic.packets_in_up++;
             }
         }

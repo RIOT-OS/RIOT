@@ -41,10 +41,10 @@ int16_t synack_seqnum = -1;
 ipv6_addr_t init_threeway_handshake(void)
 {
     border_syn_packet_t *syn;
-    msg_t m;
+    blip_t m;
     m.content.ptr = NULL;
-    msg_send(&m, border_get_serial_reader(), 1);
-    msg_receive(&m);
+    blip_send(&m, border_get_serial_reader());
+    blip_receive(&m);
 
     syn = (border_syn_packet_t *)m.content.ptr;
     border_conf_header_t *synack = (border_conf_header_t *)get_serial_out_buffer(0);
@@ -91,13 +91,13 @@ ipv6_addr_t flowcontrol_init(void)
 
 static void sending_slot(void)
 {
-    msg_t m;
+    blip_t m;
     uint8_t seq_num;
     struct send_slot *slot;
     border_packet_t *tmp;
 
     while (1) {
-        msg_receive(&m);
+        blip_receive(&m);
         seq_num = *((uint8_t *)m.content.ptr);
         slot = &(slwin_stat.send_win[seq_num % BORDER_SWS]);
         tmp = (border_packet_t *)slot->frame;
