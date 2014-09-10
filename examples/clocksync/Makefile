@@ -1,15 +1,15 @@
 # name of your application
-export APPLICATION = clocksync
+APPLICATION = clocksync
 
 # If no BOARD is found in the environment, use this default:
-export BOARD ?= native
+BOARD ?= native
 
-export SYNCMOD ?= gtsp
+SYNCMOD ?= gtsp
 #export SYNCMOD ?= ftsp
 #export SYNCMOD ?= pulsesync
 
 # This has to be the absolute path to the RIOT base directory:
-export RIOTBASE ?= $(CURDIR)/../..
+RIOTBASE ?= $(CURDIR)/../..
 
 # Uncomment these lines if you want to use platform support from external
 # repositories:
@@ -28,10 +28,10 @@ export RIOTBASE ?= $(CURDIR)/../..
 # development process:
 #CFLAGS += -DDEVELHELP
 
-export LINKFLAGS += -lm
+LINKFLAGS += -lm
 
 # Change this to 0 show compiler invocation lines by default:
-export QUIET ?= 1
+QUIET ?= 1
 
 # Modules to include:
 
