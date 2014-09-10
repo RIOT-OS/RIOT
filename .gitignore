@@ -7,9 +7,6 @@ doc/doxygen/*.log
 *~
 *.orig
 .*.swp
-*.lock
-*.pids
-*.taps
 cachegrind.out*
 .project
 .cproject
