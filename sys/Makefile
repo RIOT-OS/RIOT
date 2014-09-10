@@ -77,6 +77,9 @@ endif
 ifneq (,$(filter routing,$(USEMODULE)))
 	DIRS += net/routing
 endif
+ifneq (,$(filter dns,$(USEMODULE)))
+    DIRS += net/applications/dns
+endif
 ifneq (,$(filter ieee802154,$(USEMODULE)))
     DIRS += net/link_layer/ieee802154
 endif
