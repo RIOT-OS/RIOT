@@ -31,6 +31,8 @@
 #include "board.h"
 #include "thread.h"
 #include "kernel.h"
+#include "mutex.h"
+#include "ringbuffer.h"
 #include "irq.h"
 #include "periph/uart.h"
 
