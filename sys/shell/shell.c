@@ -236,6 +236,18 @@ static int readline(shell_t *shell, char *buf, size_t size)
             shell->put_char('\n');
             return 0;
         }
+        else if (c == '\b') {
+            if (line_buf_ptr == buf) {
+                /* The line is empty. */
+                continue;
+            }
+
+            *--line_buf_ptr = '\0';
+            /* white-tape the character */
+            shell->put_char('\b');
+            shell->put_char(' ');
+            shell->put_char('\b');
+        }
         else {
             *line_buf_ptr++ = c;
             shell->put_char(c);
