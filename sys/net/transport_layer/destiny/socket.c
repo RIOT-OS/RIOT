@@ -260,7 +260,9 @@ int bind_tcp_socket(int s, sockaddr6_t *name, int namelen, kernel_pid_t pid)
 {
     int i;
 
-    if (!exists_socket(s)) {
+    socket_internal_t *sock = get_socket(s);
+
+    if (!sock) {
         return -1;
     }
 
@@ -271,9 +273,9 @@ int bind_tcp_socket(int s, sockaddr6_t *name, int namelen, kernel_pid_t pid)
         }
     }
 
-    memcpy(&get_socket(s)->socket_values.local_address, name, namelen);
-    get_socket(s)->recv_pid = pid;
-    get_socket(s)->socket_values.tcp_control.rto = TCP_INITIAL_ACK_TIMEOUT;
+    sock->socket_values.local_address = *name;
+    sock->socket_values.tcp_control.rto = TCP_INITIAL_ACK_TIMEOUT;
+    sock->recv_pid = pid;
     return 0;
 }
 
