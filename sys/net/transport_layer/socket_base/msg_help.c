@@ -17,11 +17,9 @@
 
 #include "thread.h"
 
-#include "tcp_timer.h"
-
 #include "msg_help.h"
 
-void block_continue_thread(void)
+void socket_base_block_continue_thread(void)
 {
     //  msg_t recv_m;
     //  recv_m.type = TCP_NOT_DEFINED;
@@ -31,24 +29,24 @@ void block_continue_thread(void)
     //      }
 }
 
-int net_msg_receive(msg_t *m)
+int socket_base_net_msg_receive(msg_t *m)
 {
     return msg_receive(m);
 }
 
-int net_msg_reply(msg_t *m, msg_t *reply, uint16_t message)
+int socket_base_net_msg_reply(msg_t *m, msg_t *reply, uint16_t message)
 {
     reply->type = message;
     return msg_reply(m, reply);
 }
 
-int net_msg_send(msg_t *m, kernel_pid_t pid, bool block, uint16_t message)
+int socket_base_net_msg_send(msg_t *m, kernel_pid_t pid, bool block, uint16_t message)
 {
     m->type = message;
     return msg_send(m, pid, block);
 }
 
-int net_msg_send_recv(msg_t *m, msg_t *reply, kernel_pid_t pid, uint16_t message)
+int socket_base_net_msg_send_recv(msg_t *m, msg_t *reply, kernel_pid_t pid, uint16_t message)
 {
     m->type = message;
     return msg_send_receive(m, reply, pid);;

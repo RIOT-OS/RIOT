@@ -16,7 +16,7 @@
 
 #include "sixlowpan.h"
 
-#include "destiny/socket.h"
+#include "socket_base/socket.h"
 
 #include "tcp.h"
 

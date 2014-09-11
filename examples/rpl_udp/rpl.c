@@ -24,7 +24,7 @@
 #include "thread.h"
 #include "net_if.h"
 #include "sixlowpan.h"
-#include "destiny.h"
+#include "udp.h"
 #include "rpl.h"
 #include "rpl/rpl_dodag.h"
 #include "rpl_udp.h"
@@ -122,7 +122,7 @@ void rpl_udp_init(int argc, char **argv)
     msg_send_receive(&m, &m, transceiver_pid);
     printf("Channel set to %u\n", RADIO_CHANNEL);
 
-    puts("Destiny initialized");
+    puts("Transport Layer initialized");
     /* start transceiver watchdog */
 }
 

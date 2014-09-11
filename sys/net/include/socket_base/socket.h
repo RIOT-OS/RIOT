@@ -1,5 +1,5 @@
 /**
- * destiny/socket.h - Destiny socket API
+ * socket_base/socket.h - Transport Layer socket API
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup destiny
+ * @ingroup socket_base
  * @{
  * @file
  * @brief   Header for BSD socket API
@@ -19,14 +19,14 @@
  */
 
 
-#ifndef DESTINY_SOCKET_H
-#define DESTINY_SOCKET_H
+#ifndef SOCKET_BASE_SOCKET_H
+#define SOCKET_BASE_SOCKET_H
 
 #include <stdint.h>
 
 #include "ipv6.h"
 
-#include "destiny/in.h"
+#include "socket_base/in.h"
 
 typedef uint8_t sa_family_t;    ///< POSIX compatible type for address family.
 typedef uint32_t  socklen_t;    ///< POSIX compatible type for address length.
@@ -159,17 +159,17 @@ typedef uint32_t  socklen_t;    ///< POSIX compatible type for address length.
 #define PF_MAX          AF_MAX          ///< maximum of protocol families
                                         ///< @see AF_MAX
 
-#define DESTINY_SOCKET_STATIC_MSS       48  ///< Static TCP maxmimum segment size.
+#define TRANSPORT_LAYER_SOCKET_STATIC_MSS       48  ///< Static TCP maxmimum segment size.
 
 /**
  * Static TCP flow control window for window size 1.
  */
-#define DESTINY_SOCKET_STATIC_WINDOW    1 * DESTINY_SOCKET_STATIC_MSS
+#define TRANSPORT_LAYER_SOCKET_STATIC_WINDOW    1 * TRANSPORT_LAYER_SOCKET_STATIC_MSS
 
 /**
  * Maximum size of TCP buffer.
  */
-#define DESTINY_SOCKET_MAX_TCP_BUFFER   1 * DESTINY_SOCKET_STATIC_WINDOW
+#define TRANSPORT_LAYER_SOCKET_MAX_TCP_BUFFER   1 * TRANSPORT_LAYER_SOCKET_STATIC_WINDOW
 
 /**
  * Socket address type for IPv6 communication.
@@ -194,7 +194,7 @@ typedef struct __attribute__((packed)) {
  *                      imply IPPROTO_TCP, etc.)
  * @return Socket ID on success, -1 otherwise.
  */
-int destiny_socket(int domain, int type, int protocol);
+int socket_base_socket(int domain, int type, int protocol);
 
 /**
  * Connects socket *socket* with a foreign host with IPv6 address *addr*
@@ -208,7 +208,7 @@ int destiny_socket(int domain, int type, int protocol);
  *
  * @return 0 on success, -1 otherwise
  */
-int destiny_socket_connect(int socket, sockaddr6_t *addr,
+int socket_base_connect(int socket, sockaddr6_t *addr,
                            socklen_t addrlen);
 
 /**
@@ -223,7 +223,7 @@ int destiny_socket_connect(int socket, sockaddr6_t *addr,
  *
  * @return Number of received bytes, -1 on error.
  */
-int32_t destiny_socket_recv(int s, void *buf, uint32_t len, int flags);
+int32_t socket_base_recv(int s, void *buf, uint32_t len, int flags);
 
 /**
  * Receives data through socket *s* and saves it in buffer *buf*. The address
@@ -240,7 +240,7 @@ int32_t destiny_socket_recv(int s, void *buf, uint32_t len, int flags);
  *
  * @return Number of received bytes, -1 on error.
  */
-int32_t destiny_socket_recvfrom(int s, void *buf, uint32_t len, int flags,
+int32_t socket_base_recvfrom(int s, void *buf, uint32_t len, int flags,
                                 sockaddr6_t *from, socklen_t *fromlen);
 
 /**
@@ -255,7 +255,7 @@ int32_t destiny_socket_recvfrom(int s, void *buf, uint32_t len, int flags,
  *
  * @return Number of send bytes, -1 on error.
  */
-int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags);
+int32_t socket_base_send(int s, const void *buf, uint32_t len, int flags);
 
 /**
  * Sends data *buf* through socket *s* to foreign host with IPv6 address *addr*.
@@ -271,7 +271,7 @@ int32_t destiny_socket_send(int s, const void *buf, uint32_t len, int flags);
  *
  * @return Number of send bytes, -1 on error.
  */
-int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
+int32_t socket_base_sendto(int s, const void *buf, uint32_t len, int flags,
                               sockaddr6_t *to, socklen_t tolen);
 
 /**
@@ -281,7 +281,7 @@ int32_t destiny_socket_sendto(int s, const void *buf, uint32_t len, int flags,
  *
  * @return 0 on success, -1 otherwise.
  */
-int destiny_socket_close(int s);
+int socket_base_close(int s);
 
 /**
  * Assigns an IPv6 address *addr* to the socket *s*. Roughly identical to
@@ -293,7 +293,7 @@ int destiny_socket_close(int s);
  *
  * @return 0 on success, -1 otherwise.
  */
-int destiny_socket_bind(int s, sockaddr6_t *addr, int addrlen);
+int socket_base_bind(int s, sockaddr6_t *addr, int addrlen);
 
 /**
  * Marks socket *s* as an passive socket, that listens for incoming messages.
@@ -304,7 +304,7 @@ int destiny_socket_bind(int s, sockaddr6_t *addr, int addrlen);
  *
  * @return 0 on success, -1 otherwise.
  */
-int destiny_socket_listen(int s, int backlog);
+int socket_base_listen(int s, int backlog);
 
 /**
  * Blocks the current thread and waits for incoming communication on the listening
@@ -318,16 +318,16 @@ int destiny_socket_listen(int s, int backlog);
  *
  * @return New socket ID for communication. -1 on error.
  */
-int destiny_socket_accept(int s, sockaddr6_t *addr, socklen_t *addrlen);
+int socket_base_accept(int s, sockaddr6_t *addr, socklen_t *addrlen);
 
 /**
  * Outputs a list of all open sockets to stdout. Information includes its
  * creation parameters, local and foreign address and ports, it's ID and the
  * PIDs of the send and receive thread.
  */
-void destiny_socket_print_sockets(void);
+void socket_base_print_sockets(void);
 
 /**
  * @}
  */
-#endif /* DESTINY_SOCKET_H */
+#endif /* SOCKET_BASE_SOCKET_H */

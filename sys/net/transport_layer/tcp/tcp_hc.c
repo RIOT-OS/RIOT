@@ -1,5 +1,5 @@
 /**
- * Destiny TCP header compression
+ * TCP header compression
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup destiny
+ * @ingroup transport_layer
  * @{
  * @file    tcp_hc.c
  * @brief   TCP HC
@@ -37,7 +37,7 @@ socket_internal_t *get_tcp_socket_by_context(ipv6_hdr_t *current_ipv6_header,
     socket_internal_t *temp_socket;
 
     for (int i = 1; i < MAX_SOCKETS + 1; i++) {
-        temp_socket = get_socket(i);
+        temp_socket = socket_base_get_socket(i);
 
         if ((temp_socket != NULL) &&
             ipv6_addr_is_equal(&temp_socket->socket_values.foreign_address.sin6_addr,

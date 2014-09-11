@@ -4,11 +4,24 @@ endif
 
 ifneq (,$(filter pnet,$(USEMODULE)))
 	USEMODULE += posix
-	USEMODULE += destiny
+	USEMODULE += socket_base
 	USEMODULE += net_help
 endif
 
-ifneq (,$(filter destiny,$(USEMODULE)))
+ifneq (,$(filter transport_layer,$(USEMODULE)))
+	USEMODULE += tcp
+	USEMODULE += udp
+endif
+
+ifneq (,$(filter udp,$(USEMODULE)))
+	USEMODULE += socket_base
+endif
+
+ifneq (,$(filter tcp,$(USEMODULE)))
+	USEMODULE += socket_base
+endif
+
+ifneq (,$(filter socket_base,$(USEMODULE)))
 	USEMODULE += sixlowpan
 	USEMODULE += net_help
 	USEMODULE += vtimer
