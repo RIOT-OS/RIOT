@@ -18,14 +18,6 @@
 
 #include "ringbuffer.h"
 
-void ringbuffer_init(ringbuffer_t *restrict rb, char *buffer, unsigned bufsize)
-{
-    rb->buf = buffer;
-    rb->size = bufsize;
-    rb->start = 0;
-    rb->avail = 0;
-}
-
 /**
  * @brief           Add an element to the end of the ringbuffer.
  * @details         This helper function does not check the pre-requirements for adding,

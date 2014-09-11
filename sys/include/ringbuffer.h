@@ -45,7 +45,13 @@ typedef struct ringbuffer {
  * @param[in]    buffer    Buffer to use by rb.
  * @param[in]    bufsize   `sizeof (buffer)`
  */
-void ringbuffer_init(ringbuffer_t *restrict rb, char *buffer, unsigned bufsize);
+static inline void ringbuffer_init(ringbuffer_t *restrict rb, char *buffer, unsigned bufsize)
+{
+    rb->buf = buffer;
+    rb->size = bufsize;
+    rb->start = 0;
+    rb->avail = 0;
+}
 
 /**
  * @brief           Add an element to the ringbuffer.
