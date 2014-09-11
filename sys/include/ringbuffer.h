@@ -87,6 +87,14 @@ int ringbuffer_get_one(ringbuffer_t *restrict rb);
 unsigned ringbuffer_get(ringbuffer_t *restrict rb, char *buf, unsigned n);
 
 /**
+ * @brief           Remove a number of elements from the ringbuffer.
+ * @param[in,out]   rb    Ringbuffer to operate on.
+ * @param[in]       n     Read at most n elements.
+ * @returns         Number of elements actually removed.
+ */
+unsigned ringbuffer_remove(ringbuffer_t *restrict rb, unsigned n);
+
+/**
  * @brief           Test if the ringbuffer is empty.
  * @param[in,out]   rb    Ringbuffer to operate on.
  * @returns         0 iff not empty
