@@ -18,6 +18,8 @@
 
 #include "ringbuffer.h"
 
+#include <string.h>
+
 /**
  * @brief           Add an element to the end of the ringbuffer.
  * @details         This helper function does not check the pre-requirements for adding,
@@ -87,9 +89,23 @@ unsigned ringbuffer_get(ringbuffer_t *restrict rb, char *buf, unsigned n)
     if (n > rb->avail) {
         n = rb->avail;
     }
-
-    for (unsigned i = 0; i < n; ++i) {
-        buf[i] = get_head(rb);
+    if (n > 0) {
+        unsigned bytes_till_end = rb->size - rb->start;
+        if (bytes_till_end >= n) {
+            memcpy(buf, rb->buf + rb->start, n);
+            if (bytes_till_end == n) {
+                rb->start = 0;
+            }
+            else {
+                rb->start += n;
+            }
+        }
+        else {
+            memcpy(buf, rb->buf + rb->start, bytes_till_end);
+            rb->start = n - bytes_till_end;
+            memcpy(buf + bytes_till_end, rb->buf, rb->start);
+        }
+        rb->avail -= n;
     }
     return n;
 }
