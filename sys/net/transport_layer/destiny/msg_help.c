@@ -23,7 +23,7 @@
 
 void block_continue_thread(void)
 {
-    //  msg_t recv_m;
+    //  blip_t recv_m;
     //  recv_m.type = TCP_NOT_DEFINED;
     //  while (recv_m.type != TCP_CONTINUE)
     //      {
@@ -31,27 +31,27 @@ void block_continue_thread(void)
     //      }
 }
 
-int net_msg_receive(msg_t *m)
+int net_msg_receive(blip_t *m)
 {
-    return msg_receive(m);
+    return blip_receive(m);
 }
 
-int net_msg_reply(msg_t *m, msg_t *reply, uint16_t message)
+int net_msg_reply(blip_t *m, blip_t *reply, uint16_t message)
 {
     reply->type = message;
-    return msg_reply(m, reply);
+    return blip_reply(m, reply);
 }
 
-int net_msg_send(msg_t *m, kernel_pid_t pid, bool block, uint16_t message)
+int net_msg_send(blip_t *m, kernel_pid_t pid, bool block, uint16_t message)
 {
     m->type = message;
-    return msg_send(m, pid, block);
+    return blip_send(m, pid, block);
 }
 
-int net_msg_send_recv(msg_t *m, msg_t *reply, kernel_pid_t pid, uint16_t message)
+int net_msg_send_recv(blip_t *m, blip_t *reply, kernel_pid_t pid, uint16_t message)
 {
     m->type = message;
-    return msg_send_receive(m, reply, pid);;
+    return blip_send_receive(m, reply, pid);;
 }
 
 /**

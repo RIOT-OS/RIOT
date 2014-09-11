@@ -65,7 +65,7 @@ kernel_pid_t etx_radio_pid = KERNEL_PID_UNDEF;
 kernel_pid_t etx_clock_pid = KERNEL_PID_UNDEF;
 
 //Message queue for radio
-static msg_t msg_que[ETX_RCV_QUEUE_SIZE];
+static blip_t msg_que[ETX_RCV_QUEUE_SIZE];
 
 /*
  * The counter for the current 'round'. An ETX beacon is sent every ETX_INTERVAL
@@ -103,7 +103,7 @@ mutex_t etx_mutex = MUTEX_INIT;
 transceiver_command_t tcmd;
 
 //Message to send probes with
-msg_t mesg;
+blip_t mesg;
 
 static ipv6_addr_t *own_address;
 
@@ -392,7 +392,7 @@ static void *etx_radio(void *arg)
 {
     (void) arg;
 
-    msg_t m;
+    blip_t m;
     radio_packet_t *p;
 
     ieee802154_frame_t frame;
@@ -406,7 +406,7 @@ static void *etx_radio(void *arg)
     ipv6_net_if_get_best_src_addr(&candidate_addr, &ll_address);
 
     while (1) {
-        msg_receive(&m);
+        blip_receive(&m);
 
         if (m.type == PKT_PENDING) {
             p = (radio_packet_t *) m.content.ptr;

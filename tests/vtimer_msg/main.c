@@ -49,12 +49,12 @@ void *timer_thread(void *arg)
     /* we need a queue if the second message arrives while the first is still processed */
     /* without a queue, the message would get lost */
     /* because of the way this timer works, there can be max 1 queued message */
-    msg_t msgq[1];
+    blip_t msgq[1];
     msg_init_queue(msgq, sizeof(msgq));
 
     while (1) {
-        msg_t m;
-        msg_receive(&m);
+        blip_t m;
+        blip_receive(&m);
         struct timer_msg *tmsg = (struct timer_msg *) m.content.ptr;
         vtimer_now(&now);
         printf("now=%" PRIu32 ":%" PRIu32 " -> every %" PRIu32 ".%" PRIu32 "s: %s\n",
@@ -80,8 +80,8 @@ void *timer_thread_local(void *arg)
     printf("This is thread %" PRIkernel_pid "\n", thread_getpid());
 
     while (1) {
-        msg_t m;
-        msg_receive(&m);
+        blip_t m;
+        blip_receive(&m);
 
         struct tm t;
         vtimer_get_localtime(&t);
@@ -91,7 +91,7 @@ void *timer_thread_local(void *arg)
 
 int main(void)
 {
-    msg_t m;
+    blip_t m;
     kernel_pid_t pid = thread_create(
                   timer_stack,
                   sizeof(timer_stack),
@@ -103,11 +103,11 @@ int main(void)
 
     puts("sending 1st msg");
     m.content.ptr = (char *) &msg_a;
-    msg_send(&m, pid, false);
+    blip_send(&m, pid, false);
 
     puts("sending 2nd msg");
     m.content.ptr = (char *) &msg_b;
-    msg_send(&m, pid, false);
+    blip_send(&m, pid, false);
 
     kernel_pid_t pid2 = thread_create(
                    timer_stack_local,
@@ -122,6 +122,6 @@ int main(void)
 
     while (1) {
         vtimer_sleep(sleep);
-        msg_send(&m, pid2, 0);
+        blip_send(&m, pid2, 0);
     }
 }

@@ -84,7 +84,7 @@ radio_packet_t transceiver_buffer[TRANSCEIVER_BUFFER_SIZE];
 uint8_t data_buffer[TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE];
 
 /* message buffer */
-msg_t msg_buffer[TRANSCEIVER_MSG_BUFFER_SIZE];
+blip_t msg_buffer[TRANSCEIVER_MSG_BUFFER_SIZE];
 
 uint32_t response; ///< response bytes for messages to upper layer threads
 
@@ -281,14 +281,14 @@ static void *run(void *arg)
 {
     (void) arg;
 
-    msg_t m;
+    blip_t m;
     transceiver_command_t *cmd;
 
     msg_init_queue(msg_buffer, TRANSCEIVER_MSG_BUFFER_SIZE);
 
     while (1) {
         DEBUG("transceiver: Waiting for next message\n");
-        msg_receive(&m);
+        blip_receive(&m);
         /* only makes sense for messages for upper layers */
         cmd = (transceiver_command_t *) m.content.ptr;
         DEBUG("transceiver: Transceiver: Message received, type: %02X\n", m.type);
@@ -306,37 +306,37 @@ static void *run(void *arg)
             case SND_PKT:
                 response = send_packet(cmd->transceivers, cmd->data);
                 m.content.value = response;
-                msg_reply(&m, &m);
+                blip_reply(&m, &m);
                 break;
 
             case GET_CHANNEL:
                 *((int32_t *) cmd->data) = get_channel(cmd->transceivers);
-                msg_reply(&m, &m);
+                blip_reply(&m, &m);
                 break;
 
             case SET_CHANNEL:
                 *((int32_t *) cmd->data) = set_channel(cmd->transceivers, cmd->data);
-                msg_reply(&m, &m);
+                blip_reply(&m, &m);
                 break;
 
             case GET_ADDRESS:
                 *((radio_address_t *) cmd->data) = get_address(cmd->transceivers);
-                msg_reply(&m, &m);
+                blip_reply(&m, &m);
                 break;
 
             case SET_ADDRESS:
                 *((radio_address_t *) cmd->data) = set_address(cmd->transceivers, cmd->data);
-                msg_reply(&m, &m);
+                blip_reply(&m, &m);
                 break;
 
             case GET_LONG_ADDR:
                 *((transceiver_eui64_t *) cmd->data) = get_long_addr(cmd->transceivers);
-                msg_reply(&m, &m);
+                blip_reply(&m, &m);
                 break;
 
             case SET_LONG_ADDR:
                 *((transceiver_eui64_t *) cmd->data) = set_long_addr(cmd->transceivers, cmd->data);
-                msg_reply(&m, &m);
+                blip_reply(&m, &m);
                 break;
 
             case SET_MONITOR:
@@ -353,18 +353,18 @@ static void *run(void *arg)
 
             case GET_PAN:
                 *((int32_t *) cmd->data) = get_pan(cmd->transceivers);
-                msg_reply(&m, &m);
+                blip_reply(&m, &m);
                 break;
 
             case SET_PAN:
                 *((int32_t *) cmd->data) = set_pan(cmd->transceivers, cmd->data);
-                msg_reply(&m, &m);
+                blip_reply(&m, &m);
                 break;
 
 #ifdef DBG_IGNORE
             case DBG_IGN:
                 *((int16_t *) cmd->data) = ignore_add(cmd->transceivers, cmd->data);
-                msg_reply(&m, &m);
+                blip_reply(&m, &m);
                 break;
 #endif
 
@@ -390,7 +390,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
     size_t i = 0;
     transceiver_type_t t;
     rx_buffer_pos = pos;
-    msg_t m;
+    blip_t m;
 
     DEBUG("Packet received\n");
 
@@ -504,7 +504,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
             m.content.ptr = (char *) &(transceiver_buffer[transceiver_buffer_pos]);
             DEBUG("transceiver: Notify thread %" PRIkernel_pid "\n", reg[i].pid);
 
-            if (msg_send(&m, reg[i].pid, false) && (m.type != ENOBUFFER)) {
+            if (blip_send(&m, reg[i].pid, false) && (m.type != ENOBUFFER)) {
                 transceiver_buffer[transceiver_buffer_pos].processing++;
             }
         }

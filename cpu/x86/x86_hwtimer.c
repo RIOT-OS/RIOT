@@ -210,11 +210,11 @@ static void *hwtimer_tick_handler(void *arg)
 {
     (void) arg;
 
-    msg_t msg_array[2];
+    blip_t msg_array[2];
     msg_init_queue(msg_array, sizeof (msg_array) / sizeof (*msg_array));
     while (1) {
-        msg_t m;
-        msg_receive(&m);
+        blip_t m;
+        blip_receive(&m);
 
         dINT();
         set_next_alarm(true);
@@ -269,8 +269,8 @@ static bool set_next_alarm(bool may_call)
             DEBUG("      callback(%u) (%lli µs prematurely), may_call=%u\n",
                   timer_i, us_future, may_call);
             if (!may_call) {
-                msg_t m;
-                msg_send_int(&m, hwtimer_pid);
+                blip_t m;
+                blip_send_int(&m, hwtimer_pid);
                 return true;
             }
             else {
