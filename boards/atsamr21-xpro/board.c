@@ -52,5 +52,5 @@ void board_init(void)
 void led_init(void)
 {
     LED_PORT.DIRSET.reg = LED_PIN;
-    LED_PORT.OUTCLR.reg = LED_PIN;
+    LED_PORT.OUTSET.reg = LED_PIN; //LED OFF
 }

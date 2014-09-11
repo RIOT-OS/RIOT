@@ -90,11 +90,11 @@
  * @name GPIO configuration
  * @{
  */
-#define GPIO_NUMOF          (3U)
+#define GPIO_NUMOF          (4U)
 #define GPIO_0_EN           1
 #define GPIO_1_EN           1
 #define GPIO_2_EN           1
-#define GPIO_3_EN           0
+#define GPIO_3_EN           1
 #define GPIO_4_EN           0
 #define GPIO_5_EN           0
 #define GPIO_6_EN           0
@@ -112,36 +112,52 @@
 //May have to implement more
 /* GPIO channel 0 config */
 #define GPIO_0_PIN          PIN_PA13 //EXT1 PIN5
+#define GPIO_0_EXTINT		PIN_PA13A_EIC_EXTINT13
 /* GPIO channel 1 config */
 #define GPIO_1_PIN          PIN_PA28 //EXT1 PIN6, and USER_BUTTON
+#define GPIO_1_EXTINT		PIN_PA28A_EIC_EXTINT8
 /* GPIO channel 2 config */
 #define GPIO_2_PIN          PIN_PA15 //EXT3 PIN5
+#define GPIO_2_EXTINT		PIN_PA15A_EIC_EXTINT15
 /* GPIO channel 3 config */
-#define GPIO_3_PIN          
+#define GPIO_3_PIN 			PIN_PA19
+#define GPIO_3_EXTINT       PIN_PA19A_EIC_EXTINT3
 /* GPIO channel 4 config */
-#define GPIO_4_PIN          
+#define GPIO_4_PIN
+#define GPIO_4_EXTINT          
 /* GPIO channel 5 config */
-#define GPIO_5_PIN          
+#define GPIO_5_PIN
+#define GPIO_5_EXTINT          
 /* GPIO channel 6 config */
-#define GPIO_6_PIN          
+#define GPIO_6_PIN
+#define GPIO_6_EXTINT          
 /* GPIO channel 7 config */
-#define GPIO_7_PIN          
+#define GPIO_7_PIN
+#define GPIO_7_EXTINT          
 /* GPIO channel 8 config */        
-#define GPIO_8_PIN          
+#define GPIO_8_PIN
+#define GPIO_8_EXTINT          
 /* GPIO channel 9 config */ 
-#define GPIO_9_PIN          
+#define GPIO_9_PIN
+#define GPIO_9_EXTINT          
 /* GPIO channel 10 config */ 
-#define GPIO_10_PIN         
+#define GPIO_10_PIN
+#define GPIO_10_EXTINT         
 /* GPIO channel 11 config */
-#define GPIO_11_PIN         
+#define GPIO_11_PIN
+#define GPIO_11_EXTINT         
 /* GPIO channel 12 config */
-#define GPIO_12_PIN         
+#define GPIO_12_PIN
+#define GPIO_12_EXTINT         
 /* GPIO channel 13 config */
-#define GPIO_13_PIN         
+#define GPIO_13_PIN
+#define GPIO_13_EXTINT         
 /* GPIO channel 14 config */
-#define GPIO_14_PIN         
+#define GPIO_14_PIN 
+#define GPIO_14_EXTINT        
 /* GPIO channel 15 config */
-#define GPIO_15_PIN         
+#define GPIO_15_PIN 
+#define GPIO_15_EXTINT        
 /** @} */
 
 #endif /* __PERIPH_CONF_H */
