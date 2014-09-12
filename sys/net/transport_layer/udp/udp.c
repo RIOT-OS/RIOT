@@ -70,19 +70,16 @@ void *udp_packet_handler(void *arg)
     (void) arg;
 
     msg_t m_recv_ip, m_send_ip, m_recv_udp, m_send_udp;
-    ipv6_hdr_t *ipv6_header;
-    udp_hdr_t *udp_header;
     socket_internal_t *udp_socket = NULL;
-    uint16_t chksum;
 
     msg_init_queue(udp_msg_queue, UDP_PKT_RECV_BUF_SIZE);
 
     while (1) {
         msg_receive(&m_recv_ip);
-        ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
-        udp_header = ((udp_hdr_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
+        ipv6_hdr_t *ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
+        udp_hdr_t *udp_header = ((udp_hdr_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
 
-        chksum = ipv6_csum(ipv6_header, (uint8_t*) udp_header, NTOHS(udp_header->length), IPPROTO_UDP);
+        uint16_t chksum = ipv6_csum(ipv6_header, (uint8_t*) udp_header, NTOHS(udp_header->length), IPPROTO_UDP);
 
         if (chksum == 0xffff) {
             udp_socket = get_udp_socket(udp_header);

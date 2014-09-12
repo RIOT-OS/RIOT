@@ -667,8 +667,6 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
 {
     /* try to find best match if dest is not mcast or link local */
     int if_id = 0; // TODO: get this somehow
-    uint8_t tmp = 0;
-    uint8_t bmatch = 0;
     ipv6_net_if_addr_t *addr = NULL;
     ipv6_net_if_addr_t *tmp_addr = NULL;
 
@@ -679,8 +677,9 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
                 if (!ipv6_addr_is_link_local(addr->addr_data) &&
                     !ipv6_addr_is_multicast(addr->addr_data) &&
                     !ipv6_addr_is_unique_local_unicast(addr->addr_data)) {
-                    tmp = ipv6_get_addr_match(dest, addr->addr_data);
 
+                    uint8_t bmatch = 0;
+                    uint8_t tmp = ipv6_get_addr_match(dest, addr->addr_data);
                     if (tmp >= bmatch) {
                         bmatch = tmp;
                         tmp_addr = addr;

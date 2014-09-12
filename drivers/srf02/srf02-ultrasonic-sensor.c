@@ -98,10 +98,9 @@ uint32_t srf02_get_distance(uint8_t ranging_mode)
 
 void srf02_start_ranging(uint16_t ranging_mode)
 {
-    uint32_t distance = 0;
 
     while (1) {
-        distance = srf02_get_distance(ranging_mode);
+        uint32_t distance = srf02_get_distance(ranging_mode);
 
         if (distance != UINT32_MAX) {
             switch (ranging_mode) {

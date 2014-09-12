@@ -996,7 +996,6 @@ uint32_t _maca_init_from_flash ( uint32_t addr ) {
     nvm_err_t err;
 
     volatile uint32_t buffer[8];
-    volatile uint32_t length;
     volatile uint32_t i = 0;
     volatile uint32_t j = 0;
 
@@ -1013,6 +1012,7 @@ uint32_t _maca_init_from_flash ( uint32_t addr ) {
     }
 
     if ( buffer[0] == MACA_FLASH_INIT_MAGIC ) {
+        volatile uint32_t length;
         length = buffer[1] & 0x0000ffff;
 
         while ( i < ( length-4 ) ) {

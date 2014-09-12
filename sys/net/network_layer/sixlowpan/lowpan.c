@@ -364,10 +364,9 @@ static void *lowpan_transfer(void *arg)
     msg_t m_recv, m_send;
     ipv6_hdr_t *ipv6_buf;
     lowpan_reas_buf_t *current_buf;
-    uint8_t gotosleep;
 
     while (1) {
-        gotosleep = 1;
+        uint8_t gotosleep = 1;
         mutex_lock(&fifo_mutex);
         current_buf = packet_fifo;
 
@@ -785,10 +784,6 @@ void lowpan_read(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
                  net_if_eui64_t *d_addr)
 {
     /* check if packet is fragmented */
-    uint8_t hdr_length = 0;
-    uint8_t datagram_offset = 0;
-    uint16_t datagram_size = 0;
-    uint16_t datagram_tag = 0;
     short i;
 
     check_timeout();
@@ -807,6 +802,10 @@ void lowpan_read(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
     /* Fragmented Packet */
     if (((data[0] & SIXLOWPAN_FRAG_HDR_MASK) == SIXLOWPAN_FRAG1_DISPATCH) ||
         ((data[0] & SIXLOWPAN_FRAG_HDR_MASK) == SIXLOWPAN_FRAGN_DISPATCH)) {
+        uint8_t hdr_length = 0;
+        uint8_t datagram_offset = 0;
+        uint16_t datagram_size = 0;
+        uint16_t datagram_tag = 0;
         uint16_t byte_offset;
         DEBUG("INFO: fragmentation dispatch 0x%02x received\n",
               data[0] & SIXLOWPAN_FRAG_HDR_MASK);
@@ -1171,11 +1170,9 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
     uint8_t *ipv6_hdr_fields = data;
     uint8_t lowpan_iphc[2];
     uint8_t cid = 0;
-    uint8_t sci = 0;
     uint8_t dci = 0;
 
     uint8_t ll_prefix[2] = {0xfe, 0x80};
-    uint8_t m_prefix[2] = {0xff, 0x02};
     lowpan_context_t *con = NULL;
 
     ipv6_buf = ipv6_get_buf();
@@ -1275,6 +1272,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
     if (lowpan_iphc[1] & SIXLOWPAN_IPHC2_SAC) {
         /* 1: Source address compression uses stateful, context-based
          * compression.*/
+        uint8_t sci = 0;
         if (cid) {
             sci = ipv6_hdr_fields[3] >> 4;
         }
@@ -1395,6 +1393,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
             mutex_unlock(&lowpan_context_mutex);
         }
         else {
+            uint8_t m_prefix[2] = {0xff, 0x02};
             /* If M=1 and DAC=0: */
             switch (lowpan_iphc[1] & 0x03) {
                 case (0x01): {
@@ -1642,11 +1641,10 @@ static void *lowpan_context_auto_remove(void *arg)
     timex_t minute = timex_set(60, 0);
     int i;
     int8_t to_remove[NDP_6LOWPAN_CONTEXT_MAX];
-    int8_t to_remove_size;
 
     while (1) {
         vtimer_sleep(minute);
-        to_remove_size = 0;
+        int8_t to_remove_size = 0;
         mutex_lock(&lowpan_context_mutex);
 
         for (i = 0; i < lowpan_context_len(); i++) {

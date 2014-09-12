@@ -61,7 +61,6 @@ static void *init_udp_server(void *arg)
 
     sockaddr6_t sa;
     char buffer_main[UDP_BUFFER_SIZE];
-    int32_t recsize;
     uint32_t fromlen;
     int sock = socket_base_socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -79,7 +78,7 @@ static void *init_udp_server(void *arg)
     }
 
     while (1) {
-        recsize = socket_base_recvfrom(sock, (void *)buffer_main, UDP_BUFFER_SIZE, 0, &sa, &fromlen);
+        int32_t recsize = socket_base_recvfrom(sock, (void *)buffer_main, UDP_BUFFER_SIZE, 0, &sa, &fromlen);
 
         if (recsize < 0) {
             printf("ERROR: recsize < 0!\n");
