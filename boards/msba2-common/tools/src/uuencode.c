@@ -36,16 +36,15 @@ static char uuchar(unsigned int val);
 void uuencode(char *str, const unsigned char *data, int num)
 {
     int i, n;
-    unsigned int val;
 
     *str++ = uuchar(num);
 
     n = (num + 2) / 3;
 
     for (i = 0; i < n; i++) {
-        val = ((data[0] & 0xFF) << 16)
-              | ((data[1] & 0xFF) << 8)
-              | ((data[2] & 0xFF) << 0);
+        unsigned int val = ((data[0] & 0xFF) << 16)
+                         | ((data[1] & 0xFF) << 8)
+                         | ((data[2] & 0xFF) << 0);
         *str++ = uuchar(val >> 18);
         *str++ = uuchar(val >> 12);
         *str++ = uuchar(val >>  6);
@@ -60,7 +59,6 @@ int uudecode(const char *str, unsigned char *data, int max)
 {
     int num = 0;
     int i, n;
-    unsigned int val;
 
     if (*str == '\0') {
         return 0;
@@ -91,10 +89,10 @@ int uudecode(const char *str, unsigned char *data, int max)
             return 0;
         }
 
-        val = (((str[0] - 32) & 0x3F) << 18)
-              | (((str[1] - 32) & 0x3F) << 12)
-              | (((str[2] - 32) & 0x3F) << 6)
-              | (((str[3] - 32) & 0x3F) << 0);
+        unsigned int val = (((str[0] - 32) & 0x3F) << 18)
+                         | (((str[1] - 32) & 0x3F) << 12)
+                         | (((str[2] - 32) & 0x3F) << 6)
+                         | (((str[3] - 32) & 0x3F) << 0);
         *data++ = (val >> 16) & 0xFF;
         *data++ = (val >> 8) & 0xFF;
         *data++ = (val >> 0) & 0xFF;
