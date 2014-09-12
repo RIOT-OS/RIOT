@@ -300,7 +300,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     pmux_set(pin, EIC_FUNCTION); //set pinmux to eic function
 
     /* Turn on APB clock */
-    PM->APBAMASK.reg |= PM_APBAMASK_EIC; //Cannot use *.bit.EIC because of defines
+    PM->APBAMASK.reg |= PM_APBAMASK_EIC; //Cannot use PM->APBAMASK.bit.EIC because of defines
 
     /* Enable GCLK_EIC, Init process is: */
     //Write to gendiv, no division needed
@@ -415,7 +415,15 @@ void gpio_write(gpio_t dev, int value)
 /** Handler for exint interrupts **/
 void EIC_Handler(void)
 {
-
+    //Find callback
+    for(int i = 0; i < GPIO_NUMOF; ++i)
+    {
+        uint8_t extint = get_extint(i);
+        if(EIC->INTFLAG.vec.EXTINT & ( 1 << extint) )
+        {
+            gpio_config[i].cb(gpio_config[i].arg); //execute callback with args
+        }
+    }
 }
 
 #endif /* GPIO_NUMOF */
