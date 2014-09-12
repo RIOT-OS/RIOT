@@ -319,18 +319,15 @@ uint8_t ipv6_get_addr_match(const ipv6_addr_t *src,
  */
 static int is_our_address(ipv6_addr_t *addr)
 {
-    ipv6_net_if_ext_t *net_if_ext;
-    ipv6_net_if_addr_t *myaddr;
-    uint8_t prefix, suffix;
     int if_id = -1;
     unsigned counter = 0;
 
     DEBUGF("Is this my addres: %s?\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
-        net_if_ext = ipv6_net_if_get_ext(if_id);
-        myaddr = NULL;
-        prefix = net_if_ext->prefix / 8;
-        suffix = IPV6_ADDR_LEN - prefix;
+        ipv6_net_if_ext_t *net_if_ext = ipv6_net_if_get_ext(if_id);
+        ipv6_net_if_addr_t *myaddr = NULL;
+        uint8_t prefix = net_if_ext->prefix / 8;
+        uint8_t suffix = IPV6_ADDR_LEN - prefix;
 
         while ((myaddr = (ipv6_net_if_addr_t *)net_if_iter_addresses(if_id,
                          (net_if_addr_t **) &myaddr)) != NULL) {
@@ -494,7 +491,6 @@ int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
                          ndp_addr_state_t state, uint32_t val_ltime,
                          uint32_t pref_ltime, uint8_t is_anycast)
 {
-    ipv6_net_if_addr_t *addr_entry;
     ipv6_net_if_hit_t hit;
 
     if (ipv6_addr_is_unspecified(addr) == 128) {
@@ -522,7 +518,7 @@ int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
         ipv6_addr_t *addr_data = &ipv6_addr_buffer[ipv6_net_if_addr_buffer_count];
         memcpy(addr_data, addr, sizeof(ipv6_addr_t));
 
-        addr_entry = &ipv6_net_if_addr_buffer[ipv6_net_if_addr_buffer_count];
+        ipv6_net_if_addr_t *addr_entry = &ipv6_net_if_addr_buffer[ipv6_net_if_addr_buffer_count];
         addr_entry->addr_data = addr_data;
         addr_entry->addr_len = 128;
 

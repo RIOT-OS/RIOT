@@ -34,11 +34,10 @@
 uint8_t cc110x_strobe(uint8_t c)
 {
     uint8_t statusByte = 0;
-    uint16_t int_state, gdo_state;
 
     /* Check for valid strobe command */
     if ((c == 0xBD) || ((c > RF_SRES) && (c < RF_SNOP))) {
-        int_state = disableIRQ();
+        uint16_t int_state = disableIRQ();
 
         /* Clear the Status read flag */
         RF1AIFCTL1 &= ~(RFSTATIFG);
@@ -49,7 +48,7 @@ uint8_t cc110x_strobe(uint8_t c)
         /* Write the strobe instruction */
         if ((c > RF_SRES) && (c < RF_SNOP)) {
 
-            gdo_state = cc110x_read_reg(IOCFG2); /* buffer IOCFG2 state */
+            uint16_t gdo_state = cc110x_read_reg(IOCFG2); /* buffer IOCFG2 state */
             cc110x_write_reg(IOCFG2, 0x29); /* c-ready to GDO2 */
 
             RF1AINSTRB = c;

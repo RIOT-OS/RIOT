@@ -937,14 +937,12 @@ uint16_t maca_get_pan(void)
 #define MACA_ROM_END 0x0013ffff
 #define MACA_ENTRY_EOF 0x00000e0f
 uint32_t _exec_init_entry ( volatile uint32_t *entries, uint8_t *value_buffer ) {
-    volatile uint32_t i;
-
     if ( entries[0] <= MACA_ROM_END ) {
         if ( entries[0] == 0 ) {
             /* do delay */
             printf ( "init_entry: delay 0x%08x\n", (unsigned int) entries[1] );
 
-            for ( i=0; i < entries[1]; i++ ) {
+            for ( volatile uint32_t i=0; i < entries[1]; i++ ) {
                 continue;
             }
 

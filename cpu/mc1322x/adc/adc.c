@@ -179,10 +179,8 @@ void adc_flush(void)
  */
 void adc_service(uint16_t *channels_read)
 {
-    uint16_t tmp;
-
     while (!ADC->FIFO_STATUSbits.EMPTY) {
-        tmp = ADC->FIFO_READ;
+        uint16_t tmp = ADC->FIFO_READ;
 
         if ((tmp >> 12) < ADC_NUM_CHANS) {
             channels_read[tmp >> 12] = tmp & 0x0fff;

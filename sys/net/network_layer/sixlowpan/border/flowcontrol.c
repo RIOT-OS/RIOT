@@ -91,16 +91,13 @@ ipv6_addr_t flowcontrol_init(void)
 
 static void sending_slot(void)
 {
-    msg_t m;
-    uint8_t seq_num;
-    struct send_slot *slot;
-    border_packet_t *tmp;
-
     while (1) {
+        msg_t m;
         msg_receive(&m);
-        seq_num = *((uint8_t *)m.content.ptr);
-        slot = &(slwin_stat.send_win[seq_num % BORDER_SWS]);
-        tmp = (border_packet_t *)slot->frame;
+
+        uint8_t seq_num = *((uint8_t *) m.content.ptr);
+        struct send_slot *slot = &(slwin_stat.send_win[seq_num % BORDER_SWS]);
+        border_packet_t *tmp = (border_packet_t *)slot->frame;
 
         if (seq_num == tmp->seq_num) {
             writepacket(slot->frame, slot->frame_len);

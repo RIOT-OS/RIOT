@@ -23,7 +23,7 @@
 
 void color_rgb2hsv(color_rgb_t *rgb, color_hsv_t *hsv)
 {
-    float rd, gd, bd, delta, rc, gc, bc;
+    float rd, gd, bd, delta;
 
     /* norm RGB colors to the range [0 - 1.0] */
     rd = (float)rgb->r / 255.0f;
@@ -52,6 +52,8 @@ void color_rgb2hsv(color_rgb_t *rgb, color_hsv_t *hsv)
     /* compute hue */
     hsv->h = 0.0f;
     if (hsv->s != 0.0) {
+        float rc, gc, bc;
+
         rc = (hsv->v - rd) / delta;
         gc = (hsv->v - gd) / delta;
         bc = (hsv->v - bd) / delta;
@@ -81,47 +83,47 @@ void color_hsv2rgb(color_hsv_t *hsv, color_rgb_t *rgb)
         rgb->r = (uint8_t)(hsv->v * 255.0f);
         rgb->g = (uint8_t)(hsv->v * 255.0f);
         rgb->b = (uint8_t)(hsv->v * 255.0f);
+        return;
     }
-    else {
-        h = (hsv->h == 360.0f) ? 0.0 : hsv->h;
-        h /= 60.0f;
-        i = (int)h;
-        f = h - i;
-        aa = hsv->v * (1.0f - hsv->s);
-        bb = hsv->v * (1.0f - (hsv->s * f));
-        cc = hsv->v * (1.0f - (hsv->s * (1.0f - f)));
 
-        switch (i) {
-            case 0:
-                rgb->r = (uint8_t)(hsv->v * 255.0f);
-                rgb->g = (uint8_t)(cc * 255.0f);
-                rgb->b = (uint8_t)(aa * 255.0f);
-                break;
-            case 1:
-                rgb->r = (uint8_t)(bb * 255.0f);
-                rgb->g = (uint8_t)(hsv->v * 255.0f);
-                rgb->b = (uint8_t)(aa * 255.0f);
-                break;
-            case 2:
-                rgb->r = (uint8_t)(aa * 255.0f);
-                rgb->g = (uint8_t)(hsv->v * 255.0f);
-                rgb->b = (uint8_t)(cc * 255.0f);
-                break;
-            case 3:
-                rgb->r = (uint8_t)(aa * 255.0f);
-                rgb->g = (uint8_t)(bb * 255.0f);
-                rgb->b = (uint8_t)(hsv->v * 255.0f);
-                break;
-            case 4:
-                rgb->r = (uint8_t)(cc * 255.0f);
-                rgb->g = (uint8_t)(aa * 255.0f);
-                rgb->b = (uint8_t)(hsv->v * 255.0f);
-                break;
-            case 5:
-                rgb->r = (uint8_t)(hsv->v * 255.0f);
-                rgb->g = (uint8_t)(aa * 255.0f);
-                rgb->b = (uint8_t)(bb * 255.0f);
-                break;
-        }
+    h = (hsv->h == 360.0f) ? 0.0 : hsv->h;
+    h /= 60.0f;
+    i = (int)h;
+    f = h - i;
+    aa = hsv->v * (1.0f - hsv->s);
+    bb = hsv->v * (1.0f - (hsv->s * f));
+    cc = hsv->v * (1.0f - (hsv->s * (1.0f - f)));
+
+    switch (i) {
+        case 0:
+            rgb->r = (uint8_t)(hsv->v * 255.0f);
+            rgb->g = (uint8_t)(cc * 255.0f);
+            rgb->b = (uint8_t)(aa * 255.0f);
+            break;
+        case 1:
+            rgb->r = (uint8_t)(bb * 255.0f);
+            rgb->g = (uint8_t)(hsv->v * 255.0f);
+            rgb->b = (uint8_t)(aa * 255.0f);
+            break;
+        case 2:
+            rgb->r = (uint8_t)(aa * 255.0f);
+            rgb->g = (uint8_t)(hsv->v * 255.0f);
+            rgb->b = (uint8_t)(cc * 255.0f);
+            break;
+        case 3:
+            rgb->r = (uint8_t)(aa * 255.0f);
+            rgb->g = (uint8_t)(bb * 255.0f);
+            rgb->b = (uint8_t)(hsv->v * 255.0f);
+            break;
+        case 4:
+            rgb->r = (uint8_t)(cc * 255.0f);
+            rgb->g = (uint8_t)(aa * 255.0f);
+            rgb->b = (uint8_t)(hsv->v * 255.0f);
+            break;
+        case 5:
+            rgb->r = (uint8_t)(hsv->v * 255.0f);
+            rgb->g = (uint8_t)(aa * 255.0f);
+            rgb->b = (uint8_t)(bb * 255.0f);
+            break;
     }
 }

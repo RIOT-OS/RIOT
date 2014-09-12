@@ -174,14 +174,12 @@ int unmkBinaryInt(unsigned char **data, int *datalen, unsigned int *result,
 
 int mkInterest(char **namecomp, unsigned int *nonce, unsigned char *out)
 {
-    int len = 0, k;
-
-    len = mkHeader(out, CCN_DTAG_INTEREST, CCN_TT_DTAG);   // interest
+    int len = mkHeader(out, CCN_DTAG_INTEREST, CCN_TT_DTAG); // interest
     len += mkHeader(out + len, CCN_DTAG_NAME, CCN_TT_DTAG);  // name
 
     while (*namecomp) {
         len += mkHeader(out + len, CCN_DTAG_COMPONENT, CCN_TT_DTAG);  // comp
-        k = strlen(*namecomp);
+        int k = strlen(*namecomp);
         len += mkHeader(out + len, k, CCN_TT_BLOB);
         memcpy(out + len, *namecomp++, k);
         len += k;
@@ -205,14 +203,12 @@ int mkInterest(char **namecomp, unsigned int *nonce, unsigned char *out)
 int
 mkContent(char **namecomp, char *data, int datalen, unsigned char *out)
 {
-    int len = 0, k;
-
-    len = mkHeader(out, CCN_DTAG_CONTENTOBJ, CCN_TT_DTAG);   // content
-    len += mkHeader(out + len, CCN_DTAG_NAME, CCN_TT_DTAG); // name
+    int len = mkHeader(out, CCN_DTAG_CONTENTOBJ, CCN_TT_DTAG); // content
+    len += mkHeader(out + len, CCN_DTAG_NAME, CCN_TT_DTAG);    // name
 
     while (*namecomp) {
         len += mkHeader(out + len, CCN_DTAG_COMPONENT, CCN_TT_DTAG); // comp
-        k = strlen(*namecomp);
+        int k = strlen(*namecomp);
         len += mkHeader(out + len, k, CCN_TT_BLOB);
         memcpy(out + len, *namecomp++, k);
         len += k;

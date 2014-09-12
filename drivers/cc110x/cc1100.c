@@ -170,13 +170,12 @@ static bool spi_receive_packet_variable(uint8_t *rxBuffer, radio_packet_length_t
     /* Needed here for statistics */
     extern cc1100_statistic_t cc1100_statistic;
 
-    uint8_t status[2];
-    uint8_t packetLength = 0;
-
     /* Any bytes available in RX FIFO? */
     if ((cc1100_spi_read_status(CC1100_RXBYTES) & BYTES_IN_RXFIFO)) {
+        uint8_t status[2];
+
         /* Read length byte (first byte in RX FIFO) */
-        packetLength = cc1100_spi_read_reg(CC1100_RXFIFO);
+        uint8_t packetLength = cc1100_spi_read_reg(CC1100_RXFIFO);
 
         /* Read data from RX FIFO and store in rxBuffer */
         if (packetLength <= length) {

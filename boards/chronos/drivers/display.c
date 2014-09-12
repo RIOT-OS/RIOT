@@ -239,7 +239,7 @@ void display_char(uint8_t segment, char chr, uint8_t mode)
 {
     /* Write to single 7-segment character */
     if ((segment >= LCD_SEG_L1_3) && (segment <= LCD_SEG_L2_DP)) {
-        uint8_t bits, bits1; /* Bits to write */
+        uint8_t bits; /* Bits to write */
 
         /* Get LCD memory address for segment from table */
         uint8_t *lcdmem = (uint8_t *)segments_lcdmem[segment];
@@ -264,7 +264,7 @@ void display_char(uint8_t segment, char chr, uint8_t mode)
         /* When addressing LINE2 7-segment characters need to swap high- and low-nibble, */
         /* because LCD COM/SEG assignment is mirrored against LINE1 */
         if (segment >= LCD_SEG_L2_5) {
-            bits1 = ((bits << 4) & 0xF0) | ((bits >> 4) & 0x0F);
+            uint8_t bits1 = ((bits << 4) & 0xF0) | ((bits >> 4) & 0x0F);
             bits = bits1;
 
             /* When addressing LCD_SEG_L2_5, need to convert ASCII '1' and 'L' to 1 bit, */
