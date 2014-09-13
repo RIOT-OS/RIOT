@@ -1087,7 +1087,6 @@ int32_t tcp_send(int s, const void *buf, uint32_t len, int flags)
                         COMPRESSED_HEADER;
 #endif
                     return -1;
-                    break;
                 }
             }
         }
