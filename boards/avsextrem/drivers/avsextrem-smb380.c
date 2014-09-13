@@ -305,8 +305,8 @@ uint8_t getRingReadPointerforCurrentThread(void)
 {
     uint8_t pointerNo = 0;
 
-    while ((PointerList[pointerNo] != sched_active_pid) &&
-           (pointerNo < SMB380_RING_BUFF_MAX_THREADS)) {
+    while ((pointerNo < SMB380_RING_BUFF_MAX_THREADS) &&
+           (PointerList[pointerNo] != sched_active_pid)) {
         pointerNo++;
     }
 
@@ -318,8 +318,8 @@ uint8_t initRingReadPointerforCurrentThread(void)
     //TODO: make it Threadsafe
     uint8_t pointerNo = 0;
 
-    while ((PointerList[pointerNo] > 0) &&
-           (pointerNo < SMB380_RING_BUFF_MAX_THREADS)) {
+    while ((pointerNo < SMB380_RING_BUFF_MAX_THREADS) &&
+           (PointerList[pointerNo] > 0)) {
         pointerNo++;
     }
 
@@ -564,8 +564,8 @@ void wakeUpRegisteredProcesses(void)
     //wake up waiting processes
     wakeupmessage.type = MSG_TYPE_SMB380_WAKEUP;
 
-    while ((PointerList[pointerNo] > 0) &&
-           (pointerNo < SMB380_RING_BUFF_MAX_THREADS)) {
+    while ((pointerNo < SMB380_RING_BUFF_MAX_THREADS) &&
+           (PointerList[pointerNo] > 0)) {
         msg_send(&wakeupmessage, PointerList[pointerNo], false);
         pointerNo++;
     }

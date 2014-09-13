@@ -766,7 +766,7 @@ uint8_t sixlowpan_lowpan_register(kernel_pid_t pid)
 {
     uint8_t i;
 
-    for (i = 0; ((sixlowpan_reg[i] != pid) && (i < SIXLOWPAN_MAX_REGISTERED) &&
+    for (i = 0; (((i < SIXLOWPAN_MAX_REGISTERED) && sixlowpan_reg[i] != pid) &&
                  (sixlowpan_reg[i] != 0)); i++) {
         ;
     }
