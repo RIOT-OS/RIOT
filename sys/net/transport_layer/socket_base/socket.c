@@ -362,7 +362,6 @@ int socket_base_bind(int s, sockaddr6_t *addr, int addrlen)
             case (PF_INET): {
                 /* Not provided */
                 return -1;
-                break;
             }
 
             case (PF_INET6): {
@@ -373,14 +372,10 @@ int socket_base_bind(int s, sockaddr6_t *addr, int addrlen)
                             (current_socket->protocol == IPPROTO_TCP)) {
                             return tcp_bind_socket(s, addr, addrlen,
                                                    thread_getpid());
-                            break;
                         }
                         else {
                             return -1;
-                            break;
                         }
-
-                        break;
                     }
 
                     /* UDP */
@@ -389,31 +384,24 @@ int socket_base_bind(int s, sockaddr6_t *addr, int addrlen)
                             (current_socket->protocol == IPPROTO_UDP)) {
                             return udp_bind_socket(s, addr, addrlen,
                                                    thread_getpid());
-                            break;
                         }
                         else {
                             return -1;
-                            break;
                         }
-
-                        break;
                     }
 
                     case (SOCK_SEQPACKET): {
                         /* not provided */
                         return -1;
-                        break;
                     }
 
                     case (SOCK_RAW): {
                         /* not provided */
                         return -1;
-                        break;
                     }
 
                     default: {
                         return -1;
-                        break;
                     }
                 }
 
@@ -423,7 +411,6 @@ int socket_base_bind(int s, sockaddr6_t *addr, int addrlen)
             case (PF_UNIX): {
                 /* Not provided */
                 return -1;
-                break;
             }
         }
     }
