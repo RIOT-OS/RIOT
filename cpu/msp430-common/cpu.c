@@ -64,7 +64,7 @@ __attribute__((section (".fini9"))) void __main_epilogue(void) { __asm__("ret");
 //----------------------------------------------------------------------------
 char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size)
 {
-    unsigned short stk = (unsigned short)(stack_start + stack_size);
+    unsigned short stk = (unsigned short)((uintptr_t) stack_start + stack_size);
 
     /* ensure correct stack alignment (on 16-bit boundary) */
     stk &= 0xfffe;
