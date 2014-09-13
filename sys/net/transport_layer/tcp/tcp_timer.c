@@ -68,12 +68,11 @@ void handle_established(socket_internal_t *current_socket)
         current_timeout = SECOND;
     }
 
-    uint8_t i;
 
     if ((current_socket->socket_values.tcp_control.send_nxt >
          current_socket->socket_values.tcp_control.send_una) &&
         (thread_getstatus(current_socket->send_pid) == STATUS_RECEIVE_BLOCKED)) {
-        for (i = 0; i < current_socket->socket_values.tcp_control.no_of_retries;
+        for (uint8_t i = 0; i < current_socket->socket_values.tcp_control.no_of_retries;
              i++) {
             current_timeout *= 2;
         }
@@ -94,11 +93,10 @@ void handle_established(socket_internal_t *current_socket)
 
 void check_sockets(void)
 {
-    socket_internal_t *current_socket;
     uint8_t i = 1;
 
     while (i < MAX_SOCKETS + 1) {
-        current_socket = socket_base_get_socket(i);
+        socket_internal_t *current_socket = socket_base_get_socket(i);
 
         if (tcp_socket_compliancy(i)) {
             switch (current_socket->socket_values.tcp_control.state) {

@@ -173,13 +173,12 @@ static void *etx_beacon(void *arg)
      * and modifies the time to wait accordingly.
      */
     etx_probe_t *packet = etx_get_send_buf();
-    uint8_t p_length = 0;
 
     while (true) {
         thread_sleep();
         mutex_lock(&etx_mutex);
         //Build etx packet
-        p_length = 0;
+        uint8_t p_length = 0;
 
         for (uint8_t i = 0; i < ETX_BEST_CANDIDATES; i++) {
             if (candidates[i].used != 0) {

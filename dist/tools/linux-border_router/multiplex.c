@@ -60,12 +60,11 @@ uint8_t serial_read_byte()
 int readpacket(uint8_t *packet_buf, size_t size)
 {
     uint8_t *line_buf_ptr = packet_buf;
-    uint8_t byte = END + 1;
     uint8_t esc = 0;
     uint8_t translate = 1;
 
     while ((line_buf_ptr - packet_buf) < size - 1) {
-        byte = serial_read_byte();
+        uint8_t byte = serial_read_byte();
 
         if (translate && byte == END) {
             break;

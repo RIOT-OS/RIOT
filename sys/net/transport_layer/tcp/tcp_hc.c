@@ -410,7 +410,6 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
     uint8_t *packet_buffer = ((uint8_t *)temp_ipv6_header) + IPV6_HDR_LEN;
     uint16_t tcp_hc_header;
     socket_internal_t *current_socket = NULL;
-    uint16_t packet_size = 0;
 
     /* Full header TCP segment */
     if (*(((uint8_t *)temp_ipv6_header) + IPV6_HDR_LEN) == 0x01) {
@@ -442,6 +441,8 @@ socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header)
     }
     /* Compressed header TCP segment */
     else {
+        uint16_t packet_size = 0;
+
         /* Temporary TCP Header */
         tcp_hdr_t full_tcp_header;
         memset(&full_tcp_header, 0, sizeof(tcp_hdr_t));

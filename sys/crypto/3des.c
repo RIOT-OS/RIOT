@@ -359,14 +359,13 @@ uint8_t tripledes_get_preferred_block_size(void)
 static void cookey(const uint32_t *raw1, uint32_t *keyout)
 {
     uint32_t *cook;
-    const uint32_t *raw0;
     uint32_t dough[32];
     int i;
 
     cook = dough;
 
     for (i = 0; i < 16; i++, raw1++) {
-        raw0 = raw1++;
+        const uint32_t *raw0 = raw1++;
         *cook    = (*raw0 & 0x00fc0000L) << 6;
         *cook   |= (*raw0 & 0x00000fc0L) << 10;
         *cook   |= (*raw1 & 0x00fc0000L) >> 10;
@@ -383,7 +382,7 @@ static void cookey(const uint32_t *raw1, uint32_t *keyout)
 
 static void deskey(const uint8_t *key, int decrypt, uint32_t *keyout)
 {
-    uint32_t i, j, l, m, n, kn[32];
+    uint32_t i, j, l, m, kn[32];
     uint8_t pc1m[56], pcr[56];
 
     for (j = 0; j < 56; j++) {
@@ -401,7 +400,7 @@ static void deskey(const uint8_t *key, int decrypt, uint32_t *keyout)
             m = i << 1;
         }
 
-        n = m + 1;
+        uint32_t n = m + 1;
         kn[m] = kn[n] = 0L;
 
         for (j = 0; j < 28; j++) {

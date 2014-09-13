@@ -391,11 +391,10 @@ bool i2c_write(uint8_t i2c_interface, uint8_t slave_addr, uint8_t reg_addr,
     i2c_write_length = tx_buff_length + 1;
     i2c_master_buffer[0] = (slave_addr << 1) & WRITE_ENABLE_BIT_MASK;
     i2c_master_buffer[1] = reg_addr;
-    int32_t i;
-    int32_t j = 0;
 
     if ((tx_buff != NULL) && tx_buff_length < (I2C_BUFSIZE - 2)) {
-        for (i = 2; i < tx_buff_length + 2; i++) {
+        int32_t j = 0;
+        for (int32_t i = 2; i < tx_buff_length + 2; i++) {
             i2c_master_buffer[i] = tx_buff[j];
             j++;
             //printf("I2CMasterBuffer[%d] = %d\n", i, I2CMasterBuffer[i]);
@@ -419,14 +418,12 @@ bool i2c_trans_receive(uint8_t i2c_interface, uint8_t slave_addr,
                      I2C_BUFSIZE * sizeof(uint8_t));
     i2c_write_length = tx_buff_length;
     i2c_read_length = rx_buff_length;
-    bool successful = false;
-    int32_t read_index = 0;
-    int32_t i = 0;
 
     if (tx_buff != NULL && (tx_buff_length > 0)) {
+        int32_t read_index = 0;
         i2c_master_buffer[0] = (slave_addr << 1) & WRITE_ENABLE_BIT_MASK;
 
-        for (i = 1; i < tx_buff_length + 1; i++) {
+        for (int32_t i = 1; i < tx_buff_length + 1; i++) {
             if (i < I2C_BUFSIZE) {
                 i2c_master_buffer[i] = tx_buff[i - 1];
             }
@@ -439,7 +436,7 @@ bool i2c_trans_receive(uint8_t i2c_interface, uint8_t slave_addr,
             read_index = i + 1;
         }
 
-        successful = i2c_transaction(i2c_interface);
+        bool successful = i2c_transaction(i2c_interface);
 
         if (successful && (rx_buff != NULL) && (rx_buff_length > 0)) {
             memcpy(rx_buff, (const uint8_t *)(i2c_master_buffer + read_index),
