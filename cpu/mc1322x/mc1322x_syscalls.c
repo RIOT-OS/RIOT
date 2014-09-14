@@ -24,7 +24,7 @@ static const caddr_t heap_max = (caddr_t)&__heap_end;
 static const caddr_t heap_start = (caddr_t)&__heap_start;
 
 /*-----------------------------------------------------------------------------------*/
-caddr_t _sbrk_r(struct _reent *r, size_t incr)
+caddr_t _sbrk_r(struct _reent *r, ptrdiff_t incr)
 {
     uint32_t cpsr = disableIRQ();
 
