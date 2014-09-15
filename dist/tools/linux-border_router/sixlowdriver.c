@@ -101,10 +101,9 @@ int tun_to_serial_packet(uint8_t *serial_packet, uint8_t *tun_packet, size_t pac
 void *tun_reader_f(void *args)
 {
     unsigned char data[BUFFER_SIZE];
-    size_t bytes;
 
     while (1) {
-        bytes = read(tun_fd, (void *)data, BUFFER_SIZE);
+        size_t bytes = read(tun_fd, (void *)data, BUFFER_SIZE);
 
         if (bytes > 0) {
             bytes = tun_to_serial_packet(tun_in_buf, (uint8_t *)data, bytes);

@@ -28,6 +28,7 @@
 #include "msg.h"
 #include "mutex.h"
 #include "thread.h"
+#include "kernel_macros.h"
 
 #include "vtimer.h"
 
@@ -61,10 +62,26 @@ static uint32_t hwtimer_next_absolute;
 
 static uint32_t seconds = 0;
 
+static inline priority_queue_node_t *timer_get_node(vtimer_t *timer)
+{
+    if (!timer) {
+        return NULL;
+    }
+    return &timer->priority_queue_entry;
+}
+
+static inline vtimer_t *node_get_timer(priority_queue_node_t *node)
+{
+    if (!node) {
+        return NULL;
+    }
+    return container_of(node, vtimer_t, priority_queue_entry);
+}
+
 static int set_longterm(vtimer_t *timer)
 {
     timer->priority_queue_entry.priority = timer->absolute.seconds;
-    priority_queue_add(&longterm_priority_queue_root, (priority_queue_node_t *)timer);
+    priority_queue_add(&longterm_priority_queue_root, timer_get_node(timer));
     return 0;
 }
 
@@ -97,7 +114,7 @@ static int update_shortterm(void)
     uint32_t now = HWTIMER_TICKS_TO_US(hwtimer_now());
 
     /* make sure the longterm_tick_timer does not get truncated */
-    if (((vtimer_t *) shortterm_priority_queue_root.first)->action != vtimer_callback_tick) {
+    if (node_get_timer(shortterm_priority_queue_root.first)->action != vtimer_callback_tick) {
         /* the next vtimer to schedule is the long term tick */
         /* it has a shortterm offset of longterm_tick_start */
         next += longterm_tick_start;
@@ -126,7 +143,7 @@ void vtimer_callback_tick(vtimer_t *timer)
     set_shortterm(&longterm_tick_timer);
 
     while (longterm_priority_queue_root.first) {
-        vtimer_t *timer = (vtimer_t *) longterm_priority_queue_root.first;
+        vtimer_t *timer = node_get_timer(longterm_priority_queue_root.first);
 
         if (timer->absolute.seconds == seconds) {
             priority_queue_remove_head(&longterm_priority_queue_root);
@@ -161,7 +178,7 @@ static int set_shortterm(vtimer_t *timer)
 {
     DEBUG("set_shortterm(): Absolute: %" PRIu32 " %" PRIu32 "\n", timer->absolute.seconds, timer->absolute.microseconds);
     timer->priority_queue_entry.priority = timer->absolute.microseconds;
-    priority_queue_add(&shortterm_priority_queue_root, (priority_queue_node_t *)timer);
+    priority_queue_add(&shortterm_priority_queue_root, timer_get_node(timer));
     return 1;
 }
 
@@ -174,7 +191,7 @@ void vtimer_callback(void *ptr)
     hwtimer_id = -1;
 
     /* get the vtimer that fired */
-    vtimer_t *timer = (vtimer_t *)priority_queue_remove_head(&shortterm_priority_queue_root);
+    vtimer_t *timer = node_get_timer(priority_queue_remove_head(&shortterm_priority_queue_root));
 
     if (timer) {
 #if ENABLE_DEBUG
@@ -358,8 +375,8 @@ int vtimer_remove(vtimer_t *t)
 {
     unsigned int irq_state = disableIRQ();
 
-    priority_queue_remove(&shortterm_priority_queue_root, (priority_queue_node_t *)t);
-    priority_queue_remove(&longterm_priority_queue_root, (priority_queue_node_t *)t);
+    priority_queue_remove(&shortterm_priority_queue_root, timer_get_node(t));
+    priority_queue_remove(&longterm_priority_queue_root, timer_get_node(t));
     update_shortterm();
 
     restoreIRQ(irq_state);

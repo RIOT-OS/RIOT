@@ -67,10 +67,8 @@ void rx(void *ptr, char data)
 
 int tx(void *ptr)
 {
-    char data;
-
     if (tx_buf.avail > 0) {
-        data = ringbuffer_get_one(&tx_buf);
+        char data = ringbuffer_get_one(&tx_buf);
         uart_write(DEV, data);
         return 1;
     }
@@ -95,10 +93,6 @@ void *uart_thread(void *arg)
 
 int main(void)
 {
-    char buf[128];
-    int res;
-    msg_t msg;
-
     main_pid = thread_getpid();
 
     puts("\nTesting interrupt driven mode of UART driver\n");
@@ -121,10 +115,12 @@ int main(void)
                   0, uart_thread, 0, "uart");
 
     while (1) {
+        msg_t msg;
         msg_receive(&msg);
 
         printf("RECEIVED INPUT: ");
-        res = ringbuffer_get(&rx_buf, buf, rx_buf.avail);
+        char buf[128];
+        int res = ringbuffer_get(&rx_buf, buf, rx_buf.avail);
         buf[res] = '\0';
         printf("%s", buf);
 

@@ -74,7 +74,7 @@ char *thread_arch_stack_init(void *(*task_func)(void *), void *arg, void *stack_
     uint8_t *stk;
 
     /* AVR uses 16 Bit or two 8 Bit registers for storing  pointers*/
-    stk = (uint8_t *)((uint16_t)stack_start + stack_size);
+    stk = (uint8_t *)((uintptr_t)stack_start + stack_size);
 
     /* put marker on stack */
     stk--;

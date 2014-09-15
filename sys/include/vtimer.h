@@ -1,18 +1,18 @@
 /**
- * @defgroup    sys_vtimer Virtual (Software) Timer library
- * @ingroup  sys
- * @brief       Virtual software timer for general timer functionality in applications
+ * virtual timer header
+ *
+ * Copyright (C) 2009, 2014 Kaspar Schleiser
+ * Copyright (C) 2013, 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
+ * @ingroup  sys_vtimer
  * @{
- *
  * @file        vtimer.h
- * @brief       VTimer API
- *
- * The vtimer library provides functions for setting, resetting and restarting
- * software timers, and for checking if a vtimer has expired.
- *
- * (As of now, not resetting, restarting, removing and checking are not implemented)
- *
- * @author      unknown
+ * @author Kaspar Schleiser <kaspar@schleiser.de>
+ * @}
  */
 
 #ifndef __VTIMER_H

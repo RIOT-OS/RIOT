@@ -56,21 +56,21 @@ static char settings_file[256] = {'\0'};
 void init_settings(void)
 {
     const char *home_dir;
-    FILE *fp;
-    char buf[1024], *p, *q;
+    char buf[1024];
 
     home_dir = getenv("HOME");
 
     if (home_dir && *home_dir) {
         snprintf(settings_file, sizeof(settings_file),
                  "%s/.lpc2k_pgm", home_dir);
-        fp = fopen(settings_file, "r");
+        FILE *fp = fopen(settings_file, "r");
 
         if (fp == NULL) {
             return;
         }
 
         while (!feof(fp)) {
+            char *p, *q;
             buf[0] = '\0';
             fgets(buf, sizeof(buf), fp);
 

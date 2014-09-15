@@ -281,16 +281,14 @@ static void *run(void *arg)
 {
     (void) arg;
 
-    msg_t m;
-    transceiver_command_t *cmd;
-
     msg_init_queue(msg_buffer, TRANSCEIVER_MSG_BUFFER_SIZE);
 
     while (1) {
         DEBUG("transceiver: Waiting for next message\n");
+        msg_t m;
         msg_receive(&m);
         /* only makes sense for messages for upper layers */
-        cmd = (transceiver_command_t *) m.content.ptr;
+        transceiver_command_t *cmd = (transceiver_command_t *) m.content.ptr;
         DEBUG("transceiver: Transceiver: Message received, type: %02X\n", m.type);
 
         switch (m.type) {

@@ -83,9 +83,6 @@ int32_t srf08_get_distances(uint32_t *range_array, uint8_t ranging_mode)
 {
     bool status = false;
     uint8_t reg_size = 1;
-    uint8_t range_high_byte = 0;
-    uint8_t range_low_byte = 0;
-    uint32_t distance = 0;
     uint8_t rx_buff[reg_size];
     uint8_t tx_buff[reg_size];
     uint8_t register_location;
@@ -110,7 +107,7 @@ int32_t srf08_get_distances(uint32_t *range_array, uint8_t ranging_mode)
             puts("Read the high echo byte from the i2c-interface is failed");
             return -1;
         }
-        range_high_byte = rx_buff[0];
+        uint8_t range_high_byte = rx_buff[0];
         //read the low echo byte
         status = i2c_read(SRF08_I2C_INTERFACE, SRF08_DEFAULT_ADDR,
                           register_location + 1, rx_buff, reg_size);
@@ -118,12 +115,12 @@ int32_t srf08_get_distances(uint32_t *range_array, uint8_t ranging_mode)
             puts("Read the low echo byte from the i2c-interface is failed");
             return -1;
         }
-        range_low_byte = rx_buff[0];
+        uint8_t range_low_byte = rx_buff[0];
         if ((range_high_byte == 0) && (range_low_byte == 0)) {
             break;
         }
         else {
-            distance = (range_high_byte << 8) | range_low_byte;
+            uint32_t distance = (range_high_byte << 8) | range_low_byte;
             range_array[(register_location - 2) / 2] = distance;
             echo_number++;
             printf("distance = %4lu cm , echo%d\n",
@@ -139,7 +136,6 @@ void srf08_start_ranging(uint8_t ranging_mode)
 {
     uint32_t range_array[SRF08_MAX_ECHO_NUMBER];
     uint8_t i;
-    uint8_t echo_number;
 
     puts("Ultrasonic SRF08 engine is started");
     //wait due to calibration
@@ -149,7 +145,7 @@ void srf08_start_ranging(uint8_t ranging_mode)
 
     while (1) {
         puts("--------------------------------------------");
-        echo_number = srf08_get_distances(range_array, ranging_mode);
+        uint8_t echo_number = srf08_get_distances(range_array, ranging_mode);
         if (echo_number > 0) {
             for (i = 0; i < echo_number; i++) {
                 printf("stored distance = %4lu cm , echo%d\n", range_array[i], i + 1);

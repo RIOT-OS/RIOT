@@ -103,7 +103,7 @@ void Isr_GPDMA(void) __attribute__((interrupt("IRQ")));
 void Isr_MCI(void)
 {
     unsigned long ms;
-    unsigned char n, xs;
+    unsigned char xs;
 
     ms = MCI_STATUS & 0x073A;   /* Clear MCI interrupt status */
     MCI_CLEAR = ms;
@@ -116,7 +116,7 @@ void Isr_MCI(void)
                 GPDMA_SOFT_BREQ = 0x10;    /* Pop off remaining data in the MCIFIFO */
             }
 
-            n = (XferWp + 1) % N_BUF;   /* Next write buffer */
+            unsigned char n = (XferWp + 1) % N_BUF;   /* Next write buffer */
             XferWp = n;
 
             if (n == XferRp) {
@@ -124,7 +124,7 @@ void Isr_MCI(void)
             }
         }
         else {                      /* In card write operation */
-            n = (XferRp + 1) % N_BUF;   /* Next read buffer */
+            unsigned char n = (XferRp + 1) % N_BUF;   /* Next read buffer */
             XferRp = n;
 
             if (n == XferWp) {
@@ -700,8 +700,6 @@ DRESULT MCI_read(unsigned char *buff, unsigned long sector, unsigned char count)
 {
     unsigned long resp;
     unsigned int cmd;
-    unsigned char rp;
-
 
     if (count < 1 || count > 127) {
         return RES_PARERR;    /* Check parameter */
@@ -725,7 +723,7 @@ DRESULT MCI_read(unsigned char *buff, unsigned long sector, unsigned char count)
 
     if (send_cmd(cmd, sector, 1, &resp)     /* Start to read */
        && !(resp & 0xC0580000)) {
-        rp = 0;
+        unsigned char rp = 0;
 
         do {
             while ((rp == XferWp) && !(XferStat & 0xC)) {
@@ -879,7 +877,7 @@ DRESULT MCI_ioctl(
 )
 {
     DRESULT res;
-    unsigned char b, *ptr = (unsigned char *)buff;
+    unsigned char *ptr = (unsigned char *)buff;
     unsigned long resp[4], d, *dp, st, ed;
 
 
@@ -903,7 +901,7 @@ DRESULT MCI_ioctl(
                 *(unsigned long *)buff = d << 10;
             }
             else {                      /* MMC or SDC CSD v1.0 */
-                b = (CardInfo[5] & 15) + ((CardInfo[10] & 128) >> 7) + ((CardInfo[9] & 3) << 1) + 2;
+                unsigned char b = (CardInfo[5] & 15) + ((CardInfo[10] & 128) >> 7) + ((CardInfo[9] & 3) << 1) + 2;
                 d = (CardInfo[8] >> 6) + ((unsigned short)CardInfo[7] << 2) + ((unsigned short)(CardInfo[6] & 3) << 10) + 1;
                 *(unsigned long *)buff = d << (b - 9);
             }

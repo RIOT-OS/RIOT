@@ -38,7 +38,7 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
 {
     unsigned int *stk;
     int i;
-    stk = (unsigned int *)((unsigned int)stack_start + stack_size);
+    stk = (unsigned int *)((uintptr_t)stack_start + stack_size);
     stk--;
 
     *stk = STACK_MARKER;

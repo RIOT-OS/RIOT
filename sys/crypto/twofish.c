@@ -528,6 +528,7 @@ static int twofish_set_key(twofish_context_t *ctx, uint8_t *key, uint8_t keylen)
     /* The S vector used to key the S-boxes, split up into individual bytes.
      * 128-bit keys use only sa through sh; 256-bit use all of them. */
     uint8_t sa = 0, sb = 0, sc = 0, sd = 0, se = 0, sf = 0, sg = 0, sh = 0;
+    /* cppcheck-suppress variableScope */
     uint8_t si = 0, sj = 0, sk = 0, sl = 0, sm = 0, sn = 0, so = 0, sp = 0;
 
     /* Temporary for CALC_S. */

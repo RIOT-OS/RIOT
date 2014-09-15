@@ -1,5 +1,13 @@
+/*
+ * Copyright (C) 2014  Freie Universität Berlin.
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
- * destiny/in.h - Constants defined by the internet system, per RFC 790,
+ * socket_base/in.h - Constants defined by the internet system, per RFC 790,
  *                September 1981, and numerous additions, inspired by
  *                netinet/in.h definitions.
  * @{
@@ -18,8 +26,8 @@
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef DESTINY_IN_H
-#define DESTINY_IN_H
+#ifndef SOCKET_BASE_IN_H
+#define SOCKET_BASE_IN_H
 
 /*
  * Protocols (RFC 1700) TODO: may be deleted due to some double definition
@@ -141,4 +149,4 @@
 
 #define IN_LOOPBACKNET          (127)             ///< official!
 
-#endif /* DESTINY_IN_H */
+#endif /* SOCKET_BASE_IN_H */

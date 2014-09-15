@@ -75,22 +75,16 @@ void bloom_del(struct bloom_t *bloom)
 
 void bloom_add(struct bloom_t *bloom, const uint8_t *buf, size_t len)
 {
-    uint32_t hash;
-    size_t n;
-
-    for (n = 0; n < bloom->k; n++) {
-        hash = bloom->hash[n](buf, len);
+    for (size_t n = 0; n < bloom->k; n++) {
+        uint32_t hash = bloom->hash[n](buf, len);
         SETBIT(bloom->a, (hash % bloom->m));
     }
 }
 
 bool bloom_check(struct bloom_t *bloom, const uint8_t *buf, size_t len)
 {
-    uint32_t hash;
-    size_t n;
-
-    for (n = 0; n < bloom->k; n++) {
-        hash = bloom->hash[n](buf, len);
+    for (size_t n = 0; n < bloom->k; n++) {
+        uint32_t hash = bloom->hash[n](buf, len);
 
         if (!(GETBIT(bloom->a, (hash % bloom->m)))) {
             return false;

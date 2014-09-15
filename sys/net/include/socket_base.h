@@ -1,5 +1,5 @@
 /**
- * destiny.h - Wraps all API types, constants and functions of the transport
+ * socket_base.h - Wraps all API types, constants and functions of the transport
  *             layer implementation.
  *
  * Copyright (C) 2013  INRIA.
@@ -10,9 +10,9 @@
  */
 
 /**
- * @defgroup destiny    DESTiny - Transport layer implementation
+ * @defgroup socket_base    Transport layer implementation
  * @ingroup net
- * @brief   DESTiny module implements the transport layer. This includes
+ * @brief   This module implements the transport layer. This includes
  *          6LoWPAN UDP header compression and (experimental) 6LoWPAN TCP header
  *          compression.
  * @see     <a href="http://tools.ietf.org/html/rfc6282#section-4.3">
@@ -25,23 +25,16 @@
  *          </a>
  * @{
  * @file
- * @brief   destiny functions
+ * @brief   transport_layer functions
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef DESTINY_H
-#define DESTINY_H
+#ifndef SOCKET_BASE_H
+#define SOCKET_BASE_H
 
-#include "destiny/in.h"
-#include "destiny/socket.h"
-#include "destiny/types.h"
+#include "socket_base/in.h"
+#include "socket_base/socket.h"
+#include "socket_base/types.h"
 
-/**
- * Initializes transport layer.
- *
- * @return 0 on success, other else.
- */
-int destiny_init_transport_layer(void);
-
-#endif /* DESTINY_H */
+#endif /* SOCKET_BASE_H */

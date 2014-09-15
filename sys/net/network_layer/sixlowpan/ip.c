@@ -307,22 +307,31 @@ uint8_t ipv6_get_addr_match(const ipv6_addr_t *src,
     return val;
 }
 
-int is_our_address(ipv6_addr_t *addr)
+/**
+ * @brief Check if the given IPv6 address is assigned to any configured
+ *        interface
+ *
+ * @param[in] addr  The IPv6 address to check
+ *
+ * @return 1    If *addr* is assigned to at least one interface
+ * @return 0    If *addr* is not assigned to any interface
+ * @return -1   If no IPv6 address is configured to any interface
+ */
+static int is_our_address(ipv6_addr_t *addr)
 {
-    ipv6_net_if_ext_t *net_if_ext;
-    ipv6_net_if_addr_t *myaddr;
-    uint8_t prefix, suffix;
     int if_id = -1;
+    unsigned counter = 0;
 
     DEBUGF("Is this my addres: %s?\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
-        net_if_ext = ipv6_net_if_get_ext(if_id);
-        myaddr = NULL;
-        prefix = net_if_ext->prefix / 8;
-        suffix = IPV6_ADDR_LEN - prefix;
+        ipv6_net_if_ext_t *net_if_ext = ipv6_net_if_get_ext(if_id);
+        ipv6_net_if_addr_t *myaddr = NULL;
+        uint8_t prefix = net_if_ext->prefix / 8;
+        uint8_t suffix = IPV6_ADDR_LEN - prefix;
 
         while ((myaddr = (ipv6_net_if_addr_t *)net_if_iter_addresses(if_id,
                          (net_if_addr_t **) &myaddr)) != NULL) {
+            counter++;
             DEBUGF("\tCompare with: %s?\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, (ipv6_addr_t*) myaddr->addr_data));
             if ((ipv6_get_addr_match(myaddr->addr_data, addr) >= net_if_ext->prefix) &&
                 (memcmp(&addr->uint8[prefix], &myaddr->addr_data->uint8[prefix], suffix) == 0)) {
@@ -331,7 +340,11 @@ int is_our_address(ipv6_addr_t *addr)
         }
     }
 
-    return 0;
+    if (!counter) {
+        counter = -1;
+    }
+    /* return negative value if no address is configured so far */
+    return counter;
 }
 
 void *ipv6_process(void *arg)
@@ -362,8 +375,15 @@ void *ipv6_process(void *arg)
             }
         }
 
+        int addr_match = is_our_address(&ipv6_buf->destaddr);
+
+        /* no address configured for this node so far, exit early */
+        if (addr_match < 1) {
+            msg_reply(&m_recv_lowpan, &m_send_lowpan);
+            continue;
+        }
         /* destination is our address */
-        if (is_our_address(&ipv6_buf->destaddr)) {
+        else if (addr_match) {
             switch (*nextheader) {
                 case (IPV6_PROTO_NUM_ICMPV6): {
                     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
@@ -471,7 +491,6 @@ int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
                          ndp_addr_state_t state, uint32_t val_ltime,
                          uint32_t pref_ltime, uint8_t is_anycast)
 {
-    ipv6_net_if_addr_t *addr_entry;
     ipv6_net_if_hit_t hit;
 
     if (ipv6_addr_is_unspecified(addr) == 128) {
@@ -499,7 +518,7 @@ int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
         ipv6_addr_t *addr_data = &ipv6_addr_buffer[ipv6_net_if_addr_buffer_count];
         memcpy(addr_data, addr, sizeof(ipv6_addr_t));
 
-        addr_entry = &ipv6_net_if_addr_buffer[ipv6_net_if_addr_buffer_count];
+        ipv6_net_if_addr_t *addr_entry = &ipv6_net_if_addr_buffer[ipv6_net_if_addr_buffer_count];
         addr_entry->addr_data = addr_data;
         addr_entry->addr_len = 128;
 
@@ -648,8 +667,6 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
 {
     /* try to find best match if dest is not mcast or link local */
     int if_id = 0; // TODO: get this somehow
-    uint8_t tmp = 0;
-    uint8_t bmatch = 0;
     ipv6_net_if_addr_t *addr = NULL;
     ipv6_net_if_addr_t *tmp_addr = NULL;
 
@@ -660,8 +677,9 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
                 if (!ipv6_addr_is_link_local(addr->addr_data) &&
                     !ipv6_addr_is_multicast(addr->addr_data) &&
                     !ipv6_addr_is_unique_local_unicast(addr->addr_data)) {
-                    tmp = ipv6_get_addr_match(dest, addr->addr_data);
 
+                    uint8_t bmatch = 0;
+                    uint8_t tmp = ipv6_get_addr_match(dest, addr->addr_data);
                     if (tmp >= bmatch) {
                         bmatch = tmp;
                         tmp_addr = addr;

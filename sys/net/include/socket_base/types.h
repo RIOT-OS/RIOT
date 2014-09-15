@@ -1,5 +1,5 @@
 /**
- * Destiny types header
+ * Transport Layer types header
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,15 +7,15 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup destiny
+ * @ingroup transport_layer
  * @{
  * @file
- * @brief   Destiny types
+ * @brief   Transport Layer types
  * @author  Oliver Gesch <oliver.gesch@googlemail.com>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef DESTINY_TYPES_H_
-#define DESTINY_TYPES_H_
+#ifndef SOCKET_BASE_TYPES_H_
+#define SOCKET_BASE_TYPES_H_
 #include <stdint.h>
 
 /**
@@ -73,4 +73,4 @@ typedef struct __attribute__((packed)) {
  * @}
  */
 
-#endif /* DESTINY_TYPES_H_ */
+#endif /* SOCKET_BASE_TYPES_H_ */

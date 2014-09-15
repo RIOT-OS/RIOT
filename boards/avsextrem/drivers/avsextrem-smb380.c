@@ -305,8 +305,8 @@ uint8_t getRingReadPointerforCurrentThread(void)
 {
     uint8_t pointerNo = 0;
 
-    while ((PointerList[pointerNo] != sched_active_pid) &&
-           (pointerNo < SMB380_RING_BUFF_MAX_THREADS)) {
+    while ((pointerNo < SMB380_RING_BUFF_MAX_THREADS) &&
+           (PointerList[pointerNo] != sched_active_pid)) {
         pointerNo++;
     }
 
@@ -318,8 +318,8 @@ uint8_t initRingReadPointerforCurrentThread(void)
     //TODO: make it Threadsafe
     uint8_t pointerNo = 0;
 
-    while ((PointerList[pointerNo] > 0) &&
-           (pointerNo < SMB380_RING_BUFF_MAX_THREADS)) {
+    while ((pointerNo < SMB380_RING_BUFF_MAX_THREADS) &&
+           (PointerList[pointerNo] > 0)) {
         pointerNo++;
     }
 
@@ -564,8 +564,8 @@ void wakeUpRegisteredProcesses(void)
     //wake up waiting processes
     wakeupmessage.type = MSG_TYPE_SMB380_WAKEUP;
 
-    while ((PointerList[pointerNo] > 0) &&
-           (pointerNo < SMB380_RING_BUFF_MAX_THREADS)) {
+    while ((pointerNo < SMB380_RING_BUFF_MAX_THREADS) &&
+           (PointerList[pointerNo] > 0)) {
         msg_send(&wakeupmessage, PointerList[pointerNo], false);
         pointerNo++;
     }
@@ -685,19 +685,17 @@ unsigned char SMB380_getWakeUpPause(void)
 
 void SMB380_setBandWidth(unsigned char bandWidth)
 {
-    unsigned char utemp;
-
-    if ((bandWidth == SMB380_BAND_WIDTH_100HZ) |
-        (bandWidth == SMB380_BAND_WIDTH_1500HZ) |
-        (bandWidth == SMB380_BAND_WIDTH_190HZ) |
-        (bandWidth == SMB380_BAND_WIDTH_25HZ) |
-        (bandWidth == SMB380_BAND_WIDTH_375HZ) |
-        (bandWidth == SMB380_BAND_WIDTH_50HZ) |
-        (bandWidth == SMB380_BAND_WIDTH_750HZ)) {
+    if ((bandWidth == SMB380_BAND_WIDTH_100HZ) ||
+            (bandWidth == SMB380_BAND_WIDTH_1500HZ) ||
+            (bandWidth == SMB380_BAND_WIDTH_190HZ) ||
+            (bandWidth == SMB380_BAND_WIDTH_25HZ) ||
+            (bandWidth == SMB380_BAND_WIDTH_375HZ) ||
+            (bandWidth == SMB380_BAND_WIDTH_50HZ) ||
+            (bandWidth == SMB380_BAND_WIDTH_750HZ)) {
         unsigned long cpsr = disableIRQ();
         SMB380_Prepare();
         SMB380_ssp_write(SMB380_CONTROL3, 0, SMB380_READ_REGISTER);
-        utemp = SMB380_ssp_read();
+        unsigned char utemp = SMB380_ssp_read();
         utemp &= ~SMB380_CONTROL3_BANDWITH_MASK;
         utemp |= (bandWidth & 0x7);
         SMB380_ssp_write(SMB380_CONTROL3, utemp, SMB380_WRITE_REGISTER);
@@ -709,13 +707,11 @@ void SMB380_setBandWidth(unsigned char bandWidth)
 
 void SMB380_setRange(unsigned char range)
 {
-    unsigned char utemp = 0;
-
     if (range != 0x3) {
         unsigned long cpsr = disableIRQ();
         SMB380_Prepare();
         SMB380_ssp_write(SMB380_CONTROL3, 0, SMB380_READ_REGISTER);
-        utemp = (unsigned char)SMB380_ssp_read();
+        unsigned char utemp = (unsigned char)SMB380_ssp_read();
         utemp &= ~SMB380_CONTROL3_RANGE_MASK;
         utemp |= (range & 0x3) << 3;
         SMB380_ssp_write(SMB380_CONTROL3, utemp, SMB380_WRITE_REGISTER);
@@ -857,16 +853,14 @@ void SMB380_Selftest_1(void)
 
 void SMB380_ShowMemory(void)
 {
-    uint16_t uReg = 0;
     uint8_t bitMask[16];
     printf("SMB380 Speicher\n\r");
-    unsigned long cpsr;
 
     for (unsigned char regAd = 0x16; regAd > 0; regAd--) {
-        cpsr = disableIRQ();
+        unsigned long cpsr = disableIRQ();
         SMB380_Prepare();
         SMB380_ssp_write(regAd - 1, 0, SMB380_READ_REGISTER);
-        uReg = SMB380_ssp_read();
+        uint16_t uReg = SMB380_ssp_read();
         SMB380_Unprepare();
         restoreIRQ(cpsr);
         printf("Register: = %X: 0x%X = ", regAd - 1, uReg);

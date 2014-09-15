@@ -13,4 +13,8 @@ BOARD_INSUFFICIENT_RAM += redbee-econotag stm32f0discovery
 
 USEMODULE += libfixmath-unittests
 
+ifeq ($(TRAVIS),true)
+  BOARD_WHITELIST := -
+endif
+
 include $(RIOTBASE)/Makefile.include

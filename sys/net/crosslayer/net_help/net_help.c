@@ -33,27 +33,21 @@ void printArrayRange(uint8_t *array, uint16_t len, char *str)
 
 uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len)
 {
-    int count;
-    uint16_t carry;
-
-    count = len >> 1;
+    int count = len >> 1;
 
     if (count) {
-        if (count) {
-            carry = 0;
+        uint16_t carry = 0;
 
-            do {
-                uint16_t t = (*buf << 8) + *(buf + 1);
-                count--;
-                buf += 2;
-                sum += carry;
-                sum += t;
-                carry = (t > sum);
-            }
-            while (count);
-
+        do {
+            uint16_t t = (*buf << 8) + *(buf + 1);
+            count--;
+            buf += 2;
             sum += carry;
-        }
+            sum += t;
+            carry = (t > sum);
+        } while (count);
+
+        sum += carry;
     }
 
     if (len & 1) {

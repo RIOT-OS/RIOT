@@ -1,5 +1,5 @@
 /**
- * Destiny TCP header
+ * TCP header
  *
  * Copyright (C) 2013  INRIA.
  *
@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup destiny
+ * @ingroup transport_layer
  * @{
  * @file
  * @brief   TCP data structs and prototypes
@@ -18,7 +18,8 @@
 #define TCP_H_
 
 #include "ipv6.h"
-#include "destiny/types.h"
+#include "socket_base/types.h"
+#include "socket.h"
 
 #define TCP_EOO_OPTION          (0x00)        /* End of option list */
 #define TCP_NOP_OPTION          (0x01)        /* No operation */
@@ -96,10 +97,16 @@ extern uint8_t             global_context_counter;
 extern mutex_t             global_sequence_counter_mutex;
 extern uint32_t            global_sequence_counter;
 
-void *tcp_packet_handler(void *);
-uint16_t tcp_csum(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header);
-void printTCPHeader(tcp_hdr_t *tcp_header);
-void printArrayRange_tcp(uint8_t *udp_header, uint16_t len);
+/* methods usde by socket_base */
+int tcp_bind_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid);
+bool tcp_socket_compliancy(int s);
+int32_t tcp_send(int s, const void *buf, uint32_t len, int flags);
+int tcp_accept(int s, sockaddr6_t *addr, socklen_t *addrlen);
+int tcp_connect(int socket, sockaddr6_t *addr, uint32_t addrlen);
+int tcp_listen(int s, int backlog);
+int32_t tcp_recv(int s, void *buf, uint32_t len, int flags);
+bool tcp_socket_compliancy(int s);
+int tcp_teardown(socket_internal_t *current_socket);
 
 /**
  * @}

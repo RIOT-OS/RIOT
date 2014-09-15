@@ -59,7 +59,6 @@ uint8_t flashrom_write(uint8_t *dst, const uint8_t *src, size_t size)
     (void) size; /* unused */
 
     char err;
-    unsigned intstate;
     uint8_t sec;
 
     sec = iap_get_sector((uint32_t) dst);
@@ -76,37 +75,32 @@ uint8_t flashrom_write(uint8_t *dst, const uint8_t *src, size_t size)
 
     /* prepare sector */
     err = prepare_sectors(sec, sec);
-
     if (err) {
         DEBUG("\n-- ERROR: PREPARE_SECTOR_FOR_WRITE_OPERATION: %u\n", err);
         return 0;
     }
-    /* write flash */
-    else {
-        intstate = disableIRQ();
-        err = copy_ram_to_flash((uint32_t) dst, (uint32_t) src, 256);
+
+    /*  write flash */
+    unsigned intstate = disableIRQ();
+    err = copy_ram_to_flash((uint32_t) dst, (uint32_t) src, 256);
+    restoreIRQ(intstate);
+
+    if (err) {
+        DEBUG("ERROR: COPY_RAM_TO_FLASH: %u\n", err);
+        /* set interrupts back and return */
         restoreIRQ(intstate);
-
-        if (err) {
-            DEBUG("ERROR: COPY_RAM_TO_FLASH: %u\n", err);
-            /* set interrupts back and return */
-            restoreIRQ(intstate);
-            return 0;
-        }
-        /* check result */
-        else {
-            err = compare((uint32_t) dst, (uint32_t) src, 256);
-
-            if (err) {
-                DEBUG("ERROR: COMPARE: %i (at position %u)\n", err, iap_result[1]);
-                return 0;
-            }
-            else {
-                DEBUG("Data successfully written!\n");
-                return 1;
-            }
-        }
+        return 0;
     }
+    /* check result */
+    err = compare((uint32_t) dst, (uint32_t) src, 256);
+
+    if (err) {
+        DEBUG("ERROR: COMPARE: %i (at position %u)\n", err, iap_result[1]);
+        return 0;
+    }
+
+    DEBUG("Data successfully written!\n");
+    return 1;
 }
 
 

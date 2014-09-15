@@ -58,14 +58,12 @@ struct timeval *
 ccnl_run_events(void)
 {
     static struct timeval now;
-    long usec;
-
     ccnl_get_timeval(&now);
     //DEBUGMSG(1, "ccnl_run_events now: %ld:%ld\n", now.tv_sec, now.tv_usec);
 
     while (eventqueue) {
         struct ccnl_timer_s *t = eventqueue;
-        usec = timevaldelta(&(t->timeout), &now);
+        long usec = timevaldelta(&(t->timeout), &now);
 
         if (usec >= 0) {
             //DEBUGMSG(1, "ccnl_run_events nothing to do: %ld:%ld\n", now.tv_sec, now.tv_usec);

@@ -127,7 +127,7 @@ void msp430_init_dco(void)
 #ifdef  CALIBRATE_MSP430_DCO
 #define DELTA    (F_CPU / (F_RC_OSCILLATOR / 8))
     /* This code taken from the FU Berlin sources and reformatted. */
-    unsigned int compare, oldcapture = 0;
+    unsigned int oldcapture = 0;
     unsigned int i;
 
     /* 10100100 = XT2 is off, ACLK divided by 4, RSELx=4 */
@@ -147,6 +147,8 @@ void msp430_init_dco(void)
     TACTL = TASSEL1 + TACLR + MC1;        /* SMCLK, continous mode */
 
     while (1) {
+        unsigned int compare;
+
         while ((CCTL2 & CCIFG) != CCIFG);   /* Wait until capture occured!*/
 
         CCTL2 &= ~CCIFG;                    /* Capture occured, clear flag */

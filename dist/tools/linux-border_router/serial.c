@@ -111,7 +111,7 @@ static void report_open_error(const char *filename, int err)
     struct passwd *p;
     struct group *g;
     mode_t perm;
-    int r, perm_ok = 0;
+    int r;
 
     printf("\r\n");
     printf("Unable to open \"%s\"\r\n", filename);
@@ -198,6 +198,7 @@ static void report_open_error(const char *filename, int err)
     else {
         printf("%s is not read/write for everybody, so\r\n", filename);
         printf("  you must match either user or group permission\r\n");
+        int perm_ok = 0;
 
         if ((perm & S_IRUSR) && (perm & S_IWUSR)) {
             printf("%s has read/write permission for user %s\r\n",

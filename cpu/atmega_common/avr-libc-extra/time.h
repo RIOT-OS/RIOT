@@ -26,6 +26,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* \cond DOXYGEN_BLACKLIST */
+
 /* $Id$ */
 
 /** \file */
@@ -521,6 +523,9 @@ extern          "C" {
     };
 
     /* @} */
+
+/* /endcond */
+
 #ifdef __cplusplus
 }
 #endif

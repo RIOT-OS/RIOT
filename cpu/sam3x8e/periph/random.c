@@ -38,6 +38,7 @@ void random_init(void)
 
 int random_read(char *buf, unsigned int num)
 {
+    /* cppcheck-suppress variableScope */
     uint32_t tmp;
     int count = 0;
 
