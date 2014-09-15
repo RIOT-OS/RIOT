@@ -34,8 +34,6 @@
 #define thread_print_stack              thread_arch_print_stack
 #define cpu_switch_context_exit         thread_arch_start_threading
 #define thread_yield                    thread_arch_yield
-#define thread_get_ip			thread_arch_get_ip
-#define thread_set_ip			thread_arch_set_ip
 #endif
 /** @} */
 
@@ -66,15 +64,6 @@ void thread_arch_start_threading(void) NORETURN;
  */
 void thread_arch_yield(void);
 
-/**
- * @brief Get current instruction pointer
- */
-void *thread_arch_get_ip(void);
-
-/**
- * @brief Set instruction pointer
- */
-void thread_arch_set_ip(void *ip);
 
 #endif /* __THREAD_ARCH_H */
 /** @} */

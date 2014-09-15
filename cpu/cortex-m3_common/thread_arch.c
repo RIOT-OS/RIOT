@@ -177,15 +177,3 @@ __attribute__((naked)) void isr_pendsv(void)
     sched_run();
     context_restore();
 }
-
-void *thread_arch_get_ip(void)
-{
-    void *ip;
-    asm("mov %0 r15" : "=r"(ip));
-    return ip;
-}
-
-void thread_arch_set_ip(void *ip)
-{
-    asm("mov r15 %0" : : "r"(ip));
-}
