@@ -173,14 +173,17 @@ uint16_t at86rf231_get_pan(void)
     return radio_pan;
 }
 
-uint8_t at86rf231_set_channel(uint8_t channel)
+int8_t at86rf231_set_channel(uint8_t channel)
 {
     uint8_t cca_state;
     radio_channel = channel;
 
     if (channel < RF86RF231_MIN_CHANNEL ||
         channel > RF86RF231_MAX_CHANNEL) {
-        radio_channel = RF86RF231_MAX_CHANNEL;
+#if DEVELHELP
+        puts("[at86rf231] channel out of range!");
+#endif
+        return -1;
     }
 
     cca_state = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA) & ~AT86RF231_PHY_CC_CCA_MASK__CHANNEL;
