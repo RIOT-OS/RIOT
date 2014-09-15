@@ -120,7 +120,7 @@ void rpl_udp_init(int argc, char **argv)
     msg_send_receive(&m, &m, transceiver_pid);
     printf("Channel set to %u\n", RADIO_CHANNEL);
 
-    puts("Transport Layer initialized");
+    puts("Transport layer initialized");
     /* start transceiver watchdog */
 }
 

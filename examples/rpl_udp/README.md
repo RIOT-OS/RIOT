@@ -37,7 +37,7 @@ Init your rpl node as either a root or a node router.
 	INFO: Initialize as node on address 2
 	6LoWPAN and RPL initialized.
 	Channel set to 10
-	UDP transport layer initialized
+	Transport layer initialized
 
 or
 
@@ -46,7 +46,7 @@ or
 	INFO: Initialize as root on address 1
 	6LoWPAN and RPL initialized.
 	Channel set to 10
-	UDP transport layer initialized
+	Transport layer initialized
 
 (It is advised to start all nodes before running the root node, because the interval for sending DIOs from the root increases over time)
 A few seconds withing running, setting and initializing your second node, the nodes will automatically start to exchange control traffic. You should be seeing output similar to the following:
