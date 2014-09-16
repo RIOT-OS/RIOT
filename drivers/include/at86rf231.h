@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 #ifndef AT86RF231_H_
 #define AT86RF231_H_
 
@@ -52,7 +60,7 @@ void at86rf231_rx_irq(void);
 
 int16_t at86rf231_send(at86rf231_packet_t *packet);
 
-uint8_t at86rf231_set_channel(uint8_t channel);
+int8_t at86rf231_set_channel(uint8_t channel);
 uint8_t at86rf231_get_channel(void);
 
 uint16_t at86rf231_set_pan(uint16_t pan);
