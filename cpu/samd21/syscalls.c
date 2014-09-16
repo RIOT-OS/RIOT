@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_samr21xxxA
+ * @ingroup     cpu_samd21
  * @{
  *
  * @file        syscalls.c
- * @brief       NewLib system calls implementations for SAMR21xxxA
+ * @brief       NewLib system calls implementations for samd21
  *
  * @author      Michael Baar <michael.baar@fu-berlin.de>
  * @author      Stefan Pfeiffer <pfeiffer@inf.fu-berlin.de>

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_samr21xxxA
+ * @ingroup     cpu_samd21
  * @{
  *
  * @file        reboot_arch.c

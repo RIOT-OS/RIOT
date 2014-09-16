@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_samr21xxxA
+ * @ingroup     cpu_samd21
  * @{
  *
  * @file        io_arch.c

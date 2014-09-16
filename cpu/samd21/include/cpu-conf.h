@@ -18,7 +18,7 @@
 #ifndef __CPU_CONF_H
 #define __CPU_CONF_H
 
-#include "samr21xxxA.h"
+#include "samd21.h"
 
 
 /**

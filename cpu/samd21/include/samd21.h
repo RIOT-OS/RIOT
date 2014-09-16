@@ -239,7 +239,7 @@ void I2S_Handler                 ( void );
 
 #include <core_cm0.h>
 #if !defined DONT_USE_CMSIS_INIT
-#include "system_samr21.h"
+#include "system_samd21.h"
 #endif /* DONT_USE_CMSIS_INIT */
 
 /*@}*/
