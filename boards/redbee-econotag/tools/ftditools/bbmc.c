@@ -453,7 +453,7 @@ int print_and_prompt(struct ftdi_device_list *devlist)
                                        curdev->dev,
                                        manufacturer, 128,
                                        description, 128,
-                                       serial, 128)
+                                       serial, 128);
         if (0 > ret) {
             fprintf(stderr, "ftdi_usb_get_strings failed: %d (%s)\n",
                     ret, ftdi_get_error_string(&ftdic));
