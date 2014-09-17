@@ -2,7 +2,8 @@ APPLICATION = bloom
 include ../Makefile.tests_common
 
 BOARD_INSUFFICIENT_RAM := chronos msb-430 msb-430h redbee-econotag \
-                          telosb wsn430-v1_3b wsn430-v1_4 z1 stm32f0discovery
+                          telosb wsn430-v1_3b wsn430-v1_4 z1 stm32f0discovery \
+                          spark-core
 
 BOARD_BLACKLIST := arduino-mega2560
 # arduino-mega2560: Errors in assembly, e.g:
