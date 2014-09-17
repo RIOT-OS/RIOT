@@ -125,14 +125,14 @@
 typedef uint32_t (*hashfp_t)(const uint8_t *, int len);
 
 /**
- * struct bloom_t bloom filter object
+ * bloom_t bloom filter object
  */
-struct bloom_t {
+typedef struct {
     size_t m;
     size_t k;
     uint8_t *a;
     hashfp_t *hash;
-};
+} bloom_t;
 
 /**
  * bloom_new  Allocate and return a pointer to a new Bloom filter.
@@ -146,7 +146,7 @@ struct bloom_t {
  * @return An allocated bloom filter
  *
  */
-struct bloom_t *bloom_new(size_t size, size_t num_hashes, ...);
+bloom_t *bloom_new(size_t size, size_t num_hashes, ...);
 
 /**
  * bloom_del  Delete a Bloom filter.
@@ -155,7 +155,7 @@ struct bloom_t *bloom_new(size_t size, size_t num_hashes, ...);
  * @return nothing
  *
  */
-void bloom_del(struct bloom_t *bloom);
+void bloom_del(bloom_t *bloom);
 
 /**
  * bloom_add  Add a string to a Bloom filter.
@@ -168,7 +168,7 @@ void bloom_del(struct bloom_t *bloom);
  * @return       nothing
  *
  */
-void bloom_add(struct bloom_t *bloom, const uint8_t *buf, size_t len);
+void bloom_add(bloom_t *bloom, const uint8_t *buf, size_t len);
 
 /**
  * bloom_check  Determine if a string is in the Bloom filter.
@@ -205,7 +205,7 @@ void bloom_add(struct bloom_t *bloom, const uint8_t *buf, size_t len);
  * @return       true if string is may be in the filter
  *
  */
-bool bloom_check(struct bloom_t *bloom, const uint8_t *buf, size_t len);
+bool bloom_check(bloom_t *bloom, const uint8_t *buf, size_t len);
 
 /** @} */
 #endif /* _BLOOM_FILTER_H */
