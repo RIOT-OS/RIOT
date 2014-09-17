@@ -63,12 +63,12 @@
 #define UART_IRQ_PRIO       1
 
 /* UART 0 device configuration */
-#define UART_0_DEV          Sercom->USART
+#define UART_0_DEV          SERCOM0->USART
 #define UART_0_IRQ          SERCOM0_IRQn
 #define UART_0_ISR          isr_sercom0
 /* UART 0 pin configuration */
-#define UART_0_PORT         Port->Group[0]
-#define UART_0_PINS         (PIN_PA08 | PIN_PA09)
+#define UART_0_PORT         PORT->Group[0]
+#define UART_0_PINS         (PORT_PA04 | PORT_PA05)
 
 /* UART 1 device configuration */
 #define UART_1_DEV
@@ -83,7 +83,7 @@
  * @name Random Number Generator configuration
  * @{
  */
-#define RANDOM_NUMOF        (1U)
+#define RANDOM_NUMOF        (0U)
 /** @} */
 
 /**

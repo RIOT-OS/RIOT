@@ -24,6 +24,13 @@
  */
 void cpu_init(void)
 {
+    /* pm clk enable */
+    PM->APBAMASK.reg = PM_APBAMASK_PM;
+    /* port clk enable */
+    PM->APBBMASK.reg |= PM_APBBMASK_PORT;
     /* disable the watchdog timer */
     WDT->CTRL.bit.ENABLE = 0;
+
+    /* set pendSV interrupt to lowest possible priority */
+    NVIC_SetPriority(PendSV_IRQn, 0xff);
 }

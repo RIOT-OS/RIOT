@@ -25,6 +25,7 @@
 
 
 void led_init(void);
+void clk_init(void);
 
 
 void board_init(void)
@@ -35,22 +36,55 @@ void board_init(void)
     /* initialize the CPU */
     cpu_init();
 
+    /* initialize the GCLK */
+    clk_init();
+
     /* initialize the boards LEDs */
     led_init();
 }
 
 
 /**
- * @brief Initialize the boards on-board LED (Amber LED "L")
+ * @brief Initialize the boards on-board LED
  *
  * The LED initialization is hard-coded in this function. As the LED is soldered
  * onto the board it is fixed to its CPU pins.
  *
  * The LED is connected to the following pin:
- * - LED: PB27
+ * - LED: PA19
  */
 void led_init(void)
 {
     LED_PORT.DIRSET.reg = LED_PIN;
-    LED_PORT.OUTCLR.reg = LED_PIN;
+    LED_PORT.OUTSET.reg = LED_PIN;
+}
+
+void clk_init(void)
+{
+    PM->APBAMASK.reg |= PM_APBAMASK_SYSCTRL;
+    SYSCTRL->OSC8M.bit.PRESC = 0;
+    SYSCTRL->OSC8M.bit.ONDEMAND = 1;
+    SYSCTRL->OSC8M.bit.RUNSTDBY = 0;
+    SYSCTRL->OSC8M.bit.ENABLE = 1;
+
+    PM->APBAMASK.reg |= PM_APBAMASK_GCLK;
+    /* Software reset the module to ensure it is re-initialized correctly */
+    GCLK->CTRL.reg = GCLK_CTRL_SWRST;
+    while (GCLK->CTRL.reg & GCLK_CTRL_SWRST);
+
+    PM->CPUSEL.reg = (uint32_t)0x0;
+    PM->APBASEL.reg = (uint32_t)0x0;
+    PM->APBBSEL.reg = (uint32_t)0x0;
+
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
+    /* Select the correct generator */
+    *((uint8_t*)&GCLK->GENDIV.reg) = 0;
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
+    GCLK->GENDIV.reg = 0x00000100;
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
+    *((uint8_t*)&GCLK->GENCTRL.reg) = GCLK_CLKCTRL_GEN_GCLK0;
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
+    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC8M);
+    // while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
+    // GCLK->GENCTRL.reg = GCLK_GENCTRL_GENEN;
 }

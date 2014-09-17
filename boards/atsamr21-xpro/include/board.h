@@ -26,7 +26,7 @@
 /**
  * Define the nominal CPU core clock in this board
  */
-#define F_CPU               (1000000UL)
+#define F_CPU               (48000000UL)
 
 /**
  * Assign the hardware timer
@@ -38,7 +38,7 @@
  * @{
  */
 #define STDIO               UART_0
-#define STDIO_BAUDRATE      (115200U)
+#define STDIO_BAUDRATE      (9600U)
 /** @} */
 
 /**
@@ -53,14 +53,17 @@
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED_ON              (LED_PORT.OUTSET.reg = LED_PIN)
-#define LED_OFF             (LED_PORT.OUTCLR.reg = LED_PIN)
+#define LED_ON              (LED_PORT.OUTCLR.reg = LED_PIN)
+#define LED_OFF             (LED_PORT.OUTSET.reg = LED_PIN)
 #define LED_TOGGLE          (LED_PORT.OUTTGL.reg = LED_PIN)
 
 /* for compatability to other boards */
 #define LED_GREEN_ON        /* not available */
 #define LED_GREEN_OFF       /* not available */
 #define LED_GREEN_TOGGLE    /* not available */
+#define LED_ORANGE_ON        /* not available */
+#define LED_ORANGE_OFF       /* not available */
+#define LED_ORANGE_TOGGLE    /* not available */
 #define LED_RED_ON          LED_ON
 #define LED_RED_OFF         LED_OFF
 #define LED_RED_TOGGLE      LED_TOGGLE
