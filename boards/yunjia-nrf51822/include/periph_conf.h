@@ -7,14 +7,12 @@
  */
 
 /**
- * @ingroup     board_pca10005
+ * @ingroup     board_yunjia-nrf51822
  * @{
  *
  * @file        periph_conf.h
- * @brief       Peripheral MCU configuration for the nRF51822 board pca10005
+ * @brief       Peripheral MCU configuration for the Yunjia NRF51822 board
  *
- * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
- * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
@@ -62,14 +60,12 @@
  */
 #define UART_NUMOF          (1U)
 #define UART_0_EN           1
-#define UART_1_EN           0
 #define UART_IRQ_PRIO       1
-#define UART_CLK            14000000
 
 /* UART 0 device configuration */
 #define UART_0_DEV          NRF_UART0
-#define UART_0_PIN_RX       11
-#define UART_0_PIN_TX       9
+#define UART_0_PIN_RX       1
+#define UART_0_PIN_TX       2
 /** @} */
 
 /**
@@ -98,7 +94,7 @@
  * @name GPIO configuration
  * @{
  */
-#define GPIO_NUMOF          16
+#define GPIO_NUMOF          (8U)
 #define GPIO_0_EN           1
 #define GPIO_1_EN           1
 #define GPIO_2_EN           1
@@ -107,33 +103,17 @@
 #define GPIO_5_EN           1
 #define GPIO_6_EN           1
 #define GPIO_7_EN           1
-#define GPIO_8_EN           1
-#define GPIO_9_EN           1
-#define GPIO_10_EN          1
-#define GPIO_11_EN          1
-#define GPIO_12_EN          1
-#define GPIO_13_EN          1
-#define GPIO_14_EN          1
-#define GPIO_15_EN          1
 #define GPIO_IRQ_PRIO       1
 
 /* GPIO pin configuration */
-#define GPIO_0_PIN          0
-#define GPIO_1_PIN          1
-#define GPIO_2_PIN          2
-#define GPIO_3_PIN          3
-#define GPIO_4_PIN          4
-#define GPIO_5_PIN          5
-#define GPIO_6_PIN          6
-#define GPIO_7_PIN          7
-#define GPIO_8_PIN          8
-#define GPIO_9_PIN          9
-#define GPIO_10_PIN         10
-#define GPIO_11_PIN         11
-#define GPIO_12_PIN         12
-#define GPIO_13_PIN         13
-#define GPIO_14_PIN         14
-#define GPIO_15_PIN         15
+#define GPIO_0_PIN          7
+#define GPIO_1_PIN          8
+#define GPIO_2_PIN          9
+#define GPIO_3_PIN          10
+#define GPIO_4_PIN          11
+#define GPIO_5_PIN          12
+#define GPIO_6_PIN          13
+#define GPIO_7_PIN          14
 /** @} */
 
 #endif /* __PERIPH_CONF_H */
