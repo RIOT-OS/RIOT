@@ -70,7 +70,8 @@
 #define UART_0_PORT         PORT->Group[0]
 #define UART_0_PINS         (PORT_PA04 | PORT_PA05)
 #define UART_0_RX_PIN		PIN_PA05 //SERCOM0/PAD1
-#define UART_0_PINS         (UART_0_TX_PIN | UART_0_RX_PIN)
+#define UART_0_TX_PIN		PIN_PA04
+//TROELS:#define UART_0_PINS         (UART_0_TX_PIN | UART_0_RX_PIN)
 
 #define EXT1_UART_MODULE              SERCOM0
 #define EXT1_UART_SERCOM_MUX_SETTING  USART_RX_1_TX_0_XCK_1
@@ -83,7 +84,7 @@
 
 
 
-#define F_REF				48000000UL
+#define F_REF				8000000UL
 #define F_BAUD				115200
 /* UART 1 device configuration */
 #define UART_1_DEV
