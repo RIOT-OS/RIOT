@@ -1,5 +1,5 @@
 # define the cpu used by the arduino due board
-export CPU = samr21xxxA
+export CPU = samd21
 export CPU_MODEL = samr21g18a
 
 # set the default port

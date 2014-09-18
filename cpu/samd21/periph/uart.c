@@ -23,6 +23,7 @@
 
 #include "periph/uart.h"
 #include "periph_conf.h"
+#include "port_util.h"
 
 /* guard file in case no UART device was specified */
 #if UART_NUMOF
@@ -40,7 +41,27 @@ typedef struct {
  * @brief Allocate memory to store the callback functions.
  */
 static uart_conf_t uart_config[UART_NUMOF];
+static uint64_t long_division(uint64_t n, uint64_t d)
+{
+    int32_t i;
+    uint64_t q = 0, r = 0, bit_shift;
+    for (i = 63; i >= 0; i--) {
+        bit_shift = (uint64_t)1 << i;
 
+        r = r << 1;
+
+        if (n & bit_shift) {
+            r |= 0x01;
+        }
+
+        if (r >= d) {
+            r = r - d;
+            q |= bit_shift;
+        }
+    }
+
+    return q;
+}
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t tx_cb, void *arg)
 {
@@ -67,55 +88,72 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, uart_tx_cb_t t
 int uart_init_blocking(uart_t uart, uint32_t baudrate)
 {
     /* Calculate the BAUD value */
-	uint16_t clock_divider = (0xffff & (65536 * ((uint64_t)1 << 32) - (((16 * (uint64_t)9600) << 32)/8000000)) >> 32);
-
+    GCLK_CLKCTRL_Type clkctrl_core;
+    GCLK_CLKCTRL_Type clkctrl_slow;
+    uint64_t temp1 = ((16 * ((uint64_t)baudrate)) << 32);
+    uint64_t ratio = long_division(temp1 , F_REF);
+    uint64_t scale = ((uint64_t)1 << 32) - ratio;
+    uint64_t baud_calculated = (65536 * scale) >> 32;
     switch (uart) {
 #if UART_0_EN
         case UART_0:
-            /* sercom clk enable */
+            /* Turn on power manager for sercom */
             PM->APBCMASK.reg |= PM_APBCMASK_SERCOM0;
+            /*Set up clock generator mux for sercom0*/
+            clkctrl_core.bit.ID = SERCOM0_GCLK_ID_CORE;
+            clkctrl_core.bit.GEN = 0; //Generator 0
+            clkctrl_core.bit.CLKEN = 1;
+            clkctrl_core.bit.WRTLOCK = 0;
 
-            /* configure GCLK0 to feed sercom0 */
-            GCLK->CLKCTRL.reg &= (uint16_t)(~GCLK_CLKCTRL_CLKEN);
-            GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (0x14 << GCLK_CLKCTRL_ID_Pos)));
+            clkctrl_slow.bit.ID = SERCOM0_GCLK_ID_SLOW;
+            clkctrl_slow.bit.GEN = 0; //Generator 0
+            clkctrl_slow.bit.CLKEN = 1;
+            clkctrl_slow.bit.WRTLOCK = 0;
 
-            uart_poweroff(uart);
-            /* reset */
-            UART_0_DEV.CTRLA.reg = 0;
+            GCLK->CLKCTRL = clkctrl_core;
+            while(GCLK->STATUS.bit.SYNCBUSY);
+            GCLK->CLKCTRL = clkctrl_slow;
+            while(GCLK->STATUS.bit.SYNCBUSY);
 
-            while (UART_0_DEV.SYNCBUSY.reg);
+            /* configure PINS to input/output*/
+            UART_0_PORT.DIRSET.reg = (1 << UART_0_TX_PIN);
+            UART_0_PORT.DIRSET.reg = (1 << UART_0_RX_PIN);
+            UART_0_PORT.PINCFG[UART_0_RX_PIN % 32].bit.INEN = true;
+            UART_0_PORT.PINCFG[UART_0_TX_PIN % 32].bit.INEN = true;
+            pmux_set(UART_0_TX_PIN, D);
+            pmux_set(UART_0_RX_PIN, D);
 
-            /* set clock divider */
-            UART_0_DEV.BAUD.reg = clock_divider;
+            UART_0_DEV.CTRLA.bit.ENABLE = 0; //Disable to write, need to sync tho
+            while(UART_0_DEV.SYNCBUSY.bit.ENABLE);
+            SERCOM_USART_CTRLA_Type ctrla = 
+            {
+                .bit.MODE = SERCOM_USART_CTRLA_MODE_USART_INT_CLK_Val,
+                .bit.RXPO = 1, //RX = SERCOMPAD[1]
+                .bit.TXPO = 0, //TX = SERCOMPAD[0]
+                .bit.RUNSTDBY = 0,
+                .bit.CMODE = 0, //Async mode
+                .bit.DORD = 1, //LSB transmitted first
+                .bit.FORM = 0 //USART frame without parity
+            };
+            UART_0_DEV.CTRLA = ctrla;
 
-            while (UART_0_DEV.SYNCBUSY.reg);
+            /* Set baud rate */
+            UART_0_DEV.BAUD.bit.BAUD = baud_calculated;
 
-            /* enable receiver and transmitter, one stop bit*/
-            UART_0_DEV.CTRLB.reg = (SERCOM_USART_CTRLB_RXEN | SERCOM_USART_CTRLB_TXEN);
+            SERCOM_USART_CTRLB_Type ctrlb = 
+            {
+                .bit.CHSIZE = 0, //8 bit size
+                .bit.PMODE = 0, //Parity even
+                .bit.SBMODE = 0, //1 stop bit
+                .bit.RXEN = 1,
+                .bit.TXEN = 1
+            };
+            UART_0_DEV.CTRLB = ctrlb;
+            while(UART_0_DEV.SYNCBUSY.bit.CTRLB);
 
-            while (UART_0_DEV.SYNCBUSY.reg);
+            uart_poweron(uart);
 
-            /* set to LSB, asynchronous mode without parity, PAD0 Tx, PAD1 Rx,
-             * 16x over-sampling, internal clk */
-            UART_0_DEV.CTRLA.reg = SERCOM_USART_CTRLA_DORD \
-                                    | SERCOM_USART_CTRLA_FORM(0x0) \
-                                    | SERCOM_USART_CTRLA_SAMPA(0x0) \
-                                    | SERCOM_USART_CTRLA_TXPO(0x0) \
-                                    | SERCOM_USART_CTRLA_RXPO(0x1) \
-                                    | SERCOM_USART_CTRLA_SAMPR(0x0) \
-                                    | SERCOM_USART_CTRLA_MODE_USART_INT_CLK;
-
-            /* configure PINS */
-            UART_0_PORT.WRCONFIG.reg = PORT_WRCONFIG_WRPINCFG \
-                                        | PORT_WRCONFIG_WRPMUX \
-                                        | PORT_WRCONFIG_PMUX(0x3) \
-                                        | PORT_WRCONFIG_PMUXEN
-                                        | UART_0_PINS;
-            /* PA04 output */
-            UART_0_PORT.DIRSET.reg = PORT_PA04;
-            /* PA05 input buffered */
-            UART_0_PORT.PINCFG[PIN_PA05].bit.INEN=1;
-
+            return 1;
             break;
 #endif
     }
@@ -169,7 +207,6 @@ int uart_write_blocking(uart_t uart, char data)
 void uart_poweron(uart_t uart)
 {
     while (UART_0_DEV.SYNCBUSY.reg);
-
     UART_0_DEV.CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
 }
 

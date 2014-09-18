@@ -62,29 +62,39 @@ void led_init(void)
 void clk_init(void)
 {
     PM->APBAMASK.reg |= PM_APBAMASK_SYSCTRL;
+    PM->APBAMASK.reg |= PM_APBAMASK_GCLK;
+
+
     SYSCTRL->OSC8M.bit.PRESC = 0;
     SYSCTRL->OSC8M.bit.ONDEMAND = 1;
     SYSCTRL->OSC8M.bit.RUNSTDBY = 0;
     SYSCTRL->OSC8M.bit.ENABLE = 1;
 
-    PM->APBAMASK.reg |= PM_APBAMASK_GCLK;
-    /* Software reset the module to ensure it is re-initialized correctly */
     GCLK->CTRL.reg = GCLK_CTRL_SWRST;
     while (GCLK->CTRL.reg & GCLK_CTRL_SWRST);
+    /* disable the watchdog timer */
+    WDT->CTRL.bit.ENABLE = 0;
+    /* GCLK setup */
 
-    PM->CPUSEL.reg = (uint32_t)0x0;
-    PM->APBASEL.reg = (uint32_t)0x0;
-    PM->APBBSEL.reg = (uint32_t)0x0;
+    /*Set up main clock generator */
+    GCLK_GENDIV_Type gendiv =
+    {
+        .bit.ID = 0,
+        .bit.DIV = 0   
+    };
+    GCLK->GENDIV = gendiv;
+    while (GCLK->STATUS.bit.SYNCBUSY);
+    
+    GCLK_GENCTRL_Type genctrl = {
+        .bit.ID = 0, //Generator 0, TODO: is this correct
+        .bit.SRC = GCLK_SOURCE_OSC8M,
+        .bit.GENEN = true,
+        .bit.IDC = 0,
+        .bit.OOV = 0,
+        .bit.DIVSEL = 0,
+        .bit.RUNSTDBY = 0
+    };
+    GCLK->GENCTRL = genctrl;
 
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-    /* Select the correct generator */
-    *((uint8_t*)&GCLK->GENDIV.reg) = 0;
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-    GCLK->GENDIV.reg = 0x00000100;
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-    *((uint8_t*)&GCLK->GENCTRL.reg) = GCLK_CLKCTRL_GEN_GCLK0;
-    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-    GCLK->GENCTRL.reg = (GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC8M);
-    // while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-    // GCLK->GENCTRL.reg = GCLK_GENCTRL_GENEN;
+    while(GCLK->STATUS.bit.SYNCBUSY);
 }
