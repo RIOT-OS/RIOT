@@ -27,8 +27,8 @@
  */
 typedef struct priority_queue_node_t {
     struct priority_queue_node_t *next; /**< next queue node */
-    unsigned int data;                  /**< queue node data */
     uint32_t priority;                  /**< queue node priority */
+    unsigned int data;                  /**< queue node data */
 } priority_queue_node_t;
 
 /**

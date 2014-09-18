@@ -131,11 +131,10 @@ void multiplex_send_addr_over_uart(ipv6_addr_t *addr)
 int readpacket(uint8_t *packet_buf, size_t size)
 {
     uint8_t *line_buf_ptr = packet_buf;
-    uint8_t byte = END + 1;
     uint8_t esc = 0;
 
     while (1) {
-        byte = uart0_readc();
+        uint8_t byte = uart0_readc();
 
         if (byte == END) {
             break;

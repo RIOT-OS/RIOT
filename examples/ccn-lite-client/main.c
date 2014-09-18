@@ -42,6 +42,8 @@
 #define RIOT_CCN_APPSERVER (1)
 #define RIOT_CCN_TESTS (0)
 
+static const char DEFAULT_INTEREST[] = "/ccnx/0.7.1/doc/technical/CanonicalOrder.txt";
+
 char relay_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
 #if RIOT_CCN_APPSERVER
@@ -58,7 +60,6 @@ unsigned char big_buf[3 * 1024];
 char small_buf[PAYLOAD_SIZE];
 
 #if RIOT_CCN_APPSERVER
-
 static void riot_ccn_appserver(int argc, char **argv)
 {
     (void) argc; /* the function takes no arguments */
@@ -79,13 +80,11 @@ static void riot_ccn_appserver(int argc, char **argv)
 
 static void riot_ccn_express_interest(int argc, char **argv)
 {
-    static const char *default_interest = "/ccnx/0.7.1/doc/technical/CanonicalOrder.txt";
-
     if (argc < 2) {
-        strncpy(small_buf, default_interest, 100); // null terminated
+        strncpy(small_buf, DEFAULT_INTEREST, sizeof(small_buf));
     }
     else {
-        strncpy(small_buf, argv[1], 100);
+        strncpy(small_buf, argv[1], sizeof(small_buf));
     }
 
     DEBUG("in='%s'\n", small_buf);

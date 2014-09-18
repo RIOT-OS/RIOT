@@ -24,6 +24,38 @@
  */
 void cpu_init(void)
 {
+	while(!SYSCTRL->PCLKSR.bit.DFLLRDY); //wait for DFLL to be ready
+    SYSCTRL->DFLLCTRL.bit.ENABLE = 1;
+
     /* disable the watchdog timer */
     WDT->CTRL.bit.ENABLE = 0;
+    /* GCLK setup */
+    PM->APBAMASK.reg |= PM_APBAMASK_GCLK;
+    /*Set up main clock generator */
+    GCLK_GENDIV_Type gendiv;
+        gendiv.bit.ID = 1;
+        gendiv.bit.DIV = 0;
+    GCLK->GENDIV = gendiv;
+    while(GCLK->STATUS.bit.SYNCBUSY);
+    
+    GCLK_GENCTRL_Type genctrl;
+        genctrl.bit.ID = 1; //Generator 0, TODO: is this correct
+        genctrl.bit.SRC = GCLK_SOURCE_DFLL48M;
+        genctrl.bit.GENEN = true;
+        genctrl.bit.IDC = 1;
+        genctrl.bit.OOV = 0;
+        genctrl.bit.DIVSEL = 0;
+        genctrl.bit.RUNSTDBY = 0;
+    GCLK->GENCTRL = genctrl;
+
+    while(GCLK->STATUS.bit.SYNCBUSY);
+    GCLK_CLKCTRL_Type clkctrl = 
+    {
+    	.bit.ID = 1, // DFLL48M ref
+    	.bit.GEN = 0,
+    	.bit.CLKEN = 1,
+    	.bit.WRTLOCK = 0
+    };
+    GCLK->CLKCTRL = clkctrl;
+   	while(GCLK->STATUS.bit.SYNCBUSY);
 }

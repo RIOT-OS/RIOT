@@ -24,7 +24,7 @@
 #include "thread.h"
 #include "net_if.h"
 #include "sixlowpan.h"
-#include "destiny.h"
+#include "udp.h"
 #include "rpl.h"
 #include "rpl/rpl_dodag.h"
 #include "rpl_udp.h"
@@ -53,8 +53,6 @@ void rpl_udp_init(int argc, char **argv)
         return;
     }
 
-    uint8_t state;
-
     char command = argv[1][0];
     if ((command == 'n') || (command == 'r')) {
         printf("INFO: Initialize as %s on address %d\n", ((command == 'n') ? "node" : "root"), id);
@@ -68,7 +66,7 @@ void rpl_udp_init(int argc, char **argv)
         net_if_set_hardware_address(0, id);
 
         DEBUGF("Initializing RPL for interface 0\n");
-        state = rpl_init(0);
+        uint8_t state = rpl_init(0);
 
         if (state != SIXLOWERROR_SUCCESS) {
             printf("Error initializing RPL\n");
@@ -122,7 +120,7 @@ void rpl_udp_init(int argc, char **argv)
     msg_send_receive(&m, &m, transceiver_pid);
     printf("Channel set to %u\n", RADIO_CHANNEL);
 
-    puts("Destiny initialized");
+    puts("Transport layer initialized");
     /* start transceiver watchdog */
 }
 

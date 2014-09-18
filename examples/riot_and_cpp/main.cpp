@@ -85,7 +85,6 @@ void *threadA_func(void *)
 {
     int day = 13, month = 6, year = 2014;
     int ret_day;
-    char day_of_week_table[][32] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
     printf("\n******** Hello, now you're in %s ********\n", thread_getname(thread_getpid()));
     printf("We'll test some C functions here!\n");
@@ -99,6 +98,7 @@ void *threadA_func(void *)
 
     ret_day = day_of_week(day, month, year);
     if (ret_day >= 0){
+        char day_of_week_table[][32] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
         printf("%s\n", day_of_week_table[ret_day]);
     }
 

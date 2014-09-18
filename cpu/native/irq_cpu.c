@@ -30,7 +30,7 @@
 #define VALGRIND_DEBUG(...)
 #endif
 
-// __USE_GNU for gregs[REG_EIP] access under Linux
+/* __USE_GNU for gregs[REG_EIP] access under Linux */
 #define __USE_GNU
 #include <signal.h>
 #undef __USE_GNU
@@ -331,6 +331,11 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     /* disable interrupts in context */
     isr_set_sigmask((ucontext_t *)context);
     _native_in_isr = 1;
+    /*
+     * For register access on new platforms see:
+     * http://google-glog.googlecode.com/svn/trunk/m4/pc_from_ucontext.m4
+     * (URL added on Fri Aug 29 17:17:45 CEST 2014)
+     */
 #ifdef __MACH__
     _native_saved_eip = ((ucontext_t *)context)->uc_mcontext->__ss.__eip;
     ((ucontext_t *)context)->uc_mcontext->__ss.__eip = (unsigned int)&_native_sig_leave_tramp;
@@ -338,9 +343,14 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
     _native_saved_eip = ((struct sigcontext *)context)->sc_eip;
     ((struct sigcontext *)context)->sc_eip = (unsigned int)&_native_sig_leave_tramp;
 #else
+#ifdef __arm__
+    _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.arm_pc;
+    ((ucontext_t *)context)->uc_mcontext.arm_pc = (unsigned int)&_native_sig_leave_tramp;
+#else
     //printf("\n\033[31mEIP:\t%p\ngo switching\n\n\033[0m", (void*)((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP]);
     _native_saved_eip = ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP];
     ((ucontext_t *)context)->uc_mcontext.gregs[REG_EIP] = (unsigned int)&_native_sig_leave_tramp;
+#endif
 #endif
 }
 

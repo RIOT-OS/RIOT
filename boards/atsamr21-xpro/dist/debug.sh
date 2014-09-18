@@ -5,4 +5,4 @@ openocd -f "${RIOTBOARD}/${BOARD}/dist/atmel_samr21_xpro.cfg" \
     -c "telnet_port 4444" \
     -c "init" \
     -c "targets" \
-    -c "reset halt"
+    -c "reset halt"\

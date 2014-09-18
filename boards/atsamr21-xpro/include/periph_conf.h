@@ -63,13 +63,28 @@
 #define UART_IRQ_PRIO       1
 
 /* UART 0 device configuration */
-#define UART_0_DEV          Sercom->USART
+#define UART_0_DEV          SERCOM0->USART
 #define UART_0_IRQ          SERCOM0_IRQn
 #define UART_0_ISR          isr_sercom0
 /* UART 0 pin configuration */
-#define UART_0_PORT         Port->Group[0]
-#define UART_0_PINS         (PIN_PA08 | PIN_PA09)
+#define UART_0_PORT         PORT->Group[0]
+#define UART_0_PINS         (PORT_PA04 | PORT_PA05)
+#define UART_0_RX_PIN		PIN_PA05 //SERCOM0/PAD1
+#define UART_0_PINS         (UART_0_TX_PIN | UART_0_RX_PIN)
 
+#define EXT1_UART_MODULE              SERCOM0
+#define EXT1_UART_SERCOM_MUX_SETTING  USART_RX_1_TX_0_XCK_1
+#define EXT1_UART_SERCOM_PINMUX_PAD0  PINMUX_PA04D_SERCOM0_PAD0
+#define EXT1_UART_SERCOM_PINMUX_PAD1  PINMUX_PA05D_SERCOM0_PAD1
+#define EXT1_UART_SERCOM_PINMUX_PAD2  PINMUX_UNUSED
+#define EXT1_UART_SERCOM_PINMUX_PAD3  PINMUX_UNUSED
+#define EXT1_UART_SERCOM_DMAC_ID_TX   SERCOM0_DMAC_ID_TX
+#define EXT1_UART_SERCOM_DMAC_ID_RX   SERCOM0_DMAC_ID_RX
+
+
+
+#define F_REF				48000000UL
+#define F_BAUD				115200
 /* UART 1 device configuration */
 #define UART_1_DEV
 #define UART_1_IRQ
@@ -83,7 +98,7 @@
  * @name Random Number Generator configuration
  * @{
  */
-#define RANDOM_NUMOF        (1U)
+#define RANDOM_NUMOF        (0U)
 /** @} */
 
 /**
@@ -112,16 +127,16 @@
 //May have to implement more
 /* GPIO channel 0 config */
 #define GPIO_0_PIN          PIN_PA13 //EXT1 PIN5
-#define GPIO_0_EXTINT		PIN_PA13A_EIC_EXTINT13
+#define GPIO_0_EXTINT		13//PIN_PA13A_EIC_EXTINT13
 /* GPIO channel 1 config */
-#define GPIO_1_PIN          PIN_PA28 //EXT1 PIN6, and USER_BUTTON
-#define GPIO_1_EXTINT		PIN_PA28A_EIC_EXTINT8
+#define GPIO_1_PIN          PIN_PA28 //EXT1 PIN6, and USER_BUTTON //ACTIVE LOW
+#define GPIO_1_EXTINT		8//PIN_PA28A_EIC_EXTINT8
 /* GPIO channel 2 config */
 #define GPIO_2_PIN          PIN_PA15 //EXT3 PIN5
-#define GPIO_2_EXTINT		PIN_PA15A_EIC_EXTINT15
+#define GPIO_2_EXTINT		15//PIN_PA15A_EIC_EXTINT15
 /* GPIO channel 3 config */
-#define GPIO_3_PIN 			PIN_PA19
-#define GPIO_3_EXTINT       PIN_PA19A_EIC_EXTINT3
+#define GPIO_3_PIN 			PIN_PA19 //ACTIVE LOW ON LED
+#define GPIO_3_EXTINT       3//PIN_PA19A_EIC_EXTINT3
 /* GPIO channel 4 config */
 #define GPIO_4_PIN
 #define GPIO_4_EXTINT          

@@ -320,7 +320,6 @@ void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, ui
 void icmpv6_send_router_sol(uint8_t sllao)
 {
     uint16_t packet_length;
-    int if_id = 0;  // TODO get this somehow
 
     ipv6_buf = ipv6_get_buf();
     icmp_buf = get_icmpv6_buf(ipv6_ext_hdr_len);
@@ -343,6 +342,7 @@ void icmpv6_send_router_sol(uint8_t sllao)
 
     if (sllao == OPT_SLLAO) {
         opt_stllao_buf = get_opt_stllao_buf(ipv6_ext_hdr_len, icmpv6_opt_hdr_len);
+        int if_id = 0;  // TODO get this somehow
 
         if (net_if_get_src_address_mode(if_id) == NET_IF_TRANS_ADDR_M_LONG) {
             icmpv6_ndp_set_sllao(opt_stllao_buf, if_id, NDP_OPT_SLLAO_TYPE, 2);
@@ -430,7 +430,6 @@ void recv_echo_repl(void)
 
 void recv_rtr_sol(void)
 {
-    int if_id = 0;  // TODO, get this somehow
     icmpv6_opt_hdr_len = RTR_SOL_LEN;
     ipv6_buf = ipv6_get_buf();
 
@@ -456,6 +455,7 @@ void recv_rtr_sol(void)
             return;
         }
 
+        int if_id = 0;  // TODO, get this somehow
         if (nbr_entry != NULL) {
             /* found neighbor in cache, update values and check addr */
             if (memcmp(&llao[2], &nbr_entry->lladdr, lladdr_len) == 0) {
@@ -1269,13 +1269,11 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *t
 
 void recv_nbr_adv(void)
 {
-    int if_id = 0;  // TODO, get this somehow
     ipv6_buf = ipv6_get_buf();
     uint16_t packet_length = IPV6_HDR_LEN + NTOHS(ipv6_buf->length);
     icmpv6_opt_hdr_len = NBR_ADV_LEN;
     llao = NULL;
     nbr_entry = NULL;
-    int8_t new_ll = -1;
     nbr_adv_buf = get_nbr_adv_buf(ipv6_ext_hdr_len);
 
     /* check if options are present */
@@ -1303,12 +1301,14 @@ void recv_nbr_adv(void)
         nbr_entry = ndp_neighbor_cache_search(&nbr_adv_buf->target_addr);
 
         if (nbr_entry != NULL) {
+            int8_t new_ll = -1;
             if (llao != 0) {
                 new_ll = memcmp(&llao[2], &(nbr_entry->lladdr),
                                 nbr_entry->lladdr_len);
                 ((icmpv6_ndp_opt_stllao_t *)llao)->length = nbr_entry->lladdr_len / 8 + 1;
             }
 
+            int if_id = 0;  // TODO, get this somehow
             if (nbr_entry->state == NDP_NCE_STATUS_INCOMPLETE) {
                 if (llao == NULL) {
                     return;
@@ -1518,16 +1518,19 @@ ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_addr_t *ipaddr)
 
 int ndp_addr_is_on_link(ipv6_addr_t *dest_addr)
 {
-    ndp_prefix_info_t *pi;
     ndp_neighbor_cache_t *nce;
     int if_id = -1;
 
     if ((nce = ndp_neighbor_cache_search(dest_addr))) {
+#ifdef DEBUG_ENABLED
+        char addr_str[IPV6_MAX_ADDR_STR_LEN];
         DEBUG("INFO: %s is in nbr cache\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest_addr));
+#endif
         return 1;
     }
 
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
+        ndp_prefix_info_t *pi;
         if ((pi = ndp_prefix_info_search(if_id, dest_addr, 128))) {
             return (pi->flags & ICMPV6_NDP_OPT_PI_FLAG_ON_LINK) != 0;
         }

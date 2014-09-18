@@ -434,7 +434,7 @@ void usage(void)
 
 int print_and_prompt(struct ftdi_device_list *devlist)
 {
-    int i, ret;
+    int i;
     struct ftdi_context ftdic;
     struct ftdi_device_list *curdev;
     char manufacturer[128], description[128], serial[128];
@@ -449,11 +449,12 @@ int print_and_prompt(struct ftdi_device_list *devlist)
     for (curdev = devlist; curdev != NULL; i++) {
         printf("  [%d]   ", i);
 
-        if (0 > (ret = ftdi_usb_get_strings(&ftdic,
-                                            curdev->dev,
-                                            manufacturer, 128,
-                                            description, 128,
-                                            serial, 128))) {
+        int ret = ftdi_usb_get_strings(&ftdic,
+                                       curdev->dev,
+                                       manufacturer, 128,
+                                       description, 128,
+                                       serial, 128);
+        if (0 > ret) {
             fprintf(stderr, "ftdi_usb_get_strings failed: %d (%s)\n",
                     ret, ftdi_get_error_string(&ftdic));
             return EXIT_FAILURE;

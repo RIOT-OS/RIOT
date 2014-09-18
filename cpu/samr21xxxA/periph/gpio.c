@@ -21,6 +21,7 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
+#include "port_util.h"
 /* guard file in case no GPIO devices are defined */
 #if GPIO_NUMOF
 
@@ -207,35 +208,7 @@ static uint8_t get_extint(gpio_t dev)
     }
     return extint; 
 }
-//TODO: Atmel ASF
-static inline PortGroup* system_pinmux_get_group_from_gpio_pin(
-        const uint8_t gpio_pin)
-{
-    uint8_t port_index  = (gpio_pin / 128);
-    uint8_t group_index = (gpio_pin / 32);
 
-    /* Array of available ports. */
-    Port *const ports[PORT_INST_NUM] = PORT_INSTS;
-    if (port_index < PORT_INST_NUM) {
-        return &(ports[port_index]->Group[group_index]);
-    } else {
-        return 0;
-    }
-}
-static void inline pmux_set(uint32_t pin, uint8_t periph_function)
-{
-    PortGroup* group = system_pinmux_get_group_from_gpio_pin(pin);
-    group->PINCFG[pin % 32].bit.PMUXEN = 1; //Enable mux to eic
-    group->PINCFG[pin % 32].bit.PMUXEN = 1; //Set mux to periph A (eic)
-    if((pin % 32) & 1) //Test on first bit if odd or even
-    {
-        group->PMUX[(pin % 32) / 2].bit.PMUXO = periph_function; //PMUX odd        
-    }
-    else
-    {
-        group->PMUX[(pin % 32) / 2].bit.PMUXE =  periph_function;//PMUX even 
-    }
-}
 int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
 {
     uint32_t pin = port_get_gpio_pin(dev);
@@ -310,7 +283,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     GCLK_GENCTRL_Type genctrl = //define this ?
     {
         .bit.ID = 0, //Generator 0, TODO: is this correct
-        .bit.SRC = GCLK_GENCTRL_SRC_DFLL48M_Val,
+        .bit.SRC = GCLK_SOURCE_OSC8M,
         .bit.GENEN = true,
         .bit.IDC = 0,
         .bit.OOV = 0,

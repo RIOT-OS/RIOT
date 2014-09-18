@@ -51,8 +51,11 @@ int main(void)
     char buf[128];
     int p, i;
     char tmp;
-
-    puts("Test UART driver in blocking mode\n");
+    uart_init_blocking(0, F_BAUD);
+    while(1)
+    {
+        uart_write_blocking(0,'c');
+    }
     puts("Setting up remaining UART devices:");
     for (int i = UART_0; i < UART_NUMOF; i++) {
         if (i != STDIO) {
