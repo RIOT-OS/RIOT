@@ -348,7 +348,7 @@ static void download_main(int event)
             case SYNC_3:
                 switch (event) {
                     case BEGIN:
-                        if (sscanf(crystal, "%lf", &xtal) != 1) {
+                        if (sscanf(crystal, "%20lf", &xtal) != 1) {
                             printf("\r\n");
                             download_cancel("Crystal frequency is required for 3rd step of baud rate sync");
                             return;
