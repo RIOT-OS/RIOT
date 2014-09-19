@@ -50,7 +50,7 @@
 /**
  * @brief UART configuration
  */
-#define UART_NUMOF          (2U)
+#define UART_NUMOF          (1U)
 #define UART_0_EN           1
 #define UART_1_EN           0
 #define UART_IRQ_PRIO       1
