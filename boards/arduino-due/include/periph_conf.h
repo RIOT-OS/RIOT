@@ -90,7 +90,7 @@
  * @name GPIO configuration
  * @{
  */
-#define GPIO_NUMOF          (15U)
+#define GPIO_NUMOF          (16U)
 #define GPIO_0_EN           1
 #define GPIO_1_EN           1
 #define GPIO_2_EN           1
@@ -107,55 +107,88 @@
 #define GPIO_13_EN          1
 #define GPIO_14_EN          1
 #define GPIO_15_EN          1
+#define GPIO_IRQ_PRIO       1
 
 /* GPIO channel 0 config */
 #define GPIO_0_DEV          PIOA
 #define GPIO_0_PIN          PIO_PA14
+#define GPIO_0_IRQ          PIOA_IRQn
+#define GPIO_A14_MAP        0
 /* GPIO channel 1 config */
 #define GPIO_1_DEV          PIOD
 #define GPIO_1_PIN          PIO_PD0
+#define GPIO_1_IRQ          PIOD_IRQn
+#define GPIO_D0_MAP         1
 /* GPIO channel 2 config */
 #define GPIO_2_DEV          PIOD
 #define GPIO_2_PIN          PIO_PD2
+#define GPIO_2_IRQ          PIOD_IRQn
+#define GPIO_D2_MAP         2
 /* GPIO channel 3 config */
 #define GPIO_3_DEV          PIOD
 #define GPIO_3_PIN          PIO_PD6
+#define GPIO_3_IRQ          PIOD_IRQn
+#define GPIO_D6_MAP         3
 /* GPIO channel 4 config */
 #define GPIO_4_DEV          PIOA
 #define GPIO_4_PIN          PIO_PA7
+#define GPIO_4_IRQ          PIOA_IRQn
+#define GPIO_A7_MAP         4
 /* GPIO channel 5 config */
 #define GPIO_5_DEV          PIOC
 #define GPIO_5_PIN          PIO_PC1
+#define GPIO_5_IRQ          PIOC_IRQn
+#define GPIO_C1_MAP         5
 /* GPIO channel 6 config */
 #define GPIO_6_DEV          PIOC
 #define GPIO_6_PIN          PIO_PC3
+#define GPIO_6_IRQ          PIOC_IRQn
+#define GPIO_C3_MAP         6
 /* GPIO channel 7 config */
 #define GPIO_7_DEV          PIOC
 #define GPIO_7_PIN          PIO_PC5
+#define GPIO_7_IRQ          PIOC_IRQn
+#define GPIO_C5_MAP         7
 /* GPIO channel 8 config */
 #define GPIO_8_DEV          PIOC
 #define GPIO_8_PIN          PIO_PC7
+#define GPIO_8_IRQ          PIOC_IRQn
+#define GPIO_C7_MAP         8
 /* GPIO channel 9 config */
 #define GPIO_9_DEV          PIOC
 #define GPIO_9_PIN          PIO_PC9
+#define GPIO_9_IRQ          PIOC_IRQn
+#define GPIO_C9_MAP         9
 /* GPIO channel 10 config */
 #define GPIO_10_DEV         PIOA
 #define GPIO_10_PIN         PIO_PA20
+#define GPIO_10_IRQ         PIOA_IRQn
+#define GPIO_A20_MAP        10
 /* GPIO channel 11 config */
 #define GPIO_11_DEV         PIOC
 #define GPIO_11_PIN         PIO_PC18
+#define GPIO_11_IRQ         PIOC_IRQn
+#define GPIO_C18_MAP        11
 /* GPIO channel 12 config */
 #define GPIO_12_DEV         PIOC
 #define GPIO_12_PIN         PIO_PC16
+#define GPIO_12_IRQ         PIOC_IRQn
+#define GPIO_C16_MAP        12
 /* GPIO channel 13 config */
 #define GPIO_13_DEV         PIOC
 #define GPIO_13_PIN         PIO_PC14
+#define GPIO_13_IRQ         PIOC_IRQn
+#define GPIO_C14_MAP        13
 /* GPIO channel 14 config */
 #define GPIO_14_DEV         PIOC
 #define GPIO_14_PIN         PIO_PC12
+#define GPIO_14_IRQ         PIOC_IRQn
+#define GPIO_C12_MAP        14
 /* GPIO channel 15 config */
 #define GPIO_15_DEV         PIOB
 #define GPIO_15_PIN         PIO_PB14
+#define GPIO_15_IRQ         PIOB_IRQn
+#define GPIO_B14_MAP        15
 /** @} */
 
 #endif /* __PERIPH_CONF_H */
