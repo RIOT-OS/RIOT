@@ -50,7 +50,7 @@ int main(void)
 {
     hwtimer_init();
 
-    struct bloom_t *bloom = bloom_new(1 << 12, 8, fnv_hash, sax_hash, sdbm_hash,
+    bloom_t *bloom = bloom_new(1 << 12, 8, fnv_hash, sax_hash, sdbm_hash,
                                       djb2_hash, kr_hash, dek_hash, rotating_hash, one_at_a_time_hash);
 
     printf("Testing Bloom filter.\n\n");
