@@ -1,5 +1,7 @@
 language: c
 
+cache: apt
+
 env:
     - NPROC_MAX=8
 
