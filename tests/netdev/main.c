@@ -644,6 +644,10 @@ static int check_protocol(void)
                     puts("Got protocol: CCN lite");
                     return 1;
 
+                case NETDEV_PROTO_CC110X:
+                    puts("Got protocol: CC110x");
+                    return 1;
+
                 default:
                     puts("You probably have to update this switch-case.");
                     return 0;

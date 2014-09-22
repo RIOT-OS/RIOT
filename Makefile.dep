@@ -72,6 +72,10 @@ ifneq (,$(filter cc110x%,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
 
+ifneq (,$(filter cc110x,$(USEMODULE)))
+    USEMODULE += transceiver
+endif
+
 ifneq (,$(filter cc110x_legacy,$(USEMODULE)))
 	USEMODULE += transceiver
 endif
