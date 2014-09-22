@@ -1,6 +1,11 @@
 language: c
 
-cache: apt
+cache:
+    apt: true
+    directories:
+        - toolchain
+        - pkg/libfixmath/checkout
+        - pkg/tlsf/tlsf-3.0.zip
 
 env:
     - NPROC_MAX=8
