@@ -66,8 +66,7 @@ void rx_cb(void *arg, char data)
     ringbuffer_add_one(&rx_buf, data);
     mutex_unlock(&uart_rx_mutex);
 #elif MODULE_UART0
-    uart0_handle_incoming(data);
-    uart0_notify_thread();
+    uart0_handle_incoming(&data, 1);
 #endif
 }
 

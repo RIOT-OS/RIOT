@@ -297,8 +297,7 @@ static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
     if (dev->SR & USART_SR_RXNE) {
         char data = (char)dev->DR;
 #ifdef MODULE_UART0
-        uart0_handle_incoming(data);
-        uart0_notify_thread();
+        uart0_handle_incoming(&data, 1);
 #else
         config[uartnum].rx_cb(config[uartnum].arg, data);
 #endif
