@@ -2,6 +2,6 @@
 MODULE = $(BOARD)_base
 
 # add a list of board specific subdirectories that should also be built
-DIRS =
+DIRS = drivers
 
 include $(RIOTBASE)/Makefile.base

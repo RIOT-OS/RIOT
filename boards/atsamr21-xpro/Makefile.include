@@ -20,7 +20,7 @@ export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
 # define build specific options
 export CPU_USAGE = -mcpu=cortex-m0
 FPU_USAGE =
-export CFLAGS += -ggdb -g3 -std=gnu99 -O0 -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
+export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
 export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
 export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
 export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles
@@ -36,4 +36,5 @@ export LINKFLAGS += -specs=nano.specs -lc -lnosys
 endif
 
 # export board specific includes to the global includes-listing
-export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/ -I$(RIOTBASE)/drivers/at86rf231/include -I$(RIOTBASE)/sys/net/include
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep

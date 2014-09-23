@@ -22,6 +22,12 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 #include "port_util.h"
+
+
+
+#define ENABLE_DEBUG (1)
+#include "debug.h"
+#include <unistd.h>
 /* guard file in case no GPIO devices are defined */
 #if GPIO_NUMOF
 
@@ -59,12 +65,12 @@ static uint32_t port_get_gpio_pin(gpio_t dev)
 #endif
 #if GPIO_4_EN
         case GPIO_4:
-               pin = GPIO_4_PIN;
+            pin = GPIO_4_PIN;
             break;
 #endif
 #if GPIO_5_EN
         case GPIO_5:
-               pin = GPIO_5_PIN;
+            pin = GPIO_5_PIN;
             break;
 #endif
 #if GPIO_6_EN
@@ -121,9 +127,13 @@ static uint32_t port_get_gpio_pin(gpio_t dev)
     return pin;
 }
 //Helper function to map devices to External interrupts
-static uint8_t get_extint(gpio_t dev)
+/*
+*   Returns -1 for gpio without extint
+*/
+static int32_t get_extint(gpio_t dev)
 {
-    uint32_t extint = 0;
+    int32_t extint = 0;
+
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:
@@ -175,7 +185,7 @@ static uint8_t get_extint(gpio_t dev)
             extint = GPIO_9_EXTINT;
             break;
 #endif
-#if GPIO_10_EN
+#if GPIO_10_ENN
         case GPIO_10:
             extint = GPIO_10_EXTINT;
             break;
@@ -205,6 +215,8 @@ static uint8_t get_extint(gpio_t dev)
             extint = GPIO_15_EXTINT;
             break;
 #endif
+        default:
+            extint = -1;
     }
     return extint; 
 }
@@ -263,7 +275,12 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     /* TODO: implement */
     int res;
     uint32_t pin = port_get_gpio_pin(dev);
-    uint32_t extint = get_extint(dev);
+    int32_t extint = get_extint(dev);
+    if(extint < 0)
+    {
+        return -1;
+    }
+
     /* configure pin as input */
     res = gpio_init_in(dev, pullup);
     if (res < 0) {
@@ -280,17 +297,6 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     //Write to genctrl
     //Write to clkctrl
     //Maybe create function for this
-    GCLK_GENCTRL_Type genctrl = //define this ?
-    {
-        .bit.ID = 0, //Generator 0, TODO: is this correct
-        .bit.SRC = GCLK_SOURCE_OSC8M,
-        .bit.GENEN = true,
-        .bit.IDC = 0,
-        .bit.OOV = 0,
-        .bit.DIVSEL = 0,
-        .bit.RUNSTDBY = 0
-    };
-    GCLK->GENCTRL = genctrl;
     
     GCLK_CLKCTRL_Type clkctrl = 
     {
@@ -309,12 +315,12 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     gpio_config[dev].cb = cb;
     gpio_config[dev].arg = arg;
 
-    /*Enable pin interrupt */
-    EIC->INTENSET.reg = (1 << (extint));
+
 
     /*Set config */
     uint32_t config_pos = (4 * (extint % 8));
     uint32_t config_reg    = extint / 8;
+
     /*Set flank detection */
     switch (flank) {
         case GPIO_FALLING:
@@ -331,11 +337,17 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             break;
     }
 
+    
+    /*Enable pin interrupt */
+    EIC->INTENSET.reg = (1 << (extint));
+    DEBUG("GPIO initialized\n");
     /*Enable external interrupts*/
     EIC->CTRL.bit.ENABLE = true;
+
+
     return 0;
 }
-/*TODO: How does External interrupts and GPIOs correspond */
+
 void gpio_irq_enable(gpio_t dev)
 {
     uint32_t extint = get_extint(dev);
@@ -386,13 +398,16 @@ void gpio_write(gpio_t dev, int value)
     }
 }
 /** Handler for exint interrupts **/
+
 void EIC_Handler(void)
 {
+    DEBUG("CALLBACK");
     //Find callback
     for(int i = 0; i < GPIO_NUMOF; ++i)
     {
         uint8_t extint = get_extint(i);
-        if(EIC->INTFLAG.vec.EXTINT & ( 1 << extint) )
+
+        if((extint != -1)  && (EIC->INTFLAG.vec.EXTINT & ( 1 << extint)))
         {
             gpio_config[i].cb(gpio_config[i].arg); //execute callback with args
         }

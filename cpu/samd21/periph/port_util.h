@@ -38,7 +38,6 @@ static inline void pmux_set(uint32_t pin, MUXFUNCTION periph_function)
 {
     PortGroup* group = system_pinmux_get_group_from_gpio_pin(pin);
     group->PINCFG[pin % 32].bit.PMUXEN = 1; //Enable mux
-    //group->PINCFG[pin % 32].bit.PMUXEN = 1; //Set mux to periph A (eic)
     if((pin % 32) & 1) //Test on first bit if odd or even
     {
         group->PMUX[(pin % 32) / 2].bit.PMUXO = periph_function; //PMUX odd        
