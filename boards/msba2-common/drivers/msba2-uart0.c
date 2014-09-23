@@ -19,6 +19,7 @@
 #include "VIC.h"
 #include "kernel.h"
 #include "thread.h"
+#include "kernel_types.h"
 
 #include "board_uart0.h"
 
@@ -129,7 +130,7 @@ void UART0_IRQHandler(void)
         case UIIR_CTI_INT:                // Character Timeout Indicator
         case UIIR_RDA_INT:                // Receive Data Available
 #ifdef MODULE_UART0
-            if (uart0_handler_pid != KERNEL_PID_UNDEF) {
+            {
                 int read_count = 0;
                 do {
                     char c = U0RBR;
@@ -144,7 +145,6 @@ void UART0_IRQHandler(void)
                     thread_yield();
                 }
             }
-
 #endif
             break;
 

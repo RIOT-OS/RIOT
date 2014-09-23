@@ -22,6 +22,10 @@
 
 #include <sys/types.h>
 
+#ifdef MODULE_MSP430_COMMON
+#   include <msp430_types.h>
+#endif
+
 #include "cpu-conf.h"   /* To give user access to UART0_BUFSIZE */
 
 size_t uart0_handle_incoming(const char *buf, size_t n);
