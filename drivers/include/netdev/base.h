@@ -56,6 +56,13 @@ typedef enum {
     NETDEV_PROTO_UNKNOWN        = 0x0000,   /**< Type was not specified */
 
     /**
+     * @brief   Proprietary frame protocol
+     *
+     * @detail  Sends any frames, handled internal.
+     */
+    NETDEV_PROTO_PROPRIETARY    = 0x0008,
+
+    /**
      * @brief   Radio frame protocol
      *
      * @detail  Sends frames as defined by radio_packet_t.
