@@ -74,7 +74,7 @@ class SerCmd(cmd.Cmd):
     port.
     """
 
-    def __init__(self, port=None, baudrate=None, tcp_serial=None,
+    def __init__(self, port=None, baudrate=None, toggle=None, tcp_serial=None,
                  confdir=None, conffile=None, host=None, run_name=None, 
                  log_dir_name=None):
         """Constructor.
@@ -94,6 +94,7 @@ class SerCmd(cmd.Cmd):
         cmd.Cmd.__init__(self)
         self.port = port
         self.baudrate = baudrate
+        self.toggle = toggle
         self.tcp_serial = tcp_serial
         self.configdir = confdir
         self.configfile = conffile
@@ -551,8 +552,9 @@ class SerCmd(cmd.Cmd):
     def serial_connect(self):
         self.ser = serial.Serial(port=self.port, dsrdtr=0, rtscts=0)
         self.ser.baudrate = self.baudrate
-        self.ser.setDTR(0)
-        self.ser.setRTS(0)
+        if self.toggle:
+            self.ser.setDTR(0)
+            self.ser.setRTS(0)
 
     def reader(self):
         """Serial or TCP reader.
@@ -655,6 +657,10 @@ if __name__ == "__main__":
             help="Specifies baudrate for the serial port, default is %s"
                  % defaultbaud,
             default=defaultbaud)
+    parser.add_argument("-tg", "--toggle",
+            action="store_true",
+            help="toggles the DTR and RTS pin of the serial line when "
+                 "connecting, default is not toggling the pins")
     parser.add_argument('-d', '--directory',
             help="Specify the Pyterm directory, default is %s"
                  % defaultdir,
@@ -678,7 +684,7 @@ if __name__ == "__main__":
                  default=defaultdir)
     args = parser.parse_args()
 
-    myshell = SerCmd(args.port, args.baudrate, args.tcp_serial,
+    myshell = SerCmd(args.port, args.baudrate, args.toggle, args.tcp_serial,
                      args.directory, args.config, args.host, args.run_name,
                      args.log_dir_name)
     myshell.prompt = ''
