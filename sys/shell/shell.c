@@ -236,7 +236,8 @@ static int readline(shell_t *shell, char *buf, size_t size)
             shell->put_char('\n');
             return 0;
         }
-        else if (c == '\b') {
+        /* QEMU uses 0x7f (DEL) as backspace, while 0x08 (BS) is for most terminals */
+        else if (c == 0x08 || c == 0x7f) {
             if (line_buf_ptr == buf) {
                 /* The line is empty. */
                 continue;
