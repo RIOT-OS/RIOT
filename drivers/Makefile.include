@@ -22,3 +22,6 @@ endif
 ifneq (,$(filter l3g4200d,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/l3g4200d/include
 endif
+ifneq (,$(filter nrf24l01p,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/nrf24l01p/include
+endif
