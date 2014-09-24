@@ -26,9 +26,6 @@
 #include "thread.h"
 #include "sched.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 /* guard file in case no SPI device is defined */
 #if SPI_NUMOF
 
@@ -137,73 +134,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 
 int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
 {
-    SPI_TypeDef *spi = 0;
-    GPIO_TypeDef *port = 0;
-    int pin[3];        /* 3 pins: sck, miso, mosi */
-    int af;
-
-    /* enable the SPI modules clock */
-    spi_poweron(dev);
-
-    switch (dev) {
-#if SPI_0_EN
-        case SPI_0:
-            spi = SPI_0_DEV;
-            port = SPI_0_PORT;
-            pin[0] = SPI_0_PIN_SCK;
-            pin[1] = SPI_0_PIN_MISO;
-            pin[2] = SPI_0_PIN_MOSI;
-            af = SPI_0_PIN_AF;
-            SPI_0_PORT_CLKEN();
-            NVIC_SetPriority(SPI_0_IRQ, SPI_IRQ_PRIO);
-            NVIC_EnableIRQ(SPI_0_IRQ);
-            break;
-#endif
-#if SPI_1_EN
-        case SPI_1:
-            spi = SPI_1_DEV;
-            port = SPI_1_PORT;
-            pin[0] = SPI_1_PIN_SCK;
-            pin[1] = SPI_1_PIN_MISO;
-            pin[2] = SPI_1_PIN_MOSI;
-            af = SPI_1_PIN_AF;
-            SPI_1_PORT_CLKEN();
-            NVIC_SetPriority(SPI_1_IRQ, SPI_IRQ_PRIO);
-            NVIC_EnableIRQ(SPI_1_IRQ);
-            break;
-#endif
-    }
-
-    /* set callback */
-    spi_config[dev].cb = cb;
-
-    /* configure pins for their correct alternate function */
-    for (int i = 0; i < 3; i++) {
-        port->MODER &= ~(3 << (pin[i] * 2));
-        port->MODER |= (2 << (pin[i] * 2));
-        int hl = (pin[i] < 8) ? 0 : 1;
-        port->AFR[hl] &= (0xf << ((pin[i] - (hl * 8)) * 4));
-        port->AFR[hl] |= (af << ((pin[i] - (hl * 8)) * 4));
-    }
-
-    /* reset SPI configuration registers */
-    spi->CR1 = 0;
-    spi->CR2 = 0;
-    spi->I2SCFGR = 0;       /* this makes sure SPI mode is selected */
-
-    /* select clock polarity and clock phase */
-    spi->CR1 |= conf;
-    /* the NSS (chip select) is managed by software and NSS is low (slave enabled) */
-    spi->CR1 |= SPI_CR1_SSM;
-    /* set data-size to 8-bit */
-    spi->CR2 |= (0x7 << 8);
-    /* set FIFO threshold to set RXNE when 8 bit are received */
-    spi->CR2 |= SPI_CR2_FRXTH;
-    /* enable interrupt for arriving data: 'receive register no empty' and errors */
-    spi->CR2 |= SPI_CR2_RXNEIE | SPI_CR2_ERRIE;
-    /* enable the SPI device */
-    spi->CR1 |= SPI_CR1_SPE;
-    return 0;
+    /* due to issues with the send buffer, the master mode is not (yet) supported */
+    return -1;
 }
 
 int spi_transfer_byte(spi_t dev, char out, char *in)
@@ -245,17 +177,13 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
     char res;
 
     for (int i = 0; i < length; i++) {
-        DEBUG("Ready for byte %i\n", i);
         if (out) {
-            DEBUG("Send out with real data: %c\n", out[i]);
             spi_transfer_byte(dev, out[i], &res);
         }
         else {
-            DEBUG("Send byte with zero data\n");
             spi_transfer_byte(dev, 0, &res);
         }
         if (in) {
-            DEBUG("Got byte: %c\n", res);
             in[i] = res;
         }
     }
@@ -277,18 +205,7 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
 
 void spi_transmission_begin(spi_t dev, char reset_val)
 {
-    switch (dev) {
-#if SPI_0_EN
-        case SPI_0:
-            *((volatile uint8_t *)(&SPI_0_DEV->DR)) = (uint8_t)reset_val;
-            break;
-#endif
-#if SPI_1_EN
-        case SPI_1:
-            *((volatile uint8_t *)(&SPI_1_DEV->DR)) = (uint8_t)reset_val;
-            break;
-#endif
-    }
+    /* slave mode is not (yet) supported */
 }
 
 void spi_poweron(spi_t dev)
@@ -348,9 +265,7 @@ static inline void irq_handler(SPI_TypeDef *spi, spi_t dev)
 __attribute__((naked)) void SPI_0_ISR(void)
 {
     ISR_ENTER();
-    LD4_TOGGLE;
     irq_handler(SPI_0_DEV, SPI_0);
-    LD4_TOGGLE;
     ISR_EXIT();
 }
 #endif
