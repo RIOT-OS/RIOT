@@ -52,7 +52,7 @@ caddr_t heap_top = (caddr_t)&_end + 4;
  * @brief use mutex for waiting on incoming UART chars
  */
 static mutex_t uart_rx_mutex;
-static char rx_buf_mem[STDIO_BUFSIZE];
+static char rx_buf_mem[STDIO_RX_BUFSIZE];
 static ringbuffer_t rx_buf;
 #endif
 
@@ -82,7 +82,7 @@ void _init(void)
 {
 #ifndef MODULE_UART0
     mutex_init(&uart_rx_mutex);
-    ringbuffer_init(&rx_buf, rx_buf_mem, STDIO_BUFSIZE);
+    ringbuffer_init(&rx_buf, rx_buf_mem, STDIO_RX_BUFSIZE);
 #endif
     uart_init(STDIO, STDIO_BAUDRATE, rx_cb, 0, 0);}
 
@@ -195,8 +195,9 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
     }
     return ringbuffer_get(&rx_buf, (char*)buffer, rx_buf.avail);
 #else
-    r->_errno = ENODEV;
-    return -1;
+    char *res = (char*)buffer;
+    res[0] = (char)uart0_readc();
+    return 1;
 #endif
 }
 
