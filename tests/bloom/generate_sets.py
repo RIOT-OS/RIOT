@@ -24,12 +24,12 @@ A = A[sizeOfB:]
 
 SetsFile = open(sys.argv[2], 'w')
 SetsFile.write('const int lenA = ' + str(sizeOfA) + ';\n')
-SetsFile.write('const char* A[' + str(sizeOfA) + '] = {')
+SetsFile.write('const char* const A[' + str(sizeOfA) + '] = {')
 SetsFile.writelines(",".join('"' + x + '"\n' for x in A))
 SetsFile.write('};\n')
 
 SetsFile.write('const int lenB = ' + str(sizeOfB) + ';\n')
-SetsFile.write('const char* B[' + str(sizeOfB) + '] = {')
+SetsFile.write('const char* const B[' + str(sizeOfB) + '] = {')
 SetsFile.writelines(",".join('"' + x + '"\n' for x in B))
 SetsFile.write('};\n')
 
