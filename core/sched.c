@@ -158,7 +158,7 @@ void sched_switch(uint16_t other_prio)
 
     DEBUG("%s: %" PRIu16 " %" PRIu16 " %i\n", sched_active_thread->name, current_prio, other_prio, in_isr);
 
-    if (current_prio >= other_prio) {
+    if (current_prio > other_prio) {
         if (in_isr) {
             sched_context_switch_request = 1;
         }
