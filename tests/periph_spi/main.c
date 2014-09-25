@@ -134,11 +134,11 @@ void slave_on_cs(void *arg)
 {
     (void)arg;
 
-    LD3_ON;
+    LED_RED_ON;
     spi_transmission_begin(spi_dev, 'F');
     state = 0;
     rw = INIT;
-    LD3_OFF;
+    LED_RED_OFF;
 }
 
 char slave_on_data(char data)
