@@ -27,13 +27,13 @@
  * TODO: measure and adjust for the cortex-m0
  * @{
  */
-#define KERNEL_CONF_STACKSIZE_PRINTF    (2500) 
+#define KERNEL_CONF_STACKSIZE_PRINTF    (512)
 
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   (2500) 
+#define KERNEL_CONF_STACKSIZE_DEFAULT   (512)
 #endif
 
-#define KERNEL_CONF_STACKSIZE_IDLE      (512)
+#define KERNEL_CONF_STACKSIZE_IDLE      (256)
 /** @} */
 
 /**
@@ -43,7 +43,7 @@
  * @{
  */
 #ifndef UART0_BUFSIZE
-#define UART0_BUFSIZE                   (64)
+#define UART0_BUFSIZE                   (128)
 #endif
 /** @} */
 

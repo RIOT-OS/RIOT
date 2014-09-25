@@ -1,12 +1,17 @@
-
 # this CPU implementation is using the new core/CPU interface
 export CFLAGS += -DCOREIF_NG=1
+
+# this CPU implementation doesn't use CMSIS initialisation
+export CFLAGS += -DDONT_USE_CMSIS_INIT
 
 # tell the build system that the CPU depends on the Cortex-M common files
 export USEMODULE += cortex-m0_common
 
 # define path to cortex-m common module, which is needed for this CPU
 export CORTEX_COMMON = $(RIOTCPU)/cortex-m0_common/
+
+# this CPU implementation makes use of the ringbuffer, so include the lib module
+export USEMODULE += lib
 
 # define the linker script to use for this CPU
 export LINKERSCRIPT = $(RIOTCPU)/$(CPU)/samd21_linkerscript.ld

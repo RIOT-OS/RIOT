@@ -22,7 +22,7 @@
 #include "debug.h"
 
 static void cc2420_gen_pkt(uint8_t *buf, cc2420_packet_t *packet);
-static uint8_t sequenz_nr;
+static uint8_t sequence_nr;
 static bool wait_for_ack;
 
 radio_tx_status_t cc2420_load_tx_buf(ieee802154_packet_kind_t kind,
@@ -71,7 +71,7 @@ radio_tx_status_t cc2420_load_tx_buf(ieee802154_packet_kind_t kind,
     }
 
     /* sequence number */
-    hdr[2] = sequenz_nr++;
+    hdr[2] = sequence_nr++;
 
     /* variable-length fields */
     int idx = 3;
@@ -190,7 +190,7 @@ radio_tx_status_t cc2420_transmit_tx_buf(void)
         /* a packet has arrived, read the arrived data */
         cc2420_read_fifo(ackbuf, ACK_LENGTH);
         if (ackbuf[0] == 0x02  /* ack packet in buffer */
-             && (ackbuf[2] == sequenz_nr - 1)) /* correct sequence number */
+             && (ackbuf[2] == sequence_nr - 1)) /* correct sequence number */
             return RADIO_TX_OK;
     }
     return RADIO_TX_NOACK;
@@ -243,9 +243,9 @@ int16_t cc2420_send(cc2420_packet_t *packet)
     }
 
     packet->frame.src_pan_id = cc2420_get_pan();
-    packet->frame.seq_nr = sequenz_nr;
+    packet->frame.seq_nr = sequence_nr;
 
-    sequenz_nr += 1;
+    sequence_nr += 1;
 
     /* calculate size of the package (header + payload + fcs) */
     packet->length = ieee802154_frame_get_hdr_len(&packet->frame) +

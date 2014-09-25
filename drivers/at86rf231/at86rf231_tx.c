@@ -17,7 +17,7 @@ static void at86rf231_xmit(uint8_t *data, radio_packet_length_t length);
 
 static void at86rf231_gen_pkt(uint8_t *buf, at86rf231_packet_t *packet);
 
-static uint8_t sequenz_nr;
+static uint8_t sequence_nr;
 
 int16_t at86rf231_send(at86rf231_packet_t *packet)
 {
@@ -47,9 +47,9 @@ int16_t at86rf231_send(at86rf231_packet_t *packet)
     }
 
     packet->frame.src_pan_id = at86rf231_get_pan();
-    packet->frame.seq_nr = sequenz_nr;
+    packet->frame.seq_nr = sequence_nr;
 
-    sequenz_nr += 1;
+    sequence_nr += 1;
 
     // calculate size of the frame (payload + FCS) */
     packet->length = ieee802154_frame_get_hdr_len(&packet->frame) +

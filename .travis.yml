@@ -1,5 +1,7 @@
 language: c
 
+cache: apt
+
 env:
     - NPROC_MAX=8
 
@@ -15,15 +17,23 @@ before_install:
     - sudo apt-get update
 
 install:
-    - sudo apt-get install build-essential
-    - sudo apt-get install gcc-multilib
-#TODO: remove the `=4-*` if the stock gcc-arm-none-eabi ships the missing c++ headers (cf. #1656)
-    - sudo apt-get install gcc-arm-none-eabi=4-*
-    - sudo apt-get install gcc-msp430
-    - sudo apt-get install pcregrep libpcre3
-    - sudo apt-get install qemu-system-x86 python3
-    - sudo apt-get install g++-multilib
-    - sudo apt-get install gcc-avr binutils-avr avr-libc
+    # TODO: Remove the `=4-*` if the stock gcc-arm-none-eabi ships
+    # the missing c++ headers (cf. #1656)
+    - >
+        sudo apt-get install \
+            build-essential \
+            gcc-multilib \
+            gcc-arm-none-eabi=4-* \
+            gcc-msp430 \
+            pcregrep \
+            libpcre3 \
+            qemu-system-x86 \
+            python3 \
+            g++-multilib \
+            gcc-avr \
+            binutils-avr \
+            avr-libc \
+            cppcheck \
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
 
@@ -39,6 +49,10 @@ script:
     - make -C ./tests/unittests test BOARD=native
     - make -C ./tests/unittests test BOARD=qemu-i386
     - ./dist/tools/licenses/check.sh master
+# TODO:
+#   Remove the --error-exitcode=0` when all warnings of cppcheck have been
+#   taken care of in master.
+    - ./dist/tools/cppcheck/check.sh master --error-exitcode=0
 
 notifications:
     email: false
