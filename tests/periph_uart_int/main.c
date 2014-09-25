@@ -123,8 +123,6 @@ int main(void)
         int res = ringbuffer_get(&rx_buf, buf, rx_buf.avail);
         buf[res] = '\0';
         printf("%s", buf);
-
-
     }
 
     return 0;
