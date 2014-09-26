@@ -62,10 +62,9 @@
 #define UART_0_EN           1
 #define UART_IRQ_PRIO       1
 
-/* UART 0 device configuration */
-#define UART_0_DEV          NRF_UART0
-#define UART_0_PIN_RX       1
-#define UART_0_PIN_TX       2
+/* UART pin configuration */
+#define UART_PIN_RX       1
+#define UART_PIN_TX       2
 /** @} */
 
 /**

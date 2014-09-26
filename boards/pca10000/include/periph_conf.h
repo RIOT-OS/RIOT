@@ -79,13 +79,12 @@
 #define UART_0_EN           1
 #define UART_IRQ_PRIO       1
 
-/* UART 0 device configuration */
-#define UART_0_DEV          NRF_UART0
-#define UART_0_HWFLOWCTRL   1
-#define UART_0_PIN_RX       11
-#define UART_0_PIN_TX       9
-#define UART_0_PIN_RTS      8
-#define UART_0_PIN_CTS      10
+/* UART pin configuration */
+#define UART_HWFLOWCTRL   1
+#define UART_PIN_RX       11
+#define UART_PIN_TX       9
+#define UART_PIN_RTS      8
+#define UART_PIN_CTS      10
 /** @} */
 
 /**
