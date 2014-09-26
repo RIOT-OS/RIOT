@@ -37,5 +37,8 @@ endif
 ifneq (,$(filter servo,$(USEMODULE)))
     DIRS += servo
 endif
+ifneq (,$(filter pir,$(USEMODULE)))
+    DIRS += pir
+endif
 
 include $(RIOTBASE)/Makefile.base
