@@ -49,7 +49,7 @@ BOARD_BLACKLIST := arduino-due mbed_lpc1768 msb-430 pttu udoo qemu-i386 \
 
 USEMODULE += shell
 USEMODULE += shell_commands
-USEMODULE += posix
+USEMODULE += uart0
 USEMODULE += ps
 USEMODULE += random
 USEMODULE += defaulttransceiver

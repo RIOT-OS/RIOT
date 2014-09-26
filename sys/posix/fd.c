@@ -14,6 +14,7 @@
  *          operations.
  * @author  Christian Mehlis <mehlis@inf.fu-berlin.de>
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
+ * @author  René Kijewski <rene.kijewski@fu-berlin.de>
  */
 #include <errno.h>
 #include <stdio.h>
@@ -27,28 +28,70 @@
 #include "fd.h"
 
 #ifdef CPU_MSP430
-#define FD_MAX 5
+#   define FD_MAX 5
 #else
-#define FD_MAX 15
+#   define FD_MAX 15
 #endif
 
 static fd_t fd_table[FD_MAX];
 
+static ssize_t stdio_read(int fd, void *buf_, size_t n)
+{
+    (void) fd;
+    char *buf = buf_;
+    return uart0_read(buf, n);
+}
+
+static ssize_t stdio_write(int fd, const void *buf_, size_t n)
+{
+    if (n == 0) {
+        return 0;
+    }
+
+    (void) fd;
+    const char *buf = buf_;
+
+    ssize_t wrote = 0;
+    while (n > 0) {
+        int put = putchar(*buf);
+        if (put == *buf) {
+            ++wrote;
+            ++buf;
+            --n;
+        }
+        else if (wrote > 0) {
+            return wrote;
+        }
+        else {
+            return -1;
+        }
+    }
+    return wrote;
+}
+
+static int stdio_close(int fd)
+{
+    (void) fd;
+    return 0;
+}
+
 int fd_init(void)
 {
-    memset(fd_table, 0, sizeof(fd_t) * FD_MAX);
-
-    posix_open(uart0_handler_pid, 0);
     fd_t fd = {
         .__active = 1,
-        .fd = (int)uart0_handler_pid,
-        .read = (ssize_t ( *)(int, void *, size_t))posix_read,
-        .write = (ssize_t ( *)(int, const void *, size_t))posix_write,
-        .close = posix_close
+        .read = stdio_read,
+        .write = stdio_write,
+        .close = stdio_close,
     };
-    memcpy(&fd_table[STDIN_FILENO], &fd, sizeof(fd_t));
-    memcpy(&fd_table[STDOUT_FILENO], &fd, sizeof(fd_t));
-    memcpy(&fd_table[STDERR_FILENO], &fd, sizeof(fd_t));
+
+    fd_table[STDIN_FILENO] = fd;
+    fd_table[STDOUT_FILENO] = fd;
+    fd_table[STDERR_FILENO] = fd;
+
+    fd_table[STDIN_FILENO].fd = STDIN_FILENO;
+    fd_table[STDOUT_FILENO].fd = STDOUT_FILENO;
+    fd_table[STDERR_FILENO].fd = STDERR_FILENO;
+
     return FD_MAX;
 }
 

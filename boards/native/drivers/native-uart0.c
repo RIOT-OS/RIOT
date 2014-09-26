@@ -200,11 +200,8 @@ void handle_uart_in(void)
             errx(EXIT_FAILURE, "handle_uart_in: unhandled situation!");
         }
     }
-    for (int pos = 0; pos < nread; pos++) {
-        uart0_handle_incoming(buf[pos]);
-    }
-    uart0_notify_thread();
 
+    uart0_handle_incoming(buf, nread);
     thread_yield();
 }
 

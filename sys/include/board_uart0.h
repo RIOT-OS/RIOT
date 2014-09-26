@@ -20,16 +20,19 @@
 #ifndef __BOARD_UART0_H
 #define __BOARD_UART0_H
 
-#include "kernel_types.h"
+#include <sys/types.h>
+
+#ifdef MODULE_MSP430_COMMON
+#   include <msp430_types.h>
+#endif
+
 #include "cpu-conf.h"   /* To give user access to UART0_BUFSIZE */
 
-extern kernel_pid_t uart0_handler_pid;
+size_t uart0_handle_incoming(const char *buf, size_t n);
 
-void board_uart0_init(void);
-void uart0_handle_incoming(int c);
-void uart0_notify_thread(void);
-
+ssize_t uart0_read(char *buf, size_t n);
 int uart0_readc(void);
+
 void uart0_putc(int c);
 
 /** @} */

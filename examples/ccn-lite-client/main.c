@@ -25,7 +25,6 @@
 
 #include "msg.h"
 #include "thread.h"
-#include "posix_io.h"
 #include "shell.h"
 #include "board_uart0.h"
 #include "transceiver.h"
@@ -332,11 +331,7 @@ int main(void)
     riot_ccn_relay_start();
 
     puts("starting shell...");
-    puts("  posix open");
-    posix_open(uart0_handler_pid, 0);
-    puts("  shell init");
     shell_init(&shell, sc, UART0_BUFSIZE, uart0_readc, uart0_putc);
-    puts("  shell run");
     shell_run(&shell);
 
     return 0;
