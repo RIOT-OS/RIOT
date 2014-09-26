@@ -7,13 +7,14 @@
  */
 
 /**
- * @ingroup     cpu_stm32f1
+ * @ingroup     cpu_samd21
  * @{
  *
  * @file        spi.c
  * @brief       Low-level SPI driver implementation
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ *              Troels Hoffmeyer <troels.d.hoffmeyer@gmail.com>
  *
  * @}
  */
@@ -24,15 +25,16 @@
 #include "periph_conf.h"
 #include "board.h"
 #include "port_util.h"
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
+    DEBUG("INIT SPI\n");
     GCLK_CLKCTRL_Type clkctrl_core;
     SercomSpi* spi_dev;
-    uint8_t   data_out_pad;
-    uint8_t   data_in_pad;
+    uint8_t   dopo;
+    uint8_t   dipo;
     uint8_t   cpha;
     uint8_t   cpol;
     uint32_t   f_baud;
@@ -79,22 +81,57 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         case SPI_0:
             /* Enable sercom4 in power manager */
             PM->APBCMASK.reg |= PM_APBCMASK_SERCOM4;
-            /* Setup clock */
-            clkctrl_core.bit.ID = SERCOM4_GCLK_ID_CORE;
-            clkctrl_core.bit.GEN = 0; //Generator 0, which at the moment is at 8Mhz
-            clkctrl_core.bit.CLKEN = 1;
-            clkctrl_core.bit.WRTLOCK = 0;
-            GCLK->CLKCTRL = clkctrl_core;
-            while(GCLK->STATUS.bit.SYNCBUSY);
-            /* TODO: Setup pins */
+            /* Setup clock */            
+            GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (SERCOM4_GCLK_ID_CORE << GCLK_CLKCTRL_ID_Pos)));
+            while (GCLK->STATUS.bit.SYNCBUSY);
+
             pmux_set(SPI_0_SCLK_PIN, F);
             pmux_set(SPI_0_MISO_PIN, F);
             pmux_set(SPI_0_MOSI_PIN, F);
-            pmux_set(SPI_0_CS_PIN,   F);
+            pmux_set(SPI_0_CS_PIN,   D);
+            //SCLK+MOSI
+            SPI_0_SCLK_DEV.DIRSET.reg = (1 << (SPI_0_SCLK_PIN % 32));
+            SPI_0_MOSI_DEV.DIRSET.reg = (1 << (SPI_0_MOSI_PIN % 32));
+
+            //MISO = input
+            /* configure as input */
+            SPI_0_MISO_DEV.DIRCLR.reg = (1 << (SPI_0_MISO_PIN % 32));
+            /* buffer input value */
+            SPI_0_MISO_DEV.PINCFG[SPI_0_MISO_PIN % 32].bit.INEN = true;
+            SPI_0_MISO_DEV.OUTCLR.reg = (1 << (SPI_0_MISO_PIN % 32));
+            SPI_0_MISO_DEV.PINCFG[SPI_0_MISO_PIN % 32].bit.PULLEN = false;
 
             spi_dev = &SPI_0_DEV;
-            data_out_pad = SPI_0_MOSI_PAD;
-            data_in_pad  = SPI_0_MISO_PAD;
+            dopo = SPI_0_DOPO;
+            dipo = SPI_0_DIPO;
+            break;
+#endif
+#ifdef SPI_1_EN
+        case SPI_1:
+            /* Enable sercom5 in power manager */
+            PM->APBCMASK.reg |= PM_APBCMASK_SERCOM5;
+            /* Setup clock */            /* configure GCLK0 to feed sercom0 */;
+            GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (SERCOM5_GCLK_ID_CORE << GCLK_CLKCTRL_ID_Pos)));
+            while (GCLK->STATUS.bit.SYNCBUSY);
+
+            pmux_set(SPI_1_SCLK_PIN, D);
+            pmux_set(SPI_1_MISO_PIN, D);
+            pmux_set(SPI_1_MOSI_PIN, D);
+            //SCLK+MOSI
+            SPI_1_SCLK_DEV.DIRSET.reg = (1 << (SPI_1_SCLK_PIN % 32));
+            SPI_1_MOSI_DEV.DIRSET.reg = (1 << (SPI_1_MOSI_PIN % 32));
+
+            //MISO = input
+            /* configure as input */
+            SPI_1_MISO_DEV.DIRCLR.reg = (1<<(SPI_1_MISO_PIN%32));
+            /* buffer input value */
+            SPI_1_MISO_DEV.PINCFG[SPI_1_MISO_PIN % 32].bit.INEN = true;
+            SPI_1_MISO_DEV.OUTCLR.reg = (1 << (SPI_1_MISO_PIN % 32));
+            SPI_1_MISO_DEV.PINCFG[SPI_1_MISO_PIN % 32].bit.PULLEN = false;
+
+            spi_dev = &SPI_1_DEV;
+            dopo = SPI_1_DOPO;
+            dipo  = SPI_1_DIPO;
             break;
 #endif
     }
@@ -107,8 +144,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         .bit.MODE   = SERCOM_SPI_CTRLA_MODE_SPI_MASTER_Val,
         .bit.RUNSTDBY = 0, //Don't run in standby
         .bit.IBON   = 0,
-        .bit.DOPO   = data_out_pad,
-        .bit.DIPO   = data_in_pad,
+        .bit.DOPO   = dopo,
+        .bit.DIPO   = dipo,
         .bit.FORM   = 0, //SPI frame without address
         .bit.CPHA   = cpha,
         .bit.CPOL   = cpol,
@@ -126,7 +163,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         .bit.RXEN    = 1  //Enable receiver
     };
     spi_dev->CTRLB    = ctrlb;
-    spi_dev->BAUD.bit.BAUD     = (uint8_t) SPI_0_F_REF / (2* f_baud) - 1; //Synchronous mode
+    while(spi_dev->SYNCBUSY.bit.CTRLB);
+    spi_dev->BAUD.bit.BAUD     = (uint8_t) (((uint32_t) SPI_0_F_REF) / (2 * f_baud) - 1); //Synchronous mode
     spi_poweron(dev);
 
     return 0;
@@ -141,19 +179,31 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
 int spi_transfer_byte(spi_t dev, char out, char *in)
 {
     SercomSpi* spi_dev;
+    int transfered = 0;
+
     switch(dev)
     {
 #ifdef SPI_0_EN
         case SPI_0:
             spi_dev = &(SPI_0_DEV);
-
+            break;
+#endif
+#ifdef SPI_1_EN
+        case SPI_1:
+            spi_dev = &(SPI_1_DEV);
+            break;
 #endif
     }
     while(!spi_dev->INTFLAG.bit.DRE); //while data register is not empty
     spi_dev->DATA.bit.DATA = out;
-    while(!spi_dev->INTFLAG.bit.RXC); //while receive is not complete
-    *in = spi_dev->DATA.bit.DATA;
-    return 1; // Always transfer 1 byte, as the name of the function suggests
+    transfered++;
+    if(in != NULL)
+    {
+        while(!spi_dev->INTFLAG.bit.RXC); //while receive is not complete
+        *in = spi_dev->DATA.bit.DATA;
+        transfered++;
+    }
+    return transfered;
 }
 
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
@@ -199,12 +249,18 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
 
 void spi_poweron(spi_t dev)
 {
-    
      switch(dev) {
  #ifdef SPI_0_EN
          case SPI_0:
+            while(SPI_0_DEV.SYNCBUSY.bit.ENABLE);
             SPI_0_DEV.CTRLA.bit.ENABLE = true; //Enable spi
-             break;
+            break;
+#endif
+ #ifdef SPI_1_EN
+         case SPI_1:
+            while(SPI_1_DEV.SYNCBUSY.bit.ENABLE);
+            SPI_1_DEV.CTRLA.bit.ENABLE = true; //Enable spi
+            break;
 #endif
     }
 }
@@ -214,8 +270,23 @@ void spi_poweroff(spi_t dev)
     switch(dev) {
 #ifdef SPI_0_EN
         case SPI_0:
-            SPI_0_DEV.CTRLA.bit.ENABLE = false; //Disnable spi
+            while(SPI_0_DEV.SYNCBUSY.bit.ENABLE);
+            SPI_0_DEV.CTRLA.bit.ENABLE = false; //Disable spi
+            break;
+#endif
+#ifdef SPI_1_EN
+        case SPI_1:
+            while(SPI_1_DEV.SYNCBUSY.bit.ENABLE);
+            SPI_1_DEV.CTRLA.bit.ENABLE = false; //Disable spi
             break;
 #endif
    }
+}
+
+
+__attribute__((naked)) void isr_sercom4(void)
+{
+    ISR_ENTER();
+    DEBUG("INTERRUPT");
+    ISR_EXIT();
 }

@@ -25,7 +25,6 @@
 
 
 void led_init(void);
-void clk_init(void);
 
 
 void board_init(void)
@@ -35,9 +34,6 @@ void board_init(void)
 
     /* initialize the CPU */
     cpu_init();
-
-    /* initialize the GCLK */
-    clk_init();
 
     /* initialize the boards LEDs */
     led_init();
@@ -59,42 +55,3 @@ void led_init(void)
     LED_PORT.OUTSET.reg = LED_PIN;
 }
 
-void clk_init(void)
-{
-    PM->APBAMASK.reg |= PM_APBAMASK_SYSCTRL;
-    PM->APBAMASK.reg |= PM_APBAMASK_GCLK;
-
-
-    SYSCTRL->OSC8M.bit.PRESC = 0;
-    SYSCTRL->OSC8M.bit.ONDEMAND = 1;
-    SYSCTRL->OSC8M.bit.RUNSTDBY = 0;
-    SYSCTRL->OSC8M.bit.ENABLE = 1;
-
-    GCLK->CTRL.reg = GCLK_CTRL_SWRST;
-    while (GCLK->CTRL.reg & GCLK_CTRL_SWRST);
-    /* disable the watchdog timer */
-    WDT->CTRL.bit.ENABLE = 0;
-    /* GCLK setup */
-
-    /*Set up main clock generator */
-    GCLK_GENDIV_Type gendiv =
-    {
-        .bit.ID = 0,
-        .bit.DIV = 0   
-    };
-    GCLK->GENDIV = gendiv;
-    while (GCLK->STATUS.bit.SYNCBUSY);
-    
-    GCLK_GENCTRL_Type genctrl = {
-        .bit.ID = 0, //Generator 0, TODO: is this correct
-        .bit.SRC = GCLK_SOURCE_OSC8M,
-        .bit.GENEN = true,
-        .bit.IDC = 0,
-        .bit.OOV = 0,
-        .bit.DIVSEL = 0,
-        .bit.RUNSTDBY = 0
-    };
-    GCLK->GENCTRL = genctrl;
-
-    while(GCLK->STATUS.bit.SYNCBUSY);
-}
