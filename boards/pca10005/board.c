@@ -15,22 +15,19 @@
  *
  * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
  * @author      Timo Ziegler <timo.ziegler@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  * @}
  */
 
-#include <stdio.h>
-#include <string.h>
 #include "board.h"
 #include "cpu.h"
-#include "nrf51.h"
-#include "periph/uart.h"
-#include "periph/gpio.h"
-
-extern void SystemInit(void);
 
 void board_init(void)
 {
+    /* setup led(s) for debugging */
+    NRF_GPIO->PIN_CNF[LED_RED_PIN] = GPIO_PIN_CNF_DIR_Output;
+
     /* initialize the CPU */
     cpu_init();
 }
