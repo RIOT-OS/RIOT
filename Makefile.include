@@ -131,7 +131,7 @@ BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
-.PHONY: all clean flash doc term
+.PHONY: all clean flash term doc debug debug-server reset objdump
 
 ELFFILE ?= $(BINDIR)$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
@@ -206,6 +206,9 @@ debug-server:
 
 reset:
 	$(RESET) $(RESET_FLAGS)
+
+objdump:
+	$(PREFIX)objdump -S -D -h $(ELFFILE) | less
 
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests
