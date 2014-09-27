@@ -61,6 +61,23 @@ per second for the current architecture."
 #endif
 
 /**
+ * @brief       Overhead of the `hwtimer_wait` function
+ *
+ * @verbatim    This value is used to decrease the number of ticks that
+ *              `hwtimer_wait` uses to set the actual hardware timer.
+ *
+ *              The goal is to make sure the number of ticks spent in the
+ *              function corresponds to the ticks argument it was given.
+ *
+ *              Boards should override this.
+ *
+ * @def         HWTIMER_WAIT_OVERHEAD
+ */
+#ifndef HWTIMER_WAIT_OVERHEAD
+#define HWTIMER_WAIT_OVERHEAD (2)
+#endif
+
+/**
  * @brief       Convert microseconds to kernel timer ticks
  * @param[in]   us number of microseconds
  * @return      kernel timer ticks

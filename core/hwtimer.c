@@ -129,9 +129,7 @@ void hwtimer_wait(unsigned long ticks)
 
     mutex_t mutex = MUTEX_INIT;
     mutex_lock(&mutex);
-    /* TODO: introduce HWTIMER_INSTRUCTIONS_PER_TICK?
-     * -2 is to adjust the real value */
-    int res = hwtimer_set(ticks - 2, hwtimer_releasemutex, &mutex);
+    int res = hwtimer_set(ticks - (HWTIMER_WAIT_OVERHEAD), hwtimer_releasemutex, &mutex);
     if (res == -1) {
         mutex_unlock(&mutex);
         hwtimer_spin(ticks);
