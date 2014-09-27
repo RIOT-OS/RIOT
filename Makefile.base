@@ -46,23 +46,26 @@ DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
 $(BINDIR)$(MODULE)/:
 	$(AD)mkdir -p $@
 
-$(BINDIR)$(MODULE).a: $(OBJ) ${DIRS:%=ALL--%} $(BINDIR)$(MODULE)/
-	$(AD)$(AR) -rcs $@ $(OBJ)
+$(BINDIR)$(MODULE).a $(OBJ): | $(BINDIR)$(MODULE)/
+
+$(BINDIR)$(MODULE).a: $(OBJ) | ${DIRS:%=ALL--%}
+   $(AD)$(AR) -rcs $@ $(OBJ)
+
 
 CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 
 # compile and generate dependency info
 
-$(OBJC): $(BINDIR)$(MODULE)/%.o: %.c $(BINDIR)$(MODULE)/
+$(OBJC): $(BINDIR)$(MODULE)/%.o: %.c
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
-$(OBJCXX): $(BINDIR)$(MODULE)/%.o: %.cpp $(BINDIR)$(MODULE)/
+$(OBJCXX): $(BINDIR)$(MODULE)/%.o: %.cpp
 	$(AD)$(CXX) $(CXXFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
-$(ASMOBJ): $(BINDIR)$(MODULE)/%.o: %.s $(BINDIR)$(MODULE)/
+$(ASMOBJ): $(BINDIR)$(MODULE)/%.o: %.s
 	$(AD)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
-$(ASSMOBJ): $(BINDIR)$(MODULE)/%.o: %.S $(BINDIR)$(MODULE)/
+$(ASSMOBJ): $(BINDIR)$(MODULE)/%.o: %.S
 	$(AD)$(CC) $(CFLAGS) $(INCLUDES) -MD -MP -c -o $@ $(abspath $<)
 
 # pull in dependency info for *existing* .o files
