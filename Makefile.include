@@ -207,6 +207,9 @@ debug-server:
 reset:
 	$(RESET) $(RESET_FLAGS)
 
+objdump:
+	$(PREFIX)objdump -S -D -h $(ELFFILE) | less
+
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests
 
