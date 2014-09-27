@@ -10,4 +10,3 @@
 #include <stddef.h>
 
 typedef int16_t suseconds_t;
-typedef size_t ssize_t;
