@@ -36,7 +36,7 @@ endif
 ifeq ($(shell $(CC) -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
   # duplicated parameters don't hurt
   CFLAGS += -Wstrict-prototypes -Werror=strict-prototypes -Wold-style-definition -Werror=old-style-definition
-  CXXUWFLAGS += -std=% -Wstrict-prototypes -Wold-style-definition
+  CXXUWFLAGS += -Wstrict-prototypes -Wold-style-definition
 endif
 
 # Unwanted flags for c++
