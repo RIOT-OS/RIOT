@@ -15,8 +15,4 @@ typedef signed   ssize_t;
 typedef ssize_t  off_t;
 typedef int      pid_t;
 
-#ifdef MODULE_PTHREAD
-#   include "pthread.h"
-#endif
-
 #endif /* ifndef RIOT__NATIVE__SYS_TYPES_H__ */

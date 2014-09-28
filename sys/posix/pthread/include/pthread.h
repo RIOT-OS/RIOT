@@ -17,6 +17,7 @@
 #include "kernel.h"
 #include "mutex.h"
 #include "sched.h"
+#include "tcb.h"
 
 #include "pthread_threading_attr.h"
 #include "pthread_threading.h"
