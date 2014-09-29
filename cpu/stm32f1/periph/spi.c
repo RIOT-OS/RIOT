@@ -29,13 +29,23 @@
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
-    SPI_TypeDef *SPIx;
-    uint16_t br_div = 0;
+    SPI_TypeDef *spi;
+    GPIO_TypeDef *clk_port, *mosi_port, *miso_port;
+    int clk_pin, mosi_pin, miso_pin;
+    uint16_t br_div;
+    uint8_t bus_div;
 
     switch(dev) {
 #ifdef SPI_0_EN
         case SPI_0:
-            SPIx = SPI_0_DEV;
+            spi = SPI_0_DEV;
+            clk_port = SPI_0_CLK_PORT;
+            clk_pin = SPI_0_CLK_PIN;
+            mosi_port = SPI_0_MOSI_PORT;
+            mosi_pin = SPI_0_MOSI_PIN;
+            miso_port = SPI_0_MISO_PORT;
+            miso_pin = SPI_0_MISO_PIN;
+            bus_div = SPI_0_BUS_DIV;
             SPI_0_CLKEN();
             break;
 #endif
@@ -43,37 +53,60 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             return -1;
     }
 
+    /* configure CLK pin */
+    if (clk_pin < 8) {
+        clk_port->CRL &= ~(0xf << (clk_pin * 4));
+        clk_port->CRL |= (0xb << (clk_pin * 4));
+    }
+    else {
+        clk_port->CRH &= ~(0xf << ((clk_pin - 8) * 4));
+        clk_port->CRH &= (0xb << ((clk_pin - 8) * 4));
+    }
+    /* configure the MOSI pin */
+    if (mosi_pin < 8) {
+        mosi_port->CRL &= ~(0xf << (mosi_pin * 4));
+        mosi_port->CRL |= (0xb << (mosi_pin * 4));
+    }
+    else {
+        mosi_port->CRH &= ~(0xf << ((mosi_pin - 8) * 4));
+        mosi_port->CRH &= (0xb << ((mosi_pin - 8) * 4));
+    }
+    /* configure MISO pin */
+    if (miso_pin < 8) {
+        miso_port->CRL &= ~(0xf << (miso_pin * 4));
+        miso_port->CRL |= (0x4 << (miso_pin * 4));
+    }
+    else {
+        miso_port->CRH &= ~(0xf << ((miso_pin - 8) * 4));
+        miso_port->CRH &= (0x4 << ((miso_pin - 8) * 4));
+    }
+
+    /* configure SPI bus speed */
     switch(speed) {
         case SPI_SPEED_10MHZ:
-            br_div = SPI_BR_PRESCALER_8;      /* actual speed: 9MHz   */
+            br_div = 0x01 + bus_div;      /* actual speed: 9MHz   */
             break;
         case SPI_SPEED_5MHZ:
-            br_div = SPI_BR_PRESCALER_16;     /* actual speed: 4.5MHz */
+            br_div = 0x02 + bus_div;     /* actual speed: 4.5MHz */
             break;
         case SPI_SPEED_1MHZ:
-            br_div = SPI_BR_PRESCALER_64;     /* actual speed: 1.1MHz */
+            br_div = 0x04 + bus_div;     /* actual speed: 1.1MHz */
             break;
         case SPI_SPEED_400KHZ:
-            br_div = SPI_BR_PRESCALER_128;    /* actual speed: 500kHz */
+            br_div = 0x05 + bus_div;    /* actual speed: 560kHz */
             break;
         case SPI_SPEED_100KHZ:
-            br_div = SPI_BR_PRESCALER_256;    /* actual speed: 200kHz */
+            br_div = 0x07;              /* actual speed: 280kHz on APB2, 140KHz on APB1 */
+        default:
+            return -2;
     }
 
     /* set up SPI */
-    SPIx->CR1 = SPI_2_LINES_FULL_DUPLEX \
-                | SPI_MASTER_MODE \
-                | SPI_DATA_SIZE_8B \
-                | (conf & 0x3) \
-                | SPI_NSS_SOFT \
-                | br_div \
-                | SPI_1ST_BIT_MSB;
-
-    SPIx->I2SCFGR &= 0xF7FF;     /* select SPI mode */
-
-    SPIx->CRCPR = 0x7;           /* reset CRC polynomial */
-
-    SPIx->CR2 |= (uint16_t)(1<<7);
+    spi->CR1 = SPI_CR1_SSM | SPI_CR1_SSI | SPI_CR1_MSTR | (conf & 0x3) | (br_div << 3);
+    spi->I2SCFGR &= 0xF7FF;     /* select SPI mode */
+    spi->CRCPR = 0x7;           /* reset CRC polynomial */
+    /* enable the SPI device */
+    spi->CR1 |= SPI_CR1_SPE;
 
     return 0;
 }
@@ -86,34 +119,34 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
 
 int spi_transfer_byte(spi_t dev, char out, char *in)
 {
-    SPI_TypeDef *SPI_dev;
+    SPI_TypeDef *spi;
     int transfered = 0;
 
     switch(dev) {
 #ifdef SPI_0_EN
         case SPI_0:
-            SPI_dev = SPI_0_DEV;
+            spi = SPI_0_DEV;
             break;
 #endif
         default:
             return -1;
     }
 
-    while ((SPI_dev->SR & SPI_SR_TXE) == RESET);
-    SPI_dev->DR = out;
+    while ((spi->SR & SPI_SR_TXE) == RESET);
+    spi->DR = out;
     transfered++;
 
-    while ((SPI_dev->SR & SPI_SR_RXNE) == RESET);
+    while ((spi->SR & SPI_SR_RXNE) == RESET);
     if (in != NULL) {
-        *in = SPI_dev->DR;
+        *in = spi->DR;
         transfered++;
     }
     else {
-        SPI_dev->DR;
+        spi->DR;
     }
 
     /* SPI busy */
-    while ((SPI_dev->SR & 0x80));
+    while ((spi->SR & 0x80));
 
     DEBUG("\nout: %x in: %x transfered: %x\n", out, *in, transfered);
 
@@ -172,7 +205,7 @@ void spi_poweron(spi_t dev)
 #ifdef SPI_0_EN
         case SPI_0:
             SPI_0_CLKEN();
-            SPI_0_DEV->CR1 |= 0x0040;   /* turn SPI peripheral on */
+            SPI_0_DEV->CR1 |= SPI_CR1_SPE;   /* turn SPI peripheral on */
             break;
 #endif
     }
@@ -183,8 +216,8 @@ void spi_poweroff(spi_t dev)
     switch(dev) {
 #ifdef SPI_0_EN
         case SPI_0:
+            SPI_0_DEV->CR1 &= ~(SPI_CR1_SPE);   /* turn SPI peripheral off */
             SPI_0_CLKDIS();
-            SPI_0_DEV->CR1 &= ~(0x0040);   /* turn SPI peripheral off */
             break;
 #endif
     }
