@@ -14,7 +14,9 @@
  * @brief       Peripheral MCU configuration for the iot-lab_M3 board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
+
 #ifndef __PERIPH_CONF_H
 #define __PERIPH_CONF_H
 
@@ -236,51 +238,27 @@
 
 /**
  * @brief SPI configuration
+ * @{
  */
-#define SPI_NUMOF       1
-#define SPI_0_EN        1
+#define SPI_NUMOF           (1U)
+#define SPI_0_EN            1
 
-#define SPI_0_DEV       SPI1
-#define SPI_IRQ_0       SPI_0
-
-#define SPI_0_BR_PRESC  16
-
-#define SPI_0_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
-#define SPI_0_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_SPI1EN))
-#define SPI_0_SCLK_GPIO     GPIO_8
-#define SPI_0_SCLK_PIN      GPIO_8_PIN
-#define SPI_0_SCLK_PORT     GPIO_8_PORT
-#define SPI_0_MISO_GPIO     GPIO_9
-#define SPI_0_MISO_PIN      GPIO_9_PIN
-#define SPI_0_MISO_PORT     GPIO_9_PORT
-#define SPI_0_MOSI_GPIO     GPIO_10
-#define SPI_0_MOSI_PIN      GPIO_10_PIN
-#define SPI_0_MOSI_PORT     GPIO_10_PORT
-#define SPI_0_CS_GPIO       GPIO_11
-#define SPI_0_CS_PIN        GPIO_11_PIN
-#define SPI_0_CS_PORT       GPIO_11_PORT
-#define SPI_0_IRQ0_GPIO     GPIO_12
-#define SPI_0_IRQ0_PIN      GPIO_12_PIN
-#define SPI_0_IRQ0_PORT     GPIO_12_PORT
-#define SPI_0_RESET_GPIO    GPIO_13
-#define SPI_0_RESET_PIN     GPIO_13_PIN
-#define SPI_0_RESET_PORT    GPIO_13_PORT
-#define SPI_0_SLEEP_GPIO    GPIO_14
-#define SPI_0_SLEEP_PIN     GPIO_14_PIN
-#define SPI_0_SLEEP_PORT    GPIO_14_PORT
-
-#define SPI_2_LINES_FULL_DUPLEX     (0x0000)
-#define SPI_MASTER_MODE             (0x0104)
-#define SPI_DATA_SIZE_8B            (0x0000)
-#define SPI_CPOL_LOW                (0x0000)
-#define SPI_CPHA_1_EDGE             (0x0000)
-#define SPI_NSS_SOFT                (0x0200)
-#define SPI_BR_PRESCALER_8          (0x0010)
-#define SPI_BR_PRESCALER_16         (0x0018)
-#define SPI_BR_PRESCALER_64         (0x0028)
-#define SPI_BR_PRESCALER_128        (0x0030)
-#define SPI_BR_PRESCALER_256        (0x0038)
-#define SPI_1ST_BIT_MSB             (0x0000)
+/* SPI 0 device configuration */
+#define SPI_0_DEV               SPI1
+#define SPI_0_CLKEN()           (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
+#define SPI_0_CLKDIS()          (RCC->APB2ENR &= ~(RCC_APB2ENR_SPI1EN))
+#define SPI_0_BUS_DIV           1   /* 1 -> SPI runs with full CPU clock, 0 -> half CPU clock */
+/* SPI 0 pin configuration */
+#define SPI_0_CLK_PORT          GPIOA
+#define SPI_0_CLK_PIN           5
+#define SPI_0_CLK_PORT_CLKEN()  (RCC->APB2ENR |= RCC_APB2ENR_IOPAEN)
+#define SPI_0_MOSI_PORT         GPIOA
+#define SPI_0_MOSI_PIN          7
+#define SPI_0_MOSI_PORT_CLKEN() (RCC->APB2ENR |= RCC_APB2ENR_IOPAEN)
+#define SPI_0_MISO_PORT         GPIOA
+#define SPI_0_MISO_PIN          6
+#define SPI_0_MISO_PORT_CLKEN() (RCC->APB2ENR |= RCC_APB2ENR_IOPAEN)
+/** @} */
 
 #endif /* __PERIPH_CONF_H */
 /** @} */
