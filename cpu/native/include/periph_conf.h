@@ -34,6 +34,29 @@
 #define RTC_NUMOF (1)
 /** @} */
 
+#ifdef MODULE_NATIVE_GPIO_DUMMY
+#define GPIO_0_EN   (1)
+#define GPIO_1_EN   (1)
+#define GPIO_2_EN   (1)
+#define GPIO_3_EN   (1)
+#define GPIO_4_EN   (1)
+#define GPIO_5_EN   (1)
+#define GPIO_6_EN   (1)
+#define GPIO_7_EN   (1)
+#define GPIO_8_EN   (1)
+#define GPIO_9_EN   (1)
+#define GPIO_10_EN  (1)
+#define GPIO_11_EN  (1)
+#define GPIO_12_EN  (1)
+#define GPIO_13_EN  (1)
+#define GPIO_14_EN  (1)
+#define GPIO_15_EN  (1)
+#define GPIO_NUMOF (16)
+
+#else /* no GPIO device */
+#define GPIO_NUMOF (0)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
