@@ -33,6 +33,8 @@ pir_t dev;
 
 void* pir_handler(void *arg)
 {
+    (void) arg; /* unused */
+
     msg_t msg_q[1];
     msg_init_queue(msg_q, 1);
 
