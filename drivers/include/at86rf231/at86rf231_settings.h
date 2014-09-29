@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     drivers_at86rf231
+ * @{
+ *
+ * @file
+ * @brief       Register and command definitions for the AT86RF231 radio
+ *
+ * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ */
+
 #ifndef AT86AT86RF231_SETTINGS_H
 #define AT86AT86RF231_SETTINGS_H
 

@@ -6,8 +6,20 @@
  * directory for more details.
  */
 
+/**
+ * @ingroup     drivers_at86rf231
+ * @{
+ *
+ * @file
+ * @brief       RX related functionality for the AT86RF231 device driver
+ *
+ * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ *
+ * @}
+ */
+
 #include "at86rf231.h"
-#include "at86rf231_arch.h"
 #include "at86rf231_spi.h"
 
 #include "kernel_types.h"
