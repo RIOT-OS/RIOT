@@ -68,7 +68,6 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += defaulttransceiver
-USEMODULE += auto_init
 USEMODULE += random
 USEMODULE += $(SYNCMOD)
 USEMODULE += clocksync_eval
