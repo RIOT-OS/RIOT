@@ -71,6 +71,11 @@ typedef uint8_t radio_packet_length_t;
 #define STDIO_RX_BUFSIZE    (64U)
 /** @} */
 
+#define CC3000_SPI          SPI_1
+#define CC3000_WLAN_EN      GPIO_14
+#define CC3000_CS           GPIO_10
+#define CC3000_SPI_IRQ      GPIO_3
+
 /**
  * @name LED pin definitions
  * @{
