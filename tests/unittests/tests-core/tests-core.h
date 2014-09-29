@@ -67,5 +67,12 @@ Test *tests_core_lifo_tests(void);
  */
 Test *tests_core_priority_queue_tests(void);
 
+/**
+ * @brief   Generates tests for byteorder.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_core_byteorder_tests(void);
+
 #endif /* __TESTS_CORE_H_ */
 /** @} */
