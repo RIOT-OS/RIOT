@@ -295,7 +295,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     uint32_t pin = 0;
     uint32_t extint = 0;
     int res = 0;
-    
+
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:

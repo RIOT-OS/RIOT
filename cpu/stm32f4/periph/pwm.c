@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Low-level GPIO driver implementation
+ * @brief       Low-level PWM driver implementation
  *
  * @author      Hauke Petersen <mail@haukepetersen.de>
  *

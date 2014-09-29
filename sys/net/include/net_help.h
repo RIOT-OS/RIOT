@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @defgroup    net_help Net help
  * @ingroup     net
@@ -6,7 +14,7 @@
  *
  * @file        net_help.h
  *
- * @author      Oliver
+ * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
 #ifndef __NET_HELP_H

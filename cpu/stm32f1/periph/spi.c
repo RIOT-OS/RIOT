@@ -81,7 +81,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
 {
     /* TODO */
-    return 0;
+    return -1;
 }
 
 int spi_transfer_byte(spi_t dev, char out, char *in)
@@ -159,6 +159,11 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
 {
     spi_transfer_byte(dev, reg, NULL);
     return spi_transfer_bytes(dev, out, in, length);
+}
+
+void spi_transmission_begin(spi_t dev, char reset_val)
+{
+    /* slave mode not implemented, yet */
 }
 
 void spi_poweron(spi_t dev)

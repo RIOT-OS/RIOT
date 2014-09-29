@@ -601,66 +601,82 @@ void gpio_set(gpio_t dev)
 #if GPIO_0_EN
         case GPIO_0:
             GPIO_0_DEV->PIO_SODR = GPIO_0_PIN;
+            break;
 #endif
 #if GPIO_1_EN
         case GPIO_1:
             GPIO_1_DEV->PIO_SODR = GPIO_1_PIN;
+            break;
 #endif
 #if GPIO_2_EN
         case GPIO_2:
             GPIO_2_DEV->PIO_SODR = GPIO_2_PIN;
+            break;
 #endif
 #if GPIO_3_EN
         case GPIO_3:
             GPIO_3_DEV->PIO_SODR = GPIO_3_PIN;
+            break;
 #endif
 #if GPIO_4_EN
         case GPIO_4:
             GPIO_4_DEV->PIO_SODR = GPIO_4_PIN;
+            break;
 #endif
 #if GPIO_5_EN
         case GPIO_5:
             GPIO_5_DEV->PIO_SODR = GPIO_5_PIN;
+            break;
 #endif
 #if GPIO_6_EN
         case GPIO_6:
             GPIO_6_DEV->PIO_SODR = GPIO_6_PIN;
+            break;
 #endif
 #if GPIO_7_EN
         case GPIO_7:
             GPIO_7_DEV->PIO_SODR = GPIO_7_PIN;
+            break;
 #endif
 #if GPIO_8_EN
         case GPIO_8:
             GPIO_8_DEV->PIO_SODR = GPIO_8_PIN;
+            break;
 #endif
 #if GPIO_9_EN
         case GPIO_9:
             GPIO_9_DEV->PIO_SODR = GPIO_9_PIN;
+            break;
 #endif
 #if GPIO_10_EN
         case GPIO_10:
             GPIO_10_DEV->PIO_SODR = GPIO_10_PIN;
+            break;
 #endif
 #if GPIO_11_EN
         case GPIO_11:
             GPIO_11_DEV->PIO_SODR = GPIO_11_PIN;
+            break;
 #endif
 #if GPIO_12_EN
         case GPIO_12:
             GPIO_12_DEV->PIO_SODR = GPIO_12_PIN;
+            break;
 #endif
 #if GPIO_13_EN
         case GPIO_13:
             GPIO_13_DEV->PIO_SODR = GPIO_13_PIN;
+            break;
 #endif
 #if GPIO_14_EN
         case GPIO_14:
             GPIO_14_DEV->PIO_SODR = GPIO_14_PIN;
+            break;
 #endif
 #if GPIO_15_EN
         case GPIO_15:
             GPIO_15_DEV->PIO_SODR = GPIO_15_PIN;
+            break;
 #endif
     }
 }
@@ -671,66 +687,82 @@ void gpio_clear(gpio_t dev)
 #if GPIO_0_EN
         case GPIO_0:
             GPIO_0_DEV->PIO_CODR = GPIO_0_PIN;
+            break;
 #endif
 #if GPIO_1_EN
         case GPIO_1:
             GPIO_1_DEV->PIO_CODR = GPIO_1_PIN;
+            break;
 #endif
 #if GPIO_2_EN
         case GPIO_2:
             GPIO_2_DEV->PIO_CODR = GPIO_2_PIN;
+            break;
 #endif
 #if GPIO_3_EN
         case GPIO_3:
             GPIO_3_DEV->PIO_CODR = GPIO_3_PIN;
+            break;
 #endif
 #if GPIO_4_EN
         case GPIO_4:
             GPIO_4_DEV->PIO_CODR = GPIO_4_PIN;
+            break;
 #endif
 #if GPIO_5_EN
         case GPIO_5:
             GPIO_5_DEV->PIO_CODR = GPIO_5_PIN;
+            break;
 #endif
 #if GPIO_6_EN
         case GPIO_6:
             GPIO_6_DEV->PIO_CODR = GPIO_6_PIN;
+            break;
 #endif
 #if GPIO_7_EN
         case GPIO_7:
             GPIO_7_DEV->PIO_CODR = GPIO_7_PIN;
+            break;
 #endif
 #if GPIO_8_EN
         case GPIO_8:
             GPIO_8_DEV->PIO_CODR = GPIO_8_PIN;
+            break;
 #endif
 #if GPIO_9_EN
         case GPIO_9:
             GPIO_9_DEV->PIO_CODR = GPIO_9_PIN;
+            break;
 #endif
 #if GPIO_10_EN
         case GPIO_10:
             GPIO_10_DEV->PIO_CODR = GPIO_10_PIN;
+            break;
 #endif
 #if GPIO_11_EN
         case GPIO_11:
             GPIO_11_DEV->PIO_CODR = GPIO_11_PIN;
+            break;
 #endif
 #if GPIO_12_EN
         case GPIO_12:
             GPIO_12_DEV->PIO_CODR = GPIO_12_PIN;
+            break;
 #endif
 #if GPIO_13_EN
         case GPIO_13:
             GPIO_13_DEV->PIO_CODR = GPIO_13_PIN;
+            break;
 #endif
 #if GPIO_14_EN
         case GPIO_14:
             GPIO_14_DEV->PIO_CODR = GPIO_14_PIN;
+            break;
 #endif
 #if GPIO_15_EN
         case GPIO_15:
             GPIO_15_DEV->PIO_CODR = GPIO_15_PIN;
+            break;
 #endif
     }
 }
