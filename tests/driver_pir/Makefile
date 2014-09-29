@@ -10,6 +10,10 @@ endif
 ifneq (,$(filter arduino-due,$(BOARD)))
   export PIR_GPIO ?= GPIO_10
 endif
+ifneq (,$(filter native,$(BOARD)))
+  export PIR_GPIO ?= GPIO_0
+  USEMODULE += native_gpio_dummy
+endif
 
 USEMODULE += pir
 USEMODULE += vtimer
