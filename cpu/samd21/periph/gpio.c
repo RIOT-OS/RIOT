@@ -25,6 +25,8 @@
 
 #include "sched.h"
 #include "thread.h"
+#define ENABLE_DEBUG (1)
+#include "debug.h"
 
 /* guard file in case no GPIO devices are defined */
 #if GPIO_NUMOF
