@@ -1,5 +1,5 @@
-/**
- * Send helper functions for clock.-sync. protocols.
+/*
+ * Send helper functions for clock synchronization protocols
  *
  * Copyright (C) 2014  Philipp Rosenkranz, Daniel Jentsch
  *
@@ -10,6 +10,7 @@
 
 /**
  * @{
+ * @breif    Send helper functions for clock synchronization protocols
  * @file     send_helper.h
  * @author   Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
  * @author   Daniel Jentsch <d.jentsch@fu-berlin.de>

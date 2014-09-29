@@ -1,4 +1,4 @@
-/**
+/*
  * Clock-sync protocol evaluation module.
  *
  * Copyright (C) 2014  Philipp Rosenkranz, Daniel Jentsch

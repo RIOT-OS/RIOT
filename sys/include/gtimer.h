@@ -21,9 +21,9 @@
 #ifndef __GTIMER_H
 #define __GTIMER_H
 
-#include <timex.h>
-#include <vtimer.h>
 #include <stdint.h>
+#include "timex.h"
+#include "vtimer.h"
 
 typedef struct gtimer_timeval {
     uint64_t local;

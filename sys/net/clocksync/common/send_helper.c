@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2014  Philipp Rosenkranz, Daniel Jentsch
  *
  * This file is subject to the terms and conditions of the GNU Lesser

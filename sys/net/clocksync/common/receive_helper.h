@@ -1,5 +1,5 @@
-/**
- * Receive helper functions for clock.-sync. protocols.
+/*
+ * Receive helper functions for clock synchronization protocols
  *
  * Copyright (C) 2014  Philipp Rosenkranz, Daniel Jentsch
  *
@@ -10,6 +10,7 @@
 
 /**
  * @{
+ * @brief    Receive helper functions for clock synchronization protocols
  * @file     receive_helper.h
  * @author   Philipp Rosenkranz <philipp.rosenkranz@fu-berlin.de>
  * @author   Daniel Jentsch <d.jentsch@fu-berlin.de>
@@ -20,8 +21,7 @@
 #define __CLOCKSYNC_COMMON_RECEIVE_HELPER_H
 
 /**
- * Calls <protocol>_mac_read function whenever
- * a beacon for <protocol> arrives.
+ * Calls <protocol>_mac_read function whenever a beacon for <protocol> arrives.
  */
 void clocksync_common_init_recv(void);
 

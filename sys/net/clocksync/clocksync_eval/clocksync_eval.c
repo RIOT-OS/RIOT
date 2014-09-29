@@ -41,15 +41,16 @@
 #include "clocksync/pulsesync.h"
 #endif
 #ifdef MODULE_CC110X_NG
-#include "cc110x_ng/cc110x-interface.h" // for radio statistics
+/* for radio statistics */
+#include "cc110x_ng/cc110x-interface.h"
 #endif
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-// Protocol parameters
-#define CLOCKSYNC_EVAL_BEACON_INTERVAL (10 * 1000 * 1000) // default to 10s
-#define CLOCKSYNC_EVAL_HEARTBEAT_INTERVAL (1 * 1000 * 1000) // default to 1s
+/* Protocol parameters */
+#define CLOCKSYNC_EVAL_BEACON_INTERVAL (10 * 1000 * 1000) /* default to 10s */
+#define CLOCKSYNC_EVAL_HEARTBEAT_INTERVAL (1 * 1000 * 1000) /* default to 1s */
 
 
 #define CLOCKSYNC_EVAL_BEACON_STACK_SIZE (KERNEL_CONF_STACKSIZE_PRINTF_FLOAT)
@@ -105,7 +106,7 @@ void clocksync_eval_mac_read(uint8_t *payload, uint16_t src,
                              gtimer_timeval_t *gtimer_toa)
 {
     mutex_lock(&clocksync_eval_mutex);
-    DEBUG("clocksync_eval_mac_read");
+    DEBUG("clocksync_eval_mac_read\n");
     clocksync_eval_beacon_t *beacon = (clocksync_eval_beacon_t *) payload;
     printf("#et, a: %" PRIu16 ",", src);
     printf(" c: %"PRIu32",", beacon->counter);
@@ -220,7 +221,7 @@ static void *cyclic_driver_thread(void *arg)
         vtimer_usleep(beacon_interval);
 
         if (!pause_protocol) {
-            DEBUG("cyclic_driver_thread: waking sender thread up");
+            DEBUG("cyclic_driver_thread: waking sender thread up\n");
             thread_wakeup(beacon_pid);
         }
     }
@@ -230,7 +231,7 @@ static void *cyclic_driver_thread(void *arg)
 
 static void send_beacon(void)
 {
-    puts("send_beacon\n");
+    puts("send_beacon");
     clocksync_eval_beacon_t *clocksync_eval_beacon =
         (clocksync_eval_beacon_t *) clocksync_eval_beacon_buffer;
     memset(clocksync_eval_beacon_buffer, 0, sizeof(clocksync_eval_beacon_t));

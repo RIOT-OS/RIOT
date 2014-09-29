@@ -1,4 +1,4 @@
-/**
+/*
  * The flooding time synchronization protocol
  *
  * Copyright (C) 2014  Philipp Rosenkranz, Daniel Jentsch

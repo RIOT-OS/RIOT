@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2014  Philipp Rosenkranz, Daniel Jentsch
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -65,12 +65,12 @@ static void *recv_ieee802154_frame(void *arg)
             uint8_t dispatch_header = frame.payload[0];
 
             if ((dispatch_header >> 6) & VALID_LOWPAN_DISPATCH_HEADER) {
-                DEBUG("sixlowpan packet received");
+                DEBUG("sixlowpan packet received\n");
             }
 
 #ifdef MODULE_GTSP
             else if (dispatch_header == GTSP_PROTOCOL_DISPATCH) {
-                DEBUG("gtsp packet received");
+                DEBUG("gtsp packet received\n");
                 gtimer_timeval_t gtimer_toa = p->toa;
                 gtsp_mac_read(frame.payload, p->src, &gtimer_toa);
             }
@@ -78,7 +78,7 @@ static void *recv_ieee802154_frame(void *arg)
 #endif
 #ifdef MODULE_FTSP
             else if (dispatch_header == FTSP_PROTOCOL_DISPATCH) {
-                DEBUG("ftsp packet received");
+                DEBUG("ftsp packet received\n");
                 gtimer_timeval_t gtimer_toa = p->toa;
                 ftsp_mac_read(frame.payload, p->src, &gtimer_toa);
             }
@@ -86,7 +86,7 @@ static void *recv_ieee802154_frame(void *arg)
 #endif
 #ifdef MODULE_PULSESYNC
             else if (dispatch_header == PULSESYNC_PROTOCOL_DISPATCH) {
-                DEBUG("pulsesync packet received");
+                DEBUG("pulsesync packet received\n");
                 gtimer_timeval_t gtimer_toa = p->toa;
                 pulsesync_mac_read(frame.payload, p->src, &gtimer_toa);
             }
@@ -94,7 +94,7 @@ static void *recv_ieee802154_frame(void *arg)
 #endif
 #ifdef MODULE_CLOCKSYNC_EVAL
             else if (dispatch_header == CLOCKSYNC_EVAL_PROTOCOL_DISPATCH) {
-                DEBUG("clocksync_eval packet received");
+                DEBUG("clocksync_eval packet received\n");
                 gtimer_timeval_t gtimer_toa = p->toa;
                 clocksync_eval_mac_read(frame.payload, p->src, &gtimer_toa);
             }
@@ -103,10 +103,10 @@ static void *recv_ieee802154_frame(void *arg)
             p->processing--;
         }
         else if (m.type == ENOBUFFER) {
-            DEBUG("Transceiver buffer full");
+            DEBUG("Transceiver buffer full\n");
         }
         else {
-            DEBUG("Unknown packet received");
+            DEBUG("Unknown packet received\n");
         }
     }
 
