@@ -44,6 +44,8 @@
 #ifndef _SAMR21_PORT_COMPONENT_
 #define _SAMR21_PORT_COMPONENT_
 
+/** \addtogroup SAMR21G18A
+/* @{ */
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR PORT */
 /* ========================================================================== */

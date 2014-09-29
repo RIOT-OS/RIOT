@@ -45,8 +45,9 @@
 #define _SAMR21G18A_
 
 /**
- * \ingroup SAMR21_definitions
- * \addtogroup SAMR21G18A_definitions SAMR21G18A definitions
+ * \addtogroup CMSIS_Device */
+/** @{ */
+/** \addtogroup SAMR21G18A
  * This file defines all structures and symbols for SAMR21G18A:
  *   - registers and bitfields
  *   - peripheral base address
@@ -547,6 +548,6 @@ void I2S_Handler                 ( void );
 }
 #endif
 
-/*@}*/
+/*@}@}*/
 
 #endif /* SAMR21G18A_H */

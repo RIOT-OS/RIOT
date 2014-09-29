@@ -44,6 +44,8 @@
 #ifndef _SAMR21_GCLK_COMPONENT_
 #define _SAMR21_GCLK_COMPONENT_
 
+/** \addtogroup SAMR21G18A
+/* @{ */
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR GCLK */
 /* ========================================================================== */

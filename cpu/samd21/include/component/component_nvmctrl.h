@@ -44,6 +44,8 @@
 #ifndef _SAMR21_NVMCTRL_COMPONENT_
 #define _SAMR21_NVMCTRL_COMPONENT_
 
+/** \addtogroup SAMR21G18A
+/* @{ */
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR NVMCTRL */
 /* ========================================================================== */
@@ -362,7 +364,7 @@ typedef struct {
 /* ************************************************************************** */
 /**  SOFTWARE PERIPHERAL API DEFINITION FOR NON-VOLATILE FUSES */
 /* ************************************************************************** */
-/** \addtogroup fuses_api Peripheral Software API */
+/* \addtogroup fuses_api Peripheral Software API */
 /*@{*/
 
 
