@@ -107,3 +107,7 @@ endif
 ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
 	USEPKG += libfixmath
 endif
+
+ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
+	FEATURES_REQUIRED += transceiver
+endif

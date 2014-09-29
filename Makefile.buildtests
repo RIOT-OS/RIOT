@@ -27,12 +27,9 @@ ifneq (, $(filter buildtest info-concurrency, $(MAKECMDGOALS)))
   endif
 endif
 
-BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name *-common -printf '%f ')
-BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
-BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
-
 .PHONY: buildtest info-objsize info-buildsize info-buildsizes \
-        info-buildsizes-diff info-build info-boards-supported
+        info-buildsizes-diff info-build info-boards-supported \
+        info-features-missing info-boards-features-missing
 
 
 COLOR_GREEN  :=
@@ -54,7 +51,7 @@ buildtest:
 	@ \
 	BUILDTESTOK=true; \
 	rm -rf "$$BINDIRBASE"; \
-	for BOARD in $(BOARDS); do \
+	for BOARD in $$($(MAKE) -s info-boards-supported); do \
 		RIOTNOLINK=$$(case ' $(BOARD_INSUFFICIENT_RAM) ' in *" $${BOARD} "*) echo 1; esac); \
 		${COLOR_ECHO} -n "Building for $${BOARD} "; \
 		[ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
@@ -107,7 +104,7 @@ info-buildsize:
 info-buildsizes: SHELL=bash
 info-buildsizes:
 	echo -e "   text\t   data\t    bss\t    dec\tboard"; \
-	for BOARD in $(BOARDS); do \
+	for BOARD in $$($(MAKE) -s info-boards-supported); do \
 		echo "$$(env -i \
 			HOME=$${HOME} \
 			PATH=$${PATH} \
@@ -122,7 +119,7 @@ info-buildsizes:
 info-buildsizes-diff: SHELL=bash
 info-buildsizes-diff:
 	echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
-	for BOARD in $(BOARDS); do \
+	for BOARD in $$($(MAKE) -s info-boards-supported); do \
 		for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
 			env -i \
 				HOME=$${HOME} \
@@ -172,6 +169,9 @@ info-build:
 	@echo 'ELFFILE: $(ELFFILE)'
 	@echo 'HEXFILE: $(HEXFILE)'
 	@echo ''
+	@echo 'FEATURES_REQUIRED: $(sort $(FEATURES_REQUIRED))'
+	@echo 'FEATURES_PROVIDED: $(sort $(FEATURES_PROVIDED))'
+	@echo ''
 	@echo 'CC:      $(CC)'
 	@echo -e 'CFLAGS:$(patsubst %, \n\t%, $(CFLAGS))'
 	@echo ''
@@ -207,7 +207,39 @@ info-build:
 	@echo -e 'MAKEFILE_LIST:$(patsubst %, \n\t%, $(abspath $(MAKEFILE_LIST)))'
 
 info-boards-supported:
-	@echo "$(BOARDS)"
+	@echo $(BOARDS)
+
+info-features-missing:
+	@echo $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))
+
+info-boards-features-missing:
+	@for f in $(BOARDS_FEATURES_MISSING); do echo $${f}; done | column -t
+
+ifneq (, $(filter info-boards-supported info-boards-features-missing info-build, $(MAKECMDGOALS)))
+  FEATURES_PROVIDED_BAK := $(FEATURES_PROVIDED)
+
+  define board_missing_features
+    FEATURES_PROVIDED :=
+    -include $${RIOTBOARD}/${1}/Makefile.features
+
+    FEATURES_MISSING := $$(filter-out $$(FEATURES_PROVIDED), $$(FEATURES_REQUIRED))
+    ifneq (, $${FEATURES_MISSING})
+      BOARDS_WITH_MISSING_FEATURES += ${1}
+      BOARDS_FEATURES_MISSING += "${1} $${FEATURES_MISSING}"
+    endif
+  endef
+
+  BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name *-common -printf '%f ')
+  BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
+  BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
+
+  BOARDS_WITH_MISSING_FEATURES :=
+  BOARDS_FEATURES_MISSING :=
+  $(foreach BOARD, $(BOARDS), $(eval $(call board_missing_features,$(BOARD))))
+  BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES), $(BOARDS))
+
+  FEATURES_PROVIDED := $(FEATURES_PROVIDED_BAK)
+endif
 
 info-concurrency:
 	@echo "$(NPROC)"

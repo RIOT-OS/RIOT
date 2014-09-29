@@ -11,18 +11,6 @@ RIOTCPU := $(abspath $(RIOTCPU))
 RIOTBOARD ?= $(RIOTBASE)/boards
 RIOTBOARD := $(abspath $(RIOTBOARD))
 
-ifeq (,$(filter buildtest,$(MAKECMDGOALS)))
-	ifneq (,$(BOARD_WHITELIST))
-		ifeq (,$(filter $(BOARD),$(BOARD_WHITELIST)))
-$(error This application only runs on following boards: $(BOARD_WHITELIST))
-		endif
-	endif
-
-	ifneq (,$(filter $(BOARD),$(BOARD_BLACKLIST)))
-$(error This application does not run on following boards: $(BOARD_BLACKLIST))
-	endif
-endif
-
 BINDIRBASE ?= $(CURDIR)/bin
 BINDIR ?= $(abspath $(BINDIRBASE)/$(BOARD))/
 
@@ -89,6 +77,9 @@ ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
 endif
 
+# import list of provided features
+-include $(RIOTBOARD)/$(BOARD)/Makefile.features
+
 # if you want to publish the board into the sources as an uppercase #define
 BOARDDEF := $(shell echo $(BOARD) | tr 'a-z' 'A-Z' | tr '-' '_')
 CPUDEF := $(shell echo $(CPU) | tr 'a-z' 'A-Z' | tr '-' '_')
@@ -100,11 +91,6 @@ CFLAGS += -DMCU_$(MCUDEF)='"$(MCU)"' -DRIOT_MCU=MCU_$(MCUDEF)
 # OSX fails to create empty archives. Provide a wrapper to catch that error.
 ifneq (0, $(shell mkdir -p $(BINDIR); $(AR) -rc $(BINDIR)empty-archive.a 2> /dev/null; echo $$?))
 	AR := $(RIOTBASE)/dist/ar-wrapper $(AR)
-endif
-
-# Test if there where dependencies against a module in DISABLE_MODULE.
-ifneq (, $(filter $(DISABLE_MODULE), $(USEMODULE)))
-$(error "Required modules were disabled using DISABLE_MODULE: $(sort $(filter $(DISABLE_MODULE), $(USEMODULE)))")
 endif
 
 # Feature test default CFLAGS and LINKFLAGS for the set compiled.
@@ -217,3 +203,41 @@ include $(RIOTBASE)/Makefile.buildtests
 
 # Export variables used throughout the whole make system:
 include $(RIOTBASE)/Makefile.vars
+
+ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
+  EXPECT_ERRORS :=
+
+  # Test if there where dependencies against a module in DISABLE_MODULE.
+  ifneq (, $(filter $(DISABLE_MODULE), $(USEMODULE)))
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)Required modules were disabled using DISABLE_MODULE:$(COLOR_RESET)"\
+                          "$(sort $(filter $(DISABLE_MODULE), $(USEMODULE)))" 1>&2)
+    EXPECT_ERRORS := 1
+  endif
+
+  # Test if all feature requirements were met by the selected board.
+  ifneq (, $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED)))
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)There are unsatisfied feature requirements:$(COLOR_RESET)"\
+                          "$(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))" 1>&2)
+    EXPECT_ERRORS := 1
+  endif
+
+  # If there is a whitelist, then test if the board is whitelisted.
+  ifneq (, $(BOARD_WHITELIST))
+    ifeq (, $(filter $(BOARD_WHITELIST), $(BOARD)))
+      $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected BOARD=${BOARD} is not whitelisted:$(COLOR_RESET) ${BOARD_WHITELIST}" 1>&2)
+      EXPECT_ERRORS := 1
+    endif
+  endif
+
+  # If there is a blacklist, then test if the board is blacklisted.
+  ifneq (, $(BOARD_BLACKLIST))
+    ifneq (, $(filter $(BOARD_BLACKLIST), $(BOARD)))
+      $(shell $(COLOR_ECHO) "$(COLOR_RED)The selected BOARD=${BOARD} is blacklisted:$(COLOR_RESET) ${BOARD_BLACKLIST}" 1>&2)
+      EXPECT_ERRORS := 1
+    endif
+  endif
+
+  ifneq (, $(EXPECT_ERRORS))
+    $(shell $(COLOR_ECHO) "\n\n$(COLOR_RED)EXPECT ERRORS!$(COLOR_RESET)\n\n" 1>&2)
+  endif
+endif
