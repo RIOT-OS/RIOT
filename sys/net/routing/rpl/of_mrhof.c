@@ -20,6 +20,9 @@
 
 #include "etx_beaconing.h"
 
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
 // Function Prototypes
 static uint16_t calc_rank(rpl_parent_t *, uint16_t);
 static rpl_parent_t *which_parent(rpl_parent_t *, rpl_parent_t *);
@@ -53,7 +56,7 @@ void reset(rpl_dodag_t *dodag)
 
 static uint16_t calc_path_cost(rpl_parent_t *parent)
 {
-    puts("calc_pathcost");
+    DEBUGF("calc_pathcost\n");
 
     /*
      * Calculates the path cost through the parent, for now, only for ETX
@@ -61,12 +64,12 @@ static uint16_t calc_path_cost(rpl_parent_t *parent)
     if (parent == NULL) {
         // Shouldn't ever happen since this function is supposed to be always
         // run with a parent. If it does happen, we can assume a root called it.
-        puts("[WARNING] calc_path_cost called without parent!");
+        DEBUGF("[WARNING] calc_path_cost called without parent!\n");
         return DEFAULT_MIN_HOP_RANK_INCREASE;
     }
 
     double etx_value = etx_get_metric(&(parent->addr));
-    printf("Metric for parent returned: %f", etx_value);
+    DEBUGF("Metric for parent returned: %f\n", etx_value);
 
     if (etx_value != 0) {
         /*
@@ -103,7 +106,7 @@ static uint16_t calc_path_cost(rpl_parent_t *parent)
 
 static uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
 {
-    puts("calc_rank");
+    DEBUGF("calc_rank\n");
 
     /*
      * Return the rank for this node.
@@ -152,7 +155,7 @@ static uint16_t calc_rank(rpl_parent_t *parent, uint16_t base_rank)
 
 static rpl_parent_t *which_parent(rpl_parent_t *p1, rpl_parent_t *p2)
 {
-    puts("which_parent");
+    DEBUGF("which_parent\n");
     /*
      * Return the parent with the lowest path cost.
      * Before returning any of the two given parents, make sure that a switch is
