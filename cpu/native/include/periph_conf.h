@@ -34,7 +34,7 @@
 #define RTC_NUMOF (1)
 /** @} */
 
-#ifdef MODULE_NATIVE_GPIO_DUMMY
+#ifdef MODULE_NATIVE_GPIO_DUMMY         /* virtual */
 #define GPIO_0_EN   (1)
 #define GPIO_1_EN   (1)
 #define GPIO_2_EN   (1)
@@ -53,26 +53,68 @@
 #define GPIO_15_EN  (1)
 #define GPIO_NUMOF (16)
 
-#elif defined MODULE_NATIVE_GPIO_SYSFS
-#define GPIO_0_EN   (1)
-#define GPIO_1_EN   (1)
-#define GPIO_2_EN   (1)
-#define GPIO_3_EN   (1)
-#define GPIO_4_EN   (1)
-#define GPIO_5_EN   (1)
-#define GPIO_6_EN   (1)
-#define GPIO_7_EN   (1)
-#define GPIO_8_EN   (1)
-#define GPIO_9_EN   (1)
-#define GPIO_10_EN  (1)
-#define GPIO_11_EN  (1)
-#define GPIO_12_EN  (1)
-#define GPIO_13_EN  (1)
-#define GPIO_14_EN  (1)
-#define GPIO_15_EN  (1)
-#define GPIO_NUMOF (16)
+#elif defined MODULE_NATIVE_GPIO_SYSFS  /* sysfs */
 
-#else /* no GPIO device */
+#ifdef NATIVE_GPIO_NUMOF
+#   if NATIVE_GPIO_NUMOF > 16
+#       define GPIO_NUMOF 16
+#   else
+#       define GPIO_NUMOF NATIVE_GPIO_NUMOF
+#   endif
+#else
+#    define GPIO_NUMOF 0
+#endif
+
+#if GPIO_NUMOF > 0
+#   define GPIO_0_EN    (1)
+#endif
+#if GPIO_NUMOF > 1
+#   define GPIO_1_EN    (1)
+#endif
+#if GPIO_NUMOF > 2
+#   define GPIO_2_EN    (1)
+#endif
+#if GPIO_NUMOF > 3
+#   define GPIO_3_EN    (1)
+#endif
+#if GPIO_NUMOF > 4
+#   define GPIO_4_EN    (1)
+#endif
+#if GPIO_NUMOF > 5
+#   define GPIO_5_EN    (1)
+#endif
+#if GPIO_NUMOF > 6
+#   define GPIO_6_EN    (1)
+#endif
+#if GPIO_NUMOF > 7
+#   define GPIO_7_EN    (1)
+#endif
+#if GPIO_NUMOF > 8
+#   define GPIO_8_EN    (1)
+#endif
+#if GPIO_NUMOF > 9
+#   define GPIO_9_EN    (1)
+#endif
+#if GPIO_NUMOF > 10
+#   define GPIO_10_EN   (1)
+#endif
+#if GPIO_NUMOF > 11
+#   define GPIO_11_EN   (1)
+#endif
+#if GPIO_NUMOF > 12
+#   define GPIO_12_EN   (1)
+#endif
+#if GPIO_NUMOF > 13
+#   define GPIO_13_EN   (1)
+#endif
+#if GPIO_NUMOF > 14
+#   define GPIO_14_EN   (1)
+#endif
+#if GPIO_NUMOF > 15
+#   define GPIO_15_EN   (1)
+#endif
+
+#else                                   /* no GPIO device */
 #define GPIO_NUMOF (0)
 #endif
 
