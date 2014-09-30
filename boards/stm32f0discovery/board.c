@@ -23,6 +23,8 @@
 
 
 static void leds_init(void);
+static void hse_init(void);
+
 
 void board_init(void)
 {
@@ -31,6 +33,9 @@ void board_init(void)
 
     /* initialize the CPU */
     cpu_init();
+
+    /* initialize the HSE clock */
+    hse_init();
 }
 
 /**
@@ -60,4 +65,59 @@ void leds_init(void)
 
     /* turn all LEDs off */
     LED_PORT->BRR = 0x0300;
+}
+
+/*
+ * @brief Configure the controllers HSE clock
+ *
+ * The clock initialization make the following assumptions:
+ * - the external HSE clock from an external oscillator is used as base clock
+ * - the internal PLL circuit is used for clock refinement
+ *
+ * Use the following formulas to calculate the needed values:
+ *
+ * SYSCLK = ((HSE_VALUE / CLOCK_PLL_M) * CLOCK_PLL_N) / CLOCK_PLL_P
+ * USB, SDIO and RNG Clock =  ((HSE_VALUE / CLOCK_PLL_M) * CLOCK_PLL_N) / CLOCK_PLL_Q
+ *
+ * The actual used values are specified in the board's `periph_conf.h` file.
+ *
+ * NOTE: currently there is not timeout for initialization of PLL and other locks
+ *       -> when wrong values are chosen, the initialization could stall
+ */
+static void hse_init(void)
+{
+    /* configure the HSE clock */
+
+    /* enable the HSE clock */
+    RCC->CR |= RCC_CR_HSEON;
+
+    /* wait for HSE to be ready */
+    while (!(RCC->CR & RCC_CR_HSERDY));
+
+
+    /* configure the PLL */
+
+    /* reset PLL configuration bits */
+    RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMUL);
+    /* set PLL configuration */
+    RCC->CFGR |= RCC_CFGR_PLLSRC_HSE_PREDIV | RCC_CFGR_PLLXTPRE_HSE_PREDIV_DIV1 |
+                 (((CLOCK_PLL_MUL - 2) & 0xf) << 18);
+
+    /* enable PLL again */
+    RCC->CR |= RCC_CR_PLLON;
+
+    /* wait until PLL is stable */
+    while(!(RCC->CR & RCC_CR_PLLRDY));
+
+
+    /* configure the sysclock and the peripheral clocks */
+
+    /* set sysclock to be driven by the PLL clock */
+    RCC->CFGR &= ~RCC_CFGR_SW;
+    RCC->CFGR |= RCC_CFGR_SW_PLL;
+
+
+    /* wait for sysclock to be stable */
+    while (!(RCC->CFGR & RCC_CFGR_SWS_PLL));
+
 }
