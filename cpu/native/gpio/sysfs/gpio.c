@@ -190,9 +190,11 @@ static int sysfs_gpio_conf(gpio_t dev, _native_gpio_conf_t conf)
         return -1;
     }
  
-    int fd = open(gpio_path_name, O_WRONLY);
+    _native_syscall_enter();
+    int fd = real_open(gpio_path_name, O_WRONLY);
     if (fd < 0) {
         warn("sysfs_gpio_conf(%i)", dev);
+        _native_syscall_leave();
         return -1;
     }
  
@@ -215,7 +217,8 @@ static int sysfs_gpio_conf(gpio_t dev, _native_gpio_conf_t conf)
             ret = -1;
             break;
     }
-    close(fd);
+    real_close(fd);
+    _native_syscall_leave();
     return ret;
 }
 
@@ -229,14 +232,16 @@ static int sysfs_gpio_read(gpio_t dev)
         return -1;
     }
  
-    int fd = open(gpio_path_name, O_WRONLY);
+    _native_syscall_enter();
+    int fd = real_open(gpio_path_name, O_WRONLY);
     if (fd < 0) {
         warn("sysfs_gpio_read(%i)", dev);
+        _native_syscall_leave();
         return -1;
     }
  
     char val;
-    int ret = read(fd, &val, 1);
+    int ret = _native_read(fd, &val, 1);
     if (ret == -1) {
         warn("sysfs_gpio_read(%i)", dev);
     }
@@ -254,8 +259,9 @@ static int sysfs_gpio_read(gpio_t dev)
         }
     }
  
-    if (close(fd) == -1) {
+    if (real_close(fd) == -1) {
         warn("sysfs_gpio_read");
     }
+    _native_syscall_leave();
     return ret;
 }
