@@ -1,5 +1,5 @@
 /**
- * Native dummy GPIO interface
+ * Native virtual GPIO interface
  *
  * Copyright (C) 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  *

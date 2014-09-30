@@ -34,7 +34,7 @@
 #define RTC_NUMOF (1)
 /** @} */
 
-#ifdef MODULE_NATIVE_GPIO_DUMMY         /* virtual */
+#ifdef MODULE_NATIVE_GPIO_VIRTUAL       /* virtual */
 #define GPIO_0_EN   (1)
 #define GPIO_1_EN   (1)
 #define GPIO_2_EN   (1)

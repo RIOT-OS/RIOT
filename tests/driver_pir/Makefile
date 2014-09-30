@@ -12,7 +12,7 @@ ifneq (,$(filter arduino-due,$(BOARD)))
 endif
 ifneq (,$(filter native,$(BOARD)))
   export PIR_GPIO ?= GPIO_0
-  USEMODULE += native_gpio_dummy
+  USEMODULE += native_gpio_virtual
 endif
 
 USEMODULE += pir
