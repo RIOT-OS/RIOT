@@ -18,19 +18,13 @@
  * @}
  */
 
-#include "cmsis_system.h"
 #include "board.h"
 #include "cpu.h"
 
-
 static void leds_init(void);
-
 
 void board_init(void)
 {
-    /* initialize core clocks via CMSIS function provided by ST */
-    SystemInit();
-
     /* initialize the CPU */
     cpu_init();
 

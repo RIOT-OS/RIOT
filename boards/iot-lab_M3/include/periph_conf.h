@@ -19,6 +19,24 @@
 #define __PERIPH_CONF_H
 
 /**
+ * @name Clock system configuration
+ * @{
+ **/
+#define CLOCK_HSE           (16000000U)             /* frequency of external oscillator */
+#define CLOCK_CORECLOCK     (72000000U)             /* targeted core clock frequency */
+/* configuration of PLL prescaler and multiply values */
+/* CORECLOCK := HSE / PLL_HSE_DIV * PLL_HSE_MUL */
+#define CLOCK_PLL_HSE_DIV   RCC_CFGR_PLLXTPRE_HSE_Div2
+#define CLOCK_PLL_HSE_MUL   RCC_CFGR_PLLMULL9
+/* configuration of peripheral bus clock prescalers */
+#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1      /* AHB clock -> 72MHz */
+#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1     /* APB2 clock -> 72MHz */
+#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV2     /* APB1 clock -> 36MHz */
+/* configuration of flash access cycles */
+#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY_2
+/** @} */
+
+/**
  * @brief Timer configuration
  * @{
  */
