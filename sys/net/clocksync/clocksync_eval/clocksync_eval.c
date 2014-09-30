@@ -66,7 +66,7 @@ static void send_beacon(void);
 static uint16_t get_transceiver_addr(void);
 
 static uint32_t beacon_counter = 0;
-static int beacon_pid = 0;
+static int beacon_pid = KERNEL_PID_UNDEF;
 static uint32_t beacon_interval = CLOCKSYNC_EVAL_BEACON_INTERVAL;
 static uint32_t heartbeat_interval = CLOCKSYNC_EVAL_HEARTBEAT_INTERVAL;
 static uint32_t beacon_interval_jitter = 5000;

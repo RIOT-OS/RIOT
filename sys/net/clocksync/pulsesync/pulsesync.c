@@ -88,8 +88,8 @@ static void add_new_entry(pulsesync_beacon_t *beacon, gtimer_timeval_t *toa);
 static void remove_last_entry(void);
 static uint16_t get_transceiver_addr(void);
 
-static int beacon_pid = 0;
-static int cyclic_driver_pid = 0;
+static int beacon_pid = KERNEL_PID_UNDEF;
+static int cyclic_driver_pid = KERNEL_PID_UNDEF;
 
 /* protocol state variables */
 static uint32_t beacon_interval = PULSESYNC_BEACON_INTERVAL;

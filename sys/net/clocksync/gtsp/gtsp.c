@@ -76,7 +76,7 @@ static gtsp_sync_point_t *neighbor_add(uint16_t addr,
 static gtsp_sync_point_t *neighbor_get(uint16_t addr);
 
 static int beacon_pid = KERNEL_PID_UNDEF;
-static int cyclic_driver_pid = 0;
+static int cyclic_driver_pid = KERNEL_PID_UNDEF;
 static uint32_t beacon_interval = GTSP_BEACON_INTERVAL;
 static uint32_t transmission_delay = GTSP_CALIBRATION_OFFSET;
 static bool pause_protocol = true;
