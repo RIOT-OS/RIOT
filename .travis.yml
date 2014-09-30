@@ -23,7 +23,7 @@ install:
         sudo apt-get install \
             build-essential \
             gcc-multilib \
-            gcc-arm-none-eabi=4-* \
+            gcc-arm-none-eabi \
             gcc-msp430 \
             pcregrep \
             libpcre3 \
