@@ -27,11 +27,12 @@
 #include <stdint.h>
 
 #include "cpu.h"
+#include "periph_conf.h"
 
 /**
  * Define the nominal CPU core clock in this board
  */
-#define F_CPU               (72000000UL)
+#define F_CPU               CLOCK_CORECLOCK
 
 /**
  * @name Define the UART to be used as stdio and its baudrate
