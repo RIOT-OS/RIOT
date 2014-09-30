@@ -24,9 +24,7 @@ typedef enum {
     _NATIVE_GPIO_CONF_NONE,
     _NATIVE_GPIO_CONF_IN,
     _NATIVE_GPIO_CONF_OUT,
-    _NATIVE_GPIO_CONF_BOTH,
     _NATIVE_GPIO_CONF_INT,
-    _NATIVE_GPIO_CONF_INT_OUT,
 } _native_gpio_conf_t;
 
 typedef struct {
@@ -44,28 +42,14 @@ _native_gpio_state_t gpio_device_state[GPIO_NUMOF];
 int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
 {
     gpio_device_state[dev].pp = pullup;
-    switch (gpio_device_state[dev].conf) {
-        case _NATIVE_GPIO_CONF_IN:
-            gpio_device_state[dev].conf = _NATIVE_GPIO_CONF_BOTH;
-            break;
-        default:
-            gpio_device_state[dev].conf = _NATIVE_GPIO_CONF_OUT;
-            break;
-    }
+    gpio_device_state[dev].conf = _NATIVE_GPIO_CONF_OUT;
     return 0;
 }
 
 int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
 {
     gpio_device_state[dev].pp = pullup;
-    switch (gpio_device_state[dev].conf) {
-        case _NATIVE_GPIO_CONF_OUT:
-            gpio_device_state[dev].conf = _NATIVE_GPIO_CONF_BOTH;
-            break;
-        default:
-            gpio_device_state[dev].conf = _NATIVE_GPIO_CONF_IN;
-            break;
-    }
+    gpio_device_state[dev].conf = _NATIVE_GPIO_CONF_IN;
     return 0;
 }
 
@@ -75,14 +59,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     gpio_device_state[dev].flank = flank;
     gpio_device_state[dev].cb = cb;
     gpio_device_state[dev].cb_arg = arg;
-    switch (gpio_device_state[dev].conf) {
-        case _NATIVE_GPIO_CONF_OUT:
-            gpio_device_state[dev].conf = _NATIVE_GPIO_CONF_INT_OUT;
-            break;
-        default:
-            gpio_device_state[dev].conf = _NATIVE_GPIO_CONF_INT;
-            break;
-    };
+    gpio_device_state[dev].conf = _NATIVE_GPIO_CONF_INT;
     gpio_irq_enable(dev);
     return 0;
 }
