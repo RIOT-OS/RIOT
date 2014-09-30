@@ -75,7 +75,7 @@ static gtsp_sync_point_t *neighbor_add(uint16_t addr,
                                        gtsp_sync_point_t *sync_point);
 static gtsp_sync_point_t *neighbor_get(uint16_t addr);
 
-static int beacon_pid = 0;
+static int beacon_pid = KERNEL_PID_UNDEF;
 static int cyclic_driver_pid = 0;
 static uint32_t beacon_interval = GTSP_BEACON_INTERVAL;
 static uint32_t transmission_delay = GTSP_CALIBRATION_OFFSET;
@@ -101,11 +101,8 @@ void gtsp_init(void)
 {
     mutex_init(&gtsp_mutex);
 
-    gtsp_sync_point_t *beacon;
-
     for (int i = 0; i < GTSP_MAX_NEIGHBORS; i++) {
-        beacon = &gtsp_neighbor_table[i];
-        beacon->src = 0;
+        gtsp_neighbor_table[i].src = 0;
     }
 
     beacon_pid = thread_create(gtsp_beacon_stack, GTSP_BEACON_STACK_SIZE,
@@ -182,10 +179,8 @@ static float compute_rate(void)
     int offset_count = 0;
     int neighbor_count = 0;
 
-    gtsp_sync_point_t *beacon;
-
     for (uint32_t i = 0; i < GTSP_MAX_NEIGHBORS; i++) {
-        beacon = (gtsp_sync_point_t *) &gtsp_neighbor_table[i];
+        gtsp_sync_point_t *beacon = (gtsp_sync_point_t *) &gtsp_neighbor_table[i];
 
         if (beacon->src == 0) {
             continue;
@@ -376,10 +371,8 @@ static gtsp_sync_point_t *neighbor_add(uint16_t addr,
 
 static gtsp_sync_point_t *neighbor_get(uint16_t addr)
 {
-    gtsp_sync_point_t *sync_point;
-
     for (int i = 0; i < GTSP_MAX_NEIGHBORS; i++) {
-        sync_point = &gtsp_neighbor_table[i];
+        gtsp_sync_point_t *sync_point = &gtsp_neighbor_table[i];
 
         if (sync_point->src == addr) {
             return sync_point;
