@@ -351,7 +351,7 @@ void pulsesync_resume(void)
     genrand_init((uint32_t) node_id);
     pause_protocol = false;
 
-    if (beacon_pid == 0) {
+    if (beacon_pid == KERNEL_PID_UNDEF) {
         if (node_id == PULSESYNC_PREFERRED_ROOT) {
             beacon_pid = thread_create(pulsesync_beacon_stack,
                                        PULSESYNC_BEACON_STACK_SIZE,
@@ -366,7 +366,7 @@ void pulsesync_resume(void)
         }
     }
 
-    if (cyclic_driver_pid == 0 && node_id == PULSESYNC_PREFERRED_ROOT) {
+    if (cyclic_driver_pid == KERNEL_PID_UNDEF && node_id == PULSESYNC_PREFERRED_ROOT) {
         cyclic_driver_pid = thread_create(pulsesync_cyclic_stack,
                                           PULSESYNC_CYCLIC_STACK_SIZE,
                                           PRIORITY_MAIN - 2,

@@ -324,7 +324,7 @@ void gtsp_resume(void)
 {
     pause_protocol = false;
 
-    if (cyclic_driver_pid == 0) {
+    if (cyclic_driver_pid == KERNEL_PID_UNDEF) {
         cyclic_driver_pid = thread_create(gtsp_cyclic_stack,
                                           GTSP_CYCLIC_STACK_SIZE,
                                           PRIORITY_MAIN - 2,
