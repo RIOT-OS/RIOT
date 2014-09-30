@@ -54,6 +54,7 @@ typedef struct {
  */
 static int sysfs_gpio_conf(gpio_t dev, _native_gpio_conf_t conf);
 static int sysfs_gpio_read(gpio_t dev);
+static int sysfs_gpio_write(gpio_t dev, int value);
 
 _native_gpio_state_t gpio_device_state[GPIO_NUMOF];
 
@@ -108,11 +109,13 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 
 void gpio_irq_enable(gpio_t dev)
 {
+    /* TODO: implement */
     gpio_device_state[dev].int_enabled = 1;
 }
 
 void gpio_irq_disable(gpio_t dev)
 {
+    /* TODO: implement */
     gpio_device_state[dev].int_enabled = 0;
 }
 
@@ -121,25 +124,46 @@ int gpio_read(gpio_t dev)
     int ret = sysfs_gpio_read(dev);
     if (ret == -1) {
         warnx("gpio_read(%i): error reading", dev);
+        return -1;
     }
+
     gpio_device_state[dev].pin_state = ret;
+
     return gpio_device_state[dev].pin_state;
 }
 
 void gpio_set(gpio_t dev)
 {
+    int ret = sysfs_gpio_write(dev, 1);
+    if (ret == -1) {
+        warnx("gpio_set(%i): error writing", dev);
+        return;
+    }
+
     printf("Native GPIO device %i is now HIGH\n", dev);
     gpio_device_state[dev].pin_state = 1;
 }
 
 void gpio_clear(gpio_t dev)
 {
+    int ret = sysfs_gpio_write(dev, 0);
+    if (ret == -1) {
+        warnx("gpio_clear(%i): error writing", dev);
+        return;
+    }
+
     printf("Native GPIO device %i is now LOW\n", dev);
     gpio_device_state[dev].pin_state = 0;
 }
 
 void gpio_toggle(gpio_t dev)
 {
+    int ret = sysfs_gpio_write(dev, !gpio_device_state[dev].pin_state);
+    if (ret == -1) {
+        warnx("gpio_toggle(%i): error writing", dev);
+        return;
+    }
+
     gpio_device_state[dev].pin_state = !gpio_device_state[dev].pin_state;
     printf("Native GPIO device %i is now %s\n", dev,
             (gpio_device_state[dev].pin_state == 0) ? "LOW" : "HIGH");
@@ -147,6 +171,12 @@ void gpio_toggle(gpio_t dev)
 
 void gpio_write(gpio_t dev, int value)
 {
+    int ret = sysfs_gpio_write(dev, value);
+    if (ret == -1) {
+        warnx("gpio_write(%i): error writing", dev);
+        return;
+    }
+
     gpio_device_state[dev].pin_state = (value == 0) ? 0 : 1;
     printf("Native GPIO device %i is now %s\n", dev,
             (gpio_device_state[dev].pin_state == 0) ? "LOW" : "HIGH");
@@ -210,7 +240,7 @@ static int sysfs_gpio_read(gpio_t dev)
     }
  
     _native_syscall_enter();
-    int fd = real_open(gpio_path_name, O_WRONLY);
+    int fd = real_open(gpio_path_name, O_RDONLY);
     if (fd < 0) {
         warn("sysfs_gpio_read(%i)", dev);
         _native_syscall_leave();
@@ -218,7 +248,7 @@ static int sysfs_gpio_read(gpio_t dev)
     }
  
     char val;
-    int ret = _native_read(fd, &val, 1);
+    int ret = real_read(fd, &val, 1);
     if (ret == -1) {
         warn("sysfs_gpio_read(%i)", dev);
     }
@@ -239,6 +269,49 @@ static int sysfs_gpio_read(gpio_t dev)
     if (real_close(fd) == -1) {
         warn("sysfs_gpio_read");
     }
+
     _native_syscall_leave();
+
+    return ret;
+}
+
+static int sysfs_gpio_write(gpio_t dev, int value)
+{
+    char gpio_path_name[255];
+
+    int len = snprintf(gpio_path_name, sizeof(gpio_path_name), GPIO_SYSFS_PATH  "/gpio%hi/value", dev);
+    if (len < 0) {
+        warnx("sysfs_gpio_write(%i): snprintf: fail", dev);
+        return -1;
+    }
+
+    _native_syscall_enter();
+    int fd = real_open(gpio_path_name, O_WRONLY);
+    if (fd < 0) {
+        warn("sysfs_gpio_write(%i)", dev);
+        _native_syscall_leave();
+        return -1;
+    }
+
+    int ret = real_write(fd, (value == 0) ? "0" : "1", 2);
+    switch (ret) {
+        case -1:
+            warn("sysfs_gpio_write(%i)", dev);
+            break;
+        case 2:
+            ret = 0;
+            break;
+        default:
+            warnx("sysfs_gpio_write(%i): short write", dev);
+            ret = -1;
+            break;
+    }
+
+    if (real_close(fd) == -1) {
+        warn("sysfs_gpio_write");
+    }
+
+    _native_syscall_leave();
+
     return ret;
 }
