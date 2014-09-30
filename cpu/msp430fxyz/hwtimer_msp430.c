@@ -32,16 +32,14 @@ extern void timer_unset(short timer);
 
 void timerA_init(void)
 {
-    volatile unsigned int *ccr;
-    volatile unsigned int *ctl;
 
     TACTL = TASSEL_1 + TACLR;                /* Clear the timer counter, set ACLK */
     TACTL &= ~TAIFG;                         /* Clear the IFG */
     TACTL &= ~TAIE;                          /* Disable TAIE (overflow IRQ) */
 
     for (int i = 0; i < HWTIMER_MAXTIMERS; i++) {
-        ccr = &TACCR0 + (i);
-        ctl = &TACCTL0 + (i);
+        volatile unsigned int *ccr = &TACCR0 + (i);
+        volatile unsigned int *ctl = &TACCTL0 + (i);
         *ccr = 0;
         *ctl &= ~(CCIFG);
         *ctl &= ~(CCIE);
