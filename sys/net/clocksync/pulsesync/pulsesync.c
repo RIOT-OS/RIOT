@@ -74,6 +74,7 @@
 #define PULSESYNC_BEACON_STACK_SIZE (KERNEL_CONF_STACKSIZE_PRINTF_FLOAT)
 #define PULSESYNC_CYCLIC_STACK_SIZE (KERNEL_CONF_STACKSIZE_PRINTF_FLOAT)
 #define PULSESYNC_BEACON_BUFFER_SIZE (64)
+#define PULSESYNC_UNKNOWN_NODE UINT16_MAX
 
 /* threads */
 static void *root_beacon_thread(void *arg);
@@ -95,7 +96,7 @@ static int cyclic_driver_pid = KERNEL_PID_UNDEF;
 static uint32_t beacon_interval = PULSESYNC_BEACON_INTERVAL;
 static uint32_t transmission_delay = PULSESYNC_CALIBRATION_OFFSET;
 static bool pause_protocol = true;
-static uint16_t root_id = UINT16_MAX;
+static uint16_t root_id = PULSESYNC_UNKNOWN_NODE;
 static uint16_t node_id = 0, seq_num;
 static uint8_t table_entries, heart_beats, num_errors;
 static int64_t offset;
@@ -199,7 +200,7 @@ static void send_beacon(void)
         (pulsesync_beacon_t *) pulsesync_beacon_buffer;
     gtimer_sync_now(&now);
 
-    if ((root_id != 0xFFFF)) {
+    if (root_id != PULSESYNC_UNKNOWN_NODE) {
         if ((table_entries < PULSESYNC_ENTRY_SEND_LIMIT)
             && (root_id != node_id)) {
             heart_beats++;
@@ -339,7 +340,7 @@ void pulsesync_resume(void)
         root_id = node_id;
     }
     else {
-        root_id = 0xFFFF;
+        root_id = PULSESYNC_UNKNOWN_NODE;
     }
 
     rate = 1.0;
