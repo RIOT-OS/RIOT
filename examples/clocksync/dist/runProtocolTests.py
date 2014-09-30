@@ -18,18 +18,20 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-import sys, os
+import sys
+import os
 from subprocess import call
 from os.path import expanduser
 
 scriptDir = os.path.dirname(__file__)
 makeFilePath = os.path.join(scriptDir, os.pardir)
-desvirtPath =  os.path.join(scriptDir, "desvirt")
-logFilePath =  os.path.join(expanduser("~"), ".pyterm", "log")
+desvirtPath = os.path.join(scriptDir, "desvirt")
+logFilePath = os.path.join(expanduser("~"), ".pyterm", "log")
 possibleModules = ["gtsp", "ftsp", "pulsesync"]
 scriptPostFix = "DesVirt.py"
 
 devnull = open('/dev/null', 'w')
+
 
 def runTestFor(moduleName):
     print "--- testing " + moduleName + " ---"
@@ -40,9 +42,10 @@ def runTestFor(moduleName):
 
 def buildModule(moduleName):
     print "! building " + moduleName
-    envvars = "export BOARD=native; export SYNCMOD=" + moduleName +";"
+    envvars = "export BOARD=native; export SYNCMOD=" + moduleName + ";"
     return call(envvars + "make clean; make", shell=True,
                 cwd=makeFilePath, stdout=devnull, stderr=devnull)
+
 
 def startDesVirtFor(moduleName):
     print "! running desvirt for " + moduleName
@@ -52,10 +55,13 @@ def startDesVirtFor(moduleName):
     else:
         return -1
 
+
 def evaluateLogFilesFor(moduleName):
     print "! evaluating log files for " + moduleName
-    minErrorCmd = os.path.join(makeFilePath, "dist", "getMinError.py") + " -m 1000 " + logFilePath
+    minErrorCmd = os.path.join(
+        makeFilePath, "dist", "getMinError.py") + " -m 1000 " + logFilePath
     return call(minErrorCmd, stdout=devnull, stderr=devnull, shell=True)
+
 
 def runOrAbort(retVal):
     if retVal == 0:

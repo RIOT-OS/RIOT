@@ -19,7 +19,10 @@
 # 02110-1301 USA
 
 
-import sys, os, re, datetime
+import sys
+import os
+import re
+import datetime
 from os.path import expanduser
 
 pytermDir = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir,
@@ -32,15 +35,17 @@ from pytermcontroller import Experiment, ExperimentRunner
 from testbeds import DesVirtTestbed
 from clocksyncExperiment import DesVirtClockSyncExperiment
 
-serverHost =   "localhost"
-serverPort =   1025
-desvirtPath =  os.path.join(os.path.dirname(__file__), "desvirt")
+serverHost = "localhost"
+serverPort = 1025
+desvirtPath = os.path.join(os.path.dirname(__file__), "desvirt")
 topologyName = "ctest"
-pytermArgs =   " -s" + serverHost + " -P " + str(serverPort)
-pyterm =       os.path.join(pytermDir, "pyterm") + pytermArgs
-logFilePath =  os.path.join(expanduser("~"), ".pyterm", "log")
+pytermArgs = " -s" + serverHost + " -P " + str(serverPort)
+pyterm = os.path.join(pytermDir, "pyterm") + pytermArgs
+logFilePath = os.path.join(expanduser("~"), ".pyterm", "log")
+
 
 class FTSPDesVirt(DesVirtClockSyncExperiment):
+
     def enableProtocol(self):
         self.sendToAll("ftsp delay 0")
         self.sendToAll("ftsp on")
@@ -51,8 +56,8 @@ class FTSPDesVirt(DesVirtClockSyncExperiment):
     def postHook(self):
         self.runner.testbed.archiveLogs("ftsp-desvirt")
 
-testbed = DesVirtTestbed(serverHost, serverPort, desvirtPath, topologyName
-                       ,pyterm, logFilePath)
+testbed = DesVirtTestbed(serverHost, serverPort, desvirtPath,
+                         topologyName, pyterm, logFilePath)
 testbed.flashNodes()
 experiment = ExperimentRunner(FTSPDesVirt, testbed)
 experiment.run()
