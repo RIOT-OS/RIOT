@@ -45,8 +45,8 @@
 #define MAX_OUTPUT_POWER           (11) ///< Maximum output power value
 
 #define PACKET_LENGTH               (0x3E)      ///< Packet length = 62 Bytes.
-#define CC1100_SYNC_WORD_TX_TIME   (90000)      // loop count (max. timeout ~ 15 ms) to wait for
-// sync word to be transmitted (GDO2 from low to high)
+#define CC1100_SYNC_WORD_TX_TIME   (90000)      /**< loop count (max. timeout ~ 15 ms) to wait for
+                                                    sync word to be transmitted (GDO2 from low to high) */
 /**
  * @name    Defines used as state values for state machine
  * @{
