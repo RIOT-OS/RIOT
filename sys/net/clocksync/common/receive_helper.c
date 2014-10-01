@@ -43,7 +43,7 @@
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
 msg_t msg_q[RADIO_RCV_BUF_SIZE];
-static kernel_pid_t thread_id = 0;
+static kernel_pid_t thread_id = KERNEL_PID_UNDEF;
 
 static void *recv_ieee802154_frame(void *arg)
 {
@@ -115,7 +115,7 @@ static void *recv_ieee802154_frame(void *arg)
 
 void clocksync_common_init_recv(void)
 {
-    if (!thread_id) {
+    if (thread_id == KERNEL_PID_UNDEF) {
         thread_id = thread_create(radio_stack_buffer, RADIO_STACK_SIZE,
                                   PRIORITY_MAIN - 2, CREATE_STACKTEST, recv_ieee802154_frame, NULL,
                                   "clocksync_recv");
