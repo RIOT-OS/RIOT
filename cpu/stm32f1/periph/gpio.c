@@ -30,6 +30,9 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+/* guard file in case no GPIO device is defined */
+#if GPIO_NUMOF
+
 typedef struct {
     gpio_cb_t cb;       /**< callback called from GPIO interrupt */
     void *arg;          /**< argument passed to the callback */
@@ -43,112 +46,112 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pullup)
     uint32_t pin;
 
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
         case GPIO_0:
             GPIO_0_CLKEN();
             port = GPIO_0_PORT;
             pin = GPIO_0_PIN;
             break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
         case GPIO_1:
             GPIO_1_CLKEN();
             port = GPIO_1_PORT;
             pin = GPIO_1_PIN;
             break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
         case GPIO_2:
             GPIO_2_CLKEN();
             port = GPIO_2_PORT;
             pin = GPIO_2_PIN;
             break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
         case GPIO_3:
             GPIO_3_CLKEN();
             port = GPIO_3_PORT;
             pin = GPIO_3_PIN;
             break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
         case GPIO_4:
             GPIO_4_CLKEN();
             port = GPIO_4_PORT;
             pin = GPIO_4_PIN;
             break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
         case GPIO_5:
             GPIO_5_CLKEN();
             port = GPIO_5_PORT;
             pin = GPIO_5_PIN;
             break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
         case GPIO_6:
             GPIO_6_CLKEN();
             port = GPIO_6_PORT;
             pin = GPIO_6_PIN;
             break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
         case GPIO_7:
             GPIO_7_CLKEN();
             port = GPIO_7_PORT;
             pin = GPIO_7_PIN;
             break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
         case GPIO_8:
             GPIO_8_CLKEN();
             port = GPIO_8_PORT;
             pin = GPIO_8_PIN;
             break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
         case GPIO_9:
             GPIO_9_CLKEN();
             port = GPIO_9_PORT;
             pin = GPIO_9_PIN;
             break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
         case GPIO_10:
             GPIO_10_CLKEN();
             port = GPIO_10_PORT;
             pin = GPIO_10_PIN;
             break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
         case GPIO_11:
             GPIO_11_CLKEN();
             port = GPIO_11_PORT;
             pin = GPIO_11_PIN;
             break;
 #endif
-#ifdef GPIO_12_EN
+#if GPIO_12_EN
         case GPIO_12:
             GPIO_12_CLKEN();
             port = GPIO_12_PORT;
             pin = GPIO_12_PIN;
             break;
 #endif
-#ifdef GPIO_13_EN
+#if GPIO_13_EN
         case GPIO_13:
             GPIO_13_CLKEN();
             port = GPIO_13_PORT;
             pin = GPIO_13_PIN;
             break;
 #endif
-#ifdef GPIO_14_EN
+#if GPIO_14_EN
         case GPIO_14:
             GPIO_14_CLKEN();
             port = GPIO_14_PORT;
             pin = GPIO_14_PIN;
             break;
 #endif
-#ifdef GPIO_15_EN
+#if GPIO_15_EN
         case GPIO_15:
             GPIO_15_CLKEN();
             port = GPIO_15_PORT;
@@ -180,112 +183,112 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
     uint32_t pin;
 
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
         case GPIO_0:
             GPIO_0_CLKEN();
             port = GPIO_0_PORT;
             pin = GPIO_0_PIN;
             break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
         case GPIO_1:
             GPIO_1_CLKEN();
             port = GPIO_1_PORT;
             pin = GPIO_1_PIN;
             break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
         case GPIO_2:
             GPIO_2_CLKEN();
             port = GPIO_2_PORT;
             pin = GPIO_2_PIN;
             break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
         case GPIO_3:
             GPIO_3_CLKEN();
             port = GPIO_3_PORT;
             pin = GPIO_3_PIN;
             break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
         case GPIO_4:
             GPIO_4_CLKEN();
             port = GPIO_4_PORT;
             pin = GPIO_4_PIN;
             break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
         case GPIO_5:
             GPIO_5_CLKEN();
             port = GPIO_5_PORT;
             pin = GPIO_5_PIN;
             break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
         case GPIO_6:
             GPIO_6_CLKEN();
             port = GPIO_6_PORT;
             pin = GPIO_6_PIN;
             break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
         case GPIO_7:
             GPIO_7_CLKEN();
             port = GPIO_7_PORT;
             pin = GPIO_7_PIN;
             break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
         case GPIO_8:
             GPIO_8_CLKEN();
             port = GPIO_8_PORT;
             pin = GPIO_8_PIN;
             break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
         case GPIO_9:
             GPIO_9_CLKEN();
             port = GPIO_9_PORT;
             pin = GPIO_9_PIN;
             break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
         case GPIO_10:
             GPIO_10_CLKEN();
             port = GPIO_10_PORT;
             pin = GPIO_10_PIN;
             break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
         case GPIO_11:
             GPIO_11_CLKEN();
             port = GPIO_11_PORT;
             pin = GPIO_11_PIN;
             break;
 #endif
-#ifdef GPIO_12_EN
+#if GPIO_12_EN
         case GPIO_12:
             GPIO_12_CLKEN();
             port = GPIO_12_PORT;
             pin = GPIO_12_PIN;
             break;
 #endif
-#ifdef GPIO_13_EN
+#if GPIO_13_EN
         case GPIO_13:
             GPIO_13_CLKEN();
             port = GPIO_13_PORT;
             pin = GPIO_13_PIN;
             break;
 #endif
-#ifdef GPIO_14_EN
+#if GPIO_14_EN
         case GPIO_14:
             GPIO_14_CLKEN();
             port = GPIO_14_PORT;
             pin = GPIO_14_PIN;
             break;
 #endif
-#ifdef GPIO_15_EN
+#if GPIO_15_EN
         case GPIO_15:
             GPIO_15_CLKEN();
             port = GPIO_15_PORT;
@@ -330,7 +333,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 
     /* read pin number, set EXTI channel and enable global interrupt for EXTI channel */
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
         case GPIO_0:
             exti_line = GPIO_0_EXTI_LINE;
             gpio_irq = GPIO_IRQ_0;
@@ -339,7 +342,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_0_IRQ);
             break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
         case GPIO_1:
             exti_line = GPIO_1_EXTI_LINE;
             gpio_irq = GPIO_IRQ_1;
@@ -348,7 +351,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_1_IRQ);
             break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
         case GPIO_2:
             exti_line = GPIO_2_EXTI_LINE;
             gpio_irq = GPIO_IRQ_2;
@@ -357,7 +360,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_2_IRQ);
             break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
         case GPIO_3:
             exti_line = GPIO_3_EXTI_LINE;
             gpio_irq = GPIO_IRQ_3;
@@ -366,7 +369,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_3_IRQ);
             break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
         case GPIO_4:
             exti_line = GPIO_4_EXTI_LINE;
             gpio_irq = GPIO_IRQ_4;
@@ -375,7 +378,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_4_IRQ);
             break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
         case GPIO_5:
             exti_line = GPIO_5_EXTI_LINE;
             gpio_irq = GPIO_IRQ_5;
@@ -384,7 +387,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_5_IRQ);
             break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
         case GPIO_6:
             exti_line = GPIO_6_EXTI_LINE;
             gpio_irq = GPIO_IRQ_6;
@@ -393,7 +396,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_6_IRQ);
             break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
         case GPIO_7:
             exti_line = GPIO_7_EXTI_LINE;
             gpio_irq = GPIO_IRQ_7;
@@ -402,7 +405,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_7_IRQ);
             break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
         case GPIO_8:
             exti_line = GPIO_8_EXTI_LINE;
             gpio_irq = GPIO_IRQ_8;
@@ -411,7 +414,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_8_IRQ);
             break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
         case GPIO_9:
             exti_line = GPIO_9_EXTI_LINE;
             gpio_irq = GPIO_IRQ_9;
@@ -420,7 +423,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_9_IRQ);
             break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
         case GPIO_10:
             exti_line = GPIO_10_EXTI_LINE;
             gpio_irq = GPIO_IRQ_10;
@@ -429,7 +432,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_10_IRQ);
             break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
         case GPIO_11:
             exti_line = GPIO_11_EXTI_LINE;
             gpio_irq = GPIO_IRQ_11;
@@ -438,7 +441,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_11_IRQ);
             break;
 #endif
-#ifdef GPIO_12_EN
+#if GPIO_12_EN
         case GPIO_12:
             exti_line = GPIO_12_EXTI_LINE;
             gpio_irq = GPIO_IRQ_12;
@@ -447,7 +450,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_12_IRQ);
             break;
 #endif
-#ifdef GPIO_13_EN
+#if GPIO_13_EN
         case GPIO_13:
             exti_line = GPIO_13_EXTI_LINE;
             gpio_irq = GPIO_IRQ_13;
@@ -456,7 +459,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_13_IRQ);
             break;
 #endif
-#ifdef GPIO_14_EN
+#if GPIO_14_EN
         case GPIO_14:
             exti_line = GPIO_14_EXTI_LINE;
             gpio_irq = GPIO_IRQ_14;
@@ -465,7 +468,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             NVIC_EnableIRQ(GPIO_14_IRQ);
             break;
 #endif
-#ifdef GPIO_15_EN
+#if GPIO_15_EN
         case GPIO_15:
             exti_line = GPIO_15_EXTI_LINE;
             gpio_irq = GPIO_IRQ_15;
@@ -510,86 +513,88 @@ void gpio_irq_enable(gpio_t dev)
     uint8_t exti_line;
 
     switch(dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
         case GPIO_0:
             exti_line = GPIO_0_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
         case GPIO_1:
             exti_line = GPIO_1_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
         case GPIO_2:
             exti_line = GPIO_2_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
         case GPIO_3:
             exti_line = GPIO_3_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
         case GPIO_4:
             exti_line = GPIO_4_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
         case GPIO_5:
             exti_line = GPIO_5_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
         case GPIO_6:
             exti_line = GPIO_6_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
         case GPIO_7:
             exti_line = GPIO_7_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
         case GPIO_8:
             exti_line = GPIO_8_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
         case GPIO_9:
             exti_line = GPIO_9_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
         case GPIO_10:
             exti_line = GPIO_10_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
         case GPIO_11:
             exti_line = GPIO_11_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_12_EN
+#if GPIO_12_EN
         case GPIO_12:
             exti_line = GPIO_12_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_13_EN
+#if GPIO_13_EN
         case GPIO_13:
             exti_line = GPIO_13_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_14_EN
+#if GPIO_14_EN
         case GPIO_14:
             exti_line = GPIO_14_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_15_EN
+#if GPIO_15_EN
         case GPIO_15:
             exti_line = GPIO_15_EXTI_LINE;
             break;
 #endif
+        default:
+            return;
     }
     /* save state */
     // int state = (EXTI->IMR & (1 << exti_line) >> exti_line);
@@ -605,86 +610,88 @@ void gpio_irq_disable(gpio_t dev)
     uint8_t exti_line;
 
     switch(dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
         case GPIO_0:
             exti_line = GPIO_0_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
         case GPIO_1:
             exti_line = GPIO_1_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
         case GPIO_2:
             exti_line = GPIO_2_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
         case GPIO_3:
             exti_line = GPIO_3_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
         case GPIO_4:
             exti_line = GPIO_4_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
         case GPIO_5:
             exti_line = GPIO_5_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
         case GPIO_6:
             exti_line = GPIO_6_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
         case GPIO_7:
             exti_line = GPIO_7_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
         case GPIO_8:
             exti_line = GPIO_8_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
         case GPIO_9:
             exti_line = GPIO_9_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
         case GPIO_10:
             exti_line = GPIO_10_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
         case GPIO_11:
             exti_line = GPIO_11_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_12_EN
+#if GPIO_12_EN
         case GPIO_12:
             exti_line = GPIO_12_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_13_EN
+#if GPIO_13_EN
         case GPIO_13:
             exti_line = GPIO_13_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_14_EN
+#if GPIO_14_EN
         case GPIO_14:
             exti_line = GPIO_14_EXTI_LINE;
             break;
 #endif
-#ifdef GPIO_15_EN
+#if GPIO_15_EN
         case GPIO_15:
             exti_line = GPIO_15_EXTI_LINE;
             break;
 #endif
+        default:
+            return;
     }
     // /* save state */
     // int state = ((EXTI->IMR & (1 << exti_line)) >> exti_line);
@@ -701,97 +708,97 @@ int gpio_read(gpio_t dev)
     uint32_t pin;
 
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
         case GPIO_0:
             port = GPIO_0_PORT;
             pin = GPIO_0_PIN;
             break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
         case GPIO_1:
             port = GPIO_1_PORT;
             pin = GPIO_1_PIN;
             break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
         case GPIO_2:
             port = GPIO_2_PORT;
             pin = GPIO_2_PIN;
             break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
         case GPIO_3:
             port = GPIO_3_PORT;
             pin = GPIO_3_PIN;
             break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
         case GPIO_4:
             port = GPIO_4_PORT;
             pin = GPIO_4_PIN;
             break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
         case GPIO_5:
             port = GPIO_5_PORT;
             pin = GPIO_5_PIN;
             break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
         case GPIO_6:
             port = GPIO_6_PORT;
             pin = GPIO_6_PIN;
             break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
         case GPIO_7:
             port = GPIO_7_PORT;
             pin = GPIO_7_PIN;
             break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
         case GPIO_8:
             port = GPIO_8_PORT;
             pin = GPIO_8_PIN;
             break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
         case GPIO_9:
             port = GPIO_9_PORT;
             pin = GPIO_9_PIN;
             break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
         case GPIO_10:
             port = GPIO_10_PORT;
             pin = GPIO_10_PIN;
             break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
         case GPIO_11:
             port = GPIO_11_PORT;
             pin = GPIO_11_PIN;
             break;
 #endif
-#ifdef GPIO_12_EN
+#if GPIO_12_EN
         case GPIO_12:
             port = GPIO_12_PORT;
             pin = GPIO_12_PIN;
             break;
 #endif
-#ifdef GPIO_13_EN
+#if GPIO_13_EN
         case GPIO_13:
             port = GPIO_13_PORT;
             pin = GPIO_13_PIN;
             break;
 #endif
-#ifdef GPIO_14_EN
+#if GPIO_14_EN
         case GPIO_14:
             port = GPIO_14_PORT;
             pin = GPIO_14_PIN;
             break;
 #endif
-#ifdef GPIO_15_EN
+#if GPIO_15_EN
         case GPIO_15:
             port = GPIO_15_PORT;
             pin = GPIO_15_PIN;
@@ -820,82 +827,82 @@ int gpio_read(gpio_t dev)
 void gpio_set(gpio_t dev)
 {
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
         case GPIO_0:
             GPIO_0_PORT->BSRR = (1 << GPIO_0_PIN);
             break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
         case GPIO_1:
             GPIO_1_PORT->BSRR = (1 << GPIO_1_PIN);
             break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
         case GPIO_2:
             GPIO_2_PORT->BSRR = (1 << GPIO_2_PIN);
             break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
         case GPIO_3:
             GPIO_3_PORT->BSRR = (1 << GPIO_3_PIN);
             break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
         case GPIO_4:
             GPIO_4_PORT->BSRR = (1 << GPIO_4_PIN);
             break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
         case GPIO_5:
             GPIO_5_PORT->BSRR = (1 << GPIO_5_PIN);
             break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
         case GPIO_6:
             GPIO_6_PORT->BSRR = (1 << GPIO_6_PIN);
             break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
         case GPIO_7:
             GPIO_7_PORT->BSRR = (1 << GPIO_7_PIN);
             break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
         case GPIO_8:
             GPIO_8_PORT->BSRR = (1 << GPIO_8_PIN);
             break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
         case GPIO_9:
             GPIO_9_PORT->BSRR = (1 << GPIO_9_PIN);
             break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
         case GPIO_10:
             GPIO_10_PORT->BSRR = (1 << GPIO_10_PIN);
             break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
         case GPIO_11:
             GPIO_11_PORT->BSRR = (1 << GPIO_11_PIN);
             break;
 #endif
-#ifdef GPIO_12_EN
+#if GPIO_12_EN
         case GPIO_12:
             GPIO_12_PORT->BSRR = (1 << GPIO_12_PIN);
             break;
 #endif
-#ifdef GPIO_13_EN
+#if GPIO_13_EN
         case GPIO_13:
             GPIO_13_PORT->BSRR = (1 << GPIO_13_PIN);
             break;
 #endif
-#ifdef GPIO_14_EN
+#if GPIO_14_EN
         case GPIO_14:
             GPIO_14_PORT->BSRR = (1 << GPIO_14_PIN);
             break;
 #endif
-#ifdef GPIO_15_EN
+#if GPIO_15_EN
         case GPIO_15:
             GPIO_15_PORT->BSRR = (1 << GPIO_15_PIN);
             break;
@@ -906,82 +913,82 @@ void gpio_set(gpio_t dev)
 void gpio_clear(gpio_t dev)
 {
     switch (dev) {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
         case GPIO_0:
             GPIO_0_PORT->BRR = (1 << GPIO_0_PIN);
             break;
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
         case GPIO_1:
             GPIO_1_PORT->BRR = (1 << GPIO_1_PIN);
             break;
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
         case GPIO_2:
             GPIO_2_PORT->BRR = (1 << GPIO_2_PIN);
             break;
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
         case GPIO_3:
             GPIO_3_PORT->BRR = (1 << GPIO_3_PIN);
             break;
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
         case GPIO_4:
             GPIO_4_PORT->BRR = (1 << GPIO_4_PIN);
             break;
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
         case GPIO_5:
             GPIO_5_PORT->BRR = (1 << GPIO_5_PIN);
             break;
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
         case GPIO_6:
             GPIO_6_PORT->BRR = (1 << GPIO_6_PIN);
             break;
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
         case GPIO_7:
             GPIO_7_PORT->BRR = (1 << GPIO_7_PIN);
             break;
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
         case GPIO_8:
             GPIO_8_PORT->BRR = (1 << GPIO_8_PIN);
             break;
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
         case GPIO_9:
             GPIO_9_PORT->BRR = (1 << GPIO_9_PIN);
             break;
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
         case GPIO_10:
             GPIO_10_PORT->BRR = (1 << GPIO_10_PIN);
             break;
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
         case GPIO_11:
             GPIO_11_PORT->BRR = (1 << GPIO_11_PIN);
             break;
 #endif
-#ifdef GPIO_12_EN
+#if GPIO_12_EN
         case GPIO_12:
             GPIO_12_PORT->BRR = (1 << GPIO_12_PIN);
             break;
 #endif
-#ifdef GPIO_13_EN
+#if GPIO_13_EN
         case GPIO_13:
             GPIO_13_PORT->BRR = (1 << GPIO_13_PIN);
             break;
 #endif
-#ifdef GPIO_14_EN
+#if GPIO_14_EN
         case GPIO_14:
             GPIO_14_PORT->BRR = (1 << GPIO_14_PIN);
             break;
 #endif
-#ifdef GPIO_15_EN
+#if GPIO_15_EN
         case GPIO_15:
             GPIO_15_PORT->BRR = (1 << GPIO_15_PIN);
             break;
@@ -1010,6 +1017,7 @@ void gpio_write(gpio_t dev, int value)
     }
 }
 
+#if GPIO_IRQ_0
 __attribute__((naked)) void isr_exti0(void)
 {
     ISR_ENTER();
@@ -1023,7 +1031,9 @@ __attribute__((naked)) void isr_exti0(void)
     }
     ISR_EXIT();
 }
+#endif
 
+#if GPIO_IRQ_1
 __attribute__((naked)) void isr_exti1(void)
 {
     ISR_ENTER();
@@ -1037,7 +1047,9 @@ __attribute__((naked)) void isr_exti1(void)
     }
     ISR_EXIT();
 }
+#endif
 
+#if GPIO_IRQ_2
 __attribute__((naked)) void isr_exti2(void)
 {
     ISR_ENTER();
@@ -1051,7 +1063,9 @@ __attribute__((naked)) void isr_exti2(void)
     }
     ISR_EXIT();
 }
+#endif
 
+#if GPIO_IRQ_3
 __attribute__((naked)) void isr_exti3(void)
 {
     ISR_ENTER();
@@ -1065,7 +1079,9 @@ __attribute__((naked)) void isr_exti3(void)
     }
     ISR_EXIT();
 }
+#endif
 
+#if GPIO_IRQ_4
 __attribute__((naked)) void isr_exti4(void)
 {
     ISR_ENTER();
@@ -1079,31 +1095,41 @@ __attribute__((naked)) void isr_exti4(void)
     }
     ISR_EXIT();
 }
+#endif
 
 __attribute__((naked)) void isr_exti9_5(void)
 {
     ISR_ENTER();
+#if GPIO_IRQ_5
     if (EXTI->PR & EXTI_PR_PR5) {
         EXTI->PR |= EXTI_PR_PR5;        /* clear status bit by writing a 1 to it */
         config[GPIO_5].cb(config[GPIO_5].arg);
     }
+#endif
+#if GPIO_IRQ_6
     else if (EXTI->PR & EXTI_PR_PR6) {
         EXTI->PR |= EXTI_PR_PR6;        /* clear status bit by writing a 1 to it */
         config[GPIO_6].cb(config[GPIO_6].arg);
     }
+#endif
+#if GPIO_IRQ_7
     else if (EXTI->PR & EXTI_PR_PR7) {
         EXTI->PR |= EXTI_PR_PR7;        /* clear status bit by writing a 1 to it */
         config[GPIO_7].cb(config[GPIO_7].arg);
     }
+#endif
+#if GPIO_IRQ_8
     else if (EXTI->PR & EXTI_PR_PR8) {
         EXTI->PR |= EXTI_PR_PR8;        /* clear status bit by writing a 1 to it */
         config[GPIO_8].cb(config[GPIO_8].arg);
     }
+#endif
+#if GPIO_IRQ_9
     else if (EXTI->PR & EXTI_PR_PR9) {
         EXTI->PR |= EXTI_PR_PR9;        /* clear status bit by writing a 1 to it */
         config[GPIO_9].cb(config[GPIO_9].arg);
     }
-
+#endif
     if (sched_context_switch_request) {
         thread_yield();
     }
@@ -1113,33 +1139,46 @@ __attribute__((naked)) void isr_exti9_5(void)
 __attribute__((naked)) void isr_exti15_10(void)
 {
     ISR_ENTER();
+#if GPIO_IRQ_10
     if (EXTI->PR & EXTI_PR_PR10) {
         EXTI->PR |= EXTI_PR_PR10;        /* clear status bit by writing a 1 to it */
         config[GPIO_10].cb(config[GPIO_10].arg);
     }
+#endif
+#if GPIO_IRQ_11
     else if (EXTI->PR & EXTI_PR_PR11) {
         EXTI->PR |= EXTI_PR_PR11;        /* clear status bit by writing a 1 to it */
         config[GPIO_11].cb(config[GPIO_11].arg);
     }
+#endif
+#if GPIO_IRQ_12
     else if (EXTI->PR & EXTI_PR_PR12) {
         EXTI->PR |= EXTI_PR_PR12;        /* clear status bit by writing a 1 to it */
         config[GPIO_12].cb(config[GPIO_12].arg);
     }
+#endif
+#if GPIO_IRQ_13
     else if (EXTI->PR & EXTI_PR_PR13) {
         EXTI->PR |= EXTI_PR_PR13;        /* clear status bit by writing a 1 to it */
         config[GPIO_13].cb(config[GPIO_13].arg);
     }
+#endif
+#if GPIO_IRQ_14
     else if (EXTI->PR & EXTI_PR_PR14) {
         EXTI->PR |= EXTI_PR_PR14;        /* clear status bit by writing a 1 to it */
         config[GPIO_14].cb(config[GPIO_14].arg);
     }
+#endif
+#if GPIO_IRQ_15
     else if (EXTI->PR & EXTI_PR_PR15) {
         EXTI->PR |= EXTI_PR_PR15;        /* clear status bit by writing a 1 to it */
         config[GPIO_15].cb(config[GPIO_15].arg);
     }
-
+#endif
     if (sched_context_switch_request) {
         thread_yield();
     }
     ISR_EXIT();
 }
+
+#endif
