@@ -1,0 +1,83 @@
+From 713130afe532b4f29b85b692a062852d43120059 Mon Sep 17 00:00:00 2001
+From: Philipp Rosenkranz <ph.rosenkranz@gmail.com>
+Date: Wed, 1 Oct 2014 01:04:00 +0200
+Subject: [PATCH] add clocksync test topology
+
+---
+ .desvirt/ctest.xml      | 25 +++++++++++++++++++++++++
+ .desvirt/lib/.gitignore |  3 +++
+ .desvirt/lib/ctest.macs | 21 +++++++++++++++++++++
+ 3 files changed, 49 insertions(+)
+ create mode 100644 .desvirt/ctest.xml
+ create mode 100644 .desvirt/lib/ctest.macs
+
+diff --git a/.desvirt/ctest.xml b/.desvirt/ctest.xml
+new file mode 100644
+index 0000000..20bf093
+--- /dev/null
++++ b/.desvirt/ctest.xml
+@@ -0,0 +1,25 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<topology version="1">
++    <net description="two client nodes and one probing node" name="ctest">
++        <nodeTypes>
++            <nodeType name="riot_native">
++                <interfaces>
++                    <interface name="wlan0" type="802.11bg"/>
++                </interfaces>
++            </nodeType>
++        </nodeTypes>
++        <nodes>
++            <node binary="../../../examples/clocksync/bin/native/clocksync.elf" name="a1" type="riot_native"/>
++            <node binary="../../../examples/clocksync/bin/native/clocksync.elf" name="a2" type="riot_native"/>
++            <node binary="../../../examples/clocksync/bin/native/clocksync.elf" name="a3" type="riot_native"/>
++        </nodes>
++        <links>
++            <link broadcast_loss="0.0" from_if="wlan0" from_node="a1" loss="0.0" to_if="wlan0" to_node="a2" uni="false"/>
++            <link broadcast_loss="0.0" from_if="wlan0" from_node="a1" loss="0.0" to_if="wlan0" to_node="a3" uni="false"/>
++            <link broadcast_loss="0.0" from_if="wlan0" from_node="a2" loss="0.0" to_if="wlan0" to_node="a1" uni="false"/>
++            <link broadcast_loss="0.0" from_if="wlan0" from_node="a2" loss="0.0" to_if="wlan0" to_node="a3" uni="false"/>
++            <link broadcast_loss="0.0" from_if="wlan0" from_node="a3" loss="0.0" to_if="wlan0" to_node="a1" uni="false"/>
++            <link broadcast_loss="0.0" from_if="wlan0" from_node="a3" loss="0.0" to_if="wlan0" to_node="a2" uni="false"/>
++        </links>
++    </net>
++</topology>
+diff --git a/.desvirt/lib/.gitignore b/.desvirt/lib/.gitignore
+index e69de29..ca15e27 100644
+--- a/.desvirt/lib/.gitignore
++++ b/.desvirt/lib/.gitignore
+@@ -0,0 +1,3 @@
++*.lock
++*.pids
++*.taps
+diff --git a/.desvirt/lib/ctest.macs b/.desvirt/lib/ctest.macs
+new file mode 100644
+index 0000000..ec9565f
+--- /dev/null
++++ b/.desvirt/lib/ctest.macs
+@@ -0,0 +1,21 @@
++(dp0
++Va1
++p1
++(dp2
++Vwlan0
++p3
++S'50:51:52:2c:8c:76'
++p4
++ssVa3
++p5
++(dp6
++g3
++S'50:51:52:7f:21:25'
++p7
++ssVa2
++p8
++(dp9
++g3
++S'50:51:52:75:41:aa'
++p10
++ss.
+\ No newline at end of file
+-- 
+1.9.1
+

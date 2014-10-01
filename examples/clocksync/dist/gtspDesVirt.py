@@ -37,7 +37,8 @@ from clocksyncExperiment import DesVirtClockSyncExperiment
 
 serverHost = "localhost"
 serverPort = 1025
-desvirtPath = os.path.join(os.path.dirname(__file__), "desvirt")
+desvirtPath = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir,
+                           os.pardir, "pkg", "desvirt", "desvirt")
 topologyName = "ctest"
 pytermArgs = " -s" + serverHost + " -P " + str(serverPort)
 pyterm = os.path.join(pytermDir, "pyterm") + pytermArgs

@@ -25,7 +25,8 @@ from os.path import expanduser
 
 scriptDir = os.path.dirname(__file__)
 makeFilePath = os.path.join(scriptDir, os.pardir)
-desvirtPath = os.path.join(scriptDir, "desvirt")
+desvirtPath = os.path.join(scriptDir, os.pardir, os.pardir,
+                           os.pardir, "pkg", "desvirt")
 logFilePath = os.path.join(expanduser("~"), ".pyterm", "log")
 possibleModules = ["gtsp", "ftsp", "pulsesync"]
 scriptPostFix = "DesVirt.py"
@@ -71,6 +72,7 @@ def runOrAbort(retVal):
         sys.exit(1)
 
 if __name__ == "__main__":
+    call("make clean all", cwd=desvirtPath, shell=True)
     if sys.argv[1:]:
         for module in sys.argv[1:]:
             if module in possibleModules:
