@@ -58,6 +58,7 @@
 #define GTSP_MOVING_ALPHA 0.9
 #define GTSP_SANE_OFFSET_CHECK (1)
 #define GTSP_SANE_OFFSET_THRESHOLD ((int64_t)3145 * 10 * 1000 * 1000 * 1000) // 1 year in us
+#define GTSP_MAX_RATE ((float) 0.00005)// max allowable clock rate
 
 #define GTSP_BEACON_STACK_SIZE (KERNEL_CONF_STACKSIZE_MAIN)
 #define GTSP_CYCLIC_STACK_SIZE (KERNEL_CONF_STACKSIZE_MAIN)
@@ -214,11 +215,11 @@ static float compute_rate(void)
     avg_rate /= (neighbor_count + 1);
 
     /* safeguard: ensures sane clock rates in the presence of byzantine faults */
-    if (avg_rate > 0.00005) {
-        avg_rate = 0.00005;
+    if (avg_rate > GTSP_MAX_RATE) {
+        avg_rate = GTSP_MAX_RATE;
     }
-    else if (avg_rate < -0.00005) {
-        avg_rate = -0.00005;
+    else if (avg_rate < -GTSP_MAX_RATE) {
+        avg_rate = -GTSP_MAX_RATE;
     }
 
     return avg_rate;
