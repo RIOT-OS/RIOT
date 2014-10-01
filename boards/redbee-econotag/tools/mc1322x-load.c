@@ -203,7 +203,7 @@ int main(int argc, char **argv)
 
     while (1) {
         /* Wait for CONNECT */
-        r = write(pfd, (const void *)"\0", 1);
+        write(pfd, (const void *)"\0", 1);
         sleep(1);
         r = read(pfd, &buf[i], sizeof(buf) - 1 - i);
 
@@ -249,7 +249,7 @@ int main(int argc, char **argv)
 
     s = sbuf.st_size;
     printf("Sending %s (%i bytes)...\n", filename, s);
-    r = write(pfd, (const void *)&s, 4);
+    write(pfd, (const void *)&s, 4);
     i = 0;
     r = read(ffd, buf, 1);
 
@@ -316,7 +316,7 @@ int main(int argc, char **argv)
 
             s = sbuf.st_size;
             printf("Sending %s (%i bytes)...\n", second, s);
-            r = write(pfd, (const void *)&s, 4);
+            write(pfd, (const void *)&s, 4);
             i = 0;
             r = read(sfd, buf, 1);
 
@@ -345,7 +345,7 @@ int main(int argc, char **argv)
     /* Send the remaining arguments */
     if (args) {
         printf("Sending %s\n", args);
-        r = write(pfd, (const void *)args, strlen(args));
+        write(pfd, (const void *)args, strlen(args));
         r = write(pfd, (const void *)",", 1);
     }
 

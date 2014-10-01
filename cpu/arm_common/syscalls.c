@@ -103,6 +103,7 @@ _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int whence)
 
     r->_errno = ENODEV;
 #ifdef MODULE_FAT
+    /* cppcheck-suppress redundantAssignment */
     result = ff_lseek_r(r, fd, pos, whence);
 #endif
 
@@ -120,6 +121,7 @@ int _open_r(struct _reent *r, const char *name, int mode)
 
     r->_errno = ENODEV; // no such device
 #ifdef MODULE_FAT
+    /* cppcheck-suppress redundantAssignment */
     ret = ff_open_r(r, name, mode);
 #endif
 
@@ -136,6 +138,7 @@ int _stat_r(struct _reent *r, char *name, struct stat *st)
     PRINTF("_stat_r '%s' \n", name);
     r->_errno = ENODEV; // no such device
 #ifdef MODULE_FAT
+    /* cppcheck-suppress redundantAssignment */
     ret = ff_stat_r(r, name, st);
 #endif
     PRINTF("_stat_r [%i] errno %i\n", ret, r->_errno);
@@ -212,6 +215,7 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
     int result = -1;
     r->_errno = EBADF;
 #ifdef MODULE_FAT
+    /* cppcheck-suppress redundantAssignment */
     result = ff_read_r(r, fd, buffer, count);
 #endif
     PRINTF("read [%i] buffer @%p count %i\n", fd, buffer, count);
@@ -242,6 +246,7 @@ int _unlink_r(struct _reent *r, char *path)
     int result = -1;
     r->_errno = ENODEV;
 #ifdef MODULE_FAT
+    /* cppcheck-suppress redundantAssignment */
     result = ff_unlink_r(r, path);
 #endif
     PRINTF("unlink '%s'\n", path);

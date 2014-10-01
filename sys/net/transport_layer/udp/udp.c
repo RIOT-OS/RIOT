@@ -151,6 +151,7 @@ int32_t udp_recvfrom(int s, void *buf, uint32_t len, int flags, sockaddr6_t *fro
     payload = (uint8_t *)(m_recv.content.ptr + IPV6_HDR_LEN + UDP_HDR_LEN);
 
     memset(buf, 0, len);
+    /* cppcheck-suppress redundantCopy */
     memcpy(buf, payload, NTOHS(udp_header->length) - UDP_HDR_LEN);
     memcpy(&from->sin6_addr, &ipv6_header->srcaddr, 16);
     from->sin6_family = AF_INET6;
