@@ -142,6 +142,8 @@ CPPMIX ?= $(if $(wildcard *.cpp),1,)
 # We assume $(LINK) to be gcc-like. Use `LINKFLAGPREFIX :=` for ld-like linker options.
 LINKFLAGPREFIX ?= -Wl,
 
+DIRS += $(EXTERNAL_MODULE_DIRS)
+
 ## make script for your application. Build RIOT-base here!
 all: ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
 	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
