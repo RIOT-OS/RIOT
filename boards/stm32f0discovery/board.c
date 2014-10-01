@@ -70,7 +70,7 @@ void leds_init(void)
 /*
  * @brief Configure the controllers HSE clock
  *
- * The clock initialization make the following assumptions:
+ * The clock initialization makes the following assumptions:
  * - the external HSE clock from an external oscillator is used as base clock
  * - the internal PLL circuit is used for clock refinement
  *
@@ -81,7 +81,7 @@ void leds_init(void)
  *
  * The actual used values are specified in the board's `periph_conf.h` file.
  *
- * NOTE: currently there is not timeout for initialization of PLL and other locks
+ * NOTE: currently there is no timeout for initialization of PLL and other locks
  *       -> when wrong values are chosen, the initialization could stall
  */
 static void hse_init(void)

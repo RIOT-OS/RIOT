@@ -13,7 +13,7 @@
  * @file
  * @brief       Board specific implementations for the ELL-i ellduino board
  *
- * @author      Lari Lehtomäki <lari@lehtomaki.fi
+ * @author      Lari Lehtomäki <lari@lehtomaki.fi>
  *
  * @}
  */
@@ -39,7 +39,7 @@ void board_init(void)
 /**
  * @brief Configure the controllers clock system
  *
- * The clock initialization make the following assumptions:
+ * The clock initialization makes the following assumptions:
  * - the internal HSI clock is used as base clock
  * - the internal PLL circuit is used for clock refinement
  *
@@ -50,7 +50,7 @@ void board_init(void)
  *
  * The actual used values are specified in the board's `periph_conf.h` file.
  *
- * NOTE: currently there is not timeout for initialization of PLL and other locks
+ * NOTE: currently there is no timeout for initialization of PLL and other locks
  *       -> when wrong values are chosen, the initialization could stall
  */
 void clock_init(void) {
