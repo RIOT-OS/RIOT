@@ -32,7 +32,7 @@
 #include "debug.h"
 
 
-static inline void irq_handler(tim_t timer, TIM_TypeDef *dev);
+static inline void irq_handler(tim_t timer, TIM_TypeDef *dev0, TIM_TypeDef *dev1);
 
 typedef struct {
     void (*cb)(int);
@@ -45,7 +45,9 @@ static timer_conf_t config[TIMER_NUMOF];
 
 int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 {
-    TIM_TypeDef *timer;
+    TIM_TypeDef *timer0;
+    TIM_TypeDef *timer1;
+    uint8_t     trigger_selector;
 
     switch (dev) {
 #if TIMER_0_EN
@@ -53,9 +55,12 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
             /* enable timer peripheral clock */
             TIMER_0_CLKEN();
             /* set timer's IRQ priority */
-            NVIC_SetPriority(TIMER_0_IRQ_CHAN, TIMER_0_IRQ_PRIO);
+            NVIC_SetPriority(TIMER_0_IRQ_CHAN_0, TIMER_0_IRQ_PRIO);
+            NVIC_SetPriority(TIMER_0_IRQ_CHAN_1, TIMER_0_IRQ_PRIO);
             /* select timer */
-            timer = TIMER_0_DEV;
+            timer0 = TIMER_0_DEV_0;
+            timer1 = TIMER_0_DEV_1;
+            trigger_selector = TIMER_0_TRIG_SEL;
             break;
 #endif
 #if TIMER_1_EN
@@ -63,9 +68,12 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
             /* enable timer peripheral clock */
             TIMER_1_CLKEN();
             /* set timer's IRQ priority */
-            NVIC_SetPriority(TIMER_1_IRQ_CHAN, TIMER_1_IRQ_PRIO);
+            NVIC_SetPriority(TIMER_1_IRQ_CHAN_0, TIMER_1_IRQ_PRIO);
+            NVIC_SetPriority(TIMER_1_IRQ_CHAN_1, TIMER_1_IRQ_PRIO);
             /* select timer */
-            timer = TIMER_1_DEV;
+            timer0 = TIMER_1_DEV_0;
+            timer1 = TIMER_1_DEV_1;
+            trigger_selector = TIMER_1_TRIG_SEL;
             break;
 #endif
         case TIMER_UNDEFINED:
@@ -77,12 +85,22 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     config[dev].cb = callback;
 
     /* set timer to run in counter mode */
-    timer->CR1 |= TIM_CR1_URS;
+    timer0->CR1 = (TIM_CR1_ARPE | TIM_CR1_URS);
+    timer1->CR1 = TIM_CR1_URS;
 
+    /* configure master timer0 */
+    /* send update event as trigger output */
+    timer0->CR2 |= TIM_CR2_MMS_1;
     /* set auto-reload and prescaler values and load new values */
-    timer->ARR = TIMER_0_MAX_VALUE;
-    timer->PSC = TIMER_0_PRESCALER * ticks_per_us;
-    timer->EGR |= TIM_EGR_UG;
+    timer0->ARR = TIMER_0_MAX_VALUE;
+    timer0->PSC = TIMER_0_PRESCALER * ticks_per_us;
+    // timer->EGR |= TIM_EGR_UG;
+
+    /* configure slave timer1 */
+    /* get input trigger */
+    timer1->SMCR |= trigger_selector;
+    /* external clock mode 1 */
+    timer1->SMCR |= TIM_SMCR_SMS;
 
     /* enable the timer's interrupt */
     timer_irq_enable(dev);
@@ -101,17 +119,22 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    TIM_TypeDef *timer = NULL;
+    TIM_TypeDef *timer0 = NULL;
+    TIM_TypeDef *timer1 = NULL;
 
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            timer = TIMER_0_DEV;
+            /* select timer */
+            timer0 = TIMER_0_DEV_0;
+            timer1 = TIMER_0_DEV_1;
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            timer = TIMER_1_DEV;
+            /* select timer */
+            timer0 = TIMER_1_DEV_0;
+            timer1 = TIMER_1_DEV_1;
             break;
 #endif
         case TIMER_UNDEFINED:
@@ -119,27 +142,36 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
             return -1;
     }
 
+    timer0->DIER &= ~TIM_DIER_UIE;
+
     switch (channel) {
         case 0:
-            timer->CCR1 = value;
-            timer->SR &= ~TIM_SR_CC1IF;
-            timer->DIER |= TIM_DIER_CC1IE;
-            DEBUG("Timer 1 set to %x\n", value);
+            timer0->CCR1  = (0xffff & value);
+            timer1->CCR1  = (value >> 16);
+            timer0->SR   &= ~TIM_SR_CC1IF;
+            timer0->DIER |= TIM_DIER_CC1IE;
+            DEBUG("Channel 1 set to %x\n", value);
             break;
         case 1:
-            timer->CCR2 = value;
-            timer->SR &= ~TIM_SR_CC2IF;
-            timer->DIER |= TIM_DIER_CC2IE;
+            timer0->CCR2  = (0xffff & value);
+            timer1->CCR2  = (value >> 16);
+            timer0->SR   &= ~TIM_SR_CC2IF;
+            timer0->DIER |= TIM_DIER_CC2IE;
+            DEBUG("Channel 2 set to %x\n", value);
             break;
         case 2:
-            timer->CCR3 = value;
-            timer->SR &= ~TIM_SR_CC3IF;
-            timer->DIER |= TIM_DIER_CC3IE;
+            timer0->CCR3  = (0xffff & value);
+            timer1->CCR3  = (value >> 16);
+            timer0->SR   &= ~TIM_SR_CC3IF;
+            timer0->DIER |= TIM_DIER_CC3IE;
+            DEBUG("Channel 3 set to %x\n", value);
             break;
         case 3:
-            timer->CCR4 = value;
-            timer->SR &= ~TIM_SR_CC4IF;
-            timer->DIER |= TIM_DIER_CC4IE;
+            timer0->CCR4  = (0xffff & value);
+            timer1->CCR4  = (value >> 16);
+            timer0->SR   &= ~TIM_SR_CC4IF;
+            timer0->DIER |= TIM_DIER_CC4IE;
+            DEBUG("Channel 4 set to %x\n", value);
             break;
         default:
             return -1;
@@ -149,16 +181,16 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_clear(tim_t dev, int channel)
 {
-    TIM_TypeDef *timer;
+    TIM_TypeDef *timer0;
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            timer = TIMER_0_DEV;
+            timer0 = TIMER_0_DEV_0;
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            timer = TIMER_1_DEV;
+            timer0 = TIMER_1_DEV_0;
             break;
 #endif
         case TIMER_UNDEFINED:
@@ -167,16 +199,16 @@ int timer_clear(tim_t dev, int channel)
     }
     switch (channel) {
         case 0:
-            timer->DIER &= ~TIM_DIER_CC1IE;
+            timer0->DIER &= ~TIM_DIER_CC1IE;
             break;
         case 1:
-            timer->DIER &= ~TIM_DIER_CC2IE;
+            timer0->DIER &= ~TIM_DIER_CC2IE;
             break;
         case 2:
-            timer->DIER &= ~TIM_DIER_CC3IE;
+            timer0->DIER &= ~TIM_DIER_CC3IE;
             break;
         case 3:
-            timer->DIER &= ~TIM_DIER_CC4IE;
+            timer0->DIER &= ~TIM_DIER_CC4IE;
             break;
         default:
             return -1;
@@ -189,12 +221,12 @@ unsigned int timer_read(tim_t dev)
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            return TIMER_0_DEV->CNT;
+            return (((unsigned int)(0xffff & TIMER_0_DEV_0->CNT)) | (TIMER_0_DEV_1->CNT<<16));
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            return TIMER_1_DEV->CNT;
+            return (((unsigned int)(0xffff & TIMER_1_DEV_0->CNT)) | (TIMER_1_DEV_1->CNT<<16));
             break;
 #endif
         case TIMER_UNDEFINED:
@@ -208,12 +240,16 @@ void timer_start(tim_t dev)
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            TIMER_0_DEV->CR1 |= TIM_CR1_CEN;
+            /* slave has to be enabled first */
+            TIMER_0_DEV_1->CR1 |= TIM_CR1_CEN;
+            TIMER_0_DEV_0->CR1 |= TIM_CR1_CEN;
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            TIMER_1_DEV->CR1 |= TIM_CR1_CEN;
+            /* slave has to be enabled first */
+            TIMER_1_DEV_1->CR1 |= TIM_CR1_CEN;
+            TIMER_1_DEV_0->CR1 |= TIM_CR1_CEN;
             break;
 #endif
         case TIMER_UNDEFINED:
@@ -226,12 +262,14 @@ void timer_stop(tim_t dev)
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            TIMER_0_DEV->CR1 &= ~TIM_CR1_CEN;
+            TIMER_0_DEV_0->CR1 &= ~TIM_CR1_CEN;
+            TIMER_0_DEV_1->CR1 &= ~TIM_CR1_CEN;
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            TIMER_1_DEV->CR1 &= ~TIM_CR1_CEN;
+            TIMER_1_DEV_0->CR1 &= ~TIM_CR1_CEN;
+            TIMER_1_DEV_1->CR1 &= ~TIM_CR1_CEN;
             break;
 #endif
         case TIMER_UNDEFINED:
@@ -244,12 +282,14 @@ void timer_irq_enable(tim_t dev)
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            NVIC_EnableIRQ(TIMER_0_IRQ_CHAN);
+            NVIC_EnableIRQ(TIMER_0_IRQ_CHAN_0);
+            NVIC_EnableIRQ(TIMER_0_IRQ_CHAN_1);
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            NVIC_EnableIRQ(TIMER_1_IRQ_CHAN);
+            NVIC_EnableIRQ(TIMER_1_IRQ_CHAN_0);
+            NVIC_EnableIRQ(TIMER_1_IRQ_CHAN_1);
             break;
 #endif
         case TIMER_UNDEFINED:
@@ -262,12 +302,14 @@ void timer_irq_disable(tim_t dev)
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            NVIC_DisableIRQ(TIMER_0_IRQ_CHAN);
+            NVIC_DisableIRQ(TIMER_0_IRQ_CHAN_0);
+            NVIC_DisableIRQ(TIMER_0_IRQ_CHAN_1);
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            NVIC_DisableIRQ(TIMER_1_IRQ_CHAN);
+            NVIC_DisableIRQ(TIMER_1_IRQ_CHAN_0);
+            NVIC_DisableIRQ(TIMER_1_IRQ_CHAN_1);
             break;
 #endif
         case TIMER_UNDEFINED:
@@ -280,12 +322,14 @@ void timer_reset(tim_t dev)
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:
-            TIMER_0_DEV->CNT = 0;
+            TIMER_0_DEV_0->CNT = 0;
+            TIMER_0_DEV_1->CNT = 0;
             break;
 #endif
 #if TIMER_1_EN
         case TIMER_1:
-            TIMER_1_DEV->CNT = 0;
+            TIMER_1_DEV_0->CNT = 0;
+            TIMER_1_DEV_1->CNT = 0;
             break;
 #endif
         case TIMER_UNDEFINED:
@@ -295,61 +339,73 @@ void timer_reset(tim_t dev)
 
 
 #if TIMER_0_EN
-__attribute__ ((naked)) void TIMER_0_ISR(void)
+__attribute__ ((naked)) void TIMER_0_ISR_0(void)
 {
     ISR_ENTER();
-    DEBUG("enter ISR\n");
-    irq_handler(TIMER_0, TIMER_0_DEV);
-    DEBUG("leave ISR\n");
+    DEBUG("\nenter ISR\n");
+    irq_handler(TIMER_0, TIMER_0_DEV_0, TIMER_0_DEV_1);
+    DEBUG("leave ISR\n\n");
     ISR_EXIT();
 }
 #endif
 
 #if TIMER_1_EN
-__attribute__ ((naked)) void TIMER_1_ISR(void)
+__attribute__ ((naked)) void TIMER_1_ISR_0(void)
 {
     ISR_ENTER();
-    irq_handler(TIMER_1, TIMER_1_DEV);
+    irq_handler(TIMER_0, TIMER_1_DEV_0, TIMER_1_DEV_1);
     ISR_EXIT();
 }
 #endif
 
-static inline void irq_handler(tim_t timer, TIM_TypeDef *dev)
+static inline void irq_handler(tim_t timer, TIM_TypeDef *dev0, TIM_TypeDef *dev1)
 {
-    if (dev->SR & TIM_SR_UIF) {
-        DEBUG("Overflow.\n");
-        dev->SR &= ~(TIM_SR_UIF|TIM_SR_CC1IF|TIM_SR_CC2IF|TIM_SR_CC3IF|TIM_SR_CC4IF);
-        return;
-    }
-    if (dev->SR & TIM_SR_CC1IF) {
-        DEBUG("1\n");
-        dev->DIER &= ~TIM_DIER_CC1IE;
-        dev->SR &= ~TIM_SR_CC1IF;
-        config[timer].cb(0);
-        DEBUG("-1\n");
-    }
-    else if (dev->SR & TIM_SR_CC2IF) {
-        DEBUG("2\n");
-        dev->DIER &= ~TIM_DIER_CC2IE;
-        dev->SR &= ~TIM_SR_CC2IF;
-        config[timer].cb(1);
-        DEBUG("-2\n");
-    }
-    else if (dev->SR & TIM_SR_CC3IF) {
-        DEBUG("3\n");
-        dev->DIER &= ~TIM_DIER_CC3IE;
-        dev->SR &= ~TIM_SR_CC3IF;
-        config[timer].cb(2);
-        DEBUG("-3\n");
-    }
-    else if (dev->SR & TIM_SR_CC4IF) {
-        DEBUG("4\n");
-        dev->DIER &= ~TIM_DIER_CC4IE;
-        dev->SR &= ~TIM_SR_CC4IF;
-        config[timer].cb(3);
-        DEBUG("-4\n");
-    }
+    DEBUG("CNT: %08x SR/DIER: %08x\n", ((dev1->CNT<<16) | (0xffff & dev0->CNT)),
+                                       ((dev0->SR<<16) | (0xffff & dev0->DIER)));
 
+    if ((dev0->SR & TIM_SR_CC1IF) && (dev0->DIER & TIM_DIER_CC1IE)) {
+        /* clear interrupt anyway */
+        dev0->SR &= ~TIM_SR_CC1IF;
+        /* if higher 16bit also match */
+        if (dev1->CNT >= dev1->CCR1) {
+            dev0->DIER &= ~TIM_DIER_CC1IE;
+            config[timer].cb(0);
+        }
+        DEBUG("channel 1 CCR: %08x\n", ((dev1->CCR1<<16) | (0xffff & dev0->CCR1)));
+    }
+    else if ((dev0->SR & TIM_SR_CC2IF) && (dev0->DIER & TIM_DIER_CC2IE)) {
+        /* clear interrupt anyway */
+        dev0->SR &= ~TIM_SR_CC2IF;
+        /* if higher 16bit also match */
+        if (dev1->CNT >= dev1->CCR2) {
+            dev0->DIER &= ~TIM_DIER_CC2IE;
+            config[timer].cb(1);
+        }
+        DEBUG("channel 2 CCR: %08x\n", ((dev1->CCR2<<16) | (0xffff & dev0->CCR2)));
+    }
+    else if ((dev0->SR & TIM_SR_CC3IF) && (dev0->DIER & TIM_DIER_CC3IE)) {
+        /* clear interrupt anyway */
+        dev0->SR &= ~TIM_SR_CC3IF;
+        /* if higher 16bit also match */
+        if (dev1->CNT >= dev1->CCR3) {
+            dev0->DIER &= ~TIM_DIER_CC3IE;
+            config[timer].cb(2);
+        }
+        DEBUG("channel 3 CCR: %08x\n", ((dev1->CCR3<<16) | (0xffff & dev0->CCR3)));
+    }
+    else if ((dev0->SR & TIM_SR_CC4IF) && (dev0->DIER & TIM_DIER_CC4IE)) {
+        /* clear interrupt anyway */
+        dev0->SR &= ~TIM_SR_CC4IF;
+        /* if higher 16bit also match */
+        if (dev1->CNT >= dev1->CCR4) {
+            dev0->DIER &= ~TIM_DIER_CC4IE;
+            config[timer].cb(3);
+        }
+        DEBUG("channel 4 CCR: %08x\n", ((dev1->CCR4<<16) | (0xffff & dev0->CCR4)));
+    }
+    else {
+        dev0->SR = 0;
+    }
     if (sched_context_switch_request) {
         thread_yield();
     }
