@@ -90,8 +90,12 @@ void pulsesync_pause(void);
 void pulsesync_resume(void);
 
 /**
- * @brief reads a frame supplied by the mac layer of sixlowpan.
- * This function should only be called by mac.c
+ * @brief reads a IEEE802.15.4 frame.
+ * This function should only be called by receive_helper.c
+ *
+ * @param[in] payload pointer to the frame payload
+ * @param src src transceiver source address
+ * @param[in] gtimer_toa gtimer time of arrival timestamp
  */
 void pulsesync_mac_read(uint8_t *frame_payload, uint16_t src, gtimer_timeval_t *toa);
 

@@ -35,23 +35,54 @@ typedef struct  __attribute__((packed))
 {
     uint8_t dispatch_marker;    /// << protocol marker
     uint32_t counter;           /// << sender beacon counter
-}
-clocksync_eval_beacon_t;
+} clocksync_eval_beacon_t;
 
+/**
+ * @brief Starts the clocksync_eval module
+ */
 void clocksync_eval_init(void);
 
+/**
+ * @brief reads a IEEE802.15.4 frame.
+ * This function should only be called by receive_helper.c
+ *
+ * @param[in] payload pointer to the frame payload
+ * @param src src transceiver source address
+ * @param[in] gtimer_toa gtimer time of arrival timestamp
+ */
 void clocksync_eval_mac_read(uint8_t *payload, uint16_t src, gtimer_timeval_t *gtimer_toa);
 
+/**
+ * @brief sets the beacon interval in seconds.
+ *
+ * @param lower_delay_in_ms lower bound of the interval
+ * @param jitter_in_ms upper bound of the interval
+ */
 void clocksync_eval_set_beacon_interval(uint32_t lower_delay_in_ms, uint32_t jitter_in_ms);
 
+/**
+ * @brief sets the frequency for printing heartbeat messages to the uart.
+ */
 void clocksync_eval_set_heartbeat_interval(uint32_t delay_in_ms);
 
+/**
+ * @brief causes clocksync_eval to stop sending beacons
+ */
 void clocksync_eval_pause_sending(void);
 
+/**
+ * @brief resumes beacon sending
+ */
 void clocksync_eval_resume_sending(void);
 
+/**
+ * @brief causes clocksync_eval to stop printing heartbeat messages to the uart.
+ */
 void clocksync_eval_pause_heartbeat(void);
 
+/**
+ * @brief resumes heartbeat message printing to the uart.
+ */
 void clocksync_eval_resume_heartbeat(void);
 
 #endif /* __CLOCKSYNC_EVAL_H_ */
