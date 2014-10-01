@@ -51,13 +51,29 @@
 #define GPIO_13_EN  (1)
 #define GPIO_14_EN  (1)
 #define GPIO_15_EN  (1)
-#define GPIO_NUMOF (16)
+#define GPIO_16_EN  (1)
+#define GPIO_17_EN  (1)
+#define GPIO_18_EN  (1)
+#define GPIO_19_EN  (1)
+#define GPIO_20_EN  (1)
+#define GPIO_21_EN  (1)
+#define GPIO_22_EN  (1)
+#define GPIO_23_EN  (1)
+#define GPIO_24_EN  (1)
+#define GPIO_25_EN  (1)
+#define GPIO_26_EN  (1)
+#define GPIO_27_EN  (1)
+#define GPIO_28_EN  (1)
+#define GPIO_29_EN  (1)
+#define GPIO_30_EN  (1)
+#define GPIO_31_EN  (1)
+#define GPIO_NUMOF (32)
 
 #elif defined MODULE_NATIVE_GPIO_SYSFS  /* sysfs */
 
 #ifdef NATIVE_GPIO_NUMOF
-#   if NATIVE_GPIO_NUMOF > 16
-#       define GPIO_NUMOF 16
+#   if NATIVE_GPIO_NUMOF > 32
+#       define GPIO_NUMOF 32
 #   else
 #       define GPIO_NUMOF NATIVE_GPIO_NUMOF
 #   endif
