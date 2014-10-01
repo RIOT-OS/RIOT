@@ -90,7 +90,7 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pullup)
 
 int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
-    int ret = sysfs_gpio_conf(dev, _NATIVE_GPIO_CONF_IN);
+    int ret = sysfs_gpio_conf(dev, _NATIVE_GPIO_CONF_INT);
     if (ret != 0) {
         warnx("gpio_init_int(%i)", dev);
         return -1;
@@ -212,11 +212,17 @@ static int sysfs_gpio_conf(gpio_t dev, _native_gpio_conf_t conf)
             if (ret == -1) {
                 warn("sysfs_gpio_conf(%i, _NATIVE_GPIO_CONF_IN)", dev);
             }
+            else {
+                ret = 0;
+            }
             break;
         case (_NATIVE_GPIO_CONF_OUT):
             ret = real_write(fd, "out", 4);
             if (ret == -1) {
                 warn("sysfs_gpio_conf(%i, _NATIVE_GPIO_CONF_OUT)", dev);
+            }
+            else {
+                ret = 0;
             }
             break;
         default:
