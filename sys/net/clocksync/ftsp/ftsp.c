@@ -127,7 +127,8 @@ void ftsp_init(void)
     seq_num = 0;
 
     beacon_pid = thread_create(ftsp_beacon_stack, FTSP_BEACON_STACK_SIZE,
-                               PRIORITY_MAIN - 2, CREATE_STACKTEST, beacon_thread, NULL, "ftsp_beacon");
+                               PRIORITY_MAIN - 2, CREATE_STACKTEST|CREATE_SLEEPING,
+                               beacon_thread, NULL, "ftsp_beacon");
 
     clocksync_common_init_recv();
 
@@ -139,7 +140,6 @@ static void *beacon_thread(void *arg)
     (void) arg;
 
     while (1) {
-        thread_sleep();
         DEBUG("_ftsp_beacon_thread locking mutex\n");
         mutex_lock(&ftsp_mutex);
         memset(ftsp_beacon_buffer, 0, sizeof(ftsp_beacon_t));
@@ -150,6 +150,7 @@ static void *beacon_thread(void *arg)
 
         mutex_unlock(&ftsp_mutex);
         DEBUG("_ftsp_beacon_thread: mutex unlocked\n");
+        thread_sleep();
     }
 
     return NULL;

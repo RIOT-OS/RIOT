@@ -90,7 +90,8 @@ void clocksync_eval_init(void)
     mutex_init(&clocksync_eval_mutex);
 
     beacon_pid = thread_create(clocksync_eval_beacon_stack,
-                               CLOCKSYNC_EVAL_BEACON_STACK_SIZE, PRIORITY_MAIN - 2, CREATE_STACKTEST,
+                               CLOCKSYNC_EVAL_BEACON_STACK_SIZE, PRIORITY_MAIN - 2,
+                               CREATE_STACKTEST|CREATE_SLEEPING,
                                beacon_send_thread, NULL, "clocksync_eval_beacon");
 
     thread_create(clocksync_eval_cyclic_beacon_stack,
@@ -160,10 +161,6 @@ static void *beacon_send_thread(void *arg)
     (void) arg;
 
     while (1) {
-        DEBUG("beacon_send_thread: sleeping\n");
-        thread_sleep();
-        DEBUG("beacon_send_thread: woke up\n");
-
         if (!pause_protocol) {
             mutex_lock(&clocksync_eval_mutex);
             send_beacon();
@@ -208,6 +205,9 @@ static void *beacon_send_thread(void *arg)
                   beacon_interval);
             mutex_unlock(&clocksync_eval_mutex);
         }
+        DEBUG("beacon_send_thread: sleeping\n");
+        thread_sleep();
+        DEBUG("beacon_send_thread: woke up\n");
     }
 
     return NULL;

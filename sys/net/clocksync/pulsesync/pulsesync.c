@@ -136,7 +136,6 @@ static void *beacon_thread(void *arg)
     (void) arg;
 
     while (1) {
-        thread_sleep();
         DEBUG("beacon_thread locking mutex\n");
         mutex_lock(&pulsesync_mutex);
         memset(pulsesync_beacon_buffer, 0, sizeof(pulsesync_beacon_t));
@@ -150,6 +149,7 @@ static void *beacon_thread(void *arg)
 
         mutex_unlock(&pulsesync_mutex);
         DEBUG("beacon_thread: mutex unlocked\n");
+        thread_sleep();
     }
 
     return NULL;
@@ -160,7 +160,6 @@ static void *root_beacon_thread(void *arg)
     (void) arg;
 
     while (1) {
-        thread_sleep();
         DEBUG("root_beacon_thread locking mutex\n");
         mutex_lock(&pulsesync_mutex);
         memset(pulsesync_beacon_buffer, 0, sizeof(pulsesync_beacon_t));
@@ -171,6 +170,7 @@ static void *root_beacon_thread(void *arg)
 
         mutex_unlock(&pulsesync_mutex);
         DEBUG("root_beacon_thread: mutex unlocked\n");
+        thread_sleep();
     }
 
     return NULL;
@@ -355,14 +355,15 @@ void pulsesync_resume(void)
         if (node_id == PULSESYNC_PREFERRED_ROOT) {
             beacon_pid = thread_create(pulsesync_beacon_stack,
                                        PULSESYNC_BEACON_STACK_SIZE,
-                                       PRIORITY_MAIN - 2, CREATE_STACKTEST, root_beacon_thread, NULL,
+                                       PRIORITY_MAIN - 2, CREATE_STACKTEST|CREATE_SLEEPING,
+                                       root_beacon_thread, NULL,
                                        "pulsesync_root_beacon");
         }
         else {
             beacon_pid = thread_create(pulsesync_beacon_stack,
                                        PULSESYNC_BEACON_STACK_SIZE,
-                                       PRIORITY_MAIN - 2, CREATE_STACKTEST, beacon_thread, NULL,
-                                       "pulsesync_beacon");
+                                       PRIORITY_MAIN - 2, CREATE_STACKTEST|CREATE_SLEEPING,
+                                       beacon_thread, NULL, "pulsesync_beacon");
         }
     }
 

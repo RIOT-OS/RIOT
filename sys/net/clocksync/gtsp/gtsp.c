@@ -106,11 +106,13 @@ void gtsp_init(void)
     }
 
     beacon_pid = thread_create(gtsp_beacon_stack, GTSP_BEACON_STACK_SIZE,
-                               PRIORITY_MAIN - 2, CREATE_STACKTEST, beacon_thread, NULL, "gtsp_beacon");
+                               PRIORITY_MAIN - 2, CREATE_STACKTEST|CREATE_SLEEPING,
+                               beacon_thread, NULL, "gtsp_beacon");
 
     cyclic_driver_pid = thread_create(gtsp_cyclic_stack, GTSP_CYCLIC_STACK_SIZE,
                                       PRIORITY_MAIN - 2,
-                                      CREATE_STACKTEST, cyclic_driver_thread, NULL, "gtsp_cyclic_driver");
+                                      CREATE_STACKTEST, cyclic_driver_thread, NULL,
+                                      "gtsp_cyclic_driver");
 
     clocksync_common_init_recv();
     puts("GTSP initialized");
@@ -121,7 +123,6 @@ static void *beacon_thread(void *arg)
     (void) arg;
 
     while (1) {
-        thread_sleep();
         DEBUG("_gtsp_beacon_thread locking mutex\n");
         mutex_lock(&gtsp_mutex);
         memset(gtsp_beacon_buffer, 0, sizeof(gtsp_beacon_t));
@@ -132,6 +133,7 @@ static void *beacon_thread(void *arg)
 
         mutex_unlock(&gtsp_mutex);
         DEBUG("_gtsp_beacon_thread: mutex unlocked\n");
+        thread_sleep();
     }
 
     return NULL;
