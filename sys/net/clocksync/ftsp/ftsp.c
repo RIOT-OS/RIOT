@@ -127,7 +127,7 @@ void ftsp_init(void)
     seq_num = 0;
 
     beacon_pid = thread_create(ftsp_beacon_stack, FTSP_BEACON_STACK_SIZE,
-                               PRIORITY_MAIN - 2, CREATE_STACKTEST|CREATE_SLEEPING,
+                               PRIORITY_MAIN - 2, CREATE_STACKTEST | CREATE_SLEEPING,
                                beacon_thread, NULL, "ftsp_beacon");
 
     clocksync_common_init_recv();

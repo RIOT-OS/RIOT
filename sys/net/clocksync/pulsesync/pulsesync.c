@@ -355,14 +355,14 @@ void pulsesync_resume(void)
         if (node_id == PULSESYNC_PREFERRED_ROOT) {
             beacon_pid = thread_create(pulsesync_beacon_stack,
                                        PULSESYNC_BEACON_STACK_SIZE,
-                                       PRIORITY_MAIN - 2, CREATE_STACKTEST|CREATE_SLEEPING,
+                                       PRIORITY_MAIN - 2, CREATE_STACKTEST | CREATE_SLEEPING,
                                        root_beacon_thread, NULL,
                                        "pulsesync_root_beacon");
         }
         else {
             beacon_pid = thread_create(pulsesync_beacon_stack,
                                        PULSESYNC_BEACON_STACK_SIZE,
-                                       PRIORITY_MAIN - 2, CREATE_STACKTEST|CREATE_SLEEPING,
+                                       PRIORITY_MAIN - 2, CREATE_STACKTEST | CREATE_SLEEPING,
                                        beacon_thread, NULL, "pulsesync_beacon");
         }
     }

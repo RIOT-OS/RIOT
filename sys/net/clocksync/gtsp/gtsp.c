@@ -107,7 +107,7 @@ void gtsp_init(void)
     }
 
     beacon_pid = thread_create(gtsp_beacon_stack, GTSP_BEACON_STACK_SIZE,
-                               PRIORITY_MAIN - 2, CREATE_STACKTEST|CREATE_SLEEPING,
+                               PRIORITY_MAIN - 2, CREATE_STACKTEST | CREATE_SLEEPING,
                                beacon_thread, NULL, "gtsp_beacon");
 
     cyclic_driver_pid = thread_create(gtsp_cyclic_stack, GTSP_CYCLIC_STACK_SIZE,
