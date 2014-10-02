@@ -42,6 +42,7 @@ install:
     - git log -1 --pretty=format:%H riot/master
 
 script:
+    - sudo ./cpu/native/tapsetup.sh create 2
     - make -s -C ./examples/default info-concurrency
     - git rebase riot/master || git rebase --abort
 
