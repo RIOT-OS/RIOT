@@ -12,6 +12,9 @@
 #include <sys/_types.h>
 #include <errno.h>
 
+/** defining signed type for size_t */
+#include "kernel_types.h"
+
 #ifndef EINVAL
 /**
  * @brief defines EINVAL if MSP430 toolchain is too old to provide it itself
@@ -27,9 +30,6 @@
  */
 #define EOVERFLOW   (65)
 #endif
-
-/** defining signed type for size_t */
-typedef _ssize_t ssize_t;
 
 typedef unsigned long time_t;
 

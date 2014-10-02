@@ -11,6 +11,24 @@
 
 #include <stdint.h>
 #include <inttypes.h>
+#include <limits.h>
+
+#ifndef NATIVE_INCLUDES
+#   include <stddef.h>
+#   include <sys/types.h>
+
+#   ifndef SSIZE_MAX
+#       ifdef _POSIX_SSIZE_MAX
+#           define SSIZE_MAX _POSIX_SSIZE_MAX
+#       else
+#           define SSIZE_MAX ((ssize_t) (SIZE_MAX / 2))
+#       endif
+#   endif
+
+#   if defined (MODULE_MSP430_COMMON) || defined (MODULE_ATMEGA_COMMON)
+        typedef signed ssize_t;
+#   endif
+#endif
 
 /**
  * @def MAXTHREADS

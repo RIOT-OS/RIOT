@@ -7,10 +7,10 @@ include $(RIOTBOARD)/Makefile.base
 include $(RIOTBOARD)/$(BOARD)/Makefile.include
 endif
 
-.PHONY: all clean patch reset
+.PHONY: all clean patch distclean
 
 all: patch
-	make -C $(CURDIR)/$(PKG_NAME)
+	$(MAKE) -C $(CURDIR)/$(PKG_NAME)
 
 patch: $(CURDIR)/$(PKG_NAME)/Makefile
 	# Dependancy might be changed accordingly though we think the Makefile

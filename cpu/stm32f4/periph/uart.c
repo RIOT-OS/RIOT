@@ -27,7 +27,6 @@
 
 /* guard file in case no UART device was specified */
 #if UART_NUMOF
-
 /**
  * @brief Each UART device has to store two callbacks.
  */

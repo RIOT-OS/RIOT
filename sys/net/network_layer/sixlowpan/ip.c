@@ -320,7 +320,7 @@ uint8_t ipv6_get_addr_match(const ipv6_addr_t *src,
 static int is_our_address(ipv6_addr_t *addr)
 {
     int if_id = -1;
-    unsigned counter = 0;
+    int if_counter = -1;
 
     DEBUGF("Is this my addres: %s?\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
@@ -331,7 +331,7 @@ static int is_our_address(ipv6_addr_t *addr)
 
         while ((myaddr = (ipv6_net_if_addr_t *)net_if_iter_addresses(if_id,
                          (net_if_addr_t **) &myaddr)) != NULL) {
-            counter++;
+            if_counter++;
             DEBUGF("\tCompare with: %s?\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, (ipv6_addr_t*) myaddr->addr_data));
             if ((ipv6_get_addr_match(myaddr->addr_data, addr) >= net_if_ext->prefix) &&
                 (memcmp(&addr->uint8[prefix], &myaddr->addr_data->uint8[prefix], suffix) == 0)) {
@@ -340,11 +340,11 @@ static int is_our_address(ipv6_addr_t *addr)
         }
     }
 
-    if (!counter) {
-        counter = -1;
-    }
     /* return negative value if no address is configured so far */
-    return counter;
+    if (if_counter >= 0) {
+        return 0;
+    }
+    return -1;
 }
 
 void *ipv6_process(void *arg)

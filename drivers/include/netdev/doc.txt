@@ -1,0 +1,16 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the LGPLv2 License.
+ * See the file LICENSE in the top level directory for more details.
+ */
+
+/**
+ * @defgroup    netdev  Network device interface
+ * @ingroup     drivers
+ * @brief       Network device drivers
+ *
+ * The module the network device drivers. It consists of a set of device
+ * independent interface definitions and specific implementations for every
+ * device.
+ */

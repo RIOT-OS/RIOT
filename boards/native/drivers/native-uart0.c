@@ -122,7 +122,7 @@ int init_tcp_socket(char *tcpport)
             err(EXIT_FAILURE, "init_uart_socket: setsockopt");
         }
 
-        if (bind(s, p->ai_addr, p->ai_addrlen) == -1) {
+        if (real_bind(s, p->ai_addr, p->ai_addrlen) == -1) {
             close(s);
             warn("init_uart_socket: bind");
             continue;
@@ -135,7 +135,7 @@ int init_tcp_socket(char *tcpport)
     }
     freeaddrinfo(info);
 
-    if (listen(s, 1) == -1) {
+    if (real_listen(s, 1) == -1) {
         err(EXIT_FAILURE, "init_uart_socket: listen");
     }
 
@@ -160,11 +160,11 @@ int init_unix_socket(void)
         snprintf(sa.sun_path, sizeof(sa.sun_path), "/tmp/riot.tty.%d", _native_pid);
     }
     real_unlink(sa.sun_path); /* remove stale socket */
-    if (bind(s, (struct sockaddr *)&sa, SUN_LEN(&sa)) == -1) {
+    if (real_bind(s, (struct sockaddr *)&sa, SUN_LEN(&sa)) == -1) {
         err(EXIT_FAILURE, "init_unix_socket: bind");
     }
 
-    if (listen(s, 5) == -1) {
+    if (real_listen(s, 5) == -1) {
         err(EXIT_FAILURE, "init_unix_socket: listen");
     }
 

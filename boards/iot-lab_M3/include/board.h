@@ -27,24 +27,37 @@
 #include <stdint.h>
 
 #include "cpu.h"
+#include "periph_conf.h"
 
 /**
  * Define the nominal CPU core clock in this board
  */
-#define F_CPU               (72000000UL)
+#define F_CPU               CLOCK_CORECLOCK
 
 /**
  * @name Define the UART to be used as stdio and its baudrate
  * @{
  */
 #define STDIO               UART_0
-#define STDIO_BAUDRATE      (115200)
+#define STDIO_BAUDRATE      (115200U)
+#define STDIO_RX_BUFSIZE    (64U)
 /** @} */
 
 /**
  * Assign the hardware timer
  */
 #define HW_TIMER            TIMER_0
+
+/**
+ * @name Define the interface to the AT86RF231 radio
+ * @{
+ */
+#define AT86RF231_SPI       SPI_0
+#define AT86RF231_CS        GPIO_11
+#define AT86RF231_INT       GPIO_12
+#define AT86RF231_RESET     GPIO_13
+#define AT86RF231_SLEEP     GPIO_14
+/** @} */
 
 /**
  * @name LED pin definitions

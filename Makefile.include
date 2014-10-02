@@ -131,7 +131,7 @@ BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
-.PHONY: all clean flash doc term
+.PHONY: all clean flash term doc debug debug-server reset objdump
 
 ELFFILE ?= $(BINDIR)$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
@@ -141,6 +141,8 @@ CPPMIX ?= $(if $(wildcard *.cpp),1,)
 
 # We assume $(LINK) to be gcc-like. Use `LINKFLAGPREFIX :=` for ld-like linker options.
 LINKFLAGPREFIX ?= -Wl,
+
+DIRS += $(EXTERNAL_MODULE_DIRS)
 
 ## make script for your application. Build RIOT-base here!
 all: ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
@@ -206,6 +208,9 @@ debug-server:
 
 reset:
 	$(RESET) $(RESET_FLAGS)
+
+objdump:
+	$(PREFIX)objdump -S -D -h $(ELFFILE) | less
 
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests

@@ -64,11 +64,20 @@
 #endif
 
 #ifdef MODULE_NET_IF
+#include "cpu-conf.h"
+#include "cpu.h"
+#include "kernel.h"
 #include "net_if.h"
 #include "transceiver.h"
+#include "net_help.h"
+#include "hashes.h"
+#include "periph/cpuid.h"
 #endif
 
 #define ENABLE_DEBUG (0)
+#if ENABLE_DEBUG
+#define DEBUG_ENABLED
+#endif
 #include "debug.h"
 
 #ifndef CONF_RADIO_ADDR
@@ -78,6 +87,105 @@
 #ifndef CONF_PAN_ID
 #define CONF_PAN_ID     (0xabcd)
 #endif
+
+#ifdef MODULE_NET_IF
+void auto_init_net_if(void)
+{
+    int iface;
+    transceiver_type_t transceivers = 0;
+#ifdef MODULE_AT86RF231
+    transceivers |= TRANSCEIVER_AT86RF231;
+#endif
+#ifdef MODULE_CC1020
+    transceivers |= TRANSCEIVER_CC1020;
+#endif
+#if MODULE_CC110X || MODULE_CC110X_NG
+    transceivers |= TRANSCEIVER_CC1100;
+#endif
+#ifdef MODULE_CC2420
+    transceivers |= TRANSCEIVER_CC2420;
+#endif
+#ifdef MODULE_MC1322X
+    transceivers |= TRANSCEIVER_MC1322X;
+#endif
+#ifdef MODULE_NATIVENET
+    transceivers |= TRANSCEIVER_NATIVE;
+#endif
+    net_if_init();
+
+    if (transceivers != 0) {
+#if CPUID_ID_LEN && defined(MODULE_HASHES)
+        uint8_t cpuid[CPUID_ID_LEN];
+
+        cpuid_get(cpuid);
+#endif
+        transceiver_init(transceivers);
+        transceiver_start();
+        iface = net_if_init_interface(0, transceivers);
+
+#if CPUID_ID_LEN && defined(MODULE_HASHES)
+        net_if_eui64_t eui64;
+        uint32_t hash_h = djb2_hash(cpuid, CPUID_ID_LEN / 2);
+#if CPUID_ID_LEN % 2 == 0
+        uint32_t hash_l = djb2_hash(&(cpuid[CPUID_ID_LEN / 2]),
+                                    CPUID_ID_LEN / 2);
+#else /* CPUID_ID_LEN % 2 == 0 */
+        uint32_t hash_l = djb2_hash(&(cpuid[CPUID_ID_LEN / 2]),
+                                    CPUID_ID_LEN / 2 + 1);
+#endif /* CPUID_ID_LEN % 2 == 0 */
+
+        memcpy(&(eui64.uint32[0]), &hash_h, sizeof(uint32_t));
+        memcpy(&(eui64.uint32[1]), &hash_l, sizeof(uint32_t));
+        net_if_set_eui64(iface, &eui64);
+
+#ifdef DEBUG_ENABLED
+        DEBUG("Auto init radio long address on interface %d to ", iface);
+
+        for (size_t i = 0; i < 8; i++) {
+            printf("%02x ", eui64.uint8[i]);
+        }
+
+        DEBUG("\n");
+#endif /* DEBUG_ENABLED */
+
+#undef CONF_RADIO_ADDR
+        uint16_t hwaddr = HTONS((uint16_t)hash_l);
+        net_if_set_hardware_address(iface, hwaddr);
+        DEBUG("Auto init radio address on interface %d to 0x%04x\n", iface, hwaddr);
+#else /* CPUID_ID_LEN && defined(MODULE_HASHES) */
+
+        if (net_if_set_src_address_mode(iface, NET_IF_TRANS_ADDR_M_SHORT)) {
+            DEBUG("Auto init source address mode to short on interface %d\n",
+                  iface);
+        }
+        else {
+            net_if_set_src_address_mode(iface, NET_IF_TRANS_ADDR_M_LONG);
+            DEBUG("Auto init source address mode to long on interface %d\n",
+                  iface);
+        }
+
+        if (!net_if_get_hardware_address(iface)) {
+            DEBUG("Auto init radio address on interface %d to 0x%04x\n", iface, CONF_RADIO_ADDR);
+            DEBUG("Change this value at compile time with macro CONF_RADIO_ADDR\n");
+            net_if_set_hardware_address(iface, CONF_RADIO_ADDR);
+        }
+#endif /* CPUID_ID_LEN && defined(MODULE_HASHES) */
+
+        if (net_if_get_pan_id(iface) <= 0) {
+            DEBUG("Auto init PAN ID on interface %d to 0x%04x\n", iface, CONF_PAN_ID);
+            DEBUG("Change this value at compile time with macro CONF_PAN_ID\n");
+            net_if_set_pan_id(iface, CONF_PAN_ID);
+        }
+
+        if (iface >= 0) {
+            DEBUG("Auto init interface %d\n", iface);
+        }
+    }
+    else {
+        iface = -1;
+    }
+}
+#endif /* MODULE_NET_IF */
 
 void auto_init(void)
 {
@@ -117,68 +225,12 @@ void auto_init(void)
     MCI_initialize();
 #endif
 #ifdef MODULE_NET_IF
-    int iface;
     DEBUG("Auto init net_if module.\n");
-    transceiver_type_t transceivers = 0;
-#ifdef MODULE_AT86RF231
-    transceivers |= TRANSCEIVER_AT86RF231;
+    auto_init_net_if();
 #endif
-#ifdef MODULE_CC1020
-    transceivers |= TRANSCEIVER_CC1020;
-#endif
-#if MODULE_CC110X || MODULE_CC110X_NG
-    transceivers |= TRANSCEIVER_CC1100;
-#endif
-#ifdef MODULE_CC2420
-    transceivers |= TRANSCEIVER_CC2420;
-#endif
-#ifdef MODULE_MC1322X
-    transceivers |= TRANSCEIVER_MC1322X;
-#endif
-#ifdef MODULE_NATIVENET
-    transceivers |= TRANSCEIVER_NATIVE;
-#endif
-    net_if_init();
-
-    if (transceivers != 0) {
-        transceiver_init(transceivers);
-        transceiver_start();
-        iface = net_if_init_interface(0, transceivers);
-
-        if (net_if_set_src_address_mode(iface, NET_IF_TRANS_ADDR_M_SHORT)) {
-            DEBUG("Auto init source address mode to short on interface %d\n",
-                  iface);
-        }
-        else {
-            net_if_set_hardware_address(iface, NET_IF_TRANS_ADDR_M_LONG);
-            DEBUG("Auto init source address mode to long on interface %d\n",
-                  iface);
-        }
-
-        if (!net_if_get_hardware_address(iface)) {
-            DEBUG("Auto init radio address on interface %d to 0x%04x\n", iface, CONF_RADIO_ADDR);
-            DEBUG("Change this value at compile time with macro CONF_RADIO_ADDR\n");
-            net_if_set_hardware_address(iface, CONF_RADIO_ADDR);
-        }
-
-        if (net_if_get_pan_id(iface) <= 0) {
-            DEBUG("Auto init PAN ID on interface %d to 0x%04x\n", iface, CONF_PAN_ID);
-            DEBUG("Change this value at compile time with macro CONF_PAN_ID\n");
-            net_if_set_pan_id(iface, CONF_PAN_ID);
-        }
-
-        if (iface >= 0) {
-            DEBUG("Auto init interface %d\n", iface);
-        }
-    }
-    else {
-        iface = -1;
-    }
-
 #ifdef MODULE_SIXLOWPAN
     DEBUG("Auto init 6LoWPAN module.\n");
     sixlowpan_lowpan_init();
-#endif
 #endif
 #ifdef MODULE_PROFILING
     extern void profiling_init(void);

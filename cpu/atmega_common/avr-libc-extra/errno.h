@@ -86,7 +86,8 @@ extern int errno;
 #define EAGAIN ENOERR
 #define EALREADY ENOERR
 #define EBADF ENOERR
-//#define EBUSY ENOERR
+/* #define EBUSY ENOERR */
+#define ECANCELED ENOERR
 #define ECHILD ENOERR
 #define ECONNABORTED ENOERR
 #define ECONNREFUSED ENOERR
@@ -99,7 +100,7 @@ extern int errno;
 #define EHOSTUNREACH ENOERR
 #define EILSEQ ENOERR
 #define EINPROGRESS ENOERR
-//#define EINVAL ENOERR
+/* #define EINVAL ENOERR */
 #define EIO ENOERR
 #define EISCONN ENOERR
 #define EISDIR ENOERR
@@ -128,6 +129,7 @@ extern int errno;
 #define ENOTTY ENOERR
 #define ENXIO ENOERR
 #define EOPNOTSUPP ENOERR
+#define ENOTSUP    EOPNOTSUPP
 #define EPERM ENOERR
 #define EPIPE ENOERR
 #define EPROTONOSUPPORT ENOERR

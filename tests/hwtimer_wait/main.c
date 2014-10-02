@@ -19,14 +19,10 @@
  */
 
 #include <stdio.h>
-#include <limits.h>
-#include <stdlib.h>
 #include <math.h>
 
-#include "board_uart0.h"
-#include "posix_io.h"
 #include "hwtimer.h"
-#include "thread.h"
+#include "board.h"
 
 int main(void)
 {
@@ -40,7 +36,7 @@ int main(void)
     printf("The test should take about %li sec.\n", (HWTIMER_TICKS_TO_US(duration)/1000000));
 
     for (unsigned long r = iterations; r > 0; r--) {
-        for (unsigned long i = start_duration; i; i = i >> 1) {
+        for (unsigned long i = start_duration; i > HWTIMER_SPIN_BARRIER; i = i >> 1) {
             hwtimer_wait(i);
         }
     }

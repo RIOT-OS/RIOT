@@ -19,7 +19,7 @@ else ifeq ($(OUTPUT),COMPILER)
 endif
 
 ifeq (, $(filter tests-%, $(MAKECMDGOALS)))
-    UNIT_TESTS := $(shell find -mindepth 1 -maxdepth 1 -type d -name 'tests-*' -printf '%f ')
+    UNIT_TESTS := $(foreach d,$(wildcard tests-*/Makefile),$(shell dirname $(d)))
 else
     UNIT_TESTS := $(filter tests-%, $(MAKECMDGOALS))
 endif
