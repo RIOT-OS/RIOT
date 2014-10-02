@@ -31,7 +31,8 @@
 /**
  * Assign the hardware timer
  */
-#define HW_TIMER            TIMER_0
+#define HW_TIMER_0            TIMER_0
+#define HW_TIMER_1            TIMER_1
 
 /**
  * @name Define UART device and baudrate for stdio
