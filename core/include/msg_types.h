@@ -31,6 +31,11 @@ typedef enum {
     /* core message type: */
     MT_MSG_UNDEF = 0,                   /**< undefined message type */
 
+#ifdef MODULE_PIR
+    MT_PIR_STATUS_HI,                   /**< motion was detected */
+    MT_PIR_STATUS_LO,                   /**< no motion is detected */
+#endif
+
     /* core message type: */
     MT_MSG_MAX,                         /**< highest defined message type */
 } msg_type_t;

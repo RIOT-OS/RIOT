@@ -21,6 +21,7 @@
 #ifndef __PIR_H
 #define __PIR_H
 
+#include "msg_types.h"
 #include "kernel_types.h"
 #include "periph/gpio.h"
 
@@ -37,8 +38,8 @@ typedef struct {
 #endif
 
 typedef enum {
-    PIR_STATUS_HI = PIR_MSG_T_STATUS_START,     /**< motion was detected */
-    PIR_STATUS_LO,                              /**< no motion is detected */
+    PIR_STATUS_HI = MT_PIR_STATUS_HI,   /**< motion was detected */
+    PIR_STATUS_LO = MT_PIR_STATUS_LO,   /**< no motion is detected */
 } pir_event_t;
 
 /**
