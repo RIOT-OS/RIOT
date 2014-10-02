@@ -63,7 +63,7 @@ void *radio(void *arg)
     while (receiving) {
         msg_receive(&m);
 
-        if (m.type == PKT_PENDING) {
+        if (m.type == MT_TRANSCEIVER_PKT_PENDING) {
             p = (radio_packet_t *) m.content.ptr;
 
             if ((p->src == SENDER_ADDR) && (p->length == PACKET_SIZE)) {
@@ -89,7 +89,7 @@ void *radio(void *arg)
 
             p->processing--;
         }
-        else if (m.type == ENOBUFFER) {
+        else if (m.type == MT_TRANSCEIVER_ENOBUFFER) {
             puts("Transceiver buffer full");
         }
         else {
@@ -107,7 +107,7 @@ void sender(void)
     transceiver_command_t tcmd;
     radio_packet_t p;
 
-    mesg.type = SND_PKT;
+    mesg.type = MT_TRANSCEIVER_SND_PKT;
     mesg.content.ptr = (char *) &tcmd;
 
     tcmd.transceivers = TRANSCEIVER_NATIVE;
@@ -160,7 +160,7 @@ int main(void)
     tcmd.transceivers = TRANSCEIVER_NATIVE;
     tcmd.data = &a;
     mesg.content.ptr = (char *) &tcmd;
-    mesg.type = SET_ADDRESS;
+    mesg.type = MT_TRANSCEIVER_SET_ADDRESS;
 
     printf("[nativenet] trying to set address %" PRIi16 "\n", a);
     msg_send_receive(&mesg, &mesg, transceiver_pid);

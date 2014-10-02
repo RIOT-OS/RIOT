@@ -5048,11 +5048,11 @@
 #define RADIO_INTENSET_PAYLOAD_Set (1UL) /*!< Enable interrupt on write. */
 
 /* Bit 1 : Enable interrupt on ADDRESS event. */
-#define RADIO_INTENSET_ADDRESS_Pos (1UL) /*!< Position of ADDRESS field. */
-#define RADIO_INTENSET_ADDRESS_Msk (0x1UL << RADIO_INTENSET_ADDRESS_Pos) /*!< Bit mask of ADDRESS field. */
-#define RADIO_INTENSET_ADDRESS_Disabled (0UL) /*!< Interrupt disabled. */
-#define RADIO_INTENSET_ADDRESS_Enabled (1UL) /*!< Interrupt enabled. */
-#define RADIO_INTENSET_ADDRESS_Set (1UL) /*!< Enable interrupt on write. */
+#define RADIO_INTENMT_TRANSCEIVER_SET_ADDRESS_Pos (1UL) /*!< Position of ADDRESS field. */
+#define RADIO_INTENMT_TRANSCEIVER_SET_ADDRESS_Msk (0x1UL << RADIO_INTENMT_TRANSCEIVER_SET_ADDRESS_Pos) /*!< Bit mask of ADDRESS field. */
+#define RADIO_INTENMT_TRANSCEIVER_SET_ADDRESS_Disabled (0UL) /*!< Interrupt disabled. */
+#define RADIO_INTENMT_TRANSCEIVER_SET_ADDRESS_Enabled (1UL) /*!< Interrupt enabled. */
+#define RADIO_INTENMT_TRANSCEIVER_SET_ADDRESS_Set (1UL) /*!< Enable interrupt on write. */
 
 /* Bit 0 : Enable interrupt on READY event. */
 #define RADIO_INTENSET_READY_Pos (0UL) /*!< Position of READY field. */

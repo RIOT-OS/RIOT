@@ -39,7 +39,7 @@ void lpm_init(void)
 enum lpm_mode lpm_set(enum lpm_mode target)
 {
     if (target != LPM_ON) {
-        if (target == LPM_POWERDOWN) {
+        if (target == LPM_MT_TRANSCEIVER_POWERDOWN) {
             x86_shutdown();
         }
         asm volatile ("hlt");

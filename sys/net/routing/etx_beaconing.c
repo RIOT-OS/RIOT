@@ -407,7 +407,7 @@ static void *etx_radio(void *arg)
     while (1) {
         msg_receive(&m);
 
-        if (m.type == PKT_PENDING) {
+        if (m.type == MT_TRANSCEIVER_PKT_PENDING) {
             p = (radio_packet_t *) m.content.ptr;
 
             ieee802154_frame_read(p->data, &frame, p->length);
@@ -428,7 +428,7 @@ static void *etx_radio(void *arg)
 
             p->processing--;
         }
-        else if (m.type == ENOBUFFER) {
+        else if (m.type == MT_TRANSCEIVER_ENOBUFFER) {
             DEBUGF("Transceiver buffer full\n");
         }
         else {

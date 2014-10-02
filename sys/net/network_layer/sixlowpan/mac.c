@@ -85,7 +85,7 @@ static void *recv_ieee802154_frame(void *arg)
     while (1) {
         msg_receive(&m);
 
-        if (m.type == PKT_PENDING) {
+        if (m.type == MT_TRANSCEIVER_PKT_PENDING) {
 #if (defined(MODULE_AT86RF231) | \
      defined(MODULE_CC2420) | \
      defined(MODULE_MC1322X))
@@ -160,7 +160,7 @@ static void *recv_ieee802154_frame(void *arg)
 
             p->processing--;
         }
-        else if (m.type == ENOBUFFER) {
+        else if (m.type == MT_TRANSCEIVER_ENOBUFFER) {
             DEBUG("Transceiver buffer full");
         }
         else {

@@ -92,7 +92,7 @@ void cc110x_init(kernel_pid_t tpid)
     /* Switch to desired mode (WOR or RX) */
     rd_set_mode(RADIO_MODE_ON);
 
-#ifdef DBG_IGNORE
+#ifdef MT_TRANSCEIVER_DBG_IGNORE
     cc110x_init_ignore();
 #endif
 }

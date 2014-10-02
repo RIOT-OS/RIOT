@@ -61,7 +61,7 @@ void *radio(void *arg)
     while (1) {
         msg_receive(&m);
 
-        if (m.type == PKT_PENDING) {
+        if (m.type == MT_TRANSCEIVER_PKT_PENDING) {
             p = (radio_packet_t *) m.content.ptr;
             printf("Got radio packet:\n");
             printf("\tLength:\t%u\n", p->length);
@@ -77,7 +77,7 @@ void *radio(void *arg)
             p->processing--;
             puts("\n");
         }
-        else if (m.type == ENOBUFFER) {
+        else if (m.type == MT_TRANSCEIVER_ENOBUFFER) {
             puts("Transceiver buffer full");
         }
         else {

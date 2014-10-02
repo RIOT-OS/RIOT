@@ -310,7 +310,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 
         mutex_lock(&ccnl->global_lock);
         switch (in.type) {
-            case PKT_PENDING:
+            case MT_TRANSCEIVER_PKT_PENDING:
                 /* msg from transceiver */
                 p = (radio_packet_t *) in.content.ptr;
                 DEBUGMSG(1, "\tLength:\t%u\n", p->length);
@@ -366,7 +366,7 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                 ccnl->max_cache_entries = in.content.value;
                 DEBUGMSG(1, "max_cache_entries set to %d\n", ccnl->max_cache_entries);
                 break;
-            case (ENOBUFFER):
+            case (MT_TRANSCEIVER_ENOBUFFER):
                 /* transceiver has not enough buffer to store incoming packets, one packet is dropped  */
                 DEBUGMSG(1, "transceiver: one packet is dropped because buffers are full\n");
                 break;

@@ -80,10 +80,10 @@ void _transceiver_get_set_address_handler(int argc, char **argv)
     if (argc > 1) {
         a = atoi(argv[1]);
         printf("[transceiver] trying to set address %" PRIu16 "\n", a);
-        mesg.type = SET_ADDRESS;
+        mesg.type = MT_TRANSCEIVER_SET_ADDRESS;
     }
     else {
-        mesg.type = GET_ADDRESS;
+        mesg.type = MT_TRANSCEIVER_GET_ADDRESS;
     }
 
     msg_send_receive(&mesg, &mesg, transceiver_pid);
@@ -165,10 +165,10 @@ void _transceiver_get_set_long_addr_handler(int argc, char **argv)
         a = _str_to_eui64(argv[1]);
 #endif
         printf("[transceiver] trying to set EUI-64 %016"PRIx64"\n", a);
-        mesg.type = SET_LONG_ADDR;
+        mesg.type = MT_TRANSCEIVER_SET_LONG_ADDR;
     }
     else {
-        mesg.type = GET_LONG_ADDR;
+        mesg.type = MT_TRANSCEIVER_GET_LONG_ADDR;
     }
 
     msg_send_receive(&mesg, &mesg, transceiver_pid);
@@ -195,10 +195,10 @@ void _transceiver_get_set_channel_handler(int argc, char **argv)
     if (argc > 1) {
         c = atoi(argv[1]);
         printf("[transceiver] Trying to set channel %" PRIi32 "\n", c);
-        mesg.type = SET_CHANNEL;
+        mesg.type = MT_TRANSCEIVER_SET_CHANNEL;
     }
     else {
-        mesg.type = GET_CHANNEL;
+        mesg.type = MT_TRANSCEIVER_GET_CHANNEL;
     }
 
     msg_send_receive(&mesg, &mesg, transceiver_pid);
@@ -248,7 +248,7 @@ void _transceiver_send_handler(int argc, char **argv)
 #endif
 
     msg_t mesg;
-    mesg.type = SND_PKT;
+    mesg.type = MT_TRANSCEIVER_SND_PKT;
     mesg.content.ptr = (char *) &tcmd;
 
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
@@ -282,7 +282,7 @@ void _transceiver_monitor_handler(int argc, char **argv)
 
     msg_t mesg;
     mesg.content.ptr = (char *) &tcmd;
-    mesg.type = SET_MONITOR;
+    mesg.type = MT_TRANSCEIVER_SET_MONITOR;
 
     msg_send(&mesg, transceiver_pid, 1);
 }
@@ -306,10 +306,10 @@ void _transceiver_get_set_pan_handler(int argc, char **argv)
     if (argc > 1) {
         p = atoi(argv[1]);
         printf("[transceiver] Trying to set pan %" PRIi32 "\n", p);
-        mesg.type = SET_PAN;
+        mesg.type = MT_TRANSCEIVER_SET_PAN;
     }
     else {
-        mesg.type = GET_PAN;
+        mesg.type = MT_TRANSCEIVER_GET_PAN;
     }
     msg_send_receive(&mesg, &mesg, transceiver_pid);
     if (p == -1) {
@@ -321,7 +321,7 @@ void _transceiver_get_set_pan_handler(int argc, char **argv)
 }
 
 /* checked for type safety */
-#ifdef DBG_IGNORE
+#ifdef MT_TRANSCEIVER_DBG_IGNORE
 void _transceiver_set_ignore_handler(int argc, char **argv)
 {
 
@@ -355,7 +355,7 @@ void _transceiver_set_ignore_handler(int argc, char **argv)
 
     a = atoi(argv[1]);
     printf("[transceiver] trying to add address %" PRIu16 " to the ignore list \n", a);
-    mesg.type = DBG_IGN;
+    mesg.type = MT_TRANSCEIVER_DBG_IGN;
     msg_send_receive(&mesg, &mesg, transceiver_pid);
 
     int16_t response = a;

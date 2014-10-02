@@ -154,7 +154,7 @@ void cc110x_gdo0_irq(void);
  */
 void cc110x_gdo2_irq(void);
 
-#ifdef DBG_IGNORE
+#ifdef MT_TRANSCEIVER_DBG_IGNORE
 /**
  * @brief   Initialize ignore function
  */

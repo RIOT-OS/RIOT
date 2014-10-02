@@ -206,7 +206,7 @@ void _nativenet_handle_packet(radio_packet_t *packet)
     if (_native_net_tpid != KERNEL_PID_UNDEF) {
         DEBUG("_nativenet_handle_packet: notifying transceiver thread!\n");
         msg_t m;
-        m.type = (uint16_t) RCV_PKT_NATIVE;
+        m.type = (uint16_t) MT_TRANSCEIVER_RCV_PKT_NATIVE;
         m.content.value = rx_buffer_next;
         msg_send_int(&m, _native_net_tpid);
     }

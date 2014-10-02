@@ -60,7 +60,7 @@ extern void _x86_lspci(int argc, char **argv);
 
 /* configure available commands for each transceiver device: */
 #ifdef MODULE_TRANSCEIVER
-#ifdef DBG_IGNORE
+#ifdef MT_TRANSCEIVER_DBG_IGNORE
 #define _TC_IGN
 #endif
 #if (defined(MODULE_CC110X_NG) || defined(MODULE_CC2420) || defined(MODULE_AT86RF231) || defined(MODULE_NATIVENET))

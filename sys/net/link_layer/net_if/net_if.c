@@ -336,7 +336,7 @@ int net_if_send_packet(int if_id, uint16_t target, const void *payload,
 
         p.frame.dest_pan_id = net_if_get_pan_id(if_id);
         memcpy(p.frame.dest_addr, &target, 2);
-        response = net_if_transceiver_get_set_handler(if_id, SND_PKT, (void *)&p);
+        response = net_if_transceiver_get_set_handler(if_id, MT_TRANSCEIVER_SND_PKT, (void *)&p);
     }
     else {
         radio_packet_t p;
@@ -344,7 +344,7 @@ int net_if_send_packet(int if_id, uint16_t target, const void *payload,
         p.data = (uint8_t *) payload;
         p.length = payload_len;
         p.dst = target;
-        response = net_if_transceiver_get_set_handler(if_id, SND_PKT, (void *)&p);
+        response = net_if_transceiver_get_set_handler(if_id, MT_TRANSCEIVER_SND_PKT, (void *)&p);
     }
 
 
@@ -379,7 +379,7 @@ int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
         p.frame.fcf.frame_pend = 0;
         p.frame.dest_pan_id = net_if_get_pan_id(if_id);
         memcpy(p.frame.dest_addr, target, 8);
-        response = net_if_transceiver_get_set_handler(if_id, SND_PKT, (void *)&p);
+        response = net_if_transceiver_get_set_handler(if_id, MT_TRANSCEIVER_SND_PKT, (void *)&p);
     }
     else {
         radio_packet_t p;
@@ -387,7 +387,7 @@ int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
         p.data = (uint8_t *) payload;
         p.length = payload_len;
         p.dst = NTOHS(target->uint16[3]);
-        response = net_if_transceiver_get_set_handler(if_id, SND_PKT, (void *)&p);
+        response = net_if_transceiver_get_set_handler(if_id, MT_TRANSCEIVER_SND_PKT, (void *)&p);
     }
 
 
@@ -418,7 +418,7 @@ int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation)
         return 0;
     }
 
-    net_if_transceiver_get_set_handler(if_id, GET_LONG_ADDR, &tmp);
+    net_if_transceiver_get_set_handler(if_id, MT_TRANSCEIVER_GET_LONG_ADDR, &tmp);
 
     eui64->uint64 = HTONLL(tmp);
 
@@ -464,7 +464,7 @@ int net_if_set_eui64(int if_id, net_if_eui64_t *eui64)
         return 0;
     }
 
-    net_if_transceiver_get_set_handler(if_id, SET_LONG_ADDR, (void *) &tmp);
+    net_if_transceiver_get_set_handler(if_id, MT_TRANSCEIVER_SET_LONG_ADDR, (void *) &tmp);
 
     return eui64->uint64 != 0;
 }
@@ -478,7 +478,7 @@ uint16_t net_if_get_hardware_address(int if_id)
         return 0;
     }
 
-    net_if_transceiver_get_set_handler(if_id, GET_ADDRESS, &addr);
+    net_if_transceiver_get_set_handler(if_id, MT_TRANSCEIVER_GET_ADDRESS, &addr);
     return addr;
 }
 
@@ -489,7 +489,7 @@ uint16_t net_if_set_hardware_address(int if_id, uint16_t addr)
         return 0;
     }
 
-    net_if_transceiver_get_set_handler(if_id, SET_ADDRESS, &addr);
+    net_if_transceiver_get_set_handler(if_id, MT_TRANSCEIVER_SET_ADDRESS, &addr);
     return addr;
 }
 
@@ -502,7 +502,7 @@ int32_t net_if_get_channel(int if_id)
         return -1;
     }
 
-    net_if_transceiver_get_set_handler(if_id, GET_CHANNEL, &channel);
+    net_if_transceiver_get_set_handler(if_id, MT_TRANSCEIVER_GET_CHANNEL, &channel);
     return channel;
 }
 
@@ -513,7 +513,7 @@ int32_t net_if_set_channel(int if_id, uint16_t channel)
         return -1;
     }
 
-    net_if_transceiver_get_set_handler(if_id, SET_CHANNEL, &channel);
+    net_if_transceiver_get_set_handler(if_id, MT_TRANSCEIVER_SET_CHANNEL, &channel);
     return channel;
 }
 
@@ -526,7 +526,7 @@ int32_t net_if_get_pan_id(int if_id)
         return -1;
     }
 
-    net_if_transceiver_get_set_handler(if_id, GET_PAN, &pan_id);
+    net_if_transceiver_get_set_handler(if_id, MT_TRANSCEIVER_GET_PAN, &pan_id);
     if (pan_id < 0) {
         return 0;
     }
@@ -543,7 +543,7 @@ int32_t net_if_set_pan_id(int if_id, uint16_t pan_id)
         return -1;
     }
 
-    net_if_transceiver_get_set_handler(if_id, SET_PAN, &pan_id);
+    net_if_transceiver_get_set_handler(if_id, MT_TRANSCEIVER_SET_PAN, &pan_id);
     return pan_id;
 }
 
