@@ -1,4 +1,0 @@
-ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-    USEMODULE += at86rf231
-    USEMODULE += transceiver
-endif
