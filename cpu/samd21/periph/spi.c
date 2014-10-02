@@ -164,7 +164,6 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
                        |  (SERCOM_SPI_CTRLA_DIPO(dipo))
                        |  (cpha << SERCOM_SPI_CTRLA_CPHA_Pos)
                        |  (cpol << SERCOM_SPI_CTRLA_CPOL_Pos);
-    int ctrla = spi_dev->CTRLA.reg;
 
     while (spi_dev->SYNCBUSY.reg);
     spi_dev->CTRLB.reg = (SERCOM_SPI_CTRLB_CHSIZE(0) | SERCOM_SPI_CTRLB_RXEN);

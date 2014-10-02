@@ -27,7 +27,7 @@
 #include "periph/timer.h"
 #include "periph_conf.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 
@@ -350,13 +350,18 @@ __attribute__ ((naked))
 void TIMER_0_ISR(void)
 {
     ISR_ENTER();
+        DEBUG("ISR0\n");
         if (TIMER_0_DEV.INTFLAG.bit.MC0 && TIMER_0_DEV.INTENSET.bit.MC0) {
-            config[TIMER_0].cb(0);
+            if(config[TIMER_0].cb){ //check for null
+                config[TIMER_0].cb(0);
+            }
             TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
         }
         else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
-            config[TIMER_0].cb(1);
+            if(config[TIMER_0].cb){ //check for null
+                config[TIMER_0].cb(1);
+            }
             TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
         }
@@ -371,12 +376,19 @@ void TIMER_1_ISR(void)
 {
     ISR_ENTER();
         if (TIMER_1_DEV.INTFLAG.bit.MC0 && TIMER_1_DEV.INTENSET.bit.MC0) {
-            config[TIMER_1].cb(0);
+            if(config[TIMER_1].cb){ //check for null
+                config[TIMER_1].cb(0);
+                DEBUG("ISR11\n");
+            }
             TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
         }
         else if (TIMER_1_DEV.INTFLAG.bit.MC1 && TIMER_1_DEV.INTENSET.bit.MC1) {
-            config[TIMER_1].cb(1);
+            if(config[TIMER_1].cb){ //check for null
+               config[TIMER_1].cb(1);
+                DEBUG("ISR12\n");
+
+            }
             TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
         }
@@ -390,13 +402,19 @@ __attribute__ ((naked))
 void TIMER_2_ISR(void)
 {
     ISR_ENTER();
+        DEBUG("ISR2\n");
+
         if (TIMER_2_DEV.INTFLAG.bit.MC0 && TIMER_2_DEV.INTENSET.bit.MC0) {
             TIMER_2_DEV.INTFLAG.bit.MC0 = 1;
-            config[TIMER_2].cb(0);
+            if(config[TIMER_2].cb){ //check for null
+                config[TIMER_2].cb(0);
+            }
         }
         else if (TIMER_2_DEV.INTFLAG.bit.MC1 && TIMER_2_DEV.INTENSET.bit.MC1) {
             TIMER_2_DEV.INTFLAG.bit.MC1 = 1;
-            config[TIMER_2].cb(1);
+            if(config[TIMER_2].cb){ //check for null
+               config[TIMER_2].cb(1);
+            }
         }
     ISR_EXIT();
 }
