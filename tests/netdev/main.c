@@ -630,10 +630,6 @@ static int check_protocol(void)
                     puts("Got protocol: IEEE 802.15.4");
                     return 1;
 
-                case NETDEV_PROTO_RADIO_802154:
-                    puts("Got protocol: radio-encapsulated IEEE 802.15.4");
-                    return 1;
-
                 case NETDEV_PROTO_6LOWPAN:
                     puts("Got protocol: 6LoWPAN");
                     return 1;
