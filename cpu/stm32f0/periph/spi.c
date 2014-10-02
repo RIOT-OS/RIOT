@@ -29,33 +29,12 @@
 /* guard file in case no SPI device is defined */
 #if SPI_NUMOF
 
-/**
- * @brief unified interrupt handler to be shared between SPI devices
- *
- * @param[in] spi       Pointer to the devices base register
- * @param[in] dev       The device that triggered the interrupt
- */
-static inline void irq_handler(SPI_TypeDef *spi, spi_t dev);
-
-/**
- * @brief structure that defines the state for an SPI device
- */
-typedef struct {
-    char (*cb)(char data);
-} spi_state_t;
-
-/**
- * @brief array with one field for each possible SPI device
- */
-static spi_state_t spi_config[SPI_NUMOF];
-
-
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
-    SPI_TypeDef *spi = 0;
-    GPIO_TypeDef *port = 0;
+    SPI_TypeDef *spi;
+    GPIO_TypeDef *port;
     int pin[3];        /* 3 pins: sck, miso, mosi */
-    int af;
+    int af = 0;
 
     /* power on the SPI device */
     spi_poweron(dev);
@@ -83,6 +62,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             SPI_0_PORT_CLKEN();
             break;
 #endif
+        default:
+            return -1;
     }
 
     /* configure pins for their correct alternate function */
@@ -154,6 +135,8 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
             spi = SPI_1_DEV;
             break;
 #endif
+        default:
+            return 0;
     }
 
     /* wait for an eventually previous byte to be readily transferred */
@@ -175,20 +158,21 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
     char res;
+    int count = 0;
 
     for (int i = 0; i < length; i++) {
         if (out) {
-            spi_transfer_byte(dev, out[i], &res);
+            count += spi_transfer_byte(dev, out[i], &res);
         }
         else {
-            spi_transfer_byte(dev, 0, &res);
+            count += spi_transfer_byte(dev, 0, &res);
         }
         if (in) {
             in[i] = res;
         }
     }
 
-    return length;
+    return count;
 }
 
 int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
@@ -241,42 +225,5 @@ void spi_poweroff(spi_t dev)
 #endif
     }
 }
-
-
-static inline void irq_handler(SPI_TypeDef *spi, spi_t dev)
-{
-    char data;
-
-    /* call owner when new byte was receive (asserts SPI is in slave mode) */
-    if (spi->SR & SPI_SR_RXNE) {
-        /* read received byte from data register */
-        data = *((volatile uint8_t *)(&spi->DR));
-        /* call callback for receiving the answer of the received byte */
-        //data = spi_config[dev].cb(data);
-        /* set answer byte to be transferred next */
-        *((volatile uint8_t *)(&spi->DR)) = (uint8_t)data;
-    }
-    if (sched_context_switch_request) {
-        thread_yield();
-    }
-}
-
-#if SPI_0_EN
-__attribute__((naked)) void SPI_0_ISR(void)
-{
-    ISR_ENTER();
-    irq_handler(SPI_0_DEV, SPI_0);
-    ISR_EXIT();
-}
-#endif
-
-#if SPI_1_EN
-__attribute__((naked)) void SPI_1_ISR(void)
-{
-    ISR_ENTER();
-    irq_handler(SPI_1_DEV, SPI_1);
-    ISR_EXIT();
-}
-#endif
 
 #endif /* SPI_NUMOF */
