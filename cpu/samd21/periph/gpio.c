@@ -940,6 +940,7 @@ void gpio_write(gpio_t dev, int value)
 __attribute__((naked)) void isr_eic(void)
 {
     ISR_ENTER();
+    DEBUG("INTERRUPT \n");
     uint16_t status = EIC->INTFLAG.reg;
     switch (status) {
         case EIC_INTFLAG_EXTINT0:

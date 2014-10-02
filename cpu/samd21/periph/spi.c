@@ -78,50 +78,56 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     {
 #ifdef SPI_0_EN
         case SPI_0:
-            spi_dev = &SPI_0_DEV;
+            spi_dev = &SPI_0_DEV;  
+            
             /* Enable sercom4 in power manager */
-
             PM->APBCMASK.reg |= PM_APBCMASK_SERCOM4;
             GCLK->CLKCTRL.reg = (uint32_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (SERCOM4_GCLK_ID_CORE << GCLK_CLKCTRL_ID_Pos)));
 
-            //spi_dev->CTRLA.bit.SWRST = true; //Reset spi
-            while(spi_dev->CTRLA.reg & SERCOM_SPI_CTRLA_SWRST);            
             /* Setup clock */            
             while (GCLK->STATUS.bit.SYNCBUSY);
+            pmux_set(SPI_0_SCLK_PIN, F);
+            pmux_set(SPI_0_MISO_PIN, F);
+            pmux_set(SPI_0_MOSI_PIN, F);
 
-            uint32_t pinmask = (((1UL << (SPI_0_SCLK_PIN % 32)) | (1UL << (SPI_0_MISO_PIN % 32)))  >> 16);
-            /* PMUX */
-            SPI_0_PORT0.WRCONFIG.reg = 
-                             PORT_WRCONFIG_HWSEL \
-                            | PORT_WRCONFIG_WRPMUX \
-                            | (0x5 << PORT_WRCONFIG_PMUX_Pos) \
-                            | PORT_WRCONFIG_PMUXEN \
-                            | (pinmask << PORT_WRCONFIG_PINMASK_Pos);
 
-            pinmask = (1UL << (SPI_0_MOSI_PIN % 32)) >> 16;
-            SPI_0_PORT1.WRCONFIG.reg = 
-                             PORT_WRCONFIG_HWSEL \
-                            | PORT_WRCONFIG_WRPMUX \
-                            | (0x5 << PORT_WRCONFIG_PMUX_Pos) \
-                            | PORT_WRCONFIG_PMUXEN \
-                            | (pinmask << PORT_WRCONFIG_PINMASK_Pos);
-            //MISO = input
-            /* configure as input */
-            SPI_0_MISO_DEV.DIRCLR.reg = (1 << (SPI_0_MISO_PIN % 32));
-            /* buffer input value */
-            SPI_0_MISO_DEV.PINCFG[SPI_0_MISO_PIN % 32].reg |= PORT_PINCFG_INEN;
-            //SPI_0_MISO_DEV.OUTCLR.reg = (1 << (SPI_0_MISO_PIN % 32));     
 
+            // uint32_t pinmask = (((1UL << (SPI_0_SCLK_PIN % 32)) | (1UL << (SPI_0_MISO_PIN % 32)))  >> 16);
+            // /* PMUX */
+            // SPI_0_PORT0.WRCONFIG.reg |= 
+            //                  PORT_WRCONFIG_HWSEL
+            //                 | PORT_WRCONFIG_WRPMUX
+            //                 | (0x5 << PORT_WRCONFIG_PMUX_Pos)
+            //                 | PORT_WRCONFIG_PMUXEN
+            //                 | (pinmask << PORT_WRCONFIG_PINMASK_Pos);
+
+            // pinmask = (1UL << (SPI_0_MOSI_PIN % 32)) >> 16;
+            // SPI_0_PORT1.WRCONFIG.reg |= 
+            //                  PORT_WRCONFIG_HWSEL
+            //                 | PORT_WRCONFIG_WRPMUX
+            //                 | (0x5 << PORT_WRCONFIG_PMUX_Pos)
+            //                 | PORT_WRCONFIG_PMUXEN
+            //                 | (pinmask << PORT_WRCONFIG_PINMASK_Pos);
             //SCLK+MOSI
             SPI_0_SCLK_DEV.DIRSET.reg = (1 << (SPI_0_SCLK_PIN % 32));
             SPI_0_MOSI_DEV.DIRSET.reg = (1 << (SPI_0_MOSI_PIN % 32));
 
+            //MISO = input
+            /* configure as input */
+            SPI_0_MISO_DEV.DIRCLR.reg = (1<<(SPI_0_MISO_PIN % 32));
+            SPI_0_MISO_DEV.PINCFG[SPI_0_MISO_PIN % 32].bit.INEN = true;
+
+            SPI_0_MISO_DEV.OUTCLR.reg = (1 << (SPI_0_MISO_PIN % 32));
+            SPI_0_MISO_DEV.PINCFG[SPI_0_MISO_PIN % 32].bit.PULLEN = true;
+
             dopo = SPI_0_DOPO;
-            dipo = SPI_0_DIPO;
+            dipo  = SPI_0_DIPO;
             break;
 #endif
 #ifdef SPI_1_EN
         case SPI_1:
+            spi_dev = &SPI_1_DEV;
+
             /* Enable sercom5 in power manager */
             PM->APBCMASK.reg |= PM_APBCMASK_SERCOM5;
             /* Setup clock */            /* configure GCLK0 to feed sercom5 */;
@@ -137,36 +143,33 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 
             //MISO = input
             /* configure as input */
-            SPI_1_MISO_DEV.DIRCLR.reg = (1<<(SPI_1_MISO_PIN%32));
-            //SPI_1_MISO_DEV.PINCFG[SPI_1_MISO_PIN % 32].bit.INEN = true;
+            SPI_1_MISO_DEV.DIRCLR.reg = (1<<(SPI_1_MISO_PIN % 32));
+            SPI_1_MISO_DEV.PINCFG[SPI_1_MISO_PIN % 32].bit.INEN = true;
 
             SPI_1_MISO_DEV.OUTCLR.reg = (1 << (SPI_1_MISO_PIN % 32));
-            SPI_1_MISO_DEV.PINCFG[SPI_1_MISO_PIN % 32].bit.PULLEN = false;
+            SPI_1_MISO_DEV.PINCFG[SPI_1_MISO_PIN % 32].bit.PULLEN = true;
 
-            spi_dev = &SPI_1_DEV;
             dopo = SPI_1_DOPO;
             dipo  = SPI_1_DIPO;
             break;
 #endif
     }
-    spi_dev->CTRLA.bit.ENABLE = 0; //Disable spi to write confs
-    while(spi_dev->SYNCBUSY.reg);
+    spi_dev->CTRLA.bit.ENABLE = 0;  // Disable spi to write confs
+    while (spi_dev->SYNCBUSY.reg);
     spi_dev->CTRLA.reg |= SERCOM_SPI_CTRLA_MODE_SPI_MASTER;
-    while(spi_dev->SYNCBUSY.reg);
+    while (spi_dev->SYNCBUSY.reg);
     
-    spi_dev->BAUD.bit.BAUD     = (uint8_t) (((uint32_t) SPI_0_F_REF) / (2 * f_baud) - 1); //Synchronous mode
-    
-    spi_dev->CTRLA.reg |= (SERCOM_SPI_CTRLA_DOPO(dopo)) | \
-                          (SERCOM_SPI_CTRLA_DIPO(dipo)) | \
-                          (cpha << SERCOM_SPI_CTRLA_CPHA_Pos) | \
-                          (cpol << SERCOM_SPI_CTRLA_CPOL_Pos);
+    spi_dev->BAUD.bit.BAUD = (uint8_t) (((uint32_t) SPI_0_F_REF) / (2 * f_baud) - 1); // Synchronous mode
+    spi_dev->CTRLA.reg |= (SERCOM_SPI_CTRLA_DOPO(dopo))
+                       |  (SERCOM_SPI_CTRLA_DIPO(dipo))
+                       |  (cpha << SERCOM_SPI_CTRLA_CPHA_Pos)
+                       |  (cpol << SERCOM_SPI_CTRLA_CPOL_Pos);
+    int ctrla = spi_dev->CTRLA.reg;
 
+    while (spi_dev->SYNCBUSY.reg);
+    spi_dev->CTRLB.reg = (SERCOM_SPI_CTRLB_CHSIZE(0) | SERCOM_SPI_CTRLB_RXEN);
     while(spi_dev->SYNCBUSY.reg);
-    spi_dev->CTRLB.reg |= (SERCOM_SPI_CTRLB_CHSIZE(0) | SERCOM_SPI_CTRLB_RXEN);
-    while(spi_dev->SYNCBUSY.reg);
-
     spi_poweron(dev);
-
     return 0;
 }
 
@@ -195,23 +198,19 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 #endif
     }
 
-    while(!spi_dev->INTFLAG.bit.DRE); //while data register is not empty
+    while (!spi_dev->INTFLAG.bit.DRE); // while data register is not empty
     spi_dev->DATA.bit.DATA = out;
     transfered++;
-    while(!(spi_dev->INTFLAG.reg & SERCOM_SPI_INTFLAG_TXC));
-    if(in != NULL)
+    if (in != NULL)
     {
-        while(!spi_dev->INTFLAG.bit.RXC); //while receive is not complete
+        while (!spi_dev->INTFLAG.bit.RXC); // while receive is not complete
         *in = spi_dev->DATA.bit.DATA;
         transfered++;
-    }
+    } 
     else
     {
         spi_dev->DATA.reg;
     }
-    DEBUG("out: %X, in: %X, Overflow: %d \n", out, *in, spi_dev->STATUS.bit.BUFOVF);
-
-    
     return transfered;
 }
 

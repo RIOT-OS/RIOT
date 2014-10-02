@@ -95,7 +95,6 @@ void at86rf231_disable_interrupts(void)
 
 void at86rf231_gpio_spi_interrupts_init(void)
 {
-    DEBUG("AT86RF231 gpio/spi init \n");
     /* RF control */
     PM->APBCMASK.reg |= PM_APBCMASK_RFCTRL;
     
@@ -109,8 +108,6 @@ void at86rf231_gpio_spi_interrupts_init(void)
 
     /* SPI init */
     spi_init_master(SPI_0, SPI_CONF_FIRST_RISING, SPI_SPEED_100KHZ);
-    spi_poweron(SPI_0);
-
     /* IRQ0 */
     gpio_init_in(SPI_0_IRQ0_GPIO, GPIO_NOPULL);
     gpio_init_int(SPI_0_IRQ0_GPIO, GPIO_NOPULL, GPIO_RISING, (gpio_cb_t)at86rf231_rx_irq, NULL);
@@ -124,13 +121,6 @@ void at86rf231_gpio_spi_interrupts_init(void)
     gpio_init_out(SPI_0_SLEEP_GPIO, GPIO_NOPULL);
     /* RESET */
     gpio_init_out(SPI_0_RESET_GPIO, GPIO_NOPULL);
-    // while(1)
-    // {
-    //     char i = 0;
-    //     spi_transfer_byte(SPI_0, 0xAA, &i);
-    // }
-
-    DEBUG("CS: %d, SLEEP: %d, RESET %d \n", SPI_0_CS_GPIO, SPI_0_SLEEP_GPIO, SPI_0_RESET_GPIO);
 
 }
 
@@ -144,10 +134,12 @@ void at86rf231_reset(void)
     at86rf231_slp_clear();
 
     /* additional waiting to comply to min rst pulse width */
-    uint8_t delay = 50;
+    uint8_t volatile delay = 100;
     while (delay--){}
 
     at86rf231_rst_clear();
+    delay = 100;
+    while (delay--){}
 
     /* Send a FORCE TRX OFF command */
     at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__FORCE_TRX_OFF);

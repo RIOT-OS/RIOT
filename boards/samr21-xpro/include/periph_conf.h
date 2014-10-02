@@ -115,7 +115,7 @@
 #define SPI_IRQ_0       SERCOM4_IRQn
 #define SPI_0_DOPO			1 //1 MOSI = pad2, SCLK=pad3
 #define SPI_0_DIPO			0
-//#define SPI_0_DIPO			2 //used for loopback mode
+//#define SPI_0_DIPO			0 //used for loopback mode
 #define SPI_0_F_REF         F_REF
 #define SPI_0_PORT0			PORT->Group[2]
 #define SPI_0_PORT1			PORT->Group[1]
@@ -154,7 +154,7 @@
 #define SPI_1_DEV       SERCOM5->SPI
 #define SPI_IRQ_1       SERCOM5_IRQn
 #define SPI_1_DOPO			1
-#define SPI_1_DIPO			0
+#define SPI_1_DIPO			2
 #define SPI_1_F_REF         F_REF
 
 #define SPI_1_SCLK_DEV		PORT->Group[1]
