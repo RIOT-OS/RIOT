@@ -43,6 +43,7 @@ BOARD_BLACKLIST := arduino-mega2560
 
 USEMODULE += shell
 USEMODULE += shell_commands
+USEMODULE += uart0
 USEMODULE += ps
 USEMODULE += vtimer
 USEMODULE += defaulttransceiver

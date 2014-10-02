@@ -53,7 +53,6 @@ ifneq (,$(filter uart0,$(USEMODULE)))
 endif
 
 ifneq (,$(filter posix,$(USEMODULE)))
-	USEMODULE += uart0
 	USEMODULE += timex
 	USEMODULE += vtimer
 endif
