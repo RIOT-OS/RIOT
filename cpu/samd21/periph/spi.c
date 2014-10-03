@@ -25,7 +25,7 @@
 #include "periph_conf.h"
 #include "board.h"
 #include "port_util.h"
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
