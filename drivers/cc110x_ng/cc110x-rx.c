@@ -28,7 +28,7 @@
 #include "cpu-conf.h"
 #include "cpu.h"
 
-#ifdef MT_TRANSCEIVER_DBG_IGNORE
+#ifdef DBG_IGNORE
 #include <stdio.h>
 #include <string.h>
 #define IGN_MAX     (10)
@@ -76,7 +76,7 @@ void cc110x_rx_handler(void)
         hwtimer_wait(IDLE_TO_RX_TIME);
         radio_state = RADIO_RX;
 
-#ifdef MT_TRANSCEIVER_DBG_IGNORE
+#ifdef DBG_IGNORE
 
         if (is_ignored(cc110x_rx_buffer[rx_buffer_next].packet.phy_src)) {
             LED_RED_TOGGLE;
@@ -191,7 +191,7 @@ static uint8_t receive_packet(uint8_t *rxBuffer, radio_packet_length_t length)
     return 0;
 }
 
-#ifdef MT_TRANSCEIVER_DBG_IGNORE
+#ifdef DBG_IGNORE
 void cc110x_init_ignore(void)
 {
     memset(ignored_addr, 0, IGN_MAX * sizeof(radio_address_t));

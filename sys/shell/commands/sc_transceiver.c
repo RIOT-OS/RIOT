@@ -321,7 +321,7 @@ void _transceiver_get_set_pan_handler(int argc, char **argv)
 }
 
 /* checked for type safety */
-#ifdef MT_TRANSCEIVER_DBG_IGNORE
+#ifdef DBG_IGNORE
 void _transceiver_set_ignore_handler(int argc, char **argv)
 {
 

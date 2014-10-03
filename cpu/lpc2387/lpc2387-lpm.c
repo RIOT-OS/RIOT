@@ -94,8 +94,8 @@ enum lpm_mode lpm_set(enum lpm_mode target)
     else if (target == LPM_SLEEP) {
         target_flags = PM_SLEEP;
     }
-    else if (target == LPM_MT_TRANSCEIVER_POWERDOWN) {
-        target_flags = PM_MT_TRANSCEIVER_POWERDOWN;
+    else if (target == LPM_POWERDOWN) {
+        target_flags = PM_POWERDOWN;
     }
     else {
         target_flags = 0;

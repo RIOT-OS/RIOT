@@ -142,7 +142,7 @@ static void set_monitor(transceiver_type_t t, void *mode);
 static void powerdown(transceiver_type_t t);
 static void switch_to_rx(transceiver_type_t t);
 
-#ifdef MT_TRANSCEIVER_DBG_IGNORE
+#ifdef DBG_IGNORE
 static int16_t ignore_add(transceiver_type_t transceiver, void *address);
 
 radio_address_t transceiver_ignored_addr[TRANSCEIVER_MAX_IGNORED_ADDR];
@@ -162,7 +162,7 @@ void transceiver_init(transceiver_type_t t)
     /* Initializing transceiver buffer and data buffer */
     memset(transceiver_buffer, 0, sizeof(transceiver_buffer));
     memset(data_buffer, 0, TRANSCEIVER_BUFFER_SIZE * PAYLOAD_SIZE);
-#ifdef MT_TRANSCEIVER_DBG_IGNORE
+#ifdef DBG_IGNORE
     memset(transceiver_ignored_addr, 0, sizeof(transceiver_ignored_addr));
 #endif
 
@@ -359,7 +359,7 @@ static void *run(void *arg)
                 msg_reply(&m, &m);
                 break;
 
-#ifdef MT_TRANSCEIVER_DBG_IGNORE
+#ifdef DBG_IGNORE
             case MT_TRANSCEIVER_DBG_IGN:
                 *((int16_t *) cmd->data) = ignore_add(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
@@ -479,7 +479,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
             return;
         }
 
-#ifdef MT_TRANSCEIVER_DBG_IGNORE
+#ifdef DBG_IGNORE
 
         for (size_t j = 0; (j < TRANSCEIVER_MAX_IGNORED_ADDR) && (transceiver_ignored_addr[j]); j++) {
             DEBUG("check if source (%u) is ignored -> %u\n", transceiver_buffer[transceiver_buffer_pos].src, transceiver_ignored_addr[j]);
@@ -1233,7 +1233,7 @@ static void switch_to_rx(transceiver_type_t t)
     }
 }
 
-#ifdef MT_TRANSCEIVER_DBG_IGNORE
+#ifdef DBG_IGNORE
 static int16_t ignore_add(transceiver_type_t transceiver, void *address)
 {
     (void) transceiver;

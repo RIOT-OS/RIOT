@@ -63,7 +63,7 @@ typedef struct {
 #define   SDRAMC_MR_MODE_LOAD_MODEREG (0x3u << 0) /**< \brief (SDRAMC_MR) The SDRAM Controller issues a "Load Mode Register" command when the SDRAM device is accessed regardless of the cycle. To activate this mode, command must be followed by a write to the SDRAM. */
 #define   SDRAMC_MR_MODE_AUTO_REFRESH (0x4u << 0) /**< \brief (SDRAMC_MR) The SDRAM Controller issues an "Auto-Refresh" Command when the SDRAM device is accessed regardless of the cycle. Previously, an "All Banks Precharge" command must be issued. To activate this mode, command must be followed by a write to the SDRAM. */
 #define   SDRAMC_MR_MODE_EXT_LOAD_MODEREG (0x5u << 0) /**< \brief (SDRAMC_MR) The SDRAM Controller issues an "Extended Load Mode Register" command when the SDRAM device is accessed regardless of the cycle. To activate this mode, the "Extended Load Mode Register" command must be followed by a write to the SDRAM. The write in the SDRAM must be done in the appropriate bank; most low-power SDRAM devices use the bank 1. */
-#define   SDRAMC_MR_MODE_DEEP_MT_TRANSCEIVER_POWERDOWN (0x6u << 0) /**< \brief (SDRAMC_MR) Deep power-down mode. Enters deep power-down mode. */
+#define   SDRAMC_MR_MODE_DEEP_POWERDOWN (0x6u << 0) /**< \brief (SDRAMC_MR) Deep power-down mode. Enters deep power-down mode. */
 /* -------- SDRAMC_TR : (SDRAMC Offset: 0x04) SDRAMC Refresh Timer Register -------- */
 #define SDRAMC_TR_COUNT_Pos 0
 #define SDRAMC_TR_COUNT_Msk (0xfffu << SDRAMC_TR_COUNT_Pos) /**< \brief (SDRAMC_TR) SDRAMC Refresh Timer Count */

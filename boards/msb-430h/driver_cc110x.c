@@ -325,7 +325,7 @@ void cc110x_spi_init(void)
 interrupt(PORT2_VECTOR) __attribute__((naked)) cc110x_isr(void)
 {
     __enter_isr();
-    //  if (system_state.MT_TRANSCEIVER_POWERDOWN) SPI_INIT; /* Initialize SPI after wakeup */
+    //  if (system_state.POWERDOWN) SPI_INIT; /* Initialize SPI after wakeup */
     /* Check IFG */
     if ((P2IFG & 0x01) != 0) {
         P2IFG &= ~0x01;
@@ -342,6 +342,6 @@ interrupt(PORT2_VECTOR) __attribute__((naked)) cc110x_isr(void)
         //      CLEAR(P2IFG, 0xFF); /* Clear all flags */
     }
 
-    //  if (system_state.MT_TRANSCEIVER_POWERDOWN != 0) END_LPM3;
+    //  if (system_state.POWERDOWN != 0) END_LPM3;
     __exit_isr();
 }

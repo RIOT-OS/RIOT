@@ -63,7 +63,7 @@ enum lpm_mode lpm_set(enum lpm_mode target)
         // stops CPU and master clock blocks
         __bis_status_register(CPUOFF | SCG0);
         break;
-    case LPM_MT_TRANSCEIVER_POWERDOWN:
+    case LPM_POWERDOWN:
         // deep-level mode => LPM3 mode of MSP430
         __bic_status_register(OSCOFF);
         // stops all blocks except auxiliary clock (timers)
@@ -95,7 +95,7 @@ enum lpm_mode lpm_get(void)
         break;
     case CPUOFF + SCG0 + SCG1:   // MSP430's LPM3
     case CPUOFF + SCG1:   // MSP430's LPM2
-        current_mode = LPM_MT_TRANSCEIVER_POWERDOWN;
+        current_mode = LPM_POWERDOWN;
         break;
     case CPUOFF + SCG0:   // MSP430's LPM1
         current_mode = LPM_SLEEP;

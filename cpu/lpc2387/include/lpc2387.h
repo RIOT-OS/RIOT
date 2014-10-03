@@ -128,7 +128,7 @@
 
 #define PM_IDLE         (PM0)
 #define PM_SLEEP        (PM2|PM0)
-#define PM_MT_TRANSCEIVER_POWERDOWN    (PM1)
+#define PM_POWERDOWN    (PM1)
 /** @} */
 
 /**

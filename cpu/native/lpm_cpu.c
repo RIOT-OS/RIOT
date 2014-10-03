@@ -122,9 +122,9 @@ enum lpm_mode lpm_set(enum lpm_mode target)
             printf("XXX: lpm_set(): LPM_SLEEP not implemented\n");
             //sigsuspend();
 
-        case LPM_MT_TRANSCEIVER_POWERDOWN:
+        case LPM_POWERDOWN:
             /*TODO: implement*/
-            printf("XXX: lpm_set(): LPM_MT_TRANSCEIVER_POWERDOWN not implemented\n");
+            printf("XXX: lpm_set(): LPM_POWERDOWN not implemented\n");
             //sigsuspend();
 
         case LPM_OFF:

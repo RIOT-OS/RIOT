@@ -47,7 +47,7 @@ enum lpm_mode {
     LPM_ON,             /**< MCU is active */
     LPM_IDLE,           /**< MCU is idle */
     LPM_SLEEP,          /**< MCU in sleep mode */
-    LPM_MT_TRANSCEIVER_POWERDOWN,      /**< MCU is powered down */
+    LPM_POWERDOWN,      /**< MCU is powered down */
     LPM_OFF,            /**< MCU is off */
     LPM_UNKNOWN = -1    /**< status unknown/unavailable */
 };
