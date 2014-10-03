@@ -27,6 +27,7 @@
 #include "kernel_types.h"
 #include "transceiver.h"
 #include "vtimer.h"
+#include "hwtimer.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -96,12 +97,11 @@ void at86rf231_switch_to_rx(void)
 
     // wait until it is on RX_ON state
     uint8_t status;
-    uint8_t max_wait = 100;   // TODO : move elsewhere, this is in 10us
+    uint8_t max_wait = 100;  
 
     do {
         status = at86rf231_get_status();
-
-        vtimer_usleep(10);
+        hwtimer_wait(HWTIMER_TICKS(10));
 
         if (!--max_wait) {
             printf("at86rf231 : ERROR : could not enter RX_ON mode\n");
@@ -215,7 +215,7 @@ void at86rf231_set_monitor(uint8_t mode)
 void at86rf231_gpio_spi_interrupts_init(void)
 {
     /* SPI init */
-    spi_init_master(AT86RF231_SPI, SPI_CONF_FIRST_RISING, SPI_SPEED_5MHZ);
+    spi_init_master(AT86RF231_SPI, SPI_CONF_FIRST_RISING, SPI_SPEED_1MHZ);
     /* IRQ0 */
     gpio_init_int(AT86RF231_INT, GPIO_NOPULL, GPIO_RISING, at86rf231_rx_irq, NULL);
     /* CS */
