@@ -10,7 +10,7 @@
  * @ingroup native_cpu
  * @{
  * @file
- * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ * @author Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  */
 
 #include <stdio.h>
@@ -196,7 +196,7 @@ static int sysfs_gpio_conf(gpio_t dev, _native_gpio_conf_t conf)
         warnx("sysfs_gpio_conf(%i): snprintf: fail", dev);
         return -1;
     }
- 
+
     _native_syscall_enter();
     int fd = real_open(gpio_path_name, O_WRONLY);
     if (fd < 0) {
@@ -204,7 +204,7 @@ static int sysfs_gpio_conf(gpio_t dev, _native_gpio_conf_t conf)
         _native_syscall_leave();
         return -1;
     }
- 
+
     int ret = 0;
     switch (conf) {
         case (_NATIVE_GPIO_CONF_IN):
@@ -244,7 +244,7 @@ static int sysfs_gpio_read(gpio_t dev)
         warnx("sysfs_gpio_read(%i): snprintf: fail", dev);
         return -1;
     }
- 
+
     _native_syscall_enter();
     int fd = real_open(gpio_path_name, O_RDONLY);
     if (fd < 0) {
@@ -252,7 +252,7 @@ static int sysfs_gpio_read(gpio_t dev)
         _native_syscall_leave();
         return -1;
     }
- 
+
     char val;
     int ret = real_read(fd, &val, 1);
     if (ret == -1) {
@@ -271,7 +271,7 @@ static int sysfs_gpio_read(gpio_t dev)
                 ret = -1;
         }
     }
- 
+
     if (real_close(fd) == -1) {
         warn("sysfs_gpio_read");
     }
