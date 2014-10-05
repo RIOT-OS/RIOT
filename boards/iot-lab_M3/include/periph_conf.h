@@ -281,5 +281,29 @@
 #define RTT_PRESCALER       (0x7fff)        /* run with 1 Hz */
 /** @} */
 
+/**
+ * @name I2C configuration
+  * @{
+ */
+#define I2C_NUMOF           (1U)
+#define I2C_0_EN            1
+#define I2C_IRQ_PRIO        1
+#define I2C_APBCLK          (36000000U)
+
+/* I2C 0 device configuration */
+#define I2C_0_DEV           I2C1
+#define I2C_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_I2C1EN)
+#define I2C_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN))
+#define I2C_0_IRQ           I2C1_EV_IRQn
+#define I2C_0_ISR           isr_i2c1
+/* I2C 0 pin configuration */
+#define I2C_0_SCL_PORT      GPIOB
+#define I2C_0_SCL_PIN       6
+#define I2C_0_SCL_CLKEN()   (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
+#define I2C_0_SDA_PORT      GPIOB
+#define I2C_0_SDA_PIN       7
+#define I2C_0_SDA_CLKEN()   (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
+/** @} */
+
 #endif /* __PERIPH_CONF_H */
 /** @} */
