@@ -4,7 +4,8 @@ endif
 
 ifneq (,$(filter olsr2,$(USEMODULE)))
 	USEMODULE += vtimer
-	USEMODULE += destiny
+	USEMODULE += socket_base
+	USEMODULE += udp
 	USEMODULE += sixlowpan
 	USEMODULE += slist
 	USEMODULE += oonf_common

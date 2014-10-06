@@ -14,7 +14,7 @@
 #include <vtimer.h>
 #include <rtc.h>
 #include <random.h>
-#include <destiny.h>
+#include <socket_base/socket.h>
 #include <transceiver.h>
 #include <sixlowpan/icmp.h>
 
