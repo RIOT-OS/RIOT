@@ -1097,6 +1097,7 @@ __attribute__((naked)) void isr_exti4(void)
 }
 #endif
 
+#if (GPIO_IRQ_5 || GPIO_IRQ_6 || GPIO_IRQ_7 || GPIO_IRQ_8 || GPIO_IRQ_9)
 __attribute__((naked)) void isr_exti9_5(void)
 {
     ISR_ENTER();
@@ -1135,7 +1136,9 @@ __attribute__((naked)) void isr_exti9_5(void)
     }
     ISR_EXIT();
 }
+#endif
 
+#if (GPIO_IRQ_10 || GPIO_IRQ_11 || GPIO_IRQ_12 || GPIO_IRQ_13 || GPIO_IRQ_14 || GPIO_IRQ_15)
 __attribute__((naked)) void isr_exti15_10(void)
 {
     ISR_ENTER();
@@ -1180,5 +1183,6 @@ __attribute__((naked)) void isr_exti15_10(void)
     }
     ISR_EXIT();
 }
+#endif
 
 #endif
