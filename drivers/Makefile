@@ -49,5 +49,8 @@ endif
 ifneq (,$(filter mq3,$(USEMODULE)))
     DIRS += mq3
 endif
+ifneq (,$(filter lps331ap,$(USEMODULE)))
+    DIRS += lps331ap
+endif
 
 include $(RIOTBASE)/Makefile.base
