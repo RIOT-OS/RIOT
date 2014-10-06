@@ -236,7 +236,7 @@ void at86rf231_reset(void)
     gpio_clear(AT86RF231_SLEEP);
 
     /* additional waiting to comply to min rst pulse width */
-    uint8_t delay = 50;
+    uint8_t volatile delay = 50; /* volatile to ensure it isn't optimized away */
     while (delay--){}
 
     gpio_set(AT86RF231_RESET);
