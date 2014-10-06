@@ -11,7 +11,7 @@ export CFLAGS += -march=armv4t -mtune=arm7tdmi-s -mlong-calls \
 		-nodefaultlibs -Wcast-align -Wall -Wstrict-prototypes -Wextra \
 		-Os -pipe
 export CFLAGS_MTHUMB ?= -mthumb
-$(warning TODO add -mthumb)
+# TODO add -mthumb
 export AFLAGS = -Wa,-gstabs $(CFLAGS)
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
