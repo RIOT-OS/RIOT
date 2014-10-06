@@ -43,5 +43,8 @@ endif
 ifneq (,$(filter netdev_base,$(USEMODULE)))
     DIRS += netdev/base
 endif
+ifneq (,$(filter isl29020,$(USEMODULE)))
+    DIRS += isl29020
+endif
 
 include $(RIOTBASE)/Makefile.base
