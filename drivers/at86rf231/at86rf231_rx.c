@@ -28,7 +28,7 @@
 
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
-#define DEBUG_ENABLED (1)
+#define DEBUG_ENABLED
 #endif
 #include "debug.h"
 
@@ -68,7 +68,7 @@ void at86rf231_rx_handler(void)
                           at86rf231_rx_buffer[rx_buffer_next].length);
 
     if (at86rf231_rx_buffer[rx_buffer_next].frame.fcf.frame_type != 2) {
-#if DEBUG_ENABLED
+#ifdef DEBUG_ENABLED
         ieee802154_frame_print_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
 #endif
 
@@ -81,7 +81,7 @@ void at86rf231_rx_handler(void)
         }
     }
     else {
-#if DEBUG_ENABLED
+#ifdef DEBUG_ENABLED
         DEBUG("GOT ACK for SEQ %u\n", at86rf231_rx_buffer[rx_buffer_next].frame.seq_nr);
         ieee802154_frame_print_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
 #endif

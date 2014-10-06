@@ -573,6 +573,7 @@ void receive_cc2420_packet(ieee802154_packet_t *trans_p)
     memcpy(&data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH],
            p->frame.payload, p->frame.payload_len);
     trans_p->frame.payload = (uint8_t *) & (data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH]);
+    trans_p->frame.payload_len = p->frame.payload_len;
     eINT();
 
 #ifdef DEBUG_ENABLED
@@ -608,8 +609,6 @@ void receive_cc2420_packet(ieee802154_packet_t *trans_p)
         return;
     }
 #endif
-    trans_p->frame.payload = (uint8_t *) &(data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH]);
-    trans_p->frame.payload_len = p->frame.payload_len;
     DEBUG("transceiver: Content: %s\n", trans_p->data);
 }
 #endif
@@ -667,6 +666,7 @@ void receive_at86rf231_packet(ieee802154_packet_t *trans_p)
     memcpy(&data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH], p->frame.payload,
            p->frame.payload_len);
     trans_p->frame.payload = (uint8_t *) & (data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH]);
+    trans_p->frame.payload_len = p->frame.payload_len;
     eINT();
 
 #ifdef DEBUG_ENABLED
