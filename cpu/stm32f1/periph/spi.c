@@ -14,6 +14,7 @@
  * @brief       Low-level SPI driver implementation
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Fabian Nack <nack@inf.fu-berlin.de>
  *
  * @}
  */
@@ -27,11 +28,12 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+/* guard file in case no SPI device is defined */
+#if SPI_NUMOF
+
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
     SPI_TypeDef *spi;
-    GPIO_TypeDef *clk_port, *mosi_port, *miso_port;
-    int clk_pin, mosi_pin, miso_pin;
     uint16_t br_div;
     uint8_t bus_div;
 
@@ -39,12 +41,6 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 #ifdef SPI_0_EN
         case SPI_0:
             spi = SPI_0_DEV;
-            clk_port = SPI_0_CLK_PORT;
-            clk_pin = SPI_0_CLK_PIN;
-            mosi_port = SPI_0_MOSI_PORT;
-            mosi_pin = SPI_0_MOSI_PIN;
-            miso_port = SPI_0_MISO_PORT;
-            miso_pin = SPI_0_MISO_PIN;
             bus_div = SPI_0_BUS_DIV;
             SPI_0_CLKEN();
             break;
@@ -53,33 +49,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             return -1;
     }
 
-    /* configure CLK pin */
-    if (clk_pin < 8) {
-        clk_port->CRL &= ~(0xf << (clk_pin * 4));
-        clk_port->CRL |= (0xb << (clk_pin * 4));
-    }
-    else {
-        clk_port->CRH &= ~(0xf << ((clk_pin - 8) * 4));
-        clk_port->CRH &= (0xb << ((clk_pin - 8) * 4));
-    }
-    /* configure the MOSI pin */
-    if (mosi_pin < 8) {
-        mosi_port->CRL &= ~(0xf << (mosi_pin * 4));
-        mosi_port->CRL |= (0xb << (mosi_pin * 4));
-    }
-    else {
-        mosi_port->CRH &= ~(0xf << ((mosi_pin - 8) * 4));
-        mosi_port->CRH &= (0xb << ((mosi_pin - 8) * 4));
-    }
-    /* configure MISO pin */
-    if (miso_pin < 8) {
-        miso_port->CRL &= ~(0xf << (miso_pin * 4));
-        miso_port->CRL |= (0x4 << (miso_pin * 4));
-    }
-    else {
-        miso_port->CRH &= ~(0xf << ((miso_pin - 8) * 4));
-        miso_port->CRH &= (0x4 << ((miso_pin - 8) * 4));
-    }
+    /* configure SCK, MISO and MOSI pin */
+    spi_conf_pins(dev);
 
     /* configure SPI bus speed */
     switch(speed) {
@@ -97,6 +68,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             break;
         case SPI_SPEED_100KHZ:
             br_div = 0x07;              /* actual speed: 280kHz on APB2, 140KHz on APB1 */
+            break;
         default:
             return -2;
     }
@@ -115,6 +87,42 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
 {
     /* TODO */
     return -1;
+}
+
+int spi_conf_pins(spi_t dev)
+{
+    GPIO_TypeDef *port[3];
+    int pin[3];
+
+    switch(dev) {
+#ifdef SPI_0_EN
+        case SPI_0:
+            port[0] = SPI_0_CLK_PORT;
+            pin[0] = SPI_0_CLK_PIN;
+            port[1] = SPI_0_MOSI_PORT;
+            pin[1] = SPI_0_MOSI_PIN;
+            port[2] = SPI_0_MISO_PORT;
+            pin[2] = SPI_0_MISO_PIN;
+            break;
+#endif
+        default:
+            return -1;
+    }
+
+    /* configure pins for alternate function input (MISO) or output (MOSI, CLK) */
+    for (int i = 0; i < 3; i++) {
+        int crbitval = (i < 2) ? 0xb : 0x4;
+        if (pin[i] < 8) {
+            port[i]->CRL &= ~(0xf << (pin[i] * 4));
+            port[i]->CRL |= (crbitval << (pin[i] * 4));
+        }
+        else {
+            port[i]->CRH &= ~(0xf << ((pin[i] - 8) * 4));
+            port[i]->CRH &= (crbitval << ((pin[i] - 8) * 4));
+        }
+    }
+
+    return 0;
 }
 
 int spi_transfer_byte(spi_t dev, char out, char *in)
@@ -222,3 +230,5 @@ void spi_poweroff(spi_t dev)
 #endif
     }
 }
+
+#endif /* SPI_NUMOF */

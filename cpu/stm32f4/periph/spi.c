@@ -14,6 +14,7 @@
  * @brief       Low-level SPI driver implementation
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author      Fabian Nack <nack@inf.fu-berlin.de>
  *
  * @}
  */
@@ -43,7 +44,6 @@ static spi_state_t spi_config[SPI_NUMOF];
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
-
     uint8_t speed_devider;
     SPI_TypeDef *spi_port;
 
@@ -76,58 +76,6 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             SPI_0_SCK_PORT_CLKEN();
             SPI_0_MISO_PORT_CLKEN();
             SPI_0_MOSI_PORT_CLKEN();
-
-            /***************** GPIO-Init *****************/
-            /* Set GPIOs to AF mode */
-            SPI_0_SCK_PORT->MODER &= ~(3 << (2 * SPI_0_SCK_PIN));
-            SPI_0_SCK_PORT->MODER |= (2 << (2 * SPI_0_SCK_PIN));
-            SPI_0_MISO_PORT->MODER &= ~(3 << (2 * SPI_0_MISO_PIN));
-            SPI_0_MISO_PORT->MODER |= (2 << (2 * SPI_0_MISO_PIN));
-            SPI_0_MOSI_PORT->MODER &= ~(3 << (2 * SPI_0_MOSI_PIN));
-            SPI_0_MOSI_PORT->MODER |= (2 << (2 * SPI_0_MOSI_PIN));
-            /* Set speed */
-            SPI_0_SCK_PORT->OSPEEDR &= ~(3 << (2 * SPI_0_SCK_PIN));
-            SPI_0_SCK_PORT->OSPEEDR |= (3 << (2 * SPI_0_SCK_PIN));
-            SPI_0_MISO_PORT->OSPEEDR &= ~(3 << (2 * SPI_0_MISO_PIN));
-            SPI_0_MISO_PORT->OSPEEDR |= (3 << (2 * SPI_0_MISO_PIN));
-            SPI_0_MOSI_PORT->OSPEEDR &= ~(3 << (2 * SPI_0_MOSI_PIN));
-            SPI_0_MOSI_PORT->OSPEEDR |= (3 << (2 * SPI_0_MOSI_PIN));
-            /* Set to push-pull configuration */
-            SPI_0_SCK_PORT->OTYPER &= ~(1 << SPI_0_SCK_PIN);
-            SPI_0_MISO_PORT->OTYPER &= ~(1 << SPI_0_MISO_PIN);
-            SPI_0_MOSI_PORT->OTYPER &= ~(1 << SPI_0_MOSI_PIN);
-            /* Configure push-pull resistors */
-            SPI_0_SCK_PORT->PUPDR &= ~(3 << (2 * SPI_0_SCK_PIN));
-            SPI_0_SCK_PORT->PUPDR |= (2 << (2 * SPI_0_SCK_PIN));
-            SPI_0_MISO_PORT->PUPDR &= ~(3 << (2 * SPI_0_MISO_PIN));
-            SPI_0_MISO_PORT->PUPDR |= (2 << (2 * SPI_0_MISO_PIN));
-            SPI_0_MOSI_PORT->PUPDR &= ~(3 << (2 * SPI_0_MOSI_PIN));
-            SPI_0_MOSI_PORT->PUPDR |= (2 << (2 * SPI_0_MOSI_PIN));
-            /* Configure GPIOs to for the SPI0 alternate function */
-#if (SPI_0_SCK_PIN < 8)
-            SPI_0_SCK_PORT->AFR[0] &= ~(0xf << (4 * SPI_0_SCK_PIN));
-            SPI_0_SCK_PORT->AFR[0] |= (SPI_0_SCK_AF << (4 * SPI_0_SCK_PIN));
-
-#else
-            SPI_0_SCK_PORT->AFR[1] &= ~(0xf << (4 * (SPI_0_SCK_PIN - 8)));
-            SPI_0_SCK_PORT->AFR[1] |= (SPI_0_SCK_AF << (4 * (SPI_0_SCK_PIN - 8)));
-#endif
-
-#if (SPI_0_MISO_PIN < 8)
-            SPI_0_MISO_PORT->AFR[0] &= ~(0xf << (4 * SPI_0_MISO_PIN));
-            SPI_0_MISO_PORT->AFR[0] |= (SPI_0_MISO_AF << (4 * SPI_0_MISO_PIN));
-#else
-            SPI_0_MISO_PORT->AFR[1] &= ~(0xf << (4 * (SPI_0_MISO_PIN - 8)));
-            SPI_0_MISO_PORT->AFR[1] |= (SPI_0_MISO_AF << (4 * (SPI_0_MISO_PIN - 8)));
-#endif
-
-#if (SPI_0_MOSI_PIN < 8)
-            SPI_0_MOSI_PORT->AFR[0] &= ~(0xf << (4 * SPI_0_MOSI_PIN));
-            SPI_0_MOSI_PORT->AFR[0] |= (SPI_0_MOSI_AF << (4 * SPI_0_MOSI_PIN));
-#else
-            SPI_0_MOSI_PORT->AFR[1] &= ~(0xf << (4 * (SPI_0_MOSI_PIN - 8)));
-            SPI_0_MOSI_PORT->AFR[1] |= (SPI_0_MOSI_AF << (4 * (SPI_0_MOSI_PIN - 8)));
-#endif
             break;
 #endif /* SPI_0_EN */
 #if SPI_1_EN
@@ -138,62 +86,24 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             SPI_1_SCK_PORT_CLKEN();
             SPI_1_MISO_PORT_CLKEN();
             SPI_1_MOSI_PORT_CLKEN();
-
-            /************************* GPIO-Init *************************/
-            /* Set GPIOs to AF mode */
-            SPI_1_SCK_PORT->MODER &= ~(3 << (2 * SPI_1_SCK_PIN));
-            SPI_1_SCK_PORT->MODER |= (2 << (2 * SPI_1_SCK_PIN));
-            SPI_1_MISO_PORT->MODER &= ~(3 << (2 * SPI_1_MISO_PIN));
-            SPI_1_MISO_PORT->MODER |= (2 << (2 * SPI_1_MISO_PIN));
-            SPI_1_MOSI_PORT->MODER &= ~(3 << (2 * SPI_1_MOSI_PIN));
-            SPI_1_MOSI_PORT->MODER |= (2 << (2 * SPI_1_MOSI_PIN));
-            /* Set speed */
-            SPI_1_SCK_PORT->OSPEEDR &= ~(3 << (2 * SPI_1_SCK_PIN));
-            SPI_1_SCK_PORT->OSPEEDR |= (3 << (2 * SPI_1_SCK_PIN));
-            SPI_1_MISO_PORT->OSPEEDR &= ~(3 << (2 * SPI_1_MISO_PIN));
-            SPI_1_MISO_PORT->OSPEEDR |= (3 << (2 * SPI_1_MISO_PIN));
-            SPI_1_MOSI_PORT->OSPEEDR &= ~(3 << (2 * SPI_1_MOSI_PIN));
-            SPI_1_MOSI_PORT->OSPEEDR |= (3 << (2 * SPI_1_MOSI_PIN));
-            /* Set to push-pull configuration */
-            SPI_1_SCK_PORT->OTYPER &= ~(1 << SPI_1_SCK_PIN);
-            SPI_1_MISO_PORT->OTYPER &= ~(1 << SPI_1_MISO_PIN);
-            SPI_1_MOSI_PORT->OTYPER &= ~(1 << SPI_1_MOSI_PIN);
-            /* Configure push-pull resistors */
-            SPI_1_SCK_PORT->PUPDR &= ~(3 << (2 * SPI_1_SCK_PIN));
-            SPI_1_SCK_PORT->PUPDR |= (2 << (2 * SPI_1_SCK_PIN));
-            SPI_1_MISO_PORT->PUPDR &= ~(3 << (2 * SPI_1_MISO_PIN));
-            SPI_1_MISO_PORT->PUPDR |= (2 << (2 * SPI_1_MISO_PIN));
-            SPI_1_MOSI_PORT->PUPDR &= ~(3 << (2 * SPI_1_MOSI_PIN));
-            SPI_1_MOSI_PORT->PUPDR |= (2 << (2 * SPI_1_MOSI_PIN));
-            /* Configure the pins alternate function */
-#if (SPI_1_SCK_PIN < 8)
-            SPI_1_SCK_PORT->AFR[0] &= ~(0xf << (4 * SPI_1_SCK_PIN));
-            SPI_1_SCK_PORT->AFR[0] |= (SPI_1_SCK_AF << (4 * SPI_1_SCK_PIN));
-#else
-            SPI_1_SCK_PORT->AFR[1] &= ~(0xf << (4 * (SPI_1_SCK_PIN - 8)));
-            SPI_1_SCK_PORT->AFR[1] |= (SPI_1_SCK_AF << (4 * (SPI_1_SCK_PIN - 8)));
-#endif
-
-#if (SPI_1_MISO_PIN < 8)
-            SPI_1_MISO_PORT->AFR[0] &= ~(0xf << (4 * SPI_1_MISO_PIN));
-            SPI_1_MISO_PORT->AFR[0] |= (SPI_1_MISO_AF << (4 * SPI_1_MISO_PIN));
-#else
-            SPI_1_MISO_PORT->AFR[1] &= ~(0xf << (4 * (SPI_1_MISO_PIN - 8)));
-            SPI_1_MISO_PORT->AFR[1] |= (SPI_1_MISO_AF << (4 * (SPI_1_MISO_PIN - 8)));
-#endif
-
-#if (SPI_1_MOSI_PIN < 8)
-            SPI_1_MOSI_PORT->AFR[0] &= ~(0xf << (4 * SPI_1_MOSI_PIN));
-            SPI_1_MOSI_PORT->AFR[0] |= (SPI_1_MOSI_AF << (4 * SPI_1_MOSI_PIN));
-#else
-            SPI_1_MOSI_PORT->AFR[1] &= ~(0xf << (4 * (SPI_1_MOSI_PIN - 8)));
-            SPI_1_MOSI_PORT->AFR[1] |= (SPI_1_MOSI_AF << (4 * (SPI_1_MOSI_PIN - 8)));
-#endif
             break;
 #endif /* SPI_1_EN */
+#if SPI_2_EN
+        case SPI_2:
+            spi_port = SPI_2_DEV;
+            /* enable clocks */
+            SPI_2_CLKEN();
+            SPI_2_SCK_PORT_CLKEN();
+            SPI_2_MISO_PORT_CLKEN();
+            SPI_2_MOSI_PORT_CLKEN();
+            break;
+#endif /* SPI_2_EN */
         default:
             return -1;
     }
+
+    /* configure SCK, MISO and MOSI pin */
+    spi_conf_pins(dev);
 
     /**************** SPI-Init *****************/
     spi_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);/* Activate the SPI mode (Reset I2SMOD bit in I2SCFGR register) */
@@ -225,55 +135,6 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             /* configure interrupt channel */
             NVIC_SetPriority(SPI_0_IRQ, SPI_IRQ_PRIO); /* set SPI interrupt priority */
             NVIC_EnableIRQ(SPI_0_IRQ); /* set SPI interrupt priority */
-
-            /***************** GPIO-Init *****************/
-            /* Set GPIOs to AF mode (not especially input or output) */
-            SPI_0_SCK_PORT->MODER &= ~(3 << (2 * SPI_0_SCK_PIN));
-            SPI_0_SCK_PORT->MODER |= (2 << (2 * SPI_0_SCK_PIN));
-            SPI_0_MISO_PORT->MODER &= ~(3 << (2 * SPI_0_MISO_PIN));
-            SPI_0_MISO_PORT->MODER |= (2 << (2 * SPI_0_MISO_PIN));
-            SPI_0_MOSI_PORT->MODER &= ~(3 << (2 * SPI_0_MOSI_PIN));
-            SPI_0_MOSI_PORT->MODER |= (2 << (2 * SPI_0_MOSI_PIN));
-            /* Set speed */
-            SPI_0_SCK_PORT->OSPEEDR &= ~(3 << (2 * SPI_0_SCK_PIN));
-            SPI_0_SCK_PORT->OSPEEDR |= (3 << (2 * SPI_0_SCK_PIN));
-            SPI_0_MISO_PORT->OSPEEDR &= ~(3 << (2 * SPI_0_MISO_PIN));
-            SPI_0_MISO_PORT->OSPEEDR |= (3 << (2 * SPI_0_MISO_PIN));
-            SPI_0_MOSI_PORT->OSPEEDR &= ~(3 << (2 * SPI_0_MOSI_PIN));
-            SPI_0_MOSI_PORT->OSPEEDR |= (3 << (2 * SPI_0_MOSI_PIN));
-            /* Set to push-pull configuration (not open drain) */
-            SPI_0_SCK_PORT->OTYPER &= ~(1 << SPI_0_SCK_PIN);
-            SPI_0_MISO_PORT->OTYPER &= ~(1 << SPI_0_MISO_PIN);
-            SPI_0_MOSI_PORT->OTYPER &= ~(1 << SPI_0_MOSI_PIN);
-            /* Configure push-pull resistors */
-            SPI_0_SCK_PORT->PUPDR &= ~(3 << (2 * SPI_0_SCK_PIN));
-            SPI_0_SCK_PORT->PUPDR |= (2 << (2 * SPI_0_SCK_PIN));
-            SPI_0_MISO_PORT->PUPDR &= ~(3 << (2 * SPI_0_MISO_PIN));
-            SPI_0_MISO_PORT->PUPDR |= (2 << (2 * SPI_0_MISO_PIN));
-            SPI_0_MOSI_PORT->PUPDR &= ~(3 << (2 * SPI_0_MOSI_PIN));
-            SPI_0_MOSI_PORT->PUPDR |= (2 << (2 * SPI_0_MOSI_PIN));
-            /* configure the pins alternate function */
-#if (SPI_0_SCK_PIN < 8)
-            SPI_0_SCK_PORT->AFR[0] &= ~(0xf << (4 * SPI_0_SCK_PIN));
-            SPI_0_SCK_PORT->AFR[0] |= (SPI_0_SCK_AF << (4 * SPI_0_SCK_PIN));
-#else
-            SPI_0_SCK_PORT->AFR[1] &= ~(0xf << (4 * (SPI_0_SCK_PIN - 8)));
-            SPI_0_SCK_PORT->AFR[1] |= (SPI_0_SCK_AF << (4 * (SPI_0_SCK_PIN - 8)));
-#endif
-#if (SPI_0_MISO_PIN < 8)
-            SPI_0_MISO_PORT->AFR[0] &= ~(0xf << (4 * SPI_0_MISO_PIN));
-            SPI_0_MISO_PORT->AFR[0] |= (SPI_0_MISO_AF << (4 * SPI_0_MISO_PIN));
-#else
-            SPI_0_MISO_PORT->AFR[1] &= ~(0xf << (4 * (SPI_0_MISO_PIN - 8)));
-            SPI_0_MISO_PORT->AFR[1] |= (SPI_0_MISO_AF << (4 * (SPI_0_MISO_PIN - 8)));
-#endif
-#if (SPI_0_MOSI_PIN < 8)
-            SPI_0_MOSI_PORT->AFR[0] &= ~(0xf << (4 * SPI_0_MOSI_PIN));
-            SPI_0_MOSI_PORT->AFR[0] |= (SPI_0_MOSI_AF << (4 * SPI_0_MOSI_PIN));
-#else
-            SPI_0_MOSI_PORT->AFR[1] &= ~(0xf << (4 * (SPI_0_MOSI_PIN - 8)));
-            SPI_0_MOSI_PORT->AFR[1] |= (SPI_0_MOSI_AF << (4 * (SPI_0_MOSI_PIN - 8)));
-#endif
             break;
 #endif /* SPI_0_EN */
 #if SPI_1_EN
@@ -287,60 +148,27 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             /* configure interrupt channel */
             NVIC_SetPriority(SPI_1_IRQ, SPI_IRQ_PRIO);
             NVIC_EnableIRQ(SPI_1_IRQ);
-
-            /***************** GPIO-Init *****************/
-            /* Set GPIOs to AF mode (not especially input or output) */
-            SPI_1_SCK_PORT->MODER &= ~(3 << (2 * SPI_1_SCK_PIN));
-            SPI_1_SCK_PORT->MODER |= (2 << (2 * SPI_1_SCK_PIN));
-            SPI_1_MISO_PORT->MODER &= ~(3 << (2 * SPI_1_MISO_PIN));
-            SPI_1_MISO_PORT->MODER |= (2 << (2 * SPI_1_MISO_PIN));
-            SPI_1_MOSI_PORT->MODER &= ~(3 << (2 * SPI_1_MOSI_PIN));
-            SPI_1_MOSI_PORT->MODER |= (2 << (2 * SPI_1_MOSI_PIN));
-            /* Set speed */
-            SPI_1_SCK_PORT->OSPEEDR &= ~(3 << (2 * SPI_1_SCK_PIN));
-            SPI_1_SCK_PORT->OSPEEDR |= (3 << (2 * SPI_1_SCK_PIN));
-            SPI_1_MISO_PORT->OSPEEDR &= ~(3 << (2 * SPI_1_MISO_PIN));
-            SPI_1_MISO_PORT->OSPEEDR |= (3 << (2 * SPI_1_MISO_PIN));
-            SPI_1_MOSI_PORT->OSPEEDR &= ~(3 << (2 * SPI_1_MOSI_PIN));
-            SPI_1_MOSI_PORT->OSPEEDR |= (3 << (2 * SPI_1_MOSI_PIN));
-            /* Set to push-pull configuration (not open drain) */
-            SPI_1_SCK_PORT->OTYPER &= ~(1 << SPI_1_SCK_PIN);
-            SPI_1_MISO_PORT->OTYPER &= ~(1 << SPI_1_MISO_PIN);
-            SPI_1_MOSI_PORT->OTYPER &= ~(1 << SPI_1_MOSI_PIN);
-            /* Configure push-pull resistors */
-            SPI_1_SCK_PORT->PUPDR &= ~(3 << (2 * SPI_1_SCK_PIN));
-            SPI_1_SCK_PORT->PUPDR |= (2 << (2 * SPI_1_SCK_PIN));
-            SPI_1_MISO_PORT->PUPDR &= ~(3 << (2 * SPI_1_MISO_PIN));
-            SPI_1_MISO_PORT->PUPDR |= (2 << (2 * SPI_1_MISO_PIN));
-            SPI_1_MOSI_PORT->PUPDR &= ~(3 << (2 * SPI_1_MOSI_PIN));
-            SPI_1_MOSI_PORT->PUPDR |= (2 << (2 * SPI_1_MOSI_PIN));
-
-#if (SPI_1_SCK_PIN < 8)
-            SPI_1_SCK_PORT->AFR[0] &= ~(0xf << (4 * SPI_1_SCK_PIN));
-            SPI_1_SCK_PORT->AFR[0] |= (SPI_1_SCK_AF << (4 * SPI_1_SCK_PIN));
-#else
-            SPI_1_SCK_PORT->AFR[1] &= ~(0xf << (4 * (SPI_1_SCK_PIN - 8)));
-            SPI_1_SCK_PORT->AFR[1] |= (SPI_1_SCK_AF << (4 * (SPI_1_SCK_PIN - 8)));
-#endif
-#if (SPI_1_MISO_PIN < 8)
-            SPI_1_MISO_PORT->AFR[0] &= ~(0xf << (4 * SPI_1_MISO_PIN));
-            SPI_1_MISO_PORT->AFR[0] |= (SPI_1_MISO_AF << (4 * SPI_1_MISO_PIN));
-#else
-            SPI_1_MISO_PORT->AFR[1] &= ~(0xf << (4 * (SPI_1_MISO_PIN - 8)));
-            SPI_1_MISO_PORT->AFR[1] |= (SPI_1_MISO_AF << (4 * (SPI_1_MISO_PIN - 8)));
-#endif
-#if (SPI_1_MOSI_PIN < 8)
-            SPI_1_MOSI_PORT->AFR[0] &= ~(0xf << (4 * SPI_1_MOSI_PIN));
-            SPI_1_MOSI_PORT->AFR[0] |= (SPI_1_MOSI_AF << (4 * SPI_1_MOSI_PIN));
-#else
-            SPI_1_MOSI_PORT->AFR[1] &= ~(0xf << (4 * (SPI_1_MOSI_PIN - 8)));
-            SPI_1_MOSI_PORT->AFR[1] |= (SPI_1_MOSI_AF << (4 * (SPI_1_MOSI_PIN - 8)));
-#endif
             break;
 #endif /* SPI_1_EN */
+#if SPI_2_EN
+        case SPI_2:
+            spi_port = SPI_2_DEV;
+            /* enable clocks */
+            SPI_2_CLKEN();
+            SPI_2_SCK_PORT_CLKEN();
+            SPI_2_MISO_PORT_CLKEN();
+            SPI_2_MOSI_PORT_CLKEN();
+            /* configure interrupt channel */
+            NVIC_SetPriority(SPI_2_IRQ, SPI_IRQ_PRIO);
+            NVIC_EnableIRQ(SPI_2_IRQ);
+            break;
+#endif /* SPI_2_EN */
         default:
             return -1;
     }
+
+    /* configure sck, miso and mosi pin */
+    spi_conf_pins(dev);
 
     /***************** SPI-Init *****************/
     spi_port->I2SCFGR &= ~(SPI_I2SCFGR_I2SMOD);
@@ -358,6 +186,77 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
     return 0;
 }
 
+int spi_conf_pins(spi_t dev)
+{
+    GPIO_TypeDef *port[3];
+    int pin[3], af[3];
+
+    switch (dev) {
+#if SPI_0_EN
+        case SPI_0:
+            port[0] = SPI_0_SCK_PORT;
+            pin[0] = SPI_0_SCK_PIN;
+            af[0] = SPI_0_SCK_AF;
+            port[1] = SPI_0_MOSI_PORT;
+            pin[1] = SPI_0_MOSI_PIN;
+            af[1] = SPI_0_MOSI_AF;
+            port[2] = SPI_0_MISO_PORT;
+            pin[2] = SPI_0_MISO_PIN;
+            af[2] = SPI_0_MISO_AF;
+            break;
+#endif /* SPI_0_EN */
+#if SPI_1_EN
+        case SPI_1:
+            port[0] = SPI_1_SCK_PORT;
+            pin[0] = SPI_1_SCK_PIN;
+            af[0] = SPI_1_SCK_AF;
+            port[1] = SPI_1_MOSI_PORT;
+            pin[1] = SPI_1_MOSI_PIN;
+            af[1] = SPI_1_MOSI_AF;
+            port[2] = SPI_1_MISO_PORT;
+            pin[2] = SPI_1_MISO_PIN;
+            af[2] = SPI_1_MISO_AF;
+            break;
+#endif /* SPI_1_EN */
+#if SPI_2_EN
+        case SPI_2:
+            port[0] = SPI_2_SCK_PORT;
+            pin[0] = SPI_2_SCK_PIN;
+            af[0] = SPI_2_SCK_AF;
+            port[1] = SPI_2_MOSI_PORT;
+            pin[1] = SPI_2_MOSI_PIN;
+            af[1] = SPI_2_MOSI_AF;
+            port[2] = SPI_2_MISO_PORT;
+            pin[2] = SPI_2_MISO_PIN;
+            af[2] = SPI_2_MISO_AF;
+            break;
+#endif /* SPI_2_EN */
+        default:
+            return -1;
+    }
+
+    /***************** GPIO-Init *****************/
+    for (int i = 0; i < 3; i++) {
+        /* Set GPIOs to AF mode */
+        port[i]->MODER &= ~(3 << (2 * pin[i]));
+        port[i]->MODER |= (2 << (2 * pin[i]));
+        /* Set speed */
+        port[i]->OSPEEDR &= ~(3 << (2 * pin[i]));
+        port[i]->OSPEEDR |= (3 << (2 * pin[i]));
+        /* Set to push-pull configuration */
+        port[i]->OTYPER &= ~(1 << pin[i]);
+        /* Configure push-pull resistors */
+        port[i]->PUPDR &= ~(3 << (2 * pin[i]));
+        port[i]->PUPDR |= (2 << (2 * pin[i]));
+        /* Configure GPIOs for the SPI alternate function */
+        int hl = (pin[i] < 8) ? 0 : 1;
+        port[i]->AFR[hl] &= ~(0xf << ((pin[i] - (hl * 8)) * 4));
+        port[i]->AFR[hl] |= (af[i] << ((pin[i] - (hl * 8)) * 4));
+    }
+
+    return 0;
+}
+
 int spi_transfer_byte(spi_t dev, char out, char *in)
 {
     SPI_TypeDef *spi_port;
@@ -371,6 +270,11 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 #if SPI_1_EN
         case SPI_1:
             spi_port = SPI_1_DEV;
+            break;
+#endif
+#if SPI_2_EN
+        case SPI_2:
+            spi_port = SPI_2_DEV;
             break;
 #endif
         default:
@@ -463,6 +367,11 @@ void spi_transmission_begin(spi_t dev, char reset_val)
             SPI_1_DEV->DR = reset_val;
             break;
 #endif
+#if SPI_2_EN
+        case SPI_2:
+            SPI_2_DEV->DR = reset_val;
+            break;
+#endif
     }
 }
 
@@ -477,6 +386,11 @@ void spi_poweron(spi_t dev)
 #if SPI_1_EN
         case SPI_1:
             SPI_1_CLKEN();
+            break;
+#endif
+#if SPI_2_EN
+        case SPI_2:
+            SPI_2_CLKEN();
             break;
 #endif
     }
@@ -495,6 +409,12 @@ void spi_poweroff(spi_t dev)
         case SPI_1:
             while (SPI_1_DEV->SR & SPI_SR_BSY);
             SPI_1_CLKDIS();
+            break;
+#endif
+#if SPI_2_EN
+        case SPI_2:
+            while (SPI_2_DEV->SR & SPI_SR_BSY);
+            SPI_2_CLKDIS();
             break;
 #endif
     }
@@ -529,6 +449,15 @@ __attribute__((naked)) void SPI_1_IRQ_HANDLER(void)
 {
     ISR_ENTER();
     irq_handler_transfer(SPI_1_DEV, SPI_1);
+    ISR_EXIT();
+}
+#endif
+
+#if SPI_2_EN
+__attribute__((naked)) void SPI_2_IRQ_HANDLER(void)
+{
+    ISR_ENTER();
+    irq_handler_transfer(SPI_2_DEV, SPI_2);
     ISR_EXIT();
 }
 #endif
