@@ -19,13 +19,12 @@
 #include <stdio.h>
 #include <thread.h>
 #include <vtimer.h>
-#include <destiny/socket.h>
+#include <socket_base/socket.h>
 #include <inet_pton.h>
 #include <sixlowpan/ip.h>
 #include <msg.h>
 #include <net_help.h>
 #include <mutex.h>
-#include <destiny.h>
 #include <random.h>
 #include <config.h>
 #include <board.h>
@@ -82,7 +81,7 @@ static void write_packet(struct rfc5444_writer *wr __attribute__((unused)),
 #ifdef ENABLE_LEDS
     LED_GREEN_TOGGLE;
 #endif
-    int bytes_send = destiny_socket_sendto(sock, buffer, length, 0, &sa_bcast, sizeof sa_bcast);
+    int bytes_send = socket_base_sendto(sock, buffer, length, 0, &sa_bcast, sizeof sa_bcast);
 
     DEBUG("write_packet(%d bytes), %d bytes sent", length, bytes_send);
 }
@@ -95,9 +94,9 @@ static void olsr_receiver_thread(void)
     sa.sin6_family = AF_INET6;
     sa.sin6_port = HTONS(MANET_PORT);
 
-    if (destiny_socket_bind(sock, &sa, sizeof sa) < 0) {
+    if (socket_base_bind(sock, &sa, sizeof sa) < 0) {
         printf("Error bind failed!\n");
-        destiny_socket_close(sock);
+        socket_base_close(sock);
     }
 
     int32_t recsize;
@@ -108,7 +107,7 @@ static void olsr_receiver_thread(void)
     _src._prefix_len = 128;
 
     while (1) {
-        recsize = destiny_socket_recvfrom(sock, &buffer, sizeof buffer, 0, &sa, &fromlen);
+        recsize = socket_base_recvfrom(sock, &buffer, sizeof buffer, 0, &sa, &fromlen);
 #ifdef ENABLE_LEDS
         LED_RED_TOGGLE;
 #endif
@@ -193,7 +192,7 @@ void olsr_init(void)
     ipv6_addr_set_all_nodes_addr(&sa_bcast.sin6_addr);
 
     /* enable receive */
-    sock = destiny_socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+    sock = socket_base_socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
     thread_create(receive_thread_stack, sizeof receive_thread_stack, PRIORITY_MAIN - 1, CREATE_STACKTEST, olsr_receiver_thread, NULL, "olsr_rec");
 
     /* set get_local_addr() */
