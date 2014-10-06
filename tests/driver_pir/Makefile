@@ -16,6 +16,9 @@ USEMODULE += vtimer
 
 ifneq (,$(PIR_GPIO))
   CFLAGS += -DPIR_GPIO=$(PIR_GPIO)
+else
+  # set random default
+  CFLAGS += -DPIR_GPIO=GPIO_0
 endif
 
 include $(RIOTBASE)/Makefile.include
