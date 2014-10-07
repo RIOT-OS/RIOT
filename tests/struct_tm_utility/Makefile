@@ -6,7 +6,7 @@ BOARD_INSUFFICIENT_RAM := stm32f0discovery
 DISABLE_MODULE += auto_init
 
 USEMODULE += shell
-USEMODULE += posix
+USEMODULE += uart0
 USEMODULE += timex
 
 # The MSP-430 toolchain lacks sscanf:

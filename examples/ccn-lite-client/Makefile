@@ -33,7 +33,7 @@ BOARD_INSUFFICIENT_RAM := chronos msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1 re
 
 USEMODULE += shell
 USEMODULE += shell_commands
-USEMODULE += posix
+USEMODULE += uart0
 USEMODULE += ps
 USEMODULE += random
 USEMODULE += defaulttransceiver
