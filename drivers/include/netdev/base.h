@@ -134,6 +134,8 @@ typedef enum {
     NETDEV_STATE_PROMISCUOUS_MODE,      /**< Device is in receive mode and
                                              accepts all packets without regard
                                              for their destination */
+    NETDEV_STATE_TX_BURST,              /**< Device is burst sending and
+                                             does not accept packets */
 } netdev_state_t;
 
 /**
