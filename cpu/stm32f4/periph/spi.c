@@ -64,7 +64,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             speed_devider = 3;  /* makes 10.5 MHz */
             break;
         default:
-            return -2;
+            return -1;
     }
 
     switch (dev) {
@@ -192,7 +192,7 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             break;
 #endif /* SPI_1_EN */
         default:
-            return -1;
+            return -2;
     }
 
     /**************** SPI-Init *****************/
@@ -423,11 +423,11 @@ int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
 
     trans_ret = spi_transfer_byte(dev, reg, in);
     if (trans_ret < 0) {
-        return -2;
+        return -1;
     }
     trans_ret = spi_transfer_byte(dev, out, in);
     if (trans_ret < 0) {
-        return -3;
+        return -1;
     }
 
     return 1;
@@ -439,11 +439,11 @@ int spi_transfer_regs(spi_t dev, uint8_t reg, char *out, char *in, unsigned int 
 
     trans_ret = spi_transfer_byte(dev, reg, in);
     if (trans_ret < 0) {
-        return -2;
+        return -1;
     }
     trans_ret = spi_transfer_bytes(dev, out, in, length);
     if (trans_ret < 0) {
-        return -3;
+        return -1;
     }
 
     return trans_ret;
