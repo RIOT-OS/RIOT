@@ -114,7 +114,7 @@ void rpl_udp_init(int argc, char **argv)
     /* set channel to 10 */
     tcmd.transceivers = TRANSCEIVER;
     tcmd.data = &chan;
-    m.type = SET_CHANNEL;
+    m.type = MT_TRANSCEIVER_SET_CHANNEL;
     m.content.ptr = (void *) &tcmd;
 
     msg_send_receive(&m, &m, transceiver_pid);

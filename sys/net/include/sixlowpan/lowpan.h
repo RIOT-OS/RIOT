@@ -162,7 +162,7 @@
  *
  * @see sixlowpan_lowpan_register()
  */
-#define LOWPAN_FRAME_RECEIVED        (UPPER_LAYER_1)
+#define LOWPAN_FRAME_RECEIVED        (MT_TRANSCEIVER_UPPER_LAYER_1)
 
 /**
  * @brief   Data type to configure 6LoWPAN IPv6 header compression.

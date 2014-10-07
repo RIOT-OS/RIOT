@@ -68,7 +68,7 @@ void *rpl_udp_monitor(void *arg)
     while (1) {
         msg_receive(&m);
 
-        if (m.type == PKT_PENDING) {
+        if (m.type == MT_TRANSCEIVER_PKT_PENDING) {
             p = (radio_packet_t *) m.content.ptr;
 
             DEBUGF("Received packet from ID %u\n", p->src);
@@ -106,7 +106,7 @@ void *rpl_udp_monitor(void *arg)
 
             printf("\n");
         }
-        else if (m.type == ENOBUFFER) {
+        else if (m.type == MT_TRANSCEIVER_ENOBUFFER) {
             puts("Transceiver buffer full");
         }
         else {
@@ -129,7 +129,7 @@ void rpl_udp_ignore(int argc, char **argv)
     }
 
     msg_t mesg;
-    mesg.type = DBG_IGN;
+    mesg.type = MT_TRANSCEIVER_DBG_IGN;
     mesg.content.ptr = (char *) &tcmd;
 
     tcmd.transceivers = TRANSCEIVER_CC1100;

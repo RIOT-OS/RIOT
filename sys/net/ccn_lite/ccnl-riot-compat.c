@@ -67,7 +67,7 @@ int riot_send_transceiver(uint8_t *buf, uint16_t size, uint16_t to)
     tcmd.transceivers = TRANSCEIVER;
     tcmd.data = &p;
 
-    mesg.type = SND_PKT;
+    mesg.type = MT_TRANSCEIVER_SND_PKT;
     mesg.content.ptr = (char *) &tcmd;
     msg_send_receive(&mesg, &rep, transceiver_pid);
 
@@ -120,8 +120,8 @@ kernel_pid_t riot_start_helper_thread(void)
 char *riot_ccnl_event_to_string(int event)
 {
     switch (event) {
-        case PKT_PENDING:
-            return "PKT_PENDING";
+        case MT_TRANSCEIVER_PKT_PENDING:
+            return "MT_TRANSCEIVER_PKT_PENDING";
 
         case CCNL_RIOT_MSG:
             return "RIOT_MSG";
@@ -135,8 +135,8 @@ char *riot_ccnl_event_to_string(int event)
         case CCNL_RIOT_PRINT_STAT:
             return "CCNL_RIOT_PRINT_STAT";
 
-        case ENOBUFFER:
-            return "ENOBUFFER";
+        case MT_TRANSCEIVER_ENOBUFFER:
+            return "MT_TRANSCEIVER_ENOBUFFER";
 
         default:
             return "UNKNOWN";

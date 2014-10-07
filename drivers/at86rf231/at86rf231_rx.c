@@ -75,7 +75,7 @@ void at86rf231_rx_handler(void)
         /* notify transceiver thread if any */
         if (transceiver_pid != KERNEL_PID_UNDEF) {
             msg_t m;
-            m.type = (uint16_t) RCV_PKT_AT86RF231;
+            m.type = (uint16_t) MT_TRANSCEIVER_RCV_PKT_AT86RF231;
             m.content.value = rx_buffer_next;
             msg_send_int(&m, transceiver_pid);
         }

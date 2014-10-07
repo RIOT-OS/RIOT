@@ -45,7 +45,7 @@ void set_address_handler(uint16_t a)
     mesg.content.ptr = (char *) &tcmd;
 
     printf("trying to set address %" PRIu16 "\n", a);
-    mesg.type = SET_ADDRESS;
+    mesg.type = MT_TRANSCEIVER_SET_ADDRESS;
 
     printf("transceiver_pid=%" PRIkernel_pid"\n", transceiver_pid);
 

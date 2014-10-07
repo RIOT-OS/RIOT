@@ -160,7 +160,7 @@ static void riot_ccn_transceiver_start(kernel_pid_t _relay_pid)
     tcmd.transceivers = TRANSCEIVER;
     tcmd.data = &c;
     mesg.content.ptr = (char *) &tcmd;
-    mesg.type = SET_CHANNEL;
+    mesg.type = MT_TRANSCEIVER_SET_CHANNEL;
     msg_send_receive(&mesg, &mesg, transceiver_pid);
     if (c == -1) {
         puts("[transceiver] Error setting/getting channel");

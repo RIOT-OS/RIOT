@@ -35,6 +35,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "kernel_types.h"
+#include "msg_types.h"
 
 /**
  * @brief Describes a message object which can be sent between threads.

@@ -81,7 +81,7 @@
  *
  * @see ipv6_register_packet_handler()
  */
-#define IPV6_PACKET_RECEIVED        (UPPER_LAYER_2)
+#define IPV6_PACKET_RECEIVED        (MT_TRANSCEIVER_UPPER_LAYER_2)
 
 /**
  * @brief   Get IPv6 send/receive buffer.

@@ -292,75 +292,75 @@ static void *run(void *arg)
         DEBUG("transceiver: Transceiver: Message received, type: %02X\n", m.type);
 
         switch (m.type) {
-            case RCV_PKT_CC1020:
-            case RCV_PKT_CC1100:
-            case RCV_PKT_CC2420:
-            case RCV_PKT_MC1322X:
-            case RCV_PKT_NATIVE:
-            case RCV_PKT_AT86RF231:
+            case MT_TRANSCEIVER_RCV_PKT_CC1020:
+            case MT_TRANSCEIVER_RCV_PKT_CC1100:
+            case MT_TRANSCEIVER_RCV_PKT_CC2420:
+            case MT_TRANSCEIVER_RCV_PKT_MC1322X:
+            case MT_TRANSCEIVER_RCV_PKT_NATIVE:
+            case MT_TRANSCEIVER_RCV_PKT_AT86RF231:
                 receive_packet(m.type, m.content.value);
                 break;
 
-            case SND_PKT:
+            case MT_TRANSCEIVER_SND_PKT:
                 response = send_packet(cmd->transceivers, cmd->data);
                 m.content.value = response;
                 msg_reply(&m, &m);
                 break;
 
-            case GET_CHANNEL:
+            case MT_TRANSCEIVER_GET_CHANNEL:
                 *((int32_t *) cmd->data) = get_channel(cmd->transceivers);
                 msg_reply(&m, &m);
                 break;
 
-            case SET_CHANNEL:
+            case MT_TRANSCEIVER_SET_CHANNEL:
                 *((int32_t *) cmd->data) = set_channel(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;
 
-            case GET_ADDRESS:
+            case MT_TRANSCEIVER_GET_ADDRESS:
                 *((radio_address_t *) cmd->data) = get_address(cmd->transceivers);
                 msg_reply(&m, &m);
                 break;
 
-            case SET_ADDRESS:
+            case MT_TRANSCEIVER_SET_ADDRESS:
                 *((radio_address_t *) cmd->data) = set_address(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;
 
-            case GET_LONG_ADDR:
+            case MT_TRANSCEIVER_GET_LONG_ADDR:
                 *((transceiver_eui64_t *) cmd->data) = get_long_addr(cmd->transceivers);
                 msg_reply(&m, &m);
                 break;
 
-            case SET_LONG_ADDR:
+            case MT_TRANSCEIVER_SET_LONG_ADDR:
                 *((transceiver_eui64_t *) cmd->data) = set_long_addr(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;
 
-            case SET_MONITOR:
+            case MT_TRANSCEIVER_SET_MONITOR:
                 set_monitor(cmd->transceivers, cmd->data);
                 break;
 
-            case POWERDOWN:
+            case MT_TRANSCEIVER_POWERDOWN:
                 powerdown(cmd->transceivers);
                 break;
 
-            case SWITCH_RX:
+            case MT_TRANSCEIVER_SWITCH_RX:
                 switch_to_rx(cmd->transceivers);
                 break;
 
-            case GET_PAN:
+            case MT_TRANSCEIVER_GET_PAN:
                 *((int32_t *) cmd->data) = get_pan(cmd->transceivers);
                 msg_reply(&m, &m);
                 break;
 
-            case SET_PAN:
+            case MT_TRANSCEIVER_SET_PAN:
                 *((int32_t *) cmd->data) = set_pan(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;
 
 #ifdef DBG_IGNORE
-            case DBG_IGN:
+            case MT_TRANSCEIVER_DBG_IGN:
                 *((int16_t *) cmd->data) = ignore_add(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;
@@ -393,27 +393,27 @@ static void receive_packet(uint16_t type, uint8_t pos)
     DEBUG("Packet received\n");
 
     switch (type) {
-        case RCV_PKT_CC1020:
+        case MT_TRANSCEIVER_RCV_PKT_CC1020:
             t = TRANSCEIVER_CC1020;
             break;
 
-        case RCV_PKT_CC1100:
+        case MT_TRANSCEIVER_RCV_PKT_CC1100:
             t = TRANSCEIVER_CC1100;
             break;
 
-        case RCV_PKT_CC2420:
+        case MT_TRANSCEIVER_RCV_PKT_CC2420:
             t = TRANSCEIVER_CC2420;
             break;
 
-        case RCV_PKT_MC1322X:
+        case MT_TRANSCEIVER_RCV_PKT_MC1322X:
             t = TRANSCEIVER_MC1322X;
             break;
 
-        case RCV_PKT_NATIVE:
+        case MT_TRANSCEIVER_RCV_PKT_NATIVE:
             t = TRANSCEIVER_NATIVE;
             break;
 
-        case RCV_PKT_AT86RF231:
+        case MT_TRANSCEIVER_RCV_PKT_AT86RF231:
             t = TRANSCEIVER_AT86RF231;
             break;
 
@@ -432,17 +432,17 @@ static void receive_packet(uint16_t type, uint8_t pos)
     /* no buffer left */
     if (i >= TRANSCEIVER_BUFFER_SIZE) {
         /* inform upper layers of lost packet */
-        m.type = ENOBUFFER;
+        m.type = MT_TRANSCEIVER_ENOBUFFER;
         m.content.value = t;
         DEBUGF("transceiver: buffer size exceeded, dropping packet\n");
     }
     /* copy packet and handle it */
     else {
-        m.type = PKT_PENDING;
+        m.type = MT_TRANSCEIVER_PKT_PENDING;
 
         /* pass a null pointer if a packet from a undefined transceiver is
          * received */
-        if (type == RCV_PKT_CC1100) {
+        if (type == MT_TRANSCEIVER_RCV_PKT_CC1100) {
 #ifdef MODULE_CC110X_NG
             radio_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_cc110x_packet(trans_p);
@@ -451,25 +451,25 @@ static void receive_packet(uint16_t type, uint8_t pos)
             receive_cc1100_packet(trans_p);
 #endif
         }
-        else if (type == RCV_PKT_MC1322X) {
+        else if (type == MT_TRANSCEIVER_RCV_PKT_MC1322X) {
 #ifdef MODULE_MC1322X
             ieee802154_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_mc1322x_packet(trans_p);
 #endif
         }
-        else if (type == RCV_PKT_CC2420) {
+        else if (type == MT_TRANSCEIVER_RCV_PKT_CC2420) {
 #ifdef MODULE_CC2420
             ieee802154_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_cc2420_packet(trans_p);
 #endif
         }
-        else if (type == RCV_PKT_AT86RF231) {
+        else if (type == MT_TRANSCEIVER_RCV_PKT_AT86RF231) {
 #ifdef MODULE_AT86RF231
             ieee802154_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_at86rf231_packet(trans_p);
 #endif
         }
-        else if (type == RCV_PKT_NATIVE) {
+        else if (type == MT_TRANSCEIVER_RCV_PKT_NATIVE) {
 #ifdef MODULE_NATIVENET
             radio_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_nativenet_packet(trans_p);
@@ -503,7 +503,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
             m.content.ptr = (char *) &(transceiver_buffer[transceiver_buffer_pos]);
             DEBUG("transceiver: Notify thread %" PRIkernel_pid "\n", reg[i].pid);
 
-            if (msg_send(&m, reg[i].pid, false) && (m.type != ENOBUFFER)) {
+            if (msg_send(&m, reg[i].pid, false) && (m.type != MT_TRANSCEIVER_ENOBUFFER)) {
                 transceiver_buffer[transceiver_buffer_pos].processing++;
             }
             else {
