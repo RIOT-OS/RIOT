@@ -30,12 +30,12 @@
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
-    SercomSpi* spi_dev;
-    uint8_t   dopo;
-    uint8_t   dipo;
-    uint8_t   cpha;
-    uint8_t   cpol;
-    uint32_t   f_baud;
+    SercomSpi* spi_dev = 0;
+    uint8_t   dopo = 0;
+    uint8_t   dipo = 0;
+    uint8_t   cpha = 0;
+    uint8_t   cpol = 0;
+    uint32_t   f_baud = 0;
     /* Speed < ½ f_ref, current f_ref = 8`000`000 
     *  baud = f_ref/(2 f_baud) - 1 
     */
@@ -89,8 +89,6 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
             pmux_set(SPI_0_SCLK_PIN, F);
             pmux_set(SPI_0_MISO_PIN, F);
             pmux_set(SPI_0_MOSI_PIN, F);
-
-
 
             // uint32_t pinmask = (((1UL << (SPI_0_SCLK_PIN % 32)) | (1UL << (SPI_0_MISO_PIN % 32)))  >> 16);
             // /* PMUX */
@@ -180,7 +178,7 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
 
 int spi_transfer_byte(spi_t dev, char out, char *in)
 {
-    SercomSpi* spi_dev;
+    SercomSpi* spi_dev = 0;
     int transfered = 0;
 
     switch(dev)
@@ -208,7 +206,7 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     } 
     else
     {
-        spi_dev->DATA.reg;
+        int volatile temp = spi_dev->DATA.reg;
     }
     return transfered;
 }

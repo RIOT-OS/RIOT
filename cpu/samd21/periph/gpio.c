@@ -25,7 +25,7 @@
 
 #include "sched.h"
 #include "thread.h"
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /* guard file in case no GPIO devices are defined */
@@ -940,7 +940,6 @@ void gpio_write(gpio_t dev, int value)
 __attribute__((naked)) void isr_eic(void)
 {
     ISR_ENTER();
-    DEBUG("INTERRUPT \n");
     uint16_t status = EIC->INTFLAG.reg;
     switch (status) {
         case EIC_INTFLAG_EXTINT0:

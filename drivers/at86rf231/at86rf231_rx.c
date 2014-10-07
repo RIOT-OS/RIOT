@@ -41,9 +41,9 @@ void at86rf231_rx_handler(void)
     uint8_t lqi, fcs_rssi;
     // read packet length
     at86rf231_read_fifo(&at86rf231_rx_buffer[rx_buffer_next].length, 1);
-
     // read psdu, read packet with length as first byte and lqi as last byte.
     uint8_t *buf = buffer[rx_buffer_next];
+
     at86rf231_read_fifo(buf, at86rf231_rx_buffer[rx_buffer_next].length);
 
     // read lqi which is appended after the psdu
@@ -67,8 +67,9 @@ void at86rf231_rx_handler(void)
     ieee802154_frame_read(&buf[1], &at86rf231_rx_buffer[rx_buffer_next].frame,
                           at86rf231_rx_buffer[rx_buffer_next].length);
 
+
     if (at86rf231_rx_buffer[rx_buffer_next].frame.fcf.frame_type != 2) {
-#if DEBUG_ENABLED
+#ifdef DEBUG_ENABLED
         ieee802154_frame_print_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
 #endif
 
@@ -81,17 +82,15 @@ void at86rf231_rx_handler(void)
         }
     }
     else {
-#if DEBUG_ENABLED
+#ifdef DEBUG_ENABLED
         DEBUG("GOT ACK for SEQ %u\n", at86rf231_rx_buffer[rx_buffer_next].frame.seq_nr);
         ieee802154_frame_print_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
 #endif
     }
-
     // shift to next buffer element
     if (++rx_buffer_next == AT86RF231_RX_BUF_SIZE) {
         rx_buffer_next = 0;
     }
-
     // Read IRQ to clear it
     at86rf231_reg_read(AT86RF231_REG__IRQ_STATUS);
 }

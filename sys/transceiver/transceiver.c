@@ -60,9 +60,9 @@
 #include "ieee802154_frame.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #if ENABLE_DEBUG
-#define DEBUG_ENABLED
+//#define DEBUG_ENABLED
 #undef TRANSCEIVER_STACK_SIZE
 #define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_MAIN)
 #endif
@@ -663,7 +663,7 @@ void receive_at86rf231_packet(ieee802154_packet_t *trans_p)
     trans_p->rssi = p->rssi;
     trans_p->crc = p->crc;
     trans_p->lqi = p->lqi;
-    memcpy(&trans_p->frame, &p->frame, p->length);
+    memcpy(&trans_p->frame, &p->frame, sizeof(p->frame));//p->length);
     memcpy(&data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH], p->frame.payload,
            p->frame.payload_len);
     trans_p->frame.payload = (uint8_t *) & (data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH]);
