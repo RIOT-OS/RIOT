@@ -52,11 +52,13 @@
 int close(int fildes);
 
 #ifndef __USECONDS_T_TYPE
-#ifndef __MACH__
+#if !(defined(__MACH__) || defined(__FreeBSD__))
 typedef unsigned long __USECONDS_T_TYPE;
 typedef __USECONDS_T_TYPE __useconds_t;
 #else
+#ifdef __MACH__
 typedef __darwin_useconds_t __useconds_t;
+#endif
 #endif
 #endif
 typedef __useconds_t useconds_t;
