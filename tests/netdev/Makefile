@@ -9,11 +9,10 @@ endif
 include ../Makefile.tests_common
 
 USEMODULE += defaulttransceiver
+USEMODULE += net_help
 USEMODULE += netdev_base
 
 DISABLE_MODULE += auto_init
-
-INCLUDES += -I$(RIOTBASE)/sys/net/include
 
 CHANNEL ?= 1
 SENDER_ADDRESS ?= 1
