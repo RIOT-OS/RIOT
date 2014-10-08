@@ -19,6 +19,10 @@
 #ifndef ATTRIBUTES_H_
 #define ATTRIBUTES_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @def NORETURN
  * @brief The *NORETURN* keyword tells the compiler to assume that the function
@@ -66,6 +70,10 @@
 #define UNREACHABLE() __builtin_unreachable()
 #else
 #define UNREACHABLE() do { /* nothing */ } while (1)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* ATTRIBUTES_H_ */

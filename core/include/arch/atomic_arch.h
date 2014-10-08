@@ -19,6 +19,10 @@
 #ifndef __ATOMIC_ARCH_H
 #define __ATOMIC_ARCH_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @brief Define mappings between arch and internal interfaces
  *
@@ -41,6 +45,9 @@
  */
 unsigned int atomic_arch_set_return(unsigned int *to_set, unsigned int value);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __ATOMIC_ARCH_H */
 /** @} */

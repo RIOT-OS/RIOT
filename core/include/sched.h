@@ -80,6 +80,10 @@
 #ifndef _SCHEDULER_H
 #define _SCHEDULER_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include <stddef.h>
 #include "bitarithm.h"
 #include "tcb.h"
@@ -176,6 +180,10 @@ extern schedstat sched_pidlist[KERNEL_PID_LAST + 1];
  */
 void sched_register_cb(void (*callback)(uint32_t, uint32_t));
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // _SCHEDULER_H

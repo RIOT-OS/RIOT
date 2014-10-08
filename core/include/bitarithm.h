@@ -20,6 +20,10 @@
 #ifndef BITARITHM_H_
 #define BITARITHM_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @def SETBIT
  * @brief Sets a bitmask for a bitfield
@@ -113,6 +117,10 @@ unsigned bitarithm_lsb(register unsigned v);
  * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
  */
 unsigned bitarithm_bits_set(unsigned v);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BITARITHM_H_ */
 /** @} */

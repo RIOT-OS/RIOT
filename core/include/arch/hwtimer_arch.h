@@ -22,6 +22,10 @@
 #ifndef HWTIMER_ARCH_H_
 #define HWTIMER_ARCH_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include <stdint.h>
 
 /**
@@ -73,6 +77,9 @@ void hwtimer_arch_unset(short timer);
  */
 unsigned long hwtimer_arch_now(void);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* HWTIMER_ARCH_H_ */
 /** @} */

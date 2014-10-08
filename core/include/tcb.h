@@ -20,6 +20,10 @@
 #ifndef TCB_H_
 #define TCB_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include <stdint.h>
 #include "priority_queue.h"
 #include "clist.h"
@@ -77,6 +81,10 @@ typedef struct tcb_t {
     int stack_size;             /**< thread's stack size            */
 #endif
 } tcb_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TCB_H_ */
 /** @} */

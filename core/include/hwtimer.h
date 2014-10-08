@@ -33,6 +33,10 @@
 #ifndef __HWTIMER_H
 #define __HWTIMER_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include <stdint.h>
 #include "hwtimer_cpu.h"
 #include "board.h"
@@ -171,6 +175,10 @@ void hwtimer_init_comp(uint32_t fcpu);
  * @param[in]   ticks        Number of kernel ticks to delay
  */
 void hwtimer_spin(unsigned long ticks);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __HWTIMER_H */

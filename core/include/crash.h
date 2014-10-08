@@ -22,6 +22,10 @@
 #ifndef __CRASH_H
 #define __CRASH_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include "kernel.h"
 
 /**
@@ -45,6 +49,10 @@
  * @return                  this function never returns
  * */
 NORETURN void core_panic(int crash_code, const char *message);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __CRASH_H */
 /** @} */
