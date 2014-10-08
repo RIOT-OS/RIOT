@@ -335,7 +335,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:
-            exti_line = GPIO_0_EXTI_LINE;
+            exti_line = GPIO_0_PIN;
             gpio_irq = GPIO_IRQ_0;
             GPIO_0_EXTI_CFG();
             NVIC_SetPriority(GPIO_0_IRQ, GPIO_IRQ_PRIO);
@@ -344,7 +344,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_1_EN
         case GPIO_1:
-            exti_line = GPIO_1_EXTI_LINE;
+            exti_line = GPIO_1_PIN;
             gpio_irq = GPIO_IRQ_1;
             GPIO_1_EXTI_CFG();
             NVIC_SetPriority(GPIO_1_IRQ, GPIO_IRQ_PRIO);
@@ -353,7 +353,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_2_EN
         case GPIO_2:
-            exti_line = GPIO_2_EXTI_LINE;
+            exti_line = GPIO_2_PIN;
             gpio_irq = GPIO_IRQ_2;
             GPIO_2_EXTI_CFG();
             NVIC_SetPriority(GPIO_2_IRQ, GPIO_IRQ_PRIO);
@@ -362,7 +362,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_3_EN
         case GPIO_3:
-            exti_line = GPIO_3_EXTI_LINE;
+            exti_line = GPIO_3_PIN;
             gpio_irq = GPIO_IRQ_3;
             GPIO_3_EXTI_CFG();
             NVIC_SetPriority(GPIO_3_IRQ, GPIO_IRQ_PRIO);
@@ -371,7 +371,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_4_EN
         case GPIO_4:
-            exti_line = GPIO_4_EXTI_LINE;
+            exti_line = GPIO_4_PIN;
             gpio_irq = GPIO_IRQ_4;
             GPIO_4_EXTI_CFG();
             NVIC_SetPriority(GPIO_4_IRQ, GPIO_IRQ_PRIO);
@@ -380,7 +380,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_5_EN
         case GPIO_5:
-            exti_line = GPIO_5_EXTI_LINE;
+            exti_line = GPIO_5_PIN;
             gpio_irq = GPIO_IRQ_5;
             GPIO_5_EXTI_CFG();
             NVIC_SetPriority(GPIO_5_IRQ, GPIO_IRQ_PRIO);
@@ -389,7 +389,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_6_EN
         case GPIO_6:
-            exti_line = GPIO_6_EXTI_LINE;
+            exti_line = GPIO_6_PIN;
             gpio_irq = GPIO_IRQ_6;
             GPIO_6_EXTI_CFG();
             NVIC_SetPriority(GPIO_6_IRQ, GPIO_IRQ_PRIO);
@@ -398,7 +398,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_7_EN
         case GPIO_7:
-            exti_line = GPIO_7_EXTI_LINE;
+            exti_line = GPIO_7_PIN;
             gpio_irq = GPIO_IRQ_7;
             GPIO_7_EXTI_CFG();
             NVIC_SetPriority(GPIO_7_IRQ, GPIO_IRQ_PRIO);
@@ -407,7 +407,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_8_EN
         case GPIO_8:
-            exti_line = GPIO_8_EXTI_LINE;
+            exti_line = GPIO_8_PIN;
             gpio_irq = GPIO_IRQ_8;
             GPIO_8_EXTI_CFG();
             NVIC_SetPriority(GPIO_8_IRQ, GPIO_IRQ_PRIO);
@@ -416,7 +416,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_9_EN
         case GPIO_9:
-            exti_line = GPIO_9_EXTI_LINE;
+            exti_line = GPIO_9_PIN;
             gpio_irq = GPIO_IRQ_9;
             GPIO_9_EXTI_CFG();
             NVIC_SetPriority(GPIO_9_IRQ, GPIO_IRQ_PRIO);
@@ -425,7 +425,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_10_EN
         case GPIO_10:
-            exti_line = GPIO_10_EXTI_LINE;
+            exti_line = GPIO_10_PIN;
             gpio_irq = GPIO_IRQ_10;
             GPIO_10_EXTI_CFG();
             NVIC_SetPriority(GPIO_10_IRQ, GPIO_IRQ_PRIO);
@@ -434,7 +434,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_11_EN
         case GPIO_11:
-            exti_line = GPIO_11_EXTI_LINE;
+            exti_line = GPIO_11_PIN;
             gpio_irq = GPIO_IRQ_11;
             GPIO_11_EXTI_CFG();
             NVIC_SetPriority(GPIO_11_IRQ, GPIO_IRQ_PRIO);
@@ -443,7 +443,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_12_EN
         case GPIO_12:
-            exti_line = GPIO_12_EXTI_LINE;
+            exti_line = GPIO_12_PIN;
             gpio_irq = GPIO_IRQ_12;
             GPIO_12_EXTI_CFG();
             NVIC_SetPriority(GPIO_12_IRQ, GPIO_IRQ_PRIO);
@@ -452,7 +452,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_13_EN
         case GPIO_13:
-            exti_line = GPIO_13_EXTI_LINE;
+            exti_line = GPIO_13_PIN;
             gpio_irq = GPIO_IRQ_13;
             GPIO_13_EXTI_CFG();
             NVIC_SetPriority(GPIO_13_IRQ, GPIO_IRQ_PRIO);
@@ -461,7 +461,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_14_EN
         case GPIO_14:
-            exti_line = GPIO_14_EXTI_LINE;
+            exti_line = GPIO_14_PIN;
             gpio_irq = GPIO_IRQ_14;
             GPIO_14_EXTI_CFG();
             NVIC_SetPriority(GPIO_14_IRQ, GPIO_IRQ_PRIO);
@@ -470,7 +470,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
 #if GPIO_15_EN
         case GPIO_15:
-            exti_line = GPIO_15_EXTI_LINE;
+            exti_line = GPIO_15_PIN;
             gpio_irq = GPIO_IRQ_15;
             GPIO_15_EXTI_CFG();
             NVIC_SetPriority(GPIO_15_IRQ, GPIO_IRQ_PRIO);
@@ -515,82 +515,82 @@ void gpio_irq_enable(gpio_t dev)
     switch(dev) {
 #if GPIO_0_EN
         case GPIO_0:
-            exti_line = GPIO_0_EXTI_LINE;
+            exti_line = GPIO_0_PIN;
             break;
 #endif
 #if GPIO_1_EN
         case GPIO_1:
-            exti_line = GPIO_1_EXTI_LINE;
+            exti_line = GPIO_1_PIN;
             break;
 #endif
 #if GPIO_2_EN
         case GPIO_2:
-            exti_line = GPIO_2_EXTI_LINE;
+            exti_line = GPIO_2_PIN;
             break;
 #endif
 #if GPIO_3_EN
         case GPIO_3:
-            exti_line = GPIO_3_EXTI_LINE;
+            exti_line = GPIO_3_PIN;
             break;
 #endif
 #if GPIO_4_EN
         case GPIO_4:
-            exti_line = GPIO_4_EXTI_LINE;
+            exti_line = GPIO_4_PIN;
             break;
 #endif
 #if GPIO_5_EN
         case GPIO_5:
-            exti_line = GPIO_5_EXTI_LINE;
+            exti_line = GPIO_5_PIN;
             break;
 #endif
 #if GPIO_6_EN
         case GPIO_6:
-            exti_line = GPIO_6_EXTI_LINE;
+            exti_line = GPIO_6_PIN;
             break;
 #endif
 #if GPIO_7_EN
         case GPIO_7:
-            exti_line = GPIO_7_EXTI_LINE;
+            exti_line = GPIO_7_PIN;
             break;
 #endif
 #if GPIO_8_EN
         case GPIO_8:
-            exti_line = GPIO_8_EXTI_LINE;
+            exti_line = GPIO_8_PIN;
             break;
 #endif
 #if GPIO_9_EN
         case GPIO_9:
-            exti_line = GPIO_9_EXTI_LINE;
+            exti_line = GPIO_9_PIN;
             break;
 #endif
 #if GPIO_10_EN
         case GPIO_10:
-            exti_line = GPIO_10_EXTI_LINE;
+            exti_line = GPIO_10_PIN;
             break;
 #endif
 #if GPIO_11_EN
         case GPIO_11:
-            exti_line = GPIO_11_EXTI_LINE;
+            exti_line = GPIO_11_PIN;
             break;
 #endif
 #if GPIO_12_EN
         case GPIO_12:
-            exti_line = GPIO_12_EXTI_LINE;
+            exti_line = GPIO_12_PIN;
             break;
 #endif
 #if GPIO_13_EN
         case GPIO_13:
-            exti_line = GPIO_13_EXTI_LINE;
+            exti_line = GPIO_13_PIN;
             break;
 #endif
 #if GPIO_14_EN
         case GPIO_14:
-            exti_line = GPIO_14_EXTI_LINE;
+            exti_line = GPIO_14_PIN;
             break;
 #endif
 #if GPIO_15_EN
         case GPIO_15:
-            exti_line = GPIO_15_EXTI_LINE;
+            exti_line = GPIO_15_PIN;
             break;
 #endif
         default:
@@ -612,82 +612,82 @@ void gpio_irq_disable(gpio_t dev)
     switch(dev) {
 #if GPIO_0_EN
         case GPIO_0:
-            exti_line = GPIO_0_EXTI_LINE;
+            exti_line = GPIO_0_PIN;
             break;
 #endif
 #if GPIO_1_EN
         case GPIO_1:
-            exti_line = GPIO_1_EXTI_LINE;
+            exti_line = GPIO_1_PIN;
             break;
 #endif
 #if GPIO_2_EN
         case GPIO_2:
-            exti_line = GPIO_2_EXTI_LINE;
+            exti_line = GPIO_2_PIN;
             break;
 #endif
 #if GPIO_3_EN
         case GPIO_3:
-            exti_line = GPIO_3_EXTI_LINE;
+            exti_line = GPIO_3_PIN;
             break;
 #endif
 #if GPIO_4_EN
         case GPIO_4:
-            exti_line = GPIO_4_EXTI_LINE;
+            exti_line = GPIO_4_PIN;
             break;
 #endif
 #if GPIO_5_EN
         case GPIO_5:
-            exti_line = GPIO_5_EXTI_LINE;
+            exti_line = GPIO_5_PIN;
             break;
 #endif
 #if GPIO_6_EN
         case GPIO_6:
-            exti_line = GPIO_6_EXTI_LINE;
+            exti_line = GPIO_6_PIN;
             break;
 #endif
 #if GPIO_7_EN
         case GPIO_7:
-            exti_line = GPIO_7_EXTI_LINE;
+            exti_line = GPIO_7_PIN;
             break;
 #endif
 #if GPIO_8_EN
         case GPIO_8:
-            exti_line = GPIO_8_EXTI_LINE;
+            exti_line = GPIO_8_PIN;
             break;
 #endif
 #if GPIO_9_EN
         case GPIO_9:
-            exti_line = GPIO_9_EXTI_LINE;
+            exti_line = GPIO_9_PIN;
             break;
 #endif
 #if GPIO_10_EN
         case GPIO_10:
-            exti_line = GPIO_10_EXTI_LINE;
+            exti_line = GPIO_10_PIN;
             break;
 #endif
 #if GPIO_11_EN
         case GPIO_11:
-            exti_line = GPIO_11_EXTI_LINE;
+            exti_line = GPIO_11_PIN;
             break;
 #endif
 #if GPIO_12_EN
         case GPIO_12:
-            exti_line = GPIO_12_EXTI_LINE;
+            exti_line = GPIO_12_PIN;
             break;
 #endif
 #if GPIO_13_EN
         case GPIO_13:
-            exti_line = GPIO_13_EXTI_LINE;
+            exti_line = GPIO_13_PIN;
             break;
 #endif
 #if GPIO_14_EN
         case GPIO_14:
-            exti_line = GPIO_14_EXTI_LINE;
+            exti_line = GPIO_14_PIN;
             break;
 #endif
 #if GPIO_15_EN
         case GPIO_15:
-            exti_line = GPIO_15_EXTI_LINE;
+            exti_line = GPIO_15_PIN;
             break;
 #endif
         default:
@@ -1023,7 +1023,7 @@ __attribute__((naked)) void isr_exti0(void)
     ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR0) {
         EXTI->PR |= EXTI_PR_PR0;        /* clear status bit by writing a 1 to it */
-        config[GPIO_0].cb(config[GPIO_0].arg);
+        config[GPIO_0_PIN].cb(config[GPIO_0_PIN].arg);
     }
 
     if (sched_context_switch_request) {
@@ -1039,7 +1039,7 @@ __attribute__((naked)) void isr_exti1(void)
     ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR1) {
         EXTI->PR |= EXTI_PR_PR1;        /* clear status bit by writing a 1 to it */
-        config[GPIO_1].cb(config[GPIO_1].arg);
+        config[GPIO_1_PIN].cb(config[GPIO_1_PIN].arg);
     }
 
     if (sched_context_switch_request) {
@@ -1055,7 +1055,7 @@ __attribute__((naked)) void isr_exti2(void)
     ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR2) {
         EXTI->PR |= EXTI_PR_PR2;        /* clear status bit by writing a 1 to it */
-        config[GPIO_2].cb(config[GPIO_2].arg);
+        config[GPIO_2_PIN].cb(config[GPIO_2_PIN].arg);
     }
 
     if (sched_context_switch_request) {
@@ -1071,7 +1071,7 @@ __attribute__((naked)) void isr_exti3(void)
     ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR3) {
         EXTI->PR |= EXTI_PR_PR3;        /* clear status bit by writing a 1 to it */
-        config[GPIO_3].cb(config[GPIO_3].arg);
+        config[GPIO_3_PIN].cb(config[GPIO_3_PIN].arg);
     }
 
     if (sched_context_switch_request) {
@@ -1087,7 +1087,7 @@ __attribute__((naked)) void isr_exti4(void)
     ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR4) {
         EXTI->PR |= EXTI_PR_PR4;        /* clear status bit by writing a 1 to it */
-        config[GPIO_4].cb(config[GPIO_4].arg);
+        config[GPIO_4_PIN].cb(config[GPIO_4_PIN].arg);
     }
 
     if (sched_context_switch_request) {
@@ -1103,31 +1103,31 @@ __attribute__((naked)) void isr_exti9_5(void)
 #if GPIO_IRQ_5
     if (EXTI->PR & EXTI_PR_PR5) {
         EXTI->PR |= EXTI_PR_PR5;        /* clear status bit by writing a 1 to it */
-        config[GPIO_5].cb(config[GPIO_5].arg);
+        config[GPIO_5_PIN].cb(config[GPIO_5_PIN].arg);
     }
 #endif
 #if GPIO_IRQ_6
     else if (EXTI->PR & EXTI_PR_PR6) {
         EXTI->PR |= EXTI_PR_PR6;        /* clear status bit by writing a 1 to it */
-        config[GPIO_6].cb(config[GPIO_6].arg);
+        config[GPIO_6_PIN].cb(config[GPIO_6_PIN].arg);
     }
 #endif
 #if GPIO_IRQ_7
     else if (EXTI->PR & EXTI_PR_PR7) {
         EXTI->PR |= EXTI_PR_PR7;        /* clear status bit by writing a 1 to it */
-        config[GPIO_7].cb(config[GPIO_7].arg);
+        config[GPIO_7_PIN].cb(config[GPIO_7_PIN].arg);
     }
 #endif
 #if GPIO_IRQ_8
     else if (EXTI->PR & EXTI_PR_PR8) {
         EXTI->PR |= EXTI_PR_PR8;        /* clear status bit by writing a 1 to it */
-        config[GPIO_8].cb(config[GPIO_8].arg);
+        config[GPIO_8_PIN].cb(config[GPIO_8_PIN].arg);
     }
 #endif
 #if GPIO_IRQ_9
     else if (EXTI->PR & EXTI_PR_PR9) {
         EXTI->PR |= EXTI_PR_PR9;        /* clear status bit by writing a 1 to it */
-        config[GPIO_9].cb(config[GPIO_9].arg);
+        config[GPIO_9_PIN].cb(config[GPIO_9_PIN].arg);
     }
 #endif
     if (sched_context_switch_request) {
@@ -1142,37 +1142,37 @@ __attribute__((naked)) void isr_exti15_10(void)
 #if GPIO_IRQ_10
     if (EXTI->PR & EXTI_PR_PR10) {
         EXTI->PR |= EXTI_PR_PR10;        /* clear status bit by writing a 1 to it */
-        config[GPIO_10].cb(config[GPIO_10].arg);
+        config[GPIO_10_PIN].cb(config[GPIO_10_PIN].arg);
     }
 #endif
 #if GPIO_IRQ_11
     else if (EXTI->PR & EXTI_PR_PR11) {
         EXTI->PR |= EXTI_PR_PR11;        /* clear status bit by writing a 1 to it */
-        config[GPIO_11].cb(config[GPIO_11].arg);
+        config[GPIO_11_PIN].cb(config[GPIO_11_PIN].arg);
     }
 #endif
 #if GPIO_IRQ_12
     else if (EXTI->PR & EXTI_PR_PR12) {
         EXTI->PR |= EXTI_PR_PR12;        /* clear status bit by writing a 1 to it */
-        config[GPIO_12].cb(config[GPIO_12].arg);
+        config[GPIO_12_PIN].cb(config[GPIO_12_PIN].arg);
     }
 #endif
 #if GPIO_IRQ_13
     else if (EXTI->PR & EXTI_PR_PR13) {
         EXTI->PR |= EXTI_PR_PR13;        /* clear status bit by writing a 1 to it */
-        config[GPIO_13].cb(config[GPIO_13].arg);
+        config[GPIO_13_PIN].cb(config[GPIO_13_PIN].arg);
     }
 #endif
 #if GPIO_IRQ_14
     else if (EXTI->PR & EXTI_PR_PR14) {
         EXTI->PR |= EXTI_PR_PR14;        /* clear status bit by writing a 1 to it */
-        config[GPIO_14].cb(config[GPIO_14].arg);
+        config[GPIO_14_PIN].cb(config[GPIO_14_PIN].arg);
     }
 #endif
 #if GPIO_IRQ_15
     else if (EXTI->PR & EXTI_PR_PR15) {
         EXTI->PR |= EXTI_PR_PR15;        /* clear status bit by writing a 1 to it */
-        config[GPIO_15].cb(config[GPIO_15].arg);
+        config[GPIO_15_PIN].cb(config[GPIO_15_PIN].arg);
     }
 #endif
     if (sched_context_switch_request) {
