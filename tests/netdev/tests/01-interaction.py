@@ -6,7 +6,7 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import os, sys, time
+import os, signal, sys, time
 from pexpect import spawn, TIMEOUT, EOF
 
 class Abort(Exception):
@@ -134,9 +134,9 @@ def main():
         return 0
     finally:
         if sender and not sender.terminate():
-            sender.terminate(force=True)
+            os.killpg(sender.pid, signal.SIGKILL)
         if receiver and not receiver.terminate():
-            receiver.terminate(force=True)
+            os.killpg(receiver.pid, signal.SIGKILL)
 
 if __name__ == "__main__":
     sys.exit(main())
