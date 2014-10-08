@@ -17,11 +17,22 @@ board = os.environ.get('BOARD', 'native')
 DEFAULT_TIMEOUT=5
 
 def main():
-    receiver = spawn("make term", timeout=5, env={"SENDER": '0'})
-    time.sleep(1)
-    sender = spawn("make term", timeout=5, env={"SENDER": '1'})
+    receiver = None
+    sender = None
+
+    if "PORT" in os.environ:
+        del os.environ["PORT"]
+
+    if "TERMFLAGS" in os.environ:
+        del os.environ["TERMFLAGS"]
 
     try:
+        os.environ["SENDER"] = "0"
+        receiver = spawn("make term", timeout=5)
+        time.sleep(1)
+        os.environ["SENDER"] = "1"
+        sender = spawn("make term", timeout=5)
+
         receiver.expect(r"RIOT netdev test")
         sender.expect(r"RIOT netdev test")
 
@@ -122,9 +133,9 @@ def main():
     except Abort:
         return 0
     finally:
-        if not sender.terminate():
+        if sender and not sender.terminate():
             sender.terminate(force=True)
-        if not receiver.terminate():
+        if receiver and not receiver.terminate():
             receiver.terminate(force=True)
 
 if __name__ == "__main__":
