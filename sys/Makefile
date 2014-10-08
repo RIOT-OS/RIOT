@@ -44,6 +44,9 @@ endif
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
     DIRS += net/link_layer/sixlowpan
 endif
+ifneq (,$(filter sixlowpan_iphc_cbuf,$(USEMODULE)))
+    DIRS += net/link_layer/sixlowpan/iphc_cbuf
+endif
 ifneq (,$(filter ipv6,$(USEMODULE)))
     # TODO
 endif
