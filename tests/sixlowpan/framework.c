@@ -25,6 +25,9 @@
 #include "netapi.h"
 #include "pktbuf.h"
 #include "sixlowpan.h"
+#ifdef MODULE_SIXLOWPAN_IPHC_CBUF
+#include "sixlowpan/iphc_cbuf.h"
+#endif
 #include "thread.h"
 
 #include "framework.h"
@@ -416,6 +419,14 @@ int sixlowpan_test_run(uint32_t exp, sixlowpan_test_t test, char *name)
 
     pktbuf_reset();
     sixlowpan_reset();
+
+#ifdef MODULE_SIXLOWPAN_IPHC_CBUF
+
+    for (int i = 0; i < SIXLOWPAN_IPHC_CBUF_SIZE; i++) {
+        sixlowpan_iphc_cbuf_remove_by_cid(i);
+    }
+
+#endif
 
     res = test();
 

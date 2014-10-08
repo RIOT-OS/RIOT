@@ -47,6 +47,10 @@ ifneq (,$(filter sixlowpan_legacy,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
 
+ifneq (,$(filter sixlowpan_iphc_cbuf,$(USEMODULE)))
+	USEMODULE += vtimer
+endif
+
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
 	USEMODULE += netapi
 	USEMODULE += netdev_base
