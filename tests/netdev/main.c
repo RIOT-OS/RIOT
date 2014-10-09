@@ -34,14 +34,8 @@
 #ifdef NETDEV_DEFAULT
 #define SHELL_BUFSIZE   (UART0_BUFSIZE)
 
-#ifndef MODULE_NATIVENET
-static netdev_t dev_mem;
-static netdev_t *dev = &dev_mem;
-#else
-static netdev_t *dev = (netdev_t *) &nativenet_default_dev;
-#endif
-
 static size_t dev_address_len = 0;
+static netdev_t *dev = NULL;
 
 /***********************************
  * test channel                    *
