@@ -6,6 +6,14 @@ export RIOTBASE ?= $(CURDIR)/../..
 # other toolchains lack assert.h used by oonf_api
 BOARD_WHITELIST := avsextrem msba2 native
 
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+CFLAGS += -DDEVELHELP
+
+# Change this to 0 show compiler invocation lines by default:
+QUIET ?= 1
+
 USEPKG += oonf_api
 
 export CFLAGS = -DRIOT -DENABLE_NAME
