@@ -34,7 +34,7 @@ struct netaddr_str nbuf[1];
 #include "reader.h"
 #include "writer.h"
 #include "constants.h"
-#include "routing.h"
+#include "routing_table.h"
 
 static struct rfc5444_reader reader;
 static struct netaddr *current_src;

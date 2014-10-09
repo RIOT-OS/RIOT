@@ -24,7 +24,7 @@
 #include "olsr.h"
 #include "util.h"
 #include "debug.h"
-#include "routing.h"
+#include "routing_table.h"
 #include "constants.h"
 #include <slist.h>
 

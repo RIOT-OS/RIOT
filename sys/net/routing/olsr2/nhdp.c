@@ -17,7 +17,7 @@
 #include "util.h"
 #include "debug.h"
 #include "node.h"
-#include "routing.h"
+#include "routing_table.h"
 #include "constants.h"
 
 #include "common/avl.h"
