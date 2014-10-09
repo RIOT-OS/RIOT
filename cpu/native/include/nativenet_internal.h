@@ -32,14 +32,68 @@
 #define NNEV_SWTRX      0x0b
 #define NNEV_MAXEV      0x0b
 
+#define _NATIVENET_DEV_MORE(dev) ((_nativenet_netdev_more_t *)dev->more)
+
 struct rx_buffer_s {
     radio_packet_t packet;
     char data[NATIVE_MAX_DATA_LENGTH];
 };
 
 extern struct rx_buffer_s _nativenet_rx_buffer[RX_BUF_SIZE];
-extern uint64_t _native_net_addr_long;
-extern radio_address_t _native_net_addr;
+
+/**
+ * @brief   Definition of network device data.
+ */
+typedef struct {
+    /**
+     * @brief   The channel assigned to this device
+     *
+     * @note    For internal use only, do not change externally!
+     *
+     * @internal
+     */
+    uint8_t _channel;
+
+    /**
+     * @brief   The PAN ID assigned to this device
+     *
+     * @note    For internal use only, do not change externally!
+     * @internal
+     */
+    uint16_t _pan_id;
+
+    /**
+     * @brief   The short address assigned to this device
+     *
+     * @note    For internal use only, do not change externally!
+     * @internal
+     */
+    radio_address_t _radio_addr;
+
+    /**
+     * @brief   The long address assigned to this device
+     *
+     * @note    For internal use only, do not change externally!
+     * @internal
+     */
+    uint64_t _long_addr;
+
+    /**
+     * @brief   Flag to determine if device is in promiscuous mode
+     *
+     * @note    For internal use only, do not change externally!
+     * @internal
+     */
+    uint8_t _is_monitoring;
+
+    /**
+     * @brief   Receive data callbacks for this device
+     */
+    netdev_rcv_data_cb_t _callbacks[NATIVENET_DEV_CB_MAX];
+} _nativenet_netdev_more_t;
+
+/* internal counterpart to nativenet_default_dev */
+extern _nativenet_netdev_more_t _nativenet_default_dev_more;
 
 void _nativenet_handle_packet(radio_packet_t *packet);
 int8_t send_buf(radio_packet_t *packet);

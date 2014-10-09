@@ -13,7 +13,8 @@
  * @file        periph_conf.h
  * @brief       Peripheral MCU configuration for the Arduino Due board
  *
- * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Hauke Petersen  <hauke.petersen@fu-berlin.de>
+ * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
 #ifndef __PERIPH_CONF_H
@@ -84,6 +85,36 @@
  * @{
  */
 #define RANDOM_NUMOF        (1U)
+/** @} */
+
+/**
+* @name SPI configuration
+* @{
+*/
+#define SPI_NUMOF           (1U)
+#define SPI_0_EN            1
+
+/* SPI 0 device config */
+#define SPI_0_DEV           SPI0
+#define SPI_0_CLKEN()       (PMC->PMC_PCER0 |= (1 << ID_SPI0));
+#define SPI_0_CLKDIS()      (PMC->PMC_PCER0 &= ~(1 << ID_SPI0));
+#define SPI_0_IRQ           SPI0_IRQn
+#define SPI_0_IRQ_HANDLER   isr_spi0
+#define SPI_0_IRQ_PRIO      1
+
+/* SPI 0 pin configuration */
+#define SPI_0_MISO_PIN      PIO_PA25A_SPI0_MISO
+#define SPI_0_MOSI_PIN      PIO_PA26A_SPI0_MOSI
+#define SPI_0_SCK_PIN       PIO_PA27A_SPI0_SPCK
+
+
+#define SPI_0_MISO_PORT     PIOA
+#define SPI_0_MOSI_PORT     PIOA
+#define SPI_0_SCK_PORT      PIOA
+
+#define SPI_0_MISO_PORT_CLKEN()  (PMC->PMC_PCER0 |= (1 << ID_PIOA));
+#define SPI_0_MOSI_PORT_CLKEN()  (PMC->PMC_PCER0 |= (1 << ID_PIOA));
+#define SPI_0_SCK_PORT_CLKEN()   (PMC->PMC_PCER0 |= (1 << ID_PIOA));
 /** @} */
 
 /**
