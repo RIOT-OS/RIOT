@@ -31,7 +31,7 @@ extern "C" {
  * @brief Definition of available timers
  *
  * Each timer is based on a hardware timer, which can further have 1 or more channels.
- * To this point 4 timers are possible, might need to be expanded for some cases.
+ * To this point 6 timers are possible, might need to be expanded for some cases.
  */
 typedef enum {
 #if TIMER_0_EN
@@ -45,6 +45,12 @@ typedef enum {
 #endif
 #if TIMER_3_EN
     TIMER_3,                /**< 4th timer */
+#endif
+#if TIMER_4_EN
+    TIMER_4,                /**< 5th timer */
+#endif
+#if TIMER_5_EN
+    TIMER_5,                /**< 6th timer */
 #endif
     TIMER_UNDEFINED         /**< fall-back if no timer is defined */
 } tim_t; /* named tim instead of timer to avoid conflicts with vendor libraries */
