@@ -31,7 +31,7 @@
 #include "nhdp.h"
 #include "olsr.h"
 #include "debug.h"
-#include "routing.h"
+#include "routing_table.h"
 
 uint8_t msg_buffer[256];
 uint8_t msg_addrtlvs[512];

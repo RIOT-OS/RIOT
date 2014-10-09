@@ -22,7 +22,7 @@ struct netaddr_str nbuf[3];
 #include <slist.h>
 #include "debug.h"
 #include "util.h"
-#include "routing.h"
+#include "routing_table.h"
 #include "constants.h"
 #include "rfc5444/rfc5444.h"
 
