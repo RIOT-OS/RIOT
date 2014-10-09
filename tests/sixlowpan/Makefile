@@ -11,6 +11,10 @@ BOARD_BLACKLIST := arduino-mega2560 # errnos all have the same value
 USEMODULE += netapi
 USEMODULE += sixlowpan
 
+ifeq (,$(WITHOUT_SIXLOWPAN_HC))
+    USEMODULE += sixlowpan_hc
+endif
+
 ifeq (TEXT,$(OUTPUT))
     CFLAGS += -DTEXT
 endif

@@ -38,6 +38,11 @@
 
 #include "sixlowpan.h"
 
+#ifdef MODULE_SIXLOWPAN_HC
+#include "sixlowpan/hc.h"
+#include "sixlowpan/iphc_cbuf.h"
+#endif
+
 #define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
@@ -693,17 +698,65 @@ static int _handle_send(kernel_pid_t mac_pid, netdev_hlist_t **ulh, void *dest,
 
     dispatch_hdr->header = (void *)(&(dispatch[0]));
 
+#ifdef MODULE_SIXLOWPAN_HC
+
     if (hc_status == SIXLOWPAN_HC_ENABLE) {
-        /* TODO */
+        size_t src_len = 8;
+        uint8_t src[src_len];
+
+        if ((res = netapi_get_option(mac_pid, (netapi_conf_type_t)NETDEV_OPT_SRC_LEN,
+                                     &src_len, sizeof(size_t))) < 0) {
+            if (res == -ENOTSUP) {
+                src_len = 2;
+            }
+            else {
+                return res;
+            }
+        }
+
+        if (src_len > 2) {
+            if ((res = netapi_get_option(mac_pid, (netapi_conf_type_t)NETDEV_OPT_ADDRESS_LONG,
+                                         &src, sizeof(src))) < 0) {
+                if (res == -ENOTSUP) {
+                    if ((res = netapi_get_option(mac_pid,
+                                                 (netapi_conf_type_t)NETDEV_OPT_ADDRESS, &src,
+                                                 sizeof(src))) < 0) {
+                        return res;
+                    }
+                }
+                else {
+                    return res;
+                }
+            }
+        }
+        else {
+            if ((res = netapi_get_option(mac_pid, (netapi_conf_type_t)NETDEV_OPT_ADDRESS,
+                                         &src, sizeof(src))) < 0) {
+                return res;
+            }
+        }
+
+        src_len = (size_t)res;
+
+        dispatch_hdr->header_len = ulh_len + 1;
+
+        if ((res = sixlowpan_hc_encode(dispatch_hdr, ulh, src, src_len, dest,
+                                       dest_len)) < 0) {
+            return res;
+        }
     }
     else {
         dispatch[dispatch_len++] = SIXLOWPAN_IPV6_DISPATCH;
         dispatch_hdr->header_len = dispatch_len;
     }
 
+#else
+
     (void)hc_status;
     dispatch[dispatch_len++] = SIXLOWPAN_IPV6_DISPATCH;
     dispatch_hdr->header_len = dispatch_len;
+
+#endif
 
     dispatch_hdr->protocol = NETDEV_PROTO_6LOWPAN;
 
@@ -742,6 +795,10 @@ static int _handle_get_option(kernel_pid_t mac_pid, kernel_pid_t *registry,
                               sixlowpan_hc_status_t hc_status,
                               netapi_conf_t *conf)
 {
+#ifndef MODULE_SIXLOWPAN_HC
+    (void)hc_status;
+#endif
+
     switch ((sixlowpan_conf_t)conf->param) {
         case SIXLOWPAN_CONF_CHANNEL:
         case SIXLOWPAN_CONF_ADDRESS:

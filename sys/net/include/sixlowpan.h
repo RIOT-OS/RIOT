@@ -45,7 +45,10 @@
 #include "byteorder.h"
 #include "cpu-conf.h"
 #include "netapi.h"
-#include "ipv6.h"
+
+#ifdef MODULE_SIXLOWPAN_HC
+#include "sixlowpan/hc.h"
+#endif /* MODULE_SIXLOWPAN_HC */
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,97 +68,6 @@ extern "C" {
 #define SIXLOWPAN_IPV6_DISPATCH     (0x41)
 
 /**
- * @brief   6LoWPAN dispatch value for IPv6 header compression (part of
- *          first byte of LOWPAN_IPHC).
- * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1.1">
- *          RFC 4944, section 3.1.1
- *      </a>
- */
-#define SIXLOWPAN_IPHC1_DISPATCH    (0x60)
-
-/**
- * @brief   Flag for Flow Label elision (part of first byte of
- *          LOWPAN_IPHC).
- * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1.1">
- *          RFC 6282, section 3.1.1
- *      </a>
- */
-#define SIXLOWPAN_IPHC1_FL_C        (0x10)
-
-/**
- * @brief   Flag for Traffic Class elision (part of first byte of
- *          LOWPAN_IPHC).
- * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1.1">
- *          RFC 6282, section 3.1.1
- *      </a>
- */
-#define SIXLOWPAN_IPHC1_TC_C        (0x08)
-
-/**
- * @brief   Flag for Next Header Compression (part of first byte of
- *          LOWPAN_IPHC).
- * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1.1">
- *          RFC 6282, section 3.1.1
- *      </a>
- */
-#define SIXLOWPAN_IPHC1_NH          (0x04)
-
-/**
- * @brief   Flag for Context Identifier Extention (part of second byte
- *          of LOWPAN_IPHC).
- * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1.1">
- *          RFC 6282, section 3.1.1
- *      </a>
- */
-#define SIXLOWPAN_IPHC2_CID         (0x80)
-
-/**
- * @brief   Flag for Source Address Compression (part of second byte
- *          of LOWPAN_IPHC).
- * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1.1">
- *          RFC 6282, section 3.1.1
- *      </a>
- */
-#define SIXLOWPAN_IPHC2_SAC         (0x40)
-
-/**
- * @brief   Bits for Source Address Mode (part of second byte of
- *          LOWPAN_IPHC).
- * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1.1">
- *          RFC 6282, section 3.1.1
- *      </a>
- */
-#define SIXLOWPAN_IPHC2_SAM         (0x30)
-
-/**
- * @brief   Flag for Destination Address Compression (part of second
- *          byte of LOWPAN_IPHC).
- * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1.1">
- *          RFC 6282, section 3.1.1
- *      </a>
- */
-#define SIXLOWPAN_IPHC2_DAC         (0x04)
-
-/**
- * @brief   Bits for Destination Address Mode (part of second byte of
- *          LOWPAN_IPHC).
- * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1.1">
- *          RFC 6282, section 3.1.1
- *      </a>
- */
-#define SIXLOWPAN_IPHC2_DAM         (0x03)
-
-/**
- * @brief   Flag for Multicast Compression (part of second byte of
- *          LOWPAN_IPHC).
- * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1.1">
- *          RFC 6282, section 3.1.1
- *      </a>
- */
-#define SIXLOWPAN_IPHC2_M           (0x08)
-
-
-/**
  * @brief   6LoWPAN dispatch value for fragmentation header (first fragment)
  * @see <a href="http://tools.ietf.org/html/rfc4944#section-5.1">
  *          RFC 4944, section 5.1
@@ -171,6 +83,14 @@ extern "C" {
  */
 #define SIXLOWPAN_FRAGN_DISPATCH    (0xe0)
 
+/**
+ * @brief   6LoWPAN dispatch value for IPv6 header compression (part of
+ *          first byte of LOWPAN_IPHC).
+ * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1.1">
+ *          RFC 4944, section 3.1.1
+ *      </a>
+ */
+#define SIXLOWPAN_IPHC1_DISPATCH    (0x60)
 
 /**
  * @brief   Mask to identify 6LoWPAN IPv6 header compression
@@ -197,20 +117,6 @@ extern "C" {
  *          fragmentation (2^11 - 1 == 0x7ff)
  */
 #define SIXLOWPAN_FRAG_MAX_DATAGRAM_LEN (0x7ff)
-
-/**
- * @brief   Data type to configure 6LoWPAN contexts
- * @see <a href="http://tools.ietf.org/html/rfc6282#section-3.1">
- *          RFC 6282, section 3.1
- *      </a>
- */
-typedef struct {
-    uint8_t cid;            /**< Context ID */
-    uint8_t prefix_len;     /**< Length of the prefix, if 0 on NETAPI_CMD_SET
-                             *   Context will be removed.
-                             */
-    ipv6_addr_t prefix;     /**< The prefix associated to this context */
-} sixlowpan_iphc_context_t;
 
 /**
  * @brief   Data type to configure 6LoWPAN header compression according to
@@ -255,6 +161,37 @@ typedef enum {
      */
     SIXLOWPAN_CONF_HC_STATUS,
 } sixlowpan_conf_t;
+
+/**
+ * @brief   Set header compression status for 6LoWPAN.
+ *
+ * @param[in] pid       The PID of the 6LoWPAN thread
+ * @param[in] status    Header compression status to set to.
+ *
+ * @return  netapi return code (0 on success)
+ */
+static inline int sixlowpan_hc_set_status(kernel_pid_t pid, sixlowpan_hc_status_t status)
+{
+#ifdef MODULE_SIXLOWPAN_HC
+    return netapi_set_option(pid, (netapi_conf_type_t)SIXLOWPAN_CONF_HC_STATUS,
+                             &status, sizeof(sixlowpan_hc_status_t));
+#else
+    (void)pid;
+    (void)status;
+
+    return -ENOTSUP;
+#endif
+}
+
+/**
+ * @brief   Get header compression status for 6LoWPAN.
+ *
+ * @param[in] pid       The PID of the 6LoWPAN thread
+ *
+ * @return  Header compression status.
+ * @return  SIXLOWPAN_HC_DISABLE, on netapi error.
+ */
+sixlowpan_hc_status_t sixlowpan_hc_get_status(kernel_pid_t pid);
 
 /**
  * @brief   Initialises the sixlowpan module. If it is already initialized
@@ -316,13 +253,6 @@ static inline void sixlowpan_init_fragn_dispatch(uint8_t *data,
     data[3] = (uint8_t)datagram_tag;
     data[4] = datagram_offset;
 }
-
-/**
- * @brief   Set header compression status for 6LoWPAN.
- *
- * @param[in] status    Header compression status to set to.
- */
-void sixlowpan_hc_set_status(sixlowpan_hc_status_t status);
 
 #ifdef TEST_SUITES
 /**
