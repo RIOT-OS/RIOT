@@ -286,5 +286,20 @@
 #define SPI_0_MISO_PORT_CLKEN() (RCC->APB2ENR |= RCC_APB2ENR_IOPAEN)
 /** @} */
 
+/**
+ * @name Real time counter configuration
+ * @{
+ */
+#define RTT_NUMOF           (1U)
+#define RTT_IRQ_PRIO        1
+
+#define RTT_DEV             RTC
+#define RTT_IRQ             RTC_IRQn
+#define RTT_ISR             isr_rtc
+#define RTT_MAX_VALUE       (0xffffffff)
+#define RTT_FREQUENCY       (1)             /* in Hz */
+#define RTT_PRESCALER       (0x7fff)        /* run with 1 Hz */
+/** @} */
+
 #endif /* __PERIPH_CONF_H */
 /** @} */
