@@ -651,16 +651,15 @@ void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix,
     uint8_t bytes = bits / 8, mask;
 
     if (bits % 8) {
-        mask = 0xff << (bits - (bytes * 8));
+        mask = 0xff << (8 - (bits - (bytes * 8)));
     }
     else {
         mask = 0x00;
     }
 
-    bytes++;
-    memset(out, 0, 16);
     memcpy(out, prefix, bytes);
     out->uint8[bytes] = prefix->uint8[bytes] & mask;
+    memset(&(out[bytes + 1]), 0, 15 - bytes);
 }
 
 void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
