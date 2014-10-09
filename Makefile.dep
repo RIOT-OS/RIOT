@@ -47,15 +47,14 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
 
-ifneq (,$(filter posix,$(USEMODULE)))
-	USEMODULE += uart0
-	USEMODULE += timex
-	USEMODULE += vtimer
-endif
-
 ifneq (,$(filter uart0,$(USEMODULE)))
 	USEMODULE += lib
 	USEMODULE += posix
+endif
+
+ifneq (,$(filter posix,$(USEMODULE)))
+	USEMODULE += timex
+	USEMODULE += vtimer
 endif
 
 ifneq (,$(filter cbor,$(USEMODULE)))
@@ -106,4 +105,8 @@ endif
 
 ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
 	USEPKG += libfixmath
+endif
+
+ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
+	FEATURES_REQUIRED += transceiver
 endif

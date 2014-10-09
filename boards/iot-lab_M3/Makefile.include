@@ -7,7 +7,7 @@ OS := $(shell uname)
 ifeq ($(OS),Linux)
   PORT ?= /dev/ttyUSB1
 else ifeq ($(OS),Darwin)
-  PORT ?= $(shell ls -1 /dev/tty.usbmodem* | head -n 1)
+  PORT ?= $(shell ls -1 /dev/tty.usbserial* | head -n 1)
 else
   $(info CAUTION: No PORT was defined for your host platform!)
   # TODO: add support for windows as host platform

@@ -101,6 +101,15 @@ typedef enum {
                                          signed value in host byte order */
     NETDEV_OPT_MAX_PACKET_SIZE,     /**< Maximum packet size the device supports
                                          unsigned value in host byte order */
+
+    /**
+     * @brief   Last value for @netdev_opt_t defined here
+     *
+     * @detail  Specific devices or modules like @ref netapi that utilize these
+     *          values to may define higher values, but they must be greater
+     *          or equal to @ref NETDEV_OPT_LAST.
+     */
+    NETDEV_OPT_LAST,
 } netdev_opt_t;
 
 /**

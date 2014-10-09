@@ -28,28 +28,12 @@ CFLAGS += -DDEVELHELP
 QUIET ?= 1
 
 BOARD_INSUFFICIENT_RAM := chronos msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1 redbee-econotag
-BOARD_BLACKLIST := arduino-due mbed_lpc1768 msb-430 pttu udoo qemu-i386 \
-                   stm32f0discovery stm32f3discovery stm32f4discovery pca10000 pca10005 \
-                   arduino-mega2560 msbiot yunjia-nrf51822 samr21-xpro
-# mbed_lpc1768:     see https://github.com/RIOT-OS/RIOT/issues/675
-# msb-430:          see https://github.com/RIOT-OS/RIOT/issues/658
-# pttu:             see https://github.com/RIOT-OS/RIOT/issues/659
-# qemu-i386:        no transceiver, yet
-# stm32f0discovery: no transceiver, yet
-# stm32f3discovery: no transceiver, yet
-# stm32f4discovery: no transceiver, yet
-# pca10000:         no transceiver, yet
-# pca10005:         no transceiver, yet
-# arduino-mega2560: no transceiver, yet
-# msbiot:           no transceiver, yet
-# yunjia-nrf51822:  no transceiver, yet
-# samr21-xpro:      no transceiver, yet
 
 # Modules to include:
 
 USEMODULE += shell
 USEMODULE += shell_commands
-USEMODULE += posix
+USEMODULE += uart0
 USEMODULE += ps
 USEMODULE += random
 USEMODULE += defaulttransceiver

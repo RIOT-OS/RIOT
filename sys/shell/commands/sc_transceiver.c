@@ -239,8 +239,9 @@ void _transceiver_send_handler(int argc, char **argv)
     p.frame.payload = (uint8_t*) text_msg;
     p.frame.payload_len = strlen(text_msg) + 1;
     p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
+    p.frame.fcf.src_addr_m = IEEE_802154_SHORT_ADDR_M;
     memset(p.frame.dest_addr, 0, sizeof(p.frame.dest_addr));
-    p.frame.dest_addr[7] = atoi(argv[1]);
+    p.frame.dest_addr[1] = atoi(argv[1]);
 #else
     p.data = (uint8_t *) text_msg;
     p.length = strlen(text_msg) + 1;
@@ -252,7 +253,7 @@ void _transceiver_send_handler(int argc, char **argv)
     mesg.content.ptr = (char *) &tcmd;
 
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-    printf("[transceiver] Sending packet of length %" PRIu16 " to %" PRIu16 ": %s\n", p.frame.payload_len, p.frame.dest_addr[7], (char*) p.frame.payload);
+    printf("[transceiver] Sending packet of length %" PRIu16 " to %" PRIu16 ": %s\n", p.frame.payload_len, p.frame.dest_addr[1], (char*) p.frame.payload);
 #else
     printf("[transceiver] Sending packet of length %" PRIu16 " to %" PRIu16 ": %s\n", p.length, p.dst, (char*) p.data);
 #endif
