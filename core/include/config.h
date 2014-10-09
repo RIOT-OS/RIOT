@@ -19,6 +19,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include <stdint.h>
 
 #define CONFIG_KEY      (0x1701)    /**< key to identify configuration             */
@@ -65,6 +69,10 @@ uint8_t config_save(void);
  * @note If no configuration is present within flashrom a new configuration will be created
  */
 void config_load(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CONFIG_H */
 /** @} */

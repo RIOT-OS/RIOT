@@ -19,6 +19,10 @@
 #ifndef __IO_ARCH_H
 #define __IO_ARCH_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @brief Define mapping between kernel internal and arch interfaces
  *
@@ -44,6 +48,9 @@
  */
 int io_arch_puts(char *data, int count);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __IO_ARCH_H */
 /** @} */

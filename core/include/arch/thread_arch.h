@@ -19,6 +19,10 @@
 #ifndef __THREAD_ARCH_H
 #define __THREAD_ARCH_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include "attributes.h"
 
 /**
@@ -65,6 +69,9 @@ void thread_arch_start_threading(void) NORETURN;
  */
 void thread_arch_yield(void);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __THREAD_ARCH_H */
 /** @} */

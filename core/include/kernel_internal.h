@@ -19,6 +19,10 @@
 #ifndef KERNEL_INTERNAL_H_
 #define KERNEL_INTERNAL_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include "attributes.h"
 
 /**
@@ -54,6 +58,10 @@ NORETURN void sched_task_exit(void);
  * @brief   Prints human readable, ps-like thread information for debugging purposes
  */
 void thread_print_stack(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* KERNEL_INTERNAL_H_ */
 /** @} */

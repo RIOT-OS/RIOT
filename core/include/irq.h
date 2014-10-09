@@ -21,6 +21,10 @@
 #ifndef IRQ_H_
 #define IRQ_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include <stdbool.h>
 #include "arch/irq_arch.h"
 
@@ -68,6 +72,10 @@ void restoreIRQ(unsigned state);
  * @return  true, if in interrupt service routine, false if not
  */
 int inISR(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* IRQ_H_ */
 /** @} */

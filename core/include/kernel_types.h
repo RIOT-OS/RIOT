@@ -9,6 +9,10 @@
 #ifndef KERNEL_TYPES_H
 #define KERNEL_TYPES_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include <stdint.h>
 #include <inttypes.h>
 #include <limits.h>
@@ -62,5 +66,9 @@
  * Unique process identifier
  */
 typedef int16_t kernel_pid_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* KERNEL_TYPES_H */

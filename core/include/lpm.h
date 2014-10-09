@@ -23,6 +23,10 @@
 #ifndef LPM_H_
 #define LPM_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include "arch/lpm_arch.h"
 
 /**
@@ -59,6 +63,10 @@ void lpm_end_awake(void);
  * @return  Current power mode
  */
 enum lpm_mode lpm_get(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __LPM_H_ */
 /** @} */

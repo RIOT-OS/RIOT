@@ -20,6 +20,10 @@
 #ifndef __REBOOT_ARCH_H
 #define __REBOOT_ARCH_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @brief Reboot the system
  *
@@ -30,6 +34,9 @@
  */
 int reboot_arch(int mode);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __REBOOT_ARCH_H */
 /** @} */
