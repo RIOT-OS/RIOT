@@ -115,12 +115,21 @@ int msg_try_send(msg_t *m, kernel_pid_t target_pid);
 int msg_send_to_self(msg_t *m);
 
 /**
+ * Value of msg_t::sender_pid if the sender was an interrupt service routine.
+ */
+#define KERNEL_PID_ISR (KERNEL_PID_LAST + 1)
+
+/**
  * @brief Send message from interrupt.
  *
- * Will be automatically chosen instead of ``msg_send()`` if called from an
+ * Will be automatically chosen instead of msg_send() if called from an
  * interrupt/ISR.
  *
- * @param[in] m             Pointer to preallocated ``msg_t`` structure, must
+ * The value of ``m->sender_pid`` is set to @ref KERNEL_PID_ISR.
+ *
+ * @see msg_sent_by_int()
+ *
+ * @param[in] m             Pointer to preallocated @ref msg_t structure, must
  *                          not be NULL.
  * @param[in] target_pid    PID of target thread.
  *
@@ -130,6 +139,17 @@ int msg_send_to_self(msg_t *m);
  */
 int msg_send_int(msg_t *m, kernel_pid_t target_pid);
 
+/**
+ * @brief Test if the message was sent inside an ISR.
+ * @see msg_send_int()
+ * @param[in] m The message in question.
+ * @returns `== 0` if *not* sent by an ISR
+ * @returns `!= 0` if sent by an ISR
+ */
+static inline int msg_sent_by_int(const msg_t *m)
+{
+    return (m->sender_pid == KERNEL_PID_ISR);
+}
 
 /**
  * @brief Receive a message.

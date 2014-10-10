@@ -18,10 +18,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include "kernel.h"
 #include "irq.h"
-
-#include "thread.h"
 #include "msg.h"
 
 #include "ringbuffer.h"
@@ -45,8 +42,6 @@ void chardev_loop(ringbuffer_t *rb)
 {
     msg_t m;
 
-    kernel_pid_t pid = thread_getpid();
-
     kernel_pid_t reader_pid = KERNEL_PID_UNDEF;
     struct posix_iop_t *r = NULL;
 
@@ -55,7 +50,7 @@ void chardev_loop(ringbuffer_t *rb)
     while (1) {
         msg_receive(&m);
 
-        if (m.sender_pid != pid) {
+        if (!msg_sent_by_int(&m)) {
             DEBUG("Receiving message from another thread: ");
 
             switch(m.type) {
