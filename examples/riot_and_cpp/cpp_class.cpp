@@ -20,7 +20,7 @@
  * @}
  */
 
-#include "cpp_class.h"
+#include "cpp_class.hpp"
 
 cpp_class::cpp_class()
 {
