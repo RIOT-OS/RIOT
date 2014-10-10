@@ -20,10 +20,19 @@
 
 #include "../unittests.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   The entry point of this test suite.
  */
 void tests_pktqueue(void);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __TESTS_PKTQUEUE_H_ */
 /** @} */

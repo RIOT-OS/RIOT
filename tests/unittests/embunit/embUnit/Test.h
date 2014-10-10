@@ -35,6 +35,10 @@
 #ifndef __TEST_H__
 #define __TEST_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct __TestResult     TestResult;
 typedef struct __TestResult*    TestResultRef;/*downward compatible*/
 
@@ -61,5 +65,9 @@ struct __Test {
 #define Test_name(s)            ((Test*)s)->isa->name(s)
 #define Test_run(s,r)           ((Test*)s)->isa->run(s,r)
 #define Test_countTestCases(s)  ((Test*)s)->isa->countTestCases(s)
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif/*__TEST_H__*/

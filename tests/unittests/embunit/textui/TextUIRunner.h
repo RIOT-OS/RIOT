@@ -39,10 +39,18 @@
 
 #include <embUnit/embUnit.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void TextUIRunner_setOutputter(OutputterRef outputter);
 void TextUIRunner_startWithOutputter(OutputterRef outputter);
 void TextUIRunner_start(void);
 void TextUIRunner_runTest(TestRef test);
 void TextUIRunner_end(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif/*__TEXTUIRUNNER_H__*/

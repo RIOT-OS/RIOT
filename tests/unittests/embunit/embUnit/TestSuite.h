@@ -35,6 +35,10 @@
 #ifndef __TESTSUITE_H__
 #define __TESTSUITE_H__
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 typedef struct __TestSuite  TestSuite;
 typedef struct __TestSuite* TestSuiteRef;/*downward compatible*/
 
@@ -54,5 +58,9 @@ extern const TestImplement TestSuiteImplement;
         numberOfTests,\
         tests,\
     }
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif/*__TESTSUITE_H__*/

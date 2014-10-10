@@ -35,6 +35,10 @@
 #ifndef __TESTCALLER_H__
 #define __TESTCALLER_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct __TestFixture    TestFixture;
 typedef struct __TestFixture*   TestFixtureRef;/*downward compatible*/
 
@@ -68,5 +72,9 @@ extern const TestImplement TestCallerImplement;
         numberOfFixtuers,\
         fixtuers,\
     }
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif/*__TESTCALLER_H__*/

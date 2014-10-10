@@ -20,6 +20,10 @@
 
 #include "../unittests.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   The entry point of this test suite.
  */
@@ -31,6 +35,10 @@ void tests_lib(void);
  * @return  embUnit tests if successful, NULL if not.
  */
 Test *tests_lib_ringbuffer_tests(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __TESTS_CORE_H_ */
 /** @} */
