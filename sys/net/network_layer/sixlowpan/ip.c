@@ -378,7 +378,7 @@ void *ipv6_process(void *arg)
         int addr_match = is_our_address(&ipv6_buf->destaddr);
 
         /* no address configured for this node so far, exit early */
-        if (addr_match < 1) {
+        if (addr_match < 0) {
             msg_reply(&m_recv_lowpan, &m_send_lowpan);
             continue;
         }
