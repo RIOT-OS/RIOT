@@ -6,6 +6,19 @@
  * directory for more details.
  */
 
+
+/**
+ * @addtogroup  core_util
+ * @{
+ *
+ * @file        kernel_types.h
+ * @brief       Types used by the kernel
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      René Kijewski <rene.kijewski@fu-berlin.de>
+ * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+ */
+
 #ifndef KERNEL_TYPES_H
 #define KERNEL_TYPES_H
 
