@@ -175,11 +175,11 @@ $(USEPKG:%=${BINDIR}%.a):
 
 clean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i clean ; done
-	-@rm -rf $(BINDIR) $(CLEANFILES)
+	-@rm -rf $(BINDIR)
 
 distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i distclean ; done
-	-@rm -rf $(BINDIRBASE) $(CLEANFILES)
+	-@rm -rf $(BINDIRBASE)
 
 flash: all
 	$(FLASHER) $(FFLAGS)
