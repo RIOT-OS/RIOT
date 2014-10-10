@@ -18,6 +18,9 @@ endif
 ifneq (,$(filter net_if,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
+ifneq (,$(filter pktqueue,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
+endif
 ifneq (,$(filter protocol_multiplex,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif
