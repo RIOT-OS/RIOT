@@ -26,6 +26,10 @@
 
 #include "priority_queue.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   data type for packet queue nodes
  *
@@ -128,6 +132,10 @@ static inline void pktqueue_remove(pktqueue_t *queue, pktqueue_node_t *node)
 {
     priority_queue_remove((priority_queue_t *)queue, (priority_queue_node_t *) node);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PKTQUEUE_H_ */
 /**

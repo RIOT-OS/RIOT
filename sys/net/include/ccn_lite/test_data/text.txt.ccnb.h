@@ -16,6 +16,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define RIOT_CCNL_POPULATE (1)
 
 #if RIOT_CCNL_POPULATE
@@ -356,4 +360,8 @@ unsigned char text_txt_ccnb_9[] = {
 };
 unsigned int text_txt_ccnb_9_len = 118;
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

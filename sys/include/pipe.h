@@ -38,6 +38,10 @@
 #include "ringbuffer.h"
 #include "thread.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef PIPE_BUF
 #   define PIPE_BUF (128) /**< Size of a dynamically malloc'd pipe. */
 #endif
@@ -107,6 +111,10 @@ pipe_t *pipe_malloc(unsigned size);
  * @param     rp   Pipe to free.
  */
 void pipe_free(pipe_t *rp);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /**

@@ -24,6 +24,10 @@
 #   include "msp430_types.h"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @note condition attributes are currently NOT USED in RIOT condition variables
  */
@@ -131,6 +135,10 @@ int pthread_cond_signal(struct pthread_cond_t *cond);
  * @return returns 0 on success, an errorcode otherwise.
  */
 int pthread_cond_broadcast(struct pthread_cond_t *cond);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* _CONDITION_VARIABLE_H */

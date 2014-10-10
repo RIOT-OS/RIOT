@@ -20,6 +20,10 @@
 
 #include <sys/time.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // (ms) I moved the following struct def here because it is used by all
 // containers apart from the kernel (this way I don't need to redefine it
 // for omnet.
@@ -47,3 +51,7 @@ void
 ccnl_rem_timer(void *h);
 
 extern struct ccnl_timer_s *eventqueue;
+
+#ifdef __cplusplus
+}
+#endif

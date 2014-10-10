@@ -28,6 +28,10 @@
 #include "timex.h"
 #include "msg.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MSG_TIMER 12345
 
 /**
@@ -136,6 +140,10 @@ void vtimer_print_short_queue(void);
  */
 void vtimer_print_long_queue(void);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 /** @} */

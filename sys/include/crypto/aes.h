@@ -29,6 +29,9 @@
 #include <stdint.h>
 #include "crypto/ciphers.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef uint32_t u32;
 typedef uint16_t u16;
@@ -137,6 +140,10 @@ uint8_t aes_get_preferred_block_size(void);
   *
   */
 extern block_cipher_interface_t aes_inerface;
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* AES_H */

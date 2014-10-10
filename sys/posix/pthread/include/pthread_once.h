@@ -9,6 +9,10 @@
 #ifndef __SYS__POSIX__PTHREAD_ONCE__H
 #define __SYS__POSIX__PTHREAD_ONCE__H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief           Datatype to supply to pthread_once().
  */
@@ -31,6 +35,10 @@ typedef volatile int pthread_once_t;
  * @returns         0, this invocation cannot fail.
  */
 int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

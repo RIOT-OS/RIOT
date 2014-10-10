@@ -15,6 +15,10 @@
 #ifndef TCP_TIMER_H_
 #define TCP_TIMER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define TCP_TIMER_RESOLUTION        500*1000
 
 #define SECOND                      1000.0f*1000.0f
@@ -34,6 +38,10 @@
 #define TCP_CONTINUE                3
 
 void *tcp_general_timer(void *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TCP_TIMER_H_ */
 /**

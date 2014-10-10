@@ -26,6 +26,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Data type to represent an EUI-64.
  */
@@ -393,6 +397,10 @@ typedef enum __attribute__((packed)) {
     NDP_ADDR_STATE_DEPRECATED,  ///< deprecated address, use discouraged.
     NDP_ADDR_STATE_ANY          ///< addresses of this state are always permitted.
 } ndp_addr_state_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* SIXLOWPAN_TYPES_H */

@@ -28,6 +28,10 @@
 #include "border.h"
 #include "bordermultiplex.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* packet types for flowcontrol */
 #define BORDER_PACKET_ACK_TYPE    (1)
 
@@ -73,5 +77,9 @@ typedef struct __attribute__((packed)) {
 ipv6_addr_t flowcontrol_init(void);
 void flowcontrol_send_over_uart(border_packet_t *packet, int len);
 void flowcontrol_deliver_from_uart(border_packet_t *packet, int len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SIXLOWPAN_FLOWCONTROL_H*/

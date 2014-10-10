@@ -26,6 +26,10 @@
 #ifndef CCNL_EXT_H__
 #define CCNL_EXT_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define compute_ccnx_digest(buf) sha256(buf->data, buf->datalen, NULL)
 
 #ifdef USE_FRAG
@@ -92,6 +96,10 @@ ccnl_prefix_clone_strip(struct ccnl_prefix_s *p, int strip);
 # define ccnl_sched_destroy(S)      do{}while(0)
 
 char *ccnl_prefix_to_path(struct ccnl_prefix_s *pr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CCNL_EXT_H__ */
 

@@ -10,6 +10,10 @@
 #ifndef __SYS__POSIX__PTHREAD_CANCELLCATION__H
 #define __SYS__POSIX__PTHREAD_CANCELLCATION__H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define PTHREAD_CANCEL_DISABLE 0
 #define PTHREAD_CANCEL_ENABLE  1
 
@@ -49,6 +53,10 @@ int pthread_cancel(pthread_t th);
  * @details      If pthread_cancel() called before, the current thread exits with with the code #PTHREAD_CANCELED.
  */
 void pthread_testcancel(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

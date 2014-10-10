@@ -11,6 +11,10 @@
 
 #include "attributes.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief        Datatype to identify a POSIX thread.
  * @note         The pthread ids are one off to the index in the internal array.
@@ -90,6 +94,10 @@ static inline int pthread_equal(pthread_t thread1, pthread_t thread2)
 {
     return thread1 == thread2;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

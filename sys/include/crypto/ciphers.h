@@ -22,6 +22,10 @@
 #ifndef __CIPHERS_H_
 #define __CIPHERS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Shared header file for all cipher algorithms */
 
 /* Set the algorithms that should be compiled in here. When these defines
@@ -118,6 +122,10 @@ typedef struct {
     uint8_t context[12];
 #endif
 } cipher_mac_context_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __CIPHERS_H_ */

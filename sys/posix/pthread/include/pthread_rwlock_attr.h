@@ -11,6 +11,10 @@
 
 #include <errno.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief     Attributes for a new reader/writer lock.
  * @details   The options set in this struct will be ignored by pthread_rwlock_init().
@@ -63,6 +67,10 @@ int pthread_rwlockattr_getpshared(const pthread_rwlockattr_t *attr, int *pshared
  *                  `EINVAL` if `attr == NULL` or a wrong value for `pshared` was supplied.
  */
 int pthread_rwlockattr_setpshared(pthread_rwlockattr_t *attr, int pshared);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

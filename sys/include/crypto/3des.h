@@ -29,6 +29,10 @@
 #ifndef THREEDES_H_
 #define THREEDES_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define THREEDES_BLOCK_SIZE    8
 #define THREEDES_KEY_SIZE      PARSEC_KEYSIZE
 
@@ -147,6 +151,10 @@ uint8_t tripledes_get_preferred_block_size(void);
  *
  */
 extern block_cipher_interface_t tripledes_interface;
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* THREEDES_H_ */

@@ -11,6 +11,10 @@
 
 #include "mutex.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @def     PTHREAD_PROCESS_SHARED
  * @brief   Share the structure with child processes (default).
@@ -119,6 +123,10 @@ int pthread_barrierattr_getpshared(const pthread_barrierattr_t *attr, int *pshar
  * @returns   0, the invocation cannot fail
  */
 int pthread_barrierattr_setpshared(pthread_barrierattr_t *attr, int pshared);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

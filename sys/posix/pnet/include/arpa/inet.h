@@ -29,6 +29,10 @@
 #include "inet_ntop.h"
 #include "inet_pton.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef uint16_t in_port_t;     ///< Internet port type
 typedef uint32_t in_addr_t;     ///< IPv4 address type
 
@@ -93,6 +97,10 @@ struct in_addr {
  *                      order.
  */
 #define ntohs(netshort)     NTOHS(netshort)
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @}

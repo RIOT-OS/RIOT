@@ -21,6 +21,10 @@
 #include "socket_base/types.h"
 #include "socket.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define TCP_EOO_OPTION          (0x00)        /* End of option list */
 #define TCP_NOP_OPTION          (0x01)        /* No operation */
 #define TCP_MSS_OPTION          (0x02)        /* Maximum segment size */
@@ -107,6 +111,10 @@ int tcp_listen(int s, int backlog);
 int32_t tcp_recv(int s, void *buf, uint32_t len, int flags);
 bool tcp_socket_compliancy(int s);
 int tcp_teardown(socket_internal_t *current_socket);
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @}
