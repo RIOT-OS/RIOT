@@ -1,0 +1,25 @@
+From 40651f114bd6e1b4b2ebc89bdf8fb06d1243eb55 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benpicco@zedat.fu-berlin.de>
+Date: Fri, 10 Oct 2014 02:08:32 +0200
+Subject: [PATCH] if_index is not used
+
+---
+ src-api/common/netaddr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src-api/common/netaddr.c b/src-api/common/netaddr.c
+index ed44341..fa528ca 100644
+--- a/src-api/common/netaddr.c
++++ b/src-api/common/netaddr.c
+@@ -319,7 +319,7 @@ netaddr_create_host_bin(struct netaddr *host, const struct netaddr *netmask,
+  */
+ int
+ netaddr_socket_init(union netaddr_socket *combined, const struct netaddr *addr,
+-    uint16_t port, unsigned if_index) {
++    uint16_t port, unsigned if_index __attribute__((unused))) {
+   /* initialize memory block */
+   memset(combined, 0, sizeof(*combined));
+ 
+-- 
+1.9.1
+
