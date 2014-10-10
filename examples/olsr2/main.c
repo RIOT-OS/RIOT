@@ -34,7 +34,7 @@ static uint32_t get_node_id(void) {
 }
 
 #else /* CPU ID availiable */
-#include "cpu-conf.h"
+#include <periph/cpuid.h>
 
 static uint32_t get_node_id(void) {
 	uint32_t cpuid = 0;
@@ -93,6 +93,10 @@ static void set_id(int argc, char **argv) {
 	config_save();
 }
 
+static void print_routes(__attribute__((unused)) int argc, __attribute__((unused)) char **argv) {
+	print_topology_set();
+}
+
 static void init(void) {
 	ipv6_addr_t tmp;
 
@@ -115,7 +119,7 @@ static void init(void) {
 }
 
 const shell_command_t shell_commands[] = {
-	{"routes", "print all known nodes and routes", print_topology_set},
+	{"routes", "print all known nodes and routes", print_routes},
 	{"set_id", "set node ID and name", set_id},
 #ifdef ENABLE_NAME
 	{"ping", "send packets to a node", ping},

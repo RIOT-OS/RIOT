@@ -53,8 +53,8 @@ struct timer_msg {
     void (*func)(void);
 };
 
-static struct timer_msg msg_hello = { .timer = {0}, .interval = { .seconds = OLSR2_HELLO_REFRESH_INTERVAL_SECONDS - 1, .microseconds = 0}, .func = writer_send_hello };
-static struct timer_msg msg_tc = { .timer = {0}, .interval = { .seconds = OLSR2_TC_REFRESH_INTERVAL_SECONDS - 1, .microseconds = 0}, .func = writer_send_tc };
+static struct timer_msg msg_hello = { .interval = { .seconds = OLSR2_HELLO_REFRESH_INTERVAL_SECONDS - 1, .microseconds = 0}, .func = writer_send_hello };
+static struct timer_msg msg_tc    = { .interval = { .seconds = OLSR2_TC_REFRESH_INTERVAL_SECONDS - 1, .microseconds = 0}, .func = writer_send_tc };
 
 static int sock;
 static sockaddr6_t sa_bcast;
@@ -64,7 +64,7 @@ static mutex_t olsr_data;
 static char _name[5];
 static char *gen_name(char *dest, const size_t len)
 {
-    for (int i = 0; i < len - 1; ++i) {
+    for (unsigned int i = 0; i < len - 1; ++i) {
         dest[i] = 'A' + (genrand_uint32() % ('Z' - 'A'));
     }
 
@@ -81,12 +81,15 @@ static void write_packet(struct rfc5444_writer *wr __attribute__((unused)),
 #ifdef ENABLE_LEDS
     LED_GREEN_TOGGLE;
 #endif
-    int bytes_send = socket_base_sendto(sock, buffer, length, 0, &sa_bcast, sizeof sa_bcast);
+#ifdef ENABLE_DEBUG
+    int bytes_send =
+#endif
+    socket_base_sendto(sock, buffer, length, 0, &sa_bcast, sizeof sa_bcast);
 
     DEBUG("write_packet(%d bytes), %d bytes sent", length, bytes_send);
 }
 
-static void olsr_receiver_thread(void)
+static void* olsr_receiver_thread(void *ctx __attribute__((unused)))
 {
     char buffer[256];
 
@@ -118,9 +121,11 @@ static void olsr_receiver_thread(void)
         reader_handle_packet(&buffer, recsize, &_src, 1); // TODO: proper metric
         mutex_unlock(&olsr_data);
     }
+
+    return NULL;
 }
 
-static void olsr_sender_thread(void)
+static void* olsr_sender_thread(void *ctx __attribute__((unused)))
 {
     DEBUG("olsr_sender_thread, pid %d\n", thread_getpid());
 
@@ -144,6 +149,7 @@ static void olsr_sender_thread(void)
             DEBUG("vtimer_set_msg failed, stopped sending");
         }
     }
+    return NULL;
 }
 
 static ipv6_addr_t *get_next_hop(ipv6_addr_t *dest)
