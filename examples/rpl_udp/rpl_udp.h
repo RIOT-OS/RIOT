@@ -9,6 +9,10 @@
 #ifndef RPL_UDP_H
 #define RPL_UDP_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define APP_VERSION "1.2"
 
 #define RADIO_CHANNEL   (10)
@@ -96,4 +100,9 @@ extern radio_address_t id;
 
 /** @brief Char array for IP address printing */
 extern char addr_str[IPV6_MAX_ADDR_STR_LEN];
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* RPL_UDP_H */
