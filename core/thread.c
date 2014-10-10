@@ -34,7 +34,7 @@
 
 volatile tcb_t *thread_get(kernel_pid_t pid)
 {
-    if ((pid != KERNEL_PID_UNDEF) && (KERNEL_PID_FIRST <= pid) && (pid <= KERNEL_PID_LAST)) {
+    if (pid_is_valid(pid)) {
         return sched_threads[pid];
     }
     return NULL;
