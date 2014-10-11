@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    pktqueue
- * @addtogroup  net
+ * @defgroup    pktqueue Packet Queue
+ * @ingroup     net
  * @{
  *
  * @file        pktqueue.h
@@ -39,7 +39,7 @@ typedef struct pktqueue_node_t {
 /**
  * @brief   data type for packet queues
  *
- * @extends prioriry_queue_t
+ * @extends priority_queue_t
  */
 typedef struct {
     pktqueue_node_t *first;     /**< first node in the queue */
