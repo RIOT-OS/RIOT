@@ -29,7 +29,7 @@
 #include <slist.h>
 
 #ifdef ENABLE_DEBUG
-struct netaddr_str nbuf[3];
+static struct netaddr_str nbuf[3];
 #endif
 
 static struct olsr_node *_new_olsr_node(struct netaddr *addr,
@@ -448,7 +448,7 @@ void print_routing_graph(void) {}
 void print_topology_set(void)
 {
 #ifndef ENABLE_DEBUG
-	struct netaddr_str nbuf[3];
+    struct netaddr_str nbuf[3];
 #endif
     struct alt_route *route;
     struct olsr_node *node;

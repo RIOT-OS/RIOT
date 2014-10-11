@@ -24,7 +24,7 @@ static struct netaddr_rc local_addr;
 static struct avl_tree olsr_head;
 
 #ifdef ENABLE_DEBUG
-struct netaddr_str nbuf[2];
+static struct netaddr_str nbuf[2];
 #endif
 
 #ifdef ENABLE_NAME

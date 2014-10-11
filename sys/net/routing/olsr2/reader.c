@@ -21,7 +21,7 @@
 #include "rfc5444/rfc5444_reader.h"
 
 #ifdef ENABLE_DEBUG
-struct netaddr_str nbuf[1];
+static struct netaddr_str nbuf[1];
 #endif
 
 #ifdef RIOT

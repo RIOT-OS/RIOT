@@ -23,7 +23,7 @@
 #include "common/avl.h"
 
 #ifdef ENABLE_DEBUG
-struct netaddr_str nbuf[1];
+static struct netaddr_str nbuf[1];
 #endif
 
 static struct olsr_node *_node_replace(struct olsr_node *old_n)
