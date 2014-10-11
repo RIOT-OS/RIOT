@@ -41,7 +41,7 @@
 #include <olsr2/olsr2.h>
 
 #ifdef ENABLE_DEBUG
-struct netaddr_str nbuf[1];
+static struct netaddr_str nbuf[1];
 #endif
 
 static char receive_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];

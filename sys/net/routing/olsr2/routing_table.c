@@ -15,7 +15,7 @@
 #include <stdio.h>
 
 #ifdef ENABLE_DEBUG
-struct netaddr_str nbuf[3];
+static struct netaddr_str nbuf[3];
 #endif
 
 #include "olsr.h"

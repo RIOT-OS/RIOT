@@ -22,7 +22,7 @@
 #endif
 
 #ifdef ENABLE_DEBUG
-struct netaddr_str nbuf[1];
+static struct netaddr_str nbuf[1];
 #endif
 
 #include "constants.h"
