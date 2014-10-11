@@ -24,6 +24,7 @@
 
 #include <olsr2/olsr2.h>
 
+/* Interface ID */
 #define IF_ID (0)
 
 #ifdef HAVE_NO_CPUID
