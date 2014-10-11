@@ -45,7 +45,8 @@ typedef struct {
 } timer_conf_t;
 
 /** Timer state memory */
-timer_conf_t config[TIMER_NUMOF];
+static timer_conf_t config[TIMER_NUMOF];
+static uint16_t   overflow[TIMER_NUMOF];
 
 static inline int get_timer_base(tim_t dev) {
     switch(dev) {
@@ -72,37 +73,6 @@ static inline int get_timer_base(tim_t dev) {
 #if TIMER_5_EN
         case TIMER_5:
         return TIMER5_BASE;
-#endif
-        default:
-        return -1;
-    }
-}
-
-static inline int get_timer_num(tim_t dev) {
-    switch(dev) {
-#if TIMER_0_EN
-        case TIMER_0:
-        return 0;
-#endif
-#if TIMER_1_EN
-        case TIMER_1:
-        return 1;
-#endif
-#if TIMER_2_EN
-        case TIMER_2:
-        return 2;
-#endif
-#if TIMER_3_EN
-        case TIMER_3:
-        return 3;
-#endif
-#if TIMER_4_EN
-        case TIMER_4:
-        return 4;
-#endif
-#if TIMER_5_EN
-        case TIMER_5:
-        return 5;
 #endif
         default:
         return -1;
@@ -160,18 +130,18 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int)) {
     DEBUG("timer_init(%d)\n", dev);
     DEBUG("Running at %d Hz\n", ROM_SysCtlClockGet());
 
-    config[get_timer_num(dev)].cb = callback;
+    config[dev].cb = callback;
 
     uint32_t timer = get_timer_base(dev);
 
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0 + get_timer_num(dev));
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0 + dev);
     ROM_TimerConfigure(timer, TIMER_CFG_PERIODIC_UP);
     ROM_TimerLoadSet(timer, TIMER_A, HWTIMER_MAXTICKS);
 
     NVIC_EnableIRQ(get_timer_irq(dev));
 
     // enable timeout interrupt, just because
-    ROM_TimerIntDisable(get_timer_base(dev), TIMER_TIMA_TIMEOUT);
+    ROM_TimerIntEnable(timer, TIMER_TIMA_TIMEOUT);
 
     timer_start(dev);
 
@@ -206,7 +176,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout) {
 int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
     DEBUG("timer_set_absolute(%d, %u)\n", dev, value);
 
-    ROM_TimerMatchSet(get_timer_base(dev), TIMER_A, value);
+    ROM_TimerMatchSet(get_timer_base(dev), TIMER_A, value * TIMER_0_PRESCALER);
 
     timer_irq_enable(dev);
 
@@ -241,8 +211,8 @@ int timer_clear(tim_t dev, int channel) {
 unsigned int timer_read(tim_t dev) {
     uint32_t value = ROM_TimerValueGet(get_timer_base(dev), TIMER_A);
 
-    DEBUG("timer_read(%d) = %u\n", dev, value);
-    return value;
+    DEBUG("timer_read(%d) = [%d] %u -> %d\n", dev, overflow[dev], value, value / TIMER_0_PRESCALER + (overflow[dev] << 22));
+    return value / TIMER_0_PRESCALER + (overflow[dev] << 22);
 }
 
 /**
@@ -338,15 +308,13 @@ __attribute__ ((naked)) void TIMER_5_ISR(void)
 static inline void irq_handler(tim_t timer, TIMER0_Type *dev)
 {
     if (ROM_TimerIntStatus((uint32_t) dev, 0) & TIMER_TIMA_TIMEOUT) {
-        BLUE_LED_TOGGLE;
         ROM_TimerIntClear ((uint32_t) dev, TIMER_TIMA_TIMEOUT);
-    }
-
-    if (ROM_TimerIntStatus((uint32_t) dev, 0) & TIMER_TIMA_MATCH) {
+        DEBUG("Timer %d overflowed\n", timer);
+        ++overflow[timer];
+    } else if (ROM_TimerIntStatus((uint32_t) dev, 0) & TIMER_TIMA_MATCH) {
         ROM_TimerIntClear ((uint32_t) dev, TIMER_TIMA_MATCH);
         timer_irq_disable(timer);
-
-        config[timer].cb(get_timer_num(timer));
+        config[timer].cb(timer);
     }
 
     if (sched_context_switch_request) {

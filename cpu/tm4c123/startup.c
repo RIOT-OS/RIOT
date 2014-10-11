@@ -96,10 +96,9 @@ void dummy_handler(void)
 void isr_hard_fault(void)
 {
 	while(1){
-		GREEN_LED_ON;
 		RED_LED_ON;
 		ROM_SysCtlDelay(1000000);
-		GREEN_LED_OFF;
+		RED_LED_OFF;
 		ROM_SysCtlDelay(1000000);
 	}
 }
