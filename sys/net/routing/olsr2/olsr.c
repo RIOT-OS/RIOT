@@ -411,7 +411,7 @@ void print_routing_graph(void)
     avl_for_each_element(get_olsr_head(), node, node) {
         if (node->addr != NULL && node->last_addr != NULL) {
             tmp = get_node(node->last_addr);
-            printf("\t%s -> %s\n", tmp ? tmp->name : local_name, node->name);
+            printf("\t%s -> %s\n", tmp ? tmp->name : olsr2_local_name, node->name);
         }
     }
     puts("}");
@@ -421,7 +421,7 @@ void print_routing_graph(void)
     puts("// BEGIN FLOODING MPR");
     avl_for_each_element(get_olsr_head(), node, node) {
         if (node->type == NODE_TYPE_NHDP && h1_deriv(node)->mpr_slctr_flood) {
-            printf("\t%s -> %s\n", node->name, local_name);
+            printf("\t%s -> %s\n", node->name, olsr2_local_name);
         }
     }
     puts("// END FLOODING MPR");
@@ -432,7 +432,7 @@ void print_routing_graph(void)
     puts("// BEGIN ROUTING MPR");
     avl_for_each_element(get_olsr_head(), node, node) {
         if (node->distance == 1 && h1_deriv(node)->mpr_slctr_route) {
-            printf("\t%s -> %s\n", node->name, local_name);
+            printf("\t%s -> %s\n", node->name, olsr2_local_name);
         }
     }
     puts("// END ROUTING MPR");
@@ -456,7 +456,7 @@ void print_topology_set(void)
     puts("");
     puts("---[ Topology Set ]--");
 #ifdef ENABLE_NAME
-    printf(" [ %s | %s ]\n", netaddr_to_str_s(&nbuf[0], get_local_addr()), local_name);
+    printf(" [ %s | %s ]\n", netaddr_to_str_s(&nbuf[0], get_local_addr()), olsr2_local_name);
 #else
     printf(" [%s]\n", netaddr_to_str_s(&nbuf[0], get_local_addr()));
 #endif

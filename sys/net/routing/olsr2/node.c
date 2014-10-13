@@ -28,7 +28,7 @@ static struct netaddr_str nbuf[2];
 #endif
 
 #ifdef ENABLE_NAME
-char *local_name;
+char *olsr2_local_name;
 #endif
 
 static void _decrease_mpr_neigh(struct olsr_node *node)

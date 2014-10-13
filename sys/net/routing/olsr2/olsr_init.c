@@ -182,9 +182,9 @@ void olsr_init(void)
 
 #ifdef ENABLE_NAME
 #ifdef BOARD_NATIVE
-    local_name = gen_name(_name, sizeof _name);
+    olsr2_local_name = gen_name(_name, sizeof _name);
 #else
-    local_name = sysconfig.name;
+    olsr2_local_name = sysconfig.name;
 #endif
 #endif
     mutex_init(&olsr_data);
@@ -209,7 +209,7 @@ void olsr_init(void)
     /* register olsr for routing */
     ipv6_iface_set_routing_provider(get_next_hop);
 
-    DEBUG("This is node %s with IP %s", local_name, netaddr_to_str_s(&nbuf[0], get_local_addr()));
+    DEBUG("This is node %s with IP %s", olsr2_local_name, netaddr_to_str_s(&nbuf[0], get_local_addr()));
 
     /* enable sending */
     int pid = thread_create(sender_thread_stack, sizeof sender_thread_stack, PRIORITY_MAIN - 1, CREATE_STACKTEST, olsr_sender_thread, NULL, "olsr_snd");
