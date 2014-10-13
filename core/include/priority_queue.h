@@ -19,6 +19,10 @@
 #ifndef __QUEUE_H
 #define __QUEUE_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -108,6 +112,10 @@ void priority_queue_remove(priority_queue_t *root, priority_queue_node_t *node);
 #if ENABLE_DEBUG
 void priority_queue_print(priority_queue_t *root);
 void priority_queue_print_node(priority_queue_t *root);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 /** @} */

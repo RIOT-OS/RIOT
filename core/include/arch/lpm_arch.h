@@ -22,6 +22,10 @@
 #ifndef __LPM_ARCH_H
 #define __LPM_ARCH_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @brief Define the mapping between the architecture independent interfaces
           and the kernel internal interfaces
@@ -88,6 +92,9 @@ void lpm_arch_begin_awake(void);
  */
 void lpm_arch_end_awake(void);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __LPM_ARCH_H */
 /** @} */

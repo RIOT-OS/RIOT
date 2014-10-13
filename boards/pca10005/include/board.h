@@ -46,9 +46,11 @@
  * @name Macros for controlling the on-board LEDs.
  * @{
  */
-#define LED_RED_ON          /* not available */
-#define LED_RED_OFF         /* not available */
-#define LED_RED_TOGGLE      /* not available */
+#define LED_RED_PIN         1
+
+#define LED_RED_ON          (NRF_GPIO->OUTSET = (1 << LED_RED_PIN))
+#define LED_RED_OFF         (NRF_GPIO->OUTCLR = (1 << LED_RED_PIN))
+#define LED_RED_TOGGLE      (NRF_GPIO->OUT ^= (1 << LED_RED_PIN))
 #define LED_GREEN_ON        /* not available */
 #define LED_GREEN_OFF       /* not available */
 #define LED_GREEN_TOGGLE    /* not available */

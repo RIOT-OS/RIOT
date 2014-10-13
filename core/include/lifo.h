@@ -23,6 +23,10 @@
 #ifndef __LIFO_H_
 #define __LIFO_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @brief   Check if the given lifo is empty.
  *
@@ -61,6 +65,10 @@ void lifo_insert(int *array, int i);
  * @return          the least recently inserted element, otherwise.
  */
 int lifo_get(int *array);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __LIFO_H_ */
 /** @} */

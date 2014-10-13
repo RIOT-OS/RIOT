@@ -21,6 +21,10 @@
 #ifndef IO_H
 #define IO_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @brief   Firmware putstring implementation
  *
@@ -28,6 +32,10 @@
  * @param[in] count number of characters to be written
  */
 int fw_puts(char *data, int count);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* IO_H */

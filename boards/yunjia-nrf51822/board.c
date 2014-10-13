@@ -21,10 +21,11 @@
 #include "board.h"
 #include "cpu.h"
 
-#include "periph/uart.h"
-
 void board_init(void)
 {
+    /* setup led(s) for debugging */
+    NRF_GPIO->PIN_CNF[LED_RED_PIN] = GPIO_PIN_CNF_DIR_Output;
+
     /* initialize the CPU */
     cpu_init();
 }

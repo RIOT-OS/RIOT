@@ -19,6 +19,10 @@
 #ifndef _FLAGS_H
 #define _FLAGS_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @name Optional flags for controlling a threads initial state.
  * @{
@@ -29,6 +33,10 @@
 #define CREATE_STACKTEST    (8)     /**< write markers into the thread's stack to measure stack
                                          usage (for debugging) */
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _FLAGS_H */
 /** @} */
