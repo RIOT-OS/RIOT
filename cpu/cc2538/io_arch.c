@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_sam3x8e
+ * @ingroup     cpu_cc2538
  * @{
  *
  * @file        io_arch.c
@@ -25,8 +25,10 @@
 int io_arch_puts(char *data, int size)
 {
     int i = 0;
+
     for (; i < size; i++) {
         putchar(data[i]);
     }
+
     return i;
 }
