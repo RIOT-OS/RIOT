@@ -9,6 +9,14 @@
 #ifndef BATTERY_H
 #define BATTERY_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 uint32_t battery_get_voltage(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BATTERY_H */

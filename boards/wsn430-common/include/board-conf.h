@@ -20,7 +20,15 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define INFOMEM     (0x1000)
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* BOARD-CONF_H */

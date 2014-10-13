@@ -27,6 +27,10 @@
 
 #include "board-conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // for correct inclusion of <msp430.h>
 #ifndef __MSP430F1611__
 #define __MSP430F1611__
@@ -57,6 +61,10 @@
 #define LED_BLUE_ON         LEDS_PxOUT &=~LEDS_CONF_BLUE
 #define LED_BLUE_OFF        LEDS_PxOUT |= LEDS_CONF_BLUE
 #define LED_BLUE_TOGGLE     LEDS_PxOUT ^= LEDS_CONF_BLUE
+
+#ifdef __cplusplus
+}
+#endif
 
 #include <msp430x16x.h>
 

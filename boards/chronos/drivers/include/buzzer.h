@@ -9,6 +9,14 @@
 #ifndef BUZZER_H
 #define BUZZER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void buzzer_beep(uint8_t pitch, uint16_t duration);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BUZZER_H */

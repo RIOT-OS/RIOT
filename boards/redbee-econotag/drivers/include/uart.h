@@ -13,6 +13,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*-----------------------------------------------------------------*/
 /* UART */
 #define UART1_BASE      (0x80005000)
@@ -101,5 +105,9 @@ uint8_t uart1_getc(void);
 
 void uart2_putc(uint8_t c);
 uint8_t uart2_getc(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

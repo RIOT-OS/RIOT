@@ -9,6 +9,14 @@
 #ifndef __DISPLAY_PUTCHAR_H
 #define __DISPLAY_PUTCHAR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void init_display_putchar(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DISPLAY_PUTCHAR_H */

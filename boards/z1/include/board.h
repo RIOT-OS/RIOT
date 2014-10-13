@@ -32,6 +32,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef __MSP430F2617__
 #define __MSP430F2617__
 #endif
@@ -73,6 +77,10 @@
 #define USER_BTN_RELEASED  ((USER_BTN_PxIN & USER_BTN_MASK) != 0)
 
 typedef uint8_t radio_packet_length_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif // _Z1_BOARD_H

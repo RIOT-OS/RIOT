@@ -22,6 +22,10 @@
 #include <stdint.h>
 #include "bitarithm.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define F_CPU                   (96000000)
 
 
@@ -42,6 +46,10 @@ typedef uint8_t radio_packet_length_t;
  * @param[in] t The waiting cycles
  */
 void loop_delay(uint32_t t);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __BOARD_H */

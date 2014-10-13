@@ -19,6 +19,10 @@
 #ifndef __PERIPH_CONF_H
 #define __PERIPH_CONF_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @name Clock system configuration
  * @{
@@ -225,5 +229,9 @@
 #define GPIO_11_EXTI_CFG2() (SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI0_PA)
 #define GPIO_11_IRQ          EXTI0_IRQn
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PERIPH_CONF_H */

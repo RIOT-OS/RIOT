@@ -9,6 +9,14 @@
 #ifndef __UART0_H
 #define __UART0_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern kernel_pid_t uart0_handler_pid;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __UART0_H */

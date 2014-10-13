@@ -38,6 +38,10 @@
 #ifndef __DISPLAY_H
 #define __DISPLAY_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CLOCK_24HR              (0)
 #define CLOCK_AM_PM             (1)
 #define CLOCK_DISPLAY_SELECT    (2)
@@ -454,5 +458,9 @@ uint8_t switch_seg(uint8_t line, uint8_t index1, uint8_t index2);
  * @return      none
  * ************************************************************************************************/
 void display_all_off(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DISPLAY_ */

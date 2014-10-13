@@ -29,6 +29,10 @@
 #include "cpu.h"
 #include "periph_conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @name Define the nominal CPU core clock in this board
  */
@@ -115,6 +119,10 @@ typedef uint8_t radio_packet_length_t;
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BOARD_H_ */
 /** @} */
