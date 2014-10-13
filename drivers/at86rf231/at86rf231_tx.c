@@ -21,7 +21,7 @@
 
 #include "at86rf231.h"
 #include "at86rf231_spi.h"
-#include "vtimer.h"
+#include "hwtimer.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -95,7 +95,7 @@ static void at86rf231_xmit(uint8_t *data, radio_packet_length_t length)
     do {
         status = at86rf231_get_status();
 
-        vtimer_usleep(10);
+        hwtimer_wait(HWTIMER_TICKS(10));
 
         if (!--max_wait) {
             printf("at86rf231 : ERROR : could not enter PLL_ON mode");
