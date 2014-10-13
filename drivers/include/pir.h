@@ -24,6 +24,10 @@
 #include "kernel_types.h"
 #include "periph/gpio.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief device descriptor for a PIR sensor
  */
@@ -83,6 +87,10 @@ pir_event_t pir_get_status(pir_t *dev);
  * @return              -2 if another thread is registered already
  */
 int pir_register_thread(pir_t *dev);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PIR_H */
 /** @} */

@@ -22,6 +22,10 @@
 #include <sys/time.h>
 #include "kernel_types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Initializes the RTC for calendar mode
  */
@@ -56,6 +60,10 @@ void rtc_get_localtime(struct tm *localt);
 time_t rtc_time(struct timeval *time);
 
 extern kernel_pid_t rtc_second_pid;
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif

@@ -21,6 +21,10 @@
 
 #include "periph_conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* guard file in case no RTC device was specified */
 #if RTT_NUMOF
 
@@ -84,5 +88,10 @@ void rtt_poweron(void);
 void rtt_poweroff(void);
 
 #endif /* RTT_NUMOF */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* __RTT_H */
 /** @} */

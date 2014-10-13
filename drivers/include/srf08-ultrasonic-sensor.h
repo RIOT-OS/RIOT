@@ -27,6 +27,10 @@
 #ifndef SRF08_ULTRASONIC_SENSOR_I2C_H_
 #define SRF08_ULTRASONIC_SENSOR_I2C_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* define the SRF02 registers*/
 #define SRF08_DEFAULT_ADDR              112
 #define SRF08_COMMAND_REG               0x0
@@ -127,6 +131,10 @@ uint8_t srf08_get_gain(void);
  *            otherwise the number of the detected targets is delivered.
  */
 int32_t srf08_get_distances(uint32_t *range_array, uint8_t ranging_mode);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* SRF08_ULTRASONIC_SENSOR_I2C_H_ */

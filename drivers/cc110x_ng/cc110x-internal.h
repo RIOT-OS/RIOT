@@ -22,6 +22,9 @@
 #ifndef CC1100_INTERNAL_H
 #define CC1100_INTERNAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define FIXED_PKTLEN        (0x00)      ///< Fixed length packets, length configured in PKTLEN register.
 #define VARIABLE_PKTLEN     (0x01)      ///< Variable length packets, packet length configured by the first
@@ -191,6 +194,10 @@
 #define CC1100_TXFIFO       (0x3F)      ///< TX FIFO: Write operations write to the TX FIFO (SB: +0x00; BURST: +0x40)
 #define CC1100_RXFIFO       (0x3F)      ///< RX FIFO: Read operations read from the RX FIFO (SB: +0x80; BURST: +0xC0)
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif

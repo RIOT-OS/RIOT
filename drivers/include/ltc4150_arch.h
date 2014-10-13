@@ -9,6 +9,10 @@
 #ifndef __LTC4150_ARCH_H
 #define __LTC4150_ARCH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @defgroup    ltc4150 LTC4150
  * @ingroup     drivers
@@ -40,6 +44,10 @@ void ltc4150_arch_init(void);
  * implemented in driver
  */
 void ltc4150_interrupt(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** * @} */
 #endif /* __LTC4150_ARCH_H */

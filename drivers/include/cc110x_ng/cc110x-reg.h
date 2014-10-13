@@ -22,6 +22,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Write a set of bytes using burst mode (if available)
  *
@@ -87,6 +91,10 @@ uint8_t cc110x_read_status(uint8_t addr);
  * @return Command response
  */
 uint8_t cc110x_strobe(uint8_t c);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __CC110X_REG_H */

@@ -21,6 +21,10 @@
 
 #include "cpu-conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @def CPUID_ID_LEN
  *
@@ -38,6 +42,10 @@
  */
 void cpuid_get(void *id);
 #endif /* CPUID_ID_LEN */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PERIPH_CPUID_H_ */
 /**

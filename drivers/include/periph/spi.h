@@ -26,6 +26,10 @@
 
 #include "periph_conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* add guard for the case that no SPI device is defined */
 #if SPI_NUMOF
 
@@ -200,6 +204,10 @@ void spi_poweron(spi_t dev);
 void spi_poweroff(spi_t dev);
 
 #endif /* SPI_NUMOF */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __SPI_H */
 /** @} */

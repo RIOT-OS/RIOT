@@ -29,6 +29,10 @@
 #include <stdbool.h>
 #include "cc110x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @name    Defines used as state values for state machine
  * @{
@@ -317,6 +321,10 @@ void cc1100_cs_write_cca(const int cca);
 void cc1100_reset_statistic(void);
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif

@@ -27,6 +27,10 @@
 #define SRF02_ULTRASONIC_SENSOR_I2C_H_
 #include "i2c.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* define the SRF02 registers*/
 #define SRF02_DEFAULT_ADDR                  112
 #define SRF02_COMMAND_REG                   0x0
@@ -93,6 +97,10 @@ uint32_t srf02_get_distance(uint8_t ranging_mode);
  *
  */
 void srf02_start_ranging(uint16_t ranging_mode);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* SRF02_ULTRASONIC_SENSOR_I2C_H_ */

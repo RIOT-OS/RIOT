@@ -27,6 +27,10 @@
 #include <stdint.h>
 #include "radio/radio.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CC1100_BROADCAST_ADDRESS (0x00) ///< CC1100 broadcast address
 
 #define MAX_UID                  (0xFF) ///< Maximum UID of a node is 255
@@ -198,5 +202,9 @@ void cc1100_print_config(void);
 void cc1100_print_statistic(void);
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CC1100INTERFACE_H_ */

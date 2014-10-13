@@ -27,6 +27,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * gpioint_flags:
  * Note: - We rely on the exact values for the edges.
@@ -59,6 +63,10 @@ typedef void(*fp_irqcb)(void);
 bool gpioint_set(int port, uint32_t bitmask, int flags, fp_irqcb callback);
 
 void gpioint_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* GPIOINT_H_ */

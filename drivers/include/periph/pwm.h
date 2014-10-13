@@ -22,6 +22,10 @@
 
 #include "periph_conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ignore file in case no PWM devices are defined */
 #if PWM_NUMOF
 
@@ -127,6 +131,10 @@ void pwm_poweron(pwm_t dev);
 void pwm_poweroff(pwm_t dev);
 
 #endif /* PWM_NUMOF */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PWM_H */
 /** @} */
