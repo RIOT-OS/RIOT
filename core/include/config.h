@@ -19,11 +19,11 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-#include <stdint.h>
 
 #define CONFIG_KEY      (0x1701)    /**< key to identify configuration             */
 #define CONFIG_NAME_LEN (10)        /**< length of name for configuration in bytes */

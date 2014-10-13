@@ -21,13 +21,13 @@
 #ifndef __THREAD_H
 #define __THREAD_H
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 #include "kernel.h"
 #include "tcb.h"
 #include "arch/thread_arch.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 #define STATUS_NOT_FOUND (-1)
 

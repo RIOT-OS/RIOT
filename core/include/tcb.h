@@ -20,15 +20,15 @@
 #ifndef TCB_H_
 #define TCB_H_
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 #include <stdint.h>
 #include "priority_queue.h"
 #include "clist.h"
 #include "cib.h"
 #include "msg.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /**
  * @brief Thread status list

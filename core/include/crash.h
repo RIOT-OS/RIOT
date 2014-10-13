@@ -22,11 +22,11 @@
 #ifndef __CRASH_H
 #define __CRASH_H
 
+#include "kernel.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-#include "kernel.h"
 
 /**
  * @brief Handle an unrecoverable error by halting or rebooting the system

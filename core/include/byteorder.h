@@ -21,6 +21,9 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* ******************************* INTERFACE ******************************* */
 
@@ -309,6 +312,10 @@ uint64_t byteorder_ntohll(network_uint64_t v)
 {
     return _byteorder_swap(v.u64, ll);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BYTEORDER_H_ */
 /** @} */

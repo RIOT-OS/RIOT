@@ -21,12 +21,12 @@
 #ifndef __DEBUG_H
 #define __DEBUG_H
 
+#include <stdio.h>
+#include "sched.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-#include <stdio.h>
-#include "sched.h"
 
 /**
  * @name Print debug information if the calling thread stack is large enough
