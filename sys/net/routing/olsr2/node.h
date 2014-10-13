@@ -19,8 +19,9 @@
 
 #include "util.h"
 
+/* nodes can have a name (hostname) for easier debugging */
 #ifdef ENABLE_NAME
-extern char *local_name;
+extern char *olsr2_local_name;
 #endif
 
 /* if a connection is lost, the loss will be reported LOST_ITER_MAX times in HELLO and TC messages. */
