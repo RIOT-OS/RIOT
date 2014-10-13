@@ -34,6 +34,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define I2C_BUFSIZE             0x23
 #define MAX_TIMEOUT             0x00FFFFFF
 
@@ -325,5 +329,9 @@ void i2c_enable_pull_up_resistor(uint8_t i2c_interface);
  *                              open-drain pins without pull-up/down.
  */
 void i2c_disable_pull_up_resistor(uint8_t i2c_interface);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* end __I2C_H */

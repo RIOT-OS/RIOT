@@ -44,6 +44,10 @@
 #ifndef _SAMR21_TC7_INSTANCE_
 #define _SAMR21_TC7_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for TC7 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_TC7_CTRLA              (0x42003C00U) /**< \brief (TC7) Control A */
@@ -107,5 +111,9 @@
 #define TC7_OW_NUM                  2
 #define TC7_PERIOD_EXT              0
 #define TC7_SHADOW_EXT              0
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_TC7_INSTANCE_ */

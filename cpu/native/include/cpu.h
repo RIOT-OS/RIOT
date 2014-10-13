@@ -20,9 +20,17 @@
 #ifndef _CPU_H
 #define _CPU_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* TODO: remove once these have been removed from RIOT: */
 void dINT(void);
 void eINT(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif //_CPU_H

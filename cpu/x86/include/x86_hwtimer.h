@@ -29,6 +29,10 @@
 #ifndef CPU__X86__HWTIMER__H__
 #define CPU__X86__HWTIMER__H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Do timestamping to enable the use of the hwtimer module.
  *
@@ -36,6 +40,10 @@
  * You must not call this function on your own accord.
  */
 void x86_init_hwtimer(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -35,6 +35,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Early initialization of the UART system, before there are interrupts.
  *
@@ -170,6 +174,10 @@ enum iir_t {
     IIR_FIFO_MAL     = 2 << 6, /* FIFO enabled, not working */
     IIR_FIFO_ENABLED = 3 << 6, /* FIFO enabled */
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

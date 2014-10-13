@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_EMAC_INSTANCE_
 #define _SAM3XA_EMAC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for EMAC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_EMAC_NCR            (0x400B0000U) /**< \brief (EMAC) Network Control Register */
@@ -124,5 +128,9 @@
 #define REG_EMAC_TID   (*(RwReg*)0x400B00B8U) /**< \brief (EMAC) Type ID Checking Register */
 #define REG_EMAC_USRIO (*(RwReg*)0x400B00C0U) /**< \brief (EMAC) User Input/Output Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_EMAC_INSTANCE_ */

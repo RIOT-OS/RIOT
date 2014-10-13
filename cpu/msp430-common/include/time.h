@@ -9,6 +9,10 @@
 #ifndef MSPGCC_TIME_H
 #define MSPGCC_TIME_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct tm {
     int tm_sec;                   /* Seconds after the minute [0, 60] */
     int tm_min;                   /* Minutes after the hour [0, 59] */
@@ -20,5 +24,9 @@ struct tm {
     int tm_yday;                  /* Days since January 1st [0, 365] */
     int tm_isdst;                 /* Daylight saving time is in effect */
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

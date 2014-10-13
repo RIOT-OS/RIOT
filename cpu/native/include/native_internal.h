@@ -47,6 +47,9 @@
 
 #include "kernel_types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Prototype for native's internal callbacks
@@ -145,6 +148,10 @@ int register_interrupt(int sig, _native_callback_t handler);
 int unregister_interrupt(int sig);
 
 //#include <sys/param.h>
+
+#ifdef __cplusplus
+}
+#endif
 
 #include "kernel_internal.h"
 #include "sched.h"

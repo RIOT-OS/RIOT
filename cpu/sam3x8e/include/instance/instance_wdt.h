@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_WDT_INSTANCE_
 #define _SAM3XA_WDT_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for WDT peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_WDT_CR          (0x400E1A50U) /**< \brief (WDT) Control Register */
@@ -40,5 +44,9 @@
 #define REG_WDT_MR (*(RwReg*)0x400E1A54U) /**< \brief (WDT) Mode Register */
 #define REG_WDT_SR (*(RoReg*)0x400E1A58U) /**< \brief (WDT) Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_WDT_INSTANCE_ */

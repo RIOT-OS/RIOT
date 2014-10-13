@@ -12,6 +12,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define ASM_BASE_ADDRESS 0x80008000
 
 struct ASM_struct {
@@ -99,5 +103,9 @@ void asm_cbc_mac_finish(asm_data_t *data);
 void asm_ctr_cbc_mac_init(asm_keys_t *keys);
 void asm_ctr_cbc_mac_update(asm_data_t *data, asm_ctr_t *ctr);
 void asm_ctr_cbc_mac_finish(asm_data_t *data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ASM_H */

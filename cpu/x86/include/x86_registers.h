@@ -30,6 +30,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* see "Intel® Quark SoC X1000 Core Developer’s Manual", § 4.4.1.1 (p. 47) */
 #define CR0_PE (1u << 0)  /**< 1 = protected mode */
 #define CR0_MP (1u << 1)  /**< 1 = monitor coprocessor (FWAIT causes an interrupt) */
@@ -246,6 +250,10 @@ static inline uint64_t X86_CR_ATTR cpuid_caps(void)
     asm volatile ("cpuid" : "=d"(edx), "=c"(ecx) : "a"(1) : "ebx");
     return ((uint64_t) ecx << 32) | edx;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

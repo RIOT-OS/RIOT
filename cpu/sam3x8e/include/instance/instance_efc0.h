@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_EFC0_INSTANCE_
 #define _SAM3XA_EFC0_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for EFC0 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_EFC0_FMR           (0x400E0A00U) /**< \brief (EFC0) EEFC Flash Mode Register */
@@ -42,5 +46,9 @@
 #define REG_EFC0_FSR  (*(RoReg*)0x400E0A08U) /**< \brief (EFC0) EEFC Flash Status Register */
 #define REG_EFC0_FRR  (*(RoReg*)0x400E0A0CU) /**< \brief (EFC0) EEFC Flash Result Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_EFC0_INSTANCE_ */

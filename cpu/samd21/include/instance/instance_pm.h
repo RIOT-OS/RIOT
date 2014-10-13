@@ -44,6 +44,10 @@
 #ifndef _SAMR21_PM_INSTANCE_
 #define _SAMR21_PM_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for PM peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_PM_CTRL                (0x40000400U) /**< \brief (PM) Control */
@@ -83,5 +87,9 @@
 #define PM_CTRL_MCSEL_OSC8M         1
 #define PM_CTRL_MCSEL_XOSC          2
 #define PM_PM_CLK_APB_NUM           2
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_PM_INSTANCE_ */

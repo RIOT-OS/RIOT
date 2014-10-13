@@ -10,6 +10,10 @@
 #ifndef CPUCONF_H_
 #define CPUCONF_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @ingroup     conf
  * @ingroup     mc1322x
@@ -61,6 +65,10 @@
 
 #ifndef UART0_BUFSIZE
 #define UART0_BUFSIZE                   (64)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 /** @} */

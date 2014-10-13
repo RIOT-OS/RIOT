@@ -44,6 +44,10 @@
 #ifndef _SAMR21_ADC_INSTANCE_
 #define _SAMR21_ADC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for ADC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_ADC_CTRLA              (0x42004000U) /**< \brief (ADC) Control A */
@@ -95,5 +99,9 @@
 #define ADC_GCLK_ID                 30
 #define ADC_RESULT_BITS             16
 #define ADC_RESULT_MSB              (ADC_RESULT_BITS-1)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_ADC_INSTANCE_ */

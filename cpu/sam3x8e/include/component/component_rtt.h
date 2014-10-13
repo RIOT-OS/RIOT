@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_RTT_COMPONENT_
 #define _SAM3XA_RTT_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Real-time Timer */
 /* ============================================================================= */
@@ -66,5 +70,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_RTT_COMPONENT_ */

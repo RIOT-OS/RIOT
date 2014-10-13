@@ -44,6 +44,10 @@
 #ifndef _SAMR21G18A_PIO_
 #define _SAMR21G18A_PIO_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define PIN_PA00                           0  /**< \brief Pin Number for PA00 */
 #define PORT_PA00                  (1u <<  0) /**< \brief PORT Mask  for PA00 */
 #define PIN_PA01                           1  /**< \brief Pin Number for PA01 */
@@ -1005,5 +1009,9 @@
 #define MUX_PA15F_RFCTRL_FECTRL5           5
 #define PINMUX_PA15F_RFCTRL_FECTRL5  ((PIN_PA15F_RFCTRL_FECTRL5 << 16) | MUX_PA15F_RFCTRL_FECTRL5)
 #define PORT_PA15F_RFCTRL_FECTRL5  (1u << 15)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21G18A_PIO_ */

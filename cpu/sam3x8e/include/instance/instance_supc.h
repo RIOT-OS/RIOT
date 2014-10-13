@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_SUPC_INSTANCE_
 #define _SAM3XA_SUPC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for SUPC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_SUPC_CR            (0x400E1A10U) /**< \brief (SUPC) Supply Controller Control Register */
@@ -46,5 +50,9 @@
 #define REG_SUPC_WUIR (*(RwReg*)0x400E1A20U) /**< \brief (SUPC) Supply Controller Wake Up Inputs Register */
 #define REG_SUPC_SR   (*(RoReg*)0x400E1A24U) /**< \brief (SUPC) Supply Controller Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_SUPC_INSTANCE_ */

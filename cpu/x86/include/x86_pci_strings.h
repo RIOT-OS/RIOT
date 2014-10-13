@@ -28,6 +28,10 @@
 #ifndef CPU__X86__PCI_NAMES__H__
 #define CPU__X86__PCI_NAMES__H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief        Get a string representation of the device class.
  * @param[out]   baseclass_name   Name of the base class. Supply NULL if you do not care.
@@ -47,6 +51,10 @@ const char *x86_pci_subclass_to_string(unsigned baseclass, unsigned subclass, un
  * This function is not thread safe.
  */
 const char *x86_pci_device_id_to_string(unsigned vendor_id, unsigned device_id, const char **vendor_name);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

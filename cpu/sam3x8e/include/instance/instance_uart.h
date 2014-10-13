@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_UART_INSTANCE_
 #define _SAM3XA_UART_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for UART peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_UART_CR            (0x400E0800U) /**< \brief (UART) Control Register */
@@ -72,5 +76,9 @@
 #define REG_UART_PTCR (*(WoReg*)0x400E0920U) /**< \brief (UART) Transfer Control Register */
 #define REG_UART_PTSR (*(RoReg*)0x400E0924U) /**< \brief (UART) Transfer Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_UART_INSTANCE_ */

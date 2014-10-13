@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_CAN0_INSTANCE_
 #define _SAM3XA_CAN0_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for CAN0 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_CAN0_MR               (0x400B4000U) /**< \brief (CAN0) Mode Register */
@@ -188,5 +192,9 @@
 #define REG_CAN0_MDH7    (*(RwReg*)0x400B42F8U) /**< \brief (CAN0) Mailbox Data High Register (MB = 7) */
 #define REG_CAN0_MCR7    (*(WoReg*)0x400B42FCU) /**< \brief (CAN0) Mailbox Control Register (MB = 7) */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_CAN0_INSTANCE_ */

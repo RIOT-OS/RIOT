@@ -11,6 +11,10 @@
 #include "rtc.h"
 #include "time.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @ingroup     cc430
  */
@@ -52,5 +56,8 @@ void rtc_set_alarm(struct tm *localti, rtc_alarm_mask_t mask);
  */
 void rtc_remove_alarm(void);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

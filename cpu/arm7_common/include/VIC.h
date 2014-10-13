@@ -9,7 +9,7 @@
 #define __ARM_COMMON_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**

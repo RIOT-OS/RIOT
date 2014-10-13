@@ -30,11 +30,19 @@
 #ifndef _SAM3XA_GPBR_INSTANCE_
 #define _SAM3XA_GPBR_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for GPBR peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_GPBR_GPBR            (0x400E1A90U) /**< \brief (GPBR) General Purpose Backup Register */
 #else
 #define REG_GPBR_GPBR   (*(RwReg*)0x400E1A90U) /**< \brief (GPBR) General Purpose Backup Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_GPBR_INSTANCE_ */

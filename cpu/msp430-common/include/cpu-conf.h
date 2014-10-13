@@ -9,6 +9,10 @@
 #ifndef CPUCONF_H_
 #define CPUCONF_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @name Kernel configuration
  * @{
@@ -35,5 +39,9 @@
                                                    overall MTU dependent */
 #endif
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CPUCONF_H_ */

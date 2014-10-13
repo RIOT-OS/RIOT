@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_CHIPID_INSTANCE_
 #define _SAM3XA_CHIPID_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for CHIPID peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_CHIPID_CIDR          (0x400E0940U) /**< \brief (CHIPID) Chip ID Register */
@@ -38,5 +42,9 @@
 #define REG_CHIPID_CIDR (*(RoReg*)0x400E0940U) /**< \brief (CHIPID) Chip ID Register */
 #define REG_CHIPID_EXID (*(RoReg*)0x400E0944U) /**< \brief (CHIPID) Chip ID Extension Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_CHIPID_INSTANCE_ */

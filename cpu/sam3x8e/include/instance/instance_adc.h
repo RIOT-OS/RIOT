@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_ADC_INSTANCE_
 #define _SAM3XA_ADC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for ADC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_ADC_CR               (0x400C0000U) /**< \brief (ADC) Control Register */
@@ -88,5 +92,9 @@
 #define REG_ADC_PTCR    (*(WoReg*)0x400C0120U) /**< \brief (ADC) Transfer Control Register */
 #define REG_ADC_PTSR    (*(RoReg*)0x400C0124U) /**< \brief (ADC) Transfer Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_ADC_INSTANCE_ */

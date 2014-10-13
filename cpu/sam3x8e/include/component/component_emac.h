@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_EMAC_COMPONENT_
 #define _SAM3XA_EMAC_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Ethernet MAC 10/100 */
 /* ============================================================================= */
@@ -332,5 +336,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_EMAC_COMPONENT_ */
