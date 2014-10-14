@@ -91,7 +91,6 @@
 #ifdef MODULE_NET_IF
 void auto_init_net_if(void)
 {
-    int iface;
     transceiver_type_t transceivers = 0;
 #ifdef MODULE_AT86RF231
     transceivers |= TRANSCEIVER_AT86RF231;
@@ -114,6 +113,7 @@ void auto_init_net_if(void)
     net_if_init();
 
     if (transceivers != 0) {
+        int iface;
 #if CPUID_ID_LEN && defined(MODULE_HASHES)
         uint8_t cpuid[CPUID_ID_LEN];
 
@@ -149,7 +149,7 @@ void auto_init_net_if(void)
 #endif /* DEBUG_ENABLED */
 
 #undef CONF_RADIO_ADDR
-        uint16_t hwaddr = HTONS((uint16_t)((hash_l + hash_h) % (1 << 16)));
+        uint16_t hwaddr = HTONS((uint16_t)((hash_l ^ hash_h) ^ ((hash_l ^ hash_h) >> 16)));
         net_if_set_hardware_address(iface, hwaddr);
         DEBUG("Auto init radio address on interface %d to 0x%04x\n", iface, hwaddr);
 #else /* CPUID_ID_LEN && defined(MODULE_HASHES) */
@@ -181,9 +181,6 @@ void auto_init_net_if(void)
         if (iface >= 0) {
             DEBUG("Auto init interface %d\n", iface);
         }
-    }
-    else {
-        iface = -1;
     }
 }
 #endif /* MODULE_NET_IF */
