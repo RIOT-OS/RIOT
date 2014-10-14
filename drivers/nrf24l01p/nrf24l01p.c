@@ -12,6 +12,9 @@
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @}
  */
+#include <string.h>
+#include <stdlib.h>
+
 #include "nrf24l01p.h"
 #include "nrf24l01p_settings.h"
 #include "periph/gpio.h"
@@ -19,7 +22,6 @@
 #include "hwtimer.h"
 #include "thread.h"
 #include "msg.h"
-#include "netdev/base.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -182,13 +184,12 @@ static int _type_pun_up_signed(void *value_out, size_t desired_len,
     }
 }
 
-
 int _nrf24l01p_init(netdev_t *dev)
 {
 
     int res = 0;
 
-    if ((res = nrf24l01p_init((nrf24l01p_t *)dev->more , SPI_PORT, CE_PIN, CS_PIN, IRQ_PIN)) < 0) {
+    if ((res = nrf24l01p_init_netdev(dev, SPI_PORT, CE_PIN, CS_PIN, IRQ_PIN)) < 0) {
 
         return -ENODEV;
     }
@@ -196,10 +197,12 @@ int _nrf24l01p_init(netdev_t *dev)
     return 0;
 }
 
-
 int _nrf24l01p_send_data(netdev_t *dev, void *dest, size_t dest_len, netdev_hlist_t *upper_layer_hdrs, void *data,
                          size_t data_len)
 {
+    netdev_hlist_t *ptr = upper_layer_hdrs;
+    uint8_t tx_buffer[data_len + netdev_get_hlist_len(upper_layer_hdrs)];
+    size_t tx_ptr = 0;
 
     int status = 0;
     int bytes_transferred = 0;
@@ -208,12 +211,24 @@ int _nrf24l01p_send_data(netdev_t *dev, void *dest, size_t dest_len, netdev_hlis
         return -ENODEV;
     }
 
+    /* append possible upper layer headers */
+    if (upper_layer_hdrs) {
+        do {
+            memcpy(&(tx_buffer[tx_ptr]), ptr->header, ptr->header_len);
+            tx_ptr += ptr->header_len;
+            netdev_hlist_advance(&ptr);
+        }
+        while (ptr != upper_layer_hdrs);
+    }
+
+    /* append data */
+    memcpy(&(tx_buffer[tx_ptr]), data, data_len);
+
     nrf24l01p_set_txmode((nrf24l01p_t *)dev->more);
 
-    while (bytes_transferred < data_len) {
-
+    while (bytes_transferred < sizeof(tx_buffer)) {
         nrf24l01p_flush_tx_fifo((nrf24l01p_t *)dev->more);
-        nrf24l01p_preload((nrf24l01p_t *)dev->more, ((char *)data + bytes_transferred), (unsigned int) NRF24L01P_MAX_DATA_LENGTH);
+        nrf24l01p_preload((nrf24l01p_t *)dev->more, ((char *)tx_buffer + bytes_transferred), (unsigned int) NRF24L01P_MAX_DATA_LENGTH);
         nrf24l01p_transmit((nrf24l01p_t *)dev->more);
 
         while (!(status & TX_DS)) {
@@ -228,13 +243,11 @@ int _nrf24l01p_send_data(netdev_t *dev, void *dest, size_t dest_len, netdev_hlis
     return 0;
 }
 
-
 char nrf24l01p_rx_buffer[NRFL01P_RX_BUF_SIZE];
 static netdev_rcv_data_cb_t recv_func = {NULL};
 
 int _nrf24l01p_add_rcv_data_cb(netdev_t *dev, netdev_rcv_data_cb_t cb)
 {
-
     if (dev != &nrf24l01p_netdev) {
         return -ENODEV;
     }
@@ -250,7 +263,6 @@ int _nrf24l01p_add_rcv_data_cb(netdev_t *dev, netdev_rcv_data_cb_t cb)
 
 int _nrf24l01p_rem_rcv_data_cb(netdev_t *dev, netdev_rcv_data_cb_t cb)
 {
-
     if (dev != &nrf24l01p_netdev) {
         return -ENODEV;
     }
@@ -262,23 +274,22 @@ int _nrf24l01p_rem_rcv_data_cb(netdev_t *dev, netdev_rcv_data_cb_t cb)
     return 0;
 }
 
-
-
 int _nrf24l01p_get_option(netdev_t *dev, netdev_opt_t opt, void *value, size_t *value_len)
 {
-
     netdev_nrf24l01p_addr_t *address_txrx = ((netdev_nrf24l01p_addr_t *) value);
-    uint64_t addr_64;
+    uint64_t tx_addr_64;
+    uint64_t rx_addr_64;
 
     if (dev->type != NETDEV_TYPE_BASE) {
         return -ENODEV;
     }
 
+    if (*value_len == 0) {
+        return -EOVERFLOW;
+    }
+
     switch (opt) {
         case NETDEV_OPT_CHANNEL:
-            if (*value_len == 0) {
-                return -EOVERFLOW;
-            }
 
             if (*value_len > sizeof(uint8_t)) {
                 *value_len = sizeof(uint8_t);
@@ -288,54 +299,58 @@ int _nrf24l01p_get_option(netdev_t *dev, netdev_opt_t opt, void *value, size_t *
             break;
 
         case NETDEV_OPT_ADDRESS:
-            if (*value_len < sizeof(netdev_nrf24l01p_addr_t)) {
-                return -EOVERFLOW;
+
+            if (*value_len != sizeof(uint32_t)) {
+                *value_len = sizeof(uint32_t);
             }
 
-            if (*value_len > sizeof(netdev_nrf24l01p_addr_t)) {
-                *value_len = sizeof(netdev_nrf24l01p_addr_t);
+            rx_addr_64 = nrf24l01p_get_rx_address_long((nrf24l01p_t *)dev->more, NRF24L01P_PIPE0);
+            tx_addr_64 = nrf24l01p_get_tx_address_long((nrf24l01p_t *)dev->more);
+
+            if (rx_addr_64 == tx_addr_64) {
+                *((uint32_t *)value) = (uint32_t)rx_addr_64;
             }
-
-            switch (address_txrx->type) {
-
-
-                case NETDEV_NRF24L01P_ADDR_TYPE_RX:
-
-                    if (!((address_txrx->pipe)  < NRF24L01P_PIPE0) || ((address_txrx->pipe) > NRF24L01P_PIPE5)) {
-
-                        addr_64 = nrf24l01p_get_rx_address_long((nrf24l01p_t *)dev->more, address_txrx->pipe);
-                        address_txrx->addr = addr_64;
-                        *((netdev_nrf24l01p_addr_t *)value) = *((netdev_nrf24l01p_addr_t *)address_txrx);
-                    }
-
-                    else {
-                        return -1;
-                    }
-
-                    break;
-
-                case NETDEV_NRF24L01P_ADDR_TYPE_TX:
-                    addr_64 = nrf24l01p_get_tx_address_long((nrf24l01p_t *)dev->more);
-                    address_txrx->addr = addr_64;
-                    *((netdev_nrf24l01p_addr_t *)value) = *((netdev_nrf24l01p_addr_t *)address_txrx);
-                    break;
-
-                default:
-                    return -ENOTSUP;
+            else {
+                return -1;
             }
 
             break;
 
-        case NETDEV_OPT_NID:
-            if (*value_len < sizeof(int)) {
+        case NETDEV_OPT_ADDRESS_TX_PREFIX:
+
+            if (*value_len < sizeof(netdev_nrf24l01p_addr_t)) {
                 return -EOVERFLOW;
             }
 
-            if (*value_len > sizeof(int)) {
-                *value_len = sizeof(int);
+            if (!((address_txrx->pipe)  < NRF24L01P_PIPE0) || ((address_txrx->pipe) > NRF24L01P_PIPE5)) {
+
+                tx_addr_64 = nrf24l01p_get_tx_address_long((nrf24l01p_t *)dev->more);
+                address_txrx->addr = tx_addr_64;
+                *((netdev_nrf24l01p_addr_t *)value) = *((netdev_nrf24l01p_addr_t *)address_txrx);
             }
 
-            nrf24l01p_get_id((nrf24l01p_t *)dev->more, value);
+            else {
+                return -1;
+            }
+
+            break;
+
+        case NETDEV_OPT_ADDRESS_RX_PREFIX:
+
+            if (*value_len < sizeof(netdev_nrf24l01p_addr_t)) {
+                return -EOVERFLOW;
+            }
+
+            if (!((address_txrx->pipe)  < NRF24L01P_PIPE0) || ((address_txrx->pipe) > NRF24L01P_PIPE5)) {
+
+                rx_addr_64 = nrf24l01p_get_rx_address_long((nrf24l01p_t *)dev->more, address_txrx->pipe);
+                address_txrx->addr = rx_addr_64;
+                *((netdev_nrf24l01p_addr_t *)value) = *((netdev_nrf24l01p_addr_t *)address_txrx);
+            }
+            else {
+                return -1;
+            }
+
             break;
 
         case NETDEV_OPT_TX_POWER:
@@ -371,7 +386,7 @@ int _nrf24l01p_get_option(netdev_t *dev, netdev_opt_t opt, void *value, size_t *
                 *value_len = sizeof(netdev_proto_t);
             }
 
-            *((netdev_proto_t *)value) = NETDEV_PROTO_PROPRIETARY;
+            *((netdev_proto_t *)value) = NETDEV_PROTO_NRF24L01X;
             break;
 
         default:
@@ -381,13 +396,13 @@ int _nrf24l01p_get_option(netdev_t *dev, netdev_opt_t opt, void *value, size_t *
     return 0;
 }
 
-
-
 int _nrf24l01p_set_option(netdev_t *dev, netdev_opt_t opt, void *value, size_t value_len)
 {
-
     netdev_nrf24l01p_addr_t *address_txrx = ((netdev_nrf24l01p_addr_t *) value);
     uint8_t set_value[sizeof(uint64_t)];
+    char tx_addr[INITIAL_ADDRESS_WIDTH];
+    char rx_addr[INITIAL_ADDRESS_WIDTH];
+    int status;
     int res = 0;
 
 
@@ -397,54 +412,72 @@ int _nrf24l01p_set_option(netdev_t *dev, netdev_opt_t opt, void *value, size_t v
 
     switch (opt) {
         case NETDEV_OPT_CHANNEL:
+
             if ((res = _type_pun_up_unsigned(set_value, sizeof(uint8_t),
                                              value, value_len)) == 0) {
-
                 nrf24l01p_set_channel((nrf24l01p_t *)dev->more, *((uint8_t *)set_value));
             }
 
             break;
 
         case NETDEV_OPT_ADDRESS:
-            switch (address_txrx->type) {
-                case NETDEV_NRF24L01P_ADDR_TYPE_RX:
 
-                    if (address_txrx->addr == 0) {
-                        res = nrf24l01p_disable_pipe((nrf24l01p_t *)dev->more, address_txrx->pipe);
-                    }
+            if ((res = _type_pun_up_unsigned(set_value, sizeof(uint32_t),
+                                             value, value_len)) == 0) {
 
-                    else if (((address_txrx->addr)  < 0) || ((address_txrx->addr) >= 0xFFFFFFFFFF)) {
-                        return -1;
-                    }
+                tx_addr[0] = TX_ADDR_PRE;
+                rx_addr[0] = RX_ADDR_PRE;
 
-                    else {
-                        res = nrf24l01p_set_rx_address_long((nrf24l01p_t *)dev->more, address_txrx->pipe, address_txrx->addr, INITIAL_ADDRESS_WIDTH);
-                    }
+                for (int i = 1; i < INITIAL_ADDRESS_WIDTH; i++) {
+                    tx_addr[i] = (uint8_t)(*((uint32_t *)value) >> (((INITIAL_ADDRESS_WIDTH - 1) - i) * 8));
+                    rx_addr[i] = tx_addr[i];
+                }
 
-                    break;
+                /* Set TX Address */
+                status = nrf24l01p_set_tx_address((nrf24l01p_t *)dev->more, tx_addr, INITIAL_ADDRESS_WIDTH);
 
-                case NETDEV_NRF24L01P_ADDR_TYPE_TX:
+                if (status < 0) {
+                    return status;
+                }
 
-                    if (!(address_txrx->addr <= 0) || (address_txrx->addr >= 0xFFFFFFFFFF)) {
-                        res = nrf24l01p_set_tx_address_long((nrf24l01p_t *)dev->more, address_txrx->addr, INITIAL_ADDRESS_WIDTH);
-                    }
-                    else {
+                /* Set RX Adress */
+                status = nrf24l01p_set_rx_address((nrf24l01p_t *)dev->more, NRF24L01P_PIPE0, rx_addr, INITIAL_ADDRESS_WIDTH);
 
-                        return -1;
-                    }
-
-                    break;
-
-                default:
-                    return -ENOTSUP;
+                if (status < 0) {
+                    return status;
+                }
             }
 
             break;
 
-        case NETDEV_OPT_NID:
-            if ((res = _type_pun_up_unsigned(set_value, sizeof(int),
-                                             value, value_len)) == 0) {
-                nrf24l01p_register((nrf24l01p_t *)dev->more, (unsigned int *)set_value);
+        case NETDEV_OPT_ADDRESS_TX_PREFIX:
+
+            if (!(address_txrx->addr <= 0) || (address_txrx->addr >= 0xFFFFFFFFFF)) {
+                res = nrf24l01p_set_tx_address_long((nrf24l01p_t *)dev->more, address_txrx->addr, INITIAL_ADDRESS_WIDTH);
+
+                if (!(res < 0)) {
+                    res = 0;
+                }
+            }
+            else {
+
+                return -1;
+            }
+
+            break;
+
+        case NETDEV_OPT_ADDRESS_RX_PREFIX:
+
+            if (address_txrx->addr == 0) {
+                res = nrf24l01p_disable_pipe((nrf24l01p_t *)dev->more, address_txrx->pipe);
+            }
+            else if (((address_txrx->addr)  < 0) || ((address_txrx->addr) >= 0xFFFFFFFFFF)) {
+
+                return -1;
+            }
+
+            else {
+                res = nrf24l01p_set_rx_address_long((nrf24l01p_t *)dev->more, address_txrx->pipe, address_txrx->addr, INITIAL_ADDRESS_WIDTH);
             }
 
             break;
@@ -470,7 +503,6 @@ int _nrf24l01p_set_option(netdev_t *dev, netdev_opt_t opt, void *value, size_t v
 
 int _nrf24l01p_get_state(netdev_t *dev, netdev_state_t *state)
 {
-
     char read_conf;
     int read_ce_pin;
 
@@ -496,7 +528,6 @@ int _nrf24l01p_get_state(netdev_t *dev, netdev_state_t *state)
 
 int _nrf24l01p_set_state(netdev_t *dev, netdev_state_t state)
 {
-
     if (dev != &nrf24l01p_netdev) {
         return -ENODEV;
     }
@@ -531,8 +562,6 @@ void _nrf24l01p_event(netdev_t *dev, uint32_t event_type)
 
 /************************************ lowlevel functions ************************************/
 
-
-
 int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer)
 {
     int status;
@@ -565,7 +594,7 @@ int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write)
 }
 
 
-int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq)
+static int nrf24l01p_init_handler(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq)
 {
     int status;
     char INITIAL_TX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
@@ -583,10 +612,6 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
     /* Init CS pin */
     gpio_init_out(dev->cs, GPIO_NOPULL);
     gpio_set(dev->cs);
-
-    /* Init IRQ pin */
-    gpio_init_int(dev->irq, GPIO_PULLUP, GPIO_FALLING, nrf24l01p_rx_cb, dev);
-
 
     /* Init SPI */
     spi_poweron(dev->spi);
@@ -692,6 +717,35 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
     return nrf24l01p_on(dev);
 }
 
+int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq)
+{
+    int res;
+    res = nrf24l01p_init_handler(dev, spi, ce, cs, irq);
+
+    if (res < 0) {
+        return -1;
+    }
+
+    /* Init IRQ pin */
+    return gpio_init_int(dev->irq, GPIO_PULLUP, GPIO_FALLING, nrf24l01p_rx_cb, dev);
+}
+
+#ifdef MODULE_NETDEV_BASE
+int nrf24l01p_init_netdev(netdev_t *net_dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq)
+{
+    int res;
+    res = nrf24l01p_init((nrf24l01p_t *)(net_dev->more), spi, ce,  cs, irq);
+
+    if (res < 0) {
+        return -1;
+    }
+
+    /* Init IRQ pin */
+    return gpio_init_int(((nrf24l01p_t *)(net_dev->more))->irq, GPIO_PULLUP, GPIO_FALLING, nrf24l01p_rx_cb, net_dev);
+}
+#endif
+
+
 int nrf24l01p_on(nrf24l01p_t *dev)
 {
     char read;
@@ -721,7 +775,7 @@ int nrf24l01p_off(nrf24l01p_t *dev)
     hwtimer_spin(DELAY_CS_TOGGLE_TICKS);
     gpio_set(dev->cs);
 
-    hwtimer_wait(DELAY_CHANGE_PWR_MODE_US);
+    hwtimer_spin(DELAY_CHANGE_TXRX_US);
 
     return status;
 }
@@ -883,8 +937,6 @@ int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char
     return nrf24l01p_write_reg(dev, pipe_pw_address, width);
 }
 
-
-
 int nrf24l01p_set_tx_address(nrf24l01p_t *dev, char *saddr, unsigned int length)
 {
     int status;
@@ -954,7 +1006,6 @@ uint64_t nrf24l01p_get_tx_address_long(nrf24l01p_t *dev)
     return saddr_64;
 }
 
-
 int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *saddr, unsigned int length)
 {
     int status;
@@ -1019,7 +1070,6 @@ int nrf24l01p_set_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, ui
     return nrf24l01p_set_rx_address(dev, pipe, buf, length);
 }
 
-
 uint64_t nrf24l01p_get_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 {
     int status;
@@ -1075,7 +1125,6 @@ uint64_t nrf24l01p_get_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pip
 
     return saddr_64;
 }
-
 
 int nrf24l01p_set_datarate(nrf24l01p_t *dev, nrf24l01p_dr_t dr)
 {
@@ -1173,15 +1222,16 @@ int nrf24l01p_get_power(nrf24l01p_t *dev)
     return pwr;
 }
 
-
 int nrf24l01p_set_txmode(nrf24l01p_t *dev)
 {
     char conf;
     int status;
 
+    nrf24l01p_stop(dev);
+
     nrf24l01p_mask_interrupt(dev, (MASK_RX_DR | MASK_TX_DS | MASK_MAX_RT));
 
-    nrf24l01p_stop(dev);
+    nrf24l01p_flush_tx_fifo(dev);
 
     nrf24l01p_read_reg(dev, REG_CONFIG, &conf);
     conf &= ~(PRIM_RX);
@@ -1201,13 +1251,13 @@ int nrf24l01p_set_rxmode(nrf24l01p_t *dev)
     nrf24l01p_unmask_interrupt(dev, MASK_RX_DR);
     nrf24l01p_mask_interrupt(dev, (MASK_TX_DS | MASK_MAX_RT));
 
+    nrf24l01p_flush_rx_fifo(dev);
+
     nrf24l01p_read_reg(dev, REG_CONFIG, &conf);
     conf |= PRIM_RX;
-
+    status = nrf24l01p_write_reg(dev, REG_CONFIG, conf);
 
     nrf24l01p_start(dev);
-
-    status = nrf24l01p_write_reg(dev, REG_CONFIG, conf);
 
     hwtimer_wait(DELAY_CHANGE_TXRX_US);
 
@@ -1258,8 +1308,6 @@ int nrf24l01p_disable_pipe(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe)
 
     return nrf24l01p_write_reg(dev, REG_EN_RXADDR, pipe_conf);
 }
-
-
 
 int nrf24l01p_enable_crc(nrf24l01p_t *dev, nrf24l01p_crc_t crc)
 {
@@ -1336,7 +1384,6 @@ int nrf24l01p_disable_all_auto_ack(nrf24l01p_t *dev)
     return nrf24l01p_write_reg(dev, REG_EN_AA, 0x00);
 }
 
-
 int nrf24l01p_flush_tx_fifo(nrf24l01p_t *dev)
 {
     int status;
@@ -1370,38 +1417,41 @@ int nrf24l01p_flush_rx_fifo(nrf24l01p_t *dev)
     return status;
 }
 
-
 void nrf24l01p_rx_cb(void *arg)
 {
     DEBUG("In HW cb\n");
-
-    nrf24l01p_t *dev = (nrf24l01p_t *)arg;
-
-    /* clear interrupt */
-    nrf24l01p_reset_all_interrupts(dev);
-
-    /* informs thread about available rx data*/
-    if (dev->listener != KERNEL_PID_UNDEF) {
-        msg_t m;
-        m.type = RCV_PKT_NRF24L01P;
-        m.content.ptr = (char *)dev;
-        /* transmit more things here ? */
-        msg_send_int(&m, dev->listener);
-    }
+    nrf24l01p_t *dev_native = (recv_func) ? ((nrf24l01p_t *)(((netdev_t *)arg)->more)) : (nrf24l01p_t *)arg;
 
     /* callback if used as netdev */
     if (recv_func != NULL) {
         char rx_buf[NRF24L01P_MAX_DATA_LENGTH];
+
+        netdev_t *dev = (netdev_t *)arg;
+        /* clear interrupt */
+        nrf24l01p_reset_all_interrupts(dev_native);
         /* CE low */
-        nrf24l01p_stop(dev);
+        nrf24l01p_stop(dev_native);
         /* read payload */
-        nrf24l01p_read_payload(dev, rx_buf, NRF24L01P_MAX_DATA_LENGTH);
+        nrf24l01p_read_payload(dev_native, rx_buf, NRF24L01P_MAX_DATA_LENGTH);
         /* flush rx fifo */
-        nrf24l01p_flush_rx_fifo(dev);
+        nrf24l01p_flush_rx_fifo(dev_native);
         /* CE high */
-        nrf24l01p_start(dev);
+        nrf24l01p_start(dev_native);
         /* callback */
-        recv_func(0, 0, 0, 0, 0, (void *) rx_buf, (size_t) NRF24L01P_MAX_DATA_LENGTH);
+        recv_func(dev, 0, 0, 0, 0, (void *) rx_buf, (size_t) NRF24L01P_MAX_DATA_LENGTH);
+    }
+    else {
+        /* clear interrupt */
+        nrf24l01p_reset_all_interrupts(dev_native);
+
+        /* informs thread about available rx data*/
+        if (dev_native->listener != KERNEL_PID_UNDEF) {
+            msg_t m;
+            m.type = RCV_PKT_NRF24L01P;
+            m.content.ptr = (char *)dev_native;
+            /* transmit more things here ? */
+            msg_send_int(&m, dev_native->listener);
+        }
     }
 }
 

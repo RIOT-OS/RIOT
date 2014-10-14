@@ -46,4 +46,12 @@ extern "C" {
 
 #endif /* MODULE_NATIVENET */
 
+#ifdef MODULE_NRF24L01P
+#include "nrf24l01p.h"
+
+#ifndef NETDEV_DEFAULT
+#define NETDEV_DEFAULT   ((netdev_t *)(&nrf24l01p_netdev))
+#endif /* NETDEV_DEFAULT */
+#endif /* MODULE_NRF24L01P */
+
 #endif /* __NETDEV_DEFAULT_H_ */

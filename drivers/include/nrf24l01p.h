@@ -26,8 +26,10 @@
 #include <stdio.h>
 #include "periph/gpio.h"
 #include "periph/spi.h"
-#include "netdev/base.h" 
 
+#ifdef MODULE_NETDEV_BASE
+#include "netdev/base.h"
+#endif
 
 
 /**
@@ -120,20 +122,11 @@ typedef enum {
     RCV_PKT_NRF24L01P = 0,  /**< transceiver received data */
 } nrf24l01p_rx_event_t ;
 
-/**
- * @brief Switch between TX and RX address for set/get options
- */
-typedef enum {
-    NETDEV_NRF24L01P_ADDR_TYPE_RX = 0,  /**< selects RX address register */
-    NETDEV_NRF24L01P_ADDR_TYPE_TX,      /**< selects TX address register */
-} netdev_nrf24l01p_addr_type_t;
-
 
 /**
  * @brief Structure which helps to setup TX and TR addresses
  */
 typedef struct {
-    netdev_nrf24l01p_addr_type_t type;  /**< selects between RX or TX address */
     nrf24l01p_rx_pipe_t pipe;           /**< selects datapipe for RX address */
     uint64_t addr;                      /**< contains the actual address */
 } netdev_nrf24l01p_addr_t;
@@ -142,7 +135,7 @@ typedef struct {
 /**
 * @brief Read one register of the nrf24l01+ transceiver.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 * @param[in] reg    Register address to read from.
 * @param[in] answer Byte to read.
 *
@@ -154,7 +147,7 @@ int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer);
 /**
 * @brief Write one register to the nrf24l01+ transceiver.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 * @param[in] reg    Register address to write to.
 * @param[in] answer Byte to write.
 *
@@ -164,12 +157,12 @@ int nrf24l01p_read_reg(nrf24l01p_t *dev, char reg, char *answer);
 int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write);
 
 /**
-* @brief Initialize the nrf24l01+ transceiver.
+* @brief Initialize the nrf24l01+ transceiver in lowlevel mode.
 *
 * @ note
-* This function initializes the transceiver so that it is ready to use. 
+* This function initializes the transceiver so that it is ready to use.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 * @param[in] spi    SPI device to use.
 * @param[in] ce     GPIO pin to use for chip enable.
 * @param[in] cs     GPIO pin to use for chip select.
@@ -181,9 +174,32 @@ int nrf24l01p_write_reg(nrf24l01p_t *dev, char reg, char write);
 int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t csn, gpio_t irq);
 
 /**
+* @brief Initialize the nrf24l01+ transceiver in netdev.
+*
+* @ note
+* This function initializes the transceiver so that it is ready to use.
+*
+* @ note
+* This function initializes the transceiver in case the netdev interface is used.
+* For a simple lowlevel usage, this function is not needed.
+*
+* @param[in] net_dev  Network (transceiver) device to use.
+* @param[in] spi      SPI device to use.
+* @param[in] ce       GPIO pin to use for chip enable.
+* @param[in] cs       GPIO pin to use for chip select.
+* @param[in] irq      GPIO pin to use for interrupt request.
+*
+* @return             1 on success.
+* @return             -1 on error.
+*/
+#ifdef MODULE_NETDEV_BASE
+int nrf24l01p_init_netdev(netdev_t *net_dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq);
+#endif
+
+/**
 * @brief Power on the nrf24l01+ transceiver.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 *
 * @return           1 on success.
 * @return           -1 on error.
@@ -193,7 +209,7 @@ int nrf24l01p_on(nrf24l01p_t *dev);
 /**
 * @brief Power off the nrf24l01+ transceiver.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 *
 * @return           1 on success.
 * @return           -1 on error.
@@ -203,7 +219,7 @@ int nrf24l01p_off(nrf24l01p_t *dev);
 /**
 * @brief Transmit payload laying in TX FIFO of the nrf24l01+ transceiver.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 *
 */
 void nrf24l01p_transmit(nrf24l01p_t *dev);
@@ -211,7 +227,7 @@ void nrf24l01p_transmit(nrf24l01p_t *dev);
 /**
 * @brief Read payload from RX FIFO of the nrf24l01+ transceiver.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 * @param[in] answer Buffer to receive bytes to.
 * @param[in] size   Number of bytes to transfer. For nrf24l01+ in general 32.
 *
@@ -223,7 +239,7 @@ int nrf24l01p_read_payload(nrf24l01p_t *dev, char *answer, unsigned int size);
 /**
 * @brief Register a given ID to the nrf24l01+ transceiver.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 * @param[in] pid    ID to register.
 *
 */
@@ -232,7 +248,7 @@ void nrf24l01p_register(nrf24l01p_t *dev, unsigned int *pid);
 /**
 * @brief Unregister the nrf24l01+ transceiver from his ID.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 * @param[in] pid    Actual ID to unregister.
 *
 * @return           0 on success.
@@ -243,7 +259,7 @@ int nrf24l01p_unregister(nrf24l01p_t *dev, unsigned int pid);
 /**
 * @brief Get ID from the nrf24l01p transceiver.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 * @param[in] pid    T.ransceiver ID
 *
 */
@@ -268,7 +284,7 @@ void nrf24l01p_stop(nrf24l01p_t *dev);
 /**
 * @brief Preload TX FIFO with payload to transmit.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 * @param[in] data   Buffer to preload.
 * @param[in] size   Number of bytes in buffer. For nrf24l01+ e.g. 32
 *
@@ -280,11 +296,11 @@ int nrf24l01p_preload(nrf24l01p_t *dev, char *data, unsigned int size);
 /**
 * @brief Set the RF channel for the nrf24l01+ transceiver.
 *
-* @note 
-* To ensure non-overlapping channels in 2Mbps mode, don't use directly 
+* @note
+* To ensure non-overlapping channels in 2Mbps mode, don't use directly
 * neighbouring channels in this mode.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 * @param[in] chan   Buffer to preload.
 *
 * @return           1 on success.
@@ -295,7 +311,7 @@ int nrf24l01p_set_channel(nrf24l01p_t *dev, uint8_t chan);
 /**
 * @brief Set the address width for the nrf24l01+ transceiver.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 * @param[in] aw     Address width (type nrf24l01p_aw_t).
 *
 * @return           1 on success.
@@ -307,10 +323,10 @@ int nrf24l01p_set_address_width(nrf24l01p_t *dev, nrf24l01p_aw_t aw);
 * @brief Set the RX payload width for the nrf24l01+ transceiver
 *
 * @ note
-* This function sets the payload width for one packet. If the maximum of 32 bytes is 
+* This function sets the payload width for one packet. If the maximum of 32 bytes is
 * exeeded, this value is set to 32.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 * @param[in] pipe   RX pipe to set the payload width.
 * @param[in] width  Numer of bytes per packet in RX payload.
 *
@@ -322,12 +338,12 @@ int nrf24l01p_set_payload_width(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char
 /**
 * @brief Set the TX address for the nrf24l01+ transceiver (byte array).
 *
-* @note 
-* You can either use this function and give it a pointer to a byte array which 
-* holds the address to set, or use "nrf24l01p_set_tx_address_long" which requires 
+* @note
+* You can either use this function and give it a pointer to a byte array which
+* holds the address to set, or use "nrf24l01p_set_tx_address_long" which requires
 * a uint64_t which holds the address in the LSBs.
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 * @param[in] saddr  Byte array which holds the TX address.
 * @param[in] length Number of bytes in address array.
 *
@@ -339,7 +355,7 @@ int nrf24l01p_set_tx_address(nrf24l01p_t *dev, char *saddr, unsigned int length)
 /**
 * @brief Set the TX address for the nrf24l01+ transceiver (long int).
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 * @param[in] saddr  Long integer which holds the TX address in LSBs.
 * @param[in] length Number of relevant bytes in uint64_t.
 *
@@ -351,13 +367,13 @@ int nrf24l01p_set_tx_address_long(nrf24l01p_t *dev, uint64_t saddr, unsigned int
 /**
 * @brief Set the RX address for the nrf24l01+ transceiver (byte array).
 *
-* @note 
-* You can either use this function and give it a pointer to a byte array which 
-* holds the address to set, or use "nrf24l01p_set_rx_address_long" which requires 
+* @note
+* You can either use this function and give it a pointer to a byte array which
+* holds the address to set, or use "nrf24l01p_set_rx_address_long" which requires
 * a uint64_t which holds the address in the LSBs.
 *
 * @param[in] dev    Transceiver device to use.
-* @param[in] pipe   RX pipe to set the address.  
+* @param[in] pipe   RX pipe to set the address.
 * @param[in] saddr  Byte array which holds the RX address.
 * @param[in] length Number of bytes in address array.
 *
@@ -369,8 +385,8 @@ int nrf24l01p_set_rx_address(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, char *s
 /**
 * @brief Set the RX address for the nrf24l01+ transceiver (long int).
 *
-* @param[in] dev    Transceiver device to use. 
-* @param[in] pipe   RX pipe to set the address. 
+* @param[in] dev    Transceiver device to use.
+* @param[in] pipe   RX pipe to set the address.
 * @param[in] saddr  Long integer which holds the RX address in LSBs.
 * @param[in] length Number of relevant bytes in uint64_t.
 *
@@ -382,30 +398,30 @@ int nrf24l01p_set_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, ui
 /**
 * @brief Get the TX address for the nrf24l01+ transceiver (long int).
 *
-* @param[in] dev    Transceiver device to use. 
+* @param[in] dev    Transceiver device to use.
 *
 * @return           TX address of the nrf24l01+ transceiver.
 */
-uint64_t nrf24l01p_get_tx_address_long(nrf24l01p_t *dev); 
+uint64_t nrf24l01p_get_tx_address_long(nrf24l01p_t *dev);
 
 /**
 * @brief Get the RX address for the nrf24l01+ transceiver (long int).
 *
-* @param[in] dev    Transceiver device to use. 
-* @param[in] pipe   RX pipe to get the address from. 
+* @param[in] dev    Transceiver device to use.
+* @param[in] pipe   RX pipe to get the address from.
 *
 * @return           RX address of the nrf24l01+ transceiver.
 */
-uint64_t nrf24l01p_get_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe); 
+uint64_t nrf24l01p_get_rx_address_long(nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe);
 
 /**
 * @brief Get the TX address for the nrf24l01+ transceiver (long int).
 *
-* @note 
+* @note
 * If you chose 2Mbps you should not allocate directly neighboring RF channels.
 *
-* @param[in] dev    Transceiver device to use. 
-* @param[in] dr     Datarate (of type nrf24l01p_dr_t). 
+* @param[in] dev    Transceiver device to use.
+* @param[in] dr     Datarate (of type nrf24l01p_dr_t).
 *
 * @return           1 on success.
 * @return           -1 on error.
@@ -424,16 +440,16 @@ int nrf24l01p_get_status(nrf24l01p_t *dev);
 /**
 * @brief Set the transmit power for the nrf24l01+ transceiver device.
 *
-* @note 
+* @note
 * This function rounds the input values to the nearest possible setting.
 *
-* @param[in] dev    Transceiver device to use. 
-* @param[in] pwr    TX power for the nrf24l01p transceiver. 
+* @param[in] dev    Transceiver device to use.
+* @param[in] pwr    TX power for the nrf24l01p transceiver.
 *
 * @return           1 on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_power(nrf24l01p_t *dev, int *pwr); 
+int nrf24l01p_set_power(nrf24l01p_t *dev, int *pwr);
 
 /**
 * @brief Get the transmit power for the nrf24l01+ transceiver device.
@@ -478,7 +494,7 @@ int nrf24l01p_reset_all_interrupts(nrf24l01p_t *dev);
 * @brief Mask one interrupt on the nrf24l01+ transceiver.
 *
 * @note
-* There are three interrupts on the nrf24l01+ which can be masked: 
+* There are three interrupts on the nrf24l01+ which can be masked:
 * "MASK_RX_DR", "MASK_TX_DS" and "MASK_MAX_RT". Theay are defined
 * in "include/nrf24l01p_settings.h".
 *
@@ -494,7 +510,7 @@ int nrf24l01p_mask_interrupt(nrf24l01p_t *dev, char intr);
 * @brief Unmask one interrupt on the nrf24l01+ transceiver.
 *
 * @note
-* There are three interrupts on the nrf24l01+ which can be unmasked: 
+* There are three interrupts on the nrf24l01+ which can be unmasked:
 * "MASK_RX_DR", "MASK_TX_DS" and "MASK_MAX_RT". Theay are defined
 * in "include/nrf24l01p_settings.h".
 *
@@ -543,12 +559,12 @@ int nrf24l01p_enable_crc(nrf24l01p_t *dev, nrf24l01p_crc_t crc);
 * @brief Setup and enable automatic ACK and retransmission on the nrf24l01+ transceiver.
 *
 * @note
-* This function enables automatic acknowledgement for a given RX data pipe and also sets up the 
+* This function enables automatic acknowledgement for a given RX data pipe and also sets up the
 * mautomatic retransmission behavior.
 *
 * @param[in] dev    Transceiver device to use.
 * @param[in] pipe   RX pipe to setup auto ack.
-* @param[in] delay_retrans    Automatic retransmission delay 
+* @param[in] delay_retrans    Automatic retransmission delay
                               (type nrf24l01p_retransmit_delay_t)
 * @param[in] count_retrans    Auto retransmit count.
 *
@@ -588,7 +604,7 @@ int nrf24l01p_flush_tx_fifo(nrf24l01p_t *dev);
 int nrf24l01p_flush_rx_fifo(nrf24l01p_t *dev);
 
 /**
-* @brief Callback that is called when interrupt occurs on interrupt 
+* @brief Callback that is called when interrupt occurs on interrupt
 * pin from the nrf24l01+ transceiver.
 *
 * @param[in] arg    Used to pass transceiver device "dev".

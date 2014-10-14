@@ -19,11 +19,20 @@
  * @}
  */
 
-#ifndef __REGS_H
-#define __REGS_H
+#ifndef __NRF24L01P_SETTINGS_H
+#define __NRF24L01P_SETTINGS_H
 
-#define INITIAL_ADDRESS_WIDTH		5
-#define NRF24L01P_MAX_DATA_LENGTH	32
+
+#define SPI_PORT  SPI_0
+#define CE_PIN    GPIO_8
+#define CS_PIN    GPIO_7
+#define IRQ_PIN   GPIO_6
+
+#define TX_ADDR_PRE                 0xe9
+#define RX_ADDR_PRE                 0xe9
+
+#define INITIAL_ADDRESS_WIDTH       5
+#define NRF24L01P_MAX_DATA_LENGTH   32
 #define INITIAL_RF_CHANNEL          5
 
 #define NRFL01P_RX_BUF_SIZE         4
@@ -34,7 +43,7 @@
 #define DELAY_CHANGE_PWR_MODE_US            HWTIMER_TICKS(1500)
 #define DELAY_CHANGE_TXRX_US                HWTIMER_TICKS(130)
 #define DELAY_CE_START_US                   HWTIMER_TICKS(5)
-#define DELAY_AFTER_TX_PACKET				HWTIMER_TICKS(1500)
+#define DELAY_AFTER_TX_PACKET               HWTIMER_TICKS(1500)
 
 
 #define CMD_R_REGISTER          0x00
@@ -89,12 +98,12 @@
 #define PRIM_RX      0x01
 
 /* Bits in STATUS register */
-#define RX_DR       	0x40
-#define TX_DS       	0x20
-#define MAX_RT      	0x10
-#define RX_P_NO			0x0e
-#define TX_FULL			0x01
-#define ALL_INT_MASK	0x70
+#define RX_DR           0x40
+#define TX_DS           0x20
+#define MAX_RT          0x10
+#define RX_P_NO         0x0e
+#define TX_FULL         0x01
+#define ALL_INT_MASK    0x70
 
 #define RF_SETUP_CONT_WAVE      (1 << 7)
 #define RF_SETUP_RF_DR_LOW      (1 << 5)
@@ -116,4 +125,4 @@
 #define FEATURE_EN_DYN_ACK      (1 << 0)
 
 
-#endif /* __REGS_H */
+#endif /* __NRF24L01P_SETTINGS_H */
