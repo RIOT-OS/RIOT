@@ -282,6 +282,7 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
             if (_rpl_process_pid != KERNEL_PID_UNDEF) {
                 msg_t m_send;
                 m_send.content.ptr = (char *) ipv6_buf;
+                m_send.type = ((icmpv6_hdr_t *)(m_send.content.ptr + IPV6_HDR_LEN))->code;
                 msg_send(&m_send, _rpl_process_pid);
             }
             else {
