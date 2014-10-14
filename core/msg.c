@@ -61,6 +61,12 @@ int msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
         return msg_send_to_self(m);
     }
 
+#if DEVELHELP
+    if (!pid_is_valid(target_pid)) {
+        DEBUG("msg_send(): target_pid is invalid, continuing anyways\n");
+    }
+#endif /* DEVELHELP */
+
     dINT();
 
     tcb_t *target = (tcb_t*) sched_threads[target_pid];
@@ -143,6 +149,12 @@ int msg_send_to_self(msg_t *m)
 
 int msg_send_int(msg_t *m, kernel_pid_t target_pid)
 {
+#if DEVELHELP
+    if (!pid_is_valid(target_pid)) {
+        DEBUG("msg_send(): target_pid is invalid, continuing anyways\n");
+    }
+#endif /* DEVELHELP */
+
     tcb_t *target = (tcb_t *) sched_threads[target_pid];
 
     if (target == NULL) {
