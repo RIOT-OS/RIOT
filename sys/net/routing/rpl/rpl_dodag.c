@@ -34,6 +34,8 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 rpl_instance_t instances[RPL_MAX_INSTANCES];
 rpl_dodag_t dodags[RPL_MAX_DODAGS];
 rpl_parent_t parents[RPL_MAX_PARENTS];
+char dao_delay_over_buf[RPL_MAX_DODAGS][DAO_DELAY_STACKSIZE];
+char trickle_buf[RPL_MAX_DODAGS][TRICKLE_INTERVAL_STACKSIZE];
 
 void rpl_instances_init(void)
 {
@@ -91,14 +93,22 @@ rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid)
 
     rpl_dodag_t *dodag;
     rpl_dodag_t *end;
+    char *my_dao_delay_over_buf;
+    char *my_trickle_buf;
 
-    for (dodag = &dodags[0], end = dodag + RPL_MAX_DODAGS; dodag < end; dodag++) {
+    for (dodag = &dodags[0], end = dodag + RPL_MAX_DODAGS,
+            my_dao_delay_over_buf = dao_delay_over_buf[0],
+            my_trickle_buf = trickle_buf[0];
+            dodag < end;
+            dodag++, my_dao_delay_over_buf++, my_trickle_buf++) {
         if (dodag->used == 0) {
             memset(dodag, 0, sizeof(*dodag));
             dodag->instance = inst;
             dodag->my_rank = INFINITE_RANK;
             dodag->used = 1;
             memcpy(&dodag->dodag_id, dodagid, sizeof(*dodagid));
+            dodag->dao_delay_over_buf = my_dao_delay_over_buf;
+            dodag->trickle.thread_buf = my_trickle_buf;
             return dodag;
         }
     }
@@ -137,6 +147,7 @@ void rpl_leave_dodag(rpl_dodag_t *dodag)
     dodag->joined = 0;
     dodag->my_preferred_parent = NULL;
     rpl_delete_all_parents();
+    stop_trickle(&dodag->trickle);
 }
 
 bool rpl_equal_id(ipv6_addr_t *id1, ipv6_addr_t *id2)
@@ -279,10 +290,10 @@ rpl_parent_t *rpl_find_preferred_parent(void)
         my_dodag->my_preferred_parent = best;
 
         if (my_dodag->mop != RPL_NO_DOWNWARD_ROUTES) {
-            delay_dao();
+            delay_dao(my_dodag);
         }
 
-        reset_trickletimer();
+        reset_trickletimer(&my_dodag->trickle);
     }
 
     return best;
@@ -315,8 +326,55 @@ void rpl_parent_update(rpl_parent_t *parent)
             my_dodag->min_rank = my_dodag->my_rank;
         }
 
-        reset_trickletimer();
+        reset_trickletimer(&my_dodag->trickle);
     }
+}
+
+void delay_dao(rpl_dodag_t *dodag)
+{
+    dodag->dao_time = timex_set(DEFAULT_DAO_DELAY, 0);
+    dodag->dao_counter = 0;
+    dodag->ack_received = false;
+    vtimer_remove(&dodag->dao_timer);
+    vtimer_set_wakeup(&dodag->dao_timer, dodag->dao_time, dodag->dao_delay_over_pid);
+}
+
+/* This function is used for regular update of the routes. The Timer can be overwritten, as the normal delay_dao function gets called */
+void long_delay_dao(rpl_dodag_t *dodag)
+{
+    dodag->dao_time = timex_set(REGULAR_DAO_INTERVAL, 0);
+    dodag->dao_counter = 0;
+    dodag->ack_received = false;
+    vtimer_remove(&dodag->dao_timer);
+    vtimer_set_wakeup(&dodag->dao_timer, dodag->dao_time, dodag->dao_delay_over_pid);
+}
+
+
+void dao_ack_received(rpl_dodag_t *dodag)
+{
+    dodag->ack_received = true;
+    long_delay_dao(dodag);
+}
+
+
+void *dao_delay_over(void *arg)
+{
+    rpl_dodag_t *dodag = (rpl_dodag_t *) arg;
+    while (1) {
+        thread_sleep();
+
+        if ((dodag->ack_received == false) && (dodag->dao_counter < DAO_SEND_RETRIES)) {
+            dodag->dao_counter++;
+            rpl_send_DAO(NULL, 0, true, 0);
+            dodag->dao_time = timex_set(DEFAULT_WAIT_FOR_DAO_ACK, 0);
+            vtimer_remove(&dodag->dao_timer);
+            vtimer_set_wakeup(&dodag->dao_timer, dodag->dao_time, dodag->dao_delay_over_pid);
+        }
+        else if (dodag->ack_received == false) {
+            long_delay_dao(dodag);
+        }
+    }
+    return NULL;
 }
 
 void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_rank)
@@ -356,6 +414,9 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     my_dodag->my_rank = dodag->of->calc_rank(preferred_parent, dodag->my_rank);
     my_dodag->dao_seq = RPL_COUNTER_INIT;
     my_dodag->min_rank = my_dodag->my_rank;
+    my_dodag->dao_delay_over_pid = KERNEL_PID_UNDEF;
+    my_dodag->ack_received = true;
+    my_dodag->dao_counter = 0;
     DEBUG("Joint DODAG:\n");
     DEBUG("\tMOP:\t%02X\n", my_dodag->mop);
     DEBUG("\tminhoprankincrease :\t%04X\n", my_dodag->minhoprankincrease);
@@ -367,8 +428,13 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
     DEBUG("\tmy_preferred_parent rank\t%02X\n", my_dodag->my_preferred_parent->rank);
     DEBUG("\tmy_preferred_parent lifetime\t%04X\n", my_dodag->my_preferred_parent->lifetime);
 
-    start_trickle(my_dodag->dio_min, my_dodag->dio_interval_doubling, my_dodag->dio_redundancy);
-    delay_dao();
+    my_dodag->trickle.callback.func = &rpl_trickle_send_dio;
+    my_dodag->trickle.callback.args = (void *) &mcast;
+    start_trickle(&my_dodag->trickle, my_dodag->dio_min, my_dodag->dio_interval_doubling, my_dodag->dio_redundancy);
+    my_dodag->dao_delay_over_pid = thread_create(my_dodag->dao_delay_over_buf, DAO_DELAY_STACKSIZE,
+                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                       dao_delay_over, (void *) my_dodag, "dao_delay_over");
+    delay_dao(my_dodag);
 }
 
 void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank)
@@ -395,8 +461,8 @@ void rpl_global_repair(rpl_dodag_t *dodag, ipv6_addr_t *p_addr, uint16_t rank)
         my_dodag->my_rank = my_dodag->of->calc_rank(my_dodag->my_preferred_parent,
                             my_dodag->my_rank);
         my_dodag->min_rank = my_dodag->my_rank;
-        reset_trickletimer();
-        delay_dao();
+        reset_trickletimer(&my_dodag->trickle);
+        delay_dao(my_dodag);
     }
 
     DEBUGF("Migrated to DODAG Version %d. My new Rank: %d\n", my_dodag->version,
@@ -416,7 +482,7 @@ void rpl_local_repair(void)
     my_dodag->my_rank = INFINITE_RANK;
     my_dodag->dtsn++;
     rpl_delete_all_parents();
-    reset_trickletimer();
+    reset_trickletimer(&my_dodag->trickle);
 
 }
 
@@ -434,4 +500,9 @@ ipv6_addr_t *rpl_get_my_preferred_parent(void)
 uint16_t rpl_calc_rank(uint16_t abs_rank, uint16_t minhoprankincrease)
 {
     return abs_rank / minhoprankincrease;
+}
+
+void rpl_trickle_send_dio(void *args) {
+    ipv6_addr_t *mcast = (ipv6_addr_t *) args;
+    rpl_send_DIO(mcast);
 }

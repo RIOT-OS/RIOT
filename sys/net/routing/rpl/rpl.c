@@ -46,8 +46,6 @@
 
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
-#undef TRICKLE_TIMER_STACKSIZE
-#define TRICKLE_TIMER_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
@@ -58,6 +56,13 @@ mutex_t rpl_send_mutex = MUTEX_INIT;
 msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
+char routing_table_buf[RT_STACKSIZE];
+kernel_pid_t rt_timer_over_pid = KERNEL_PID_UNDEF;
+vtimer_t rt_timer;
+timex_t rt_time;
+ipv6_addr_t mcast;
+
+static void *rt_timer_over(void *arg);
 
 #if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
 uint8_t srh_buffer[BUFFER_SIZE];
@@ -101,7 +106,8 @@ uint8_t rpl_init(int if_id)
         DEBUGF("Routing table init finished!\n");
     }
 
-    init_trickle();
+    ipv6_addr_set_all_nodes_addr(&mcast);
+
     rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
                                     PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                     rpl_process, NULL, "rpl_process");
@@ -118,7 +124,11 @@ uint8_t rpl_init(int if_id)
 
     /* initialize objective function manager */
     rpl_of_manager_init(&my_address);
-    rpl_init_mode(&my_address);
+	rpl_init_mode(&my_address);
+
+    rt_timer_over_pid = thread_create(routing_table_buf, RT_STACKSIZE,
+                                      PRIORITY_MAIN - 1, CREATE_STACKTEST,
+                                      rt_timer_over, NULL, "rt_timer_over");
     return SIXLOWERROR_SUCCESS;
 }
 
@@ -308,6 +318,55 @@ void rpl_recv_DAO_ACK(void)
     DEBUGF("DAO ACK received\n");
 
     rpl_recv_dao_ack_mode();
+}
+
+/**************************************************************/
+/**************************************************************/
+
+/******************************************************************************/
+/* Routing related functions are obsolete and will be replaced in near future */
+/******************************************************************************/
+
+void *rt_timer_over(void *arg)
+{
+    (void) arg;
+
+    rpl_routing_entry_t *rt;
+
+    while (1) {
+        rpl_dodag_t *my_dodag = rpl_get_my_dodag();
+
+        if (my_dodag != NULL) {
+            rt = rpl_get_routing_table();
+
+            for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
+                if (rt[i].used) {
+                    if (rt[i].lifetime <= 1) {
+                        memset(&rt[i], 0, sizeof(rt[i]));
+                    }
+                    else {
+                        rt[i].lifetime--;
+                    }
+                }
+            }
+
+            /* Parent is NULL for root too */
+            if (my_dodag->my_preferred_parent != NULL) {
+                if (my_dodag->my_preferred_parent->lifetime <= 1) {
+                    DEBUGF("parent lifetime timeout\n");
+                    rpl_parent_update(NULL);
+                }
+                else {
+                    my_dodag->my_preferred_parent->lifetime--;
+                }
+            }
+        }
+
+        /* Wake up every second */
+        vtimer_usleep(1000000);
+    }
+
+    return NULL;
 }
 
 ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr)

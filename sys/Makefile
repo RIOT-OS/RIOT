@@ -65,6 +65,9 @@ endif
 ifneq (,$(filter netapi,$(USEMODULE)))
     DIRS += net/crosslayer/netapi
 endif
+ifneq (,$(filter trickle,$(USEMODULE)))
+    DIRS += trickle
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 

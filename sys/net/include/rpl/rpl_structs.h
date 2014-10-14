@@ -20,6 +20,7 @@
 
 #include <string.h>
 #include "ipv6.h"
+#include "trickle.h"
 
 #ifndef RPL_STRUCTS_H_INCLUDED
 #define RPL_STRUCTS_H_INCLUDED
@@ -167,6 +168,13 @@ typedef struct rpl_dodag_t {
     uint8_t joined;
     rpl_parent_t *my_preferred_parent;
     struct rpl_of_t *of;
+    trickle_t trickle;
+    kernel_pid_t dao_delay_over_pid;
+    bool ack_received;
+    uint8_t dao_counter;
+    vtimer_t dao_timer;
+    timex_t dao_time;
+    char *dao_delay_over_buf;
 } rpl_dodag_t;
 
 typedef struct rpl_of_t {
