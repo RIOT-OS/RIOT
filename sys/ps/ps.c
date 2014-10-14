@@ -73,20 +73,23 @@ void thread_print_all(void)
             double runtime_ticks =  sched_pidlist[i].runtime_ticks / (double) hwtimer_now() * 100;
             int switches = sched_pidlist[i].schedules;
 #endif
-            printf("\t%3u | %-21s| %-8s %.1s | %3i | "
+            printf("\t%3u | "
 #ifdef DEVELHELP
-                   "%5i (%5i) "
+                   "%-21s| %5i (%5i) "
 #endif
-                   "%p"
+                   "%-8s %.1s | %3i"
 #if SCHEDSTATISTICS
-                   " | %6.3f%% |  %8d"
+                   " | %p | %6.3f%% |  %8d"
 #endif
                    "\n",
-                   p->pid, p->name, sname, queued, p->priority,
+                   p->pid,
 #ifdef DEVELHELP
-                   p->stack_size, stacksz,
+                   p->name,
 #endif
-                   p->stack_start
+                   sname, queued, p->priority
+#ifdef DEVELHELP
+                   , p->stack_size, stacksz, p->stack_start
+#endif
 #if SCHEDSTATISTICS
                    , runtime_ticks, switches
 #endif

@@ -107,16 +107,6 @@ volatile tcb_t *thread_get(kernel_pid_t pid);
 int thread_getstatus(kernel_pid_t pid);
 
 /**
- * @brief Returns the name of a process
- *
- * @param[in] pid   the PID of the thread to get the name from
- *
- * @return          the threads name
- * @return          `NULL` if pid is unknown
- */
-const char *thread_getname(kernel_pid_t pid);
-
-/**
  * @brief Puts the current thread into sleep mode. Has to be woken up externally.
  */
 void thread_sleep(void);
@@ -156,6 +146,16 @@ static inline kernel_pid_t thread_getpid(void)
 }
 
 #ifdef DEVELHELP
+/**
+ * @brief Returns the name of a process
+ *
+ * @param[in] pid   the PID of the thread to get the name from
+ *
+ * @return          the threads name
+ * @return          `NULL` if pid is unknown
+ */
+const char *thread_getname(kernel_pid_t pid);
+
 /**
  * @brief Measures the stack usage of a stack
  *
