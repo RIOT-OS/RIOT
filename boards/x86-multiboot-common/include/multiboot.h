@@ -23,6 +23,9 @@
  * @file
  */
 
+#ifndef MULTIBOOT_H
+#define MULTIBOOT_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -129,4 +132,5 @@ enum multiboot_info_flags {
 }
 #endif
 
+#endif /* MULTIBOOT_H */
 /** @} */
