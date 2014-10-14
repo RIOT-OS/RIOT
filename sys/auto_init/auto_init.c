@@ -149,7 +149,7 @@ void auto_init_net_if(void)
 #endif /* DEBUG_ENABLED */
 
 #undef CONF_RADIO_ADDR
-        uint16_t hwaddr = HTONS((uint16_t)hash_l);
+        uint16_t hwaddr = HTONS((uint16_t)((hash_l + hash_h) % (1 << 16)));
         net_if_set_hardware_address(iface, hwaddr);
         DEBUG("Auto init radio address on interface %d to 0x%04x\n", iface, hwaddr);
 #else /* CPUID_ID_LEN && defined(MODULE_HASHES) */
@@ -169,6 +169,7 @@ void auto_init_net_if(void)
             DEBUG("Change this value at compile time with macro CONF_RADIO_ADDR\n");
             net_if_set_hardware_address(iface, CONF_RADIO_ADDR);
         }
+
 #endif /* CPUID_ID_LEN && defined(MODULE_HASHES) */
 
         if (net_if_get_pan_id(iface) <= 0) {
