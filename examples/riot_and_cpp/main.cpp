@@ -66,7 +66,7 @@ int main()
     vInts.push_back(1);
     vInts.push_back(3);
     vInts.push_back(2);
-    printf("The vector vInts has been filled with %d numbers.\n", vInts.size());
+    printf("The vector vInts has been filled with %d numbers.\n", (int)vInts.size());
 
     printf("\n-= Test iterator =-\n");
     printf("The content of vInts = { ");
