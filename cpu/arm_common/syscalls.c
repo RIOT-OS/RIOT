@@ -43,10 +43,6 @@
 #define PRINTF(...)
 #endif
 
-#ifdef MODULE_FAT
-#include "ff_ansi.h"
-#endif
-
 /**
  * @name Heaps (defined in linker script)
  * @{
@@ -94,9 +90,6 @@ _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int whence)
     PRINTF("lseek [%i] pos %li whence %i\n", fd, pos, whence);
 
     r->_errno = ENODEV;
-#ifdef MODULE_FAT
-    result = ff_lseek_r(r, fd, pos, whence);
-#endif
 
     PRINTF("lseek returned %li (0 is success)\n", result);
     return result;
@@ -111,9 +104,6 @@ int _open_r(struct _reent *r, const char *name, int mode)
     PRINTF("open '%s' mode %#x\n", name, mode);
 
     r->_errno = ENODEV; // no such device
-#ifdef MODULE_FAT
-    ret = ff_open_r(r, name, mode);
-#endif
 
     PRINTF("open [%i] errno %i\n", ret, r->_errno);
     return ret;
@@ -127,9 +117,6 @@ int _stat_r(struct _reent *r, char *name, struct stat *st)
     int ret = -1;
     PRINTF("_stat_r '%s' \n", name);
     r->_errno = ENODEV; // no such device
-#ifdef MODULE_FAT
-    ret = ff_stat_r(r, name, st);
-#endif
     PRINTF("_stat_r [%i] errno %i\n", ret, r->_errno);
     return ret;
 }
@@ -146,16 +133,7 @@ int _fstat_r(struct _reent *r, int fd, struct stat *st)
         ret = 0;
     }
     else {
-
-#ifdef MODULE_FAT
-        PRINTF("_fstat_r '%i' \n", fd);
-
-        ret = ff_fstat_r(r, fd, st);
-        PRINTF("_fstat_r [%i] errno %i\n", ret, r->_errno);
-
-#else
         r->_errno = ENODEV;
-#endif
     }
 
     return ret;
@@ -173,9 +151,6 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
             break;
 
         default:
-#ifdef MODULE_FAT
-            result = ff_write_r(r, fd, data, count);
-#endif
             PRINTF("write [%i] data @%p count %i\n", fd, data, count);
 
             PRINTF("write [%i] returned %i errno %i\n", fd, result, r->_errno);
@@ -193,9 +168,6 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
     (void) count;
     int result = -1;
     r->_errno = EBADF;
-#ifdef MODULE_FAT
-    result = ff_read_r(r, fd, buffer, count);
-#endif
     PRINTF("read [%i] buffer @%p count %i\n", fd, buffer, count);
     PRINTF("read [%i] returned %i\n", fd, result);
 
@@ -207,9 +179,6 @@ int _close_r(struct _reent *r, int fd)
     (void) fd;
     int result = -1;
     r->_errno = EBADF;
-#ifdef MODULE_FAT
-    ret = ff_close_r(r, fd);
-#endif
     PRINTF("close [%i]\n", fd);
     PRINTF("close returned %i errno %i\n", result, errno);
 
@@ -223,9 +192,6 @@ int _unlink_r(struct _reent *r, char *path)
 
     int result = -1;
     r->_errno = ENODEV;
-#ifdef MODULE_FAT
-    result = ff_unlink_r(r, path);
-#endif
     PRINTF("unlink '%s'\n", path);
     PRINTF("unlink returned %i errno %i\n", result, errno);
 

@@ -81,7 +81,7 @@ uint8_t srf08_get_gain(void)
 
 int32_t srf08_get_distances(uint32_t *range_array, uint8_t ranging_mode)
 {
-    bool status = false;
+    bool status;
     uint8_t reg_size = 1;
     uint8_t rx_buff[reg_size];
     uint8_t tx_buff[reg_size];
