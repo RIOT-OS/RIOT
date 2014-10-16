@@ -117,7 +117,6 @@ void auto_init_net_if(void)
     net_if_init();
 
     if (transceivers != 0) {
-        int iface;
 #if CPUID_ID_LEN && defined(MODULE_HASHES)
         uint8_t cpuid[CPUID_ID_LEN];
 
@@ -125,7 +124,7 @@ void auto_init_net_if(void)
 #endif
         transceiver_init(transceivers);
         transceiver_start();
-        iface = net_if_init_interface(0, transceivers);
+        int iface = net_if_init_interface(0, transceivers);
 
 #if CPUID_ID_LEN && defined(MODULE_HASHES)
         net_if_eui64_t eui64;

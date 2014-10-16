@@ -660,14 +660,13 @@ void *tcp_packet_handler(void *arg)
     (void) arg;
 
     msg_t m_recv_ip, m_send_ip;
-    tcp_hdr_t *tcp_header;
     socket_internal_t *tcp_socket = NULL;
 
     while (1) {
         msg_receive(&m_recv_ip);
 
         ipv6_hdr_t *ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
-        tcp_header = ((tcp_hdr_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
+        tcp_hdr_t *tcp_header = ((tcp_hdr_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
 #ifdef TCP_HC
         tcp_socket = decompress_tcp_packet(ipv6_header);
 #else
