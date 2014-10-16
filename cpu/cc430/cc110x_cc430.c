@@ -119,6 +119,8 @@ void cc110x_write_reg(uint8_t addr, uint8_t value)
 
     while (!(RFDINIFG & RF1AIFCTL1));
 
+    /* cppcheck: need to force a read to RF1ADOUTB to trigger reset */
+    /* cppcheck-suppress unreadVariable */
     i = RF1ADOUTB;                            /* Reset RFDOUTIFG flag which contains status byte */
 
     restoreIRQ(int_state);
@@ -213,6 +215,8 @@ uint8_t cc110x_writeburst_reg(uint8_t addr, char *buffer, uint8_t count)
         while (!(RFDINIFG & RF1AIFCTL1));        /* Wait for TX to finish */
     }
 
+    /* cppcheck: need to force a read to RF1ADOUTB to trigger reset */
+    /* cppcheck-suppress unreadVariable */
     i = RF1ADOUTB;                            /* Reset RFDOUTIFG flag which contains status byte */
 
     restoreIRQ(int_state);
