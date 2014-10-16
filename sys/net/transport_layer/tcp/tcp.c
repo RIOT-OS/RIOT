@@ -683,9 +683,7 @@ void *tcp_packet_handler(void *arg)
             update_tcp_hc_context(true, tcp_socket, tcp_header);
 #endif
             /* Remove reserved bits from tcp flags field */
-            uint8_t tcp_flags = tcp_header->reserved_flags;
-
-            switch (tcp_flags) {
+            switch (tcp_header->reserved_flags) {
                 case TCP_ACK: {
                     /* only ACK Bit set */
                     uint8_t tcp_payload_len = NTOHS(ipv6_header->length) - TCP_HDR_LEN;

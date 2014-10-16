@@ -680,7 +680,6 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
                     uint8_t bmatch = 0;
                     uint8_t tmp = ipv6_get_addr_match(dest, addr->addr_data);
                     if (tmp >= bmatch) {
-                        bmatch = tmp;
                         tmp_addr = addr;
                     }
                 }

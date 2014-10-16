@@ -794,15 +794,13 @@ int16_t SMB380_getBandWidthAbs(void)
 
 void SMB380_softReset(void)
 {
-    unsigned char ur;
     unsigned long cpsr = disableIRQ();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL1, SMB380_CONTROL1_SOFT_RESET_MASK,
                      SMB380_WRITE_REGISTER);
-    ur = ((unsigned char)SMB380_ssp_read()) & SMB380_CONTROL1_SOFT_RESET_MASK;
+    SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);
-    ur = ur >> 1;
 }
 
 void SMB380_setCustomerReg(unsigned char data)

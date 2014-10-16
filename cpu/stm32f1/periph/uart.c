@@ -305,3 +305,4 @@ static inline void irq_handler(uint8_t uartnum, USART_TypeDef *dev)
         thread_yield();
     }
 }
+#endif /* UART_0_EN || UART_1_EN */
