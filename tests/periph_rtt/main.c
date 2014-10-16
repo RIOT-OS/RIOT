@@ -28,9 +28,6 @@
 #include "periph_conf.h"
 #include "periph/rtt.h"
 
-/* only compile this test if a RTT device is defined */
-#if RTT_NUMOF
-
 #define TICKS_TO_WAIT       (10 * RTT_FREQUENCY)
 
 void cb(void *arg)
@@ -59,15 +56,3 @@ int main(void)
     puts("Done setting up the RTT, wait for many Hellos");
     return 0;
 }
-
-#else
-
-int main(void)
-{
-    puts("\nRIOT RTT low-level driver test");
-    puts("There are no RTT devices defined for this board!");
-
-    return 0;
-}
-
-#endif /* RTT_NUMOF */
