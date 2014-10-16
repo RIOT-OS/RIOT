@@ -1,1 +1,1 @@
-FEATURES_PROVIDED = periph_gpio periph_random
+FEATURES_PROVIDED = periph_gpio periph_random periph_cpuid
