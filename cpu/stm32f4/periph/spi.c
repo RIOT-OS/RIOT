@@ -436,29 +436,23 @@ static inline void irq_handler_transfer(SPI_TypeDef *spi, spi_t dev)
 }
 
 #if SPI_0_EN
-__attribute__((naked)) void SPI_0_IRQ_HANDLER(void)
+void SPI_0_IRQ_HANDLER(void)
 {
-    ISR_ENTER();
     irq_handler_transfer(SPI_0_DEV, SPI_0);
-    ISR_EXIT();
 }
 #endif
 
 #if SPI_1_EN
-__attribute__((naked)) void SPI_1_IRQ_HANDLER(void)
+void SPI_1_IRQ_HANDLER(void)
 {
-    ISR_ENTER();
     irq_handler_transfer(SPI_1_DEV, SPI_1);
-    ISR_EXIT();
 }
 #endif
 
 #if SPI_2_EN
-__attribute__((naked)) void SPI_2_IRQ_HANDLER(void)
+void SPI_2_IRQ_HANDLER(void)
 {
-    ISR_ENTER();
     irq_handler_transfer(SPI_2_DEV, SPI_2);
-    ISR_EXIT();
 }
 #endif
 

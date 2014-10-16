@@ -293,18 +293,14 @@ void timer_reset(tim_t dev)
     }
 }
 
-__attribute__ ((naked)) void TIMER_0_ISR(void)
+void TIMER_0_ISR(void)
 {
-    ISR_ENTER();
     irq_handler(TIMER_0, TIMER_0_DEV);
-    ISR_EXIT();
 }
 
-__attribute__ ((naked)) void TIMER_1_ISR(void)
+void TIMER_1_ISR(void)
 {
-    ISR_ENTER();
     irq_handler(TIMER_1, TIMER_1_DEV);
-    ISR_EXIT();
 }
 
 static inline void irq_handler(tim_t timer, TIM_TypeDef *dev)

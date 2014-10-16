@@ -285,29 +285,23 @@ int uart_write_blocking(uart_t uart, char data)
 }
 
 #if UART_0_EN
-__attribute__((naked)) void UART_0_ISR(void)
+void UART_0_ISR(void)
 {
-    ISR_ENTER();
     irq_handler(UART_0, UART_0_DEV);
-    ISR_EXIT();
 }
 #endif
 
 #if UART_1_EN
-__attribute__((naked)) void UART_1_ISR(void)
+void UART_1_ISR(void)
 {
-    ISR_ENTER();
     irq_handler(UART_1, UART_1_DEV);
-    ISR_EXIT();
 }
 #endif
 
 #if UART_2_EN
-__attribute__((naked)) void UART_2_ISR(void)
+void UART_2_ISR(void)
 {
-    ISR_ENTER();
     irq_handler(UART_2, UART_2_DEV);
-    ISR_EXIT();
 }
 #endif
 

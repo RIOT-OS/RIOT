@@ -887,9 +887,8 @@ void gpio_write(gpio_t dev, int value)
     }
 }
 
-__attribute__((naked)) void isr_eic(void)
+void isr_eic(void)
 {
-    ISR_ENTER();
     uint16_t status = EIC->INTFLAG.reg;
     switch (status) {
         case EIC_INTFLAG_EXTINT0:
@@ -960,7 +959,6 @@ __attribute__((naked)) void isr_eic(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 
 #endif /* GPIO_NUMOF */

@@ -339,22 +339,18 @@ void timer_reset(tim_t dev)
 
 
 #if TIMER_0_EN
-__attribute__ ((naked)) void TIMER_0_ISR_0(void)
+void TIMER_0_ISR_0(void)
 {
-    ISR_ENTER();
     DEBUG("\nenter ISR\n");
     irq_handler(TIMER_0, TIMER_0_DEV_0, TIMER_0_DEV_1);
     DEBUG("leave ISR\n\n");
-    ISR_EXIT();
 }
 #endif
 
 #if TIMER_1_EN
-__attribute__ ((naked)) void TIMER_1_ISR_0(void)
+void TIMER_1_ISR_0(void)
 {
-    ISR_ENTER();
     irq_handler(TIMER_0, TIMER_1_DEV_0, TIMER_1_DEV_1);
-    ISR_EXIT();
 }
 #endif
 

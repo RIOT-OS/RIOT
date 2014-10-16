@@ -342,54 +342,45 @@ void timer_reset(tim_t dev)
 
 
 #if TIMER_0_EN
-__attribute__ ((naked))
 void TIMER_0_ISR(void)
 {
-    ISR_ENTER();
-        if (TIMER_0_DEV.INTFLAG.bit.MC0 && TIMER_0_DEV.INTENSET.bit.MC0) {
-            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
-            config[TIMER_0].cb(0);
-        }
-        else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
-            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
-            config[TIMER_0].cb(1);
-        }
-    ISR_EXIT();
+    if (TIMER_0_DEV.INTFLAG.bit.MC0 && TIMER_0_DEV.INTENSET.bit.MC0) {
+        TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+        config[TIMER_0].cb(0);
+    }
+    else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
+        TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
+        config[TIMER_0].cb(1);
+    }
 }
 #endif /* TIMER_0_EN */
 
 
 #if TIMER_1_EN
-__attribute__ ((naked))
 void TIMER_1_ISR(void)
 {
-    ISR_ENTER();
-        if (TIMER_1_DEV.INTFLAG.bit.MC0 && TIMER_1_DEV.INTENSET.bit.MC0) {
-            TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
-            config[TIMER_1].cb(0);
-        }
-        else if (TIMER_1_DEV.INTFLAG.bit.MC1 && TIMER_1_DEV.INTENSET.bit.MC1) {
-            TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
-            config[TIMER_1].cb(1);
-        }
-    ISR_EXIT();
+    if (TIMER_1_DEV.INTFLAG.bit.MC0 && TIMER_1_DEV.INTENSET.bit.MC0) {
+        TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
+        config[TIMER_1].cb(0);
+    }
+    else if (TIMER_1_DEV.INTFLAG.bit.MC1 && TIMER_1_DEV.INTENSET.bit.MC1) {
+        TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
+        config[TIMER_1].cb(1);
+    }
 }
 #endif /* TIMER_1_EN */
 
 
 #if TIMER_2_EN
-__attribute__ ((naked))
 void TIMER_2_ISR(void)
 {
-    ISR_ENTER();
-        if (TIMER_2_DEV.INTFLAG.bit.MC0 && TIMER_2_DEV.INTENSET.bit.MC0) {
-            TIMER_2_DEV.INTFLAG.bit.MC0 = 1;
-            config[TIMER_2].cb(0);
-        }
-        else if (TIMER_2_DEV.INTFLAG.bit.MC1 && TIMER_2_DEV.INTENSET.bit.MC1) {
-            TIMER_2_DEV.INTFLAG.bit.MC1 = 1;
-            config[TIMER_2].cb(1);
-        }
-    ISR_EXIT();
+    if (TIMER_2_DEV.INTFLAG.bit.MC0 && TIMER_2_DEV.INTENSET.bit.MC0) {
+        TIMER_2_DEV.INTFLAG.bit.MC0 = 1;
+        config[TIMER_2].cb(0);
+    }
+    else if (TIMER_2_DEV.INTFLAG.bit.MC1 && TIMER_2_DEV.INTENSET.bit.MC1) {
+        TIMER_2_DEV.INTFLAG.bit.MC1 = 1;
+        config[TIMER_2].cb(1);
+    }
 }
 #endif /* TIMER_2_EN */
