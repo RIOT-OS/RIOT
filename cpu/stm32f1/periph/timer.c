@@ -31,6 +31,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+/* guard file in case no TIMER device is defined */
+#if TIMER_0_EN || TIMER_1_EN
 
 static inline void irq_handler(tim_t timer, TIM_TypeDef *dev0, TIM_TypeDef *dev1);
 
@@ -119,8 +121,8 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    TIM_TypeDef *timer0 = NULL;
-    TIM_TypeDef *timer1 = NULL;
+    TIM_TypeDef *timer0;
+    TIM_TypeDef *timer1;
 
     switch (dev) {
 #if TIMER_0_EN
@@ -406,3 +408,4 @@ static inline void irq_handler(tim_t timer, TIM_TypeDef *dev0, TIM_TypeDef *dev1
         thread_yield();
     }
 }
+#endif /* TIMER_0_EN || TIMER_1_EN */

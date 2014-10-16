@@ -33,7 +33,7 @@
 #include "debug.h"
 
 /* guard file in case no I2C device is defined */
-#if I2C_NUMOF
+#if I2C_0_EN
 
 /* static function definitions */
 static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag);
@@ -392,4 +392,4 @@ static inline void _stop(I2C_TypeDef *dev)
     dev->CR1 |= I2C_CR1_STOP;
 }
 
-#endif /* I2C_NUMOF */
+#endif /* I2C_0_EN */

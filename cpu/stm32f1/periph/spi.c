@@ -29,7 +29,7 @@
 #include "debug.h"
 
 /* guard file in case no SPI device is defined */
-#if SPI_NUMOF
+#if SPI_0_EN
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
@@ -231,4 +231,4 @@ void spi_poweroff(spi_t dev)
     }
 }
 
-#endif /* SPI_NUMOF */
+#endif /* SPI_0_EN */

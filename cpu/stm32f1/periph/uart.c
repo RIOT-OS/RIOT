@@ -29,6 +29,9 @@
 #include "sched.h"
 #include "thread.h"
 
+/* guard file in case no UART device is defined */
+#if UART_0_EN || UART_1_EN
+
 /**
  * @brief Each UART device has to store two callbacks.
  */
