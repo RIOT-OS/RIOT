@@ -21,6 +21,14 @@
 
 #include "cpu-conf.h"
 
+/**
+ * @def CPUID_ID_LEN
+ *
+ * @brief   The length in byte of the CPU's serial number.
+ *
+ * @note    Must be defined in the CPU's @ref cpu-conf.h
+ */
+
 #if CPUID_ID_LEN
 /**
  * @brief   Gets the serial number of the CPU.
