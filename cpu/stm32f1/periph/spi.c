@@ -155,8 +155,14 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 
     /* SPI busy */
     while ((spi->SR & 0x80));
-
-    DEBUG("\nout: %x in: %x transfered: %x\n", out, *in, transfered);
+#if ENABLE_DEBUG
+    if (in != NULL) {
+        DEBUG("\nout: %x in: %x transfered: %x\n", out, *in, transfered);
+    }
+    else {
+        DEBUG("\nout: %x in: was nullPointer transferred: %x\n", out, transferred);
+    }
+#endif /*ENABLE_DEBUG */
 
     return transfered;
 }

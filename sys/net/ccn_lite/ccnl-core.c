@@ -378,6 +378,7 @@ ccnl_extract_prefix_nonce_ppkd(unsigned char **data, int *datalen, int *scope,
 
     if (!buf) {
         puts("can't get more memory from malloc, dropping ccn msg...");
+        goto Bail;
     }
 
     // carefully rebase ptrs to new buf because of 64bit pointers:
