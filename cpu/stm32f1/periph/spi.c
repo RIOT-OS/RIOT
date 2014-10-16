@@ -128,7 +128,7 @@ int spi_conf_pins(spi_t dev)
 int spi_transfer_byte(spi_t dev, char out, char *in)
 {
     SPI_TypeDef *spi;
-    int transfered = 0;
+    int transferred = 0;
 
     switch(dev) {
 #ifdef SPI_0_EN
@@ -142,12 +142,12 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 
     while ((spi->SR & SPI_SR_TXE) == RESET);
     spi->DR = out;
-    transfered++;
+    transferred++;
 
     while ((spi->SR & SPI_SR_RXNE) == RESET);
     if (in != NULL) {
         *in = spi->DR;
-        transfered++;
+        transferred++;
     }
     else {
         spi->DR;
@@ -157,19 +157,19 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     while ((spi->SR & 0x80));
 #if ENABLE_DEBUG
     if (in != NULL) {
-        DEBUG("\nout: %x in: %x transfered: %x\n", out, *in, transfered);
+        DEBUG("\nout: %x in: %x transferred: %x\n", out, *in, transferred);
     }
     else {
         DEBUG("\nout: %x in: was nullPointer transferred: %x\n", out, transferred);
     }
 #endif /*ENABLE_DEBUG */
 
-    return transfered;
+    return transferred;
 }
 
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
-    int transfered = 0;
+    int transferred = 0;
 
     if (out != NULL) {
         DEBUG("out*: %p out: %x length: %x\n", out, *out, length);
@@ -178,7 +178,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
             if (ret <  0) {
                 return ret;
             }
-            transfered += ret;
+            transferred += ret;
         }
     }
     if (in != NULL) {
@@ -187,13 +187,13 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
             if (ret <  0) {
                 return ret;
             }
-            transfered += ret;
+            transferred += ret;
         }
-        DEBUG("in*: %p in: %x transfered: %x\n", in, *(in-transfered), transfered);
+        DEBUG("in*: %p in: %x transferred: %x\n", in, *(in-transferred), transferred);
     }
 
-    DEBUG("sent %x byte(s)\n", transfered);
-    return transfered;
+    DEBUG("sent %x byte(s)\n", transferred);
+    return transferred;
 }
 
 int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
