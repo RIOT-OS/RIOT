@@ -25,6 +25,9 @@
 #include "periph_conf.h"
 #include "periph/timer.h"
 
+/* guard file in case no TIMER devices are defined */
+#if TIMER_0_EN || TIMER_1_EN
+
 
 static inline void irq_handler(tim_t timer, TIM_TypeDef *dev);
 
@@ -324,3 +327,4 @@ static inline void irq_handler(tim_t timer, TIM_TypeDef *dev)
         config[timer].cb(3);
     }
 }
+#endif /* TIMER_0_EN || TIMER_1_EN */

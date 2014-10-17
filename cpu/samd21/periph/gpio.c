@@ -141,6 +141,10 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
             return -1;
     }
 
+    if (port == NULL) {
+        return -1;
+    }
+
     /* configure as output */
     port->DIRSET.reg = (1<<(pin%32));
 
@@ -262,6 +266,10 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pushpull)
 #endif
         default:
             return -1;
+    }
+
+    if (port == NULL) {
+        return -1;
     }
 
     /* configure as input */
@@ -409,6 +417,10 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
         default:
             return -1;
+    }
+
+    if (port == NULL) {
+        return -1;
     }
 
     /* configure pin as input */
