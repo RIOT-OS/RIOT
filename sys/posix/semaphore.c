@@ -91,7 +91,7 @@ static void sem_thread_blocked(sem_t *sem)
     /* scheduler should schedule an other thread, that unlocks the
      * mutex in the future, when this happens I get scheduled again
      */
-    thread_yield();
+    thread_yield_higher();
 }
 
 int sem_wait(sem_t *sem)

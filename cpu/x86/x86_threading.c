@@ -99,7 +99,7 @@ static void __attribute__((noreturn)) isr_thread_yield(void)
     setcontext(ctx);
 }
 
-void thread_yield(void)
+void thread_yield_higher(void)
 {
     if (x86_in_isr) {
         isr_thread_yield();

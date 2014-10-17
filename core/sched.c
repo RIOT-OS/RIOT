@@ -88,7 +88,6 @@ void sched_run(void)
      */
     int nextrq = bitarithm_lsb(runqueue_bitcache);
     my_active_thread = clist_get_container(sched_runqueues[nextrq], tcb_t, rq_entry);
-    clist_advance(&(sched_runqueues[nextrq]));
     DEBUG("scheduler: first in queue: %s\n", my_active_thread->name);
 
     kernel_pid_t my_next_pid = my_active_thread->pid;
@@ -162,7 +161,7 @@ void sched_switch(uint16_t other_prio)
             sched_context_switch_request = 1;
         }
         else {
-            thread_yield();
+            thread_yield_higher();
         }
     }
 }
@@ -179,4 +178,16 @@ NORETURN void sched_task_exit(void)
 
     sched_active_thread = NULL;
     cpu_switch_context_exit();
+}
+
+void thread_yield(void)
+{
+    unsigned old_state = disableIRQ();
+    tcb_t *me = (tcb_t *)sched_active_thread;
+    if (me->status >= STATUS_ON_RUNQUEUE) {
+        clist_advance(&sched_runqueues[me->priority]);
+    }
+    restoreIRQ(old_state);
+
+    thread_yield_higher();
 }

@@ -35,9 +35,9 @@ void save_context(void);
 void restore_context(void);
 
 /**
- * @brief Let the thread yield
+ * @brief Let the scheduler yield
  */
-void thread_yield(void);
+void thread_yield_higher(void);
 
 /** @} */
 
