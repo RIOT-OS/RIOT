@@ -182,7 +182,7 @@ void thread_arch_stack_print(void)
     uint8_t *sp = (uint8_t *)sched_active_thread->sp;
     uint16_t size = 0;
 
-    printf("Printing current stack of thread %" PRIkernel_pid "\n", thread_getpid());
+    printf("Printing current stack of thread %" PRIkernel_pid "\n", sched_active_pid);
     printf("\taddress:\tdata:\n");
 
     do {

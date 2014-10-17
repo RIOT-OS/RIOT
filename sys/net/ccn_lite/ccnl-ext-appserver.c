@@ -151,7 +151,7 @@ static void riot_ccnl_appserver_ioloop(void)
 static void riot_ccnl_appserver_register(void)
 {
     char faceid[10];
-    snprintf(faceid, sizeof(faceid), "%" PRIkernel_pid, thread_getpid());
+    snprintf(faceid, sizeof(faceid), "%" PRIkernel_pid, sched_active_pid);
     char *type = "newMSGface";
 
     unsigned char *mgnt_pkg = malloc(256);

@@ -845,7 +845,7 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
     ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *syn_ack_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
-    current_queued_int_socket->recv_pid = thread_getpid();
+    current_queued_int_socket->recv_pid = sched_active_pid;
 #ifdef TCP_HC
     current_queued_int_socket->socket_values.tcp_control.tcp_context.hc_type =
         FULL_HEADER;
@@ -950,7 +950,7 @@ int32_t tcp_send(int s, const void *buf, uint32_t len, int flags)
     }
 
     /* Add thread PID */
-    current_int_tcp_socket->send_pid = thread_getpid();
+    current_int_tcp_socket->send_pid = sched_active_pid;
 
     recv_msg.type = UNDEFINED;
 
@@ -1108,7 +1108,7 @@ int tcp_accept(int s, sockaddr6_t *addr, uint32_t *addrlen)
 
         if (current_queued_socket != NULL) {
             return handle_new_tcp_connection(current_queued_socket,
-                                             server_socket, thread_getpid());
+                                             server_socket, sched_active_pid);
         }
         else {
             /* No waiting connections, waiting for message from TCP Layer */
@@ -1122,7 +1122,7 @@ int tcp_accept(int s, sockaddr6_t *addr, uint32_t *addrlen)
             current_queued_socket = get_waiting_connection_socket(s, NULL, NULL);
 
             return handle_new_tcp_connection(current_queued_socket,
-                                             server_socket, thread_getpid());
+                                             server_socket, sched_active_pid);
         }
     }
     else {
@@ -1152,7 +1152,7 @@ int tcp_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
 
     current_tcp_socket = &current_int_tcp_socket->socket_values;
 
-    current_int_tcp_socket->recv_pid = thread_getpid();
+    current_int_tcp_socket->recv_pid = sched_active_pid;
 
     /* Local address information */
     ipv6_net_if_get_best_src_addr(&src_addr, &addr->sin6_addr);
@@ -1339,7 +1339,7 @@ int32_t tcp_recv(int s, void *buf, uint32_t len, int flags)
     current_int_tcp_socket = socket_base_get_socket(s);
 
     /* Setting Thread PID */
-    current_int_tcp_socket->recv_pid = thread_getpid();
+    current_int_tcp_socket->recv_pid = sched_active_pid;
 
     if (current_int_tcp_socket->tcp_input_buffer_end > 0) {
         return read_from_socket(current_int_tcp_socket, buf, len);
@@ -1393,7 +1393,7 @@ int tcp_teardown(socket_internal_t *current_socket)
         return 0;
     }
 
-    current_socket->send_pid = thread_getpid();
+    current_socket->send_pid = sched_active_pid;
 
     /* Refresh local TCP socket information */
     current_socket->socket_values.tcp_control.state = TCP_FIN_WAIT_1;

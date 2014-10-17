@@ -28,7 +28,7 @@ void *second_thread(void *arg)
 {
     (void) arg;
 
-    printf("2nd thread started, pid: %" PRIkernel_pid "\n", thread_getpid());
+    printf("2nd thread started, pid: %" PRIkernel_pid "\n", sched_active_pid);
     msg_t m;
 
     while (1) {
@@ -46,7 +46,7 @@ char second_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
 int main(void)
 {
     printf("Starting IPC Ping-pong example...\n");
-    printf("1st thread started, pid: %" PRIkernel_pid "\n", thread_getpid());
+    printf("1st thread started, pid: %" PRIkernel_pid "\n", sched_active_pid);
 
     msg_t m;
 

@@ -142,7 +142,7 @@ int32_t udp_recvfrom(int s, void *buf, uint32_t len, int flags, sockaddr6_t *fro
     ipv6_hdr_t *ipv6_header;
     udp_hdr_t *udp_header;
     uint8_t *payload;
-    socket_base_get_socket(s)->recv_pid = thread_getpid();
+    socket_base_get_socket(s)->recv_pid = sched_active_pid;
 
     msg_receive(&m_recv);
 

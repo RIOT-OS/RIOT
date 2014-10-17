@@ -45,7 +45,7 @@ void chardev_loop(ringbuffer_t *rb)
 {
     msg_t m;
 
-    kernel_pid_t pid = thread_getpid();
+    kernel_pid_t pid = sched_active_pid;
 
     kernel_pid_t reader_pid = KERNEL_PID_UNDEF;
     struct posix_iop_t *r = NULL;

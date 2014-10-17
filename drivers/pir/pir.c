@@ -52,7 +52,7 @@ pir_event_t pir_get_status(pir_t *dev)
 int pir_register_thread(pir_t *dev)
 {
     if (dev->msg_thread_pid != KERNEL_PID_UNDEF) {
-        if (dev->msg_thread_pid != thread_getpid()) {
+        if (dev->msg_thread_pid != sched_active_pid) {
             DEBUG("pir_register_thread: already registered to another thread\n");
             return -2;
         }
@@ -65,7 +65,7 @@ int pir_register_thread(pir_t *dev)
         }
         DEBUG("\tsuccess\n");
     }
-    dev->msg_thread_pid = thread_getpid();
+    dev->msg_thread_pid = sched_active_pid;
 
     return 0;
 }
