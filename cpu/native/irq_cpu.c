@@ -87,8 +87,6 @@ void print_thread_sigmask(ucontext_t *cp)
 #ifdef DEVELHELP
 void print_sigmasks(void)
 {
-    //tcb_t *cb = NULL;
-
     for (int i = 0; i < MAXTHREADS; i++) {
         if (sched_threads[i] != NULL) {
             ucontext_t *p;
