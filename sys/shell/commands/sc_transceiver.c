@@ -39,11 +39,13 @@
 
 #elif defined( MODULE_CC2420 )
 #include "cc2420.h"
+#include "ieee802154_frame.h"
 #define TEXT_SIZE           CC2420_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_CC2420
 
 #elif defined( MODULE_AT86RF231 )
 #include "at86rf231.h"
+#include "ieee802154_frame.h"
 #define TEXT_SIZE           AT86RF231_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_AT86RF231
 
@@ -236,11 +238,12 @@ void _transceiver_send_handler(int argc, char **argv)
     strcpy(text_msg, argv[2]);
 
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+    memset(&p, 0, sizeof(ieee802154_packet_t));
     p.frame.payload = (uint8_t*) text_msg;
     p.frame.payload_len = strlen(text_msg) + 1;
     p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
     p.frame.fcf.src_addr_m = IEEE_802154_SHORT_ADDR_M;
-    memset(p.frame.dest_addr, 0, sizeof(p.frame.dest_addr));
+    p.frame.dest_pan_id = 1;
     p.frame.dest_addr[1] = atoi(argv[1]);
 #else
     p.data = (uint8_t *) text_msg;
