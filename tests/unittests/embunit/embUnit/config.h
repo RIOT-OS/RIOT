@@ -35,6 +35,10 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 /*  #define NO_STDIO_PRINTF*/
     #ifdef  NO_STDIO_PRINTF
         extern void stdimpl_print(const char *string);
@@ -44,5 +48,9 @@
     #endif
 
     #define ASSERT_STRING_BUFFER_MAX    64
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif/*__CONFIG_H__*/

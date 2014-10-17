@@ -19,6 +19,10 @@
 #ifndef __UNITTESTS__H
 #define __UNITTESTS__H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "embUnit/embUnit.h"
 
 #ifdef OUTPUT
@@ -46,6 +50,10 @@
 #   define TESTS_START()   TestRunner_start()
 #   define TESTS_RUN(t)    TestRunner_runTest(t)
 #   define TESTS_END()     TestRunner_end()
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

@@ -37,6 +37,14 @@
 
 #include "Outputter.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 OutputterRef TextOutputter_outputter(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif/*__TEXTOUTPUTTER_H__*/

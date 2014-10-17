@@ -37,7 +37,15 @@
 
 #include "Outputter.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void XMLOutputter_setStyleSheet(char *style);
 OutputterRef XMLOutputter_outputter(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif/*__XMLOUTPUTTER_H__*/

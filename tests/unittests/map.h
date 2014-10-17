@@ -29,6 +29,10 @@
 #ifndef MAP_H_INCLUDED
 #define MAP_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define EVAL0(...) __VA_ARGS__
 #define EVAL1(...) EVAL0 (EVAL0 (EVAL0 (__VA_ARGS__)))
 #define EVAL2(...) EVAL1 (EVAL1 (EVAL1 (__VA_ARGS__)))
@@ -47,5 +51,9 @@
 #define MAP0(f, x, peek, ...) f(x) MAP_NEXT (peek, MAP1) (f, peek, __VA_ARGS__)
 #define MAP1(f, x, peek, ...) f(x) MAP_NEXT (peek, MAP0) (f, peek, __VA_ARGS__)
 #define MAP(f, ...) EVAL (MAP1 (f, __VA_ARGS__, (), 0))
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

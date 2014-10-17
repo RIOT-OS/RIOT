@@ -35,6 +35,10 @@
 #ifndef __HELPERMACRO_H__
 #define __HELPERMACRO_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define EMB_UNIT_TESTCASE(ca,sup,tdw,run) \
     static const TestCase   ca = new_TestCase(#ca,sup,tdw,run)
 
@@ -55,5 +59,9 @@
 
 #define EMB_UNIT_REPEATEDTEST(repeater,test,tmrp) \
     static const RepeatedTest   repeater = new_RepeatedTest(test,tmrp)
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif/*__HELPERMACRO_H__*/

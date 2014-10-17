@@ -47,4 +47,12 @@
 #include <embUnit/AssertImpl.h>
 #include <embUnit/HelperMacro.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif/*__EMBUNIT_H__*/
