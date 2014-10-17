@@ -15,6 +15,7 @@
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Hauke Petersen <mail@haukepetersen.de>
+ * @author      Fabian Nack <nack@inf.fu-berlin.de>
  *
  * @}
  */
@@ -32,9 +33,6 @@
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
     SPI_TypeDef *spi;
-    GPIO_TypeDef *port;
-    int pin[3];        /* 3 pins: sck, miso, mosi */
-    int af = 0;
 
     /* power on the SPI device */
     spi_poweron(dev);
@@ -43,37 +41,21 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 #if SPI_0_EN
         case SPI_0:
             spi = SPI_0_DEV;
-            port = SPI_0_PORT;
-            pin[0] = SPI_0_PIN_SCK;
-            pin[1] = SPI_0_PIN_MISO;
-            pin[2] = SPI_0_PIN_MOSI;
-            af = SPI_0_PIN_AF;
             SPI_0_PORT_CLKEN();
             break;
 #endif
 #if SPI_1_EN
         case SPI_1:
             spi = SPI_1_DEV;
-            port = SPI_1_PORT;
-            pin[0] = SPI_1_PIN_SCK;
-            pin[1] = SPI_1_PIN_MISO;
-            pin[2] = SPI_1_PIN_MOSI;
-            af = SPI_1_PIN_AF;
-            SPI_0_PORT_CLKEN();
+            SPI_1_PORT_CLKEN();
             break;
 #endif
         default:
             return -1;
     }
 
-    /* configure pins for their correct alternate function */
-    for (int i = 0; i < 3; i++) {
-        port->MODER &= ~(3 << (pin[i] * 2));
-        port->MODER |= (2 << (pin[i] * 2));
-        int hl = (pin[i] < 8) ? 0 : 1;
-        port->AFR[hl] &= (0xf << ((pin[i] - (hl * 8)) * 4));
-        port->AFR[hl] |= (af << ((pin[i] - (hl * 8)) * 4));
-    }
+    /* configure SCK, MISO and MOSI pin */
+    spi_conf_pins(dev);
 
     /* reset SPI configuration registers */
     spi->CR1 = 0;
@@ -117,6 +99,47 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data))
 {
     /* due to issues with the send buffer, the master mode is not (yet) supported */
     return -1;
+}
+
+int spi_conf_pins(spi_t dev)
+{
+    GPIO_TypeDef *port;
+    int pin[3];        /* 3 pins: sck, miso, mosi */
+    int af = 0;
+
+    switch (dev) {
+#if SPI_0_EN
+        case SPI_0:
+            port = SPI_0_PORT;
+            pin[0] = SPI_0_PIN_SCK;
+            pin[1] = SPI_0_PIN_MISO;
+            pin[2] = SPI_0_PIN_MOSI;
+            af = SPI_0_PIN_AF;
+            break;
+#endif
+#if SPI_1_EN
+        case SPI_1:
+            port = SPI_1_PORT;
+            pin[0] = SPI_1_PIN_SCK;
+            pin[1] = SPI_1_PIN_MISO;
+            pin[2] = SPI_1_PIN_MOSI;
+            af = SPI_1_PIN_AF;
+            break;
+#endif
+        default:
+            return -1;
+    }
+
+    /* configure pins for their correct alternate function */
+    for (int i = 0; i < 3; i++) {
+        port->MODER &= ~(3 << (pin[i] * 2));
+        port->MODER |= (2 << (pin[i] * 2));
+        int hl = (pin[i] < 8) ? 0 : 1;
+        port->AFR[hl] &= ~(0xf << ((pin[i] - (hl * 8)) * 4));
+        port->AFR[hl] |= (af << ((pin[i] - (hl * 8)) * 4));
+    }
+
+    return 0;
 }
 
 int spi_transfer_byte(spi_t dev, char out, char *in)

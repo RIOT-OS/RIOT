@@ -91,56 +91,20 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 
         default:
             return -1;
-            break;
     }
 
     switch (dev) {
 #if SPI_0_EN
         case SPI_0:
             spi_port = SPI_0_DEV;
-            /***************** PIO-Init *****************/
-            /* Push-pull configuration */
-            SPI_0_MISO_PORT->PIO_MDER &= ~SPI_0_MISO_PIN;
-            SPI_0_MISO_PORT->PIO_MDDR |= SPI_0_MISO_PIN;
-            SPI_0_MOSI_PORT->PIO_MDER &= ~SPI_0_MOSI_PIN;
-            SPI_0_MOSI_PORT->PIO_MDDR |= SPI_0_MOSI_PIN;
-            SPI_0_SCK_PORT->PIO_MDER &= ~SPI_0_SCK_PIN;
-            SPI_0_SCK_PORT->PIO_MDDR |= SPI_0_SCK_PIN;
-
-            /* With pull-up resistors */
-            SPI_0_MISO_PORT->PIO_PUDR &= ~SPI_0_MISO_PIN;
-            SPI_0_MISO_PORT->PIO_PUER |= SPI_0_MISO_PIN;
-            SPI_0_MOSI_PORT->PIO_PUDR &= ~SPI_0_MOSI_PIN;
-            SPI_0_MOSI_PORT->PIO_PUER |= SPI_0_MOSI_PIN;
-            SPI_0_SCK_PORT->PIO_PUDR &= ~SPI_0_SCK_PIN;
-            SPI_0_SCK_PORT->PIO_PUER |= SPI_0_SCK_PIN;
-
-            /* Clear output */
-            SPI_0_MISO_PORT->PIO_SODR &= ~SPI_0_MISO_PIN;
-            SPI_0_MISO_PORT->PIO_CODR |= SPI_0_MISO_PIN;
-            SPI_0_MOSI_PORT->PIO_SODR &= ~SPI_0_MOSI_PIN;
-            SPI_0_MOSI_PORT->PIO_CODR |= SPI_0_MOSI_PIN;
-            SPI_0_SCK_PORT->PIO_SODR &= ~SPI_0_SCK_PIN;
-            SPI_0_SCK_PORT->PIO_CODR |= SPI_0_SCK_PIN;
-
-            /* Peripheral Function Selection */
-            SPI_0_MISO_PORT->PIO_PER &= ~SPI_0_MISO_PIN;
-            SPI_0_MISO_PORT->PIO_PDR |= SPI_0_MISO_PIN;
-            SPI_0_MOSI_PORT->PIO_PER &= ~SPI_0_MOSI_PIN;
-            SPI_0_MOSI_PORT->PIO_PDR |= SPI_0_MOSI_PIN;
-            SPI_0_SCK_PORT->PIO_PER &= ~SPI_0_SCK_PIN;
-            SPI_0_SCK_PORT->PIO_PDR |= SPI_0_SCK_PIN;
-
-            /* Peripheral A */
-            SPI_0_MISO_PORT->PIO_ABSR &= ~SPI_0_MISO_PIN;
-            SPI_0_MOSI_PORT->PIO_ABSR &= ~SPI_0_MOSI_PIN;
-            SPI_0_SCK_PORT->PIO_ABSR &= ~SPI_0_SCK_PIN;
-
             break;
 #endif /* SPI_0_EN */
         default:
             return -2;
     }
+
+    /* Configure SCK, MISO and MOSI pin */
+    spi_conf_pins(dev);
 
     /***************** SPI-Init *****************/
 
@@ -199,55 +163,17 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
             spi_port = SPI_0_DEV;
             NVIC_SetPriority(SPI_0_IRQ, SPI_0_IRQ_PRIO);
             NVIC_EnableIRQ(SPI_0_IRQ);
-
-            /***************** PIO-Init *****************/
-
             /* Initialize predefined NSS pin as output so it is "disabled" */
             PIOA->PIO_PER |= PIO_PA28A_SPI0_NPCS0;
             PIOA->PIO_OER |= PIO_PA28A_SPI0_NPCS0;
-
-            /* Push-pull configuration */
-            SPI_0_MISO_PORT->PIO_MDER &= ~SPI_0_MISO_PIN;
-            SPI_0_MISO_PORT->PIO_MDDR |= SPI_0_MISO_PIN;
-            SPI_0_MOSI_PORT->PIO_MDER &= ~SPI_0_MOSI_PIN;
-            SPI_0_MOSI_PORT->PIO_MDDR |= SPI_0_MOSI_PIN;
-            SPI_0_SCK_PORT->PIO_MDER &= ~SPI_0_SCK_PIN;
-            SPI_0_SCK_PORT->PIO_MDDR |= SPI_0_SCK_PIN;
-
-            /* With pull-up resistors */
-            SPI_0_MISO_PORT->PIO_PUDR &= ~SPI_0_MISO_PIN;
-            SPI_0_MISO_PORT->PIO_PUER |= SPI_0_MISO_PIN;
-            SPI_0_MOSI_PORT->PIO_PUDR &= ~SPI_0_MOSI_PIN;
-            SPI_0_MOSI_PORT->PIO_PUER |= SPI_0_MOSI_PIN;
-            SPI_0_SCK_PORT->PIO_PUDR &= ~SPI_0_SCK_PIN;
-            SPI_0_SCK_PORT->PIO_PUER |= SPI_0_SCK_PIN;
-
-            /* Clear output */
-            SPI_0_MISO_PORT->PIO_SODR &= ~SPI_0_MISO_PIN;
-            SPI_0_MISO_PORT->PIO_CODR |= SPI_0_MISO_PIN;
-            SPI_0_MOSI_PORT->PIO_SODR &= ~SPI_0_MOSI_PIN;
-            SPI_0_MOSI_PORT->PIO_CODR |= SPI_0_MOSI_PIN;
-            SPI_0_SCK_PORT->PIO_SODR &= ~SPI_0_SCK_PIN;
-            SPI_0_SCK_PORT->PIO_CODR |= SPI_0_SCK_PIN;
-
-            /* Peripheral Function Selection */
-            SPI_0_MISO_PORT->PIO_PER &= ~SPI_0_MISO_PIN;
-            SPI_0_MISO_PORT->PIO_PDR |= SPI_0_MISO_PIN;
-            SPI_0_MOSI_PORT->PIO_PER &= ~SPI_0_MOSI_PIN;
-            SPI_0_MOSI_PORT->PIO_PDR |= SPI_0_MOSI_PIN;
-            SPI_0_SCK_PORT->PIO_PER &= ~SPI_0_SCK_PIN;
-            SPI_0_SCK_PORT->PIO_PDR |= SPI_0_SCK_PIN;
-
-            /* Peripheral A */
-            SPI_0_MISO_PORT->PIO_ABSR &= ~SPI_0_MISO_PIN;
-            SPI_0_MOSI_PORT->PIO_ABSR &= ~SPI_0_MOSI_PIN;
-            SPI_0_SCK_PORT->PIO_ABSR &= ~SPI_0_SCK_PIN;
-
             break;
 #endif /* SPI_0_EN */
         default:
             return -1;
     }
+
+    /* Configure SCK, MISO and MOSI pin */
+    spi_conf_pins(dev);
 
     /***************** SPI-Init *****************/
 
@@ -292,6 +218,58 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char(*cb)(char data))
 
     /* Set callback */
     spi_config[dev].cb = cb;
+
+    return 0;
+}
+
+int spi_conf_pins(spi_t dev)
+{
+    switch (dev) {
+#if SPI_0_EN
+        case SPI_0:
+            /***************** PIO-Init *****************/
+            /* Push-pull configuration */
+            SPI_0_MISO_PORT->PIO_MDER &= ~SPI_0_MISO_PIN;
+            SPI_0_MISO_PORT->PIO_MDDR |= SPI_0_MISO_PIN;
+            SPI_0_MOSI_PORT->PIO_MDER &= ~SPI_0_MOSI_PIN;
+            SPI_0_MOSI_PORT->PIO_MDDR |= SPI_0_MOSI_PIN;
+            SPI_0_SCK_PORT->PIO_MDER &= ~SPI_0_SCK_PIN;
+            SPI_0_SCK_PORT->PIO_MDDR |= SPI_0_SCK_PIN;
+
+            /* With pull-up resistors */
+            SPI_0_MISO_PORT->PIO_PUDR &= ~SPI_0_MISO_PIN;
+            SPI_0_MISO_PORT->PIO_PUER |= SPI_0_MISO_PIN;
+            SPI_0_MOSI_PORT->PIO_PUDR &= ~SPI_0_MOSI_PIN;
+            SPI_0_MOSI_PORT->PIO_PUER |= SPI_0_MOSI_PIN;
+            SPI_0_SCK_PORT->PIO_PUDR &= ~SPI_0_SCK_PIN;
+            SPI_0_SCK_PORT->PIO_PUER |= SPI_0_SCK_PIN;
+
+            /* Clear output */
+            SPI_0_MISO_PORT->PIO_SODR &= ~SPI_0_MISO_PIN;
+            SPI_0_MISO_PORT->PIO_CODR |= SPI_0_MISO_PIN;
+            SPI_0_MOSI_PORT->PIO_SODR &= ~SPI_0_MOSI_PIN;
+            SPI_0_MOSI_PORT->PIO_CODR |= SPI_0_MOSI_PIN;
+            SPI_0_SCK_PORT->PIO_SODR &= ~SPI_0_SCK_PIN;
+            SPI_0_SCK_PORT->PIO_CODR |= SPI_0_SCK_PIN;
+
+            /* Peripheral Function Selection */
+            SPI_0_MISO_PORT->PIO_PER &= ~SPI_0_MISO_PIN;
+            SPI_0_MISO_PORT->PIO_PDR |= SPI_0_MISO_PIN;
+            SPI_0_MOSI_PORT->PIO_PER &= ~SPI_0_MOSI_PIN;
+            SPI_0_MOSI_PORT->PIO_PDR |= SPI_0_MOSI_PIN;
+            SPI_0_SCK_PORT->PIO_PER &= ~SPI_0_SCK_PIN;
+            SPI_0_SCK_PORT->PIO_PDR |= SPI_0_SCK_PIN;
+
+            /* Peripheral A */
+            SPI_0_MISO_PORT->PIO_ABSR &= ~SPI_0_MISO_PIN;
+            SPI_0_MOSI_PORT->PIO_ABSR &= ~SPI_0_MOSI_PIN;
+            SPI_0_SCK_PORT->PIO_ABSR &= ~SPI_0_SCK_PIN;
+
+            break;
+#endif /* SPI_0_EN */
+        default:
+            return -1;
+    }
 
     return 0;
 }
