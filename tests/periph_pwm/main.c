@@ -30,9 +30,6 @@
 #include "vtimer.h"
 #include "periph/pwm.h"
 
-/* only compile this test if PWM devices are defined */
-#if PWM_NUMOF
-
 #define WAIT        (10000)
 #define STEP        (10)
 
@@ -77,15 +74,3 @@ int main(void)
 
     return 0;
 }
-
-#else
-
-int main(void)
-{
-    puts("\nRIOT PWM test");
-    puts("There are no PWM devices defined for this board!");
-
-    return 0;
-}
-
-#endif /* PWM_NUMOF */

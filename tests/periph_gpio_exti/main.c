@@ -24,9 +24,6 @@
 #include "periph_conf.h"
 #include "periph/gpio.h"
 
-/* only compile this if at least one GPIO device is defined */
-#if GPIO_NUMOF
-
 #define ACTIVE_FLANK        GPIO_RISING
 #define PULL                GPIO_NOPULL
 
@@ -187,14 +184,3 @@ int main(void)
 
     return 0;
 }
-
-#else
-
-int main(void)
-{
-    puts("No low-level GPIO device defined for this platform.");
-
-    return 0;
-}
-
-#endif /* GPIO_NUMOF */
