@@ -44,6 +44,8 @@ static int spi_speed = -1;
 static int spi_master = -1;     /* 0 for slave, 1 for master, -1 for not initialized */
 
 static char buffer[256];       /* temporary buffer */
+static char rx_buffer[256];    /* global receive buffer */
+static int rx_counter = 0;
 
 static volatile int state;
 static char* mem = "Hello Master! abcdefghijklmnopqrstuvwxyz 0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -140,6 +142,12 @@ void slave_on_cs(void *arg)
 
 char slave_on_data(char data)
 {
+    rx_buffer[rx_counter] = data;
+    rx_counter++;
+    if (rx_counter >= 256) {
+        rx_counter = 0;
+    }
+
     switch (rw) {
         case READ:
             return mem[state++];
@@ -239,6 +247,19 @@ void cmd_transfer(int argc, char **argv)
     }
 }
 
+void cmd_print(int argc, char **argv)
+{
+    if (spi_master != 0) {
+        puts("error: node is not initialized as slave");
+    }
+    else {
+        printf("Received %i bytes:\n", rx_counter);
+        print_bytes("MOSI", rx_buffer, rx_counter);
+    }
+    rx_counter = 0;
+    memset(&rx_buffer, 0, 256);
+}
+
 int shell_getchar(void)
 {
     return (int)getchar();
@@ -253,6 +274,7 @@ static const shell_command_t shell_commands[] = {
     { "init_master", "Initialize node as SPI master", cmd_init_master },
     { "init_slave", "Initialize node as SPI slave", cmd_init_slave },
     { "send", "Transfer string to slave (only in master mode)", cmd_transfer },
+    { "print_rx", "Print the received string (only in slave mode)", cmd_print },
     { NULL, NULL, NULL }
 };
 
