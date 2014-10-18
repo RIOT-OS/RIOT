@@ -19,7 +19,7 @@ export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 FLASHER = mc1322x-load.pl
 TERM = pyterm
-LINKFLAGS = -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T$(RIOTBASE)/cpu/$(CPU)/mc1322x.lds
+LINKFLAGS += -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T$(RIOTBASE)/cpu/$(CPU)/mc1322x.lds
 
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0

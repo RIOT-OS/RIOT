@@ -11,8 +11,8 @@ export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
-#LINKFLAGS =  -g3 -ggdb -mcpu=cortex-m3 $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles -T$(RIOTCPU)/$(CPU)/LPC1768.ld
-LINKFLAGS = -mcpu=cortex-m3 -mthumb -Wl,--gc-sections,--cref -lc -lgcc -lnosys -T$(RIOTCPU)/$(CPU)/LPC1768.ld -nostartfiles
+#LINKFLAGS +=  -g3 -ggdb -mcpu=cortex-m3 $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles -T$(RIOTCPU)/$(CPU)/LPC1768.ld
+LINKFLAGS += -mcpu=cortex-m3 -mthumb -Wl,--gc-sections,--cref -lc -lgcc -lnosys -T$(RIOTCPU)/$(CPU)/LPC1768.ld -nostartfiles
 
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0

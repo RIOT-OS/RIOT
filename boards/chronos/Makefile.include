@@ -14,7 +14,7 @@ export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
-export LINKFLAGS = -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
+export LINKFLAGS += -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
 export FLASHER = mspdebug
 export USEMODULE += msp430_common
 export FFLAGS = rf2500 "prog $(HEXFILE)"
