@@ -26,6 +26,8 @@
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
+#if GPIO_NUMOF
+
 typedef struct {
     void (*cb)(void);
 } gpio_state_t;
@@ -69,3 +71,5 @@ void gpio_toggle(gpio_t dev)
 void gpio_write(gpio_t dev, int value)
 {
 }
+
+#endif /* GPIO_NUMOF */
