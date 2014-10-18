@@ -90,7 +90,6 @@ void sched_run(void)
     my_active_thread = clist_get_container(sched_runqueues[nextrq], tcb_t, rq_entry);
     clist_advance(&(sched_runqueues[nextrq]));
     DEBUG("scheduler: first in queue: %s\n", my_active_thread->name);
-    sched_active_pid = (volatile int) my_active_thread->pid;
 
     kernel_pid_t my_next_pid = my_active_thread->pid;
 
