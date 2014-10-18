@@ -371,7 +371,7 @@ int socket_base_bind(int s, sockaddr6_t *addr, int addrlen)
                         if ((current_socket->protocol == 0) ||
                             (current_socket->protocol == IPPROTO_TCP)) {
                             return tcp_bind_socket(s, addr, addrlen,
-                                                   thread_getpid());
+                                                   sched_active_pid);
                         }
                         else {
                             return -1;
@@ -383,7 +383,7 @@ int socket_base_bind(int s, sockaddr6_t *addr, int addrlen)
                         if ((current_socket->protocol == 0) ||
                             (current_socket->protocol == IPPROTO_UDP)) {
                             return udp_bind_socket(s, addr, addrlen,
-                                                   thread_getpid());
+                                                   sched_active_pid);
                         }
                         else {
                             return -1;

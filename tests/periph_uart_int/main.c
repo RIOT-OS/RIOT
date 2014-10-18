@@ -93,7 +93,7 @@ void *uart_thread(void *arg)
 
 int main(void)
 {
-    main_pid = thread_getpid();
+    main_pid = sched_active_pid;
 
     puts("\nTesting interrupt driven mode of UART driver\n");
 

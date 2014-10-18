@@ -44,7 +44,7 @@ void *timer_thread(void *arg)
 {
     (void) arg;
 
-    printf("This is thread %" PRIkernel_pid "\n", thread_getpid());
+    printf("This is thread %" PRIkernel_pid "\n", sched_active_pid);
 
     /* we need a queue if the second message arrives while the first is still processed */
     /* without a queue, the message would get lost */
@@ -64,7 +64,7 @@ void *timer_thread(void *arg)
                tmsg->interval.microseconds,
                tmsg->msg);
 
-        if (vtimer_set_msg(&tmsg->timer, tmsg->interval, thread_getpid(), tmsg) != 0) {
+        if (vtimer_set_msg(&tmsg->timer, tmsg->interval, sched_active_pid, tmsg) != 0) {
             puts("something went wrong");
         }
         else {
@@ -77,7 +77,7 @@ void *timer_thread_local(void *arg)
 {
     (void) arg;
 
-    printf("This is thread %" PRIkernel_pid "\n", thread_getpid());
+    printf("This is thread %" PRIkernel_pid "\n", sched_active_pid);
 
     while (1) {
         msg_t m;

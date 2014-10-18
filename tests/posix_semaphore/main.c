@@ -123,7 +123,7 @@ static void *priority_sema_thread(void *arg)
 {
     (void) arg;
     sem_wait(&s);
-    printf("Thread '%s' woke up.\n", thread_getname(thread_getpid()));
+    printf("Thread '%s' woke up.\n", thread_getname(sched_active_pid));
     return NULL;
 }
 

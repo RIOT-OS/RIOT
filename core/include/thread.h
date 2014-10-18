@@ -135,17 +135,6 @@ void thread_yield(void);
  */
 int thread_wakeup(kernel_pid_t pid);
 
-
-/**
- * @brief Returns the process ID of the currently running thread
- *
- * @return          obviously you are not a golfer.
- */
-static inline kernel_pid_t thread_getpid(void)
-{
-    return sched_active_pid;
-}
-
 #ifdef DEVELHELP
 /**
  * @brief Measures the stack usage of a stack

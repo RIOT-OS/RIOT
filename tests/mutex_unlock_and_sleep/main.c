@@ -44,7 +44,7 @@ int main(void)
     indicator = 0;
     count = 0;
 
-    main_pid = thread_getpid();
+    main_pid = sched_active_pid;
 
     kernel_pid_t second_pid = thread_create(stack,
                   sizeof(stack),

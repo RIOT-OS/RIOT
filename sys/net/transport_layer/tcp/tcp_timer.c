@@ -148,7 +148,7 @@ void *tcp_general_timer(void *arg)
         inc_global_variables();
         check_sockets();
 
-        vtimer_set_wakeup(&tcp_vtimer, interval, thread_getpid());
+        vtimer_set_wakeup(&tcp_vtimer, interval, sched_active_pid);
         thread_sleep();
 
         vtimer_remove(&tcp_vtimer);

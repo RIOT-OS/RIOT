@@ -37,7 +37,7 @@ void *run(void *arg)
 {
     (void) arg;
 
-    kernel_pid_t me = thread_getpid();
+    kernel_pid_t me = sched_active_pid;
     printf("I am alive (%d)\n", me);
     msg_t m;
     msg_receive(&m);
@@ -61,7 +61,7 @@ void *run(void *arg)
 
 int main(void)
 {
-    main_id = thread_getpid();
+    main_id = sched_active_pid;
 
     printf("Problem: %d\n", PROBLEM);
 

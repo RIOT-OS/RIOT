@@ -73,7 +73,7 @@ int main(void)
 {
     printf("CCN!\n");
 
-    _relay_pid = thread_getpid();
+    _relay_pid = sched_active_pid;
 
     thread_create(t2_stack, sizeof(t2_stack), PRIORITY_MAIN + 1,
                   CREATE_STACKTEST, second_thread, NULL, "helper thread");

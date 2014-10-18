@@ -54,7 +54,7 @@ struct timer_msg timer_msgs[] = { { .interval = { .seconds = 0, .microseconds = 
 void *timer_thread(void *arg)
 {
     (void) arg;
-    printf("This is thread %" PRIkernel_pid "\n", thread_getpid());
+    printf("This is thread %" PRIkernel_pid "\n", sched_active_pid);
 
     msg_t msgq[16];
     msg_init_queue(msgq, sizeof(msgq));
@@ -87,7 +87,7 @@ void *timer_thread(void *arg)
             printf("WARNING: timer difference %" PRId64 "us exceeds MAXDIFF(%d)!\n", diff, MAXDIFF);
         }
 
-        if (vtimer_set_msg(&tmsg->timer, tmsg->interval, thread_getpid(), tmsg) != 0) {
+        if (vtimer_set_msg(&tmsg->timer, tmsg->interval, sched_active_pid, tmsg) != 0) {
             puts("something went wrong setting a timer");
         }
 
