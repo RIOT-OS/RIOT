@@ -1,6 +1,7 @@
 MODULE = cpu
 
 DIRS += periph
+DIRS += drivers
 ifneq (,$(filter rtc,$(USEMODULE)))
 	DIRS += rtc
 endif
