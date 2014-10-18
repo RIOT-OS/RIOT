@@ -1,5 +1,6 @@
 MODULE = cpu
 
+DIRS += periph
 ifneq (,$(filter rtc,$(USEMODULE)))
 	DIRS += rtc
 endif
