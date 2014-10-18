@@ -29,7 +29,8 @@ char t1_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char t2_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char t3_stack[KERNEL_CONF_STACKSIZE_MAIN];
 
-kernel_pid_t p1 = KERNEL_PID_UNDEF, p2 = KERNEL_PID_UNDEF, p3 = KERNEL_PID_UNDEF;
+kernel_pid_t p_main = KERNEL_PID_UNDEF, p1 = KERNEL_PID_UNDEF,
+             p2 = KERNEL_PID_UNDEF, p3 = KERNEL_PID_UNDEF;
 
 void *sub_thread(void *arg)
 {
@@ -42,7 +43,7 @@ void *sub_thread(void *arg)
 
     msg.content.ptr = (char*)thread_getname(pid);
 
-    msg_send(&msg, 1, 1);
+    msg_send(&msg, p_main, true);
 
     printf("THREAD %s (pid:%" PRIkernel_pid ") end.\n", thread_getname(pid), pid);
 
@@ -53,6 +54,8 @@ void *sub_thread(void *arg)
 int main(void)
 {
     msg_t msg;
+
+    p_main = sched_active_pid;
 
     p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST,
