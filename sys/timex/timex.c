@@ -2,7 +2,7 @@
  * Timex implementation
  *
  * Copyright (C) 2009, 2010, 2013, 2014 Freie Universitaet Berlin (FUB).
- * Copyright (C) 2013, INRIA.
+ * Copyright (C) 2013, 2014 INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
