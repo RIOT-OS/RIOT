@@ -10,6 +10,7 @@
  * @defgroup    core_thread Threading
  * @ingroup     core
  * @brief       Support for multi-threading
+ *
  * @{
  *
  * @file        thread.h
@@ -29,10 +30,13 @@
  extern "C" {
 #endif
 
+/**
+ * @brief Describes an illegal thread status
+ */
 #define STATUS_NOT_FOUND (-1)
 
 /**
- * @name Minimum stack size
+ * @brief Minimum stack size
  */
 #ifndef MINIMUM_STACK_SIZE
 #define MINIMUM_STACK_SIZE  (sizeof(tcb_t))
@@ -163,5 +167,5 @@ uintptr_t thread_measure_stack_free(char *stack);
 }
 #endif
 
-/* @} */
+/** @} */
 #endif /* __THREAD_H */

@@ -8,7 +8,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup  sys_vtimer
+ * @defgroup  sys_vtimer
  * @{
  * @file        vtimer.h
  * @author Kaspar Schleiser <kaspar@schleiser.de>

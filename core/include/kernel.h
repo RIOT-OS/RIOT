@@ -117,7 +117,7 @@ extern volatile int lpm_prevent_sleep;
 /**
  * @brief Variable used to store system configuration
  *
- * @detail This contains e.g. the node ID, name, default channel and so on
+ * @details This contains e.g. the node ID, name, default channel and so on
  */
 extern config_t sysconfig;
 
