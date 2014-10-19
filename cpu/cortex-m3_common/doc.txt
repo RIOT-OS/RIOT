@@ -3,38 +3,3 @@
  * @brief       ARM Cortex-M specific code
  * @ingroup     cpu
  */
-
-/**
- * @defgroup    CMSIS_Core_FunctionInterface
- * @ingroup     cpu_cortex-m3
- */
-
-/**
- * @defgroup    CMSIS_core_register
- * @ingroup     cpu_cortex-m3
- */
-
-/**
- * @defgroup    CMSIS_glob_defs
- * @ingroup     cpu_cortex-m3
- */
-
-/**
- * @defgroup    CMSIS_MISRA_Exceptions
- * @ingroup     cpu_cortex-m3
- */
-
-/**
- * @defgroup    CMSIS_core_definitions
- * @ingroup     cpu_cortex-m3
- */
-
-/**
- * @defgroup    CMSIS_SIMD_intrinsics
- * @ingroup     cpu_cortex-m3
- */
-
-/**
- * @defgroup    CMSIS_Core_InstructionInterface
- * @ingroup     cpu_cortex-m3
- */
