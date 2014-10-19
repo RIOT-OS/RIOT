@@ -54,7 +54,7 @@ static void context_restore(void) NORETURN;
  * --------------------------------------
  *
  */
-char *thread_arch_stack_init(void *(*task_func)(void *), void *arg, void *stack_start, int stack_size)
+char *thread_arch_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size)
 {
     uint32_t *stk;
     stk = (uint32_t *)((uintptr_t)stack_start + stack_size);

@@ -79,7 +79,7 @@ kernel_pid_t thread_create(char *stack,
                   int stacksize,
                   char priority,
                   int flags,
-                  void *(*function)(void *arg),
+                  thread_task_func_t task_func,
                   void *arg,
                   const char *name);
 
