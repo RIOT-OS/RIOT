@@ -43,7 +43,7 @@
   * @{
   */
 
-/** @addtogroup stm32f10x
+/** @addtogroup cpu_specific_stm32f10x
   * @{
   */
 
@@ -54,7 +54,7 @@
  extern "C" {
 #endif
 
-/** @addtogroup Library_configuration_section
+/** @addtogroup cpu_specific_Library_configuration_section
   * @{
   */
 
@@ -480,7 +480,7 @@ typedef enum IRQn
 #include "core_cm3.h"
 #include <stdint.h>
 
-/** @addtogroup Exported_types
+/** @addtogroup cpu_specific_Exported_types
   * @{
   */
 
@@ -532,7 +532,7 @@ typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrorStatus;
   * @}
   */
 
-/** @addtogroup Peripheral_registers_structures
+/** @addtogroup cpu_specific_Peripheral_registers_structures
   * @{
   */
 
@@ -1265,7 +1265,7 @@ typedef struct
   * @}
   */
 
-/** @addtogroup Peripheral_memory_map
+/** @addtogroup cpu_specific_Peripheral_memory_map
   * @{
   */
 
@@ -1374,7 +1374,7 @@ typedef struct
   * @}
   */
 
-/** @addtogroup Peripheral_declaration
+/** @addtogroup cpu_specific_Peripheral_declaration
   * @{
   */
 
@@ -1457,11 +1457,11 @@ typedef struct
   * @}
   */
 
-/** @addtogroup Exported_constants
+/** @addtogroup cpu_specific_Exported_constants
   * @{
   */
 
-  /** @addtogroup Peripheral_Registers_Bits_Definition
+  /** @addtogroup cpu_specific_Peripheral_Registers_Bits_Definition
   * @{
   */
 
@@ -8298,7 +8298,7 @@ typedef struct
   #include "stm32f10x_conf.h"
 #endif
 
-/** @addtogroup Exported_macro
+/** @addtogroup cpu_specific_Exported_macro
   * @{
   */
 

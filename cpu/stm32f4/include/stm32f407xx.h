@@ -9,7 +9,7 @@
   *          This file contains:
   *           - Data structures and the address mapping for all peripherals
   *           - Peripheral's registers declarations and bits definition
-  *           - Macros to access peripheral’s registers hardware
+  *           - Macros to access peripheral?s registers hardware
   *
   ******************************************************************************
   * @attention
@@ -45,7 +45,7 @@
   * @{
   */
 
-/** @addtogroup stm32f407xx
+/** @addtogroup cpu_specific_stm32f407xx
   * @{
   */
 
@@ -74,7 +74,7 @@
   * @}
   */
 
-/** @addtogroup Peripheral_interrupt_number_definition
+/** @addtogroup cpu_specific_Peripheral_interrupt_number_definition
   * @{
   */
 
@@ -184,7 +184,7 @@ typedef enum
 #include "core_cm4.h"             /* Cortex-M4 processor and core peripherals */
 #include <stdint.h>
 
-/** @addtogroup Peripheral_registers_structures
+/** @addtogroup cpu_specific_Peripheral_registers_structures
   * @{
   */
 
@@ -1078,7 +1078,7 @@ USB_OTG_HostChannelTypeDef;
   * @}
   */
 
-/** @addtogroup Peripheral_declaration
+/** @addtogroup cpu_specific_Peripheral_declaration
   * @{
   */
 #define TIM2                ((TIM_TypeDef *) TIM2_BASE)
@@ -1170,11 +1170,11 @@ USB_OTG_HostChannelTypeDef;
   * @}
   */
 
-/** @addtogroup Exported_constants
+/** @addtogroup cpu_specific_Exported_constants
   * @{
   */
 
-  /** @addtogroup Peripheral_Registers_Bits_Definition
+  /** @addtogroup cpu_specific_Peripheral_Registers_Bits_Definition
   * @{
   */
 
@@ -7580,7 +7580,7 @@ USB_OTG_HostChannelTypeDef;
   * @}
   */
 
-/** @addtogroup Exported_macros
+/** @addtogroup cpu_specific_Exported_macros
   * @{
   */
 
