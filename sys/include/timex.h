@@ -27,6 +27,8 @@
 
 #define SEC_IN_USEC 1000000
 
+#define TIMEX_MAX_STR_LEN   (18)
+
 typedef struct timex_t {
     uint32_t seconds;
     uint32_t microseconds;
@@ -87,11 +89,18 @@ static inline timex_t timex_from_uint64(const uint64_t timestamp)
 }
 
 /**
- * @brief Prints a timex_t
+ * @brief Converts a timex_t to a struct
  */
-static inline void timex_print(const timex_t t)
+static inline const char *timex_to_str(timex_t t, char *timestamp)
 {
-    printf("Seconds: %" PRIu32 " - Microseconds: %" PRIu32 "\n", t.seconds, t.microseconds);
+    timex_normalize(&t);
+    /* 2^32 seconds have maximum 10 digits, microseconds are always < 1000000
+     * in a normalized timestamp, plus two chars for the point and terminator
+     * => 10 + 6 + 2 = 20 */
+    /* TODO: replace call to snprintf by something more efficient */
+    snprintf(timestamp, TIMEX_MAX_STR_LEN, "%" PRIu32 ".%06" PRIu32 " s",
+             t.seconds, t.microseconds);
+    return timestamp;
 }
 
 #endif /* __TIMEX_H */
