@@ -32,8 +32,8 @@
 #define TEXT_SIZE           CC1100_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_CC1100
 
-#elif defined( MODULE_CC110X_NG )
-#include "cc110x_ng.h"
+#elif defined( MODULE_CC110X_LEGACY )
+#include "cc110x_legacy.h"
 #define TEXT_SIZE           CC1100_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_CC1100
 

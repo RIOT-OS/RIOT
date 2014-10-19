@@ -10,7 +10,7 @@
 #define __CC1100_DEFAULTSETTINGS_H
 
 /**
- * @ingroup     drivers_cc110x_ng
+ * @ingroup     drivers_cc110x_legacy
  * @{
  *
  * @file

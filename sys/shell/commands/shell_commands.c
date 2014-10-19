@@ -63,7 +63,7 @@ extern void _x86_lspci(int argc, char **argv);
 #ifdef DBG_IGNORE
 #define _TC_IGN
 #endif
-#if (defined(MODULE_CC110X_NG) || defined(MODULE_CC2420) || defined(MODULE_AT86RF231) || defined(MODULE_NATIVENET))
+#if (defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC2420) || defined(MODULE_AT86RF231) || defined(MODULE_NATIVENET))
 #define _TC_ADDR
 #define _TC_CHAN
 #define _TC_MON

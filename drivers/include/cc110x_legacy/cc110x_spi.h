@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_cc110x_ng
+ * @ingroup     drivers_cc110x_legacy
  * @{
  *
  * @file

@@ -2,7 +2,7 @@ ifneq (,$(filter cc110x,$(USEMODULE)))
 	USEMODULE += gpioint
 endif
 
-ifneq (,$(filter cc110x_ng,$(USEMODULE)))
+ifneq (,$(filter cc110x_legacy,$(USEMODULE)))
 	USEMODULE += cc110x_spi
 	USEMODULE += gpioint
 endif
