@@ -30,7 +30,7 @@
 
 #define TIMEX_MAX_STR_LEN   (18)
 
-typedef struct timex_t {
+typedef struct {
     uint32_t seconds;
     uint32_t microseconds;
 } timex_t;
