@@ -26,8 +26,6 @@
 
 #include "timex.h"
 
-#define SEC_IN_USEC 1000000
-
 timex_t timex_add(const timex_t a, const timex_t b)
 {
 #if ENABLE_DEBUG
@@ -46,17 +44,6 @@ timex_t timex_add(const timex_t a, const timex_t b)
     }
 
     return result;
-}
-
-void timex_normalize(timex_t *time)
-{
-    time->seconds += (time->microseconds / SEC_IN_USEC);
-    time->microseconds %= SEC_IN_USEC;
-}
-
-int timex_isnormalized(timex_t *time)
-{
-    return (time->microseconds < SEC_IN_USEC);
 }
 
 timex_t timex_set(uint32_t seconds, uint32_t microseconds)
@@ -119,19 +106,4 @@ int timex_cmp(const timex_t a, const timex_t b)
     }
 
     return 1;
-}
-
-uint64_t timex_uint64(const timex_t a)
-{
-    return (uint64_t) a.seconds * SEC_IN_USEC + a.microseconds;
-}
-
-timex_t timex_from_uint64(const uint64_t timestamp)
-{
-    return timex_set(timestamp / SEC_IN_USEC, timestamp % SEC_IN_USEC);
-}
-
-void timex_print(const timex_t t)
-{
-    printf("Seconds: %" PRIu32 " - Microseconds: %" PRIu32 "\n", t.seconds, t.microseconds);
 }
