@@ -218,8 +218,8 @@ void _transceiver_send_handler(int argc, char **argv)
         puts("Transceiver not initialized");
         return;
     }
-    if (argc != 3) {
-        printf("Usage:\t%s <ADDR> <MSG>\n", argv[0]);
+    if (argc < 3) {
+        printf("Usage:\t%s <ADDR> <MSG> [PAN]\n", argv[0]);
         return;
     }
 
@@ -243,8 +243,13 @@ void _transceiver_send_handler(int argc, char **argv)
     p.frame.payload_len = strlen(text_msg) + 1;
     p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
     p.frame.fcf.src_addr_m = IEEE_802154_SHORT_ADDR_M;
-    p.frame.dest_pan_id = 1;
     p.frame.dest_addr[1] = atoi(argv[1]);
+    if (argc == 4) {
+        p.frame.dest_pan_id = atoi(argv[3]);
+    }
+    else {
+        p.frame.dest_pan_id = 1;
+    }
 #else
     p.data = (uint8_t *) text_msg;
     p.length = strlen(text_msg) + 1;

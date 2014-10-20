@@ -23,6 +23,7 @@ config_t sysconfig  = {
 #ifdef HAS_RADIO
     0,      /**< default radio address */
     0,      /**< default radio channel */
+    1,      /**< default radio PAN id   */
 #endif
-    "foobar", /**< default name */
+    "foobar",   /**< default name */
 };

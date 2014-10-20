@@ -72,6 +72,6 @@ void at86rf231_write_fifo(const uint8_t *data, radio_packet_length_t length)
 
 uint8_t at86rf231_get_status(void)
 {
-    return at86rf231_reg_read(AT86RF231_REG__TRX_STATUS)
-           & AT86RF231_TRX_STATUS_MASK__TRX_STATUS;
+    return (at86rf231_reg_read(AT86RF231_REG__TRX_STATUS)
+            & AT86RF231_TRX_STATUS_MASK__TRX_STATUS);
 }
