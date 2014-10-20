@@ -52,6 +52,9 @@ endif
 ifneq (,$(filter lps331ap,$(USEMODULE)))
     DIRS += lps331ap
 endif
+ifneq (,$(filter l3g4200d,$(USEMODULE)))
+    DIRS += l3g4200d
+endif
 ifneq (,$(filter netdev_802154,$(USEMODULE)))
     DIRS += netdev/802154
 endif
