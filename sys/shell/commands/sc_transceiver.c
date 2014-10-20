@@ -285,7 +285,7 @@ void _transceiver_monitor_handler(int argc, char **argv)
     mesg.content.ptr = (char *) &tcmd;
     mesg.type = SET_MONITOR;
 
-    msg_send(&mesg, transceiver_pid, 1);
+    msg_send(&mesg, transceiver_pid);
 }
 
 /* checked for type safety */

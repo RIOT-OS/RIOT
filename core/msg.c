@@ -199,7 +199,7 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
 
     /* msg_send blocks until reply received */
 
-    return msg_send(m, target_pid, true);
+    return msg_send(m, target_pid);
 }
 
 int msg_reply(msg_t *m, msg_t *reply)

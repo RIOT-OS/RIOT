@@ -42,7 +42,7 @@ static void *child_fun(void *arg)
         msg_t m;
         m.type = i + 1;
         m.content.ptr = (void *) sched_active_thread->name;
-        msg_send(&m, parent_pid, true);
+        msg_send(&m, parent_pid);
     }
 
     printf("End of %s.\n", sched_active_thread->name);

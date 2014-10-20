@@ -158,7 +158,7 @@ static void SMB380_simple_interrupthandler(void)
     if (interruptTicksSMB380 >= sampleRateSMB380 - 1) {
         interruptTicksSMB380 = 0;
         wakeupmessage.type = MSG_TYPE_SMB380_WAKEUP;
-        msg_send(&wakeupmessage, simple_pid, 0);
+        msg_try_send(&wakeupmessage, simple_pid);
     }
     else {
         interruptTicksSMB380++;
@@ -566,7 +566,7 @@ void wakeUpRegisteredProcesses(void)
 
     while ((pointerNo < SMB380_RING_BUFF_MAX_THREADS) &&
            (PointerList[pointerNo] > 0)) {
-        msg_send(&wakeupmessage, PointerList[pointerNo], false);
+        msg_try_send(&wakeupmessage, PointerList[pointerNo]);
         pointerNo++;
     }
 }
