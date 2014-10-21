@@ -1,5 +1,5 @@
 /**
- * @defgroup    cpu_cortex-m3 Cortex-M
+ * @defgroup    cpu_cortex-m3 Cortex-M3 common
  * @brief       ARM Cortex-M specific code
  * @ingroup     cpu
  */
