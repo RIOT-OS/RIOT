@@ -91,6 +91,7 @@ int vtimer_init(void);
  * @return      0 on success, < 0 on error
  */
 int vtimer_usleep(uint32_t us);
+int vtimer_usleep_until(timex_t *last_wakeup, uint32_t usecs);
 
 /**
  * @brief   will cause the calling thread to be suspended from excecution until the time specified by time has elapsed
@@ -98,6 +99,7 @@ int vtimer_usleep(uint32_t us);
  * @return      0 on success, < 0 on error
  */
 int vtimer_sleep(timex_t time);
+int vtimer_sleep_until(timex_t *last_wakeup, const timex_t interval);
 
 /**
  * @brief   set a vtimer with msg event handler of type @ref MSG_TIMER
