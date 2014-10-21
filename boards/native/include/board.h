@@ -15,7 +15,7 @@
  *
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Basic definitions for the native board
  *
  * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>

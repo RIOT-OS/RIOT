@@ -16,7 +16,7 @@
  *
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Basic definitions for the TelosB board
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>

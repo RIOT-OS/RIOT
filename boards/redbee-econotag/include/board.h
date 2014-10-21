@@ -12,7 +12,7 @@
  * @brief       Support for the Redbee Econotag board
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Basic definitions for the Redbee Econotag board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

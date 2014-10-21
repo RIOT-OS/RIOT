@@ -10,7 +10,7 @@
  * @ingroup     board_udoo
  * @{
  *
- * @file        periph_conf.h
+ * @file
  * @brief       Peripheral MCU configuration for the UDOO board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

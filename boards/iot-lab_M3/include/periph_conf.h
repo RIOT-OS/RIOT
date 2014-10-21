@@ -10,7 +10,7 @@
  * @ingroup     board_iot-lab_M3
  * @{
  *
- * @file        periph_conf.h
+ * @file
  * @brief       Peripheral MCU configuration for the iot-lab_M3 board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

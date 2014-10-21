@@ -10,7 +10,7 @@
  * @ingroup     board_pca10005
  * @{
  *
- * @file        periph_conf.h
+ * @file
  * @brief       Peripheral MCU configuration for the nRF51822 board pca10005
  *
  * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>

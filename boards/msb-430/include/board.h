@@ -17,7 +17,7 @@
  *
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Central defnitions for the ScatterWeb MSB-430 board
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project

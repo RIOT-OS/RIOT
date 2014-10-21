@@ -16,7 +16,7 @@
  *
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Basic definitions for the Senslab WSN430 v1.4 board
  *
  * @author      Milan Babel <babel@inf.fu-berlin.de>

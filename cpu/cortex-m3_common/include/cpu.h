@@ -10,7 +10,7 @@
  * @addtogroup  cpu_cortex-m3
  * @{
  *
- * @file        cpu.h
+ * @file
  * @brief       Basic definitions for the Cortex-M3 common module
  *
  * When ever you want to do something hardware related, that is accessing MCUs registers directly,

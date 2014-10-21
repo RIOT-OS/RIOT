@@ -10,7 +10,7 @@
  * @ingroup     board_arduino-due
  * @{
  *
- * @file        periph_conf.h
+ * @file
  * @brief       Peripheral MCU configuration for the Arduino Due board
  *
  * @author      Hauke Petersen  <hauke.petersen@fu-berlin.de>

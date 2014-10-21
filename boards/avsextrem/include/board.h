@@ -14,7 +14,7 @@
  * @brief       Support for the Avsextrem board
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Boards specific drivers and configuration for the Avsextrem board
  *
  * @author      Heiko Will

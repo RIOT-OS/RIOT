@@ -12,7 +12,7 @@
  * @brief       Support for the ScatterWeb MSB-430H board
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Basic definitions for the MSB-430H board
  *
  * @author      Freie Universität Berlin, Computer Systems & Telematics, FeuerWhere project

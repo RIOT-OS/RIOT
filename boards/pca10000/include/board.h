@@ -12,7 +12,7 @@
  * @brief       Board specific files for the nRF51822 board pca10000.
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Board specific definitions for the nRF51822 evaluation board pca10000.
  *
  * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>

@@ -12,7 +12,7 @@
  * @brief       Support for the Atmel SAM R21 Xplained Pro board.
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Board specific definitions for the Atmel SAM R21 Xplained Pro board.
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

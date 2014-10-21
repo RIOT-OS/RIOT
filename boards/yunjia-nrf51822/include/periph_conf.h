@@ -10,7 +10,7 @@
  * @ingroup     board_yunjia-nrf51822
  * @{
  *
- * @file        periph_conf.h
+ * @file
  * @brief       Peripheral MCU configuration for the Yunjia NRF51822 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
