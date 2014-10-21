@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @defgroup    net_help Net help
  * @ingroup     net
@@ -6,7 +14,7 @@
  *
  * @file        net_help.h
  *
- * @author      Oliver
+ * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
 #ifndef __NET_HELP_H
@@ -19,23 +27,39 @@
 #include "clang_compat.h"
 #endif
 
+#include "byteorder.h"
+
 #define BITSET(var,pos) ((var) & (1<<(pos)))
-#define HTONS(a) ((((uint16_t) (a) >> 8) & 0xff) | ((((uint16_t) (a)) & 0xff) << 8))
-#define HTONL(a) ((((uint32_t) (a) & 0xff000000) >> 24) | \
-                  (((uint32_t) (a) & 0x00ff0000) >> 8)  | \
-                  (((uint32_t) (a) & 0x0000ff00) << 8)  | \
-                  (((uint32_t) (a) & 0x000000ff) << 24))
-#define HTONLL(a) ((((uint64_t) (a) & 0xff00000000000000) >> 56) | \
-                   (((uint64_t) (a) & 0x00ff000000000000) >> 40)  | \
-                   (((uint64_t) (a) & 0x0000ff0000000000) >> 24) | \
-                   (((uint64_t) (a) & 0x000000ff00000000) >> 8)  | \
-                   (((uint64_t) (a) & 0x00000000ff000000) << 8)  | \
-                   (((uint64_t) (a) & 0x0000000000ff0000) << 24)  | \
-                   (((uint64_t) (a) & 0x000000000000ff00) << 40)  | \
-                   (((uint64_t) (a) & 0x00000000000000ff) << 56))
-#define NTOHS HTONS
-#define NTOHL HTONL
-#define NTOHLL HTONLL
+
+static inline uint16_t HTONS(uint16_t a)
+{
+    return byteorder_htons(a).u16;
+}
+
+static inline uint32_t HTONL(uint32_t a)
+{
+    return byteorder_htonl(a).u32;
+}
+
+static inline uint64_t HTONLL(uint64_t a)
+{
+    return byteorder_htonll(a).u64;
+}
+
+static inline uint16_t NTOHS(uint16_t a)
+{
+    return byteorder_ntohs(*(network_uint16_t *) &a);
+}
+
+static inline uint32_t NTOHL(uint32_t a)
+{
+    return byteorder_ntohl(*(network_uint32_t *) &a);
+}
+
+static inline uint64_t NTOHLL(uint64_t a)
+{
+    return byteorder_ntohll(*(network_uint64_t *) &a);
+}
 
 #define CMP_IPV6_ADDR(a, b) (memcmp(a, b, 16))
 

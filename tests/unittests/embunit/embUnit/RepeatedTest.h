@@ -35,6 +35,10 @@
 #ifndef __REPEATEDTEST_H__
 #define __REPEATEDTEST_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct __RepeatedTest   RepeatedTest;
 typedef struct __RepeatedTest*  RepeatedTestRef;    /*downward compatible*/
 
@@ -52,5 +56,9 @@ extern const TestImplement RepeatedTestImplement;
         (Test*)test,\
         tmrp,\
     }
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif/*__REPEATEDTEST_H__*/

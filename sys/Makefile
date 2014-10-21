@@ -13,6 +13,9 @@ endif
 ifneq (,$(filter ping,$(USEMODULE)))
     DIRS += ping
 endif
+ifneq (,$(filter pktbuf,$(USEMODULE)))
+    DIRS += net/crosslayer/pktbuf
+endif
 ifneq (,$(filter ps,$(USEMODULE)))
     DIRS += ps
 endif

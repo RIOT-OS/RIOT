@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 #include "board.h"
+#include "cpu.h"
 
 /**
  * memory markers as defined in the linker script
@@ -57,6 +58,11 @@ void reset_handler(void)
     uint32_t *dst;
     uint32_t *src = &_etext;
 
+    /* make sure all RAM blocks are turned on
+     * -> see NRF51822 Product Anomaly Notice (PAN) #16 for more details
+     */
+    NRF_POWER->RAMON = 0xf;
+
     /* load data section from flash to ram */
     for (dst = &_srelocate; dst < &_erelocate; ) {
         *(dst++) = *(src++);
@@ -90,8 +96,12 @@ void isr_nmi(void)
 
 void isr_hard_fault(void)
 {
-    LED_RED_ON;
-    while (1) {asm ("nop");}
+    while (1) {
+        for (int i = 0; i < 500000; i++) {
+            asm("nop");
+        }
+        LED_RED_TOGGLE;
+    }
 }
 
 /* Cortex-M specific interrupt vectors */

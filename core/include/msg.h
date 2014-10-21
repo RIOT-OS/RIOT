@@ -32,6 +32,10 @@
 #ifndef __MSG_H_
 #define __MSG_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "kernel_types.h"
@@ -179,6 +183,10 @@ int msg_reply(msg_t *m, msg_t *reply);
  * @return -1, on error
  */
 int msg_init_queue(msg_t *array, int num);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __MSG_H_ */
 /** @} */

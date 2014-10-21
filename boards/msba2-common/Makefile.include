@@ -14,13 +14,13 @@ export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 FLASHER = lpc2k_pgm
 TERMPROG ?= $(RIOTBASE)/dist/tools/pyterm/pyterm
-LINKFLAGS = -gdwarf-2 -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T$(RIOTBASE)/cpu/$(CPU)/linkerscript.x
+LINKFLAGS += -gdwarf-2 -mcpu=arm7tdmi-s -static -lgcc -nostartfiles -T$(RIOTBASE)/cpu/$(CPU)/linkerscript.x
 
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
 endif
 export FFLAGS = $(PORT) $(HEXFILE)
-export TERMFLAGS += -p "$(PORT)"
+export TERMFLAGS += -tg -p "$(PORT)"
 include $(RIOTBOARD)/msba2-common/Makefile.dep
 
 export INCLUDES += -I$(RIOTBOARD)/msba2-common/include -I$(RIOTBOARD)/msba2-common/drivers/include

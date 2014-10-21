@@ -40,7 +40,7 @@ int main(int argc, char **argv)
             return -1;
         }
 
-        sscanf(argv[8], "%f", &interval);
+        sscanf(argv[8], "%20f", &interval);
         sprintf(ping_addr, "abcd::%s/64", argv[4]);
 
         start_test(ping_addr, argv[5], argv[6], atoi(argv[7]), interval);

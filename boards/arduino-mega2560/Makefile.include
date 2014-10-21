@@ -28,16 +28,28 @@ else
 endif
 export FLASHER
 export PORT
+export DIST_PATH = $(RIOTBOARD)/$(BOARD)/dist
+export DEBUGSERVER_PORT = 4242
+export DEBUGSERVER = $(DIST_PATH)/debug_srv.sh
+export DEBUGSERVER_FLAGS = "-g -j usb :$(DEBUGSERVER_PORT)"
+export DEBUGGER_FLAGS = "-x $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(ELFFILE)"
+export DEBUGGER = $(DIST_PATH)/debug.sh $(DEBUGSERVER_FLAGS) $(DIST_PATH) $(DEBUGSERVER_PORT)
+
+# PROGRAMMER defaults to stk500v2 which is the internal flasher via USB. Can be
+# overridden for debugging (which requires changes that require to use an ISP)
+export PROGRAMMER ?= stk500v2
+
+ifeq ($(PROGRAMMER), stk500v2)
+    export PROGRAMMER_FLAGS = -P $(PORT) -b 115200
+endif
 
 # define build specific options
 export CPU_USAGE = -mmcu=atmega2560
 export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE)
 export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE)
 export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -static -lgcc -e reset_handler
-# linkerscript specified in cpu/Makefile.include
-#export LINKFLAGS += -T$(LINKERSCRIPT)
 export OFLAGS += -j .text -j .data -O ihex
-export FFLAGS += -p m2560 -c stk500v2 -P $(PORT) -b 115200 -F -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex
+export FFLAGS += -p m2560 -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -F -U flash:w:bin/$(BOARD)/$(PROJECT)$(APPLICATION).hex
 
 # export board specific includes to the global includes-listing
 export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include

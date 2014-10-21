@@ -14,6 +14,7 @@
  * @name       Peripheral MCU configuration for the STM32F4discovery board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
 #ifndef __PERIPH_CONF_H
@@ -193,39 +194,51 @@
  * @name SPI configuration
  * @{
  */
-#define SPI_NUMOF           (0U)                                                /* TODO !!!!!!! */
-#define SPI_0_EN            0
-#define SPI_1_EN            0
+#define SPI_NUMOF           (2U)
+#define SPI_0_EN            1
+#define SPI_1_EN            1
+#define SPI_IRQ_PRIO        1
 
 /* SPI 0 device config */
-#define SPI_0_DEV
-#define SPI_0_CLKEN()
-#define SPI_0_IRQ
-#define SPI_0_IRQ_HANDLER
-#define SPI_0_IRQ_PRIO
-/* SPI 1 pin configuration */
-#define SPI_0_PORT
-#define SPI_0_PINS
-#define SPI_1_PORT_CLKEN()
-#define SPI_1_SCK_AFCFG()
-#define SPI_1_MISO_AFCFG()
-#define SPI_1_MOSI_AFCFG()
+#define SPI_0_DEV               SPI1
+#define SPI_0_CLKEN()           (RCC->APB2ENR |= RCC_APB2ENR_SPI1EN)
+#define SPI_0_CLKDIS()          (RCC->APB2ENR &= ~RCC_APB2ENR_SPI1EN)
+#define SPI_0_IRQ               SPI1_IRQn
+#define SPI_0_IRQ_HANDLER       isr_spi1
+/* SPI 0 pin configuration */
+#define SPI_0_SCK_PORT          GPIOA
+#define SPI_0_SCK_PIN           5
+#define SPI_0_SCK_AF            5
+#define SPI_0_SCK_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
+#define SPI_0_MISO_PORT         GPIOA
+#define SPI_0_MISO_PIN          6
+#define SPI_0_MISO_AF           5
+#define SPI_0_MISO_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
+#define SPI_0_MOSI_PORT         GPIOA
+#define SPI_0_MOSI_PIN          7
+#define SPI_0_MOSI_AF           5
+#define SPI_0_MOSI_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
 
 /* SPI 1 device config */
-#define SPI_1_DEV
-#define SPI_1_CLKEN()
-#define SPI_1_IRQ
-#define SPI_1_IRQ_HANDLER
-#define SPI_1_IRQ_PRIO
+#define SPI_1_DEV               SPI2
+#define SPI_1_CLKEN()           (RCC->APB1ENR |= RCC_APB1ENR_SPI2EN)
+#define SPI_1_CLKDIS()          (RCC->APB1ENR &= ~RCC_APB1ENR_SPI2EN)
+#define SPI_1_IRQ               SPI2_IRQn
+#define SPI_1_IRQ_HANDLER       isr_spi2
 /* SPI 1 pin configuration */
-#define SPI_1_PORT
-#define SPI_1_PINS
-#define SPI_1_PORT_CLKEN()
-#define SPI_1_SCK_AFCFG()
-#define SPI_1_MISO_AFCFG()
-#define SPI_1_MOSI_AFCFG()
+#define SPI_1_SCK_PORT          GPIOB
+#define SPI_1_SCK_PIN           13
+#define SPI_1_SCK_AF            5
+#define SPI_1_SCK_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define SPI_1_MISO_PORT         GPIOB
+#define SPI_1_MISO_PIN          14
+#define SPI_1_MISO_AF           5
+#define SPI_1_MISO_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define SPI_1_MOSI_PORT         GPIOB
+#define SPI_1_MOSI_PIN          15
+#define SPI_1_MOSI_AF           5
+#define SPI_1_MOSI_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
 /** @} */
-
 
 /**
  * @name I2C configuration

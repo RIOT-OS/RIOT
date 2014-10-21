@@ -589,6 +589,7 @@ static void test_float_half(void)
     /* check border conditions */
     CBOR_CHECK(float, float_half, stream, -.0f, HEX_LITERAL(0xf9, 0x80, 0x00), EQUAL_FLOAT);
     CBOR_CHECK(float, float_half, stream, .0f, HEX_LITERAL(0xf9, 0x00, 0x00), EQUAL_FLOAT);
+    /* cppcheck-suppress nanInArithmeticExpression */
     CBOR_CHECK(float, float_half, stream, INFINITY, HEX_LITERAL(0xf9, 0x7c, 0x00), EQUAL_FLOAT);
     /* TODO: Broken: encode_float_half issue? */
     /*CBOR_CHECK(float, float_half, stream, NAN, HEX_LITERAL(0xf9, 0x7e, 0x00), EQUAL_FLOAT);*/
@@ -618,10 +619,14 @@ static void test_float(void)
     /* check border conditions */
     CBOR_CHECK(float, float, stream, .0f,
                HEX_LITERAL(0xfa, 0x00, 0x00, 0x00, 0x00), EQUAL_FLOAT);
+    /* cppcheck-suppress nanInArithmeticExpression */
     CBOR_CHECK(float, float, stream, INFINITY,
+    /* cppcheck-suppress nanInArithmeticExpression */
                HEX_LITERAL(0xfa, 0x7f, 0x80, 0x00, 0x00), EQUAL_FLOAT);
+    /* cppcheck-suppress nanInArithmeticExpression */
     CBOR_CHECK(float, float, stream, NAN,
                HEX_LITERAL(0xfa, 0x7f, 0xc0, 0x00, 0x00), EQUAL_FLOAT);
+    /* cppcheck-suppress nanInArithmeticExpression */
     CBOR_CHECK(float, float, stream, -INFINITY,
                HEX_LITERAL(0xfa, 0xff, 0x80, 0x00, 0x00), EQUAL_FLOAT);
 
@@ -646,10 +651,14 @@ static void test_double(void)
     /* check border conditions */
     CBOR_CHECK(double, double, stream, .0f,
                HEX_LITERAL(0xfb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00), EQUAL_FLOAT);
+    /* cppcheck-suppress nanInArithmeticExpression */
     CBOR_CHECK(double, double, stream, INFINITY,
+    /* cppcheck-suppress nanInArithmeticExpression */
                HEX_LITERAL(0xfb, 0x7f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00), EQUAL_FLOAT);
+    /* cppcheck-suppress nanInArithmeticExpression */
     CBOR_CHECK(double, double, stream, NAN,
                HEX_LITERAL(0xfb, 0x7f, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00), EQUAL_FLOAT);
+    /* cppcheck-suppress nanInArithmeticExpression */
     CBOR_CHECK(double, double, stream, -INFINITY,
                HEX_LITERAL(0xfb, 0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00), EQUAL_FLOAT);
 

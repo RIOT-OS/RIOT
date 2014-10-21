@@ -6,9 +6,22 @@
  * directory for more details.
  */
 
+/**
+ * @ingroup     drivers_at86rf231
+ * @{
+ *
+ * @file
+ * @brief       RX related functionality for the AT86RF231 device driver
+ *
+ * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ *
+ * @}
+ */
+
 #include "at86rf231.h"
-#include "at86rf231_arch.h"
 #include "at86rf231_spi.h"
+#include "hwtimer.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -17,7 +30,7 @@ static void at86rf231_xmit(uint8_t *data, radio_packet_length_t length);
 
 static void at86rf231_gen_pkt(uint8_t *buf, at86rf231_packet_t *packet);
 
-static uint8_t sequenz_nr;
+static uint8_t sequence_nr;
 
 int16_t at86rf231_send(at86rf231_packet_t *packet)
 {
@@ -47,9 +60,9 @@ int16_t at86rf231_send(at86rf231_packet_t *packet)
     }
 
     packet->frame.src_pan_id = at86rf231_get_pan();
-    packet->frame.seq_nr = sequenz_nr;
+    packet->frame.seq_nr = sequence_nr;
 
-    sequenz_nr += 1;
+    sequence_nr += 1;
 
     // calculate size of the frame (payload + FCS) */
     packet->length = ieee802154_frame_get_hdr_len(&packet->frame) +
@@ -82,7 +95,7 @@ static void at86rf231_xmit(uint8_t *data, radio_packet_length_t length)
     do {
         status = at86rf231_get_status();
 
-        vtimer_usleep(10);
+        hwtimer_wait(HWTIMER_TICKS(10));
 
         if (!--max_wait) {
             printf("at86rf231 : ERROR : could not enter PLL_ON mode");

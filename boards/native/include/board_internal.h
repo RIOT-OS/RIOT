@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2013, 2014 Ludwig Ortmann
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 #ifdef MODULE_UART0
 #include <sys/select.h>
 void _native_handle_uart0_input(void);

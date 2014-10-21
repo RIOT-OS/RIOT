@@ -1,5 +1,4 @@
 /*
- * at86rf231.c - Implementation of at86rf231 functions.
  * Copyright (C) 2013 Alaeddine Weslati <alaeddine.weslati@inria.fr>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -7,15 +6,12 @@
  * directory for more details.
  */
 
-#include "kernel_types.h"
-#include "transceiver.h"
-
 /**
  * @ingroup     drivers_at86rf231
  * @{
  *
- * @file        at86rf231.c
- * @brief       Driver implementation for at86rf231 chip
+ * @file
+ * @brief       Driver implementation of the AT86RF231 device driver
  *
  * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
@@ -24,8 +20,13 @@
  */
 
 #include "at86rf231.h"
-#include "at86rf231_arch.h"
 #include "at86rf231_spi.h"
+#include "board.h"
+#include "periph/gpio.h"
+#include "periph/spi.h"
+#include "kernel_types.h"
+#include "transceiver.h"
+#include "hwtimer.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -36,6 +37,11 @@ static uint16_t radio_address;
 static uint64_t radio_address_long;
 
 uint8_t  driver_state;
+
+uint8_t at86rf231_get_status(void);
+void at86rf231_gpio_spi_interrupts_init(void);
+void at86rf231_reset(void);
+
 
 void at86rf231_init(kernel_pid_t tpid)
 {
@@ -71,7 +77,8 @@ void at86rf231_init(kernel_pid_t tpid)
 
 void at86rf231_switch_to_rx(void)
 {
-    at86rf231_disable_interrupts();
+    gpio_irq_disable(AT86RF231_INT);
+
     // Send a FORCE TRX OFF command
     at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__FORCE_TRX_OFF);
 
@@ -82,7 +89,7 @@ void at86rf231_switch_to_rx(void)
     at86rf231_reg_read(AT86RF231_REG__IRQ_STATUS);
 
     // Enable IRQ interrupt
-    at86rf231_enable_interrupts();
+    gpio_irq_enable(AT86RF231_INT);
 
     // Start RX
     at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__RX_ON);
@@ -94,7 +101,7 @@ void at86rf231_switch_to_rx(void)
     do {
         status = at86rf231_get_status();
 
-        vtimer_usleep(10);
+        hwtimer_wait(HWTIMER_TICKS(10));
 
         if (!--max_wait) {
             printf("at86rf231 : ERROR : could not enter RX_ON mode\n");
@@ -104,8 +111,10 @@ void at86rf231_switch_to_rx(void)
     while ((status & AT86RF231_TRX_STATUS_MASK__TRX_STATUS) != AT86RF231_TRX_STATUS__RX_ON);
 }
 
-void at86rf231_rx_irq(void)
+void at86rf231_rx_irq(void *arg)
 {
+    (void)arg;
+
     /* check if we are in sending state */
     if (driver_state == AT_DRIVER_STATE_SENDING) {
         /* Read IRQ to clear it */
@@ -173,14 +182,17 @@ uint16_t at86rf231_get_pan(void)
     return radio_pan;
 }
 
-uint8_t at86rf231_set_channel(uint8_t channel)
+int8_t at86rf231_set_channel(uint8_t channel)
 {
     uint8_t cca_state;
     radio_channel = channel;
 
     if (channel < RF86RF231_MIN_CHANNEL ||
         channel > RF86RF231_MAX_CHANNEL) {
-        radio_channel = RF86RF231_MAX_CHANNEL;
+#if DEVELHELP
+        puts("[at86rf231] channel out of range!");
+#endif
+        return -1;
     }
 
     cca_state = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA) & ~AT86RF231_PHY_CC_CCA_MASK__CHANNEL;
@@ -198,4 +210,51 @@ void at86rf231_set_monitor(uint8_t mode)
 {
     (void) mode;
     // TODO
+}
+
+void at86rf231_gpio_spi_interrupts_init(void)
+{
+    /* SPI init */
+    spi_init_master(AT86RF231_SPI, SPI_CONF_FIRST_RISING, SPI_SPEED_5MHZ);
+    /* IRQ0 */
+    gpio_init_int(AT86RF231_INT, GPIO_NOPULL, GPIO_RISING, at86rf231_rx_irq, NULL);
+    /* CS */
+    gpio_init_out(AT86RF231_CS, GPIO_NOPULL);
+    /* SLEEP */
+    gpio_init_out(AT86RF231_SLEEP, GPIO_NOPULL);
+    /* RESET */
+    gpio_init_out(AT86RF231_RESET, GPIO_NOPULL);
+}
+
+void at86rf231_reset(void)
+{
+    /* force reset */
+    gpio_clear(AT86RF231_RESET);
+
+    /* put pins to default values */
+    gpio_set(AT86RF231_CS);
+    gpio_clear(AT86RF231_SLEEP);
+
+    /* additional waiting to comply to min rst pulse width */
+    uint8_t delay = 50;
+    while (delay--){}
+
+    gpio_set(AT86RF231_RESET);
+
+    /* Send a FORCE TRX OFF command */
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__FORCE_TRX_OFF);
+
+    /* busy wait for TRX_OFF state */
+    uint8_t status;
+    uint8_t max_wait = 100;
+
+    do {
+        status = at86rf231_get_status();
+
+        if (!--max_wait) {
+            printf("at86rf231 : ERROR : could not enter TRX_OFF mode\n");
+            break;
+        }
+    } while ((status & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
+             != AT86RF231_TRX_STATUS__TRX_OFF);
 }

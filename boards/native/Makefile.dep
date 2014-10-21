@@ -1,4 +1,6 @@
 ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-	USEMODULE += nativenet
-	USEMODULE += transceiver
+    USEMODULE += nativenet
+    ifeq (,$(filter netdev_base,$(USEMODULE)))
+        USEMODULE += transceiver
+    endif
 endif

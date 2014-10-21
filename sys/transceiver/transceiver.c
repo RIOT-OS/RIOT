@@ -434,6 +434,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
         /* inform upper layers of lost packet */
         m.type = ENOBUFFER;
         m.content.value = t;
+        DEBUGF("transceiver: buffer size exceeded, dropping packet\n");
     }
     /* copy packet and handle it */
     else {
@@ -505,6 +506,9 @@ static void receive_packet(uint16_t type, uint8_t pos)
             if (msg_send(&m, reg[i].pid, false) && (m.type != ENOBUFFER)) {
                 transceiver_buffer[transceiver_buffer_pos].processing++;
             }
+            else {
+                DEBUGF("transceiver: failed to notify upper layer.\n");
+            }
         }
 
         i++;
@@ -569,6 +573,7 @@ void receive_cc2420_packet(ieee802154_packet_t *trans_p)
     memcpy(&data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH],
            p->frame.payload, p->frame.payload_len);
     trans_p->frame.payload = (uint8_t *) & (data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH]);
+    trans_p->frame.payload_len = p->frame.payload_len;
     eINT();
 
 #ifdef DEBUG_ENABLED
@@ -604,8 +609,6 @@ void receive_cc2420_packet(ieee802154_packet_t *trans_p)
         return;
     }
 #endif
-    trans_p->frame.payload = (uint8_t *) &(data_buffer[transceiver_buffer_pos * CC2420_MAX_DATA_LENGTH]);
-    trans_p->frame.payload_len = p->frame.payload_len;
     DEBUG("transceiver: Content: %s\n", trans_p->data);
 }
 #endif
@@ -663,6 +666,7 @@ void receive_at86rf231_packet(ieee802154_packet_t *trans_p)
     memcpy(&data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH], p->frame.payload,
            p->frame.payload_len);
     trans_p->frame.payload = (uint8_t *) & (data_buffer[transceiver_buffer_pos * AT86RF231_MAX_DATA_LENGTH]);
+    trans_p->frame.payload_len = p->frame.payload_len;
     eINT();
 
 #ifdef DEBUG_ENABLED

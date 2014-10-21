@@ -1,6 +1,6 @@
 export APPLICATION = periph_cpuid
 include ../Makefile.tests_common
 
-#BOARD_WHITELIST := native
+FEATURES_REQUIRED = periph_cpuid
 
 include $(RIOTBASE)/Makefile.include

@@ -12,7 +12,7 @@ export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
-export LINKFLAGS = -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
+export LINKFLAGS += -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
 export FLASHER = mspdebug
 ifeq ($(strip $(PORT)),)
     export PORT = /dev/ttyUSB0

@@ -1,8 +1,19 @@
+/*
+ * Copyright (C) 2014 INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 #ifndef MSP430_TYPES_H
 #define MSP430_TYPES_H
 
 #include <sys/_types.h>
 #include <errno.h>
+
+/** defining signed type for size_t */
+#include "kernel_types.h"
 
 #ifndef EINVAL
 /**
@@ -19,9 +30,6 @@
  */
 #define EOVERFLOW   (65)
 #endif
-
-/** defining signed type for size_t */
-typedef _ssize_t ssize_t;
 
 typedef unsigned long time_t;
 

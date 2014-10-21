@@ -6,8 +6,20 @@
  * directory for more details.
  */
 
+/**
+ * @ingroup     drivers_at86rf231
+ * @{
+ *
+ * @file
+ * @brief       RX related functionality for the AT86RF231 device driver
+ *
+ * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ *
+ * @}
+ */
+
 #include "at86rf231.h"
-#include "at86rf231_arch.h"
 #include "at86rf231_spi.h"
 
 #include "kernel_types.h"
@@ -56,7 +68,7 @@ void at86rf231_rx_handler(void)
                           at86rf231_rx_buffer[rx_buffer_next].length);
 
     if (at86rf231_rx_buffer[rx_buffer_next].frame.fcf.frame_type != 2) {
-#if DEBUG_ENABLED
+#ifdef DEBUG_ENABLED
         ieee802154_frame_print_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
 #endif
 
@@ -69,7 +81,7 @@ void at86rf231_rx_handler(void)
         }
     }
     else {
-#if DEBUG_ENABLED
+#ifdef DEBUG_ENABLED
         DEBUG("GOT ACK for SEQ %u\n", at86rf231_rx_buffer[rx_buffer_next].frame.seq_nr);
         ieee802154_frame_print_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
 #endif

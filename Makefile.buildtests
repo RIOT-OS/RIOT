@@ -27,30 +27,36 @@ ifneq (, $(filter buildtest info-concurrency, $(MAKECMDGOALS)))
   endif
 endif
 
-BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name *-common -printf '%f ')
-BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
-BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
-
 .PHONY: buildtest info-objsize info-buildsize info-buildsizes \
-        info-buildsizes-diff info-build info-boards-supported
+        info-buildsizes-diff info-build info-boards-supported \
+        info-features-missing info-boards-features-missing
+
+
+COLOR_GREEN  :=
+COLOR_RED    :=
+COLOR_PURPLE :=
+COLOR_RESET  :=
+COLOR_ECHO   := /bin/echo
+ifeq (, ${JENKINS_URL})
+  ifeq (0,  $(shell tput colors 2>&1 > /dev/null; echo $$?))
+    COLOR_GREEN  := \033[1;32m
+    COLOR_RED    := \033[1;31m
+    COLOR_PURPLE := \033[1;35m
+    COLOR_RESET  := \033[0m
+    COLOR_ECHO   := /bin/echo -e
+  endif
+endif
 
 buildtest:
-	@if [ -z "$${JENKINS_URL}" ] && tput colors 2>&1 > /dev/null; then \
-		GREEN='\033[1;32m'; RED='\033[1;31m'; PURPLE='\033[1;35m'; RESET='\033[0m'; \
-		ECHO='/bin/echo -e'; \
-	else \
-		GREEN=''; RED=''; PURPLE=''; RESET=''; \
-		ECHO='/bin/echo'; \
-	fi; \
-	\
+	@ \
 	BUILDTESTOK=true; \
 	rm -rf "$$BINDIRBASE"; \
-	for BOARD in $(BOARDS); do \
+	for BOARD in $$($(MAKE) -s info-boards-supported); do \
 		RIOTNOLINK=$$(case ' $(BOARD_INSUFFICIENT_RAM) ' in *" $${BOARD} "*) echo 1; esac); \
-		$${ECHO} -n "Building for $${BOARD} "; \
-		[ -n "$${RIOTNOLINK}" ] && $${ECHO} -n "(no linking) "; \
+		${COLOR_ECHO} -n "Building for $${BOARD} "; \
+		[ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
 		for NTH_TRY in 1 2; do \
-			$${ECHO} -n ".. "; \
+			${COLOR_ECHO} -n ".. "; \
 			LOG=$$(env -i \
 					HOME=$${HOME} \
 					PATH=$${PATH} \
@@ -63,12 +69,12 @@ buildtest:
 					RIOT_VERSION=$${RIOT_VERSION} \
 					$(MAKE) -j$(NPROC) 2>&1 >/dev/null) ; \
 			if [ "$${?}" = "0" ]; then \
-				$${ECHO} "$${GREEN}success$${RESET}"; \
+				${COLOR_ECHO} "${COLOR_GREEN}success${COLOR_RESET}"; \
 			elif [ -n "$${RIOT_DO_RETRY}" ] && $${BUILDTESTOK} && [ $${NTH_TRY} = 1 ]; then \
-				$${ECHO} -n "$${PURPLE}retrying$${RESET} "; \
+				${COLOR_ECHO} -n "${COLOR_PURPLE}retrying${COLOR_RESET} "; \
 				continue; \
 			else \
-				$${ECHO} "$${RED}failed$${RESET}"; \
+				${COLOR_ECHO} "${COLOR_RED}failed${COLOR_RESET}"; \
 				echo "$${LOG}" | grep -v -E '^make(\[[[:digit:]]])?:'; \
 				BUILDTESTOK=false; \
 			fi; \
@@ -98,7 +104,7 @@ info-buildsize:
 info-buildsizes: SHELL=bash
 info-buildsizes:
 	echo -e "   text\t   data\t    bss\t    dec\tboard"; \
-	for BOARD in $(BOARDS); do \
+	for BOARD in $$($(MAKE) -s info-boards-supported); do \
 		echo "$$(env -i \
 			HOME=$${HOME} \
 			PATH=$${PATH} \
@@ -112,10 +118,8 @@ info-buildsizes:
 
 info-buildsizes-diff: SHELL=bash
 info-buildsizes-diff:
-	@GREEN='\033[1;32m'; RED='\033[1;31m'; RESET='\033[0m'; \
-	\
 	echo -e "text\tdata\tbss\tdec\tBOARD/BINDIRBASE\n"; \
-	for BOARD in $(BOARDS); do \
+	for BOARD in $$($(MAKE) -s info-boards-supported); do \
 		for BINDIRBASE in $${OLDBIN} $${NEWBIN}; do \
 			env -i \
 				HOME=$${HOME} \
@@ -131,16 +135,16 @@ info-buildsizes-diff:
 			for I in 0 1 2 3; do \
 				if [[ -n "$${NEW[I]}" && -n "$${OLD[I]}" ]]; then \
 					DIFF=$$(($${NEW[I]} - $${OLD[I]})); \
-					if [[ "$${DIFF}" -gt 0 ]]; then echo -ne "$${RED}"; fi; \
-					if [[ "$${DIFF}" -lt 0 ]]; then echo -ne "$${GREEN}"; fi; \
+					if [[ "$${DIFF}" -gt 0 ]]; then $(COLOR_ECHO) -n "${COLOR_RED}"; fi; \
+					if [[ "$${DIFF}" -lt 0 ]]; then $(COLOR_ECHO) -n "${COLOR_GREEN}"; fi; \
 				else \
 					DIFF="$${RED}ERR"; \
 				fi; \
 				echo -ne "$${DIFF}\t$${RESET}"; \
 			done; \
 			echo "$${BOARD}"; \
-			for I in 0 1 2 3; do echo -ne "$${OLD[I]-$${RED}ERR$${RESET}}\t"; done; echo -e "$${OLDBIN}"; \
-			for I in 0 1 2 3; do echo -ne "$${NEW[I]-$${RED}ERR$${RESET}}\t"; done; echo -e "$${NEWBIN}\n"; \
+			for I in 0 1 2 3; do echo -ne "$${OLD[I]-${COLOR_RED}ERR${COLOR_RESET}}\t"; done; echo -e "$${OLDBIN}"; \
+			for I in 0 1 2 3; do echo -ne "$${NEW[I]-${COLOR_RED}ERR${COLOR_RESET}}\t"; done; echo -e "$${NEWBIN}\n"; \
 		done; \
 	done;
 
@@ -164,6 +168,9 @@ info-build:
 	@echo ''
 	@echo 'ELFFILE: $(ELFFILE)'
 	@echo 'HEXFILE: $(HEXFILE)'
+	@echo ''
+	@echo 'FEATURES_REQUIRED: $(sort $(FEATURES_REQUIRED))'
+	@echo 'FEATURES_PROVIDED: $(sort $(FEATURES_PROVIDED))'
 	@echo ''
 	@echo 'CC:      $(CC)'
 	@echo -e 'CFLAGS:$(patsubst %, \n\t%, $(CFLAGS))'
@@ -200,7 +207,39 @@ info-build:
 	@echo -e 'MAKEFILE_LIST:$(patsubst %, \n\t%, $(abspath $(MAKEFILE_LIST)))'
 
 info-boards-supported:
-	@echo "$(BOARDS)"
+	@echo $(BOARDS)
+
+info-features-missing:
+	@echo $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))
+
+info-boards-features-missing:
+	@for f in $(BOARDS_FEATURES_MISSING); do echo $${f}; done | column -t
+
+ifneq (, $(filter info-boards-supported info-boards-features-missing info-build, $(MAKECMDGOALS)))
+  FEATURES_PROVIDED_BAK := $(FEATURES_PROVIDED)
+
+  define board_missing_features
+    FEATURES_PROVIDED :=
+    -include $${RIOTBOARD}/${1}/Makefile.features
+
+    FEATURES_MISSING := $$(filter-out $$(FEATURES_PROVIDED), $$(FEATURES_REQUIRED))
+    ifneq (, $${FEATURES_MISSING})
+      BOARDS_WITH_MISSING_FEATURES += ${1}
+      BOARDS_FEATURES_MISSING += "${1} $${FEATURES_MISSING}"
+    endif
+  endef
+
+  BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name *-common -printf '%f ')
+  BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
+  BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
+
+  BOARDS_WITH_MISSING_FEATURES :=
+  BOARDS_FEATURES_MISSING :=
+  $(foreach BOARD, $(BOARDS), $(eval $(call board_missing_features,$(BOARD))))
+  BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES), $(BOARDS))
+
+  FEATURES_PROVIDED := $(FEATURES_PROVIDED_BAK)
+endif
 
 info-concurrency:
 	@echo "$(NPROC)"

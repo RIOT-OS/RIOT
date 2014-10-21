@@ -109,6 +109,16 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed);
 int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char data));
 
 /**
+ * @brief Configure SCK, MISO and MOSI pins for the given SPI device
+ *
+ * @param[in] dev       SPI device to use
+ *
+ * @return              0 on success
+ * @return              -1 on error
+ */
+int spi_conf_pins(spi_t dev);
+
+/**
  * @brief Transfer one byte on the given SPI bus
  *
  * @param[in] dev       SPI device to use

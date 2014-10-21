@@ -22,6 +22,10 @@
 #ifndef KERNEL_H_
 #define KERNEL_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -135,6 +139,10 @@ int reboot(int mode);
  * @brief Reboot the system in the usual fashion
  */
 #define RB_AUTOBOOT 0
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* KERNEL_H_ */
 /** @} */

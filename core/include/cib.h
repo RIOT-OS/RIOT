@@ -21,6 +21,10 @@
 #ifndef __CIB_H
 #define __CIB_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @brief circular integer buffer structure
  */
@@ -67,6 +71,10 @@ int cib_put(cib_t *cib);
  * @return positive number for #cib_get < #cib_put
  */
 int cib_avail(cib_t *cib);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __CIB_H */
 /** @} */

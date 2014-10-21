@@ -155,10 +155,10 @@ static void *trickle_interval_over(void *arg)
         DEBUG("TRICKLE new Interval %" PRIu32 "\n", I);
 
         if (I == 0) {
-            puts("[WARNING] Interval was 0");
+            DEBUGF("[WARNING] Interval was 0\n");
 
             if (Imax == 0) {
-                puts("[WARNING] Imax == 0");
+                DEBUGF("[WARNING] Imax == 0\n");
             }
 
             I = (Imin << Imax);
@@ -179,13 +179,13 @@ static void *trickle_interval_over(void *arg)
         vtimer_remove(&trickle_t_timer);
 
         if (vtimer_set_wakeup(&trickle_t_timer, t_time, timer_over_pid) != 0) {
-            puts("[ERROR] setting Wakeup");
+            DEBUGF("[ERROR] setting Wakeup\n");
         }
 
         vtimer_remove(&trickle_I_timer);
 
         if (vtimer_set_wakeup(&trickle_I_timer, I_time, interval_over_pid) != 0) {
-            puts("[ERROR] setting Wakeup");
+            DEBUGF("[ERROR] setting Wakeup\n");
         }
     }
 
@@ -263,7 +263,7 @@ static void *rt_timer_over(void *arg)
             /* Parent is NULL for root too */
             if (my_dodag->my_preferred_parent != NULL) {
                 if (my_dodag->my_preferred_parent->lifetime <= 1) {
-                    puts("parent lifetime timeout");
+                    DEBUGF("parent lifetime timeout\n");
                     rpl_parent_update(NULL);
                 }
                 else {

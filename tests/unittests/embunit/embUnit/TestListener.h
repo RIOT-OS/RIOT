@@ -35,6 +35,10 @@
 #ifndef __TESTLISTENER_H__
 #define __TESTLISTENER_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct __TestListnerImplement   TestListnerImplement;
 typedef struct __TestListnerImplement*  TestListnerImplementRef;/*downward compatible*/
 
@@ -58,5 +62,9 @@ struct __TestListner {
 #define TestListner_startTest(s,t)          ((TestListner*)s)->isa->startTest(s,t)
 #define TestListner_endTest(s,t)            ((TestListner*)s)->isa->endTest(s,t)
 #define TestListner_addFailure(s,t,m,l,f)   ((TestListner*)s)->isa->addFailure(s,t,m,l,f)
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif/*__TESTLISTENER_H__*/

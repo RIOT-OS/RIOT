@@ -13,7 +13,7 @@ export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
-export LINKFLAGS = -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
+export LINKFLAGS += -mmcu=$(MCU) -lgcc $(BINDIR)msp430_common/startup.o
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
 export FLASHER = $(RIOTBASE)/dist/tools/goodfet/goodfet.bsl
 ifeq ($(strip $(PORT)),)

@@ -22,6 +22,10 @@
 #ifndef __IRQ_ARCH_H
 #define __IRQ_ARCH_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @name Define mapping between kernel internal and arch interfaces
  *
@@ -66,6 +70,9 @@ void irq_arch_restore(unsigned int state);
  */
 int irq_arch_in(void);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __IRQ_ARCH_H */
 /** @} */

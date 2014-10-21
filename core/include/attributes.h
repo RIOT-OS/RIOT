@@ -19,6 +19,12 @@
 #ifndef ATTRIBUTES_H_
 #define ATTRIBUTES_H_
 
+#include <stddef.h>
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @def NORETURN
  * @brief The *NORETURN* keyword tells the compiler to assume that the function
@@ -66,6 +72,18 @@
 #define UNREACHABLE() __builtin_unreachable()
 #else
 #define UNREACHABLE() do { /* nothing */ } while (1)
+#endif
+
+/**
+ * @def         ALIGN_OF(T)
+ * @brief       Calculate the minimal alignment for type T.
+ * @param[in]   T   Type to examine
+ * @returns     The minimal alignment of T.
+ */
+#define ALIGN_OF(T) (offsetof(struct { char c; T t; }, t))
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* ATTRIBUTES_H_ */

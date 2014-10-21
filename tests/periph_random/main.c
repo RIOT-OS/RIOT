@@ -24,9 +24,6 @@
 #include <periph/random.h>
 #include <periph_conf.h>
 
-/* only compile test if a random number generator is defined */
-#if RANDOM_NUMOF
-
 #define LIMIT       (20U)
 
 int main(void)
@@ -66,14 +63,3 @@ int main(void)
 
     return 0;
 }
-
-#else
-
-int main(void)
-{
-    puts("Random number generator low-level driver test");
-    puts("There is no (pseudo) random generator implementation for your platform");
-    return 0;
-}
-
-#endif /* RANDOM_NUMOF */

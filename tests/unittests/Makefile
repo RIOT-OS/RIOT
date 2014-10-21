@@ -1,7 +1,7 @@
 APPLICATION = unittests
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_RAM := chronos redbee-econotag stm32f0discovery
+BOARD_INSUFFICIENT_RAM := chronos msb-430 msb-430h redbee-econotag stm32f0discovery
 
 USEMODULE += embunit
 
@@ -19,7 +19,7 @@ else ifeq ($(OUTPUT),COMPILER)
 endif
 
 ifeq (, $(filter tests-%, $(MAKECMDGOALS)))
-    UNIT_TESTS := $(shell find -mindepth 1 -maxdepth 1 -type d -name 'tests-*' -printf '%f ')
+    UNIT_TESTS := $(foreach d,$(wildcard tests-*/Makefile),$(shell dirname $(d)))
 else
     UNIT_TESTS := $(filter tests-%, $(MAKECMDGOALS))
 endif
