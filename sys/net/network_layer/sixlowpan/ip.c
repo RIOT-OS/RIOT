@@ -81,40 +81,45 @@ typedef struct {
 static fallback_args_t fallback_args;
 
 /* XXX: temporary fallback until there is a proper IPv6 packet queue */
-static void *_fallback(void *packet)
+static void *_fallback(void *args)
 {
-    uint8_t packet_tmp[((fallback_args_t *)packet)->data_len];
-    ipv6_addr_t *dest = ((fallback_args_t *)packet)->dest;
     int retries = 5;
     ndp_neighbor_cache_t *nce = NULL;
+    msg_t msg;
 
-    if (!packet || !(((fallback_args_t *)packet)->data) ||
-        !(((fallback_args_t *)packet)->data_len)) {
-        return NULL;
+    msg_receive(&msg);
+
+    if (!(((fallback_args_t *)msg.content.ptr)->data) ||
+        !(((fallback_args_t *)msg.content.ptr)->data_len)) {
+        uint8_t packet_tmp[((fallback_args_t *)msg.content.ptr)->data_len];
+        ipv6_addr_t *dest = ((fallback_args_t *)msg.content.ptr)->dest;
+        memcpy(packet_tmp, ((fallback_args_t *)msg.content.ptr)->data,
+               sizeof(packet_tmp));
+        msg_reply(&msg, &msg);
+
+        if (!ndp_neighbor_cache_search(dest)) {
+            ndp_neighbor_cache_add(0, dest, NULL, 0, 0, NDP_NCE_STATUS_INCOMPLETE,
+                                   NDP_NCE_TYPE_REGISTERED, 100);
+        }
+
+        while (nce == NULL && retries >= 0) {
+            icmpv6_send_neighbor_sol(NULL, NULL, dest, 1, 0);
+            /* repeat according to standard */
+            vtimer_usleep(500000);
+            nce = ndp_get_ll_address(dest);
+            retries--;
+        }
+
+        ipv6_send_packet((ipv6_hdr_t *)packet_tmp);
+
+        mutex_lock(&_fallback_mutex);
+        _fallback_running = 0;
+        mutex_unlock(&_fallback_mutex);
+    }
+    else {
+        msg_reply(&msg, &msg);
     }
 
-    memcpy(packet_tmp, ((fallback_args_t *)packet)->data, sizeof(packet_tmp));
-
-    mutex_unlock(&_fallback_mutex);
-
-    if (!ndp_neighbor_cache_search(dest)) {
-        ndp_neighbor_cache_add(0, dest, NULL, 0, 0, NDP_NCE_STATUS_INCOMPLETE,
-                               NDP_NCE_TYPE_REGISTERED, 100);
-    }
-
-    while (nce == NULL && retries >= 0) {
-        icmpv6_send_neighbor_sol(NULL, NULL, dest, 1, 0);
-        /* repeat according to standard */
-        vtimer_usleep(500000);
-        nce = ndp_get_ll_address(dest);
-        retries--;
-    }
-
-    ipv6_send_packet((ipv6_hdr_t *)packet_tmp);
-
-    mutex_lock(&_fallback_mutex);
-    _fallback_running = 0;
-    mutex_unlock(&_fallback_mutex);
 
     return NULL;
 }
@@ -178,11 +183,15 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
 
             if (!_fallback_running) {
                 fallback_args_t fallback_args = { dest, packet, length };
-                thread_create(_fallback_stack, KERNEL_CONF_STACKSIZE_DEFAULT,
-                              PRIORITY_MAIN + 3, 0, _fallback, &fallback_args,
-                              "ndp_fallback_hack");
+                msg_t msg;
+
+                msg.content.ptr = (char *)&fallback_args;
+
+                kernel_pid_t pid = thread_create(_fallback_stack,
+                                                 KERNEL_CONF_STACKSIZE_DEFAULT, PRIORITY_MAIN + 3, 0,
+                                                 _fallback, NULL, "ndp_fallback_hack");
+                msg_send_receive(&msg, &msg, pid);
                 thread_yield();
-                mutex_lock(&_fallback_mutex);
             }
 
             mutex_unlock(&_fallback_mutex);
@@ -389,6 +398,7 @@ static int is_our_address(ipv6_addr_t *addr)
     int if_counter = -1;
 
     DEBUGF("Is this my addres: %s?\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
+
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
         ipv6_net_if_ext_t *net_if_ext = ipv6_net_if_get_ext(if_id);
         ipv6_net_if_addr_t *myaddr = NULL;
