@@ -1559,7 +1559,9 @@ uint8_t ndp_neighbor_cache_add(int if_id, const ipv6_addr_t *ipaddr,
 
     nbr_cache[nbr_count].if_id = if_id;
     memcpy(&(nbr_cache[nbr_count].addr), ipaddr, 16);
-    memcpy(&(nbr_cache[nbr_count].lladdr), lladdr, lladdr_len);
+    if (lladdr != NULL) {
+        memcpy(&(nbr_cache[nbr_count].lladdr), lladdr, lladdr_len);
+    }
     nbr_cache[nbr_count].lladdr_len = lladdr_len;
     nbr_cache[nbr_count].isrouter = isrouter;
     nbr_cache[nbr_count].state = state;
