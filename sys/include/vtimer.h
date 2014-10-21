@@ -75,11 +75,29 @@ int vtimer_init(void);
 int vtimer_usleep(uint32_t us);
 
 /**
+ * @brief   will cause the calling thread to be suspended from excecution until
+ *          the the system time reaches in microseconds reaches *time*
+ * @param[in]   time        system time in microseconds
+ * @return      0 on success, < 0 on error
+ */
+int vtimer_usleep_until(uint32_t time);
+
+/**
  * @brief   will cause the calling thread to be suspended from excecution until the time specified by time has elapsed
  * @param[in]   time    timex_t with time to suspend execution
  * @return      0 on success, < 0 on error
  */
 int vtimer_sleep(timex_t time);
+
+/**
+ * @brief   will cause the calling thread to be suspended from excecution until
+ *          the current system time reaches *time*
+ *
+ * @param[in]   time    timex_t with the system time until which to suspend
+ *                      execution
+ * @return  0 on success, < 0 on error
+ */
+int vtimer_sleep_until(timex_t time);
 
 /**
  * @brief   set a vtimer with msg event handler

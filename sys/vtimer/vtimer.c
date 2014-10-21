@@ -342,6 +342,12 @@ int vtimer_usleep(uint32_t usecs)
     return vtimer_sleep(offset);
 }
 
+int vtimer_usleep_until(uint32_t time)
+{
+    timex_t timex = timex_set(0, time);
+    return vtimer_sleep_until(timex);
+}
+
 int vtimer_sleep(timex_t time)
 {
     /**
@@ -368,6 +374,16 @@ int vtimer_sleep(timex_t time)
     ret = vtimer_set(&t);
     mutex_lock(&mutex);
     return ret;
+}
+
+int vtimer_sleep_until(timex_t time)
+{
+    timex_t now;
+
+    vtimer_now(&now);
+    time = timex_sub(time, now);
+
+    return vtimer_sleep(time);
 }
 
 int vtimer_remove(vtimer_t *t)
