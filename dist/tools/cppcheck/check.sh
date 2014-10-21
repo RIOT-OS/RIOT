@@ -1,5 +1,6 @@
 #!/bin/sh
 
+CHECKROOT=$(dirname "${0}")
 BRANCH=${1}
 FILEREGEX='\.([sScHh]|cpp)$'
 
@@ -31,7 +32,7 @@ if [ -z "${FILES}" ]; then
     exit
 fi
 
-cppcheck --std=c99 --enable=style --force \
-    --error-exitcode=2 --inline-suppr --quiet -j 8 \
+cppcheck --std=c99 --enable=style --force --error-exitcode=2 --quiet -j 8 \
+    --inline-suppr --suppressions ${CHECKROOT}/vendor_suppressions.txt \
     --template "{file}:{line}: {severity} ({id}): {message}" \
     ${@} ${FILES}
