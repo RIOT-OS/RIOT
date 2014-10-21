@@ -29,100 +29,100 @@
  * @brief Definition of available GPIO devices. Each device is managing exactly one pin.
  */
 typedef enum {
-#ifdef GPIO_0_EN
+#if GPIO_0_EN
     GPIO_0 = 0,             /**< GPIO device 0 */
 #endif
-#ifdef GPIO_1_EN
+#if GPIO_1_EN
     GPIO_1,                 /**< GPIO device 1 */
 #endif
-#ifdef GPIO_2_EN
+#if GPIO_2_EN
     GPIO_2,                 /**< GPIO device 2 */
 #endif
-#ifdef GPIO_3_EN
+#if GPIO_3_EN
     GPIO_3,                 /**< GPIO device 3 */
 #endif
-#ifdef GPIO_4_EN
+#if GPIO_4_EN
     GPIO_4,                 /**< GPIO device 4 */
 #endif
-#ifdef GPIO_5_EN
+#if GPIO_5_EN
     GPIO_5,                 /**< GPIO device 5 */
 #endif
-#ifdef GPIO_6_EN
+#if GPIO_6_EN
     GPIO_6,                 /**< GPIO device 6 */
 #endif
-#ifdef GPIO_7_EN
+#if GPIO_7_EN
     GPIO_7,                 /**< GPIO device 7 */
 #endif
-#ifdef GPIO_8_EN
+#if GPIO_8_EN
     GPIO_8,                 /**< GPIO device 8 */
 #endif
-#ifdef GPIO_9_EN
+#if GPIO_9_EN
     GPIO_9,                 /**< GPIO device 9 */
 #endif
-#ifdef GPIO_10_EN
+#if GPIO_10_EN
     GPIO_10,                /**< GPIO device 10 */
 #endif
-#ifdef GPIO_11_EN
+#if GPIO_11_EN
     GPIO_11,                /**< GPIO device 11 */
 #endif
-#ifdef GPIO_12_EN
+#if GPIO_12_EN
     GPIO_12,                /**< GPIO device 12 */
 #endif
-#ifdef GPIO_13_EN
+#if GPIO_13_EN
     GPIO_13,                /**< GPIO device 13 */
 #endif
-#ifdef GPIO_14_EN
+#if GPIO_14_EN
     GPIO_14,                /**< GPIO device 14 */
 #endif
-#ifdef GPIO_15_EN
+#if GPIO_15_EN
     GPIO_15,                /**< GPIO device 15 */
 #endif
-#ifdef GPIO_16_EN
+#if GPIO_16_EN
     GPIO_16,                /**< GPIO device 16 */
 #endif
-#ifdef GPIO_17_EN
+#if GPIO_17_EN
     GPIO_17,                /**< GPIO device 17 */
 #endif
-#ifdef GPIO_18_EN
+#if GPIO_18_EN
     GPIO_18,                /**< GPIO device 18 */
 #endif
-#ifdef GPIO_19_EN
+#if GPIO_19_EN
     GPIO_19,                /**< GPIO device 19 */
 #endif
-#ifdef GPIO_20_EN
+#if GPIO_20_EN
     GPIO_20,                /**< GPIO device 20 */
 #endif
-#ifdef GPIO_21_EN
+#if GPIO_21_EN
     GPIO_21,                /**< GPIO device 21 */
 #endif
-#ifdef GPIO_22_EN
+#if GPIO_22_EN
     GPIO_22,                /**< GPIO device 22 */
 #endif
-#ifdef GPIO_23_EN
+#if GPIO_23_EN
     GPIO_23,                /**< GPIO device 23 */
 #endif
-#ifdef GPIO_24_EN
+#if GPIO_24_EN
     GPIO_24,                /**< GPIO device 24 */
 #endif
-#ifdef GPIO_25_EN
+#if GPIO_25_EN
     GPIO_25,                /**< GPIO device 25 */
 #endif
-#ifdef GPIO_26_EN
+#if GPIO_26_EN
     GPIO_26,                /**< GPIO device 26 */
 #endif
-#ifdef GPIO_27_EN
+#if GPIO_27_EN
     GPIO_27,                /**< GPIO device 27 */
 #endif
-#ifdef GPIO_28_EN
+#if GPIO_28_EN
     GPIO_28,                /**< GPIO device 28 */
 #endif
-#ifdef GPIO_29_EN
+#if GPIO_29_EN
     GPIO_29,                /**< GPIO device 29 */
 #endif
-#ifdef GPIO_30_EN
+#if GPIO_30_EN
     GPIO_30,                /**< GPIO device 30 */
 #endif
-#ifdef GPIO_31_EN
+#if GPIO_31_EN
     GPIO_31,                /**< GPIO device 31 */
 #endif
 } gpio_t;

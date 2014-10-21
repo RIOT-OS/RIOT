@@ -37,6 +37,10 @@
 
 #include <embUnit/embUnit.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct __OutputterImplement     OutputterImplement;
 typedef struct __OutputterImplement*    OutputterImplementRef;
 
@@ -70,5 +74,9 @@ struct __Outputter {
 #define Outputter_printSuccessful(o,t,c)    (o)->isa->printSuccessful(o,t,c)
 #define Outputter_printFailure(o,t,m,l,f,c) (o)->isa->printFailure(o,t,m,l,f,c)
 #define Outputter_printStatistics(o,r)      (o)->isa->printStatistics(o,r)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif/*__OUTPUTTER_H__*/

@@ -150,7 +150,8 @@ pid_t _getpid(void)
  *
  * @return      TODO
  */
-int _kill_r(struct _reent *r, pid_t pid, int sig)
+ //TODO: was _kill_r, changed to compile c++
+int _kill(struct _reent *r, pid_t pid, int sig)
 {
     r->_errno = ESRCH;                      /* not implemented yet */
     return -1;

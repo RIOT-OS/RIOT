@@ -26,7 +26,7 @@
 #include "periph/spi.h"
 #include "kernel_types.h"
 #include "transceiver.h"
-#include "vtimer.h"
+#include "hwtimer.h"
 #include "hwtimer.h"
 
 #define ENABLE_DEBUG (1)
@@ -101,6 +101,7 @@ void at86rf231_switch_to_rx(void)
 
     do {
         status = at86rf231_get_status();
+        hwtimer_wait(HWTIMER_TICKS(10));
         hwtimer_wait(HWTIMER_TICKS(10));
 
         if (!--max_wait) {
@@ -257,4 +258,3 @@ void at86rf231_reset(void)
     } while ((status & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
              != AT86RF231_TRX_STATUS__TRX_OFF);
 }
-

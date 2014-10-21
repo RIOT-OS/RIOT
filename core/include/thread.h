@@ -156,7 +156,7 @@ static inline kernel_pid_t thread_getpid(void)
  *
  * @return          the amount of unused space of the thread's stack
  */
-int thread_measure_stack_free(char *stack);
+uintptr_t thread_measure_stack_free(char *stack);
 #endif
 
 #ifdef __cplusplus

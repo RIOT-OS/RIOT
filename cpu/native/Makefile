@@ -1,8 +1,7 @@
 MODULE = cpu
 
-ifneq (,$(filter rtc,$(USEMODULE)))
-	DIRS += rtc
-endif
+DIRS += periph
+DIRS += drivers
 ifneq (,$(filter nativenet,$(USEMODULE)))
 	DIRS += net
 endif

@@ -261,7 +261,7 @@
 /**
  * @brief GPIO configuration
  */
-#define GPIO_NUMOF          (15U)
+#define GPIO_NUMOF          (0U)
 #define GPIO_0_EN           0
 #define GPIO_1_EN           0
 #define GPIO_2_EN           0

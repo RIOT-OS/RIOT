@@ -32,6 +32,7 @@ extern "C" {
 
 #include <cstdio>
 #include <vector>
+#include <iostream>
 #include "cpp_class.hpp"
 
 using namespace std;

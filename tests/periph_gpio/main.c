@@ -25,9 +25,6 @@
 #include "periph/gpio.h"
 #include "hwtimer.h"
 
-/* only compile this if at least one GPIO device is defined */
-#if GPIO_NUMOF
-
 uint32_t state = 0;
 uint32_t old_state = 0;
 
@@ -92,14 +89,3 @@ while(1);
 
     return 0;
 }
-
-#else
-
-int main(void)
-{
-    puts("No low-level GPIO device defined for this platform.");
-
-    return 0;
-}
-
-#endif /* GPIO_NUMOF */

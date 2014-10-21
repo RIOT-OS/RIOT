@@ -35,6 +35,10 @@
 #ifndef __TESTCASE_H__
 #define __TESTCASE_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct __TestCase   TestCase;
 typedef struct __TestCase*  TestCaseRef;/*compatible embUnit1.0*/
 
@@ -56,5 +60,9 @@ extern const TestImplement TestCaseImplement;
         tearDown,\
         runTest,\
     }
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif/*__TESTCASE_H__*/

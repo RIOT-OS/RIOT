@@ -165,12 +165,12 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
 void uart_tx_begin(uart_t uart)
 {
     switch (uart) {
-#if UART_1_EN
+#if UART_0_EN
         case UART_0:
             UART_0_DEV->CR1 |= USART_CR1_TXEIE;
             break;
 #endif
-#if UART_0_EN
+#if UART_1_EN
         case UART_1:
             UART_1_DEV->CR1 |= USART_CR1_TXEIE;
             break;

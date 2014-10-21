@@ -25,9 +25,6 @@
 #include "cpu-conf.h"
 #include "periph/cpuid.h"
 
-/* only compile this test if CPUID getter is defined for the platform */
-#if CPUID_ID_LEN
-
 int main(void)
 {
     uint8_t id[CPUID_ID_LEN];
@@ -47,14 +44,3 @@ int main(void)
 
     return 0;
 }
-
-#else
-
-int main(void)
-{
-    puts("Test for the CPUID driver");
-    puts("Error: the CPUID driver is not defined for this platform");
-    return 0;
-}
-
-#endif /* CPUID_ID_LEN */

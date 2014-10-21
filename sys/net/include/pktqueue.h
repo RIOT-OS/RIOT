@@ -8,6 +8,7 @@
 
 /**
  * @defgroup    pktqueue Packet Queue
+ * @brief       Packet wrapper for the Priority Queue
  * @ingroup     net
  * @{
  *

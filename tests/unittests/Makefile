@@ -1,7 +1,7 @@
 APPLICATION = unittests
 include ../Makefile.tests_common
 
-BOARD_INSUFFICIENT_RAM := chronos redbee-econotag stm32f0discovery
+BOARD_INSUFFICIENT_RAM := chronos msb-430 msb-430h redbee-econotag stm32f0discovery
 
 USEMODULE += embunit
 
