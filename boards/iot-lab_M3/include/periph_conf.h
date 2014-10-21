@@ -168,10 +168,10 @@ extern "C" {
 #define GPIO_1_EXTI_CFG()   (AFIO->EXTICR[2] |= AFIO_EXTICR3_EXTI8_PA)
 #define GPIO_1_IRQ          EXTI9_5_IRQn
 /* GPIO channel 2 config */
-#define GPIO_2_PORT         GPIOA
+#define GPIO_2_PORT         GPIOB
 #define GPIO_2_PIN          12
-#define GPIO_2_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPAEN)
-#define GPIO_2_EXTI_CFG()   (AFIO->EXTICR[3] |= AFIO_EXTICR4_EXTI12_PA)
+#define GPIO_2_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
+#define GPIO_2_EXTI_CFG()   (AFIO->EXTICR[3] |= AFIO_EXTICR4_EXTI12_PB)
 #define GPIO_2_IRQ          EXTI15_10_IRQn
 /* GPIO channel 3 config */
 #define GPIO_3_PORT         GPIOB
@@ -204,11 +204,11 @@ extern "C" {
 #define GPIO_7_EXTI_CFG()   (AFIO->EXTICR[2] |= AFIO_EXTICR3_EXTI11_PC)
 #define GPIO_7_IRQ          EXTI15_10_IRQn
 /* GPIO channel 8 config */
-#define GPIO_8_PORT         GPIOA
-#define GPIO_8_PIN          5
-#define GPIO_8_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPAEN)
-#define GPIO_8_EXTI_CFG()   (AFIO->EXTICR[1] |= AFIO_EXTICR2_EXTI5_PA)
-#define GPIO_8_IRQ          EXTI9_5_IRQn
+#define GPIO_8_PORT         GPIOB
+#define GPIO_8_PIN          2
+#define GPIO_8_CLKEN()      (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
+#define GPIO_8_EXTI_CFG()   (AFIO->EXTICR[1] |= AFIO_EXTICR1_EXTI2_PB)
+#define GPIO_8_IRQ          EXTI2_IRQn
 /* GPIO channel 9 config */
 #define GPIO_9_PORT         GPIOA
 #define GPIO_9_PIN          6
