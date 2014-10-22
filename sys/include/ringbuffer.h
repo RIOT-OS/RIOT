@@ -107,6 +107,16 @@ static inline int ringbuffer_full(const ringbuffer_t *restrict rb)
 }
 
 /**
+ * @brief           Return available space in ringbuffer
+ * @param[in,out]   rb Ringbuffer to query.
+ * @returns         number of available bytes
+ */
+static inline unsigned int ringbuffer_get_free(const ringbuffer_t *restrict rb)
+{
+    return rb->size - rb->avail;
+}
+
+/**
  * @brief           Read, but don't remove, the oldest element in the buffer.
  * @param[in]       rb    Ringbuffer to operate on.
  * @returns         Same as ringbuffer_get_one()
