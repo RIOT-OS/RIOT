@@ -82,8 +82,6 @@ typedef struct {
 /* XXX: temporary fallback until there is a proper IPv6 packet queue */
 static void *_fallback(void *args)
 {
-    int retries = 5;
-    ndp_neighbor_cache_t *nce = NULL;
     msg_t msg;
 
     (void)args;
@@ -94,6 +92,9 @@ static void *_fallback(void *args)
         !(((fallback_args_t *)msg.content.ptr)->data_len)) {
         uint8_t packet_tmp[((fallback_args_t *)msg.content.ptr)->data_len];
         ipv6_addr_t *dest = ((fallback_args_t *)msg.content.ptr)->dest;
+        int retries = 5;
+        ndp_neighbor_cache_t *nce = NULL;
+
         memcpy(packet_tmp, ((fallback_args_t *)msg.content.ptr)->data,
                sizeof(packet_tmp));
         msg_reply(&msg, &msg);
