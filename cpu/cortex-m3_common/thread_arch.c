@@ -29,6 +29,18 @@
 #include "cpu.h"
 #include "kernel_internal.h"
 
+//TODO: Hack to fix travis build failures for other boards
+//Decide how to resolve this properly
+// 22/10/14 - ryankurte
+#ifndef SVC_ISR
+#define SVC_ISR       isr_svc  
+#endif
+
+#ifndef PEND_SV_ISR
+#define PEND_SV_ISR   isr_pendsv
+#endif
+//End hack
+
 /**
  * @name noticeable marker marking the beginning of a stack segment
  *
