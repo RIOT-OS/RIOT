@@ -159,6 +159,31 @@ static inline kernel_pid_t thread_getpid(void)
     return sched_active_pid;
 }
 
+#ifdef MODULE_MSG_QUEUE
+/**
+ * @brief Sets / changes a thread's message queue.
+ *
+ * The msg_queue object must have been initialized before
+ * using msg_queue_init().
+ *
+ * @param[in] pid   the PID of the thread to change
+ *
+ * @return          `1` on success
+ * @return          `STATUS_NOT_FOUND` if pid is unknown or not sleeping
+ */
+int thread_set_msg_queue(int pid, msg_queue_t* msg_queue);
+#endif
+
+/**
+ * @brief Returns a pointer to the thread's default message node
+ *
+ * @param[in] pid   the PID of the thread
+ *
+ * @return          ptr to the thread's default message node on success
+ * @return          `STATUS_NOT_FOUND` if pid is unknown or not sleeping
+ */
+msg_node_t *thread_get_msg_node(int pid);
+
 #ifdef DEVELHELP
 /**
  * @brief Returns the name of a process

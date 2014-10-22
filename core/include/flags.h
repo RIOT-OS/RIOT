@@ -32,6 +32,7 @@
 #define CREATE_WOUT_YIELD   (4)     /**< do not automatically call thread_yield() after creation */
 #define CREATE_STACKTEST    (8)     /**< write markers into the thread's stack to measure stack
                                          usage (for debugging) */
+#define CREATE_NOMSG        (16)    /**< Create thread without messaging capabilities */
 /** @} */
 
 #ifdef __cplusplus
