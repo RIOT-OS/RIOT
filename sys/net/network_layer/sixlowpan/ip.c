@@ -46,9 +46,10 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)
 #define IPV6_NET_IF_ADDR_BUFFER_LEN (NET_IF_MAX * IPV6_NET_IF_ADDR_LIST_LEN)
 
+#define FALLBACK_STACKSIZE          (1024)
 static mutex_t _fallback_mutex = MUTEX_INIT;
 static uint8_t _fallback_running = 0;
-static char _fallback_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
+static char _fallback_stack[FALLBACK_STACKSIZE];
 
 uint8_t ip_send_buffer[BUFFER_SIZE];
 uint8_t buffer[BUFFER_SIZE];
@@ -188,7 +189,8 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
                 msg.content.ptr = (char *)&fallback_args;
 
                 kernel_pid_t pid = thread_create(_fallback_stack,
-                                                 KERNEL_CONF_STACKSIZE_DEFAULT, PRIORITY_MAIN + 3, 0,
+                                                 FALLBACK_STACKSIZE,
+                                                 PRIORITY_MAIN + 3, CREATE_STACKTEST,
                                                  _fallback, NULL, "ndp_fallback_hack");
                 msg_send_receive(&msg, &msg, pid);
                 thread_yield();
