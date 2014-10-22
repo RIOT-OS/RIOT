@@ -32,6 +32,10 @@
 #include "at86rf231/at86rf231_settings.h"
 #include "periph/gpio.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define AT86RF231_MAX_PKT_LENGTH    127
 #define AT86RF231_MAX_DATA_LENGTH   118
 
@@ -95,6 +99,10 @@ enum {
 };
 
 extern at86rf231_packet_t at86rf231_rx_buffer[AT86RF231_RX_BUF_SIZE];
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* AT86RF231_H_ */
 /** @} */

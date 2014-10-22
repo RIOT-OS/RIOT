@@ -22,6 +22,10 @@
 #include <stdint.h>
 #include "timex.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** CC1100 register configuration */
 typedef struct {
     uint8_t _IOCFG2;
@@ -109,6 +113,10 @@ typedef struct cc110x_statistic {
     uint32_t    rx_buffer_max;
     uint32_t    watch_dog_resets;
 } cc110x_statistic_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __CC110X_CONFIG_H */

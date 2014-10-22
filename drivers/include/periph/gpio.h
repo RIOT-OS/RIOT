@@ -22,6 +22,10 @@
 
 #include "periph_conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* guard file in case no GPIO devices are defined */
 #if GPIO_NUMOF
 
@@ -249,6 +253,10 @@ void gpio_toggle(gpio_t dev);
 void gpio_write(gpio_t dev, int value);
 
 #endif /* GPIO_NUMOF */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __GPIO_H */
 /** @} */

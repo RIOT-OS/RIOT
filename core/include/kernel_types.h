@@ -6,7 +6,6 @@
  * directory for more details.
  */
 
-
 /**
  * @addtogroup  core_util
  * @{
@@ -19,12 +18,9 @@
  * @author      Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  */
 
+
 #ifndef KERNEL_TYPES_H
 #define KERNEL_TYPES_H
-
-#ifdef __cplusplus
- extern "C" {
-#endif
 
 #include <stdint.h>
 #include <inttypes.h>
@@ -45,6 +41,10 @@
 #   if defined (MODULE_MSP430_COMMON) || defined (MODULE_ATMEGA_COMMON)
         typedef signed ssize_t;
 #   endif
+#endif
+
+#ifdef __cplusplus
+ extern "C" {
 #endif
 
 /**

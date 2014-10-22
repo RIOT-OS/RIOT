@@ -19,11 +19,11 @@
 #ifndef __CLIST_H
 #define __CLIST_H
 
+#include "kernel_macros.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-#include "kernel_macros.h"
 
 /**
  * @def         clist_get_container(NODE, TYPE, MEMBER)

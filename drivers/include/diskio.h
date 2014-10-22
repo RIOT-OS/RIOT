@@ -21,6 +21,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define DN_MCI      0   /* Physical drive number for MCI */
 #define DN_NAND     1   /* Physical drive number for NAND flash */
 
@@ -116,6 +120,10 @@ DRESULT MCI_read(unsigned char *, unsigned long, unsigned char);
 DRESULT MCI_write(const unsigned char *, unsigned long, unsigned char);
 DRESULT MCI_ioctl(unsigned char, void *);
 void MCI_timerproc(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif

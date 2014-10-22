@@ -8,4 +8,12 @@
 #include "cc110x_ng/cc110x-arch.h"
 #include "cc110x_ng/cc110x_spi.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* CC110X_NG_H */

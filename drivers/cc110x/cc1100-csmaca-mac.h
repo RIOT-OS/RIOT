@@ -23,6 +23,10 @@
 
 #include "cc1100-defaultSettings.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //#define CSMACA_MAC_AGGRESSIVE_MODE                // MAC aggressive mode on/off switch
 
 #define CARRIER_SENSE_TIMEOUT            (200000)   // Carrier Sense timeout ~ 2 seconds
@@ -44,5 +48,9 @@
 #define PRIO_DATA_SLOTTIME    (CS_TX_SWITCH_TIME)   // Time of one additional wait slot
 #define PRIO_DATA_MIN_WINDOW_SIZE             (4)   // Minimum window size of backoff algorithm
 #define PRIO_DATA_MAX_WINDOW_SIZE            (32)   // Maximum window size of backoff algorithm
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /*CC1100_CSMACA_MAC_*/

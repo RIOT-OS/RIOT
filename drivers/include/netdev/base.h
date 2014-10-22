@@ -25,6 +25,10 @@
 
 #include "clist.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Type for @ref msg_t if device fired an event.
  */
@@ -376,6 +380,10 @@ static inline void netdev_hlist_remove(netdev_hlist_t **list,
 {
     clist_remove((clist_node_t **)list, (clist_node_t *)node);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NETDEV_BASE_H_ */
 /**

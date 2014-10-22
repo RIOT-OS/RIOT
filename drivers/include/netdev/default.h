@@ -29,11 +29,21 @@
  */
 
 #ifdef MODULE_NATIVENET
+
 #include "nativenet.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef NETDEV_DEFAULT
 #define NETDEV_DEFAULT   (&nativenet_default_dev)
 #endif /* NETDEV_DEFAULT */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* MODULE_NATIVENET */
 
 #endif /* __NETDEV_DEFAULT_H_ */

@@ -19,6 +19,10 @@
 #ifndef AT86AT86RF231_SETTINGS_H
 #define AT86AT86RF231_SETTINGS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define AT86RF231_RX_BUF_SIZE   3
 
 enum at86rf231_access {
@@ -222,5 +226,9 @@ enum {
     AT86RF231_TIMING__RESET = 100,
     AT86RF231_TIMING__RESET_TO_TRX_OFF = 37,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

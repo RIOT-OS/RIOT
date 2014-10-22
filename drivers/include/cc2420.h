@@ -86,6 +86,10 @@ Frame type value:
 
 #include "radio_driver.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CC2420_MAX_PKT_LENGTH 127
 #define CC2420_MAX_DATA_LENGTH (118)
 
@@ -396,5 +400,8 @@ static inline void do_set_tx_power(int pow) {
  */
 extern const ieee802154_radio_driver_t cc2420_radio_driver;
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

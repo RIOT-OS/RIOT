@@ -19,12 +19,12 @@
 #ifndef __QUEUE_H
 #define __QUEUE_H
 
+#include <stddef.h>
+#include <stdint.h>
+
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-#include <stddef.h>
-#include <stdint.h>
 
 /**
  * data type for priority queue nodes

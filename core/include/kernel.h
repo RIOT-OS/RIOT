@@ -22,10 +22,6 @@
 #ifndef KERNEL_H_
 #define KERNEL_H_
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -36,6 +32,10 @@
 #include "flags.h"
 #include "sched.h"
 #include "cpu-conf.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /**
  * @def KERNEL_CONF_STACKSIZE_DEFAULT

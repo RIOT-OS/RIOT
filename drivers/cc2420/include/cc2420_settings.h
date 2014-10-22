@@ -19,6 +19,10 @@
 #ifndef CC2420_SETTINGS_H
 #define CC2420_SETTINGS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @name CC2420 access mode values.
  * @brief Values defining the command you want to give to the CC2420:
@@ -308,5 +312,9 @@
 #define CC2420_SYNC_WORD_TX_TIME 900000
 #define CC2420_RX_BUF_SIZE      3
 #define CC2420_WAIT_TIME        500
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

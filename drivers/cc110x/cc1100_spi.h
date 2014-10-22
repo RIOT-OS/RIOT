@@ -26,6 +26,10 @@
 #ifndef CC1100_SPI_H_
 #define CC1100_SPI_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int cc110x_get_gdo0(void);
 int cc110x_get_gdo1(void);
 int cc110x_get_gdo2(void);
@@ -41,6 +45,10 @@ void cc1100_spi_write_reg(uint8_t addr, uint8_t value);
 uint8_t cc1100_spi_read_reg(uint8_t addr);
 uint8_t cc1100_spi_read_status(uint8_t addr);
 uint8_t cc1100_spi_strobe(uint8_t c);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* CC1100_SPI_H_ */

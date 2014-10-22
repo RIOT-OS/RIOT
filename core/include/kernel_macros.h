@@ -18,6 +18,10 @@
 
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @def         container_of(PTR, TYPE, MEMBER)
  * @brief       Returns the container of a pointer to a member.
@@ -48,6 +52,10 @@
 #else
 #   define container_of(PTR, TYPE, MEMBER) \
         ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER)))
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 /**

@@ -12,6 +12,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Initialize ADC.
  */
@@ -25,6 +29,10 @@ void adc_init(void);
  * @return  ADC value of selected channel.
  */
 uint16_t adc_read(uint8_t channel);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* ADC_H */

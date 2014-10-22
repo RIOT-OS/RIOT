@@ -107,7 +107,7 @@ void SysTick_Handler(void);      /**< SysTick handler */
 
 #define __CM3_REV              0x0200 /**< CC2538 core revision number ([15:8] revision number, [7:0] patch number) */
 #define __MPU_PRESENT          1      /**< CC2538 does provide a MPU */
-#define __NVIC_PRIO_BITS       4      /**< CC2538 uses 4 Bits for the Priority Levels */
+#define __NVIC_PRIO_BITS       3      /**< CC2538 uses 3 Bits for the Priority Levels */
 #define __Vendor_SysTickConfig 0      /**< Set to 1 if different SysTick Config is used */
 
 /**

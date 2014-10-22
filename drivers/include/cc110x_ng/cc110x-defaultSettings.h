@@ -22,6 +22,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // returns hwtimer ticks per us
 #define RTIMER_TICKS(us) HWTIMER_TICKS(us)
 
@@ -78,6 +82,9 @@
 // Burst retry to TX switch time (measured ~ 230 us)
 #define BURST_RETRY_TX_SWITCH_TIME  (23)
 
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __CC110X_DEFAULTSETTINGS_H */
