@@ -43,7 +43,7 @@ void *sub_thread(void *arg)
 
     msg.content.ptr = (char*)thread_getname(pid);
 
-    msg_send(&msg, p_main, true);
+    msg_send(&msg, p_main);
 
     printf("THREAD %s (pid:%" PRIkernel_pid ") end.\n", thread_getname(pid), pid);
 

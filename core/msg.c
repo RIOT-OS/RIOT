@@ -37,6 +37,7 @@
 #include "thread.h"
 
 static int _msg_receive(msg_t *m, int block);
+static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block);
 
 
 static int queue_msg(tcb_t *target, msg_t *m)
@@ -51,7 +52,15 @@ static int queue_msg(tcb_t *target, msg_t *m)
     return 0;
 }
 
-int msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
+int msg_send(msg_t *m, kernel_pid_t target_pid) {
+    return _msg_send(m, target_pid, true);
+}
+
+int msg_try_send(msg_t *m, kernel_pid_t target_pid) {
+    return _msg_send(m, target_pid, false);
+}
+
+static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
 {
     if (inISR()) {
         return msg_send_int(m, target_pid);
@@ -190,7 +199,7 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
 
     /* msg_send blocks until reply received */
 
-    return msg_send(m, target_pid, true);
+    return msg_send(m, target_pid);
 }
 
 int msg_reply(msg_t *m, msg_t *reply)

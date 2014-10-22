@@ -39,7 +39,7 @@ void *thread1(void *arg)
     memset(&msg, 1, sizeof(msg_t));
 
     /* step 1: send asynchonously */
-    msg_send(&msg, p_main, 0);
+    msg_try_send(&msg, p_main);
 
     /* step 2: send message, turning its status into STATUS_REPLY_BLOCKED */
     msg_send_receive(&msg, &reply, p_main);

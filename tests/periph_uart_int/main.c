@@ -61,7 +61,7 @@ void rx(void *ptr, char data)
 
     ringbuffer_add_one(&rx_buf, data);
     if (data == '\n') {
-        msg_send(&msg, main_pid, 1);
+        msg_send(&msg, main_pid);
     }
 }
 
