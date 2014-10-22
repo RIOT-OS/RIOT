@@ -2,23 +2,18 @@
 #### Sample Makefile for building applications with the RIOT OS
 ####
 #### The example file system layout is:
-#### ./application makefile
+#### ./application Makefile
 #### ../../RIOT
 ####
 
 # Set the name of your application:
-export APPLICATION = foobar
+APPLICATION = foobar
 
 # If no BOARD is found in the environment, use this default:
-export BOARD ?= native
+BOARD ?= native
 
 # This has to be the absolute path to the RIOT base directory:
-export RIOTBASE ?= $(CURDIR)/../../RIOT
-
-# Uncomment these lines if you want to use platform support from external
-# repositories:
-#export RIOTCPU ?= $(CURDIR)/../../RIOT/thirdparty_cpu
-#export RIOTBOARD ?= $(CURDIR)/../../RIOT/thirdparty_boards
+RIOTBASE ?= $(CURDIR)/../../RIOT
 
 # Uncomment this to enable scheduler statistics for ps:
 #CFLAGS += -DSCHEDSTATISTICS
@@ -33,7 +28,7 @@ export RIOTBASE ?= $(CURDIR)/../../RIOT
 #CFLAGS += -DDEVELHELP
 
 # Change this to 0 show compiler invocation lines by default:
-export QUIET ?= 1
+QUIET ?= 1
 
 # Modules to include:
 
@@ -41,15 +36,13 @@ export QUIET ?= 1
 #USEMODULE += uart0
 #USEMODULE += posix
 #USEMODULE += vtimer
-#USEMODULE += sht11
-#USEMODULE += ltc4150
-#USEMODULE += cc110x
-#USEMODULE += fat
+#USEMODULE += defaulttransceiver
+#USEMODULE += sixlowpan
 
 #export INCLUDES += -Iapplication_include
 
 # Specify custom dependencies for your application here ...
-# export APPDEPS = app_data.h config.h
+# APPDEPS = app_data.h config.h
 
 include $(RIOTBASE)/Makefile.include
 
