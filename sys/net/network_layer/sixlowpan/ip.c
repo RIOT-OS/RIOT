@@ -78,14 +78,14 @@ typedef struct {
     uint16_t data_len;
 } fallback_args_t;
 
-static fallback_args_t fallback_args;
-
 /* XXX: temporary fallback until there is a proper IPv6 packet queue */
 static void *_fallback(void *args)
 {
     int retries = 5;
     ndp_neighbor_cache_t *nce = NULL;
     msg_t msg;
+
+    (void)args;
 
     msg_receive(&msg);
 
