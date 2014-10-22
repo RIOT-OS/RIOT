@@ -24,6 +24,10 @@
 
 #include "periph_conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* guard file in case no UART device was specified */
 #if UART_NUMOF
 
@@ -169,6 +173,10 @@ void uart_poweron(uart_t uart);
 void uart_poweroff(uart_t uart);
 
 #endif /* UART_NUMOF */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PERIPH_UART_H */
 /** @} */

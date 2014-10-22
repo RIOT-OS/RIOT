@@ -20,6 +20,10 @@
 #ifndef CC1100_SPI_H_
 #define CC1100_SPI_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int cc110x_get_gdo0(void);
 int cc110x_get_gdo1(void);
 int cc110x_get_gdo2(void);
@@ -28,6 +32,10 @@ void cc110x_spi_init(void);
 void cc110x_spi_cs(void);
 void cc110x_spi_select(void);
 void cc110x_spi_unselect(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* CC1100_SPI_H_ */

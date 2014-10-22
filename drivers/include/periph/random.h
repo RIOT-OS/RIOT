@@ -29,6 +29,10 @@
 
 #include "periph_conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* only include this file if a random number generator is defined */
 #if RANDOM_NUMOF
 
@@ -66,6 +70,10 @@ void random_poweron(void);
 void random_poweroff(void);
 
 #endif /* RANDOM_NUMOF */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __RANDOM_H */
 /** @} */

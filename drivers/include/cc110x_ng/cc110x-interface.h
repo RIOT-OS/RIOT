@@ -29,6 +29,10 @@
 #include "kernel_types.h"
 #include "transceiver.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CC1100_MAX_DATA_LENGTH (58)
 
 #define CC1100_HEADER_LENGTH   (3)             ///< Header covers SRC, DST and FLAGS
@@ -169,6 +173,10 @@ void cc110x_init_ignore(void);
  *
  */
 uint8_t cc110x_add_ignored(radio_address_t addr);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 /** @} */

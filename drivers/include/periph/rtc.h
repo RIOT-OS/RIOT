@@ -23,6 +23,10 @@
 #include <time.h>
 #include "periph_conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* guard file in case no RTC device was specified */
 #if RTC_NUMOF
 
@@ -102,5 +106,10 @@ void rtc_poweron(void);
 void rtc_poweroff(void);
 
 #endif /* RTC_NUMOF */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* __RTC_H */
 /** @} */

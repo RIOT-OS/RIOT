@@ -21,6 +21,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Callback function type for receiving incoming packets
@@ -345,6 +348,9 @@ typedef struct {
 
 } ieee802154_radio_driver_t;
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* IEEE802154_RADIO_DRIVER_API_ */
 

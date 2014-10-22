@@ -31,6 +31,10 @@
 #include "cc1100-internal.h"
 #include "cc110x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MAX_DATA_LENGTH     (0x3A)  ///< Maximum data length of layer 0 = 58 Bytes.
 
 /**
@@ -132,5 +136,9 @@ int cc1100_phy_calc_wor_settings(uint16_t millis);
 void cc1100_phy_rx_handler(void);
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CC1100_PHY_H_ */

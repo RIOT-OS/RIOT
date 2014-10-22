@@ -21,6 +21,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 uint8_t cc110x_txrx(uint8_t c);
 
 void cc110x_gdo0_enable(void);
@@ -31,6 +35,10 @@ void cc110x_init_interrupts(void);
 
 void cc110x_before_send(void);
 void cc110x_after_send(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __CC1100_ARCH_H */

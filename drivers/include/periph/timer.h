@@ -22,6 +22,9 @@
 
 #include "periph_conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Definition of available timers
@@ -142,6 +145,10 @@ void timer_irq_disable(tim_t dev);
  * @param[in] dev           the timer to reset
  */
 void timer_reset(tim_t dev);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __TIMER_H */
 /** @} */

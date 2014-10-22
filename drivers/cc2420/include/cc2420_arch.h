@@ -18,6 +18,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief SPI tx and rx function.
  *
@@ -117,3 +121,7 @@ void cc2420_before_send(void);
  *
  */
 void cc2420_after_send(void);
+
+#ifdef __cplusplus
+}
+#endif
