@@ -32,7 +32,8 @@
 extern "C" {
 #endif
 
-/** @name Numeric representation of the four GPIO ports
+/**
+ * @name Numeric representation of the four GPIO ports
  * @{
  */
 enum {
@@ -211,15 +212,74 @@ typedef struct {
     cc2538_reg_t RESERVED6[567];                    /**< Reserved addresses */
 } cc2538_gpio_t;
 
-#define GPIO_A ( (cc2538_gpio_t*)0x400d9000 )       /**< GPIO Port A instance */
-#define GPIO_B ( (cc2538_gpio_t*)0x400da000 )       /**< GPIO Port B instance */
-#define GPIO_C ( (cc2538_gpio_t*)0x400db000 )       /**< GPIO Port C instance */
-#define GPIO_D ( (cc2538_gpio_t*)0x400dc000 )       /**< GPIO Port D instance */
+/**
+ * @brief IOC port component registers
+ */
+typedef struct {
+    cc2538_reg_t PA_SEL[8];
+    cc2538_reg_t PB_SEL[8];
+    cc2538_reg_t PC_SEL[8];
+    cc2538_reg_t PD_SEL[8];
+    cc2538_reg_t PA_OVER[8];
+    cc2538_reg_t PB_OVER[8];
+    cc2538_reg_t PC_OVER[8];
+    cc2538_reg_t PD_OVER[8];
+} cc2538_ioc_t;
 
-void gpio_port_a_isr(void);                         /**< Interrupt service routine for Port A */
-void gpio_port_b_isr(void);                         /**< Interrupt service routine for Port B */
-void gpio_port_c_isr(void);                         /**< Interrupt service routine for Port C */
-void gpio_port_d_isr(void);                         /**< Interrupt service routine for Port D */
+/**
+ * @name Values for IOC_PXX_SEL
+ * @{
+ */
+#define IOC_SEL_UART0_TXD       (0)     /**< UART0 TXD */
+#define IOC_SEL_UART1_RTS       (1)     /**< UART1 RTS */
+#define IOC_SEL_UART1_TXD       (2)     /**< UART1 TXD */
+#define IOC_SEL_SSI0_TXD        (3)     /**< SSI0 TXD */
+#define IOC_SEL_SSI0_CLKOUT     (4)     /**< SSI0 CLKOUT */
+#define IOC_SEL_SSI0_FSSOUT     (5)     /**< SSI0 FSSOUT */
+#define IOC_SEL_SSI0_STXSER_EN  (6)     /**< SSI0 STXSER EN */
+#define IOC_SEL_SSI1_TXD        (7)     /**< SSI1 TXD */
+#define IOC_SEL_SSI1_CLKOUT     (8)     /**< SSI1 CLKOUT */
+#define IOC_SEL_SSI1_FSSOUT     (9)     /**< SSI1 FSSOUT */
+#define IOC_SEL_SSI1_STXSER_EN  (10)    /**< SSI1 STXSER EN */
+#define IOC_SEL_I2C_CMSSDA      (11)    /**< I2C CMSSDA */
+#define IOC_SEL_I2C_CMSSCL      (12)    /**< I2C CMSSCL */
+#define IOC_SEL_GPT0_ICP1       (13)    /**< GPT0 ICP1 */
+#define IOC_SEL_GPT0_ICP2       (14)    /**< GPT0 ICP2 */
+#define IOC_SEL_GPT1_ICP1       (15)    /**< GPT1 ICP1 */
+#define IOC_SEL_GPT1_ICP2       (16)    /**< GPT1 ICP2 */
+#define IOC_SEL_GPT2_ICP1       (17)    /**< GPT2 ICP1 */
+#define IOC_SEL_GPT2_ICP2       (18)    /**< GPT2 ICP2 */
+#define IOC_SEL_GPT3_ICP1       (19)    /**< GPT3 ICP1 */
+#define IOC_SEL_GPT3_ICP2       (20)    /**< GPT3 ICP2 */
+/** @} */
+
+/**
+ * @name Values for IOC_PXX_OVER
+ * @{
+ */
+#define IOC_OVERRIDE_OE   0x00000008    /**< Output Enable */
+#define IOC_OVERRIDE_PUE  0x00000004    /**< Pull Up Enable */
+#define IOC_OVERRIDE_PDE  0x00000002    /**< Pull Down Enable */
+#define IOC_OVERRIDE_ANA  0x00000001    /**< Analog Enable */
+#define IOC_OVERRIDE_DIS  0x00000000    /**< Override Disabled */
+/** @} */
+
+/**
+ * @name GPIO instance definitions
+ * @{
+ */
+#define GPIO_A ((cc2538_gpio_t *)0x400d9000)    /**< GPIO Port A instance */
+#define GPIO_B ((cc2538_gpio_t *)0x400da000)    /**< GPIO Port B instance */
+#define GPIO_C ((cc2538_gpio_t *)0x400db000)    /**< GPIO Port C instance */
+#define GPIO_D ((cc2538_gpio_t *)0x400dc000)    /**< GPIO Port D instance */
+/** @} */
+
+/**
+ * @name IOC instance definition
+ * @{
+ */
+#define IOC    ((cc2538_ioc_t *)0x400d4000)     /**< IOC instance */
+/** @} */
 
 #ifdef __cplusplus
 } /* end extern "C" */
