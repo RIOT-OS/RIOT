@@ -45,7 +45,7 @@ volatile tcb_t *sched_active_thread;
 
 volatile kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
 
-clist_node_t *sched_runqueues[SCHED_PRIO_LEVELS];
+static clist_node_t *sched_runqueues[SCHED_PRIO_LEVELS];
 static uint32_t runqueue_bitcache = 0;
 
 #if SCHEDSTATISTICS

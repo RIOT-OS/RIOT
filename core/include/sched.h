@@ -152,11 +152,6 @@ extern volatile int sched_num_threads;
  */
 extern volatile kernel_pid_t sched_active_pid;
 
-/**
- * List of runqueues per priority level
- */
-extern clist_node_t *runqueues[SCHED_PRIO_LEVELS];
-
 #if SCHEDSTATISTICS
 /**
  *  Scheduler statistics
