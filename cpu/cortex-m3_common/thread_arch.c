@@ -29,6 +29,18 @@
 #include "cpu.h"
 #include "kernel_internal.h"
 
+//TODO: Hack to fix travis build failures for other boards
+//Decide how to resolve this properly
+// 22/10/14 - ryankurte
+#ifndef SVC_ISR
+#define SVC_ISR       isr_svc  
+#endif
+
+#ifndef PEND_SV_ISR
+#define PEND_SV_ISR   isr_pendsv
+#endif
+//End hack
+
 /**
  * @name noticeable marker marking the beginning of a stack segment
  *
@@ -80,7 +92,8 @@ char *thread_arch_stack_init(void *(*task_func)(void *), void *arg, void *stack_
     *stk = (uint32_t) 0;
 
     /* r1 - r3 */
-    for (int i = 3; i >= 1; i--) {
+    for (int i = 3; i >= 1; i--)
+    {
         stk--;
         *stk = i;
     }
@@ -90,7 +103,8 @@ char *thread_arch_stack_init(void *(*task_func)(void *), void *arg, void *stack_
     *stk = (unsigned int) arg;
 
     /* r11 - r4 */
-    for (int i = 11; i >= 4; i--) {
+    for (int i = 11; i >= 4; i--)
+    {
         stk--;
         *stk = i;
     }
@@ -99,7 +113,7 @@ char *thread_arch_stack_init(void *(*task_func)(void *), void *arg, void *stack_
     stk--;
     *stk = (uint32_t)EXCEPT_RET_TASK_MODE;
 
-    return (char*) stk;
+    return (char *) stk;
 }
 
 void thread_arch_stack_print(void)
@@ -110,11 +124,13 @@ void thread_arch_stack_print(void)
     printf("printing the current stack of thread %" PRIkernel_pid "\n", thread_getpid());
     printf("  address:      data:\n");
 
-    do {
+    do
+    {
         printf("  0x%08x:   0x%08x\n", (unsigned int)sp, (unsigned int)*sp);
         sp++;
         count++;
-    } while (*sp != STACK_MARKER);
+    }
+    while (*sp != STACK_MARKER);
 
     printf("current stack size: %i byte\n", count);
 }
