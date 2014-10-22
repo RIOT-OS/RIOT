@@ -23,9 +23,6 @@
 #include "cpu.h"
 #include "sched.h"
 #include "thread.h"
-
-#include "cc2538-gpio.h"
-#include "ioc.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
