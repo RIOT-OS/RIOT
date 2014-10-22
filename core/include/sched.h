@@ -80,15 +80,15 @@
 #ifndef _SCHEDULER_H
 #define _SCHEDULER_H
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 #include <stddef.h>
 #include "bitarithm.h"
 #include "tcb.h"
 #include "attributes.h"
 #include "kernel_types.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /**
  * @def SCHED_PRIO_LEVELS

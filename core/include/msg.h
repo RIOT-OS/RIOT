@@ -32,13 +32,13 @@
 #ifndef __MSG_H_
 #define __MSG_H_
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 #include <stdint.h>
 #include <stdbool.h>
 #include "kernel_types.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /**
  * @brief Describes a message object which can be sent between threads.

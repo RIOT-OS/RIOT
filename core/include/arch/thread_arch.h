@@ -19,11 +19,11 @@
 #ifndef __THREAD_ARCH_H
 #define __THREAD_ARCH_H
 
+#include "attributes.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-#include "attributes.h"
 
 /**
  * @name Define the mapping between the architecture independent interfaces

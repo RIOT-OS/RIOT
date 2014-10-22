@@ -33,13 +33,13 @@
 #ifndef __HWTIMER_H
 #define __HWTIMER_H
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 #include <stdint.h>
 #include "hwtimer_cpu.h"
 #include "board.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /**
  * @brief   Number of kernel timer ticks per second
