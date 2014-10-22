@@ -32,6 +32,7 @@ BOARD_INSUFFICIENT_RAM := chronos msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1 re
 # Modules to include:
 
 USEMODULE += posix
+USEMODULE += msg_queue
 
 USEMODULE += defaulttransceiver
 USEMODULE += ccn_lite

@@ -52,7 +52,7 @@ char appserver_stack[KERNEL_CONF_STACKSIZE_MAIN];
 static volatile kernel_pid_t _relay_pid = KERNEL_PID_UNDEF, _appserver_pid = KERNEL_PID_UNDEF;
 
 #define SHELL_MSG_BUFFER_SIZE (64)
-msg_t msg_buffer_shell[SHELL_MSG_BUFFER_SIZE];
+static char shell_msg_queue[MSG_QUEUE_SPACE(SHELL_MSG_BUFFER_SIZE)];
 
 shell_t shell;
 
@@ -324,8 +324,8 @@ int main(void)
 {
     puts("CCN!");
 
-    if (msg_init_queue(msg_buffer_shell, SHELL_MSG_BUFFER_SIZE) != 0) {
-        DEBUG("msg init queue failed...abording\n");
+    if (thread_msg_queue_init(shell_msg_queue, sizeof(shell_msg_queue), 0) != 0) {
+        DEBUG("msg queue init failed...abording\n");
         return -1;
     }
 

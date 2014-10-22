@@ -11,6 +11,7 @@ BOARD_BLACKLIST := arduino-due chronos mbed_lpc1768 msb-430 msb-430h qemu-i386 s
 BOARD_INSUFFICIENT_RAM := redbee-econotag
 
 USEMODULE += defaulttransceiver
+USEMODULE += msg_queue
 USEPKG += libcoap
 
 include $(RIOTBASE)/Makefile.include

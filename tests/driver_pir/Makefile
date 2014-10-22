@@ -11,6 +11,7 @@ ifneq (,$(filter arduino-due,$(BOARD)))
   export PIR_GPIO ?= GPIO_10
 endif
 
+USEMODULE += msg_queue
 USEMODULE += pir
 USEMODULE += vtimer
 

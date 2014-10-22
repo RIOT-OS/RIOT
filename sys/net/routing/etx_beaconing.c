@@ -65,7 +65,7 @@ kernel_pid_t etx_radio_pid = KERNEL_PID_UNDEF;
 kernel_pid_t etx_clock_pid = KERNEL_PID_UNDEF;
 
 //Message queue for radio
-static msg_t msg_que[ETX_RCV_QUEUE_SIZE];
+static char etx_msg_queue[MSG_QUEUE_SPACE(ETX_RCV_QUEUE_SIZE)];
 
 /*
  * The counter for the current 'round'. An ETX beacon is sent every ETX_INTERVAL
@@ -396,7 +396,7 @@ static void *etx_radio(void *arg)
 
     ieee802154_frame_t frame;
 
-    msg_init_queue(msg_que, ETX_RCV_QUEUE_SIZE);
+    thread_msg_queue_init(etx_msg_queue, sizeof(etx_msg_queue), 0);
 
     ipv6_addr_t ll_address;
     ipv6_addr_t candidate_addr;

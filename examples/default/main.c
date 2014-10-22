@@ -50,7 +50,7 @@
 #ifdef MODULE_TRANSCEIVER
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
-msg_t msg_q[RCV_BUFFER_SIZE];
+static char msg_queue[MSG_QUEUE_SPACE(RCV_BUFFER_SIZE)];
 
 void *radio(void *arg)
 {
@@ -65,7 +65,7 @@ void *radio(void *arg)
     radio_packet_length_t i;
 #endif
 
-    msg_init_queue(msg_q, RCV_BUFFER_SIZE);
+    thread_msg_queue_init(msg_queue, sizeof(msg_queue), 0);
 
     while (1) {
         msg_receive(&m);

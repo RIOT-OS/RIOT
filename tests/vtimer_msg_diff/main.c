@@ -56,8 +56,8 @@ void *timer_thread(void *arg)
     (void) arg;
     printf("This is thread %" PRIkernel_pid "\n", thread_getpid());
 
-    msg_t msgq[16];
-    msg_init_queue(msgq, sizeof(msgq));
+    char msg_queue[MSG_QUEUE_SPACE(16)];
+    thread_msg_queue_init(msg_queue, sizeof(msg_queue), 0);
 
     while (1) {
         msg_t m;

@@ -108,3 +108,7 @@ endif
 ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
 	FEATURES_REQUIRED += transceiver
 endif
+
+ifneq (,$(filter transceiver,$(USEMODULE)))
+	USEMODULE += msg_queue
+endif

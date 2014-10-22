@@ -7,6 +7,7 @@ BOARD_BLACKLIST := arduino-mega2560
 
 BOARD_INSUFFICIENT_RAM := mbed_lpc1768 stm32f0discovery pca10000 pca10005
 
+USEMODULE += msg_queue
 USEMODULE += vtimer
 
 include $(RIOTBASE)/Makefile.include

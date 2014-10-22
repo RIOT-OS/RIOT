@@ -49,7 +49,7 @@
 #define DEFAULT_IEEE_802154_PAN_ID  (0x1234)
 
 char radio_stack_buffer[RADIO_STACK_SIZE];
-msg_t msg_q[RADIO_RCV_BUF_SIZE];
+static char msg_q[MSG_QUEUE_SPACE(RADIO_RCV_BUF_SIZE)];
 
 uint8_t lowpan_mac_buf[PAYLOAD_SIZE];
 static uint8_t macdsn;
@@ -80,7 +80,7 @@ static void *recv_ieee802154_frame(void *arg)
     ieee802154_frame_t frame;
     net_if_eui64_t src, dst;
 
-    msg_init_queue(msg_q, RADIO_RCV_BUF_SIZE);
+    thread_msg_queue_init(msg_q, sizeof(msg_q), 0);
 
     while (1) {
         msg_receive(&m);

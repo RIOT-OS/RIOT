@@ -50,7 +50,8 @@
 #define RELAY_MSG_BUFFER_SIZE (64)
 
 /** message buffer */
-msg_t msg_buffer_relay[RELAY_MSG_BUFFER_SIZE];
+static char msg_buffer_relay[MSG_QUEUE_SPACE(RELAY_MSG_BUFFER_SIZE)];
+
 
 struct ccnl_relay_s *theRelay = NULL;
 
@@ -295,8 +296,8 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 
     DEBUGMSG(1, "starting main event and IO loop\n");
 
-    if (msg_init_queue(msg_buffer_relay, RELAY_MSG_BUFFER_SIZE) != 0) {
-        DEBUGMSG(1, "msg init queue failed...abording\n");
+    if (thread_msg_queue_init(msg_buffer_relay, sizeof(msg_buffer_relay), 0) != 0) {
+        DEBUGMSG(1, "msg queue init failed...abording\n");
         return -1;
     }
 

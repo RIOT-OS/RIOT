@@ -40,5 +40,6 @@ USEMODULE += defaulttransceiver
 USEMODULE += vtimer
 USEMODULE += ccn_lite
 USEMODULE += ccn_lite_client
+USEMODULE += msg_queue
 
 include $(RIOTBASE)/Makefile.include

@@ -35,7 +35,7 @@
 #define APPSERVER_MSG_BUFFER_SIZE (64)
 
 /** message buffer */
-msg_t msg_buffer_appserver[APPSERVER_MSG_BUFFER_SIZE];
+static char msg_buffer_appserver[MSG_QUEUE_SPACE(APPSERVER_MSG_BUFFER_SIZE)];
 
 kernel_pid_t relay_pid = KERNEL_PID_UNDEF;
 char prefix[] = "/riot/appserver/";
@@ -118,7 +118,7 @@ static void riot_ccnl_appserver_ioloop(void)
 {
     DEBUGMSG(1, "starting appserver main event and IO loop\n");
 
-    if (msg_init_queue(msg_buffer_appserver, APPSERVER_MSG_BUFFER_SIZE) != 0) {
+    if (thread_msg_queue_init(msg_buffer_appserver, sizeof(msg_buffer_appserver), 0) != 0) {
         DEBUGMSG(1, "msg init queue failed...abording\n");
     }
 

@@ -33,7 +33,7 @@
 
 #include "udp.h"
 
-msg_t udp_msg_queue[UDP_PKT_RECV_BUF_SIZE];
+static char msg_queue[MSG_QUEUE_SPACE(UDP_PKT_RECV_BUF_SIZE)];
 
 char udp_stack_buffer[UDP_STACK_SIZE];
 
@@ -72,7 +72,7 @@ void *udp_packet_handler(void *arg)
     msg_t m_recv_ip, m_send_ip, m_recv_udp, m_send_udp;
     socket_internal_t *udp_socket = NULL;
 
-    msg_init_queue(udp_msg_queue, UDP_PKT_RECV_BUF_SIZE);
+    thread_msg_queue_init(msg_queue, sizeof(msg_queue), 0);
 
     while (1) {
         msg_receive(&m_recv_ip);

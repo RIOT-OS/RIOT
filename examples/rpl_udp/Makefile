@@ -46,6 +46,7 @@ USEMODULE += shell_commands
 USEMODULE += uart0
 USEMODULE += ps
 USEMODULE += vtimer
+USEMODULE += msg_queue
 USEMODULE += defaulttransceiver
 USEMODULE += rpl
 USEMODULE += udp
