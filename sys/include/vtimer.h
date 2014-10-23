@@ -82,7 +82,7 @@ int vtimer_usleep(uint32_t us);
 int vtimer_sleep(timex_t time);
 
 /**
- * @brief   set a vtimer with msg event handler
+ * @brief   set a vtimer with msg event handler of type @ref MSG_TIMER
  * @param[in]   t           pointer to preinitialised vtimer_t
  * @param[in]   interval    vtimer timex_t interval
  * @param[in]   pid         process id
