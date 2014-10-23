@@ -813,6 +813,8 @@ EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = */board/*/tools/* \
                          */cpu/*/include/component/* \
                          */cpu/*/include/instance/* \
+                         */cpu/*/include/pio/* \
+                         */cpu/lpc*/include/core_cm*.h \
                          */cpu/cortex-*_common/include/core_cm*.h \
                          */cpu/cortex-*_common/include/core_cmInstr.h \
                          */cpu/cortex-*_common/include/core_cmFunc.h \

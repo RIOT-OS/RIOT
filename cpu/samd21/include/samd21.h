@@ -1,4 +1,4 @@
-/**
+/*
  * \file
  *
  * \brief Header file for SAMR21G18A
