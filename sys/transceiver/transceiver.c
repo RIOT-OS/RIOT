@@ -609,7 +609,7 @@ void receive_cc2420_packet(ieee802154_packet_t *trans_p)
         return;
     }
 #endif
-    DEBUG("transceiver: Content: %s\n", trans_p->data);
+    DEBUG("transceiver: Content: %s\n", trans_p->frame.payload);
 }
 #endif
 
