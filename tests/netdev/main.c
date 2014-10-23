@@ -860,7 +860,7 @@ static int send_packet(void)
                 }
 
                 puts("");
-                
+
                 dev->driver->send_data(dev, &dest, dev_address_len,
                                        hlist, payload, strlen(payload));
             }
