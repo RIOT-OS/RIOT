@@ -25,6 +25,7 @@
  extern "C" {
 #endif
 
+#include "kernel_internal.h"
 /**
  * @name Define the mapping between the architecture independent interfaces
  *       and the kernel internal interfaces
@@ -52,7 +53,7 @@
  *
  * @return                  pointer to the new top of the stack
  */
-char *thread_arch_stack_init(void *(*function)(void *arg), void *arg, void *stack_start, int stack_size);
+char *thread_arch_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size);
 
 /**
  * @brief Print the current stack to stdout

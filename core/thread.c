@@ -105,7 +105,7 @@ uintptr_t thread_measure_stack_free(char *stack)
 }
 #endif
 
-kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags, void *(*function)(void *arg), void *arg, const char *name)
+kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags, thread_task_func_t function, void *arg, const char *name)
 {
     if (priority >= SCHED_PRIO_LEVELS) {
         return -EINVAL;

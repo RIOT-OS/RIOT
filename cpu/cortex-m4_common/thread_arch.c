@@ -57,7 +57,7 @@
  * --------------------------------------
  *
  */
-char *thread_arch_stack_init(void *(*task_func)(void *),
+char *thread_arch_stack_init(thread_task_func_t task_func,
                              void *arg,
                              void *stack_start,
                              int stack_size)
