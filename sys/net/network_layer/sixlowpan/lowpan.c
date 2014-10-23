@@ -53,7 +53,9 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
-#define CON_STACKSIZE                   (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define LOWPAN_AUX_MSGQ_SIZE                   (8)
+
+#define LOWPAN_AUX_STACKSIZE            (KERNEL_CONF_STACKSIZE_DEFAULT)
 #define LOWPAN_TRANSFER_BUF_STACKSIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
 
 #define SIXLOWPAN_MAX_REGISTERED        (4)
@@ -125,7 +127,7 @@ mutex_t fifo_mutex = MUTEX_INIT;
 
 kernel_pid_t ip_process_pid = KERNEL_PID_UNDEF;
 kernel_pid_t nd_nbr_cache_rem_pid = KERNEL_PID_UNDEF;
-kernel_pid_t contexts_rem_pid = KERNEL_PID_UNDEF;
+kernel_pid_t lowpan_aux_pid = KERNEL_PID_UNDEF;
 kernel_pid_t transfer_pid = KERNEL_PID_UNDEF;
 
 mutex_t lowpan_context_mutex = MUTEX_INIT;
@@ -135,7 +137,7 @@ kernel_pid_t sixlowpan_reg[SIXLOWPAN_MAX_REGISTERED];
 static sixlowpan_lowpan_frame_t current_frame;
 
 char ip_process_buf[IP_PROCESS_STACKSIZE];
-char con_buf[CON_STACKSIZE];
+char lowpan_aux_stack[LOWPAN_AUX_STACKSIZE];
 char lowpan_transfer_buf[LOWPAN_TRANSFER_BUF_STACKSIZE];
 lowpan_context_t contexts[NDP_6LOWPAN_CONTEXT_MAX];
 uint8_t context_len = 0;
@@ -1634,30 +1636,68 @@ lowpan_context_t *lowpan_context_num_lookup(uint8_t num)
     return NULL;
 }
 
-static void *lowpan_context_auto_remove(void *arg)
+static void *lowpan_auxilarity(void *arg)
 {
     (void) arg;
 
     timex_t minute = timex_set(60, 0);
+    vtimer_t timer;
     int i;
     int8_t to_remove[NDP_6LOWPAN_CONTEXT_MAX];
+    kernel_pid_t pid = thread_getpid();
+    msg_t msg, msgq[LOWPAN_AUX_MSGQ_SIZE];
+
+    msg_init_queue(msgq, LOWPAN_AUX_MSGQ_SIZE);
+
+    vtimer_set_msg(&timer, minute, pid, NULL);
 
     while (1) {
-        vtimer_sleep(minute);
         int8_t to_remove_size = 0;
-        mutex_lock(&lowpan_context_mutex);
 
-        for (i = 0; i < lowpan_context_len(); i++) {
-            if (--(contexts[i].lifetime) == 0) {
-                to_remove[to_remove_size++] = contexts[i].num;
-            }
+        msg_receive(&msg);
+
+        switch (msg.type) {
+            case MSG_TIMER:
+                mutex_lock(&lowpan_context_mutex);
+                for (i = 0; i < lowpan_context_len(); i++) {
+                    if (--(contexts[i].lifetime) == 0) {
+                        to_remove[to_remove_size++] = contexts[i].num;
+                    }
+                }
+
+                for (i = 0; i < to_remove_size; i++) {
+                    lowpan_context_remove(to_remove[i]);
+                }
+
+                mutex_unlock(&lowpan_context_mutex);
+                vtimer_set_msg(&timer, minute, pid, NULL);
+                break;
+
+            case MSG_SEND_NS:
+                if ((((ns_fallback_args_t *)msg.content.ptr)->data) &&
+                    (((ns_fallback_args_t *)msg.content.ptr)->data_len)) {
+                    uint8_t packet_tmp[((ns_fallback_args_t *)msg.content.ptr)->data_len];
+                    ipv6_addr_t *dest = ((ns_fallback_args_t *)msg.content.ptr)->dest;
+                    ndp_neighbor_cache_t *nce = NULL;
+
+                    memcpy(packet_tmp, ((ns_fallback_args_t *)msg.content.ptr)->data,
+                           sizeof(packet_tmp));
+                    msg_reply(&msg, &msg);
+
+                    if (!ndp_neighbor_cache_search(dest)) {
+                        ndp_neighbor_cache_add(0, dest, NULL, 0, 0, NDP_NCE_STATUS_INCOMPLETE,
+                                               NDP_NCE_TYPE_REGISTERED, 100);
+                    }
+
+                    icmpv6_send_neighbor_sol(NULL, NULL, dest, 1, 0);
+                }
+                else {
+                    msg_reply(&msg, &msg);
+                }
+
+            default:
+                break;
         }
-
-        for (i = 0; i < to_remove_size; i++) {
-            lowpan_context_remove(to_remove[i]);
-        }
-
-        mutex_unlock(&lowpan_context_mutex);
     }
 
     return NULL;
@@ -1798,11 +1838,11 @@ int sixlowpan_lowpan_init(void)
 
     nbr_cache_auto_rem();
 
-    contexts_rem_pid = thread_create(con_buf, CON_STACKSIZE,
-                                     PRIORITY_MAIN + 1, CREATE_STACKTEST,
-                                     lowpan_context_auto_remove, NULL, "lowpan_context_rem");
+    lowpan_aux_pid = thread_create(lowpan_aux_stack, LOWPAN_AUX_STACKSIZE,
+                                   PRIORITY_MAIN + 1, CREATE_STACKTEST,
+                                   lowpan_auxilarity, NULL, "lowpan_auxilarity");
 
-    if (contexts_rem_pid == KERNEL_PID_UNDEF) {
+    if (lowpan_aux_pid == KERNEL_PID_UNDEF) {
         return 0;
     }
 

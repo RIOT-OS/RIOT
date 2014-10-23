@@ -37,6 +37,13 @@ typedef struct {
 
 extern uint16_t local_address;
 extern mutex_t lowpan_context_mutex;
+extern kernel_pid_t lowpan_aux_pid;
+
+typedef struct {
+    ipv6_addr_t *dest;
+    void *data;
+    uint16_t data_len;
+} ns_fallback_args_t;
 
 void lowpan_read(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
                  net_if_eui64_t *d_addr);

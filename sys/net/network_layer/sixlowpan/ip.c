@@ -46,10 +46,6 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #define LLHDR_IPV6HDR_LEN           (LL_HDR_LEN + IPV6_HDR_LEN)
 #define IPV6_NET_IF_ADDR_BUFFER_LEN (NET_IF_MAX * IPV6_NET_IF_ADDR_LIST_LEN)
 
-static mutex_t _fallback_mutex = MUTEX_INIT;
-static uint8_t _fallback_running = 0;
-static char _fallback_stack[KERNEL_CONF_STACKSIZE_DEFAULT];
-
 uint8_t ip_send_buffer[BUFFER_SIZE];
 uint8_t buffer[BUFFER_SIZE];
 msg_t ip_msg_queue[IP_PKT_RECV_BUF_SIZE];
@@ -71,59 +67,6 @@ static uint8_t default_hop_limit = MULTIHOP_HOPLIMIT;
 
 /* registered upper layer threads */
 kernel_pid_t sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
-
-typedef struct {
-    ipv6_addr_t *dest;
-    void *data;
-    uint16_t data_len;
-} fallback_args_t;
-
-/* XXX: temporary fallback until there is a proper IPv6 packet queue */
-static void *_fallback(void *args)
-{
-    msg_t msg;
-
-    (void)args;
-
-    msg_receive(&msg);
-
-    if (!(((fallback_args_t *)msg.content.ptr)->data) ||
-        !(((fallback_args_t *)msg.content.ptr)->data_len)) {
-        uint8_t packet_tmp[((fallback_args_t *)msg.content.ptr)->data_len];
-        ipv6_addr_t *dest = ((fallback_args_t *)msg.content.ptr)->dest;
-        int retries = 5;
-        ndp_neighbor_cache_t *nce = NULL;
-
-        memcpy(packet_tmp, ((fallback_args_t *)msg.content.ptr)->data,
-               sizeof(packet_tmp));
-        msg_reply(&msg, &msg);
-
-        if (!ndp_neighbor_cache_search(dest)) {
-            ndp_neighbor_cache_add(0, dest, NULL, 0, 0, NDP_NCE_STATUS_INCOMPLETE,
-                                   NDP_NCE_TYPE_REGISTERED, 100);
-        }
-
-        while (nce == NULL && retries >= 0) {
-            icmpv6_send_neighbor_sol(NULL, NULL, dest, 1, 0);
-            /* repeat according to standard */
-            vtimer_usleep(500000);
-            nce = ndp_get_ll_address(dest);
-            retries--;
-        }
-
-        ipv6_send_packet((ipv6_hdr_t *)packet_tmp);
-
-        mutex_lock(&_fallback_mutex);
-        _fallback_running = 0;
-        mutex_unlock(&_fallback_mutex);
-    }
-    else {
-        msg_reply(&msg, &msg);
-    }
-
-
-    return NULL;
-}
 
 int ipv6_send_packet(ipv6_hdr_t *packet)
 {
@@ -152,6 +95,8 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
         return length;
     }
     else {
+        ipv6_addr_t *dest;
+
         /* see if dest should be routed to a different next hop */
         if (ipv6_addr_is_multicast(&packet->destaddr)) {
             /* if_id will be ignored */
@@ -160,12 +105,15 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
                                            length);
         }
 
-        if (ip_get_next_hop == NULL) {
-            return -1;
+        if (ip_get_next_hop != NULL) {
+            DEBUG("Trying to find the next hop for %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                    &packet->destaddr));
+            dest = ip_get_next_hop(&packet->destaddr);
+        }
+        else {
+            dest = &packet->destaddr;
         }
 
-        DEBUG("Trying to find the next hop for %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &packet->destaddr));
-        ipv6_addr_t *dest = ip_get_next_hop(&packet->destaddr);
 
         if (dest == NULL) {
             return -1;
@@ -179,23 +127,13 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
             /* XXX: super-hacky because of missing packet-queue +
              *      this is wrong */
             uint16_t raddr = dest->uint16[7];
+            ns_fallback_args_t fallback_args = { dest, packet, length };
+            msg_t msg;
 
-            mutex_lock(&_fallback_mutex);
+            msg.type = MSG_SEND_NS;
+            msg.content.ptr = (char *)&fallback_args;
 
-            if (!_fallback_running) {
-                fallback_args_t fallback_args = { dest, packet, length };
-                msg_t msg;
-
-                msg.content.ptr = (char *)&fallback_args;
-
-                kernel_pid_t pid = thread_create(_fallback_stack,
-                                                 KERNEL_CONF_STACKSIZE_DEFAULT, PRIORITY_MAIN + 3, 0,
-                                                 _fallback, NULL, "ndp_fallback_hack");
-                msg_send_receive(&msg, &msg, pid);
-                thread_yield();
-            }
-
-            mutex_unlock(&_fallback_mutex);
+            msg_send_receive(&msg, &msg, lowpan_aux_pid);
 
             sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *)packet, length);
             /* return -1; */
