@@ -316,7 +316,7 @@ int _nrf24l01p_get_option(netdev_t *dev, netdev_opt_t opt, void *value, size_t *
 
             break;
 
-        case NETDEV_OPT_ADDRESS_TX_PREFIX:
+        case NETDEV_OPT_ADDRESS_TX:
 
             if (*value_len < sizeof(netdev_nrf24l01p_addr_t)) {
                 return -EOVERFLOW;
@@ -335,7 +335,7 @@ int _nrf24l01p_get_option(netdev_t *dev, netdev_opt_t opt, void *value, size_t *
 
             break;
 
-        case NETDEV_OPT_ADDRESS_RX_PREFIX:
+        case NETDEV_OPT_ADDRESS_RX:
 
             if (*value_len < sizeof(netdev_nrf24l01p_addr_t)) {
                 return -EOVERFLOW;
@@ -450,7 +450,7 @@ int _nrf24l01p_set_option(netdev_t *dev, netdev_opt_t opt, void *value, size_t v
 
             break;
 
-        case NETDEV_OPT_ADDRESS_TX_PREFIX:
+        case NETDEV_OPT_ADDRESS_TX:
 
             if (!(address_txrx->addr <= 0) || (address_txrx->addr >= 0xFFFFFFFFFF)) {
                 res = nrf24l01p_set_tx_address_long((nrf24l01p_t *)dev->more, address_txrx->addr, INITIAL_ADDRESS_WIDTH);
@@ -466,7 +466,7 @@ int _nrf24l01p_set_option(netdev_t *dev, netdev_opt_t opt, void *value, size_t v
 
             break;
 
-        case NETDEV_OPT_ADDRESS_RX_PREFIX:
+        case NETDEV_OPT_ADDRESS_RX:
 
             if (address_txrx->addr == 0) {
                 res = nrf24l01p_disable_pipe((nrf24l01p_t *)dev->more, address_txrx->pipe);
