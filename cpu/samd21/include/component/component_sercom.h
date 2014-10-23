@@ -44,6 +44,8 @@
 #ifndef _SAMR21_SERCOM_COMPONENT_
 #define _SAMR21_SERCOM_COMPONENT_
 
+/** \addtogroup SAMR21G18A
+/* @{ */
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR SERCOM */
 /* ========================================================================== */

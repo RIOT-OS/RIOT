@@ -41,6 +41,8 @@
  *
  */
 
+/** \addtogroup SAMR21G18A
+/* @{ */
 #ifndef _SAMR21G18A_PIO_
 #define _SAMR21G18A_PIO_
 
@@ -1007,3 +1009,5 @@
 #define PORT_PA15F_RFCTRL_FECTRL5  (1u << 15)
 
 #endif /* _SAMR21G18A_PIO_ */
+
+/**@}*/

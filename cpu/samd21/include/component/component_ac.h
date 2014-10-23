@@ -44,6 +44,8 @@
 #ifndef _SAMR21_AC_COMPONENT_
 #define _SAMR21_AC_COMPONENT_
 
+/** \addtogroup SAMR21G18A
+/* @{ */
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR AC */
 /* ========================================================================== */
@@ -554,6 +556,6 @@ typedef struct {
 } Ac;
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
-/*@}*/
+/*@}@}*/
 
 #endif /* _SAMR21_AC_COMPONENT_ */

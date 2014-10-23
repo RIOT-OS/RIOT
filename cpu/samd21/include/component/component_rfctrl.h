@@ -44,6 +44,8 @@
 #ifndef _SAMR21_RFCTRL_COMPONENT_
 #define _SAMR21_RFCTRL_COMPONENT_
 
+/** \addtogroup SAMR21G18A
+/* @{ */
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR RFCTRL */
 /* ========================================================================== */

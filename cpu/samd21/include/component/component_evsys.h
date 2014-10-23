@@ -44,6 +44,8 @@
 #ifndef _SAMR21_EVSYS_COMPONENT_
 #define _SAMR21_EVSYS_COMPONENT_
 
+/** \addtogroup SAMR21G18A
+/* @{ */
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR EVSYS */
 /* ========================================================================== */

@@ -7,9 +7,12 @@
  */
 
 /**
+ * @defgroup        cpu_samd21 samd21
+ * @ingroup         cpu
+ * @brief           CPU specific implementations for the samd21
  * @{
  *
- * @file            cpu-conf.h
+ * @file
  * @brief           Implementation specific CPU configuration options
  *
  * @author          Thomas Eichinger <thomas.eichinger@fu-berlin.de>
