@@ -526,7 +526,7 @@ void gpio_write(gpio_t dev, int value)
 
 /** @brief Interrupt service routine for Port A */
 __attribute__((naked))
-void gpio_port_a_isr(void)
+void isr_gpioa(void)
 {
     int mis, bit;
     gpio_state_t* state;
@@ -558,7 +558,7 @@ void gpio_port_a_isr(void)
 
 /** @brief Interrupt service routine for Port B */
 __attribute__((naked))
-void gpio_port_b_isr(void)
+void isr_gpiob(void)
 {
     int mis, bit;
     gpio_state_t* state;
@@ -590,7 +590,7 @@ void gpio_port_b_isr(void)
 
 /** @brief Interrupt service routine for Port C */
 __attribute__((naked))
-void gpio_port_c_isr(void)
+void isr_gpioc(void)
 {
     int mis, bit;
     gpio_state_t* state;
@@ -622,7 +622,7 @@ void gpio_port_c_isr(void)
 
 /** @brief Interrupt service routine for Port D */
 __attribute__((naked))
-void gpio_port_d_isr(void)
+void isr_gpiod(void)
 {
     int mis, bit;
     gpio_state_t* state;

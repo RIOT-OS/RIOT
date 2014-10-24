@@ -43,6 +43,8 @@ extern "C" {
 #define TIMER_0_MAX_VALUE   0xffffffff
 #define TIMER_0_IRQn_1      GPTIMER_0A_IRQn
 #define TIMER_0_IRQn_2      GPTIMER_0B_IRQn
+#define TIMER_0_ISR_1       isr_timer0_chan0
+#define TIMER_0_ISR_2       isr_timer0_chan1
 
 /* Timer 1 configuration */
 #define TIMER_1_DEV         GPTIMER1
@@ -50,6 +52,8 @@ extern "C" {
 #define TIMER_1_MAX_VALUE   0xffffffff
 #define TIMER_1_IRQn_1      GPTIMER_1A_IRQn
 #define TIMER_1_IRQn_2      GPTIMER_1B_IRQn
+#define TIMER_1_ISR_1       isr_timer1_chan0
+#define TIMER_1_ISR_2       isr_timer1_chan1
 
 /* Timer 2 configuration */
 #define TIMER_2_DEV         GPTIMER2
@@ -57,6 +61,8 @@ extern "C" {
 #define TIMER_2_MAX_VALUE   0xffffffff
 #define TIMER_2_IRQn_1      GPTIMER_2A_IRQn
 #define TIMER_2_IRQn_2      GPTIMER_2B_IRQn
+#define TIMER_2_ISR_1       isr_timer2_chan0
+#define TIMER_2_ISR_2       isr_timer2_chan1
 
 /* Timer 3 configuration */
 #define TIMER_3_DEV         GPTIMER3
@@ -64,6 +70,8 @@ extern "C" {
 #define TIMER_3_MAX_VALUE   0xffffffff
 #define TIMER_3_IRQn_1      GPTIMER_3A_IRQn
 #define TIMER_3_IRQn_2      GPTIMER_3B_IRQn
+#define TIMER_3_ISR_1       isr_timer3_chan0
+#define TIMER_3_ISR_2       isr_timer3_chan1
 /** @} */
 
 
@@ -83,6 +91,7 @@ extern "C" {
 /* UART 0 device configuration */
 #define UART_0_DEV          UART0
 #define UART_0_IRQ          UART0_IRQn
+#define UART_0_ISR          isr_uart0
 /* UART 0 pin configuration */
 #define UART_0_TX_PIN       GPIO_PA1
 #define UART_0_RX_PIN       GPIO_PA0
@@ -90,6 +99,7 @@ extern "C" {
 /* UART 1 device configuration */
 #define UART_1_DEV          UART1
 #define UART_1_IRQ          UART1_IRQn
+#define UART_1_ISR          isr_uart1
 /* UART 1 pin configuration */
 #define UART_1_RTS_PIN      GPIO_PD3
 #define UART_1_CTS_PIN      GPIO_PB0

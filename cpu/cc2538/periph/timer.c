@@ -389,7 +389,7 @@ void timer_reset(tim_t dev)
 
 #if TIMER_0_EN
 __attribute__((naked))
-void isr_timer0_chan0(void)
+void TIMER_0_ISR_1(void)
 {
     ISR_ENTER();
     if (config[0].cb != NULL) config[0].cb(0);
@@ -402,7 +402,7 @@ void isr_timer0_chan0(void)
 }
 
 __attribute__((naked))
-void isr_timer0_chan1(void)
+void TIMER_0_ISR_2(void)
 {
     ISR_ENTER();
     if (config[0].cb != NULL) config[0].cb(1);
@@ -418,7 +418,7 @@ void isr_timer0_chan1(void)
 
 #if TIMER_1_EN
 __attribute__((naked))
-void isr_timer1_chan0(void)
+void TIMER_1_ISR_1(void)
 {
     ISR_ENTER();
     if (config[1].cb != NULL) config[1].cb(0);
@@ -431,7 +431,7 @@ void isr_timer1_chan0(void)
 }
 
 __attribute__((naked))
-void isr_timer1_chan1(void)
+void TIMER_1_ISR_2(void)
 {
     ISR_ENTER();
     if (config[1].cb != NULL) config[1].cb(1);
@@ -447,7 +447,7 @@ void isr_timer1_chan1(void)
 
 #if TIMER_2_EN
 __attribute__((naked))
-void isr_timer2_chan0(void)
+void TIMER_2_ISR_1(void)
 {
     ISR_ENTER();
     if (config[2].cb != NULL) config[2].cb(0);
@@ -460,7 +460,7 @@ void isr_timer2_chan0(void)
 }
 
 __attribute__((naked))
-void isr_timer2_chan1(void)
+void TIMER_2_ISR_2(void)
 {
     ISR_ENTER();
     if (config[2].cb != NULL) config[2].cb(1);
@@ -476,7 +476,7 @@ void isr_timer2_chan1(void)
 
 #if TIMER_3_EN
 __attribute__((naked))
-void isr_timer3_chan0(void)
+void TIMER_3_ISR_1(void)
 {
     ISR_ENTER();
     if (config[3].cb != NULL) config[3].cb(0);
@@ -489,7 +489,7 @@ void isr_timer3_chan0(void)
 }
 
 __attribute__((naked))
-void isr_timer3_chan1(void)
+void TIMER_3_ISR_2(void)
 {
     ISR_ENTER();
     if (config[3].cb != NULL) config[3].cb(1);
