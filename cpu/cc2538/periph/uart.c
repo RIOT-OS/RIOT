@@ -117,7 +117,7 @@ static void reset(cc2538_uart_t *u)
 
 #if UART_0_EN
 __attribute__((naked))
-void isr_uart0(void)
+void UART_0_ISR(void)
 {
     uint_fast16_t mis;
 
@@ -150,7 +150,7 @@ void isr_uart0(void)
 
 #if UART_1_EN
 __attribute__((naked))
-void isr_uart1(void)
+void UART_1_ISR(void)
 {
     uint_fast16_t mis;
 
