@@ -13,8 +13,8 @@ endif
 ifneq (,$(filter cc110x,$(USEMODULE)))
     DIRS += cc110x
 endif
-ifneq (,$(filter cc110x_ng,$(USEMODULE)))
-    DIRS += cc110x_ng
+ifneq (,$(filter cc110x_legacy,$(USEMODULE)))
+    DIRS += cc110x_legacy
 endif
 ifneq (,$(filter at86rf231,$(USEMODULE)))
     DIRS += at86rf231

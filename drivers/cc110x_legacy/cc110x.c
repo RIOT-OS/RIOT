@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     drivers_cc110x_ng
+ * @ingroup     drivers_cc110x_legacy
  * @{
  * @file        cc110x.c
  * @brief       Basic functionality of cc110x driver
@@ -16,7 +16,7 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @}
  */
-#include "cc110x_ng.h"
+#include "cc110x_legacy.h"
 #include "cc110x-internal.h"
 
 #include "hwtimer.h"
@@ -305,7 +305,7 @@ void cc110x_print_config(void)
 
 void cc110x_switch_to_pwd(void)
 {
-    DEBUG("[cc110x_ng] switching to powerdown\n");
+    DEBUG("[cc110x_legacy] switching to powerdown\n");
     cc110x_wakeup_from_rx();
     cc110x_strobe(CC1100_SPWD);
     radio_state = RADIO_PWD;

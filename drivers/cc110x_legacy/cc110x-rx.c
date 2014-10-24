@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     drivers_cc110x_ng
+ * @ingroup     drivers_cc110x_legacy
  * @{
  * @file        cc110x-rx.c
  * @brief       Functions for packet reception on cc110x
@@ -17,7 +17,7 @@
  * @}
  */
 
-#include "cc110x_ng.h"
+#include "cc110x_legacy.h"
 #include "cc110x-internal.h"
 
 #include "kernel_types.h"

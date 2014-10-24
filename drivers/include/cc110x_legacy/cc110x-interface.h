@@ -8,19 +8,19 @@
  */
 
 /**
- * @defgroup    drivers_cc110x_ng CC110x_ng
+ * @defgroup    drivers_cc110x_legacy CC110x_legacy
  * @brief       Driver for Texas Instruments CC110x (without MAC protocol)
  * @ingroup     drivers
  * @{
  *
- * @file        cc110x_ng.h
+ * @file        cc110x_legacy.h
  * @brief       Data structures and variables for the cc110x driver interface
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
 
-#ifndef CC110X_NG_INTERFACE_H
-#define CC110X_NG_INTERFACE_H
+#ifndef CC110X_LEGACY_INTERFACE_H
+#define CC110X_LEGACY_INTERFACE_H
 
 #include <stdint.h>
 #include "radio/radio.h"
@@ -180,4 +180,4 @@ uint8_t cc110x_add_ignored(radio_address_t addr);
 #endif
 
 /** @} */
-#endif /* CC110X_NG_INTERFACE_H */
+#endif /* CC110X_LEGACY_INTERFACE_H */

@@ -32,8 +32,8 @@
 #endif
 #endif
 
-#ifdef MODULE_CC110X_NG
-#include "cc110x_ng.h"
+#ifdef MODULE_CC110X_LEGACY
+#include "cc110x_legacy.h"
 #ifndef TRANSCEIVER_DEFAULT
 #define TRANSCEIVER_DEFAULT TRANSCEIVER_CC1100
 #endif
@@ -91,7 +91,7 @@
 #define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
 #endif
 #endif
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
 #if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
 #undef PAYLOAD_SIZE
 #define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)

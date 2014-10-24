@@ -1,7 +1,7 @@
 export INCLUDES += -I$(RIOTBOARD)/avsextrem/include
 
 ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-	USEMODULE += cc110x_ng
+	USEMODULE += cc110x_legacy
 	USEMODULE += transceiver
 endif
 

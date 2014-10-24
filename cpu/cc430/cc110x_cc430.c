@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 #include "irq.h"
-#include "cc110x_ng.h"
+#include "cc110x_legacy.h"
 #include "board.h"
 #include "hwtimer.h"
 

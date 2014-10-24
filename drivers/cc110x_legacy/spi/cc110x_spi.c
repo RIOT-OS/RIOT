@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_cc110x_ng
+ * @ingroup     drivers_cc110x_legacy
  * @{
  *
  * @file        cc110x_spi.c
@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "cc110x_ng.h"
+#include "cc110x_legacy.h"
 #include "cc110x-internal.h"
 
 #include "irq.h"

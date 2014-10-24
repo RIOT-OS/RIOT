@@ -9,7 +9,7 @@
 + OBJ = $(SRC:%.c=$(BINDIR)%.o)
 + DEP = $(SRC:%.c=$(BINDIR)%.d)
 +
-+ INCLUDES += -I$(RIOTBASE) -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/drivers/cc110x_ng/include -I$(RIOTBASE)/cpu/arm_common/include -I$(RIOTBASE)/cpu/msp430-common/include -I$(RIOTBASE)/sys/net/include/
++ INCLUDES += -I$(RIOTBASE) -I$(RIOTBASE)/sys/include -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/drivers/cc110x_legacy/include -I$(RIOTBASE)/cpu/arm_common/include -I$(RIOTBASE)/cpu/msp430-common/include -I$(RIOTBASE)/sys/net/include/
 +
 + INCLUDES += -I$(CURDIR)
 + INCLUDES += -I$(CURDIR)/02a-MAClow

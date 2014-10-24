@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup   drivers_cc110x_ng
+ * @ingroup   drivers_cc110x_legacy
  * @{
  *
  * @file
@@ -19,7 +19,7 @@
  * @}
  */
 
-#include "cc110x_ng.h"
+#include "cc110x_legacy.h"
 
 // Default PA table index (output power)
 #define PATABLE                 (11)

@@ -98,7 +98,7 @@ void auto_init_net_if(void)
 #ifdef MODULE_CC1020
     transceivers |= TRANSCEIVER_CC1020;
 #endif
-#if MODULE_CC110X || MODULE_CC110X_NG
+#if MODULE_CC110X || MODULE_CC110X_LEGACY
     transceivers |= TRANSCEIVER_CC1100;
 #endif
 #ifdef MODULE_CC2420
