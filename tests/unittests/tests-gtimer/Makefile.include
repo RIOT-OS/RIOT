@@ -1,0 +1,4 @@
+CFLAGS += -DGTIMER_TEST=1
+
+USEMODULE += gtimer
+

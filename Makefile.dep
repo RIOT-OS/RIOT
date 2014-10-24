@@ -1,3 +1,36 @@
+ifneq (,$(filter gtimer,$(USEMODULE)))
+	USEMODULE += timex
+	USEMODULE += vtimer
+endif
+
+ifneq (,$(filter clocksync_eval,$(USEMODULE)))
+	USEMODULE += net_if
+	USEMODULE += ieee802154
+	USEMODULE += gtimer
+	USEMODULE += random
+endif
+
+ifneq (,$(filter gtsp,$(USEMODULE)))
+	USEMODULE += net_if
+	USEMODULE += ieee802154
+	USEMODULE += gtimer
+	USEMODULE += random
+endif
+
+ifneq (,$(filter ftsp,$(USEMODULE)))
+	USEMODULE += net_if
+	USEMODULE += ieee802154
+	USEMODULE += gtimer
+	USEMODULE += random
+endif
+
+ifneq (,$(filter pulsesync,$(USEMODULE)))
+	USEMODULE += net_if
+	USEMODULE += ieee802154
+	USEMODULE += gtimer
+	USEMODULE += random
+endif
+
 ifneq (,$(filter libcoap,$(USEPKG)))
 	USEMODULE += pnet
 endif

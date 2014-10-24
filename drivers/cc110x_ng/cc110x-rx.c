@@ -28,6 +28,10 @@
 #include "cpu-conf.h"
 #include "cpu.h"
 
+#ifdef MODULE_GTIMER
+#include "gtimer.h"
+#endif
+
 #ifdef DBG_IGNORE
 #include <stdio.h>
 #include <string.h>
@@ -45,6 +49,10 @@ volatile uint8_t rx_buffer_next;        ///< Next packet in RX queue
 
 void cc110x_rx_handler(void)
 {
+#ifdef MODULE_GTIMER
+        gtimer_timeval_t gtimer_toa;
+        gtimer_sync_now(&gtimer_toa);
+#endif
     uint8_t res = 0;
 
     /* Possible packet received, RX -> IDLE (0.1 us) */
@@ -83,6 +91,10 @@ void cc110x_rx_handler(void)
             return;
         }
 
+#endif
+
+#ifdef MODULE_GTIMER
+        cc110x_rx_buffer[rx_buffer_next].toa = gtimer_toa;
 #endif
 
         /* notify transceiver thread if any */

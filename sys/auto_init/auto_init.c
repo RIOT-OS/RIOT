@@ -47,6 +47,26 @@
 #include "vtimer.h"
 #endif
 
+#ifdef MODULE_GTIMER
+#include "gtimer.h"
+#endif
+
+#ifdef MODULE_GTSP
+#include "clocksync/gtsp.h"
+#endif
+
+#ifdef MODULE_FTSP
+#include "clocksync/ftsp.h"
+#endif
+
+#ifdef MODULE_PULSESYNC
+#include "clocksync/pulsesync.h"
+#endif
+
+#ifdef MODULE_CLOCKSYNC_EVAL
+#include "clocksync/clocksync_eval.h"
+#endif
+
 #ifdef MODULE_RTC
 #include "rtc.h"
 #endif
@@ -200,6 +220,10 @@ void auto_init(void)
     rtc_init();
     rtc_enable();
 #endif
+#ifdef MODULE_GTIMER
+    DEBUG("Auto init gtimer module.\n");
+    gtimer_init();
+#endif
 #ifdef MODULE_SHT11
     DEBUG("Auto init SHT11 module.\n");
     sht11_init();
@@ -242,5 +266,21 @@ void auto_init(void)
 #ifdef MODULE_TCP
     DEBUG("Auto init transport layer module: [tcp].\n");
     tcp_init_transport_layer();
+#endif
+#ifdef MODULE_CLOCKSYNC_EVAL
+    DEBUG("Auto init clocksync_eval module.\n");
+    clocksync_eval_init();
+#endif
+#ifdef MODULE_GTSP
+    DEBUG("Auto init gtsp clock sync module.\n");
+    gtsp_init();
+#endif
+#ifdef MODULE_FTSP
+    DEBUG("Auto init ftsp clock sync module.\n");
+    ftsp_init();
+#endif
+#ifdef MODULE_PULSESYNC
+    DEBUG("Auto init pulsesync clock sync module.\n");
+    pulsesync_init();
 #endif
 }
