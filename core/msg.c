@@ -96,7 +96,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
             DEBUG("msg_send() %s:%i: Target %" PRIkernel_pid " has a msg_queue. Queueing message.\n", __FILE__, __LINE__, target_pid);
             eINT();
             if (sched_active_thread->status == STATUS_REPLY_BLOCKED) {
-                thread_yield();
+                thread_yield_higher();
             }
             return 1;
         }
@@ -130,6 +130,9 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
         sched_set_status((tcb_t*) sched_active_thread, newstatus);
 
         DEBUG("msg_send: %s: Back from send block.\n", sched_active_thread->name);
+
+        eINT();
+        thread_yield_higher();
     }
     else {
         DEBUG("msg_send: %s: Direct msg copy from %" PRIkernel_pid " to %" PRIkernel_pid ".\n", sched_active_thread->name, thread_getpid(), target_pid);
@@ -137,10 +140,11 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
         msg_t *target_message = (msg_t*) target->wait_data;
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
-    }
 
-    eINT();
-    thread_yield();
+        uint16_t target_prio = target->priority;
+        eINT();
+        sched_switch(target_prio);
+    }
 
     return 1;
 }
@@ -224,8 +228,9 @@ int msg_reply(msg_t *m, msg_t *reply)
     msg_t *target_message = (msg_t*) target->wait_data;
     *target_message = *reply;
     sched_set_status(target, STATUS_PENDING);
+    uint16_t target_prio = target->priority;
     restoreIRQ(state);
-    thread_yield();
+    sched_switch(target_prio);
 
     return 1;
 }
@@ -293,7 +298,7 @@ static int _msg_receive(msg_t *m, int block)
             sched_set_status(me, STATUS_RECEIVE_BLOCKED);
 
             eINT();
-            thread_yield();
+            thread_yield_higher();
 
             /* sender copied message */
         }

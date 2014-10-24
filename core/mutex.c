@@ -77,7 +77,7 @@ static void mutex_wait(struct mutex_t *mutex)
 
     restoreIRQ(irqstate);
 
-    thread_yield();
+    thread_yield_higher();
 
     /* we were woken up by scheduler. waker removed us from queue. we have the mutex now. */
 }
@@ -123,5 +123,5 @@ void mutex_unlock_and_sleep(struct mutex_t *mutex)
     DEBUG("%s: going to sleep.\n", sched_active_thread->name);
     sched_set_status((tcb_t*) sched_active_thread, STATUS_SLEEPING);
     restoreIRQ(irqstate);
-    thread_yield();
+    thread_yield_higher();
 }

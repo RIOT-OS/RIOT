@@ -198,7 +198,7 @@ void isr_thread_yield(void)
     }
 }
 
-void thread_yield(void)
+void thread_yield_higher(void)
 {
     ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
     if (_native_in_isr == 0) {
@@ -209,7 +209,7 @@ void thread_yield(void)
         native_isr_context.uc_stack.ss_flags = 0;
         makecontext(&native_isr_context, isr_thread_yield, 0);
         if (swapcontext(ctx, &native_isr_context) == -1) {
-            err(EXIT_FAILURE, "thread_yield: swapcontext");
+            err(EXIT_FAILURE, "thread_yield_higher: swapcontext");
         }
         eINT();
     }

@@ -61,7 +61,7 @@ void thread_sleep(void)
     dINT();
     sched_set_status((tcb_t *)sched_active_thread, STATUS_SLEEPING);
     eINT();
-    thread_yield();
+    thread_yield_higher();
 }
 
 int thread_wakeup(kernel_pid_t pid)
@@ -208,7 +208,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
         if (!(flags & CREATE_WOUT_YIELD)) {
             if (!inISR()) {
                 eINT();
-                thread_yield();
+                sched_switch(priority);
             }
             else {
                 sched_context_switch_request = 1;

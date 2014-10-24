@@ -118,10 +118,15 @@ const char *thread_getname(kernel_pid_t pid);
 void thread_sleep(void);
 
 /**
- * @brief The current thread yields and let the scheduler run
+ * @brief   Lets current thread yield.
  *
- * The current thread will resume operation immediately if there is no other thread with the same
- * or a higher priority.
+ * @details The current thread will resume operation immediately,
+ *          if there is no other ready thread with the same or a higher priority.
+ *
+ *          Differently from thread_yield_higher() the current thread will be put to the
+ *          end of the threads in its priority class.
+ *
+ * @see     thread_yield_higher()
  */
 void thread_yield(void);
 
