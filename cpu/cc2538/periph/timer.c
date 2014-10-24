@@ -25,9 +25,6 @@
 #include "cpu.h"
 #include "sched.h"
 #include "thread.h"
-
-#include "gptimer.h"
-
 #include "periph/timer.h"
 #include "periph_conf.h"
 

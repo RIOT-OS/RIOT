@@ -24,12 +24,6 @@
 #include "cpu.h"
 #include "sched.h"
 #include "thread.h"
-
-#include "cc2538-gpio.h"
-#include "cc2538-uart.h"
-#include "ioc.h"
-#include "sys-ctrl.h"
-
 #include "periph/uart.h"
 #include "periph_conf.h"
 
