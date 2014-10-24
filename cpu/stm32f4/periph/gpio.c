@@ -40,7 +40,7 @@ typedef struct {
  */
 static inline void irq_handler(gpio_t dev);
 
-/* static pint and port mappings */
+/* static port mapping */
 static GPIO_TypeDef *const gpio_port_map[GPIO_NUMOF] = {
 #if GPIO_0_EN
     [GPIO_0] = GPIO_0_PORT,
@@ -92,7 +92,7 @@ static GPIO_TypeDef *const gpio_port_map[GPIO_NUMOF] = {
 #endif
 };
 
-/* static pint and port mappings */
+/* static pin mapping */
 static const uint8_t gpio_pin_map[GPIO_NUMOF] = {
 #if GPIO_0_EN
     [GPIO_0] = GPIO_0_PIN,
@@ -134,16 +134,17 @@ static const uint8_t gpio_pin_map[GPIO_NUMOF] = {
     [GPIO_12] = GPIO_12_PIN,
 #endif
 #if GPIO_13_EN
-    [GPIO_13] = GPIO_12_PIN,
+    [GPIO_13] = GPIO_13_PIN,
 #endif
 #if GPIO_14_EN
-    [GPIO_14] = GPIO_12_PIN,
+    [GPIO_14] = GPIO_14_PIN,
 #endif
 #if GPIO_15_EN
-    [GPIO_15] = GPIO_12_PIN,
+    [GPIO_15] = GPIO_15_PIN,
 #endif
 };
 
+/* static irq id mapping */
 static const IRQn_Type gpio_irq_map[GPIO_NUMOF] = {
 #if GPIO_0_EN
     [GPIO_0] = GPIO_0_IRQ,
@@ -185,13 +186,13 @@ static const IRQn_Type gpio_irq_map[GPIO_NUMOF] = {
     [GPIO_12] = GPIO_12_IRQ,
 #endif
 #if GPIO_13_EN
-    [GPIO_13] = GPIO_12_IRQ,
+    [GPIO_13] = GPIO_13_IRQ,
 #endif
 #if GPIO_14_EN
-    [GPIO_14] = GPIO_12_IRQ,
+    [GPIO_14] = GPIO_14_IRQ,
 #endif
 #if GPIO_15_EN
-    [GPIO_15] = GPIO_12_IRQ,
+    [GPIO_15] = GPIO_15_IRQ,
 #endif
 };
 
