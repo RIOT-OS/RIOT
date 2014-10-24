@@ -35,6 +35,9 @@ void kernel_init(void);
  */
 void board_init(void);
 
+/**
+ * @brief Prototype for a thread entry function
+ */
 typedef void *(*thread_task_func_t)(void *arg);
 
 /**

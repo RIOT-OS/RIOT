@@ -12,7 +12,7 @@
  * @brief       Common files for all MSB-430 boards
  * @{
  *
- * @file        board-config.h
+ * @file
  * @brief       Common definitions for all msb-430 based boards
  *
  * @author      unknown

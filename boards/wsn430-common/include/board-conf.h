@@ -9,7 +9,7 @@
  * @brief       Common files for WSN430 based boards
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Common definitions for WSN430 based boards
  *
  * @author      unknown

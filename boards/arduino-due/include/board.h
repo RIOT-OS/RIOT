@@ -12,7 +12,7 @@
  * @brief       Support for the Arduino Due board.
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Board specific definitions for the Arduino Due board.
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

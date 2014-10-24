@@ -12,7 +12,7 @@
  * @brief       Board specific files for the Yunjia NRF51822 board
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Board specific definitions for the Yunjia NRF51822 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

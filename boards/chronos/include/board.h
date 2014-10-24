@@ -12,7 +12,7 @@
  * @brief       Support for the chronos board
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Header for the chronos board
  *
  * @author      unknwon

@@ -4,7 +4,7 @@
  * @brief       Support for the PTTU board
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Basic definitions for the PTTU board
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

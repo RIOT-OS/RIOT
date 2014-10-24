@@ -12,7 +12,7 @@
  * @brief       Support for the ScatterWeb MSB-A2 board
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Basic definitions for the MSB-A2 board
  *
  * @author      unknown

@@ -10,7 +10,7 @@
   *          This file contains:
   *           - Data structures and the address mapping for all peripherals
   *           - Peripheral's registers declarations and bits definition
-  *           - Macros to access peripheral’s registers hardware
+  *           - Macros to access peripheral?s registers hardware
   *
   ******************************************************************************
   * @attention
@@ -46,7 +46,7 @@
   * @{
   */
 
-/** @addtogroup stm32f051x8
+/** @addtogroup cpu_specific_stm32f051x8
   * @{
   */
 
@@ -73,7 +73,7 @@
   * @}
   */
 
-/** @addtogroup Peripheral_interrupt_number_definition
+/** @addtogroup cpu_specific_Peripheral_interrupt_number_definition
   * @{
   */
 
@@ -128,7 +128,7 @@ typedef enum
 #include "core_cm0.h"            /* Cortex-M0 processor and core peripherals */
 #include <stdint.h>
 
-/** @addtogroup Peripheral_registers_structures
+/** @addtogroup cpu_specific_Peripheral_registers_structures
   * @{
   */
 
@@ -552,7 +552,7 @@ typedef struct
   * @}
   */
 
-/** @addtogroup Peripheral_memory_map
+/** @addtogroup cpu_specific_Peripheral_memory_map
   * @{
   */
 
@@ -616,7 +616,7 @@ typedef struct
   * @}
   */
 
-/** @addtogroup Peripheral_declaration
+/** @addtogroup cpu_specific_Peripheral_declaration
   * @{
   */
 
@@ -669,11 +669,11 @@ typedef struct
   * @}
   */
 
-/** @addtogroup Exported_constants
+/** @addtogroup cpu_specific_Exported_constants
   * @{
   */
 
-  /** @addtogroup Peripheral_Registers_Bits_Definition
+  /** @addtogroup cpu_specific_Peripheral_Registers_Bits_Definition
   * @{
   */
 
@@ -3485,7 +3485,7 @@ typedef struct
   */
 
 
-/** @addtogroup Exported_macro
+/** @addtogroup cpu_specific_Exported_macro
   * @{
   */
 

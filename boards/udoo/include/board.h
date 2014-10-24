@@ -12,7 +12,7 @@
  * @brief       Support for the UDOO board.
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Board specific definitions for the UDOO board.
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

@@ -1,18 +1,21 @@
-/**
- * virtual timer header
- *
+/*
  * Copyright (C) 2009, 2014 Kaspar Schleiser
  * Copyright (C) 2013, 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup  sys_vtimer
+ */
+
+/**
+ * @defgroup  sys_vtimer Virtual Timer
+ * @ingroup   sys
+ * @brief     Provides a high level abstraction timer module to register
+ *            timers, get current system time, and let a thread sleep for a certain amount
+ *            of time. It does not give any timing guarantees.
  * @{
- * @file        vtimer.h
+ * @file
  * @author Kaspar Schleiser <kaspar@schleiser.de>
- * @}
  */
 
 #ifndef __VTIMER_H
@@ -30,7 +33,8 @@
 /**
  * A vtimer object.
  *
- * This structure is used for declaring a vtimer. This should not be used by programmers, use the vtimer_set_*-functions instead.
+ * This structure is used for declaring a vtimer. This should not be used by
+ * programmers, use the vtimer_set_*-functions instead.
  *
  * \hideinitializer
  */

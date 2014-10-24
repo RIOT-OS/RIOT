@@ -7,12 +7,12 @@
  */
 
 /**
- * @defgroup    board_pca10005
+ * @defgroup    board_pca10005 PCA10005 (nRF51822 Development Kit)
  * @ingroup     boards
  * @brief       Board specific files for the nRF51822 board pca10005
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Board specific definitions for the nRF51822 evaluation board pca10005
  *
  * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>

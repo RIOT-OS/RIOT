@@ -2,7 +2,7 @@
 #define __BOARD_H
 
 /**
- * @file    boards.h
+ * @file
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  *
  * @defgroup    mbed_lpc1768 mbed NXP LPC1768 development kit

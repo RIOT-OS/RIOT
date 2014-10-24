@@ -31,7 +31,7 @@
 /**
  * @brief Initialize architecture dependent kernel timer support
  *
- * @param[in] handler   callback that is called when timer offset is reached
+ * @param[in] handler   callback that is called when timer @p offset is reached
  * @param[in] fcpu      the core CPU-frequency for tick interval calculation
  */
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu);
@@ -47,7 +47,7 @@ void hwtimer_arch_enable_interrupt(void);
 void hwtimer_arch_disable_interrupt(void);
 
 /**
- * @brief Set a kernel timer to raise an interrupt after ::offset kernel timer
+ * @brief Set a kernel timer to raise an interrupt after @p offset kernel timer
  *              ticks from now
  *
  * @param[in] offset    number of ticks until the timer fires

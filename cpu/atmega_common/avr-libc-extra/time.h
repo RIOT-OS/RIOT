@@ -531,3 +531,7 @@ extern          "C" {
 #endif
 
 #endif              /* TIME_H  */
+
+/**
+\endcond
+*/
