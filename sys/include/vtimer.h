@@ -91,6 +91,21 @@ int vtimer_init(void);
  * @return      0 on success, < 0 on error
  */
 int vtimer_usleep(uint32_t us);
+
+/**
+ * @brief   will cause the calling thread to be suspended until the absolute
+ *          time (last_wakeup + interval). last_wakeup is set to vtimer_now().
+ *
+ * This function can be used to create periodic wakeups.
+ * @c last_wakeup should be set to vtimer_now() before first call of the function.
+ *
+ * If the result of (@c last_wakeup) would be in the past, the function sets
+ * @c last_wakeup to vtimer_now() and returns immediately.
+ *
+ * @param[in]   last_wakeup pointer to time used as base time for the wakeup
+ * @param[in]   usecs time in microseconds that will be added to last_wakeup
+ * @return      0 on success, < 0 on error
+ */
 int vtimer_usleep_until(timex_t *last_wakeup, uint32_t usecs);
 
 /**
@@ -99,6 +114,21 @@ int vtimer_usleep_until(timex_t *last_wakeup, uint32_t usecs);
  * @return      0 on success, < 0 on error
  */
 int vtimer_sleep(timex_t time);
+
+/**
+ * @brief   will cause the calling thread to be suspended until the absolute
+ *          time (last_wakeup + interval). last_wakeup is set to vtimer_now().
+ *
+ * This function can be used to create periodic wakeups.
+ * @c last_wakeup should be set to vtimer_now() before first call of the function.
+ *
+ * If the result of (@c last_wakeup) would be in the past, the function sets
+ * @c last_wakeup to vtimer_now() and returns immediately.
+ *
+ * @param[in]   last_wakeup pointer to time used as base time for the wakeup
+ * @param[in]   interval time that will be added to last_wakeup
+ * @return      0 on success, < 0 on error
+ */
 int vtimer_sleep_until(timex_t *last_wakeup, const timex_t interval);
 
 /**
