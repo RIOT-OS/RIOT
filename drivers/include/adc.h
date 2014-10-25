@@ -2,9 +2,11 @@
  * @defgroup    drivers_adc ADC
  * @ingroup     drivers
  * @brief       Generic interface for ADC drivers
- * @{
+ * @deprecated  This interface is obsolete. Use the @ref driver_periph_adc
+ *              interface in @ref driver_periph instead.
  *
- * @file        adc.h
+ * @{
+ * @file
  */
 
 #ifndef ADC_H
