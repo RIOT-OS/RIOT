@@ -1674,26 +1674,28 @@ static void *lowpan_auxilarity(void *arg)
                 break;
 
             case MSG_SEND_NS:
-                if ((((ns_fallback_args_t *)msg.content.ptr)->data) &&
-                    (((ns_fallback_args_t *)msg.content.ptr)->data_len)) {
-                    uint8_t packet_tmp[((ns_fallback_args_t *)msg.content.ptr)->data_len];
-                    ipv6_addr_t *dest = ((ns_fallback_args_t *)msg.content.ptr)->dest;
-                    ndp_neighbor_cache_t *nce = NULL;
+                do {
+                    ns_fallback_args_t *args = ((ns_fallback_args_t *)msg.content.ptr);
 
-                    memcpy(packet_tmp, ((ns_fallback_args_t *)msg.content.ptr)->data,
-                           sizeof(packet_tmp));
-                    msg_reply(&msg, &msg);
+                    if ((args->data) && (args->data_len)) {
+                        uint8_t packet_tmp[args->data_len];
+                        ipv6_addr_t *dest = args->dest;
+                        ndp_neighbor_cache_t *nce = NULL;
 
-                    if (!ndp_neighbor_cache_search(dest)) {
-                        ndp_neighbor_cache_add(0, dest, NULL, 0, 0, NDP_NCE_STATUS_INCOMPLETE,
-                                               NDP_NCE_TYPE_REGISTERED, 100);
+                        memcpy(packet_tmp, args->data, args->data_len);
+                        msg_reply(&msg, &msg);
+
+                        if (!ndp_neighbor_cache_search(dest)) {
+                            ndp_neighbor_cache_add(0, dest, NULL, 0, 0, NDP_NCE_STATUS_INCOMPLETE,
+                                                   NDP_NCE_TYPE_REGISTERED, 100);
+                        }
+
+                        icmpv6_send_neighbor_sol(NULL, NULL, dest, 1, 0);
                     }
-
-                    icmpv6_send_neighbor_sol(NULL, NULL, dest, 1, 0);
-                }
-                else {
-                    msg_reply(&msg, &msg);
-                }
+                    else {
+                        msg_reply(&msg, &msg);
+                    }
+                } while (0);
 
             default:
                 break;
