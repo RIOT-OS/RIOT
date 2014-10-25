@@ -37,6 +37,7 @@
 
 #define VTIMER_THRESHOLD 20UL
 #define VTIMER_BACKOFF 10UL
+#define VTIMER_SLEEP_UNTIL_OVERHEAD (VTIMER_THRESHOLD)
 
 #define SECONDS_PER_TICK (4096U)
 #define MICROSECONDS_PER_TICK (4096UL * 1000000)
@@ -385,18 +386,31 @@ int vtimer_sleep(timex_t time)
     return ret;
 }
 
-int vtimer_sleep_until(timex_t *last_wakeup, const timex_t interval) {
-    int ret;
+int vtimer_sleep_until(timex_t *last_wakeup, timex_t interval) {
+    int ret = 0;
     vtimer_t t;
     mutex_t mutex = MUTEX_INIT;
-    mutex_lock(&mutex);
+    timex_t overhead = { 0, VTIMER_SLEEP_UNTIL_OVERHEAD};
+    timex_t now;
+
+    interval = timex_sub(interval, overhead);
 
     t.action = vtimer_callback_unlock;
     t.arg = &mutex;
     t.absolute = timex_add(*last_wakeup, interval);
 
+    /* make sure we're not setting a value in the past */
+    vtimer_now(&now);
+    
+    if (timex_cmp(now, t.absolute) == 1) {
+        goto out;
+    }
+
+    mutex_lock(&mutex);
     ret = vtimer_set_absolute(&t);
     mutex_lock(&mutex);
+
+out:
     vtimer_now(last_wakeup);
 
     return ret;

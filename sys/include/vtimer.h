@@ -129,7 +129,7 @@ int vtimer_sleep(timex_t time);
  * @param[in]   interval time that will be added to last_wakeup
  * @return      0 on success, < 0 on error
  */
-int vtimer_sleep_until(timex_t *last_wakeup, const timex_t interval);
+int vtimer_sleep_until(timex_t *last_wakeup, timex_t interval);
 
 /**
  * @brief   set a vtimer with msg event handler of type @ref MSG_TIMER
