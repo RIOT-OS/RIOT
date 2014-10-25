@@ -1,5 +1,5 @@
 /*
- * adc.h - Structure definition for registers of the
+ * mc1322x-adc.h - Structure definition for registers of the
  * Analog to Digital Converter module of the mc1322x MCU
  * Copyright (C) 2013 Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *
@@ -9,8 +9,8 @@
  * This file is part of RIOT.
  */
 
-#ifndef ADC_H
-#define ADC_H
+#ifndef MC1322X_ADC_H
+#define MC1322X_ADC_H
 
 #include <stdint.h>
 #include "adc_legacy.h"
@@ -128,4 +128,4 @@ void adc_setup_channel(uint8_t channel);
 void adc_flush(void);
 void adc_service(uint16_t *channels_read);
 
-#endif /* ADC_H */
+#endif /* MC1322X_ADC_H */
