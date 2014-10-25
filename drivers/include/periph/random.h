@@ -7,6 +7,7 @@
  */
 
 /**
+ * @defgroup    driver_periph_random Random
  * @ingroup     driver_periph
  * @{
  *
