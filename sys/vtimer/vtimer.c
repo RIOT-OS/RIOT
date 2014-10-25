@@ -403,6 +403,9 @@ int vtimer_sleep_until(timex_t *last_wakeup, timex_t interval) {
     vtimer_now(&now);
     
     if (timex_cmp(now, t.absolute) == 1) {
+#ifdef DEVELHELP
+        DEBUG("WARNING: vtimer_sleep_until() called with target time in the past.\n");
+#endif
         goto out;
     }
 
