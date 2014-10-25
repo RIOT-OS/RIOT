@@ -25,13 +25,18 @@
 int main(void)
 {
     puts("Test Starting.\n");
-    timex_t last_wakeup, interval = { 0, 2000 };
-    vtimer_now(&last_wakeup);
+    timex_t last_wakeup = { 0 };
+    timex_t interval = { 1, 0 };
+/*    vtimer_now(&last_wakeup); */
 
     uint32_t pre, after;
 
+    /* sleep so vtimer_now gets significantly larger than 0. */
+    vtimer_usleep(1000000);
+
     while(1) {
         pre = hwtimer_now();
+        /* first call should return immediately if now wasn't initialized */
         vtimer_sleep_until(&last_wakeup, interval);
         after = hwtimer_now();
         printf("Woke up. diff: %i.\n", after-pre);
