@@ -7,11 +7,12 @@
  */
 
 /**
+ * @defgroup    driver_periph_rtc RTC
  * @ingroup     driver_periph
  * @brief       Low-level RTC (Real Time Clock) peripheral driver
  * @{
  *
- * @file        rtc.h
+ * @file
  * @brief       Low-level RTC peripheral driver interface definitions
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

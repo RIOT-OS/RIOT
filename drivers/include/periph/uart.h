@@ -7,11 +7,12 @@
  */
 
 /**
+ * @defgroup    driver_periph_uart UART
  * @ingroup     driver_periph
  * @brief       Low-level UART peripheral driver
  * @{
  *
- * @file        periph/uart.h
+ * @file
  * @brief       Low-level UART peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

@@ -7,6 +7,7 @@
  */
 
 /**
+ * @defgroup    driver_periph_adc ADC
  * @ingroup     driver_periph
  * @brief       Low-level ADC peripheral driver
  * @{
