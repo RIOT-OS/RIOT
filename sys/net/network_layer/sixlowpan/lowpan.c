@@ -1680,7 +1680,6 @@ static void *lowpan_auxilarity(void *arg)
                     if ((args->data) && (args->data_len)) {
                         uint8_t packet_tmp[args->data_len];
                         ipv6_addr_t *dest = args->dest;
-                        ndp_neighbor_cache_t *nce = NULL;
 
                         memcpy(packet_tmp, args->data, args->data_len);
                         msg_reply(&msg, &msg);
