@@ -13,6 +13,7 @@
 #define ADC_H
 
 #include <stdint.h>
+#include "adc_legacy.h"
 
 #define ADC_BASE (0x8000D000)
 
@@ -123,9 +124,7 @@ struct ADC_struct {
 static volatile struct ADC_struct *const ADC = (void *)(ADC_BASE);
 
 /* function prototypes */
-void adc_init(void);
 void adc_setup_channel(uint8_t channel);
-uint16_t adc_read(void);
 void adc_flush(void);
 void adc_service(uint16_t *channels_read);
 
