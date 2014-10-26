@@ -12,7 +12,7 @@ ifneq (,$(filter udp,$(USEMODULE)))
 endif
 ifneq (,$(filter net_help,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
-    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x_legacy_csma
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x_legacy/include
 endif
 ifneq (,$(filter net_if,$(USEMODULE)))

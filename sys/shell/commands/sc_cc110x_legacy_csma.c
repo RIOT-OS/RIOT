@@ -9,7 +9,7 @@
  *
  * @ingroup shell_commands
  * @{
- * @file    sc_cc1100.c
+ * @file    sc_cc110x_legacy_csma.c
  * @brief   provides shell commands to configure the cc110x driver
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
@@ -20,7 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "cc110x.h"
+#include "cc110x_legacy_csma.h"
 
 
 void _cc110x_get_set_address_handler(int argc, char **argv)

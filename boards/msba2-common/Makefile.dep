@@ -1,4 +1,4 @@
-ifneq (,$(filter cc110x,$(USEMODULE)))
+ifneq (,$(filter cc110x_legacy_csma,$(USEMODULE)))
 	USEMODULE += gpioint
 endif
 

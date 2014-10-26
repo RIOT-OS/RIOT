@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     dev_cc110x
+ * @ingroup     dev_cc110x_legacy_csma
  * @{
  */
 
