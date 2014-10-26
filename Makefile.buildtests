@@ -173,7 +173,7 @@ info-build:
 	@echo '         $(or $(sort $(filter-out $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED))), -none-)'
 	@echo 'FEATURES_OPTIONAL (strictly "nice to have"):'
 	@echo '         $(or $(sort $(FEATURES_OPTIONAL)), -none-)'
-	@echo 'FEATURES_PROVIDED (by the board):'
+	@echo 'FEATURES_PROVIDED (by the board or USEMODULE'"'"'d drivers):'
 	@echo '         $(or $(sort $(FEATURES_PROVIDED)), -none-)'
 	@echo 'FEATURES_MISSING (incl. optional features):'
 	@echo '         $(or $(sort $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))), -none-)'
@@ -229,7 +229,7 @@ ifneq (, $(filter info-boards-supported info-boards-features-missing info-build,
   FEATURES_PROVIDED_BAK := $(FEATURES_PROVIDED)
 
   define board_missing_features
-    FEATURES_PROVIDED :=
+    FEATURES_PROVIDED := $(FEATURES_PROVIDED_BAK)
     -include $${RIOTBOARD}/${1}/Makefile.features
 
     FEATURES_MISSING := $$(filter-out $$(FEATURES_PROVIDED), $$(FEATURES_REQUIRED))
