@@ -56,11 +56,6 @@
  */
 
 /**
- * @def FEUERWARE_CONF_BOARD_NAME
- * @brief   Defines the name of the board as a string
- */
-
-/**
  * @def FEUERWARE_CONF_CPU_NAME
  * @brief   Defines the name of the cpu as a string
  */

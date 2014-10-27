@@ -27,8 +27,6 @@
 #include "bitarithm.h"
 #include "msba2_common.h"
 
-#define FEUERWARE_CONF_BOARD_NAME         "FU Berlin AVSEXTREM BOARD"
-
 #define LED_RED_PIN (BIT25)
 #define LED_GREEN_PIN (BIT26)
 
