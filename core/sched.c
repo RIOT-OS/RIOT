@@ -179,15 +179,3 @@ NORETURN void sched_task_exit(void)
     sched_active_thread = NULL;
     cpu_switch_context_exit();
 }
-
-void thread_yield(void)
-{
-    unsigned old_state = disableIRQ();
-    tcb_t *me = (tcb_t *)sched_active_thread;
-    if (me->status >= STATUS_ON_RUNQUEUE) {
-        clist_advance(&sched_runqueues[me->priority]);
-    }
-    restoreIRQ(old_state);
-
-    thread_yield_higher();
-}
