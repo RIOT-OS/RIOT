@@ -127,10 +127,19 @@ void rpl_udp_ignore(int argc, char **argv)
 {
     uint16_t a;
 
+    if (argc < 2) {
+        printf("Usage: %s <addr>\n", argv[0]);
+        return;
+    }
+
     if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not runnning.");
         return;
     }
+
+    /* cppcheck: a is actually read via tcmd.data */
+    /* cppcheck-suppress unreadVariable */
+    a = atoi(argv[1]);
 
     msg_t mesg;
     mesg.type = DBG_IGN;
@@ -139,14 +148,7 @@ void rpl_udp_ignore(int argc, char **argv)
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &a;
 
-    if (argc == 2) {
-        /* cppcheck: a is actually read via tcmd.data */
-        /* cppcheck-suppress unreadVariable */
-        a = atoi(argv[1]);
-        printf("sending to transceiver (%" PRIkernel_pid "): %u\n", transceiver_pid, (*(uint8_t *)tcmd.data));
-        msg_send(&mesg, transceiver_pid);
-    }
-    else {
-        printf("Usage: %s <addr>\n", argv[0]);
-    }
+    printf("sending to transceiver (%" PRIkernel_pid "): %u\n", transceiver_pid,
+           (*(uint8_t *)tcmd.data));
+    msg_send(&mesg, transceiver_pid);
 }
