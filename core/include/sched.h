@@ -153,6 +153,11 @@ extern volatile int sched_num_threads;
 extern volatile kernel_pid_t sched_active_pid;
 
 /**
+ * List of runqueues per priority level
+ */
+extern clist_node_t *sched_runqueues[SCHED_PRIO_LEVELS];
+
+/**
  * @brief   Lets current thread yield in favor of a higher prioritized thread.
  *
  * @details The current thread will resume operation immediately,
