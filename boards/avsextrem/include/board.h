@@ -38,9 +38,6 @@
 #define LED_RED_ON (FIO3CLR = LED_RED_PIN)
 #define LED_RED_TOGGLE (FIO3PIN ^= LED_RED_PIN)
 
-// if FAT is enabled this board supports files
-#define FEUERWARE_CONF_CORE_SUPPORTS_FILES    defined(MODULE_FAT)
-
 #ifdef MODULE_FAT
 #define CFG_CONF_MEM_SIZE             0x7FFFFFFF
 #define SYSLOG_CONF_NUM_INTERFACES        2
