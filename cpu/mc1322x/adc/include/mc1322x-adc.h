@@ -1,18 +1,24 @@
 /*
- * adc.h - Structure definition for registers of the
+ * mc1322x-adc.h - Structure definition for registers of the
  * Analog to Digital Converter module of the mc1322x MCU
  * Copyright (C) 2013 Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *
- * This source code is licensed under the GNU Lesser General Public License,
- * Version 2.  See the file LICENSE for more details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  *
  * This file is part of RIOT.
  */
 
-#ifndef ADC_H
-#define ADC_H
+#ifndef MC1322X_ADC_H
+#define MC1322X_ADC_H
 
 #include <stdint.h>
+#include "adc_legacy.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define ADC_BASE (0x8000D000)
 
@@ -123,10 +129,12 @@ struct ADC_struct {
 static volatile struct ADC_struct *const ADC = (void *)(ADC_BASE);
 
 /* function prototypes */
-void adc_init(void);
 void adc_setup_channel(uint8_t channel);
-uint16_t adc_read(void);
 void adc_flush(void);
 void adc_service(uint16_t *channels_read);
 
-#endif /* ADC_H */
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* MC1322X_ADC_H */
