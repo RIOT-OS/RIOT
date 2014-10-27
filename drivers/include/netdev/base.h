@@ -105,11 +105,11 @@ typedef enum {
     NETDEV_OPT_ADDRESS_LONG,        /**< Longer hardware address for the device
                                          (e.g. EUI-64) for the device as
                                          unsigned value in host byte order */
-    NETDEV_OPT_ADDRESS_TX,          /**< If the radio uses full-duplex addressing 
-                                         NETDEV_OPT_ADDRESS_TX sets the
+    NETDEV_OPT_ADDRESS_TX_PREFIX,   /**< If the radio uses full-duplex addressing 
+                                         NETDEV_OPT_ADDRESS_TX_PREFIX sets the
                                          transmit address separately */
-    NETDEV_OPT_ADDRESS_RX,          /**< If the radio uses full-duplex addressing 
-                                         NETDEV_OPT_ADDRESS_RX sets the
+    NETDEV_OPT_ADDRESS_RX_PREFIX,   /**< If the radio uses full-duplex addressing 
+                                         NETDEV_OPT_ADDRESS_RX_PREFIX sets the
                                          receive address separately */
     NETDEV_OPT_TX_POWER,            /**< The output of the device in dB as
                                          signed value in host byte order */

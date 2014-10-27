@@ -260,7 +260,7 @@ int nrf24l01p_unregister(nrf24l01p_t *dev, unsigned int pid);
 * @brief Get ID from the nrf24l01p transceiver.
 *
 * @param[in] dev    Transceiver device to use.
-* @param[in] pid    Transceiver ID
+* @param[in] pid    T.ransceiver ID
 *
 */
 void nrf24l01p_get_id(nrf24l01p_t *dev, unsigned int *pid);
