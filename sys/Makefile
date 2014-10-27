@@ -10,6 +10,9 @@ endif
 ifneq (,$(filter lib,$(USEMODULE)))
     DIRS += lib
 endif
+ifneq (,$(filter od,$(USEMODULE)))
+    DIRS += od
+endif
 ifneq (,$(filter ping,$(USEMODULE)))
     DIRS += ping
 endif
