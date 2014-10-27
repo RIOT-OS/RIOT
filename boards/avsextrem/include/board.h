@@ -40,14 +40,6 @@
 #define LED_RED_ON (FIO3CLR = LED_RED_PIN)
 #define LED_RED_TOGGLE (FIO3PIN ^= LED_RED_PIN)
 
-
-
-#ifdef MODULE_CC110X
-#define FEUERWARE_CONF_NUM_RADIOS         1
-#else
-#define FEUERWARE_CONF_NUM_RADIOS         0
-#endif
-
 // if FAT is enabled this board supports files
 #define FEUERWARE_CONF_CORE_SUPPORTS_FILES    defined(MODULE_FAT)
 
