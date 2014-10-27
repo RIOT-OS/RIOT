@@ -201,7 +201,7 @@ int hwtimer_remove(int n)
 {
     DEBUG("hwtimer_remove n=%d\n", n);
 
-    int state = disableIRQ();
+    unsigned state = disableIRQ();
     hwtimer_arch_unset(n);
 
     lifo_insert(lifo, n);

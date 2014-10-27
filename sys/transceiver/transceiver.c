@@ -237,7 +237,7 @@ kernel_pid_t transceiver_start(void)
 uint8_t transceiver_register(transceiver_type_t t, kernel_pid_t pid)
 {
     int result = 0;
-    int state = disableIRQ();
+    unsigned state = disableIRQ();
     for (size_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
         if ((reg[i].pid == pid) || (reg[i].transceivers == TRANSCEIVER_NONE)) {
             reg[i].transceivers |= t;
@@ -256,7 +256,7 @@ uint8_t transceiver_register(transceiver_type_t t, kernel_pid_t pid)
 uint8_t transceiver_unregister(transceiver_type_t t, kernel_pid_t pid)
 {
     int result = 0;
-    int state = disableIRQ();
+    unsigned state = disableIRQ();
     for (size_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; ++i) {
         if (reg[i].pid == pid) {
             reg[i].transceivers &= ~t;
