@@ -16,6 +16,10 @@
 #include <stdint.h>
 #include "adc_legacy.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define ADC_BASE (0x8000D000)
 
 /* Structure-based register definitions */
@@ -128,5 +132,9 @@ static volatile struct ADC_struct *const ADC = (void *)(ADC_BASE);
 void adc_setup_channel(uint8_t channel);
 void adc_flush(void);
 void adc_service(uint16_t *channels_read);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MC1322X_ADC_H */
