@@ -68,7 +68,7 @@ int thread_wakeup(kernel_pid_t pid)
 {
     DEBUG("thread_wakeup: Trying to wakeup PID %" PRIkernel_pid "...\n", pid);
 
-    int old_state = disableIRQ();
+    unsigned old_state = disableIRQ();
 
     tcb_t *other_thread = (tcb_t *) sched_threads[pid];
     if (other_thread && other_thread->status == STATUS_SLEEPING) {

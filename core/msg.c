@@ -151,7 +151,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
 
 int msg_send_to_self(msg_t *m)
 {
-    unsigned int state = disableIRQ();
+    unsigned state = disableIRQ();
 
     m->sender_pid = sched_active_pid;
     int res = queue_msg((tcb_t *) sched_active_thread, m);
@@ -208,7 +208,7 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
 
 int msg_reply(msg_t *m, msg_t *reply)
 {
-    int state = disableIRQ();
+    unsigned state = disableIRQ();
 
     tcb_t *target = (tcb_t*) sched_threads[m->sender_pid];
 
