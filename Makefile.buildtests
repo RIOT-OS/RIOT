@@ -31,6 +31,7 @@ endif
         info-buildsizes-diff info-build info-boards-supported \
         info-features-missing info-boards-features-missing
 
+OS := $(shell uname)
 
 COLOR_GREEN  :=
 COLOR_RED    :=
@@ -43,7 +44,12 @@ ifeq (, ${JENKINS_URL})
     COLOR_RED    := \033[1;31m
     COLOR_PURPLE := \033[1;35m
     COLOR_RESET  := \033[0m
-    COLOR_ECHO   := /bin/echo -e
+    ifeq ($(OS),Darwin)
+      COLOR_ECHO   := echo -e
+      SHELL=bash
+    else
+      COLOR_ECHO   := /bin/echo -e
+    endif
   endif
 endif
 
@@ -52,7 +58,7 @@ buildtest:
 	BUILDTESTOK=true; \
 	rm -rf "$$BINDIRBASE"; \
 	for BOARD in $$($(MAKE) -s info-boards-supported); do \
-		RIOTNOLINK=$$(case ' $(BOARD_INSUFFICIENT_RAM) ' in *" $${BOARD} "*) echo 1; esac); \
+		RIOTNOLINK=$$(echo $(BOARD_INSUFFICIENT_RAM) | grep $${BOARD} 2>&1 >/dev/null && echo 1); \
 		${COLOR_ECHO} -n "Building for $${BOARD} "; \
 		[ -n "$${RIOTNOLINK}" ] && ${COLOR_ECHO} -n "(no linking) "; \
 		for NTH_TRY in 1 2; do \
@@ -229,7 +235,7 @@ ifneq (, $(filter info-boards-supported info-boards-features-missing info-build,
     endif
   endef
 
-  BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name *-common -printf '%f ')
+  BOARDS ?= $(shell find $(RIOTBOARD)/* -maxdepth 0 -type d \! -name "*-common" -exec basename {} \;)
   BOARDS := $(filter $(if $(BOARD_WHITELIST), $(BOARD_WHITELIST), %), $(BOARDS))
   BOARDS := $(filter-out $(BOARD_BLACKLIST), $(BOARDS))
 
