@@ -39,6 +39,13 @@
 #ifdef MODULE_UART0
 #include "board_uart0.h"
 #endif
+
+#ifdef CPU_MODEL_CC2538NF11
+#define SRAM_LENGTH (16 * 1024) /**< The CC2538NF11 has 16 Kb of RAM */
+#else
+#define SRAM_LENGTH (32 * 1024) /**< All other existing models of the CC2538 have 32 Kb of RAM */
+#endif
+
 /**
  * manage the heap
  */
@@ -113,21 +120,25 @@ void _exit(int n)
  * @brief Allocate memory from the heap.
  *
  * The current heap implementation is very rudimentary, it is only able to allocate
- * memory. But it does not
- * - check if the returned address is valid (no check if the memory very exists)
- * - have any means to free memory again
+ * memory. It does not have any means to free memory again.
  *
- * TODO: check if the requested memory is really available
- *
- * @return [description]
+ * @return      a pointer to the successfully allocated memory
+ * @return      -1 on error, and errno is set to ENOMEM
  */
 caddr_t _sbrk_r(struct _reent *r, size_t incr)
 {
     unsigned int state = disableIRQ();
-    caddr_t res = heap_top;
-    heap_top += incr;
-    restoreIRQ(state);
-    return res;
+    if ((uintptr_t)heap_top + incr > SRAM_BASE + SRAM_LENGTH) {
+        restoreIRQ(state);
+        r->_errno = ENOMEM;
+        return (caddr_t)-1;
+    }
+    else {
+        caddr_t res = heap_top;
+        heap_top += incr;
+        restoreIRQ(state);
+        return res;
+    }
 }
 
 /**
