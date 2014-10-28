@@ -34,7 +34,6 @@
  * @{
  */
 #define FEUERWARE_CPU_LPC2387                   1
-#define FEUERWARE_CONF_CORE_SUPPORTS_TIME       1
 /** @} */
 
 /**
