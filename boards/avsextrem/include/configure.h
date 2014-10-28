@@ -56,11 +56,6 @@
  */
 
 /**
- * @def FEUERWARE_CONF_CPU_NAME
- * @brief   Defines the name of the cpu as a string
- */
-
-/**
  * @def FEUERWARE_CONF_SUPPORTS_FILES
  * @brief   Defines if standard library file functions are available
  */

@@ -27,8 +27,6 @@
  * @note        $Id$
  */
 
-#define FEUERWARE_CONF_CPU_NAME         "NXP LPC2387"
-
 /**
  * @name CPU capabilities
  * @{
