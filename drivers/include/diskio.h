@@ -1,6 +1,10 @@
-/*-----------------------------------------------------------------------
-/  Low level disk interface modlue include file   (C)ChaN, 2010
-/-----------------------------------------------------------------------*/
+/*
+ * Copyright 2010 ChaN
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
 
 /**
  * @defgroup    diskio Disk IO Driver
