@@ -49,19 +49,5 @@
 #undef TRACELOG_CONF_NUM_ENTRIES
 #endif
 
-
-/* ------------------------------------------------------------------------- */
-/*
- * documentation of defines that do not belong to a specific module:
- */
-
-/**
- * @def FEUERWARE_CONF_SUPPORTS_FILES
- * @brief   Defines if standard library file functions are available
- */
-#ifndef FEUERWARE_CONF_SUPPORTS_FILES
-#define FEUERWARE_CONF_SUPPORTS_FILES 0
-#endif
-
 /** @} */
 #endif /* CONFIGURE_H_ */
