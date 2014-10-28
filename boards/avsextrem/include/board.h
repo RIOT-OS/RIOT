@@ -27,8 +27,6 @@
 #include "bitarithm.h"
 #include "msba2_common.h"
 
-#define FEUERWARE_CONF_BOARD_NAME         "FU Berlin AVSEXTREM BOARD"
-
 #define LED_RED_PIN (BIT25)
 #define LED_GREEN_PIN (BIT26)
 
@@ -39,9 +37,6 @@
 #define LED_RED_OFF (FIO3SET = LED_RED_PIN)
 #define LED_RED_ON (FIO3CLR = LED_RED_PIN)
 #define LED_RED_TOGGLE (FIO3PIN ^= LED_RED_PIN)
-
-// if FAT is enabled this board supports files
-#define FEUERWARE_CONF_CORE_SUPPORTS_FILES    defined(MODULE_FAT)
 
 #ifdef MODULE_FAT
 #define CFG_CONF_MEM_SIZE             0x7FFFFFFF

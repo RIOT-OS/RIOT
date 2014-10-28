@@ -41,17 +41,6 @@
 #include "hwtimer.h"
 #include "bitarithm.h"
 
-/* TODO: cc1100 port timer */
-#ifdef FEUERWARE_CPU_LPC2387
-//#include "cpu/lpc2387/lpc2387-timer2.h"
-#endif
-
-#if defined(FEUERWARE_CPU_MSP430)
-#include <msp430x16x.h>
-#elif defined(FEUERWARE_CPU_LPC2387)
-#include "lpc2387.h"
-#endif
-
 #define PACKET_LENGTH               (0x3E)      ///< Packet length = 62 Bytes.
 #define CC1100_SYNC_WORD_TX_TIME   (90000)      /* loop count (max. timeout ~ 15 ms) to wait for */
                                                 /* sync word to be transmitted (GDO2 from low to high) */

@@ -36,14 +36,6 @@
 #include "vtimer.h"
 #endif
 
-/* When using the HAL standard in and out are handled by HAL
-   devices. */
-#if FEUERWARE_CONF_ENABLE_HAL
-#include "hal.h"
-#include "interface-chardevice.h"
-#include "hal-syscalls.h"
-#endif
-
 #define DEBUG_SYSCALLS          0
 #if DEBUG_SYSCALLS
 #define PRINTF(...)             printf(__VA_ARGS__)
@@ -177,17 +169,7 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
     switch(fd) {
         case STDOUT_FILENO:
         case STDERR_FILENO:
-#if FEUERWARE_CONF_ENABLE_HAL
-            if (stdio != NULL) {
-                result = chardevice_write(stdio, (char *)data, count);
-            }
-            else if (hal_state == HAL_NOT_INITIALIZED) {
-                result = fw_puts((char *)data, count);
-            }
-
-#else
             result = fw_puts((char *)data, count);
-#endif
             break;
 
         default:
