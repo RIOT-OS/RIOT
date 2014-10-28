@@ -87,6 +87,14 @@ endif
 
 ifneq (,$(filter net_if,$(USEMODULE)))
 	USEMODULE += transceiver
+endif
+
+ifneq (,$(filter scfs,$(USEMODULE)))
+	USEMODULE += fs
+	USEMODULE += shell_commands
+endif
+
+ifneq (,$(filter shell_commands,$(USEMODULE)))
 	USEMODULE += net_help
 	USEMODULE += hashes
 endif
