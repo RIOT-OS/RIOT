@@ -46,9 +46,7 @@
 //#include "cpu/lpc2387/lpc2387-timer2.h"
 #endif
 
-#if defined(FEUERWARE_CPU_MSP430)
-#include <msp430x16x.h>
-#elif defined(FEUERWARE_CPU_LPC2387)
+#if defined(FEUERWARE_CPU_LPC2387)
 #include "lpc2387.h"
 #endif
 
