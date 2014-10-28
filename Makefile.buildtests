@@ -169,8 +169,16 @@ info-build:
 	@echo 'ELFFILE: $(ELFFILE)'
 	@echo 'HEXFILE: $(HEXFILE)'
 	@echo ''
-	@echo 'FEATURES_REQUIRED: $(sort $(FEATURES_REQUIRED))'
-	@echo 'FEATURES_PROVIDED: $(sort $(FEATURES_PROVIDED))'
+	@echo 'FEATURES_REQUIRED (excl. optional features):'
+	@echo '         $(or $(sort $(filter-out $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED))), -none-)'
+	@echo 'FEATURES_OPTIONAL (strictly "nice to have"):'
+	@echo '         $(or $(sort $(FEATURES_OPTIONAL)), -none-)'
+	@echo 'FEATURES_PROVIDED (by the board or USEMODULE'"'"'d drivers):'
+	@echo '         $(or $(sort $(FEATURES_PROVIDED)), -none-)'
+	@echo 'FEATURES_MISSING (incl. optional features):'
+	@echo '         $(or $(sort $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))), -none-)'
+	@echo 'FEATURES_MISSING (only non-optional features):'
+	@echo '         $(or $(sort $(filter-out $(FEATURES_OPTIONAL) $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))), -none-)'
 	@echo ''
 	@echo 'CC:      $(CC)'
 	@echo -e 'CFLAGS:$(patsubst %, \n\t%, $(CFLAGS))'
@@ -215,17 +223,22 @@ info-features-missing:
 info-boards-features-missing:
 	@for f in $(BOARDS_FEATURES_MISSING); do echo $${f}; done | column -t
 
+FEATURES_REQUIRED += $(FEATURES_OPTIONAL)
+
 ifneq (, $(filter info-boards-supported info-boards-features-missing info-build, $(MAKECMDGOALS)))
   FEATURES_PROVIDED_BAK := $(FEATURES_PROVIDED)
 
   define board_missing_features
-    FEATURES_PROVIDED :=
+    FEATURES_PROVIDED := $(FEATURES_PROVIDED_BAK)
     -include $${RIOTBOARD}/${1}/Makefile.features
 
     FEATURES_MISSING := $$(filter-out $$(FEATURES_PROVIDED), $$(FEATURES_REQUIRED))
     ifneq (, $${FEATURES_MISSING})
-      BOARDS_WITH_MISSING_FEATURES += ${1}
       BOARDS_FEATURES_MISSING += "${1} $${FEATURES_MISSING}"
+
+      ifneq (, $$(filter-out $$(FEATURES_OPTIONAL), $$(FEATURES_MISSING)))
+        BOARDS_WITH_MISSING_FEATURES += ${1}
+      endif
     endif
   endef
 

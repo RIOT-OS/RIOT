@@ -77,9 +77,6 @@ ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
 endif
 
-# import list of provided features
--include $(RIOTBOARD)/$(BOARD)/Makefile.features
-
 # if you want to publish the board into the sources as an uppercase #define
 BOARDDEF := $(shell echo $(BOARD) | tr 'a-z' 'A-Z' | tr '-' '_')
 CPUDEF := $(shell echo $(CPU) | tr 'a-z' 'A-Z' | tr '-' '_')
@@ -205,10 +202,15 @@ objdump:
 # Extra make goals for testing and comparing changes.
 include $(RIOTBASE)/Makefile.buildtests
 
+# import list of provided features
+-include $(RIOTBOARD)/$(BOARD)/Makefile.features
+
 # Export variables used throughout the whole make system:
 include $(RIOTBASE)/Makefile.vars
 
+# Warn if the selected board and drivers don't provide all needed featues:
 ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
+
   EXPECT_ERRORS :=
 
   # Test if there where dependencies against a module in DISABLE_MODULE.
@@ -219,9 +221,9 @@ ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   endif
 
   # Test if all feature requirements were met by the selected board.
-  ifneq (, $(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED)))
+  ifneq (, $(filter-out $(FEATURES_PROVIDED) $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED)))
     $(shell $(COLOR_ECHO) "$(COLOR_RED)There are unsatisfied feature requirements:$(COLOR_RESET)"\
-                          "$(filter-out $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))" 1>&2)
+                          "$(sort $(filter-out $(FEATURES_PROVIDED) $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED)))" 1>&2)
     EXPECT_ERRORS := 1
   endif
 
