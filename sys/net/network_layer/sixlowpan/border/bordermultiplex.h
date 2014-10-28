@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "ip.h"
+#include "sixlowpan/ip.h"
 
 /* packet types of uart-packets */
 #define BORDER_PACKET_RAW_TYPE    (0)

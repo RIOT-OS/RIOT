@@ -738,6 +738,7 @@ void set_remaining_time(timex_t *t, uint32_t time)
 }
 
 int ipv6_init_as_router(void)
+
 {
     ipv6_addr_t addr;
     int if_id = -1;

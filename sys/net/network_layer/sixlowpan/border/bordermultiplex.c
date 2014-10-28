@@ -23,8 +23,8 @@
 #include "sixlowpan/error.h"
 
 #include "flowcontrol.h"
-#include "lowpan.h"
-#include "icmp.h"
+#include "../lowpan.h"
+#include "../icmp.h"
 #include "border.h"
 
 #include "bordermultiplex.h"

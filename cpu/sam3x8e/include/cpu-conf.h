@@ -20,6 +20,10 @@
 
 #include "sam3x8e.h"
 
+#ifndef CPUID_ID_LEN
+#define CPUID_ID_LEN                    (4)
+#endif
+
 
 /**
  * @name Kernel configuration

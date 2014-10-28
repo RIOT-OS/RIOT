@@ -74,7 +74,7 @@
 #include "periph/cpuid.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 #endif
@@ -122,6 +122,7 @@ void auto_init_net_if(void)
         transceiver_init(transceivers);
         transceiver_start();
         iface = net_if_init_interface(0, transceivers);
+        #warning WHAHAHA
 
 #if CPUID_ID_LEN && defined(MODULE_HASHES)
         net_if_eui64_t eui64;

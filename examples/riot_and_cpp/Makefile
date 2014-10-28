@@ -54,4 +54,17 @@ BOARD_BLACKLIST := arduino-due avsextrem chronos mbed_lpc1768 msb-430h msba2 red
 # to CXXEXFLAGS variable
 CXXEXFLAGS += -std=gnu++11
 
+
+# Modules
+#USEMODULE += posix
+#USEMODULE += transceiver
+USEMODULE += defaulttransceiver
+USEMODULE += auto_init
+USEMODULE += sixlowpan
+USEMODULE += shell
+USEMODULE += shell_commands
+USEMODULE += uart0
+USEMODULE += ps
+USEMODULE += hashes
+
 include $(RIOTBASE)/Makefile.include

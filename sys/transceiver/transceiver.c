@@ -60,7 +60,7 @@
 #include "ieee802154_frame.h"
 #endif
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
 //#define DEBUG_ENABLED
 #undef TRANSCEIVER_STACK_SIZE
@@ -237,6 +237,7 @@ kernel_pid_t transceiver_start(void)
 uint8_t transceiver_register(transceiver_type_t t, kernel_pid_t pid)
 {
     int result = 0;
+
     int state = disableIRQ();
     for (size_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
         if ((reg[i].pid == pid) || (reg[i].transceivers == TRANSCEIVER_NONE)) {
@@ -244,7 +245,7 @@ uint8_t transceiver_register(transceiver_type_t t, kernel_pid_t pid)
             reg[i].pid = pid;
             DEBUG("transceiver: Thread %i registered for %i\n", reg[i].pid, reg[i].transceivers);
             restoreIRQ(state);
-            result = 1;
+            result = 1;            
             break;
         }
     }

@@ -24,6 +24,42 @@
 #define CPP_CLASS_H_
 
 #include <cstdio>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+ extern "C"{
+  #include "socket_base.h"
+//#include "net_if.h"
+#include "sixlowpan.h"
+#include "board_uart0.h"
+#include "ipv6.h"
+#include "shell.h"
+#include "shell_commands.h"
+#include "posix_io.h"
+//#include "transceiver.h"  
+ }
+
+
+#pragma once
+
+class sixlowpan
+{
+public:
+    sixlowpan();
+    ~sixlowpan();
+    void sixlowpan_init(int argc, char **argv);
+    void printUsage();
+    void print_ipv6_addr(const ipv6_addr_t *ipv6_addr);
+    void bootstrapping(int argc, char **argv);
+    void send_packet(int argc, char **argv);
+    void ip(int argc, char **argv);
+    void context(int argc, char **argv);
+private:
+
+};
+
 
 class cpp_class
 {

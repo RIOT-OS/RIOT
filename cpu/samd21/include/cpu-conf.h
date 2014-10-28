@@ -21,6 +21,11 @@
 #include "samd21.h"
 
 
+ /* @brief   length of CPU ID for @ref cpuid_get() in @ref periph/cpuid.h*/
+#ifndef CPUID_ID_LEN
+#define CPUID_ID_LEN                    (128/8)
+#endif
+
 /**
  * @name Kernel configuration
  *
@@ -43,11 +48,11 @@
  * @{
  */
 #ifndef UART0_BUFSIZE
-#define UART0_BUFSIZE                   (256)
+#define UART0_BUFSIZE                   (128)//(256)
 #endif
 /** @} */
 
-#define TRANSCEIVER_BUFFER_SIZE (64)
+#define TRANSCEIVER_BUFFER_SIZE 		(64)
 
 
 #endif /* __CPU_CONF_H */

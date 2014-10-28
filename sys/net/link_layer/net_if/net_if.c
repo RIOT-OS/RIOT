@@ -354,7 +354,7 @@ int net_if_send_packet(int if_id, uint16_t target, const void *payload,
 int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
                             const void *payload, size_t payload_len)
 {
-    DEBUG("net_if_send_packet: if_id = %d, target = %016" PRIx64 ", "
+    DEBUG("net_if_send_packet_long: if_id = %d, target = %016" PRIx64 ", "
           "payload = %p, payload_len = %d\n", if_id, NTOHLL(target->uint64), payload,
           payload_len);
     uint32_t response;
