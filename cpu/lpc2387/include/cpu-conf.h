@@ -28,13 +28,6 @@
  */
 
 /**
- * @name CPU capabilities
- * @{
- */
-#define FEUERWARE_CPU_LPC2387                   1
-/** @} */
-
-/**
  * @name Stdlib configuration
  * @{
  */
