@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup        drivers_cc110x CC110x
+ * @defgroup        drivers_cc110x_legacy_csma CC110X_LEGACY_CSMA
  * @ingroup         drivers
  * @brief           Driver for Texas Instruments CC110x (including CMSA/CA MAC)
  *
@@ -27,7 +27,7 @@
 #define CC1100_H
 
 #include <stdbool.h>
-#include "cc110x.h"
+#include "cc110x_legacy_csma.h"
 
 #ifdef __cplusplus
 extern "C" {

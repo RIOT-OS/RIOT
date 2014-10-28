@@ -27,8 +27,8 @@
 #include "transceiver.h"
 #include "msg.h"
 
-#if   defined( MODULE_CC110X )
-#include "cc110x.h"
+#if   defined( MODULE_CC110X_LEGACY_CSMA )
+#include "cc110x_legacy_csma.h"
 #define TEXT_SIZE           CC1100_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_CC1100
 

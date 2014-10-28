@@ -2,7 +2,7 @@ export INCLUDES += -I$(RIOTBOARD)/pttu/include
 
 # Enable this after fixing https://github.com/RIOT-OS/RIOT/issues/659
 #ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
-#	USEMODULE += cc110x
+#	USEMODULE += cc110x_legacy_csma
 #	USEMODULE += transceiver
 #endif
 

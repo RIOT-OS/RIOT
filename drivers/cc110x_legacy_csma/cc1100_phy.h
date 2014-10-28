@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     dev_cc110x
+ * @ingroup     dev_cc110x_legacy_csma
  * @{
  */
 
@@ -29,7 +29,7 @@
 #include <stdint.h>
 //#include "cc1100.h"
 #include "cc1100-internal.h"
-#include "cc110x.h"
+#include "cc110x_legacy_csma.h"
 
 #ifdef __cplusplus
 extern "C" {

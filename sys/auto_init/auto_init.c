@@ -27,8 +27,8 @@
 #include "gpioint.h"
 #endif
 
-#ifdef MODULE_CC110X
-#include "cc110x.h"
+#ifdef MODULE_CC110X_LEGACY_CSMA
+#include "cc110x_legacy_csma.h"
 #endif
 
 #ifdef MODULE_LTC4150
@@ -98,7 +98,7 @@ void auto_init_net_if(void)
 #ifdef MODULE_CC1020
     transceivers |= TRANSCEIVER_CC1020;
 #endif
-#if MODULE_CC110X || MODULE_CC110X_LEGACY
+#if MODULE_CC110X_LEGACY_CSMA || MODULE_CC110X_LEGACY
     transceivers |= TRANSCEIVER_CC1100;
 #endif
 #ifdef MODULE_CC2420
@@ -208,7 +208,7 @@ void auto_init(void)
     DEBUG("Auto init gpioint module.\n");
     gpioint_init();
 #endif
-#ifdef MODULE_CC110X
+#ifdef MODULE_CC110X_LEGACY_CSMA
     DEBUG("Auto init CC1100 module.\n");
 #ifndef MODULE_TRANSCEIVER
     cc1100_init();

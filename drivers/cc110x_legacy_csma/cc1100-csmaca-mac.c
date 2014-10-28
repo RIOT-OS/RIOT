@@ -8,7 +8,7 @@
 
 /**
  * @file
- * @ingroup     dev_cc110x
+ * @ingroup     dev_cc110x_legacy_csma
  * @brief       ScatterWeb MSB-A2 mac-layer
  *
  * @author      Thomas Hillebrandt <hillebra@inf.fu-berlin.de>

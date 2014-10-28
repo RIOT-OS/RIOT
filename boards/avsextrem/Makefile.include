@@ -5,7 +5,7 @@ ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
 	USEMODULE += transceiver
 endif
 
-ifneq (,$(filter cc110x,$(USEMODULE)))
+ifneq (,$(filter cc110x_legacy_csma,$(USEMODULE)))
 	INCLUDES += -I$(RIOTBASE)/sys/net/include
 endif
 

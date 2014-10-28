@@ -10,8 +10,8 @@ endif
 ifneq (,$(filter ltc4150,$(USEMODULE)))
     DIRS += ltc4150
 endif
-ifneq (,$(filter cc110x,$(USEMODULE)))
-    DIRS += cc110x
+ifneq (,$(filter cc110x_legacy_csma,$(USEMODULE)))
+    DIRS += cc110x_legacy_csma
 endif
 ifneq (,$(filter cc110x_legacy,$(USEMODULE)))
     DIRS += cc110x_legacy
