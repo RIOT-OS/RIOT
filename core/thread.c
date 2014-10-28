@@ -58,9 +58,9 @@ void thread_sleep(void)
         return;
     }
 
-    dINT();
+    int state = disableIRQ();
     sched_set_status((tcb_t *)sched_active_thread, STATUS_SLEEPING);
-    eINT();
+    restoreIRQ(state);
     thread_yield_higher();
 }
 
@@ -149,8 +149,9 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     }
 #endif
 
+    int state;
     if (!inISR()) {
-        dINT();
+        state = disableIRQ();
     }
 
     kernel_pid_t pid = KERNEL_PID_UNDEF;
@@ -164,7 +165,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
         DEBUG("thread_create(): too many threads!\n");
 
         if (!inISR()) {
-            eINT();
+            restoreIRQ(state);
         }
 
         return -EOVERFLOW;
@@ -207,7 +208,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
         if (!(flags & CREATE_WOUT_YIELD)) {
             if (!inISR()) {
-                eINT();
+                restoreIRQ(state);
                 sched_switch(priority);
             }
             else {
@@ -217,7 +218,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
     }
 
     if (!inISR() && sched_active_thread != NULL) {
-        eINT();
+        restoreIRQ(state);
     }
 
     return pid;
