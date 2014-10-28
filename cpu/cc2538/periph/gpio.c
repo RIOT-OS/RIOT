@@ -352,9 +352,9 @@ static const uint8_t reverse_pin_lut[] = {
 };
 
 static const uint32_t ioc_mask_lut[] = {
-    [GPIO_NOPULL  ] = IOC_OVERRIDE_OE,
-    [GPIO_PULLUP  ] = IOC_OVERRIDE_OE | IOC_OVERRIDE_PUE,
-    [GPIO_PULLDOWN] = IOC_OVERRIDE_OE | IOC_OVERRIDE_PDE,
+    [GPIO_NOPULL  ] = IOC_OVERRIDE_DIS,
+    [GPIO_PULLUP  ] = IOC_OVERRIDE_PUE,
+    [GPIO_PULLDOWN] = IOC_OVERRIDE_PDE,
 };
 
 int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
@@ -370,7 +370,7 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
     gpio_dir_output(pin);
 
     /* configure the pin's pull resistor state */
-    IOC_PXX_OVER[pin] = ioc_mask_lut[pushpull];
+    IOC_PXX_OVER[pin] = IOC_OVERRIDE_OE | ioc_mask_lut[pushpull];
 
     return 0;
 }
