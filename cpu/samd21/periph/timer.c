@@ -137,15 +137,17 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
             return -1;
     }
 
-    DEBUG("Setting timer %i channel %i to %i\n", dev, channel, value);
+    DEBUG("Setting timer %i channel %i to %i\n", dev, channel, (0xffff&value));
 
     /* set timeout value */
     switch (channel) {
         case 0:
+            tim->INTFLAG.bit.MC0 = 1;
             tim->CC[0].reg = value;
             tim->INTENSET.bit.MC0 = 1;
             break;
         case 1:
+            tim->INTFLAG.bit.MC1 = 1;
             tim->CC[1].reg = value;
             tim->INTENSET.bit.MC1 = 1;
             break;
@@ -185,9 +187,11 @@ int timer_clear(tim_t dev, int channel)
     /* disable the channels interrupt */
     switch (channel) {
         case 0:
+            tim->INTFLAG.bit.MC0 = 1;
             tim->INTENCLR.bit.MC0 = 1;
             break;
         case 1:
+            tim->INTFLAG.bit.MC1 = 1;
             tim->INTENCLR.bit.MC1 = 1;
             break;
         default:
@@ -347,12 +351,14 @@ void TIMER_0_ISR(void)
 {
     ISR_ENTER();
         if (TIMER_0_DEV.INTFLAG.bit.MC0 && TIMER_0_DEV.INTENSET.bit.MC0) {
-            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
             config[TIMER_0].cb(0);
+            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
         }
         else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
-            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
             config[TIMER_0].cb(1);
+            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
         }
     ISR_EXIT();
 }
@@ -365,12 +371,14 @@ void TIMER_1_ISR(void)
 {
     ISR_ENTER();
         if (TIMER_1_DEV.INTFLAG.bit.MC0 && TIMER_1_DEV.INTENSET.bit.MC0) {
-            TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
             config[TIMER_1].cb(0);
+            TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
         }
         else if (TIMER_1_DEV.INTFLAG.bit.MC1 && TIMER_1_DEV.INTENSET.bit.MC1) {
-            TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
             config[TIMER_1].cb(1);
+            TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
         }
     ISR_EXIT();
 }
