@@ -36,9 +36,9 @@
 
 #include <string.h>
 
-// At compile time we can choose the search algorithm for finding
-// symbols: linear or binary. Binary search is twice as large but
-// still small.
+/* At compile time we can choose the search algorithm for finding
+   symbols: linear or binary. Binary search is twice as large but
+   still small. */
 #ifndef SYMTAB_CONF_BINARY_SEARCH
 #define SYMTAB_CONF_BINARY_SEARCH 1
 #endif
@@ -52,10 +52,10 @@ symtab_lookup(const char *name)
 	int r;
 
 	start = 0;
-	end = symbols_nelts - 1; // Last entry is { 0, 0 }.
+	end = symbols_nelts - 1; /* Last entry is { 0, 0 }. */
 
 	while(start <= end) {
-		// Check middle, divide
+		/* Check middle, divide */
 		middle = (start + end) / 2;
 		r = strcmp(name, symbols[middle].name);
 		if(r < 0) {
@@ -68,7 +68,7 @@ symtab_lookup(const char *name)
 	}
 	return NULL;
 }
-#else // SYMTAB_CONF_BINARY_SEARCH
+#else /* SYMTAB_CONF_BINARY_SEARCH */
 void *
 symtab_lookup(const char *name)
 {
@@ -80,5 +80,5 @@ symtab_lookup(const char *name)
 	}
 	return 0;
 }
-#endif // SYMTAB_CONF_BINARY_SEARCH
+#endif /* SYMTAB_CONF_BINARY_SEARCH */
 /*---------------------------------------------------------------------------*/

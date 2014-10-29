@@ -161,16 +161,16 @@ typedef uint16_t elf32_half;
 typedef uint32_t elf32_off;
 typedef uint32_t elf32_addr;
 
-// representation of a relocation
+/* representation of a relocation */
 typedef struct elf32_rela {
-	elf32_addr      offset;       // location of the relocation, as an
-								  // offset to section start. This is
-								  // where the new address needs to be
-								  // written.
+	elf32_addr      offset;       /* location of the relocation, as an
+								     offset to section start. This is
+								     where the new address needs to be
+								     written. */
 
-	elf32_word      info;         // Relocation type and symbol index.
+	elf32_word      info;         /* Relocation type and symbol index. */
 
-	elf32_sword     addend;       // Addend
+	elf32_sword     addend;       /* Addend */
 } elf32_rela_t;
 
 

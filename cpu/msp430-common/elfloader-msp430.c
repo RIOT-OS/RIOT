@@ -34,18 +34,18 @@
 #include <string.h>
 #include "elfloader-arch.h"
 
-//------------------------------------------------------------------------------
+/*----------------------------------------------------------------------------*/
 void
 elfloader_arch_relocate(uint8_t *addr_to_write,
                         elf32_rela_t* rela, const char *addr)
 {
 	addr += rela->addend;
-	// yes really copy the value of *addr*. hence the & in &addr.
-	memcpy(addrToWrite, &addr, 2);
+	/* yes really copy the value of *addr*. hence the & in &addr. */
+	memcpy(addr_to_write, &addr, 2);
 }
-//------------------------------------------------------------------------------
+/*----------------------------------------------------------------------------*/
 int elfloader_arch_get_segment_size(const uint8_t *addr) {
 	return 512;
 }
-//------------------------------------------------------------------------------
+/*----------------------------------------------------------------------------*/
 

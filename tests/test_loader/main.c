@@ -29,7 +29,7 @@
 #include "flags.h"
 #include "kernel.h"
 
-// provide the dynamic app as an array (workaround)
+/* provide the dynamic app as an array (workaround) */
 #include "../test_dyn_app/dyn_main.h"
 
 #define LOADER_STACK_SIZE 1024
@@ -39,13 +39,13 @@ void run(void)
 {
 	printf("Thread Started.\n");
 
- 	// relocate object file at char * dyn_app
+ 	/* relocate object file at char * dyn_app */
  	process_t dyn_entry;
  	int status = elfloader_load(dyn_app, "dyn_main", &dyn_entry);
  
  	printf("Dynamic entry point address: 0x%x\n", dyn_entry);
  
- 	// execute dynamic application at function pointer
+ 	/* execute dynamic application at function pointer */
  	int result = dyn_entry();
  
  	printf("==============================\n");
@@ -54,7 +54,7 @@ void run(void)
 
 int main(void)
 {
-	// elfloader_load needs more stack, than the default stack size
+	/* elfloader_load needs more stack, than the default stack size */
 	thread_create(loader_stack, LOADER_STACK_SIZE, PRIORITY_MAIN - 1, CREATE_WOUT_YIELD | CREATE_STACKTEST, run, "elfloader_thread");
 	
     return 0;

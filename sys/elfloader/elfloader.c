@@ -53,69 +53,69 @@
 #define EI_NIDENT 16
 
 
-// representation of an elf header
+/* representation of an elf header */
 typedef struct elf32_ehdr {
-	unsigned char ident[EI_NIDENT];    // ident bytes
-	elf32_half type;                   // file type
-	elf32_half machine;                // target machine
-	elf32_word version;                // file version
-	elf32_addr entry;                  // start address
-	elf32_off  phoff;                  // phdr file offset
-	elf32_off  shoff;                  // shdr file offset
-	elf32_word flags;                  // file flags
-	elf32_half ehsize;                 // sizeof ehdr
-	elf32_half phentsize;              // sizeof phdr
-	elf32_half phnum;                  // number phdrs
-	elf32_half shentsize;              // sizeof shdr
-	elf32_half shnum;                  // number shdrs
-	elf32_half shstrndx;               // shdr string index
+	unsigned char ident[EI_NIDENT];    /* ident bytes */
+	elf32_half type;                   /* file type */
+	elf32_half machine;                /* target machine */
+	elf32_word version;                /* file version */
+	elf32_addr entry;                  /* start address */
+	elf32_off  phoff;                  /* phdr file offset */
+	elf32_off  shoff;                  /* shdr file offset */
+	elf32_word flags;                  /* file flags */
+	elf32_half ehsize;                 /* sizeof ehdr */
+	elf32_half phentsize;              /* sizeof phdr */
+	elf32_half phnum;                  /* number phdrs */
+	elf32_half shentsize;              /* sizeof shdr */
+	elf32_half shnum;                  /* number shdrs */
+	elf32_half shstrndx;               /* shdr string index */
 } elf32_ehdr_t;
 
-// representation of a section header in an elf file
+/* representation of a section header in an elf file */
 typedef struct elf32_shdr {
-	elf32_word name;        // section name
-	elf32_word type;        // SHT_...
-	elf32_word flags;       // SHF_...
-	elf32_addr addr;        // virtual address
-	elf32_off  offset;      // file offset
-	elf32_word size;        // section size
-	elf32_word link;        // misc info
-	elf32_word info;        // misc info
-	elf32_word addralign;   // memory alignment
-	elf32_word entsize;     // entry size if table
+	elf32_word name;        /* section name */
+	elf32_word type;        /* SHT_... */
+	elf32_word flags;       /* SHF_... */
+	elf32_addr addr;        /* virtual address */
+	elf32_off  offset;      /* file offset */
+	elf32_word size;        /* section size */
+	elf32_word link;        /* misc info */
+	elf32_word info;        /* misc info */
+	elf32_word addralign;   /* memory alignment */
+	elf32_word entsize;     /* entry size if table */
 } elf32_shdr_t;
 
-// sh_type
-#define SHT_NULL        0               // inactive
-#define SHT_PROGBITS    1               // program defined information
-#define SHT_SYMTAB      2               // symbol table section
-#define SHT_STRTAB      3               // string table section
-#define SHT_RELA        4               // relocation section with addend
-#define SHT_HASH        5               // symbol hash table section
-#define SHT_DYNAMIC     6               // dynamic section
-#define SHT_NOTE        7               // note section
-#define SHT_NOBITS      8               // no space section
-#define SHT_REL         9               // relation section without addends
-#define SHT_SHLIB       10              // reserved - purpose unknown
-#define SHT_DYNSYM      11              // dynamic symbol table section
-#define SHT_LOPROC      0x70000000      // reserved range for processor
-#define SHT_HIPROC      0x7fffffff      // specific section header types
-#define SHT_LOUSER      0x80000000      // reserved range for application
-#define SHT_HIUSER      0xffffffff      // specific indexes
+/* sh_type */
+#define SHT_NULL        0               /* inactive */
+#define SHT_PROGBITS    1               /* program defined information */
+#define SHT_SYMTAB      2               /* symbol table section */
+#define SHT_STRTAB      3               /* string table section */
+#define SHT_RELA        4               /* relocation section with addend */
+#define SHT_HASH        5               /* symbol hash table section */
+#define SHT_DYNAMIC     6               /* dynamic section */
+#define SHT_NOTE        7               /* note section */
+#define SHT_NOBITS      8               /* no space section */
+#define SHT_REL         9               /* relation section without addends */
+#define SHT_SHLIB       10              /* reserved - purpose unknown */
+#define SHT_DYNSYM      11              /* dynamic symbol table section */
+#define SHT_LOPROC      0x70000000      /* reserved range for processor */
+#define SHT_HIPROC      0x7fffffff      /* specific section header types */
+#define SHT_LOUSER      0x80000000      /* reserved range for application */
+#define SHT_HIUSER      0xffffffff      /* specific indexes */
 
-// representation of a relocation without an addend
+/* representation of a relocation without an addend */
 typedef struct elf32_rel {
-	elf32_addr    offset;     // Location to be relocated.
-	elf32_word    info;       // Relocation type and symbol index.
+	elf32_addr    offset;     /* Location to be relocated. */
+	elf32_word    info;       /* Relocation type and symbol index. */
 } elf32_rel_t;
 
 typedef struct elf32_sym {
-	elf32_word      name;         // String table index of name.
-	elf32_addr      value;        // Symbol value.
-	elf32_word      size;         // Size of associated object.
-	unsigned char   info;         // Type and binding information.
-	unsigned char   other;        // Reserved (not used).
-	elf32_half      shndx;        // Section index of symbol.
+	elf32_word      name;         /* String table index of name. */
+	elf32_addr      value;        /* Symbol value. */
+	elf32_word      size;         /* Size of associated object. */
+	unsigned char   info;         /* Type and binding information. */
+	unsigned char   other;        /* Reserved (not used). */
+	elf32_half      shndx;        /* Section index of symbol. */
 } elf32_sym_t;
 
 #define ELF32_R_SYM(info)       ((info) >> 8)
@@ -131,7 +131,7 @@ typedef struct relSectGroup {
 	relevant_section_t bss, data, rodata, text;
 } relSectGroup_t;
 
-//------------------------------------------------------------------------------
+/*----------------------------------------------------------------------------*/
 const relevant_section_t* findSectionById(elf32_half id, const relSectGroup_t* rsg) {
 	const relevant_section_t* retSect = NULL;
 	if(id == rsg->bss.number) {
@@ -145,7 +145,7 @@ const relevant_section_t* findSectionById(elf32_half id, const relSectGroup_t* r
 	}
 	return retSect;
 }
-//------------------------------------------------------------------------------
+/*----------------------------------------------------------------------------*/
 static void *
 find_local_symbol(void * objPtr, const char *symbol,
 				  const elf32_shdr_t* symtab, const elf32_shdr_t* strtab,
@@ -168,7 +168,7 @@ find_local_symbol(void * objPtr, const char *symbol,
 	}
 	return retAddr;
 }
-//------------------------------------------------------------------------------
+/*----------------------------------------------------------------------------*/
 static int
 relocate_section(void * objPtr,
 				 const elf32_shdr_t* shdr,
@@ -178,21 +178,21 @@ relocate_section(void * objPtr,
 				 unsigned char using_relas,
 				 const relSectGroup_t* rsg)
 {
-	// sectionbase added; runtime start address of current section
-	elf32_rela_t rela; // Now used both for rel and rela data!
+	/* sectionbase added; runtime start address of current section */
+	elf32_rela_t rela; /* Now used both for rel and rela data! */
 	int rel_size = 0;
 	unsigned int a;
 	const char* addr;
 
-	// determine correct relocation entry sizes
+	/* determine correct relocation entry sizes */
 	if(using_relas) {
 		rel_size = sizeof(elf32_rela_t);
 	} else {
 		rel_size = sizeof(elf32_rel_t);
 	}
 
-	uint8_t segment[512]; // Buffering to avoid writes to flash
-	uint8_t* lastSegment = NULL; // Address of the last segment
+	uint8_t segment[512]; /* Buffering to avoid writes to flash */
+	uint8_t* lastSegment = NULL; /* Address of the last segment */
 
 	for(a = shdr->offset; a < shdr->offset + shdr->size; a += rel_size) {
 		memcpy(&rela, objPtr+a, rel_size);
@@ -200,16 +200,16 @@ relocate_section(void * objPtr,
 		if(s->name != 0) {
 			const char* name = objPtr + strtab->offset + s->name;
 
-			// Look for the symbol in the kernel
+			/* Look for the symbol in the kernel */
 			addr = (char *)symtab_lookup(name);
-			// ADDED
+			/* ADDED */
 			if(addr == NULL) {
 				PRINTF("name not found in global: %s\n", name);
 				addr = find_local_symbol(objPtr, name, symtab, strtab, rsg);
 				PRINTF("found address %p\n", addr);
 			}
 			if(addr == NULL) {
-				// This doesn't look safe
+				/* This doesn't look safe */
 				const relevant_section_t* sect = findSectionById(s->shndx, rsg);
 				if (sect == NULL) {
 					PRINTF("elfloader unknown name: '%30s'\n", name);
@@ -227,26 +227,26 @@ relocate_section(void * objPtr,
 		}
 
 		if(!using_relas) {
-			// copy addend to rela structure
+			/* copy addend to rela structure */
 			memcpy(&rela.addend, objPtr + sectionAddr->offset + rela.offset, 4);
 		}
 
-		//TODO address size unequal to int default size
+		/* TODO address size unequal to int default size */
 		uint8_t *addrToWrite = objPtr + sectionAddr->offset + rela.offset;
 		int currentSegmentSize = elfloader_arch_get_segment_size(addrToWrite);
 		uint8_t *segmentToWrite = (uint8_t*)((int)addrToWrite & ~(currentSegmentSize-1));
 
-		// If the segment changes, write old segment to flash
+		/* If the segment changes, write old segment to flash */
 		if (segmentToWrite != lastSegment) {
 
-			// First loop lastSegement is NULL -> nothing to erase/write
+			/* First loop lastSegement is NULL -> nothing to erase/write */
 			if (lastSegment != NULL) {
 				if (memcmp(lastSegment, segment, elfloader_arch_get_segment_size(lastSegment)) != 0) {
 					printf("write segment, found new one\n");
-					//erase segment
+					/* erase segment */
 					flashrom_erase(lastSegment);
 					printf("erased\n");
-					//write segment
+					/* write segment */
 					flashrom_write(lastSegment, segment, elfloader_arch_get_segment_size(lastSegment));
 					printf("written\n");
 
@@ -266,10 +266,10 @@ relocate_section(void * objPtr,
 		if (memcmp(lastSegment, segment, elfloader_arch_get_segment_size(lastSegment)) != 0) {
 			printf("write segment, end of relocate\n");
 
-			//erase segment
+			/* erase segment */
 			flashrom_erase(lastSegment);
 			printf("erased\n");
-			//write segment
+			/* write segment */
 			flashrom_write(lastSegment, segment, elfloader_arch_get_segment_size(lastSegment));
 			printf("written\n");
 		} else {
@@ -279,29 +279,29 @@ relocate_section(void * objPtr,
 	return ELFLOADER_OK;
 }
 
-//------------------------------------------------------------------------------
+/*----------------------------------------------------------------------------*/
 
 static int check_if_correct_elfheader(void const* ptr) {
 	static const unsigned char elf_magic_header[] =
-		{0x7f, 0x45, 0x4c, 0x46,  // 0x7f, 'E', 'L', 'F'
-		 0x01,                    // Only 32-bit objects.
-		 0x01,                    // Only LSB data.
-		 0x01,                    // Only ELF version 1.
+		{0x7f, 0x45, 0x4c, 0x46,  /* 0x7f, 'E', 'L', 'F' */
+		 0x01,                    /* Only 32-bit objects. */
+		 0x01,                    /* Only LSB data. */
+		 0x01,                    /* Only ELF version 1. */
 		};
 
 	return memcmp(ptr, elf_magic_header, sizeof(elf_magic_header)) == 0;
 }
 
 
-//------------------------------------------------------------------------------
+/*----------------------------------------------------------------------------*/
 int elfloader_load(void * objPtr, const char * entry_point_name, process_t** elfloader_process)
 {
 	const elf32_shdr_t* strtable;
 
 	unsigned char using_relas = -1;
 
-	// Initialize the segment sizes to zero so that we can check if
-	// their sections was found in the file or not.
+	/* Initialize the segment sizes to zero so that we can check if */
+	/* their sections was found in the file or not. */
 	const elf32_shdr_t* textrela   = NULL;
 	const elf32_shdr_t* datarela   = NULL;
 	const elf32_shdr_t* rodatarela = NULL;
@@ -310,10 +310,10 @@ int elfloader_load(void * objPtr, const char * entry_point_name, process_t** elf
 
 	relSectGroup_t rsg;
 
-	// The ELF header is located at the start of the buffer.
+	/* The ELF header is located at the start of the buffer. */
 	const elf32_ehdr_t* ehdr = (const elf32_ehdr_t*)objPtr;
 
-	// Make sure that we have a correct and compatible ELF header.
+	/* Make sure that we have a correct and compatible ELF header. */
 	if (!check_if_correct_elfheader(ehdr->ident)) {
 		PRINTF("ELF header problems\n");
 		return ELFLOADER_BAD_ELF_HEADER;
@@ -322,7 +322,7 @@ int elfloader_load(void * objPtr, const char * entry_point_name, process_t** elf
 
 	PRINTF("Section header: size %d num %d\n", ehdr->shentsize, ehdr->shnum);
 
-	// The string table section: holds the names of the sections.
+	/* The string table section: holds the names of the sections. */
 	strtable = objPtr + ehdr->shoff + ehdr->shentsize * ehdr->shstrndx;
 
 	PRINTF("Strtable offset %d\n", (int)strtable->offset);
@@ -344,23 +344,23 @@ int elfloader_load(void * objPtr, const char * entry_point_name, process_t** elf
 
 	rsg.bss.number = rsg.data.number = rsg.rodata.number = rsg.text.number = -1;
 
-	// Grab the section header.
+	/* Grab the section header. */
 	const void* shdrptr = objPtr + ehdr->shoff;
 
 	for(int i=0; i<ehdr->shnum; ++i) {
 		const elf32_shdr_t* shdr = shdrptr + ehdr->shentsize*i;
 
-		// The name of the section is contained in the strings table.
+		/* The name of the section is contained in the strings table. */
 		const void const* nameptr = objPtr + strtable->offset + shdr->name;
 
 		PRINTF("Section shdrptr 0x%x, %d + %d type %d\n",
 			   (int)shdrptr,
 			   (int)strtable->offset, (int)shdr->name,
 			   (int)shdr->type);
-		// Match the name of the section with a predefined set of
-		// names (.text, .data, .bss, .rela.text, .rela.data, .symtab,
-		// and .strtab).
-		// added support for .rodata, .rel.text and .rel.data).
+		/* Match the name of the section with a predefined set of
+		   names (.text, .data, .bss, .rela.text, .rela.data, .symtab,
+		   and .strtab).
+		   added support for .rodata, .rel.text and .rel.data). */
 
 		if (strncmp(nameptr, ".rela", 5) == 0) {
 			using_relas = 1;
@@ -385,17 +385,17 @@ int elfloader_load(void * objPtr, const char * entry_point_name, process_t** elf
 			rsg.data.offset = shdr->offset;
 			rsg.data.size   = shdr->size;
 		} else if(strcmp(nameptr, ".rodata") == 0) {
-			// read-only data handled the same way as regular text section
+			/* read-only data handled the same way as regular text section */
 			rsg.rodata.number = i;
 			rsg.rodata.offset = shdr->offset;
 			rsg.rodata.size   = shdr->size;
 		} else if(strcmp(nameptr, ".rel.rodata") == 0) {
-			// using elf32_rel instead of rela
+			/* using elf32_rel instead of rela */
 			rodatarela = shdr;
 		} else if(strcmp(nameptr, ".rela.rodata") == 0) {
 			rodatarela = shdr;
 		} else if(strcmp(nameptr, ".rel.data") == 0) {
-			// using elf32_rel instead of rela
+			/* using elf32_rel instead of rela */
 			datarela = shdr;
 		} else if(strcmp(nameptr, ".rela.data") == 0) {
 			datarela = shdr;
@@ -406,7 +406,7 @@ int elfloader_load(void * objPtr, const char * entry_point_name, process_t** elf
 		}
 	}
 
-	// Error checking, symbol table, string table and text (code) should be available
+	/* Error checking, symbol table, string table and text (code) should be available */
 	if(symtab == NULL || symtab->size == 0) {
 		return ELFLOADER_NO_SYMTAB;
 	}
@@ -430,7 +430,7 @@ int elfloader_load(void * objPtr, const char * entry_point_name, process_t** elf
 	PRINTF("rodata base address: rodata.address = 0x%08x\n", (int)rsg.rodata.address);
 
 
-	// If we have text segment relocations, we process them.
+	/* If we have text segment relocations, we process them. */
 	PRINTF("elfloader: relocate text\n");
 	if(textrela != NULL) {
 		int ret = relocate_section(objPtr, textrela, &rsg.text, strtab, symtab, using_relas, &rsg);
@@ -440,7 +440,7 @@ int elfloader_load(void * objPtr, const char * entry_point_name, process_t** elf
 		}
 	}
 
-	// If we have any rodata segment relocations, we process them too.
+	/* If we have any rodata segment relocations, we process them too. */
 	PRINTF("elfloader: relocate rodata\n");
 	if(rodatarela != NULL) {
 		int ret = relocate_section(objPtr, rodatarela, &rsg.rodata, strtab, symtab, using_relas, &rsg);
@@ -450,7 +450,7 @@ int elfloader_load(void * objPtr, const char * entry_point_name, process_t** elf
 		}
 	}
 
-	// If we have any data segment relocations, we process them too.
+	/* If we have any data segment relocations, we process them too. */
 	PRINTF("elfloader: relocate data\n");
 	if(datarela != NULL) {
 		int ret = relocate_section(objPtr, datarela, &rsg.data, strtab, symtab, using_relas, &rsg);
@@ -470,4 +470,4 @@ int elfloader_load(void * objPtr, const char * entry_point_name, process_t** elf
 	}
 	return ELFLOADER_OK;
 }
-//------------------------------------------------------------------------------
+/*----------------------------------------------------------------------------*/

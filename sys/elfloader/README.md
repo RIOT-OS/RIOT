@@ -112,7 +112,7 @@ Putting Objectfiles onto the device
 -----------------------------------
 
 To put and relocate an object file persistently, you need to put into
-the flash memory. Then during relocation, the new values are falshed
+the flash memory. Then during relocation, the new values are flashed
 persistently. You need to take care, that
 
 - The object file does not share any segements with running code,
@@ -143,7 +143,7 @@ An example implementation can be found for the msp-430:
 							elf32_rela_t* rela, const char *addr)
 	{
 		addr += rela->addend;
-		// yes really copy the value of *addr*. hence the & in &addr.
+		/* yes really copy the value of *addr*. hence the & in &addr. */
 		memcpy(fd + sectionoffset + rela->offset, &addr, 2);
 	}
 	/*---------------------------------------------------------------------------*/
