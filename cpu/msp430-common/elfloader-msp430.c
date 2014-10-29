@@ -36,8 +36,8 @@
 
 //------------------------------------------------------------------------------
 void
-elfloader_arch_relocate(uint8_t *addrToWrite,
-						elf32_rela_t* rela, const char *addr)
+elfloader_arch_relocate(uint8_t *addr_to_write,
+                        elf32_rela_t* rela, const char *addr)
 {
 	addr += rela->addend;
 	// yes really copy the value of *addr*. hence the & in &addr.
