@@ -33,22 +33,27 @@
 #define SYMTAB_H_
 
 /**
- * Will lookup *name* in the OS symbol table and return a pointer to
- * the symbol. When the symbol is not found, NULL is returned.
+ * @brief Will lookup *name* in the OS symbol table and return a
+ *        pointer to the symbol. When the symbol is not found, NULL is
+ *        returned.
  *
- * Works with the globally defined symbols array, of the form:
+ *        Works with the globally defined symbols array, of the form:
  *
- * const struct symbols symbols[symbols_nelts] = {
- * {"atomic_set_return", (char *)0x00002ffc},
- * {"auto_init", (char *)0x00003562},
- * {"bitarithm_bits_set", (char *)0x00002f84},
- * {"bitarithm_lsb", (char *)0x00002f72},
- * ...
- * {(void *)0, 0}
- * };
+ *        const struct symbols symbols[symbols_nelts] = {
+ *        {"atomic_set_return", (char *)0x00002ffc},
+ *        {"auto_init", (char *)0x00003562},
+ *        {"bitarithm_bits_set", (char *)0x00002f84},
+ *        {"bitarithm_lsb", (char *)0x00002f72},
+ *        ...
+ *        {(void *)0, 0}
+ *        };
  *
- * Where symbols_nelts is the number of the symbols in the kernel plus
- * one.
+ *        Where symbols_nelts is the number of the symbols in the kernel plus
+ *        one.
+ *
+ * @param name The name of the symbol to look up
+ *
+ * @return Address to the code/data to which the name refers
  */
 void *symtab_lookup(const char *name);
 

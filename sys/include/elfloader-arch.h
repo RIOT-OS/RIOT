@@ -30,12 +30,12 @@
  *
  */
 /**
- * \addtogroup elfloader
+ * @addtogroup elfloader
  * @{
  */
 
 /**
- * \defgroup elfloaderarch Architecture specific functionality for the ELF loader.
+ * @defgroup elfloaderarch Architecture specific functionality for the ELF loader.
  *
  * The architecture specific functionality for the Contiki ELF loader
  * has to be implemented for each processor type RIOT runs on.
@@ -54,18 +54,18 @@
  */
 
 /**
- * \file
+ * @file
  *         Header file for the architecture specific parts of the RIOT ELF loader.
  *
- * \author
+ * @author
  *         Adam Dunkels <adam@sics.se> (Contiki)
  *
  * Adopted for RIOT:
  *
- * \author      Simon Gene Gottlieb <s.gottlieb@fu-berlin.de>
- * \author      Dimitri Schachmann <d.schachmann@fu-berlin.de>
- * \author      Ron Wenzel <ron.wenzel@fu-berlin.de>
- * \author      Christopher Pockrandt <christopher.pockrandt@fu-berlin.de>
+ * @author      Simon Gene Gottlieb <s.gottlieb@fu-berlin.de>
+ * @author      Dimitri Schachmann <d.schachmann@fu-berlin.de>
+ * @author      Ron Wenzel <ron.wenzel@fu-berlin.de>
+ * @author      Christopher Pockrandt <christopher.pockrandt@fu-berlin.de>
  *
  */
 
@@ -75,13 +75,13 @@
 #include "elfloader.h"
 
 /**
- * \brief      Perform a relocation.
- * \param objPtr
+ * @brief      Perform a relocation.
+ * @param objPtr
  *             The file descriptor for the ELF file.
- * \param sectionoffset The file offset at which the relocation can be found.
- * \param sectionaddr The section start address (absolute runtime).
- * \param rela A pointer to an ELF32 rela structure (struct elf32_rela).
- * \param addr The relocated address.
+ * @param sectionoffset The file offset at which the relocation can be found.
+ * @param sectionaddr The section start address (absolute runtime).
+ * @param rela A pointer to an ELF32 rela structure (struct elf32_rela).
+ * @param addr The relocated address.
  *
  *             This function is called from the Contiki ELF loader to
  *             perform a relocation on a piece of code or data. The

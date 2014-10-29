@@ -1,5 +1,5 @@
 /**
- * \addtogroup loader
+ * @addtogroup loader
  * @{
  */
 
@@ -31,17 +31,17 @@
  */
 
 /**
- * \file
+ * @file
  *         Header file for the Contiki ELF loader.
- * \author
+ * @author
  *         Adam Dunkels <adam@sics.se> (Contiki)
  *
  * Adopted for RIOT:
  *
- * \author      Simon Gene Gottlieb <s.gottlieb@fu-berlin.de>
- * \author      Dimitri Schachmann <d.schachmann@fu-berlin.de>
- * \author      Ron Wenzel <ron.wenzel@fu-berlin.de>
- * \author      Christopher Pockrandt <christopher.pockrandt@fu-berlin.de>
+ * @author      Simon Gene Gottlieb <s.gottlieb@fu-berlin.de>
+ * @author      Dimitri Schachmann <d.schachmann@fu-berlin.de>
+ * @author      Ron Wenzel <ron.wenzel@fu-berlin.de>
+ * @author      Christopher Pockrandt <christopher.pockrandt@fu-berlin.de>
  *
  */
 
@@ -130,17 +130,17 @@
 typedef int (*process_t)(void);
 
 /**
- * \brief      Load and relocate an ELF file.
- * \param objPtr
+ * @brief      Load and relocate an ELF file.
+ * @param objPtr
  *             A pointer to the object file. This pointer needs to be
  *             aligned according to platform flash
  *             requirements. Usually word size.
 
- * \param entry_point_name
+ * @param entry_point_name
  *             Name of the symbol for wich the address is written to
  *             elfloader_process parameter.
  *
- * \return     ELFLOADER_OK if loading and relocation worked.
+ * @return     ELFLOADER_OK if loading and relocation worked.
  *             Otherwise an error value.
  *
  *             This function loads and relocates an ELF file.
@@ -148,7 +148,7 @@ typedef int (*process_t)(void);
  *             If the function is able to load the ELF file, a pointer
  *             to the entry_point_name is written to elfloader_process.
  *
- * \note
+ * @note
  *             This function modifies the ELF file.  If the contents
  *             of the file is required to be intact, the file must be
  *             backed up first.
