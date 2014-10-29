@@ -46,6 +46,12 @@
 
 #include "kernel_types.h"
 
+
+/**
+ * Prototype for native's internal callbacks
+ */
+typedef void (*_native_callback_t)(void);
+
 /**
  * internal functions
  */
@@ -120,7 +126,7 @@ ssize_t _native_write(int fd, const void *buf, size_t count);
 /**
  * register interrupt handler handler for interrupt sig
  */
-int register_interrupt(int sig, void (*handler)(void));
+int register_interrupt(int sig, _native_callback_t handler);
 
 /**
  * unregister interrupt handler for interrupt sig
