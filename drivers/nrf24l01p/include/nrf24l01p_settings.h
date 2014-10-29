@@ -22,6 +22,10 @@
 #ifndef __NRF24L01P_SETTINGS_H
 #define __NRF24L01P_SETTINGS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #define SPI_PORT  SPI_0
 #define CE_PIN    GPIO_8
@@ -124,5 +128,8 @@
 #define FEATURE_EN_ACK_PAY      (1 << 1)
 #define FEATURE_EN_DYN_ACK      (1 << 0)
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NRF24L01P_SETTINGS_H */

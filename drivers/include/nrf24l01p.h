@@ -22,6 +22,11 @@
 #ifndef __NRF24L01P_H
 #define __NRF24L01P_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include <stdint.h>
 #include <stdio.h>
 #include "periph/gpio.h"
@@ -614,6 +619,10 @@ void nrf24l01p_rx_cb(void *arg);
 extern nrf24l01p_t nrf24l01p_dev_hw;
 
 extern netdev_t nrf24l01p_netdev;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NRF24L01P_H */
 /** @} */
