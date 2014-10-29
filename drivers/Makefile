@@ -46,5 +46,8 @@ endif
 ifneq (,$(filter isl29020,$(USEMODULE)))
     DIRS += isl29020
 endif
+ifneq (,$(filter nrf24l01p,$(USEMODULE)))
+    DIRS += nrf24l01p
+endif
 
 include $(RIOTBASE)/Makefile.base

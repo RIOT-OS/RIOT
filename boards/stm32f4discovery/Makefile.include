@@ -47,3 +47,10 @@ endif
 
 # export board specific includes to the global includes-listing
 export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
+
+ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
+    USEMODULE += nrf24l01p
+    ifeq (,$(filter netdev_base,$(USEMODULE)))
+        USEMODULE += transceiver
+    endif
+endif

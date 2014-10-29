@@ -73,6 +73,7 @@ typedef enum {
     NETDEV_PROTO_UDP            = 0x0005,   /**< UDP. */
     NETDEV_PROTO_TCP            = 0x0006,   /**< TCP. */
     NETDEV_PROTO_CCNL           = 0x0007,   /**< CCN lite. */
+    NETDEV_PROTO_NRF24L01X      = 0x0008,   /**< Proprietary protocol for nrf24l01+ transceiver. */
 } netdev_proto_t;
 
 /**
@@ -94,13 +95,22 @@ typedef enum {
     NETDEV_OPT_CHANNEL,             /**< Channel for the device as unsigned value
                                          in host byte order */
     NETDEV_OPT_ADDRESS,             /**< Hardware address for the device as
-                                         unsigned value in host byte order */
+                                         unsigned value in host byte order. If the 
+                                         radio uses full-duplex addressing 
+                                         NETDEV_OPT_ADDRESS sets a suffix for the 
+                                         two addresses */
     NETDEV_OPT_NID,                 /**< Network ID (e.g. PAN ID in IEEE 802.15.4)
                                          for the device as unsigned value in
                                          host byte order */
     NETDEV_OPT_ADDRESS_LONG,        /**< Longer hardware address for the device
                                          (e.g. EUI-64) for the device as
                                          unsigned value in host byte order */
+    NETDEV_OPT_ADDRESS_TX_PREFIX,   /**< If the radio uses full-duplex addressing 
+                                         NETDEV_OPT_ADDRESS_TX_PREFIX sets the
+                                         transmit address separately */
+    NETDEV_OPT_ADDRESS_RX_PREFIX,   /**< If the radio uses full-duplex addressing 
+                                         NETDEV_OPT_ADDRESS_RX_PREFIX sets the
+                                         receive address separately */
     NETDEV_OPT_TX_POWER,            /**< The output of the device in dB as
                                          signed value in host byte order */
     NETDEV_OPT_MAX_PACKET_SIZE,     /**< Maximum packet size the device supports
@@ -114,6 +124,7 @@ typedef enum {
      *          or equal to @ref NETDEV_OPT_LAST.
      */
     NETDEV_OPT_LAST,
+
 } netdev_opt_t;
 
 /**

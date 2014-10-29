@@ -13,3 +13,7 @@ endif
 ifneq (,$(filter isl29020,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/isl29020/include
 endif
+ifneq (,$(filter nrf24l01p,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/nrf24l01p/include
+    FEATURES_PROVIDED += transceiver
+endif

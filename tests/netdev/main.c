@@ -18,7 +18,8 @@
  *
  * @}
  */
-
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -156,17 +157,23 @@ static int check_channel(void)
  ***********************************/
 static int init_address(void)
 {
+#ifdef MODULE_NRF24L01P
+    uint32_t address = NETDEV_TEST_ADDRESS;
+    int res = dev->driver->set_option(dev, NETDEV_OPT_ADDRESS,
+                                      &address, sizeof(uint32_t));
+#else
     uint8_t address = NETDEV_TEST_ADDRESS;
     int res = dev->driver->set_option(dev, NETDEV_OPT_ADDRESS,
                                       &address, sizeof(uint8_t));
+#endif
 
     switch (res) {
         case 0:
-            printf("Address was set to %" PRIu8 "\n", address);
+            printf("Address was set to %" PRIu32 "\n", address);
             return 1;
 
         case -EINVAL:
-            printf("Address %" PRIu8 " not supported\n", address);
+            printf("Address %" PRIu32 " not supported\n", address);
             break;
 
         case -ENODEV:
@@ -363,7 +370,7 @@ static int check_long_address(void)
                 case 8:
                     do {
                         uint64_t *a = (uint64_t *)address;
-                        printf("Got long address of value 0x%" PRIx64 " of length %u\n",
+                        printf("Got long address of value 0x%" PRIu64 " of length %u\n",
                                *a, address_len);
                         return (*a == NETDEV_TEST_ADDRESS) ? 1 : 0;
                     } while (0);
@@ -642,6 +649,10 @@ static int check_protocol(void)
 
                 case NETDEV_PROTO_CCNL:
                     puts("Got protocol: CCN lite");
+                    return 1;
+
+                case NETDEV_PROTO_NRF24L01X:
+                    puts("Got protocol: NRF24L01X transceiver");
                     return 1;
 
                 default:
@@ -942,7 +953,7 @@ static int test_callback(netdev_t *rcv_dev, void *src, size_t src_len,
 
             break;
     }
-
+#ifndef MODULE_NRF24L01P
     if (src_len != dev_address_len || memcmp(exp_src, src, src_len) != 0) {
         printf("cb: src is not from sender %d\n", NETDEV_TEST_SENDER);
         return -EINVAL;
@@ -957,7 +968,7 @@ static int test_callback(netdev_t *rcv_dev, void *src, size_t src_len,
         puts("cb: payload is not as expected (\"header 1,header 2,payload\")");
         return -EINVAL;
     }
-
+#endif
     printf("Received \"");
 
     for (size_t i = 0; i < payload_len; i++) {
@@ -968,8 +979,13 @@ static int test_callback(netdev_t *rcv_dev, void *src, size_t src_len,
 
     printf("Sender was");
 
-    for (size_t i = 0; i < src_len; i++) {
-        printf(" %02x", ((char *)src)[i]);
+    if (src_len !=0) {
+        for (size_t i = 0; i < src_len; i++) {
+            printf(" %02x", ((char *)src)[i]);
+        }
+    }
+    else {
+            printf(" not known");
     }
 
     printf("\n");

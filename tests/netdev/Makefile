@@ -14,10 +14,17 @@ USEMODULE += netdev_base
 
 DISABLE_MODULE += auto_init
 
+ifneq (,$(filter stm32f4discovery,$(BOARD)))
+CHANNEL ?= 1
+SENDER_ADDRESS ?= 1
+RECEIVER_ADDRESS ?= 1
+NID ?= 0
+else
 CHANNEL ?= 1
 SENDER_ADDRESS ?= 1
 RECEIVER_ADDRESS ?= 2
 NID ?= 0
+endif
 
 ifeq (native,$(BOARD))
     RECEIVER_PORT ?= tap0
