@@ -34,6 +34,8 @@
 #include <string.h>
 #include "elfloader-arch.h"
 
+#define MSP430_SEGMENT_SIZE 512
+
 /*----------------------------------------------------------------------------*/
 void
 elfloader_arch_relocate(uint8_t *addr_to_write,
@@ -45,7 +47,7 @@ elfloader_arch_relocate(uint8_t *addr_to_write,
 }
 /*----------------------------------------------------------------------------*/
 int elfloader_arch_get_segment_size(const uint8_t *addr) {
-	return 512;
+	return MSP430_SEGMENT_SIZE;
 }
 /*----------------------------------------------------------------------------*/
 
