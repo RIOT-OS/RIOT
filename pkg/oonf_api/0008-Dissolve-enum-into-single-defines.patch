@@ -1,0 +1,54 @@
+From e590e6f26b115da34a943fd4ed6d4c93fd2c64d0 Mon Sep 17 00:00:00 2001
+From: Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
+Date: Wed, 29 Oct 2014 12:05:11 +0100
+Subject: [PATCH] Dissolve enum into single defines
+
+---
+ src-api/rfc5444/rfc5444.h | 26 ++++++++++++--------------
+ 1 file changed, 12 insertions(+), 14 deletions(-)
+
+diff --git a/src-api/rfc5444/rfc5444.h b/src-api/rfc5444/rfc5444.h
+index c5d6420..6b5576e 100644
+--- a/src-api/rfc5444/rfc5444.h
++++ b/src-api/rfc5444/rfc5444.h
+@@ -43,25 +43,23 @@
+ 
+ #include "common/common_types.h"
+ 
+-enum {
+-  /* timetlv_max = 14 * 2^28 * 1000 / 1024 = 14000 << 18 = 3 670 016 000 ms */
+-  RFC5444_TIMETLV_MAX = 0xdac00000,
++/* timetlv_max = 14 * 2^28 * 1000 / 1024 = 14000 << 18 = 3 670 016 000 ms */
++#define RFC5444_TIMETLV_MAX  0xdac00000
+ 
+-  /* timetlv_min = 1000/1024 ms */
+-  RFC5444_TIMETLV_MIN = 0x00000001,
++/* timetlv_min = 1000/1024 ms */
++#define RFC5444_TIMETLV_MIN 0x00000001
+ 
+-  /* metric_max = 1<<24 - 256 */
+-  RFC5444_METRIC_MAX = 0xffff00,
++/* metric_max = 1<<24 - 256 */
++#define RFC5444_METRIC_MAX 0xffff00
+ 
+-  /* metric_min = 1 */
+-  RFC5444_METRIC_MIN = 0x000001,
++/* metric_min = 1 */
++#define RFC5444_METRIC_MIN 0x000001
+ 
+-  /* larger than possible metric value */
+-  RFC5444_METRIC_INFINITE = 0xffffff,
++/* larger than possible metric value */
++#define RFC5444_METRIC_INFINITE 0xffffff
+ 
+-  /* infinite path cost */
+-  RFC5444_METRIC_INFINITE_PATH = 0xffffffff,
+-};
++/* infinite path cost */
++#define RFC5444_METRIC_INFINITE_PATH 0xffffffff
+ 
+ EXPORT uint8_t rfc5444_timetlv_get_from_vector(
+     uint8_t *vector, size_t vector_length, uint8_t hopcount);
+-- 
+2.1.2
+
