@@ -45,8 +45,7 @@
 
 /*---------------------------------------------------------------------------*/
 #if SYMTAB_CONF_BINARY_SEARCH
-void *
-symtab_lookup(const char *name)
+void * symtab_lookup(const char *name)
 {
 	int start, middle, end;
 	int r;
