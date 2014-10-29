@@ -37,6 +37,7 @@
 #include "thread.h"
 
 #include "native_internal.h"
+#include "native_fildes.h"
 #include "board_internal.h"
 
 #define ENABLE_DEBUG (0)
@@ -44,6 +45,7 @@
 
 int _native_uart_sock;
 int _native_uart_conn;
+_native_fd_t _native_uart_fd = -1;
 
 int _native_replay_enabled;
 FILE *_native_replay_buffer;
@@ -222,6 +224,10 @@ void handle_uart_sock(void)
     }
     else {
         warnx("handle_uart_sock: successfully accepted socket");
+        if (_native_uart_fd != -1) {
+            _native_fd_remove(_native_uart_fd);
+        }
+        _native_uart_fd = _native_fd_add(s);
     }
 
     if (real_dup2(s, STDOUT_FILENO) == -1) {
@@ -301,6 +307,12 @@ void _native_init_uart0(char *stdiotype, char *ioparam, int replay)
         if ((_native_replay_buffer = real_fopen(stdout_logname, "r+")) == NULL) {
             err(EXIT_FAILURE, "_native_init_uart0: fdopen(_native_null_out_file)");
         }
+
+        int fd = real_fileno(_native_replay_buffer);
+        if (fd == -1) {
+            err(EXIT_FAILURE, "_native_init_uart0: fileno(_native_replay_buffer)");
+        }
+        (void) _native_fd_add(fd); /* _native_replay_buffer is not touched again */
     }
 
     if (strcmp(stdiotype, "tcp") == 0) {
@@ -319,6 +331,10 @@ void _native_init_uart0(char *stdiotype, char *ioparam, int replay)
     }
     else {
         errx(EXIT_FAILURE, "_native_init_uart0: unknown stdio type");
+    }
+
+    if (_native_uart_sock != -1) {
+        (void) _native_fd_add(_native_uart_sock); /* don't need this fd */
     }
 
     puts("RIOT native uart0 initialized.");

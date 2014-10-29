@@ -35,6 +35,7 @@
 
 #include "board_internal.h"
 #include "native_internal.h"
+#include "native_fildes.h"
 #include "tap.h"
 
 int _native_null_in_pipe[2];
@@ -56,6 +57,10 @@ void _native_null_in(char *stdiotype)
 {
     if (real_pipe(_native_null_in_pipe) == -1) {
         err(EXIT_FAILURE, "_native_null_in(): pipe()");
+    }
+    else {
+        (void) _native_fd_add(_native_null_in_pipe[0]); /* don't need this fd */
+        (void) _native_fd_add(_native_null_in_pipe[1]); /* don't need this fd */
     }
 
     if (strcmp(stdiotype, "stdio") == 0) {
@@ -85,12 +90,18 @@ void _native_log_stdout(char *stdouttype)
         if ((stdout_outfile = real_open("/dev/null", O_WRONLY)) == -1) {
             err(EXIT_FAILURE, "_native_log_stdout: open");
         }
+        else {
+            (void) _native_fd_add(stdout_outfile); /* don't need this fd */
+        }
     }
     else if (strcmp(stdouttype, "file") == 0) {
         char stdout_logname[255];
         snprintf(stdout_logname, sizeof(stdout_logname), "/tmp/riot.stdout.%d", _native_pid);
         if ((stdout_outfile = real_creat(stdout_logname, 0666)) == -1) {
             err(EXIT_FAILURE, "_native_log_stdout: open");
+        }
+        else {
+            (void) _native_fd_add(stdout_outfile); /* don't need this fd */
         }
     }
     else {
@@ -120,12 +131,18 @@ void _native_log_stderr(char *stderrtype)
         if ((stderr_outfile = real_open("/dev/null", O_WRONLY)) == -1) {
             err(EXIT_FAILURE, "_native_log_stderr: open");
         }
+        else {
+            (void) _native_fd_add(stderr_outfile); /* don't need this fd */
+        }
     }
     else if (strcmp(stderrtype, "file") == 0) {
         char stderr_logname[255];
         snprintf(stderr_logname, sizeof(stderr_logname), "/tmp/riot.stderr.%d", _native_pid);
         if ((stderr_outfile = real_creat(stderr_logname, 0666)) == -1) {
             err(EXIT_FAILURE, "_native_log_stderr: open");
+        }
+        else {
+            (void) _native_fd_add(stderr_outfile); /* don't need this fd */
         }
     }
     else {

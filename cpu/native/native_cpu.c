@@ -53,6 +53,7 @@
 #endif
 
 #include "native_internal.h"
+#include "native_fildes.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -71,9 +72,7 @@ int reboot_arch(int mode)
     dINT();
 
     printf("\n\n\t\t!! REBOOT !!\n\n");
-#ifdef MODULE_UART0
-    /* TODO: close stdio fds */
-#endif
+    _native_fd_close_all();
 #ifdef MODULE_NATIVENET
     if (_native_tap_fd != -1) {
         real_close(_native_tap_fd);
