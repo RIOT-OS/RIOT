@@ -45,16 +45,22 @@ void thread_print_all(void)
     int overall_stacksz = 0, overall_used = 0;
 #endif
 
-    printf("\tpid | %-21s| %-9sQ | pri | "
+    printf("\tpid | "
 #ifdef DEVELHELP
-           "stack ( used) "
+            "%-21s| "
 #endif
-           "location"
+            "%-9sQ | pri "
+#ifdef DEVELHELP
+           "| stack ( used) | location   "
+#endif
 #if SCHEDSTATISTICS
-           "  | runtime | switches"
+           "| runtime | switches"
 #endif
-           "\n"
-           , "name", "state");
+           "\n",
+#ifdef DEVELHELP
+           "name",
+#endif
+           "state");
 
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
         tcb_t *p = (tcb_t *)sched_threads[i];
@@ -73,13 +79,16 @@ void thread_print_all(void)
             double runtime_ticks =  sched_pidlist[i].runtime_ticks / (double) hwtimer_now() * 100;
             int switches = sched_pidlist[i].schedules;
 #endif
-            printf("\t%3u | "
+            printf("\t%3" PRIkernel_pid
 #ifdef DEVELHELP
-                   "%-21s| %5i (%5i) "
+                   " | %-20s"
 #endif
-                   "%-8s %.1s | %3i"
+                   " | %-8s %.1s | %3i"
+#ifdef DEVELHELP
+                   " | %5i (%5i) | %p "
+#endif
 #if SCHEDSTATISTICS
-                   " | %p | %6.3f%% |  %8d"
+                   " | %6.3f%% |  %8d"
 #endif
                    "\n",
                    p->pid,
