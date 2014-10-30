@@ -16,7 +16,7 @@ QUIET ?= 1
 
 USEPKG += oonf_api
 
-export CFLAGS = -DRIOT -DENABLE_NAME
+export CFLAGS += -DRIOT -DENABLE_NAME
 
 # Modules to include. 
 USEMODULE += rtc
