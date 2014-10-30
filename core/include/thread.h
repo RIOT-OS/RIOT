@@ -125,6 +125,20 @@ void thread_sleep(void);
 void thread_yield(void);
 
 /**
+ * @brief   Lets current thread yield in favor of a higher prioritized thread.
+ *
+ * @details The current thread will resume operation immediately,
+ *          if there is no other ready thread with a higher priority.
+ *
+ *          Differently from thread_yield() the current thread will be scheduled next
+ *          in its own priority class, i.e. it stays the first thread in its
+ *          priority class.
+ *
+ * @see     thread_yield()
+ */
+void thread_yield_higher(void);
+
+/**
  * @brief Wakes up a sleeping thread.
  *
  * @param[in] pid   the PID of the thread to be woken up

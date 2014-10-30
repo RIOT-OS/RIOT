@@ -91,6 +91,18 @@ int thread_wakeup(kernel_pid_t pid)
     }
 }
 
+void thread_yield(void)
+{
+    unsigned old_state = disableIRQ();
+    tcb_t *me = (tcb_t *)sched_active_thread;
+    if (me->status >= STATUS_ON_RUNQUEUE) {
+        clist_advance(&sched_runqueues[me->priority]);
+    }
+    restoreIRQ(old_state);
+
+    thread_yield_higher();
+}
+
 #ifdef DEVELHELP
 uintptr_t thread_measure_stack_free(char *stack)
 {

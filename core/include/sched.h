@@ -154,18 +154,9 @@ extern volatile int sched_num_threads;
 extern volatile kernel_pid_t sched_active_pid;
 
 /**
- * @brief   Lets current thread yield in favor of a higher prioritized thread.
- *
- * @details The current thread will resume operation immediately,
- *          if there is no other ready thread with a higher priority.
- *
- *          Differently from thread_yield() the current thread will be scheduled next
- *          in its own priority class, i.e. it stays the first thread in its
- *          priority class.
- *
- * @see     thread_yield()
+ * List of runqueues per priority level
  */
-void thread_yield_higher(void);
+extern clist_node_t *sched_runqueues[SCHED_PRIO_LEVELS];
 
 #if SCHEDSTATISTICS
 /**
