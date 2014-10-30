@@ -103,6 +103,7 @@ static void init(void) {
 
 	rtc_enable();
 	genrand_init(get_node_id());
+	net_if_set_src_address_mode(IF_ID, NET_IF_TRANS_ADDR_M_SHORT);
 	net_if_set_hardware_address(IF_ID, get_node_id());
 
 	ipv6_addr_set_link_local_prefix(&tmp);
