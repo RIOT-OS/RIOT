@@ -19,6 +19,10 @@
 
 #include "auto_init.h"
 
+#ifdef MODULE_CONFIG
+#include "config.h"
+#endif
+
 #ifdef MODULE_SHT11
 #include "sht11.h"
 #endif
@@ -187,6 +191,11 @@ void auto_init_net_if(void)
 
 void auto_init(void)
 {
+#ifdef MODULE_CONFIG
+    DEBUG("Auto init loading config\n");
+    config_load();
+#endif
+
 #ifdef MODULE_VTIMER
     DEBUG("Auto init vtimer module.\n");
     vtimer_init();
