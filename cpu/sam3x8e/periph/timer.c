@@ -23,7 +23,8 @@
 
 #include "board.h"
 #include "cpu.h"
-
+#include "sched.h"
+#include "thread.h"
 #include "periph/timer.h"
 #include "periph_conf.h"
 
@@ -35,7 +36,7 @@ typedef struct {
 /**
  * @brief Timer state memory
  */
-timer_conf_t config[TIMER_NUMOF];
+static timer_conf_t timer_config[TIMER_NUMOF];
 
 
 /**
@@ -90,7 +91,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     }
 
     /* save callback */
-    config[dev].cb = callback;
+    timer_config[dev].cb = callback;
 
     /* configure the timer block by connecting TIOA2 to XC0 and XC1 */
     tim->TC_BMR = TC_BMR_TC0XC0S_TIOA2 | TC_BMR_TC1XC1S_TIOA2;
@@ -398,42 +399,46 @@ void timer_reset(tim_t dev)
 
 
 #if TIMER_0_EN
-__attribute__ ((naked))
-void TIMER_0_ISR1(void)
+__attribute__ ((naked)) void TIMER_0_ISR1(void)
 {
     ISR_ENTER();
     uint32_t status = TIMER_0_DEV->TC_CHANNEL[0].TC_SR;
     if (status & TC_SR_CPAS) {
         TIMER_0_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPAS;
-        config[TIMER_0].cb(0);
+        timer_config[TIMER_0].cb(0);
     }
     else if (status & TC_SR_CPBS) {
         TIMER_0_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPBS;
-        config[TIMER_0].cb(1);
+        timer_config[TIMER_0].cb(1);
     }
     else if (status & TC_SR_CPCS) {
         TIMER_0_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPCS;
-        config[TIMER_0].cb(2);
+        timer_config[TIMER_0].cb(2);
+    }
+    if (sched_context_switch_request) {
+        thread_yield();
     }
     ISR_EXIT();
 }
 
-__attribute__ ((naked))
-void TIMER_0_ISR2(void)
+__attribute__ ((naked)) void TIMER_0_ISR2(void)
 {
     ISR_ENTER();
     uint32_t status = TIMER_0_DEV->TC_CHANNEL[1].TC_SR;
     if (status & TC_SR_CPAS) {
         TIMER_0_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPAS;
-        config[TIMER_0].cb(3);
+        timer_config[TIMER_0].cb(3);
     }
     else if (status & TC_SR_CPBS) {
         TIMER_0_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPBS;
-        config[TIMER_0].cb(4);
+        timer_config[TIMER_0].cb(4);
     }
     else if (status & TC_SR_CPCS) {
         TIMER_0_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPCS;
-        config[TIMER_0].cb(5);
+        timer_config[TIMER_0].cb(5);
+    }
+    if (sched_context_switch_request) {
+        thread_yield();
     }
     ISR_EXIT();
 }
@@ -441,42 +446,46 @@ void TIMER_0_ISR2(void)
 
 
 #if TIMER_1_EN
-__attribute__ ((naked))
-void TIMER_1_ISR1(void)
+__attribute__ ((naked)) void TIMER_1_ISR1(void)
 {
     ISR_ENTER();
     uint32_t status = TIMER_1_DEV->TC_CHANNEL[0].TC_SR;
     if (status & TC_SR_CPAS) {
         TIMER_1_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPAS;
-        config[TIMER_1].cb(0);
+        timer_config[TIMER_1].cb(0);
     }
     if (status & TC_SR_CPBS) {
         TIMER_1_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPBS;
-        config[TIMER_1].cb(1);
+        timer_config[TIMER_1].cb(1);
     }
     if (status & TC_SR_CPCS) {
         TIMER_1_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPCS;
-        config[TIMER_1].cb(2);
+        timer_config[TIMER_1].cb(2);
+    }
+    if (sched_context_switch_request) {
+        thread_yield();
     }
     ISR_EXIT();
 }
 
-__attribute__ ((naked))
-void TIMER_1_ISR2(void)
+__attribute__ ((naked)) void TIMER_1_ISR2(void)
 {
     ISR_ENTER();
     uint32_t status = TIMER_1_DEV->TC_CHANNEL[1].TC_SR;
     if (status & TC_SR_CPAS) {
         TIMER_1_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPAS;
-        config[TIMER_1].cb(3);
+        timer_config[TIMER_1].cb(3);
     }
     if (status & TC_SR_CPBS) {
         TIMER_1_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPBS;
-        config[TIMER_1].cb(4);
+        timer_config[TIMER_1].cb(4);
     }
     if (status & TC_SR_CPCS) {
         TIMER_1_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPCS;
-        config[TIMER_1].cb(5);
+        timer_config[TIMER_1].cb(5);
+    }
+    if (sched_context_switch_request) {
+        thread_yield();
     }
     ISR_EXIT();
 }
@@ -484,42 +493,46 @@ void TIMER_1_ISR2(void)
 
 
 #if TIMER_2_EN
-__attribute__ ((naked))
-void TIMER_2_ISR1(void)
+__attribute__ ((naked)) void TIMER_2_ISR1(void)
 {
     ISR_ENTER();
     uint32_t status = TIMER_2_DEV->TC_CHANNEL[0].TC_SR;
     if (status & TC_SR_CPAS) {
         TIMER_2_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPAS;
-        config[TIMER_2].cb(0);
+        timer_config[TIMER_2].cb(0);
     }
     else if (status & TC_SR_CPBS) {
         TIMER_2_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPBS;
-        config[TIMER_2].cb(1);
+        timer_config[TIMER_2].cb(1);
     }
     else if (status & TC_SR_CPCS) {
         TIMER_2_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPCS;
-        config[TIMER_2].cb(2);
+        timer_config[TIMER_2].cb(2);
+    }
+    if (sched_context_switch_request) {
+        thread_yield();
     }
     ISR_EXIT();
 }
 
-__attribute__ ((naked))
-void TIMER_2_ISR2(void)
+__attribute__ ((naked)) void TIMER_2_ISR2(void)
 {
     ISR_ENTER();
     uint32_t status = TIMER_2_DEV->TC_CHANNEL[1].TC_SR;
     if (status & TC_SR_CPAS) {
         TIMER_2_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPAS;
-        config[TIMER_2].cb(3);
+        timer_config[TIMER_2].cb(3);
     }
     else if (status & TC_SR_CPBS) {
         TIMER_2_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPBS;
-        config[TIMER_2].cb(4);
+        timer_config[TIMER_2].cb(4);
     }
     else if (status & TC_SR_CPCS) {
         TIMER_2_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPCS;
-        config[TIMER_2].cb(5);
+        timer_config[TIMER_2].cb(5);
+    }
+    if (sched_context_switch_request) {
+        thread_yield();
     }
     ISR_EXIT();
 }
