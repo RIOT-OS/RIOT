@@ -129,6 +129,54 @@
 #if GPIO_NUMOF > 15
 #   define GPIO_15_EN   (1)
 #endif
+#if GPIO_NUMOF > 16
+#   define GPIO_16_EN   (1)
+#endif
+#if GPIO_NUMOF > 17
+#   define GPIO_17_EN   (1)
+#endif
+#if GPIO_NUMOF > 18
+#   define GPIO_18_EN   (1)
+#endif
+#if GPIO_NUMOF > 19
+#   define GPIO_19_EN   (1)
+#endif
+#if GPIO_NUMOF > 20
+#   define GPIO_20_EN   (1)
+#endif
+#if GPIO_NUMOF > 21
+#   define GPIO_21_EN   (1)
+#endif
+#if GPIO_NUMOF > 22
+#   define GPIO_22_EN   (1)
+#endif
+#if GPIO_NUMOF > 23
+#   define GPIO_23_EN   (1)
+#endif
+#if GPIO_NUMOF > 24
+#   define GPIO_24_EN   (1)
+#endif
+#if GPIO_NUMOF > 25
+#   define GPIO_25_EN   (1)
+#endif
+#if GPIO_NUMOF > 26
+#   define GPIO_26_EN   (1)
+#endif
+#if GPIO_NUMOF > 27
+#   define GPIO_27_EN   (1)
+#endif
+#if GPIO_NUMOF > 28
+#   define GPIO_28_EN   (1)
+#endif
+#if GPIO_NUMOF > 29
+#   define GPIO_29_EN   (1)
+#endif
+#if GPIO_NUMOF > 30
+#   define GPIO_30_EN   (1)
+#endif
+#if GPIO_NUMOF > 31
+#   define GPIO_31_EN   (1)
+#endif
 
 #else                                   /* no GPIO device */
 #define GPIO_NUMOF (0)
