@@ -23,7 +23,7 @@
 #include "net_if.h"
 #include "net_help.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 #endif
@@ -407,7 +407,6 @@ int net_if_register(int if_id, kernel_pid_t pid)
 int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation)
 {
     uint64_t tmp;
-
     if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Get EUI-64: No interface initialized with ID %d.\n", if_id);
         return 0;
@@ -446,8 +445,7 @@ int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation)
             return 0;
         }
 
-    }
-
+    }    
     return 1;
 }
 

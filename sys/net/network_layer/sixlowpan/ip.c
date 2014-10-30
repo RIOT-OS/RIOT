@@ -34,7 +34,7 @@
 
 #include "net_help.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
@@ -633,7 +633,7 @@ ipv6_addr_t *ipv6_addr_set_by_eui64(ipv6_addr_t *out, int if_id,
 
 #else
         out->uint8[8] ^= 0x02;
-#endif
+#endif        
         return out;
     }
     else {

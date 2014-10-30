@@ -29,7 +29,7 @@
 #include "hwtimer.h"
 #include "hwtimer.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 static uint16_t radio_pan;
@@ -195,10 +195,8 @@ int8_t at86rf231_set_channel(uint8_t channel)
 #endif
         return -1;
     }
-
     cca_state = at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA) & ~AT86RF231_PHY_CC_CCA_MASK__CHANNEL;
-    at86rf231_reg_write(AT86RF231_REG__PHY_CC_CCA, cca_state | (radio_channel & AT86RF231_PHY_CC_CCA_MASK__CHANNEL));
-
+    at86rf231_reg_write(AT86RF231_REG__PHY_CC_CCA, cca_state | (radio_channel & AT86RF231_PHY_CC_CCA_MASK__CHANNEL));    
     return radio_channel;
 }
 

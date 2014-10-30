@@ -197,7 +197,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     sched_num_threads++;
 
-    DEBUG("Created thread %s. PID: %" PRIkernel_pid ". Priority: %u.\n", name, cb->pid, priority);
+    DEBUG("Created thread %s. PID: %" PRIkernel_pid ". Priority: %u. StackPtr: %x \n", name, cb->pid, priority, cb->stack_start);
 
     if (flags & CREATE_SLEEPING) {
         sched_set_status(cb, STATUS_SLEEPING);

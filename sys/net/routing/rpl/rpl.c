@@ -87,6 +87,8 @@ uint8_t rpl_init(int if_id)
     rpl_objective_functions[1] = rpl_get_of_mrhof();
 
     sixlowpan_lowpan_init_interface(if_id);
+    DEBUG("sixlowpan_lowpan_init_interface \n");
+    
     /* need link local prefix to query _our_ corresponding address  */
     ipv6_addr_t my_address;
     ipv6_addr_t ll_address;

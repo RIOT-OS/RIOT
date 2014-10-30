@@ -60,11 +60,11 @@
 #include "ieee802154_frame.h"
 #endif
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
 //#define DEBUG_ENABLED
 #undef TRANSCEIVER_STACK_SIZE
-#define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_MAIN)
+#define TRANSCEIVER_STACK_SIZE      (1024)
 #endif
 #include "debug.h"
 
@@ -290,7 +290,6 @@ static void *run(void *arg)
         /* only makes sense for messages for upper layers */
         transceiver_command_t *cmd = (transceiver_command_t *) m.content.ptr;
         DEBUG("transceiver: Transceiver: Message received, type: %02X\n", m.type);
-
         switch (m.type) {
             case RCV_PKT_CC1020:
             case RCV_PKT_CC1100:
@@ -354,7 +353,7 @@ static void *run(void *arg)
                 msg_reply(&m, &m);
                 break;
 
-            case SET_PAN:
+            case SET_PAN:                
                 *((int32_t *) cmd->data) = set_pan(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;

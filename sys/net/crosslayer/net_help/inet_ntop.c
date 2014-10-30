@@ -15,11 +15,11 @@
  */
 
 #include <stdio.h>
+
 #include <string.h>
 #include <stdint.h>
 
 #include "inet_ntop.h"
-
 /* const char *
  * inet_ntop4(src, dst, size)
  *  format an IPv4 address, more or less like inet_ntoa()
@@ -88,7 +88,6 @@ static const char *inet_ntop6(const unsigned char *src, char *dst, size_t size)
     int i;
     const unsigned char *next_src, *src_end;
     unsigned int *next_dest;
-
     /*
      * Preprocess:
      *  Copy the input (bytewise) array into a wordwise array.
@@ -144,6 +143,7 @@ static const char *inet_ntop6(const unsigned char *src, char *dst, size_t size)
     tp = tmp;
 
     for (i = 0; i < ((int) (IN6ADDRSZ / INT16SZ));) {
+
         /* Are we inside the best run of 0x00's? */
         if (i == best.base) {
             *tp++ = ':';
@@ -169,6 +169,7 @@ static const char *inet_ntop6(const unsigned char *src, char *dst, size_t size)
 
         tp += snprintf(tp, sizeof tmp - (tp - tmp), "%x", words[i]);
         i++;
+
     }
 
     /* Was it a trailing run of 0x00's? */
@@ -186,6 +187,7 @@ static const char *inet_ntop6(const unsigned char *src, char *dst, size_t size)
     }
 
     strcpy(dst, tmp);
+
     return (dst);
 }
 

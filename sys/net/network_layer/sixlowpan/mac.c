@@ -36,13 +36,13 @@
 #include "ieee802154_frame.h"
 #include "net_help.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 #endif
 #include "debug.h"
 
-#define RADIO_STACK_SIZE            (KERNEL_CONF_STACKSIZE_MAIN)
+#define RADIO_STACK_SIZE            (1024)
 #define RADIO_RCV_BUF_SIZE          (64)
 #define RADIO_SENDING_DELAY         (1000)
 

@@ -30,7 +30,7 @@
 #include "rpl_udp.h"
 #include "transceiver.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 #define TRANSCEIVER TRANSCEIVER_DEFAULT
@@ -44,7 +44,7 @@ void rpl_udp_init(int argc, char **argv)
 {
     transceiver_command_t tcmd;
     msg_t m;
-    uint8_t chan = RADIO_CHANNEL;
+    int32_t chan = RADIO_CHANNEL;
 
     if (argc != 2) {
         printf("Usage: %s (r|n)\n", argv[0]);
@@ -94,7 +94,7 @@ void rpl_udp_init(int argc, char **argv)
         DEBUGF("Register at transceiver %02X\n", TRANSCEIVER);
         transceiver_register(TRANSCEIVER, monitor_pid);
         ipv6_register_packet_handler(monitor_pid);
-        //sixlowpan_lowpan_register(monitor_pid);
+        sixlowpan_lowpan_register(monitor_pid);
     }
     else {
         printf("ERROR: Unknown command '%c'\n", command);
@@ -114,7 +114,7 @@ void rpl_udp_init(int argc, char **argv)
     /* set channel to 10 */
     tcmd.transceivers = TRANSCEIVER;
     tcmd.data = &chan;
-    m.type = SET_CHANNEL;
+    m.type = SET_CHANNEL; //SET
     m.content.ptr = (void *) &tcmd;
 
     msg_send_receive(&m, &m, transceiver_pid);

@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = riot_and_cpp
+APPLICATION = beehive
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -52,6 +52,18 @@ BOARD_BLACKLIST := arduino-due avsextrem chronos mbed_lpc1768 msb-430h msba2 red
 
 # If you want to add some extra flags when compile c++ files, add these flags
 # to CXXEXFLAGS variable
-CXXEXFLAGS += -std=gnu++11
+CXXEXFLAGS += -std=gnu++11 -fno-exceptions -funwind-tables
 
+USEMODULE += defaulttransceiver
+USEMODULE += sixlowpan
+USEMODULE += auto_init
+
+USEMODULE += uart0
+USEMODULE += posix
+USEMODULE += vtimer
+USEMODULE += shell
+USEMODULE += shell_commands
+USEMODULE += ps
+USEMODULE += hashes
+USEMODULE += udp
 include $(RIOTBASE)/Makefile.include
