@@ -34,6 +34,11 @@
 #define MSP430_HAS_DCOR             1
 #define MSP430_HAS_EXTERNAL_CRYSTAL 1
 
+/**
+ * @brief Boards has a radio
+ */
+#define HAS_RADIO
+
 typedef uint8_t radio_packet_length_t;
 
 #endif // _MSB_BOARD_H

@@ -41,6 +41,11 @@ void _native_LED_RED_ON(void);
 void _native_LED_RED_TOGGLE(void);
 #define LED_RED_TOGGLE (_native_LED_RED_TOGGLE())
 
+/**
+ * @brief Boards has a radio
+ */
+#define HAS_RADIO
+
 typedef uint16_t radio_packet_length_t;
 
 /** @} */
