@@ -35,11 +35,6 @@
 #define LED_RED_ON (FIO3CLR = LED_RED_PIN)
 #define LED_RED_TOGGLE (FIO3PIN ^= LED_RED_PIN)
 
-/**
- * @brief Boards has a radio
- */
-#define HAS_RADIO
-
 void init_clks1(void);
 
 typedef uint8_t radio_packet_length_t;

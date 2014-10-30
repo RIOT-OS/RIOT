@@ -20,7 +20,7 @@
 
 config_t sysconfig  = {
     0,      /**< default ID */
-#ifdef HAS_RADIO
+#ifdef FEATURE_TRANSCEIVER
     0,      /**< default radio address */
     0,      /**< default radio channel */
 #endif

@@ -29,11 +29,6 @@
 #define IBIAS       0x1f
 #define FTUNE       0x7
 
-/**
- * @brief Boards has a radio
- */
-#define HAS_RADIO
-
 typedef uint8_t radio_packet_length_t;
 
 #endif

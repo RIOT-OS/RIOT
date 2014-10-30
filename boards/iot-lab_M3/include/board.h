@@ -107,11 +107,6 @@
 /** @} */
 
 /**
- * @brief Boards has a radio
- */
-#define HAS_RADIO
-
-/**
  * Define the type for the radio packet length for the transceiver
  */
 typedef uint8_t radio_packet_length_t;
