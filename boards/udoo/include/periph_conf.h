@@ -19,7 +19,6 @@
 #ifndef __PERIPH_CONF_H
 #define __PERIPH_CONF_H
 
-
 /**
  * @name Timer peripheral configuration
  * @{
@@ -51,7 +50,6 @@
 #define TIMER_2_ISR2        isr_tc7
 /** @} */
 
-
 /**
  * @name UART configuration
  * @{
@@ -80,6 +78,34 @@
 #define UART_1_PINS         (GPIO_Pin_2 | GPIO_Pin_3)
 /** @} */
 
+/**
+* @name SPI configuration
+* @{
+*/
+#define SPI_NUMOF           (1U)
+#define SPI_0_EN            1
+
+/* SPI 0 device config */
+#define SPI_0_DEV           SPI0
+#define SPI_0_CLKEN()       (PMC->PMC_PCER0 |= (1 << ID_SPI0));
+#define SPI_0_CLKDIS()      (PMC->PMC_PCER0 &= ~(1 << ID_SPI0));
+#define SPI_0_IRQ           SPI0_IRQn
+#define SPI_0_IRQ_HANDLER   isr_spi0
+#define SPI_0_IRQ_PRIO      1
+
+/* SPI 0 pin configuration */
+#define SPI_0_MISO_PIN      PIO_PA25A_SPI0_MISO
+#define SPI_0_MOSI_PIN      PIO_PA26A_SPI0_MOSI
+#define SPI_0_SCK_PIN       PIO_PA27A_SPI0_SPCK
+
+#define SPI_0_MISO_PORT     PIOA
+#define SPI_0_MOSI_PORT     PIOA
+#define SPI_0_SCK_PORT      PIOA
+
+#define SPI_0_MISO_PORT_CLKEN()  (PMC->PMC_PCER0 |= (1 << ID_PIOA));
+#define SPI_0_MOSI_PORT_CLKEN()  (PMC->PMC_PCER0 |= (1 << ID_PIOA));
+#define SPI_0_SCK_PORT_CLKEN()   (PMC->PMC_PCER0 |= (1 << ID_PIOA));
+/** @} */
 
 /**
  * @name GPIO configuration
