@@ -18,8 +18,10 @@
  * @}
  */
 
+#include <stdio.h>
 #include <stdint.h>
 
+#include "board.h"
 
 /**
  * memory markers as defined in the linker script
@@ -101,7 +103,13 @@ void isr_debug_mon(void)
 
 void isr_hard_fault(void)
 {
-    while (1) {asm ("nop");}
+    puts("\n### HARD FAULT ###\n");
+    while (1) {
+        LED_RED_TOGGLE;
+        for (int i = 0; i < 2000000; i++) {
+            asm ("nop");
+        }
+    }
 }
 
 void isr_bus_fault(void)
