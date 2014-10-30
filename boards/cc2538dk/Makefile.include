@@ -15,9 +15,21 @@ export OBJCOPY = $(PREFIX)objcopy
 export OBJDUMP = $(PREFIX)objdump
 
 export TERMPROG  ?= $(RIOTBASE)/dist/tools/pyterm/pyterm
+export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
+export DEBUGSERVER = JLinkGDBServer -device CC2538SF53
+export RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
 
 # Define the flash-tool and default port:
-export FLASHER   ?= python $(RIOTBOARD)/$(BOARD)/dist/cc2538-bsl.py
+export PROGRAMMER ?= cc2538-bsl
+
+ifeq ($(PROGRAMMER),cc2538-bsl)
+  export FLASHER = python $(RIOTBOARD)/$(BOARD)/dist/cc2538-bsl.py
+  export FFLAGS  = -p "$(PORT)" -e -w -v $(HEXFILE)
+else ifeq ($(PROGRAMMER),jlink)
+  export FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flash.sh
+  export FFLAGS  = $(BINDIR) $(HEXFILE)
+endif
+
 export PORT      ?= /dev/ttyUSB1
 
 # Define build specific options:
@@ -27,8 +39,10 @@ export ASFLAGS   += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
 export CFLAGS    += $(ASFLAGS) -std=gnu99 -mthumb -mthumb-interwork -nostartfiles -Os -Wall -Wstrict-prototypes -ffunction-sections -fdata-sections -fno-builtin
 export LINKFLAGS += $(CFLAGS) -static -lgcc -T$(LINKERSCRIPT) -L$(RIOTCPU)/$(CPU)
 export OFLAGS    += -O binary --gap-fill 0xff
-export FFLAGS    += -p "$(PORT)" -e -w -v bin/$(BOARD)/$(APPLICATION).hex
+export HEXFILE = $(ELFFILE:.elf=.bin)
 export TERMFLAGS += -p "$(PORT)"
+export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
+export RESET_FLAGS = $(BINDIR)
 
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
