@@ -20,6 +20,9 @@
 #define CONFIG_H
 
 #include <stdint.h>
+#ifdef HAS_RADIO
+#include "radio/types.h"
+#endif
 
 #ifdef __cplusplus
  extern "C" {
@@ -37,16 +40,21 @@ extern char configmem[];
  * @brief  Stores configuration data of the node.
  */
 typedef struct {
-    uint16_t id;                /**< unique node identifier          */
-    uint8_t radio_address;      /**< address for radio communication */
-    uint8_t radio_channel;      /**< current frequency               */
-    char name[CONFIG_NAME_LEN]; /**< name of the node                */
+    /* cppcheck-suppress unusedStructMember : is used in sys/shell/commands/sc_id.c  */
+    uint16_t id;                    /**< unique node identifier          */
+#ifdef HAS_RADIO
+    radio_address_t radio_address;  /**< address for radio communication */
+    uint8_t radio_channel;          /**< current frequency               */
+#endif
+    /* cppcheck-suppress unusedStructMember : useful for debug purposes */
+    char name[CONFIG_NAME_LEN];     /**< name of the node                */
 } config_t;
 
 /**
  * @brief  Element to store in flashrom.
  */
 typedef struct {
+    /* cppcheck-suppress unusedStructMember : magic_key is only read directly from ROM */
     uint16_t magic_key;         /**< validity check           */
     config_t config;            /**< the node's configuration */
 } configmem_t;
