@@ -70,6 +70,14 @@
 /** @} */
 
 /**
+ * @name Define the interface to the LPS331AP pressure sensor
+ * @{
+ */
+#define LPS331AP_I2C        I2C_0
+#define LPS331AP_ADDR       0x5c
+/** @} */
+
+/**
  * @name LED pin definitions
  * @{
  */
