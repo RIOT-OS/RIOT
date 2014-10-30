@@ -77,7 +77,6 @@ void reset_handler(void)
 /**
  * @brief Default handler is called in case no interrupt handler was defined
  */
-__attribute__((naked))
 void dummy_handler(void)
 {
     while (1) {
@@ -85,7 +84,6 @@ void dummy_handler(void)
     }
 }
 
-__attribute__((naked))
 void isr_nmi(void)
 {
     while (1) {
@@ -93,7 +91,6 @@ void isr_nmi(void)
     }
 }
 
-__attribute__((naked))
 void isr_mem_manage(void)
 {
     while (1) {
@@ -101,7 +98,6 @@ void isr_mem_manage(void)
     }
 }
 
-__attribute__((naked))
 void isr_debug_mon(void)
 {
     while (1) {
@@ -109,7 +105,6 @@ void isr_debug_mon(void)
     }
 }
 
-__attribute__((naked))
 void isr_hard_fault(void)
 {
     while (1) {
@@ -117,7 +112,6 @@ void isr_hard_fault(void)
     }
 }
 
-__attribute__((naked))
 void isr_bus_fault(void)
 {
     while (1) {
@@ -125,7 +119,6 @@ void isr_bus_fault(void)
     }
 }
 
-__attribute__((naked))
 void isr_usage_fault(void)
 {
     while (1) {

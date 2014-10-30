@@ -288,20 +288,16 @@ void timer_reset(tim_t dev)
 }
 
 #if TIMER_0_EN
-__attribute__ ((naked)) void TIMER_0_ISR(void)
+void TIMER_0_ISR(void)
 {
-    ISR_ENTER();
     irq_handler(TIMER_0, TIMER_0_DEV);
-    ISR_EXIT();
 }
 #endif
 
 #if TIMER_1_EN
-__attribute__ ((naked)) void TIMER_1_ISR(void)
+void TIMER_1_ISR(void)
 {
-    ISR_ENTER();
     irq_handler(TIMER_1, TIMER_1_DEV);
-    ISR_EXIT();
 }
 #endif
 

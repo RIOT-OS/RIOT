@@ -785,9 +785,8 @@ void gpio_write(gpio_t dev, int value)
     }
 }
 
-__attribute__((naked)) void isr_pioa(void)
+void isr_pioa(void)
 {
-    ISR_ENTER();
     uint32_t status = PIOA->PIO_ISR;
 #ifdef GPIO_A0_MAP
     if (status & (1 << 0)) {
@@ -952,12 +951,10 @@ __attribute__((naked)) void isr_pioa(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 
-__attribute__((naked)) void isr_piob(void)
+void isr_piob(void)
 {
-    ISR_ENTER();
     uint32_t status = PIOB->PIO_ISR;
 #ifdef GPIO_B0_MAP
     if (status & (1 << 0)) {
@@ -1122,12 +1119,10 @@ __attribute__((naked)) void isr_piob(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 
-__attribute__((naked)) void isr_pioc(void)
+void isr_pioc(void)
 {
-    ISR_ENTER();
     uint32_t status = PIOC->PIO_ISR;
 #ifdef GPIO_C0_MAP
     if (status & (1 << 0)) {
@@ -1292,13 +1287,10 @@ __attribute__((naked)) void isr_pioc(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-
-    ISR_EXIT();
 }
 
-__attribute__((naked)) void isr_piod(void)
+void isr_piod(void)
 {
-    ISR_ENTER();
     uint32_t status = PIOD->PIO_ISR;
 #ifdef GPIO_D0_MAP
     if (status & (1 << 0)) {
@@ -1463,7 +1455,6 @@ __attribute__((naked)) void isr_piod(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 
 #endif /* GPIO_NUMOF */

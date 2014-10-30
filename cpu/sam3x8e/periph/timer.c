@@ -399,9 +399,8 @@ void timer_reset(tim_t dev)
 
 
 #if TIMER_0_EN
-__attribute__ ((naked)) void TIMER_0_ISR1(void)
+void TIMER_0_ISR1(void)
 {
-    ISR_ENTER();
     uint32_t status = TIMER_0_DEV->TC_CHANNEL[0].TC_SR;
     if (status & TC_SR_CPAS) {
         TIMER_0_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPAS;
@@ -418,12 +417,10 @@ __attribute__ ((naked)) void TIMER_0_ISR1(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 
-__attribute__ ((naked)) void TIMER_0_ISR2(void)
+void TIMER_0_ISR2(void)
 {
-    ISR_ENTER();
     uint32_t status = TIMER_0_DEV->TC_CHANNEL[1].TC_SR;
     if (status & TC_SR_CPAS) {
         TIMER_0_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPAS;
@@ -440,15 +437,13 @@ __attribute__ ((naked)) void TIMER_0_ISR2(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 #endif /* TIMER_0_EN */
 
 
 #if TIMER_1_EN
-__attribute__ ((naked)) void TIMER_1_ISR1(void)
+void TIMER_1_ISR1(void)
 {
-    ISR_ENTER();
     uint32_t status = TIMER_1_DEV->TC_CHANNEL[0].TC_SR;
     if (status & TC_SR_CPAS) {
         TIMER_1_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPAS;
@@ -465,12 +460,10 @@ __attribute__ ((naked)) void TIMER_1_ISR1(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 
-__attribute__ ((naked)) void TIMER_1_ISR2(void)
+void TIMER_1_ISR2(void)
 {
-    ISR_ENTER();
     uint32_t status = TIMER_1_DEV->TC_CHANNEL[1].TC_SR;
     if (status & TC_SR_CPAS) {
         TIMER_1_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPAS;
@@ -487,15 +480,13 @@ __attribute__ ((naked)) void TIMER_1_ISR2(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 #endif /* TIMER_1_EN */
 
 
 #if TIMER_2_EN
-__attribute__ ((naked)) void TIMER_2_ISR1(void)
+void TIMER_2_ISR1(void)
 {
-    ISR_ENTER();
     uint32_t status = TIMER_2_DEV->TC_CHANNEL[0].TC_SR;
     if (status & TC_SR_CPAS) {
         TIMER_2_DEV->TC_CHANNEL[0].TC_IDR = TC_IDR_CPAS;
@@ -512,12 +503,10 @@ __attribute__ ((naked)) void TIMER_2_ISR1(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 
-__attribute__ ((naked)) void TIMER_2_ISR2(void)
+void TIMER_2_ISR2(void)
 {
-    ISR_ENTER();
     uint32_t status = TIMER_2_DEV->TC_CHANNEL[1].TC_SR;
     if (status & TC_SR_CPAS) {
         TIMER_2_DEV->TC_CHANNEL[1].TC_IDR = TC_IDR_CPAS;
@@ -534,6 +523,5 @@ __attribute__ ((naked)) void TIMER_2_ISR2(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 #endif /* TIMER_2_EN */

@@ -297,9 +297,8 @@ void gpio_write(gpio_t dev, int value)
     }
 }
 
-__attribute__((naked)) void isr_gpiote(void)
+void isr_gpiote(void)
 {
-    ISR_ENTER();
     if (NRF_GPIOTE->EVENTS_IN[0] == 1)
     {
         NRF_GPIOTE->EVENTS_IN[0] = 0;
@@ -308,7 +307,6 @@ __attribute__((naked)) void isr_gpiote(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 
 #endif /* GPIO_NUMOF */

@@ -388,116 +388,89 @@ void timer_reset(tim_t dev)
 
 
 #if TIMER_0_EN
-__attribute__((naked))
 void TIMER_0_ISR_1(void)
 {
-    ISR_ENTER();
     if (config[0].cb != NULL) config[0].cb(0);
 
     if (sched_context_switch_request) {
         thread_yield();
     }
 
-    ISR_EXIT();
 }
 
-__attribute__((naked))
 void TIMER_0_ISR_2(void)
 {
-    ISR_ENTER();
     if (config[0].cb != NULL) config[0].cb(1);
 
     if (sched_context_switch_request) {
         thread_yield();
     }
 
-    ISR_EXIT();
 }
 #endif /* TIMER_0_EN */
 
-
 #if TIMER_1_EN
-__attribute__((naked))
 void TIMER_1_ISR_1(void)
 {
-    ISR_ENTER();
     if (config[1].cb != NULL) config[1].cb(0);
 
     if (sched_context_switch_request) {
         thread_yield();
     }
 
-    ISR_EXIT();
 }
 
-__attribute__((naked))
 void TIMER_1_ISR_2(void)
 {
-    ISR_ENTER();
     if (config[1].cb != NULL) config[1].cb(1);
 
     if (sched_context_switch_request) {
         thread_yield();
     }
 
-    ISR_EXIT();
 }
 #endif /* TIMER_1_EN */
 
-
 #if TIMER_2_EN
-__attribute__((naked))
 void TIMER_2_ISR_1(void)
 {
-    ISR_ENTER();
     if (config[2].cb != NULL) config[2].cb(0);
 
     if (sched_context_switch_request) {
         thread_yield();
     }
 
-    ISR_EXIT();
 }
 
-__attribute__((naked))
 void TIMER_2_ISR_2(void)
 {
-    ISR_ENTER();
     if (config[2].cb != NULL) config[2].cb(1);
 
     if (sched_context_switch_request) {
         thread_yield();
     }
 
-    ISR_EXIT();
 }
 #endif /* TIMER_2_EN */
 
-
 #if TIMER_3_EN
-__attribute__((naked))
 void TIMER_3_ISR_1(void)
 {
-    ISR_ENTER();
     if (config[3].cb != NULL) config[3].cb(0);
 
     if (sched_context_switch_request) {
         thread_yield();
     }
 
-    ISR_EXIT();
 }
 
-__attribute__((naked))
 void TIMER_3_ISR_2(void)
 {
-    ISR_ENTER();
     if (config[3].cb != NULL) config[3].cb(1);
 
     if (sched_context_switch_request) {
         thread_yield();
     }
 
-    ISR_EXIT();
 }
 #endif /* TIMER_3_EN */

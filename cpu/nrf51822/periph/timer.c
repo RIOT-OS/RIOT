@@ -349,9 +349,8 @@ void timer_reset(tim_t dev)
 }
 
 #if TIMER_0_EN
-__attribute__((naked)) void TIMER_0_ISR(void)
+void TIMER_0_ISR(void)
 {
-    ISR_ENTER();
     for(int i = 0; i < TIMER_0_CHANNELS; i++){
         if(TIMER_0_DEV->EVENTS_COMPARE[i] == 1){
             TIMER_0_DEV->EVENTS_COMPARE[i] = 0;
@@ -362,14 +361,12 @@ __attribute__((naked)) void TIMER_0_ISR(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 #endif
 
 #if TIMER_1_EN
-__attribute__((naked)) void TIMER_1_ISR(void)
+void TIMER_1_ISR(void)
 {
-    ISR_ENTER();
     for(int i = 0; i < TIMER_1_CHANNELS; i++){
         if(TIMER_1_DEV->EVENTS_COMPARE[i] == 1){
             TIMER_1_DEV->EVENTS_COMPARE[i] = 0;
@@ -380,14 +377,12 @@ __attribute__((naked)) void TIMER_1_ISR(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 #endif
 
 #if TIMER_2_EN
-__attribute__((naked)) void TIMER_2_ISR(void)
+void TIMER_2_ISR(void)
 {
-    ISR_ENTER();
     for(int i = 0; i < TIMER_2_CHANNELS; i++){
         if(TIMER_2_DEV->EVENTS_COMPARE[i] == 1){
             TIMER_2_DEV->EVENTS_COMPARE[i] = 0;
@@ -398,6 +393,5 @@ __attribute__((naked)) void TIMER_2_ISR(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 #endif
