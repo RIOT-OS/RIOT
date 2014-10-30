@@ -34,18 +34,16 @@ kernel_pid_t p_main = KERNEL_PID_UNDEF, p1 = KERNEL_PID_UNDEF,
 
 void *sub_thread(void *arg)
 {
-    (void) arg;
-
     kernel_pid_t pid = thread_getpid();
-    printf("THREAD %s (pid:%" PRIkernel_pid ") start\n", thread_getname(pid), pid);
+    printf("THREAD %s (pid:%" PRIkernel_pid ") start\n", (char*) arg, pid);
 
     msg_t msg;
 
-    msg.content.ptr = (char*)thread_getname(pid);
+    msg.content.ptr = (char*) arg;
 
     msg_send(&msg, p_main);
 
-    printf("THREAD %s (pid:%" PRIkernel_pid ") end.\n", thread_getname(pid), pid);
+    printf("THREAD %s (pid:%" PRIkernel_pid ") end.\n", (char*) arg, pid);
 
     return NULL;
 }
@@ -59,13 +57,13 @@ int main(void)
 
     p1 = thread_create(t1_stack, sizeof(t1_stack), PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                       sub_thread, NULL, "nr1");
+                       sub_thread, "nr1", "nr1");
     p2 = thread_create(t2_stack, sizeof(t2_stack), PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                       sub_thread, NULL, "nr2");
+                       sub_thread, "nr2", "nr2");
     p3 = thread_create(t3_stack, sizeof(t3_stack), PRIORITY_MAIN - 1,
                        CREATE_WOUT_YIELD | CREATE_STACKTEST,
-                       sub_thread, NULL, "nr3");
+                       sub_thread, "nr3", "nr3");
 
     puts("THREADS CREATED\n");
     for(int i = 0; i < 3; i++) {

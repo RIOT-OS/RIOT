@@ -46,11 +46,13 @@ int thread_getstatus(kernel_pid_t pid)
     return t ? t->status : STATUS_NOT_FOUND;
 }
 
+#ifdef DEVELHELP
 const char *thread_getname(kernel_pid_t pid)
 {
     volatile tcb_t *t = thread_get(pid);
     return t ? t->name : NULL;
 }
+#endif
 
 void thread_sleep(void)
 {
@@ -113,6 +115,8 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
 #ifdef DEVELHELP
     int total_stacksize = stacksize;
+#else
+    (void) name;
 #endif
 
     /* align the stack on a 16/32bit boundary */
@@ -174,10 +178,11 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     cb->pid = pid;
     cb->sp = thread_stack_init(function, arg, stack, stacksize);
-    cb->stack_start = stack;
 
 #ifdef DEVELHELP
+    cb->stack_start = stack;
     cb->stack_size = total_stacksize;
+    cb->name = name;
 #endif
 
     cb->priority = priority;
@@ -185,8 +190,6 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     cb->rq_entry.next = NULL;
     cb->rq_entry.prev = NULL;
-
-    cb->name = name;
 
     cb->wait_data = NULL;
 

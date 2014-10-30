@@ -84,13 +84,12 @@ void print_thread_sigmask(ucontext_t *cp)
     }
 }
 
+#ifdef DEVELHELP
 void print_sigmasks(void)
 {
-    ucontext_t *p;
-    //tcb_t *cb = NULL;
-
     for (int i = 0; i < MAXTHREADS; i++) {
         if (sched_threads[i] != NULL) {
+            ucontext_t *p;
             printf("%s:\n", sched_threads[i]->name);
             //print_thread_sigmask(sched_threads[i]->sp);
             p = (ucontext_t *)(sched_threads[i]->stack_start);
@@ -99,6 +98,7 @@ void print_sigmasks(void)
         }
     }
 }
+#endif
 
 void native_print_signals(void)
 {
