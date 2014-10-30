@@ -430,6 +430,11 @@ void recv_echo_repl(void)
 
 void recv_rtr_sol(void)
 {
+    if (!ipv6_is_router()) {
+        return;     /* "A host MUST silently discard any received Router
+                       Solicitation messages." -- RFC 4861, section 6.2.6 */
+    }
+
     icmpv6_opt_hdr_len = RTR_SOL_LEN;
     ipv6_buf = ipv6_get_buf();
 
