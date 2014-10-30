@@ -259,9 +259,6 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 
     /* enable IRQ */
-    NVIC_SetPriority(gpio_irq_map[dev], GPIO_IRQ_PRIO);
-    NVIC_EnableIRQ(gpio_irq_map[dev]);
-
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:
@@ -344,6 +341,8 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
             break;
 #endif
     }
+    NVIC_SetPriority(gpio_irq_map[dev], GPIO_IRQ_PRIO);
+    NVIC_EnableIRQ(gpio_irq_map[dev]);
 
     /* set callback */
     gpio_config[dev].cb = cb;
