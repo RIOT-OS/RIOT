@@ -45,11 +45,6 @@
 #define SYSLOG_CONF_NUM_INTERFACES        1
 #endif
 
-/**
- * @brief Boards has a radio
- */
-#define HAS_RADIO
-
 void init_clks1(void);
 
 typedef uint8_t radio_packet_length_t;

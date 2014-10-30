@@ -20,11 +20,6 @@
 
 #define VICIntEnClear VICIntEnClr
 
-/**
- * @brief Boards has a radio
- */
-#define HAS_RADIO
-
 void init_clks1(void);
 void init_clks2(void);
 void bl_init_clks(void);
