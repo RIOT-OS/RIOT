@@ -20,6 +20,7 @@
 #define CONFIG_H
 
 #include <stdint.h>
+#include "board.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -38,7 +39,7 @@ extern char configmem[];
  */
 typedef struct {
     uint16_t id;                /**< unique node identifier          */
-    uint8_t radio_address;      /**< address for radio communication */
+    radio_address_t radio_address;  /**< address for radio communication */
     uint8_t radio_channel;      /**< current frequency               */
     char name[CONFIG_NAME_LEN]; /**< name of the node                */
 } config_t;
