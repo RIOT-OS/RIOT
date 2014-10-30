@@ -217,12 +217,12 @@ void olsr_init(void)
     msg_t m;
     DEBUG("setting up HELLO timer");
     m.content.ptr = (char *) &msg_hello;
-    msg_send(&m, pid, false);
+    msg_try_send(&m, pid);
 
     sleep_s(1);
     DEBUG("setting up TC timer");
     m.content.ptr = (char *) &msg_tc;
-    msg_send(&m, pid, false);
+    msg_try_send(&m, pid);
 }
 
 #endif /* RIOT */
