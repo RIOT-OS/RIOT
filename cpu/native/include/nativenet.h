@@ -34,7 +34,7 @@
 #define RX_BUF_SIZE (10)
 #endif
 #ifndef TRANSCEIVER_BUFFER_SIZE
-#define TRANSCEIVER_BUFFER_SIZE (3)
+#define TRANSCEIVER_BUFFER_SIZE (10)
 #endif
 
 /**
