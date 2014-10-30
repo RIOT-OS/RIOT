@@ -27,10 +27,10 @@
  * TODO: measure and adjust for the cortex-m0
  * @{
  */
-#define KERNEL_CONF_STACKSIZE_PRINTF    (256)
+#define KERNEL_CONF_STACKSIZE_PRINTF    (256/2)
 
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   (1024)
+#define KERNEL_CONF_STACKSIZE_DEFAULT   (2048) //1024
 #endif
 
 #define KERNEL_CONF_STACKSIZE_IDLE      (512)
@@ -47,8 +47,17 @@
 #endif
 /** @} */
 
-#define TRANSCEIVER_BUFFER_SIZE (64)
+#define TRANSCEIVER_BUFFER_SIZE (3)
 
+/**
+ * @def CPUID_ID_LEN
+ *
+ * @brief   The length in byte of the CPU's serial number.
+ *
+ * @note    Must be defined in the CPU's @ref cpu-conf.h
+ */
+
+#define CPUID_ID_LEN (128/8) //128 bits long, 16 bytes long
 
 #endif /* __CPU_CONF_H */
 /** @} */
