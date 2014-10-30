@@ -139,6 +139,8 @@ typedef struct {
     /**
      * @see netdev_driver_t::init
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     int (*init)(netdev_t *dev);
 
     /**
@@ -146,6 +148,8 @@ typedef struct {
      *
      * @see netdev_driver_t::send_data
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     int (*send_data)(netdev_t *dev, void *dest, size_t dest_len,
                      netdev_hlist_t *upper_layer_hdrs, void *data,
                      size_t data_len);
@@ -153,11 +157,15 @@ typedef struct {
     /**
      * @see netdev_driver_t::add_receive_data_callback
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     int (*add_receive_data_callback)(netdev_t *dev, netdev_rcv_data_cb_t cb);
 
     /**
      * @see netdev_driver_t::rem_receive_data_callback
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     int (*rem_receive_data_callback)(netdev_t *dev, netdev_rcv_data_cb_t cb);
 
     /**
@@ -174,6 +182,8 @@ typedef struct {
      *         NETDEV_OPT_TX_POWER         | int         | >= 4
      *         NETDEV_OPT_MAX_PACKET_SIZE  | uint8_t     | >= 1
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     int (*get_option)(netdev_t *dev, netdev_opt_t opt, void *value,
                       size_t *value_len);
 
@@ -192,22 +202,30 @@ typedef struct {
      *
      *         NETDEV_OPT_MAX_PACKET_SIZE can not be set.
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     int (*set_option)(netdev_t *dev, netdev_opt_t opt, void *value,
                       size_t value_len);
 
     /**
      * @see netdev_driver_t::get_state
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     int (*get_state)(netdev_t *dev, netdev_state_t *state);
 
     /**
      * @see netdev_driver_t::set_state
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     int (*set_state)(netdev_t *dev, netdev_state_t state);
 
     /**
      * @see netdev_driver_t::event
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     void (*event)(netdev_t *dev, uint32_t event_type);
 
     /**
@@ -238,6 +256,8 @@ typedef struct {
      * @return The outcome of this packet's transmission.
      *         @see netdev_802154_tx_status_t
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     netdev_802154_tx_status_t (* load_tx)(netdev_t *dev,
                                           netdev_802154_pkt_kind_t kind,
                                           netdev_802154_node_addr_t *dest,
@@ -255,6 +275,8 @@ typedef struct {
      * @return The outcome of this packet's transmission.
      *         @see netdev_802154_tx_status_t
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     netdev_802154_tx_status_t (* transmit)(netdev_t *dev);
 
     /**
@@ -286,6 +308,8 @@ typedef struct {
      * @return The outcome of this packet's transmission.
      *         @see netdev_802154_tx_status_t
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     netdev_802154_tx_status_t (* send)(netdev_t *dev,
                                        netdev_802154_pkt_kind_t kind,
                                        netdev_802154_node_addr_t *dest,
@@ -314,6 +338,8 @@ typedef struct {
      * @return  -ENOBUFS, if maximum number of registrable callbacks is exceeded
      * @return  -ENODEV, if *dev* is not recognized
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     int (* add_receive_raw_callback)(netdev_t *dev, netdev_802154_raw_packet_cb_t recv_func);
 
     /**
@@ -327,6 +353,8 @@ typedef struct {
      * @return  0, on success
      * @return  -ENODEV, if *dev* is not recognized
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     int (* rem_receive_raw_callback)(netdev_t *dev, netdev_802154_raw_packet_cb_t recv_func);
 
     /**
@@ -339,6 +367,8 @@ typedef struct {
      * @return 0 if another transmission is already running.
      * @return  -ENODEV, if *dev* is not recognized
      */
+    /* suppress because interface is not used yet */
+    /* cppcheck-suppress unusedStructMember */
     int (* channel_is_clear)(netdev_t *dev);
 } netdev_802154_driver_t;
 
