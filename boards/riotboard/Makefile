@@ -9,8 +9,6 @@ include $(RIOTBASE)/Makefile.base
 
 muxer_config:
 	rm -f muxer_config
-	# broken
-	#ln -s $(RIOTBOARD_MUXCONF_PATH)/muxer_config
 	ln -s $(RIOTBASE)/pkg/riotboard_SDK/muxer_config
 
 clean::
