@@ -150,16 +150,12 @@ static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr
 
     unsigned state;
 
-    if (!inISR()) {
-        state = disableIRQ();
-    }
+    state = disableIRQ();
 
     int n = lifo_get(lifo);
 
     if (n == -1) {
-        if (!inISR()) {
-            restoreIRQ(state);
-        }
+        restoreIRQ(state);
 
         puts("No hwtimer left.");
         return -1;
@@ -179,9 +175,7 @@ static int _hwtimer_set(unsigned long offset, void (*callback)(void*), void *ptr
 
     lpm_prevent_sleep++;
 
-    if (!inISR()) {
-        restoreIRQ(state);
-    }
+    restoreIRQ(state);
 
     return n;
 }
