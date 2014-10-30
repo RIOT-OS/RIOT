@@ -110,6 +110,25 @@ unsigned ringbuffer_get(ringbuffer_t *restrict rb, char *buf, unsigned n)
     return n;
 }
 
+unsigned ringbuffer_remove(ringbuffer_t *restrict rb, unsigned n)
+{
+    if (n > rb->avail) {
+        n = rb->avail;
+        rb->start = rb->avail = 0;
+    }
+    else {
+        rb->start -= n;
+        rb->avail -= n;
+
+        /* compensate underflow */
+        if (rb->start > rb->size) {
+            rb->start += rb->size;
+        }
+    }
+
+    return n;
+}
+
 int ringbuffer_peek_one(const ringbuffer_t *restrict rb_)
 {
     ringbuffer_t rb = *rb_;
