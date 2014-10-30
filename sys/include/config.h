@@ -20,7 +20,7 @@
 #define CONFIG_H
 
 #include <stdint.h>
-#ifdef HAS_RADIO
+#ifdef FEATURE_TRANSCEIVER
 #include "radio/types.h"
 #endif
 
@@ -42,7 +42,7 @@ extern char configmem[];
 typedef struct {
     /* cppcheck-suppress unusedStructMember : is used in sys/shell/commands/sc_id.c  */
     uint16_t id;                    /**< unique node identifier          */
-#ifdef HAS_RADIO
+#ifdef FEATURE_TRANSCEIVER
     radio_address_t radio_address;  /**< address for radio communication */
     uint8_t radio_channel;          /**< current frequency               */
 #endif
