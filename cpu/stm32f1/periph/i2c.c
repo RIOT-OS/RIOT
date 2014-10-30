@@ -161,7 +161,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
             DEBUG("Send Slave address and wait for ADDR == 1\n");
             _start(i2c, address, I2C_FLAG_READ);
             DEBUG("Set POS bit\n");
-            i2c->CR1 |= I2C_CR1_POS;
+            i2c->CR1 |= (I2C_CR1_POS | I2C_CR1_ACK);
             DEBUG("Crit block: Clear ADDR bit and clear ACK flag\n");
             state = disableIRQ();
             _clear_addr(i2c);
@@ -192,9 +192,9 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
             _start(i2c, address, I2C_FLAG_READ);
             _clear_addr(i2c);
 
-            while (i < (length - 2)) {
+            while (i < (length - 3)) {
                 DEBUG("Wait until byte was received\n");
-                while (!(i2c->SR1 & I2C_SR1_BTF));
+                while (!(i2c->SR1 & I2C_SR1_RXNE));
                 DEBUG("Copy byte from DR\n");
                 data[i++] = (char)i2c->DR;
             }
@@ -205,12 +205,17 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
             DEBUG("Disable ACK\n");
             i2c->CR1 &= ~(I2C_CR1_ACK);
 
-            DEBUG("Crit block: set STOP and read second last byte\n");
+            DEBUG("Crit block: set STOP and read N-2 byte\n");
             state = disableIRQ();
-            i2c->CR1 |= (I2C_CR1_STOP);
             data[i++] = (char)i2c->DR;
+            i2c->CR1 |= (I2C_CR1_STOP);
             restoreIRQ(state);
+
+            DEBUG("Read N-1 byte\n");
+            data[i++] = (char)i2c->DR;
+
             while (!(i2c->SR1 & I2C_SR1_RXNE));
+            DEBUG("Read last byte\n");
             data[i++] = (char)i2c->DR;
 
             DEBUG("wait for STOP bit to be cleared again\n");
