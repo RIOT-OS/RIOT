@@ -22,6 +22,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include "od.h"
 #include "vtimer.h"
 #include "mutex.h"
 #include "msg.h"
@@ -68,6 +69,18 @@ static uint8_t default_hop_limit = MULTIHOP_HOPLIMIT;
 /* registered upper layer threads */
 kernel_pid_t sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
+
+/* fallback workaround to send neighbor solicitations without packet queue */
+void _ipv6_send_ns_fallback(ipv6_addr_t *dest, void *packet, uint16_t packet_length) {
+    ns_fallback_args_t fallback_args = { dest, packet, packet_length };
+    msg_t msg;
+
+    msg.type = MSG_SEND_NS;
+    msg.content.ptr = (char *)&fallback_args;
+
+    msg_send_receive(&msg, &msg, lowpan_aux_pid);
+}
+
 int ipv6_send_packet(ipv6_hdr_t *packet)
 {
     uint16_t length = IPV6_HDR_LEN + NTOHS(packet->length);
@@ -88,6 +101,11 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
             /* XXX: this is wrong, but until ND does work correctly,
              *      this is the only way (aka the old way)*/
             uint16_t raddr = NTOHS(packet->destaddr.uint16[7]);
+            /* XXX: add least try to update neighbor cache */
+
+            printf("on link\n");
+            od_hex_dump(packet, length, 0);
+            _ipv6_send_ns_fallback(&packet->destaddr, packet, length);
             sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *)packet, length);
             /* return -1; */
         }
@@ -116,7 +134,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
 
 
         if (dest == NULL) {
-            return -1;
+            dest = &packet->destaddr;
         }
 
         nce = ndp_get_ll_address(dest);
@@ -127,13 +145,11 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
             /* XXX: super-hacky because of missing packet-queue +
              *      this is wrong */
             uint16_t raddr = dest->uint16[7];
-            ns_fallback_args_t fallback_args = { dest, packet, length };
-            msg_t msg;
 
-            msg.type = MSG_SEND_NS;
-            msg.content.ptr = (char *)&fallback_args;
+            printf("not on-link\n");
+            od_hex_dump(packet, length, 0);
 
-            msg_send_receive(&msg, &msg, lowpan_aux_pid);
+            _ipv6_send_ns_fallback(dest, packet, length);
 
             sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *)packet, length);
             /* return -1; */

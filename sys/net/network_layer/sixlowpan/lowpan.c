@@ -1676,24 +1676,18 @@ static void *lowpan_auxilarity(void *arg)
             case MSG_SEND_NS:
                 do {
                     ns_fallback_args_t *args = ((ns_fallback_args_t *)msg.content.ptr);
+                    msg_t msg_rply;
 
-                    if ((args->data) && (args->data_len)) {
-                        uint8_t packet_tmp[args->data_len];
-                        ipv6_addr_t *dest = args->dest;
+                    ipv6_addr_t *dest = args->dest;
 
-                        memcpy(packet_tmp, args->data, args->data_len);
-                        msg_reply(&msg, &msg);
+                    msg_reply(&msg, &msg_rply);
 
-                        if (!ndp_neighbor_cache_search(dest)) {
-                            ndp_neighbor_cache_add(0, dest, NULL, 0, 0, NDP_NCE_STATUS_INCOMPLETE,
-                                                   NDP_NCE_TYPE_REGISTERED, 100);
-                        }
-
-                        icmpv6_send_neighbor_sol(NULL, NULL, dest, 1, 0);
+                    if (!ndp_neighbor_cache_search(dest)) {
+                        ndp_neighbor_cache_add(0, dest, NULL, 0, 0, NDP_NCE_STATUS_INCOMPLETE,
+                                               NDP_NCE_TYPE_REGISTERED, 100);
                     }
-                    else {
-                        msg_reply(&msg, &msg);
-                    }
+
+                    icmpv6_send_neighbor_sol(NULL, NULL, dest, 1, 0);
                 } while (0);
 
             default:

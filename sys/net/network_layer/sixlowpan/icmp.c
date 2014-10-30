@@ -894,6 +894,8 @@ void recv_rtr_adv(void)
     mutex_unlock(&lowpan_context_mutex);
 
     if (trigger_ns >= 0) {
+        ipv6_addr_t src;
+        printf("trigger_ns\n");
         /* send ns - draft-ietf-6lowpan-nd-15#section-5.5.1
          *
          * section-10.2.4
@@ -902,7 +904,8 @@ void recv_rtr_adv(void)
          * containing its tentative global IPv6 address to register
          *
          * if new address was configured, set src to newaddr(gp16) */
-        icmpv6_send_neighbor_sol(&newaddr, &(ipv6_buf->srcaddr), &(ipv6_buf->srcaddr), OPT_SLLAO, OPT_ARO);
+        ipv6_net_if_get_best_src_addr(&src, &(ipv6_buf->srcaddr));
+        icmpv6_send_neighbor_sol(&newaddr, &src, &src, OPT_SLLAO, OPT_ARO);
     }
 }
 
@@ -1183,8 +1186,10 @@ void recv_nbr_sol(void)
     if (send_na) {
         /* solicited na */
         uint8_t flags = (ICMPV6_NEIGHBOR_ADV_FLAG_OVERRIDE | ICMPV6_NEIGHBOR_ADV_FLAG_SOLICITED);
+        printf("send_na");
         icmpv6_send_neighbor_adv(&(ipv6_buf->srcaddr), &(ipv6_buf->destaddr),
-                                 alist_targ.addr->addr_data, flags, 0, OPT_ARO);
+                                 alist_targ.addr->addr_data, flags, OPT_SLLAO,
+                                 OPT_ARO);
     }
 }
 
@@ -1262,6 +1267,7 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *t
     ipv6_buf->length = HTONS(packet_length - IPV6_HDR_LEN);
 
     icmp_buf->checksum = icmpv6_csum(ipv6_buf, icmp_buf);
+    printf("csum: 0x%04x, HTONS(csum): 0x%04x\n", icmp_buf->checksum, HTONS(icmp_buf->checksum));
 
 #ifdef DEBUG_ENABLED
     char addr_str[IPV6_MAX_ADDR_STR_LEN];
@@ -1434,6 +1440,8 @@ void icmpv6_ndp_set_sllao(icmpv6_ndp_opt_stllao_t *sllao, int if_id,
     }
 }
 
+#include "od.h"
+
 uint16_t icmpv6_csum(ipv6_hdr_t *ipv6_buf, icmpv6_hdr_t *icmpv6_buf)
 {
     uint16_t sum;
@@ -1441,9 +1449,16 @@ uint16_t icmpv6_csum(ipv6_hdr_t *ipv6_buf, icmpv6_hdr_t *icmpv6_buf)
 
     icmpv6_buf->checksum = 0;
     sum = len + IPV6_PROTO_NUM_ICMPV6;
+    printf("len (%d) + IPV6_PROTO_NUM_ICMPV6 == %d\n", len, sum);
 
     sum = csum(sum, (uint8_t *)&ipv6_buf->srcaddr, 2 * sizeof(ipv6_addr_t));
+    printf("srcaddr:\n");
+    od_hex_dump(&ipv6_buf->srcaddr, sizeof(ipv6_addr_t), 0);
+    printf("destaddr:\n");
+    od_hex_dump(&ipv6_buf->destaddr, sizeof(ipv6_addr_t), 0);
     sum = csum(sum, (uint8_t *)icmpv6_buf, len);
+
+    printf("sum == 0x%04x, HTONS(sum) == 0x%04x, ~HTONS(sum) == 0x%04x\n", sum, HTONS(sum), ~HTONS(sum));
 
     return (sum == 0) ? 0 : ~HTONS(sum);
 }
