@@ -36,7 +36,6 @@ extern uint32_t _ezero;
 extern uint32_t _sstack;
 extern uint32_t _estack;
 
-
 /**
  * @brief functions for initializing the board, std-lib and kernel
  */
@@ -84,7 +83,6 @@ void dummy_handler(void)
 {
     while (1) {asm ("nop");}
 }
-
 
 void isr_nmi(void)
 {
@@ -192,7 +190,7 @@ const void *interrupt_vector[] = {
     (void*) (0UL),                  /* Reserved */
     (void*) isr_pendsv,             /* pendSV interrupt, used for task switching in RIOT */
     (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
-    /* STM specific peripheral handlers */
+    /* SAM3X8E specific peripheral handlers */
     (void*) isr_supc,               /*  0 supply controller */
     (void*) isr_rstc,               /*  1 reset controller */
     (void*) isr_rtc,                /*  2 real time clock */
