@@ -29,15 +29,13 @@
 #include "transceiver.h"
 #include "msg.h"
 
+#include "native_internal.h"
 #include "tap.h"
 #include "nativenet.h"
 #include "nativenet_internal.h"
 #include "cpu.h"
 
-struct nativenet_callback_s {
-    void (*func)(void);
-};
-static struct nativenet_callback_s _nativenet_callbacks[255];
+static _native_callback_t _nativenet_callbacks[255];
 
 struct rx_buffer_s _nativenet_rx_buffer[RX_BUF_SIZE];
 static volatile uint8_t rx_buffer_next;
@@ -151,14 +149,14 @@ void nativenet_switch_to_rx(void)
 /* nativenet_internal.h *************************************************/
 /************************************************************************/
 
-int _nativenet_register_cb(int event, void (*func)(void))
+int _nativenet_register_cb(int event, _native_callback_t func)
 {
     if (event > NNEV_MAXEV) {
         DEBUG("_nativenet_register_cb: event > NNEV_MAXEV\n");
         return -1;
     }
 
-    _nativenet_callbacks[event].func = func;
+    _nativenet_callbacks[event] = func;
     return 0;
 }
 
@@ -169,7 +167,7 @@ int _nativenet_unregister_cb(int event)
         return -1;
     }
 
-    _nativenet_callbacks[event].func = NULL;
+    _nativenet_callbacks[event] = NULL;
     return 0;
 }
 
@@ -180,8 +178,8 @@ void do_cb(int event)
         return;
     }
 
-    if (_nativenet_callbacks[event].func != NULL) {
-        _nativenet_callbacks[event].func();
+    if (_nativenet_callbacks[event] != NULL) {
+        _nativenet_callbacks[event]();
     }
 }
 
