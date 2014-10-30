@@ -53,70 +53,66 @@ static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
 schedstat sched_pidlist[KERNEL_PID_LAST + 1];
 #endif
 
-void sched_run(void)
+int sched_run(void)
 {
     sched_context_switch_request = 0;
 
-#ifdef SCHEDSTATISTICS
-    unsigned long time = hwtimer_now();
-#endif
-
-    tcb_t *my_active_thread = (tcb_t *)sched_active_thread;
-
-    if (my_active_thread) {
-        if (my_active_thread->status == STATUS_RUNNING) {
-            my_active_thread->status = STATUS_PENDING;
-        }
-
-#ifdef SCHED_TEST_STACK
-        if (*((unsigned int *)my_active_thread->stack_start) != (unsigned int) my_active_thread->stack_start) {
-            printf("scheduler(): stack overflow detected, task=%s pid=%" PRIkernel_pid "\n", my_active_thread->name, my_active_thread->pid);
-        }
-#endif
-
-#ifdef SCHEDSTATISTICS
-        if (sched_pidlist[my_active_thread->pid].laststart) {
-            sched_pidlist[my_active_thread->pid].runtime_ticks += time - sched_pidlist[my_active_thread->pid].laststart;
-        }
-#endif
-    }
-
-    DEBUG("\nscheduler: previous task: %s\n", (my_active_thread == NULL) ? "none" : my_active_thread->name);
+    tcb_t *active_thread = (tcb_t *)sched_active_thread;
 
     /* The bitmask in runqueue_bitcache is never empty,
      * since the threading should not be started before at least the idle thread was started.
      */
     int nextrq = bitarithm_lsb(runqueue_bitcache);
-    my_active_thread = clist_get_container(sched_runqueues[nextrq], tcb_t, rq_entry);
-    DEBUG("scheduler: first in queue: %s\n", my_active_thread->name);
+    tcb_t *next_thread = clist_get_container(sched_runqueues[nextrq], tcb_t, rq_entry);
 
-    kernel_pid_t my_next_pid = my_active_thread->pid;
+    DEBUG("scheduler: active thread: %" PRIkernel_pid ", next thread: %" PRIkernel_pid "\n",
+          (active_thread == NULL) ? KERNEL_PID_UNDEF : active_thread->pid,
+          next_thread->pid);
+
+    if (active_thread == next_thread) {
+        DEBUG("scheduler: done, sched_active_thread was not changed.\n");
+        return 0;
+    }
+
+#ifdef SCHEDSTATISTICS
+    unsigned long time = hwtimer_now();
+#endif
+
+    if (active_thread) {
+        if (active_thread->status == STATUS_RUNNING) {
+            active_thread->status = STATUS_PENDING;
+        }
+
+#ifdef SCHED_TEST_STACK
+        if (*((uintptr_t *) active_thread->stack_start) != (uintptr_t) active_thread->stack_start) {
+            printf("scheduler(): stack overflow detected, pid=%" PRIkernel_pid "\n", active_thread->pid);
+        }
+#endif
+
+#ifdef SCHEDSTATISTICS
+        schedstat *active_stat = &sched_pidlist[active_thread->pid];
+        if (active_stat->laststart) {
+            active_stat->runtime_ticks += time - active_stat->laststart;
+        }
+#endif
+    }
 
 #if SCHEDSTATISTICS
-    sched_pidlist[my_next_pid].laststart = time;
-    sched_pidlist[my_next_pid].schedules++;
-    if ((sched_cb) && (my_next_pid != sched_active_pid)) {
-        sched_cb(time, my_next_pid);
+    schedstat *next_stat = &sched_pidlist[next_thread->pid];
+    next_stat->laststart = time;
+    next_stat->schedules++;
+    if (sched_cb) {
+        sched_cb(time, next_thread->pid);
     }
 #endif
 
-    sched_active_pid = my_next_pid;
+    next_thread->status = STATUS_RUNNING;
+    sched_active_pid = next_thread->pid;
+    sched_active_thread = (volatile tcb_t *) next_thread;
 
-    DEBUG("scheduler: next task: %s\n", my_active_thread->name);
+    DEBUG("scheduler: done, changed sched_active_thread.\n");
 
-    if (my_active_thread != sched_active_thread) {
-        if (sched_active_thread != NULL) {
-            if (sched_active_thread->status == STATUS_RUNNING) {
-                sched_active_thread->status = STATUS_PENDING;
-            }
-        }
-
-        sched_set_status((tcb_t *)my_active_thread, STATUS_RUNNING);
-    }
-
-    sched_active_thread = (volatile tcb_t *) my_active_thread;
-
-    DEBUG("scheduler: done.\n");
+    return 1;
 }
 
 #if SCHEDSTATISTICS
