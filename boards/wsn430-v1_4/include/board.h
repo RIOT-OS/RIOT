@@ -60,6 +60,10 @@
 
 #include <msp430x16x.h>
 
+/**
+ * @brief Boards has a radio
+ */
+#define HAS_RADIO
 typedef uint8_t radio_packet_length_t;
 
 /** @} */

@@ -72,6 +72,10 @@
 #define USER_BTN_PRESSED   ((USER_BTN_PxIN & USER_BTN_MASK) == 0)
 #define USER_BTN_RELEASED  ((USER_BTN_PxIN & USER_BTN_MASK) != 0)
 
+/**
+ * @brief Boards has a radio
+ */
+#define HAS_RADIO
 typedef uint8_t radio_packet_length_t;
 
 /** @} */

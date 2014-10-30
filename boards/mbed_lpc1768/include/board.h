@@ -26,6 +26,11 @@
 #define LED_OFF(led_nr)     (LPC_GPIO1->FIOCLR = PIN_LED##led_nr)
 #define LED_TOGGLE(led_nr)  (LPC_GPIO1->FIOPIN ^= PIN_LED##led_nr)
 
+/**
+ * @brief Boards has a radio
+ */
+#define HAS_RADIO
+
 typedef uint8_t radio_packet_length_t;
 
 /**
