@@ -10,6 +10,8 @@
  * @defgroup    rtc Realtime Clock
  * @ingroup     drivers
  * @brief       Generic real time clock driver interface
+ * @deprecated  This interface is obsolete. Use the @ref driver_periph_rtc
+ *              interface in @ref driver_periph instead.
  * @{
  */
 
