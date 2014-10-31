@@ -16,7 +16,7 @@ export AR ?= $(PREFIX)ar
 export AS ?= $(PREFIX)as
 export LINK ?= $(PREFIX)gcc
 export SIZE ?= $(PREFIX)size
-export OBJCOPY = true
+export OBJCOPY = $(PREFIX)objcopy
 
 export DEBUGGER = gdb
 export TERMPROG = $(ELF)
