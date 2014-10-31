@@ -45,6 +45,7 @@ typedef struct {
 #ifdef FEATURE_TRANSCEIVER
     radio_address_t radio_address;  /**< address for radio communication */
     uint8_t radio_channel;          /**< current frequency               */
+    uint16_t radio_pan_id;          /**< PAN id for radio communication  */
 #endif
     /* cppcheck-suppress unusedStructMember : useful for debug purposes */
     char name[CONFIG_NAME_LEN];     /**< name of the node                */
