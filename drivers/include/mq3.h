@@ -23,6 +23,10 @@
 
 #include "periph/adc.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MQ3_MAX_RAW_VALUE           (1023U)
 
 /**
@@ -67,6 +71,10 @@ int mq3_read_raw(mq3_t *dev);
  * @return              the scaled sensor value in PPM of alcohol
  */
 int mq3_read(mq3_t *dev);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __MQ3_H */
 /** @} */
