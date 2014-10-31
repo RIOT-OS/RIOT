@@ -136,6 +136,8 @@ void rpl_udp_ignore(int argc, char **argv)
     tcmd.data = &a;
 
     if (argc == 2) {
+        /* cppcheck: a is actually read via tcmd.data */
+        /* cppcheck-suppress unreadVariable */
         a = atoi(argv[1]);
         printf("sending to transceiver (%" PRIkernel_pid "): %u\n", transceiver_pid, (*(uint8_t *)tcmd.data));
         msg_send(&mesg, transceiver_pid);

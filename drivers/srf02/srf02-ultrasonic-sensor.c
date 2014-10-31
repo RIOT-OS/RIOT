@@ -49,7 +49,7 @@ bool srf02_init(uint8_t i2c_interface, uint32_t baud_rate)
 
 uint32_t srf02_get_distance(uint8_t ranging_mode)
 {
-    bool status = false;
+    bool status;
     uint8_t reg_size = 1;
     uint8_t range_high_byte = 0;
     uint8_t range_low_byte = 0;

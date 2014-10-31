@@ -289,10 +289,11 @@ int border_initialize(char *if_name, const char *ip_addr, const char *tty_dev)
 {
     int res, i;
     char command[21 + IPV6_ADDR_LEN + IF_NAME_LEN];
-    char ip_addr_cpy[IPV6_ADDR_LEN];
+    char ip_addr_cpy[IPV6_ADDR_LEN + 1];
     struct in6_addr parsed_addr;
 
     strncpy(ip_addr_cpy, ip_addr, IPV6_ADDR_LEN);
+    ip_addr_cpy[IPV6_ADDR_LEN] = '\0';
 
     strtok(ip_addr_cpy, "/");
 

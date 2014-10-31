@@ -30,7 +30,7 @@
 #include "board.h"
 
 /* guard file in case no UART device was specified */
-#if UART_NUMOF
+#if UART_0_EN
 
 /**
  * @brief Each UART device has to store two callbacks.
@@ -241,4 +241,4 @@ void isr_uart0(void)
     }
 }
 
-#endif /* UART_NUMOF */
+#endif /* UART_0_EN */

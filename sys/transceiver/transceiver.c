@@ -811,6 +811,8 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
  */
 static int32_t set_channel(transceiver_type_t t, void *channel)
 {
+    /* cppcheck: c is read depending on enabled modules */
+    /* cppcheck-suppress unreadVariable */
     uint8_t c = *((uint8_t *)channel);
 
     switch (t) {
@@ -1030,6 +1032,8 @@ static radio_address_t get_address(transceiver_type_t t)
  */
 static radio_address_t set_address(transceiver_type_t t, void *address)
 {
+    /* cppcheck: addr is read depending on enabled modules */
+    /* cppcheck-suppress unreadVariable */
     radio_address_t addr = *((radio_address_t *)address);
 
     switch (t) {

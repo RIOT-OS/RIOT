@@ -1016,7 +1016,7 @@ uint32_t _maca_init_from_flash ( uint32_t addr ) {
         length = buffer[1] & 0x0000ffff;
 
         while ( i < ( length-4 ) ) {
-            err = nvm_read ( g_nvm_internal_interface_c, type, ( uint8_t * ) buffer, addr+i, 32 );
+            nvm_read ( g_nvm_internal_interface_c, type, ( uint8_t * ) buffer, addr+i, 32 );
             i += 4 * _exec_init_entry ( buffer, _ram_values );
         }
     }

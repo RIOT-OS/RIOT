@@ -660,14 +660,13 @@ void *tcp_packet_handler(void *arg)
     (void) arg;
 
     msg_t m_recv_ip, m_send_ip;
-    tcp_hdr_t *tcp_header;
     socket_internal_t *tcp_socket = NULL;
 
     while (1) {
         msg_receive(&m_recv_ip);
 
         ipv6_hdr_t *ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
-        tcp_header = ((tcp_hdr_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
+        tcp_hdr_t *tcp_header = ((tcp_hdr_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
 #ifdef TCP_HC
         tcp_socket = decompress_tcp_packet(ipv6_header);
 #else
@@ -683,9 +682,7 @@ void *tcp_packet_handler(void *arg)
             update_tcp_hc_context(true, tcp_socket, tcp_header);
 #endif
             /* Remove reserved bits from tcp flags field */
-            uint8_t tcp_flags = tcp_header->reserved_flags;
-
-            switch (tcp_flags) {
+            switch (tcp_header->reserved_flags) {
                 case TCP_ACK: {
                     /* only ACK Bit set */
                     uint8_t tcp_payload_len = NTOHS(ipv6_header->length) - TCP_HDR_LEN;

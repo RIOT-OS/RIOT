@@ -224,6 +224,8 @@ int skipjack_encrypt(cipher_context_t *context, uint8_t *plainBlock,
     s2cM(w3, cipherBlock);
     cipherBlock += 2;
     s2cM(w4, cipherBlock);
+    /* cppcheck: may introduce timing bias if left out */
+    /* cppcheck-suppress uselessAssignmentPtrArg */
     cipherBlock += 2;
 
     return 1;

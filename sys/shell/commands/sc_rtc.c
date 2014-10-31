@@ -27,6 +27,8 @@ static void _gettime_handler(void)
     struct tm now;
     rtc_get_localtime(&now);
 
+    /* cppcheck: see man 3 asctime: obsoleted by POSIX.1-2008 */
+    /* cppcheck-suppress obsoleteFunctionsasctime */
     printf("%s", asctime(&now));
 }
 

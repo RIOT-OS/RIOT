@@ -383,7 +383,7 @@ static size_t encode_bytes(unsigned char major_type, cbor_stream_t *s, const cha
 
 static size_t decode_bytes(const cbor_stream_t *s, size_t offset, char *out, size_t length)
 {
-    if ((CBOR_TYPE(s, offset) != CBOR_BYTES && CBOR_TYPE(s, offset) != CBOR_TEXT) || !s || !out) {
+    if ((CBOR_TYPE(s, offset) != CBOR_BYTES && CBOR_TYPE(s, offset) != CBOR_TEXT) || !out) {
         return 0;
     }
 

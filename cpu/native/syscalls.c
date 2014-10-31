@@ -320,6 +320,7 @@ void err(int eval, const char *fmt, ...)
     va_list argp;
     va_start(argp, fmt);
     verr(eval, fmt, argp);
+    va_end(argp);
 }
 
 void errx(int eval, const char *fmt, ...)
@@ -327,6 +328,7 @@ void errx(int eval, const char *fmt, ...)
     va_list argp;
     va_start(argp, fmt);
     verrx(eval, fmt, argp);
+    va_end(argp);
 }
 
 int getpid(void)
