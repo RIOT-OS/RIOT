@@ -12,7 +12,11 @@
  * @brief       Generic real time clock driver interface
  * @deprecated  This interface is obsolete. Use the @ref driver_periph_rtc
  *              interface in @ref driver_periph instead.
+ *
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ *
  * @{
+ * @file
  */
 
 #ifndef RTC_H
