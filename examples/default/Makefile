@@ -35,8 +35,10 @@ USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += vtimer
 USEMODULE += defaulttransceiver
+USEMODULE += config
 
 FEATURES_OPTIONAL += transceiver
+FEATURES_OPTIONAL += config
 FEATURES_OPTIONAL += periph_rtc
 
 ifneq (,$(filter msb-430,$(BOARD)))
@@ -46,12 +48,10 @@ ifneq (,$(filter msba2,$(BOARD)))
 	USEMODULE += sht11
 	USEMODULE += ltc4150
 	USEMODULE += mci
-	USEMODULE += config
 	USEMODULE += random
 endif
 ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += ltc4150
-	USEMODULE += config
 	USEMODULE += random
 endif
 ifneq (,$(filter iot-lab_M3,$(BOARD)))
