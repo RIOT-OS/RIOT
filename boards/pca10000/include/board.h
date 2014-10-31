@@ -24,6 +24,9 @@
 
 #include "cpu.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Define the nominal CPU core clock in this board
@@ -73,6 +76,10 @@
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /** __BOARD_H */
 /** @} */

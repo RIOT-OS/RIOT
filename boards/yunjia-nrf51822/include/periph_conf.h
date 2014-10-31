@@ -19,6 +19,10 @@
 #ifndef __PERIPH_CONF_H
 #define __PERIPH_CONF_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @name Timer configuration
  * @{
@@ -114,5 +118,9 @@
 #define GPIO_6_PIN          13
 #define GPIO_7_PIN          14
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PERIPH_CONF_H */

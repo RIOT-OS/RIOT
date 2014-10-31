@@ -26,6 +26,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define F_CPU 1000000
 
 void _native_LED_GREEN_OFF(void);
@@ -42,6 +46,10 @@ void _native_LED_RED_TOGGLE(void);
 #define LED_RED_TOGGLE (_native_LED_RED_TOGGLE())
 
 typedef uint16_t radio_packet_length_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* BOARD_H */

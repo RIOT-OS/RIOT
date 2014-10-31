@@ -24,6 +24,10 @@
 #include <msp430x16x.h>
 #include "bitarithm.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* SCK  = P3B5
  * DATA = P3B4
  */
@@ -36,6 +40,10 @@
 #define SHT11_DATA_IN   P3DIR &= ~(BIT5);      /**< serial I/O as input */
 #define SHT11_DATA_OUT  P3DIR |= BIT5;      /**< serial I/O as output */
 #define SHT11_INIT      P3DIR |= BIT5;      /* FIO1DIR |= BIT25; PINSEL3 &= ~(BIT14|BIT15 | BIT16|BIT17); */
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* SHT11BOARD_H_ */

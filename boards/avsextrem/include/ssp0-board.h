@@ -24,6 +24,10 @@
 
 #include "stdint.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define DMA_ENABLED     0
 
 /*
@@ -113,5 +117,9 @@ unsigned short SMB380_ssp_read(void);
 unsigned short nrf24l01_ssp_read_write(const uint8_t data);
 unsigned short acam_trx(const uint8_t data);
 void SSP0Handler(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* __SSP_H__ */

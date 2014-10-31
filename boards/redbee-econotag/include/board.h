@@ -23,6 +23,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define F_CPU   (24000000)              ///< CPU target speed in Hz
 
 #define CTUNE       0xb
@@ -30,5 +34,9 @@
 #define FTUNE       0x7
 
 typedef uint8_t radio_packet_length_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

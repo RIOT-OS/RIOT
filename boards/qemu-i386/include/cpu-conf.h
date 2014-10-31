@@ -28,6 +28,10 @@
 #ifndef __RIOT__BOARDS__QEMU_I386__CPU_CONF__H
 #define __RIOT__BOARDS__QEMU_I386__CPU_CONF__H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* FIXME: This file is just a filler. The numbers are entirely random ... */
 
 #define KERNEL_CONF_STACKSIZE_DEFAULT      (8192)
@@ -40,6 +44,10 @@
 #define UART0_BUFSIZE                      (16)
 
 #define F_CPU (1000000) /* This value is unused in x86 */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

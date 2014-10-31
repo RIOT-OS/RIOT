@@ -24,6 +24,10 @@
 #include <stdint.h>
 #include "lpc2387.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define VICIntEnClear VICIntEnClr
 
 static inline void pllfeed(void)
@@ -31,6 +35,10 @@ static inline void pllfeed(void)
     PLLFEED = 0xAA;
     PLLFEED = 0x55;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif // __MSBA2_COMMON_H
