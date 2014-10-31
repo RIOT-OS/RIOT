@@ -52,7 +52,7 @@
 #endif
 
 #ifdef MODULE_RTC
-#include "rtc.h"
+#include "rtc_legacy.h"
 #endif
 
 #ifdef MODULE_SIXLOWPAN

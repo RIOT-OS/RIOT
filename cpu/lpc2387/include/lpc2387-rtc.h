@@ -32,7 +32,7 @@
 
 #include <time.h>
 #include <sys/time.h>
-#include "rtc.h"
+#include "rtc_legacy.h"
 #include "lpc2387.h"
 
 /* ------------------------------------------------------------------------- */
