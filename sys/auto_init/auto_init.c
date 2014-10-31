@@ -19,6 +19,10 @@
 
 #include "auto_init.h"
 
+#ifdef FEATURE_PERIPH_RTC
+#include "periph/rtc.h"
+#endif
+
 #ifdef MODULE_CONFIG
 #include "config.h"
 #endif
@@ -197,6 +201,12 @@ void auto_init_net_if(void)
 
 void auto_init(void)
 {
+#ifdef FEATURE_PERIPH_RTC
+    DEBUG("Auto init rtc driver.\n");
+    rtc_init();
+    rtc_poweron();
+#endif
+
 #ifdef MODULE_CONFIG
     DEBUG("Auto init loading config\n");
     config_load();
