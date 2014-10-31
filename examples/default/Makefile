@@ -51,7 +51,6 @@ ifneq (,$(filter msba2,$(BOARD)))
 endif
 ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += ltc4150
-	USEMODULE += rtc
 	USEMODULE += config
 	USEMODULE += random
 endif
