@@ -124,7 +124,7 @@ int at86rf231_on(void)
     }
     /* read CSMA_SEED_1 and write back with RNG value */
     uint8_t tmp = at86rf231_reg_read(AT86RF231_REG__CSMA_SEED_1);
-    tmp = ((at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA)&0x60)>>5);
+    tmp |= ((at86rf231_reg_read(AT86RF231_REG__PHY_CC_CCA)&0x60)>>5);
     at86rf231_reg_write(AT86RF231_REG__CSMA_SEED_1, tmp);
 
     /* change into reception mode */
@@ -583,7 +583,7 @@ int at86rf231_set_option(netdev_t *dev, netdev_opt_t opt, void *value,
                                              value, value_len)) == 0) {
                 size_t *v = (size_t *)set_value;
 
-                if (*v != 2 || *v != 8) {
+                if (*v != 2 && *v != 8) {
                     return -EINVAL;
                 }
                 _default_src_addr_len = *v;
