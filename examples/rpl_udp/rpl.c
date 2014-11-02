@@ -60,10 +60,12 @@ void rpl_udp_init(int argc, char **argv)
                ((command == 'h') ? "non-" : ""),
                (((command == 'n') || (command == 'h')) ? "node" : "root"), id);
 
+#if defined(MODULE_CC110X_LEGACY_CSMA) || defined(MODULE_CC110X_LEGACY)
         if (!id || (id > 255)) {
             printf("ERROR: address not a valid 8 bit integer\n");
             return;
         }
+#endif
 
         DEBUGF("Setting HW address to %u\n", id);
         net_if_set_hardware_address(0, id);

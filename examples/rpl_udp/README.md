@@ -2,7 +2,6 @@
 
 command order:
 
-	set <node-id>
 	init [r|n]
 	server
 	send <node-id> <message>
@@ -24,11 +23,6 @@ Run the first node
 	make term
 
 Type ``help`` to see the commands available.
-Now you need set the node ID. This ID will be used by other nodes to address this node.
-
-	> set 1
-    set 1
-    Set node ID to 1
 
 Init your rpl node as either a root or a node router.
 

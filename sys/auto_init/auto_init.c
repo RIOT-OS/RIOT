@@ -152,7 +152,13 @@ void auto_init_net_if(void)
 #endif /* DEBUG_ENABLED */
 
 #undef CONF_RADIO_ADDR
+#if defined(MODULE_CC110X_LEGACY_CSMA) || defined(MODULE_CC110X_LEGACY)
+        uint8_t hwaddr = (uint8_t)((hash_l ^ hash_h) ^ ((hash_l ^ hash_h) >> 24));
+        /* do not combine more parts to keep the propability low that it just
+         * becomes 0xff */
+#else
         uint16_t hwaddr = HTONS((uint16_t)((hash_l ^ hash_h) ^ ((hash_l ^ hash_h) >> 16)));
+#endif
         net_if_set_hardware_address(iface, hwaddr);
         DEBUG("Auto init radio address on interface %d to 0x%04x\n", iface, hwaddr);
 #else /* CPUID_ID_LEN && defined(MODULE_HASHES) */
