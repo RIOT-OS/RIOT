@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -L "$0" ]; then
-    FILE=$(readlink -e "$0")
+    FILE=$(readlink "$0")
 else
     FILE="$0"
 fi
