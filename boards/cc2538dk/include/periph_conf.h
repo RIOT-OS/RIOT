@@ -76,6 +76,14 @@ extern "C" {
 
 
 /**
+ * @name Hardware Timer peripheral configuration
+ * @{
+ */
+#define HWTIMER_IRQ_PRIO    1
+/** @} */
+
+
+/**
  * @name UART configuration
  * @{
  */
