@@ -252,12 +252,13 @@ typedef struct {
      * @param[in] opt           the option type
      * @param[out] value        pointer to store the gotten value in
      * @param[in,out] value_len the length of *value*. Must be initialized to the
-     *                          available space in value on call.
+     *                          available space in *value* on call.
      * @return  0, on success
      * @return  -ENODEV, if *dev* is not recognized
      * @return  -ENOTSUP, if *opt* is not supported for the device with this
      *          operation
-     * @return  -EOVERFLOW, if length of *value* is longer then *value_len*.
+     * @return  -EOVERFLOW, if available space in *value* given in *value_len*
+     *          is not big enough to store the option value.
      * @return  any other fitting negative errno if the ones stated above
      *          are not sufficient
      */
