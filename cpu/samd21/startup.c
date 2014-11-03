@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 #include "crash.h"
-
+#include "ps.h"
 /**
  * memory markers as defined in the linker script
  */

@@ -54,7 +54,7 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
-#define CON_STACKSIZE                   (512)
+#define CON_STACKSIZE                   (1024)
 #define LOWPAN_TRANSFER_BUF_STACKSIZE   (1024)
 
 #define SIXLOWPAN_MAX_REGISTERED        (4)
@@ -1720,8 +1720,6 @@ int sixlowpan_lowpan_init_interface(int if_id)
 
     /* init link-local prefix */
     ipv6_addr_set_link_local_prefix(&tmp);
-    DEBUG("sixlowpan_lowpan_init_interface1\n");
-
     if (!ipv6_addr_set_by_eui64(&tmp, if_id, &tmp)) {
         DEBUG("Can not set link-local by EUI-64 on interface %d\n", if_id);
         return 0;
@@ -1737,13 +1735,10 @@ int sixlowpan_lowpan_init_interface(int if_id)
         DEBUG("Can not add link-local address to interface %d\n", if_id);
         return 0;
     }
-    DEBUG("sixlowpan_lowpan_init_interface6\n");
-
 
     /* add solicited nodes multicast address of link local address */
     ipv6_addr_set_solicited_node_addr(&tmp, &tmp);
-    DEBUG("sixlowpan_lowpan_init_interface7\n");
-
+    
     DEBUG("%s, %d: sixlowpan_lowpan_init(): add solicited nodes multicast address "
           "to of link layer address interface %d: %s\n", __FILE__, __LINE__,
           if_id, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &tmp));

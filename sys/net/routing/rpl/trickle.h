@@ -18,7 +18,7 @@
 #include "vtimer.h"
 #include "thread.h"
 
-#define TRICKLE_TIMER_STACKSIZE (256)
+#define TRICKLE_TIMER_STACKSIZE (512)
 #define TRICKLE_INTERVAL_STACKSIZE (256)
 #define DAO_DELAY_STACKSIZE (256)
 #define RT_STACKSIZE (512)
