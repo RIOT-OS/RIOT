@@ -85,13 +85,13 @@ void send_packet(int argc, char **argv)
     printf("%d\n", r_addr);
     printf("%s", "sixlowpan msg_len: ");
     printf("%d\n", msg_len);
-    //fe80::ff:fe00:1
-    //ipv6_addr_init(&ipaddr, 0xfe80, 0, 0, 0, 0, 0x00FF, 0xFE00, r_addr);
+    //fe80::ff:fe00:    
+    ipv6_addr_init(&ipaddr, 0xfe80, 0, 0, 0, 0, 0x00FF, 0xFE00, r_addr);
     //ipv6_addr_init(&ipaddr, 0xABCD, 0, 0, 0, 0x1034, 0x00FF, 0xFE00, r_addr);
     //ipv6_addr_init(&ipaddr, 0xabcd, 0x0, 0x0, 0x0, 0x1034/*0x3612*/, 0x00ff, 0xfe00, r_addr);
     printf("%s\n", "sixlowpan send packet ipv6_sendto!");
-    //result = ipv6_sendto(&ipaddr, IPV6_PROTO_NUM_NONE, (uint8_t*)msg, msg_len);
-    result = sixlowpan_lowpan_sendto(TRANSCEIVER_TYPE, &r_addr, 2, (uint8_t*)msg, msg_len);
+    result = ipv6_sendto(&ipaddr, IPV6_PROTO_NUM_NONE, (uint8_t*)msg, msg_len);
+    //result = sixlowpan_lowpan_sendto(TRANSCEIVER_TYPE, &r_addr, 2, (uint8_t*)msg, msg_len);
     if(result == msg_len)
     {
         printf("%s\n", "sixlowpan 'send packet' SENT!!!");
@@ -314,7 +314,7 @@ int main()
     printf("\n");
     printf("\t\tInitialize SixLoWPan with the Following:\n");
     printUsage();
-
+    net_if_set_src_address_mode(0, NET_IF_TRANS_ADDR_M_SHORT);
     posix_open(uart0_handler_pid, 0);
 
     shell_t shell;

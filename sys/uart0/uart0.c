@@ -34,11 +34,11 @@
 #include "board_uart0.h"
 
 #ifndef UART0_BUFSIZE
-#define UART0_BUFSIZE       (160)
+#define UART0_BUFSIZE       (128)
 #endif
 
 /* increase when ENABLE_DEBUG in chardev_thread is set to 1! */
-#define UART0_STACKSIZE     (KERNEL_CONF_STACKSIZE_IDLE)//(KERNEL_CONF_STACKSIZE_DEFAULT)
+#define UART0_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT - 512)
 
 ringbuffer_t uart0_ringbuffer;
 kernel_pid_t uart0_handler_pid = KERNEL_PID_UNDEF;
@@ -46,8 +46,6 @@ kernel_pid_t uart0_handler_pid = KERNEL_PID_UNDEF;
 static char buffer[UART0_BUFSIZE];
 
 static char uart0_thread_stack[UART0_STACKSIZE];
-
-int oldsize;
 
 void board_uart0_init(void)
 {

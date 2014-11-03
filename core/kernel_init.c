@@ -79,7 +79,7 @@ static void *idle_thread(void *arg)
 const char *main_name = "main";
 const char *idle_name = "idle";
 
-static char main_stack[KERNEL_CONF_STACKSIZE_MAIN];
+static char main_stack[KERNEL_CONF_STACKSIZE_MAIN + 160];
 static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
 
 void kernel_init(void)

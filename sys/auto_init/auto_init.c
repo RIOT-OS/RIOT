@@ -74,7 +74,7 @@
 #include "periph/cpuid.h"
 #endif
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 #endif
@@ -150,6 +150,7 @@ void auto_init_net_if(void)
 #endif /* DEBUG_ENABLED */
 
 #undef CONF_RADIO_ADDR
+        #warning "Bubber angriber"
         uint16_t hwaddr = HTONS((uint16_t)((hash_l ^ hash_h) ^ ((hash_l ^ hash_h) >> 16)));
         net_if_set_hardware_address(iface, hwaddr);
         DEBUG("Auto init radio address on interface %d to 0x%04x\n", iface, hwaddr);

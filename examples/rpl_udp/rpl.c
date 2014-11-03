@@ -44,7 +44,7 @@ void rpl_udp_init(int argc, char **argv)
 {
     transceiver_command_t tcmd;
     msg_t m;
-    uint8_t chan = RADIO_CHANNEL;
+    int32_t chan = RADIO_CHANNEL;
 
     if (argc != 2) {
         printf("Usage: %s (r|n)\n", argv[0]);

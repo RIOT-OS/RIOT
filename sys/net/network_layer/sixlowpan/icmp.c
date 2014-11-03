@@ -32,7 +32,7 @@
 #include "serialnumber.h"
 #include "net_help.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 #endif
@@ -275,6 +275,7 @@ void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, 
                    &ipv6_buf->destaddr));
 #endif
     ipv6_send_packet(ipv6_buf);
+    DEBUG("icmpv6 send echo: after ipv6 send packet --> end\n");
 }
 
 void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, uint8_t *data, size_t data_len)

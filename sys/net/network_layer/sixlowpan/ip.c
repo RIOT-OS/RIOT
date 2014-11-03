@@ -72,25 +72,27 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
     uint16_t length = IPV6_HDR_LEN + NTOHS(packet->length);
     ndp_neighbor_cache_t *nce;
 
-    DEBUGF("Got a packet to send to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &packet->destaddr));
+    DEBUG("Got a packet to send to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &packet->destaddr));
     ipv6_net_if_get_best_src_addr(&packet->srcaddr, &packet->destaddr);
 
     if (!ipv6_addr_is_multicast(&packet->destaddr) &&
         ndp_addr_is_on_link(&packet->destaddr)) {
         /* not multicast, on-link */
         nce = ndp_get_ll_address(&packet->destaddr);
-
+        DEBUG("ipv6 send packet: after get ll adr\n");
         if (nce == NULL || sixlowpan_lowpan_sendto(nce->if_id, &nce->lladdr,
                 nce->lladdr_len,
                 (uint8_t *)packet,
                 length) < 0) {
+            DEBUG("ipv6 send packet: before lowpan_sendto\n");
             /* XXX: this is wrong, but until ND does work correctly,
              *      this is the only way (aka the old way)*/
             uint16_t raddr = NTOHS(packet->destaddr.uint16[7]);
             sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *)packet, length);
+            DEBUG("ipv6 send packet: after lowpan_sendto\n");
             /* return -1; */
         }
-
+        DEBUG("ipv6 send packet: before return length\n");
         return length;
     }
     else {
