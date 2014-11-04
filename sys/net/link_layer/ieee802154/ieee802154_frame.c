@@ -185,7 +185,7 @@ uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame,
 
     index++;
 
-    if(frame->fcf.dest_addr_m != 0)
+    if (frame->fcf.dest_addr_m != 0)
     {
         frame->dest_pan_id = (((uint16_t)buf[index]) << 8) | buf[index + 1];
         index += 2;
@@ -226,7 +226,6 @@ uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame,
         {
             frame->src_pan_id = (((uint16_t)buf[index]) << 8) | buf[index + 1];
             index += 2;
-        }
         }
     }
 
