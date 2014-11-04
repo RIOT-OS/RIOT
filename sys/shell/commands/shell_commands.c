@@ -159,6 +159,10 @@ extern int _netif_send(int argc, char **argv);
 #endif
 #endif
 
+#ifdef MODULE_FIB
+extern void _fib_route_handler( int argc, char **argv );
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
 #ifdef MODULE_CONFIG
@@ -259,6 +263,13 @@ const shell_command_t _shell_command_list[] = {
 #ifndef MODULE_TRANSCEIVER
     {"txtsnd", "send raw data", _netif_send },
 #endif
+#endif
+#ifdef MODULE_FIB
+    {
+        "fibroute",
+        "Manipulate the FIB (info: 'fibroute [add|del]')",
+        _fib_route_handler
+    },
 #endif
     {NULL, NULL, NULL}
 };

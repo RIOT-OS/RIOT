@@ -150,3 +150,9 @@ ifneq (,$(filter nhdp,$(USEMODULE)))
   USEMODULE += oonf_common
   USEMODULE += oonf_rfc5444
 endif
+
+ifneq (,$(filter fib,$(USEMODULE)))
+  USEMODULE += timex
+  USEMODULE += vtimer
+  USEMODULE += net_help
+endif
