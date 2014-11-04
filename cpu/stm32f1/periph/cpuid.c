@@ -11,7 +11,7 @@
  * @{
  *
  * @file        cpuid.c
- * @brief       Implementation
+ * @brief       Low-level CPUID driver implementation
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  */
@@ -23,7 +23,7 @@
 
 void cpuid_get(void *id)
 {
-    memcpy(id, (void *)(0x1ffff7e8), CPU_ID_LEN);
+    memcpy(id, (void *)(0x1ffff7e8), CPUID_ID_LEN);
 }
 
 /** @} */
