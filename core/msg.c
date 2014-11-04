@@ -146,9 +146,8 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block, unsigned sta
         *target_message = *m;
         sched_set_status(target, STATUS_PENDING);
 
-        uint16_t target_prio = target->priority;
         restoreIRQ(state);
-        sched_switch(target_prio);
+        thread_yield_higher();
     }
 
     return 1;
