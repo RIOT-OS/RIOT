@@ -104,6 +104,9 @@ endif
 ifneq (,$(filter ng_pktdump,$(USEMODULE)))
     DIRS += net/crosslayer/ng_pktdump
 endif
+ifneq (,$(filter fib,$(USEMODULE)))
+    DIRS += net/network_layer/fib
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
