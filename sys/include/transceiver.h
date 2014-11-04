@@ -25,15 +25,15 @@
 /* supported transceivers *
  * NOTE: necessary to include here again due to
  * https://github.com/RIOT-OS/RIOT/issues/117 */
-#ifdef MODULE_CC110X
-#include "cc110x.h"
+#ifdef MODULE_CC110X_LEGACY_CSMA
+#include "cc110x_legacy_csma.h"
 #ifndef TRANSCEIVER_DEFAULT
 #define TRANSCEIVER_DEFAULT TRANSCEIVER_CC1100
 #endif
 #endif
 
-#ifdef MODULE_CC110X_NG
-#include "cc110x_ng.h"
+#ifdef MODULE_CC110X_LEGACY
+#include "cc110x_legacy.h"
 #ifndef TRANSCEIVER_DEFAULT
 #define TRANSCEIVER_DEFAULT TRANSCEIVER_CC1100
 #endif
@@ -85,13 +85,13 @@
 #ifndef PAYLOAD_SIZE
 #define PAYLOAD_SIZE  (0)
 #endif
-#ifdef MODULE_CC110X
+#ifdef MODULE_CC110X_LEGACY_CSMA
 #if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
 #undef PAYLOAD_SIZE
 #define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)
 #endif
 #endif
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
 #if (CC1100_MAX_DATA_LENGTH > PAYLOAD_SIZE)
 #undef PAYLOAD_SIZE
 #define PAYLOAD_SIZE (CC1100_MAX_DATA_LENGTH)

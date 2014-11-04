@@ -18,8 +18,10 @@
  * @}
  */
 
+#include <stdio.h>
 #include <stdint.h>
 
+#include "board.h"
 
 /**
  * memory markers as defined in the linker script
@@ -33,7 +35,6 @@ extern uint32_t _szero;
 extern uint32_t _ezero;
 extern uint32_t _sstack;
 extern uint32_t _estack;
-
 
 /**
  * @brief functions for initializing the board, std-lib and kernel
@@ -83,7 +84,6 @@ void dummy_handler(void)
     while (1) {asm ("nop");}
 }
 
-
 void isr_nmi(void)
 {
     while (1) {asm ("nop");}
@@ -101,7 +101,13 @@ void isr_debug_mon(void)
 
 void isr_hard_fault(void)
 {
-    while (1) {asm ("nop");}
+    puts("\n### HARD FAULT ###\n");
+    while (1) {
+        LED_RED_TOGGLE;
+        for (int i = 0; i < 2000000; i++) {
+            asm ("nop");
+        }
+    }
 }
 
 void isr_bus_fault(void)
@@ -184,7 +190,7 @@ const void *interrupt_vector[] = {
     (void*) (0UL),                  /* Reserved */
     (void*) isr_pendsv,             /* pendSV interrupt, used for task switching in RIOT */
     (void*) isr_systick,            /* SysTick interrupt, not used in RIOT */
-    /* STM specific peripheral handlers */
+    /* SAM3X8E specific peripheral handlers */
     (void*) isr_supc,               /*  0 supply controller */
     (void*) isr_rstc,               /*  1 reset controller */
     (void*) isr_rtc,                /*  2 real time clock */

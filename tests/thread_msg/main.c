@@ -76,7 +76,7 @@ void *thread3(void *arg)
         msg_t msg;
         msg.content.value = i;
         printf("T3 i=%d\n", i);
-        msg_send(&msg, p1, 1);
+        msg_send(&msg, p1);
     }
     return NULL;
 }

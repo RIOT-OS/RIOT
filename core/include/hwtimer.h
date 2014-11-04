@@ -18,11 +18,11 @@
  * set a flag and trigger a worker thread).
  *
  * <b>The hardware timer should not be used (until you know what
- * you're doing)<b>, use \ref sys_vtimer instead.
+ * you're doing)</b>, use \ref sys_vtimer instead.
  *
  * @{
  *
- * @file        hwtimer.h
+ * @file
  * @brief       HW-timer abstraction
  *
  * @author      Heiko Will
@@ -53,7 +53,7 @@ per second for the current architecture."
 /**
  * @brief       Upper bound for hwtimer_spin
  *
- * @verbatim    Barrier below which hwtimer_spin is called instead of
+ * @note        Barrier below which hwtimer_spin is called instead of
  *              setting a timer and yielding the thread.
  *
  *              Boards should override this.
@@ -67,7 +67,7 @@ per second for the current architecture."
 /**
  * @brief       Overhead of the `hwtimer_wait` function
  *
- * @verbatim    This value is used to decrease the number of ticks that
+ * @note        This value is used to decrease the number of ticks that
  *              `hwtimer_wait` uses to set the actual hardware timer.
  *
  *              The goal is to make sure the number of ticks spent in the

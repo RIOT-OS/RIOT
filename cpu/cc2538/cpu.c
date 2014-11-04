@@ -18,7 +18,6 @@
  */
 
 #include "cpu.h"
-#include "sys-ctrl.h"
 
 #define BIT(n)          ( 1UL << (n) )
 

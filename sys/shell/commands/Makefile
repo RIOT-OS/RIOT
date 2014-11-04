@@ -8,9 +8,9 @@ endif
 ifneq (,$(filter transceiver,$(USEMODULE)))
 	SRC += sc_transceiver.c
 endif
-ifneq (,$(filter cc110x,$(USEMODULE)))
+ifneq (,$(filter cc110x_legacy_csma,$(USEMODULE)))
 	ifeq (,$(filter transceiver,$(USEMODULE)))
-		SRC += sc_cc1100.c
+		SRC += sc_cc110x_legacy_csma.c
 	endif
 endif
 ifneq (,$(filter net_if,$(USEMODULE)))

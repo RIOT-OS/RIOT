@@ -53,7 +53,7 @@ void mutex_lock(struct mutex_t *mutex)
 
 static void mutex_wait(struct mutex_t *mutex)
 {
-    int irqstate = disableIRQ();
+    unsigned irqstate = disableIRQ();
     DEBUG("%s: Mutex in use. %u\n", sched_active_thread->name, mutex->val);
 
     if (mutex->val == 0) {
@@ -77,7 +77,7 @@ static void mutex_wait(struct mutex_t *mutex)
 
     restoreIRQ(irqstate);
 
-    thread_yield();
+    thread_yield_higher();
 
     /* we were woken up by scheduler. waker removed us from queue. we have the mutex now. */
 }
@@ -85,7 +85,7 @@ static void mutex_wait(struct mutex_t *mutex)
 void mutex_unlock(struct mutex_t *mutex)
 {
     DEBUG("%s: unlocking mutex. val: %u pid: %" PRIkernel_pid "\n", sched_active_thread->name, mutex->val, sched_active_pid);
-    int irqstate = disableIRQ();
+    unsigned irqstate = disableIRQ();
 
     if (mutex->val != 0) {
         priority_queue_node_t *next = priority_queue_remove_head(&(mutex->queue));
@@ -107,7 +107,7 @@ void mutex_unlock(struct mutex_t *mutex)
 void mutex_unlock_and_sleep(struct mutex_t *mutex)
 {
     DEBUG("%s: unlocking mutex. val: %u pid: %" PRIkernel_pid ", and taking a nap\n", sched_active_thread->name, mutex->val, sched_active_pid);
-    int irqstate = disableIRQ();
+    unsigned irqstate = disableIRQ();
 
     if (mutex->val != 0) {
         priority_queue_node_t *next = priority_queue_remove_head(&(mutex->queue));
@@ -123,5 +123,5 @@ void mutex_unlock_and_sleep(struct mutex_t *mutex)
     DEBUG("%s: going to sleep.\n", sched_active_thread->name);
     sched_set_status((tcb_t*) sched_active_thread, STATUS_SLEEPING);
     restoreIRQ(irqstate);
-    thread_yield();
+    thread_yield_higher();
 }

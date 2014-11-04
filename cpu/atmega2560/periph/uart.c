@@ -27,6 +27,7 @@
 #include "periph/uart.h"
 #include "periph_conf.h"
 
+#if UART_0_EN || UART_1_EN || UART2_EN || UART_3_EN
 
 /**
  * @brief Each UART device has to store two callbacks.
@@ -315,3 +316,4 @@ ISR(USART2_RX_vect, ISR_BLOCK)
     }
 }
 #endif /* UART_3_EN */
+#endif /* UART_0_EN || UART_1_EN |UART_2_EN| UART3 */

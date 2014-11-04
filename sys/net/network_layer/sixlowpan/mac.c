@@ -256,7 +256,7 @@ int sixlowpan_mac_prepare_ieee802144_frame(
     ieee802154_frame_init(frame, (uint8_t *)&lowpan_mac_buf);
     memcpy(&lowpan_mac_buf[hdrlen], frame->payload, frame->payload_len);
     /* set FCS */
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
     fcs = (uint16_t *)&lowpan_mac_buf[frame->payload_len + hdrlen+1];
 #else
     fcs = (uint16_t *)&lowpan_mac_buf[frame->payload_len + hdrlen];

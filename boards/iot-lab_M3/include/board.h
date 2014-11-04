@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    board_iot-lab_M3 iot-lab_M3
+ * @defgroup    board_iot-lab_M3 IoT-LAB M3 open node
  * @ingroup     boards
  * @brief       Board specific files for the iot-lab_M3 board.
  * @{
@@ -28,6 +28,10 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name Define the nominal CPU core clock in this board
@@ -70,6 +74,14 @@
 /** @} */
 
 /**
+ * @name Define the interface to the LPS331AP pressure sensor
+ * @{
+ */
+#define LPS331AP_I2C        I2C_0
+#define LPS331AP_ADDR       0x5c
+/** @} */
+
+/**
  * @name LED pin definitions
  * @{
  */
@@ -107,6 +119,10 @@ typedef uint8_t radio_packet_length_t;
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BOARD_H_ */
 /** @} */

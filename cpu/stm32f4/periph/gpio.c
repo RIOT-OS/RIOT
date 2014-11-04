@@ -956,65 +956,48 @@ static inline void irq_handler(gpio_t dev)
     }
 }
 
-__attribute__((naked))
 void isr_exti0(void)
 {
-    ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR0) {
         EXTI->PR |= EXTI_PR_PR0;        /* clear status bit by writing a 1 to it */
         irq_handler(GPIO_IRQ_0);
     }
-    ISR_EXIT();
 }
 
-__attribute__((naked))
 void isr_exti1(void)
 {
-    ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR1) {
         EXTI->PR |= EXTI_PR_PR1;        /* clear status bit by writing a 1 to it */
         irq_handler(GPIO_IRQ_1);
     }
-    ISR_EXIT();
 }
 
-__attribute__((naked))
 void isr_exti2(void)
 {
-    ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR2) {
         EXTI->PR |= EXTI_PR_PR2;        /* clear status bit by writing a 1 to it */
         irq_handler(GPIO_IRQ_2);
     }
-    ISR_EXIT();
 }
 
-__attribute__((naked))
 void isr_exti3(void)
 {
-    ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR3) {
         EXTI->PR |= EXTI_PR_PR3;        /* clear status bit by writing a 1 to it */
         irq_handler(GPIO_IRQ_3);
     }
-    ISR_EXIT();
 }
 
-__attribute__((naked))
 void isr_exti4(void)
 {
-    ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR4) {
         EXTI->PR |= EXTI_PR_PR4;        /* clear status bit by writing a 1 to it */
         irq_handler(GPIO_IRQ_4);
     }
-    ISR_EXIT();
 }
 
-__attribute__((naked))
 void isr_exti9_5(void)
 {
-    ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR5) {
         EXTI->PR |= EXTI_PR_PR5;        /* clear status bit by writing a 1 to it */
         irq_handler(GPIO_IRQ_5);
@@ -1035,13 +1018,10 @@ void isr_exti9_5(void)
         EXTI->PR |= EXTI_PR_PR9;        /* clear status bit by writing a 1 to it */
         irq_handler(GPIO_IRQ_9);
     }
-    ISR_EXIT();
 }
 
-__attribute__((naked))
 void isr_exti15_10(void)
 {
-    ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR10) {
         EXTI->PR |= EXTI_PR_PR10;        /* clear status bit by writing a 1 to it */
         irq_handler(GPIO_IRQ_10);
@@ -1066,7 +1046,6 @@ void isr_exti15_10(void)
         EXTI->PR |= EXTI_PR_PR15;        /* clear status bit by writing a 1 to it */
         irq_handler(GPIO_IRQ_15);
     }
-    ISR_EXIT();
 }
 
 #endif /* GPIO_NUMOF */

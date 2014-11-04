@@ -10,7 +10,7 @@
  * @ingroup     board_yunjia-nrf51822
  * @{
  *
- * @file        periph_conf.h
+ * @file
  * @brief       Peripheral MCU configuration for the Yunjia NRF51822 board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -18,6 +18,10 @@
 
 #ifndef __PERIPH_CONF_H
 #define __PERIPH_CONF_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name Timer configuration
@@ -62,10 +66,9 @@
 #define UART_0_EN           1
 #define UART_IRQ_PRIO       1
 
-/* UART 0 device configuration */
-#define UART_0_DEV          NRF_UART0
-#define UART_0_PIN_RX       1
-#define UART_0_PIN_TX       2
+/* UART pin configuration */
+#define UART_PIN_RX       1
+#define UART_PIN_TX       2
 /** @} */
 
 /**
@@ -115,5 +118,9 @@
 #define GPIO_6_PIN          13
 #define GPIO_7_PIN          14
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PERIPH_CONF_H */

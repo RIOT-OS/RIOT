@@ -5,11 +5,13 @@
  * Public License v2.1. See the file LICENSE in the top level directory for more
  * details.
  */
+
 /**
+ * @defgroup    driver_periph_rtt RTT
  * @ingroup     driver_periph
  * @{
  *
- * @file        rtt.h
+ * @file
  * @brief       Low-level RTT (Real Time Timer) peripheral driver interface
  *              definitions
  *

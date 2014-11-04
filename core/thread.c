@@ -46,11 +46,13 @@ int thread_getstatus(kernel_pid_t pid)
     return t ? t->status : STATUS_NOT_FOUND;
 }
 
+#ifdef DEVELHELP
 const char *thread_getname(kernel_pid_t pid)
 {
     volatile tcb_t *t = thread_get(pid);
     return t ? t->name : NULL;
 }
+#endif
 
 void thread_sleep(void)
 {
@@ -61,14 +63,14 @@ void thread_sleep(void)
     dINT();
     sched_set_status((tcb_t *)sched_active_thread, STATUS_SLEEPING);
     eINT();
-    thread_yield();
+    thread_yield_higher();
 }
 
 int thread_wakeup(kernel_pid_t pid)
 {
     DEBUG("thread_wakeup: Trying to wakeup PID %" PRIkernel_pid "...\n", pid);
 
-    int old_state = disableIRQ();
+    unsigned old_state = disableIRQ();
 
     tcb_t *other_thread = (tcb_t *) sched_threads[pid];
     if (other_thread && other_thread->status == STATUS_SLEEPING) {
@@ -89,6 +91,18 @@ int thread_wakeup(kernel_pid_t pid)
     }
 }
 
+void thread_yield(void)
+{
+    unsigned old_state = disableIRQ();
+    tcb_t *me = (tcb_t *)sched_active_thread;
+    if (me->status >= STATUS_ON_RUNQUEUE) {
+        clist_advance(&sched_runqueues[me->priority]);
+    }
+    restoreIRQ(old_state);
+
+    thread_yield_higher();
+}
+
 #ifdef DEVELHELP
 uintptr_t thread_measure_stack_free(char *stack)
 {
@@ -105,7 +119,7 @@ uintptr_t thread_measure_stack_free(char *stack)
 }
 #endif
 
-kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags, void *(*function)(void *arg), void *arg, const char *name)
+kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags, thread_task_func_t function, void *arg, const char *name)
 {
     if (priority >= SCHED_PRIO_LEVELS) {
         return -EINVAL;
@@ -113,6 +127,8 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
 #ifdef DEVELHELP
     int total_stacksize = stacksize;
+#else
+    (void) name;
 #endif
 
     /* align the stack on a 16/32bit boundary */
@@ -174,10 +190,11 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     cb->pid = pid;
     cb->sp = thread_stack_init(function, arg, stack, stacksize);
-    cb->stack_start = stack;
 
 #ifdef DEVELHELP
+    cb->stack_start = stack;
     cb->stack_size = total_stacksize;
+    cb->name = name;
 #endif
 
     cb->priority = priority;
@@ -185,8 +202,6 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
 
     cb->rq_entry.next = NULL;
     cb->rq_entry.prev = NULL;
-
-    cb->name = name;
 
     cb->wait_data = NULL;
 
@@ -208,7 +223,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, char priority, int flags,
         if (!(flags & CREATE_WOUT_YIELD)) {
             if (!inISR()) {
                 eINT();
-                thread_yield();
+                sched_switch(priority);
             }
             else {
                 sched_context_switch_request = 1;

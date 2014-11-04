@@ -44,11 +44,11 @@
 
 
 
-/** @addtogroup Nordic Semiconductor
+/** @addtogroup cpu_specific_Nordic Semiconductor
   * @{
   */
 
-/** @addtogroup nRF51
+/** @addtogroup cpu_specific_nRF51
   * @{
   */
 
@@ -124,7 +124,7 @@ typedef enum {
 /* ================================================================================ */
 
 
-/** @addtogroup Device_Peripheral_Registers
+/** @addtogroup cpu_specific_Device_Peripheral_Registers
   * @{
   */
 

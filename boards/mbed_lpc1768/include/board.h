@@ -1,8 +1,16 @@
+/*
+ * Copyright 2014 INRIA
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 #ifndef __BOARD_H
 #define __BOARD_H
 
 /**
- * @file    boards.h
+ * @file
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  *
  * @defgroup    mbed_lpc1768 mbed NXP LPC1768 development kit
@@ -13,6 +21,10 @@
 
 #include <stdint.h>
 #include "bitarithm.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define F_CPU                   (96000000)
 
@@ -34,6 +46,10 @@ typedef uint8_t radio_packet_length_t;
  * @param[in] t The waiting cycles
  */
 void loop_delay(uint32_t t);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __BOARD_H */

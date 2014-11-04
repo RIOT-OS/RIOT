@@ -67,8 +67,8 @@ static void __enter_thread_mode(void);
  * it inside of the programm counter of the MCU.
  * if task_func returns sched_task_exit gets popped into the PC
  */
-char *thread_arch_stack_init(void *(*task_func)(void *), void *arg, void *stack_start,
-                             int stack_size)
+char *thread_arch_stack_init(thread_task_func_t task_func, void *arg,
+                             void *stack_start, int stack_size)
 {
     uint16_t tmp_adress;
     uint8_t *stk;

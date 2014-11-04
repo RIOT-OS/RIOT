@@ -45,7 +45,13 @@ typedef struct ringbuffer {
  * @param[in]    buffer    Buffer to use by rb.
  * @param[in]    bufsize   `sizeof (buffer)`
  */
-void ringbuffer_init(ringbuffer_t *restrict rb, char *buffer, unsigned bufsize);
+static inline void ringbuffer_init(ringbuffer_t *restrict rb, char *buffer, unsigned bufsize)
+{
+    rb->buf = buffer;
+    rb->size = bufsize;
+    rb->start = 0;
+    rb->avail = 0;
+}
 
 /**
  * @brief           Add an element to the ringbuffer.
@@ -87,6 +93,14 @@ int ringbuffer_get_one(ringbuffer_t *restrict rb);
 unsigned ringbuffer_get(ringbuffer_t *restrict rb, char *buf, unsigned n);
 
 /**
+ * @brief           Remove a number of elements from the ringbuffer.
+ * @param[in,out]   rb    Ringbuffer to operate on.
+ * @param[in]       n     Read at most n elements.
+ * @returns         Number of elements actually removed.
+ */
+unsigned ringbuffer_remove(ringbuffer_t *restrict rb, unsigned n);
+
+/**
  * @brief           Test if the ringbuffer is empty.
  * @param[in,out]   rb    Ringbuffer to operate on.
  * @returns         0 iff not empty
@@ -104,6 +118,16 @@ static inline int ringbuffer_empty(const ringbuffer_t *restrict rb)
 static inline int ringbuffer_full(const ringbuffer_t *restrict rb)
 {
     return rb->avail == rb->size;
+}
+
+/**
+ * @brief           Return available space in ringbuffer
+ * @param[in,out]   rb Ringbuffer to query.
+ * @returns         number of available bytes
+ */
+static inline unsigned int ringbuffer_get_free(const ringbuffer_t *restrict rb)
+{
+    return rb->size - rb->avail;
 }
 
 /**

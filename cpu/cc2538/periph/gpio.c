@@ -23,9 +23,6 @@
 #include "cpu.h"
 #include "sched.h"
 #include "thread.h"
-
-#include "cc2538-gpio.h"
-#include "ioc.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
@@ -355,9 +352,9 @@ static const uint8_t reverse_pin_lut[] = {
 };
 
 static const uint32_t ioc_mask_lut[] = {
-    [GPIO_NOPULL  ] = IOC_OVERRIDE_OE,
-    [GPIO_PULLUP  ] = IOC_OVERRIDE_OE | IOC_OVERRIDE_PUE,
-    [GPIO_PULLDOWN] = IOC_OVERRIDE_OE | IOC_OVERRIDE_PDE,
+    [GPIO_NOPULL  ] = IOC_OVERRIDE_DIS,
+    [GPIO_PULLUP  ] = IOC_OVERRIDE_PUE,
+    [GPIO_PULLDOWN] = IOC_OVERRIDE_PDE,
 };
 
 int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
@@ -373,7 +370,7 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
     gpio_dir_output(pin);
 
     /* configure the pin's pull resistor state */
-    IOC_PXX_OVER[pin] = ioc_mask_lut[pushpull];
+    IOC_PXX_OVER[pin] = IOC_OVERRIDE_OE | ioc_mask_lut[pushpull];
 
     return 0;
 }
@@ -528,14 +525,10 @@ void gpio_write(gpio_t dev, int value)
 }
 
 /** @brief Interrupt service routine for Port A */
-__attribute__((naked))
-void gpio_port_a_isr(void)
+void isr_gpioa(void)
 {
     int mis, bit;
     gpio_state_t* state;
-
-    ISR_ENTER();
-    asm("push {r4-r5}");
 
     /* Latch and clear the interrupt status early on: */
     mis = GPIO_A->MIS;
@@ -554,20 +547,13 @@ void gpio_port_a_isr(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-
-    asm("pop {r4-r5}");
-    ISR_EXIT();
 }
 
 /** @brief Interrupt service routine for Port B */
-__attribute__((naked))
-void gpio_port_b_isr(void)
+void isr_gpiob(void)
 {
     int mis, bit;
     gpio_state_t* state;
-
-    ISR_ENTER();
-    asm("push {r4-r5}");
 
     /* Latch and clear the interrupt status early on: */
     mis = GPIO_B->MIS;
@@ -586,20 +572,13 @@ void gpio_port_b_isr(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-
-    asm("pop {r4-r5}");
-    ISR_EXIT();
 }
 
 /** @brief Interrupt service routine for Port C */
-__attribute__((naked))
-void gpio_port_c_isr(void)
+void isr_gpioc(void)
 {
     int mis, bit;
     gpio_state_t* state;
-
-    ISR_ENTER();
-    asm("push {r4-r5}");
 
     /* Latch and clear the interrupt status early on: */
     mis = GPIO_C->MIS;
@@ -618,20 +597,13 @@ void gpio_port_c_isr(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-
-    asm("pop {r4-r5}");
-    ISR_EXIT();
 }
 
 /** @brief Interrupt service routine for Port D */
-__attribute__((naked))
-void gpio_port_d_isr(void)
+void isr_gpiod(void)
 {
     int mis, bit;
     gpio_state_t* state;
-
-    ISR_ENTER();
-    asm("push {r4-r5}");
 
     /* Latch and clear the interrupt status early on: */
     mis = GPIO_D->MIS;
@@ -650,9 +622,6 @@ void gpio_port_d_isr(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-
-    asm("pop {r4-r5}");
-    ISR_EXIT();
 }
 
 #endif /* GPIO_NUMOF */

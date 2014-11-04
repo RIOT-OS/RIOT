@@ -12,7 +12,7 @@
  * @brief       Common files for all MSB-430 boards
  * @{
  *
- * @file        board-config.h
+ * @file
  * @brief       Common definitions for all msb-430 based boards
  *
  * @author      unknown
@@ -23,6 +23,14 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define INFOMEM     (0x1000)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BOARD-CONF_H */

@@ -14,7 +14,7 @@
  * @brief   LIFO buffer API, read long description carefully
  * @author  Heiko Will <hwill@inf.fu-berlin.de>
  *
- * @detail  This LIFO implementation very efficiently handles integer values.
+ * @details This LIFO implementation very efficiently handles integer values.
  *          The caveat is that it **can only handle values between 0 and its own
  *          size - 1**. Also it can only handle up to one element of each value.
  *          If you insert a value twice the LIFO will break.

@@ -27,23 +27,25 @@
 #include "transceiver.h"
 #include "msg.h"
 
-#if   defined( MODULE_CC110X )
-#include "cc110x.h"
+#if   defined( MODULE_CC110X_LEGACY_CSMA )
+#include "cc110x_legacy_csma.h"
 #define TEXT_SIZE           CC1100_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_CC1100
 
-#elif defined( MODULE_CC110X_NG )
-#include "cc110x_ng.h"
+#elif defined( MODULE_CC110X_LEGACY )
+#include "cc110x_legacy.h"
 #define TEXT_SIZE           CC1100_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_CC1100
 
 #elif defined( MODULE_CC2420 )
 #include "cc2420.h"
+#include "ieee802154_frame.h"
 #define TEXT_SIZE           CC2420_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_CC2420
 
 #elif defined( MODULE_AT86RF231 )
 #include "at86rf231.h"
+#include "ieee802154_frame.h"
 #define TEXT_SIZE           AT86RF231_MAX_DATA_LENGTH
 #define _TC_TYPE            TRANSCEIVER_AT86RF231
 
@@ -216,8 +218,8 @@ void _transceiver_send_handler(int argc, char **argv)
         puts("Transceiver not initialized");
         return;
     }
-    if (argc != 3) {
-        printf("Usage:\t%s <ADDR> <MSG>\n", argv[0]);
+    if (argc < 3) {
+        printf("Usage:\t%s <ADDR> <MSG> [PAN]\n", argv[0]);
         return;
     }
 
@@ -236,12 +238,18 @@ void _transceiver_send_handler(int argc, char **argv)
     strcpy(text_msg, argv[2]);
 
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+    memset(&p, 0, sizeof(ieee802154_packet_t));
     p.frame.payload = (uint8_t*) text_msg;
     p.frame.payload_len = strlen(text_msg) + 1;
     p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
     p.frame.fcf.src_addr_m = IEEE_802154_SHORT_ADDR_M;
-    memset(p.frame.dest_addr, 0, sizeof(p.frame.dest_addr));
     p.frame.dest_addr[1] = atoi(argv[1]);
+    if (argc == 4) {
+        p.frame.dest_pan_id = atoi(argv[3]);
+    }
+    else {
+        p.frame.dest_pan_id = 1;
+    }
 #else
     p.data = (uint8_t *) text_msg;
     p.length = strlen(text_msg) + 1;
@@ -285,7 +293,7 @@ void _transceiver_monitor_handler(int argc, char **argv)
     mesg.content.ptr = (char *) &tcmd;
     mesg.type = SET_MONITOR;
 
-    msg_send(&mesg, transceiver_pid, 1);
+    msg_send(&mesg, transceiver_pid);
 }
 
 /* checked for type safety */

@@ -20,6 +20,13 @@
 #define __CPU_CONF_H
 
 #include "cc2538.h"
+#include "cc2538-gpio.h"
+#include "cc2538-uart.h"
+#include "gptimer.h"
+#include "ioc.h"
+#include "soc-adc.h"
+#include "rfcore.h"
+#include "sys-ctrl.h"
 
 #ifdef __cplusplus
 extern "C" {

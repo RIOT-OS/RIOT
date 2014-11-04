@@ -23,7 +23,6 @@
 #include <string.h>
 
 #include "cpu.h"
-#include "cpu-conf.h"
 #include "periph/cpuid.h"
 
 #define BITS_PER_BYTE 8

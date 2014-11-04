@@ -52,7 +52,7 @@ static int appserver_sent_content(uint8_t *buf, int len, kernel_pid_t from)
     m.content.ptr = (char *) &rmsg;
     kernel_pid_t dest_pid = from;
     DEBUGMSG(1, "sending msg to pid=%" PRIkernel_pid "\n", dest_pid);
-    int ret = msg_send(&m, dest_pid, 1);
+    int ret = msg_send(&m, dest_pid);
     DEBUGMSG(1, "msg_reply returned: %d\n", ret);
     return ret;
 }

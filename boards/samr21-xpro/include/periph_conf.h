@@ -10,7 +10,7 @@
  * @ingroup     board_atsamr21-xpro
  * @{
  *
- * @file        periph_conf.h
+ * @file
  * @brief       Peripheral MCU configuration for the Atmel SAM R21 Xplained Pro board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
@@ -18,6 +18,10 @@
 
 #ifndef __PERIPH_CONF_H
 #define __PERIPH_CONF_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name Timer peripheral configuration
@@ -265,6 +269,10 @@
 #define GPIO_15_PIN 
 #define GPIO_15_EXTINT        
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PERIPH_CONF_H */
 /** @} */

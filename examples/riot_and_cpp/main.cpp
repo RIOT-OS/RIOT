@@ -42,6 +42,10 @@ using namespace std;
 int main()
 {
     printf("\n************ RIOT and C++ demo program ***********\n");
+    printf("******** Hello, you're in thread #%" PRIkernel_pid " ********\n", sched_active_pid);
+    printf("The vector vInts has been filled with %d numbers.\n", (int)vInts.size());
 
     return 0;
 }
+
+    printf("******** Hello, you're in thread #%" PRIkernel_pid " ********\n", sched_active_pid);

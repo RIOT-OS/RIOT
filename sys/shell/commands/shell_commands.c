@@ -63,7 +63,7 @@ extern void _x86_lspci(int argc, char **argv);
 #ifdef DBG_IGNORE
 #define _TC_IGN
 #endif
-#if (defined(MODULE_CC110X_NG) || defined(MODULE_CC2420) || defined(MODULE_AT86RF231) || defined(MODULE_NATIVENET))
+#if (defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC2420) || defined(MODULE_AT86RF231) || defined(MODULE_NATIVENET))
 #define _TC_ADDR
 #define _TC_CHAN
 #define _TC_MON
@@ -74,7 +74,7 @@ extern void _x86_lspci(int argc, char **argv);
 #define _TC_PAN
 #endif
 #else /* WITHOUT MODULE_TRANSCEIVER */
-#ifdef MODULE_CC110X
+#ifdef MODULE_CC110X_LEGACY_CSMA
 extern void _cc110x_get_set_address_handler(int argc, char **argv);
 extern void _cc110x_get_set_channel_handler(int argc, char **argv);
 #endif
@@ -172,7 +172,7 @@ const shell_command_t _shell_command_list[] = {
     {"ign", "Ignore the address at the transceiver", _transceiver_set_ignore_handler},
 #endif
 #else /* WITHOUT MODULE_TRANSCEIVER */
-#ifdef MODULE_CC110X
+#ifdef MODULE_CC110X_LEGACY_CSMA
     {"addr", "Gets or sets the address for the CC1100 transceiver", _cc110x_get_set_address_handler},
     {"chan", "Gets or sets the channel for the CC1100 transceiver", _cc110x_get_set_channel_handler},
 #endif

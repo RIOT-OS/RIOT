@@ -7,11 +7,12 @@
  */
 
 /**
+ * @defgroup    driver_periph_pwm PWM
  * @ingroup     driver_periph
  * @brief       Low-level PWM peripheral driver
  * @{
  *
- * @file        periph/pwm.h
+ * @file
  * @brief       Low-level PWM peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

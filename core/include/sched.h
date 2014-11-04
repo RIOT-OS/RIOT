@@ -100,8 +100,9 @@
 
 /**
  * @brief   Triggers the scheduler to schedule the next thread
+ * @returns 1 if sched_active_thread/sched_active_pid was changed, 0 otherwise.
  */
-void sched_run(void);
+int sched_run(void);
 
 /**
  * @brief   Set the status of the specified process
@@ -155,7 +156,7 @@ extern volatile kernel_pid_t sched_active_pid;
 /**
  * List of runqueues per priority level
  */
-extern clist_node_t *runqueues[SCHED_PRIO_LEVELS];
+extern clist_node_t *sched_runqueues[SCHED_PRIO_LEVELS];
 
 #if SCHEDSTATISTICS
 /**

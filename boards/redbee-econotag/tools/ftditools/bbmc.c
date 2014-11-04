@@ -473,6 +473,8 @@ int print_and_prompt(struct ftdi_device_list *devlist)
         size_t last = strlen(input) - 1;
 
         if (input[last] == '\n') {
+            /* cppcheck: input is accessed later via *s */
+            /* cppcheck-suppress unreadVariable */
             input[last] = '\0';
         }
 
@@ -534,7 +536,6 @@ void erase(struct ftdi_context *ftdic, const struct layout *l)
 int bb_mpsee(struct ftdi_context *ftdic, uint16_t dir, uint16_t val)
 {
     uint8_t buf[3];
-    int ret;
 
     /* command "set data bits low byte" */
     buf[0] = 0x80;
@@ -559,7 +560,7 @@ int bb_mpsee(struct ftdi_context *ftdic, uint16_t dir, uint16_t val)
     fprintf(stderr, "write %x %x %x\n", buf[0], buf[1], buf[2]);
 #endif
 
-    if ((ret = (ftdi_write_data(ftdic, buf, 3))) < 0) {
+    if ((ftdi_write_data(ftdic, buf, 3)) < 0) {
         perror("ft2232_write error");
         fprintf(stderr, "ft2232_write command %x\n", buf[0]);
         return EXIT_FAILURE;

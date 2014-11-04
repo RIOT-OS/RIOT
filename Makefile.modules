@@ -5,6 +5,7 @@ USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
 ED = $(patsubst %,-DMODULE_%,$(subst -,_,$(USEMODULE) $(USEPKG)))
+ED += $(patsubst %,-DFEATURE_%,$(subst -,_,$(filter $(FEATURES_PROVIDED), $(FEATURES_REQUIRED))))
 EXTDEFINES = $(shell echo $(sort $(ED))|tr 'a-z' 'A-Z')
 REALMODULES = $(filter-out $(PSEUDOMODULES), $(sort $(USEMODULE)))
 export BASELIBS += $(REALMODULES:%=$(BINDIR)%.a)

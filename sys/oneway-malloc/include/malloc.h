@@ -7,7 +7,8 @@
  */
 
 /**
- * @addtogroup  oneway_malloc
+ * @defgroup    oneway_malloc
+ * @ingroup     sys
  * @{
  * @file        malloc.h
  * @brief       A malloc implementation for MSP-430 boards without free.

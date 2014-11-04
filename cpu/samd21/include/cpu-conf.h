@@ -9,7 +9,7 @@
 /**
  * @{
  *
- * @file            cpu-conf.h
+ * @file
  * @brief           Implementation specific CPU configuration options
  *
  * @author          Thomas Eichinger <thomas.eichinger@fu-berlin.de>

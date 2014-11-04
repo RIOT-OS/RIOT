@@ -353,47 +353,42 @@ void timer_reset(tim_t dev)
 /*TROELS: don't know if thread_yield is appropriate here, but i noticed it in uart, and it works here */
 
 #if TIMER_0_EN
-__attribute__ ((naked))
 void TIMER_0_ISR(void)
 {
-    ISR_ENTER();
-        if (TIMER_0_DEV.INTFLAG.bit.MC0 && TIMER_0_DEV.INTENSET.bit.MC0) {
-            if(config[TIMER_0].cb){ //check for null
-                config[TIMER_0].cb(0);
-            }
+    if (TIMER_0_DEV.INTFLAG.bit.MC0 && TIMER_0_DEV.INTENSET.bit.MC0) {
+        TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+        config[TIMER_0].cb(0);
+    }
             TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
         }
-        else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
+    else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
             if(config[TIMER_0].cb){ //check for null
-                config[TIMER_0].cb(1);
-            }
+        config[TIMER_0].cb(1);
+    }
             TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
         }
         if (sched_context_switch_request) {
             thread_yield();
         }
-    ISR_EXIT();
 }
 #endif /* TIMER_0_EN */
 
 
 #if TIMER_1_EN
-__attribute__ ((naked))
 void TIMER_1_ISR(void)
 {
-    ISR_ENTER();
-        if (TIMER_1_DEV.INTFLAG.bit.MC0 && TIMER_1_DEV.INTENSET.bit.MC0) {
-            if(config[TIMER_1].cb){ //check for null
-                config[TIMER_1].cb(0);
-            }
+    if (TIMER_1_DEV.INTFLAG.bit.MC0 && TIMER_1_DEV.INTENSET.bit.MC0) {
+        TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
+        config[TIMER_1].cb(0);
+    }
             TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
         }
-        else if (TIMER_1_DEV.INTFLAG.bit.MC1 && TIMER_1_DEV.INTENSET.bit.MC1) {
-            if(config[TIMER_1].cb){ //check for null
-               config[TIMER_1].cb(1);
+    else if (TIMER_1_DEV.INTFLAG.bit.MC1 && TIMER_1_DEV.INTENSET.bit.MC1) {
+        TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
+        config[TIMER_1].cb(1);
 
             }
             TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
@@ -402,32 +397,28 @@ void TIMER_1_ISR(void)
 
         if (sched_context_switch_request) {
             thread_yield();
-        }
-    ISR_EXIT();
+    }
 }
 #endif /* TIMER_1_EN */
 
 
 #if TIMER_2_EN
-__attribute__ ((naked))
 void TIMER_2_ISR(void)
 {
-    ISR_ENTER();
-        if (TIMER_2_DEV.INTFLAG.bit.MC0 && TIMER_2_DEV.INTENSET.bit.MC0) {
-            TIMER_2_DEV.INTFLAG.bit.MC0 = 1;
+    if (TIMER_2_DEV.INTFLAG.bit.MC0 && TIMER_2_DEV.INTENSET.bit.MC0) {
+        TIMER_2_DEV.INTFLAG.bit.MC0 = 1;
             if(config[TIMER_2].cb){ //check for null
-                config[TIMER_2].cb(0);
-            }
+        config[TIMER_2].cb(0);
+    }
         }
-        else if (TIMER_2_DEV.INTFLAG.bit.MC1 && TIMER_2_DEV.INTENSET.bit.MC1) {
-            TIMER_2_DEV.INTFLAG.bit.MC1 = 1;
+    else if (TIMER_2_DEV.INTFLAG.bit.MC1 && TIMER_2_DEV.INTENSET.bit.MC1) {
+        TIMER_2_DEV.INTFLAG.bit.MC1 = 1;
             if(config[TIMER_2].cb){ //check for null
-               config[TIMER_2].cb(1);
+        config[TIMER_2].cb(1);
             }
         }
         if (sched_context_switch_request) {
             thread_yield();
-        }
-    ISR_EXIT();
+    }
 }
 #endif /* TIMER_2_EN */

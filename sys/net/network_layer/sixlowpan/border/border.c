@@ -113,7 +113,7 @@ void *serial_reader_f(void *arg)
 
                 if (conf_packet->conftype == BORDER_CONF_SYN) {
                     m.content.ptr = (char *)conf_packet;
-                    msg_send(&m, main_pid, 1);
+                    msg_send(&m, main_pid);
                     continue;
                 }
             }

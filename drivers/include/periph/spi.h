@@ -7,6 +7,7 @@
  */
 
 /**
+ * @defgroup    driver_periph_spi SPI
  * @ingroup     driver_periph
  * @brief       Low-level SPI peripheral driver
  * @{

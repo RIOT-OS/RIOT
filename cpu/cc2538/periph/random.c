@@ -21,9 +21,6 @@
 #include <stdint.h>
 
 #include "cpu.h"
-#include "rfcore.h"
-#include "soc-adc.h"
-
 #include "periph_conf.h"
 #include "periph/random.h"
 

@@ -10,7 +10,7 @@
  * @ingroup         cpu_samd21
  * @{
  *
- * @file            hwtimer_cpu.h
+ * @file
  * @brief           CPU specific hwtimer configuration options
  *
  * @author          Thomas Eichinger <thomas.eichinger@fu-berlin.de>

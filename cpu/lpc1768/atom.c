@@ -38,7 +38,7 @@ NORETURN void cpu_switch_context_exit(void){
 }
 
 
-void thread_yield(void) {
+void thread_yield_higher(void) {
     asm("svc 0x01\n");
 }
 

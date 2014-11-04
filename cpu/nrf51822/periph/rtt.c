@@ -93,9 +93,8 @@ void rtt_poweroff(void)
     RTT_DEV->POWER = 0;
 }
 
-__attribute__((naked)) void RTT_ISR(void)
+void RTT_ISR(void)
 {
-    ISR_ENTER();
     if (RTT_DEV->EVENTS_COMPARE[0] ==1) {
         RTT_DEV->EVENTS_COMPARE[0] = 0;
         RTT_DEV->INTENCLR = RTC_INTENSET_COMPARE0_Msk;
@@ -104,7 +103,6 @@ __attribute__((naked)) void RTT_ISR(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 
 #endif /* RTT_NUMOF */

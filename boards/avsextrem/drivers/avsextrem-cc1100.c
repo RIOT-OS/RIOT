@@ -27,7 +27,7 @@
 // cpu
 #include "cpu.h"
 // sys
-#include "cc110x_ng.h"
+#include "cc110x_legacy.h"
 #include "gpioint.h"
 
 #define CC1100_GDO0   (FIO2PIN & BIT6)  // read serial I/O (GDO0)

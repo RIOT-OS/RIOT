@@ -301,7 +301,7 @@ static inline void ipv6_addr_set_solicited_node_addr(ipv6_addr_t *ipv6_addr_out,
     /* copy only the last 24-bit of the ip-address that is beeing resolved */
     ipv6_addr_out->uint32[0] = HTONL(0xff020000);
     ipv6_addr_out->uint32[1] = 0;
-    ipv6_addr_out->uint32[2] = HTONS(1);
+    ipv6_addr_out->uint32[2] = HTONL(1);
     ipv6_addr_out->uint8[12] = 0xff;
     ipv6_addr_out->uint8[13] = ipv6_addr_in->uint8[13];
     ipv6_addr_out->uint16[7] = ipv6_addr_in->uint16[7];

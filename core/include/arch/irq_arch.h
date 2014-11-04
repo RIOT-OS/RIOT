@@ -16,6 +16,9 @@
  * This file acts as a wrapper between the kernels interrupt interface and the architecture
  * dependent implementation of the interfaces.
  *
+ * @note All functions in this module have to be implemented in a way that it
+ *       is safe to call them from within the context of an ISR.
+ *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 

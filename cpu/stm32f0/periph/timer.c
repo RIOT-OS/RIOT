@@ -25,6 +25,9 @@
 #include "periph_conf.h"
 #include "periph/timer.h"
 
+/* guard file in case no TIMER devices are defined */
+#if TIMER_0_EN || TIMER_1_EN
+
 
 static inline void irq_handler(tim_t timer, TIM_TypeDef *dev);
 
@@ -288,20 +291,16 @@ void timer_reset(tim_t dev)
 }
 
 #if TIMER_0_EN
-__attribute__ ((naked)) void TIMER_0_ISR(void)
+void TIMER_0_ISR(void)
 {
-    ISR_ENTER();
     irq_handler(TIMER_0, TIMER_0_DEV);
-    ISR_EXIT();
 }
 #endif
 
 #if TIMER_1_EN
-__attribute__ ((naked)) void TIMER_1_ISR(void)
+void TIMER_1_ISR(void)
 {
-    ISR_ENTER();
     irq_handler(TIMER_1, TIMER_1_DEV);
-    ISR_EXIT();
 }
 #endif
 
@@ -328,3 +327,4 @@ static inline void irq_handler(tim_t timer, TIM_TypeDef *dev)
         config[timer].cb(3);
     }
 }
+#endif /* TIMER_0_EN || TIMER_1_EN */

@@ -30,6 +30,9 @@
 #   include <stddef.h>
 #   include <sys/types.h>
 
+/**
+ * @brief Maximum value for ssize_t
+ */
 #   ifndef SSIZE_MAX
 #       ifdef _POSIX_SSIZE_MAX
 #           define SSIZE_MAX _POSIX_SSIZE_MAX
@@ -97,3 +100,4 @@ static inline int pid_is_valid(kernel_pid_t pid)
 #endif
 
 #endif /* KERNEL_TYPES_H */
+/** @} */

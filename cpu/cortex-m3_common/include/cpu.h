@@ -10,7 +10,7 @@
  * @addtogroup  cpu_cortex-m3
  * @{
  *
- * @file        cpu.h
+ * @file
  * @brief       Basic definitions for the Cortex-M3 common module
  *
  * When ever you want to do something hardware related, that is accessing MCUs registers directly,
@@ -32,16 +32,6 @@
 #include "irq.h"
 #define eINT            enableIRQ
 #define dINT            disableIRQ
-
-/**
- * @brief Macro has to be called in the beginning of each ISR
- */
-#define ISR_ENTER()     asm("push {LR}")
-
-/**
- * @brief Macro has to be called on each exit of an ISR
- */
-#define ISR_EXIT()      asm("pop {r0} \n bx r0")
 
 /**
  * @brief Initialization of the CPU

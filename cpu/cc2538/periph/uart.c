@@ -24,12 +24,6 @@
 #include "cpu.h"
 #include "sched.h"
 #include "thread.h"
-
-#include "cc2538-gpio.h"
-#include "cc2538-uart.h"
-#include "ioc.h"
-#include "sys-ctrl.h"
-
 #include "periph/uart.h"
 #include "periph_conf.h"
 
@@ -116,13 +110,9 @@ static void reset(cc2538_uart_t *u)
 /*---------------------------------------------------------------------------*/
 
 #if UART_0_EN
-__attribute__((naked))
-void isr_uart0(void)
+void UART_0_ISR(void)
 {
     uint_fast16_t mis;
-
-    ISR_ENTER();
-    asm("push {r4}");
 
     /* Store the current MIS and clear all flags early, except the RTM flag.
      * This will clear itself when we read out the entire FIFO contents */
@@ -142,20 +132,13 @@ void isr_uart0(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-
-    asm("pop {r4}");
-    ISR_EXIT();
 }
 #endif /* UART_0_EN */
 
 #if UART_1_EN
-__attribute__((naked))
-void isr_uart1(void)
+void UART_1_ISR(void)
 {
     uint_fast16_t mis;
-
-    ISR_ENTER();
-    asm("push {r4}");
 
     /* Store the current MIS and clear all flags early, except the RTM flag.
      * This will clear itself when we read out the entire FIFO contents */
@@ -175,9 +158,6 @@ void isr_uart1(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-
-    asm("pop {r4}");
-    ISR_EXIT();
 }
 #endif /* UART_1_EN */
 

@@ -1,1 +1,1 @@
-FEATURES_PROVIDED = transceiver periph_cpuid
+FEATURES_PROVIDED += transceiver periph_cpuid

@@ -25,7 +25,7 @@
 /* cpu */
 #include "cpu.h"
 /* drivers  */
-#include "cc110x_ng.h"
+#include "cc110x_legacy.h"
 
 #include "gpioint.h"
 

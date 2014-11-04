@@ -7,11 +7,12 @@
  */
 
 /**
+ * @defgroup    driver_periph_timer Timer
  * @ingroup     driver_periph
  * @brief       Low-level timer peripheral driver
  * @{
  *
- * @file        periph/timer.h
+ * @file
  * @brief       Low-level timer peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

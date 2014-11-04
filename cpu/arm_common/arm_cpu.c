@@ -25,7 +25,7 @@
 #define STACK_MARKER    (0x77777777)
 #define REGISTER_CNT    (12)
 
-void thread_yield(void)
+void thread_yield_higher(void)
 {
     asm("svc 0\n");
 }
