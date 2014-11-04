@@ -103,6 +103,17 @@
 
 
 /**
+ * @ I2C Configuration
+ * @{
+ */
+#define I2C_NUMOF	(1U)
+#define I2C_0_EN	(1)
+
+/* I2C device configuration */
+#define I2C_0_DEV	 	
+/** @} */
+
+/**
  * @ ADC Configuration
  * @{
  */
