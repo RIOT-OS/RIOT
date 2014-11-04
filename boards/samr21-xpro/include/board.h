@@ -30,13 +30,12 @@ extern "C" {
 /**
  * Define the nominal CPU core clock in this board
  */
-#define F_CPU               (48000000UL)
+#define F_CPU               (8000000UL)
 
 /**
  * Assign the hardware timer
  */
-#define HW_TIMER_0            TIMER_0
-#define HW_TIMER_1            TIMER_1
+#define HW_TIMER            TIMER_1 //TIMER_1 is the only 32bit
 
 /**
  * @name Define UART device and baudrate for stdio

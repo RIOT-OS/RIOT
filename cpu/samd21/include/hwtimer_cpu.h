@@ -23,9 +23,9 @@
  * @name Hardware timer configuration
  * @{
  */
-#define HWTIMER_MAXTIMERS   4               /**< the CPU implementation supports 2 HW timers */
+#define HWTIMER_MAXTIMERS   2               /**< the CPU implementation supports 2 HW timers */
 #define HWTIMER_SPEED       (124999U)       /**< the HW timer runs with 125kHz */
-#define HWTIMER_MAXTICKS    (0xFFFF)        /**< 16-bit timer */
+#define HWTIMER_MAXTICKS    (0xFFFFFFFF)        /**< 16-bit timer */
 /** @} */
 
 

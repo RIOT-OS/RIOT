@@ -33,7 +33,7 @@
 #define KERNEL_CONF_STACKSIZE_DEFAULT   (2048) //1024
 #endif
 
-#define KERNEL_CONF_STACKSIZE_IDLE      (512)
+#define KERNEL_CONF_STACKSIZE_IDLE      (256)
 /** @} */
 
 /**
@@ -47,7 +47,19 @@
 #endif
 /** @} */
 
-#define TRANSCEIVER_BUFFER_SIZE (3)
+#define TRANSCEIVER_BUFFER_SIZE (5)
+
+
+/**
+ * @name Definition of different panic modes
+ */
+typedef enum {
+    HARD_FAULT,
+    WATCHDOG,
+    BUS_FAULT,
+    USAGE_FAULT,
+    DUMMY_HANDLER
+} panic_t;
 
 /**
  * @def CPUID_ID_LEN
