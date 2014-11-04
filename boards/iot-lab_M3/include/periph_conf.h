@@ -298,8 +298,10 @@ extern "C" {
 #define I2C_0_DEV           I2C1
 #define I2C_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_I2C1EN)
 #define I2C_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN))
-#define I2C_0_IRQ           I2C1_EV_IRQn
-#define I2C_0_ISR           isr_i2c1
+#define I2C_0_EVT_IRQ       I2C1_EV_IRQn
+#define I2C_0_EVT_ISR       isr_i2c1_ev
+#define I2C_0_ERR_IRQ       I2C1_ER_IRQn
+#define I2C_0_ERR_ISR       isr_i2c1_er
 /* I2C 0 pin configuration */
 #define I2C_0_SCL_PORT      GPIOB
 #define I2C_0_SCL_PIN       6
