@@ -19,6 +19,10 @@
 #ifndef __ISL29020_INTERNAL_H
 #define __ISL29020_INTERNAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @name ISL29020 registers
  * @{
@@ -60,6 +64,10 @@
 #define ISL29020_RANGE_3        0x02
 #define ISL29020_RANGE_4        0x03
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __ISL29020_INTERNAL_H */
 /** @} */

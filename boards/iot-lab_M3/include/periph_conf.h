@@ -10,7 +10,7 @@
  * @ingroup     board_iot-lab_M3
  * @{
  *
- * @file        periph_conf.h
+ * @file
  * @brief       Peripheral MCU configuration for the iot-lab_M3 board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
@@ -19,6 +19,10 @@
 
 #ifndef __PERIPH_CONF_H
 #define __PERIPH_CONF_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name Clock system configuration
@@ -304,6 +308,10 @@
 #define I2C_0_SDA_PIN       7
 #define I2C_0_SDA_CLKEN()   (RCC->APB2ENR |= RCC_APB2ENR_IOPBEN)
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PERIPH_CONF_H */
 /** @} */

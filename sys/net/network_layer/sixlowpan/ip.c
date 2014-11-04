@@ -34,7 +34,7 @@
 
 #include "net_help.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
@@ -264,7 +264,7 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
             if (_rpl_process_pid != KERNEL_PID_UNDEF) {
                 msg_t m_send;
                 m_send.content.ptr = (char *) &hdr->code;
-                msg_send(&m_send, _rpl_process_pid, 1);
+                msg_send(&m_send, _rpl_process_pid);
             }
             else {
                 DEBUG("INFO: no RPL handler registered\n");
@@ -373,7 +373,7 @@ void *ipv6_process(void *arg)
                 msg_t m_send;
                 m_send.type = IPV6_PACKET_RECEIVED;
                 m_send.content.ptr = (char *) ipv6_buf;
-                msg_send(&m_send, sixlowip_reg[i], 1);
+                msg_send(&m_send, sixlowip_reg[i]);
             }
         }
 
@@ -635,7 +635,7 @@ ipv6_addr_t *ipv6_addr_set_by_eui64(ipv6_addr_t *out, int if_id,
 
 #else
         out->uint8[8] ^= 0x02;
-#endif
+#endif        
         return out;
     }
     else {
@@ -682,7 +682,6 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
                     uint8_t bmatch = 0;
                     uint8_t tmp = ipv6_get_addr_match(dest, addr->addr_data);
                     if (tmp >= bmatch) {
-                        bmatch = tmp;
                         tmp_addr = addr;
                     }
                 }

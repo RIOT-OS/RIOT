@@ -24,6 +24,10 @@
 #include <stdint.h>
 #include "periph/i2c.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
  /**
   * @brief The sensors default I2C address
   */
@@ -100,6 +104,10 @@ int isl29020_enable(isl29020_t *dev);
  * @return              -1 on error
  */
 int isl29020_disable(isl29020_t *dev);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __ISL29020_H */
 /** @} */

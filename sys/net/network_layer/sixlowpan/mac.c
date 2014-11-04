@@ -42,7 +42,7 @@
 #endif
 #include "debug.h"
 
-#define RADIO_STACK_SIZE            (KERNEL_CONF_STACKSIZE_MAIN)
+#define RADIO_STACK_SIZE            (1024)
 #define RADIO_RCV_BUF_SIZE          (64)
 #define RADIO_SENDING_DELAY         (1000)
 
@@ -265,7 +265,7 @@ int sixlowpan_mac_prepare_ieee802144_frame(
     ieee802154_frame_init(frame, (uint8_t *)&lowpan_mac_buf);
     memcpy(&lowpan_mac_buf[hdrlen], frame->payload, frame->payload_len);
     /* set FCS */
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
     fcs = (uint16_t *)&lowpan_mac_buf[frame->payload_len + hdrlen+1];
 #else
     fcs = (uint16_t *)&lowpan_mac_buf[frame->payload_len + hdrlen];

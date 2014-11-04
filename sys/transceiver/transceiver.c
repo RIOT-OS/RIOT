@@ -30,12 +30,12 @@
 #include "transceiver.h"
 
 /* supported transceivers */
-#ifdef MODULE_CC110X
-#include "cc110x.h"
+#ifdef MODULE_CC110X_LEGACY_CSMA
+#include "cc110x_legacy_csma.h"
 #endif
 
-#ifdef MODULE_CC110X_NG
-#include "cc110x_ng.h"
+#ifdef MODULE_CC110X_LEGACY
+#include "cc110x_legacy.h"
 #endif
 
 #ifdef MODULE_CC2420
@@ -64,7 +64,7 @@
 #if ENABLE_DEBUG
 //#define DEBUG_ENABLED
 #undef TRANSCEIVER_STACK_SIZE
-#define TRANSCEIVER_STACK_SIZE      (KERNEL_CONF_STACKSIZE_MAIN)
+#define TRANSCEIVER_STACK_SIZE      (1024)
 #endif
 #include "debug.h"
 
@@ -93,7 +93,7 @@ volatile kernel_pid_t transceiver_pid = KERNEL_PID_UNDEF; ///< the transceiver t
 static volatile uint8_t rx_buffer_pos = 0;
 static volatile uint8_t transceiver_buffer_pos = 0;
 
-#ifdef MODULE_CC110X
+#ifdef MODULE_CC110X_LEGACY_CSMA
 void *cc1100_payload;
 int cc1100_payload_size;
 packet_info_t *cc1100_packet_info;
@@ -108,10 +108,10 @@ char transceiver_stack[TRANSCEIVER_STACK_SIZE];
 /* function prototypes */
 static void *run(void *arg);
 static void receive_packet(uint16_t type, uint8_t pos);
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
 static void receive_cc110x_packet(radio_packet_t *trans_p);
 #endif
-#ifdef MODULE_CC110X
+#ifdef MODULE_CC110X_LEGACY_CSMA
 void cc1100_packet_monitor(void *payload, int payload_size, protocol_t protocol, packet_info_t *packet_info);
 void receive_cc1100_packet(radio_packet_t *trans_p);
 #endif
@@ -189,14 +189,14 @@ kernel_pid_t transceiver_start(void)
         puts("Error creating transceiver thread");
     }
 
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
     else if (transceivers & TRANSCEIVER_CC1100) {
         DEBUG("transceiver: Transceiver started for CC1100\n");
         cc110x_init(transceiver_pid);
     }
 
 #endif
-#ifdef MODULE_CC110X
+#ifdef MODULE_CC110X_LEGACY_CSMA
     else if (transceivers & TRANSCEIVER_CC1100) {
         DEBUG("transceiver: Transceiver started for CC1100\n");
         cc1100_init();
@@ -237,8 +237,7 @@ kernel_pid_t transceiver_start(void)
 uint8_t transceiver_register(transceiver_type_t t, kernel_pid_t pid)
 {
     int result = 0;
-
-    int state = disableIRQ();
+    unsigned state = disableIRQ();
     for (size_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; i++) {
         if ((reg[i].pid == pid) || (reg[i].transceivers == TRANSCEIVER_NONE)) {
             reg[i].transceivers |= t;
@@ -257,7 +256,7 @@ uint8_t transceiver_register(transceiver_type_t t, kernel_pid_t pid)
 uint8_t transceiver_unregister(transceiver_type_t t, kernel_pid_t pid)
 {
     int result = 0;
-    int state = disableIRQ();
+    unsigned state = disableIRQ();
     for (size_t i = 0; i < TRANSCEIVER_MAX_REGISTERED; ++i) {
         if (reg[i].pid == pid) {
             reg[i].transceivers &= ~t;
@@ -291,7 +290,6 @@ static void *run(void *arg)
         /* only makes sense for messages for upper layers */
         transceiver_command_t *cmd = (transceiver_command_t *) m.content.ptr;
         DEBUG("transceiver: Transceiver: Message received, type: %02X\n", m.type);
-
         switch (m.type) {
             case RCV_PKT_CC1020:
             case RCV_PKT_CC1100:
@@ -355,7 +353,7 @@ static void *run(void *arg)
                 msg_reply(&m, &m);
                 break;
 
-            case SET_PAN:
+            case SET_PAN:                
                 *((int32_t *) cmd->data) = set_pan(cmd->transceivers, cmd->data);
                 msg_reply(&m, &m);
                 break;
@@ -444,10 +442,10 @@ static void receive_packet(uint16_t type, uint8_t pos)
         /* pass a null pointer if a packet from a undefined transceiver is
          * received */
         if (type == RCV_PKT_CC1100) {
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
             radio_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_cc110x_packet(trans_p);
-#elif MODULE_CC110X
+#elif MODULE_CC110X_LEGACY_CSMA
             radio_packet_t *trans_p = &(transceiver_buffer[transceiver_buffer_pos]);
             receive_cc1100_packet(trans_p);
 #endif
@@ -504,7 +502,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
             m.content.ptr = (char *) &(transceiver_buffer[transceiver_buffer_pos]);
             DEBUG("transceiver: Notify thread %" PRIkernel_pid "\n", reg[i].pid);
 
-            if (msg_send(&m, reg[i].pid, false) && (m.type != ENOBUFFER)) {
+            if (msg_try_send(&m, reg[i].pid) && (m.type != ENOBUFFER)) {
                 transceiver_buffer[transceiver_buffer_pos].processing++;
             }
             else {
@@ -516,7 +514,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
     }
 }
 
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
 /*
  * @brief process packets from CC1100
  *
@@ -542,7 +540,7 @@ static void receive_cc110x_packet(radio_packet_t *trans_p)
 }
 #endif
 
-#ifdef MODULE_CC110X
+#ifdef MODULE_CC110X_LEGACY_CSMA
 void receive_cc1100_packet(radio_packet_t *trans_p)
 {
     dINT();
@@ -610,7 +608,7 @@ void receive_cc2420_packet(ieee802154_packet_t *trans_p)
         return;
     }
 #endif
-    DEBUG("transceiver: Content: %s\n", trans_p->data);
+    DEBUG("transceiver: Content: %s\n", trans_p->frame.payload);
 }
 #endif
 
@@ -729,7 +727,7 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
     DEBUG("\n");
 #endif
 
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
     cc110x_packet_t cc110x_pkt;
 #endif
 #ifdef MODULE_MC1322X
@@ -746,13 +744,13 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
 
     switch (t) {
         case TRANSCEIVER_CC1100:
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
             cc110x_pkt.length = p->length + CC1100_HEADER_LENGTH;
             cc110x_pkt.address = p->dst;
             cc110x_pkt.flags = 0;
             memcpy(cc110x_pkt.data, p->data, p->length);
             res = cc110x_send(&cc110x_pkt);
-#elif MODULE_CC110X
+#elif MODULE_CC110X_LEGACY_CSMA
             memcpy(cc1100_pkt, p->data, p->length);
 
             res = cc1100_send_csmaca(p->dst, 4, 0, (char *) cc1100_pkt, p->length);
@@ -812,13 +810,15 @@ static int8_t send_packet(transceiver_type_t t, void *pkt)
  */
 static int32_t set_channel(transceiver_type_t t, void *channel)
 {
+    /* cppcheck: c is read depending on enabled modules */
+    /* cppcheck-suppress unreadVariable */
     uint8_t c = *((uint8_t *)channel);
 
     switch (t) {
         case TRANSCEIVER_CC1100:
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
             return cc110x_set_channel(c);
-#elif MODULE_CC110X
+#elif MODULE_CC110X_LEGACY_CSMA
             return cc1100_set_channel(c);
 #else
             return -1;
@@ -861,9 +861,9 @@ static int32_t get_channel(transceiver_type_t t)
 {
     switch (t) {
         case TRANSCEIVER_CC1100:
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
             return cc110x_get_channel();
-#elif MODULE_CC110X
+#elif MODULE_CC110X_LEGACY_CSMA
             return cc1100_get_channel();
 #else
             return -1;
@@ -986,9 +986,9 @@ static radio_address_t get_address(transceiver_type_t t)
 {
     switch (t) {
         case TRANSCEIVER_CC1100:
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
             return cc110x_get_address();
-#elif MODULE_CC110X
+#elif MODULE_CC110X_LEGACY_CSMA
             return cc1100_get_address();
 #else
             return 0; /* XXX see TODO above */
@@ -1031,13 +1031,15 @@ static radio_address_t get_address(transceiver_type_t t)
  */
 static radio_address_t set_address(transceiver_type_t t, void *address)
 {
+    /* cppcheck: addr is read depending on enabled modules */
+    /* cppcheck-suppress unreadVariable */
     radio_address_t addr = *((radio_address_t *)address);
 
     switch (t) {
         case TRANSCEIVER_CC1100:
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
             return cc110x_set_address(addr);
-#elif MODULE_CC110X
+#elif MODULE_CC110X_LEGACY_CSMA
             return cc1100_set_address(addr);
 #else
             return 0; /* XXX see TODO above */
@@ -1135,7 +1137,7 @@ static void set_monitor(transceiver_type_t t, void *mode)
     (void) mode;
 
     switch (t) {
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
 
         case TRANSCEIVER_CC1100:
             cc110x_set_monitor(*((uint8_t *)mode));
@@ -1164,7 +1166,7 @@ static void set_monitor(transceiver_type_t t, void *mode)
     }
 }
 
-#ifdef MODULE_CC110X
+#ifdef MODULE_CC110X_LEGACY_CSMA
 void cc1100_packet_monitor(void *payload, int payload_size, protocol_t protocol, packet_info_t *packet_info)
 {
     (void) protocol;
@@ -1180,7 +1182,7 @@ void cc1100_packet_monitor(void *payload, int payload_size, protocol_t protocol,
 static void powerdown(transceiver_type_t t)
 {
     switch (t) {
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
 
         case TRANSCEIVER_CC1100:
             cc110x_switch_to_pwd();
@@ -1208,7 +1210,7 @@ static void powerdown(transceiver_type_t t)
 static void switch_to_rx(transceiver_type_t t)
 {
     switch (t) {
-#ifdef MODULE_CC110X_NG
+#ifdef MODULE_CC110X_LEGACY
 
         case TRANSCEIVER_CC1100:
             cc110x_switch_to_rx();

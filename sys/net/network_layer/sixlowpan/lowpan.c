@@ -39,6 +39,7 @@
 #ifdef MODULE_SIXLOWBORDER
 #include "border/border.h"
 #endif
+ 
 #include "ip.h"
 #include "icmp.h"
 
@@ -46,7 +47,7 @@
 #include "socket_base/in.h"
 #include "net_help.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
@@ -795,7 +796,7 @@ void lowpan_read(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
             current_frame.length = length;
             current_frame.data = data;
             m_send.content.ptr = (char *) &current_frame;
-            msg_send(&m_send, sixlowpan_reg[i], 1);
+            msg_send(&m_send, sixlowpan_reg[i]);
         }
     }
 
@@ -1678,6 +1679,7 @@ void init_reas_bufs(lowpan_reas_buf_t *buf)
 
 int sixlowpan_lowpan_init_adhoc_interface(int if_id, const ipv6_addr_t *prefix)
 {
+    DEBUG("sixlowpan_lowpan_init_adhoc_interface \n");
     ipv6_addr_t tmp;
 
     /* if prefix is set */
@@ -1718,7 +1720,6 @@ int sixlowpan_lowpan_init_interface(int if_id)
 
     /* init link-local prefix */
     ipv6_addr_set_link_local_prefix(&tmp);
-
     if (!ipv6_addr_set_by_eui64(&tmp, if_id, &tmp)) {
         DEBUG("Can not set link-local by EUI-64 on interface %d\n", if_id);
         return 0;
@@ -1737,6 +1738,7 @@ int sixlowpan_lowpan_init_interface(int if_id)
 
     /* add solicited nodes multicast address of link local address */
     ipv6_addr_set_solicited_node_addr(&tmp, &tmp);
+    
     DEBUG("%s, %d: sixlowpan_lowpan_init(): add solicited nodes multicast address "
           "to of link layer address interface %d: %s\n", __FILE__, __LINE__,
           if_id, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &tmp));

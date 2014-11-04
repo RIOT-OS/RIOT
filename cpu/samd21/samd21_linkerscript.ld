@@ -39,7 +39,7 @@ MEMORY
 }
 
 /* The stack size used by the application. NOTE: you need to adjust  */
-STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x1000 ;
+STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0xa00 ; /* 0x2000 */
 
 /* Section Definitions */
 SECTIONS
@@ -69,7 +69,7 @@ SECTIONS
         KEEP (*(.init_array))
         __init_array_end = .;
 
-        . = ALIGN(0x4);
+        . = ALIGN(0x4); 
         KEEP (*crtbegin.o(.ctors))
         KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
         KEEP (*(SORT(.ctors.*)))

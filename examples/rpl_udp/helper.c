@@ -43,7 +43,11 @@ void rpl_udp_set_id(int argc, char **argv)
 {
     if (argc != 2) {
         printf("Usage: %s address\n", argv[0]);
+#if defined(MODULE_CC110X_LEGACY_CSMA) || defined(MODULE_CC110X_LEGACY)
         printf("\taddress must be an 8 bit integer\n");
+#else
+        printf("\taddress must be an 16 bit integer\n");
+#endif
         printf("\n\t(Current address is %u)\n", id);
         return;
     }
@@ -123,10 +127,19 @@ void rpl_udp_ignore(int argc, char **argv)
 {
     uint16_t a;
 
+    if (argc < 2) {
+        printf("Usage: %s <addr>\n", argv[0]);
+        return;
+    }
+
     if (transceiver_pid == KERNEL_PID_UNDEF) {
         puts("Transceiver not runnning.");
         return;
     }
+
+    /* cppcheck: a is actually read via tcmd.data */
+    /* cppcheck-suppress unreadVariable */
+    a = atoi(argv[1]);
 
     msg_t mesg;
     mesg.type = DBG_IGN;
@@ -135,12 +148,7 @@ void rpl_udp_ignore(int argc, char **argv)
     tcmd.transceivers = TRANSCEIVER_CC1100;
     tcmd.data = &a;
 
-    if (argc == 2) {
-        a = atoi(argv[1]);
-        printf("sending to transceiver (%" PRIkernel_pid "): %u\n", transceiver_pid, (*(uint8_t *)tcmd.data));
-        msg_send(&mesg, transceiver_pid, 1);
-    }
-    else {
-        printf("Usage: %s <addr>\n", argv[0]);
-    }
+    printf("sending to transceiver (%" PRIkernel_pid "): %u\n", transceiver_pid,
+           (*(uint8_t *)tcmd.data));
+    msg_send(&mesg, transceiver_pid);
 }

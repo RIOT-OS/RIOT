@@ -7,11 +7,12 @@
  */
 
 /**
+ * @defgroup    driver_periph_uart UART
  * @ingroup     driver_periph
  * @brief       Low-level UART peripheral driver
  * @{
  *
- * @file        periph/uart.h
+ * @file
  * @brief       Low-level UART peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -23,6 +24,10 @@
 #include <stdint.h>
 
 #include "periph_conf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* guard file in case no UART device was specified */
 #if UART_NUMOF
@@ -169,6 +174,10 @@ void uart_poweron(uart_t uart);
 void uart_poweroff(uart_t uart);
 
 #endif /* UART_NUMOF */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PERIPH_UART_H */
 /** @} */

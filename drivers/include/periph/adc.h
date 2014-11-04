@@ -7,6 +7,7 @@
  */
 
 /**
+ * @defgroup    driver_periph_adc ADC
  * @ingroup     driver_periph
  * @brief       Low-level ADC peripheral driver
  * @{
@@ -21,6 +22,10 @@
 #define __ADC_H
 
 #include "periph_conf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* guard file in case no ADC device is defined */
 #if ADC_NUMOF
@@ -131,6 +136,10 @@ int adc_map(adc_t dev, int value, int min, int max);
 float adc_mapf(adc_t dev, int value, float min, float max);
 
 #endif /* ADC_NUMOF */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __ADC_H */
 /** @} */

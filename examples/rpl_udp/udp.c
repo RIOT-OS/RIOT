@@ -35,7 +35,7 @@
 #define UDP_BUFFER_SIZE     (128)
 #define SERVER_PORT     (0xFF01)
 
-char udp_server_stack_buffer[KERNEL_CONF_STACKSIZE_MAIN];
+char udp_server_stack_buffer[512];
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 static void *init_udp_server(void *);

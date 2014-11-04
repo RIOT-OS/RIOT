@@ -1,11 +1,10 @@
-/**
-  * cc2420_spi.h - Definition of CC2420 SPI functions.
-  * Copyright (C) 2013 Milan Babel <babel@inf.fu-berlin.de>
-  *
-  * This source code is licensed under the GNU Lesser General Public License,
-  * Version 2.  See the file LICENSE for more details.
-  */
-
+/*
+ * Copyright (C) 2013 Milan Babel <babel@inf.fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
 
 /**
   * @ingroup CC2420
@@ -20,6 +19,10 @@
 
 #include <stdio.h>
 #include "board.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Writes a byte to the cc2420 register.
@@ -89,5 +92,9 @@ radio_packet_length_t cc2420_write_fifo(uint8_t* data, radio_packet_length_t dat
  * @return The number of bytes read.
  */
 radio_packet_length_t cc2420_read_fifo(uint8_t* data, radio_packet_length_t data_length);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

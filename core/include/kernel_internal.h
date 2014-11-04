@@ -19,11 +19,11 @@
 #ifndef KERNEL_INTERNAL_H_
 #define KERNEL_INTERNAL_H_
 
+#include "attributes.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-#include "attributes.h"
 
 /**
  * @brief   Initializes scheduler and creates main and idle task
@@ -35,6 +35,9 @@ void kernel_init(void);
  */
 void board_init(void);
 
+/**
+ * @brief Prototype for a thread entry function
+ */
 typedef void *(*thread_task_func_t)(void *arg);
 
 /**

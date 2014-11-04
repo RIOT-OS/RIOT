@@ -12,7 +12,7 @@
  * @brief       Support for the UDOO board.
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Board specific definitions for the UDOO board.
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -24,6 +24,9 @@
 #include "cpu.h"
 #include "cpu-conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Define the nominal CPU core clock in this board
@@ -74,6 +77,9 @@
  */
 void board_init(void);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /** __BOARD_H */
 /** @} */

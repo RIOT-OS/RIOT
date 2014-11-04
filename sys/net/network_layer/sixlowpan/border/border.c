@@ -74,7 +74,7 @@ kernel_pid_t border_get_serial_reader(void)
     return serial_reader_pid;
 }
 
-void serial_reader_f(void)
+void *serial_reader_f(void *arg)
 {
     kernel_pid_t main_pid;
     msg_t m;
@@ -113,7 +113,7 @@ void serial_reader_f(void)
 
                 if (conf_packet->conftype == BORDER_CONF_SYN) {
                     m.content.ptr = (char *)conf_packet;
-                    msg_send(&m, main_pid, 1);
+                    msg_send(&m, main_pid);
                     continue;
                 }
             }
@@ -131,10 +131,10 @@ int sixlowpan_lowpan_border_init(int if_id)
     serial_reader_pid = thread_create(
                             serial_reader_stack, 
                             READER_STACK_SIZE,
-                            PRIORITY_MAIN - 1, 
+                            serial_reader_f, NULL,"serial_reader");
                             CREATE_STACKTEST,
                             serial_reader_f, 
-                            NULL,
+                                   border_process_lowpan, NULL,
                             "serial_reader"
                             );
     ip_process_pid = thread_create(
@@ -142,7 +142,6 @@ int sixlowpan_lowpan_border_init(int if_id)
                             IP_PROCESS_STACKSIZE,
                             PRIORITY_MAIN - 1,
                             CREATE_STACKTEST,
-                            border_process_lowpan,
                             NULL,
                             "border_process_lowpan"
                             );
@@ -177,7 +176,7 @@ int sixlowpan_lowpan_border_init(int if_id)
     return 1;
 }
 
-void border_process_lowpan(void)
+void *border_process_lowpan(void *arg)
 {
     msg_t m;
 

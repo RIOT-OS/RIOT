@@ -19,6 +19,10 @@
 
 #include "auto_init.h"
 
+#ifdef MODULE_CONFIG
+#include "config.h"
+#endif
+
 #ifdef MODULE_SHT11
 #include "sht11.h"
 #endif
@@ -27,8 +31,8 @@
 #include "gpioint.h"
 #endif
 
-#ifdef MODULE_CC110X
-#include "cc110x.h"
+#ifdef MODULE_CC110X_LEGACY_CSMA
+#include "cc110x_legacy_csma.h"
 #endif
 
 #ifdef MODULE_LTC4150
@@ -74,7 +78,7 @@
 #include "periph/cpuid.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 #endif
@@ -98,7 +102,7 @@ void auto_init_net_if(void)
 #ifdef MODULE_CC1020
     transceivers |= TRANSCEIVER_CC1020;
 #endif
-#if MODULE_CC110X || MODULE_CC110X_NG
+#if MODULE_CC110X_LEGACY_CSMA || MODULE_CC110X_LEGACY
     transceivers |= TRANSCEIVER_CC1100;
 #endif
 #ifdef MODULE_CC2420
@@ -113,7 +117,6 @@ void auto_init_net_if(void)
     net_if_init();
 
     if (transceivers != 0) {
-        int iface;
 #if CPUID_ID_LEN && defined(MODULE_HASHES)
         uint8_t cpuid[CPUID_ID_LEN];
 
@@ -121,7 +124,7 @@ void auto_init_net_if(void)
 #endif
         transceiver_init(transceivers);
         transceiver_start();
-        iface = net_if_init_interface(0, transceivers);
+        int iface = net_if_init_interface(0, transceivers);
         #warning WHAHAHA
 
 #if CPUID_ID_LEN && defined(MODULE_HASHES)
@@ -150,8 +153,13 @@ void auto_init_net_if(void)
 #endif /* DEBUG_ENABLED */
 
 #undef CONF_RADIO_ADDR
-        #warning "Bubber angriber"
+#if defined(MODULE_CC110X_LEGACY_CSMA) || defined(MODULE_CC110X_LEGACY)
+        uint8_t hwaddr = (uint8_t)((hash_l ^ hash_h) ^ ((hash_l ^ hash_h) >> 24));
+        /* do not combine more parts to keep the propability low that it just
+         * becomes 0xff */
+#else
         uint16_t hwaddr = HTONS((uint16_t)((hash_l ^ hash_h) ^ ((hash_l ^ hash_h) >> 16)));
+#endif
         net_if_set_hardware_address(iface, hwaddr);
         DEBUG("Auto init radio address on interface %d to 0x%04x\n", iface, hwaddr);
 #else /* CPUID_ID_LEN && defined(MODULE_HASHES) */
@@ -173,7 +181,6 @@ void auto_init_net_if(void)
         }
 
 #endif /* CPUID_ID_LEN && defined(MODULE_HASHES) */
-
         if (net_if_get_pan_id(iface) <= 0) {
             DEBUG("Auto init PAN ID on interface %d to 0x%04x\n", iface, CONF_PAN_ID);
             DEBUG("Change this value at compile time with macro CONF_PAN_ID\n");
@@ -189,6 +196,11 @@ void auto_init_net_if(void)
 
 void auto_init(void)
 {
+#ifdef MODULE_CONFIG
+    DEBUG("Auto init loading config\n");
+    config_load();
+#endif
+
 #ifdef MODULE_VTIMER
     DEBUG("Auto init vtimer module.\n");
     vtimer_init();
@@ -210,7 +222,7 @@ void auto_init(void)
     DEBUG("Auto init gpioint module.\n");
     gpioint_init();
 #endif
-#ifdef MODULE_CC110X
+#ifdef MODULE_CC110X_LEGACY_CSMA
     DEBUG("Auto init CC1100 module.\n");
 #ifndef MODULE_TRANSCEIVER
     cc1100_init();

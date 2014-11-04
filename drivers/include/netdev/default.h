@@ -27,13 +27,30 @@
  *
  * @brief   Default device as a pointer of netdev_t.
  */
+#ifdef MODULE_AT86RF231
+#include "at86rf231.h"
+
+#ifndef NETDEV_DEFAULT
+#define NETDEV_DEFAULT  ((netdev_t *)(&at86rf231_netdev))
+#endif /* NETDEV_DEFAULT */
+#endif /* MODULE_AT86RF231 */
 
 #ifdef MODULE_NATIVENET
+
 #include "nativenet.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef NETDEV_DEFAULT
 #define NETDEV_DEFAULT   (&nativenet_default_dev)
 #endif /* NETDEV_DEFAULT */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* MODULE_NATIVENET */
 
 #endif /* __NETDEV_DEFAULT_H_ */

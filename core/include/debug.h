@@ -13,7 +13,8 @@
  * @file        debug.h
  * @brief       Debug-header
  *
- * #define ENABLE_DEBUG, include this and then use DEBUG as printf you can toggle.
+ * @details     If ENABLE_DEBUG is set, before this header is included, 
+ *              ::DEBUG will print out to stdout, otherwise do nothing
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
@@ -21,12 +22,12 @@
 #ifndef __DEBUG_H
 #define __DEBUG_H
 
+#include <stdio.h>
+#include "sched.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-#include <stdio.h>
-#include "sched.h"
 
 /**
  * @name Print debug information if the calling thread stack is large enough

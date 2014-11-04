@@ -19,7 +19,7 @@
 #include "thread.h"
 #include "msg.h"
 
-#include "cc110x/cc1100.h"
+#include "cc110x_legacy_csma/cc1100.h"
 #include "lpc2387.h"
 
 #include "vtimer.h"

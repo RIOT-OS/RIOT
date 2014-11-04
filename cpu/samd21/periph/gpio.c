@@ -143,6 +143,10 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
             return -1;
     }
 
+    if (port == NULL) {
+        return -1;
+    }
+
     /* configure as output */
     port->DIRSET.reg = (1 << (pin % 32));
     /* configure the pin's pull resistor state */
@@ -263,6 +267,10 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pushpull)
 #endif
         default:
             return -1;
+    }
+
+    if (port == NULL) {
+        return -1;
     }
 
     /* configure as input */
@@ -409,6 +417,10 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 #endif
         default:
             return -1;
+    }
+
+    if (port == NULL) {
+        return -1;
     }
 
     /* configure pin as input */
@@ -937,9 +949,8 @@ void gpio_write(gpio_t dev, int value)
     }
 }
 
-__attribute__((naked)) void isr_eic(void)
+void isr_eic(void)
 {
-    ISR_ENTER();
     uint16_t status = EIC->INTFLAG.reg;
     switch (status) {
         case EIC_INTFLAG_EXTINT0:
@@ -1010,7 +1021,6 @@ __attribute__((naked)) void isr_eic(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 
 #endif /* GPIO_NUMOF */

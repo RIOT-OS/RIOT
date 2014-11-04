@@ -13,6 +13,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum
 {
         g_nvm_type_no_nvm_c = 0,
@@ -54,5 +58,9 @@ extern nvm_err_t (*nvm_write)(nvm_interface_t nvm_interface, nvm_type_t nvm_type
 /* bit 0 is the first sector, bit 31 is the last */
 extern nvm_err_t (*nvm_erase)(nvm_interface_t nvm_interface, nvm_type_t nvm_type ,uint32_t sector_bitfield);
 extern void(*nvm_setsvar)(uint32_t zero_for_awesome);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //NVM_H

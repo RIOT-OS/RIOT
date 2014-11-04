@@ -36,6 +36,8 @@ USEMODULE += ps
 USEMODULE += vtimer
 USEMODULE += defaulttransceiver
 
+FEATURES_OPTIONAL += transceiver
+
 ifneq (,$(filter msb-430,$(BOARD)))
 	USEMODULE += sht11
 endif

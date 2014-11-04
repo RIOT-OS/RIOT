@@ -19,8 +19,6 @@
 #ifndef __HWTIMER_CPU_H
 #define __HWTIMER_CPU_H
 
-#include "gptimer.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,7 +27,7 @@ extern "C" {
  * @name Hardware timer configuration
  * @{
  */
-#define HWTIMER_MAXTIMERS   NUM_CHANNELS_PER_GPTIMER /**< Number of hwtimers */
+#define HWTIMER_MAXTIMERS   2               /**< Number of hwtimers */
 #define HWTIMER_SPEED       1000000         /**< The hardware timer runs at 1MHz */
 #define HWTIMER_MAXTICKS    0xFFFFFFFF      /**< 32-bit timer */
 /** @} */

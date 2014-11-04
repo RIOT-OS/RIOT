@@ -1,3 +1,11 @@
+/*
+ * Copyright 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @defgroup    flashrom Flash memory driver
  * @ingroup     drivers
@@ -15,6 +23,10 @@
 
 #include <stdint.h>
 #include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Erase sector
@@ -35,6 +47,10 @@ uint8_t             flashrom_erase(uint8_t *addr);
  * @return          1 on success, 0 otherwise
  */
 uint8_t             flashrom_write(uint8_t *dst, const uint8_t *src, size_t size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* FLASHROM_H */
 /** @} */

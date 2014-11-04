@@ -10,7 +10,7 @@
  * @ingroup     board_atsamr21-xpro
  * @{
  *
- * @file        periph_conf.h
+ * @file
  * @brief       Peripheral MCU configuration for the Atmel SAM R21 Xplained Pro board
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
@@ -19,14 +19,17 @@
 #ifndef __PERIPH_CONF_H
 #define __PERIPH_CONF_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @name Timer peripheral configuration
  * @{
  */
-#define TIMER_NUMOF         (3U)
+#define TIMER_NUMOF         (2U)
 #define TIMER_0_EN          1
 #define TIMER_1_EN          1
-#define TIMER_2_EN          1
 
 /* Timer 0 configuration */
 #define TIMER_0_DEV         TC3->COUNT16
@@ -35,16 +38,11 @@
 #define TIMER_0_ISR         isr_tc3
 
 /* Timer 1 configuration */
-#define TIMER_1_DEV         TC4->COUNT16
+#define TIMER_1_DEV         TC4->COUNT32
 #define TIMER_1_CHANNELS    2
-#define TIMER_1_MAX_VALUE   (0xffff)
+#define TIMER_1_MAX_VALUE   (0xffffffff)
 #define TIMER_1_ISR         isr_tc4
 
-/* Timer 2 configuration */
-#define TIMER_2_DEV         TC5->COUNT16
-#define TIMER_2_CHANNELS    2
-#define TIMER_2_MAX_VALUE   (0xffff)
-#define TIMER_2_ISR         isr_tc5
 /** @} */
 
 /**
@@ -400,6 +398,10 @@
 #define GPIO_15_PIN 
 #define GPIO_15_EXTINT        
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PERIPH_CONF_H */
 /** @} */

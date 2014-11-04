@@ -19,12 +19,13 @@
 #ifndef __THREAD_ARCH_H
 #define __THREAD_ARCH_H
 
+#include "attributes.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
 
-#include "attributes.h"
-
+#include "kernel_internal.h"
 /**
  * @name Define the mapping between the architecture independent interfaces
  *       and the kernel internal interfaces
@@ -37,7 +38,7 @@
 #define thread_stack_init               thread_arch_stack_init
 #define thread_print_stack              thread_arch_print_stack
 #define cpu_switch_context_exit         thread_arch_start_threading
-#define thread_yield                    thread_arch_yield
+#define thread_yield_higher             thread_arch_yield
 #endif
 /** @} */
 
@@ -52,7 +53,7 @@
  *
  * @return                  pointer to the new top of the stack
  */
-char *thread_arch_stack_init(void *(*function)(void *arg), void *arg, void *stack_start, int stack_size);
+char *thread_arch_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size);
 
 /**
  * @brief Print the current stack to stdout

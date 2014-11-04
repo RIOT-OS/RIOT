@@ -37,7 +37,6 @@ extern "C" {
 #include <functional>
 using namespace std;
 
-/* thread's stack */
 //char threadA_stack [KERNEL_CONF_STACKSIZE_MAIN];
 #define TRANSCEIVER_TYPE 0 //TRANSCEIVER_AT86RF231
 //#define RADIO_STACK_SIZE    (KERNEL_CONF_STACKSIZE_DEFAULT)
@@ -59,26 +58,22 @@ void printUsage()
     printf("\tb\tinitialize as border router\n\n");
     printf("\tradio_address must be an 8 bit integer\n");
 }
-
-/* thread's function */
 //void *threadA_func(void *arg);
 
 void bootstrapping(int argc, char **argv)
 {
     sixlowpan_lowpan_bootstrapping();
 }
-
+    printf("The vector vInts has been filled with %d numbers.\n", (int)vInts.size());
 void send_packet(int argc, char **argv)
 {
     printf("%s\n", "sixlowpan send packet!");
-
     uint16_t r_addr;
     int result;
     ipv6_addr_t std_addr;
     char* msg = argv[1]; // Message
     uint16_t msg_len = (uint16_t)strlen(msg);
     r_addr = atoi(argv[2]); // Radio Dest. Address
-
     ipv6_addr_t ipaddr;
     printf("%s\n", "sixlowpan send packet adr init!");
     printf("%s", "sixlowpan r_addr: ");
@@ -102,12 +97,9 @@ void send_packet(int argc, char **argv)
     }
     printf("%s", "sixlowpan send result: ");
     printf("%d\n", result);
-
     // print_ipv6_addr(&ipaddr);
-
     // for (int j = 0; j < 100; j++) {
     //     test[0] = j;
-
     //     for (int i = 0; i < 1000; i++) {
     //         //int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
     //             //const uint8_t *payload, uint16_t payload_length)
@@ -119,7 +111,6 @@ void send_packet(int argc, char **argv)
     //     //lib6lowpan_bootstrapping(&addr8);
     // }
 }
-
 void ip(int argc, char **argv)
 {
     //char *addr_str;
@@ -143,16 +134,13 @@ void context(int argc, char **argv)
 }
 
 void sixlowpan_init(int argc, char **argv)
-{
     printf("%s\n", "sixlowpan initiating!");
-
     uint16_t r_addr;
     ipv6_addr_t std_addr;
     char* str = argv[1];
     r_addr = atoi(argv[2]);
     //size_t str_len = strlen(str);
     char *command = str; // strtok(str, " ");
-
     // if ((command = strtok(NULL, " ")) == NULL) {
     //     printf("%s\n", "sixlowpan command == NULL!");
     //   for(int count = 1; count < argc; count++)
@@ -162,7 +150,6 @@ void sixlowpan_init(int argc, char **argv)
     //     printUsage();
     //     return;
     // }
-
     // char *p;
     // if (((p = strtok(NULL, " ")) == NULL) || ((r_addr = (uint16_t) strtol(p, NULL, 10)) == 0)) {
     //     printf("%s\n", "sixlowpan r_addr == NULL!");
@@ -172,9 +159,7 @@ void sixlowpan_init(int argc, char **argv)
     printf("%s\n", "sixlowpan ipv6_addr_init initiating!");
     printf("%s", "sixlowpan r_addr: ");
     printf("%d\n", r_addr);
-
     ipv6_addr_init(&std_addr, 0xABCD, 0, 0, 0, 0x1034, 0x00FF, 0xFE00, r_addr);
-
     switch (command[0]) {
         case 'h':
             printf("INFO: Initialize as host on radio address %hu\n", r_addr);
@@ -183,12 +168,10 @@ void sixlowpan_init(int argc, char **argv)
                 printf("ERROR: radio_address not an 8 bit integer\n");
                 return;
             }
-
             //sixlowpan_lowpan_init(); //TRANSCEIVER_TYPE, r_addr, 0);
             //net_if_set_hardware_address(TRANSCEIVER_TYPE, r_addr);
             sixlowpan_lowpan_init_interface(TRANSCEIVER_TYPE);
             break;
-
         case 'r':
             printf("INFO: Initialize as router on radio address %hu\n", r_addr);
 

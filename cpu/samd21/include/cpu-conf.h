@@ -9,7 +9,7 @@
 /**
  * @{
  *
- * @file            cpu-conf.h
+ * @file
  * @brief           Implementation specific CPU configuration options
  *
  * @author          Thomas Eichinger <thomas.eichinger@fu-berlin.de>
@@ -32,13 +32,13 @@
  * TODO: measure and adjust for the cortex-m0
  * @{
  */
-#define KERNEL_CONF_STACKSIZE_PRINTF    (512)
+#define KERNEL_CONF_STACKSIZE_PRINTF    (256/2)
 
 #ifndef KERNEL_CONF_STACKSIZE_DEFAULT
-#define KERNEL_CONF_STACKSIZE_DEFAULT   (1024+128)//(1024)
+#define KERNEL_CONF_STACKSIZE_DEFAULT   (2048) //1024
 #endif
 
-#define KERNEL_CONF_STACKSIZE_IDLE      (512)
+#define KERNEL_CONF_STACKSIZE_IDLE      (256)
 /** @} */
 
 /**
@@ -52,8 +52,29 @@
 #endif
 /** @} */
 
-#define TRANSCEIVER_BUFFER_SIZE 		(3)//(64)
+#define TRANSCEIVER_BUFFER_SIZE (5)
 
+
+/**
+ * @name Definition of different panic modes
+ */
+typedef enum {
+    HARD_FAULT,
+    WATCHDOG,
+    BUS_FAULT,
+    USAGE_FAULT,
+    DUMMY_HANDLER
+} panic_t;
+
+/**
+ * @def CPUID_ID_LEN
+ *
+ * @brief   The length in byte of the CPU's serial number.
+ *
+ * @note    Must be defined in the CPU's @ref cpu-conf.h
+ */
+
+#define CPUID_ID_LEN (128/8) //128 bits long, 16 bytes long
 
 #endif /* __CPU_CONF_H */
 /** @} */

@@ -95,7 +95,7 @@ int riot_send_msg(uint8_t *buf, uint16_t size, uint16_t to)
     m.type = CCNL_RIOT_MSG;
     m.content.ptr = (char *) rmsg;
     DEBUGMSG(1, "sending msg to pid=%" PRIkernel_pid "\n", to);
-    msg_send(&m, to, 1);
+    msg_send(&m, to);
 
     return size;
 }
@@ -105,7 +105,7 @@ void riot_send_nack(uint16_t to)
     msg_t m;
     m.type = CCNL_RIOT_NACK;
     DEBUGMSG(1, "sending NACK msg to pid=%" PRIkernel_pid"\n", to);
-    msg_send(&m, to, 0);
+    msg_try_send(&m, to);
 }
 
 void *ccnl_riot_relay_helper_start(void *);

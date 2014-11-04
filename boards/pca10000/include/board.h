@@ -7,12 +7,12 @@
  */
 
 /**
- * @defgroup    board_pca10000
+ * @defgroup    board_pca10000 PCA10000 (nRF51822 Development Kit)
  * @ingroup     boards
  * @brief       Board specific files for the nRF51822 board pca10000.
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Board specific definitions for the nRF51822 evaluation board pca10000.
  *
  * @author      Christian Kühling <kuehling@zedat.fu-berlin.de>
@@ -24,6 +24,9 @@
 
 #include "cpu.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Define the nominal CPU core clock in this board
@@ -41,6 +44,7 @@
  */
 #define STDIO               UART_0
 #define STDIO_BAUDRATE      (115200U)
+#define STDIO_RX_BUFSIZE    (64U)
 /** @} */
 
 /**
@@ -72,6 +76,10 @@
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /** __BOARD_H */
 /** @} */

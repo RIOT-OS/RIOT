@@ -194,11 +194,9 @@ void uart_poweroff(uart_t uart)
 }
 
 #if UART_0_EN
-__attribute__((naked)) void UART_0_ISR(void)
+void UART_0_ISR(void)
 {
-    ISR_ENTER();
     irq_handler(UART_0, &UART_0_DEV);
-    ISR_EXIT();
 }
 #endif
 

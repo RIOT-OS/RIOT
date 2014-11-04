@@ -23,6 +23,10 @@
  * @file
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MULTIBOOT_HEADER_MAGIC 0x1BADB002 /**< The magic number for the Multiboot header. */
 #define MULTIBOOT_HEADER_FLAGS 0x00010003 /**< The flags for the Multiboot header. */
 #define MULTIBOOT_HEADER_CHECKSUM (-(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)) /**< The checksum for the Multiboot header.  */
@@ -120,5 +124,9 @@ enum multiboot_info_flags {
     MULTIBOOT_INFO_FLAGS_SYMS2   = 0x20,
     MULTIBOOT_INFO_FLAGS_MMAP    = 0x40,
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */

@@ -10,11 +10,11 @@ endif
 ifneq (,$(filter ltc4150,$(USEMODULE)))
     DIRS += ltc4150
 endif
-ifneq (,$(filter cc110x,$(USEMODULE)))
-    DIRS += cc110x
+ifneq (,$(filter cc110x_legacy_csma,$(USEMODULE)))
+    DIRS += cc110x_legacy_csma
 endif
-ifneq (,$(filter cc110x_ng,$(USEMODULE)))
-    DIRS += cc110x_ng
+ifneq (,$(filter cc110x_legacy,$(USEMODULE)))
+    DIRS += cc110x_legacy
 endif
 ifneq (,$(filter at86rf231,$(USEMODULE)))
     DIRS += at86rf231
@@ -45,6 +45,15 @@ ifneq (,$(filter netdev_base,$(USEMODULE)))
 endif
 ifneq (,$(filter isl29020,$(USEMODULE)))
     DIRS += isl29020
+endif
+ifneq (,$(filter mq3,$(USEMODULE)))
+    DIRS += mq3
+endif
+ifneq (,$(filter lps331ap,$(USEMODULE)))
+    DIRS += lps331ap
+endif
+ifneq (,$(filter netdev_802154,$(USEMODULE)))
+    DIRS += netdev/802154
 endif
 
 include $(RIOTBASE)/Makefile.base

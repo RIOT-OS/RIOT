@@ -163,10 +163,8 @@ inline void _rtt_leave_config_mode(void)
     while (!(RTT_DEV->CRL & RTT_FLAG_RTOFF));
 }
 
-__attribute__((naked)) void RTT_ISR(void)
+void RTT_ISR(void)
 {
-    ISR_ENTER();
-
     if (RTT_DEV->CRL & RTC_CRL_ALRF) {
         RTT_DEV->CRL &= ~(RTC_CRL_ALRF);
         alarm_cb(alarm_arg);
@@ -174,7 +172,6 @@ __attribute__((naked)) void RTT_ISR(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 
 #endif /* RTT_NUMOF */

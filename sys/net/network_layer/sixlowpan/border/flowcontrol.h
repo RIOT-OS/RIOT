@@ -24,7 +24,7 @@
 #include "vtimer.h"
 
 #include "semaphore.h"
-#include "sixlowpan/ip.h"
+#include "../ip.h"
 #include "border.h"
 #include "bordermultiplex.h"
 

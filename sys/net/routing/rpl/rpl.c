@@ -30,7 +30,6 @@
 
 #include "sixlowpan.h"
 #include "net_help.h"
-
 /* You can only run Storing Mode by now. Other unsupported modes lead to default (Storing Mode) */
 #if RPL_DEFAULT_MOP == RPL_STORING_MODE_NO_MC
 #include "rpl/rpl_storing.h"
@@ -38,7 +37,7 @@
 #include "rpl/rpl_storing.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #if ENABLE_DEBUG
 #undef TRICKLE_TIMER_STACKSIZE
 #define TRICKLE_TIMER_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
@@ -77,7 +76,10 @@ uint8_t rpl_init(int if_id)
 
     /* initialize routing table */
     rpl_clear_routing_table();
+
     init_trickle();
+    thread_print_all();
+
     rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
                                     PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                     rpl_process, NULL, "rpl_process");
@@ -87,6 +89,8 @@ uint8_t rpl_init(int if_id)
     rpl_objective_functions[1] = rpl_get_of_mrhof();
 
     sixlowpan_lowpan_init_interface(if_id);
+    DEBUG("sixlowpan_lowpan_init_interface \n");
+    
     /* need link local prefix to query _our_ corresponding address  */
     ipv6_addr_t my_address;
     ipv6_addr_t ll_address;

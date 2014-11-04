@@ -23,6 +23,9 @@
 
 #include "periph/pwm.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name Descriptor struct for a servo
@@ -81,6 +84,10 @@ int servo_init(servo_t *dev, pwm_t pwm, int pwm_channel, unsigned int min, unsig
  * @return                  -2 on invalid position
  */
 int servo_set(servo_t *dev, unsigned int pos);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __SERVO_H */
 /** @} */

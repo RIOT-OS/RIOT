@@ -26,6 +26,10 @@
 #include <stdint.h>
 #include "bitarithm.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SMB380_DEBUG_MESSAGE "SMB380 Driver Error: "
 
 #define MSG_TYPE_SMB380_WAKEUP          814
@@ -250,5 +254,8 @@ void SMB380_writeOffsetTemp(uint16_t *offset, uint8_t EEPROM);
 void SMB380_ShowMemory(void);
 void SMB380_Selftest_1(void);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif   /* SMB380_H_ */

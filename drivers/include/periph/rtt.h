@@ -5,11 +5,13 @@
  * Public License v2.1. See the file LICENSE in the top level directory for more
  * details.
  */
+
 /**
+ * @defgroup    driver_periph_rtt RTT
  * @ingroup     driver_periph
  * @{
  *
- * @file        rtt.h
+ * @file
  * @brief       Low-level RTT (Real Time Timer) peripheral driver interface
  *              definitions
  *
@@ -20,6 +22,10 @@
 #define __RTT_H
 
 #include "periph_conf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* guard file in case no RTC device was specified */
 #if RTT_NUMOF
@@ -84,5 +90,10 @@ void rtt_poweron(void);
 void rtt_poweroff(void);
 
 #endif /* RTT_NUMOF */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* __RTT_H */
 /** @} */

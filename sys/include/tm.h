@@ -9,6 +9,8 @@
 /**
  * @addtogroup  sys_timex
  * @{
+ *
+ * @file
  * @brief       Utility library for `struct tm`.
  */
 

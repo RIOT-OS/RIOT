@@ -208,7 +208,7 @@ void x86_int_handler(void)
     ctx->__intr.ip = sp[0];
     ctx->__intr.flags = sp[2];
 
-    thread_yield();
+    thread_yield_higher();
     __builtin_unreachable();
 }
 

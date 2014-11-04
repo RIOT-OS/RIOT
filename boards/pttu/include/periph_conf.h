@@ -21,6 +21,10 @@
 
 #include "lpc2387.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief PWM device and pinout configuration
  */
@@ -41,6 +45,9 @@
 #define PWM_0_CH2_PIN       (4)
 #define PWM_0_FUNC          (1)
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PERIPH_CONF_H */
 /** @} */

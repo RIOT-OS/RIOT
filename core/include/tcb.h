@@ -20,15 +20,15 @@
 #ifndef TCB_H_
 #define TCB_H_
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 #include <stdint.h>
 #include "priority_queue.h"
 #include "clist.h"
 #include "cib.h"
 #include "msg.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /**
  * @brief Thread status list
@@ -74,10 +74,11 @@ typedef struct tcb_t {
     cib_t msg_queue;            /**< message queue                  */
     msg_t *msg_array;           /**< memory holding messages        */
 
-    const char *name;           /**< thread's name                  */
+#if defined DEVELHELP || defined(SCHED_TEST_STACK)
     char *stack_start;          /**< thread's stack start address   */
-
+#endif
 #ifdef DEVELHELP
+    const char *name;           /**< thread's name                  */
     int stack_size;             /**< thread's stack size            */
 #endif
 } tcb_t;

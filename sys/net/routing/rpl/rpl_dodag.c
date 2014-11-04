@@ -22,6 +22,7 @@
 #include "rpl/rpl_dodag.h"
 #include "trickle.h"
 #include "rpl.h"
+#include "ps.h"
 
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG

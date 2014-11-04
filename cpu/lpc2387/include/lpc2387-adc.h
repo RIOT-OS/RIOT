@@ -27,6 +27,7 @@
  */
 
 #include <stdint.h>
+#include "adc_legacy.h"
 
 #define ADC_NUM                  (6)
 #define ADC_OFFSET            (0x10)
@@ -38,18 +39,8 @@
 /**
  * @brief   Initialize ADC.
  */
-void adc_init(void);
 void adc_init_1(void);
 void adc_init_2(void);
-
-/**
- * @brief   Read ADC value of selected channel.
- *
- * Valid channel numbers are from 0 to 2.
- *
- * @return  ADC value of selected channel.
- */
-uint16_t adc_read(uint8_t channel);
 
 /** @} */
 #endif /* LPC2387ADC_H_ */

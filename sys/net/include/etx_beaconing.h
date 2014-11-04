@@ -1,3 +1,11 @@
+/*
+ * Copyright 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 #ifndef ETX_BEACONING_H_
 #define ETX_BEACONING_H_
 #include <stdint.h>
@@ -16,7 +24,7 @@
 #if ENABLE_DEBUG
 #define ETX_MAX_CANDIDATE_NEIGHBORS (15) //Stacksizes are huge in debug mode, so memory is rare
 #else
-#define ETX_MAX_CANDIDATE_NEIGHBORS (40)
+#define ETX_MAX_CANDIDATE_NEIGHBORS (5)
 #endif
 //ETX Interval parameters
 #define MS  (1000)

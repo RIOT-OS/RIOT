@@ -23,11 +23,11 @@
 #ifndef LPM_H_
 #define LPM_H_
 
+#include "arch/lpm_arch.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-#include "arch/lpm_arch.h"
 
 /**
  * @brief   Initialization of power management (including clock setup)

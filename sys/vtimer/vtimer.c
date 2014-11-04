@@ -307,7 +307,7 @@ void vtimer_get_localtime(struct tm *localt)
 int vtimer_init(void)
 {
     DEBUG("vtimer_init().\n");
-    int state = disableIRQ();
+    unsigned state = disableIRQ();
     seconds = 0;
 
     longterm_tick_start = 0;
@@ -372,7 +372,7 @@ int vtimer_sleep(timex_t time)
 
 int vtimer_remove(vtimer_t *t)
 {
-    unsigned int irq_state = disableIRQ();
+    unsigned irq_state = disableIRQ();
 
     priority_queue_remove(&shortterm_priority_queue_root, timer_get_node(t));
     priority_queue_remove(&longterm_priority_queue_root, timer_get_node(t));
