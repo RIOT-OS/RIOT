@@ -23,7 +23,7 @@
 #include "inttypes.h"
 #include "trickle.h"
 #include "rpl.h"
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 /* thread stacks */
@@ -96,7 +96,8 @@ void init_trickle(void)
 
     rt_timer_over_pid = thread_create(routing_table_buf, RT_STACKSIZE,
                                       PRIORITY_MAIN - 1, CREATE_STACKTEST,
-                                      rt_timer_over, NULL, "rt_timer_over");
+                                      rt_timer_over, NULL, "rt_timer_over");    
+
 }
 
 void start_trickle(uint8_t DIOIntMin, uint8_t DIOIntDoubl,
@@ -276,7 +277,6 @@ static void *rt_timer_over(void *arg)
 
         /* Wake up every second */
         vtimer_usleep(1000000);
-        DEBUG("AFTER SLEEP \n");
     }
 
     return NULL;

@@ -42,7 +42,7 @@
 #endif
 #include "debug.h"
 
-#define RADIO_STACK_SIZE            (1024)
+#define RADIO_STACK_SIZE            (512+256)
 #define RADIO_RCV_BUF_SIZE          (64)
 #define RADIO_SENDING_DELAY         (1000)
 

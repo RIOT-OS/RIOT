@@ -37,7 +37,7 @@
 #include "rpl/rpl_storing.h"
 #endif
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
 #undef TRICKLE_TIMER_STACKSIZE
 #define TRICKLE_TIMER_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
@@ -78,7 +78,7 @@ uint8_t rpl_init(int if_id)
     rpl_clear_routing_table();
 
     init_trickle();
-    thread_print_all();
+    //thread_print_all();
 
     rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
                                     PRIORITY_MAIN - 1, CREATE_STACKTEST,
