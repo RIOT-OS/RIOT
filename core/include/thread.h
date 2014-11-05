@@ -159,6 +159,23 @@ static inline kernel_pid_t thread_getpid(void)
     return sched_active_pid;
 }
 
+/**
+ * @brief Tells if a given thread priority is in the valid range for user threads.
+ * @return `0` if the priority is invalid, `!= 0` otherwise.
+ */
+static inline int thread_priority_valid(thread_priority_t prio)
+{
+    return prio <= PRIORITY_MIN;
+}
+
+/**
+ * @brief Compare two thread priorities and return the higher priority.
+ */
+static inline thread_priority_t thread_priority_higher(thread_priority_t one, thread_priority_t another)
+{
+    return one < another ? one : another;
+}
+
 #ifdef DEVELHELP
 /**
  * @brief Returns the name of a process

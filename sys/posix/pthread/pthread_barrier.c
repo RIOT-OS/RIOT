@@ -19,6 +19,7 @@
 
 #include "sched.h"
 #include "pthread.h"
+#include "thread.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -38,11 +39,6 @@ int pthread_barrier_destroy(pthread_barrier_t *barrier)
 {
     barrier->count = -1;
     return 0;
-}
-
-static inline thread_priority_t priority_min(thread_priority_t a, thread_priority_t b)
-{
-    return a < b ? a : b;
 }
 
 int pthread_barrier_wait(pthread_barrier_t *barrier)
@@ -97,7 +93,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
             next->cont = 1;
 
             tcb_t *other = (tcb_t *) sched_threads[next->pid];
-            switch_prio = priority_min(switch_prio, other->priority);
+            switch_prio = thread_priority_higher(switch_prio, other->priority);
             sched_set_status(other, STATUS_PENDING);
         }
         barrier->next = NULL;

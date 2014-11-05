@@ -158,11 +158,6 @@ int pthread_cond_signal(struct pthread_cond_t *cond)
     return 0;
 }
 
-static inline thread_priority_t max_prio(thread_priority_t a, thread_priority_t b)
-{
-    return a < b ? a : b;
-}
-
 int pthread_cond_broadcast(struct pthread_cond_t *cond)
 {
     unsigned old_state = disableIRQ();
@@ -177,7 +172,7 @@ int pthread_cond_broadcast(struct pthread_cond_t *cond)
 
         tcb_t *other_thread = (tcb_t *) sched_threads[head->data];
         if (other_thread) {
-            other_prio = max_prio(other_prio, other_thread->priority);
+            other_prio = thread_priority_higher(other_prio, other_thread->priority);
             sched_set_status(other_thread, STATUS_PENDING);
         }
         head->data = -1u;
