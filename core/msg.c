@@ -53,6 +53,7 @@ static int queue_msg(tcb_t *target, const msg_t *m, kernel_pid_t sender_pid)
     if (n < 0) {
         DEBUG("queue_msg(): not queuing message from %" PRIkernel_pid " for %" PRIkernel_pid
               ", queue full\n", sender_pid, target->pid);
+        return 0;
     }
 
     DEBUG("queue_msg(): queuing message from %" PRIkernel_pid " for %" PRIkernel_pid,
