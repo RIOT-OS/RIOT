@@ -138,6 +138,8 @@ SECTIONS
         _estack = .;
     } > ram
 
+    /* heap section */
     . = ALIGN(4);
-    _end = . ;
+    _sheap = . ;
+    _eheap = ORIGIN(ram) + LENGTH(ram);
 }
