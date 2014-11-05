@@ -30,10 +30,12 @@
 /* ...and FCS*/
 #define IEEE_802154_FCS_LEN             (2)
 
-#define IEEE_802154_BEACON_FRAME        (0)
-#define IEEE_802154_DATA_FRAME          (1)
-#define IEEE_802154_ACK_FRAME           (2)
-#define IEEE_802154_MAC_CMD_FRAME       (3)
+typedef enum __attribute__((packed)) {
+    IEEE_802154_BEACON_FRAME    = 0,
+    IEEE_802154_DATA_FRAME      = 1,
+    IEEE_802154_ACK_FRAME       = 2,
+    IEEE_802154_MAC_CMD_FRAME   = 3
+} ieee802154_frame_type_t;
 
 #define IEEE_802154_SHORT_ADDR_M        (2)
 #define IEEE_802154_LONG_ADDR_M         (3)
@@ -66,7 +68,7 @@
 #define LETOHS(a)   HTOLES(a)
 
 typedef struct __attribute__((packed)) {
-    uint8_t frame_type;
+    ieee802154_frame_type_t frame_type;
     uint8_t sec_enb;
     uint8_t frame_pend;
     uint8_t ack_req;
