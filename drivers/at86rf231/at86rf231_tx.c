@@ -199,7 +199,6 @@ int16_t at86rf231_load(at86rf231_packet_t *packet)
 {
     // Set missing frame information
     packet->frame.fcf.frame_ver = 0;
-    packet->frame.fcf.frame_type = 0x1;
 
     packet->frame.src_pan_id = at86rf231_get_pan();
 

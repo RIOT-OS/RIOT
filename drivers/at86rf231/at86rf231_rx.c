@@ -65,6 +65,14 @@ void at86rf231_rx_handler(void)
         return;
     }
 
+#ifdef DEBUG_ENABLED
+    DEBUG("pkg: ");
+    for (int i = 1; i < at86rf231_rx_buffer[rx_buffer_next].length; i++) {
+        DEBUG("%x ", buf[i]);
+    }
+    DEBUG("\n");
+#endif
+
     /* read buffer into ieee802154_frame */
     ieee802154_frame_read(&buf[1], &at86rf231_rx_buffer[rx_buffer_next].frame,
                           at86rf231_rx_buffer[rx_buffer_next].length);
