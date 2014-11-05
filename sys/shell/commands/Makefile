@@ -52,5 +52,8 @@ endif
 ifneq (,$(filter l3g4200d,$(USEMODULE)))
 	SRC += sc_l3g4200d.c
 endif
+ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
+	SRC += sc_lsm303dlhc.c
+endif
 
 include $(RIOTBASE)/Makefile.base
