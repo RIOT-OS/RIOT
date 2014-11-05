@@ -122,9 +122,12 @@ uintptr_t thread_measure_stack_free(char *stack)
 kernel_pid_t thread_create(char *stack, int stacksize, thread_priority_t priority,
                            int flags, thread_task_func_t function, void *arg, const char *name)
 {
-    if (priority >= SCHED_PRIO_LEVELS) {
-        return -EINVAL;
+#ifdef DEVELHELP
+    if (!thread_priority_valid(priority) && (priority != PRIORITY_IDLE ||
+                                             sched_runqueues[PRIORITY_IDLE] != NULL)) {
+        printf("thread_create: invalid priority %" PRIthread_priority ". Expect errors.\n", priority);
     }
+#endif
 
 #ifdef DEVELHELP
     int total_stacksize = stacksize;

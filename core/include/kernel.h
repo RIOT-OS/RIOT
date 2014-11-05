@@ -73,21 +73,27 @@
 /* ------------------------------------------------------------------------- */
 /**
  * @def PRIORITY_MIN
- * @brief Least priority a thread can have
+ * @brief Least priority a user thread can have
  */
-#define PRIORITY_MIN            (SCHED_PRIO_LEVELS-1)
+#define PRIORITY_MIN            ((thread_priority_t) (SCHED_PRIO_LEVELS - 2))
+/**
+ * @def PRIORITY_MAX
+ * @brief Highest priority a user thread can have
+ */
+#define PRIORITY_MAX            ((thread_priority_t) 0)
 
 /**
  * @def PRIORITY_IDLE
  * @brief Priority of the idle thread
+ * @details Also a convenient initialization for thread_priority_higher().
  */
-#define PRIORITY_IDLE           PRIORITY_MIN
+#define PRIORITY_IDLE           ((thread_priority_t) (SCHED_PRIO_LEVELS - 1))
 
 /**
  * @def PRIORITY_MAIN
  * @brief Priority of the main thread
  */
-#define PRIORITY_MAIN           (PRIORITY_MIN - (SCHED_PRIO_LEVELS/2))
+#define PRIORITY_MAIN           ((thread_priority_t) (PRIORITY_MIN / 2))
 
 /**
  * @def LPM_PREVENT_SLEEP_UART
