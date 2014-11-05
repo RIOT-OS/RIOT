@@ -55,5 +55,10 @@ ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += config
 	USEMODULE += random
 endif
+ifneq (,$(filter iot-lab_M3,$(BOARD)))
+	USEMODULE += isl29020
+	USEMODULE += lps331ap
+	USEMODULE += l3g4200d
+endif
 
 include $(RIOTBASE)/Makefile.include

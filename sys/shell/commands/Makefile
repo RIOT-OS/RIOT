@@ -43,5 +43,14 @@ endif
 ifeq ($(CPU),x86)
 	SRC += sc_x86_lspci.c
 endif
+ifneq (,$(filter isl29020,$(USEMODULE)))
+	SRC += sc_isl29020.c
+endif
+ifneq (,$(filter lps331ap,$(USEMODULE)))
+	SRC += sc_lps331ap.c
+endif
+ifneq (,$(filter l3g4200d,$(USEMODULE)))
+	SRC += sc_l3g4200d.c
+endif
 
 include $(RIOTBASE)/Makefile.base
