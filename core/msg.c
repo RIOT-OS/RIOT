@@ -43,16 +43,24 @@ static int _msg_send(const msg_t *m, kernel_pid_t target_pid, bool block);
 
 static int queue_msg(tcb_t *target, const msg_t *m, kernel_pid_t sender_pid)
 {
-    int n = cib_put(&(target->msg_queue));
-
-    if (n != -1) {
-        msg_t *dest = &target->msg_array[n];
-        *dest = *m;
-        dest->sender_pid = sender_pid;
-        return 1;
+    if (target->msg_array == NULL) {
+        DEBUG("queue_msg(): not queuing message from %" PRIkernel_pid " for %" PRIkernel_pid
+              ", no message queue present\n", sender_pid, target->pid);
+        return 0;
     }
 
-    return 0;
+    int n = cib_put(&(target->msg_queue));
+    if (n < 0) {
+        DEBUG("queue_msg(): not queuing message from %" PRIkernel_pid " for %" PRIkernel_pid
+              ", queue full\n", sender_pid, target->pid);
+    }
+
+    DEBUG("queue_msg(): queuing message from %" PRIkernel_pid " for %" PRIkernel_pid,
+          sender_pid, target->pid);
+    msg_t *dest = &target->msg_array[n];
+    *dest = *m;
+    dest->sender_pid = sender_pid;
+    return 1;
 }
 
 int msg_send(const msg_t *m, kernel_pid_t target_pid) {
@@ -95,8 +103,7 @@ static int _msg_send(const msg_t *m, kernel_pid_t target_pid, bool block)
     if (target->status != STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send(): target is not RECEIVE_BLOCKED.\n");
 
-        if (target->msg_array && queue_msg(target, m, sched_active_pid)) {
-            DEBUG("msg_send(): target has a msg_queue. Queueing message.\n");
+        if (queue_msg(target, m, sched_active_pid)) {
             eINT();
             if (sched_active_thread->status == STATUS_REPLY_BLOCKED) {
                 thread_yield_higher();
@@ -156,20 +163,9 @@ int msg_send_to_self(const msg_t *m)
 {
     unsigned state = disableIRQ();
 
-    int res;
-    if (sched_active_thread->msg_array) {
-        res = queue_msg((tcb_t *) sched_active_thread, m, sched_active_pid);
-        if (res == 1) {
-            DEBUG("msg_send_to_self(): %" PRIkernel_pid " queued a message for itself\n", sched_active_pid);
-        }
-        else {
-            DEBUG("msg_send_to_self(): %" PRIkernel_pid "'s message queue is already full\n", sched_active_pid);
-        }
-    }
-    else {
-        DEBUG("msg_send_to_self(): %" PRIkernel_pid " has no message queue\n", sched_active_pid);
-        res = 0;
-    }
+    DEBUG("msg_send_to_self(): %" PRIkernel_pid " tries to send a message to its own queue\n",
+          sched_active_pid);
+    int res = queue_msg((tcb_t *) sched_active_thread, m, sched_active_pid);
 
     restoreIRQ(state);
     return res;
@@ -204,13 +200,9 @@ int msg_send_int(const msg_t *m, kernel_pid_t target_pid)
         sched_context_switch_request = 1;
         return 1;
     }
-    else if (target->msg_array) {
-        DEBUG("msg_send_int(): Receiver %" PRIkernel_pid " not waiting, queuing message.\n", target_pid);
-        return queue_msg(target, m, target_pid);
-    }
     else {
-        DEBUG("msg_send_int(): Receiver %" PRIkernel_pid " not waiting, and has no message queue.\n", target_pid);
-        return 0;
+        DEBUG("msg_send_int(): Receiver %" PRIkernel_pid " not waiting.\n", target_pid);
+        return queue_msg(target, m, target_pid);
     }
 }
 
