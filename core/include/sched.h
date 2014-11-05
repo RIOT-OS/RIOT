@@ -120,7 +120,7 @@ void sched_set_status(tcb_t *process, unsigned int status);
  *
  * @param[in]   other_prio      The priority of the target thread
  */
-void sched_switch(uint16_t other_prio);
+void sched_switch(thread_priority_t other_prio);
 
 /**
  * @brief   Call context switching at thread exit

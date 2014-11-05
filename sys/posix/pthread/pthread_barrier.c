@@ -40,11 +40,8 @@ int pthread_barrier_destroy(pthread_barrier_t *barrier)
     return 0;
 }
 
-static inline int priority_min(int a, int b)
+static inline thread_priority_t priority_min(thread_priority_t a, thread_priority_t b)
 {
-    if (a == -1) {
-        return b;
-    }
     return a < b ? a : b;
 }
 
@@ -58,7 +55,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
     DEBUG("%s: hit a synchronization barrier. pid=%" PRIkernel_pid"\n",
           sched_active_thread->name, sched_active_pid);
 
-    int switch_prio = -1;
+    thread_priority_t switch_prio = PRIORITY_IDLE;
 
     if (--barrier->count > 0) {
         /* need to wait for further threads */
@@ -108,10 +105,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
     }
 
     mutex_unlock(&barrier->mutex);
-
-    if (switch_prio != -1) {
-        sched_switch(switch_prio);
-    }
+    sched_switch(switch_prio);
 
     return 0;
 }

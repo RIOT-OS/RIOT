@@ -142,7 +142,7 @@ int pthread_cond_signal(struct pthread_cond_t *cond)
     unsigned old_state = disableIRQ();
 
     priority_queue_node_t *head = priority_queue_remove_head(&(cond->queue));
-    int other_prio = -1;
+    thread_priority_t other_prio = PRIORITY_IDLE;
     if (head != NULL) {
         tcb_t *other_thread = (tcb_t *) sched_threads[head->data];
         if (other_thread) {
@@ -153,24 +153,21 @@ int pthread_cond_signal(struct pthread_cond_t *cond)
     }
 
     restoreIRQ(old_state);
-
-    if (other_prio >= 0) {
-        sched_switch(other_prio);
-    }
+    sched_switch(other_prio);
 
     return 0;
 }
 
-static int max_prio(int a, int b)
+static inline thread_priority_t max_prio(thread_priority_t a, thread_priority_t b)
 {
-    return (a < 0) ? b : ((a < b) ? a : b);
+    return a < b ? a : b;
 }
 
 int pthread_cond_broadcast(struct pthread_cond_t *cond)
 {
     unsigned old_state = disableIRQ();
 
-    int other_prio = -1;
+    thread_priority_t other_prio = PRIORITY_IDLE;
 
     while (1) {
         priority_queue_node_t *head = priority_queue_remove_head(&(cond->queue));
@@ -187,10 +184,7 @@ int pthread_cond_broadcast(struct pthread_cond_t *cond)
     }
 
     restoreIRQ(old_state);
-
-    if (other_prio >= 0) {
-        sched_switch(other_prio);
-    }
+    sched_switch(other_prio);
 
     return 0;
 }

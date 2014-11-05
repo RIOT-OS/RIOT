@@ -227,7 +227,7 @@ int msg_reply(msg_t *m, msg_t *reply)
     msg_t *target_message = (msg_t*) target->wait_data;
     *target_message = *reply;
     sched_set_status(target, STATUS_PENDING);
-    uint16_t target_prio = target->priority;
+    thread_priority_t target_prio = target->priority;
     restoreIRQ(state);
     sched_switch(target_prio);
 
