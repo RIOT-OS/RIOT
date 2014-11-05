@@ -122,7 +122,7 @@ int msg_send_to_self(const msg_t *m);
  * @param[in] target_pid    PID of target thread.
  *
  * @return 1, if sending was successful
- * @return 0, if receiver is not waiting and ``block == 0``
+ * @return 0, if receiver is not waiting and it has no messag queue
  * @return -1, on error (invalid PID)
  */
 int msg_send_int(const msg_t *m, kernel_pid_t target_pid);

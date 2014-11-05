@@ -156,7 +156,20 @@ int msg_send_to_self(const msg_t *m)
 {
     unsigned state = disableIRQ();
 
-    int res = queue_msg((tcb_t *) sched_active_thread, m, sched_active_pid);
+    int res;
+    if (sched_active_thread->msg_array) {
+        res = queue_msg((tcb_t *) sched_active_thread, m, sched_active_pid);
+        if (res == 1) {
+            DEBUG("msg_send_to_self(): %" PRIkernel_pid " queued a message for itself\n", sched_active_pid);
+        }
+        else {
+            DEBUG("msg_send_to_self(): %" PRIkernel_pid "'s message queue is already full\n", sched_active_pid);
+        }
+    }
+    else {
+        DEBUG("msg_send_to_self(): %" PRIkernel_pid " has no message queue\n", sched_active_pid);
+        res = 0;
+    }
 
     restoreIRQ(state);
     return res;
@@ -191,9 +204,13 @@ int msg_send_int(const msg_t *m, kernel_pid_t target_pid)
         sched_context_switch_request = 1;
         return 1;
     }
-    else {
+    else if (target->msg_array) {
         DEBUG("msg_send_int(): Receiver %" PRIkernel_pid " not waiting, queuing message.\n", target_pid);
         return queue_msg(target, m, target_pid);
+    }
+    else {
+        DEBUG("msg_send_int(): Receiver %" PRIkernel_pid " not waiting, and has no message queue.\n", target_pid);
+        return 0;
     }
 }
 
