@@ -39,7 +39,8 @@ extern "C" {
 #define F_CPU               CLOCK_CORECLOCK
 
 /**
- * @name Define the UART to be used as stdio and its baudrate
+ * @name Define the UART to be used as stdio, its baudrate, and the size of
+ *       receiving ringbuffer
  * @{
  */
 #define STDIO               UART_0
