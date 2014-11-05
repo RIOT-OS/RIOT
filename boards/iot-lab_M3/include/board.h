@@ -43,7 +43,11 @@ extern "C" {
  * @{
  */
 #define STDIO               UART_0
-#define STDIO_BAUDRATE      (500000U)
+
+#ifndef STDIO_BAUDRATE
+#   define STDIO_BAUDRATE   (500000U)
+#endif
+
 #define STDIO_RX_BUFSIZE    (64U)
 /** @} */
 
