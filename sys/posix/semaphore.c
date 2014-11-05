@@ -142,15 +142,19 @@ int sem_post(sem_t *sem)
     unsigned old_state = disableIRQ();
     ++sem->value;
 
+    thread_priority_t prio = PRIORITY_IDLE;
+
     priority_queue_node_t *next = priority_queue_remove_head(&sem->queue);
     if (next) {
         tcb_t *next_process = (tcb_t*) next->data;
         DEBUG("%s: waking up %s\n", sched_active_thread->name, next_process->name);
+        prio = next_process->priority;
         sched_set_status(next_process, STATUS_PENDING);
-        sched_switch(next_process->priority);
     }
 
     restoreIRQ(old_state);
+    sched_switch(prio);
+
     return 1;
 }
 
