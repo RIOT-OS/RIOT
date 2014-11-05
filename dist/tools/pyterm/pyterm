@@ -169,24 +169,36 @@ class SerCmd(cmd.Cmd):
             self.port = defaultport
         # if a TCP port is specified try to connect
         if self.tcp_serial:
-            self.logger.info("Connect to localhost:%s"
-                             % self.tcp_serial)
-            for res in socket.getaddrinfo('localhost', self.tcp_serial,
-                                          socket.AF_UNSPEC, 
-                                          socket.SOCK_STREAM):
-                af, socktype, proto, canonname, sa = res
-                try:
-                    s = fdsocket(af, socktype, proto)
-                except socket.error as msg:
-                    s = None
-                    continue
-                try:
-                    s.connect(sa)
-                except socket.error as msg:
-                    s.close()
-                    s = None
-                    continue
-                break
+            if self.tcp_serial.find(':') >= 0:
+                host = self.tcp_serial.split(':')[0]
+                port = self.tcp_serial.split(':')[1]
+            else:
+                self.logger.warn("Host name for TCP connection is "
+                                 "missing, defaulting to \"localhost\"")
+                host = "localhost"
+                port = self.tcp_serial
+            self.logger.info("Connect to %s:%s"
+                             % (host, port))
+            try:
+                for res in socket.getaddrinfo(host, port,
+                                              socket.AF_UNSPEC,
+                                              socket.SOCK_STREAM):
+                    af, socktype, proto, canonname, sa = res
+                    try:
+                        s = fdsocket(af, socktype, proto)
+                    except socket.error as msg:
+                        s = None
+                        continue
+                    try:
+                        s.connect(sa)
+                    except socket.error as msg:
+                        s.close()
+                        s = None
+                        continue
+                    break
+            except socket.gaierror as msg:
+                self.logger.error(str(msg))
+                s = None
             if s:
                 self.ser = s
             else:
@@ -652,7 +664,9 @@ if __name__ == "__main__":
                  % defaultport,
             default=defaultport)
     parser.add_argument("-ts", "--tcp-serial",
-            help="Connect to a TCP port instead of a serial port")
+            help="Connect to a TCP port instead of a serial port. "
+                 "Format is <hostname>:<port>. If the colon is missing"
+                 " host defaults to \"localhost\"")
     parser.add_argument("-b", "--baudrate",
             help="Specifies baudrate for the serial port, default is %s"
                  % defaultbaud,
