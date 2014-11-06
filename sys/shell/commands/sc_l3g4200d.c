@@ -57,6 +57,7 @@ void _get_l3g4200d_read_handler(int argc, char **argv)
 
     if (!l3g4200d_dev.addr) {
         puts("Error: please call `l3g4200d_init` first!");
+        return;
     }
 
     res = l3g4200d_read(&l3g4200d_dev, &data);

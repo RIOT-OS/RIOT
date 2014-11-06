@@ -56,6 +56,7 @@ void _get_isl29020_read_handler(int argc, char **argv)
 
     if (!isl29020_dev.address) {
         puts("Error: please call `isl29020_init` first!");
+        return;
     }
 
     val = isl29020_read(&isl29020_dev);
