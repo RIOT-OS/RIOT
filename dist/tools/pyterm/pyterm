@@ -26,13 +26,13 @@ except ImportError:
 
 
 import cmd, serial, socket, sys, threading, readline, time, logging, \
-       os, argparse, re, codecs, signal
+    os, argparse, re, codecs, signal
 
-### import twisted if available, define dummy classes otherwise
+# import twisted if available, define dummy classes otherwise
 try:
     from twisted.internet import reactor
     from twisted.internet.protocol import Protocol, \
-                                          ReconnectingClientFactory
+        ReconnectingClientFactory
 except ImportError:
     logging.getLogger("").warn("Twisted not available, please install "
                                "it if you want to use pyterm's JSON "
@@ -41,31 +41,33 @@ except ImportError:
     class Protocol():
         def __init__(self):
             pass
+
     class ReconnectingClientFactory():
         def __init__(self):
             pass
 
-### set some default options
+# set some default options
 import platform
 defaulthostname = platform.node()
 
-### default serial port
-defaultport     = "/dev/ttyUSB0"
+# default serial port
+defaultport    = "/dev/ttyUSB0"
 
-### default baudrate for serial connection
+# default baudrate for serial connection
 defaultbaud     = 115200
 
-### directory to store configuration and log files
+# directory to store configuration and log files
 defaultdir      = os.environ['HOME'] + os.path.sep + '.pyterm'
 
-### configuration file name
+# configuration file name
 defaultfile     = "pyterm-" + defaulthostname + ".conf"
 
-### logging subfolder
+# logging subfolder
 defaultrunname  = "default-run"
 
-### default logging prefix format string
+# default logging prefix format string
 default_fmt_str = '%(asctime)s - %(levelname)s # %(message)s'
+
 
 class SerCmd(cmd.Cmd):
     """Main class for pyterm based on Python's Cmd class.
@@ -75,7 +77,7 @@ class SerCmd(cmd.Cmd):
     """
 
     def __init__(self, port=None, baudrate=None, toggle=None, tcp_serial=None,
-                 confdir=None, conffile=None, host=None, run_name=None, 
+                 confdir=None, conffile=None, host=None, run_name=None,
                  log_dir_name=None):
         """Constructor.
 
@@ -131,7 +133,7 @@ class SerCmd(cmd.Cmd):
         except IOError:
             pass
 
-        ### create Logging object
+        # create Logging object
         my_millis = "%.4f" % (time.time())
         date_str = '%s.%s' % (time.strftime('%Y%m%d-%H:%M:%S'), my_millis[-4:])
         self.startup = date_str
@@ -141,10 +143,8 @@ class SerCmd(cmd.Cmd):
         directory = self.configdir + os.path.sep + self.log_dir_name
         if not os.path.exists(directory):
             os.makedirs(directory)
-        logging.basicConfig(filename = directory + os.path.sep +
-                                       self.run_name + '.log',
-                                       level=logging.DEBUG,
-                                       format=self.fmt_str)
+        logging.basicConfig(filename=directory + os.path.sep + self.run_name +
+                            '.log', level=logging.DEBUG, format=self.fmt_str)
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)
 
@@ -156,7 +156,6 @@ class SerCmd(cmd.Cmd):
         ch.setFormatter(formatter)
         # add ch to logger
         self.logger.addHandler(ch)
-
 
     def preloop(self):
         """Executed bat program start.
@@ -322,7 +321,7 @@ class SerCmd(cmd.Cmd):
                 i += 1
 
         with open(self.configdir + os.path.sep + self.configfile, 'wb')\
-        as config_fd:
+                as config_fd:
             self.config.write(config_fd)
             self.logger.info("Config saved")
 
@@ -415,8 +414,8 @@ class SerCmd(cmd.Cmd):
         """Pyterm command: Transfer lines matching this Regex as JSON
         object.
         """
-        self.json_regs[line.split(' ')[0].strip()] = \
-        re.compile(line.partition(' ')[2].strip())
+        self.json_regs[line.split(' ')[0].strip()] =\
+            re.compile(line.partition(' ')[2].strip())
 
     def do_PYTERM_unjson(self, line):
         """Pyterm command: Remove a JSON filter.
@@ -440,7 +439,8 @@ class SerCmd(cmd.Cmd):
 
         interval = int(argv[0])
         cmd = argv[2]
-        self.logger.info("Schedule %s to fire after %i seconds" % (cmd, interval))
+        self.logger.info("Schedule %s to fire after %i seconds"
+                         % (cmd, interval))
         t = threading.Timer(interval, self.timer_handler, (cmd,))
         t.start()
 
@@ -448,24 +448,22 @@ class SerCmd(cmd.Cmd):
         """Internal function to laod configuration from file.
         """
         self.config = configparser.SafeConfigParser()
-        self.config.read([self.configdir + os.path.sep + \
-                         self.configfile])
+        self.config.read([self.configdir + os.path.sep + self.configfile])
 
         for sec in self.config.sections():
             if sec == "filters":
                 for opt in self.config.options(sec):
                     self.filters.append(
-                            re.compile(self.config.get(sec, opt)))
+                        re.compile(self.config.get(sec, opt)))
             if sec == "ignores":
                 for opt in self.config.options(sec):
                     self.ignores.append(
-                            re.compile(self.config.get(sec, opt)))
+                        re.compile(self.config.get(sec, opt)))
             if sec == "json_regs":
                 for opt in self.config.options(sec):
                     self.logger.info("add json regex for %s"
                                      % self.config.get(sec, opt))
-                    self.json_regs[opt] = \
-                        re.compile(self.config.get(sec, opt))
+                    self.json_regs[opt] = re.compile(self.config.get(sec, opt))
             if sec == "aliases":
                 for opt in self.config.options(sec):
                     self.aliases[opt] = self.config.get(sec, opt)
@@ -507,10 +505,9 @@ class SerCmd(cmd.Cmd):
             if m:
                 self.onecmd(self.precmd(self.triggers[trigger]))
 
-        # ckecking if the line should be sent as JSON object to a tcp 
+        # ckecking if the line should be sent as JSON object to a tcp
         # server
-        if (len(self.json_regs)) and self.factory and \
-            self.factory.myproto:
+        if (len(self.json_regs)) and self.factory and self.factory.myproto:
             for j in self.json_regs:
                 m = self.json_regs[j].search(line)
                 if m:
@@ -560,7 +557,6 @@ class SerCmd(cmd.Cmd):
             if not ignored:
                 self.process_line(line)
 
-
     def serial_connect(self):
         self.ser = serial.Serial(port=self.port, dsrdtr=0, rtscts=0)
         self.ser.baudrate = self.baudrate
@@ -594,30 +590,32 @@ class SerCmd(cmd.Cmd):
                 output = ""
             else:
                 output += c
-            #sys.stdout.write(c)
-            #sys.stdout.flush()
+            # sys.stdout.write(c)
+            # sys.stdout.flush()
+
 
 class PytermProt(Protocol):
     def __init__(self, factory):
         self.factory = factory
-        
+
     def connectionMade(self):
         print("writing to transport")
         self.transport.write("hostname: %s\n" % (self.factory.shell.host))
-    
+
     def dataReceived(self, data):
         sys.stdout.write(data)
         if(data.strip() == "/exit"):
             reactor.callLater(2, self.factory.shell.do_PYTERM_exit, data)
         else:
-            self.factory.shell.ser.write(data + "\n")               
+            self.factory.shell.ser.write(data + "\n")
 
     def sendMessage(self, msg):
         self.transport.writeSomeData("%d#%s\n" % (len(msg), msg))
 
+
 class PytermClientFactory(ReconnectingClientFactory):
 
-    def __init__(self, shell = None):
+    def __init__(self, shell=None):
         self.myproto = None
         self.shell = shell
 
@@ -639,8 +637,10 @@ class PytermClientFactory(ReconnectingClientFactory):
                                                          connector,
                                                          reason)
 
+
 def __stop_reactor(signum, stackframe):
     sys.stderr.write("Ctrl-C is disabled, type '/exit' instead\n")
+
 
 class fdsocket(socket.socket):
     def read(self, bufsize):
@@ -660,42 +660,42 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Pyterm - The Python "
                                                  "terminal program")
     parser.add_argument("-p", "--port",
-            help="Specifies the serial port to use, default is %s"
-                 % defaultport,
-            default=defaultport)
+                        help="Specifies the serial port to use, default is %s"
+                        % defaultport,
+                        default=defaultport)
     parser.add_argument("-ts", "--tcp-serial",
-            help="Connect to a TCP port instead of a serial port. "
-                 "Format is <hostname>:<port>. If the colon is missing"
-                 " host defaults to \"localhost\"")
+                        help="Connect to a TCP port instead of a serial port. "
+                        "Format is <hostname>:<port>. If the colon is missing"
+                        " host defaults to \"localhost\"")
     parser.add_argument("-b", "--baudrate",
-            help="Specifies baudrate for the serial port, default is %s"
-                 % defaultbaud,
-            default=defaultbaud)
+                        help="Specifies baudrate for the serial port, default "
+                        "is %s" % defaultbaud,
+                        default=defaultbaud)
     parser.add_argument("-tg", "--toggle",
-            action="store_true",
-            help="toggles the DTR and RTS pin of the serial line when "
-                 "connecting, default is not toggling the pins")
+                        action="store_true",
+                        help="toggles the DTR and RTS pin of the serial line "
+                        "when connecting, default is not toggling the pins")
     parser.add_argument('-d', '--directory',
-            help="Specify the Pyterm directory, default is %s"
-                 % defaultdir,
-            default=defaultdir)
+                        help="Specify the Pyterm directory, default is %s"
+                        % defaultdir,
+                        default=defaultdir)
     parser.add_argument("-c", "--config",
-            help="Specify the config filename, default is %s"
-                 % defaultfile,
-            default=defaultfile)
+                        help="Specify the config filename, default is %s"
+                        % defaultfile,
+                        default=defaultfile)
     parser.add_argument("-s", "--server",
-            help="Connect via TCP to this server to send output as "
-                 "JSON")
+                        help="Connect via TCP to this server to send output "
+                        "as JSON")
     parser.add_argument("-P", "--tcp_port", type=int,
-            help="Port at the JSON server")
+                        help="Port at the JSON server")
     parser.add_argument("-H", "--host",
-            help="Hostname of this maschine")
+                        help="Hostname of this maschine")
     parser.add_argument("-rn", "--run-name",
-            help="Run name, used for logfile")
+                        help="Run name, used for logfile")
     parser.add_argument("-ln", "--log-dir-name",
-            help="Log directory name (default is hostname e.g. %s/<hostname>)"
-                 %defaultdir,
-                 default=defaultdir)
+                        help="Log directory name (default is hostname e.g. "
+                        "%s/<hostname>)" % defaultdir,
+                        default=defaultdir)
     args = parser.parse_args()
 
     myshell = SerCmd(args.port, args.baudrate, args.toggle, args.tcp_serial,
