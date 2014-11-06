@@ -78,7 +78,7 @@ void at86rf231_rx_handler(void)
                           at86rf231_rx_buffer[rx_buffer_next].length);
 
     /* if packet is no ACK */
-    if (at86rf231_rx_buffer[rx_buffer_next].frame.fcf.frame_type != 2) {
+    if (at86rf231_rx_buffer[rx_buffer_next].frame.fcf.frame_type != IEEE_802154_ACK_FRAME) {
 #ifdef DEBUG_ENABLED
         ieee802154_frame_print_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
 #endif
