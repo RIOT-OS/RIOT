@@ -38,8 +38,10 @@ MEMORY
     ram (rwx)   : ORIGIN = 0x20000000, LENGTH = 0x00008000  /* RAM, 32K    */
 }
 
-/* The stack size used by the application. NOTE: you need to adjust  */
-STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x2000 ;
+/* Define the default stack size for interrupt mode. As no context is
+   saved on this stack and ISRs are supposed to be short, it can be fairly
+   small. 512 byte should be a save assumption here */
+STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x200; /* 512 byte */
 
 /* Section Definitions */
 SECTIONS
