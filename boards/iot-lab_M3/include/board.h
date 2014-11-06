@@ -111,8 +111,8 @@ extern "C" {
  * @{
  */
 #define LSM303DLHC_I2C      I2C_0
-#define LSM303DLHC_ACC_ADDR (25)
-#define LSM303DLHC_MAG_ADDR (30)
+#define LSM303DLHC_ACC_ADDR (0x19)
+#define LSM303DLHC_MAG_ADDR (0x1e)
 #define LSM303DLHC_INT1     GPIO_5
 #define LSM303DLHC_INT2     GPIO_6
 #define LSM303DLHC_DRDY     GPIO_7

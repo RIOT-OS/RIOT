@@ -51,6 +51,8 @@ typedef struct {
     i2c_t i2c;              /**< I2C device                  */
     uint8_t acc_address;    /**< accelerometer's I2C address */
     uint8_t mag_address;    /**< magnetometer's I2C address  */
+    gpio_t  acc_pin;        /**< accelerometer's data ready pin */
+    gpio_t  mag_pin;        /**< magnetometer's data ready pin  */
 } lsm303dlhc_t;
 
 /**
