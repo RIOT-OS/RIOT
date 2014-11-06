@@ -47,15 +47,15 @@
 #include "socket_base/in.h"
 #include "net_help.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
-#define CON_STACKSIZE                   (1024)
-#define LOWPAN_TRANSFER_BUF_STACKSIZE   (1024)
+#define CON_STACKSIZE                   (512)
+#define LOWPAN_TRANSFER_BUF_STACKSIZE   (512)
 
 #define SIXLOWPAN_MAX_REGISTERED        (4)
 
@@ -180,7 +180,9 @@ int sixlowpan_lowpan_sendto(int if_id, const void *dest, int dest_len,
         print_long_local_addr((net_if_eui64_t *)dest);
     }
     else {
-        printf("0x%04"PRIx16"\n", NTOHS(*((uint16_t *)dest)));
+        uint16_t destination;
+        memcpy(&destination, dest, 2); // i really do not know if this is correct
+        printf("0x%04"PRIx16"\n", destination);//NTOHS(*((uint16_t *)dest)));
     }
 
     DEBUG("data: \n");
@@ -195,12 +197,10 @@ int sixlowpan_lowpan_sendto(int if_id, const void *dest, int dest_len,
 
 #endif
 
-
     if (iphc_status == LOWPAN_IPHC_ENABLE) {
         if (!lowpan_iphc_encoding(if_id, dest, dest_len, ipv6_buf, data)) {
             return -1;
         }
-
         data = &comp_buf[0];
         send_packet_length = comp_len;
     }
@@ -1099,7 +1099,8 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
             ipv6_hdr_fields[0] = con->num;
 
         }
-
+        uint16_t destination;
+        memcpy(&destination, dest, 2);
         if (con || ipv6_addr_is_link_local(&ipv6_buf->destaddr)) {
             if (dest_len == 8 &&
                 ipv6_buf->destaddr.uint8[8] == (dest[0] ^ 0x02) &&
@@ -1111,7 +1112,7 @@ uint8_t lowpan_iphc_encoding(int if_id, const uint8_t *dest, int dest_len,
             else if (dest_len == 2 &&
                      ipv6_buf->destaddr.uint32[2] == HTONL(0x000000ff) &&
                      ipv6_buf->destaddr.uint16[6] == HTONS(0xfe00) &&
-                     ipv6_buf->destaddr.uint16[7] == *((uint16_t *) dest)) {
+                     ipv6_buf->destaddr.uint16[7] == destination) {
                 /* 0 bits. The address is derived using context information
                  * and possibly the link-layer addresses.*/
                 lowpan_iphc[1] |= 0x03;
