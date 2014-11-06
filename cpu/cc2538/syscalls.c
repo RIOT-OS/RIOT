@@ -39,18 +39,12 @@
 #ifdef MODULE_UART0
 #include "board_uart0.h"
 #endif
-
-#ifdef CPU_MODEL_CC2538NF11
-#define SRAM_LENGTH (16 * 1024) /**< The CC2538NF11 has 16 Kb of RAM */
-#else
-#define SRAM_LENGTH (32 * 1024) /**< All other existing models of the CC2538 have 32 Kb of RAM */
-#endif
-
 /**
  * manage the heap
  */
-extern uint32_t _end;                       /* address of last used memory cell */
-caddr_t heap_top = (caddr_t) &_end + 4;
+extern char _sheap;                 /* start of the heap */
+extern char _eheap;                 /* end of the heap */
+caddr_t heap_top = (caddr_t)&_sheap + 4;
 
 #ifndef MODULE_UART0
 /**
@@ -120,25 +114,26 @@ void _exit(int n)
  * @brief Allocate memory from the heap.
  *
  * The current heap implementation is very rudimentary, it is only able to allocate
- * memory. It does not have any means to free memory again.
+ * memory. But it does not
+ * - have any means to free memory again
  *
- * @return      a pointer to the successfully allocated memory
- * @return      -1 on error, and errno is set to ENOMEM
+ * @return [description]
  */
-caddr_t _sbrk_r(struct _reent *r, size_t incr)
+caddr_t _sbrk_r(struct _reent *r, ptrdiff_t incr)
 {
     unsigned int state = disableIRQ();
-    if ((uintptr_t)heap_top + incr > SRAM_BASE + SRAM_LENGTH) {
-        restoreIRQ(state);
+    caddr_t res = heap_top;
+
+    if (((incr > 0) && ((heap_top + incr > &_eheap) || (heap_top + incr < res))) ||
+        ((incr < 0) && ((heap_top + incr < &_sheap) || (heap_top + incr > res)))) {
         r->_errno = ENOMEM;
-        return (caddr_t)-1;
-    }
-    else {
-        caddr_t res = heap_top;
+        res = (void *) -1;
+    } else {
         heap_top += incr;
-        restoreIRQ(state);
-        return res;
     }
+
+    restoreIRQ(state);
+    return res;
 }
 
 /**

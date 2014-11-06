@@ -66,6 +66,16 @@ extern "C" {
 /** @} */
 
 /**
+ * @name Define the interface for the connected flash memory
+ * @{
+ */
+#define EXTFLASH_SPI        SPI_1
+#define EXTFLASH_CS         GPIO_8
+#define EXTFLASH_WRITE      GPIO_9
+#define EXTFLASH_HOLD       GPIO_10
+/** @} */
+
+/**
  * @name Define the interface to the ISL29020 light sensor
  * @{
  */
@@ -79,6 +89,18 @@ extern "C" {
  */
 #define LPS331AP_I2C        I2C_0
 #define LPS331AP_ADDR       0x5c
+/** @} */
+
+/**
+ * @name Define the interface to the LSM303DLHC accelerometer and magnetometer
+ * @{
+ */
+#define LSM303DLHC_I2C      I2C_0
+#define LSM303DLHC_ACC_ADDR (25)
+#define LSM303DLHC_MAG_ADDR (30)
+#define LSM303DLHC_INT1     GPIO_5
+#define LSM303DLHC_INT2     GPIO_6
+#define LSM303DLHC_DRDY     GPIO_7
 /** @} */
 
 /**
