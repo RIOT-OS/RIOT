@@ -118,7 +118,7 @@ int spi_conf_pins(spi_t dev)
         }
         else {
             port[i]->CRH &= ~(0xf << ((pin[i] - 8) * 4));
-            port[i]->CRH &= (crbitval << ((pin[i] - 8) * 4));
+            port[i]->CRH |= (crbitval << ((pin[i] - 8) * 4));
         }
     }
 
