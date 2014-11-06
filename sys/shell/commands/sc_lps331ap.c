@@ -54,6 +54,7 @@ void _get_lps331ap_read_handler(int argc, char **argv)
 
     if (!lps331ap_dev.address) {
         puts("Error: please call `lps331ap_init` first!");
+        return;
     }
 
     temp = lps331ap_read_temp(&lps331ap_dev);
