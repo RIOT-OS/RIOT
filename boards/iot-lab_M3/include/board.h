@@ -97,6 +97,16 @@ extern "C" {
 /** @} */
 
 /**
+ * @name Define the interface for the L3G4200D gyroscope
+ * @{
+ */
+#define L3G4200D_I2C        I2C_0
+#define L3G4200D_ADDR       0x68
+#define L3G4200D_DRDY       GPIO_4
+#define L3G4200D_INT        GPIO_3
+/** @} */
+
+/**
  * @name Define the interface to the LSM303DLHC accelerometer and magnetometer
  * @{
  */

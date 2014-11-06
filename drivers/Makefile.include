@@ -19,3 +19,6 @@ endif
 ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/lsm303dlhc/include
 endif
+ifneq (,$(filter l3g4200d,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/l3g4200d/include
+endif
