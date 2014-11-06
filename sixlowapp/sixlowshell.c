@@ -85,14 +85,14 @@ void sixlowapp_netcat(int argc, char **argv)
     
     if (argc < 3) {
         puts("! Not enough parameters");
-        puts("  usage: nc [-l] [destination] [port]");
+        puts("  usage: nc [-l] [destination] [port] [text]");
         return;
     }
 
     if (strlen(argv[1]) == 2) {
         if (strncmp(argv[1], "-l", 2)) {
             puts("! Invalid parameter");
-            puts("  usage: nc [-l] [destination] [port]");
+            puts("  usage: nc [-l] [destination] [port] [text]");
             return;
         }
         else {
@@ -107,7 +107,7 @@ void sixlowapp_netcat(int argc, char **argv)
         sixlowapp_ndp_workaround(&dest);
         size_t plen;
         if (argc > 3 ) {
-            plen = (strlen(argv[3]) > MAX_PAYLOAD_SIZE) ? MAX_PAYLOAD_SIZE : strlen(argv[1]) + 1;
+            plen = (strlen(argv[3]) > MAX_PAYLOAD_SIZE) ? MAX_PAYLOAD_SIZE : strlen(argv[3]) + 1;
             memcpy(payload, argv[3], plen);
             payload[plen - 1] = 0;
         }
