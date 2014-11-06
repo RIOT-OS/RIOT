@@ -24,6 +24,8 @@
 #include "board.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
+#define ENABLE_DEBUG (0)
+#include "debug.h"
 
 void at86rf231_reg_write(uint8_t addr, uint8_t value)
 {

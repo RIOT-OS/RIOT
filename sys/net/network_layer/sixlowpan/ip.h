@@ -41,7 +41,7 @@
 #define MULTIHOP_HOPLIMIT           (64)
 
 #define SIXLOWIP_MAX_REGISTERED     (4)
-#define IP_PROCESS_STACKSIZE        (1024)
+#define IP_PROCESS_STACKSIZE        (1024+512)
 
 /* extern variables */
 extern uint8_t ipv6_ext_hdr_len;

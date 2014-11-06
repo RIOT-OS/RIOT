@@ -101,7 +101,7 @@ void isr_debug_mon(void)
 
 void isr_hard_fault(void)
 {
-    thread_print_all();
+    //thread_print_all();
     core_panic(HARD_FAULT, "HARD FAULT");
     while (1) {asm ("nop");}
 }

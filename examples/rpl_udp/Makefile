@@ -13,7 +13,7 @@ RIOTBASE ?= $(CURDIR)/../..
 #RIOTBOARD ?= $(CURDIR)/../../RIOT/thirdparty_boards
 
 # Uncomment this to enable scheduler statistics for ps:
-#CFLAGS += -DSCHEDSTATISTICS
+CFLAGS += -DSCHEDSTATISTICS
 
 # If you want to use native with valgrind, you should recompile native
 # with the target all-valgrind instead of all:

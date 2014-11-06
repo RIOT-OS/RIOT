@@ -20,7 +20,7 @@
 
 #define TRICKLE_TIMER_STACKSIZE (1024)
 #define TRICKLE_INTERVAL_STACKSIZE (512)
-#define DAO_DELAY_STACKSIZE (512)
+#define DAO_DELAY_STACKSIZE (1024)
 #define RT_STACKSIZE (1024)
 
 void reset_trickletimer(void);

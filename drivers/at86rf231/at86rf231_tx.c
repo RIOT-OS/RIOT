@@ -170,7 +170,6 @@ netdev_802154_tx_status_t at86rf231_transmit_tx_buf(netdev_t *dev)
 
     /* Start TX */
     at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__TX_START);
-    DEBUG("Started TX\n");
 
     if (!wait_for_ack) {
         return NETDEV_802154_TX_STATUS_OK;
@@ -267,8 +266,6 @@ int16_t at86rf231_load(at86rf231_packet_t *packet)
 
     /* load packet into fifo */
     at86rf231_write_fifo(pkt, packet->length);
-    DEBUG("Wrote to FIFO\n");
-
     return packet->length;
 }
 

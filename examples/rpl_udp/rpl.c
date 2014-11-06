@@ -30,12 +30,12 @@
 #include "rpl_udp.h"
 #include "transceiver.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 #define TRANSCEIVER TRANSCEIVER_DEFAULT
 
-char monitor_stack_buffer[MONITOR_STACK_SIZE];
+//char monitor_stack_buffer[MONITOR_STACK_SIZE];
 radio_address_t id;
 
 uint8_t is_root = 0;
@@ -95,17 +95,17 @@ void rpl_udp_init(int argc, char **argv)
         }
 
         DEBUGF("Start monitor\n");
-        kernel_pid_t monitor_pid = thread_create(monitor_stack_buffer,
-                                                 sizeof(monitor_stack_buffer),
-                                                 PRIORITY_MAIN - 2,
-                                                 CREATE_STACKTEST,
-                                                 rpl_udp_monitor,
-                                                 NULL,
-                                                 "monitor");
-        DEBUGF("Register at transceiver %02X\n", TRANSCEIVER);
-        transceiver_register(TRANSCEIVER, monitor_pid);
-        ipv6_register_packet_handler(monitor_pid);
-        sixlowpan_lowpan_register(monitor_pid);
+        // kernel_pid_t monitor_pid = thread_create(monitor_stack_buffer,
+        //                                          sizeof(monitor_stack_buffer),
+        //                                          PRIORITY_MAIN - 2,
+        //                                          CREATE_STACKTEST,
+        //                                          rpl_udp_monitor,
+        //                                          NULL,
+        //                                          "monitor");
+        // DEBUGF("Register at transceiver %02X\n", TRANSCEIVER);
+        // transceiver_register(TRANSCEIVER, monitor_pid);
+        // ipv6_register_packet_handler(monitor_pid);
+        // sixlowpan_lowpan_register(monitor_pid);
     }
     else {
         printf("ERROR: Unknown command '%c'\n", command);

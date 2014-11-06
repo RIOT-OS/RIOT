@@ -35,7 +35,7 @@
 #define UDP_BUFFER_SIZE     (128)
 #define SERVER_PORT     (0xFF01)
 
-char udp_server_stack_buffer[512];
+char udp_server_stack_buffer[1024];
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 static void *init_udp_server(void *);
@@ -100,7 +100,7 @@ void udp_send(int argc, char **argv)
     ipv6_addr_t ipaddr;
     int bytes_sent;
     int address;
-    char text[5];
+    char text[20];
 
     if (argc != 3) {
         printf("usage: send <addr> <text>\n");

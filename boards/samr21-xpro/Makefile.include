@@ -22,6 +22,7 @@ export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
 export CPU_USAGE = -mcpu=cortex-m0plus
 FPU_USAGE =
 DEBUG_FLAGS = -ggdb -g3
+#remember to change to little endian
 export CFLAGS += -std=gnu99 -O0 -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles -mtune=cortex-m0plus
 export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
 export ASFLAGS += $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian

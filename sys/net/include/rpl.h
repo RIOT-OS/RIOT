@@ -39,7 +39,7 @@
 #define CC1100_RADIO_MODE CC1100_MODE_WOR
 
 #define RPL_PKT_RECV_BUF_SIZE 16
-#define RPL_PROCESS_STACKSIZE (1024)
+#define RPL_PROCESS_STACKSIZE (1024+512)
 
 /* global variables */
 extern rpl_of_t *rpl_objective_functions[NUMBER_IMPLEMENTED_OFS];
