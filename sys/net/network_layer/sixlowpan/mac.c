@@ -36,7 +36,7 @@
 #include "ieee802154_frame.h"
 #include "net_help.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 #endif
@@ -274,6 +274,7 @@ int sixlowpan_mac_send_data(int if_id,
                             const void *payload,
                             uint8_t payload_len, uint8_t mcast)
 {
+
     if (mcast) {
         return net_if_send_packet_broadcast(IEEE_802154_SHORT_ADDR_M,
                                             payload,
@@ -285,7 +286,8 @@ int sixlowpan_mac_send_data(int if_id,
                                            payload, (size_t)payload_len);
         }
         else if (dest_len == 2) {
-            return net_if_send_packet(if_id, NTOHS((*((net_if_eui64_t*)dest)).uint16[0]),
+            uint16_t destination = ((net_if_eui64_t*)dest)->uint16[0];
+            return net_if_send_packet(if_id, (destination),
                                       payload, (size_t)payload_len);
         }
     }
