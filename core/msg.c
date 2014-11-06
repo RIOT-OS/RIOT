@@ -324,12 +324,17 @@ static int _msg_receive(msg_t *m, int block)
         *m = *sender_msg;
 
         /* remove sender from queue */
+        uint16_t sender_prio = PRIORITY_IDLE;
         if (sender->status != STATUS_REPLY_BLOCKED) {
             sender->wait_data = NULL;
             sched_set_status(sender, STATUS_PENDING);
+            sender_prio = sender->priority;
         }
 
         eINT();
+        if (sender_prio < PRIORITY_IDLE) {
+            sched_switch(sender_prio);
+        }
         return 1;
     }
 

@@ -72,7 +72,7 @@ void cc2420_rx_handler(void)
                           cc2420_rx_buffer[rx_buffer_next].length);
 
     /* follow-up to transceiver module if adequate */
-    if (cc2420_rx_buffer[rx_buffer_next].frame.fcf.frame_type != 2) {
+    if (cc2420_rx_buffer[rx_buffer_next].frame.fcf.frame_type != IEEE_802154_ACK_FRAME) {
 #ifdef DEBUG
         ieee802154_frame_print_fcf_frame(&cc2420_rx_buffer[rx_buffer_next].frame);
 #endif

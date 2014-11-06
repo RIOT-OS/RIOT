@@ -331,7 +331,7 @@ int net_if_send_packet(int if_id, uint16_t target, const void *payload,
         p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
         p.frame.fcf.ack_req = 0;
         p.frame.fcf.sec_enb = 0;
-        p.frame.fcf.frame_type = 1;
+        p.frame.fcf.frame_type = IEEE_802154_DATA_FRAME;
         p.frame.fcf.frame_pend = 0;
 
         p.frame.dest_pan_id = net_if_get_pan_id(if_id);
@@ -375,7 +375,7 @@ int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
         p.frame.fcf.dest_addr_m = IEEE_802154_LONG_ADDR_M;
         p.frame.fcf.ack_req = 0;
         p.frame.fcf.sec_enb = 0;
-        p.frame.fcf.frame_type = 1;
+        p.frame.fcf.frame_type = IEEE_802154_DATA_FRAME;
         p.frame.fcf.frame_pend = 0;
         p.frame.dest_pan_id = net_if_get_pan_id(if_id);
         memcpy(p.frame.dest_addr, target, 8);

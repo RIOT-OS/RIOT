@@ -39,11 +39,16 @@ extern "C" {
 #define F_CPU               CLOCK_CORECLOCK
 
 /**
- * @name Define the UART to be used as stdio and its baudrate
+ * @name Define the UART to be used as stdio, its baudrate, and the size of
+ *       receiving ringbuffer
  * @{
  */
 #define STDIO               UART_0
-#define STDIO_BAUDRATE      (115200U)
+
+#ifndef STDIO_BAUDRATE
+#   define STDIO_BAUDRATE   (500000U)
+#endif
+
 #define STDIO_RX_BUFSIZE    (64U)
 /** @} */
 
@@ -92,12 +97,22 @@ extern "C" {
 /** @} */
 
 /**
+ * @name Define the interface for the L3G4200D gyroscope
+ * @{
+ */
+#define L3G4200D_I2C        I2C_0
+#define L3G4200D_ADDR       0x68
+#define L3G4200D_DRDY       GPIO_4
+#define L3G4200D_INT        GPIO_3
+/** @} */
+
+/**
  * @name Define the interface to the LSM303DLHC accelerometer and magnetometer
  * @{
  */
 #define LSM303DLHC_I2C      I2C_0
-#define LSM303DLHC_ACC_ADDR (25)
-#define LSM303DLHC_MAG_ADDR (30)
+#define LSM303DLHC_ACC_ADDR (0x19)
+#define LSM303DLHC_MAG_ADDR (0x1e)
 #define LSM303DLHC_INT1     GPIO_5
 #define LSM303DLHC_INT2     GPIO_6
 #define LSM303DLHC_DRDY     GPIO_7

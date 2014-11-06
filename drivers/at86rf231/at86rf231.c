@@ -251,8 +251,36 @@ radio_address_t at86rf231_set_address(radio_address_t address)
 {
     radio_address = address;
 
+    uint8_t old_state = at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS;
+
+    /* Go to state PLL_ON */
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__PLL_ON);
+
+    /* wait until it is on PLL_ON state */
+    do {
+        int max_wait = _MAX_RETRIES;
+        if (!--max_wait) {
+            DEBUG("at86rf231 : ERROR : could not enter PLL_ON mode\n");
+            break;
+        }
+    } while ((at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
+             != AT86RF231_TRX_STATUS__PLL_ON);
+
     at86rf231_reg_write(AT86RF231_REG__SHORT_ADDR_0, (uint8_t)(0x00FF & radio_address));
     at86rf231_reg_write(AT86RF231_REG__SHORT_ADDR_1, (uint8_t)(radio_address >> 8));
+
+    /* Go to state old state */
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE, old_state);
+
+    /* wait until it is on old state */
+    do {
+        int max_wait = _MAX_RETRIES;
+        if (!--max_wait) {
+            DEBUG("at86rf231 : ERROR : could not enter old state %x\n", old_state);
+            break;
+        }
+    } while ((at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
+             != old_state);
 
     return radio_address;
 }
@@ -266,6 +294,21 @@ uint64_t at86rf231_set_address_long(uint64_t address)
 {
     radio_address_long = address;
 
+    uint8_t old_state = at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS;
+
+    /* Go to state PLL_ON */
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__PLL_ON);
+
+    /* wait until it is on PLL_ON state */
+    do {
+        int max_wait = _MAX_RETRIES;
+        if (!--max_wait) {
+            DEBUG("at86rf231 : ERROR : could not enter PLL_ON mode\n");
+            break;
+        }
+    } while ((at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
+             != AT86RF231_TRX_STATUS__PLL_ON);
+
     at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_0, (uint8_t)(0x00000000000000FF & radio_address_long));
     at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_1, (uint8_t)(0x000000000000FF00 & radio_address_long >> 8));
     at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_2, (uint8_t)(0x0000000000FF0000 & radio_address_long >> 16));
@@ -274,6 +317,19 @@ uint64_t at86rf231_set_address_long(uint64_t address)
     at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_5, (uint8_t)(0x0000FF0000000000 & radio_address_long >> 40));
     at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_6, (uint8_t)(0x00FF000000000000 & radio_address_long >> 48));
     at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_7, (uint8_t)(radio_address_long >> 56));
+
+    /* Go to state old state */
+    at86rf231_reg_write(AT86RF231_REG__TRX_STATE, old_state);
+
+    /* wait until it is on old state */
+    do {
+        int max_wait = _MAX_RETRIES;
+        if (!--max_wait) {
+            DEBUG("at86rf231 : ERROR : could not enter old state %x\n", old_state);
+            break;
+        }
+    } while ((at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
+             != old_state);
 
     return radio_address_long;
 }
