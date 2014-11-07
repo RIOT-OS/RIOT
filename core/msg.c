@@ -39,17 +39,23 @@
 static int _msg_receive(msg_t *m, int block);
 static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block);
 
-
-static int queue_msg(tcb_t *target, msg_t *m)
+static int queue_msg(tcb_t *target, const msg_t *m)
 {
-    int n = cib_put(&(target->msg_queue));
-
-    if (n != -1) {
-        target->msg_array[n] = *m;
-        return 1;
+    if (target->msg_array == NULL) {
+        DEBUG("queue_msg(): no message queue present\n");
+        return 0;
     }
 
-    return 0;
+    int n = cib_put(&(target->msg_queue));
+    if (n < 0) {
+        DEBUG("queue_msg(): message queue is full\n");
+        return 0;
+    }
+
+    DEBUG("queue_msg(): queuing message\n");
+    msg_t *dest = &target->msg_array[n];
+    *dest = *m;
+    return 1;
 }
 
 int msg_send(msg_t *m, kernel_pid_t target_pid) {
@@ -92,7 +98,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block)
 
     if (target->status != STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send() %s:%i: Target %" PRIkernel_pid " is not RECEIVE_BLOCKED.\n", __FILE__, __LINE__, target_pid);
-        if (target->msg_array && queue_msg(target, m)) {
+        if (queue_msg(target, m)) {
             DEBUG("msg_send() %s:%i: Target %" PRIkernel_pid " has a msg_queue. Queueing message.\n", __FILE__, __LINE__, target_pid);
             eINT();
             if (sched_active_thread->status == STATUS_REPLY_BLOCKED) {
