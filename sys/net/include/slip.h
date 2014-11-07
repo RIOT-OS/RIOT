@@ -29,6 +29,10 @@
 #include "periph/uart.h"
 #include "ringbuffer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if !UART_NUMOF
 /**
  * @brief   Guard type in the case that the board does not implement the new
@@ -73,5 +77,8 @@ int slip_send_l3_packet(kernel_pid_t pid, netdev_hlist_t *upper_layer_hdrs,
                         void *data, size_t data_len);
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __SLIP_H_ */
