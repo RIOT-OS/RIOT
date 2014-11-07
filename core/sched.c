@@ -126,14 +126,16 @@ void sched_set_status(tcb_t *process, unsigned int status)
 {
     if (status >= STATUS_ON_RUNQUEUE) {
         if (!(process->status >= STATUS_ON_RUNQUEUE)) {
-            DEBUG("adding process %s to runqueue %u.\n", process->name, process->priority);
+            DEBUG("sched_set_status: adding process %" PRIkernel_pid " to runqueue %" PRIthread_priority ".\n",
+                  process->pid, process->priority);
             clist_add(&sched_runqueues[process->priority], &(process->rq_entry));
             runqueue_bitcache |= 1 << process->priority;
         }
     }
     else {
         if (process->status >= STATUS_ON_RUNQUEUE) {
-            DEBUG("removing process %s from runqueue %u.\n", process->name, process->priority);
+            DEBUG("sched_set_status: removing process %" PRIkernel_pid " to runqueue %" PRIthread_priority ".\n",
+                  process->pid, process->priority);
             clist_remove(&sched_runqueues[process->priority], &(process->rq_entry));
 
             if (!sched_runqueues[process->priority]) {
@@ -145,26 +147,35 @@ void sched_set_status(tcb_t *process, unsigned int status)
     process->status = status;
 }
 
-void sched_switch(uint16_t other_prio)
+void sched_switch(thread_priority_t other_prio)
 {
     int in_isr = inISR();
-    uint16_t current_prio = sched_active_thread->priority;
+    tcb_t *active_thread = (tcb_t *) sched_active_thread;
+    thread_priority_t current_prio = active_thread->priority;
+    int on_runqueue = (active_thread->status >= STATUS_ON_RUNQUEUE);
 
-    DEBUG("%s: %" PRIu16 " %" PRIu16 " %i\n", sched_active_thread->name, current_prio, other_prio, in_isr);
+    DEBUG("sched_switch: active pid=%" PRIkernel_pid" prio=%" PRIthread_priority " on_runqueue=%i "
+          ", other_prio=%" PRIthread_priority " in_isr=%i\n",
+          active_thread->pid, current_prio, on_runqueue, other_prio, in_isr);
 
-    if (current_prio > other_prio) {
+    if (!on_runqueue || (current_prio > other_prio)) {
         if (in_isr) {
+            DEBUG("sched_switch: setting sched_context_switch_request.\n");
             sched_context_switch_request = 1;
         }
         else {
+            DEBUG("sched_switch: yielding immediately.\n");
             thread_yield_higher();
         }
+    }
+    else {
+        DEBUG("sched_switch: continuing without yield.\n");
     }
 }
 
 NORETURN void sched_task_exit(void)
 {
-    DEBUG("sched_task_exit(): ending task %s...\n", sched_active_thread->name);
+    DEBUG("sched_task_exit(): ending task %" PRIkernel_pid "\n", sched_active_thread->pid);
 
     dINT();
     sched_threads[sched_active_pid] = NULL;

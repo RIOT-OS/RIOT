@@ -49,7 +49,7 @@ static ssize_t pipe_rw(ringbuffer_t *rb,
 
         if (count > 0) {
             tcb_t *other_thread = *other_op_blocked;
-            int other_prio = -1;
+            thread_priority_t other_prio = PRIORITY_IDLE;
             if (other_thread) {
                 *other_op_blocked = NULL;
                 other_prio = other_thread->priority;
@@ -57,10 +57,7 @@ static ssize_t pipe_rw(ringbuffer_t *rb,
             }
 
             restoreIRQ(old_state);
-
-            if (other_prio >= 0) {
-                sched_switch(other_prio);
-            }
+            sched_switch(other_prio);
 
             return count;
         }

@@ -94,6 +94,16 @@ static inline int pid_is_valid(kernel_pid_t pid)
     return ((KERNEL_PID_FIRST <= pid) && (pid <= KERNEL_PID_LAST));
 }
 
+/**
+ * @brief Unsigned integer type to denote the priority of a thread.
+ */
+typedef uint8_t thread_priority_t;
+
+/**
+ * Format code fro printing a @ref thread_priority_t.
+ */
+#define PRIthread_priority PRIu8
+
 #ifdef __cplusplus
 }
 #endif

@@ -19,6 +19,7 @@
 
 #include "sched.h"
 #include "pthread.h"
+#include "thread.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -40,14 +41,6 @@ int pthread_barrier_destroy(pthread_barrier_t *barrier)
     return 0;
 }
 
-static inline int priority_min(int a, int b)
-{
-    if (a == -1) {
-        return b;
-    }
-    return a < b ? a : b;
-}
-
 int pthread_barrier_wait(pthread_barrier_t *barrier)
 {
     /* Idea: the count is decreased by every thread that waits on the barrier.
@@ -58,7 +51,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
     DEBUG("%s: hit a synchronization barrier. pid=%" PRIkernel_pid"\n",
           sched_active_thread->name, sched_active_pid);
 
-    int switch_prio = -1;
+    thread_priority_t switch_prio = PRIORITY_IDLE;
 
     if (--barrier->count > 0) {
         /* need to wait for further threads */
@@ -100,7 +93,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
             next->cont = 1;
 
             tcb_t *other = (tcb_t *) sched_threads[next->pid];
-            switch_prio = priority_min(switch_prio, other->priority);
+            switch_prio = thread_priority_higher(switch_prio, other->priority);
             sched_set_status(other, STATUS_PENDING);
         }
         barrier->next = NULL;
@@ -108,10 +101,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier)
     }
 
     mutex_unlock(&barrier->mutex);
-
-    if (switch_prio != -1) {
-        sched_switch(switch_prio);
-    }
+    sched_switch(switch_prio);
 
     return 0;
 }
