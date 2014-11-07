@@ -16,6 +16,7 @@
  *              definitions
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
 #ifndef __RTT_H
@@ -35,12 +36,25 @@ extern "C" {
  *
  * @param[in] arg           optional argument to put the callback in the right context
  */
-typedef void(*rtt_alarm_cb_t)(void *arg);
+typedef void(*rtt_cb_t)(void *arg);
 
 /**
  * @brief Initialize RTT module
  */
 void rtt_init(void);
+
+/**
+ * @brief Set a callback for the counter overflow event
+ *
+ * @param[in] cb            Callback to execute on overflow
+ * @param[in] arg           Argument passed to the callback
+ */
+void rtt_set_overflow_cb(rtt_cb_t cb, void *arg);
+
+/**
+ * @brief Clear the overflow callback
+ */
+void rtt_clear_overflow_cb(void);
 
 /**
  * @brief Get the current RTT counter.
@@ -63,7 +77,7 @@ void rtt_set_counter(uint32_t counter);
  * @param[in] cb            Callback executed when alarm is hit.
  * @param[in] arg           Argument passed to callback when alarm is hit.
  */
-void rtt_set_alarm(uint32_t alarm, rtt_alarm_cb_t cb, void *arg);
+void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg);
 
 /**
  * @brief Get the value of a set alarm.
