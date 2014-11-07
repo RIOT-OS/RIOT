@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file    flowcontrol.c
  * @brief   flowcontrol for constraint node border router implementation
@@ -38,7 +38,7 @@ flowcontrol_stat_t slwin_stat;
 sem_t connection_established;
 int16_t synack_seqnum = -1;
 
-ipv6_addr_t init_threeway_handshake(void)
+ipv6_legacy_addr_t init_threeway_handshake(void)
 {
     border_syn_packet_t *syn;
     msg_t m;
@@ -48,8 +48,8 @@ ipv6_addr_t init_threeway_handshake(void)
 
     syn = (border_syn_packet_t *)m.content.ptr;
     border_conf_header_t *synack = (border_conf_header_t *)get_serial_out_buffer(0);
-    ipv6_addr_t addr;
-    memcpy(&addr, &(syn->addr), sizeof(ipv6_addr_t));
+    ipv6_legacy_addr_t addr;
+    memcpy(&addr, &(syn->addr), sizeof(ipv6_legacy_addr_t));
 
     slwin_stat.next_exp = syn->next_seq_num;
     slwin_stat.last_frame = syn->next_exp - 1;
@@ -67,7 +67,7 @@ ipv6_addr_t init_threeway_handshake(void)
     return addr;
 }
 
-ipv6_addr_t flowcontrol_init(void)
+ipv6_legacy_addr_t flowcontrol_init(void)
 {
     int i;
 

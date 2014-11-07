@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file    bordermultiplex.h
  * @brief   data structs for border router multiplexing
@@ -16,8 +16,8 @@
  * @}
  */
 
-#ifndef _SIXLOWPAN_BORDERMULTIPLEX_H
-#define _SIXLOWPAN_BORDERMULTIPLEX_H
+#ifndef _SIXLOWPAN_LEGACY_BORDERMULTIPLEX_H
+#define _SIXLOWPAN_LEGACY_BORDERMULTIPLEX_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -38,7 +38,7 @@ extern "C" {
 #define BORDER_CONF_IPADDR        (3)
 
 /* ethertypes for L3 packets */
-#define BORDER_ETHERTYPE_IPV6     (0x86DD)
+#define BORDER_ETHERTYPE_IPV6_LEGACY     (0x86DD)
 
 typedef struct __attribute__((packed)) {
     uint8_t empty;
@@ -66,7 +66,7 @@ typedef struct __attribute__((packed)) {
     uint8_t seq_num;
     uint8_t conftype;
     uint16_t version;
-    ipv6_addr_t addr;
+    ipv6_legacy_addr_t addr;
 } border_addr_packet_t;
 
 typedef struct __attribute__((packed)) {
@@ -77,18 +77,18 @@ typedef struct __attribute__((packed)) {
     struct border_context_t {
         uint16_t version;
         uint8_t cid;
-        ipv6_addr_t prefix;
+        ipv6_legacy_addr_t prefix;
         uint8_t length;
         uint8_t comp;
         uint16_t lifetime;
     } context;
 } border_context_packet_t;
 
-#define BORDER_BUFFER_SIZE (sizeof(border_l3_header_t) + IPV6_MTU)
+#define BORDER_BUFFER_SIZE (sizeof(border_l3_header_t) + IPV6_LEGACY_MTU)
 
 void demultiplex(border_packet_t *packet);
-void multiplex_send_ipv6_over_uart(ipv6_hdr_t *packet);
-void multiplex_send_addr_over_uart(ipv6_addr_t *addr);
+void multiplex_send_ipv6_legacy_over_uart(ipv6_legacy_hdr_t *packet);
+void multiplex_send_addr_over_uart(ipv6_legacy_addr_t *addr);
 
 int readpacket(uint8_t *packet_buf, size_t size);
 int writepacket(uint8_t *packet_buf, size_t size);
@@ -97,4 +97,4 @@ int writepacket(uint8_t *packet_buf, size_t size);
 }
 #endif
 
-#endif /* _SIXLOWPAN_BORDERMULTIPLEX_H*/
+#endif /* _SIXLOWPAN_LEGACY_BORDERMULTIPLEX_H*/

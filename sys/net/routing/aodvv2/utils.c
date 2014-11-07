@@ -12,7 +12,7 @@
  * @{
  *
  * @file        utils.c
- * @brief       client- and RREQ-table, ipv6 address representation converters
+ * @brief       client- and RREQ-table, ipv6_legacy address representation converters
  *
  * @author      Lotte Steenbrink <lotte.steenbrink@fu-berlin.de>
  */
@@ -229,14 +229,14 @@ static void _reset_entry_if_stale(uint8_t i)
     }
 }
 
-void ipv6_addr_t_to_netaddr(ipv6_addr_t *src, struct netaddr *dst)
+void ipv6_legacy_addr_t_to_netaddr(ipv6_legacy_addr_t *src, struct netaddr *dst)
 {
     dst->_type = AF_INET6;
     dst->_prefix_len = AODVV2_RIOT_PREFIXLEN;
     memcpy(dst->_addr, src, sizeof(dst->_addr));
 }
 
-void netaddr_to_ipv6_addr_t(struct netaddr *src, ipv6_addr_t *dst)
+void netaddr_to_ipv6_legacy_addr_t(struct netaddr *src, ipv6_legacy_addr_t *dst)
 {
     memcpy(dst, src->_addr, sizeof(uint8_t) * NETADDR_MAX_LENGTH);
 }

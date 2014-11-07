@@ -14,7 +14,7 @@
 #ifndef TCP_HC_H_
 #define TCP_HC_H_
 
-#include "sixlowpan.h"
+#include "sixlowpan_legacy.h"
 
 #include "socket_base/socket.h"
 
@@ -31,8 +31,8 @@ extern "C" {
 #define COMPRESSED_HEADER           3
 
 void update_tcp_hc_context(bool incoming, socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet);
-uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current_tcp_packet, ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length);
-socket_internal_t *decompress_tcp_packet(ipv6_hdr_t *temp_ipv6_header);
+uint16_t compress_tcp_packet(socket_internal_t *current_socket, uint8_t *current_tcp_packet, ipv6_legacy_hdr_t *temp_ipv6_legacy_header, uint8_t flags, uint8_t payload_length);
+socket_internal_t *decompress_tcp_packet(ipv6_legacy_hdr_t *temp_ipv6_legacy_header);
 #endif
 
 #ifdef __cplusplus

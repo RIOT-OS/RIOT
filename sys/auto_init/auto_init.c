@@ -55,8 +55,8 @@
 #include "rtc.h"
 #endif
 
-#ifdef MODULE_SIXLOWPAN
-#include "sixlowpan.h"
+#ifdef MODULE_SIXLOWPAN_LEGACY
+#include "sixlowpan_legacy.h"
 #endif
 
 #ifdef MODULE_UDP
@@ -249,9 +249,9 @@ void auto_init(void)
     DEBUG("Auto init net_if module.\n");
     auto_init_net_if();
 #endif
-#ifdef MODULE_SIXLOWPAN
+#ifdef MODULE_SIXLOWPAN_LEGACY
     DEBUG("Auto init 6LoWPAN module.\n");
-    sixlowpan_lowpan_init();
+    sixlowpan_legacy_lowpan_init();
 #endif
 #ifdef MODULE_PROFILING
     extern void profiling_init(void);

@@ -7,7 +7,7 @@
  */
 
 /**
- * @file        network_layer/sixlowpan/lowpan.h
+ * @file        network_layer/sixlowpan_legacy/lowpan.h
  * @brief       6lowpan header
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -16,14 +16,14 @@
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  */
 
-#ifndef _SIXLOWPAN_LOWPAN_H
-#define _SIXLOWPAN_LOWPAN_H
+#ifndef _SIXLOWPAN_LEGACY_LOWPAN_H
+#define _SIXLOWPAN_LEGACY_LOWPAN_H
 
 #include "mutex.h"
 #include "net_if.h"
 #include "vtimer.h"
 
-#include "sixlowpan/lowpan.h"
+#include "sixlowpan_legacy/lowpan.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +33,7 @@ extern "C" {
 
 typedef struct {
     uint8_t num;
-    ipv6_addr_t prefix;
+    ipv6_legacy_addr_t prefix;
     uint8_t length;
     uint8_t comp;
     uint16_t lifetime;
@@ -46,7 +46,7 @@ void lowpan_read(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
                  net_if_eui64_t *d_addr);
 uint8_t lowpan_context_len(void);
 lowpan_context_t *lowpan_context_update(uint8_t num,
-                                        const ipv6_addr_t *prefix,
+                                        const ipv6_legacy_addr_t *prefix,
                                         uint8_t length, uint8_t comp,
                                         uint16_t lifetime);
 lowpan_context_t *lowpan_context_get(void);
@@ -56,4 +56,4 @@ lowpan_context_t *lowpan_context_num_lookup(uint8_t num);
 }
 #endif
 
-#endif  /* _SIXLOWPAN_LOWPAN_H */
+#endif  /* _SIXLOWPAN_LEGACY_LOWPAN_H */

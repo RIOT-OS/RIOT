@@ -26,7 +26,7 @@
 #include <inttypes.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include "ipv6.h"
+#include "ipv6_legacy.h"
 #include "socket_base/socket.h"
 
 #ifdef __cplusplus
@@ -49,7 +49,7 @@ struct in6_addr {
     /**
      * Private RIOT-internal data, needs not to be touched by the user.
      */
-    ipv6_addr_t     __in6_u;
+    ipv6_legacy_addr_t     __in6_u;
 
     /**
      * IPv6 Address represented as sequence of 8-bit numbers. Member of
@@ -145,7 +145,7 @@ extern const struct sockaddr_in6 in6addr_loopback;
  *          The Open Group Base Specification Issue 7, setsockopt
  *      </a>
  */
-#define IPV6_MULTICAST_HOPS 0x12
+#define IPV6_LEGACY_MULTICAST_HOPS 0x12
 
 /**
  * Test for IPv6 multicast address.

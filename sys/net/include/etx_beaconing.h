@@ -20,7 +20,7 @@
 #ifndef ETX_BEACONING_H_
 #define ETX_BEACONING_H_
 #include <stdint.h>
-#include "sixlowpan.h"
+#include "sixlowpan_legacy.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,7 +56,7 @@ extern "C" {
 #define ETX_BEST_CANDIDATES (15)                    //Sent only 15 candidates in a beaconing packet
 #define ETX_TUPLE_SIZE      (2)                     //1 Byte for Addr, 1 Byte for packets rec.
 #define ETX_PKT_REC_OFFSET  (ETX_TUPLE_SIZE - 1)    //Offset in a tuple of (addr,pkt_rec), will always be the last byte
-#define ETX_IPV6_LAST_BYTE  (15)                    //The last byte for an ipv6 address
+#define ETX_IPV6_LEGACY_LAST_BYTE  (15)                    //The last byte for an ipv6_legacy address
 #define ETX_MAX_JITTER      (ETX_INTERVAL / 5)      //The default value is 20% of ETX_INTERVAL
 #define ETX_JITTER_MOD      (ETX_MAX_JITTER + 1)    //The modulo value for jitter computation
 #define ETX_DEF_JIT_CORRECT (ETX_MAX_JITTER / 2)    //Default Jitter correction value (normally ETX_MAX_JITTER / 2)
@@ -94,7 +94,7 @@ typedef struct __attribute__((packed)) etx_probe_t {
 } etx_probe_t;
 
 typedef struct etx_neighbor_t {
-    ipv6_addr_t addr;           //The address of this node
+    ipv6_legacy_addr_t addr;           //The address of this node
     uint8_t     tx_cur_round;   //The indicator for receiving a packet from this candidate this round
     uint8_t     packets_tx[ETX_WINDOW]; //The packets this node has transmitted TO ME
     uint8_t     packets_rx;     //The packets this node has received FROM ME
@@ -103,8 +103,8 @@ typedef struct etx_neighbor_t {
 } etx_neighbor_t;
 
 //prototypes
-void etx_init_beaconing(ipv6_addr_t *address);
-double etx_get_metric(ipv6_addr_t *address);
+void etx_init_beaconing(ipv6_legacy_addr_t *address);
+double etx_get_metric(ipv6_legacy_addr_t *address);
 void etx_update(etx_neighbor_t *neighbor);
 
 #define ETX_PKT_OPT         (0)     //Position of Option-Type-Byte

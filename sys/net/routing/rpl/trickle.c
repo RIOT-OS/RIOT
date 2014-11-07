@@ -133,8 +133,8 @@ static void *trickle_timer_over(void *arg)
 {
     (void) arg;
 
-    ipv6_addr_t mcast;
-    ipv6_addr_set_all_nodes_addr(&mcast);
+    ipv6_legacy_addr_t mcast;
+    ipv6_legacy_addr_set_all_nodes_addr(&mcast);
 
     while (1) {
         thread_sleep();

@@ -46,42 +46,42 @@ typedef uint8_t net_if_l3p_t;
  * @brief   Interface protocols (for net_if_t.protocols): Use unicast IPv6
  *          address in upper layer, addr_len must be 128.
  */
-#define NET_IF_L3P_IPV6_UNICAST (0x01)
+#define NET_IF_L3P_IPV6_LEGACY_UNICAST (0x01)
 
 /**
  * @brief   Interface protocols (for net_if_t.protocols): Use multicast IPv6
  *          address in upper layer, addr_len must be 128.
  */
-#define NET_IF_L3P_IPV6_MULTICAST (0x02)
+#define NET_IF_L3P_IPV6_LEGACY_MULTICAST (0x02)
 
 /**
  * @brief   Interface protocols (for net_if_t.protocols): Use anycast IPv6
  *          address in upper layer, addr_len must be 128.
  */
-#define NET_IF_L3P_IPV6_ANYCAST (0x04)
+#define NET_IF_L3P_IPV6_LEGACY_ANYCAST (0x04)
 
 /**
  * @brief   Interface protocols (for net_if_t.protocols): Use IPv6 prefix in
  *          upper layer, addr_len <= 128 becomes prefix length.
  */
-#define NET_IF_L3P_IPV6_PREFIX  (0x08)
+#define NET_IF_L3P_IPV6_LEGACY_PREFIX  (0x08)
 
 /**
  * @brief   Interface protocols (for net_if_t.protocols): Convenience macro
- *          combining NET_IF_L3P_IPV6_UNICAST, NET_IF_L3P_IPV6_ANYCAST, and
- *          NET_IF_L3P_IPV6_MULTICAST for comparisons
+ *          combining NET_IF_L3P_IPV6_LEGACY_UNICAST, NET_IF_L3P_IPV6_LEGACY_ANYCAST, and
+ *          NET_IF_L3P_IPV6_LEGACY_MULTICAST for comparisons
  */
-#define NET_IF_L3P_IPV6_ADDR    (NET_IF_L3P_IPV6_UNICAST | NET_IF_L3P_IPV6_ANYCAST \
-                                | NET_IF_L3P_IPV6_MULTICAST)
+#define NET_IF_L3P_IPV6_LEGACY_ADDR    (NET_IF_L3P_IPV6_LEGACY_UNICAST | NET_IF_L3P_IPV6_LEGACY_ANYCAST \
+                                | NET_IF_L3P_IPV6_LEGACY_MULTICAST)
 
 /**
  * @brief   Interface protocols (for net_if_t.protocols): Convenience macro
- *          combining NET_IF_L3P_IPV6_UNICAST, NET_IF_L3P_IPV6_ANYCAST,
- *          NET_IF_L3P_IPV6_MULTICAST, and NET_IF_L3P_IPV6_PREFIX for
+ *          combining NET_IF_L3P_IPV6_LEGACY_UNICAST, NET_IF_L3P_IPV6_LEGACY_ANYCAST,
+ *          NET_IF_L3P_IPV6_LEGACY_MULTICAST, and NET_IF_L3P_IPV6_LEGACY_PREFIX for
  *          comparisons
  */
-#define NET_IF_L3P_IPV6         (NET_IF_L3P_IPV6_UNICAST | NET_IF_L3P_IPV6_ANYCAST \
-                                | NET_IF_L3P_IPV6_MULTICAST | NET_IF_L3P_IPV6_PREFIX)
+#define NET_IF_L3P_IPV6_LEGACY         (NET_IF_L3P_IPV6_LEGACY_UNICAST | NET_IF_L3P_IPV6_LEGACY_ANYCAST \
+                                | NET_IF_L3P_IPV6_LEGACY_MULTICAST | NET_IF_L3P_IPV6_LEGACY_PREFIX)
 
 /**
  * @brief   Interface protocols: Return value of net_if_get_l3p_types() on

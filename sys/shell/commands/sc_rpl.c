@@ -20,7 +20,7 @@
 
 #include "rpl.h"
 
-static char addr_str[IPV6_MAX_ADDR_STR_LEN];
+static char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
 
 void _rpl_route_handler(int argc, char **argv)
 {
@@ -38,9 +38,9 @@ void _rpl_route_handler(int argc, char **argv)
     for (int i = 0; i < rpl_max_routing_entries; i++) {
         if (rtable[i].used) {
             c++;
-            printf(" %03d: %-18s  ", i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+            printf(" %03d: %-18s  ", i, ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
                                             (&rtable[i].address)));
-            printf("%-18s  ", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+            printf("%-18s  ", ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
                                             (&rtable[i].next_hop)));
             printf("%d\n", rtable[i].lifetime);
 

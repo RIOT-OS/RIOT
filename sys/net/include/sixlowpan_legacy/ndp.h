@@ -7,12 +7,12 @@
  */
 
 /**
- * @addtogroup  net_sixlowpan_ndp
- * @ingroup     net_sixlowpan
+ * @addtogroup  net_sixlowpan_legacy_ndp
+ * @ingroup     net_sixlowpan_legacy
  * @brief       Neighbor discovery protocol for 6LoWPAN and IPv6
  * @{
  *
- * @file        sixlowpan/ndp.h
+ * @file        sixlowpan_legacy/ndp.h
  * @brief       6LoWPAN constants, data structs, and prototypes related to NDP
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -21,14 +21,14 @@
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
-#ifndef SIXLOWPAN_NDP_H
-#define SIXLOWPAN_NDP_H
+#ifndef SIXLOWPAN_LEGACY_NDP_H
+#define SIXLOWPAN_LEGACY_NDP_H
 
 #include <stdint.h>
 
 #include "net_if.h"
 #include "timex.h"
-#include "sixlowpan/types.h"
+#include "sixlowpan_legacy/types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -87,10 +87,10 @@ typedef struct __attribute__((packed)) ndp_prefix_info_t {
     struct ndp_prefix_info_t *addr_prev;
     /**
      * @brief Flags to define upper layer protocols this address applies to.
-     *        For this layer NET_IF_L3P_IPV6_PREFIX must be set.
+     *        For this layer NET_IF_L3P_IPV6_LEGACY_PREFIX must be set.
      */
     net_if_l3p_t prefix_protocol;
-    ipv6_addr_t *prefix_data;       ///< The Prefix.
+    ipv6_legacy_addr_t *prefix_data;       ///< The Prefix.
     uint8_t prefix_len;             ///< Length of the prefix.
     uint8_t inuse;                  ///< Prefix is in in use.
     /**
@@ -109,7 +109,7 @@ typedef struct __attribute__((packed)) ndp_prefix_info_t {
  *          router advertisement.
  */
 typedef struct __attribute__((packed)) {
-    ipv6_addr_t addr;       ///< Address of router.
+    ipv6_legacy_addr_t addr;       ///< Address of router.
     timex_t inval_time;     ///< remaining time until this entry is
     ///< invalid.
 } ndp_default_router_list_t;
@@ -127,7 +127,7 @@ typedef struct __attribute__((packed)) {
     ndp_nce_state_t state;      ///< State of neighbor cache entry.
     uint8_t isrouter;           ///< Flag to signify that this neighbor
     ///< is a router.
-    ipv6_addr_t addr;           ///< IPv6 address of the neighbor.
+    ipv6_legacy_addr_t addr;           ///< IPv6 address of the neighbor.
     uint8_t lladdr[8];          ///< Link-layer address of the neighbor
     uint8_t lladdr_len;         ///< Length of link-layer address of the
     ///< neighbor
@@ -142,12 +142,12 @@ typedef struct __attribute__((packed)) {
  */
 typedef struct __attribute__((packed)) {
     uint16_t version;                       ///< version of entry.
-    ipv6_addr_t abr_addr;                   ///< Addres of ABR.
+    ipv6_legacy_addr_t abr_addr;                   ///< Addres of ABR.
     uint8_t cids[NDP_6LOWPAN_CONTEXT_MAX];  ///< context IDs.
 } ndp_a6br_cache_t;
 
-ndp_default_router_list_t *ndp_default_router_list_search(ipv6_addr_t *ipaddr);
-uint8_t ndp_neighbor_cache_add(int if_id, const ipv6_addr_t *ipaddr,
+ndp_default_router_list_t *ndp_default_router_list_search(ipv6_legacy_addr_t *ipaddr);
+uint8_t ndp_neighbor_cache_add(int if_id, const ipv6_legacy_addr_t *ipaddr,
                                const void *lladdr, uint8_t lladdr_len,
                                uint8_t isrouter, ndp_nce_state_t state,
                                ndp_nce_type_t type, uint16_t ltime);
@@ -160,11 +160,11 @@ uint8_t ndp_neighbor_cache_add(int if_id, const ipv6_addr_t *ipaddr,
  *
  * @return  1 on success, 0 otherwise.
  */
-uint8_t ndp_neighbor_cache_remove(const ipv6_addr_t *ipaddr);
+uint8_t ndp_neighbor_cache_remove(const ipv6_legacy_addr_t *ipaddr);
 
-ndp_neighbor_cache_t *ndp_neighbor_cache_search(ipv6_addr_t *ipaddr);
-ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_addr_t *ipaddr);
-int ndp_addr_is_on_link(ipv6_addr_t *dest_addr);
+ndp_neighbor_cache_t *ndp_neighbor_cache_search(ipv6_legacy_addr_t *ipaddr);
+ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_legacy_addr_t *ipaddr);
+int ndp_addr_is_on_link(ipv6_legacy_addr_t *dest_addr);
 
 /**
  * @brief   Adds a prefix information to an interface. If it already exists,
@@ -195,7 +195,7 @@ int ndp_addr_is_on_link(ipv6_addr_t *dest_addr);
  *                                  ICMPV6_NDP_OPT_PI_FLAG_ON_LINK and
  *                                  ICMPV6_NDP_OPT_PI_FLAG_AUTONOM
  */
-int ndp_add_prefix_info(int if_id, const ipv6_addr_t *prefix,
+int ndp_add_prefix_info(int if_id, const ipv6_legacy_addr_t *prefix,
                         uint8_t prefix_len, uint32_t valid_lifetime,
                         uint32_t preferred_lifetime, uint8_t advertisable,
                         uint8_t flags);
@@ -207,13 +207,13 @@ int ndp_add_prefix_info(int if_id, const ipv6_addr_t *prefix,
  * @param[in]   if_id   The interface's ID.
  * @param[in]   addr    The address to search the prefix for.
  * @param[in]   up_to   The number of bits up to which point the search should
- *                      go. Set to IPV6_ADDR_BIT_LEN for the whole address.
- *                      Values greater then IPV6_ADDR_BIT_LEN are set to
- *                      IPV6_ADDR_BIT_LEN.
+ *                      go. Set to IPV6_LEGACY_ADDR_BIT_LEN for the whole address.
+ *                      Values greater then IPV6_LEGACY_ADDR_BIT_LEN are set to
+ *                      IPV6_LEGACY_ADDR_BIT_LEN.
  *
  * @return The found prefix information, NULL when none is found.
  */
-ndp_prefix_info_t *ndp_prefix_info_search(int if_id, const ipv6_addr_t *addr,
+ndp_prefix_info_t *ndp_prefix_info_search(int if_id, const ipv6_legacy_addr_t *addr,
         uint8_t up_to);
 
 /**
@@ -226,7 +226,7 @@ ndp_prefix_info_t *ndp_prefix_info_search(int if_id, const ipv6_addr_t *addr,
  *
  * @return The found prefix information, NULL when none is found.
  */
-ndp_prefix_info_t *ndp_prefix_info_match(int if_id, const ipv6_addr_t *prefix,
+ndp_prefix_info_t *ndp_prefix_info_match(int if_id, const ipv6_legacy_addr_t *prefix,
         uint8_t prefix_len);
 ndp_a6br_cache_t *ndp_a6br_cache_get_most_current(void);
 ndp_a6br_cache_t *ndp_a6br_cache_get_oldest(void);
@@ -236,4 +236,4 @@ ndp_a6br_cache_t *ndp_a6br_cache_get_oldest(void);
 #endif
 
 /** @} */
-#endif /* SIXLOWPAN_NDP_H */
+#endif /* SIXLOWPAN_LEGACY_NDP_H */

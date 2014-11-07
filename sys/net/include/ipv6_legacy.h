@@ -7,9 +7,9 @@
  */
 
 /**
- * @ingroup net_sixlowpan
+ * @ingroup net_sixlowpan_legacy
  * @{
- * @file    ipv6.h
+ * @file    ipv6_legacy.h
  * @brief   IPv6 and ICMP functions
  *
  *          Wraps all API types, constants and functions of
@@ -17,16 +17,16 @@
  *
  * @author  Martin Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef IPV6_H
-#define IPV6_H
+#ifndef IPV6_LEGACY_H
+#define IPV6_LEGACY_H
 
-#include "sixlowpan/error.h"
-#include "sixlowpan/types.h"
-#include "sixlowpan/ip.h"
-#include "sixlowpan/icmp.h"
-#include "sixlowpan/ndp.h"
+#include "sixlowpan_legacy/error.h"
+#include "sixlowpan_legacy/types.h"
+#include "sixlowpan_legacy/ip.h"
+#include "sixlowpan_legacy/icmp.h"
+#include "sixlowpan_legacy/ndp.h"
 
-#include "../network_layer/sixlowpan/icmp.h"        /* TODO: remove if not needed anymore */
+#include "../network_layer/sixlowpan_legacy/icmp.h"        /* TODO: remove if not needed anymore */
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,7 +36,7 @@ extern "C" {
 }
 #endif
 
-#endif /* IPV6_H */
+#endif /* IPV6_LEGACY_H */
 /**
  * @}
  */

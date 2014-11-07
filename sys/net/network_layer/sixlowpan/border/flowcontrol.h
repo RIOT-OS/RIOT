@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file    flowcontrol.h
  * @brief   data structs for border router flowcontrol
@@ -16,8 +16,8 @@
  * @}
  */
 
-#ifndef _SIXLOWPAN_FLOWCONTROL_H
-#define _SIXLOWPAN_FLOWCONTROL_H
+#ifndef _SIXLOWPAN_LEGACY_FLOWCONTROL_H
+#define _SIXLOWPAN_LEGACY_FLOWCONTROL_H
 
 #include <stdint.h>
 
@@ -71,10 +71,10 @@ typedef struct __attribute__((packed)) {
     uint8_t next_seq_num;
     uint8_t conftype;
     uint8_t next_exp;
-    ipv6_addr_t addr;
+    ipv6_legacy_addr_t addr;
 } border_syn_packet_t;
 
-ipv6_addr_t flowcontrol_init(void);
+ipv6_legacy_addr_t flowcontrol_init(void);
 void flowcontrol_send_over_uart(border_packet_t *packet, int len);
 void flowcontrol_deliver_from_uart(border_packet_t *packet, int len);
 
@@ -82,4 +82,4 @@ void flowcontrol_deliver_from_uart(border_packet_t *packet, int len);
 }
 #endif
 
-#endif /* _SIXLOWPAN_FLOWCONTROL_H*/
+#endif /* _SIXLOWPAN_LEGACY_FLOWCONTROL_H*/

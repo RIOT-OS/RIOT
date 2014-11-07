@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "msg.h"
-#include "sixlowpan/ip.h"
+#include "sixlowpan_legacy/ip.h"
 #include "transceiver.h"
 #include "ieee802154_frame.h"
 #include "rpl/rpl_structs.h"
@@ -33,9 +33,9 @@
 #include "debug.h"
 
 #define LL_HDR_LEN  (0x4)
-#define IPV6_HDR_LEN    (0x28)
+#define IPV6_LEGACY_HDR_LEN    (0x28)
 
-extern uint8_t ipv6_ext_hdr_len;
+extern uint8_t ipv6_legacy_ext_hdr_len;
 
 msg_t msg_q[RCV_BUFFER_SIZE];
 
@@ -63,7 +63,7 @@ void *rpl_udp_monitor(void *arg)
 
     msg_t m;
     radio_packet_t *p;
-    ipv6_hdr_t *ipv6_buf;
+    ipv6_legacy_hdr_t *ipv6_legacy_buf;
     uint8_t icmp_type, icmp_code;
     icmpv6_hdr_t *icmpv6_buf = NULL;
 
@@ -89,19 +89,19 @@ void *rpl_udp_monitor(void *arg)
             p->processing--;
             DEBUG("\n");
         }
-        else if (m.type == IPV6_PACKET_RECEIVED) {
-            ipv6_buf = (ipv6_hdr_t *) m.content.ptr;
-            printf("IPv6 datagram received (next header: %02X)", ipv6_buf->nextheader);
-            printf(" from %s ", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                                                 &ipv6_buf->srcaddr));
+        else if (m.type == IPV6_LEGACY_PACKET_RECEIVED) {
+            ipv6_legacy_buf = (ipv6_legacy_hdr_t *) m.content.ptr;
+            printf("IPv6 datagram received (next header: %02X)", ipv6_legacy_buf->nextheader);
+            printf(" from %s ", ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
+                                                 &ipv6_legacy_buf->srcaddr));
 
-            if (ipv6_buf->nextheader == IPV6_PROTO_NUM_ICMPV6) {
-                icmpv6_buf = (icmpv6_hdr_t *) &ipv6_buf[(LL_HDR_LEN + IPV6_HDR_LEN) + ipv6_ext_hdr_len];
+            if (ipv6_legacy_buf->nextheader == IPV6_LEGACY_PROTO_NUM_ICMPV6) {
+                icmpv6_buf = (icmpv6_hdr_t *) &ipv6_legacy_buf[(LL_HDR_LEN + IPV6_LEGACY_HDR_LEN) + ipv6_legacy_ext_hdr_len];
                 icmp_type = icmpv6_buf->type;
                 icmp_code = icmpv6_buf->code;
             }
 
-            if (ipv6_buf->nextheader == IPV6_PROTO_NUM_ICMPV6) {
+            if (ipv6_legacy_buf->nextheader == IPV6_LEGACY_PROTO_NUM_ICMPV6) {
                 DEBUG("\t ICMP type: %02X ", icmp_type);
                 DEBUG("\t ICMP code: %02X ", icmp_code);
                 (void) icmp_type;

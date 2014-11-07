@@ -29,18 +29,18 @@
 #include "net_if.h"
 #include "transceiver.h"
 
-#ifndef MODULE_SIXLOWPAN
+#ifndef MODULE_SIXLOWPAN_LEGACY
 #define ADDR_REGISTERED_MAX (6)
 #define ADDRS_LEN_MAX       (16)
 
 static uint8_t addr_registered = 0;
 static uint8_t addrs[ADDR_REGISTERED_MAX][ADDRS_LEN_MAX];
 #else
-#include "ipv6.h"
+#include "ipv6_legacy.h"
 #endif
 
 void _net_if_ifconfig_add(int if_id, int argc, char **argv);
-void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv);
+void _net_if_ifconfig_add_ipv6_legacy(int if_id, int argc, char **argv);
 void _net_if_ifconfig_set(int if_id, char *key, char *value);
 void _net_if_ifconfig_set_srcaddrmode(int if_id, char *mode);
 void _net_if_ifconfig_set_eui64(int if_id, char *addr);
@@ -48,7 +48,7 @@ void _net_if_ifconfig_set_hwaddr(int if_id, char *addr);
 void _net_if_ifconfig_set_pan_id(int if_id, char *pan_id);
 void _net_if_ifconfig_set_channel(int if_id, char *channel);
 void _net_if_ifconfig_create(char *transceivers_str);
-int _net_if_ifconfig_ipv6_addr_convert(net_if_addr_t *addr, void *addr_data,
+int _net_if_ifconfig_ipv6_legacy_addr_convert(net_if_addr_t *addr, void *addr_data,
                                        char *type, char *addr_data_str,
                                        char *addr_data_len);
 void _net_if_ifconfig_list(int if_id);
@@ -96,7 +96,7 @@ char *addr_data_to_str(char *addr_str, const uint8_t *addr, uint8_t addr_len)
 
 void add_usage(void)
 {
-    puts("Usage: ifconfig <if_id> add ipv6 [multicast|anycast] <addr>");
+    puts("Usage: ifconfig <if_id> add ipv6_legacy [multicast|anycast] <addr>");
 }
 
 void set_usage(void)
@@ -316,7 +316,7 @@ void _net_if_ifconfig_set(int if_id, char *key, char *value)
     }
 }
 
-void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
+void _net_if_ifconfig_add_ipv6_legacy(int if_id, int argc, char **argv)
 {
     char *type;
     char *addr_str;
@@ -339,9 +339,9 @@ void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
         type = NULL;
     }
 
-#ifdef MODULE_SIXLOWPAN
-    ipv6_addr_t ipv6_addr;
-    void *addr_data = &ipv6_addr;
+#ifdef MODULE_SIXLOWPAN_LEGACY
+    ipv6_legacy_addr_t ipv6_legacy_addr;
+    void *addr_data = &ipv6_legacy_addr;
 #else
     void *addr_data = (void *)&addrs[addr_registered][0];
 #endif
@@ -349,16 +349,16 @@ void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
     addr_data_str = strtok(addr_str, "/");
     addr_data_len = strtok(NULL, "/");
 
-    if (!_net_if_ifconfig_ipv6_addr_convert(&addr, addr_data, type,
+    if (!_net_if_ifconfig_ipv6_legacy_addr_convert(&addr, addr_data, type,
                                             addr_data_str, addr_data_len)) {
         add_usage();
         return;
     }
 
-#ifdef MODULE_SIXLOWPAN
+#ifdef MODULE_SIXLOWPAN_LEGACY
 
-    if (addr.addr_protocol & NET_IF_L3P_IPV6_PREFIX) {
-        if (ndp_add_prefix_info(if_id, &ipv6_addr, addr.addr_len,
+    if (addr.addr_protocol & NET_IF_L3P_IPV6_LEGACY_PREFIX) {
+        if (ndp_add_prefix_info(if_id, &ipv6_legacy_addr, addr.addr_len,
                                 NDP_OPT_PI_VLIFETIME_INFINITE,
                                 NDP_OPT_PI_PLIFETIME_INFINITE, 1,
                                 ICMPV6_NDP_OPT_PI_FLAG_AUTONOM) != SIXLOWERROR_SUCCESS) {
@@ -366,14 +366,14 @@ void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
             return;
         }
     }
-    else if (addr.addr_protocol & NET_IF_L3P_IPV6_ADDR) {
+    else if (addr.addr_protocol & NET_IF_L3P_IPV6_LEGACY_ADDR) {
         uint8_t is_anycast = 0;
 
-        if (addr.addr_protocol & NET_IF_L3P_IPV6_ANYCAST) {
+        if (addr.addr_protocol & NET_IF_L3P_IPV6_LEGACY_ANYCAST) {
             is_anycast = 1;
         }
 
-        if (!ipv6_net_if_add_addr(if_id, &ipv6_addr, NDP_ADDR_STATE_PREFERRED,
+        if (!ipv6_legacy_net_if_add_addr(if_id, &ipv6_legacy_addr, NDP_ADDR_STATE_PREFERRED,
                                   0, 0, is_anycast)) {
             add_usage();
             return;
@@ -397,8 +397,8 @@ void _net_if_ifconfig_add_ipv6(int if_id, int argc, char **argv)
 
 void _net_if_ifconfig_add(int if_id, int argc, char **argv)
 {
-    if (strcmp(argv[3], "ipv6") == 0) {
-        _net_if_ifconfig_add_ipv6(if_id, argc, argv);
+    if (strcmp(argv[3], "ipv6_legacy") == 0) {
+        _net_if_ifconfig_add_ipv6_legacy(if_id, argc, argv);
     }
     else {
         add_usage();
@@ -457,8 +457,8 @@ void _net_if_ifconfig_create(char *transceivers_str)
 
 static inline int _is_multicast(uint8_t *addr)
 {
-#ifdef MODULE_SIXLOWPAN
-    return ipv6_addr_is_multicast((ipv6_addr_t *) addr);
+#ifdef MODULE_SIXLOWPAN_LEGACY
+    return ipv6_legacy_addr_is_multicast((ipv6_legacy_addr_t *) addr);
 #else
     return *addr == 0xff;
 #endif
@@ -466,8 +466,8 @@ static inline int _is_multicast(uint8_t *addr)
 
 static inline int _is_link_local(uint8_t *addr)
 {
-#ifdef MODULE_SIXLOWPAN
-    return ipv6_addr_is_link_local((ipv6_addr_t *) addr);
+#ifdef MODULE_SIXLOWPAN_LEGACY
+    return ipv6_legacy_addr_is_link_local((ipv6_legacy_addr_t *) addr);
 #else
     return (addr[0] == 0xfe && addr[1] == 0x80) ||
            (_is_multicast(addr) && (addr[1] & 0x0f) == 2);
@@ -479,28 +479,28 @@ int _set_protocol_from_type(char *type, net_if_addr_t *addr)
     if (type != NULL) {
         if ((strcmp(type, "multicast") == 0) &&
             _is_multicast((uint8_t *)addr->addr_data)) {
-            addr->addr_protocol |= NET_IF_L3P_IPV6_MULTICAST;
+            addr->addr_protocol |= NET_IF_L3P_IPV6_LEGACY_MULTICAST;
             return 1;
         }
         else if ((strcmp(type, "anycast") == 0) &&
-                 addr->addr_protocol & NET_IF_L3P_IPV6_PREFIX) {
-            addr->addr_protocol |= NET_IF_L3P_IPV6_ANYCAST;
+                 addr->addr_protocol & NET_IF_L3P_IPV6_LEGACY_PREFIX) {
+            addr->addr_protocol |= NET_IF_L3P_IPV6_LEGACY_ANYCAST;
             return 1;
         }
 
         return 0;
     }
     else if (_is_multicast((uint8_t *)addr->addr_data)) {
-        addr->addr_protocol |= NET_IF_L3P_IPV6_MULTICAST;
+        addr->addr_protocol |= NET_IF_L3P_IPV6_LEGACY_MULTICAST;
         return 1;
     }
     else {
-        addr->addr_protocol |= NET_IF_L3P_IPV6_UNICAST;
+        addr->addr_protocol |= NET_IF_L3P_IPV6_LEGACY_UNICAST;
         return 1;
     }
 }
 
-int _net_if_ifconfig_ipv6_addr_convert(net_if_addr_t *addr, void *addr_data,
+int _net_if_ifconfig_ipv6_legacy_addr_convert(net_if_addr_t *addr, void *addr_data,
                                        char *type, char *addr_data_str,
                                        char *addr_data_len)
 {
@@ -524,7 +524,7 @@ int _net_if_ifconfig_ipv6_addr_convert(net_if_addr_t *addr, void *addr_data,
     }
     else {
         addr->addr_len = atoi(addr_data_len);
-        addr->addr_protocol = NET_IF_L3P_IPV6_PREFIX;
+        addr->addr_protocol = NET_IF_L3P_IPV6_LEGACY_PREFIX;
 
         if (addr->addr_len > 128 || !_set_protocol_from_type(type, addr)) {
             return 0;
@@ -627,13 +627,13 @@ void _net_if_ifconfig_list(int if_id)
             puts("\n");
         }
 
-#ifdef MODULE_SIXLOWPAN
-        if (addr_ptr->addr_protocol & NET_IF_L3P_IPV6) {
-            char addr_str[IPV6_MAX_ADDR_STR_LEN];
+#ifdef MODULE_SIXLOWPAN_LEGACY
+        if (addr_ptr->addr_protocol & NET_IF_L3P_IPV6_LEGACY) {
+            char addr_str[IPV6_LEGACY_MAX_ADDR_STR_LEN];
             printf("            inet6 addr: ");
 
             if (inet_ntop(AF_INET6, addr_ptr->addr_data, addr_str,
-                          IPV6_MAX_ADDR_STR_LEN)) {
+                          IPV6_LEGACY_MAX_ADDR_STR_LEN)) {
                 printf("%s/%d", addr_str, addr_ptr->addr_len);
                 printf("  scope: ");
 
@@ -644,13 +644,13 @@ void _net_if_ifconfig_list(int if_id)
                     printf("global");
                 }
 
-                if (!(addr_ptr->addr_protocol & NET_IF_L3P_IPV6_UNICAST)) {
+                if (!(addr_ptr->addr_protocol & NET_IF_L3P_IPV6_LEGACY_UNICAST)) {
                     printf(" ");
 
-                    if (addr_ptr->addr_protocol & NET_IF_L3P_IPV6_MULTICAST) {
+                    if (addr_ptr->addr_protocol & NET_IF_L3P_IPV6_LEGACY_MULTICAST) {
                         printf("[multicast]");
                     }
-                    else if (addr_ptr->addr_protocol & NET_IF_L3P_IPV6_ANYCAST) {
+                    else if (addr_ptr->addr_protocol & NET_IF_L3P_IPV6_LEGACY_ANYCAST) {
                         printf("[anycast]");
                     }
                 }

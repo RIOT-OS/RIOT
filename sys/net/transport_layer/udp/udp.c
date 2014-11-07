@@ -19,9 +19,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "ipv6.h"
+#include "ipv6_legacy.h"
 #include "msg.h"
-#include "sixlowpan.h"
+#include "sixlowpan_legacy.h"
 #include "thread.h"
 
 #include "socket_base/in.h"
@@ -37,13 +37,13 @@ msg_t udp_msg_queue[UDP_PKT_RECV_BUF_SIZE];
 
 char udp_stack_buffer[UDP_STACK_SIZE];
 
-uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
+uint16_t udp_csum(ipv6_legacy_hdr_t *ipv6_legacy_header, udp_hdr_t *udp_header)
 {
     uint16_t sum;
     uint16_t len = NTOHS(udp_header->length);
 
     sum = len + IPPROTO_UDP;
-    sum = net_help_csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
+    sum = net_help_csum(sum, (uint8_t *)&ipv6_legacy_header->srcaddr, 2 * sizeof(ipv6_legacy_addr_t));
     sum = net_help_csum(sum, (uint8_t *)udp_header, len);
     return (sum == 0) ? 0xffff : HTONS(sum);
 }
@@ -76,16 +76,16 @@ void *udp_packet_handler(void *arg)
 
     while (1) {
         msg_receive(&m_recv_ip);
-        ipv6_hdr_t *ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
-        udp_hdr_t *udp_header = ((udp_hdr_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
+        ipv6_legacy_hdr_t *ipv6_legacy_header = ((ipv6_legacy_hdr_t *)m_recv_ip.content.ptr);
+        udp_hdr_t *udp_header = ((udp_hdr_t *)(m_recv_ip.content.ptr + IPV6_LEGACY_HDR_LEN));
 
-        uint16_t chksum = ipv6_csum(ipv6_header, (uint8_t*) udp_header, NTOHS(udp_header->length), IPPROTO_UDP);
+        uint16_t chksum = ipv6_legacy_csum(ipv6_legacy_header, (uint8_t*) udp_header, NTOHS(udp_header->length), IPPROTO_UDP);
 
         if (chksum == 0xffff) {
             udp_socket = get_udp_socket(udp_header);
 
             if (udp_socket != NULL) {
-                m_send_udp.content.ptr = (char *)ipv6_header;
+                m_send_udp.content.ptr = (char *)ipv6_legacy_header;
 
                 msg_send_receive(&m_send_udp, &m_recv_udp, udp_socket->recv_pid);
             }
@@ -140,16 +140,16 @@ int32_t udp_recvfrom(int s, void *buf, uint32_t len, int flags, sockaddr6_t *fro
     (void) flags;
 
     msg_t m_recv, m_send;
-    ipv6_hdr_t *ipv6_header;
+    ipv6_legacy_hdr_t *ipv6_legacy_header;
     udp_hdr_t *udp_header;
     uint8_t *payload;
     socket_base_get_socket(s)->recv_pid = thread_getpid();
 
     msg_receive(&m_recv);
 
-    ipv6_header = ((ipv6_hdr_t *)m_recv.content.ptr);
-    udp_header = ((udp_hdr_t *)(m_recv.content.ptr + IPV6_HDR_LEN));
-    payload = (uint8_t *)(m_recv.content.ptr + IPV6_HDR_LEN + UDP_HDR_LEN);
+    ipv6_legacy_header = ((ipv6_legacy_hdr_t *)m_recv.content.ptr);
+    udp_header = ((udp_hdr_t *)(m_recv.content.ptr + IPV6_LEGACY_HDR_LEN));
+    payload = (uint8_t *)(m_recv.content.ptr + IPV6_LEGACY_HDR_LEN + UDP_HDR_LEN);
 
     memset(buf, 0, len);
     /* cppcheck: the memset sets parts of the buffer to 0 even though it will
@@ -160,7 +160,7 @@ int32_t udp_recvfrom(int s, void *buf, uint32_t len, int flags, sockaddr6_t *fro
      */
     /* cppcheck-suppress redundantCopy */
     memcpy(buf, payload, NTOHS(udp_header->length) - UDP_HDR_LEN);
-    memcpy(&from->sin6_addr, &ipv6_header->srcaddr, 16);
+    memcpy(&from->sin6_addr, &ipv6_legacy_header->srcaddr, 16);
     from->sin6_family = AF_INET6;
     from->sin6_flowinfo = 0;
     from->sin6_port = udp_header->src_port;
@@ -180,12 +180,12 @@ int32_t udp_sendto(int s, const void *buf, uint32_t len, int flags,
         (socket_base_get_socket(s)->socket_values.foreign_address.sin6_port == 0)) {
         uint8_t send_buffer[BUFFER_SIZE];
 
-        ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
-        udp_hdr_t *current_udp_packet = ((udp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
-        uint8_t *payload = &send_buffer[IPV6_HDR_LEN + UDP_HDR_LEN];
+        ipv6_legacy_hdr_t *temp_ipv6_legacy_header = ((ipv6_legacy_hdr_t *)(&send_buffer));
+        udp_hdr_t *current_udp_packet = ((udp_hdr_t *)(&send_buffer[IPV6_LEGACY_HDR_LEN]));
+        uint8_t *payload = &send_buffer[IPV6_LEGACY_HDR_LEN + UDP_HDR_LEN];
 
-        memcpy(&(temp_ipv6_header->destaddr), &to->sin6_addr, 16);
-        ipv6_net_if_get_best_src_addr(&(temp_ipv6_header->srcaddr), &(temp_ipv6_header->destaddr));
+        memcpy(&(temp_ipv6_legacy_header->destaddr), &to->sin6_addr, 16);
+        ipv6_legacy_net_if_get_best_src_addr(&(temp_ipv6_legacy_header->srcaddr), &(temp_ipv6_legacy_header->destaddr));
 
         current_udp_packet->src_port = socket_base_get_free_source_port(IPPROTO_UDP);
         current_udp_packet->dst_port = to->sin6_port;
@@ -193,14 +193,14 @@ int32_t udp_sendto(int s, const void *buf, uint32_t len, int flags,
 
         memcpy(payload, buf, len);
         current_udp_packet->length = HTONS(UDP_HDR_LEN + len);
-        temp_ipv6_header->length = UDP_HDR_LEN + len;
+        temp_ipv6_legacy_header->length = UDP_HDR_LEN + len;
 
-        current_udp_packet->checksum = ~ipv6_csum(temp_ipv6_header,
+        current_udp_packet->checksum = ~ipv6_legacy_csum(temp_ipv6_legacy_header,
                                        (uint8_t *) current_udp_packet,
                                        UDP_HDR_LEN + len,
                                        IPPROTO_UDP);
 
-        return ipv6_sendto(&to->sin6_addr, IPPROTO_UDP,
+        return ipv6_legacy_sendto(&to->sin6_addr, IPPROTO_UDP,
                            (uint8_t *)(current_udp_packet),
                            NTOHS(current_udp_packet->length), NULL);
     }
@@ -222,7 +222,7 @@ int udp_init_transport_layer(void)
         return -1;
     }
 
-    ipv6_register_next_header_handler(IPV6_PROTO_NUM_UDP, udp_thread_pid);
+    ipv6_legacy_register_next_header_handler(IPV6_LEGACY_PROTO_NUM_UDP, udp_thread_pid);
 
     return 0;
 }

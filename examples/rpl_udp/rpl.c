@@ -23,7 +23,7 @@
 #include "vtimer.h"
 #include "thread.h"
 #include "net_if.h"
-#include "sixlowpan.h"
+#include "sixlowpan_legacy.h"
 #include "udp.h"
 #include "rpl.h"
 #include "rpl/rpl_dodag.h"
@@ -83,11 +83,11 @@ void rpl_udp_init(int argc, char **argv)
 
             if (command == 'r') {
                 rpl_init_root();
-                ipv6_iface_set_routing_provider(rpl_get_next_hop);
+                ipv6_legacy_iface_set_routing_provider(rpl_get_next_hop);
                 is_root = 1;
             }
             else {
-                ipv6_iface_set_routing_provider(rpl_get_next_hop);
+                ipv6_legacy_iface_set_routing_provider(rpl_get_next_hop);
             }
         }
         else {
@@ -104,8 +104,8 @@ void rpl_udp_init(int argc, char **argv)
                                                  "monitor");
         DEBUGF("Register at transceiver %02X\n", TRANSCEIVER);
         transceiver_register(TRANSCEIVER, monitor_pid);
-        ipv6_register_packet_handler(monitor_pid);
-        //sixlowpan_lowpan_register(monitor_pid);
+        ipv6_legacy_register_packet_handler(monitor_pid);
+        //sixlowpan_legacy_lowpan_register(monitor_pid);
     }
     else {
         printf("ERROR: Unknown command '%c'\n", command);
@@ -113,15 +113,15 @@ void rpl_udp_init(int argc, char **argv)
     }
 
     /* add global address */
-    ipv6_addr_t tmp;
+    ipv6_legacy_addr_t tmp;
     /* initialize prefix */
-    ipv6_addr_init(&tmp, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, id);
+    ipv6_legacy_addr_init(&tmp, 0xabcd, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, id);
     /* set host suffix */
-    ipv6_addr_set_by_eui64(&tmp, 0, &tmp);
-    ipv6_net_if_add_addr(0, &tmp, NDP_ADDR_STATE_PREFERRED, 0, 0, 0);
+    ipv6_legacy_addr_set_by_eui64(&tmp, 0, &tmp);
+    ipv6_legacy_net_if_add_addr(0, &tmp, NDP_ADDR_STATE_PREFERRED, 0, 0, 0);
 
     if (command != 'h') {
-        ipv6_init_as_router();
+        ipv6_legacy_init_as_router();
     }
 
     /* set channel to 10 */
@@ -152,13 +152,13 @@ void rpl_udp_dodag(int argc, char **argv)
     }
 
     printf("Part of Dodag:\n");
-    printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+    printf("%s\n", ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
                                     (&mydodag->dodag_id)));
     printf("my rank: %d\n", mydodag->my_rank);
 
     if (!is_root) {
         printf("my preferred parent:\n");
-        printf("%s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+        printf("%s\n", ipv6_legacy_addr_to_str(addr_str, IPV6_LEGACY_MAX_ADDR_STR_LEN,
                                         (&mydodag->my_preferred_parent->addr)));
     }
 

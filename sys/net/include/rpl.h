@@ -29,7 +29,7 @@
 #include <vtimer.h>
 #include <mutex.h>
 #include <transceiver.h>
-#include "ipv6.h"
+#include "ipv6_legacy.h"
 #include "rpl/rpl_dodag.h"
 #include "rpl/rpl_of_manager.h"
 
@@ -47,7 +47,7 @@ extern "C" {
 extern kernel_pid_t rpl_process_pid;
 extern uint8_t rpl_max_routing_entries;
 
-/* needed for receiving messages with ICMP-code 155. Received via IPC from ipv6.c */
+/* needed for receiving messages with ICMP-code 155. Received via IPC from ipv6_legacy.c */
 extern mutex_t rpl_recv_mutex;
 
 /* needed for sending RPL-messages */
@@ -61,7 +61,7 @@ extern uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
  * @brief Initialization of RPL.
  *
  * This function initializes all basic RPL resources such as mutex for send/receive,
- * corresponding objective functions and sixlowpan (including own address). Calls
+ * corresponding objective functions and sixlowpan_legacy (including own address). Calls
  * initialization for mode as specified by PL_DEFAULT_MOP in rpl_structs.h.
  *
  * @param[in] if_id             ID of the interface, which correspond to the network under RPL-control
@@ -92,7 +92,7 @@ void rpl_init_root(void);
  * @param[in] destination       IPv6-address of the destination of the DIO. Should be a direct neighbor.
  *
  */
-void rpl_send_DIO(ipv6_addr_t *destination);
+void rpl_send_DIO(ipv6_legacy_addr_t *destination);
 
 /**
  * @brief Sends a DAO-message to a given destination
@@ -107,7 +107,7 @@ void rpl_send_DIO(ipv6_addr_t *destination);
  * @param[in] start_index       Describes whether a DAO must be split because of too many routing entries.
  *
  */
-void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index);
+void rpl_send_DAO(ipv6_legacy_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index);
 
 /**
  * @brief Sends a DIS-message to a given destination
@@ -119,7 +119,7 @@ void rpl_send_DAO(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifet
  * @param[in] destination       IPv6-address of the destination of the DIS. Should be a direct neighbor or multicast-address.
  *
  */
-void rpl_send_DIS(ipv6_addr_t *destination);
+void rpl_send_DIS(ipv6_legacy_addr_t *destination);
 
 /**
  * @brief Sends a DAO acknowledgment-message to a given destination
@@ -131,7 +131,7 @@ void rpl_send_DIS(ipv6_addr_t *destination);
  * @param[in] destination       IPv6-address of the destination of the DAO_ACK. Should be a direct neighbor.
  *
  */
-void rpl_send_DAO_ACK(ipv6_addr_t *destination);
+void rpl_send_DAO_ACK(ipv6_legacy_addr_t *destination);
 
 /**
  * @brief Receives a DIO message
@@ -173,7 +173,7 @@ void rpl_recv_DAO_ACK(void);
  * @brief Initialization of RPl-root.
  *
  * This function initializes all RPL resources especially for root purposes.
- * corresponding objective functions and sixlowpan (including own address). It also register mutexes for
+ * corresponding objective functions and sixlowpan_legacy (including own address). It also register mutexes for
  * sending and receiving RPL-based messages. Both are necessary because of parallel access from different
  * layers/modules of RIOT. May change with future structure changes.
  *
@@ -193,7 +193,7 @@ void *rpl_process(void *arg);
  * @return Next hop address
  *
  * */
-ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr);
+ipv6_legacy_addr_t *rpl_get_next_hop(ipv6_legacy_addr_t *addr);
 
 /**
  * @brief Adds routing entry to routing table
@@ -206,7 +206,7 @@ ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr);
  * @param[in] lifetime              Lifetime of the entry
  *
  * */
-void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t lifetime);
+void rpl_add_routing_entry(ipv6_legacy_addr_t *addr, ipv6_legacy_addr_t *next_hop, uint16_t lifetime);
 
 /**
  * @brief Deletes routing entry to routing table
@@ -217,7 +217,7 @@ void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t li
  * @param[in] addr                  Destination address
  *
  * */
-void rpl_del_routing_entry(ipv6_addr_t *addr);
+void rpl_del_routing_entry(ipv6_legacy_addr_t *addr);
 
 /**
  * @brief Finds routing entry for a given destination.
@@ -230,7 +230,7 @@ void rpl_del_routing_entry(ipv6_addr_t *addr);
  * @return Routing entry address
  *
  * */
-rpl_routing_entry_t *rpl_find_routing_entry(ipv6_addr_t *addr);
+rpl_routing_entry_t *rpl_find_routing_entry(ipv6_legacy_addr_t *addr);
 
 /**
  * @brief Clears routing table.
@@ -273,16 +273,16 @@ uint8_t rpl_is_root(void);
  * @param[in] lifetime               Lifetime of the relation
  *
  * */
-void rpl_add_srh_entry(ipv6_addr_t *child, ipv6_addr_t *parent, uint16_t lifetime);
+void rpl_add_srh_entry(ipv6_legacy_addr_t *child, ipv6_legacy_addr_t *parent, uint16_t lifetime);
 
 /**
  * @brief Constructs a source routing header based on an original IPv6-header
  *
- * @param[in] act_ipv6_hdr                  Pointer to original IPv6-packet header
+ * @param[in] act_ipv6_legacy_hdr                  Pointer to original IPv6-packet header
  * @return Source routing header or NULL
  *
  * */
-ipv6_srh_t *rpl_get_srh_header(ipv6_hdr_t *act_ipv6_hdr);
+ipv6_legacy_srh_t *rpl_get_srh_header(ipv6_legacy_hdr_t *act_ipv6_legacy_hdr);
 
 /**
  * @brief Manages sending an SRH-header integrated in an original IPv6-package to the next hop.
@@ -295,16 +295,16 @@ ipv6_srh_t *rpl_get_srh_header(ipv6_hdr_t *act_ipv6_hdr);
  * @param[in] srh_length           Length of the pre-built source routing header
  * @return                         Status of sending progress
  * */
-int rpl_srh_sendto(const void *buf, uint16_t len, ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_srh_t *srh_header, uint8_t srh_length);
+int rpl_srh_sendto(const void *buf, uint16_t len, ipv6_legacy_addr_t *src, ipv6_legacy_addr_t *dest, ipv6_legacy_srh_t *srh_header, uint8_t srh_length);
 
 /**
  * @brief Sends IPC-message to the service, which is indicated by the next-header-field in the source routing header
  *
- * @param[in] ipv6_header          Actual IPv6-header
+ * @param[in] ipv6_legacy_header          Actual IPv6-header
  * @return IPv6-address of the next-hop. Is NULL on error occurrence.
  *
  * */
-void rpl_remove_srh_header(ipv6_hdr_t *ipv6_header, const void *buf, uint8_t nextheader);
+void rpl_remove_srh_header(ipv6_legacy_hdr_t *ipv6_legacy_header, const void *buf, uint8_t nextheader);
 
 #endif /* RPL_DEFAULT_MOP == RPL_NON_STORING_MODE */
 

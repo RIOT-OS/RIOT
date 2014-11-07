@@ -31,7 +31,7 @@
 
 rpl_of_t *objective_functions[NUMBER_IMPLEMENTED_OFS];
 
-void rpl_of_manager_init(ipv6_addr_t *my_address)
+void rpl_of_manager_init(ipv6_legacy_addr_t *my_address)
 {
     /* insert new objective functions here */
     objective_functions[0] = rpl_get_of0();
