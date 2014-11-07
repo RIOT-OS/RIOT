@@ -27,7 +27,7 @@ ifneq (,$(filter socket_base,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
 
-ifneq (,$(filter sixlowborder,$(USEMODULE)))
+ifneq (,$(filter sixlowborder_legacy,$(USEMODULE)))
 	USEMODULE += sixlowpan_legacy
 endif
 
@@ -44,6 +44,13 @@ ifneq (,$(filter sixlowpan_legacy,$(USEMODULE)))
 	USEMODULE += net_help
 	USEMODULE += net_if
 	USEMODULE += posix
+	USEMODULE += vtimer
+endif
+
+ifneq (,$(filter sixlowpan,$(USEMODULE)))
+	USEMODULE += netapi
+	USEMODULE += netdev_base
+	USEMODULE += pktbuf
 	USEMODULE += vtimer
 endif
 
