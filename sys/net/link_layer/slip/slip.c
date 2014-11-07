@@ -159,12 +159,12 @@ static void _slip_receive(msg_t *uart_msg, _uart_ctx_t *ctx)
 
     for (int i = 0; i < _SLIP_REGISTRY_SIZE; i++) {
         if (ctx->registry[i] != KERNEL_PID_UNDEF) {
-            netapi_ack_t *ack;
             size_t offset = 0;
 
             while (offset < ctx->bytes) {
                 packet.data = (void *)(pkt + offset);
                 packet.data_len = bytes - offset;
+                netapi_ack_t *ack;
 
                 msg_send_receive(&l3_pkt, &l3_ack, ctx->registry[i]);
                 ack = (netapi_ack_t *)(l3_ack.content.ptr);
@@ -377,10 +377,8 @@ static void *_slip_control(void *arg)
 kernel_pid_t slip_init(uart_t uart, uint32_t baudrate, ringbuffer_t *in_buf)
 {
     char control_name[_SLIP_MAX_NAME_LEN];
-    char number[_SLIP_MAX_NAME_LEN - strlen("slip_control_uart")];
 
-    strcpy(control_name, "slip_control_uart");
-    strcpy(control_name, number);
+    sprintf(control_name, "slip_contol_uart%02u", uart);
 
 #if UART_NUMOF
     _uart_ctx[uart].bytes = 0;
