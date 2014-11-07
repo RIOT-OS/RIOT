@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file    sixlowip.c
  * @brief   6lowpan IP layer functions
@@ -26,7 +26,7 @@
 #include "mutex.h"
 #include "msg.h"
 #include "net_if.h"
-#include "sixlowpan/mac.h"
+#include "sixlowpan_legacy/mac.h"
 
 #include "ip.h"
 #include "icmp.h"
@@ -47,7 +47,7 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 uint8_t ip_send_buffer[BUFFER_SIZE];
 uint8_t buffer[BUFFER_SIZE];
 msg_t ip_msg_queue[IP_PKT_RECV_BUF_SIZE];
-ipv6_hdr_t *ipv6_buf;
+ipv6_legacy_hdr_t *ipv6_buf;
 icmpv6_hdr_t *icmp_buf;
 uint8_t *nextheader;
 
@@ -55,7 +55,7 @@ kernel_pid_t udp_packet_handler_pid = KERNEL_PID_UNDEF;
 kernel_pid_t tcp_packet_handler_pid = KERNEL_PID_UNDEF;
 
 static volatile kernel_pid_t _rpl_process_pid = KERNEL_PID_UNDEF;
-ipv6_addr_t *(*ip_get_next_hop)(ipv6_addr_t *);
+ipv6_legacy_addr_t *(*ip_get_next_hop)(ipv6_addr_t *);
 uint8_t (*ip_srh_indicator)(void);
 
 static ipv6_net_if_ext_t ipv6_net_if_ext[NET_IF_MAX];
@@ -75,7 +75,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
 
     if (next_hop == NULL) {
         DEBUGF("Got a packet to send to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &packet->destaddr));
-        ipv6_net_if_get_best_src_addr(&packet->srcaddr, &packet->destaddr);
+        ipv6_legacy_net_if_get_best_src_addr(&packet->srcaddr, &packet->destaddr);
     }
 
     if (!ipv6_addr_is_multicast(&packet->destaddr)
@@ -84,12 +84,12 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
         nce = ndp_get_ll_address(&packet->destaddr);
 
         if (nce == NULL
-            || sixlowpan_lowpan_sendto(nce->if_id, &nce->lladdr,
+            || sixlowpan_legacy_lowpan_sendto(nce->if_id, &nce->lladdr,
                                        nce->lladdr_len, (uint8_t *) packet, length) < 0) {
             /* XXX: this is wrong, but until ND does work correctly,
              *      this is the only way (aka the old way)*/
             uint16_t raddr = NTOHS(packet->destaddr.uint16[7]);
-            sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *) packet, length);
+            sixlowpan_legacy_lowpan_sendto(0, &raddr, 2, (uint8_t *) packet, length);
             /* return -1; */
         }
 
@@ -100,7 +100,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
         if (ipv6_addr_is_multicast(&packet->destaddr)) {
             /* if_id will be ignored */
             uint16_t addr = 0xffff;
-            return sixlowpan_lowpan_sendto(0, &addr, 2, (uint8_t *) packet,
+            return sixlowpan_legacy_lowpan_sendto(0, &addr, 2, (uint8_t *) packet,
                                            length);
         }
 
@@ -111,7 +111,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
                 return -1;
             }
 
-            ipv6_addr_t *dest = ip_get_next_hop(&packet->destaddr);
+            ipv6_legacy_addr_t *dest = ip_get_next_hop(&packet->destaddr);
 
             if (dest == NULL) {
                 return -1;
@@ -120,12 +120,12 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
             nce = ndp_get_ll_address(dest);
 
             if (nce == NULL
-                || sixlowpan_lowpan_sendto(nce->if_id, &nce->lladdr,
+                || sixlowpan_legacy_lowpan_sendto(nce->if_id, &nce->lladdr,
                                            nce->lladdr_len, (uint8_t *) packet, length) < 0) {
                 /* XXX: this is wrong, but until ND does work correctly,
                  *      this is the only way (aka the old way)*/
                 uint16_t raddr = dest->uint16[7];
-                sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *) packet,
+                sixlowpan_legacy_lowpan_sendto(0, &raddr, 2, (uint8_t *) packet,
                                         length);
                 /* return -1; */
             }
@@ -135,12 +135,12 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
             nce = ndp_get_ll_address(next_hop);
 
             if (nce == NULL
-                || sixlowpan_lowpan_sendto(nce->if_id, &nce->lladdr,
+                || sixlowpan_legacy_lowpan_sendto(nce->if_id, &nce->lladdr,
                                            nce->lladdr_len, (uint8_t *) packet, length) < 0) {
                 /* XXX: this is wrong, but until ND does work correctly,
                  *      this is the only way (aka the old way)*/
                 uint16_t raddr = next_hop->uint16[7];
-                sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *) packet,
+                sixlowpan_legacy_lowpan_sendto(0, &raddr, 2, (uint8_t *) packet,
                                         length);
                 /* return -1; */
             }
@@ -150,7 +150,7 @@ int ipv6_send_packet(ipv6_hdr_t *packet, ipv6_addr_t *next_hop)
     }
 }
 
-ipv6_hdr_t *ipv6_get_buf_send(void)
+ipv6_legacy_hdr_t *ipv6_get_buf_send(void)
 {
     return ((ipv6_hdr_t *) &ip_send_buffer[LL_HDR_LEN]);
 }
@@ -160,7 +160,7 @@ uint8_t *get_payload_buf_send(uint8_t ext_len)
     return &(ip_send_buffer[LLHDR_IPV6HDR_LEN + ext_len]);
 }
 
-ipv6_hdr_t *ipv6_get_buf(void)
+ipv6_legacy_hdr_t *ipv6_get_buf(void)
 {
     return ((ipv6_hdr_t *) &buffer[LL_HDR_LEN]);
 }
@@ -182,19 +182,19 @@ int ipv6_sendto(const ipv6_addr_t *dest, uint8_t next_header,
 
     if (next_header == IPV6_PROTO_NUM_TCP) {
         p_ptr = get_payload_buf_send(ipv6_ext_hdr_len);
-        ipv6_buf = ipv6_get_buf_send();
+        ipv6_legacy_buf = ipv6_get_buf_send();
     }
     else {
-        ipv6_buf = ipv6_get_buf();
+        ipv6_legacy_buf = ipv6_get_buf();
         p_ptr = get_payload_buf(ipv6_ext_hdr_len);
     }
 
-    ipv6_buf->version_trafficclass = IPV6_VER;
-    ipv6_buf->trafficclass_flowlabel = 0;
-    ipv6_buf->flowlabel = 0;
-    ipv6_buf->nextheader = next_header;
-    ipv6_buf->hoplimit = MULTIHOP_HOPLIMIT;
-    ipv6_buf->length = HTONS(payload_length);
+    ipv6_legacy_buf->version_trafficclass = IPV6_VER;
+    ipv6_legacy_buf->trafficclass_flowlabel = 0;
+    ipv6_legacy_buf->flowlabel = 0;
+    ipv6_legacy_buf->nextheader = next_header;
+    ipv6_legacy_buf->hoplimit = MULTIHOP_HOPLIMIT;
+    ipv6_legacy_buf->length = HTONS(payload_length);
 
     memcpy(&(ipv6_buf->destaddr), dest, 16);
     memcpy(p_ptr, payload, payload_length);
@@ -346,8 +346,8 @@ static int is_our_address(ipv6_addr_t *addr)
     DEBUGF("Is this my address: %s?\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
 
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
-        ipv6_net_if_ext_t *net_if_ext = ipv6_net_if_get_ext(if_id);
-        ipv6_net_if_addr_t *myaddr = NULL;
+        ipv6_legacy_net_if_ext_t *net_if_ext = ipv6_net_if_get_ext(if_id);
+        ipv6_legacy_net_if_addr_t *myaddr = NULL;
         uint8_t prefix = net_if_ext->prefix / 8;
         uint8_t suffix = IPV6_ADDR_LEN - prefix;
 
@@ -388,7 +388,7 @@ void *ipv6_process(void *arg)
     while (1) {
         msg_receive(&m_recv_lowpan);
 
-        ipv6_buf = (ipv6_hdr_t *) m_recv_lowpan.content.ptr;
+        ipv6_legacy_buf = (ipv6_hdr_t *) m_recv_lowpan.content.ptr;
 
         /* identifiy packet */
         nextheader = &ipv6_buf->nextheader;
@@ -493,7 +493,7 @@ void *ipv6_process(void *arg)
                 packet_length = IPV6_HDR_LEN + NTOHS(ipv6_buf->length);
                 ndp_neighbor_cache_t *nce;
 
-                ipv6_addr_t *dest;
+                ipv6_legacy_addr_t *dest;
 
                 if (ip_get_next_hop == NULL) {
                     dest = &ipv6_buf->destaddr;
@@ -516,7 +516,7 @@ void *ipv6_process(void *arg)
 
                 /* send packet to node ID derived from dest IP */
                 if (nce != NULL) {
-                    sixlowpan_lowpan_sendto(nce->if_id, &nce->lladdr,
+                    sixlowpan_legacy_lowpan_sendto(nce->if_id, &nce->lladdr,
                                             nce->lladdr_len, (uint8_t *) ipv6_get_buf_send(),
                                             packet_length);
                 }
@@ -524,7 +524,7 @@ void *ipv6_process(void *arg)
                     /* XXX: this is wrong, but until ND does work correctly,
                      *      this is the only way (aka the old way)*/
                     uint16_t raddr = dest->uint16[7];
-                    sixlowpan_lowpan_sendto(0, &raddr, 2,
+                    sixlowpan_legacy_lowpan_sendto(0, &raddr, 2,
                                             (uint8_t *) ipv6_get_buf_send(), packet_length);
                 }
             }
@@ -534,7 +534,7 @@ void *ipv6_process(void *arg)
     }
 }
 
-ipv6_net_if_ext_t *ipv6_net_if_get_ext(int if_id)
+ipv6_legacy_net_if_ext_t *ipv6_net_if_get_ext(int if_id)
 {
     if (net_if_get_interface(if_id)) {
         return &ipv6_net_if_ext[if_id];
@@ -548,7 +548,7 @@ int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
                          ndp_addr_state_t state, uint32_t val_ltime, uint32_t pref_ltime,
                          uint8_t is_anycast)
 {
-    ipv6_net_if_hit_t hit;
+    ipv6_legacy_net_if_hit_t hit;
 
     if (ipv6_addr_is_unspecified(addr) == 128) {
         DEBUG("ERROR: unspecified address (::) can't be assigned to interface.\n");
@@ -572,11 +572,11 @@ int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
 
         vtimer_now(&now);
 
-        ipv6_addr_t *addr_data =
+        ipv6_legacy_addr_t *addr_data =
             &ipv6_addr_buffer[ipv6_net_if_addr_buffer_count];
         memcpy(addr_data, addr, sizeof(ipv6_addr_t));
 
-        ipv6_net_if_addr_t *addr_entry =
+        ipv6_legacy_net_if_addr_t *addr_entry =
             &ipv6_net_if_addr_buffer[ipv6_net_if_addr_buffer_count];
         addr_entry->addr_data = addr_data;
         addr_entry->addr_len = 128;
@@ -596,17 +596,17 @@ int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
         addr_entry->preferred_lifetime = timex_add(now, preftime);
         addr_entry->is_anycast = is_anycast;
 
-        ipv6_net_if_addr_buffer_count++;
+        ipv6_legacy_net_if_addr_buffer_count++;
 
         net_if_add_address(if_id, (net_if_addr_t *) addr_entry);
 
         /* Register to Solicited-Node multicast address according to RFC 4291 */
         if (is_anycast || !ipv6_addr_is_multicast(addr)) {
-            ipv6_addr_t sol_node_mcast_addr;
-            ipv6_addr_set_solicited_node_addr(&sol_node_mcast_addr, addr);
+            ipv6_legacy_addr_t sol_node_mcast_addr;
+            ipv6_legacy_addr_set_solicited_node_addr(&sol_node_mcast_addr, addr);
 
             if (ipv6_net_if_addr_match(&hit, &sol_node_mcast_addr) == NULL) {
-                ipv6_net_if_add_addr(if_id, &sol_node_mcast_addr, state,
+                ipv6_legacy_net_if_add_addr(if_id, &sol_node_mcast_addr, state,
                                      val_ltime, pref_ltime, 0);
             }
         }
@@ -617,11 +617,11 @@ int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
     return 0;
 }
 
-ipv6_net_if_hit_t *ipv6_net_if_addr_match(ipv6_net_if_hit_t *hit,
+ipv6_legacy_net_if_hit_t *ipv6_net_if_addr_match(ipv6_net_if_hit_t *hit,
         const ipv6_addr_t *addr)
 {
     int if_id = -1;
-    ipv6_net_if_addr_t *addr_entry = NULL;
+    ipv6_legacy_net_if_addr_t *addr_entry = NULL;
 
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
         while (net_if_iter_addresses(if_id, (net_if_addr_t **) &addr_entry)
@@ -649,11 +649,11 @@ ipv6_net_if_hit_t *ipv6_net_if_addr_match(ipv6_net_if_hit_t *hit,
     return NULL;
 }
 
-ipv6_net_if_hit_t *ipv6_net_if_addr_prefix_eq(ipv6_net_if_hit_t *hit,
-        ipv6_addr_t *addr)
+ipv6_legacy_net_if_hit_t *ipv6_net_if_addr_prefix_eq(ipv6_net_if_hit_t *hit,
+        ipv6_legacy_addr_t *addr)
 {
     int if_id = -1;
-    ipv6_net_if_addr_t *addr_entry = NULL;
+    ipv6_legacy_net_if_addr_t *addr_entry = NULL;
 
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
         while (net_if_iter_addresses(if_id, (net_if_addr_t **) &addr_entry)
@@ -674,7 +674,7 @@ ipv6_net_if_hit_t *ipv6_net_if_addr_prefix_eq(ipv6_net_if_hit_t *hit,
 /* TODO ipv6_net_if_hit_t returning function similar wrapping
  *      ipv6_net_if_get_best_src_addr() to search on all interfaces */
 
-ipv6_addr_t *ipv6_addr_set_by_eui64(ipv6_addr_t *out, int if_id,
+ipv6_legacy_addr_t *ipv6_addr_set_by_eui64(ipv6_addr_t *out, int if_id,
                                     const ipv6_addr_t *prefix)
 {
     uint8_t force_generation = 0;
@@ -689,9 +689,9 @@ ipv6_addr_t *ipv6_addr_set_by_eui64(ipv6_addr_t *out, int if_id,
 
     if (net_if_get_eui64((net_if_eui64_t *) &out->uint8[8], if_id,
                          force_generation)) {
-#ifdef MODULE_SIXLOWPAN
+#ifdef MODULE_SIXLOWPAN_LEGACY
 
-        if (!sixlowpan_lowpan_eui64_to_short_addr((net_if_eui64_t *)&out->uint8[8])) {
+        if (!sixlowpan_legacy_lowpan_eui64_to_short_addr((net_if_eui64_t *)&out->uint8[8])) {
             out->uint8[8] ^= 0x02;
         }
 
@@ -734,8 +734,8 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
 {
     /* try to find best match if dest is not mcast or link local */
     int if_id = 0; // TODO: get this somehow
-    ipv6_net_if_addr_t *addr = NULL;
-    ipv6_net_if_addr_t *tmp_addr = NULL;
+    ipv6_legacy_net_if_addr_t *addr = NULL;
+    ipv6_legacy_net_if_addr_t *tmp_addr = NULL;
 
     if (!(ipv6_addr_is_link_local(dest)) && !(ipv6_addr_is_multicast(dest))) {
         while ((addr = (ipv6_net_if_addr_t *) net_if_iter_addresses(if_id,
@@ -808,10 +808,10 @@ void set_remaining_time(timex_t *t, uint32_t time)
 
 int ipv6_init_as_router(void)
 {
-    ipv6_addr_t addr;
+    ipv6_legacy_addr_t addr;
     int if_id = -1;
 
-    ipv6_addr_set_all_routers_addr(&addr);
+    ipv6_legacy_addr_set_all_routers_addr(&addr);
 
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
         if (!ipv6_net_if_add_addr(if_id, &addr, NDP_ADDR_STATE_PREFERRED, 0, 0,
@@ -825,10 +825,10 @@ int ipv6_init_as_router(void)
 
 uint8_t ipv6_is_router(void)
 {
-    ipv6_addr_t addr;
-    ipv6_net_if_hit_t hit;
+    ipv6_legacy_addr_t addr;
+    ipv6_legacy_net_if_hit_t hit;
 
-    ipv6_addr_set_all_routers_addr(&addr);
+    ipv6_legacy_addr_set_all_routers_addr(&addr);
 
     if (ipv6_net_if_addr_match(&hit, &addr) != NULL) {
         return 1;
@@ -890,9 +890,9 @@ uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len,
 {
     uint16_t sum = 0;
     DEBUG("Calculate checksum over src: %s, dst: %s, len: %04X, buf: %p, proto: %u\n",
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+          ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                            &ipv6_header->srcaddr),
-          ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+          ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                            &ipv6_header->destaddr),
           len, buf, proto);
     sum = len + proto;

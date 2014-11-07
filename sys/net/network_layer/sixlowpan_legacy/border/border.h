@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file
  * @brief   header for 6lowpan border router
@@ -18,8 +18,8 @@
 
 /* 6LoWPAN Border Router header file */
 
-#ifndef _SIXLOWPAN_BORDER_H
-#define _SIXLOWPAN_BORDER_H
+#ifndef _SIXLOWPAN_LEGACY_BORDER_H
+#define _SIXLOWPAN_LEGACY_BORDER_H
 
 #include <stdint.h>
 
@@ -46,4 +46,4 @@ void border_process_lowpan(void);
 }
 #endif
 
-#endif /* _SIXLOWPAN_BORDER_H*/
+#endif /* _SIXLOWPAN_LEGACY_BORDER_H*/

@@ -7,12 +7,12 @@
  */
 
 /**
- * @defgroup    net_sixlowpan_types Type definitions and data structs for 6LoWPAN and IPv6
- * @ingroup     net_sixlowpan
+ * @defgroup    net_sixlowpan_legacy_types Type definitions and data structs for 6LoWPAN and IPv6
+ * @ingroup     net_sixlowpan_legacy
  * @brief       Structs, constants, and enums for 6LoWPAN and IPv6 related functions
  * @{
  *
- * @file        sixlowpan/types.h
+ * @file        sixlowpan_legacy/types.h
  * @brief       6LoWPAN data types
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -21,8 +21,8 @@
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
-#ifndef SIXLOWPAN_TYPES_H
-#define SIXLOWPAN_TYPES_H
+#ifndef SIXLOWPAN_LEGACY_TYPES_H
+#define SIXLOWPAN_LEGACY_TYPES_H
 
 #include <stdint.h>
 
@@ -70,8 +70,8 @@ typedef struct __attribute__((packed)) {
     uint16_t length;                ///< payload length of this packet.
     uint8_t nextheader;             ///< type of next header in this packet.
     uint8_t hoplimit;               ///< hop limit for this packet.
-    ipv6_addr_t srcaddr;            ///< source address of this packet.
-    ipv6_addr_t destaddr;           ///< destination address of this packet.
+    ipv6_legacy_addr_t srcaddr;            ///< source address of this packet.
+    ipv6_legacy_addr_t destaddr;           ///< destination address of this packet.
 } ipv6_hdr_t;
 
 /**
@@ -88,7 +88,7 @@ typedef struct __attribute__((packed)) {
     unsigned pad :4;                /**< number of octets used for padding after addresses. */
     unsigned reserved :10;          /**< reserved. Set to 0. */
     unsigned reserved2 :10;         /**< reserved. Set to 0. */
-    ipv6_addr_t route[];
+    ipv6_legacy_addr_t route[];
 } ipv6_srh_t;
 
 /**
@@ -193,7 +193,7 @@ typedef struct __attribute__((packed)) {
  */
 typedef struct __attribute__((packed)) {
     uint32_t reserved;          ///< reserved field.
-    ipv6_addr_t target_addr;    ///< target address field.
+    ipv6_legacy_addr_t target_addr;    ///< target address field.
 } icmpv6_neighbor_sol_hdr_t;
 
 /**
@@ -210,7 +210,7 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed)) {
     uint8_t rso;                ///< flags + first 5 bits of reserved field.
     uint8_t reserved[3];        ///< rest of reserved field.
-    ipv6_addr_t target_addr;    ///< target address field.
+    ipv6_legacy_addr_t target_addr;    ///< target address field.
 } icmpv6_neighbor_adv_hdr_t;
 
 /**
@@ -283,7 +283,7 @@ typedef struct __attribute__((packed)) {
     uint32_t val_ltime;         ///< valid lifetime field.
     uint32_t pref_ltime;        ///< preferred lifetime field.
     uint32_t reserved2;         ///< reserved2 field.
-    ipv6_addr_t addr;           ///< prefix field.
+    ipv6_legacy_addr_t addr;           ///< prefix field.
 } icmpv6_ndp_opt_pi_t;
 
 /**
@@ -386,7 +386,7 @@ typedef struct __attribute__((packed)) {
     uint8_t length;             ///< length field.
     uint16_t version;           ///< version field.
     uint32_t reserved;          ///< reseverd field.
-    ipv6_addr_t addr;           ///< 6LBR address field.
+    ipv6_legacy_addr_t addr;           ///< 6LBR address field.
 } icmpv6_ndp_opt_abro_t;
 
 /**
@@ -405,4 +405,4 @@ typedef enum __attribute__((packed)) {
 #endif
 
 /** @} */
-#endif /* SIXLOWPAN_TYPES_H */
+#endif /* SIXLOWPAN_LEGACY_TYPES_H */

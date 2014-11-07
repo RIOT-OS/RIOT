@@ -7,12 +7,12 @@
  */
 
 /**
- * @addtogroup  net_sixlowpan_ndp
- * @ingroup     net_sixlowpan
+ * @addtogroup  net_sixlowpan_legacy_ndp
+ * @ingroup     net_sixlowpan_legacy
  * @brief       Neighbor discovery protocol for 6LoWPAN and IPv6
  * @{
  *
- * @file        sixlowpan/ndp.h
+ * @file        sixlowpan_legacy/ndp.h
  * @brief       6LoWPAN constants, data structs, and prototypes related to NDP
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -21,14 +21,14 @@
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
-#ifndef SIXLOWPAN_NDP_H
-#define SIXLOWPAN_NDP_H
+#ifndef SIXLOWPAN_LEGACY_NDP_H
+#define SIXLOWPAN_LEGACY_NDP_H
 
 #include <stdint.h>
 
 #include "net_if.h"
 #include "timex.h"
-#include "sixlowpan/types.h"
+#include "sixlowpan_legacy/types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,7 +90,7 @@ typedef struct __attribute__((packed)) ndp_prefix_info_t {
      *        For this layer NET_IF_L3P_IPV6_PREFIX must be set.
      */
     net_if_l3p_t prefix_protocol;
-    ipv6_addr_t *prefix_data;       ///< The Prefix.
+    ipv6_legacy_addr_t *prefix_data;       ///< The Prefix.
     uint8_t prefix_len;             ///< Length of the prefix.
     uint8_t inuse;                  ///< Prefix is in in use.
     /**
@@ -109,7 +109,7 @@ typedef struct __attribute__((packed)) ndp_prefix_info_t {
  *          router advertisement.
  */
 typedef struct __attribute__((packed)) {
-    ipv6_addr_t addr;       ///< Address of router.
+    ipv6_legacy_addr_t addr;       ///< Address of router.
     timex_t inval_time;     ///< remaining time until this entry is
     ///< invalid.
 } ndp_default_router_list_t;
@@ -127,7 +127,7 @@ typedef struct __attribute__((packed)) {
     ndp_nce_state_t state;      ///< State of neighbor cache entry.
     uint8_t isrouter;           ///< Flag to signify that this neighbor
     ///< is a router.
-    ipv6_addr_t addr;           ///< IPv6 address of the neighbor.
+    ipv6_legacy_addr_t addr;           ///< IPv6 address of the neighbor.
     uint8_t lladdr[8];          ///< Link-layer address of the neighbor
     uint8_t lladdr_len;         ///< Length of link-layer address of the
     ///< neighbor
@@ -142,7 +142,7 @@ typedef struct __attribute__((packed)) {
  */
 typedef struct __attribute__((packed)) {
     uint16_t version;                       ///< version of entry.
-    ipv6_addr_t abr_addr;                   ///< Addres of ABR.
+    ipv6_legacy_addr_t abr_addr;                   ///< Addres of ABR.
     uint8_t cids[NDP_6LOWPAN_CONTEXT_MAX];  ///< context IDs.
 } ndp_a6br_cache_t;
 
@@ -236,4 +236,4 @@ ndp_a6br_cache_t *ndp_a6br_cache_get_oldest(void);
 #endif
 
 /** @} */
-#endif /* SIXLOWPAN_NDP_H */
+#endif /* SIXLOWPAN_LEGACY_NDP_H */

@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file    sixlowmac.c
  * @brief   6lowpan link layer functions
@@ -28,7 +28,7 @@
 #include "msg.h"
 #include "radio/radio.h"
 #include "net_if.h"
-#include "sixlowpan/mac.h"
+#include "sixlowpan_legacy/mac.h"
 
 #include "ip.h"
 #include "icmp.h"
@@ -203,7 +203,7 @@ void set_ieee802154_frame_values(int if_id, uint16_t dest_pan,
     macdsn++;
 }
 
-int sixlowpan_mac_prepare_ieee802144_frame(
+int sixlowpan_legacy_mac_prepare_ieee802144_frame(
     ieee802154_frame_t *frame, int if_id, uint16_t dest_pan, const void *dest,
     uint8_t dest_len, const void *payload, uint8_t length, uint8_t mcast)
 {
@@ -266,7 +266,7 @@ int sixlowpan_mac_prepare_ieee802144_frame(
     return hdrlen;
 }
 
-int sixlowpan_mac_send_data(int if_id,
+int sixlowpan_legacy_mac_send_data(int if_id,
                             const void *dest, uint8_t dest_len,
                             const void *payload,
                             uint8_t payload_len, uint8_t mcast)
@@ -290,21 +290,21 @@ int sixlowpan_mac_send_data(int if_id,
     return -1;
 }
 
-int sixlowpan_mac_send_ieee802154_frame(int if_id,
+int sixlowpan_legacy_mac_send_ieee802154_frame(int if_id,
                                         const void *dest, uint8_t dest_len,
                                         const void *payload,
                                         uint8_t payload_len, uint8_t mcast)
 {
     if (net_if_get_interface(if_id) &&
         net_if_get_interface(if_id)->transceivers & IEEE802154_TRANSCEIVER) {
-        return sixlowpan_mac_send_data(if_id, dest, dest_len, payload,
+        return sixlowpan_legacy_mac_send_data(if_id, dest, dest_len, payload,
                                        payload_len, mcast);
     }
     else {
         ieee802154_frame_t frame;
         uint16_t dest_pan = HTONS(0xabcd);
         uint8_t length;
-        int hdrlen = sixlowpan_mac_prepare_ieee802144_frame(&frame, if_id,
+        int hdrlen = sixlowpan_legacy_mac_prepare_ieee802144_frame(&frame, if_id,
                                                             dest_pan, dest,
                                                             dest_len, payload,
                                                             payload_len, mcast);
@@ -315,12 +315,12 @@ int sixlowpan_mac_send_ieee802154_frame(int if_id,
 
         length = hdrlen + frame.payload_len + IEEE_802154_FCS_LEN;
 
-        return sixlowpan_mac_send_data(if_id, dest, dest_len, lowpan_mac_buf,
+        return sixlowpan_legacy_mac_send_data(if_id, dest, dest_len, lowpan_mac_buf,
                                        length, mcast);
     }
 }
 
-kernel_pid_t sixlowpan_mac_init(void)
+kernel_pid_t sixlowpan_legacy_mac_init(void)
 {
     kernel_pid_t recv_pid = thread_create(radio_stack_buffer, RADIO_STACK_SIZE,
                                           PRIORITY_MAIN - 2, CREATE_STACKTEST,

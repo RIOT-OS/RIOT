@@ -32,7 +32,7 @@
 #include "of_mrhof.h"
 #include "trickle.h"
 
-#include "sixlowpan.h"
+#include "sixlowpan_legacy.h"
 #include "net_help.h"
 
 #if RPL_DEFAULT_MOP == RPL_STORING_MODE_NO_MC
@@ -61,18 +61,18 @@ uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
 #if RPL_DEFAULT_MOP == RPL_NON_STORING_MODE
 uint8_t srh_buffer[BUFFER_SIZE];
 uint8_t srh_send_buffer[BUFFER_SIZE];
-ipv6_addr_t *down_next_hop;
-ipv6_srh_t *srh_header;
+ipv6_legacy_addr_t *down_next_hop;
+ipv6_legacy_srh_t *srh_header;
 msg_t srh_m_send, srh_m_recv;
 #endif
 
 rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
 
 uint8_t rpl_max_routing_entries;
-ipv6_addr_t my_address;
+ipv6_legacy_addr_t my_address;
 
 /* IPv6 message buffer */
-ipv6_hdr_t *ipv6_buf;
+ipv6_legacy_hdr_t *ipv6_buf;
 icmpv6_hdr_t *icmp_buf;
 
 uint8_t rpl_init(int if_id)
@@ -96,14 +96,14 @@ uint8_t rpl_init(int if_id)
                                     PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                     rpl_process, NULL, "rpl_process");
 
-    sixlowpan_lowpan_init_interface(if_id);
+    sixlowpan_legacy_lowpan_init_interface(if_id);
     /* need link local prefix to query _our_ corresponding address  */
-    ipv6_addr_t ll_address;
-    ipv6_addr_set_link_local_prefix(&ll_address);
-    ipv6_net_if_get_best_src_addr(&my_address, &ll_address);
-    ipv6_register_rpl_handler(rpl_process_pid);
-    ipv6_iface_set_srh_indicator(rpl_is_root);
-    ipv6_iface_set_routing_provider(rpl_get_next_hop);
+    ipv6_legacy_addr_t ll_address;
+    ipv6_legacy_addr_set_link_local_prefix(&ll_address);
+    ipv6_legacy_net_if_get_best_src_addr(&my_address, &ll_address);
+    ipv6_legacy_register_rpl_handler(rpl_process_pid);
+    ipv6_legacy_iface_set_srh_indicator(rpl_is_root);
+    ipv6_legacy_iface_set_routing_provider(rpl_get_next_hop);
     DEBUGF("All addresses set!\n");
 
     /* initialize objective function manager */
@@ -165,7 +165,7 @@ void *rpl_process(void *arg)
         msg_receive(&m_recv);
 
         /* differentiate packet types */
-        ipv6_buf = ((ipv6_hdr_t *)m_recv.content.ptr);
+        ipv6_legacy_buf = ((ipv6_hdr_t *)m_recv.content.ptr);
         memcpy(&rpl_buffer, ipv6_buf, NTOHS(ipv6_buf->length) + IPV6_HDR_LEN);
 
         /* This is an RPL-related message. */
@@ -311,7 +311,7 @@ void rpl_recv_DAO_ACK(void)
     rpl_recv_dao_ack_mode();
 }
 
-ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr)
+ipv6_legacy_addr_t *rpl_get_next_hop(ipv6_addr_t *addr)
 {
 
     DEBUGF("Looking up the next hop to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
@@ -455,14 +455,14 @@ int ipv6_suffix_is_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
            (a->uint32[3] == b->uint32[3]);
 }
 
-ipv6_srh_t *rpl_get_srh_header(ipv6_hdr_t *act_ipv6_hdr)
+ipv6_legacy_srh_t *rpl_get_srh_header(ipv6_hdr_t *act_ipv6_hdr)
 {
     uint8_t route_length = RPL_MAX_SRH_PATH_LENGTH;
-    ipv6_addr_t rev_route[route_length];
-    ipv6_addr_t *actual_node;
+    ipv6_legacy_addr_t rev_route[route_length];
+    ipv6_legacy_addr_t *actual_node;
     uint8_t counter = 0;
     uint8_t traceable;
-    ipv6_srh_t *srh_header = (ipv6_srh_t *)(&srh_buffer);
+    ipv6_legacy_srh_t *srh_header = (ipv6_srh_t *)(&srh_buffer);
 
     /* init source route with child */
     actual_node = &(act_ipv6_hdr->destaddr);
@@ -526,7 +526,7 @@ ipv6_srh_t *rpl_get_srh_header(ipv6_hdr_t *act_ipv6_hdr)
 
 void rpl_remove_srh_header(ipv6_hdr_t *ipv6_header, const void *buf, uint8_t nextheader)
 {
-    ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&srh_send_buffer));
+    ipv6_legacy_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&srh_send_buffer));
     uint8_t *payload = &srh_send_buffer[IPV6_HDR_LEN];
     memcpy(temp_ipv6_header, ipv6_header, sizeof(ipv6_hdr_t));
     int msg_length = NTOHS(ipv6_header->length) - sizeof(ipv6_srh_t);
@@ -541,8 +541,8 @@ void rpl_remove_srh_header(ipv6_hdr_t *ipv6_header, const void *buf, uint8_t nex
 
 int rpl_srh_sendto(const void *buf, uint16_t len, ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_srh_t *srh_header, uint8_t srh_length)
 {
-    ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&srh_send_buffer));
-    ipv6_srh_t *current_packet = ((ipv6_srh_t *)(&srh_send_buffer[IPV6_HDR_LEN]));
+    ipv6_legacy_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&srh_send_buffer));
+    ipv6_legacy_srh_t *current_packet = ((ipv6_srh_t *)(&srh_send_buffer[IPV6_HDR_LEN]));
     uint8_t *payload = &srh_send_buffer[IPV6_HDR_LEN + srh_length];
     memcpy(&(temp_ipv6_header->destaddr), dest, sizeof(ipv6_addr_t));
     memcpy(&(temp_ipv6_header->srcaddr), src, sizeof(ipv6_addr_t));

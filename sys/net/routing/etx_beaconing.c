@@ -30,7 +30,7 @@
 #include "thread.h"
 #include "transceiver.h"
 
-#include "sixlowpan/ip.h"
+#include "sixlowpan_legacy/ip.h"
 #include "ieee802154_frame.h"
 #include "etx_beaconing.h"
 
@@ -199,7 +199,7 @@ static void *etx_beacon(void *arg)
         /* will be send broadcast, so if_id and destination address will be
          * ignored (see documentation)
          */
-        sixlowpan_mac_send_ieee802154_frame(0, NULL, 8, &etx_send_buf[0],
+        sixlowpan_legacy_mac_send_ieee802154_frame(0, NULL, 8, &etx_send_buf[0],
                                             ETX_DATA_MAXLEN + ETX_PKT_HDR_LEN, 1);
         DEBUG("sent beacon!\n");
         etx_set_packets_received();
@@ -403,11 +403,11 @@ static void *etx_radio(void *arg)
 
     msg_init_queue(msg_que, ETX_RCV_QUEUE_SIZE);
 
-    ipv6_addr_t ll_address;
-    ipv6_addr_t candidate_addr;
+    ipv6_legacy_addr_t ll_address;
+    ipv6_legacy_addr_t candidate_addr;
 
-    ipv6_addr_set_link_local_prefix(&ll_address);
-    ipv6_net_if_get_best_src_addr(&candidate_addr, &ll_address);
+    ipv6_legacy_addr_set_link_local_prefix(&ll_address);
+    ipv6_legacy_net_if_get_best_src_addr(&candidate_addr, &ll_address);
 
     while (1) {
         msg_receive(&m);

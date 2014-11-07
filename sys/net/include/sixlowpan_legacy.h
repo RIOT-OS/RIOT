@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    net_sixlowpan 6LoWPAN
+ * @defgroup    net_sixlowpan_legacy 6LoWPAN
  * @ingroup     net
  * @brief       6LoWPAN module implements (parts of) the 6LoWPAN adaption layer
  *              for IPv6 over Low Power Wireless Personal Area Networks
@@ -34,18 +34,18 @@
  *
  *
  * @{
- * @file        sixlowpan.h
+ * @file        sixlowpan_legacy.h
  * @brief       6lowpan link layer and lowpan functions
  *
  * @author      Martin Lenders <mlenders@inf.fu-berlin.de>
  */
-#ifndef SIXLOWPAN_H
-#define SIXLOWPAN_H
+#ifndef SIXLOWPAN_LEGACY_H
+#define SIXLOWPAN_LEGACY_H
 
-#include "sixlowpan/error.h"
-#include "sixlowpan/types.h"
-#include "sixlowpan/lowpan.h"
-#include "sixlowpan/mac.h"
+#include "sixlowpan_legacy/error.h"
+#include "sixlowpan_legacy/types.h"
+#include "sixlowpan_legacy/lowpan.h"
+#include "sixlowpan_legacy/mac.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,5 +55,5 @@ extern "C" {
 }
 #endif
 
-#endif /* SIXLOWPAN_H */
+#endif /* SIXLOWPAN_LEGACY_H */
 /** @} */

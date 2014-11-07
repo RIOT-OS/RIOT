@@ -7,13 +7,13 @@
  */
 
 /**
- * @addtogroup    net_sixlowpan_ndp Neighbor discovery
- * @ingroup     net_sixlowpan
+ * @addtogroup    net_sixlowpan_legacy_ndp Neighbor discovery
+ * @ingroup     net_sixlowpan_legacy
  * @brief       Internet Control Message Protocol version 6
  *
  * @{
  *
- * @file        include/sixlowpan/icmp.h
+ * @file        include/sixlowpan_legacy/icmp.h
  * @brief       6LoWPAN ICMP related header
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -22,13 +22,13 @@
  * @author      Oliver Gesch <oliver.gesch@googlemail.com>
  */
 
-#ifndef SIXLOWPAN_ICMP_H
-#define SIXLOWPAN_ICMP_H
+#ifndef SIXLOWPAN_LEGACY_ICMP_H
+#define SIXLOWPAN_LEGACY_ICMP_H
 
 #include <stddef.h>
 #include <stdint.h>
 
-#include "sixlowpan/types.h"
+#include "sixlowpan_legacy/types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -218,7 +218,7 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao,
  *                      *aro* == OPT_ARO add it, else not.
  */
 void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest,
-                              ipv6_addr_t *targ, uint8_t sllao,
+                              ipv6_legacy_addr_t *targ, uint8_t sllao,
                               uint8_t aro);
 
 /**
@@ -236,7 +236,7 @@ void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest,
  *                      *aro* == OPT_ARO add it, else not.
  */
 void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst,
-                              ipv6_addr_t *tgt, uint8_t rso,
+                              ipv6_legacy_addr_t *tgt, uint8_t rso,
                               uint8_t sllao, uint8_t aro);
 
 /**
@@ -255,5 +255,5 @@ uint16_t icmpv6_csum(ipv6_hdr_t *ipv6_buf, icmpv6_hdr_t *icmpv6_buf);
 }
 #endif
 
-#endif /* SIXLOWPAN_ICMP_H */
+#endif /* SIXLOWPAN_LEGACY_ICMP_H */
 /** @} */

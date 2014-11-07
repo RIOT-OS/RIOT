@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file    sixlowborder.c
  * @brief   constraint node implementation for a 6lowpan border router
@@ -28,7 +28,7 @@
 #include "board_uart0.h"
 
 #include "ieee802154_frame.h"
-#include "sixlowpan/error.h"
+#include "sixlowpan_legacy/error.h"
 #include "bordermultiplex.h"
 #include "flowcontrol.h"
 #include "border.h"
@@ -49,7 +49,7 @@ kernel_pid_t serial_reader_pid = KERNEL_PID_UNDEF;
 uint8_t serial_out_buf[BORDER_BUFFER_SIZE];
 uint8_t serial_in_buf[BORDER_BUFFER_SIZE];
 
-ipv6_addr_t *abr_addr;
+ipv6_legacy_addr_t *abr_addr;
 
 uint8_t *get_serial_out_buffer(int offset)
 {
@@ -123,9 +123,9 @@ void serial_reader_f(void)
     }
 }
 
-int sixlowpan_lowpan_border_init(int if_id)
+int sixlowpan_legacy_lowpan_border_init(int if_id)
 {
-    ipv6_net_if_addr_t *addr = NULL;
+    ipv6_legacy_net_if_addr_t *addr = NULL;
     uint8_t abr_addr_initialized = 0;
 
     serial_reader_pid = thread_create(
@@ -141,7 +141,7 @@ int sixlowpan_lowpan_border_init(int if_id)
         return 0;
     }
 
-    if (!sixlowpan_lowpan_init_interface(if_id)) {
+    if (!sixlowpan_legacy_lowpan_init_interface(if_id)) {
         return 0;
     }
 
@@ -157,12 +157,12 @@ int sixlowpan_lowpan_border_init(int if_id)
     }
 
     if (!abr_addr_initialized) {
-        DEBUG("sixlowpan_lowpan_border_init(): A prefix must be initialized to"
+        DEBUG("sixlowpan_legacy_lowpan_border_init(): A prefix must be initialized to"
               "interface %d first", if_id);
         return 0;
     }
 
-    ipv6_init_as_router();
+    ipv6_legacy_init_as_router();
 
     return 1;
 }
@@ -173,7 +173,7 @@ void border_process_lowpan(void)
 
     while (1) {
         msg_receive(&m);
-        ipv6_hdr_t *ipv6_buf = (ipv6_hdr_t *)m.content.ptr;
+        ipv6_legacy_hdr_t *ipv6_buf = (ipv6_hdr_t *)m.content.ptr;
 
         if (ipv6_buf->nextheader == IPV6_PROTO_NUM_ICMPV6) {
             icmpv6_hdr_t *icmp_buf = (icmpv6_hdr_t *)(((uint8_t *)ipv6_buf) + IPV6_HDR_LEN);

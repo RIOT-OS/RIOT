@@ -7,7 +7,7 @@
  */
 
 /**
- * @file        network_layer/sixlowpan/lowpan.h
+ * @file        network_layer/sixlowpan_legacy/lowpan.h
  * @brief       6lowpan header
  *
  * @author      Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
@@ -16,14 +16,14 @@
  * @author      Eric Engel <eric.engel@fu-berlin.de>
  */
 
-#ifndef _SIXLOWPAN_LOWPAN_H
-#define _SIXLOWPAN_LOWPAN_H
+#ifndef _SIXLOWPAN_LEGACY_LOWPAN_H
+#define _SIXLOWPAN_LEGACY_LOWPAN_H
 
 #include "mutex.h"
 #include "net_if.h"
 #include "vtimer.h"
 
-#include "sixlowpan/lowpan.h"
+#include "sixlowpan_legacy/lowpan.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +33,7 @@ extern "C" {
 
 typedef struct {
     uint8_t num;
-    ipv6_addr_t prefix;
+    ipv6_legacy_addr_t prefix;
     uint8_t length;
     uint8_t comp;
     uint16_t lifetime;
@@ -56,4 +56,4 @@ lowpan_context_t *lowpan_context_num_lookup(uint8_t num);
 }
 #endif
 
-#endif  /* _SIXLOWPAN_LOWPAN_H */
+#endif  /* _SIXLOWPAN_LEGACY_LOWPAN_H */

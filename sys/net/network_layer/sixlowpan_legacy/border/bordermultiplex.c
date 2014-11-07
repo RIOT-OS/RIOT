@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file    bordermultiplex.c
  * @brief   multiplexiing border router information
@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include "board_uart0.h"
-#include "sixlowpan/error.h"
+#include "sixlowpan_legacy/error.h"
 
 #include "flowcontrol.h"
 #include "lowpan.h"
@@ -47,8 +47,8 @@ void demultiplex(border_packet_t *packet)
 
             switch (l3_header_buf->ethertype) {
                 case (BORDER_ETHERTYPE_IPV6): {
-                    ipv6_hdr_t *ipv6_buf = (ipv6_hdr_t *)(((unsigned char *)packet) + sizeof(border_l3_header_t));
-                    ipv6_send_packet(ipv6_buf, NULL);
+                    ipv6_legacy_hdr_t *ipv6_buf = (ipv6_hdr_t *)(((unsigned char *)packet) + sizeof(border_l3_header_t));
+                    ipv6_legacy_send_packet(ipv6_buf, NULL);
                     break;
                 }
 
@@ -66,8 +66,8 @@ void demultiplex(border_packet_t *packet)
             switch (conf_header_buf->conftype) {
                 case (BORDER_CONF_CONTEXT): {
                     border_context_packet_t *context = (border_context_packet_t *)packet;
-                    ipv6_addr_t target_addr;
-                    ipv6_addr_set_all_nodes_addr(&target_addr);
+                    ipv6_legacy_addr_t target_addr;
+                    ipv6_legacy_addr_set_all_nodes_addr(&target_addr);
                     mutex_lock(&lowpan_context_mutex);
                     lowpan_context_update(
                         context->context.cid,

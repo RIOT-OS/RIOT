@@ -7,7 +7,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sixlowpan
+ * @ingroup sixlowpan_legacy
  * @{
  * @file    bordermultiplex.h
  * @brief   data structs for border router multiplexing
@@ -16,8 +16,8 @@
  * @}
  */
 
-#ifndef _SIXLOWPAN_BORDERMULTIPLEX_H
-#define _SIXLOWPAN_BORDERMULTIPLEX_H
+#ifndef _SIXLOWPAN_LEGACY_BORDERMULTIPLEX_H
+#define _SIXLOWPAN_LEGACY_BORDERMULTIPLEX_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -66,7 +66,7 @@ typedef struct __attribute__((packed)) {
     uint8_t seq_num;
     uint8_t conftype;
     uint16_t version;
-    ipv6_addr_t addr;
+    ipv6_legacy_addr_t addr;
 } border_addr_packet_t;
 
 typedef struct __attribute__((packed)) {
@@ -77,7 +77,7 @@ typedef struct __attribute__((packed)) {
     struct border_context_t {
         uint16_t version;
         uint8_t cid;
-        ipv6_addr_t prefix;
+        ipv6_legacy_addr_t prefix;
         uint8_t length;
         uint8_t comp;
         uint16_t lifetime;
@@ -97,4 +97,4 @@ int writepacket(uint8_t *packet_buf, size_t size);
 }
 #endif
 
-#endif /* _SIXLOWPAN_BORDERMULTIPLEX_H*/
+#endif /* _SIXLOWPAN_LEGACY_BORDERMULTIPLEX_H*/

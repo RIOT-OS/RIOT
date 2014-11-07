@@ -35,11 +35,11 @@ endif
 ifneq (,$(filter protocol_multiplex,$(USEMODULE)))
     DIRS += net/link_layer/protocol-multiplex
 endif
-ifneq (,$(filter sixlowpan,$(USEMODULE)))
-    DIRS += net/network_layer/sixlowpan
+ifneq (,$(filter sixlowpan_legacy,$(USEMODULE)))
+    DIRS += net/network_layer/sixlowpan_legacy
 endif
 ifneq (,$(filter sixlowborder,$(USEMODULE)))
-    DIRS += net/network_layer/sixlowpan/border
+    DIRS += net/network_layer/sixlowpan_legacy/border
 endif
 ifneq (,$(filter rpl,$(USEMODULE)))
     DIRS += net/routing/rpl

@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sixlowpan.h"
+#include "sixlowpan_legacy.h"
 #include "thread.h"
 #include "vtimer.h"
 
@@ -134,10 +134,10 @@ void print_tcp_status(int in_or_out, ipv6_hdr_t *ipv6_header,
     printf("--- %s TCP packet: ---\n",
            (in_or_out == INC_PACKET ? "Incoming" : "Outgoing"));
     printf("IPv6 Source: %s\n",
-           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+           ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_header->srcaddr));
     printf("IPv6 Dest: %s\n",
-           ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+           ipv6_legacy_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_header->destaddr));
     printf("TCP Length: %x\n", NTOHS(ipv6_header->length) - TCP_HDR_LEN);
     printf("Source Port: %x, Dest. Port: %x\n",
@@ -239,7 +239,7 @@ void set_tcp_packet(tcp_hdr_t *tcp_hdr, uint16_t src_port, uint16_t dst_port,
 }
 
 int send_tcp(socket_internal_t *current_socket, tcp_hdr_t *current_tcp_packet,
-             ipv6_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length)
+             ipv6_legacy_hdr_t *temp_ipv6_header, uint8_t flags, uint8_t payload_length)
 {
     socket_t *current_tcp_socket = &current_socket->socket_values;
     uint8_t header_length = TCP_HDR_LEN / 4;
@@ -300,13 +300,13 @@ bool is_four_touple(socket_internal_t *current_socket, ipv6_hdr_t *ipv6_header,
     return (ipv6_addr_is_equal(&current_socket->socket_values.local_address.sin6_addr,
                                &ipv6_header->destaddr) &&
             (current_socket->socket_values.local_address.sin6_port == tcp_header->dst_port) &&
-            ipv6_addr_is_equal(&current_socket->socket_values.foreign_address.sin6_addr,
+            ipv6_legacy_addr_is_equal(&current_socket->socket_values.foreign_address.sin6_addr,
                                &ipv6_header->srcaddr) &&
             (current_socket->socket_values.foreign_address.sin6_port == tcp_header->src_port));
 }
 
 socket_internal_t *get_waiting_connection_socket(int socket,
-        ipv6_hdr_t *ipv6_header,
+        ipv6_legacy_hdr_t *ipv6_header,
         tcp_hdr_t *tcp_header)
 {
     int i;
@@ -404,7 +404,7 @@ socket_internal_t *get_tcp_socket(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header
                  ((current_socket->socket_values.tcp_control.state == TCP_LISTEN) ||
                   (current_socket->socket_values.tcp_control.state == TCP_SYN_RCVD)) &&
                  (current_socket->socket_values.local_address.sin6_addr.uint8[15] ==
-                  ipv6_header->destaddr.uint8[15]) &&
+                  ipv6_legacy_header->destaddr.uint8[15]) &&
                  (current_socket->socket_values.local_address.sin6_port ==
                   tcp_header->dst_port) &&
                  (current_socket->socket_values.foreign_address.sin6_addr.uint8[15] ==
@@ -553,7 +553,7 @@ void handle_tcp_fin_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
     msg_t m_send;
     socket_t *current_tcp_socket = &tcp_socket->socket_values;
     uint8_t send_buffer[BUFFER_SIZE];
-    ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
+    ipv6_legacy_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
     set_tcp_cb(&current_tcp_socket->tcp_control, tcp_header->seq_nr + 1,
@@ -586,7 +586,7 @@ void handle_tcp_fin_ack_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
     msg_t m_send;
     socket_t *current_tcp_socket = &tcp_socket->socket_values;
     uint8_t send_buffer[BUFFER_SIZE];
-    ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
+    ipv6_legacy_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
     current_tcp_socket->tcp_control.state = TCP_CLOSED;
@@ -610,7 +610,7 @@ void handle_tcp_no_flags_packet(ipv6_hdr_t *ipv6_header, tcp_hdr_t *tcp_header,
 {
     socket_t *current_tcp_socket = &tcp_socket->socket_values;
     uint8_t send_buffer[BUFFER_SIZE];
-    ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
+    ipv6_legacy_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
     if (check_tcp_consistency(current_tcp_socket, tcp_header, tcp_payload_len) == PACKET_OK) {
@@ -653,7 +653,7 @@ void *tcp_packet_handler(void *arg)
     while (1) {
         msg_receive(&m_recv_ip);
 
-        ipv6_hdr_t *ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
+        ipv6_legacy_hdr_t *ipv6_header = ((ipv6_hdr_t *)m_recv_ip.content.ptr);
         tcp_hdr_t *tcp_header = ((tcp_hdr_t *)(m_recv_ip.content.ptr + IPV6_HDR_LEN));
 #ifdef TCP_HC
         tcp_socket = decompress_tcp_packet(ipv6_header);
@@ -825,7 +825,7 @@ int handle_new_tcp_connection(socket_internal_t *current_queued_int_socket,
     msg_t msg_recv_client_ack, msg_send_client_ack;
     socket_t *current_queued_socket = &current_queued_int_socket->socket_values;
     uint8_t send_buffer[BUFFER_SIZE];
-    ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
+    ipv6_legacy_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *syn_ack_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
     current_queued_int_socket->recv_pid = thread_getpid();
@@ -916,7 +916,7 @@ int32_t tcp_send(int s, const void *buf, uint32_t len, int flags)
     socket_t *current_tcp_socket;
     uint8_t send_buffer[BUFFER_SIZE];
     memset(send_buffer, 0, BUFFER_SIZE);
-    ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
+    ipv6_legacy_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
     /* Check if socket exists and is TCP socket */
@@ -1118,12 +1118,12 @@ int tcp_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     (void) addrlen;
 
     /* Variables */
-    ipv6_addr_t src_addr;
+    ipv6_legacy_addr_t src_addr;
     socket_internal_t *current_int_tcp_socket;
     socket_t *current_tcp_socket;
     msg_t msg_from_server;
     uint8_t send_buffer[BUFFER_SIZE];
-    ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
+    ipv6_legacy_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
     /* Check if socket exists */
@@ -1138,7 +1138,7 @@ int tcp_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
     current_int_tcp_socket->recv_pid = thread_getpid();
 
     /* Local address information */
-    ipv6_net_if_get_best_src_addr(&src_addr, &addr->sin6_addr);
+    ipv6_legacy_net_if_get_best_src_addr(&src_addr, &addr->sin6_addr);
     set_socket_address(&current_tcp_socket->local_address, PF_INET6,
                        HTONS(socket_base_get_free_source_port(IPPROTO_TCP)), 0, &src_addr);
 
@@ -1367,7 +1367,7 @@ int tcp_teardown(socket_internal_t *current_socket)
     /* Variables */
     msg_t m_recv;
     uint8_t send_buffer[BUFFER_SIZE];
-    ipv6_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
+    ipv6_legacy_hdr_t *temp_ipv6_header = ((ipv6_hdr_t *)(&send_buffer));
     tcp_hdr_t *current_tcp_packet = ((tcp_hdr_t *)(&send_buffer[IPV6_HDR_LEN]));
 
     /* Check for TCP_ESTABLISHED STATE */
@@ -1411,7 +1411,7 @@ int tcp_init_transport_layer(void)
         return -1;
     }
 
-    ipv6_register_next_header_handler(IPV6_PROTO_NUM_TCP, tcp_thread_pid);
+    ipv6_legacy_register_next_header_handler(IPV6_PROTO_NUM_TCP, tcp_thread_pid);
 
     if (thread_create(tcp_timer_stack, TCP_TIMER_STACKSIZE, PRIORITY_MAIN + 1,
                       CREATE_STACKTEST, tcp_general_timer, NULL, "tcp_general_timer") < 0) {

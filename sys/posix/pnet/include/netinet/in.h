@@ -49,7 +49,7 @@ struct in6_addr {
     /**
      * Private RIOT-internal data, needs not to be touched by the user.
      */
-    ipv6_addr_t     __in6_u;
+    ipv6_legacy_addr_t     __in6_u;
 
     /**
      * IPv6 Address represented as sequence of 8-bit numbers. Member of
