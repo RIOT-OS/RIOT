@@ -19,7 +19,7 @@
 
 #include "tests-basic_mac.h"
 
-#define UNITTEST_DONE                   (RAND_UINT16)
+#define UNITTEST_DONE                   (TEST_UINT16)
 #define UNITTESTS_BASIC_MAC_NAME        "unittests_basic_mac"
 #define UNITTESTS_BASIC_MAC_STACKSIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
 
@@ -38,8 +38,8 @@ static size_t received_data_len = 0, received_src_len = 0, received_dst_len = 0;
 
 #define SET_OPTION_NUMBER   (3)
 #define GET_OPTION_NUMBER   (7)
-#define RANDOM_SET_OPTION   ((RAND_UINT8 % SET_OPTION_NUMBER) + 1)
-#define RANDOM_GET_OPTION   (RAND_UINT8 % SET_OPTION_NUMBER)
+#define RANDOM_SET_OPTION   ((TEST_UINT8 % SET_OPTION_NUMBER) + 1)
+#define RANDOM_GET_OPTION   (TEST_UINT8 % SET_OPTION_NUMBER)
 
 static void _reset_received(void)
 {
@@ -141,27 +141,27 @@ static void test_basic_mac_thread(void)
  *********************************************/
 static void test_basic_mac_send_data_dest_too_long(void)
 {
-    char dest[] = RAND_STRING8;
-    char data[] = RAND_STRING64;
+    char dest[] = TEST_STRING8;
+    char data[] = TEST_STRING64;
     TEST_ASSERT_EQUAL_INT(-EAFNOSUPPORT, netapi_send_data(basic_mac_pid, dest,
-                          UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN + RAND_UINT8,
+                          UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN + TEST_UINT8,
                           data, 1));
 }
 
 static void test_basic_mac_send_data_data_too_long(void)
 {
-    char dest[] = RAND_STRING8;
-    char data[] = RAND_STRING64;
+    char dest[] = TEST_STRING8;
+    char data[] = TEST_STRING64;
     TEST_ASSERT_EQUAL_INT(-EMSGSIZE, netapi_send_data(basic_mac_pid, dest,
                           UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN, data,
-                          UNITTESTS_NETDEV_DUMMY_MAX_PACKET + RAND_UINT8));
+                          UNITTESTS_NETDEV_DUMMY_MAX_PACKET + TEST_UINT8));
 }
 
 static void test_basic_mac_send_data_send(void)
 {
-    char dest[] = RAND_STRING64;
+    char dest[] = TEST_STRING64;
     size_t dest_len = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN;
-    char data[] = RAND_STRING8;
+    char data[] = TEST_STRING8;
 #if UNITTESTS_NETDEV_DUMMY_MAX_PACKET < 8
     size_t data_len = UNITTESTS_NETDEV_DUMMY_MAX_PACKET;
 #else
@@ -176,11 +176,11 @@ static void test_basic_mac_send_data_send(void)
 #if UNITTESTS_NETDEV_DUMMY_MAX_PACKET > 4
 static void test_basic_mac_send_data_send2(void)
 {
-    netdev_hlist_t hlist_node = {NULL, NULL, RAND_STRING8, 4};
+    netdev_hlist_t hlist_node = {NULL, NULL, TEST_STRING8, 4};
     netdev_hlist_t *hlist = NULL;
-    char dest[] = RAND_STRING64;
+    char dest[] = TEST_STRING64;
     size_t dest_len = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN;
-    char data[] = RAND_STRING16;
+    char data[] = TEST_STRING16;
 #if UNITTESTS_NETDEV_DUMMY_MAX_PACKET < 12
     size_t data_len = UNITTESTS_NETDEV_DUMMY_MAX_PACKET - 4;
     char expected[UNITTESTS_NETDEV_DUMMY_MAX_PACKET];
@@ -189,8 +189,8 @@ static void test_basic_mac_send_data_send2(void)
     char expected[12];
 #endif
 
-    memcpy(expected, RAND_STRING8, 4);
-    memcpy(&(expected[4]), RAND_STRING16, data_len);
+    memcpy(expected, TEST_STRING8, 4);
+    memcpy(&(expected[4]), TEST_STRING16, data_len);
 
     clist_add((clist_node_t **)&hlist, (clist_node_t *)&hlist_node);
     TEST_ASSERT_EQUAL_INT((int)sizeof(expected), netapi_send_data2(basic_mac_pid,
@@ -216,11 +216,11 @@ static void test_basic_mac_reg_buffer_full(void)
 static void test_basic_mac_register(void)
 {
     msg_t done;
-    char src[] = RAND_STRING64;
+    char src[] = TEST_STRING64;
     size_t src_len = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN;
-    char dest[] = RAND_STRING64;
+    char dest[] = TEST_STRING64;
     size_t dest_len = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN;
-    char data[] = RAND_STRING8;
+    char data[] = TEST_STRING8;
 #if UNITTESTS_NETDEV_DUMMY_MAX_PACKET < 8
     size_t data_len = UNITTESTS_NETDEV_DUMMY_MAX_PACKET;
 #else
@@ -258,26 +258,26 @@ static void test_basic_mac_get_option_null_data(void)
 
 static void test_basic_mac_get_option_overflow(void)
 {
-    unsigned int value = RAND_UINT32;
+    unsigned int value = TEST_UINT32;
 
     TEST_ASSERT_EQUAL_INT(-EOVERFLOW, netapi_get_option(basic_mac_pid,
                           RANDOM_GET_OPTION, &value, 0));
-    TEST_ASSERT_EQUAL_INT(RAND_UINT32, value);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT32, value);
 }
 
 static void test_basic_mac_get_option_not_supported(void)
 {
-    unsigned int value = RAND_UINT32;
+    unsigned int value = TEST_UINT32;
     size_t value_len = sizeof(unsigned int);
     TEST_ASSERT_EQUAL_INT(-ENOTSUP, netapi_get_option(basic_mac_pid,
                           (netapi_conf_type_t)UINT32_MAX, &value,
                           value_len));
-    TEST_ASSERT_EQUAL_INT(RAND_UINT32, value);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT32, value);
 }
 
 static void test_basic_mac_get_option_get_protocol(void)
 {
-    netdev_proto_t value = RAND_UINT8 % 9;
+    netdev_proto_t value = TEST_UINT8 % 9;
     TEST_ASSERT_EQUAL_INT(sizeof(netdev_proto_t),
                           netapi_get_option(basic_mac_pid,
                                             BASIC_MAC_PROTO, &value,
@@ -287,7 +287,7 @@ static void test_basic_mac_get_option_get_protocol(void)
 
 static void test_basic_mac_get_option_get_channel(void)
 {
-    unsigned int value = RAND_UINT32;
+    unsigned int value = TEST_UINT32;
     TEST_ASSERT_EQUAL_INT(sizeof(unsigned int),
                           netapi_get_option(basic_mac_pid,
                                             BASIC_MAC_CHANNEL, &value,
@@ -297,7 +297,7 @@ static void test_basic_mac_get_option_get_channel(void)
 
 static void test_basic_mac_get_option_get_nid(void)
 {
-    unsigned int value = RAND_UINT32;
+    unsigned int value = TEST_UINT32;
     TEST_ASSERT_EQUAL_INT(sizeof(unsigned int),
                           netapi_get_option(basic_mac_pid,
                                             BASIC_MAC_NID, &value,
@@ -345,37 +345,37 @@ static void test_basic_mac_set_option_null_data(void)
 
 static void test_basic_mac_set_option_inval(void)
 {
-    unsigned int value = RAND_UINT32;
+    unsigned int value = TEST_UINT32;
     size_t value_len = 0;
 
     TEST_ASSERT_EQUAL_INT(-EINVAL, netapi_set_option(basic_mac_pid,
                           RANDOM_SET_OPTION, &value, value_len));
-    TEST_ASSERT_EQUAL_INT(RAND_UINT32, value);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT32, value);
 }
 
 static void test_basic_mac_set_option_overflow(void)
 {
-    unsigned int value = RAND_UINT32;
-    size_t value_len = UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN + RAND_UINT16;
+    unsigned int value = TEST_UINT32;
+    size_t value_len = UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN + TEST_UINT16;
 
     TEST_ASSERT_EQUAL_INT(-EOVERFLOW, netapi_set_option(basic_mac_pid,
                           RANDOM_SET_OPTION, &value, value_len));
-    TEST_ASSERT_EQUAL_INT(RAND_UINT32, value);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT32, value);
 }
 
 static void test_basic_mac_set_option_not_supported(void)
 {
-    unsigned int value = RAND_UINT32;
+    unsigned int value = TEST_UINT32;
     size_t value_len = sizeof(unsigned int);
     TEST_ASSERT_EQUAL_INT(-ENOTSUP, netapi_set_option(basic_mac_pid,
                           (netapi_conf_type_t)UINT32_MAX, &value,
                           value_len));
-    TEST_ASSERT_EQUAL_INT(RAND_UINT32, value);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT32, value);
 }
 
 static void test_basic_mac_set_get_channel(void)
 {
-    unsigned int value = RAND_UINT32;
+    unsigned int value = TEST_UINT32;
     size_t value_len = sizeof(unsigned int);
     TEST_ASSERT_EQUAL_INT(0, netapi_set_option(basic_mac_pid,
                           BASIC_MAC_CHANNEL, &value, value_len));
@@ -383,7 +383,7 @@ static void test_basic_mac_set_get_channel(void)
     TEST_ASSERT_EQUAL_INT(sizeof(unsigned int),
                           netapi_get_option(basic_mac_pid, BASIC_MAC_CHANNEL,
                                             &value, value_len));
-    TEST_ASSERT_EQUAL_INT(RAND_UINT32, value);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT32, value);
     TEST_ASSERT_EQUAL_INT(sizeof(unsigned int), value_len);
 }
 
@@ -392,9 +392,9 @@ static void test_basic_mac_set_get_address(void)
     char value[UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN];
     size_t value_len = UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN;
 #if UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN < 12
-    strncpy(value, RAND_STRING12, UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN);
+    strncpy(value, TEST_STRING12, UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN);
 #else
-    strncpy(value, RAND_STRING12, 12);
+    strncpy(value, TEST_STRING12, 12);
 #endif
     TEST_ASSERT_EQUAL_INT(0, netapi_set_option(basic_mac_pid,
                           BASIC_MAC_ADDRESS, value,
@@ -409,16 +409,16 @@ static void test_basic_mac_set_get_address(void)
                                             BASIC_MAC_ADDRESS, value,
                                             value_len));
 #if UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN < 12
-    TEST_ASSERT(strncmp(value, RAND_STRING12,
+    TEST_ASSERT(strncmp(value, TEST_STRING12,
                         UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN) == 0);
 #else
-    TEST_ASSERT(strncmp(value, RAND_STRING12, 12) == 0);
+    TEST_ASSERT(strncmp(value, TEST_STRING12, 12) == 0);
 #endif
 }
 
 static void test_basic_mac_set_get_nid(void)
 {
-    unsigned int value = RAND_UINT32;
+    unsigned int value = TEST_UINT32;
     size_t value_len = sizeof(unsigned int);
     TEST_ASSERT_EQUAL_INT(0, netapi_set_option(basic_mac_pid,
                           BASIC_MAC_NID, &value, value_len));
@@ -426,7 +426,7 @@ static void test_basic_mac_set_get_nid(void)
     TEST_ASSERT_EQUAL_INT(sizeof(unsigned int),
                           netapi_get_option(basic_mac_pid, BASIC_MAC_NID,
                                             &value, value_len));
-    TEST_ASSERT_EQUAL_INT(RAND_UINT32, value);
+    TEST_ASSERT_EQUAL_INT(TEST_UINT32, value);
     TEST_ASSERT_EQUAL_INT(sizeof(unsigned int), value_len);
 }
 
@@ -435,9 +435,9 @@ static void test_basic_mac_set_get_long_address(void)
     char value[UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN];
     size_t value_len = UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN;
 #if UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN < 12
-    strncpy(value, RAND_STRING12, UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN);
+    strncpy(value, TEST_STRING12, UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN);
 #else
-    strncpy(value, RAND_STRING12, 12);
+    strncpy(value, TEST_STRING12, 12);
 #endif
     TEST_ASSERT_EQUAL_INT(0, netapi_set_option(basic_mac_pid,
                           BASIC_MAC_ADDRESS2, value,
@@ -452,10 +452,10 @@ static void test_basic_mac_set_get_long_address(void)
                                             BASIC_MAC_ADDRESS2, value,
                                             value_len));
 #if UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN < 12
-    TEST_ASSERT(strncmp(value, RAND_STRING12,
+    TEST_ASSERT(strncmp(value, TEST_STRING12,
                         UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN) == 0);
 #else
-    TEST_ASSERT(strncmp(value, RAND_STRING12, 12) == 0);
+    TEST_ASSERT(strncmp(value, TEST_STRING12, 12) == 0);
 #endif
     TEST_ASSERT_EQUAL_INT(UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN, value_len);
 }
@@ -467,10 +467,10 @@ static void test_basic_mac_event_value(void)
 {
     msg_t m;
     m.type = NETDEV_MSG_EVENT_TYPE;
-    m.content.value = RAND_UINT32;
+    m.content.value = TEST_UINT32;
     msg_send(&m, basic_mac_pid);
     vtimer_usleep(1000);
-    TEST_ASSERT_EQUAL_INT(RAND_UINT32, unittest_netdev_dummy_get_last_event(dev));
+    TEST_ASSERT_EQUAL_INT(TEST_UINT32, unittest_netdev_dummy_get_last_event(dev));
 }
 
 Test *tests_basic_mac_tests(void)
