@@ -658,7 +658,9 @@ void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix,
     }
 
     memcpy(out, prefix, bytes);
-    out->uint8[bytes] = prefix->uint8[bytes] & mask;
+    if (bytes < 16) {
+        out->uint8[bytes] = prefix->uint8[bytes] & mask;
+    }
     memset(&(out[bytes + 1]), 0, 15 - bytes);
 }
 
