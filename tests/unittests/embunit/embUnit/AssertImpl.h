@@ -41,29 +41,59 @@ extern "C" {
 
 void addFailure(const char *msg, long line, const char *file);  /*TestCase.c*/
 
-void assertImplementationInt(int expected,int actual, long line, const char *file);
+void assertImplementationLongLong(long long expected,long long actual, long line, const char *file);
 void assertImplementationCStr(const char *expected,const char *actual, long line, const char *file);
 
-#define TEST_ASSERT_EQUAL_STRING(expected,actual)\
-    if (expected && actual && (stdimpl_strcmp(expected,actual)==0)) {} else {assertImplementationCStr(expected,actual,__LINE__,__FILE__);return;}
+#define TEST_ASSERT_EQUAL_STRING(expected_, actual_) \
+    do { \
+        __typeof__(expected_) ____expected__ = expected_; \
+        __typeof__(actual_) ____actual__ = actual_; \
+        if (stdimpl_strcmp(____expected__, ____actual__) != 0) { \
+            assertImplementationCStr(____expected__, ____actual__, __LINE__, __FILE__); \
+            return; \
+        } \
+    } while (0)
 
-#define TEST_ASSERT_EQUAL_INT(expected,actual)\
-    if (expected == actual) {} else {assertImplementationInt(expected,actual,__LINE__,__FILE__);return;}
+#define TEST_ASSERT_EQUAL_INT(expected_, actual_) \
+    do { \
+        long long ____expected__ = (long long) (expected_); \
+        long long ____actual__ = (long long) (actual_); \
+        if (____expected__ != ____actual__) { \
+            assertImplementationLongLong(____expected__, ____actual__, __LINE__, __FILE__); \
+            return; \
+        } \
+    } while (0)
 
-#define TEST_ASSERT_NULL(pointer)\
-    TEST_ASSERT_MESSAGE(pointer == NULL,#pointer " was not null.")
+#define TEST_ASSERT_NULL(pointer_) \
+    do { \
+        __typeof__(pointer_) ____pointer__ = (pointer_); \
+        TEST_ASSERT_MESSAGE(____pointer__ == NULL, #pointer_ " was not null."); \
+    } while (0)
 
-#define TEST_ASSERT_NOT_NULL(pointer)\
-    TEST_ASSERT_MESSAGE(pointer != NULL,#pointer " was null.")
+#define TEST_ASSERT_NOT_NULL(pointer_) \
+    do { \
+        __typeof__(pointer_) ____pointer__ = (pointer_); \
+        TEST_ASSERT_MESSAGE(____pointer__ != NULL, #pointer_ " was null."); \
+    } while (0)
 
-#define TEST_ASSERT_MESSAGE(condition, message)\
-    if (condition) {} else {TEST_FAIL(message);}
+#define TEST_ASSERT_MESSAGE(condition_, message) \
+    do { \
+        __typeof__(condition_) ____condition__ = (condition_); \
+        if (!____condition__) { \
+            TEST_FAIL((message)); \
+        } \
+    } while (0)
 
-#define TEST_ASSERT(condition)\
-    if (condition) {} else {TEST_FAIL(#condition);}
+#define TEST_ASSERT(condition) \
+    do { \
+        TEST_ASSERT_MESSAGE((condition), #condition); \
+    } while (0)
 
-#define TEST_FAIL(message)\
-    if (0) {} else {addFailure(message,__LINE__,__FILE__);return;}
+#define TEST_FAIL(message) \
+    do { \
+        addFailure((message), __LINE__, __FILE__); \
+        return; \
+    } while (0)
 
 #ifdef  __cplusplus
 }
