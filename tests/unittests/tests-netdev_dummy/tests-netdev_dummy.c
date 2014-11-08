@@ -566,9 +566,9 @@ static void test_netdev_dummy_set_get_address(void)
                           value, &value_len));
 #if UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN < 12
     TEST_ASSERT(strncmp(value, TEST_STRING12,
-                        UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN) == 0)
+                        UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN) == 0);
 #else
-    TEST_ASSERT(strncmp(value, TEST_STRING12, 12) == 0)
+    TEST_ASSERT(strncmp(value, TEST_STRING12, 12) == 0);
 #endif
 }
 
@@ -606,9 +606,9 @@ static void test_netdev_dummy_set_get_long_address(void)
                           NETDEV_OPT_ADDRESS_LONG, value, &value_len));
 #if UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN < 12
     TEST_ASSERT(strncmp(value, TEST_STRING12,
-                        UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN) == 0)
+                        UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN) == 0);
 #else
-    TEST_ASSERT(strncmp(value, TEST_STRING12, 12) == 0)
+    TEST_ASSERT(strncmp(value, TEST_STRING12, 12) == 0);
 #endif
     TEST_ASSERT_EQUAL_INT(UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN, value_len);
 }
