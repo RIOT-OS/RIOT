@@ -410,9 +410,9 @@ static void test_basic_mac_set_get_address(void)
                                             value_len));
 #if UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN < 12
     TEST_ASSERT(strncmp(value, RAND_STRING12,
-                        UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN) == 0)
+                        UNITTESTS_NETDEV_DUMMY_MAX_ADDR_LEN) == 0);
 #else
-    TEST_ASSERT(strncmp(value, RAND_STRING12, 12) == 0)
+    TEST_ASSERT(strncmp(value, RAND_STRING12, 12) == 0);
 #endif
 }
 
@@ -453,9 +453,9 @@ static void test_basic_mac_set_get_long_address(void)
                                             value_len));
 #if UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN < 12
     TEST_ASSERT(strncmp(value, RAND_STRING12,
-                        UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN) == 0)
+                        UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN) == 0);
 #else
-    TEST_ASSERT(strncmp(value, RAND_STRING12, 12) == 0)
+    TEST_ASSERT(strncmp(value, RAND_STRING12, 12) == 0);
 #endif
     TEST_ASSERT_EQUAL_INT(UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN, value_len);
 }
