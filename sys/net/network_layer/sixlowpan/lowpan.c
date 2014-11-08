@@ -486,6 +486,7 @@ lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size,
             return new_buf;
         }
         else {
+            free(new_buf);
             return NULL;
         }
     }
