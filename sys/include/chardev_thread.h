@@ -18,7 +18,15 @@
 
 #include "ringbuffer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void chardev_loop(ringbuffer_t *rb);
 void *chardev_thread_entry(void *rb_);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __CHARDEV_THREAD_H */

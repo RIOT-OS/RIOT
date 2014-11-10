@@ -54,6 +54,10 @@
 
 #include "ccnl.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // ----------------------------------------------------------------------
 
 typedef union {
@@ -289,6 +293,10 @@ void free_3ptr_list(void *a, void *b, void *c);
 void free_4ptr_list(void *a, void *b, void *c, void *d);
 void free_prefix(struct ccnl_prefix_s *p);
 void free_content(struct ccnl_content_s *c);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /*CCNL_CORE_H__*/
 // eof

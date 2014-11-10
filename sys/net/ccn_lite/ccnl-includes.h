@@ -28,10 +28,18 @@
 
 #include "crypto/sha256.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define RIOT_MSG_DEV    (1)
 #define RIOT_TRANS_DEV  (2)
 
 #define RIOT_MSG_IDX (0)
 #define RIOT_TRANS_IDX (1)
+
+#ifdef __cplusplus
+}
+#endif
 
 // eof

@@ -15,6 +15,10 @@
 #include <errno.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief     A fair reader writer lock.
  * @details   The implementation ensures that readers and writers of the same priority
@@ -160,6 +164,10 @@ bool __pthread_rwlock_blocked_readingly(const pthread_rwlock_t *rwlock);
  * @returns          `false` if locking for writing is possible without blocking.
  */
 bool __pthread_rwlock_blocked_writingly(const pthread_rwlock_t *rwlock);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

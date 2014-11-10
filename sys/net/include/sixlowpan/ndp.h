@@ -30,6 +30,10 @@
 #include "timex.h"
 #include "sixlowpan/types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define NDP_6LOWPAN_CONTEXT_MAX         (16)
 
 #define NDP_OPT_SLLAO_TYPE                  (1)
@@ -226,6 +230,10 @@ ndp_prefix_info_t *ndp_prefix_info_match(int if_id, const ipv6_addr_t *prefix,
         uint8_t prefix_len);
 ndp_a6br_cache_t *ndp_a6br_cache_get_most_current(void);
 ndp_a6br_cache_t *ndp_a6br_cache_get_oldest(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* SIXLOWPAN_NDP_H */

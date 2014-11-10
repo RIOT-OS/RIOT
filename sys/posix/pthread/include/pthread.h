@@ -32,6 +32,14 @@
 #include "pthread_cancellation.h"
 #include "pthread_cond.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 
 /**

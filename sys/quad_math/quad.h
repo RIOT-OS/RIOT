@@ -53,6 +53,11 @@
 #include <limits.h>
 
 #include <machine/endian.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef char ___QUAD_ASSERT__LENGHTS[sizeof (long long) == 2*sizeof (int) ? +1 : -1];
 typedef char ___QUAD_ASSERT__2COMPLEMENT[-1234 == (~1234 + 1) ? +1 : -1];
 
@@ -138,3 +143,7 @@ int __ucmpdi2(u_quad_t, u_quad_t);
 u_quad_t __udivdi3(u_quad_t, u_quad_t );
 u_quad_t __umoddi3(u_quad_t, u_quad_t );
 quad_t __xordi3(quad_t, quad_t);
+
+#ifdef __cplusplus
+}
+#endif

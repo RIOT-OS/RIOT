@@ -18,6 +18,10 @@
 #define SOCKET_BASE_TYPES_H_
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * UDP packet header length
  */
@@ -68,6 +72,10 @@ typedef struct __attribute__((packed)) {
     uint16_t    checksum;
     uint16_t    urg_pointer;            ///< urgent pointer
 } tcp_hdr_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @}

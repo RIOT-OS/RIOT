@@ -9,6 +9,10 @@
 #ifndef __SYS__POSIX__PTHREAD_THREADING_ATTR__H
 #define __SYS__POSIX__PTHREAD_THREADING_ATTR__H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief     An attribute set to supply to pthread_create()
  * @details   A zeroed out datum is default initiliazed.
@@ -188,6 +192,10 @@ int pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize);
  * @return          0, this invocation cannot fail.
  */
 int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

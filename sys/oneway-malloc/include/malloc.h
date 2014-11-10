@@ -28,6 +28,10 @@
 
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief       Allocation a block of memory.
  * @param[in]   size   Size of the block to allocate in bytes.
@@ -64,6 +68,10 @@ void *calloc(int size, size_t cnt);
  * @param[in]   ptr   The ignored argument.
  */
 void free(void *ptr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __MALLOC_H */
 

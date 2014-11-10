@@ -33,6 +33,10 @@
 #include "sixlowpan/ip.h"
 #include "sixlowpan/types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* IPv6 field values */
 #define IPV6_VER                    (0x60)
 /* size of global buffer */
@@ -98,5 +102,9 @@ ipv6_net_if_hit_t *ipv6_net_if_addr_prefix_eq(ipv6_net_if_hit_t *hit, ipv6_addr_
 ipv6_net_if_hit_t *ipv6_net_if_addr_match(ipv6_net_if_hit_t *hit, const ipv6_addr_t *addr);
 uint32_t get_remaining_time(timex_t *t);
 void set_remaining_time(timex_t *t, uint32_t time);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SIXLOWPAN_IP_H*/

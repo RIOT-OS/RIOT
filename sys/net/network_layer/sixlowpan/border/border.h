@@ -29,6 +29,10 @@
 #include "ip.h"
 #include "semaphore.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern ipv6_addr_t *abr_addr;
 
 kernel_pid_t border_get_serial_reader(void);
@@ -37,5 +41,9 @@ uint8_t *get_serial_out_buffer(int offset);
 uint8_t *get_serial_in_buffer(int offset);
 
 void border_process_lowpan(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SIXLOWPAN_BORDER_H*/

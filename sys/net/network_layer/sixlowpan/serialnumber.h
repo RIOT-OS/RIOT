@@ -14,6 +14,10 @@
 #define _SIXLOWPAN_SERIALNUMBER_H
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum serial_comp_res_t {
     LESS = 0,
     EQUAL = 1,
@@ -86,5 +90,9 @@ serial_comp_res_t serial_comp16(uint16_t s1, uint16_t s2);
  *          else UNDEF (see RFC1982 section 3.2).
  **/
 serial_comp_res_t serial_comp32(uint32_t s1, uint32_t s2);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SIXLOWPAN_SERIALNUMBER_H*/

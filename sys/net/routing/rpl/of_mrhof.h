@@ -12,6 +12,10 @@
 #include "rpl/rpl_structs.h"
 #include "rpl/rpl_config.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Disallow links with greater than 4 expected
  * transmission counts on the selected path.
@@ -45,5 +49,9 @@
 #define ETX_RANK_MULTIPLIER (0x80)
 
 rpl_of_t *rpl_get_of_mrhof(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* OF_MRHOF_H */

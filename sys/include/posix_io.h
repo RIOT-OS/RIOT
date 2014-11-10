@@ -22,6 +22,10 @@
 
 #include "kernel_types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define OPEN 0
 #define CLOSE 1
 #define READ 2
@@ -36,6 +40,10 @@ int posix_open(int pid, int flags);
 int posix_close(int pid);
 int posix_read(int pid, char *buffer, int bufsize);
 int posix_write(int pid, char *buffer, int bufsize);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __READ_H */

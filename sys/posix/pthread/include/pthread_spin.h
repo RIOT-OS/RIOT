@@ -14,6 +14,10 @@
 
 #include <errno.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief           A spinlock.
  * @warning         Spinlocks should be avoided.
@@ -72,6 +76,10 @@ int pthread_spin_trylock(pthread_spinlock_t *lock);
  *                  `EINVAL` if `lock == NULL`.
  */
 int pthread_spin_unlock(pthread_spinlock_t *lock);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

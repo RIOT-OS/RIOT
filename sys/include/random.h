@@ -15,6 +15,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef PRNG_FLOAT
 #  define PRNG_FLOAT (0)
 #endif
@@ -72,3 +76,7 @@ double genrand_real_exclusive(void);
 double genrand_res53(void);
 
 #endif /* PRNG_FLOAT */
+
+#ifdef __cplusplus
+}
+#endif

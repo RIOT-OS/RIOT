@@ -11,6 +11,10 @@
 
 #include <errno.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @def             PTHREAD_MUTEX_NORMAL
  * @brief           A non-error correcting mutex (default).
@@ -198,6 +202,10 @@ int pthread_mutexattr_getrobust(const pthread_mutexattr_t *attr, int *robustness
  *                  `EINVAL` if `attr == NULL`.
  */
 int pthread_mutexattr_setrobust(pthread_mutexattr_t *attr, int robustness);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

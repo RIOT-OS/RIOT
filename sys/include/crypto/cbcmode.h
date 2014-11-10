@@ -31,6 +31,10 @@
 
 #include "crypto/ciphers.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MIN(a, b) ( ((a) < (b)) ? (a) : (b))
 
 #define DBG_CRYPTO      1
@@ -203,6 +207,10 @@ int block_cipher_mode_decrypt(CipherModeContext *context,
                               uint8_t *plain_blocks,
                               uint16_t num_bytes,
                               uint8_t *IV);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* CBCMODE_H_ */

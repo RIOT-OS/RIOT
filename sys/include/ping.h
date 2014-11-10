@@ -15,6 +15,10 @@
 
 #include "radio/radio.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void init_payload(void);
 void ping_init(protocol_t protocol, uint8_t channr, radio_address_t addr);
 void ping(radio_address_t addr, uint8_t channr);
@@ -38,3 +42,7 @@ typedef struct pong {
 typedef struct ping_payload {
     char *payload;
 } ping_payload;
+
+#ifdef __cplusplus
+}
+#endif

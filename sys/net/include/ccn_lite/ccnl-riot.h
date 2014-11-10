@@ -38,6 +38,10 @@
 
 #include "transceiver.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define TRANSCEIVER TRANSCEIVER_DEFAULT
 
 #define CCNL_DEFAULT_CHANNEL 6
@@ -81,6 +85,10 @@ void *ccnl_riot_relay_start(void *arg);
  * @param arg the pid of the relay
  */
 void *ccnl_riot_appserver_start(void *arg);
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @}

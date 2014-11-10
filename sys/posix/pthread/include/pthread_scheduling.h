@@ -10,6 +10,10 @@
 #ifndef __SYS__POSIX__PTHREAD_SCHEDULING__H
 #define __SYS__POSIX__PTHREAD_SCHEDULING__H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief           Unimplemented.
  * @note            Due to the native of RIOT it is unlikely that this function will ever be implemented.
@@ -38,6 +42,10 @@ int pthread_getschedparam(pthread_t target_thread, int *policy, struct sched_par
  * @returns         The function is unimplemented. Using it will cause a link time error.
  */
 int pthread_setschedprio(pthread_t target_thread, int prio);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
