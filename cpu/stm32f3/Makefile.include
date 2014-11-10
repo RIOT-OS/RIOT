@@ -17,7 +17,7 @@ export CORTEX_M4_COMMON = $(RIOTCPU)/cortex-m4_common/
 include $(CORTEX_M4_COMMON)Makefile.include
 
 # define the linker script to use for this CPU
-export LINKERSCRIPT = $(RIOTCPU)/$(CPU)/$(CPU_MODEL)_linkerscript.ld
+export LINKERSCRIPT ?= $(RIOTCPU)/$(CPU)/$(CPU_MODEL)_linkerscript.ld
 
 #export the CPU model
 MODEL = $(shell echo $(CPU_MODEL)|tr 'a-z' 'A-Z')
