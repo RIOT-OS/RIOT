@@ -96,6 +96,7 @@ static uint64_t htonll(uint64_t x)
     return (((uint64_t)HTONL(x)) << 32) + HTONL(x >> 32);
 }
 
+#ifndef CBOR_NO_FLOAT
 /**
  * Convert long long @p x to host format
  */
@@ -104,7 +105,6 @@ static uint64_t ntohll(uint64_t x)
     return (((uint64_t)NTOHL(x)) << 32) + NTOHL(x >> 32);
 }
 
-#ifndef CBOR_NO_FLOAT
 /**
  * Convert float @p x to network format
  */
