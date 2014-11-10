@@ -27,6 +27,7 @@
 
 #include <net/ethernet.h>
 
+#include "radio/types.h"
 #include "kernel_types.h"
 #include "netdev/base.h"
 
