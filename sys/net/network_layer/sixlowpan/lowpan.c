@@ -1562,9 +1562,10 @@ void lowpan_context_remove(uint8_t num)
 
     abr_remove_context(num);
 
-    for (j = i; j < NDP_6LOWPAN_CONTEXT_MAX; j++) {
+    for (j = i; j < (NDP_6LOWPAN_CONTEXT_MAX - 1); j++) {
         contexts[j] = contexts[j + 1];
     }
+    memset(&contexts[NDP_6LOWPAN_CONTEXT_MAX - 1], 0, sizeof(lowpan_context_t));
 }
 
 lowpan_context_t *lowpan_context_update(uint8_t num, const ipv6_addr_t *prefix,
