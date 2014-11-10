@@ -9,7 +9,7 @@ export USEMODULE += cortex-m3_common
 export CORTEX_COMMON = $(RIOTCPU)/cortex-m3_common/
 
 # define the linker script to use for this CPU
-export LINKERSCRIPT = $(RIOTCPU)/$(CPU)/sam3x8e_linkerscript.ld
+export LINKERSCRIPT ?= $(RIOTCPU)/$(CPU)/sam3x8e_linkerscript.ld
 
 # include CPU specific includes
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include
