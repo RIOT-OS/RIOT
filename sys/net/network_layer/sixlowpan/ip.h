@@ -58,6 +58,8 @@ extern kernel_pid_t ip_process_pid;
 
 #define IPV6_NET_IF_ADDR_LIST_LEN   (10)    // maybe to much
 
+#define MSG_SEND_NS                 (12346)
+
 /* buffer */
 extern uint8_t buffer[BUFFER_SIZE];
 extern char ip_process_buf[IP_PROCESS_STACKSIZE];

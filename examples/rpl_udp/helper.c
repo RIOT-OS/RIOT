@@ -26,6 +26,7 @@
 #include "transceiver.h"
 #include "ieee802154_frame.h"
 #include "rpl/rpl_structs.h"
+#include "od.h"
 
 #include "rpl_udp.h"
 
@@ -109,6 +110,8 @@ void *rpl_udp_monitor(void *arg)
             }
 
             printf("\n");
+
+            od_hex_dump(ipv6_buf, sizeof(ipv6_hdr_t) + NTOHS(ipv6_buf->length), 0);
         }
         else if (m.type == ENOBUFFER) {
             puts("Transceiver buffer full");

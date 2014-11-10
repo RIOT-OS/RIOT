@@ -22,11 +22,13 @@
 #include <string.h>
 #include <errno.h>
 
+#include "od.h"
 #include "vtimer.h"
 #include "mutex.h"
 #include "msg.h"
 #include "net_if.h"
 #include "sixlowpan/mac.h"
+#include "thread.h"
 
 #include "ip.h"
 #include "icmp.h"
@@ -67,6 +69,18 @@ static uint8_t default_hop_limit = MULTIHOP_HOPLIMIT;
 /* registered upper layer threads */
 kernel_pid_t sixlowip_reg[SIXLOWIP_MAX_REGISTERED];
 
+
+/* fallback workaround to send neighbor solicitations without packet queue */
+void _ipv6_send_ns_fallback(ipv6_addr_t *dest, void *packet, uint16_t packet_length) {
+    ns_fallback_args_t fallback_args = { dest, packet, packet_length };
+    msg_t msg;
+
+    msg.type = MSG_SEND_NS;
+    msg.content.ptr = (char *)&fallback_args;
+
+    msg_send_receive(&msg, &msg, lowpan_aux_pid);
+}
+
 int ipv6_send_packet(ipv6_hdr_t *packet)
 {
     uint16_t length = IPV6_HDR_LEN + NTOHS(packet->length);
@@ -87,6 +101,11 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
             /* XXX: this is wrong, but until ND does work correctly,
              *      this is the only way (aka the old way)*/
             uint16_t raddr = NTOHS(packet->destaddr.uint16[7]);
+            /* XXX: add least try to update neighbor cache */
+
+            printf("on link\n");
+            od_hex_dump(packet, length, 0);
+            _ipv6_send_ns_fallback(&packet->destaddr, packet, length);
             sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *)packet, length);
             /* return -1; */
         }
@@ -94,6 +113,8 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
         return length;
     }
     else {
+        ipv6_addr_t *dest;
+
         /* see if dest should be routed to a different next hop */
         if (ipv6_addr_is_multicast(&packet->destaddr)) {
             /* if_id will be ignored */
@@ -102,15 +123,18 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
                                            length);
         }
 
-        if (ip_get_next_hop == NULL) {
-            return -1;
+        if (ip_get_next_hop != NULL) {
+            DEBUG("Trying to find the next hop for %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
+                    &packet->destaddr));
+            dest = ip_get_next_hop(&packet->destaddr);
+        }
+        else {
+            dest = &packet->destaddr;
         }
 
-        DEBUG("Trying to find the next hop for %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &packet->destaddr));
-        ipv6_addr_t *dest = ip_get_next_hop(&packet->destaddr);
 
         if (dest == NULL) {
-            return -1;
+            dest = &packet->destaddr;
         }
 
         nce = ndp_get_ll_address(dest);
@@ -118,9 +142,15 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
         if (nce == NULL || sixlowpan_lowpan_sendto(nce->if_id, &nce->lladdr,
                 nce->lladdr_len,
                 (uint8_t *)packet, length) < 0) {
-            /* XXX: this is wrong, but until ND does work correctly,
-             *      this is the only way (aka the old way)*/
+            /* XXX: super-hacky because of missing packet-queue +
+             *      this is wrong */
             uint16_t raddr = dest->uint16[7];
+
+            printf("not on-link\n");
+            od_hex_dump(packet, length, 0);
+
+            _ipv6_send_ns_fallback(dest, packet, length);
+
             sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *)packet, length);
             /* return -1; */
         }
@@ -323,6 +353,7 @@ static int is_our_address(ipv6_addr_t *addr)
     int if_counter = -1;
 
     DEBUGF("Is this my addres: %s?\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
+
     while ((if_id = net_if_iter_interfaces(if_id)) >= 0) {
         ipv6_net_if_ext_t *net_if_ext = ipv6_net_if_get_ext(if_id);
         ipv6_net_if_addr_t *myaddr = NULL;
