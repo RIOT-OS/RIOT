@@ -34,17 +34,16 @@ extern "C" {
 
 #ifndef BASIC_MAC_REGISTRY_SIZE
 /**
- * @brief   The size of dummy MAC's recipant registry.
+ * @brief   The size of basic MAC's recipant registry.
  */
 #define BASIC_MAC_REGISTRY_SIZE (1)
 #endif
 
 /**
- * @brief   The minimal required stack size for a
- *          dummy MAC thread
- * TODO: determine real minimal size based on variable used in C file
+ * @brief   Recommended stack size for a basic MAC thread
+ * TODO: determine real minimal size based on thread_print_all() output
  */
-#define BASIC_MAC_MINIMAL_STACK_SIZE    (32)
+#define BASIC_MAC_CONTROL_STACKSIZE    (KERNEL_CONF_STACKSIZE_DEFAULT)
 
 /**
  * @brief   Basic configuration types
