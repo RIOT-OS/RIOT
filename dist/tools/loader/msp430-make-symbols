@@ -1,0 +1,27 @@
+#!/bin/sh
+NM=msp430-nm
+
+SYMBOLS=`$NM $* | perl -ne 'print ".global $2\n$2 = 0x$1\n" if(/([0-9a-f]+) [ABDRST] (.+)$/);' | grep -v ^_ | grep -v _reset_vector | grep = | perl -ne 'print "{\"$1\", (char *)$2},\n" if(/(\w+) = (\w+)/)' | wc -l`
+SYMBOLS=`expr $SYMBOLS + 1`
+
+#echo \#ifndef __SYMBOLS_H__ > symbols.h
+#echo \#define __SYMBOLS_H__ >> symbols.h
+#echo \#include '"symbols.h"' >> symbols.h
+#echo "extern const struct symbols symbols[$SYMBOLS];" >> symbols.h
+#echo \#endif >> symbols.h
+
+echo \#include '"symbols.h"' > symbols.c
+
+echo "const int symbols_nelts = $SYMBOLS;" >> symbols.c
+echo "" >> symbols.c
+echo "const struct symbols symbols[$SYMBOLS] = {" >> symbols.c
+
+if [ -f $* ] ; then 
+    $NM $* | perl -ne 'print ".global $2\n$2 = 0x$1\n" if(/([0-9a-f]+) [ABDRST] (.+)$/);' | grep -v ^_ | grep -v _reset_vector | grep = | perl -ne 'print "{\"$1\", (char *)$2},\n" if(/(\w+) = (\w+)/)' | sort >> symbols.c
+#    msp430-nm $* | perl -ne 'print ".global $2\n$2 = 0x$1\n" if(/([0-9a-f]+) [ABDRST] (.+)$/);' | grep -v ^_ | grep -v _reset_vector | grep = | perl -ne 'print "{\"$1\", (char *)$2},\n" if(/(\w+) = (\w+)/)' | sort
+    status=$?
+fi
+
+echo "{(void *)0, 0} };" >> symbols.c
+
+exit $status

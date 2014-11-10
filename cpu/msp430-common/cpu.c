@@ -59,9 +59,9 @@ NORETURN void cpu_switch_context_exit(void)
  * thread_stack_init behavior. */
 __attribute__((section (".fini9"))) void __main_epilogue(void) { __asm__("ret"); }
 
-//----------------------------------------------------------------------------
-// Processor specific routine - here for MSP
-//----------------------------------------------------------------------------
+/*------------------------------------------------------------------------------*/
+/* Processor specific routine - here for MSP */
+/*------------------------------------------------------------------------------*/
 char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size)
 {
     unsigned short stk = (unsigned short)((uintptr_t) stack_start + stack_size);
