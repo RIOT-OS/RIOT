@@ -8,6 +8,7 @@ export PORT ?= /dev/ttyACM0
 # define tools used for building the project
 export PREFIX = arm-none-eabi-
 export CC = $(PREFIX)gcc
+export CXX = $(PREFIX)g++
 export AR = $(PREFIX)ar
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
@@ -36,4 +37,5 @@ export LINKFLAGS += -specs=nano.specs -lc -lnosys
 endif
 
 # export board specific includes to the global includes-listing
-export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/ -I$(RIOTBASE)/drivers/at86rf231/include -I$(RIOTBASE)/sys/net/include
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep

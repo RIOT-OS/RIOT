@@ -30,12 +30,12 @@ extern "C" {
 /**
  * Define the nominal CPU core clock in this board
  */
-#define F_CPU               (48000000UL)
+#define F_CPU               (8000000UL)
 
 /**
  * Assign the hardware timer
  */
-#define HW_TIMER            TIMER_0
+#define HW_TIMER            TIMER_1
 
 /**
  * @name Define UART device and baudrate for stdio
@@ -73,6 +73,10 @@ extern "C" {
 #define LED_RED_OFF         LED_OFF
 #define LED_RED_TOGGLE      LED_TOGGLE
 /** @} */
+/**
+ * Define the type for the radio packet length for the transceiver
+ */
+typedef uint8_t radio_packet_length_t;
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
