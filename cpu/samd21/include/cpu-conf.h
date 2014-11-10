@@ -47,6 +47,29 @@
 #endif
 /** @} */
 
+#define TRANSCEIVER_BUFFER_SIZE (5)
+
+
+/**
+ * @name Definition of different panic modes
+ */
+typedef enum {
+    HARD_FAULT,
+    WATCHDOG,
+    BUS_FAULT,
+    USAGE_FAULT,
+    DUMMY_HANDLER
+} panic_t;
+
+/**
+ * @def CPUID_ID_LEN
+ *
+ * @brief   The length in byte of the CPU's serial number.
+ *
+ * @note    Must be defined in the CPU's @ref cpu-conf.h
+ */
+
+#define CPUID_ID_LEN (128/8) //128 bits long, 16 bytes long
 
 #endif /* __CPU_CONF_H */
 /** @} */
