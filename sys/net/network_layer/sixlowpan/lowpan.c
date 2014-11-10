@@ -486,6 +486,7 @@ lowpan_reas_buf_t *new_packet_buffer(uint16_t datagram_size,
             return new_buf;
         }
         else {
+            free(new_buf);
             return NULL;
         }
     }
@@ -1352,7 +1353,7 @@ void lowpan_iphc_decoding(uint8_t *data, uint8_t length, net_if_eui64_t *s_addr,
             case (0x03): {
                 /* 0-bits */
                 memcpy(&(ipv6_buf->srcaddr.uint8[0]), &ll_prefix[0], 2);
-                memset(&(ipv6_buf->srcaddr.uint8[2]), 0, 20);
+                memset(&(ipv6_buf->srcaddr.uint8[2]), 0, 6);
                 memcpy(&(ipv6_buf->srcaddr.uint8[8]), &s_addr->uint8[0], 8);
                 break;
             }
@@ -1561,9 +1562,10 @@ void lowpan_context_remove(uint8_t num)
 
     abr_remove_context(num);
 
-    for (j = i; j < NDP_6LOWPAN_CONTEXT_MAX; j++) {
+    for (j = i; j < (NDP_6LOWPAN_CONTEXT_MAX - 1); j++) {
         contexts[j] = contexts[j + 1];
     }
+    memset(&contexts[NDP_6LOWPAN_CONTEXT_MAX - 1], 0, sizeof(lowpan_context_t));
 }
 
 lowpan_context_t *lowpan_context_update(uint8_t num, const ipv6_addr_t *prefix,
