@@ -181,10 +181,10 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
         return -1;
     }
 
+    m->sender_pid = target_pid;
     if (target->status == STATUS_RECEIVE_BLOCKED) {
         DEBUG("msg_send_int: Direct msg copy from %" PRIkernel_pid " to %" PRIkernel_pid ".\n", thread_getpid(), target_pid);
 
-        m->sender_pid = target_pid;
 
         /* copy msg to target */
         msg_t *target_message = (msg_t*) target->wait_data;
