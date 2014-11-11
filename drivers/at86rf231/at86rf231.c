@@ -396,7 +396,7 @@ int at86rf231_get_monitor(void)
 void at86rf231_gpio_spi_interrupts_init(void)
 {
     /* SPI init */
-    spi_init_master(AT86RF231_SPI, SPI_CONF_FIRST_RISING, SPI_SPEED_5MHZ);
+    spi_init_master(AT86RF231_SPI, SPI_CONF_FIRST_RISING, SPI_SPEED_1MHZ);
     /* IRQ0 */
     gpio_init_int(AT86RF231_INT, GPIO_NOPULL, GPIO_RISING, (gpio_cb_t)at86rf231_rx_irq, NULL);
     /* CS */
@@ -417,9 +417,8 @@ void at86rf231_reset(void)
     gpio_clear(AT86RF231_SLEEP);
 
     /* additional waiting to comply to min rst pulse width */
-    uint8_t delay = 50;
-    while (delay--){}
-
+    uint8_t volatile delay = 50; /* volatile to ensure it isn't optimized away */
+    while (--delay);
     gpio_set(AT86RF231_RESET);
 }
 
