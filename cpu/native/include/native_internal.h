@@ -98,6 +98,7 @@ extern int (*real_dup2)(int, int);
 extern int (*real_execve)(const char *, char *const[], char *const[]);
 extern int (*real_feof)(FILE *stream);
 extern int (*real_ferror)(FILE *stream);
+extern int (*real_fileno)(FILE *stream);
 extern int (*real_fork)(void);
 /* The ... is a hack to save includes: */
 extern int (*real_getaddrinfo)(const char *node, ...);

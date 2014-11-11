@@ -73,6 +73,7 @@ int (*real_execve)(const char *, char *const[], char *const[]);
 int (*real_fork)(void);
 int (*real_feof)(FILE *stream);
 int (*real_ferror)(FILE *stream);
+int (*real_fileno)(FILE *stream);
 int (*real_listen)(int socket, int backlog);
 int (*real_ioctl)(int fildes, int request, ...);
 int (*real_open)(const char *path, int oflag, ...);
@@ -412,6 +413,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_fread) = dlsym(RTLD_NEXT, "fread");
     *(void **)(&real_feof) = dlsym(RTLD_NEXT, "feof");
     *(void **)(&real_ferror) = dlsym(RTLD_NEXT, "ferror");
+    *(void **)(&real_fileno) = dlsym(RTLD_NEXT, "fileno");
     *(void **)(&real_clearerr) = dlsym(RTLD_NEXT, "clearerr");
 #ifdef __MACH__
 #else
