@@ -2,6 +2,16 @@ ifneq (,$(filter libcoap,$(USEPKG)))
 	USEMODULE += pnet
 endif
 
+ifneq (,$(filter olsr2,$(USEMODULE)))
+	USEMODULE += vtimer
+	USEMODULE += socket_base
+	USEMODULE += udp
+	USEMODULE += sixlowpan
+	USEMODULE += slist
+	USEMODULE += oonf_common
+	USEMODULE += oonf_rfc5444
+endif
+
 ifneq (,$(filter pnet,$(USEMODULE)))
 	USEMODULE += posix
 	USEMODULE += socket_base

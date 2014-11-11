@@ -16,6 +16,9 @@
  * @author      René Kijewski
  */
 
+#ifndef KERNEL_MACROS_
+#define KERNEL_MACROS_
+
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -35,6 +38,7 @@ extern "C" {
  * @param[in]   MEMBER   name of the member of TYPE which PTR points to
  * @return      Pointer to the container of PTR.
  */
+#ifndef container_of
 #if __STDC_VERSION__ >= 201112L
 #   define container_of(PTR, TYPE, MEMBER) \
         (_Generic((PTR), \
@@ -53,11 +57,11 @@ extern "C" {
 #   define container_of(PTR, TYPE, MEMBER) \
         ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER)))
 #endif
-
+#endif
 #ifdef __cplusplus
 }
 #endif
-
 /**
  * @}
  */
+#endif /* KERNEL_MACROS_ */
