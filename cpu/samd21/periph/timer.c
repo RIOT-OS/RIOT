@@ -29,7 +29,7 @@
 
 #include "sched.h"
 #include "thread.h"
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 
@@ -55,7 +55,7 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
     GCLK->CLKCTRL.reg = (uint16_t)((GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | (TC4_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
     while (GCLK->STATUS.bit.SYNCBUSY);
     /* select the timer and enable the timer specific peripheral clocks */
-    
+
     switch (dev) {
 #if TIMER_0_EN
         case TIMER_0:

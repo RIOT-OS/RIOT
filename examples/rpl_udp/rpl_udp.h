@@ -17,7 +17,7 @@ extern "C" {
 
 #define RADIO_CHANNEL   (15)
 
-#define MONITOR_STACK_SIZE  (512)
+#define MONITOR_STACK_SIZE  (1024)
 #define RCV_BUFFER_SIZE     (32)
 
 /* RPL shell command handlers */

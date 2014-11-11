@@ -42,6 +42,9 @@ void cpu_init(void)
     /* configure the vector table location to internal flash */
     SCB->VTOR = FLASH_BASE;
 
+    /* Enable the CC2538's more compact alternate interrupt mapping */
+    SYS_CTRL->I_MAP = 1;
+
     /* initialize the clock system */
     cpu_clock_init();
 

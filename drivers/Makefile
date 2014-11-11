@@ -55,5 +55,8 @@ endif
 ifneq (,$(filter netdev_802154,$(USEMODULE)))
     DIRS += netdev/802154
 endif
+ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
+    DIRS += lsm303dlhc
+endif
 
 include $(RIOTBASE)/Makefile.base
