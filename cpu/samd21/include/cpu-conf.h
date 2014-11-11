@@ -50,6 +50,7 @@ extern "C" {
 #endif
 /** @} */
 
+#define TRANSCEIVER_BUFFER_SIZE (3)
 #ifdef __cplusplus
 }
 #endif
