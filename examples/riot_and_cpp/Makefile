@@ -27,12 +27,8 @@ CFLAGS += -DDEVELHELP
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-# Blacklist boards
-BOARD_BLACKLIST := arduino-due avsextrem chronos mbed_lpc1768 msb-430h msba2 redbee-econotag \
-                   telosb wsn430-v1_3b wsn430-v1_4 msb-430 pttu udoo qemu-i386 z1 stm32f0discovery \
-                   stm32f3discovery stm32f4discovery pca10000 pca10005 iot-lab_M3 arduino-mega2560 \
-                   msbiot yunjia-nrf51822 samr21-xpro cc2538dk openmote spark-core airfy-beacon \
-                   f4vi1
+# Features required
+FEATURES_REQUIRED += cpp
 
 # This example only works with native for now.
 # msb430-based boards: msp430-g++ is not provided in mspgcc.
