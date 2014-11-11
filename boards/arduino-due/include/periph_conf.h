@@ -55,7 +55,6 @@ extern "C" {
 #define TIMER_2_ISR2        isr_tc7
 /** @} */
 
-
 /**
  * @name UART configuration
  * @{
@@ -110,12 +109,9 @@ extern "C" {
 #define SPI_0_MISO_PIN      PIO_PA25A_SPI0_MISO
 #define SPI_0_MOSI_PIN      PIO_PA26A_SPI0_MOSI
 #define SPI_0_SCK_PIN       PIO_PA27A_SPI0_SPCK
-
-
 #define SPI_0_MISO_PORT     PIOA
 #define SPI_0_MOSI_PORT     PIOA
 #define SPI_0_SCK_PORT      PIOA
-
 #define SPI_0_MISO_PORT_CLKEN()  (PMC->PMC_PCER0 |= (1 << ID_PIOA));
 #define SPI_0_MOSI_PORT_CLKEN()  (PMC->PMC_PCER0 |= (1 << ID_PIOA));
 #define SPI_0_SCK_PORT_CLKEN()   (PMC->PMC_PCER0 |= (1 << ID_PIOA));
