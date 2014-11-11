@@ -51,7 +51,7 @@ int ccnl_riot_client_get(kernel_pid_t relay_pid, char *name, char *reply_buf)
         memset(segment_string, 0, 16);
         snprintf(segment_string, 16, "%d", segment);
         prefix[i] = segment_string;
-        unsigned char *interest_pkg = malloc(PAYLOAD_SIZE);
+        unsigned char *interest_pkg = ccnl_malloc(PAYLOAD_SIZE);
         if (!interest_pkg) {
             puts("ccnl_riot_client_get: malloc failed");
             return 0;
