@@ -66,12 +66,12 @@ int sched_run(void)
     int nextrq = bitarithm_lsb(runqueue_bitcache);
     tcb_t *next_thread = clist_get_container(sched_runqueues[nextrq], tcb_t, rq_entry);
 
-    DEBUG("scheduler: active thread: %" PRIkernel_pid ", next thread: %" PRIkernel_pid "\n",
+    DEBUG("sched_run: active thread: %" PRIkernel_pid ", next thread: %" PRIkernel_pid "\n",
           (active_thread == NULL) ? KERNEL_PID_UNDEF : active_thread->pid,
           next_thread->pid);
 
     if (active_thread == next_thread) {
-        DEBUG("scheduler: done, sched_active_thread was not changed.\n");
+        DEBUG("sched_run: done, sched_active_thread was not changed.\n");
         return 0;
     }
 
@@ -111,7 +111,7 @@ int sched_run(void)
     sched_active_pid = next_thread->pid;
     sched_active_thread = (volatile tcb_t *) next_thread;
 
-    DEBUG("scheduler: done, changed sched_active_thread.\n");
+    DEBUG("sched_run: done, changed sched_active_thread.\n");
 
     return 1;
 }
@@ -127,7 +127,7 @@ void sched_set_status(tcb_t *process, unsigned int status)
 {
     if (status >= STATUS_ON_RUNQUEUE) {
         if (!(process->status >= STATUS_ON_RUNQUEUE)) {
-            DEBUG("sched_set_status: adding process %" PRIkernel_pid " to runqueue %" PRIu16 ".\n",
+            DEBUG("sched_set_status: adding thread %" PRIkernel_pid " to runqueue %" PRIu16 ".\n",
                   process->pid, process->priority);
             clist_add(&sched_runqueues[process->priority], &(process->rq_entry));
             runqueue_bitcache |= 1 << process->priority;
@@ -135,7 +135,7 @@ void sched_set_status(tcb_t *process, unsigned int status)
     }
     else {
         if (process->status >= STATUS_ON_RUNQUEUE) {
-            DEBUG("sched_set_status: removing process %" PRIkernel_pid " to runqueue %" PRIu16 ".\n",
+            DEBUG("sched_set_status: removing thread %" PRIkernel_pid " to runqueue %" PRIu16 ".\n",
                   process->pid, process->priority);
             clist_remove(&sched_runqueues[process->priority], &(process->rq_entry));
 
@@ -170,7 +170,7 @@ void sched_switch(uint16_t other_prio)
 
 NORETURN void sched_task_exit(void)
 {
-    DEBUG("sched_task_exit(): ending task %" PRIkernel_pid "...\n", sched_active_thread->pid);
+    DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n", sched_active_thread->pid);
 
     dINT();
     sched_threads[sched_active_pid] = NULL;
