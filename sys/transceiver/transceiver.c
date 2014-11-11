@@ -482,6 +482,19 @@ static void receive_packet(uint16_t type, uint8_t pos)
 
 #ifdef DBG_IGNORE
 
+#if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
+        radio_address_t short_addr;
+        short_addr = (transceiver_buffer[transceiver_buffer_pos].frame.src_addr[1] << 8)
+            | transceiver_buffer[transceiver_buffer_pos].frame.src_addr[0];
+        for (size_t j = 0; (j < TRANSCEIVER_MAX_IGNORED_ADDR) && (transceiver_ignored_addr[j]); j++) {
+            DEBUG("check if source (%u) is ignored -> %u\n", short_addr, transceiver_ignored_addr[j]);
+
+            if (short_addr == transceiver_ignored_addr[j]) {
+                DEBUG("ignored packet from %" PRIu16 "\n", short_addr);
+                return;
+            }
+        }
+#else
         for (size_t j = 0; (j < TRANSCEIVER_MAX_IGNORED_ADDR) && (transceiver_ignored_addr[j]); j++) {
             DEBUG("check if source (%u) is ignored -> %u\n", transceiver_buffer[transceiver_buffer_pos].src, transceiver_ignored_addr[j]);
 
@@ -490,7 +503,7 @@ static void receive_packet(uint16_t type, uint8_t pos)
                 return;
             }
         }
-
+#endif
 #endif
     }
 
