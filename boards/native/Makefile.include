@@ -81,7 +81,8 @@ all-cachegrind: export CFLAGS += -g
 all-gprof: export CFLAGS += -pg
 all-gprof: export LINKFLAGS += -pg
 
-export INCLUDES += $(NATIVEINCLUDES)
+INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/overrides/
+INCLUDES += $(filter-out -DNATIVE_INCLUDES, $(NATIVEINCLUDES))
 
 # backward compatability with glibc <= 2.17 for native
 ifeq ($(CPU),native)
