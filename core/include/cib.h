@@ -22,7 +22,7 @@
 #define __CIB_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -34,7 +34,7 @@ typedef struct {
     unsigned int mask;          /**< Size of buffer -1, i.e. mask of the bits */
 } cib_t;
 
-#define CIB_INIT(SIZE) ((cib_t) { 0, 0, (SIZE) - 1 })
+#define CIB_INIT(SIZE) { 0, 0, (SIZE) - 1 }
 
 /**
  * @brief Initialize cib_t to 0 and set size.
@@ -43,9 +43,10 @@ typedef struct {
  *                      Must not be NULL.
  * @param[in]  size     Size of the buffer.
  */
-static inline void cib_init(cib_t *restrict cib, unsigned int size)
+static inline void cib_init(cib_t *__restrict cib, unsigned int size)
 {
-    *cib = CIB_INIT(size);
+    cib_t c = CIB_INIT(size);
+    *cib = c;
 }
 
 /**
@@ -55,7 +56,7 @@ static inline void cib_init(cib_t *restrict cib, unsigned int size)
  *                      Must not be NULL.
  * @return How often cib_get() can be called before the CIB is empty.
  */
-static inline unsigned int cib_avail(cib_t *restrict cib)
+static inline unsigned int cib_avail(cib_t *__restrict cib)
 {
     return cib->write_count - cib->read_count;
 }
@@ -67,7 +68,7 @@ static inline unsigned int cib_avail(cib_t *restrict cib)
  *                      Must not be NULL.
  * @return index of next item, -1 if the buffer is empty
  */
-static inline int cib_get(cib_t *restrict cib)
+static inline int cib_get(cib_t *__restrict cib)
 {
     unsigned int avail = cib_avail(cib);
 
@@ -85,7 +86,7 @@ static inline int cib_get(cib_t *restrict cib)
  *                      Must not be NULL.
  * @return index of item to put to, -1 if the buffer is full
  */
-static inline int cib_put(cib_t *restrict cib)
+static inline int cib_put(cib_t *__restrict cib)
 {
     unsigned int avail = cib_avail(cib);
 
