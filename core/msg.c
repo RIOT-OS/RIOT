@@ -53,7 +53,8 @@ static int queue_msg(tcb_t *target, const msg_t *m)
     return 1;
 }
 
-int msg_send(msg_t *m, kernel_pid_t target_pid) {
+int msg_send(msg_t *m, kernel_pid_t target_pid)
+{
     if (inISR()) {
         return msg_send_int(m, target_pid);
     }
@@ -63,7 +64,8 @@ int msg_send(msg_t *m, kernel_pid_t target_pid) {
     return _msg_send(m, target_pid, true, disableIRQ());
 }
 
-int msg_try_send(msg_t *m, kernel_pid_t target_pid) {
+int msg_try_send(msg_t *m, kernel_pid_t target_pid)
+{
     if (inISR()) {
         return msg_send_int(m, target_pid);
     }
