@@ -18,6 +18,7 @@
  */
 
 #include "cpu.h"
+#include "periph_conf.h"
 
 /**
  * @brief Initialize the CPU, set IRQ priorities
@@ -26,4 +27,17 @@ void cpu_init(void)
 {
     /* set pendSV interrupt to lowest possible priority */
     NVIC_SetPriority(PendSV_IRQn, 0xff);
+
+    /* set the correct clock source for HFCLK */
+#if CLOCK_CRYSTAL == 32
+    NRF_CLOCK->XTALFREQ = CLOCK_XTALFREQ_XTALFREQ_32MHz;
+    NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
+    NRF_CLOCK->TASKS_HFCLKSTART = 1;
+    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
+#elif CLOCK_CRYSTAL == 16
+    NRF_CLOCK->XTALFREQ = CLOCK_XTALFREQ_XTALFREQ_16MHz;
+    NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
+    NRF_CLOCK->TASKS_HFCLKSTART = 1;
+    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0);
+#endif
 }
