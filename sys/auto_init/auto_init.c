@@ -71,6 +71,10 @@
 #include "basic_mac.h"
 #endif
 
+#ifdef MODULE_IPV6_IF
+#include "ipv6/if.h"
+#endif
+
 #ifdef MODULE_NET_IF
 #include "cpu-conf.h"
 #include "cpu.h"
@@ -252,6 +256,10 @@ void auto_init(void)
 #ifdef MODULE_BASIC_MAC
     DEBUG("Auto init basic_mac module.\n");
     basic_mac_init_module();
+#endif
+#ifdef MODULE_IPV6_IF
+    DEBUG("Auto init ipv6_if module.\n");
+    ipv6_if_init();
 #endif
 #ifdef MODULE_NET_IF
     DEBUG("Auto init net_if module.\n");

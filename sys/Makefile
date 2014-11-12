@@ -54,10 +54,13 @@ ifneq (,$(filter sixlowpan_iphc_cbuf,$(USEMODULE)))
     DIRS += net/link_layer/sixlowpan/iphc_cbuf
 endif
 ifneq (,$(filter ipv6,$(USEMODULE)))
-    # TODO
+    DIRS += net/network_layer/ipv6
 endif
 ifneq (,$(filter ipv6_addr,$(USEMODULE)))
     DIRS += net/network_layer/ipv6/addr
+endif
+ifneq (,$(filter ipv6_if,$(USEMODULE)))
+    DIRS += net/network_layer/ipv6/if
 endif
 ifneq (,$(filter rpl,$(USEMODULE)))
     DIRS += net/routing/rpl

@@ -63,6 +63,19 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
 
+ifneq (,$(filter ipv6_router,$(USEMODULE)))
+    USEMODULE += ipv6
+endif
+
+ifneq (,$(filter ipv6,$(USEMODULE)))
+    USEMODULE += ipv6_if
+    USEMODULE += ipv6_addr
+endif
+
+ifneq (,$(filter ipv6_if,$(USEMODULE)))
+    USEMODULE += ipv6_addr
+endif
+
 ifneq (,$(filter aodvv2,$(USEMODULE)))
         USEMODULE += vtimer
         USEMODULE += sixlowpan_legacy
