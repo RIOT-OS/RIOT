@@ -301,6 +301,8 @@ uint8_t ipv6_get_addr_match(const ipv6_addr_t *src,
                     break;
                 }
             }
+
+            break;
         }
     }
 
