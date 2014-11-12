@@ -56,6 +56,9 @@ endif
 ifneq (,$(filter ipv6,$(USEMODULE)))
     # TODO
 endif
+ifneq (,$(filter ipv6_addr,$(USEMODULE)))
+    DIRS += net/network_layer/ipv6/addr
+endif
 ifneq (,$(filter rpl,$(USEMODULE)))
     DIRS += net/routing/rpl
 endif
