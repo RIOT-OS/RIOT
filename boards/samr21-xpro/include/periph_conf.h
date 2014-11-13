@@ -69,7 +69,7 @@ extern "C" {
 #define UART_0_ISR          isr_sercom0
 /* UART 0 pin configuration */
 #define UART_0_PORT         (PORT->Group[0])
-#define UART_0_TX_PIN       (PIN_PA04  % 32)
+#define UART_0_TX_PIN       (PIN_PA04 % 32)
 #define UART_0_RX_PIN       (PIN_PA05 % 32)
 #define UART_0_PINS         (PORT_PA04 | PORT_PA05)
 #define UART_0_REF_F        (8000000UL)
@@ -102,22 +102,15 @@ extern "C" {
 #define SPI_0_DIPO         0
 
 #define SPI_0_F_REF        F_REF
-#define SPI_0_PORT0        PORT->Group[2]
-#define SPI_0_PORT1        PORT->Group[1]
-
 
 #define SPI_0_SCLK_DEV     PORT->Group[2]
 #define SPI_0_SCLK_PIN     (PIN_PC18 % 32)
-#define SPI_0_SCLK_PAD     3
 
 #define SPI_0_MISO_DEV     PORT->Group[2]
-#define SPI_0_MISO_PIN     (PIN_PC19  % 32)
-#define SPI_0_MISO_PAD     0
+#define SPI_0_MISO_PIN     (PIN_PC19 % 32)
 
 #define SPI_0_MOSI_DEV     PORT->Group[1]
 #define SPI_0_MOSI_PIN     (PIN_PB30 % 32)
-#define SPI_0_MOSI_PAD     2
-
 
 
 /*      SPI1             */
@@ -129,15 +122,12 @@ extern "C" {
 
 #define SPI_1_SCLK_DEV     PORT->Group[1]
 #define SPI_1_SCLK_PIN     (PIN_PB23 % 32)
-#define SPI_1_SCLK_PAD     3
 
 #define SPI_1_MISO_DEV     PORT->Group[1]
 #define SPI_1_MISO_PIN     (PIN_PB02 % 32)
-#define SPI_1_MISO_PAD     0
 
 #define SPI_1_MOSI_DEV     PORT->Group[1]
 #define SPI_1_MOSI_PIN     (PIN_PB22 % 32)
-#define SPI_1_MOSI_PAD     2
 
 
 /**
@@ -151,6 +141,7 @@ extern "C" {
  * @name GPIO configuration
  * @{
  */
+#define GPIO_EXTINT_NUMOF  (18)
 #define GPIO_NUMOF         (9U)
 #define GPIO_0_EN          1
 #define GPIO_1_EN          1

@@ -35,23 +35,20 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
     uint8_t   cpha = 0;
     uint8_t   cpol = 0;
     uint32_t   f_baud = 0;
-    /* Speed < ½ f_ref, current f_ref = 8`000`000
-    *  baud = f_ref/(2 f_baud) - 1
-    */
     switch(speed)
     {
-    case SPI_SPEED_100KHZ:       /**< drive the SPI bus with 100KHz */
+    case SPI_SPEED_100KHZ:
         f_baud = 100000;
         break;
-    case SPI_SPEED_400KHZ:           /**< drive the SPI bus with 400KHz */
+    case SPI_SPEED_400KHZ:
         f_baud = 400000;
         break;
-    case SPI_SPEED_1MHZ:             /**< drive the SPI bus with 1MHz */
+    case SPI_SPEED_1MHZ:
         f_baud = 1000000;
         break;
-    case SPI_SPEED_5MHZ:             /**< drive the SPI bus with 5MHz */
+    case SPI_SPEED_5MHZ:
         return -1;
-    case SPI_SPEED_10MHZ:             /**< drive the SPI bus with 10MHz */
+    case SPI_SPEED_10MHZ:
         return -1;
     }
     switch(conf)
@@ -144,6 +141,8 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         dipo  = SPI_1_DIPO;
         break;
 #endif
+    default:
+        return -1;
     }
     spi_dev->CTRLA.bit.ENABLE = 0;  /* Disable spi to write confs */
     while (spi_dev->SYNCBUSY.reg);
@@ -203,7 +202,7 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
     }
     else
     {
-        int volatile temp = spi_dev->DATA.reg;
+        spi_dev->DATA.reg;
     }
     return transfered;
 }

@@ -424,10 +424,12 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     if (port == NULL) {
         return -1;
     }
+    if (extint > GPIO_EXTINT_NUMOF){
+        return -1;
+    }
 
     /* configure pin as input */
     res = gpio_init_in(dev, pullup);
-    pin = pin;
     if (res < 0) {
         return res;
     }
