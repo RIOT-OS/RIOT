@@ -16,7 +16,12 @@ export AR ?= $(PREFIX)ar
 export AS ?= $(PREFIX)as
 export LINK ?= $(PREFIX)gcc
 export SIZE ?= $(PREFIX)size
-export OBJCOPY = $(PREFIX)objcopy
+ifneq ($(shell uname -s),Darwin)
+export OBJCOPY ?= $(PREFIX)objcopy
+else
+export OBJCOPY ?= $(PREFIX)gobjcopy
+export OFLAGS ?= -O ihex
+endif
 
 export DEBUGGER = gdb
 export TERMPROG = $(ELF)
