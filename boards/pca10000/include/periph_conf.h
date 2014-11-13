@@ -112,6 +112,14 @@ extern "C" {
 /** @} */
 
 /**
+ * @name Radio configuration
+ * @{
+ */
+#define RADIO_NUMOF         (1U)
+#define RADIO_IRQ_PRIO      1
+/** @} */
+
+/**
  * @name GPIO configuration
  * @{
  */

@@ -1,2 +1,3 @@
 FEATURES_PROVIDED += cpp
+FEATURES_PROVIDED += transceiver nrf51
 FEATURES_PROVIDED += periph_gpio periph_random periph_rtt periph_cpuid
