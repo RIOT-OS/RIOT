@@ -55,3 +55,5 @@ endif
 
 # export board specific includes to the global includes-listing
 export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
+
+include $(RIOTBOARD)/$(BOARD)/Makefile.dep
