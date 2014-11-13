@@ -85,9 +85,6 @@ extern "C" {
 /** @} */
 
 
-#define F_REF              8000000UL
-#define F_BAUD             115200
-
 /**
  * @brief SPI configuration
  */
@@ -101,7 +98,7 @@ extern "C" {
 #define SPI_0_DOPO         1
 #define SPI_0_DIPO         0
 
-#define SPI_0_F_REF        F_REF
+#define SPI_0_F_REF        8000000UL
 
 #define SPI_0_SCLK_DEV     PORT->Group[2]
 #define SPI_0_SCLK_PIN     (18)
@@ -118,7 +115,7 @@ extern "C" {
 #define SPI_IRQ_1          SERCOM5_IRQn
 #define SPI_1_DOPO         1
 #define SPI_1_DIPO         2
-#define SPI_1_F_REF        F_REF
+#define SPI_1_F_REF        8000000UL
 
 #define SPI_1_SCLK_DEV     PORT->Group[1]
 #define SPI_1_SCLK_PIN     (23)
