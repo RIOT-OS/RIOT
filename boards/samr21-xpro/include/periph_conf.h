@@ -87,24 +87,7 @@ extern "C" {
 
 #define F_REF              8000000UL
 #define F_BAUD             115200
-/* UART 1 device configuration */
-#define UART_1_DEV
-#define UART_1_IRQ
-#define UART_1_ISR
-/* UART 1 pin configuration */
-#define UART_1_PORT
-#define UART_1_PINS
-/** @} */
 
-/*      Transceiver        config   */
-#define AT86RF231_SPI      SPI_0
-#define AT86RF231_CS       GPIO_4
-#define AT86RF231_INT      GPIO_5
-#define AT86RF231_RESET    GPIO_6
-#define AT86RF231_SLEEP    GPIO_7
-#define PIN_RFCTRL1        PIN_PA09
-#define PIN_RFCTRL2        PIN_PA12
-#define RFCTRL_CFG_ANT_DIV 4
 /**
  * @brief SPI configuration
  */
@@ -135,21 +118,6 @@ extern "C" {
 #define SPI_0_MOSI_PIN     PIN_PB30
 #define SPI_0_MOSI_PAD     2
 
-#define SPI_0_CS_GPIO      GPIO_4
-#define SPI_0_CS_DEV       PORT->Group[1]
-#define SPI_0_CS_PIN       PIN_PB31
-
-#define SPI_0_IRQ0_GPIO    GPIO_5
-#define SPI_0_IRQ0_DEV     PORT->Group[1]
-#define SPI_0_IRQ0_PIN     PIN_PB00
-
-#define SPI_0_RESET_GPIO   GPIO_6
-#define SPI_0_RESET_DEV    PORT->Group[1]
-#define SPI_0_RESET_PIN    PIN_PB15
-
-#define SPI_0_SLEEP_GPIO   GPIO_7
-#define SPI_0_SLEEP_DEV    PORT->Group[0]
-#define SPI_0_SLEEP_PIN    PIN_PA20
 
 
 /*      SPI1             */
@@ -171,10 +139,6 @@ extern "C" {
 #define SPI_1_MOSI_PIN     PIN_PB22
 #define SPI_1_MOSI_PAD     2
 
-#define SPI_1_CS_GPIO      GPIO_8
-#define SPI_1_CS_DEV       PORT->Group[0]
-#define SPI_1_CS_PIN       PIN_PA27
-
 
 /**
  * @name Random Number Generator configuration
@@ -192,12 +156,11 @@ extern "C" {
 #define GPIO_1_EN          1
 #define GPIO_2_EN          1
 #define GPIO_3_EN          1
-//SPI0
+/*4-7 -> internal */
 #define GPIO_4_EN          1
 #define GPIO_5_EN          1
 #define GPIO_6_EN          1
 #define GPIO_7_EN          1
-//SPI1
 #define GPIO_8_EN          1
 #define GPIO_9_EN          0
 #define GPIO_10_EN         0
@@ -225,25 +188,26 @@ extern "C" {
 #define GPIO_3_DEV         PORT->Group[0]
 #define GPIO_3_PIN         PIN_PA19
 #define GPIO_3_EXTINT      3
-/* GPIO channel 4 config */
-#define GPIO_4_DEV         SPI_0_CS_DEV
-#define GPIO_4_PIN         SPI_0_CS_PIN
-#define GPIO_4_EXTINT      -1 //No external interrupt availible on this pin
-/* GPIO channel 5 config */
-#define GPIO_5_DEV         SPI_0_IRQ0_DEV
-#define GPIO_5_PIN         SPI_0_IRQ0_PIN
+/* GPIO 4-7 Internal radio pins*/
+/* GPIO channel 4 config Internal CS*/
+#define GPIO_4_DEV         PORT->Group[1]
+#define GPIO_4_PIN         PIN_PB31
+#define GPIO_4_EXTINT      -1
+/* GPIO channel 5 config  Internal IRQ0*/
+#define GPIO_5_DEV         PORT->Group[1]
+#define GPIO_5_PIN         PIN_PB00
 #define GPIO_5_EXTINT      0
-/* GPIO channel 6 config */
-#define GPIO_6_DEV         SPI_0_RESET_DEV
-#define GPIO_6_PIN         SPI_0_RESET_PIN
+/* GPIO channel 6 config  Internal reset*/
+#define GPIO_6_DEV         PORT->Group[1]
+#define GPIO_6_PIN         PIN_PB15
 #define GPIO_6_EXTINT      -1
-/* GPIO channel 7 config */
-#define GPIO_7_DEV         SPI_0_SLEEP_DEV
-#define GPIO_7_PIN         SPI_0_SLEEP_PIN
+/* GPIO channel 7 config Internal sleep*/
+#define GPIO_7_DEV         PORT->Group[0]
+#define GPIO_7_PIN         PIN_PA20
 #define GPIO_7_EXTINT      -1
 /* GPIO channel 8 config */
-#define GPIO_8_DEV         SPI_1_CS_DEV
-#define GPIO_8_PIN         SPI_1_CS_PIN
+#define GPIO_8_DEV         PORT->Group[0]
+#define GPIO_8_PIN         PIN_PA27
 #define GPIO_8_EXTINT      -1
 /* GPIO channel 9 config */
 #define GPIO_9_DEV
