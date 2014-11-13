@@ -109,6 +109,13 @@
 /** @} */
 
 /**
+ * @name Radio configuration
+ * @{
+ */
+#define RADIO_IRQ_PRIO      1
+/** @} */
+
+/**
  * @name GPIO configuration
  * @{
  */
