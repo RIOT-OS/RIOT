@@ -82,15 +82,13 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
         PM->APBCMASK.reg |= PM_APBCMASK_TC4;
         /* reset timer */
         TIMER_1_DEV.CTRLA.bit.SWRST = 1;
-        DEBUG("Timer init \n");
 
         while (TIMER_1_DEV.CTRLA.bit.SWRST);
-        DEBUG("Timer init \n");
 
 
         TIMER_1_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT32_Val;
-        /* sourced by 8MHz with Presc 64 results in 125kHz clk */
-        TIMER_1_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV64_Val;
+        /* sourced by 8MHz with Presc 8 results in 1Mhz clk */
+        TIMER_1_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV8_Val;
         /* choose normal frequency operation */
         TIMER_1_DEV.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_NFRQ_Val;
         break;
