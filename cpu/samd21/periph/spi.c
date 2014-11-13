@@ -168,6 +168,10 @@ int spi_init_slave(spi_t dev, spi_conf_t conf, char (*cb)(char))
     /* TODO */
     return 0;
 }
+void spi_transmission_begin(spi_t dev, char reset_val)
+{
+    /* TODO*/ 
+}
 
 int spi_transfer_byte(spi_t dev, char out, char *in)
 {
