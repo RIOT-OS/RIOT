@@ -94,11 +94,11 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         SPI_0_MISO_DEV.PMUX[(SPI_0_MISO_PIN % 32) / 2].bit.PMUXO = 5;
         SPI_0_MOSI_DEV.PMUX[(SPI_0_MOSI_PIN % 32) / 2].bit.PMUXE = 5;
 
-        //SCLK+MOSI
+        /* SCLK+MOSI */
         SPI_0_SCLK_DEV.DIRSET.reg = (1 << (SPI_0_SCLK_PIN % 32));
         SPI_0_MOSI_DEV.DIRSET.reg = (1 << (SPI_0_MOSI_PIN % 32));
 
-        //MISO = input
+        /* MISO = input */
         /* configure as input */
         SPI_0_MISO_DEV.DIRCLR.reg = (1<<(SPI_0_MISO_PIN % 32));
         SPI_0_MISO_DEV.PINCFG[SPI_0_MISO_PIN % 32].bit.INEN = true;
@@ -128,11 +128,11 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         SPI_1_SCLK_DEV.PMUX[(SPI_1_SCLK_PIN % 32) / 2].bit.PMUXO = 3;
         SPI_1_MISO_DEV.PMUX[(SPI_1_MISO_PIN % 32) / 2].bit.PMUXE = 3;
         SPI_1_MOSI_DEV.PMUX[(SPI_1_MOSI_PIN % 32) / 2].bit.PMUXE = 3;
-        //SCLK+MOSI
+        /* SCLK+MOSI */
         SPI_1_SCLK_DEV.DIRSET.reg = (1 << (SPI_1_SCLK_PIN % 32));
         SPI_1_MOSI_DEV.DIRSET.reg = (1 << (SPI_1_MOSI_PIN % 32));
 
-        //MISO = input
+        /* MISO = input */
         /* configure as input */
         SPI_1_MISO_DEV.DIRCLR.reg = (1<<(SPI_1_MISO_PIN % 32));
         SPI_1_MISO_DEV.PINCFG[SPI_1_MISO_PIN % 32].bit.INEN = true;
@@ -145,12 +145,12 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         break;
 #endif
     }
-    spi_dev->CTRLA.bit.ENABLE = 0;  // Disable spi to write confs
+    spi_dev->CTRLA.bit.ENABLE = 0;  /* Disable spi to write confs */
     while (spi_dev->SYNCBUSY.reg);
     spi_dev->CTRLA.reg |= SERCOM_SPI_CTRLA_MODE_SPI_MASTER;
     while (spi_dev->SYNCBUSY.reg);
 
-    spi_dev->BAUD.bit.BAUD = (uint8_t) (((uint32_t) SPI_0_F_REF) / (2 * f_baud) - 1); // Synchronous mode
+    spi_dev->BAUD.bit.BAUD = (uint8_t) (((uint32_t) SPI_0_F_REF) / (2 * f_baud) - 1); /* Syncronous mode*/
     spi_dev->CTRLA.reg |= (SERCOM_SPI_CTRLA_DOPO(dopo))
                           |  (SERCOM_SPI_CTRLA_DIPO(dipo))
                           |  (cpha << SERCOM_SPI_CTRLA_CPHA_Pos)
@@ -192,12 +192,12 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 #endif
     }
 
-    while (!spi_dev->INTFLAG.bit.DRE); // while data register is not empty
+    while (!spi_dev->INTFLAG.bit.DRE); /* while data register is not empty*/
     spi_dev->DATA.bit.DATA = out;
     transfered++;
     if (in != NULL)
     {
-        while (!spi_dev->INTFLAG.bit.RXC); // while receive is not complete
+        while (!spi_dev->INTFLAG.bit.RXC); /* while receive is not complete*/
         *in = spi_dev->DATA.bit.DATA;
         transfered++;
     }
@@ -272,13 +272,13 @@ void spi_poweroff(spi_t dev)
     switch(dev) {
 #ifdef SPI_0_EN
     case SPI_0:
-        SPI_0_DEV.CTRLA.bit.ENABLE = 0; //Disable spi
+        SPI_0_DEV.CTRLA.bit.ENABLE = 0; /*Disable spi*/
         while(SPI_0_DEV.SYNCBUSY.bit.ENABLE);
         break;
 #endif
 #ifdef SPI_1_EN
     case SPI_1:
-        SPI_1_DEV.CTRLA.bit.ENABLE = 0; //Disable spi
+        SPI_1_DEV.CTRLA.bit.ENABLE = 0; /*Disable spi*/
         while(SPI_1_DEV.SYNCBUSY.bit.ENABLE);
         break;
 #endif
