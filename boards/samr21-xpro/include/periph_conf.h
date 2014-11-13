@@ -141,7 +141,6 @@ extern "C" {
  * @name GPIO configuration
  * @{
  */
-#define GPIO_EXTINT_NUMOF  (18)
 #define GPIO_NUMOF         (9U)
 #define GPIO_0_EN          1
 #define GPIO_1_EN          1
@@ -162,6 +161,7 @@ extern "C" {
 #define GPIO_14_EN         0
 #define GPIO_15_EN         0
 
+#define GPIO_NO_EXTINT     (18)
 
 /* GPIO channel 0 config */
 #define GPIO_0_DEV         PORT->Group[0]
@@ -183,7 +183,7 @@ extern "C" {
 /* GPIO channel 4 config Internal CS*/
 #define GPIO_4_DEV         PORT->Group[1]
 #define GPIO_4_PIN         (31)
-#define GPIO_4_EXTINT      -1
+#define GPIO_4_EXTINT      GPIO_NO_EXTINT
 /* GPIO channel 5 config  Internal IRQ0*/
 #define GPIO_5_DEV         PORT->Group[1]
 #define GPIO_5_PIN         (0)
@@ -191,15 +191,15 @@ extern "C" {
 /* GPIO channel 6 config  Internal reset*/
 #define GPIO_6_DEV         PORT->Group[1]
 #define GPIO_6_PIN         (15)
-#define GPIO_6_EXTINT      -1
+#define GPIO_6_EXTINT      GPIO_NO_EXTINT
 /* GPIO channel 7 config Internal sleep*/
 #define GPIO_7_DEV         PORT->Group[0]
 #define GPIO_7_PIN         (20)
-#define GPIO_7_EXTINT      -1
+#define GPIO_7_EXTINT      GPIO_NO_EXTINT
 /* GPIO channel 8 config */
 #define GPIO_8_DEV         PORT->Group[0]
 #define GPIO_8_PIN         (27)
-#define GPIO_8_EXTINT      -1
+#define GPIO_8_EXTINT      GPIO_NO_EXTINT
 /* GPIO channel 9 config */
 #define GPIO_9_DEV
 #define GPIO_9_PIN
