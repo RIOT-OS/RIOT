@@ -23,6 +23,7 @@
 #define __BOARD_H
 
 #include "cpu.h"
+#include "nrf51.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,6 +64,18 @@ extern "C" {
 #define LED_BLUE_OFF        /* not available */
 #define LED_BLUE_TOGGLE     /* not available */
 /* @} */
+
+/**
+ * @name Define the transceiver buffer size
+ */
+#ifdef MODULE_TRANSCEIVER
+#define TRANSCEIVER_BUFFER_SIZE     NRF51_RX_BUFSIZE
+#endif
+
+/**
+ * Define the type for the radio packet length for the transceiver
+ */
+typedef uint8_t radio_packet_length_t;
 
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
