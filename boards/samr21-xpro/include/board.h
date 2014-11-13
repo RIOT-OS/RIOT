@@ -43,6 +43,8 @@ extern "C" {
 #define AT86RF231_INT      GPIO_5
 #define AT86RF231_RESET    GPIO_6
 #define AT86RF231_SLEEP    GPIO_7
+
+#define AT86RF231_SPI_SPEED SPI_SPEED_1MHZ
 /**
  * @name Define UART device and baudrate for stdio
  * @{
