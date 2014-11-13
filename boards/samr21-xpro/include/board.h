@@ -36,16 +36,13 @@ extern "C" {
  * Assign the hardware timer
  */
 #define HW_TIMER            TIMER_0
- 
+
 /*      Transceiver        config   */
 #define AT86RF231_SPI      SPI_0
 #define AT86RF231_CS       GPIO_4
 #define AT86RF231_INT      GPIO_5
 #define AT86RF231_RESET    GPIO_6
 #define AT86RF231_SLEEP    GPIO_7
-#define PIN_RFCTRL1        PIN_PA09
-#define PIN_RFCTRL2        PIN_PA12
-#define RFCTRL_CFG_ANT_DIV 4
 /**
  * @name Define UART device and baudrate for stdio
  * @{
@@ -60,7 +57,7 @@ extern "C" {
  * @{
  */
 #define LED_PORT            PORT->Group[0]
-#define LED_PIN             PORT_PA19
+#define LED_PIN             (19)
 /** @} */
 
 /**
