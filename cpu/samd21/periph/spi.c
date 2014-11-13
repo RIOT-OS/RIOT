@@ -86,25 +86,25 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         /* Setup clock */
         while (GCLK->STATUS.bit.SYNCBUSY);
         /* Mux enable*/
-        SPI_0_SCLK_DEV.PINCFG[SPI_0_SCLK_PIN % 32].bit.PMUXEN = 1;
-        SPI_0_MISO_DEV.PINCFG[SPI_0_MISO_PIN % 32].bit.PMUXEN = 1;
-        SPI_0_MOSI_DEV.PINCFG[SPI_0_MOSI_PIN % 32].bit.PMUXEN = 1;
+        SPI_0_SCLK_DEV.PINCFG[SPI_0_SCLK_PIN].bit.PMUXEN = 1;
+        SPI_0_MISO_DEV.PINCFG[SPI_0_MISO_PIN].bit.PMUXEN = 1;
+        SPI_0_MOSI_DEV.PINCFG[SPI_0_MOSI_PIN].bit.PMUXEN = 1;
         /*Set mux function to spi. seperate registers, for even or odd pins */
-        SPI_0_SCLK_DEV.PMUX[(SPI_0_SCLK_PIN % 32) / 2].bit.PMUXE = 5;
-        SPI_0_MISO_DEV.PMUX[(SPI_0_MISO_PIN % 32) / 2].bit.PMUXO = 5;
-        SPI_0_MOSI_DEV.PMUX[(SPI_0_MOSI_PIN % 32) / 2].bit.PMUXE = 5;
+        SPI_0_SCLK_DEV.PMUX[(SPI_0_SCLK_PIN) / 2].bit.PMUXE = 5;
+        SPI_0_MISO_DEV.PMUX[(SPI_0_MISO_PIN) / 2].bit.PMUXO = 5;
+        SPI_0_MOSI_DEV.PMUX[(SPI_0_MOSI_PIN) / 2].bit.PMUXE = 5;
 
         /* SCLK+MOSI */
-        SPI_0_SCLK_DEV.DIRSET.reg = (1 << (SPI_0_SCLK_PIN % 32));
-        SPI_0_MOSI_DEV.DIRSET.reg = (1 << (SPI_0_MOSI_PIN % 32));
+        SPI_0_SCLK_DEV.DIRSET.reg = (1 << (SPI_0_SCLK_PIN));
+        SPI_0_MOSI_DEV.DIRSET.reg = (1 << (SPI_0_MOSI_PIN));
 
         /* MISO = input */
         /* configure as input */
-        SPI_0_MISO_DEV.DIRCLR.reg = (1<<(SPI_0_MISO_PIN % 32));
-        SPI_0_MISO_DEV.PINCFG[SPI_0_MISO_PIN % 32].bit.INEN = true;
+        SPI_0_MISO_DEV.DIRCLR.reg = (1<<(SPI_0_MISO_PIN));
+        SPI_0_MISO_DEV.PINCFG[SPI_0_MISO_PIN].bit.INEN = true;
 
-        SPI_0_MISO_DEV.OUTCLR.reg = (1 << (SPI_0_MISO_PIN % 32));
-        SPI_0_MISO_DEV.PINCFG[SPI_0_MISO_PIN % 32].bit.PULLEN = true;
+        SPI_0_MISO_DEV.OUTCLR.reg = (1 << (SPI_0_MISO_PIN));
+        SPI_0_MISO_DEV.PINCFG[SPI_0_MISO_PIN].bit.PULLEN = true;
 
         dopo = SPI_0_DOPO;
         dipo  = SPI_0_DIPO;
@@ -121,24 +121,24 @@ int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
         while (GCLK->STATUS.reg);
 
         /* Mux enable*/
-        SPI_1_SCLK_DEV.PINCFG[SPI_1_SCLK_PIN % 32].bit.PMUXEN = 1;
-        SPI_1_MISO_DEV.PINCFG[SPI_1_MISO_PIN % 32].bit.PMUXEN = 1;
-        SPI_1_MOSI_DEV.PINCFG[SPI_1_MOSI_PIN % 32].bit.PMUXEN = 1;
+        SPI_1_SCLK_DEV.PINCFG[SPI_1_SCLK_PIN].bit.PMUXEN = 1;
+        SPI_1_MISO_DEV.PINCFG[SPI_1_MISO_PIN].bit.PMUXEN = 1;
+        SPI_1_MOSI_DEV.PINCFG[SPI_1_MOSI_PIN].bit.PMUXEN = 1;
         /*Set mux function to spi. seperate registers, for even or odd pins */
-        SPI_1_SCLK_DEV.PMUX[(SPI_1_SCLK_PIN % 32) / 2].bit.PMUXO = 3;
-        SPI_1_MISO_DEV.PMUX[(SPI_1_MISO_PIN % 32) / 2].bit.PMUXE = 3;
-        SPI_1_MOSI_DEV.PMUX[(SPI_1_MOSI_PIN % 32) / 2].bit.PMUXE = 3;
+        SPI_1_SCLK_DEV.PMUX[(SPI_1_SCLK_PIN) / 2].bit.PMUXO = 3;
+        SPI_1_MISO_DEV.PMUX[(SPI_1_MISO_PIN) / 2].bit.PMUXE = 3;
+        SPI_1_MOSI_DEV.PMUX[(SPI_1_MOSI_PIN) / 2].bit.PMUXE = 3;
         /* SCLK+MOSI */
-        SPI_1_SCLK_DEV.DIRSET.reg = (1 << (SPI_1_SCLK_PIN % 32));
-        SPI_1_MOSI_DEV.DIRSET.reg = (1 << (SPI_1_MOSI_PIN % 32));
+        SPI_1_SCLK_DEV.DIRSET.reg = (1 << (SPI_1_SCLK_PIN));
+        SPI_1_MOSI_DEV.DIRSET.reg = (1 << (SPI_1_MOSI_PIN));
 
         /* MISO = input */
         /* configure as input */
-        SPI_1_MISO_DEV.DIRCLR.reg = (1<<(SPI_1_MISO_PIN % 32));
-        SPI_1_MISO_DEV.PINCFG[SPI_1_MISO_PIN % 32].bit.INEN = true;
+        SPI_1_MISO_DEV.DIRCLR.reg = (1<<(SPI_1_MISO_PIN));
+        SPI_1_MISO_DEV.PINCFG[SPI_1_MISO_PIN].bit.INEN = true;
 
-        SPI_1_MISO_DEV.OUTCLR.reg = (1 << (SPI_1_MISO_PIN % 32));
-        SPI_1_MISO_DEV.PINCFG[SPI_1_MISO_PIN % 32].bit.PULLEN = true;
+        SPI_1_MISO_DEV.OUTCLR.reg = (1 << (SPI_1_MISO_PIN));
+        SPI_1_MISO_DEV.PINCFG[SPI_1_MISO_PIN].bit.PULLEN = true;
 
         dopo = SPI_1_DOPO;
         dipo  = SPI_1_DIPO;

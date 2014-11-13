@@ -69,8 +69,8 @@ extern "C" {
 #define UART_0_ISR          isr_sercom0
 /* UART 0 pin configuration */
 #define UART_0_PORT         (PORT->Group[0])
-#define UART_0_TX_PIN       PIN_PA04
-#define UART_0_RX_PIN       PIN_PA05
+#define UART_0_TX_PIN       (PIN_PA04  % 32)
+#define UART_0_RX_PIN       (PIN_PA05 % 32)
 #define UART_0_PINS         (PORT_PA04 | PORT_PA05)
 #define UART_0_REF_F        (8000000UL)
 
@@ -107,15 +107,15 @@ extern "C" {
 
 
 #define SPI_0_SCLK_DEV     PORT->Group[2]
-#define SPI_0_SCLK_PIN     PIN_PC18
+#define SPI_0_SCLK_PIN     (PIN_PC18 % 32)
 #define SPI_0_SCLK_PAD     3
 
 #define SPI_0_MISO_DEV     PORT->Group[2]
-#define SPI_0_MISO_PIN     PIN_PC19
+#define SPI_0_MISO_PIN     (PIN_PC19  % 32)
 #define SPI_0_MISO_PAD     0
 
 #define SPI_0_MOSI_DEV     PORT->Group[1]
-#define SPI_0_MOSI_PIN     PIN_PB30
+#define SPI_0_MOSI_PIN     (PIN_PB30 % 32)
 #define SPI_0_MOSI_PAD     2
 
 
@@ -128,15 +128,15 @@ extern "C" {
 #define SPI_1_F_REF        F_REF
 
 #define SPI_1_SCLK_DEV     PORT->Group[1]
-#define SPI_1_SCLK_PIN     PIN_PB23
+#define SPI_1_SCLK_PIN     (PIN_PB23 % 32)
 #define SPI_1_SCLK_PAD     3
 
 #define SPI_1_MISO_DEV     PORT->Group[1]
-#define SPI_1_MISO_PIN     PIN_PB02
+#define SPI_1_MISO_PIN     (PIN_PB02 % 32)
 #define SPI_1_MISO_PAD     0
 
 #define SPI_1_MOSI_DEV     PORT->Group[1]
-#define SPI_1_MOSI_PIN     PIN_PB22
+#define SPI_1_MOSI_PIN     (PIN_PB22 % 32)
 #define SPI_1_MOSI_PAD     2
 
 
@@ -174,40 +174,40 @@ extern "C" {
 
 /* GPIO channel 0 config */
 #define GPIO_0_DEV         PORT->Group[0]
-#define GPIO_0_PIN         PIN_PA13
+#define GPIO_0_PIN         (PIN_PA13 % 32)
 #define GPIO_0_EXTINT      13
 /* GPIO channel 1 config */
 #define GPIO_1_DEV         PORT->Group[0]
-#define GPIO_1_PIN         PIN_PA28
+#define GPIO_1_PIN         (PIN_PA28 % 32)
 #define GPIO_1_EXTINT      8
 /* GPIO channel 2 config */
 #define GPIO_2_DEV         PORT->Group[0]
-#define GPIO_2_PIN         PIN_PA15
+#define GPIO_2_PIN         (PIN_PA15 % 32)
 #define GPIO_2_EXTINT      15
 /* GPIO channel 3 config */
 #define GPIO_3_DEV         PORT->Group[0]
-#define GPIO_3_PIN         PIN_PA19
+#define GPIO_3_PIN         (PIN_PA19 % 32)
 #define GPIO_3_EXTINT      3
 /* GPIO 4-7 Internal radio pins*/
 /* GPIO channel 4 config Internal CS*/
 #define GPIO_4_DEV         PORT->Group[1]
-#define GPIO_4_PIN         PIN_PB31
+#define GPIO_4_PIN         (PIN_PB31 % 32)
 #define GPIO_4_EXTINT      -1
 /* GPIO channel 5 config  Internal IRQ0*/
 #define GPIO_5_DEV         PORT->Group[1]
-#define GPIO_5_PIN         PIN_PB00
+#define GPIO_5_PIN         (PIN_PB00 % 32)
 #define GPIO_5_EXTINT      0
 /* GPIO channel 6 config  Internal reset*/
 #define GPIO_6_DEV         PORT->Group[1]
-#define GPIO_6_PIN         PIN_PB15
+#define GPIO_6_PIN         (PIN_PB15 % 32)
 #define GPIO_6_EXTINT      -1
 /* GPIO channel 7 config Internal sleep*/
 #define GPIO_7_DEV         PORT->Group[0]
-#define GPIO_7_PIN         PIN_PA20
+#define GPIO_7_PIN         (PIN_PA20 % 32)
 #define GPIO_7_EXTINT      -1
 /* GPIO channel 8 config */
 #define GPIO_8_DEV         PORT->Group[0]
-#define GPIO_8_PIN         PIN_PA27
+#define GPIO_8_PIN         (PIN_PA27 % 32)
 #define GPIO_8_EXTINT      -1
 /* GPIO channel 9 config */
 #define GPIO_9_DEV
