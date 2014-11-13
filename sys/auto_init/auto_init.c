@@ -100,6 +100,9 @@ void auto_init_net_if(void)
 #ifdef MODULE_AT86RF231
     transceivers |= TRANSCEIVER_AT86RF231;
 #endif
+#ifdef MODULE_NRF51
+    transceivers |= TRANSCEIVER_NRF51;
+#endif
 #ifdef MODULE_CC1020
     transceivers |= TRANSCEIVER_CC1020;
 #endif
