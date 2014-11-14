@@ -55,6 +55,7 @@ void (*real_free)(void *ptr);
 void* (*real_malloc)(size_t size);
 void* (*real_calloc)(size_t nmemb, size_t size);
 void* (*real_realloc)(void *ptr, size_t size);
+int (*real_accept)(int socket, ...);
 int (*real_bind)(int socket, ...);
 int (*real_printf)(const char *format, ...);
 int (*real_getpid)(void);
@@ -355,6 +356,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_malloc) = dlsym(RTLD_NEXT, "malloc");
     *(void **)(&real_realloc) = dlsym(RTLD_NEXT, "realloc");
     *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");
+    *(void **)(&real_accept) = dlsym(RTLD_NEXT, "accept");
     *(void **)(&real_bind) = dlsym(RTLD_NEXT, "bind");
     *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
     *(void **)(&real_getpid) = dlsym(RTLD_NEXT, "getpid");

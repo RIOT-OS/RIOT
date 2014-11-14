@@ -78,6 +78,8 @@ extern void* (*real_calloc)(size_t nmemb, size_t size);
 extern void* (*real_malloc)(size_t size);
 extern void* (*real_realloc)(void *ptr, size_t size);
 /* The ... is a hack to save includes: */
+extern int (*real_accept)(int socket, ...);
+/* The ... is a hack to save includes: */
 extern int (*real_bind)(int socket, ...);
 extern int (*real_close)(int);
 extern int (*real_dup2)(int, int);

@@ -217,7 +217,7 @@ void handle_uart_sock(void)
     t = sizeof(remote);
 
     _native_syscall_enter();
-    if ((s = accept(_native_uart_sock, &remote, &t)) == -1) {
+    if ((s = real_accept(_native_uart_sock, &remote, &t)) == -1) {
         err(EXIT_FAILURE, "handle_uart_sock: accept");
     }
     else {
