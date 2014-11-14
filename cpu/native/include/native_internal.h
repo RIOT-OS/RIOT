@@ -43,6 +43,7 @@
 #include <ucontext.h>
 #endif
 #endif // BSD/Linux
+#include <netdb.h>
 
 #include "kernel_types.h"
 
@@ -78,6 +79,8 @@ extern void* (*real_calloc)(size_t nmemb, size_t size);
 extern void* (*real_malloc)(size_t size);
 extern void* (*real_realloc)(void *ptr, size_t size);
 /* The ... is a hack to save includes: */
+extern void (*real_freeaddrinfo)(struct addrinfo *res);
+/* The ... is a hack to save includes: */
 extern int (*real_accept)(int socket, ...);
 /* The ... is a hack to save includes: */
 extern int (*real_bind)(int socket, ...);
@@ -87,12 +90,17 @@ extern int (*real_execve)(const char *, char *const[], char *const[]);
 extern int (*real_feof)(FILE *stream);
 extern int (*real_ferror)(FILE *stream);
 extern int (*real_fork)(void);
+/* The ... is a hack to save includes: */
+extern int (*real_getaddrinfo)(const char *node, ...);
 extern int (*real_getpid)(void);
 extern int (*real_listen)(int socket, int backlog);
 extern int (*real_pause)(void);
 extern int (*real_pipe)(int[2]);
+extern int (*real_setsockopt)(int socket, ...);
+extern int (*real_socket)(int domain, int type, int protocol);
 extern int (*real_printf)(const char *format, ...);
 extern int (*real_unlink)(const char *);
+extern const char* (*real_gai_strerror)(int errcode);
 extern FILE* (*real_fopen)(const char *path, const char *mode);
 
 /**

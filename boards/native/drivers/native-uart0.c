@@ -106,24 +106,24 @@ int init_tcp_socket(char *tcpport)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    if ((i = getaddrinfo(NULL, tcpport, &hints, &info)) != 0) {
+    if ((i = real_getaddrinfo(NULL, tcpport, &hints, &info)) != 0) {
         errx(EXIT_FAILURE,
-                "init_uart_socket: getaddrinfo: %s", gai_strerror(i));
+                "init_uart_socket: getaddrinfo: %s", real_gai_strerror(i));
     }
 
     for (p = info; p != NULL; p = p->ai_next) {
-        if ((s = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+        if ((s = real_socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
             warn("init_uart_socket: socket");
             continue;
         }
 
         i = 1;
-        if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) == -1) {
+        if (real_setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(int)) == -1) {
             err(EXIT_FAILURE, "init_uart_socket: setsockopt");
         }
 
         if (real_bind(s, p->ai_addr, p->ai_addrlen) == -1) {
-            close(s);
+            real_close(s);
             warn("init_uart_socket: bind");
             continue;
         }
@@ -133,7 +133,7 @@ int init_tcp_socket(char *tcpport)
     if (p == NULL)  {
         errx(EXIT_FAILURE, "init_uart_socket: failed to bind\n");
     }
-    freeaddrinfo(info);
+    real_freeaddrinfo(info);
 
     if (real_listen(s, 1) == -1) {
         err(EXIT_FAILURE, "init_uart_socket: listen");
@@ -147,7 +147,7 @@ int init_unix_socket(void)
     int s;
     struct sockaddr_un sa;
 
-    if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+    if ((s = real_socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
         err(EXIT_FAILURE, "init_unix_socket: socket");
     }
 
