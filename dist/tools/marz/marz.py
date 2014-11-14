@@ -65,7 +65,7 @@ def read_configuration():
         if m:
             config[m.group(1)][int(m.group(2))] = \
                 RiotEndpoint(configparser.getint(m.group(0), 'recipient'),
-                             "fe80::ff:fe00:%s" % configparser.getint(m.group(0), 'recipient'),
+                             "fe80::ff:fe00:%x" % configparser.getint(m.group(0), 'recipient'),
                              configparser.getint(m.group(0), 'port'))
     return config
 
@@ -107,13 +107,42 @@ def get_tap_mac(tap_name, tap):
 
 class RiotProtocol(protocol.AbstractDatagramProtocol):
     implements(IEthernetProtocol)
-
+    fragments = dict()
+    
     def datagramReceived(self, frame, partial=0):
         riot = Ether(frame)[Riot]
         dot15d4 = riot[Dot15d4Data]
         # here should the defragmentation take place but it isn't here yet.
-        if (LoWPANFragmentationFirst in dot15d4) or (LoWPANFragmentationSubsequent in dot15d4):
-            print "SixLoWPAN fragmentation not handled. Dropping packet."
+        if (LoWPANFragmentationFirst in dot15d4):
+            first_frag = dot15d4[LoWPANFragmentationFirst]
+            print "Found SixLoWPAN fragmentation header with tag %s and size %i" % \
+                (first_frag.datagramTag, first_frag.datagramSize)
+            self.fragments[(first_frag.datagramTag, first_frag.datagramSize)] = (first_frag.datagramSize - len(first_frag.load), first_frag.load)
+            #print self.fragments
+            return
+        if (LoWPANFragmentationSubsequent in dot15d4):
+            segment = dot15d4[LoWPANFragmentationSubsequent]
+            print "Found SixLoWPAN fragmentation segment with tag %s, size %i and offset %i." % \
+                (segment.datagramTag, segment.datagramSize, segment.datagramOffset*8)
+            if (segment.datagramTag, segment.datagramSize) in self.fragments:
+                print "Found corresponding first fragment"
+                (rem, s) = self.fragments[(segment.datagramTag, segment.datagramSize)]
+                rem -= len(segment.load)
+                s = s + segment.load
+                self.fragments[(segment.datagramTag, segment.datagramSize)] = (rem, s)
+                #print self.fragments
+                if rem <= 0:
+                    # Ok, there is no way right now to put the
+                    # assembled payload back into a recorded Dot15d4
+                    # instance right now. That would be the right way.
+                    # For now, we grab the UDP pkt right from offset
+                    # 16 (ipv6.dest) + 1 (next header) + 2 (IPHC) = 19
+                    if rem < 0:
+                        dirty_udp = UDP(s[19:rem])
+                    else:
+                        dirty_udp = UDP(s[19:])
+                    #interact(mydict={ "s": s, "dirty_udp": dirty_udp }, mybanner="In Fragmentation")
+                    self._processUDP(dirty_udp)
             return
         ipv6 = dot15d4[IPv6]
         # we assume this implicitly
