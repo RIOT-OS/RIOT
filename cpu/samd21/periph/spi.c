@@ -26,6 +26,7 @@
 #include "board.h"
 #define ENABLE_DEBUG (0)
 #include "debug.h"
+#if SPI_0_EN  || SPI_1_EN
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
@@ -287,3 +288,4 @@ void spi_poweroff(spi_t dev)
 #endif
     }
 }
+#endif /* SPI_0_EN || SPI_1_EN */
