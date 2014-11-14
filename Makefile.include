@@ -107,7 +107,7 @@ BASELIBS += $(BINDIR)$(BOARD)_base.a
 BASELIBS += $(BINDIR)${APPLICATION}.a
 BASELIBS += $(USEPKG:%=${BINDIR}%.a)
 
-.PHONY: all clean flash term doc debug debug-server reset objdump
+.PHONY: all clean compile link flash term doc debug debug-server reset objdump
 
 ELFFILE ?= $(BINDIR)$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
@@ -120,18 +120,33 @@ LINKFLAGPREFIX ?= -Wl,
 
 DIRS += $(EXTERNAL_MODULE_DIRS)
 
-## make script for your application. Build RIOT-base here!
-all: ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
-	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
+# Default rule: Generate the $(HEXFILE) unless $(RIOTNOLINK) is defined.
 ifeq (,$(RIOTNOLINK))
+all: $(HEXFILE)
+else
+all: compile
+endif
+
+# Compiling rules for your application. Build RIOT-base here!
+compile: ..build-message $(USEPKG:%=${BINDIR}%.a) $(APPDEPS)
+	$(AD)DIRS="$(DIRS)" "$(MAKE)" -C $(CURDIR) -f $(RIOTBASE)/Makefile.application
+
+$(UNDEF) $(BASELIBS): compile
+
+# Linking rules: Generate the $(ELFFILE).
+link: $(ELFFILE)
+
+$(ELFFILE): $(UNDEF) $(BASELIBS)
 ifeq ($(BUILDOSXNATIVE),1)
 	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(BASELIBS) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
 	$(AD)$(if $(CPPMIX),$(CXX),$(LINK)) $(UNDEF) -o $(ELFFILE) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group  $(LINKFLAGPREFIX)-Map=$(BINDIR)$(APPLICATION).map $(LINKFLAGS)
 endif
 	$(AD)$(SIZE) $(ELFFILE)
-	$(AD)$(OBJCOPY) $(OFLAGS) $(ELFFILE) $(HEXFILE)
-endif
+
+# Stripping rule: Use objcopy to generate the $(HEXFILE) from the $(ELFFILE).
+$(HEXFILE): $(ELFFILE)
+	$(AD)$(OBJCOPY) $(OFLAGS) $< $@
 
 ..build-message:
 	@echo "Building application $(APPLICATION) for $(BOARD) w/ MCU $(MCU)."
@@ -171,16 +186,7 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
-flash: $(filter all all-%, $(MAKECMDGOALS))
-	@if [ ! -f $${HEXFILE} ]; then \
-		echo ""; \
-		echo ""; \
-		echo "You need to create a hex file before you can flash it."; \
-		echo "Unless you know otherwise, 'make all' usually does what you want."; \
-		echo ""; \
-		echo ""; \
-		exit 1; \
-	fi
+flash: $(HEXFILE)
 	$(FLASHER) $(FFLAGS)
 
 term:
