@@ -86,19 +86,19 @@ extern "C" {
 
 
 /**
- * @brief SPI configuration
+ * @name SPI configuration
+ * @{
  */
-#define SPI_NUMOF          2
+#define SPI_NUMOF          (2)
 #define SPI_0_EN           1
 #define SPI_1_EN           1
 
 /*      SPI0             */
 #define SPI_0_DEV          SERCOM4->SPI
 #define SPI_IRQ_0          SERCOM4_IRQn
-#define SPI_0_DOPO         1
-#define SPI_0_DIPO         0
-
-#define SPI_0_F_REF        8000000UL
+#define SPI_0_DOPO         (1)
+#define SPI_0_DIPO         (0)
+#define SPI_0_F_REF        (8000000UL)
 
 #define SPI_0_SCLK_DEV     PORT->Group[2]
 #define SPI_0_SCLK_PIN     (18)
@@ -109,13 +109,12 @@ extern "C" {
 #define SPI_0_MOSI_DEV     PORT->Group[1]
 #define SPI_0_MOSI_PIN     (30)
 
-
 /*      SPI1             */
 #define SPI_1_DEV          SERCOM5->SPI
 #define SPI_IRQ_1          SERCOM5_IRQn
-#define SPI_1_DOPO         1
-#define SPI_1_DIPO         2
-#define SPI_1_F_REF        8000000UL
+#define SPI_1_DOPO         (1)
+#define SPI_1_DIPO         (2)
+#define SPI_1_F_REF        (8000000UL)
 
 #define SPI_1_SCLK_DEV     PORT->Group[1]
 #define SPI_1_SCLK_PIN     (23)
@@ -125,7 +124,7 @@ extern "C" {
 
 #define SPI_1_MOSI_DEV     PORT->Group[1]
 #define SPI_1_MOSI_PIN     (22)
-
+/** @} */
 
 /**
  * @name Random Number Generator configuration
@@ -163,28 +162,28 @@ extern "C" {
 /* GPIO channel 0 config */
 #define GPIO_0_DEV         PORT->Group[0]
 #define GPIO_0_PIN         (13)
-#define GPIO_0_EXTINT      13
+#define GPIO_0_EXTINT      (13)
 /* GPIO channel 1 config */
 #define GPIO_1_DEV         PORT->Group[0]
 #define GPIO_1_PIN         (28)
-#define GPIO_1_EXTINT      8
+#define GPIO_1_EXTINT      (8)
 /* GPIO channel 2 config */
 #define GPIO_2_DEV         PORT->Group[0]
 #define GPIO_2_PIN         (15)
-#define GPIO_2_EXTINT      15
+#define GPIO_2_EXTINT      (15)
 /* GPIO channel 3 config */
 #define GPIO_3_DEV         PORT->Group[0]
 #define GPIO_3_PIN         (19)
-#define GPIO_3_EXTINT      3
+#define GPIO_3_EXTINT      (3)
 /* GPIO 4-7 Internal radio pins*/
-/* GPIO channel 4 config radio CS*/
+/* GPIO channel 4 config  radio CS*/
 #define GPIO_4_DEV         PORT->Group[1]
 #define GPIO_4_PIN         (31)
 #define GPIO_4_EXTINT      GPIO_NO_EXTINT
 /* GPIO channel 5 config  radio IRQ0*/
 #define GPIO_5_DEV         PORT->Group[1]
 #define GPIO_5_PIN         (0)
-#define GPIO_5_EXTINT      0
+#define GPIO_5_EXTINT      (0)
 /* GPIO channel 6 config  radio reset*/
 #define GPIO_6_DEV         PORT->Group[1]
 #define GPIO_6_PIN         (15)

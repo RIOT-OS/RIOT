@@ -37,7 +37,10 @@ extern "C" {
  */
 #define HW_TIMER            TIMER_0
 
-/*      Transceiver        config   */
+/**
+* @name AT86RF231 config
+* @{ 
+*/
 #define AT86RF231_SPI      SPI_0
 #define AT86RF231_CS       GPIO_4
 #define AT86RF231_INT      GPIO_5
@@ -45,6 +48,7 @@ extern "C" {
 #define AT86RF231_SLEEP    GPIO_7
 
 #define AT86RF231_SPI_SPEED SPI_SPEED_1MHZ
+/** @}*/
 /**
  * @name Define UART device and baudrate for stdio
  * @{
@@ -81,8 +85,9 @@ extern "C" {
 #define LED_RED_OFF         LED_OFF
 #define LED_RED_TOGGLE      LED_TOGGLE
 /** @} */
+
 /**
- * Define the type for the radio packet length for the transceiver
+ * @brief Define the type for the radio packet length for the transceiver
  */
 typedef uint8_t radio_packet_length_t;
 
