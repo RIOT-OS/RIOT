@@ -177,19 +177,19 @@ extern "C" {
 #define GPIO_3_PIN         (19)
 #define GPIO_3_EXTINT      3
 /* GPIO 4-7 Internal radio pins*/
-/* GPIO channel 4 config Internal CS*/
+/* GPIO channel 4 config radio CS*/
 #define GPIO_4_DEV         PORT->Group[1]
 #define GPIO_4_PIN         (31)
 #define GPIO_4_EXTINT      GPIO_NO_EXTINT
-/* GPIO channel 5 config  Internal IRQ0*/
+/* GPIO channel 5 config  radio IRQ0*/
 #define GPIO_5_DEV         PORT->Group[1]
 #define GPIO_5_PIN         (0)
 #define GPIO_5_EXTINT      0
-/* GPIO channel 6 config  Internal reset*/
+/* GPIO channel 6 config  radio reset*/
 #define GPIO_6_DEV         PORT->Group[1]
 #define GPIO_6_PIN         (15)
 #define GPIO_6_EXTINT      GPIO_NO_EXTINT
-/* GPIO channel 7 config Internal sleep*/
+/* GPIO channel 7 config radio sleep*/
 #define GPIO_7_DEV         PORT->Group[0]
 #define GPIO_7_PIN         (20)
 #define GPIO_7_EXTINT      GPIO_NO_EXTINT
