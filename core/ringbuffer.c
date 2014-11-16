@@ -8,7 +8,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup sys_lib
+ * @ingroup  core_util
  * @{
  * @file   ringbuffer.c
  * @author Kaspar Schleiser <kaspar@schleiser.de>
