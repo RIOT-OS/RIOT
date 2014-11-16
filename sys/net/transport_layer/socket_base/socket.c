@@ -184,7 +184,7 @@ int socket_base_exists_socket(int socket)
     if (socket<1) {
         return false;
     }
-    if (socket_base_sockets[socket - 1].socket_id == 0) {
+    if ((socket > MAX_SOCKETS) || (socket_base_sockets[socket - 1].socket_id == 0)) {
         return false;
     }
     else {
@@ -248,7 +248,7 @@ uint16_t socket_base_get_free_source_port(uint8_t protocol)
 
 int socket_base_socket(int domain, int type, int protocol)
 {
-    int i = 0;
+    int i = 1;
 
     while (socket_base_get_socket(i) != NULL) {
         i++;
@@ -257,17 +257,16 @@ int socket_base_socket(int domain, int type, int protocol)
     if (i > MAX_SOCKETS) {
         return -1;
     }
-    else {
-        socket_t *current_socket = &socket_base_sockets[i].socket_values;
-        socket_base_sockets[i].socket_id = i + 1;
-        current_socket->domain = domain;
-        current_socket->type = type;
-        current_socket->protocol = protocol;
+
+    socket_t *current_socket = &socket_base_sockets[i - 1].socket_values;
+    socket_base_sockets[i - 1].socket_id = i;
+    current_socket->domain = domain;
+    current_socket->type = type;
+    current_socket->protocol = protocol;
 #ifdef MODULE_TCP
-        current_socket->tcp_control.state = 0;
+    current_socket->tcp_control.state = 0;
 #endif
-        return socket_base_sockets[i].socket_id;
-    }
+    return socket_base_sockets[i - 1].socket_id;
 }
 
 int socket_base_connect(int socket, sockaddr6_t *addr, uint32_t addrlen)
