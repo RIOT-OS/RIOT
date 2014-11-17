@@ -65,7 +65,20 @@ static inline uint64_t NTOHLL(uint64_t a)
     return byteorder_ntohll(*(network_uint64_t *) &a);
 }
 
-uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len);
+/**
+ * @brief   Computes the Internet Checksum for *buf* with initial value *init*
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc1071">
+ *          RFC 1071
+ *      </a>
+ *
+ * @param[in] init      Initial value for the checksum (0 in most cases)
+ * @param[in] buf       A byte array to calculate the checksum of
+ * @param[in] buf_len   Length of *buf*
+ *
+ * @return  The Internet Checksum of *buf* with initial value *init*
+ */
+uint16_t net_help_csum(uint16_t init, uint8_t *buf, uint16_t buf_len);
 
 #ifdef __cplusplus
 }

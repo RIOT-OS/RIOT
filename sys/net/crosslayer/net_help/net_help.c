@@ -19,7 +19,7 @@
 
 #include "net_help.h"
 
-uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len)
+uint16_t net_help_csum(uint16_t sum, uint8_t *buf, uint16_t len)
 {
     int count = len >> 1;
 

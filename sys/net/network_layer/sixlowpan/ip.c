@@ -820,7 +820,7 @@ uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t 
                            &ipv6_header->destaddr),
           len, buf, proto);
     sum = len + proto;
-    sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
-    sum = csum(sum, buf, len);
+    sum = net_help_csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
+    sum = net_help_csum(sum, buf, len);
     return (sum == 0) ? 0xffff : HTONS(sum);
 }
