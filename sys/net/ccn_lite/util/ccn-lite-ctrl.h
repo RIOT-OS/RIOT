@@ -16,7 +16,15 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int mkNewFaceRequest(unsigned char *out, char *macsrc, char *ip4src,
                      char *host, char *port, char *flags);
 
 int mkPrefixregRequest(unsigned char *out, char reg, char *path, char *faceid);
+
+#ifdef __cplusplus
+}
+#endif

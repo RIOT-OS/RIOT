@@ -19,6 +19,10 @@
 #ifndef SIXLOWPAN_ERROR_H
 #define SIXLOWPAN_ERROR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Functions return this if call was success. Only defined if not
  * already defined by other header.
@@ -94,6 +98,10 @@
  * not found.
  */
 #define SIXLOWERROR_CSUM        (141)
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* SIXLOWPAN_ERROR_H */

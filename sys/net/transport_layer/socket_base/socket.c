@@ -245,25 +245,25 @@ uint16_t socket_base_get_free_source_port(uint8_t protocol)
 
 int socket_base_socket(int domain, int type, int protocol)
 {
-    int i = 1;
+    int i = 0;
 
     while (socket_base_get_socket(i) != NULL) {
         i++;
     }
 
-    if (i > MAX_SOCKETS + 1) {
+    if (i > MAX_SOCKETS) {
         return -1;
     }
     else {
-        socket_t *current_socket = &socket_base_sockets[i - 1].socket_values;
-        socket_base_sockets[i - 1].socket_id = i;
+        socket_t *current_socket = &socket_base_sockets[i].socket_values;
+        socket_base_sockets[i].socket_id = i + 1;
         current_socket->domain = domain;
         current_socket->type = type;
         current_socket->protocol = protocol;
 #ifdef MODULE_TCP
         current_socket->tcp_control.state = 0;
 #endif
-        return socket_base_sockets[i - 1].socket_id;
+        return socket_base_sockets[i].socket_id;
     }
 }
 

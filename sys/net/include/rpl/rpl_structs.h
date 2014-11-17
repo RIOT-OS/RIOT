@@ -20,6 +20,11 @@
 
 #ifndef RPL_STRUCTS_H_INCLUDED
 #define RPL_STRUCTS_H_INCLUDED
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Modes of Operation */
 
 /* DIO Base Object (RFC 6550 Fig. 14) */
@@ -178,5 +183,9 @@ typedef struct {
     uint16_t lifetime;
     uint8_t used;
 } rpl_routing_entry_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

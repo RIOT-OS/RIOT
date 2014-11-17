@@ -31,6 +31,10 @@
 #include "net_help.h"
 #include "sixlowpan/types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   IPv6 maximum transmission unit.
  */
@@ -541,6 +545,10 @@ void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t *dest)
  * @return The IPv6 upper-layer checksum.
  */
 uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t proto);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SIXLOWPAN_IP_H */
 /** @} */

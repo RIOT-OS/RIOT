@@ -29,6 +29,10 @@
 #ifndef SOCKET_BASE_IN_H
 #define SOCKET_BASE_IN_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Protocols (RFC 1700) TODO: may be deleted due to some double definition
  *                            in sys/net/sixlowpan/include/sixlowpan/ip.h
@@ -148,5 +152,9 @@
 #define IPPROTO_DONE            (257)             ///< last return value of *_input(), meaning "all job for this pkt is done".
 
 #define IN_LOOPBACKNET          (127)             ///< official!
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SOCKET_BASE_IN_H */

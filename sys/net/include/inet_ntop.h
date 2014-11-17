@@ -19,6 +19,10 @@
 #define INET_NTOP_H_
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef AF_INET
 #define AF_INET             2           ///< internetwork address family: UDP, TCP, etc.
 #endif
@@ -49,5 +53,9 @@
  */
 
 const char *inet_ntop(int af, const void *src, char *dst, size_t size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* INET_NTOP_H_ */

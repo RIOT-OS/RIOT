@@ -23,6 +23,10 @@
 
 #include "crypto/ciphers.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define F(addr) /*CRYPTO_TABLE_ACCESS( &SJ_F[addr])*/ (SJ_F[addr])
 
 // G-Permutation: 4 round feistel structure
@@ -166,6 +170,10 @@ uint8_t skipjack_get_preferred_block_size(void);
  *
  */
 extern block_cipher_interface_t skipjack_interface;
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* SKIPJACK_H_ */

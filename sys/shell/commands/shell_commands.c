@@ -49,6 +49,26 @@ extern void _get_weather_handler(int argc, char **argv);
 extern void _set_offset_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_ISL29020
+extern void _get_isl29020_init_handler(int argc, char **argv);
+extern void _get_isl29020_read_handler(int argc, char **argv);
+#endif
+
+#ifdef MODULE_LPS331AP
+extern void _get_lps331ap_init_handler(int argc, char **argv);
+extern void _get_lps331ap_read_handler(int argc, char **argv);
+#endif
+
+#ifdef MODULE_L3G4200D
+extern void _get_l3g4200d_init_handler(int argc, char **argv);
+extern void _get_l3g4200d_read_handler(int argc, char **argv);
+#endif
+
+#ifdef MODULE_LSM303DLHC
+extern void _get_lsm303dlhc_init_handler(int argc, char **argv);
+extern void _get_lsm303dlhc_read_handler(int argc, char **argv);
+#endif
+
 #ifdef MODULE_LTC4150
 extern void _get_current_handler(int argc, char **argv);
 extern void _reset_current_handler(int argc, char **argv);
@@ -144,6 +164,22 @@ const shell_command_t _shell_command_list[] = {
     {"hum", "Prints measured humidity.", _get_humidity_handler},
     {"weather", "Prints measured humidity and temperature.", _get_weather_handler},
     {"offset", "Set temperature offset.", _set_offset_handler},
+#endif
+#ifdef MODULE_ISL29020
+    {"isl29020_init", "Initializes the isl29020 sensor driver.", _get_isl29020_init_handler},
+    {"isl29020_read", "Prints data from the isl29020 sensor.", _get_isl29020_read_handler},
+#endif
+#ifdef MODULE_LPS331AP
+    {"lps331ap_init", "Initializes the lps331ap sensor driver.", _get_lps331ap_init_handler},
+    {"lps331ap_read", "Prints data from the lps331ap sensor.", _get_lps331ap_read_handler},
+#endif
+#ifdef MODULE_L3G4200D
+    {"l3g4200d_init", "Initializes the l3g4200d sensor driver.", _get_l3g4200d_init_handler},
+    {"l3g4200d_read", "Prints data from the l3g4200d sensor.", _get_l3g4200d_read_handler},
+#endif
+#ifdef MODULE_LSM303DLHC
+    {"lsm303dlhc_init", "Initializes the lsm303dlhc sensor driver.", _get_lsm303dlhc_init_handler},
+    {"lsm303dlhc_read", "Prints data from the lsm303dlhc sensor.", _get_lsm303dlhc_read_handler},
 #endif
 #ifdef MODULE_LTC4150
     {"cur", "Prints current and average power consumption.", _get_current_handler},

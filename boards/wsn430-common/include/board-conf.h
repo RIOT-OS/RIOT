@@ -1,6 +1,9 @@
 /*
- * This source code is licensed under the GNU Lesser General Public License,
- * Version 2.  See the file LICENSE for more details.
+ * Copyright (C) 2013 Milan Babel <babel@inf.fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**

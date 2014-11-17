@@ -48,7 +48,12 @@ char* stdimpl_strcat(char *dst, const char *src);
 char* stdimpl_strncat(char *dst, const char *src,unsigned int count);
 int stdimpl_strlen(const char *str);
 int stdimpl_strcmp(const char *s1, const char *s2);
-char* stdimpl_itoa(int v,char *string,int r);
+char* stdimpl_lltoa(long long v,char *string,int r);
+
+static inline char* stdimpl_itoa(int v,char *string,int r)
+{
+    return stdimpl_lltoa(v,string,r);
+}
 
 #ifdef  __cplusplus
 }

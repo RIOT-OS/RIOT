@@ -331,11 +331,12 @@ int net_if_send_packet(int if_id, uint16_t target, const void *payload,
         p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
         p.frame.fcf.ack_req = 0;
         p.frame.fcf.sec_enb = 0;
-        p.frame.fcf.frame_type = 1;
+        p.frame.fcf.frame_type = IEEE_802154_DATA_FRAME;
         p.frame.fcf.frame_pend = 0;
 
         p.frame.dest_pan_id = net_if_get_pan_id(if_id);
-        memcpy(p.frame.dest_addr, &target, 2);
+        uint16_t target_h = NTOHS(target);
+        memcpy(p.frame.dest_addr, &target_h, 2);
         response = net_if_transceiver_get_set_handler(if_id, SND_PKT, (void *)&p);
     }
     else {
@@ -375,10 +376,11 @@ int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
         p.frame.fcf.dest_addr_m = IEEE_802154_LONG_ADDR_M;
         p.frame.fcf.ack_req = 0;
         p.frame.fcf.sec_enb = 0;
-        p.frame.fcf.frame_type = 1;
+        p.frame.fcf.frame_type = IEEE_802154_DATA_FRAME;
         p.frame.fcf.frame_pend = 0;
         p.frame.dest_pan_id = net_if_get_pan_id(if_id);
-        memcpy(p.frame.dest_addr, target, 8);
+        uint64_t target_h = NTOHLL(target->uint64);
+        memcpy(p.frame.dest_addr, &target_h, 8);
         response = net_if_transceiver_get_set_handler(if_id, SND_PKT, (void *)&p);
     }
     else {
@@ -407,6 +409,7 @@ int net_if_register(int if_id, kernel_pid_t pid)
 int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation)
 {
     uint64_t tmp;
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
     if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Get EUI-64: No interface initialized with ID %d.\n", if_id);
         return 0;

@@ -21,6 +21,10 @@
  * 2011-03-30 created
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CCNL_MAX_INTERFACES             2 /* transceiver and msg interfaces */
 
 #define CCNL_INTEREST_TIMEOUT_SEC       0
@@ -138,5 +142,9 @@
 
 // function alias for RIOTs debug infrastructure
 #define DEBUGMSG(LVL, ...) DEBUG(__VA_ARGS__)
+
+#ifdef __cplusplus
+}
+#endif
 
 // eof

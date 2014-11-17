@@ -29,6 +29,10 @@
 #include "ipv6.h"
 #include "socket_base/socket.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * IPv4 socket address type.
  */
@@ -150,6 +154,10 @@ extern const struct sockaddr_in6 in6addr_loopback;
  * @return  1 if *a* is an multicast address, 0 if not.
  */
 #define IN6_IS_ADDR_MULTICAST(a) (((const uint8_t *) (a))[0] == 0xff)
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @}

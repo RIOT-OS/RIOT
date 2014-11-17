@@ -18,6 +18,10 @@
 #ifndef RPL_CONFIG_H_INCLUDED
 #define RPL_CONFIG_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*  Default values */
 #define RPL_NO_DOWNWARD_ROUTES  0x00
 #define RPL_NON_STORING_MODE    0x01
@@ -132,5 +136,9 @@ static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A,uint8_t B)
 #define RPL_DIS_D_MASK 0x20
 #define RPL_GROUNDED_SHIFT 7
 #define RPL_DEFAULT_OCP 0
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

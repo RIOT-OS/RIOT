@@ -27,6 +27,10 @@
 #include "mutex.h"
 #include "transceiver.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   type to specify types of upper layer addresses
  */
@@ -496,6 +500,10 @@ int32_t net_if_get_pan_id(int if_id);
  * @return  the PAN ID on success, -1 on failure.
  */
 int32_t net_if_set_pan_id(int if_id, uint32_t pan_id);
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @}

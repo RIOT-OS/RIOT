@@ -65,12 +65,20 @@ void at86rf231_rx_handler(void)
         return;
     }
 
+#ifdef DEBUG_ENABLED
+    DEBUG("pkg: ");
+    for (int i = 1; i < at86rf231_rx_buffer[rx_buffer_next].length; i++) {
+        DEBUG("%x ", buf[i]);
+    }
+    DEBUG("\n");
+#endif
+
     /* read buffer into ieee802154_frame */
     ieee802154_frame_read(&buf[1], &at86rf231_rx_buffer[rx_buffer_next].frame,
                           at86rf231_rx_buffer[rx_buffer_next].length);
 
     /* if packet is no ACK */
-    if (at86rf231_rx_buffer[rx_buffer_next].frame.fcf.frame_type != 2) {
+    if (at86rf231_rx_buffer[rx_buffer_next].frame.fcf.frame_type != IEEE_802154_ACK_FRAME) {
 #ifdef DEBUG_ENABLED
         ieee802154_frame_print_fcf_frame(&at86rf231_rx_buffer[rx_buffer_next].frame);
 #endif

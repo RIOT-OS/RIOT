@@ -77,6 +77,10 @@
 #endif
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Stack size for transceiver thread */
 #ifndef TRANSCEIVER_STACK_SIZE
 #define TRANSCEIVER_STACK_SIZE      (1024)
@@ -246,6 +250,10 @@ uint8_t transceiver_register(transceiver_type_t transceivers, kernel_pid_t pid);
  * @return              1 on success, 0 otherwise
  */
 uint8_t transceiver_unregister(transceiver_type_t transceivers, kernel_pid_t pid);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TRANSCEIVER_H */
 /** @} */

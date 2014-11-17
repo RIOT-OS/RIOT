@@ -28,6 +28,10 @@
 
 #include "socket_base/in.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef uint8_t sa_family_t;    ///< POSIX compatible type for address family.
 typedef uint32_t  socklen_t;    ///< POSIX compatible type for address length.
 
@@ -326,6 +330,10 @@ int socket_base_accept(int s, sockaddr6_t *addr, socklen_t *addrlen);
  * PIDs of the send and receive thread.
  */
 void socket_base_print_sockets(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @}

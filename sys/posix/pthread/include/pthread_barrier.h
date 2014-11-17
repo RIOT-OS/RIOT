@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup pthread
  * @{
@@ -10,6 +18,10 @@
 #define __SYS__POSIX__PTHREAD_BARRIER__H
 
 #include "mutex.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @def     PTHREAD_PROCESS_SHARED
@@ -119,6 +131,10 @@ int pthread_barrierattr_getpshared(const pthread_barrierattr_t *attr, int *pshar
  * @returns   0, the invocation cannot fail
  */
 int pthread_barrierattr_setpshared(pthread_barrierattr_t *attr, int pshared);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -23,6 +23,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Data-structure describing a RGB color
  */
@@ -57,6 +61,10 @@ void color_rgb2hsv(color_rgb_t *rgb, color_hsv_t *hsv);
  * @param[out] rgb      Output color encoded in RGB space
  */
 void color_hsv2rgb(color_hsv_t *hsv, color_rgb_t *rgb);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __COLOR_H */
 /** @} */

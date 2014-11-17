@@ -99,9 +99,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+
 #ifndef CBOR_NO_CTIME
 #include <time.h>
 #endif /* CBOR_NO_CTIME */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Struct containing CBOR-encoded data
@@ -362,6 +367,10 @@ bool cbor_at_break(const cbor_stream_t *s, size_t offset);
  * @return True in case @p offset marks the end of the stream
  */
 bool cbor_at_end(const cbor_stream_t *s, size_t offset);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

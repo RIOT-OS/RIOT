@@ -90,10 +90,18 @@ typedef struct {
 
 extern socket_internal_t socket_base_sockets[MAX_SOCKETS];
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 socket_internal_t *socket_base_get_socket(int s);
 uint16_t socket_base_get_free_source_port(uint8_t protocol);
 int socket_base_exists_socket(int socket);
 int socket_base_socket(int domain, int type, int protocol);
 void socket_base_print_sockets(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SOCKET_BASE_SOCKET */

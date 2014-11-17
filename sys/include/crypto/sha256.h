@@ -51,6 +51,10 @@
 
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SHA256_DIGEST_LENGTH 32
 
 typedef struct {
@@ -95,6 +99,10 @@ void sha256_final(unsigned char digest[32], sha256_context_t *ctx);
  *           if md == NULL, one static buffer is used
  */
 unsigned char *sha256(const unsigned char *d, size_t n, unsigned char *md);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* _SHA256_H_ */

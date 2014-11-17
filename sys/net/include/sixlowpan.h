@@ -47,5 +47,13 @@
 #include "sixlowpan/lowpan.h"
 #include "sixlowpan/mac.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* SIXLOWPAN_H */
 /** @} */

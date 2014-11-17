@@ -37,6 +37,10 @@
 #include <stdbool.h>
 #include "radio/types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define L1_PROTOCOL_CATCH_ALL             (0xff)    ///< Catch all protocol ID
 
 enum layer_1_protocols {
@@ -71,6 +75,10 @@ typedef struct {
     void (*print_stats)(void);
     void (*print_config)(void);
 } radio_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 

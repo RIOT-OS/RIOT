@@ -25,6 +25,10 @@
 #include <stdio.h>
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // mspgcc bug : PRIxxx macros not defined before mid-2011 versions
 #ifndef PRIu32
 #define PRIu32 "lu"
@@ -163,6 +167,10 @@ static inline const char *timex_to_str(timex_t t, char *timestamp)
              t.seconds, t.microseconds);
     return timestamp;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __TIMEX_H */

@@ -18,6 +18,10 @@
 
 #include "ccn_lite/ccnl-riot.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define RIOT_CCN_EVENT_NUMBER_OFFSET (1 << 8)
 
 #define RIOT_BROADCAST (UINT16_MAX)
@@ -32,3 +36,7 @@ int riot_send_msg(uint8_t *buf, uint16_t size, uint16_t to);
 void riot_send_nack(uint16_t to);
 kernel_pid_t riot_start_helper_thread(void);
 char *riot_ccnl_event_to_string(int event);
+
+#ifdef __cplusplus
+}
+#endif

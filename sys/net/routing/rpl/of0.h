@@ -12,6 +12,14 @@
 #include "rpl/rpl_structs.h"
 #include "rpl/rpl_config.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 rpl_of_t *rpl_get_of0(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* OF0_H */

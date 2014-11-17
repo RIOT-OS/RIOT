@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 René Kijewski <rene.kijewski@fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup pthread
  * @{
@@ -9,6 +17,10 @@
 
 #ifndef __SYS__POSIX__PTHREAD_CANCELLCATION__H
 #define __SYS__POSIX__PTHREAD_CANCELLCATION__H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define PTHREAD_CANCEL_DISABLE 0
 #define PTHREAD_CANCEL_ENABLE  1
@@ -49,6 +61,10 @@ int pthread_cancel(pthread_t th);
  * @details      If pthread_cancel() called before, the current thread exits with with the code #PTHREAD_CANCELED.
  */
 void pthread_testcancel(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

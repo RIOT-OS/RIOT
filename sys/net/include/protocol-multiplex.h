@@ -26,6 +26,10 @@
 
 #include "radio/types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     packet_handler_t    handler;
     protocol_t          protocol;
@@ -41,6 +45,10 @@ int pm_find_handler_index(const pm_table_t *table, protocol_t protocol, unsigned
 int pm_set_handler(const pm_table_t *table, protocol_t protocol, packet_handler_t handler);
 void pm_remove_handler(const pm_table_t *table, protocol_t protocol, packet_handler_t handler);
 int pm_invoke(const pm_table_t *table, protocol_t protocol, void *payload, int payload_size, packet_info_t *packet_info);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* PROTOCOLMULTIPLEX_H_ */
