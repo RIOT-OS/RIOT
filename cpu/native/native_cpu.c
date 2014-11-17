@@ -68,6 +68,8 @@ int reboot_arch(int mode)
 {
     (void) mode;
 
+    dINT();
+
     printf("\n\n\t\t!! REBOOT !!\n\n");
 #ifdef MODULE_UART0
     /* TODO: close stdio fds */
