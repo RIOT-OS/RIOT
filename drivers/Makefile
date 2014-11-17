@@ -7,6 +7,9 @@ endif
 ifneq (,$(filter sht11,$(USEMODULE)))
     DIRS += sht11
 endif
+ifneq (,$(filter sht2x,$(USEMODULE)))
+    DIRS += sht2x
+endif
 ifneq (,$(filter ltc4150,$(USEMODULE)))
     DIRS += ltc4150
 endif
