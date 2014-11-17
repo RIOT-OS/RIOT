@@ -150,6 +150,29 @@ void daemonize(void)
     }
 }
 
+/**
+ * Remove any -d options from an argument vector.
+ *
+ * @param[in][out]  argv    an argument vector
+ *
+ * @return                  1 if "-d" was found, 0 otherwise
+ */
+static int filter_daemonize_argv(char **argv)
+{
+    int ret = 0;
+    for (char **narg = argv; *narg != NULL; narg++) {
+        if (strcmp("-d", narg[0]) == 0) {
+            ret = 1;
+            char **xarg = narg;
+            do {
+                xarg[0] = xarg[1];
+            } while (*xarg++ != NULL);
+            narg--; /* rescan current item to filter out double args */
+        }
+    }
+    return ret;
+}
+
 void usage_exit(void)
 {
     real_printf("usage: %s", _progname);
@@ -240,7 +263,6 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
             _native_id = atol(argv[argp]);
         }
         else if (strcmp("-d", arg) == 0) {
-            daemonize();
             if (strcmp(stdiotype, "stdio") == 0) {
                 stdiotype = "null";
             }
@@ -298,6 +320,10 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
         else {
             usage_exit();
         }
+    }
+
+    if (filter_daemonize_argv(_native_argv)) {
+        daemonize();
     }
 
     _native_log_stderr(stderrtype);
