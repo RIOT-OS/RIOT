@@ -95,7 +95,7 @@ static int appserver_handle_interest(char *data, uint16_t datalen, uint16_t from
     char name[] = "/riot/appserver/test/0";
     appserver_create_prefix(name, prefix);
 
-    unsigned char *content_pkg = malloc(PAYLOAD_SIZE);
+    unsigned char *content_pkg = ccnl_malloc(PAYLOAD_SIZE);
     if (!content_pkg) {
         puts("appserver_handle_interest: malloc failed");
         return 0;
@@ -154,7 +154,7 @@ static void riot_ccnl_appserver_register(void)
     snprintf(faceid, sizeof(faceid), "%" PRIkernel_pid, thread_getpid());
     char *type = "newMSGface";
 
-    unsigned char *mgnt_pkg = malloc(256);
+    unsigned char *mgnt_pkg = ccnl_malloc(256);
     if (!mgnt_pkg) {
         puts("riot_ccnl_appserver_register: malloc failed");
         return;
