@@ -19,6 +19,10 @@
 #define INET_PTON_H_
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef AF_INET
 #define AF_INET             2           ///< internetwork address family: UDP, TCP, etc.
 #endif
@@ -53,5 +57,9 @@
  */
 
 int inet_pton(int af, const char *src, void *dst);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* INET_PTON_H_ */

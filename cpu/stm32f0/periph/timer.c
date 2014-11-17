@@ -22,12 +22,13 @@
 
 #include "cpu.h"
 #include "board.h"
+#include "sched.h"
+#include "thread.h"
 #include "periph_conf.h"
 #include "periph/timer.h"
 
 /* guard file in case no TIMER devices are defined */
 #if TIMER_0_EN || TIMER_1_EN
-
 
 static inline void irq_handler(tim_t timer, TIM_TypeDef *dev);
 
@@ -38,7 +39,7 @@ typedef struct {
 /**
  * Timer state memory
  */
-timer_conf_t config[TIMER_NUMOF];
+static timer_conf_t config[TIMER_NUMOF];
 
 
 int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
@@ -325,6 +326,9 @@ static inline void irq_handler(tim_t timer, TIM_TypeDef *dev)
         dev->DIER &= ~TIM_DIER_CC4IE;
         dev->SR &= ~TIM_SR_CC4IF;
         config[timer].cb(3);
+    }
+    if (sched_context_switch_request) {
+        thread_yield();
     }
 }
 #endif /* TIMER_0_EN || TIMER_1_EN */

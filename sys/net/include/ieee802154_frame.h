@@ -25,6 +25,10 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* maximum 802.15.4 header length */
 #define IEEE_802154_MAX_HDR_LEN         (23)
 /* ...and FCS*/
@@ -108,6 +112,10 @@ uint8_t ieee802154_frame_get_hdr_len(ieee802154_frame_t *frame);
 uint8_t ieee802154_frame_read(uint8_t *buf, ieee802154_frame_t *frame, uint8_t len);
 void ieee802154_frame_print_fcf_frame(ieee802154_frame_t *frame);
 uint16_t ieee802154_frame_get_fcs(const uint8_t *frame, uint8_t frame_len);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* IEEE802154_IEEE802154_FRAME */

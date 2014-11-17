@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 René Kijewski <rene.kijewski@fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup pthread
  * @{
@@ -14,6 +22,10 @@
 
 #include <errno.h>
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief     A fair reader writer lock.
@@ -160,6 +172,10 @@ bool __pthread_rwlock_blocked_readingly(const pthread_rwlock_t *rwlock);
  * @returns          `false` if locking for writing is possible without blocking.
  */
 bool __pthread_rwlock_blocked_writingly(const pthread_rwlock_t *rwlock);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

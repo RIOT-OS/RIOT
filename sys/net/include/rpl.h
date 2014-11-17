@@ -35,6 +35,10 @@
 #include "ipv6.h"
 #include "rpl/rpl_dodag.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #undef CC1100_RADIO_MODE
 #define CC1100_RADIO_MODE CC1100_MODE_WOR
 
@@ -262,6 +266,10 @@ void rpl_clear_routing_table(void);
  *
  * */
 rpl_routing_entry_t *rpl_get_routing_table(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __RPL_H */

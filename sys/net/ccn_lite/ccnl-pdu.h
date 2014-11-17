@@ -16,6 +16,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int dehead(unsigned char **buf, int *len, int *num, int *typ);
 int mkHeader(unsigned char *buf, unsigned int num, unsigned int tt);
 int mkBlob(unsigned char *out, unsigned int num, unsigned int tt, char *cp, int cnt);
@@ -26,3 +30,7 @@ int unmkBinaryInt(unsigned char **data, int *datalen, unsigned int *result,
                   unsigned char *width);
 int mkInterest(char **namecomp, unsigned int *nonce, unsigned char *out);
 int mkContent(char **namecomp, char *data, int datalen, unsigned char *out);
+
+#ifdef __cplusplus
+}
+#endif

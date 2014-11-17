@@ -9,4 +9,10 @@
 #include <inttypes.h>
 #include <stddef.h>
 
+#ifndef AVR_TYPES_H
+#define AVR_TYPES_H
+
 typedef int16_t suseconds_t;
+typedef signed int ssize_t;
+
+#endif /* ifndef AVR_TYPES_H */

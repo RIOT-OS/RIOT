@@ -262,7 +262,7 @@ uint32_t net_if_transceiver_get_set_handler(int if_id, uint16_t op_type,
     transceiver_command_t tcmd;
 
     tcmd.transceivers = interfaces[if_id].transceivers;
-    tcmd.data = (void *)data;
+    tcmd.data = (char *)data;
     msg.content.ptr = (char *)&tcmd;
     msg.type = op_type;
     msg_send_receive(&msg, &msg, transceiver_pid);
@@ -335,7 +335,8 @@ int net_if_send_packet(int if_id, uint16_t target, const void *payload,
         p.frame.fcf.frame_pend = 0;
 
         p.frame.dest_pan_id = net_if_get_pan_id(if_id);
-        memcpy(p.frame.dest_addr, &target, 2);
+        uint16_t target_h = NTOHS(target);
+        memcpy(p.frame.dest_addr, &target_h, 2);
         response = net_if_transceiver_get_set_handler(if_id, SND_PKT, (void *)&p);
     }
     else {
@@ -378,7 +379,8 @@ int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
         p.frame.fcf.frame_type = IEEE_802154_DATA_FRAME;
         p.frame.fcf.frame_pend = 0;
         p.frame.dest_pan_id = net_if_get_pan_id(if_id);
-        memcpy(p.frame.dest_addr, target, 8);
+        uint64_t target_h = NTOHLL(target->uint64);
+        memcpy(p.frame.dest_addr, &target_h, 8);
         response = net_if_transceiver_get_set_handler(if_id, SND_PKT, (void *)&p);
     }
     else {
@@ -407,6 +409,7 @@ int net_if_register(int if_id, kernel_pid_t pid)
 int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation)
 {
     uint64_t tmp;
+
     if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Get EUI-64: No interface initialized with ID %d.\n", if_id);
         return 0;
@@ -445,7 +448,8 @@ int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation)
             return 0;
         }
 
-    }    
+    }
+
     return 1;
 }
 
@@ -534,7 +538,7 @@ int32_t net_if_get_pan_id(int if_id)
 
 }
 
-int32_t net_if_set_pan_id(int if_id, uint32_t pan_id)
+int32_t net_if_set_pan_id(int if_id, uint16_t pan_id)
 {
     if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Set PAN ID: No interface initialized with ID %d.\n", if_id);

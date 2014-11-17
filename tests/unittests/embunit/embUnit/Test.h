@@ -62,9 +62,9 @@ struct __Test {
     TestImplement* isa;
 };
 
-#define Test_name(s)            ((Test*)s)->isa->name(s)
-#define Test_run(s,r)           ((Test*)s)->isa->run(s,r)
-#define Test_countTestCases(s)  ((Test*)s)->isa->countTestCases(s)
+#define Test_name(s)            (s)->isa->name(s)
+#define Test_run(s,r)           (s)->isa->run(s,r)
+#define Test_countTestCases(s)  (s)->isa->countTestCases(s)
 
 #ifdef  __cplusplus
 }

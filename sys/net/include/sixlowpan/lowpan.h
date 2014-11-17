@@ -31,6 +31,10 @@
 #include "net_if.h"
 #include "sixlowpan/types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   6LoWPAN dispatch value for uncompressed IPv6 packets.
  * @see <a href="http://tools.ietf.org/html/rfc4944#section-5.1">
@@ -300,6 +304,10 @@ void sixlowpan_lowpan_print_reassembly_buffers(void);
  * @return  1 on success, 0 on failure.
  */
 int sixlowpan_lowpan_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SIXLOWPAN_LOWPAN_H */
 /** @} */

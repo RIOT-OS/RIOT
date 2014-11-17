@@ -38,6 +38,10 @@
 
 #include "socket_base/socket.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Used to define the socket address.
  */
@@ -463,6 +467,10 @@ int setsockopt(int socket, int level, int option_name, const void *option_value,
  *          be returned and errno set to indicate the error.
  */
 int socket(int domain, int type, int protocol);
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @}

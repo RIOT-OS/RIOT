@@ -25,6 +25,10 @@
 #include <stddef.h>
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief djb2_hash
  *
@@ -154,6 +158,10 @@ uint32_t rotating_hash(const uint8_t *buf, size_t len);
  * @return 32 bit sized hash
  */
 uint32_t one_at_a_time_hash(const uint8_t *buf, size_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __HASHES_H */

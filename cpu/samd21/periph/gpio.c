@@ -25,6 +25,7 @@
 
 #include "sched.h"
 #include "thread.h"
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -148,16 +149,17 @@ int gpio_init_out(gpio_t dev, gpio_pp_t pushpull)
     }
 
     /* configure as output */
-    port->DIRSET.reg = (1 << (pin % 32));
+    port->DIRSET.reg = (1<<(pin));
+
     /* configure the pin's pull resistor state */
     switch (pushpull) {
         case GPIO_PULLDOWN:
             return -1;
         case GPIO_PULLUP:
-            port->PINCFG[pin % 32].bit.PULLEN = true;
+            port->PINCFG[pin].bit.PULLEN = true;
             break;
         case GPIO_NOPULL:
-            port->PINCFG[pin % 32].bit.PULLEN = false;
+            port->PINCFG[pin].bit.PULLEN = false;
             break;
     }
 
@@ -274,21 +276,22 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pushpull)
     }
 
     /* configure as input */
-    port->DIRCLR.reg = (1 << (pin %32 ));
+    port->DIRCLR.reg = (1<<(pin));
     /* buffer input value */
-    port->PINCFG[pin % 32].bit.INEN = true;
+    port->PINCFG[pin].bit.INEN = true;
+
     /* configure the pin's pull resistor state */
     switch (pushpull) {
         case GPIO_PULLDOWN:
-            port->OUTCLR.reg = (1 << (pin % 32));
-            port->PINCFG[pin % 32].bit.PULLEN = true;
+            port->OUTCLR.reg = (1 << (pin));
+            port->PINCFG[pin].bit.PULLEN = true;
             break;
         case GPIO_PULLUP:
-            port->OUTSET.reg = (1 << (pin % 32));
-            port->PINCFG[pin % 32].bit.PULLEN = true;
+            port->OUTSET.reg = (1 << (pin));
+            port->PINCFG[pin].bit.PULLEN = true;
             break;
         case GPIO_NOPULL:
-            port->PINCFG[pin % 32].bit.PULLEN = false;
+            port->PINCFG[pin].bit.PULLEN = false;
             break;
     }
 
@@ -425,12 +428,11 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 
     /* configure pin as input */
     res = gpio_init_in(dev, pullup);
-    pin = pin % 32;
     if (res < 0) {
         return res;
     }
 
-    if (pin < 16) {
+    if (pin<16) {
         port->WRCONFIG.reg = PORT_WRCONFIG_WRPINCFG \
                         | PORT_WRCONFIG_WRPMUX \
                         | PORT_WRCONFIG_PMUX(0x0) \
@@ -450,13 +452,13 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
 
     GCLK->CLKCTRL = (GCLK_CLKCTRL_Type){
         .bit.ID = EIC_GCLK_ID,
-        .bit.GEN = 0, //Generator 0
+        .bit.GEN = 0,
         .bit.CLKEN = 1,
         .bit.WRTLOCK = 0
     };
 
     /* Setup interrupt */
-    NVIC_SetPriority(EIC_IRQn, 10); //TODO: Come up with a sensible prio, now highest
+    NVIC_SetPriority(EIC_IRQn, 10);
     NVIC_EnableIRQ(EIC_IRQn);
 
     /* save callback */
@@ -670,82 +672,82 @@ int gpio_read(gpio_t dev)
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:
-            res = (&GPIO_0_DEV)->IN.reg & (1 << (GPIO_0_PIN % 32));
+            res = (&GPIO_0_DEV)->IN.reg & (1 << (GPIO_0_PIN));
             break;
 #endif
 #if GPIO_1_EN
         case GPIO_1:
-            res = (&GPIO_1_DEV)->IN.reg & (1 << (GPIO_1_PIN % 32));
+            res = (&GPIO_1_DEV)->IN.reg & (1 << (GPIO_1_PIN));
             break;
 #endif
 #if GPIO_2_EN
         case GPIO_2:
-            res = (&GPIO_2_DEV)->IN.reg & (1 << (GPIO_2_PIN % 32));
+            res = (&GPIO_2_DEV)->IN.reg & (1 << (GPIO_2_PIN));
             break;
 #endif
 #if GPIO_3_EN
         case GPIO_3:
-            res = (&GPIO_3_DEV)->IN.reg & (1 << (GPIO_3_PIN % 32));
+            res = (&GPIO_3_DEV)->IN.reg & (1 << (GPIO_3_PIN));
             break;
 #endif
 #if GPIO_4_EN
         case GPIO_4:
-            res = (&GPIO_4_DEV)->IN.reg & (1 << (GPIO_4_PIN % 32));
+            res = (&GPIO_4_DEV)->IN.reg & (1 << (GPIO_4_PIN));
             break;
 #endif
 #if GPIO_5_EN
         case GPIO_5:
-            res = (&GPIO_5_DEV)->IN.reg & (1 << (GPIO_5_PIN % 32));
+            res = (&GPIO_5_DEV)->IN.reg & (1 << (GPIO_5_PIN));
             break;
 #endif
 #if GPIO_6_EN
         case GPIO_6:
-            res = (&GPIO_6_DEV)->IN.reg & (1 << (GPIO_6_PIN % 32));
+            res = (&GPIO_6_DEV)->IN.reg & (1 << (GPIO_6_PIN));
             break;
 #endif
 #if GPIO_7_EN
         case GPIO_7:
-            res = (&GPIO_7_DEV)->IN.reg & (1 << (GPIO_7_PIN % 32));
+            res = (&GPIO_7_DEV)->IN.reg & (1 << (GPIO_7_PIN));
             break;
 #endif
 #if GPIO_8_EN
         case GPIO_8:
-            res = (&GPIO_8_DEV)->IN.reg & (1 << (GPIO_8_PIN % 32));
+            res = (&GPIO_8_DEV)->IN.reg & (1 << (GPIO_8_PIN));
             break;
 #endif
 #if GPIO_9_EN
         case GPIO_9:
-            res = (&GPIO_9_DEV)->IN.reg & (1 << (GPIO_9_PIN % 32));
+            res = (&GPIO_9_DEV)->IN.reg & (1 << (GPIO_9_PIN));
             break;
 #endif
 #if GPIO_10_EN
         case GPIO_10:
-            res = (&GPIO_10_DEV)->IN.reg & (1 << (GPIO_10_PIN % 32));
+            res = (&GPIO_10_DEV)->IN.reg & (1 << (GPIO_10_PIN));
             break;
 #endif
 #if GPIO_11_EN
         case GPIO_11:
-            res = (&GPIO_11_DEV)->IN.reg & (1 << (GPIO_11_PIN % 32));
+            res = (&GPIO_11_DEV)->IN.reg & (1 << (GPIO_11_PIN));
             break;
 #endif
 #if GPIO_12_EN
         case GPIO_12:
-            res = (&GPIO_12_DEV)->IN.reg & (1 << (GPIO_12_PIN % 32));
+            res = (&GPIO_12_DEV)->IN.reg & (1 << (GPIO_12_PIN));
             break;
 #endif
 #if GPIO_13_EN
         case GPIO_13:
-            res = (&GPIO_13_DEV)->IN.reg & (1 << (GPIO_13_PIN % 32));
+            res = (&GPIO_13_DEV)->IN.reg & (1 << (GPIO_13_PIN));
             break;
 #endif
 #if GPIO_14_EN
         case GPIO_14:
-            res = (&GPIO_14_DEV)->IN.reg & (1 << (GPIO_14_PIN % 32));
+            res = (&GPIO_14_DEV)->IN.reg & (1 << (GPIO_14_PIN));
             break;
 #endif
 #if GPIO_15_EN
         case GPIO_15:
-            res = (&GPIO_15_DEV)->IN.reg & (1 << (GPIO_15_PIN % 32));
+            res = (&GPIO_15_DEV)->IN.reg & (1 << (GPIO_15_PIN));
             break;
 #endif
     }
@@ -763,82 +765,82 @@ void gpio_set(gpio_t dev)
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:
-            (&GPIO_0_DEV)->OUTSET.reg = (1 << (GPIO_0_PIN % 32));
+            (&GPIO_0_DEV)->OUTSET.reg = (1 << (GPIO_0_PIN));
             break;
 #endif
 #if GPIO_1_EN
         case GPIO_1:
-            (&GPIO_1_DEV)->OUTSET.reg = (1 << (GPIO_1_PIN % 32));
+            (&GPIO_1_DEV)->OUTSET.reg = (1 << (GPIO_1_PIN));
             break;
 #endif
 #if GPIO_2_EN
         case GPIO_2:
-            (&GPIO_2_DEV)->OUTSET.reg = (1 << (GPIO_2_PIN % 32));
+            (&GPIO_2_DEV)->OUTSET.reg = (1 << (GPIO_2_PIN));
             break;
 #endif
 #if GPIO_3_EN
         case GPIO_3:
-            (&GPIO_3_DEV)->OUTSET.reg = (1 << (GPIO_3_PIN % 32));
+            (&GPIO_3_DEV)->OUTSET.reg = (1 << (GPIO_3_PIN));
             break;
 #endif
 #if GPIO_4_EN
         case GPIO_4:
-            (&GPIO_4_DEV)->OUTSET.reg = (1 << (GPIO_4_PIN % 32));
+            (&GPIO_4_DEV)->OUTSET.reg = (1 << (GPIO_4_PIN));
             break;
 #endif
 #if GPIO_5_EN
         case GPIO_5:
-            (&GPIO_5_DEV)->OUTSET.reg = (1 << (GPIO_5_PIN % 32));
+            (&GPIO_5_DEV)->OUTSET.reg = (1 << (GPIO_5_PIN));
             break;
 #endif
 #if GPIO_6_EN
         case GPIO_6:
-            (&GPIO_6_DEV)->OUTSET.reg = (1 << (GPIO_6_PIN % 32));
+            (&GPIO_6_DEV)->OUTSET.reg = (1 << (GPIO_6_PIN));
             break;
 #endif
 #if GPIO_7_EN
         case GPIO_7:
-            (&GPIO_7_DEV)->OUTSET.reg = (1 << (GPIO_7_PIN % 32));
+            (&GPIO_7_DEV)->OUTSET.reg = (1 << (GPIO_7_PIN));
             break;
 #endif
 #if GPIO_8_EN
         case GPIO_8:
-            (&GPIO_8_DEV)->OUTSET.reg = (1 << (GPIO_8_PIN % 32));
+            (&GPIO_8_DEV)->OUTSET.reg = (1 << (GPIO_8_PIN));
             break;
 #endif
 #if GPIO_9_EN
         case GPIO_9:
-            (&GPIO_9_DEV)->OUTSET.reg = (1 << (GPIO_9_PIN % 32));
+            (&GPIO_9_DEV)->OUTSET.reg = (1 << (GPIO_9_PIN));
             break;
 #endif
 #if GPIO_10_EN
         case GPIO_10:
-            (&GPIO_10_DEV)->OUTSET.reg = (1 << (GPIO_10_PIN % 32));
+            (&GPIO_10_DEV)->OUTSET.reg = (1 << (GPIO_10_PIN));
             break;
 #endif
 #if GPIO_11_EN
         case GPIO_11:
-            (&GPIO_11_DEV)->OUTSET.reg = (1 << (GPIO_11_PIN % 32));
+            (&GPIO_11_DEV)->OUTSET.reg = (1 << (GPIO_11_PIN));
             break;
 #endif
 #if GPIO_12_EN
         case GPIO_12:
-            (&GPIO_12_DEV)->OUTSET.reg = (1 << (GPIO_12_PIN % 32));
+            (&GPIO_12_DEV)->OUTSET.reg = (1 << (GPIO_12_PIN));
             break;
 #endif
 #if GPIO_13_EN
         case GPIO_13:
-            (&GPIO_13_DEV)->OUTSET.reg = (1 << (GPIO_13_PIN % 32));
+            (&GPIO_13_DEV)->OUTSET.reg = (1 << (GPIO_13_PIN));
             break;
 #endif
 #if GPIO_14_EN
         case GPIO_14:
-            (&GPIO_14_DEV)->OUTSET.reg = (1 << (GPIO_14_PIN % 32));
+            (&GPIO_14_DEV)->OUTSET.reg = (1 << (GPIO_14_PIN));
             break;
 #endif
 #if GPIO_15_EN
         case GPIO_15:
-            (&GPIO_15_DEV)->OUTSET.reg = (1 << (GPIO_15_PIN % 32));
+            (&GPIO_15_DEV)->OUTSET.reg = (1 << (GPIO_15_PIN));
             break;
 #endif
     }
@@ -849,83 +851,83 @@ void gpio_clear(gpio_t dev)
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:
-            (&GPIO_0_DEV)->OUTCLR.reg = (1 << (GPIO_0_PIN % 32));
+            (&GPIO_0_DEV)->OUTCLR.reg = (1 << (GPIO_0_PIN));
             break;
 #endif
 #if GPIO_1_EN
         case GPIO_1:
-            (&GPIO_1_DEV)->OUTCLR.reg = (1 << (GPIO_1_PIN % 32));
+            (&GPIO_1_DEV)->OUTCLR.reg = (1 << (GPIO_1_PIN));
             break;
 #endif
 #if GPIO_2_EN
         case GPIO_2:
-            (&GPIO_2_DEV)->OUTCLR.reg = (1 << (GPIO_2_PIN % 32));
+            (&GPIO_2_DEV)->OUTCLR.reg = (1 << (GPIO_2_PIN));
             break;
 #endif
 #if GPIO_3_EN
         case GPIO_3:
-            (&GPIO_3_DEV)->OUTCLR.reg = (1 << (GPIO_3_PIN % 32));
+            (&GPIO_3_DEV)->OUTCLR.reg = (1 << (GPIO_3_PIN));
             break;
 #endif
 #if GPIO_4_EN
         case GPIO_4:
-            (&GPIO_4_DEV)->OUTCLR.reg = (1 << (GPIO_4_PIN % 32));
+            (&GPIO_4_DEV)->OUTCLR.reg = (1 << (GPIO_4_PIN));
             break;
 
 #endif
 #if GPIO_5_EN
         case GPIO_5:
-            (&GPIO_5_DEV)->OUTCLR.reg = (1 << (GPIO_5_PIN % 32));
+            (&GPIO_5_DEV)->OUTCLR.reg = (1 << (GPIO_5_PIN));
             break;
 #endif
 #if GPIO_6_EN
         case GPIO_6:
-            (&GPIO_6_DEV)->OUTCLR.reg = (1 << (GPIO_6_PIN % 32));
+            (&GPIO_6_DEV)->OUTCLR.reg = (1 << (GPIO_6_PIN));
             break;
 #endif
 #if GPIO_7_EN
         case GPIO_7:
-            (&GPIO_7_DEV)->OUTCLR.reg = (1 << (GPIO_7_PIN % 32));
+            (&GPIO_7_DEV)->OUTCLR.reg = (1 << (GPIO_7_PIN));
             break;
 #endif
 #if GPIO_8_EN
         case GPIO_8:
-            (&GPIO_8_DEV)->OUTCLR.reg = (1 << (GPIO_8_PIN % 32));
+            (&GPIO_8_DEV)->OUTCLR.reg = (1 << (GPIO_8_PIN));
             break;
 #endif
 #if GPIO_9_EN
         case GPIO_9:
-            (&GPIO_9_DEV)->OUTCLR.reg = (1 << (GPIO_9_PIN % 32));
+            (&GPIO_9_DEV)->OUTCLR.reg = (1 << (GPIO_9_PIN));
             break;
 #endif
 #if GPIO_10_EN
         case GPIO_10:
-            (&GPIO_10_DEV)->OUTCLR.reg = (1 << (GPIO_10_PIN % 32));
+            (&GPIO_10_DEV)->OUTCLR.reg = (1 << (GPIO_10_PIN));
             break;
 #endif
 #if GPIO_11_EN
         case GPIO_11:
-            (&GPIO_11_DEV)->OUTCLR.reg = (1 << (GPIO_11_PIN % 32));
+            (&GPIO_11_DEV)->OUTCLR.reg = (1 << (GPIO_11_PIN));
             break;
 #endif
 #if GPIO_12_EN
         case GPIO_12:
-            (&GPIO_12_DEV)->OUTCLR.reg = (1 << (GPIO_12_PIN % 32));
+            (&GPIO_12_DEV)->OUTCLR.reg = (1 << (GPIO_12_PIN));
             break;
 #endif
 #if GPIO_13_EN
         case GPIO_13:
-            (&GPIO_13_DEV)->OUTCLR.reg = (1 << (GPIO_13_PIN % 32));
+            (&GPIO_13_DEV)->OUTCLR.reg = (1 << (GPIO_13_PIN));
             break;
 #endif
 #if GPIO_14_EN
         case GPIO_14:
-            (&GPIO_14_DEV)->OUTCLR.reg = (1 << (GPIO_14_PIN % 32));
+            (&GPIO_14_DEV)->OUTCLR.reg = (1 << (GPIO_14_PIN));
             break;
 #endif
 #if GPIO_15_EN
         case GPIO_15:
-            (&GPIO_15_DEV)->OUTCLR.reg = (1 << (GPIO_15_PIN % 32));
+            (&GPIO_15_DEV)->OUTCLR.reg = (1 << (GPIO_15_PIN));
             break;
 #endif
     }

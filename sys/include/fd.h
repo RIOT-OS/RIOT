@@ -25,6 +25,10 @@
 #include "kernel_types.h"
 #include "cpu.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * File descriptor table.
  */
@@ -86,5 +90,9 @@ fd_t *fd_get(int fd);
  * @param[in] fd    A POSIX-like file descriptor.
  */
 void fd_destroy(int fd);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* FD_H */

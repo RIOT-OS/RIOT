@@ -1,12 +1,24 @@
+/*
+ * Copyright (C) 2013 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 #ifndef _SEMAPHORE_H
 #define _SEMAPHORE_H    1
 
 #include <time.h>
 
+#include "priority_queue.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** Value returned if `sem_open' failed.  */
 #define SEM_FAILED      ((sem_t *) 0)
-
-#include "priority_queue.h"
 
 typedef struct sem {
     volatile unsigned int value;
@@ -97,5 +109,9 @@ int sem_post(sem_t *sem);
  * @param sval place whre value goes to
  */
 int sem_getvalue(sem_t *sem, int *sval);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* semaphore.h */

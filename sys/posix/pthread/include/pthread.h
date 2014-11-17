@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @defgroup pthread POSIX threads
  * POSIX conforming multi-threading features.
@@ -31,6 +39,14 @@
 #include "pthread_scheduling.h"
 #include "pthread_cancellation.h"
 #include "pthread_cond.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

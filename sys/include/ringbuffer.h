@@ -19,6 +19,10 @@
 #ifndef __RINGBUFFER_H
 #define __RINGBUFFER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief     Ringbuffer.
  * @details   Non thread-safe FIFO ringbuffer implementation around a `char` array.
@@ -145,5 +149,9 @@ int ringbuffer_peek_one(const ringbuffer_t *restrict rb);
  * @returns         Same as ringbuffer_get()
  */
 unsigned ringbuffer_peek(const ringbuffer_t *restrict rb, char *buf, unsigned n);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __RINGBUFFER_H */

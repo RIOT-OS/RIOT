@@ -30,6 +30,10 @@
 #include "rpl_config.h"
 #include "rpl.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Initialization of RPL-root.
  *
@@ -140,6 +144,10 @@ void recv_rpl_dao_ack_mode(void);
  *
  */
 void rpl_send(ipv6_addr_t *destination, uint8_t *payload, uint16_t p_len, uint8_t next_header);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __RPL_SM_H */
 /** @} */

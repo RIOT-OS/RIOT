@@ -23,6 +23,9 @@
 #ifndef RC5_H_
 #define RC5_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define RC5_32_P        0xB7E15163L
 #define RC5_32_Q        0x9E3779B9L
@@ -136,6 +139,10 @@ uint8_t rc5_get_preferred_block_size(void);
  *
  */
 extern block_cipher_interface_t rc5_interface;
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* RC5_H_ */

@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 René Kijewski <rene.kijewski@fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup pthread
  * @{
@@ -8,6 +16,10 @@
 
 #ifndef __SYS__POSIX__PTHREAD_CLEANUP__H
 #define __SYS__POSIX__PTHREAD_CLEANUP__H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief   Internal structure for pthread_cleanup_push()
@@ -78,6 +90,10 @@ void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute);
         } while (0); \
         __pthread_cleanup_pop(&____datum__, ____execute__); \
     } while (0)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

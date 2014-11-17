@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 René Kijewski <rene.kijewski@fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup pthread
  * @{
@@ -9,6 +17,10 @@
 
 #ifndef __SYS__POSIX__PTHREAD_SCHEDULING__H
 #define __SYS__POSIX__PTHREAD_SCHEDULING__H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief           Unimplemented.
@@ -38,6 +50,10 @@ int pthread_getschedparam(pthread_t target_thread, int *policy, struct sched_par
  * @returns         The function is unimplemented. Using it will cause a link time error.
  */
 int pthread_setschedprio(pthread_t target_thread, int prio);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

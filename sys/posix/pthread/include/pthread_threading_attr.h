@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 René Kijewski <rene.kijewski@fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup pthread
  * @{
@@ -8,6 +16,10 @@
 
 #ifndef __SYS__POSIX__PTHREAD_THREADING_ATTR__H
 #define __SYS__POSIX__PTHREAD_THREADING_ATTR__H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief     An attribute set to supply to pthread_create()
@@ -188,6 +200,10 @@ int pthread_attr_getstacksize(const pthread_attr_t *attr, size_t *stacksize);
  * @return          0, this invocation cannot fail.
  */
 int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

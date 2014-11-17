@@ -28,6 +28,10 @@
 #include "timex.h"
 #include "vtimer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define STDIN_FILENO    0   ///< stdin file descriptor
 #define STDOUT_FILENO   1   ///< stdout file descriptor
 #define STDERR_FILENO   2   ///< stderr file descriptor
@@ -99,6 +103,10 @@ int usleep(useconds_t useconds);
  * @return          0 on success
  */
 unsigned int sleep(unsigned int seconds);
+
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * @}

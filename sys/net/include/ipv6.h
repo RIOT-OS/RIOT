@@ -28,6 +28,14 @@
 
 #include "../network_layer/sixlowpan/icmp.h"        /* TODO: remove if not needed anymore */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* IPV6_H */
 /**
  * @}

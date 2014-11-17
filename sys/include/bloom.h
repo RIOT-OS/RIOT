@@ -127,6 +127,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * hashfp_t  hash function to use in thee filter
  */
@@ -214,6 +218,10 @@ void bloom_add(bloom_t *bloom, const uint8_t *buf, size_t len);
  *
  */
 bool bloom_check(bloom_t *bloom, const uint8_t *buf, size_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* _BLOOM_FILTER_H */

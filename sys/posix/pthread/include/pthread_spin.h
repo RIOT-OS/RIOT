@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup pthread
  * @{
@@ -13,6 +21,10 @@
 #define __SYS__POSIX__PTHREAD_SPIN__H
 
 #include <errno.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief           A spinlock.
@@ -72,6 +84,10 @@ int pthread_spin_trylock(pthread_spinlock_t *lock);
  *                  `EINVAL` if `lock == NULL`.
  */
 int pthread_spin_unlock(pthread_spinlock_t *lock);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

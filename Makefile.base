@@ -3,7 +3,7 @@ ifeq (, $(__RIOTBUILD_FLAG))
 endif
 
 unexport DIRS
-DIRS := $(abspath ${DIRS})
+DIRS := $(sort $(abspath ${DIRS}))
 
 MODULE ?= $(shell basename $(CURDIR))
 

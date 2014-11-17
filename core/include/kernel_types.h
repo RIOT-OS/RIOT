@@ -41,7 +41,7 @@
 #       endif
 #   endif
 
-#   if defined (MODULE_MSP430_COMMON) || defined (MODULE_ATMEGA_COMMON)
+#   ifdef MODULE_MSP430_COMMON
         typedef signed ssize_t;
 #   endif
 #endif

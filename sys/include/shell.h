@@ -19,6 +19,10 @@
 
 #include "attributes.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief           Protype of a shell callback handler.
  * @details         The functions supplied to shell_init() must use this signature.
@@ -83,5 +87,9 @@ void shell_init(shell_t *shell,
  * @returns         This function does not return.
  */
 void shell_run(shell_t *shell) NORETURN;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __SHELL_H */

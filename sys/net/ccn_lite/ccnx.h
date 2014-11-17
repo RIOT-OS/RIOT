@@ -20,6 +20,10 @@
  * 2011-03-13 created
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // ----------------------------------------------------------------------
 
 #define CCN_DEFAULT_MTU         PAYOAD_SIZE
@@ -68,5 +72,9 @@
 #define CCN_DTAG_MAXSUFFCOMP    84
 #define CCN_DTAG_SEQNO          256
 #define CCN_DTAG_CCNPDU         17702112
+
+#ifdef __cplusplus
+}
+#endif
 
 // eof
