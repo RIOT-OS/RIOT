@@ -68,7 +68,6 @@ static inline uint64_t NTOHLL(uint64_t a)
 #define CMP_IPV6_ADDR(a, b) (memcmp(a, b, 16))
 
 uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len);
-void printArrayRange(uint8_t *array, uint16_t len, char *str);
 
 #ifdef __cplusplus
 }

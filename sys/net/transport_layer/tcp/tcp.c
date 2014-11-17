@@ -71,18 +71,6 @@ void printTCPHeader(tcp_hdr_t *tcp_header)
     printf("END: TCP HEADER\n");
 }
 
-void printArrayRange_tcp(uint8_t *udp_header, uint16_t len)
-{
-    int i = 0;
-    printf("-------------MEMORY-------------\n");
-
-    for (i = 0; i < len; i++) {
-        printf("%#x ", *(udp_header + i));
-    }
-
-    printf("-------------MEMORY-------------\n");
-}
-
 void print_tcp_flags(tcp_hdr_t *tcp_header)
 {
     printf("FLAGS: ");
@@ -744,8 +732,6 @@ void *tcp_packet_handler(void *arg)
         else {
             printf("Wrong checksum (%x) or no corresponding socket found!\n",
                    chksum);
-            printArrayRange(((uint8_t *)ipv6_header), IPV6_HDR_LEN +
-                            NTOHS(ipv6_header->length), "Incoming");
             print_tcp_status(INC_PACKET, ipv6_header, tcp_header,
                              &tcp_socket->socket_values);
         }
