@@ -20,35 +20,12 @@
 #include "mutex.h"
 #include "vtimer.h"
 
-#include "ipv6.h"
+#include "ipv6/addr.h"
 #include "sixlowpan/iphc_cbuf.h"
 
 static sixlowpan_iphc_cbuf_t _cbuf[SIXLOWPAN_IPHC_CBUF_SIZE];
 static uint32_t _cbuf_invalid_time[SIXLOWPAN_IPHC_CBUF_SIZE];
 static mutex_t _cbuf_mutex = MUTEX_INIT;
-
-#ifndef MODULE_IPV6
-void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix,
-                           uint8_t bits)
-{
-    if (bits > 128) {
-        bits = 128;
-    }
-
-    uint8_t bytes = bits / 8, mask;
-
-    if (bits % 8) {
-        mask = 0xff << (8 - (bits - (bytes * 8)));
-    }
-    else {
-        mask = 0x00;
-    }
-
-    memcpy(out, prefix, bytes);
-    out->u8[bytes] = prefix->u8[bytes] & mask;
-    memset(&(out[bytes + 1]), 0, 15 - bytes);
-}
-#endif /* MODULE_IPV6 */
 
 static uint32_t _now_in_minutes(void)
 {

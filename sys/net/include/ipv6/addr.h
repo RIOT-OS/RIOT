@@ -181,6 +181,7 @@ typedef enum __attribute__((packed)) {
     IPV6_ADDR_MCAST_SCP_ORG_LOCAL   = 0x8,      /**< organization-local scope */
     IPV6_ADDR_MCAST_SCP_GLOBAL      = 0xe,      /**< global scope */
 } ipv6_addr_mcast_scp_t;
+
 /**
  * @brief   Checks if two IPv6 addresses are equal.
  *
@@ -317,6 +318,18 @@ static inline bool ipv6_addr_is_solicited_node(const ipv6_addr_t *ipv6_addr)
  * @return  The number of bits *a* and *b* match in there prefix
  */
 uint8_t ipv6_addr_match_prefix(const ipv6_addr_t *a, const ipv6_addr_t *b);
+
+/**
+ * @brief   Sets IPv6 address *out* with the first *bits* bit taken
+ *          from *prefix* and the remaining bits to 0.
+ *
+ * @param[out]  out     Prefix to be set.
+ * @param[in]   prefix  Address to take prefix from.
+ * @param[in]   bits    Bits to be copied from *prefix* to *out*
+ *                      (set to 128 when greater than 128).
+ */
+void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix,
+                           uint8_t bits);
 
 /**
  * @brief   Sets *addr* dynamically to the unspecified IPv6 address (::).

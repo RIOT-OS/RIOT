@@ -28,7 +28,7 @@
 #ifndef __SIXLOWPAN_IPHC_CBUF_H_
 #define __SIXLOWPAN_IPHC_CBUF_H_
 
-#include "ipv6.h"
+#include "ipv6/addr.h"
 
 #define SIXLOWPAN_IPHC_CBUF_SIZE (16)
 
