@@ -206,11 +206,11 @@ static void test_basic_mac_send_data_send2(void)
 static void test_basic_mac_reg_buffer_full(void)
 {
     for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
-        TEST_ASSERT_EQUAL_INT(0, netapi_register(basic_mac_pid, (kernel_pid_t)(i + 1)));
+        TEST_ASSERT_EQUAL_INT(0, netapi_register(basic_mac_pid, (kernel_pid_t)(i + 1), 0));
     }
 
     TEST_ASSERT_EQUAL_INT(-ENOBUFS,
-                          netapi_register_current_thread(basic_mac_pid));
+                          netapi_register_current_thread(basic_mac_pid, 0));
 }
 
 static void test_basic_mac_register(void)
@@ -229,7 +229,7 @@ static void test_basic_mac_register(void)
     int res;
 
     TEST_ASSERT(basic_mac_receiver != KERNEL_PID_UNDEF);
-    TEST_ASSERT_EQUAL_INT(0, netapi_register(basic_mac_pid, basic_mac_receiver));
+    TEST_ASSERT_EQUAL_INT(0, netapi_register(basic_mac_pid, basic_mac_receiver, 0));
     res = netapi_fire_receive_event(basic_mac_pid, src, src_len, dest, dest_len, data, data_len);
     TEST_ASSERT_EQUAL_INT(0, res);
 
