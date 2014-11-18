@@ -4,12 +4,17 @@ export CPU = sam3x8e
 # define tools used for building the project
 export PREFIX = arm-none-eabi-
 export CC = $(PREFIX)gcc
+export CXX = $(PREFIX)g++
 export AR = $(PREFIX)ar
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
 export TERMPROG = $(RIOTBASE)/dist/tools/pyterm/pyterm
+
+# unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
+export CXXUWFLAGS +=
+export CXXEXFLAGS +=
 
 #define the flash-tool and default port depending on the host operating system
 OS := $(shell uname)
