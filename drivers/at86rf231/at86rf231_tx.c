@@ -142,6 +142,7 @@ netdev_802154_tx_status_t at86rf231_load_tx_buf(netdev_t *dev,
     size_t size = index + len + 2 + netdev_get_hlist_len(upper_layer_hdrs);
 
     if (size > AT86RF231_MAX_PKT_LENGTH) {
+        DEBUG("at86rf231: packet too long, dropped it.\n");
         return NETDEV_802154_TX_STATUS_PACKET_TOO_LONG;
     }
 
@@ -170,8 +171,10 @@ netdev_802154_tx_status_t at86rf231_transmit_tx_buf(netdev_t *dev)
 
     /* Start TX */
     at86rf231_reg_write(AT86RF231_REG__TRX_STATE, AT86RF231_TRX_STATE__TX_START);
+    DEBUG("at86rf231: Started TX\n");
 
     if (!wait_for_ack) {
+        DEBUG("at86rf231: Don't wait for ACK, TX done.\n");
         return NETDEV_802154_TX_STATUS_OK;
     }
 
@@ -230,6 +233,7 @@ int16_t at86rf231_load(at86rf231_packet_t *packet)
                      packet->frame.payload_len + 1;
 
     if (packet->length > AT86RF231_MAX_PKT_LENGTH) {
+        DEBUG("at86rf231: ERROR: packet too long, dropped it.\n");
         return -1;
     }
 
@@ -265,6 +269,7 @@ int16_t at86rf231_load(at86rf231_packet_t *packet)
 
     /* load packet into fifo */
     at86rf231_write_fifo(pkt, packet->length);
+    DEBUG("at86rf231: Wrote to FIFO\n");
     return packet->length;
 }
 

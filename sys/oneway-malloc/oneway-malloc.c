@@ -60,7 +60,7 @@ void __attribute__((weak)) *realloc(void *ptr, size_t size)
     }
 }
 
-void __attribute__((weak)) *calloc(int size, size_t cnt)
+void __attribute__((weak)) *calloc(size_t size, size_t cnt)
 {
     void *mem = malloc(size * cnt);
     if (mem) {

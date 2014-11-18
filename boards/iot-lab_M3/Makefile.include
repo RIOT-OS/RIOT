@@ -17,6 +17,7 @@ export PORT
 # define tools used for building the project
 export PREFIX = arm-none-eabi-
 export CC = $(PREFIX)gcc
+export CXX = $(PREFIX)g++
 export AR = $(PREFIX)ar
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
@@ -32,6 +33,11 @@ export CPU_USAGE = -mcpu=cortex-m3
 export FPU_USAGE =
 export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
 export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
+
+# unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
+export CXXUWFLAGS +=
+export CXXEXFLAGS +=
+
 export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
 export LINKFLAGS += -ggdb -g3 -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles
 # $(LINKERSCRIPT) is specified in cpu/Makefile.include

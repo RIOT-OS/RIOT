@@ -39,8 +39,10 @@ MEMORY
     ccmram (rwx): ORIGIN = 0x10000000, LENGTH = 8K
 }
 
-/* The stack size used by the application. NOTE: you need to adjust  */
-STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0xa00; /* 2.5K */
+/* Define the default stack size for interrupt mode. As no context is
+   saved on this stack and ISRs are supposed to be short, it can be fairly
+   small. 512 byte should be a save assumption here */
+STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x200; /* 512 byte */
 
 /* Section Definitions */
 SECTIONS

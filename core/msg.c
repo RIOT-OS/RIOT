@@ -41,14 +41,9 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block);
 
 static int queue_msg(tcb_t *target, const msg_t *m)
 {
-    if (target->msg_array == NULL) {
-        DEBUG("queue_msg(): no message queue present\n");
-        return 0;
-    }
-
     int n = cib_put(&(target->msg_queue));
     if (n < 0) {
-        DEBUG("queue_msg(): message queue is full\n");
+        DEBUG("queue_msg(): message queue is full (or there is none)\n");
         return 0;
     }
 

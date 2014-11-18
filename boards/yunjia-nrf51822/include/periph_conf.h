@@ -36,8 +36,8 @@ extern "C" {
 /* Timer 0 configuration */
 #define TIMER_0_DEV         NRF_TIMER0
 #define TIMER_0_CHANNELS    3
-#define TIMER_0_MAX_VALUE   (0xffffffff)
-#define TIMER_0_BITMODE     TIMER_BITMODE_BITMODE_32Bit
+#define TIMER_0_MAX_VALUE   (0xffffff)
+#define TIMER_0_BITMODE     TIMER_BITMODE_BITMODE_24Bit     /* only possible value for TIMER0 */
 #define TIMER_0_ISR         isr_timer0
 #define TIMER_0_IRQ         TIMER0_IRQn
 
