@@ -23,6 +23,8 @@
 
 #include "byteorder.h"
 #include "ipv6/addr.h"
+#include "kernel_types.h"
+#include "netapi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,6 +54,30 @@ extern "C" {
  * @brief   L4 protocol number for IPv6 destination options.
  */
 #define IPV6_PROTO_NUM_IPV6_OPTS    (60)
+
+/**
+ * @brief   PID of the IPv6 control thread.
+ */
+extern kernel_pid_t ipv6_pid;
+
+/**
+ * @brief   @ref netapi configuration types for IPv6
+ * @extends netapi_conf_type_t
+ *
+ * @details Since the IPv6 thread is to be supposed the only one of its kind
+ *          in the system and setting of the IPv6 addresses is more dependent
+ *          on the interface (equivalent to MAC control thread PID) then on
+ *          IPv6 as a whole itself, addresses are set and got by the @ref ipv6_if
+ *          module.
+ */
+typedef enum {
+    /**
+     * @brief   Protocol of the IPv6 layer of type netdev_proto_t; Always
+     *          NETDEV_PROTO_IPV6; Only for getting.
+     */
+    IPV6_CONF_PROTO = NETAPI_CONF_PROTO,
+    IPV6_CONF_REGISTRY = NETAPI_CONF_REGISTRY,  /**< Getter for receiver registry */
+} ipv6_conf_t;
 
 /**
  * @brief   Data type to represent an IPv6 packet header
