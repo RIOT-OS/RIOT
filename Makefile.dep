@@ -57,6 +57,7 @@ ifneq (,$(filter sixlowpan_iphc_cbuf,$(USEMODULE)))
 endif
 
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
+	USEMODULE += ipv6
 	USEMODULE += netapi
 	USEMODULE += netdev_base
 	USEMODULE += pktbuf
@@ -70,6 +71,7 @@ endif
 ifneq (,$(filter ipv6,$(USEMODULE)))
     USEMODULE += ipv6_if
     USEMODULE += ipv6_addr
+    USEMODULE += net_help
 endif
 
 ifneq (,$(filter ipv6_if,$(USEMODULE)))
