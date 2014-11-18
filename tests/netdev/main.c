@@ -756,8 +756,8 @@ static int check_state(void)
 static int send_packet(void)
 {
     netdev_hlist_t *hlist = NULL;
-    netdev_hlist_t header1 = {NULL, NULL, "header 1,", 9};
-    netdev_hlist_t header2 = {NULL, NULL, "header 2,", 9};
+    netdev_hlist_t header1 = {NULL, NULL, NETDEV_PROTO_UNKNOWN, "header 1,", 9};
+    netdev_hlist_t header2 = {NULL, NULL, NETDEV_PROTO_UNKNOWN, "header 2,", 9};
     char payload[] = "payload";
 
     netdev_hlist_add(&hlist, &header2);
