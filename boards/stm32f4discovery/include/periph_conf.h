@@ -126,11 +126,11 @@ extern "C" {
 #define ADC_0_PORT          GPIOA
 #define ADC_0_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
 /* ADC 0 channel 0 pin config */
-#define ADC_0_CH0           1
-#define ADC_0_CH0_PIN       1
+#define ADC_0_CH0           0
+#define ADC_0_CH0_PIN       0
 /* ADC 0 channel 1 pin config */
-#define ADC_0_CH1           4
-#define ADC_0_CH1_PIN       4
+#define ADC_0_CH1           1
+#define ADC_0_CH1_PIN       1
 
 /* ADC 0 configuration */
 #define ADC_1_DEV           ADC2
@@ -180,8 +180,8 @@ extern "C" {
 /* PWM 1 pin configuration */
 #define PWM_1_PORT          GPIOB
 #define PWM_1_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
-#define PWM_1_PIN_CH0       4
-#define PWM_1_PIN_CH1       5
+#define PWM_1_PIN_CH0       8
+#define PWM_1_PIN_CH1       9
 #define PWM_1_PIN_CH2       0
 #define PWM_1_PIN_CH3       1
 #define PWM_1_PIN_AF        2
@@ -210,18 +210,18 @@ extern "C" {
 #define SPI_0_IRQ               SPI1_IRQn
 #define SPI_0_IRQ_HANDLER       isr_spi1
 /* SPI 0 pin configuration */
-#define SPI_0_SCK_PORT          GPIOA
-#define SPI_0_SCK_PIN           5
+#define SPI_0_SCK_PORT          GPIOB
+#define SPI_0_SCK_PIN           3
 #define SPI_0_SCK_AF            5
-#define SPI_0_SCK_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
-#define SPI_0_MISO_PORT         GPIOA
-#define SPI_0_MISO_PIN          6
+#define SPI_0_SCK_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define SPI_0_MISO_PORT         GPIOB
+#define SPI_0_MISO_PIN          4
 #define SPI_0_MISO_AF           5
-#define SPI_0_MISO_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
-#define SPI_0_MOSI_PORT         GPIOA
-#define SPI_0_MOSI_PIN          7
+#define SPI_0_MISO_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define SPI_0_MOSI_PORT         GPIOB
+#define SPI_0_MOSI_PIN          5
 #define SPI_0_MOSI_AF           5
-#define SPI_0_MOSI_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN)
+#define SPI_0_MOSI_PORT_CLKEN() (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
 
 /* SPI 1 device config */
 #define SPI_1_DEV               SPI2
