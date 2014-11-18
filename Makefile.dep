@@ -53,7 +53,8 @@ ifneq (,$(filter sixlowpan_hc,$(USEMODULE)))
 endif
 
 ifneq (,$(filter sixlowpan_iphc_cbuf,$(USEMODULE)))
-	USEMODULE += vtimer
+    USEMODULE += ipv6_addr
+    USEMODULE += vtimer
 endif
 
 ifneq (,$(filter sixlowpan,$(USEMODULE)))

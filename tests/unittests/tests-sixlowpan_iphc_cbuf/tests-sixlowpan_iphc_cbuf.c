@@ -17,7 +17,7 @@
 
 #include "embUnit/embUnit.h"
 
-#include "ipv6.h"
+#include "ipv6/addr.h"
 #include "sixlowpan/iphc_cbuf.h"
 
 #include "tests-sixlowpan_iphc_cbuf.h"
