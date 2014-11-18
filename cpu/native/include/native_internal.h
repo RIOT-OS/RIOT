@@ -45,6 +45,8 @@
 #endif // BSD/Linux
 #include <netdb.h>
 #include <ifaddrs.h>
+#include <time.h>
+#include <sys/time.h>
 
 #include "kernel_types.h"
 
@@ -109,6 +111,8 @@ extern int (*real_pause)(void);
 extern int (*real_pipe)(int[2]);
 /* The ... is a hack to save includes: */
 extern int (*real_select)(int nfds, ...);
+extern int (*real_setitimer)(int which, const struct itimerval
+        *restrict value, struct itimerval *restrict ovalue);
 extern int (*real_setsockopt)(int socket, ...);
 extern int (*real_socket)(int domain, int type, int protocol);
 extern int (*real_printf)(const char *format, ...);
@@ -116,6 +120,11 @@ extern int (*real_unlink)(const char *);
 extern long int (*real_random)(void);
 extern const char* (*real_gai_strerror)(int errcode);
 extern FILE* (*real_fopen)(const char *path, const char *mode);
+
+#ifdef __MACH__
+#else
+extern int (*real_clock_gettime)(clockid_t clk_id, struct timespec *tp);
+#endif
 
 /**
  * data structures

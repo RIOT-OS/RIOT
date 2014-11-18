@@ -79,12 +79,19 @@ int (*real_open)(const char *path, int oflag, ...);
 int (*real_pause)(void);
 int (*real_pipe)(int[2]);
 int (*real_select)(int nfds, ...);
+int (*real_setitimer)(int which, const struct itimerval
+        *restrict value, struct itimerval *restrict ovalue);
 int (*real_setsockopt)(int socket, ...);
 int (*real_socket)(int domain, int type, int protocol);
 int (*real_unlink)(const char *);
 long int (*real_random)(void);
 const char* (*real_gai_strerror)(int errcode);
 FILE* (*real_fopen)(const char *path, const char *mode);
+
+#ifdef __MACH__
+#else
+int (*real_clock_gettime)(clockid_t clk_id, struct timespec *tp);
+#endif
 
 void _native_syscall_enter(void)
 {
@@ -390,6 +397,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_fork) = dlsym(RTLD_NEXT, "fork");
     *(void **)(&real_dup2) = dlsym(RTLD_NEXT, "dup2");
     *(void **)(&real_select) = dlsym(RTLD_NEXT, "select");
+    *(void **)(&real_setitimer) = dlsym(RTLD_NEXT, "setitimer");
     *(void **)(&real_setsockopt) = dlsym(RTLD_NEXT, "setsockopt");
     *(void **)(&real_socket) = dlsym(RTLD_NEXT, "socket");
     *(void **)(&real_unlink) = dlsym(RTLD_NEXT, "unlink");
@@ -404,4 +412,8 @@ void _native_init_syscalls(void)
     *(void **)(&real_feof) = dlsym(RTLD_NEXT, "feof");
     *(void **)(&real_ferror) = dlsym(RTLD_NEXT, "ferror");
     *(void **)(&real_clearerr) = dlsym(RTLD_NEXT, "clearerr");
+#ifdef __MACH__
+#else
+    *(void **)(&real_clock_gettime) = dlsym(RTLD_NEXT, "clock_gettime");
+#endif
 }
