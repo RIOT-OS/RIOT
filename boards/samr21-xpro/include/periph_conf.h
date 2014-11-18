@@ -49,9 +49,9 @@ extern "C" {
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
+#define UART_NUMOF          (2U)
 #define UART_0_EN           1
-#define UART_1_EN           0
+#define UART_1_EN           1
 #define UART_2_EN           0
 #define UART_3_EN           0
 #define UART_IRQ_PRIO       1
@@ -69,12 +69,15 @@ extern "C" {
 
 
 /* UART 1 device configuration */
-#define UART_1_DEV
-#define UART_1_IRQ
-#define UART_1_ISR
+#define UART_1_DEV			SERCOM2->USART
+#define UART_1_IRQ			SERCOM2_IRQn
+#define UART_1_ISR			isr_sercom2
 /* UART 1 pin configuration */
-#define UART_1_PORT
-#define UART_1_PINS
+#define UART_1_PORT         (PORT->Group[0])
+#define UART_1_TX_PIN       (14)
+#define UART_1_RX_PIN       (15)
+#define UART_1_PINS         (PORT_PA14 | PORT_PA15)
+#define UART_1_REF_F        (8000000UL)
 /** @} */
 
 
@@ -119,56 +122,6 @@ extern "C" {
 #define SPI_1_MOSI_PIN     (22)
 /** @} */
 
-
-#define SPI_0_MISO_DEV		PORT->Group[2]
-#define SPI_0_MISO_PIN      PIN_PC19
-#define SPI_0_MISO_PAD		0
-
-#define SPI_0_MOSI_DEV      PORT->Group[1]
-#define SPI_0_MOSI_PIN      PIN_PB30
-#define SPI_0_MOSI_PAD		2
-
-#define SPI_0_CS_GPIO		GPIO_4
-#define SPI_0_CS_DEV        PORT->Group[1]
-#define SPI_0_CS_PIN        PIN_PB31
-
-#define SPI_0_IRQ0_GPIO		GPIO_5
-#define SPI_0_IRQ0_DEV      PORT->Group[1]
-#define SPI_0_IRQ0_PIN      PIN_PB00
-
-#define SPI_0_RESET_GPIO	GPIO_6
-#define SPI_0_RESET_DEV     PORT->Group[1]
-#define SPI_0_RESET_PIN     PIN_PB15
-
-#define SPI_0_SLEEP_GPIO	GPIO_7
-#define SPI_0_SLEEP_DEV     PORT->Group[0]
-#define SPI_0_SLEEP_PIN     PIN_PA20
-
-
-/* SPI1 */
-#define SPI_1_DEV       SERCOM5->SPI
-#define SPI_IRQ_1       SERCOM5_IRQn
-#define SPI_1_DOPO			1
-#define SPI_1_DIPO			2
-#define SPI_1_F_REF         F_REF
-
-#define SPI_1_SCLK_DEV		PORT->Group[1]
-#define SPI_1_SCLK_PIN      PIN_PB23
-#define SPI_1_SCLK_PAD		3
-
-#define SPI_1_MISO_DEV		PORT->Group[1]
-#define SPI_1_MISO_PIN      PIN_PB02
-#define SPI_1_MISO_PAD		0
-
-#define SPI_1_MOSI_DEV      PORT->Group[1]
-#define SPI_1_MOSI_PIN      PIN_PB22
-#define SPI_1_MOSI_PAD		2
-
-#define SPI_1_CS_GPIO		GPIO_8
-#define SPI_1_CS_DEV        PORT->Group[0]
-#define SPI_1_CS_PIN        PIN_PA27
-
-
 /**
  * @name Random Number Generator configuration
  * @{
@@ -183,7 +136,7 @@ extern "C" {
 #define GPIO_NUMOF         (9U)
 #define GPIO_0_EN          1
 #define GPIO_1_EN          1
-#define GPIO_2_EN          1
+#define GPIO_2_EN          0
 #define GPIO_3_EN          1
 /*4-7 -> internal */
 #define GPIO_4_EN          1
@@ -211,9 +164,9 @@ extern "C" {
 #define GPIO_1_PIN         (28)
 #define GPIO_1_EXTINT      (8)
 /* GPIO channel 2 config */
-#define GPIO_2_DEV         PORT->Group[0]
-#define GPIO_2_PIN         (15)
-#define GPIO_2_EXTINT      (15)
+#define GPIO_2_DEV         //PORT->Group[0]
+#define GPIO_2_PIN         //(15)
+#define GPIO_2_EXTINT      //(15)
 /* GPIO channel 3 config */
 #define GPIO_3_DEV         PORT->Group[0]
 #define GPIO_3_PIN         (19)
