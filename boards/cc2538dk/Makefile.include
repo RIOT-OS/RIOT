@@ -7,6 +7,7 @@ export CPU_MODEL ?= cc2538nf53
 export PREFIX ?= arm-none-eabi-
 
 export CC      = $(PREFIX)gcc
+export CXX     = $(PREFIX)g++
 export AR      = $(PREFIX)ar
 export AS      = $(PREFIX)as
 export LINK    = $(PREFIX)gcc
@@ -45,6 +46,10 @@ export DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
 export RESET_FLAGS = $(BINDIR)
 
 export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
+
+# unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
+export CXXUWFLAGS +=
+export CXXEXFLAGS +=
 
 # Use the nano-specs of the NewLib when available:
 ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
