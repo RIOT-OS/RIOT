@@ -4,15 +4,23 @@ export CPU = lpc1768
 # toolchain config
 export PREFIX = arm-none-eabi-
 export CC = $(PREFIX)gcc
+export CXX = $(PREFIX)g++
 export AR = $(PREFIX)ar
-export CFLAGS += -DUSE_STDPERIPH_DRIVER -ggdb -g3 -O0 -Wall -Wstrict-prototypes -mcpu=cortex-m3 $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
-export ASFLAGS = -ggdb -g3 -mcpu=cortex-m3 $(FPU_USAGE) -mlittle-endian
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
 export SIZE = $(PREFIX)size
 export OBJCOPY = $(PREFIX)objcopy
-#LINKFLAGS +=  -g3 -ggdb -mcpu=cortex-m3 $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles -T$(RIOTCPU)/$(CPU)/LPC1768.ld
-LINKFLAGS += -mcpu=cortex-m3 -mthumb -Wl,--gc-sections,--cref -lc -lgcc -lnosys -T$(RIOTCPU)/$(CPU)/LPC1768.ld -nostartfiles
+
+# define build options
+CPU_USAGE = -mcpu=cortex-m3
+FPU_USAGE =
+export CFLAGS += -ggdb -g3 -std=gnu99 -Os -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles
+export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
+export ASFLAGS += -ggdb -g3 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
+export LINKFLAGS += -g3 -ggdb -std=gnu99 $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -static -lgcc -mthumb -mthumb-interwork -nostartfiles
+export LINKFLAGS += -T$(RIOTCPU)/$(CPU)/LPC1768.ld
+
+#LINKFLAGS += -mcpu=cortex-m3 -mthumb -Wl,--gc-sections,--cref -lc -lgcc -lnosys  -nostartfiles
 
 ifeq ($(strip $(PORT)),)
 	export PORT = /dev/ttyUSB0
@@ -25,3 +33,7 @@ export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/ -I$(RIOTCPU)/$(CPU)/include
 export OFLAGS = -O binary
 
 export UNDEF += $(BINDIR)cpu/startup.o
+
+# unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
+export CXXUWFLAGS +=
+export CXXEXFLAGS +=
