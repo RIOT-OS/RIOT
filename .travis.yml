@@ -43,21 +43,22 @@ script:
     - make -s -C ./examples/default info-concurrency
     - git rebase riot/master || git rebase --abort
 
-    - ./dist/tools/licenses/check.sh master
+    - ./dist/tools/licenses/check.sh master || exit
+
 # TODO:
 #   Remove the `AC` argument when all headers have been
 #   taken care of in master.
-    - ./dist/tools/externc/check.sh master AC
+    - ./dist/tools/externc/check.sh master AC || exit
 
 # TODO:
 #   Remove all but `master` parameters to cppcheck (and remove second
 #   invocation) once all warnings of cppcheck have been taken care of
 #   in master.
-    - ./dist/tools/cppcheck/check.sh master --diff-filter=MR --error-exitcode=0
-    - ./dist/tools/cppcheck/check.sh master --diff-filter=AC
+    - ./dist/tools/cppcheck/check.sh master --diff-filter=MR --error-exitcode=0 || exit
+    - ./dist/tools/cppcheck/check.sh master --diff-filter=AC || exit
 
-    - make -C ./tests/unittests all test BOARD=native
-    - make -C ./tests/unittests all test BOARD=qemu-i386
+    - make -C ./tests/unittests all test BOARD=native || exit
+    - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
 
     - ./dist/tools/compile_test/compile_test.py
 
