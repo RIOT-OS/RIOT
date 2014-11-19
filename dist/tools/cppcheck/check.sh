@@ -1,6 +1,14 @@
 #!/bin/sh
 
-CHECKROOT=$(dirname "${0}")
+# Don't show warnings about unusedStructMembers by default
+DEFAULT_SUPPRESSIONS="${1}"
+if echo "${DEFAULT_SUPPRESSIONS}" | grep -q '^--show-unused-struct'; then
+    DEFAULT_SUPPRESSIONS=""
+    shift 1
+else
+    DEFAULT_SUPPRESSIONS=--suppress="unusedStructMember"
+fi
+
 BRANCH=${1}
 FILEREGEX='\.([sScHh]|cpp)$'
 
@@ -33,6 +41,5 @@ if [ -z "${FILES}" ]; then
 fi
 
 cppcheck --std=c99 --enable=style --force --error-exitcode=2 --quiet -j 8 \
-    --inline-suppr --suppressions ${CHECKROOT}/vendor_suppressions.txt \
-    --template "{file}:{line}: {severity} ({id}): {message}" \
-    ${@} ${FILES}
+         --template "{file}:{line}: {severity} ({id}): {message}"         \
+         --inline-suppr ${DEFAULT_SUPPRESSIONS} ${@} ${FILES}

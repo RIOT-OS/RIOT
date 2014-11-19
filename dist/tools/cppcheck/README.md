@@ -15,12 +15,19 @@ Check all files changed in the current branch against the branch named
 
 Check all files but ignore warnings about unused struct members:
 
-    ./dist/tools/cppcheck/check.sh --suppress=unusedStructMember
+    ./dist/tools/cppcheck/check.sh --suppress=unassignedVariable
 
 Check all files changed in the current branch against the branch named
-'master', ignoring warnings about unused struct members:
+'master', ignoring warnings about unassigned variables:
 
-    ./dist/tools/cppcheck/check.sh master --suppress=unusedStructMember --suppress=unassignedVariable
+    ./dist/tools/cppcheck/check.sh master  --suppress=unassignedVariable
+
+# Default options
+
+This script suppresses warnings of the type "unusedStructMember" by default. If
+you want to get warnings about "unusedStructMembers" run the script with the
+--show-unused-struct option:
+    ./dist/tools/cppcheck/check.sh  --show-unused-struct [BRANCH] [options to be passed]
 
 # What to do about the findings
 
