@@ -79,6 +79,7 @@ extern void* (*real_calloc)(size_t nmemb, size_t size);
 extern void* (*real_malloc)(size_t size);
 extern void* (*real_realloc)(void *ptr, size_t size);
 extern void (*real_freeaddrinfo)(struct addrinfo *res);
+extern void (*real_srandom)(unsigned int seed);
 /* The ... is a hack to save includes: */
 extern int (*real_accept)(int socket, ...);
 /* The ... is a hack to save includes: */
@@ -99,6 +100,7 @@ extern int (*real_setsockopt)(int socket, ...);
 extern int (*real_socket)(int domain, int type, int protocol);
 extern int (*real_printf)(const char *format, ...);
 extern int (*real_unlink)(const char *);
+extern long int (*real_random)(void);
 extern const char* (*real_gai_strerror)(int errcode);
 extern FILE* (*real_fopen)(const char *path, const char *mode);
 
