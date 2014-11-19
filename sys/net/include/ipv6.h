@@ -518,10 +518,10 @@ static inline int ipv6_register_routing_provider(ipv6_routing_provider_t rp)
  * @param[in] payload           Payload of the packet.
  * @param[in] payload_len       Length of *payload*.
  *
- * @return  *payload_length*, on success
- * @return  -EHOSTUNREACH, if no route to the given dest could be obtained
+ * @return  total length of transmitted data, on success.
+ * @return  -EHOSTUNREACH, if no route to the given dest could be obtained.
  * @return  -EINPROGRESS, In case of reactive routing: routing is going to try
- *          to find a route
+ *          to find a route.
  */
 static inline int ipv6_sendto(const ipv6_addr_t *dest, netdev_hlist_t *next_headers,
                               void *payload, size_t payload_len)
@@ -529,6 +529,49 @@ static inline int ipv6_sendto(const ipv6_addr_t *dest, netdev_hlist_t *next_head
     return netapi_send_data2(ipv6_pid, next_headers, (void *)dest,
                              sizeof(ipv6_addr_t), payload, payload_len);
 }
+
+/**
+ * @brief   IPv6 internal function to send a packet.
+ *
+ * @internal
+ *
+ * @note    MUST be called from within the IPv6 control thread.
+ *
+ * @param[in] ipv6_hdr      The IPv6 header.
+ * @param[in] next_headers  List of next headers.
+ * @param[in] payload       Payload of the packet.
+ * @param[in] payload_len   Length of *payload*.
+ *
+ * @return  total length of transmitted data, on success.
+ * @return  -EHOSTUNREACH, if no route to the given dest could be obtained.
+ * @return  -EINPROGRESS, In case of reactive routing: routing is going to try
+ *          to find a route.
+ * @return  -EACCES, caller PID was not ipv6_pid.
+ */
+int ipv6_send_packet(const ipv6_hdr_t *ipv6_hdr, netdev_hlist_t *next_headers,
+                     void *payload, size_t payload_len);
+
+/**
+ * @brief   IPv6 internal function to send a packet with highest priority.
+ *
+ * @internal
+ *
+ * @note    MUST be called from within the IPv6 control thread.
+ *
+ * @param[in] ipv6_hdr      The IPv6 header.
+ * @param[in] next_headers  List of next headers.
+ * @param[in] payload       Payload of the packet.
+ * @param[in] payload_len   Length of *payload*.
+ *
+ * @return  total length of transmitted data, on success.
+ * @return  -EHOSTUNREACH, if no route to the given dest could be obtained.
+ * @return  -EINPROGRESS, In case of reactive routing: routing is going to try
+ *          to find a route.
+ * @return  -EACCES, caller PID was not ipv6_pid.
+ */
+int ipv6_send_packet_high_priority(const ipv6_hdr_t *ipv6_hdr,
+                                   netdev_hlist_t *next_headers,
+                                   void *payload, size_t payload_len);
 
 /**
  * @brief   Sets the default hop limit to use with IPv6 packets.
