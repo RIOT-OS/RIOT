@@ -26,6 +26,10 @@
 #ifndef __LPC17xx_H__
 #define __LPC17xx_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * ==========================================================================
  * ---------- Interrupt Number Definition -----------------------------------
@@ -1029,5 +1033,9 @@ typedef struct
 #define LPC_GPDMACH6          ((LPC_GPDMACH_TypeDef   *) LPC_GPDMACH6_BASE )
 #define LPC_GPDMACH7          ((LPC_GPDMACH_TypeDef   *) LPC_GPDMACH7_BASE )
 #define LPC_USB               ((LPC_USB_TypeDef       *) LPC_USB_BASE      )
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __LPC17xx_H__
