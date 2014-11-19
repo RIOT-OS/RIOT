@@ -23,8 +23,8 @@
 
 kernel_pid_t ipv6_pid = KERNEL_PID_UNDEF;
 
-uint16_t ipv6_pseudo_hdr_checksum(const ipv6_hdr_t *ipv6_hdr, uint32_t ul_packet_len,
-                                  uint8_t next_header, uint16_t sum)
+uint16_t ipv6_pseudo_hdr_csum(const ipv6_hdr_t *ipv6_hdr, uint32_t ul_packet_len,
+                              uint8_t next_header, uint16_t sum)
 {
     network_uint32_t length, nh;
     length = byteorder_htonl(ul_packet_len);

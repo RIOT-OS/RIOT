@@ -147,6 +147,24 @@ typedef struct __attribute__((packed)) {
 typedef ipv6_addr_t *(*ipv6_routing_provider_t)(int *if_id, ipv6_addr_t *dest);
 
 /**
+ * @brief   Definition of upper layer Internet Checksum checksum callback.
+ *
+ * @details The callback is supposed to set the checksum field of the upper layer
+ *          header. That's why there is no return value.
+ *
+ * @see     ipv6_reg_csum_cb()
+ *
+ * @param[in] ipv6_hdr      Generated IPv6 header with initialized source address.
+ * @param[in] ulh           Upper layer headers without IPv6 extension headers in
+ *                          decending (layer-wise) order.
+ * @param[in] payload       Payload of highest layer.
+ * @param[in] payload_len   Length of *payload*.
+ * @param[in] initial       initial value for checksum
+ */
+typedef void (*ipv6_csum_cb_t)(const ipv6_hdr_t *ipv6_hdr, netdev_hlist_t *ulh,
+                               void *payload, size_t payload_len, uint16_t initial);
+
+/**
  * @brief   Sets the version field of *hdr* to 6
  *
  * @param[out] hdr  Pointer to an IPv6 header.
@@ -553,9 +571,23 @@ int ipv6_register_set_routing_provider(ipv6_routing_provider_t rp);
  * @return  The checksum IPv6 pseudo header with values from *ipv6_hdr*,
  *          *ul_packet_len*, and *next_header* and intial value *initial*.
  */
-uint16_t ipv6_pseudo_hdr_checksum(const ipv6_hdr_t *ipv6_hdr, uint32_t ul_packet_len,
-                                  uint8_t next_header, uint16_t initial);
+uint16_t ipv6_pseudo_hdr_csum(const ipv6_hdr_t *ipv6_hdr, uint32_t ul_packet_len,
+                              uint8_t next_header, uint16_t initial);
 
+/**
+ * @brief   Register a callback to calculate the upper layer checksum
+ *
+ * @detail  Since the source address is selected by the IPv6 layer, it was
+ *          necessary to jump back the upper layer. This functions allows to
+ *          register callbacks that do exactly that
+ *
+ * @param[in] next_header   Next header value according to IANA
+ * @param[in] cb            Callback to calculate the checksum.
+ *
+ * @return  0, on success
+ * @return  -ENOBUFS, if no space is left to register the checksum callback.
+ */
+int ipv6_reg_csum_cb(uint8_t next_header, ipv6_csum_cb_t cb);
 
 /* TODO: ICMPv6 option/header handler; IPv6 extension header handler? */
 
