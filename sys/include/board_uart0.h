@@ -35,6 +35,7 @@ void uart0_notify_thread(void);
 
 int uart0_readc(void);
 void uart0_putc(int c);
+int uart0_puts(char *astring, int length);
 
 #ifdef __cplusplus
 }
