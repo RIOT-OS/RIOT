@@ -49,7 +49,7 @@ typedef struct ringbuffer {
  * @param[in]    buffer    Buffer to use by rb.
  * @param[in]    bufsize   `sizeof (buffer)`
  */
-static inline void ringbuffer_init(ringbuffer_t *restrict rb, char *buffer, unsigned bufsize)
+static inline void ringbuffer_init(ringbuffer_t *__restrict rb, char *buffer, unsigned bufsize)
 {
     rb->buf = buffer;
     rb->size = bufsize;
@@ -66,7 +66,7 @@ static inline void ringbuffer_init(ringbuffer_t *restrict rb, char *buffer, unsi
  * @returns         The element that was dropped, iff the buffer was full.
  *                  -1 iff the buffer was not full.
  */
-int ringbuffer_add_one(ringbuffer_t *restrict rb, char c);
+int ringbuffer_add_one(ringbuffer_t *__restrict rb, char c);
 
 /**
  * @brief           Add a number of elements to the ringbuffer.
@@ -78,14 +78,14 @@ int ringbuffer_add_one(ringbuffer_t *restrict rb, char c);
  * @param[in]       n     Maximum number of elements to add.
  * @returns         Number of elements actually added. 0 if rb is full.
  */
-unsigned ringbuffer_add(ringbuffer_t *restrict rb, const char *buf, unsigned n);
+unsigned ringbuffer_add(ringbuffer_t *__restrict rb, const char *buf, unsigned n);
 
 /**
  * @brief           Peek and remove oldest element from the ringbuffer.
  * @param[in,out]   rb   Ringbuffer to operate on.
  * @returns         The oldest element that was added, or `-1` if rb is empty.
  */
-int ringbuffer_get_one(ringbuffer_t *restrict rb);
+int ringbuffer_get_one(ringbuffer_t *__restrict rb);
 
 /**
  * @brief           Read and remove a number of elements from the ringbuffer.
@@ -94,7 +94,7 @@ int ringbuffer_get_one(ringbuffer_t *restrict rb);
  * @param[in]       n     Read at most n elements.
  * @returns         Number of elements actually read.
  */
-unsigned ringbuffer_get(ringbuffer_t *restrict rb, char *buf, unsigned n);
+unsigned ringbuffer_get(ringbuffer_t *__restrict rb, char *buf, unsigned n);
 
 /**
  * @brief           Remove a number of elements from the ringbuffer.
@@ -102,14 +102,14 @@ unsigned ringbuffer_get(ringbuffer_t *restrict rb, char *buf, unsigned n);
  * @param[in]       n     Read at most n elements.
  * @returns         Number of elements actually removed.
  */
-unsigned ringbuffer_remove(ringbuffer_t *restrict rb, unsigned n);
+unsigned ringbuffer_remove(ringbuffer_t *__restrict rb, unsigned n);
 
 /**
  * @brief           Test if the ringbuffer is empty.
  * @param[in,out]   rb    Ringbuffer to operate on.
  * @returns         0 iff not empty
  */
-static inline int ringbuffer_empty(const ringbuffer_t *restrict rb)
+static inline int ringbuffer_empty(const ringbuffer_t *__restrict rb)
 {
     return rb->avail == 0;
 }
@@ -119,7 +119,7 @@ static inline int ringbuffer_empty(const ringbuffer_t *restrict rb)
  * @param[in,out]   rb    Ringbuffer to operate on.
  * @returns         0 iff not full
  */
-static inline int ringbuffer_full(const ringbuffer_t *restrict rb)
+static inline int ringbuffer_full(const ringbuffer_t *__restrict rb)
 {
     return rb->avail == rb->size;
 }
@@ -129,7 +129,7 @@ static inline int ringbuffer_full(const ringbuffer_t *restrict rb)
  * @param[in,out]   rb Ringbuffer to query.
  * @returns         number of available bytes
  */
-static inline unsigned int ringbuffer_get_free(const ringbuffer_t *restrict rb)
+static inline unsigned int ringbuffer_get_free(const ringbuffer_t *__restrict rb)
 {
     return rb->size - rb->avail;
 }
@@ -139,7 +139,7 @@ static inline unsigned int ringbuffer_get_free(const ringbuffer_t *restrict rb)
  * @param[in]       rb    Ringbuffer to operate on.
  * @returns         Same as ringbuffer_get_one()
  */
-int ringbuffer_peek_one(const ringbuffer_t *restrict rb);
+int ringbuffer_peek_one(const ringbuffer_t *__restrict rb);
 
 /**
  * @brief           Read, but don't remove, the a number of element of the buffer.
@@ -148,7 +148,7 @@ int ringbuffer_peek_one(const ringbuffer_t *restrict rb);
  * @param[in]       n     Read at most n elements.
  * @returns         Same as ringbuffer_get()
  */
-unsigned ringbuffer_peek(const ringbuffer_t *restrict rb, char *buf, unsigned n);
+unsigned ringbuffer_peek(const ringbuffer_t *__restrict rb, char *buf, unsigned n);
 
 #ifdef __cplusplus
 }

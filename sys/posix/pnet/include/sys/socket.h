@@ -206,8 +206,8 @@ struct __attribute__((packed)) sockaddr_storage {
  *          file descriptor of the accepted socket. Otherwise, -1 shall be
  *          returned and errno set to indicate the error.
  */
-int accept(int socket, struct sockaddr *restrict address,
-           socklen_t *restrict address_len);
+int accept(int socket, struct sockaddr *__restrict address,
+           socklen_t *__restrict address_len);
 
 /**
  * @brief   Bind a name to a socket.
@@ -279,7 +279,7 @@ int connect(int socket, const struct sockaddr *address, socklen_t address_len);
  *          -1 shall be returned and errno set to indicate the error.
  */
 int getsockopt(int socket, int level, int option_name,
-               void *restrict option_value, socklen_t *restrict option_len);
+               void *__restrict option_value, socklen_t *__restrict option_len);
 
 /**
  * @brief   Listen for socket connections and limit the queue of incoming
@@ -363,9 +363,9 @@ ssize_t recv(int socket, void *buffer, size_t length, int flags);
  *          return 0. Otherwise, the function shall return -1 and set errno to
  *          indicate the error.
  */
-ssize_t recvfrom(int socket, void *restrict buffer, size_t length, int flags,
-                 struct sockaddr *restrict address,
-                 socklen_t *restrict address_len);
+ssize_t recvfrom(int socket, void *__restrict buffer, size_t length, int flags,
+                 struct sockaddr *__restrict address,
+                 socklen_t *__restrict address_len);
 
 /**
  * @brief   Send a message on a socket.
