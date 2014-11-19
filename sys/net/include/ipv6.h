@@ -619,7 +619,7 @@ static inline int ipv6_register_packet_handler(kernel_pid_t pid)
 }
 
 /**
- * @brief   Registers a handler thread for L4 protocol.
+ * @brief   Registers a handler thread for incoming L4 protocol.
  *
  * @param[in] next_header   Next header ID of the L4 protocol.
  * @param[in] pid           PID of the handler thread
@@ -628,6 +628,28 @@ static inline int ipv6_register_next_header_handler(uint8_t next_header,
         kernel_pid_t pid)
 {
     return netapi_register(ipv6_pid, pid, (netapi_reg_demux_ctx_t)next_header);
+}
+
+/**
+ * @brief   Registers a handler thread for incoming TCP packets.
+ *
+ * @param[in] pid           PID of the handler thread
+ */
+static inline int ipv6_register_tcp_handler(kernel_pid_t pid)
+{
+    return netapi_register(ipv6_pid, pid,
+                           (netapi_reg_demux_ctx_t)IPV6_PROTO_NUM_TCP);
+}
+
+/**
+ * @brief   Registers a handler thread for incoming UDP packets.
+ *
+ * @param[in] pid           PID of the handler thread
+ */
+static inline int ipv6_register_udp_handler(kernel_pid_t pid)
+{
+    return netapi_register(ipv6_pid, pid,
+                           (netapi_reg_demux_ctx_t)IPV6_PROTO_NUM_UDP);
 }
 
 /**
