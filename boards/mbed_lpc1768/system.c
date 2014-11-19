@@ -23,9 +23,6 @@
  *
  ******************************************************************************/
 
-
-#include <stdint.h>
-#include "board.h"
 #include "LPC17xx.h"
 
 /*--------------------- Clock Configuration ----------------------------------
@@ -409,28 +406,6 @@
 #endif
 #endif
 
-#define BLINK_DELAY (1000000)
-
-void loop_delay(uint32_t t)
-{
-    for (uint32_t delay = 0; delay < t; delay++) {
-        __asm("NOP");
-    }
-}
-
-void bl_blink(void)
-{
-    LED_ON(1);
-    LED_ON(2);
-    LED_ON(3);
-    LED_ON(4);
-    loop_delay(BLINK_DELAY);
-    LED_OFF(1);
-    LED_OFF(2);
-    LED_OFF(3);
-    LED_OFF(4);
-}
-
 /*----------------------------------------------------------------------------
   Clock Variable definitions
  *----------------------------------------------------------------------------*/
@@ -440,7 +415,7 @@ uint32_t system_clock = __CORE_CLK;/*!< System Clock Frequency (Core Clock)*/
 /*----------------------------------------------------------------------------
   Clock functions
  *----------------------------------------------------------------------------*/
-void clock_update(void)            /* Get Core Clock Frequency      */
+void SystemCoreClockUpdate(void)            /* Get Core Clock Frequency      */
 {
     /* Determine clock frequency according to clock register values             */
     if (((LPC_SC->PLL0STAT >> 24) & 3) == 3) { /* If PLL0 enabled and connected */
@@ -493,7 +468,7 @@ void clock_update(void)            /* Get Core Clock Frequency      */
  * @brief  Setup the microcontroller system.
  *         Initialize the System.
  */
-void board_init(void)
+void SystemInit(void)
 {
 #if (CLOCK_SETUP)                       /* Clock Setup                        */
     LPC_SC->SCS       = SCS_Val;
@@ -557,12 +532,4 @@ void board_init(void)
 #if (FLASH_SETUP == 1)                  /* Flash Accelerator Setup            */
     LPC_SC->FLASHCFG  = (LPC_SC->FLASHCFG & ~0x0000F000) | FLASHCFG_Val;
 #endif
-
-    /* Initialize LED pins */
-    LPC_GPIO1->FIODIR |= PIN_LED1;
-    LPC_GPIO1->FIODIR |= PIN_LED2;
-    LPC_GPIO1->FIODIR |= PIN_LED3;
-    LPC_GPIO1->FIODIR |= PIN_LED4;
-
-    bl_blink();
 }
