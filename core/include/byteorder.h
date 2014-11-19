@@ -21,6 +21,10 @@
 
 #include <stdint.h>
 
+#if defined(__MACH__)
+#   include "clang_compat.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,8 +38,8 @@ extern "C" {
  *                 between different byte orders at compile time.
  */
 typedef union __attribute__((packed)) {
-    uint8_t      u8[2]; /**< 8 bit representation */
     uint16_t    u16;    /**< 16 bit representation */
+    uint8_t      u8[2]; /**< 8 bit representation */
 } le_uint16_t;
 
 /**
@@ -44,9 +48,9 @@ typedef union __attribute__((packed)) {
  *                 between different byte orders at compile time.
  */
 typedef union __attribute__((packed)) {
+    uint32_t    u32;    /**< 32 bit representation */
     uint8_t      u8[4]; /**< 8 bit representation */
     uint16_t    u16[2]; /**< 16 bit representation */
-    uint32_t    u32;    /**< 32 bit representation */
     le_uint16_t l16[2]; /**< little endian 16 bit representation */
 } le_uint32_t;
 
@@ -56,10 +60,10 @@ typedef union __attribute__((packed)) {
  *                 between different byte orders at compile time.
  */
 typedef union __attribute__((packed)) {
+    uint64_t    u64;    /**< 64 bit representation */
     uint8_t      u8[8]; /**< 8 bit representation */
     uint16_t    u16[4]; /**< 16 bit representation */
     uint32_t    u32[2]; /**< 32 bit representation */
-    uint64_t    u64;    /**< 64 bit representation */
     le_uint16_t l16[4]; /**< little endian 16 bit representation */
     le_uint32_t l32[2]; /**< little endian 32 bit representation */
 } le_uint64_t;
@@ -70,8 +74,8 @@ typedef union __attribute__((packed)) {
  *                 between different byte orders at compile time.
  */
 typedef union __attribute__((packed)) {
-    uint8_t      u8[2]; /**< 8 bit representation */
     uint16_t    u16;    /**< 16 bit representation */
+    uint8_t      u8[2]; /**< 8 bit representation */
 } be_uint16_t;
 
 /**
@@ -80,9 +84,9 @@ typedef union __attribute__((packed)) {
  *                 between different byte orders at compile time.
  */
 typedef union __attribute__((packed)) {
+    uint32_t    u32;    /**< 32 bit representation */
     uint8_t      u8[4]; /**< 8 bit representation */
     uint16_t    u16[2]; /**< 16 bit representation */
-    uint32_t    u32;    /**< 32 bit representation */
     be_uint16_t b16[2]; /**< big endian 16 bit representation */
 } be_uint32_t;
 
@@ -92,10 +96,10 @@ typedef union __attribute__((packed)) {
  *                 between different byte orders at compile time.
  */
 typedef union __attribute__((packed)) {
+    uint64_t    u64;    /**< 64 bit representation */
     uint8_t      u8[8]; /**< 8 bit representation */
     uint16_t    u16[4]; /**< 16 bit representation */
     uint32_t    u32[2]; /**< 32 bit representation */
-    uint64_t    u64;    /**< 64 bit representation */
     be_uint16_t b16[4]; /**< big endian 16 bit representation */
     be_uint32_t b32[2]; /**< big endian 32 bit representation */
 } be_uint64_t;
@@ -220,6 +224,54 @@ static inline uint32_t byteorder_swapl(uint32_t v);
  */
 static inline uint64_t byteorder_swapll(uint64_t v);
 
+/**
+ * @brief          Convert from host byte order to network byte order, 16 bit.
+ * @see            byteorder_htons()
+ * @param[in]      v   The integer to convert.
+ * @returns        Converted integer.
+ */
+static inline uint16_t HTONS(uint16_t a);
+
+/**
+ * @brief          Convert from host byte order to network byte order, 32 bit.
+ * @see            byteorder_htonl()
+ * @param[in]      v   The integer to convert.
+ * @returns        Converted integer.
+ */
+static inline uint32_t HTONL(uint32_t a);
+
+/**
+ * @brief          Convert from host byte order to network byte order, 64 bit.
+ * @see            byteorder_htonll()
+ * @param[in]      v   The integer to convert.
+ * @returns        Converted integer.
+ */
+static inline uint64_t HTONLL(uint64_t a);
+
+/**
+ * @brief          Convert from network byte order to host byte order, 16 bit.
+ * @see            byteorder_ntohs()
+ * @param[in]      v   The integer to convert.
+ * @returns        Converted integer.
+ */
+static inline uint16_t NTOHS(uint16_t a);
+
+/**
+ * @brief          Convert from network byte order to host byte order, 32 bit.
+ * @see            byteorder_ntohl()
+ * @param[in]      v   The integer to convert.
+ * @returns        Converted integer.
+ */
+static inline uint32_t NTOHL(uint32_t a);
+
+/**
+ * @brief          Convert from network byte order to host byte order, 64 bit.
+ * @see            byteorder_ntohll()
+ * @param[in]      v   The integer to convert.
+ * @returns        Converted integer.
+ */
+static inline uint64_t NTOHLL(uint64_t a);
+
 
 /* **************************** IMPLEMENTATION ***************************** */
 
@@ -229,7 +281,7 @@ static inline uint16_t byteorder_swaps(uint16_t v)
 #ifndef MODULE_MSP430_COMMON
     return __builtin_bswap16(v);
 #else
-    network_uint16_t result = { .u16 = v };
+    network_uint16_t result = { v };
     uint8_t tmp = result.u8[0];
     result.u8[0] = result.u8[1];
     result.u8[1] = tmp;
@@ -249,37 +301,37 @@ static inline uint64_t byteorder_swapll(uint64_t v)
 
 static inline be_uint16_t byteorder_ltobs(le_uint16_t v)
 {
-    be_uint16_t result = { .u16 =  byteorder_swaps(v.u16) };
+    be_uint16_t result = { byteorder_swaps(v.u16) };
     return result;
 }
 
 static inline be_uint32_t byteorder_ltobl(le_uint32_t v)
 {
-    be_uint32_t result = { .u32 =  byteorder_swapl(v.u32) };
+    be_uint32_t result = { byteorder_swapl(v.u32) };
     return result;
 }
 
 static inline be_uint64_t byteorder_ltobll(le_uint64_t v)
 {
-    be_uint64_t result = { .u64 =  byteorder_swapll(v.u64) };
+    be_uint64_t result = { byteorder_swapll(v.u64) };
     return result;
 }
 
 static inline le_uint16_t byteorder_btols(be_uint16_t v)
 {
-    le_uint16_t result = { .u16 =  byteorder_swaps(v.u16) };
+    le_uint16_t result = { byteorder_swaps(v.u16) };
     return result;
 }
 
 static inline le_uint32_t byteorder_btoll(be_uint32_t v)
 {
-    le_uint32_t result = { .u32 =  byteorder_swapl(v.u32) };
+    le_uint32_t result = { byteorder_swapl(v.u32) };
     return result;
 }
 
 static inline le_uint64_t byteorder_btolll(be_uint64_t v)
 {
-    le_uint64_t result = { .u64 =  byteorder_swapll(v.u64) };
+    le_uint64_t result = { byteorder_swapll(v.u64) };
     return result;
 }
 
@@ -296,19 +348,19 @@ static inline le_uint64_t byteorder_btolll(be_uint64_t v)
 
 static inline network_uint16_t byteorder_htons(uint16_t v)
 {
-    network_uint16_t result = { .u16 = _byteorder_swap(v, s) };
+    network_uint16_t result = { _byteorder_swap(v, s) };
     return result;
 }
 
 static inline network_uint32_t byteorder_htonl(uint32_t v)
 {
-    network_uint32_t result = { .u32 = _byteorder_swap(v, l) };
+    network_uint32_t result = { _byteorder_swap(v, l) };
     return result;
 }
 
 static inline network_uint64_t byteorder_htonll(uint64_t v)
 {
-    network_uint64_t result = { .u64 = _byteorder_swap(v, ll) };
+    network_uint64_t result = { _byteorder_swap(v, ll) };
     return result;
 }
 
@@ -325,6 +377,39 @@ static inline uint32_t byteorder_ntohl(network_uint32_t v)
 static inline uint64_t byteorder_ntohll(network_uint64_t v)
 {
     return _byteorder_swap(v.u64, ll);
+}
+
+static inline uint16_t HTONS(uint16_t a)
+{
+    return byteorder_htons(a).u16;
+}
+
+static inline uint32_t HTONL(uint32_t a)
+{
+    return byteorder_htonl(a).u32;
+}
+
+static inline uint64_t HTONLL(uint64_t a)
+{
+    return byteorder_htonll(a).u64;
+}
+
+static inline uint16_t NTOHS(uint16_t a)
+{
+    network_uint16_t input = { a };
+    return byteorder_ntohs(input);
+}
+
+static inline uint32_t NTOHL(uint32_t a)
+{
+    network_uint32_t input = { a };
+    return byteorder_ntohl(input);
+}
+
+static inline uint64_t NTOHLL(uint64_t a)
+{
+    network_uint64_t input = { a };
+    return byteorder_ntohll(input);
 }
 
 #ifdef __cplusplus

@@ -23,10 +23,6 @@
 #include <string.h>
 #include <stdint.h>
 
-#if defined(__MACH__)
-#include "clang_compat.h"
-#endif
-
 #include "byteorder.h"
 
 #ifdef __cplusplus
@@ -34,36 +30,6 @@ extern "C" {
 #endif
 
 #define BITSET(var,pos) ((var) & (1<<(pos)))
-
-static inline uint16_t HTONS(uint16_t a)
-{
-    return byteorder_htons(a).u16;
-}
-
-static inline uint32_t HTONL(uint32_t a)
-{
-    return byteorder_htonl(a).u32;
-}
-
-static inline uint64_t HTONLL(uint64_t a)
-{
-    return byteorder_htonll(a).u64;
-}
-
-static inline uint16_t NTOHS(uint16_t a)
-{
-    return byteorder_ntohs(*(network_uint16_t *) &a);
-}
-
-static inline uint32_t NTOHL(uint32_t a)
-{
-    return byteorder_ntohl(*(network_uint32_t *) &a);
-}
-
-static inline uint64_t NTOHLL(uint64_t a)
-{
-    return byteorder_ntohll(*(network_uint64_t *) &a);
-}
 
 /**
  * @brief   Computes the Internet Checksum for *buf* with initial value *init*
