@@ -56,6 +56,7 @@ void* (*real_malloc)(size_t size);
 void* (*real_calloc)(size_t nmemb, size_t size);
 void* (*real_realloc)(void *ptr, size_t size);
 void (*real_freeaddrinfo)(struct addrinfo *res);
+void (*real_srandom)(unsigned int seed);
 int (*real_accept)(int socket, ...);
 int (*real_bind)(int socket, ...);
 int (*real_printf)(const char *format, ...);
@@ -73,6 +74,7 @@ int (*real_pipe)(int[2]);
 int (*real_setsockopt)(int socket, ...);
 int (*real_socket)(int domain, int type, int protocol);
 int (*real_unlink)(const char *);
+long int (*real_random)(void);
 const char* (*real_gai_strerror)(int errcode);
 FILE* (*real_fopen)(const char *path, const char *mode);
 
@@ -362,6 +364,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_realloc) = dlsym(RTLD_NEXT, "realloc");
     *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");
     *(void **)(&real_freeaddrinfo) = dlsym(RTLD_NEXT, "freeaddrinfo");
+    *(void **)(&real_srandom) = dlsym(RTLD_NEXT, "srandom");
     *(void **)(&real_accept) = dlsym(RTLD_NEXT, "accept");
     *(void **)(&real_bind) = dlsym(RTLD_NEXT, "bind");
     *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
@@ -375,6 +378,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_setsockopt) = dlsym(RTLD_NEXT, "setsockopt");
     *(void **)(&real_socket) = dlsym(RTLD_NEXT, "socket");
     *(void **)(&real_unlink) = dlsym(RTLD_NEXT, "unlink");
+    *(void **)(&real_random) = dlsym(RTLD_NEXT, "random");
     *(void **)(&real_execve) = dlsym(RTLD_NEXT, "execve");
     *(void **)(&real_listen) = dlsym(RTLD_NEXT, "listen");
     *(void **)(&real_pause) = dlsym(RTLD_NEXT, "pause");
