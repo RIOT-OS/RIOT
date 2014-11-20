@@ -32,7 +32,7 @@
 
 #include <time.h>
 #include <sys/time.h>
-#include "rtc.h"
+#include "periph/rtc.h"
 #include "lpc2387.h"
 
 #ifdef __cplusplus
@@ -95,7 +95,6 @@ void rtc_set(time_t time);
  *
  * @see ::rtc_alarm_mask
  */
-void rtc_set_alarm(struct tm *localt, enum rtc_alarm_mask mask);
 
 /**
  * @brief   Gets the current alarm setting

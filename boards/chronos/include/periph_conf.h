@@ -23,6 +23,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Real Time Clock configuration
+ */
 #define RTC_NUMOF           (1)
 
 #ifdef __cplusplus

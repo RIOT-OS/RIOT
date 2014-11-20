@@ -19,7 +19,7 @@
 #include "kernel_types.h"
 
 #if defined MODULE_RTC
-#   include "rtc.h"
+#   include "periph/rtc.h"
 #elif defined MODULE_VTIMER
 #   include "vtimer.h"
 #endif
