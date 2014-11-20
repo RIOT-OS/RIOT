@@ -84,11 +84,14 @@ static void _rtc_setalarm(char **argv)
 static void _rtc_gettime(void)
 {
     struct tm now;
-    rtc_get_time(&now);
-
-    /* cppcheck: see man 3 asctime: obsoleted by POSIX.1-2008 */
-    /* cppcheck-suppress obsoleteFunctionsasctime */
-    printf("%s", asctime(&now));
+    if (rtc_get_time(&now) == 0) {
+        /* cppcheck: see man 3 asctime: obsoleted by POSIX.1-2008 */
+        /* cppcheck-suppress obsoleteFunctionsasctime */
+        printf("%s", asctime(&now));
+    }
+    else {
+        puts("error");
+    }
 }
 
 static void _rtc_settime(char **argv)
@@ -96,7 +99,9 @@ static void _rtc_settime(char **argv)
     struct tm now;
 
     if (_parse_time(argv, &now) == 0) {
-        rtc_set_time(&now);
+        if (rtc_set_time(&now) == -1) {
+            puts("error");
+        }
     }
 }
 
