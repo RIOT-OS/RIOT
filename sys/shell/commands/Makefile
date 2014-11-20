@@ -55,5 +55,8 @@ endif
 ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
 	SRC += sc_lsm303dlhc.c
 endif
+ifneq (,$(filter shell_periph,$(USEMODULE)))
+	SRC += sc_periph.c
+endif
 
 include $(RIOTBASE)/Makefile.base
