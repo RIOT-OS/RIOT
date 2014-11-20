@@ -25,21 +25,18 @@
 #if RTC_NUMOF
 #include "periph/rtc.h"
 
-static void _rtc_gettime(void)
+void _alarm_handler(void *arg)
 {
-    struct tm now;
-    rtc_get_time(&now);
+    (void) arg;
 
-    /* cppcheck: see man 3 asctime: obsoleted by POSIX.1-2008 */
-    /* cppcheck-suppress obsoleteFunctionsasctime */
-    printf("%s", asctime(&now));
+    puts("The alarm rang");
 }
 
 static int _parse_time(char **argv, struct tm *time)
 {
     short i1, i2, i3;
 
-    if(sscanf(argv[0], "%6hd:%6hd:%6hd", &i1, &i2, &i3) != 3) {
+    if(sscanf(argv[0], "%6hd-%6hd-%6hd", &i1, &i2, &i3) != 3) {
         puts("could not parse date");
         return -1;
     }
@@ -60,6 +57,40 @@ static int _parse_time(char **argv, struct tm *time)
     return 0;
 }
 
+static void _rtc_getalarm(void)
+{
+    struct tm now;
+    if (rtc_get_alarm(&now) == 0) {
+        /* cppcheck: see man 3 asctime: obsoleted by POSIX.1-2008 */
+        /* cppcheck-suppress obsoleteFunctionsasctime */
+        printf("%s", asctime(&now));
+    }
+    else {
+        puts("error");
+    }
+}
+
+static void _rtc_setalarm(char **argv)
+{
+    struct tm now;
+
+    if (_parse_time(argv, &now) == 0) {
+        if (rtc_set_alarm(&now, _alarm_handler, NULL) == -1) {
+            puts("error");
+        }
+    }
+}
+
+static void _rtc_gettime(void)
+{
+    struct tm now;
+    rtc_get_time(&now);
+
+    /* cppcheck: see man 3 asctime: obsoleted by POSIX.1-2008 */
+    /* cppcheck-suppress obsoleteFunctionsasctime */
+    printf("%s", asctime(&now));
+}
+
 static void _rtc_settime(char **argv)
 {
     struct tm now;
@@ -76,8 +107,8 @@ static void _rtc_usage(void)
     puts("\tinit\t\tinitialize the interface");
     puts("\tpoweron\t\tpower the interface on");
     puts("\tpoweroff\tpower the interface off");
-    puts("\tclearalarm\t\tdeactivate the current alarm");
-    puts("\tgetalarm\t\tprint the currently alarm time");
+    puts("\tclearalarm\tdeactivate the current alarm");
+    puts("\tgetalarm\tprint the currently alarm time");
     puts("\tsetalarm YYYY-MM-DD HH:MM:SS\n\t\t\tset an alarm for the specified time");
     puts("\tgettime\t\tprint the current time");
     puts("\tsettime YYYY-MM-DD HH:MM:SS\n\t\t\tset the current time");
