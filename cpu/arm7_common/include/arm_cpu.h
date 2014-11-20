@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 #include "VIC.h"
-#include "arm_common.h"
+#include "arm7_common.h"
 
 #define NEW_TASK_CPSR 0x1F
 #define WORDSIZE 32

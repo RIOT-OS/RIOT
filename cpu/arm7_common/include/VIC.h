@@ -9,7 +9,7 @@
 #define __ARM_COMMON_H
 
 /**
- * @ingroup         arm_common
+ * @ingroup         arm7_common
  * @{
  */
 

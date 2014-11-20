@@ -8,7 +8,7 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  *
- * @ingroup arm_common
+ * @ingroup arm7_common
  * @{
  * @file
  * @author Kaspar Schleiser <kaspar@schleiser.de>

@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     arm_common
+ * @ingroup     arm7_common
  * @{
  */
 
