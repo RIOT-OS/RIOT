@@ -63,14 +63,6 @@ enum rtc_alarm_mask {
     RTC_AMR_YEAR =  AMRYEAR,    ///< Alarm mask for Year
 };
 
-void rtc_reset(void);
-
-/**
- * @brief   Returns the time of compilation in seconds
- * @internal
- */
-time_t rtc_get_compile_time(void) __attribute__((noinline));
-
 /**
  * @brief   Returns the current clock time
  * @param[out]  time        optional return value
@@ -79,37 +71,16 @@ time_t rtc_get_compile_time(void) __attribute__((noinline));
 time_t rtc_time(struct timeval *time);
 
 /**
+ * @brief Set clock to start of unix epoch
+ */
+void rtc_reset(void);
+
+/**
  * @brief   Sets the current clock time
  * @param[in]   time        new time in seconds
  * @note    Any set alarm is shifted
  */
 void rtc_set(time_t time);
-
-/**
- * @brief   Sets the alarm
- * @internal
- * @param[in]   localt  Alarm time
- * @param[in]   mask    Sets the registers to poll for the alarm
- *
- * To disable the alarm set mask to RTC_AMR_DISABLED.
- *
- * @see ::rtc_alarm_mask
- */
-
-/**
- * @brief   Gets the current alarm setting
- * @internal
- * @param[out]  localt  Pointer to structure to receive alarm time
- * @return      Alarm mask
- *
- * @see rtc_set_alarm
- * @see ::rtc_alarm_mask
- */
-enum rtc_alarm_mask _rtc_get_alarm(struct tm *localt);
-
-#ifdef __cplusplus
-}
-#endif
 
 /** @} */
 #endif /* end __RTC_H */

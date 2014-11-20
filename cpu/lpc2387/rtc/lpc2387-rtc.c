@@ -1,20 +1,10 @@
 /*
  * Copyright 2008-2010, Freie Universitaet Berlin (FUB). All rights reserved.
+ * Copyright 2014 INRIA
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- */
-
-/**
- * @file
- * @ingroup     lpc2387_rtc
- * @brief       LPC2387 Real-Time-Clock
- *
- * @author      Michael Baar <michael.baar@fu-berlin.de>
- * @version     $Revision: 2005 $
- *
- * @note        $Id: lpc2387-rtc.c 2005 2010-03-17 10:52:03Z baar $
  */
 
 #include <sys/time.h>
@@ -30,9 +20,6 @@
 #include "lpc2387-rtc.h"
 #include "lpm.h"
 
-#define PREINT_RTC  0x000001C8  /* Prescaler value, integer portion, PCLK = 15Mhz */
-#define PREFRAC_RTC 0x000061C0  /* Prescaler value, fraction portion, PCLK = 15Mhz */
-
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -46,6 +33,30 @@ static void *_cb_arg;
  * @brief   epoch time in hour granularity
  */
 static volatile time_t epoch;
+
+void RTC_IRQHandler(void) __attribute__((interrupt("IRQ")));
+
+void rtc_init(void)
+{
+    PCONP |= BIT9;
+    RTC_AMR = 0xff;                         /* disable alarm irq */
+    RTC_CIIR = IMHOUR;                      /* enable increase irq */
+    RTC_CISS = 0;                           /* disable subsecond irq */
+
+    INTWAKE |= BIT15;                       /* rtc irq wakes up mcu from power down */
+
+    RTC_CCR = CCR_CLKSRC;                   /* Clock from external 32 kHz Osc. */
+
+    /* initialize clock with valid unix compatible values
+     * If RTC_YEAR contains an value larger unix time_t we must reset. */
+    if (RTC_YEAR > 2037) {
+        rtc_reset();
+    }
+
+    DEBUG("%2lu.%2lu.%4lu  %2lu:%2lu:%2lu epoch %lu\n",
+          RTC_DOM, RTC_MONTH, RTC_YEAR, RTC_HOUR, RTC_MIN, RTC_SEC,
+          epoch);
+}
 
 /**
  * @brief   Sets the current time in broken down format directly from to RTC
@@ -70,20 +81,23 @@ int rtc_set_time(struct tm *localt)
     return 0;
 }
 
-void rtc_set(time_t time)
+int rtc_get_time(struct tm *localt)
 {
-    struct tm *localt;
-    localt = localtime(&time);                      /* convert seconds to broken-down time */
-    rtc_set_time(localt);
-    epoch = time - localt->tm_sec - localt->tm_min * 60;
+    if (localt != NULL) {
+        localt->tm_sec = RTC_SEC;
+        localt->tm_min = RTC_MIN;
+        localt->tm_hour = RTC_HOUR;
+        localt->tm_mday = RTC_DOM;
+        localt->tm_wday = RTC_DOW;
+        localt->tm_yday = RTC_DOY;
+        localt->tm_mon = RTC_MONTH - 1;
+        localt->tm_year = RTC_YEAR;
+        localt->tm_isdst = -1; /* not available */
+        return 0;
+    }
+    return -1;
 }
 
-/* set clock to start of unix epoch */
-void rtc_reset(void)
-{
-    rtc_set(0);
-    epoch = 0;
-}
 
 int rtc_set_alarm(struct tm *localt, rtc_alarm_cb_t cb, void *arg)
 {
@@ -135,7 +149,24 @@ void rtc_clear_alarm(void)
     RTC_AMR = 0xff;
 }
 
-void RTC_IRQHandler(void) __attribute__((interrupt("IRQ")));
+void rtc_poweron(void)
+{
+    PCONP |= BIT9;
+    RTC_ILR = (ILR_RTSSF | ILR_RTCCIF | ILR_RTCALF);    /* clear interrupt flags */
+    RTC_CCR |= CCR_CLKEN;                               /* enable clock */
+    install_irq(RTC_INT, &RTC_IRQHandler, IRQP_RTC);    /* install interrupt handler */
+
+    time_t now = rtc_time(NULL);
+    epoch = now - (now % 3600);
+}
+
+void rtc_poweroff(void)
+{
+    RTC_CCR &= ~CCR_CLKEN;  /* disable clock */
+    install_irq(RTC_INT, NULL, 0);
+    RTC_ILR = 0;
+    PCONP &= ~BIT9;
+}
 
 void RTC_IRQHandler(void)
 {
@@ -162,39 +193,6 @@ void RTC_IRQHandler(void)
     }
 
     VICVectAddr = 0;                        /* Acknowledge Interrupt */
-}
-
-void rtc_enable(void)
-{
-    PCONP |= BIT9;
-    RTC_ILR = (ILR_RTSSF | ILR_RTCCIF | ILR_RTCALF);    /* clear interrupt flags */
-    RTC_CCR |= CCR_CLKEN;                               /* enable clock */
-    install_irq(RTC_INT, &RTC_IRQHandler, IRQP_RTC);    /* install interrupt handler */
-
-    time_t now = rtc_time(NULL);
-    epoch = now - (now % 3600);
-}
-
-void rtc_init(void)
-{
-    PCONP |= BIT9;
-    RTC_AMR = 0xff;                         /* disable alarm irq */
-    RTC_CIIR = IMHOUR;                      /* enable increase irq */
-    RTC_CISS = 0;                           /* disable subsecond irq */
-
-    INTWAKE |= BIT15;                       /* rtc irq wakes up mcu from power down */
-
-    RTC_CCR = CCR_CLKSRC;                   /* Clock from external 32 kHz Osc. */
-
-    /* initialize clock with valid unix compatible values
-     * If RTC_YEAR contains an value larger unix time_t we must reset. */
-    if (RTC_YEAR > 2037) {
-        rtc_reset();
-    }
-
-    DEBUG("%2lu.%2lu.%4lu  %2lu:%2lu:%2lu epoch %lu\n",
-          RTC_DOM, RTC_MONTH, RTC_YEAR, RTC_HOUR, RTC_MIN, RTC_SEC,
-          epoch);
 }
 
 time_t rtc_time(struct timeval *time)
@@ -226,29 +224,19 @@ time_t rtc_time(struct timeval *time)
     return sec;
 }
 
-void rtc_poweroff(void)
+void rtc_set(time_t time)
 {
-    RTC_CCR &= ~CCR_CLKEN;  /* disable clock */
-    install_irq(RTC_INT, NULL, 0);
-    RTC_ILR = 0;
-    PCONP &= ~BIT9;
+    struct tm *localt;
+    localt = localtime(&time);                      /* convert seconds to broken-down time */
+    rtc_set_time(localt);
+    epoch = time - localt->tm_sec - localt->tm_min * 60;
 }
 
-int rtc_get_time(struct tm *localt)
+/* set clock to start of unix epoch */
+void rtc_reset(void)
 {
-    if (localt != NULL) {
-        localt->tm_sec = RTC_SEC;
-        localt->tm_min = RTC_MIN;
-        localt->tm_hour = RTC_HOUR;
-        localt->tm_mday = RTC_DOM;
-        localt->tm_wday = RTC_DOW;
-        localt->tm_yday = RTC_DOY;
-        localt->tm_mon = RTC_MONTH - 1;
-        localt->tm_year = RTC_YEAR;
-        localt->tm_isdst = -1; /* not available */
-        return 0;
-    }
-    return -1;
+    rtc_set(0);
+    epoch = 0;
 }
 
 void gettimeofday_r(struct _reent *r, struct timeval *ptimeval, struct timezone *ptimezone)
