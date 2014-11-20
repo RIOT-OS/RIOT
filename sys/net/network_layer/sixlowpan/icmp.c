@@ -1443,8 +1443,8 @@ uint16_t icmpv6_csum(ipv6_hdr_t *ipv6_buf, icmpv6_hdr_t *icmpv6_buf)
     icmpv6_buf->checksum = 0;
     sum = len + IPV6_PROTO_NUM_ICMPV6;
 
-    sum = csum(sum, (uint8_t *)&ipv6_buf->srcaddr, 2 * sizeof(ipv6_addr_t));
-    sum = csum(sum, (uint8_t *)icmpv6_buf, len);
+    sum = net_help_csum(sum, (uint8_t *)&ipv6_buf->srcaddr, 2 * sizeof(ipv6_addr_t));
+    sum = net_help_csum(sum, (uint8_t *)icmpv6_buf, len);
 
     return (sum == 0) ? 0 : ~HTONS(sum);
 }

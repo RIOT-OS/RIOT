@@ -33,6 +33,10 @@ export OFLAGS += -O binary
 export FFLAGS += $(HEXFILE)
 export TERMFLAGS += "$(PORT)"
 
+# unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
+export CXXUWFLAGS +=
+export CXXEXFLAGS +=
+
 # use the nano-specs of the NewLib when available
 ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
 export LINKFLAGS += -specs=nano.specs -lc -lnosys

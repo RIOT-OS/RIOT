@@ -43,8 +43,8 @@ uint16_t udp_csum(ipv6_hdr_t *ipv6_header, udp_hdr_t *udp_header)
     uint16_t len = NTOHS(udp_header->length);
 
     sum = len + IPPROTO_UDP;
-    sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
-    sum = csum(sum, (uint8_t *)udp_header, len);
+    sum = net_help_csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
+    sum = net_help_csum(sum, (uint8_t *)udp_header, len);
     return (sum == 0) ? 0xffff : HTONS(sum);
 }
 

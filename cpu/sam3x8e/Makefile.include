@@ -4,9 +4,6 @@ export CFLAGS += -DCOREIF_NG=1
 # export the peripheral drivers to be linked into the final binary
 export USEMODULE += periph
 
-# this CPU implementation makes use of the ringbuffer, so include the lib module
-export USEMODULE += lib
-
 # tell the build system that the CPU depends on the Cortex-M common files
 export USEMODULE += cortex-m3_common
 

@@ -15,7 +15,7 @@
 
 #include "cbor.h"
 
-#include "net_help.h"
+#include "byteorder.h"
 
 #include <inttypes.h>
 #include <math.h>
@@ -88,22 +88,6 @@
 #define NAN (0.0/0.0)
 #endif
 
-/**
- * Convert long long @p x to network format
- */
-static uint64_t htonll(uint64_t x)
-{
-    return (((uint64_t)HTONL(x)) << 32) + HTONL(x >> 32);
-}
-
-/**
- * Convert long long @p x to host format
- */
-static uint64_t ntohll(uint64_t x)
-{
-    return (((uint64_t)NTOHL(x)) << 32) + NTOHL(x >> 32);
-}
-
 #ifndef CBOR_NO_FLOAT
 /**
  * Convert float @p x to network format
@@ -138,7 +122,7 @@ static uint64_t htond(double x)
         double d;
         uint64_t i;
     } u = { .d = x };
-    return htonll(u.i);
+    return HTONLL(u.i);
 }
 
 /**
@@ -149,7 +133,7 @@ static double ntohd(uint64_t x)
     union u {
         double d;
         uint64_t i;
-    } u = { .i = ntohll(x) };
+    } u = { .i = HTONLL(x) };
     return u.d;
 }
 
@@ -357,7 +341,7 @@ static size_t decode_int(const cbor_stream_t *s, size_t offset, uint64_t *val)
             break;
 
         default:
-            *val = htonll(*((uint64_t *)&in[1]));
+            *val = HTONLL(*((uint64_t *)&in[1]));
             break;
     }
 
