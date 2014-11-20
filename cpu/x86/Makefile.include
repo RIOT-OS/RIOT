@@ -1,4 +1,4 @@
 export INCLUDES += -I$(RIOTCPU)/x86/include
 
-export USEMODULE += quad_math
+export USEMODULE += quad_math msg_queue
 export USEPKG += tlsf

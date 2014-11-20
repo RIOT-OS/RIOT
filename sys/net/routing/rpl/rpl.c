@@ -52,7 +52,7 @@ rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
 kernel_pid_t rpl_process_pid = KERNEL_PID_UNDEF;
 mutex_t rpl_recv_mutex = MUTEX_INIT;
 mutex_t rpl_send_mutex = MUTEX_INIT;
-msg_t rpl_msg_queue[RPL_PKT_RECV_BUF_SIZE];
+static char rpl_msg_buf[MSG_QUEUE_SPACE(RPL_PKT_RECV_BUF_SIZE)];
 char rpl_process_buf[RPL_PROCESS_STACKSIZE];
 uint8_t rpl_buffer[BUFFER_SIZE - LL_HDR_LEN];
 
@@ -115,7 +115,7 @@ void *rpl_process(void *arg)
     (void) arg;
 
     msg_t m_recv;
-    msg_init_queue(rpl_msg_queue, RPL_PKT_RECV_BUF_SIZE);
+    thread_msg_queue_init(rpl_msg_buf, sizeof(rpl_msg_buf), 0);
 
     while (1) {
         msg_receive(&m_recv);

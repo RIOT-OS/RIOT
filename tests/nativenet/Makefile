@@ -4,6 +4,7 @@ include ../Makefile.tests_common
 BOARD_WHITELIST := native
 
 USEMODULE += nativenet
+USEMODULE += msg_queue
 USEMODULE += transceiver
 
 include $(RIOTBASE)/Makefile.include

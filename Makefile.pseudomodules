@@ -1,3 +1,4 @@
+PSEUDOMODULES += msg_queue
 PSEUDOMODULES += defaulttransceiver
 PSEUDOMODULES += transport_layer
 PSEUDOMODULES += pktqueue

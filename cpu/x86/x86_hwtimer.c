@@ -35,6 +35,7 @@
 #include "arch/hwtimer_arch.h"
 #include "irq.h"
 #include "thread.h"
+#include "msg.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -210,8 +211,9 @@ static void *hwtimer_tick_handler(void *arg)
 {
     (void) arg;
 
-    msg_t msg_array[2];
-    msg_init_queue(msg_array, sizeof (msg_array) / sizeof (*msg_array));
+    char msg_queue_buf[MSG_QUEUE_SPACE(2)];
+    thread_msg_queue_init(msg_queue_buf, sizeof(msg_queue_buf), 0);
+
     while (1) {
         msg_t m;
         msg_receive(&m);

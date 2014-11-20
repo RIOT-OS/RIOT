@@ -33,8 +33,8 @@ pir_t dev;
 
 void* pir_handler(void *arg)
 {
-    msg_t msg_q[1];
-    msg_init_queue(msg_q, 1);
+    char msg_queue[MSG_QUEUE_SPACE(1)];
+    thread_msg_queue_init(msg_queue, sizeof(msg_queue), 0);
 
     printf("Registering PIR handler thread...     %s\n",
            pir_register_thread(&dev) == 0 ? "[OK]" : "[Failed]");

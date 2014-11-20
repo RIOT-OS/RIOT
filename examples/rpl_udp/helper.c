@@ -37,7 +37,7 @@
 
 extern uint8_t ipv6_ext_hdr_len;
 
-msg_t msg_q[RCV_BUFFER_SIZE];
+static char msg_queue[MSG_QUEUE_SPACE(RCV_BUFFER_SIZE)];
 
 void rpl_udp_set_id(int argc, char **argv)
 {
@@ -67,7 +67,7 @@ void *rpl_udp_monitor(void *arg)
     uint8_t icmp_type, icmp_code;
     icmpv6_hdr_t *icmpv6_buf = NULL;
 
-    msg_init_queue(msg_q, RCV_BUFFER_SIZE);
+    thread_msg_queue_init(msg_queue, sizeof(msg_queue), 0);
 
     while (1) {
         msg_receive(&m);

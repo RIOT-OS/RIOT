@@ -22,6 +22,7 @@
 #include <stddef.h>
 
 #include "tcb.h"
+#include "msg.h"
 
 #define P(NAME) printf("\t%-*s%4zu%4zu\n", 11, #NAME, sizeof(((tcb_t *) 0)->NAME), offsetof(tcb_t, NAME));
 
@@ -36,10 +37,7 @@ int main(void)
     P(pid);
     P(priority);
     P(rq_entry);
-    P(wait_data);
-    P(msg_waiters);
-    P(msg_queue);
-    P(msg_array);
+    P(msg_node);
 #ifdef DEVELHELP
     P(name);
 #endif

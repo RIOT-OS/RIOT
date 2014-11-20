@@ -8,5 +8,6 @@ endif
 
 USEMODULE += net_if
 USEMODULE += defaulttransceiver
+USEMODULE += msg_queue
 
 include $(RIOTBASE)/Makefile.include

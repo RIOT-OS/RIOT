@@ -47,7 +47,8 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 uint8_t ip_send_buffer[BUFFER_SIZE];
 uint8_t buffer[BUFFER_SIZE];
-msg_t ip_msg_queue[IP_PKT_RECV_BUF_SIZE];
+static char ip_msg_buf[MSG_QUEUE_SPACE(IP_PKT_RECV_BUF_SIZE)];
+
 ipv6_hdr_t *ipv6_buf;
 icmpv6_hdr_t *icmp_buf;
 uint8_t *nextheader;
@@ -358,7 +359,7 @@ void *ipv6_process(void *arg)
     uint8_t i;
     uint16_t packet_length;
 
-    msg_init_queue(ip_msg_queue, IP_PKT_RECV_BUF_SIZE);
+    thread_msg_queue_init(ip_msg_buf, sizeof(ip_msg_buf), 0);
 
     while (1) {
         msg_receive(&m_recv_lowpan);
