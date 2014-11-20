@@ -30,5 +30,5 @@ int reboot_arch(int mode)
 
     NVIC_SystemReset();
 
-    return 0;
+    return -1;
 }
