@@ -91,12 +91,12 @@ static void sem_thread_blocked(sem_t *sem)
     /* scheduler should schedule an other thread, that unlocks the
      * mutex in the future, when this happens I get scheduled again
      */
-    thread_yield();
+    thread_yield_higher();
 }
 
 int sem_wait(sem_t *sem)
 {
-    int old_state = disableIRQ();
+    unsigned old_state = disableIRQ();
     while (1) {
         unsigned value = sem->value;
         if (value == 0) {
@@ -121,7 +121,7 @@ int sem_timedwait(sem_t *sem, const struct timespec *abstime)
 
 int sem_trywait(sem_t *sem)
 {
-    int old_state = disableIRQ();
+    unsigned old_state = disableIRQ();
     int result;
 
     unsigned value = sem->value;
@@ -139,7 +139,7 @@ int sem_trywait(sem_t *sem)
 
 int sem_post(sem_t *sem)
 {
-    int old_state = disableIRQ();
+    unsigned old_state = disableIRQ();
     ++sem->value;
 
     priority_queue_node_t *next = priority_queue_remove_head(&sem->queue);

@@ -123,7 +123,11 @@ static void *priority_sema_thread(void *arg)
 {
     (void) arg;
     sem_wait(&s);
+#ifdef DEVELHELP
     printf("Thread '%s' woke up.\n", thread_getname(thread_getpid()));
+#else
+    printf("Thread with PID '%" PRIkernel_pid "' woke up.\n", thread_getpid());
+#endif
     return NULL;
 }
 

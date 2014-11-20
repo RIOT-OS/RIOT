@@ -51,7 +51,7 @@ int ccnl_riot_client_get(kernel_pid_t relay_pid, char *name, char *reply_buf)
         memset(segment_string, 0, 16);
         snprintf(segment_string, 16, "%d", segment);
         prefix[i] = segment_string;
-        unsigned char *interest_pkg = malloc(PAYLOAD_SIZE);
+        unsigned char *interest_pkg = ccnl_malloc(PAYLOAD_SIZE);
         if (!interest_pkg) {
             puts("ccnl_riot_client_get: malloc failed");
             return 0;
@@ -67,7 +67,7 @@ int ccnl_riot_client_get(kernel_pid_t relay_pid, char *name, char *reply_buf)
         msg_t m, rep;
         m.content.ptr = (char *) &rmsg;
         m.type = CCNL_RIOT_MSG;
-        msg_send(&m, relay_pid, 1);
+        msg_send(&m, relay_pid);
 
         /* ######################################################################### */
 
@@ -131,7 +131,7 @@ int ccnl_riot_client_new_face(kernel_pid_t relay_pid, char *type, char *faceid,
     m.content.ptr = (char *) &rmsg;
     m.type = CCNL_RIOT_MSG;
     DEBUGMSG(1, "  sending face req to relay\n");
-    msg_send(&m, relay_pid, 1);
+    msg_send(&m, relay_pid);
 
     /* ######################################################################### */
 
@@ -160,7 +160,7 @@ int ccnl_riot_client_register_prefix(kernel_pid_t relay_pid, char *prefix, char 
     m.content.ptr = (char *) &rmsg;
     m.type = CCNL_RIOT_MSG;
     DEBUGMSG(1, "  sending prefix req to relay\n");
-    msg_send(&m, relay_pid, 1);
+    msg_send(&m, relay_pid);
 
     /* ######################################################################### */
 

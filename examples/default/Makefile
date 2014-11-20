@@ -36,6 +36,8 @@ USEMODULE += ps
 USEMODULE += vtimer
 USEMODULE += defaulttransceiver
 
+FEATURES_OPTIONAL += transceiver
+
 ifneq (,$(filter msb-430,$(BOARD)))
 	USEMODULE += sht11
 endif
@@ -52,6 +54,17 @@ ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += rtc
 	USEMODULE += config
 	USEMODULE += random
+endif
+ifneq (,$(filter iot-lab_M3,$(BOARD)))
+	USEMODULE += isl29020
+	USEMODULE += lps331ap
+	USEMODULE += l3g4200d
+	USEMODULE += lsm303dlhc
+endif
+ifneq (,$(filter fox,$(BOARD)))
+        USEMODULE += lps331ap
+        USEMODULE += l3g4200d
+	USEMODULE += lsm303dlhc
 endif
 
 include $(RIOTBASE)/Makefile.include

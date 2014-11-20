@@ -7,7 +7,8 @@
  */
 
 /**
- * @addtogroup  oneway_malloc
+ * @defgroup    oneway_malloc
+ * @ingroup     sys
  * @{
  * @file        malloc.h
  * @brief       A malloc implementation for MSP-430 boards without free.
@@ -26,6 +27,10 @@
 #define __MALLOC_H
 
 #include <stdlib.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief       Allocation a block of memory.
@@ -54,7 +59,7 @@ void *realloc(void *ptr, size_t size);
  * @param[in]   cnt    The other factor of the number of bytes to allocated.
  * @returns     The new memory block. `NULL` if the "heap" is exhausted.
  */
-void *calloc(int size, size_t cnt);
+void *calloc(size_t size, size_t cnt);
 
 /**
  * @brief       This is a no-op.
@@ -63,6 +68,10 @@ void *calloc(int size, size_t cnt);
  * @param[in]   ptr   The ignored argument.
  */
 void free(void *ptr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __MALLOC_H */
 

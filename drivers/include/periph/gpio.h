@@ -7,11 +7,12 @@
  */
 
 /**
+ * @defgroup    driver_periph_gpio GPIO
  * @ingroup     driver_periph
  * @brief       Low-level GPIO peripheral driver
  * @{
  *
- * @file        periph/gpio.h
+ * @file
  * @brief       Low-level GPIO peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -21,6 +22,10 @@
 #define __GPIO_H
 
 #include "periph_conf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* guard file in case no GPIO devices are defined */
 #if GPIO_NUMOF
@@ -249,6 +254,10 @@ void gpio_toggle(gpio_t dev);
 void gpio_write(gpio_t dev, int value);
 
 #endif /* GPIO_NUMOF */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __GPIO_H */
 /** @} */

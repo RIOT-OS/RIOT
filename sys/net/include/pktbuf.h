@@ -31,6 +31,10 @@
 
 #include "cpu-conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef PKTBUF_SIZE
 /**
  * @brief Maximum size of the packet buffer.
@@ -181,6 +185,10 @@ int pktbuf_contains(const void *pkt);
  * @brief   Sets the whole packet buffer to 0
  */
 void pktbuf_reset(void);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* __PKTBUF_H_ */

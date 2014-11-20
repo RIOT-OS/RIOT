@@ -30,6 +30,10 @@
 
 #include "sixlowpan/types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief ICMPv6 packet type for parameter problem message.
  * @see <a href="http://tools.ietf.org/html/rfc4443#section-3.4">
@@ -246,5 +250,10 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst,
  * @return The internet checksum of the given ICMPv6 packet.
  */
 uint16_t icmpv6_csum(ipv6_hdr_t *ipv6_buf, icmpv6_hdr_t *icmpv6_buf);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* SIXLOWPAN_ICMP_H */
 /** @} */

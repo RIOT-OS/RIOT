@@ -48,7 +48,6 @@ ifneq (,$(filter sixlowpan,$(USEMODULE)))
 endif
 
 ifneq (,$(filter uart0,$(USEMODULE)))
-	USEMODULE += lib
 	USEMODULE += posix
 endif
 
@@ -66,7 +65,7 @@ ifneq (,$(filter cc110x%,$(USEMODULE)))
 	USEMODULE += vtimer
 endif
 
-ifneq (,$(filter cc110x_ng,$(USEMODULE)))
+ifneq (,$(filter cc110x_legacy,$(USEMODULE)))
 	USEMODULE += transceiver
 endif
 
@@ -76,9 +75,8 @@ ifneq (,$(filter cc2420,$(USEMODULE)))
 endif
 
 ifneq (,$(filter at86rf231,$(USEMODULE)))
-	USEMODULE += transceiver
+	USEMODULE += netdev_802154
 	USEMODULE += ieee802154
-	USEMODULE += vtimer
 endif
 
 ifneq (,$(filter vtimer,$(USEMODULE)))
@@ -95,12 +93,12 @@ ifneq (,$(filter ccn_lite,$(USEMODULE)))
 	USEMODULE += crypto
 endif
 
-ifneq (,$(filter rgbled,$(USEMODULE)))
-	USEMODULE += color
+ifneq (,$(filter netdev_802154,$(USEMODULE)))
+	USEMODULE += netdev_base
 endif
 
-ifneq (,$(filter pipe,$(USEMODULE)))
-	USEMODULE += lib
+ifneq (,$(filter rgbled,$(USEMODULE)))
+	USEMODULE += color
 endif
 
 ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))

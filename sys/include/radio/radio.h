@@ -37,8 +37,8 @@
 #include <stdbool.h>
 #include "radio/types.h"
 
-#ifndef FEUERWARE_CONF_NUM_RADIOS
-#define FEUERWARE_CONF_NUM_RADIOS 1
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 #define L1_PROTOCOL_CATCH_ALL             (0xff)    ///< Catch all protocol ID
@@ -76,7 +76,9 @@ typedef struct {
     void (*print_config)(void);
 } radio_t;
 
-extern const struct radio *feuerware_radios[FEUERWARE_CONF_NUM_RADIOS];
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 

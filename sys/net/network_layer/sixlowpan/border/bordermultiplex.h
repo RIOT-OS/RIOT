@@ -24,6 +24,10 @@
 
 #include "ip.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* packet types of uart-packets */
 #define BORDER_PACKET_RAW_TYPE    (0)
 #define BORDER_PACKET_CONF_TYPE   (2)
@@ -88,5 +92,9 @@ void multiplex_send_addr_over_uart(ipv6_addr_t *addr);
 
 int readpacket(uint8_t *packet_buf, size_t size);
 int writepacket(uint8_t *packet_buf, size_t size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SIXLOWPAN_BORDERMULTIPLEX_H*/

@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup pthread
  * @{
@@ -10,6 +18,10 @@
 #define __SYS__POSIX__PTHREAD_RWLOCK_ATTR__H
 
 #include <errno.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief     Attributes for a new reader/writer lock.
@@ -63,6 +75,10 @@ int pthread_rwlockattr_getpshared(const pthread_rwlockattr_t *attr, int *pshared
  *                  `EINVAL` if `attr == NULL` or a wrong value for `pshared` was supplied.
  */
 int pthread_rwlockattr_setpshared(pthread_rwlockattr_t *attr, int pshared);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

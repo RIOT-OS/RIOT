@@ -59,10 +59,7 @@ volatile unsigned int _native_saved_eip;
 volatile int _native_sigpend;
 int _sig_pipefd[2];
 
-struct int_handler_t {
-    void (*func)(void);
-};
-static struct int_handler_t native_irq_handlers[255];
+static _native_callback_t native_irq_handlers[255];
 char sigalt_stk[SIGSTKSZ];
 
 void print_thread_sigmask(ucontext_t *cp)
@@ -74,7 +71,7 @@ void print_thread_sigmask(ucontext_t *cp)
     }
 
     for (int i = 1; i < (NSIG); i++) {
-        if (native_irq_handlers[i].func != NULL) {
+        if (native_irq_handlers[i] != NULL) {
             printf("%s: %s\n",
                    strsignal(i),
                    (sigismember(&_native_sig_set, i) ? "blocked" : "unblocked")
@@ -87,13 +84,12 @@ void print_thread_sigmask(ucontext_t *cp)
     }
 }
 
+#ifdef DEVELHELP
 void print_sigmasks(void)
 {
-    ucontext_t *p;
-    //tcb_t *cb = NULL;
-
     for (int i = 0; i < MAXTHREADS; i++) {
         if (sched_threads[i] != NULL) {
+            ucontext_t *p;
             printf("%s:\n", sched_threads[i]->name);
             //print_thread_sigmask(sched_threads[i]->sp);
             p = (ucontext_t *)(sched_threads[i]->stack_start);
@@ -102,6 +98,7 @@ void print_sigmasks(void)
         }
     }
 }
+#endif
 
 void native_print_signals(void)
 {
@@ -121,7 +118,7 @@ void native_print_signals(void)
     }
 
     for (int i = 1; i < (NSIG); i++) {
-        if (native_irq_handlers[i].func != NULL || i == SIGUSR1) {
+        if (native_irq_handlers[i] != NULL || i == SIGUSR1) {
             printf("%s: %s in active thread\n",
                    strsignal(i),
                    (sigismember(&_native_sig_set, i) ? "blocked" : "unblocked")
@@ -259,9 +256,9 @@ void native_irq_handler(void)
         int sig = _native_popsig();
         _native_sigpend--;
 
-        if (native_irq_handlers[sig].func != NULL) {
+        if (native_irq_handlers[sig] != NULL) {
             DEBUG("calling interrupt handler for %i\n", sig);
-            native_irq_handlers[sig].func();
+            native_irq_handlers[sig]();
         }
         else if (sig == SIGUSR1) {
             DEBUG("ignoring SIGUSR1\n");
@@ -360,7 +357,7 @@ void native_isr_entry(int sig, siginfo_t *info, void *context)
  * TODO: use appropriate data structure for signal
  *       handlers.
  */
-int register_interrupt(int sig, void (*handler)(void))
+int register_interrupt(int sig, _native_callback_t handler)
 {
     DEBUG("register_interrupt()\n");
 
@@ -369,7 +366,7 @@ int register_interrupt(int sig, void (*handler)(void))
         err(EXIT_FAILURE, "register_interrupt: sigdelset");
     }
 
-    native_irq_handlers[sig].func = handler;
+    native_irq_handlers[sig] = handler;
 
     /* set current dINT sigmask for all signals */
     struct sigaction sa;
@@ -377,7 +374,7 @@ int register_interrupt(int sig, void (*handler)(void))
     sa.sa_mask = _native_sig_set_dint;
     sa.sa_flags = SA_RESTART | SA_SIGINFO | SA_ONSTACK;
     for (int i = 0; i < 255; i++) {
-        if (native_irq_handlers[i].func != NULL) {
+        if (native_irq_handlers[i] != NULL) {
             if (sigaction(sig, &sa, NULL)) {
                 err(EXIT_FAILURE, "register_interrupt: sigaction");
             }
@@ -400,7 +397,7 @@ int unregister_interrupt(int sig)
         err(EXIT_FAILURE, "unregister_interrupt: sigaddset");
     }
 
-    native_irq_handlers[sig].func = NULL;
+    native_irq_handlers[sig] = NULL;
 
     /* reset signal handler for sig */
     struct sigaction sa;
@@ -413,7 +410,7 @@ int unregister_interrupt(int sig)
     /* change sigmask for remaining signal handlers */
     sa.sa_sigaction = native_isr_entry;
     for (int i = 0; i < 255; i++) {
-        if (native_irq_handlers[i].func != NULL) {
+        if (native_irq_handlers[i] != NULL) {
             if (sigaction(sig, &sa, NULL)) {
                 err(EXIT_FAILURE, "register_interrupt: sigaction");
             }
@@ -424,7 +421,7 @@ int unregister_interrupt(int sig)
     return 0;
 }
 
-void shutdown(int sig, siginfo_t *info, void *context)
+static void native_shutdown(int sig, siginfo_t *info, void *context)
 {
     (void)sig;
     (void)info;
@@ -451,7 +448,7 @@ void native_interrupt_init(void)
     _native_sigpend = 0;
 
     for (int i = 0; i < 255; i++) {
-        native_irq_handlers[i].func = NULL;
+        native_irq_handlers[i] = NULL;
     }
 
     sa.sa_sigaction = native_isr_entry;
@@ -513,8 +510,8 @@ void native_interrupt_init(void)
     }
 
     /* allow for ctrl+c to shut down gracefully always */
-    //register_interrupt(SIGINT, shutdown);
-    sa.sa_sigaction = shutdown;
+    //register_interrupt(SIGINT, native_shutdown);
+    sa.sa_sigaction = native_shutdown;
     if (sigdelset(&_native_sig_set, SIGINT) == -1) {
         err(EXIT_FAILURE, "native_interrupt_init: sigdelset");
     }

@@ -22,10 +22,18 @@
 #include "mutex.h"
 #include "pktbuf.h"
 
+#if PKTBUF_SIZE < 128
+typedef uint8_t _pktsize_t;
+#elif PKTBUF_SIZE < 65536
+typedef uint16_t _pktsize_t;
+#else
+typedef size_t _pktsize_t;
+#endif
+
 typedef struct __attribute__((packed)) _packet_t {
     volatile struct _packet_t *next;
     uint8_t processing;
-    size_t size;
+    _pktsize_t size;
 } _packet_t;
 
 static uint8_t _pktbuf[PKTBUF_SIZE];

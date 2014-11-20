@@ -1,10 +1,22 @@
 /*
+ * Copyright 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/*
  * Header file for serial number arithmetics [RFC1982]
  */
 
 #ifndef _SIXLOWPAN_SERIALNUMBER_H
 #define _SIXLOWPAN_SERIALNUMBER_H
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum serial_comp_res_t {
     LESS = 0,
@@ -78,5 +90,9 @@ serial_comp_res_t serial_comp16(uint16_t s1, uint16_t s2);
  *          else UNDEF (see RFC1982 section 3.2).
  **/
 serial_comp_res_t serial_comp32(uint32_t s1, uint32_t s2);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SIXLOWPAN_SERIALNUMBER_H*/

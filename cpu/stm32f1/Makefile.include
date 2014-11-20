@@ -4,14 +4,11 @@ export CFLAGS += -DCOREIF_NG=1
 # tell the build system that the CPU depends on the Cortex-M common files
 export USEMODULE += cortex-m3_common
 
-# this CPU implementation makes use of the ringbuffer, so include the lib module
-export USEMODULE += lib
-
 # define path to cortex-m common module, which is needed for this CPU
 export CORTEXM_COMMON = $(RIOTCPU)/cortex-m3_common/
 
 # define the linker script to use for this CPU
-export LINKERSCRIPT = $(RIOTCPU)/$(CPU)/$(CPU_MODEL)_linkerscript.ld
+export LINKERSCRIPT ?= $(RIOTCPU)/$(CPU)/$(CPU_MODEL)_linkerscript.ld
 
 # include CPU specific includes
 export INCLUDES += -I$(RIOTCPU)/$(CPU)/include/components

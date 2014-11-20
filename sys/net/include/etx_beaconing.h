@@ -1,7 +1,19 @@
+/*
+ * Copyright 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 #ifndef ETX_BEACONING_H_
 #define ETX_BEACONING_H_
 #include <stdint.h>
 #include "sixlowpan.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //[option|length|ipaddr.|packetcount] with up to 15 ipaddr|packetcount pairs
 // 1 Byte 1 Byte  1 Byte  1 Byte
@@ -90,5 +102,9 @@ void etx_update(etx_neighbor_t *neighbor);
 #define ETX_DATA_MAXLEN     (30)    //max length of the data
 #define ETX_PKT_HDR_LEN     (2)     //Option type + Length (1 Byte each)
 #define ETX_PKT_DATA        (2)     //Begin of Data Bytes
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ETX_BEACONING_H_ */

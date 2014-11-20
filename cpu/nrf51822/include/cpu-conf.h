@@ -10,7 +10,7 @@
  * @ingroup         cpu_nrf51822
  * @{
  *
- * @file            cpu-conf.h
+ * @file
  * @brief           Implementation specific CPU configuration options
  *
  * @author          Hauke Petersen <hauke.peterse@fu-berlin.de>

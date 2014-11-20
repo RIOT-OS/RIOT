@@ -14,6 +14,7 @@
  * @brief       Scheduler implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      René Kijewski <rene.kijewski@fu-berlin.de>
  *
  * @}
  */
@@ -53,72 +54,66 @@ static void (*sched_cb) (uint32_t timestamp, uint32_t value) = NULL;
 schedstat sched_pidlist[KERNEL_PID_LAST + 1];
 #endif
 
-void sched_run(void)
+int sched_run(void)
 {
     sched_context_switch_request = 0;
 
-#ifdef SCHEDSTATISTICS
-    unsigned long time = hwtimer_now();
-#endif
-
-    tcb_t *my_active_thread = (tcb_t *)sched_active_thread;
-
-    if (my_active_thread) {
-        if (my_active_thread->status == STATUS_RUNNING) {
-            my_active_thread->status = STATUS_PENDING;
-        }
-
-#ifdef SCHED_TEST_STACK
-        if (*((unsigned int *)my_active_thread->stack_start) != (unsigned int) my_active_thread->stack_start) {
-            printf("scheduler(): stack overflow detected, task=%s pid=%" PRIkernel_pid "\n", my_active_thread->name, my_active_thread->pid);
-        }
-#endif
-
-#ifdef SCHEDSTATISTICS
-        if (sched_pidlist[my_active_thread->pid].laststart) {
-            sched_pidlist[my_active_thread->pid].runtime_ticks += time - sched_pidlist[my_active_thread->pid].laststart;
-        }
-#endif
-    }
-
-    DEBUG("\nscheduler: previous task: %s\n", (my_active_thread == NULL) ? "none" : my_active_thread->name);
+    tcb_t *active_thread = (tcb_t *)sched_active_thread;
 
     /* The bitmask in runqueue_bitcache is never empty,
      * since the threading should not be started before at least the idle thread was started.
      */
     int nextrq = bitarithm_lsb(runqueue_bitcache);
-    my_active_thread = clist_get_container(sched_runqueues[nextrq], tcb_t, rq_entry);
-    clist_advance(&(sched_runqueues[nextrq]));
-    DEBUG("scheduler: first in queue: %s\n", my_active_thread->name);
-    sched_active_pid = (volatile int) my_active_thread->pid;
+    tcb_t *next_thread = clist_get_container(sched_runqueues[nextrq], tcb_t, rq_entry);
 
-    kernel_pid_t my_next_pid = my_active_thread->pid;
+    DEBUG("sched_run: active thread: %" PRIkernel_pid ", next thread: %" PRIkernel_pid "\n",
+          (active_thread == NULL) ? KERNEL_PID_UNDEF : active_thread->pid,
+          next_thread->pid);
+
+    if (active_thread == next_thread) {
+        DEBUG("sched_run: done, sched_active_thread was not changed.\n");
+        return 0;
+    }
+
+#ifdef SCHEDSTATISTICS
+    unsigned long time = hwtimer_now();
+#endif
+
+    if (active_thread) {
+        if (active_thread->status == STATUS_RUNNING) {
+            active_thread->status = STATUS_PENDING;
+        }
+
+#ifdef SCHED_TEST_STACK
+        if (*((uintptr_t *) active_thread->stack_start) != (uintptr_t) active_thread->stack_start) {
+            printf("scheduler(): stack overflow detected, pid=%" PRIkernel_pid "\n", active_thread->pid);
+        }
+#endif
+
+#ifdef SCHEDSTATISTICS
+        schedstat *active_stat = &sched_pidlist[active_thread->pid];
+        if (active_stat->laststart) {
+            active_stat->runtime_ticks += time - active_stat->laststart;
+        }
+#endif
+    }
 
 #if SCHEDSTATISTICS
-    sched_pidlist[my_next_pid].laststart = time;
-    sched_pidlist[my_next_pid].schedules++;
-    if ((sched_cb) && (my_next_pid != sched_active_pid)) {
-        sched_cb(time, my_next_pid);
+    schedstat *next_stat = &sched_pidlist[next_thread->pid];
+    next_stat->laststart = time;
+    next_stat->schedules++;
+    if (sched_cb) {
+        sched_cb(time, next_thread->pid);
     }
 #endif
 
-    sched_active_pid = my_next_pid;
+    next_thread->status = STATUS_RUNNING;
+    sched_active_pid = next_thread->pid;
+    sched_active_thread = (volatile tcb_t *) next_thread;
 
-    DEBUG("scheduler: next task: %s\n", my_active_thread->name);
+    DEBUG("sched_run: done, changed sched_active_thread.\n");
 
-    if (my_active_thread != sched_active_thread) {
-        if (sched_active_thread != NULL) {
-            if (sched_active_thread->status == STATUS_RUNNING) {
-                sched_active_thread->status = STATUS_PENDING;
-            }
-        }
-
-        sched_set_status((tcb_t *)my_active_thread, STATUS_RUNNING);
-    }
-
-    sched_active_thread = (volatile tcb_t *) my_active_thread;
-
-    DEBUG("scheduler: done.\n");
+    return 1;
 }
 
 #if SCHEDSTATISTICS
@@ -132,14 +127,16 @@ void sched_set_status(tcb_t *process, unsigned int status)
 {
     if (status >= STATUS_ON_RUNQUEUE) {
         if (!(process->status >= STATUS_ON_RUNQUEUE)) {
-            DEBUG("adding process %s to runqueue %u.\n", process->name, process->priority);
+            DEBUG("sched_set_status: adding thread %" PRIkernel_pid " to runqueue %" PRIu16 ".\n",
+                  process->pid, process->priority);
             clist_add(&sched_runqueues[process->priority], &(process->rq_entry));
             runqueue_bitcache |= 1 << process->priority;
         }
     }
     else {
         if (process->status >= STATUS_ON_RUNQUEUE) {
-            DEBUG("removing process %s from runqueue %u.\n", process->name, process->priority);
+            DEBUG("sched_set_status: removing thread %" PRIkernel_pid " to runqueue %" PRIu16 ".\n",
+                  process->pid, process->priority);
             clist_remove(&sched_runqueues[process->priority], &(process->rq_entry));
 
             if (!sched_runqueues[process->priority]) {
@@ -154,23 +151,26 @@ void sched_set_status(tcb_t *process, unsigned int status)
 void sched_switch(uint16_t other_prio)
 {
     int in_isr = inISR();
-    uint16_t current_prio = sched_active_thread->priority;
+    tcb_t *active_thread = (tcb_t *) sched_active_thread;
+    uint16_t current_prio = active_thread->priority;
 
-    DEBUG("%s: %" PRIu16 " %" PRIu16 " %i\n", sched_active_thread->name, current_prio, other_prio, in_isr);
+    DEBUG("sched_switch: active pid=%" PRIkernel_pid" prio=%" PRIu16
+          ", other_prio=%" PRIu16 " in_isr=%i\n",
+          active_thread->pid, current_prio, other_prio, in_isr);
 
     if (current_prio > other_prio) {
         if (in_isr) {
             sched_context_switch_request = 1;
         }
         else {
-            thread_yield();
+            thread_yield_higher();
         }
     }
 }
 
 NORETURN void sched_task_exit(void)
 {
-    DEBUG("sched_task_exit(): ending task %s...\n", sched_active_thread->name);
+    DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n", sched_active_thread->pid);
 
     dINT();
     sched_threads[sched_active_pid] = NULL;

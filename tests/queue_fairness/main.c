@@ -35,17 +35,16 @@ static kernel_pid_t parent_pid = KERNEL_PID_UNDEF;
 
 static void *child_fun(void *arg)
 {
-    (void) arg;
-    printf("Start of %s.\n", sched_active_thread->name);
+    printf("Start of %s.\n", (char*) arg);
 
     for (int i = 0; i < NUM_ITERATIONS; ++i) {
         msg_t m;
         m.type = i + 1;
-        m.content.ptr = (void *) sched_active_thread->name;
-        msg_send(&m, parent_pid, true);
+        m.content.ptr = (char*) arg;
+        msg_send(&m, parent_pid);
     }
 
-    printf("End of %s.\n", sched_active_thread->name);
+    printf("End of %s.\n", (char*) arg);
     return NULL;
 }
 
@@ -61,7 +60,7 @@ int main(void)
                                 PRIORITY_MAIN + 1,
                                 CREATE_WOUT_YIELD | CREATE_STACKTEST,
                                 child_fun,
-                                NULL,
+                                names[i],
                                 names[i]);
     }
 

@@ -10,7 +10,7 @@
  * @ingroup     board_arduino-due
  * @{
  *
- * @file        periph_conf.h
+ * @file
  * @brief       Peripheral MCU configuration for the Arduino Due board
  *
  * @author      Hauke Petersen  <hauke.petersen@fu-berlin.de>
@@ -19,6 +19,10 @@
 
 #ifndef __PERIPH_CONF_H
 #define __PERIPH_CONF_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name Timer peripheral configuration
@@ -51,20 +55,21 @@
 #define TIMER_2_ISR2        isr_tc7
 /** @} */
 
-
 /**
  * @name UART configuration
  * @{
  */
-#define UART_NUMOF          (1U)
+#define UART_NUMOF          (4U)
 #define UART_0_EN           1
-#define UART_1_EN           0
-#define UART_2_EN           0
-#define UART_3_EN           0
+#define UART_1_EN           1
+#define UART_2_EN           1
+#define UART_3_EN           1
 #define UART_IRQ_PRIO       1
 
 /* UART 0 device configuration */
 #define UART_0_DEV          UART
+#define UART_0_CLKEN()      (PMC->PMC_PCER0 |= (1 << ID_UART))
+#define UART_0_CLKDIS()     (PMC->PMC_PCER0 &= ~(1 << ID_UART))
 #define UART_0_IRQ          UART_IRQn
 #define UART_0_ISR          isr_uart
 /* UART 0 pin configuration */
@@ -72,12 +77,34 @@
 #define UART_0_PINS         (PIO_PA8 | PIO_PA9)
 
 /* UART 1 device configuration */
-#define UART_1_DEV
-#define UART_1_IRQ
-#define UART_1_ISR
+#define UART_1_DEV          USART0
+#define UART_1_CLKEN()      (PMC->PMC_PCER0 |= (1 << ID_USART0))
+#define UART_1_CLKDIS()     (PMC->PMC_PCER0 &= ~(1 << ID_USART0))
+#define UART_1_IRQ          USART0_IRQn
+#define UART_1_ISR          isr_usart0
 /* UART 1 pin configuration */
-#define UART_1_PORT
-#define UART_1_PINS
+#define UART_1_PORT         PIOA
+#define UART_1_PINS         (PIO_PA10 | PIO_PA11)
+
+/* UART 1 device configuration */
+#define UART_2_DEV          USART1
+#define UART_2_CLKEN()      (PMC->PMC_PCER0 |= (1 << ID_USART1))
+#define UART_2_CLKDIS()     (PMC->PMC_PCER0 &= ~(1 << ID_USART1))
+#define UART_2_IRQ          USART1_IRQn
+#define UART_2_ISR          isr_usart1
+/* UART 1 pin configuration */
+#define UART_2_PORT         PIOA
+#define UART_2_PINS         (PIO_PA12 | PIO_PA13)
+
+/* UART 1 device configuration */
+#define UART_3_DEV          USART3
+#define UART_3_CLKEN()      (PMC->PMC_PCER0 |= (1 << ID_USART3))
+#define UART_3_CLKDIS()     (PMC->PMC_PCER0 &= ~(1 << ID_USART3))
+#define UART_3_IRQ          USART3_IRQn
+#define UART_3_ISR          isr_usart3
+/* UART 1 pin configuration */
+#define UART_3_PORT         PIOD
+#define UART_3_PINS         (PIO_PD4 | PIO_PD5)
 /** @} */
 
 /**
@@ -106,12 +133,9 @@
 #define SPI_0_MISO_PIN      PIO_PA25A_SPI0_MISO
 #define SPI_0_MOSI_PIN      PIO_PA26A_SPI0_MOSI
 #define SPI_0_SCK_PIN       PIO_PA27A_SPI0_SPCK
-
-
 #define SPI_0_MISO_PORT     PIOA
 #define SPI_0_MOSI_PORT     PIOA
 #define SPI_0_SCK_PORT      PIOA
-
 #define SPI_0_MISO_PORT_CLKEN()  (PMC->PMC_PCER0 |= (1 << ID_PIOA));
 #define SPI_0_MOSI_PORT_CLKEN()  (PMC->PMC_PCER0 |= (1 << ID_PIOA));
 #define SPI_0_SCK_PORT_CLKEN()   (PMC->PMC_PCER0 |= (1 << ID_PIOA));
@@ -221,6 +245,10 @@
 #define GPIO_15_IRQ         PIOB_IRQn
 #define GPIO_B14_MAP        15
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PERIPH_CONF_H */
 /** @} */

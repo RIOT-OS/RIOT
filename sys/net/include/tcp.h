@@ -30,11 +30,19 @@
 #include "socket_base/socket.h"
 #include "socket_base/types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Initializes tcp.
  *
  * @return 0 on success, other else.
  */
 int tcp_init_transport_layer(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TCP_H */

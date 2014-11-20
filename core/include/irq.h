@@ -21,12 +21,12 @@
 #ifndef IRQ_H_
 #define IRQ_H_
 
+#include <stdbool.h>
+#include "arch/irq_arch.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-#include <stdbool.h>
-#include "arch/irq_arch.h"
 
 /**
  * @brief   This function sets the IRQ disable bit in the status register

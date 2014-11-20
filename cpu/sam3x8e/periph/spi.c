@@ -395,13 +395,13 @@ static inline void irq_handler_transfer(Spi *spi, spi_t dev)
     }
 }
 
-__attribute__((naked))
+#if SPI_0_EN
 void SPI_0_IRQ_HANDLER(void)
 {
     if (SPI_0_DEV->SPI_SR & SPI_SR_RDRF) {
-        ISR_ENTER();
         irq_handler_transfer(SPI_0_DEV, SPI_0);
-        ISR_EXIT();
     }
 }
+#endif
+
 #endif /* SPI_NUMOF */

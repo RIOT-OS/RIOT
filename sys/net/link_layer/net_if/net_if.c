@@ -142,7 +142,7 @@ int net_if_add_address(int if_id, net_if_addr_t *addr)
         return 0;
     }
 
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Address addition: No interface initialized with ID %d.\n", if_id);
         return 0;
     }
@@ -166,7 +166,7 @@ int net_if_del_address(int if_id, net_if_addr_t *addr)
         return 0;
     }
 
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Address deletion: No interface initialized with ID %d.\n", if_id);
         return 0;
     }
@@ -183,7 +183,7 @@ int net_if_del_address(int if_id, net_if_addr_t *addr)
 
 net_if_addr_t *net_if_iter_addresses(int if_id, net_if_addr_t **addr)
 {
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Address iteration: No interface initialized with ID %d.\n", if_id);
         return NULL;
     }
@@ -206,7 +206,7 @@ net_if_l3p_t net_if_get_l3p_types(int if_id)
 {
     net_if_l3p_t protocols;
 
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Get L3 protocols: No interface initialized with ID %d.\n", if_id);
         return NET_IF_L3P_FAILURE;
     }
@@ -222,7 +222,7 @@ net_if_l3p_t net_if_get_l3p_types(int if_id)
 
 int net_if_add_l3p_types(int if_id, net_if_l3p_t protocols)
 {
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Add L3 protocols: No interface initialized with ID %d.\n", if_id);
         return 0;
     }
@@ -236,7 +236,7 @@ int net_if_del_l3p_types(int if_id, net_if_l3p_t protocols)
 {
     net_if_addr_t *addr_ptr = NULL;
 
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Remove L3 protocols: No interface initialized with ID %d.\n", if_id);
         return 0;
     }
@@ -315,7 +315,7 @@ int net_if_send_packet(int if_id, uint16_t target, const void *payload,
           "payload_len = %d\n", if_id, target, payload, payload_len);
     uint32_t response;
 
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Send packet: No interface initialized with ID %d.\n", if_id);
         return -1;
     }
@@ -331,11 +331,12 @@ int net_if_send_packet(int if_id, uint16_t target, const void *payload,
         p.frame.fcf.dest_addr_m = IEEE_802154_SHORT_ADDR_M;
         p.frame.fcf.ack_req = 0;
         p.frame.fcf.sec_enb = 0;
-        p.frame.fcf.frame_type = 1;
+        p.frame.fcf.frame_type = IEEE_802154_DATA_FRAME;
         p.frame.fcf.frame_pend = 0;
 
         p.frame.dest_pan_id = net_if_get_pan_id(if_id);
-        memcpy(p.frame.dest_addr, &target, 2);
+        uint16_t target_h = NTOHS(target);
+        memcpy(p.frame.dest_addr, &target_h, 2);
         response = net_if_transceiver_get_set_handler(if_id, SND_PKT, (void *)&p);
     }
     else {
@@ -359,7 +360,7 @@ int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
           payload_len);
     uint32_t response;
 
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Send packet: No interface initialized with ID %d.\n", if_id);
         return -1;
     }
@@ -375,10 +376,11 @@ int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
         p.frame.fcf.dest_addr_m = IEEE_802154_LONG_ADDR_M;
         p.frame.fcf.ack_req = 0;
         p.frame.fcf.sec_enb = 0;
-        p.frame.fcf.frame_type = 1;
+        p.frame.fcf.frame_type = IEEE_802154_DATA_FRAME;
         p.frame.fcf.frame_pend = 0;
         p.frame.dest_pan_id = net_if_get_pan_id(if_id);
-        memcpy(p.frame.dest_addr, target, 8);
+        uint64_t target_h = NTOHLL(target->uint64);
+        memcpy(p.frame.dest_addr, &target_h, 8);
         response = net_if_transceiver_get_set_handler(if_id, SND_PKT, (void *)&p);
     }
     else {
@@ -396,7 +398,7 @@ int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
 
 int net_if_register(int if_id, kernel_pid_t pid)
 {
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Register thread: No interface initialized with ID %d.\n", if_id);
         return 0;
     }
@@ -408,7 +410,7 @@ int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation)
 {
     uint64_t tmp;
 
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Get EUI-64: No interface initialized with ID %d.\n", if_id);
         return 0;
     }
@@ -459,7 +461,7 @@ int net_if_set_eui64(int if_id, net_if_eui64_t *eui64)
 
     uint64_t tmp = NTOHLL(eui64->uint64);
 
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Set EUI-64: No interface initialized with ID %d.\n", if_id);
         return 0;
     }
@@ -473,7 +475,7 @@ uint16_t net_if_get_hardware_address(int if_id)
 {
     uint16_t addr;
 
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Get hardware address: No interface initialized with ID %d.\n", if_id);
         return 0;
     }
@@ -484,7 +486,7 @@ uint16_t net_if_get_hardware_address(int if_id)
 
 uint16_t net_if_set_hardware_address(int if_id, uint16_t addr)
 {
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Set hardware address: No interface initialized with ID %d.\n", if_id);
         return 0;
     }
@@ -497,7 +499,7 @@ int32_t net_if_get_channel(int if_id)
 {
     int32_t channel;
 
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Get channel: No interface initialized with ID %d.\n", if_id);
         return -1;
     }
@@ -508,7 +510,7 @@ int32_t net_if_get_channel(int if_id)
 
 int32_t net_if_set_channel(int if_id, uint16_t channel)
 {
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Set channel: No interface initialized with ID %d.\n", if_id);
         return -1;
     }
@@ -521,7 +523,7 @@ int32_t net_if_get_pan_id(int if_id)
 {
     int32_t pan_id;
 
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Get PAN ID: No interface initialized with ID %d.\n", if_id);
         return -1;
     }
@@ -538,7 +540,7 @@ int32_t net_if_get_pan_id(int if_id)
 
 int32_t net_if_set_pan_id(int if_id, uint16_t pan_id)
 {
-    if (if_id < 0 || if_id > NET_IF_MAX || !interfaces[if_id].initialized) {
+    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Set PAN ID: No interface initialized with ID %d.\n", if_id);
         return -1;
     }

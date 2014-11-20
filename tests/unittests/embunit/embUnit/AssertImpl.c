@@ -36,20 +36,26 @@
 #include "stdImpl.h"
 #include "AssertImpl.h"
 
-void assertImplementationInt(int expected,int actual, long line, const char *file)
+#include <limits.h>
+
+/* This is the maximal length of 2^n in decimal notation. */
+/* http://www.wolframalpha.com/input/?i=%28%28n-2%29%2F3%2B1%29%2F%28log_10%282^n%29%29%3E%3D1 */
+#define MAX_LL_LEN ((CHAR_BIT*sizeof(long long) - 2)/3 + 1)
+
+void assertImplementationLongLong(long long expected,long long actual, long line, const char *file)
 {
-    char buffer[32];    /*"exp -2147483647 was -2147483647"*/
-    char numbuf[12];    /*32bit int decimal maximum column is 11 (-2147483647~2147483647)*/
+    char numbuf[MAX_LL_LEN + 2];              /* one (signed) decimal number + sign + null */
+    char buffer[2*(sizeof(numbuf) - 1) + 10]; /* "exp " + decimal + " was " + decimal + null */
 
     stdimpl_strcpy(buffer, "exp ");
 
-    {   stdimpl_itoa(expected, numbuf, 10);
-        stdimpl_strncat(buffer, numbuf, 11);    }
+    stdimpl_lltoa(expected, numbuf, 10);
+    stdimpl_strncat(buffer, numbuf, sizeof(numbuf));
 
     stdimpl_strcat(buffer, " was ");
 
-    {   stdimpl_itoa(actual, numbuf, 10);
-        stdimpl_strncat(buffer, numbuf, 11);    }
+    stdimpl_lltoa(actual, numbuf, 10);
+    stdimpl_strncat(buffer, numbuf, sizeof(numbuf));
 
     addFailure(buffer, line, file);
 }

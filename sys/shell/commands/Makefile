@@ -8,9 +8,9 @@ endif
 ifneq (,$(filter transceiver,$(USEMODULE)))
 	SRC += sc_transceiver.c
 endif
-ifneq (,$(filter cc110x,$(USEMODULE)))
+ifneq (,$(filter cc110x_legacy_csma,$(USEMODULE)))
 	ifeq (,$(filter transceiver,$(USEMODULE)))
-		SRC += sc_cc1100.c
+		SRC += sc_cc110x_legacy_csma.c
 	endif
 endif
 ifneq (,$(filter net_if,$(USEMODULE)))
@@ -42,6 +42,18 @@ ifneq (,$(filter random,$(USEMODULE)))
 endif
 ifeq ($(CPU),x86)
 	SRC += sc_x86_lspci.c
+endif
+ifneq (,$(filter isl29020,$(USEMODULE)))
+	SRC += sc_isl29020.c
+endif
+ifneq (,$(filter lps331ap,$(USEMODULE)))
+	SRC += sc_lps331ap.c
+endif
+ifneq (,$(filter l3g4200d,$(USEMODULE)))
+	SRC += sc_l3g4200d.c
+endif
+ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
+	SRC += sc_lsm303dlhc.c
 endif
 
 include $(RIOTBASE)/Makefile.base

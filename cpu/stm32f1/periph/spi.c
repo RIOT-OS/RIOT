@@ -29,7 +29,7 @@
 #include "debug.h"
 
 /* guard file in case no SPI device is defined */
-#if SPI_NUMOF
+#if SPI_0_EN
 
 int spi_init_master(spi_t dev, spi_conf_t conf, spi_speed_t speed)
 {
@@ -118,7 +118,7 @@ int spi_conf_pins(spi_t dev)
         }
         else {
             port[i]->CRH &= ~(0xf << ((pin[i] - 8) * 4));
-            port[i]->CRH &= (crbitval << ((pin[i] - 8) * 4));
+            port[i]->CRH |= (crbitval << ((pin[i] - 8) * 4));
         }
     }
 
@@ -128,7 +128,7 @@ int spi_conf_pins(spi_t dev)
 int spi_transfer_byte(spi_t dev, char out, char *in)
 {
     SPI_TypeDef *spi;
-    int transfered = 0;
+    int transferred = 0;
 
     switch(dev) {
 #ifdef SPI_0_EN
@@ -142,12 +142,12 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 
     while ((spi->SR & SPI_SR_TXE) == RESET);
     spi->DR = out;
-    transfered++;
+    transferred++;
 
     while ((spi->SR & SPI_SR_RXNE) == RESET);
     if (in != NULL) {
         *in = spi->DR;
-        transfered++;
+        transferred++;
     }
     else {
         spi->DR;
@@ -155,15 +155,21 @@ int spi_transfer_byte(spi_t dev, char out, char *in)
 
     /* SPI busy */
     while ((spi->SR & 0x80));
+#if ENABLE_DEBUG
+    if (in != NULL) {
+        DEBUG("\nout: %x in: %x transferred: %x\n", out, *in, transferred);
+    }
+    else {
+        DEBUG("\nout: %x in: was nullPointer transferred: %x\n", out, transferred);
+    }
+#endif /*ENABLE_DEBUG */
 
-    DEBUG("\nout: %x in: %x transfered: %x\n", out, *in, transfered);
-
-    return transfered;
+    return transferred;
 }
 
 int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
 {
-    int transfered = 0;
+    int transferred = 0;
 
     if (out != NULL) {
         DEBUG("out*: %p out: %x length: %x\n", out, *out, length);
@@ -172,7 +178,7 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
             if (ret <  0) {
                 return ret;
             }
-            transfered += ret;
+            transferred += ret;
         }
     }
     if (in != NULL) {
@@ -181,13 +187,13 @@ int spi_transfer_bytes(spi_t dev, char *out, char *in, unsigned int length)
             if (ret <  0) {
                 return ret;
             }
-            transfered += ret;
+            transferred += ret;
         }
-        DEBUG("in*: %p in: %x transfered: %x\n", in, *(in-transfered), transfered);
+        DEBUG("in*: %p in: %x transferred: %x\n", in, *(in-transferred), transferred);
     }
 
-    DEBUG("sent %x byte(s)\n", transfered);
-    return transfered;
+    DEBUG("sent %x byte(s)\n", transferred);
+    return transferred;
 }
 
 int spi_transfer_reg(spi_t dev, uint8_t reg, char out, char *in)
@@ -231,4 +237,4 @@ void spi_poweroff(spi_t dev)
     }
 }
 
-#endif /* SPI_NUMOF */
+#endif /* SPI_0_EN */

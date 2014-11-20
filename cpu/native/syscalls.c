@@ -55,10 +55,13 @@ void (*real_free)(void *ptr);
 void* (*real_malloc)(size_t size);
 void* (*real_calloc)(size_t nmemb, size_t size);
 void* (*real_realloc)(void *ptr, size_t size);
+void (*real_freeaddrinfo)(struct addrinfo *res);
+void (*real_srandom)(unsigned int seed);
+int (*real_accept)(int socket, ...);
 int (*real_bind)(int socket, ...);
 int (*real_printf)(const char *format, ...);
+int (*real_getaddrinfo)(const char *node, ...);
 int (*real_getpid)(void);
-int (*real_pipe)(int[2]);
 int (*real_close)(int);
 int (*real_dup2)(int, int);
 int (*real_execve)(const char *, char *const[], char *const[]);
@@ -67,7 +70,12 @@ int (*real_feof)(FILE *stream);
 int (*real_ferror)(FILE *stream);
 int (*real_listen)(int socket, int backlog);
 int (*real_pause)(void);
+int (*real_pipe)(int[2]);
+int (*real_setsockopt)(int socket, ...);
+int (*real_socket)(int domain, int type, int protocol);
 int (*real_unlink)(const char *);
+long int (*real_random)(void);
+const char* (*real_gai_strerror)(int errcode);
 FILE* (*real_fopen)(const char *path, const char *mode);
 
 void _native_syscall_enter(void)
@@ -320,6 +328,7 @@ void err(int eval, const char *fmt, ...)
     va_list argp;
     va_start(argp, fmt);
     verr(eval, fmt, argp);
+    va_end(argp);
 }
 
 void errx(int eval, const char *fmt, ...)
@@ -327,6 +336,7 @@ void errx(int eval, const char *fmt, ...)
     va_list argp;
     va_start(argp, fmt);
     verrx(eval, fmt, argp);
+    va_end(argp);
 }
 
 int getpid(void)
@@ -353,14 +363,22 @@ void _native_init_syscalls(void)
     *(void **)(&real_malloc) = dlsym(RTLD_NEXT, "malloc");
     *(void **)(&real_realloc) = dlsym(RTLD_NEXT, "realloc");
     *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");
+    *(void **)(&real_freeaddrinfo) = dlsym(RTLD_NEXT, "freeaddrinfo");
+    *(void **)(&real_srandom) = dlsym(RTLD_NEXT, "srandom");
+    *(void **)(&real_accept) = dlsym(RTLD_NEXT, "accept");
     *(void **)(&real_bind) = dlsym(RTLD_NEXT, "bind");
     *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
+    *(void **)(&real_gai_strerror) = dlsym(RTLD_NEXT, "gai_strerror");
+    *(void **)(&real_getaddrinfo) = dlsym(RTLD_NEXT, "getaddrinfo");
     *(void **)(&real_getpid) = dlsym(RTLD_NEXT, "getpid");
     *(void **)(&real_pipe) = dlsym(RTLD_NEXT, "pipe");
     *(void **)(&real_close) = dlsym(RTLD_NEXT, "close");
     *(void **)(&real_fork) = dlsym(RTLD_NEXT, "fork");
     *(void **)(&real_dup2) = dlsym(RTLD_NEXT, "dup2");
+    *(void **)(&real_setsockopt) = dlsym(RTLD_NEXT, "setsockopt");
+    *(void **)(&real_socket) = dlsym(RTLD_NEXT, "socket");
     *(void **)(&real_unlink) = dlsym(RTLD_NEXT, "unlink");
+    *(void **)(&real_random) = dlsym(RTLD_NEXT, "random");
     *(void **)(&real_execve) = dlsym(RTLD_NEXT, "execve");
     *(void **)(&real_listen) = dlsym(RTLD_NEXT, "listen");
     *(void **)(&real_pause) = dlsym(RTLD_NEXT, "pause");

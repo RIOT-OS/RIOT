@@ -24,6 +24,9 @@
 #include "color.h"
 #include "periph/pwm.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name Descriptor struct for rgbleds
@@ -54,6 +57,10 @@ void rgbled_init(rgbled_t *led, pwm_t pwm, int channel_r, int channel_g, int cha
  * @param[in] color         Color to set the led to
  */
 void rgbled_set(rgbled_t *led, color_rgb_t *color);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __RGBLED_H */
 /** @} */

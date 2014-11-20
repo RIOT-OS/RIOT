@@ -14,7 +14,7 @@
 #include "cpu.h"
 #include "irq.h"
 
-#include "cc110x_ng.h"
+#include "cc110x_legacy.h"
 
 #define CC1100_GDO0         (P1IN & 0x08)   // read serial I/O (GDO0)
 #define CC1100_GDO1         (P5IN & 0x04)   // read serial I/O (GDO1)

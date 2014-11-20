@@ -7,10 +7,11 @@
  */
 
 /**
- * @addtogroup  driver_periph
+ * @defgroup    driver_periph_cpuid CPUID
+ * @ingroup     driver_periph
  * @{
  *
- * @file        periph/cpuid.h
+ * @file
  * @brief       Provides access the CPU's serial number
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
@@ -20,6 +21,10 @@
 #define __PERIPH_CPUID_H_
 
 #include "cpu-conf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @def CPUID_ID_LEN
@@ -38,6 +43,10 @@
  */
 void cpuid_get(void *id);
 #endif /* CPUID_ID_LEN */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PERIPH_CPUID_H_ */
 /**

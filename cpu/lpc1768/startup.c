@@ -190,7 +190,7 @@ void (* const g_pfnVectors[])(void) =
 *******************************************************************************/
 void Reset_Handler(void)
 {
-    unsigned long *pulSrc, *pulDest;
+    unsigned long *pulDest;
 
     /*
      * This used for cleaning AHBRAM0 section
@@ -218,7 +218,7 @@ void Reset_Handler(void)
      * Copy the data segment initializers from flash to SRAM in ROM mode
      */
 #if (__RAM_MODE__==0)
-    pulSrc = &__sidata;
+    unsigned long *pulSrc = &__sidata;
     for(pulDest = &__data_start__; pulDest < &__data_end__; )
     {
         *(pulDest++) = *(pulSrc++);

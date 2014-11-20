@@ -10,7 +10,7 @@
  * @ingroup         cpu_sam3x8e
  * @{
  *
- * @file            hwtimer_cpu.h
+ * @file
  * @brief           CPU specific hwtimer configuration options
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>

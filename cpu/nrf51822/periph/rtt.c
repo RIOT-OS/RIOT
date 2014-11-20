@@ -32,10 +32,24 @@
 #if RTT_NUMOF
 
 /*
- * callback and argument for an active alarm
+ * @brief Callback for the active alarm
  */
-static rtt_alarm_cb_t alarm_cb;
+static rtt_cb_t alarm_cb;
+
+/**
+ * @brief Argument for the active alarm callback
+ */
 static void *alarm_arg;
+
+/**
+ * @brief Callback for the overflow event
+ */
+static rtt_cb_t overflow_cb;
+
+/**
+ * @brief Argument for the overflow callback
+ */
+static void *overflow_arg;
 
 void rtt_init(void)
 {
@@ -55,6 +69,18 @@ void rtt_init(void)
     RTT_DEV->TASKS_START = 1;
 }
 
+void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
+{
+    overflow_cb = cb;
+    overflow_arg = arg;
+    RTT_DEV->INTENSET = RTC_INTENSET_OVRFLW_Msk;
+}
+
+void rtt_clear_overflow_cb(void)
+{
+    RTT_DEV->INTENCLR = RTC_INTENCLR_OVRFLW_Msk;
+}
+
 uint32_t rtt_get_counter(void)
 {
     return RTT_DEV->COUNTER;
@@ -65,7 +91,7 @@ void rtt_set_counter(uint32_t counter)
     /* not supported for the NRF51822? -> could not find out how to do this */
 }
 
-void rtt_set_alarm(uint32_t alarm, rtt_alarm_cb_t cb, void *arg)
+void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
 {
     alarm_cb = cb;
     alarm_arg = arg;
@@ -93,18 +119,20 @@ void rtt_poweroff(void)
     RTT_DEV->POWER = 0;
 }
 
-__attribute__((naked)) void RTT_ISR(void)
+void RTT_ISR(void)
 {
-    ISR_ENTER();
-    if (RTT_DEV->EVENTS_COMPARE[0] ==1) {
+    if (RTT_DEV->EVENTS_COMPARE[0] == 1) {
         RTT_DEV->EVENTS_COMPARE[0] = 0;
         RTT_DEV->INTENCLR = RTC_INTENSET_COMPARE0_Msk;
         alarm_cb(alarm_arg);
     }
+    if (RTT_DEV->EVENTS_OVRFLW == 1) {
+        RTT_DEV->EVENTS_OVRFLW = 0;
+        overflow_cb(overflow_arg);
+    }
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 
 #endif /* RTT_NUMOF */

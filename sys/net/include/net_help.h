@@ -23,48 +23,32 @@
 #include <string.h>
 #include <stdint.h>
 
-#if defined(__MACH__)
-#include "clang_compat.h"
-#endif
-
 #include "byteorder.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define BITSET(var,pos) ((var) & (1<<(pos)))
 
-static inline uint16_t HTONS(uint16_t a)
-{
-    return byteorder_htons(a).u16;
+/**
+ * @brief   Computes the Internet Checksum for *buf* with initial value *init*
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc1071">
+ *          RFC 1071
+ *      </a>
+ *
+ * @param[in] init      Initial value for the checksum (0 in most cases)
+ * @param[in] buf       A byte array to calculate the checksum of
+ * @param[in] buf_len   Length of *buf*
+ *
+ * @return  The Internet Checksum of *buf* with initial value *init*
+ */
+uint16_t net_help_csum(uint16_t init, uint8_t *buf, uint16_t buf_len);
+
+#ifdef __cplusplus
 }
-
-static inline uint32_t HTONL(uint32_t a)
-{
-    return byteorder_htonl(a).u32;
-}
-
-static inline uint64_t HTONLL(uint64_t a)
-{
-    return byteorder_htonll(a).u64;
-}
-
-static inline uint16_t NTOHS(uint16_t a)
-{
-    return byteorder_ntohs(*(network_uint16_t *) &a);
-}
-
-static inline uint32_t NTOHL(uint32_t a)
-{
-    return byteorder_ntohl(*(network_uint32_t *) &a);
-}
-
-static inline uint64_t NTOHLL(uint64_t a)
-{
-    return byteorder_ntohll(*(network_uint64_t *) &a);
-}
-
-#define CMP_IPV6_ADDR(a, b) (memcmp(a, b, 16))
-
-uint16_t csum(uint16_t sum, uint8_t *buf, uint16_t len);
-void printArrayRange(uint8_t *array, uint16_t len, char *str);
+#endif
 
 /** @} */
 #endif /* __NET_HELP_H */

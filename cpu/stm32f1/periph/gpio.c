@@ -1014,9 +1014,8 @@ void gpio_write(gpio_t dev, int value)
 }
 
 #ifdef GPIO_IRQ_0
-__attribute__((naked)) void isr_exti0(void)
+void isr_exti0(void)
 {
-    ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR0) {
         EXTI->PR |= EXTI_PR_PR0;        /* clear status bit by writing a 1 to it */
         config[GPIO_IRQ_0].cb(config[GPIO_IRQ_0].arg);
@@ -1025,14 +1024,12 @@ __attribute__((naked)) void isr_exti0(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 #endif
 
 #ifdef GPIO_IRQ_1
-__attribute__((naked)) void isr_exti1(void)
+void isr_exti1(void)
 {
-    ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR1) {
         EXTI->PR |= EXTI_PR_PR1;        /* clear status bit by writing a 1 to it */
         config[GPIO_IRQ_1].cb(config[GPIO_IRQ_1].arg);
@@ -1041,14 +1038,12 @@ __attribute__((naked)) void isr_exti1(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 #endif
 
 #ifdef GPIO_IRQ_2
-__attribute__((naked)) void isr_exti2(void)
+void isr_exti2(void)
 {
-    ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR2) {
         EXTI->PR |= EXTI_PR_PR2;        /* clear status bit by writing a 1 to it */
         config[GPIO_IRQ_2].cb(config[GPIO_IRQ_2].arg);
@@ -1057,14 +1052,12 @@ __attribute__((naked)) void isr_exti2(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 #endif
 
 #ifdef GPIO_IRQ_3
-__attribute__((naked)) void isr_exti3(void)
+void isr_exti3(void)
 {
-    ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR3) {
         EXTI->PR |= EXTI_PR_PR3;        /* clear status bit by writing a 1 to it */
         config[GPIO_IRQ_3].cb(config[GPIO_IRQ_3].arg);
@@ -1073,14 +1066,12 @@ __attribute__((naked)) void isr_exti3(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 #endif
 
 #ifdef GPIO_IRQ_4
-__attribute__((naked)) void isr_exti4(void)
+void isr_exti4(void)
 {
-    ISR_ENTER();
     if (EXTI->PR & EXTI_PR_PR4) {
         EXTI->PR |= EXTI_PR_PR4;        /* clear status bit by writing a 1 to it */
         config[GPIO_IRQ_4].cb(config[GPIO_IRQ_4].arg);
@@ -1089,14 +1080,12 @@ __attribute__((naked)) void isr_exti4(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 #endif
 
 #if defined(GPIO_IRQ_5) || defined(GPIO_IRQ_6) || defined(GPIO_IRQ_7) || defined(GPIO_IRQ_8) || defined(GPIO_IRQ_9)
-__attribute__((naked)) void isr_exti9_5(void)
+void isr_exti9_5(void)
 {
-    ISR_ENTER();
 #ifdef GPIO_IRQ_5
     if (EXTI->PR & EXTI_PR_PR5) {
         EXTI->PR |= EXTI_PR_PR5;        /* clear status bit by writing a 1 to it */
@@ -1130,14 +1119,12 @@ __attribute__((naked)) void isr_exti9_5(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 #endif
 
 #if defined(GPIO_IRQ_10) || defined(GPIO_IRQ_11) || defined(GPIO_IRQ_12) || defined(GPIO_IRQ_13) || defined(GPIO_IRQ_14) || defined(GPIO_IRQ_15)
-__attribute__((naked)) void isr_exti15_10(void)
+void isr_exti15_10(void)
 {
-    ISR_ENTER();
 #ifdef GPIO_IRQ_10
     if (EXTI->PR & EXTI_PR_PR10) {
         EXTI->PR |= EXTI_PR_PR10;        /* clear status bit by writing a 1 to it */
@@ -1177,7 +1164,6 @@ __attribute__((naked)) void isr_exti15_10(void)
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 #endif
 

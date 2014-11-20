@@ -81,7 +81,11 @@ extern "C" {
  * @name Flash Customer Configuration Area (CCA) parameters
  * @{
  */
+
+#ifndef UPDATE_CCA
 #define UPDATE_CCA                1
+#endif
+
 #define CCA_BACKDOOR_ENABLE       1
 #define CCA_BACKDOOR_PORT_A_PIN   3 /**< Select button */
 #define CCA_BACKDOOR_ACTIVE_LEVEL 0 /**< Active low */

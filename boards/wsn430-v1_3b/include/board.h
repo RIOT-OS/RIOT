@@ -1,8 +1,9 @@
 /*
  * Copyright (C) 2013 Milan Babel <babel@inf.fu-berlin.de>
  *
- * This source code is licensed under the GNU Lesser General Public License,
- * Version 2.  See the file LICENSE for more details.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 /**
@@ -16,7 +17,7 @@
  *
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Basic definitions for the Senslab WSN430 v1.3b board
  *
  * @author      Milan Babel <babel@inf.fu-berlin.de>
@@ -26,6 +27,10 @@
 #define _WSN_BOARD_H
 
 #include "board-conf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // for correct inclusion of <msp430.h>
 #ifndef __MSP430F1611__
@@ -57,6 +62,10 @@
 #define LED_BLUE_ON         LEDS_PxOUT &=~LEDS_CONF_BLUE
 #define LED_BLUE_OFF        LEDS_PxOUT |= LEDS_CONF_BLUE
 #define LED_BLUE_TOGGLE     LEDS_PxOUT ^= LEDS_CONF_BLUE
+
+#ifdef __cplusplus
+}
+#endif
 
 #include <msp430x16x.h>
 

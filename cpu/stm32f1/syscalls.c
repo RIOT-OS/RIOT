@@ -35,6 +35,7 @@
 #include "ringbuffer.h"
 #include "irq.h"
 #include "periph/uart.h"
+#include "board.h"
 
 #ifdef MODULE_UART0
 #include "board_uart0.h"
@@ -43,8 +44,9 @@
 /**
  * manage the heap
  */
-extern uint32_t _end;                       /* address of last used memory cell */
-caddr_t heap_top = (caddr_t)&_end + 4;
+extern char _sheap;                 /* start of the heap */
+extern char _eheap;                 /* end of the heap */
+caddr_t heap_top = (caddr_t)&_sheap + 4;
 
 #ifndef MODULE_UART0
 /**
@@ -114,10 +116,7 @@ void _exit(int n)
  *
  * The current heap implementation is very rudimentary, it is only able to allocate
  * memory. But it does not
- * - check if the returned address is valid (no check if the memory very exists)
  * - have any means to free memory again
- *
- * TODO: check if the requested memory is really available
  *
  * @return [description]
  */
@@ -125,7 +124,16 @@ caddr_t _sbrk_r(struct _reent *r, ptrdiff_t incr)
 {
     unsigned int state = disableIRQ();
     caddr_t res = heap_top;
-    heap_top += incr;
+
+    if (((incr > 0) && ((heap_top + incr > &_eheap) || (heap_top + incr < res))) ||
+        ((incr < 0) && ((heap_top + incr < &_sheap) || (heap_top + incr > res)))) {
+        r->_errno = ENOMEM;
+        res = (void *) -1;
+    }
+    else {
+        heap_top += incr;
+    }
+
     restoreIRQ(state);
     return res;
 }
@@ -149,9 +157,26 @@ int _getpid(void)
  *
  * @return      TODO
  */
+__attribute__ ((weak))
 int _kill_r(struct _reent *r, int pid, int sig)
 {
     r->_errno = ESRCH;                      /* not implemented yet */
+    return -1;
+}
+
+/**
+ * @brief Send a signal to a given thread (non-reentrant syscall)
+ *
+ * @param r     TODO
+ * @param pid   TODO
+ * @param sig   TODO
+ *
+ * @return      TODO
+ */
+__attribute__ ((weak))
+int _kill(int pid, int sig)
+{
+    errno = ESRCH;		                   /* not implemented yet */
     return -1;
 }
 
@@ -220,7 +245,7 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 {
     char *c = (char*)data;
     for (int i = 0; i < count; i++) {
-        uart_write_blocking(UART_0, c[i]);
+        uart_write_blocking(STDIO, c[i]);
     }
     return count;
 }

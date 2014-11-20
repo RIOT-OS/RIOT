@@ -1437,8 +1437,8 @@ uint16_t icmpv6_csum(ipv6_hdr_t *ipv6_buf, icmpv6_hdr_t *icmpv6_buf)
     icmpv6_buf->checksum = 0;
     sum = len + IPV6_PROTO_NUM_ICMPV6;
 
-    sum = csum(sum, (uint8_t *)&ipv6_buf->srcaddr, 2 * sizeof(ipv6_addr_t));
-    sum = csum(sum, (uint8_t *)icmpv6_buf, len);
+    sum = net_help_csum(sum, (uint8_t *)&ipv6_buf->srcaddr, 2 * sizeof(ipv6_addr_t));
+    sum = net_help_csum(sum, (uint8_t *)icmpv6_buf, len);
 
     return (sum == 0) ? 0 : ~HTONS(sum);
 }
@@ -1518,10 +1518,9 @@ ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_addr_t *ipaddr)
 
 int ndp_addr_is_on_link(ipv6_addr_t *dest_addr)
 {
-    ndp_neighbor_cache_t *nce;
     int if_id = -1;
 
-    if ((nce = ndp_neighbor_cache_search(dest_addr))) {
+    if ((ndp_neighbor_cache_search(dest_addr))) {
 #ifdef DEBUG_ENABLED
         char addr_str[IPV6_MAX_ADDR_STR_LEN];
         DEBUG("INFO: %s is in nbr cache\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, dest_addr));

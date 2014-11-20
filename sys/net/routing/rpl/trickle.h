@@ -18,7 +18,11 @@
 #include "vtimer.h"
 #include "thread.h"
 
-#define TRICKLE_TIMER_STACKSIZE (KERNEL_CONF_STACKSIZE_DEFAULT)
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define TRICKLE_TIMER_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
 #define TRICKLE_INTERVAL_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
 #define DAO_DELAY_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
 #define RT_STACKSIZE (KERNEL_CONF_STACKSIZE_DEFAULT)
@@ -29,3 +33,7 @@ void start_trickle(uint8_t DIOINtMin, uint8_t DIOIntDoubl, uint8_t DIORedundancy
 void trickle_increment_counter(void);
 void delay_dao(void);
 void dao_ack_received(void);
+
+#ifdef __cplusplus
+}
+#endif

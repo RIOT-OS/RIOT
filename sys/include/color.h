@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    sys_color Module for handling colors
+ * @defgroup    sys_color Color
  * @ingroup     sys
  * @brief       The color sys module supports handling RGB and HSV color
  * @{
@@ -23,8 +23,12 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
- * @name Data-structure describing a RGB color
+ * @brief Data-structure describing a RGB color
  */
 typedef struct {
     uint8_t r;          /**< red value      [0 - 255] */
@@ -33,7 +37,7 @@ typedef struct {
 } color_rgb_t;
 
 /**
- * @name Data-structure for holding HSV colors
+ * @brief Data-structure for holding HSV colors
  */
 typedef struct {
     float h;            /**< hue value        [0.0 - 360.0] */
@@ -57,6 +61,10 @@ void color_rgb2hsv(color_rgb_t *rgb, color_hsv_t *hsv);
  * @param[out] rgb      Output color encoded in RGB space
  */
 void color_hsv2rgb(color_hsv_t *hsv, color_rgb_t *rgb);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __COLOR_H */
 /** @} */

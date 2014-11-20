@@ -30,6 +30,10 @@
 #include "board.h"
 #include "timex.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef uint8_t protocol_t;         ///< Packet protocol type
 typedef uint16_t radio_address_t;   ///< Radio layer address type
 
@@ -96,5 +100,9 @@ typedef void (*packet_handler_t)(void *payload, int payload_size, packet_info_t 
  * @param   packet_info     Cross-layer meta data
  */
 typedef void (*packet_monitor_t)(void *payload, int payload_size, protocol_t protocol, packet_info_t *packet_info);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* COMMONTYPES_H_ */

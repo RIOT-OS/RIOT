@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 René Kijewski <rene.kijewski@fu-berlin.de>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup pthread
  * @{
@@ -10,6 +18,10 @@
 #define __SYS__POSIX__PTHREAD_THREADING__H
 
 #include "attributes.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief        Datatype to identify a POSIX thread.
@@ -90,6 +102,10 @@ static inline int pthread_equal(pthread_t thread1, pthread_t thread2)
 {
     return thread1 == thread2;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

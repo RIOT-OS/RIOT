@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup pthread
  * @{
@@ -10,6 +18,10 @@
 #define __SYS__POSIX__PTHREAD_MUTEX_ATTR__H
 
 #include <errno.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @def             PTHREAD_MUTEX_NORMAL
@@ -198,6 +210,10 @@ int pthread_mutexattr_getrobust(const pthread_mutexattr_t *attr, int *robustness
  *                  `EINVAL` if `attr == NULL`.
  */
 int pthread_mutexattr_setrobust(pthread_mutexattr_t *attr, int robustness);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

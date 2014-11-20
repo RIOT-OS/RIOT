@@ -4,6 +4,7 @@ export CPU = sam3x8e
 # define tools used for building the project
 export PREFIX = arm-none-eabi-
 export CC = $(PREFIX)gcc
+export CXX = $(PREFIX)g++
 export AR = $(PREFIX)ar
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc

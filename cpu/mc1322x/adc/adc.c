@@ -7,7 +7,7 @@
  * directory for more details.
  */
 
-#include "adc.h"
+#include "mc1322x-adc.h"
 #include "gpio.h"
 
 #define ADC_CLOCK_DIVIDER_300kHz 0x50

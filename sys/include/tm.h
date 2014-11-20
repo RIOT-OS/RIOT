@@ -9,6 +9,8 @@
 /**
  * @addtogroup  sys_timex
  * @{
+ *
+ * @file
  * @brief       Utility library for `struct tm`.
  */
 
@@ -20,6 +22,10 @@
 #include <stdint.h>
 
 #include "attributes.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define TM_WDAY_SUN (0) /**< Sunday in `struct tm::tm_wday`. */
 #define TM_WDAY_MON (1) /**< Monday in `struct tm::tm_wday`. */
@@ -107,5 +113,9 @@ int tm_is_valid_date(int year, int mon, int mday) CONST;
  * @returns         0 iff the time is invalid.
  */
 int tm_is_valid_time(int hour, int min, int sec) CONST;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

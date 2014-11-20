@@ -37,4 +37,12 @@
 #include "socket_base/socket.h"
 #include "socket_base/types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* SOCKET_BASE_H */

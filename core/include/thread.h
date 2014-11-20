@@ -10,6 +10,7 @@
  * @defgroup    core_thread Threading
  * @ingroup     core
  * @brief       Support for multi-threading
+ *
  * @{
  *
  * @file        thread.h
@@ -21,18 +22,21 @@
 #ifndef __THREAD_H
 #define __THREAD_H
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 #include "kernel.h"
 #include "tcb.h"
 #include "arch/thread_arch.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
+/**
+ * @brief Describes an illegal thread status
+ */
 #define STATUS_NOT_FOUND (-1)
 
 /**
- * @name Minimum stack size
+ * @brief Minimum stack size
  */
 #ifndef MINIMUM_STACK_SIZE
 #define MINIMUM_STACK_SIZE  (sizeof(tcb_t))
@@ -79,7 +83,7 @@ kernel_pid_t thread_create(char *stack,
                   int stacksize,
                   char priority,
                   int flags,
-                  void *(*function)(void *arg),
+                  thread_task_func_t task_func,
                   void *arg,
                   const char *name);
 
@@ -103,27 +107,36 @@ volatile tcb_t *thread_get(kernel_pid_t pid);
 int thread_getstatus(kernel_pid_t pid);
 
 /**
- * @brief Returns the name of a process
- *
- * @param[in] pid   the PID of the thread to get the name from
- *
- * @return          the threads name
- * @return          `NULL` if pid is unknown
- */
-const char *thread_getname(kernel_pid_t pid);
-
-/**
  * @brief Puts the current thread into sleep mode. Has to be woken up externally.
  */
 void thread_sleep(void);
 
 /**
- * @brief The current thread yields and let the scheduler run
+ * @brief   Lets current thread yield.
  *
- * The current thread will resume operation immediately if there is no other thread with the same
- * or a higher priority.
+ * @details The current thread will resume operation immediately,
+ *          if there is no other ready thread with the same or a higher priority.
+ *
+ *          Differently from thread_yield_higher() the current thread will be put to the
+ *          end of the threads in its priority class.
+ *
+ * @see     thread_yield_higher()
  */
 void thread_yield(void);
+
+/**
+ * @brief   Lets current thread yield in favor of a higher prioritized thread.
+ *
+ * @details The current thread will resume operation immediately,
+ *          if there is no other ready thread with a higher priority.
+ *
+ *          Differently from thread_yield() the current thread will be scheduled next
+ *          in its own priority class, i.e. it stays the first thread in its
+ *          priority class.
+ *
+ * @see     thread_yield()
+ */
+void thread_yield_higher(void);
 
 /**
  * @brief Wakes up a sleeping thread.
@@ -148,6 +161,16 @@ static inline kernel_pid_t thread_getpid(void)
 
 #ifdef DEVELHELP
 /**
+ * @brief Returns the name of a process
+ *
+ * @param[in] pid   the PID of the thread to get the name from
+ *
+ * @return          the threads name
+ * @return          `NULL` if pid is unknown
+ */
+const char *thread_getname(kernel_pid_t pid);
+
+/**
  * @brief Measures the stack usage of a stack
  *
  * Only works if the thread was created with the flag CREATE_STACKTEST.
@@ -163,5 +186,5 @@ uintptr_t thread_measure_stack_free(char *stack);
 }
 #endif
 
-/* @} */
+/** @} */
 #endif /* __THREAD_H */

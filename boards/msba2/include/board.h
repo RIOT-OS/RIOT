@@ -12,7 +12,7 @@
  * @brief       Support for the ScatterWeb MSB-A2 board
  * @{
  *
- * @file        board.h
+ * @file
  * @brief       Basic definitions for the MSB-A2 board
  *
  * @author      unknown
@@ -23,6 +23,10 @@
 
 #include "msba2_common.h"
 #include "bitarithm.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define LED_RED_PIN (BIT25)
 #define LED_GREEN_PIN (BIT26)
@@ -38,5 +42,9 @@
 void init_clks1(void);
 
 typedef uint8_t radio_packet_length_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __BOARD_H */

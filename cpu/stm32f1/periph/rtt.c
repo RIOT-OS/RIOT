@@ -42,8 +42,14 @@ inline void _rtt_leave_config_mode(void);
 /*
  * callback and argument for an active alarm
  */
-static rtt_alarm_cb_t alarm_cb;
+static rtt_cb_t alarm_cb;
 static void *alarm_arg;
+
+/*
+ * callback and argument for overflow callback
+ */
+static rtt_cb_t overflow_cb;
+static void *overflow_arg;
 
 void rtt_init(void)
 {
@@ -66,6 +72,24 @@ void rtt_init(void)
     RTT_DEV->PRLH = ((RTT_PRESCALER>>16)&0x000f);
     RTT_DEV->PRLL = (RTT_PRESCALER&0xffff);
 
+    _rtt_leave_config_mode();
+}
+
+void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
+{
+    overflow_cb = cb;
+    overflow_arg = arg;
+    _rtt_enter_config_mode();
+    /* Enable overflow interrupt */
+    RTT_DEV->CRH |= RTC_CRH_OWIE;
+    _rtt_leave_config_mode();
+}
+
+void rtt_clear_overflow_cb(void)
+{
+    _rtt_enter_config_mode();
+    /* Clear overflow interrupt */
+    RTT_DEV->CRH &= ~(RTC_CRH_OWIE);
     _rtt_leave_config_mode();
 }
 
@@ -97,7 +121,7 @@ uint32_t rtt_get_alarm(void)
     return (((uint32_t)RTT_DEV->ALRH << 16 ) | (uint32_t)(RTT_DEV->ALRL));
 }
 
-void rtt_set_alarm(uint32_t alarm, rtt_alarm_cb_t cb, void *arg)
+void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
 {
     _rtt_enter_config_mode();
 
@@ -163,18 +187,19 @@ inline void _rtt_leave_config_mode(void)
     while (!(RTT_DEV->CRL & RTT_FLAG_RTOFF));
 }
 
-__attribute__((naked)) void RTT_ISR(void)
+void RTT_ISR(void)
 {
-    ISR_ENTER();
-
     if (RTT_DEV->CRL & RTC_CRL_ALRF) {
         RTT_DEV->CRL &= ~(RTC_CRL_ALRF);
         alarm_cb(alarm_arg);
     }
+    if (RTT_DEV->CRL & RTC_CRL_OWF) {
+        RTT_DEV->CRL &= ~(RTC_CRL_OWF);
+        overflow_cb(overflow_arg);
+    }
     if (sched_context_switch_request) {
         thread_yield();
     }
-    ISR_EXIT();
 }
 
 #endif /* RTT_NUMOF */

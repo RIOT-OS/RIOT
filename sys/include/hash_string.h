@@ -9,7 +9,15 @@
 #ifndef __HASH_STRING_H
 #define __HASH_STRING_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 unsigned long hash_string(unsigned char *str);
 int cmp_string(char *a, char *b);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __HASH_STRING_H */

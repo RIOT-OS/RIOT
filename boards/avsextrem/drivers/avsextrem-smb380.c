@@ -158,7 +158,7 @@ static void SMB380_simple_interrupthandler(void)
     if (interruptTicksSMB380 >= sampleRateSMB380 - 1) {
         interruptTicksSMB380 = 0;
         wakeupmessage.type = MSG_TYPE_SMB380_WAKEUP;
-        msg_send(&wakeupmessage, simple_pid, 0);
+        msg_try_send(&wakeupmessage, simple_pid);
     }
     else {
         interruptTicksSMB380++;
@@ -566,7 +566,7 @@ void wakeUpRegisteredProcesses(void)
 
     while ((pointerNo < SMB380_RING_BUFF_MAX_THREADS) &&
            (PointerList[pointerNo] > 0)) {
-        msg_send(&wakeupmessage, PointerList[pointerNo], false);
+        msg_try_send(&wakeupmessage, PointerList[pointerNo]);
         pointerNo++;
     }
 }
@@ -794,15 +794,13 @@ int16_t SMB380_getBandWidthAbs(void)
 
 void SMB380_softReset(void)
 {
-    unsigned char ur;
     unsigned long cpsr = disableIRQ();
     SMB380_Prepare();
     SMB380_ssp_write(SMB380_CONTROL1, SMB380_CONTROL1_SOFT_RESET_MASK,
                      SMB380_WRITE_REGISTER);
-    ur = ((unsigned char)SMB380_ssp_read()) & SMB380_CONTROL1_SOFT_RESET_MASK;
+    SMB380_ssp_read();
     SMB380_Unprepare();
     restoreIRQ(cpsr);
-    ur = ur >> 1;
 }
 
 void SMB380_setCustomerReg(unsigned char data)

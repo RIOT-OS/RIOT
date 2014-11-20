@@ -262,7 +262,7 @@ int icmpv6_demultiplex(const icmpv6_hdr_t *hdr)
             if (_rpl_process_pid != KERNEL_PID_UNDEF) {
                 msg_t m_send;
                 m_send.content.ptr = (char *) &hdr->code;
-                msg_send(&m_send, _rpl_process_pid, 1);
+                msg_send(&m_send, _rpl_process_pid);
             }
             else {
                 DEBUG("INFO: no RPL handler registered\n");
@@ -301,6 +301,8 @@ uint8_t ipv6_get_addr_match(const ipv6_addr_t *src,
                     break;
                 }
             }
+
+            break;
         }
     }
 
@@ -371,7 +373,7 @@ void *ipv6_process(void *arg)
                 msg_t m_send;
                 m_send.type = IPV6_PACKET_RECEIVED;
                 m_send.content.ptr = (char *) ipv6_buf;
-                msg_send(&m_send, sixlowip_reg[i], 1);
+                msg_send(&m_send, sixlowip_reg[i]);
             }
         }
 
@@ -658,7 +660,9 @@ void ipv6_addr_init_prefix(ipv6_addr_t *out, const ipv6_addr_t *prefix,
     }
 
     memcpy(out, prefix, bytes);
-    out->uint8[bytes] = prefix->uint8[bytes] & mask;
+    if (bytes < 16) {
+        out->uint8[bytes] = prefix->uint8[bytes] & mask;
+    }
     memset(&(out[bytes + 1]), 0, 15 - bytes);
 }
 
@@ -680,7 +684,6 @@ void ipv6_net_if_get_best_src_addr(ipv6_addr_t *src, const ipv6_addr_t *dest)
                     uint8_t bmatch = 0;
                     uint8_t tmp = ipv6_get_addr_match(dest, addr->addr_data);
                     if (tmp >= bmatch) {
-                        bmatch = tmp;
                         tmp_addr = addr;
                     }
                 }
@@ -817,7 +820,7 @@ uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t 
                            &ipv6_header->destaddr),
           len, buf, proto);
     sum = len + proto;
-    sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
-    sum = csum(sum, buf, len);
+    sum = net_help_csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
+    sum = net_help_csum(sum, buf, len);
     return (sum == 0) ? 0xffff : HTONS(sum);
 }

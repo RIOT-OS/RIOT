@@ -69,5 +69,4 @@ unsigned long hwtimer_arch_now(void)
 void irq_handler(int channel)
 {
     timeout_handler((short)(channel));
-    thread_yield();
 }

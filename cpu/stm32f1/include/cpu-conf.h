@@ -9,7 +9,7 @@
 
 /**
  * @defgroup        cpu_stm32f1 STM32F1
- * @addtogroup      cpu
+ * @ingroup         cpu
  * @brief           CPU specific implementations for the STM32F1
  * @{
  *
@@ -54,7 +54,7 @@
 /**
  * @name Length for reading CPU_ID
  */
-#define CPU_ID_LEN                      (12)
+#define CPUID_ID_LEN                    (12)
 
 /**
  * @name Definition of different panic modes

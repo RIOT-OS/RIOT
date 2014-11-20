@@ -32,6 +32,10 @@
 #include "lowpan.h"
 #include "ip.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum option_types_t {
     OPT_SLLAO = 1,
     OPT_TLLAO,
@@ -58,4 +62,9 @@ void nbr_cache_auto_rem(void);
 ndp_a6br_cache_t *abr_add_context(uint16_t version, ipv6_addr_t *abr_addr,
                                   uint8_t cid);
 void abr_remove_context(uint8_t cid);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* _SIXLOWPAN_ICMP_H*/

@@ -73,7 +73,7 @@ static ssize_t pipe_rw(ringbuffer_t *rb,
 
             sched_set_status((tcb_t *) sched_active_thread, STATUS_SLEEPING);
             restoreIRQ(old_state);
-            thread_yield();
+            thread_yield_higher();
         }
     }
 }

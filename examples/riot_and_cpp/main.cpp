@@ -51,7 +51,7 @@ int main()
     /* create thread A */
     thread_create(threadA_stack, sizeof(threadA_stack), 0, CREATE_WOUT_YIELD, threadA_func, NULL, "thread A");
 
-    printf("******** Hello, you're in thread %s ********\n", thread_getname(thread_getpid()));
+    printf("******** Hello, you're in thread #%" PRIkernel_pid " ********\n", sched_active_pid);
     printf("We'll test C++ class and methods here!\n");
 
     cpp_class cpp_obj;
@@ -66,7 +66,7 @@ int main()
     vInts.push_back(1);
     vInts.push_back(3);
     vInts.push_back(2);
-    printf("The vector vInts has been filled with %d numbers.\n", vInts.size());
+    printf("The vector vInts has been filled with %d numbers.\n", (int)vInts.size());
 
     printf("\n-= Test iterator =-\n");
     printf("The content of vInts = { ");
@@ -86,7 +86,7 @@ void *threadA_func(void *)
     int day = 13, month = 6, year = 2014;
     int ret_day;
 
-    printf("\n******** Hello, now you're in %s ********\n", thread_getname(thread_getpid()));
+    printf("******** Hello, you're in thread #%" PRIkernel_pid " ********\n", sched_active_pid);
     printf("We'll test some C functions here!\n");
 
     printf("\n-= hello function =-\n");

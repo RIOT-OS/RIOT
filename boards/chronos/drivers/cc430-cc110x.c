@@ -25,7 +25,7 @@
 
 #include "cpu.h"
 #include "irq.h"
-#include "cc110x_ng.h"
+#include "cc110x_legacy.h"
 
 #define CC1100_GDO0     (RF1AIN & BIT0)
 #define CC1100_GDO1     (RF1AIN & BIT1)

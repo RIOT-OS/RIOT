@@ -21,11 +21,11 @@
 #ifndef __MUTEX_H_
 #define __MUTEX_H_
 
+#include "priority_queue.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-#include "priority_queue.h"
 
 /**
  * @brief Mutex structure. Must never be modified by the user.

@@ -144,7 +144,7 @@ arm_irq_handler:
     MRS R1, CPSR
     MSR SPSR, R1
 
-.if CPU != mc1322x
+.if (CPU != mc1322x)
     /* jump into vic interrupt */
     mov    r0, #0xffffff00    /* lpc23xx */
     ldr    r0, [r0]

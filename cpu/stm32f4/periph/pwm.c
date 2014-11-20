@@ -26,7 +26,7 @@
 #include "periph_conf.h"
 
 /* ignore file in case no PWM devices are defined */
-#if PWM_NUMOF
+#if PWM_0_EN || PWM_1_EN
 
 int pwm_init(pwm_t dev, pwm_mode_t mode, unsigned int frequency, unsigned int resolution)
 {
@@ -239,4 +239,4 @@ void pwm_poweroff(pwm_t dev)
     }
 }
 
-#endif /* PWM_NUMOF */
+#endif /* PWM_0_EN || PWM_1_EN */

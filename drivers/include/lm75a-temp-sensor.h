@@ -31,6 +31,10 @@
 #include <math.h>
 #include "i2c.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* LM75A register addresses */
 #define LM75A_ADDR                      0x48
 #define LM75A_TEMPERATURE_REG           0x0
@@ -252,6 +256,10 @@ bool lm75A_external_interrupt_register(void *handler);
  *
  */
 void lm75A_set_in_alarm(bool b);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* LM75A_H_ */

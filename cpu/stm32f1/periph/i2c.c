@@ -33,9 +33,12 @@
 #include "debug.h"
 
 /* guard file in case no I2C device is defined */
-#if I2C_NUMOF
+#if I2C_0_EN
 
 /* static function definitions */
+static void _i2c_init(I2C_TypeDef *i2c, int ccr);
+static void _toggle_pins(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin_scl, int pin_sda);
+static void _pin_config(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin_scl, int pin_sda);
 static void _start(I2C_TypeDef *dev, uint8_t address, uint8_t rw_flag);
 static inline void _clear_addr(I2C_TypeDef *dev);
 static inline void _write(I2C_TypeDef *dev, char *data, int length);
@@ -73,12 +76,54 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
             I2C_0_CLKEN();
             I2C_0_SCL_CLKEN();
             I2C_0_SDA_CLKEN();
+            NVIC_SetPriority(I2C_0_ERR_IRQ, I2C_IRQ_PRIO);
+            NVIC_EnableIRQ(I2C_0_ERR_IRQ);
             break;
 #endif
         default:
             return -1;
     }
 
+    /* configure pins */
+    _pin_config(port_scl, port_sda, pin_scl, pin_sda);
+
+    /* configure device */
+    _i2c_init(i2c, ccr);
+
+    /* make sure the analog filters don't hang -> see errata sheet 2.14.7 */
+    if (i2c->SR2 & I2C_SR2_BUSY) {
+        DEBUG("LINE BUSY AFTER RESET -> toggle pins now\n");
+        /* disable peripheral */
+        i2c->CR1 &= ~I2C_CR1_PE;
+        /* toggle both pins to reset analog filter */
+        _toggle_pins(port_scl, port_sda, pin_scl, pin_sda);
+        /* reset pins for alternate function */
+        _pin_config(port_scl, port_sda, pin_scl, pin_sda);
+        /* make peripheral soft reset */
+        i2c->CR1 |= I2C_CR1_SWRST;
+        i2c->CR1 &= ~I2C_CR1_SWRST;
+        /* enable device */
+        _i2c_init(i2c, ccr);
+    }
+    return 0;
+}
+
+static void _i2c_init(I2C_TypeDef *i2c, int ccr)
+{
+    /* disable device and set ACK bit */
+    i2c->CR1 = I2C_CR1_ACK;
+    /* configure I2C clock and enable error interrupts */
+    i2c->CR2 = (I2C_APBCLK / 1000000) | I2C_CR2_ITERREN;
+    i2c->CCR = ccr;
+    i2c->TRISE = (I2C_APBCLK / 1000000) + 1;
+    /* configure device */
+    i2c->OAR1 = 0;              /* makes sure we are in 7-bit address mode */
+    /* enable device */
+    i2c->CR1 |= I2C_CR1_PE;
+}
+
+static void _pin_config(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin_scl, int pin_sda)
+{
     /* configure pins, alternate output, open-drain, output mode with 50MHz */
     if (pin_scl < 8) {
         port_scl->CRL |= (0xf << (pin_scl * 4));
@@ -92,18 +137,34 @@ int i2c_init_master(i2c_t dev, i2c_speed_t speed)
     else {
         port_sda->CRH |= (0xf << ((pin_sda - 8) * 4));
     }
+}
 
-    /* disable device and set ACK bit */
-    i2c->CR1 = I2C_CR1_ACK;
-    /* configure I2C clock */
-    i2c->CR2 = (I2C_APBCLK / 1000000);
-    i2c->CCR = ccr;
-    i2c->TRISE = (I2C_APBCLK / 1000000) + 1;
-    /* configure device */
-    i2c->OAR1 = 0;              /* makes sure we are in 7-bit address mode */
-    /* enable device */
-    i2c->CR1 |= I2C_CR1_PE;
-    return 0;
+static void _toggle_pins(GPIO_TypeDef *port_scl, GPIO_TypeDef *port_sda, int pin_scl, int pin_sda)
+{
+    /* configure pins, output, open-drain, output mode with 50MHz */
+    if (pin_scl < 8) {
+        port_scl->CRL |= (0x7 << (pin_scl * 4));
+    }
+    else {
+        port_scl->CRH |= (0x7 << ((pin_scl - 8) * 4));
+    }
+    if (pin_sda < 8) {
+        port_sda->CRL |= (0x7 << (pin_sda * 4));
+    }
+    else {
+        port_sda->CRH |= (0x7 << ((pin_sda - 8) * 4));
+    }
+    /* set both to high */
+    port_scl->ODR |= (1 << pin_scl);
+    port_sda->ODR |= (1 << pin_sda);
+    /* set SDA to low */
+    port_sda->ODR &= ~(1 << pin_sda);
+    /* set SCL to low */
+    port_scl->ODR &= ~(1 << pin_scl);
+    /* set SCL to high */
+    port_scl->ODR |= (1 << pin_scl);
+    /* set SDA to high */
+    port_sda->ODR |= (1 << pin_sda);
 }
 
 int i2c_init_slave(i2c_t dev, uint8_t address)
@@ -161,7 +222,7 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
             DEBUG("Send Slave address and wait for ADDR == 1\n");
             _start(i2c, address, I2C_FLAG_READ);
             DEBUG("Set POS bit\n");
-            i2c->CR1 |= I2C_CR1_POS;
+            i2c->CR1 |= (I2C_CR1_POS | I2C_CR1_ACK);
             DEBUG("Crit block: Clear ADDR bit and clear ACK flag\n");
             state = disableIRQ();
             _clear_addr(i2c);
@@ -192,9 +253,9 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
             _start(i2c, address, I2C_FLAG_READ);
             _clear_addr(i2c);
 
-            while (i < (length - 2)) {
+            while (i < (length - 3)) {
                 DEBUG("Wait until byte was received\n");
-                while (!(i2c->SR1 & I2C_SR1_BTF));
+                while (!(i2c->SR1 & I2C_SR1_RXNE));
                 DEBUG("Copy byte from DR\n");
                 data[i++] = (char)i2c->DR;
             }
@@ -205,12 +266,17 @@ int i2c_read_bytes(i2c_t dev, uint8_t address, char *data, int length)
             DEBUG("Disable ACK\n");
             i2c->CR1 &= ~(I2C_CR1_ACK);
 
-            DEBUG("Crit block: set STOP and read second last byte\n");
+            DEBUG("Crit block: set STOP and read N-2 byte\n");
             state = disableIRQ();
-            i2c->CR1 |= (I2C_CR1_STOP);
             data[i++] = (char)i2c->DR;
+            i2c->CR1 |= (I2C_CR1_STOP);
             restoreIRQ(state);
+
+            DEBUG("Read N-1 byte\n");
+            data[i++] = (char)i2c->DR;
+
             while (!(i2c->SR1 & I2C_SR1_RXNE));
+            DEBUG("Read last byte\n");
             data[i++] = (char)i2c->DR;
 
             DEBUG("wait for STOP bit to be cleared again\n");
@@ -387,4 +453,35 @@ static inline void _stop(I2C_TypeDef *dev)
     dev->CR1 |= I2C_CR1_STOP;
 }
 
-#endif /* I2C_NUMOF */
+#if I2C_0_EN
+void I2C_0_ERR_ISR(void)
+{
+    unsigned state = I2C_0_DEV->SR1;
+    DEBUG("\n\n### I2C ERROR OCCURED ###\n");
+    DEBUG("status: %08x\n", state);
+    if (state & I2C_SR1_OVR) {
+        DEBUG("OVR\n");
+    }
+    if (state & I2C_SR1_AF) {
+        DEBUG("AF\n");
+    }
+    if (state & I2C_SR1_ARLO) {
+        DEBUG("ARLO\n");
+    }
+    if (state & I2C_SR1_BERR) {
+        DEBUG("BERR\n");
+    }
+    if (state & I2C_SR1_PECERR) {
+        DEBUG("PECERR\n");
+    }
+    if (state & I2C_SR1_TIMEOUT) {
+        DEBUG("TIMEOUT\n");
+    }
+    if (state & I2C_SR1_SMBALERT) {
+        DEBUG("SMBALERT\n");
+    }
+    while (1);
+}
+#endif
+
+#endif /* I2C_0_EN */

@@ -8,5 +8,6 @@
 
 /**
  * @defgroup    sys_crypto Crypto
+ * @ingroup     sys
  * @brief       The crypto module is a lose collection of different crypto and hash algorithms
  */

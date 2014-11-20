@@ -25,6 +25,10 @@
 
 #include "sixlowpan/lowpan.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define IEEE802154_TRANSCEIVER      (TRANSCEIVER_AT86RF231 | TRANSCEIVER_CC2420 | TRANSCEIVER_MC1322X)
 
 typedef struct {
@@ -47,5 +51,9 @@ lowpan_context_t *lowpan_context_update(uint8_t num,
                                         uint16_t lifetime);
 lowpan_context_t *lowpan_context_get(void);
 lowpan_context_t *lowpan_context_num_lookup(uint8_t num);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* _SIXLOWPAN_LOWPAN_H */

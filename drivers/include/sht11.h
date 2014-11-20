@@ -23,6 +23,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SHT11_NO_ACK        (0)
 #define SHT11_ACK           (1)
 //adr command  r/w
@@ -95,6 +99,10 @@ uint8_t sht11_write_status(uint8_t *p_value);
  * return   1 on success, 0 otherwise
  */
 uint8_t sht11_read_status(uint8_t *p_value, uint8_t *p_checksum);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /*SHT11_H_*/

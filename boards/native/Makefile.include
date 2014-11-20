@@ -16,7 +16,12 @@ export AR ?= $(PREFIX)ar
 export AS ?= $(PREFIX)as
 export LINK ?= $(PREFIX)gcc
 export SIZE ?= $(PREFIX)size
-export OBJCOPY = true
+ifneq ($(shell uname -s),Darwin)
+export OBJCOPY ?= $(PREFIX)objcopy
+else
+export OBJCOPY ?= $(PREFIX)gobjcopy
+export OFLAGS ?= -O ihex
+endif
 
 export DEBUGGER = gdb
 export TERMPROG = $(ELF)
@@ -55,8 +60,19 @@ else
 export LINKFLAGS += -ldl
 endif
 
+# set the tap interface for term/valgrind
+ifneq (,$(filter nativenet,$(USEMODULE)))
+	export PORT ?= tap0
+else
+	export PORT =
+endif
+
+ifeq (,$(filter $(PORT),$(TERMFLAGS)))
+    export TERMFLAGS += $(PORT)
+endif
+
 export ASFLAGS =
-export DEBUGGER_FLAGS = $(ELF)
+export DEBUGGER_FLAGS = --args $(ELF) $(TERMFLAGS)
 term-valgrind: export VALGRIND_FLAGS ?= \
 	--track-origins=yes \
 	--fullpath-after=$(RIOTBASE)/ \
@@ -87,17 +103,6 @@ ifeq ($(CPU),native)
 ifeq ($(shell uname -s),Darwin)
 	BUILDOSXNATIVE = 1
 endif
-endif
-
-# set the tap interface for term/valgrind
-ifneq (,$(filter nativenet,$(USEMODULE)))
-	export PORT ?= tap0
-else
-	export PORT =
-endif
-
-ifeq (,$(filter $(PORT),$(TERMFLAGS)))
-    export TERMFLAGS += $(PORT)
 endif
 
 all: # do not override first target

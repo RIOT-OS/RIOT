@@ -25,6 +25,10 @@
 
 #include "clist.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Type for @ref msg_t if device fired an event.
  */
@@ -37,6 +41,8 @@ typedef enum {
     NETDEV_TYPE_UNKNOWN = 0,    /**< Type was not specified and may not
                                      understand this API */
     NETDEV_TYPE_BASE,           /**< Device understands this API */
+    NETDEV_TYPE_802154,         /**< Device understands this API and the API
+                                     defined in @ref netdev_802154 */
 } netdev_type_t;
 
 /**
@@ -101,6 +107,10 @@ typedef enum {
                                          signed value in host byte order */
     NETDEV_OPT_MAX_PACKET_SIZE,     /**< Maximum packet size the device supports
                                          unsigned value in host byte order */
+    NETDEV_OPT_SRC_LEN,             /**< Default mode the source address is
+                                         set to as value of `size_t`. (e.g.
+                                         either PAN-centric 16-bit address or
+                                         EUI-64 in IEEE 802.15.4) */
 
     /**
      * @brief   Last value for @netdev_opt_t defined here
@@ -242,12 +252,13 @@ typedef struct {
      * @param[in] opt           the option type
      * @param[out] value        pointer to store the gotten value in
      * @param[in,out] value_len the length of *value*. Must be initialized to the
-     *                          available space in value on call.
+     *                          available space in *value* on call.
      * @return  0, on success
      * @return  -ENODEV, if *dev* is not recognized
      * @return  -ENOTSUP, if *opt* is not supported for the device with this
      *          operation
-     * @return  -EOVERFLOW, if length of *value* is longer then *value_len*.
+     * @return  -EOVERFLOW, if available space in *value* given in *value_len*
+     *          is not big enough to store the option value.
      * @return  any other fitting negative errno if the ones stated above
      *          are not sufficient
      */
@@ -376,6 +387,10 @@ static inline void netdev_hlist_remove(netdev_hlist_t **list,
 {
     clist_remove((clist_node_t **)list, (clist_node_t *)node);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NETDEV_BASE_H_ */
 /**

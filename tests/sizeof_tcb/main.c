@@ -40,8 +40,12 @@ int main(void)
     P(msg_waiters);
     P(msg_queue);
     P(msg_array);
+#ifdef DEVELHELP
     P(name);
+#endif
+#if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
     P(stack_start);
+#endif
 
 #ifdef DEVELHELP
     P(stack_size);

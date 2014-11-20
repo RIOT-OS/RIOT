@@ -25,6 +25,10 @@
 #include <sys/types.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Returns the position of the first (least significant) bit set in
  *          integer *i*, or 0 if no bits are set in i.
@@ -114,5 +118,9 @@ int strncasecmp(const char *s1, const char *s2, size_t n);
  *      </a>
  */
 #define strcasecmp_l(s1, s2, l) strncasecmp(s1, s2, -1)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* STRINGS_H */

@@ -1,6 +1,10 @@
-/*-----------------------------------------------------------------------
-/  Low level disk interface modlue include file   (C)ChaN, 2010
-/-----------------------------------------------------------------------*/
+/*
+ * Copyright 2010 ChaN
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
 
 /**
  * @defgroup    diskio Disk IO Driver
@@ -20,6 +24,10 @@
 #define DEF_DISKIO
 
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define DN_MCI      0   /* Physical drive number for MCI */
 #define DN_NAND     1   /* Physical drive number for NAND flash */
@@ -116,6 +124,10 @@ DRESULT MCI_read(unsigned char *, unsigned long, unsigned char);
 DRESULT MCI_write(const unsigned char *, unsigned long, unsigned char);
 DRESULT MCI_ioctl(unsigned char, void *);
 void MCI_timerproc(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif

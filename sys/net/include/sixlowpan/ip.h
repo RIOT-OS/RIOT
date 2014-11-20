@@ -31,6 +31,10 @@
 #include "net_help.h"
 #include "sixlowpan/types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   IPv6 maximum transmission unit.
  */
@@ -301,7 +305,7 @@ static inline void ipv6_addr_set_solicited_node_addr(ipv6_addr_t *ipv6_addr_out,
     /* copy only the last 24-bit of the ip-address that is beeing resolved */
     ipv6_addr_out->uint32[0] = HTONL(0xff020000);
     ipv6_addr_out->uint32[1] = 0;
-    ipv6_addr_out->uint32[2] = HTONS(1);
+    ipv6_addr_out->uint32[2] = HTONL(1);
     ipv6_addr_out->uint8[12] = 0xff;
     ipv6_addr_out->uint8[13] = ipv6_addr_in->uint8[13];
     ipv6_addr_out->uint16[7] = ipv6_addr_in->uint16[7];
@@ -541,6 +545,10 @@ void ipv6_iface_set_routing_provider(ipv6_addr_t *(*next_hop)(ipv6_addr_t *dest)
  * @return The IPv6 upper-layer checksum.
  */
 uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t proto);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SIXLOWPAN_IP_H */
 /** @} */

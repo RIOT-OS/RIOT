@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup pthread
  * @{
@@ -13,6 +21,10 @@
 
 #include "kernel.h"
 #include "mutex.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief           Pthread mutexes are quite the same as RIOT mutexes.
@@ -96,6 +108,10 @@ int pthread_mutex_getprioceiling(const pthread_mutex_t *mutex, int *prioceiling)
  * @return          Well ... you'll get a link time error, so nothing will be returned.
  */
 int pthread_mutex_setprioceiling(pthread_mutex_t *mutex, int prioceiling, int *old_ceiling);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

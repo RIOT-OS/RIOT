@@ -99,7 +99,12 @@ void isr_debug_mon(void)
 
 void isr_hard_fault(void)
 {
-    while (1) {asm ("nop");}
+    while (1) {
+        for (int i = 0; i < 250000; i++) {
+            asm ("nop");
+        }
+        LED_RED_TOGGLE;
+    }
 }
 
 void isr_bus_fault(void)
@@ -109,12 +114,7 @@ void isr_bus_fault(void)
 
 void isr_usage_fault(void)
 {
-    while (1) {
-        for (int i = 0; i < 250000; i++) {
-            asm ("nop");
-        }
-        LD4_TOGGLE;
-    }
+    while (1) {asm ("nop");}
 }
 
 /* Cortex-M specific interrupt vectors */

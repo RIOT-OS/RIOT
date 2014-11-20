@@ -28,6 +28,10 @@
 #ifndef TWOFISH_H_
 #define TWOFISH_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define TWOFISH_BLOCK_SIZE      16
 #define TWOFISH_KEY_SIZE        16   //only alternative is 32!
 
@@ -277,6 +281,10 @@ uint8_t twofish_get_preferred_block_size(void);
  *
  */
 extern block_cipher_interface_t twofish_interface;
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* TWOFISH_H_ */

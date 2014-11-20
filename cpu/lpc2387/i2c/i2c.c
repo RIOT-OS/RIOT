@@ -358,7 +358,7 @@ bool i2c_read(uint8_t i2c_interface, uint8_t slave_addr, uint8_t reg_addr,
                      I2C_BUFSIZE * sizeof(uint8_t));
     i2c_write_length = 1;
     i2c_read_length = rx_buff_length;
-    bool successful = false;
+    bool successful;
     uint8_t readIndex = 3;
     i2c_master_buffer[0] = (slave_addr << 1) & WRITE_ENABLE_BIT_MASK;
     i2c_master_buffer[1] = reg_addr;

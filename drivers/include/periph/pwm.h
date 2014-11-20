@@ -7,11 +7,12 @@
  */
 
 /**
+ * @defgroup    driver_periph_pwm PWM
  * @ingroup     driver_periph
  * @brief       Low-level PWM peripheral driver
  * @{
  *
- * @file        periph/pwm.h
+ * @file
  * @brief       Low-level PWM peripheral driver interface definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
@@ -21,6 +22,10 @@
 #define __PWM_H
 
 #include "periph_conf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* ignore file in case no PWM devices are defined */
 #if PWM_NUMOF
@@ -127,6 +132,10 @@ void pwm_poweron(pwm_t dev);
 void pwm_poweroff(pwm_t dev);
 
 #endif /* PWM_NUMOF */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __PWM_H */
 /** @} */

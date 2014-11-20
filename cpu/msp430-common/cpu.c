@@ -20,10 +20,10 @@ char __isr_stack[MSP430_ISR_STACK_SIZE];
 
 /*
  * we must prevent the compiler to generate a prologue or an epilogue
- * for thread_yield(), since we rely on the RETI instruction at the end
+ * for thread_yield_higher(), since we rely on the RETI instruction at the end
  * of its execution, in the inlined __restore_context() sub-function
  */
-__attribute__((naked)) void thread_yield(void)
+__attribute__((naked)) void thread_yield_higher(void)
 {
     /*
      * disable IRQ, remembering if they are

@@ -1,1 +1,2 @@
-FEATURES_PROVIDED = periph_gpio periph_spi periph_random
+FEATURES_PROVIDED += cpp
+FEATURES_PROVIDED += periph_uart periph_gpio periph_spi periph_random
