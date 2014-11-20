@@ -31,7 +31,7 @@
 #include "irq.h"
 #include "io.h"
 #if defined MODULE_RTC
-#include "rtc.h"
+#include "rtc_legacy.h"
 #elif defined MODULE_VTIMER
 #include "vtimer.h"
 #endif

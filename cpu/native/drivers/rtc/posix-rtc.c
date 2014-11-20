@@ -1,5 +1,5 @@
 /**
- * Native CPU rtc.h implementation
+ * Native CPU rtc_legacy.h implementation
  *
  * The native rtc implementation uses POSIX system calls to simulate a
  * real-time clock.
@@ -25,7 +25,7 @@
 
 #include "debug.h"
 
-#include "rtc.h"
+#include "rtc_legacy.h"
 #include "cpu.h"
 
 #include "native_internal.h"

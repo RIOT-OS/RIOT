@@ -8,7 +8,7 @@
 
 #ifndef CC430_RTC_H
 #define CC430_RTC_H
-#include "rtc.h"
+#include "rtc_legacy.h"
 #include "time.h"
 
 /**
