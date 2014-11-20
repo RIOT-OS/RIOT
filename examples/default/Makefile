@@ -37,6 +37,7 @@ USEMODULE += vtimer
 USEMODULE += defaulttransceiver
 
 FEATURES_OPTIONAL += transceiver
+FEATURES_OPTIONAL += periph_rtc
 
 ifneq (,$(filter msb-430,$(BOARD)))
 	USEMODULE += sht11
