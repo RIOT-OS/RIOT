@@ -27,21 +27,21 @@ extern "C" {
  * @name Timer peripheral configuration
  * @{
  */
-#define TIMER_NUMOF         (2U)
-#define TIMER_0_EN          1
-#define TIMER_1_EN          1
+#define TIMER_NUMOF        (2U)
+#define TIMER_0_EN         1
+#define TIMER_1_EN         1
 
 /* Timer 0 configuration */
-#define TIMER_0_DEV         TC3->COUNT16
-#define TIMER_0_CHANNELS    2
-#define TIMER_0_MAX_VALUE   (0xffff)
-#define TIMER_0_ISR         isr_tc3
+#define TIMER_0_DEV        TC3->COUNT16
+#define TIMER_0_CHANNELS   2
+#define TIMER_0_MAX_VALUE  (0xffff)
+#define TIMER_0_ISR        isr_tc3
 
 /* Timer 1 configuration */
-#define TIMER_1_DEV         TC4->COUNT32
-#define TIMER_1_CHANNELS    2
-#define TIMER_1_MAX_VALUE   (0xffffffff)
-#define TIMER_1_ISR         isr_tc4
+#define TIMER_1_DEV        TC4->COUNT32
+#define TIMER_1_CHANNELS   2
+#define TIMER_1_MAX_VALUE  (0xffffffff)
+#define TIMER_1_ISR        isr_tc4
 
 /** @} */
 

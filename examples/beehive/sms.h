@@ -5,6 +5,7 @@ extern "C" {
 #define SMS_H_
 
 #define CIPSHUT "AT+CIPSHUT\r\n"
+#define CGDCONT "AT+CGDCONT=3,\"IPV6\"\r\n"
 #define CSTT "AT+CSTT=\"internet\",\"\",\"\"\r\n"
 #define CIICR "AT+CIICR\r\n"
 #define CIFSR "AT+CIFSR\r\n"

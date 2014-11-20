@@ -35,7 +35,7 @@ extern "C" {
 /**
  * Assign the hardware timer
  */
-#define HW_TIMER            TIMER_1 //TIMER_1 is the only 32bit
+#define HW_TIMER            TIMER_1
 
 /**
 * @name AT86RF231 config

@@ -58,46 +58,46 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
 
     switch (dev) {
 #if TIMER_0_EN
-        case TIMER_0:
-            if (TIMER_0_DEV.CTRLA.bit.ENABLE) {
-                return 0;
-            }
-            PM->APBCMASK.reg |= PM_APBCMASK_TC3;
-            /* reset timer */
-            TIMER_0_DEV.CTRLA.bit.SWRST = 1;
-            while (TIMER_0_DEV.CTRLA.bit.SWRST);
-                /* choosing 16 bit mode */
-            TIMER_0_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT16_Val;
-            /* sourced by 8MHz with Presc 64 results in 125kHz clk */
-            TIMER_0_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV64_Val;
-            /* choose normal frequency operation */
-            TIMER_0_DEV.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_NFRQ_Val;
-            break;
+    case TIMER_0:
+        if (TIMER_0_DEV.CTRLA.bit.ENABLE) {
+            return 0;
+        }
+        PM->APBCMASK.reg |= PM_APBCMASK_TC3;
+        /* reset timer */
+        TIMER_0_DEV.CTRLA.bit.SWRST = 1;
+        while (TIMER_0_DEV.CTRLA.bit.SWRST);
+        /* choosing 16 bit mode */
+        TIMER_0_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT16_Val;
+        /* sourced by 8MHz with Presc 64 results in 125kHz clk */
+        TIMER_0_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV64_Val;
+        /* choose normal frequency operation */
+        TIMER_0_DEV.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_NFRQ_Val;
+        break;
 #endif
 #if TIMER_1_EN
-        case TIMER_1:
-            if (TIMER_1_DEV.CTRLA.bit.ENABLE) {
-                return 0;
-            }
-            PM->APBCMASK.reg |= PM_APBCMASK_TC4;
-            /* reset timer */
-            TIMER_1_DEV.CTRLA.bit.SWRST = 1;
-            DEBUG("Timer init \n");
-            
-            while (TIMER_1_DEV.CTRLA.bit.SWRST);
-            DEBUG("Timer init \n");
+    case TIMER_1:
+        if (TIMER_1_DEV.CTRLA.bit.ENABLE) {
+            return 0;
+        }
+        PM->APBCMASK.reg |= PM_APBCMASK_TC4;
+        /* reset timer */
+        TIMER_1_DEV.CTRLA.bit.SWRST = 1;
+
+        while (TIMER_1_DEV.CTRLA.bit.SWRST);
 
 
-            TIMER_1_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT32_Val;
-            /* sourced by 8MHz with Presc 64 results in 125kHz clk */
-            TIMER_1_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV64_Val;
+        TIMER_1_DEV.CTRLA.bit.MODE = TC_CTRLA_MODE_COUNT32_Val;
+        /* sourced by 8MHz with Presc 8 results in 1Mhz clk */
+        TIMER_1_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV8_Val;
+        /* choose normal frequency operation */
+        TIMER_1_DEV.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_NFRQ_Val;
             /* choose normal frequency operation */
             TIMER_1_DEV.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_NFRQ_Val;
-            break;
+        break;
 #endif
-        case TIMER_UNDEFINED:
-        default:
-            return -1;
+    case TIMER_UNDEFINED:
+    default:
+        return -1;
     }
 
     /* save callback */
@@ -118,42 +118,42 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    DEBUG("Setting timer %i channel %i to %i\n", dev, channel, (0xffff&value));
+    DEBUG("Setting timer %i channel %i to %i\n", dev, channel, value);
 
     /* get timer base register address */
     switch (dev) {
 #if TIMER_0_EN
-        case TIMER_0:
-            /* set timeout value */
-            switch (channel) {
-                case 0:
-                    TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
-                    TIMER_0_DEV.CC[0].reg = value;
-                    TIMER_0_DEV.INTENSET.bit.MC0 = 1;
+    case TIMER_0:
+        /* set timeout value */
+        switch (channel) {
+        case 0:
+            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_0_DEV.CC[0].reg = value;
+            TIMER_0_DEV.INTENSET.bit.MC0 = 1;
                     break;
-                case 1:
-                    TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
-                    TIMER_0_DEV.CC[1].reg = value;
-                    TIMER_0_DEV.INTENSET.bit.MC1 = 1;
+        case 1:
+            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_0_DEV.CC[1].reg = value;
+            TIMER_0_DEV.INTENSET.bit.MC1 = 1;
                     break;
                 default:
                     return -1;
-            }
-            break;
+        }
+        break;
 #endif
 #if TIMER_1_EN
-        case TIMER_1:
-            /* set timeout value */
-            switch (channel) {
+    case TIMER_1:
+        /* set timeout value */
+        switch (channel) {
                 case 0:
-                    TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
-                    TIMER_1_DEV.CC[0].reg = value;
-                    TIMER_1_DEV.INTENSET.bit.MC0 = 1;
+            TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_1_DEV.CC[0].reg = value;
+            TIMER_1_DEV.INTENSET.bit.MC0 = 1;
                     break;
                 case 1:
-                    TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
-                    TIMER_1_DEV.CC[1].reg = value;
-                    TIMER_1_DEV.INTENSET.bit.MC1 = 1;
+            TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_1_DEV.CC[1].reg = value;
+            TIMER_1_DEV.INTENSET.bit.MC1 = 1;
                     break;
                 default:
                     return -1;
@@ -163,7 +163,16 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
         case TIMER_UNDEFINED:
         default:
             return -1;
+        }
+        break;
+#endif
+    case TIMER_UNDEFINED:
+    default:
+        return -1;
     }
+
+
+
 
 
 
@@ -176,40 +185,40 @@ int timer_clear(tim_t dev, int channel)
     /* get timer base register address */
     switch (dev) {
 #if TIMER_0_EN
-        case TIMER_0:
-            switch (channel) {
-                case 0:
-                    TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
-                    TIMER_0_DEV.INTENCLR.bit.MC0 = 1;
+    case TIMER_0:
+        switch (channel) {
+        case 0:
+            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_0_DEV.INTENCLR.bit.MC0 = 1;
                     break;
-                case 1:
-                    TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
-                    TIMER_0_DEV.INTENCLR.bit.MC1 = 1;
+        case 1:
+            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_0_DEV.INTENCLR.bit.MC1 = 1;
                     break;
                 default:
                     return -1;
-            }
-            break;
+        }
+        break;
 #endif
 #if TIMER_1_EN
-        case TIMER_1:
-            switch (channel) {
+    case TIMER_1:
+        switch (channel) {
                 case 0:
-                    TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
-                    TIMER_1_DEV.INTENCLR.bit.MC0 = 1;
+            TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_1_DEV.INTENCLR.bit.MC0 = 1;
                     break;
                 case 1:
-                    TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
-                    TIMER_1_DEV.INTENCLR.bit.MC1 = 1;
-                    break;
-                default:
-                    return -1;
-            }
+            TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
+            TIMER_1_DEV.INTENCLR.bit.MC1 = 1;
             break;
-#endif
-        case TIMER_UNDEFINED:
         default:
             return -1;
+        }
+        break;
+#endif
+    case TIMER_UNDEFINED:
+    default:
+        return -1;
     }
 
     /* disable the channels interrupt */
@@ -222,25 +231,25 @@ unsigned int timer_read(tim_t dev)
 {
     switch (dev) {
 #if TIMER_0_EN
-        case TIMER_0:
-            /* request syncronisation */
-            TIMER_0_DEV.READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(0x10);
-            while (TIMER_0_DEV.STATUS.bit.SYNCBUSY);
+    case TIMER_0:
+        /* request syncronisation */
+        TIMER_0_DEV.READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(0x10);
+        while (TIMER_0_DEV.STATUS.bit.SYNCBUSY);
 
-            return TIMER_0_DEV.COUNT.reg;
-            break;
+        return TIMER_0_DEV.COUNT.reg;
+        break;
 #endif
 #if TIMER_1_EN
-        case TIMER_1:
-            /* request syncronisation */
-            TIMER_1_DEV.READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(0x10);
-            while (TIMER_1_DEV.STATUS.bit.SYNCBUSY);
+    case TIMER_1:
+        /* request syncronisation */
+        TIMER_1_DEV.READREQ.reg = TC_READREQ_RREQ | TC_READREQ_ADDR(0x10);
+        while (TIMER_1_DEV.STATUS.bit.SYNCBUSY);
 
-            return TIMER_1_DEV.COUNT.reg;
-            break;
+        return TIMER_1_DEV.COUNT.reg;
+        break;
 #endif
-        default:
-            return 0;
+    default:
+        return 0;
     }
 
 
@@ -337,19 +346,23 @@ void timer_reset(tim_t dev)
 }
 
 /*TROELS: don't know if thread_yield is appropriate here, but i noticed it in uart, and it works here */
-
 #if TIMER_0_EN
 void TIMER_0_ISR(void)
 {
     DEBUG("\t\tISR0 \n");
     if (TIMER_0_DEV.INTFLAG.bit.MC0 && TIMER_0_DEV.INTENSET.bit.MC0) {
-        TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
-        TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
-        config[TIMER_0].cb(0);
+        if(config[TIMER_0].cb)
+        {
+            TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
+            TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC0;
+            config[TIMER_0].cb(0);            
+        }
     }
 
     else if (TIMER_0_DEV.INTFLAG.bit.MC1 && TIMER_0_DEV.INTENSET.bit.MC1) {
-        if(config[TIMER_0].cb){ //check for null
+        if(config[TIMER_0].cb) 
+        {
+            TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_0_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
             config[TIMER_0].cb(1);
         }
@@ -379,13 +392,13 @@ void TIMER_1_ISR(void)
         {
             TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_1_DEV.INTENCLR.reg = TC_INTENCLR_MC1;
-            config[TIMER_1].cb(1);       
+            config[TIMER_1].cb(1);
         }
 
     }
 
     if (sched_context_switch_request) {
-            thread_yield();
+        thread_yield();
     }
 }
 #endif /* TIMER_1_EN */
