@@ -19,6 +19,10 @@
 
 #include "auto_init.h"
 
+#ifdef FEATURE_PERIPH_RANDOM
+#include "periph/random.h"
+#endif
+
 #ifdef FEATURE_PERIPH_RTC
 #include "periph/rtc.h"
 #endif
@@ -201,6 +205,10 @@ void auto_init_net_if(void)
 
 void auto_init(void)
 {
+#ifdef FEATURE_PERIPH_RANDOM
+    DEBUG("Auto init random driver.\n");
+    random_init();
+#endif
 #ifdef FEATURE_PERIPH_RTC
     DEBUG("Auto init rtc driver.\n");
     rtc_init();
