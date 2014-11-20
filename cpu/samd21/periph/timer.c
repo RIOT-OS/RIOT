@@ -130,14 +130,14 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
             TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_0_DEV.CC[0].reg = value;
             TIMER_0_DEV.INTENSET.bit.MC0 = 1;
-                    break;
+            break;
         case 1:
             TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_0_DEV.CC[1].reg = value;
             TIMER_0_DEV.INTENSET.bit.MC1 = 1;
-                    break;
-                default:
-                    return -1;
+            break;
+        default:
+            return -1;
         }
         break;
 #endif
@@ -145,37 +145,23 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     case TIMER_1:
         /* set timeout value */
         switch (channel) {
-                case 0:
+        case 0:
             TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_1_DEV.CC[0].reg = value;
             TIMER_1_DEV.INTENSET.bit.MC0 = 1;
-                    break;
-                case 1:
+            break;
+        case 1:
             TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_1_DEV.CC[1].reg = value;
             TIMER_1_DEV.INTENSET.bit.MC1 = 1;
-                    break;
-                default:
-                    return -1;
-            }
             break;
 #endif
-        case TIMER_UNDEFINED:
         default:
             return -1;
         }
-        break;
-#endif
-    case TIMER_UNDEFINED:
-    default:
-        return -1;
+        case TIMER_UNDEFINED:
+            return -1;
     }
-
-
-
-
-
-
 
     return 1;
 }
