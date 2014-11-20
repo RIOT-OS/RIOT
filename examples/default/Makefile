@@ -54,12 +54,14 @@ ifneq (,$(filter native,$(BOARD)))
 	USEMODULE += rtc
 	USEMODULE += config
 	USEMODULE += random
+	USEMODULE += shell_periph
 endif
 ifneq (,$(filter iot-lab_M3,$(BOARD)))
 	USEMODULE += isl29020
 	USEMODULE += lps331ap
 	USEMODULE += l3g4200d
 	USEMODULE += lsm303dlhc
+	USEMODULE += shell_periph
 endif
 ifneq (,$(filter fox,$(BOARD)))
         USEMODULE += lps331ap

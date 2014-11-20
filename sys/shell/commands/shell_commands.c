@@ -24,6 +24,10 @@
 #include <stdlib.h>
 #include "shell_commands.h"
 
+#ifdef MODULE_SHELL_PERIPH
+#include "periph_conf.h"
+#endif
+
 extern void _reboot_handler(int argc, char **argv);
 
 #ifdef MODULE_CONFIG
@@ -72,6 +76,14 @@ extern void _get_lsm303dlhc_read_handler(int argc, char **argv);
 #ifdef MODULE_LTC4150
 extern void _get_current_handler(int argc, char **argv);
 extern void _reset_current_handler(int argc, char **argv);
+#endif
+
+#if RANDOM_NUMOF
+extern void _random_handler(int argc, char **argv);
+#endif
+
+#if RTC_NUMOF
+extern void _rtc_handler(int argc, char **argv);
 #endif
 
 #ifdef CPU_X86
@@ -229,6 +241,12 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_RANDOM
     { "mersenne_init", "initializes the PRNG", _mersenne_init },
     { "mersenne_get", "returns 32 bit of pseudo randomness", _mersenne_get },
+#endif
+#if RANDOM_NUMOF
+    {"random", "control random peripheral interface",  _random_handler},
+#endif
+#if RTC_NUMOF
+    {"rtc", "control RTC peripheral interface",  _rtc_handler},
 #endif
 #ifdef CPU_X86
     {"lspci", "Lists PCI devices", _x86_lspci},
