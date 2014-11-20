@@ -22,88 +22,136 @@
 #include "cpu.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
-
+#define ENABLE_DEBUG    (1)
+#include "debug.h"
 
 /* guard in case that no ADC device is defined */
 #if ADC_NUMOF
 
-enum adc_system_clock_apb_bus 
-{
-    //SYSTEM_CLOCK_APB_APBA, //NOT USED BY ADC
-    //SYSTEM_CLOCK_APB_APBB, //NOT USED BY ADC
-    SYSTEM_CLOCK_APB_APBC,
-};
-
 /* Prototypes */
-void adc_system_apb_clock_set_mask(const enum adc_system_clock_apb_bus, const uint32_t);
-void adc_system_gclk_chan_set_config(const uint8_t, uint8_t);
-void adc_system_gclk_chan_enable(const uint8_t);
-void adc_gclk(void);
 bool adc_syncing(Adc*);
-void adc_system_voltage_ref_enable(void);
-void adc_enable(Adc*);
-void adc_disable(Adc*);
-int adc_config_setup(Adc*, adc_precision_t);
-void adc_start_conversion(Adc*);
 void adc_clear_status(Adc*, uint32_t);
 bool adc_get_status(Adc*);
 void adc_configure_with_resolution(Adc*, int);
 
-/* ADC Init */
+/**
+ * @brief Initialization of a given ADC device
+ *
+ * The ADC will be initialized in synchronous, blocking mode, so no callbacks for finished
+ * conversions are required as conversions are presumed to be very fast (somewhere in the
+ * range of some us).
+ *
+ * @param[in] dev           the device to initialize
+ * @param[in] precision     the precision to use for conversion
+ *
+ * @return                  0 on success
+ * @return                  -1 on precision not available
+ */
 int adc_init(adc_t dev, adc_precision_t precision)
 {
     adc_poweron(dev);
     Adc *adc = 0;
     switch (dev) {
-        #if ADC_0_EN
-            case ADC_0:
-                adc = ADC_0_DEV;
-                int response = adc_config_setup(adc, precision);
-                if(response == -1)
-                {
-                    return response;
-                }
-                adc_enable(adc);
-            break;
-        #endif
+    #if ADC_0_EN
+        case ADC_0:
+            adc = ADC_0_DEV;
+
+            switch (precision) 
+            {
+                case ADC_RES_6BIT: // Not possible!
+                    return -1;
+                    break;
+                case ADC_RES_8BIT:
+                    adc_configure_with_resolution(adc, ADC_0_RES_8BIT); 
+                    break;
+                case ADC_RES_10BIT:
+                    adc_configure_with_resolution(adc, ADC_0_RES_10BIT); 
+                    break;
+                case ADC_RES_12BIT:
+                    adc_configure_with_resolution(adc, ADC_0_RES_12BIT); 
+                    break;
+                case ADC_RES_14BIT: // Not possible!
+                    return -1;
+                    break;
+                case ADC_RES_16BIT:
+                    adc_configure_with_resolution(adc, ADC_0_RES_16BIT);            
+                    break;
+                default:
+                    return -1;
+            }
+            while(adc_syncing(adc));
+            /* Enable bandgap if internal ref 1 volt */
+            if(ADC_0_REF_DEFAULT == ADC_0_REF_INT_1V)
+            {
+                SYSCTRL->VREF.reg |= SYSCTRL_VREF_BGOUTEN;                    
+            }
+            /* Enable */
+            adc->CTRLA.reg |= ADC_CTRLA_ENABLE;
+        break;
+    #endif
+        default:
+            return -1;
     }
     return 0;
 }
 
-/* ADC Sample */
+/**
+ * @brief Start a new conversion by using the given channel.
+ *
+ * If a conversion on any channel on the given ADC core is in progress, it is aborted.
+ *
+ * @param[in] dev           the ADC device to use for the conversion
+ * @param[in] channel       the channel to convert from
+ *
+ * @return                  the converted value
+ * @return                  -1 on invalid channel
+ */
 int adc_sample(adc_t dev, int channel)
 {
     uint16_t result;
-
-     Adc *adc = 0;
-    switch (dev) {
-        #if ADC_0_EN
-            case ADC_0:
-                adc = ADC_0_DEV;
-                adc_start_conversion(adc);
-            break;
-        #endif
+    Adc *adc = 0;
+    switch (dev)
+    {
+    #if ADC_0_EN
+        case ADC_0:
+            adc = ADC_0_DEV;
+            /* Starts the ADC conversion */
+            while(adc_syncing(adc));
+            adc->SWTRIG.reg |= ADC_SWTRIG_START;
+        break;
+    #endif
     }
-    while(adc_syncing(adc)) {/*wait for the ADC to become ready!*/ }
-
+    while(adc_syncing(adc));
     result = adc->RESULT.reg;
-
     //CLEAR RESET FLAG
     adc_clear_status(adc, ADC_0_STATUS_RESULT_READY);
-
-    while(!adc_get_status(adc)){} // MUST NOT BLOCK
-
+    while(!adc_get_status(adc)){} /* MUST NOT BLOCK */
     return result;
 }
 
-void adc_poweron(adc_t dev)
+/**
+ * @brief Enable the power for the given ADC device
+ *
+ * @param[in] dev           the ADC device to power up
+ */
+void adc_poweron(adc_t dev) 
 {
     switch (dev) 
     {
     #if ADC_0_EN
-        case ADC_0:            
-            adc_system_apb_clock_set_mask(SYSTEM_CLOCK_APB_APBC, PM_APBCMASK_ADC);
-            adc_gclk();
+        case ADC_0:
+            /* Setup generic clock mask for adc */
+            PM->APBCMASK.reg |= PM_APBCMASK_ADC;
+            /* Setup generic clock channel for adc */ 
+            //system_gclk_chan_disable(ADC_GCLK_ID); //TODO:                            
+            GCLK->CLKCTRL.reg |= (ADC_GCLK_ID << GCLK_CLKCTRL_GEN_Pos);
+            /* Enable generic clock channel */
+            // Need a "mutex" ???  TODO:  
+            // Select requested generator channel
+            *((uint8_t*)&GCLK->CLKCTRL.reg) |= ADC_GCLK_ID;
+            // enable generic clock
+            GCLK->CLKCTRL.reg |= GCLK_CLKCTRL_CLKEN;
+            //release mutex TODO:
             break;
     #endif
         default:
@@ -111,6 +159,11 @@ void adc_poweron(adc_t dev)
     }
 }
 
+/**
+ * @brief Disable the power for the given ADC device
+ *
+ * @param[in] dev           the ADC device to power down
+ */
 void adc_poweroff(adc_t dev)
 {
     Adc *adc = 0;
@@ -120,7 +173,9 @@ void adc_poweroff(adc_t dev)
     #if ADC_0_EN
         case ADC_0:
             adc = ADC_0_DEV;
-            adc_disable(adc); // perhaps theres a need to clear the gclk channel as well???
+            while(adc_syncing(adc));
+            /* Disable */
+            adc->CTRLA.reg &= ~ADC_CTRLA_ENABLE;
             break;
     #endif
         default:
@@ -144,6 +199,7 @@ void adc_poweroff(adc_t dev)
  */
 int adc_map(adc_t dev, int value, int min, int max)
 {
+    DEBUG("adc_map Not implemented!\n");
     return 0;
 }
 
@@ -161,53 +217,8 @@ int adc_map(adc_t dev, int value, int min, int max)
  */
 float adc_mapf(adc_t dev, int value, float min, float max)
 {
+    DEBUG("adc_mapf Not implemented!\n");
     return 0.0;
-}
-
-/* Setup generic clock mask for adc */
-void adc_system_apb_clock_set_mask(const enum adc_system_clock_apb_bus bus, const uint32_t mask)
-{
-    switch(bus)
-    {
-        case SYSTEM_CLOCK_APB_APBC:
-            PM->APBCMASK.reg |= mask;
-            break;
-        default:
-            return;
-            break;
-    }
-}
-
-/* Setup generic clock channel for adc */
-void adc_system_gclk_chan_set_config(const uint8_t channel, uint8_t generator)
-{
-    uint32_t clkctrlconfig = (channel << GCLK_CLKCTRL_GEN_Pos);
-    
-    //system_gclk_chan_disable(channel); //TODO:
-
-    // write new configuration
-    GCLK->CLKCTRL.reg = clkctrlconfig;
-}
-
-/* Enable generic clock channel */
-void adc_system_gclk_chan_enable(const uint8_t channel)
-{
-    //cpu_irq_enter_critical(); // TODO: Need a "lock" ???
-    
-    // Select requested generator channel
-    *((uint8_t*)&GCLK->CLKCTRL.reg) = channel;
-
-    // enable generic clock
-    GCLK->CLKCTRL.reg |= GCLK_CLKCTRL_CLKEN;
-
-    //cpu_irq_leave_critical(); //TODO:
-}
-
-/* Setup gclk */
-void adc_gclk(void)
-{
-    adc_system_gclk_chan_set_config(ADC_GCLK_ID, ADC_0_CLK_SOURCE);
-    adc_system_gclk_chan_enable(ADC_GCLK_ID);
 }
 
 /* ADC syncing */
@@ -216,60 +227,6 @@ bool adc_syncing(Adc* adc)
     if(adc->STATUS.reg & ADC_STATUS_SYNCBUSY)
         return true;
     return false;
-}
-
-/* VREF internal reference 1 volt */
-void adc_system_voltage_ref_enable(void)
-{
-    SYSCTRL->VREF.reg |= SYSCTRL_VREF_BGOUTEN;
-}
-
-/* ADC Enable */
-void adc_enable(Adc* adc)
-{
-    while(adc_syncing(adc)) {/*wait for the ADC to become ready!*/ }
-
-    /* Enable bandgap if internal ref 1 volt */
-    if(ADC_0_REF_DEFAULT == ADC_0_REF_INT_1V)
-        adc_system_voltage_ref_enable();
-
-    /* Enable */
-    adc->CTRLA.reg |= ADC_CTRLA_ENABLE;
-}
-
-/* ADC Disable */
-void adc_disable(Adc* adc)
-{
-    while(adc_syncing(adc)) {/*wait for the ADC to become ready!*/ } 
-
-    /* Disable */
-    adc->CTRLA.reg &= ~ADC_CTRLA_ENABLE;
-} 
-
-/* Config Setup */
-int adc_config_setup(Adc* adc, adc_precision_t precision)
-{
-    switch (precision) {
-        case ADC_RES_6BIT: // Not possible!
-            return -1;
-            break;
-        case ADC_RES_8BIT:
-            adc_configure_with_resolution(adc, ADC_0_RES_8BIT); 
-            break;
-        case ADC_RES_10BIT:
-            adc_configure_with_resolution(adc, ADC_0_RES_10BIT); 
-            break;
-        case ADC_RES_12BIT:
-            adc_configure_with_resolution(adc, ADC_0_RES_12BIT); 
-            break;
-        case ADC_RES_14BIT: // Not possible!
-            return -1;
-            break;
-        case ADC_RES_16BIT:
-            adc_configure_with_resolution(adc, ADC_0_RES_16BIT);            
-            break;
-        }
-    return 0;
 }
 
 /* Configure ADC with defined Resolution */
@@ -324,13 +281,6 @@ void adc_configure_with_resolution(Adc* adc, int precision)
         );
 }
 
-/* Starts the ADC conversion */
-void adc_start_conversion(Adc* adc)
-{
-    while(adc_syncing(adc)) {/*wait for the ADC to become ready!*/ }
-    adc->SWTRIG.reg |= ADC_SWTRIG_START;
-}
-
 /* Clear interrupt status flags */
 void adc_clear_status(Adc* adc, uint32_t status_flag)
 {
@@ -362,7 +312,6 @@ bool adc_get_status(Adc* adc)
         status_flags |= ADC_0_STATUS_OVERRUN;
         //adc_clear_status(adc, ADC_0_STATUS_OVERRUN); // TODO:
     }
-
     if(status_flags > 0)
         return false;
     else
