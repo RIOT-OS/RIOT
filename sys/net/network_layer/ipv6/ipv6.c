@@ -35,8 +35,9 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
-#define _IPV6_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT)
-#define _IPV6_REGISTRY_SIZE (4)
+#define _IPV6_STACKSIZE         (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define _IPV6_REGISTRY_SIZE     (4)
+#define _IPV6_MSG_QUEUE_SIZE    (32)
 
 typedef struct {
     uint16_t next_header;   /* 16-bit to include ANY */
@@ -45,7 +46,7 @@ typedef struct {
 
 kernel_pid_t ipv6_pid = KERNEL_PID_UNDEF;
 
-static _registry_t _rcv_registry[_IPV6_REGISTRY_SIZE];
+static _registry_t _registry[_IPV6_REGISTRY_SIZE];
 static char _ipv6_stack[_IPV6_STACKSIZE];
 
 #ifdef MODULE_IPV6_ROUTER
@@ -149,7 +150,96 @@ uint16_t ipv6_pseudo_hdr_csum(const ipv6_hdr_t *ipv6_hdr, uint32_t ul_packet_len
 
 static void *_control(void *args)
 {
-    /* TODO: send router solicitation */
+    msg_t msg_q[_IPV6_MSG_QUEUE_SIZE];
+
+    for (int i = 0; i < _IPV6_REGISTRY_SIZE; i++) {
+        _registry[i].next_header = 0;
+        _registry[i].pid = KERNEL_PID_UNDEF;
+    }
+
+    msg_init_queue(msg_q, _IPV6_MSG_QUEUE_SIZE);
+
+    while (1) {
+        msg_t msg_cmd, msg_ack;
+        netapi_cmd_t *cmd;
+        netapi_ack_t *ack;
+        uint8_t replied = 0;
+
+        msg_receive(&msg_cmd);
+
+        if (msg_cmd.type != NETAPI_MSG_TYPE) {
+            msg_ack.type = 0;
+            msg_reply(&msg_cmd, &msg_ack);
+        }
+
+        msg_ack.type = NETAPI_MSG_TYPE;
+
+        cmd = (netapi_cmd_t *)msg_cmd.content.ptr;
+
+        ack = cmd->ack;
+        ack->type = NETAPI_CMD_ACK;
+        ack->orig = cmd->type;
+
+        msg_ack.content.ptr = (char *)ack;
+
+        switch (cmd->type) {
+            case NETAPI_CMD_RCV:
+                break;
+
+            case NETAPI_CMD_SND:
+                break;
+
+            case NETAPI_CMD_GET:
+                break;
+
+            case NETAPI_CMD_SET:
+                break;
+
+            case NETAPI_CMD_REG:
+                DEBUG("Received registration command from %d\n" msg_cmd.sender_pid);
+
+                ack->result = -ENOBUFS;
+
+                for (unsigned int i = 0; i < _IPV6_REGISTRY_SIZE; i++) {
+                    if (registry[i].pid = KERNEL_PID_UNDEF) {
+                        registry[i].next_header = ((netapi_reg_t *)cmd)->demux_ctx;
+                        registry[i].pid = ((netapi_reg_t *)cmd)->reg_pid;
+                        ack->result = NETAPI_STATUS_OK;
+                    }
+                }
+
+                break;
+
+            case NETAPI_CMD_UNREG:
+                DEBUG("Received unregistration command from %d\n", msg_cmd.sender_pid);
+
+                ack->result = NETAPI_STATUS_OK;
+
+                for (unsigned int i = 0; i < _REGISTRY_SIZE; i++) {
+                    if (registry[i] == ((netapi_reg_t *)cmd)->reg_pid) {
+                        registry[i].pid = KERNEL_PID_UNDEF;
+
+                        break;
+                    }
+                }
+
+                break;
+
+            default:
+                DEBUG("Received unknown command from %d\n", msg_cmd.sender_pid);
+
+                ack->result = -ENOTSUP;
+
+                break;
+        }
+
+        if (!replied) {
+            msg_reply(&msg_cmd, &msg_ack);
+        }
+        else {
+            replied = 0;
+        }
+    }
 
     return NULL;
 }
