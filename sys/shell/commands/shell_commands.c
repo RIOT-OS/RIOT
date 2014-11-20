@@ -38,10 +38,6 @@ extern void _heap_handler(int argc, char **argv);
 extern void _ps_handler(int argc, char **argv);
 #endif
 
-#ifdef MODULE_RTC
-extern void _date_handler(int argc, char **argv);
-#endif
-
 #ifdef MODULE_SHT11
 extern void _get_temperature_handler(int argc, char **argv);
 extern void _get_humidity_handler(int argc, char **argv);
@@ -72,6 +68,10 @@ extern void _get_lsm303dlhc_read_handler(int argc, char **argv);
 #ifdef MODULE_LTC4150
 extern void _get_current_handler(int argc, char **argv);
 extern void _reset_current_handler(int argc, char **argv);
+#endif
+
+#if FEATURE_PERIPH_RTC
+extern void _rtc_handler(int argc, char **argv);
 #endif
 
 #ifdef CPU_X86
@@ -162,9 +162,6 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_PS
     {"ps", "Prints information about running threads.", _ps_handler},
 #endif
-#ifdef MODULE_RTC
-    {"date", "Gets or sets current date and time.", _date_handler},
-#endif
 #ifdef MODULE_SHT11
     {"temp", "Prints measured temperature.", _get_temperature_handler},
     {"hum", "Prints measured humidity.", _get_humidity_handler},
@@ -240,6 +237,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_RANDOM
     { "mersenne_init", "initializes the PRNG", _mersenne_init },
     { "mersenne_get", "returns 32 bit of pseudo randomness", _mersenne_get },
+#endif
+#if FEATURE_PERIPH_RTC
+    {"rtc", "control RTC peripheral interface",  _rtc_handler},
 #endif
 #ifdef CPU_X86
     {"lspci", "Lists PCI devices", _x86_lspci},
