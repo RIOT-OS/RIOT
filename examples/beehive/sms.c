@@ -9,7 +9,7 @@
 #include "string.h"
 #include "periph/uart.h"
 #include "ringbuffer.h"
-#include "hwtimer.h"
+#include "vtimer.h"
 static char gsm_rx_buf_mem[128];
 static ringbuffer_t gsm_rx_buf;
 void rx_callback(void *arg, char data)
@@ -24,8 +24,8 @@ void sms_init(void)
 	send_command_string(CSTT);
 	send_command_string(CIICR);
 	send_command_string(CIFSR);
-
-	send_command_string(CIPSTART);
+	//send_command_string(CGDCONT);
+	//send_command_string(CIPSTART);
 
 }
 void send_to_uart1(int argc, char **argv)
@@ -33,7 +33,7 @@ void send_to_uart1(int argc, char **argv)
 	printf("%s\n", strlen(argv[1]));
 	send_command(argv[1], strlen(argv[1]));
 	send_command("\r\n", 2);
-	hwtimer_wait(HWTIMER_TICKS_TO_US(1000));
+	vtimer_usleep(100000);
 
 	print_buffer();
 }
@@ -45,7 +45,7 @@ void set_message_format(void)
 {
 	char message[] = "AT+CMGF=1\r";
 	send_command(message, strlen(message));
-	hwtimer_wait(HWTIMER_TICKS_TO_US(1000));
+	vtimer_usleep(1000);
 	print_buffer();
 }
 void sms_send(int argc, char **argv)
@@ -56,26 +56,39 @@ void sms_send(int argc, char **argv)
   	set_message_format();
 	char start[]   = "AT+CMGS=\"30622610\"\r";
 	send_command(start, strlen(start));
-	hwtimer_wait(HWTIMER_TICKS_TO_US(1000));
+	vtimer_usleep(1000);
 	send_command(argv[1], strlen(argv[1]));
 	send_command(end, 2);
 	send_command("\r\n", 2);
-	hwtimer_wait(HWTIMER_TICKS_TO_US(1000));
+	vtimer_usleep(1000);
 	print_buffer();
 
+}
+//void init_tcp_connection(ip address, )
+void post_http(int argc, char **argv)
+{
+	send_command_string(CREG);
+	send_command_string(SAPBR);
+	send_command_string(WAIT);
+	send_command_string(HTTPINIT);
+	send_command_string(URL);
+	send_command_string(CID);
+	send_command_string(HTTPACTION);
+	send_command_string(HTTPREAD);
+	send_command_string(WAIT);
+	send_command_string(TERMINATE);
 }
 void get_imei(int argc, char **argv)
 {
 	char cmd[]  = "AT+GSN\r\n";
 	send_command(cmd, strlen(cmd));
-	hwtimer_wait(HWTIMER_TICKS_TO_US(1000));
+	vtimer_usleep(1000);
 	print_buffer();
 }
 void send_command_string(char* command)
 {
 	send_command(command, strlen(command));
-	hwtimer_wait(HWTIMER_TICKS_TO_US(10000));
-	//wait_for_ok();
+	vtimer_usleep(1000000);
 	print_buffer();
 
 }
@@ -96,7 +109,7 @@ int wait_for_ok(void)
 {
 	while(!ringbuffer_empty(&gsm_rx_buf))
 	{
-		hwtimer_wait(HWTIMER_TICKS_TO_US(1000));
+		vtimer_usleep(1000);
 		if(ringbuffer_get_one(&gsm_rx_buf) == 'O')
 		{
 			if(ringbuffer_get_one(&gsm_rx_buf) == 'K')

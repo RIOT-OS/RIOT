@@ -28,7 +28,7 @@ const shell_command_t shell_commands[] = {
     {"send", "send pure message", send_to_uart1},
     {"sms", "Send SMS to number", sms_send},
     {"imei", "Get IMEI", get_imei},
-
+    {"http", "Send http request", post_http},
     {NULL, NULL, NULL}
 };
 

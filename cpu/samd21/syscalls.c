@@ -141,21 +141,21 @@ pid_t _getpid(void)
     return (pid_t) sched_active_pid;
 }
 
-/**
- * @brief Send a signal to a given thread
- *
- * @param r     TODO
- * @param pid   TODO
- * @param sig   TODO
- *
- * @return      TODO
- */
-__attribute__ ((weak))
-int _kill(struct _reent *r, pid_t pid, int sig)
-{
-    r->_errno = ESRCH;                      /* not implemented yet */
-    return -1;
-}
+// /**
+//  * @brief Send a signal to a given thread
+//  *
+//  * @param r     TODO
+//  * @param pid   TODO
+//  * @param sig   TODO
+//  *
+//  * @return      TODO
+//  */
+// __attribute__ ((weak))
+// int _kill(struct _reent *r, pid_t pid, int sig)
+// {
+//     r->_errno = ESRCH;                      /* not implemented yet */
+//     return -1;
+// }
 
 /**
  * @brief Open a file

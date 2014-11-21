@@ -91,8 +91,6 @@ int timer_init(tim_t dev, unsigned int ticks_per_us, void (*callback)(int))
         TIMER_1_DEV.CTRLA.bit.PRESCALER = TC_CTRLA_PRESCALER_DIV8_Val;
         /* choose normal frequency operation */
         TIMER_1_DEV.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_NFRQ_Val;
-            /* choose normal frequency operation */
-            TIMER_1_DEV.CTRLA.bit.WAVEGEN = TC_CTRLA_WAVEGEN_NFRQ_Val;
         break;
 #endif
     case TIMER_UNDEFINED:
@@ -155,13 +153,18 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
             TIMER_1_DEV.CC[1].reg = value;
             TIMER_1_DEV.INTENSET.bit.MC1 = 1;
             break;
-#endif
         default:
             return -1;
         }
-        case TIMER_UNDEFINED:
-            return -1;
+        break;
+#endif
+    case TIMER_UNDEFINED:
+    default:
+        return -1;
     }
+
+
+
 
     return 1;
 }
@@ -176,24 +179,24 @@ int timer_clear(tim_t dev, int channel)
         case 0:
             TIMER_0_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_0_DEV.INTENCLR.bit.MC0 = 1;
-                    break;
+            break;
         case 1:
             TIMER_0_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_0_DEV.INTENCLR.bit.MC1 = 1;
-                    break;
-                default:
-                    return -1;
+            break;
+        default:
+            return -1;
         }
         break;
 #endif
 #if TIMER_1_EN
     case TIMER_1:
         switch (channel) {
-                case 0:
+        case 0:
             TIMER_1_DEV.INTFLAG.bit.MC0 = 1;
             TIMER_1_DEV.INTENCLR.bit.MC0 = 1;
-                    break;
-                case 1:
+            break;
+        case 1:
             TIMER_1_DEV.INTFLAG.bit.MC1 = 1;
             TIMER_1_DEV.INTENCLR.bit.MC1 = 1;
             break;
@@ -331,11 +334,9 @@ void timer_reset(tim_t dev)
     }
 }
 
-/*TROELS: don't know if thread_yield is appropriate here, but i noticed it in uart, and it works here */
 #if TIMER_0_EN
 void TIMER_0_ISR(void)
 {
-    DEBUG("\t\tISR0 \n");
     if (TIMER_0_DEV.INTFLAG.bit.MC0 && TIMER_0_DEV.INTENSET.bit.MC0) {
         if(config[TIMER_0].cb)
         {
@@ -364,7 +365,6 @@ void TIMER_0_ISR(void)
 #if TIMER_1_EN
 void TIMER_1_ISR(void)
 {
-    DEBUG("\t\tISR1 \n");
     if (TIMER_1_DEV.INTFLAG.bit.MC0 && TIMER_1_DEV.INTENSET.bit.MC0) {
         if (config[TIMER_1].cb)
         {
