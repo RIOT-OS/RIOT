@@ -70,7 +70,7 @@ kernel_pid_t slip_init(uart_t uart, uint32_t baudrate, ringbuffer_t *in_buf);
 static inline int slip_send_l3_packet(kernel_pid_t pid, netdev_hlist_t *upper_layer_hdrs,
                                       void *data, size_t data_len)
 {
-    return netapi_send_data(pid, upper_layer_hdrs, NULL, 0, data, data_len);
+    return netapi_send_packet(pid, upper_layer_hdrs, NULL, 0, data, data_len);
 }
 #else
 int slip_send_l3_packet(kernel_pid_t pid, netdev_hlist_t *upper_layer_hdrs,
