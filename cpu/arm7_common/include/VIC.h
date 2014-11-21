@@ -8,8 +8,12 @@
 #ifndef __ARM_COMMON_H
 #define __ARM_COMMON_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
- * @ingroup         arm_common
+ * @ingroup         arm7_common
  * @{
  */
 
@@ -79,6 +83,10 @@
 #include "cpu.h"
 
 bool cpu_install_irq(int IntNumber, void *HandlerAddr, int Priority);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /*ARMVIC_H_*/

@@ -10,7 +10,7 @@
 #define __ARM_COMMON_H
 
 /**
- * @defgroup    arm_common ARM CPU common
+ * @defgroup    arm7_common ARM CPU common
  * @brief       Common implementations and headers for ARM based micro-controllers
  * @ingroup     cpu
  * @{
@@ -25,6 +25,10 @@
  */
 
 #include "bitarithm.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /**
  * @name    PCONP Constants
@@ -90,6 +94,10 @@
 #define MR3R (BIT10)
 #define MR3S (BIT11)
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif // __ARM_COMMON_H

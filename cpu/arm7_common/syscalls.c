@@ -9,7 +9,7 @@
 
 /**
  * @file
- * @ingroup     arm_common
+ * @ingroup     arm7_common
  * @brief       LPC2387 NewLib system calls implementation
  *
  * @author      Michael Baar <michael.baar@fu-berlin.de>

@@ -11,7 +11,11 @@
 
 #include <stdint.h>
 #include "VIC.h"
-#include "arm_common.h"
+#include "arm7_common.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 #define NEW_TASK_CPSR 0x1F
 #define WORDSIZE 32
@@ -24,5 +28,9 @@ void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale);
 
 void arm_reset(void);
 void stdio_flush(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _ARM_CPU_H
