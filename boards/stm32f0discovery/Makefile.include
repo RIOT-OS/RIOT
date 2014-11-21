@@ -17,6 +17,7 @@ export PORT
 # define tools used for building the project
 export PREFIX = arm-none-eabi-
 export CC = $(PREFIX)gcc
+export CXX = $(PREFIX)g++
 export AR = $(PREFIX)ar
 export AS = $(PREFIX)as
 export LINK = $(PREFIX)gcc
@@ -40,6 +41,10 @@ export OFLAGS = -O binary
 export FFLAGS = write bin/$(BOARD)/$(APPLICATION).hex 0x08000000
 export DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/gdb.conf bin/$(BOARD)/$(APPLICATION).elf
 export TERMFLAGS += -p "$(PORT)"
+
+# unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
+export CXXUWFLAGS +=
+export CXXEXFLAGS +=
 
 # use the nano-specs of the NewLib when available
 ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)

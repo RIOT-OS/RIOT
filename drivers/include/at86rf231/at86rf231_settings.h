@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-#define AT86RF231_RX_BUF_SIZE   3
+#define AT86RF231_RX_BUF_SIZE   5
 
 enum at86rf231_access {
     AT86RF231_ACCESS_REG = 0x80,

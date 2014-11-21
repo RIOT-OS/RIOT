@@ -171,16 +171,7 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTBASE)/pkg/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
-flash: $(filter all all-%, $(MAKECMDGOALS))
-	@if [ ! -f $${HEXFILE} ]; then \
-		echo ""; \
-		echo ""; \
-		echo "You need to create a hex file before you can flash it."; \
-		echo "Unless you know otherwise, 'make all' usually does what you want."; \
-		echo ""; \
-		echo ""; \
-		exit 1; \
-	fi
+flash: all
 	$(FLASHER) $(FFLAGS)
 
 term:

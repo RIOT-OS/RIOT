@@ -153,9 +153,25 @@ int _getpid(void)
  *
  * @return      TODO
  */
+__attribute__ ((weak))
 int _kill_r(struct _reent *r, int pid, int sig)
 {
     r->_errno = ESRCH;                      /* not implemented yet */
+    return -1;
+}
+
+/**
+ * @brief Send a signal to a thread
+ *
+ * @param[in] pid the pid to send to
+ * @param[in] sig the signal to send
+ *
+ * @return TODO
+ */
+__attribute__ ((weak))
+int _kill(int pid, int sig)
+{
+    errno = ESRCH;                         /* not implemented yet */
     return -1;
 }
 

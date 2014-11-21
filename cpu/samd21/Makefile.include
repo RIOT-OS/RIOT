@@ -10,9 +10,6 @@ export USEMODULE += cortex-m0_common
 # define path to cortex-m common module, which is needed for this CPU
 export CORTEX_COMMON = $(RIOTCPU)/cortex-m0_common/
 
-# this CPU implementation makes use of the ringbuffer, so include the lib module
-export USEMODULE += lib
-
 # define the linker script to use for this CPU
 export LINKERSCRIPT ?= $(RIOTCPU)/$(CPU)/samd21_linkerscript.ld
 

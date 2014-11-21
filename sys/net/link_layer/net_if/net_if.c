@@ -262,7 +262,7 @@ uint32_t net_if_transceiver_get_set_handler(int if_id, uint16_t op_type,
     transceiver_command_t tcmd;
 
     tcmd.transceivers = interfaces[if_id].transceivers;
-    tcmd.data = (void *)data;
+    tcmd.data = (char *)data;
     msg.content.ptr = (char *)&tcmd;
     msg.type = op_type;
     msg_send_receive(&msg, &msg, transceiver_pid);
@@ -410,7 +410,6 @@ int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation)
 {
     uint64_t tmp;
     if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
-    if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Get EUI-64: No interface initialized with ID %d.\n", if_id);
         return 0;
     }
@@ -448,7 +447,8 @@ int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation)
             return 0;
         }
 
-    }    
+    }
+
     return 1;
 }
 
@@ -537,7 +537,7 @@ int32_t net_if_get_pan_id(int if_id)
 
 }
 
-int32_t net_if_set_pan_id(int if_id, uint32_t pan_id)
+int32_t net_if_set_pan_id(int if_id, uint16_t pan_id)
 {
     if (if_id < 0 || if_id >= NET_IF_MAX || !interfaces[if_id].initialized) {
         DEBUG("Set PAN ID: No interface initialized with ID %d.\n", if_id);

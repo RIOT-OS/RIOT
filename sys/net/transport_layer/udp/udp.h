@@ -24,7 +24,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#define UDP_STACK_SIZE (KERNEL_CONF_STACKSIZE_MAIN)
 #define UDP_PKT_RECV_BUF_SIZE           (64)
 
 int udp_bind_socket(int s, sockaddr6_t *name, int namelen, uint8_t pid);

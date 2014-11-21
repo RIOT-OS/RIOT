@@ -22,6 +22,7 @@ export DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debug.sh
 export CPU_USAGE = -mcpu=cortex-m0plus
 FPU_USAGE =
 DEBUG_FLAGS = -ggdb -g3
+#remember to change to little endian
 export CFLAGS += -std=gnu99 -O0 -Wall -Wstrict-prototypes $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian -mthumb -mthumb-interwork -nostartfiles -mtune=cortex-m0plus
 export CFLAGS += -ffunction-sections -fdata-sections -fno-builtin
 export ASFLAGS += $(CPU_USAGE) $(FPU_USAGE) -mlittle-endian
@@ -32,11 +33,15 @@ export OFLAGS += -O binary
 export FFLAGS += $(HEXFILE)
 export TERMFLAGS += "$(PORT)"
 
+# unwanted (CXXUWFLAGS) and extra (CXXEXFLAGS) flags for c++
+export CXXUWFLAGS +=
+export CXXEXFLAGS +=
+
 # use the nano-specs of the NewLib when available
 ifeq ($(shell $(LINK) -specs=nano.specs -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
 export LINKFLAGS += -specs=nano.specs -lc -lnosys
 endif
 
 # export board specific includes to the global includes-listing
-export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/ -I$(RIOTBASE)/drivers/at86rf231/include -I$(RIOTBASE)/sys/net/include
+export INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/ 
 include $(RIOTBOARD)/$(BOARD)/Makefile.dep

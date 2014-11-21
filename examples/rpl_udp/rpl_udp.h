@@ -15,7 +15,7 @@ extern "C" {
 
 #define APP_VERSION "1.2"
 
-#define RADIO_CHANNEL   (15)
+#define RADIO_CHANNEL   (11)
 
 #define MONITOR_STACK_SIZE  (1024)
 #define RCV_BUFFER_SIZE     (32)

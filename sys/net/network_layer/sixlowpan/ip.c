@@ -34,7 +34,7 @@
 
 #include "net_help.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 char addr_str[IPV6_MAX_ADDR_STR_LEN];
@@ -87,9 +87,10 @@ int ipv6_send_packet(ipv6_hdr_t *packet)
             DEBUG("ipv6 send packet: before lowpan_sendto\n");
             /* XXX: this is wrong, but until ND does work correctly,
              *      this is the only way (aka the old way)*/
+
             uint16_t raddr = NTOHS(packet->destaddr.uint16[7]);
             sixlowpan_lowpan_sendto(0, &raddr, 2, (uint8_t *)packet, length);
-            DEBUG("ipv6 send packet: after lowpan_sendto\n");
+
             /* return -1; */
         }
         DEBUG("ipv6 send packet: before return length\n");
@@ -303,6 +304,8 @@ uint8_t ipv6_get_addr_match(const ipv6_addr_t *src,
                     break;
                 }
             }
+
+            break;
         }
     }
 
@@ -821,7 +824,7 @@ uint16_t ipv6_csum(ipv6_hdr_t *ipv6_header, uint8_t *buf, uint16_t len, uint8_t 
                            &ipv6_header->destaddr),
           len, buf, proto);
     sum = len + proto;
-    sum = csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
-    sum = csum(sum, buf, len);
+    sum = net_help_csum(sum, (uint8_t *)&ipv6_header->srcaddr, 2 * sizeof(ipv6_addr_t));
+    sum = net_help_csum(sum, buf, len);
     return (sum == 0) ? 0xffff : HTONS(sum);
 }

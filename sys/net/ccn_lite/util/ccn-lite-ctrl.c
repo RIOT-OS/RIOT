@@ -30,6 +30,7 @@
 #include "ccnx.h"
 #include "ccnl.h"
 #include "ccnl-pdu.h"
+#include "ccnl-core.h"
 
 // ----------------------------------------------------------------------
 
@@ -39,13 +40,13 @@ mkNewFaceRequest(unsigned char *out, char *macsrc, char *ip4src,
 {
     int len = 0, len2, len3;
 
-    unsigned char *contentobj = malloc(500);
+    unsigned char *contentobj = ccnl_malloc(500);
     if (!contentobj) {
         puts("mkNewFaceRequest: malloc failed");
         return 0;
     }
 
-    unsigned char *faceinst = malloc(500);
+    unsigned char *faceinst = ccnl_malloc(500);
     if (!faceinst) {
         free(contentobj);
         puts("mkNewFaceRequest: malloc failed");
@@ -117,13 +118,13 @@ mkPrefixregRequest(unsigned char *out, char reg, char *path, char *faceid)
     int len = 0, len2, len3;
     char *cp;
 
-    unsigned char *contentobj = malloc(500);
+    unsigned char *contentobj = ccnl_malloc(500);
     if (!contentobj) {
         puts("mkNewFaceRequest: malloc failed");
         return 0;
     }
 
-    unsigned char *fwdentry = malloc(500);
+    unsigned char *fwdentry = ccnl_malloc(500);
     if (!fwdentry) {
         free(contentobj);
         puts("mkNewFaceRequest: malloc failed");

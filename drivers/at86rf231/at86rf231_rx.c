@@ -61,7 +61,7 @@ void at86rf231_rx_handler(void)
     at86rf231_rx_buffer[rx_buffer_next].crc = (fcs_rssi >> 7) & 0x01;
 
     if (at86rf231_rx_buffer[rx_buffer_next].crc == 0) {
-        DEBUG("Got packet with invalid crc.\n");
+        DEBUG("at86rf231: Got packet with invalid crc.\n");
         return;
     }
 

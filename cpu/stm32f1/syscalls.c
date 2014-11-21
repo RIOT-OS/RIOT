@@ -35,6 +35,7 @@
 #include "ringbuffer.h"
 #include "irq.h"
 #include "periph/uart.h"
+#include "board.h"
 
 #ifdef MODULE_UART0
 #include "board_uart0.h"
@@ -156,9 +157,26 @@ int _getpid(void)
  *
  * @return      TODO
  */
+__attribute__ ((weak))
 int _kill_r(struct _reent *r, int pid, int sig)
 {
     r->_errno = ESRCH;                      /* not implemented yet */
+    return -1;
+}
+
+/**
+ * @brief Send a signal to a given thread (non-reentrant syscall)
+ *
+ * @param r     TODO
+ * @param pid   TODO
+ * @param sig   TODO
+ *
+ * @return      TODO
+ */
+__attribute__ ((weak))
+int _kill(int pid, int sig)
+{
+    errno = ESRCH;		                   /* not implemented yet */
     return -1;
 }
 
@@ -227,7 +245,7 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 {
     char *c = (char*)data;
     for (int i = 0; i < count; i++) {
-        uart_write_blocking(UART_0, c[i]);
+        uart_write_blocking(STDIO, c[i]);
     }
     return count;
 }

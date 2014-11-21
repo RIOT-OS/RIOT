@@ -52,7 +52,7 @@
 #endif
 /** @} */
 
-#define TRANSCEIVER_BUFFER_SIZE (5)
+#define TRANSCEIVER_BUFFER_SIZE (3)
 
 
 /**

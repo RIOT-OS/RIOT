@@ -20,16 +20,15 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <vtimer.h>
-#include <periph/random.h>
-#include <periph_conf.h>
+
+#include "vtimer.h"
+#include "periph/random.h"
 
 #define LIMIT       (20U)
 
 int main(void)
 {
     char buf[LIMIT];
-    int count = 0;
 
     puts("\nRandom number generator low-level driver test\n");
     printf("This test will print from 1 to %i random bytes about every second\n\n", LIMIT);
@@ -42,9 +41,9 @@ int main(void)
         memset(buf, 0, sizeof(buf));
 
         /* create random numbers */
-        for (int i = 1; i <= LIMIT; i++) {
+        for (unsigned i = 1; i <= LIMIT; i++) {
             printf("generating %i random byte(s)\n", i);
-            count = random_read(buf, i);
+            unsigned count = random_read(buf, i);
 
             if (count != i) {
                 printf("Error generating random bytes, got %i instead of %i", count, i);
@@ -52,8 +51,8 @@ int main(void)
             }
 
             printf("Got:");
-            for (int j = 0; j < i; j++) {
-                printf(" 0x%02x", buf[j]);
+            for (unsigned j = 0; j < i; j++) {
+                printf(" 0x%02x", (unsigned char)buf[j]);
             }
             printf("\n");
         }

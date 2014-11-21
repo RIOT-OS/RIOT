@@ -21,8 +21,5 @@ export UNDEF += $(BINDIR)cpu/startup.o
 # export the peripheral drivers to be linked into the final binary
 export USEMODULE += periph
 
-# the uart implementation uses ringbuffer and therefore needs lib
-export USEMODULE += lib
-
 # CPU depends on the atmega common module, so include it
 include $(ATMEGA_COMMON)Makefile.include

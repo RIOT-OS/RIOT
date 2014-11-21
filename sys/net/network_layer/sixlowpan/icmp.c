@@ -32,7 +32,7 @@
 #include "serialnumber.h"
 #include "net_help.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
 #endif
@@ -1444,8 +1444,8 @@ uint16_t icmpv6_csum(ipv6_hdr_t *ipv6_buf, icmpv6_hdr_t *icmpv6_buf)
     icmpv6_buf->checksum = 0;
     sum = len + IPV6_PROTO_NUM_ICMPV6;
 
-    sum = csum(sum, (uint8_t *)&ipv6_buf->srcaddr, 2 * sizeof(ipv6_addr_t));
-    sum = csum(sum, (uint8_t *)icmpv6_buf, len);
+    sum = net_help_csum(sum, (uint8_t *)&ipv6_buf->srcaddr, 2 * sizeof(ipv6_addr_t));
+    sum = net_help_csum(sum, (uint8_t *)icmpv6_buf, len);
 
     return (sum == 0) ? 0 : ~HTONS(sum);
 }
@@ -1513,7 +1513,6 @@ ndp_neighbor_cache_t *ndp_neighbor_cache_search(ipv6_addr_t *ipaddr)
 ndp_neighbor_cache_t *ndp_get_ll_address(ipv6_addr_t *ipaddr)
 {
     ndp_neighbor_cache_t *nce = ndp_neighbor_cache_search(ipaddr);
-
     if (nce == NULL || nce->type == NDP_NCE_TYPE_GC ||
         nce->state == NDP_NCE_STATUS_INCOMPLETE) {
         // TODO: send neighbor solicitation, wait, and recheck cache

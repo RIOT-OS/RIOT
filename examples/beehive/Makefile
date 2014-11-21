@@ -57,7 +57,6 @@ CXXEXFLAGS += -std=gnu++11 -fno-exceptions -funwind-tables
 USEMODULE += defaulttransceiver
 USEMODULE += sixlowpan
 USEMODULE += auto_init
-
 USEMODULE += uart0
 USEMODULE += posix
 USEMODULE += vtimer

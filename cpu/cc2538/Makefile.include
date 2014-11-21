@@ -25,9 +25,6 @@ export UNDEF += $(BINDIR)cpu/startup.o
 # Export the peripheral drivers to be linked into the final binary:
 export USEMODULE += periph
 
-# this CPU implementation makes use of the ringbuffer, so include the lib module
-export USEMODULE += lib
-
 # CPU depends on the cortex-m common module, so include it:
 include $(CORTEX_COMMON)Makefile.include
 

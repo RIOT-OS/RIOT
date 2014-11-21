@@ -59,7 +59,7 @@ void *realloc(void *ptr, size_t size);
  * @param[in]   cnt    The other factor of the number of bytes to allocated.
  * @returns     The new memory block. `NULL` if the "heap" is exhausted.
  */
-void *calloc(int size, size_t cnt);
+void *calloc(size_t size, size_t cnt);
 
 /**
  * @brief       This is a no-op.
