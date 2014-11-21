@@ -78,6 +78,10 @@
 #include "periph/cpuid.h"
 #endif
 
+#ifdef MODULE_L2_PING
+#include "l2_ping.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
 #define DEBUG_ENABLED
@@ -236,6 +240,10 @@ void auto_init(void)
 #ifdef MODULE_MCI
     DEBUG("Auto init mci module.\n");
     MCI_initialize();
+#endif
+#ifdef MODULE_L2_PING
+    DEBUG("Auto init net_if module.\n");
+    l2_ping_init();
 #endif
 #ifdef MODULE_NET_IF
     DEBUG("Auto init net_if module.\n");
