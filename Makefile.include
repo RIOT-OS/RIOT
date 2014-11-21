@@ -22,6 +22,7 @@ else
 endif
 
 BOARD := $(strip $(BOARD))
+APPLICATION := $(strip $(APPLICATION))
 
 # provide common external programs for `Makefile.include`s
 
