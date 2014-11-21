@@ -26,6 +26,10 @@
 
 #include "bitarithm.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @name    PCONP Constants
  * @{
@@ -90,6 +94,10 @@
 #define MR3R (BIT10)
 #define MR3S (BIT11)
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif // __ARM_COMMON_H

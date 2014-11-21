@@ -11,6 +11,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* IAP-Commands  */
 #define PREPARE_SECTOR_FOR_WRITE_OPERATION  (50)
 #define COPY_RAM_TO_FLASH                   (51)
@@ -54,5 +58,10 @@
  * @return  Sector number. 0xFF on error
  */
 uint8_t iap_get_sector(uint32_t addr);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /*IAP_H_*/
