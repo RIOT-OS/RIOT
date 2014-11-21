@@ -42,11 +42,11 @@ int main(void)
 
         /* create random numbers */
         for (unsigned i = 1; i <= LIMIT; i++) {
-            printf("generating %i random byte(s)\n", i);
+            printf("generating %u random byte(s)\n", i);
             unsigned count = random_read(buf, i);
 
             if (count != i) {
-                printf("Error generating random bytes, got %i instead of %i", count, i);
+                printf("Error generating random bytes, got %u instead of %u", count, i);
                 return 0;
             }
 
