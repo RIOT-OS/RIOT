@@ -26,10 +26,10 @@
 #include <sys/time.h>
 
 #include "arm_cpu.h"
+#include "board_uart0.h"
 // core
 #include "kernel.h"
 #include "irq.h"
-#include "io.h"
 #if defined MODULE_RTC
 #include "rtc.h"
 #elif defined MODULE_VTIMER
@@ -147,7 +147,7 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
     switch(fd) {
         case STDOUT_FILENO:
         case STDERR_FILENO:
-            result = fw_puts((char *)data, count);
+            result = uart0_puts((char *)data, count);
             break;
 
         default:
