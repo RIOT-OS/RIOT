@@ -143,7 +143,7 @@ static void test_basic_mac_send_data_dest_too_long(void)
 {
     char dest[] = TEST_STRING8;
     char data[] = TEST_STRING64;
-    TEST_ASSERT_EQUAL_INT(-EAFNOSUPPORT, netapi_send_data(basic_mac_pid, dest,
+    TEST_ASSERT_EQUAL_INT(-EAFNOSUPPORT, netapi_send_payload(basic_mac_pid, dest,
                           UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN + TEST_UINT8,
                           data, 1));
 }
@@ -152,7 +152,7 @@ static void test_basic_mac_send_data_data_too_long(void)
 {
     char dest[] = TEST_STRING8;
     char data[] = TEST_STRING64;
-    TEST_ASSERT_EQUAL_INT(-EMSGSIZE, netapi_send_data(basic_mac_pid, dest,
+    TEST_ASSERT_EQUAL_INT(-EMSGSIZE, netapi_send_payload(basic_mac_pid, dest,
                           UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN, data,
                           UNITTESTS_NETDEV_DUMMY_MAX_PACKET + TEST_UINT8));
 }
@@ -167,7 +167,7 @@ static void test_basic_mac_send_data_send(void)
 #else
     size_t data_len = 8;
 #endif
-    TEST_ASSERT_EQUAL_INT((int)data_len, netapi_send_data(basic_mac_pid,
+    TEST_ASSERT_EQUAL_INT((int)data_len, netapi_send_payload(basic_mac_pid,
                           dest, dest_len, data, data_len));
     TEST_ASSERT_EQUAL_INT(0, unittest_netdev_dummy_check_transmitted(dev,
                           dest, dest_len, data, data_len));
@@ -193,7 +193,7 @@ static void test_basic_mac_send_data_send2(void)
     memcpy(&(expected[4]), TEST_STRING16, data_len);
 
     clist_add((clist_node_t **)&hlist, (clist_node_t *)&hlist_node);
-    TEST_ASSERT_EQUAL_INT((int)sizeof(expected), netapi_send_data2(basic_mac_pid,
+    TEST_ASSERT_EQUAL_INT((int)sizeof(expected), netapi_send_packet(basic_mac_pid,
                           hlist, dest, dest_len, data, data_len));
     TEST_ASSERT_EQUAL_INT(0, unittest_netdev_dummy_check_transmitted(dev,
                           dest, dest_len, expected, data_len + 4));
