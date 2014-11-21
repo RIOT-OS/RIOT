@@ -1,246 +1,329 @@
-/**
- * Syscall implementation for NXP LPC1768
- *
- * Copyright (C) 2013 Oliver Hahm <oliver.hahm@inria.fr>
+/*
+ * Copyright (C) 2014 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup  lpc1768
+ */
+
+/**
+ * @ingroup     cpu_lpc1768
  * @{
- * @file    syscalls.c
- * @author Oliver Hahm <oliver.hahm@inria.fr>
- * @author Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ *
+ * @file
+ * @brief       NewLib system calls implementations for LPC1768
+ *
+ * @author      Michael Baar <michael.baar@fu-berlin.de>
+ * @author      Stefan Pfeiffer <pfeiffer@inf.fu-berlin.de>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Oliver Hahm <oliver.hahm@inria.fr>
+ * @author      Alaeddine Weslati <alaeddine.weslati@inria.fr>
+ *
  * @}
  */
 
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
 #include <stdint.h>
-#include <sys/time.h>
+
+#include "board.h"
+#include "thread.h"
 #include "kernel.h"
+#include "mutex.h"
+#include "ringbuffer.h"
 #include "irq.h"
-#ifdef MODULE_VTIMER
-#include "vtimer.h"
+#include "periph/uart.h"
+
+#ifdef MODULE_UART0
+#include "board_uart0.h"
 #endif
 
 /**
- * @name Heaps (defined in linker script)
- * @{
+ * manage the heap
  */
-#define NUM_HEAPS               1
+extern char _sheap;                 /* start of the heap */
+extern char _eheap;                 /* end of the heap */
+caddr_t heap_top = (caddr_t)&_sheap + 4;
 
-#define DEBUG_SYSCALLS          0
-#if DEBUG_SYSCALLS
-#define PRINTF(...)             printf(__VA_ARGS__)
-#else
-#define PRINTF(...)
+#ifndef MODULE_UART0
+/**
+ * @brief use mutex for waiting on incoming UART chars
+ */
+static mutex_t uart_rx_mutex;
+static char rx_buf_mem[STDIO_RX_BUFSIZE];
+static ringbuffer_t rx_buf;
 #endif
 
-extern uintptr_t __heap_start;      ///< start of heap memory space
-extern uintptr_t __heap_max;        ///< maximum for end of heap memory space
-
-/// current position in heap
-static caddr_t heap[NUM_HEAPS] = {(caddr_t)&__heap_start};
-/// maximum position in heap
-static const caddr_t heap_max[NUM_HEAPS] = {(caddr_t)&__heap_max};
-// start position in heap
-static const caddr_t heap_start[NUM_HEAPS] = {(caddr_t)&__heap_start};
-// current heap in use
-volatile static uint8_t iUsedHeap = 0;
-
-/** @} */
-
-/*-----------------------------------------------------------------------------------*/
-void heap_stats(void) {
-    for(int i = 0; i < NUM_HEAPS; i++)
-        printf("# heap %i: %p -- %p -> %p (%li of %li free)\n", i, heap_start[i], heap[i], heap_max[i],
-            (uint32_t)heap_max[i] - (uint32_t)heap[i], (uint32_t)heap_max[i] - (uint32_t)heap_start[i]);
-}
-/*-----------------------------------------------------------------------------------*/
-void __assert_func(const char *file, int line, const char *func, const char *failedexpr)
+/**
+ * @brief Receive a new character from the UART and put it into the receive buffer
+ */
+void rx_cb(void *arg, char data)
 {
-    printf("#! assertion %s failed\n\t%s() in %s:%d\n", failedexpr, func, file, line );
-    _exit(3);
-}
-/*-----------------------------------------------------------------------------------*/
-void __assert(const char *file, int line, const char *failedexpr)
-{
-    __assert_func(file, line, "?", failedexpr);
-}
-/*-----------------------------------------------------------------------------------*/
-caddr_t _sbrk_r(struct _reent *r, ptrdiff_t incr)
-{
-    if(incr < 0)
-    {
-        puts("[syscalls] Negative Values for _sbrk_r are not supported");
-        r->_errno = ENOMEM;
-        return NULL;
+#ifndef MODULE_UART0
+    (void)arg;
+
+    ringbuffer_add_one(&rx_buf, data);
+    mutex_unlock(&uart_rx_mutex);
+#else
+    if (uart0_handler_pid) {
+        uart0_handle_incoming(data);
+
+        uart0_notify_thread();
     }
-
-    uint32_t cpsr = disableIRQ();
-
-    /* check all heaps for a chunk of the requested size */
-    for( ; iUsedHeap < NUM_HEAPS; iUsedHeap++ ) {
-        caddr_t new_heap = heap[iUsedHeap] + incr;
-
-        if( new_heap <= heap_max[iUsedHeap] ) {
-            caddr_t prev_heap = heap[iUsedHeap];
-            heap[iUsedHeap] = new_heap;
-
-            r->_errno = 0;
-            restoreIRQ(cpsr);
-            return prev_heap;
-        }
-    }
-    restoreIRQ(cpsr);
-
-    r->_errno = ENOMEM;
-    return NULL;
+#endif
 }
-/*---------------------------------------------------------------------------*/
-int _isatty_r(struct _reent *r, int fd)
+
+/**
+ * @brief Initialize NewLib, called by __libc_init_array() from the startup script
+ */
+void _init(void)
 {
-    r->_errno = 0;
-    if( fd == STDOUT_FILENO || fd == STDERR_FILENO )
-        return 1;
-    else
-        return 0;
+#ifndef MODULE_UART0
+    mutex_init(&uart_rx_mutex);
+    ringbuffer_init(&rx_buf, rx_buf_mem, STDIO_RX_BUFSIZE);
+#endif
+    uart_init(STDIO, STDIO_BAUDRATE, rx_cb, 0, 0);
 }
-/*---------------------------------------------------------------------------*/
-_off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int whence)
+
+/**
+ * @brief Free resources on NewLib de-initialization, not used for RIOT
+ */
+void _fini(void)
 {
-    _off_t result = -1;
-    PRINTF("lseek [%i] pos %li whence %i\n", fd, pos, whence);
-
-    r->_errno = ENODEV;
-
-    PRINTF("lseek returned %li (0 is success)\n", result);
-    return result;
+    /* nothing to do here */
 }
-/*---------------------------------------------------------------------------*/
-int _open_r(struct _reent *r, const char *name, int mode)
-{
-    int ret = -1;
-    PRINTF("open '%s' mode %#x\n", name, mode);
 
-    r->_errno = ENODEV; // no such device
-
-    PRINTF("open [%i] errno %i\n", ret, r->_errno);
-    return ret;
-}
-/*---------------------------------------------------------------------------*/
-int _stat_r(struct _reent *r, char *name, struct stat *st)
-{
-    int ret = -1;
-    PRINTF("_stat_r '%s' \n", name);
-    r->_errno = ENODEV; // no such device
-    PRINTF("_stat_r [%i] errno %i\n", ret, r->_errno);
-    return ret;
-}
-/*---------------------------------------------------------------------------*/
-int _fstat_r(struct _reent *r, int fd, struct stat * st)
-{
-    int ret = -1;
-
-    r->_errno = 0;
-    memset(st, 0, sizeof(*st));
-    if (fd == STDOUT_FILENO || fd == STDERR_FILENO) {
-        st->st_mode = S_IFCHR;
-        ret = 0;
-    }
-    else {
-        r->_errno = ENODEV;
-    }
-    return ret;
-}
-/*---------------------------------------------------------------------------*/
-int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
-{
-    int result = EOF;
-    r->_errno = EBADF;
-
-    switch(fd) {
-        case STDOUT_FILENO:
-        case STDERR_FILENO:
-        {
-                //FIXME impl fw_puts
-                //char* chars = (char*) data;
-                for(int i = 0;i < count;i++) {
-                  //USART_SendData(USART2, chars[i]);
-
-                  /* Loop until the end of transmission */
-                  //while (USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET){}
-                }
-
-                return count;
-                //result = fw_puts((char*)data, count);
-        }
-            break;
-
-        default:
-            break;
-    }
-
-    return result;
-}
-/*---------------------------------------------------------------------------*/
-int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
-{
-    int result = -1;
-    r->_errno = EBADF;
-    return result;
-}
-/*---------------------------------------------------------------------------*/
-int _close_r(struct _reent *r, int fd)
-{
-    int ret = -1;
-    r->_errno = EBADF;
-    return ret;
-}
-/*---------------------------------------------------------------------------*/
-int _unlink_r(struct _reent *r, char* path)
-{
-    int ret = -1;
-    r->_errno = ENODEV;
-    return ret;
-}
-/*---------------------------------------------------------------------------*/
+/**
+ * @brief Exit a program without cleaning up files
+ *
+ * If your system doesn't provide this, it is best to avoid linking with subroutines that
+ * require it (exit, system).
+ *
+ * @param n     the exit code, 0 for all OK, >0 for not OK
+ */
 void _exit(int n)
 {
     printf("#! exit %i: resetting\n", n);
-
-    //FIXME write out all peripherie buffers stdout flush
     NVIC_SystemReset();
     while(1);
 }
-/*---------------------------------------------------------------------------*/
-pid_t _getpid(void)
+
+/**
+ * @brief Allocate memory from the heap.
+ *
+ * The current heap implementation is very rudimentary, it is only able to allocate
+ * memory. But it does not
+ * - have any means to free memory again
+ *
+ * @return [description]
+ */
+caddr_t _sbrk_r(struct _reent *r, ptrdiff_t incr)
+{
+    unsigned int state = disableIRQ();
+    caddr_t res = heap_top;
+
+    if (((incr > 0) && ((heap_top + incr > &_eheap) || (heap_top + incr < res))) ||
+        ((incr < 0) && ((heap_top + incr < &_sheap) || (heap_top + incr > res)))) {
+        r->_errno = ENOMEM;
+        res = (void *) -1;
+    }
+    else {
+        heap_top += incr;
+    }
+
+    restoreIRQ(state);
+    return res;
+}
+
+/**
+ * @brief Get the process-ID of the current thread
+ *
+ * @return      the process ID of the current thread
+ */
+int _getpid(void)
 {
     return sched_active_pid;
 }
-/*---------------------------------------------------------------------------*/
+
+/**
+ * @brief Send a signal to a given thread
+ *
+ * @param r     TODO
+ * @param pid   TODO
+ * @param sig   TODO
+ *
+ * @return      TODO
+ */
 __attribute__ ((weak))
 int _kill_r(struct _reent *r, int pid, int sig)
 {
     r->_errno = ESRCH;                      /* not implemented yet */
     return -1;
 }
-/*---------------------------------------------------------------------------*/
-#ifdef MODULE_VTIMER
-int _gettimeofday(struct timeval *tp, void *restrict tzp) {
-    (void) tzp;
-    vtimer_gettimeofday(tp);
-    return 0;
-}
-#endif
 
-void _init(void){}
-void _fini(void){}
+/**
+ * @brief Open a file
+ *
+ * @param r     TODO
+ * @param name  TODO
+ * @param mode  TODO
+ *
+ * @return      TODO
+ */
+int _open_r(struct _reent *r, const char *name, int mode)
+{
+    r->_errno = ENODEV;                     /* not implemented yet */
+    return -1;
+}
+
+/**
+ * @brief Read from a file
+ *
+ * All input is read from UART_0. The function will block until a byte is actually read.
+ *
+ * Note: the read function does not buffer - data will be lost if the function is not
+ * called fast enough.
+ *
+ * TODO: implement more sophisticated read call.
+ *
+ * @param r     TODO
+ * @param fd    TODO
+ * @param buffer TODO
+ * @param int   TODO
+ *
+ * @return      TODO
+ */
+int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
+{
+#ifndef MODULE_UART0
+    while (rx_buf.avail == 0) {
+        mutex_lock(&uart_rx_mutex);
+    }
+    return ringbuffer_get(&rx_buf, (char*)buffer, rx_buf.avail);
+#else
+    char *res = (char*)buffer;
+    res[0] = (char)uart0_readc();
+    return 1;
+#endif
+}
+
+/**
+ * @brief Write characters to a file
+ *
+ * All output is currently directed to UART_0, independent of the given file descriptor.
+ * The write call will further block until the byte is actually written to the UART.
+ *
+ * TODO: implement more sophisticated write call.
+ *
+ * @param r     TODO
+ * @param fd    TODO
+ * @param data  TODO
+ * @param int   TODO
+ *
+ * @return      TODO
+ */
+int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
+{
+    int i = 0;
+
+    while (i < count) {
+        uart_write_blocking(STDIO, ((char*)data)[i++]);
+    }
+
+    return i;
+}
+
+/**
+ * @brief Close a file
+ *
+ * @param r     TODO
+ * @param fd    TODO
+ *
+ * @return      TODO
+ */
+int _close_r(struct _reent *r, int fd)
+{
+    r->_errno = ENODEV;                     /* not implemented yet */
+    return -1;
+}
+
+/**
+ * @brief Set position in a file
+ *
+ * @param r     TODO
+ * @param fd    TODO
+ * @param pos   TODO
+ * @param dir   TODO
+ *
+ * @return      TODO
+ */
+_off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int dir)
+{
+    r->_errno = ENODEV;                     /* not implemented yet */
+    return -1;
+}
+
+/**
+ * @brief Status of an open file
+ *
+ * @param r     TODO
+ * @param fd    TODO
+ * @param stat  TODO
+ *
+ * @return      TODO
+ */
+int _fstat_r(struct _reent *r, int fd, struct stat * st)
+{
+    r->_errno = ENODEV;                     /* not implemented yet */
+    return -1;
+}
+
+/**
+ * @brief Status of a file (by name)
+ *
+ * @param r     TODO
+ * @param name  TODO
+ * @param stat  TODO
+ *
+ * @return      TODO
+ */
+int _stat_r(struct _reent *r, char *name, struct stat *st)
+{
+    r->_errno = ENODEV;                     /* not implemented yet */
+    return -1;
+}
+
+/**
+ * @brief Query whether output stream is a terminal
+ *
+ * @param r     TODO
+ * @param fd    TODO
+ *
+ * @return      TODO
+ */
+int _isatty_r(struct _reent *r, int fd)
+{
+    r->_errno = 0;
+    return -1;
+}
+
+/**
+ * @brief  Remove a file's directory entry
+ *
+ * @param r     TODO
+ * @param path  TODO
+ *
+ * @return      TODO
+ */
+int _unlink_r(struct _reent *r, char* path)
+{
+    r->_errno = ENODEV;                     /* not implemented yet */
+    return -1;
+}
 
 /**
  * @brief Send a signal to a thread
