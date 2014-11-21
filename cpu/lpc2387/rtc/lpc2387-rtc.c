@@ -17,7 +17,6 @@
 #include "periph/rtc.h"
 #include "VIC.h"
 #include "lpc2387.h"
-#include "lpc2387-rtc.h"
 #include "lpm.h"
 
 #define ENABLE_DEBUG (0)
@@ -239,13 +238,3 @@ void rtc_reset(void)
     epoch = 0;
 }
 
-void gettimeofday_r(struct _reent *r, struct timeval *ptimeval, struct timezone *ptimezone)
-{
-    (void) ptimezone; /* unused */
-
-    r->_errno = 0;
-
-    if (ptimeval != NULL) {
-        rtc_time(ptimeval);
-    }
-}
