@@ -31,7 +31,7 @@ int main(void)
 	adc_t dev;
 	dev = ADC_0;
 	adc_precision_t pre;
-	pre = ADC_RES_16BIT; // 6BIT & 14BIT is not valid
+	pre = ADC_RES_12BIT; // 6BIT & 14BIT is not valid
 
 	int response = adc_init(dev, pre);
 	handle_init_response(response);
@@ -42,7 +42,7 @@ int main(void)
     {
     	result = adc_sample(dev, 0);
     	//printf("Result: " );
-    	printf("%u\n\r", result);    	
+    	printf("%u\n", result);    	
     }
     
     return 0;

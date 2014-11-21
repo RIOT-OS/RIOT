@@ -213,13 +213,6 @@ extern "C" {
 #define ADC_0_STATUS_WINDOW			(1UL << 1)
 #define ADC_0_STATUS_OVERRUN		(1UL << 2) 	
 
-
-//#define ADC_0_CLKEN()       PM->APBCMASK//(RCC->APB2ENR |= RCC_APB2ENR_ADCEN)
-//#define ADC_0_CLKDIS()      //(RCC->APB2ENR &= ~(RCC_APB2ENR_ADCEN))
-//#define ADC_0_PORT          //GPIOC
-//#define ADC_0_PORT_CLKEN()  //(RCC->AHBENR |= RCC_AHBENR_GPIOCEN)
-
-
 /* ADC 0 Positive Input Pins */
 #define ADC_0_POS_INPUT		ADC_INPUTCTRL_MUXPOS_PIN6
 
@@ -246,7 +239,7 @@ extern "C" {
 #define ADC_0_REF_INT_1V	ADC_REFCTRL_REFSEL_INT1V
 #define ADC_0_REF_EXT_B		ADC_REFCTRL_REFSEL_AREFB
 #define ADC_0_REF_COM_EN	0 // default
-#define ADC_0_REF_DEFAULT	ADC_0_REF_INT_1V // Use this to define the value used
+#define ADC_0_REF_DEFAULT	ADC_REFCTRL_REFSEL_AREFB//ADC_0_REF_INT_1V // Use this to define the value used
 
 /* ADC 0 ACCUMULATE */
 #define ADC_0_ACCUM_DISABLE	ADC_AVGCTRL_SAMPLENUM_1
@@ -260,7 +253,7 @@ extern "C" {
 #define ADC_0_ACCUM_256		ADC_AVGCTRL_SAMPLENUM_256
 #define ADC_0_ACCUM_512		ADC_AVGCTRL_SAMPLENUM_512
 #define ADC_0_ACCUM_1024	ADC_AVGCTRL_SAMPLENUM_1024
-#define ADC_0_ACCUM_DEFAULT	ADC_0_ACCUM_1024 // ADC_0_ACCUM_DISABLE // Use this to define the value used
+#define ADC_0_ACCUM_DEFAULT	ADC_AVGCTRL_SAMPLENUM_32//ADC_0_ACCUM_1024 // ADC_0_ACCUM_DISABLE // Use this to define the value used
 
 /* ADC 0 DEVIDE RESULT */
 #define ADC_0_DIV_RES_DISABLE	0
