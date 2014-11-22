@@ -43,7 +43,8 @@ script:
     - make -s -C ./examples/default info-concurrency
     - git rebase riot/master || git rebase --abort
 
-    - ./dist/tools/licenses/check.sh master || exit
+    - ./dist/tools/licenses/check.sh master --diff-filter=MR
+    - ./dist/tools/licenses/check.sh master --diff-filter=AC || exit
 
 # TODO:
 #   Remove the `AC` argument when all headers have been
