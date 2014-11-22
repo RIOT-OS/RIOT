@@ -1,21 +1,21 @@
-/**
- * Native CPU periph/rtc.h implementation
- *
- * The native rtc implementation uses POSIX system calls to simulate a
- * real-time clock.
- *
- * Setting the clock will be implemented using a delta variable.
- *
- * Copyright (C) 2013 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
+/*
+ * Copyright (C) 2013, 2014 Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
+ */
+
+/**
+ * Native CPU periph/rtc.h implementation
+ *
+ * The implementation uses POSIX system calls to emulate a real-time
+ * clock based on the system clock.
  *
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
  *
  * @ingroup native_cpu
- * @ingroup rtc
+ * @defgroup native_rtc
  * @file
  */
 
@@ -60,10 +60,11 @@ void rtc_poweroff(void)
 
 int rtc_set_time(struct tm *ttime)
 {
+    /* TODO: implemented setting using a delta */
     DEBUG("rtc_set_time()\n");
 
     (void)ttime; /* not implemented atm */
-    printf("setting time not supported.");
+    warnx("rtc_set_time: not implemented");
 
     return -1;
 }
@@ -91,7 +92,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     (void) cb;
     (void) arg;
 
-    warnx("rtc_set_alarm: not implemeted");
+    warnx("rtc_set_alarm: not implemented");
 
     return -1;
 }
@@ -100,12 +101,12 @@ int rtc_get_alarm(struct tm *time)
 {
     (void) time;
 
-    warnx("rtc_get_alarm: not implemeted");
+    warnx("rtc_get_alarm: not implemented");
 
     return -1;
 }
 
 void rtc_clear_alarm(void)
 {
-    warnx("rtc_clear_alarm: not implemeted");
+    warnx("rtc_clear_alarm: not implemented");
 }
