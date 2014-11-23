@@ -72,6 +72,7 @@ endif
 ifneq (,$(filter ipv6,$(USEMODULE)))
     USEMODULE += ipv6_if
     USEMODULE += ipv6_addr
+    USEMODULE += netapi
     USEMODULE += net_help
 endif
 

@@ -48,6 +48,7 @@ kernel_pid_t ipv6_pid = KERNEL_PID_UNDEF;
 
 static _registry_t _registry[_IPV6_REGISTRY_SIZE];
 static char _ipv6_stack[_IPV6_STACKSIZE];
+static uint8_t _ipv6_default_hop_limit = IPV6_MULTIHOP_HOP_LIMIT;
 
 #ifdef MODULE_IPV6_ROUTER
 
@@ -148,6 +149,85 @@ uint16_t ipv6_pseudo_hdr_csum(const ipv6_hdr_t *ipv6_hdr, uint32_t ul_packet_len
     return sum;
 }
 
+static int _get_option(netapi_conf_t *conf)
+{
+    switch ((ipv6_conf_t)conf->param) {
+        case IPV6_CONF_PROTO:
+            if (conf->data_len < sizeof(netdev_proto_t)) {
+                return -EOVERFLOW;
+            }
+            else {
+                netdev_proto_t *proto = conf->data;
+                *proto = NETDEV_PROTO_IPV6;
+                conf->data_len = sizeof(netdev_proto_t);
+                return conf->data_len;
+            }
+
+        case IPV6_CONF_REGISTRY:
+            if (conf->data_len >= sizeof(kernel_pid_t)) {
+                kernel_pid_t *data = conf->data;
+                int size = 0;
+
+                for (size = 0; size < _IPV6_REGISTRY_SIZE; size++) {
+                    if (i < (conf->data_len / sizeof(kernel_pid_t))) {
+                        data[i] = _registry[i].pid;
+                    }
+                    else {
+                        break;
+                    }
+                }
+
+                conf->data_len = sizeof(kernel_pid_t) * size;
+
+                return conf->data_len;
+            }
+            else {
+                conf->data_len = 0;
+                return 0;
+            }
+
+            break;
+
+        case IPV6_CONF_DEFAULT_HOP_LIMIT:
+            if (conf->data_len == 0) {
+                return -EOVERFLOW;
+            }
+            else {
+                uint8_t *data = conf->data;
+
+                *data = _ipv6_default_hop_limit;
+                conf->data_len = sizeof(uint8_t);
+                return conf->data_len;
+            }
+
+        default:
+            return -ENOTSUP;
+    }
+}
+
+static int _set_option(netapi_conf_t *conf)
+{
+    switch ((ipv6_conf_t)conf->param) {
+        case IPV6_CONF_DEFAULT_HOP_LIMIT:
+            if (conf->data_len > sizeof(uint8_t)) {
+                return -EOVERFLOW;
+            }
+            else if (conf->data_len == 0) {
+                return -EINVAL;
+            }
+            else {
+                uint8_t *data = conf->data;
+
+                _ipv6_default_hop_limit = *data;
+                conf->data_len = sizeof(uint8_t);
+                return conf->data_len;
+            }
+
+        default:
+            return -ENOTSUP;
+    }
+}
+
 static void *_control(void *args)
 {
     msg_t msg_q[_IPV6_MSG_QUEUE_SIZE];
@@ -190,9 +270,13 @@ static void *_control(void *args)
                 break;
 
             case NETAPI_CMD_GET:
+                ack->result = _get_option((netapi_conf_t *)cmd);
+
                 break;
 
             case NETAPI_CMD_SET:
+                ack->result = _set_option((netapi_conf_t *)cmd);
+
                 break;
 
             case NETAPI_CMD_REG:
