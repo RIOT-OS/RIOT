@@ -34,19 +34,6 @@ void adc_clear_status(Adc*, uint32_t);
 bool adc_get_status(Adc*);
 void adc_configure_with_resolution(Adc*, int);
 
-/**
- * @brief Initialization of a given ADC device
- *
- * The ADC will be initialized in synchronous, blocking mode, so no callbacks for finished
- * conversions are required as conversions are presumed to be very fast (somewhere in the
- * range of some us).
- *
- * @param[in] dev           the device to initialize
- * @param[in] precision     the precision to use for conversion
- *
- * @return                  0 on success
- * @return                  -1 on precision not available
- */
 int adc_init(adc_t dev, adc_precision_t precision)
 {
     adc_poweron(dev);
@@ -58,9 +45,6 @@ int adc_init(adc_t dev, adc_precision_t precision)
 
             switch (precision) 
             {
-                case ADC_RES_6BIT: // Not possible!
-                    return -1;
-                    break;
                 case ADC_RES_8BIT:
                     adc_configure_with_resolution(adc, ADC_0_RES_8BIT); 
                     break;
@@ -69,9 +53,6 @@ int adc_init(adc_t dev, adc_precision_t precision)
                     break;
                 case ADC_RES_12BIT:
                     adc_configure_with_resolution(adc, ADC_0_RES_12BIT); 
-                    break;
-                case ADC_RES_14BIT: // Not possible!
-                    return -1;
                     break;
                 case ADC_RES_16BIT:
                     adc_configure_with_resolution(adc, ADC_0_RES_16BIT);            
@@ -95,17 +76,6 @@ int adc_init(adc_t dev, adc_precision_t precision)
     return 0;
 }
 
-/**
- * @brief Start a new conversion by using the given channel.
- *
- * If a conversion on any channel on the given ADC core is in progress, it is aborted.
- *
- * @param[in] dev           the ADC device to use for the conversion
- * @param[in] channel       the channel to convert from
- *
- * @return                  the converted value
- * @return                  -1 on invalid channel
- */
 int adc_sample(adc_t dev, int channel)
 {
     uint16_t result;
@@ -120,20 +90,17 @@ int adc_sample(adc_t dev, int channel)
             adc->SWTRIG.reg |= ADC_SWTRIG_START;
         break;
     #endif
+        default:
+            return -1;
     }
     while(adc_syncing(adc));
     result = adc->RESULT.reg;
-    //CLEAR RESET FLAG
+    /*CLEAR RESET FLAG */
     adc_clear_status(adc, ADC_0_STATUS_RESULT_READY);
     while(!adc_get_status(adc)){} /* MUST NOT BLOCK */
     return result;
 }
 
-/**
- * @brief Enable the power for the given ADC device
- *
- * @param[in] dev           the ADC device to power up
- */
 void adc_poweron(adc_t dev) 
 {
     switch (dev) 
@@ -142,16 +109,12 @@ void adc_poweron(adc_t dev)
         case ADC_0:
             /* Setup generic clock mask for adc */
             PM->APBCMASK.reg |= PM_APBCMASK_ADC;
-            /* Setup generic clock channel for adc */ 
-            //system_gclk_chan_disable(ADC_GCLK_ID); //TODO:                            
+            /* Setup generic clock channel for adc */                             
             GCLK->CLKCTRL.reg |= (ADC_GCLK_ID << GCLK_CLKCTRL_GEN_Pos);
             /* Enable generic clock channel */
-            // Need a "mutex" ???  TODO:  
-            // Select requested generator channel
             *((uint8_t*)&GCLK->CLKCTRL.reg) |= ADC_GCLK_ID;
-            // enable generic clock
+            /* enable generic clock */
             GCLK->CLKCTRL.reg |= GCLK_CLKCTRL_CLKEN;
-            //release mutex TODO:
             break;
     #endif
         default:
@@ -159,11 +122,6 @@ void adc_poweron(adc_t dev)
     }
 }
 
-/**
- * @brief Disable the power for the given ADC device
- *
- * @param[in] dev           the ADC device to power down
- */
 void adc_poweroff(adc_t dev)
 {
     Adc *adc = 0;
@@ -183,45 +141,18 @@ void adc_poweroff(adc_t dev)
     }
 }
 
-/**
- * @brief Helper function to map a converted value to the given integer range.
- *
- * This function is useful for converting sampled ADC values into their physical representation.
- *
- * The min value is asserted to be smaller than the max value.
- *
- * @param[in] dev           the ADC device to read the precision value from (as input interval)
- * @param[in] value         the value to map
- * @param[in] min           the lower bound of the target interval
- * @param[in] max           the upper bound of the target interval
- *
- * @return                  the mapped value
- */
 int adc_map(adc_t dev, int value, int min, int max)
 {
     DEBUG("adc_map Not implemented!\n");
     return 0;
 }
 
-/**
- * @brief Helper function to map a converted value to the given float range
- *
- * @see adc_map
- *
- * @param[in] dev           the ADC device to read the precision value from (as input interval)
- * @param[in] value         the value to map
- * @param[in] min           the lower bound of the target interval
- * @param[in] max           the upper bound of the target interval
- *
- * @return                  the mapped value
- */
 float adc_mapf(adc_t dev, int value, float min, float max)
 {
     DEBUG("adc_mapf Not implemented!\n");
     return 0.0;
 }
 
-/* ADC syncing */
 bool adc_syncing(Adc* adc)
 {
     if(adc->STATUS.reg & ADC_STATUS_SYNCBUSY)
@@ -232,29 +163,35 @@ bool adc_syncing(Adc* adc)
 /* Configure ADC with defined Resolution */
 void adc_configure_with_resolution(Adc* adc, int precision)
 {
-    adc->CTRLA.reg = (ADC_0_RUN_IN_STANDBY << ADC_CTRLA_RUNSTDBY_Pos); // Set RUN_IN_STANDBY register to default
-    adc->REFCTRL.reg = (ADC_0_REF_COM_EN << ADC_REFCTRL_REFCOMP_Pos) | ADC_0_REF_DEFAULT; // Set Reference config register to default
-    adc->AVGCTRL.reg = ADC_AVGCTRL_ADJRES(ADC_0_DIV_RES_DEFAULT) | ADC_0_ACCUM_DEFAULT; // Set the accumaltion and devide results register
-    adc->SAMPCTRL.reg = (ADC_0_SAMPLE_LENGTH << ADC_SAMPCTRL_SAMPLEN_Pos); // Set Sample length register with default value
-    while(adc_syncing(adc)) {/*wait for the ADC to become ready!*/ } 
-
-    /* Configure CTRLB Register*/  // <---- HERE IS THE RESOLUTION SET!
+    /* Set RUN_IN_STANDBY */
+    adc->CTRLA.reg = (ADC_0_RUN_IN_STANDBY << ADC_CTRLA_RUNSTDBY_Pos);
+    /* Set Voltage Reference */
+    adc->REFCTRL.reg = (ADC_0_REF_COM_EN << ADC_REFCTRL_REFCOMP_Pos) | ADC_0_REF_DEFAULT;
+    /* Set the accumlation and devide result */
+    adc->AVGCTRL.reg = ADC_AVGCTRL_ADJRES(ADC_0_DIV_RES_DEFAULT) | ADC_0_ACCUM_DEFAULT;
+    /* Set Sample length */
+    adc->SAMPCTRL.reg = (ADC_0_SAMPLE_LENGTH << ADC_SAMPCTRL_SAMPLEN_Pos);
+    while(adc_syncing(adc));    
+    /* If external vref. Pin setup */
+    if(ADC_0_REF_DEFAULT == ADC_0_REF_EXT_B)
+    {
+        ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_REF_DEFAULT);
+        ADC_0_PORT.PINCFG[ADC_0_REF_DEFAULT].bit.INEN = true;
+        ADC_0_PORT.PINCFG[ADC_0_REF_DEFAULT].bit.PULLEN = false;
+    }
+    while(adc_syncing(adc));
+    /* Configure CTRLB Register HERE IS THE RESOLUTION SET!*/
     adc->CTRLB.reg = 
-        ADC_0_PRESCALER | 
-        /*ADC_0_RES_16BIT*/
+        ADC_0_PRESCALER |
         precision | 
         (ADC_0_CORRECTION_EN << ADC_CTRLB_CORREN_Pos) | 
         (ADC_0_FREE_RUNNING << ADC_CTRLB_FREERUN_Pos) | 
         (ADC_0_LEFT_ADJUST << ADC_CTRLB_LEFTADJ_Pos) |
         (ADC_0_DIFFERENTIAL_MODE << ADC_CTRLB_DIFFMODE_Pos);        
-    while(adc_syncing(adc)) {/*wait for the ADC to become ready!*/ }
-
+    while(adc_syncing(adc));
     /* Configure Window Mode Register */
     adc->WINCTRL.reg = ADC_0_WINDOW_MODE;
-    while(adc_syncing(adc)) {/*wait for the ADC to become ready!*/ }
-
-    //Perhaps lower&upper window must be set, even though it's disabled???
-
+    while(adc_syncing(adc)); 
     /* Configure PIN SCAN MODE & positive & Negative Input Pins */
     adc->INPUTCTRL.reg = 
         ADC_0_GAIN_FACTOR_DEFAULT |
@@ -262,15 +199,12 @@ void adc_configure_with_resolution(Adc* adc, int precision)
         (ADC_0_PIN_SCAN_INPUT_TO_SCAN << ADC_INPUTCTRL_INPUTSCAN_Pos) |
         ADC_0_NEG_INPUT |
         ADC_0_POS_INPUT;
-
     /* Configure event action */
     adc->EVCTRL.reg = ADC_0_EVENT_ACTION;
-
     /* Disable all interrupts */
     adc->INTENCLR.reg =
         (1 << ADC_INTENCLR_SYNCRDY_Pos) | (1 << ADC_INTENCLR_WINMON_Pos) |
-        (1 << ADC_INTENCLR_OVERRUN_Pos) | (1 << ADC_INTENCLR_RESRDY_Pos);     
-
+        (1 << ADC_INTENCLR_OVERRUN_Pos) | (1 << ADC_INTENCLR_RESRDY_Pos);
     /* Load the fixed device calibration constants*/
     adc->CALIB.reg =
         ADC_CALIB_BIAS_CAL(
@@ -291,8 +225,7 @@ void adc_clear_status(Adc* adc, uint32_t status_flag)
     if(status_flag & ADC_0_STATUS_WINDOW)
         interrupt_flags |= ADC_INTFLAG_WINMON;
     if(status_flag & ADC_0_STATUS_OVERRUN)
-        interrupt_flags |= ADC_INTFLAG_OVERRUN; 
-
+        interrupt_flags |= ADC_INTFLAG_OVERRUN;
     /* Clear interrupt flag*/
     adc->INTFLAG.reg = interrupt_flags;
 }

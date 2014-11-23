@@ -120,38 +120,41 @@ extern "C" {
 #define GPIO_3_EXTINT       3
 /** @} */
 
+/** @} */
+
 /**
  * @ ADC Configuration
  * @{
  */
-#define ADC_NUMOF			(1U)
-#define ADC_0_EN			1
+#define ADC_NUMOF		(1U)
+#define ADC_0_EN		1
 #define ADC_MAX_CHANNELS	8
 
 /* ADC 0 device configuration */
 #define ADC_0_DEV 			ADC
+#define	ADC_0_PORT			(PORT->Group[0])
 #define ADC_0_IRQ			ADC_IRQn 	
-#define ADC_0_CHANNELS      8
-
+#define ADC_0_CHANNELS      	8
 /* ADC 0 Default values */
-#define ADC_0_CLK_SOURCE	0 //GCLK_GENERATOR_0
+#define ADC_0_CLK_SOURCE	0 /* GCLK_GENERATOR_0 */
 #define ADC_0_PRESCALER		ADC_CTRLB_PRESCALER_DIV4
 #define ADC_0_WINDOW_MODE	ADC_WINCTRL_WINMODE_DISABLE
-#define ADC_0_CORRECTION_EN 0 // disabled
+
+#define ADC_0_CORRECTION_EN 0 /* disabled */
 #define ADC_0_GAIN_CORRECTION	ADC_GAINCORR_RESETVALUE
 #define ADC_0_OFFSET_CORRECTION	ADC_OFFSETCORR_RESETVALUE
 #define ADC_0_SAMPLE_LENGTH	0
-#define ADC_0_PIN_SCAN_OFFSET_START	0 // disabled
-#define	ADC_0_PIN_SCAN_INPUT_TO_SCAN	0 // disabled 	
-#define ADC_0_LEFT_ADJUST	0 // disabled
-#define ADC_0_DIFFERENTIAL_MODE	0 // disabled
-#define ADC_0_FREE_RUNNING	0 // disabled
-#define ADC_0_EVENT_ACTION	0 // disabled 	
-#define ADC_0_RUN_IN_STANDBY	0 // disabled
+#define ADC_0_PIN_SCAN_OFFSET_START	0 /* disabled */
+#define	ADC_0_PIN_SCAN_INPUT_TO_SCAN	0 /* disabled */	
+#define ADC_0_LEFT_ADJUST	0 /* disabled */
+#define ADC_0_DIFFERENTIAL_MODE	0 /* disabled */
+#define ADC_0_FREE_RUNNING	0 /* disabled */
+#define ADC_0_EVENT_ACTION	0 /* disabled */	
+#define ADC_0_RUN_IN_STANDBY	0 /* disabled */
 
 /* ADC 0 Module Status flags */
 #define ADC_0_STATUS_RESULT_READY	(1UL << 0)
-#define ADC_0_STATUS_WINDOW			(1UL << 1)
+#define ADC_0_STATUS_WINDOW		(1UL << 1)
 #define ADC_0_STATUS_OVERRUN		(1UL << 2) 	
 
 /* ADC 0 Positive Input Pins */
@@ -166,21 +169,21 @@ extern "C" {
 #define ADC_0_GAIN_FACTOR_4X	ADC_INPUTCTRL_GAIN_4X
 #define ADC_0_GAIN_FACTOR_8X	ADC_INPUTCTRL_GAIN_8X
 #define ADC_0_GAIN_FACTOR_16X	ADC_INPUTCTRL_GAIN_16X
+ 	/* Use this to define the value used */
 #define ADC_0_GAIN_FACTOR_DEFAULT	ADC_0_GAIN_FACTOR_1X
 
-/* ADC 0 Resolutions */
-//#define ADC_0_RES_6BIT // NOT POSSIBLE! 	
+/* ADC 0 Resolutions */	
 #define ADC_0_RES_8BIT	ADC_CTRLB_RESSEL_8BIT
 #define ADC_0_RES_10BIT ADC_CTRLB_RESSEL_10BIT
 #define ADC_0_RES_12BIT	ADC_CTRLB_RESSEL_12BIT
-//#define ADC_0_RES_14BIT // NOT POSSIBLE!
 #define ADC_0_RES_16BIT	ADC_CTRLB_RESSEL_16BIT 
 
 /* ADC 0 Voltage reference */
 #define ADC_0_REF_INT_1V	ADC_REFCTRL_REFSEL_INT1V
 #define ADC_0_REF_EXT_B		ADC_REFCTRL_REFSEL_AREFB
-#define ADC_0_REF_COM_EN	0 // default
-#define ADC_0_REF_DEFAULT	ADC_0_REF_INT_1V // Use this to define the value used
+#define ADC_0_REF_COM_EN	0
+/* Use this to define the value used */ 
+#define ADC_0_REF_DEFAULT	ADC_0_REF_EXT_B
 
 /* ADC 0 ACCUMULATE */
 #define ADC_0_ACCUM_DISABLE	ADC_AVGCTRL_SAMPLENUM_1
@@ -194,7 +197,8 @@ extern "C" {
 #define ADC_0_ACCUM_256		ADC_AVGCTRL_SAMPLENUM_256
 #define ADC_0_ACCUM_512		ADC_AVGCTRL_SAMPLENUM_512
 #define ADC_0_ACCUM_1024	ADC_AVGCTRL_SAMPLENUM_1024
-#define ADC_0_ACCUM_DEFAULT	ADC_0_ACCUM_1024 // ADC_0_ACCUM_DISABLE // Use this to define the value used
+/* Use this to define the value used */
+#define ADC_0_ACCUM_DEFAULT	ADC_AVGCTRL_SAMPLENUM_32 
 
 /* ADC 0 DEVIDE RESULT */
 #define ADC_0_DIV_RES_DISABLE	0
@@ -205,9 +209,10 @@ extern "C" {
 #define ADC_0_DIV_RES_32		5
 #define ADC_0_DIV_RES_64		6
 #define ADC_0_DIV_RES_128		7
-#define ADC_0_DIV_RES_DEFAULT	ADC_0_DIV_RES_DISABLE // Use this to define the value used
-	
-/* ADC 0 channel 0 pin config */
+/* Use this to define the value used */
+#define ADC_0_DIV_RES_DEFAULT	ADC_0_DIV_RES_DISABLE 
+
+/* ADC 0 channel 0 pin config - NOT implemented yet */
 #define ADC_0_CH0           PORT_PB08B_ADC_AIN2//10
 #define ADC_0_CH0_PIN       PIN_PB08B_ADC_AIN2//0
 /* ADC 0 channel 1 pin config */
