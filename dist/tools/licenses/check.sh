@@ -11,6 +11,7 @@ TMP="${CHECKROOT}/.tmp"
 ROOT=$(git rev-parse --show-toplevel)
 LICENSES=$(ls "${LICENSEDIR}")
 EXIT_CODE=0
+ERROR_EXIT_CODE="1"
 
 # reset output dir
 rm -fr "${OUTPUT}"
@@ -39,6 +40,13 @@ else
     DIFFFILTER="--diff-filter=ACMR"
 fi
 
+# If the --error-exitcode option is given, consume this parameter
+# and overwrite the default ERROR_EXIT_CODE.
+if echo "${1}" | grep -q '^--error-exitcode='; then
+    ERROR_EXIT_CODE=$(echo ${1} | sed -e 's/--error-exitcode=//')
+    shift 1
+fi
+
 # select files to check
 if [ -z "${BRANCH}" ]; then
     FILES="$(git ls-tree -r --full-tree --name-only HEAD | grep -E '\.([sSch]|cpp)$')"
@@ -60,7 +68,7 @@ for FILE in ${FILES}; do
     if [ ${FAIL} = 1 ]; then
         echo "${FILE}" >> "${UNKNOWN}"
         echo "file has an unknown license header: '${FILE}'"
-        EXIT_CODE=1
+        EXIT_CODE=${ERROR_EXIT_CODE}
     fi
 done
 
