@@ -70,6 +70,9 @@ extern "C" {
 #ifndef IPV6_DEFAULT_MTU
 #define IPV6_DEFAULT_MTU        (1280)
 #endif
+
+#ifndef IPV6_MULTIHOP_HOP_LIMIT
+#define IPV6_MULTIHOP_HOP_LIMIT (64)
 #endif
 
 /**
@@ -93,9 +96,8 @@ typedef enum {
      *          NETDEV_PROTO_IPV6; Only for getting.
      */
     IPV6_CONF_PROTO = NETAPI_CONF_PROTO,
-    IPV6_CONF_REGISTRY = NETAPI_CONF_REGISTRY,  /**< Get for receiver registry. */
+    IPV6_CONF_REGISTRY = NETAPI_CONF_REGISTRY,  /**< Getter for receiver registry. */
     IPV6_CONF_DEFAULT_HOP_LIMIT,    /**< Get or set default hop limit. */
-    IPV6_CONF_ROUTING_PROVIDER,     /**< Set routing provider. */
 } ipv6_conf_t;
 
 /**
@@ -511,6 +513,7 @@ static inline bool ipv6_is_router(void)
 
 static inline int ipv6_register_routing_provider(ipv6_routing_provider_t rp)
 {
+    (void)rp;
     return 0;
 }
 #endif /* MODULE_IPV6_ROUTER */
@@ -531,8 +534,8 @@ static inline int ipv6_register_routing_provider(ipv6_routing_provider_t rp)
 static inline int ipv6_sendto(const ipv6_addr_t *dest, netdev_hlist_t *next_headers,
                               void *payload, size_t payload_len)
 {
-    return netapi_send_data2(ipv6_pid, next_headers, (void *)dest,
-                             sizeof(ipv6_addr_t), payload, payload_len);
+    return netapi_send_packet(ipv6_pid, next_headers, (void *)dest,
+                              sizeof(ipv6_addr_t), payload, payload_len);
 }
 
 /**
