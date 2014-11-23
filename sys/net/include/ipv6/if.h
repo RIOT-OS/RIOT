@@ -123,6 +123,7 @@ typedef struct {
     ipv6_if_addr_t addrs[IPV6_IF_ADDR_NUM]; /**< addresses registered to the interface */
     mutex_t mutex;                          /**< mutex for the interface */
     kernel_pid_t mac_pid;                   /**< MAC layer registered to this interface */
+    uint16_t mtu;                           /**< Maximum Transmission Unit (MTU) for the interface */
 } ipv6_if_t;
 
 /**
@@ -219,6 +220,39 @@ int ipv6_if_get_id_by_mac(kernel_pid_t mac_pid);
 static inline ipv6_if_t *ipv6_if_get_by_mac(kernel_pid_t mac_pid)
 {
     return ipv6_if_get_by_id(ipv6_if_get_id_by_mac(mac_pid));
+}
+
+/**
+ * @brief Set MTU of the interface.
+ *
+ * @details If *if_id* does no identify an interface the call will be ignored.
+ *
+ * @param[in] if_id An interface's ID.
+ * @param[in] mtu   MTU to set.
+ */
+static inline void ipv6_if_set_mtu(int if_id, uint16_t mtu)
+{
+    if (ipv6_if_get_by_id(if_id) != NULL) {
+        ipv6_if_get_by_id(if_id)->mtu = mtu;
+    }
+}
+
+/**
+ * @brief Set MTU of the interface.
+ *
+ * @param[in] if_id An interface's ID.
+ *
+ * @return  MTU of the interface, on success.
+ * @return  0, if *if_id* does not an interface.
+ */
+static inline uint16_t ipv6_if_get_mtu(int if_id)
+{
+    if (ipv6_if_get_by_id(if_id) != NULL) {
+        return ipv6_if_get_by_id(if_id)->mtu;
+    }
+    else {
+        return 0;
+    }
 }
 
 /**

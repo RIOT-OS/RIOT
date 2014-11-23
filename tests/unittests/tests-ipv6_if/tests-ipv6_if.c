@@ -125,6 +125,25 @@ static void test_ipv6_if_get_by_mac(void)
     TEST_ASSERT_NOT_NULL(ipv6_if_get_by_mac(TEST_MAC_PID));
 }
 
+static void test_ipv6_if_set_mtu(void)
+{
+    ipv6_if_set_mtu(if_id, 14836);
+
+    TEST_ASSERT_EQUAL_INT(14836, ipv6_if_get_by_id(if_id)->mtu);
+}
+
+static void test_ipv6_if_get_mtu_unitialized(void)
+{
+    TEST_ASSERT_EQUAL_INT(IPV6_DEFAULT_MTU, ipv6_if_get_mtu(if_id));
+}
+
+static void test_ipv6_if_get_mtu(void)
+{
+    ipv6_if_set_mtu(if_id, 33440);
+
+    TEST_ASSERT_EQUAL_INT(33440, ipv6_if_get_mtu(if_id));
+}
+
 static void test_ipv6_if_add_addr_wrong_interface_with_anycast(void)
 {
     ipv6_addr_t addr = { {
@@ -870,8 +889,8 @@ Test *tests_ipv6_if_uninit_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(uninit_fixtures) {
         new_TestFixture(test_ipv6_if_init_if_EINVAL),
-        new_TestFixture(test_ipv6_if_init_if_EISCONN),
-        new_TestFixture(test_ipv6_if_init_if_ENOBUFS),
+                        new_TestFixture(test_ipv6_if_init_if_EISCONN),
+                        new_TestFixture(test_ipv6_if_init_if_ENOBUFS),
     };
 
     EMB_UNIT_TESTCALLER(ipv6_if_tests, NULL, NULL, uninit_fixtures);
@@ -893,6 +912,9 @@ Test *tests_ipv6_if_init_tests(void)
         new_TestFixture(test_ipv6_if_get_by_mac_KERNEL_PID_UNDEF),
         new_TestFixture(test_ipv6_if_get_by_mac_KERNEL_PID_LAST),
         new_TestFixture(test_ipv6_if_get_by_mac),
+        new_TestFixture(test_ipv6_if_set_mtu),
+        new_TestFixture(test_ipv6_if_get_mtu_unitialized),
+        new_TestFixture(test_ipv6_if_get_mtu),
         new_TestFixture(test_ipv6_if_add_addr_wrong_interface_with_anycast),
         new_TestFixture(test_ipv6_if_add_addr_wrong_interface_without_anycast),
         new_TestFixture(test_ipv6_if_add_unspecified_addr_with_anycast),

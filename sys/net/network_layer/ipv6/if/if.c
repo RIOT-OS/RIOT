@@ -18,6 +18,7 @@
 #include <errno.h>
 
 #include "kernel_macros.h"
+#include "ipv6.h"
 #include "ipv6/if.h"
 
 #define _CHECK(if_id, err_ret) \
@@ -31,6 +32,7 @@ const ipv6_if_t ipv6_if_loopback = {
     { { IPV6_ADDR_LOOPBACK, IPV6_IF_ADDR_FLAGS_UNICAST } },
     MUTEX_INIT,
     KERNEL_PID_UNDEF,
+    IPV6_DEFAULT_MTU
 };
 
 static inline void _reset_addr(ipv6_if_addr_t *a)
@@ -43,6 +45,7 @@ static inline void _reset_addr(ipv6_if_addr_t *a)
 static void _reset_if(ipv6_if_t *ipv6_if)
 {
     ipv6_if->mac_pid = KERNEL_PID_UNDEF;
+    ipv6_if->mtu = IPV6_DEFAULT_MTU;
 
     for (int i = 0; i < IPV6_IF_ADDR_NUM; i++) {
         _reset_addr(ipv6_if->addrs + i);
