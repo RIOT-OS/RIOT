@@ -67,6 +67,11 @@ extern "C" {
  */
 #define IPV6_PROTO_NUM_IPV6_ANY     (256)
 
+#ifndef IPV6_DEFAULT_MTU
+#define IPV6_DEFAULT_MTU        (1280)
+#endif
+#endif
+
 /**
  * @brief   PID of the IPv6 control thread.
  */
