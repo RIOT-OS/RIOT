@@ -6,11 +6,23 @@
  *   Copyright(C) 2006, NXP Semiconductor
  *   All rights reserved.
  *
+ *   Licensed under the Apache License, Version 2.0 (the "License"); you may
+ *   not use this file except in compliance with the License.  You may obtain a
+ *   copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ *   License for the specific language governing permissions and limitations
+ *   under the License.
+ *
  *   History
  *   2005.10.01  ver 1.00    Prelimnary version, first Release
  *   2007.05.17  ver 1.01    several corrections
  *
-******************************************************************************/
+ ******************************************************************************/
 
 #ifndef __LPC23xx_H
 #define __LPC23xx_H
@@ -62,7 +74,7 @@
 #define VICVectAddr31  (*(volatile unsigned long *)(VIC_BASE_ADDR + 0x17C))
 
 /* The name convention below is from previous LPC2000 family MCUs, in LPC23xx/24xx,
-these registers are known as "VICVectPriority(x)". */
+   these registers are known as "VICVectPriority(x)". */
 #define VICVectCntl0   (*(volatile unsigned long *)(VIC_BASE_ADDR + 0x200))
 #define VICVectCntl1   (*(volatile unsigned long *)(VIC_BASE_ADDR + 0x204))
 #define VICVectCntl2   (*(volatile unsigned long *)(VIC_BASE_ADDR + 0x208))
@@ -368,8 +380,8 @@ these registers are known as "VICVectPriority(x)". */
 
 
 /* System Control Block(SCB) modules include Memory Accelerator Module,
-Phase Locked Loop, VPB divider, Power Control, External Interrupt,
-Reset, and Code Security/Debugging */
+   Phase Locked Loop, VPB divider, Power Control, External Interrupt,
+   Reset, and Code Security/Debugging */
 #define SCB_BASE_ADDR   0xE01FC000
 
 /* Memory Accelerator Module (MAM) */
@@ -415,7 +427,7 @@ Reset, and Code Security/Debugging */
 #define SCS            (*(volatile unsigned long *)(SCB_BASE_ADDR + 0x1A0))
 
 /* MPMC(EMC) registers, note: all the external memory controller(EMC) registers
-are for LPC24xx only. */
+   are for LPC24xx only. */
 #define STATIC_MEM0_BASE        0x80000000
 #define STATIC_MEM1_BASE        0x81000000
 #define STATIC_MEM2_BASE        0x82000000
@@ -1059,13 +1071,13 @@ are for LPC24xx only. */
 #define OTG_I2C_CLKLO       (*(volatile unsigned long *)(USBOTG_I2C_BASE_ADDR + 0x10))
 
 /* On LPC23xx, the names are USBClkCtrl and USBClkSt; on LPC24xx, the names are
-OTG_CLK_CTRL and OTG_CLK_STAT respectively. */
+   OTG_CLK_CTRL and OTG_CLK_STAT respectively. */
 #define USBOTG_CLK_BASE_ADDR    0xFFE0CFF0
 #define OTG_CLK_CTRL        (*(volatile unsigned long *)(USBOTG_CLK_BASE_ADDR + 0x04))
 #define OTG_CLK_STAT        (*(volatile unsigned long *)(USBOTG_CLK_BASE_ADDR + 0x08))
 
 /* Note: below three register name convention is for LPC23xx USB device only, match
-with the spec. update in USB Device Section. */
+   with the spec. update in USB Device Section. */
 #define USBPortSel          (*(volatile unsigned long *)(USBOTG_BASE_ADDR + 0x10))
 #define USBClkCtrl          (*(volatile unsigned long *)(USBOTG_CLK_BASE_ADDR + 0x04))
 #define USBClkSt            (*(volatile unsigned long *)(USBOTG_CLK_BASE_ADDR + 0x08))
