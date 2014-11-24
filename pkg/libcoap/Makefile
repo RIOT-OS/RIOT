@@ -15,7 +15,7 @@ endif
 .PHONY: all clean patch reset
 
 all: patch
-	make -C $(PKG_DIR)
+	"$(MAKE)" -C $(PKG_DIR)
 
 patch: $(PKG_DIR)/Makefile
 
