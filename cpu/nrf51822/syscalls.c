@@ -209,6 +209,16 @@ int _open_r(struct _reent *r, const char *name, int mode)
  */
 int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
 {
+    if (fd != STDIN_FILENO) {
+        r->_errno = EBADF;
+        return -1;
+    }
+
+    r->_errno = 0;
+    if (count == 0) {
+        return 0;
+    }
+
 #ifndef MODULE_UART0
     while (rx_buf.avail == 0) {
         mutex_lock(&uart_rx_mutex);
@@ -238,7 +248,13 @@ int _read_r(struct _reent *r, int fd, void *buffer, unsigned int count)
  */
 int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
 {
-    for (int i = 0; i < count; i++) {
+    if ((fd != STDOUT_FILENO) && (fd != STDERR_FILENO)) {
+        r->_errno = EBADF;
+        return -1;
+    }
+
+    r->_errno = 0;
+    for (unsigned i = 0; i < count; i++) {
         uart_write_blocking(STDIO, ((char*)data)[i]);
     }
     return count;
