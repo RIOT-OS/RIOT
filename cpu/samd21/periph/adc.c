@@ -22,7 +22,7 @@
 #include "cpu.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 /* guard in case that no ADC device is defined */
