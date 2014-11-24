@@ -156,6 +156,8 @@ int _getpid(void)
 __attribute__ ((weak))
 int _kill_r(struct _reent *r, int pid, int sig)
 {
+    (void) pid;
+    (void) sig;
     r->_errno = ESRCH;                      /* not implemented yet */
     return -1;
 }
@@ -171,6 +173,8 @@ int _kill_r(struct _reent *r, int pid, int sig)
 __attribute__ ((weak))
 int _kill(int pid, int sig)
 {
+    (void) pid;
+    (void) sig;
     errno = ESRCH;                         /* not implemented yet */
     return -1;
 }
@@ -186,6 +190,8 @@ int _kill(int pid, int sig)
  */
 int _open_r(struct _reent *r, const char *name, int mode)
 {
+    (void) name;
+    (void) mode;
     r->_errno = ENODEV;                     /* not implemented yet */
     return -1;
 }
@@ -270,6 +276,7 @@ int _write_r(struct _reent *r, int fd, const void *data, unsigned int count)
  */
 int _close_r(struct _reent *r, int fd)
 {
+    (void) fd;
     r->_errno = ENODEV;                     /* not implemented yet */
     return -1;
 }
@@ -286,6 +293,9 @@ int _close_r(struct _reent *r, int fd)
  */
 _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int dir)
 {
+    (void) fd;
+    (void) pos;
+    (void) dir;
     r->_errno = ENODEV;                     /* not implemented yet */
     return -1;
 }
@@ -301,6 +311,8 @@ _off_t _lseek_r(struct _reent *r, int fd, _off_t pos, int dir)
  */
 int _fstat_r(struct _reent *r, int fd, struct stat * st)
 {
+    (void) fd;
+    (void) st;
     r->_errno = ENODEV;                     /* not implemented yet */
     return -1;
 }
@@ -316,6 +328,8 @@ int _fstat_r(struct _reent *r, int fd, struct stat * st)
  */
 int _stat_r(struct _reent *r, char *name, struct stat *st)
 {
+    (void) name;
+    (void) st;
     r->_errno = ENODEV;                     /* not implemented yet */
     return -1;
 }
@@ -349,6 +363,7 @@ int _isatty_r(struct _reent *r, int fd)
  */
 int _unlink_r(struct _reent *r, char* path)
 {
+    (void) path;
     r->_errno = ENODEV;                     /* not implemented yet */
     return -1;
 }
