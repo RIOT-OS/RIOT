@@ -88,6 +88,7 @@ uint32_t rtt_get_counter(void)
 
 void rtt_set_counter(uint32_t counter)
 {
+    (void) counter;
     /* not supported for the NRF51822? -> could not find out how to do this */
 }
 

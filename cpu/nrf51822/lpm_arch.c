@@ -22,32 +22,33 @@
 
 void lpm_arch_init(void)
 {
-	/* TODO: needs to be implemented */
+    /* TODO: needs to be implemented */
 }
 
 enum lpm_mode lpm_arch_set(enum lpm_mode target)
 {
-	/* TODO: needs to be implemented */
+    (void) target;
+    /* TODO: needs to be implemented */
     return 0;
 }
 
 enum lpm_mode lpm_arch_get(void)
 {
-	/* TODO: needs to be implemented */
+    /* TODO: needs to be implemented */
     return 0;
 }
 
 void lpm_arch_awake(void)
 {
-	/* TODO: needs to be implemented */
+    /* TODO: needs to be implemented */
 }
 
 void lpm_arch_begin_awake(void)
 {
-	/* TODO: needs to be implemented */
+    /* TODO: needs to be implemented */
 }
 
 void lpm_arch_end_awake(void)
 {
-	/* TODO: needs to be implemented */
+    /* TODO: needs to be implemented */
 }

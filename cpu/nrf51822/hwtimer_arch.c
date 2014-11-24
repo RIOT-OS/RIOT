@@ -32,6 +32,7 @@ void (*timeout_handler)(int);
 
 void hwtimer_arch_init(void (*handler)(int), uint32_t fcpu)
 {
+    (void) fcpu;
     timeout_handler = handler;
     timer_init(HW_TIMER, 1, &irq_handler);
 }
