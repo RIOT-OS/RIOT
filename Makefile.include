@@ -37,6 +37,7 @@ ifeq (, ${JENKINS_URL})
   ifeq (0,  $(shell tput colors 2>&1 > /dev/null; echo $$?))
     COLOR_GREEN  := \033[1;32m
     COLOR_RED    := \033[1;31m
+    COLOR_YELLOW := \033[1;33m
     COLOR_PURPLE := \033[1;35m
     COLOR_RESET  := \033[0m
     ifeq ($(OS),Darwin)
@@ -316,6 +317,7 @@ include $(RIOTBASE)/Makefile.vars
 # Warn if the selected board and drivers don't provide all needed featues:
 ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
   EXPECT_ERRORS :=
+  EXPECT_CONFLICT :=
 
   # Test if there where dependencies against a module in DISABLE_MODULE.
   ifneq (, $(filter $(DISABLE_MODULE), $(USEMODULE)))
@@ -329,6 +331,17 @@ ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
     $(shell $(COLOR_ECHO) "$(COLOR_RED)There are unsatisfied feature requirements:$(COLOR_RESET)"\
                           "$(sort $(filter-out $(FEATURES_PROVIDED) $(FEATURES_OPTIONAL), $(FEATURES_REQUIRED)))" 1>&2)
     EXPECT_ERRORS := 1
+  endif
+
+  # Test if any required feature conflict with another one.
+  CONFLICT := $(foreach var,$(FEATURES_CONFLICT),$(if $(filter $(words $(subst :, ,$(var))),$(words $(filter $(FEATURES_REQUIRED),$(subst :, ,$(var))))),$(subst :, ,$(var))))
+  ifneq (, $(strip $(CONFLICT)))
+    $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)The following features may conflict:$(COLOR_RESET)"\
+                          "$(COLOR_GREEN)$(sort $(filter $(FEATURES_REQUIRED), $(CONFLICT)))$(COLOR_RESET)" 1>&2)
+    ifneq (, $(FEATURES_CONFLICT_MSG))
+        $(shell $(COLOR_ECHO) "$(COLOR_YELLOW)Rationale: $(COLOR_RESET)$(FEATURES_CONFLICT_MSG)" 1>&2)
+    endif
+    EXPECT_CONFLICT := 1
   endif
 
   # If there is a whitelist, then test if the board is whitelisted.
@@ -347,9 +360,14 @@ ifneq (, $(filter all, $(if $(MAKECMDGOALS), $(MAKECMDGOALS), all)))
     endif
   endif
 
+  ifneq (, $(EXPECT_CONFLICT))
+    $(shell $(COLOR_ECHO) "\n$(COLOR_YELLOW)EXPECT undesired behaviour!$(COLOR_RESET)" 1>&2)
+  endif
+
   ifneq (, $(EXPECT_ERRORS))
     $(shell $(COLOR_ECHO) "\n\n$(COLOR_RED)EXPECT ERRORS!$(COLOR_RESET)\n\n" 1>&2)
   endif
+
 endif
 
 else # RIOT_VERSION
