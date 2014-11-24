@@ -19,6 +19,11 @@
 #include "kernel_types.h"
 #include "transceiver.h"
 #include "msg.h"
+
+#define ENABLE_DEBUG (0)
+#if ENABLE_DEBUG
+#define DEBUG_ENABLED
+#endif
 #include "debug.h"
 
 /* circular buffer for incoming 802.15.4 packets */
@@ -73,7 +78,7 @@ void cc2420_rx_handler(void)
 
     /* follow-up to transceiver module if adequate */
     if (cc2420_rx_buffer[rx_buffer_next].frame.fcf.frame_type != IEEE_802154_ACK_FRAME) {
-#ifdef DEBUG
+#ifdef DEBUG_ENABLED
         ieee802154_frame_print_fcf_frame(&cc2420_rx_buffer[rx_buffer_next].frame);
 #endif
 
@@ -86,12 +91,11 @@ void cc2420_rx_handler(void)
         }
     }
 
-#ifdef DEBUG
+#ifdef DEBUG_ENABLED
     else {
         DEBUG("GOT ACK for SEQ %u\n", cc2420_rx_buffer[rx_buffer_next].frame.seq_nr);
         ieee802154_frame_print_fcf_frame(&cc2420_rx_buffer[rx_buffer_next].frame);
     }
-
 #endif
 
     /* shift to next buffer element */
