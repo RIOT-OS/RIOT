@@ -53,8 +53,8 @@ extern "C" {
  * @name Define UART device and baudrate for stdio
  * @{
  */
-#define STDIO               UART_0
-#define STDIO_BAUDRATE      (115200U)
+#define STDIO               UART_1
+#define STDIO_BAUDRATE      (9600U)
 #define STDIO_BUFSIZE		(64U)
 /** @} */
 
@@ -85,10 +85,6 @@ extern "C" {
 #define LED_RED_OFF         LED_OFF
 #define LED_RED_TOGGLE      LED_TOGGLE
 /** @} */
-/**
- * Define the type for the radio packet length for the transceiver
- */
-typedef uint8_t radio_packet_length_t;
 
 /**
  * @brief Define the type for the radio packet length for the transceiver

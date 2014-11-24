@@ -38,11 +38,7 @@
 #endif
 
 /* increase when ENABLE_DEBUG in chardev_thread is set to 1! */
-<<<<<<< HEAD
 #define UART0_STACKSIZE     (KERNEL_CONF_STACKSIZE_DEFAULT - 512)
-=======
-#define UART0_STACKSIZE     (512)
->>>>>>> 71a96ac1632dc79a1ddf2e221b93e0c5d5678f5d
 
 ringbuffer_t uart0_ringbuffer;
 kernel_pid_t uart0_handler_pid = KERNEL_PID_UNDEF;

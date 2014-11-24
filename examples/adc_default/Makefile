@@ -15,5 +15,7 @@ CFLAGS += -DDEVELHELP
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+#USEMODULE += uart0
+
 include $(RIOTBASE)/Makefile.include
  
