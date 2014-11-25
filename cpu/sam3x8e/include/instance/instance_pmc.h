@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_PMC_INSTANCE_
 #define _SAM3XA_PMC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for PMC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_PMC_SCER            (0x400E0600U) /**< \brief (PMC) System Clock Enable Register */
@@ -86,5 +90,9 @@
 #define REG_PMC_PCSR1  (*(RoReg*)0x400E0708U) /**< \brief (PMC) Peripheral Clock Status Register 1 */
 #define REG_PMC_PCR    (*(RwReg*)0x400E070CU) /**< \brief (PMC) Peripheral Control Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_PMC_INSTANCE_ */

@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_TWI1_INSTANCE_
 #define _SAM3XA_TWI1_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for TWI1 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_TWI1_CR            (0x40090000U) /**< \brief (TWI1) Control Register */
@@ -76,5 +80,9 @@
 #define REG_TWI1_PTCR (*(WoReg*)0x40090120U) /**< \brief (TWI1) Transfer Control Register */
 #define REG_TWI1_PTSR (*(RoReg*)0x40090124U) /**< \brief (TWI1) Transfer Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_TWI1_INSTANCE_ */

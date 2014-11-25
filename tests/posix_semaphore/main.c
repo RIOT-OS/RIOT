@@ -25,7 +25,7 @@
 #include "thread.h"
 #include "semaphore.h"
 
-#define SEMAPHORE_TEST_THREADS 10
+#define SEMAPHORE_TEST_THREADS 5
 char test1_thread_stack[KERNEL_CONF_STACKSIZE_MAIN];
 char test2_thread_stack[SEMAPHORE_TEST_THREADS][KERNEL_CONF_STACKSIZE_MAIN];
 
@@ -70,18 +70,16 @@ static void test1(void)
                                      test1_second_thread,
                                      NULL,
                                      "second");
-
     if (pid == KERNEL_PID_UNDEF) {
         puts("first: thread create failed");
     }
-
     puts("first: thread created");
 
     puts("first: sem_getvalue");
     int val;
 
     if (sem_getvalue(&s, &val) != 0 || val != 0) {
-        puts("first: sem_getvalue failed");
+        puts("first: sem_getvalue FAILED");
     }
 
     puts("first: sem_getvalue != 0");
@@ -95,7 +93,7 @@ static void test1(void)
     puts("first: sem_trywait");
 
     if (sem_trywait(&s) != -1) {
-        puts("first: sem_trywait failed");
+        puts("first: sem_trywait FAILED");
     }
 
     puts("first: sem_trywait done");
@@ -103,7 +101,7 @@ static void test1(void)
     puts("first: sem_post");
 
     if (sem_post(&s) != 1) {
-        puts("first: sem_post failed");
+        puts("first: sem_post FAILED");
     }
 
     puts("first: sem_post done");
@@ -113,21 +111,16 @@ static void test1(void)
     puts("first: sem_destroy");
 
     if (sem_destroy(&s) != 0) {
-        puts("first: sem_destroy failed");
+        puts("first: sem_destroy FAILED");
     }
 
     puts("first: end");
 }
 
-static void *priority_sema_thread(void *arg)
+static void *priority_sema_thread(void *name)
 {
-    (void) arg;
     sem_wait(&s);
-#ifdef DEVELHELP
-    printf("Thread '%s' woke up.\n", thread_getname(thread_getpid()));
-#else
-    printf("Thread with PID '%" PRIkernel_pid "' woke up.\n", thread_getpid());
-#endif
+    printf("Thread '%s' woke up.\n", (const char *) name);
     return NULL;
 }
 
@@ -137,7 +130,7 @@ void test2(void)
     puts("first: sem_init");
 
     if (sem_init(&s, 0, 0) != 0) {
-        puts("first: sem_init failed");
+        puts("first: sem_init FAILED");
     }
 
     for (int i = 0; i < SEMAPHORE_TEST_THREADS; i++) {
@@ -150,11 +143,11 @@ void test2(void)
                                          priority,
                                          CREATE_STACKTEST,
                                          priority_sema_thread,
-                                         NULL,
+                                         names[i],
                                          names[i]);
 
         if (pid == KERNEL_PID_UNDEF) {
-            puts("first: thread create failed");
+            puts("first: thread create FAILED");
         }
 
         printf("first: thread created: %s (%d/%d)\n", names[i], i + 1, SEMAPHORE_TEST_THREADS);
@@ -171,10 +164,10 @@ void test2(void)
 
 int main(void)
 {
-    puts("#########################");
+    puts("######################### TEST1:");
     test1();
-    puts("#########################");
+    puts("######################### TEST2:");
     test2();
-    puts("#########################");
+    puts("######################### DONE");
     return 0;
 }

@@ -27,6 +27,12 @@
 #ifndef TEST_LSM303DLHC_ACC_ADDR
 #error "TEST_LSM303DLHC_ACC_ADDR not defined"
 #endif
+#ifndef TEST_LSM303DLHC_ACC_PIN
+#error "TEST_LSM303DLHC_ACC_PIN not defined"
+#endif
+#ifndef TEST_LSM303DLHC_MAG_PIN
+#error "TEST_LSM303DLHC_MAG_PIN not defined"
+#endif
 
 #include <stdio.h>
 
@@ -38,8 +44,6 @@
 #define ACC_SCALE   LSM303DLHC_ACC_SCALE_2G
 #define MAG_S_RATE  LSM303DLHC_MAG_SAMPLE_RATE_75HZ
 #define MAG_GAIN    LSM303DLHC_MAG_GAIN_400_355_GAUSS
-#define ACC_PIN     GPIO_2
-#define MAG_PIN     GPIO_8
 
 int main(void)
 {
@@ -51,7 +55,7 @@ int main(void)
     puts("LSM303DLHC temperature test application\n");
     printf("Initializing LSM303DLHC sensor at I2C_%i... ", TEST_LSM303DLHC_I2C);
 
-    if (lsm303dlhc_init(&dev, TEST_LSM303DLHC_I2C, ACC_PIN, MAG_PIN,
+    if (lsm303dlhc_init(&dev, TEST_LSM303DLHC_I2C, TEST_LSM303DLHC_ACC_PIN, TEST_LSM303DLHC_MAG_PIN,
                         TEST_LSM303DLHC_ACC_ADDR, ACC_S_RATE, ACC_SCALE,
                         TEST_LSM303DLHC_MAG_ADDR, MAG_S_RATE, MAG_GAIN) == 0) {
         puts("[OK]\n");

@@ -248,35 +248,28 @@ extern "C" {
  * @name I2C configuration
  * @{
  */
-#define I2C_NUMOF           (0U)                                                /* TODO !!!!!!! */
-#define I2C_0_EN            0
-#define I2C_0_EN            0
+#define I2C_NUMOF           (1U)
+#define I2C_0_EN            1
+#define I2C_IRQ_PRIO        1
+#define I2C_APBCLK          (42000000U)
 
-/* SPI 0 device configuration */
-#define I2C_0_DEV
-#define I2C_0_CLKEN()
-#define I2C_0_ISR
-#define I2C_0_IRQ
-#define I2C_0_IRQ_PRIO
-/* SPI 0 pin configuration */
-#define I2C_0_PORT
-#define I2C_0_PINS
-#define I2C_0_PORT_CLKEN()
-#define I2C_0_SCL_AFCFG()
-#define I2C_0_SDA_AFCFG()
-
-/* SPI 1 device configuration */
-#define I2C_1_DEV
-#define I2C_1_CLKEN()
-#define I2C_1_ISR
-#define I2C_1_IRQ
-#define I2C_1_IRQ_PRIO
-/* SPI 1 pin configuration */
-#define I2C_1_PORT
-#define I2C_1_PINS
-#define I2C_1_PORT_CLKEN()
-#define I2C_1_SCL_AFCFG()
-#define I2C_1_SDA_AFCFG()
+/* I2C 0 device configuration */
+#define I2C_0_DEV           I2C1
+#define I2C_0_CLKEN()       (RCC->APB1ENR |= RCC_APB1ENR_I2C1EN)
+#define I2C_0_CLKDIS()      (RCC->APB1ENR &= ~(RCC_APB1ENR_I2C1EN))
+#define I2C_0_EVT_IRQ       I2C1_EV_IRQn
+#define I2C_0_EVT_ISR       isr_i2c1_ev
+#define I2C_0_ERR_IRQ       I2C1_ER_IRQn
+#define I2C_0_ERR_ISR       isr_i2c1_er
+/* I2C 0 pin configuration */
+#define I2C_0_SCL_PORT      GPIOB
+#define I2C_0_SCL_PIN       6
+#define I2C_0_SCL_AF        4
+#define I2C_0_SCL_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
+#define I2C_0_SDA_PORT      GPIOB
+#define I2C_0_SDA_PIN       7
+#define I2C_0_SDA_AF        4
+#define I2C_0_SDA_CLKEN()   (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN)
 /** @} */
 
 /**

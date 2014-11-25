@@ -42,6 +42,11 @@
 
 #ifndef NATIVE_MAX_DATA_LENGTH
 #include "tap.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef MODULE_SIXLOWPAN
 #define NATIVE_MAX_DATA_LENGTH (127)
 #else
@@ -155,5 +160,10 @@ uint16_t nativenet_get_pan(void);
  * Enable transceiver rx mode
  */
 void nativenet_switch_to_rx(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 /** @} */
 #endif /* NATIVENET_H */

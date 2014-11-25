@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_PIOF_INSTANCE_
 #define _SAM3XA_PIOF_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for PIOF peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_PIOF_PER             (0x400E1800U) /**< \brief (PIOF) PIO Enable Register */
@@ -120,5 +124,9 @@
 #define REG_PIOF_WPMR   (*(RwReg*)0x400E18E4U) /**< \brief (PIOF) Write Protect Mode Register */
 #define REG_PIOF_WPSR   (*(RoReg*)0x400E18E8U) /**< \brief (PIOF) Write Protect Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_PIOF_INSTANCE_ */

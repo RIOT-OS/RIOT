@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_TRNG_INSTANCE_
 #define _SAM3XA_TRNG_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for TRNG peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_TRNG_CR             (0x400BC000U) /**< \brief (TRNG) Control Register */
@@ -46,5 +50,9 @@
 #define REG_TRNG_ISR   (*(RoReg*)0x400BC01CU) /**< \brief (TRNG) Interrupt Status Register */
 #define REG_TRNG_ODATA (*(RoReg*)0x400BC050U) /**< \brief (TRNG) Output Data Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_TRNG_INSTANCE_ */

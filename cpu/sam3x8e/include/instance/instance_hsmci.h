@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_HSMCI_INSTANCE_
 #define _SAM3XA_HSMCI_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for HSMCI peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_HSMCI_CR                 (0x40000000U) /**< \brief (HSMCI) Control Register */
@@ -74,5 +78,9 @@
 #define REG_HSMCI_WPSR      (*(RoReg*)0x400000E8U) /**< \brief (HSMCI) Write Protection Status Register */
 #define REG_HSMCI_FIFO      (*(RwReg*)0x40000200U) /**< \brief (HSMCI) FIFO Memory Aperture0 */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_HSMCI_INSTANCE_ */

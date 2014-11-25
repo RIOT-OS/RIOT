@@ -19,6 +19,10 @@
 #ifndef __HWTIMER_CPU_H
 #define __HWTIMER_CPU_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @name Hardware timer configuration
  * @{
@@ -29,6 +33,9 @@
 #define HWTIMER_MAXTICKS    (0xFFFFFF)      /**< 24-bit timer -> see PAN note */
 /** @} */
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __HWTIMER_CPU_H */
 /** @} */

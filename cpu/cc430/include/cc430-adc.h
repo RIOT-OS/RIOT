@@ -36,9 +36,17 @@
 #ifndef CC430_ADC_H
 #define CC430_ADC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern uint16_t adc12_single_conversion(uint16_t ref, uint16_t sht, uint16_t channel);
 
 extern uint16_t adc12_result;
 extern uint8_t  adc12_data_ready;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

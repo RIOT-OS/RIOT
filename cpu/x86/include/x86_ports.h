@@ -29,6 +29,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief        Reads and returns a byte from PORT.
  * @param[in]    port   Port to read from.
@@ -182,5 +186,9 @@ static inline void  __attribute__((always_inline)) io_wait(void)
                  "1: jmp 2f\n"
                  "2:");
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

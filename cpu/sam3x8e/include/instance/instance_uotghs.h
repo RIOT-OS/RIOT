@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_UOTGHS_INSTANCE_
 #define _SAM3XA_UOTGHS_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for UOTGHS peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_UOTGHS_DEVCTRL                 (0x400AC000U) /**< \brief (UOTGHS) Device General Control Register */
@@ -230,5 +234,9 @@
 #define REG_UOTGHS_SFR            (*(WoReg*)0x400AC80CU) /**< \brief (UOTGHS) General Status Set Register */
 #define REG_UOTGHS_FSM            (*(RoReg*)0x400AC82CU) /**< \brief (UOTGHS) General Finite State Machine Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_UOTGHS_INSTANCE_ */

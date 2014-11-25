@@ -257,6 +257,10 @@ void WDT_Handler        ( void );
  * \brief CMSIS includes
  */
 
+#ifdef __cplusplus
+}
+#endif
+
 #include <core_cm3.h>
 #if !defined DONT_USE_CMSIS_INIT
 #include "system_sam3xa.h"
@@ -572,11 +576,6 @@ void WDT_Handler        ( void );
 #define CHIP_FREQ_FWS_1                 (34000000UL) /**< \brief Maximum operating frequency when FWS is 1 */
 #define CHIP_FREQ_FWS_2                 (53000000UL) /**< \brief Maximum operating frequency when FWS is 2 */
 #define CHIP_FREQ_FWS_3                 (78000000UL) /**< \brief Maximum operating frequency when FWS is 3 */
-
-
-#ifdef __cplusplus
-}
-#endif
 
 /*@}*/
 

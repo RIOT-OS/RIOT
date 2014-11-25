@@ -10,11 +10,19 @@
 
 #ifndef __CLANG_COMPAT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #undef HTONS
 #undef HTONL
 #undef HTONLL
 #undef NTOHS
 #undef NTOHL
 #undef NTOHLL
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

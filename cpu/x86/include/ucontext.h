@@ -31,6 +31,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Common stacksize for a signal handler.
  *
@@ -160,6 +164,10 @@ void makecontext(ucontext_t *ucp, makecontext_fun_t func, int argc, ...);
  * Same restrictions apply.
  */
 int swapcontext(ucontext_t *oucp, const ucontext_t *ucp);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

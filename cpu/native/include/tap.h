@@ -21,6 +21,10 @@
 #include "board.h"
 #include "radio/types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * create and/or open tap device "name"
  *
@@ -54,5 +58,9 @@ union eth_frame {
     } field;
     unsigned char buffer[ETHER_MAX_LEN];
 } __attribute__((packed));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TAP_H */

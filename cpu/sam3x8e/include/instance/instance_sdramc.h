@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_SDRAMC_INSTANCE_
 #define _SAM3XA_SDRAMC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for SDRAMC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_SDRAMC_MR            (0x400E0200U) /**< \brief (SDRAMC) SDRAMC Mode Register */
@@ -56,5 +60,9 @@
 #define REG_SDRAMC_CR1  (*(RwReg*)0x400E0228U) /**< \brief (SDRAMC) SDRAMC Configuration Register 1 */
 #define REG_SDRAMC_OCMS (*(RwReg*)0x400E022CU) /**< \brief (SDRAMC) SDRAMC OCMS Register 1 */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_SDRAMC_INSTANCE_ */

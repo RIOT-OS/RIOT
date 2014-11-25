@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_PIOD_INSTANCE_
 #define _SAM3XA_PIOD_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for PIOD peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_PIOD_PER             (0x400E1400U) /**< \brief (PIOD) PIO Enable Register */
@@ -120,5 +124,9 @@
 #define REG_PIOD_WPMR   (*(RwReg*)0x400E14E4U) /**< \brief (PIOD) Write Protect Mode Register */
 #define REG_PIOD_WPSR   (*(RoReg*)0x400E14E8U) /**< \brief (PIOD) Write Protect Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_PIOD_INSTANCE_ */

@@ -2,10 +2,9 @@
  * gpio.h - GPIO driver for redbee
  * Copyright (C) 2013 Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *
- * This source code is licensed under the GNU General Public License,
- * Version 3.  See the file LICENSE for more details.
- *
- * This file is part of RIOT.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
  */
 
 #ifndef GPIO_H
@@ -13,6 +12,10 @@
 
 // TODO: why do we need to include this for macro expansion?
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Structure-based GPIO access
    Example usage:
@@ -155,5 +158,9 @@ enum { _REP(0,0) };
 #undef _V
 
 static volatile struct GPIO_struct * const GPIO = (void *) (0x80000000);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

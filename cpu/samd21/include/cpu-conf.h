@@ -20,6 +20,9 @@
 
 #include "samd21.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name Kernel configuration

@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_GPBR_COMPONENT_
 #define _SAM3XA_GPBR_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR General Purpose Backup Register */
 /* ============================================================================= */
@@ -50,5 +54,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_GPBR_COMPONENT_ */

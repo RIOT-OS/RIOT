@@ -44,6 +44,10 @@
 #ifndef _SAMR21_SERCOM_COMPONENT_
 #define _SAMR21_SERCOM_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR SERCOM */
 /* ========================================================================== */
@@ -1504,5 +1508,9 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /*@}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_SERCOM_COMPONENT_ */

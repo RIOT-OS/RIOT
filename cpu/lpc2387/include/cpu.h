@@ -20,10 +20,18 @@
 #include "lpc2387.h"
 #include "arm_cpu.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern uintptr_t __stack_start;     ///< end of user stack memory space
 
 void lpc2387_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale);
 bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* __CPU_H */

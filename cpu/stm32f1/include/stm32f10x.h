@@ -477,8 +477,16 @@ typedef enum IRQn
   * @}
   */
 
+#ifdef __cplusplus
+}
+#endif
+
 #include "core_cm3.h"
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @addtogroup cpu_specific_Exported_types
   * @{
@@ -8294,8 +8302,16 @@ typedef struct
   * @}
   */
 
+#ifdef __cplusplus
+}
+#endif
+
 #ifdef USE_STDPERIPH_DRIVER
   #include "stm32f10x_conf.h"
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /** @addtogroup cpu_specific_Exported_macro

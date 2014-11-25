@@ -31,6 +31,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Maximum static size of the kernel.
  *
@@ -169,6 +173,10 @@ void x86_release_virtual_pages(uint32_t virtual_start, unsigned pages);
  *            0x0010 is the data segment, from 0x00000000 to 0xFFFFFFFF, non-executable, writable.
  */
 void x86_init_gdt(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

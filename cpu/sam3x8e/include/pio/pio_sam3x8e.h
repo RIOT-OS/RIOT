@@ -30,6 +30,10 @@
 #ifndef _SAM3X8E_PIO_
 #define _SAM3X8E_PIO_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define PIO_PA0              (1u << 0)  /**< \brief Pin Controlled by PA0 */
 #define PIO_PA1              (1u << 1)  /**< \brief Pin Controlled by PA1 */
 #define PIO_PA2              (1u << 2)  /**< \brief Pin Controlled by PA2 */
@@ -548,5 +552,9 @@
 #define PIO_PD8_IDX          104
 #define PIO_PD9_IDX          105
 #define PIO_PD10_IDX         106
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3X8E_PIO_ */

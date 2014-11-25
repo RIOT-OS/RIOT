@@ -25,6 +25,10 @@
 
 #include "stm32f10x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @name Kernel configuration
  *
@@ -70,6 +74,10 @@ typedef enum {
 void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale);
 
 #define TRANSCEIVER_BUFFER_SIZE (3)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __CPU_CONF_H */
 /** @} */

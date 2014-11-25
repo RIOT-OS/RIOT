@@ -10,6 +10,10 @@
 #ifndef CPUCONF_H_
 #define CPUCONF_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @ingroup     conf
  * @ingroup     lpc2387
@@ -66,6 +70,9 @@
 #define UART0_BUFSIZE                   (128)
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* CPUCONF_H_ */

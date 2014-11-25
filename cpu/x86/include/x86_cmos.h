@@ -32,6 +32,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CMOS_ADDRESS (0x70)
 #define CMOS_DATA    (0x71)
 
@@ -57,6 +61,10 @@ void x86_cmos_write(int reg, uint8_t value);
  * The implementor of the board specific code should know whether the BIOS contains a serial number.
  */
 void x86_cmos_serial(uint8_t (*serial)[CMOS_SERIAL_LEN]);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

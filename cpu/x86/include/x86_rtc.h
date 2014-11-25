@@ -36,6 +36,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   A timestamp.
  *
@@ -205,6 +209,10 @@ void x86_rtc_set_periodic_callback(x86_rtc_callback_t cb);
  * because the hwtimer subsystem gets set up before the message system works.
  */
 void x86_rtc_set_update_callback(x86_rtc_callback_t cb);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
