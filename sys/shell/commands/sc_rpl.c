@@ -27,7 +27,7 @@ void _rpl_route_handler(int argc, char **argv)
     (void) argc;
     (void) argv;
 
-    rpl_routing_entry_t *rtable;
+    rpl_routing_entry_t **rtable;
     rtable = rpl_get_routing_table();
     unsigned c = 0;
     puts("--------------------------------------------------------------------");
@@ -36,13 +36,16 @@ void _rpl_route_handler(int argc, char **argv)
     puts("--------------------------------------------------------------------");
 
     for (int i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        if (rtable[i].used) {
+        if(rtable[i] == NULL) {
+            break;
+        }
+        if (rtable[i]->used) {
             c++;
             printf(" %03d: %-18s  ", i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                                            (&rtable[i].address)));
+                                            (&rtable[i]->address)));
             printf("%-18s  ", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
-                                            (&rtable[i].next_hop)));
-            printf("%d\n", rtable[i].lifetime);
+                                            (&rtable[i]->next_hop)));
+            printf("%d\n", rtable[i]->lifetime);
 
         }
     }

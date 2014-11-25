@@ -48,7 +48,8 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 
 /* global variables */
 rpl_of_t *rpl_objective_functions[NUMBER_IMPLEMENTED_OFS];
-rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
+size_t rpl_routing_table_entries = 0;
+rpl_routing_entry_t* rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
 kernel_pid_t rpl_process_pid = KERNEL_PID_UNDEF;
 mutex_t rpl_recv_mutex = MUTEX_INIT;
 mutex_t rpl_send_mutex = MUTEX_INIT;
@@ -76,7 +77,12 @@ uint8_t rpl_init(int if_id)
     rpl_instances_init();
 
     /* initialize routing table */
+    rpl_routing_table_entries = RPL_START_ROUTING_ENTRIES;
+    for(size_t i = 0; i < rpl_routing_table_entries; ++i) {
+        rpl_routing_table[i] = calloc( 1, sizeof(rpl_routing_entry_t) );
+    }
     rpl_clear_routing_table();
+
     init_trickle();
     rpl_process_pid = thread_create(rpl_process_buf, RPL_PROCESS_STACKSIZE,
                                     PRIORITY_MAIN - 1, CREATE_STACKTEST,
@@ -238,13 +244,13 @@ void recv_rpl_DAO_ACK(void)
 ipv6_addr_t *rpl_get_next_hop(ipv6_addr_t *addr)
 {
     DEBUGF("looking up the next hop to %s\n", ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, addr));
-    for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        if (rpl_routing_table[i].used) {
-            DEBUGF("checking %d: %s\n", i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_routing_table[i].address));
+    for (uint8_t i = 0; i < rpl_routing_table_entries; i++) {
+        if (rpl_routing_table[i]->used) {
+            DEBUGF("checking %d: %s\n", i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_routing_table[i]->address));
         }
-        if (rpl_routing_table[i].used && rpl_equal_id(&rpl_routing_table[i].address, addr)) {
-            DEBUGF("found %d: %s\n", i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_routing_table[i].next_hop));
-            return &rpl_routing_table[i].next_hop;
+        if (rpl_routing_table[i]->used && rpl_equal_id(&rpl_routing_table[i]->address, addr)) {
+            DEBUGF("found %d: %s\n", i, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN, &rpl_routing_table[i]->next_hop));
+            return &rpl_routing_table[i]->next_hop;
         }
     }
 
@@ -260,22 +266,31 @@ void rpl_add_routing_entry(ipv6_addr_t *addr, ipv6_addr_t *next_hop, uint16_t li
         return;
     }
 
-    for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        if (!rpl_routing_table[i].used) {
-            memcpy(&rpl_routing_table[i].address, addr, sizeof(ipv6_addr_t));
-            memcpy(&rpl_routing_table[i].next_hop, next_hop, sizeof(ipv6_addr_t));
-            rpl_routing_table[i].lifetime = lifetime;
-            rpl_routing_table[i].used = 1;
-            break;
+    for (uint8_t i = 0; i < rpl_routing_table_entries; i++) {
+        if (!rpl_routing_table[i]->used) {
+            memcpy(&rpl_routing_table[i]->address, addr, sizeof(ipv6_addr_t));
+            memcpy(&rpl_routing_table[i]->next_hop, next_hop, sizeof(ipv6_addr_t));
+            rpl_routing_table[i]->lifetime = lifetime;
+            rpl_routing_table[i]->used = 1;
+            return;
         }
+    }
+
+    if( rpl_routing_table_entries < RPL_MAX_ROUTING_ENTRIES ) {
+        rpl_routing_table[rpl_routing_table_entries] = calloc(1, sizeof(rpl_routing_entry_t));
+        memcpy(&rpl_routing_table[rpl_routing_table_entries]->address, addr, sizeof(ipv6_addr_t));
+        memcpy(&rpl_routing_table[rpl_routing_table_entries]->next_hop, next_hop, sizeof(ipv6_addr_t));
+        rpl_routing_table[rpl_routing_table_entries]->lifetime = lifetime;
+        rpl_routing_table[rpl_routing_table_entries]->used = 1;
+        rpl_routing_table_entries++;
     }
 }
 
 void rpl_del_routing_entry(ipv6_addr_t *addr)
 {
-    for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        if (rpl_routing_table[i].used && rpl_equal_id(&rpl_routing_table[i].address, addr)) {
-            memset(&rpl_routing_table[i], 0, sizeof(rpl_routing_table[i]));
+    for (uint8_t i = 0; i < rpl_routing_table_entries; i++) {
+        if (rpl_routing_table[i]->used && rpl_equal_id(&rpl_routing_table[i]->address, addr)) {
+            memset(rpl_routing_table[i], 0, sizeof(*rpl_routing_table[i]));
             return;
         }
     }
@@ -283,9 +298,9 @@ void rpl_del_routing_entry(ipv6_addr_t *addr)
 
 rpl_routing_entry_t *rpl_find_routing_entry(ipv6_addr_t *addr)
 {
-    for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        if (rpl_routing_table[i].used && rpl_equal_id(&rpl_routing_table[i].address, addr)) {
-            return &rpl_routing_table[i];
+    for (uint8_t i = 0; i < rpl_routing_table_entries; i++) {
+        if (rpl_routing_table[i]->used && rpl_equal_id(&rpl_routing_table[i]->address, addr)) {
+            return rpl_routing_table[i];
         }
     }
 
@@ -294,13 +309,13 @@ rpl_routing_entry_t *rpl_find_routing_entry(ipv6_addr_t *addr)
 
 void rpl_clear_routing_table(void)
 {
-    for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        memset(&rpl_routing_table[i], 0, sizeof(rpl_routing_table[i]));
+    for (uint8_t i = 0; i < rpl_routing_table_entries; i++) {
+        memset(rpl_routing_table[i], 0, sizeof(*rpl_routing_table[i]));
     }
 
 }
 
-rpl_routing_entry_t *rpl_get_routing_table(void)
+rpl_routing_entry_t **rpl_get_routing_table(void)
 {
     return rpl_routing_table;
 }
