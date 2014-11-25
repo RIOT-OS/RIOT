@@ -21,7 +21,9 @@
  */
 
 #include <stdio.h>
+#include <stdint.h>
 #include "periph/adc.h"
+#include "periph/gpio.h" 
 
 void handle_init_response( int );
 
@@ -31,18 +33,19 @@ int main(void)
 	adc_t dev;
 	dev = ADC_0;
 	adc_precision_t pre;
-	pre = ADC_RES_12BIT; // 6BIT & 14BIT is not valid
+	pre = ADC_RES_16BIT; // 6BIT & 14BIT is not valid
 
 	int response = adc_init(dev, pre);
 	handle_init_response(response);
 	int result = 0;      
-  	printf("ADC Testing while(1)\n" );
- 
+  	printf("ADC Testing while(1)\n" ); 	
+  	gpio_init_out(GPIO_0, GPIO_NOPULL);
+  	gpio_set(GPIO_0);
     while(1)
     {
     	result = adc_sample(dev, 0);
     	//printf("Result: " );
-    	printf("%u\n", result);    	
+    	printf("%d\n", result);    	
     }
     
     return 0;

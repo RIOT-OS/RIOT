@@ -78,18 +78,18 @@ extern "C" {
 // #define UART_1_REF_F        (8000000UL)
 
 /* UART 1 device configuration */
-#define UART_1_DEV			SERCOM2->USART
-#define UART_1_IRQ			SERCOM2_IRQn
-#define UART_1_ISR			isr_sercom2
+#define UART_1_DEV            SERCOM2->USART
+#define UART_1_IRQ            SERCOM2_IRQn
+#define UART_1_ISR            isr_sercom2
 /* UART 1 pin configuration */
 #define UART_1_PORT         (PORT->Group[0])
 #define UART_1_TX_PIN       (14)
 #define UART_1_RX_PIN       (15)
 #define UART_1_PINS         (PORT_PA14 | PORT_PA15)
 #define UART_1_REF_F        (8000000UL)
-// #define UART_0_DEV			SERCOM2->USART
-// #define UART_0_IRQ			SERCOM2_IRQn
-// #define UART_0_ISR			isr_sercom2
+// #define UART_0_DEV            SERCOM2->USART
+// #define UART_0_IRQ            SERCOM2_IRQn
+// #define UART_0_ISR            isr_sercom2
 // /* UART 1 pin configuration */
 // #define UART_0_PORT         (PORT->Group[0])
 // #define UART_0_TX_PIN       (14)
@@ -105,8 +105,8 @@ extern "C" {
  * @ I2C Configuration
  * @{
  */
-//#define I2C_NUMOF	(1U)
-//#define I2C_0_EN	(1)
+//#define I2C_NUMOF    (1U)
+//#define I2C_0_EN    (1)
 
 /* I2C device configuration */
 
@@ -127,55 +127,55 @@ extern "C" {
 #define I2C_0_ISR       isr_sercom2
 /* I2C 0 pin configuration */
 #define I2C_0_PORT    (PORT->Group[0])
-#define I2C_SDA    	  PIN_PA16
-#define I2C_SCL	   	  PIN_PA17
+#define I2C_SDA          PIN_PA16
+#define I2C_SCL             PIN_PA17
 #define I2C_0_PINS    (PORT_PA16 | PORT_PA17)
-#define I2C_0_REF_F	  (8000000UL) // Default Clock Source on reset OSC8M - 8MHz 
+#define I2C_0_REF_F      (8000000UL) // Default Clock Source on reset OSC8M - 8MHz 
 
 
-//#define I2C_0_DEV	SERCOM3->I2CM//SERCOM1->I2CM
+//#define I2C_0_DEV    SERCOM3->I2CM//SERCOM1->I2CM
 
 /* I2C Default values*/
-#define I2C_0_F_REF         F_REF
-#define I2C_0_CLK_SOURCE	0
-#define I2C_0_RUN_IN_STANDBY	0
-#define I2C_0_START_HOLD_TIME	SERCOM_I2CM_CTRLA_SDAHOLD(2) //I2C_MASTER_START_HOLD_TIME_300NS_600NS
-#define I2C_BUFFER_TIMEOUT	65535
-#define I2C_UNKNOWN_BUS_STATE_TIMEOUT	65535
-#define I2C_SCL_LOW_TIMEOUT	0
-#define I2C_INACTIVE_TIMEOUT	SERCOM_I2CM_CTRLA_INACTOUT(0) // I2C_MASTER_INACTIVE_TIMEOUT_DISABLED
+#define I2C_0_F_REF                                 F_REF
+#define I2C_0_CLK_SOURCE                            0
+#define I2C_0_RUN_IN_STANDBY                        0
+#define I2C_0_START_HOLD_TIME                        SERCOM_I2CM_CTRLA_SDAHOLD(2) //I2C_MASTER_START_HOLD_TIME_300NS_600NS
+#define I2C_BUFFER_TIMEOUT                            65535
+#define I2C_UNKNOWN_BUS_STATE_TIMEOUT                65535
+#define I2C_SCL_LOW_TIMEOUT                            0
+#define I2C_INACTIVE_TIMEOUT                        SERCOM_I2CM_CTRLA_INACTOUT(0) // I2C_MASTER_INACTIVE_TIMEOUT_DISABLED
 
 
 /*I2C pinmux*/
-#define I2C_PINMUX_DEV		(PORT->Group[0])
-#define I2C_PINMUX_PAD0_PIN     PIN_PA16
-#define I2C_PINMUX_PAD0_MUXPOSITION	(I2C_PINMUX_PAD0_PIN & 0xFFFF)
-#define I2C_PINMUX_PAD1_PIN		PIN_PA17
-#define I2C_PINMUX_PAD1_MUXPOSITION	(I2C_PINMUX_PAD1_PIN & 0xFFFF)
+#define I2C_PINMUX_DEV                                (PORT->Group[0])
+#define I2C_PINMUX_PAD0_PIN                         PIN_PA16
+#define I2C_PINMUX_PAD0_MUXPOSITION                    (I2C_PINMUX_PAD0_PIN & 0xFFFF)
+#define I2C_PINMUX_PAD1_PIN                            PIN_PA17
+#define I2C_PINMUX_PAD1_MUXPOSITION                    (I2C_PINMUX_PAD1_PIN & 0xFFFF)
 
 //#define I2C_0_PINS         (PORT_PA16 | PORT_PA17)
 
-#define I2C_PINMUX_MUXPOSITION	(1 << 7) //SYSTEM_PINMUX_GPIO	
-#define I2C_PINMUX_DIRECTION	2 //SYSTEM_PINMUX_PIN_DIR_OUTPUT_WITH_READBACK//0 //SYSTEM_PINMUX_PIN_DIR_INPUT
-#define I2C_PINMUX_INPUT_PULL	1 //SYSTEM_PINMUX_PIN_PULL_UP
-#define I2C_PINMUX_POWERSAVE	0
+#define I2C_PINMUX_MUXPOSITION                        (1 << 7) //SYSTEM_PINMUX_GPIO    
+#define I2C_PINMUX_DIRECTION                        2 //SYSTEM_PINMUX_PIN_DIR_OUTPUT_WITH_READBACK//0 //SYSTEM_PINMUX_PIN_DIR_INPUT
+#define I2C_PINMUX_INPUT_PULL                        1 //SYSTEM_PINMUX_PIN_PULL_UP
+#define I2C_PINMUX_POWERSAVE                        0
 
-#define FEATURE_I2C_FAST_MODE_PLUS_AND_HIGH_SPEED	0 //1
-#define FEATURE_I2C_SCL_STRETCH_MODE 0 //1
-#define FEATURE_I2C_SCL_EXTEND_TIMEOUT 0 //1
+#define FEATURE_I2C_FAST_MODE_PLUS_AND_HIGH_SPEED    0 //1
+#define FEATURE_I2C_SCL_STRETCH_MODE                 0 //1
+#define FEATURE_I2C_SCL_EXTEND_TIMEOUT                 0 //1
 
 #ifdef FEATURE_I2C_SCL_STRETCH_MODE
-#define I2C_scl_stretch_only_after_ack_bit 0
+#define I2C_scl_stretch_only_after_ack_bit             0
 #endif
 #ifdef FEATURE_I2C_SCL_EXTEND_TIMEOUT
-#define I2C_slave_scl_low_extend_timeout 0
-#define I2C_master_scl_low_extend_timeout 0
+#define I2C_slave_scl_low_extend_timeout             0
+#define I2C_master_scl_low_extend_timeout             0
 #endif
-#define I2C_0_BAUDRATE	100 // 100KHz
-#define I2C_0_TRANSFER_SPEED	SERCOM_I2CM_CTRLA_SPEED(0) //I2C_MASTER_SPEED_STANDARD_AND_FAST
+#define I2C_0_BAUDRATE                                100 // 100KHz
+#define I2C_0_TRANSFER_SPEED                        SERCOM_I2CM_CTRLA_SPEED(0) //I2C_MASTER_SPEED_STANDARD_AND_FAST
 #ifdef FEATURE_I2C_FAST_MODE_PLUS_AND_HIGH_SPEED
-#define I2C_0_HS_BAUDRATE	3400
-#endif 	
+#define I2C_0_HS_BAUDRATE                            3400
+#endif     
 
 
 /** @} */
@@ -184,116 +184,119 @@ extern "C" {
  * @ ADC Configuration
  * @{
  */
-#define ADC_NUMOF				(1U)
-#define ADC_0_EN				1
-#define ADC_MAX_CHANNELS		8
+#define ADC_NUMOF                          (1U)
+#define ADC_0_EN                           1
+#define ADC_MAX_CHANNELS                   8
 
 /* ADC 0 device configuration */
-#define ADC_0_DEV 				ADC
-#define	ADC_0_PORT 				(PORT->Group[0])
-#define ADC_0_IRQ				ADC_IRQn 	
-#define ADC_0_CHANNELS      	8
+#define ADC_0_DEV                          ADC
+#define    ADC_0_PORT                      (PORT->Group[0])
+#define ADC_0_IRQ                          ADC_IRQn     
+#define ADC_0_CHANNELS                     8
 /* ADC 0 Default values */
-#define ADC_0_CLK_SOURCE		0 /* GCLK_GENERATOR_0 */
-#define ADC_0_PRESCALER			ADC_CTRLB_PRESCALER_DIV4
-#define ADC_0_WINDOW_MODE		ADC_WINCTRL_WINMODE_DISABLE
+#define ADC_0_CLK_SOURCE                   0 /* GCLK_GENERATOR_0 */
+#define ADC_0_PRESCALER                    ADC_CTRLB_PRESCALER_DIV4
+#define ADC_0_WINDOW_MODE                  ADC_WINCTRL_WINMODE_DISABLE
+#define ADC_0_WINDOW_LOWER                 0
+#define ADC_0_WINDOW_HIGHER                0     
 
-#define ADC_0_CORRECTION_EN 	0 /* disabled */
-#define ADC_0_GAIN_CORRECTION	ADC_GAINCORR_RESETVALUE
-#define ADC_0_OFFSET_CORRECTION	ADC_OFFSETCORR_RESETVALUE
-#define ADC_0_SAMPLE_LENGTH		0
-#define ADC_0_PIN_SCAN_OFFSET_START	0 /* disabled */
-#define	ADC_0_PIN_SCAN_INPUT_TO_SCAN	0 /* disabled */	
-#define ADC_0_LEFT_ADJUST		0 /* disabled */
-#define ADC_0_DIFFERENTIAL_MODE	0 /* disabled */
-#define ADC_0_FREE_RUNNING		0 /* disabled */
-#define ADC_0_EVENT_ACTION		0 /* disabled */	
-#define ADC_0_RUN_IN_STANDBY	0 /* disabled */
+#define ADC_0_CORRECTION_EN                0 /* disabled */
+#define ADC_0_GAIN_CORRECTION              ADC_GAINCORR_RESETVALUE//(0b100100000101)//ADC_GAINCORR_RESETVALUE
+#define ADC_0_OFFSET_CORRECTION            ADC_OFFSETCORR_RESETVALUE//(0b000000010000)//ADC_OFFSETCORR_RESETVALUE
+#define ADC_0_SAMPLE_LENGTH                0
+#define ADC_0_PIN_SCAN_OFFSET_START        0 /* disabled */
+#define    ADC_0_PIN_SCAN_INPUT_TO_SCAN    0 /* disabled */    
+#define ADC_0_LEFT_ADJUST                  0 /* disabled */
+#define ADC_0_DIFFERENTIAL_MODE            0 /* disabled */
+#define ADC_0_FREE_RUNNING                 0 /* disabled */
+#define ADC_0_EVENT_ACTION                 0 /* disabled */    
+#define ADC_0_RUN_IN_STANDBY               0 /* disabled */
 
 /* ADC 0 Module Status flags */
-#define ADC_0_STATUS_RESULT_READY	(1UL << 0)
-#define ADC_0_STATUS_WINDOW			(1UL << 1)
-#define ADC_0_STATUS_OVERRUN		(1UL << 2) 	
+#define ADC_0_STATUS_RESULT_READY          (1UL << 0)
+#define ADC_0_STATUS_WINDOW                (1UL << 1)
+#define ADC_0_STATUS_OVERRUN               (1UL << 2)     
+
 
 /* ADC 0 Positive Input Pins */
-#define ADC_0_POS_INPUT			ADC_INPUTCTRL_MUXPOS_PIN6
+#define ADC_0_POS_INPUT                    ADC_INPUTCTRL_MUXPOS_PIN6
 
-/* ADC 0 Negative Input Pins */ 	
-#define ADC_0_NEG_INPUT			ADC_INPUTCTRL_MUXNEG_GND
+/* ADC 0 Negative Input Pins */     
+#define ADC_0_NEG_INPUT                    ADC_INPUTCTRL_MUXNEG_GND
 
 /* ADC 0 Gain Factor */
-#define ADC_0_GAIN_FACTOR_1X	ADC_INPUTCTRL_GAIN_1X
-#define ADC_0_GAIN_FACTOR_2X	ADC_INPUTCTRL_GAIN_2X
-#define ADC_0_GAIN_FACTOR_4X	ADC_INPUTCTRL_GAIN_4X
-#define ADC_0_GAIN_FACTOR_8X	ADC_INPUTCTRL_GAIN_8X
-#define ADC_0_GAIN_FACTOR_16X	ADC_INPUTCTRL_GAIN_16X
- 	/* Use this to define the value used */
-#define ADC_0_GAIN_FACTOR_DEFAULT	ADC_0_GAIN_FACTOR_1X
+#define ADC_0_GAIN_FACTOR_1X               ADC_INPUTCTRL_GAIN_1X
+#define ADC_0_GAIN_FACTOR_2X               ADC_INPUTCTRL_GAIN_2X
+#define ADC_0_GAIN_FACTOR_4X               ADC_INPUTCTRL_GAIN_4X
+#define ADC_0_GAIN_FACTOR_8X               ADC_INPUTCTRL_GAIN_8X
+#define ADC_0_GAIN_FACTOR_16X              ADC_INPUTCTRL_GAIN_16X
+/* Use this to define the value used */
+#define ADC_0_GAIN_FACTOR_DEFAULT          ADC_0_GAIN_FACTOR_1X
 
-/* ADC 0 Resolutions */	
-#define ADC_0_RES_8BIT			ADC_CTRLB_RESSEL_8BIT
-#define ADC_0_RES_10BIT 		ADC_CTRLB_RESSEL_10BIT
-#define ADC_0_RES_12BIT			ADC_CTRLB_RESSEL_12BIT
-#define ADC_0_RES_16BIT			ADC_CTRLB_RESSEL_16BIT 
+/* ADC 0 Resolutions */    
+#define ADC_0_RES_8BIT                     ADC_CTRLB_RESSEL_8BIT
+#define ADC_0_RES_10BIT                    ADC_CTRLB_RESSEL_10BIT
+#define ADC_0_RES_12BIT                    ADC_CTRLB_RESSEL_12BIT
+#define ADC_0_RES_16BIT                    ADC_CTRLB_RESSEL_16BIT 
 
 /* ADC 0 Voltage reference */
-#define ADC_0_REF_INT_1V		ADC_REFCTRL_REFSEL_INT1V
-#define ADC_0_REF_EXT_B			ADC_REFCTRL_REFSEL_AREFB
-#define ADC_0_REF_COM_EN		0
+#define ADC_0_REF_INT_1V                   ADC_REFCTRL_REFSEL_INT1V
+#define ADC_0_REF_EXT_B                    ADC_REFCTRL_REFSEL_AREFB
+#define ADC_0_REF_COM_EN        0
 /* Use this to define the value used */ 
-#define ADC_0_REF_DEFAULT		ADC_0_REF_INT_1V
+#define ADC_0_REF_DEFAULT                  ADC_0_REF_EXT_B
 
 /* ADC 0 ACCUMULATE */
-#define ADC_0_ACCUM_DISABLE		ADC_AVGCTRL_SAMPLENUM_1
-#define ADC_0_ACCUM_2			ADC_AVGCTRL_SAMPLENUM_2
-#define ADC_0_ACCUM_4			ADC_AVGCTRL_SAMPLENUM_4
-#define ADC_0_ACCUM_8			ADC_AVGCTRL_SAMPLENUM_8
-#define ADC_0_ACCUM_16			ADC_AVGCTRL_SAMPLENUM_16
-#define ADC_0_ACCUM_32			ADC_AVGCTRL_SAMPLENUM_32
-#define ADC_0_ACCUM_64			ADC_AVGCTRL_SAMPLENUM_64
-#define ADC_0_ACCUM_128			ADC_AVGCTRL_SAMPLENUM_128
-#define ADC_0_ACCUM_256			ADC_AVGCTRL_SAMPLENUM_256
-#define ADC_0_ACCUM_512			ADC_AVGCTRL_SAMPLENUM_512
-#define ADC_0_ACCUM_1024		ADC_AVGCTRL_SAMPLENUM_1024
+#define ADC_0_ACCUM_DISABLE                ADC_AVGCTRL_SAMPLENUM_1
+#define ADC_0_ACCUM_2                      ADC_AVGCTRL_SAMPLENUM_2
+#define ADC_0_ACCUM_4                      ADC_AVGCTRL_SAMPLENUM_4
+#define ADC_0_ACCUM_8                      ADC_AVGCTRL_SAMPLENUM_8
+#define ADC_0_ACCUM_16                     ADC_AVGCTRL_SAMPLENUM_16
+#define ADC_0_ACCUM_32                     ADC_AVGCTRL_SAMPLENUM_32
+#define ADC_0_ACCUM_64                     ADC_AVGCTRL_SAMPLENUM_64
+#define ADC_0_ACCUM_128                    ADC_AVGCTRL_SAMPLENUM_128
+#define ADC_0_ACCUM_256                    ADC_AVGCTRL_SAMPLENUM_256
+#define ADC_0_ACCUM_512                    ADC_AVGCTRL_SAMPLENUM_512
+#define ADC_0_ACCUM_1024                   ADC_AVGCTRL_SAMPLENUM_1024
 /* Use this to define the value used */
-#define ADC_0_ACCUM_DEFAULT		ADC_AVGCTRL_SAMPLENUM_32 
+#define ADC_0_ACCUM_DEFAULT                ADC_0_ACCUM_1024 
 
 /* ADC 0 DEVIDE RESULT */
-#define ADC_0_DIV_RES_DISABLE	0
-#define ADC_0_DIV_RES_2			1
-#define ADC_0_DIV_RES_4			2
-#define ADC_0_DIV_RES_8			3
-#define ADC_0_DIV_RES_16		4
-#define ADC_0_DIV_RES_32		5
-#define ADC_0_DIV_RES_64		6
-#define ADC_0_DIV_RES_128		7
+#define ADC_0_DIV_RES_DISABLE              0
+#define ADC_0_DIV_RES_2                    1
+#define ADC_0_DIV_RES_4                    2
+#define ADC_0_DIV_RES_8                    3
+#define ADC_0_DIV_RES_16                   4
+#define ADC_0_DIV_RES_32                   5
+#define ADC_0_DIV_RES_64                   6
+#define ADC_0_DIV_RES_128                  7
 /* Use this to define the value used */
-#define ADC_0_DIV_RES_DEFAULT	ADC_0_DIV_RES_DISABLE 
+#define ADC_0_DIV_RES_DEFAULT             ADC_0_DIV_RES_DISABLE 
 
 /* ADC 0 channel 0 pin config - NOT implemented yet */
-#define ADC_0_CH0           	PORT_PB08B_ADC_AIN2
-#define ADC_0_CH0_PIN       	PIN_PB08B_ADC_AIN2
+#define ADC_0_CH0               PORT_PB08B_ADC_AIN2
+#define ADC_0_CH0_PIN           PIN_PB08B_ADC_AIN2
 /* ADC 0 channel 1 pin config */
-#define ADC_0_CH1           	PORT_PB09B_ADC_AIN3
-#define ADC_0_CH1_PIN       	PIN_PB09B_ADC_AIN3
+#define ADC_0_CH1               PORT_PB09B_ADC_AIN3
+#define ADC_0_CH1_PIN           PIN_PB09B_ADC_AIN3
 /* ADC 0 channel 2 pin config */
-#define ADC_0_CH2       		PORT_PA04B_ADC_AIN4
-#define ADC_0_CH2_PIN      		PIN_PA04B_ADC_AIN4
+#define ADC_0_CH2               PORT_PA04B_ADC_AIN4
+#define ADC_0_CH2_PIN              PIN_PA04B_ADC_AIN4
 /* ADC 0 channel 3 pin config */
-#define ADC_0_CH3           	PORT_PA05B_ADC_AIN5
-#define ADC_0_CH3_PIN       	PIN_PA05B_ADC_AIN5
+#define ADC_0_CH3               PORT_PA05B_ADC_AIN5
+#define ADC_0_CH3_PIN           PIN_PA05B_ADC_AIN5
 /* ADC 0 channel 4 pin config */
-#define ADC_0_CH4           	PORT_PA06B_ADC_AIN6
-#define ADC_0_CH4_PIN       	PIN_PA06B_ADC_AIN6
+#define ADC_0_CH4               PORT_PA06B_ADC_AIN6
+#define ADC_0_CH4_PIN           PIN_PA06B_ADC_AIN6
 /* ADC 0 channel 5 pin config */
-#define ADC_0_CH5           	PORT_PA07B_ADC_AIN7
-#define ADC_0_CH5_PIN       	PIN_PA07B_ADC_AIN7
+#define ADC_0_CH5               PORT_PA07B_ADC_AIN7
+#define ADC_0_CH5_PIN           PIN_PA07B_ADC_AIN7
 /* ADC 0 channel 6 pin config */
-#define ADC_0_CH6           	PORT_PB00B_ADC_AIN8
-#define ADC_0_CH6_PIN       	PIN_PB00B_ADC_AIN8
+#define ADC_0_CH6               PORT_PB00B_ADC_AIN8
+#define ADC_0_CH6_PIN           PIN_PB00B_ADC_AIN8
 /* ADC 0 channel 7 pin config */
-#define ADC_0_CH7           	PORT_PB02B_ADC_AIN10
-#define ADC_0_CH7_PIN       	PIN_PB02B_ADC_AIN10
+#define ADC_0_CH7               PORT_PB02B_ADC_AIN10
+#define ADC_0_CH7_PIN           PIN_PB02B_ADC_AIN10
 /** @} */
 
 
