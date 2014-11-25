@@ -38,6 +38,10 @@ ifneq (,$(filter rpl,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/routing/rpl
 endif
+ifneq (,$(filter nhdp,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
+    USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/routing/nhdp
+endif
 ifneq (,$(filter ieee802154,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/include
 endif

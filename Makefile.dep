@@ -124,3 +124,9 @@ endif
 ifneq (,$(filter defaulttransceiver,$(USEMODULE)))
 	FEATURES_REQUIRED += transceiver
 endif
+
+ifneq (,$(filter nhdp,$(USEMODULE)))
+	USEMODULE += vtimer
+	USEMODULE += oonf_common
+	USEMODULE += oonf_rfc5444
+endif

@@ -83,6 +83,9 @@ endif
 ifneq (,$(filter trickle,$(USEMODULE)))
     DIRS += trickle
 endif
+ifneq (,$(filter nhdp,$(USEMODULE)))
+    DIRS += net/routing/nhdp
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, ${USEMODULE})))
 
