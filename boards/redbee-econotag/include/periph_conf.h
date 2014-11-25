@@ -19,4 +19,6 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* make Travis happy: #ifdef __cplusplus extern "C" { #endif */
+
 #endif /* PERIPH_CONF_H */
