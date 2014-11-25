@@ -294,10 +294,7 @@ rpl_routing_entry_t *rpl_find_routing_entry(ipv6_addr_t *addr)
 
 void rpl_clear_routing_table(void)
 {
-    for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-        memset(&rpl_routing_table[i], 0, sizeof(rpl_routing_table[i]));
-    }
-
+    memset(&rpl_routing_table, 0, sizeof(rpl_routing_table));
 }
 
 rpl_routing_entry_t *rpl_get_routing_table(void)
