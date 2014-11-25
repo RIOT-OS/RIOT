@@ -217,7 +217,7 @@ void rpl_init_root_mode(void)
     i_am_root = 1;
     dodag->trickle.callback.func = &rpl_trickle_send_dio;
     dodag->trickle.callback.args = (void *) &mcast;
-    start_trickle(&dodag->trickle, dodag->dio_min, dodag->dio_interval_doubling, dodag->dio_redundancy);
+    start_trickle(&dodag->trickle, (1 << dodag->dio_min), dodag->dio_interval_doubling, dodag->dio_redundancy);
     DEBUGF("ROOT INIT FINISHED\n");
 
 }

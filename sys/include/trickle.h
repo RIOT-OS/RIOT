@@ -32,7 +32,12 @@
 #include "vtimer.h"
 #include "thread.h"
 
-#define TRICKLE_INTERVAL_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
+#define TRICKLE_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)
+#define TRICKLE_PKT_RECV_BUF_SIZE 16
+
+#define TRICKLE_CODE_INTERVAL   0x1
+#define TRICKLE_CODE_CALLBACK   0x2
+#define TRICKLE_CODE_STOP       0x3
 
 typedef struct {
     void (*func)(void *);
@@ -46,20 +51,17 @@ typedef struct {
     uint32_t I;
     uint32_t t;
     uint16_t c;
-    uint8_t done    :1;
-    uint8_t reset   :1;
-    uint8_t padding :6;
+    uint8_t code;
     timex_t wakeup_time;
     vtimer_t wakeup_timer;
-    kernel_pid_t thread_pid;
     trickle_callback_t callback;
-    char *thread_buf;
 } trickle_t;
 
 void reset_trickletimer(trickle_t *trickle);
-void start_trickle(trickle_t *trickle, uint8_t DIOINtMin, uint8_t DIOIntDoubl, uint8_t DIORedundancyConstatnt);
+void start_trickle(trickle_t *trickle, uint32_t Imin, uint8_t Imax, uint8_t k);
 void stop_trickle(trickle_t *trickle);
 void trickle_increment_counter(trickle_t *trickle);
+int trickle_init(void);
 
 #ifdef __cplusplus
 }

@@ -35,7 +35,6 @@ rpl_instance_t instances[RPL_MAX_INSTANCES];
 rpl_dodag_t dodags[RPL_MAX_DODAGS];
 rpl_parent_t parents[RPL_MAX_PARENTS];
 char dao_delay_over_buf[RPL_MAX_DODAGS][DAO_DELAY_STACKSIZE];
-char trickle_buf[RPL_MAX_DODAGS][TRICKLE_INTERVAL_STACKSIZE];
 
 void rpl_instances_init(void)
 {
@@ -94,13 +93,11 @@ rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid)
     rpl_dodag_t *dodag;
     rpl_dodag_t *end;
     char *my_dao_delay_over_buf;
-    char *my_trickle_buf;
 
     for (dodag = &dodags[0], end = dodag + RPL_MAX_DODAGS,
-            my_dao_delay_over_buf = dao_delay_over_buf[0],
-            my_trickle_buf = trickle_buf[0];
+            my_dao_delay_over_buf = dao_delay_over_buf[0];
             dodag < end;
-            dodag++, my_dao_delay_over_buf++, my_trickle_buf++) {
+            dodag++, my_dao_delay_over_buf++) {
         if (dodag->used == 0) {
             memset(dodag, 0, sizeof(*dodag));
             dodag->instance = inst;
@@ -108,7 +105,6 @@ rpl_dodag_t *rpl_new_dodag(uint8_t instanceid, ipv6_addr_t *dodagid)
             dodag->used = 1;
             memcpy(&dodag->dodag_id, dodagid, sizeof(*dodagid));
             dodag->dao_delay_over_buf = my_dao_delay_over_buf;
-            dodag->trickle.thread_buf = my_trickle_buf;
             return dodag;
         }
     }
@@ -430,7 +426,7 @@ void rpl_join_dodag(rpl_dodag_t *dodag, ipv6_addr_t *parent, uint16_t parent_ran
 
     my_dodag->trickle.callback.func = &rpl_trickle_send_dio;
     my_dodag->trickle.callback.args = (void *) &mcast;
-    start_trickle(&my_dodag->trickle, my_dodag->dio_min, my_dodag->dio_interval_doubling, my_dodag->dio_redundancy);
+    start_trickle(&my_dodag->trickle, (1 << my_dodag->dio_min), my_dodag->dio_interval_doubling, my_dodag->dio_redundancy);
     my_dodag->dao_delay_over_pid = thread_create(my_dodag->dao_delay_over_buf, DAO_DELAY_STACKSIZE,
                                        PRIORITY_MAIN - 1, CREATE_STACKTEST,
                                        dao_delay_over, (void *) my_dodag, "dao_delay_over");

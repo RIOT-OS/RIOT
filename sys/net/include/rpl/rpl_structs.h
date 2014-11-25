@@ -18,16 +18,16 @@
  * @}
  */
 
-#include <string.h>
-#include "ipv6.h"
-#include "trickle.h"
-
 #ifndef RPL_STRUCTS_H_INCLUDED
 #define RPL_STRUCTS_H_INCLUDED
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <string.h>
+#include "ipv6.h"
+#include "trickle.h"
 
 /* Modes of Operation */
 
