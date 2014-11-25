@@ -1,25 +1,19 @@
 # OpenWSN on RIOT
 
-This port of OpenWSN to RIOT is based on release RB-1.4 with backported support
-for the iot-lab_M3 board from the develop branch.
-
-# Compatibility
-
-This port of the openwsn stack is compatible with the iot-lab_M3 board only for now.
-The TelosB board support was temporarily dropped but will return soon again.
-The hardware dependency will be reduced in the future and thous running on more
-hardware platforms.
+This port of OpenWSN to RIOT is based on current OpenWSN upstream providing a
+BSP with RIOT's interfaces. Currently supported are iot-lab_M3 and fox. More
+boards will follow through improvements in netdev radio driver interface.
 
 # Usage
 
-A test can be found in the [projects repository](https://github.com/RIOT-OS/projects/)
-named ```test_openwsn_pkg``` with an example ```Makefile```.
+A test can be found in tests/openwsn providing a shell command to initialise
+as root or listening node. And providing a sample Makefile.
 
 Build using
 ```Bash
 $> export BOARD=iot-lab_M3
 $> export PORT=/dev/ttyTHEPORTOFYOURIOTLAB
-$> make -B clean flash
+$> make -B clean flash term
 ```
 
 To use OpenWSN with RIOT it has to be added to the used packages variable

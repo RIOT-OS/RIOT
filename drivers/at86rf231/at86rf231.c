@@ -164,8 +164,14 @@ void at86rf231_switch_to_rx(void)
         }
     } while (at86rf231_get_status() != AT86RF231_TRX_STATUS__PLL_ON);
 
+#ifndef MODULE_OPENWSN
     /* Reset IRQ to TRX END only */
     at86rf231_reg_write(AT86RF231_REG__IRQ_MASK, AT86RF231_IRQ_STATUS_MASK__TRX_END);
+#else
+    /* OpenWSN also needs RX_START IRQ */
+    at86rf231_reg_write(AT86RF231_REG__IRQ_MASK, ( AT86RF231_IRQ_STATUS_MASK__RX_START | AT86RF231_IRQ_STATUS_MASK__TRX_END));
+#endif
+
 
     /* Read IRQ to clear it */
     at86rf231_reg_read(AT86RF231_REG__IRQ_STATUS);
@@ -190,6 +196,7 @@ void at86rf231_rxoverflow_irq(void)
     /* TODO */
 }
 
+#ifndef MODULE_OPENWSN
 void at86rf231_rx_irq(void)
 {
     /* check if we are in sending state */
@@ -206,6 +213,7 @@ void at86rf231_rx_irq(void)
         at86rf231_rx_handler();
     }
 }
+#endif
 
 int at86rf231_add_raw_recv_callback(netdev_t *dev,
                                     netdev_802154_raw_packet_cb_t recv_cb)
