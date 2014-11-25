@@ -12,6 +12,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* does not include 2 byte FCS checksum */
 #ifndef MACA_MAX_PAYLOAD_SIZE
 #define MACA_MAX_PAYLOAD_SIZE 125
@@ -39,5 +43,9 @@ struct packet {
     uint8_t data[MACA_MAX_PAYLOAD_SIZE+2+1]; /* +2 for FCS; + 1 since maca returns the length as the first byte */
 };
 typedef struct packet maca_packet_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

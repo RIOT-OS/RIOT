@@ -44,6 +44,10 @@
 #ifndef _SAMR21_MTB_INSTANCE_
 #define _SAMR21_MTB_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for MTB peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_MTB_POSITION           (0x41006000U) /**< \brief (MTB) MTB Position */
@@ -99,5 +103,8 @@
 #define REG_MTB_CID3               (*(RoReg  *)0x41006FFCU) /**< \brief (MTB) CoreSight */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_MTB_INSTANCE_ */

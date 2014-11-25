@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_PIO_COMPONENT_
 #define _SAM3XA_PIO_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Parallel Input/Output Controller */
 /* ============================================================================= */
@@ -1432,5 +1436,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_PIO_COMPONENT_ */

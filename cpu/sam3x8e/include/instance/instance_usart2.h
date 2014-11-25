@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_USART2_INSTANCE_
 #define _SAM3XA_USART2_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for USART2 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_USART2_CR          (0x400A0000U) /**< \brief (USART2) Control Register */
@@ -92,5 +96,9 @@
 #define REG_USART2_PTCR (*(WoReg*)0x400A0120U) /**< \brief (USART2) Transfer Control Register */
 #define REG_USART2_PTSR (*(RoReg*)0x400A0124U) /**< \brief (USART2) Transfer Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_USART2_INSTANCE_ */

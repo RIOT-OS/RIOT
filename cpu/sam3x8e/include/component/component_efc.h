@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_EFC_COMPONENT_
 #define _SAM3XA_EFC_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Embedded Flash Controller */
 /* ============================================================================= */
@@ -73,5 +77,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_EFC_COMPONENT_ */

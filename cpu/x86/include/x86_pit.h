@@ -37,6 +37,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define PIT_CHANNEL_0_PORT (0x40) /**< Channel 0 */
 #define PIT_CHANNEL_1_PORT (0x41) /**< Channel 1, DO NOT USE */
 #define PIT_CHANNEL_2_PORT (0x42) /**< Channel 2, do not use if you can help it */
@@ -108,6 +112,10 @@ void x86_pit_set2(unsigned channel, unsigned mode, uint16_t max);
  * Beware: the 1,193,163 different values for hz will only render 2,165 different values for max.
  */
 bool x86_pit_set(unsigned channel, unsigned mode, unsigned hz);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_SMC_INSTANCE_
 #define _SAM3XA_SMC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for SMC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_SMC_CFG               (0x400E0000U) /**< \brief (SMC) SMC NFC Configuration Register */
@@ -180,5 +184,9 @@
 #define REG_SMC_WPCR     (*(WoReg*)0x400E01E4U) /**< \brief (SMC) Write Protection Control Register */
 #define REG_SMC_WPSR     (*(RoReg*)0x400E01E8U) /**< \brief (SMC) Write Protection Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_SMC_INSTANCE_ */

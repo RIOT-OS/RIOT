@@ -16,6 +16,10 @@
 #ifndef CPUCONF_H_
 #define CPUCONF_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* TODO: tighten stack sizes */
 #ifdef __MACH__ /* OSX */
 #define KERNEL_CONF_STACKSIZE_DEFAULT       (163840)
@@ -62,6 +66,10 @@
  */
 #ifndef CPUID_ID_LEN
 #define CPUID_ID_LEN                    (4)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* CPUCONF_H_ */

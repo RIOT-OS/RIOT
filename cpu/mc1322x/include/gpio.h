@@ -13,6 +13,10 @@
 // TODO: why do we need to include this for macro expansion?
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Structure-based GPIO access
    Example usage:
 
@@ -154,5 +158,9 @@ enum { _REP(0,0) };
 #undef _V
 
 static volatile struct GPIO_struct * const GPIO = (void *) (0x80000000);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

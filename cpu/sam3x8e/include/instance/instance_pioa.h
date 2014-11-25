@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_PIOA_INSTANCE_
 #define _SAM3XA_PIOA_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for PIOA peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_PIOA_PER             (0x400E0E00U) /**< \brief (PIOA) PIO Enable Register */
@@ -120,5 +124,9 @@
 #define REG_PIOA_WPMR   (*(RwReg*)0x400E0EE4U) /**< \brief (PIOA) Write Protect Mode Register */
 #define REG_PIOA_WPSR   (*(RoReg*)0x400E0EE8U) /**< \brief (PIOA) Write Protect Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_PIOA_INSTANCE_ */

@@ -31,6 +31,10 @@
 #include "msp430_types.h"
 #include "cpu-conf.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define WORDSIZE 16
 
 extern volatile int __inISR;
@@ -134,6 +138,10 @@ inline void dINT(void)
 int inISR(void);
 
 void msp430_cpu_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif // _CPU_H

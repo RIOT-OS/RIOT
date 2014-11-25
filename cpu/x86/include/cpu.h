@@ -39,6 +39,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static inline void __attribute__((always_inline)) dINT(void)
 {
     asm volatile ("cli");
@@ -115,6 +119,10 @@ void x86_init_board(void);
  * The regions are expected to contain memory that lies inside the elf sections.
  */
 bool x86_get_memory_region(uint64_t *start, uint64_t *len, unsigned long *cnt);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

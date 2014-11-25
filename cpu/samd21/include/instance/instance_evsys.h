@@ -44,6 +44,10 @@
 #ifndef _SAMR21_EVSYS_INSTANCE_
 #define _SAMR21_EVSYS_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for EVSYS peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_EVSYS_CTRL             (0x42000400U) /**< \brief (EVSYS) Control */
@@ -193,5 +197,9 @@
 #define EVSYS_ID_USER_AC_SOC_1      26
 #define EVSYS_ID_USER_DAC_START     27
 #define EVSYS_ID_USER_PTC_STCONV    28
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_EVSYS_INSTANCE_ */

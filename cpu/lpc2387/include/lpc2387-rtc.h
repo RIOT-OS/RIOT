@@ -35,6 +35,10 @@
 #include "rtc.h"
 #include "lpc2387.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ------------------------------------------------------------------------- */
 /**
  * @name LPC2387 RTC Compile-Time Configuration
@@ -103,6 +107,10 @@ void rtc_set_alarm(struct tm *localt, enum rtc_alarm_mask mask);
  * @see ::rtc_alarm_mask
  */
 enum rtc_alarm_mask _rtc_get_alarm(struct tm *localt);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* end __RTC_H */

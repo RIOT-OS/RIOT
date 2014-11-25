@@ -44,6 +44,10 @@
 #ifndef _SAMR21_PORT_COMPONENT_
 #define _SAMR21_PORT_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR PORT */
 /* ========================================================================== */
@@ -391,5 +395,9 @@ typedef struct {
 #define SECTION_PORT_IOBUS
 
 /*@}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_PORT_COMPONENT_ */

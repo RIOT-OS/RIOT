@@ -44,6 +44,10 @@
 #ifndef _SAMR21_TC6_INSTANCE_
 #define _SAMR21_TC6_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for TC6 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_TC6_CTRLA              (0x42003800U) /**< \brief (TC6) Control A */
@@ -107,5 +111,9 @@
 #define TC6_OW_NUM                  2
 #define TC6_PERIOD_EXT              0
 #define TC6_SHADOW_EXT              0
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_TC6_INSTANCE_ */

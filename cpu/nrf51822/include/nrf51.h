@@ -116,8 +116,15 @@ typedef enum {
 #define __Vendor_SysTickConfig         0            /*!< Set to 1 if different SysTick Config is used                          */
 /** @} */ /* End of group Configuration_of_CMSIS */
 
+#ifdef __cplusplus
+}
+#endif
+
 #include <core_cm0.h>                               /*!< Cortex-M0 processor and core peripherals                              */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* ================================================================================ */
 /* ================       Device Specific Peripheral Section       ================ */

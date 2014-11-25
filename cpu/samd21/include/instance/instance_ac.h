@@ -44,6 +44,10 @@
 #ifndef _SAMR21_AC_INSTANCE_
 #define _SAMR21_AC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for AC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_AC_CTRLA               (0x42004400U) /**< \brief (AC) Control A */
@@ -83,5 +87,9 @@
 #define AC_GCLK_ID_DIG              31
 #define AC_NUM_CMP                  AC_CMP_NUM
 #define AC_PAIRS                    1
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_AC_INSTANCE_ */

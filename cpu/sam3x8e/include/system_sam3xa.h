@@ -42,13 +42,14 @@
 
 /* @cond 0 */
 /**INDENT-OFF**/
-#ifdef __cplusplus
-extern "C" {
-#endif
 /**INDENT-ON**/
 /* @endcond */
 
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern uint32_t SystemCoreClock;    /* System Clock Frequency (Core Clock) */
 

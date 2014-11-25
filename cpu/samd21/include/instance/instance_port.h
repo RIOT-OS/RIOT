@@ -44,6 +44,10 @@
 #ifndef _SAMR21_PORT_INSTANCE_
 #define _SAMR21_PORT_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for PORT peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_PORT_DIR0              (0x41004400U) /**< \brief (PORT) Data Direction 0 */
@@ -158,5 +162,9 @@
 #define PORT_SLEWLIM                0
 #define PORT_SLEWLIM_DEFAULT_VAL    { 0x00000000, 0x00000000, 0x00000000 }
 #define PORT_SLEWLIM_IMPLEMENTED    { 0x00000000, 0x00000000, 0x00000000 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_PORT_INSTANCE_ */

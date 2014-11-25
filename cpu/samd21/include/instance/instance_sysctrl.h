@@ -44,6 +44,10 @@
 #ifndef _SAMR21_SYSCTRL_INSTANCE_
 #define _SAMR21_SYSCTRL_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for SYSCTRL peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_SYSCTRL_INTENCLR       (0x40000800U) /**< \brief (SYSCTRL) Interrupt Enable Clear */
@@ -116,5 +120,9 @@
 #define SYSCTRL_VREG_VERSION        0x201
 #define SYSCTRL_XOSC_VERSION        0x111
 #define SYSCTRL_XOSC32K_VERSION     0x111
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_SYSCTRL_INSTANCE_ */

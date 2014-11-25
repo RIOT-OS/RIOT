@@ -44,6 +44,10 @@
 #ifndef _SAMR21_EIC_INSTANCE_
 #define _SAMR21_EIC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for EIC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_EIC_CTRL               (0x40001800U) /**< \brief (EIC) Control */
@@ -74,5 +78,9 @@
 /* ========== Instance parameters for EIC peripheral ========== */
 #define EIC_CONFIG_NUM              ((EIC_EXTINT_NUM+7)/8)
 #define EIC_GCLK_ID                 5
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_EIC_INSTANCE_ */

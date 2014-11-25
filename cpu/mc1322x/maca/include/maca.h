@@ -15,6 +15,10 @@
 
 #include "maca_packet.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************************************************/
 /* function definitions                                  */
 /*********************************************************/
@@ -530,5 +534,8 @@ static volatile struct MACA_struct * const MACA = (void *) (MACA_BASE_ADDRESS + 
 #define MACA_TMRDIS_SFTOFF_ABORT 1
 
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // MACA_H_

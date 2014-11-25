@@ -44,6 +44,10 @@
 #ifndef _SAMR21_TCC_COMPONENT_
 #define _SAMR21_TCC_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR TCC */
 /* ========================================================================== */
@@ -1604,5 +1608,9 @@ typedef struct {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /*@}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_TCC_COMPONENT_ */

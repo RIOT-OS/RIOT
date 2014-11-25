@@ -44,6 +44,10 @@
 #ifndef _SAMR21_PAC1_INSTANCE_
 #define _SAMR21_PAC1_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for PAC1 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_PAC1_WPCLR             (0x41000000U) /**< \brief (PAC1) Write Protection Clear */
@@ -55,5 +59,9 @@
 
 /* ========== Instance parameters for PAC1 peripheral ========== */
 #define PAC1_WPROT_DEFAULT_VAL      0x00000000
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_PAC1_INSTANCE_ */

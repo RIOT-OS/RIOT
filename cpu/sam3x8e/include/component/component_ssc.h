@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_SSC_COMPONENT_
 #define _SAM3XA_SSC_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Synchronous Serial Controller */
 /* ============================================================================= */
@@ -267,5 +271,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_SSC_COMPONENT_ */

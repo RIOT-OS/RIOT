@@ -13,6 +13,10 @@
 
 #include "cpu.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef __MSP430_HAS_TA2__
 #define HWTIMER_MAXTIMERS 2
 #endif
@@ -31,5 +35,9 @@
 
 #define HWTIMER_SPEED  (F_RC_OSCILLATOR)
 #define HWTIMER_MAXTICKS (0xFFFFFFFF)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __HWTIMER_CPU_H

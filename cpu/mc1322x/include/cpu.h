@@ -26,8 +26,16 @@
 #include "arm_cpu.h"
 #include "mc1322x.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern uintptr_t __stack_start;     ///< end of user stack memory space
 bool install_irq(int int_number, void *handler_addr, int priority);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* CPU_H */

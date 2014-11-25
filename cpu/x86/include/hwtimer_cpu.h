@@ -29,6 +29,10 @@
 #ifndef CPU__X86__HWTIMER_CPU__H__
 #define CPU__X86__HWTIMER_CPU__H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Number of configured hardware timers.
  *
@@ -52,6 +56,10 @@
  * Since 1 tick = 1 µs, this number will flow over after 4295 seconds (1h11m34s).
  */
 #define HWTIMER_MAXTICKS (0xFFFFFFFFu)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

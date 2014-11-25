@@ -30,6 +30,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Initialize the Programmable Interrupt Controller.
  *
@@ -162,6 +166,10 @@ void x86_pic_enable_irq(unsigned num);
  * This function should only be called by other subsystems like the PCI subsystem.
  */
 void x86_pic_disable_irq(unsigned num);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

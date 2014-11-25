@@ -31,6 +31,10 @@
 
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Initialize threading.
  *
@@ -43,6 +47,10 @@ void x86_init_threading(void);
  * @brief   The getter/setter for inISR() for the x86 port.
  */
 extern bool x86_in_isr;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -34,6 +34,10 @@
 
 #include <core_cm0.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Peripheral: AAR */
 /* Description: Accelerated Address Resolver. */
 
@@ -6889,6 +6893,9 @@
 #define WDT_POWER_POWER_Disabled (0UL) /*!< Module power disabled. */
 #define WDT_POWER_POWER_Enabled (1UL) /*!< Module power enabled. */
 
+#ifdef __cplusplus
+}
+#endif
 
 /*lint --flb "Leave library region" */
 #endif

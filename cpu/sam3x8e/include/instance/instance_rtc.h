@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_RTC_INSTANCE_
 #define _SAM3XA_RTC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for RTC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_RTC_CR              (0x400E1A60U) /**< \brief (RTC) Control Register */
@@ -60,5 +64,9 @@
 #define REG_RTC_VER    (*(RoReg*)0x400E1A8CU) /**< \brief (RTC) Valid Entry Register */
 #define REG_RTC_WPMR   (*(RwReg*)0x400E1B44U) /**< \brief (RTC) Write Protect Mode Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_RTC_INSTANCE_ */

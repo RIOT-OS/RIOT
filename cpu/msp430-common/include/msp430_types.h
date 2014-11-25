@@ -15,6 +15,10 @@
 /** defining signed type for size_t */
 #include "kernel_types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef EINVAL
 /**
  * @brief defines EINVAL if MSP430 toolchain is too old to provide it itself
@@ -46,5 +50,9 @@ struct timeval {
 
 /* TODO: remove once msp430 libc supports clockid_t */
 typedef int clockid_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MSP430_TYPES_H */
