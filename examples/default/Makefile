@@ -45,7 +45,6 @@ endif
 ifneq (,$(filter msba2,$(BOARD)))
 	USEMODULE += sht11
 	USEMODULE += ltc4150
-	USEMODULE += rtc
 	USEMODULE += mci
 	USEMODULE += config
 	USEMODULE += random

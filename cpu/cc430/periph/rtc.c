@@ -8,8 +8,8 @@
  */
 
 /**
- * @ingroup rtc
- * @file        cc430-rtc.c
+ * @ingroup driver_periph_rtc
+ * @file
  * @brief       CC430 real time clock implementation
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  */
