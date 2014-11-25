@@ -222,8 +222,19 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
         resolution = ADC_0_RES_12BIT;
         break;
     case ADC_0_RES_16BIT:
-        divideResult = (ADC_0_DIV_RES_DISABLE | ADC_0_DIV_RES_DEFAULT);
-        accumulate = (ADC_0_ACCUM_256 | ADC_0_ACCUM_DEFAULT);
+        divideResult = ADC_0_DIV_RES_DISABLE;
+        switch(ADC_0_ACCUM_DEFAULT)
+        {
+            case ADC_0_ACCUM_512:
+                accumulate = ADC_0_ACCUM_512;
+                break;
+            case ADC_0_ACCUM_1024:
+                accumulate = ADC_0_ACCUM_1024;
+                break;
+            default:
+                accumulate = ADC_0_ACCUM_256;
+                break;
+        }        
         resolution = ADC_0_RES_16BIT;
         break;
     default:
