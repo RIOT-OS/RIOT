@@ -241,21 +241,23 @@ static void *rt_timer_over(void *arg)
 {
     (void) arg;
 
-    rpl_routing_entry_t *rt;
+    rpl_routing_entry_t **rt;
 
     while (1) {
         rpl_dodag_t *my_dodag = rpl_get_my_dodag();
 
         if (my_dodag != NULL) {
             rt = rpl_get_routing_table();
-
             for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
-                if (rt[i].used) {
-                    if (rt[i].lifetime <= 1) {
+                if(rt[i] == NULL) {
+                    break;
+                }
+                if (rt[i]->used) {
+                    if (rt[i]->lifetime <= 1) {
                         memset(&rt[i], 0, sizeof(rt[i]));
                     }
                     else {
-                        rt[i].lifetime--;
+                        rt[i]->lifetime--;
                     }
                 }
             }

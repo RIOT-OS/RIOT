@@ -47,7 +47,7 @@ extern "C" {
 
 /* global variables */
 extern rpl_of_t *rpl_objective_functions[NUMBER_IMPLEMENTED_OFS];
-extern rpl_routing_entry_t rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
+extern rpl_routing_entry_t* rpl_routing_table[RPL_MAX_ROUTING_ENTRIES];
 extern kernel_pid_t rpl_process_pid;
 
 /* needed for receiving messages with ICMP-code 155. Received via IPC from ipv6.c */
@@ -265,7 +265,7 @@ void rpl_clear_routing_table(void);
  * @return Routing table
  *
  * */
-rpl_routing_entry_t *rpl_get_routing_table(void);
+rpl_routing_entry_t **rpl_get_routing_table(void);
 
 #ifdef __cplusplus
 }
