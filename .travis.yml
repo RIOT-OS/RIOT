@@ -32,8 +32,8 @@ install:
             binutils-avr \
             avr-libc \
             cppcheck \
-			expect \
-			python-pexpect \
+            expect \
+            python-pexpect \
     - git config --global user.email "travis@example.com"
     - git config --global user.name "Travis CI"
 
