@@ -65,4 +65,6 @@ USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += hashes
 USEMODULE += udp
+USEMODULE += rpl
+#USEMODULE += border_router
 include $(RIOTBASE)/Makefile.include

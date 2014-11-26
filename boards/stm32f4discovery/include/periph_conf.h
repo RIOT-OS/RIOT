@@ -132,17 +132,17 @@ extern "C" {
 #define ADC_0_CH1           4
 #define ADC_0_CH1_PIN       4
 
-/* ADC 0 configuration */
+/* ADC 1 configuration */
 #define ADC_1_DEV           ADC2
 #define ADC_1_CHANNELS      2
 #define ADC_1_CLKEN()       (RCC->APB2ENR |= RCC_APB2ENR_ADC2EN)
 #define ADC_1_CLKDIS()      (RCC->APB2ENR &= ~(RCC_APB2ENR_ADC2EN))
 #define ADC_1_PORT          GPIOC
 #define ADC_1_PORT_CLKEN()  (RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN)
-/* ADC 0 channel 0 pin config */
+/* ADC 1 channel 0 pin config */
 #define ADC_1_CH0           11
 #define ADC_1_CH0_PIN       1
-/* ADC 0 channel 1 pin config */
+/* ADC 1 channel 1 pin config */
 #define ADC_1_CH1           12
 #define ADC_1_CH1_PIN       2
 /** @} */

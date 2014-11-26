@@ -6,7 +6,7 @@ import (
     "fmt"
     "net"
     "os"
-    "bytes"
+//    "bytes"
 )
 
 const (  
@@ -44,13 +44,13 @@ func main() {
 // Handles incoming requests.
 func handleRequest(conn net.Conn) {  
   // Make a buffer to hold incoming data.
-  buf := make([]byte, 1024)
+  buf := make([]byte, 2024)
   // Read the incoming connection into the buffer.
   reqLen, err := conn.Read(buf)
   if err != nil {
     fmt.Println("Error reading:", err.Error())
   }
-  n := bytes.Index(buf, []byte{0})
-  fmt.Printf("Message: %s, length: %d \r\n", string(buf[:n-1]), reqLen )
+ // n := bytes.Index(buf, []byte{0})
+  fmt.Printf("Message: %s, length: %d \r\n", string(buf[:reqLen]), reqLen )
   conn.Close()
 }

@@ -37,6 +37,13 @@ extern "C" {
 #endif
 
 #define KERNEL_CONF_STACKSIZE_IDLE      (256)
+#define TRICKLE_TIMER_STACKSIZE         (512)
+#define TRICKLE_INTERVAL_STACKSIZE     (512)
+#define DAO_DELAY_STACKSIZE     (512)
+#define RT_STACKSIZE     (512)
+//#define RT_STACKSIZE     (512)
+
+
 /** @} */
 
 /**
@@ -73,6 +80,8 @@ typedef enum {
  */
 
 #define CPUID_ID_LEN (128/8) //128 bits long, 16 bytes long
-
+#ifdef __cplusplus
+} /* end extern "C" */
+#endif
 #endif /* __CPU_CONF_H */
 /** @} */
