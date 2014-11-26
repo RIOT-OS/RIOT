@@ -59,6 +59,7 @@ script:
     - make -C ./tests/unittests all test BOARD=qemu-i386 || exit
 
     - ./dist/tools/compile_test/compile_test.py
+    - ./dist/tools/pr_check/pr_check.sh riot/master
 
 notifications:
     email: false
