@@ -32,6 +32,7 @@ install:
             binutils-avr \
             avr-libc \
             cppcheck \
+            bridge-utils \
             expect \
             python-pexpect \
     - git config --global user.email "travis@example.com"
