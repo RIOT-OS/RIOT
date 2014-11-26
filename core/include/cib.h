@@ -41,7 +41,7 @@ typedef struct {
  *
  * @param[out] cib      Buffer to initialize.
  *                      Must not be NULL.
- * @param[in]  size     Size of the buffer.
+ * @param[in]  size     Size of the buffer, must not exceed MAXINT/2.
  */
 static inline void cib_init(cib_t *__restrict cib, unsigned int size)
 {
