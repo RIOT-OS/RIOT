@@ -33,6 +33,7 @@
 #ifdef MODULE_VTIMER
 #include <sys/time.h>
 #endif
+#include <ifaddrs.h>
 
 #include "kernel.h"
 #include "cpu.h"
@@ -51,32 +52,46 @@ ssize_t (*real_read)(int fd, void *buf, size_t count);
 ssize_t (*real_write)(int fd, const void *buf, size_t count);
 size_t (*real_fread)(void *ptr, size_t size, size_t nmemb, FILE *stream);
 void (*real_clearerr)(FILE *stream);
+__attribute__((noreturn)) void (*real_exit)(int status);
 void (*real_free)(void *ptr);
 void* (*real_malloc)(size_t size);
 void* (*real_calloc)(size_t nmemb, size_t size);
 void* (*real_realloc)(void *ptr, size_t size);
 void (*real_freeaddrinfo)(struct addrinfo *res);
+void (*real_freeifaddrs)(struct ifaddrs *ifa);
 void (*real_srandom)(unsigned int seed);
 int (*real_accept)(int socket, ...);
 int (*real_bind)(int socket, ...);
 int (*real_printf)(const char *format, ...);
 int (*real_getaddrinfo)(const char *node, ...);
+int (*real_getifaddrs)(struct ifaddrs **ifap);
 int (*real_getpid)(void);
 int (*real_close)(int);
+int (*real_creat)(const char *path, ...);
 int (*real_dup2)(int, int);
 int (*real_execve)(const char *, char *const[], char *const[]);
 int (*real_fork)(void);
 int (*real_feof)(FILE *stream);
 int (*real_ferror)(FILE *stream);
 int (*real_listen)(int socket, int backlog);
+int (*real_ioctl)(int fildes, int request, ...);
+int (*real_open)(const char *path, int oflag, ...);
 int (*real_pause)(void);
 int (*real_pipe)(int[2]);
+int (*real_select)(int nfds, ...);
+int (*real_setitimer)(int which, const struct itimerval
+        *restrict value, struct itimerval *restrict ovalue);
 int (*real_setsockopt)(int socket, ...);
 int (*real_socket)(int domain, int type, int protocol);
 int (*real_unlink)(const char *);
 long int (*real_random)(void);
 const char* (*real_gai_strerror)(int errcode);
 FILE* (*real_fopen)(const char *path, const char *mode);
+
+#ifdef __MACH__
+#else
+int (*real_clock_gettime)(clockid_t clk_id, struct timespec *tp);
+#endif
 
 void _native_syscall_enter(void)
 {
@@ -189,7 +204,8 @@ ssize_t _native_write(int fd, const void *buf, size_t count)
 #if defined(__FreeBSD__)
 #undef putchar
 #endif
-int putchar(int c) {
+int putchar(int c)
+{
     _native_write(STDOUT_FILENO, &c, 1);
     return 0;
 }
@@ -269,7 +285,7 @@ void vwarn(const char *fmt, va_list args)
 
     if ((m = make_message(fmt, args)) == NULL) {
         _native_write(STDERR_FILENO, "malloc\n", 7);
-        exit(EXIT_FAILURE);
+        real_exit(EXIT_FAILURE);
     }
     _native_write(STDERR_FILENO, _progname, strlen(_progname));
     _native_write(STDERR_FILENO, ": ", 2);
@@ -286,7 +302,7 @@ void vwarnx(const char *fmt, va_list args)
 
     if ((m = make_message(fmt, args)) == NULL) {
         _native_write(STDERR_FILENO, "malloc\n", 7);
-        exit(EXIT_FAILURE);
+        real_exit(EXIT_FAILURE);
     }
     _native_write(STDERR_FILENO, _progname, strlen(_progname));
     _native_write(STDERR_FILENO, ": ", 2);
@@ -298,13 +314,13 @@ void vwarnx(const char *fmt, va_list args)
 void verr(int eval, const char *fmt, va_list args)
 {
     vwarn(fmt, args);
-    exit(eval);
+    real_exit(eval);
 }
 
 void verrx(int eval, const char *fmt, va_list args)
 {
     vwarnx(fmt, args);
-    exit(eval);
+    real_exit(eval);
 }
 
 void warn(const char *fmt, ...)
@@ -346,7 +362,8 @@ int getpid(void)
 }
 
 #ifdef MODULE_VTIMER
-int _gettimeofday(struct timeval *tp, void *restrict tzp) {
+int _gettimeofday(struct timeval *tp, void *restrict tzp)
+{
     (void) tzp;
     vtimer_gettimeofday(tp);
     return 0;
@@ -362,29 +379,41 @@ void _native_init_syscalls(void)
     *(void **)(&real_write) = dlsym(RTLD_NEXT, "write");
     *(void **)(&real_malloc) = dlsym(RTLD_NEXT, "malloc");
     *(void **)(&real_realloc) = dlsym(RTLD_NEXT, "realloc");
+    *(void **)(&real_exit) = dlsym(RTLD_NEXT, "exit");
     *(void **)(&real_free) = dlsym(RTLD_NEXT, "free");
     *(void **)(&real_freeaddrinfo) = dlsym(RTLD_NEXT, "freeaddrinfo");
+    *(void **)(&real_freeifaddrs) = dlsym(RTLD_NEXT, "freeifaddrs");
     *(void **)(&real_srandom) = dlsym(RTLD_NEXT, "srandom");
     *(void **)(&real_accept) = dlsym(RTLD_NEXT, "accept");
     *(void **)(&real_bind) = dlsym(RTLD_NEXT, "bind");
     *(void **)(&real_printf) = dlsym(RTLD_NEXT, "printf");
     *(void **)(&real_gai_strerror) = dlsym(RTLD_NEXT, "gai_strerror");
     *(void **)(&real_getaddrinfo) = dlsym(RTLD_NEXT, "getaddrinfo");
+    *(void **)(&real_getifaddrs) = dlsym(RTLD_NEXT, "getifaddrs");
     *(void **)(&real_getpid) = dlsym(RTLD_NEXT, "getpid");
     *(void **)(&real_pipe) = dlsym(RTLD_NEXT, "pipe");
     *(void **)(&real_close) = dlsym(RTLD_NEXT, "close");
+    *(void **)(&real_creat) = dlsym(RTLD_NEXT, "creat");
     *(void **)(&real_fork) = dlsym(RTLD_NEXT, "fork");
     *(void **)(&real_dup2) = dlsym(RTLD_NEXT, "dup2");
+    *(void **)(&real_select) = dlsym(RTLD_NEXT, "select");
+    *(void **)(&real_setitimer) = dlsym(RTLD_NEXT, "setitimer");
     *(void **)(&real_setsockopt) = dlsym(RTLD_NEXT, "setsockopt");
     *(void **)(&real_socket) = dlsym(RTLD_NEXT, "socket");
     *(void **)(&real_unlink) = dlsym(RTLD_NEXT, "unlink");
     *(void **)(&real_random) = dlsym(RTLD_NEXT, "random");
     *(void **)(&real_execve) = dlsym(RTLD_NEXT, "execve");
+    *(void **)(&real_ioctl) = dlsym(RTLD_NEXT, "ioctl");
     *(void **)(&real_listen) = dlsym(RTLD_NEXT, "listen");
+    *(void **)(&real_open) = dlsym(RTLD_NEXT, "open");
     *(void **)(&real_pause) = dlsym(RTLD_NEXT, "pause");
     *(void **)(&real_fopen) = dlsym(RTLD_NEXT, "fopen");
     *(void **)(&real_fread) = dlsym(RTLD_NEXT, "fread");
     *(void **)(&real_feof) = dlsym(RTLD_NEXT, "feof");
     *(void **)(&real_ferror) = dlsym(RTLD_NEXT, "ferror");
     *(void **)(&real_clearerr) = dlsym(RTLD_NEXT, "clearerr");
+#ifdef __MACH__
+#else
+    *(void **)(&real_clock_gettime) = dlsym(RTLD_NEXT, "clock_gettime");
+#endif
 }
