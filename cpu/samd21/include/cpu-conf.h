@@ -37,9 +37,9 @@ extern "C" {
 #endif
 
 #define KERNEL_CONF_STACKSIZE_IDLE      (256)
-#define TRICKLE_TIMER_STACKSIZE         (512)
+#define TRICKLE_TIMER_STACKSIZE         (1024)
 #define TRICKLE_INTERVAL_STACKSIZE     (512)
-#define DAO_DELAY_STACKSIZE     (512)
+#define DAO_DELAY_STACKSIZE     (1024)
 #define RT_STACKSIZE     (512)
 //#define RT_STACKSIZE     (512)
 
@@ -66,6 +66,8 @@ extern "C" {
  */
 #define CPUID_ID_LEN (16) /* 128 bits long, 16 bytes long */
 /** @} */
+
+/*
  * @name Definition of different panic modes
  */
 typedef enum {
@@ -84,7 +86,6 @@ typedef enum {
  * @note    Must be defined in the CPU's @ref cpu-conf.h
  */
 
-#define CPUID_ID_LEN (128/8) //128 bits long, 16 bytes long
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
