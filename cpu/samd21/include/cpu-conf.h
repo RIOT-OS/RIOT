@@ -61,6 +61,11 @@ extern "C" {
 
 
 /**
+ * @name CPUID_ID_LEN length of cpuid in bytes
+ * @{
+ */
+#define CPUID_ID_LEN (16) /* 128 bits long, 16 bytes long */
+/** @} */
  * @name Definition of different panic modes
  */
 typedef enum {
