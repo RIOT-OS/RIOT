@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    basic_mac Dummy MAC
+ * @defgroup    basic_mac Basic MAC
  * @ingroup     net
  * @brief       Basic link layer protocol to speak with any transceiver driver
  *              in some manner.
@@ -70,7 +70,7 @@ typedef enum {
 void basic_mac_init_module(void);
 
 /**
- * @brief   Initialize new dummy MAC layer.
+ * @brief   Initialize new basic MAC layer.
  *
  * @param[in] stack     Stack for the control thread
  * @param[in] stacksize Size of *stack*
@@ -82,7 +82,7 @@ void basic_mac_init_module(void);
  *
  * @see @ref thread_create
  *
- * @return  PID of dummy MAC control thread on success
+ * @return  PID of basic MAC control thread on success
  * @return  -EINVAL if priority is invalid
  * @return  -EOVERFLOW if no slot for the new thread is available
  */
