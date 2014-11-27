@@ -24,7 +24,7 @@
 #include <stdint.h>
 #include "periph/adc.h"
 #include "periph/gpio.h" 
-
+#include "vtimer.h"
 void handle_init_response( int );
 
 int main(void)
@@ -38,14 +38,20 @@ int main(void)
 	int response = adc_init(dev, pre);
 	handle_init_response(response);
 	int result = 0;      
-  	printf("ADC Testing while(1)\n" ); 	
+  	printf("ADC Testing\n" ); 	
   	gpio_init_out(GPIO_0, GPIO_NOPULL);
   	gpio_set(GPIO_0);
+  	sleep(1);
+  	printf("ADC Testing while(1)\n" );
     while(1)
     {
-    	result = adc_sample(dev, 0);
+    	//result = adc_sample(dev, 2); //pin 6
     	//printf("Result: " );
-    	printf("%d\n", result);    	
+    	//printf("PIN6: %d\n", result);   
+
+    	result = adc_sample(dev, 0); // pin 5
+    	//printf("Result: " );
+    	printf("%d\n", result);  	
     }
     
     return 0;

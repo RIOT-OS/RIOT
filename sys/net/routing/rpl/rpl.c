@@ -37,7 +37,7 @@
 #include "rpl/rpl_storing.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #if ENABLE_DEBUG
 #undef TRICKLE_TIMER_STACKSIZE
 #define TRICKLE_TIMER_STACKSIZE (KERNEL_CONF_STACKSIZE_MAIN)

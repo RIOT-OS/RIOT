@@ -36,7 +36,7 @@ int adc_configure_with_resolution(Adc*, uint32_t);
 
 int adc_init(adc_t dev, adc_precision_t precision)
 {
-    adc_poweron(dev);
+    //adc_poweron(dev);
     Adc *adc = 0;
     int init = 0;
     switch (dev) {
@@ -58,7 +58,8 @@ int adc_init(adc_t dev, adc_precision_t precision)
                     init = adc_configure_with_resolution(adc, ADC_0_RES_12BIT); 
                     break;
                 case ADC_RES_16BIT:
-                    init = adc_configure_with_resolution(adc, ADC_0_RES_16BIT);            
+                    init = adc_configure_with_resolution(adc, ADC_0_RES_16BIT);
+                    DEBUG("Init switch DONE\n");            
                     break;
                 default:
                     return -1;
@@ -69,7 +70,7 @@ int adc_init(adc_t dev, adc_precision_t precision)
             /* Enable bandgap if internal ref 1 volt */
             if(ADC_0_REF_DEFAULT == ADC_0_REF_INT_1V)
             {
-                SYSCTRL->VREF.reg |= SYSCTRL_VREF_BGOUTEN;                    
+                //SYSCTRL->VREF.reg |= SYSCTRL_VREF_BGOUTEN;                    
             }
             /* Enable */
             adc->CTRLA.reg |= ADC_CTRLA_ENABLE;
@@ -85,6 +86,7 @@ int adc_sample(adc_t dev, int channel)
 {
     int result = 0;
     Adc *adc = 0;
+    int posChanInput = 0;
     switch (dev)
     {
     #if ADC_0_EN
@@ -99,6 +101,77 @@ int adc_sample(adc_t dev, int channel)
             DEBUG("case default\n");
             return -1;
     }
+    // adc->CTRLA.reg &= ~ADC_CTRLA_ENABLE;
+    // switch(channel)
+    // {
+    //     case 1:
+    //         /* Pin Muxing */
+    //         ADC_0_PORT.PINCFG[ ADC_0_CH1 ].bit.PMUXEN = 1;
+    //         ADC_0_PORT.PMUX[ ADC_0_CH1 / 2].bit.PMUXO = 1;
+
+    //         /* ADC_0_POS_INPUT Input */
+    //         ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_CH1);
+    //         ADC_0_PORT.PINCFG[ADC_0_CH1].bit.INEN = true;
+    //         ADC_0_PORT.PINCFG[ADC_0_CH1].bit.PULLEN = false; 
+
+    //         if(ADC_0_NEG_INPUT != ADC_INPUTCTRL_MUXNEG_GND)
+    //         {
+    //             ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_NEG_INPUT);
+    //             ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.INEN = true;
+    //             ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.PULLEN = false;
+    //         }
+    //         posChanInput = ADC_0_CH1;
+    //         break;
+    //     case 2:
+    //         /* Pin Muxing */
+    //         ADC_0_PORT.PINCFG[ ADC_0_CH2 ].bit.PMUXEN = 1;
+    //         ADC_0_PORT.PMUX[ ADC_0_CH2 / 2].bit.PMUXE = 1;
+
+    //         /* ADC_0_POS_INPUT Input */
+    //         ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_CH2);
+    //         ADC_0_PORT.PINCFG[ADC_0_CH2].bit.INEN = true;
+    //         ADC_0_PORT.PINCFG[ADC_0_CH2].bit.PULLEN = false; 
+
+    //         if(ADC_0_NEG_INPUT != ADC_INPUTCTRL_MUXNEG_GND)
+    //         {
+    //             ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_NEG_INPUT);
+    //             ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.INEN = true;
+    //             ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.PULLEN = false;
+    //         }
+    //         posChanInput = ADC_0_CH2; 
+    //         break;
+    //     case 3:
+    //         /* Pin Muxing */
+    //         ADC_0_PORT.PINCFG[ ADC_0_CH3 ].bit.PMUXEN = 1;
+    //         ADC_0_PORT.PMUX[ ADC_0_CH3 / 2].bit.PMUXO = 1;
+
+    //         /* ADC_0_POS_INPUT Input */
+    //         ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_CH3);
+    //         ADC_0_PORT.PINCFG[ADC_0_CH3].bit.INEN = true;
+    //         ADC_0_PORT.PINCFG[ADC_0_CH3].bit.PULLEN = false; 
+
+    //         if(ADC_0_NEG_INPUT != ADC_INPUTCTRL_MUXNEG_GND)
+    //         {
+    //             ADC_0_PORT.DIRCLR.reg = (1 << ADC_0_NEG_INPUT);
+    //             ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.INEN = true;
+    //             ADC_0_PORT.PINCFG[ADC_0_NEG_INPUT].bit.PULLEN = false;
+    //         }
+    //         posChanInput = ADC_0_CH3; 
+    //         break;
+    //         default:
+    //             DEBUG("Invalid channel\n");
+    //             return -1;
+    // }
+    // /* Configure PIN SCAN MODE & positive & Negative Input Pins */
+    // adc->INPUTCTRL.reg = 
+    //     ADC_0_GAIN_FACTOR_DEFAULT |
+    //     (ADC_0_PIN_SCAN_OFFSET_START << ADC_INPUTCTRL_INPUTOFFSET_Pos) |
+    //     (ADC_0_PIN_SCAN_INPUT_TO_SCAN << ADC_INPUTCTRL_INPUTSCAN_Pos) |
+    //     ADC_0_NEG_INPUT |
+    //     posChanInput;
+    // while(adc_syncing(adc));
+    // adc->CTRLA.reg |= ADC_CTRLA_ENABLE;
+    //while(adc_syncing(adc));
     /* MUST NOT BLOCK */
     while(!(adc_get_status(adc) & ADC_0_STATUS_RESULT_READY))
     {
@@ -125,12 +198,6 @@ void adc_poweron(adc_t dev)
         case ADC_0:
             /* Setup generic clock mask for adc */
             PM->APBCMASK.reg |= PM_APBCMASK_ADC;
-            /* Setup generic clock channel for adc */                             
-            GCLK->CLKCTRL.reg |= (ADC_GCLK_ID << GCLK_CLKCTRL_GEN_Pos);
-             /*Enable generic clock channel */
-            *((uint8_t*)&GCLK->CLKCTRL.reg) |= ADC_GCLK_ID;
-            /* enable generic clock */
-            GCLK->CLKCTRL.reg |= GCLK_CLKCTRL_CLKEN;
             break;
     #endif
         default:
@@ -150,6 +217,7 @@ void adc_poweroff(adc_t dev)
             while(adc_syncing(adc));
             /* Disable */
             adc->CTRLA.reg &= ~ADC_CTRLA_ENABLE;
+            /*PM->APBCMASK.reg &= ~PM_APBCMASK_ADC;*/ 
             break;
     #endif
         default:
@@ -180,6 +248,7 @@ bool adc_syncing(Adc* adc)
 /* Configure ADC with defined Resolution */
 int adc_configure_with_resolution(Adc* adc, uint32_t precision)
 {
+    adc_poweron(ADC_0);
     uint8_t  divideResult = ADC_0_DIV_RES_DEFAULT;
     uint32_t resolution = ADC_0_RES_16BIT;
     uint32_t accumulate = ADC_0_ACCUM_DEFAULT;
@@ -187,8 +256,13 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
         return -1;
     if(adc->CTRLA.reg & ADC_CTRLA_ENABLE)
         return -1;
+    
+    /* GCLK Setup */
+    GCLK->CLKCTRL.reg = (uint32_t)((GCLK_CLKCTRL_CLKEN
+                          | GCLK_CLKCTRL_GEN_GCLK0 
+                          | (ADC_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
 
-     /* Pin Muxing */
+    /* Pin Muxing */
     ADC_0_PORT.PINCFG[ ADC_0_POS_INPUT ].bit.PMUXEN = 1;
     ADC_0_PORT.PMUX[ ADC_0_POS_INPUT / 2].bit.PMUXE = 1;
 
@@ -248,6 +322,7 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
     /* Set Sample length */
     adc->SAMPCTRL.reg = (ADC_0_SAMPLE_LENGTH << ADC_SAMPCTRL_SAMPLEN_Pos);
     while(adc_syncing(adc));
+    
     /* If external vref. Pin setup */
     if(ADC_0_REF_DEFAULT == ADC_0_REF_EXT_B)
     {
@@ -255,7 +330,7 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
         ADC_0_PORT.PINCFG[ADC_0_REF_DEFAULT].bit.INEN = true;
         ADC_0_PORT.PINCFG[ADC_0_REF_DEFAULT].bit.PULLEN = false;
     }
-    while(adc_syncing(adc));
+
     /* Configure CTRLB Register HERE IS THE RESOLUTION SET!*/
     adc->CTRLB.reg = 
         ADC_0_PRESCALER |
@@ -264,16 +339,19 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
         (ADC_0_FREE_RUNNING << ADC_CTRLB_FREERUN_Pos) | 
         (ADC_0_LEFT_ADJUST << ADC_CTRLB_LEFTADJ_Pos) |
         (ADC_0_DIFFERENTIAL_MODE << ADC_CTRLB_DIFFMODE_Pos);        
-    while(adc_syncing(adc));
+
+
     /* Configure Window Mode Register */
-    adc->WINCTRL.reg = ADC_0_WINDOW_MODE;
-    while(adc_syncing(adc));
+    /*adc->WINCTRL.reg = ADC_0_WINDOW_MODE;
+    while(adc_syncing(adc));*/
 
     /* Configure lower threshold */
     adc->WINLT.reg = ADC_0_WINDOW_LOWER << ADC_WINLT_WINLT_Pos;
     while(adc_syncing(adc));
+
     /* Configure lower threshold */
     adc->WINUT.reg = ADC_0_WINDOW_HIGHER << ADC_WINUT_WINUT_Pos;
+    while(adc_syncing(adc));
 
     /* Configure PIN SCAN MODE & positive & Negative Input Pins */
     adc->INPUTCTRL.reg = 
@@ -285,7 +363,7 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
     
     /* Configure event action */
     adc->EVCTRL.reg = ADC_0_EVENT_ACTION;
-    
+
     if (ADC_0_CORRECTION_EN)
     {
         if (ADC_0_GAIN_CORRECTION > ADC_GAINCORR_GAINCORR_Msk) 
@@ -314,11 +392,12 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
     adc->INTENCLR.reg =
         (1 << ADC_INTENCLR_SYNCRDY_Pos) | (1 << ADC_INTENCLR_WINMON_Pos) |
         (1 << ADC_INTENCLR_OVERRUN_Pos) | (1 << ADC_INTENCLR_RESRDY_Pos);
-    
+   
     /* Load the fixed device calibration constants*/
     adc->CALIB.reg = ADC_CALIB_BIAS_CAL((*(uint32_t*)ADC_FUSES_BIASCAL_ADDR >> ADC_FUSES_BIASCAL_Pos))
                     |
                     ADC_CALIB_LINEARITY_CAL((*(uint64_t*)ADC_FUSES_LINEARITY_0_ADDR >> ADC_FUSES_LINEARITY_0_Pos));
+  
     return 1;
 }
 
