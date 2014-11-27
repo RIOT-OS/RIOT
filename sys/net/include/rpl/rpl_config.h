@@ -1,17 +1,21 @@
-/**
- * RPL data structs
- *
+/*
  * Copyright (C) 2013, 2014  INRIA.
  *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- *
- * @ingroup rpl
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     rpl
  * @{
- * @file    rpl_config.h
- * @brief   RPL Config
- * @author  Eric Engel <eric.engel@fu-berlin.de>
+ *
+ * @file        rpl_config.h
+ * @brief       RPL Config
+ *
+ * Configuration file, which defines all environmental variables for RPL.
+ *
+ * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @}
  */
 
@@ -42,11 +46,11 @@ extern "C" {
 #define DAO_ACK_LEN                 4
 #define DAO_ACK_D_LEN               24
 #define RPL_OPT_LEN                 2
-#define RPL_OPT_DODAG_CONF_LEN      14
-#define RPL_OPT_PREFIX_INFO_LEN     30
-#define RPL_OPT_SOLICITED_INFO_LEN  19
-#define RPL_OPT_TARGET_LEN          18
-#define RPL_OPT_TRANSIT_LEN         4
+#define RPL_OPT_DODAG_CONF_LEN      16
+#define RPL_OPT_PREFIX_INFO_LEN     32
+#define RPL_OPT_SOLICITED_INFO_LEN  21
+#define RPL_OPT_TARGET_LEN          20
+#define RPL_OPT_TRANSIT_LEN         22
 
 /* message options */
 #define RPL_OPT_PAD1                 0
@@ -68,7 +72,7 @@ extern "C" {
 
 static inline uint8_t RPL_COUNTER_INCREMENT(uint8_t counter)
 {
-    return (counter > RPL_COUNTER_LOWER_REGION ? (counter == RPL_COUNTER_MAX ? counter=0 : ++counter) : (counter == RPL_COUNTER_LOWER_REGION ? counter=0 : ++counter));
+    return (counter > RPL_COUNTER_LOWER_REGION ? (counter == RPL_COUNTER_MAX ? counter = 0 : ++counter) : (counter == RPL_COUNTER_LOWER_REGION ? counter = 0 : ++counter));
 }
 
 static inline bool RPL_COUNTER_IS_INIT(uint8_t counter)
@@ -76,14 +80,14 @@ static inline bool RPL_COUNTER_IS_INIT(uint8_t counter)
     return (counter > RPL_COUNTER_LOWER_REGION);
 }
 
-static inline bool RPL_COUNTER_GREATER_THAN_LOCAL(uint8_t A,uint8_t B)
+static inline bool RPL_COUNTER_GREATER_THAN_LOCAL(uint8_t A, uint8_t B)
 {
-    return (((A<B) && (RPL_COUNTER_LOWER_REGION + 1 - B + A < RPL_COUNTER_SEQ_WINDOW)) || ((A > B) && (A-B < RPL_COUNTER_SEQ_WINDOW)));
+    return (((A < B) && (RPL_COUNTER_LOWER_REGION + 1 - B + A < RPL_COUNTER_SEQ_WINDOW)) || ((A > B) && (A - B < RPL_COUNTER_SEQ_WINDOW)));
 }
 
-static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A,uint8_t B)
+static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 {
-    return ((A>RPL_COUNTER_LOWER_REGION) ? ((B > RPL_COUNTER_LOWER_REGION ) ? RPL_COUNTER_GREATER_THAN_LOCAL(A,B) : 0): (( B>RPL_COUNTER_LOWER_REGION ) ? 1: RPL_COUNTER_GREATER_THAN_LOCAL(A,B)));
+    return ((A > RPL_COUNTER_LOWER_REGION) ? ((B > RPL_COUNTER_LOWER_REGION) ? RPL_COUNTER_GREATER_THAN_LOCAL(A, B) : 0) : ((B > RPL_COUNTER_LOWER_REGION) ? 1 : RPL_COUNTER_GREATER_THAN_LOCAL(A, B)));
 }
 
 /* Node Status */
@@ -123,7 +127,10 @@ static inline bool RPL_COUNTER_GREATER_THAN(uint8_t A,uint8_t B)
 #define RPL_MAX_DODAGS 3
 #define RPL_MAX_INSTANCES 1
 #define RPL_MAX_PARENTS 5
-#define RPL_MAX_ROUTING_ENTRIES 128
+#define RPL_MAX_ROUTING_ENTRIES_STORING 128
+#define RPL_MAX_ROUTING_ENTRIES_NON_STORING 128
+#define RPL_MAX_SRH_PATH_LENGTH 10;
+#define RPL_SRH_ENTRIES 15
 #define RPL_ROOT_RANK 256
 #define RPL_DEFAULT_LIFETIME 0xff
 #define RPL_LIFETIME_UNIT 2
