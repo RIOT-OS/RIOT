@@ -12,7 +12,7 @@
 
 #include "clist.h"
 
-#include "embUnit/embUnit.h"
+#include "embUnit.h"
 
 #include "netdev_dummy.h"
 

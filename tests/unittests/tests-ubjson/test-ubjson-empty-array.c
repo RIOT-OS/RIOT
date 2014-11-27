@@ -17,6 +17,7 @@
  */
 
 #include "tests-ubjson.h"
+#include "kernel.h"
 
 typedef enum {
     BEFORE_ARRAY_1 = __LINE__,

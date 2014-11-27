@@ -7,21 +7,18 @@
  */
 
 /**
- * @addtogroup  unittests
+ * @addtogroup unittests
+ * @addtogroup sys
  * @{
  *
- * @file        unittests.h
- * @brief       Common header file for unittests
+ * @file
+ * @brief Common header file for unittests
  *
- * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
-#ifndef __UNITTESTS__H
-#define __UNITTESTS__H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef __SYS__EMB_UNIT__H
+#define __SYS__EMB_UNIT__H
 
 #include "embUnit/embUnit.h"
 
@@ -31,17 +28,17 @@ extern "C" {
 #   define OUTPUT_COMPILER (4)
 
 #   if (OUTPUT==OUTPUT_XML)
-#       include "textui/XMLOutputter.h"
+#       include "embUnit/XMLOutputter.h"
 #       define OUTPUTTER   (XMLOutputter_outputter())
 #   elif (OUTPUT==OUTPUT_TEXT)
-#       include "textui/TextOutputter.h"
+#       include "embUnit/TextOutputter.h"
 #       define OUTPUTTER   (TextOutputter_outputter())
 #   elif (OUTPUT==OUTPUT_COMPILER)
-#       include "textui/CompilerOutputter.h"
+#       include "embUnit/CompilerOutputter.h"
 #       define OUTPUTTER   (CompilerOutputter_outputter())
 #   endif
 
-#   include "textui/TextUIRunner.h"
+#   include "embUnit/TextUIRunner.h"
 
 #   define TESTS_START()   TextUIRunner_start()
 #   define TESTS_RUN(t)    TextUIRunner_runTest(t)
@@ -53,7 +50,15 @@ extern "C" {
 #endif
 
 #ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
 }
 #endif
 
 #endif
+
+/**
+ * @}
+ */

@@ -32,7 +32,7 @@
  *
  * $Id: TestRunner.c,v 1.6 2004/02/10 16:19:29 arms22 Exp $
  */
-#include "config.h"
+#include "embUnit_config.h"
 #include "stdImpl.h"
 #include "Test.h"
 #include "TestListener.h"
