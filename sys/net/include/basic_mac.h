@@ -34,7 +34,7 @@ extern "C" {
 
 #ifndef BASIC_MAC_REGISTRY_SIZE
 /**
- * @brief   The size of basic MAC's recipant registry.
+ * @brief   The size of basic MAC's registry of receiving threads.
  */
 #define BASIC_MAC_REGISTRY_SIZE (1)
 #endif
