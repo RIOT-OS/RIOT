@@ -42,6 +42,7 @@ if [ -z "${FILES}" ]; then
     exit
 fi
 
-cppcheck --std=c99 --enable=style --force --error-exitcode=2 --quiet -j 8 \
+# TODO: switch back to 8 jobs when/if cppcheck issue is resolved
+cppcheck --std=c99 --enable=style --force --error-exitcode=2 --quiet -j 1 \
          --template "{file}:{line}: {severity} ({id}): {message}"         \
          --inline-suppr ${DEFAULT_SUPPRESSIONS} ${@} ${FILES}
