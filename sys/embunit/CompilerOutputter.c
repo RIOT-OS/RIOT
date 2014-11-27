@@ -64,7 +64,7 @@ static void CompilerOutputter_printFailure(OutputterRef self,TestRef test,char *
 {
     (void)self;
     (void)runCount;
-    fprintf(stdout,"%s %d: %s: %s\n", file, line, Test_name(test), msg);
+    printf("%s %d: %s: %s\n", file, line, Test_name(test), msg);
 }
 
 static void CompilerOutputter_printStatistics(OutputterRef self,TestResultRef result)
