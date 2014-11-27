@@ -28,8 +28,8 @@
 #define BASIC_MAC_MSG_QUEUE_SIZE    (16)
 
 static struct {
-    kernel_pid_t registrar_pid;
-    kernel_pid_t recipant_pid;
+    kernel_pid_t registrar_pid; /**< Thread recipand is registered to */
+    kernel_pid_t recipant_pid;  /**< Registered recipant thread */
 } _basic_mac_registry[BASIC_MAC_REGISTRY_SIZE];
 
 static int _basic_mac_recv_cb(netdev_t *dev, void *src, size_t src_len,
