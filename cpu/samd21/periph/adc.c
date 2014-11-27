@@ -184,18 +184,10 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
     if(adc->CTRLA.reg & ADC_CTRLA_ENABLE)
         return -1;
     
-    /* Cache the new config to reduce sync requirements */
-    uint32_t new_config = (ADC_GCLK_ID << GCLK_CLKCTRL_ID_Pos);
-    /* Select the desired generic clock generator */
-    new_config |= ADC_0_CLK_SOURCE << GCLK_CLKCTRL_GEN_Pos;
-    /* Setup generic clock channel for adc */                             
-    GCLK->CLKCTRL.reg |= (ADC_GCLK_ID << GCLK_CLKCTRL_GEN_Pos);
-    /* Write the new configuration */
-    GCLK->CLKCTRL.reg = new_config;
-    /*Choose generic clock channel */
-    *((uint8_t*)&GCLK->CLKCTRL.reg) = ADC_GCLK_ID;
-    /* Enable generic clock */
-    GCLK->CLKCTRL.reg |= GCLK_CLKCTRL_CLKEN;
+    /* GCLK Setup*/
+    GCLK->CLKCTRL.reg = (uint32_t)((GCLK_CLKCTRL_CLKEN
+                          | GCLK_CLKCTRL_GEN_GCLK0 
+                          | (ADC_GCLK_ID << GCLK_CLKCTRL_ID_Pos)));
 
      /* Pin Muxing */
     ADC_0_PORT.PINCFG[ ADC_0_POS_INPUT ].bit.PMUXEN = 1;
