@@ -75,7 +75,6 @@ void basic_mac_init_module(void);
  * @param[in] stack     Stack for the control thread
  * @param[in] stacksize Size of *stack*
  * @param[in] priority  Priority for the control thread
- * @param[in] flags     Flags for the control thread
  * @param[in] name      Name for the control thread
  * @param[in] dev       An *initialized* network device to use with this MAC
  *                      layer
@@ -86,7 +85,7 @@ void basic_mac_init_module(void);
  * @return  -EINVAL if priority is invalid
  * @return  -EOVERFLOW if no slot for the new thread is available
  */
-kernel_pid_t basic_mac_init(char *stack, int stacksize, char priority, int flags,
+kernel_pid_t basic_mac_init(char *stack, int stacksize, char priority,
                             const char *name, netdev_t *dev);
 
 #ifdef MODULE_NETDEV_DUMMY

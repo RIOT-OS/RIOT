@@ -534,8 +534,8 @@ void tests_basic_mac(void)
 
     basic_mac_pid = basic_mac_init(unittests_basic_mac_stack,
                                    UNITTESTS_BASIC_MAC_STACKSIZE,
-                                   PRIORITY_MAIN - 1, 0,
-                                   UNITTESTS_BASIC_MAC_NAME, dev);
+                                   PRIORITY_MAIN - 1, UNITTESTS_BASIC_MAC_NAME,
+                                   dev);
 
     TESTS_RUN(tests_basic_mac_tests());
     TESTS_RUN(tests_basic_mac_threaded_tests());

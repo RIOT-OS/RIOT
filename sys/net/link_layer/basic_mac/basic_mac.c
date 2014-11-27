@@ -283,13 +283,13 @@ void basic_mac_init_module(void)
     }
 }
 
-kernel_pid_t basic_mac_init(char *stack, int stacksize, char priority, int flags,
+kernel_pid_t basic_mac_init(char *stack, int stacksize, char priority,
                             const char *name, netdev_t *dev)
 {
     dev->driver->add_receive_data_callback(dev, _basic_mac_recv_cb);
 
-    return thread_create(stack, stacksize, priority, flags, _basic_mac_runner,
-                         (void *)dev, name);
+    return thread_create(stack, stacksize, priority, CREATE_STACKTEST,
+                         _basic_mac_runner, (void *)dev, name);
 }
 
 #ifdef MODULE_NETDEV_DUMMY
