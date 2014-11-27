@@ -137,7 +137,7 @@ static int _basic_mac_get_option(netdev_t *dev, netapi_conf_t *conf)
                     }
 
                     if (_basic_mac_registry[i].registrar_pid == current_pid) {
-                        registry[size++] = current_pid;
+                        registry[size++] = _basic_mac_registry[i].recipant_pid;
                     }
                 }
 
