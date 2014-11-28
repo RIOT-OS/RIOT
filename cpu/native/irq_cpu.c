@@ -279,6 +279,7 @@ void native_irq_handler(void)
 void isr_set_sigmask(ucontext_t *ctx)
 {
     ctx->uc_sigmask = _native_sig_set_dint;
+    native_interrupts_enabled = 0;
 }
 
 /**
