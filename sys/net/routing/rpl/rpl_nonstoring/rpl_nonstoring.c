@@ -290,8 +290,9 @@ void rpl_send_DAO_mode(ipv6_addr_t *destination, uint8_t lifetime, bool default_
         return;
     }
 
-    /* TODO: take advantage of start_index, by now not used in non-storing mode */
+    /* TODO: take advantage of start_index, by now not used in non-storing mode
     start_index++;
+     */
 
     rpl_dodag_t *my_dodag;
 
