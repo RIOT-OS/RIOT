@@ -617,6 +617,10 @@ int nrf24l01p_set_power(nrf24l01p_t *dev, int *pwr)
 
     nrf24l01p_read_reg(dev, REG_RF_SETUP, &rf_setup);
 
+    if (pwr == NULL) {
+        return -1;
+    }
+
     if (*pwr >= -3) {
         rf_setup &= ~(3 << 1);
         rf_setup |= (NRF24L01P_PWR_0DBM << 1);
