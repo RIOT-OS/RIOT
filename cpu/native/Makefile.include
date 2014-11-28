@@ -6,3 +6,7 @@ ifeq ($(BUILDOSXNATIVE),1)
 endif
 
 export USEMODULE += periph
+
+ifeq ($(shell uname -s),Darwin)
+export CFLAGS += -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE
+endif
