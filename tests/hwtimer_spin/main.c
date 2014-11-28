@@ -28,16 +28,12 @@ int main(void)
 {
     puts("This is just a functionality test for hwtimer_spin.");
 
-    puts("\nYou should see the message \"success\" after while if this test was successful");
-    puts("If you do not see this message, something went wrong.\n");
+    puts("\nYou should see the message \"success\" after a while if"
+            " this test was successful.");
+    puts("If you do not see that message, something went wrong.\n");
 
-    for (unsigned long r = 100; r > 0; r--) {
-        /* test values <= SPIN_BARRIER */
+    for (unsigned long r = 10000; r > 0; r--) {
         for (unsigned long i = HWTIMER_SPIN_BARRIER; i > 0; i--) {
-            hwtimer_wait(i);
-        }
-        /* test values that are slightly above the SPIN_BARRIER */
-        for (unsigned long i = (10 * HWTIMER_SPIN_BARRIER); i > HWTIMER_SPIN_BARRIER; i--) {
             hwtimer_wait(i);
         }
     }
