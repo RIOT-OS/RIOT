@@ -306,10 +306,10 @@ int rpl_srh_sendto(const void *buf, uint16_t len, ipv6_addr_t *src, ipv6_addr_t 
  * */
 void rpl_remove_srh_header(ipv6_hdr_t *ipv6_header, const void *buf, uint8_t nextheader);
 
+#endif /* RPL_DEFAULT_MOP == RPL_NON_STORING_MODE */
+
 #ifdef __cplusplus
 }
-#endif
-
 #endif
 /** @} */
 #endif /* __RPL_H */
