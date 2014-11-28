@@ -132,7 +132,7 @@ extern "C" {
 
 /* ADC 0 device configuration */
 #define ADC_0_DEV                          ADC
-#define    ADC_0_PORT                      (PORT->Group[0])
+#define ADC_0_PORT                         (PORT->Group[0])
 #define ADC_0_IRQ                          ADC_IRQn     
 #define ADC_0_CHANNELS                     8
 /* ADC 0 Default values */
@@ -147,7 +147,7 @@ extern "C" {
 #define ADC_0_OFFSET_CORRECTION            ADC_OFFSETCORR_RESETVALUE
 #define ADC_0_SAMPLE_LENGTH                0
 #define ADC_0_PIN_SCAN_OFFSET_START        0 /* disabled */
-#define    ADC_0_PIN_SCAN_INPUT_TO_SCAN    0 /* disabled */    
+#define ADC_0_PIN_SCAN_INPUT_TO_SCAN       0 /* disabled */    
 #define ADC_0_LEFT_ADJUST                  0 /* disabled */
 #define ADC_0_DIFFERENTIAL_MODE            0 /* disabled */
 #define ADC_0_FREE_RUNNING                 0 /* disabled */
@@ -157,8 +157,7 @@ extern "C" {
 /* ADC 0 Module Status flags */
 #define ADC_0_STATUS_RESULT_READY          (1UL << 0)
 #define ADC_0_STATUS_WINDOW                (1UL << 1)
-#define ADC_0_STATUS_OVERRUN               (1UL << 2)     
-
+#define ADC_0_STATUS_OVERRUN               (1UL << 2)
 
 /* ADC 0 Positive Input Pins */
 #define ADC_0_POS_INPUT                    ADC_INPUTCTRL_MUXPOS_PIN6
