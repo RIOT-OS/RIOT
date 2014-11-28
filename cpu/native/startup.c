@@ -32,6 +32,7 @@
 
 #include "kernel_init.h"
 #include "cpu.h"
+#include "irq.h"
 
 #include "board_internal.h"
 #include "native_internal.h"
@@ -334,5 +335,6 @@ __attribute__((constructor)) static void startup(int argc, char **argv)
     board_init();
 
     puts("RIOT native hardware initialization complete.\n");
+    irq_enable();
     kernel_init();
 }

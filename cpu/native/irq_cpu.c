@@ -45,7 +45,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-volatile int native_interrupts_enabled;
+volatile int native_interrupts_enabled = 0;
 volatile int _native_in_isr;
 volatile int _native_in_syscall;
 
@@ -466,7 +466,6 @@ void native_interrupt_init(void)
     VALGRIND_DEBUG("VALGRIND_STACK_REGISTER(%p, %p)\n",
                    (void *)__isr_stack, (void*)((int)__isr_stack + sizeof(__isr_stack)));
 
-    native_interrupts_enabled = 1;
     _native_sigpend = 0;
 
     for (int i = 0; i < 255; i++) {
