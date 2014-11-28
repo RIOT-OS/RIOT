@@ -53,8 +53,8 @@ per second for the current architecture."
 /**
  * @brief       Upper bound for hwtimer_spin
  *
- * @note        Barrier below which hwtimer_spin is called instead of
- *              setting a timer and yielding the thread.
+ * @note        Barrier starting from which hwtimer_spin is called instead
+ *              of setting a timer and yielding the thread.
  *
  *              Boards should override this.
  *
