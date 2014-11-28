@@ -28,8 +28,8 @@
 #define BASIC_MAC_MSG_QUEUE_SIZE    (16)
 
 static struct {
-    kernel_pid_t registrar_pid; /**< Thread recipand is registered to */
-    kernel_pid_t recipant_pid;  /**< Registered recipant thread */
+    kernel_pid_t registrar_pid; /**< Thread recipient is registered to */
+    kernel_pid_t recipient_pid; /**< Registered recipient thread */
 } _basic_mac_registry[BASIC_MAC_REGISTRY_SIZE];
 
 static int _basic_mac_recv_cb(netdev_t *dev, void *src, size_t src_len,
@@ -62,7 +62,7 @@ static int _basic_mac_recv_cb(netdev_t *dev, void *src, size_t src_len,
                 packet.data_len = payload_len - offset;
 
                 msg_send_receive(&msg_pkt, &msg_ack,
-                                 _basic_mac_registry[i].recipant_pid);
+                                 _basic_mac_registry[i].recipient_pid);
                 ack = (netapi_ack_t *)(msg_ack.content.ptr);
 
                 if ((msg_ack.type == NETAPI_MSG_TYPE) &&
@@ -73,9 +73,9 @@ static int _basic_mac_recv_cb(netdev_t *dev, void *src, size_t src_len,
                     }
                     else {
                         DEBUG("Error code received for registrar \"%s\" with "
-                              "recipant \"%s\": %d",
+                              "recipient \"%s\": %d",
                               thread_getname(_basic_mac_registry[i].registrar_pid),
-                              thread_getname(_basic_mac_registry[i].recipant_pid),
+                              thread_getname(_basic_mac_registry[i].recipient_pid),
                               -ack->result);
 
                         return ack->result;
@@ -83,11 +83,11 @@ static int _basic_mac_recv_cb(netdev_t *dev, void *src, size_t src_len,
                 }
                 else {
                     DEBUG("Unexpected msg instead of ACK. Abort for registrar "
-                          "\"%s\" with recipant \"%s\": msg.type = %d, "
+                          "\"%s\" with recipient \"%s\": msg.type = %d, "
 
                           "ack->type = %d, ack->orig = %d",
                           thread_getname(_basic_mac_registry[i].registrar_pid),
-                          thread_getname(_basic_mac_registry[i].recipant_pid),
+                          thread_getname(_basic_mac_registry[i].recipient_pid),
                           msg_ack->type, ack->type, ack->orig);
 
                     return -ENOMSG;
@@ -137,7 +137,7 @@ static int _basic_mac_get_option(netdev_t *dev, netapi_conf_t *conf)
                     }
 
                     if (_basic_mac_registry[i].registrar_pid == current_pid) {
-                        registry[size++] = _basic_mac_registry[i].recipant_pid;
+                        registry[size++] = _basic_mac_registry[i].recipient_pid;
                     }
                 }
 
@@ -221,7 +221,7 @@ static void *_basic_mac_runner(void *args)
                         for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
                             if (_basic_mac_registry[i].registrar_pid == KERNEL_PID_UNDEF) {
                                 _basic_mac_registry[i].registrar_pid = thread_getpid();
-                                _basic_mac_registry[i].recipant_pid = reg->reg_pid;
+                                _basic_mac_registry[i].recipient_pid = reg->reg_pid;
                                 ack->result = NETAPI_STATUS_OK;
                                 break;
                             }
@@ -237,8 +237,8 @@ static void *_basic_mac_runner(void *args)
 
                         for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
                             if (_basic_mac_registry[i].registrar_pid == thread_getpid() &&
-                                _basic_mac_registry[i].recipant_pid == reg->reg_pid) {
-                                _basic_mac_registry[i].recipant_pid = KERNEL_PID_UNDEF;
+                                _basic_mac_registry[i].recipient_pid == reg->reg_pid) {
+                                _basic_mac_registry[i].recipient_pid = KERNEL_PID_UNDEF;
                                 break;
                             }
 
@@ -279,7 +279,7 @@ void basic_mac_init_module(void)
 {
     for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
         _basic_mac_registry[i].registrar_pid = KERNEL_PID_UNDEF;
-        _basic_mac_registry[i].recipant_pid = KERNEL_PID_UNDEF;
+        _basic_mac_registry[i].recipient_pid = KERNEL_PID_UNDEF;
     }
 }
 
