@@ -151,11 +151,11 @@ void cpu_switch_context_exit(void)
         irq_disable();
         _native_in_isr = 1;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
-        native_isr_context.uc_stack.ss_size = SIGSTKSZ;
+        native_isr_context.uc_stack.ss_size = sizeof(__isr_stack);
         native_isr_context.uc_stack.ss_flags = 0;
         makecontext(&native_isr_context, isr_cpu_switch_context_exit, 0);
         if (setcontext(&native_isr_context) == -1) {
-            err(EXIT_FAILURE, "cpu_switch_context_exit: swapcontext");
+            err(EXIT_FAILURE, "cpu_switch_context_exit: setcontext");
         }
         errx(EXIT_FAILURE, "1 this should have never been reached!!");
     }
@@ -182,8 +182,8 @@ void isr_thread_yield(void)
 
 void thread_yield_higher(void)
 {
-    ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
     if (_native_in_isr == 0) {
+        ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
         _native_in_isr = 1;
         irq_disable();
         native_isr_context.uc_stack.ss_sp = __isr_stack;
