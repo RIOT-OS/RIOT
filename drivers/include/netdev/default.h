@@ -23,8 +23,6 @@
 #include "netdev/base.h"
 
 /**
- * @def     NETDEV_DEFAULT
- *
  * @brief   Default device as a pointer of netdev_t.
  */
 #ifdef MODULE_AT86RF231

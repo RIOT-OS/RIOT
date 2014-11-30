@@ -73,7 +73,7 @@ static inline void __attribute__((always_inline, noreturn)) x86_hlt(void)
  * Called by the board specific startup code.
  * @li The .bss has to be cleared before.
  * @li The stack has to be set up, probably somewhere in the low memory.
- * @li The A20 line has to be activated, because all the code is beyong 1MB.
+ * @li The A20 line has to be activated, because all the code is beyond 1MB.
  * @li Paging must be disabled.
  * @li The SS, DS, and CS must span the whole 4GB of RAM.
  * @li 32 bit protected mode must be entered.

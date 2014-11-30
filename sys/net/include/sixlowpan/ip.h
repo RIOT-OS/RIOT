@@ -68,7 +68,9 @@ extern "C" {
 /**
 * @brief  Next header value for source routing
 * @see <a href="http://tools.ietf.org/html/rfc5095#section-1">
- */
+*          RFC 5095, section 1
+*      </a>
+*/
 #define IPV6_PROTO_NUM_SRH          (43)
 
 /**

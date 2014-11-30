@@ -94,7 +94,7 @@ static inline void X86_CR_ATTR cr0_write(uint32_t value)
  * @brief   Read the Page Fault Linear Address.
  *
  * The PFLA is the address which was accessed when the page fauled occured,
- * i.e. this is not the PC of the #X86_INT_PF!
+ * i.e. this is not the PC of the \#PF!
  */
 static inline uint32_t X86_CR_ATTR cr2_read(void)
 {
