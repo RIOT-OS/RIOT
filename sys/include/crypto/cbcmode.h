@@ -10,7 +10,7 @@
  * @ingroup     sys_crypto
  * @{
  *
- * @file        cbcmode.h
+ * @file
  * @brief       Headers of the implementation of the CBC Mode of Operation
  *
  * Implementation of the CBC Mode of Operation with Ciphertext-Stealing for encryption.
@@ -71,7 +71,6 @@ enum {
 
 
 /**
- * @struct CBCModeContext CBCMode.c "CBCMode.c"
  * @brief   The context for processing the en-/decryption in the CBC-Mode with
  *          CTS
  *

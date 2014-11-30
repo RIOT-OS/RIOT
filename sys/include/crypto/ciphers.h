@@ -101,7 +101,6 @@ typedef struct CipherModeContext {
 
 /**
  * @brief       struct for an archive of all available ciphers
- * @struct      BlockCipher_Archive_t CipherManager.h "ciphers/CipherManager.h"
  * @typedef     BlockCipher_Archive_t
  */
 typedef struct {
