@@ -70,6 +70,7 @@ extern "C" {
 #define LED_BLUE_ON         (NRF_GPIO->OUTCLR = LED_BLUE_PIN)
 #define LED_BLUE_OFF        (NRF_GPIO->OUTSET = LED_BLUE_PIN)
 #define LED_BLUE_TOGGLE     (NRF_GPIO->OUT ^= LED_BLUE_PIN)
+/** @} */
 
 
 /**

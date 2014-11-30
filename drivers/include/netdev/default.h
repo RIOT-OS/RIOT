@@ -54,3 +54,4 @@ extern "C" {
 #endif /* MODULE_NATIVENET */
 
 #endif /* __NETDEV_DEFAULT_H_ */
+/** @} */

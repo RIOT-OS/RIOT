@@ -46,3 +46,4 @@ int udp_init_transport_layer(void);
 #endif
 
 #endif /* UDP_H */
+/** @} */
