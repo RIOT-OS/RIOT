@@ -406,7 +406,7 @@ ssize_t send(int socket, const void *buffer, size_t length, int flags);
  *      </a>
  *
  * @param[in] socket    Specifies the socket file descriptor.
- * @param[in] buffer    Points to the buffer containing the message to send.
+ * @param[in] message   Points to the buffer containing the message to send.
  * @param[in] length    Specifies the length of the message in bytes.
  * @param[in] flags     Specifies the type of message reception. Support
  *                      for values other than 0 is not implemented yet.

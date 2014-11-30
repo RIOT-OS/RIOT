@@ -144,7 +144,7 @@ int16_t nativenet_get_channel(void);
 /**
  * Set transceiver pan
  *
- * @param channel the pan
+ * @param pan the pan
  * @return the pan
  */
 uint16_t nativenet_set_pan(uint16_t pan);

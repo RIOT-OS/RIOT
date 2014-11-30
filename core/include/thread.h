@@ -72,7 +72,7 @@
  * @param[in] stacksize the size of the thread's stack in bytes
  * @param[in] priority  priority of the new thread, lower mean higher priority
  * @param[in] flags     optional flags for the creation of the new thread
- * @param[in] function  pointer to the code that is executed in the new thread
+ * @param[in] task_func pointer to the code that is executed in the new thread
  * @param[in] arg       the argument to the function
  * @param[in] name      a human readable descriptor for the thread
  *

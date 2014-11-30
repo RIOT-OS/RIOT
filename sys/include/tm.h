@@ -80,17 +80,18 @@ int tm_doomsday(int year) CONST;
  * @details         Illegal dates are not catched.
  * @param[in]       year   The year. Probably should be ≥ 1582, but needs to be ≥ 1.
  * @param[in]       mon    The month, TM_MON_JAN to TM_MON_DEC.
- * @param[in]       day    The day in the month, 1 to 31.
+ * @param[in]       mday   The day in the month, 1 to 31.
  * @param[out]      wday   Returns the day of the week.
  * @param[out]      yday   Returns the day of the year (Jan 1st is 0).
  */
 void tm_get_wyday(int year, int mon, int mday, int *wday, int *yday);
 
 /**
- * @brief           Fills in `struct tm::tm_wday` and `struct tm::tm_yday` given a date.
- * @details         `struct tm::tm_year`, `struct tm::tm_mon`, and `struct tm::tm_mday`
- *                  need to be set before you call this function.
- * @param[in,out]   The datum to operate on.
+ * @brief               Fills in `struct tm::tm_wday` and `struct tm::tm_yday` given a date.
+ * @details             `struct tm::tm_year`, `struct tm::tm_mon`, and `struct
+ *                      tm::tm_mday` need to be set before you call this
+ *                      function.
+ * @param[in,out] tm    The datum to operate on.
  */
 void tm_fill_derived_values(struct tm *tm);
 
@@ -99,7 +100,7 @@ void tm_fill_derived_values(struct tm *tm);
  * @details         Dates before 1582-10-15 are invalid.
  * @param[in]       year   The year.
  * @param[in]       mon    The month.
- * @param[in]       day    The day in the month.
+ * @param[in]       mday   The day in the month.
  * @returns         0 iff the date is invalid.
  */
 int tm_is_valid_date(int year, int mon, int mday) CONST;

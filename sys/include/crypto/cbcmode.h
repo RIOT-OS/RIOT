@@ -127,7 +127,7 @@ int block_cipher_mode_init(CipherModeContext *context, uint8_t key_size,
  *                        invocations of this module which use this particular
  *                        key. It also contains the opaque context for the
  *                        underlying BlockCipher as well.
- * @param   keySize       key size in bytes.
+ * @param   key_size      key size in bytes.
  * @param   key           pointer to the key.
  * @param   cipher_index  the index of the cipher-algorithm to init in the
  *                        (cipher-)archive

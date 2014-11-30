@@ -352,8 +352,8 @@ int net_if_send_packet_long(int if_id, net_if_eui64_t *target,
  *                                  the destination broadcast address. Choose
  *                                  NET_IF_TRANS_ADDR_M_SHORT if you are not
  *                                  sure
- * @param[in] packet_data           The packet to send
- * @param[in] packet_len            The length of the packet's data in byte,
+ * @param[in] payload               The packet to send
+ * @param[in] payload_len           The length of the packet's data in byte,
  *                                  negative number on error.
  *
  * @return The number of bytes send on success, negative value on failure

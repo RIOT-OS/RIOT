@@ -492,7 +492,6 @@ static inline net_if_eui64_t *ipv6_addr_get_iid(const ipv6_addr_t *ipv6_addr,
  *
  * @param[in] if_id         The interface's ID.
  * @param[in] addr          Address to be added to the interface.
- * @param[in] type          Type of this address.
  * @param[in] state         Initial state of the address.
  * @param[in] val_ltime     Valid lifetime of this address in seconds. Set 0
  *                          for unspecified.
@@ -520,7 +519,6 @@ int ipv6_net_if_add_addr(int if_id, const ipv6_addr_t *addr,
  *
  * @param[out]  src     The best source address for this node (may be
  *                      all zero if ther is none).
- * @param[in]   if_id   The interface's ID.
  * @param[in]   dest    The destination address for a packet we search
  *                      the source address for.
  */

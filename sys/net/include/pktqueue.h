@@ -87,7 +87,7 @@ static inline void pktqueue_init(pktqueue_t *queue)
 /**
  * @brief get the packet queue's head without removing it
  *
- * @param[out]  root    the queue
+ * @param[out] queue    the queue
  *
  * @return              the head
  */
@@ -99,7 +99,7 @@ static inline pktqueue_node_t *pktqueue_get_head(pktqueue_t *queue)
 /**
  * @brief remove the packet queue's head
  *
- * @param[in]  root     the queue
+ * @param[in]  queue    the queue
  *
  * @return              the old head
  */
