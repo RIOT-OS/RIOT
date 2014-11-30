@@ -32,6 +32,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief IPC message type for vtimer msg callback
+ */
 #define MSG_TIMER 12345
 
 /**

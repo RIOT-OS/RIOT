@@ -13,7 +13,7 @@
  * @{
  *
  * @file        pktqueue.h
- * @brief       Pointer-centric wrapper for @ref priority_queue
+ * @brief       Pointer-centric wrapper for @ref priority_queue_t
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  */

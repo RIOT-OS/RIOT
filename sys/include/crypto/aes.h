@@ -125,7 +125,8 @@ int aes_encrypt(cipher_context_t *context, uint8_t *plain_block,
  * @param       plain_block   a pointer to the place where the decrypted
  *                            plaintext will be stored
  *
- * @return  1 or result of ::aes_set_decrypt_key if it failed
+ * @return  1 or negative value if cipher key cannot be expanded into
+ *          decryption key schedule
  */
 int aes_decrypt(cipher_context_t *context, uint8_t *cipher_block,
                 uint8_t *plain_block);

@@ -37,8 +37,11 @@ extern "C" {
 /* see "Intel® Quark SoC X1000 Core Developer’s Manual", § 4.4.1.1 (p. 47) */
 #define CR0_PE (1u << 0)  /**< 1 = protected mode */
 #define CR0_MP (1u << 1)  /**< 1 = monitor coprocessor (FWAIT causes an interrupt) */
-#define CR0_EM (1u << 2)  /**< 1 = FPU emulation (x87 instruction cause #NM, SSE causes #UD) */
-#define CR0_TS (1u << 3)  /**< 1 = task switched flag (causes #NM on x87/SSE instructions, set by CPU on hardware task switch) */
+#define CR0_EM (1u << 2)  /**< 1 = FPU emulation (x87 instructions cause
+                                   #X86_INT_NM, SSE causes #X86_INT_UD) */
+#define CR0_TS (1u << 3)  /**< 1 = task switched flag (causes #X86_INT_NM on
+                                   x87/SSE instructions, set by CPU on hardware
+                                   task switch) */
 #define CR0_ET (1u << 4)  /**< 1 = 80387; 0 = 80287 */
 #define CR0_NE (1u << 5)  /**< 1 = numeric error */
 #define CR0_WP (1u << 16) /**< 1 = write proctected pages aren't writable in ring 0 either */
@@ -59,7 +62,7 @@ extern "C" {
 #define CR4_MCE        (1u << 6)  /**< 1 = machine-check enable */
 #define CR4_PGE        (1u << 7)  /**< 1 = enable G flag in PT */
 #define CR4_PCE        (1u << 8)  /**< 1 = allow RDPMC instruction in rings 1-3, too */
-#define CR4_OSFXSR     (1u << 9)  /**< 1 = disable #NM if CR0.TS=1 */
+#define CR4_OSFXSR     (1u << 9)  /**< 1 = disable #X86_INT_NM if CR0.TS=1 */
 #define CR4_OSXMMEXCPT (1u << 10) /**< 1 = enable unmasked SSE exceptions */
 #define CR4_SMEP       (1u << 10) /**< 1 = enables supervisor-mode execution prevention */
 
@@ -91,7 +94,7 @@ static inline void X86_CR_ATTR cr0_write(uint32_t value)
  * @brief   Read the Page Fault Linear Address.
  *
  * The PFLA is the address which was accessed when the page fauled occured,
- * i.e. this is not the PC of the #PF!
+ * i.e. this is not the PC of the #X86_INT_PF!
  */
 static inline uint32_t X86_CR_ATTR cr2_read(void)
 {

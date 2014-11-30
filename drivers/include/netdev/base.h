@@ -319,7 +319,7 @@ typedef struct {
      *
      * @param[in] dev           the network device that fired the event.
      * @param[in] event_type    Event type. Values are free to choose for the
-     *                          driver. Must be given in the @ref msg_t::content::value
+     *                          driver. Must be given in the @ref msg_t::value
      *                          of the received message
      */
     void (*event)(netdev_t *dev, uint32_t event_type);

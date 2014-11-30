@@ -141,7 +141,7 @@ int block_cipher_mode_init0(CipherModeContext *context, uint8_t key_size,
                             uint8_t *key, uint8_t cipher_index);
 
 /**
- * @brief   prints the debug-messages passed by ::dumpBuffer
+ * @brief   prints the debug-messages passed by @ref dump_buffer
  *
  * @param   mode      the mode of the debug-message
  * @param   format    pointer to the message
