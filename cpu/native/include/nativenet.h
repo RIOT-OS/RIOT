@@ -1,4 +1,4 @@
-/**
+/*
  * nativenet transceiver interface
  *
  * A configurable transceiver for the native port.
@@ -16,7 +16,7 @@
  */
 
 /**
- * @defgroup    native_net
+ * @defgroup    native_net Native network interface
  * @ingroup     native_cpu
  * @{
  * @author  Ludwig Ortmann <ludwig.ortmann@fu-berlin.de>
