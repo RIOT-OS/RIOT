@@ -11,7 +11,7 @@
  * @brief       Routing Protocol for Low power and Lossy Networks
  * @{
  *
- * @file        rpl_mode.h
+ * @file
  * @brief       RPL storing-mode header
  *
  * Header which includes all mode related RPL-functions. All functions are mandatory for any

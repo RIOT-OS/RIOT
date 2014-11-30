@@ -12,7 +12,7 @@
  * @brief   IEEE802.15.4 adapaption layer
  * @{
  *
- * @file    ieee802154/ieee802154_frame.h
+ * @file
  * @brief   IEEE 802.14.4 framing data structs and prototypes
  *
  * @author  Stephan Zeisberg <zeisberg@mi.fu-berlin.de>
