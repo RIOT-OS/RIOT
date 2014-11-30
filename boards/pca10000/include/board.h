@@ -34,7 +34,7 @@ extern "C" {
 #define F_CPU               (16000000UL)
 
 /**
- * @name Assign the hardware timer
+ * @brief Assign the hardware timer
  */
 #define HW_TIMER            TIMER_0
 
