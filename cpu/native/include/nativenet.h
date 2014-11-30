@@ -62,7 +62,7 @@ extern "C" {
 extern const netdev_driver_t nativenet_driver;
 
 /**
- * @brief   Default @netdev API device
+ * @brief   Default @ref netdev API device
  */
 extern netdev_t nativenet_default_dev;
 

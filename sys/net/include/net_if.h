@@ -402,7 +402,7 @@ int net_if_get_eui64(net_if_eui64_t *eui64, int if_id, int force_generation);
 
 /**
  * @brief   Parses a string to an EUI-64.
- * @detail  The parsing will be back to front, every non-hexadecimal character
+ * @details The parsing will be back to front, every non-hexadecimal character
  *          and every hexadecimal character beyond the count of 8 will be
  *          ignored
  *

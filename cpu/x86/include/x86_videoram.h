@@ -37,7 +37,7 @@ extern "C" {
  *
  * This method can be used before the UART system was initialized.
  *
- * Special charactes that are understood: '\n' and '\r'.
+ * Special charactes that are understood: '\n' and '\\r'.
  * Use DOS newlines.
  */
 void videoram_putc(char c);
