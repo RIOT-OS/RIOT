@@ -106,6 +106,28 @@ static inline int _basic_mac_send(netdev_t *dev, netapi_snd_pkt_t *pkt)
                                   pkt->data, pkt->data_len);
 }
 
+static int _basic_mac_get_registry(netapi_conf_t *conf)
+{
+    kernel_pid_t current_pid = thread_getpid();
+    kernel_pid_t registry[BASIC_MAC_REGISTRY_SIZE];
+    uint8_t size = 0;
+
+    for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
+        if ((size * sizeof(kernel_pid_t)) > (conf->data_len)) {
+            return -EOVERFLOW;
+        }
+
+        if (_basic_mac_registry[i].registrar_pid == current_pid) {
+            registry[size++] = _basic_mac_registry[i].recipient_pid;
+        }
+    }
+
+    conf->data_len = size * sizeof(kernel_pid_t);
+    memcpy(conf->data, registry, conf->data_len);
+
+    return 0;
+}
+
 static int _basic_mac_get_option(netdev_t *dev, netapi_conf_t *conf)
 {
     int res;
@@ -126,28 +148,7 @@ static int _basic_mac_get_option(netdev_t *dev, netapi_conf_t *conf)
             }
 
         case BASIC_MAC_REGISTRY:
-            do {
-                kernel_pid_t current_pid = thread_getpid();
-                kernel_pid_t registry[BASIC_MAC_REGISTRY_SIZE];
-                uint8_t size = 0;
-
-                for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
-                    if ((size * sizeof(kernel_pid_t)) > (conf->data_len)) {
-                        return -EOVERFLOW;
-                    }
-
-                    if (_basic_mac_registry[i].registrar_pid == current_pid) {
-                        registry[size++] = _basic_mac_registry[i].recipient_pid;
-                    }
-                }
-
-                conf->data_len = size * sizeof(kernel_pid_t);
-                memcpy(conf->data, registry, conf->data_len);
-
-                return 0;
-            } while (0);
-
-            break;
+            return _basic_mac_get_registry(conf);
 
         default:
             break;
