@@ -214,36 +214,36 @@ static void *_basic_mac_runner(void *args)
                     break;
 
                 case NETAPI_CMD_REG:
-                    do {
-                        netapi_reg_t *reg = (netapi_reg_t *)cmd;
-                        ack->result = -ENOBUFS;
+                    ack->result = -ENOBUFS;
 
-                        for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
-                            if (_basic_mac_registry[i].registrar_pid == KERNEL_PID_UNDEF) {
-                                _basic_mac_registry[i].registrar_pid = thread_getpid();
-                                _basic_mac_registry[i].recipient_pid = reg->reg_pid;
-                                ack->result = NETAPI_STATUS_OK;
-                                break;
-                            }
+                    for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
+                        if (_basic_mac_registry[i].registrar_pid == KERNEL_PID_UNDEF) {
+                            netapi_reg_t *reg = (netapi_reg_t *)cmd;
+
+                            _basic_mac_registry[i].registrar_pid = thread_getpid();
+                            _basic_mac_registry[i].recipient_pid = reg->reg_pid;
+                            ack->result = NETAPI_STATUS_OK;
+
+                            break;
                         }
-                    } while (0);
+                    }
 
                     break;
 
                 case NETAPI_CMD_UNREG:
-                    do {
+                    ack->result = NETAPI_STATUS_OK;
+
+                    for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
                         netapi_reg_t *reg = (netapi_reg_t *)cmd;
-                        ack->result = NETAPI_STATUS_OK;
 
-                        for (int i = 0; i < BASIC_MAC_REGISTRY_SIZE; i++) {
-                            if (_basic_mac_registry[i].registrar_pid == thread_getpid() &&
-                                _basic_mac_registry[i].recipient_pid == reg->reg_pid) {
-                                _basic_mac_registry[i].recipient_pid = KERNEL_PID_UNDEF;
-                                break;
-                            }
+                        if (_basic_mac_registry[i].registrar_pid == thread_getpid() &&
+                            _basic_mac_registry[i].recipient_pid == reg->reg_pid) {
+                            _basic_mac_registry[i].recipient_pid = KERNEL_PID_UNDEF;
 
+                            break;
                         }
-                    } while (0);
+
+                    }
 
                     break;
 
