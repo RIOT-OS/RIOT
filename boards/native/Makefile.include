@@ -19,8 +19,15 @@ export SIZE ?= $(PREFIX)size
 ifneq ($(shell uname -s),Darwin)
 export OBJCOPY ?= $(PREFIX)objcopy
 else
-export OBJCOPY ?= $(PREFIX)gobjcopy
+ifeq (0,$(shell which gobjcopy 2>&1 > /dev/null ; echo $$?))
+export OBJCOPY ?= gobjcopy
 export OFLAGS ?= -O ihex
+else
+# If gobjcopy is not available, just create an empty file. The hexfile
+# is not used for native anyways.
+export OBJCOPY ?= touch
+export OFLAGS =
+endif
 endif
 
 export DEBUGGER = gdb
