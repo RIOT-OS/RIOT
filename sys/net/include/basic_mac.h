@@ -103,3 +103,5 @@ void basic_mac_update_callback(netdev_t *dev);
 #endif
 
 #endif /* __BASIC_MAC_H_ */
+
+/** @} */
