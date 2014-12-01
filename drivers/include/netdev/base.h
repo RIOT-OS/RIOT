@@ -75,6 +75,13 @@ typedef enum {
     NETDEV_PROTO_UDP            = 0x0005,   /**< UDP. */
     NETDEV_PROTO_TCP            = 0x0006,   /**< TCP. */
     NETDEV_PROTO_CCNL           = 0x0007,   /**< CCN lite. */
+
+    /**
+     * @brief   CC110x frame format protocol
+     *
+     * @detail  Sends frames as defined by cc110x_packet_t.
+     */
+    NETDEV_PROTO_CC110X         = 0x0008,
 } netdev_proto_t;
 
 /**
@@ -134,6 +141,8 @@ typedef enum {
     NETDEV_STATE_PROMISCUOUS_MODE,      /**< Device is in receive mode and
                                              accepts all packets without regard
                                              for their destination */
+    NETDEV_STATE_TX_BURST,              /**< Device is burst sending and
+                                             does not accept packets */
 } netdev_state_t;
 
 /**

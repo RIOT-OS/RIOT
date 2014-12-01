@@ -102,7 +102,7 @@ void auto_init_net_if(void)
 #ifdef MODULE_CC1020
     transceivers |= TRANSCEIVER_CC1020;
 #endif
-#if MODULE_CC110X_LEGACY_CSMA || MODULE_CC110X_LEGACY
+#if (defined(MODULE_CC110X) || defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC110X_LEGACY_CSMA))
     transceivers |= TRANSCEIVER_CC1100;
 #endif
 #ifdef MODULE_CC2420
@@ -152,7 +152,7 @@ void auto_init_net_if(void)
 #endif /* DEBUG_ENABLED */
 
 #undef CONF_RADIO_ADDR
-#if defined(MODULE_CC110X_LEGACY_CSMA) || defined(MODULE_CC110X_LEGACY)
+#if (defined(MODULE_CC110X) || defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC110X_LEGACY_CSMA))
         uint8_t hwaddr = (uint8_t)((hash_l ^ hash_h) ^ ((hash_l ^ hash_h) >> 24));
         /* do not combine more parts to keep the propability low that it just
          * becomes 0xff */
