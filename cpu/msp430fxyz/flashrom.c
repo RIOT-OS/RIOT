@@ -11,7 +11,7 @@
  * @{
  *
  * @file        flashrom.c
- * @brief       MSP430x16xx flashrom functions
+ * @brief       MSP430Fxyz flashrom functions
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  *

@@ -20,7 +20,7 @@
 #include <time.h>
 #include "mutex.h"
 
-#if defined(CPU_CC430) || defined(CPU_MSP430X16X)
+#if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
 #   include "msp430_types.h"
 #endif
 
