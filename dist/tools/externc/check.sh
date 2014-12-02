@@ -21,9 +21,11 @@ else
     FILES="$(git diff --diff-filter=${DIFFFILTER} --name-only ${BRANCH} | grep -E '\.h$')"
 fi
 
+FILES=$(echo "${FILES}" | grep -v -E '^(dist/tools|boards/msba2-common/tools/)')
+
 # check files
 for FILE in ${FILES}; do
-    if head -100 "${ROOT}/${FILE}" \
+    if cat "${ROOT}/${FILE}" \
         | sed -e 's/$/ /' \
         | tr -d '\r\n' \
         | sed -e 's/  */ /g' \

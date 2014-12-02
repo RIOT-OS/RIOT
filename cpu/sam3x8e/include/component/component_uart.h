@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_UART_COMPONENT_
 #define _SAM3XA_UART_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Universal Asynchronous Receiver Transmitter */
 /* ============================================================================= */
@@ -182,5 +186,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_UART_COMPONENT_ */

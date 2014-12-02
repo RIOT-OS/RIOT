@@ -44,6 +44,10 @@
 #ifndef _SAMR21_DMAC_COMPONENT_
 #define _SAMR21_DMAC_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========================================================================== */
 /**  SOFTWARE API DEFINITION FOR DMAC */
 /* ========================================================================== */
@@ -1029,5 +1033,9 @@ typedef struct {
 #define SECTION_DMAC_DESCRIPTOR
 
 /*@}*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_DMAC_COMPONENT_ */

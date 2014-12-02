@@ -33,6 +33,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Initialize interrupts.
  *
@@ -151,6 +155,10 @@ static inline void __attribute__((always_inline)) x86_restore_flags(unsigned lon
  * @brief   Print saved general purposed registers.
  */
 void x86_print_registers(struct x86_pushad *orig_ctx, unsigned long error_code);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

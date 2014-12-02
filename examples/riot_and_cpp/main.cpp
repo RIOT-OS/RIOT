@@ -32,16 +32,15 @@ extern "C" {
 
 #include <cstdio>
 #include <vector>
-//#include <iostream>
 #include "cpp_class.hpp"
 #include <functional>
 using namespace std;
 
-//char threadA_stack [KERNEL_CONF_STACKSIZE_MAIN];
-#define TRANSCEIVER_TYPE 0 //TRANSCEIVER_AT86RF231
-//#define RADIO_STACK_SIZE    (KERNEL_CONF_STACKSIZE_DEFAULT)
+/* thread's stack */
+char threadA_stack [KERNEL_CONF_STACKSIZE_MAIN];
 
-//char radio_stack_buffer[RADIO_STACK_SIZE];
+/* thread's function */
+void *threadA_func(void *arg);
 
 void print_ipv6_addr(const ipv6_addr_t *ipv6_addr)
 {
@@ -295,25 +294,25 @@ int main()
 {
     printf("\n************ RIOT and C++ 6LoWPAN demo program ***********\n");
     printf("\n");
-    printf("\t\tInitialize SixLoWPan with the Following:\n");
-    printUsage();
-    net_if_set_src_address_mode(0, NET_IF_TRANS_ADDR_M_SHORT);
-    posix_open(uart0_handler_pid, 0);
 
-    shell_t shell;
-    shell_init(&shell, shell_commands, UART0_BUFSIZE, shell_readc, shell_putchar);// uart0_readc, uart0_putc);
-
-    shell_run(&shell);
+    /* create thread A */
+    thread_create(threadA_stack, sizeof(threadA_stack), 0, CREATE_WOUT_YIELD, threadA_func, NULL, "thread A");
 
 
+    printf("We'll test C++ class and methods here!\n");
 
-    // /* create thread A */
-    // thread_create(threadA_stack, sizeof(threadA_stack), 0, CREATE_WOUT_YIELD, threadA_func, NULL, "thread A");
+    cpp_class cpp_obj;
+    printf("\n-= Test overloading functions =-\n");
+    cpp_obj.say_hello();
+    cpp_obj.say_hello(42);
+    cpp_obj.say_hello(3.141592f);
 
-    // printf("******** Hello, you're in thread %s ********\n", thread_getname(thread_getpid()));
-    // printf("We'll test C++ class and methods here!\n");
-
-    // cpp_class cpp_obj;
+    printf("\n-= Test namespace =-\n");
+    printf("typing std::vector is obsolete when 'using namespace std;'\n");
+    vector<int> vInts;
+    vInts.push_back(1);
+    vInts.push_back(3);
+    vInts.push_back(2);
     // printf("\n-= Test overloading functions =-\n");
     // cpp_obj.say_hello();
     // cpp_obj.say_hello(42);
@@ -336,32 +335,41 @@ int main()
 
     // printf("}\n");
 
+    printf("\n-= Test iterator =-\n");
+    printf("The content of vInts = { ");
+
+    for (vector<int>::iterator it = vInts.begin(); it != vInts.end(); ++it) {
+        printf("%d ", *(it));
+    }
+
+    printf("}\n");
+
     return 0;
 }
 
-// /* thread A function implemetation */
-// void *threadA_func(void *)
-// {
-//     int day = 13, month = 6, year = 2014;
-//     int ret_day;
+/* thread A function implemetation */
+void *threadA_func(void *)
+{
+    int day = 13, month = 6, year = 2014;
+    int ret_day;
 
 //     printf("\n******** Hello, now you're in %s ********\n", thread_getname(thread_getpid()));
-//     printf("We'll test some C functions here!\n");
+    printf("We'll test some C functions here!\n");
 
-//     printf("\n-= hello function =-\n");
-//     hello();
+    printf("\n-= hello function =-\n");
+    hello();
 
-//     printf("\n-= day_of_week function =-\n");
+    printf("\n-= day_of_week function =-\n");
 
-//     printf("day %d, month %d, year %d is ", day, month, year);
+    printf("day %d, month %d, year %d is ", day, month, year);
 
-//     ret_day = day_of_week(day, month, year);
-//     if (ret_day >= 0){
-//         char day_of_week_table[][32] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-//         printf("%s\n", day_of_week_table[ret_day]);
-//     }
+    ret_day = day_of_week(day, month, year);
+    if (ret_day >= 0){
+        char day_of_week_table[][32] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+        printf("%s\n", day_of_week_table[ret_day]);
+    }
 
-//     printf("\nThis demo ends here, press Ctrl-C to exit (if you're on native)!\n");
+    printf("\nThis demo ends here, press Ctrl-C to exit (if you're on native)!\n");
 
-//     return NULL;
-// }
+    return NULL;
+}

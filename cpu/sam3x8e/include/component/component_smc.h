@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_SMC_COMPONENT_
 #define _SAM3XA_SMC_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Static Memory Controller */
 /* ============================================================================= */
@@ -481,5 +485,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_SMC_COMPONENT_ */

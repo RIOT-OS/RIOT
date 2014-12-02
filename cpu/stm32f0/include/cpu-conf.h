@@ -25,6 +25,9 @@
 #include "stm32f051x8.h"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name Kernel configuration
@@ -54,6 +57,10 @@
 #define UART0_BUFSIZE                   (128)
 #endif
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __CPU_CONF_H */
 /** @} */

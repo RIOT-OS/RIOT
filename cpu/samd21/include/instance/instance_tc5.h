@@ -44,6 +44,10 @@
 #ifndef _SAMR21_TC5_INSTANCE_
 #define _SAMR21_TC5_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for TC5 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_TC5_CTRLA              (0x42003400U) /**< \brief (TC5) Control A */
@@ -107,5 +111,9 @@
 #define TC5_OW_NUM                  2
 #define TC5_PERIOD_EXT              0
 #define TC5_SHADOW_EXT              0
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_TC5_INSTANCE_ */

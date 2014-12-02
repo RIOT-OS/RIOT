@@ -44,9 +44,15 @@
 #endif
 #endif // BSD/Linux
 #include <netdb.h>
+#include <ifaddrs.h>
+#include <time.h>
+#include <sys/time.h>
 
 #include "kernel_types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Prototype for native's internal callbacks
@@ -74,17 +80,21 @@ extern ssize_t (*real_read)(int fd, void *buf, size_t count);
 extern ssize_t (*real_write)(int fd, const void *buf, size_t count);
 extern size_t (*real_fread)(void *ptr, size_t size, size_t nmemb, FILE *stream);
 extern void (*real_clearerr)(FILE *stream);
+extern __attribute__((noreturn)) void (*real_exit)(int status);
 extern void (*real_free)(void *ptr);
 extern void* (*real_calloc)(size_t nmemb, size_t size);
 extern void* (*real_malloc)(size_t size);
 extern void* (*real_realloc)(void *ptr, size_t size);
 extern void (*real_freeaddrinfo)(struct addrinfo *res);
+extern void (*real_freeifaddrs)(struct ifaddrs *ifa);
 extern void (*real_srandom)(unsigned int seed);
 /* The ... is a hack to save includes: */
 extern int (*real_accept)(int socket, ...);
 /* The ... is a hack to save includes: */
 extern int (*real_bind)(int socket, ...);
 extern int (*real_close)(int);
+/* The ... is a hack to save includes: */
+extern int (*real_creat)(const char *path, ...);
 extern int (*real_dup2)(int, int);
 extern int (*real_execve)(const char *, char *const[], char *const[]);
 extern int (*real_feof)(FILE *stream);
@@ -92,10 +102,17 @@ extern int (*real_ferror)(FILE *stream);
 extern int (*real_fork)(void);
 /* The ... is a hack to save includes: */
 extern int (*real_getaddrinfo)(const char *node, ...);
+extern int (*real_getifaddrs)(struct ifaddrs **ifap);
 extern int (*real_getpid)(void);
+extern int (*real_ioctl)(int fildes, int request, ...);
 extern int (*real_listen)(int socket, int backlog);
+extern int (*real_open)(const char *path, int oflag, ...);
 extern int (*real_pause)(void);
 extern int (*real_pipe)(int[2]);
+/* The ... is a hack to save includes: */
+extern int (*real_select)(int nfds, ...);
+extern int (*real_setitimer)(int which, const struct itimerval
+        *restrict value, struct itimerval *restrict ovalue);
 extern int (*real_setsockopt)(int socket, ...);
 extern int (*real_socket)(int domain, int type, int protocol);
 extern int (*real_printf)(const char *format, ...);
@@ -103,6 +120,11 @@ extern int (*real_unlink)(const char *);
 extern long int (*real_random)(void);
 extern const char* (*real_gai_strerror)(int errcode);
 extern FILE* (*real_fopen)(const char *path, const char *mode);
+
+#ifdef __MACH__
+#else
+extern int (*real_clock_gettime)(clockid_t clk_id, struct timespec *tp);
+#endif
 
 /**
  * data structures
@@ -145,6 +167,10 @@ int register_interrupt(int sig, _native_callback_t handler);
 int unregister_interrupt(int sig);
 
 //#include <sys/param.h>
+
+#ifdef __cplusplus
+}
+#endif
 
 #include "kernel_internal.h"
 #include "sched.h"

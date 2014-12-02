@@ -44,6 +44,10 @@
 #ifndef _SAMR21_SERCOM4_INSTANCE_
 #define _SAMR21_SERCOM4_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for SERCOM4 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_SERCOM4_I2CM_CTRLA     (0x42001800U) /**< \brief (SERCOM4) I2CM Control A */
@@ -139,5 +143,9 @@
 #define SERCOM4_GCLK_ID_CORE        24
 #define SERCOM4_GCLK_ID_SLOW        19
 #define SERCOM4_INT_MSB             6
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_SERCOM4_INSTANCE_ */

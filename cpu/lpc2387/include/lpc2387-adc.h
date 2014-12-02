@@ -29,6 +29,10 @@
 #include <stdint.h>
 #include "adc_legacy.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define ADC_NUM                  (6)
 #define ADC_OFFSET            (0x10)
 #define ADC_INDEX                (4)
@@ -41,6 +45,10 @@
  */
 void adc_init_1(void);
 void adc_init_2(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* LPC2387ADC_H_ */

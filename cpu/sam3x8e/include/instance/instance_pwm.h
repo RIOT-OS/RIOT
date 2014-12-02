@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_PWM_INSTANCE_
 #define _SAM3XA_PWM_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for PWM peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_PWM_CLK               (0x40094000U) /**< \brief (PWM) PWM Clock Register */
@@ -302,5 +306,9 @@
 #define REG_PWM_DT7      (*(RwReg*)0x400942F8U) /**< \brief (PWM) PWM Channel Dead Time Register (ch_num = 7) */
 #define REG_PWM_DTUPD7   (*(WoReg*)0x400942FCU) /**< \brief (PWM) PWM Channel Dead Time Update Register (ch_num = 7) */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_PWM_INSTANCE_ */

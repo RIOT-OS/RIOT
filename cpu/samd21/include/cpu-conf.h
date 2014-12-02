@@ -20,11 +20,10 @@
 
 #include "samd21.h"
 
-
- /* @brief   length of CPU ID for @ref cpuid_get() in @ref periph/cpuid.h*/
-#ifndef CPUID_ID_LEN
-#define CPUID_ID_LEN                    (128/8)
+#ifdef __cplusplus
+extern "C" {
 #endif
+
 
 /**
  * @name Kernel configuration
@@ -39,6 +38,13 @@
 #endif
 
 #define KERNEL_CONF_STACKSIZE_IDLE      (256)
+#define TRICKLE_TIMER_STACKSIZE         (1024)
+#define TRICKLE_INTERVAL_STACKSIZE     (512)
+#define DAO_DELAY_STACKSIZE     (1024)
+#define RT_STACKSIZE     (512)
+//#define RT_STACKSIZE     (512)
+
+
 /** @} */
 
 /**
@@ -56,6 +62,13 @@
 
 
 /**
+ * @name CPUID_ID_LEN length of cpuid in bytes
+ * @{
+ */
+#define CPUID_ID_LEN (16) /* 128 bits long, 16 bytes long */
+/** @} */
+
+/*
  * @name Definition of different panic modes
  */
 typedef enum {
@@ -66,15 +79,9 @@ typedef enum {
     DUMMY_HANDLER
 } panic_t;
 
-/**
- * @def CPUID_ID_LEN
- *
- * @brief   The length in byte of the CPU's serial number.
- *
- * @note    Must be defined in the CPU's @ref cpu-conf.h
- */
 
-#define CPUID_ID_LEN (128/8) //128 bits long, 16 bytes long
-
+#ifdef __cplusplus
+} /* end extern "C" */
+#endif
 #endif /* __CPU_CONF_H */
 /** @} */

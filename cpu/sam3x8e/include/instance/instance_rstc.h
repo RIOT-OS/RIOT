@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_RSTC_INSTANCE_
 #define _SAM3XA_RSTC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for RSTC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_RSTC_CR          (0x400E1A00U) /**< \brief (RSTC) Control Register */
@@ -40,5 +44,9 @@
 #define REG_RSTC_SR (*(RoReg*)0x400E1A04U) /**< \brief (RSTC) Status Register */
 #define REG_RSTC_MR (*(RwReg*)0x400E1A08U) /**< \brief (RSTC) Mode Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_RSTC_INSTANCE_ */

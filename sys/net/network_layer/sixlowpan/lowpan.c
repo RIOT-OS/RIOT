@@ -54,8 +54,8 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
-#define CON_STACKSIZE                   (512)
-#define LOWPAN_TRANSFER_BUF_STACKSIZE   (512)
+#define CON_STACKSIZE                   (512+32)
+#define LOWPAN_TRANSFER_BUF_STACKSIZE   (512+32)
 
 #define SIXLOWPAN_MAX_REGISTERED        (4)
 
@@ -173,28 +173,28 @@ int sixlowpan_lowpan_sendto(int if_id, const void *dest, int dest_len,
     /* check if packet needs to be fragmented */
     DEBUG("sixlowpan_lowpan_sendto(%d, dest, %d, data, %"PRIu16")\n",
           if_id, dest_len, data_len);
-// #ifdef DEBUG_ENABLED
-//     DEBUG("dest: ");
+#ifdef DEBUG_ENABLED
+    DEBUG("dest: ");
 
-//     if (dest_len == 8) {
-//         print_long_local_addr((net_if_eui64_t *)dest);
-//     }
-//     else {
+    if (dest_len == 8) {
+        print_long_local_addr((net_if_eui64_t *)dest);
+    }
+    else {
         uint16_t destination;
         memcpy(&destination, dest, 2); // i really do not know if this is correct
         printf("0x%04"PRIx16"\n", destination);//NTOHS(*((uint16_t *)dest)));
 
-//     DEBUG("data: \n");
+    DEBUG("data: \n");
 
-//     for (int i = 0; i < data_len; i++) {
-//         printf("%02x ", data[i]);
+    for (int i = 0; i < data_len; i++) {
+        printf("%02x ", data[i]);
 
-//         if (!((i + 1) % 16) || i == data_len - 1) {
-//             printf("\n");
-//         }
-//     }
+        if (!((i + 1) % 16) || i == data_len - 1) {
+            printf("\n");
+        }
+    }
 
-// #endif
+#endif
 
     if (iphc_status == LOWPAN_IPHC_ENABLE) {
         if (!lowpan_iphc_encoding(if_id, dest, dest_len, ipv6_buf, data)) {

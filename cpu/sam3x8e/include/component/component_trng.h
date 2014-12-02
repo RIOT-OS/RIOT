@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_TRNG_COMPONENT_
 #define _SAM3XA_TRNG_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR True Random Number Generator */
 /* ============================================================================= */
@@ -69,5 +73,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_TRNG_COMPONENT_ */

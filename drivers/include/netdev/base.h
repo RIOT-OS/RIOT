@@ -145,6 +145,7 @@ typedef enum {
 typedef struct __attribute__((packed)) netdev_hlist_t {
     struct netdev_hlist_t *next;    /**< next element in list */
     struct netdev_hlist_t *prev;    /**< previous element in list */
+    netdev_proto_t protocol;        /**< protocol of the header */
     void *header;                   /**< the header stored in here */
     size_t header_len;              /**< the length of the header in byte */
 } netdev_hlist_t;

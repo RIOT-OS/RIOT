@@ -54,7 +54,7 @@ void _native_lpm_sleep(void)
     nfds++;
 
     _native_in_syscall++; // no switching here
-    nfds = select(nfds, &_native_rfds, NULL, NULL, NULL);
+    nfds = real_select(nfds, &_native_rfds, NULL, NULL, NULL);
     _native_in_syscall--;
 
     DEBUG("_native_lpm_sleep: returned: %i\n", nfds);
@@ -129,11 +129,11 @@ enum lpm_mode lpm_set(enum lpm_mode target)
 
         case LPM_OFF:
             printf("lpm_set(): exit()\n");
-            exit(0);
+            real_exit(EXIT_SUCCESS);
 
         default:
             DEBUG("XXX: unsupported power mode: %i\n", native_lpm);
-            exit(1);
+            real_exit(EXIT_FAILURE);
     }
 
     return last_lpm;

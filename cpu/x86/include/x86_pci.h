@@ -35,6 +35,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   Initialize the Peripheral Component Interconnect.
  *
@@ -409,6 +413,10 @@ void x86_pci_write16(unsigned bus, unsigned dev, unsigned fun, unsigned reg, uin
  * Bad things will happen if you supply any other value.
  */
 void x86_pci_set_irq(struct x86_known_pci_device *d, uint8_t irq_num);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_RTT_INSTANCE_
 #define _SAM3XA_RTT_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for RTT peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_RTT_MR          (0x400E1A30U) /**< \brief (RTT) Mode Register */
@@ -42,5 +46,9 @@
 #define REG_RTT_VR (*(RoReg*)0x400E1A38U) /**< \brief (RTT) Value Register */
 #define REG_RTT_SR (*(RoReg*)0x400E1A3CU) /**< \brief (RTT) Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_RTT_INSTANCE_ */

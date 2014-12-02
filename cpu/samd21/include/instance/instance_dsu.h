@@ -44,6 +44,10 @@
 #ifndef _SAMR21_DSU_INSTANCE_
 #define _SAMR21_DSU_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for DSU peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_DSU_CTRL               (0x41002000U) /**< \brief (DSU) Control */
@@ -95,5 +99,9 @@
 
 /* ========== Instance parameters for DSU peripheral ========== */
 #define DSU_CLK_HSB_ID              3
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_DSU_INSTANCE_ */

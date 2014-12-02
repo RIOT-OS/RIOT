@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_ADC_COMPONENT_
 #define _SAM3XA_ADC_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Analog-to-digital Converter */
 /* ============================================================================= */
@@ -501,5 +505,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_ADC_COMPONENT_ */

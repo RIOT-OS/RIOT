@@ -62,7 +62,7 @@
 
 #define ENABLE_DEBUG (0)
 #if ENABLE_DEBUG
-#define DEBUG_ENABLED
+//#define DEBUG_ENABLED
 #undef TRANSCEIVER_STACK_SIZE
 #define TRANSCEIVER_STACK_SIZE      (1024)
 #endif

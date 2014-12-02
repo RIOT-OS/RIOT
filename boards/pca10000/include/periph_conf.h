@@ -26,6 +26,19 @@ extern "C" {
 #endif
 
 /**
+ * @name Clock configuration
+ *
+ * @note: the radio will not work with the internal RC oscillator!
+ *
+ * @{
+ */
+#define CLOCK_CORECLOCK     (16000000U)     /* fixed for all NRF51822 */
+#define CLOCK_CRYSTAL       (16U)           /* set to  0: internal RC oscillator
+                                                      16: 16MHz crystal
+                                                      32: 32MHz crystal */
+/** @} */
+
+/**
  * @name Timer configuration
  * @{
  */

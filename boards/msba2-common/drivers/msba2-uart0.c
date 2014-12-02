@@ -150,7 +150,7 @@ void UART0_IRQHandler(void)
     VICVectAddr = 0;                    // Acknowledge Interrupt
 }
 
-static inline int uart0_puts(char *astring, int length)
+int uart0_puts(char *astring, int length)
 {
     /*    while (queue_items == (QUEUESIZE-1)) {} ;
         U0IER = 0;
@@ -174,11 +174,6 @@ static inline int uart0_puts(char *astring, int length)
     /*    */
 
     return length;
-}
-
-int fw_puts(char *astring, int length)
-{
-    return uart0_puts(astring, length);
 }
 
 int

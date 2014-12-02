@@ -17,7 +17,9 @@ FILEREGEX='\.([sScHh]|cpp)$'
 if echo "${BRANCH}" | grep -q '^-'; then
     BRANCH=""
 else
-    shift 1
+    if [ -n "${BRANCH}" ]; then
+        shift 1
+    fi
 fi
 
 # If the --diff-filter option is given, consume this parameter.

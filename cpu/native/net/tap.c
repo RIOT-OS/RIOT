@@ -124,7 +124,7 @@ void _native_handle_tap_input(void)
 
         _native_in_syscall++; // no switching here
 
-        if (select(_native_tap_fd + 1, &rfds, NULL, NULL, &t) == 1) {
+        if (real_select(_native_tap_fd + 1, &rfds, NULL, NULL, &t) == 1) {
             int sig = SIGIO;
             extern int _sig_pipefd[2];
             extern ssize_t (*real_write)(int fd, const void *buf, size_t count);
@@ -177,7 +177,7 @@ void sigio_child(void)
         FD_ZERO(&rfds);
         FD_SET(_native_tap_fd, &rfds);
 
-        if (select(_native_tap_fd + 1, &rfds, NULL, NULL, NULL) == 1) {
+        if (real_select(_native_tap_fd + 1, &rfds, NULL, NULL, NULL) == 1) {
             kill(parent, SIGIO);
         }
         else {
@@ -259,14 +259,14 @@ int tap_init(char *name)
 #endif
 
     /* implicitly create the tap interface */
-    if ((_native_tap_fd = open(clonedev , O_RDWR)) == -1) {
+    if ((_native_tap_fd = real_open(clonedev , O_RDWR)) == -1) {
         err(EXIT_FAILURE, "open(%s)", clonedev);
     }
 
 #if (defined(__MACH__) || defined(__FreeBSD__)) /* OSX/FreeBSD */
     struct ifaddrs *iflist;
 
-    if (getifaddrs(&iflist) == 0) {
+    if (real_getifaddrs(&iflist) == 0) {
         for (struct ifaddrs *cur = iflist; cur; cur = cur->ifa_next) {
             if ((cur->ifa_addr->sa_family == AF_LINK) && (strcmp(cur->ifa_name, name) == 0) && cur->ifa_addr) {
                 struct sockaddr_dl *sdl = (struct sockaddr_dl *)cur->ifa_addr;
@@ -275,7 +275,7 @@ int tap_init(char *name)
             }
         }
 
-        freeifaddrs(iflist);
+        real_freeifaddrs(iflist);
     }
 
 #else /* Linux */
@@ -283,11 +283,11 @@ int tap_init(char *name)
     ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
     strncpy(ifr.ifr_name, name, IFNAMSIZ);
 
-    if (ioctl(_native_tap_fd, TUNSETIFF, (void *)&ifr) == -1) {
+    if (real_ioctl(_native_tap_fd, TUNSETIFF, (void *)&ifr) == -1) {
         _native_in_syscall++;
         warn("ioctl TUNSETIFF");
         warnx("probably the tap interface (%s) does not exist or is already in use", name);
-        exit(EXIT_FAILURE);
+        real_exit(EXIT_FAILURE);
     }
 
     /* TODO: use strncpy */
@@ -298,7 +298,7 @@ int tap_init(char *name)
     memset(&ifr, 0, sizeof(ifr));
     snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", name);
 
-    if (ioctl(_native_tap_fd, SIOCGIFHWADDR, &ifr) == -1) {
+    if (real_ioctl(_native_tap_fd, SIOCGIFHWADDR, &ifr) == -1) {
         _native_in_syscall++;
         warn("ioctl SIOCGIFHWADDR");
 
@@ -306,7 +306,7 @@ int tap_init(char *name)
             warn("close");
         }
 
-        exit(EXIT_FAILURE);
+        real_exit(EXIT_FAILURE);
     }
 
     memcpy(_native_tap_mac, ifr.ifr_hwaddr.sa_data, ETHER_ADDR_LEN);

@@ -236,16 +236,14 @@ void gpio_irq_disable(gpio_t dev)
 
 int gpio_read(gpio_t dev)
 {
-    uint32_t pin;
-    int res = -1;
-
     /* get pin */
-    pin = get_pin(dev);
+    int pin = get_pin(dev);
     if (pin < 0) {
         return pin;
     }
 
     /* read pin value depending if pin is input or output */
+    int res;
     if (NRF_GPIO->DIR & (1 << pin)) {
         res = (NRF_GPIO->OUT & (1 << pin));
     }

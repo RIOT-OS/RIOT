@@ -19,7 +19,7 @@
 #include "cpu.h"
 #include "lpm.h"
 #include "crash.h"
-
+#include "ps.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -41,6 +41,7 @@ NORETURN void core_panic(int crash_code, const char *message)
         crashed = 1;
         puts("******** SYSTEM FAILURE ********\n");
         puts(message);
+        thread_print_all();
 #if DEVELHELP
         puts("******** RIOT HALTS HERE ********\n");
 #else

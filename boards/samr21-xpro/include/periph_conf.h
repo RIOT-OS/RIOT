@@ -244,7 +244,7 @@ extern "C" {
 #define ADC_0_REF_EXT_B                    ADC_REFCTRL_REFSEL_AREFB
 #define ADC_0_REF_COM_EN                   0
 /* Use this to define the value used */ 
-#define ADC_0_REF_DEFAULT                  ADC_0_REF_INT_1V
+#define ADC_0_REF_DEFAULT                  ADC_0_REF_EXT_B
 
 /* ADC 0 ACCUMULATE */
 #define ADC_0_ACCUM_DISABLE                ADC_AVGCTRL_SAMPLENUM_1

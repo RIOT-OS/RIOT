@@ -54,15 +54,13 @@ BOARD_BLACKLIST := arduino-due avsextrem chronos mbed_lpc1768 msb-430h msba2 red
 # to CXXEXFLAGS variable
 CXXEXFLAGS += -std=gnu++11 -fno-exceptions -funwind-tables
 
-USEMODULE += defaulttransceiver
-USEMODULE += sixlowpan
-USEMODULE += auto_init
-USEMODULE += uart0
-USEMODULE += posix
-USEMODULE += vtimer
 USEMODULE += shell
 USEMODULE += shell_commands
+USEMODULE += uart0
 USEMODULE += ps
-USEMODULE += hashes
+USEMODULE += vtimer
+USEMODULE += defaulttransceiver
+USEMODULE += rpl
 USEMODULE += udp
+#USEMODULE += border_router
 include $(RIOTBASE)/Makefile.include

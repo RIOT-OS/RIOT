@@ -29,29 +29,45 @@ void handle_init_response( int );
 
 int main(void)
 {
-	printf(" :::: ADC Test Application v0.1 ::::\n" );
+	//printf(" :::: ADC Test Application v0.1 ::::\n" );
 	adc_t dev;
 	dev = ADC_0;
 	adc_precision_t pre;
 	pre = ADC_RES_16BIT; // 6BIT & 14BIT is not valid
+	int result = 0;
+	uint32_t resultAccum = 0;
+    uint16_t count = 0;
+    uint16_t accumulateNum = 500;
 
 	int response = adc_init(dev, pre);
 	handle_init_response(response);
-	int result = 0;      
-  	printf("ADC Testing\n" ); 	
+
   	gpio_init_out(GPIO_0, GPIO_NOPULL);
   	gpio_set(GPIO_0);
-  	sleep(1);
-  	printf("ADC Testing while(1)\n" );
+  	usleep(100000);
+   
+    while( count < accumulateNum/*+20*/)
+    {
+        result = adc_sample(dev, 0);
+       // if(count > 20) // filter first 20 measurements out
+        //{        
+            resultAccum += result;
+        //}
+        count++;
+    } 
+    gpio_clear(GPIO_0);
+    resultAccum = (uint32_t)(resultAccum/accumulateNum); 
+    printf("%d\n", resultAccum); 
+
     while(1)
     {
     	//result = adc_sample(dev, 2); //pin 6
     	//printf("Result: " );
     	//printf("PIN6: %d\n", result);   
 
-    	result = adc_sample(dev, 0); // pin 5
+    	//result = adc_sample(dev, 0); // pin 5
     	//printf("Result: " );
-    	printf("%d\n", result);  	
+    	//printf("%d\n", result);  	
     }
     
     return 0;

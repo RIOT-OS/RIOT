@@ -101,12 +101,12 @@
 #ifndef TIME_H
 #define TIME_H
 
-#ifdef __cplusplus
-extern          "C" {
-#endif
-
 #include <inttypes.h>
 #include <stdlib.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
     /** \ingroup avr_time */
     /* @{ */

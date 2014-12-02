@@ -27,8 +27,7 @@
 #include "kernel_types.h"
 #include "transceiver.h"
 #include "hwtimer.h"
-#include "hwtimer.h"
-
+#include "byteorder.h"
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -94,7 +93,9 @@ int at86rf231_initialize(netdev_t *dev)
     radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 40;
     radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 48;
     radio_address_long |= ((uint64_t)at86rf231_reg_read(AT86RF231_REG__IEEE_ADDR_1)) << 56;
-
+    
+    radio_address_long = HTONLL(radio_address_long);
+    radio_address = HTONS(radio_address);
     return 0;
 }
 
@@ -272,8 +273,8 @@ radio_address_t at86rf231_set_address(radio_address_t address)
     } while ((at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
              != AT86RF231_TRX_STATUS__PLL_ON);
 
-    at86rf231_reg_write(AT86RF231_REG__SHORT_ADDR_0, (uint8_t)(0x00FF & radio_address));
-    at86rf231_reg_write(AT86RF231_REG__SHORT_ADDR_1, (uint8_t)(radio_address >> 8));
+    at86rf231_reg_write(AT86RF231_REG__SHORT_ADDR_0, (uint8_t)(0x00FF & HTONS(radio_address)));
+    at86rf231_reg_write(AT86RF231_REG__SHORT_ADDR_1, (uint8_t)(HTONS(radio_address) >> 8));
 
     /* Go to state old state */
     at86rf231_reg_write(AT86RF231_REG__TRX_STATE, old_state);
@@ -315,14 +316,14 @@ uint64_t at86rf231_set_address_long(uint64_t address)
     } while ((at86rf231_get_status() & AT86RF231_TRX_STATUS_MASK__TRX_STATUS)
              != AT86RF231_TRX_STATUS__PLL_ON);
 
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_0, (uint8_t)(0x00000000000000FF & radio_address_long));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_1, (uint8_t)(0x000000000000FF00 & radio_address_long >> 8));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_2, (uint8_t)(0x0000000000FF0000 & radio_address_long >> 16));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_3, (uint8_t)(0x00000000FF000000 & radio_address_long >> 24));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_4, (uint8_t)(0x000000FF00000000 & radio_address_long >> 32));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_5, (uint8_t)(0x0000FF0000000000 & radio_address_long >> 40));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_6, (uint8_t)(0x00FF000000000000 & radio_address_long >> 48));
-    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_7, (uint8_t)(radio_address_long >> 56));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_0, (uint8_t)(0x00000000000000FF & NTOHLL(radio_address_long)));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_1, (uint8_t)(0x000000000000FF00 & NTOHLL(radio_address_long) >> 8));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_2, (uint8_t)(0x0000000000FF0000 & NTOHLL(radio_address_long) >> 16));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_3, (uint8_t)(0x00000000FF000000 & NTOHLL(radio_address_long) >> 24));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_4, (uint8_t)(0x000000FF00000000 & NTOHLL(radio_address_long) >> 32));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_5, (uint8_t)(0x0000FF0000000000 & NTOHLL(radio_address_long) >> 40));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_6, (uint8_t)(0x00FF000000000000 & NTOHLL(radio_address_long) >> 48));
+    at86rf231_reg_write(AT86RF231_REG__IEEE_ADDR_7, (uint8_t)(NTOHLL(radio_address_long) >> 56));
 
     /* Go to state old state */
     at86rf231_reg_write(AT86RF231_REG__TRX_STATE, old_state);

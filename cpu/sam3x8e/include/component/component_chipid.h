@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_CHIPID_COMPONENT_
 #define _SAM3XA_CHIPID_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Chip Identifier */
 /* ============================================================================= */
@@ -156,5 +160,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_CHIPID_COMPONENT_ */

@@ -15,6 +15,10 @@
 #ifndef __LPC23xx_H
 #define __LPC23xx_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Vectored Interrupt Controller (VIC) */
 #define VIC_BASE_ADDR   0xFFFFF000
 #define VICIRQStatus   (*(volatile unsigned long *)(VIC_BASE_ADDR + 0x000))
@@ -1126,5 +1130,8 @@ with the spec. update in USB Device Section. */
 #define MAC_POWERDOWN       (*(volatile unsigned long *)(MAC_BASE_ADDR + 0xFF4)) /* Power-down reg */
 #define MAC_MODULEID        (*(volatile unsigned long *)(MAC_BASE_ADDR + 0xFFC)) /* Module ID reg (RO) */
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __LPC23xx_H

@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_DACC_INSTANCE_
 #define _SAM3XA_DACC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for DACC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_DACC_CR            (0x400C8000U) /**< \brief (DACC) Control Register */
@@ -72,5 +76,9 @@
 #define REG_DACC_PTCR (*(WoReg*)0x400C8120U) /**< \brief (DACC) Transfer Control Register */
 #define REG_DACC_PTSR (*(RoReg*)0x400C8124U) /**< \brief (DACC) Transfer Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_DACC_INSTANCE_ */

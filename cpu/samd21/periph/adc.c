@@ -392,12 +392,14 @@ int adc_configure_with_resolution(Adc* adc, uint32_t precision)
     adc->INTENCLR.reg =
         (1 << ADC_INTENCLR_SYNCRDY_Pos) | (1 << ADC_INTENCLR_WINMON_Pos) |
         (1 << ADC_INTENCLR_OVERRUN_Pos) | (1 << ADC_INTENCLR_RESRDY_Pos);
+
    
     /* Load the fixed device calibration constants*/
-    adc->CALIB.reg = ADC_CALIB_BIAS_CAL((*(uint32_t*)ADC_FUSES_BIASCAL_ADDR >> ADC_FUSES_BIASCAL_Pos))
+    adc->CALIB.reg = (ADC_CALIB_BIAS_CAL((*(uint32_t*)ADC_FUSES_BIASCAL_ADDR >> ADC_FUSES_BIASCAL_Pos))
                     |
-                    ADC_CALIB_LINEARITY_CAL((*(uint64_t*)ADC_FUSES_LINEARITY_0_ADDR >> ADC_FUSES_LINEARITY_0_Pos));
-  
+                    ADC_CALIB_LINEARITY_CAL((*(uint64_t*)ADC_FUSES_LINEARITY_0_ADDR >> ADC_FUSES_LINEARITY_0_Pos)));
+    DEBUG("\n\nADC CALIB BIAS: %u\n", bias);                    
+    DEBUG("\n\nADC CALIB LINEARITY: %u\n\n", ADC_CALIB_LINEARITY_CAL((*(uint64_t*)ADC_FUSES_LINEARITY_0_ADDR >> ADC_FUSES_LINEARITY_0_Pos))); 
     return 1;
 }
 

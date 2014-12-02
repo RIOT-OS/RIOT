@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_SPI0_INSTANCE_
 #define _SAM3XA_SPI0_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for SPI0 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_SPI0_CR              (0x40008000U) /**< \brief (SPI0) Control Register */
@@ -56,5 +60,9 @@
 #define REG_SPI0_WPMR   (*(RwReg*)0x400080E4U) /**< \brief (SPI0) Write Protection Control Register */
 #define REG_SPI0_WPSR   (*(RoReg*)0x400080E8U) /**< \brief (SPI0) Write Protection Status Register */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_SPI0_INSTANCE_ */

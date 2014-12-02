@@ -19,8 +19,8 @@ echo "##"
 openocd -f "${BIN_FOLDER}/openocd.cfg" \
     -c "init" \
     -c "targets" \
+    -c "halt" \
     -c "flash banks" \
-    -c "reset halt" \
     -c "flash write_image erase $1 0" \
     -c "verify_image $1" \
     -c "reset run"\

@@ -20,8 +20,8 @@
 
 #include "sam3x8e.h"
 
-#ifndef CPUID_ID_LEN
-#define CPUID_ID_LEN                    (4)
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 
@@ -51,6 +51,9 @@
 #endif
 /** @} */
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __CPU_CONF_H */
 /** @} */

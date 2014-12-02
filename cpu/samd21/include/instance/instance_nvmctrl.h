@@ -44,6 +44,10 @@
 #ifndef _SAMR21_NVMCTRL_INSTANCE_
 #define _SAMR21_NVMCTRL_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for NVMCTRL peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_NVMCTRL_CTRLA          (0x41004000U) /**< \brief (NVMCTRL) Control A */
@@ -88,5 +92,9 @@
 #define NVMCTRL_USER_PAGE_ADDRESS   (FLASH_ADDR + NVMCTRL_USER_PAGE_OFFSET)
 #define NVMCTRL_USER_PAGE_OFFSET    0x00800000
 #define NVMCTRL_USER_WORD_IMPLEMENTED_MASK 0xC01FFFFFFFFFFFFF
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_NVMCTRL_INSTANCE_ */

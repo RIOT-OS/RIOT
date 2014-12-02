@@ -18,6 +18,7 @@ QUIET ?= 1
 USEMODULE += vtimer
 USEMODULE += auto_init
 USEMODULE += posix
+USEMODULE += ps
 
 include $(RIOTBASE)/Makefile.include
  

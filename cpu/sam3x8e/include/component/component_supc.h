@@ -30,6 +30,10 @@
 #ifndef _SAM3XA_SUPC_COMPONENT_
 #define _SAM3XA_SUPC_COMPONENT_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================= */
 /**  SOFTWARE API DEFINITION FOR Supply Controller */
 /* ============================================================================= */
@@ -309,5 +313,8 @@ typedef struct {
 
 /*@}*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAM3XA_SUPC_COMPONENT_ */

@@ -28,6 +28,10 @@
 #ifndef KERNEL_MEMORY_H__
 #define KERNEL_MEMORY_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief   First byte inside the elf segments.
  *
@@ -110,6 +114,10 @@ extern char _kernel_memory_end;
  * There should be a space between _kernel_memory_end and _heap_start, but it does not have to.
  */
 extern char _heap_start;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

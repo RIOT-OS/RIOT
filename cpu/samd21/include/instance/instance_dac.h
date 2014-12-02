@@ -44,6 +44,10 @@
 #ifndef _SAMR21_DAC_INSTANCE_
 #define _SAMR21_DAC_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for DAC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_DAC_CTRLA              (0x42004800U) /**< \brief (DAC) Control A */
@@ -70,5 +74,9 @@
 /* ========== Instance parameters for DAC peripheral ========== */
 #define DAC_DMAC_ID_EMPTY           40
 #define DAC_GCLK_ID                 33
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_DAC_INSTANCE_ */

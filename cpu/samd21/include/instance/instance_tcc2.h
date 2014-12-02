@@ -44,6 +44,10 @@
 #ifndef _SAMR21_TCC2_INSTANCE_
 #define _SAMR21_TCC2_INSTANCE_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ========== Register definition for TCC2 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 #define REG_TCC2_CTRLA             (0x42002800U) /**< \brief (TCC2) Control A */
@@ -111,5 +115,9 @@
 #define TCC2_PG                     0
 #define TCC2_SIZE                   16
 #define TCC2_SWAP                   0
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _SAMR21_TCC2_INSTANCE_ */
