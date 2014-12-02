@@ -179,7 +179,7 @@ void socket_base_print_internal_socket(socket_internal_t *current_socket_interna
     printf("\n--------------------------\n");
 }
 
-int socket_base_exists_socket(int socket)
+bool socket_base_exists_socket(int socket)
 {
     if (socket < 1) {
         return false;
