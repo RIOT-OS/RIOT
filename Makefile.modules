@@ -2,6 +2,7 @@ include $(RIOTBASE)/Makefile.pseudomodules
 include $(RIOTBASE)/Makefile.defaultmodules
 
 USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
+USEMODULE := $(filter-out $(filter-out $(FEATURES_PROVIDED), $(FEATURES_OPTIONAL)), $(sort $(USEMODULE)))
 
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
 ED = $(patsubst %,-DMODULE_%,$(subst -,_,$(USEMODULE) $(USEPKG)))
