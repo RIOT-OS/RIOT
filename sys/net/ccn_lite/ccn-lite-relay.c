@@ -116,24 +116,28 @@ void ccnl_ll_TX(struct ccnl_relay_s *ccnl, struct ccnl_if_s *ifc,
 void ccnl_ageing(void *relay, void *aux)
 {
     ccnl_do_ageing(relay, aux);
-    ccnl_set_timer(TIMEOUT_TO_US(CCNL_CHECK_TIMEOUT_SEC, CCNL_CHECK_TIMEOUT_USEC), ccnl_ageing, relay, 0);
+    ccnl_set_timer(TIMEOUT_TO_US(CCNL_CHECK_TIMEOUT_SEC, CCNL_CHECK_TIMEOUT_USEC),
+                   ccnl_ageing, relay, 0);
 }
 
 void ccnl_retransmit(void *relay, void *aux)
 {
     ccnl_do_retransmit(relay, aux);
-    ccnl_set_timer(TIMEOUT_TO_US(CCNL_CHECK_RETRANSMIT_SEC, CCNL_CHECK_RETRANSMIT_USEC), ccnl_retransmit, relay, 0);
+    ccnl_set_timer(TIMEOUT_TO_US(CCNL_CHECK_RETRANSMIT_SEC,
+                   CCNL_CHECK_RETRANSMIT_USEC), ccnl_retransmit, relay, 0);
 }
 
 void ccnl_nonce_timeout(void *relay, void *aux)
 {
     ccnl_do_nonce_timeout(relay, aux);
-    ccnl_set_timer(TIMEOUT_TO_US(CCNL_NONCE_TIMEOUT_SEC, CCNL_NONCE_TIMEOUT_USEC), ccnl_nonce_timeout, relay, 0);
+    ccnl_set_timer(TIMEOUT_TO_US(CCNL_NONCE_TIMEOUT_SEC,
+                   CCNL_NONCE_TIMEOUT_USEC), ccnl_nonce_timeout, relay, 0);
 }
 
 // ----------------------------------------------------------------------
 
-void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries, int fib_threshold_prefix, int fib_threshold_aggregate)
+void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries,
+                       int fib_threshold_prefix, int fib_threshold_aggregate)
 {
     struct ccnl_if_s *i;
 
@@ -198,9 +202,12 @@ void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries, int fi
     f->flags |= CCNL_FACE_FLAGS_STATIC;
     i->broadcast_face = f;
 
-    ccnl_set_timer(TIMEOUT_TO_US(CCNL_CHECK_TIMEOUT_SEC, CCNL_CHECK_TIMEOUT_USEC), ccnl_ageing, relay, 0);
-    ccnl_set_timer(TIMEOUT_TO_US(CCNL_CHECK_RETRANSMIT_SEC, CCNL_CHECK_RETRANSMIT_USEC), ccnl_retransmit, relay, 0);
-    ccnl_set_timer(TIMEOUT_TO_US(CCNL_NONCE_TIMEOUT_SEC, CCNL_NONCE_TIMEOUT_USEC), ccnl_nonce_timeout, relay, 0);
+    ccnl_set_timer(TIMEOUT_TO_US(CCNL_CHECK_TIMEOUT_SEC, CCNL_CHECK_TIMEOUT_USEC),
+                   ccnl_ageing, relay, 0);
+    ccnl_set_timer(TIMEOUT_TO_US(CCNL_CHECK_RETRANSMIT_SEC, CCNL_CHECK_RETRANSMIT_USEC),
+                   ccnl_retransmit, relay, 0);
+    ccnl_set_timer(TIMEOUT_TO_US(CCNL_NONCE_TIMEOUT_SEC, CCNL_NONCE_TIMEOUT_USEC),
+                   ccnl_nonce_timeout, relay, 0);
 }
 
 #if RIOT_CCNL_POPULATE
@@ -217,7 +224,8 @@ void ccnl_populate_cache(struct ccnl_relay_s *ccnl, unsigned char *buf, int data
         datalen -= 2;
 
         pkt = ccnl_extract_prefix_nonce_ppkd(&data, &datalen, 0, 0,
-                                             0, 0, &prefix, &nonce, &ppkd, &content, &contlen);
+                                             0, 0, &prefix, &nonce, &ppkd,
+                                             &content, &contlen);
 
         if (!pkt) {
             DEBUGMSG(6, "  parsing error\n");
@@ -323,8 +331,10 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
                 p = (ieee802154_packet_t*) in.content.ptr;
                 DEBUGMSG(1, "\tLength:\t%u\n", p->length);
-                DEBUGMSG(1, "\tSrc:\t%u\n", (p->frame.src_addr[0]) | (p->frame.src_addr[1] << 8));
-                DEBUGMSG(1, "\tDst:\t%u\n", (p->frame.dest_addr[0]) | (p->frame.dest_addr[1] << 8));
+                DEBUGMSG(1, "\tSrc:\t%u\n",
+                         (p->frame.src_addr[0]) | (p->frame.src_addr[1] << 8));
+                DEBUGMSG(1, "\tDst:\t%u\n",
+                         (p->frame.dest_addr[0]) | (p->frame.dest_addr[1] << 8));
 #else
                 p = (radio_packet_t *) in.content.ptr;
                 DEBUGMSG(1, "\tLength:\t%u\n", p->length);
@@ -345,9 +355,14 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 #endif
 
 #if MODULE_AT86RF231 || MODULE_CC2420 || MODULE_MC1322X
-                ccnl_core_RX(ccnl, RIOT_TRANS_IDX, (unsigned char *) p->frame.payload, (int) p->frame.payload_len, *((uint16_t*) p->frame.src_addr));
+                ccnl_core_RX(ccnl, RIOT_TRANS_IDX,
+                             (unsigned char *) p->frame.payload,
+                             (int) p->frame.payload_len,
+                             *((uint16_t*) p->frame.src_addr));
 #else
-                ccnl_core_RX(ccnl, RIOT_TRANS_IDX, (unsigned char *) p->data, (int) p->length, p->src);
+                ccnl_core_RX(ccnl, RIOT_TRANS_IDX,
+                             (unsigned char *) p->data,
+                             (int) p->length, p->src);
 #endif
                 p->processing--;
                 break;
@@ -393,7 +408,8 @@ int ccnl_io_loop(struct ccnl_relay_s *ccnl)
                 DEBUGMSG(1, "max_cache_entries set to %d\n", ccnl->max_cache_entries);
                 break;
             case (ENOBUFFER):
-                /* transceiver has not enough buffer to store incoming packets, one packet is dropped  */
+                /* transceiver has not enough buffer to store incoming packets,
+                 * one packet is dropped */
                 DEBUGMSG(1, "transceiver: one packet is dropped because buffers are full\n");
                 break;
             default:
@@ -422,13 +438,17 @@ void *ccnl_riot_relay_start(void *arg)
     theRelay->riot_pid = sched_active_pid;
     mutex_init(&theRelay->global_lock);
 
-    DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n", theRelay->startup_time.tv_sec, theRelay->startup_time.tv_usec);
+    DEBUGMSG(1, "This is ccn-lite-relay, starting at %lu:%lu\n",
+             theRelay->startup_time.tv_sec, theRelay->startup_time.tv_usec);
     DEBUGMSG(1, "  compile time: %s %s\n", __DATE__, __TIME__);
     DEBUGMSG(1, "  max_cache_entries: %d\n", CCNL_DEFAULT_MAX_CACHE_ENTRIES);
     DEBUGMSG(1, "  threshold_prefix: %d\n", CCNL_DEFAULT_THRESHOLD_PREFIX);
     DEBUGMSG(1, "  threshold_aggregate: %d\n", CCNL_DEFAULT_THRESHOLD_AGGREGATE);
 
-    ccnl_relay_config(theRelay, CCNL_DEFAULT_MAX_CACHE_ENTRIES, CCNL_DEFAULT_THRESHOLD_PREFIX, CCNL_DEFAULT_THRESHOLD_AGGREGATE);
+    ccnl_relay_config(theRelay,
+                      CCNL_DEFAULT_MAX_CACHE_ENTRIES,
+                      CCNL_DEFAULT_THRESHOLD_PREFIX,
+                      CCNL_DEFAULT_THRESHOLD_AGGREGATE);
 
     theRelay->riot_helper_pid = riot_start_helper_thread();
 
