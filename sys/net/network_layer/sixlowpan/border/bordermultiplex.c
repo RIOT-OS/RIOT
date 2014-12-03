@@ -48,7 +48,7 @@ void demultiplex(border_packet_t *packet)
             switch (l3_header_buf->ethertype) {
                 case (BORDER_ETHERTYPE_IPV6): {
                     ipv6_hdr_t *ipv6_buf = (ipv6_hdr_t *)(((unsigned char *)packet) + sizeof(border_l3_header_t));
-                    ipv6_send_packet(ipv6_buf);
+                    ipv6_send_packet(ipv6_buf, NULL);
                     break;
                 }
 

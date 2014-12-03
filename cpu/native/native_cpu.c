@@ -137,21 +137,21 @@ void isr_cpu_switch_context_exit(void)
 {
     ucontext_t *ctx;
 
-    DEBUG("XXX: cpu_switch_context_exit()\n");
+    DEBUG("XXX: isr_cpu_switch_context_exit()\n");
     if ((sched_context_switch_request == 1) || (sched_active_thread == NULL)) {
         sched_run();
     }
 
-    DEBUG("XXX: cpu_switch_context_exit(): calling setcontext(%s)\n\n", sched_active_thread->name);
+    DEBUG("XXX: isr_cpu_switch_context_exit(): calling setcontext(%" PRIkernel_pid ")\n\n", sched_active_pid);
     ctx = (ucontext_t *)(sched_active_thread->sp);
 
     /* the next context will have interrupts enabled due to ucontext */
-    DEBUG("XXX: cpu_switch_context_exit: native_interrupts_enabled = 1;\n");
+    DEBUG("XXX: isr_cpu_switch_context_exit: native_interrupts_enabled = 1;\n");
     native_interrupts_enabled = 1;
     _native_in_isr = 0;
 
     if (setcontext(ctx) == -1) {
-        err(EXIT_FAILURE, "cpu_switch_context_exit(): setcontext():");
+        err(EXIT_FAILURE, "isr_cpu_switch_context_exit(): setcontext():");
     }
     errx(EXIT_FAILURE, "2 this should have never been reached!!");
 }
@@ -189,7 +189,7 @@ void isr_thread_yield(void)
 
     sched_run();
     ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
-    DEBUG("isr_thread_yield(): switching to(%s)\n\n", sched_active_thread->name);
+    DEBUG("isr_thread_yield(): switching to(%" PRIkernel_pid ")\n\n", sched_active_pid);
 
     native_interrupts_enabled = 1;
     _native_in_isr = 0;

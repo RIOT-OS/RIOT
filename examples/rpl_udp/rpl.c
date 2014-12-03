@@ -60,7 +60,7 @@ void rpl_udp_init(int argc, char **argv)
                ((command == 'h') ? "non-" : ""),
                (((command == 'n') || (command == 'h')) ? "node" : "root"), id);
 
-#if defined(MODULE_CC110X_LEGACY_CSMA) || defined(MODULE_CC110X_LEGACY)
+#if (defined(MODULE_CC110X) || defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC110X_LEGACY_CSMA))
         if (!id || (id > 255)) {
             printf("ERROR: address not a valid 8 bit integer\n");
             return;

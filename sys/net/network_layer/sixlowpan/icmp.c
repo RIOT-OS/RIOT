@@ -274,7 +274,7 @@ void icmpv6_send_echo_request(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, 
            id, seq, data_len, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                    &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, NULL);
     DEBUG("icmpv6 send echo: after ipv6 send packet --> end\n");
 }
 
@@ -314,7 +314,7 @@ void icmpv6_send_echo_reply(ipv6_addr_t *destaddr, uint16_t id, uint16_t seq, ui
            id, seq, data_len, ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                    &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, NULL);
 }
 
 /* send router solicitation message - RFC4861 section 4.1 */
@@ -373,7 +373,7 @@ void icmpv6_send_router_sol(uint8_t sllao)
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, NULL);
 }
 
 void recv_echo_req(void)
@@ -704,7 +704,7 @@ void icmpv6_send_router_adv(ipv6_addr_t *addr, uint8_t sllao, uint8_t mtu, uint8
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, NULL);
 }
 
 void recv_rtr_adv(void)
@@ -996,7 +996,7 @@ void icmpv6_send_neighbor_sol(ipv6_addr_t *src, ipv6_addr_t *dest, ipv6_addr_t *
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, NULL);
 }
 
 void recv_nbr_sol(void)
@@ -1271,7 +1271,7 @@ void icmpv6_send_neighbor_adv(ipv6_addr_t *src, ipv6_addr_t *dst, ipv6_addr_t *t
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, NULL);
 }
 
 void recv_nbr_adv(void)
@@ -1491,7 +1491,7 @@ void icmpv6_send_parameter_prob(ipv6_addr_t *src, ipv6_addr_t *dest,
            ipv6_addr_to_str(addr_str, IPV6_MAX_ADDR_STR_LEN,
                             &ipv6_buf->destaddr));
 #endif
-    ipv6_send_packet(ipv6_buf);
+    ipv6_send_packet(ipv6_buf, NULL);
 }
 
 //------------------------------------------------------------------------------

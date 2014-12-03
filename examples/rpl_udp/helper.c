@@ -43,7 +43,7 @@ void rpl_udp_set_id(int argc, char **argv)
 {
     if (argc != 2) {
         printf("Usage: %s address\n", argv[0]);
-#if defined(MODULE_CC110X_LEGACY_CSMA) || defined(MODULE_CC110X_LEGACY)
+#if (defined(MODULE_CC110X) || defined(MODULE_CC110X_LEGACY) || defined(MODULE_CC110X_LEGACY_CSMA))
         printf("\taddress must be an 8 bit integer\n");
 #else
         printf("\taddress must be an 16 bit integer\n");

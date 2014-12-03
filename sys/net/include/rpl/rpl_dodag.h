@@ -1,6 +1,4 @@
-/**
- * RPL dodag prototypes
- *
+/*
  * Copyright (C) 2013, 2014  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -9,9 +7,13 @@
  *
  * @ingroup rpl
  * @{
- * @file    rpl_dodag.h
- * @brief   RPL dodag header
- * @author  Eric Engel <eric.engel@fu-berlin.de>
+ *
+ * @file        rpl_dodag.h
+ * @brief       RPL DODAG header
+ *
+ * Header file, which defines all public known DODAG-related functions for RPL.
+ *
+ * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @}
  */
 

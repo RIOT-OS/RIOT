@@ -289,6 +289,7 @@ int gpio_init_in(gpio_t dev, gpio_pp_t pushpull)
         case GPIO_PULLUP:
             port->OUTSET.reg = (1 << (pin));
             port->PINCFG[pin].bit.PULLEN = true;
+            DEBUG("\n\n\nGPIO_PULLUP\n\n\n");
             break;
         case GPIO_NOPULL:
             port->PINCFG[pin].bit.PULLEN = false;
@@ -304,7 +305,8 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     uint32_t pin = 0;
     uint32_t extint = 0;
     int res = 0;
-
+    EIC->CTRL.bit.ENABLE = false;
+    while(EIC->STATUS.bit.SYNCBUSY);
     switch (dev) {
 #if GPIO_0_EN
         case GPIO_0:
@@ -429,6 +431,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     /* configure pin as input */
     res = gpio_init_in(dev, pullup);
     if (res < 0) {
+        DEBUG("\n\n\nGPIO res < 0\n\n\n");
         return res;
     }
 
@@ -466,7 +469,7 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
     gpio_config[extint].arg = arg;
 
     /*Enable pin interrupt */
-    EIC->INTENSET.reg = (1 << (extint));
+    EIC->INTENSET.reg |= (1 << (extint));
     EIC->WAKEUP.reg |= (1 << (extint));
 
     /*Set config */
@@ -487,9 +490,9 @@ int gpio_init_int(gpio_t dev, gpio_pp_t pullup, gpio_flank_t flank, gpio_cb_t cb
                         |= (EIC_CONFIG_SENSE0_BOTH_Val << (config_pos));
             break;
     }
-
     /*Enable external interrupts*/
     EIC->CTRL.bit.ENABLE = true;
+    while(EIC->STATUS.bit.SYNCBUSY);
     return 0;
 }
 

@@ -54,8 +54,8 @@ char addr_str[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"
 
-#define CON_STACKSIZE                   (512+32)
-#define LOWPAN_TRANSFER_BUF_STACKSIZE   (512+32)
+#define CON_STACKSIZE                   (512+16)
+#define LOWPAN_TRANSFER_BUF_STACKSIZE   (512+16)
 
 #define SIXLOWPAN_MAX_REGISTERED        (4)
 

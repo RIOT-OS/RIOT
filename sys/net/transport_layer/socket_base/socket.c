@@ -181,6 +181,9 @@ void socket_base_print_internal_socket(socket_internal_t *current_socket_interna
 
 int socket_base_exists_socket(int socket)
 {
+    if (socket<1) {
+        return false;
+    }
     if (socket_base_sockets[socket - 1].socket_id == 0) {
         return false;
     }

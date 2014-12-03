@@ -1,1 +1,2 @@
-FEATURES_PROVIDED += periph_gpio cpp
+FEATURES_PROVIDED += cpp
+FEATURES_PROVIDED += periph_uart periph_gpio periph_pwm

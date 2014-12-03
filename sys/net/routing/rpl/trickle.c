@@ -1,17 +1,20 @@
 /**
- * Trickle implementation
- *
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
- * @ingroup rpl
+ */
+
+/**
+ * @ingroup     rpl
  * @{
- * @file    trickle.c
- * @brief   Trickle implementation
- * @author  Eric Engel <eric.engel@fu-berlin.de>
+ * @file        trickle.c
+ * @brief       Trickle
+ *
+ * Implementation of Trickle-Algorithm for RPL.
+ *
+ * @author      Eric Engel <eric.engel@fu-berlin.de>
  * @}
  */
 
@@ -140,7 +143,7 @@ static void *trickle_timer_over(void *arg)
 
         /* Handle k=0 like k=infinity (according to RFC6206, section 6.5) */
         if ((c < k) || (k == 0)) {
-            send_DIO(&mcast);
+            rpl_send_DIO(&mcast);
         }
     }
 
@@ -216,13 +219,14 @@ void long_delay_dao(void)
 static void *dao_delay_over(void *arg)
 {
     (void) arg;
+
     while (1) {
         thread_sleep();
         DEBUG("dao_delay_over before sleep \n");
 
         if ((ack_received == false) && (dao_counter < DAO_SEND_RETRIES)) {
             dao_counter++;
-            send_DAO(NULL, 0, true, 0);
+            rpl_send_DAO(NULL, 0, true, 0);
             dao_time = timex_set(DEFAULT_WAIT_FOR_DAO_ACK, 0);
             vtimer_remove(&dao_timer);
             vtimer_set_wakeup(&dao_timer, dao_time, dao_delay_over_pid);
@@ -231,6 +235,7 @@ static void *dao_delay_over(void *arg)
             long_delay_dao();
         }
     }
+
     return NULL;
 }
 
@@ -252,7 +257,7 @@ static void *rt_timer_over(void *arg)
         if (my_dodag != NULL) {
             rt = rpl_get_routing_table();
 
-            for (uint8_t i = 0; i < RPL_MAX_ROUTING_ENTRIES; i++) {
+            for (uint8_t i = 0; i < rpl_max_routing_entries; i++) {
                 if (rt[i].used) {
                     if (rt[i].lifetime <= 1) {
                         memset(&rt[i], 0, sizeof(rt[i]));

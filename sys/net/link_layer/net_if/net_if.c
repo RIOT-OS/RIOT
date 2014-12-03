@@ -348,7 +348,7 @@ int net_if_send_packet(int if_id, uint16_t target, const void *payload,
         response = net_if_transceiver_get_set_handler(if_id, SND_PKT, (void *)&p);
     }
 
-
+    DEBUG("\n\nnet_if_send_packet END\n\n");
     return (response > payload_len) ? (int)payload_len : (int)response;
 }
 

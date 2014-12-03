@@ -7,20 +7,18 @@
  */
 
 /**
- * @defgroup    net_rpl RPL
  * @ingroup     net
  * @brief       Routing Protocol for Low power and Lossy Networks
- *
- * Header which includes all mode related RPL-functions. All functions are mandatory for any
- * RPL-mode. Describes receiving and sending of all RPL-related messages and special initialization behavior.
- *
  * @{
  *
  * @file        rpl_mode.h
  * @brief       RPL storing-mode header
  *
- * @author  Eric Engel <eric.engel@fu-berlin.de>
- * @author  Fabian Brandt <fabianbr@zedat.fu-berlin.de>
+ * Header which includes all mode related RPL-functions. All functions are mandatory for any
+ * RPL-mode. Describes receiving and sending of all RPL-related messages and special initialization behavior.
+ *
+ * @author      Eric Engel <eric.engel@fu-berlin.de>
+ * @author      Fabian Brandt <fabianbr@zedat.fu-berlin.de>
  */
 
 #ifndef __RPL_SM_H
@@ -62,7 +60,19 @@ void rpl_init_mode(ipv6_addr_t *my_ipv6_address);
  * @param[in] destination           IPv6-address of the destination of the DIO. Should be a direct neighbor or multicast address.
  *
  */
-void send_DIO_mode(ipv6_addr_t *destination);
+void rpl_send_DIO_mode(ipv6_addr_t *destination);
+
+/**
+ * @brief Returns whether a node is root or not
+ *
+ * This function initializes all basic RPL mode resources. For this mode this includes only acquiring the own
+ * address.
+ *
+ * @return 1 if node is root
+ * @return 0 if node is not root
+ *
+ */
+uint8_t rpl_is_root_mode(void);
 
 /**
  * @brief Sends a DAO-message to a given destination
@@ -75,7 +85,7 @@ void send_DIO_mode(ipv6_addr_t *destination);
  * @param[in] start_index           Describes whether a DAO must be split because of too many routing entries.
  *
  */
-void send_DAO_mode(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index);
+void rpl_send_DAO_mode(ipv6_addr_t *destination, uint8_t lifetime, bool default_lifetime, uint8_t start_index);
 
 /**
  * @brief Sends a DIS-message to a given destination
@@ -85,7 +95,7 @@ void send_DAO_mode(ipv6_addr_t *destination, uint8_t lifetime, bool default_life
  * @param[in] destination           IPv6-address of the destination of the DIS. Should be a direct neighbor.
  *
  */
-void send_DIS_mode(ipv6_addr_t *destination);
+void rpl_send_DIS_mode(ipv6_addr_t *destination);
 
 /**
  * @brief Sends a DAO acknowledgment-message to a given destination
@@ -95,7 +105,7 @@ void send_DIS_mode(ipv6_addr_t *destination);
  * @param[in] destination           IPv6-address of the destination of the DAO_ACK. Should be a direct neighbor.
  *
  */
-void send_DAO_ACK_mode(ipv6_addr_t *destination);
+void rpl_send_DAO_ACK_mode(ipv6_addr_t *destination);
 
 /**
  * @brief Receives a DIO message
@@ -103,7 +113,7 @@ void send_DAO_ACK_mode(ipv6_addr_t *destination);
  * This function handles receiving a DIO message in any mode .
  *
  */
-void recv_rpl_DIO_mode(void);
+void rpl_recv_DIO_mode(void);
 
 /**
  * @brief Receives a DAO message
@@ -111,7 +121,7 @@ void recv_rpl_DIO_mode(void);
  * This function handles receiving a DAO message in any mode.
  *
  */
-void recv_rpl_DAO_mode(void);
+void rpl_recv_DAO_mode(void);
 
 /**
  * @brief Receives a DIS message
@@ -119,7 +129,7 @@ void recv_rpl_DAO_mode(void);
  * This function handles receiving a DIS message in any mode.
  *
  */
-void recv_rpl_DIS_mode(void);
+void rpl_recv_DIS_mode(void);
 
 /**
  * @brief Receives a DAO acknowledgment message
@@ -127,7 +137,7 @@ void recv_rpl_DIS_mode(void);
  * This function handles receiving a DAO_ACK message in any mode.
  *
  */
-void recv_rpl_dao_ack_mode(void);
+void rpl_recv_dao_ack_mode(void);
 
 /**
  * @brief Sends a RPL message to a given destination

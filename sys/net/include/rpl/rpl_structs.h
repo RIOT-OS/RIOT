@@ -1,16 +1,19 @@
-/**
- * RPL data structs
- *
+/*
  * Copyright (C) 2013  INRIA.
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
- *
+ */
+
+/**
  * @ingroup rpl
  * @{
  * @file    rpl_structs.h
  * @brief   RPL data structs
+ *
+ * File, which defines all structs used by RPL.
+ *
  * @author  Eric Engel <eric.engel@fu-berlin.de>
  * @}
  */
@@ -116,6 +119,7 @@ typedef struct __attribute__((packed)) {
     uint8_t path_control;
     uint8_t path_sequence;
     uint8_t path_lifetime;
+    ipv6_addr_t parent;
 } rpl_opt_transit_t;
 
 struct rpl_dodag_t;
@@ -137,7 +141,6 @@ typedef struct {
     uint8_t id;
     uint8_t used;
     uint8_t joined;
-
 } rpl_instance_t;
 
 //Node-internal representation of a DODAG, with nodespecific information

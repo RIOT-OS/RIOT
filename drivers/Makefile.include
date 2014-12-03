@@ -1,6 +1,9 @@
 ifneq (,$(filter cc2420,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc2420/include
 endif
+ifneq (,$(filter cc110x,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x/include
+endif
 ifneq (,$(filter cc110x_legacy_csma,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/cc110x_legacy_csma/include
 endif
@@ -21,4 +24,7 @@ ifneq (,$(filter lsm303dlhc,$(USEMODULE)))
 endif
 ifneq (,$(filter l3g4200d,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/l3g4200d/include
+endif
+ifneq (,$(filter nrf24l01p,$(USEMODULE)))
+    USEMODULE_INCLUDES += $(RIOTBASE)/drivers/nrf24l01p/include
 endif
