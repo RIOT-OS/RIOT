@@ -22,14 +22,16 @@
 #define UNITTEST_DONE                   (TEST_UINT16)
 #define UNITTESTS_BASIC_MAC_NAME        "unittests_basic_mac"
 #define UNITTESTS_BASIC_MAC_STACKSIZE   (KERNEL_CONF_STACKSIZE_DEFAULT)
+#define UNITTESTS_BASIC_MAC_QSIZE       (4)
 
 static char unittests_basic_mac_stack[UNITTESTS_BASIC_MAC_STACKSIZE];
 static char unittests_basic_mac_rcv_stack[KERNEL_CONF_STACKSIZE_IDLE];
-static msg_t unittests_basic_mac_rcv_queue[4];
+static msg_t unittests_basic_mac_rcv_queue[UNITTESTS_BASIC_MAC_QSIZE];
 
 static netdev_t *dev = &(unittest_netdev_dummy_devs[0]);
-static kernel_pid_t basic_mac_pid, basic_mac_receiver = KERNEL_PID_UNDEF;
-static kernel_pid_t main_pid;
+static kernel_pid_t basic_mac_pid = KERNEL_PID_UNDEF;
+static kernel_pid_t basic_mac_receiver = KERNEL_PID_UNDEF;
+static kernel_pid_t main_pid = KERNEL_PID_UNDEF;
 
 static char received_data[UNITTESTS_NETDEV_DUMMY_MAX_PACKET];
 static char received_src[UNITTESTS_NETDEV_DUMMY_MAX_LONG_ADDR_LEN];
@@ -81,7 +83,7 @@ static void *test_basic_mac_receive_thread(void *args)
 
     (void)args;
 
-    msg_init_queue(unittests_basic_mac_rcv_queue, 4);
+    msg_init_queue(unittests_basic_mac_rcv_queue, UNITTESTS_BASIC_MAC_QSIZE);
 
     msg_ack.type = NETAPI_MSG_TYPE;
     done.type = UNITTEST_DONE;
@@ -89,7 +91,7 @@ static void *test_basic_mac_receive_thread(void *args)
     msg_receive(&msg_rcv);
 
     if (msg_rcv.type != NETAPI_MSG_TYPE) {
-        msg_ack.type = 0;   /* Send random reply, API handles this case */
+        msg_ack.type = 0;   /* Send arbitrary reply, API handles this case */
         msg_reply(&msg_rcv, &msg_ack);
         msg_send(&done, main_pid);
         return NULL;
@@ -118,8 +120,10 @@ static void set_up_with_thread(void)
     set_up();
     main_pid = thread_getpid();
     basic_mac_receiver = thread_create(unittests_basic_mac_rcv_stack,
-                                       KERNEL_CONF_STACKSIZE_IDLE, PRIORITY_MAIN - 3, 0,
-                                       test_basic_mac_receive_thread, NULL, "basic_mac_rcv");
+                                       sizeof(unittests_basic_mac_stack),
+                                       PRIORITY_MAIN - 3, 0,
+                                       test_basic_mac_receive_thread, NULL,
+                                       "basic_mac_rcv");
 }
 
 static void tear_down(void)
