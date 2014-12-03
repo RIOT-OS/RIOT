@@ -91,7 +91,7 @@ ccnl_run_events(void)
     return NULL;
 }
 
-// ----------------------------------------------------------------------
+/* ---------------------------------------------------------------------- */
 
 int ccnl_open_riotmsgdev(void)
 {
@@ -111,7 +111,7 @@ void ccnl_ll_TX(struct ccnl_relay_s *ccnl, struct ccnl_if_s *ifc,
     ifc->sendfunc(buf->data, (uint16_t) buf->datalen, (uint16_t) dest->id);
 }
 
-// ----------------------------------------------------------------------
+/* ---------------------------------------------------------------------- */
 
 void ccnl_ageing(void *relay, void *aux)
 {
@@ -134,7 +134,7 @@ void ccnl_nonce_timeout(void *relay, void *aux)
                    CCNL_NONCE_TIMEOUT_USEC), ccnl_nonce_timeout, relay, 0);
 }
 
-// ----------------------------------------------------------------------
+/* ---------------------------------------------------------------------- */
 
 void ccnl_relay_config(struct ccnl_relay_s *relay, int max_cache_entries,
                        int fib_threshold_prefix, int fib_threshold_aggregate)
@@ -248,7 +248,7 @@ void ccnl_populate_cache(struct ccnl_relay_s *ccnl, unsigned char *buf, int data
 
         c->flags |= CCNL_CONTENT_FLAGS_STATIC;
         if (!ccnl_content_add2cache(ccnl, c)) {
-            // content store error
+            /* content store error */
             free_content(c);
         }
 
@@ -296,7 +296,7 @@ void handle_populate_cache(struct ccnl_relay_s *ccnl)
 
 #endif
 
-// ----------------------------------------------------------------------
+/* ---------------------------------------------------------------------- */
 
 int ccnl_io_loop(struct ccnl_relay_s *ccnl)
 {
@@ -482,5 +482,3 @@ void *ccnl_riot_relay_helper_start(void *arg)
     mutex_unlock(&theRelay->stop_lock);
     return NULL;
 }
-
-// eof
