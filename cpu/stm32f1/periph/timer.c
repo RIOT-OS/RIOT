@@ -352,7 +352,7 @@ void TIMER_0_ISR_0(void)
 #if TIMER_1_EN
 void TIMER_1_ISR_0(void)
 {
-    irq_handler(TIMER_0, TIMER_1_DEV_0, TIMER_1_DEV_1);
+    irq_handler(TIMER_1, TIMER_1_DEV_0, TIMER_1_DEV_1);
 }
 #endif
 
