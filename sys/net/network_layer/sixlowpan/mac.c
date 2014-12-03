@@ -37,9 +37,6 @@
 #include "net_help.h"
 
 #define ENABLE_DEBUG    (0)
-#if ENABLE_DEBUG
-#define DEBUG_ENABLED
-#endif
 #include "debug.h"
 
 #define RADIO_STACK_SIZE            (KERNEL_CONF_STACKSIZE_MAIN)
@@ -98,7 +95,7 @@ static void *recv_ieee802154_frame(void *arg)
             length = p->length - hdrlen - IEEE_802154_FCS_LEN;
 #endif
 
-#ifdef DEBUG_ENABLED
+#if ENABLE_DEBUG
             DEBUG("INFO: Received IEEE 802.15.4. packet (length = %d):\n", length);
             DEBUG("INFO: FCF:\n");
             ieee802154_frame_print_fcf_frame(&frame);
@@ -182,7 +179,7 @@ void set_ieee802154_fcf_values(ieee802154_frame_t *frame, uint8_t dest_mode,
     frame->fcf.frame_ver = 0;
     frame->fcf.src_addr_m = src_mode;
     frame->fcf.dest_addr_m = dest_mode;
-#ifdef DEBUG_ENABLED
+#if ENABLE_DEBUG
     ieee802154_frame_print_fcf_frame(frame);
 #endif
 }

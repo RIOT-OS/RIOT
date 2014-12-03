@@ -27,7 +27,6 @@
 
 #define ENABLE_DEBUG    (0)
 #if ENABLE_DEBUG
-#define DEBUG_ENABLED
 char addr_str_mode[IPV6_MAX_ADDR_STR_LEN];
 #endif
 #include "debug.h"

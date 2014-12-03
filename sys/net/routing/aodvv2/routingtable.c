@@ -30,7 +30,7 @@ static void _reset_entry_if_stale(uint8_t i);
 static struct aodvv2_routing_entry_t routing_table[AODVV2_MAX_ROUTING_ENTRIES];
 static timex_t null_time, max_seqnum_lifetime, active_interval, max_idletime, validity_t;
 timex_t now;
-#ifdef DEBUG_ENABLED
+#if ENABLE_DEBUG
 static struct netaddr_str nbuf;
 #endif
 
@@ -79,7 +79,7 @@ struct aodvv2_routing_entry_t *routingtable_get_entry(struct netaddr *addr,
         if (!netaddr_cmp(&routing_table[i].addr, addr)
             && routing_table[i].metricType == metricType) {
             DEBUG("[routing] found entry for %s :", netaddr_to_string(&nbuf, addr));
-#ifdef DEBUG_ENABLED
+#if ENABLE_DEBUG
             print_routingtable_entry(&routing_table[i]);
 #endif
             return &routing_table[i];
