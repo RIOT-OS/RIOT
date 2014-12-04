@@ -20,9 +20,6 @@
 #endif
 
 #define ENABLE_DEBUG    (0)
-#if ENABLE_DEBUG
-#define DEBUG_ENABLED
-#endif
 #include "debug.h"
 
 #define BASIC_MAC_MSG_QUEUE_SIZE    (16)
@@ -84,7 +81,6 @@ static int _basic_mac_recv_cb(netdev_t *dev, void *src, size_t src_len,
                 else {
                     DEBUG("Unexpected msg instead of ACK. Abort for registrar "
                           "\"%s\" with recipient \"%s\": msg.type = %d, "
-
                           "ack->type = %d, ack->orig = %d",
                           thread_getname(_basic_mac_registry[i].registrar_pid),
                           thread_getname(_basic_mac_registry[i].recipient_pid),
