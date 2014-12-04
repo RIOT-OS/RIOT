@@ -261,7 +261,7 @@ void native_irq_handler(void)
             native_irq_handlers[sig]();
         }
         else if (sig == SIGUSR1) {
-            DEBUG("ignoring SIGUSR1\n");
+            warnx("ignoring SIGUSR1");
         }
         else {
             errx(EXIT_FAILURE, "XXX: no handler for signal %i\nXXX: this should not have happened!\n", sig);
