@@ -36,7 +36,7 @@ static void _reset_entry_if_stale(uint8_t i);
 static struct netaddr client_table[AODVV2_MAX_CLIENTS];
 static struct aodvv2_rreq_entry rreq_table[AODVV2_RREQ_BUF];
 
-#ifdef DEBUG_ENABLED
+#if ENABLE_DEBUG
 static struct netaddr_str nbuf;
 #endif
 static timex_t null_time, now, _max_idletime;
