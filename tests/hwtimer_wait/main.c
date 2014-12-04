@@ -39,7 +39,9 @@ int main(void)
         for (unsigned long i = start_duration; i > HWTIMER_SPIN_BARRIER; i = i >> 1) {
             hwtimer_wait(i);
         }
+        printf(".");
     }
+    puts("");
     puts("success");
 
     return 0;
