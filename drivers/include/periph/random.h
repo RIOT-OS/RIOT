@@ -9,18 +9,19 @@
 /**
  * @defgroup    driver_periph_random Random
  * @ingroup     driver_periph
- * @{
+ * @brief       Low-level (pseudo) random number generator driver
  *
- * @file
- * @brief       (Pseudo) random number generator low-level driver interface
- *
- * NOTE: The quality of the random data read from this interface is highly
+ * The quality of the random data read from this interface is highly
  * dependent on hardware dependent implementation. Most platforms utilize a
  * hardware (Pseudo) Random Number Generator. The quality of the generated
  * random data can be however very different.
  *
  * @note REFER TO YOUR PLATFORMS IMPLEMENTATION ABOUT INFORMATION ABOUT THE
  *       QUALITY OF RANDOMNES!
+ *
+ * @{
+ * @file
+ * @brief       Low-level random peripheral driver interface definitions
  *
  * @author      Christian Mehlis <mehlis@inf.fu-berlin.de>
  */
