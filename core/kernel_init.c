@@ -31,6 +31,7 @@
 #include "lpm.h"
 #include "thread.h"
 #include "hwtimer.h"
+#include "irq.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -80,7 +81,7 @@ static char idle_stack[KERNEL_CONF_STACKSIZE_IDLE];
 
 void kernel_init(void)
 {
-    dINT();
+    (void) disableIRQ();
     printf("kernel_init(): This is RIOT! (Version: %s)\n", RIOT_VERSION);
 
     hwtimer_init();
